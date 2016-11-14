@@ -18,7 +18,7 @@
 #include "options.h"
 #include "parse.h"
 #include "ptag.h"
-#include "output.h"
+#include "writer.h"
 #include <string.h>
 
 

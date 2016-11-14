@@ -13,7 +13,7 @@
 #include "fmt.h"
 #include "mio.h"
 #include "options.h"
-#include "output.h"
+#include "writer.h"
 
 
 static int writeXrefEntry  (MIO * mio, const tagEntryInfo *const tag, void *data CTAGS_ATTR_UNUSED);

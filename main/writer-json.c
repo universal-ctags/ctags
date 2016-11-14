@@ -12,9 +12,9 @@
 #include "entry.h"
 #include "mio.h"
 #include "options.h"
-#include "output.h"
 #include "read.h"
 #include "ptag.h"
+#include "writer.h"
 
 #ifdef HAVE_JANSSON
 #include <jansson.h>
@@ -42,7 +42,7 @@ tagWriter jsonWriter = {
 
 static json_t* escapeFieldValue (const tagEntryInfo * tag, fieldType ftype)
 {
-	const char *str = renderFieldEscaped (ftype, tag, NO_PARSER_FIELD);
+	const char *str = renderFieldEscaped (jsonWriter.type, ftype, tag, NO_PARSER_FIELD);
 	if (str)
 		return json_string (str);
 	else
@@ -180,6 +180,14 @@ extern bool ptagMakeJsonOutputVersion (ptagDesc *desc, void *data CTAGS_ATTR_UNU
 }
 
 #else /* HAVE_JANSSON */
+
+tagWriter jsonWriter = {
+	.writeEntry = NULL,
+	.writePtagEntry = NULL,
+	.preWriteEntry = NULL,
+	.postWriteEntry = NULL,
+	.useStdoutByDefault = true,
+};
 
 extern bool ptagMakeJsonOutputVersion (ptagDesc *desc, void *data CTAGS_ATTR_UNUSED)
 {

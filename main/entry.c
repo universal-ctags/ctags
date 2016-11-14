@@ -43,12 +43,12 @@
 #include "kind.h"
 #include "main.h"
 #include "options.h"
-#include "output.h"
 #include "ptag.h"
 #include "read.h"
 #include "routines.h"
 #include "sort.h"
 #include "strlist.h"
+#include "writer.h"
 #include "xtag.h"
 
 /*
@@ -1040,37 +1040,21 @@ static unsigned int queueTagEntry(const tagEntryInfo *const tag)
 }
 
 
-static void *writerData;
-static tagWriter *writer;
-
-extern void setTagWriter (tagWriter *t)
+static void buildFqTagCache (const tagEntryInfo *const tag)
 {
-	writer = t;
-}
-
-extern bool outpuFormatUsedStdoutByDefault (void)
-{
-	return writer->useStdoutByDefault;
+	/* TODO: WRITER_DEFAULT should not be used here.*/
+	renderFieldEscaped (WRITER_DEFAULT, FIELD_SCOPE_KIND_LONG, tag, NO_PARSER_FIELD);
+	renderFieldEscaped (WRITER_DEFAULT, FIELD_SCOPE, tag, NO_PARSER_FIELD);
 }
 
 extern void setupWriter (void)
 {
-	if (writer->preWriteEntry)
-		writerData = writer->preWriteEntry (TagFile.mio);
-	else
-		writerData = NULL;
+	writerSetup (TagFile.mio);
 }
 
 extern void teardownWriter (const char *filename)
 {
-	if (writer->postWriteEntry)
-		writer->postWriteEntry (TagFile.mio, filename, writerData);
-}
-
-static void buildFqTagCache (const tagEntryInfo *const tag)
-{
-	renderFieldEscaped (FIELD_SCOPE_KIND_LONG, tag, NO_PARSER_FIELD);
-	renderFieldEscaped (FIELD_SCOPE, tag, NO_PARSER_FIELD);
+	writerTeardown (TagFile.mio, filename);
 }
 
 static void writeTagEntry (const tagEntryInfo *const tag)
@@ -1086,14 +1070,13 @@ static void writeTagEntry (const tagEntryInfo *const tag)
 		return;
 
 	DebugStatement ( debugEntry (tag); )
-	Assert (writer);
 
 	if (includeExtensionFlags ()
 	    && isXtagEnabled (XTAG_QUALIFIED_TAGS)
 	    && doesInputLanguageRequestAutomaticFQTag ())
 		buildFqTagCache (tag);
 
-	length = writer->writeEntry (TagFile.mio, tag, writerData);
+	length = writerWriteTag (TagFile.mio, tag);
 
 	++TagFile.numTags.added;
 	rememberMaxLengths (strlen (tag->name), (size_t) length);
@@ -1109,11 +1092,11 @@ extern bool writePseudoTag (const ptagDesc *desc,
 {
 	int length;
 
-	if (writer->writePtagEntry == NULL)
+	length = writerWritePtag (TagFile.mio, desc, fileName,
+							  pattern, parserName);
+	if (length < 0)
 		return false;
 
-	length = writer->writePtagEntry (TagFile.mio, desc, fileName,
-									 pattern, parserName, writerData);
 	abort_if_ferror (TagFile.mio);
 
 	++TagFile.numTags.added;

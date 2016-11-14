@@ -71,9 +71,9 @@
 #include "keyword.h"
 #include "main.h"
 #include "options.h"
-#include "output.h"
 #include "read.h"
 #include "routines.h"
+#include "writer.h"
 
 /*
 *   MACROS
@@ -109,7 +109,7 @@ extern bool isDestinationStdout (void)
 {
 	bool toStdout = false;
 
-	if (outpuFormatUsedStdoutByDefault() ||  Option.filter  ||
+	if (outputFormatUsedStdoutByDefault() ||  Option.filter  ||
 		(Option.tagFileName != NULL  &&  (strcmp (Option.tagFileName, "-") == 0
 						  || strcmp (Option.tagFileName, "/dev/stdout") == 0
 		)))
@@ -547,7 +547,7 @@ extern int main (int argc CTAGS_ATTR_UNUSED, char **argv)
 
 	setErrorPrinter (stderrDefaultErrorPrinter, NULL);
 	setMainLoop (batchMakeTags, NULL);
-	setTagWriter (&ctagsWriter);
+	setTagWriter (WRITER_CTAGS);
 
 	setCurrentDirectory ();
 	setExecutableName (*argv++);

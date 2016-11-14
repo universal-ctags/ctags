@@ -15,9 +15,9 @@
 #include "entry.h"
 #include "mio.h"
 #include "options.h"
-#include "output.h"
 #include "read.h"
 #include "vstring.h"
+#include "writer.h"
 
 
 static int writeEtagsEntry (MIO * mio, const tagEntryInfo *const tag, void *data);

@@ -264,16 +264,19 @@
     <ClCompile Include="..\main\options.c">
       <Filter>Source Files\Main</Filter>
     </ClCompile>
-    <ClCompile Include="..\main\output-ctags.c">
+    <ClCompile Include="..\main\writer.c">
       <Filter>Source Files\Main</Filter>
     </ClCompile>
-    <ClCompile Include="..\main\output-etags.c">
+    <ClCompile Include="..\main\writer-ctags.c">
       <Filter>Source Files\Main</Filter>
     </ClCompile>
-    <ClCompile Include="..\main\output-xref.c">
+    <ClCompile Include="..\main\writer-etags.c">
       <Filter>Source Files\Main</Filter>
     </ClCompile>
-    <ClCompile Include="..\main\output-json.c">
+    <ClCompile Include="..\main\writer-xref.c">
+      <Filter>Source Files\Main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\main\writer-json.c">
       <Filter>Source Files\Main</Filter>
     </ClCompile>
     <ClCompile Include="..\main\param.c">
@@ -434,7 +437,7 @@
     <ClInclude Include="..\main\options.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\main\output.h">
+    <ClInclude Include="..\main\writer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\main\param.h">

@@ -88,85 +88,85 @@ static fieldSpec fieldSpecsFixed [] = {
         /* FIXED FIELDS */
 	DEFINE_FIELD_SPEC ('N', "name",     true,
 			  "tag name (fixed field)",
-			  renderFieldName),
+			  {[WRITER_CTAGS] = renderFieldName}),
 	DEFINE_FIELD_SPEC ('F', "input",    true,
 			   "input file (fixed field)",
-			   renderFieldInput),
+			   {[WRITER_CTAGS] = renderFieldInput}),
 	DEFINE_FIELD_SPEC ('P', "pattern",  true,
 			   "pattern (fixed field)",
-			   renderFieldPattern),
+			   {[WRITER_CTAGS] = renderFieldPattern}),
 };
 
 static fieldSpec fieldSpecsExuberant [] = {
 	DEFINE_FIELD_SPEC ('C', "compact",        false,
 			   "compact input line (fixed field, only used in -x option)",
-			   renderFieldCompactInputLine),
+			   {[WRITER_CTAGS] = renderFieldCompactInputLine}),
 
 	/* EXTENSION FIELDS */
 	DEFINE_FIELD_SPEC_FULL ('a', "access",         false,
 		      "Access (or export) of class members",
-		      renderFieldAccess, isAccessFieldAvailable),
+		      {[WRITER_CTAGS] = renderFieldAccess}, isAccessFieldAvailable),
 	DEFINE_FIELD_SPEC_FULL ('f', "file",           true,
 		      "File-restricted scoping",
-		      renderFieldFile, isFileFieldAvailable),
+		      {[WRITER_CTAGS] = renderFieldFile}, isFileFieldAvailable),
 	DEFINE_FIELD_SPEC_FULL ('i', "inherits",       false,
 		      "Inheritance information",
-		      renderFieldInherits, isInheritsFieldAvailable),
+		      {[WRITER_CTAGS] = renderFieldInherits}, isInheritsFieldAvailable),
 	DEFINE_FIELD_SPEC ('K', NULL,             false,
 		      "Kind of tag as full name",
-		      renderFieldKindName),
+		      {[WRITER_CTAGS] = renderFieldKindName}),
 	DEFINE_FIELD_SPEC ('k', NULL,             true,
 			   "Kind of tag as a single letter",
-			   renderFieldKindLetter),
+			   {[WRITER_CTAGS] = renderFieldKindLetter}),
 	DEFINE_FIELD_SPEC_FULL ('l', "language",       false,
 			   "Language of input file containing tag",
-			   renderFieldLanguage, isLanguageFieldAvailable),
+			   {[WRITER_CTAGS] = renderFieldLanguage}, isLanguageFieldAvailable),
 	DEFINE_FIELD_SPEC_FULL ('m', "implementation", false,
 			   "Implementation information",
-			   renderFieldImplementation, isImplementationFieldAvailable),
+			   {[WRITER_CTAGS] = renderFieldImplementation}, isImplementationFieldAvailable),
 	DEFINE_FIELD_SPEC ('n', "line",           false,
 			   "Line number of tag definition",
-			   renderFieldLineNumber),
+			   {[WRITER_CTAGS] = renderFieldLineNumber}),
 	DEFINE_FIELD_SPEC_FULL ('S', "signature",	     false,
 			   "Signature of routine (e.g. prototype or parameter list)",
-			   renderFieldSignature, isSignatureFieldAvailable),
+			   {[WRITER_CTAGS] = renderFieldSignature}, isSignatureFieldAvailable),
 	DEFINE_FIELD_SPEC ('s', NULL,             true,
 			   "Scope of tag definition (`p' can be used for printing its kind)",
-			   renderFieldScope),
+			   {[WRITER_CTAGS] = renderFieldScope}),
 	DEFINE_FIELD_SPEC_FULL ('t', "typeref",        true,
 			   "Type and name of a variable or typedef",
-			   renderFieldTyperef, isTyperefFieldAvailable),
+			   {[WRITER_CTAGS] = renderFieldTyperef}, isTyperefFieldAvailable),
 	DEFINE_FIELD_SPEC ('z', "kind",           false,
 			   "Include the \"kind:\" key in kind field (use k or K) in tags output, kind full name in xref output",
 			   /* Following renderer is for handling --_xformat=%{kind};
 			      and is not for tags output. */
-			   renderFieldKindName),
+			   {[WRITER_CTAGS] = renderFieldKindName}),
 };
 
 static fieldSpec fieldSpecsUniversal [] = {
 	DEFINE_FIELD_SPEC_FULL ('r', "role",    false,
 			   "Role",
-			   renderFieldRole, isRoleFieldAvailable),
+			   {[WRITER_CTAGS] = renderFieldRole}, isRoleFieldAvailable),
 	DEFINE_FIELD_SPEC ('R',  NULL,     false,
 			   "Marker (R or D) representing whether tag is definition or reference",
-			   renderFieldRefMarker),
+			   {[WRITER_CTAGS] = renderFieldRefMarker}),
 	DEFINE_FIELD_SPEC ('Z', "scope",   false,
 			  "Include the \"scope:\" key in scope field (use s) in tags output, scope name in xref output",
 			   /* Following renderer is for handling --_xformat=%{scope};
 			      and is not for tags output. */
-			   renderFieldScope),
+			   {[WRITER_CTAGS] = renderFieldScope}),
 	DEFINE_FIELD_SPEC_FULL ('E', "extra",   false,
 			   "Extra tag type information",
-			   renderFieldExtra, isExtraFieldAvailable),
+			   {[WRITER_CTAGS] = renderFieldExtra}, isExtraFieldAvailable),
 	DEFINE_FIELD_SPEC_FULL ('x', "xpath",   false,
 			   "xpath for the tag",
-			   renderFieldXpath, isXpathFieldAvailable),
+			   {[WRITER_CTAGS] = renderFieldXpath}, isXpathFieldAvailable),
 	DEFINE_FIELD_SPEC ('p', "scopeKind", false,
 			   "Kind of scope as full name",
-			   renderFieldScopeKindName),
+			   {[WRITER_CTAGS] = renderFieldScopeKindName}),
 	DEFINE_FIELD_SPEC_FULL ('e', "end", false,
 			   "end lines of various items",
-			   renderFieldEnd, isEndFieldAvailable),
+			   {[WRITER_CTAGS] = renderFieldEnd}, isEndFieldAvailable),
 };
 
 
@@ -461,12 +461,14 @@ static const char *renderFieldTyperef (const tagEntryInfo *const tag, const char
 }
 
 
-extern const char* renderFieldEscaped (fieldType type,
+extern const char* renderFieldEscaped (writerType writer,
+				      fieldType type,
 				       const tagEntryInfo *tag,
 				       int index)
 {
 	fieldDesc *fdesc = fieldDescs + type;
 	const char *value;
+	renderEscaped rfn;
 
 	Assert (tag);
 	Assert (fdesc->spec->renderEscaped);
@@ -481,7 +483,10 @@ extern const char* renderFieldEscaped (fieldType type,
 	else
 		value = NULL;
 
-	return fdesc->spec->renderEscaped (tag, value, fdesc->buffer);
+	rfn = fdesc->spec->renderEscaped [writer];
+	if (rfn == NULL)
+		rfn = fdesc->spec->renderEscaped [WRITER_DEFAULT];
+	return rfn (tag, value, fdesc->buffer);
 }
 
 /*  Writes "line", stripping leading and duplicate white space.
@@ -899,8 +904,8 @@ extern int defineField (fieldSpec *spec, langType language)
 	fdesc = fieldDescs + (fieldDescUsed);
 	spec->ftype = fieldDescUsed++;
 
-	if (spec->renderEscaped == NULL)
-		spec->renderEscaped = defaultRenderer;
+	if (spec->renderEscaped [WRITER_DEFAULT] == NULL)
+		spec->renderEscaped [WRITER_DEFAULT] = defaultRenderer;
 
 	fdesc->spec = spec;
 

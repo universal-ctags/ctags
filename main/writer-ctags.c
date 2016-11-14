@@ -12,9 +12,9 @@
 #include "entry.h"
 #include "mio.h"
 #include "options.h"
-#include "output.h"
 #include "read.h"
 #include "ptag.h"
+#include "writer.h"
 
 
 static int writeCtagsEntry (MIO * mio, const tagEntryInfo *const tag, void *data CTAGS_ATTR_UNUSED);
@@ -33,7 +33,7 @@ tagWriter ctagsWriter = {
 
 static const char* escapeFieldValue (const tagEntryInfo * tag, fieldType ftype)
 {
-	return renderFieldEscaped (ftype, tag, NO_PARSER_FIELD);
+	return renderFieldEscaped (ctagsWriter.type, ftype, tag, NO_PARSER_FIELD);
 }
 
 static int renderExtensionFieldMaybe (int xftype, const tagEntryInfo *const tag, char sep[2], MIO *mio)
@@ -64,8 +64,9 @@ static int addParserFields (MIO * mio, const tagEntryInfo *const tag)
 			continue;
 
 		length += mio_printf(mio, "\t%s:%s",
-				     getFieldName (ftype),
-				     renderFieldEscaped (tag->parserFields [i].ftype, tag, i));
+							 getFieldName (ftype),
+							 renderFieldEscaped (ctagsWriter.type,
+												 tag->parserFields [i].ftype, tag, i));
 	}
 	return length;
 }

@@ -13,6 +13,7 @@
 #define CTAGS_MAIN_FIELD_H
 
 #include "general.h"
+#include "writer.h"
 #include "types.h"
 
 #include "vstring.h"
@@ -66,7 +67,7 @@ typedef struct sFieldSpec {
 	const char* name;
 	const char* description;
 	bool enabled;
-	renderEscaped renderEscaped;
+	renderEscaped renderEscaped [WRITER_COUNT];
 	isValueAvailable isValueAvailable;
 
 	unsigned int ftype;	/* Given from the main part */
@@ -98,7 +99,7 @@ extern void printFields (int language);
 extern bool isFieldRenderable (fieldType type);
 
 extern bool doesFieldHaveValue (fieldType type, const tagEntryInfo *tag);
-extern const char* renderFieldEscaped (fieldType type, const tagEntryInfo *tag, int index);
+extern const char* renderFieldEscaped (writerType writer, fieldType type, const tagEntryInfo *tag, int index);
 
 extern void initFieldDescs (void);
 extern int countFields (void);

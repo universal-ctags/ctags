@@ -261,8 +261,10 @@ Output tag stream
 
 Ctags provides `makeTagEntry` to parsers as an entry point for writing
 tag informations to MIO. `makeTagEntry` calls `writeTagEntry` if the
-parser does not set `useCork` field. `writeTagEntry` calls one of
-three functions, `writeTagsEntry`, `writeXrefEntry` or `writeCtagsEntry`.
+parser does not set `useCork` field. `writeTagEntry` calls `writerWriteTag`.
+`writerWriteTag` just calls `writeEntry` of writer backends.
+`writerTable` variable holds the four backends: ctagsWriter, etagsWriter,
+xrefWriter, and jsonWriter.
 One of them is chosen depending on the arguments passed to ctags.
 
 If `useCork` is set, the tag information goes to a queue on memory.

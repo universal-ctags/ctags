@@ -150,12 +150,13 @@
     <ClCompile Include="..\parsers\objc.c" />
     <ClCompile Include="..\parsers\ocaml.c" />
     <ClCompile Include="..\main\options.c" />
-    <ClCompile Include="..\main\output-ctags.c" />
-    <ClCompile Include="..\main\output-etags.c" />
-    <ClCompile Include="..\main\output-xref.c" />
-    <ClCompile Include="..\main\output-json.c" />
     <ClCompile Include="..\main\param.c" />
     <ClCompile Include="..\main\parse.c" />
+    <ClCompile Include="..\main\writer.c" />
+    <ClCompile Include="..\main\writer-ctags.c" />
+    <ClCompile Include="..\main\writer-etags.c" />
+    <ClCompile Include="..\main\writer-xref.c" />
+    <ClCompile Include="..\main\writer-json.c" />
     <ClCompile Include="..\parsers\pascal.c" />
     <ClCompile Include="..\parsers\perl.c" />
     <ClCompile Include="..\parsers\perl6.c" />
@@ -241,7 +242,6 @@
     <ClInclude Include="..\main\main.h" />
     <ClInclude Include="..\main\nestlevel.h" />
     <ClInclude Include="..\main\options.h" />
-    <ClInclude Include="..\main\output.h" />
     <ClInclude Include="..\main\param.h" />
     <ClInclude Include="..\main\parse.h" />
     <ClInclude Include="..\main\parsers.h" />
@@ -250,9 +250,10 @@
     <ClInclude Include="..\main\routines.h" />
     <ClInclude Include="..\main\selectors.h" />
     <ClInclude Include="..\main\sort.h" />
+    <ClInclude Include="..\main\types.h" />
     <ClInclude Include="..\main\strlist.h" />
     <ClInclude Include="..\main\vstring.h" />
-    <ClInclude Include="..\main\types.h" />
+    <ClInclude Include="..\main\writer.h" />
     <ClInclude Include="..\main\xtag.h" />
     <ClInclude Include="..\main\mio.h" />
     <ClInclude Include="..\parsers\cxx\cxx_debug.h" />
