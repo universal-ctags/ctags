@@ -30,26 +30,26 @@ Install
 
 ### Case 1: Unix and Cygwin platform
 
-   1. ./configure
-   2. make
-   3. make install
+   1. `./configure`
+   2. `make`
+   3. `make install`
 
    * test
 
-     make atest
-     make pytest
-     make -C sample test
+        make atest
+        make pytest
+        make -C sample test
 
    * uninstall
 
-     make uninstall
+        make uninstall
 
    * configuration check
 
-     onigmo-config --cflags
-     onigmo-config --libs
-     onigmo-config --prefix
-     onigmo-config --exec-prefix
+        onigmo-config --cflags
+        onigmo-config --libs
+        onigmo-config --prefix
+        onigmo-config --exec-prefix
 
 
 ### Case 2: Windows 64/32bit platform (Visual C++)
@@ -79,10 +79,10 @@ Install
       Execute `mingw32-make -f win32/Makefile.mingw test`.
       Python (with the same bitness of Onigmo) is needed to run the tests.
 
-   If you use MinGW on MSYS2, you can also use `./configure` and `make`
-   like Unix. In this case, DLL name will have API version number. E.g.:
+   * If you use MinGW on MSYS2, you can also use `./configure` and `make`
+     like Unix. In this case, DLL name will have API version number. E.g.:
 
-      libonigmo-6.dll
+        libonigmo-6.dll
 
 
 Regular Expressions
