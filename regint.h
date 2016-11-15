@@ -35,6 +35,7 @@
 /* #define ONIG_DEBUG_COMPILE */
 /* #define ONIG_DEBUG_SEARCH */
 /* #define ONIG_DEBUG_MATCH */
+/* #define ONIG_DEBUG_MEMLEAK */
 /* #define ONIG_DONT_OPTIMIZE */
 
 /* for byte-code statistical data. */
@@ -42,7 +43,7 @@
 
 #if defined(ONIG_DEBUG_PARSE_TREE) || defined(ONIG_DEBUG_MATCH) || \
     defined(ONIG_DEBUG_SEARCH) || defined(ONIG_DEBUG_COMPILE) || \
-    defined(ONIG_DEBUG_STATISTICS)
+    defined(ONIG_DEBUG_STATISTICS) || defined(ONIG_DEBUG_MEMLEAK)
 # ifndef ONIG_DEBUG
 #  define ONIG_DEBUG
 # endif
@@ -203,6 +204,11 @@
 # define xvsnprintf  vsnprintf
 #endif
 
+#if defined(ONIG_DEBUG_MEMLEAK) && defined(_MSC_VER)
+# define _CRTDBG_MAP_ALLOC
+# include <malloc.h>
+# include <crtdbg.h>
+#endif
 
 #include <stdlib.h>
 

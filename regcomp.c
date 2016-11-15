@@ -5970,6 +5970,10 @@ onig_init(void)
 
   onig_inited = 1;
 
+#if defined(ONIG_DEBUG_MEMLEAK) && defined(_MSC_VER)
+  _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+#endif
+
   onigenc_init();
   /* onigenc_set_default_caseconv_table((UChar* )0); */
 
@@ -6019,6 +6023,10 @@ onig_end(void)
 
 #ifdef ONIG_DEBUG_STATISTICS
   onig_print_statistics(stderr);
+#endif
+
+#if defined(ONIG_DEBUG_MEMLEAK) && defined(_MSC_VER)
+  _CrtDumpMemoryLeaks();
 #endif
 
   onig_inited = 0;
