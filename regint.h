@@ -199,9 +199,11 @@
 #if defined(_WIN32) && !defined(__GNUC__)
 # define xalloca     _alloca
 # define xvsnprintf  _vsnprintf
+# define xsnprintf   sprintf_s
 #else
 # define xalloca     alloca
 # define xvsnprintf  vsnprintf
+# define xsnprintf   snprintf
 #endif
 
 #if defined(ONIG_DEBUG_MEMLEAK) && defined(_MSC_VER)

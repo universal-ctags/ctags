@@ -183,12 +183,12 @@ onig_error_code_to_format(OnigPosition code)
 
 static void sprint_byte(char* s, unsigned int v)
 {
-  sprintf(s, "%02x", (v & 0377));
+  xsnprintf(s, 3, "%02x", (v & 0377));
 }
 
 static void sprint_byte_with_x(char* s, unsigned int v)
 {
-  sprintf(s, "\\x%02x", (v & 0377));
+  xsnprintf(s, 5, "\\x%02x", (v & 0377));
 }
 
 static int to_ascii(OnigEncoding enc, UChar *s, UChar *end,
