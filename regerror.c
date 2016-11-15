@@ -322,7 +322,7 @@ onig_vsnprintf_with_pattern(UChar buf[], int bufsize, OnigEncoding enc,
   need = (pat_end - pat) * 4 + 4;
 
   if (n + need < (size_t )bufsize) {
-    strcat((char* )buf, ": /");
+    xstrcat((char* )buf, ": /", bufsize);
     s = buf + onigenc_str_bytelen_null(ONIG_ENCODING_ASCII, buf);
 
     p = pat;

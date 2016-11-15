@@ -198,12 +198,14 @@
 
 #if defined(_WIN32) && !defined(__GNUC__)
 # define xalloca     _alloca
-# define xvsnprintf  _vsnprintf
+# define xvsnprintf(buf,size,fmt,args)  _vsnprintf_s(buf,size,_TRUNCATE,fmt,args)
 # define xsnprintf   sprintf_s
+# define xstrcat(dest,src,size)   strcat_s(dest,size,src)
 #else
 # define xalloca     alloca
 # define xvsnprintf  vsnprintf
 # define xsnprintf   snprintf
+# define xstrcat(dest,src,size)	  strcat(dest,src)
 #endif
 
 #if defined(ONIG_DEBUG_MEMLEAK) && defined(_MSC_VER)
