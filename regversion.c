@@ -28,31 +28,28 @@
  * SUCH DAMAGE.
  */
 
-#include "config.h"
 #include "onigmo.h"
-#include <stdio.h>
+
+#define TOSTR_(a)	#a
+#define ONIG_VERSION_TOSTR_(a,b,c)	\
+	TOSTR_(a) "." TOSTR_(b) "." TOSTR_(c)
+#define ONIG_VERSION_STRING	\
+	ONIG_VERSION_TOSTR_(ONIGMO_VERSION_MAJOR, ONIGMO_VERSION_MINOR, ONIGMO_VERSION_TEENY)
 
 extern const char*
 onig_version(void)
 {
-  static char s[12];
+  const char *s = ONIG_VERSION_STRING;
 
-  sprintf(s, "%d.%d.%d",
-          ONIGMO_VERSION_MAJOR,
-          ONIGMO_VERSION_MINOR,
-          ONIGMO_VERSION_TEENY);
   return s;
 }
 
 extern const char*
 onig_copyright(void)
 {
-  static char s[80];
+  const char *s =
+    "Onigmo " ONIG_VERSION_STRING " : Copyright (C) 2002-2009 K.Kosako, "
+    "2011-2014 K.Takata";
 
-  sprintf(s, "Onigmo %d.%d.%d : Copyright (C) 2002-2009 K.Kosako, "
-	     "2011-2014 K.Takata",
-          ONIGMO_VERSION_MAJOR,
-          ONIGMO_VERSION_MINOR,
-          ONIGMO_VERSION_TEENY);
   return s;
 }
