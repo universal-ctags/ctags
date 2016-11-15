@@ -1517,6 +1517,9 @@ onigmo.pc: $(srcdir)/onigmo.pc.in Makefile
 mktable: $(encdir)/mktable.c $(srcdir)/regenc.h
 	$(CC) -I$(top_srcdir) -o mktable $(encdir)/mktable.c
 
+test: atest pytest
+	$(MAKE) -C sample test
+
 atest: testc$(EXEEXT) testp$(EXEEXT) testcu$(EXEEXT)
 	@echo "[Onigmo API, ASCII/EUC-JP check]"
 	@$(top_builddir)/testc  | grep RESULT

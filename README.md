@@ -36,9 +36,7 @@ Install
 
    * test
 
-        make atest
-        make pytest
-        make -C sample test
+        make test
 
    * uninstall
 

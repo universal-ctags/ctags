@@ -82,6 +82,9 @@ TESTS = testc testp testcu
 
 check_PROGRAMS = testc testp testcu
 
+test: atest pytest
+	$(MAKE) -C sample test
+
 atest: testc$(EXEEXT) testp$(EXEEXT) testcu$(EXEEXT)
 	@echo "[Onigmo API, ASCII/EUC-JP check]"
 	@$(top_builddir)/testc  | grep RESULT
