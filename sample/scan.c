@@ -54,7 +54,7 @@ exec(OnigEncoding enc, OnigOptionType options, char* apattern, char* astr)
   UChar* pattern = (UChar* )apattern;
   UChar* str     = (UChar* )astr;
 
-  onig_init();
+  onig_initialize(&enc, 1);
 
   pattern_end = pattern + onigenc_str_bytelen_null(enc, pattern);
 
