@@ -16,6 +16,9 @@
 
 // We assume that the compiler is capable of generating 32 bit wide enums
 // This is used as enumeration but also as mask in several functions.
+//
+// DON'T FORGET TO RUN misc/gencxxtypedumper.sh after updating the elements.
+//
 enum CXXTokenType
 {
 	CXXTokenTypeEOF = 1,
