@@ -674,47 +674,58 @@ extern void ungetcToInputFile (int c)
 		File.ungetchBuf[File.ungetchIdx++] = c;
 }
 
-static vString *iFileGetLine (void)
+static void readLine (vString *const vLine, MIO *const mio)
 {
 	char *str;
 	size_t size;
-	bool haveLine;
 
-	File.line = vStringNewOrClear (File.line);
-	str = vStringValue (File.line);
-	size = vStringSize (File.line);
+	vStringClear (vLine);
+
+	str = vStringValue (vLine);
+	size = vStringSize (vLine);
 
 	for (;;)
 	{
 		bool newLine;
 		bool eof;
 
-		mio_gets (File.mio, str, size);
-		vStringSetLength (File.line);
-		haveLine = vStringLength (File.line) > 0;
-		newLine = haveLine && vStringLast (File.line) == '\n';
-		eof = mio_eof (File.mio);
+		if (mio_gets (mio, str, size) == NULL)
+		{
+			if (!mio_eof (mio))
+				error (FATAL | PERROR, "Failure on attempt to read file");
+		}
+		vStringSetLength (vLine);
+		newLine = vStringLength (vLine) > 0 && vStringLast (vLine) == '\n';
+		eof = mio_eof (mio);
 
 		/* Turn line breaks into a canonical form. The three commonly
 		 * used forms of line breaks are: LF (UNIX/Mac OS X), CR-LF (MS-DOS) and
 		 * CR (Mac OS 9). As CR-only EOL isn't haneled by gets() and Mac OS 9
 		 * is dead, we only handle CR-LF EOLs and convert them into LF. */
-		if (newLine && vStringLength (File.line) > 1 &&
-			vStringItem (File.line, vStringLength (File.line) - 2) == '\r')
+		if (newLine && vStringLength (vLine) > 1 &&
+			vStringItem (vLine, vStringLength (vLine) - 2) == '\r')
 		{
-			vStringItem (File.line, vStringLength (File.line) - 2) = '\n';
-			vStringChop (File.line);
+			vStringItem (vLine, vStringLength (vLine) - 2) = '\n';
+			vStringChop (vLine);
 		}
 
 		if (newLine || eof)
 			break;
 
-		vStringResize (File.line, vStringLength (File.line) * 2);
-		str = vStringValue (File.line) + vStringLength (File.line);
-		size = vStringSize (File.line) - vStringLength (File.line);
+		vStringResize (vLine, vStringLength (vLine) * 2);
+		str = vStringValue (vLine) + vStringLength (vLine);
+		size = vStringSize (vLine) - vStringLength (vLine);
 	}
+}
 
-	if (haveLine)
+static vString *iFileGetLine (void)
+{
+	if (File.line == NULL)
+		File.line = vStringNew ();
+
+	readLine (File.line, File.mio);
+
+	if (vStringLength (File.line) > 0)
 	{
 		/* Use StartOfLine from previous iFileGetLine() call */
 		fileNewline ();
@@ -815,65 +826,18 @@ extern const unsigned char *readLineFromInputFile (void)
  */
 extern char *readLineRaw (vString *const vLine, MIO *const mio)
 {
-	char *result = NULL;
-
-	vStringClear (vLine);
 	if (mio == NULL)  /* to free memory allocated to buffer */
 		error (FATAL, "NULL file pointer");
 	else
 	{
-		bool reReadLine;
-
-		/*  If reading the line places any character other than a null or a
-		 *  newline at the last character position in the buffer (one less
-		 *  than the buffer size), then we must resize the buffer and
-		 *  reattempt to read the line.
-		 */
-		do
-		{
-			char *const pLastChar = vStringValue (vLine) + vStringSize (vLine) -2;
-			long startOfLine;
-
-			startOfLine = mio_tell(mio);
-			reReadLine = false;
-			*pLastChar = '\0';
-			result = mio_gets (mio, vStringValue (vLine), (int) vStringSize (vLine));
-			if (result == NULL)
-			{
-				if (! mio_eof (mio))
-					error (FATAL | PERROR, "Failure on attempt to read file");
-			}
-			else if (*pLastChar != '\0'  &&
-					 *pLastChar != '\n'  &&  *pLastChar != '\r')
-			{
-				/*  buffer overflow */
-				vStringResize (vLine, vStringSize (vLine) * 2);
-				mio_seek (mio, startOfLine, SEEK_SET);
-				reReadLine = true;
-			}
-			else
-			{
-				char* eol;
-				vStringLength(vLine) = mio_tell(mio) - startOfLine;
-				/* canonicalize new line */
-				eol = vStringValue (vLine) + vStringLength (vLine) - 1;
-				if (*eol == '\r')
-					*eol = '\n';
-				else if (vStringLength (vLine) != 1 && *(eol - 1) == '\r'  &&  *eol == '\n')
-				{
-					*(eol - 1) = '\n';
-					*eol = '\0';
-					--vLine->length;
-				}
-			}
-		} while (reReadLine);
+		readLine (vLine, mio);
 
 #ifdef HAVE_ICONV
 		if (isConverting ())
 			convertString (vLine);
 #endif
 	}
-	return result;
+	return vStringLength (vLine) > 0 ? vStringValue (vLine) : NULL;
 }
 
 /*  Places into the line buffer the contents of the line referenced by
@@ -887,6 +851,7 @@ extern char *readLineFromBypass (
 
 	mio_getpos (File.mio, &orignalPosition);
 	mio_setpos (File.mio, &location);
+	mio_clearerr (File.mio);
 	if (pSeekValue != NULL)
 		*pSeekValue = mio_tell (File.mio);
 	result = readLineRaw (vLine, File.mio);
@@ -994,47 +959,6 @@ extern char *readLineFromBypassSlow (vString *const vLine,
 out:
 	regfree (&patbuf);
 	mio_setpos (File.mio, &originalPosition);
-	return result;
-}
-
-/*
- *   Similar to readLineRaw but this doesn't use fgetpos/fsetpos.
- *   Useful for reading from pipe.
- */
-char* readLineRawWithNoSeek (vString* const vline, FILE *const pp)
-{
-	int c;
-	bool nlcr;
-	char *result = NULL;
-
-	vStringClear (vline);
-	nlcr = false;
-	
-	while (1)
-	{
-		c = fgetc (pp);
-		
-		if (c == EOF)
-		{
-			if (! feof (pp))
-				error (FATAL | PERROR, "Failure on attempt to read file");
-			else
-				break;
-		}
-
-		result = vStringValue (vline);
-		
-		if (c == '\n' || c == '\r')
-			nlcr = true;
-		else if (nlcr)
-		{
-			ungetc (c, pp);
-			break;
-		}
-		else
-			vStringPut (vline, c);
-	}
-
 	return result;
 }
 

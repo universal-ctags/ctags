@@ -99,9 +99,8 @@ extern const char *getSourceFileTagPath (void);
 extern const char *getSourceLanguageName (void);
 extern unsigned long getSourceLineNumber (void);
 
-/* Raw: reading from given a parameter, fp */
-extern char *readLineRaw           (vString *const vLine, MIO *const mio);
-extern char* readLineRawWithNoSeek (vString *const vline, FILE *const pp);
+/* Raw: reading from given a parameter, mio */
+extern char *readLineRaw (vString *const vLine, MIO *const mio);
 
 /* Bypass: reading from fp in inputFile WITHOUT updating fields in input fields */
 extern char *readLineFromBypass (vString *const vLine, MIOPos location, long *const pSeekValue);
