@@ -129,6 +129,7 @@ PARSER_SRCS =				\
 	parsers/cpreprocessor.c		\
 	parsers/cxx/cxx.c		\
 	parsers/cxx/cxx_debug.c		\
+	parsers/cxx/cxx_debug_type.c	\
 	parsers/cxx/cxx_keyword.c		\
 	parsers/cxx/cxx_parser.c		\
 	parsers/cxx/cxx_parser_block.c		\

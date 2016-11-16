@@ -175,9 +175,10 @@ bool cxxParserExtractVariableDeclarations(CXXTokenChain * pChain,unsigned int uF
 		}
 
 		CXX_DEBUG_PRINT(
-				"Found notable token '%s' of type 0x%02x",
+				"Found notable token '%s' of type 0x%02x(%s)",
 				vStringValue(t->pszWord),
-				t->eType
+				t->eType,
+				cxxDebugTypeDecode(t->eType)
 			);
 
 		// Now before the notable token there MUST be an identifier

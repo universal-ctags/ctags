@@ -11,6 +11,7 @@
 
 #include "general.h"
 #include "debug.h"
+#include "cxx_token.h"
 
 //
 // Uncomment this to enable extensive debugging to stderr in cxx code.
@@ -33,6 +34,8 @@ void cxxDebugEnter(const char * szFunction,const char * szFormat,...);
 void cxxDebugLeave(const char * szFunction,const char * szFormat,...);
 void cxxDebugPrint(const char * szFunction,const char * szFormat,...);
 void cxxDebugInit(void);
+
+const char* cxxDebugTypeDecode(enum CXXTokenType);
 
 #define CXX_DEBUG_ENTER() cxxDebugEnter(__PRETTY_FUNCTION__,"")
 #define CXX_DEBUG_LEAVE() cxxDebugLeave(__PRETTY_FUNCTION__,"")
