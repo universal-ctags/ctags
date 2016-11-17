@@ -5,6 +5,9 @@ product_name = onigmo
 # Comment out the next line, if you don't want to use LTCG.
 USE_LTCG = 1
 
+# Comment out the next line, if you don't want to use multiprocess build.
+USE_MP = 1
+
 # Enable the next line, if you want to use a .def file.
 #DEFFILE = onigmo.def
 
@@ -68,6 +71,13 @@ WORKDIR = build_$(ARCH)$(DBGFLG)
 CFLAGS = $(CFLAGS) -GL
 ARLIB_FLAGS = $(ARLIB_FLAGS) -LTCG
 ARDLL_FLAGS = $(ARDLL_FLAGS) -LTCG
+!endif
+!endif
+
+!if DEFINED(USE_MP) && $(USE_MP)
+# Enable multiprocess build on VC2010+.
+!if $(_MSC_VER) >= 1600
+CFLAGS = $(CFLAGS) -MP
 !endif
 !endif
 
