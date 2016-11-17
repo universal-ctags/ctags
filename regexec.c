@@ -3546,6 +3546,11 @@ bm_search(regex_t* reg, const UChar* target, const UChar* target_end,
   const UChar *tail;
   ptrdiff_t tlen1;
 
+# ifdef ONIG_DEBUG_SEARCH
+  fprintf(stderr, "bm_search: text: %"PRIuPTR", text_end: %"PRIuPTR", text_range: %"PRIuPTR"\n",
+	  text, text_end, text_range);
+# endif
+
   tail = target_end - 1;
   tlen1 = tail - target;
   end = text_range + tlen1;
@@ -4142,7 +4147,15 @@ onig_search_gpos(regex_t* reg, const UChar* str, const UChar* end,
       /* search start-position only */
     begin_position:
       if (range > start)
-	range = start + 1;
+      {
+	if (global_pos > start)
+	{
+	  if (global_pos < range)
+	    range = global_pos + 1;
+	}
+	else
+	  range = start + 1;
+      }
       else
 	range = start;
     }
