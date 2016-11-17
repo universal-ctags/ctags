@@ -5109,7 +5109,11 @@ parse_enclose(Node** np, OnigToken* tok, int term, UChar** src, UChar* end,
 	      return ONIGERR_INVALID_BACKREF;
 	    }
 	  }
-	  num = backs[0];       /* XXX: use left most named group as Perl */
+	  /* FIXME:
+	   * Use left most named group for now. This is the same as Perl.
+	   * However this should use the same strategy as normal back-
+	   * references on Ruby syntax; search right to left. */
+	  num = backs[0];
 	}
 #endif
 	else
