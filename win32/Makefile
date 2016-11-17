@@ -64,6 +64,7 @@ WORKDIR = build_$(ARCH)$(DBGFLG)
 !endif
 !endif
 
+!ifndef DEBUG
 !if DEFINED(USE_LTCG) && $(USE_LTCG)
 # Use LTCG (Link Time Code Generation).
 # Check if cl.exe is newer than VC++ 7.0 (_MSC_VER >= 1300).
@@ -71,6 +72,7 @@ WORKDIR = build_$(ARCH)$(DBGFLG)
 CFLAGS = $(CFLAGS) -GL
 ARLIB_FLAGS = $(ARLIB_FLAGS) -LTCG
 ARDLL_FLAGS = $(ARDLL_FLAGS) -LTCG
+!endif
 !endif
 !endif
 
