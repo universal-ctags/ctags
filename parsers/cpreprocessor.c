@@ -1244,7 +1244,7 @@ static void saveIgnoreToken(const char * ignoreToken)
 	cppIgnoredTokenInfo * info = (cppIgnoredTokenInfo *)eMalloc(sizeof(cppIgnoredTokenInfo));
 
 	info->ignoreFollowingParenthesis = ignoreFollowingParenthesis;
-	info->replacement = replacement ? eStrdup(replacement) : NULL;
+	info->replacement = replacement ? vStringNewInit(replacement) : NULL;
 
 	hashTablePutItem(ignoreTokenTable,eStrndup(tokenBegin,tokenEnd - tokenBegin),info);
 
@@ -1256,7 +1256,7 @@ static void freeIgnoredTokenInfo(cppIgnoredTokenInfo * info)
 	if(!info)
 		return;
 	if(info->replacement)
-		eFree(info->replacement);
+		vStringDelete (info->replacement);
 	eFree(info);
 }
 

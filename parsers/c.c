@@ -1779,7 +1779,7 @@ static void skipCppTemplateParameterList (void)
 		if (c == '<')
 		{
 			int x = cppGetc ();
-			if(x != '<') 
+			if(x != '<')
 			{
 				cppUngetc (x);
 				if (roundBracketsLevel == 0)
@@ -1794,7 +1794,7 @@ static void skipCppTemplateParameterList (void)
 		else if (c == '>')
 		{
 			int x = cppGetc ();
-			if( x != '>') 
+			if( x != '>')
 			{
 				cppUngetc (x);
 				if (roundBracketsLevel == 0)
@@ -1866,12 +1866,12 @@ static void analyzeIdentifier (tokenInfo *const token)
 			if(ignore->replacement)
 			{
 				// There is a replacement: analyze it
-				name = ignore->replacement;
+				name = vStringValue (ignore->replacement);
 			} else {
 				// There is no replacement: just ignore
 				name = NULL;
 			}
-			
+
 			if(ignore->ignoreFollowingParenthesis)
 			{
 				int c = skipToNonWhite ();
