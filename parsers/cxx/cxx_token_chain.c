@@ -217,13 +217,13 @@ void cxxTokenChainInsertAfter(CXXTokenChain * tc,CXXToken * before,CXXToken * t)
 		cxxTokenChainPrepend(tc,t);
 		return;
 	}
-	
+
 	if(!before->pNext)
 	{
 		cxxTokenChainAppend(tc,t);
 		return;
 	}
-	
+
 	t->pNext = before->pNext;
 	t->pPrev = before;
 	before->pNext = t;
