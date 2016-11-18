@@ -90,6 +90,8 @@ def cc_to_cb(s, enc, cc):
       enc -- encoding name
       cc -- char count
     """
+    if cc == -1:
+        return -1
     s = s.encode('UTF-32LE')
     clen = cc * 4
     if clen > len(s):
@@ -141,6 +143,9 @@ def xx(pattern, target, s_from, s_to, mem, not_match,
     if not isinstance(target, bytes):
         s_from = cc_to_cb(target, encoding, s_from)
         s_to = cc_to_cb(target, encoding, s_to)
+        gpos = cc_to_cb(target, encoding, gpos)
+        startpos = cc_to_cb(target, encoding, startpos)
+        endpos = cc_to_cb(target, encoding, endpos)
         target2 = target.encode(encoding)
     targetp = strptr(target2)
 
