@@ -487,6 +487,12 @@ libonig.onig_search.restype = _c_ssize_t
 onig_search = libonig.onig_search
 
 # onig_search_gpos
+libonig.onig_search_gpos.argtypes = [OnigRegex,
+        ctypes.c_void_p, ctypes.c_void_p, ctypes.c_void_p, ctypes.c_void_p,
+        ctypes.c_void_p,
+        ctypes.POINTER(OnigRegion), OnigOptionType]
+libonig.onig_search_gpos.restype = _c_ssize_t
+onig_search_gpos = libonig.onig_search_gpos
 
 # onig_match
 libonig.onig_match.argtypes = [OnigRegex,

@@ -119,6 +119,7 @@ class SearchType:
 
 def xx(pattern, target, s_from, s_to, mem, not_match,
         searchtype=SearchType.FORWARD,
+        gpos=-1, startpos=0, endpos=-1,
         syn=syntax_default, opt=onigmo.ONIG_OPTION_DEFAULT,
         err=onigmo.ONIG_NORMAL, execerr=onigmo.ONIG_NORMAL):
     global nerror
@@ -179,16 +180,32 @@ def xx(pattern, target, s_from, s_to, mem, not_match,
     # Execute
     region = onigmo.onig_region_new()
     if searchtype == SearchType.FORWARD:
-        r = onigmo.onig_search(reg, targetp.getptr(), targetp.getptr(-1),
+        if gpos >= 0:
+            r = onigmo.onig_search_gpos(reg,
                         targetp.getptr(), targetp.getptr(-1),
+                        targetp.getptr(gpos),
+                        targetp.getptr(startpos), targetp.getptr(endpos),
+                        region, onigmo.ONIG_OPTION_NONE);
+        else:
+            r = onigmo.onig_search(reg,
+                        targetp.getptr(), targetp.getptr(-1),
+                        targetp.getptr(startpos), targetp.getptr(endpos),
                         region, onigmo.ONIG_OPTION_NONE);
     elif searchtype == SearchType.BACKWARD:
-        r = onigmo.onig_search(reg, targetp.getptr(), targetp.getptr(-1),
-                        targetp.getptr(-1), targetp.getptr(),
+        if gpos >= 0:
+            r = onigmo.onig_search_gpos(reg,
+                        targetp.getptr(), targetp.getptr(-1),
+                        targetp.getptr(gpos),
+                        targetp.getptr(endpos), targetp.getptr(startpos),
+                        region, onigmo.ONIG_OPTION_NONE);
+        else:
+            r = onigmo.onig_search(reg,
+                        targetp.getptr(), targetp.getptr(-1),
+                        targetp.getptr(endpos), targetp.getptr(startpos),
                         region, onigmo.ONIG_OPTION_NONE);
     elif searchtype == SearchType.MATCH:
         r = onigmo.onig_match(reg, targetp.getptr(), targetp.getptr(-1),
-                        targetp.getptr(),
+                        targetp.getptr(startpos),
                         region, onigmo.ONIG_OPTION_NONE);
     else:
         nerror += 1
@@ -1574,6 +1591,16 @@ def main():
     # onig_match()
     x2("abc", "abcabc", 0, 3, searchtype=SearchType.MATCH)
     n("abc", " abcabc", searchtype=SearchType.MATCH)
+
+    # onig_search_gpos()
+    n("\\Gabc", "123abcdef", gpos=2)
+    x2("\\Gabc", "123abcdef", 3, 6, gpos=3)
+    x2("\\Gabc", "123abcdef", 3, 6, startpos=3)
+    n("\\Gabc", "123abcdef", gpos=0, startpos=3)
+    x2("abc\\G", "abc", 0, 3, searchtype=SearchType.BACKWARD)
+    n("abc\\G", "abc ", searchtype=SearchType.BACKWARD)
+    x2("abc\\G", "abc ", 0, 3, searchtype=SearchType.BACKWARD, endpos=3)
+    x2("abc\\G", "abc ", 0, 3, searchtype=SearchType.BACKWARD, gpos=3)
 
     # stack size
     stack_size = onigmo.onig_get_match_stack_limit_size()
