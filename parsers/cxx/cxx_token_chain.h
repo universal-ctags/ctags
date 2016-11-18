@@ -190,6 +190,7 @@ vString * cxxTokenChainJoinRange(
 	);
 
 
+
 enum CXXTokenChainCondenseFlags
 {
 	// Do not add trailing spaces for entries that are followed by space
@@ -197,6 +198,7 @@ enum CXXTokenChainCondenseFlags
 };
 
 void cxxTokenChainCondense(CXXTokenChain * tc,unsigned int uFlags);
+
 
 enum CXXTokenChainExtractRangeFlags
 {
