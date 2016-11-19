@@ -2,27 +2,33 @@
 #PARSER         NAME     DESCRIPTION                   
 CPreProcessor   if0      examine code within "#if 0" branch (true or [false])
 CPreProcessor   ignore   a token to be specially handled
+CPreProcessor   define   define replacement for an identifier
 
 # ALL MACHINABLE
 #PARSER	NAME	DESCRIPTION
 CPreProcessor	if0	examine code within "#if 0" branch (true or [false])
 CPreProcessor	ignore	a token to be specially handled
+CPreProcessor	define	define replacement for an identifier
 
 # ALL MACHINABLE NOHEADER
 CPreProcessor	if0	examine code within "#if 0" branch (true or [false])
 CPreProcessor	ignore	a token to be specially handled
+CPreProcessor	define	define replacement for an identifier
 
 # CPP
 NAME     DESCRIPTION                   
 if0      examine code within "#if 0" branch (true or [false])
 ignore   a token to be specially handled
+define   define replacement for an identifier
 
 # CPP MACHINABLE
 NAME	DESCRIPTION
 if0	examine code within "#if 0" branch (true or [false])
 ignore	a token to be specially handled
+define	define replacement for an identifier
 
 # CPP MACHINABLE NOHEADER
 if0	examine code within "#if 0" branch (true or [false])
 ignore	a token to be specially handled
+define	define replacement for an identifier
 

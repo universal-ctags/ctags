@@ -1196,7 +1196,7 @@ extern const cppIgnoredTokenInfo * cppIsIgnoreToken(const char * name)
 	return (const cppIgnoredTokenInfo *)hashTableGetItem(ignoreTokenTable,(char *)name);
 }
 
-static void saveIgnoreToken(const char * ignoreToken)
+static void saveIgnoreToken(const char * ignoreToken, const char * param_name)
 {
 	if(!ignoreToken)
 		return;
@@ -1210,6 +1210,10 @@ static void saveIgnoreToken(const char * ignoreToken)
 	const char * tokenEnd = NULL;
 	const char * replacement = NULL;
 	bool ignoreFollowingParenthesis = false;
+
+
+	if (strcmp (param_name, "define") == 0)
+		ignoreFollowingParenthesis = true;
 
 	while(cc)
 	{
@@ -1287,7 +1291,7 @@ static void CpreProInstallIgnoreToken (const langType language, const char *name
 		verbose ("    clearing list\n");
 	}
 	else
-		saveIgnoreToken (arg);
+		saveIgnoreToken (arg, name);
 }
 
 static void CpreProSetIf0 (const langType language, const char *name, const char *arg)
@@ -1303,6 +1307,10 @@ static parameterHandlerTable CpreProParameterHandlerTable [] = {
 	},
 	{ .name = "ignore",
 	  .desc = "a token to be specially handled",
+	  .handleParameter = CpreProInstallIgnoreToken,
+	},
+	{ .name = "define",
+	  .desc = "define replacement for an identifier",
 	  .handleParameter = CpreProInstallIgnoreToken,
 	},
 };
