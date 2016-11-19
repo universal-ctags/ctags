@@ -1,0 +1,3 @@
+registered_fb3	input.c	/^struct fb_info *registered_fb3[FB_MAX] __read_mostly X Y();$/;"	v	typeref:struct:fb_info * [FB_MAX]__read_mostly X Y()
+registered_fb7	input.c	/^struct fb_info *registered_fb7[FB_MAX] __read_mostly X("a");$/;"	v	typeref:struct:fb_info * [FB_MAX]__read_mostly X ("a")
+registered_fb8	input.c	/^struct fb_info *registered_fb8[FB_MAX] __read_mostly X("a") C;$/;"	v	typeref:struct:fb_info * [FB_MAX]__read_mostly X ("a") C
