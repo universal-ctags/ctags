@@ -1029,6 +1029,20 @@ the elements of the format.
 .. TODO: An example of using WILDCARD
 
 
+Incompatible changes in command line
+---------------------------------------------------------------------
+
+.. NOT REVIEWED YET
+
+``-D`` option
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+When debugging output is enabled in build config stage, ``-D`` was
+used for specifying the level of debugging output. It is changed to
+``-d``. This change is not critical because ``-D`` option was not
+described in ctags.1 man page.
+
+
 Readtags
 ---------------------------------------------------------------------
 

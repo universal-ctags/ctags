@@ -174,7 +174,7 @@ optionValues Option = {
 	.machinable = false,
 	.withListHeader = true,
 #ifdef DEBUG
-	0, 0        /* -D, -b */
+	0, 0        /* -d, -b */
 #endif
 };
 
@@ -193,7 +193,7 @@ static optionDescription LongOptionDescription [] = {
 #endif
  {0,"  -B   Use backward searching patterns (?...?)."},
 #ifdef DEBUG
- {1,"  -D <level>"},
+ {1,"  -d <level>"},
  {1,"       Set debug level."},
 #endif
  {0,"  -e   Output tag file for use with Emacs."},
@@ -2756,7 +2756,7 @@ static void processShortOption (
 				error (FATAL, "-%s: Invalid line number", option);
 			Option.breakLine = atol (parameter);
 			break;
-		case 'D':
+		case 'd':
 			if (!strToLong(parameter, 0, &Option.debugLevel))
 				error (FATAL, "-%s: Invalid debug level", option);
 
