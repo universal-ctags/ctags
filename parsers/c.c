@@ -1854,30 +1854,33 @@ static void analyzeIdentifier (tokenInfo *const token)
 {
 	const char * name = vStringValue (token->name);
 
+	vString * replacement = NULL;
+
 	if(!isInputLanguage(Lang_java))
 	{
 		// C: check for ignored token
 		// (FIXME: java doesn't support -I... but maybe it should?)
-		const cppIgnoredTokenInfo * ignore = cppIsIgnoreToken(name);
+		const cppMacroInfo * macro = cppFindMacro(name);
 
-		if(ignore)
+		if(macro)
 		{
-			// Ignored token.
-			if(ignore->replacement)
+			if(macro->hasParameterList)
 			{
-				// There is a replacement: analyze it
-				name = vStringValue (ignore->replacement);
-			} else {
-				// There is no replacement: just ignore
-				name = NULL;
-			}
-
-			if(ignore->ignoreFollowingParenthesis)
-			{
+				// This old parser does not support macro parameters: we simply assume them to be empty
 				int c = skipToNonWhite ();
 
 				if (c == '(')
 					skipToMatch ("()");
+			}
+
+			if(macro->replacements)
+			{
+				// There is a replacement: analyze it
+				replacement = cppBuildMacroReplacement(macro,NULL,0);
+				name = replacement ? vStringValue(replacement) : NULL;
+			} else {
+				// There is no replacement: just ignore
+				name = NULL;
 			}
 		}
 	}
@@ -1885,6 +1888,8 @@ static void analyzeIdentifier (tokenInfo *const token)
 	if(!name)
 	{
 		initToken(token);
+		if(replacement)
+			vStringDelete(replacement);
 		return;
 	}
 
@@ -1894,6 +1899,9 @@ static void analyzeIdentifier (tokenInfo *const token)
 		token->type = TOKEN_NAME;
 	else
 		token->type = TOKEN_KEYWORD;
+
+	if(replacement)
+		vStringDelete(replacement);
 }
 
 static void readIdentifier (tokenInfo *const token, const int firstChar)
