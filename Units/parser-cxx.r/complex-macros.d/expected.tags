@@ -1,14 +1,21 @@
-DECLARE_FUNCTION	input.cpp	/^#define DECLARE_FUNCTION(/;"	d	file:
-DECLARE_FUNCTION_2	input.cpp	/^#define DECLARE_FUNCTION_2(/;"	d	file:
-DECLARE_VARS	input.cpp	/^#define DECLARE_VARS(/;"	d	file:
-DEPRECATED	input.cpp	/^#define DEPRECATED(/;"	d	file:
-IMPLEMENT_FUNCTIONS	input.cpp	/^#define IMPLEMENT_FUNCTIONS(/;"	d	file:
-f1a	input.cpp	/^IMPLEMENT_FUNCTIONS(f1);$/;"	f	typeref:typename:void
-f1b	input.cpp	/^IMPLEMENT_FUNCTIONS(f1);$/;"	f	typeref:typename:void
+DECLARE_FUNCTION_1	input.cpp	/^#define DECLARE_FUNCTION_1 /;"	d	file:
+p0	input.cpp	/^DECLARE_FUNCTION_1;$/;"	p	typeref:typename:int	file:	signature:()
+DECLARE_FUNCTION_2	input.cpp	/^#define DECLARE_FUNCTION_2(/;"	d	file:	signature:(_ret,_name)
+p1	input.cpp	/^DECLARE_FUNCTION_2(int,p1);$/;"	p	typeref:typename:int	file:	signature:()
+p2	input.cpp	/^DECLARE_FUNCTION_2(std::string,p2);$/;"	p	typeref:typename:std::string	file:	signature:()
+DECLARE_FUNCTION_3	input.cpp	/^#define DECLARE_FUNCTION_3(/;"	d	file:	signature:(_ret,_name,...)
+p3	input.cpp	/^DECLARE_FUNCTION_3(int,p3,int a,int b);$/;"	p	typeref:typename:int	file:	signature:(int a,int b)
+DEPRECATED	input.cpp	/^#define DEPRECATED(/;"	d	file:	signature:(...)
+p4	input.cpp	/^DEPRECATED(int p4());$/;"	p	typeref:typename:int	file:	signature:()	properties:deprecated
+DECLARE_TWO_VERSIONS_OF_FUNCTIONS	input.cpp	/^#define DECLARE_TWO_VERSIONS_OF_FUNCTIONS(/;"	d	file:	signature:(_prefix1,_prefix2)
+p5a	input.cpp	/^DECLARE_TWO_VERSIONS_OF_FUNCTIONS(p5,p6)$/;"	p	typeref:typename:int	file:	signature:()
+p6a	input.cpp	/^DECLARE_TWO_VERSIONS_OF_FUNCTIONS(p5,p6)$/;"	p	typeref:typename:int	file:	signature:()
+STRINGIFY	input.cpp	/^#define STRINGIFY(/;"	d	file:	signature:(token)
+test	input.cpp	/^const char * test = "" STRINGIFY(; int notVisible;);$/;"	v	typeref:typename:const char *
+IMPLEMENT_FUNCTIONS	input.cpp	/^#define IMPLEMENT_FUNCTIONS(/;"	d	file:	signature:(_prefix)
+f1a	input.cpp	/^IMPLEMENT_FUNCTIONS(f1);$/;"	f	typeref:typename:void	signature:()
+f1b	input.cpp	/^IMPLEMENT_FUNCTIONS(f1);$/;"	f	typeref:typename:void	signature:()
+DECLARE_VARS	input.cpp	/^#define DECLARE_VARS(/;"	d	file:	signature:(_prefix)
+main	input.cpp	/^int main(int,char **)$/;"	f	typeref:typename:int	signature:(int,char **)
 la	input.cpp	/^	DECLARE_VARS(l);$/;"	l	function:main	typeref:typename:int	file:
 lb	input.cpp	/^	DECLARE_VARS(l);$/;"	l	function:main	typeref:typename:int	file:
-main	input.cpp	/^int main(int,char **)$/;"	f	typeref:typename:int
-p1	input.cpp	/^DECLARE_FUNCTION(int,p1);$/;"	p	typeref:typename:int	file:
-p2	input.cpp	/^DECLARE_FUNCTION(std::string,p2);$/;"	p	typeref:typename:std::string	file:
-p3	input.cpp	/^DECLARE_FUNCTION(int,p3,int a,int b);$/;"	p	typeref:typename:int	file:
-p4	input.cpp	/^DEPRECATED(int p4());$/;"	p	typeref:typename:int	file:	properties:deprecated
