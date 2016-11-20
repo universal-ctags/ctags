@@ -1,7 +1,6 @@
 --c++-kinds=*
 --fields-c++=+{properties}
--D DECLARE_FUNCTION=$0 $1()
--D ARGS=$*
--D DECLARE_VARS=int $0a; int $0b;
--D IMPLEMENT_FUNCTIONS=void $0a(){}; void $0b(){};
--D DEPRECATED=$* __attribute__((deprecated))
+-D DECLARE_FUNCTION(_ret,_name)=_ret _name();
+-D DECLARE_VARS(_prefix)=int _prefix ## a; int _prefix ## b;
+-D IMPLEMENT_FUNCTIONS(_prefix)=void _prefix ## a(){ }; void _prefix ## b(){ };
+-D DEPRECATED(...)=__VA_ARGS__ __attribute__((deprecated))
