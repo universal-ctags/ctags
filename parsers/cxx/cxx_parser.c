@@ -675,6 +675,7 @@ bool cxxParserParseEnum(void)
 		tag->isFileScope = !isInputHeaderFile();
 
 		CXXToken * pTypeName = NULL;
+		vString * pszProperties = NULL;
 
 		if(pTypeEnd)
 		{
@@ -683,10 +684,13 @@ bool cxxParserParseEnum(void)
 		}
 
 		if(bIsScopedEnum)
-			cxxTagSetProperties(CXXTagPropertyScopedEnum);
+			pszProperties = cxxTagSetProperties(CXXTagPropertyScopedEnum);
 
 		iCorkQueueIndex = cxxTagCommit();
-		
+
+		if (pszProperties)
+			vStringDelete (pszProperties);
+
 		if(pTypeName)
 			cxxTokenDestroy(pTypeName);
 	}
