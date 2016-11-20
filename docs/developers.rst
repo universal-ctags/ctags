@@ -65,3 +65,8 @@ Cameron Eagans <me@cweagans.net>
         contributors to tasks that they may be able to help with. With time,
         I may end up contributing directly to ctags development, but my C skills
         are not so great at the moment.
+
+Szymon Tomasz Stefanek <s.stefanek@gmail.com>
+
+	I'm a multilanguage developer and I use ctags with my own text editor
+	which has some IDE capabilities. I'm the maintainer of the new C/C++ parser.
