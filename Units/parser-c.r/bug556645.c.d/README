@@ -12,3 +12,8 @@ status with following comment:
 
 So I(Masatake YAMATO), don't touch this case and put it
 here.
+
+--------------------------------------------------------------------
+
+Surprisingly, new C/Cxx parser can capture Qtype well.
+
