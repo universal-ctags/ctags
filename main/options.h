@@ -99,7 +99,7 @@ typedef struct sOptionValues {
 	bool machinable;		/* --machinable */
 	bool withListHeader;		/* --with-list-header */
 #ifdef DEBUG
-	long debugLevel;        /* -D  debugging output */
+	long debugLevel;        /* -d  debugging output */
 	unsigned long breakLine;/* -b  input line at which to call lineBreak() */
 #endif
 } optionValues;

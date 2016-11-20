@@ -14,6 +14,7 @@
 */
 #include "general.h"  /* must always come first */
 #include "types.h"
+#include "vstring.h"
 
 /*
 *   MACROS
@@ -72,12 +73,13 @@ extern void cppTerminate (void);
 extern void cppBeginStatement (void);
 extern void cppEndStatement (void);
 extern void cppUngetc (const int c);
+extern void cppUngetString(const char * string,int len);
 extern int cppGetc (void);
 extern int cppSkipOverCComment (void);
 
 typedef struct sCppIgnoredTokenInfo {
 	bool ignoreFollowingParenthesis; /* -I SOMETHING+ */
-	char * replacement;              /* -I SOMETHING=REPLACEMENT */
+	vString *replacement;            /* -I SOMETHING=REPLACEMENT */
 } cppIgnoredTokenInfo;
 extern const cppIgnoredTokenInfo * cppIsIgnoreToken (const char *const name);
 

@@ -189,6 +189,13 @@ vString * cxxTokenChainJoinRange(
 		unsigned int uFlags
 	);
 
+// Treat the tochek chain tc as a comma separated sequence
+// of items (something, blah foo, 1 2 3 4 5, ...)
+// Create a token chain that contains tokens corresponding
+// to each item (i.e, "something", "blah foo", "1 2 3 4 5").
+// Please note that the returned chain may be empty!
+CXXTokenChain * cxxTokenChainSplitOnComma(CXXTokenChain * tc);
+
 
 enum CXXTokenChainCondenseFlags
 {
@@ -197,6 +204,7 @@ enum CXXTokenChainCondenseFlags
 };
 
 void cxxTokenChainCondense(CXXTokenChain * tc,unsigned int uFlags);
+
 
 enum CXXTokenChainExtractRangeFlags
 {

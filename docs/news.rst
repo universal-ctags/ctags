@@ -488,6 +488,49 @@ used to enable it.
 See :ref:`JSON output <output-json>` for more details.
 
 
+Defining a macro in CPreProcessor input
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. NOT REVIEWED YET
+
+Newly introduced ``-D`` option extends the function provided by
+``-I`` option.
+
+With ``-I`` option is used for ignoring specified identifiers in C and
+C++ source files.
+
+Instead of ignoring, with ``-D`` option, you can define a replacement for
+specified identifier. Here the identifier is considered as a macro in C/C++
+source code.
+
+.. code-block:: console
+
+   $ ctags ... -D foreach=for($0;;) ...
+
+This example defines `for($0;;)` as the replacement `foreach()`.
+
+With the example command line following C/C++ input:
+
+.. code-block:: C
+
+	foreach(char * p,pointers)
+	{
+
+	}
+
+is processed in new C/C++ parser as:
+
+.. code-block:: C
+
+	for(char * p;;)
+	{
+
+	}
+
+`$0` ... `$9` specifies the arguments passed to the identifier in
+source code. `$*` specifies the whole arguments.
+
+
 Changes to the tags file format
 ---------------------------------------------------------------------
 
@@ -1027,6 +1070,22 @@ the elements of the format.
 
 
 .. TODO: An example of using WILDCARD
+
+
+Incompatible changes in command line
+---------------------------------------------------------------------
+
+.. NOT REVIEWED YET
+
+``-D`` option
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+For ctags buinary that debugging output is enabled in build config
+stage, ``-D`` was used for specifying the level of debugging
+output. It is changed to ``-d``. This change is not critical because
+``-D`` option was not described in ctags.1 man page.
+
+Instead ``-D`` is used for defining a macro in CPreProcessor parser.
 
 
 Readtags
