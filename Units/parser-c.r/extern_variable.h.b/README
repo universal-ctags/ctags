@@ -1,0 +1,15 @@
+Exuberant ctags generates following tags file
+
+	$ ctags -o - --C-kinds='x'  input.h
+	C	/home/jet/var/ctags/Units/review-needed.r/extern_variable.h.t/input.h	/^class C;$/;"	x
+	S	/home/jet/var/ctags/Units/review-needed.r/extern_variable.h.t/input.h	/^struct S;$/;"	x
+	a	/home/jet/var/ctags/Units/review-needed.r/extern_variable.h.t/input.h	/^extern int a;$/;"	x
+	b	/home/jet/var/ctags/Units/review-needed.r/extern_variable.h.t/input.h	/^extern struct B b;$/;"	x
+
+Universal ctags generates following tags file
+
+	$ ./ctags -o - --C-kinds='x'  input.h
+	a	/home/jet/var/ctags/Units/review-needed.r/extern_variable.h.t/input.h	/^extern int a;$/;"	x	typeref:typename:int
+	b	/home/jet/var/ctags/Units/review-needed.r/extern_variable.h.t/input.h	/^extern struct B b;$/;"	x	typeref:struct:B
+
+I marked this .b. We have to consider which behavior is better.

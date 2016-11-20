@@ -1,0 +1,2 @@
+prototype_a	input.h	/^int prototype_a (int a, char *b);$/;"	p	typeref:typename:int
+prototype_b	input.h	/^extern void prototype_b (void);$/;"	p	typeref:typename:void
