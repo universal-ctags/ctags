@@ -1623,7 +1623,7 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
 	  (intptr_t )str, str, (intptr_t )end, end, (intptr_t )sstart, sstart, (intptr_t )sprev, sprev);
   fprintf(stderr, "size: %d, start offset: %d\n",
 	  (int )(end - str), (int )(sstart - str));
-  fprintf(stderr, "\n ofs> str                   stk  addr:opcode\n");
+  fprintf(stderr, "\n ofs> str                   stk:type  addr:opcode\n");
 #endif
 
   STACK_PUSH_ENSURED(STK_ALT, (UChar* )FinishCode);  /* bottom stack */
@@ -1652,8 +1652,9 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
       *bp = 0;                                                          \
       fputs((char* )buf, stderr);                                       \
       for (i = 0; i < 20 - (bp - buf); i++) fputc(' ', stderr);         \
-      fprintf(stderr, "%4"PRIdPTR"  %4"PRIdPTR":",                      \
-	  stk - stk_base, (op == FinishCode) ? (ptrdiff_t )-1 : op - reg->p); \
+      fprintf(stderr, "%4"PRIdPTR":%04x  %4"PRIdPTR":",                 \
+	  stk - stk_base - 1, stk[-1].type,                             \
+	  (op == FinishCode) ? (ptrdiff_t )-1 : op - reg->p);           \
       onig_print_compiled_byte_code(stderr, op, reg->p+reg->used, NULL, encode); \
       fprintf(stderr, "\n");                                            \
     }
