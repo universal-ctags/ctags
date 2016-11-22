@@ -17,3 +17,4 @@ This section deals with individual parser topics.
 	parser-xslt.rst
 	parser-python.rst
 	parser-html.rst
+	parser-asm.rst
