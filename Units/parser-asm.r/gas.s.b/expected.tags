@@ -1,1 +1,1 @@
-sub	input.s	/^.macro  sum from=0, to=5$/;"	m
+sum	input.s	/^.macro  sum from=0, to=5$/;"	m
