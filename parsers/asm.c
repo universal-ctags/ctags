@@ -167,7 +167,8 @@ static void makeAsmTag (
 		const vString *const name,
 		const vString *const operator,
 		const bool labelCandidate,
-		const bool nameFollows)
+		const bool nameFollows,
+		const bool directive)
 {
 	if (vStringLength (name) > 0)
 	{
@@ -188,6 +189,13 @@ static void makeAsmTag (
 			operatorKind (name, &found);
 			if (! found)
 				makeSimpleTag (name, AsmKinds, K_LABEL);
+		}
+		else if (directive)
+		{
+			const AsmKind kind_for_directive = operatorKind (name, &found);
+			if (found && (kind_for_directive != K_NONE))
+				makeSimpleTag (operator, AsmKinds, kind_for_directive);
+
 		}
 	}
 }
@@ -257,6 +265,7 @@ static void findAsmTags (void)
 		const unsigned char *cp = line;
 		bool labelCandidate = (bool) (! isspace ((int) *cp));
 		bool nameFollows = false;
+		bool directive = false;
 		const bool isComment = (bool)
 				(*cp != '\0' && strchr (";*@", *cp) != NULL);
 
@@ -269,6 +278,13 @@ static void findAsmTags (void)
 			++cp;
 
 		/* read symbol */
+		if (*cp == '.')
+		{
+			directive = true;
+			labelCandidate = false;
+			++cp;
+		}
+
 		cp = readSymbol (cp, name);
 		if (vStringLength (name) > 0  &&  *cp == ':')
 		{
@@ -299,7 +315,7 @@ static void findAsmTags (void)
 			cp = readSymbol (cp, name);
 			nameFollows = true;
 		}
-		makeAsmTag (name, operator, labelCandidate, nameFollows);
+		makeAsmTag (name, operator, labelCandidate, nameFollows, directive);
 	}
 
 	cppTerminate ();
