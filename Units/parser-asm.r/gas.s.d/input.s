@@ -4,3 +4,4 @@
 	sum     "(\from+1)",\to
 	.endif
 	.endm
+#define X 1
