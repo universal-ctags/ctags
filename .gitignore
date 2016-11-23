@@ -66,3 +66,4 @@ win32/*.user
 win32/[Dd]ebug/
 win32/[Rr]elease/
 _build
+man/ctags.1.rst

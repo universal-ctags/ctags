@@ -491,25 +491,43 @@ See :ref:`JSON output <output-json>` for more details.
 Defining a macro in CPreProcessor input
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. NOT REVIEWED YET
-
 Newly introduced ``-D`` option extends the function provided by
 ``-I`` option.
 
-With ``-I`` option is used for ignoring specified identifiers in C and
-C++ source files.
+``-D`` emulates the behaviour of the corresponding gcc option:
+it defines a C preprocessor macro. All types of macros are supported,
+including the ones with parameters and variable arguments.
+Stringification, token pasting and recursive macro expansion are also supported.
 
-Instead of ignoring, with ``-D`` option, you can define a replacement for
-specified identifier. Here the identifier is considered as a macro in C/C++
-source code.
+``-I`` is now simply a backward-compatible syntax to define a
+macro with no replacement.
+
+Some examples follow.
 
 .. code-block:: console
 
-   $ ctags ... -D foreach=for($0;;) ...
+	$ ctags ... -D IGNORE_THIS ...
 
-This example defines `for($0;;)` as the replacement `foreach()`.
+With this commandline the following C/C++ input
 
-With the example command line following C/C++ input:
+.. code-block:: C
+
+	int IGNORE_THIS a;
+
+will be processed as if it was
+
+.. code-block:: C
+
+	int a;
+
+Defining a macro with parameters uses the following syntax:
+
+.. code-block:: console
+
+	$ ctags ... -D "foreach(arg)=for(arg;;)" ...
+
+This example defines `for(arg;;)` as the replacement `foreach(arg)`.
+So the following C/C++ input
 
 .. code-block:: C
 
@@ -527,8 +545,49 @@ is processed in new C/C++ parser as:
 
 	}
 
-`$0` ... `$9` specifies the arguments passed to the identifier in
-source code. `$*` specifies the whole arguments.
+and the p local variable can be extracted.
+
+The previous commandline includes quotes since the macros generally contain
+characters that are treated specially by the shells. You may need some escaping.
+
+Token pasting is performed by the ## operator, just like in the normal
+C preprocessor.
+
+.. code-block:: console
+
+	$ ctags ... -D "DECLARE_FUNCTION(prefix)=int prefix ## Call();"
+
+So the following code
+
+.. code-block:: C
+
+	DECLARE_FUNCTION(a)
+	DECLARE_FUNCTION(b)
+
+will be processed as
+
+.. code-block:: C
+
+	int aCall();
+	int bCall();
+
+Macros with variable arguments use the gcc __VA_ARGS__ syntax.
+
+.. code-block:: console
+
+	$ ctags ... -D "DECLARE_FUNCTION(name,...)=int name(__VA_ARGS__);"
+
+So the following code
+
+.. code-block:: C
+
+	DECLARE_FUNCTION(x,int a,int b)
+
+will be processed as
+
+.. code-block:: C
+
+	int x(int a,int b);
 
 
 Changes to the tags file format

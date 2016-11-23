@@ -1053,6 +1053,8 @@ next_token:
 		pInfo->bTypeContainsIdentifierScopeAndSignature = true;
 	} else {
 		pToken = pInfo->pScopeStart ? pInfo->pScopeStart : pInfo->pIdentifierStart;
+
+		CXX_DEBUG_PRINT("Non-nested parentheses, looking before token '%s'",vStringValue(pToken->pszWord));
 		
 		if(pToken->pPrev)
 		{
@@ -1077,6 +1079,7 @@ next_token:
 				// looks like trailing return type
 				//   auto f() -> int;
 				//   auto f() -> int {
+				CXX_DEBUG_PRINT("Looks like a trailing return type");
 				pInfo->pTypeStart = pParenthesisOrConst->pNext->pNext;
 				pInfo->pTypeEnd = pInfo->pTypeStart;
 				while(
@@ -1089,10 +1092,12 @@ next_token:
 					pInfo->pTypeEnd = pInfo->pTypeEnd->pNext;
 			} else {
 				// probaby normal return type
+				CXX_DEBUG_PRINT("Probably a normal return type");
 				pInfo->pTypeEnd = pToken->pPrev;
 				pInfo->pTypeStart = cxxTokenChainFirst(pChain);
 			}
 		} else {
+			CXX_DEBUG_PRINT("No return type");
 			pInfo->pTypeEnd = NULL;
 			pInfo->pTypeStart = NULL;
 		}
@@ -1143,13 +1148,16 @@ int cxxParserEmitFunctionTags(
 
 	// We'll be removing the scope and identifier, fix type
 	if(
-		(pInfo->pTypeStart == pInfo->pScopeStart) ||
-		(pInfo->pTypeStart == pInfo->pIdentifierStart)
+		pInfo->pTypeStart && 
+		(
+			(pInfo->pTypeStart == pInfo->pScopeStart) ||
+			(pInfo->pTypeStart == pInfo->pIdentifierStart)
+		)
 	)
 		pInfo->pTypeStart = pInfo->pIdentifierEnd->pNext;
 	
 	CXX_DEBUG_ASSERT(pInfo->pTypeEnd != pInfo->pIdentifierEnd,"The type should never end at identifier");
-
+	
 	if(pInfo->pScopeStart)
 	{
 		if(bPushScopes)
