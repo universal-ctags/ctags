@@ -1,0 +1,2 @@
+X	input.s	/^#define X /;"	d	file:
+sum	input.s	/^.macro  sum from=0, to=5$/;"	m
