@@ -1027,7 +1027,7 @@ static void cxxParserParseNextTokenApplyReplacement(
 
 	CXX_DEBUG_ASSERT(pInfo,"Info must be not null");
 	CXX_DEBUG_ASSERT(pInfo->replacement,"There should be a replacement");
-	CXX_DEBUG_ASSERT(pInfo->replacementLength > 0,"The replacement is too short");
+	CXX_DEBUG_ASSERT(vStringLength (pInfo->replacement) > 0,"The replacement is too short");
 
 	if(!pInfo->ignoreFollowingParenthesis)
 	{
