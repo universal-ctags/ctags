@@ -22,12 +22,14 @@ static int writeCtagsPtagEntry (MIO * mio, const ptagDesc *desc,
 								const char *const fileName,
 								const char *const pattern,
 								const char *const parserName, void *data CTAGS_ATTR_UNUSED);
+static void buildCtagsFqTagCache (tagEntryInfo *const tag);
 
 tagWriter ctagsWriter = {
 	.writeEntry = writeCtagsEntry,
 	.writePtagEntry = writeCtagsPtagEntry,
 	.preWriteEntry = NULL,
 	.postWriteEntry = NULL,
+	.buildFqTagCache = buildCtagsFqTagCache,
 	.useStdoutByDefault = false,
 };
 
@@ -222,4 +224,10 @@ static int writeCtagsPtagEntry (MIO * mio, const ptagDesc *desc,
 			      PSEUDO_TAG_PREFIX, desc->name,
 			      OPT(fileName), OPT(pattern));
 #undef OPT
+}
+
+static void buildCtagsFqTagCache (tagEntryInfo *const tag)
+{
+	escapeFieldValue (tag, FIELD_SCOPE_KIND_LONG);
+	escapeFieldValue (tag, FIELD_SCOPE);
 }

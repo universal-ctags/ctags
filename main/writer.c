@@ -71,3 +71,9 @@ extern int writerWritePtag (MIO * mio,
 								   pattern, parserName, writerData);
 
 }
+
+extern void writerBuildFqTagCache (tagEntryInfo *const tag)
+{
+	if (writer->buildFqTagCache)
+		writer->buildFqTagCache (tag);
+}

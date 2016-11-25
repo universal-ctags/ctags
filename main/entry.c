@@ -1040,13 +1040,6 @@ static unsigned int queueTagEntry(const tagEntryInfo *const tag)
 }
 
 
-static void buildFqTagCache (const tagEntryInfo *const tag)
-{
-	/* TODO: WRITER_DEFAULT should not be used here.*/
-	renderFieldEscaped (WRITER_DEFAULT, FIELD_SCOPE_KIND_LONG, tag, NO_PARSER_FIELD);
-	renderFieldEscaped (WRITER_DEFAULT, FIELD_SCOPE, tag, NO_PARSER_FIELD);
-}
-
 extern void setupWriter (void)
 {
 	writerSetup (TagFile.mio);
@@ -1074,7 +1067,10 @@ static void writeTagEntry (const tagEntryInfo *const tag)
 	if (includeExtensionFlags ()
 	    && isXtagEnabled (XTAG_QUALIFIED_TAGS)
 	    && doesInputLanguageRequestAutomaticFQTag ())
-		buildFqTagCache (tag);
+	{
+		/* const is discarded to update the cache field of TAG. */
+		writerBuildFqTagCache ( (tagEntryInfo *const)tag);
+	}
 
 	length = writerWriteTag (TagFile.mio, tag);
 

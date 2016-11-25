@@ -37,6 +37,7 @@ struct sTagWriter {
 							const char *const parserName, void *data);
 	void * (* preWriteEntry) (MIO * mio);
 	void (* postWriteEntry)  (MIO * mio, const char* filename, void *data);
+	void (* buildFqTagCache) (tagEntryInfo *const tag);
 	bool useStdoutByDefault;
 
 	writerType type;
@@ -52,6 +53,8 @@ int writerWritePtag (MIO * mio,
 					 const char *const fileName,
 					 const char *const pattern,
 					 const char *const parserName);
+
+extern void writerBuildFqTagCache (tagEntryInfo *const tag);
 
 extern bool outputFormatUsedStdoutByDefault (void);
 
