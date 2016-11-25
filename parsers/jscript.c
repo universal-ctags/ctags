@@ -1368,7 +1368,6 @@ nextVar:
 			parseBlock (token, parent);
 
 		/* Potentially the name of the function */
-		readToken (token);
 		if (isType (token, TOKEN_PERIOD))
 		{
 			/*
@@ -1501,6 +1500,8 @@ nextVar:
 					readToken (token);
 			} while (isType (token, TOKEN_PERIOD));
 		}
+		else
+			readToken (token);
 
 		if ( isType (token, TOKEN_OPEN_PAREN) )
 			skipArgumentList(token, false, NULL);
