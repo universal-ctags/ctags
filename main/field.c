@@ -70,15 +70,15 @@ static bool     isXpathFieldAvailable     (const tagEntryInfo *const tag);
 static bool     isEndFieldAvailable       (const tagEntryInfo *const tag);
 
 
-#define DEFINE_FIELD_SPEC(L, N, V, H, F)		\
-	DEFINE_FIELD_SPEC_FULL (L, N, V, H, NULL, F)
-#define DEFINE_FIELD_SPEC_FULL(L, N, V, H, A, F)	\
+#define DEFINE_FIELD_SPEC(L, N, V, H, ...)		\
+	DEFINE_FIELD_SPEC_FULL (L, N, V, H, NULL, __VA_ARGS__)
+#define DEFINE_FIELD_SPEC_FULL(L, N, V, H, A, ...)	\
 	{					\
 		.letter        = L,		\
 		.name          = N,		\
 		.description   = H,		\
 		.enabled       = V,		\
-		.renderEscaped = F,		\
+		.renderEscaped = { __VA_ARGS__ },		\
 		.isValueAvailable = A,		\
 	}
 
@@ -88,96 +88,96 @@ static fieldSpec fieldSpecsFixed [] = {
         /* FIXED FIELDS */
 	DEFINE_FIELD_SPEC ('N', "name",     true,
 			  "tag name (fixed field)",
-			  {[WRITER_U_CTAGS] = renderFieldName}),
+			  [WRITER_U_CTAGS] = renderFieldName),
 	DEFINE_FIELD_SPEC ('F', "input",    true,
 			   "input file (fixed field)",
-			   {[WRITER_U_CTAGS] = renderFieldInput}),
+			   [WRITER_U_CTAGS] = renderFieldInput),
 	DEFINE_FIELD_SPEC ('P', "pattern",  true,
 			   "pattern (fixed field)",
-			   {[WRITER_U_CTAGS] = renderFieldPattern}),
+			   [WRITER_U_CTAGS] = renderFieldPattern),
 };
 
 static fieldSpec fieldSpecsExuberant [] = {
 	DEFINE_FIELD_SPEC ('C', "compact",        false,
 			   "compact input line (fixed field, only used in -x option)",
-			   {[WRITER_U_CTAGS] = renderFieldCompactInputLine}),
+			   [WRITER_U_CTAGS] = renderFieldCompactInputLine),
 
 	/* EXTENSION FIELDS */
 	DEFINE_FIELD_SPEC_FULL ('a', "access",         false,
 		      "Access (or export) of class members",
 			  isAccessFieldAvailable,
-		      {[WRITER_U_CTAGS] = renderFieldAccess}),
+		      [WRITER_U_CTAGS] = renderFieldAccess),
 	DEFINE_FIELD_SPEC_FULL ('f', "file",           true,
 		      "File-restricted scoping",
 			  isFileFieldAvailable,
-		      {[WRITER_U_CTAGS] = renderFieldFile}),
+		      [WRITER_U_CTAGS] = renderFieldFile),
 	DEFINE_FIELD_SPEC_FULL ('i', "inherits",       false,
 		      "Inheritance information",
 			  isInheritsFieldAvailable,
-		      {[WRITER_U_CTAGS] = renderFieldInherits}),
+		      [WRITER_U_CTAGS] = renderFieldInherits),
 	DEFINE_FIELD_SPEC ('K', NULL,             false,
 		      "Kind of tag as full name",
-		      {[WRITER_U_CTAGS] = renderFieldKindName}),
+		      [WRITER_U_CTAGS] = renderFieldKindName),
 	DEFINE_FIELD_SPEC ('k', NULL,             true,
 			   "Kind of tag as a single letter",
-			   {[WRITER_U_CTAGS] = renderFieldKindLetter}),
+			   [WRITER_U_CTAGS] = renderFieldKindLetter),
 	DEFINE_FIELD_SPEC_FULL ('l', "language",       false,
 			   "Language of input file containing tag",
 			   isLanguageFieldAvailable,
-			   {[WRITER_U_CTAGS] = renderFieldLanguage}),
+			   [WRITER_U_CTAGS] = renderFieldLanguage),
 	DEFINE_FIELD_SPEC_FULL ('m', "implementation", false,
 			   "Implementation information",
 			   isImplementationFieldAvailable,
-			   {[WRITER_U_CTAGS] = renderFieldImplementation}),
+			   [WRITER_U_CTAGS] = renderFieldImplementation),
 	DEFINE_FIELD_SPEC ('n', "line",           false,
 			   "Line number of tag definition",
-			   {[WRITER_U_CTAGS] = renderFieldLineNumber}),
+			   [WRITER_U_CTAGS] = renderFieldLineNumber),
 	DEFINE_FIELD_SPEC_FULL ('S', "signature",	     false,
 			   "Signature of routine (e.g. prototype or parameter list)",
 			   isSignatureFieldAvailable,
-			   {[WRITER_U_CTAGS] = renderFieldSignature}),
+			   [WRITER_U_CTAGS] = renderFieldSignature),
 	DEFINE_FIELD_SPEC ('s', NULL,             true,
 			   "Scope of tag definition (`p' can be used for printing its kind)",
-			   {[WRITER_U_CTAGS] = renderFieldScope}),
+			   [WRITER_U_CTAGS] = renderFieldScope),
 	DEFINE_FIELD_SPEC_FULL ('t', "typeref",        true,
 			   "Type and name of a variable or typedef",
 			   isTyperefFieldAvailable,
-			   {[WRITER_U_CTAGS] = renderFieldTyperef}),
+			   [WRITER_U_CTAGS] = renderFieldTyperef),
 	DEFINE_FIELD_SPEC ('z', "kind",           false,
 			   "Include the \"kind:\" key in kind field (use k or K) in tags output, kind full name in xref output",
 			   /* Following renderer is for handling --_xformat=%{kind};
 			      and is not for tags output. */
-			   {[WRITER_U_CTAGS] = renderFieldKindName}),
+			   [WRITER_U_CTAGS] = renderFieldKindName),
 };
 
 static fieldSpec fieldSpecsUniversal [] = {
 	DEFINE_FIELD_SPEC_FULL ('r', "role",    false,
 			   "Role",
 			   isRoleFieldAvailable,
-			   {[WRITER_U_CTAGS] = renderFieldRole}),
+			   [WRITER_U_CTAGS] = renderFieldRole),
 	DEFINE_FIELD_SPEC ('R',  NULL,     false,
 			   "Marker (R or D) representing whether tag is definition or reference",
-			   {[WRITER_U_CTAGS] = renderFieldRefMarker}),
+			   [WRITER_U_CTAGS] = renderFieldRefMarker),
 	DEFINE_FIELD_SPEC ('Z', "scope",   false,
 			  "Include the \"scope:\" key in scope field (use s) in tags output, scope name in xref output",
 			   /* Following renderer is for handling --_xformat=%{scope};
 			      and is not for tags output. */
-			   {[WRITER_U_CTAGS] = renderFieldScope}),
+			   [WRITER_U_CTAGS] = renderFieldScope),
 	DEFINE_FIELD_SPEC_FULL ('E', "extra",   false,
 			   "Extra tag type information",
 			   isExtraFieldAvailable,
-			   {[WRITER_U_CTAGS] = renderFieldExtra}),
+			   [WRITER_U_CTAGS] = renderFieldExtra),
 	DEFINE_FIELD_SPEC_FULL ('x', "xpath",   false,
 			   "xpath for the tag",
 			   isXpathFieldAvailable,
-			   {[WRITER_U_CTAGS] = renderFieldXpath}),
+			   [WRITER_U_CTAGS] = renderFieldXpath),
 	DEFINE_FIELD_SPEC ('p', "scopeKind", false,
 			   "Kind of scope as full name",
-			   {[WRITER_U_CTAGS] = renderFieldScopeKindName}),
+			   [WRITER_U_CTAGS] = renderFieldScopeKindName),
 	DEFINE_FIELD_SPEC_FULL ('e', "end", false,
 			   "end lines of various items",
 			   isEndFieldAvailable,
-			   {[WRITER_U_CTAGS] = renderFieldEnd}),
+			   [WRITER_U_CTAGS] = renderFieldEnd),
 };
 
 
