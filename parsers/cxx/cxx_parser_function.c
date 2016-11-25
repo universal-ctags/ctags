@@ -1143,8 +1143,11 @@ int cxxParserEmitFunctionTags(
 
 	// We'll be removing the scope and identifier, fix type
 	if(
-		(pInfo->pTypeStart == pInfo->pScopeStart) ||
-		(pInfo->pTypeStart == pInfo->pIdentifierStart)
+		pInfo->pTypeStart &&
+		(
+			(pInfo->pTypeStart == pInfo->pScopeStart) ||
+			(pInfo->pTypeStart == pInfo->pIdentifierStart)
+		)
 	)
 		pInfo->pTypeStart = pInfo->pIdentifierEnd->pNext;
 	
