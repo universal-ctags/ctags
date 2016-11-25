@@ -4,6 +4,6 @@
 var Obj = {
     myMethod(a, b) {
     },
-	*myGenerator(a, b) {
-	}
+    *myGenerator(a, b) {
+    }
 }

@@ -1199,6 +1199,13 @@ static bool parseMethods (tokenInfo *const token, tokenInfo *const class)
 	 *	   validMethod    : function(a,b) {}
 	 *	   'validMethod2' : function(a,b) {}
      *     container.dirtyTab = {'url': false, 'title':false, 'snapshot':false, '*': false}
+     *
+     * ES6 methods:
+     *     property(...) {}
+     *     *generator() {}
+     * FIXME: what to do with computed names?
+     *     [property]() {}
+     *     *[generator]() {}
 	 */
 
 	do
@@ -1211,23 +1218,36 @@ static bool parseMethods (tokenInfo *const token, tokenInfo *const class)
 
 		if (! isType (token, TOKEN_KEYWORD))
 		{
+			bool is_generator = false;
+			bool is_shorthand = false; /* ES6 shorthand syntax */
+
+			if (isType (token, TOKEN_STAR)) /* shorthand generator */
+			{
+				is_generator = true;
+				readToken (token);
+			}
+
 			copyToken(name, token, true);
 
 			readToken (token);
-			if ( isType (token, TOKEN_COLON) )
+			is_shorthand = isType (token, TOKEN_OPEN_PAREN);
+			if ( isType (token, TOKEN_COLON) || is_shorthand )
 			{
-				readToken (token);
-				if ( isKeyword (token, KEYWORD_function) )
+				if (! is_shorthand)
+					readToken (token);
+				if ( is_shorthand || isKeyword (token, KEYWORD_function) )
 				{
 					vString *const signature = vStringNew ();
-					bool is_generator = false;
 
-					readToken (token);
-					if (isType (token, TOKEN_STAR))
+					if (! is_shorthand)
 					{
-						/* generator: 'function' '*' '(' ... ')' '{' ... '}' */
-						is_generator = true;
 						readToken (token);
+						if (isType (token, TOKEN_STAR))
+						{
+							/* generator: 'function' '*' '(' ... ')' '{' ... '}' */
+							is_generator = true;
+							readToken (token);
+						}
 					}
 					if ( isType (token, TOKEN_OPEN_PAREN) )
 					{
