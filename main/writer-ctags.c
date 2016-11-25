@@ -46,7 +46,7 @@ tagWriter eCtagsWriter = {
 
 static const char* escapeFieldValue (tagWriter *writer, const tagEntryInfo * tag, fieldType ftype)
 {
-	return renderFieldEscaped (writer->type, ftype, tag, NO_PARSER_FIELD);
+	return renderFieldEscaped (writer->type, ftype, tag, NO_PARSER_FIELD, NULL);
 }
 
 static int renderExtensionFieldMaybe (tagWriter *writer, int xftype, const tagEntryInfo *const tag, char sep[2], MIO *mio)
@@ -79,7 +79,7 @@ static int addParserFields (tagWriter *writer, MIO * mio, const tagEntryInfo *co
 		length += mio_printf(mio, "\t%s:%s",
 							 getFieldName (ftype),
 							 renderFieldEscaped (writer->type,
-												 tag->parserFields [i].ftype, tag, i));
+												 tag->parserFields [i].ftype, tag, i, NULL));
 	}
 	return length;
 }
