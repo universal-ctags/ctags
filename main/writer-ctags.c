@@ -26,7 +26,7 @@ static int writeCtagsPtagEntry (tagWriter *writer CTAGS_ATTR_UNUSED,
 								const char *const parserName, void *data CTAGS_ATTR_UNUSED);
 static void buildCtagsFqTagCache (tagWriter *writer CTAGS_ATTR_UNUSED, tagEntryInfo *const tag);
 
-tagWriter ctagsWriter = {
+tagWriter uCtagsWriter = {
 	.writeEntry = writeCtagsEntry,
 	.writePtagEntry = writeCtagsPtagEntry,
 	.preWriteEntry = NULL,
@@ -35,19 +35,28 @@ tagWriter ctagsWriter = {
 	.useStdoutByDefault = false,
 };
 
-static const char* escapeFieldValue (const tagEntryInfo * tag, fieldType ftype)
+tagWriter eCtagsWriter = {
+	.writeEntry = writeCtagsEntry,
+	.writePtagEntry = writeCtagsPtagEntry,
+	.preWriteEntry = NULL,
+	.postWriteEntry = NULL,
+	.buildFqTagCache = buildCtagsFqTagCache,
+	.useStdoutByDefault = false,
+};
+
+static const char* escapeFieldValue (tagWriter *writer, const tagEntryInfo * tag, fieldType ftype)
 {
-	return renderFieldEscaped (ctagsWriter.type, ftype, tag, NO_PARSER_FIELD);
+	return renderFieldEscaped (writer->type, ftype, tag, NO_PARSER_FIELD);
 }
 
-static int renderExtensionFieldMaybe (int xftype, const tagEntryInfo *const tag, char sep[2], MIO *mio)
+static int renderExtensionFieldMaybe (tagWriter *writer, int xftype, const tagEntryInfo *const tag, char sep[2], MIO *mio)
 {
 	if (isFieldEnabled (xftype) && doesFieldHaveValue (xftype, tag))
 	{
 		int len;
 		len = mio_printf (mio, "%s\t%s:%s", sep,
 				  getFieldName (xftype),
-				  escapeFieldValue (tag, xftype));
+				  escapeFieldValue (writer, tag, xftype));
 		sep[0] = '\0';
 		return len;
 	}
@@ -55,7 +64,7 @@ static int renderExtensionFieldMaybe (int xftype, const tagEntryInfo *const tag,
 		return 0;
 }
 
-static int addParserFields (MIO * mio, const tagEntryInfo *const tag)
+static int addParserFields (tagWriter *writer, MIO * mio, const tagEntryInfo *const tag)
 {
 	unsigned int i;
 	unsigned int ftype;
@@ -69,16 +78,16 @@ static int addParserFields (MIO * mio, const tagEntryInfo *const tag)
 
 		length += mio_printf(mio, "\t%s:%s",
 							 getFieldName (ftype),
-							 renderFieldEscaped (ctagsWriter.type,
+							 renderFieldEscaped (writer->type,
 												 tag->parserFields [i].ftype, tag, i));
 	}
 	return length;
 }
 
-static int writeLineNumberEntry (MIO * mio, const tagEntryInfo *const tag)
+static int writeLineNumberEntry (tagWriter *writer, MIO * mio, const tagEntryInfo *const tag)
 {
 	if (Option.lineDirectives)
-		return mio_printf (mio, "%s", escapeFieldValue (tag, FIELD_LINE_NUMBER));
+		return mio_printf (mio, "%s", escapeFieldValue (writer, tag, FIELD_LINE_NUMBER));
 	else
 		return mio_printf (mio, "%lu", tag->lineNumber);
 }
@@ -96,7 +105,7 @@ static int file_puts (const char* s, void *data)
 	return mio_puts (fp, s);
 }
 
-static int addExtensionFields (MIO *mio, const tagEntryInfo *const tag)
+static int addExtensionFields (tagWriter *writer, MIO *mio, const tagEntryInfo *const tag)
 {
 	bool isKindKeyEnabled = isFieldEnabled (FIELD_KIND_KEY);
 	bool isScopeEnabled = isFieldEnabled   (FIELD_SCOPE_KEY);
@@ -139,14 +148,14 @@ static int addExtensionFields (MIO *mio, const tagEntryInfo *const tag)
 		sep [0] = '\0';
 	}
 
-	length += renderExtensionFieldMaybe (FIELD_LANGUAGE, tag, sep, mio);
+	length += renderExtensionFieldMaybe (writer, FIELD_LANGUAGE, tag, sep, mio);
 
 	if (isFieldEnabled (FIELD_SCOPE))
 	{
 		const char* k = NULL, *v = NULL;
 
-		k = escapeFieldValue (tag, FIELD_SCOPE_KIND_LONG);
-		v = escapeFieldValue (tag, FIELD_SCOPE);
+		k = escapeFieldValue (writer, tag, FIELD_SCOPE_KIND_LONG);
+		v = escapeFieldValue (writer, tag, FIELD_SCOPE);
 		if (k && v)
 		{
 			length += mio_printf (mio, scopeFmt, sep, scopeKey, k, v);
@@ -159,7 +168,7 @@ static int addExtensionFields (MIO *mio, const tagEntryInfo *const tag)
 		length += mio_printf (mio, "%s\t%s:%s:%s", sep,
 				      getFieldName (FIELD_TYPE_REF),
 				      tag->extensionFields.typeRef [0],
-				      escapeFieldValue (tag, FIELD_TYPE_REF));
+				      escapeFieldValue (writer, tag, FIELD_TYPE_REF));
 		sep [0] = '\0';
 	}
 
@@ -170,14 +179,14 @@ static int addExtensionFields (MIO *mio, const tagEntryInfo *const tag)
 		sep [0] = '\0';
 	}
 
-	length += renderExtensionFieldMaybe (FIELD_INHERITANCE, tag, sep, mio);
-	length += renderExtensionFieldMaybe (FIELD_ACCESS, tag, sep, mio);
-	length += renderExtensionFieldMaybe (FIELD_IMPLEMENTATION, tag, sep, mio);
-	length += renderExtensionFieldMaybe (FIELD_SIGNATURE, tag, sep, mio);
-	length += renderExtensionFieldMaybe (FIELD_ROLE, tag, sep, mio);
-	length += renderExtensionFieldMaybe (FIELD_EXTRA, tag, sep, mio);
-	length += renderExtensionFieldMaybe (FIELD_XPATH, tag, sep, mio);
-	length += renderExtensionFieldMaybe (FIELD_END, tag, sep, mio);
+	length += renderExtensionFieldMaybe (writer, FIELD_INHERITANCE, tag, sep, mio);
+	length += renderExtensionFieldMaybe (writer, FIELD_ACCESS, tag, sep, mio);
+	length += renderExtensionFieldMaybe (writer, FIELD_IMPLEMENTATION, tag, sep, mio);
+	length += renderExtensionFieldMaybe (writer, FIELD_SIGNATURE, tag, sep, mio);
+	length += renderExtensionFieldMaybe (writer, FIELD_ROLE, tag, sep, mio);
+	length += renderExtensionFieldMaybe (writer, FIELD_EXTRA, tag, sep, mio);
+	length += renderExtensionFieldMaybe (writer, FIELD_XPATH, tag, sep, mio);
+	length += renderExtensionFieldMaybe (writer, FIELD_END, tag, sep, mio);
 
 	return length;
 }
@@ -187,15 +196,15 @@ static int writePatternEntry (MIO *mio, const tagEntryInfo *const tag)
 	return makePatternStringCommon (tag, file_putc, file_puts, mio);
 }
 
-static int writeCtagsEntry (tagWriter *writer CTAGS_ATTR_UNUSED,
+static int writeCtagsEntry (tagWriter *writer,
 							MIO * mio, const tagEntryInfo *const tag, void *data CTAGS_ATTR_UNUSED)
 {
 	int length = mio_printf (mio, "%s\t%s\t",
-			      escapeFieldValue (tag, FIELD_NAME),
-			      escapeFieldValue (tag, FIELD_INPUT_FILE));
+			      escapeFieldValue (writer, tag, FIELD_NAME),
+			      escapeFieldValue (writer, tag, FIELD_INPUT_FILE));
 
 	if (tag->lineNumberEntry)
-		length += writeLineNumberEntry (mio, tag);
+		length += writeLineNumberEntry (writer, mio, tag);
 	else if (tag->pattern)
 		length += mio_printf(mio, "%s", tag->pattern);
 	else
@@ -203,8 +212,8 @@ static int writeCtagsEntry (tagWriter *writer CTAGS_ATTR_UNUSED,
 
 	if (includeExtensionFlags ())
 	{
-		length += addExtensionFields (mio, tag);
-		length += addParserFields (mio, tag);
+		length += addExtensionFields (writer, mio, tag);
+		length += addParserFields (writer, mio, tag);
 	}
 
 	length += mio_printf (mio, "\n");
@@ -232,6 +241,6 @@ static int writeCtagsPtagEntry (tagWriter *writer CTAGS_ATTR_UNUSED,
 
 static void buildCtagsFqTagCache (tagWriter *writer CTAGS_ATTR_UNUSED, tagEntryInfo *const tag)
 {
-	escapeFieldValue (tag, FIELD_SCOPE_KIND_LONG);
-	escapeFieldValue (tag, FIELD_SCOPE);
+	escapeFieldValue (writer, tag, FIELD_SCOPE_KIND_LONG);
+	escapeFieldValue (writer, tag, FIELD_SCOPE);
 }
