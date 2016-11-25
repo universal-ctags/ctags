@@ -1045,9 +1045,9 @@ extern void setupWriter (void)
 	writerSetup (TagFile.mio);
 }
 
-extern void teardownWriter (const char *filename)
+extern bool teardownWriter (const char *filename)
 {
-	writerTeardown (TagFile.mio, filename);
+	return writerTeardown (TagFile.mio, filename);
 }
 
 static void writeTagEntry (const tagEntryInfo *const tag)

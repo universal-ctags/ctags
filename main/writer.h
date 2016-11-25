@@ -37,7 +37,10 @@ struct sTagWriter {
 							const char *const pattern,
 							const char *const parserName);
 	void * (* preWriteEntry) (tagWriter *writer, MIO * mio);
-	void (* postWriteEntry)  (tagWriter *writer, MIO * mio, const char* filename);
+
+	/* Returning TRUE means the output file may be shrunk.
+	   In such case the callee may do truncate output file. */
+	bool (* postWriteEntry)  (tagWriter *writer, MIO * mio, const char* filename);
 	void (* buildFqTagCache) (tagWriter *writer, tagEntryInfo *const tag);
 	bool useStdoutByDefault;
 
@@ -50,7 +53,7 @@ struct sTagWriter {
 
 extern void setTagWriter (writerType otype);
 extern void writerSetup  (MIO *mio);
-extern void writerTeardown (MIO *mio, const char *filename);
+extern bool writerTeardown (MIO *mio, const char *filename);
 
 int writerWriteTag (MIO * mio, const tagEntryInfo *const tag);
 int writerWritePtag (MIO * mio,

@@ -45,13 +45,16 @@ extern void writerSetup (MIO *mio)
 		writer->private = NULL;
 }
 
-extern void writerTeardown (MIO *mio, const char *filename)
+extern bool writerTeardown (MIO *mio, const char *filename)
 {
 	if (writer->postWriteEntry)
 	{
-		writer->postWriteEntry (writer, mio, filename);
+		bool r;
+		r = writer->postWriteEntry (writer, mio, filename);
 		writer->private = NULL;
+		return r;
 	}
+	return false;
 }
 
 extern int writerWriteTag (MIO * mio, const tagEntryInfo *const tag)

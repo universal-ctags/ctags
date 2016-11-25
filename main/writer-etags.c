@@ -22,7 +22,7 @@
 
 static int writeEtagsEntry  (tagWriter *writer, MIO * mio, const tagEntryInfo *const tag);
 static void *beginEtagsFile (tagWriter *writer, MIO * mio);
-static void  endEtagsFile   (tagWriter *writer, MIO * mio, const char* filename);
+static bool  endEtagsFile   (tagWriter *writer, MIO * mio, const char* filename);
 
 tagWriter etagsWriter = {
 	.writeEntry = writeEtagsEntry,
@@ -50,7 +50,7 @@ static void *beginEtagsFile (tagWriter *writer CTAGS_ATTR_UNUSED, MIO *mio)
 	return &etags;
 }
 
-static void endEtagsFile (tagWriter *writer,
+static bool endEtagsFile (tagWriter *writer,
 						  MIO *mainfp, const char *filename)
 {
 	const char *line;
@@ -74,6 +74,7 @@ static void endEtagsFile (tagWriter *writer,
 		etags->mio = NULL;
 		etags->name = NULL;
 	}
+	return false;
 }
 
 static int writeEtagsEntry (tagWriter *writer,

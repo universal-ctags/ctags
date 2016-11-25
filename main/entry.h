@@ -113,7 +113,7 @@ extern const char *tagFileName (void);
 extern void openTagFile (void);
 extern void closeTagFile (const bool resize);
 extern void  setupWriter (void);
-extern void  teardownWriter (const char *inputFilename);
+extern bool  teardownWriter (const char *inputFilename);
 extern int makeTagEntry (const tagEntryInfo *const tag);
 extern void initTagEntry (tagEntryInfo *const e, const char *const name,
 			  const kindOption *kind);
