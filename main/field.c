@@ -36,6 +36,8 @@ struct sFieldDesc {
 };
 
 static const char *renderFieldName (const tagEntryInfo *const tag, const char *value, vString* b, bool *rejected);
+static const char *renderFieldNameNoEscape (const tagEntryInfo *const tag, const char *value CTAGS_ATTR_UNUSED, vString* b,
+											bool *rejected);
 static const char *renderFieldInput (const tagEntryInfo *const tag, const char *value, vString* b, bool *rejected);
 static const char *renderFieldCompactInputLine (const tagEntryInfo *const tag, const char *value, vString* b, bool *rejected);
 static const char *renderFieldSignature (const tagEntryInfo *const tag, const char *value, vString* b, bool *rejected);
@@ -88,7 +90,8 @@ static fieldSpec fieldSpecsFixed [] = {
         /* FIXED FIELDS */
 	DEFINE_FIELD_SPEC ('N', "name",     true,
 			  "tag name (fixed field)",
-			  [WRITER_U_CTAGS] = renderFieldName),
+			  [WRITER_U_CTAGS] = renderFieldName,
+			  [WRITER_E_CTAGS] = renderFieldNameNoEscape),
 	DEFINE_FIELD_SPEC ('F', "input",    true,
 			   "input file (fixed field)",
 			   [WRITER_U_CTAGS] = renderFieldInput),
@@ -436,6 +439,17 @@ static const char *renderFieldName (const tagEntryInfo *const tag, const char *v
 									bool *rejected)
 {
 	return renderEscapedName (tag->name, tag, b);
+}
+
+static const char *renderFieldNameNoEscape (const tagEntryInfo *const tag, const char *value CTAGS_ATTR_UNUSED, vString* b,
+											bool *rejected)
+{
+	if (strpbrk (tag->name, " \t"))
+	{
+		*rejected = true;
+		return NULL;
+	}
+	return renderAsIs (b, tag->name);
 }
 
 static const char *renderFieldInput (const tagEntryInfo *const tag, const char *value CTAGS_ATTR_UNUSED, vString* b,
