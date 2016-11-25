@@ -26,6 +26,11 @@ static int writeCtagsPtagEntry (tagWriter *writer CTAGS_ATTR_UNUSED,
 								const char *const parserName);
 static void buildCtagsFqTagCache (tagWriter *writer CTAGS_ATTR_UNUSED, tagEntryInfo *const tag);
 
+struct rejection {
+	bool rejectedInThisRendering;
+	bool rejectedInThisInput;
+};
+
 tagWriter uCtagsWriter = {
 	.writeEntry = writeCtagsEntry,
 	.writePtagEntry = writeCtagsPtagEntry,
@@ -37,22 +42,38 @@ tagWriter uCtagsWriter = {
 
 static void *beginECtagsFile (tagWriter *writer, MIO * mio)
 {
-	static bool rejected;
-	return &rejected;
+	static struct rejection rej;
+
+	rej.rejectedInThisInput = false;;
+
+	return &rej;
+}
+
+static bool endECTagsFile (tagWriter *writer, MIO * mio, const char* filename)
+{
+	struct rejection *rej = writer->private;
+	return rej->rejectedInThisInput;
 }
 
 tagWriter eCtagsWriter = {
 	.writeEntry = writeCtagsEntry,
 	.writePtagEntry = writeCtagsPtagEntry,
 	.preWriteEntry = beginECtagsFile,
-	.postWriteEntry = NULL,
+	.postWriteEntry = endECTagsFile,
 	.buildFqTagCache = buildCtagsFqTagCache,
 	.useStdoutByDefault = false,
 };
 
 static const char* escapeFieldValue (tagWriter *writer, const tagEntryInfo * tag, fieldType ftype)
 {
-	return renderFieldEscaped (writer->type, ftype, tag, NO_PARSER_FIELD, writer->private);
+	bool *reject = NULL;
+
+	if (writer->private)
+	{
+		struct rejection * rej = writer->private;
+		reject = &rej->rejectedInThisRendering;
+	}
+	return renderFieldEscaped (writer->type, ftype, tag, NO_PARSER_FIELD, reject);
 }
 
 static int renderExtensionFieldMaybe (tagWriter *writer, int xftype, const tagEntryInfo *const tag, char sep[2], MIO *mio)
@@ -75,6 +96,13 @@ static int addParserFields (tagWriter *writer, MIO * mio, const tagEntryInfo *co
 	unsigned int i;
 	unsigned int ftype;
 	int length = 0;
+	bool *reject = NULL;
+
+	if (writer->private)
+	{
+		struct rejection *rej = writer->private;
+		reject = &rej->rejectedInThisRendering;
+	}
 
 	for (i = 0; i < tag->usedParserFields; i++)
 	{
@@ -85,7 +113,7 @@ static int addParserFields (tagWriter *writer, MIO * mio, const tagEntryInfo *co
 		length += mio_printf(mio, "\t%s:%s",
 							 getFieldName (ftype),
 							 renderFieldEscaped (writer->type,
-												 tag->parserFields [i].ftype, tag, i, writer->private));
+												 tag->parserFields [i].ftype, tag, i, reject));
 	}
 	return length;
 }
@@ -209,8 +237,11 @@ static int writeCtagsEntry (tagWriter *writer,
 
 	if (writer->private)
 	{
-		*((bool *)writer->private) = false;
+		struct rejection *rej = writer->private;
+
 		origin = mio_tell (mio);
+		rej->rejectedInThisRendering = false;
+
 	}
 
 	int length = mio_printf (mio, "%s\t%s\t",
@@ -232,10 +263,15 @@ static int writeCtagsEntry (tagWriter *writer,
 
 	length += mio_printf (mio, "\n");
 
-	if (writer->private && *(bool *)(writer->private))
+	if (writer->private
+		&& ((struct rejection *)(writer->private))->rejectedInThisRendering)
 	{
-		length = 0;
 		mio_seek (mio, origin, SEEK_SET);
+
+		/* Truncation is needed. */
+		((struct rejection *)(writer->private))->rejectedInThisInput = true;
+
+		length = 0;
 	}
 	return length;
 }
