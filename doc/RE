@@ -1,4 +1,4 @@
-Onigmo (Oniguruma-mod) Regular Expressions Version 6.0.0    2016/11/11
+Onigmo (Oniguruma-mod) Regular Expressions Version 6.0.0    2016/11/25
 
 syntax: ONIG_SYNTAX_RUBY (default)
 
@@ -326,8 +326,8 @@ syntax: ONIG_SYNTAX_RUBY (default)
     ONIG_OPTION_CAPTURE_GROUP is not set.
 
   * ONIG_SYNTAX_PERL: \g{n}, \g{-n} and \g{name} can also be used.
-    BUG: If a name is defined more than once in Perl syntax, only the left-
-    most group should be checked.
+    If a name is defined more than once in Perl syntax, only the left-most
+    group is checked.
 
 
   backreference with recursion level

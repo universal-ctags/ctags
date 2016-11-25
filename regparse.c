@@ -3260,7 +3260,7 @@ fetch_named_backref_token(OnigCodePoint c, OnigToken* tok, UChar** src,
 
     tok->type = TK_BACKREF;
     tok->u.backref.by_name = 1;
-    if (num == 1) {
+    if (num == 1 || IS_SYNTAX_BV(syn, ONIG_SYN_USE_LEFT_MOST_NAMED_GROUP)) {
       tok->u.backref.num  = 1;
       tok->u.backref.ref1 = backs[0];
     }
@@ -5109,11 +5109,16 @@ parse_enclose(Node** np, OnigToken* tok, int term, UChar** src, UChar* end,
 	      return ONIGERR_INVALID_BACKREF;
 	    }
 	  }
-	  /* FIXME:
-	   * Use left most named group for now. This is the same as Perl.
-	   * However this should use the same strategy as normal back-
-	   * references on Ruby syntax; search right to left. */
-	  num = backs[0];
+	  if (IS_SYNTAX_BV(env->syntax, ONIG_SYN_USE_LEFT_MOST_NAMED_GROUP)) {
+	    num = backs[0];
+	  }
+	  else {
+	    /* FIXME:
+	     * Use left most named group for now. This is the same as Perl.
+	     * However this should use the same strategy as normal back-
+	     * references on Ruby syntax; search right to left. */
+	    num = backs[0];
+	  }
 	}
 #endif
 	else

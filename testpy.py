@@ -1467,7 +1467,7 @@ def main():
     # \g{} backref
     x2("((?<name1>\\d)|(?<name2>\\w))(\\g{name1}|\\g{name2})", "ff", 0, 2, syn=onigmo.ONIG_SYNTAX_PERL);
     x2("(?:(?<x>)|(?<x>efg))\\g{x}", "", 0, 0, syn=onigmo.ONIG_SYNTAX_PERL);
-    x2("(?:(?<x>abc)|(?<x>efg))\\g{x}", "abcefgefg", 3, 9, syn=onigmo.ONIG_SYNTAX_PERL);
+    x2("(?:(?<x>abc)|(?<x>efg))\\g{x}", "efgabcabc", 3, 9, syn=onigmo.ONIG_SYNTAX_PERL);
     n("(?:(?<x>abc)|(?<x>efg))\\g{x}", "abcefg", syn=onigmo.ONIG_SYNTAX_PERL);
     x2("((.*)a\\g{2}f)", "bacbabf", 3, 7, syn=onigmo.ONIG_SYNTAX_PERL);
     x2("(.*)a\\g{1}f", "baczzzzzz\nbazz\nzzzzbabf", 19, 23, syn=onigmo.ONIG_SYNTAX_PERL);
@@ -1507,7 +1507,7 @@ def main():
     x2("(?<a>a)(?<a>b)\\k<a>", "aba", 0, 3)
     x2("(?<a>a)(?<a>b)\\k<a>", "abb", 0, 3)
     x2("(?<a>a)(?<a>b)\\g{a}", "aba", 0, 3, syn=onigmo.ONIG_SYNTAX_PERL)
-#    n("(?<a>a)(?<a>b)\\g{a}", "abb", syn=onigmo.ONIG_SYNTAX_PERL)
+    n("(?<a>a)(?<a>b)\\g{a}", "abb", syn=onigmo.ONIG_SYNTAX_PERL)
     n("(?<a>a)(?<a>b)\\g<a>", "aba", err=onigmo.ONIGERR_MULTIPLEX_DEFINITION_NAME_CALL)
     x2("(?<a>[ac])(?<a>b)(?&a)", "abc", 0, 3, syn=onigmo.ONIG_SYNTAX_PERL)
     n("(?<a>[ac])(?<a>b)(?&a)", "abb", syn=onigmo.ONIG_SYNTAX_PERL)
