@@ -30,14 +30,14 @@ typedef enum eWriterType {
 struct sTagWriter;
 typedef struct sTagWriter tagWriter;
 struct sTagWriter {
-	int (* writeEntry) (MIO * mio, const tagEntryInfo *const tag, void *data);
-	int (* writePtagEntry) (MIO * mio, const ptagDesc *desc,
+	int (* writeEntry) (tagWriter *writer, MIO * mio, const tagEntryInfo *const tag, void *data);
+	int (* writePtagEntry) (tagWriter *writer, MIO * mio, const ptagDesc *desc,
 							const char *const fileName,
 							const char *const pattern,
 							const char *const parserName, void *data);
-	void * (* preWriteEntry) (MIO * mio);
-	void (* postWriteEntry)  (MIO * mio, const char* filename, void *data);
-	void (* buildFqTagCache) (tagEntryInfo *const tag);
+	void * (* preWriteEntry) (tagWriter *writer, MIO * mio);
+	void (* postWriteEntry)  (tagWriter *writer, MIO * mio, const char* filename, void *data);
+	void (* buildFqTagCache) (tagWriter *writer, tagEntryInfo *const tag);
 	bool useStdoutByDefault;
 
 	writerType type;

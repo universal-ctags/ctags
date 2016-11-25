@@ -17,12 +17,14 @@
 #include "writer.h"
 
 
-static int writeCtagsEntry (MIO * mio, const tagEntryInfo *const tag, void *data CTAGS_ATTR_UNUSED);
-static int writeCtagsPtagEntry (MIO * mio, const ptagDesc *desc,
+static int writeCtagsEntry (tagWriter *writer CTAGS_ATTR_UNUSED,
+							MIO * mio, const tagEntryInfo *const tag, void *data CTAGS_ATTR_UNUSED);
+static int writeCtagsPtagEntry (tagWriter *writer CTAGS_ATTR_UNUSED,
+								MIO * mio, const ptagDesc *desc,
 								const char *const fileName,
 								const char *const pattern,
 								const char *const parserName, void *data CTAGS_ATTR_UNUSED);
-static void buildCtagsFqTagCache (tagEntryInfo *const tag);
+static void buildCtagsFqTagCache (tagWriter *writer CTAGS_ATTR_UNUSED, tagEntryInfo *const tag);
 
 tagWriter ctagsWriter = {
 	.writeEntry = writeCtagsEntry,
@@ -185,7 +187,8 @@ static int writePatternEntry (MIO *mio, const tagEntryInfo *const tag)
 	return makePatternStringCommon (tag, file_putc, file_puts, mio);
 }
 
-static int writeCtagsEntry (MIO * mio, const tagEntryInfo *const tag, void *data CTAGS_ATTR_UNUSED)
+static int writeCtagsEntry (tagWriter *writer CTAGS_ATTR_UNUSED,
+							MIO * mio, const tagEntryInfo *const tag, void *data CTAGS_ATTR_UNUSED)
 {
 	int length = mio_printf (mio, "%s\t%s\t",
 			      escapeFieldValue (tag, FIELD_NAME),
@@ -209,7 +212,8 @@ static int writeCtagsEntry (MIO * mio, const tagEntryInfo *const tag, void *data
 	return length;
 }
 
-static int writeCtagsPtagEntry (MIO * mio, const ptagDesc *desc,
+static int writeCtagsPtagEntry (tagWriter *writer CTAGS_ATTR_UNUSED,
+				MIO * mio, const ptagDesc *desc,
 				const char *const fileName,
 				const char *const pattern,
 				const char *const parserName, void *data CTAGS_ATTR_UNUSED)
@@ -226,7 +230,7 @@ static int writeCtagsPtagEntry (MIO * mio, const ptagDesc *desc,
 #undef OPT
 }
 
-static void buildCtagsFqTagCache (tagEntryInfo *const tag)
+static void buildCtagsFqTagCache (tagWriter *writer CTAGS_ATTR_UNUSED, tagEntryInfo *const tag)
 {
 	escapeFieldValue (tag, FIELD_SCOPE_KIND_LONG);
 	escapeFieldValue (tag, FIELD_SCOPE);

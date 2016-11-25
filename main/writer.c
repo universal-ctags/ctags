@@ -39,7 +39,7 @@ extern bool outputFormatUsedStdoutByDefault (void)
 extern void writerSetup (MIO *mio)
 {
 	if (writer->preWriteEntry)
-		writerData = writer->preWriteEntry (mio);
+		writerData = writer->preWriteEntry (writer, mio);
 	else
 		writerData = NULL;
 }
@@ -48,14 +48,14 @@ extern void writerTeardown (MIO *mio, const char *filename)
 {
 	if (writer->postWriteEntry)
 	{
-		writer->postWriteEntry (mio, filename, writerData);
+		writer->postWriteEntry (writer, mio, filename, writerData);
 		writerData = NULL;
 	}
 }
 
 extern int writerWriteTag (MIO * mio, const tagEntryInfo *const tag)
 {
-	return writer->writeEntry (mio, tag, writerData);
+	return writer->writeEntry (writer, mio, tag, writerData);
 }
 
 extern int writerWritePtag (MIO * mio,
@@ -67,7 +67,7 @@ extern int writerWritePtag (MIO * mio,
 	if (writer->writePtagEntry == NULL)
 		return -1;
 
-	return writer->writePtagEntry (mio, desc, fileName,
+	return writer->writePtagEntry (writer, mio, desc, fileName,
 								   pattern, parserName, writerData);
 
 }
@@ -75,5 +75,5 @@ extern int writerWritePtag (MIO * mio,
 extern void writerBuildFqTagCache (tagEntryInfo *const tag)
 {
 	if (writer->buildFqTagCache)
-		writer->buildFqTagCache (tag);
+		writer->buildFqTagCache (writer, tag);
 }
