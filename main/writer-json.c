@@ -25,13 +25,13 @@
 
 
 static int writeJsonEntry  (tagWriter *writer CTAGS_ATTR_UNUSED,
-				MIO * mio, const tagEntryInfo *const tag, void *data CTAGS_ATTR_UNUSED);
+				MIO * mio, const tagEntryInfo *const tag);
 
 static int writeJsonPtagEntry (tagWriter *writer CTAGS_ATTR_UNUSED,
 				MIO * mio, const ptagDesc *desc,
 				const char *const fileName,
 				const char *const pattern,
-				const char *const parserName, void *data CTAGS_ATTR_UNUSED);
+				const char *const parserName);
 
 tagWriter jsonWriter = {
 	.writeEntry = writeJsonEntry,
@@ -114,7 +114,7 @@ static void addExtensionFields (json_t *response, const tagEntryInfo *const tag)
 }
 
 static int writeJsonEntry (tagWriter *writer CTAGS_ATTR_UNUSED,
-			       MIO * mio, const tagEntryInfo *const tag, void *data CTAGS_ATTR_UNUSED)
+			       MIO * mio, const tagEntryInfo *const tag)
 {
 	json_t *response = json_pack ("{ss ss ss ss}",
 		"_type", "tag",
@@ -143,7 +143,7 @@ static int writeJsonPtagEntry (tagWriter *writer CTAGS_ATTR_UNUSED,
 			       MIO * mio, const ptagDesc *desc,
 			       const char *const fileName,
 			       const char *const pattern,
-			       const char *const parserName, void *data CTAGS_ATTR_UNUSED)
+			       const char *const parserName)
 {
 #define OPT(X) ((X)?(X):"")
 	json_t *response;

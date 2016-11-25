@@ -24,7 +24,6 @@ static tagWriter *writerTable [WRITER_COUNT] = {
 	[WRITER_JSON]  = &jsonWriter,
 };
 
-static void *writerData;
 static tagWriter *writer;
 
 extern void setTagWriter (writerType wtype)
@@ -41,23 +40,23 @@ extern bool outputFormatUsedStdoutByDefault (void)
 extern void writerSetup (MIO *mio)
 {
 	if (writer->preWriteEntry)
-		writerData = writer->preWriteEntry (writer, mio);
+		writer->private = writer->preWriteEntry (writer, mio);
 	else
-		writerData = NULL;
+		writer->private = NULL;
 }
 
 extern void writerTeardown (MIO *mio, const char *filename)
 {
 	if (writer->postWriteEntry)
 	{
-		writer->postWriteEntry (writer, mio, filename, writerData);
-		writerData = NULL;
+		writer->postWriteEntry (writer, mio, filename);
+		writer->private = NULL;
 	}
 }
 
 extern int writerWriteTag (MIO * mio, const tagEntryInfo *const tag)
 {
-	return writer->writeEntry (writer, mio, tag, writerData);
+	return writer->writeEntry (writer, mio, tag);
 }
 
 extern int writerWritePtag (MIO * mio,
@@ -70,7 +69,7 @@ extern int writerWritePtag (MIO * mio,
 		return -1;
 
 	return writer->writePtagEntry (writer, mio, desc, fileName,
-								   pattern, parserName, writerData);
+								   pattern, parserName);
 
 }
 

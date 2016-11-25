@@ -18,12 +18,12 @@
 
 
 static int writeCtagsEntry (tagWriter *writer CTAGS_ATTR_UNUSED,
-							MIO * mio, const tagEntryInfo *const tag, void *data CTAGS_ATTR_UNUSED);
+							MIO * mio, const tagEntryInfo *const tag);
 static int writeCtagsPtagEntry (tagWriter *writer CTAGS_ATTR_UNUSED,
 								MIO * mio, const ptagDesc *desc,
 								const char *const fileName,
 								const char *const pattern,
-								const char *const parserName, void *data CTAGS_ATTR_UNUSED);
+								const char *const parserName);
 static void buildCtagsFqTagCache (tagWriter *writer CTAGS_ATTR_UNUSED, tagEntryInfo *const tag);
 
 tagWriter uCtagsWriter = {
@@ -197,7 +197,7 @@ static int writePatternEntry (MIO *mio, const tagEntryInfo *const tag)
 }
 
 static int writeCtagsEntry (tagWriter *writer,
-							MIO * mio, const tagEntryInfo *const tag, void *data CTAGS_ATTR_UNUSED)
+							MIO * mio, const tagEntryInfo *const tag)
 {
 	int length = mio_printf (mio, "%s\t%s\t",
 			      escapeFieldValue (writer, tag, FIELD_NAME),
@@ -225,7 +225,7 @@ static int writeCtagsPtagEntry (tagWriter *writer CTAGS_ATTR_UNUSED,
 				MIO * mio, const ptagDesc *desc,
 				const char *const fileName,
 				const char *const pattern,
-				const char *const parserName, void *data CTAGS_ATTR_UNUSED)
+				const char *const parserName)
 {
 	return parserName
 

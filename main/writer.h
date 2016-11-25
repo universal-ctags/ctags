@@ -31,17 +31,21 @@ typedef enum eWriterType {
 struct sTagWriter;
 typedef struct sTagWriter tagWriter;
 struct sTagWriter {
-	int (* writeEntry) (tagWriter *writer, MIO * mio, const tagEntryInfo *const tag, void *data);
+	int (* writeEntry) (tagWriter *writer, MIO * mio, const tagEntryInfo *const tag);
 	int (* writePtagEntry) (tagWriter *writer, MIO * mio, const ptagDesc *desc,
 							const char *const fileName,
 							const char *const pattern,
-							const char *const parserName, void *data);
+							const char *const parserName);
 	void * (* preWriteEntry) (tagWriter *writer, MIO * mio);
-	void (* postWriteEntry)  (tagWriter *writer, MIO * mio, const char* filename, void *data);
+	void (* postWriteEntry)  (tagWriter *writer, MIO * mio, const char* filename);
 	void (* buildFqTagCache) (tagWriter *writer, tagEntryInfo *const tag);
 	bool useStdoutByDefault;
 
+	/* The value returned from preWriteEntry is stored `private' field.
+	   The value must be released in postWriteEntry. */
+	void *private;
 	writerType type;
+
 };
 
 extern void setTagWriter (writerType otype);
