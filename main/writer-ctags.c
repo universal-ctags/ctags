@@ -35,10 +35,16 @@ tagWriter uCtagsWriter = {
 	.useStdoutByDefault = false,
 };
 
+static void *beginECtagsFile (tagWriter *writer, MIO * mio)
+{
+	static bool rejected;
+	return &rejected;
+}
+
 tagWriter eCtagsWriter = {
 	.writeEntry = writeCtagsEntry,
 	.writePtagEntry = writeCtagsPtagEntry,
-	.preWriteEntry = NULL,
+	.preWriteEntry = beginECtagsFile,
 	.postWriteEntry = NULL,
 	.buildFqTagCache = buildCtagsFqTagCache,
 	.useStdoutByDefault = false,
@@ -46,7 +52,7 @@ tagWriter eCtagsWriter = {
 
 static const char* escapeFieldValue (tagWriter *writer, const tagEntryInfo * tag, fieldType ftype)
 {
-	return renderFieldEscaped (writer->type, ftype, tag, NO_PARSER_FIELD, NULL);
+	return renderFieldEscaped (writer->type, ftype, tag, NO_PARSER_FIELD, writer->private);
 }
 
 static int renderExtensionFieldMaybe (tagWriter *writer, int xftype, const tagEntryInfo *const tag, char sep[2], MIO *mio)
@@ -79,7 +85,7 @@ static int addParserFields (tagWriter *writer, MIO * mio, const tagEntryInfo *co
 		length += mio_printf(mio, "\t%s:%s",
 							 getFieldName (ftype),
 							 renderFieldEscaped (writer->type,
-												 tag->parserFields [i].ftype, tag, i, NULL));
+												 tag->parserFields [i].ftype, tag, i, writer->private));
 	}
 	return length;
 }
@@ -199,6 +205,14 @@ static int writePatternEntry (MIO *mio, const tagEntryInfo *const tag)
 static int writeCtagsEntry (tagWriter *writer,
 							MIO * mio, const tagEntryInfo *const tag)
 {
+	long origin = 0;
+
+	if (writer->private)
+	{
+		*((bool *)writer->private) = false;
+		origin = mio_tell (mio);
+	}
+
 	int length = mio_printf (mio, "%s\t%s\t",
 			      escapeFieldValue (writer, tag, FIELD_NAME),
 			      escapeFieldValue (writer, tag, FIELD_INPUT_FILE));
@@ -218,6 +232,11 @@ static int writeCtagsEntry (tagWriter *writer,
 
 	length += mio_printf (mio, "\n");
 
+	if (writer->private && *(bool *)(writer->private))
+	{
+		length = 0;
+		mio_seek (mio, origin, SEEK_SET);
+	}
 	return length;
 }
 
