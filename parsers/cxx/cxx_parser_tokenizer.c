@@ -961,14 +961,13 @@ static bool cxxParserParseNextTokenCondenseAttribute(void)
 	return cxxParserParseNextToken();
 }
 
-// An ignore token was encountered and it specifies to skip the
-// eventual following parenthesis.
+// An macro token was encountered and it expects a parameter list.
 // The routine has to check if there is a following parenthesis
 // and eventually skip it but it MUST NOT parse the next token
-// if it is not a parenthesis. This is because the ignored token
+// if it is not a parenthesis. This is because the macro token
 // may have a replacement and is that one that has to be returned
 // back to the caller from cxxParserParseNextToken().
-static bool cxxParserParseNextTokenSkipIgnoredParenthesis(CXXToken ** ppChain)
+static bool cxxParserParseNextTokenSkipMacroParenthesis(CXXToken ** ppChain)
 {
 	CXX_DEBUG_ENTER();
 
@@ -1019,119 +1018,53 @@ static bool cxxParserParseNextTokenSkipIgnoredParenthesis(CXXToken ** ppChain)
 }
 
 static void cxxParserParseNextTokenApplyReplacement(
-		const cppIgnoredTokenInfo * pInfo,
+		const cppMacroInfo * pInfo,
 		CXXToken * pParameterChainToken
 	)
 {
 	CXX_DEBUG_ENTER();
 
 	CXX_DEBUG_ASSERT(pInfo,"Info must be not null");
-	CXX_DEBUG_ASSERT(pInfo->replacement,"There should be a replacement");
-	CXX_DEBUG_ASSERT(vStringLength (pInfo->replacement) > 0,"The replacement is too short");
+	CXX_DEBUG_ASSERT(pInfo->replacements,"There should be a replacement");
 
-	if(!pInfo->ignoreFollowingParenthesis)
+	if(!pInfo->hasParameterList)
 	{
 		CXX_DEBUG_ASSERT(!pParameterChainToken,"This shouldn't have been extracted");
-		cppUngetString(vStringValue (pInfo->replacement),vStringLength (pInfo->replacement));
-		CXX_DEBUG_LEAVE_TEXT("Applied simple replacement %s",vStringValue (pInfo->replacement));
-		return;
 	}
-
-	const char * c = vStringValue (pInfo->replacement);
-	const char * e = c + vStringLength (pInfo->replacement);
-
-	vString * pReplacement = vStringNew();
-
-	const char * b = c;
 
 	CXXTokenChain * pParameters = NULL;
+	const char ** aParameters = NULL;
+	int iParameterCount = 0;
 
-	while(c < e)
+	if(pInfo->hasParameterList && pParameterChainToken && (pParameterChainToken->pChain->iCount >= 3))
 	{
-		if(*c == '$')
+		// kill parenthesis
+		cxxTokenChainDestroyFirst(pParameterChainToken->pChain);
+		cxxTokenChainDestroyLast(pParameterChainToken->pChain);
+
+		pParameters = cxxTokenChainSplitOnComma(
+				pParameterChainToken->pChain
+			);
+
+		aParameters = (const char **)eMalloc(sizeof(const char *) * pParameters->iCount);
+		CXXToken * pParam = cxxTokenChainFirst(pParameters);
+		while(pParam)
 		{
-			if(c > b)
-				vStringNCatS(pReplacement,b,c-b);
-			c++;
-			if(c >= e)
-			{
-				// stray $
-				vStringPut(pReplacement,'$');
-				break;
-			}
-
-			int idx;
-
-			if(*c == '*')
-			{
-				idx = -1; // all parameters
-			} else {
-				if((*c < '0') && (*c > '9'))
-				{
-					vStringPut(pReplacement,'$');
-					b = c;
-					continue;
-				}
-				idx = *c - '0';
-			}
-
-
-			if(!pParameters)
-			{
-				if(pParameterChainToken && (pParameterChainToken->pChain->iCount >= 3))
-				{
-					// kill parenthesis
-					cxxTokenChainDestroyFirst(pParameterChainToken->pChain);
-					cxxTokenChainDestroyLast(pParameterChainToken->pChain);
-
-					pParameters = cxxTokenChainSplitOnComma(
-							pParameterChainToken->pChain
-						);
-
-					cxxTokenChainCondense(pParameterChainToken->pChain,0);
-
-					CXX_DEBUG_PRINT(
-							"Parameter chain is '%s'",
-							vStringValue(cxxTokenChainFirst(pParameterChainToken->pChain)->pszWord)
-						);
-				}
-			}
-
-			if(pParameters)
-			{
-				if(idx >= 0)
-				{
-					CXX_DEBUG_PRINT("Applying $%d",idx);
-
-					CXXToken * pParameter = cxxTokenChainAt(pParameters,idx);
-					if(pParameter)
-						vStringCat(pReplacement,pParameter->pszWord);
-				} else {
-					if(pParameterChainToken)
-					{
-						// Note that we have condensed the chain above!
-						CXXToken * pAll = cxxTokenChainFirst(
-								pParameterChainToken->pChain
-							);
-						if(pAll)
-							vStringCat(pReplacement,pAll->pszWord);
-					}
-				}
-
-			}
-
-			c++;
-			b = c;
-		} else {
-			c++;
+			aParameters[iParameterCount] = vStringValue(pParam->pszWord);
+			iParameterCount++;
+			pParam = pParam->pNext;
 		}
+
+		CXX_DEBUG_ASSERT(iParameterCount == pParameters->iCount,"Bad number of parameters found");
 	}
 
-	if(c > b)
-		vStringNCatS(pReplacement,b,c-b);
+	vString * pReplacement = cppBuildMacroReplacement(pInfo,aParameters,iParameterCount);
 
 	if(pParameters)
+	{
 		cxxTokenChainDestroy(pParameters);
+		eFree(aParameters);
+	}
 
 	CXX_DEBUG_PRINT("Applying complex replacement '%s'",vStringValue(pReplacement));
 
@@ -1261,33 +1194,30 @@ bool cxxParserParseNextToken(void)
 			}
 		} else {
 
-			const cppIgnoredTokenInfo * pIgnore = cppIsIgnoreToken(vStringValue(t->pszWord));
+			const cppMacroInfo * pMacro = cppFindMacro(vStringValue(t->pszWord));
 
-			if(pIgnore)
+			if(pMacro)
 			{
-				CXX_DEBUG_PRINT("Ignore token %s",vStringValue(t->pszWord));
+				CXX_DEBUG_PRINT("Macro %s",vStringValue(t->pszWord));
 
 				cxxTokenChainDestroyLast(g_cxx.pTokenChain);
 
 				CXXToken * pParameterChain = NULL;
 
-				if(pIgnore->ignoreFollowingParenthesis)
+				if(pMacro->hasParameterList)
 				{
-					CXX_DEBUG_PRINT("Ignored token specifies to ignore parens too");
-					if(!cxxParserParseNextTokenSkipIgnoredParenthesis(&pParameterChain))
+					CXX_DEBUG_PRINT("Macro has parameter list");
+					if(!cxxParserParseNextTokenSkipMacroParenthesis(&pParameterChain))
 						return false;
 				}
 
 				// This is used to avoid infinite recursion in substitution
-				// (things like -I foo=foo or similar)
+				// (things like -D foo=foo or similar)
 				static int iReplacementRecursionCount = 0;
 
-				if(pIgnore->replacement)
+				if(pMacro->replacements)
 				{
-					CXX_DEBUG_PRINT(
-							"The token has replacement %s: applying",
-							pIgnore->replacement
-						);
+					CXX_DEBUG_PRINT("The token has replacements: applying");
 
 					if(iReplacementRecursionCount < 1024)
 					{
@@ -1295,7 +1225,7 @@ bool cxxParserParseNextToken(void)
 						cppUngetc(g_cxx.iChar);
 						// unget the replacement
 						cxxParserParseNextTokenApplyReplacement(
-								pIgnore,
+								pMacro,
 								pParameterChain
 							);
 

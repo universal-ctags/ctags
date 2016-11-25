@@ -411,7 +411,7 @@ static bool cxxParserParseEnumStructClassOrUnionFullDeclarationTrailer(
 		CXX_DEBUG_LEAVE_TEXT("Got EOF after enum/class/struct/union block");
 		return true;
 	}
-	
+
 	if(g_cxx.pTokenChain->iCount < 2)
 	{
 		CXX_DEBUG_LEAVE_TEXT("Nothing interesting after enum/class/struct block");
@@ -591,7 +591,7 @@ bool cxxParserParseEnum(void)
 	{
 		// skip type
 		CXX_DEBUG_PRINT("Single colon, trying to skip type");
-		
+
 		pTypeBegin = g_cxx.pToken;
 
 		if(!cxxParserParseUpToOneOf(
