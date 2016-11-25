@@ -5086,38 +5086,22 @@ parse_enclose(Node** np, OnigToken* tok, int term, UChar** src, UChar* end,
 	}
 #ifdef USE_NAMED_GROUP
 	else if (c == '<' || c == '\'') {    /* (<name>), ('name') */
-	  int nums;
-	  int *backs;
-
 	  name = p;
-	  r = fetch_name((OnigCodePoint )c, &p, end, &name_end, env, &num, 0);
+	  r = fetch_named_backref_token(c, tok, &p, end, env);
 	  if (r < 0) return r;
 	  if (!PPEEK_IS(')')) return ONIGERR_UNDEFINED_GROUP_OPTION;
 	  PINC;
 
-	  nums = onig_name_to_group_numbers(env->reg, name, name_end, &backs);
-	  if (nums <= 0) {
-	    onig_scan_env_set_error_string(env,
-		     ONIGERR_UNDEFINED_NAME_REFERENCE, name, name_end);
-	    return ONIGERR_UNDEFINED_NAME_REFERENCE;
-	  }
-	  if (IS_SYNTAX_BV(env->syntax, ONIG_SYN_STRICT_CHECK_BACKREF)) {
-	    int i;
-	    for (i = 0; i < nums; i++) {
-	      if (backs[i] > env->num_mem ||
-		  IS_NULL(SCANENV_MEM_NODES(env)[backs[i]]))
-	      return ONIGERR_INVALID_BACKREF;
-	    }
-	  }
 	  if (IS_SYNTAX_BV(env->syntax, ONIG_SYN_USE_LEFT_MOST_NAMED_GROUP)) {
-	    num = backs[0];
+	    num = tok->u.backref.ref1;
 	  }
 	  else {
 	    /* FIXME:
 	     * Use left most named group for now. This is the same as Perl.
 	     * However this should use the same strategy as normal back-
 	     * references on Ruby syntax; search right to left. */
-	    num = backs[0];
+	    int len = tok->u.backref.num;
+	    num = len > 1 ? tok->u.backref.refs[0] : tok->u.backref.ref1;
 	  }
 	}
 #endif
