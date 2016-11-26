@@ -19,6 +19,7 @@
 !_TAG_KIND_SEPARATOR!PHP	\\	/nn/
 !_TAG_KIND_SEPARATOR!PHP	\\	/nt/
 !_TAG_KIND_SEPARATOR!PHP	\\	/nv/
+!_TAG_OUTPUT_MODE	u-ctags	/u-ctags or e-ctags/
 !_TAG_PROGRAM_AUTHOR	Universal Ctags Team	//
 !_TAG_PROGRAM_NAME	Universal Ctags	/Derived from Exuberant Ctags/
 !_TAG_PROGRAM_URL	https://ctags.io/	/official site/

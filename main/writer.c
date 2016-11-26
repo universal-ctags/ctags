@@ -8,6 +8,7 @@
 */
 
 #include "general.h"
+#include "entry.h"
 #include "writer.h"
 
 extern tagWriter uCtagsWriter;
@@ -80,4 +81,20 @@ extern void writerBuildFqTagCache (tagEntryInfo *const tag)
 {
 	if (writer->buildFqTagCache)
 		writer->buildFqTagCache (writer, tag);
+}
+
+
+extern bool ptagMakeCtagsOutputMode (ptagDesc *desc, void *data CTAGS_ATTR_UNUSED)
+{
+	const char *mode ="";
+
+	if (&uCtagsWriter == writer)
+		mode = "u-ctags";
+	else if (&eCtagsWriter == writer)
+		mode = "e-ctags";
+
+	return writePseudoTag (desc,
+						   mode,
+						   "u-ctags or e-ctags",
+						   NULL);
 }

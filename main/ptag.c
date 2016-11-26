@@ -160,6 +160,10 @@ static ptagDesc ptagDescs [] = {
 	  "the letters, names and descriptions of kinds in a parser",
 	  ptagMakeKindDescriptions,
 	  false },
+	{ true, "TAG_OUTPUT_MODE",
+	  "the output mode: u-ctags or e-ctags",
+	  ptagMakeCtagsOutputMode,
+	  true },
 };
 
 extern bool makePtagIfEnabled (ptagType type, void *data)

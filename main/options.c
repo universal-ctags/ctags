@@ -756,6 +756,7 @@ static void setXrefMode (void)
 static void setJsonMode (void)
 {
 	enablePtag (PTAG_JSON_OUTPUT_VERSION, true);
+	enablePtag (PTAG_OUTPUT_MODE, false);
 	setTagWriter (WRITER_JSON);
 }
 #endif
