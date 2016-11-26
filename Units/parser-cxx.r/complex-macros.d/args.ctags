@@ -3,6 +3,7 @@
 --fields=+S
 --sort=no
 -D DECLARE_FUNCTION_1=int p0()
+-D DECLARE_FUNCTION_1A()=int p0A()
 -D DECLARE_FUNCTION_2(_ret,_name)=_ret _name();
 -D DECLARE_FUNCTION_3(_ret,_name,...)=_ret _name(__VA_ARGS__);
 -D DEPRECATED(...)=__VA_ARGS__ __attribute__((deprecated))

@@ -1,5 +1,7 @@
 DECLARE_FUNCTION_1	input.cpp	/^#define DECLARE_FUNCTION_1 /;"	d	file:
 p0	input.cpp	/^DECLARE_FUNCTION_1;$/;"	p	typeref:typename:int	file:	signature:()
+DECLARE_FUNCTION_1A	input.cpp	/^#define DECLARE_FUNCTION_1A(/;"	d	file:	signature:()
+p0A	input.cpp	/^DECLARE_FUNCTION_1A;$/;"	p	typeref:typename:int	file:	signature:()
 DECLARE_FUNCTION_2	input.cpp	/^#define DECLARE_FUNCTION_2(/;"	d	file:	signature:(_ret,_name)
 p1	input.cpp	/^DECLARE_FUNCTION_2(int,p1);$/;"	p	typeref:typename:int	file:	signature:()
 p2	input.cpp	/^DECLARE_FUNCTION_2(std::string,p2);$/;"	p	typeref:typename:std::string	file:	signature:()

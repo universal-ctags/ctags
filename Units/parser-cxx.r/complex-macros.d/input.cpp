@@ -5,6 +5,11 @@
 
 DECLARE_FUNCTION_1;
 
+// Macro without parameters
+#define DECLARE_FUNCTION_1A() int p0A()
+
+DECLARE_FUNCTION_1A;
+
 // Simple macro with parameters
 
 #define DECLARE_FUNCTION_2(_ret,_name) _ret _name();
