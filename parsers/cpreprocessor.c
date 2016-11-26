@@ -26,6 +26,8 @@
 #include "parse.h"
 #include "xtag.h"
 
+#include "cxx/cxx_debug.h"
+
 /*
 *   MACROS
 */
@@ -582,6 +584,10 @@ static void makeIncludeTag (const  char *const name, bool systemHeader)
 static vString *signature;
 static int directiveDefine (const int c, bool undef)
 {
+	// FIXME: We could possibly handle the macros here!
+	//        However we'd need a separate hash table for macros of the current file
+	//        to avoid breaking the "global" ones.
+
 	int r = CORK_NIL;
 
 	if (cppIsident1 (c))
@@ -1171,6 +1177,8 @@ process:
 
 static void findCppTags (void)
 {
+	CXX_DEBUG_INIT();
+
 	cppInit (0, false, false, false,
 			 NULL, 0, NULL, 0, 0);
 
@@ -1184,24 +1192,76 @@ static void findCppTags (void)
  *  Token ignore processing
  */
 
-static hashTable * ignoreTokenTable;
+static hashTable * defineMacroTable;
 
 /*  Determines whether or not "name" should be ignored, per the ignore list.
  */
-extern const cppIgnoredTokenInfo * cppIsIgnoreToken(const char * name)
+extern const cppMacroInfo * cppFindMacro(const char * name)
 {
-	if(!ignoreTokenTable)
+	if(!defineMacroTable)
 		return NULL;
 
-	return (const cppIgnoredTokenInfo *)hashTableGetItem(ignoreTokenTable,(char *)name);
+	return (const cppMacroInfo *)hashTableGetItem(defineMacroTable,(char *)name);
 }
 
-static void saveIgnoreToken(const char * ignoreToken, const char * param_name)
+extern vString * cppBuildMacroReplacement(
+		const cppMacroInfo * macro,
+		const char ** parameters, /* may be NULL */
+		int parameterCount
+	)
+{
+	if(!macro)
+		return NULL;
+
+	if(!macro->replacements)
+		return NULL;
+
+	vString * ret = vStringNew();
+
+	cppMacroReplacementPartInfo * r = macro->replacements;
+
+	while(r)
+	{
+		if(r->parameterIndex < 0)
+		{
+			if(r->constant)
+				vStringCat(ret,r->constant);
+		} else {
+			if(parameters && (r->parameterIndex < parameterCount))
+			{
+				if(r->flags & CPP_MACRO_REPLACEMENT_FLAG_STRINGIFY)
+					vStringPut(ret,'"');
+
+				vStringCatS(ret,parameters[r->parameterIndex]);
+				if(r->flags & CPP_MACRO_REPLACEMENT_FLAG_VARARGS)
+				{
+					int idx = r->parameterIndex + 1;
+					while(idx < parameterCount)
+					{
+						vStringPut(ret,',');
+						vStringCatS(ret,parameters[idx]);
+						idx++;
+					}
+				}
+
+				if(r->flags & CPP_MACRO_REPLACEMENT_FLAG_STRINGIFY)
+					vStringPut(ret,'"');
+			}
+		}
+
+		r = r->next;
+	}
+
+	return ret;
+}
+
+
+static void saveIgnoreToken(const char * ignoreToken)
 {
 	if(!ignoreToken)
 		return;
 
-	Assert (ignoreTokenTable);
+	Assert (defineMacroTable);
 
 	const char * c = ignoreToken;
 	char cc = *c;
@@ -1210,10 +1270,6 @@ static void saveIgnoreToken(const char * ignoreToken, const char * param_name)
 	const char * tokenEnd = NULL;
 	const char * replacement = NULL;
 	bool ignoreFollowingParenthesis = false;
-
-
-	if (strcmp (param_name, "define") == 0)
-		ignoreFollowingParenthesis = true;
 
 	while(cc)
 	{
@@ -1244,34 +1300,343 @@ static void saveIgnoreToken(const char * ignoreToken, const char * param_name)
 	if(tokenEnd <= tokenBegin)
 		return;
 
+	cppMacroInfo * info = (cppMacroInfo *)eMalloc(sizeof(cppMacroInfo));
 
-	cppIgnoredTokenInfo * info = (cppIgnoredTokenInfo *)eMalloc(sizeof(cppIgnoredTokenInfo));
+	info->hasParameterList = ignoreFollowingParenthesis;
+	if(replacement)
+	{
+		cppMacroReplacementPartInfo * rep = \
+			(cppMacroReplacementPartInfo *)eMalloc(sizeof(cppMacroReplacementPartInfo));
+		rep->parameterIndex = -1;
+		rep->flags = 0;
+		rep->constant = vStringNewInit(replacement);
+		rep->next = NULL;
+		info->replacements = rep;
+	} else {
+		info->replacements = NULL;
+	}
 
-	info->ignoreFollowingParenthesis = ignoreFollowingParenthesis;
-	info->replacement = replacement ? vStringNewInit(replacement) : NULL;
-
-	hashTablePutItem(ignoreTokenTable,eStrndup(tokenBegin,tokenEnd - tokenBegin),info);
+	hashTablePutItem(defineMacroTable,eStrndup(tokenBegin,tokenEnd - tokenBegin),info);
 
 	verbose ("    ignore token: %s\n", ignoreToken);
 }
 
-static void freeIgnoredTokenInfo(cppIgnoredTokenInfo * info)
+static void saveMacro(const char * macro)
+{
+	CXX_DEBUG_ENTER_TEXT("Save macro %s",macro);
+
+	if(!macro)
+		return;
+
+	Assert (defineMacroTable);
+
+	const char * c = macro;
+
+	// skip initial spaces
+	while(*c && isspacetab(*c))
+		c++;
+
+	if(!*c)
+	{
+		CXX_DEBUG_LEAVE_TEXT("Bad empty macro definition");
+		return;
+	}
+
+	if(!(isalpha(*c) || (*c == '_')))
+	{
+		CXX_DEBUG_LEAVE_TEXT("Macro does not start with an alphanumeric character");
+		return; // must be a sequence of letters and digits
+	}
+
+	const char * identifierBegin = c;
+
+	while(*c && (isalnum(*c) || (*c == '_')))
+		c++;
+
+	const char * identifierEnd = c;
+
+	CXX_DEBUG_PRINT("Macro identifier '%.*s'",identifierEnd - identifierBegin,identifierBegin);
+
+#define MAX_PARAMS 16
+
+	const char * paramBegin[MAX_PARAMS];
+	const char * paramEnd[MAX_PARAMS];
+
+	int iParamCount = 0;
+
+	while(*c && isspacetab(*c))
+		c++;
+
+	cppMacroInfo * info = (cppMacroInfo *)eMalloc(sizeof(cppMacroInfo));
+
+	if(*c == '(')
+	{
+		// parameter list
+		CXX_DEBUG_PRINT("Macro has a parameter list");
+
+		info->hasParameterList = true;
+
+		c++;
+		while(*c)
+		{
+			while(*c && isspacetab(*c))
+				c++;
+
+			if(*c && (*c != ',') && (*c != ')'))
+			{
+				paramBegin[iParamCount] = c;
+				c++;
+				while(*c && (*c != ',') && (*c != ')') && (!isspacetab(*c)))
+					c++;
+				paramEnd[iParamCount] = c;
+
+				CXX_DEBUG_PRINT(
+						"Macro parameter %d '%.*s'",
+							iParamCount,
+							paramEnd[iParamCount] - paramBegin[iParamCount],
+							paramBegin[iParamCount]
+					);
+
+				iParamCount++;
+				if(iParamCount >= MAX_PARAMS)
+					break;
+			}
+
+			while(*c && isspacetab(*c))
+				c++;
+
+			if(*c == ')')
+				break;
+
+			if(*c == ',')
+				c++;
+		}
+
+		while(*c && (*c != ')'))
+			c++;
+
+		if(*c == ')')
+			c++;
+
+		CXX_DEBUG_PRINT("Got %d parameters",iParamCount);
+
+	} else {
+		info->hasParameterList = false;
+	}
+
+	while(*c && isspacetab(*c))
+		c++;
+
+	info->replacements = NULL;
+
+
+	if(*c == '=')
+	{
+		CXX_DEBUG_PRINT("Macro has a replacement part");
+
+		// have replacement part
+		c++;
+
+		cppMacroReplacementPartInfo * lastReplacement = NULL;
+		int nextParameterReplacementFlags = 0;
+
+#define ADD_REPLACEMENT_NEW_PART(part) \
+		do { \
+			if(lastReplacement) \
+				lastReplacement->next = part; \
+			else \
+				info->replacements = part; \
+			lastReplacement = part; \
+		} while(0)
+
+#define ADD_CONSTANT_REPLACEMENT_NEW_PART(start,len) \
+		do { \
+			cppMacroReplacementPartInfo * rep = \
+				(cppMacroReplacementPartInfo *)eMalloc(sizeof(cppMacroReplacementPartInfo)); \
+			rep->parameterIndex = -1; \
+			rep->flags = 0; \
+			rep->constant = vStringNew(); \
+			vStringNCatS(rep->constant,start,len); \
+			rep->next = NULL; \
+			CXX_DEBUG_PRINT("Constant replacement part: '%s'",vStringValue(rep->constant)); \
+			ADD_REPLACEMENT_NEW_PART(rep); \
+		} while(0)
+
+#define ADD_CONSTANT_REPLACEMENT(start,len) \
+		do { \
+			if(lastReplacement && (lastReplacement->parameterIndex == -1)) \
+			{ \
+				vStringNCatS(lastReplacement->constant,start,len); \
+				CXX_DEBUG_PRINT( \
+						"Constant replacement part changed: '%s'", \
+						vStringValue(lastReplacement->constant) \
+					); \
+			} else { \
+				ADD_CONSTANT_REPLACEMENT_NEW_PART(start,len); \
+			} \
+		} while(0)
+
+		// parse replacements
+		const char * begin = c;
+
+		while(*c)
+		{
+			if(isalpha(*c) || (*c == '_'))
+			{
+				if(c > begin)
+					ADD_CONSTANT_REPLACEMENT(begin,c - begin);
+
+				const char * tokenBegin = c;
+
+				while(*c && (isalnum(*c) || (*c == '_')))
+					c++;
+
+				// check if it is a parameter
+				int tokenLen = c - tokenBegin;
+
+				CXX_DEBUG_PRINT("Check token '%.*s'",tokenLen,tokenBegin);
+
+				bool bIsVarArg = strncmp(tokenBegin,"__VA_ARGS__",tokenLen) == 0;
+
+				int i = 0;
+				for(;i<iParamCount;i++)
+				{
+					int paramLen = paramEnd[i] - paramBegin[i];
+
+					if(
+							(
+								bIsVarArg &&
+								(paramLen == 3) &&
+								(strncmp(paramBegin[i],"...",3) == 0)
+							) || (
+								(!bIsVarArg) &&
+								(paramLen == tokenLen) &&
+								(strncmp(paramBegin[i],tokenBegin,paramLen) == 0)
+							)
+						)
+					{
+						// parameter!
+						cppMacroReplacementPartInfo * rep = \
+								(cppMacroReplacementPartInfo *)eMalloc(sizeof(cppMacroReplacementPartInfo));
+						rep->parameterIndex = i;
+						rep->flags = nextParameterReplacementFlags |
+								(bIsVarArg ? CPP_MACRO_REPLACEMENT_FLAG_VARARGS : 0);
+						rep->constant = NULL;
+						rep->next = NULL;
+
+						nextParameterReplacementFlags = 0;
+
+						CXX_DEBUG_PRINT("Parameter replacement part: %d (vararg %d)",i,bIsVarArg);
+
+						ADD_REPLACEMENT_NEW_PART(rep);
+						break;
+					}
+				}
+
+				if(i >= iParamCount)
+				{
+					// no parameter found
+					ADD_CONSTANT_REPLACEMENT(tokenBegin,tokenLen);
+				}
+
+				begin = c;
+				continue;
+			}
+
+			if((*c == '"') || (*c == '\''))
+			{
+				// skip string/char constant
+				char term = *c;
+				c++;
+				while(*c)
+				{
+					if(*c == '\\')
+					{
+						c++;
+						if(*c)
+							c++;
+					} else if(*c == term)
+					{
+						c++;
+						break;
+					}
+					c++;
+				}
+				continue;
+			}
+
+			if(*c == '#')
+			{
+				// check for token paste/stringification
+				if(c > begin)
+					ADD_CONSTANT_REPLACEMENT(begin,c - begin);
+
+				c++;
+				if(*c == '#')
+				{
+					// token paste
+					CXX_DEBUG_PRINT("Found token paste operator");
+					while(*c == '#')
+						c++;
+
+					// we just skip this part and the followin spaces
+					while(*c && isspacetab(*c))
+						c++;
+
+					if(lastReplacement && (lastReplacement->parameterIndex == -1))
+					{
+						// trim spaces from the last replacement constant!
+						vStringStripTrailing(lastReplacement->constant);
+						CXX_DEBUG_PRINT(
+								"Last replacement truncated to '%s'",
+								vStringValue(lastReplacement->constant)
+							);
+					}
+				} else {
+					// stringification
+					CXX_DEBUG_PRINT("Found stringification operator");
+					nextParameterReplacementFlags |= CPP_MACRO_REPLACEMENT_FLAG_STRINGIFY;
+				}
+
+				begin = c;
+				continue;
+			}
+
+			c++;
+		}
+
+		if(c > begin)
+			ADD_CONSTANT_REPLACEMENT(begin,c - begin);
+	}
+
+	hashTablePutItem(defineMacroTable,eStrndup(identifierBegin,identifierEnd - identifierBegin),info);
+	CXX_DEBUG_LEAVE();
+}
+
+static void freeMacroInfo(cppMacroInfo * info)
 {
 	if(!info)
 		return;
-	if(info->replacement)
-		vStringDelete (info->replacement);
+	cppMacroReplacementPartInfo * pPart = info->replacements;
+	while(pPart)
+	{
+		if(pPart->constant)
+			vStringDelete(pPart->constant);
+		cppMacroReplacementPartInfo * pPartToDelete = pPart;
+		pPart = pPart->next;
+		eFree(pPartToDelete);
+	}
 	eFree(info);
 }
 
-static hashTable *makeIgnoreTokenTable (void)
+static hashTable *makeMacroTable (void)
 {
 	return hashTableNew(
 		1024,
 		hashCstrhash,
 		hashCstreq,
 		free,
-		(void (*)(void *))freeIgnoredTokenInfo
+		(void (*)(void *))freeMacroInfo
 		);
 }
 
@@ -1279,19 +1644,31 @@ static void initializeCpp (const langType language)
 {
 	Cpp.lang = language;
 
-	ignoreTokenTable = makeIgnoreTokenTable ();
+	defineMacroTable = makeMacroTable ();
 }
 
-static void CpreProInstallIgnoreToken (const langType language, const char *name, const char *arg)
+static void CpreProInstallIgnoreToken (const langType language, const char *optname, const char *arg)
 {
 	if (arg == NULL || arg[0] == '\0')
 	{
-		hashTableDelete(ignoreTokenTable);
-		ignoreTokenTable = makeIgnoreTokenTable ();
+		hashTableDelete(defineMacroTable);
+		defineMacroTable = makeMacroTable ();
 		verbose ("    clearing list\n");
+	} else {
+		saveIgnoreToken(arg);
 	}
-	else
-		saveIgnoreToken (arg, name);
+}
+
+static void CpreProInstallMacroToken (const langType language, const char *optname, const char *arg)
+{
+	if (arg == NULL || arg[0] == '\0')
+	{
+		hashTableDelete(defineMacroTable);
+		defineMacroTable = makeMacroTable ();
+		verbose ("    clearing list\n");
+	} else {
+		saveMacro(arg);
+	}
 }
 
 static void CpreProSetIf0 (const langType language, const char *name, const char *arg)
@@ -1311,7 +1688,7 @@ static parameterHandlerTable CpreProParameterHandlerTable [] = {
 	},
 	{ .name = "define",
 	  .desc = "define replacement for an identifier",
-	  .handleParameter = CpreProInstallIgnoreToken,
+	  .handleParameter = CpreProInstallMacroToken,
 	},
 };
 

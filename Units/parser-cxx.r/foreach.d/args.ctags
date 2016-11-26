@@ -1,2 +1,2 @@
 --c++-kinds=+pxl
--D foreach=for($0;;)
+-D foreach(arg1,...)=for(arg1;;)

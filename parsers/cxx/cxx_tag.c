@@ -382,7 +382,8 @@ CXXToken * cxxTagCheckAndSetTypeField(
 		CXXToken * pTypeEnd
 	)
 {
-	CXX_DEBUG_ASSERT(pTypeStart && pTypeEnd,"Non null parameters are expected");
+	CXX_DEBUG_ASSERT(pTypeStart,"Non null type start is expected here");
+	CXX_DEBUG_ASSERT(pTypeEnd,"Non null type end is expected here");
 
 	const char * szTypeRef0;
 
