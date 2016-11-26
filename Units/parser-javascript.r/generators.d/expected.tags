@@ -1,0 +1,8 @@
+g1	input.js	/^  g1: function*() {$/;"	g	class:obj1
+g2	input.js	/^function *g2() {$/;"	g
+g3	input.js	/^var g3 = function*g4(x) {$/;"	g
+g4	input.js	/^var g3 = function*g4(x) {$/;"	g
+g5	input.js	/^  this.g5 = function*g6() {$/;"	g	class:obj2
+g6	input.js	/^  this.g5 = function*g6() {$/;"	g	class:obj2
+obj1	input.js	/^var obj1 = {$/;"	c
+obj2	input.js	/^var obj2 = function() {$/;"	c
