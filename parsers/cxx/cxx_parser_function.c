@@ -548,6 +548,11 @@ static bool cxxParserLookForFunctionSignatureCheckParenthesisAndIdentifier(
 	)
 {
 	CXX_DEBUG_ENTER();
+	
+	CXX_DEBUG_ASSERT(
+			pParenthesis && pIdentifierChain && pIdentifierStart && pIdentifierEnd && pInfo && pParamInfo,
+			"All parameters must be non null here"
+		);
 
 	// Even if we have found a parenthesis and proper identifier we still
 	// continue looping until a termination condition is found.
@@ -668,13 +673,15 @@ bool cxxParserLookForFunctionSignature(
 	//    list of function parameters.
 	//
 	//    Since the identifier may be hidden within a parenthesis chain (and thus NOT be toplevel)
-	//    we must scan the inner parenthesis chains too. For this reason this loop
-	//    first looks for a parenthesis chain (which is always present at toplevel)
-	//    and then looks for a suitable identifier near or inside it.
+	//    we must scan the inner parenthesis chains in a sequence of special cases.
+	// 
+	//    (Mainly) for this reason this loop first looks for a parenthesis chain (which is always
+	//    present at toplevel) and then looks for a suitable identifier near or inside it.
 	//
-	//    Stop scanning when one of { ; EOF : , is found.
+	//    Once we have found a suitable parenthesis-chain/identifier pair we continue
+	//    scanning until one of { ; EOF : , is found.
 	//
-	//    Bail out if anything suspicious is found in the middle.
+	//    We bail out if anything suspicious is found in the middle of the scan.
 	//
 
 	while(pToken)
@@ -722,7 +729,7 @@ bool cxxParserLookForFunctionSignature(
 			break;
 		} 
 
-		// Check for tokens that should never appear at top leve of a function signature
+		// Check for tokens that should never appear at top level of a function signature
 
 		if(cxxTokenTypeIsOneOf(
 					pToken,
@@ -735,7 +742,7 @@ bool cxxParserLookForFunctionSignature(
 			)
 		{
 			// Nope.
-			CXX_DEBUG_LEAVE_TEXT("Found tokens that should not appear in a function signature");
+			CXX_DEBUG_LEAVE_TEXT("Found token that should never appear at toplevel of a signature");
 			return false;
 		}
 
@@ -753,21 +760,26 @@ bool cxxParserLookForFunctionSignature(
 			goto next_token;
 		}
 		
+		// If we have already found a parenthesis+identifier just continue scanning
+		// until an exit condition is found. Do not look for parenthesis+identifier again.
+		
 		if(pInfo->pParenthesis)
 		{
 			CXX_DEBUG_PRINT("Already have a proper parenthesis: continuing loop to find terminator");
 			goto next_token;
 		}
 
-		// Didn't reach end. Now check for parenthesis + identifier
+		// Parenthesis+identifier hasn't been found yet, look for it.
+		// Several specialized cases follow.
 
 		CXXTokenChain * pIdentifierChain = pChain;
 
 		if(cxxTokenIsKeyword(pToken,CXXKeywordOPERATOR))
 		{
-			// Special case for operator <something> ()
+			// Special case for operator <something> (), which has an identifier
+			// that is actually composed of multiple tokens.
 
-			CXX_DEBUG_PRINT("operator token found: looking deeper");
+			CXX_DEBUG_PRINT("operator token found: looking for proper identifier");
 
 			pIdentifierStart = pToken;
 			pToken = pToken->pNext;
@@ -841,32 +853,32 @@ bool cxxParserLookForFunctionSignature(
 		}
 
 		// Now we look only at parenthesis chains
+
 		if(!cxxTokenTypeIs(pToken,CXXTokenTypeParenthesisChain))
 		{
 			CXX_DEBUG_PRINT("Not a parenthesis chain: assume this can be skipped");
 			goto next_token;
 		}
 
-		// parentheses at position 0 are meaningless
+		// parentheses at position 0 are always meaningless for us
+
 		if(!pToken->pPrev)
 		{
 			CXX_DEBUG_PRINT("Parenthesis at position 0, meaningless");
 			goto next_token;
 		}
 
-		CXX_DEBUG_PRINT("Found parenthesis chain: check for identifier");
+		CXX_DEBUG_PRINT("Found interesting parenthesis chain: check for identifier");
 
 		// parentheses at position 1 they are likely to be macro invocations...
 		// but we still handle them in case we find nothing else.
 
-		// must have an identifier before (this excludes things like __attribute__
-		// and declspec which are marked as keywords)
-		
 		pTopLevelParenthesis = pToken;
 		
 		if(cxxTokenTypeIs(pToken->pPrev,CXXTokenTypeIdentifier))
 		{
 			// identifier before
+
 			CXX_DEBUG_PRINT("Got identifier before parenthesis chain");
 
 			pIdentifierStart = pToken->pPrev;
@@ -932,17 +944,19 @@ bool cxxParserLookForFunctionSignature(
 				return false;
 			}
 
-			cxxParserLookForFunctionSignatureCheckParenthesisAndIdentifier(
-					pTopLevelParenthesis,
-					pIdentifierChain,
-					pIdentifierStart,
-					pIdentifierEnd,
-					pInfo,
-					pParamInfo
-				);
-
-			// Even if the check above failed we have nothing more to do with this token
-			goto next_token;
+			if(
+				cxxParserLookForFunctionSignatureCheckParenthesisAndIdentifier(
+						pTopLevelParenthesis,
+						pIdentifierChain,
+						pIdentifierStart,
+						pIdentifierEnd,
+						pInfo,
+						pParamInfo
+					)
+				)
+				goto next_token;
+			
+			// If the check above failed, try different identifier possibilities
 		}
 		
 		if(
@@ -987,6 +1001,10 @@ next_token:
 		CXX_DEBUG_LEAVE_TEXT("No suitable parenthesis chain found");
 		return false; // no function, no party
 	}
+	
+	// parenthesis + identifier has been found, this is a function signature.
+	
+	// Figure out the remainig parameters.
 
 	CXX_DEBUG_ASSERT(pTopLevelParenthesis,"This should have been set");
 
