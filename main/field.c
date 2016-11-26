@@ -42,6 +42,8 @@ static const char *renderFieldInput (const tagEntryInfo *const tag, const char *
 static const char *renderFieldCompactInputLine (const tagEntryInfo *const tag, const char *value, vString* b, bool *rejected);
 static const char *renderFieldSignature (const tagEntryInfo *const tag, const char *value, vString* b, bool *rejected);
 static const char *renderFieldScope (const tagEntryInfo *const tag, const char *value, vString* b, bool *rejected);
+static const char *renderFieldScopeNoEscape (const tagEntryInfo *const tag, const char *value, vString* b,
+											 bool *rejected);
 static const char *renderFieldTyperef (const tagEntryInfo *const tag, const char *value, vString* b, bool *rejected);
 static const char *renderFieldInherits (const tagEntryInfo *const tag, const char *value, vString* b, bool *rejected);
 static const char *renderFieldKindName (const tagEntryInfo *const tag, const char *value, vString* b, bool *rejected);
@@ -141,7 +143,8 @@ static fieldSpec fieldSpecsExuberant [] = {
 			   [WRITER_U_CTAGS] = renderFieldSignature),
 	DEFINE_FIELD_SPEC ('s', NULL,             true,
 			   "Scope of tag definition (`p' can be used for printing its kind)",
-			   [WRITER_U_CTAGS] = renderFieldScope),
+			   [WRITER_U_CTAGS] = renderFieldScope,
+			   [WRITER_E_CTAGS] = renderFieldScopeNoEscape),
 	DEFINE_FIELD_SPEC_FULL ('t', "typeref",        true,
 			   "Type and name of a variable or typedef",
 			   isTyperefFieldAvailable,
@@ -165,7 +168,8 @@ static fieldSpec fieldSpecsUniversal [] = {
 			  "Include the \"scope:\" key in scope field (use s) in tags output, scope name in xref output",
 			   /* Following renderer is for handling --_xformat=%{scope};
 			      and is not for tags output. */
-			   [WRITER_U_CTAGS] = renderFieldScope),
+			   [WRITER_U_CTAGS] = renderFieldScope,
+			   [WRITER_E_CTAGS] = renderFieldScopeNoEscape),
 	DEFINE_FIELD_SPEC_FULL ('E', "extra",   false,
 			   "Extra tag type information",
 			   isExtraFieldAvailable,
@@ -476,6 +480,21 @@ static const char *renderFieldScope (const tagEntryInfo *const tag, const char *
 
 	getTagScopeInformation ((tagEntryInfo *const)tag, NULL, &scope);
 	return scope? renderEscapedName (scope, tag, b): NULL;
+}
+
+static const char *renderFieldScopeNoEscape (const tagEntryInfo *const tag, const char *value CTAGS_ATTR_UNUSED, vString* b,
+											 bool *rejected)
+{
+	const char* scope;
+
+	getTagScopeInformation ((tagEntryInfo *const)tag, NULL, &scope);
+	if (scope && strpbrk (scope, " \t"))
+	{
+		*rejected = true;
+		return NULL;
+	}
+
+	return scope? renderAsIs (b, scope): NULL;
 }
 
 static const char *renderFieldInherits (const tagEntryInfo *const tag, const char *value CTAGS_ATTR_UNUSED, vString* b,
