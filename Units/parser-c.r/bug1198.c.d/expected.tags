@@ -1,0 +1,4 @@
+XESetCopyEventCookie	input.c	/^extern Bool (*XESetCopyEventCookie($/;"	p	typeref:typename:Bool (*)(Display *,XGenericEventCookie *,XGenericEventCookie *)	file:	signature:(Display *,int,Bool (*)(Display *,XGenericEventCookie *,XGenericEventCookie *))
+f	input.c	/^int (* f (char c)) (void * a)$/;"	f	typeref:typename:int (*)(void * a)	signature:(char c)
+f	input.c	/^int (* f (char c)) (void * a);$/;"	p	typeref:typename:int (*)(void * a)	file:	signature:(char c)
+g	input.c	/^static int g (void *a)$/;"	f	typeref:typename:int	file:	signature:(void * a)
