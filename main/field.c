@@ -39,6 +39,8 @@ static const char *renderFieldName (const tagEntryInfo *const tag, const char *v
 static const char *renderFieldNameNoEscape (const tagEntryInfo *const tag, const char *value CTAGS_ATTR_UNUSED, vString* b,
 											bool *rejected);
 static const char *renderFieldInput (const tagEntryInfo *const tag, const char *value, vString* b, bool *rejected);
+static const char *renderFieldInputNoEscape (const tagEntryInfo *const tag, const char *value, vString* b,
+											 bool *rejected);
 static const char *renderFieldCompactInputLine (const tagEntryInfo *const tag, const char *value, vString* b, bool *rejected);
 static const char *renderFieldSignature (const tagEntryInfo *const tag, const char *value, vString* b, bool *rejected);
 static const char *renderFieldScope (const tagEntryInfo *const tag, const char *value, vString* b, bool *rejected);
@@ -96,7 +98,8 @@ static fieldSpec fieldSpecsFixed [] = {
 			  [WRITER_E_CTAGS] = renderFieldNameNoEscape),
 	DEFINE_FIELD_SPEC ('F', "input",    true,
 			   "input file (fixed field)",
-			   [WRITER_U_CTAGS] = renderFieldInput),
+			   [WRITER_U_CTAGS] = renderFieldInput,
+			   [WRITER_E_CTAGS] = renderFieldInputNoEscape),
 	DEFINE_FIELD_SPEC ('P', "pattern",  true,
 			   "pattern (fixed field)",
 			   [WRITER_U_CTAGS] = renderFieldPattern),
@@ -464,6 +467,23 @@ static const char *renderFieldInput (const tagEntryInfo *const tag, const char *
 	if (Option.lineDirectives && tag->sourceFileName)
 		f = tag->sourceFileName;
 	return renderEscapedString (f, tag, b);
+}
+
+static const char *renderFieldInputNoEscape (const tagEntryInfo *const tag, const char *value, vString* b,
+											 bool *rejected)
+{
+	const char *f = tag->inputFileName;
+
+	if (Option.lineDirectives && tag->sourceFileName)
+		f = tag->sourceFileName;
+
+	if (strpbrk (f, " \t"))
+	{
+		*rejected = true;
+		return NULL;
+	}
+
+	return renderAsIs (b, f);
 }
 
 static const char *renderFieldSignature (const tagEntryInfo *const tag, const char *value CTAGS_ATTR_UNUSED, vString* b,
