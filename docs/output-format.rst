@@ -17,3 +17,4 @@ This section deals with individual output-format topics.
 	:maxdepth: 2
 
 	output-json.rst
+	output-xref.rst
