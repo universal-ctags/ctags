@@ -1230,7 +1230,7 @@ extern vString * cppBuildMacroReplacement(
 			if(parameters && (r->parameterIndex < parameterCount))
 			{
 				if(r->flags & CPP_MACRO_REPLACEMENT_FLAG_STRINGIFY)
-					vStringPut(ret,'\"');
+					vStringPut(ret,'"');
 
 				vStringCatS(ret,parameters[r->parameterIndex]);
 				if(r->flags & CPP_MACRO_REPLACEMENT_FLAG_VARARGS)
@@ -1245,7 +1245,7 @@ extern vString * cppBuildMacroReplacement(
 				}
 
 				if(r->flags & CPP_MACRO_REPLACEMENT_FLAG_STRINGIFY)
-					vStringPut(ret,'\"');
+					vStringPut(ret,'"');
 			}
 		}
 
