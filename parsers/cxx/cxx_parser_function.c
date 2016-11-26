@@ -534,6 +534,81 @@ bool cxxParserTokenChainLooksLikeConstructorParameterSet(
 }
 
 //
+// Check the parenthesis chain and the identifier found by
+// cxxParserLookForFunctionSignature() to determine if its valid for 
+// a function signature.
+//
+static bool cxxParserLookForFunctionSignatureCheckParenthesisAndIdentifier(
+		CXXToken * pParenthesis,
+		CXXTokenChain * pIdentifierChain,
+		CXXToken * pIdentifierStart,
+		CXXToken * pIdentifierEnd,
+		CXXFunctionSignatureInfo * pInfo,
+		CXXFunctionParameterInfo * pParamInfo
+	)
+{
+	CXX_DEBUG_ENTER();
+
+	// Even if we have found a parenthesis and proper identifier we still
+	// continue looping until a termination condition is found.
+
+	CXX_DEBUG_ASSERT(
+			cxxTokenTypeIs(pParenthesis,CXXTokenTypeParenthesisChain),
+			"Must have found a parenthesis chain here"
+		);
+
+	// looks almost fine
+
+	CXXToken * pInner = cxxTokenChainAt(pParenthesis->pChain,1);
+
+	// Look for the __ARGS(()) macro pattern.
+	if(
+			// nested parentheses
+			(pParenthesis->pChain->iCount == 3) &&
+			cxxTokenTypeIs(pInner,CXXTokenTypeParenthesisChain) &&
+			// FIXME: This actually excludes operator!
+			cxxTokenTypeIs(pIdentifierEnd,CXXTokenTypeIdentifier) &&
+			// an identifier right before the identifier we found
+			pIdentifierEnd->pPrev &&
+			cxxTokenTypeIs(pIdentifierEnd->pPrev,CXXTokenTypeIdentifier) &&
+			cxxParserTokenChainLooksLikeFunctionParameterList(
+					pInner->pChain,
+					pParamInfo
+				)
+		)
+	{
+		CXX_DEBUG_PRINT("Looks like an __ARGS() case parenthesis chain");
+
+		// __ARGS() case
+		pInfo->pParenthesisContainerChain = pParenthesis->pChain;
+		pInfo->pIdentifierEnd = pIdentifierEnd->pPrev;
+		pInfo->pIdentifierStart = pInfo->pIdentifierEnd;
+		pInfo->pIdentifierChain = pIdentifierChain;
+		pInfo->pParenthesis = pInner;
+		return true;
+	}
+	
+	if(cxxParserTokenChainLooksLikeFunctionParameterList(
+			pParenthesis->pChain,
+			pParamInfo
+		))
+	{
+		CXX_DEBUG_PRINT("Looks like valid parenthesis chain");
+
+		// non __ARGS()
+		pInfo->pParenthesisContainerChain = pIdentifierChain;
+		pInfo->pIdentifierStart = pIdentifierStart;
+		pInfo->pIdentifierEnd = pIdentifierEnd;
+		pInfo->pIdentifierChain = pIdentifierChain;
+		pInfo->pParenthesis = pParenthesis;
+		return true;
+	}
+	
+	CXX_DEBUG_PRINT("Doesn't look like a valid parenthesis chain");
+	return false;
+}
+
+//
 // Look for a function signature in the specified chain.
 //
 // If a proper function signature is found then also standardize the spacing
@@ -684,10 +759,9 @@ bool cxxParserLookForFunctionSignature(
 			goto next_token;
 		}
 
-		// Didn't reach end. Check if we have a parenthesis.
+		// Didn't reach end. Now check for parenthesis + identifier
 
 		CXXTokenChain * pIdentifierChain = pChain;
-		CXXToken * pParenthesis = NULL;
 
 		if(cxxTokenIsKeyword(pToken,CXXKeywordOPERATOR))
 		{
@@ -750,189 +824,158 @@ bool cxxParserLookForFunctionSignature(
 					"Must have found a parenthesis chain here"
 				);
 
-			pParenthesis = pToken;
+			pTopLevelParenthesis = pToken;
 			pIdentifierEnd = pToken->pPrev;
 
-		} else {
+			cxxParserLookForFunctionSignatureCheckParenthesisAndIdentifier(
+					pTopLevelParenthesis,
+					pIdentifierChain,
+					pIdentifierStart,
+					pIdentifierEnd,
+					pInfo,
+					pParamInfo
+				);
 
-			// must be parenthesis chain
-			if(!cxxTokenTypeIs(pToken,CXXTokenTypeParenthesisChain))
-			{
-				CXX_DEBUG_PRINT("Not a parenthesis chain: assume this can be skipped");
-				goto next_token;
-			}
-
-			// parentheses at position 0 are meaningless
-			if(!pToken->pPrev)
-			{
-				CXX_DEBUG_PRINT("Parenthesis at position 0, meaningless");
-				goto next_token;
-			}
-
-			CXX_DEBUG_PRINT("Found parenthesis chain: check for identifier");
-
-			// parentheses at position 1 they are likely to be macro invocations...
-			// but we still handle them in case we find nothing else.
-
-			// must have an identifier before (this excludes things like __attribute__
-			// and declspec which are marked as keywords)
-			
-			pParenthesis = pToken;
-			
-			if(cxxTokenTypeIs(pToken->pPrev,CXXTokenTypeIdentifier))
-			{
-				// identifier before
-				CXX_DEBUG_PRINT("Got identifier before parenthesis chain");
-
-				pIdentifierStart = pToken->pPrev;
-				pIdentifierEnd = pToken->pPrev;
-			} else if(
-
-				// check for complex parenthesized declarations.
-				// Keep functions, discard everything else.
-				//
-				// Possible cases:
-				//    ret type (*baz)(params) <-- function pointer (variable)
-				//    ret type (*(baz))(params) <-- function pointer (variable)
-				//    ret type (* const (baz))(params) <-- function pointer (variable)
-				//    ret type (*baz())() <-- function returning function pointer
-				//    ret type (*baz(params))(params) <-- function returning function pointer
-				//    ret type (*baz(params)) <-- function returning a pointer
-				//    ret type (*baz(params))[2] <-- function returning a pointer to array
-
-#if 0
-				// Probably not needed
-				(
-					// Followed by another parenthesis that looks like a function signature
-					(
-						pToken->pNext &&
-						cxxTokenTypeIs(pToken->pNext,CXXTokenTypeParenthesisChain) &&
-						// the next parenthesis must look like a function parameter list (return function)
-						cxxParserTokenChainLooksLikeFunctionParameterList(
-								pToken->pNext->pChain,
-								NULL
-							)
-					) ||
-					(
-						pToken->pNext &&
-						cxxTokenTypeIs(pToken->pNext,CXXTokenTypeSquareParenthesisChain) &&
-					)
-				) &&
-#endif
-				// look for the identifier
-				(pIdentifierStart = cxxTokenChainFirstPossiblyNestedTokenOfType(
-						pToken->pChain,
-						CXXTokenTypeIdentifier,
-						&pIdentifierChain
-					))
-				)
-			{
-				CXX_DEBUG_PRINT(
-						"Got identifier '%s' inside parenthesis chain",
-						vStringValue(pIdentifierStart->pszWord)
-					);
-
-				// Now pIdentifierStart points at the innermost identifier
-				// Check if it's followed by a parameter list
-				if(
-					pIdentifierStart->pNext &&
-					cxxTokenTypeIs(pIdentifierStart->pNext,CXXTokenTypeParenthesisChain) &&
-					cxxParserTokenChainLooksLikeFunctionParameterList(
-							pIdentifierStart->pNext->pChain,
-							NULL
-						)
-					)
-				{
-					CXX_DEBUG_PRINT("Identifier followed by a parameter-like parenthesis chain");
-					pIdentifierEnd = pIdentifierStart;
-					// correct our guess for parenthesis
-					pParenthesis = pIdentifierStart->pNext;
-				} else {
-					// Looks more like a function pointer or something else we can't figure out
-					CXX_DEBUG_LEAVE_TEXT("Identifier NOT followed by a parameter-like parenthesis chain");
-					return false;
-				}
-			} else if(
-					pToken->pPrev->pPrev &&
-					cxxTokenTypeIs(pToken->pPrev,CXXTokenTypeGreaterThanSign)
-				)
-			{
-				// look for template specialisation
-				CXXToken * pSpecBegin = cxxTokenChainSkipBackToStartOfTemplateAngleBracket(
-						pToken->pPrev
-					);
-
-				if(
-						pSpecBegin &&
-						pSpecBegin->pPrev &&
-						cxxTokenTypeIs(pSpecBegin->pPrev,CXXTokenTypeIdentifier)
-					)
-				{
-					// template specialisation
-					CXX_DEBUG_PRINT("Maybe template specialisation?");
-					pIdentifierStart = pSpecBegin->pPrev;
-					pIdentifierEnd = pSpecBegin->pPrev;
-					pInfo->uFlags |= CXXFunctionSignatureInfoTemplateSpecialization;
-				} else {
-					// no way
-					goto next_token;
-				}
-			} else {
-				// no way
-				goto next_token;
-			}
+			// Even if the check above failed we have nothing more to do with this token
+			goto next_token;
 		}
 
-		if(pParenthesis)
+		// Now we look only at parenthesis chains
+		if(!cxxTokenTypeIs(pToken,CXXTokenTypeParenthesisChain))
 		{
-			CXX_DEBUG_ASSERT(
-					cxxTokenTypeIs(pParenthesis,CXXTokenTypeParenthesisChain),
-					"Must have found a parenthesis chain here"
-				);
-	
-			// looks almost fine
-	
-			CXXToken * pInner = cxxTokenChainAt(pParenthesis->pChain,1);
-	
-			// Look for the __ARGS(()) macro pattern.
+			CXX_DEBUG_PRINT("Not a parenthesis chain: assume this can be skipped");
+			goto next_token;
+		}
+
+		// parentheses at position 0 are meaningless
+		if(!pToken->pPrev)
+		{
+			CXX_DEBUG_PRINT("Parenthesis at position 0, meaningless");
+			goto next_token;
+		}
+
+		CXX_DEBUG_PRINT("Found parenthesis chain: check for identifier");
+
+		// parentheses at position 1 they are likely to be macro invocations...
+		// but we still handle them in case we find nothing else.
+
+		// must have an identifier before (this excludes things like __attribute__
+		// and declspec which are marked as keywords)
+		
+		pTopLevelParenthesis = pToken;
+		
+		if(cxxTokenTypeIs(pToken->pPrev,CXXTokenTypeIdentifier))
+		{
+			// identifier before
+			CXX_DEBUG_PRINT("Got identifier before parenthesis chain");
+
+			pIdentifierStart = pToken->pPrev;
+			pIdentifierEnd = pToken->pPrev;
+			
 			if(
-					// nested parentheses
-					(pParenthesis->pChain->iCount == 3) &&
-					cxxTokenTypeIs(pInner,CXXTokenTypeParenthesisChain) &&
-					// FIXME: This actually excludes operator!
-					cxxTokenTypeIs(pIdentifierEnd,CXXTokenTypeIdentifier) &&
-					// an identifier right before the identifier we found
-					pIdentifierEnd->pPrev &&
-					cxxTokenTypeIs(pIdentifierEnd->pPrev,CXXTokenTypeIdentifier) &&
-					cxxParserTokenChainLooksLikeFunctionParameterList(
-							pInner->pChain,
-							pParamInfo
-						)
+				cxxParserLookForFunctionSignatureCheckParenthesisAndIdentifier(
+						pTopLevelParenthesis,
+						pIdentifierChain,
+						pIdentifierStart,
+						pIdentifierEnd,
+						pInfo,
+						pParamInfo
+					)
+				)
+				goto next_token;
+			
+			// If the check above failed, try different identifier possibilities
+		}
+
+		if(
+			// check for complex parenthesized declarations.
+			// Keep functions, discard everything else.
+			//
+			// Possible cases:
+			//    ret type (*baz)(params) <-- function pointer (variable)
+			//    ret type (*(baz))(params) <-- function pointer (variable)
+			//    ret type (* const (baz))(params) <-- function pointer (variable)
+			//    ret type (*baz())() <-- function returning function pointer
+			//    ret type (*baz(params))(params) <-- function returning function pointer
+			//    ret type (*baz(params)) <-- function returning a pointer
+			//    ret type (*baz(params))[2] <-- function returning a pointer to array
+			(pIdentifierStart = cxxTokenChainFirstPossiblyNestedTokenOfType(
+					pToken->pChain,
+					CXXTokenTypeIdentifier,
+					&pIdentifierChain
+				))
+			)
+		{
+			CXX_DEBUG_PRINT(
+					"Got identifier '%s' inside parenthesis chain",
+					vStringValue(pIdentifierStart->pszWord)
+				);
+
+			// Now pIdentifierStart points at the innermost identifier
+			// Check if it's followed by a parameter list
+			if(
+				pIdentifierStart->pNext &&
+				cxxTokenTypeIs(pIdentifierStart->pNext,CXXTokenTypeParenthesisChain) &&
+				cxxParserTokenChainLooksLikeFunctionParameterList(
+						pIdentifierStart->pNext->pChain,
+						NULL
+					)
 				)
 			{
-				// __ARGS() case
-				pTopLevelParenthesis = pParenthesis;
-				pInfo->pParenthesisContainerChain = pParenthesis->pChain;
-				pInfo->pIdentifierEnd = pIdentifierEnd->pPrev;
-				pInfo->pIdentifierStart = pInfo->pIdentifierEnd;
-				pInfo->pIdentifierChain = pIdentifierChain;
-				pInfo->pParenthesis = pInner;
-			} else if(cxxParserTokenChainLooksLikeFunctionParameterList(
-					pParenthesis->pChain,
-					pParamInfo
-				))
-			{
-				// non __ARGS()
-				pTopLevelParenthesis = pParenthesis;
-				pInfo->pParenthesisContainerChain = pIdentifierChain;
-				pInfo->pIdentifierStart = pIdentifierStart;
-				pInfo->pIdentifierEnd = pIdentifierEnd;
-				pInfo->pIdentifierChain = pIdentifierChain;
-				pInfo->pParenthesis = pParenthesis;
+				CXX_DEBUG_PRINT("Identifier followed by a parameter-like parenthesis chain");
+				pIdentifierEnd = pIdentifierStart;
+				// correct our guess for parenthesis
+				pTopLevelParenthesis = pIdentifierStart->pNext;
+			} else {
+				// Looks more like a function pointer or something else we can't figure out
+				CXX_DEBUG_LEAVE_TEXT("Identifier NOT followed by a parameter-like parenthesis chain");
+				return false;
 			}
-			
-			// Even if we have found a parenthesis and proper identifier we still
-			// continue looping until a termination condition is found.
+
+			cxxParserLookForFunctionSignatureCheckParenthesisAndIdentifier(
+					pTopLevelParenthesis,
+					pIdentifierChain,
+					pIdentifierStart,
+					pIdentifierEnd,
+					pInfo,
+					pParamInfo
+				);
+
+			// Even if the check above failed we have nothing more to do with this token
+			goto next_token;
+		}
+		
+		if(
+				pToken->pPrev->pPrev &&
+				cxxTokenTypeIs(pToken->pPrev,CXXTokenTypeGreaterThanSign)
+			)
+		{
+			// look for template specialisation
+			CXXToken * pSpecBegin = cxxTokenChainSkipBackToStartOfTemplateAngleBracket(
+					pToken->pPrev
+				);
+
+			if(
+					pSpecBegin &&
+					pSpecBegin->pPrev &&
+					cxxTokenTypeIs(pSpecBegin->pPrev,CXXTokenTypeIdentifier)
+				)
+			{
+				// template specialisation
+				CXX_DEBUG_PRINT("Maybe template specialisation?");
+				pIdentifierStart = pSpecBegin->pPrev;
+				pIdentifierEnd = pSpecBegin->pPrev;
+				pInfo->uFlags |= CXXFunctionSignatureInfoTemplateSpecialization;
+
+				cxxParserLookForFunctionSignatureCheckParenthesisAndIdentifier(
+						pTopLevelParenthesis,
+						pIdentifierChain,
+						pIdentifierStart,
+						pIdentifierEnd,
+						pInfo,
+						pParamInfo
+					);
+			}
 		}
 
 next_token:
@@ -944,6 +987,8 @@ next_token:
 		CXX_DEBUG_LEAVE_TEXT("No suitable parenthesis chain found");
 		return false; // no function, no party
 	}
+
+	CXX_DEBUG_ASSERT(pTopLevelParenthesis,"This should have been set");
 
 	if(pInfo->pIdentifierStart != pInfo->pIdentifierEnd)
 	{
