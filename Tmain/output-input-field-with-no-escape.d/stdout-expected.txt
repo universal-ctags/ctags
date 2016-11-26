@@ -1,0 +1,6 @@
+# u-ctags
+!_TAG_OUTPUT_MODE	u-ctags	/u-ctags or e-ctags/
+foo	a\\b.c	/^#define foo$/;"	d	file:
+# e-ctags
+!_TAG_OUTPUT_MODE	e-ctags	/u-ctags or e-ctags/
+foo	a\b.c	/^#define foo$/;"	d	file:
