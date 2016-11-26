@@ -69,7 +69,7 @@
 # define RECURSE_SUPPORTED
 #endif
 
-#define isCompoundOption(c)  (bool) (strchr ("fohiILpDb", (c)) != NULL)
+#define isCompoundOption(c)  (bool) (strchr ("fohiILpdDb", (c)) != NULL)
 
 #define SUBDIR_OPTLIB "optlib"
 #define SUBDIR_PRELOAD "preload"
