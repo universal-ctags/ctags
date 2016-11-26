@@ -1351,6 +1351,31 @@ onig_print_statistics(FILE* f)
 #endif /* ONIG_DEBUG_STATISTICS */
 
 
+#ifdef ONIG_DEBUG_MATCH
+static char *
+stack_type_str(int stack_type)
+{
+  switch (stack_type) {
+    case STK_ALT:		return "Alt   ";
+    case STK_LOOK_BEHIND_NOT:	return "LBNot ";
+    case STK_POS_NOT:		return "PosNot";
+    case STK_MEM_START:		return "MemS  ";
+    case STK_MEM_END:		return "MemE  ";
+    case STK_REPEAT_INC:	return "RepInc";
+    case STK_STATE_CHECK_MARK:	return "StChMk";
+    case STK_NULL_CHECK_START:	return "NulChS";
+    case STK_NULL_CHECK_END:	return "NulChE";
+    case STK_MEM_END_MARK:	return "MemEMk";
+    case STK_POS:		return "Pos   ";
+    case STK_STOP_BT:		return "StopBt";
+    case STK_REPEAT:		return "Rep   ";
+    case STK_CALL_FRAME:	return "Call  ";
+    case STK_RETURN:		return "Ret   ";
+    case STK_VOID:		return "Void  ";
+    default:			return "      ";
+  }
+}
+#endif
 
 /* matching region of POSIX API */
 typedef int regoff_t;
@@ -1623,7 +1648,7 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
 	  (intptr_t )str, str, (intptr_t )end, end, (intptr_t )sstart, sstart, (intptr_t )sprev, sprev);
   fprintf(stderr, "size: %d, start offset: %d\n",
 	  (int )(end - str), (int )(sstart - str));
-  fprintf(stderr, "\n ofs> str                   stk:type  addr:opcode\n");
+  fprintf(stderr, "\n ofs> str                   stk:type   addr:opcode\n");
 #endif
 
   STACK_PUSH_ENSURED(STK_ALT, (UChar* )FinishCode);  /* bottom stack */
@@ -1646,14 +1671,15 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
 	  len = enclen(encode, q, end);                                 \
 	  while (len-- > 0) *bp++ = *q++;                               \
 	}                                                               \
+        if (q < end) { xmemcpy(bp, "...", 3); bp += 3; }                \
       }                                                                 \
-      if (q < end) { xmemcpy(bp, "...\"", 4); bp += 4; }                \
-      else         { xmemcpy(bp, "\"",    1); bp += 1; }                \
+      xmemcpy(bp, "\"", 1); bp += 1;                                    \
       *bp = 0;                                                          \
       fputs((char* )buf, stderr);                                       \
       for (i = 0; i < 20 - (bp - buf); i++) fputc(' ', stderr);         \
-      fprintf(stderr, "%4"PRIdPTR":%04x  %4"PRIdPTR":",                 \
-	  stk - stk_base - 1, stk[-1].type,                             \
+      fprintf(stderr, "%4"PRIdPTR":%s %4"PRIdPTR":",                    \
+	  stk - stk_base - 1,                                           \
+	  (stk > stk_base) ? stack_type_str(stk[-1].type) : "      ",   \
 	  (op == FinishCode) ? (ptrdiff_t )-1 : op - reg->p);           \
       onig_print_compiled_byte_code(stderr, op, reg->p+reg->used, NULL, encode); \
       fprintf(stderr, "\n");                                            \
