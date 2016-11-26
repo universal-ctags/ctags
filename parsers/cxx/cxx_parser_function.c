@@ -586,13 +586,32 @@ bool cxxParserLookForFunctionSignature(
 	CXXToken * pIdentifierEnd = NULL;
 	CXXToken * pTopLevelParenthesis = NULL;
 
+	// Strategy:
+	//
+	//    Scan the toplevel token chain and look for the first identifier immediately
+	//    followed by a parenthesis chain that looks like a (possibly empty)
+	//    list of function parameters.
+	//
+	//    Since the identifier may be hidden within a parenthesis chain (and thus NOT be toplevel)
+	//    we must scan the inner parenthesis chains too. For this reason this loop
+	//    first looks for a parenthesis chain (which is always present at toplevel)
+	//    and then looks for a suitable identifier near or inside it.
+	//
+	//    Stop scanning when one of { ; EOF : , is found.
+	//
+	//    Bail out if anything suspicious is found in the middle.
+	//
+
 	while(pToken)
 	{
 		CXX_DEBUG_PRINT(
-				"Token '%s' of type 0x%02x",
+				"Token '%s' of type 0x%02x (%s)",
 				vStringValue(pToken->pszWord),
-				pToken->eType
+				pToken->eType,
+				cxxDebugTypeDecode(pToken->eType)
 			);
+
+		// Check exit conditions first
 
 		if(cxxTokenTypeIsOneOf(
 				pToken,
@@ -600,6 +619,7 @@ bool cxxParserLookForFunctionSignature(
 			))
 		{
 			// reached end
+			CXX_DEBUG_PRINT("Found opening bracket, semicolon or EOF");
 			break;
 		}
 		
@@ -607,6 +627,7 @@ bool cxxParserLookForFunctionSignature(
 		{
 			// reached end, but we have a trailing comma.
 			pInfo->pTrailingComma = pToken;
+			CXX_DEBUG_PRINT("Found trailing comma");
 			break;
 		}
 
@@ -622,8 +643,11 @@ bool cxxParserLookForFunctionSignature(
 			// With a single colon it might be a constructor.
 			// With assignment it might be virtual type func(..) = 0;
 			// With a pointer operator it might be trailing return type
+			CXX_DEBUG_PRINT("Found single colon");
 			break;
 		} 
+
+		// Check for tokens that should never appear at top leve of a function signature
 
 		if(cxxTokenTypeIsOneOf(
 					pToken,
@@ -640,6 +664,8 @@ bool cxxParserLookForFunctionSignature(
 			return false;
 		}
 
+		// Explicitly skip template-like angle brackets, which are not condensed here and may confuse us
+
 		if(cxxTokenTypeIs(pToken,CXXTokenTypeSmallerThanSign))
 		{
 			pToken = cxxTokenChainSkipToEndOfTemplateAngleBracket(pToken);
@@ -648,6 +674,13 @@ bool cxxParserLookForFunctionSignature(
 				CXX_DEBUG_LEAVE_TEXT("Couln't skip past angle bracket chain");
 				return false;
 			}
+			CXX_DEBUG_PRINT("Skipped angle bracket chain");
+			goto next_token;
+		}
+		
+		if(pInfo->pParenthesis)
+		{
+			CXX_DEBUG_PRINT("Already have a proper parenthesis: continuing loop to find terminator");
 			goto next_token;
 		}
 
@@ -659,6 +692,8 @@ bool cxxParserLookForFunctionSignature(
 		if(cxxTokenIsKeyword(pToken,CXXKeywordOPERATOR))
 		{
 			// Special case for operator <something> ()
+
+			CXX_DEBUG_PRINT("operator token found: looking deeper");
 
 			pIdentifierStart = pToken;
 			pToken = pToken->pNext;
@@ -722,11 +757,17 @@ bool cxxParserLookForFunctionSignature(
 
 			// must be parenthesis chain
 			if(!cxxTokenTypeIs(pToken,CXXTokenTypeParenthesisChain))
+			{
+				CXX_DEBUG_PRINT("Not a parenthesis chain: assume this can be skipped");
 				goto next_token;
+			}
 
 			// parentheses at position 0 are meaningless
 			if(!pToken->pPrev)
+			{
+				CXX_DEBUG_PRINT("Parenthesis at position 0, meaningless");
 				goto next_token;
+			}
 
 			CXX_DEBUG_PRINT("Found parenthesis chain: check for identifier");
 
@@ -741,10 +782,12 @@ bool cxxParserLookForFunctionSignature(
 			if(cxxTokenTypeIs(pToken->pPrev,CXXTokenTypeIdentifier))
 			{
 				// identifier before
-				CXX_DEBUG_PRINT("Got identifier before");
+				CXX_DEBUG_PRINT("Got identifier before parenthesis chain");
+
 				pIdentifierStart = pToken->pPrev;
 				pIdentifierEnd = pToken->pPrev;
 			} else if(
+
 				// check for complex parenthesized declarations.
 				// Keep functions, discard everything else.
 				//
@@ -753,6 +796,7 @@ bool cxxParserLookForFunctionSignature(
 				//    ret type (*(baz))(params) <-- function pointer (variable)
 				//    ret type (* const (baz))(params) <-- function pointer (variable)
 				//    ret type (*baz())() <-- function returning function pointer
+				//    ret type (*baz(params))(params) <-- function returning function pointer
 				//    ret type (*baz(params)) <-- function returning a pointer
 				//    ret type (*baz(params))[2] <-- function returning a pointer to array
 
@@ -783,6 +827,11 @@ bool cxxParserLookForFunctionSignature(
 					))
 				)
 			{
+				CXX_DEBUG_PRINT(
+						"Got identifier '%s' inside parenthesis chain",
+						vStringValue(pIdentifierStart->pszWord)
+					);
+
 				// Now pIdentifierStart points at the innermost identifier
 				// Check if it's followed by a parameter list
 				if(
@@ -794,15 +843,13 @@ bool cxxParserLookForFunctionSignature(
 						)
 					)
 				{
-					CXX_DEBUG_PRINT("Still looking like a function");
+					CXX_DEBUG_PRINT("Identifier followed by a parameter-like parenthesis chain");
 					pIdentifierEnd = pIdentifierStart;
 					// correct our guess for parenthesis
 					pParenthesis = pIdentifierStart->pNext;
 				} else {
 					// Looks more like a function pointer or something else we can't figure out
-					CXX_DEBUG_LEAVE_TEXT(
-							"Does not look like a function (possibly pointer or something else)"
-						);
+					CXX_DEBUG_LEAVE_TEXT("Identifier NOT followed by a parameter-like parenthesis chain");
 					return false;
 				}
 			} else if(
@@ -883,6 +930,9 @@ bool cxxParserLookForFunctionSignature(
 				pInfo->pIdentifierChain = pIdentifierChain;
 				pInfo->pParenthesis = pParenthesis;
 			}
+			
+			// Even if we have found a parenthesis and proper identifier we still
+			// continue looping until a termination condition is found.
 		}
 
 next_token:
