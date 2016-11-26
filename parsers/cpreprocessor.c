@@ -1382,7 +1382,7 @@ static void saveMacro(const char * macro)
 			while(*c && isspacetab(*c))
 				c++;
 
-			if(*c && (*c != ','))
+			if(*c && (*c != ',') && (*c != ')'))
 			{
 				paramBegin[iParamCount] = c;
 				c++;
