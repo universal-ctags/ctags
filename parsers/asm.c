@@ -28,6 +28,7 @@
 *   DATA DECLARATIONS
 */
 typedef enum {
+	K_PSUEDO_MACRO_END = -2,
 	K_NONE = -1, K_DEFINE, K_LABEL, K_MACRO, K_TYPE
 } AsmKind;
 
@@ -93,7 +94,7 @@ static const opKind OpKinds [] = {
 	{ OP_ALIGN,       K_NONE   },
 	{ OP_COLON_EQUAL, K_DEFINE },
 	{ OP_END,         K_NONE   },
-	{ OP_ENDM,        K_NONE   },
+	{ OP_ENDM,        K_PSUEDO_MACRO_END },
 	{ OP_ENDMACRO,    K_NONE   },
 	{ OP_ENDP,        K_NONE   },
 	{ OP_ENDS,        K_NONE   },
@@ -168,7 +169,8 @@ static void makeAsmTag (
 		const vString *const operator,
 		const bool labelCandidate,
 		const bool nameFollows,
-		const bool directive)
+		const bool directive,
+		unsigned int *lastMacroCorkIndex)
 {
 	if (vStringLength (name) > 0)
 	{
@@ -176,7 +178,7 @@ static void makeAsmTag (
 		const AsmKind kind = operatorKind (operator, &found);
 		if (found)
 		{
-			if (kind != K_NONE)
+			if (kind > K_NONE)
 				makeSimpleTag (name, AsmKinds, kind);
 		}
 		else if (isDefineOperator (operator))
@@ -192,10 +194,27 @@ static void makeAsmTag (
 		}
 		else if (directive)
 		{
-			const AsmKind kind_for_directive = operatorKind (name, &found);
-			if (found && (kind_for_directive != K_NONE))
-				makeSimpleTag (operator, AsmKinds, kind_for_directive);
+			bool found_dummy;
+			const AsmKind kind_for_directive = operatorKind (name, &found_dummy);
+			tagEntryInfo *macro_tag;
 
+			switch (kind_for_directive)
+			{
+			case K_NONE:
+				break;
+			case K_MACRO:
+				*lastMacroCorkIndex = makeSimpleTag (operator,
+													 AsmKinds,
+													 kind_for_directive);
+				break;
+			case K_PSUEDO_MACRO_END:
+				macro_tag = getEntryInCorkQueue (*lastMacroCorkIndex);
+				macro_tag->extensionFields.endLine = getInputLineNumber ();
+				*lastMacroCorkIndex = CORK_NIL;
+				break;
+			default:
+				makeSimpleTag (operator, AsmKinds, kind_for_directive);
+			}
 		}
 	}
 }
@@ -260,6 +279,8 @@ static void findAsmTags (void)
 	cppInit (false, false, false, false,
 			 NULL, 0, NULL, 0, 0);
 
+	unsigned int lastMacroCorkIndex = CORK_NIL;
+
 	while ((line = asmReadLineFromInputFile ()) != NULL)
 	{
 		const unsigned char *cp = line;
@@ -315,7 +336,8 @@ static void findAsmTags (void)
 			cp = readSymbol (cp, name);
 			nameFollows = true;
 		}
-		makeAsmTag (name, operator, labelCandidate, nameFollows, directive);
+		makeAsmTag (name, operator, labelCandidate, nameFollows, directive,
+					&lastMacroCorkIndex);
 	}
 
 	cppTerminate ();
@@ -354,5 +376,6 @@ extern parserDefinition* AsmParser (void)
 	def->keywordTable = AsmKeywords;
 	def->keywordCount = ARRAY_SIZE (AsmKeywords);
 	def->selectLanguage = selectors;
+	def->useCork = true;
 	return def;
 }

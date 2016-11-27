@@ -1,2 +1,3 @@
-X	input.s	/^#define X /;"	d	file:
-sum	input.s	/^.macro  sum from=0, to=5$/;"	m
+X	input.s	/^#define X /;"	d	line:7	file:	end:7
+altsum	input.s	/^.macro  altsum from=0, to=6$/;"	m	line:8	end:13
+sum	input.s	/^.macro  sum from=0, to=5$/;"	m	line:1	end:6
