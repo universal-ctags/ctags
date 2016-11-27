@@ -99,6 +99,10 @@ main()
 	i=$(expr $i + 1)
     fi
 
+    if ! check_name_cpp_macro parsers; then
+	i=$(expr $i + 1)
+    fi
+
     return 0
 }
 
