@@ -73,6 +73,21 @@ check_name_cpp_macro()
     return $r
 }
 
+check_vStringCatS_usage()
+{
+    local i=0
+
+    header "Check wrong vStringCatS usage(use vStringPut instead): $1"
+    for f in $(find $1 -name '*.c'); do
+	if grep -H -a -e 'vStringCatS[[:space:]]*(.*,[[:space:]]*"."[[:space:]]*)' $f; then
+	    i=$(expr $i + 1)
+	elif grep -H -a -e 'vStringCatS[[:space:]]*(.*,[[:space:]]*"\\."[[:space:]]*)' $f; then
+	    i=$(expr $i + 1)
+	fi
+    done
+
+    return $i
+}
 main()
 {
     local i=0
@@ -100,6 +115,14 @@ main()
     fi
 
     if ! check_name_cpp_macro parsers; then
+	i=$(expr $i + 1)
+    fi
+
+    if ! check_vStringCatS_usage main; then
+	i=$(expr $i + 1)
+    fi
+
+    if ! check_vStringCatS_usage parsers; then
 	i=$(expr $i + 1)
     fi
 
