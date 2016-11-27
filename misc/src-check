@@ -45,7 +45,7 @@ check_include_general_h_first()
 	if grep -a -q -e '^#[[:space:]]*include' $f; then
 	    l=$()
 	    if ! ( grep -a -e '^#[[:space:]]*include' $f | head -1 | grep -q "general.h" ); then
-		i=$(expr i + 1)
+		i=$(expr $i + 1)
 		echo "$f: general.h should be included FIRST" 2>&1
 	    fi
 	fi
