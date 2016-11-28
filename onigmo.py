@@ -378,6 +378,7 @@ ONIGERR_STACK_BUG                                       =   -12
 ONIGERR_UNDEFINED_BYTECODE                              =   -13
 ONIGERR_UNEXPECTED_BYTECODE                             =   -14
 ONIGERR_MATCH_STACK_LIMIT_OVER                          =   -15
+ONIGERR_PARSE_DEPTH_LIMIT_OVER                          =   -16
 ONIGERR_DEFAULT_ENCODING_IS_NOT_SET                     =   -21
 ONIGERR_SPECIFIED_ENCODING_CANT_CONVERT_TO_WIDE_CHAR    =   -22
 # general error
@@ -595,6 +596,16 @@ onig_get_match_stack_limit_size = libonig.onig_get_match_stack_limit_size
 libonig.onig_set_match_stack_limit_size.argtypes = [ctypes.c_int]
 libonig.onig_set_match_stack_limit_size.restype = ctypes.c_int
 onig_set_match_stack_limit_size = libonig.onig_set_match_stack_limit_size
+
+# onig_get_parse_depth_limit
+libonig.onig_get_parse_depth_limit.argtypes = []
+libonig.onig_get_parse_depth_limit.restype = ctypes.c_int
+onig_get_parse_depth_limit = libonig.onig_get_parse_depth_limit
+
+# onig_set_parse_depth_limit
+libonig.onig_set_parse_depth_limit.argtypes = [ctypes.c_int]
+libonig.onig_set_parse_depth_limit.restype = ctypes.c_int
+onig_set_parse_depth_limit = libonig.onig_set_parse_depth_limit
 
 # onig_end
 libonig.onig_end.argtypes = []

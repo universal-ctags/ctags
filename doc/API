@@ -1,4 +1,4 @@
-Onigmo (Oniguruma-mod) API  Version 6.0.0  2016/11/14
+Onigmo (Oniguruma-mod) API  Version 6.0.0  2016/11/28
 
 #include <onigmo.h>
 
@@ -669,6 +669,20 @@ Onigmo (Oniguruma-mod) API  Version 6.0.0  2016/11/14
 
   Set the maximum number of stack size.
   (size = 0: unlimited)
+
+  normal return: ONIG_NORMAL
+
+
+# unsigned int onig_get_parse_depth_limit(void)
+
+  Return the maximum depth of parser recursion.
+  (default: DEFAULT_PARSE_DEPTH_LIMIT defined in regint.h. Currently 4096.)
+
+
+# int onig_set_parse_depth_limit(unsigned int depth)
+
+  Set the maximum depth of parser recursion.
+  (depth = 0: Set to the default value defined in regint.h.)
 
   normal return: ONIG_NORMAL
 

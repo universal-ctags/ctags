@@ -59,6 +59,8 @@ onig_error_code_to_format(OnigPosition code)
     p = "unexpected bytecode (bug)"; break;
   case ONIGERR_MATCH_STACK_LIMIT_OVER:
     p = "match-stack limit over"; break;
+  case ONIGERR_PARSE_DEPTH_LIMIT_OVER:
+    p = "parse depth limit over"; break;
   case ONIGERR_DEFAULT_ENCODING_IS_NOT_SET:
     p = "default multibyte-encoding is not set"; break;
   case ONIGERR_SPECIFIED_ENCODING_CANT_CONVERT_TO_WIDE_CHAR:

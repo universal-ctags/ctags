@@ -85,6 +85,7 @@
 
 #define INIT_MATCH_STACK_SIZE                     160
 #define DEFAULT_MATCH_STACK_LIMIT_SIZE              0 /* unlimited */
+#define DEFAULT_PARSE_DEPTH_LIMIT                4096
 
 #define OPT_EXACT_MAXLEN   24
 

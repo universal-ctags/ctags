@@ -633,6 +633,7 @@ ONIG_EXTERN const OnigSyntaxType*   OnigDefaultSyntax;
 #define ONIGERR_UNDEFINED_BYTECODE                            -13
 #define ONIGERR_UNEXPECTED_BYTECODE                           -14
 #define ONIGERR_MATCH_STACK_LIMIT_OVER                        -15
+#define ONIGERR_PARSE_DEPTH_LIMIT_OVER                        -16
 #define ONIGERR_DEFAULT_ENCODING_IS_NOT_SET                   -21
 #define ONIGERR_SPECIFIED_ENCODING_CANT_CONVERT_TO_WIDE_CHAR  -22
 /* general error */
@@ -911,6 +912,10 @@ ONIG_EXTERN
 unsigned int onig_get_match_stack_limit_size(void);
 ONIG_EXTERN
 int onig_set_match_stack_limit_size(unsigned int size);
+ONIG_EXTERN
+unsigned int onig_get_parse_depth_limit(void);
+ONIG_EXTERN
+int onig_set_parse_depth_limit(unsigned int depth);
 ONIG_EXTERN
 int onig_end(void);
 ONIG_EXTERN

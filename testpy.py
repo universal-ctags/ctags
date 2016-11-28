@@ -1617,6 +1617,16 @@ def main():
     n("^a*$", "a" * 2000 + "b", execerr=onigmo.ONIGERR_MATCH_STACK_LIMIT_OVER)
     onigmo.onig_set_match_stack_limit_size(0)
 
+    # parse depth
+    parse_depth = onigmo.onig_get_parse_depth_limit()
+    print("Default parse depth:", parse_depth)
+    onigmo.onig_set_parse_depth_limit(1000)
+    print("New parse depth:", onigmo.onig_get_parse_depth_limit())
+    # These patterns need deep parse stack.
+    x2("(" * 200 + "a" + ")" * 200, "a", 0, 1)
+    n("(" * 2000 + "a" + ")" * 2000, "a", err=onigmo.ONIGERR_PARSE_DEPTH_LIMIT_OVER)
+    onigmo.onig_set_match_stack_limit_size(0)
+
     # syntax functions
     onigmo.onig_set_syntax_op(syntax_default,
         onigmo.onig_get_syntax_op(onigmo.ONIG_SYNTAX_DEFAULT))

@@ -317,6 +317,7 @@ typedef struct {
   int curr_max_regnum;
   int has_recursion;
 #endif
+  unsigned int parse_depth;
   int warnings_flag;
 #ifdef RUBY
   const char* sourcefile;
