@@ -1367,7 +1367,7 @@ int cxxParserEmitFunctionTags(
 		vString * pszSignature = cxxTokenChainJoin(pInfo->pParenthesis->pChain,NULL,0);
 		if(pInfo->pSignatureConst)
 		{
-			vStringCatS(pszSignature," ");
+			vStringPut (pszSignature, ' ');
 			cxxTokenAppendToString(pszSignature,pInfo->pSignatureConst);
 		}
 

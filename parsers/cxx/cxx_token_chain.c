@@ -286,7 +286,7 @@ void cxxTokenChainJoinRangeInString(
 	cxxTokenAppendToString(s,t);
 
 	if((!(uFlags & CXXTokenChainJoinNoTrailingSpaces)) && t->bFollowedBySpace)
-		vStringCatS(s," ");
+		vStringPut (s, ' ');
 
 	while(t && (t != to))
 	{
@@ -303,7 +303,7 @@ void cxxTokenChainJoinRangeInString(
 				(!(uFlags & CXXTokenChainJoinNoTrailingSpaces)) &&
 				t->bFollowedBySpace
 			)
-			vStringCatS(s," ");
+			vStringPut (s, ' ');
 	}
 }
 
@@ -345,7 +345,7 @@ void cxxTokenChainJoinInString(
 			(!(uFlags & CXXTokenChainJoinNoTrailingSpaces)) &&
 			t->bFollowedBySpace
 		)
-		vStringCatS(s," ");
+		vStringPut (s, ' ');
 
 	t = t->pNext;
 	while(t)
@@ -359,7 +359,7 @@ void cxxTokenChainJoinInString(
 				(!(uFlags & CXXTokenChainJoinNoTrailingSpaces)) &&
 				t->bFollowedBySpace
 			)
-			vStringCatS(s," ");
+			vStringPut (s, ' ');
 
 		t = t->pNext;
 	}
@@ -501,7 +501,7 @@ void cxxTokenChainCondense(CXXTokenChain * tc,unsigned int uFlags)
 				(!(uFlags & CXXTokenChainCondenseNoTrailingSpaces)) &&
 				t->bFollowedBySpace
 			)
-			vStringCatS(pCondensed->pszWord," ");
+			vStringPut (pCondensed->pszWord, ' ');
 
 		pCondensed->bFollowedBySpace = t->bFollowedBySpace;
 		cxxTokenDestroy(t);
@@ -952,7 +952,7 @@ CXXToken * cxxTokenChainExtractRange(
 			(!(uFlags & CXXTokenChainExtractRangeNoTrailingSpaces)) &&
 			pToken->bFollowedBySpace
 		)
-		vStringCatS(pRet->pszWord," ");
+		vStringPut (pRet->pszWord, ' ');
 	pRet->bFollowedBySpace = pToken->bFollowedBySpace;
 
 	while(pToken != to)
@@ -965,7 +965,7 @@ CXXToken * cxxTokenChainExtractRange(
 				(!(uFlags & CXXTokenChainExtractRangeNoTrailingSpaces)) &&
 				pToken->bFollowedBySpace
 			)
-			vStringCatS(pRet->pszWord," ");
+			vStringPut (pRet->pszWord, ' ');
 		pRet->bFollowedBySpace = pToken->bFollowedBySpace;
 	}
 
@@ -1008,7 +1008,7 @@ CXXToken * cxxTokenChainExtractIndexRange(
 			(!(uFlags & CXXTokenChainExtractRangeNoTrailingSpaces)) &&
 			pToken->bFollowedBySpace
 		)
-		vStringCatS(pRet->pszWord," ");
+		vStringPut (pRet->pszWord, ' ');
 	pRet->bFollowedBySpace = pToken->bFollowedBySpace;
 
 	while(idx < iLastIndex)
@@ -1021,7 +1021,7 @@ CXXToken * cxxTokenChainExtractIndexRange(
 				(!(uFlags & CXXTokenChainExtractRangeNoTrailingSpaces)) &&
 				pToken->bFollowedBySpace
 			)
-			vStringCatS(pRet->pszWord," ");
+			vStringPut (pRet->pszWord, ' ');
 		pRet->bFollowedBySpace = pToken->bFollowedBySpace;
 		idx++;
 	}
