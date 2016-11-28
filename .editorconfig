@@ -12,6 +12,11 @@ indent_style = tab
 indent_size = 2
 tab_width = 8
 
+[st.[ch]]
+indent_style = tab
+indent_size = 4
+tab_width = 8
+
 [**.py]
 indent_style = space
 indent_size = 4
