@@ -304,7 +304,7 @@ static void makeClassTag (tokenInfo *const token, vString *const signature)
 		if (vStringLength (token->scope) > 0)
 		{
 			vStringCopy(fulltag, token->scope);
-			vStringCatS (fulltag, ".");
+			vStringPut (fulltag, '.');
 			vStringCatS (fulltag, vStringValue(token->string));
 		}
 		else
@@ -330,7 +330,7 @@ static void makeFunctionTag (tokenInfo *const token, vString *const signature, b
 		if (vStringLength (token->scope) > 0)
 		{
 			vStringCopy(fulltag, token->scope);
-			vStringCatS (fulltag, ".");
+			vStringPut (fulltag, '.');
 			vStringCatS (fulltag, vStringValue(token->string));
 		}
 		else
@@ -804,7 +804,7 @@ static void addContext (tokenInfo* const parent, const tokenInfo* const child)
 {
 	if (vStringLength (parent->string) > 0)
 	{
-		vStringCatS (parent->string, ".");
+		vStringPut (parent->string, '.');
 	}
 	vStringCatS (parent->string, vStringValue(child->string));
 }
@@ -813,7 +813,7 @@ static void addToScope (tokenInfo* const token, vString* const extra)
 {
 	if (vStringLength (token->scope) > 0)
 	{
-		vStringCatS (token->scope, ".");
+		vStringPut (token->scope, '.');
 	}
 	vStringCatS (token->scope, vStringValue(extra));
 }
@@ -1704,7 +1704,7 @@ nextVar:
 					if (vStringLength (token->scope) > 0)
 					{
 						vStringCopy(fulltag, token->scope);
-						vStringCatS (fulltag, ".");
+						vStringPut (fulltag, '.');
 						vStringCatS (fulltag, vStringValue(token->string));
 					}
 					else
@@ -1794,7 +1794,7 @@ nextVar:
 				if (vStringLength (token->scope) > 0)
 				{
 					vStringCopy(fulltag, token->scope);
-					vStringCatS (fulltag, ".");
+					vStringPut (fulltag, '.');
 					vStringCatS (fulltag, vStringValue(token->string));
 				}
 				else

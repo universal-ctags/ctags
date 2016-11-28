@@ -534,7 +534,7 @@ static void makeVhdlTag (tokenInfo * const token, const vhdlKind kind)
 		{
 			vString *fulltag = vStringNew ();
 			vStringCopy (fulltag, token->scope);
-			vStringCatS (fulltag, ".");
+			vStringPut (fulltag, '.');
 			vStringCatS (fulltag, vStringValue (token->string));
 			vStringCopy (token->string, fulltag);
 			vStringDelete (fulltag);

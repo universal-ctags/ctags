@@ -529,7 +529,7 @@ static void makeTag (tokenInfo *const token, const goKind kind,
 	{
 		vString *qualifiedName = vStringNew ();
 		vStringCopy (qualifiedName, scope);
-		vStringCatS (qualifiedName, ".");
+		vStringPut (qualifiedName, '.');
 		vStringCat (qualifiedName, token->string);
 		e.name = vStringValue (qualifiedName);
 		markTagExtraBit (&e, XTAG_QUALIFIED_TAGS);

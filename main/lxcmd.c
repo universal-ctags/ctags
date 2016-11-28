@@ -310,7 +310,7 @@ static bool loadPathKinds  (xcmdPath *const path, const langType language)
 	char file_kind = getLanguageFileKind (language)->letter;
 
 	opt = vStringNewInit(XCMD_LIST_KIND_OPTION);
-	vStringCatS (opt, "=");
+	vStringPut (opt, '=');
 	vStringCatS (opt, getLanguageName(language));
 
 	argv[2] = NULL;

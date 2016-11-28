@@ -1263,7 +1263,7 @@ static void addContextSeparator (vString *const scope)
 	if (isInputLanguage (Lang_c)  ||  isInputLanguage (Lang_cpp))
 		vStringCatS (scope, "::");
 	else if (isInputLanguage (Lang_java) || isInputLanguage (Lang_csharp) || isInputLanguage(Lang_d))
-		vStringCatS (scope, ".");
+		vStringPut (scope, '.');
 }
 
 static void addOtherFields (tagEntryInfo* const tag, const tagType type,
@@ -2910,7 +2910,7 @@ static void addContext (statementInfo *const st, const tokenInfo* const token)
 				vStringCatS (st->context->name, "::");
 			else if (isInputLanguage (Lang_java) || isInputLanguage (Lang_csharp) ||
 				isInputLanguage (Lang_d))
-				vStringCatS (st->context->name, ".");
+				vStringPut (st->context->name, '.');
 		}
 		vStringCat (st->context->name, token->name);
 		st->context->type = TOKEN_NAME;

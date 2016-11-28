@@ -554,7 +554,7 @@ static void parseMethodsName (vString * const ident, objcToken what)
 
 	case Tok_dpoint:
 		vStringCat (fullMethodName, prevIdent);
-		vStringCatS (fullMethodName, ":");
+		vStringPut (fullMethodName, ':');
 		vStringClear (prevIdent);
 		break;
 
@@ -595,7 +595,7 @@ static void parseMethodsImplemName (vString * const ident, objcToken what)
 
 	case Tok_dpoint:
 		vStringCat (fullMethodName, prevIdent);
-		vStringCatS (fullMethodName, ":");
+		vStringPut (fullMethodName, ':');
 		vStringClear (prevIdent);
 		break;
 

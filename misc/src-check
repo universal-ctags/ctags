@@ -45,7 +45,7 @@ check_include_general_h_first()
 	if grep -a -q -e '^#[[:space:]]*include' $f; then
 	    l=$()
 	    if ! ( grep -a -e '^#[[:space:]]*include' $f | head -1 | grep -q "general.h" ); then
-		i=$(expr i + 1)
+		i=$(expr $i + 1)
 		echo "$f: general.h should be included FIRST" 2>&1
 	    fi
 	fi
@@ -73,6 +73,21 @@ check_name_cpp_macro()
     return $r
 }
 
+check_vStringCatS_usage()
+{
+    local i=0
+
+    header "Check wrong vStringCatS usage(use vStringPut instead): $1"
+    for f in $(find $1 -name '*.c'); do
+	if grep -H -a -e 'vStringCatS[[:space:]]*(.*,[[:space:]]*"."[[:space:]]*)' $f; then
+	    i=$(expr $i + 1)
+	elif grep -H -a -e 'vStringCatS[[:space:]]*(.*,[[:space:]]*"\\."[[:space:]]*)' $f; then
+	    i=$(expr $i + 1)
+	fi
+    done
+
+    return $i
+}
 main()
 {
     local i=0
@@ -96,6 +111,18 @@ main()
     fi
 
     if ! check_name_cpp_macro main; then
+	i=$(expr $i + 1)
+    fi
+
+    if ! check_name_cpp_macro parsers; then
+	i=$(expr $i + 1)
+    fi
+
+    if ! check_vStringCatS_usage main; then
+	i=$(expr $i + 1)
+    fi
+
+    if ! check_vStringCatS_usage parsers; then
 	i=$(expr $i + 1)
     fi
 
