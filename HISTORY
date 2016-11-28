@@ -2,6 +2,21 @@ History of Onigmo (Oniguruma-mod)
 
 2016/xx/xx: Version 6.0.0
 
+2016/11/28: [impl] Import the latest version of st.c from Ruby. (Issue #70)
+                   Import Ruby r56793 with some modifications.
+2016/11/28: [API]  Add onig_{get,set}_parse_depth_limit().
+2016/11/28: [bug]  Fix stack overflow when parsing deeply nested capture
+                   groups. (Issue #68)
+2016/11/26: [bug]  Fix multiple name groups in Perl syntax. (Issue #74)
+2016/11/18: [impl] Enable multiprocess build on VC2010+.
+2016/11/17: [bug]  Fix wrong optimization for gpos. (Issue #53)
+2016/11/15: [impl] Drop support for old compilers which don't have string.h.
+2016/11/15: [impl] Add ONIG_DEBUG_MEMLEAK for MSVC.
+2016/11/14: [API]  Add onig_initialize() for compatibility to Oniguruma 6.0.
+2016/11/11: [doc]  Clarify the behavior of multiple defined names.
+2016/11/11: [API]  Add onig_scan().
+                   Imported from oniguruma.
+2016/11/09: [impl] Disable OP_PUSH_OR_JUMP_EXACT1.
 2016/11/07: [API]  Remove onigenc_set_default_caseconv_table().
 2016/11/07: [impl] Remove all THREAD_* macros.
                    Imported from oniguruma.
