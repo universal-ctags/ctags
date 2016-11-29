@@ -56,3 +56,14 @@ Reviewing the resulf of Units test
 ------------------------------------------------------------
 
 Try misc/review. [TBW]
+
+Running cppcheck
+------------------------------------------------------------
+
+.. NOT REVIEWD YET
+
+cppcheck is a tool for static C/C++ code analysis.
+
+To run it do as following after install cppcheck::
+
+   $ make cppcheck

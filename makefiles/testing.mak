@@ -1,4 +1,4 @@
-.PHONY: check units fuzz noise tmain tinst clean-units clean-tmain clean-gcov run-gcov codecheck
+.PHONY: check units fuzz noise tmain tinst clean-units clean-tmain clean-gcov run-gcov codecheck cppcheck
 
 check: tmain units
 
@@ -161,3 +161,14 @@ clean-gcov:
 	$(SILENT) echo Cleaning coverage reports
 	$(SILENT) rm -f $(ALL_SRCS:.c=.gcda)
 	$(SILENT) rm -f $(srcdir)/*.gcov
+
+#
+# Cppcheck
+#
+CPPCHECK_DEFS   = -DHAVE_LIBYAML -DHAVE_LIBXML -DHAVE_COPROC -DHAVE_DECL___ENVIRON
+CPPCHECK_UNDEFS = -UDEBUG -UMIO_DEBUG -UCXX_DEBUGGING_ENABLED
+CPPCHECK_FLAGS  = --enable=all
+
+cppcheck:
+	cppcheck $(CPPCHECK_DEFS) $(CPPCHECK_UNDEFS) $(CPPCHECK_UNDEFS) $(CPPCHECK_FLAGS) \
+		 $$(git  ls-files | grep '^\(parsers\|main\)/.*\.[ch]' )
