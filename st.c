@@ -562,6 +562,10 @@ st_init_table_with_size(const struct st_hash_type *type, st_index_t size) {
 #endif
 
     n = get_power2(size);
+#ifndef RUBY
+    if (n < 0)
+	return NULL;
+#endif
     tab = (st_table *) malloc(sizeof (st_table));
     if (tab == NULL)
 	return NULL;
