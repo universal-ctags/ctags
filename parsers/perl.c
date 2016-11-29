@@ -223,7 +223,7 @@ static enum const_state parseConstantsFromLine (const char *cp,
 		const size_t sz = strcspn(cp, "#}=");
 		switch (cp[sz]) {
 			case '=':
-				if (cp[sz + 1] && '>' == cp[sz + 1])
+				if ('>' == cp[sz + 1])
 					makeTagFromLeftSide(cp, cp + sz, name, package);
 				break;
 			case '}':	/* Assume this is the end of the hashref. */
