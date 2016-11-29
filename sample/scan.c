@@ -14,7 +14,7 @@ scan_callback(int n, int r, OnigRegion* region, void* arg)
 
   fprintf(stdout, "match at %d\n", r);
   for (i = 0; i < region->num_regs; i++) {
-    fprintf(stdout, "%d: (%d-%d)\n", i, region->beg[i], region->end[i]);
+    fprintf(stdout, "%d: (%ld-%ld)\n", i, region->beg[i], region->end[i]);
   }
 
   return 0;
