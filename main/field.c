@@ -798,7 +798,7 @@ static const char *renderFieldEnd (const tagEntryInfo *const tag,
 
 	if (tag->extensionFields.endLine != 0)
 	{
-		sprintf (buf, "%ld", tag->extensionFields.endLine);
+		sprintf (buf, "%lu", tag->extensionFields.endLine);
 		return renderAsIs (b, buf);
 	}
 	else
