@@ -312,8 +312,8 @@ extern char* eStrdup (const char* str)
 extern char* eStrndup (const char* str, size_t len)
 {
 	char* result = xMalloc (len + 1, char);
-	memset(result, 0, len + 1);
 	strncpy (result, str, len);
+	result [len] = '\0';
 	return result;
 }
 
