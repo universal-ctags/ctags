@@ -570,7 +570,6 @@ getNextChar:
 			if (d != '\n')
 				ungetcToInputFile (d);
 			goto getNextChar;
-			break;
 		}
 
 		case '#': /* comment */
