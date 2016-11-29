@@ -307,11 +307,7 @@ struct st_features features[] = {
 static inline st_hash_t
 do_hash(st_data_t key, st_table *tab) {
     st_index_t h = (st_index_t)(tab->curr_hash)(key);
-#if SIZEOF_INT == SIZEOF_VOIDP
     st_hash_t hash = h;
-#else
-    st_hash_t hash = h;
-#endif
 
     /* RESERVED_HASH_VAL is used for a deleted entry.  Map it into
        another value.  Such mapping should be extremely rare.  */
