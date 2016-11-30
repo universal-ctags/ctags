@@ -111,12 +111,12 @@ extern void runIniconfParser (const iniconfCallback callback, void* userData)
 		const unsigned char* cp = line;
 		bool possible = true;
 
-		if (isspace ((int) *cp) || *cp == '#' || *cp == ';'
-		    || (*cp != '\0' && *cp == '/' && *(cp+1) == '/'))
+		if (isspace ((int) *cp) || *cp == '#' || *cp == ';' || *cp == '\0'
+		    || (*cp == '/' && *(cp+1) == '/'))
 			continue;
 
 		/* look for a section */
-		if (*cp != '\0' && *cp == '[')
+		if (*cp == '[')
 		{
 			++cp;
 			while (*cp != '\0' && *cp != ']')
