@@ -3840,6 +3840,7 @@ setup_comb_exp_check(Node* node, int state, ScanEnv* env)
 #define IN_REPEAT     (1<<2)
 #define IN_VAR_REPEAT (1<<3)
 #define IN_ROOT       (1<<4)
+#define IN_CALL       (1<<5)
 
 /* setup_tree does the following work.
  1. check empty loop. (set qn->target_empty_info)
@@ -4044,10 +4045,12 @@ restart:
 	break;
 
       case ENCLOSE_MEMORY:
-	if ((state & (IN_ALT | IN_NOT | IN_VAR_REPEAT)) != 0) {
+	if ((state & (IN_ALT | IN_NOT | IN_VAR_REPEAT | IN_CALL)) != 0) {
 	  BIT_STATUS_ON_AT(env->bt_mem_start, en->regnum);
 	  /* SET_ENCLOSE_STATUS(node, NST_MEM_IN_ALT_NOT); */
 	}
+	if (IS_ENCLOSE_CALLED(en))
+	  state |= IN_CALL;
 	r = setup_tree(en->target, reg, state, env);
 	break;
 
