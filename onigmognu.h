@@ -1,7 +1,7 @@
 #ifndef ONIGMOGNU_H
 #define ONIGMOGNU_H
 /**********************************************************************
-  onigmognu.h - Oniguruma (regular expression library)
+  onigmognu.h - Onigmo (Oniguruma-mod) (regular expression library)
 **********************************************************************/
 /*-
  * Copyright (c) 2002-2005  K.Kosako  <sndgk393 AT ybb DOT ne DOT jp>

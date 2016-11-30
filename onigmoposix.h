@@ -1,7 +1,7 @@
 #ifndef ONIGMOPOSIX_H
 #define ONIGMOPOSIX_H
 /**********************************************************************
-  onigmoposix.h - Oniguruma (regular expression library)
+  onigmoposix.h - Onigmo (Oniguruma-mod) (regular expression library)
 **********************************************************************/
 /*-
  * Copyright (c) 2002-2005  K.Kosako  <sndgk393 AT ybb DOT ne DOT jp>
