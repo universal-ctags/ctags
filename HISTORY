@@ -2,6 +2,7 @@ History of Onigmo (Oniguruma-mod)
 
 2016/xx/xx: Version 6.0.0
 
+2016/11/30: [bug]  Partial fix for wrong capture in subexp call. (Issue #48)
 2016/11/28: [impl] Import the latest version of st.c from Ruby. (Issue #70)
                    Import Ruby r56793 with some modifications.
 2016/11/28: [API]  Add onig_{get,set}_parse_depth_limit().
