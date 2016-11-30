@@ -1,6 +1,17 @@
-Onigmo (Oniguruma-mod) API  Version 5.14.0  2014/07/01
+Onigmo (Oniguruma-mod) API  Version 6.0.0  2016/11/28
 
-#include <oniguruma.h>
+#include <onigmo.h>
+
+
+# int onig_initialize(OnigEncoding use_encodings[], int num_encodings)
+
+  Initialize library.
+  This is added for compatibility to Oniguruma 6.0.
+  Currently this is same as onig_init().
+
+  arguments
+  1 use_encodings:         array of encodings used in application.
+  2 num_encodings:         number of encodings.
 
 
 # int onig_init(void)
@@ -9,6 +20,7 @@ Onigmo (Oniguruma-mod) API  Version 5.14.0  2014/07/01
 
   Single thread program:
     You don't have to call it explicitly, because it is called in onig_new().
+    However calling it is preferred.
 
   Multi thread program:
     You have to call it explicitly from a specific thread (normally the main
@@ -108,23 +120,46 @@ Onigmo (Oniguruma-mod) API  Version 5.14.0  2014/07/01
       ONIG_ENCODING_ISO_8859_14   ISO 8859-14
       ONIG_ENCODING_ISO_8859_15   ISO 8859-15
       ONIG_ENCODING_ISO_8859_16   ISO 8859-16
+      ONIG_ENCODING_UTF_8         UTF-8
+      ONIG_ENCODING_UTF_16BE      UTF-16BE
+      ONIG_ENCODING_UTF_16LE      UTF-16LE
+      ONIG_ENCODING_UTF_32BE      UTF-32BE
+      ONIG_ENCODING_UTF_32LE      UTF-32LE
+      ONIG_ENCODING_EUC_JP        EUC-JP
+      ONIG_ENCODING_EUC_TW        EUC-TW
+      ONIG_ENCODING_EUC_KR        EUC-KR
+      ONIG_ENCODING_EUC_CN        EUC-CN
+      ONIG_ENCODING_SHIFT_JIS     Shift_JIS
+      ONIG_ENCODING_WINDOWS_31J   Windows-31J (CP932)
+      ONIG_ENCODING_KOI8_R        KOI8-R
+      ONIG_ENCODING_KOI8_U        KOI8-U
+      ONIG_ENCODING_WINDOWS_1250  Windows-1250 (CP1250)
+      ONIG_ENCODING_WINDOWS_1251  Windows-1251 (CP1251)
+      ONIG_ENCODING_WINDOWS_1252  Windows-1252 (CP1252)
+      ONIG_ENCODING_WINDOWS_1253  Windows-1253 (CP1253)
+      ONIG_ENCODING_WINDOWS_1254  Windows-1254 (CP1254)
+      ONIG_ENCODING_WINDOWS_1257  Windows-1257 (CP1257)
+      ONIG_ENCODING_BIG5          Big5
+      ONIG_ENCODING_GB18030       GB18030
+
+      or any OnigEncodingType data address defined by user.
+
+      The following encoding names can be also used for backward compatibility:
+
       ONIG_ENCODING_UTF8          UTF-8
       ONIG_ENCODING_UTF16_BE      UTF-16BE
       ONIG_ENCODING_UTF16_LE      UTF-16LE
       ONIG_ENCODING_UTF32_BE      UTF-32BE
       ONIG_ENCODING_UTF32_LE      UTF-32LE
-      ONIG_ENCODING_EUC_JP        EUC-JP
-      ONIG_ENCODING_EUC_TW        EUC-TW
-      ONIG_ENCODING_EUC_KR        EUC-KR
-      ONIG_ENCODING_EUC_CN        EUC-CN
       ONIG_ENCODING_SJIS          Shift_JIS
-      ONIG_ENCODING_CP932         CP932
-      ONIG_ENCODING_KOI8_R        KOI8-R
-      ONIG_ENCODING_CP1251        CP1251
-      ONIG_ENCODING_BIG5          Big5
-      ONIG_ENCODING_GB18030       GB18030
+      ONIG_ENCODING_CP932         Windows-31J (CP932)
+      ONIG_ENCODING_CP1250        Windows-1250 (CP1250)
+      ONIG_ENCODING_CP1251        Windows-1251 (CP1251)
+      ONIG_ENCODING_CP1252        Windows-1252 (CP1252)
+      ONIG_ENCODING_CP1253        Windows-1253 (CP1253)
+      ONIG_ENCODING_CP1254        Windows-1254 (CP1254)
+      ONIG_ENCODING_CP1257        Windows-1257 (CP1257)
 
-      or any OnigEncodingType data address defined by user.
 
   6 syntax:     address of pattern syntax definition.
 
@@ -196,13 +231,13 @@ Onigmo (Oniguruma-mod) API  Version 5.14.0  2014/07/01
   the following cases only.
 
     pattern_enc: ASCII, ISO_8859_1
-    target_enc:  UTF16_BE, UTF16_LE, UTF32_BE, UTF32_LE
+    target_enc:  UTF_16BE, UTF_16LE, UTF_32BE, UTF_32LE
 
-    pattern_enc: UTF16_BE/LE
-    target_enc:  UTF16_LE/BE
+    pattern_enc: UTF_16BE/LE
+    target_enc:  UTF_16LE/BE
 
-    pattern_enc: UTF32_BE/LE
-    target_enc:  UTF32_LE/BE
+    pattern_enc: UTF_32BE/LE
+    target_enc:  UTF_32LE/BE
 
 
 # void onig_free(regex_t* reg)
@@ -277,6 +312,27 @@ Onigmo (Oniguruma-mod) API  Version 5.14.0  2014/07/01
     ONIG_OPTION_POSIX_REGION region argument is regmatch_t[] type of POSIX API.
 
 
+# int onig_scan(regex_t* reg, const UChar* str, const UChar* end,
+                OnigRegion* region, OnigOptionType option,
+                int (*scan_callback)(int, int, OnigRegion*, void*),
+                void* callback_arg)
+
+  Scan string and callback with matching region.
+
+  normal return: number of matching times
+  error:         error code
+  interruption:  return value of callback function (!= 0)
+
+  arguments
+  1 reg:    regex object
+  2 str:    target string
+  3 end:    terminate address of target string
+  4 region: address for return group match range info (NULL is allowed)
+  5 option: search time option
+  6 scan_callback: callback function (defined by user)
+  7 callback_arg:  optional argument passed to callback
+
+
 # OnigRegion* onig_region_new(void)
 
   Create a region.
@@ -291,7 +347,7 @@ Onigmo (Oniguruma-mod) API  Version 5.14.0  2014/07/01
   2 free_self: [1: free all, 0: free memory used in region but not self]
 
 
-# void onig_region_copy(OnigRegion* to, OnigRegion* from)
+# void onig_region_copy(OnigRegion* to, const OnigRegion* from)
 
   Copy contents of region.
 
@@ -337,7 +393,7 @@ Onigmo (Oniguruma-mod) API  Version 5.14.0  2014/07/01
 
 
 # int onig_name_to_backref_number(regex_t* reg, const UChar* name, const UChar* name_end,
-                                  OnigRegion *region)
+                                  const OnigRegion *region)
 
   Return the group number corresponding to the named backref (\k<name>).
   If two or more regions for the groups of the name are effective,
@@ -370,7 +426,7 @@ Onigmo (Oniguruma-mod) API  Version 5.14.0  2014/07/01
   3 arg:     argument for func.
 
 
-# int onig_number_of_names(regex_t* reg)
+# int onig_number_of_names(const regex_t* reg)
 
   Return the number of names defined in the pattern.
   Multiple definitions of one name is counted as one.
@@ -379,10 +435,10 @@ Onigmo (Oniguruma-mod) API  Version 5.14.0  2014/07/01
   1 reg:     regex object.
 
 
-# OnigEncoding     onig_get_encoding(regex_t* reg)
-# OnigOptionType   onig_get_options(regex_t* reg)
-# OnigCaseFoldType onig_get_case_fold_flag(regex_t* reg)
-# OnigSyntaxType*  onig_get_syntax(regex_t* reg)
+# OnigEncoding     onig_get_encoding(const regex_t* reg)
+# OnigOptionType   onig_get_options(const regex_t* reg)
+# OnigCaseFoldType onig_get_case_fold_flag(const regex_t* reg)
+# OnigSyntaxType*  onig_get_syntax(const regex_t* reg)
 
   Return a value of the regex object.
 
@@ -390,7 +446,7 @@ Onigmo (Oniguruma-mod) API  Version 5.14.0  2014/07/01
   1 reg:     regex object.
 
 
-# int onig_number_of_captures(regex_t* reg)
+# int onig_number_of_captures(const regex_t* reg)
 
   Return the number of capture group in the pattern.
 
@@ -398,7 +454,7 @@ Onigmo (Oniguruma-mod) API  Version 5.14.0  2014/07/01
   1 reg:     regex object.
 
 
-# int onig_number_of_capture_histories(regex_t* reg)
+# int onig_number_of_capture_histories(const regex_t* reg)
 
   Return the number of capture history defined in the pattern.
 
@@ -456,7 +512,7 @@ Onigmo (Oniguruma-mod) API  Version 5.14.0  2014/07/01
   4 arg;     optional callback argument.
 
 
-# int onig_noname_group_capture_is_active(regex_t* reg)
+# int onig_noname_group_capture_is_active(const regex_t* reg)
 
   Return noname group capture activity.
 
@@ -477,7 +533,8 @@ Onigmo (Oniguruma-mod) API  Version 5.14.0  2014/07/01
   else --> active
 
 
-# UChar* onigenc_get_prev_char_head(OnigEncoding enc, const UChar* start, const UChar* s)
+# UChar* onigenc_get_prev_char_head(OnigEncoding enc, const UChar* start,
+                                    const UChar* s, const UChar* end)
 
   Return previous character head address.
 
@@ -485,10 +542,11 @@ Onigmo (Oniguruma-mod) API  Version 5.14.0  2014/07/01
   1 enc:   character encoding
   2 start: string address
   3 s:     target address of string
+  4 end:   end of string
 
 
 # UChar* onigenc_get_left_adjust_char_head(OnigEncoding enc,
-                                           const UChar* start, const UChar* s)
+                           const UChar* start, const UChar* s, const UChar* end)
 
   Return left-adjusted head address of a character.
 
@@ -496,10 +554,11 @@ Onigmo (Oniguruma-mod) API  Version 5.14.0  2014/07/01
   1 enc:   character encoding
   2 start: string address
   3 s:     target address of string
+  4 end:   end of string
 
 
 # UChar* onigenc_get_right_adjust_char_head(OnigEncoding enc,
-                                            const UChar* start, const UChar* s)
+                    const UChar* start, const UChar* s, const UChar* end)
 
   Return right-adjusted head address of a character.
 
@@ -507,6 +566,7 @@ Onigmo (Oniguruma-mod) API  Version 5.14.0  2014/07/01
   1 enc:   character encoding
   2 start: string address
   3 s:     target address of string
+  4 end:   end of string
 
 
 # int onigenc_strlen(OnigEncoding enc, const UChar* s, const UChar* end)
@@ -520,7 +580,7 @@ Onigmo (Oniguruma-mod) API  Version 5.14.0  2014/07/01
   Return number of bytes in the string.
 
 
-# int onig_set_default_syntax(OnigSyntaxType* syntax)
+# int onig_set_default_syntax(const OnigSyntaxType* syntax)
 
   Set default syntax.
 
@@ -537,10 +597,10 @@ Onigmo (Oniguruma-mod) API  Version 5.14.0  2014/07/01
   2 from: source address.
 
 
-# unsigned int onig_get_syntax_op(OnigSyntaxType* syntax)
-# unsigned int onig_get_syntax_op2(OnigSyntaxType* syntax)
-# unsigned int onig_get_syntax_behavior(OnigSyntaxType* syntax)
-# OnigOptionType onig_get_syntax_options(OnigSyntaxType* syntax)
+# unsigned int onig_get_syntax_op(const OnigSyntaxType* syntax)
+# unsigned int onig_get_syntax_op2(const OnigSyntaxType* syntax)
+# unsigned int onig_get_syntax_behavior(const OnigSyntaxType* syntax)
+# OnigOptionType onig_get_syntax_options(const OnigSyntaxType* syntax)
 
 # void onig_set_syntax_op(OnigSyntaxType* syntax, unsigned int op)
 # void onig_set_syntax_op2(OnigSyntaxType* syntax, unsigned int op2)
@@ -554,7 +614,7 @@ Onigmo (Oniguruma-mod) API  Version 5.14.0  2014/07/01
   2 op, op2, behavior, options: value of element.
 
 
-# void onig_copy_encoding(OnigEncoding to, OnigOnigEncoding from)
+# void onig_copy_encoding(OnigEncodingType *to, OnigEncoding from)
 
   Copy encoding.
 
@@ -587,7 +647,7 @@ Onigmo (Oniguruma-mod) API  Version 5.14.0  2014/07/01
   3 code: meta character or ONIG_INEFFECTIVE_META_CHAR.
 
 
-# OnigCaseFoldType onig_get_default_case_fold_flag()
+# OnigCaseFoldType onig_get_default_case_fold_flag(void)
 
   Get default case fold flag.
 
@@ -609,6 +669,20 @@ Onigmo (Oniguruma-mod) API  Version 5.14.0  2014/07/01
 
   Set the maximum number of stack size.
   (size = 0: unlimited)
+
+  normal return: ONIG_NORMAL
+
+
+# unsigned int onig_get_parse_depth_limit(void)
+
+  Return the maximum depth of parser recursion.
+  (default: DEFAULT_PARSE_DEPTH_LIMIT defined in regint.h. Currently 4096.)
+
+
+# int onig_set_parse_depth_limit(unsigned int depth)
+
+  Set the maximum depth of parser recursion.
+  (depth = 0: Set to the default value defined in regint.h.)
 
   normal return: ONIG_NORMAL
 

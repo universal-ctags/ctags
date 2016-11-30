@@ -37,16 +37,12 @@ print(<<"EOS")
 #include <stdio.h>
 
 #ifdef POSIX_TEST
-#include "onigposix.h"
+#include "onigmoposix.h"
 #else
-#include "oniguruma.h"
+#include "onigmo.h"
 #endif
 
-#ifdef HAVE_STRING_H
-# include <string.h>
-#else
-# include <strings.h>
-#endif
+#include <string.h>
 
 #define SLEN(s)  strlen(s)
 
@@ -107,7 +103,7 @@ static void xx(char* pattern, char* str, int from, int to, int mem, int not)
       }
       else {
         fprintf(stdout, "FAIL: /%s/ '%s' %d-%d : %d-%d\\n", pattern, str,
-	        from, to, pmatch[mem].rm_so, pmatch[mem].rm_eo);
+	        (int)from, (int)to, (int)pmatch[mem].rm_so, (int)pmatch[mem].rm_eo);
         nfail++;
       }
     }
@@ -164,7 +160,7 @@ static void xx(char* pattern, char* str, int from, int to, int mem, int not)
       }
       else {
         fprintf(stdout, "FAIL: /%s/ '%s' %d-%d : %d-%d\\n", pattern, str,
-	        from, to, region->beg[mem], region->end[mem]);
+	        (int)from, (int)to, (int)region->beg[mem], (int)region->end[mem]);
         nfail++;
       }
     }

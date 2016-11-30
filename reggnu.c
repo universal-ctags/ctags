@@ -3,7 +3,7 @@
 **********************************************************************/
 /*-
  * Copyright (c) 2002-2008  K.Kosako  <sndgk393 AT ybb DOT ne DOT jp>
- * Copyright (c) 2011       K.Takata  <kentkt AT csc DOT jp>
+ * Copyright (c) 2011-2016  K.Takata  <kentkt AT csc DOT jp>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -30,8 +30,8 @@
 
 #include "regint.h"
 
-#ifndef ONIGGNU_H
-#include "oniggnu.h"
+#ifndef ONIGMOGNU_H
+# include "onigmognu.h"
 #endif
 
 extern void
@@ -48,12 +48,13 @@ re_adjust_startpos(regex_t* reg, const char* string, int size,
   if (startpos > 0 && ONIGENC_MBC_MAXLEN(reg->enc) != 1 && startpos < size) {
     UChar *p;
     UChar *s = (UChar* )string + startpos;
+    UChar *e = (UChar* )string + size;
 
     if (range > 0) {
-      p = onigenc_get_right_adjust_char_head(reg->enc, (UChar* )string, s);
+      p = onigenc_get_right_adjust_char_head(reg->enc, (UChar* )string, s, e);
     }
     else {
-      p = ONIGENC_LEFT_ADJUST_CHAR_HEAD(reg->enc, (UChar* )string, s);
+      p = ONIGENC_LEFT_ADJUST_CHAR_HEAD(reg->enc, (UChar* )string, s, e);
     }
     return (int )(p - (UChar* )string);
   }
@@ -94,29 +95,6 @@ re_compile_pattern(const char* pattern, int size, regex_t* reg, char* ebuf)
   return r;
 }
 
-#ifdef USE_RECOMPILE_API
-extern int
-re_recompile_pattern(const char* pattern, int size, regex_t* reg, char* ebuf)
-{
-  int r;
-  OnigErrorInfo einfo;
-  OnigEncoding enc;
-
-  /* I think encoding and options should be arguments of this function.
-     But this is adapted to present re.c. (2002/11/29)
-   */
-  enc = OnigEncDefaultCharEncoding;
-
-  r = onig_recompile(reg, (UChar* )pattern, (UChar* )(pattern + size),
-		     reg->options, enc, OnigDefaultSyntax, &einfo);
-  if (r != ONIG_NORMAL) {
-    if (IS_NOT_NULL(ebuf))
-      (void )onig_error_code_to_str((UChar* )ebuf, r, &einfo);
-  }
-  return r;
-}
-#endif
-
 extern void
 re_free_pattern(regex_t* reg)
 {
@@ -138,7 +116,7 @@ re_alloc_pattern(regex_t** reg)
 extern void
 re_set_casetable(const char* table)
 {
-  onigenc_set_default_caseconv_table((UChar* )table);
+  /* onigenc_set_default_caseconv_table((UChar* )table); */
 }
 
 extern void

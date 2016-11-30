@@ -1,59 +1,60 @@
 ## Makefile.am for Onigmo
 encdir    = $(top_srcdir)/enc
 sampledir = $(top_srcdir)/sample
-libname = libonig.la
+libname = libonigmo.la
+
+PYTHON = @python_prog@
 
 ACLOCAL_AMFLAGS = -I m4
-#AM_CFLAGS = -DNOT_RUBY
-AM_CFLAGS =
-INCLUDES  = -I$(top_srcdir) -I$(includedir)
+AM_CFLAGS = -Wall
+AM_CPPFLAGS = -I$(top_srcdir) -I$(includedir) -I$(encdir)/unicode
 
 SUBDIRS = . sample
 
-include_HEADERS = oniguruma.h oniggnu.h onigposix.h
+include_HEADERS = onigmo.h onigmognu.h onigmoposix.h
 lib_LTLIBRARIES = $(libname)
 
-libonig_la_SOURCES = regint.h regparse.h regenc.h st.h \
+libonigmo_la_SOURCES = regint.h regparse.h regenc.h st.h \
 	regerror.c regparse.c regext.c regcomp.c regexec.c reggnu.c \
 	regenc.c regsyntax.c regtrav.c regversion.c st.c \
 	regposix.c regposerr.c \
-	$(encdir)/unicode.c $(encdir)/ascii.c $(encdir)/utf8.c \
-	$(encdir)/utf16_be.c $(encdir)/utf16_le.c \
-	$(encdir)/utf32_be.c $(encdir)/utf32_le.c \
+	$(encdir)/unicode.c $(encdir)/ascii.c $(encdir)/utf_8.c \
+	$(encdir)/utf_16be.c $(encdir)/utf_16le.c \
+	$(encdir)/utf_32be.c $(encdir)/utf_32le.c \
 	$(encdir)/unicode/casefold.h $(encdir)/unicode/name2ctype.h \
-	$(encdir)/euc_jp.c $(encdir)/sjis.c $(encdir)/cp932.c \
+	$(encdir)/euc_jp.c $(encdir)/shift_jis.c $(encdir)/windows_31j.c \
 	$(encdir)/jis/props.h $(encdir)/jis/props.kwd \
-	$(encdir)/iso8859_1.c \
-	$(encdir)/iso8859_2.c  $(encdir)/iso8859_3.c \
-	$(encdir)/iso8859_4.c  $(encdir)/iso8859_5.c \
-	$(encdir)/iso8859_6.c  $(encdir)/iso8859_7.c \
-	$(encdir)/iso8859_8.c  $(encdir)/iso8859_9.c \
-	$(encdir)/iso8859_10.c $(encdir)/iso8859_11.c \
-	$(encdir)/iso8859_13.c $(encdir)/iso8859_14.c \
-	$(encdir)/iso8859_15.c $(encdir)/iso8859_16.c \
+	$(encdir)/iso_8859.h $(encdir)/iso_8859_1.c \
+	$(encdir)/iso_8859_2.c  $(encdir)/iso_8859_3.c \
+	$(encdir)/iso_8859_4.c  $(encdir)/iso_8859_5.c \
+	$(encdir)/iso_8859_6.c  $(encdir)/iso_8859_7.c \
+	$(encdir)/iso_8859_8.c  $(encdir)/iso_8859_9.c \
+	$(encdir)/iso_8859_10.c $(encdir)/iso_8859_11.c \
+	$(encdir)/iso_8859_13.c $(encdir)/iso_8859_14.c \
+	$(encdir)/iso_8859_15.c $(encdir)/iso_8859_16.c \
 	$(encdir)/euc_tw.c $(encdir)/euc_kr.c $(encdir)/big5.c \
-	$(encdir)/gb18030.c $(encdir)/koi8_r.c $(encdir)/cp1251.c
+	$(encdir)/gb18030.c $(encdir)/koi8_r.c $(encdir)/koi8_u.c \
+	$(encdir)/windows_1250.c $(encdir)/windows_1251.c \
+	$(encdir)/windows_1252.c $(encdir)/windows_1253.c \
+	$(encdir)/windows_1254.c $(encdir)/windows_1257.c
 
-libonig_la_LDFLAGS = -version-info $(LTVERSION) -no-undefined
+libonigmo_la_LDFLAGS = -version-info $(LTVERSION) -no-undefined
 
-EXTRA_DIST = .gitignore oniguruma.pc.in HISTORY README.ja index.html \
-	index_ja.html doc/API doc/API.ja doc/RE doc/RE.ja doc/FAQ doc/FAQ.ja \
+EXTRA_DIST = .gitignore onigmo.pc.in HISTORY README.ja README.md \
+	doc/API doc/API.ja doc/RE doc/RE.ja doc/FAQ doc/FAQ.ja \
 	doc/UnicodeProps.txt \
-	tool/.gitignore tool/case-folding.rb tool/convert-name2ctype.sh \
-	tool/convert-jis-props.sh \
+	tool/.gitignore tool/Makefile tool/case-folding.rb \
+	tool/convert-name2ctype.sh tool/convert-jis-props.sh \
 	tool/enc-unicode.rb tool/download-ucd.sh tool/update-doc.py \
 	win32/Makefile win32/Makefile.mingw win32/config.h win32/testc.c \
-	win32/makedef.py win32/onig.rc \
-	$(encdir)/koi8.c $(encdir)/mktable.c \
-	$(sampledir)/encode.c $(sampledir)/listcap.c $(sampledir)/names.c \
-	$(sampledir)/posix.c $(sampledir)/simple.c $(sampledir)/sql.c \
-	$(sampledir)/syntax.c $(sampledir)/crnl.c \
+	win32/makedef.py win32/onigmo.rc \
+	$(encdir)/mktable.c \
 	test.rb testconv.rb testconvu.rb \
-	onig.py testpy.py .editorconfig
+	onigmo.py testpy.py .editorconfig
 
-bin_SCRIPTS = onig-config
+bin_SCRIPTS = onigmo-config
 
-onig-config: onig-config.in
+onigmo-config: onigmo-config.in
 
 do_subst = sed                                          \
       -e 's,[@]datadir[@],$(datadir),g'                 \
@@ -64,20 +65,12 @@ do_subst = sed                                          \
       -e 's,[@]libdir[@],$(libdir),g'                   \
       -e 's,[@]includedir[@],$(includedir),g'
 
-oniguruma.pc: $(srcdir)/oniguruma.pc.in Makefile
-	$(do_subst) < $(srcdir)/oniguruma.pc.in > $(@)
+onigmo.pc: $(srcdir)/onigmo.pc.in Makefile
+	$(do_subst) < $(srcdir)/onigmo.pc.in > $(@)
 
 pkgconfigdir   = $(libdir)/pkgconfig
-pkgconfig_DATA = oniguruma.pc
-
-dll:
-	$(CXX) -shared -Wl,--output-def,libonig.def -o libonig.dll *.o \
-	$(LIBS)
-	strip libonig.dll
-
-# Ruby TEST
-rtest:
-	$(RUBYDIR)/ruby -w -Ke $(srcdir)/test.rb
+pkgconfig_DATA = onigmo.pc
+CLEANFILES = onigmo.pc
 
 # character-types-table source generator
 mktable: $(encdir)/mktable.c $(srcdir)/regenc.h
@@ -89,42 +82,59 @@ TESTS = testc testp testcu
 
 check_PROGRAMS = testc testp testcu
 
-atest: testc testp testcu
-	@echo "[Oniguruma API, ASCII/EUC-JP check]"
+test: atest pytest
+	$(MAKE) -C sample test
+
+atest: testc$(EXEEXT) testp$(EXEEXT) testcu$(EXEEXT)
+	@echo "[Onigmo API, ASCII/EUC-JP check]"
 	@$(top_builddir)/testc  | grep RESULT
 	@echo "[POSIX API, ASCII/EUC-JP check]"
 	@$(top_builddir)/testp  | grep RESULT
-	@echo "[Oniguruma API, UTF-16 check]"
+	@echo "[Onigmo API, UTF-16 check]"
 	@$(top_builddir)/testcu | grep RESULT
 
 testc_SOURCES = testc.c
-testc_LDADD = libonig.la
+testc_LDADD = libonigmo.la
 
 testp_SOURCES = testc.c
-testp_LDADD = libonig.la
+testp_LDADD = libonigmo.la
 testp_CFLAGS = -DPOSIX_TEST
 
 testcu_SOURCES = testu.c
-testcu_LDADD = libonig.la
+testcu_LDADD = libonigmo.la
 
 
-testc.c: $(srcdir)/test.rb $(srcdir)/testconv.rb
+$(srcdir)/testc.c: $(srcdir)/test.rb $(srcdir)/testconv.rb
 	ruby -Ke $(srcdir)/testconv.rb < $(srcdir)/test.rb > $@
 
-testu.c: $(srcdir)/test.rb $(srcdir)/testconvu.rb
+$(srcdir)/testu.c: $(srcdir)/test.rb $(srcdir)/testconvu.rb
 	ruby -Ke $(srcdir)/testconvu.rb $(srcdir)/test.rb > $@
 
-win32/testc.c: $(srcdir)/test.rb $(srcdir)/testconv.rb
-	ruby -Ke $(srcdir)/testconv.rb -win < $(srcdir)/test.rb | nkf -cs > $@
+$(srcdir)/win32/testc.c: $(srcdir)/test.rb $(srcdir)/testconv.rb
+	ruby -Ke $(srcdir)/testconv.rb -win < $(srcdir)/test.rb | iconv -f euc-jp -t cp932 | sed -e "s/$$/\r/" > $@
 
 # Python TEST
 pytest:
-	LD_LIBRARY_PATH=.libs python testpy.py EUC-JP
-	LD_LIBRARY_PATH=.libs python testpy.py SJIS
-	LD_LIBRARY_PATH=.libs python testpy.py UTF-8
-	LD_LIBRARY_PATH=.libs python testpy.py UTF-16LE
-	LD_LIBRARY_PATH=.libs python testpy.py UTF-16BE
-	LD_LIBRARY_PATH=.libs python testpy.py UTF-32LE
-	LD_LIBRARY_PATH=.libs python testpy.py UTF-32BE
+	LD_LIBRARY_PATH=.libs $(PYTHON) $(srcdir)/testpy.py EUC-JP
+	LD_LIBRARY_PATH=.libs $(PYTHON) $(srcdir)/testpy.py SJIS
+	LD_LIBRARY_PATH=.libs $(PYTHON) $(srcdir)/testpy.py UTF-8
+	LD_LIBRARY_PATH=.libs $(PYTHON) $(srcdir)/testpy.py UTF-16LE
+	LD_LIBRARY_PATH=.libs $(PYTHON) $(srcdir)/testpy.py UTF-16BE
+	LD_LIBRARY_PATH=.libs $(PYTHON) $(srcdir)/testpy.py UTF-32LE
+	LD_LIBRARY_PATH=.libs $(PYTHON) $(srcdir)/testpy.py UTF-32BE
+
+
+# lcov
+
+# Collect coverage data and write to coverage.info, then create HTML output
+# in the coverage directory.
+lcov:
+	if [ ! -f $(builddir)/enc/jis/props.kwd ]; then mkdir -p $(builddir)/enc/jis; cp $(srcdir)/enc/jis/props.kwd $(builddir)/enc/jis/props.kwd; fi
+	lcov -c -d .libs -o coverage.info
+	genhtml -o coverage coverage.info
+
+# Clear coverage data.
+lcov-clear:
+	lcov -d . -z
 
 ## END OF FILE

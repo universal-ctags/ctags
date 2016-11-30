@@ -4,9 +4,9 @@
 #include<stdio.h>
 
 #ifdef POSIX_TEST
-#include "onigposix.h"
+#include "onigmoposix.h"
 #else
-#include "oniguruma.h"
+#include "onigmo.h"
 #endif
 
 static int nsucc  = 0;
@@ -106,7 +106,7 @@ static void xx(char* pattern, char* str, int from, int to, int mem, int not)
       }
       else {
         fprintf(stdout, "FAIL: /%s/ '%s' %d-%d : %d-%d\n", cpat, cstr,
-	        from, to, pmatch[mem].rm_so, pmatch[mem].rm_eo);
+	        (int)from, (int)to, (int)pmatch[mem].rm_so, (int)pmatch[mem].rm_eo);
         nfail++;
       }
     }
@@ -142,7 +142,7 @@ static void xx(char* pattern, char* str, int from, int to, int mem, int not)
 
   if (r) {
     char s[ONIG_MAX_ERROR_MESSAGE_LEN];
-    onig_error_code_to_str(s, r, &einfo);
+    onig_error_code_to_str((UChar* )s, r, &einfo);
     fprintf(err_file, "ERROR: %s\n", s);
     nerror++;
     return ;
@@ -153,7 +153,7 @@ static void xx(char* pattern, char* str, int from, int to, int mem, int not)
 		  region, ONIG_OPTION_NONE);
   if (r < ONIG_MISMATCH) {
     char s[ONIG_MAX_ERROR_MESSAGE_LEN];
-    onig_error_code_to_str(s, r);
+    onig_error_code_to_str((UChar* )s, r);
     fprintf(err_file, "ERROR: %s\n", s);
     nerror++;
     return ;
@@ -181,7 +181,7 @@ static void xx(char* pattern, char* str, int from, int to, int mem, int not)
       }
       else {
         fprintf(stdout, "FAIL: /%s/ '%s' %d-%d : %d-%d\n", cpat, cstr,
-	        from, to, region->beg[mem], region->end[mem]);
+	        (int)from, (int)to, (int)region->beg[mem], (int)region->end[mem]);
         nfail++;
       }
     }

@@ -1,4 +1,4 @@
-Onigmo (Oniguruma-mod) Unicode Properties  Version 5.14.0    2014/06/22
+Onigmo (Oniguruma-mod) Unicode Properties  Version 6.0.0    2016/10/15
 
 * POSIX brackets
     Alpha
@@ -15,6 +15,7 @@ Onigmo (Oniguruma-mod) Unicode Properties  Version 5.14.0    2014/06/22
     Word
     Alnum
     ASCII
+    XPosixPunct
 
 * Special
     Any
@@ -61,6 +62,9 @@ Onigmo (Oniguruma-mod) Unicode Properties  Version 5.14.0    2014/06/22
     Zs
 
 * Scripts
+    Adlam
+    Ahom
+    Anatolian_Hieroglyphs
     Arabic
     Armenian
     Avestan
@@ -69,6 +73,7 @@ Onigmo (Oniguruma-mod) Unicode Properties  Version 5.14.0    2014/06/22
     Bassa_Vah
     Batak
     Bengali
+    Bhaiksuki
     Bopomofo
     Brahmi
     Braille
@@ -101,6 +106,7 @@ Onigmo (Oniguruma-mod) Unicode Properties  Version 5.14.0    2014/06/22
     Han
     Hangul
     Hanunoo
+    Hatran
     Hebrew
     Hiragana
     Imperial_Aramaic
@@ -129,6 +135,7 @@ Onigmo (Oniguruma-mod) Unicode Properties  Version 5.14.0    2014/06/22
     Malayalam
     Mandaic
     Manichaean
+    Marchen
     Meetei_Mayek
     Mende_Kikakui
     Meroitic_Cursive
@@ -137,12 +144,15 @@ Onigmo (Oniguruma-mod) Unicode Properties  Version 5.14.0    2014/06/22
     Modi
     Mongolian
     Mro
+    Multani
     Myanmar
     Nabataean
     New_Tai_Lue
+    Newa
     Nko
     Ogham
     Ol_Chiki
+    Old_Hungarian
     Old_Italic
     Old_North_Arabian
     Old_Permic
@@ -150,6 +160,7 @@ Onigmo (Oniguruma-mod) Unicode Properties  Version 5.14.0    2014/06/22
     Old_South_Arabian
     Old_Turkic
     Oriya
+    Osage
     Osmanya
     Pahawh_Hmong
     Palmyrene
@@ -164,6 +175,7 @@ Onigmo (Oniguruma-mod) Unicode Properties  Version 5.14.0    2014/06/22
     Sharada
     Shavian
     Siddham
+    SignWriting
     Sinhala
     Sora_Sompeng
     Sundanese
@@ -176,6 +188,7 @@ Onigmo (Oniguruma-mod) Unicode Properties  Version 5.14.0    2014/06/22
     Tai_Viet
     Takri
     Tamil
+    Tangut
     Telugu
     Thaana
     Thai
@@ -234,9 +247,10 @@ Onigmo (Oniguruma-mod) Unicode Properties  Version 5.14.0    2014/06/22
     Other_Uppercase
     Pattern_Syntax
     Pattern_White_Space
+    Prepended_Concatenation_Mark
     Quotation_Mark
     Radical
-    STerm
+    Sentence_Terminal
     Soft_Dotted
     Terminal_Punctuation
     Unified_Ideograph
@@ -276,10 +290,12 @@ Onigmo (Oniguruma-mod) Unicode Properties  Version 5.14.0    2014/06/22
     OLower
     OMath
     OUpper
+    PCM
     Pat_Syn
     Pat_WS
     QMark
     SD
+    STerm
     Term
     UIdeo
     VS
@@ -329,6 +345,7 @@ Onigmo (Oniguruma-mod) Unicode Properties  Version 5.14.0    2014/06/22
     Space_Separator
 
 * PropertyValueAliases (Script)
+    Adlm
     Aghb
     Arab
     Armi
@@ -339,6 +356,7 @@ Onigmo (Oniguruma-mod) Unicode Properties  Version 5.14.0    2014/06/22
     Bass
     Batk
     Beng
+    Bhks
     Bopo
     Brah
     Brai
@@ -368,9 +386,12 @@ Onigmo (Oniguruma-mod) Unicode Properties  Version 5.14.0    2014/06/22
     Hang
     Hani
     Hano
+    Hatr
     Hebr
     Hira
+    Hluw
     Hmng
+    Hung
     Ital
     Java
     Kali
@@ -392,6 +413,7 @@ Onigmo (Oniguruma-mod) Unicode Properties  Version 5.14.0    2014/06/22
     Mahj
     Mand
     Mani
+    Marc
     Mend
     Merc
     Mero
@@ -399,6 +421,7 @@ Onigmo (Oniguruma-mod) Unicode Properties  Version 5.14.0    2014/06/22
     Mong
     Mroo
     Mtei
+    Mult
     Mymr
     Narb
     Nbat
@@ -407,6 +430,7 @@ Onigmo (Oniguruma-mod) Unicode Properties  Version 5.14.0    2014/06/22
     Olck
     Orkh
     Orya
+    Osge
     Osma
     Palm
     Pauc
@@ -422,6 +446,7 @@ Onigmo (Oniguruma-mod) Unicode Properties  Version 5.14.0    2014/06/22
     Samr
     Sarb
     Saur
+    Sgnw
     Shaw
     Shrd
     Sidd
@@ -436,6 +461,7 @@ Onigmo (Oniguruma-mod) Unicode Properties  Version 5.14.0    2014/06/22
     Tale
     Talu
     Taml
+    Tang
     Tavt
     Telu
     Tfng
@@ -471,6 +497,8 @@ Onigmo (Oniguruma-mod) Unicode Properties  Version 5.14.0    2014/06/22
     Age=6.2
     Age=6.3
     Age=7.0
+    Age=8.0
+    Age=9.0
 
 * Blocks
     In_Basic_Latin
@@ -534,6 +562,7 @@ Onigmo (Oniguruma-mod) Unicode Properties  Version 5.14.0    2014/06/22
     In_Batak
     In_Lepcha
     In_Ol_Chiki
+    In_Cyrillic_Extended_C
     In_Sundanese_Supplement
     In_Vedic_Extensions
     In_Phonetic_Extensions
@@ -614,6 +643,7 @@ Onigmo (Oniguruma-mod) Unicode Properties  Version 5.14.0    2014/06/22
     In_Meetei_Mayek_Extensions
     In_Ethiopic_Extended_A
     In_Latin_Extended_E
+    In_Cherokee_Supplement
     In_Meetei_Mayek
     In_Hangul_Syllables
     In_Hangul_Jamo_Extended_B
@@ -649,6 +679,7 @@ Onigmo (Oniguruma-mod) Unicode Properties  Version 5.14.0    2014/06/22
     In_Deseret
     In_Shavian
     In_Osmanya
+    In_Osage
     In_Elbasan
     In_Caucasian_Albanian
     In_Linear_A
@@ -656,6 +687,7 @@ Onigmo (Oniguruma-mod) Unicode Properties  Version 5.14.0    2014/06/22
     In_Imperial_Aramaic
     In_Palmyrene
     In_Nabataean
+    In_Hatran
     In_Phoenician
     In_Lydian
     In_Meroitic_Hieroglyphs
@@ -669,6 +701,7 @@ Onigmo (Oniguruma-mod) Unicode Properties  Version 5.14.0    2014/06/22
     In_Inscriptional_Pahlavi
     In_Psalter_Pahlavi
     In_Old_Turkic
+    In_Old_Hungarian
     In_Rumi_Numeral_Symbols
     In_Brahmi
     In_Kaithi
@@ -678,22 +711,33 @@ Onigmo (Oniguruma-mod) Unicode Properties  Version 5.14.0    2014/06/22
     In_Sharada
     In_Sinhala_Archaic_Numbers
     In_Khojki
+    In_Multani
     In_Khudawadi
     In_Grantha
+    In_Newa
     In_Tirhuta
     In_Siddham
     In_Modi
+    In_Mongolian_Supplement
     In_Takri
+    In_Ahom
     In_Warang_Citi
     In_Pau_Cin_Hau
+    In_Bhaiksuki
+    In_Marchen
     In_Cuneiform
     In_Cuneiform_Numbers_and_Punctuation
+    In_Early_Dynastic_Cuneiform
     In_Egyptian_Hieroglyphs
+    In_Anatolian_Hieroglyphs
     In_Bamum_Supplement
     In_Mro
     In_Bassa_Vah
     In_Pahawh_Hmong
     In_Miao
+    In_Ideographic_Symbols_and_Punctuation
+    In_Tangut
+    In_Tangut_Components
     In_Kana_Supplement
     In_Duployan
     In_Shorthand_Format_Controls
@@ -703,7 +747,10 @@ Onigmo (Oniguruma-mod) Unicode Properties  Version 5.14.0    2014/06/22
     In_Tai_Xuan_Jing_Symbols
     In_Counting_Rod_Numerals
     In_Mathematical_Alphanumeric_Symbols
+    In_Sutton_SignWriting
+    In_Glagolitic_Supplement
     In_Mende_Kikakui
+    In_Adlam
     In_Arabic_Mathematical_Alphabetic_Symbols
     In_Mahjong_Tiles
     In_Domino_Tiles
@@ -717,9 +764,11 @@ Onigmo (Oniguruma-mod) Unicode Properties  Version 5.14.0    2014/06/22
     In_Alchemical_Symbols
     In_Geometric_Shapes_Extended
     In_Supplemental_Arrows_C
+    In_Supplemental_Symbols_and_Pictographs
     In_CJK_Unified_Ideographs_Extension_B
     In_CJK_Unified_Ideographs_Extension_C
     In_CJK_Unified_Ideographs_Extension_D
+    In_CJK_Unified_Ideographs_Extension_E
     In_CJK_Compatibility_Ideographs_Supplement
     In_Tags
     In_Variation_Selectors_Supplement

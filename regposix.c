@@ -3,7 +3,7 @@
 **********************************************************************/
 /*-
  * Copyright (c) 2002-2008  K.Kosako  <sndgk393 AT ybb DOT ne DOT jp>
- * Copyright (c) 2011       K.Takata  <kentkt AT csc DOT jp>
+ * Copyright (c) 2011-2016  K.Takata  <kentkt AT csc DOT jp>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -31,7 +31,7 @@
 #define regex_t   onig_regex_t
 #include "regint.h"
 #undef regex_t
-#include "onigposix.h"
+#include "onigmoposix.h"
 
 #define ONIG_C(reg)    ((onig_regex_t* )((reg)->onig))
 #define PONIG_C(reg)   ((onig_regex_t** )(&(reg)->onig))
@@ -115,7 +115,6 @@ onig2posix_error_code(int code)
     { ONIGERR_GROUP_NUMBER_OVER_FOR_CAPTURE_HISTORY,      REG_BADPAT },
     { ONIGERR_INVALID_CHAR_PROPERTY_NAME,                 REG_BADPAT },
     { ONIGERR_NOT_SUPPORTED_ENCODING_COMBINATION,         REG_EONIG_BADARG },
-    { ONIGERR_OVER_THREAD_PASS_LIMIT_COUNT,               REG_EONIG_THREAD }
 
   };
 
@@ -135,7 +134,7 @@ extern int
 regcomp(regex_t* reg, const char* pattern, int posix_options)
 {
   int r, len;
-  OnigSyntaxType* syntax = OnigDefaultSyntax;
+  const OnigSyntaxType* syntax = OnigDefaultSyntax;
   OnigOptionType options;
 
   if ((posix_options & REG_EXTENDED) == 0)

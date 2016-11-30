@@ -3,9 +3,9 @@
  */
 #include <stdio.h>
 #include <string.h>
-#include "oniguruma.h"
+#include "onigmo.h"
 
-extern int exec(OnigSyntaxType* syntax,
+extern int exec(const OnigSyntaxType* syntax,
 		char* apattern, char* astr)
 {
   int r;

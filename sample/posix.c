@@ -2,7 +2,7 @@
  * posix.c
  */
 #include <stdio.h>
-#include "onigposix.h"
+#include "onigmoposix.h"
 
 typedef unsigned char  UChar;
 
@@ -87,6 +87,14 @@ extern int main(int argc, char* argv[])
     return -1;
   }
   x(&reg, pattern, (UChar* )"a\nb\n");
+
+  /* Error test */
+  pattern = (UChar* )" [";
+  r = regcomp(&reg, (char* )pattern, REG_EXTENDED);
+  if (r) {
+    regerror(r, &reg, buf, sizeof(buf));
+    fprintf(stderr, "OK(E): %s\n", buf);
+  }
 
   regfree(&reg);
   return 0;

@@ -1,6 +1,17 @@
-Onigmo インターフェース Version 5.14.0   2014/07/01
+Onigmo インターフェース Version 6.0.0   2016/11/28
 
-#include <oniguruma.h>
+#include <onigmo.h>
+
+
+# int onig_initialize(OnigEncoding use_encodings[], int num_encodings)
+
+  ライブラリの初期化
+  鬼車6.0との互換性のために追加された。
+  現時点ではonig_init()と同じである。
+
+  引数
+  1 use_encodings:         使用する文字エンコーディングの配列
+  2 num_encodings:         文字エンコーディングの数
 
 
 # int onig_init(void)
@@ -9,6 +20,7 @@ Onigmo インターフェース Version 5.14.0   2014/07/01
 
   シングルスレッドプログラム:
     onig_new()の中で呼び出されるので、この関数を明示的に呼び出さなくてもよい。
+    しかし呼び出す方が望ましい。
 
   マルチスレッドプログラム:
     この関数はスレッドセーフではないため、onig_new()を呼ぶ前にある特定の
@@ -109,23 +121,46 @@ Onigmo インターフェース Version 5.14.0   2014/07/01
       ONIG_ENCODING_ISO_8859_14   ISO 8859-14
       ONIG_ENCODING_ISO_8859_15   ISO 8859-15
       ONIG_ENCODING_ISO_8859_16   ISO 8859-16
+      ONIG_ENCODING_UTF_8         UTF-8
+      ONIG_ENCODING_UTF_16BE      UTF-16BE
+      ONIG_ENCODING_UTF_16LE      UTF-16LE
+      ONIG_ENCODING_UTF_32BE      UTF-32BE
+      ONIG_ENCODING_UTF_32LE      UTF-32LE
+      ONIG_ENCODING_EUC_JP        EUC-JP
+      ONIG_ENCODING_EUC_TW        EUC-TW
+      ONIG_ENCODING_EUC_KR        EUC-KR
+      ONIG_ENCODING_EUC_CN        EUC-CN
+      ONIG_ENCODING_SHIFT_JIS     Shift_JIS
+      ONIG_ENCODING_WINDOWS_31J   Windows-31J (CP932)
+      ONIG_ENCODING_KOI8_R        KOI8-R
+      ONIG_ENCODING_KOI8_U        KOI8-U
+      ONIG_ENCODING_WINDOWS_1250  Windows-1250 (CP1250)
+      ONIG_ENCODING_WINDOWS_1251  Windows-1251 (CP1251)
+      ONIG_ENCODING_WINDOWS_1252  Windows-1252 (CP1252)
+      ONIG_ENCODING_WINDOWS_1253  Windows-1253 (CP1253)
+      ONIG_ENCODING_WINDOWS_1254  Windows-1254 (CP1254)
+      ONIG_ENCODING_WINDOWS_1257  Windows-1257 (CP1257)
+      ONIG_ENCODING_BIG5          Big5
+      ONIG_ENCODING_GB18030       GB18030
+
+      または、ユーザが定義したOnigEncodingTypeデータのアドレス
+
+      後方互換性のため、以下のエンコーディング名も使用できる。
+
       ONIG_ENCODING_UTF8          UTF-8
       ONIG_ENCODING_UTF16_BE      UTF-16BE
       ONIG_ENCODING_UTF16_LE      UTF-16LE
       ONIG_ENCODING_UTF32_BE      UTF-32BE
       ONIG_ENCODING_UTF32_LE      UTF-32LE
-      ONIG_ENCODING_EUC_JP        EUC-JP
-      ONIG_ENCODING_EUC_TW        EUC-TW
-      ONIG_ENCODING_EUC_KR        EUC-KR
-      ONIG_ENCODING_EUC_CN        EUC-CN
       ONIG_ENCODING_SJIS          Shift_JIS
-      ONIG_ENCODING_CP932         CP932
-      ONIG_ENCODING_KOI8_R        KOI8-R
-      ONIG_ENCODING_CP1251        CP1251
-      ONIG_ENCODING_BIG5          Big5
-      ONIG_ENCODING_GB18030       GB18030
+      ONIG_ENCODING_CP932         Windows-31J (CP932)
+      ONIG_ENCODING_CP1250        Windows-1250 (CP1250)
+      ONIG_ENCODING_CP1251        Windows-1251 (CP1251)
+      ONIG_ENCODING_CP1252        Windows-1252 (CP1252)
+      ONIG_ENCODING_CP1253        Windows-1253 (CP1253)
+      ONIG_ENCODING_CP1254        Windows-1254 (CP1254)
+      ONIG_ENCODING_CP1257        Windows-1257 (CP1257)
 
-      または、ユーザが定義したOnigEncodingTypeデータのアドレス
 
   6 syntax:     正規表現パターン文法定義
 
@@ -250,8 +285,8 @@ Onigmo インターフェース Version 5.14.0   2014/07/01
 
     ONIG_OPTION_NOTBOL        文字列の先頭(str)を行頭と看做さない
     ONIG_OPTION_NOTEOL        文字列の終端(end)を行末と看做さない
-    ONIG_OPTION_NOTBOS        文字列の先頭(str)を先頭(\A)と見做さない
-    ONIG_OPTION_NOTEOS        文字列の終端(end)を終端(\z)と見做さない
+    ONIG_OPTION_NOTBOS        文字列の先頭(str)を先頭(\A)と看做さない
+    ONIG_OPTION_NOTEOS        文字列の終端(end)を終端(\z)と看做さない
     ONIG_OPTION_POSIX_REGION  region引数をPOSIX APIのregmatch_t[]にする
 
 
@@ -273,9 +308,30 @@ Onigmo インターフェース Version 5.14.0   2014/07/01
 
     ONIG_OPTION_NOTBOL        文字列の先頭(str)を行頭と看做さない
     ONIG_OPTION_NOTEOL        文字列の終端(end)を行末と看做さない
-    ONIG_OPTION_NOTBOS        文字列の先頭(str)を先頭(\A)と見做さない
-    ONIG_OPTION_NOTEOS        文字列の終端(end)を終端(\z)と見做さない
+    ONIG_OPTION_NOTBOS        文字列の先頭(str)を先頭(\A)と看做さない
+    ONIG_OPTION_NOTEOS        文字列の終端(end)を終端(\z)と看做さない
     ONIG_OPTION_POSIX_REGION  region引数をPOSIX APIのregmatch_t[]にする
+
+
+# int onig_scan(regex_t* reg, const UChar* str, const UChar* end,
+                OnigRegion* region, OnigOptionType option,
+                int (*scan_callback)(int, int, OnigRegion*, void*),
+                void* callback_arg)
+
+  正規表現で文字列をスキャンして、マッチングする毎にコールバック関数を呼び出す。
+
+  正常終了: マッチ回数 (0回も含める)
+  エラー:   エラーコード (< 0)
+  中断: コールバック関数が０以外の戻り値を返したとき、その値を戻り値として中断
+
+  引数
+  1 reg:    正規表現オブジェクト
+  2 str:    検索対象文字列
+  3 end:    検索対象文字列の終端アドレス
+  4 region: マッチ領域情報(region)  (NULLも許される)
+  5 option: 検索時オプション
+  6 scan_callback: コールバック関数
+  7 callback_arg:  コールバック関数に渡される付加引数値
 
 
 # OnigRegion* onig_region_new(void)
@@ -292,7 +348,7 @@ Onigmo インターフェース Version 5.14.0   2014/07/01
   2 free_self:  [1: region自身を含めて全て解放, 0: region自身は解放しない]
 
 
-# void onig_region_copy(OnigRegion* to, OnigRegion* from)
+# void onig_region_copy(OnigRegion* to, const OnigRegion* from)
 
   マッチ領域情報(region)を複製する。
 
@@ -339,7 +395,7 @@ Onigmo インターフェース Version 5.14.0   2014/07/01
 
 
 # int onig_name_to_backref_number(regex_t* reg, const UChar* name, const UChar* name_end,
-                                  OnigRegion *region)
+                                  const OnigRegion *region)
 
   指定された名前の後方参照(\k<name>)に対する捕獲式集合(グループ)の番号を返す。
   名前に対して、複数のマッチ領域が有効であれば、その中の最大の番号を返す。
@@ -376,7 +432,7 @@ Onigmo インターフェース Version 5.14.0   2014/07/01
   3 arg:     funcに対する追加引数
 
 
-# int onig_number_of_names(regex_t* reg)
+# int onig_number_of_names(const regex_t* reg)
 
   パターン中で定義された名前の数を返す。
   一個の名前の多重定義は一個と看做す。
@@ -385,10 +441,10 @@ Onigmo インターフェース Version 5.14.0   2014/07/01
   1 reg:    正規表現オブジェクト
 
 
-# OnigEncoding     onig_get_encoding(regex_t* reg)
-# OnigOptionType   onig_get_options(regex_t* reg)
-# OnigCaseFoldType onig_get_case_fold_flag(regex_t* reg)
-# OnigSyntaxType*  onig_get_syntax(regex_t* reg)
+# OnigEncoding     onig_get_encoding(const regex_t* reg)
+# OnigOptionType   onig_get_options(const regex_t* reg)
+# OnigCaseFoldType onig_get_case_fold_flag(const regex_t* reg)
+# OnigSyntaxType*  onig_get_syntax(const regex_t* reg)
 
   正規表現オブジェクトに対して、対応する値を返す。
 
@@ -396,7 +452,7 @@ Onigmo インターフェース Version 5.14.0   2014/07/01
   1 reg:    正規表現オブジェクト
 
 
-# int onig_number_of_captures(regex_t* reg)
+# int onig_number_of_captures(const regex_t* reg)
 
   パターン中で定義された捕獲グループの数を返す。
 
@@ -404,7 +460,7 @@ Onigmo インターフェース Version 5.14.0   2014/07/01
   1 reg:    正規表現オブジェクト
 
 
-# int onig_number_of_capture_histories(regex_t* reg)
+# int onig_number_of_capture_histories(const regex_t* reg)
 
   パターン中で定義された捕獲履歴(?@...)の数を返す。
 
@@ -463,7 +519,7 @@ Onigmo インターフェース Version 5.14.0   2014/07/01
   4 arg;     funcに対する追加引数
 
 
-# int onig_noname_group_capture_is_active(regex_t* reg)
+# int onig_noname_group_capture_is_active(const regex_t* reg)
 
   名前なし式集合の捕獲機能が有効かどうかを返す。
 
@@ -484,7 +540,8 @@ Onigmo インターフェース Version 5.14.0   2014/07/01
   上記以外の場合 --> 有効
 
 
-# UChar* onigenc_get_prev_char_head(OnigEncoding enc, const UChar* start, const UChar* s)
+# UChar* onigenc_get_prev_char_head(OnigEncoding enc, const UChar* start,
+                                    const UChar* s, const UChar* end)
 
   文字一個分前の文字列位置を返す。
 
@@ -492,10 +549,11 @@ Onigmo インターフェース Version 5.14.0   2014/07/01
   1 enc:   文字エンコーディング
   2 start: 文字列の先頭アドレス
   3 s:     文字列中の位置
+  4 end:   文字列の末尾
 
 
 # UChar* onigenc_get_left_adjust_char_head(OnigEncoding enc,
-                                           const UChar* start, const UChar* s)
+                           const UChar* start, const UChar* s, const UChar* end)
 
   文字の先頭バイト位置になるように左側に調整したアドレスを返す。
 
@@ -503,10 +561,11 @@ Onigmo インターフェース Version 5.14.0   2014/07/01
   1 enc:   文字エンコーディング
   2 start: 文字列の先頭アドレス
   3 s:     文字列中の位置
+  4 end:   文字列の末尾
 
 
 # UChar* onigenc_get_right_adjust_char_head(OnigEncoding enc,
-                                            const UChar* start, const UChar* s)
+                    const UChar* start, const UChar* s, const UChar* end)
 
   文字の先頭バイト位置になるように右側に調整したアドレスを返す。
 
@@ -514,6 +573,7 @@ Onigmo インターフェース Version 5.14.0   2014/07/01
   1 enc:   文字エンコーディング
   2 start: 文字列の先頭アドレス
   3 s:     文字列中の位置
+  4 end:   文字列の末尾
 
 
 # int onigenc_strlen(OnigEncoding enc, const UChar* s, const UChar* end)
@@ -527,7 +587,7 @@ Onigmo インターフェース Version 5.14.0   2014/07/01
   文字列のバイト数を返す。
 
 
-# int onig_set_default_syntax(OnigSyntaxType* syntax)
+# int onig_set_default_syntax(const OnigSyntaxType* syntax)
 
   デフォルトの正規表現パターン文法をセットする。
 
@@ -544,10 +604,10 @@ Onigmo インターフェース Version 5.14.0   2014/07/01
   2 from: 元
 
 
-# unsigned int onig_get_syntax_op(OnigSyntaxType* syntax)
-# unsigned int onig_get_syntax_op2(OnigSyntaxType* syntax)
-# unsigned int onig_get_syntax_behavior(OnigSyntaxType* syntax)
-# OnigOptionType onig_get_syntax_options(OnigSyntaxType* syntax)
+# unsigned int onig_get_syntax_op(const OnigSyntaxType* syntax)
+# unsigned int onig_get_syntax_op2(const OnigSyntaxType* syntax)
+# unsigned int onig_get_syntax_behavior(const OnigSyntaxType* syntax)
+# OnigOptionType onig_get_syntax_options(const OnigSyntaxType* syntax)
 
 # void onig_set_syntax_op(OnigSyntaxType* syntax, unsigned int op)
 # void onig_set_syntax_op2(OnigSyntaxType* syntax, unsigned int op2)
@@ -561,7 +621,7 @@ Onigmo インターフェース Version 5.14.0   2014/07/01
   2 op, op2, behavior, options: 要素の値
 
 
-# void onig_copy_encoding(OnigEncoding to, OnigOnigEncoding from)
+# void onig_copy_encoding(OnigEncodingType *to, OnigEncoding from)
 
   文字エンコーディングをコピーする。
 
@@ -594,7 +654,7 @@ Onigmo インターフェース Version 5.14.0   2014/07/01
   3 code: メタ文字のコードポイント または ONIG_INEFFECTIVE_META_CHAR.
 
 
-# OnigCaseFoldType onig_get_default_case_fold_flag()
+# OnigCaseFoldType onig_get_default_case_fold_flag(void)
 
   デフォルトのcase foldフラグを取得する。
 
@@ -617,6 +677,20 @@ Onigmo インターフェース Version 5.14.0   2014/07/01
 
   マッチスタックサイズの最大値を指定する。
   (size = 0: 無制限)
+
+  正常終了戻り値: ONIG_NORMAL
+
+
+# unsigned int onig_get_parse_depth_limit(void)
+
+  再帰パース処理の最大深さを返す。
+  (デフォルト: regint.h で定義されている DEFAULT_PARSE_DEPTH_LIMIT。現在は 4096)
+
+
+# int onig_set_parse_depth_limit(unsigned int depth)
+
+  再帰パース処理の最大深さを指定する。
+  (depth = 0: regint.h で定義されたデフォルト値に設定する。)
 
   正常終了戻り値: ONIG_NORMAL
 

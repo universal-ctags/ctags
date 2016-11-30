@@ -3,7 +3,7 @@
  */
 #include <stdio.h>
 #include <string.h>
-#include "oniguruma.h"
+#include "onigmo.h"
 
 static int
 name_callback(const UChar* name, const UChar* name_end,

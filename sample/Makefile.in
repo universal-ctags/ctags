@@ -53,14 +53,14 @@ build_triplet = @build@
 host_triplet = @host@
 noinst_PROGRAMS = encode$(EXEEXT) listcap$(EXEEXT) names$(EXEEXT) \
 	posix$(EXEEXT) simple$(EXEEXT) sql$(EXEEXT) syntax$(EXEEXT) \
-	crnl$(EXEEXT)
+	scan$(EXEEXT) crnl$(EXEEXT)
 subdir = sample
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/libtool.m4 \
 	$(top_srcdir)/m4/ltoptions.m4 $(top_srcdir)/m4/ltsugar.m4 \
 	$(top_srcdir)/m4/ltversion.m4 $(top_srcdir)/m4/lt~obsolete.m4 \
-	$(top_srcdir)/configure.in
+	$(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(install_sh) -d
@@ -68,8 +68,8 @@ CONFIG_HEADER = $(top_builddir)/config.h
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 PROGRAMS = $(noinst_PROGRAMS)
-crnl_SOURCES = crnl.c
-crnl_OBJECTS = crnl.$(OBJEXT)
+am_crnl_OBJECTS = crnl.$(OBJEXT)
+crnl_OBJECTS = $(am_crnl_OBJECTS)
 crnl_LDADD = $(LDADD)
 crnl_DEPENDENCIES = $(libname)
 am_encode_OBJECTS = encode.$(OBJEXT)
@@ -88,6 +88,10 @@ am_posix_OBJECTS = posix.$(OBJEXT)
 posix_OBJECTS = $(am_posix_OBJECTS)
 posix_LDADD = $(LDADD)
 posix_DEPENDENCIES = $(libname)
+am_scan_OBJECTS = scan.$(OBJEXT)
+scan_OBJECTS = $(am_scan_OBJECTS)
+scan_LDADD = $(LDADD)
+scan_DEPENDENCIES = $(libname)
 am_simple_OBJECTS = simple.$(OBJEXT)
 simple_OBJECTS = $(am_simple_OBJECTS)
 simple_LDADD = $(LDADD)
@@ -113,12 +117,12 @@ CCLD = $(CC)
 LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
-SOURCES = crnl.c $(encode_SOURCES) $(listcap_SOURCES) $(names_SOURCES) \
-	$(posix_SOURCES) $(simple_SOURCES) $(sql_SOURCES) \
-	$(syntax_SOURCES)
-DIST_SOURCES = crnl.c $(encode_SOURCES) $(listcap_SOURCES) \
-	$(names_SOURCES) $(posix_SOURCES) $(simple_SOURCES) \
-	$(sql_SOURCES) $(syntax_SOURCES)
+SOURCES = $(crnl_SOURCES) $(encode_SOURCES) $(listcap_SOURCES) \
+	$(names_SOURCES) $(posix_SOURCES) $(scan_SOURCES) \
+	$(simple_SOURCES) $(sql_SOURCES) $(syntax_SOURCES)
+DIST_SOURCES = $(crnl_SOURCES) $(encode_SOURCES) $(listcap_SOURCES) \
+	$(names_SOURCES) $(posix_SOURCES) $(scan_SOURCES) \
+	$(simple_SOURCES) $(sql_SOURCES) $(syntax_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -237,6 +241,7 @@ pdfdir = @pdfdir@
 prefix = @prefix@
 program_transform_name = @program_transform_name@
 psdir = @psdir@
+python_prog = @python_prog@
 sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
 srcdir = @srcdir@
@@ -245,7 +250,7 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-libname = $(top_builddir)/libonig.la
+libname = $(top_builddir)/libonigmo.la
 LDADD = $(libname)
 INCLUDES = -I$(top_srcdir) -I$(includedir)
 encode_SOURCES = encode.c
@@ -255,6 +260,8 @@ posix_SOURCES = posix.c
 simple_SOURCES = simple.c
 sql_SOURCES = sql.c
 syntax_SOURCES = syntax.c
+scan_SOURCES = scan.c
+crnl_SOURCES = crnl.c
 sampledir = $(top_builddir)/sample
 all: all-am
 
@@ -314,6 +321,9 @@ names$(EXEEXT): $(names_OBJECTS) $(names_DEPENDENCIES) $(EXTRA_names_DEPENDENCIE
 posix$(EXEEXT): $(posix_OBJECTS) $(posix_DEPENDENCIES) $(EXTRA_posix_DEPENDENCIES) 
 	@rm -f posix$(EXEEXT)
 	$(LINK) $(posix_OBJECTS) $(posix_LDADD) $(LIBS)
+scan$(EXEEXT): $(scan_OBJECTS) $(scan_DEPENDENCIES) $(EXTRA_scan_DEPENDENCIES) 
+	@rm -f scan$(EXEEXT)
+	$(LINK) $(scan_OBJECTS) $(scan_LDADD) $(LIBS)
 simple$(EXEEXT): $(simple_OBJECTS) $(simple_DEPENDENCIES) $(EXTRA_simple_DEPENDENCIES) 
 	@rm -f simple$(EXEEXT)
 	$(LINK) $(simple_OBJECTS) $(simple_LDADD) $(LIBS)
@@ -335,6 +345,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/listcap.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/names.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/posix.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/scan.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/simple.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sql.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/syntax.Po@am__quote@
@@ -569,7 +580,7 @@ uninstall-am:
 	pdf pdf-am ps ps-am tags uninstall uninstall-am
 
 
-test: encode listcap names posix simple sql syntax
+test: encode$(EXEEXT) listcap$(EXEEXT) names$(EXEEXT) posix$(EXEEXT) simple$(EXEEXT) sql$(EXEEXT) syntax$(EXEEXT) scan$(EXEEXT) crnl$(EXEEXT)
 	$(sampledir)/encode
 	$(sampledir)/listcap
 	$(sampledir)/names
@@ -577,6 +588,8 @@ test: encode listcap names posix simple sql syntax
 	$(sampledir)/simple
 	$(sampledir)/sql
 	$(sampledir)/syntax
+	$(sampledir)/scan
+	$(sampledir)/crnl
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

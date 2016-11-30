@@ -28,7 +28,7 @@
  * SUCH DAMAGE.
  */
 
-#include "regint.h"
+#include "regenc.h"
 
 #define eucjp_islead(c)    ((UChar )((c) - 0xa1) > 0xfe - 0xa1)
 
@@ -50,6 +50,69 @@ static const int EncLen_EUCJP[] = {
   2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
   2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1
 };
+
+typedef enum { FAILURE = -2, ACCEPT = -1, S0 = 0, S1, S2 } state_t;
+#define A ACCEPT
+#define F FAILURE
+static const signed char trans[][0x100] = {
+  { /* S0   0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f */
+    /* 0 */ A, A, A, A, A, A, A, A, A, A, A, A, A, A, A, A,
+    /* 1 */ A, A, A, A, A, A, A, A, A, A, A, A, A, A, A, A,
+    /* 2 */ A, A, A, A, A, A, A, A, A, A, A, A, A, A, A, A,
+    /* 3 */ A, A, A, A, A, A, A, A, A, A, A, A, A, A, A, A,
+    /* 4 */ A, A, A, A, A, A, A, A, A, A, A, A, A, A, A, A,
+    /* 5 */ A, A, A, A, A, A, A, A, A, A, A, A, A, A, A, A,
+    /* 6 */ A, A, A, A, A, A, A, A, A, A, A, A, A, A, A, A,
+    /* 7 */ A, A, A, A, A, A, A, A, A, A, A, A, A, A, A, A,
+    /* 8 */ F, F, F, F, F, F, F, F, F, F, F, F, F, F, 1, 2,
+    /* 9 */ F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F,
+    /* a */ F, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+    /* b */ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+    /* c */ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+    /* d */ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+    /* e */ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+    /* f */ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, F
+  },
+  { /* S1   0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f */
+    /* 0 */ F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F,
+    /* 1 */ F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F,
+    /* 2 */ F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F,
+    /* 3 */ F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F,
+    /* 4 */ F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F,
+    /* 5 */ F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F,
+    /* 6 */ F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F,
+    /* 7 */ F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F,
+    /* 8 */ F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F,
+    /* 9 */ F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F,
+    /* a */ F, A, A, A, A, A, A, A, A, A, A, A, A, A, A, A,
+    /* b */ A, A, A, A, A, A, A, A, A, A, A, A, A, A, A, A,
+    /* c */ A, A, A, A, A, A, A, A, A, A, A, A, A, A, A, A,
+    /* d */ A, A, A, A, A, A, A, A, A, A, A, A, A, A, A, A,
+    /* e */ A, A, A, A, A, A, A, A, A, A, A, A, A, A, A, A,
+    /* f */ A, A, A, A, A, A, A, A, A, A, A, A, A, A, A, F
+  },
+  { /* S2   0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f */
+    /* 0 */ F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F,
+    /* 1 */ F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F,
+    /* 2 */ F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F,
+    /* 3 */ F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F,
+    /* 4 */ F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F,
+    /* 5 */ F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F,
+    /* 6 */ F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F,
+    /* 7 */ F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F,
+    /* 8 */ F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F,
+    /* 9 */ F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F,
+    /* a */ F, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+    /* b */ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+    /* c */ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+    /* d */ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+    /* e */ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+    /* f */ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, F
+  },
+
+};
+#undef A
+#undef F
 
 static const OnigPairCaseFoldCodes CaseFoldMap[] = {
   /* Fullwidth Alphabet */
@@ -143,18 +206,30 @@ static const OnigPairCaseFoldCodes CaseFoldMap[] = {
 };
 
 static int
-mbc_enc_len(const UChar* p)
+mbc_enc_len(const UChar* p, const UChar* e, OnigEncoding enc ARG_UNUSED)
 {
-  return EncLen_EUCJP[*p];
+  int firstbyte = *p++;
+  state_t s;
+  s = trans[0][firstbyte];
+  if (s < 0) return s == ACCEPT ? ONIGENC_CONSTRUCT_MBCLEN_CHARFOUND(1) :
+                                  ONIGENC_CONSTRUCT_MBCLEN_INVALID();
+  if (p == e) return ONIGENC_CONSTRUCT_MBCLEN_NEEDMORE(EncLen_EUCJP[firstbyte]-1);
+  s = trans[s][*p++];
+  if (s < 0) return s == ACCEPT ? ONIGENC_CONSTRUCT_MBCLEN_CHARFOUND(2) :
+                                  ONIGENC_CONSTRUCT_MBCLEN_INVALID();
+  if (p == e) return ONIGENC_CONSTRUCT_MBCLEN_NEEDMORE(EncLen_EUCJP[firstbyte]-2);
+  s = trans[s][*p++];
+  return s == ACCEPT ? ONIGENC_CONSTRUCT_MBCLEN_CHARFOUND(3) :
+                       ONIGENC_CONSTRUCT_MBCLEN_INVALID();
 }
 
 static OnigCodePoint
-mbc_to_code(const UChar* p, const UChar* end)
+mbc_to_code(const UChar* p, const UChar* end, OnigEncoding enc)
 {
   int c, i, len;
   OnigCodePoint n;
 
-  len = mbc_enc_len(p);
+  len = mbc_enc_len(p, end, enc);
   n = (OnigCodePoint )*p++;
   if (len == 1) return n;
 
@@ -167,9 +242,11 @@ mbc_to_code(const UChar* p, const UChar* end)
 }
 
 static int
-code_to_mbclen(OnigCodePoint code)
+code_to_mbclen(OnigCodePoint code, OnigEncoding enc ARG_UNUSED)
 {
   if (ONIGENC_IS_CODE_ASCII(code)) return 1;
+  else if (code > 0x00ffffff)
+    return ONIGERR_TOO_BIG_WIDE_CHAR_VALUE;
   else if ((code & 0xff808080) == 0x00808080) return 3;
   else if ((code & 0xffff8080) == 0x00008080) return 2;
   else
@@ -196,7 +273,7 @@ code_to_mbc_first(OnigCodePoint code)
 #endif
 
 static int
-code_to_mbc(OnigCodePoint code, UChar *buf)
+code_to_mbc(OnigCodePoint code, UChar *buf, OnigEncoding enc)
 {
   UChar *p = buf;
 
@@ -205,7 +282,7 @@ code_to_mbc(OnigCodePoint code, UChar *buf)
   *p++ = (UChar )(code & 0xff);
 
 #if 1
-  if (mbc_enc_len(buf) != (p - buf))
+  if (mbc_enc_len(buf, p, enc) != (p - buf))
     return ONIGERR_INVALID_CODE_POINT_VALUE;
 #endif
   return (int )(p - buf);
@@ -213,7 +290,7 @@ code_to_mbc(OnigCodePoint code, UChar *buf)
 
 static int
 apply_all_case_fold(OnigCaseFoldType flag,
-		    OnigApplyAllCaseFoldFunc f, void* arg)
+		    OnigApplyAllCaseFoldFunc f, void* arg, OnigEncoding enc)
 {
   return onigenc_apply_all_case_fold_with_map(
             numberof(CaseFoldMap), CaseFoldMap, 0,
@@ -259,16 +336,16 @@ get_upper_case(OnigCodePoint code)
 static int
 get_case_fold_codes_by_str(OnigCaseFoldType flag,
 			   const OnigUChar* p, const OnigUChar* end,
-			   OnigCaseFoldCodeItem items[])
+			   OnigCaseFoldCodeItem items[], OnigEncoding enc)
 {
   int len;
   OnigCodePoint code, code_lo, code_up;
 
-  code = mbc_to_code(p, end);
+  code = mbc_to_code(p, end, enc);
   if (ONIGENC_IS_ASCII_CODE(code))
-    return onigenc_ascii_get_case_fold_codes_by_str(flag, p, end, items);
+    return onigenc_ascii_get_case_fold_codes_by_str(flag, p, end, items, enc);
 
-  len = mbc_enc_len(p);
+  len = mbc_enc_len(p, end, enc);
   code_lo = get_lower_case(code);
   code_up = get_upper_case(code);
 
@@ -289,8 +366,9 @@ get_case_fold_codes_by_str(OnigCaseFoldType flag,
 }
 
 static int
-mbc_case_fold(OnigCaseFoldType flag ARG_UNUSED,
-	      const UChar** pp, const UChar* end ARG_UNUSED, UChar* lower)
+mbc_case_fold(OnigCaseFoldType flag,
+	      const UChar** pp, const UChar* end, UChar* lower,
+	      OnigEncoding enc)
 {
   const UChar* p = *pp;
 
@@ -303,15 +381,17 @@ mbc_case_fold(OnigCaseFoldType flag ARG_UNUSED,
     OnigCodePoint code;
     int len;
 
-    code = get_lower_case(mbc_to_code(p, end));
-    len = code_to_mbc(code, lower);
+    len = mbc_enc_len(p, end, enc);
+    code = get_lower_case(mbc_to_code(p, end, enc));
+    len = code_to_mbc(code, lower, enc);
+    if (len == ONIGERR_INVALID_CODE_POINT_VALUE) len = 1;
     (*pp) += len;
     return len; /* return byte length of converted char to lower */
   }
 }
 
 static UChar*
-left_adjust_char_head(const UChar* start, const UChar* s)
+left_adjust_char_head(const UChar* start, const UChar* s, const UChar* end, OnigEncoding enc)
 {
   /* In this encoding
      mb-trail bytes doesn't mix with single bytes.
@@ -323,14 +403,14 @@ left_adjust_char_head(const UChar* start, const UChar* s)
   p = s;
 
   while (!eucjp_islead(*p) && p > start) p--;
-  len = mbc_enc_len(p);
+  len = mbc_enc_len(p, end, enc);
   if (p + len > s) return (UChar* )p;
   p += len;
   return (UChar* )(p + ((s - p) & ~1));
 }
 
 static int
-is_allowed_reverse_match(const UChar* s, const UChar* end ARG_UNUSED)
+is_allowed_reverse_match(const UChar* s, const UChar* end, OnigEncoding enc ARG_UNUSED)
 {
   const UChar c = *s;
   if (c <= 0x7e || c == 0x8e || c == 0x8f)
@@ -423,9 +503,9 @@ static const OnigCodePoint CR_Cyrillic[] = {
 #include "enc/jis/props.h"
 
 static int
-property_name_to_ctype(OnigEncoding enc, UChar* p, UChar* end)
+property_name_to_ctype(OnigEncoding enc, const UChar* p, const UChar* end)
 {
-  UChar *s = p, *e = end;
+  const UChar *s = p, *e = end;
   const struct enc_property *prop =
     onig_jis_property((const char* )s, (unsigned int )(e - s));
 
@@ -437,14 +517,14 @@ property_name_to_ctype(OnigEncoding enc, UChar* p, UChar* end)
 }
 
 static int
-is_code_ctype(OnigCodePoint code, unsigned int ctype)
+is_code_ctype(OnigCodePoint code, unsigned int ctype, OnigEncoding enc ARG_UNUSED)
 {
   if (ctype <= ONIGENC_MAX_STD_CTYPE) {
     if (code < 128)
       return ONIGENC_IS_ASCII_CODE_CTYPE(code, ctype);
     else {
       if (CTYPE_IS_WORD_GRAPH_PRINT(ctype)) {
-	return (code_to_mbclen(code) > 1 ? TRUE : FALSE);
+	return (code_to_mbclen(code, enc) > 1 ? TRUE : FALSE);
       }
     }
   }
@@ -461,7 +541,7 @@ is_code_ctype(OnigCodePoint code, unsigned int ctype)
 
 static int
 get_ctype_code_range(OnigCtype ctype, OnigCodePoint* sb_out,
-		     const OnigCodePoint* ranges[])
+		     const OnigCodePoint* ranges[], OnigEncoding enc ARG_UNUSED)
 {
   if (ctype <= ONIGENC_MAX_STD_CTYPE) {
     return ONIG_NO_SUPPORT_CONFIG;
@@ -479,7 +559,7 @@ get_ctype_code_range(OnigCtype ctype, OnigCodePoint* sb_out,
 }
 
 
-OnigEncodingType OnigEncodingEUC_JP = {
+OnigEncodingDefine(euc_jp, EUC_JP) = {
   mbc_enc_len,
   "EUC-JP",   /* name */
   3,          /* max enc length */
@@ -496,5 +576,41 @@ OnigEncodingType OnigEncodingEUC_JP = {
   get_ctype_code_range,
   left_adjust_char_head,
   is_allowed_reverse_match,
+  onigenc_ascii_only_case_map,
+  0,
   ONIGENC_FLAG_NONE,
 };
+/*
+ * Name: EUC-JP
+ * MIBenum: 18
+ * Link: http://www.iana.org/assignments/character-sets
+ * Link: http://home.m05.itscom.net/numa/cde/sjis-euc/sjis-euc.html
+ * Link: http://home.m05.itscom.net/numa/uocjleE.pdf
+ */
+ENC_ALIAS("eucJP", "EUC-JP") /* UI-OSF Application Platform Profile for Japanese Environment Version 1.1 */
+
+/*
+ * Name: eucJP-ms
+ * Link: http://home.m05.itscom.net/numa/cde/ucs-conv/ucs-conv.html
+ * Link: http://www2d.biglobe.ne.jp/~msyk/charcode/cp932/eucJP-ms.html
+ * Link: http://ja.wikipedia.org/wiki/EUC-JP
+ */
+ENC_REPLICATE("eucJP-ms", "EUC-JP") /* TOG/JVC CDE/Motif Technical WG */
+ENC_ALIAS("euc-jp-ms", "eucJP-ms")
+
+/*
+ * Name: CP51932
+ * MIBenum: 2108
+ * Link: http://www.iana.org/assignments/charset-reg/CP51932
+ * Link: http://search.cpan.org/src/NARUSE/Encode-EUCJPMS-0.07/ucm/cp51932.ucm
+ * Link: http://legacy-encoding.sourceforge.jp/wiki/index.php?cp51932
+ * Link: http://msyk.at.webry.info/200511/article_2.html
+ */
+ENC_REPLICATE("CP51932", "EUC-JP")
+
+/*
+ * Name: EUC-JIS-2004
+ * Link: http://ja.wikipedia.org/wiki/EUC-JIS-2004
+ */
+ENC_REPLICATE("EUC-JIS-2004", "EUC-JP") /* defined at JIS X 0213:2004 */
+ENC_ALIAS("EUC-JISX0213", "EUC-JIS-2004") /* defined at JIS X 0213:2000, and obsolete at JIS X 0213:2004 */

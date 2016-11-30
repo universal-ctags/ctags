@@ -9,7 +9,13 @@ USE_LTCG = 1
 #DEFFILE = onig.def
 
 
-CPPFLAGS = 
+# Get the default ARCH. (i686, x86-64, etc.)
+ifndef ARCH
+ARCH := $(shell $(CC) -dumpmachine | sed -e 's/-.*//' -e 's/_/-/' -e 's/^mingw32$$/i686/')
+endif
+
+
+CPPFLAGS =
 CFLAGS = -O2 -Wall
 LDFLAGS =
 LOADLIBES =
@@ -21,11 +27,18 @@ LINKFLAGS =
 
 INSTALL = install -c
 CP      = cp
+RMDIR   = rm -rf
 CC = gcc
 RC = windres
-DEFS = -DHAVE_CONFIG_H -DNOT_RUBY -DEXPORT
-RUBYDIR = ..
-PYTHON = py
+DEFS = -DHAVE_CONFIG_H -DEXPORT
+
+ifneq ($(ARCH),x86-64)
+PYTHON = py -3.4-32
+else
+PYTHON = py -3
+endif
+
+WORKDIR = build_$(ARCH)
 
 ifdef DEFFILE
 # Use a .def file to export APIs.
@@ -33,50 +46,56 @@ CFLAGS = $(CFLAGS) -DONIG_EXTERN=extern
 ARDLL_FLAGS = $(ARDLL_FLAGS) $(DEFFILE)
 endif
 
-subdirs = 
+subdirs =
 
-libbase   = onig
-libname   = $(libbase)_s.a
-dllname   = $(libbase).dll
-dlllib    = $(libbase).a
+libbase   = onigmo
+libname   = $(WORKDIR)/lib$(libbase).a
+dllname   = $(WORKDIR)/$(libbase).dll
+dlllib    = $(WORKDIR)/lib$(libbase).dll.a
 
-onigheaders  = oniguruma.h regint.h regparse.h regenc.h st.h
-posixheaders = onigposix.h
+onigheaders  = onigmo.h regint.h regparse.h regenc.h st.h
+posixheaders = onigmoposix.h
 headers      = $(posixheaders) $(onigheaders)
 
-onigobjs     = reggnu.o regerror.o regparse.o regext.o regcomp.o \
-	       regexec.o regenc.o regsyntax.o regtrav.o \
-	       regversion.o st.o
-posixobjs    = regposix.o regposerr.o
-libobjs      = $(onigobjs) $(posixobjs)
+onigobjs      = $(WORKDIR)/reggnu.o $(WORKDIR)/regerror.o \
+		$(WORKDIR)/regparse.o $(WORKDIR)/regext.o \
+		$(WORKDIR)/regcomp.o $(WORKDIR)/regexec.o \
+		$(WORKDIR)/regenc.o $(WORKDIR)/regsyntax.o \
+		$(WORKDIR)/regtrav.o $(WORKDIR)/regversion.o \
+		$(WORKDIR)/st.o
+posixobjs     = $(WORKDIR)/regposix.o $(WORKDIR)/regposerr.o
+libobjs       = $(onigobjs) $(posixobjs)
 
-jp_objs      =  $(encdir)\euc_jp.o $(encdir)\sjis.o $(encdir)\cp932.o
-iso8859_objs =  $(encdir)\iso8859_1.o  $(encdir)\iso8859_2.o \
-		$(encdir)\iso8859_3.o  $(encdir)\iso8859_4.o \
-		$(encdir)\iso8859_5.o  $(encdir)\iso8859_6.o \
-		$(encdir)\iso8859_7.o  $(encdir)\iso8859_8.o \
-		$(encdir)\iso8859_9.o  $(encdir)\iso8859_10.o \
-		$(encdir)\iso8859_11.o $(encdir)\iso8859_13.o \
-		$(encdir)\iso8859_14.o $(encdir)\iso8859_15.o \
-		$(encdir)\iso8859_16.o
+jp_objs       = $(WORKDIR)/euc_jp.o $(WORKDIR)/shift_jis.o \
+		$(WORKDIR)/windows_31j.o
 
-encobjs      =  $(encdir)\ascii.o $(encdir)\utf8.o \
-		$(encdir)\unicode.o \
-		$(encdir)\utf16_be.o $(encdir)\utf16_le.o \
-		$(encdir)\utf32_be.o $(encdir)\utf32_le.o \
-		$(jp_objs) $(iso8859_objs) \
-		$(encdir)\euc_tw.o $(encdir)\euc_kr.o $(encdir)\big5.o \
-		$(encdir)\gb18030.o \
-		$(encdir)\koi8_r.o  \
-		$(encdir)\cp1251.o # $(encdir)\koi8.o
+iso_8859_objs = $(WORKDIR)/iso_8859_1.o  $(WORKDIR)/iso_8859_2.o \
+		$(WORKDIR)/iso_8859_3.o  $(WORKDIR)/iso_8859_4.o \
+		$(WORKDIR)/iso_8859_5.o  $(WORKDIR)/iso_8859_6.o \
+		$(WORKDIR)/iso_8859_7.o  $(WORKDIR)/iso_8859_8.o \
+		$(WORKDIR)/iso_8859_9.o  $(WORKDIR)/iso_8859_10.o \
+		$(WORKDIR)/iso_8859_11.o $(WORKDIR)/iso_8859_13.o \
+		$(WORKDIR)/iso_8859_14.o $(WORKDIR)/iso_8859_15.o \
+		$(WORKDIR)/iso_8859_16.o
 
-resobj       = win32\onig.res
+encobjs       = $(WORKDIR)/ascii.o $(WORKDIR)/utf_8.o \
+		$(WORKDIR)/unicode.o \
+		$(WORKDIR)/utf_16be.o $(WORKDIR)/utf_16le.o \
+		$(WORKDIR)/utf_32be.o $(WORKDIR)/utf_32le.o \
+		$(jp_objs) $(iso_8859_objs) \
+		$(WORKDIR)/euc_tw.o $(WORKDIR)/euc_kr.o $(WORKDIR)/big5.o \
+		$(WORKDIR)/gb18030.o \
+		$(WORKDIR)/koi8_r.o $(WORKDIR)/koi8_u.o \
+		$(WORKDIR)/windows_1250.o $(WORKDIR)/windows_1251.o \
+		$(WORKDIR)/windows_1252.o $(WORKDIR)/windows_1253.o \
+		$(WORKDIR)/windows_1254.o $(WORKDIR)/windows_1257.o
+
+resobj        = $(WORKDIR)/onigmo.o
 
 onigsources  = regerror.c regparse.c regext.c regcomp.c regexec.c regenc.c \
 	       regsyntax.c regtrav.c regversion.c reggnu.c st.c
 posixsources = regposix.c regposerr.c
 libsources   = $(posixsources) $(onigsources)
-rubysources  = $(onigsources)
 
 encdir       = enc
 distfiles    = README COPYING HISTORY \
@@ -92,136 +111,139 @@ makeargs = $(MFLAGS) CPPFLAGS='$(CPPFLAGS)' CFLAGS='$(CFLAGS)' CC='$(CC)'
 .SUFFIXES:
 .SUFFIXES: .o .c .h .ps .dvi .info .texinfo .res .rc
 
-.c.o:
-	$(CC) $(CFLAGS) $(CPPFLAGS) $(DEFS) -I. -I.. -o $@ -c $<
+$(WORKDIR)/%.o: %.c
+	$(CC) $(CFLAGS) $(CPPFLAGS) $(DEFS) -Iwin32 -I. -I$(encdir)/unicode -o $@ -c $<
 
-.rc.res:
+$(WORKDIR)/%.o: $(encdir)/%.c
+	$(CC) $(CFLAGS) $(CPPFLAGS) $(DEFS) -Iwin32 -I. -I$(encdir)/unicode -o $@ -c $<
+
+$(WORKDIR)/%.o: win32/%.rc
 	$(RC) -O coff -I. $< $@
 
 # targets
 default: all
 
 setup:
-	$(CP) win32/config.h config.h
-	$(CP) win32/testc.c  testc.c
 
 
-all: $(libname) $(dllname) 
+all: $(libname) $(dllname)
 
-$(libname): $(libobjs) $(encobjs)
+$(libname): $(WORKDIR) $(libobjs) $(encobjs)
 	$(ARLIB) $(ARLIB_FLAGS) $@ $(libobjs) $(encobjs)
 
-$(dllname): $(libobjs) $(encobjs) $(resobj) $(DEFFILE)
+$(dllname): $(WORKDIR) $(libobjs) $(encobjs) $(resobj) $(DEFFILE)
 	$(ARDLL) $(libobjs) $(encobjs) $(resobj) -o $@ $(ARDLL_FLAGS) -Wl,--out-implib,$(dlllib)
 
-regparse.o:  regparse.c $(onigheaders) config.h st.h
-regext.o:    regext.c   $(onigheaders) config.h
-regtrav.o:   regtrav.c  $(onigheaders) config.h
-regcomp.o:   regcomp.c  $(onigheaders) config.h
-regexec.o:   regexec.c  regint.h regenc.h oniguruma.h config.h
-reggnu.o:    reggnu.c   regint.h regenc.h oniguruma.h config.h oniggnu.h
-regerror.o:  regerror.c regint.h regenc.h oniguruma.h config.h
-regenc.o:    regenc.c   regint.h regenc.h oniguruma.h config.h
-regsyntax.o: regsyntax.c regint.h regenc.h oniguruma.h config.h
-regversion.o: regversion.c oniguruma.h config.h
-regposix.o:  regposix.c $(posixheaders) oniguruma.h config.h
-regposerr.o: regposerr.c $(posixheaders) config.h
-st.o:        st.c regint.h oniguruma.h config.h st.h
+$(WORKDIR):
+	-mkdir $(WORKDIR)
 
-$(encdir)\ascii.o:      $(encdir)\ascii.c regenc.h config.h
-$(encdir)\unicode.o:    $(encdir)\unicode.c regint.h regenc.h config.h $(encdir)\unicode\casefold.h $(encdir)\unicode\name2ctype.h
-$(encdir)\utf8.o:       $(encdir)\utf8.c regenc.h config.h
-$(encdir)\utf16_be.o:   $(encdir)\utf16_be.c regenc.h config.h
-$(encdir)\utf16_le.o:   $(encdir)\utf16_le.c regenc.h config.h
-$(encdir)\utf32_be.o:   $(encdir)\utf32_be.c regenc.h config.h
-$(encdir)\utf32_le.o:   $(encdir)\utf32_le.c regenc.h config.h
-$(encdir)\euc_jp.o:     $(encdir)\euc_jp.c regenc.h config.h $(encdir)\jis\props.h
-$(encdir)\euc_tw.o:     $(encdir)\euc_tw.c regenc.h config.h
-$(encdir)\euc_kr.o:     $(encdir)\euc_kr.c regenc.h config.h
-$(encdir)\sjis.o:       $(encdir)\sjis.c regenc.h config.h $(encdir)\jis\props.h
-$(encdir)\cp932.o:      $(encdir)\cp932.c $(encdir)\sjis.c regenc.h config.h $(encdir)\jis\props.h
-$(encdir)\iso8859_1.o:  $(encdir)\iso8859_1.c regenc.h config.h
-$(encdir)\iso8859_2.o:  $(encdir)\iso8859_2.c regenc.h config.h
-$(encdir)\iso8859_3.o:  $(encdir)\iso8859_3.c regenc.h config.h
-$(encdir)\iso8859_4.o:  $(encdir)\iso8859_4.c regenc.h config.h
-$(encdir)\iso8859_5.o:  $(encdir)\iso8859_5.c regenc.h config.h
-$(encdir)\iso8859_6.o:  $(encdir)\iso8859_6.c regenc.h config.h
-$(encdir)\iso8859_7.o:  $(encdir)\iso8859_7.c regenc.h config.h
-$(encdir)\iso8859_8.o:  $(encdir)\iso8859_8.c regenc.h config.h
-$(encdir)\iso8859_9.o:  $(encdir)\iso8859_9.c regenc.h config.h
-$(encdir)\iso8859_10.o: $(encdir)\iso8859_10.c regenc.h config.h
-$(encdir)\iso8859_11.o: $(encdir)\iso8859_11.c regenc.h config.h
-$(encdir)\iso8859_13.o: $(encdir)\iso8859_13.c regenc.h config.h
-$(encdir)\iso8859_14.o: $(encdir)\iso8859_14.c regenc.h config.h
-$(encdir)\iso8859_15.o: $(encdir)\iso8859_15.c regenc.h config.h
-$(encdir)\iso8859_16.o: $(encdir)\iso8859_16.c regenc.h config.h
-$(encdir)\koi8.o:       $(encdir)\koi8.c   regenc.h config.h
-$(encdir)\koi8_r.o:     $(encdir)\koi8_r.c regenc.h config.h
-$(encdir)\cp1251.o:     $(encdir)\cp1251.c regenc.h config.h
-$(encdir)\big5.o:       $(encdir)\big5.c   regenc.h config.h
-$(encdir)\gb18030.o:    $(encdir)\gb18030.c   regenc.h config.h
+$(WORKDIR)/regparse.o:  regparse.c $(onigheaders) win32/config.h st.h
+$(WORKDIR)/regext.o:    regext.c   $(onigheaders) win32/config.h
+$(WORKDIR)/regtrav.o:   regtrav.c  $(onigheaders) win32/config.h
+$(WORKDIR)/regcomp.o:   regcomp.c  $(onigheaders) win32/config.h
+$(WORKDIR)/regexec.o:   regexec.c  regint.h regenc.h onigmo.h win32/config.h
+$(WORKDIR)/reggnu.o:    reggnu.c   regint.h regenc.h onigmo.h win32/config.h onigmognu.h
+$(WORKDIR)/regerror.o:  regerror.c regint.h regenc.h onigmo.h win32/config.h
+$(WORKDIR)/regenc.o:    regenc.c   regint.h regenc.h onigmo.h win32/config.h
+$(WORKDIR)/regsyntax.o: regsyntax.c regint.h regenc.h onigmo.h win32/config.h
+$(WORKDIR)/regversion.o: regversion.c onigmo.h win32/config.h
+$(WORKDIR)/regposix.o:  regposix.c $(posixheaders) onigmo.h win32/config.h
+$(WORKDIR)/regposerr.o: regposerr.c $(posixheaders) win32/config.h
+$(WORKDIR)/st.o:        st.c regint.h onigmo.h win32/config.h st.h
 
-win32\onig.res: win32\onig.rc oniguruma.h
+$(WORKDIR)/ascii.o:      $(encdir)/ascii.c regenc.h win32/config.h
+$(WORKDIR)/unicode.o:    $(encdir)/unicode.c regint.h regenc.h win32/config.h $(encdir)/unicode/casefold.h $(encdir)/unicode/name2ctype.h
+$(WORKDIR)/utf_8.o:      $(encdir)/utf_8.c regenc.h win32/config.h
+$(WORKDIR)/utf_16be.o:   $(encdir)/utf_16be.c regenc.h win32/config.h
+$(WORKDIR)/utf_16le.o:   $(encdir)/utf_16le.c regenc.h win32/config.h
+$(WORKDIR)/utf_32be.o:   $(encdir)/utf_32be.c regenc.h win32/config.h
+$(WORKDIR)/utf_32le.o:   $(encdir)/utf_32le.c regenc.h win32/config.h
+$(WORKDIR)/euc_jp.o:     $(encdir)/euc_jp.c regenc.h win32/config.h $(encdir)/jis/props.h
+$(WORKDIR)/euc_tw.o:     $(encdir)/euc_tw.c regenc.h win32/config.h
+$(WORKDIR)/euc_kr.o:     $(encdir)/euc_kr.c regenc.h win32/config.h
+$(WORKDIR)/shift_jis.o:  $(encdir)/shift_jis.c regenc.h win32/config.h $(encdir)/jis/props.h
+$(WORKDIR)/windows_31j.o: $(encdir)/windows_31j.c $(encdir)/shift_jis.c regenc.h win32/config.h $(encdir)/jis/props.h
+$(WORKDIR)/iso_8859_1.o:  $(encdir)/iso_8859_1.c regenc.h win32/config.h
+$(WORKDIR)/iso_8859_2.o:  $(encdir)/iso_8859_2.c regenc.h win32/config.h
+$(WORKDIR)/iso_8859_3.o:  $(encdir)/iso_8859_3.c regenc.h win32/config.h
+$(WORKDIR)/iso_8859_4.o:  $(encdir)/iso_8859_4.c regenc.h win32/config.h
+$(WORKDIR)/iso_8859_5.o:  $(encdir)/iso_8859_5.c regenc.h win32/config.h
+$(WORKDIR)/iso_8859_6.o:  $(encdir)/iso_8859_6.c regenc.h win32/config.h
+$(WORKDIR)/iso_8859_7.o:  $(encdir)/iso_8859_7.c regenc.h win32/config.h
+$(WORKDIR)/iso_8859_8.o:  $(encdir)/iso_8859_8.c regenc.h win32/config.h
+$(WORKDIR)/iso_8859_9.o:  $(encdir)/iso_8859_9.c regenc.h win32/config.h
+$(WORKDIR)/iso_8859_10.o: $(encdir)/iso_8859_10.c regenc.h win32/config.h
+$(WORKDIR)/iso_8859_11.o: $(encdir)/iso_8859_11.c regenc.h win32/config.h
+$(WORKDIR)/iso_8859_13.o: $(encdir)/iso_8859_13.c regenc.h win32/config.h
+$(WORKDIR)/iso_8859_14.o: $(encdir)/iso_8859_14.c regenc.h win32/config.h
+$(WORKDIR)/iso_8859_15.o: $(encdir)/iso_8859_15.c regenc.h win32/config.h
+$(WORKDIR)/iso_8859_16.o: $(encdir)/iso_8859_16.c regenc.h win32/config.h
+#$(WORKDIR)/koi8.o:       $(encdir)/koi8.c   regenc.h win32/config.h
+$(WORKDIR)/koi8_r.o:     $(encdir)/koi8_r.c regenc.h win32/config.h
+$(WORKDIR)/koi8_u.o:     $(encdir)/koi8_u.c regenc.h win32/config.h
+$(WORKDIR)/windows_1250.o: $(encdir)/windows_1250.c regenc.h win32/config.h
+$(WORKDIR)/windows_1251.o: $(encdir)/windows_1251.c regenc.h win32/config.h
+$(WORKDIR)/windows_1252.o: $(encdir)/windows_1252.c regenc.h win32/config.h
+$(WORKDIR)/windows_1253.o: $(encdir)/windows_1253.c regenc.h win32/config.h
+$(WORKDIR)/windows_1254.o: $(encdir)/windows_1254.c regenc.h win32/config.h
+$(WORKDIR)/windows_1257.o: $(encdir)/windows_1257.c regenc.h win32/config.h
+$(WORKDIR)/big5.o:       $(encdir)/big5.c   regenc.h win32/config.h
+$(WORKDIR)/gb18030.o:    $(encdir)/gb18030.c   regenc.h win32/config.h
+
+$(WORKDIR)/onigmo.o: win32/onigmo.rc onigmo.h
 
 
-# Ruby test
-rtest:
-	$(RUBYDIR)\win32\ruby -w -Ke test.rb
+# Tests
+test: all ctest utest ptest pytest
 
 # C library test
-ctest: $(testc)
-	.\$(testc)
+ctest: $(WORKDIR)/$(testc)
+	$(WORKDIR)/$(testc)
+
+# C library test (Unicode)
+utest: $(WORKDIR)/$(testcu)
+	$(WORKDIR)/$(testcu)
 
 # POSIX C library test
-ptest: $(testp)
-	.\$(testp)
+ptest: $(WORKDIR)/$(testp)
+	$(WORKDIR)/$(testp)
 
-$(testc): $(testc).c $(libname)
-	$(CC) -o $(testc) -DONIG_EXTERN=extern $(testc).c $(libname)
+# Python test
+pytest:
+	cd $(WORKDIR) && $(PYTHON) ../testpy.py EUC-JP
+	cd $(WORKDIR) && $(PYTHON) ../testpy.py SJIS
+	cd $(WORKDIR) && $(PYTHON) ../testpy.py UTF-8
+	cd $(WORKDIR) && $(PYTHON) ../testpy.py UTF-16LE
+	cd $(WORKDIR) && $(PYTHON) ../testpy.py UTF-16BE
+	cd $(WORKDIR) && $(PYTHON) ../testpy.py UTF-32LE
+	cd $(WORKDIR) && $(PYTHON) ../testpy.py UTF-32BE
 
-$(testp): $(testc).c $(dlllib)
-	$(CC) -DPOSIX_TEST -o $(testp) $(testc).c $(dlllib)
+
+$(WORKDIR)/$(testc): win32/$(testc).c $(libname)
+	$(CC) $(CFLAGS) -o $(WORKDIR)/$(testc) -DONIG_EXTERN=extern win32/$(testc).c -I. $(libname)
+
+$(WORKDIR)/$(testp): win32/$(testc).c $(dlllib)
+	$(CC) $(CFLAGS) -DPOSIX_TEST -o $(WORKDIR)/$(testp) win32/$(testc).c -I. $(dlllib)
 
 #$(testc)u.c: test.rb testconvu.rb
 #	ruby -Ke testconvu.rb test.rb > $@
 
-$(testcu): $(testcu).c $(libname)
-	$(CC) -o $(testcu) -DONIG_EXTERN=extern $(testcu).c $(libname)
+$(WORKDIR)/$(testcu): $(testcu).c $(libname)
+	$(CC) $(CFLAGS) -o $(WORKDIR)/$(testcu) -DONIG_EXTERN=extern $(testcu).c -I. $(libname)
 
-$(libbase).def: win32\makedef.py oniguruma.h regenc.h oniggnu.h onigposix.h
-	$(PYTHON) win32\makedef.py > $@
+$(libbase).def: win32/makedef.py onigmo.h regenc.h onigmognu.h onigmoposix.h
+	$(PYTHON) win32/makedef.py > $@
 
 clean:
-	-rm -f *.o $(encdir)/*.o *.a *.dll $(testp).exe $(testc).exe $(testcu).exe win32/*.res
-
-
-# backup file suffix
-SORIG = ruby_orig
-
-# ruby 1.9 source update
-19:
-	$(CP) regerror.c    $(RUBYDIR)
-	$(CP) regparse.c    $(RUBYDIR)
-	$(CP) regcomp.c     $(RUBYDIR)
-	$(CP) regexec.c     $(RUBYDIR)
-	$(CP) regenc.c      $(RUBYDIR)
-	$(CP) regint.h      $(RUBYDIR)
-	$(CP) regparse.h    $(RUBYDIR)
-	$(CP) regenc.h      $(RUBYDIR)
-	$(CP) oniguruma.h   $(RUBYDIR)
-	$(CP) enc\ascii.c   $(RUBYDIR)
-	$(CP) enc\utf8.c    $(RUBYDIR)
-	$(CP) enc\euc_jp.c  $(RUBYDIR)
-	$(CP) enc\sjis.c    $(RUBYDIR)
-	$(CP) enc\unicode.c $(RUBYDIR)
+	-$(RMDIR) $(WORKDIR)
 
 
 samples: all
-	$(CC) $(CFLAGS) -I. -o simple  sample\simple.c  $(dlllib)
-	$(CC) $(CFLAGS) -I. -o posix   sample\posix.c   $(dlllib)
-	$(CC) $(CFLAGS) -I. -o names   sample\names.c   $(dlllib)
-	$(CC) $(CFLAGS) -I. -o listcap sample\listcap.c $(dlllib)
-	$(CC) $(CFLAGS) -I. -o sql     sample\sql.c     $(dlllib)
-	$(CC) $(CFLAGS) -I. -o encode  sample\encode.c  $(dlllib)
-	$(CC) $(CFLAGS) -I. -o syntax  sample\syntax.c  $(dlllib)
-	$(CC) $(CFLAGS) -I. -o crnl    sample\crnl.c    $(dlllib)
+	$(CC) $(CFLAGS) -I. -o $(WORKDIR)/simple  sample\simple.c  $(dlllib)
+	$(CC) $(CFLAGS) -I. -o $(WORKDIR)/posix   sample\posix.c   $(dlllib)
+	$(CC) $(CFLAGS) -I. -o $(WORKDIR)/names   sample\names.c   $(dlllib)
+	$(CC) $(CFLAGS) -I. -o $(WORKDIR)/listcap sample\listcap.c $(dlllib)
+	$(CC) $(CFLAGS) -I. -o $(WORKDIR)/sql     sample\sql.c     $(dlllib)
+	$(CC) $(CFLAGS) -I. -o $(WORKDIR)/encode  sample\encode.c  $(dlllib)
+	$(CC) $(CFLAGS) -I. -o $(WORKDIR)/syntax  sample\syntax.c  $(dlllib)
+	$(CC) $(CFLAGS) -I. -o $(WORKDIR)/crnl    sample\crnl.c    $(dlllib)

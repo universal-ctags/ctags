@@ -1,8 +1,6 @@
-#!/usr/local/bin/ruby -Ke
+#!/usr/local/bin/ruby
 # testconvu.rb
 # Copyright (C) 2004-2006  K.Kosako (sndgk393 AT ybb DOT ne DOT jp)
-
-require 'iconv'
 
 WINDOWS = (ARGV.size > 0 && /^-win/i =~ ARGV[0])
 ARGV.shift if WINDOWS
@@ -10,14 +8,11 @@ ARGV.shift if WINDOWS
 BIG_ENDIAN    = 1
 LITTLE_ENDIAN = 2
 
-ICV_BE = Iconv.new('UTF-16BE', 'EUC-JP')
-ICV_LE = Iconv.new('UTF-16LE', 'EUC-JP')
-
 def eucjp_char_pos(s, byte_pos)
   pos = 0
   i   = 0
   while (i < byte_pos)
-    x = s[i]
+    x = s[i].ord
     if ((x >= 0xa1 && x <= 0xfe) || x == 0x8e)
       i += 2
     elsif (x == 0x8f)
@@ -33,7 +28,7 @@ end
 def utf16_byte_pos(endian, s, char_pos)
   i = 0
   while (char_pos > 0)
-    x = (endian == BIG_ENDIAN ? s[i] : s[i+1])
+    x = (endian == BIG_ENDIAN ? s[i] : s[i+1]).ord
     if (x >= 0xd8 && x <= 0xdb)
       i += 4
     else
@@ -59,14 +54,15 @@ end
 def conv_to_utf16(endian, s)
   begin
     if (endian == BIG_ENDIAN)
-      q = ICV_BE.iconv(s)
+      q = s.encode('UTF-16BE', 'EUC-JP')
     else
-      q = ICV_LE.iconv(s)
+      q = s.encode('UTF-16LE', 'EUC-JP')
     end
-  rescue Iconv::InvalidCharacter
+    q.force_encoding('ASCII-8BIT')
+  rescue Encoding::InvalidByteSequenceError
     q = 'Invalid character'
-  rescue Iconv::IllegalSequence
-    STDERR.printf("Iconv::IllegalSequence: [%s]\n", s)
+  rescue Encoding::UndefinedConversionError
+    STDERR.printf("Encoding::UndefinedConversionError: [%s]\n", s)
     return ''
   end
 
@@ -117,6 +113,7 @@ def conv_str(endian, s, from, to)
     q.gsub!(/\\x([0-9A-Fa-f]{2})/) { $1.to_i(16).chr }
   end
 
+  q.force_encoding('ASCII-8BIT')
   from = from.to_i
   to   = to.to_i
   eucjp_from = eucjp_char_pos(q, from)
@@ -136,9 +133,9 @@ print(<<"EOS")
 #include<stdio.h>
 
 #ifdef POSIX_TEST
-#include "onigposix.h"
+#include "onigmoposix.h"
 #else
-#include "oniguruma.h"
+#include "onigmo.h"
 #endif
 
 static int nsucc  = 0;
@@ -238,7 +235,7 @@ static void xx(char* pattern, char* str, int from, int to, int mem, int not)
       }
       else {
         fprintf(stdout, "FAIL: /%s/ '%s' %d-%d : %d-%d\\n", cpat, cstr,
-	        from, to, pmatch[mem].rm_so, pmatch[mem].rm_eo);
+	        (int)from, (int)to, (int)pmatch[mem].rm_so, (int)pmatch[mem].rm_eo);
         nfail++;
       }
     }
@@ -274,7 +271,7 @@ static void xx(char* pattern, char* str, int from, int to, int mem, int not)
 
   if (r) {
     char s[ONIG_MAX_ERROR_MESSAGE_LEN];
-    onig_error_code_to_str(s, r, &einfo);
+    onig_error_code_to_str((UChar* )s, r, &einfo);
     fprintf(err_file, "ERROR: %s\\n", s);
     nerror++;
     return ;
@@ -285,7 +282,7 @@ static void xx(char* pattern, char* str, int from, int to, int mem, int not)
 		  region, ONIG_OPTION_NONE);
   if (r < ONIG_MISMATCH) {
     char s[ONIG_MAX_ERROR_MESSAGE_LEN];
-    onig_error_code_to_str(s, r);
+    onig_error_code_to_str((UChar* )s, r);
     fprintf(err_file, "ERROR: %s\\n", s);
     nerror++;
     return ;
@@ -313,7 +310,7 @@ static void xx(char* pattern, char* str, int from, int to, int mem, int not)
       }
       else {
         fprintf(stdout, "FAIL: /%s/ '%s' %d-%d : %d-%d\\n", cpat, cstr,
-	        from, to, region->beg[mem], region->end[mem]);
+	        (int)from, (int)to, (int)region->beg[mem], (int)region->end[mem]);
         nfail++;
       }
     }
@@ -399,9 +396,6 @@ File::open(ARGV[0]) { |fp|
 #File::open(ARGV[0]) { |fp|
 #  convert(LITTLE_ENDIAN, fp)
 #}
-
-ICV_BE.close
-ICV_LE.close
 
 print(<<'EOS')
   fprintf(stdout,

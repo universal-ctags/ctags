@@ -3,7 +3,7 @@
 **********************************************************************/
 /*-
  * Copyright (c) 2002-2006  K.Kosako  <sndgk393 AT ybb DOT ne DOT jp>
- * Copyright (c) 2011-2012  K.Takata  <kentkt AT csc DOT jp>
+ * Copyright (c) 2011-2016  K.Takata  <kentkt AT csc DOT jp>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -30,7 +30,7 @@
 
 #include "regint.h"
 
-OnigSyntaxType OnigSyntaxASIS = {
+const OnigSyntaxType OnigSyntaxASIS = {
     0
   , ONIG_SYN_OP2_INEFFECTIVE_ESCAPE
   , 0
@@ -46,7 +46,7 @@ OnigSyntaxType OnigSyntaxASIS = {
   }
 };
 
-OnigSyntaxType OnigSyntaxPosixBasic = {
+const OnigSyntaxType OnigSyntaxPosixBasic = {
   ( SYN_POSIX_COMMON_OP | ONIG_SYN_OP_ESC_LPAREN_SUBEXP |
     ONIG_SYN_OP_ESC_BRACE_INTERVAL )
   , 0
@@ -63,7 +63,7 @@ OnigSyntaxType OnigSyntaxPosixBasic = {
   }
 };
 
-OnigSyntaxType OnigSyntaxPosixExtended = {
+const OnigSyntaxType OnigSyntaxPosixExtended = {
   ( SYN_POSIX_COMMON_OP | ONIG_SYN_OP_LPAREN_SUBEXP |
     ONIG_SYN_OP_BRACE_INTERVAL |
     ONIG_SYN_OP_PLUS_ONE_INF | ONIG_SYN_OP_QMARK_ZERO_ONE | ONIG_SYN_OP_VBAR_ALT )
@@ -84,7 +84,7 @@ OnigSyntaxType OnigSyntaxPosixExtended = {
   }
 };
 
-OnigSyntaxType OnigSyntaxEmacs = {
+const OnigSyntaxType OnigSyntaxEmacs = {
   ( ONIG_SYN_OP_DOT_ANYCHAR | ONIG_SYN_OP_BRACKET_CC |
     ONIG_SYN_OP_ESC_BRACE_INTERVAL |
     ONIG_SYN_OP_ESC_LPAREN_SUBEXP | ONIG_SYN_OP_ESC_VBAR_ALT |
@@ -105,7 +105,7 @@ OnigSyntaxType OnigSyntaxEmacs = {
   }
 };
 
-OnigSyntaxType OnigSyntaxGrep = {
+const OnigSyntaxType OnigSyntaxGrep = {
   ( ONIG_SYN_OP_DOT_ANYCHAR | ONIG_SYN_OP_BRACKET_CC | ONIG_SYN_OP_POSIX_BRACKET |
     ONIG_SYN_OP_ESC_BRACE_INTERVAL | ONIG_SYN_OP_ESC_LPAREN_SUBEXP |
     ONIG_SYN_OP_ESC_VBAR_ALT |
@@ -127,7 +127,7 @@ OnigSyntaxType OnigSyntaxGrep = {
   }
 };
 
-OnigSyntaxType OnigSyntaxGnuRegex = {
+const OnigSyntaxType OnigSyntaxGnuRegex = {
   SYN_GNU_REGEX_OP
   , 0
   , SYN_GNU_REGEX_BV
@@ -143,7 +143,7 @@ OnigSyntaxType OnigSyntaxGnuRegex = {
   }
 };
 
-OnigSyntaxType OnigSyntaxJava = {
+const OnigSyntaxType OnigSyntaxJava = {
   (( SYN_GNU_REGEX_OP | ONIG_SYN_OP_QMARK_NON_GREEDY |
      ONIG_SYN_OP_ESC_CONTROL_CHARS | ONIG_SYN_OP_ESC_C_CONTROL |
      ONIG_SYN_OP_ESC_OCTAL3 | ONIG_SYN_OP_ESC_X_HEX2 )
@@ -168,7 +168,7 @@ OnigSyntaxType OnigSyntaxJava = {
 };
 
 /* Perl 5.8 */
-OnigSyntaxType OnigSyntaxPerl58 = {
+const OnigSyntaxType OnigSyntaxPerl58 = {
   (( SYN_GNU_REGEX_OP | ONIG_SYN_OP_QMARK_NON_GREEDY |
      ONIG_SYN_OP_ESC_OCTAL3 | ONIG_SYN_OP_ESC_X_HEX2 |
      ONIG_SYN_OP_ESC_X_BRACE_HEX8 | ONIG_SYN_OP_ESC_CONTROL_CHARS |
@@ -194,7 +194,7 @@ OnigSyntaxType OnigSyntaxPerl58 = {
 };
 
 /* Perl 5.8 + named group */
-OnigSyntaxType OnigSyntaxPerl58_NG = {
+const OnigSyntaxType OnigSyntaxPerl58_NG = {
   (( SYN_GNU_REGEX_OP | ONIG_SYN_OP_QMARK_NON_GREEDY |
      ONIG_SYN_OP_ESC_OCTAL3 | ONIG_SYN_OP_ESC_X_HEX2 |
      ONIG_SYN_OP_ESC_X_BRACE_HEX8 | ONIG_SYN_OP_ESC_CONTROL_CHARS |
@@ -225,11 +225,11 @@ OnigSyntaxType OnigSyntaxPerl58_NG = {
 };
 
 /* Perl 5.10+ */
-OnigSyntaxType OnigSyntaxPerl = {
+const OnigSyntaxType OnigSyntaxPerl = {
   (( SYN_GNU_REGEX_OP | ONIG_SYN_OP_QMARK_NON_GREEDY |
      ONIG_SYN_OP_ESC_OCTAL3 | ONIG_SYN_OP_ESC_X_HEX2 |
      ONIG_SYN_OP_ESC_X_BRACE_HEX8 | ONIG_SYN_OP_ESC_CONTROL_CHARS |
-     ONIG_SYN_OP_ESC_C_CONTROL )
+     ONIG_SYN_OP_ESC_O_BRACE_OCTAL | ONIG_SYN_OP_ESC_C_CONTROL )
    & ~ONIG_SYN_OP_ESC_LTGT_WORD_BEGIN_END )
   , ( ONIG_SYN_OP2_ESC_CAPITAL_Q_QUOTE |
       ONIG_SYN_OP2_QMARK_GROUP_EFFECT | ONIG_SYN_OP2_OPTION_PERL |
@@ -248,7 +248,8 @@ OnigSyntaxType OnigSyntaxPerl = {
       ONIG_SYN_OP2_ESC_K_NAMED_BACKREF )
   , ( SYN_GNU_REGEX_BV |
       ONIG_SYN_ALLOW_MULTIPLEX_DEFINITION_NAME |
-      ONIG_SYN_ALLOW_MULTIPLEX_DEFINITION_NAME_CALL )
+      ONIG_SYN_ALLOW_MULTIPLEX_DEFINITION_NAME_CALL |
+      ONIG_SYN_USE_LEFT_MOST_NAMED_GROUP )
   , ( ONIG_OPTION_SINGLELINE | ONIG_OPTION_CAPTURE_GROUP )
   ,
   {
@@ -261,7 +262,7 @@ OnigSyntaxType OnigSyntaxPerl = {
   }
 };
 
-OnigSyntaxType OnigSyntaxPython = {
+const OnigSyntaxType OnigSyntaxPython = {
   (( SYN_GNU_REGEX_OP | ONIG_SYN_OP_QMARK_NON_GREEDY |
      ONIG_SYN_OP_ESC_OCTAL3 | ONIG_SYN_OP_ESC_X_HEX2 |
      ONIG_SYN_OP_ESC_X_BRACE_HEX8 | ONIG_SYN_OP_ESC_CONTROL_CHARS |
@@ -292,7 +293,7 @@ OnigSyntaxType OnigSyntaxPython = {
 
 
 extern int
-onig_set_default_syntax(OnigSyntaxType* syntax)
+onig_set_default_syntax(const OnigSyntaxType* syntax)
 {
   if (IS_NULL(syntax))
     syntax = ONIG_SYNTAX_RUBY;
@@ -332,25 +333,25 @@ onig_set_syntax_options(OnigSyntaxType* syntax, OnigOptionType options)
 }
 
 extern unsigned int
-onig_get_syntax_op(OnigSyntaxType* syntax)
+onig_get_syntax_op(const OnigSyntaxType* syntax)
 {
   return syntax->op;
 }
 
 extern unsigned int
-onig_get_syntax_op2(OnigSyntaxType* syntax)
+onig_get_syntax_op2(const OnigSyntaxType* syntax)
 {
   return syntax->op2;
 }
 
 extern unsigned int
-onig_get_syntax_behavior(OnigSyntaxType* syntax)
+onig_get_syntax_behavior(const OnigSyntaxType* syntax)
 {
   return syntax->behavior;
 }
 
 extern OnigOptionType
-onig_get_syntax_options(OnigSyntaxType* syntax)
+onig_get_syntax_options(const OnigSyntaxType* syntax)
 {
   return syntax->options;
 }

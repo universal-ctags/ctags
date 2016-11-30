@@ -1,5 +1,146 @@
 History of Onigmo (Oniguruma-mod)
 
+2016/xx/xx: Version 6.0.0
+
+2016/12/01: [bug]  Import Ruby r56924
+                   Fix uppercasing for U+A64B.
+2016/11/30: [bug]  Partial fix for wrong capture in subexp call. (Issue #48)
+2016/11/28: [impl] Import the latest version of st.c from Ruby. (Issue #70)
+                   Import Ruby r56793 with some modifications.
+2016/11/28: [API]  Add onig_{get,set}_parse_depth_limit().
+2016/11/28: [bug]  Fix stack overflow when parsing deeply nested capture
+                   groups. (Issue #68)
+2016/11/26: [bug]  Fix multiple name groups in Perl syntax. (Issue #74)
+2016/11/18: [impl] Enable multiprocess build on VC2010+.
+2016/11/17: [bug]  Fix wrong optimization for gpos. (Issue #53)
+2016/11/15: [impl] Drop support for old compilers which don't have string.h.
+2016/11/15: [impl] Add ONIG_DEBUG_MEMLEAK for MSVC.
+2016/11/14: [API]  Add onig_initialize() for compatibility to Oniguruma 6.0.
+2016/11/11: [doc]  Clarify the behavior of multiple defined names.
+2016/11/11: [API]  Add onig_scan().
+                   Imported from oniguruma.
+2016/11/09: [impl] Disable OP_PUSH_OR_JUMP_EXACT1.
+2016/11/07: [API]  Remove onigenc_set_default_caseconv_table().
+2016/11/07: [impl] Remove all THREAD_* macros.
+                   Imported from oniguruma.
+2016/11/07: [impl] Remove USE_RECOMPILE_API and state member of regex.
+                   Imported from oniguruma.
+2016/11/04: [spec] Drop support for very old compilers (Issue #72)
+                   ANSI C89 is required now.
+2016/11/03: [dist] Add lcov and lcov-clear targets to Makefile.
+2016/11/03: [bug]  Restore option when fetch_token fails.
+                   Found by Coverity Scan.
+2016/11/03: [bug]  Check return value of add_code_range0()
+                   Found by Coverity Scan.
+2016/11/03: [spec] Check redundant double repeat with number. E.g.: /.{1,}{1,}/
+                   Hint by Coverity Scan.
+2016/11/02: [impl] Support ONIG_DEBUG_STATISTICS on Win32.
+2016/11/02: [bug]  Fix illegal memory access with (?(700000)) (Issue #65)
+2016/11/01: [bug]  Fix that warnings are not shown properly on UTF-16/32.
+2016/10/31: [bug]  Fix out of memory /'\/g\\\xff\xff\xff\xff&))/.
+                   Imported from oniguruma.
+2016/10/29: [bug]  Fix use after free for regexp /()(?\!(?'a')\1)/.
+                   Imported from oniguruma.
+2016/10/26: [new]  Support \uHHHH in Ruby syntax.
+2016/10/26: [new]  Support \o{OOO} in Perl syntax.
+2016/10/24: [test] Add minimal tests for backward search and onig_match()
+                   (Issue #26)
+2016/10/22: [bug]  Fix infinite loop of backreference and group (Issue #65)
+                   Imported from oniguruma.
+2016/10/21: [impl] Import Ruby r56433
+                   Implement non-ASCII case conversion for Windows-1254.
+2016/10/20: [API]  Add const.
+2016/10/19: [impl] (thanks ksss)
+                   Suppress warnings [-Wpointer-sign] (PR #64)
+2016/10/18: [bug]  Fix ignore case in look-behind (Issue #18)
+                   Imported from oniguruma.
+2016/10/15: [dist] Win32: Rewrite makefiles
+                     * Use separate build directories for x86/x64. (Issue #67)
+                     * Add "test", "utest" and "pytest" targets.
+                     * Change include directory.
+2016/10/15: [spec] Support XPosixPunct (Issue #42)
+                   Behavior of /[[:punct:]]/ in Unicode is changed now.
+2016/10/11: [bug]  Import Ruby r55562
+                   Don't optimize out group 0.
+2016/10/10: [dist] Update LTVERSION to "6:0:0".
+2016/10/10: [API]  Rename oniguruma and onig to onigmo. (Issue #66)
+                   E.g.:
+                     * oniguruma.h -> onigmo.h
+                     * libonig.{a,so} -> libonigmo.{a,so}
+                     * onig.dll -> onigmo.dll
+                   Now Onigmo will not conflict with Oniguruma.
+2016/10/08: [impl] Merge ruby-2.x branch.
+                   Now the source codes of Onigmo library and its embedded
+                   version in Ruby are merged. Ruby specific parts are
+                   surrounded by "#ifdef RUBY ... #endif".
+                   Note that Ruby specific version of onig_compile() is now
+                   renamed to onig_compile_ruby().
+2016/10/08: [impl] Import the latest files from Ruby r55740.
+2016/10/08: [impl] Import Ruby r51710
+                   Constify property_name_to_ctype arguments.
+2016/10/08: [new]  Import the latest enc/* files from Ruby r56090. This
+                   includes the following:
+                     * Update to Unicode 9.0.0.
+                     * Support case mapping. (by Martin Dürst)
+2016/10/07: [impl] Import Ruby r56333
+                   Make the shown address look relative.
+2016/10/06: [impl] Import Ruby r53610
+2016/10/06: [impl] Import Ruby r55155
+2016/10/06: [impl] Import Ruby r55203
+2016/10/06: [bug]  Import Ruby r56332
+                   Fix showing opcode.
+2016/10/06: [bug]  Import Ruby r53543
+                   Fix UNALIGNED_WORD_ACCESS.
+2016/10/06: [bug]  Import Ruby r55163
+                   Raise error if given octal escaped character is too big.
+2016/10/06: [bug]  Import Ruby r54954
+                   Fix memory leak.
+2016/10/06: [bug]  Import Ruby r55157
+                   Fix debug conditionals.
+2016/10/06: [bug]  Import Ruby r55154
+                   Return error code immediately if compile_length_tree raised
+                   error.
+2016/10/06: [impl] Import Ruby r55202
+                   Make compilers optimize harder.
+2016/10/06: [impl] Import Ruby r54741
+                   Constify oplabels.
+2016/10/06: [bug]  Import Ruby r53248, r53251
+                   Fix build with direct threaded VM.
+2016/10/06: [bug]  Import Ruby r52999
+                   Get rid of breaking strict aliasing.
+2016/10/06: [impl] Import Ruby r52757
+                   Remove trailing spaces.
+2016/10/03: [dist] Update config.guess and config.sub. (PR #57, Issue #61)
+2016/10/03: [impl] (thanks Kouhei Sutou)
+                   Support --enable-mutlithread for MinGW build. (PR #54)
+2016/10/03: [tune] (thanks KeenS)
+                   Implement Direct Threaded VM. (Issue #51, PR #52)
+2015/09/13: [impl] (thanks Kouhei Sutou)
+                   Add "const" to not changed strings. (PR #50)
+2015/09/13: [impl] (thanks Kouhei Sutou)
+                   Remove needless prototype declaration. (PR #49)
+2015/09/13: [dist] (thanks Sebastian Godelet)
+                   Add build_nmake script for building with nmake. (PR #47)
+2015/09/13: [dist] (thanks Kazuho Oku)
+                   Fix build error on systems using BSD make. (PR #55)
+2015/05/11: [impl] Import Ruby r50392
+                   Reject values larger than UTF-8 max codepoints.
+2015/05/11: [impl] Import Ruby r49025
+                   Get rid of usage of uninitialized variable.
+2015/05/11: [impl] Import Ruby r49021
+                   Fix printf format conversion specifiers.
+2015/01/21: [dist] Merge Oniguruma 5.9.6
+2014/11/04: [bug]  Import Ruby r47996
+                   Avoid undefined behaviors found by gcc -fsanitize=undefined.
+2014/09/26: [dist] (thanks Kouhei Sutou)
+                   Add -no-undefine link flag (PR #45)
+2014/09/23: [impl] Import the latest st.[ch] from Ruby r47675
+2014/09/20: [bug]  Fix possible memory leaks.
+2014/09/17: [impl] Merge Ruby r47602
+                   Shrink PosixBracketEntryType.
+2014/09/17: [impl] Merge Ruby r47601
+                   Remove unused variable.
+
 2014/09/11: Version 5.15.0
 
 2014/09/11: [dist] update LTVERSION to "5:3:0".
@@ -73,7 +214,7 @@ History of Onigmo (Oniguruma-mod)
                         OK: /a+b+/ 'aab'
 
 2014/04/12: [new]  (thanks mattn)
-                   Fix build on mingw (Issue #33)
+                   Fix build on mingw (PR #33)
 2014/04/12: [new]  improve multithread support
                    Add the default multithread implementations for Win32 and
                    Unix. Add --enable-multithread option in configure.
@@ -83,12 +224,12 @@ History of Onigmo (Oniguruma-mod)
                    see: https://bugs.ruby-lang.org/issues/8716
 2014/01/22: [new]  (thanks Allan Odgaard)
                    Add option to indicate search range is not begin/end of
-                   string (Issue #27)
+                   string (PR #27)
 2014/01/22: [bug]  fix: Backwards search not respecting range (Issue #22)
 2014/01/21: [dist] Merge Oniguruma 5.9.5
 2013/07/29: [new]  (thanks Allan Odgaard)
                    Add 'ifndef ... endif' guard around thread locking macros
-                   (Issue #23)
+                   (PR #23)
 
 2013/07/03: Version 5.13.5
 
