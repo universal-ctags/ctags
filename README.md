@@ -53,6 +53,7 @@ Install
 ### Case 2: Windows 64/32bit platform (Visual C++)
 
    Execute `build_nmake.cmd`.
+   `build_x64` or `build_x86` will be used as a working/output directory.
 
       onigmo_s.lib:  static link library
       onigmo.lib:    import library for dynamic link
@@ -67,6 +68,8 @@ Install
 ### Case 3: Windows 64/32bit platform (MinGW)
 
    Execute `mingw32-make -f win32/Makefile.mingw`.
+   `build_x86-64`, `build_i686` and etc. will be used as a working/output
+   directory.
 
       libonigmo.a:     static link library
       libonigmo.dll.a: import library for dynamic link

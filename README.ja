@@ -1,13 +1,15 @@
-README.ja  2014/07/18
+README.ja  2016/11/30
 
 鬼雲 (鬼車改)  --  (C) K.Takata <kentkt AT csc DOT jp>
 
 https://github.com/k-takata/Onigmo
 
 鬼雲は、鬼車から派生した正規表現ライブラリである。
-Perl 5.10以降で新たに導入された正規表現の一部が使用可能になっている。
+Perl 5.10以降で導入された `\K`, `\R`, `(?(cond)yes|no)` などの新たな
+正規表現をサポートすることに注力している。
 
-一部のパッチは Ruby 2.x からマージしている。
+鬼雲は、Ruby 2.0以降の標準の正規表現ライブラリであるため、多くのパッチが
+Ruby 2.xからバックポートされている。
 
 Wikiページも参照のこと。
 https://github.com/k-takata/Onigmo/wiki
@@ -23,20 +25,20 @@ https://github.com/k-takata/Onigmo/wiki
     onig_search_gpos (Perl互換の \G 用)
 
   エンコーディング:
-    CP932
+    CP932, CP1250, CP1251, CP1252, CP1253, CP1254, CP1257
 
   文法:
     Python
 
 
 新規ソースファイル:
-  enc/cp932.c                   CP932 エンコーディング
   enc/jis/props.h               JIS 文字プロパティーデータ
   enc/jis/props.kwd             JIS 文字プロパティーデータ
   enc/unicode/casefold.h        Unicodeケースフォールドデータ
   enc/unicode/name2ctype.h      Unicodeプロパティデータ
+  enc/windows_*.c               CP*エンコーディング
 
-  onig.py                       onig.dll/libonig.so ローダ
+  onigmo.py                     onigmo.dll/libonigmo.so ローダ
   testpy.py                     テストプログラム
 
   tool/download-ucd.sh          Unicode Character Database (UCD)をダウンロード
@@ -46,8 +48,8 @@ https://github.com/k-takata/Onigmo/wiki
   tool/enc-unicode.rb           UCDからname2ctype.kwdを生成
 
   win32/Makefile.mingw          Win32用 Makefile (for MinGW)
-  win32/makedef.py              onig.defを作成
-  win32/onig.rc                 onig.dll用リソースファイル
+  win32/makedef.py              onigmo.defを作成
+  win32/onigmo.rc               onigmo.dll用リソースファイル
 
 
 ToDo:

@@ -1,13 +1,15 @@
-README  2014/07/18
+README  2016/11/30
 
 Onigmo (Oniguruma-mod)  --  (C) K.Takata <kentkt AT csc DOT jp>
 
 https://github.com/k-takata/Onigmo
 
 Onigmo is a regular expressions library forked from Oniguruma.
-Some of new features introduced in Perl 5.10+ can be used.
+It focuses to support new expressions like `\K`, `\R`, `(?(cond)yes|no)`
+and etc. which are supported in Perl 5.10+.
 
-Some patches are merged from Ruby 2.x.
+Since Onigmo is used as the default regexp library of Ruby 2.0 or later,
+many patches are backported from Ruby 2.x.
 
 See also the Wiki page:
 https://github.com/k-takata/Onigmo/wiki
@@ -23,20 +25,20 @@ Main New features:
     onig_search_gpos (for Perl-compatible \G)
 
   Encoding:
-    CP932
+    CP932, CP1250, CP1251, CP1252, CP1253, CP1254, CP1257
 
   Syntax:
     Python
 
 
 New Source Files:
-  enc/cp932.c                   CP932 encoding.
   enc/jis/props.h               JIS character properties data.
   enc/jis/props.kwd             JIS character properties data.
   enc/unicode/casefold.h        Unicode case folding data.
   enc/unicode/name2ctype.h      Unicode properties data.
+  enc/windows_*.c               CP* encoding
 
-  onig.py                       onig.dll/libonig.so loader.
+  onigmo.py                     onigmo.dll/libonigmo.so loader.
   testpy.py                     test program.
 
   tool/download-ucd.sh          downloads Unicode Character Database (UCD).
@@ -46,8 +48,8 @@ New Source Files:
   tool/enc-unicode.rb           generates name2ctype.kwd from UCD.
 
   win32/Makefile.mingw          Makefile for Win32 (MinGW)
-  win32/makedef.py              creates onig.def.
-  win32/onig.rc                 resource file for onig.dll.
+  win32/makedef.py              creates onigmo.def.
+  win32/onigmo.rc               resource file for onigmo.dll.
 
 
 ToDo:
