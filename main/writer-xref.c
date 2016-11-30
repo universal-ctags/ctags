@@ -16,7 +16,8 @@
 #include "writer.h"
 
 
-static int writeXrefEntry  (MIO * mio, const tagEntryInfo *const tag, void *data CTAGS_ATTR_UNUSED);
+static int writeXrefEntry  (tagWriter *writer CTAGS_ATTR_UNUSED,
+							MIO * mio, const tagEntryInfo *const tag);
 
 tagWriter xrefWriter = {
 	.writeEntry = writeXrefEntry,
@@ -26,7 +27,8 @@ tagWriter xrefWriter = {
 	.useStdoutByDefault = true,
 };
 
-static int writeXrefEntry (MIO * mio, const tagEntryInfo *const tag, void *data CTAGS_ATTR_UNUSED)
+static int writeXrefEntry (tagWriter *writer CTAGS_ATTR_UNUSED,
+						   MIO * mio, const tagEntryInfo *const tag)
 {
 	int length;
 	static fmtElement *fmt1;

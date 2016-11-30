@@ -472,3 +472,16 @@ Exceptions
    this exceptions. See {tagname} of Proposal section for more detail
    about the conversion.
 
+.. _compat-output:
+Compatible output and weakness
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. NOT REVIEWED YET
+
+Default behavior (``--output-format=u-ctags`` option) has the
+exceptions.  In ther hand, with ``--output-format=e-ctags`` option
+ctags has no exception; Universal-ctags command may use the same file
+format as Exuberant-ctags. However, ``--output-format=e-ctags`` throws
+away a tag entry which name includes a space or a tab
+character. ``TAG_OUTPUT_MODE`` psuedo tag tells which format is
+used when ctags generating tags file.

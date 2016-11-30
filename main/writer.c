@@ -8,21 +8,23 @@
 */
 
 #include "general.h"
+#include "entry.h"
 #include "writer.h"
 
-extern tagWriter ctagsWriter;
+extern tagWriter uCtagsWriter;
+extern tagWriter eCtagsWriter;
 extern tagWriter etagsWriter;
 extern tagWriter xrefWriter;
 extern tagWriter jsonWriter;
 
 static tagWriter *writerTable [WRITER_COUNT] = {
-	[WRITER_CTAGS] = &ctagsWriter,
+	[WRITER_U_CTAGS] = &uCtagsWriter,
+	[WRITER_E_CTAGS] = &eCtagsWriter,
 	[WRITER_ETAGS] = &etagsWriter,
 	[WRITER_XREF]  = &xrefWriter,
 	[WRITER_JSON]  = &jsonWriter,
 };
 
-static void *writerData;
 static tagWriter *writer;
 
 extern void setTagWriter (writerType wtype)
@@ -39,23 +41,26 @@ extern bool outputFormatUsedStdoutByDefault (void)
 extern void writerSetup (MIO *mio)
 {
 	if (writer->preWriteEntry)
-		writerData = writer->preWriteEntry (mio);
+		writer->private = writer->preWriteEntry (writer, mio);
 	else
-		writerData = NULL;
+		writer->private = NULL;
 }
 
-extern void writerTeardown (MIO *mio, const char *filename)
+extern bool writerTeardown (MIO *mio, const char *filename)
 {
 	if (writer->postWriteEntry)
 	{
-		writer->postWriteEntry (mio, filename, writerData);
-		writerData = NULL;
+		bool r;
+		r = writer->postWriteEntry (writer, mio, filename);
+		writer->private = NULL;
+		return r;
 	}
+	return false;
 }
 
 extern int writerWriteTag (MIO * mio, const tagEntryInfo *const tag)
 {
-	return writer->writeEntry (mio, tag, writerData);
+	return writer->writeEntry (writer, mio, tag);
 }
 
 extern int writerWritePtag (MIO * mio,
@@ -67,7 +72,29 @@ extern int writerWritePtag (MIO * mio,
 	if (writer->writePtagEntry == NULL)
 		return -1;
 
-	return writer->writePtagEntry (mio, desc, fileName,
-								   pattern, parserName, writerData);
+	return writer->writePtagEntry (writer, mio, desc, fileName,
+								   pattern, parserName);
 
+}
+
+extern void writerBuildFqTagCache (tagEntryInfo *const tag)
+{
+	if (writer->buildFqTagCache)
+		writer->buildFqTagCache (writer, tag);
+}
+
+
+extern bool ptagMakeCtagsOutputMode (ptagDesc *desc, void *data CTAGS_ATTR_UNUSED)
+{
+	const char *mode ="";
+
+	if (&uCtagsWriter == writer)
+		mode = "u-ctags";
+	else if (&eCtagsWriter == writer)
+		mode = "e-ctags";
+
+	return writePseudoTag (desc,
+						   mode,
+						   "u-ctags or e-ctags",
+						   NULL);
 }

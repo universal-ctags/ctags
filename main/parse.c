@@ -2435,7 +2435,7 @@ extern bool parseFile (const char *const fileName)
 			tagFileResized = createTagsWithXcmd (fileName, language, mio)? true: tagFileResized;
 #endif
 
-		teardownWriter (fileName);
+		tagFileResized = teardownWriter (fileName)? true: tagFileResized;
 
 		if (Option.filter)
 			closeTagFile (tagFileResized);

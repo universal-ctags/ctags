@@ -873,6 +873,14 @@ The third line means `\\` is used when for combining a namespace item
 Of course, ctags uses the more specific line when choosing a
 separator; the third line has higher priority than the first.
 
+``TAG_OUTPUT_MODE``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. NOT REVIEWED YET
+
+This pseudo tag represents output mode: u-ctags or e-ctags.
+
+See also :ref:`Compatible output and weakness <compat-output>`.
 
 Parser own fields
 ---------------------------------------------------------------------

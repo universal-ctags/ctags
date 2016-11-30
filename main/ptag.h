@@ -35,6 +35,7 @@ typedef enum ePtagType { /* pseudo tag content control */
 #endif
 	PTAG_KIND_SEPARATOR,
 	PTAG_KIND_DESCRIPTION,
+	PTAG_OUTPUT_MODE,
 	PTAG_COUNT
 } ptagType;
 

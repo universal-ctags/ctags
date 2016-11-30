@@ -1,0 +1,6 @@
+!_TAG_OUTPUT_MODE	e-ctags	/u-ctags or e-ctags/
+__construct	input.php	/^    public function __construct() {$/;"	f	class:foo\bar
+bar	input.php	/^class bar {$/;"	c	namespace:foo
+foo	input.php	/^namespace foo;$/;"	n
+foo\bar	input.php	/^class bar {$/;"	c	namespace:foo
+foo\bar::__construct	input.php	/^    public function __construct() {$/;"	f	class:foo\bar

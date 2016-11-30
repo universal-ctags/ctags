@@ -5,6 +5,6 @@ CTAGS=$1
 
 . ../utils.sh
 
-run_with_format ctags
+run_with_format u-ctags
 run_with_format etags
 run_with_format xref

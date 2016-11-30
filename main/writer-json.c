@@ -24,12 +24,14 @@
 #endif
 
 
-static int writeJsonEntry  (MIO * mio, const tagEntryInfo *const tag, void *data CTAGS_ATTR_UNUSED);
+static int writeJsonEntry  (tagWriter *writer CTAGS_ATTR_UNUSED,
+				MIO * mio, const tagEntryInfo *const tag);
 
-static int writeJsonPtagEntry (MIO * mio, const ptagDesc *desc,
+static int writeJsonPtagEntry (tagWriter *writer CTAGS_ATTR_UNUSED,
+				MIO * mio, const ptagDesc *desc,
 				const char *const fileName,
 				const char *const pattern,
-				const char *const parserName, void *data CTAGS_ATTR_UNUSED);
+				const char *const parserName);
 
 tagWriter jsonWriter = {
 	.writeEntry = writeJsonEntry,
@@ -42,7 +44,7 @@ tagWriter jsonWriter = {
 
 static json_t* escapeFieldValue (const tagEntryInfo * tag, fieldType ftype)
 {
-	const char *str = renderFieldEscaped (jsonWriter.type, ftype, tag, NO_PARSER_FIELD);
+	const char *str = renderFieldEscaped (jsonWriter.type, ftype, tag, NO_PARSER_FIELD, NULL);
 	if (str)
 		return json_string (str);
 	else
@@ -111,7 +113,8 @@ static void addExtensionFields (json_t *response, const tagEntryInfo *const tag)
 		renderExtensionFieldMaybe (k, tag, response);
 }
 
-static int writeJsonEntry (MIO * mio, const tagEntryInfo *const tag, void *data CTAGS_ATTR_UNUSED)
+static int writeJsonEntry (tagWriter *writer CTAGS_ATTR_UNUSED,
+			       MIO * mio, const tagEntryInfo *const tag)
 {
 	json_t *response = json_pack ("{ss ss ss ss}",
 		"_type", "tag",
@@ -136,10 +139,11 @@ static int writeJsonEntry (MIO * mio, const tagEntryInfo *const tag, void *data 
 	return length;
 }
 
-static int writeJsonPtagEntry (MIO * mio, const ptagDesc *desc,
+static int writeJsonPtagEntry (tagWriter *writer CTAGS_ATTR_UNUSED,
+			       MIO * mio, const ptagDesc *desc,
 			       const char *const fileName,
 			       const char *const pattern,
-			       const char *const parserName, void *data CTAGS_ATTR_UNUSED)
+			       const char *const parserName)
 {
 #define OPT(X) ((X)?(X):"")
 	json_t *response;

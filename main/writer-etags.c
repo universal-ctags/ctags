@@ -20,9 +20,9 @@
 #include "writer.h"
 
 
-static int writeEtagsEntry (MIO * mio, const tagEntryInfo *const tag, void *data);
-static void *beginEtagsFile (MIO * mio);
-static void  endEtagsFile   (MIO * mio, const char* filename, void *data);
+static int writeEtagsEntry  (tagWriter *writer, MIO * mio, const tagEntryInfo *const tag);
+static void *beginEtagsFile (tagWriter *writer, MIO * mio);
+static bool  endEtagsFile   (tagWriter *writer, MIO * mio, const char* filename);
 
 tagWriter etagsWriter = {
 	.writeEntry = writeEtagsEntry,
@@ -40,7 +40,7 @@ struct sEtags {
 
 
 
-static void *beginEtagsFile (MIO *mio)
+static void *beginEtagsFile (tagWriter *writer CTAGS_ATTR_UNUSED, MIO *mio)
 {
 	static struct sEtags etags = { NULL, NULL, 0, NULL };
 
@@ -50,10 +50,11 @@ static void *beginEtagsFile (MIO *mio)
 	return &etags;
 }
 
-static void endEtagsFile (MIO *mainfp, const char *filename, void *data)
+static bool endEtagsFile (tagWriter *writer,
+						  MIO *mainfp, const char *filename)
 {
 	const char *line;
-	struct sEtags *etags = data;
+	struct sEtags *etags = writer->private;
 
 	mio_printf (mainfp, "\f\n%s,%ld\n", filename, (long) etags->byteCount);
 	abort_if_ferror (mainfp);
@@ -73,12 +74,14 @@ static void endEtagsFile (MIO *mainfp, const char *filename, void *data)
 		etags->mio = NULL;
 		etags->name = NULL;
 	}
+	return false;
 }
 
-static int writeEtagsEntry (MIO * mio, const tagEntryInfo *const tag, void *data)
+static int writeEtagsEntry (tagWriter *writer,
+							MIO * mio, const tagEntryInfo *const tag)
 {
 	int length;
-	struct sEtags *etags = data;
+	struct sEtags *etags = writer->private;
 
 	mio = etags->mio;
 

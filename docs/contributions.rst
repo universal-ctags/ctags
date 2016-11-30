@@ -141,6 +141,7 @@ GNU style:
 		...
 
 non-GNU style:
+
 .. code-block:: C
 
 	if (...)

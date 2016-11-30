@@ -20,7 +20,8 @@
 
 typedef enum eWriterType {
 	WRITER_DEFAULT,
-	WRITER_CTAGS = WRITER_DEFAULT,
+	WRITER_U_CTAGS = WRITER_DEFAULT,
+	WRITER_E_CTAGS,
 	WRITER_ETAGS,
 	WRITER_XREF,
 	WRITER_JSON,
@@ -30,21 +31,29 @@ typedef enum eWriterType {
 struct sTagWriter;
 typedef struct sTagWriter tagWriter;
 struct sTagWriter {
-	int (* writeEntry) (MIO * mio, const tagEntryInfo *const tag, void *data);
-	int (* writePtagEntry) (MIO * mio, const ptagDesc *desc,
+	int (* writeEntry) (tagWriter *writer, MIO * mio, const tagEntryInfo *const tag);
+	int (* writePtagEntry) (tagWriter *writer, MIO * mio, const ptagDesc *desc,
 							const char *const fileName,
 							const char *const pattern,
-							const char *const parserName, void *data);
-	void * (* preWriteEntry) (MIO * mio);
-	void (* postWriteEntry)  (MIO * mio, const char* filename, void *data);
+							const char *const parserName);
+	void * (* preWriteEntry) (tagWriter *writer, MIO * mio);
+
+	/* Returning TRUE means the output file may be shrunk.
+	   In such case the callee may do truncate output file. */
+	bool (* postWriteEntry)  (tagWriter *writer, MIO * mio, const char* filename);
+	void (* buildFqTagCache) (tagWriter *writer, tagEntryInfo *const tag);
 	bool useStdoutByDefault;
 
+	/* The value returned from preWriteEntry is stored `private' field.
+	   The value must be released in postWriteEntry. */
+	void *private;
 	writerType type;
+
 };
 
 extern void setTagWriter (writerType otype);
 extern void writerSetup  (MIO *mio);
-extern void writerTeardown (MIO *mio, const char *filename);
+extern bool writerTeardown (MIO *mio, const char *filename);
 
 int writerWriteTag (MIO * mio, const tagEntryInfo *const tag);
 int writerWritePtag (MIO * mio,
@@ -52,6 +61,8 @@ int writerWritePtag (MIO * mio,
 					 const char *const fileName,
 					 const char *const pattern,
 					 const char *const parserName);
+
+extern void writerBuildFqTagCache (tagEntryInfo *const tag);
 
 extern bool outputFormatUsedStdoutByDefault (void);
 
@@ -64,5 +75,6 @@ extern void truncateTagLine (char *const line, const char *const token,
 extern void abort_if_ferror(MIO *const fp);
 
 extern bool ptagMakeJsonOutputVersion (ptagDesc *desc, void *data CTAGS_ATTR_UNUSED);
+extern bool ptagMakeCtagsOutputMode (ptagDesc *desc, void *data CTAGS_ATTR_UNUSED);
 
 #endif
