@@ -160,16 +160,24 @@ static int addExtensionFields (tagWriter *writer, MIO *mio, const tagEntryInfo *
 	char sep [] = {';', '"', '\0'};
 	int length = 0;
 
+	const char *str = NULL;;
+	const char kind_letter_str[2] = {tag->kind->letter, '\0'};
+
 	if (tag->kind->name != NULL && (isFieldEnabled (FIELD_KIND_LONG)  ||
 		 (isFieldEnabled (FIELD_KIND)  && tag->kind->letter == KIND_NULL)))
 	{
-		length += mio_printf (mio, kindFmt, sep, kindKey, tag->kind->name);
-		sep [0] = '\0';
+		/* Use kind long name */
+		str = tag->kind->name;
 	}
 	else if (tag->kind->letter != KIND_NULL  && (isFieldEnabled (FIELD_KIND) ||
 			(isFieldEnabled (FIELD_KIND_LONG) &&  tag->kind->name == NULL)))
 	{
-		char str[2] = {tag->kind->letter, '\0'};
+		/* Use kind letter */
+		str = kind_letter_str;
+	}
+
+	if (str)
+	{
 		length += mio_printf (mio, kindFmt, sep, kindKey, str);
 		sep [0] = '\0';
 	}
