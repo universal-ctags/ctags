@@ -8,7 +8,7 @@ History of Onigmo (Oniguruma-mod)
 2016/12/01: [impl] Import Ruby r56951
                    Constify CaseMappingSpecials.
 2016/12/01: [new]  Import Ruby r56949
-                   Regexp supports Unicoe 9.0.0's \X. (Issue #46)
+                   Regexp supports Unicode 9.0.0's \X. (Issue #46)
 2016/12/01: [bug]  Import Ruby r56924
                    Fix uppercasing for U+A64B.
 2016/11/30: [bug]  Partial fix for wrong capture in subexp call. (Issue #48)
