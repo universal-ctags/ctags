@@ -6084,11 +6084,10 @@ node_extended_grapheme_cluster(Node** np, ScanEnv* env)
     /* Emoji variation sequence
      * http://unicode.org/Public/emoji/4.0/emoji-zwj-sequences.txt
      */
-    np1 = node_new_cclass();
+    num1 = ONIGENC_CODE_TO_MBC(env->enc, 0xfe0f, buf);
+    if (num1 < 0) return num1;
+    np1 = node_new_str_raw(buf, buf + num1);
     if (IS_NULL(np1)) goto err;
-    cc = NCCLASS(np1);
-    r = add_code_range(&(cc->mbuf), env, 0xfe0f, 0xfe0f);
-    if (r != 0) goto err;
 
     tmp = node_new_quantifier(0, 1, 0);
     if (IS_NULL(tmp)) goto err;
@@ -6131,11 +6130,10 @@ node_extended_grapheme_cluster(Node** np, ScanEnv* env)
     alt2 = NULL;
 
     /* ZWJ */
-    np1 = node_new_cclass();
+    num1 = ONIGENC_CODE_TO_MBC(env->enc, 0x200D, buf);
+    if (num1 < 0) return num1;
+    np1 = node_new_str_raw(buf, buf + num1);
     if (IS_NULL(np1)) goto err;
-    cc = NCCLASS(np1);
-    r = add_code_range(&(cc->mbuf), env, 0x200D, 0x200D);
-    if (r != 0) goto err;
 
     tmp = node_new_list(np1, list2);
     if (IS_NULL(tmp)) goto err;
@@ -6255,11 +6253,10 @@ node_extended_grapheme_cluster(Node** np, ScanEnv* env)
     list2 = tmp;
     np1 = NULL;
 
-    np1 = node_new_cclass();
+    num1 = ONIGENC_CODE_TO_MBC(env->enc, 0x200D, buf);
+    if (num1 < 0) return num1;
+    np1 = node_new_str_raw(buf, buf + num1);
     if (IS_NULL(np1)) goto err;
-    cc = NCCLASS(np1);
-    r = add_code_range(&(cc->mbuf), env, 0x200D, 0x200D);
-    if (r != 0) goto err;
 
     tmp = node_new_list(np1, list2);
     if (IS_NULL(tmp)) goto err;
@@ -6332,11 +6329,10 @@ node_extended_grapheme_cluster(Node** np, ScanEnv* env)
     np1 = NULL;
 
     /* Prepend+ */
-    np1 = node_new_cclass();
+    num1 = ONIGENC_CODE_TO_MBC(env->enc, 0x200D, buf);
+    if (num1 < 0) return num1;
+    np1 = node_new_str_raw(buf, buf + num1);
     if (IS_NULL(np1)) goto err;
-    cc = NCCLASS(np1);
-    r = add_code_range(&(cc->mbuf), env, 0x200D, 0x200D);
-    if (r != 0) goto err;
 
     tmp = node_new_quantifier(0, 1, 0);
     if (IS_NULL(tmp)) goto err;
