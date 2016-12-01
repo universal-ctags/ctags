@@ -1772,7 +1772,7 @@ add_code_range0(BBuf** pbuf, ScanEnv* env, OnigCodePoint from, OnigCodePoint to,
 static int
 add_code_range(BBuf** pbuf, ScanEnv* env, OnigCodePoint from, OnigCodePoint to)
 {
-    return add_code_range0(pbuf, env, from, to, 1);
+  return add_code_range0(pbuf, env, from, to, 1);
 }
 
 static int
@@ -4146,12 +4146,15 @@ add_ctype_to_cc(CClassNode* cc, int ctype, int not, int ascii_range, ScanEnv* en
 	  CClassNode ccascii;
 	  initialize_cclass(&ccascii);
 	  if (ONIGENC_MBC_MINLEN(env->enc) > 1) {
-	    add_code_range(&(ccascii.mbuf), env, 0x00, 0x7F);
+	    r = add_code_range(&(ccascii.mbuf), env, 0x00, 0x7F);
 	  }
 	  else {
 	    bitset_set_range(env, ccascii.bs, 0x00, 0x7F);
+	    r = 0;
 	  }
-	  r = and_cclass(&ccwork, &ccascii, env);
+	  if (r == 0) {
+	    r = and_cclass(&ccwork, &ccascii, env);
+	  }
 	  if (IS_NOT_NULL(ccascii.mbuf)) bbuf_free(ccascii.mbuf);
 	}
 	if (r == 0) {
@@ -5623,7 +5626,7 @@ node_linebreak(Node** np, ScanEnv* env)
   Node* target1 = NULL;
   Node* target2 = NULL;
   CClassNode* cc;
-  int num1, num2;
+  int num1, num2, r;
   UChar buf[ONIGENC_CODE_TO_MBC_MAXLEN * 2];
 
   /* \x0D\x0A */
@@ -5639,7 +5642,8 @@ node_linebreak(Node** np, ScanEnv* env)
   if (IS_NULL(right)) goto err;
   cc = NCCLASS(right);
   if (ONIGENC_MBC_MINLEN(env->enc) > 1) {
-    add_code_range(&(cc->mbuf), env, 0x0A, 0x0D);
+    r = add_code_range(&(cc->mbuf), env, 0x0A, 0x0D);
+    if (r != 0) goto err;
   }
   else {
     bitset_set_range(env, cc->bs, 0x0A, 0x0D);
@@ -5648,8 +5652,10 @@ node_linebreak(Node** np, ScanEnv* env)
   /* TODO: move this block to enc/unicode.c */
   if (ONIGENC_IS_UNICODE(env->enc)) {
     /* UTF-8, UTF-16BE/LE, UTF-32BE/LE */
-    add_code_range(&(cc->mbuf), env, 0x85, 0x85);
-    add_code_range(&(cc->mbuf), env, 0x2028, 0x2029);
+    r = add_code_range(&(cc->mbuf), env, 0x85, 0x85);
+    if (r != 0) goto err;
+    r = add_code_range(&(cc->mbuf), env, 0x2028, 0x2029);
+    if (r != 0) goto err;
   }
 
   /* ...|... */
