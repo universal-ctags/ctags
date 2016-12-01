@@ -2,14 +2,16 @@
 # -*- coding: utf-8 -*-
 
 # Usage:
-#   $ python update-doc.py > ../doc/UnicodeProps.txt
+#   $ python update-doc.py UCD_DIR > ../doc/UnicodeProps.txt
 
 from __future__ import print_function
 import sys
+import os
 import re
 import datetime
 
 onig_ver = "6.0.0"
+ucddir = "."
 
 def print_list(arr, title):
     print()
@@ -36,7 +38,7 @@ def output_header():
 def output_categories():
     categories = set(["LC", "Cn"])
     pattern = re.compile('^.*?;.*?;(..);')
-    with open('UnicodeData.txt', 'r') as f:
+    with open(ucddir + os.sep + 'UnicodeData.txt', 'r') as f:
         for line in f:
             res = pattern.match(line)
             if not res:
@@ -61,7 +63,7 @@ def output_scripts(filename, title, add=[]):
 def output_aliases(scripts):
     aliases = set()
     pattern = re.compile('^(\w+) *; (\w+)')
-    with open('PropertyAliases.txt', 'r') as f:
+    with open(ucddir + os.sep + 'PropertyAliases.txt', 'r') as f:
         for line in f:
             res = pattern.match(line)
             if not res:
@@ -76,7 +78,7 @@ def output_valuealiases(scripts):
     aliases = list()
     aliases_sc = list()
     pattern = re.compile('^(gc|sc) ; (\w+) *; (\w+)(?: *; (\w+))?')
-    with open('PropertyValueAliases.txt', 'r') as f:
+    with open(ucddir + os.sep + 'PropertyValueAliases.txt', 'r') as f:
         for line in f:
             res = pattern.match(line)
             if not res:
@@ -101,7 +103,7 @@ def output_valuealiases(scripts):
 def output_ages():
     ages = set()
     pattern = re.compile('^[\dA-F.]+ *; ([\d.]+)')
-    with open('DerivedAge.txt', 'r') as f:
+    with open(ucddir + os.sep + 'DerivedAge.txt', 'r') as f:
         for line in f:
             res = pattern.match(line)
             if not res:
@@ -113,7 +115,7 @@ def output_ages():
 def output_blocks():
     blocks = list()
     pattern = re.compile('^[\dA-F.]+ *; ([-\w ]+)')
-    with open('Blocks.txt', 'r') as f:
+    with open(ucddir + os.sep + 'Blocks.txt', 'r') as f:
         for line in f:
             res = pattern.match(line)
             if not res:
@@ -124,12 +126,15 @@ def output_blocks():
     return set(blocks)
 
 def main():
+    global ucddir
+    if len(sys.argv) > 1:
+        ucddir = sys.argv[1]
     scripts = set()
     scripts |= output_header()
     scripts |= output_categories()
-    scripts |= output_scripts('Scripts.txt', 'Scripts', ["Unknown"])
-    scripts |= output_scripts('DerivedCoreProperties.txt', 'DerivedCoreProperties')
-    scripts |= output_scripts('PropList.txt', 'PropList')
+    scripts |= output_scripts(ucddir + os.sep + 'Scripts.txt', 'Scripts', ["Unknown"])
+    scripts |= output_scripts(ucddir + os.sep + 'DerivedCoreProperties.txt', 'DerivedCoreProperties')
+    scripts |= output_scripts(ucddir + os.sep + 'PropList.txt', 'PropList')
     output_aliases(scripts)
     output_valuealiases(scripts)
     output_ages()
