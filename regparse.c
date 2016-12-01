@@ -5692,6 +5692,7 @@ node_extended_grapheme_cluster(Node** np, ScanEnv* env)
   Node* list2 = NULL;
   Node* alt = NULL;
   Node* alt2 = NULL;
+  BBuf *pbuf1 = NULL;
   int r = 0;
 
 #ifdef USE_UNICODE_PROPERTIES
@@ -5736,8 +5737,23 @@ node_extended_grapheme_cluster(Node** np, ScanEnv* env)
     cc = NCCLASS(np1);
     r = add_ctype_to_cc(cc, propname2ctype(env, "Grapheme_Cluster_Break=Control"), 1, 0, env);
     if (r != 0) goto err;
-    BITSET_CLEAR_BIT(cc->bs, 0x0a);
-    BITSET_CLEAR_BIT(cc->bs, 0x0d);
+    if (ONIGENC_MBC_MINLEN(env->enc) > 1) {
+      BBuf *pbuf2 = NULL;
+      r = add_code_range(&pbuf1, env, 0x0a, 0x0a);
+      if (r != 0) goto err;
+      r = add_code_range(&pbuf1, env, 0x0d, 0x0d);
+      if (r != 0) goto err;
+      r = and_code_range_buf(cc->mbuf, 0, pbuf1, 1, &pbuf2, env);
+      if (r != 0) goto err;
+      bbuf_free(pbuf1);
+      pbuf1 = NULL;
+      bbuf_free(cc->mbuf);
+      cc->mbuf = pbuf2;
+    }
+    else {
+      BITSET_CLEAR_BIT(cc->bs, 0x0a);
+      BITSET_CLEAR_BIT(cc->bs, 0x0d);
+    }
 
     tmp = onig_node_new_alt(np1, NULL_NODE);
     if (IS_NULL(tmp)) goto err;
@@ -6394,6 +6410,7 @@ node_extended_grapheme_cluster(Node** np, ScanEnv* env)
   onig_node_free(list2);
   onig_node_free(alt);
   onig_node_free(alt2);
+  bbuf_free(pbuf1);
   return (r == 0) ? ONIGERR_MEMORY : r;
 }
 
