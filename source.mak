@@ -23,6 +23,7 @@ MAIN_HEADS =			\
 	main/gcc-attr.h		\
 	main/general.h		\
 	main/htable.h		\
+	main/interactive.h	\
 	main/keyword.h		\
 	main/kind.h		\
 	main/main.h		\

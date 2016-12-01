@@ -2442,7 +2442,7 @@ extern bool parseFileWithMio (const char *const fileName, MIO *mio)
 	}
 	else
 	{
-		if (Option.filter)
+		if (Option.filter && ! Option.interactive)
 			openTagFile ();
 
 #ifdef HAVE_ICONV
@@ -2461,7 +2461,7 @@ extern bool parseFileWithMio (const char *const fileName, MIO *mio)
 
 		tagFileResized = teardownWriter (getSourceFileTagPath())? true: tagFileResized;
 
-		if (Option.filter)
+		if (Option.filter && ! Option.interactive)
 			closeTagFile (tagFileResized);
 		addTotals (1, 0L, 0L);
 

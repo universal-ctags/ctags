@@ -64,6 +64,7 @@
 #endif
 
 
+#include "ctags.h"
 #include "debug.h"
 #include "entry.h"
 #include "error.h"
@@ -74,6 +75,12 @@
 #include "read.h"
 #include "routines.h"
 #include "writer.h"
+
+#ifdef HAVE_JANSSON
+#include "interactive.h"
+#include <jansson.h>
+#include <errno.h>
+#endif
 
 /*
 *   MACROS
@@ -109,7 +116,7 @@ extern bool isDestinationStdout (void)
 {
 	bool toStdout = false;
 
-	if (outputFormatUsedStdoutByDefault() ||  Option.filter  ||
+	if (outputFormatUsedStdoutByDefault() ||  Option.filter  ||  Option.interactive ||
 		(Option.tagFileName != NULL  &&  (strcmp (Option.tagFileName, "-") == 0
 						  || strcmp (Option.tagFileName, "/dev/stdout") == 0
 		)))
@@ -483,6 +490,77 @@ static void batchMakeTags (cookedArgs *args, void *user CTAGS_ATTR_UNUSED)
 		printTotals (timeStamps);
 #undef timeStamp
 }
+
+#ifdef HAVE_JANSSON
+void interactiveLoop (cookedArgs *args, void *user CTAGS_ATTR_UNUSED)
+{
+	char buffer[1024];
+	json_t *request;
+
+	fputs ("{\"_type\": \"program\", \"name\": \"" PROGRAM_NAME "\", \"version\": \"" PROGRAM_VERSION "\"}\n", stdout);
+	fflush (stdout);
+
+	while (fgets (buffer, sizeof(buffer), stdin))
+	{
+		if (buffer[0] == '\n')
+			continue;
+
+		request = json_loads (buffer, JSON_DISABLE_EOF_CHECK, NULL);
+		if (! request)
+		{
+			error (FATAL, "invalid json");
+			goto next;
+		}
+
+		json_t *command = json_object_get (request, "command");
+		if (! command)
+		{
+			error (FATAL, "command name not found");
+			goto next;
+		}
+
+		if (!strcmp ("generate-tags", json_string_value (command)))
+		{
+			json_int_t size = -1;
+			const char *filename;
+
+			if (json_unpack (request, "{ss}", "filename", &filename) == -1)
+			{
+				error (FATAL, "invalid generate-tags request");
+				goto next;
+			}
+
+			json_unpack (request, "{sI}", "size", &size);
+
+			openTagFile ();
+			if (size == -1)
+			{					/* read from disk */
+				createTagsForEntry (filename);
+			}
+			else
+			{					/* read nbytes from stream */
+				unsigned char *data = eMalloc (size);
+				size = fread (data, 1, size, stdin);
+				MIO *mio = mio_new_memory (data, size, eRealloc, eFree);
+				parseFileWithMio (filename, mio);
+				mio_free (mio);
+			}
+
+			closeTagFile (false);
+			fputs ("{\"_type\": \"completed\", \"command\": \"generate-tags\"}\n", stdout);
+			fflush(stdout);
+		}
+		else
+		{
+			error (FATAL, "unknown command name");
+			goto next;
+		}
+
+	next:
+		json_decref (request);
+	}
+}
+#endif
 
 static bool isSafeVar (const char* var)
 {
