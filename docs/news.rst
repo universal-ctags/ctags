@@ -285,7 +285,7 @@ header is easy because it starts with a `#` character.
 ``--with-list-header=no`` suppresses output of the column header.
 
 Kinds synchronization
-----------------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 In Universal-ctags, as in Exuberant-ctags, most kinds are parser
 local; enabling (or disabling) a kind in a parser has no effect on
