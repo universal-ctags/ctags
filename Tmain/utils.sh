@@ -12,6 +12,11 @@ remove_commit_id()
     sed -i -e '/!_TAG_PROGRAM_VERSION.*/s#/[^/]*/#//#' $1
 }
 
+filesize()
+{
+    wc -c < "$1"
+}
+
 is_feature_available()
 {
     local ctags=$1
