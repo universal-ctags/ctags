@@ -607,6 +607,13 @@ will be processed as
 
 	int x(int a,int b);
 
+``--_interactive`` Mode
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+A new ``--_interactive`` option launches a JSON based command REPL which
+can be used to control ctags generation programatically.
+
+See :ref:`--_interactive Mode <interactive-mode>` for more details.
 
 Changes to the tags file format
 ---------------------------------------------------------------------
