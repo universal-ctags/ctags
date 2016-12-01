@@ -5703,12 +5703,12 @@ node_extended_grapheme_cluster(Node** np, ScanEnv* env)
   int r = 0;
   int num1, num2;
   UChar buf[ONIGENC_CODE_TO_MBC_MAXLEN * 2];
+  OnigOptionType option;
 
 #ifdef USE_UNICODE_PROPERTIES
   if (ONIGENC_IS_UNICODE(env->enc)) {
     /* UTF-8, UTF-16BE/LE, UTF-32BE/LE */
     CClassNode* cc;
-    OnigOptionType option;
     OnigCodePoint sb_out = (ONIGENC_MBC_MINLEN(env->enc) > 1) ? 0x00 : 0x80;
     int extend = propname2ctype(env, "Grapheme_Cluster_Break=Extend");
 
@@ -6374,8 +6374,6 @@ node_extended_grapheme_cluster(Node** np, ScanEnv* env)
 #endif /* USE_UNICODE_PROPERTIES */
   {
     /* PerlSyntax: (?s:.), RubySyntax: (?m:.) */
-    OnigOptionType option;
-
     np1 = node_new_anychar();
     if (IS_NULL(np1)) goto err;
 
@@ -6405,9 +6403,25 @@ node_extended_grapheme_cluster(Node** np, ScanEnv* env)
   np1 = NULL;
 
   /* (?>\x0D\x0A|...) */
-  *np = node_new_enclose(ENCLOSE_STOP_BACKTRACK);
-  if (IS_NULL(*np)) goto err;
-  NENCLOSE(*np)->target = alt;
+  tmp = node_new_enclose(ENCLOSE_STOP_BACKTRACK);
+  if (IS_NULL(tmp)) goto err;
+  NENCLOSE(tmp)->target = alt;
+  np1 = tmp;
+
+#ifdef USE_UNICODE_PROPERTIES
+  if (ONIGENC_IS_UNICODE(env->enc)) {
+    /* Don't ignore case. */
+    option = env->option;
+    ONOFF(option, ONIG_OPTION_IGNORECASE, 1);
+    *np = node_new_option(option);
+    if (IS_NULL(*np)) goto err;
+    NENCLOSE(*np)->target = np1;
+  }
+  else
+#endif
+  {
+    *np = np1;
+  }
   return ONIG_NORMAL;
 
  err:
