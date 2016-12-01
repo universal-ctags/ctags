@@ -116,12 +116,18 @@ static void addExtensionFields (json_t *response, const tagEntryInfo *const tag)
 static int writeJsonEntry (tagWriter *writer CTAGS_ATTR_UNUSED,
 			       MIO * mio, const tagEntryInfo *const tag)
 {
+	const char *pattern = tag->pattern;
+	if (!pattern)
+	{
+		pattern = makePatternString (tag);
+	}
+
 	json_t *response = json_pack ("{ss ss ss ss}",
 		"_type", "tag",
 		"name", tag->name,
 		"path", tag->sourceFileName,
 		/* --extra=f option can generates a tag with NULL pattern. */
-		"pattern", tag->pattern? tag->pattern: ""
+		"pattern", pattern? pattern: ""
 	);
 
 	if (includeExtensionFlags ())
