@@ -22,11 +22,11 @@ download:
 casefold.h: CaseFolding.txt UnicodeData.txt SpecialCasing.txt
 	$(RUBY) ./case-folding.rb -m . -o casefold.h
 
-name2ctype.h: name2ctype.kwd
-	./convert-name2ctype.sh name2ctype.kwd > name2ctype.h
+#name2ctype.h: name2ctype.kwd
+#	./convert-name2ctype.sh name2ctype.kwd > name2ctype.h
 
-name2ctype.kwd: $(UCD_FILES)
-	$(RUBY) ./enc-unicode.rb $(UNICODE_VERSION) > name2ctype.kwd
+name2ctype.h: $(UCD_FILES)
+	$(RUBY) ./enc-unicode.rb --header $(UNICODE_VERSION) > name2ctype.h
 
 
 clean:
