@@ -1,0 +1,46 @@
+identification message on startup
+=======================================
+{"name": "Universal Ctags", "version": "0.0.0"}
+
+error on invalid command
+=======================================
+{"name": "Universal Ctags", "version": "0.0.0"}
+{"error": "unknown command name", "fatal": true}
+
+error on missing arguments
+=======================================
+{"name": "Universal Ctags", "version": "0.0.0"}
+{"error": "invalid generate-tags request", "fatal": true}
+
+error on invalid file
+=======================================
+{"name": "Universal Ctags", "version": "0.0.0"}
+{"error": "cannot open input file \"test.foo\"", "warning": true, "errno": 2, "perror": "No such file or directory"}
+{"completed": "generate-tags"}
+
+generate tags from file
+=======================================
+{"name": "Universal Ctags", "version": "0.0.0"}
+{"_type": "tag", "name": "Test", "path": "test.rb", "pattern": "/^class Test$/", "kind": "class"}
+{"_type": "tag", "name": "foobar", "path": "test.rb", "pattern": "/^  def foobar$/", "kind": "method", "scope": "Test", "scopeKind": "class"}
+{"_type": "tag", "name": "baz", "path": "test.rb", "pattern": "/^  def baz(a=1)$/", "kind": "method", "scope": "Test", "scopeKind": "class"}
+{"completed": "generate-tags"}
+
+process multiple commands
+=======================================
+{"name": "Universal Ctags", "version": "0.0.0"}
+{"_type": "tag", "name": "Test", "path": "test.rb", "pattern": "/^class Test$/", "kind": "class"}
+{"_type": "tag", "name": "foobar", "path": "test.rb", "pattern": "/^  def foobar$/", "kind": "method", "scope": "Test", "scopeKind": "class"}
+{"_type": "tag", "name": "baz", "path": "test.rb", "pattern": "/^  def baz(a=1)$/", "kind": "method", "scope": "Test", "scopeKind": "class"}
+{"completed": "generate-tags"}
+{"_type": "tag", "name": "say_hello", "path": "test.c", "pattern": "/^void say_hello() {$/", "typeref": "void", "kind": "function"}
+{"_type": "tag", "name": "main", "path": "test.c", "pattern": "/^int main(int argc, char **argv) {$/", "typeref": "int", "kind": "function"}
+{"completed": "generate-tags"}
+
+generate tags from data
+=======================================
+{"name": "Universal Ctags", "version": "0.0.0"}
+{"_type": "tag", "name": "Test", "path": "foobar.rb", "pattern": "/^class Test$/", "kind": "class"}
+{"_type": "tag", "name": "foobar", "path": "foobar.rb", "pattern": "/^  def foobar$/", "kind": "method", "scope": "Test", "scopeKind": "class"}
+{"_type": "tag", "name": "baz", "path": "foobar.rb", "pattern": "/^  def baz(a=1)$/", "kind": "method", "scope": "Test", "scopeKind": "class"}
+{"completed": "generate-tags"}
