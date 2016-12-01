@@ -1,0 +1,27 @@
+# list kinds
+b  name with unwanted characters
+_  kind with no letter
+L  kind with no long name
+
+# list kinds-full
+#LETTER NAME            ENABLED  REFONLY NROLES MASTER     DESCRIPTION                   
+b       broken tag      on       FALSE   1                 name with unwanted characters 
+_       no letter       on       FALSE   0                 kind with no letter           
+L                       on       FALSE   0                 kind with no long name        
+
+# +K
+abnormal kindOption testing (no letter)	input.x	/^@$/;"	no letter
+abnormal kindOption testing (no long name)	input.x	/^L$/;"	L
+
+# +k
+abnormal kindOption testing (no letter)	input.x	/^@$/;"	no letter
+abnormal kindOption testing (no long name)	input.x	/^L$/;"	L
+
+# +zk
+abnormal kindOption testing (no letter)	input.x	/^@$/;"	kind:no letter
+abnormal kindOption testing (no long name)	input.x	/^L$/;"	kind:L
+
+# +Zk
+abnormal kindOption testing (no letter)	input.x	/^@$/;"	no letter
+abnormal kindOption testing (no long name)	input.x	/^L$/;"	L
+
