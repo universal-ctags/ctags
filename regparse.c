@@ -5709,6 +5709,7 @@ node_extended_grapheme_cluster(Node** np, ScanEnv* env)
     /* UTF-8, UTF-16BE/LE, UTF-32BE/LE */
     CClassNode* cc;
     OnigOptionType option;
+    OnigCodePoint sb_out = (ONIGENC_MBC_MINLEN(env->enc) > 1) ? 0x00 : 0x80;
     int extend = propname2ctype(env, "Grapheme_Cluster_Break=Extend");
 
     /* Prepend*
@@ -6047,32 +6048,26 @@ node_extended_grapheme_cluster(Node** np, ScanEnv* env)
     np1 = node_new_cclass();
     if (IS_NULL(np1)) goto err;
     cc = NCCLASS(np1);
-    r = add_code_range(&(cc->mbuf), env, 0x1F308, 0x1F308);
-    if (r != 0) goto err;
-    r = add_code_range(&(cc->mbuf), env, 0x1F33E, 0x1F33E);
-    if (r != 0) goto err;
-    r = add_code_range(&(cc->mbuf), env, 0x1F373, 0x1F373);
-    if (r != 0) goto err;
-    r = add_code_range(&(cc->mbuf), env, 0x1F393, 0x1F393);
-    if (r != 0) goto err;
-    r = add_code_range(&(cc->mbuf), env, 0x1F3A4, 0x1F3A4);
-    if (r != 0) goto err;
-    r = add_code_range(&(cc->mbuf), env, 0x1F3A8, 0x1F3A8);
-    if (r != 0) goto err;
-    r = add_code_range(&(cc->mbuf), env, 0x1F3EB, 0x1F3EB);
-    if (r != 0) goto err;
-    r = add_code_range(&(cc->mbuf), env, 0x1F3ED, 0x1F3ED);
-    if (r != 0) goto err;
-    r = add_code_range(&(cc->mbuf), env, 0x1F4BB, 0x1F4BC);
-    if (r != 0) goto err;
-    r = add_code_range(&(cc->mbuf), env, 0x1F527, 0x1F527);
-    if (r != 0) goto err;
-    r = add_code_range(&(cc->mbuf), env, 0x1F52C, 0x1F52C);
-    if (r != 0) goto err;
-    r = add_code_range(&(cc->mbuf), env, 0x1F680, 0x1F680);
-    if (r != 0) goto err;
-    r = add_code_range(&(cc->mbuf), env, 0x1F692, 0x1F692);
-    if (r != 0) goto err;
+    {
+      static const OnigCodePoint ranges[] = {
+	13,
+	0x1F308, 0x1F308,
+	0x1F33E, 0x1F33E,
+	0x1F373, 0x1F373,
+	0x1F393, 0x1F393,
+	0x1F3A4, 0x1F3A4,
+	0x1F3A8, 0x1F3A8,
+	0x1F3EB, 0x1F3EB,
+	0x1F3ED, 0x1F3ED,
+	0x1F4BB, 0x1F4BC,
+	0x1F527, 0x1F527,
+	0x1F52C, 0x1F52C,
+	0x1F680, 0x1F680,
+	0x1F692, 0x1F692,
+      };
+      r = add_ctype_to_cc_by_range(cc, -1, 0, env, sb_out, ranges);
+      if (r != 0) goto err;
+    }
     r = add_ctype_to_cc(cc, propname2ctype(env, "Grapheme_Cluster_Break=Glue_After_Zwj"), 0, 0, env);
     if (r != 0) goto err;
 
@@ -6108,14 +6103,17 @@ node_extended_grapheme_cluster(Node** np, ScanEnv* env)
     np1 = node_new_cclass();
     if (IS_NULL(np1)) goto err;
     cc = NCCLASS(np1);
-    r = add_code_range(&(cc->mbuf), env, 0x2640, 0x2640);
-    if (r != 0) goto err;
-    r = add_code_range(&(cc->mbuf), env, 0x2642, 0x2642);
-    if (r != 0) goto err;
-    r = add_code_range(&(cc->mbuf), env, 0x2695, 0x2696);
-    if (r != 0) goto err;
-    r = add_code_range(&(cc->mbuf), env, 0x2708, 0x2708);
-    if (r != 0) goto err;
+    {
+      static const OnigCodePoint ranges[] = {
+	4,
+	0x2640, 0x2640,
+	0x2642, 0x2642,
+	0x2695, 0x2696,
+	0x2708, 0x2708,
+      };
+      r = add_ctype_to_cc_by_range(cc, -1, 0, env, sb_out, ranges);
+      if (r != 0) goto err;
+    }
 
     tmp = node_new_list(np1, list2);
     if (IS_NULL(tmp)) goto err;
@@ -6193,21 +6191,21 @@ node_extended_grapheme_cluster(Node** np, ScanEnv* env)
     np1 = node_new_cclass();
     if (IS_NULL(np1)) goto err;
     cc = NCCLASS(np1);
-    r = add_code_range(&(cc->mbuf), env, 0x1F3C2, 0x1F3C2);
-    if (r != 0) goto err;
-    r = add_code_range(&(cc->mbuf), env, 0x1F3C7, 0x1F3C7);
-    if (r != 0) goto err;
-    r = add_code_range(&(cc->mbuf), env, 0x1F3CC, 0x1F3CC);
-    if (r != 0) goto err;
-    r = add_code_range(&(cc->mbuf), env, 0x1F3F3, 0x1F3F3);
-    if (r != 0) goto err;
-    r = add_code_range(&(cc->mbuf), env, 0x1F441, 0x1F441);
-    if (r != 0) goto err;
-    r = add_code_range(&(cc->mbuf), env, 0x1F46F, 0x1F46F);
-    if (r != 0) goto err;
-    r = add_code_range(&(cc->mbuf), env, 0x1F574, 0x1F574);
-    if (r != 0) goto err;
-    r = add_code_range(&(cc->mbuf), env, 0x1F6CC, 0x1F6CC);
+    {
+      static const OnigCodePoint ranges[] = {
+	8,
+	0x1F3C2, 0x1F3C2,
+	0x1F3C7, 0x1F3C7,
+	0x1F3CC, 0x1F3CC,
+	0x1F3F3, 0x1F3F3,
+	0x1F441, 0x1F441,
+	0x1F46F, 0x1F46F,
+	0x1F574, 0x1F574,
+	0x1F6CC, 0x1F6CC,
+      };
+      r = add_ctype_to_cc_by_range(cc, -1, 0, env, sb_out, ranges);
+      if (r != 0) goto err;
+    }
     r = add_ctype_to_cc(cc, propname2ctype(env, "Grapheme_Cluster_Break=E_Base"), 0, 0, env);
     if (r != 0) goto err;
     r = add_ctype_to_cc(cc, propname2ctype(env, "Grapheme_Cluster_Break=E_Base_GAZ"), 0, 0, env);
