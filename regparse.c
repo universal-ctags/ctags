@@ -5687,6 +5687,7 @@ propname2ctype(ScanEnv* env, const char* propname)
 static int
 node_extended_grapheme_cluster(Node** np, ScanEnv* env)
 {
+  Node* tmp = NULL;
   Node* np1 = NULL;
   Node* list = NULL;
   Node* list2 = NULL;
@@ -5694,13 +5695,12 @@ node_extended_grapheme_cluster(Node** np, ScanEnv* env)
   Node* alt2 = NULL;
   BBuf *pbuf1 = NULL;
   int r = 0;
+  int num1, num2;
+  UChar buf[ONIGENC_CODE_TO_MBC_MAXLEN * 2];
 
 #ifdef USE_UNICODE_PROPERTIES
   if (ONIGENC_IS_UNICODE(env->enc)) {
     /* UTF-8, UTF-16BE/LE, UTF-32BE/LE */
-    Node* tmp = NULL;
-    int num1, num2;
-    UChar buf[ONIGENC_CODE_TO_MBC_MAXLEN * 2];
     CClassNode* cc;
     OnigOptionType option;
     int extend = propname2ctype(env, "Grapheme_Cluster_Break=Extend");
@@ -6369,39 +6369,45 @@ node_extended_grapheme_cluster(Node** np, ScanEnv* env)
     if (IS_NULL(tmp)) goto err;
     alt = tmp;
     list = NULL;
-
-    /* \x0D\x0A */
-    num1 = ONIGENC_CODE_TO_MBC(env->enc, 0x0D, buf);
-    if (num1 < 0) return num1;
-    num2 = ONIGENC_CODE_TO_MBC(env->enc, 0x0A, buf + num1);
-    if (num2 < 0) return num2;
-    np1 = node_new_str_raw(buf, buf + num1 + num2);
-    if (IS_NULL(np1)) goto err;
-
-    tmp = onig_node_new_alt(np1, alt);
-    if (IS_NULL(tmp)) goto err;
-    alt = tmp;
-    np1 = NULL;
-
-    /* (?>...) */
-    *np = node_new_enclose(ENCLOSE_STOP_BACKTRACK);
-    if (IS_NULL(*np)) goto err;
-    NENCLOSE(*np)->target = alt;
-    return ONIG_NORMAL;
   }
+  else
 #endif /* USE_UNICODE_PROPERTIES */
-  if (IS_NULL(*np)) {
+  {
     /* PerlSyntax: (?s:.), RubySyntax: (?m:.) */
     OnigOptionType option;
+
     np1 = node_new_anychar();
     if (IS_NULL(np1)) goto err;
 
     option = env->option;
     ONOFF(option, ONIG_OPTION_MULTILINE, 0);
-    *np = node_new_option(option);
-    if (IS_NULL(*np)) goto err;
-    NENCLOSE(*np)->target = np1;
+    tmp = node_new_option(option);
+    if (IS_NULL(tmp)) goto err;
+    NENCLOSE(tmp)->target = np1;
+    np1 = tmp;
+
+    alt = onig_node_new_alt(np1, NULL_NODE);
+    if (IS_NULL(alt)) goto err;
+    np1 = NULL;
   }
+
+  /* \x0D\x0A */
+  num1 = ONIGENC_CODE_TO_MBC(env->enc, 0x0D, buf);
+  if (num1 < 0) return num1;
+  num2 = ONIGENC_CODE_TO_MBC(env->enc, 0x0A, buf + num1);
+  if (num2 < 0) return num2;
+  np1 = node_new_str_raw(buf, buf + num1 + num2);
+  if (IS_NULL(np1)) goto err;
+
+  tmp = onig_node_new_alt(np1, alt);
+  if (IS_NULL(tmp)) goto err;
+  alt = tmp;
+  np1 = NULL;
+
+  /* (?>\x0D\x0A|...) */
+  *np = node_new_enclose(ENCLOSE_STOP_BACKTRACK);
+  if (IS_NULL(*np)) goto err;
+  NENCLOSE(*np)->target = alt;
   return ONIG_NORMAL;
 
  err:

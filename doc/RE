@@ -121,7 +121,7 @@ syntax: ONIG_SYNTAX_RUBY (default)
                   http://unicode.org/reports/tr29/
 
            Not Unicode:
-             (?m:.)
+             (?>\x0D\x0A|(?m:.))
 
 
 

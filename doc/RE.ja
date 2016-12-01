@@ -121,7 +121,7 @@
                    http://unicode.org/reports/tr29/
 
            Unicode以外の場合:
-             (?m:.)
+             (?>\x0D\x0A|(?m:.))
 
 
 

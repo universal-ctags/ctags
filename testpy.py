@@ -1343,6 +1343,9 @@ def main():
 
     # extended grapheme cluster
     x2("\\X{5}", "あいab\n", 0, 5)
+    x2("\\X", "\n", 0, 1)
+    x2("\\X", "\r", 0, 1)
+    x2("\\X{3}", "\r\r\n\n", 0, 4)
     if is_unicode_encoding(onig_encoding):
         x2("\\X", "\u306F\u309A\n", 0, 2)
         x2("\\A\\X\\z", "\u0020\u200d", 0, 2)
