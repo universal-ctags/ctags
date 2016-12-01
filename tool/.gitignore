@@ -9,6 +9,7 @@ PropertyValueAliases.txt
 Scripts.txt
 SpecialCasing.txt
 UnicodeData.txt
+GraphemeBreakProperty.txt
 
 # ignore generated files
 casefold.h

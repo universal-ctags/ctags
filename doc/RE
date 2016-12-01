@@ -1,4 +1,4 @@
-Onigmo (Oniguruma-mod) Regular Expressions Version 6.0.0    2016/11/25
+Onigmo (Oniguruma-mod) Regular Expressions Version 6.0.0    2016/12/01
 
 syntax: ONIG_SYNTAX_RUBY (default)
 
@@ -114,10 +114,11 @@ syntax: ONIG_SYNTAX_RUBY (default)
            Not Unicode:
              (?>\x0D\x0A|[\x0A-\x0D])
 
-  \X       Grapheme cluster
+  \X       Extended Grapheme cluster
 
            Unicode:
-             (?>\P{M}\p{M}*)
+             See: Unicode Standard Annex #29 UNICODE TEXT SEGMENTATION
+                  http://unicode.org/reports/tr29/
 
            Not Unicode:
              (?m:.)
