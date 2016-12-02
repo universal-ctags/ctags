@@ -312,8 +312,8 @@ extern char* eStrdup (const char* str)
 extern char* eStrndup (const char* str, size_t len)
 {
 	char* result = xMalloc (len + 1, char);
-	memset(result, 0, len + 1);
 	strncpy (result, str, len);
+	result [len] = '\0';
 	return result;
 }
 
@@ -757,7 +757,10 @@ extern char* absoluteFilename (const char *file)
 	}
 
 	if (res [0] == '\0')
-		return eStrdup ("/");
+	{
+		eFree (res);
+		res = eStrdup ("/");
+	}
 	else
 	{
 #ifdef MSDOS_STYLE_PATH
@@ -765,9 +768,8 @@ extern char* absoluteFilename (const char *file)
 		if (res [1] == ':'  &&  islower (res [0]))
 			res [0] = toupper (res [0]);
 #endif
-
-		return res;
 	}
+	return res;
 }
 
 /* Return a newly allocated string containing the absolute file name of dir

@@ -109,7 +109,7 @@ getNextChar:
 			{
 				if (isspace (c))
 					c = ' ';
-				if (c != ' ' || (c == ' ' && lastC != ' '))
+				if (c != ' ' || lastC != ' ')
 				{
 					if (collectText)
 						vStringPut (token->string, c);
