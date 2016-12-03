@@ -987,7 +987,8 @@ extern void   pushNarrowedInputStream (const langType language,
 	mio_setpos (File.mio, &original);
 
 	subio = mio_new_mio (File.mio, p, q - p);
-
+	if (subio == NULL)
+		error (FATAL, "memory for mio may be exhausted");
 
 	BackupFile = File;
 
