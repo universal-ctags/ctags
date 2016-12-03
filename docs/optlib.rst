@@ -330,6 +330,9 @@ is imperfect approach for ignoring text insides comments but it may
 be better than nothing. Ghost kind is assigned to the empty name
 pattern. (See "Ghost kind in regex parser".)
 
+NOTE: This flag doesn't work well with ``_multiline``.
+
+
 Ghost kind in regex parser
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -349,7 +352,6 @@ Conceptual example::
 	--regex-<LANG>=/regexp2/replacement/kind-spec/{transformer=lowercase}
 	--regex-<LANG>=/regexp2/replacement/kind-spec/{transformer=capitalize}
 
-Currently scope long flag taking such parameter.
 
 Scope tracking in a regex parser
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -438,6 +440,9 @@ Example 2::
 NOTE: Giving a scope long flag implies setting `useCork` of the parser
 to `TRUE`. See `cork API`.
 
+NOTE: This flag doesn't work well with ``multiline``.
+
+
 Override the letter for file kind
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 (See also #317.)
@@ -489,6 +494,53 @@ To know the fileKind of languages, use ``--list-file-kind``::
 	...
 	Ruby !
 	...
+
+Multiline pattern match
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. NOT REVIEWED YET
+
+A pattern marked with `_multiline` is applied to whole file contents,
+not line by line.
+
+Next example is based on an issue #219 posted by @andreicristianpetcu::
+
+    $ cat input.java
+    @Subscribe
+    public void catchEvent(SomeEvent e)
+    {
+	return;
+    }
+
+
+    @Subscribe
+    public void
+	recover(Exception e)
+    {
+	return;
+    }
+
+    $ cat spring.ctags
+    --langdef=javaspring
+    --langmap=javaspring:.java
+    --regex-javaspring=/@Subscribe([[:space:]])*([a-z ]+)[[:space:]]*([a-zA-Z]*)\(([a-zA-Z]*)/\3-\4/s,subscription/{_multiline=3}
+    --excmd=mixed
+    --fields=+ln
+
+    $ ./ctags -o - --options=./spring.ctags input.java
+    Event-SomeEvent	input.java	/^public void catchEvent(SomeEvent e)$/;"	s	line:2	language:javaspring
+    recover-Exception	input.java	/^    recover(Exception e)$/;"	s	line:10	language:javaspring
+
+`{_multiline=N}`
+
+	This tells the patern should be applied to whole file
+	contents, not line by line.  `N` is the number of a group in the
+	pattern. The specified group is used to record the line number
+	and the pattern of tag. In the above example 3 is
+	specified. The start position of the group 3 within the whole
+	file contents is used.
+
+NOTE: This flag doesn't work well with scope related flags and ``exclusive`` flags.
 
 
 Submitting an optlib to universal-ctags project
