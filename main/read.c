@@ -111,6 +111,7 @@ typedef struct sInputFile {
 	   in sourceTagPathHolder are destroied. */
 	stringList  * sourceTagPathHolder;
 	inputLineFposMap lineFposMap;
+	vString *allLines;
 } inputFile;
 
 
@@ -759,10 +760,16 @@ static void readLine (vString *const vLine, MIO *const mio)
 	}
 }
 
+/* Stub */
+extern bool hasMultilineRegexPatterns (const langType language) { return false; }
+extern bool matchMultilineRegex (const vString* const allLines, const langType language) { return false; }
+
 static vString *iFileGetLine (void)
 {
 	if (File.line == NULL)
 		File.line = vStringNew ();
+	if ((hasMultilineRegexPatterns (getInputLanguage ())) && File.allLines == NULL)
+		File.allLines = vStringNew ();
 
 	readLine (File.line, File.mio);
 
@@ -778,10 +785,20 @@ static vString *iFileGetLine (void)
 			parseLineDirective (vStringValue (File.line) + 1);
 		matchRegex (File.line, getInputLanguage ());
 
+		if (hasMultilineRegexPatterns (getInputLanguage ()))
+			vStringCat (File.allLines, File.line);
 		return File.line;
 	}
-
-	return NULL;
+	else
+	{
+		if (hasMultilineRegexPatterns (getInputLanguage ()))
+		{
+			matchMultilineRegex (File.allLines, getInputLanguage ());
+			vStringDelete (File.allLines);
+			File.allLines = NULL;
+		}
+		return NULL;
+	}
 }
 
 /*  Do not mix use of readLineFromInputFile () and getcFromInputFile () for the same file.

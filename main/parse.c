@@ -2219,6 +2219,11 @@ static bool createTagsWithFallback1 (const langType language)
 		}
 	}
 
+	/* Force filling allLines buffer and kick the multiline regex parser */
+	if (hasMultilineRegexPatterns (language))
+		while (readLineFromInputFile () != NULL)
+			; /* Do nothing */
+
 	if (LanguageTable [language]->useCork)
 		uncorkTagFile();
 

@@ -287,6 +287,11 @@ extern void useRegexMethod (const langType language);
 extern void printRegexFlags (void);
 extern bool hasScopeActionInRegex (const langType language);
 
+/* Multiline Regex Interface */
+extern bool hasMultilineRegexPatterns (const langType language);
+extern bool matchMultilineRegex (const vString* const allLines, const langType language);
+
+
 #ifdef HAVE_COPROC
 extern bool invokeXcmd (const char* const fileName, const langType language);
 #endif
