@@ -15,6 +15,7 @@
 
 #include <string.h>
 #include <ctype.h>
+#include <stdlib.h>
 
 #define FILE_WRITE
 #include "read.h"
@@ -65,8 +66,14 @@ typedef struct sInputFileInfo {
 	inputLangInfo langInfo;
 } inputFileInfo;
 
+typedef struct sComputPos {
+	MIOPos  pos;
+	long    offset;
+	bool open;
+} compoundPos;
+
 typedef struct sInputLineFposMap {
-	MIOPos *pos;
+	compoundPos *pos;
 	unsigned int count;
 	unsigned int size;
 } inputLineFposMap;
@@ -83,7 +90,7 @@ typedef struct sInputFile {
 	vString    *line;          /* last line read from file */
 	const unsigned char* currentLine;  /* current line being worked on */
 	MIO        *mio;           /* MIO stream used for reading the file */
-	MIOPos      filePosition;  /* file position of current line */
+	compoundPos    filePosition;  /* file position of current line */
 	unsigned int ungetchIdx;
 	int         ungetchBuf[3]; /* characters that were ungotten */
 
@@ -122,7 +129,7 @@ static void     langStackClear(langStack *langStack);
 */
 static inputFile File;  /* static read through functions */
 static inputFile BackupFile;	/* File is copied here when a nested parser is pushed */
-static MIOPos StartOfLine;  /* holds deferred position of start of line */
+static compoundPos StartOfLine;  /* holds deferred position of start of line */
 
 /*
 *   FUNCTION DEFINITIONS
@@ -147,13 +154,13 @@ extern const char *getInputFileName (void)
 
 extern MIOPos getInputFilePosition (void)
 {
-	return File.filePosition;
+	return File.filePosition.pos;
 }
 
 extern MIOPos getInputFilePositionForLine (int line)
 {
 	return File.lineFposMap.pos[(((File.lineFposMap.count > (line - 1)) \
-				      && (line > 0))? (line - 1): 0)];
+				      && (line > 0))? (line - 1): 0)].pos;
 }
 
 extern langType getInputLanguage (void)
@@ -262,22 +269,54 @@ static void freeLineFposMap (inputLineFposMap *lineFposMap)
 static void allocLineFposMap (inputLineFposMap *lineFposMap)
 {
 #define INITIAL_lineFposMap_LEN 256
-	lineFposMap->pos = xCalloc (INITIAL_lineFposMap_LEN, MIOPos);
+	lineFposMap->pos = xCalloc (INITIAL_lineFposMap_LEN, compoundPos);
 	lineFposMap->size = INITIAL_lineFposMap_LEN;
 	lineFposMap->count = 0;
 }
 
-static void appendLineFposMap (inputLineFposMap *lineFposMap, MIOPos pos)
+static void appendLineFposMap (inputLineFposMap *lineFposMap, compoundPos *pos)
 {
 	if (lineFposMap->size == lineFposMap->count)
 	{
 		lineFposMap->size *= 2;
 		lineFposMap->pos = xRealloc (lineFposMap->pos,
 					     lineFposMap->size,
-					     MIOPos);
+					     compoundPos);
 	}
-	lineFposMap->pos [lineFposMap->count] = pos;
+
+	if (lineFposMap->count != 0)
+		lineFposMap->pos [lineFposMap->count - 1].open = false;
+	lineFposMap->pos [lineFposMap->count] = *pos;
+	lineFposMap->pos [lineFposMap->count].open = true;
 	lineFposMap->count++;
+}
+
+static int compoundPosForOffset (const void* oft, const void *p)
+{
+	long offset = *(long *)oft;
+	const compoundPos *pos = p;
+	const compoundPos *next = (compoundPos *)(((char *)pos) + sizeof (compoundPos));
+
+	if (offset < pos->offset)
+		return -1;
+	else if (pos->offset <= offset
+		 && (pos->open
+		     || offset < next->offset))
+		return 0;
+	else
+		return 1;
+}
+
+extern unsigned long getInputLineNumberForFileOffset(long offset)
+{
+	compoundPos *p;
+
+	p = bsearch (&offset, File.lineFposMap.pos, File.lineFposMap.count, sizeof (compoundPos),
+		     compoundPosForOffset);
+	if (p == NULL)
+		return 1;	/* TODO: 0? */
+	else
+		return 1 + (p - File.lineFposMap.pos);
 }
 
 /*
@@ -584,8 +623,9 @@ extern bool openInputFile (const char *const fileName, const langType language,
 		opened = true;
 
 		setOwnerDirectoryOfInputFile (fileName);
-		mio_getpos (File.mio, &StartOfLine);
-		mio_getpos (File.mio, &File.filePosition);
+		mio_getpos (File.mio, &StartOfLine.pos);
+		mio_getpos (File.mio, &File.filePosition.pos);
+		File.filePosition.offset = StartOfLine.offset = mio_tell (File.mio);
 		File.currentLine  = NULL;
 
 		if (File.line != NULL)
@@ -611,8 +651,9 @@ extern void resetInputFile (const langType language)
 	Assert (File.mio);
 
 	mio_rewind (File.mio);
-	mio_getpos (File.mio, &StartOfLine);
-	mio_getpos (File.mio, &File.filePosition);
+	mio_getpos (File.mio, &StartOfLine.pos);
+	mio_getpos (File.mio, &File.filePosition.pos);
+	File.filePosition.offset = StartOfLine.offset = mio_tell (File.mio);
 	File.currentLine  = NULL;
 
 	if (File.line != NULL)
@@ -656,7 +697,7 @@ static void fileNewline (void)
 	File.filePosition = StartOfLine;
 
 	if (BackupFile.mio == NULL)
-		appendLineFposMap (&File.lineFposMap, File.filePosition);
+		appendLineFposMap (&File.lineFposMap, &File.filePosition);
 
 	File.input.lineNumber++;
 	File.source.lineNumber++;
@@ -730,7 +771,8 @@ static vString *iFileGetLine (void)
 		/* Use StartOfLine from previous iFileGetLine() call */
 		fileNewline ();
 		/* Store StartOfLine for the next iFileGetLine() call */
-		mio_getpos (File.mio, &StartOfLine);
+		mio_getpos (File.mio, &StartOfLine.pos);
+		StartOfLine.offset = mio_tell (File.mio);
 
 		if (Option.lineDirectives && vStringChar (File.line, 0) == '#')
 			parseLineDirective (vStringValue (File.line) + 1);

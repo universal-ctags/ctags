@@ -116,4 +116,6 @@ extern void   popNarrowedInputStream  (void);
 extern void     pushLanguage(const langType language);
 extern langType popLanguage (void);
 
+extern unsigned long getInputLineNumberForFileOffset(long offset);
+
 #endif  /* CTAGS_MAIN_READ_H */
