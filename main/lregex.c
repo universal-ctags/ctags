@@ -410,7 +410,7 @@ static void pre_ptrn_flag_multiline_long (const char* const s CTAGS_ATTR_UNUSED,
 static flagDefinition multilinePtrnFlagDef[] = {
 #define EXPERIMENTAL "_"
 	{ '\0',  EXPERIMENTAL "multiline", NULL, pre_ptrn_flag_multiline_long ,
-	  NULL, "match in muletline mode"},
+	  NULL, "match in muletline mode. cannot combine with scope, placeholder, and exclusive"},
 };
 
 
