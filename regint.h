@@ -132,7 +132,6 @@
 # define USE_CAPTURE_HISTORY
 #endif
 #define USE_VARIABLE_META_CHARS
-#define USE_POSIX_API_REGION_OPTION     /* needed for POSIX API support */
 #define USE_FIND_LONGEST_SEARCH_ALL_OF_RANGE
 /* #define USE_COMBINATION_EXPLOSION_CHECK */     /* (X*)* */
 
@@ -384,7 +383,6 @@ typedef unsigned int  BitStatusType;
 #define IS_NOTEOL(option)         ((option) & ONIG_OPTION_NOTEOL)
 #define IS_NOTBOS(option)         ((option) & ONIG_OPTION_NOTBOS)
 #define IS_NOTEOS(option)         ((option) & ONIG_OPTION_NOTEOS)
-#define IS_POSIX_REGION(option)   ((option) & ONIG_OPTION_POSIX_REGION)
 #define IS_ASCII_RANGE(option)    ((option) & ONIG_OPTION_ASCII_RANGE)
 #define IS_POSIX_BRACKET_ALL_RANGE(option)  ((option) & ONIG_OPTION_POSIX_BRACKET_ALL_RANGE)
 #define IS_WORD_BOUND_ALL_RANGE(option)     ((option) & ONIG_OPTION_WORD_BOUND_ALL_RANGE)

@@ -461,9 +461,8 @@ typedef unsigned int        OnigOptionType;
 /* options (search time) */
 #define ONIG_OPTION_NOTBOL               (ONIG_OPTION_CAPTURE_GROUP << 1)
 #define ONIG_OPTION_NOTEOL               (ONIG_OPTION_NOTBOL << 1)
-#define ONIG_OPTION_POSIX_REGION         (ONIG_OPTION_NOTEOL << 1)
 /* options (ctype range) */
-#define ONIG_OPTION_ASCII_RANGE          (ONIG_OPTION_POSIX_REGION << 1)
+#define ONIG_OPTION_ASCII_RANGE          (ONIG_OPTION_NOTEOL << 1)
 #define ONIG_OPTION_POSIX_BRACKET_ALL_RANGE (ONIG_OPTION_ASCII_RANGE << 1)
 #define ONIG_OPTION_WORD_BOUND_ALL_RANGE    (ONIG_OPTION_POSIX_BRACKET_ALL_RANGE << 1)
 /* options (newline) */

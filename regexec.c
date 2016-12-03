@@ -1377,14 +1377,6 @@ stack_type_str(int stack_type)
 }
 #endif
 
-/* matching region of POSIX API */
-typedef int regoff_t;
-
-typedef struct {
-  regoff_t  rm_so;
-  regoff_t  rm_eo;
-} posix_regmatch_t;
-
 /* match data(str - end) from position (sstart). */
 /* if sstart == str then set sprev to NULL. */
 static OnigPosition
@@ -1707,77 +1699,51 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
 	best_len = n;
 	region = msa->region;
 	if (region) {
-#ifdef USE_POSIX_API_REGION_OPTION
-	  if (IS_POSIX_REGION(msa->options)) {
-	    posix_regmatch_t* rmt = (posix_regmatch_t* )region;
+	  region->beg[0] = ((pkeep > s) ? s : pkeep) - str;
+	  region->end[0] = s - str;
+	  for (i = 1; i <= num_mem; i++) {
+	    if (mem_end_stk[i] != INVALID_STACK_INDEX) {
+	      if (BIT_STATUS_AT(reg->bt_mem_start, i))
+		region->beg[i] = STACK_AT(mem_start_stk[i])->u.mem.pstr - str;
+	      else
+		region->beg[i] = (UChar* )((void* )mem_start_stk[i]) - str;
 
-	    rmt[0].rm_so = (regoff_t )(((pkeep > s) ? s : pkeep) - str);
-	    rmt[0].rm_eo = (regoff_t )(s - str);
-	    for (i = 1; i <= num_mem; i++) {
-	      if (mem_end_stk[i] != INVALID_STACK_INDEX) {
-		if (BIT_STATUS_AT(reg->bt_mem_start, i))
-		  rmt[i].rm_so = (regoff_t )(STACK_AT(mem_start_stk[i])->u.mem.pstr - str);
-		else
-		  rmt[i].rm_so = (regoff_t )((UChar* )((void* )(mem_start_stk[i])) - str);
-
-		rmt[i].rm_eo = (regoff_t )((BIT_STATUS_AT(reg->bt_mem_end, i)
+	      region->end[i] = (BIT_STATUS_AT(reg->bt_mem_end, i)
 				? STACK_AT(mem_end_stk[i])->u.mem.pstr
-				: (UChar* )((void* )mem_end_stk[i])) - str);
-	      }
-	      else {
-		rmt[i].rm_so = rmt[i].rm_eo = ONIG_REGION_NOTPOS;
-	      }
+				: (UChar* )((void* )mem_end_stk[i])) - str;
+	    }
+	    else {
+	      region->beg[i] = region->end[i] = ONIG_REGION_NOTPOS;
 	    }
 	  }
-	  else
-#endif /* USE_POSIX_API_REGION_OPTION */
-	  {
-	    region->beg[0] = ((pkeep > s) ? s : pkeep) - str;
-	    region->end[0] = s - str;
-	    for (i = 1; i <= num_mem; i++) {
-	      if (mem_end_stk[i] != INVALID_STACK_INDEX) {
-		if (BIT_STATUS_AT(reg->bt_mem_start, i))
-		  region->beg[i] = STACK_AT(mem_start_stk[i])->u.mem.pstr - str;
-		else
-		  region->beg[i] = (UChar* )((void* )mem_start_stk[i]) - str;
-
-		region->end[i] = (BIT_STATUS_AT(reg->bt_mem_end, i)
-				  ? STACK_AT(mem_end_stk[i])->u.mem.pstr
-				  : (UChar* )((void* )mem_end_stk[i])) - str;
-	      }
-	      else {
-		region->beg[i] = region->end[i] = ONIG_REGION_NOTPOS;
-	      }
-	    }
 
 #ifdef USE_CAPTURE_HISTORY
-	    if (reg->capture_history != 0) {
-	      int r;
-	      OnigCaptureTreeNode* node;
+	  if (reg->capture_history != 0) {
+	    int r;
+	    OnigCaptureTreeNode* node;
 
-	      if (IS_NULL(region->history_root)) {
-		region->history_root = node = history_node_new();
-		CHECK_NULL_RETURN_MEMERR(node);
-	      }
-	      else {
-		node = region->history_root;
-		history_tree_clear(node);
-	      }
-
-	      node->group = 0;
-	      node->beg   = ((pkeep > s) ? s : pkeep) - str;
-	      node->end   = s - str;
-
-	      stkp = stk_base;
-	      r = make_capture_history_tree(region->history_root, &stkp,
-		  stk, (UChar* )str, reg);
-	      if (r < 0) {
-		best_len = r; /* error code */
-		goto finish;
-	      }
+	    if (IS_NULL(region->history_root)) {
+	      region->history_root = node = history_node_new();
+	      CHECK_NULL_RETURN_MEMERR(node);
 	    }
+	    else {
+	      node = region->history_root;
+	      history_tree_clear(node);
+	    }
+
+	    node->group = 0;
+	    node->beg   = ((pkeep > s) ? s : pkeep) - str;
+	    node->end   = s - str;
+
+	    stkp = stk_base;
+	    r = make_capture_history_tree(region->history_root, &stkp,
+		stk, (UChar* )str, reg);
+	    if (r < 0) {
+	      best_len = r; /* error code */
+	      goto finish;
+	    }
+	  }
 #endif /* USE_CAPTURE_HISTORY */
-	  } /* else IS_POSIX_REGION() */
 	} /* if (region) */
       } /* n > best_len */
 
@@ -3821,11 +3787,7 @@ onig_match(regex_t* reg, const UChar* str, const UChar* end, const UChar* at, On
   }
 #endif
 
-  if (region
-#ifdef USE_POSIX_API_REGION_OPTION
-      && !IS_POSIX_REGION(option)
-#endif
-      ) {
+  if (region) {
     r = onig_region_resize_clear(region, reg->num_mem + 1);
   }
   else
@@ -4109,11 +4071,7 @@ onig_search_gpos(regex_t* reg, const UChar* str, const UChar* end,
      (intptr_t )str, str, end - str, start - str, range - str);
 #endif
 
-  if (region
-#ifdef USE_POSIX_API_REGION_OPTION
-      && !IS_POSIX_REGION(option)
-#endif
-      ) {
+  if (region) {
     r = onig_region_resize_clear(region, reg->num_mem + 1);
     if (r) goto finish_no_msa;
   }
@@ -4445,11 +4403,7 @@ onig_search_gpos(regex_t* reg, const UChar* str, const UChar* end,
 
   /* If result is mismatch and no FIND_NOT_EMPTY option,
      then the region is not set in match_at(). */
-  if (IS_FIND_NOT_EMPTY(reg->options) && region
-#ifdef USE_POSIX_API_REGION_OPTION
-      && !IS_POSIX_REGION(option)
-#endif
-      ) {
+  if (IS_FIND_NOT_EMPTY(reg->options) && region) {
     onig_region_clear(region);
   }
 

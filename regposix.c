@@ -168,36 +168,32 @@ regexec(regex_t* reg, const char* str, size_t nmatch,
 {
   int r, i, len;
   UChar* end;
-  regmatch_t* pm;
+  OnigRegion* region = NULL;
   OnigOptionType options;
 
-  options = ONIG_OPTION_POSIX_REGION;
+  options = ONIG_OPTION_NONE;
   if ((posix_options & REG_NOTBOL) != 0) options |= ONIG_OPTION_NOTBOL;
   if ((posix_options & REG_NOTEOL) != 0) options |= ONIG_OPTION_NOTEOL;
 
-  if (nmatch == 0 || (reg->comp_options & REG_NOSUB) != 0) {
-    pm = (regmatch_t* )NULL;
+  if ((reg->comp_options & REG_NOSUB) != 0) {
     nmatch = 0;
   }
-  else if ((int )nmatch < ONIG_C(reg)->num_mem + 1) {
-    pm = (regmatch_t* )xmalloc(sizeof(regmatch_t)
-                               * (ONIG_C(reg)->num_mem + 1));
-    if (pm == NULL)
+  else if (nmatch != 0) {
+    region = onig_region_new();
+    if (region == NULL)
       return REG_ESPACE;
-  }
-  else {
-    pm = pmatch;
   }
 
   ENC_STRING_LEN(ONIG_C(reg)->enc, str, len);
   end = (UChar* )(str + len);
   r = (int )onig_search(ONIG_C(reg), (UChar* )str, end, (UChar* )str, end,
-		  (OnigRegion* )pm, options);
+		  region, options);
 
   if (r >= 0) {
     r = 0; /* Match */
-    if (pm != pmatch && pm != NULL) {
-      xmemcpy(pmatch, pm, sizeof(regmatch_t) * nmatch);
+    for (i = 0; i < (int )nmatch; i++) {
+      pmatch[i].rm_so = region->beg[i];
+      pmatch[i].rm_eo = region->end[i];
     }
   }
   else if (r == ONIG_MISMATCH) {
@@ -209,8 +205,8 @@ regexec(regex_t* reg, const char* str, size_t nmatch,
     r = onig2posix_error_code(r);
   }
 
-  if (pm != pmatch && pm != NULL)
-    xfree(pm);
+  if (region != NULL)
+    onig_region_free(region, 1);
 
 #if 0
   if (reg->re_nsub > nmatch - 1)
