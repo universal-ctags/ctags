@@ -716,9 +716,19 @@ static const char *renderFieldPattern (const tagEntryInfo *const tag,
 				       vString* b,
 					   bool *rejected)
 {
-	char* tmp = makePatternString (tag);
-	vStringCatS (b, tmp);
-	eFree (tmp);
+	if (tag->lineNumberEntry)
+		return NULL;
+
+	if (tag->pattern)
+		vStringCatS (b, tag->pattern);
+	else
+	{
+		char* tmp;
+
+		tmp = makePatternString (tag);
+		vStringCatS (b, tmp);
+		eFree (tmp);
+	}
 	return vStringValue (b);
 }
 

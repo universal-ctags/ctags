@@ -126,19 +126,6 @@ static int writeLineNumberEntry (tagWriter *writer, MIO * mio, const tagEntryInf
 		return mio_printf (mio, "%lu", tag->lineNumber);
 }
 
-static int file_putc (char c, void *data)
-{
-	MIO *fp = data;
-	mio_putc (fp, c);
-	return 1;
-}
-
-static int file_puts (const char* s, void *data)
-{
-	MIO *fp = data;
-	return mio_puts (fp, s);
-}
-
 static int addExtensionFields (tagWriter *writer, MIO *mio, const tagEntryInfo *const tag)
 {
 	bool isKindKeyEnabled = isFieldEnabled (FIELD_KIND_KEY);
@@ -233,11 +220,6 @@ static int addExtensionFields (tagWriter *writer, MIO *mio, const tagEntryInfo *
 	return length;
 }
 
-static int writePatternEntry (MIO *mio, const tagEntryInfo *const tag)
-{
-	return makePatternStringCommon (tag, file_putc, file_puts, mio);
-}
-
 static int writeCtagsEntry (tagWriter *writer,
 							MIO * mio, const tagEntryInfo *const tag)
 {
@@ -258,10 +240,8 @@ static int writeCtagsEntry (tagWriter *writer,
 
 	if (tag->lineNumberEntry)
 		length += writeLineNumberEntry (writer, mio, tag);
-	else if (tag->pattern)
-		length += mio_printf(mio, "%s", tag->pattern);
 	else
-		length += writePatternEntry (mio, tag);
+		length += mio_puts(mio, escapeFieldValue(writer, tag, FIELD_PATTERN));
 
 	if (includeExtensionFlags ())
 	{
