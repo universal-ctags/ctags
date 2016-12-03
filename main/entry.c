@@ -804,7 +804,7 @@ extern void getTagScopeInformation (tagEntryInfo *const tag,
 }
 
 
-extern int   makePatternStringCommon (const tagEntryInfo *const tag,
+static int   makePatternStringCommon (const tagEntryInfo *const tag,
 				      int putc_func (char , void *),
 				      int puts_func (const char* , void *),
 				      void *output)
@@ -923,8 +923,6 @@ static void recordTagEntryInQueue (const tagEntryInfo *const tag, tagEntryInfo* 
 
 	if (slot->pattern)
 		slot->pattern = eStrdup (slot->pattern);
-	else if (!slot->lineNumberEntry)
-		slot->pattern = makePatternString (slot);
 
 	slot->inputFileName = eStrdup (slot->inputFileName);
 	slot->name = eStrdup (slot->name);

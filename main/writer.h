@@ -66,10 +66,6 @@ extern void writerBuildFqTagCache (tagEntryInfo *const tag);
 
 extern bool outputFormatUsedStdoutByDefault (void);
 
-extern int makePatternStringCommon (const tagEntryInfo *const tag,
-				    int putc_func (char , void *),
-				    int puts_func (const char* , void *),
-				    void *output);
 extern void truncateTagLine (char *const line, const char *const token,
 			     const bool discardNewline);
 extern void abort_if_ferror(MIO *const fp);
