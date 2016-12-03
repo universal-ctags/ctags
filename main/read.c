@@ -760,10 +760,6 @@ static void readLine (vString *const vLine, MIO *const mio)
 	}
 }
 
-/* Stub */
-extern bool hasMultilineRegexPatterns (const langType language) { return false; }
-extern bool matchMultilineRegex (const vString* const allLines, const langType language) { return false; }
-
 static vString *iFileGetLine (void)
 {
 	if (File.line == NULL)
