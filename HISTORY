@@ -2,6 +2,10 @@ History of Onigmo (Oniguruma-mod)
 
 2016/xx/xx: Version 6.0.0
 
+2016/12/04: [impl] Import Ruby r56976
+                   Remove special processing for U+03B9/U+03BC/U+A64B.
+2016/12/04: [impl] Import Ruby r56975
+                   Reorder codepoints in some entries of CaseUnfold_11_Table.
 2016/12/04: [bug]  Fix wrong capture in subexp call. (Issue #48)
 2016/12/01: [spec] \X matches \x0D\x0A also on non-Unicode encodings.
 2016/12/01: [impl] Import Ruby r56952
