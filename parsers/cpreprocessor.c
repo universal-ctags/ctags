@@ -481,7 +481,7 @@ static bool isIgnoreBranch (void)
 	* #if something
     *    } else x;
 	* #else
-	*    } 
+	*    }
 	* #endif
 	*/
 
