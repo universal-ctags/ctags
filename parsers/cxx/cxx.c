@@ -140,7 +140,7 @@ parserDefinition * CUDAParser (void)
 {
 	static const char * const extensions [] =
 	{
-		"cu", "cuh"
+		"cu", "cuh",
 #ifndef CASE_INSENSITIVE_FILENAMES
 		"CU", "CUH",
 #endif
