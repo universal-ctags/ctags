@@ -52,7 +52,7 @@ enum CXXTagCPPKind
 enum CXXTagCommonField
 {
 	CXXTagFieldProperties,
-	
+
 	CXXTagCommonFieldCount
 };
 

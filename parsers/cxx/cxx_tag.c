@@ -337,12 +337,12 @@ static bool cxxTagCheckTypeField(
 		CXX_DEBUG_LEAVE_TEXT("One of the pointers is NULL");
 		return false;
 	}
-	
+
 	int iTotalCount = 0;
 	int iParenthesisCount = 0;
 	int iIdentifierOrKeywordCount = 0;
 	int iConsecutiveIdentifiers = 0;
-	
+
 	while(pTypeStart)
 	{
 		iTotalCount++;
@@ -373,7 +373,7 @@ static bool cxxTagCheckTypeField(
 					CXX_DEBUG_LEAVE_TEXT("Too many non-nested parentheses for a type name");
 					return false;
 				}
-				
+
 				if(
 					(iTotalCount > 1) &&
 					cxxTokenTypeIs(pTypeStart->pPrev,CXXTokenTypeIdentifier) &&
@@ -398,19 +398,19 @@ static bool cxxTagCheckTypeField(
 
 		pTypeStart = pTypeStart->pNext;
 	}
-	
+
 	if(iIdentifierOrKeywordCount < 1)
 	{
 		CXX_DEBUG_LEAVE_TEXT("Type does not seem to contains identifiers or keywords, can't be a type name");
 		return false;
 	}
-	
+
 	if(!pTypeStart)
 	{
 		CXX_DEBUG_LEAVE_TEXT("Type tokens do not belong to the same chain!");
 		return false;
 	}
-	
+
 	CXX_DEBUG_LEAVE();
 	return true;
 }
@@ -428,14 +428,14 @@ CXXToken * cxxTagCheckAndSetTypeField(
 	// "typename" is debatable since it's not really
 	// allowed by C++ for unqualified types. However I haven't been able
 	// to come up with something better... so "typename" it is for now.
-	
+
 	// FIXME: The typeRef forma with two fields should be dropped.
 	//        It has been created with specific use cases in mind
 	//        and we are pushing it way beyond them.
 	//        We should have a plain "type" field instead.
-	
+
 	static const char * szTypename = "typename";
-	
+
 	// Filter out initial keywords that need to be excluded from typenames
 	for(;;)
 	{
@@ -478,7 +478,7 @@ CXXToken * cxxTagCheckAndSetTypeField(
 
 	cxxTokenChainNormalizeTypeNameSpacingInRange(pTypeStart,pTypeEnd);
 	CXXToken * pTypeName = cxxTokenChainExtractRangeFilterTypeName(pTypeStart,pTypeEnd);
-	
+
 	if(!pTypeName)
 	{
 		CXX_DEBUG_PRINT("Can't extract type name");
