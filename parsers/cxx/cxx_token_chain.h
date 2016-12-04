@@ -216,12 +216,10 @@ CXXToken * cxxTokenChainExtractRange(
 		CXXToken * to,
 		unsigned int uFlags
 	);
-CXXToken * cxxTokenChainExtractRangeWithExclusions(
+
+CXXToken * cxxTokenChainExtractRangeFilterTypeName(
 		CXXToken * from,
-		CXXToken * to,
-		unsigned int uFlags,
-		CXXToken ** pExcludedTokens,
-		unsigned int uExcludedTokenCount
+		CXXToken * to
 	);
 
 CXXToken * cxxTokenChainExtractIndexRange(

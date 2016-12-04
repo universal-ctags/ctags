@@ -435,6 +435,22 @@ CXXToken * cxxTagCheckAndSetTypeField(
 	//        We should have a plain "type" field instead.
 	
 	static const char * szTypename = "typename";
+	
+	// Filter out initial keywords that need to be excluded from typenames
+	for(;;)
+	{
+		if(!cxxTokenTypeIs(pTypeStart,CXXTokenTypeKeyword))
+			break;
+		if(!cxxKeywordExcludeFromTypeNames(pTypeStart->eKeyword))
+			break;
+		// must be excluded
+		if(pTypeStart == pTypeEnd)
+		{
+			CXX_DEBUG_PRINT("Type name composed only of ignored keywords");
+			return NULL; // only excluded keywords
+		}
+		pTypeStart = pTypeStart->pNext;
+	}
 
 	if(pTypeStart != pTypeEnd)
 	{
@@ -461,7 +477,13 @@ CXXToken * cxxTagCheckAndSetTypeField(
 	}
 
 	cxxTokenChainNormalizeTypeNameSpacingInRange(pTypeStart,pTypeEnd);
-	CXXToken * pTypeName = cxxTokenChainExtractRange(pTypeStart,pTypeEnd,0);
+	CXXToken * pTypeName = cxxTokenChainExtractRangeFilterTypeName(pTypeStart,pTypeEnd);
+	
+	if(!pTypeName)
+	{
+		CXX_DEBUG_PRINT("Can't extract type name");
+		return NULL;
+	}
 
 	CXX_DEBUG_PRINT("Type name is '%s'",vStringValue(pTypeName->pszWord));
 

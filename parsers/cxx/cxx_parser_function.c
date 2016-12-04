@@ -1212,12 +1212,14 @@ next_token:
 		pInfo->bTypeContainsIdentifierScopeAndSignature = false;
 	}
 
+#if 0
 	while(
 			(pInfo->pTypeStart != pInfo->pTypeEnd) &&
 			cxxTokenTypeIs(pInfo->pTypeStart,CXXTokenTypeKeyword) &&
 			cxxKeywordExcludeFromTypeNames(pInfo->pTypeStart->eKeyword)
 		)
 		pInfo->pTypeStart = pInfo->pTypeStart->pNext;
+#endif
 
 	CXX_DEBUG_LEAVE_TEXT("Found function signature");
 	return true;

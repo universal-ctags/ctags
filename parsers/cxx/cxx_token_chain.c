@@ -972,6 +972,69 @@ CXXToken * cxxTokenChainExtractRange(
 	return pRet;
 }
 
+CXXToken * cxxTokenChainExtractRangeFilterTypeName(
+		CXXToken * from,
+		CXXToken * to
+	)
+{
+	if(!from)
+		return NULL;
+
+	CXXToken * pToken = from;
+	for(;;)
+	{
+		if(!cxxTokenTypeIs(pToken,CXXTokenTypeKeyword))
+			break;
+		if(!cxxKeywordExcludeFromTypeNames(pToken->eKeyword))
+			break;
+		// must be excluded
+		if(pToken == to)
+			return NULL; // only excluded keywords
+		pToken = pToken->pNext;
+		if(!pToken)
+			return NULL; // ... bug?
+	}
+
+	// Got at least one non-excluded keyword
+	CXXToken * pRet = cxxTokenCreate();
+	pRet->iLineNumber = pToken->iLineNumber;
+	pRet->oFilePosition = pToken->oFilePosition;
+	pRet->eType = pToken->eType;
+
+	cxxTokenAppendToString(pRet->pszWord,pToken);
+	if(pToken->bFollowedBySpace)
+		vStringPut (pRet->pszWord, ' ');
+	pRet->bFollowedBySpace = pToken->bFollowedBySpace;
+
+	while(pToken != to)
+	{
+		pToken = pToken->pNext;
+		if(!pToken)
+			return pRet; // ... bug?
+
+		for(;;)
+		{
+			if(!cxxTokenTypeIs(pToken,CXXTokenTypeKeyword))
+				break;
+			if(!cxxKeywordExcludeFromTypeNames(pToken->eKeyword))
+				break;
+			// must be excluded
+			if(pToken == to)
+				return pRet;
+			pToken = pToken->pNext;
+			if(!pToken)
+				return pRet; // ... bug?
+		}
+
+		cxxTokenAppendToString(pRet->pszWord,pToken);
+		if(pToken->bFollowedBySpace)
+			vStringPut (pRet->pszWord, ' ');
+		pRet->bFollowedBySpace = pToken->bFollowedBySpace;
+	}
+
+	return pRet;
+}
+
 
 CXXToken * cxxTokenChainExtractIndexRange(
 		CXXTokenChain * tc,
