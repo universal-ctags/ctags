@@ -4049,6 +4049,9 @@ restart:
 	  BIT_STATUS_ON_AT(env->bt_mem_start, en->regnum);
 	  /* SET_ENCLOSE_STATUS(node, NST_MEM_IN_ALT_NOT); */
 	}
+	if ((state & IN_CALL) != 0) {
+	  BIT_STATUS_ON_AT(env->bt_mem_end, en->regnum);
+	}
 	if (IS_ENCLOSE_CALLED(en))
 	  state |= IN_CALL;
 	r = setup_tree(en->target, reg, state, env);
