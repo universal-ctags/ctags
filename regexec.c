@@ -1201,10 +1201,10 @@ static int mem_is_in_memp(int mem, int num, UChar* memp)
   return 0;
 }
 
-static int backref_match_at_nested_level(regex_t* reg
-	 , OnigStackType* top, OnigStackType* stk_base
-	 , int ignore_case, int case_fold_flag
-	 , int nest, int mem_num, UChar* memp, UChar** s, const UChar* send)
+static int backref_match_at_nested_level(regex_t* reg,
+	 OnigStackType* top, OnigStackType* stk_base,
+	 int ignore_case, int case_fold_flag,
+	 int nest, int mem_num, UChar* memp, UChar** s, const UChar* send)
 {
   UChar *ss, *p, *pstart, *pend = NULL_UCHARP;
   int level;
@@ -2677,8 +2677,8 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
 	GET_LENGTH_INC(tlen,  p);
 
 	sprev = s;
-	if (backref_match_at_nested_level(reg, stk, stk_base, ic
-		  , case_fold_flag, (int )level, (int )tlen, p, &s, end)) {
+	if (backref_match_at_nested_level(reg, stk, stk_base, ic,
+		  case_fold_flag, (int )level, (int )tlen, p, &s, end)) {
 	  while (sprev + (len = enclen(encode, sprev, end)) < s)
 	    sprev += len;
 
