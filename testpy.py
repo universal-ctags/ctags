@@ -1283,6 +1283,7 @@ def main():
     x2("abc{1}", "abcc", 0, 3)
     x3("\\(((?:[^(]|\\g<0>)*)\\)", "(abc)(abc)", 1, 4, 1)   # Issue #48
     x3("\\(((?:[^(]|\\g<0>)*)\\)", "((abc)(abc))", 1, 11, 1)
+    x3("\\(((?:[^(]|(\\g<0>))*)\\)", "((abc)(abc))", 6, 11, 2)
 
     # ONIG_OPTION_FIND_LONGEST option
     x2("foo|foobar", "foobar", 0, 3)
