@@ -4474,14 +4474,14 @@ onig_search_gpos(regex_t* reg, const UChar* str, const UChar* end,
   return s - str;
 }
 
-extern int
+extern OnigPosition
 onig_scan(regex_t* reg, const UChar* str, const UChar* end,
 	  OnigRegion* region, OnigOptionType option,
-	  int (*scan_callback)(int, int, OnigRegion*, void*),
+	  int (*scan_callback)(OnigPosition, OnigPosition, OnigRegion*, void*),
 	  void* callback_arg)
 {
-  int r;
-  int n;
+  OnigPosition r;
+  OnigPosition n;
   int rs;
   const UChar* start;
 

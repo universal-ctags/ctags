@@ -310,10 +310,10 @@ Onigmo (Oniguruma-mod) API  Version 6.0.0  2016/12/03
     ONIG_OPTION_NOTEOS       string end (end) isn't considered as end of string (\z)
 
 
-# int onig_scan(regex_t* reg, const UChar* str, const UChar* end,
-                OnigRegion* region, OnigOptionType option,
-                int (*scan_callback)(int, int, OnigRegion*, void*),
-                void* callback_arg)
+# OnigPosition onig_scan(regex_t* reg, const UChar* str, const UChar* end,
+        OnigRegion* region, OnigOptionType option,
+        int (*scan_callback)(OnigPosition, OnigPosition, OnigRegion*, void*),
+        void* callback_arg)
 
   Scan string and callback with matching region.
 

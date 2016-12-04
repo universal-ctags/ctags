@@ -192,8 +192,8 @@ regexec(regex_t* reg, const char* str, size_t nmatch,
   if (r >= 0) {
     r = 0; /* Match */
     for (i = 0; i < (int )nmatch; i++) {
-      pmatch[i].rm_so = region->beg[i];
-      pmatch[i].rm_eo = region->end[i];
+      pmatch[i].rm_so = (regoff_t )region->beg[i];
+      pmatch[i].rm_eo = (regoff_t )region->end[i];
     }
   }
   else if (r == ONIG_MISMATCH) {

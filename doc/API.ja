@@ -311,10 +311,10 @@ Onigmo インターフェース Version 6.0.0   2016/12/03
     ONIG_OPTION_NOTEOS        文字列の終端(end)を終端(\z)と看做さない
 
 
-# int onig_scan(regex_t* reg, const UChar* str, const UChar* end,
-                OnigRegion* region, OnigOptionType option,
-                int (*scan_callback)(int, int, OnigRegion*, void*),
-                void* callback_arg)
+# OnigPosition onig_scan(regex_t* reg, const UChar* str, const UChar* end,
+        OnigRegion* region, OnigOptionType option,
+        int (*scan_callback)(OnigPosition, OnigPosition, OnigRegion*, void*),
+        void* callback_arg)
 
   正規表現で文字列をスキャンして、マッチングする毎にコールバック関数を呼び出す。
 
