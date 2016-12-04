@@ -593,8 +593,8 @@ process_token:
 //
 bool cxxParserParseBlock(bool bExpectClosingBracket)
 {
-	cppSetExternalParserState(cppGetExternalParserState() + 1);
+	cppPushExternalParserBlock();
 	bool bRet = cxxParserParseBlockInternal(bExpectClosingBracket);
-	cppSetExternalParserState(cppGetExternalParserState() - 1);
+	cppPopExternalParserBlock();
 	return bRet;
 }

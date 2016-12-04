@@ -51,7 +51,7 @@ typedef struct sConditionalInfo {
 	bool singleBranch;       /* choose only one branch */
 	bool branchChosen;       /* branch already selected */
 	bool ignoring;           /* current ignore state */
-	int enterExternalParserState;          /* the parser state when entering this conditional: used only by cxx */
+	int enterExternalParserBlockNestLevel;          /* the parser state when entering this conditional: used only by cxx */
 } conditionalInfo;
 
 enum eState {
@@ -137,21 +137,21 @@ static bool doesExaminCodeWithInIf0Branch;
 * If at the exit of the conditional the state is changed then we assume
 * that no further branches should be followed.
 */
-static int externalParserState;
+static int externalParserBlockNestLevel;
 
 
 /*  Use brace formatting to detect end of block.
  */
 static bool BraceFormat = false;
 
-void cppSetExternalParserState(int iState)
+void cppPushExternalParserBlock()
 {
-	externalParserState = iState;
+	externalParserBlockNestLevel++;
 }
 
-int cppGetExternalParserState()
+void cppPopExternalParserBlock()
 {
-	return externalParserState;
+	externalParserBlockNestLevel--;
 }
 
 
@@ -205,7 +205,7 @@ extern void cppInit (const bool state, const bool hasAtLiteralStrings,
 
 	CXX_DEBUG_PRINT("cppInit: brace format is %d",BraceFormat);
 
-	externalParserState = 0;
+	externalParserBlockNestLevel = 0;
 
 	if (Cpp.lang == LANG_IGNORE)
 	{
@@ -464,10 +464,8 @@ static bool isIgnoreBranch (void)
 	 */
 
 	/*
-	* CXX: Force a single branch if the external parser (cxx) state at the beginning
-	* of this conditional was not equal to the current state (at exit of the first branch).
-	* The meaning of the state is assigned by the parser: CXX, for now, uses the
-	* number of nested {} blocks. So
+	* CXX: Force a single branch if the external parser (cxx) block nest level at the beginning
+	* of this conditional is not equal to the current block nest level (at exit of the first branch).
 	*
 	* Follow both branches example: (same state at enter and exit)
 	*
@@ -477,7 +475,7 @@ static bool isIgnoreBranch (void)
 	*     yyyy;
 	* #endif
 	*
-	* Follow single branch example: (different block level at enter and exit
+	* Follow single branch example: (different block level at enter and exit)
 	*
 	*    if {
 	* #if something
@@ -488,7 +486,7 @@ static bool isIgnoreBranch (void)
 	*/
 
 	if (
-			(Cpp.resolveRequired || (ifdef->enterExternalParserState != externalParserState)) &&
+			(Cpp.resolveRequired || (ifdef->enterExternalParserBlockNestLevel != externalParserBlockNestLevel)) &&
 			(!BraceFormat)
 		)
 	{
@@ -545,7 +543,7 @@ static bool pushConditional (const bool firstBranchChosen)
 		ifdef->ignoring = (bool) (ignoreAllBranches || (
 				! firstBranchChosen  &&  ! BraceFormat  &&
 				(ifdef->singleBranch || !doesExaminCodeWithInIf0Branch)));
-		ifdef->enterExternalParserState = externalParserState;
+		ifdef->enterExternalParserBlockNestLevel = externalParserBlockNestLevel;
 		ignoreBranch = ifdef->ignoring;
 	}
 	return ignoreBranch;
