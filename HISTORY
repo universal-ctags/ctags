@@ -2,6 +2,7 @@ History of Onigmo (Oniguruma-mod)
 
 2016/xx/xx: Version 6.0.0
 
+2016/12/04: [bug]  Fix wrong capture in subexp call. (Issue #48)
 2016/12/01: [spec] \X matches \x0D\x0A also on non-Unicode encodings.
 2016/12/01: [impl] Import Ruby r56952
                    Use offsetof macro and shrink table size.
