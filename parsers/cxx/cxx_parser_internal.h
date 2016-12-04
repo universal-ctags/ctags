@@ -23,6 +23,15 @@
 // This file is included only by cxx_parser_*.c
 //
 
+// CXX parser language. We use a specific enum and not langType
+// since we want to be able to use it in bit fields.
+typedef enum _CXXLanguage
+{
+	CXXLanguageC = 1,
+	CXXLanguageCPP = (1 << 1),
+	CXXLanguageCUDA = (1 << 2)
+} CXXLanguage;
+
 // cxx_parser_tokenizer.c
 bool cxxParserParseNextToken(void);
 
@@ -193,7 +202,7 @@ bool cxxParserSkipToSemicolonOrEOF(void);
 bool cxxParserParseToEndOfQualifedName(void);
 bool cxxParserParseEnum(void);
 bool cxxParserParseClassStructOrUnion(
-		enum CXXKeyword eKeyword,
+		CXXKeyword eKeyword,
 		unsigned int uTagKind,
 		unsigned int uScopeType
 	);
@@ -245,15 +254,21 @@ typedef enum _CXXParserKeywordState
 	CXXParserKeywordStateSeenAttributeDeprecated = (1 << 11),
 } CXXParserKeywordState;
 
+
 typedef struct _CXXParserState
 {
 	// The current language
-	langType eLanguage;
+	CXXLanguage eLanguage;
+
+	// The current language as langType
+	langType eLangType;
 
 	// The identifier of the CPP language, as indicated by ctags core
-	langType eCPPLanguage;
+	langType eCPPLangType;
 	// The identifier of the C language, as indicated by ctags core
-	langType eCLanguage;
+	langType eCLangType;
+	// The identifier of the CUDA language, as indicated by ctags core
+	langType eCUDALangType;
 	
 	// The kind options associated to the current language
 	kindOption * pKindOptions;
@@ -305,14 +320,22 @@ typedef struct _CXXParserState
 } CXXParserState;
 
 
-
 // defined in cxx_parser.c
 extern CXXParserState g_cxx;
 
+#define cxxParserCurrentLanguageIs(_eLanguage) \
+	(g_cxx.eLanguage == _eLanguage)
+
+#define cxxParserCurrentLanguageIsOneOf(_eLanguageMask) \
+	(((int)(g_cxx.eLanguage)) & (_eLanguageMask))
+
 #define cxxParserCurrentLanguageIsCPP() \
-	(g_cxx.eLanguage == g_cxx.eCPPLanguage)
+	cxxParserCurrentLanguageIs(CXXLanguageCPP)
 
 #define cxxParserCurrentLanguageIsC() \
-	(g_cxx.eLanguage == g_cxx.eCLanguage)
+	cxxParserCurrentLanguageIs(CXXLanguageC)
+
+#define cxxParserCurrentLanguageIsCUDA() \
+	cxxParserCurrentLanguageIs(CXXLanguageCUDA)
 
 #endif //!ctags_cxx_parser_internal_h_

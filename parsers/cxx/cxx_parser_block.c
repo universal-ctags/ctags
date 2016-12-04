@@ -449,7 +449,7 @@ process_token:
 			case CXXTokenTypeSemicolon:
 			{
 				if(
-						(g_cxx.eLanguage == g_cxx.eCLanguage) &&
+						(g_cxx.eLangType == g_cxx.eCLangType) &&
 						cxxScopeIsGlobal() &&
 						(!(g_cxx.uKeywordState & CXXParserKeywordStateSeenExtern)) &&
 						(!(g_cxx.uKeywordState & CXXParserKeywordStateSeenTypedef))

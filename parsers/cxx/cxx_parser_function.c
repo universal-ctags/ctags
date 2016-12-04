@@ -53,7 +53,7 @@ int cxxParserMaybeExtractKnRStyleFunctionDefinition(int * piCorkQueueIndex)
 	//                                       we're here
 
 	CXX_DEBUG_ASSERT(
-			g_cxx.eLanguage == g_cxx.eCLanguage,
+			cxxParserCurrentLanguageIsC(),
 			"Should be called only when parsing C"
 		);
 	CXX_DEBUG_ASSERT(
@@ -1663,7 +1663,7 @@ bool cxxParserTokenChainLooksLikeFunctionParameterList(
 
 	CXXToken * t = cxxTokenChainAt(tc,1);
 
-	bool bIsC = cxxParserCurrentLanguageIsC();
+	bool bIsCPP = cxxParserCurrentLanguageIsCPP();
 
 	for(;;)
 	{
@@ -1919,7 +1919,7 @@ try_again:
 		}
 
 		// assignment.
-		if(bIsC)
+		if(!bIsCPP)
 		{
 			CXX_DEBUG_LEAVE_TEXT(
 					"Found assignment, this doesn't look like valid C function parameter list"

@@ -18,23 +18,24 @@
 #include "routines.h"
 #include "xtag.h"
 
-#define CXX_COMMON_MACRO_ROLES(__langPrefix)		\
-    static roleDesc __langPrefix##MacroRoles [] = {	\
-	    RoleTemplateUndef,				\
-    }
+#define CXX_COMMON_MACRO_ROLES(__langPrefix) \
+	static roleDesc __langPrefix##MacroRoles [] = { \
+		RoleTemplateUndef, \
+	}
 
 CXX_COMMON_MACRO_ROLES(C);
 CXX_COMMON_MACRO_ROLES(CXX);
+CXX_COMMON_MACRO_ROLES(CUDA);
 
-
-#define CXX_COMMON_HEADER_ROLES(__langPrefix)		\
-    static roleDesc __langPrefix##HeaderRoles [] = {	\
-	    RoleTemplateSystem,				\
-	    RoleTemplateLocal,				\
-    }
+#define CXX_COMMON_HEADER_ROLES(__langPrefix) \
+	static roleDesc __langPrefix##HeaderRoles [] = { \
+		RoleTemplateSystem, \
+		RoleTemplateLocal, \
+	}
 
 CXX_COMMON_HEADER_ROLES(C);
 CXX_COMMON_HEADER_ROLES(CXX);
+CXX_COMMON_HEADER_ROLES(CUDA);
 
 
 #define CXX_COMMON_KINDS(_langPrefix, _szMemberDescription, _syncWith)	\
@@ -75,6 +76,10 @@ static kindOption g_aCXXCPPKinds [] = {
 			.referenceOnly = true },
 };
 
+static kindOption g_aCXXCUDAKinds [] = {
+	CXX_COMMON_KINDS(CUDA,"struct, and union members", LANG_IGNORE)
+};
+
 static const char * g_aCXXAccessStrings [] = {
 	NULL,
 	"public",
@@ -112,22 +117,35 @@ static fieldSpec g_aCXXCPPFields [] = {
 	}
 };
 
-void cxxTagInitForLanguage(langType eLanguage)
-{
-	g_cxx.eLanguage = eLanguage;
+static fieldSpec g_aCXXCUDAFields [] = {
+	CXX_COMMON_FIELDS
+};
 
-	if(g_cxx.eLanguage == g_cxx.eCLanguage)
+void cxxTagInitForLanguage(langType eLangType)
+{
+	g_cxx.eLangType = eLangType;
+
+	if(g_cxx.eLangType == g_cxx.eCLangType)
 	{
+		g_cxx.eLanguage = CXXLanguageC;
 		g_cxx.pKindOptions = g_aCXXCKinds;
 		g_cxx.uKindOptionCount = sizeof(g_aCXXCKinds) / sizeof(kindOption);
 		g_cxx.pFieldOptions = g_aCXXCFields;
 		g_cxx.uFieldOptionCount = sizeof(g_aCXXCFields) / sizeof(fieldSpec);
-	} else if(g_cxx.eLanguage == g_cxx.eCPPLanguage)
+	} else if(g_cxx.eLangType == g_cxx.eCPPLangType)
 	{
+		g_cxx.eLanguage = CXXLanguageCPP;
 		g_cxx.pKindOptions = g_aCXXCPPKinds;
 		g_cxx.uKindOptionCount = sizeof(g_aCXXCPPKinds) / sizeof(kindOption);
 		g_cxx.pFieldOptions = g_aCXXCPPFields;
 		g_cxx.uFieldOptionCount = sizeof(g_aCXXCPPFields) / sizeof(fieldSpec);
+	} else if(g_cxx.eLangType == g_cxx.eCUDALangType)
+	{
+		g_cxx.eLanguage = CXXLanguageCUDA;
+		g_cxx.pKindOptions = g_aCXXCUDAKinds;
+		g_cxx.uKindOptionCount = sizeof(g_aCXXCUDAKinds) / sizeof(kindOption);
+		g_cxx.pFieldOptions = g_aCXXCUDAFields;
+		g_cxx.uFieldOptionCount = sizeof(g_aCXXCUDAFields) / sizeof(fieldSpec);
 	} else {
 		CXX_DEBUG_ASSERT(false,"Invalid language passed to cxxTagInitForLanguage()");
 	}
@@ -141,6 +159,16 @@ kindOption * cxxTagGetCKindOptions(void)
 int cxxTagGetCKindOptionCount(void)
 {
 	return sizeof(g_aCXXCKinds) / sizeof(kindOption);
+}
+
+kindOption * cxxTagGetCUDAKindOptions(void)
+{
+	return g_aCXXCUDAKinds;
+}
+
+int cxxTagGetCUDAKindOptionCount(void)
+{
+	return sizeof(g_aCXXCUDAKinds) / sizeof(kindOption);
 }
 
 kindOption * cxxTagGetCPPKindOptions(void)
@@ -170,6 +198,16 @@ fieldSpec * cxxTagGetCPPFieldSpecifiers(void)
 int cxxTagGetCPPFieldSpecifierCount(void)
 {
 	return sizeof(g_aCXXCPPFields) / sizeof(fieldSpec);
+}
+
+fieldSpec * cxxTagGetCUDAFieldSpecifiers(void)
+{
+	return g_aCXXCUDAFields;
+}
+
+int cxxTagGetCUDAFieldSpecifierCount(void)
+{
+	return sizeof(g_aCXXCUDAFields) / sizeof(fieldSpec);
 }
 
 fieldSpec * cxxTagGetCFieldSpecifiers(void)
@@ -233,7 +271,7 @@ vString * cxxTagSetProperties(unsigned int uProperties)
 		return NULL;
 
 	if(!cxxTagFieldEnabled(CXXTagFieldProperties))
-			return NULL;
+		return NULL;
 
 	vString * pszProperties = vStringNew();
 

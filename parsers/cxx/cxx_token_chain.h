@@ -233,12 +233,12 @@ CXXToken * cxxTokenChainExtractIndexRange(
 
 CXXToken * cxxTokenChainPreviousKeyword(
 		CXXToken * from,
-		enum CXXKeyword eKeyword
+		CXXKeyword eKeyword
 	);
 
 CXXToken * cxxTokenChainNextKeyword(
 		CXXToken * from,
-		enum CXXKeyword eKeyword
+		CXXKeyword eKeyword
 	);
 
 CXXToken * cxxTokenChainNextIdentifier(
@@ -248,7 +248,7 @@ CXXToken * cxxTokenChainNextIdentifier(
 
 int cxxTokenChainFirstKeywordIndex(
 		CXXTokenChain * tc,
-		enum CXXKeyword eKeyword
+		CXXKeyword eKeyword
 	);
 
 #if 0
@@ -256,7 +256,7 @@ int cxxTokenChainFirstKeywordIndex(
 // Remove the #if above if needed.
 CXXToken * cxxTokenChainFirstKeyword(
 		CXXTokenChain * tc,
-		enum CXXKeyword eKeyword
+		CXXKeyword eKeyword
 	);
 #endif
 

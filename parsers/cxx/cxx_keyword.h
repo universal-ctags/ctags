@@ -13,7 +13,7 @@
 #include "parse.h"
 
 // WARNING: There is a table in cxx_keyword.c that must match order in this enum
-enum CXXKeyword
+typedef enum _CXXKeyword
 {
 	CXXKeyword__ATTRIBUTE__, // GCC
 	CXXKeyword__DECLSPEC, // Microsoft C/C++
@@ -112,16 +112,18 @@ enum CXXKeyword
 	//CXXKeywordXOR,
 	//CXXKeywordXOR_EQ,
 	// WARNING: There is a table in cxx_keyword.c that must match order in this enumeration
-};
+} CXXKeyword;
 
-bool cxxKeywordIsConstant(enum CXXKeyword eKeywordId);
-bool cxxKeywordMayBePartOfTypeName(enum CXXKeyword eKeywordId);
-bool cxxKeywordIsTypeRefMarker(enum CXXKeyword eKeywordId);
-bool cxxKeywordExcludeFromTypeNames(enum CXXKeyword eKeywordId);
+bool cxxKeywordIsConstant(CXXKeyword eKeywordId);
+bool cxxKeywordMayBePartOfTypeName(CXXKeyword eKeywordId);
+bool cxxKeywordIsTypeRefMarker(CXXKeyword eKeywordId);
+bool cxxKeywordExcludeFromTypeNames(CXXKeyword eKeywordId);
 
-const char * cxxKeywordName(enum CXXKeyword eKeywordId);
+const char * cxxKeywordName(CXXKeyword eKeywordId);
 
-void cxxBuildKeywordHash(const langType language,bool bCXX);
+// uLanguage is really CXXLanguage, but we keep it as unsigned int to avoid
+// problems with header inclusions. It works anyway.
+void cxxBuildKeywordHash(const langType eLangType,unsigned int uLanguage);
 
 
 #endif //!ctags_cxx_keyword_h_

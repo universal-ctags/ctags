@@ -16,8 +16,12 @@
 // public parser api
 rescanReason cxxCParserMain(const unsigned int passCount);
 rescanReason cxxCppParserMain(const unsigned int passCount);
-void cxxCppParserInitialize(const langType language);
+rescanReason cxxCUDAParserMain(const unsigned int passCount);
+
 void cxxCParserInitialize(const langType language);
-void cxxParserCleanup (langType language, bool initialized);
+void cxxCppParserInitialize(const langType language);
+void cxxCUDAParserInitialize(const langType language);
+
+void cxxParserCleanup(langType language, bool initialized);
 
 #endif //!ctags_cxx_parser_h_
