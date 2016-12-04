@@ -40,29 +40,78 @@ static const CXXKeywordDescriptor g_aCXXKeywordTable[] = {
 		0
 	},
 	{
+		"__constant__",
+		CXXLanguageCUDA,
+		CXXKeywordExcludeFromTypeNames
+	},
+	{
 		"__declspec",
 		CXXLanguageC | CXXLanguageCPP | CXXLanguageCUDA,
-		0
+		CXXKeywordExcludeFromTypeNames
+	},
+	{
+		"__device__",
+		CXXLanguageCUDA,
+		CXXKeywordExcludeFromTypeNames
 	},
 	{
 		"__fastcall",
-		CXXLanguageCPP,
-		0
+		CXXLanguageCPP
 	},
 	{
 		"__forceinline",
 		CXXLanguageC | CXXLanguageCPP | CXXLanguageCUDA,
-		0
+		CXXKeywordExcludeFromTypeNames
+	},
+	{
+		"__forceinline__",
+		CXXLanguageCUDA,
+		CXXKeywordExcludeFromTypeNames
+	},
+	{
+		"__global__",
+		CXXLanguageCUDA,
+		CXXKeywordExcludeFromTypeNames
+	},
+	{
+		"__host__",
+		CXXLanguageCUDA,
+		CXXKeywordExcludeFromTypeNames
 	},
 	{
 		"__inline",
 		CXXLanguageC | CXXLanguageCPP | CXXLanguageCUDA,
-		0
+		CXXKeywordExcludeFromTypeNames
 	},
 	{
 		"__inline__",
 		CXXLanguageC | CXXLanguageCPP | CXXLanguageCUDA,
-		0
+		CXXKeywordExcludeFromTypeNames
+	},
+	{
+		"__managed__",
+		CXXLanguageCUDA,
+		CXXKeywordExcludeFromTypeNames
+	},
+	{
+		"__noinline__",
+		CXXLanguageCUDA,
+		CXXKeywordExcludeFromTypeNames
+	},
+	{
+		"__restrict",
+		CXXLanguageC | CXXLanguageCPP | CXXLanguageCUDA,
+		CXXKeywordExcludeFromTypeNames
+	},
+	{
+		"__restrict__",
+		CXXLanguageC | CXXLanguageCPP | CXXLanguageCUDA,
+		CXXKeywordExcludeFromTypeNames
+	},
+	{
+		"__shared__",
+		CXXLanguageCUDA,
+		CXXKeywordExcludeFromTypeNames
 	},
 	{
 		"__stdcall",
@@ -336,6 +385,11 @@ static const CXXKeywordDescriptor g_aCXXKeywordTable[] = {
 		"requires",
 		CXXLanguageCPP,
 		0
+	},
+	{
+		"restrict",
+		CXXLanguageC | CXXLanguageCPP | CXXLanguageCUDA,
+		CXXKeywordExcludeFromTypeNames
 	},
 	{
 		"return",

@@ -404,6 +404,7 @@ process_token:
 					case CXXKeyword__INLINE:
 					case CXXKeyword__INLINE__:
 					case CXXKeyword__FORCEINLINE:
+					case CXXKeyword__FORCEINLINE__:
 						g_cxx.uKeywordState |= CXXParserKeywordStateSeenInline;
 						cxxTokenChainDestroyLast(g_cxx.pTokenChain);
 					break;

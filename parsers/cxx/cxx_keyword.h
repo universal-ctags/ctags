@@ -16,11 +16,21 @@
 typedef enum _CXXKeyword
 {
 	CXXKeyword__ATTRIBUTE__, // GCC
+	CXXKeyword__CONSTANT__, // CUDA
 	CXXKeyword__DECLSPEC, // Microsoft C/C++
+	CXXKeyword__DEVICE__, // CUDA
 	CXXKeyword__FASTCALL, // Microsoft C/C++
 	CXXKeyword__FORCEINLINE, // Microsoft C/C++
+	CXXKeyword__FORCEINLINE__, // CUDA
+	CXXKeyword__GLOBAL__, // CUDA
+	CXXKeyword__HOST__, // CUDA
 	CXXKeyword__INLINE, // Microsoft C/C++
 	CXXKeyword__INLINE__, // GCC
+	CXXKeyword__MANAGED__, // CUDA
+	CXXKeyword__NOINLINE__, // CUDA
+	CXXKeyword__RESTRICT, // Microsoft C/C++
+	CXXKeyword__RESTRICT__, // CUDA
+	CXXKeyword__SHARED__, // CUDA
 	CXXKeyword__STDCALL, // Microsoft C/C++
 	CXXKeyword__THISCALL, // Microsoft C/C++
 	CXXKeywordALIGNAS, // (since C++11)
@@ -83,6 +93,7 @@ typedef enum _CXXKeyword
 	CXXKeywordREGISTER,
 	CXXKeywordREINTERPRET_CAST,
 	CXXKeywordREQUIRES, // (Concepts TS)
+	CXXKeywordRESTRICT, // C99 extension
 	CXXKeywordRETURN,
 	CXXKeywordSHORT,
 	CXXKeywordSIGNED,
