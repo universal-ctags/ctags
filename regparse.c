@@ -5701,7 +5701,7 @@ node_extended_grapheme_cluster(Node** np, ScanEnv* env)
   Node* alt2 = NULL;
   BBuf *pbuf1 = NULL;
   int r = 0;
-  int num1, num2;
+  int num1;
   UChar buf[ONIGENC_CODE_TO_MBC_MAXLEN * 2];
   OnigOptionType option;
 
@@ -5751,7 +5751,10 @@ node_extended_grapheme_cluster(Node** np, ScanEnv* env)
       r = add_code_range(&pbuf1, env, 0x0d, 0x0d);
       if (r != 0) goto err;
       r = and_code_range_buf(cc->mbuf, 0, pbuf1, 1, &pbuf2, env);
-      if (r != 0) goto err;
+      if (r != 0) {
+	bbuf_free(pbuf2);
+	goto err;
+      }
       bbuf_free(pbuf1);
       pbuf1 = NULL;
       bbuf_free(cc->mbuf);
@@ -6084,9 +6087,9 @@ node_extended_grapheme_cluster(Node** np, ScanEnv* env)
     /* Emoji variation sequence
      * http://unicode.org/Public/emoji/4.0/emoji-zwj-sequences.txt
      */
-    num1 = ONIGENC_CODE_TO_MBC(env->enc, 0xfe0f, buf);
-    if (num1 < 0) return num1;
-    np1 = node_new_str_raw(buf, buf + num1);
+    r = ONIGENC_CODE_TO_MBC(env->enc, 0xfe0f, buf);
+    if (r < 0) goto err;
+    np1 = node_new_str_raw(buf, buf + r);
     if (IS_NULL(np1)) goto err;
 
     tmp = node_new_quantifier(0, 1, 0);
@@ -6130,9 +6133,9 @@ node_extended_grapheme_cluster(Node** np, ScanEnv* env)
     alt2 = NULL;
 
     /* ZWJ */
-    num1 = ONIGENC_CODE_TO_MBC(env->enc, 0x200D, buf);
-    if (num1 < 0) return num1;
-    np1 = node_new_str_raw(buf, buf + num1);
+    r = ONIGENC_CODE_TO_MBC(env->enc, 0x200D, buf);
+    if (r < 0) goto err;
+    np1 = node_new_str_raw(buf, buf + r);
     if (IS_NULL(np1)) goto err;
 
     tmp = node_new_list(np1, list2);
@@ -6253,9 +6256,9 @@ node_extended_grapheme_cluster(Node** np, ScanEnv* env)
     list2 = tmp;
     np1 = NULL;
 
-    num1 = ONIGENC_CODE_TO_MBC(env->enc, 0x200D, buf);
-    if (num1 < 0) return num1;
-    np1 = node_new_str_raw(buf, buf + num1);
+    r = ONIGENC_CODE_TO_MBC(env->enc, 0x200D, buf);
+    if (r < 0) goto err;
+    np1 = node_new_str_raw(buf, buf + r);
     if (IS_NULL(np1)) goto err;
 
     tmp = node_new_list(np1, list2);
@@ -6329,9 +6332,9 @@ node_extended_grapheme_cluster(Node** np, ScanEnv* env)
     np1 = NULL;
 
     /* Prepend+ */
-    num1 = ONIGENC_CODE_TO_MBC(env->enc, 0x200D, buf);
-    if (num1 < 0) return num1;
-    np1 = node_new_str_raw(buf, buf + num1);
+    r = ONIGENC_CODE_TO_MBC(env->enc, 0x200D, buf);
+    if (r < 0) goto err;
+    np1 = node_new_str_raw(buf, buf + r);
     if (IS_NULL(np1)) goto err;
 
     tmp = node_new_quantifier(0, 1, 0);
@@ -6390,11 +6393,12 @@ node_extended_grapheme_cluster(Node** np, ScanEnv* env)
   }
 
   /* \x0D\x0A */
-  num1 = ONIGENC_CODE_TO_MBC(env->enc, 0x0D, buf);
-  if (num1 < 0) return num1;
-  num2 = ONIGENC_CODE_TO_MBC(env->enc, 0x0A, buf + num1);
-  if (num2 < 0) return num2;
-  np1 = node_new_str_raw(buf, buf + num1 + num2);
+  r = ONIGENC_CODE_TO_MBC(env->enc, 0x0D, buf);
+  if (r < 0) goto err;
+  num1 = r;
+  r = ONIGENC_CODE_TO_MBC(env->enc, 0x0A, buf + num1);
+  if (r < 0) goto err;
+  np1 = node_new_str_raw(buf, buf + num1 + r);
   if (IS_NULL(np1)) goto err;
 
   tmp = onig_node_new_alt(np1, alt);
