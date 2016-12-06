@@ -2,6 +2,8 @@ History of Onigmo (Oniguruma-mod)
 
 2016/xx/xx: Version 6.0.0
 
+2016/12/06: [impl] Import Ruby r56991 and r56992
+                   Import the latest st.c.
 2016/12/04: [impl] Import Ruby r56976
                    Remove special processing for U+03B9/U+03BC/U+A64B.
 2016/12/04: [impl] Import Ruby r56975
@@ -117,7 +119,7 @@ History of Onigmo (Oniguruma-mod)
 2016/10/06: [impl] Import Ruby r54741
                    Constify oplabels.
 2016/10/06: [bug]  Import Ruby r53248, r53251
-                   Fix build with direct threaded VM.
+                   Fix build with token threaded VM.
 2016/10/06: [bug]  Import Ruby r52999
                    Get rid of breaking strict aliasing.
 2016/10/06: [impl] Import Ruby r52757
@@ -126,7 +128,7 @@ History of Onigmo (Oniguruma-mod)
 2016/10/03: [impl] (thanks Kouhei Sutou)
                    Support --enable-mutlithread for MinGW build. (PR #54)
 2016/10/03: [tune] (thanks KeenS)
-                   Implement Direct Threaded VM. (Issue #51, PR #52)
+                   Implement Token Threaded VM. (Issue #51, PR #52)
 2015/09/13: [impl] (thanks Kouhei Sutou)
                    Add "const" to not changed strings. (PR #50)
 2015/09/13: [impl] (thanks Kouhei Sutou)
