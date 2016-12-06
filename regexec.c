@@ -36,11 +36,11 @@
 # define USE_MATCH_RANGE_MUST_BE_INSIDE_OF_SPECIFIED_RANGE
 #endif
 
-#ifndef USE_DIRECT_THREADED_VM
+#ifndef USE_TOKEN_THREADED_VM
 # ifdef __GNUC__
-#  define USE_DIRECT_THREADED_VM 1
+#  define USE_TOKEN_THREADED_VM 1
 # else
-#  define USE_DIRECT_THREADED_VM 0
+#  define USE_TOKEN_THREADED_VM 0
 # endif
 #endif
 
@@ -1450,7 +1450,7 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
   int num_comb_exp_check = reg->num_comb_exp_check;
 #endif
 
-#if USE_DIRECT_THREADED_VM
+#if USE_TOKEN_THREADED_VM
 # define OP_OFFSET  1
 # define VM_LOOP JUMP;
 # define VM_LOOP_END
@@ -1625,7 +1625,7 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
     &&L_DEFAULT
 # endif
   };
-#else /* USE_DIRECT_THREADED_VM */
+#else /* USE_TOKEN_THREADED_VM */
 
 # define OP_OFFSET  0
 # define VM_LOOP                                \
@@ -1638,7 +1638,7 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
 # define DEFAULT default:
 # define NEXT break
 # define JUMP continue; break
-#endif /* USE_DIRECT_THREADED_VM */
+#endif /* USE_TOKEN_THREADED_VM */
 
 
 #ifdef USE_SUBEXP_CALL
