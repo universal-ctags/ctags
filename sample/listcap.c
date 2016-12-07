@@ -116,6 +116,9 @@ extern int main(int argc, char* argv[])
   static UChar* str3     = (UChar* )"0123";
   static UChar* pattern3 = (UChar* )"(?@.)(?@.)(?@.)(?@.)";
 
+  static UChar* str4     = (UChar* )"((abc)(abc))";
+  static UChar* pattern4 = (UChar* )"\\((?@(?:[^(]|\\g<0>)*)\\)";
+
  /* enable capture hostory */
   onig_copy_syntax(&syn, ONIG_SYNTAX_DEFAULT);
   onig_set_syntax_op2(&syn,
@@ -124,6 +127,7 @@ extern int main(int argc, char* argv[])
   r |= ex(str1, pattern1, &syn);
   r |= ex(str2, pattern2, &syn);
   r |= ex(str3, pattern3, &syn);
+  r |= ex(str4, pattern4, &syn);
 
   onig_end();
   return r;
