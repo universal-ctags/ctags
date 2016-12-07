@@ -796,6 +796,7 @@ extern char* absoluteFilename (const char *file)
 			res [0] = toupper (res [0]);
 #endif
 	}
+	canonicalizePath (res);
 	return res;
 }
 
