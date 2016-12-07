@@ -180,6 +180,7 @@ extern int lstat (const char *, struct stat *);
 static bool isPathSeparator (const int c);
 static char *strSeparator (const char *s);
 static char *strRSeparator (const char *s);
+static void canonicalizePath (char *const path);
 
 
 /*
@@ -418,7 +419,7 @@ extern bool strToInt(const char *const str, int base, int *value)
  * File system functions
  */
 
-extern void setCurrentDirectory (void)
+extern void setCurrentDirectory (void) /* TODO */
 {
 	char* buf;
 	if (CurrentDirectory == NULL)
@@ -431,6 +432,7 @@ extern void setCurrentDirectory (void)
 		sprintf (CurrentDirectory + strlen (CurrentDirectory), "%c",
 				OUTPUT_PATH_SEPARATOR);
 	}
+	canonicalizePath (CurrentDirectory);
 }
 
 /* For caching of stat() calls */
@@ -551,19 +553,15 @@ static char *strRSeparator (const char *s)
 #endif
 }
 
-#if ! defined (HAVE_STAT_ST_INO)
-
 static void canonicalizePath (char *const path CTAGS_ATTR_UNUSED)
 {
 # if defined (MSDOS_STYLE_PATH)
 	char *p;
 	for (p = path  ;  *p != '\0'  ;  ++p)
 		if (isPathSeparator (*p)  &&  *p != ':')
-			*p = PATH_SEPARATOR;
+			*p = OUTPUT_PATH_SEPARATOR;
 # endif
 }
-
-#endif
 
 extern bool isSameFile (const char *const name1, const char *const name2)
 {
