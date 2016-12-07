@@ -86,7 +86,7 @@ static void findSchemeTags (void)
 			(cp [1] == 'S' || cp [1] == 's') &&
 			(cp [2] == 'E' || cp [2] == 'e') &&
 			(cp [3] == 'T' || cp [3] == 't') &&
-			(cp [4] == '!' || cp [4] == '!') &&
+			(cp [4] == '!') &&
 			(isspace (cp [5]) || cp[5] == '\0'))
 		{
 			cp += 5;

@@ -2749,6 +2749,8 @@ extern void applyParameter (const langType language, const char *name, const cha
  */
 typedef enum {
 	K_BROKEN,
+	K_NO_LETTER,
+	K_NO_LONG_NAME,
 	KIND_COUNT
 } CTST_Kind;
 
@@ -2763,6 +2765,10 @@ static roleDesc CTST_BrokenRoles [] = {
 static kindOption CTST_Kinds[KIND_COUNT] = {
 	{true, 'b', "broken tag", "name with unwanted characters",
 	 .referenceOnly = false, ATTACH_ROLES (CTST_BrokenRoles) },
+	{true, KIND_NULL, "no letter", "kind with no letter"
+	 /* use '@' when testing. */
+	},
+	{true, 'L', NULL, "kind with no long name" },
 };
 
 static void createCTSTTags (void)
@@ -2776,7 +2782,8 @@ static void createCTSTTags (void)
 		int c = line[0];
 
 		for (i = 0; i < KIND_COUNT; i++)
-			if (c == CTST_Kinds[i].letter)
+			if ((c == CTST_Kinds[i].letter && i != K_NO_LETTER)
+				|| (c == '@' && i == K_NO_LETTER))
 			{
 				switch (i)
 				{
@@ -2786,10 +2793,17 @@ static void createCTSTTags (void)
 						e.extensionFields.scopeName = "\\Broken\tContext";
 						makeTagEntry (&e);
 						break;
+					case K_NO_LETTER:
+						initTagEntry (&e, "abnormal kindOption testing (no letter)", &CTST_Kinds[i]);
+						makeTagEntry (&e);
+						break;
+					case K_NO_LONG_NAME:
+						initTagEntry (&e, "abnormal kindOption testing (no long name)", &CTST_Kinds[i]);
+						makeTagEntry (&e);
+						break;
 				}
 			}
 	}
-
 }
 
 static parserDefinition *CTagsSelfTestParser (void)

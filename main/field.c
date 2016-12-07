@@ -716,9 +716,19 @@ static const char *renderFieldPattern (const tagEntryInfo *const tag,
 				       vString* b,
 					   bool *rejected)
 {
-	char* tmp = makePatternString (tag);
-	vStringCatS (b, tmp);
-	eFree (tmp);
+	if (tag->lineNumberEntry)
+		return NULL;
+
+	if (tag->pattern)
+		vStringCatS (b, tag->pattern);
+	else
+	{
+		char* tmp;
+
+		tmp = makePatternString (tag);
+		vStringCatS (b, tmp);
+		eFree (tmp);
+	}
 	return vStringValue (b);
 }
 
@@ -798,7 +808,7 @@ static const char *renderFieldEnd (const tagEntryInfo *const tag,
 
 	if (tag->extensionFields.endLine != 0)
 	{
-		sprintf (buf, "%ld", tag->extensionFields.endLine);
+		sprintf (buf, "%lu", tag->extensionFields.endLine);
 		return renderAsIs (b, buf);
 	}
 	else
