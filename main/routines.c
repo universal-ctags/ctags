@@ -785,8 +785,9 @@ extern char* absoluteFilename (const char *file)
 
 	if (res [0] == '\0')
 	{
+		const char root [] = {OUTPUT_PATH_SEPARATOR, '\0'};
 		eFree (res);
-		res = eStrdup ("/");
+		res = eStrdup (root);
 	}
 	else
 	{
@@ -855,7 +856,10 @@ extern char* relativeFilename (const char *file, const char *dir)
 	res = xMalloc (3 * i + strlen (fp + 1) + 1, char);
 	res [0] = '\0';
 	while (i-- > 0)
-		strcat (res, "../");
+	{
+		const char parent [] = {'.', '.', OUTPUT_PATH_SEPARATOR, '\0'};
+		strcat (res, parent);
+	}
 
 	/* Add the file name relative to the common root of file and dir. */
 	strcat (res, fp + 1);
