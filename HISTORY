@@ -2,13 +2,16 @@ History of Onigmo (Oniguruma-mod)
 
 2016/xx/xx: Version 6.0.0
 
+2016/12/08: [bug]  (thanks Masahiro Ide)
+                   Define PRIdPTRDIFF at regint.h if not defined yet (PR #77)
+2016/12/07: [impl] Better fix for wrong capture in recursive call. (Issue #48)
 2016/12/06: [impl] Import Ruby r56991 and r56992
                    Import the latest st.c.
 2016/12/04: [impl] Import Ruby r56976
                    Remove special processing for U+03B9/U+03BC/U+A64B.
 2016/12/04: [impl] Import Ruby r56975
                    Reorder codepoints in some entries of CaseUnfold_11_Table.
-2016/12/04: [bug]  Fix wrong capture in subexp call. (Issue #48)
+2016/12/04: [bug]  Fix wrong capture in recursive call. (Issue #48)
 2016/12/01: [spec] \X matches \x0D\x0A also on non-Unicode encodings.
 2016/12/01: [impl] Import Ruby r56952
                    Use offsetof macro and shrink table size.
@@ -18,7 +21,7 @@ History of Onigmo (Oniguruma-mod)
                    Regexp supports Unicode 9.0.0's \X. (Issue #46)
 2016/12/01: [bug]  Import Ruby r56924
                    Fix uppercasing for U+A64B.
-2016/11/30: [bug]  Partial fix for wrong capture in subexp call. (Issue #48)
+2016/11/30: [bug]  Partial fix for wrong capture in recursive call. (Issue #48)
 2016/11/28: [impl] Import the latest version of st.c from Ruby. (Issue #70)
                    Import Ruby r56793 with some modifications.
 2016/11/28: [API]  Add onig_{get,set}_parse_depth_limit().
