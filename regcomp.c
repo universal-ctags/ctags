@@ -1235,11 +1235,7 @@ compile_length_enclose_node(EncloseNode* node, regex_t* reg)
 		? SIZE_OP_MEMORY_END_REC : SIZE_OP_MEMORY_END);
     }
     else if (IS_ENCLOSE_RECURSION(node)) {
-      if (BIT_STATUS_AT(reg->bt_mem_start, node->regnum))
-	len = SIZE_OP_MEMORY_START_PUSH;
-      else
-	len = SIZE_OP_MEMORY_START;
-
+      len = SIZE_OP_MEMORY_START_PUSH;
       len += tlen + (BIT_STATUS_AT(reg->bt_mem_end, node->regnum)
 		     ? SIZE_OP_MEMORY_END_PUSH_REC : SIZE_OP_MEMORY_END_REC);
     }
