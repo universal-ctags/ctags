@@ -497,7 +497,7 @@ void interactiveLoop (cookedArgs *args, void *user CTAGS_ATTR_UNUSED)
   char buffer[1024];
   json_t *request;
 
-  fprintf (stdout, "{\"name\": \"" PROGRAM_NAME "\", \"version\": \"" PROGRAM_VERSION "\"}\n");
+  fprintf (stdout, "{\"_type\": \"program\", \"name\": \"" PROGRAM_NAME "\", \"version\": \"" PROGRAM_VERSION "\"}\n");
   fflush (stdout);
 
   while (fgets (buffer, sizeof(buffer), stdin)) {
@@ -538,7 +538,7 @@ void interactiveLoop (cookedArgs *args, void *user CTAGS_ATTR_UNUSED)
       }
 
       closeTagFile (false);
-      fprintf (stdout, "{\"completed\": \"generate-tags\"}\n");
+      fprintf (stdout, "{\"_type\": \"completed\", \"command\": \"generate-tags\"}\n");
       fflush(stdout);
     } else {
       error (FATAL, "unknown command name");

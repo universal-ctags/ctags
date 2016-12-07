@@ -68,7 +68,8 @@ bool jsonErrorPrinter (const errorSelection selection, const char *const format,
   vasprintf (&reason, format, ap);
 
   json_t *response = json_object ();
-  json_object_set_new (response, "error", json_string (reason));
+  json_object_set_new (response, "_type", json_string ("error"));
+  json_object_set_new (response, "message", json_string (reason));
   if (selected (selection, WARNING))
     json_object_set_new (response, "warning", json_true ());
   if (selected (selection, FATAL))

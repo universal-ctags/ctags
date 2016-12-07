@@ -19,7 +19,7 @@ commands over stdin.
 .. code-block:: console
 
     $ ctags --interactive
-    {"name": "Universal Ctags", "version": "0.0.0"}
+    {"_type": "program", "name": "Universal Ctags", "version": "0.0.0"}
 
 The following commands are currently supported in interactive mode:
 
@@ -40,9 +40,9 @@ field emitted once the file has been fully processed.
 .. code-block:: console
 
     $ echo '{"command":"generate-tags", "filename":"test.rb"}' | ctags --interactive
-    {"name": "Universal Ctags", "version": "0.0.0"}
+    {"_type": "program", "name": "Universal Ctags", "version": "0.0.0"}
     {"_type": "tag", "name": "foobar", "path": "test.rb", "pattern": "/^  def foobar$/", "kind": "method", "scope": "Test", "scopeKind": "class"}
-    {"completed": "generate-tags"}
+    {"_type":"completed", "command": "generate-tags"}
 
 The ``generate-tags`` command can also be used to generate tags for code which is not present on disk. For example,
 an IDE might want to generate ctags for an unsaved buffer while the user is editing code. When ``size`` is specified,
@@ -54,8 +54,8 @@ the corresponding number of bytes are read over stdin after the json object and 
       echo '{"command":"generate-tags", "filename":"test.rb", "size": 17}'
       echo 'def foobaz() end'
     ) | ctags --interactive
-    {"name": "Universal Ctags", "version": "0.0.0"}
+    {"_type": "program", "name": "Universal Ctags", "version": "0.0.0"}
     {"_type": "tag", "name": "foobaz", "path": "test.rb", "pattern": "/^def foobaz() end$/", "kind": "method"}
-    {"completed": "generate-tags"}
+    {"_type": "completed", "command": "generate-tags"}
 
 .. _json lines: http://jsonlines.org/
