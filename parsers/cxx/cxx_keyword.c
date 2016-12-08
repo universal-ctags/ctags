@@ -8,6 +8,7 @@
 */
 
 #include "cxx_keyword.h"
+#include "cxx_parser_internal.h"
 
 #include "keyword.h"
 
@@ -25,164 +26,544 @@ enum CXXKeywordFlag
 
 typedef struct _CXXKeywordDescriptor
 {
-	unsigned char bValidC;
 	const char * szName;
+	unsigned int uLanguages;
 	unsigned int uFlags;
 } CXXKeywordDescriptor;
 
 
 // This array is indexed by the CXXKeywordType enum
 static const CXXKeywordDescriptor g_aCXXKeywordTable[] = {
-	{ 1, "__attribute__", 0 },
-	{ 1, "__declspec", 0 },
-	{ 0, "__fastcall", 0 },
-	{ 1, "__forceinline", 0 },
-	{ 1, "__inline", 0 },
-	{ 1, "__inline__", 0 },
-	{ 1, "__stdcall", 0 },
-	{ 0, "__thiscall", 0 },
-	{ 0, "alignas", 0 },
-	{ 0, "alignof", 0 },
+	{
+		"__attribute__",
+		CXXLanguageC | CXXLanguageCPP | CXXLanguageCUDA,
+		0
+	},
+	{
+		"__constant__",
+		CXXLanguageCUDA,
+		CXXKeywordExcludeFromTypeNames
+	},
+	{
+		"__declspec",
+		CXXLanguageC | CXXLanguageCPP | CXXLanguageCUDA,
+		CXXKeywordExcludeFromTypeNames
+	},
+	{
+		"__device__",
+		CXXLanguageCUDA,
+		CXXKeywordExcludeFromTypeNames
+	},
+	{
+		"__fastcall",
+		CXXLanguageCPP
+	},
+	{
+		"__forceinline",
+		CXXLanguageC | CXXLanguageCPP | CXXLanguageCUDA,
+		CXXKeywordExcludeFromTypeNames
+	},
+	{
+		"__forceinline__",
+		CXXLanguageCUDA,
+		CXXKeywordExcludeFromTypeNames
+	},
+	{
+		"__global__",
+		CXXLanguageCUDA,
+		CXXKeywordExcludeFromTypeNames
+	},
+	{
+		"__host__",
+		CXXLanguageCUDA,
+		CXXKeywordExcludeFromTypeNames
+	},
+	{
+		"__inline",
+		CXXLanguageC | CXXLanguageCPP | CXXLanguageCUDA,
+		CXXKeywordExcludeFromTypeNames
+	},
+	{
+		"__inline__",
+		CXXLanguageC | CXXLanguageCPP | CXXLanguageCUDA,
+		CXXKeywordExcludeFromTypeNames
+	},
+	{
+		"__managed__",
+		CXXLanguageCUDA,
+		CXXKeywordExcludeFromTypeNames
+	},
+	{
+		"__noinline__",
+		CXXLanguageCUDA,
+		CXXKeywordExcludeFromTypeNames
+	},
+	{
+		"__restrict",
+		CXXLanguageC | CXXLanguageCPP | CXXLanguageCUDA,
+		CXXKeywordExcludeFromTypeNames
+	},
+	{
+		"__restrict__",
+		CXXLanguageC | CXXLanguageCPP | CXXLanguageCUDA,
+		CXXKeywordExcludeFromTypeNames
+	},
+	{
+		"__shared__",
+		CXXLanguageCUDA,
+		CXXKeywordExcludeFromTypeNames
+	},
+	{
+		"__stdcall",
+		CXXLanguageC | CXXLanguageCPP | CXXLanguageCUDA,
+		0
+	},
+	{
+		"__thiscall",
+		CXXLanguageCPP,
+		0
+	},
+	{
+		"alignas",
+		CXXLanguageCPP,
+		0
+	},
+	{
+		"alignof",
+		CXXLanguageCPP,
+		0
+	},
 	//{ 1, "and", 0 },
 	//{ 1, "and_eq", 0 },
-	{ 1, "asm", 0 },
-	{ 0, "auto", CXXKeywordFlagMayBePartOfTypeName },
+	{
+		"asm",
+		CXXLanguageC | CXXLanguageCPP | CXXLanguageCUDA,
+		0
+	},
+	{
+		"auto",
+		CXXLanguageCPP,
+		CXXKeywordFlagMayBePartOfTypeName
+	},
 	//{ 1, "bitand", 0 },
 	//{ 1, "bitor", 0 },
-	{ 1, "bool", CXXKeywordFlagMayBePartOfTypeName },
-	{ 1, "break", 0 },
-	{ 1, "case", 0 },
-	{ 0, "catch", 0 },
-	{ 1, "char", CXXKeywordFlagMayBePartOfTypeName },
-	{ 0, "char16_t", CXXKeywordFlagMayBePartOfTypeName },
-	{ 0, "char32_t", CXXKeywordFlagMayBePartOfTypeName },
-	{ 0, "class", CXXKeywordFlagMayBePartOfTypeName | CXXKeywordIsTypeRefMarker },
+	{
+		"bool",
+		CXXLanguageC | CXXLanguageCPP | CXXLanguageCUDA,
+		CXXKeywordFlagMayBePartOfTypeName
+	},
+	{
+		"break",
+		CXXLanguageC | CXXLanguageCPP | CXXLanguageCUDA,
+		0
+	},
+	{
+		"case",
+		CXXLanguageC | CXXLanguageCPP | CXXLanguageCUDA,
+		0
+	},
+	{
+		"catch",
+		CXXLanguageCPP,
+		0
+	},
+	{
+		"char",
+		CXXLanguageC | CXXLanguageCPP | CXXLanguageCUDA,
+		CXXKeywordFlagMayBePartOfTypeName
+	},
+	{
+		"char16_t",
+		CXXLanguageCPP,
+		CXXKeywordFlagMayBePartOfTypeName
+	},
+	{
+		"char32_t",
+		CXXLanguageCPP,
+		CXXKeywordFlagMayBePartOfTypeName
+	},
+	{
+		"class",
+		CXXLanguageCPP,
+		CXXKeywordFlagMayBePartOfTypeName | CXXKeywordIsTypeRefMarker
+	},
 	//{ 0, "compl", 0 },
-	{ 0, "concept", 0 },
-	{ 1, "const", CXXKeywordFlagMayBePartOfTypeName },
-	{ 0, "constexpr", CXXKeywordExcludeFromTypeNames },
-	{ 0, "const_cast", 0 },
-	{ 1, "continue", 0 },
-	{ 0, "decltype", 0 },
-	{ 1, "default", 0 },
-	{ 0, "delete", 0 },
-	{ 1, "do", 0 },
-	{ 1, "double", CXXKeywordFlagMayBePartOfTypeName },
-	{ 0, "dynamic_cast", 0 },
-	{ 1, "else", 0 },
-	{ 1, "enum", CXXKeywordFlagMayBePartOfTypeName | CXXKeywordIsTypeRefMarker },
-	{ 0, "explicit", 0 },
-	{ 0, "export", 0 },
-	{ 1, "extern", 0 },
-	{ 1, "false", CXXKeywordIsConstant },
+	{
+		"concept",
+		CXXLanguageCPP,
+		0
+	},
+	{
+		"const",
+		CXXLanguageC | CXXLanguageCPP | CXXLanguageCUDA,
+		CXXKeywordFlagMayBePartOfTypeName
+	},
+	{
+		"constexpr",
+		CXXLanguageCPP,
+		CXXKeywordExcludeFromTypeNames
+	},
+	{
+		"const_cast",
+		CXXLanguageCPP,
+		0
+	},
+	{
+		"continue",
+		CXXLanguageC | CXXLanguageCPP | CXXLanguageCUDA,
+		0
+	},
+	{
+		"decltype",
+		CXXLanguageCPP,
+		0
+	},
+	{
+		"default",
+		CXXLanguageC | CXXLanguageCPP | CXXLanguageCUDA,
+		0
+	},
+	{
+		"delete",
+		CXXLanguageCPP,
+		0
+	},
+	{
+		"do",
+		CXXLanguageC | CXXLanguageCPP | CXXLanguageCUDA,
+		0
+	},
+	{
+		"double",
+		CXXLanguageC | CXXLanguageCPP | CXXLanguageCUDA,
+		CXXKeywordFlagMayBePartOfTypeName
+	},
+	{
+		"dynamic_cast",
+		CXXLanguageCPP,
+		0
+	},
+	{
+		"else",
+		CXXLanguageC | CXXLanguageCPP | CXXLanguageCUDA,
+		0
+	},
+	{
+		"enum",
+		CXXLanguageC | CXXLanguageCPP | CXXLanguageCUDA,
+		CXXKeywordFlagMayBePartOfTypeName | CXXKeywordIsTypeRefMarker
+	},
+	{
+		"explicit",
+		CXXLanguageCPP,
+		0
+	},
+	{
+		"export",
+		CXXLanguageCPP,
+		0
+	},
+	{
+		"extern",
+		CXXLanguageC | CXXLanguageCPP | CXXLanguageCUDA,
+		0
+	},
+	{
+		"false",
+		CXXLanguageC | CXXLanguageCPP | CXXLanguageCUDA,
+		CXXKeywordIsConstant
+	},
 	// this is a keyword only in special contexts (we have a switch to enable/disable it)
-	{ 0, "final", 0 },
-	{ 1, "float", CXXKeywordFlagMayBePartOfTypeName },
-	{ 1, "for", 0 },
-	{ 0, "friend", CXXKeywordExcludeFromTypeNames },
-	{ 1, "goto", 0 },
-	{ 1, "if", 0 },
-	{ 1, "inline", CXXKeywordExcludeFromTypeNames },
-	{ 1, "int", CXXKeywordFlagMayBePartOfTypeName },
-	{ 1, "long", CXXKeywordFlagMayBePartOfTypeName },
-	{ 0, "mutable", 0 },
-	{ 0, "namespace", 0 },
-	{ 0, "new", 0 },
-	{ 0, "noexcept", 0 },
+	{
+		"final",
+		CXXLanguageCPP,
+		0
+	},
+	{
+		"float",
+		CXXLanguageC | CXXLanguageCPP | CXXLanguageCUDA,
+		CXXKeywordFlagMayBePartOfTypeName
+	},
+	{
+		"for",
+		CXXLanguageC | CXXLanguageCPP | CXXLanguageCUDA,
+		0
+	},
+	{
+		"friend",
+		CXXLanguageCPP,
+		CXXKeywordExcludeFromTypeNames
+	},
+	{
+		"goto",
+		CXXLanguageC | CXXLanguageCPP | CXXLanguageCUDA,
+		0
+	},
+	{
+		"if",
+		CXXLanguageC | CXXLanguageCPP | CXXLanguageCUDA,
+		0
+	},
+	{
+		"inline",
+		CXXLanguageC | CXXLanguageCPP | CXXLanguageCUDA,
+		CXXKeywordExcludeFromTypeNames
+	},
+	{
+		"int",
+		CXXLanguageC | CXXLanguageCPP | CXXLanguageCUDA,
+		CXXKeywordFlagMayBePartOfTypeName
+	},
+	{
+		"long",
+		CXXLanguageC | CXXLanguageCPP | CXXLanguageCUDA,
+		CXXKeywordFlagMayBePartOfTypeName
+	},
+	{
+		"mutable",
+		CXXLanguageCPP,
+		0
+	},
+	{
+		"namespace",
+		CXXLanguageCPP,
+		0
+	},
+	{
+		"new",
+		CXXLanguageCPP,
+		0
+	},
+	{
+		"noexcept",
+		CXXLanguageCPP,
+		0
+	},
 	//{ 0, "not", 0 },
 	//{ 0, "not_eq", 0 },
-	{ 0, "nullptr", CXXKeywordIsConstant },
-	{ 0, "operator", 0 },
+	{
+		"nullptr",
+		CXXLanguageCPP,
+		CXXKeywordIsConstant
+	},
+	{
+		"operator",
+		CXXLanguageCPP,
+		0
+	},
 	//{ 0, "or", 0 },
 	//{ 0, "or_eq", 0 },
 	// override is a keyword only after function declarators,
 	// it's easier handling it as identifier
 	//{ 0, "override", 0 },
-	{ 0, "private", 0 },
-	{ 0, "protected", 0 },
-	{ 0, "public", 0 },
-	{ 1, "register", 0 },
-	{ 0, "reinterpret_cast", 0 },
-	{ 0, "requires", 0 },
-	{ 1, "return", 0 },
-	{ 1, "short", CXXKeywordFlagMayBePartOfTypeName },
-	{ 1, "signed", CXXKeywordFlagMayBePartOfTypeName },
-	{ 1, "sizeof", 0 },
-	{ 1, "static", CXXKeywordExcludeFromTypeNames },
-	{ 0, "static_assert", 0 },
-	{ 0, "static_cast", 0 },
-	{ 1, "struct", CXXKeywordFlagMayBePartOfTypeName | CXXKeywordIsTypeRefMarker },
-	{ 1, "switch", 0 },
-	{ 0, "template", 0 },
-	{ 0, "this", 0 },
-	{ 0, "thread_local", 0 },
-	{ 0, "throw", 0 },
-	{ 1, "true", CXXKeywordIsConstant },
-	{ 0, "try", 0 },
-	{ 1, "typedef", 0 },
-	{ 0, "typeid", 0 },
-	{ 0, "typename", CXXKeywordFlagMayBePartOfTypeName | CXXKeywordIsTypeRefMarker },
-	{ 1, "union", CXXKeywordFlagMayBePartOfTypeName | CXXKeywordIsTypeRefMarker },
-	{ 1, "unsigned", CXXKeywordFlagMayBePartOfTypeName },
-	{ 0, "using", 0 },
-	{ 0, "virtual", CXXKeywordExcludeFromTypeNames },
-	{ 1, "void", CXXKeywordFlagMayBePartOfTypeName },
-	{ 1, "volatile", 0 },
-	{ 0, "wchar_t", CXXKeywordFlagMayBePartOfTypeName },
-	{ 1, "while", 0 },
+	{
+		"private",
+		CXXLanguageCPP,
+		0
+	},
+	{
+		"protected",
+		CXXLanguageCPP,
+		0
+	},
+	{
+		"public",
+		CXXLanguageCPP,
+		0
+	},
+	{
+		"register",
+		CXXLanguageC | CXXLanguageCPP | CXXLanguageCUDA,
+		0
+	},
+	{
+		"reinterpret_cast",
+		CXXLanguageCPP,
+		0
+	},
+	{
+		"requires",
+		CXXLanguageCPP,
+		0
+	},
+	{
+		"restrict",
+		CXXLanguageC | CXXLanguageCPP | CXXLanguageCUDA,
+		CXXKeywordExcludeFromTypeNames
+	},
+	{
+		"return",
+		CXXLanguageC | CXXLanguageCPP | CXXLanguageCUDA,
+		0
+	},
+	{
+		"short",
+		CXXLanguageC | CXXLanguageCPP | CXXLanguageCUDA,
+		CXXKeywordFlagMayBePartOfTypeName
+	},
+	{
+		"signed",
+		CXXLanguageC | CXXLanguageCPP | CXXLanguageCUDA,
+		CXXKeywordFlagMayBePartOfTypeName
+	},
+	{
+		"sizeof",
+		CXXLanguageC | CXXLanguageCPP | CXXLanguageCUDA,
+		0
+	},
+	{
+		"static",
+		CXXLanguageC | CXXLanguageCPP | CXXLanguageCUDA,
+		CXXKeywordExcludeFromTypeNames
+	},
+	{
+		"static_assert",
+		CXXLanguageCPP,
+		0
+	},
+	{
+		"static_cast",
+		CXXLanguageCPP,
+		0
+	},
+	{
+		"struct",
+		CXXLanguageC | CXXLanguageCPP | CXXLanguageCUDA,
+		CXXKeywordFlagMayBePartOfTypeName | CXXKeywordIsTypeRefMarker
+	},
+	{
+		"switch",
+		CXXLanguageC | CXXLanguageCPP | CXXLanguageCUDA,
+		0
+	},
+	{
+		"template",
+		CXXLanguageCPP,
+		0
+	},
+	{
+		"this",
+		CXXLanguageCPP,
+		0
+	},
+	{
+		"thread_local",
+		CXXLanguageCPP,
+		0
+	},
+	{
+		"throw",
+		CXXLanguageCPP,
+		0
+	},
+	{
+		"true",
+		CXXLanguageC | CXXLanguageCPP | CXXLanguageCUDA,
+		CXXKeywordIsConstant
+	},
+	{
+		"try",
+		CXXLanguageCPP,
+		0
+	},
+	{
+		"typedef",
+		CXXLanguageC | CXXLanguageCPP | CXXLanguageCUDA,
+		0
+	},
+	{
+		"typeid",
+		CXXLanguageCPP,
+		0
+	},
+	{
+		"typename",
+		CXXLanguageCPP,
+		CXXKeywordFlagMayBePartOfTypeName | CXXKeywordIsTypeRefMarker
+	},
+	{
+		"union",
+		CXXLanguageC | CXXLanguageCPP | CXXLanguageCUDA,
+		CXXKeywordFlagMayBePartOfTypeName | CXXKeywordIsTypeRefMarker
+	},
+	{
+		"unsigned",
+		CXXLanguageC | CXXLanguageCPP | CXXLanguageCUDA,
+		CXXKeywordFlagMayBePartOfTypeName
+	},
+	{
+		"using",
+		CXXLanguageCPP,
+		0
+	},
+	{
+		"virtual",
+		CXXLanguageCPP,
+		CXXKeywordExcludeFromTypeNames
+	},
+	{
+		"void",
+		CXXLanguageC | CXXLanguageCPP | CXXLanguageCUDA,
+		CXXKeywordFlagMayBePartOfTypeName
+	},
+	{
+		"volatile",
+		CXXLanguageC | CXXLanguageCPP | CXXLanguageCUDA,
+		0
+	},
+	{
+		"wchar_t",
+		CXXLanguageCPP,
+		CXXKeywordFlagMayBePartOfTypeName
+	},
+	{
+		"while",
+		CXXLanguageC | CXXLanguageCPP | CXXLanguageCUDA,
+		0
+	},
 	//{ 0, "xor", 0 },
 	//{ 0, 1, "xor_eq", 0 }
 };
 
-const char * cxxKeywordName(enum CXXKeyword eKeywordId)
+const char * cxxKeywordName(CXXKeyword eKeywordId)
 {
 	return g_aCXXKeywordTable[eKeywordId].szName;
 }
 
-bool cxxKeywordMayBePartOfTypeName(enum CXXKeyword eKeywordId)
+bool cxxKeywordMayBePartOfTypeName(CXXKeyword eKeywordId)
 {
 	return g_aCXXKeywordTable[eKeywordId].uFlags &
 			CXXKeywordFlagMayBePartOfTypeName;
 }
 
-bool cxxKeywordIsTypeRefMarker(enum CXXKeyword eKeywordId)
+bool cxxKeywordIsTypeRefMarker(CXXKeyword eKeywordId)
 {
 	return g_aCXXKeywordTable[eKeywordId].uFlags &
 			CXXKeywordIsTypeRefMarker;
 }
 
-bool cxxKeywordIsConstant(enum CXXKeyword eKeywordId)
+bool cxxKeywordIsConstant(CXXKeyword eKeywordId)
 {
 	return g_aCXXKeywordTable[eKeywordId].uFlags &
 			CXXKeywordIsConstant;
 }
 
-bool cxxKeywordExcludeFromTypeNames(enum CXXKeyword eKeywordId)
+bool cxxKeywordExcludeFromTypeNames(CXXKeyword eKeywordId)
 {
 	return g_aCXXKeywordTable[eKeywordId].uFlags &
 			CXXKeywordExcludeFromTypeNames;
 }
 
-void cxxBuildKeywordHash(const langType language,bool bCXX)
+void cxxBuildKeywordHash(const langType eLangType,unsigned int uLanguage)
 {
-	const size_t count = sizeof(g_aCXXKeywordTable) /
-			sizeof(CXXKeywordDescriptor);
+	const size_t count = sizeof(g_aCXXKeywordTable) / sizeof(CXXKeywordDescriptor);
 
 	size_t i;
 
-	if(bCXX)
+	for(i = 0;i < count;i++)
 	{
-		for(i = 0;i < count;i++)
-		{
-			const CXXKeywordDescriptor * p = g_aCXXKeywordTable + i;
-			addKeyword(p->szName,language,i);
-		}
-	} else {
-		for(i = 0;i < count;i++)
-		{
-			const CXXKeywordDescriptor * p = g_aCXXKeywordTable + i;
-			if(p->bValidC)
-				addKeyword(p->szName,language,i);
-		}
+		const CXXKeywordDescriptor * p = g_aCXXKeywordTable + i;
+		if(p->uLanguages & uLanguage)
+			addKeyword(p->szName,eLangType,i);
 	}
 }

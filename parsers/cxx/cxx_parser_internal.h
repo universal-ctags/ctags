@@ -23,6 +23,15 @@
 // This file is included only by cxx_parser_*.c
 //
 
+// CXX parser language. We use a specific enum and not langType
+// since we want to be able to use it in bit fields.
+typedef enum _CXXLanguage
+{
+	CXXLanguageC = 1,
+	CXXLanguageCPP = (1 << 1),
+	CXXLanguageCUDA = (1 << 2)
+} CXXLanguage;
+
 // cxx_parser_tokenizer.c
 bool cxxParserParseNextToken(void);
 
@@ -84,7 +93,7 @@ typedef struct _CXXFunctionSignatureInfo
 	// The parenthesis token.
 	// It is always contained in the chain pointed by pParenthesisContainerChain
 	CXXToken * pParenthesis;
-	
+
 	// The token chain that contains the parenthesis above. May or may not
 	// be the toplevel chain.
 	CXXTokenChain * pParenthesisContainerChain;
@@ -95,7 +104,7 @@ typedef struct _CXXFunctionSignatureInfo
 	// The identifier is always contained in the chain pointed by pIdentifierChain.
 	CXXToken * pIdentifierStart;
 	CXXToken * pIdentifierEnd;
-	
+
 	// The chain that pIdentifierStart, pIdentifierEnd and pScopeStart
 	// belong to. It MAY be a nested chain and it may even be included in the
 	// range specified by pTypeStart / pTypeEnd below!
@@ -120,7 +129,7 @@ typedef struct _CXXFunctionSignatureInfo
 	// It is granted that the scope and identifier are either
 	// completly included or completly excluded from the type range.
 	bool bTypeContainsIdentifierScopeAndSignature;
-	
+
 	// Non-NULL if there is a trailing comma after the function.
 	// This is used for the special case of multiple prototypes in a single
 	// declaration:
@@ -193,7 +202,7 @@ bool cxxParserSkipToSemicolonOrEOF(void);
 bool cxxParserParseToEndOfQualifedName(void);
 bool cxxParserParseEnum(void);
 bool cxxParserParseClassStructOrUnion(
-		enum CXXKeyword eKeyword,
+		CXXKeyword eKeyword,
 		unsigned int uTagKind,
 		unsigned int uScopeType
 	);
@@ -245,21 +254,27 @@ typedef enum _CXXParserKeywordState
 	CXXParserKeywordStateSeenAttributeDeprecated = (1 << 11),
 } CXXParserKeywordState;
 
+
 typedef struct _CXXParserState
 {
 	// The current language
-	langType eLanguage;
+	CXXLanguage eLanguage;
+
+	// The current language as langType
+	langType eLangType;
 
 	// The identifier of the CPP language, as indicated by ctags core
-	langType eCPPLanguage;
+	langType eCPPLangType;
 	// The identifier of the C language, as indicated by ctags core
-	langType eCLanguage;
-	
+	langType eCLangType;
+	// The identifier of the CUDA language, as indicated by ctags core
+	langType eCUDALangType;
+
 	// The kind options associated to the current language
 	kindOption * pKindOptions;
 	// The number of kind options, used mainly for checking/debug purposes
 	unsigned int uKindOptionCount;
-	
+
 	// The fields associated to the current language
 	fieldSpec * pFieldOptions;
 	// The number of field options, used mainly for checking/debug purposes
@@ -285,7 +300,7 @@ typedef struct _CXXParserState
 	// This is used to handle the special case of "final" which is a keyword
 	// in class/struct/union declarations but not anywhere else
 	bool bParsingClassStructOrUnionDeclaration;
-	
+
 	// public, protected and private keywords are C++ only.
 	// However when parsing .h files we don't know if they belong to
 	// a C program or C++ one and thus for safety we parse them as C++.
@@ -305,14 +320,22 @@ typedef struct _CXXParserState
 } CXXParserState;
 
 
-
 // defined in cxx_parser.c
 extern CXXParserState g_cxx;
 
+#define cxxParserCurrentLanguageIs(_eLanguage) \
+	(g_cxx.eLanguage == _eLanguage)
+
+#define cxxParserCurrentLanguageIsOneOf(_eLanguageMask) \
+	(((int)(g_cxx.eLanguage)) & (_eLanguageMask))
+
 #define cxxParserCurrentLanguageIsCPP() \
-	(g_cxx.eLanguage == g_cxx.eCPPLanguage)
+	cxxParserCurrentLanguageIs(CXXLanguageCPP)
 
 #define cxxParserCurrentLanguageIsC() \
-	(g_cxx.eLanguage == g_cxx.eCLanguage)
+	cxxParserCurrentLanguageIs(CXXLanguageC)
+
+#define cxxParserCurrentLanguageIsCUDA() \
+	cxxParserCurrentLanguageIs(CXXLanguageCUDA)
 
 #endif //!ctags_cxx_parser_internal_h_

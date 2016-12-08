@@ -27,6 +27,7 @@ e	end	off	NONE	TRUE	end lines of various items
 -	template	off	C++	TRUE	template parameters
 -	captures	off	C++	TRUE	lambda capture list
 -	name	on	C++	TRUE	aliased names
+-	properties	off	CUDA	TRUE	properties (static, inline, mutable,...)
 -	decorators	off	Python	TRUE	decorators on functions and classes
 -	sectionMarker	off	reStructuredText	TRUE	character used for declaring section
 #

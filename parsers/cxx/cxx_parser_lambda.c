@@ -156,12 +156,14 @@ bool cxxParserHandleLambda(CXXToken * pParenthesis)
 			)
 			pTypeEnd = pTypeEnd->pNext;
 
+#if 0
 		while(
 				(pTypeStart != pTypeEnd) &&
 				cxxTokenTypeIs(pTypeStart,CXXTokenTypeKeyword) &&
 				cxxKeywordExcludeFromTypeNames(pTypeStart->eKeyword)
 			)
 			pTypeStart = pTypeStart->pNext;
+#endif
 	}
 
 	int iCorkQueueIndex = CORK_NIL;

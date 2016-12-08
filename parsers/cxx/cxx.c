@@ -135,3 +135,36 @@ parserDefinition * CppParser (void)
 
 	return def;
 }
+
+parserDefinition * CUDAParser (void)
+{
+	static const char * const extensions [] =
+	{
+		"cu", "cuh",
+#ifndef CASE_INSENSITIVE_FILENAMES
+		"CU", "CUH",
+#endif
+		NULL
+	};
+	static parserDependency dependencies [] = {
+		{ DEPTYPE_KIND_OWNER, "C" },
+	};
+
+	parserDefinition* def = parserNew("CUDA");
+
+	def->dependencies = dependencies;
+	def->dependencyCount = ARRAY_SIZE (dependencies);
+	def->kinds = cxxTagGetCUDAKindOptions();
+	def->kindCount = cxxTagGetCUDAKindOptionCount();
+	def->fieldSpecs = cxxTagGetCUDAFieldSpecifiers();
+	def->fieldSpecCount = cxxTagGetCUDAFieldSpecifierCount();
+	def->extensions = extensions;
+	def->parser2 = cxxCUDAParserMain;
+	def->initialize = cxxCUDAParserInitialize;
+	def->finalize = cxxParserCleanup;
+	def->selectLanguage = NULL;
+	def->useCork = true; // We use corking to block output until the end of file
+
+	return def;
+}
+

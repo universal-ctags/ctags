@@ -404,6 +404,7 @@ process_token:
 					case CXXKeyword__INLINE:
 					case CXXKeyword__INLINE__:
 					case CXXKeyword__FORCEINLINE:
+					case CXXKeyword__FORCEINLINE__:
 						g_cxx.uKeywordState |= CXXParserKeywordStateSeenInline;
 						cxxTokenChainDestroyLast(g_cxx.pTokenChain);
 					break;
@@ -449,7 +450,7 @@ process_token:
 			case CXXTokenTypeSemicolon:
 			{
 				if(
-						(g_cxx.eLanguage == g_cxx.eCLanguage) &&
+						(g_cxx.eLangType == g_cxx.eCLangType) &&
 						cxxScopeIsGlobal() &&
 						(!(g_cxx.uKeywordState & CXXParserKeywordStateSeenExtern)) &&
 						(!(g_cxx.uKeywordState & CXXParserKeywordStateSeenTypedef))
