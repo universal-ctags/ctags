@@ -88,7 +88,8 @@ units: $(CTAGS_TEST)
 		$${VALGRIND} --run-shrink \
 		--with-timeout=$(TIMEOUT) \
 		$${SHOW_DIFF_OUTPUT}"; \
-	 $(SHELL) $${c} $(srcdir)/Units $${builddir}/Units
+	 TRAVIS=$(TRAVIS) APPVEYOR=$(APPVEYOR) \
+		 $(SHELL) $${c} $(srcdir)/Units $${builddir}/Units
 
 clean-units:
 	$(SILENT) echo Cleaning test units
@@ -116,7 +117,8 @@ tmain: $(CTAGS_TEST)
 		--libexecdir=$(srcdir)/libexec \
 		$${VALGRIND} \
 		$${SHOW_DIFF_OUTPUT}"; \
-	 $(SHELL) $${c} $(srcdir)/Tmain $${builddir}/Tmain
+	TRAVIS=$(TRAVIS) APPVEYOR=$(APPVEYOR) \
+		$(SHELL) $${c} $(srcdir)/Tmain $${builddir}/Tmain
 
 clean-tmain:
 	$(SILENT) echo Cleaning main part tests
