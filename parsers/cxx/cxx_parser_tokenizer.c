@@ -1164,7 +1164,7 @@ bool cxxParserParseNextToken(void)
 			g_cxx.iChar = cppGetc();
 		}
 
-		int iCXXKeyword = lookupKeyword(t->pszWord->buffer,g_cxx.eLanguage);
+		int iCXXKeyword = lookupKeyword(t->pszWord->buffer,g_cxx.eLangType);
 		if(iCXXKeyword >= 0)
 		{
 			if(
@@ -1184,7 +1184,7 @@ bool cxxParserParseNextToken(void)
 				t->eType = CXXTokenTypeIdentifier;
 			} else {
 				t->eType = CXXTokenTypeKeyword;
-				t->eKeyword = (enum CXXKeyword)iCXXKeyword;
+				t->eKeyword = (CXXKeyword)iCXXKeyword;
 
 				if(iCXXKeyword == CXXKeyword__ATTRIBUTE__)
 				{

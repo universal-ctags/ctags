@@ -52,7 +52,7 @@ enum CXXTagCPPKind
 enum CXXTagCommonField
 {
 	CXXTagFieldProperties,
-	
+
 	CXXTagCommonFieldCount
 };
 
@@ -68,6 +68,9 @@ enum CXXTagCPPField
 fieldSpec * cxxTagGetCPPFieldSpecifiers(void);
 int cxxTagGetCPPFieldSpecifierCount(void);
 
+fieldSpec * cxxTagGetCUDAFieldSpecifiers(void);
+int cxxTagGetCUDAFieldSpecifierCount(void);
+
 fieldSpec * cxxTagGetCFieldSpecifiers(void);
 int cxxTagGetCFieldSpecifierCount(void);
 
@@ -75,6 +78,9 @@ bool cxxTagFieldEnabled(unsigned int uField);
 
 kindOption * cxxTagGetCKindOptions(void);
 int cxxTagGetCKindOptionCount(void);
+
+kindOption * cxxTagGetCUDAKindOptions(void);
+int cxxTagGetCUDAKindOptionCount(void);
 
 kindOption * cxxTagGetCPPKindOptions(void);
 int cxxTagGetCPPKindOptionCount(void);
@@ -178,6 +184,6 @@ typedef enum {
 
 // Initialize the parser state for the specified language.
 // Must be called before attempting to access the kind options.
-void cxxTagInitForLanguage(langType eLanguage);
+void cxxTagInitForLanguage(langType eLangType);
 
 #endif //!_cxxTag_h_
