@@ -1,0 +1,11 @@
+array1	input.cu	/^__shared__ float2 array1[];$/;"	v	typeref:typename:float2[]
+array2	input.cu	/^__shared__ __device__ dim3 array2[];$/;"	v	typeref:typename:dim3[]
+i1	input.cu	/^__device__ volatile int i1 = 1;$/;"	v	typeref:typename:volatile int
+i2	input.cu	/^__constant__ int i2 = 2;$/;"	v	typeref:typename:int
+dev1	input.cu	/^__device__ void dev1(float * a,const float * __restrict__ b)$/;"	f	typeref:typename:void
+a	input.cu	/^__device__ void dev1(float * a,const float * __restrict__ b)$/;"	z	function:dev1	typeref:typename:float *	file:
+b	input.cu	/^__device__ void dev1(float * a,const float * __restrict__ b)$/;"	z	function:dev1	typeref:typename:const float * 	file:
+kernel1	input.cu	/^__global__ void kernel1(float * a,float * __restrict__ b)$/;"	f	typeref:typename:void
+a	input.cu	/^__global__ void kernel1(float * a,float * __restrict__ b)$/;"	z	function:kernel1	typeref:typename:float *	file:
+b	input.cu	/^__global__ void kernel1(float * a,float * __restrict__ b)$/;"	z	function:kernel1	typeref:typename:float * 	file:
+main	input.cu	/^int main()$/;"	f	typeref:typename:int
