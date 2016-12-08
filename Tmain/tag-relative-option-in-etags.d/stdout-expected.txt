@@ -1,0 +1,12 @@
+# no
+
+src/input.c,37
+int main (void) {return 0;}main1,0
+# yes
+
+indirect/src/input.c,37
+int main (void) {return 0;}main1,0
+# default
+
+indirect/src/input.c,37
+int main (void) {return 0;}main1,0
