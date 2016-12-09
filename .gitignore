@@ -11,6 +11,7 @@
 *.exe
 *.exp
 *.lib
+*.pdb
 *.pyc
 *.bak
 *.BAK
@@ -34,6 +35,7 @@
 # working dirs
 .deps
 .libs
+/build*/
 
 # autotools generated files
 /autom4te.cache
