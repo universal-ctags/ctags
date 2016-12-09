@@ -17,6 +17,7 @@
 #ifdef DEBUG
 #include <stdio.h>
 #endif
+#include <string.h>
 
 #include "debug.h"
 #include "entry.h"
@@ -164,7 +165,8 @@ typedef enum eTokenType {
 	TOKEN_CLOSE_SQUARE,
 	TOKEN_TILDE,
 	TOKEN_FORWARD_SLASH,
-	TOKEN_EQUAL
+	TOKEN_EQUAL,
+	TOKEN_DOLLAR_QUOTE,
 } tokenType;
 
 typedef struct sTokenInfoSQL {
@@ -478,6 +480,21 @@ static void parseIdentifier (vString *const string, const int firstChar)
 		ungetcToInputFile (c);		/* unget non-identifier character */
 }
 
+static tokenType parseDollarQuote (vString *const string, const int firstChar)
+{
+	int c = firstChar;
+	do
+	{
+		vStringPut (string, c);
+		c = getcFromInputFile ();
+		if (c == EOF)
+			return TOKEN_EOF;
+	} while (c != '$');
+
+	vStringPut (string, c);
+	return TOKEN_DOLLAR_QUOTE;
+}
+
 static void readToken (tokenInfo *const token)
 {
 	int c;
@@ -604,6 +621,9 @@ getNextChar:
 					  }
 					  break;
 				  }
+		case '$':
+					  token->type = parseDollarQuote (token->string, c);
+					  break;
 
 		default:
 				  if (! isIdentChar1 (c))
@@ -805,6 +825,16 @@ static void skipArgumentList (tokenInfo *const token)
 	{
 		skipToMatched (token);
 	}
+}
+
+static void skipDollarQuote (const char *tag, tokenInfo *const end)
+{
+	do {
+		readToken (end);
+		if (isType (end, TOKEN_EOF))
+			break;
+	} while (!(isType (end, TOKEN_DOLLAR_QUOTE)
+			   && (strcmp (tag, vStringValue (end->string)) == 0)));
 }
 
 static void parseSubProgram (tokenInfo *const token)
@@ -1594,11 +1624,24 @@ static void parseBlock (tokenInfo *const token, const bool local)
 	if (! isKeyword (token, KEYWORD_begin))
 	{
 		readToken (token);
-		/*
-		 * These are Oracle style declares which generally come
-		 * between an IS/AS and BEGIN block.
-		 */
-		parseDeclare (token, local);
+		if (token->type == TOKEN_DOLLAR_QUOTE)
+		{
+			/* PostgresSQL: $$ ... $$ */
+			tokenInfo *end_block = newToken ();
+			skipDollarQuote (vStringValue(token->string), end_block);
+			/* TODO: end_block can be used for making a promise .*/
+			if (isType (end_block,TOKEN_DOLLAR_QUOTE))
+				readToken (token);
+			deleteToken (end_block);
+		}
+		else
+		{
+			/*
+			 * These are Oracle style declares which generally come
+			 * between an IS/AS and BEGIN block.
+			 */
+			parseDeclare (token, local);
+		}
 	}
 	if (isKeyword (token, KEYWORD_begin))
 	{
