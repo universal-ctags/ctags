@@ -84,6 +84,7 @@ typedef struct {
 	} u;
 	unsigned int scopeActions;
 	bool *disabled;
+	int   multiline;
 } regexPattern;
 
 
@@ -91,6 +92,7 @@ typedef struct {
 	regexPattern *patterns;
 	unsigned int count;
 	hashTable   *kinds;
+	unsigned int multilinePatternsCount;
 } patternSet;
 
 /*
@@ -130,6 +132,7 @@ static void clearPatternSet (const langType language)
 			eFree (set->patterns);
 		set->patterns = NULL;
 		set->count = 0;
+		set->multilinePatternsCount = 0;
 		hashTableDelete (set->kinds);
 		set->kinds = NULL;
 	}
@@ -140,7 +143,8 @@ static void clearPatternSet (const langType language)
 */
 
 static int makeRegexTag (
-		const vString* const name, const kindOption* const kind, int scopeIndex, int placeholder)
+		const vString* const name, const kindOption* const kind, int scopeIndex, int placeholder,
+		unsigned long line, MIOPos *pos)
 {
 	Assert (kind != NULL);
 	if (kind->enabled)
@@ -150,6 +154,12 @@ static int makeRegexTag (
 		initTagEntry (&e, vStringValue (name), kind);
 		e.extensionFields.scopeIndex = scopeIndex;
 		e.placeholder = !!placeholder;
+		if (line)
+		{
+			e.lineNumber = line;
+			e.filePosition = *pos;
+		}
+
 		return makeTagEntry (&e);
 	}
 	else
@@ -381,6 +391,29 @@ static regexPattern* addCompiledTagCommon (const langType language,
 	return ptrn;
 }
 
+static void pre_ptrn_flag_multiline_long (const char* const s CTAGS_ATTR_UNUSED, const char* const v, void* data)
+{
+
+	if (!strToInt (v, 10, data))
+	{
+		error (WARNING, "wrong multiline specificaiton: %s", v);
+		*((int *)data) = -1;
+	}
+	else if (*((int *)data) < 0 || *((int *)data) >= BACK_REFERENCE_COUNT)
+	{
+		error (WARNING, "out of range(0 ~ %d) multiline specificaiton: %s",
+		       (BACK_REFERENCE_COUNT - 1), v);
+		*((int *)data) = -1;
+	}
+}
+
+static flagDefinition multilinePtrnFlagDef[] = {
+#define EXPERIMENTAL "_"
+	{ '\0',  EXPERIMENTAL "multiline", NULL, pre_ptrn_flag_multiline_long ,
+	  NULL, "match in muletline mode. cannot combine with scope, placeholder, and exclusive"},
+};
+
+
 static regexPattern *addCompiledTagPattern (const langType language, regex_t* const pattern,
 					    const char* const name, char kind, const char* kindName,
 					    char *const description, const char* flags,
@@ -389,9 +422,12 @@ static regexPattern *addCompiledTagPattern (const langType language, regex_t* co
 	regexPattern * ptrn;
 	bool exclusive = false;
 	unsigned long scopeActions = 0UL;
+	int multiline = -1;
 
 	flagsEval (flags, prePtrnFlagDef, ARRAY_SIZE(prePtrnFlagDef), &exclusive);
 	flagsEval (flags, scopePtrnFlagDef, ARRAY_SIZE(scopePtrnFlagDef), &scopeActions);
+	flagsEval (flags, multilinePtrnFlagDef, ARRAY_SIZE(multilinePtrnFlagDef), &multiline);
+
 	if (*name == '\0' && exclusive && kind == KIND_REGEX_DEFAULT)
 	{
 		kind = KIND_GHOST;
@@ -403,6 +439,10 @@ static regexPattern *addCompiledTagPattern (const langType language, regex_t* co
 	ptrn->exclusive = exclusive;
 	ptrn->scopeActions = scopeActions;
 	ptrn->disabled = disabled;
+	ptrn->multiline = multiline;
+	if (multiline >= 0)
+		Sets [language].multilinePatternsCount++;
+
 	if (ptrn->u.tag.kind->letter == '\0')
 	{
 		/* This is a newly registered kind. */
@@ -437,6 +477,7 @@ static void addCompiledCallbackPattern (const langType language, regex_t* const 
 	ptrn->u.callback.userData = userData;
 	ptrn->exclusive = exclusive;
 	ptrn->disabled = disabled;
+	ptrn->multiline = -1;
 }
 
 
@@ -583,7 +624,8 @@ static void processLanguageRegex (const langType language,
 
 static vString* substitute (
 		const char* const in, const char* out,
-		const int nmatch, const regmatch_t* const pmatch)
+		const int nmatch, const regmatch_t* const pmatch,
+		bool allow_multiple)
 {
 	vString* result = vStringNew ();
 	const char* p;
@@ -598,18 +640,20 @@ static vString* substitute (
 				vStringNCatS (result, in + pmatch [dig].rm_so, diglen);
 			}
 		}
-		else if (*p != '\n'  &&  *p != '\r')
+		else if (allow_multiple || (*p != '\n'  &&  *p != '\r'))
 			vStringPut (result, *p);
 	}
 	return result;
 }
 
-static void matchTagPattern (const vString* const line,
+static void matchTagPattern (const char* line,
 		const regexPattern* const patbuf,
-		const regmatch_t* const pmatch)
+		const regmatch_t* const pmatch,
+			     off_t offset)
 {
-	vString *const name = substitute (vStringValue (line),
-			patbuf->u.tag.name_pattern, BACK_REFERENCE_COUNT, pmatch);
+	vString *const name = substitute (line,
+			patbuf->u.tag.name_pattern, BACK_REFERENCE_COUNT, pmatch,
+			!!(patbuf->multiline >= 0));
 	bool placeholder = !!((patbuf->scopeActions & SCOPE_PLACEHOLDER) == SCOPE_PLACEHOLDER);
 	unsigned long scope = CORK_NIL;
 	int n;
@@ -637,13 +681,28 @@ static void matchTagPattern (const vString* const line,
 	if (vStringLength (name) == 0 && (placeholder == false))
 	{
 		if (patbuf->accept_empty_name == false)
-			error (WARNING, "%s:%ld: null expansion of name pattern \"%s\"",
-			       getInputFileName (), getInputLineNumber (),
+			error (WARNING, "%s:%lu: null expansion of name pattern \"%s\"",
+			       getInputFileName (),
+			       (patbuf->multiline >= 0)
+			       ? getInputLineNumberForFileOffset (offset)
+			       : getInputLineNumber (),
 			       patbuf->u.tag.name_pattern);
 		n = CORK_NIL;
 	}
 	else
-		n = makeRegexTag (name, patbuf->u.tag.kind, scope, placeholder);
+	{
+		unsigned long ln = 0;
+		MIOPos pos;
+
+		if (patbuf->multiline >= 0)
+		{
+			ln = getInputLineNumberForFileOffset (offset);
+			pos = getInputFilePositionForLine (ln);
+		}
+
+		n = makeRegexTag (name, patbuf->u.tag.kind, scope, placeholder,
+				  ln, ln == 0? NULL: &pos);
+	}
 
 	if (patbuf->scopeActions & SCOPE_PUSH)
 		currentScope = n;
@@ -689,7 +748,7 @@ static bool matchRegexPattern (const vString* const line,
 	{
 		result = true;
 		if (patbuf->type == PTRN_TAG)
-			matchTagPattern (line, patbuf, pmatch);
+			matchTagPattern (vStringValue (line), patbuf, pmatch, 0);
 		else if (patbuf->type == PTRN_CALLBACK)
 			matchCallbackPattern (line, patbuf, pmatch);
 		else
@@ -701,6 +760,46 @@ static bool matchRegexPattern (const vString* const line,
 	return result;
 }
 
+static bool matchMultilineRegexPattern (const vString* const allLines,
+					const regexPattern* const patbuf)
+{
+	const char *start;
+	const char *current;
+
+	bool result = false;
+	regmatch_t pmatch [BACK_REFERENCE_COUNT];
+	int match = 0;
+
+	if (patbuf->disabled && *(patbuf->disabled))
+		return false;
+
+	start = vStringValue (allLines);
+	for (current = start;
+	     match == 0 && current < start + strlen(vStringValue (allLines));
+	     current += pmatch [0].rm_eo)
+	{
+		match = regexec (patbuf->pattern, current,
+				 BACK_REFERENCE_COUNT, pmatch, 0);
+		if (match == 0)
+		{
+			if (patbuf->type == PTRN_TAG)
+			{
+				matchTagPattern (current, patbuf, pmatch,
+						 (current + pmatch [patbuf->multiline].rm_eo) - start);
+				result = true;
+			}
+			else if (patbuf->type == PTRN_CALLBACK)
+				;	/* Not implemented yet */
+			else
+			{
+				Assert ("invalid pattern type" == NULL);
+				result = false;
+				break;
+			}
+		}
+	}
+	return result;
+}
 
 /* PUBLIC INTERFACE */
 
@@ -718,6 +817,8 @@ extern bool matchRegex (const vString* const line, const langType language)
 		for (i = 0  ;  i < set->count  ;  ++i)
 		{
 			regexPattern* ptrn = set->patterns + i;
+			if (ptrn->multiline >= 0)
+				continue;
 			if (matchRegexPattern (line, ptrn))
 			{
 				result = true;
@@ -1076,6 +1177,38 @@ extern void freeRegexResources (void)
 	Sets = NULL;
 	SetUpper = -1;
 }
+
+extern bool hasMultilineRegexPatterns (const langType language)
+{
+	if (language <= SetUpper  &&  Sets [language].count > 0)
+		return !! (Sets [language].multilinePatternsCount > 0);
+	else
+		return false;
+}
+
+extern bool matchMultilineRegex (const vString* const allLines, const langType language)
+{
+	bool result = false;
+	if (language != LANG_IGNORE  &&  language <= SetUpper  &&
+	    Sets [language].count > 0)
+	{
+		const patternSet* const set = Sets + language;
+		unsigned int i;
+		unsigned int multilinePatternsCount = set->multilinePatternsCount;
+
+		for (i = 0; i < set->count && 0 < multilinePatternsCount; ++i)
+		{
+			regexPattern* ptrn = set->patterns + i;
+			if (ptrn->multiline < 0)
+				continue;
+
+			multilinePatternsCount--;
+			result = matchMultilineRegexPattern (allLines, ptrn) || result;
+		}
+	}
+	return false;
+}
+
 
 /* Return true if available. */
 extern bool checkRegex (void)
