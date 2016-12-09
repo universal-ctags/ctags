@@ -13,14 +13,24 @@
 #include "parse.h"
 
 // WARNING: There is a table in cxx_keyword.c that must match order in this enum
-enum CXXKeyword
+typedef enum _CXXKeyword
 {
 	CXXKeyword__ATTRIBUTE__, // GCC
+	CXXKeyword__CONSTANT__, // CUDA
 	CXXKeyword__DECLSPEC, // Microsoft C/C++
+	CXXKeyword__DEVICE__, // CUDA
 	CXXKeyword__FASTCALL, // Microsoft C/C++
 	CXXKeyword__FORCEINLINE, // Microsoft C/C++
+	CXXKeyword__FORCEINLINE__, // CUDA
+	CXXKeyword__GLOBAL__, // CUDA
+	CXXKeyword__HOST__, // CUDA
 	CXXKeyword__INLINE, // Microsoft C/C++
 	CXXKeyword__INLINE__, // GCC
+	CXXKeyword__MANAGED__, // CUDA
+	CXXKeyword__NOINLINE__, // CUDA
+	CXXKeyword__RESTRICT, // Microsoft C/C++
+	CXXKeyword__RESTRICT__, // CUDA
+	CXXKeyword__SHARED__, // CUDA
 	CXXKeyword__STDCALL, // Microsoft C/C++
 	CXXKeyword__THISCALL, // Microsoft C/C++
 	CXXKeywordALIGNAS, // (since C++11)
@@ -83,6 +93,7 @@ enum CXXKeyword
 	CXXKeywordREGISTER,
 	CXXKeywordREINTERPRET_CAST,
 	CXXKeywordREQUIRES, // (Concepts TS)
+	CXXKeywordRESTRICT, // C99 extension
 	CXXKeywordRETURN,
 	CXXKeywordSHORT,
 	CXXKeywordSIGNED,
@@ -112,16 +123,18 @@ enum CXXKeyword
 	//CXXKeywordXOR,
 	//CXXKeywordXOR_EQ,
 	// WARNING: There is a table in cxx_keyword.c that must match order in this enumeration
-};
+} CXXKeyword;
 
-bool cxxKeywordIsConstant(enum CXXKeyword eKeywordId);
-bool cxxKeywordMayBePartOfTypeName(enum CXXKeyword eKeywordId);
-bool cxxKeywordIsTypeRefMarker(enum CXXKeyword eKeywordId);
-bool cxxKeywordExcludeFromTypeNames(enum CXXKeyword eKeywordId);
+bool cxxKeywordIsConstant(CXXKeyword eKeywordId);
+bool cxxKeywordMayBePartOfTypeName(CXXKeyword eKeywordId);
+bool cxxKeywordIsTypeRefMarker(CXXKeyword eKeywordId);
+bool cxxKeywordExcludeFromTypeNames(CXXKeyword eKeywordId);
 
-const char * cxxKeywordName(enum CXXKeyword eKeywordId);
+const char * cxxKeywordName(CXXKeyword eKeywordId);
 
-void cxxBuildKeywordHash(const langType language,bool bCXX);
+// uLanguage is really CXXLanguage, but we keep it as unsigned int to avoid
+// problems with header inclusions. It works anyway.
+void cxxBuildKeywordHash(const langType eLangType,unsigned int uLanguage);
 
 
 #endif //!ctags_cxx_keyword_h_

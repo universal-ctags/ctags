@@ -346,7 +346,7 @@ void cxxParserMarkEndLineForTagInCorkQueue(int iCorkQueueIndex)
 
 // Make sure that the token chain contains only the specified keyword and eventually
 // the "const" or "volatile" type modifiers.
-static void cxxParserCleanupEnumStructClassOrUnionPrefixChain(enum CXXKeyword eKeyword)
+static void cxxParserCleanupEnumStructClassOrUnionPrefixChain(CXXKeyword eKeyword)
 {
 	CXXToken * pToken = cxxTokenChainFirst(g_cxx.pTokenChain);
 	while(pToken)
@@ -383,7 +383,7 @@ static void cxxParserCleanupEnumStructClassOrUnionPrefixChain(enum CXXKeyword eK
 //
 static bool cxxParserParseEnumStructClassOrUnionFullDeclarationTrailer(
 		unsigned int uKeywordState,
-		enum CXXKeyword eTagKeyword,
+		CXXKeyword eTagKeyword,
 		const char * szTypeName
 	)
 {
@@ -762,7 +762,7 @@ bool cxxParserParseEnum(void)
 }
 
 static bool cxxParserParseClassStructOrUnionInternal(
-		enum CXXKeyword eKeyword,
+		CXXKeyword eKeyword,
 		unsigned int uTagKind,
 		unsigned int uScopeType
 	)
@@ -1084,7 +1084,7 @@ static bool cxxParserParseClassStructOrUnionInternal(
 }
 
 bool cxxParserParseClassStructOrUnion(
-		enum CXXKeyword eKeyword,
+		CXXKeyword eKeyword,
 		unsigned int uTagKind,
 		unsigned int uScopeType
 	)
@@ -1443,7 +1443,16 @@ static rescanReason cxxParserMain(const unsigned int passCount)
 rescanReason cxxCParserMain(const unsigned int passCount)
 {
 	CXX_DEBUG_ENTER();
-	cxxTagInitForLanguage(g_cxx.eCLanguage);
+	cxxTagInitForLanguage(g_cxx.eCLangType);
+	rescanReason r = cxxParserMain(passCount);
+	CXX_DEBUG_LEAVE();
+	return r;
+}
+
+rescanReason cxxCUDAParserMain(const unsigned int passCount)
+{
+	CXX_DEBUG_ENTER();
+	cxxTagInitForLanguage(g_cxx.eCUDALangType);
 	rescanReason r = cxxParserMain(passCount);
 	CXX_DEBUG_LEAVE();
 	return r;
@@ -1452,7 +1461,7 @@ rescanReason cxxCParserMain(const unsigned int passCount)
 rescanReason cxxCppParserMain(const unsigned int passCount)
 {
 	CXX_DEBUG_ENTER();
-	cxxTagInitForLanguage(g_cxx.eCPPLanguage);
+	cxxTagInitForLanguage(g_cxx.eCPPLangType);
 
 	// In header files we disable processing of public/protected/private keywords
 	// until we either figure out that this is really C++ or we're start parsing
@@ -1470,8 +1479,9 @@ static void cxxParserFirstInit()
 {
 	memset(&g_cxx,0,sizeof(CXXParserState));
 
-	g_cxx.eCLanguage = -1;
-	g_cxx.eCPPLanguage = -1;
+	g_cxx.eCLangType = -1;
+	g_cxx.eCPPLangType = -1;
+	g_cxx.eCUDALangType = -1;
 
 	cxxTokenAPIInit();
 
@@ -1482,6 +1492,19 @@ static void cxxParserFirstInit()
 	g_bFirstRun = false;
 }
 
+void cxxCUDAParserInitialize(const langType language)
+{
+	CXX_DEBUG_INIT();
+
+	CXX_DEBUG_PRINT("Parser initialize for language CUDA");
+	if(g_bFirstRun)
+		cxxParserFirstInit();
+
+	g_cxx.eCUDALangType = language;
+
+	cxxBuildKeywordHash(language,CXXLanguageCUDA);
+}
+
 void cxxCppParserInitialize(const langType language)
 {
 	CXX_DEBUG_INIT();
@@ -1490,9 +1513,9 @@ void cxxCppParserInitialize(const langType language)
 	if(g_bFirstRun)
 		cxxParserFirstInit();
 
-	g_cxx.eCPPLanguage = language;
+	g_cxx.eCPPLangType = language;
 
-	cxxBuildKeywordHash(language,true);
+	cxxBuildKeywordHash(language,CXXLanguageCPP);
 }
 
 void cxxCParserInitialize(const langType language)
@@ -1503,17 +1526,17 @@ void cxxCParserInitialize(const langType language)
 	if(g_bFirstRun)
 		cxxParserFirstInit();
 
-	g_cxx.eCLanguage = language;
+	g_cxx.eCLangType = language;
 
-	cxxBuildKeywordHash(language,false);
+	cxxBuildKeywordHash(language,CXXLanguageC);
 }
 
-void cxxParserCleanup (langType language CTAGS_ATTR_UNUSED, bool initialized CTAGS_ATTR_UNUSED)
+void cxxParserCleanup(langType language CTAGS_ATTR_UNUSED,bool initialized CTAGS_ATTR_UNUSED)
 {
 	if(g_bFirstRun)
 		return; // didn't run at all
 
-	// This function is used as finalizer for both C and C++ parsers.
+	// This function is used as finalizer for all the sub-language parsers.
 	// The next line forces this function to be called only once
 	g_bFirstRun = true;
 

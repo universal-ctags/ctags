@@ -18,23 +18,24 @@
 #include "routines.h"
 #include "xtag.h"
 
-#define CXX_COMMON_MACRO_ROLES(__langPrefix)		\
-    static roleDesc __langPrefix##MacroRoles [] = {	\
-	    RoleTemplateUndef,				\
-    }
+#define CXX_COMMON_MACRO_ROLES(__langPrefix) \
+	static roleDesc __langPrefix##MacroRoles [] = { \
+		RoleTemplateUndef, \
+	}
 
 CXX_COMMON_MACRO_ROLES(C);
 CXX_COMMON_MACRO_ROLES(CXX);
+CXX_COMMON_MACRO_ROLES(CUDA);
 
-
-#define CXX_COMMON_HEADER_ROLES(__langPrefix)		\
-    static roleDesc __langPrefix##HeaderRoles [] = {	\
-	    RoleTemplateSystem,				\
-	    RoleTemplateLocal,				\
-    }
+#define CXX_COMMON_HEADER_ROLES(__langPrefix) \
+	static roleDesc __langPrefix##HeaderRoles [] = { \
+		RoleTemplateSystem, \
+		RoleTemplateLocal, \
+	}
 
 CXX_COMMON_HEADER_ROLES(C);
 CXX_COMMON_HEADER_ROLES(CXX);
+CXX_COMMON_HEADER_ROLES(CUDA);
 
 
 #define CXX_COMMON_KINDS(_langPrefix, _szMemberDescription, _syncWith)	\
@@ -75,6 +76,10 @@ static kindOption g_aCXXCPPKinds [] = {
 			.referenceOnly = true },
 };
 
+static kindOption g_aCXXCUDAKinds [] = {
+	CXX_COMMON_KINDS(CUDA,"struct, and union members", LANG_IGNORE)
+};
+
 static const char * g_aCXXAccessStrings [] = {
 	NULL,
 	"public",
@@ -112,22 +117,35 @@ static fieldSpec g_aCXXCPPFields [] = {
 	}
 };
 
-void cxxTagInitForLanguage(langType eLanguage)
-{
-	g_cxx.eLanguage = eLanguage;
+static fieldSpec g_aCXXCUDAFields [] = {
+	CXX_COMMON_FIELDS
+};
 
-	if(g_cxx.eLanguage == g_cxx.eCLanguage)
+void cxxTagInitForLanguage(langType eLangType)
+{
+	g_cxx.eLangType = eLangType;
+
+	if(g_cxx.eLangType == g_cxx.eCLangType)
 	{
+		g_cxx.eLanguage = CXXLanguageC;
 		g_cxx.pKindOptions = g_aCXXCKinds;
 		g_cxx.uKindOptionCount = sizeof(g_aCXXCKinds) / sizeof(kindOption);
 		g_cxx.pFieldOptions = g_aCXXCFields;
 		g_cxx.uFieldOptionCount = sizeof(g_aCXXCFields) / sizeof(fieldSpec);
-	} else if(g_cxx.eLanguage == g_cxx.eCPPLanguage)
+	} else if(g_cxx.eLangType == g_cxx.eCPPLangType)
 	{
+		g_cxx.eLanguage = CXXLanguageCPP;
 		g_cxx.pKindOptions = g_aCXXCPPKinds;
 		g_cxx.uKindOptionCount = sizeof(g_aCXXCPPKinds) / sizeof(kindOption);
 		g_cxx.pFieldOptions = g_aCXXCPPFields;
 		g_cxx.uFieldOptionCount = sizeof(g_aCXXCPPFields) / sizeof(fieldSpec);
+	} else if(g_cxx.eLangType == g_cxx.eCUDALangType)
+	{
+		g_cxx.eLanguage = CXXLanguageCUDA;
+		g_cxx.pKindOptions = g_aCXXCUDAKinds;
+		g_cxx.uKindOptionCount = sizeof(g_aCXXCUDAKinds) / sizeof(kindOption);
+		g_cxx.pFieldOptions = g_aCXXCUDAFields;
+		g_cxx.uFieldOptionCount = sizeof(g_aCXXCUDAFields) / sizeof(fieldSpec);
 	} else {
 		CXX_DEBUG_ASSERT(false,"Invalid language passed to cxxTagInitForLanguage()");
 	}
@@ -141,6 +159,16 @@ kindOption * cxxTagGetCKindOptions(void)
 int cxxTagGetCKindOptionCount(void)
 {
 	return sizeof(g_aCXXCKinds) / sizeof(kindOption);
+}
+
+kindOption * cxxTagGetCUDAKindOptions(void)
+{
+	return g_aCXXCUDAKinds;
+}
+
+int cxxTagGetCUDAKindOptionCount(void)
+{
+	return sizeof(g_aCXXCUDAKinds) / sizeof(kindOption);
 }
 
 kindOption * cxxTagGetCPPKindOptions(void)
@@ -170,6 +198,16 @@ fieldSpec * cxxTagGetCPPFieldSpecifiers(void)
 int cxxTagGetCPPFieldSpecifierCount(void)
 {
 	return sizeof(g_aCXXCPPFields) / sizeof(fieldSpec);
+}
+
+fieldSpec * cxxTagGetCUDAFieldSpecifiers(void)
+{
+	return g_aCXXCUDAFields;
+}
+
+int cxxTagGetCUDAFieldSpecifierCount(void)
+{
+	return sizeof(g_aCXXCUDAFields) / sizeof(fieldSpec);
 }
 
 fieldSpec * cxxTagGetCFieldSpecifiers(void)
@@ -233,7 +271,7 @@ vString * cxxTagSetProperties(unsigned int uProperties)
 		return NULL;
 
 	if(!cxxTagFieldEnabled(CXXTagFieldProperties))
-			return NULL;
+		return NULL;
 
 	vString * pszProperties = vStringNew();
 
@@ -299,12 +337,12 @@ static bool cxxTagCheckTypeField(
 		CXX_DEBUG_LEAVE_TEXT("One of the pointers is NULL");
 		return false;
 	}
-	
+
 	int iTotalCount = 0;
 	int iParenthesisCount = 0;
 	int iIdentifierOrKeywordCount = 0;
 	int iConsecutiveIdentifiers = 0;
-	
+
 	while(pTypeStart)
 	{
 		iTotalCount++;
@@ -335,7 +373,7 @@ static bool cxxTagCheckTypeField(
 					CXX_DEBUG_LEAVE_TEXT("Too many non-nested parentheses for a type name");
 					return false;
 				}
-				
+
 				if(
 					(iTotalCount > 1) &&
 					cxxTokenTypeIs(pTypeStart->pPrev,CXXTokenTypeIdentifier) &&
@@ -360,19 +398,19 @@ static bool cxxTagCheckTypeField(
 
 		pTypeStart = pTypeStart->pNext;
 	}
-	
+
 	if(iIdentifierOrKeywordCount < 1)
 	{
 		CXX_DEBUG_LEAVE_TEXT("Type does not seem to contains identifiers or keywords, can't be a type name");
 		return false;
 	}
-	
+
 	if(!pTypeStart)
 	{
 		CXX_DEBUG_LEAVE_TEXT("Type tokens do not belong to the same chain!");
 		return false;
 	}
-	
+
 	CXX_DEBUG_LEAVE();
 	return true;
 }
@@ -390,13 +428,29 @@ CXXToken * cxxTagCheckAndSetTypeField(
 	// "typename" is debatable since it's not really
 	// allowed by C++ for unqualified types. However I haven't been able
 	// to come up with something better... so "typename" it is for now.
-	
+
 	// FIXME: The typeRef forma with two fields should be dropped.
 	//        It has been created with specific use cases in mind
 	//        and we are pushing it way beyond them.
 	//        We should have a plain "type" field instead.
-	
+
 	static const char * szTypename = "typename";
+
+	// Filter out initial keywords that need to be excluded from typenames
+	for(;;)
+	{
+		if(!cxxTokenTypeIs(pTypeStart,CXXTokenTypeKeyword))
+			break;
+		if(!cxxKeywordExcludeFromTypeNames(pTypeStart->eKeyword))
+			break;
+		// must be excluded
+		if(pTypeStart == pTypeEnd)
+		{
+			CXX_DEBUG_PRINT("Type name composed only of ignored keywords");
+			return NULL; // only excluded keywords
+		}
+		pTypeStart = pTypeStart->pNext;
+	}
 
 	if(pTypeStart != pTypeEnd)
 	{
@@ -423,7 +477,13 @@ CXXToken * cxxTagCheckAndSetTypeField(
 	}
 
 	cxxTokenChainNormalizeTypeNameSpacingInRange(pTypeStart,pTypeEnd);
-	CXXToken * pTypeName = cxxTokenChainExtractRange(pTypeStart,pTypeEnd,0);
+	CXXToken * pTypeName = cxxTokenChainExtractRangeFilterTypeName(pTypeStart,pTypeEnd);
+
+	if(!pTypeName)
+	{
+		CXX_DEBUG_PRINT("Can't extract type name");
+		return NULL;
+	}
 
 	CXX_DEBUG_PRINT("Type name is '%s'",vStringValue(pTypeName->pszWord));
 

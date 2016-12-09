@@ -109,7 +109,7 @@ void cxxTokenForceDestroy(CXXToken * t)
 	eFree(t);
 }
 
-CXXToken * cxxTokenCreateKeyword(int iLineNumber,MIOPos oFilePosition,enum CXXKeyword eKeyword)
+CXXToken * cxxTokenCreateKeyword(int iLineNumber,MIOPos oFilePosition,CXXKeyword eKeyword)
 {
 	CXXToken * pToken = cxxTokenCreate();
 	pToken->iLineNumber = iLineNumber;

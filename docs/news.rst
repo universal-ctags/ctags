@@ -40,6 +40,7 @@ The following parsers have been added:
 * Automake
 * Clojure
 * CSS
+* CUDA
 * D
 * DBusIntrospect *libxml*
 * Diff
