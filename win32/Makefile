@@ -182,7 +182,10 @@ default: all
 setup:
 
 
-all: $(libname) $(dllname)
+all: lib dll
+
+lib: $(libname)
+dll: $(dllname)
 
 $(libname): $(WORKDIR) $(libobjs) $(encobjs)
 	$(ARLIB) $(ARLIB_FLAGS) -out:$@ $(libobjs) $(encobjs)
