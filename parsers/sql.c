@@ -136,6 +136,8 @@ enum eKeywordId {
 	KEYWORD_comment,
 	KEYWORD_create,
 	KEYWORD_go,
+	KEYWORD_with,
+	KEYWORD_without,
 };
 typedef int keywordId; /* to allow KEYWORD_NONE */
 
@@ -309,7 +311,9 @@ static const keywordTable SqlKeywordTable [] = {
 	{ "handler",						KEYWORD_handler			      },
 	{ "comment",						KEYWORD_comment			      },
 	{ "create",							KEYWORD_create				  },
-	{ "go",								KEYWORD_go				      }
+	{ "go",								KEYWORD_go				      },
+	{ "with",							KEYWORD_with			      },
+	{ "without",						KEYWORD_without			      },
 };
 
 /*
@@ -610,7 +614,9 @@ getNextChar:
 					  token->lineNumber = getInputLineNumber ();
 					  token->filePosition = getInputFilePosition ();
 					  token->keyword = lookupCaseKeyword (vStringValue (token->string), Lang_sql);
-					  if (isKeyword (token, KEYWORD_rem))
+					  if (isKeyword (token, KEYWORD_rem)
+						  || isKeyword (token, KEYWORD_with)
+						  || isKeyword (token, KEYWORD_without))
 					  {
 						  vStringClear (token->string);
 						  skipToCharacterInInputFile ('\n');
