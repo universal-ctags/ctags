@@ -46,7 +46,7 @@
 	/*
 	 * Other databases are less restrictive on the first character of
 	 * an identifier.
-	 * isIdentChar1 is used to identify the first character of an 
+	 * isIdentChar1 is used to identify the first character of an
 	 * identifier, so we are removing some restrictions.
 	 */ \
 	(isalpha (c) || (c) == '@' || (c) == '_' )
@@ -135,7 +135,7 @@ enum eKeywordId {
 	KEYWORD_handler,
 	KEYWORD_comment,
 	KEYWORD_create,
-	KEYWORD_go
+	KEYWORD_go,
 };
 typedef int keywordId; /* to allow KEYWORD_NONE */
 
@@ -328,7 +328,7 @@ static tokenType parseSqlFile (tokenInfo *const token);
 
 static bool isCmdTerm (tokenInfo *const token)
 {
-	DebugStatement ( 
+	DebugStatement (
 			debugPrintf (DEBUG_PARSE
 				, "\n isCmdTerm: token same  tt:%d  tk:%d\n"
 				, token->type
@@ -359,10 +359,10 @@ static bool isMatchedEnd(tokenInfo *const token, int nest_lvl)
 {
 	bool terminated = false;
 	/*
-	 * Since different forms of SQL allow the use of 
-	 * BEGIN 
+	 * Since different forms of SQL allow the use of
+	 * BEGIN
 	 * ...
-	 * END 
+	 * END
 	 * blocks, some statements may not be terminated using
 	 * the standard delimiters:
 	 *	   ;
@@ -488,12 +488,12 @@ getNextChar:
 		c = getcFromInputFile ();
 		token->lineNumber   = getInputLineNumber ();
 		token->filePosition = getInputFilePosition ();
-		/* 
-		 * Added " to the list of ignores, not sure what this 
+		/*
+		 * Added " to the list of ignores, not sure what this
 		 * might break but it gets by this issue:
 		 *	  create table "t1" (...)
 		 *
-		 * Darren, the code passes all my tests for both 
+		 * Darren, the code passes all my tests for both
 		 * Oracle and SQL Anywhere, but maybe you can tell me
 		 * what this may effect.
 		 */
@@ -753,7 +753,7 @@ static void skipToMatched(tokenInfo *const token)
 	 *	 (	name varchar(30), text binary(10)  )
 	 */
 
-	if (isType (token, open_token))	
+	if (isType (token, open_token))
 	{
 		nest_level++;
 		while (nest_level > 0 && !isType (token, TOKEN_EOF))
@@ -770,7 +770,7 @@ static void skipToMatched(tokenInfo *const token)
 					nest_level--;
 				}
 			}
-		} 
+		}
 		readToken (token);
 	}
 }
@@ -838,11 +838,11 @@ static void parseSubProgram (tokenInfo *const token)
 	 *	   RETURNS VARCHAR(200)
 	 *	   DETERMINISTIC
 	 *	   BEGIN
-	 *	   
+	 *
 	 *		   IF( @object = 'user_state' ) THEN
 	 *			   SET something = something;
 	 *		   END IF;
-	 *	   
+	 *
 	 *		   RETURN @name;
 	 *	   END;
 	 *
@@ -915,8 +915,8 @@ static void parseSubProgram (tokenInfo *const token)
 	if (isCmdTerm (token))
 	{
 		makeSqlTag (name, SQLTAG_PROTOTYPE);
-	} 
-	else 
+	}
+	else
 	{
 		while (! isKeyword (token, KEYWORD_is) &&
 			   ! isKeyword (token, KEYWORD_begin) &&
@@ -940,7 +940,7 @@ static void parseSubProgram (tokenInfo *const token)
 				readToken (token);
 			}
 		}
-		if (isKeyword (token, KEYWORD_at) || 
+		if (isKeyword (token, KEYWORD_at) ||
 			isKeyword (token, KEYWORD_url) ||
 			isKeyword (token, KEYWORD_internal) ||
 			isKeyword (token, KEYWORD_external))
@@ -955,14 +955,14 @@ static void parseSubProgram (tokenInfo *const token)
 
 			vStringClear (token->scope);
 			token->scopeKind = SQLTAG_COUNT;
-		} 
+		}
 		if (isType (token, TOKEN_EQUAL))
 			readToken (token);
 
 		if (isKeyword (token, KEYWORD_declare))
 			parseDeclare (token, false);
 
-		if (isKeyword (token, KEYWORD_is) || 
+		if (isKeyword (token, KEYWORD_is) ||
 			isKeyword (token, KEYWORD_begin))
 		{
 			addToScope(token, name->string, kind);
@@ -976,7 +976,7 @@ static void parseSubProgram (tokenInfo *const token)
 			parseBlock (token, true);
 			vStringClear (token->scope);
 			token->scopeKind = SQLTAG_COUNT;
-		} 
+		}
 	}
 	vStringCopy(token->scope, saveScope);
 	token->scopeKind = saveScopeKind;
@@ -1013,7 +1013,7 @@ static void parseRecord (tokenInfo *const token)
 		 *		  c4 integer,
 		 *		  constraint whatever,
 		 *		  primary key(c1),
-		 *		  foreign key (), 
+		 *		  foreign key (),
 		 *		  check ()
 		 *	  )
 		 */
@@ -1039,7 +1039,7 @@ static void parseRecord (tokenInfo *const token)
 			   ! isType (token, TOKEN_EOF))
 		{
 			readToken (token);
-			/* 
+			/*
 			 * A table structure can look like this:
 			 *	  create table t1 (
 			 *		  c1 integer,
@@ -1049,7 +1049,7 @@ static void parseRecord (tokenInfo *const token)
 			 *	  )
 			 * We can't just look for a COMMA or CLOSE_PAREN
 			 * since that will not deal with the numeric(10,5)
-			 * case.  So we need to skip the argument list 
+			 * case.  So we need to skip the argument list
 			 * when we find an open paren.
 			 */
 			if (isType (token, TOKEN_OPEN_PAREN))
@@ -1160,8 +1160,8 @@ static void parseDeclare (tokenInfo *const token, const bool local)
 					if (local)
 					{
 						makeSqlTag (token, SQLTAG_LOCAL_VARIABLE);
-					} 
-					else 
+					}
+					else
 					{
 						makeSqlTag (token, SQLTAG_VARIABLE);
 					}
@@ -1207,14 +1207,14 @@ static void parseDeclareANSI (tokenInfo *const token, const bool local)
 			if (isKeyword (token, KEYWORD_table))
 			{
 				readToken (token);
-				if (isType(token, TOKEN_IDENTIFIER) || 
+				if (isType(token, TOKEN_IDENTIFIER) ||
 					isType(token, TOKEN_STRING))
 				{
 					makeSqlTag (token, SQLTAG_TABLE);
 				}
 			}
 		}
-		else if (isType (token, TOKEN_IDENTIFIER) || 
+		else if (isType (token, TOKEN_IDENTIFIER) ||
 				 isType (token, TOKEN_STRING))
 		{
 			if (local)
@@ -1277,7 +1277,7 @@ static void parseStatements (tokenInfo *const token, const bool exit_on_endif )
 					 *		WHEN OTHERS THEN
 					 *			x := x + 3;
 					 *	 END;
-					 * In this case we need to skip this keyword and 
+					 * In this case we need to skip this keyword and
 					 * move on to the next token without reading until
 					 * TOKEN_SEMICOLON;
 					 */
@@ -1369,7 +1369,7 @@ static void parseStatements (tokenInfo *const token, const bool exit_on_endif )
 
 						}
 
-						/* 
+						/*
 						 * parseStatements returns when it finds an END, an IF
 						 * should follow the END for ANSI anyway.
 						 *	IF...THEN
@@ -1384,8 +1384,8 @@ static void parseStatements (tokenInfo *const token, const bool exit_on_endif )
 							readToken (token);
 							if (isCmdTerm(token))
 								stmtTerm = true;
-						} 
-						else 
+						}
+						else
 						{
 							/*
 							 * Well we need to do something here.
@@ -1405,11 +1405,11 @@ static void parseStatements (tokenInfo *const token, const bool exit_on_endif )
 					/*
 					 *	LOOP...
 					 *	END LOOP;
-					 *	
+					 *
 					 *	CASE
 					 *	WHEN '1' THEN
 					 *	END CASE;
-					 *	
+					 *
 					 *	FOR loop_name AS cursor_name CURSOR FOR ...
 					 *	DO
 					 *	END FOR;
@@ -1425,8 +1425,8 @@ static void parseStatements (tokenInfo *const token, const bool exit_on_endif )
 							   ! isType (token, TOKEN_EOF))
 						{
 							/*
-							 * If this is not an AS keyword this is 
-							 * not a proper FOR statement and should 
+							 * If this is not an AS keyword this is
+							 * not a proper FOR statement and should
 							 * simply be ignored
 							 */
 							return;
@@ -1459,7 +1459,7 @@ static void parseStatements (tokenInfo *const token, const bool exit_on_endif )
 						readToken (token);
 
 					/*
-					 * Typically ended with 
+					 * Typically ended with
 					 *    END LOOP [loop name];
 					 *    END CASE
 					 *    END FOR [loop name];
@@ -1494,14 +1494,14 @@ static void parseStatements (tokenInfo *const token, const bool exit_on_endif )
 					break;
 			}
 			/*
-			 * Not all statements must end in a semi-colon 
+			 * Not all statements must end in a semi-colon
 			 *	   begin
 			 *		   if current publisher <> 'publish' then
 			 *			 signal UE_FailStatement
 			 *		   end if
 			 *	   end;
 			 * The last statement prior to an end ("signal" above) does
-			 * not need a semi-colon, nor does the end if, since it is 
+			 * not need a semi-colon, nor does the end if, since it is
 			 * also the last statement prior to the end of the block.
 			 *
 			 * So we must read to the first semi-colon or an END block
@@ -1517,14 +1517,14 @@ static void parseStatements (tokenInfo *const token, const bool exit_on_endif )
 				if (isType (token, TOKEN_COLON) )
 				{
 					/*
-					 * A : can signal a loop name 
+					 * A : can signal a loop name
 					 *    myloop:
-					 *    LOOP 
+					 *    LOOP
 					 *        LEAVE myloop;
 					 *    END LOOP;
 					 * Unfortunately, labels do not have a
-					 * cmd terminator, therefore we have to check 
-					 * if the next token is a keyword and process 
+					 * cmd terminator, therefore we have to check
+					 * if the next token is a keyword and process
 					 * it accordingly.
 					 */
 					readToken (token);
@@ -1547,7 +1547,7 @@ static void parseStatements (tokenInfo *const token, const bool exit_on_endif )
 				}
 
 				/*
-				 * Since we know how to parse various statements 
+				 * Since we know how to parse various statements
 				 * if we detect them, parse them to completion
 				 */
 				if (isType (token, TOKEN_BLOCK_LABEL_BEGIN) ||
@@ -1566,14 +1566,14 @@ static void parseStatements (tokenInfo *const token, const bool exit_on_endif )
 		}
 		/*
 		 * We assumed earlier all statements ended with a command terminator.
-		 * See comment above, now, only read if the current token 
+		 * See comment above, now, only read if the current token
 		 * is not a command terminator.
 		 */
 		if (isCmdTerm(token) && ! stmtTerm)
 			stmtTerm = true;
-				
-	} while (! isKeyword (token, KEYWORD_end) && 
-			 ! (exit_on_endif && isKeyword (token, KEYWORD_endif) ) && 
+
+	} while (! isKeyword (token, KEYWORD_end) &&
+			 ! (exit_on_endif && isKeyword (token, KEYWORD_endif) ) &&
 			 ! isType (token, TOKEN_EOF) &&
 			 ! stmtTerm );
 }
@@ -1619,7 +1619,7 @@ static void parseBlock (tokenInfo *const token, const bool local)
 		 * it is the command delimiter)
 		 */
 		readToken (token);
-		
+
 		/*
 		 * Check if the END block is terminated
 		 */
@@ -1629,7 +1629,7 @@ static void parseBlock (tokenInfo *const token, const bool local)
 			 * Not sure what to do here at the moment.
 			 * I think the routine that calls parseBlock
 			 * must expect the next token has already
-			 * been read since it is possible this 
+			 * been read since it is possible this
 			 * token is not a command delimiter.
 			 */
 			/* findCmdTerm (token, false); */
@@ -1639,7 +1639,7 @@ static void parseBlock (tokenInfo *const token, const bool local)
 
 static void parsePackage (tokenInfo *const token)
 {
-	/* 
+	/*
 	 * Packages can be specified in a number of ways:
 	 *		CREATE OR REPLACE PACKAGE pkg_name AS
 	 * or
@@ -1714,9 +1714,9 @@ static void parseTable (tokenInfo *const token)
 	readToken (token);
 	if (isType (token, TOKEN_PERIOD))
 	{
-		/* 
+		/*
 		 * This could be a owner or table name.
-		 * But this is also a special case since the table can be 
+		 * But this is also a special case since the table can be
 		 * referenced with a blank owner:
 		 *     dbname..tablename
 		 */
@@ -1746,7 +1746,7 @@ static void parseTable (tokenInfo *const token)
 			vStringClear (token->scope);
 			token->scopeKind = SQLTAG_COUNT;
 		}
-	} 
+	}
 	else if (isKeyword (token, KEYWORD_at))
 	{
 		if (isType (name, TOKEN_IDENTIFIER))
@@ -1765,10 +1765,10 @@ static void parseIndex (tokenInfo *const token)
 
 	/*
 	 * This deals with these formats
-	 *	   create index i1 on t1(c1) create index "i2" on t1(c1) 
-	 *	   create virtual unique clustered index "i3" on t1(c1) 
-	 *	   create unique clustered index "i4" on t1(c1) 
-	 *	   create clustered index "i5" on t1(c1) 
+	 *	   create index i1 on t1(c1) create index "i2" on t1(c1)
+	 *	   create virtual unique clustered index "i3" on t1(c1)
+	 *	   create unique clustered index "i4" on t1(c1)
+	 *	   create clustered index "i5" on t1(c1)
 	 *	   create bitmap index "i6" on t1(c1)
 	 */
 
@@ -1955,12 +1955,12 @@ static void parseService (tokenInfo *const token)
 
 	/*
 	 * This deals with these formats
-	 *	   CREATE SERVICE s1 TYPE 'HTML' 
-	 *		   AUTHORIZATION OFF USER DBA AS 
-	 *		   SELECT * 
+	 *	   CREATE SERVICE s1 TYPE 'HTML'
+	 *		   AUTHORIZATION OFF USER DBA AS
+	 *		   SELECT *
 	 *			 FROM SYS.SYSTABLE;
 	 *	   CREATE SERVICE "s2" TYPE 'HTML'
-	 *		   AUTHORIZATION OFF USER DBA AS 
+	 *		   AUTHORIZATION OFF USER DBA AS
 	 *		   CALL sp_Something();
 	 */
 
@@ -2158,10 +2158,10 @@ static void parseMLTable (tokenInfo *const token)
 					addToScope(version, event->string, SQLTAG_EVENT);
 					makeSqlTag (version, SQLTAG_MLTABLE);
 				}
-			} 
+			}
 			if (! isType (token, TOKEN_CLOSE_PAREN))
 				findToken (token, TOKEN_CLOSE_PAREN);
-		} 
+		}
 	}
 
 	findCmdTerm (token, true);
@@ -2205,7 +2205,7 @@ static void parseMLConn (tokenInfo *const token)
 				addToScope(version, event->string, SQLTAG_EVENT);
 				makeSqlTag (version, SQLTAG_MLCONN);
 			}
-		} 
+		}
 		if (! isType (token, TOKEN_CLOSE_PAREN))
 			findToken (token, TOKEN_CLOSE_PAREN);
 
@@ -2225,10 +2225,10 @@ static void parseMLProp (tokenInfo *const token)
 
 	/*
 	 * This deals with these formats
-     *   ml_add_property ( 
-     *       'comp_name', 
-     *       'prop_set_name', 
-     *       'prop_name', 
+     *   ml_add_property (
+     *       'comp_name',
+     *       'prop_set_name',
+     *       'prop_name',
      *       'prop_value'
      *   )
 	 */
@@ -2268,10 +2268,10 @@ static void parseMLProp (tokenInfo *const token)
 					addToScope(component, prop_name->string, SQLTAG_MLPROP /* FIXME */);
 					makeSqlTag (component, SQLTAG_MLPROP);
 				}
-			} 
+			}
 			if (! isType (token, TOKEN_CLOSE_PAREN))
 				findToken (token, TOKEN_CLOSE_PAREN);
-		} 
+		}
 	}
 
 	findCmdTerm (token, true);
@@ -2285,7 +2285,7 @@ static void parseComment (tokenInfo *const token)
 {
 	/*
 	 * This deals with this statement:
-	 *	   COMMENT TO PRESERVE FORMAT ON PROCEDURE "DBA"."test" IS 
+	 *	   COMMENT TO PRESERVE FORMAT ON PROCEDURE "DBA"."test" IS
 	 *	   {create PROCEDURE DBA."test"()
 	 *	   BEGIN
 	 *		signal dave;
@@ -2363,7 +2363,7 @@ static tokenType parseSqlFile (tokenInfo *const token)
 
 		if (isType (token, TOKEN_BLOCK_LABEL_BEGIN))
 			parseLabel (token);
-		else 
+		else
 			parseKeywords (token);
 	} while (! isKeyword (token, KEYWORD_end) &&
 			 ! isType (token, TOKEN_EOF));
