@@ -112,7 +112,7 @@ makeargs = $(MFLAGS) CPPFLAGS='$(CPPFLAGS)' CFLAGS='$(CFLAGS)' CC='$(CC)'
 .SUFFIXES: .o .c .h .ps .dvi .info .texinfo .res .rc
 
 $(WORKDIR)/%.o: %.c
-	$(CC) $(CFLAGS) $(CPPFLAGS) $(DEFS) -Iwin32 -I. -I$(encdir)/unicode -o $@ -c $<
+	$(CC) $(CFLAGS) $(CPPFLAGS) $(DEFS) -Iwin32 -I. -o $@ -c $<
 
 $(WORKDIR)/%.o: $(encdir)/%.c
 	$(CC) $(CFLAGS) $(CPPFLAGS) $(DEFS) -Iwin32 -I. -I$(encdir)/unicode -o $@ -c $<

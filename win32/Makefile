@@ -170,7 +170,7 @@ makeargs = $(MFLAGS) CPPFLAGS='$(CPPFLAGS)' CFLAGS='$(CFLAGS)' CC='$(CC)'
 .c{$(WORKDIR)\}.obj::
 	$(CC) $(CFLAGS) $(CPPFLAGS) $(DEFS) /Iwin32 /I. /Fo$(WORKDIR)\ /c $<
 {$(encdir)\}.c{$(WORKDIR)\}.obj::
-	$(CC) $(CFLAGS) $(CPPFLAGS) $(DEFS) /Iwin32 /I. /I.. /I$(encdir)\unicode /Fo$(WORKDIR)\ /c $<
+	$(CC) $(CFLAGS) $(CPPFLAGS) $(DEFS) /Iwin32 /I. /I$(encdir)\unicode /Fo$(WORKDIR)\ /c $<
 !endif
 
 {win32\}.rc{$(WORKDIR)}.res:
