@@ -442,7 +442,7 @@ run_tcase ()
 	fexpected=$t/expected.tags-e
 	output_type=etags
 	output_label=/${output_type}
-	output_tflag=-e
+	output_tflag="-e  --tag-relative=no"
     elif [ -f "$t/expected.tags-x" ]; then
 	fexpected=$t/expected.tags-x
 	output_type=xref
