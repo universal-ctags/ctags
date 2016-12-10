@@ -1,0 +1,10 @@
+I don't understand the original intent of this test case.
+
+For db0002, x, n, err are tagged as a variable.
+For db0003, they are not.
+
+The difference between db0002 and db0003 is "=" and "AS".
+About "=" I cannot find good document.
+
+Masatake YAMATO
+

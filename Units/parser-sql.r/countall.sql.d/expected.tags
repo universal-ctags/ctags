@@ -1,0 +1,8 @@
+t_c1_tname	input.sql	/^  t_c1_tname      user_tables.table_name%TYPE;$/;"	v
+t_command	input.sql	/^  t_command       varchar2(200);$/;"	v
+t_cid	input.sql	/^  t_cid           integer;$/;"	v
+t_total_records	input.sql	/^  t_total_records number(10);$/;"	v
+stat	input.sql	/^  stat            integer;$/;"	v
+row_count	input.sql	/^  row_count       integer;$/;"	v
+t_limit	input.sql	/^  t_limit         integer := 0;    -- Only show tables with more rows$/;"	v
+c1	input.sql	/^  cursor c1 is select table_name from user_tables order by table_name;$/;"	c

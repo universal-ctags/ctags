@@ -1,4 +1,0 @@
-address	input.sql	/^    address varchar(50),$/;"	F	table:employees
-employees	input.sql	/^CREATE TABLE employees ($/;"	t
-id	input.sql	/^    id integer NOT NULL,$/;"	F	table:employees
-name	input.sql	/^    name varchar(20),$/;"	F	table:employees
