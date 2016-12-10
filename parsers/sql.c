@@ -1653,11 +1653,19 @@ static void parseBlock (tokenInfo *const token, const bool local)
 	if (! isKeyword (token, KEYWORD_begin))
 	{
 		readToken (token);
-		/*
-		 * These are Oracle style declares which generally come
-		 * between an IS/AS and BEGIN block.
-		 */
-		parseDeclare (token, local);
+		if (isType (token, TOKEN_STRING))
+		{
+			/* Likely a PostgreSQL FUNCTION name AS '...'
+			 * https://www.postgresql.org/docs/current/static/sql-createfunction.html */
+		}
+		else
+		{
+			/*
+			 * These are Oracle style declares which generally come
+			 * between an IS/AS and BEGIN block.
+			 */
+			parseDeclare (token, local);
+		}
 	}
 	if (isKeyword (token, KEYWORD_begin))
 	{
