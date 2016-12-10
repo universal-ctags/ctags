@@ -1,6 +1,6 @@
 History of Onigmo (Oniguruma-mod)
 
-2016/xx/xx: Version 6.0.0
+2016/12/10: Version 6.0.0
 
 2016/12/08: [bug]  (thanks Masahiro Ide)
                    Define PRIdPTRDIFF at regint.h if not defined yet (PR #77)
