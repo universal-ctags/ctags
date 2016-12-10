@@ -25,6 +25,7 @@
 #include "read.h"
 #include "routines.h"
 #include "vstring.h"
+#include "xtag.h"
 
 /*
  *	On-line "Oracle Database PL/SQL Language Reference":
@@ -427,6 +428,20 @@ static void makeSqlTag (tokenInfo *const token, const sqlKind kind)
 			Assert (token->scopeKind < SQLTAG_COUNT);
 			e.extensionFields.scopeKind = &(SqlKinds [token->scopeKind]);
 			e.extensionFields.scopeName = vStringValue (token->scope);
+
+			if (isXtagEnabled (XTAG_QUALIFIED_TAGS))
+			{
+				vString *fulltag;
+				tagEntryInfo xe = e;
+
+				fulltag =  vStringNewCopy (token->scope);
+				vStringPut (fulltag, '.');
+				vStringCat (fulltag, token->string);
+				xe.name = vStringValue (fulltag);
+				markTagExtraBit (&xe, XTAG_QUALIFIED_TAGS);
+				makeTagEntry (&xe);
+				vStringDelete (fulltag);
+			}
 		}
 
 		makeTagEntry (&e);
