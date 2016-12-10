@@ -104,13 +104,16 @@ testcu_SOURCES = testu.c
 testcu_LDADD = libonigmo.la
 
 
-$(srcdir)/testc.c: $(srcdir)/test.rb $(srcdir)/testconv.rb
+#$(srcdir)/testc.c: $(srcdir)/test.rb $(srcdir)/testconv.rb
+$(srcdir)/testc.c:
 	ruby -Ke $(srcdir)/testconv.rb < $(srcdir)/test.rb > $@
 
-$(srcdir)/testu.c: $(srcdir)/test.rb $(srcdir)/testconvu.rb
+#$(srcdir)/testu.c: $(srcdir)/test.rb $(srcdir)/testconvu.rb
+$(srcdir)/testu.c:
 	ruby -Ke $(srcdir)/testconvu.rb $(srcdir)/test.rb > $@
 
-$(srcdir)/win32/testc.c: $(srcdir)/test.rb $(srcdir)/testconv.rb
+#$(srcdir)/win32/testc.c: $(srcdir)/test.rb $(srcdir)/testconv.rb
+$(srcdir)/win32/testc.c:
 	ruby -Ke $(srcdir)/testconv.rb -win < $(srcdir)/test.rb | iconv -f euc-jp -t cp932 | sed -e "s/$$/\r/" > $@
 
 # Python TEST
