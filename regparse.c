@@ -3176,7 +3176,7 @@ fetch_token_in_cc(OnigToken* tok, UChar** src, UChar* end, ScanEnv* env)
       PUNFETCH;
       num = fetch_escaped_value(&p, end, env, &c2);
       if (num < 0) return num;
-      if (tok->u.c != c2) {
+      if ((OnigCodePoint)tok->u.c != c2) {
 	tok->u.code = (OnigCodePoint )c2;
 	tok->type   = TK_CODE_POINT;
       }
@@ -3780,7 +3780,7 @@ fetch_token(OnigToken* tok, UChar** src, UChar* end, ScanEnv* env)
 	num = fetch_escaped_value(&p, end, env, &c2);
 	if (num < 0) return num;
 	/* set_raw: */
-	if (tok->u.c != c2) {
+	if ((OnigCodePoint)tok->u.c != c2) {
 	  tok->type = TK_CODE_POINT;
 	  tok->u.code = (OnigCodePoint )c2;
 	}
