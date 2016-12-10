@@ -1,0 +1,1 @@
+my_view	input.sql	/^CREATE OR REPLACE VIEW my_view AS$/;"	V
