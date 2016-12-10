@@ -1,5 +1,5 @@
 /***/
 DECLARE
-   variable CLOB;
+   variable1 CLOB;
 BEGIN
 END;
