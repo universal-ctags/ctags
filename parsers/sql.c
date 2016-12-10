@@ -136,6 +136,8 @@ enum eKeywordId {
 	KEYWORD_comment,
 	KEYWORD_create,
 	KEYWORD_go,
+	KEYWORD_with,
+	KEYWORD_without,
 };
 typedef int keywordId; /* to allow KEYWORD_NONE */
 
@@ -309,7 +311,9 @@ static const keywordTable SqlKeywordTable [] = {
 	{ "handler",						KEYWORD_handler			      },
 	{ "comment",						KEYWORD_comment			      },
 	{ "create",							KEYWORD_create				  },
-	{ "go",								KEYWORD_go				      }
+	{ "go",								KEYWORD_go				      },
+	{ "with",							KEYWORD_with			      },
+	{ "without",						KEYWORD_without			      },
 };
 
 /*
@@ -2351,6 +2355,8 @@ static void parseKeywords (tokenInfo *const token)
 			case KEYWORD_type:			parseType (token); break;
 			case KEYWORD_variable:		parseVariable (token); break;
 			case KEYWORD_view:			parseView (token); break;
+			case KEYWORD_with:			readToken (token); break; /* skip next token */
+			case KEYWORD_without:		readToken (token); break; /* skip next token */
 			default:				    break;
 		}
 }
