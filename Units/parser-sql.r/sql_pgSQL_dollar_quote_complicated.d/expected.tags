@@ -1,0 +1,2 @@
+my_func	input.sql	/^CREATE OR REPLACE FUNCTION my_func()$/;"	f
+my_view	input.sql	/^CREATE OR REPLACE VIEW my_view AS$/;"	V
