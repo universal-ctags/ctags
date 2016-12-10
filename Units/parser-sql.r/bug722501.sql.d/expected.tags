@@ -1,0 +1,2 @@
+foo	input.sql	/^CREATE OR REPLACE PROCEDURE foo$/;"	p
+l_foo	input.sql	/^	    l_foo NUMBER;$/;"	l	procedure:foo

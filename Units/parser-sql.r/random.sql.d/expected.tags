@@ -1,0 +1,12 @@
+random	input.sql	/^create or replace package random$/;"	P
+random	input.sql	/^create or replace package body random$/;"	P
+multiplier	input.sql	/^   multiplier   constant number := 22695477;$/;"	v	package:random
+increment	input.sql	/^   increment    constant number := 1;$/;"	v	package:random
+Seed	input.sql	/^   Seed         number          := 1;$/;"	v	package:random
+smaller	input.sql	/^   function  smaller(x IN number, y IN number) return number is$/;"	f	package:random
+rand_string	input.sql	/^   function rand_string(ssiz IN number) return varchar2 is$/;"	f	package:random
+srand	input.sql	/^   procedure srand(new_seed in number) is$/;"	p	package:random
+rand	input.sql	/^   function rand return number is$/;"	f	package:random
+get_rand	input.sql	/^   procedure get_rand(r OUT number) is$/;"	p	package:random
+rand_max	input.sql	/^   function rand_max(n IN number) return number is$/;"	f	package:random
+get_rand_max	input.sql	/^   procedure get_rand_max(r OUT number, n IN number) is$/;"	p	package:random

@@ -1,2 +1,0 @@
-demo_pkg	input.sql	/^create or replace package demo_pkg is$/;"	P
-test_var	input.sql	/^test_var number;$/;"	v	package:demo_pkg

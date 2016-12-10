@@ -1,0 +1,9 @@
+demo_pkg	input.sql	/^create or replace package demo_pkg is$/;"	P
+demo_pkg.test_var	input.sql	/^test_var number;$/;"	v	package:demo_pkg
+test_var	input.sql	/^test_var number;$/;"	v	package:demo_pkg
+demo_pkg.test_func	input.sql	/^function test_func return varchar2;$/;"	d	package:demo_pkg
+test_func	input.sql	/^function test_func return varchar2;$/;"	d	package:demo_pkg
+demo_pkg.more.test_func2	input.sql	/^function more.test_func2 return varchar2;$/;"	d	function:demo_pkg.more
+test_func2	input.sql	/^function more.test_func2 return varchar2;$/;"	d	function:demo_pkg.more
+demo_pkg.test_func3	input.sql	/^function test_func3 return varchar2;$/;"	d	package:demo_pkg
+test_func3	input.sql	/^function test_func3 return varchar2;$/;"	d	package:demo_pkg

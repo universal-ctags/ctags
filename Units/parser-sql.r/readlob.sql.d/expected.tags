@@ -1,0 +1,9 @@
+lob_table	input.sql	/^CREATE TABLE lob_table  ($/;"	t
+id	input.sql	/^        id      INTEGER,$/;"	F	table:lob_table
+b_lob	input.sql	/^        b_lob   BLOB,$/;"	F	table:lob_table
+c_lob	input.sql	/^        c_lob   CLOB,$/;"	F	table:lob_table
+b_file	input.sql	/^        b_file  BFILE );$/;"	F	table:lob_table
+clob_locator	input.sql	/^   clob_locator CLOB;$/;"	v
+charbuf	input.sql	/^   charbuf      VARCHAR2(20);$/;"	v
+read_offset	input.sql	/^   read_offset  INTEGER;$/;"	v
+read_amount	input.sql	/^   read_amount  INTEGER;$/;"	v
