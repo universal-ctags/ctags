@@ -30,6 +30,9 @@
  * SUCH DAMAGE.
  */
 
+#if !defined(RUBY) && (defined(RUBY_EXPORT) || defined(ONIG_ENC_REGISTER))
+# define RUBY
+#endif
 #ifdef RUBY
 # ifndef ONIGMO_REGINT_H
 #  ifndef RUBY_EXTERN

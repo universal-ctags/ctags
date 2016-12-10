@@ -102,6 +102,9 @@
 # define ARG_UNUSED
 #endif
 
+#if !defined(RUBY) && defined(RUBY_EXPORT)
+# define RUBY
+#endif
 #ifdef RUBY
 # ifndef RUBY_DEFINES_H
 #  include "ruby/ruby.h"
