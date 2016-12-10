@@ -17,6 +17,7 @@
 #ifdef DEBUG
 #include <stdio.h>
 #endif
+#include <string.h>
 
 #include "debug.h"
 #include "entry.h"
@@ -478,6 +479,60 @@ static void parseIdentifier (vString *const string, const int firstChar)
 		ungetcToInputFile (c);		/* unget non-identifier character */
 }
 
+/* Parse a PostgreSQL: dollar-quoted string
+ * https://www.postgresql.org/docs/current/static/sql-syntax-lexical.html#SQL-SYNTAX-DOLLAR-QUOTING */
+static tokenType parseDollarQuote (vString *const string, const int delimiter)
+{
+	unsigned int len = 0;
+	char tag[32 /* arbitrary limit */] = {0};
+	int c = 0;
+
+	/* read the tag */
+	tag[len++] = (char) delimiter;
+	while ((len + 1) < sizeof tag && c != delimiter)
+	{
+		c = getcFromInputFile ();
+		if (isIdentChar(c))
+			tag[len++] = (char) c;
+		else
+			break;
+	}
+	tag[len] = 0;
+
+	if (c != delimiter)
+	{
+		/* damn that's not valid, what can we do? */
+		return TOKEN_UNDEFINED;
+	}
+
+	/* and read the content (until a matching end tag) */
+	while ((c = getcFromInputFile ()) != EOF)
+	{
+		if (c != delimiter)
+			vStringPut (string, c);
+		else
+		{
+			char *end_p = tag;
+
+			while (c != EOF && *end_p && ((int) c) == *end_p)
+			{
+				c = getcFromInputFile ();
+				end_p++;
+			}
+
+			if (! *end_p) /* full tag match */
+				break;
+			else
+			{
+				ungetcToInputFile (c);
+				vStringNCatS (string, tag, (size_t) (end_p - tag));
+			}
+		}
+	}
+
+	return TOKEN_STRING;
+}
+
 static void readToken (tokenInfo *const token)
 {
 	int c;
@@ -604,6 +659,12 @@ getNextChar:
 					  }
 					  break;
 				  }
+
+		case '$':
+				  token->type = parseDollarQuote (token->string, c);
+				  token->lineNumber = getInputLineNumber ();
+				  token->filePosition = getInputFilePosition ();
+				  break;
 
 		default:
 				  if (! isIdentChar1 (c))
