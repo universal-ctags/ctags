@@ -26,13 +26,15 @@ struct sObjPool {
 	objPoolCreateFunc createFunc;
 	objPoolDeleteFunc deleteFunc;
 	objPoolClearFunc clearFunc;
+	void *createArg;
 };
 
 /*
 *   FUNCTION DEFINITIONS
 */
 extern objPool *objPoolNew (unsigned int size,
-	objPoolCreateFunc createFunc, objPoolDeleteFunc deleteFunc, objPoolClearFunc clearFunc)
+	objPoolCreateFunc createFunc, objPoolDeleteFunc deleteFunc, objPoolClearFunc clearFunc,
+	void *createArg)
 {
 	objPool* const result = xMalloc (1, objPool);
 	result->array = ptrArrayNew (deleteFunc);
@@ -40,6 +42,7 @@ extern objPool *objPoolNew (unsigned int size,
 	result->createFunc = createFunc;
 	result->deleteFunc = deleteFunc;
 	result->clearFunc = clearFunc;
+	result->createArg = createArg;
 	return result;
 }
 
@@ -59,7 +62,7 @@ extern void *objPoolGet (objPool *pool)
 		ptrArrayRemoveLast (pool->array);
 	}
 	else
-		obj = pool->createFunc ();
+		obj = pool->createFunc (pool->createArg);
 
 	if (pool->clearFunc)
 		pool->clearFunc (obj);

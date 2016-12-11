@@ -410,7 +410,7 @@ static void makeFunctionTag (const tokenInfo *const token,
 	}
 }
 
-static void *newPoolToken (void)
+static void *newPoolToken (void *createArg CTAGS_ATTR_UNUSED)
 {
 	tokenInfo *token = xMalloc (1, tokenInfo);
 
@@ -1666,7 +1666,7 @@ static void findZephirTags (void)
 static void initializePool (void)
 {
 	if (TokenPool == NULL)
-		TokenPool = objPoolNew (16, newPoolToken, deletePoolToken, clearPoolToken);
+		TokenPool = objPoolNew (16, newPoolToken, deletePoolToken, clearPoolToken, NULL);
 }
 
 static void initializePhpParser (const langType language)

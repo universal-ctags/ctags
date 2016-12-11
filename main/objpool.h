@@ -20,7 +20,7 @@
 /*
 *   DATA DECLARATIONS
 */
-typedef void * (*objPoolCreateFunc) (void);
+typedef void * (*objPoolCreateFunc) (void *createArg);
 typedef void (*objPoolDeleteFunc) (void *data);
 typedef void (*objPoolClearFunc) (void *data);
 
@@ -31,7 +31,8 @@ typedef struct sObjPool objPool;
 *   FUNCTION PROTOTYPES
 */
 extern objPool *objPoolNew (unsigned int size,
-	objPoolCreateFunc createFunc, objPoolDeleteFunc deleteFunc, objPoolClearFunc clearFunc);
+	objPoolCreateFunc createFunc, objPoolDeleteFunc deleteFunc, objPoolClearFunc clearFunc,
+	void *createArg);
 extern void objPoolDelete (objPool *pool);
 extern void *objPoolGet (objPool *pool);
 extern void objPoolPut (objPool *pool, void *obj);

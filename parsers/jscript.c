@@ -184,7 +184,7 @@ static bool parseBlock (tokenInfo *const token, tokenInfo *const orig_parent);
 static bool parseLine (tokenInfo *const token, tokenInfo *const parent, bool is_inside_class);
 static void parseUI5 (tokenInfo *const token);
 
-static void *newPoolToken (void)
+static void *newPoolToken (void *createArg CTAGS_ATTR_UNUSED)
 {
 	tokenInfo *token = xMalloc (1, tokenInfo);
 
@@ -2003,7 +2003,7 @@ static void initialize (const langType language)
 	Assert (ARRAY_SIZE (JsKinds) == JSTAG_COUNT);
 	Lang_js = language;
 
-	TokenPool = objPoolNew (16, newPoolToken, deletePoolToken, clearPoolToken);
+	TokenPool = objPoolNew (16, newPoolToken, deletePoolToken, clearPoolToken, NULL);
 }
 
 static void finalize (langType language CTAGS_ATTR_UNUSED, bool initialized)
