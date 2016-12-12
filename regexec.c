@@ -1484,7 +1484,6 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
     &&L_OP_END_LINE,
     &&L_OP_SEMI_END_BUF,
     &&L_OP_BEGIN_POSITION,
-    &&L_OP_BEGIN_POS_OR_LINE,    /* used for implicit anchor optimization */
 
     &&L_OP_BACKREF1,
     &&L_OP_BACKREF2,
@@ -2378,7 +2377,6 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
       JUMP;
 
     CASE(OP_BEGIN_LINE)  MOP_IN(OP_BEGIN_LINE);
-    op_begin_line:
       if (ON_STR_BEGIN(s)) {
 	if (IS_NOTBOL(msa->options)) goto fail;
 	MOP_OUT;
@@ -2450,13 +2448,6 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
     CASE(OP_BEGIN_POSITION)  MOP_IN(OP_BEGIN_POSITION);
       if (s != msa->gpos)
 	goto fail;
-
-      MOP_OUT;
-      JUMP;
-
-    CASE(OP_BEGIN_POS_OR_LINE)  MOP_IN(OP_BEGIN_POS_OR_LINE);
-      if (s != msa->gpos)
-	goto op_begin_line;
 
       MOP_OUT;
       JUMP;
@@ -4302,8 +4293,6 @@ onig_search_gpos(regex_t* reg, const UChar* str, const UChar* end,
 
 	if ((reg->anchor & ANCHOR_ANYCHAR_STAR) != 0) {
 	  do {
-	    if ((reg->anchor & ANCHOR_BEGIN_POSITION) == 0)
-	      msa.gpos = s;     /* move \G position */
 	    MATCH_AND_RETURN_CHECK(orig_range);
 	    prev = s;
 	    s += enclen(reg->enc, s, end);

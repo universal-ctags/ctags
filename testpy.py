@@ -1564,6 +1564,8 @@ def main():
     x2("(?m:.*abc)", "dddabdd\nddabc", 0, 13)   # optimized /(?m:.*abc)/ ==> /\A(?m:.*abc)/
     x2("(?m:.+abc)", "dddabdd\nddabc", 0, 13)   # optimized
     x2("(?-m:.*abc)", "dddabdd\nddabc", 8, 13)  # optimized /(?-m:.*abc)/ ==> /(?:^|\A)(?m:.*abc)/
+    n("(?-m:.*ab[x-z])", "dddabdd\nddabc")      # optimized
+    x2("(?-m:.*(?:abc|\\Gabc))", "dddabdd\nddabc", 8, 13)  # optimized
     x2("(?-m:.+abc)", "dddabdd\nddabc", 8, 13)  # optimized
     x2("(?-m:.*abc)", "dddabdd\nabc", 8, 11)    # optimized
     n("(?-m:.+abc)", "dddabdd\nabc")            # optimized
@@ -1604,10 +1606,8 @@ def main():
     x2("(?i)ａｂｃ", "ＡＢＣＡＢＣ", 3, 6, searchtype=SearchType.BACKWARD)
     x2("[a-z]{3}$", "abcabc", 3, 6, searchtype=SearchType.BACKWARD)
     x2("[あ-ん]{3}$", "あいうあいう", 3, 6, searchtype=SearchType.BACKWARD)
-
-    # These match differently. Is it okay?
-    x2(".*[a-z]bc", "abcabc", 0, 6, searchtype=SearchType.BACKWARD)
-    x2(".+[a-z]bc", "abcabc", 0, 6, searchtype=SearchType.BACKWARD)
+    x2(".*[a-z]bc", "abcabc", 3, 6, searchtype=SearchType.BACKWARD) # Issue #69
+    x2(".+[a-z]bc", "abcabc", 2, 6, searchtype=SearchType.BACKWARD) # Issue #69
     x2(".{1,3}[a-z]bc", "abcabc", 2, 6, searchtype=SearchType.BACKWARD)
 
     # onig_match()
