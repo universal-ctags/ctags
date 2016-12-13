@@ -208,9 +208,12 @@ static void makeAsmTag (
 													 kind_for_directive);
 				break;
 			case K_PSUEDO_MACRO_END:
-				macro_tag = getEntryInCorkQueue (*lastMacroCorkIndex);
-				macro_tag->extensionFields.endLine = getInputLineNumber ();
-				*lastMacroCorkIndex = CORK_NIL;
+				if (*lastMacroCorkIndex != CORK_NIL)
+				{
+					macro_tag = getEntryInCorkQueue (*lastMacroCorkIndex);
+					macro_tag->extensionFields.endLine = getInputLineNumber ();
+					*lastMacroCorkIndex = CORK_NIL;
+				}
 				break;
 			default:
 				makeSimpleTag (operator, AsmKinds, kind_for_directive);
