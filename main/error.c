@@ -14,6 +14,10 @@
 #include "error.h"
 #include "options.h"
 
+#if HAVE_JANSSON
+#include <jansson.h>
+#endif
+
 #define selected(var,feature)	(((int)(var) & (int)(feature)) == (int)feature)
 
 static errorPrintFunc errorPrinter;
@@ -57,3 +61,29 @@ extern void error (const errorSelection selection,
 		exit (1);
 }
 
+#if HAVE_JANSSON
+bool jsonErrorPrinter (const errorSelection selection, const char *const format, va_list ap, void *data)
+{
+  char *reason;
+  vasprintf (&reason, format, ap);
+
+  json_t *response = json_object ();
+  json_object_set_new (response, "_type", json_string ("error"));
+  json_object_set_new (response, "message", json_string (reason));
+  if (selected (selection, WARNING))
+    json_object_set_new (response, "warning", json_true ());
+  if (selected (selection, FATAL))
+    json_object_set_new (response, "fatal", json_true ());
+  if (selected (selection, PERROR)) {
+    json_object_set_new (response, "errno", json_integer (errno));
+    json_object_set_new (response, "perror", json_string (strerror (errno)));
+  }
+  json_dumpf (response, stdout, 0);
+  fprintf (stdout, "\n");
+
+  json_decref (response);
+  free (reason);
+
+	return false;
+}
+#endif

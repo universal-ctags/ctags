@@ -1037,7 +1037,7 @@ getFileLanguageInternal (const char *const fileName, MIO **mio)
     int i;
     struct getLangCtx glc = {
         .fileName = fileName,
-        .input    = NULL,
+        .input    = mio && *mio ? mio_ref (*mio) : NULL,
         .err      = false,
     };
     const char* const baseName = baseFilename (fileName);
@@ -1094,7 +1094,7 @@ getFileLanguageInternal (const char *const fileName, MIO **mio)
 
 
   cleanup:
-    if (mio && glc.input)
+    if (mio && glc.input && *mio == NULL)
 	    *mio = mio_ref (glc.input);
     GLC_FCLOSE(&glc);
     if (fstatus)
@@ -1117,9 +1117,6 @@ getFileLanguageInternal (const char *const fileName, MIO **mio)
 static langType getFileLanguageAndKeepMIO (const char *const fileName, MIO **mio)
 {
 	langType l = Option.language;
-
-	if (mio)
-		*mio = NULL;
 
 	if (l == LANG_AUTO)
 		return getFileLanguageInternal(fileName, mio);
@@ -2395,9 +2392,13 @@ extern bool doesParserRequireMemoryStream (const langType language)
 
 extern bool parseFile (const char *const fileName)
 {
+    return parseFileWithMio (fileName, NULL);
+}
+
+extern bool parseFileWithMio (const char *const fileName, MIO *mio)
+{
 	bool tagFileResized = false;
 	langType language;
-	MIO *mio;
 
 	language = getFileLanguageAndKeepMIO (fileName, &mio);
 	Assert (language != LANG_AUTO);
@@ -2423,7 +2424,7 @@ extern bool parseFile (const char *const fileName)
 	}
 	else
 	{
-		if (Option.filter)
+		if (Option.filter && ! Option.interactive)
 			openTagFile ();
 
 #ifdef HAVE_ICONV
@@ -2442,7 +2443,7 @@ extern bool parseFile (const char *const fileName)
 
 		tagFileResized = teardownWriter (getSourceFileTagPath())? true: tagFileResized;
 
-		if (Option.filter)
+		if (Option.filter && ! Option.interactive)
 			closeTagFile (tagFileResized);
 		addTotals (1, 0L, 0L);
 
