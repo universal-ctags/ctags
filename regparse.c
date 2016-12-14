@@ -5060,9 +5060,10 @@ parse_enclose(Node** np, OnigToken* tok, int term, UChar** src, UChar* end,
 #endif
       break;
 
+#ifdef USE_CAPTURE_HISTORY
     case '@':
       if (IS_SYNTAX_OP2(env->syntax, ONIG_SYN_OP2_ATMARK_CAPTURE_HISTORY)) {
-#ifdef USE_NAMED_GROUP
+# ifdef USE_NAMED_GROUP
 	if (!PEND &&
 	    IS_SYNTAX_OP2(env->syntax, ONIG_SYN_OP2_QMARK_LT_NAMED_GROUP)) {
 	  PFETCH(c);
@@ -5072,7 +5073,7 @@ parse_enclose(Node** np, OnigToken* tok, int term, UChar** src, UChar* end,
 	  }
 	  PUNFETCH;
 	}
-#endif
+# endif
 	*np = node_new_enclose_memory(env->option, 0);
 	CHECK_NULL_RETURN_MEMERR(*np);
 	num = scan_env_add_mem_entry(env);
@@ -5087,6 +5088,7 @@ parse_enclose(Node** np, OnigToken* tok, int term, UChar** src, UChar* end,
 	return ONIGERR_UNDEFINED_GROUP_OPTION;
       }
       break;
+#endif /* USE_CAPTURE_HISTORY */
 
     case '(':   /* conditional expression: (?(cond)yes), (?(cond)yes|no) */
       if (!PEND &&
