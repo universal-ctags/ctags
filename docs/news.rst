@@ -50,6 +50,7 @@ The following parsers have been added:
 * Go
 * JavaProperties
 * JSON
+* GNU linker script(LdScript)
 * man page *optlib*
 * Maven2 *libxml*
 * M4

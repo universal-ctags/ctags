@@ -222,6 +222,7 @@
     <ClCompile Include="..\main\ptrarray.c" />
     <ClCompile Include="..\main\objpool.c" />
     <ClCompile Include="..\main\tokeninfo.c" />
+    <ClCompile Include="..\parsers\ldscript.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\fnmatch\fnmatch.h" />

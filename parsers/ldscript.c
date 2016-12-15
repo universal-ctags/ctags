@@ -1,0 +1,626 @@
+/*
+ *   Copyright (c) 2016, Masatake YAMATO
+ *   Copyright (c) 2016, Red Hat, Inc.
+ *
+ *   This source code is released for free distribution under the terms of the
+ *   GNU General Public License version 2 or (at your option) any later version.
+ *
+ *   This module contains functions for generating tags for GNU linker script
+ *   files.
+ */
+
+#include "general.h"
+#include "tokeninfo.h"
+
+#include "entry.h"
+#include "meta-cpreprocessor.h"
+#include "keyword.h"
+#include "read.h"
+#include "xtag.h"
+
+/*
+ *   DATA DEFINITIONS
+ */
+
+typedef enum {
+	LD_SCRIPT_SYMBOL_ENTRYPOINT,
+} ldScriptSymbolRole;
+
+static roleDesc LdScriptSymbolRoles [] = {
+	{ true, "entrypoint", "entry points" },
+};
+
+typedef enum {
+	K_SECTION, K_SYMBOL, K_VERSION,
+} ldScriptKind;
+
+static kindOption LdScriptKinds [] = {
+	{ true, 'S', "section", "sections" },
+	{ true, 's', "symbol",  "symbols",
+	  .referenceOnly = false, ATTACH_ROLES(LdScriptSymbolRoles)},
+	{ true, 'v', "version", "versions" },
+};
+
+enum {
+	KEYWORD_ENTRY,
+	KEYWORD_SECTIONS,
+	KEYWORD_LOC,
+	KEYWORD_AT,
+	KEYWORD_VERSION,
+	KEYWORD_PROVIDE,
+	KEYWORD_PROVIDE_HIDDEN,
+	KEYWORD_HIDDEN,
+};
+typedef int keywordId; /* to allow KEYWORD_NONE */
+
+
+static const keywordTable LdScriptKeywordTable[] = {
+	/* keyword			keyword ID */
+	{ "ENTRY",			KEYWORD_ENTRY			},
+	{ "SECTIONS",		KEYWORD_SECTIONS		},
+	{ ".",				KEYWORD_LOC				},
+	{ "AT",				KEYWORD_AT				},
+	{ "VERSION",		KEYWORD_VERSION			},
+	{ "PROVIDE",		KEYWORD_PROVIDE			},
+	{ "PROVIDE_HIDDEN",	KEYWORD_PROVIDE_HIDDEN	},
+	{ "HIDDEN",	        KEYWORD_HIDDEN	        },
+};
+
+enum eTokenType {
+	/* 0..255 are the byte's value */
+	TOKEN_EOF = 256,
+	TOKEN_UNDEFINED,
+	TOKEN_KEYWORD,
+	TOKEN_IDENTIFIER,
+	TOKEN_NUMBER,
+	TOKEN_ASSIGNMENT_OP,
+	TOKEN_OP,
+	TOKEN_PHDIR,
+	TOKEN_REGION,
+	TOKEN_FILLEXP,
+};
+
+static void readToken (tokenInfo *const token, void *data CTAGS_ATTR_UNUSED);
+static void clearToken (tokenInfo *token);
+static void copyToken (tokenInfo *dest, tokenInfo *src, void *data CTAGS_ATTR_UNUSED);
+
+struct tokenExtra {
+	int scopeIndex;
+	tokenKeyword assignment;
+};
+
+struct tokenTypePair ldScriptTypePairs [] = {
+	{ '{', '}' },
+};
+
+static struct tokenInfoClass ldScriptTokenInfoClass = {
+	.nPreAlloc = 4,
+	.typeForUndefined = TOKEN_UNDEFINED,
+	.keywordNone      = KEYWORD_NONE,
+	.typeForKeyword   = TOKEN_KEYWORD,
+	.typeForEOF       = TOKEN_EOF,
+	.extraSpace       = sizeof (struct tokenExtra),
+	.pairs            = ldScriptTypePairs,
+	.pairCount        = ARRAY_SIZE (ldScriptTypePairs),
+	.read             = readToken,
+	.clear            = clearToken,
+	.copy             = copyToken,
+};
+
+typedef enum {
+	F_ASSIGNMENT,
+	COUNT_FIELD
+} ldScriptFied;
+
+static fieldSpec LdScriptFields[COUNT_FIELD] = {
+	{ .name = "assignment",
+	  .description = "how a value is assigned to the symbol",
+	  .enabled = true },
+};
+
+static langType Lang_ldscript;
+
+/*
+ *   FUNCTION DEFINITIONS
+ */
+
+static tokenInfo *newLdScriptToken (void)
+{
+	return newToken (&ldScriptTokenInfoClass);
+}
+
+static void clearToken (tokenInfo *token)
+{
+	TOKEN_X (token, struct tokenExtra)->scopeIndex = CORK_NIL;
+	TOKEN_X (token, struct tokenExtra)->assignment = KEYWORD_NONE;
+}
+
+static void copyToken (tokenInfo *dest, tokenInfo *src, void *data CTAGS_ATTR_UNUSED)
+{
+	TOKEN_X (dest, struct tokenExtra)->scopeIndex =
+		TOKEN_X (src, struct tokenExtra)->scopeIndex;
+	TOKEN_X (dest, struct tokenExtra)->assignment =
+		TOKEN_X (src, struct tokenExtra)->assignment;
+}
+
+static int makeLdScriptTagMaybe (tagEntryInfo *const e, tokenInfo *const token,
+								 int kind, int role)
+{
+	if (role == ROLE_INDEX_DEFINITION)
+	{
+		if (! LdScriptKinds[kind].enabled)
+			return CORK_NIL;
+	}
+	else if (! (isXtagEnabled (XTAG_REFERENCE_TAGS)
+				&& LdScriptKinds[kind].roles[role].enabled))
+		return CORK_NIL;
+
+	initRefTagEntry (e, TOKEN_STRING (token),
+					 LdScriptKinds + kind,
+					 role);
+	e->lineNumber = token->lineNumber;
+	e->filePosition = token->filePosition;
+	e->extensionFields.scopeIndex = TOKEN_X (token, struct tokenExtra)->scopeIndex;
+
+	/* TODO: implement file: field. */
+	if ((kind == K_SYMBOL)
+		&& LdScriptFields[F_ASSIGNMENT].enabled)
+	{
+		char *assignment = NULL;
+
+		switch (TOKEN_X (token, struct tokenExtra)->assignment)
+		{
+		case KEYWORD_PROVIDE:
+			assignment = "provide";
+			break;
+		case KEYWORD_PROVIDE_HIDDEN:
+			assignment = "provide_hidden";
+			break;
+		case KEYWORD_HIDDEN:
+			assignment = "hidden";
+			break;
+		}
+
+		if (assignment)
+			attachParserField (e, LdScriptFields[F_ASSIGNMENT].ftype,
+							   assignment);
+	}
+
+	return makeTagEntry (e);
+}
+
+#define isIdentifierChar(c)										\
+	(isalnum (c) || (c) == '_' || (c) == '.' || (c) >= 0x80)
+
+static int readPrefixedToken (tokenInfo *const token, int type)
+{
+	int n = 0;
+	int c;
+
+	while ((c = cppGetc()) != EOF)
+	{
+		if (isIdentifierChar (c))
+		{
+			n++;
+			TOKEN_PUTC (token, c);
+		}
+		else
+		{
+			cppUngetc (c);
+			break;
+		}
+	}
+
+	if (n)
+		token->type = type;
+	return n;
+}
+
+static void readToken (tokenInfo *const token, void *data CTAGS_ATTR_UNUSED)
+{
+	int c, c0, c1;
+
+	token->type		= TOKEN_UNDEFINED;
+	token->keyword	= KEYWORD_NONE;
+	vStringClear (token->string);
+
+	do {
+		c = cppGetc();
+	} while (c == ' ' || c== '\t' || c == '\f' || c == '\r' || c == '\n');
+
+	token->lineNumber   = getInputLineNumber ();
+	token->filePosition = getInputFilePosition ();
+
+	switch (c)
+	{
+	case EOF:
+		token->type = TOKEN_EOF;
+		break;
+	case ';':
+	case '(':
+	case ')':
+	case '{':
+	case '}':
+		token->type = c;
+		break;
+	case '~':
+	case '%':
+	case '?':
+		TOKEN_PUTC(token, c);
+		token->type = TOKEN_OP;
+		break;
+	case '-':
+	case '+':
+	case '*':
+	case '/':					/* -,+,*,/,-=,+=,*=,/= */
+		TOKEN_PUTC(token, c);
+		c0 = cppGetc ();
+		token->type = TOKEN_OP;
+		if (c0 == '=')
+		{
+			TOKEN_PUTC(token, c0);
+			token->type = TOKEN_ASSIGNMENT_OP;
+		}
+		else
+			cppUngetc (c0);
+		break;
+	case '!':					/* !, != */
+		TOKEN_PUTC(token, c);
+		token->type = TOKEN_OP;
+		c0 = cppGetc ();
+		if (c0 == '=')
+			TOKEN_PUTC(token, c0);
+		else
+			cppUngetc (c0);
+	case '<':					/* <,<=,<<,<<= */
+		TOKEN_PUTC(token, c);
+		token->type = TOKEN_OP;
+		c0 = cppGetc ();
+		if (c0 == c  || c0 == '=')
+		{
+			TOKEN_PUTC(token, c0);
+			if (c0 == c)
+			{
+				c1 = cppGetc ();
+				if (c1 == '=')
+				{
+					TOKEN_PUTC(token, c1);
+					token->type = TOKEN_ASSIGNMENT_OP;
+				}
+				else
+					cppUngetc (c1);
+			}
+		}
+		else
+			cppUngetc (c0);
+	case '|':					/* |,||,|= */
+	case '&':					/* &,&&,&= */
+		TOKEN_PUTC(token, c);
+		token->type = TOKEN_OP;
+		c0 = cppGetc ();
+		if (c0 == c)
+			TOKEN_PUTC(token, c0);
+		else if (c0 == '=')
+		{
+			TOKEN_PUTC(token, c0);
+			token->type = TOKEN_ASSIGNMENT_OP;
+		}
+		else
+			cppUngetc (c0);
+		break;
+	case '=':					/* =,== */
+		TOKEN_PUTC(token, c);
+		if (!readPrefixedToken (token, TOKEN_FILLEXP))
+		{
+			c0 = cppGetc ();
+			if (c0 == '=')
+			{
+				TOKEN_PUTC(token, c0);
+				token->type = TOKEN_OP;
+			}
+			else
+			{
+				cppUngetc (c0);
+				token->type = TOKEN_ASSIGNMENT_OP;
+			}
+		}
+		break;
+	case '>':					/* >,>>,>>= */
+		TOKEN_PUTC(token, c);
+		if (!readPrefixedToken (token, TOKEN_REGION))
+		{
+			token->type = TOKEN_OP;
+			c0 = cppGetc ();
+			if (c0 == c  || c0 == '=')
+			{
+				TOKEN_PUTC(token, c0);
+				c1 = cppGetc();
+				if (c1 == '=')
+				{
+					TOKEN_PUTC(token, c1);
+					token->type = TOKEN_ASSIGNMENT_OP;
+				}
+				else
+					cppUngetc (c1);
+			}
+			else
+				cppUngetc (c0);
+		}
+		break;
+	case ':':
+		TOKEN_PUTC(token, c);
+		if (!readPrefixedToken (token, TOKEN_PHDIR))
+			token->type = c;
+		break;
+	default:
+		if (isdigit (c))
+		{
+			token->type = TOKEN_NUMBER;
+			TOKEN_PUTC(token, c);
+			while ((c = cppGetc()))
+			{
+				if (isIdentifierChar (c))
+					TOKEN_PUTC(token, c);
+				else
+				{
+					cppUngetc (c);
+					break;
+				}
+			}
+		}
+		else if (isIdentifierChar(c))
+		{
+			TOKEN_PUTC(token, c);
+			while ((c = cppGetc()))
+			{
+				if (isIdentifierChar(c))
+					TOKEN_PUTC(token, c);
+				else
+				{
+					cppUngetc (c);
+					break;
+				}
+			}
+			token->keyword = lookupKeyword (vStringValue (token->string), Lang_ldscript);
+			if (token->keyword == KEYWORD_NONE)
+				token->type = TOKEN_IDENTIFIER;
+			else
+				token->type = TOKEN_KEYWORD;
+		}
+		else
+			token->type = c;
+		break;
+	}
+}
+
+static void parseEntry (tokenInfo *const token)
+{
+	tokenRead (token);
+	if (token->type == '(')
+	{
+		tokenInfo *const name = newLdScriptToken ();
+
+		tokenRead (name);
+		if (TOKEN_IS_TYPE(name, IDENTIFIER))
+		{
+			tagEntryInfo e;
+
+			makeLdScriptTagMaybe (&e, name, K_SYMBOL, LD_SCRIPT_SYMBOL_ENTRYPOINT);
+			tokenRead (token);
+			tokenSkipToType (token, ')');
+		}
+		tokenDestroy (name);
+	}
+}
+
+static void parseProvide (tokenInfo * token)
+{
+	tokenKeyword p = token->keyword;
+
+	if (tokenSkipToType (token, '('))
+	{
+		tagEntryInfo e;
+		tokenRead (token);
+		if (TOKEN_IS_TYPE(token, IDENTIFIER))
+		{
+			TOKEN_X (token, struct tokenExtra)->assignment = p;
+
+			makeLdScriptTagMaybe (&e, token,
+								  K_SYMBOL, ROLE_INDEX_DEFINITION);
+			TOKEN_X (token, struct tokenExtra)->assignment = KEYWORD_NONE;
+		}
+		tokenSkipToType (token, ')');
+	}
+}
+
+static void parseOutputSectionCommands (tokenInfo *const token)
+{
+	tokenInfo *const tmp = newLdScriptToken ();
+
+	do {
+		tokenRead (token);
+
+		if (TOKEN_IS_TYPE (token,IDENTIFIER))
+		{
+			tagEntryInfo e;
+
+			tokenRead (tmp);
+			if (TOKEN_IS_TYPE (tmp, ASSIGNMENT_OP))
+			{
+				makeLdScriptTagMaybe (&e, token,
+									  K_SYMBOL, ROLE_INDEX_DEFINITION);
+				tokenSkipToType (token, ';');
+			}
+			else
+				tokenCopy (token, tmp);
+		}
+		else if (TOKEN_IS_KEYWORD (token, PROVIDE)
+				 || TOKEN_IS_KEYWORD (token, PROVIDE_HIDDEN)
+				 || TOKEN_IS_KEYWORD (token, HIDDEN))
+			parseProvide (token);
+	} while (! (TOKEN_IS_EOF (token) || token->type == '}'));
+
+	tokenDestroy (tmp);
+}
+
+static void parseSection (tokenInfo * name)
+{
+	tokenInfo *const token = newLdScriptToken ();
+	tagEntryInfo e;
+
+	tokenRead (token);
+
+	if (TOKEN_IS_TYPE (token, ASSIGNMENT_OP))
+	{
+		if (!TOKEN_IS_KEYWORD (name, LOC))
+			makeLdScriptTagMaybe (&e, name,
+								  K_SYMBOL, ROLE_INDEX_DEFINITION);
+		tokenSkipToType (token, ';');
+	}
+	else
+	{
+	retry:
+		if (TOKEN_IS_TYPE (token, NUMBER))
+			tokenSkipToType (token, ':');
+		else if (TOKEN_IS_TYPE (token, IDENTIFIER))
+		{
+			tokenCopy (name, token);
+			tokenRead (token);
+			goto retry;
+		}
+		else if (token->type == '(')
+			tokenSkipToType (token, ')');
+
+		if (token->type == ':')
+		{
+			int scope_index;
+
+			scope_index = makeLdScriptTagMaybe (&e, name,
+												K_SECTION, ROLE_INDEX_DEFINITION);
+			if (tokenSkipToType (token, '{'))
+			{
+				TOKEN_X (token, struct tokenExtra)->scopeIndex = scope_index;
+				parseOutputSectionCommands (token);
+			}
+		}
+	}
+	tokenDestroy (token);
+}
+
+static void parseSections (tokenInfo *const token)
+{
+	tokenRead (token);
+	if (token->type == '{')
+	{
+		do {
+			tokenRead (token);
+			if (TOKEN_IS_KEYWORD (token, ENTRY))
+				parseEntry (token);
+			else if (TOKEN_IS_TYPE(token, IDENTIFIER)
+					 || TOKEN_IS_KEYWORD (token, LOC))
+				parseSection (token);
+			else if (TOKEN_IS_KEYWORD (token, PROVIDE)
+					 || TOKEN_IS_KEYWORD (token, PROVIDE_HIDDEN)
+					 || TOKEN_IS_KEYWORD (token, HIDDEN))
+				parseProvide (token);
+		} while (! (TOKEN_IS_EOF (token) || token->type == '}'));
+	}
+}
+
+static void parseVersion (tokenInfo *const token)
+{
+	tagEntryInfo e;
+	makeLdScriptTagMaybe (&e, token,
+						  K_VERSION, ROLE_INDEX_DEFINITION);
+
+	if (tokenSkipToType (token, '{'))
+		tokenSkipOverPair (token);
+}
+
+static void parseVersions (tokenInfo *const token)
+{
+	tokenRead (token);
+	if (token->type == '{')
+	{
+		do {
+			tokenRead (token);
+			if (TOKEN_IS_TYPE(token, IDENTIFIER))
+				parseVersion (token);
+		} while (! (TOKEN_IS_EOF (token) || token->type == '}'));
+		tokenSkipToType (token, ';');
+	}
+}
+
+static void findLdScriptTags (void)
+{
+	tokenInfo *const token = newLdScriptToken ();
+	tokenInfo *const tmp = newLdScriptToken ();
+
+	cppInit (false, false, false, false,
+			 NULL, 0, NULL, 0, 0);
+
+	do {
+		tokenRead (token);
+		if (TOKEN_IS_KEYWORD (token, ENTRY))
+			parseEntry (token);
+		else if (TOKEN_IS_KEYWORD (token, SECTIONS))
+			parseSections (token);
+		else if (TOKEN_IS_TYPE(token, IDENTIFIER))
+		{
+			tagEntryInfo e;
+			tokenRead (tmp);
+			if (TOKEN_IS_TYPE(tmp, ASSIGNMENT_OP))
+			{
+				makeLdScriptTagMaybe (&e, token,
+									  K_SYMBOL, ROLE_INDEX_DEFINITION);
+				tokenSkipToType (tmp, ';');
+			}
+		}
+		else if (TOKEN_IS_KEYWORD (token, VERSION))
+			parseVersions(token);
+	} while (!TOKEN_IS_EOF (token));
+
+	cppTerminate ();
+
+	tokenDestroy (tmp);
+	tokenDestroy (token);
+
+
+}
+
+static void initialize (const langType language)
+{
+	Lang_ldscript = language;
+}
+
+extern parserDefinition* LdScriptParser (void)
+{
+	parserDefinition* def = parserNew ("LdScript");
+
+	/* File name patters are picked from Linux kernel. */
+	static const char *const extensions [] = { "lds", "scr", "ld", NULL };
+
+	/* lds.S msut be here because Asm parser registers .S as an extension. */
+	static const char *const patterns [] = { "*.lds.S", "ld.*", NULL };
+
+	/* Emacs's mode */
+	static const char *const aliases [] = { "ld-script", NULL };
+
+	def->initialize = initialize;
+	def->parser     = findLdScriptTags;
+
+	def->kinds      = LdScriptKinds;
+	def->kindCount  = ARRAY_SIZE (LdScriptKinds);
+	def->extensions = extensions;
+	def->patterns   = patterns;
+	def->aliases    = aliases;
+	def->keywordTable = LdScriptKeywordTable;
+	def->keywordCount = ARRAY_SIZE (LdScriptKeywordTable);
+	def->initialize = initialize;
+	def->fieldSpecs = LdScriptFields;
+	def->fieldSpecCount = ARRAY_SIZE (LdScriptFields);
+
+	def->useCork    = true;
+
+	return def;
+}

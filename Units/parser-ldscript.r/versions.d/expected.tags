@@ -1,0 +1,21 @@
+_vdso_data	input.lds	/^	PROVIDE(_vdso_data = . - PAGE_SIZE);$/;"	s	assignment:provide
+.hash	input.lds	/^	.hash		: { *(.hash) }			:text$/;"	S
+.gnu.hash	input.lds	/^	.gnu.hash	: { *(.gnu.hash) }$/;"	S
+.dynsym	input.lds	/^	.dynsym		: { *(.dynsym) }$/;"	S
+.dynstr	input.lds	/^	.dynstr		: { *(.dynstr) }$/;"	S
+.gnu.version	input.lds	/^	.gnu.version	: { *(.gnu.version) }$/;"	S
+.gnu.version_d	input.lds	/^	.gnu.version_d	: { *(.gnu.version_d) }$/;"	S
+.gnu.version_r	input.lds	/^	.gnu.version_r	: { *(.gnu.version_r) }$/;"	S
+.note	input.lds	/^	.note		: { *(.note.*) }		:text	:note$/;"	S
+.text	input.lds	/^	.text		: { *(.text*) }			:text	=0xd503201f$/;"	S
+__etext	input.lds	/^	PROVIDE (__etext = .);$/;"	s	assignment:provide
+_etext	input.lds	/^	PROVIDE (_etext = .);$/;"	s	assignment:provide
+etext	input.lds	/^	PROVIDE (etext = .);$/;"	s	assignment:provide
+.eh_frame_hdr	input.lds	/^	.eh_frame_hdr	: { *(.eh_frame_hdr) }		:text	:eh_frame_hdr$/;"	S
+.eh_frame	input.lds	/^	.eh_frame	: { KEEP (*(.eh_frame)) }	:text$/;"	S
+.dynamic	input.lds	/^	.dynamic	: { *(.dynamic) }		:text	:dynamic$/;"	S
+.rodata	input.lds	/^	.rodata		: { *(.rodata*) }		:text$/;"	S
+_end	input.lds	/^	_end = .;$/;"	s
+end	input.lds	/^	PROVIDE(end = .);$/;"	s	assignment:provide
+LINUX_2.6.39	input.lds	/^	LINUX_2.6.39 {$/;"	v
+VDSO_sigtramp	input.lds	/^VDSO_sigtramp		= __kernel_rt_sigreturn;$/;"	s
