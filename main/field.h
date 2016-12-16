@@ -59,6 +59,12 @@ typedef const char* (* renderEscaped) (const tagEntryInfo *const tag,
 					   bool *rejected);
 typedef bool (* isValueAvailable) (const struct sTagEntryInfo *const tag);
 
+typedef enum eFieldDataType {
+	FIELDTYPE_STRING  = 1 << 0,
+	FIELDTYPE_INTEGER = 1 << 1,
+	FIELDTYPE_BOOL    = 1 << 2,
+} fieldDataType;
+
 #define FIELD_LETTER_NO_USE '\0'
 typedef struct sFieldSpec {
 	/* lettern, and ftype are initialized in the main part,
@@ -70,6 +76,7 @@ typedef struct sFieldSpec {
 	bool enabled;
 	renderEscaped renderEscaped [WRITER_COUNT];
 	isValueAvailable isValueAvailable;
+	fieldDataType dataType; /* used in json output */
 
 	unsigned int ftype;	/* Given from the main part */
 } fieldSpec;
@@ -95,6 +102,7 @@ extern bool enableField (fieldType type, bool state, bool warnIfFixedField);
 extern bool isCommonField (fieldType type);
 extern int     getFieldOwner (fieldType type);
 extern const char* getFieldName (fieldType type);
+extern unsigned int getFieldDataType (fieldType type);
 extern void printFields (int language);
 
 /* Whether the field specified with TYPE has a
