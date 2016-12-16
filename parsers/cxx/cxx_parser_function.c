@@ -879,6 +879,8 @@ bool cxxParserLookForFunctionSignature(
 		{
 			// identifier before
 
+			// This is the most common case.
+
 			CXX_DEBUG_PRINT("Got identifier before parenthesis chain");
 
 			pIdentifierStart = pToken->pPrev;
@@ -894,7 +896,40 @@ bool cxxParserLookForFunctionSignature(
 						pParamInfo
 					)
 				)
+			{
+				// This looks like a good candidate for a function name + parenthesis.
+				// The scanning process will skip all the following tokens until
+				// an exit condition is found.
+				//
+				// However, there is a very common special case that is nice to 
+				// handle automatically and it's something like:
+				//
+				//    MACRO(return_type) function(...)
+				//
+				// This *could* be handled by the user with -D 'MACRO(x) x' but since
+				// it's quite common we can't expect the user to look up and define
+				// all macros for a large project. For this reason we use some heuristics
+				// to handle this special case automatically.
+				if(
+						// Identifier is the first token of the chain
+						(!pIdentifierStart->pPrev) &&
+						// The token following the parenthesis is an identifier
+						pInfo->pParenthesis->pNext &&
+						cxxTokenTypeIs(pInfo->pParenthesis->pNext,CXXTokenTypeIdentifier) &&
+						// The token following the identifier is again a parenthesis chain
+						pInfo->pParenthesis->pNext->pNext &&
+						cxxTokenTypeIs(pInfo->pParenthesis->pNext->pNext,CXXTokenTypeParenthesisChain) &&
+						// The current parenthesis does not contain commas
+						// (...maybe this check is too much?)
+						(!cxxTokenChainFirstTokenOfType(pInfo->pParenthesis->pChain,CXXTokenTypeComma))
+					)
+				{
+					CXX_DEBUG_PRINT("Found special case of MACRO(return_type) function(): handling");
+					pInfo->pParenthesis = NULL;
+				}
+
 				goto next_token;
+			}
 			
 			// If the check above failed, try different identifier possibilities
 		}
@@ -1204,6 +1239,23 @@ next_token:
 				// probaby normal return type
 				pInfo->pTypeEnd = pToken->pPrev;
 				pInfo->pTypeStart = cxxTokenChainFirst(pChain);
+				
+				// Handle the common special case of
+				//
+				//   MACRO(return_type) function()
+				//
+				
+				if(
+						cxxTokenTypeIs(pInfo->pTypeEnd,CXXTokenTypeParenthesisChain) &&
+						(pInfo->pTypeEnd->pChain->iCount >= 3) &&
+						(pInfo->pTypeEnd->pPrev == pInfo->pTypeStart) &&
+						cxxTokenTypeIs(pInfo->pTypeStart,CXXTokenTypeIdentifier)
+					)
+				{
+					CXX_DEBUG_PRINT("Return type seems to be embedded in a macro");
+					pInfo->pTypeStart = cxxTokenChainFirst(pInfo->pTypeEnd->pChain)->pNext;
+					pInfo->pTypeEnd = cxxTokenChainLast(pInfo->pTypeEnd->pChain)->pPrev;
+				}
 			}
 		} else {
 			pInfo->pTypeEnd = NULL;
