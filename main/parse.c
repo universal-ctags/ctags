@@ -1001,9 +1001,17 @@ tasteLanguage (struct getLangCtx *glc, const struct taster *const tasters, int n
     return LANG_IGNORE;
 }
 
+
+struct GetLanguageRequest {
+	enum { GLR_OPEN, GLR_DISCARD, GLR_REUSE, } type;
+	const char *const fileName;
+	MIO *mio;
+};
+
 static langType
-getFileLanguageInternal (const char *const fileName, MIO **mio)
+getFileLanguageForRequestInternal (struct GetLanguageRequest *req)
 {
+	const char *const fileName = req->fileName;
     langType language;
 
     /* ctags tries variety ways(HINTS) to choose a proper language
@@ -1037,7 +1045,7 @@ getFileLanguageInternal (const char *const fileName, MIO **mio)
     int i;
     struct getLangCtx glc = {
         .fileName = fileName,
-        .input    = mio && *mio ? mio_ref (*mio) : NULL,
+        .input    = (req->type == GLR_REUSE)? mio_ref (req->mio): NULL,
         .err      = false,
     };
     const char* const baseName = baseFilename (fileName);
@@ -1094,8 +1102,8 @@ getFileLanguageInternal (const char *const fileName, MIO **mio)
 
 
   cleanup:
-    if (mio && glc.input && *mio == NULL)
-	    *mio = mio_ref (glc.input);
+	if (req->type == GLR_OPEN && glc.input)
+		req->mio = mio_ref (glc.input);
     GLC_FCLOSE(&glc);
     if (fstatus)
 	    eStatFree (fstatus);
@@ -1114,12 +1122,12 @@ getFileLanguageInternal (const char *const fileName, MIO **mio)
     return language;
 }
 
-static langType getFileLanguageAndKeepMIO (const char *const fileName, MIO **mio)
+static langType getFileLanguageForRequest (struct GetLanguageRequest *req)
 {
 	langType l = Option.language;
 
 	if (l == LANG_AUTO)
-		return getFileLanguageInternal(fileName, mio);
+		return getFileLanguageForRequestInternal(req);
 	else if (! isLanguageEnabled (l))
 	{
 		error (FATAL,
@@ -1134,7 +1142,12 @@ static langType getFileLanguageAndKeepMIO (const char *const fileName, MIO **mio
 
 extern langType getFileLanguage (const char *const fileName)
 {
-	return getFileLanguageAndKeepMIO(fileName, NULL);
+	struct GetLanguageRequest req = {
+		.type = GLR_DISCARD,
+		.fileName = fileName,
+	};
+
+	return getFileLanguageForRequest (&req);
 }
 
 typedef void (*languageCallback)  (langType language, void* user_data);
@@ -2399,8 +2412,13 @@ extern bool parseFileWithMio (const char *const fileName, MIO *mio)
 {
 	bool tagFileResized = false;
 	langType language;
+	struct GetLanguageRequest req = {
+		.type = mio? GLR_REUSE: GLR_OPEN,
+		.fileName = fileName,
+		.mio = mio,
+	};
 
-	language = getFileLanguageAndKeepMIO (fileName, &mio);
+	language = getFileLanguageForRequest (&req);
 	Assert (language != LANG_AUTO);
 
 	if (Option.printLanguage)
@@ -2435,10 +2453,10 @@ extern bool parseFileWithMio (const char *const fileName, MIO *mio)
 
 		setupWriter ();
 
-		tagFileResized = createTagsWithFallback (fileName, language, mio);
+		tagFileResized = createTagsWithFallback (fileName, language, req.mio);
 #ifdef HAVE_COPROC
 		if (LanguageTable [language]->method & METHOD_XCMD_AVAILABLE)
-			tagFileResized = createTagsWithXcmd (fileName, language, mio)? true: tagFileResized;
+			tagFileResized = createTagsWithXcmd (fileName, language, req.mio)? true: tagFileResized;
 #endif
 
 		tagFileResized = teardownWriter (getSourceFileTagPath())? true: tagFileResized;
@@ -2450,13 +2468,13 @@ extern bool parseFileWithMio (const char *const fileName, MIO *mio)
 #ifdef HAVE_ICONV
 		closeConverter ();
 #endif
-		if (mio)
-			mio_free (mio);
+		if (req.type == GLR_OPEN && req.mio)
+			mio_free (req.mio);
 		return tagFileResized;
 	}
 
-	if (mio)
-		mio_free (mio);
+	if (req.type == GLR_OPEN && req.mio)
+		mio_free (req.mio);
 	return tagFileResized;
 }
 
