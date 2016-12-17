@@ -582,14 +582,13 @@ static bool cxxParserLookForFunctionSignatureCheckParenthesisAndIdentifier(
 				)
 		)
 	{
-		CXX_DEBUG_PRINT("Looks like an __ARGS() case parenthesis chain");
-
 		// __ARGS() case
 		pInfo->pParenthesisContainerChain = pParenthesis->pChain;
 		pInfo->pIdentifierEnd = pIdentifierEnd->pPrev;
 		pInfo->pIdentifierStart = pInfo->pIdentifierEnd;
 		pInfo->pIdentifierChain = pIdentifierChain;
 		pInfo->pParenthesis = pInner;
+		CXX_DEBUG_LEAVE_TEXT("Looks like an __ARGS() case parenthesis chain");
 		return true;
 	}
 	
@@ -598,14 +597,13 @@ static bool cxxParserLookForFunctionSignatureCheckParenthesisAndIdentifier(
 			pParamInfo
 		))
 	{
-		CXX_DEBUG_PRINT("Looks like valid parenthesis chain");
-
 		// non __ARGS()
 		pInfo->pParenthesisContainerChain = pIdentifierChain;
 		pInfo->pIdentifierStart = pIdentifierStart;
 		pInfo->pIdentifierEnd = pIdentifierEnd;
 		pInfo->pIdentifierChain = pIdentifierChain;
 		pInfo->pParenthesis = pParenthesis;
+		CXX_DEBUG_LEAVE_TEXT("Looks like valid parenthesis chain");
 		return true;
 	}
 	
