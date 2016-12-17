@@ -1494,8 +1494,6 @@ static void cxxParserFirstInit()
 
 void cxxCUDAParserInitialize(const langType language)
 {
-	CXX_DEBUG_INIT();
-
 	CXX_DEBUG_PRINT("Parser initialize for language CUDA");
 	if(g_bFirstRun)
 		cxxParserFirstInit();
@@ -1507,8 +1505,6 @@ void cxxCUDAParserInitialize(const langType language)
 
 void cxxCppParserInitialize(const langType language)
 {
-	CXX_DEBUG_INIT();
-
 	CXX_DEBUG_PRINT("Parser initialize for language C++");
 	if(g_bFirstRun)
 		cxxParserFirstInit();
@@ -1520,8 +1516,6 @@ void cxxCppParserInitialize(const langType language)
 
 void cxxCParserInitialize(const langType language)
 {
-	CXX_DEBUG_INIT();
-
 	CXX_DEBUG_PRINT("Parser initialize for language C");
 	if(g_bFirstRun)
 		cxxParserFirstInit();

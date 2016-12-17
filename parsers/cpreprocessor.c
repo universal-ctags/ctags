@@ -1231,8 +1231,6 @@ process:
 
 static void findCppTags (void)
 {
-	CXX_DEBUG_INIT();
-
 	cppInit (0, false, false, false,
 			 NULL, 0, NULL, 0, 0);
 
