@@ -64,16 +64,11 @@ extern void error (const errorSelection selection,
 #if HAVE_JANSSON
 bool jsonErrorPrinter (const errorSelection selection, const char *const format, va_list ap, void *data)
 {
-	char *reason = NULL;
+#define ERR_BUFFER_SIZE 4096
+	static char reason[ERR_BUFFER_SIZE];
 
-	/* TODO: vasprintf is not part of standard C library.
-	   vsnprintf with a large buffer is enough for the purpose. */
-	vasprintf (&reason, format, ap);
-	if (!reason)
-	{
-		/* Memory exhausted */
-		return true;
-	}
+	vsnprintf (reason, ERR_BUFFER_SIZE, format, ap);
+	reason [ERR_BUFFER_SIZE - 1] = '\0'; /* Do we need this? */
 
 	json_t *response = json_object ();
 	json_object_set_new (response, "_type", json_string ("error"));
@@ -91,7 +86,6 @@ bool jsonErrorPrinter (const errorSelection selection, const char *const format,
 	fprintf (stdout, "\n");
 
 	json_decref (response);
-	free (reason);
 
 	return false;
 }
