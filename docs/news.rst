@@ -285,7 +285,7 @@ header is easy because it starts with a `#` character.
 ``--with-list-header=no`` suppresses output of the column header.
 
 Kinds synchronization
-----------------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 In Universal-ctags, as in Exuberant-ctags, most kinds are parser
 local; enabling (or disabling) a kind in a parser has no effect on
@@ -607,6 +607,13 @@ will be processed as
 
 	int x(int a,int b);
 
+``--_interactive`` Mode
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+A new ``--_interactive`` option launches a JSON based command REPL which
+can be used to control ctags generation programatically.
+
+See :ref:`--_interactive Mode <interactive-mode>` for more details.
 
 Changes to the tags file format
 ---------------------------------------------------------------------

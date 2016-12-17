@@ -105,6 +105,7 @@ typedef struct sOptionValues {
 	unsigned int maxRecursionDepth; /* --maxdepth=<max-recursion-depth> */
 	bool machinable;		/* --machinable */
 	bool withListHeader;		/* --with-list-header */
+	bool interactive; /* --interactive */
 #ifdef DEBUG
 	long debugLevel;        /* -d  debugging output */
 	unsigned long breakLine;/* -b  input line at which to call lineBreak() */

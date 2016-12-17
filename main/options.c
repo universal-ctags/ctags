@@ -35,7 +35,13 @@
 #include "routines.h"
 #include "xtag.h"
 #include "routines.h"
+#include "error.h"
+#include "interactive.h"
 #include "writer.h"
+
+#ifdef HAVE_JANSSON
+#include <jansson.h>
+#endif
 
 /*
 *   MACROS
@@ -416,6 +422,10 @@ static optionDescription LongOptionDescription [] = {
  {1,"  --_force-quit=[num]"},
  {1,"       Quit when the option is processed. Useful to debug the chain"},
  {1,"       of loading option files."},
+#ifdef HAVE_JANSSON
+ {0,"  --_interactive"},
+ {0,"       Enter interactive mode (json over stdio)."},
+#endif
  {1,"  --_list-roles=[[language|all]:[kindletters|*]]"},
  {1,"       Output list of all roles of tag kind(s) specified for language(s)."},
  {1,"       e.g. --_list-roles=Make:I"},
@@ -477,6 +487,7 @@ static const char *const Features [] = {
 #endif
 #ifdef HAVE_JANSSON
 	"json",
+	"interactive",
 #endif
 #ifdef HAVE_LIBYAML
 	"yaml",
@@ -1413,6 +1424,22 @@ static void processHelpOption (
 	printOptionDescriptions (LongOptionDescription);
 	exit (0);
 }
+
+#ifdef HAVE_JANSSON
+static void processInteractiveOption (
+		const char *const option CTAGS_ATTR_UNUSED,
+		const char *const parameter CTAGS_ATTR_UNUSED)
+{
+	Option.interactive = true;
+	Option.sorted = SO_UNSORTED;
+	setMainLoop (interactiveLoop, NULL);
+	setErrorPrinter (jsonErrorPrinter, NULL);
+	setTagWriter (WRITER_JSON);
+	enablePtag (PTAG_JSON_OUTPUT_VERSION, true);
+
+	json_set_alloc_funcs (eMalloc, eFree);
+}
+#endif
 
 static void processIf0Option (const char *const option,
 							  const char *const parameter)
@@ -2452,6 +2479,9 @@ static parametricOption ParametricOptions [] = {
 	{ "filter-terminator",      processFilterTerminatorOption,  true,   STAGE_ANY },
 	{ "format",                 processFormatOption,            true,   STAGE_ANY },
 	{ "help",                   processHelpOption,              true,   STAGE_ANY },
+#ifdef HAVE_JANSSON
+	{ "_interactive",            processInteractiveOption,       true,   STAGE_ANY },
+#endif
 	{ "if0",                    processIf0Option,               false,  STAGE_ANY },
 #ifdef HAVE_ICONV
 	{ "input-encoding",         processInputEncodingOption,     false,  STAGE_ANY },
