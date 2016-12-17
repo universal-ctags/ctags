@@ -19,7 +19,7 @@
 // Please note that TRACING_ENABLED should be #defined in main/trace.h
 // for this to work.
 //
-#define CXX_DEBUGGING_ENABLED 1
+//#define CXX_DEBUGGING_ENABLED 1
 
 #if defined(DO_TRACING) && defined(CXX_DEBUGGING_ENABLED)
 	#define CXX_DO_DEBUGGING
