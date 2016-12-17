@@ -39,6 +39,10 @@
 #include "interactive.h"
 #include "writer.h"
 
+#ifdef HAVE_JANSSON
+#include <jansson.h>
+#endif
+
 /*
 *   MACROS
 */
@@ -1432,6 +1436,8 @@ static void processInteractiveOption (
 	setErrorPrinter (jsonErrorPrinter, NULL);
 	setTagWriter (WRITER_JSON);
 	enablePtag (PTAG_JSON_OUTPUT_VERSION, true);
+
+	json_set_alloc_funcs (eMalloc, eFree);
 }
 #endif
 
