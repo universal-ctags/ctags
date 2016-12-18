@@ -403,6 +403,8 @@ onig_region_copy(OnigRegion* to, const OnigRegion* from)
 #define STK_CALL_FRAME             0x0800
 #define STK_RETURN                 0x0900
 #define STK_VOID                   0x0a00  /* for fill a blank */
+#define STK_ABSENT_POS             0x0b00  /* for absent */
+#define STK_ABSENT                 0x0c00  /* absent inner loop marker */
 
 /* stack type check mask */
 #define STK_MASK_POP_USED          0x00ff
@@ -673,7 +675,8 @@ stack_double(OnigStackType** arg_stk_base, OnigStackType** arg_stk_end,
 #define STACK_PUSH_ALT(pat,s,sprev,keep)     STACK_PUSH(STK_ALT,pat,s,sprev,keep)
 #define STACK_PUSH_POS(s,sprev,keep)         STACK_PUSH(STK_POS,NULL_UCHARP,s,sprev,keep)
 #define STACK_PUSH_POS_NOT(pat,s,sprev,keep) STACK_PUSH(STK_POS_NOT,pat,s,sprev,keep)
-#define STACK_PUSH_STOP_BT              STACK_PUSH_TYPE(STK_STOP_BT)
+#define STACK_PUSH_ABSENT                    STACK_PUSH_TYPE(STK_ABSENT)
+#define STACK_PUSH_STOP_BT                   STACK_PUSH_TYPE(STK_STOP_BT)
 #define STACK_PUSH_LOOK_BEHIND_NOT(pat,s,sprev,keep) \
         STACK_PUSH(STK_LOOK_BEHIND_NOT,pat,s,sprev,keep)
 
@@ -785,6 +788,14 @@ stack_double(OnigStackType** arg_stk_base, OnigStackType** arg_stk_end,
   STACK_INC;\
 } while(0)
 
+#define STACK_PUSH_ABSENT_POS(start, end) do {\
+  STACK_ENSURE(1);\
+  stk->type = STK_ABSENT_POS;\
+  stk->u.absent_pos.abs_pstr = (start);\
+  stk->u.absent_pos.end_pstr = (end);\
+  STACK_INC;\
+} while(0)
+
 
 #ifdef ONIG_DEBUG
 # define STACK_BASE_CHECK(p, at) \
@@ -883,6 +894,33 @@ stack_double(OnigStackType** arg_stk_base, OnigStackType** arg_stk_end,
     }\
     ELSE_IF_STATE_CHECK_MARK(stk);\
   }\
+} while(0)
+
+#define STACK_POP_TIL_ABSENT  do {\
+  while (1) {\
+    stk--;\
+    STACK_BASE_CHECK(stk, "STACK_POP_TIL_ABSENT"); \
+    if (stk->type == STK_ABSENT) break;\
+    else if (stk->type == STK_MEM_START) {\
+      mem_start_stk[stk->u.mem.num] = stk->u.mem.start;\
+      mem_end_stk[stk->u.mem.num]   = stk->u.mem.end;\
+    }\
+    else if (stk->type == STK_REPEAT_INC) {\
+      STACK_AT(stk->u.repeat_inc.si)->u.repeat.count--;\
+    }\
+    else if (stk->type == STK_MEM_END) {\
+      mem_start_stk[stk->u.mem.num] = stk->u.mem.start;\
+      mem_end_stk[stk->u.mem.num]   = stk->u.mem.end;\
+    }\
+    ELSE_IF_STATE_CHECK_MARK(stk);\
+  }\
+} while(0)
+
+#define STACK_POP_ABSENT_POS(start, end) do {\
+  stk--;\
+  STACK_BASE_CHECK(stk, "STACK_POP_ABSENT_POS"); \
+  (start) = stk->u.absent_pos.abs_pstr;\
+  (end) = stk->u.absent_pos.end_pstr;\
 } while(0)
 
 #define STACK_POS_END(k) do {\
@@ -1372,6 +1410,8 @@ stack_type_str(int stack_type)
     case STK_CALL_FRAME:	return "Call  ";
     case STK_RETURN:		return "Ret   ";
     case STK_VOID:		return "Void  ";
+    case STK_ABSENT_POS:	return "AbsPos";
+    case STK_ABSENT:		return "Absent";
     default:			return "      ";
   }
 }
@@ -1551,6 +1591,9 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
     &&L_OP_LOOK_BEHIND,          /* (?<=...) start (no needs end opcode) */
     &&L_OP_PUSH_LOOK_BEHIND_NOT, /* (?<!...) start */
     &&L_OP_FAIL_LOOK_BEHIND_NOT, /* (?<!...) end   */
+    &&L_OP_PUSH_ABSENT_POS,      /* (?~...)  start */
+    &&L_OP_ABSENT,               /* (?~...)  start of inner loop */
+    &&L_OP_ABSENT_END,           /* (?~...)  end   */
 
 # ifdef USE_SUBEXP_CALL
     &&L_OP_CALL,                 /* \g<name> */
@@ -3021,6 +3064,63 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
 
     CASE(OP_FAIL_LOOK_BEHIND_NOT)  MOP_IN(OP_FAIL_LOOK_BEHIND_NOT);
       STACK_POP_TIL_LOOK_BEHIND_NOT;
+      goto fail;
+      NEXT;
+
+    CASE(OP_PUSH_ABSENT_POS)  MOP_IN(OP_PUSH_ABSENT_POS);
+      /* Save the absent-start-pos and the original end-pos. */
+      STACK_PUSH_ABSENT_POS(s, end);
+      MOP_OUT;
+      JUMP;
+
+    CASE(OP_ABSENT)  MOP_IN(OP_ABSENT);
+      {
+	const UChar* aend = end;
+	UChar* absent;
+	UChar* selfp = p - 1;
+
+	STACK_POP_ABSENT_POS(absent, end);  /* Restore end-pos. */
+	GET_RELADDR_INC(addr, p);
+#ifdef ONIG_DEBUG_MATCH
+	fprintf(stderr, "ABSENT: s:%p, end:%p, absent:%p, aend:%p\n", s, end, absent, aend);
+#endif
+	if ((absent > aend) && (s > absent)) {
+	  /* An empty match occurred in (?~...) at the start point.
+	   * Never match. */
+	  STACK_POP;
+	  goto fail;
+	}
+	else if ((s >= aend) && (s > absent)) {
+	  if (s > aend) {
+	    /* Only one (or less) character matched in the last iteration.
+	     * This is not a possible point. */
+	    goto fail;
+	  }
+	  /* All possible points were found. Try matching after (?~...). */
+	  DATA_ENSURE(0);
+	  p += addr;
+	}
+	else {
+	  STACK_PUSH_ALT(p + addr, s, sprev, pkeep); /* Push possible point. */
+	  n = enclen(encode, s, end);
+	  STACK_PUSH_ABSENT_POS(absent, end); /* Save the original pos. */
+	  STACK_PUSH_ALT(selfp, s + n, s, pkeep); /* Next iteration. */
+	  STACK_PUSH_ABSENT;
+	  end = aend;
+	}
+      }
+      MOP_OUT;
+      JUMP;
+
+    CASE(OP_ABSENT_END)  MOP_IN(OP_ABSENT_END);
+      /* The pattern inside (?~...) was matched.
+       * Set the end-pos temporary and go to next iteration. */
+      if (sprev < end)
+	end = sprev;
+#ifdef ONIG_DEBUG_MATCH
+      fprintf(stderr, "ABSENT_END: end:%p\n", end);
+#endif
+      STACK_POP_TIL_ABSENT;
       goto fail;
       NEXT;
 

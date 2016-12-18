@@ -642,6 +642,9 @@ enum OpCode {
   OP_LOOK_BEHIND,          /* (?<=...) start (no needs end opcode) */
   OP_PUSH_LOOK_BEHIND_NOT, /* (?<!...) start */
   OP_FAIL_LOOK_BEHIND_NOT, /* (?<!...) end   */
+  OP_PUSH_ABSENT_POS,      /* (?~...)  start */
+  OP_ABSENT,               /* (?~...)  start of inner loop */
+  OP_ABSENT_END,           /* (?~...)  end   */
 
   OP_CALL,                 /* \g<name> */
   OP_RETURN,
@@ -729,6 +732,9 @@ typedef void* PointerType;
 #define SIZE_OP_CALL                   (SIZE_OPCODE + SIZE_ABSADDR)
 #define SIZE_OP_RETURN                  SIZE_OPCODE
 #define SIZE_OP_CONDITION              (SIZE_OPCODE + SIZE_MEMNUM + SIZE_RELADDR)
+#define SIZE_OP_PUSH_ABSENT_POS         SIZE_OPCODE
+#define SIZE_OP_ABSENT                 (SIZE_OPCODE + SIZE_RELADDR)
+#define SIZE_OP_ABSENT_END              SIZE_OPCODE
 
 #ifdef USE_COMBINATION_EXPLOSION_CHECK
 # define SIZE_OP_STATE_CHECK           (SIZE_OPCODE + SIZE_STATE_CHECK_NUM)
@@ -840,6 +846,10 @@ typedef struct _OnigStackType {
       UChar *pstr;       /* string position */
     } call_frame;
 #endif
+    struct {
+      UChar *abs_pstr;        /* absent start position */
+      const UChar *end_pstr;  /* end position */
+    } absent_pos;
   } u;
 } OnigStackType;
 
