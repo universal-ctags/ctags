@@ -563,6 +563,9 @@ static int makeDefineTag (const char *const name, const char* const signature, b
 {
 	const bool isFileScope = (bool) (! isInputHeaderFile ());
 
+	if (!isLanguageEnabled (Cpp.lang))
+		return CORK_NIL;
+
 	if (!Cpp.defineMacroKind)
 		return CORK_NIL;
 	if (isFileScope && !isXtagEnabled(XTAG_FILE_SCOPE))
@@ -612,8 +615,12 @@ static bool doesCPreProRunAsStandaloneParser (void)
 static void makeIncludeTag (const  char *const name, bool systemHeader)
 {
 	tagEntryInfo e;
-	int role_index = systemHeader? Cpp.headerSystemRoleIndex: Cpp.headerLocalRoleIndex;
+	int role_index;
 
+	if (!isLanguageEnabled (Cpp.lang))
+		return;
+
+	role_index = systemHeader? Cpp.headerSystemRoleIndex: Cpp.headerLocalRoleIndex;
 	if (role_index == ROLE_INDEX_DEFINITION)
 		return;
 

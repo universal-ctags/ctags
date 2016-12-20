@@ -43,6 +43,7 @@ MAIN_HEADS =			\
 	main/selectors.h	\
 	main/sort.h		\
 	main/strlist.h		\
+        main/tokeninfo.h	\
 	main/types.h		\
 	main/vstring.h		\
 	main/writer.h		\
@@ -80,6 +81,7 @@ MAIN_SRCS =				\
 	main/selectors.c		\
 	main/sort.c			\
 	main/strlist.c			\
+        main/tokeninfo.c		\
 	main/vstring.c			\
 	main/writer.c			\
 	main/writer-etags.c		\
@@ -160,6 +162,7 @@ PARSER_SRCS =				\
 	parsers/jprop.c			\
 	parsers/jscript.c		\
 	parsers/json.c			\
+	parsers/ldscript.c		\
 	parsers/lisp.c			\
 	parsers/lua.c			\
 	parsers/m4.c			\

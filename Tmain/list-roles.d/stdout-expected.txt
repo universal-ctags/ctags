@@ -22,6 +22,7 @@ CUDA	d	undef	undefined	on
 CUDA	h	system	system header	on
 CUDA	h	local	local header	on
 Java	p	imported	imported package	on
+LdScript	s	entrypoint	entry points	on
 M4	d	undef	undefined	on
 M4	I	included	included macro	on
 M4	I	sincluded	silently included macro	on
@@ -67,6 +68,7 @@ CUDA	d	undef	undefined	on
 CUDA	h	system	system header	on
 CUDA	h	local	local header	on
 Java	p	imported	imported package	on
+LdScript	s	entrypoint	entry points	on
 M4	d	undef	undefined	on
 M4	I	included	included macro	on
 M4	I	sincluded	silently included macro	on

@@ -345,7 +345,7 @@ static int makeSimplePythonRefTag (const tokenInfo *const token,
 	return CORK_NIL;
 }
 
-static void *newPoolToken (void)
+static void *newPoolToken (void *createArg CTAGS_ATTR_UNUSED)
 {
 	tokenInfo *token = xMalloc (1, tokenInfo);
 	token->string = vStringNew ();
@@ -1287,7 +1287,7 @@ static void initialize (const langType language)
 {
 	Lang_python = language;
 
-	TokenPool = objPoolNew (16, newPoolToken, deletePoolToken, clearPoolToken);
+	TokenPool = objPoolNew (16, newPoolToken, deletePoolToken, clearPoolToken, NULL);
 }
 
 static void finalize (langType language CTAGS_ATTR_UNUSED, bool initialized)

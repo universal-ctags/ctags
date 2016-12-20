@@ -250,8 +250,25 @@ Parser combination
 Parser written in C
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Tag entfry info
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. _tokeninfo:
+
+tokenInfo API
+......................................................................
+
+.. NOT REVIEWED YET
+
+In Exuberant-ctags, a developer can write a parser anyway; only input
+stream and tagEntryInfo data structure is given.
+
+However, while maintaining Universal-ctags I (Masatake YAMATO) think
+we should have a framework for writing parser. Of course the framework
+is optional; you can still write a parser without the framework.
+
+To design a framework, I have studied how @b4n (Colomban Wendling)
+writes parsers. tokenInfo API is the first fruit of my study.
+
+TBW
+
 
 Output tag stream
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

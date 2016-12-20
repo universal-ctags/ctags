@@ -25,7 +25,7 @@ static objPool * g_pTokenPool = NULL;
 
 void cxxTokenForceDestroy(CXXToken * t);
 
-static CXXToken *createToken(void)
+static CXXToken *createToken(void *createArg CTAGS_ATTR_UNUSED)
 {
 	CXXToken *t = xMalloc(sizeof(CXXToken),CXXToken);
 	// we almost always want a string, and since this token
@@ -59,7 +59,8 @@ void cxxTokenAPIInit(void)
 {
 	g_pTokenPool = objPoolNew(CXX_TOKEN_POOL_MAXIMUM_SIZE,
 		(objPoolCreateFunc)createToken, (objPoolDeleteFunc)deleteToken,
-		(objPoolClearFunc)clearToken);
+		(objPoolClearFunc)clearToken,
+		NULL);
 }
 
 void cxxTokenAPINewFile(void)

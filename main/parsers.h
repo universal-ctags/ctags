@@ -72,6 +72,7 @@
 	JavaPropertiesParser, \
 	JavaScriptParser, \
 	JsonParser, \
+	LdScriptParser, \
 	LispParser, \
 	LuaParser, \
 	M4Parser, \

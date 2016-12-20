@@ -221,6 +221,8 @@
     <ClCompile Include="..\parsers\pythonloggingconfig.c" />
     <ClCompile Include="..\main\ptrarray.c" />
     <ClCompile Include="..\main\objpool.c" />
+    <ClCompile Include="..\main\tokeninfo.c" />
+    <ClCompile Include="..\parsers\ldscript.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\fnmatch\fnmatch.h" />
@@ -273,6 +275,7 @@
     <ClInclude Include="..\parsers\meta-m4.h" />
     <ClInclude Include="..\main\ptrarray.h" />
     <ClInclude Include="..\main\objpool.h" />
+    <ClInclude Include="..\main\tokeninfo.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
