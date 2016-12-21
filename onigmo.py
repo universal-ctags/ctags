@@ -137,6 +137,10 @@ elif sys.platform == "msys":
     # MSYS/MSYS2
     _libname = "msys-onigmo-%d.dll" % _onig_api_version
     libonig = ctypes.cdll.LoadLibrary(_libname)
+elif sys.platform == "darwin":
+    # Mac
+    _libname = "libonigmo.dylib"
+    libonig = ctypes.cdll.LoadLibrary(_libname)
 else:
     # Unix
     _libname = "libonigmo.so"
