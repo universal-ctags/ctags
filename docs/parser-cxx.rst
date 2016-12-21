@@ -31,13 +31,153 @@ features were added. Among them:
 
 At the time of writing (March 2016) more features are planned.
 
+Notable New Features
+---------------------------------------------------------------------
+
+Some of the notable new features are described below.
+
+Properties
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Several properties of functions and variables can be extracted
+and placed in a new field called ``properties``.
+The syntax to enable it is:
+
+.. code-block:: C
+
+	$ ctags ... --fields-c++=+{properties} ...
+
+At the time of writing the following properties are reported:
+
+- ``virtual``: a function is marked as virtual
+- ``static``: a function/variable is marked as static
+- ``inline``: a function implementation is marked as inline
+- ``explicit``: a function is marked as explicit
+- ``extern``: a function/variable is marked as extern
+- ``const``: a function is marked as const
+- ``pure``: a virtual function is pure (i.e = 0)
+- ``override``: a function is marked as override
+- ``default``: a function is marked as default
+- ``final``: a function is marked as final
+- ``delete``: a function is marked as delete
+- ``mutable``: a variable is marked as mutable
+- ``volatile``: a function is marked as volatile
+- ``specialization``: a function is a template specialization
+- ``scopespecialization``: template specialization of scope ``a<x>::b()``
+- ``deprecated``: a function is marked as deprecated via ``__attribute__``
+- ``scopedenum``: a scoped enumeration (C++11)
+
+Preprocessor macros
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The new parser supports the definition of real preprocessor macros
+via the ``-D`` option. All types of macros are supported,
+including the ones with parameters and variable arguments.
+Stringification, token pasting and recursive macro expansion are also supported.
+
+Option ``-I`` is now simply a backward-compatible syntax to define a
+macro with no replacement.
+
+The syntax is similar to the corresponding gcc ``-D`` option.
+
+Some examples follow.
+
+.. code-block:: console
+
+	$ ctags ... -D IGNORE_THIS ...
+
+With this commandline the following C/C++ input
+
+.. code-block:: C
+
+	int IGNORE_THIS a;
+
+will be processed as if it was
+
+.. code-block:: C
+
+	int a;
+
+Defining a macro with parameters uses the following syntax:
+
+.. code-block:: console
+
+	$ ctags ... -D "foreach(arg)=for(arg;;)" ...
+
+This example defines ``for(arg;;)`` as the replacement ``foreach(arg)``.
+So the following C/C++ input
+
+.. code-block:: C
+
+	foreach(char * p,pointers)
+	{
+
+	}
+
+is processed in new C/C++ parser as:
+
+.. code-block:: C
+
+	for(char * p;;)
+	{
+
+	}
+
+and the p local variable can be extracted.
+
+The previous commandline includes quotes since the macros generally contain
+characters that are treated specially by the shells. You may need some escaping.
+
+Token pasting is performed by the ``##`` operator, just like in the normal
+C preprocessor.
+
+.. code-block:: console
+
+	$ ctags ... -D "DECLARE_FUNCTION(prefix)=int prefix ## Call();"
+
+So the following code
+
+.. code-block:: C
+
+	DECLARE_FUNCTION(a)
+	DECLARE_FUNCTION(b)
+
+will be processed as
+
+.. code-block:: C
+
+	int aCall();
+	int bCall();
+
+Macros with variable arguments use the gcc ``__VA_ARGS__`` syntax.
+
+.. code-block:: console
+
+	$ ctags ... -D "DECLARE_FUNCTION(name,...)=int name(__VA_ARGS__);"
+
+So the following code
+
+.. code-block:: C
+
+	DECLARE_FUNCTION(x,int a,int b)
+
+will be processed as
+
+.. code-block:: C
+
+	int x(int a,int b);
+
+Incompatible Changes
+---------------------------------------------------------------------
+
 The parser is mostly compatible with the old one. There are some minor
 incompatible changes which are described below.
 
-Anonymous structure names
----------------------------------------------------------------------
 
-The old parser produced structure names in the form __anonN where N
+Anonymous structure names
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The old parser produced structure names in the form ``__anonN`` where N
 was a number starting at 1 in each file and increasing at each new
 structure. This caused collisions in symbol names when ctags was run
 on multiple files.
@@ -53,7 +193,7 @@ different structure names. This is unavoidable and is up to the user to
 ensure that multiple ctags runs are started from a common directory root.
 
 File scope
----------------------------------------------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The file scope information is not 100% reliable. It never was.
 There are several cases in that compiler, linker or even source code
@@ -95,33 +235,35 @@ should reflect the most common usages. The policy is the following:
 - Typedefs are in file scope if appearing inside a .c or .cpp file
 
 Most of these rules are debatable in one way or the other. Just keep in mind
-that s is not 100% reliable.
+that this is not 100% reliable.
 
 Inheritance information
----------------------------------------------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The new parser does not strip template names from base classes.
 For a declaration like
 
-template<typename A> class B : public C<A>
+.. code-block:: C
 
-the old parser reported "C" as base class while the new one reports
-"C<A>".
+	template<typename A> class B : public C<A>
+
+the old parser reported ``C`` as base class while the new one reports
+``C<A>``.
 
 Typeref
-----------------------------------------------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The syntax of the typeref field (typeref:A:B) was designed with only
-struct/class/union/enum types in mind. Generic types don't have A
+The syntax of the typeref field (``typeref:A:B``) was designed with only
+struct/class/union/enum types in mind. Generic types don't have ``A``
 information and the keywords became entirely optional in C++:
 you just can't tell. Furthermore, struct/class/union/enum types
-share the same namespace and their names can't collide, so the A
+share the same namespace and their names can't collide, so the ``A``
 information is redundant for most purposes.
 
 To accommodate generic types and preserve some degree of backward
 compatibility the new parser uses struct/class/union/enum in place
-of A where such keyword can be inferred. Where the information is
+of ``A`` where such keyword can be inferred. Where the information is
 not available it uses the 'typename' keyword.
 
-Generally, you should ignore the information in field A and use
-only information in field B.
+Generally, you should ignore the information in field ``A`` and use
+only information in field ``B``.
