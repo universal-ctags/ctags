@@ -1,0 +1,4 @@
+PL_ClearArenaPool	input.cpp	/^PR_EXTERN(void) PL_ClearArenaPool(PLArenaPool *pool, PRInt32 pattern);$/;"	p	typeref:typename:void	file:
+deflateBound	input.cpp	/^GIT_INLINE(size_t) deflateBound(z_streamp stream, size_t s)$/;"	f	typeref:typename:size_t
+ap_os_create_privileged_process	input.cpp	/^AP_DECLARE(apr_status_t) ap_os_create_privileged_process($/;"	p	typeref:typename:apr_status_t	file:
+handleError	input.cpp	/^LOCAL(struct errRecord *) handleError(z_streamp stream, size_t s) MAY_EXIT$/;"	f	typeref:struct:errRecord *
