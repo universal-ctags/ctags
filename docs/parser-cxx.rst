@@ -104,7 +104,7 @@ Defining a macro with parameters uses the following syntax:
 
 	$ ctags ... -D "foreach(arg)=for(arg;;)" ...
 
-This example defines `for(arg;;)` as the replacement `foreach(arg)`.
+This example defines ``for(arg;;)`` as the replacement ``foreach(arg)``.
 So the following C/C++ input
 
 .. code-block:: C
@@ -128,7 +128,7 @@ and the p local variable can be extracted.
 The previous commandline includes quotes since the macros generally contain
 characters that are treated specially by the shells. You may need some escaping.
 
-Token pasting is performed by the ## operator, just like in the normal
+Token pasting is performed by the ``##`` operator, just like in the normal
 C preprocessor.
 
 .. code-block:: console
@@ -149,7 +149,7 @@ will be processed as
 	int aCall();
 	int bCall();
 
-Macros with variable arguments use the gcc __VA_ARGS__ syntax.
+Macros with variable arguments use the gcc ``__VA_ARGS__`` syntax.
 
 .. code-block:: console
 
@@ -171,13 +171,13 @@ Incompatible Changes
 ---------------------------------------------------------------------
 
 The parser is mostly compatible with the old one. There are some minor
-incompatible changes which are described in a dedicated section below.
+incompatible changes which are described below.
 
 
 Anonymous structure names
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The old parser produced structure names in the form __anonN where N
+The old parser produced structure names in the form ``__anonN`` where N
 was a number starting at 1 in each file and increasing at each new
 structure. This caused collisions in symbol names when ctags was run
 on multiple files.
@@ -247,23 +247,23 @@ For a declaration like
 
 	template<typename A> class B : public C<A>
 
-the old parser reported "C" as base class while the new one reports
-"C<A>".
+the old parser reported ``C`` as base class while the new one reports
+``C<A>``.
 
 Typeref
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The syntax of the typeref field (typeref:A:B) was designed with only
-struct/class/union/enum types in mind. Generic types don't have A
+The syntax of the typeref field (``typeref:A:B``) was designed with only
+struct/class/union/enum types in mind. Generic types don't have ``A``
 information and the keywords became entirely optional in C++:
 you just can't tell. Furthermore, struct/class/union/enum types
-share the same namespace and their names can't collide, so the A
+share the same namespace and their names can't collide, so the ``A``
 information is redundant for most purposes.
 
 To accommodate generic types and preserve some degree of backward
 compatibility the new parser uses struct/class/union/enum in place
-of A where such keyword can be inferred. Where the information is
+of ``A`` where such keyword can be inferred. Where the information is
 not available it uses the 'typename' keyword.
 
-Generally, you should ignore the information in field A and use
-only information in field B.
+Generally, you should ignore the information in field ``A`` and use
+only information in field ``B``.
