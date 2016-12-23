@@ -1610,6 +1610,7 @@ def main():
     n("(?~|abc)", "abc")
     x2("(?~abc|)", "abc", 0, 1)     # ???
     x2("(?~abc|def)x", "abcx", 1, 4)
+    x2("(?~abc|def)x", "defx", 1, 4)
 
     # Perl syntax
     x2("\\Q()\\[a]\\E[b]", "()\\[a]b", 0, 7, syn=onigmo.ONIG_SYNTAX_PERL)
