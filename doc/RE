@@ -1,4 +1,4 @@
-Onigmo (Oniguruma-mod) Regular Expressions Version 6.0.0    2016/12/01
+Onigmo (Oniguruma-mod) Regular Expressions Version 6.1.0    2016/12/22
 
 syntax: ONIG_SYNTAX_RUBY (default)
 
@@ -307,6 +307,29 @@ syntax: ONIG_SYNTAX_RUBY (default)
                         BUG: If the name is defined more than once, the
                         left-most group is checked, but it should be the
                         same as \k<name>.
+
+  (?~subexp)        absent operator (experimental)
+                    Matches any string which doesn't have subexp as its suffix.
+
+                    E.g.:
+                      (?~abc) matches: "", "ab", "aab", "cccc", etc.
+                      It doesn't match: "abc", "aabc", "ccccabc", etc.
+
+                      \/\*(?~\*\/)\*\/ matches C style comments:
+                        "/**/", "/* foobar */", etc.
+
+                      \A\/\*(?~\*\/)\*\/\z doesn't match "/**/ */".
+                      This is different from \A\/\*.*?\*\/\z .
+
+                      (?~) never matches.
+
+                    Theoretical backgrounds are discussed in Tanaka Akira's
+                    paper and slide (both Japanese):
+
+                      * Absent Operator for Regular Expression
+                        https://staff.aist.go.jp/tanaka-akira/pub/prosym49-akr-paper.pdf
+                      * 正規表現における非包含オペレータの提案
+                        https://staff.aist.go.jp/tanaka-akira/pub/prosym49-akr-presen.pdf
 
 
 8. Backreferences

@@ -58,7 +58,8 @@ const OnigSyntaxType OnigSyntaxRuby = {
       ONIG_SYN_OP2_ESC_CAPITAL_X_EXTENDED_GRAPHEME_CLUSTER |
       ONIG_SYN_OP2_QMARK_LPAREN_CONDITION |
       ONIG_SYN_OP2_ESC_CAPITAL_R_LINEBREAK |
-      ONIG_SYN_OP2_ESC_CAPITAL_K_KEEP )
+      ONIG_SYN_OP2_ESC_CAPITAL_K_KEEP |
+      ONIG_SYN_OP2_QMARK_TILDE_ABSENT )
   , ( SYN_GNU_REGEX_BV |
       ONIG_SYN_ALLOW_INTERVAL_LOW_ABBREV |
       ONIG_SYN_DIFFERENT_LEN_ALT_LOOK_BEHIND |
@@ -4989,6 +4990,14 @@ parse_enclose(Node** np, OnigToken* tok, int term, UChar** src, UChar* end,
       break;
     case '>':   /* (?>...) stop backtrack */
       *np = node_new_enclose(ENCLOSE_STOP_BACKTRACK);
+      break;
+    case '~':   /* (?~...) absent operator */
+      if (IS_SYNTAX_OP2(env->syntax, ONIG_SYN_OP2_QMARK_TILDE_ABSENT)) {
+	*np = node_new_enclose(ENCLOSE_ABSENT);
+      }
+      else {
+	return ONIGERR_UNDEFINED_GROUP_OPTION;
+      }
       break;
 
 #ifdef USE_NAMED_GROUP
