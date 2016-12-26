@@ -320,7 +320,8 @@ syntax: ONIG_SYNTAX_RUBY (default)
                         "/**/", "/* foobar */", etc.
 
                       \A\/\*(?~\*\/)\*\/\z doesn't match "/**/ */".
-                      This is different from \A\/\*.*?\*\/\z .
+                      This is different from \A\/\*.*?\*\/\z which uses a
+                      reluctant quantifier (.*?).
 
                       Unlike (?:(?!abc).)*c, (?~abc)c matches "abc", because
                       (?~abc) matches "ab".
