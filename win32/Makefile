@@ -8,6 +8,9 @@ USE_LTCG = 1
 # Comment out the next line, if you don't want to use multiprocess build.
 USE_MP = 1
 
+# Enable the next line, if you want to enable .pdb file on release build.
+#ENABLE_PDB = 1
+
 # Enable the next line, if you want to use a .def file.
 #DEFFILE = onigmo.def
 
@@ -64,32 +67,37 @@ WORKDIR = build_$(ARCH)$(DBGFLG)
 !endif
 !endif
 
-!ifndef DEBUG
-!if DEFINED(USE_LTCG) && $(USE_LTCG)
-# Use LTCG (Link Time Code Generation).
-# Check if cl.exe is newer than VC++ 7.0 (_MSC_VER >= 1300).
-!if $(_MSC_VER) >= 1300
-CFLAGS = $(CFLAGS) -GL
-ARLIB_FLAGS = $(ARLIB_FLAGS) -LTCG
-ARDLL_FLAGS = $(ARDLL_FLAGS) -LTCG
-!endif
-!endif
-!endif
-
-!if DEFINED(USE_MP) && $(USE_MP)
+!if DEFINED(USE_MP) && $(_MSC_VER) >= 1600
 # Enable multiprocess build on VC2010+.
-!if $(_MSC_VER) >= 1600
 CFLAGS = $(CFLAGS) -MP
-!endif
 !endif
 
 !ifdef DEBUG
+
+# Debug Build
+
 # Enable debug information.
 CFLAGS = $(CFLAGS) -Zi -DDEBUG=1 -D_DEBUG=1 -MTd
 # Debug flags. (see regint.h)
 #CFLAGS = $(CFLAGS) -DONIG_DEBUG_PARSE_TREE -DONIG_DEBUG_COMPILE -DONIG_DEBUG_SEARCH -DONIG_DEBUG_MATCH -DONIG_DONT_OPTIMIZE
 ARDLL_FLAGS = -MTd $(ARDLL_FLAGS) -debug
+
+!else	# DEBUG
+
+# Release Build
+
+!if DEFINED(USE_LTCG) && $(_MSC_VER) >= 1300
+# Use LTCG (Link Time Code Generation) on VC++ 7.0 or later.
+CFLAGS = $(CFLAGS) -GL
+ARLIB_FLAGS = $(ARLIB_FLAGS) -LTCG
+ARDLL_FLAGS = $(ARDLL_FLAGS) -LTCG
 !endif
+!ifdef ENABLE_PDB
+CFLAGS = $(CFLAGS) -Zi
+ARDLL_FLAGS = $(ARDLL_FLAGS) -debug -PDBALTPATH:%%_PDB%%
+!endif
+
+!endif	# DEBUG
 
 !ifdef DEFFILE
 # Use a .def file to export APIs.
