@@ -30,7 +30,7 @@ ARLIB = lib
 ARLIB_FLAGS = -nologo
 ARDLL = cl
 ARDLL_FLAGS = -nologo -LD $(LINKFLAGS) -dll
-LINKFLAGS = -link -incremental:no -pdb:none
+LINKFLAGS = -link -incremental:no
 
 INSTALL = install -c
 CP      = copy
@@ -88,7 +88,7 @@ CFLAGS = $(CFLAGS) -MP
 CFLAGS = $(CFLAGS) -Zi -DDEBUG=1 -D_DEBUG=1 -MTd
 # Debug flags. (see regint.h)
 #CFLAGS = $(CFLAGS) -DONIG_DEBUG_PARSE_TREE -DONIG_DEBUG_COMPILE -DONIG_DEBUG_SEARCH -DONIG_DEBUG_MATCH -DONIG_DONT_OPTIMIZE
-ARDLL_FLAGS = -MTd $(ARDLL_FLAGS)
+ARDLL_FLAGS = -MTd $(ARDLL_FLAGS) -debug
 !endif
 
 !ifdef DEFFILE
