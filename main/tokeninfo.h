@@ -41,7 +41,7 @@ struct tokenTypePair {
 };
 
 #define TOKEN(X)  ((tokenInfo *)X)
-#define TOKEN_X(X,T)  ((T *)(((char *)TOKEN(X)) + sizeof (tokenInfo)))
+#define TOKENX(X,T)  ((T *)(((char *)TOKEN(X)) + sizeof (tokenInfo)))
 
 struct tokenInfoClass {
 	unsigned int nPreAlloc;

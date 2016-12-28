@@ -131,16 +131,16 @@ static tokenInfo *newLdScriptToken (void)
 
 static void clearToken (tokenInfo *token)
 {
-	TOKEN_X (token, struct tokenExtra)->scopeIndex = CORK_NIL;
-	TOKEN_X (token, struct tokenExtra)->assignment = KEYWORD_NONE;
+	TOKENX (token, struct tokenExtra)->scopeIndex = CORK_NIL;
+	TOKENX (token, struct tokenExtra)->assignment = KEYWORD_NONE;
 }
 
 static void copyToken (tokenInfo *dest, tokenInfo *src, void *data CTAGS_ATTR_UNUSED)
 {
-	TOKEN_X (dest, struct tokenExtra)->scopeIndex =
-		TOKEN_X (src, struct tokenExtra)->scopeIndex;
-	TOKEN_X (dest, struct tokenExtra)->assignment =
-		TOKEN_X (src, struct tokenExtra)->assignment;
+	TOKENX (dest, struct tokenExtra)->scopeIndex =
+		TOKENX (src, struct tokenExtra)->scopeIndex;
+	TOKENX (dest, struct tokenExtra)->assignment =
+		TOKENX (src, struct tokenExtra)->assignment;
 }
 
 static int makeLdScriptTagMaybe (tagEntryInfo *const e, tokenInfo *const token,
@@ -160,7 +160,7 @@ static int makeLdScriptTagMaybe (tagEntryInfo *const e, tokenInfo *const token,
 					 role);
 	e->lineNumber = token->lineNumber;
 	e->filePosition = token->filePosition;
-	e->extensionFields.scopeIndex = TOKEN_X (token, struct tokenExtra)->scopeIndex;
+	e->extensionFields.scopeIndex = TOKENX (token, struct tokenExtra)->scopeIndex;
 
 	/* TODO: implement file: field. */
 	if ((kind == K_SYMBOL)
@@ -168,7 +168,7 @@ static int makeLdScriptTagMaybe (tagEntryInfo *const e, tokenInfo *const token,
 	{
 		char *assignment = NULL;
 
-		switch (TOKEN_X (token, struct tokenExtra)->assignment)
+		switch (TOKENX (token, struct tokenExtra)->assignment)
 		{
 		case KEYWORD_PROVIDE:
 			assignment = "provide";
@@ -423,11 +423,11 @@ static void parseProvide (tokenInfo * token)
 		tokenRead (token);
 		if (tokenIsType(token, IDENTIFIER))
 		{
-			TOKEN_X (token, struct tokenExtra)->assignment = p;
+			TOKENX (token, struct tokenExtra)->assignment = p;
 
 			makeLdScriptTagMaybe (&e, token,
 								  K_SYMBOL, ROLE_INDEX_DEFINITION);
-			TOKEN_X (token, struct tokenExtra)->assignment = KEYWORD_NONE;
+			TOKENX (token, struct tokenExtra)->assignment = KEYWORD_NONE;
 		}
 		tokenSkipToType (token, ')');
 	}
@@ -499,7 +499,7 @@ static void parseSection (tokenInfo * name)
 												K_SECTION, ROLE_INDEX_DEFINITION);
 			if (tokenSkipToType (token, '{'))
 			{
-				TOKEN_X (token, struct tokenExtra)->scopeIndex = scope_index;
+				TOKENX (token, struct tokenExtra)->scopeIndex = scope_index;
 				parseOutputSectionCommands (token);
 			}
 		}
