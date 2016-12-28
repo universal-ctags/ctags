@@ -61,6 +61,9 @@ struct tokenInfoClass {
 };
 
 void *newToken       (struct tokenInfoClass *klass);
+void *newTokenByCopying (tokenInfo *src);
+void *newTokenByCopyingFull (tokenInfo *src, void *data);
+
 void  flashTokenBacklog (struct tokenInfoClass *klass);
 void  tokenDestroy    (tokenInfo *token);
 

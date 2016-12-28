@@ -124,6 +124,18 @@ void tokenCopy      (tokenInfo *dest, tokenInfo *src)
 	tokenCopyFull (dest, src, NULL);
 }
 
+void *newTokenByCopying (tokenInfo *src)
+{
+	return newTokenByCopyingFull (src, NULL);
+}
+
+void *newTokenByCopyingFull (tokenInfo *src, void *data)
+{
+	void * dest = newToken (src->klass);
+	tokenCopyFull (dest, src, data);
+	return dest;
+}
+
 bool tokenSkipToType (tokenInfo *token, tokenType t)
 {
 	while (! (tokenIsEOF (token)
