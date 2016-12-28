@@ -155,7 +155,7 @@ static int makeLdScriptTagMaybe (tagEntryInfo *const e, tokenInfo *const token,
 				&& LdScriptKinds[kind].roles[role].enabled))
 		return CORK_NIL;
 
-	initRefTagEntry (e, TOKEN_STRING (token),
+	initRefTagEntry (e, tokenString (token),
 					 LdScriptKinds + kind,
 					 role);
 	e->lineNumber = token->lineNumber;
@@ -202,7 +202,7 @@ static int readPrefixedToken (tokenInfo *const token, int type)
 		if (isIdentifierChar (c))
 		{
 			n++;
-			TOKEN_PUTC (token, c);
+			tokenPutc (token, c);
 		}
 		else
 		{
@@ -246,45 +246,45 @@ static void readToken (tokenInfo *const token, void *data CTAGS_ATTR_UNUSED)
 	case '~':
 	case '%':
 	case '?':
-		TOKEN_PUTC(token, c);
+		tokenPutc(token, c);
 		token->type = TOKEN_OP;
 		break;
 	case '-':
 	case '+':
 	case '*':
 	case '/':					/* -,+,*,/,-=,+=,*=,/= */
-		TOKEN_PUTC(token, c);
+		tokenPutc(token, c);
 		c0 = cppGetc ();
 		token->type = TOKEN_OP;
 		if (c0 == '=')
 		{
-			TOKEN_PUTC(token, c0);
+			tokenPutc(token, c0);
 			token->type = TOKEN_ASSIGNMENT_OP;
 		}
 		else
 			cppUngetc (c0);
 		break;
 	case '!':					/* !, != */
-		TOKEN_PUTC(token, c);
+		tokenPutc(token, c);
 		token->type = TOKEN_OP;
 		c0 = cppGetc ();
 		if (c0 == '=')
-			TOKEN_PUTC(token, c0);
+			tokenPutc(token, c0);
 		else
 			cppUngetc (c0);
 	case '<':					/* <,<=,<<,<<= */
-		TOKEN_PUTC(token, c);
+		tokenPutc(token, c);
 		token->type = TOKEN_OP;
 		c0 = cppGetc ();
 		if (c0 == c  || c0 == '=')
 		{
-			TOKEN_PUTC(token, c0);
+			tokenPutc(token, c0);
 			if (c0 == c)
 			{
 				c1 = cppGetc ();
 				if (c1 == '=')
 				{
-					TOKEN_PUTC(token, c1);
+					tokenPutc(token, c1);
 					token->type = TOKEN_ASSIGNMENT_OP;
 				}
 				else
@@ -295,27 +295,27 @@ static void readToken (tokenInfo *const token, void *data CTAGS_ATTR_UNUSED)
 			cppUngetc (c0);
 	case '|':					/* |,||,|= */
 	case '&':					/* &,&&,&= */
-		TOKEN_PUTC(token, c);
+		tokenPutc(token, c);
 		token->type = TOKEN_OP;
 		c0 = cppGetc ();
 		if (c0 == c)
-			TOKEN_PUTC(token, c0);
+			tokenPutc(token, c0);
 		else if (c0 == '=')
 		{
-			TOKEN_PUTC(token, c0);
+			tokenPutc(token, c0);
 			token->type = TOKEN_ASSIGNMENT_OP;
 		}
 		else
 			cppUngetc (c0);
 		break;
 	case '=':					/* =,== */
-		TOKEN_PUTC(token, c);
+		tokenPutc(token, c);
 		if (!readPrefixedToken (token, TOKEN_FILLEXP))
 		{
 			c0 = cppGetc ();
 			if (c0 == '=')
 			{
-				TOKEN_PUTC(token, c0);
+				tokenPutc(token, c0);
 				token->type = TOKEN_OP;
 			}
 			else
@@ -326,18 +326,18 @@ static void readToken (tokenInfo *const token, void *data CTAGS_ATTR_UNUSED)
 		}
 		break;
 	case '>':					/* >,>>,>>= */
-		TOKEN_PUTC(token, c);
+		tokenPutc(token, c);
 		if (!readPrefixedToken (token, TOKEN_REGION))
 		{
 			token->type = TOKEN_OP;
 			c0 = cppGetc ();
 			if (c0 == c  || c0 == '=')
 			{
-				TOKEN_PUTC(token, c0);
+				tokenPutc(token, c0);
 				c1 = cppGetc();
 				if (c1 == '=')
 				{
-					TOKEN_PUTC(token, c1);
+					tokenPutc(token, c1);
 					token->type = TOKEN_ASSIGNMENT_OP;
 				}
 				else
@@ -348,7 +348,7 @@ static void readToken (tokenInfo *const token, void *data CTAGS_ATTR_UNUSED)
 		}
 		break;
 	case ':':
-		TOKEN_PUTC(token, c);
+		tokenPutc(token, c);
 		if (!readPrefixedToken (token, TOKEN_PHDIR))
 			token->type = c;
 		break;
@@ -356,11 +356,11 @@ static void readToken (tokenInfo *const token, void *data CTAGS_ATTR_UNUSED)
 		if (isdigit (c))
 		{
 			token->type = TOKEN_NUMBER;
-			TOKEN_PUTC(token, c);
+			tokenPutc(token, c);
 			while ((c = cppGetc()))
 			{
 				if (isIdentifierChar (c))
-					TOKEN_PUTC(token, c);
+					tokenPutc(token, c);
 				else
 				{
 					cppUngetc (c);
@@ -370,11 +370,11 @@ static void readToken (tokenInfo *const token, void *data CTAGS_ATTR_UNUSED)
 		}
 		else if (isIdentifierChar(c))
 		{
-			TOKEN_PUTC(token, c);
+			tokenPutc(token, c);
 			while ((c = cppGetc()))
 			{
 				if (isIdentifierChar(c))
-					TOKEN_PUTC(token, c);
+					tokenPutc(token, c);
 				else
 				{
 					cppUngetc (c);
@@ -584,8 +584,6 @@ static void findLdScriptTags (void)
 
 	tokenDestroy (tmp);
 	tokenDestroy (token);
-
-
 }
 
 static void initialize (const langType language)

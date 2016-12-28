@@ -80,13 +80,12 @@ void tokenCopy       (tokenInfo *dest, tokenInfo *src);
 									&& (TKN)->keyword == KEYWORD_##K)
 #define TOKEN_IS_EOF(TKN)      ((TKN)->type == (TKN)->klass->typeForEOF)
 
-#define TOKEN_STRING(TKN)	   (vStringValue ((TKN)->string))
-#define TOKEN_PUTC(TKN,C)      (vStringPut ((TKN)->string, C))
+#define tokenString(TKN)	   (vStringValue ((TKN)->string))
+#define tokenPutc(TKN,C)      (vStringPut ((TKN)->string, C))
 
 bool tokenIsType          (tokenInfo *token, tokenType t);
 bool tokenIsKeyword       (tokenInfo *token, tokenKeyword k);
 
-const char* const tokenString (tokenInfo *token);
 
 /* return true if t is found. In that case token holds an
    language object type t.
