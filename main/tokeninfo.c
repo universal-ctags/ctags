@@ -96,7 +96,7 @@ void tokenReadFull (tokenInfo *token, void *data)
 		tokenInfo *backlog = ptrArrayLast (token->klass->backlog);
 		tokenCopyFull (token, backlog, data);
 		ptrArrayRemoveLast (token->klass->backlog);
-		tokenDestroy (token);
+		tokenDestroy (backlog);
 	}
 	else
 		token->klass->read (token, data);
