@@ -107,17 +107,6 @@ void tokenRead (tokenInfo *token)
 	tokenReadFull (token, NULL);
 }
 
-bool tokenIsType     (tokenInfo *token, tokenType t)
-{
-	return (token->type == t)? true: false;
-}
-
-bool tokenIsKeyword  (tokenInfo *token, tokenKeyword k)
-{
-	return (tokenIsType (token, token->klass->typeForKeyword)
-			&& token->keyword == k)? true: false;
-}
-
 void tokenCopyFull  (tokenInfo *dest, tokenInfo *src, void *data)
 {
 	dest->lineNumber = src->lineNumber;
@@ -137,7 +126,7 @@ void tokenCopy      (tokenInfo *dest, tokenInfo *src)
 
 bool tokenSkipToType (tokenInfo *token, tokenType t)
 {
-	while (! (TOKEN_IS_EOF (token)
+	while (! (tokenIsEOF (token)
 			  || token->type == t))
 		tokenRead (token);
 
@@ -181,7 +170,7 @@ bool tokenSkipOverPair (tokenInfo *token)
 			depth ++;
 		else if (token->type == end)
 			depth--;
-	} while ((!TOKEN_IS_EOF(token)) && (depth > 0));
+	} while ((!tokenIsEOF(token)) && (depth > 0));
 
 	return (depth == 0)? true: false;
 }

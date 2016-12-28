@@ -75,17 +75,13 @@ void tokenCopy       (tokenInfo *dest, tokenInfo *src);
 
 /* Helper macro & functions */
 
-#define TOKEN_IS_TYPE(TKN,T)     ((TKN)->type == TOKEN_##T)
-#define TOKEN_IS_KEYWORD(TKN,K)  ((TKN)->type == TKN->klass->typeForKeyword \
+#define tokenIsType(TKN,T)     ((TKN)->type == TOKEN_##T)
+#define tokenIsKeyword(TKN,K)  ((TKN)->type == TKN->klass->typeForKeyword \
 									&& (TKN)->keyword == KEYWORD_##K)
-#define TOKEN_IS_EOF(TKN)      ((TKN)->type == (TKN)->klass->typeForEOF)
+#define tokenIsEOF(TKN)      ((TKN)->type == (TKN)->klass->typeForEOF)
 
 #define tokenString(TKN)	   (vStringValue ((TKN)->string))
 #define tokenPutc(TKN,C)      (vStringPut ((TKN)->string, C))
-
-bool tokenIsType          (tokenInfo *token, tokenType t);
-bool tokenIsKeyword       (tokenInfo *token, tokenKeyword k);
-
 
 /* return true if t is found. In that case token holds an
    language object type t.

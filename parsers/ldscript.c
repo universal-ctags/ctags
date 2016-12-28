@@ -401,7 +401,7 @@ static void parseEntry (tokenInfo *const token)
 		tokenInfo *const name = newLdScriptToken ();
 
 		tokenRead (name);
-		if (TOKEN_IS_TYPE(name, IDENTIFIER))
+		if (tokenIsType(name, IDENTIFIER))
 		{
 			tagEntryInfo e;
 
@@ -421,7 +421,7 @@ static void parseProvide (tokenInfo * token)
 	{
 		tagEntryInfo e;
 		tokenRead (token);
-		if (TOKEN_IS_TYPE(token, IDENTIFIER))
+		if (tokenIsType(token, IDENTIFIER))
 		{
 			TOKEN_X (token, struct tokenExtra)->assignment = p;
 
@@ -440,12 +440,12 @@ static void parseOutputSectionCommands (tokenInfo *const token)
 	do {
 		tokenRead (token);
 
-		if (TOKEN_IS_TYPE (token,IDENTIFIER))
+		if (tokenIsType (token,IDENTIFIER))
 		{
 			tagEntryInfo e;
 
 			tokenRead (tmp);
-			if (TOKEN_IS_TYPE (tmp, ASSIGNMENT_OP))
+			if (tokenIsType (tmp, ASSIGNMENT_OP))
 			{
 				makeLdScriptTagMaybe (&e, token,
 									  K_SYMBOL, ROLE_INDEX_DEFINITION);
@@ -454,11 +454,11 @@ static void parseOutputSectionCommands (tokenInfo *const token)
 			else
 				tokenCopy (token, tmp);
 		}
-		else if (TOKEN_IS_KEYWORD (token, PROVIDE)
-				 || TOKEN_IS_KEYWORD (token, PROVIDE_HIDDEN)
-				 || TOKEN_IS_KEYWORD (token, HIDDEN))
+		else if (tokenIsKeyword (token, PROVIDE)
+				 || tokenIsKeyword (token, PROVIDE_HIDDEN)
+				 || tokenIsKeyword (token, HIDDEN))
 			parseProvide (token);
-	} while (! (TOKEN_IS_EOF (token) || token->type == '}'));
+	} while (! (tokenIsEOF (token) || token->type == '}'));
 
 	tokenDestroy (tmp);
 }
@@ -470,9 +470,9 @@ static void parseSection (tokenInfo * name)
 
 	tokenRead (token);
 
-	if (TOKEN_IS_TYPE (token, ASSIGNMENT_OP))
+	if (tokenIsType (token, ASSIGNMENT_OP))
 	{
-		if (!TOKEN_IS_KEYWORD (name, LOC))
+		if (!tokenIsKeyword (name, LOC))
 			makeLdScriptTagMaybe (&e, name,
 								  K_SYMBOL, ROLE_INDEX_DEFINITION);
 		tokenSkipToType (token, ';');
@@ -480,9 +480,9 @@ static void parseSection (tokenInfo * name)
 	else
 	{
 	retry:
-		if (TOKEN_IS_TYPE (token, NUMBER))
+		if (tokenIsType (token, NUMBER))
 			tokenSkipToType (token, ':');
-		else if (TOKEN_IS_TYPE (token, IDENTIFIER))
+		else if (tokenIsType (token, IDENTIFIER))
 		{
 			tokenCopy (name, token);
 			tokenRead (token);
@@ -514,16 +514,16 @@ static void parseSections (tokenInfo *const token)
 	{
 		do {
 			tokenRead (token);
-			if (TOKEN_IS_KEYWORD (token, ENTRY))
+			if (tokenIsKeyword (token, ENTRY))
 				parseEntry (token);
-			else if (TOKEN_IS_TYPE(token, IDENTIFIER)
-					 || TOKEN_IS_KEYWORD (token, LOC))
+			else if (tokenIsType(token, IDENTIFIER)
+					 || tokenIsKeyword (token, LOC))
 				parseSection (token);
-			else if (TOKEN_IS_KEYWORD (token, PROVIDE)
-					 || TOKEN_IS_KEYWORD (token, PROVIDE_HIDDEN)
-					 || TOKEN_IS_KEYWORD (token, HIDDEN))
+			else if (tokenIsKeyword (token, PROVIDE)
+					 || tokenIsKeyword (token, PROVIDE_HIDDEN)
+					 || tokenIsKeyword (token, HIDDEN))
 				parseProvide (token);
-		} while (! (TOKEN_IS_EOF (token) || token->type == '}'));
+		} while (! (tokenIsEOF (token) || token->type == '}'));
 	}
 }
 
@@ -544,9 +544,9 @@ static void parseVersions (tokenInfo *const token)
 	{
 		do {
 			tokenRead (token);
-			if (TOKEN_IS_TYPE(token, IDENTIFIER))
+			if (tokenIsType(token, IDENTIFIER))
 				parseVersion (token);
-		} while (! (TOKEN_IS_EOF (token) || token->type == '}'));
+		} while (! (tokenIsEOF (token) || token->type == '}'));
 		tokenSkipToType (token, ';');
 	}
 }
@@ -561,24 +561,24 @@ static void findLdScriptTags (void)
 
 	do {
 		tokenRead (token);
-		if (TOKEN_IS_KEYWORD (token, ENTRY))
+		if (tokenIsKeyword (token, ENTRY))
 			parseEntry (token);
-		else if (TOKEN_IS_KEYWORD (token, SECTIONS))
+		else if (tokenIsKeyword (token, SECTIONS))
 			parseSections (token);
-		else if (TOKEN_IS_TYPE(token, IDENTIFIER))
+		else if (tokenIsType(token, IDENTIFIER))
 		{
 			tagEntryInfo e;
 			tokenRead (tmp);
-			if (TOKEN_IS_TYPE(tmp, ASSIGNMENT_OP))
+			if (tokenIsType(tmp, ASSIGNMENT_OP))
 			{
 				makeLdScriptTagMaybe (&e, token,
 									  K_SYMBOL, ROLE_INDEX_DEFINITION);
 				tokenSkipToType (tmp, ';');
 			}
 		}
-		else if (TOKEN_IS_KEYWORD (token, VERSION))
+		else if (tokenIsKeyword (token, VERSION))
 			parseVersions(token);
-	} while (!TOKEN_IS_EOF (token));
+	} while (!tokenIsEOF (token));
 
 	cppTerminate ();
 
