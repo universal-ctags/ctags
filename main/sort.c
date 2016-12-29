@@ -71,6 +71,9 @@ static void appendCstringWithQuotes (vString *dest, const char* cstr)
 {
 	const char* o;
 
+#ifdef WIN32
+	vStringCatS (dest, cstr);
+#else
 	vStringPut (dest, '\'');
 	for (o = cstr; *o; o++)
 	{
@@ -80,6 +83,7 @@ static void appendCstringWithQuotes (vString *dest, const char* cstr)
 			vStringPut (dest, *o);
 	}
 	vStringPut (dest, '\'');
+#endif
 }
 
 extern void externalSortTags (const bool toStdout, MIO *tagFile)

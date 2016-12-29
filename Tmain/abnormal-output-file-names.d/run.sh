@@ -3,6 +3,10 @@
 
 CTAGS=$1
 
+. ../utils.sh
+
+exit_if_win32 "$CTAGS"
+
 rm -f ./"'"
 rm -f ./'"'
 rm -f ./'$(ls)'
