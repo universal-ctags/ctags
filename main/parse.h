@@ -110,6 +110,9 @@ struct sParserDefinition {
 	parameterHandlerTable  *parameterHandlerTable;
 	unsigned int parameterHandlerCount;
 
+	xpathFileSpec *xpathFileSpecs;
+	unsigned int xpathFileSpecCount;
+
 	/* used internally */
 	langType id;		    /* id assigned to language */
 	unsigned int enabled:1;	       /* currently enabled? */
@@ -244,6 +247,8 @@ extern bool hasScopeActionInRegex (const langType language);
 extern bool hasMultilineRegexPatterns (const langType language);
 extern bool matchMultilineRegex (const vString* const allLines, const langType language);
 
+extern unsigned int   getXpathFileSpecCount (const langType language);
+extern xpathFileSpec* getXpathFileSpec (const langType language, unsigned int nth);
 
 #ifdef HAVE_COPROC
 extern bool invokeXcmd (const char* const fileName, const langType language);

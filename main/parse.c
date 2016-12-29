@@ -2579,6 +2579,27 @@ static void installTagXpathTable (const langType language)
 	}
 }
 
+extern unsigned int getXpathFileSpecCount (const langType language)
+{
+	parserDefinition* lang;
+
+	Assert (0 <= language  &&  language < (int) LanguageCount);
+	lang = LanguageTable [language];
+
+	return lang->xpathFileSpecCount;
+}
+
+extern xpathFileSpec* getXpathFileSpec (const langType language, unsigned int nth)
+{
+	parserDefinition* lang;
+
+	Assert (0 <= language  &&  language < (int) LanguageCount);
+	lang = LanguageTable [language];
+
+	Assert (nth < lang->xpathFileSpecCount);
+	return lang->xpathFileSpecs + nth;
+}
+
 extern bool makeKindSeparatorsPseudoTags (const langType language,
 					     const ptagDesc *pdesc)
 {

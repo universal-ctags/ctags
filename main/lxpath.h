@@ -59,6 +59,15 @@ typedef struct sTagXpathTableTable {
 	unsigned int   count;
 } tagXpathTableTable;
 
+typedef struct sXpathFileSpec {
+	const char *rootElementName;
+	const char *nameInDTD;
+	const char *externalID;
+	const char *systemID;
+	const char *rootNSPrefix;
+	const char *rootNSHref;
+} xpathFileSpec;
+
 /* Xpath interface */
 extern void findXMLTags (xmlXPathContext *ctx, xmlNode *root,
 			 const tagXpathTableTable *xpathTableTable,
