@@ -151,6 +151,7 @@ PARSER_SRCS =				\
 	parsers/cxx/cxx_token_chain.c		\
 	parsers/diff.c			\
 	parsers/dosbatch.c		\
+	parsers/dtd.c			\
 	parsers/dts.c			\
 	parsers/eiffel.c		\
 	parsers/erlang.c		\

@@ -57,6 +57,7 @@
 	CUDAParser, \
 	DParser, \
 	DiffParser, \
+	DtdParser, \
 	DTSParser, \
 	DosBatchParser, \
 	EiffelParser, \

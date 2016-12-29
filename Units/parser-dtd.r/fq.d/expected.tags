@@ -1,0 +1,6 @@
+a	input.dtd	/^<!ELEMENT a (b)>$/;"	e
+a	input.dtd	/^<!ATTLIST a$/;"	e	role:attOwner	extra:reference
+id-attr	input.dtd	/^        %id-attr;$/;"	p	element:a	role:partOfAttDef	extra:reference
+a/%id-attr	input.dtd	/^        %id-attr;$/;"	p	element:a	role:partOfAttDef	extra:qualified,reference
+type	input.dtd	/^        type CDATA      "text\/smil-basic-layout"$/;"	a	element:a
+a/@type	input.dtd	/^        type CDATA      "text\/smil-basic-layout"$/;"	a	element:a	extra:qualified
