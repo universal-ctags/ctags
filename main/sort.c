@@ -55,17 +55,48 @@ extern void catFile (MIO *mio)
 # define PE_CONST const
 #endif
 
+/*
+   Output file name should not be evaluated in system(3) function.
+   The name must be used as is. Quotations are required to block the
+   evaluation.
+
+   Normal single-quotes are used to quote a cstring:
+   a => 'a'
+   " => '"'
+
+   If a single-quote is included in the cstring, use double quotes for quoting it.
+   ' => ''"'"''
+*/
+static void appendCstringWithQuotes (vString *dest, const char* cstr)
+{
+	const char* o;
+
+#ifdef WIN32
+	vStringCatS (dest, cstr);
+#else
+	vStringPut (dest, '\'');
+	for (o = cstr; *o; o++)
+	{
+		if (*o == '\'')
+			vStringCatS (dest, "'\"'\"'");
+		else
+			vStringPut (dest, *o);
+	}
+	vStringPut (dest, '\'');
+#endif
+}
+
 extern void externalSortTags (const bool toStdout, MIO *tagFile)
 {
 	const char *const sortNormalCommand = "sort -u";
 	const char *const sortFoldedCommand = "sort -u -f";
 	const char *sortCommand =
 		Option.sorted == SO_FOLDSORTED ? sortFoldedCommand : sortNormalCommand;
+# ifndef HAVE_SETENV
 	PE_CONST char *const sortOrder1 = "LC_COLLATE=C";
 	PE_CONST char *const sortOrder2 = "LC_ALL=C";
-	const size_t length = 4 + strlen (sortOrder1) + strlen (sortOrder2) +
-			strlen (sortCommand) + (2 * strlen (tagFileName ()));
-	char *const cmd = (char *) malloc (length + 1);
+# endif
+	vString *cmd = vStringNew ();
 	int ret = -1;
 
 	if (cmd != NULL)
@@ -80,19 +111,29 @@ extern void externalSortTags (const bool toStdout, MIO *tagFile)
 		putenv (sortOrder1);
 		putenv (sortOrder2);
 # endif
-		if (toStdout)
-			sprintf (cmd, "%s", sortCommand);
-		else
-			sprintf (cmd, "%s -o %s %s", sortCommand,
-					tagFileName (), tagFileName ());
+		vStringCatS (cmd, sortCommand);
+		if (! toStdout)
+		{
+			vStringCatS (cmd, " -o ");
+			appendCstringWithQuotes (cmd, tagFileName ());
+			vStringPut (cmd, ' ');
+			appendCstringWithQuotes (cmd, tagFileName ());
+		}
 #else
-		if (toStdout)
-			sprintf (cmd, "%s %s %s", sortOrder1, sortOrder2, sortCommand);
-		else
-			sprintf (cmd, "%s %s %s -o %s %s", sortOrder1, sortOrder2,
-					sortCommand, tagFileName (), tagFileName ());
+		vStringCatS (cmd, sortOrder1);
+		vStringPut (cmd, ' ');
+		vStringCatS (cmd, sortOrder2);
+		vStringPut (cmd, ' ');
+		vStringCatS (cmd, sortCommand);
+		if (! toStdout)
+		{
+			vStringCats (cmd, " -o ");
+			appendCstringWithQuotes (cmd, tagFileName ());
+			vStringPut (cmd, ' ');
+			appendCstringWithQuotes (cmd, tagFileName ());
+		}
 #endif
-		verbose ("system (\"%s\")\n", cmd);
+		verbose ("system (\"%s\")\n", vStringValue (cmd));
 		if (toStdout)
 		{
 			const int fdstdin = 0;
@@ -105,15 +146,14 @@ extern void externalSortTags (const bool toStdout, MIO *tagFile)
 				error (FATAL | PERROR, "cannot redirect stdin");
 			if (lseek (fdstdin, 0, SEEK_SET) != 0)
 				error (FATAL | PERROR, "cannot rewind tag file");
-			ret = system (cmd);
+			ret = system (vStringValue (cmd));
 			if (dup2 (fdsave, fdstdin) < 0)
 				error (FATAL | PERROR, "cannot restore stdin fd");
 			close (fdsave);
 		}
 		else
-			ret = system (cmd);
-		free (cmd);
-
+			ret = system (vStringValue (cmd));
+		vStringDelete (cmd);
 	}
 	if (ret != 0)
 		error (FATAL | PERROR, "cannot sort tag file");
