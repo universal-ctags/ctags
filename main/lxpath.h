@@ -60,6 +60,10 @@ typedef struct sTagXpathTableTable {
 } tagXpathTableTable;
 
 typedef struct sXpathFileSpec {
+	/*
+	   NULL represents the associated field in DTD is not examined.
+	   "" (an empty string) represents the associated field in DTD
+	   (and root element) must not exist. */
 	const char *rootElementName;
 	const char *nameInDTD;
 	const char *externalID;
