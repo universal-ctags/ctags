@@ -216,7 +216,21 @@ static bool fileNameMatched (
 		const vString* const vpattern, const char* const fileName)
 {
 	const char* const pattern = vStringValue (vpattern);
+
+#ifdef CASE_INSENSITIVE_FILENAMES
+	{
+		bool r;
+
+		char* const p = newUpperString (pattern);
+		char* const f = newUpperString (fileName);
+		r =  (bool) (fnmatch (p, f, 0) == 0);
+		eFree (f);
+		eFree (p);
+		return r;
+	}
+#else
 	return (bool) (fnmatch (pattern, fileName, 0) == 0);
+#endif
 }
 
 extern bool stringListFileMatched (

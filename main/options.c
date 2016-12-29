@@ -492,6 +492,9 @@ static const char *const Features [] = {
 #ifdef HAVE_LIBYAML
 	"yaml",
 #endif
+#ifdef CASE_INSENSITIVE_FILENAMES
+	"case-insensitive-filenames",
+#endif
 	NULL
 };
 
