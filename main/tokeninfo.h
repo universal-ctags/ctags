@@ -41,7 +41,7 @@ struct tokenTypePair {
 };
 
 #define TOKEN(X)  ((tokenInfo *)X)
-#define TOKEN_X(X,T)  ((T *)(((char *)TOKEN(X)) + sizeof (tokenInfo)))
+#define TOKENX(X,T)  ((T *)(((char *)TOKEN(X)) + sizeof (tokenInfo)))
 
 struct tokenInfoClass {
 	unsigned int nPreAlloc;
@@ -61,6 +61,9 @@ struct tokenInfoClass {
 };
 
 void *newToken       (struct tokenInfoClass *klass);
+void *newTokenByCopying (tokenInfo *src);
+void *newTokenByCopyingFull (tokenInfo *src, void *data);
+
 void  flashTokenBacklog (struct tokenInfoClass *klass);
 void  tokenDestroy    (tokenInfo *token);
 
@@ -75,18 +78,13 @@ void tokenCopy       (tokenInfo *dest, tokenInfo *src);
 
 /* Helper macro & functions */
 
-#define TOKEN_IS_TYPE(TKN,T)     ((TKN)->type == TOKEN_##T)
-#define TOKEN_IS_KEYWORD(TKN,K)  ((TKN)->type == TKN->klass->typeForKeyword \
+#define tokenIsType(TKN,T)     ((TKN)->type == TOKEN_##T)
+#define tokenIsKeyword(TKN,K)  ((TKN)->type == TKN->klass->typeForKeyword \
 									&& (TKN)->keyword == KEYWORD_##K)
-#define TOKEN_IS_EOF(TKN)      ((TKN)->type == (TKN)->klass->typeForEOF)
+#define tokenIsEOF(TKN)      ((TKN)->type == (TKN)->klass->typeForEOF)
 
-#define TOKEN_STRING(TKN)	   (vStringValue ((TKN)->string))
-#define TOKEN_PUTC(TKN,C)      (vStringPut ((TKN)->string, C))
-
-bool tokenIsType          (tokenInfo *token, tokenType t);
-bool tokenIsKeyword       (tokenInfo *token, tokenKeyword k);
-
-const char* const tokenString (tokenInfo *token);
+#define tokenString(TKN)	   (vStringValue ((TKN)->string))
+#define tokenPutc(TKN,C)      (vStringPut ((TKN)->string, C))
 
 /* return true if t is found. In that case token holds an
    language object type t.
