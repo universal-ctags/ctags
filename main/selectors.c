@@ -119,7 +119,9 @@ tastePerlLine (const char *line, void *data CTAGS_ATTR_UNUSED)
 }
 
 const char *
-selectByPickingPerlVersion (MIO *input)
+selectByPickingPerlVersion (MIO *input,
+							langType *candidates CTAGS_ATTR_UNUSED,
+							unsigned int nCandidates CTAGS_ATTR_UNUSED)
 {
     /* Default to Perl 5 */
     return selectByLines (input, tastePerlLine, TR_PERL5, NULL);
@@ -160,7 +162,9 @@ tasteObjectiveCOrMatLabLines (const char *line, void *data CTAGS_ATTR_UNUSED)
 }
 
 const char *
-selectByObjectiveCAndMatLabKeywords (MIO * input)
+selectByObjectiveCAndMatLabKeywords (MIO * input,
+									 langType *candidates CTAGS_ATTR_UNUSED,
+									 unsigned int nCandidates CTAGS_ATTR_UNUSED)
 {
     return selectByLines (input, tasteObjectiveCOrMatLabLines,
 			  NULL, NULL);
@@ -178,7 +182,9 @@ tasteObjectiveC (const char *line, void *data CTAGS_ATTR_UNUSED)
 }
 
 const char *
-selectByObjectiveCKeywords (MIO * input)
+selectByObjectiveCKeywords (MIO * input,
+							langType *candidates CTAGS_ATTR_UNUSED,
+							unsigned int nCandidates CTAGS_ATTR_UNUSED)
 {
     /* TODO: Ideally opening input should be delayed til
        enable/disable based selection is done. */
@@ -218,7 +224,9 @@ tasteR (const char *line, void *data CTAGS_ATTR_UNUSED)
 }
 
 const char *
-selectByArrowOfR (MIO *input)
+selectByArrowOfR (MIO *input,
+				  langType *candidates CTAGS_ATTR_UNUSED,
+				  unsigned int nCandidates CTAGS_ATTR_UNUSED)
 {
     /* TODO: Ideally opening input should be delayed till
        enable/disable based selection is done. */
@@ -264,7 +272,9 @@ tasteREXXOrDosBatch (const char *line, void *data)
 }
 
 const char *
-selectByRexxCommentAndDosbatchLabelPrefix (MIO *input)
+selectByRexxCommentAndDosbatchLabelPrefix (MIO *input,
+										   langType *candidates CTAGS_ATTR_UNUSED,
+										   unsigned int nCandidates CTAGS_ATTR_UNUSED)
 {
     /* TODO: Ideally opening input should be delayed till
        enable/disable based selection is done. */
@@ -370,7 +380,9 @@ selectParserForXmlDoc (xmlDocPtr doc)
 }
 
 const char *
-selectByDTD (MIO *input)
+selectByDTD (MIO *input,
+			 langType *candidates,
+			 unsigned int nCandidates)
 {
 	xmlDocPtr doc;
 	const char *r = NULL;

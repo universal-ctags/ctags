@@ -28,6 +28,6 @@ struct sParserDefinition;
 typedef struct sParserDefinition parserDefinition;
 
 struct _MIO;
-typedef const char * (*selectLanguage) (struct _MIO *);
+typedef const char * (*selectLanguage) (struct _MIO *, langType *, unsigned int);
 
 #endif	/* CTAGS_MAIN_TYPES_H */
