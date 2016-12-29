@@ -54,8 +54,6 @@ typedef void (*parserInitialize) (langType language);
    is called. */
 typedef void (*parserFinalize) (langType language, bool initialized);
 
-typedef const char * (*selectLanguage) (MIO *);
-
 typedef enum {
 	METHOD_NOT_CRAFTED    = 1 << 0,
 	METHOD_REGEX          = 1 << 1,
