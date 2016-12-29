@@ -317,14 +317,24 @@ xmlParseMIO (MIO *input)
 static const char *
 selectParserForXmlDoc (xmlDocPtr doc)
 {
-	if (doc && doc->children && doc->children->name)
-		verbose ("		Xml[root name]: %s\n", doc->children->name);
-	if (doc && doc->intSubset && doc->intSubset->ExternalID)
-		verbose ("		Xml[ExternalID]: %s\n", doc->intSubset->ExternalID);
-	if (doc && doc->intSubset && doc->intSubset->SystemID)
-		verbose ("		Xml[SystemID]: %s\n", doc->intSubset->SystemID);
-	if (doc && doc->children && doc->children->ns && doc->children->ns->href)
-		verbose ("		Xml[NS]: %s\n", doc->children->ns->href);
+	verbose ("		Xml[rootElementName]: %s\n",
+			 (doc->children && doc->children->name)
+			 ? ((char *)doc->children->name): "-");
+	verbose ("		Xml[nameInDTD]: %s\n",
+			 (doc->intSubset && doc->intSubset->name)
+			 ? ((char *)doc->intSubset->name): "-");
+	verbose ("		Xml[externalID]: %s\n",
+			 (doc->intSubset && doc->intSubset->ExternalID)
+			 ? ((char *)doc->intSubset->ExternalID): "-");
+	verbose ("		Xml[systemID]: %s\n",
+			 (doc->intSubset && doc->intSubset->SystemID)
+			 ? ((char *)doc->intSubset->SystemID): "-");
+	verbose ("		Xml[rootNSPrefix]: %s\n",
+			 (doc->children && doc->children->ns && doc->children->ns->prefix)
+			 ? ((char *)doc->children->ns->prefix): "-");
+	verbose ("		Xml[rootNSHref]: %s\n",
+			 (doc->children && doc->children->ns && doc->children->ns->href)
+			 ? ((char *)doc->children->ns->href): "-");
 
 	/* These conditions should be part of parsers. */
 	if (doc->children
