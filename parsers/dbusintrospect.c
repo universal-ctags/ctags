@@ -143,7 +143,7 @@ DbusIntrospectParser (void)
 {
 	static const char *const extensions [] = { "xml", NULL };
 	parserDefinition* const def = parserNew ("DBusIntrospect");
-	static selectLanguage selectors[] = { selectByDTD, NULL };
+	static selectLanguage selectors[] = { selectByXpathFileSpec, NULL };
 
 	static xpathFileSpec xpathFileSpecs[] = {
 		{

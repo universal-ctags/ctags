@@ -250,7 +250,7 @@ Maven2Parser (void)
 	static const char *const extensions [] = { "pom", "xml", NULL };
 	static const char *const patterns [] =   { "pom.xml", NULL };
 	parserDefinition* const def = parserNew ("Maven2");
-	static selectLanguage selectors[] = { selectByDTD, NULL };
+	static selectLanguage selectors[] = { selectByXpathFileSpec, NULL };
 
 	static xpathFileSpec xpathFileSpecs[] = {
 		{

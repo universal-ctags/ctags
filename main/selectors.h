@@ -29,7 +29,7 @@ selectByRexxCommentAndDosbatchLabelPrefix (MIO *, langType *, unsigned int);
 
 #ifdef HAVE_LIBXML
 const char *
-selectByDTD (MIO *input, langType *candidates, unsigned int nCandidates);
+selectByXpathFileSpec (MIO *input, langType *candidates, unsigned int nCandidates);
 #endif
 
 #endif

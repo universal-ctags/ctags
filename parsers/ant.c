@@ -224,7 +224,7 @@ extern parserDefinition* AntParser (void)
 	static const char *const patterns [] = { "build.xml", NULL };
 	parserDefinition* const def = parserNew ("Ant");
 #ifdef HAVE_LIBXML
-	static selectLanguage selectors[] = { selectByDTD, NULL };
+	static selectLanguage selectors[] = { selectByXpathFileSpec, NULL };
 	static xpathFileSpec xpathFileSpecs[] = {
 		/* See http://ant.apache.org/faq.html#dtd */
 		{

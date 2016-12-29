@@ -460,9 +460,9 @@ selectParserForXmlDoc (xmlDocPtr doc,
 }
 
 const char *
-selectByDTD (MIO *input,
-			 langType *candidates,
-			 unsigned int nCandidates)
+selectByXpathFileSpec (MIO *input,
+					   langType *candidates,
+					   unsigned int nCandidates)
 {
 	xmlDocPtr doc;
 	const char *r = NULL;
