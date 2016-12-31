@@ -309,12 +309,13 @@ syntax: ONIG_SYNTAX_RUBY (default)
                         same as \k<name>.
 
   (?~subexp)        absent operator (experimental)
-                    Matches any string which doesn't have subexp as its suffix.
+                    Matches any string which doesn't contain any string which
+                    matches subexp.
                     Similar to (?:(?!subexp).)*, but easy to write.
 
                     E.g.:
-                      (?~abc) matches: "", "ab", "aab", "cccc", etc.
-                      It doesn't match: "abc", "aabc", "ccccabc", etc.
+                      (?~abc) matches: "", "ab", "aab", "ccdd", etc.
+                      It doesn't match: "abc", "aabc", "ccabcdd", etc.
 
                       \/\*(?~\*\/)\*\/ matches C style comments:
                         "/**/", "/* foobar */", etc.
