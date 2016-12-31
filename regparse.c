@@ -5040,7 +5040,9 @@ parse_enclose(Node** np, OnigToken* tok, int term, UChar** src, UChar* end,
 	named_group1:
 	  list_capture = 0;
 
+# ifdef USE_CAPTURE_HISTORY
 	named_group2:
+# endif
 	  name = p;
 	  r = fetch_name((OnigCodePoint )c, &p, end, &name_end, env, &num, 0);
 	  if (r < 0) return r;
