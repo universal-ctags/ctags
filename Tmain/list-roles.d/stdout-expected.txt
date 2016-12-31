@@ -2,6 +2,7 @@
 #
 #
 #
+Asm	s	placement	placement where the assembled code goes	on
 Automake	d	program	directory for PROGRAMS primary	on
 Automake	d	man	directory for MANS primary	on
 Automake	d	ltlibrary	directory for LTLIBRARIES primary	on
@@ -48,6 +49,7 @@ Vera	h	local	local header	on
 #
 # all.*
 #
+Asm	s	placement	placement where the assembled code goes	on
 Automake	d	program	directory for PROGRAMS primary	on
 Automake	d	man	directory for MANS primary	on
 Automake	d	ltlibrary	directory for LTLIBRARIES primary	on
