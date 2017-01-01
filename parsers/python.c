@@ -630,7 +630,7 @@ getNextChar:
 			}
 			else
 			{
-				/* FIXME: handle U, B and R string prefixes? */
+				/* FIXME: handle U, B, R and F string prefixes? */
 				readIdentifier (token->string, c);
 				token->keyword = lookupKeyword (vStringValue (token->string), Lang_python);
 				if (token->keyword == KEYWORD_NONE)

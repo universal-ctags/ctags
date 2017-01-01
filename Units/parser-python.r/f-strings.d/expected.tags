@@ -1,0 +1,3 @@
+extra	input.py	/^extra = f'{extra},waiters:{len(self._waiters)}'$/;"	v
+methoddef_name	input.py	/^methoddef_name = f"{c_basename.upper()}_METHODDEF"$/;"	v
+zzz	input.py	/^zzz = 1$/;"	v
