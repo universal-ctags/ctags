@@ -1,0 +1,6 @@
+np	input.py	/^import numpy as np$/;"	I
+dotFunc	input.py	/^def dotFunc():$/;"	f	decorators:something
+dotMethod	input.py	/^def dotMethod():$/;"	f	decorators:something
+atOpv1	input.py	/^def atOpv1():$/;"	f	decorators:something
+atOpv2	input.py	/^def atOpv2():$/;"	f
+atOpv3	input.py	/^def atOpv3():$/;"	f	decorators:something
