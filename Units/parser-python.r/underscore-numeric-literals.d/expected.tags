@@ -1,0 +1,4 @@
+amount	input.py	/^amount = 10_000_000.0$/;"	v
+addr	input.py	/^addr = 0xCAFE_F00D$/;"	v
+flags	input.py	/^flags = 0b_0011_1111_0100_1110$/;"	v
+flags2	input.py	/^flags2 = int('0b_1111_0000', 2)$/;"	v
