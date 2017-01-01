@@ -1078,6 +1078,43 @@ static bool parseImport (tokenInfo *const token)
 	return false;
 }
 
+/* this only handles the most common cases, but an annotation can be any
+ * expression in theory.
+ * this function assumes there must be an annotation, and doesn't do any check
+ * on the token on which it is called: the caller should do that part. */
+static bool skipTypeAnnotation (tokenInfo *const token)
+{
+	bool readNext = true;
+
+	readToken (token);
+	switch (token->type)
+	{
+		case '[': readNext = skipOverPair (token, '[', ']', NULL, false); break;
+		case '(': readNext = skipOverPair (token, '(', ')', NULL, false); break;
+		case '{': readNext = skipOverPair (token, '{', '}', NULL, false); break;
+	}
+	if (readNext)
+		readToken (token);
+	/* skip subscripts and calls */
+	while (token->type == '[' || token->type == '(' || token->type == '.')
+	{
+		switch (token->type)
+		{
+			case '[': readNext = skipOverPair (token, '[', ']', NULL, false); break;
+			case '(': readNext = skipOverPair (token, '(', ')', NULL, false); break;
+			case '.':
+				readToken (token);
+				readNext = token->type == TOKEN_IDENTIFIER;
+				break;
+			default:  readNext = false; break;
+		}
+		if (readNext)
+			readToken (token);
+	}
+
+	return false;
+}
+
 static bool parseVariable (tokenInfo *const token, const pythonKind kind)
 {
 	/* In order to support proper tag type for lambdas in multiple
@@ -1111,6 +1148,11 @@ static bool parseVariable (tokenInfo *const token, const pythonKind kind)
 		}
 
 		nameTokens[nameCount++] = name;
+
+		/* skip annotations.  we need not to be too permissive because we
+		 * aren't yet sure we're actually parsing a variable. */
+		if (token->type == ':' && skipTypeAnnotation (token))
+			readToken (token);
 
 		if (token->type == ',')
 			readToken (token);
