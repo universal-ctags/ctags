@@ -1,0 +1,15 @@
+read_data	input.py	/^async def read_data(db):$/;"	f
+commit	input.py	/^async def commit(session, data):$/;"	f
+Cursor	input.py	/^class Cursor:$/;"	c
+__init__	input.py	/^    def __init__(self):$/;"	m	class:Cursor
+_prefetch	input.py	/^    async def _prefetch(self):$/;"	m	class:Cursor
+__aiter__	input.py	/^    def __aiter__(self):$/;"	m	class:Cursor
+__anext__	input.py	/^    async def __anext__(self):$/;"	m	class:Cursor
+AsyncIteratorWrapper	input.py	/^class AsyncIteratorWrapper:$/;"	c
+__init__	input.py	/^    def __init__(self, obj):$/;"	m	class:AsyncIteratorWrapper
+__aiter__	input.py	/^    def __aiter__(self):$/;"	m	class:AsyncIteratorWrapper
+__anext__	input.py	/^    async def __anext__(self):$/;"	m	class:AsyncIteratorWrapper
+ticker	input.py	/^async def ticker(delay, to):$/;"	f
+TestDecorators	input.py	/^class TestDecorators:$/;"	c
+simplestuff	input.py	/^    def simplestuff():$/;"	m	class:TestDecorators	decorators:staticmethod
+something	input.py	/^    async def something(other):$/;"	m	class:TestDecorators	decorators:staticmethod

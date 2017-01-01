@@ -32,6 +32,7 @@
 
 enum {
 	KEYWORD_as,
+	KEYWORD_async,
 	KEYWORD_cdef,
 	KEYWORD_class,
 	KEYWORD_cpdef,
@@ -144,6 +145,7 @@ static kindOption PythonKinds[COUNT_KIND] = {
 static const keywordTable PythonKeywordTable[] = {
 	/* keyword			keyword ID */
 	{ "as",				KEYWORD_as				},
+	{ "async",			KEYWORD_async			},
 	{ "cdef",			KEYWORD_cdef			},
 	{ "cimport",		KEYWORD_import			},
 	{ "class",			KEYWORD_class			},
@@ -1251,6 +1253,10 @@ static void findPythonTags (void)
 	{
 		tokenType iterationTokenType = token->type;
 		bool readNext = true;
+
+		/* skip async keyword that confuses decorator parsing before a def */
+		if (token->keyword == KEYWORD_async)
+			readToken (token);
 
 		if (token->type == TOKEN_INDENT)
 			setIndent (token);
