@@ -216,7 +216,7 @@ static int makeLdScriptTagMaybe (tagEntryInfo *const e, tokenInfo *const token,
 }
 
 #define isIdentifierChar(c)										\
-	(isalnum (c) || (c) == '_' || (c) == '.' || (c) >= 0x80)
+	(isalnum (c) || (c) == '_' || (c) == '.' || (c) == '-' || (c) >= 0x80)
 
 static int readPrefixedToken (tokenInfo *const token, int type)
 {
