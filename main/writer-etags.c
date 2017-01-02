@@ -90,16 +90,22 @@ static int writeEtagsEntry (tagWriter *writer,
 				tag->name, tag->lineNumber);
 	else
 	{
+		size_t len;
 		long seekValue;
 		char *const line =
 				readLineFromBypassAnyway (etags->vLine, tag, &seekValue);
 		if (line == NULL)
 			return 0;
 
+		len = strlen (line);
+
 		if (tag->truncateLine)
 			truncateTagLine (line, tag->name, true);
 		else
-			line [strlen (line) - 1] = '\0';
+			line [len - 1] = '\0';
+
+		if (Option.patternLengthLimit < len)
+			line [Option.patternLengthLimit - 1] = '\0';
 
 		length = mio_printf (mio, "%s\177%s\001%lu,%ld\n", line,
 				tag->name, tag->lineNumber, seekValue);
