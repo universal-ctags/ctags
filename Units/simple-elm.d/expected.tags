@@ -1,16 +1,16 @@
-Cons a	input.elm	/^    = Cons a$/;"	c	type:Param a
-Json.Encode as Je	input.elm	/^import Json.Encode as Je$/;"	i
-List	input.elm	/^import List$/;"	i
 Main	input.elm	/^port module Main exposing (..)$/;"	m
+List	input.elm	/^import List$/;"	i
 Maybe	input.elm	/^import Maybe exposing (withDefault)$/;"	i
-Num	input.elm	/^type alias Num =$/;"	a
-One	input.elm	/^    = One$/;"	c	type:Thing
-Other a	input.elm	/^    | Other a$/;"	c	type:Param a
-Param a	input.elm	/^type Param a$/;"	t
+Json.Encode as Je	input.elm	/^import Json.Encode as Je$/;"	i
 Thing	input.elm	/^type Thing$/;"	t
+One	input.elm	/^    = One$/;"	c	type:Thing
 Two Int	input.elm	/^    | Two Int$/;"	c	type:Thing
+Param a	input.elm	/^type Param a$/;"	t
+Cons a	input.elm	/^    = Cons a$/;"	c	type:Param a
+Other a	input.elm	/^    | Other a$/;"	c	type:Param a
+Num	input.elm	/^type alias Num =$/;"	a
+outward	input.elm	/^port outward : String -> Cmd a$/;"	p
+inward	input.elm	/^port inward : (b -> a) -> Sub a$/;"	p
+foo	input.elm	/^foo a =$/;"	f
 bar	input.elm	/^bar =$/;"	f
 bas	input.elm	/^        bas =$/;"	f	function:bar
-foo	input.elm	/^foo a =$/;"	f
-inward	input.elm	/^port inward : (b -> a) -> Sub a$/;"	p
-outward	input.elm	/^port outward : String -> Cmd a$/;"	p
