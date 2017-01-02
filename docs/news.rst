@@ -46,6 +46,7 @@ The following parsers have been added:
 * Diff
 * DTD
 * DTS
+* Elm *optlib*
 * Falcon
 * Glade *libxml*
 * Go

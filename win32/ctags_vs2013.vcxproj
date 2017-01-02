@@ -107,6 +107,7 @@
     <ClCompile Include="..\parsers\clojure.c" />
     <ClCompile Include="..\parsers\cobol.c" />
     <ClCompile Include="..\optlib\CoffeeScript.c" />
+    <ClCompile Include="..\optlib\elm.c" />
     <ClCompile Include="..\parsers\css.c" />
     <ClCompile Include="..\optlib\ctags-optlib.c" />
     <ClCompile Include="..\main\debug.c" />
