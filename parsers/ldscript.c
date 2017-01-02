@@ -31,7 +31,9 @@ static roleDesc LdScriptSymbolRoles [] = {
 };
 
 typedef enum {
-	K_SECTION, K_SYMBOL, K_VERSION,
+	K_SECTION,
+	K_SYMBOL,
+	K_VERSION,
 } ldScriptKind;
 
 static kindOption LdScriptKinds [] = {
