@@ -18,18 +18,10 @@
 #include "dependency.h"
 #include "field.h"
 #include "kind.h"
+#include "lxpath.h"
 #include "param.h"
 #include "parsers.h"  /* contains list of parsers */
 #include "strlist.h"
-
-#ifdef HAVE_LIBXML
-#include <libxml/xpath.h>
-#include <libxml/tree.h>
-#else
-#define xmlNode void
-#define xmlXPathCompExpr void
-#define xmlXPathContext void
-#endif
 
 /*
 *   MACROS
@@ -62,8 +54,6 @@ typedef void (*parserInitialize) (langType language);
    is called. */
 typedef void (*parserFinalize) (langType language, bool initialized);
 
-typedef const char * (*selectLanguage) (MIO *);
-
 typedef enum {
 	METHOD_NOT_CRAFTED    = 1 << 0,
 	METHOD_REGEX          = 1 << 1,
@@ -80,44 +70,6 @@ typedef struct {
 	const char *const flags;
 	bool    *disabled;
 } tagRegexTable;
-
-typedef struct sTagXpathMakeTagSpec {
-	int   kind;
-	int   role;
-	/* If make is NULL, just makeTagEntry is used instead. */
-	void (*make) (xmlNode *node,
-		      const struct sTagXpathMakeTagSpec *spec,
-		      tagEntryInfo *tag,
-		      void *userData);
-} tagXpathMakeTagSpec;
-
-typedef struct sTagXpathRecurSpec {
-	void (*enter) (xmlNode *node,
-		       const struct sTagXpathRecurSpec *spec,
-		       xmlXPathContext *ctx,
-		       void *userData);
-
-	int  nextTable;		/* A parser can use this field any purpose.
-				   main/lxpath part doesn't touch this. */
-
-} tagXpathRecurSpec;
-
-typedef struct sTagXpathTable
-{
-	const char *const xpath;
-	enum  { LXPATH_TABLE_DO_MAKE, LXPATH_TABLE_DO_RECUR } specType;
-	union {
-		tagXpathMakeTagSpec makeTagSpec;
-		tagXpathRecurSpec   recurSpec;
-	} spec;
-	xmlXPathCompExpr* xpathCompiled;
-} tagXpathTable;
-
-typedef struct sTagXpathTableTable {
-	tagXpathTable *table;
-	unsigned int   count;
-} tagXpathTableTable;
-
 
 typedef struct {
 	const char *name;
@@ -157,6 +109,9 @@ struct sParserDefinition {
 
 	parameterHandlerTable  *parameterHandlerTable;
 	unsigned int parameterHandlerCount;
+
+	xpathFileSpec *xpathFileSpecs;
+	unsigned int xpathFileSpecCount;
 
 	/* used internally */
 	langType id;		    /* id assigned to language */
@@ -292,6 +247,8 @@ extern bool hasScopeActionInRegex (const langType language);
 extern bool hasMultilineRegexPatterns (const langType language);
 extern bool matchMultilineRegex (const vString* const allLines, const langType language);
 
+extern unsigned int   getXpathFileSpecCount (const langType language);
+extern xpathFileSpec* getXpathFileSpec (const langType language, unsigned int nth);
 
 #ifdef HAVE_COPROC
 extern bool invokeXcmd (const char* const fileName, const langType language);
@@ -309,13 +266,6 @@ extern void foreachXcmdKinds (const langType language, bool (* func) (kindOption
 extern void freeXcmdResources (void);
 extern void useXcmdMethod (const langType language);
 extern void notifyAvailabilityXcmdMethod (const langType language);
-
-/* Xpath interface */
-extern void findXMLTags (xmlXPathContext *ctx, xmlNode *root,
-			 const tagXpathTableTable *xpathTableTable,
-			 const kindOption* const kinds, void *userData);
-extern void addTagXpath (const langType language, tagXpathTable *xpathTable);
-
 
 extern bool makeKindSeparatorsPseudoTags (const langType language,
 					     const ptagDesc *pdesc);

@@ -809,9 +809,19 @@ commonSelector (const parserCandidate *candidates, int n_candidates)
  * language associated with the string returned by the selector.
  */
 static int
-pickLanguageBySelection (selectLanguage selector, MIO *input)
+pickLanguageBySelection (selectLanguage selector, MIO *input,
+						 parserCandidate *candidates,
+						 unsigned int nCandidates)
 {
-    const char *lang = selector(input);
+	const char *lang;
+	langType *cs = xMalloc(nCandidates, langType);
+	int i;
+
+	for (i = 0; i < nCandidates; i++)
+		cs[i] = candidates[i].lang;
+    lang = selector(input, cs, nCandidates);
+	eFree (cs);
+
     if (lang)
     {
         verbose ("		selection: %s\n", lang);
@@ -930,7 +940,7 @@ static langType getSpecLanguageCommon (const char *const spec, struct getLangCtx
 		GLC_FOPEN_IF_NECESSARY(glc, fopen_error, memStreamRequired);
 		if (selector) {
 			verbose ("	selector: %p\n", selector);
-			language = pickLanguageBySelection(selector, glc->input);
+			language = pickLanguageBySelection(selector, glc->input, candidates, n_candidates);
 		} else {
 			verbose ("	selector: NONE\n");
 		fopen_error:
@@ -2567,6 +2577,27 @@ static void installTagXpathTable (const langType language)
 				addTagXpath (language, lang->tagXpathTableTable[i].table + j);
 		useXpathMethod (language);
 	}
+}
+
+extern unsigned int getXpathFileSpecCount (const langType language)
+{
+	parserDefinition* lang;
+
+	Assert (0 <= language  &&  language < (int) LanguageCount);
+	lang = LanguageTable [language];
+
+	return lang->xpathFileSpecCount;
+}
+
+extern xpathFileSpec* getXpathFileSpec (const langType language, unsigned int nth)
+{
+	parserDefinition* lang;
+
+	Assert (0 <= language  &&  language < (int) LanguageCount);
+	lang = LanguageTable [language];
+
+	Assert (nth < lang->xpathFileSpecCount);
+	return lang->xpathFileSpecs + nth;
 }
 
 extern bool makeKindSeparatorsPseudoTags (const langType language,

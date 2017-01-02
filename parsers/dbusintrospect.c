@@ -143,8 +143,17 @@ DbusIntrospectParser (void)
 {
 	static const char *const extensions [] = { "xml", NULL };
 	parserDefinition* const def = parserNew ("DBusIntrospect");
-	static selectLanguage selectors[] = { selectByDTD, NULL };
+	static selectLanguage selectors[] = { selectByXpathFileSpec, NULL };
 
+	static xpathFileSpec xpathFileSpecs[] = {
+		{
+			/* <!DOCTYPE node PUBLIC "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN"
+			   "http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
+			   <node ... */
+			.externalID = "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN",
+			.systemID   = "http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd",
+		},
+	};
 	def->kinds         = DbusIntrospectKinds;
 	def->kindCount     = ARRAY_SIZE (DbusIntrospectKinds);
 	def->extensions    = extensions;
@@ -153,5 +162,8 @@ DbusIntrospectParser (void)
 	def->tagXpathTableCount = ARRAY_SIZE (dbusIntrospectXpathTableTable);
 	def->useCork = true;
 	def->selectLanguage = selectors;
+	def->xpathFileSpecs = xpathFileSpecs;
+	def->xpathFileSpecCount = ARRAY_SIZE (xpathFileSpecs);
+
 	return def;
 }

@@ -247,10 +247,17 @@ findMaven2Tags (void)
 extern parserDefinition*
 Maven2Parser (void)
 {
-	static const char *const extensions [] = { "pom", NULL };
+	static const char *const extensions [] = { "pom", "xml", NULL };
 	static const char *const patterns [] =   { "pom.xml", NULL };
 	parserDefinition* const def = parserNew ("Maven2");
-	static selectLanguage selectors[] = { selectByDTD, NULL };
+	static selectLanguage selectors[] = { selectByXpathFileSpec, NULL };
+
+	static xpathFileSpec xpathFileSpecs[] = {
+		{
+			.rootElementName = "project",
+			.rootNSHref      = "http://maven.apache.org/POM/4.0.0",
+		},
+	};
 
 	def->kinds         = Maven2Kinds;
 	def->kindCount     = ARRAY_SIZE (Maven2Kinds);
@@ -263,5 +270,7 @@ Maven2Parser (void)
 	def->selectLanguage = selectors;
 	def->fieldSpecs = Maven2Fields;
 	def->fieldSpecCount = ARRAY_SIZE (Maven2Fields);
+	def->xpathFileSpecs = xpathFileSpecs;
+	def->xpathFileSpecCount = ARRAY_SIZE (xpathFileSpecs);
 	return def;
 }

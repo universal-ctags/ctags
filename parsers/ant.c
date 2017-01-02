@@ -224,7 +224,26 @@ extern parserDefinition* AntParser (void)
 	static const char *const patterns [] = { "build.xml", NULL };
 	parserDefinition* const def = parserNew ("Ant");
 #ifdef HAVE_LIBXML
-	static selectLanguage selectors[] = { selectByDTD, NULL };
+	static selectLanguage selectors[] = { selectByXpathFileSpec, NULL };
+	static xpathFileSpec xpathFileSpecs[] = {
+		/* See http://ant.apache.org/faq.html#dtd */
+		{
+			.rootElementName = "project",
+			.nameInDTD       = "",
+			.externalID      = "",
+			.systemID        = "",
+			.rootNSPrefix    = "",
+			.rootNSHref      = "",
+		},
+		{
+			.rootElementName = "project",
+			.nameInDTD       = "project",
+			.externalID      = "",
+			.systemID        = "",
+			.rootNSPrefix    = "",
+			.rootNSHref      = "",
+		}
+	};
 #endif
 	def->extensions = extensions;
 	def->patterns = patterns;
@@ -236,6 +255,8 @@ extern parserDefinition* AntParser (void)
 	def->tagXpathTableCount = ARRAY_SIZE (antXpathTableTable);
 	def->useCork = true;
 	def->selectLanguage = selectors;
+	def->xpathFileSpecs = xpathFileSpecs;
+	def->xpathFileSpecCount = ARRAY_SIZE (xpathFileSpecs);
 #else
 	def->tagRegexTable = antTagRegexTable;
 	def->tagRegexCount = ARRAY_SIZE (antTagRegexTable);

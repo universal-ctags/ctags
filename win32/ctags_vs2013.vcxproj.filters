@@ -455,6 +455,9 @@
     <ClInclude Include="..\main\parse.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\main\lxpath.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="..\main\parsers.h">
       <Filter>Header Files</Filter>
     </ClInclude>

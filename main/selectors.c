@@ -119,7 +119,9 @@ tastePerlLine (const char *line, void *data CTAGS_ATTR_UNUSED)
 }
 
 const char *
-selectByPickingPerlVersion (MIO *input)
+selectByPickingPerlVersion (MIO *input,
+							langType *candidates CTAGS_ATTR_UNUSED,
+							unsigned int nCandidates CTAGS_ATTR_UNUSED)
 {
     /* Default to Perl 5 */
     return selectByLines (input, tastePerlLine, TR_PERL5, NULL);
@@ -160,7 +162,9 @@ tasteObjectiveCOrMatLabLines (const char *line, void *data CTAGS_ATTR_UNUSED)
 }
 
 const char *
-selectByObjectiveCAndMatLabKeywords (MIO * input)
+selectByObjectiveCAndMatLabKeywords (MIO * input,
+									 langType *candidates CTAGS_ATTR_UNUSED,
+									 unsigned int nCandidates CTAGS_ATTR_UNUSED)
 {
     return selectByLines (input, tasteObjectiveCOrMatLabLines,
 			  NULL, NULL);
@@ -178,7 +182,9 @@ tasteObjectiveC (const char *line, void *data CTAGS_ATTR_UNUSED)
 }
 
 const char *
-selectByObjectiveCKeywords (MIO * input)
+selectByObjectiveCKeywords (MIO * input,
+							langType *candidates CTAGS_ATTR_UNUSED,
+							unsigned int nCandidates CTAGS_ATTR_UNUSED)
 {
     /* TODO: Ideally opening input should be delayed til
        enable/disable based selection is done. */
@@ -218,7 +224,9 @@ tasteR (const char *line, void *data CTAGS_ATTR_UNUSED)
 }
 
 const char *
-selectByArrowOfR (MIO *input)
+selectByArrowOfR (MIO *input,
+				  langType *candidates CTAGS_ATTR_UNUSED,
+				  unsigned int nCandidates CTAGS_ATTR_UNUSED)
 {
     /* TODO: Ideally opening input should be delayed till
        enable/disable based selection is done. */
@@ -264,7 +272,9 @@ tasteREXXOrDosBatch (const char *line, void *data)
 }
 
 const char *
-selectByRexxCommentAndDosbatchLabelPrefix (MIO *input)
+selectByRexxCommentAndDosbatchLabelPrefix (MIO *input,
+										   langType *candidates CTAGS_ATTR_UNUSED,
+										   unsigned int nCandidates CTAGS_ATTR_UNUSED)
 {
     /* TODO: Ideally opening input should be delayed till
        enable/disable based selection is done. */
@@ -314,53 +324,145 @@ xmlParseMIO (MIO *input)
 	return xmlParseMemory((const char *)buf, len);
 }
 
-static const char *
-selectParserForXmlDoc (xmlDocPtr doc)
+static bool
+matchXpathFileSpec (xmlDocPtr doc, xpathFileSpec *spec)
 {
-	if (doc && doc->children && doc->children->name)
-		verbose ("		Xml[root name]: %s\n", doc->children->name);
-	if (doc && doc->intSubset && doc->intSubset->ExternalID)
-		verbose ("		Xml[ExternalID]: %s\n", doc->intSubset->ExternalID);
-	if (doc && doc->intSubset && doc->intSubset->SystemID)
-		verbose ("		Xml[SystemID]: %s\n", doc->intSubset->SystemID);
-	if (doc && doc->children && doc->children->ns && doc->children->ns->href)
-		verbose ("		Xml[NS]: %s\n", doc->children->ns->href);
-
-	/* These conditions should be part of parsers. */
-	if (doc->children
-	    && doc->intSubset
-	    && doc->children->name && doc->intSubset->name
-	    && (strcmp ((const char *)doc->children->name, (const char *)doc->intSubset->name) == 0)
-	    && doc->intSubset->ExternalID
-	    && (strcmp ((const char *)doc->intSubset->ExternalID,
-			"-//freedesktop//DTD D-BUS Object Introspection 1.0//EN") == 0)
-	    && doc->intSubset->SystemID
-	    && (strcmp ((const char *)doc->intSubset->SystemID,
-			"http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd") == 0))
+	if (spec->rootElementName)
 	{
-		/* <!DOCTYPE node PUBLIC "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN"
-		   "http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
-		   <node ... */
-		return "DBusIntrospect";
+		if (*spec->rootElementName == '\0')
+		{
+			/* The statement is just for keeping code symmetric.
+			   Meaningless examination: a root element is
+			   always there.*/
+			if (doc->children && doc->children->name)
+				return false;
+		}
+		else if (! (doc->children
+					&& doc->children->name
+					&& (strcmp (spec->rootElementName, (char *)doc->children->name) == 0)))
+			return false;
 	}
-	else if (doc->children
-		 && doc->children->name
-		 && (strcmp ((const char*)doc->children->name, "project") == 0))
+
+	if (spec->nameInDTD)
 	{
-		if ((doc->children->ns != NULL)
-		    && doc->children->ns->href != NULL
-		    && (strcmp ((const char *)doc->children->ns->href,
-				"http://maven.apache.org/POM/4.0.0") == 0))
-			return "Maven2";
-		else
-			return "Ant";
+		if (*spec->rootElementName == '\0')
+		{
+			if (doc->intSubset && doc->intSubset->name)
+				return false;
+		}
+		else if (! (doc->intSubset
+					&& doc->intSubset->name
+					&& (strcmp (spec->nameInDTD, (char *)doc->intSubset->name) == 0)))
+			return false;
+	}
+
+	if (spec->externalID)
+	{
+		if (*spec->externalID == '\0')
+		{
+			if (doc->intSubset && doc->intSubset->ExternalID)
+				return false;
+		}
+		else if (! (doc->intSubset
+					&& doc->intSubset->ExternalID
+					&& (strcmp (spec->externalID, (char *)doc->intSubset->ExternalID) == 0)))
+			return false;
+	}
+
+	if (spec->systemID)
+	{
+		if (*spec->systemID == '\0')
+		{
+			if (doc->intSubset && doc->intSubset->SystemID)
+				return false;
+		}
+		else if (! (doc->intSubset
+					&& doc->intSubset->SystemID
+					&& (strcmp (spec->systemID, (char *)doc->intSubset->SystemID) == 0)))
+			return false;
+	}
+
+	if (spec->rootNSPrefix)
+	{
+		if (*spec->rootNSPrefix == '\0')
+		{
+			if (doc->children && doc->children->ns && doc->children->ns->prefix)
+				return false;
+		}
+		else if (! (doc->children
+					&& doc->children->ns
+					&& doc->children->ns->prefix
+					&& (strcmp (spec->rootNSPrefix, (char *)doc->children->ns->prefix))))
+			return false;
+	}
+
+	if (spec->rootNSHref)
+	{
+		if (*spec->rootNSHref == '\0')
+		{
+			if (doc->children && doc->children->ns && doc->children->ns->href)
+				return false;
+		}
+		else if (! (doc->children
+					&& doc->children->ns
+					&& doc->children->ns->href
+					&& (strcmp (spec->rootNSHref, (char *)doc->children->ns->href) == 0)))
+			return false;
+	}
+	return true;
+}
+
+static const char *
+selectParserForXmlDoc (xmlDocPtr doc,
+					   langType *candidates,
+					   unsigned int nCandidates)
+{
+
+	unsigned int lang_index;
+
+	verbose ("		Xml[rootElementName]: %s\n",
+			 (doc->children && doc->children->name)
+			 ? ((char *)doc->children->name): "-");
+	verbose ("		Xml[nameInDTD]: %s\n",
+			 (doc->intSubset && doc->intSubset->name)
+			 ? ((char *)doc->intSubset->name): "-");
+	verbose ("		Xml[externalID]: %s\n",
+			 (doc->intSubset && doc->intSubset->ExternalID)
+			 ? ((char *)doc->intSubset->ExternalID): "-");
+	verbose ("		Xml[systemID]: %s\n",
+			 (doc->intSubset && doc->intSubset->SystemID)
+			 ? ((char *)doc->intSubset->SystemID): "-");
+	verbose ("		Xml[rootNSPrefix]: %s\n",
+			 (doc->children && doc->children->ns && doc->children->ns->prefix)
+			 ? ((char *)doc->children->ns->prefix): "-");
+	verbose ("		Xml[rootNSHref]: %s\n",
+			 (doc->children && doc->children->ns && doc->children->ns->href)
+			 ? ((char *)doc->children->ns->href): "-");
+
+	for (lang_index = 0; lang_index < nCandidates; lang_index++)
+	{
+		unsigned int spec_index;
+		xpathFileSpec* spec;
+		unsigned int spec_count;
+
+		verbose ("		lxpath examines %s\n", getLanguageName (candidates[lang_index]));
+
+		spec_count = getXpathFileSpecCount (candidates[lang_index]);
+		for (spec_index = 0; spec_index < spec_count; spec_index++)
+		{
+			spec = getXpathFileSpec (candidates[lang_index], spec_index);
+			if (matchXpathFileSpec (doc, spec))
+				return getLanguageName (candidates[lang_index]);
+		}
 	}
 
 	return NULL;
 }
 
 const char *
-selectByDTD (MIO *input)
+selectByXpathFileSpec (MIO *input,
+					   langType *candidates,
+					   unsigned int nCandidates)
 {
 	xmlDocPtr doc;
 	const char *r = NULL;
@@ -369,7 +471,7 @@ selectByDTD (MIO *input)
 	if (doc == NULL)
 		return NULL;
 
-	r = selectParserForXmlDoc (doc);
+	r = selectParserForXmlDoc (doc, candidates, nCandidates);
 
 	if (r == NULL)
 		xmlFreeDoc (doc);
