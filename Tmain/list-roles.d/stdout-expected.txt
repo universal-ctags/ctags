@@ -24,6 +24,7 @@ CUDA	h	system	system header	on
 CUDA	h	local	local header	on
 Java	p	imported	imported package	on
 LdScript	s	entrypoint	entry points	on
+LdScript	i	mapped	mapped to output section	on
 M4	d	undef	undefined	on
 M4	I	included	included macro	on
 M4	I	sincluded	silently included macro	on
@@ -71,6 +72,7 @@ CUDA	h	system	system header	on
 CUDA	h	local	local header	on
 Java	p	imported	imported package	on
 LdScript	s	entrypoint	entry points	on
+LdScript	i	mapped	mapped to output section	on
 M4	d	undef	undefined	on
 M4	I	included	included macro	on
 M4	I	sincluded	silently included macro	on
