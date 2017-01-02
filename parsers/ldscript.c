@@ -18,6 +18,8 @@
 #include "read.h"
 #include "xtag.h"
 
+#include <string.h>
+
 /*
  *   DATA DEFINITIONS
  */
@@ -32,10 +34,12 @@ static roleDesc LdScriptSymbolRoles [] = {
 
 typedef enum {
 	LD_SCRIPT_INPUT_SECTION_MAPPED,
+	LD_SCRIPT_INPUT_SECTION_DISCARDED,
 } ldScriptInputSectionRole;
 
 static roleDesc LdScriptInputSectionRoles [] = {
 	{ true, "mapped",  "mapped to output section" },
+	{ true, "discarded", "discarded when linking" },
 };
 
 typedef enum {
@@ -99,6 +103,7 @@ enum eTokenType {
 	TOKEN_PHDIR,
 	TOKEN_REGION,
 	TOKEN_FILLEXP,
+	TOKEN_DISCARD,
 };
 
 static void readToken (tokenInfo *const token, void *data CTAGS_ATTR_UNUSED);
@@ -283,6 +288,28 @@ static void readToken (tokenInfo *const token, void *data CTAGS_ATTR_UNUSED)
 		{
 			tokenPutc(token, c0);
 			token->type = TOKEN_ASSIGNMENT_OP;
+		}
+		else if (c == '/' && c0 == 'D')
+		{
+			tokenInfo *const discard = newLdScriptToken ();
+
+			cppUngetc (c0);
+			tokenRead (discard);
+			if (tokenIsType(discard, IDENTIFIER) &&
+				(strcmp(tokenString(discard), "DISCARD")) == 0)
+			{
+				c1 = cppGetc ();
+				if (c1 == '/')
+					token->type = TOKEN_DISCARD;
+				else
+				{
+					cppUngetc (c1);
+					tokenUnread (discard);
+				}
+			}
+			else
+				tokenUnread (discard);
+			tokenDestroy (discard);
 		}
 		else
 			cppUngetc (c0);
@@ -471,7 +498,9 @@ static void parseInputSections (tokenInfo *const token)
 		else if (tokenIsType (token, IDENTIFIER))
 			makeLdScriptTagMaybe (&e, token,
 								  K_INPUT_SECTION,
-								  LD_SCRIPT_INPUT_SECTION_MAPPED);
+								  TOKENX(token, struct tokenExtra)->scopeIndex == CORK_NIL
+								  ? LD_SCRIPT_INPUT_SECTION_DISCARDED
+								  : LD_SCRIPT_INPUT_SECTION_MAPPED);
 		else if (tokenIsKeyword (token, EXCLUDE_FILE))
 			tokenSkipToType (token, ')');
 	} while (!tokenIsEOF (token));
@@ -581,8 +610,11 @@ static void parseSection (tokenInfo * name)
 		{
 			int scope_index;
 
-			scope_index = makeLdScriptTagMaybe (&e, name,
-												K_SECTION, ROLE_INDEX_DEFINITION);
+			if (tokenIsType (name, DISCARD))
+				scope_index = CORK_NIL;
+			else
+				scope_index = makeLdScriptTagMaybe (&e, name,
+													K_SECTION, ROLE_INDEX_DEFINITION);
 
 			if (tokenSkipToType (token, '{'))
 			{
@@ -604,7 +636,8 @@ static void parseSections (tokenInfo *const token)
 			if (tokenIsKeyword (token, ENTRY))
 				parseEntry (token);
 			else if (tokenIsType(token, IDENTIFIER)
-					 || tokenIsKeyword (token, LOC))
+					 || tokenIsKeyword (token, LOC)
+					 || tokenIsType (token, DISCARD))
 				parseSection (token);
 			else if (tokenIsKeyword (token, PROVIDE)
 					 || tokenIsKeyword (token, PROVIDE_HIDDEN)
