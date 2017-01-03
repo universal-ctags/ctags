@@ -20,9 +20,6 @@
 --langdef=elm
 --map-elm=+.elm
 --regex-elm=/^(port[[:blank:]]+)?module[[:blank:]]+([[:upper:]][[:alnum:]_.]*)/\2/m,module,Module/{scope=push}{exclusive}
---regex-elm=/^import[[:blank:]]+([[:alnum:]_.]+[[:blank:]]+as[[:blank:]]+.+)/\1/i,import,Import/{scope=clear}{exclusive}
---regex-elm=/^import[[:blank:]]+([[:alnum:]_.]+)[[:blank:]]exposing/\1/i,import,Import/{scope=clear}{exclusive}
---regex-elm=/^import[[:blank:]]+([[:alnum:]_.]+)/\1/i,import,Import/{scope=clear}{exclusive}
 --regex-elm=/^port[[:blank:]]+([[:lower:]][[:alnum:]_]*).*/\1/p,port,Port/{scope=clear}{exclusive}
 --regex-elm=/^type +([[:upper:]][[:alnum:]_]*.*)/\1/t,type,Type Definition/{scope=set}{exclusive}
 --regex-elm=/^[[:blank:]]+[|=][[:blank:]]+([[:upper:]][[:alnum:]_]*.*)$/\1/c,constructor,Type Constructor/{scope=ref}{exclusive}

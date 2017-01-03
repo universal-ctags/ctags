@@ -1,7 +1,4 @@
 Main	input.elm	/^port module Main exposing (..)$/;"	m
-List	input.elm	/^import List$/;"	i
-Maybe	input.elm	/^import Maybe exposing (withDefault)$/;"	i
-Json.Encode as Je	input.elm	/^import Json.Encode as Je$/;"	i
 Thing	input.elm	/^type Thing$/;"	t
 One	input.elm	/^    = One$/;"	c	type:Thing
 Two Int	input.elm	/^    | Two Int$/;"	c	type:Thing
