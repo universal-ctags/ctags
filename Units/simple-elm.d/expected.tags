@@ -1,4 +1,5 @@
 Main	input.elm	/^port module Main exposing (..)$/;"	m
+Je	input.elm	/^import Json.Encode as Je$/;"	x
 Thing	input.elm	/^type Thing$/;"	t
 One	input.elm	/^    = One$/;"	c	type:Thing
 Two Int	input.elm	/^    | Two Int$/;"	c	type:Thing

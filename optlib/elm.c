@@ -28,6 +28,8 @@ extern parserDefinition* ElmParser (void)
 	static tagRegexTable ElmTagRegexTable [] = {
 		{"^(port[[:blank:]]+)?module[[:blank:]]+([[:upper:]][[:alnum:]_.]*)", "\\2",
 		"m,module,Module", "{scope=push}{exclusive}"},
+		{"^import[[:blank:]]+[[:alnum:]_.]+[[:blank:]]+as[[:blank:]]+([[:alnum:]]+)", "\\1",
+		"x,unknown,Unknown objects", "{scope=clear}{exclusive}"},
 		{"^import[[:blank:]]+([[:alnum:]_.]+)[[:blank:]]exposing", "",
 		"", "{scope=clear}{exclusive}"},
 		{"^import[[:blank:]]+([[:alnum:]_.]+)", "",
