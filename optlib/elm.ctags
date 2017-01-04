@@ -20,6 +20,12 @@
 --langdef=elm
 --map-elm=+.elm
 --regex-elm=/^(port[[:blank:]]+)?module[[:blank:]]+([[:upper:]][[:alnum:]_.]*)/\2/m,module,Module/{scope=push}{exclusive}
+#
+# Following two patterns are just for clearing scope stack.
+# X in "import X" should be captured as a reference tag in the future.
+#
+--regex-elm=/^import[[:blank:]]+([[:alnum:]_.]+)[[:blank:]]exposing///{scope=clear}{exclusive}
+--regex-elm=/^import[[:blank:]]+([[:alnum:]_.]+)///{scope=clear}{exclusive}
 --regex-elm=/^port[[:blank:]]+([[:lower:]][[:alnum:]_]*).*/\1/p,port,Port/{scope=clear}{exclusive}
 --regex-elm=/^type +([[:upper:]][[:alnum:]_]*.*)/\1/t,type,Type Definition/{scope=set}{exclusive}
 --regex-elm=/^[[:blank:]]+[|=][[:blank:]]+([[:upper:]][[:alnum:]_]*.*)$/\1/c,constructor,Type Constructor/{scope=ref}{exclusive}
