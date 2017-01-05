@@ -18,6 +18,8 @@
 #include "read.h"
 #include "xtag.h"
 
+#include <string.h>
+
 /*
  *   DATA DEFINITIONS
  */
@@ -31,7 +33,20 @@ static roleDesc LdScriptSymbolRoles [] = {
 };
 
 typedef enum {
-	K_SECTION, K_SYMBOL, K_VERSION,
+	LD_SCRIPT_INPUT_SECTION_MAPPED,
+	LD_SCRIPT_INPUT_SECTION_DISCARDED,
+} ldScriptInputSectionRole;
+
+static roleDesc LdScriptInputSectionRoles [] = {
+	{ true, "mapped",  "mapped to output section" },
+	{ true, "discarded", "discarded when linking" },
+};
+
+typedef enum {
+	K_SECTION,
+	K_SYMBOL,
+	K_VERSION,
+	K_INPUT_SECTION,
 } ldScriptKind;
 
 static kindOption LdScriptKinds [] = {
@@ -39,6 +54,8 @@ static kindOption LdScriptKinds [] = {
 	{ true, 's', "symbol",  "symbols",
 	  .referenceOnly = false, ATTACH_ROLES(LdScriptSymbolRoles)},
 	{ true, 'v', "version", "versions" },
+	{ true, 'i', "inputSection", "input sections",
+	  .referenceOnly = true, ATTACH_ROLES(LdScriptInputSectionRoles)},
 };
 
 enum {
@@ -50,6 +67,10 @@ enum {
 	KEYWORD_PROVIDE,
 	KEYWORD_PROVIDE_HIDDEN,
 	KEYWORD_HIDDEN,
+	KEYWORD_EXCLUDE_FILE,
+	KEYWORD_INPUT_SECTION_FLAGS,
+	KEYWORD_COMMON,
+	KEYWORD_KEEP,
 };
 typedef int keywordId; /* to allow KEYWORD_NONE */
 
@@ -64,6 +85,10 @@ static const keywordTable LdScriptKeywordTable[] = {
 	{ "PROVIDE",		KEYWORD_PROVIDE			},
 	{ "PROVIDE_HIDDEN",	KEYWORD_PROVIDE_HIDDEN	},
 	{ "HIDDEN",	        KEYWORD_HIDDEN	        },
+	{ "EXCLUDE_FILE",   KEYWORD_EXCLUDE_FILE    },
+	{ "INPUT_SECTION_FLAGS", KEYWORD_INPUT_SECTION_FLAGS },
+	{ "COMMON",         KEYWORD_COMMON },
+	{ "KEEP",           KEYWORD_KEEP },
 };
 
 enum eTokenType {
@@ -78,6 +103,7 @@ enum eTokenType {
 	TOKEN_PHDIR,
 	TOKEN_REGION,
 	TOKEN_FILLEXP,
+	TOKEN_DISCARD,
 };
 
 static void readToken (tokenInfo *const token, void *data CTAGS_ATTR_UNUSED);
@@ -190,7 +216,7 @@ static int makeLdScriptTagMaybe (tagEntryInfo *const e, tokenInfo *const token,
 }
 
 #define isIdentifierChar(c)										\
-	(isalnum (c) || (c) == '_' || (c) == '.' || (c) >= 0x80)
+	(isalnum (c) || (c) == '_' || (c) == '.' || (c) == '-' || (c) >= 0x80)
 
 static int readPrefixedToken (tokenInfo *const token, int type)
 {
@@ -241,6 +267,8 @@ static void readToken (tokenInfo *const token, void *data CTAGS_ATTR_UNUSED)
 	case ')':
 	case '{':
 	case '}':
+	case '[':
+	case ']':
 		token->type = c;
 		break;
 	case '~':
@@ -260,6 +288,28 @@ static void readToken (tokenInfo *const token, void *data CTAGS_ATTR_UNUSED)
 		{
 			tokenPutc(token, c0);
 			token->type = TOKEN_ASSIGNMENT_OP;
+		}
+		else if (c == '/' && c0 == 'D')
+		{
+			tokenInfo *const discard = newLdScriptToken ();
+
+			cppUngetc (c0);
+			tokenRead (discard);
+			if (tokenIsType(discard, IDENTIFIER) &&
+				(strcmp(tokenString(discard), "DISCARD")) == 0)
+			{
+				c1 = cppGetc ();
+				if (c1 == '/')
+					token->type = TOKEN_DISCARD;
+				else
+				{
+					cppUngetc (c1);
+					tokenUnread (discard);
+				}
+			}
+			else
+				tokenUnread (discard);
+			tokenDestroy (discard);
 		}
 		else
 			cppUngetc (c0);
@@ -433,32 +483,97 @@ static void parseProvide (tokenInfo * token)
 	}
 }
 
-static void parseOutputSectionCommands (tokenInfo *const token)
+/* An example of input sections:
+
+	(.text .rdata)
+
+  .text and .rtada are input sections. */
+static void parseInputSections (tokenInfo *const token)
+{
+	tagEntryInfo e;
+	do {
+		tokenRead (token);
+		if (token->type == ')')
+			break;
+		else if (tokenIsType (token, IDENTIFIER))
+			makeLdScriptTagMaybe (&e, token,
+								  K_INPUT_SECTION,
+								  TOKENX(token, struct tokenExtra)->scopeIndex == CORK_NIL
+								  ? LD_SCRIPT_INPUT_SECTION_DISCARDED
+								  : LD_SCRIPT_INPUT_SECTION_MAPPED);
+		else if (tokenIsKeyword (token, EXCLUDE_FILE))
+			tokenSkipToType (token, ')');
+	} while (!tokenIsEOF (token));
+}
+
+/* Symbols and input sections are captured here.
+   An example of output sections:
+
+		__brk_base = .;
+		. += 64 * 1024;
+		*(.brk_reservation)
+		__brk_limit = .;
+
+  __brk_base and __brk_limit should be recorded as a symbol.
+  .brk_reservationshould be recorded as an input section. */
+
+static void parseOutputSectionCommands (tokenInfo *const token, int terminator)
 {
 	tokenInfo *const tmp = newLdScriptToken ();
+	int scope_index = TOKENX (token, struct tokenExtra)->scopeIndex;
 
 	do {
 		tokenRead (token);
+		TOKENX (token, struct tokenExtra)->scopeIndex = scope_index;
 
-		if (tokenIsType (token,IDENTIFIER))
+		if (tokenIsKeyword (token, INPUT_SECTION_FLAGS))
+		{
+			tokenSkipToType (token, '(');
+			tokenSkipToType (token, ')');
+		}
+		else if (tokenIsKeyword (token, KEEP))
+		{
+			tokenSkipToType (token, '(');
+			parseOutputSectionCommands (token, ')');
+		}
+		else if (tokenIsType (token,IDENTIFIER)
+				 || tokenIsKeyword (token, LOC))
 		{
 			tagEntryInfo e;
 
 			tokenRead (tmp);
 			if (tokenIsType (tmp, ASSIGNMENT_OP))
 			{
-				makeLdScriptTagMaybe (&e, token,
-									  K_SYMBOL, ROLE_INDEX_DEFINITION);
+				if (! tokenIsKeyword (token, LOC))
+					makeLdScriptTagMaybe (&e, token,
+										  K_SYMBOL, ROLE_INDEX_DEFINITION);
 				tokenSkipToType (token, ';');
 			}
+			else if (tmp->type == '(')
+				parseInputSections (token);
 			else
-				tokenCopy (token, tmp);
+				tokenUnread (tmp);
+		}
+		/* `*',`?', `[', `]' can be part of a pattern of input object file names
+		   as a meta character.
+		   `[' can enumerated here because it cannot be at the end of pattern. */
+		else if ((token->type == TOKEN_OP
+				  && ((tokenString(token)[0] == '*')
+					  || (tokenString(token)[0] == '?'))
+				  && (tokenString(token)[1] == '\0'))
+				 || token->type == ']')
+		{
+			tokenRead (tmp);
+			if (tmp->type == '(')
+				parseInputSections (token);
+			else
+				tokenUnread (tmp);
 		}
 		else if (tokenIsKeyword (token, PROVIDE)
 				 || tokenIsKeyword (token, PROVIDE_HIDDEN)
 				 || tokenIsKeyword (token, HIDDEN))
 			parseProvide (token);
-	} while (! (tokenIsEOF (token) || token->type == '}'));
+	} while (! (tokenIsEOF (token) || token->type == terminator));
 
 	tokenDestroy (tmp);
 }
@@ -495,12 +610,16 @@ static void parseSection (tokenInfo * name)
 		{
 			int scope_index;
 
-			scope_index = makeLdScriptTagMaybe (&e, name,
-												K_SECTION, ROLE_INDEX_DEFINITION);
+			if (tokenIsType (name, DISCARD))
+				scope_index = CORK_NIL;
+			else
+				scope_index = makeLdScriptTagMaybe (&e, name,
+													K_SECTION, ROLE_INDEX_DEFINITION);
+
 			if (tokenSkipToType (token, '{'))
 			{
 				TOKENX (token, struct tokenExtra)->scopeIndex = scope_index;
-				parseOutputSectionCommands (token);
+				parseOutputSectionCommands (token, '}');
 			}
 		}
 	}
@@ -517,7 +636,8 @@ static void parseSections (tokenInfo *const token)
 			if (tokenIsKeyword (token, ENTRY))
 				parseEntry (token);
 			else if (tokenIsType(token, IDENTIFIER)
-					 || tokenIsKeyword (token, LOC))
+					 || tokenIsKeyword (token, LOC)
+					 || tokenIsType (token, DISCARD))
 				parseSection (token);
 			else if (tokenIsKeyword (token, PROVIDE)
 					 || tokenIsKeyword (token, PROVIDE_HIDDEN)

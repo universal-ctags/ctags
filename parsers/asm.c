@@ -29,7 +29,8 @@
 */
 typedef enum {
 	K_PSUEDO_MACRO_END = -2,
-	K_NONE = -1, K_DEFINE, K_LABEL, K_MACRO, K_TYPE
+	K_NONE = -1, K_DEFINE, K_LABEL, K_MACRO, K_TYPE,
+	K_SECTION,
 } AsmKind;
 
 typedef enum {
@@ -48,10 +49,15 @@ typedef enum {
 	OP_PROC,
 	OP_RECORD,
 	OP_SECTIONS,
+	OP_SECTION,
 	OP_SET,
 	OP_STRUCT,
 	OP_LAST
 } opKeyword;
+
+typedef enum {
+	ASM_SECTION_PLACEMENT,
+} asmSectionRole;
 
 typedef struct {
 	opKeyword keyword;
@@ -63,11 +69,17 @@ typedef struct {
 */
 static langType Lang_asm;
 
+static roleDesc asmSectionRoles [] = {
+	{ true, "placement", "placement where the assembled code goes" },
+};
+
 static kindOption AsmKinds [] = {
 	{ true, 'd', "define", "defines" },
 	{ true, 'l', "label",  "labels"  },
 	{ true, 'm', "macro",  "macros"  },
-	{ true, 't', "type",   "types (structs and records)"   }
+	{ true, 't', "type",   "types (structs and records)"   },
+	{ true, 's', "section",   "sections",
+	  .referenceOnly = true, ATTACH_ROLES(asmSectionRoles)},
 };
 
 static const keywordTable AsmKeywords [] = {
@@ -85,6 +97,10 @@ static const keywordTable AsmKeywords [] = {
 	{ "proc",     OP_PROC        },
 	{ "record",   OP_RECORD      },
 	{ "sections", OP_SECTIONS    },
+
+	/* This one is used in GNU as. */
+	{ "section",  OP_SECTION     },
+
 	{ "set",      OP_SET         },
 	{ "struct",   OP_STRUCT      }
 };
@@ -105,6 +121,7 @@ static const opKind OpKinds [] = {
 	{ OP_PROC,        K_LABEL  },
 	{ OP_RECORD,      K_TYPE   },
 	{ OP_SECTIONS,    K_NONE   },
+	{ OP_SECTION,     K_SECTION },
 	{ OP_SET,         K_DEFINE },
 	{ OP_STRUCT,      K_TYPE   }
 };
@@ -215,6 +232,12 @@ static void makeAsmTag (
 					*lastMacroCorkIndex = CORK_NIL;
 				}
 				break;
+			case K_SECTION:
+				makeSimpleRefTag (operator,
+								  AsmKinds,
+								  kind_for_directive,
+								  ASM_SECTION_PLACEMENT);
+				break;
 			default:
 				makeSimpleTag (operator, AsmKinds, kind_for_directive);
 			}
@@ -245,7 +268,7 @@ static const unsigned char *readOperator (
 {
 	const unsigned char *cp = start;
 	vStringClear (operator);
-	while (*cp != '\0'  &&  ! isspace ((int) *cp))
+	while (*cp != '\0'  &&  ! isspace ((int) *cp) && *cp != ',')
 	{
 		vStringPut (operator, *cp);
 		++cp;
