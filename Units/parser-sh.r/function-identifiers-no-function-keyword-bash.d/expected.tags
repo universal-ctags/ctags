@@ -1,0 +1,2 @@
+a::anotherTest	input.bash	/^function a::anotherTest() {$/;"	f
+a::test	input.bash	/^a::test() {$/;"	f
