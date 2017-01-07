@@ -107,13 +107,13 @@ extern void stringListDelete (stringList *const current)
 static bool compareString (
 		const char *const string, vString *const itm)
 {
-	return (bool) (strcmp (string, vStringValue (itm)) == 0);
+	return (strcmp (string, vStringValue (itm)) == 0);
 }
 
 static bool compareStringInsensitive (
 		const char *const string, vString *const itm)
 {
-	return (bool) (strcasecmp (string, vStringValue (itm)) == 0);
+	return (strcasecmp (string, vStringValue (itm)) == 0);
 }
 
 static int stringListIndex (
@@ -219,17 +219,15 @@ static bool fileNameMatched (
 
 #ifdef CASE_INSENSITIVE_FILENAMES
 	{
-		bool r;
-
 		char* const p = newUpperString (pattern);
 		char* const f = newUpperString (fileName);
-		r =  (bool) (fnmatch (p, f, 0) == 0);
+		bool r = (fnmatch (p, f, 0) == 0);
 		eFree (f);
 		eFree (p);
 		return r;
 	}
 #else
-	return (bool) (fnmatch (pattern, fileName, 0) == 0);
+	return (fnmatch (pattern, fileName, 0) == 0);
 #endif
 }
 
