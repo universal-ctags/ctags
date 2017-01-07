@@ -361,6 +361,7 @@ static regexPattern* addCompiledTagCommon (const langType language,
 						       hashPtreq,
 						       NULL,
 						       kindFree);
+			Sets [i].multilinePatternsCount = 0;
 		}
 		SetUpper = language;
 	}
