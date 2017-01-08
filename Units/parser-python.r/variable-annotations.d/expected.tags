@@ -1,0 +1,20 @@
+primes	input.py	/^primes: List[int] = []$/;"	v
+some_list	input.py	/^some_list: List[int] = []  # variable with initial value$/;"	v
+sane_world	input.py	/^    sane_world = True$/;"	v
+t	input.py	/^t: Tuple[int, ...] = (1, 2, 3)$/;"	v
+header	input.py	/^header, kind, body = message$/;"	v
+kind	input.py	/^header, kind, body = message$/;"	v
+body	input.py	/^header, kind, body = message$/;"	v
+BasicStarship	input.py	/^class BasicStarship:$/;"	c
+captain	input.py	/^    captain: str = 'Picard'               # instance variable with default$/;"	v	class:BasicStarship
+stats	input.py	/^    stats: ClassVar[Dict[str, int]] = {}  # class variable$/;"	v	class:BasicStarship
+Starship	input.py	/^class Starship:$/;"	c
+captain	input.py	/^    captain: str = 'Picard'$/;"	v	class:Starship
+stats	input.py	/^    stats: ClassVar[Dict[str, int]] = {}$/;"	v	class:Starship
+__init__	input.py	/^    def __init__(self, damage: int, captain: str = None):$/;"	m	class:Starship
+hit	input.py	/^    def hit(self):$/;"	m	class:Starship
+enterprise_d	input.py	/^enterprise_d = Starship(3000)$/;"	v
+Cls	input.py	/^class Cls:$/;"	c
+c	input.py	/^c = Cls()$/;"	v
+d	input.py	/^d = {}$/;"	v
+qualified	input.py	/^qualified: typing.Any = 'anything'$/;"	v

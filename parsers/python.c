@@ -32,6 +32,7 @@
 
 enum {
 	KEYWORD_as,
+	KEYWORD_async,
 	KEYWORD_cdef,
 	KEYWORD_class,
 	KEYWORD_cpdef,
@@ -144,6 +145,7 @@ static kindOption PythonKinds[COUNT_KIND] = {
 static const keywordTable PythonKeywordTable[] = {
 	/* keyword			keyword ID */
 	{ "as",				KEYWORD_as				},
+	{ "async",			KEYWORD_async			},
 	{ "cdef",			KEYWORD_cdef			},
 	{ "cimport",		KEYWORD_import			},
 	{ "class",			KEYWORD_class			},
@@ -630,7 +632,7 @@ getNextChar:
 			}
 			else
 			{
-				/* FIXME: handle U, B and R string prefixes? */
+				/* FIXME: handle U, B, R and F string prefixes? */
 				readIdentifier (token->string, c);
 				token->keyword = lookupKeyword (vStringValue (token->string), Lang_python);
 				if (token->keyword == KEYWORD_NONE)
@@ -1078,6 +1080,43 @@ static bool parseImport (tokenInfo *const token)
 	return false;
 }
 
+/* this only handles the most common cases, but an annotation can be any
+ * expression in theory.
+ * this function assumes there must be an annotation, and doesn't do any check
+ * on the token on which it is called: the caller should do that part. */
+static bool skipTypeAnnotation (tokenInfo *const token)
+{
+	bool readNext = true;
+
+	readToken (token);
+	switch (token->type)
+	{
+		case '[': readNext = skipOverPair (token, '[', ']', NULL, false); break;
+		case '(': readNext = skipOverPair (token, '(', ')', NULL, false); break;
+		case '{': readNext = skipOverPair (token, '{', '}', NULL, false); break;
+	}
+	if (readNext)
+		readToken (token);
+	/* skip subscripts and calls */
+	while (token->type == '[' || token->type == '(' || token->type == '.')
+	{
+		switch (token->type)
+		{
+			case '[': readNext = skipOverPair (token, '[', ']', NULL, false); break;
+			case '(': readNext = skipOverPair (token, '(', ')', NULL, false); break;
+			case '.':
+				readToken (token);
+				readNext = token->type == TOKEN_IDENTIFIER;
+				break;
+			default:  readNext = false; break;
+		}
+		if (readNext)
+			readToken (token);
+	}
+
+	return false;
+}
+
 static bool parseVariable (tokenInfo *const token, const pythonKind kind)
 {
 	/* In order to support proper tag type for lambdas in multiple
@@ -1111,6 +1150,11 @@ static bool parseVariable (tokenInfo *const token, const pythonKind kind)
 		}
 
 		nameTokens[nameCount++] = name;
+
+		/* skip annotations.  we need not to be too permissive because we
+		 * aren't yet sure we're actually parsing a variable. */
+		if (token->type == ':' && skipTypeAnnotation (token))
+			readToken (token);
 
 		if (token->type == ',')
 			readToken (token);
@@ -1209,6 +1253,10 @@ static void findPythonTags (void)
 	{
 		tokenType iterationTokenType = token->type;
 		bool readNext = true;
+
+		/* skip async keyword that confuses decorator parsing before a def */
+		if (token->keyword == KEYWORD_async)
+			readToken (token);
 
 		if (token->type == TOKEN_INDENT)
 			setIndent (token);
