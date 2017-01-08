@@ -198,18 +198,18 @@ static void findShTags (void)
 				}
 			}
 
-			check_char = isIdentChar;
+			check_char = isBashFunctionChar;
 
 			if (strncmp ((const char*) cp, "function", (size_t) 8) == 0  &&
 				isspace ((int) cp [8]))
 			{
-				check_char = isBashFunctionChar;
 				found_kind = K_FUNCTION;
 				cp += 8;
 			}
 			else if (strncmp ((const char*) cp, "alias", (size_t) 5) == 0  &&
 				isspace ((int) cp [5]))
 			{
+				check_char = isIdentChar;
 				found_kind = K_ALIAS;
 				cp += 5;
 			}
