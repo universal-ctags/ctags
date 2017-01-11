@@ -74,6 +74,7 @@
 #include "options.h"
 #include "read.h"
 #include "routines.h"
+#include "trace.h"
 #include "writer.h"
 
 #ifdef HAVE_JANSSON
@@ -622,6 +623,8 @@ static void sanitizeEnviron (void)
 extern int main (int argc CTAGS_ATTR_UNUSED, char **argv)
 {
 	cookedArgs *args;
+
+	TRACE_INIT();
 
 	setErrorPrinter (stderrDefaultErrorPrinter, NULL);
 	setMainLoop (batchMakeTags, NULL);
