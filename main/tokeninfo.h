@@ -23,16 +23,13 @@ struct tokenTypePair;
 typedef short tokenType;
 typedef short tokenKeyword;
 
-#define tokenInfoMembers					\
-	tokenType		type;					\
-	tokenKeyword	keyword;				\
-	vString *	string;							\
-	struct tokenInfoClass *klass;				\
-	unsigned long	lineNumber;					\
-	MIOPos		filePosition
-
 typedef struct sTokenInfo {
-	tokenInfoMembers;
+	tokenType type;
+	tokenKeyword keyword;
+	vString *string;
+	struct tokenInfoClass *klass;
+	unsigned long lineNumber;
+	MIOPos filePosition;
 } tokenInfo;
 
 struct tokenTypePair {
