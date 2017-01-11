@@ -77,9 +77,6 @@ parserDefinition * CParser (void)
 	static const char * const extensions [] =
 	{
 		"c",
-#ifndef CASE_INSENSITIVE_FILENAMES
-		"C",
-#endif
 		NULL
 	};
 
@@ -141,9 +138,6 @@ parserDefinition * CUDAParser (void)
 	static const char * const extensions [] =
 	{
 		"cu", "cuh",
-#ifndef CASE_INSENSITIVE_FILENAMES
-		"CU", "CUH",
-#endif
 		NULL
 	};
 	static parserDependency dependencies [] = {
@@ -167,4 +161,3 @@ parserDefinition * CUDAParser (void)
 
 	return def;
 }
-
