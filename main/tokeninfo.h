@@ -28,6 +28,7 @@ typedef struct sTokenInfo {
 	struct tokenInfoClass *klass;
 	unsigned long lineNumber;
 	MIOPos filePosition;
+	int scopeIndex;
 } tokenInfo;
 
 struct tokenTypePair {

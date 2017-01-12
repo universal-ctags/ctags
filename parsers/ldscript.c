@@ -119,7 +119,6 @@ static void clearToken (tokenInfo *token);
 static void copyToken (tokenInfo *dest, tokenInfo *src, void *data CTAGS_ATTR_UNUSED);
 
 struct tokenExtra {
-	int scopeIndex;
 	tokenKeyword assignment;
 };
 
@@ -165,14 +164,11 @@ static tokenInfo *newLdScriptToken (void)
 
 static void clearToken (tokenInfo *token)
 {
-	TOKENX (token, struct tokenExtra)->scopeIndex = CORK_NIL;
 	TOKENX (token, struct tokenExtra)->assignment = KEYWORD_NONE;
 }
 
 static void copyToken (tokenInfo *dest, tokenInfo *src, void *data CTAGS_ATTR_UNUSED)
 {
-	TOKENX (dest, struct tokenExtra)->scopeIndex =
-		TOKENX (src, struct tokenExtra)->scopeIndex;
 	TOKENX (dest, struct tokenExtra)->assignment =
 		TOKENX (src, struct tokenExtra)->assignment;
 }
@@ -194,7 +190,7 @@ static int makeLdScriptTagMaybe (tagEntryInfo *const e, tokenInfo *const token,
 					 role);
 	e->lineNumber = token->lineNumber;
 	e->filePosition = token->filePosition;
-	e->extensionFields.scopeIndex = TOKENX (token, struct tokenExtra)->scopeIndex;
+	e->extensionFields.scopeIndex = token->scopeIndex;
 
 	/* TODO: implement file: field. */
 	if ((kind == K_SYMBOL)
@@ -515,7 +511,7 @@ static void parseInputSections (tokenInfo *const token)
 		else if (tokenIsType (token, IDENTIFIER))
 			makeLdScriptTagMaybe (&e, token,
 								  K_INPUT_SECTION,
-								  TOKENX(token, struct tokenExtra)->scopeIndex == CORK_NIL
+								  token->scopeIndex == CORK_NIL
 								  ? LD_SCRIPT_INPUT_SECTION_DISCARDED
 								  : LD_SCRIPT_INPUT_SECTION_MAPPED);
 		else if (tokenIsKeyword (token, EXCLUDE_FILE))
@@ -537,11 +533,11 @@ static void parseInputSections (tokenInfo *const token)
 static void parseOutputSectionCommands (tokenInfo *const token, int terminator)
 {
 	tokenInfo *const tmp = newLdScriptToken ();
-	int scope_index = TOKENX (token, struct tokenExtra)->scopeIndex;
+	int scope_index = token->scopeIndex;
 
 	do {
 		tokenRead (token);
-		TOKENX (token, struct tokenExtra)->scopeIndex = scope_index;
+		token->scopeIndex = scope_index;
 
 		if (tokenIsKeyword (token, INPUT_SECTION_FLAGS))
 		{
@@ -635,7 +631,7 @@ static void parseSection (tokenInfo * name)
 
 			if (tokenSkipToType (token, '{'))
 			{
-				TOKENX (token, struct tokenExtra)->scopeIndex = scope_index;
+				token->scopeIndex = scope_index;
 				parseOutputSectionCommands (token, '}');
 			}
 		}

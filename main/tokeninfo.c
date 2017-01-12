@@ -40,6 +40,7 @@ static void clearToken (void *data)
 	vStringClear (token->string);
 	token->lineNumber = getInputLineNumber ();
 	token->filePosition = getInputFilePosition ();
+	token->scopeIndex = CORK_NIL;
 }
 
 static void destroyToken (void *data)
@@ -122,6 +123,7 @@ void tokenCopyFull  (tokenInfo *dest, tokenInfo *src, void *data)
 	dest->filePosition = src->filePosition;
 	dest->type = src->type;
 	dest->keyword = src->keyword;
+	dest->scopeIndex = src->scopeIndex;
 	/* klass */
 	vStringCopy(dest->string, src->string);
 	if (src->klass->copy)
