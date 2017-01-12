@@ -2438,7 +2438,6 @@ extern bool parseFileWithMio (const char *const fileName, MIO *mio)
 	if (Option.printLanguage)
 	{
 		printGuessedParser (fileName, language);
-		TRACE_LEAVE();
 		return tagFileResized;
 	}
 
