@@ -11,54 +11,38 @@
 
 #include "general.h"
 #include "debug.h"
+#include "trace.h"
 #include "cxx_token.h"
 
 //
 // Uncomment this to enable extensive debugging to stderr in cxx code.
-// Currently cxx-specific debugging is supported only on gcc (because of
-// variadic macros and __PRETTY_FUNC__)
+// Please note that TRACING_ENABLED should be #defined in main/trace.h
+// for this to work.
 //
 //#define CXX_DEBUGGING_ENABLED 1
 
-#if defined (__GNUC__) && (__GNUC__ > 2 || (__GNUC__ == 2 && __GNUC_MINOR__ >= 4))
-	#define CXX_DEBUGGING_SUPPORTED
-#endif
-
-#if defined(CXX_DEBUGGING_SUPPORTED) && defined(CXX_DEBUGGING_ENABLED)
+#if defined(DO_TRACING) && defined(CXX_DEBUGGING_ENABLED)
 	#define CXX_DO_DEBUGGING
 #endif
 
 #ifdef CXX_DO_DEBUGGING
 
-void cxxDebugEnter(const char * szFunction,const char * szFormat,...);
-void cxxDebugLeave(const char * szFunction,const char * szFormat,...);
-void cxxDebugPrint(const char * szFunction,const char * szFormat,...);
-void cxxDebugInit(void);
-
 const char* cxxDebugTypeDecode(enum CXXTokenType);
 
-#define CXX_DEBUG_ENTER() cxxDebugEnter(__PRETTY_FUNCTION__,"")
-#define CXX_DEBUG_LEAVE() cxxDebugLeave(__PRETTY_FUNCTION__,"")
+#define CXX_DEBUG_ENTER() TRACE_ENTER()
+#define CXX_DEBUG_LEAVE() TRACE_LEAVE()
 
 #define CXX_DEBUG_ENTER_TEXT(_szFormat,...) \
-	cxxDebugEnter(__PRETTY_FUNCTION__,_szFormat,## __VA_ARGS__)
+	TRACE_ENTER_TEXT(_szFormat,## __VA_ARGS__)
 
 #define CXX_DEBUG_LEAVE_TEXT(_szFormat,...) \
-	cxxDebugLeave(__PRETTY_FUNCTION__,_szFormat,## __VA_ARGS__)
+	TRACE_LEAVE_TEXT(_szFormat,## __VA_ARGS__)
 
 #define CXX_DEBUG_PRINT(_szFormat,...) \
-	cxxDebugPrint(__PRETTY_FUNCTION__,_szFormat,## __VA_ARGS__)
-
-#define CXX_DEBUG_INIT() cxxDebugInit()
+	TRACE_PRINT(_szFormat,## __VA_ARGS__)
 
 #define CXX_DEBUG_ASSERT(_condition,_szFormat,...) \
-	do { \
-		if(!(_condition)) \
-		{ \
-			cxxDebugPrint(__PRETTY_FUNCTION__,_szFormat,## __VA_ARGS__); \
-			Assert(false); \
-		} \
-	} while(0)
+	TRACE_ASSERT(_condition,_szFormat,## __VA_ARGS__)
 
 #else //!CXX_DO_DEBUGGING
 
@@ -69,8 +53,6 @@ const char* cxxDebugTypeDecode(enum CXXTokenType);
 #define CXX_DEBUG_LEAVE_TEXT(_szFormat,...) do { } while(0)
 
 #define CXX_DEBUG_PRINT(_szFormat,...) do { } while(0)
-
-#define CXX_DEBUG_INIT() do { } while(0)
 
 #define CXX_DEBUG_ASSERT(_condition,_szFormat,...) do { } while(0)
 

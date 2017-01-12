@@ -44,7 +44,8 @@ MAIN_HEADS =			\
 	main/selectors.h	\
 	main/sort.h		\
 	main/strlist.h		\
-        main/tokeninfo.h	\
+	main/trace.h		\
+	main/tokeninfo.h	\
 	main/types.h		\
 	main/vstring.h		\
 	main/writer.h		\
@@ -82,7 +83,8 @@ MAIN_SRCS =				\
 	main/selectors.c		\
 	main/sort.c			\
 	main/strlist.c			\
-        main/tokeninfo.c		\
+	main/trace.c			\
+	main/tokeninfo.c		\
 	main/vstring.c			\
 	main/writer.c			\
 	main/writer-etags.c		\

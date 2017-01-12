@@ -27,6 +27,7 @@
 #include "ptag.h"
 #include "read.h"
 #include "routines.h"
+#include "trace.h"
 #include "vstring.h"
 #ifdef HAVE_ICONV
 # include "mbcs.h"
@@ -2415,7 +2416,10 @@ extern bool doesParserRequireMemoryStream (const langType language)
 
 extern bool parseFile (const char *const fileName)
 {
-    return parseFileWithMio (fileName, NULL);
+	TRACE_ENTER_TEXT("Parsing file %s",fileName);
+	bool bRet = parseFileWithMio (fileName, NULL);
+	TRACE_LEAVE();
+	return bRet;
 }
 
 extern bool parseFileWithMio (const char *const fileName, MIO *mio)
@@ -2485,6 +2489,7 @@ extern bool parseFileWithMio (const char *const fileName, MIO *mio)
 
 	if (req.type == GLR_OPEN && req.mio)
 		mio_free (req.mio);
+
 	return tagFileResized;
 }
 
