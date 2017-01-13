@@ -429,7 +429,6 @@ static void parseAttDefs (tokenInfo *const token)
 		}
 		else if (tokenIsType(token, CLOSE))
 		{
-			token->scopeIndex = CORK_NIL;
 			tokenUnread (token);
 			break;
 		}

@@ -161,7 +161,7 @@ bool tokenSkipToType (tokenInfo *token, tokenType t)
 	return tokenSkipToTypeFull (token, t, NULL);
 }
 
-void tokenUnreadFull (tokenInfo *token, void *data)
+void tokenUnreadFull (tokenInfo *token, bool keepScopeIndex, void *data)
 {
 	tokenInfo *backlog;
 
@@ -170,12 +170,14 @@ void tokenUnreadFull (tokenInfo *token, void *data)
 
 	backlog = newToken (token->klass);
 	tokenCopyFull (backlog, token, data);
+	if (!keepScopeIndex)
+		backlog->scopeIndex = CORK_NIL;
 	ptrArrayAdd (token->klass->backlog, backlog);
 }
 
 void tokenUnread      (tokenInfo *token)
 {
-	tokenUnreadFull (token, NULL);
+	tokenUnreadFull (token, false, NULL);
 }
 
 bool tokenSkipOverPair (tokenInfo *token)
