@@ -704,6 +704,8 @@ static void findLdScriptTags (void)
 
 	tokenDestroy (tmp);
 	tokenDestroy (token);
+
+	flashTokenBacklog (&ldScriptTokenInfoClass);
 }
 
 static void initialize (const langType language)
