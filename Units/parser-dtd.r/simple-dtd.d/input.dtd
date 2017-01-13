@@ -1,0 +1,42 @@
+<!-- Taken from pacemaker/src/resource-agents/heartbeat/ra-api-1.dtd  -->
+
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!ELEMENT resource-agent (version,longdesc,shortdesc,parameters?,actions) >
+<!ATTLIST resource-agent
+        name    CDATA   #REQUIRED
+        version CDATA   #IMPLIED>
+
+<!ELEMENT version (#PCDATA)>
+
+<!ELEMENT parameters (parameter*)>
+
+<!ELEMENT actions (action*)>
+
+<!ELEMENT parameter (longdesc+,shortdesc+,content)>
+<!ATTLIST parameter
+        name    CDATA   #REQUIRED
+        required  (1|0)   "0"
+        unique  (1|0)   "0">
+
+<!ELEMENT longdesc ANY>
+<!ATTLIST longdesc
+        lang    NMTOKEN #IMPLIED>
+
+<!ELEMENT shortdesc ANY>
+<!ATTLIST shortdesc
+        lang    NMTOKEN #IMPLIED>
+
+<!ELEMENT content EMPTY>
+<!ATTLIST content
+        type    (string|integer|boolean|time)        #REQUIRED
+        default CDATA   #IMPLIED>
+
+<!ELEMENT action EMPTY>
+<!ATTLIST action
+        name (start|stop|recover|monitor|restart|migrate_to|migrate_from|promote|demote|notify|status|reload|meta-data|usage|methods|validate-all) #REQUIRED
+        timeout         CDATA   #REQUIRED
+        interval        CDATA   #IMPLIED
+        start-delay     CDATA   #IMPLIED
+        role            CDATA   #IMPLIED
+        depth           CDATA   #IMPLIED>

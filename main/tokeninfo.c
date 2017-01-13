@@ -77,7 +77,8 @@ void *newToken (struct tokenInfoClass *klass)
 
 void  flashTokenBacklog (struct tokenInfoClass *klass)
 {
-	ptrArrayClear (klass->backlog);
+	if (klass->backlog)
+		ptrArrayClear (klass->backlog);
 }
 
 void tokenDestroy (tokenInfo *token)

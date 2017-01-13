@@ -1,0 +1,5 @@
+<![%x;[
+<!ENTITY % xhtml-struct.mod
+     PUBLIC "-//W3C//ELEMENTS XHTML Document Structure 1.0//EN"
+            "http://www.w3.org/TR/xhtml-modularization/DTD/xhtml-struct-1.mod" >
+]]>

@@ -1,0 +1,2 @@
+SUB	input.mod	/^<!ELEMENT (SUB|SUP) - - (%inline;)*    -- subscript, superscript -->$/;"	e	end:1
+SUP	input.mod	/^<!ELEMENT (SUB|SUP) - - (%inline;)*    -- subscript, superscript -->$/;"	e	end:1
