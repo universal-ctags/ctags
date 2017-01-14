@@ -33,6 +33,7 @@
 #include "routines.h"
 #include "vstring.h"
 #include "objpool.h"
+#include "trace.h"
 
 /*
  *	 MACROS
@@ -44,6 +45,52 @@
 		(c) == '@' || (c) == '_' || (c) == '#')
 #define newToken() (objPoolGet (TokenPool))
 #define deleteToken(t) (objPoolPut (TokenPool, (t)))
+
+/*
+ * Debugging
+ *
+ * Uncomment this to enable extensive debugging to stderr in jscript code.
+ * Please note that TRACING_ENABLED should be #defined in main/trace.h
+ * for this to work.
+ *
+ */
+//#define JSCRIPT_DEBUGGING_ENABLED 1
+
+#if defined(DO_TRACING) && defined(JSCRIPT_DEBUGGING_ENABLED)
+	#define JSCRIPT_DO_DEBUGGING
+#endif
+
+#ifdef JSCRIPT_DO_DEBUGGING
+
+#define JSCRIPT_DEBUG_ENTER() TRACE_ENTER()
+#define JSCRIPT_DEBUG_LEAVE() TRACE_LEAVE()
+
+#define JSCRIPT_DEBUG_ENTER_TEXT(_szFormat,...) \
+	TRACE_ENTER_TEXT(_szFormat,## __VA_ARGS__)
+
+#define JSCRIPT_DEBUG_LEAVE_TEXT(_szFormat,...) \
+	TRACE_LEAVE_TEXT(_szFormat,## __VA_ARGS__)
+
+#define JSCRIPT_DEBUG_PRINT(_szFormat,...) \
+	TRACE_PRINT(_szFormat,## __VA_ARGS__)
+
+#define JSCRIPT_DEBUG_ASSERT(_condition,_szFormat,...) \
+	TRACE_ASSERT(_condition,_szFormat,## __VA_ARGS__)
+
+#else //!JSCRIPT_DO_DEBUGGING
+
+#define JSCRIPT_DEBUG_ENTER() do { } while(0)
+#define JSCRIPT_DEBUG_LEAVE() do { } while(0)
+
+#define JSCRIPT_DEBUG_ENTER_TEXT(_szFormat,...) do { } while(0)
+#define JSCRIPT_DEBUG_LEAVE_TEXT(_szFormat,...) do { } while(0)
+
+#define JSCRIPT_DEBUG_PRINT(_szFormat,...) do { } while(0)
+
+#define JSCRIPT_DEBUG_ASSERT(_condition,_szFormat,...) do { } while(0)
+
+#endif //!JSCRIPT_DO_DEBUGGING
+
 
 /*
  *	 DATA DECLARATIONS
@@ -253,6 +300,8 @@ static void makeJsTag (tokenInfo *const token, const jsKind kind, vString *const
 		}
 
 		initTagEntry (&e, name, &(JsKinds [kind]));
+
+		JSCRIPT_DEBUG_PRINT("Emitting tag for symbol '%s' of kind %02x",name,kind);
 
 		e.lineNumber   = token->lineNumber;
 		e.filePosition = token->filePosition;
@@ -746,6 +795,7 @@ getNextChar:
 static void readToken (tokenInfo *const token)
 {
 	readTokenFull (token, false, NULL);
+	JSCRIPT_DEBUG_PRINT("token '%s' of type %02x",vStringValue(token->string),token->type);
 }
 
 /*
@@ -1087,6 +1137,8 @@ static void parseFunction (tokenInfo *const token)
 
 static bool parseBlock (tokenInfo *const token, tokenInfo *const orig_parent)
 {
+	JSCRIPT_DEBUG_ENTER();
+
 	bool is_class = false;
 	bool read_next_token = true;
 	vString * saveScope = vStringNew ();
@@ -1185,11 +1237,15 @@ static bool parseBlock (tokenInfo *const token, tokenInfo *const orig_parent)
 	vStringDelete(saveScope);
 	token->nestLevel--;
 
+	JSCRIPT_DEBUG_LEAVE();
+
 	return is_class;
 }
 
 static bool parseMethods (tokenInfo *const token, tokenInfo *const class)
 {
+	JSCRIPT_DEBUG_ENTER();
+
 	tokenInfo *const name = newToken ();
 	bool has_methods = false;
 
@@ -1237,6 +1293,7 @@ static bool parseMethods (tokenInfo *const token, tokenInfo *const class)
 					readToken (token);
 				if ( is_shorthand || isKeyword (token, KEYWORD_function) )
 				{
+					JSCRIPT_DEBUG_PRINT("Seems to be a function or shorthand");
 					vString *const signature = vStringNew ();
 
 					if (! is_shorthand)
@@ -1315,16 +1372,22 @@ static bool parseMethods (tokenInfo *const token, tokenInfo *const class)
 		}
 	} while ( isType(token, TOKEN_COMMA) );
 
+	JSCRIPT_DEBUG_PRINT("Finished parsing methods");
+
 	findCmdTerm (token, false, false);
 
 cleanUp:
 	deleteToken (name);
+	
+	JSCRIPT_DEBUG_LEAVE();
 
 	return has_methods;
 }
 
 static bool parseStatement (tokenInfo *const token, tokenInfo *const parent, bool is_inside_class)
 {
+	JSCRIPT_DEBUG_ENTER();
+
 	tokenInfo *const name = newToken ();
 	tokenInfo *const secondary_name = newToken ();
 	tokenInfo *const method_body_token = newToken ();
@@ -1375,6 +1438,7 @@ static bool parseStatement (tokenInfo *const token, tokenInfo *const parent, boo
 		 isKeyword(token, KEYWORD_let) ||
 		 isKeyword(token, KEYWORD_const) )
 	{
+		JSCRIPT_DEBUG_PRINT("var/let/const case");
 		is_const = isKeyword(token, KEYWORD_const);
 		/*
 		 * Only create variables for global scope
@@ -1389,6 +1453,8 @@ static bool parseStatement (tokenInfo *const token, tokenInfo *const parent, boo
 nextVar:
 	if ( isKeyword(token, KEYWORD_this) )
 	{
+		JSCRIPT_DEBUG_PRINT("found 'this' keyword");
+
 		readToken(token);
 		if (isType (token, TOKEN_PERIOD))
 		{
@@ -1397,6 +1463,7 @@ nextVar:
 	}
 
 	copyToken(name, token, true);
+	JSCRIPT_DEBUG_PRINT("name becomes '%s'",vStringValue(name->string));
 
 	while (! isType (token, TOKEN_CLOSE_CURLY) &&
 	       ! isType (token, TOKEN_SEMICOLON)   &&
@@ -1668,7 +1735,8 @@ nextVar:
 					if (! ( isType (name, TOKEN_IDENTIFIER)
 						|| isType (name, TOKEN_STRING) ) )
 					{
-                                                /* Unexpected input. Try to reset the parsing. */
+						/* Unexpected input. Try to reset the parsing. */
+						JSCRIPT_DEBUG_PRINT("Unexpected input, trying to reset");
 						vStringDelete (signature);
 						goto cleanUp;
 					}
@@ -1877,6 +1945,8 @@ cleanUp:
 	deleteToken (method_body_token);
 	vStringDelete(saveScope);
 
+	JSCRIPT_DEBUG_LEAVE();
+
 	return is_terminated;
 }
 
@@ -1932,6 +2002,8 @@ static void parseUI5 (tokenInfo *const token)
 
 static bool parseLine (tokenInfo *const token, tokenInfo *const parent, bool is_inside_class)
 {
+	JSCRIPT_DEBUG_ENTER_TEXT("token is %s",vStringValue(token->string));
+
 	bool is_terminated = true;
 	/*
 	 * Detect the common statements, if, while, for, do, ...
@@ -1980,11 +2052,16 @@ static bool parseLine (tokenInfo *const token, tokenInfo *const parent, bool is_
 		 */
 		is_terminated = parseStatement (token, parent, is_inside_class);
 	}
+
+	JSCRIPT_DEBUG_LEAVE();
+
 	return is_terminated;
 }
 
 static void parseJsFile (tokenInfo *const token)
 {
+	JSCRIPT_DEBUG_ENTER();
+	
 	do
 	{
 		readToken (token);
@@ -1996,6 +2073,8 @@ static void parseJsFile (tokenInfo *const token)
 		else
 			parseLine (token, token, false);
 	} while (! isType (token, TOKEN_EOF));
+
+	JSCRIPT_DEBUG_LEAVE();
 }
 
 static void initialize (const langType language)
