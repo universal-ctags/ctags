@@ -126,7 +126,8 @@ enum eKeywordId {
 	KEYWORD_sap,
 	KEYWORD_return,
 	KEYWORD_class,
-	KEYWORD_extends
+	KEYWORD_extends,
+	KEYWORD_static
 };
 typedef int keywordId; /* to allow KEYWORD_NONE */
 
@@ -221,7 +222,8 @@ static const keywordTable JsKeywordTable [] = {
 	{ "sap",	    KEYWORD_sap    				},
 	{ "return",		KEYWORD_return				},
 	{ "class",		KEYWORD_class				},
-	{ "extends",	KEYWORD_extends				}
+	{ "extends",	KEYWORD_extends				},
+	{ "static",		KEYWORD_static				}
 };
 
 /*
@@ -2004,6 +2006,9 @@ static bool parseES6Class(tokenInfo *const token,tokenInfo * const parent)
 		
 		if(isType(token,TOKEN_CLOSE_CURLY))
 			break;
+		
+		if(isKeyword(token,KEYWORD_static))
+			readToken(token);
 		
 		if(!isType(token,TOKEN_IDENTIFIER))
 			break;

@@ -1,5 +1,5 @@
 Class1	input.js	/^class Class1$/;"	c
 Class2	input.js	/^class Class2$/;"	c
-method1	input.js	/^  method1(arg1,arg2)$/;"	m	class:Class1
-method2	input.js	/^  method2(arg1,arg2)$/;"	m	class:Class1
-method3	input.js	/^  method3(arg = 10)$/;"	m	class:Class2
+method1	input.js	/^	method1(arg1,arg2)$/;"	m	class:Class1
+method2	input.js	/^	method2(arg1,arg2)$/;"	m	class:Class1
+method3	input.js	/^	static method3(arg = 10)$/;"	m	class:Class2
