@@ -12,7 +12,7 @@ class Class1
 
 class Class2
 {
-	method3(arg = 10)
+	static method3(arg = 10)
 	{
 	}
 }
