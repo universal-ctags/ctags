@@ -124,7 +124,9 @@ enum eKeywordId {
 	KEYWORD_catch,
 	KEYWORD_finally,
 	KEYWORD_sap,
-	KEYWORD_return
+	KEYWORD_return,
+	KEYWORD_class,
+	KEYWORD_extends,
 };
 typedef int keywordId; /* to allow KEYWORD_NONE */
 
@@ -217,7 +219,9 @@ static const keywordTable JsKeywordTable [] = {
 	{ "catch",		KEYWORD_catch				},
 	{ "finally",	KEYWORD_finally				},
 	{ "sap",	    KEYWORD_sap    				},
-	{ "return",		KEYWORD_return				}
+	{ "return",		KEYWORD_return				},
+	{ "class",		KEYWORD_class				},
+	{ "extends",	KEYWORD_extends				},
 };
 
 /*
@@ -1733,7 +1737,8 @@ nextVar:
 				else
 				{
 					if (! ( isType (name, TOKEN_IDENTIFIER)
-						|| isType (name, TOKEN_STRING) ) )
+					     || isType (name, TOKEN_STRING)
+					     || isType (name, TOKEN_KEYWORD) ) )
 					{
 						/* Unexpected input. Try to reset the parsing. */
 						JSCRIPT_DEBUG_PRINT("Unexpected input, trying to reset");
@@ -1950,6 +1955,94 @@ cleanUp:
 	return is_terminated;
 }
 
+static bool parseES6Class (tokenInfo *const token,tokenInfo * const parent)
+{
+	JSCRIPT_DEBUG_ENTER();
+
+	tokenInfo * className = newToken ();
+	tokenInfo * base = NULL;
+
+	readToken (className);
+	// FIXME: Check if it's an identifier?
+
+	readToken (token);
+	if (isType (token, TOKEN_KEYWORD) && (token->keyword == KEYWORD_extends))
+	{
+		readToken (token);
+
+		if (isType (token, TOKEN_IDENTIFIER))
+		{
+			base = newToken ();
+			copyToken (base, token, true);
+		}
+	}
+
+	// emit class
+	// FIXME: Handle base?
+
+	JSCRIPT_DEBUG_PRINT("Emitting tag for class '%s'",vStringValue(className->string));
+
+	makeJsTag (className, JSTAG_CLASS, NULL);
+
+	if (base)
+		deleteToken (base);
+
+	while (! isType (token, TOKEN_OPEN_CURLY) && ! isType (token, TOKEN_EOF))
+		readToken (token);
+
+	if (isType (token, TOKEN_EOF))
+	{
+		deleteToken (className);
+		JSCRIPT_DEBUG_LEAVE();
+		return true;
+	}
+
+	tokenInfo * name = newToken ();
+
+	for (;;)
+	{
+		readToken (token);
+
+		if (isType (token, TOKEN_CLOSE_CURLY))
+			break;
+
+		if (! isType (token, TOKEN_IDENTIFIER))
+			break;
+
+		// assume method
+		copyToken (name, token, true);
+
+		readToken (token);
+
+		if (! isType (token, TOKEN_OPEN_PAREN))
+			break;
+
+		vString * signature = vStringNew ();
+
+		skipArgumentList (token, false, signature);
+
+		if (! isType (token, TOKEN_OPEN_CURLY))
+		{
+			vStringDelete (signature);
+			break;
+		}
+
+		addToScope (name, className->string);
+		makeJsTag (name, JSTAG_METHOD, signature);
+		parseBlock (token, name);
+
+		vStringDelete (signature);
+	}
+
+	findCmdTerm (token, false, false);
+
+	deleteToken (name);
+	deleteToken (className);
+
+	JSCRIPT_DEBUG_LEAVE();
+	return true;
+}
+
 static void parseUI5 (tokenInfo *const token)
 {
 	tokenInfo *const name = newToken ();
@@ -2037,6 +2130,9 @@ static bool parseLine (tokenInfo *const token, tokenInfo *const parent, bool is_
 				break;
 			case KEYWORD_return:
 				is_terminated = findCmdTerm (token, true, false);
+				break;
+			case KEYWORD_class:
+				is_terminated = parseES6Class (token, parent);
 				break;
 			default:
 				is_terminated = parseStatement (token, parent, is_inside_class);
