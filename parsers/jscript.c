@@ -1248,7 +1248,7 @@ static bool parseBlock (tokenInfo *const token, tokenInfo *const orig_parent)
 	return is_class;
 }
 
-static bool parseMethods (tokenInfo *const token, tokenInfo *const class)
+static bool parseMethods (tokenInfo *const token, tokenInfo *const class, const bool is_es6_class)
 {
 	JSCRIPT_DEBUG_ENTER();
 
@@ -1325,15 +1325,18 @@ static bool parseMethods (tokenInfo *const token, tokenInfo *const class)
 						parseBlock (token, name);
 
 						/*
-						 * Read to the closing curly, check next
-						 * token, if a comma, we must loop again
+						 * If we aren't parsing an ES6 class (for which there
+						 * is no mandatory separators), read to the closing
+						 * curly, check next token, if a comma, we must loop
+						 * again.
 						 */
-						readToken (token);
+						if (! is_es6_class)
+							readToken (token);
 					}
 
 					vStringDelete (signature);
 				}
-				else
+				else if (! is_es6_class)
 				{
 						vString * saveScope = vStringNew ();
 						bool has_child_methods = false;
@@ -1348,7 +1351,7 @@ static bool parseMethods (tokenInfo *const token, tokenInfo *const class)
 								/* Recurse to find child properties/methods */
 								vStringCopy (saveScope, token->scope);
 								addToScope (token, class->string);
-								has_child_methods = parseMethods (token, name);
+								has_child_methods = parseMethods (token, name, false);
 								vStringCopy (token->scope, saveScope);
 								readToken (token);
 							}
@@ -1376,7 +1379,8 @@ static bool parseMethods (tokenInfo *const token, tokenInfo *const class)
 				}
 			}
 		}
-	} while ( isType(token, TOKEN_COMMA) );
+	} while ( isType(token, TOKEN_COMMA) ||
+	          ( is_es6_class && ! isType(token, TOKEN_EOF) ) );
 
 	JSCRIPT_DEBUG_PRINT("Finished parsing methods");
 
@@ -1598,7 +1602,7 @@ nextVar:
 							 *         'validMethodTwo' : function(a,b) {}
 							 *     }
 							 */
-							parseMethods(token, name);
+							parseMethods(token, name, false);
 							/*
 							 * Find to the end of the statement
 							 */
@@ -1772,7 +1776,7 @@ nextVar:
 			 * Or checks if this is a hash variable.
 			 *     var z = {};
 			 */
-			has_methods = parseMethods(token, name);
+			has_methods = parseMethods(token, name, false);
 			if (has_methods)
 				makeJsTag (name, JSTAG_CLASS, NULL);
 			else
@@ -1963,6 +1967,7 @@ static bool parseES6Class (tokenInfo *const token,tokenInfo * const parent)
 
 	tokenInfo * className = newToken ();
 	tokenInfo * base = NULL;
+	bool is_terminated = true;
 
 	readToken (className);
 	// FIXME: Check if it's an identifier?
@@ -1989,63 +1994,18 @@ static bool parseES6Class (tokenInfo *const token,tokenInfo * const parent)
 	if (base)
 		deleteToken (base);
 
-	while (! isType (token, TOKEN_OPEN_CURLY) && ! isType (token, TOKEN_EOF))
+	while (! isType (token, TOKEN_OPEN_CURLY) &&
+	       ! isType (token, TOKEN_EOF) &&
+	       ! isType (token, TOKEN_SEMICOLON))
 		readToken (token);
 
-	if (isType (token, TOKEN_EOF))
-	{
-		deleteToken (className);
-		JSCRIPT_DEBUG_LEAVE();
-		return true;
-	}
+	if (isType (token, TOKEN_OPEN_CURLY))
+		is_terminated = parseMethods (token, className, true);
 
-	tokenInfo * name = newToken ();
-
-	for (;;)
-	{
-		readToken (token);
-
-		if (isType (token, TOKEN_CLOSE_CURLY))
-			break;
-
-		if (isKeyword (token, KEYWORD_static))
-			readToken (token);
-
-		if (! isType (token, TOKEN_IDENTIFIER))
-			break;
-
-		// assume method
-		copyToken (name, token, true);
-
-		readToken (token);
-
-		if (! isType (token, TOKEN_OPEN_PAREN))
-			break;
-
-		vString * signature = vStringNew ();
-
-		skipArgumentList (token, false, signature);
-
-		if (! isType (token, TOKEN_OPEN_CURLY))
-		{
-			vStringDelete (signature);
-			break;
-		}
-
-		addToScope (name, className->string);
-		makeJsTag (name, JSTAG_METHOD, signature);
-		parseBlock (token, name);
-
-		vStringDelete (signature);
-	}
-
-	findCmdTerm (token, false, false);
-
-	deleteToken (name);
 	deleteToken (className);
 
 	JSCRIPT_DEBUG_LEAVE();
-	return true;
+	return is_terminated;
 }
 
 static void parseUI5 (tokenInfo *const token)
@@ -2090,7 +2050,7 @@ static void parseUI5 (tokenInfo *const token)
 
 		do
 		{
-			parseMethods (token, name);
+			parseMethods (token, name, false);
 		} while (! isType (token, TOKEN_CLOSE_CURLY) &&
 				 ! isType (token, TOKEN_EOF));
 	}
