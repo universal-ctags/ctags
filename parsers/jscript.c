@@ -174,6 +174,8 @@ typedef struct sTokenInfo {
 static tokenType LastTokenType;
 static tokenInfo *NextToken;
 
+static unsigned int AnonymousID;
+
 static langType Lang_js;
 
 static objPool *TokenPool = NULL;
@@ -288,7 +290,8 @@ static void copyToken (tokenInfo *const dest, const tokenInfo *const src,
  *	 Tag generation functions
  */
 
-static void makeJsTag (tokenInfo *const token, const jsKind kind, vString *const signature)
+static void makeJsTag (const tokenInfo *const token, const jsKind kind,
+                       vString *const signature)
 {
 	if (JsKinds [kind].enabled && ! token->ignoreTag )
 	{
@@ -1248,7 +1251,8 @@ static bool parseBlock (tokenInfo *const token, tokenInfo *const orig_parent)
 	return is_class;
 }
 
-static bool parseMethods (tokenInfo *const token, tokenInfo *const class, const bool is_es6_class)
+static bool parseMethods (tokenInfo *const token, const tokenInfo *const class,
+                          const bool is_es6_class)
 {
 	JSCRIPT_DEBUG_ENTER();
 
@@ -1392,6 +1396,84 @@ cleanUp:
 	JSCRIPT_DEBUG_LEAVE();
 
 	return has_methods;
+}
+
+static bool parseES6Class (tokenInfo *const token, const tokenInfo *const parent,
+                           const tokenInfo *targetName)
+{
+	JSCRIPT_DEBUG_ENTER();
+
+	tokenInfo * className = newToken ();
+	tokenInfo * base = NULL;
+	bool is_anonymous = true;
+	bool is_terminated = true;
+
+	readToken (className);
+	/* optional name */
+	if (isType (className, TOKEN_IDENTIFIER))
+	{
+		readToken (token);
+		is_anonymous = false;
+	}
+	else
+	{
+		copyToken (token, className, true);
+		/* We create a fake name so we have a scope for the members */
+		if (! targetName)
+		{
+			char buf[32];
+			snprintf (buf, sizeof buf, "AnonymousClass%u", ++AnonymousID);
+			vStringCopyS (className->string, buf);
+		}
+	}
+
+	if (! targetName)
+		targetName = className;
+
+	if (isKeyword (token, KEYWORD_extends))
+	{
+		readToken (token);
+
+		if (isType (token, TOKEN_IDENTIFIER))
+		{
+			base = newToken ();
+			copyToken (base, token, true);
+		}
+	}
+
+	// emit class
+	// FIXME: Handle base?
+
+	JSCRIPT_DEBUG_PRINT("Emitting tag for class '%s'", vStringValue(targetName->string));
+
+	makeJsTag (targetName, JSTAG_CLASS, NULL);
+
+	if (! is_anonymous && targetName != className)
+	{
+		/* FIXME: what to do with the secondary name?  It's local to the
+		 *        class itself, so not very useful... let's hope people
+		 *        don't give it another name than the target in case of
+		 *        	var MyClass = class MyClassSecondaryName { ... }
+		 *        I guess it could be an alias to MyClass, or duplicate it
+		 *        altogether, not sure. */
+		makeJsTag (className, JSTAG_CLASS, NULL);
+	}
+
+	if (base)
+		deleteToken (base);
+
+	while (! isType (token, TOKEN_OPEN_CURLY) &&
+	       ! isType (token, TOKEN_EOF) &&
+	       ! isType (token, TOKEN_SEMICOLON))
+		readToken (token);
+
+	if (isType (token, TOKEN_OPEN_CURLY))
+		is_terminated = parseMethods (token, targetName, true);
+
+	deleteToken (className);
+
+	JSCRIPT_DEBUG_LEAVE();
+	return is_terminated;
 }
 
 static bool parseStatement (tokenInfo *const token, tokenInfo *const parent, bool is_inside_class)
@@ -1765,6 +1847,10 @@ nextVar:
 
 			vStringDelete (signature);
 		}
+		else if (isKeyword (token, KEYWORD_class))
+		{
+			is_terminated = parseES6Class (token, name, name);
+		}
 		else if (isType (token, TOKEN_OPEN_CURLY))
 		{
 			/*
@@ -1961,53 +2047,6 @@ cleanUp:
 	return is_terminated;
 }
 
-static bool parseES6Class (tokenInfo *const token,tokenInfo * const parent)
-{
-	JSCRIPT_DEBUG_ENTER();
-
-	tokenInfo * className = newToken ();
-	tokenInfo * base = NULL;
-	bool is_terminated = true;
-
-	readToken (className);
-	// FIXME: Check if it's an identifier?
-
-	readToken (token);
-	if (isType (token, TOKEN_KEYWORD) && (token->keyword == KEYWORD_extends))
-	{
-		readToken (token);
-
-		if (isType (token, TOKEN_IDENTIFIER))
-		{
-			base = newToken ();
-			copyToken (base, token, true);
-		}
-	}
-
-	// emit class
-	// FIXME: Handle base?
-
-	JSCRIPT_DEBUG_PRINT("Emitting tag for class '%s'",vStringValue(className->string));
-
-	makeJsTag (className, JSTAG_CLASS, NULL);
-
-	if (base)
-		deleteToken (base);
-
-	while (! isType (token, TOKEN_OPEN_CURLY) &&
-	       ! isType (token, TOKEN_EOF) &&
-	       ! isType (token, TOKEN_SEMICOLON))
-		readToken (token);
-
-	if (isType (token, TOKEN_OPEN_CURLY))
-		is_terminated = parseMethods (token, className, true);
-
-	deleteToken (className);
-
-	JSCRIPT_DEBUG_LEAVE();
-	return is_terminated;
-}
-
 static void parseUI5 (tokenInfo *const token)
 {
 	tokenInfo *const name = newToken ();
@@ -2097,7 +2136,7 @@ static bool parseLine (tokenInfo *const token, tokenInfo *const parent, bool is_
 				is_terminated = findCmdTerm (token, true, false);
 				break;
 			case KEYWORD_class:
-				is_terminated = parseES6Class (token, parent);
+				is_terminated = parseES6Class (token, parent, NULL);
 				break;
 			default:
 				is_terminated = parseStatement (token, parent, is_inside_class);
@@ -2158,6 +2197,7 @@ static void findJsTags (void)
 {
 	tokenInfo *const token = newToken ();
 
+	AnonymousID = 0;
 	NextToken = NULL;
 	ClassNames = stringListNew ();
 	FunctionNames = stringListNew ();

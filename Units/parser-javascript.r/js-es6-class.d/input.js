@@ -16,3 +16,17 @@ class Class2
 	{
 	}
 }
+
+var Class3 = class {
+	method4(){}
+	static method5(){}
+}
+
+var Class4 = class Class4_2 {
+	method6(){}
+	static method7(){}
+}
+
+class {
+	method8(n) { return n * n; }
+}
