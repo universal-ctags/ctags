@@ -1,8 +1,13 @@
 History of Onigmo (Oniguruma-mod)
 
+2017/01/16: Version 6.1.0
+
+2017/01/16: [dist] Update LTVERSION to "6:1:0".
 2016/12/26: [impl] Import Ruby r57143, r57175, r57134, r57138 and r57190.
 2016/12/23: [new]  (special thanks to Tanaka Akira)
                    Support absent operator (Issue #82)
+2016/12/22: [bug]  (thanks iology)
+                   mac: Fix loading library (PR #84)
 2016/12/14: [impl] Don't parse (?@...) if USE_CAPTURE_HISTORY is not defined
 2016/12/13: [bug]  Fix out-of-bounds read in set_bm_skip() (Issue #81)
 2016/12/12: [bug]  Fix backward search with .* (Issue #69)

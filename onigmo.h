@@ -5,7 +5,7 @@
 **********************************************************************/
 /*-
  * Copyright (c) 2002-2009  K.Kosako  <sndgk393 AT ybb DOT ne DOT jp>
- * Copyright (c) 2011-2016  K.Takata  <kentkt AT csc DOT jp>
+ * Copyright (c) 2011-2017  K.Takata  <kentkt AT csc DOT jp>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -38,7 +38,7 @@ extern "C" {
 #endif
 
 #define ONIGMO_VERSION_MAJOR   6
-#define ONIGMO_VERSION_MINOR   0
+#define ONIGMO_VERSION_MINOR   1
 #define ONIGMO_VERSION_TEENY   0
 
 #ifndef ONIG_EXTERN

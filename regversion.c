@@ -3,7 +3,7 @@
 **********************************************************************/
 /*-
  * Copyright (c) 2002-2016  K.Kosako  <sndgk393 AT ybb DOT ne DOT jp>
- * Copyright (c) 2011-2016  K.Takata  <kentkt AT csc DOT jp>
+ * Copyright (c) 2011-2017  K.Takata  <kentkt AT csc DOT jp>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -49,7 +49,7 @@ onig_copyright(void)
 {
   const char *s =
     "Onigmo " ONIG_VERSION_STRING " : Copyright (C) 2002-2016 K.Kosako, "
-    "2011-2016 K.Takata";
+    "2011-2017 K.Takata";
 
   return s;
 }
