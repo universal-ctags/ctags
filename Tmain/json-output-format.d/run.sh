@@ -5,10 +5,10 @@ CTAGS=$1
 
 . ../utils.sh
 
-if is_feature_available ${CTAGS} json; then
+if is_feature_available "${CTAGS}" json; then
     {
-	run_with_format json
-	run_with_format json --fields="*"
-	run_with_format json --fields="*" --extra='*'
+	run_with_format json --languages=+man
+	run_with_format json --languages=+man --fields="*"
+	run_with_format json --languages=+man --fields="*" --extra='*'
     } | grep -v TAG_PROGRAM_VERSION
 fi
