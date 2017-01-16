@@ -291,7 +291,7 @@ static void copyToken (tokenInfo *const dest, const tokenInfo *const src,
  */
 
 static void makeJsTag (const tokenInfo *const token, const jsKind kind,
-                       vString *const signature)
+                       vString *const signature, vString *const inheritance)
 {
 	if (JsKinds [kind].enabled && ! token->ignoreTag )
 	{
@@ -347,12 +347,16 @@ static void makeJsTag (const tokenInfo *const token, const jsKind kind,
 			e.extensionFields.signature = vStringValue(signature);
 		}
 
+		if (inheritance)
+			e.extensionFields.inheritance = vStringValue(inheritance);
+
 		makeTagEntry (&e);
 		vStringDelete (fullscope);
 	}
 }
 
-static void makeClassTag (tokenInfo *const token, vString *const signature)
+static void makeClassTag (tokenInfo *const token, vString *const signature,
+                          vString *const inheritance)
 {
 	vString *	fulltag;
 
@@ -372,7 +376,7 @@ static void makeClassTag (tokenInfo *const token, vString *const signature)
 		if ( ! stringListHas(ClassNames, vStringValue (fulltag)) )
 		{
 			stringListAdd (ClassNames, vStringNewCopy (fulltag));
-			makeJsTag (token, JSTAG_CLASS, signature);
+			makeJsTag (token, JSTAG_CLASS, signature, inheritance);
 		}
 		vStringDelete (fulltag);
 	}
@@ -398,7 +402,7 @@ static void makeFunctionTag (tokenInfo *const token, vString *const signature, b
 		if ( ! stringListHas(FunctionNames, vStringValue (fulltag)) )
 		{
 			stringListAdd (FunctionNames, vStringNewCopy (fulltag));
-			makeJsTag (token, generator ? JSTAG_GENERATOR : JSTAG_FUNCTION, signature);
+			makeJsTag (token, generator ? JSTAG_GENERATOR : JSTAG_FUNCTION, signature, NULL);
 		}
 		vStringDelete (fulltag);
 	}
@@ -1132,7 +1136,7 @@ static void parseFunction (tokenInfo *const token)
 	{
 		is_class = parseBlock (token, name);
 		if ( is_class )
-			makeClassTag (name, signature);
+			makeClassTag (name, signature, NULL);
 		else
 			makeFunctionTag (name, signature, is_generator);
 	}
@@ -1325,7 +1329,7 @@ static bool parseMethods (tokenInfo *const token, const tokenInfo *const class,
 					{
 						has_methods = true;
 						addToScope (name, class->string);
-						makeJsTag (name, is_generator ? JSTAG_GENERATOR : JSTAG_METHOD, signature);
+						makeJsTag (name, is_generator ? JSTAG_GENERATOR : JSTAG_METHOD, signature, NULL);
 						parseBlock (token, name);
 
 						/*
@@ -1377,9 +1381,9 @@ static bool parseMethods (tokenInfo *const token, const tokenInfo *const class,
 						has_methods = true;
 						addToScope (name, class->string);
 						if (has_child_methods)
-							makeJsTag (name, JSTAG_CLASS, NULL);
+							makeJsTag (name, JSTAG_CLASS, NULL, NULL);
 						else
-							makeJsTag (name, JSTAG_PROPERTY, NULL);
+							makeJsTag (name, JSTAG_PROPERTY, NULL, NULL);
 				}
 			}
 		}
@@ -1404,7 +1408,7 @@ static bool parseES6Class (tokenInfo *const token, const tokenInfo *const parent
 	JSCRIPT_DEBUG_ENTER();
 
 	tokenInfo * className = newToken ();
-	tokenInfo * base = NULL;
+	vString *inheritance = NULL;
 	bool is_anonymous = true;
 	bool is_terminated = true;
 
@@ -1431,22 +1435,26 @@ static bool parseES6Class (tokenInfo *const token, const tokenInfo *const parent
 		targetName = className;
 
 	if (isKeyword (token, KEYWORD_extends))
+		inheritance = vStringNew ();
+
+	/* skip inheritance info */
+	while (! isType (token, TOKEN_OPEN_CURLY) &&
+	       ! isType (token, TOKEN_EOF) &&
+	       ! isType (token, TOKEN_SEMICOLON))
+		readTokenFull (token, false, inheritance);
+
+	/* remove the last added token (here we assume it's one char, "{" or ";" */
+	if (inheritance && vStringLength (inheritance) > 0 &&
+	    ! isType (token, TOKEN_EOF))
 	{
-		readToken (token);
-
-		if (isType (token, TOKEN_IDENTIFIER))
-		{
-			base = newToken ();
-			copyToken (base, token, true);
-		}
+		vStringChop (inheritance);
+		vStringStripTrailing (inheritance);
+		vStringStripLeading (inheritance);
 	}
-
-	// emit class
-	// FIXME: Handle base?
 
 	JSCRIPT_DEBUG_PRINT("Emitting tag for class '%s'", vStringValue(targetName->string));
 
-	makeJsTag (targetName, JSTAG_CLASS, NULL);
+	makeJsTag (targetName, JSTAG_CLASS, NULL, inheritance);
 
 	if (! is_anonymous && targetName != className)
 	{
@@ -1456,16 +1464,11 @@ static bool parseES6Class (tokenInfo *const token, const tokenInfo *const parent
 		 *        	var MyClass = class MyClassSecondaryName { ... }
 		 *        I guess it could be an alias to MyClass, or duplicate it
 		 *        altogether, not sure. */
-		makeJsTag (className, JSTAG_CLASS, NULL);
+		makeJsTag (className, JSTAG_CLASS, NULL, inheritance);
 	}
 
-	if (base)
-		deleteToken (base);
-
-	while (! isType (token, TOKEN_OPEN_CURLY) &&
-	       ! isType (token, TOKEN_EOF) &&
-	       ! isType (token, TOKEN_SEMICOLON))
-		readToken (token);
+	if (inheritance)
+		vStringDelete (inheritance);
 
 	if (isType (token, TOKEN_OPEN_CURLY))
 		is_terminated = parseMethods (token, targetName, true);
@@ -1622,7 +1625,7 @@ nextVar:
 						 */
 						goto cleanUp;
 
-					makeClassTag (name, NULL);
+					makeClassTag (name, NULL, NULL);
 					is_class = true;
 
 					/*
@@ -1657,7 +1660,7 @@ nextVar:
 									readToken (method_body_token);
 							}
 
-							makeJsTag (token, JSTAG_METHOD, signature);
+							makeJsTag (token, JSTAG_METHOD, signature, NULL);
 							vStringDelete (signature);
 
 							if ( isType (method_body_token, TOKEN_OPEN_CURLY))
@@ -1740,7 +1743,7 @@ nextVar:
 			 * Handles this syntax:
 			 *	   var g_var2;
 			 */
-			makeJsTag (name, is_const ? JSTAG_CONSTANT : JSTAG_VARIABLE, NULL);
+			makeJsTag (name, is_const ? JSTAG_CONSTANT : JSTAG_VARIABLE, NULL, NULL);
 		}
 		/*
 		 * Statement has ended.
@@ -1817,7 +1820,7 @@ nextVar:
 				 */
 				if ( is_inside_class )
 				{
-					makeJsTag (name, is_generator ? JSTAG_GENERATOR : JSTAG_METHOD, signature);
+					makeJsTag (name, is_generator ? JSTAG_GENERATOR : JSTAG_METHOD, signature, NULL);
 					if ( vStringLength(secondary_name->string) > 0 )
 						makeFunctionTag (secondary_name, signature, is_generator);
 					parseBlock (token, name);
@@ -1836,7 +1839,7 @@ nextVar:
 
 					is_class = parseBlock (token, name);
 					if ( is_class )
-						makeClassTag (name, signature);
+						makeClassTag (name, signature, NULL);
 					else
 						makeFunctionTag (name, signature, is_generator);
 
@@ -1864,7 +1867,7 @@ nextVar:
 			 */
 			has_methods = parseMethods(token, name, false);
 			if (has_methods)
-				makeJsTag (name, JSTAG_CLASS, NULL);
+				makeJsTag (name, JSTAG_CLASS, NULL, NULL);
 			else
 			{
 				/*
@@ -1899,7 +1902,7 @@ nextVar:
 					if ( ! stringListHas(FunctionNames, vStringValue (fulltag)) &&
 							! stringListHas(ClassNames, vStringValue (fulltag)) )
 					{
-						makeJsTag (name, is_const ? JSTAG_CONSTANT : JSTAG_VARIABLE, NULL);
+						makeJsTag (name, is_const ? JSTAG_CONSTANT : JSTAG_VARIABLE, NULL, NULL);
 					}
 					vStringDelete (fulltag);
 				}
@@ -1935,13 +1938,13 @@ nextVar:
 					{
 						if ( is_var )
 						{
-							makeJsTag (name, is_const ? JSTAG_CONSTANT : JSTAG_VARIABLE, NULL);
+							makeJsTag (name, is_const ? JSTAG_CONSTANT : JSTAG_VARIABLE, NULL, NULL);
 						}
 						else
 						{
 							if ( is_class )
 							{
-								makeClassTag (name, NULL);
+								makeClassTag (name, NULL, NULL);
 							} else {
 								/* FIXME: we cannot really get a meaningful
 								 * signature from a `new Function()` call,
@@ -1989,7 +1992,7 @@ nextVar:
 				if ( ! stringListHas(FunctionNames, vStringValue (fulltag)) &&
 						! stringListHas(ClassNames, vStringValue (fulltag)) )
 				{
-					makeJsTag (name, is_const ? JSTAG_CONSTANT : JSTAG_VARIABLE, NULL);
+					makeJsTag (name, is_const ? JSTAG_CONSTANT : JSTAG_VARIABLE, NULL, NULL);
 				}
 				vStringDelete (fulltag);
 			}
