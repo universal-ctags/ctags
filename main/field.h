@@ -97,6 +97,8 @@ extern int     getFieldOwner (fieldType type);
 extern const char* getFieldName (fieldType type);
 extern void printFields (int language);
 
+/* Whether the field specified with TYPE has a
+   method for rendering in the current format. */
 extern bool isFieldRenderable (fieldType type);
 
 extern bool doesFieldHaveValue (fieldType type, const tagEntryInfo *tag);
