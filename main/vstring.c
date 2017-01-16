@@ -156,13 +156,14 @@ extern void vStringStripNewline (vString *const string)
  */
 extern void vStringStripLeading (vString *const string)
 {
-	while (isspace ((int) string->buffer [0]) && string->length > 0)
+	size_t n = 0;
+
+	while (n < string->length && isspace ((int) string->buffer [n]))
+		n++;
+	if (n > 0)
 	{
-		size_t i;
-		for (i = 1  ;  i < string->length  ;  ++i)
-			string->buffer [i - 1] = string->buffer [i];
-		--string->length;
-		string->buffer [string->length] = '\0';
+		memmove (string->buffer, string->buffer + n, string->length - n);
+		vStringTruncate (string, string->length - n);
 	}
 }
 
