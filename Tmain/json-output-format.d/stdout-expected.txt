@@ -1,16 +1,18 @@
-# json
+# json --languages=+man
 {"_type": "tag", "name": "Foo", "path": "input.py", "pattern": "/^class Foo:$/", "kind": "class"}
+{"_type": "tag", "name": "N\tA\tM\tE", "path": "input.1", "pattern": "/^.SH \"\tN\tA\tM\tE\t\"$/", "kind": "section"}
 {"_type": "tag", "name": "doIt", "path": "input.py", "pattern": "/^    def doIt():$/", "kind": "member", "scope": "Foo", "scopeKind": "class"}
 {"_type": "tag", "name": "main", "path": "input.c", "pattern": "/^main(void)$/", "typeref": "int", "kind": "function"}
 {"_type": "tag", "name": "main", "path": "input.go", "pattern": "/^func main() {$/", "kind": "func"}
 {"_type": "tag", "name": "main", "path": "input.go", "pattern": "/^package main$/", "kind": "package"}
-# json --fields=*
+# json --languages=+man --fields=*
 {"_type": "tag", "name": "Foo", "path": "input.py", "pattern": "/^class Foo:$/", "access": "public", "inherits": false, "language": "Python", "line": 1, "kind": "class", "end": 3}
+{"_type": "tag", "name": "N\tA\tM\tE", "path": "input.1", "pattern": "/^.SH \"\tN\tA\tM\tE\t\"$/", "language": "man", "line": 1, "kind": "section"}
 {"_type": "tag", "name": "doIt", "path": "input.py", "pattern": "/^    def doIt():$/", "access": "public", "language": "Python", "line": 2, "signature": "()", "kind": "member", "scope": "Foo", "scopeKind": "class", "end": 3}
 {"_type": "tag", "name": "main", "path": "input.c", "pattern": "/^main(void)$/", "language": "C", "line": 4, "signature": "(void)", "typeref": "int", "kind": "function", "end": 7}
 {"_type": "tag", "name": "main", "path": "input.go", "pattern": "/^func main() {$/", "language": "Go", "line": 3, "signature": "()", "kind": "func"}
 {"_type": "tag", "name": "main", "path": "input.go", "pattern": "/^package main$/", "language": "Go", "line": 1, "kind": "package"}
-# json --fields=* --extra=*
+# json --languages=+man --fields=* --extra=*
 {"_type": "ptag", "name": "JSON_OUTPUT_VERSION", "path": "0.0", "pattern": "in development"}
 {"_type": "ptag", "name": "TAG_FILE_FORMAT", "path": "2", "pattern": "extended format; --format=1 will not append ;\" to lines"}
 {"_type": "ptag", "name": "TAG_FILE_SORTED", "path": "1", "pattern": "0=unsorted, 1=sorted, 2=foldcase"}
@@ -19,7 +21,9 @@
 {"_type": "ptag", "name": "TAG_PROGRAM_URL", "path": "https://ctags.io/", "pattern": "official site"}
 {"_type": "tag", "name": "Foo", "path": "input.py", "pattern": "/^class Foo:$/", "access": "public", "inherits": false, "language": "Python", "line": 1, "kind": "class", "end": 3}
 {"_type": "tag", "name": "Foo.doIt", "path": "input.py", "pattern": "/^    def doIt():$/", "access": "public", "language": "Python", "line": 2, "signature": "()", "kind": "member", "scope": "Foo", "extra": "qualified", "scopeKind": "class", "end": 3}
+{"_type": "tag", "name": "N\tA\tM\tE", "path": "input.1", "pattern": "/^.SH \"\tN\tA\tM\tE\t\"$/", "language": "man", "line": 1, "kind": "section"}
 {"_type": "tag", "name": "doIt", "path": "input.py", "pattern": "/^    def doIt():$/", "access": "public", "language": "Python", "line": 2, "signature": "()", "kind": "member", "scope": "Foo", "scopeKind": "class", "end": 3}
+{"_type": "tag", "name": "input.1", "path": "input.1", "pattern": false, "language": "man", "line": 1, "kind": "file", "extra": "inputFile", "end": 1}
 {"_type": "tag", "name": "input.c", "path": "input.c", "pattern": false, "language": "C", "line": 1, "kind": "file", "extra": "inputFile", "end": 7}
 {"_type": "tag", "name": "input.go", "path": "input.go", "pattern": false, "language": "Go", "line": 1, "kind": "file", "extra": "inputFile", "end": 4}
 {"_type": "tag", "name": "input.py", "path": "input.py", "pattern": false, "language": "Python", "line": 1, "kind": "file", "extra": "inputFile", "end": 3}
