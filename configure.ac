@@ -585,30 +585,48 @@ AC_CHECK_FUNCS(scandir)
 AC_CHECK_FUNCS(fork waitpid execv pipe,[enable_xcmd=yes],[enable_xcmd=no])
 AM_CONDITIONAL([ENABLE_XCMD], [test "xyes" = "x$enable_xcmd"])
 
+AC_ARG_ENABLE([xml],
+	[AS_HELP_STRING([--enable-xml],
+		[enable xml support [no]])])
+
 AH_TEMPLATE([HAVE_LIBXML],
 	[Define this value if libxml is available.])
 dnl About the condition of version
 dnl see https://mail.gnome.org/archives/xml/2010-February/msg00008.html
-PKG_CHECK_MODULES(LIBXML, [libxml-2.0 >= 2.7.7],
-		       [have_libxml=yes
-		       AC_DEFINE(HAVE_LIBXML)],
-		       [have_libxml=no])
+AS_IF([test "${enable_xml}" = "yes"], [
+	PKG_CHECK_MODULES(LIBXML, [libxml-2.0 >= 2.7.7],
+			       [have_libxml=yes
+			       AC_DEFINE(HAVE_LIBXML)],
+			       [AC_MSG_ERROR([libxml2 not found])])
+])
 AM_CONDITIONAL(HAVE_LIBXML, test "x$have_libxml" = xyes)
+
+AC_ARG_ENABLE([json],
+	[AS_HELP_STRING([--enable-json],
+		[enable json support [no]])])
 
 AH_TEMPLATE([HAVE_JANSSON],
 	[Define this value if jansson is available.])
-PKG_CHECK_MODULES(JANSSON, jansson,
-		       [have_jansson=yes
-		       AC_DEFINE(HAVE_JANSSON)],
-		       [have_jansson=no])
+AS_IF([test "${enable_json}" = "yes"], [
+	PKG_CHECK_MODULES(JANSSON, jansson,
+			       [have_jansson=yes
+			       AC_DEFINE(HAVE_JANSSON)],
+			       [AC_MSG_ERROR([jansson not found])])
+])
 AM_CONDITIONAL(HAVE_JANSSON, test "x$have_jansson" = xyes)
+
+AC_ARG_ENABLE([yaml],
+	[AS_HELP_STRING([--enable-yaml],
+		[enable yaml support [no]])])
 
 AH_TEMPLATE([HAVE_LIBYAML],
 	[Define this value if libyaml is available.])
-PKG_CHECK_MODULES(LIBYAML, yaml-0.1,
-		       [have_libyaml=yes
-		       AC_DEFINE(HAVE_LIBYAML)],
-		       [have_libyaml=no])
+AS_IF([test "${enable_yaml}" = "yes"], [
+	PKG_CHECK_MODULES(LIBYAML, yaml-0.1,
+			       [have_libyaml=yes
+			       AC_DEFINE(HAVE_LIBYAML)],
+			       [AC_MSG_ERROR([libyaml not found])])
+])
 AM_CONDITIONAL(HAVE_LIBYAML, test "x$have_libyaml" = xyes)
 
 
