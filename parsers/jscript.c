@@ -174,8 +174,6 @@ typedef struct sTokenInfo {
 static tokenType LastTokenType;
 static tokenInfo *NextToken;
 
-static unsigned int AnonymousID;
-
 static langType Lang_js;
 
 static objPool *TokenPool = NULL;
@@ -1424,11 +1422,7 @@ static bool parseES6Class (tokenInfo *const token, const tokenInfo *const parent
 		copyToken (token, className, true);
 		/* We create a fake name so we have a scope for the members */
 		if (! targetName)
-		{
-			char buf[32];
-			snprintf (buf, sizeof buf, "AnonymousClass%u", ++AnonymousID);
-			vStringCopyS (className->string, buf);
-		}
+			anonGenerate (className->string, "AnonymousClass", JSTAG_CLASS);
 	}
 
 	if (! targetName)
@@ -2200,7 +2194,7 @@ static void findJsTags (void)
 {
 	tokenInfo *const token = newToken ();
 
-	AnonymousID = 0;
+	anonReset ();
 	NextToken = NULL;
 	ClassNames = stringListNew ();
 	FunctionNames = stringListNew ();

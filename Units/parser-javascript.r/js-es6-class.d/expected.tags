@@ -1,4 +1,4 @@
-AnonymousClass1	input.js	/^class {$/;"	c
+AnonymousClass152c525b0101	input.js	/^class {$/;"	c
 Class1	input.js	/^class Class1$/;"	c
 Class2	input.js	/^class Class2$/;"	c
 Class3	input.js	/^var Class3 = class {$/;"	c
@@ -11,4 +11,4 @@ method4	input.js	/^	method4(){}$/;"	m	class:Class3
 method5	input.js	/^	static method5(){}$/;"	m	class:Class3
 method6	input.js	/^	method6(){}$/;"	m	class:Class4
 method7	input.js	/^	static method7(){}$/;"	m	class:Class4
-method8	input.js	/^	method8(n) { return n * n; }$/;"	m	class:AnonymousClass1
+method8	input.js	/^	method8(n) { return n * n; }$/;"	m	class:AnonymousClass152c525b0101
