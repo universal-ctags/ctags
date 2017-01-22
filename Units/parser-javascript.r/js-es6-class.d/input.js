@@ -42,5 +42,10 @@ function func1() {
 	}
 }
 
+class Class5 {
+	method11() {};
+	method12() {};
+}
+
 function func2() {
 }

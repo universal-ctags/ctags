@@ -1286,7 +1286,8 @@ static bool parseMethods (tokenInfo *const token, const tokenInfo *const class,
 			goto cleanUp;
 		}
 
-		if (! isType (token, TOKEN_KEYWORD))
+		if (! isType (token, TOKEN_KEYWORD) &&
+		    ! isType (token, TOKEN_SEMICOLON))
 		{
 			bool is_generator = false;
 			bool is_shorthand = false; /* ES6 shorthand syntax */
