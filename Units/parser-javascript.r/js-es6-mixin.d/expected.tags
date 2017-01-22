@@ -1,8 +1,8 @@
-Foo	input.js	/^class Foo {$/;"	c
-foo	input.js	/^  foo() { return "foo"; }$/;"	m	class:Foo
 Bar	input.js	/^class Bar extends Foo {$/;"	c	inherits:Foo
-bar	input.js	/^  bar() { return "bar"; }$/;"	m	class:Bar
-Mixin	input.js	/^function Mixin(superclass) {$/;"	f
 Baz	input.js	/^class Baz extends Mixin(Bar) {$/;"	c	inherits:Mixin(Bar)
+Foo	input.js	/^class Foo {$/;"	c
+Mixin	input.js	/^function Mixin(superclass) {$/;"	f
+bar	input.js	/^  bar() { return "bar"; }$/;"	m	class:Bar
+foo	input.js	/^  foo() { return "foo"; }$/;"	m	class:Foo
 hi	input.js	/^  hi() {$/;"	m	class:Baz
 i	input.js	/^var i = new Baz();$/;"	v
