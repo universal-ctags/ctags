@@ -315,6 +315,7 @@ static void makeJsTag (const tokenInfo *const token, const jsKind kind,
 
 		if ( vStringLength(fullscope) > 0 )
 		{
+			/* FIXME: proper parent type */
 			jsKind parent_kind = JSTAG_CLASS;
 
 			/*
@@ -1156,7 +1157,8 @@ static bool parseBlock (tokenInfo *const token, tokenInfo *const orig_parent)
 	tokenInfo *const parent = newToken ();
 
 	/* backup the parent token to allow calls like parseBlock(token, token) */
-	copyToken (parent, orig_parent, true);
+	if (orig_parent)
+		copyToken (parent, orig_parent, true);
 
 	token->nestLevel++;
 	/*
@@ -1410,7 +1412,11 @@ static bool parseES6Class (tokenInfo *const token, const tokenInfo *const parent
 	bool is_anonymous = true;
 	bool is_terminated = true;
 
+	copyToken (className, token, true);
 	readToken (className);
+	if (parent && ! targetName)
+		addToScope (className, parent->string);
+
 	/* optional name */
 	if (isType (className, TOKEN_IDENTIFIER))
 	{
@@ -2168,7 +2174,7 @@ static void parseJsFile (tokenInfo *const token)
 		else if (isType (token, TOKEN_KEYWORD) && token->keyword == KEYWORD_sap)
 			parseUI5 (token);
 		else
-			parseLine (token, token, false);
+			parseLine (token, NULL, false);
 	} while (! isType (token, TOKEN_EOF));
 
 	JSCRIPT_DEBUG_LEAVE();

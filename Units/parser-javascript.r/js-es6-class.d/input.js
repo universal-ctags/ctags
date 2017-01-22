@@ -30,3 +30,17 @@ var Class4 = class Class4_2 {
 class {
 	method8(n) { return n * n; }
 }
+
+function func1() {
+	class InnerClass1 {
+		method9() {
+		}
+	}
+	class InnerClass2 {
+		method10() {
+		}
+	}
+}
+
+function func2() {
+}
