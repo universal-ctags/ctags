@@ -1410,7 +1410,6 @@ static bool parseES6Class (tokenInfo *const token, const tokenInfo *const parent
 	tokenInfo * className = newToken ();
 	vString *inheritance = NULL;
 	bool is_anonymous = true;
-	bool is_terminated = true;
 
 	copyToken (className, token, true);
 	readToken (className);
@@ -1471,12 +1470,12 @@ static bool parseES6Class (tokenInfo *const token, const tokenInfo *const parent
 		vStringDelete (inheritance);
 
 	if (isType (token, TOKEN_OPEN_CURLY))
-		is_terminated = parseMethods (token, targetName, true);
+		parseMethods (token, targetName, true);
 
 	deleteToken (className);
 
 	JSCRIPT_DEBUG_LEAVE();
-	return is_terminated;
+	return true;
 }
 
 static bool parseStatement (tokenInfo *const token, tokenInfo *const parent, bool is_inside_class)
