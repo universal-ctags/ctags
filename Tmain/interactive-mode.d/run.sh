@@ -12,6 +12,8 @@ s()
 	sed -e s/':"'/': "'/g
 }
 
+CTAGS="$CTAGS --options=NONE"
+
 echo identification message on startup
 echo =======================================
 ${CTAGS} --_interactive < /dev/null |s
