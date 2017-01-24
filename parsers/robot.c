@@ -1,6 +1,6 @@
 /*
  * robot.c
- * parser for robot framewor
+ * parser for robot framework
  * Author - Daniel Riechers
  * License GPL-2
  */
