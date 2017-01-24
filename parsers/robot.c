@@ -2,7 +2,7 @@
  *   Copyright (c) 2017, Daniel Riechers
  *
  *   This source code is released for free distribution under the terms of the
- *   GNU General Public License version 2.
+ *   GNU General Public License version 2 or (at your option) any later version.
  *
  *   Parser from Robot Framework http://robotframework.org
  */
