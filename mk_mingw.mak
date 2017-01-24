@@ -4,7 +4,7 @@ include source.mak
 
 REGEX_DEFINES = -DHAVE_REGCOMP -D__USE_GNU -Dbool=int -Dfalse=0 -Dtrue=1 -Dstrcasecmp=stricmp
 
-CFLAGS = -Wall
+CFLAGS = -Wall -std=gnu99
 DEFINES = -DWIN32 $(REGEX_DEFINES)
 INCLUDES = -I. -Imain -Ignu_regex -Ifnmatch -Iparsers
 CC = gcc
