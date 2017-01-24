@@ -1,8 +1,10 @@
 /*
- * robot.c
- * parser for robot framework
- * Author - Daniel Riechers
- * License GPL-2
+ *   Copyright (c) 2017, Daniel Riechers
+ *
+ *   This source code is released for free distribution under the terms of the
+ *   GNU General Public License version 2.
+ *
+ *   Parser from Robot Framework http://robotframework.org
  */
 
 #include "general.h"
@@ -40,12 +42,12 @@ static void whitespaceSwap (vString *const s)
             toReplace = '_';
         }
 
-        for(int i=0; i < s->length; i++)
+        for(int i=0; i < vStringLength(s); i++)
             if(s->buffer[i] == toReplace)
                 s->buffer[i] = replaceWith;
 }
 
-static void keywords (const char *const line, const regexMatch *const matches,
+static void tagKeywords (const char *const line, const regexMatch *const matches,
                                const unsigned int count, void *data)
 {
     if (count > 1)
@@ -55,10 +57,11 @@ static void keywords (const char *const line, const regexMatch *const matches,
         makeSimpleTag (name, RobotKinds, K_KEYWORD);
         whitespaceSwap(name);
         makeSimpleTag (name, RobotKinds, K_KEYWORD);
+        vStringDelete (name);
     }
 }
 
-static void variables (const char *const line, const regexMatch *const matches,
+static void tagVariables (const char *const line, const regexMatch *const matches,
                                const unsigned int count, void *data)
 {
     if (count > 1)
@@ -68,15 +71,16 @@ static void variables (const char *const line, const regexMatch *const matches,
         makeSimpleTag (name, RobotKinds, K_VARIABLE);
         whitespaceSwap(name);
         makeSimpleTag (name, RobotKinds, K_VARIABLE);
+        vStringDelete (name);
     }
 }
 
 static void initialize (const langType language)
 {
-    addCallbackRegex (language, "(^[A-Za-z0-9]+([ _][A-Za-z0-9]+)*)",
-            "{exclusive}", keywords, NULL, NULL);
-    addCallbackRegex (language, "^[$@]\\{([_A-Za-z0-9][ _A-Za-z0-9]+)\\}  [ ]*.+",
-            "{exclusive}", variables, NULL, NULL);
+    addCallbackRegex (language, "(^[A-Za-z0-9]+([' _][A-Za-z0-9]+)*)",
+            "{exclusive}", tagKeywords, NULL, NULL);
+    addCallbackRegex (language, "^[$@]\\{([_A-Za-z0-9][' _A-Za-z0-9]+)\\}  [ ]*.+",
+            "{exclusive}", tagVariables, NULL, NULL);
 }
 
 extern parserDefinition* RobotParser (void)
