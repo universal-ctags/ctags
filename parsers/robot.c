@@ -77,7 +77,7 @@ static void tagVariables (const char *const line, const regexMatch *const matche
 
 static void initialize (const langType language)
 {
-    addCallbackRegex (language, "(^[A-Za-z0-9]+([' _][A-Za-z0-9]+)*)",
+    addCallbackRegex (language, "(^[A-Za-z0-9]+([' _][A-Za-z0-9]+)*)($|[ ]*[$@])",
             "{exclusive}", tagKeywords, NULL, NULL);
     addCallbackRegex (language, "^[$@]\\{([_A-Za-z0-9][' _A-Za-z0-9]+)\\}  [ ]*.+",
             "{exclusive}", tagVariables, NULL, NULL);
