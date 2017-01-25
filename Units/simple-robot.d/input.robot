@@ -1,4 +1,4 @@
-*** Settings ***
+* Settings ***
 Library           test.py
 
 *** Variables ***
@@ -7,7 +7,7 @@ ${var_2}   b
 @{list 1}   a  b  c
 @{list_2}  d  e  f
 
-*** Test Case ***
+*** Test Cases ***
 Test case 1
     Keyword 1  ${var 1}
     Keyword_2  ${var_1}
@@ -18,23 +18,22 @@ Test case 1
     Keyword 3  @{list 2}
     Keyword 3  @{list_2}
     Keyword with a variable name
-    Keyword two with a variable name
     it's ok to be correct
 
-*** Keyword ***
+*** Keywords ***
 Keyword 1
+    [Arguments]  ${arg}
     python keyword 1
 
 Keyword 2
+    [Arguments]  ${arg}
     python_keyword_2
 
 Keyword_3
+    [Arguments]  @{arg1}
     Python_keyword_2
 
 Keyword ${with variable} name
-    Python_keyword_2
-
-Keyword two ${with variable} name
     Python_keyword_2
 
 it's ok to be correct

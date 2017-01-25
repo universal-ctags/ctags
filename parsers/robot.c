@@ -16,12 +16,16 @@
 #include "routines.h"
 
 typedef enum {
+        K_TESTCASE,
         K_KEYWORD,
         K_VARIABLE,
         COUNT_KIND
 } RobotKind;
 
+static RobotKind section = -1;
+
 static kindOption RobotKinds[COUNT_KIND] = {
+	{true, 't', "testcase",   "testcases"},
 	{true, 'k', "keyword",    "keywords"},
 	{true, 'v', "variable",   "variables"},
 };
@@ -47,16 +51,39 @@ static void whitespaceSwap (vString *const s)
                 s->buffer[i] = replaceWith;
 }
 
-static void tagKeywords (const char *const line, const regexMatch *const matches,
+static void changeSection (const char *const line, const regexMatch *const matches,
                                const unsigned int count, void *data)
 {
-    if (count > 1)
+    vString *const sectionName = vStringNew ();
+    vStringNCopyS (sectionName, line + matches [1].start, matches [1].length);
+    vStringCopyToLower(sectionName, sectionName);
+
+    if(strcmp(sectionName->buffer, "test cases") == 0)
+    {
+        section = K_TESTCASE;
+    }
+    else if(strcmp(sectionName->buffer, "keywords") == 0)
+    {
+        section = K_KEYWORD;
+    }
+    else if(strcmp(sectionName->buffer, "variables") == 0)
+    {
+        section = K_VARIABLE;
+    }
+
+    vStringDelete(sectionName);
+}
+
+static void tagKeywordsAndTestCases (const char *const line, const regexMatch *const matches,
+                               const unsigned int count, void *data)
+{
+    if (count > 1 && ( section == K_KEYWORD || section == K_TESTCASE) )
     {
         vString *const name = vStringNew ();
         vStringNCopyS (name, line + matches [1].start, matches [1].length);
-        makeSimpleTag (name, RobotKinds, K_KEYWORD);
+        makeSimpleTag (name, RobotKinds, section);
         whitespaceSwap(name);
-        makeSimpleTag (name, RobotKinds, K_KEYWORD);
+        makeSimpleTag (name, RobotKinds, section);
         vStringDelete (name);
     }
 }
@@ -64,7 +91,7 @@ static void tagKeywords (const char *const line, const regexMatch *const matches
 static void tagVariables (const char *const line, const regexMatch *const matches,
                                const unsigned int count, void *data)
 {
-    if (count > 1)
+    if (count > 1 && section == K_VARIABLE)
     {
         vString *const name = vStringNew ();
         vStringNCopyS (name, line + matches [1].start, matches [1].length);
@@ -77,8 +104,10 @@ static void tagVariables (const char *const line, const regexMatch *const matche
 
 static void initialize (const langType language)
 {
+    addCallbackRegex (language, "^\\*+ *([^* ].+[^* ]) *\\*+$",
+            "{exclusive}", changeSection, NULL, NULL);
     addCallbackRegex (language, "(^[A-Za-z0-9]+([' _][A-Za-z0-9]+)*)($|[ ]*[$@])",
-            "{exclusive}", tagKeywords, NULL, NULL);
+            "{exclusive}", tagKeywordsAndTestCases, NULL, NULL);
     addCallbackRegex (language, "^[$@]\\{([_A-Za-z0-9][' _A-Za-z0-9]+)\\}  [ ]*.+",
             "{exclusive}", tagVariables, NULL, NULL);
 }
