@@ -59,10 +59,14 @@ typedef const char* (* renderEscaped) (const tagEntryInfo *const tag,
 					   bool *rejected);
 typedef bool (* isValueAvailable) (const struct sTagEntryInfo *const tag);
 
+#define fieldDataTypeFalgs "sib" /* used in --list-fields */
 typedef enum eFieldDataType {
 	FIELDTYPE_STRING  = 1 << 0,
 	FIELDTYPE_INTEGER = 1 << 1,
 	FIELDTYPE_BOOL    = 1 << 2,
+
+	/* used in --list-fields */
+	FIELDTYPE_END_MARKER = 1 << 3,
 } fieldDataType;
 
 #define FIELD_LETTER_NO_USE '\0'

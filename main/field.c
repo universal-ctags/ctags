@@ -366,6 +366,7 @@ extern bool doesFieldHaveValue (fieldType type, const tagEntryInfo *tag)
 #define PR_FIELD_WIDTH_LANGUAGE  16
 #define PR_FIELD_WIDTH_DESC      30
 #define PR_FIELD_WIDTH_XFMT      6
+#define PR_FIELD_WIDTH_JSTYPE    6
 #define PR_FIELD_WIDTH_ENABLED   7
 
 #define PR_FIELD_STR(X) PR_FIELD_WIDTH_##X
@@ -382,6 +383,8 @@ extern bool doesFieldHaveValue (fieldType type, const tagEntryInfo *tag)
 	" "					\
 	PR_FIELD_FMT (XFMT,s)		\
 	" "					\
+	PR_FIELD_FMT (JSTYPE,s)		\
+	" "					\
 	PR_FIELD_FMT (DESC,s)			\
 	"\n"
 
@@ -390,6 +393,7 @@ static void printField (fieldType i)
 	unsigned char letter = fieldDescs[i].spec->letter;
 	const char *name;
 	const char *language;
+	char  typefields [] = "---";
 
 	if (letter == FIELD_LETTER_NO_USE)
 		letter = '-';
@@ -404,12 +408,23 @@ static void printField (fieldType i)
 	else
 		language = getLanguageName (fieldDescs[i].language);
 
-	printf((Option.machinable? "%c\t%s\t%s\t%s\t%s\t%s\n": MAKE_FIELD_FMT(c)),
+	{
+		unsigned int bmask, offset;
+		unsigned int dt = getFieldDataType(i);
+		for (bmask = 1, offset = 0;
+			 bmask < FIELDTYPE_END_MARKER;
+			 bmask <<= 1, offset++)
+			if (dt & bmask)
+				typefields[offset] = fieldDataTypeFalgs[offset];
+	}
+
+	printf((Option.machinable? "%c\t%s\t%s\t%s\t%s\t%s\t%s\n": MAKE_FIELD_FMT(c)),
 	       letter,
 	       name,
 	       isFieldEnabled (i)? "on": "off",
 	       language,
 	       getFieldDesc (i)->spec->renderEscaped? "TRUE": "FALSE",
+		   typefields,
 	       fieldDescs[i].spec->description? fieldDescs[i].spec->description: "NONE");
 }
 
@@ -418,8 +433,8 @@ extern void printFields (int language)
 	unsigned int i;
 
 	if (Option.withListHeader)
-		printf ((Option.machinable? "%s\t%s\t%s\t%s\t%s\t%s\n": MAKE_FIELD_FMT(s)),
-			"#LETTER", "NAME", "ENABLED", "LANGUAGE", "XFMT", "DESCRIPTION");
+		printf ((Option.machinable? "%s\t%s\t%s\t%s\t%s\t%s\t%s\n": MAKE_FIELD_FMT(s)),
+			"#LETTER", "NAME", "ENABLED", "LANGUAGE", "XFMT", "JSTYPE", "DESCRIPTION");
 
 	for (i = 0; i < fieldDescUsed; i++)
 	{
