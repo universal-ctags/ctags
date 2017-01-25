@@ -608,6 +608,10 @@ AC_ARG_ENABLE([json],
 
 AH_TEMPLATE([HAVE_JANSSON],
 	[Define this value if jansson is available.])
+dnl This enforces explicit feature usage regardless of the libraries
+dnl available on the build system. This avoids automagic dependencies which
+dnl can cause issues for source-based distros [1].
+dnl [1]: https://wiki.gentoo.org/wiki/Project:Quality_Assurance/Automagic_dependencies
 AS_IF([test "x$enable_json" != "xno"], [
 	PKG_CHECK_MODULES(JANSSON, jansson,
 			       [have_jansson=yes
