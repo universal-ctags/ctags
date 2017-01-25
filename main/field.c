@@ -1043,6 +1043,9 @@ extern int defineField (fieldSpec *spec, langType language)
 	if (spec->renderEscaped [WRITER_DEFAULT] == NULL)
 		spec->renderEscaped [WRITER_DEFAULT] = defaultRenderer;
 
+	if (! spec->dataType)
+		spec->dataType = FIELDTYPE_STRING;
+
 	fdesc->spec = spec;
 
 	fdesc->fixed =  0;
