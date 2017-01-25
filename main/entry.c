@@ -162,9 +162,7 @@ static void rememberMaxLengths (const size_t nameLength, const size_t lineLength
 
 static void addCommonPseudoTags (void)
 {
-	int i;
-
-	for (i = 0; i < PTAG_COUNT; i++)
+	for (int i = 0; i < PTAG_COUNT; i++)
 	{
 		if (isPtagCommonInParsers (i))
 			makePtagIfEnabled (i, NULL);
