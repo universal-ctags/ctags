@@ -4,6 +4,9 @@
 JSON output
 ======================================================================
 
+Format
+----------------------------------------------------------------------   
+
 JSON output goes to standard output by default.
 Each generated tag line is represented as an object.
 
@@ -46,3 +49,37 @@ fields internally. As for all kinds, long names are used for printing
 If you need kind letters, open an issue at the GitHub site of
 Universal-ctags.
 
+.. NOT REVIEWED YET
+
+Field introspection
+----------------------------------------------------------------------   
+
+Values for the most of all fields are represented in JSON string type.
+However, some of them are represented in integer type and/or boolean type.
+What kind of JSON data types used in a field can be known with the output
+of ``--list-fields`` option:
+
+        $ ./ctags --list-fields
+        #LETTER NAME            ENABLED LANGUAGE         XFMT   JSTYPE DESCRIPTION
+        N       name            on      NONE             TRUE   s--    tag name (fixed field)
+        ..
+        f       file            on      NONE             TRUE   --b    File-restricted scoping
+        i       inherits        off     NONE             TRUE   s-b    Inheritance information
+        ...
+        n       line            off     NONE             TRUE   -i-    Line number of tag definition
+        ...
+    
+`JSTYPE` column tells the data type of fields.
+
+s
+	string
+
+i
+	integer
+
+b
+	boolean
+
+For exapmle, The value for "inherits" field is represented in the string or boolean type.
+
+	
