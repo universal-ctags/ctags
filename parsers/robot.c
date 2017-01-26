@@ -54,24 +54,20 @@ static void whitespaceSwap (vString *const s)
 static void changeSection (const char *const line, const regexMatch *const matches,
                                const unsigned int count, void *data)
 {
-    vString *const sectionName = vStringNew ();
-    vStringNCopyS (sectionName, line + matches [1].start, matches [1].length);
-    vStringCopyToLower(sectionName, sectionName);
+    const char * const matchedSection = line + matches[1].start;
 
-    if(strcmp(sectionName->buffer, "test cases") == 0)
+    if(strncasecmp(matchedSection, "test cases", matches[1].length) == 0)
     {
         section = K_TESTCASE;
     }
-    else if(strcmp(sectionName->buffer, "keywords") == 0)
+    else if(strncasecmp(matchedSection, "keywords", matches[1].length) == 0)
     {
         section = K_KEYWORD;
     }
-    else if(strcmp(sectionName->buffer, "variables") == 0)
+    else if(strncasecmp(matchedSection, "variables", matches[1].length) == 0)
     {
         section = K_VARIABLE;
     }
-
-    vStringDelete(sectionName);
 }
 
 static void tagKeywordsAndTestCases (const char *const line, const regexMatch *const matches,
