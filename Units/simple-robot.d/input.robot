@@ -17,6 +17,7 @@ Test case 1
     Keyword 3  @{list_1}
     Keyword 3  @{list 2}
     Keyword 3  @{list_2}
+    Keyword 4  @{list_2}
     Keyword with a variable name
     it's ok to be correct
 
@@ -31,6 +32,9 @@ Keyword 2
 
 Keyword_3
     [Arguments]  @{arg1}
+    Python_keyword_2
+
+Keyword_4    [Arguments]  @{arg1}
     Python_keyword_2
 
 Keyword ${with variable} name

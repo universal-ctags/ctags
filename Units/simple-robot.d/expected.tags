@@ -1,17 +1,13 @@
-!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
-!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
-!_TAG_OUTPUT_MODE	u-ctags	/u-ctags or e-ctags/
-!_TAG_PROGRAM_AUTHOR	Universal Ctags Team	//
-!_TAG_PROGRAM_NAME	Universal Ctags	/Derived from Exuberant Ctags/
-!_TAG_PROGRAM_URL	https://ctags.io/	/official site/
-!_TAG_PROGRAM_VERSION	0.0.0	/f6247b0/
-Keyword	input.robot	/^Keyword ${with variable} name$/;"	k
+Keyword ${with variable} name	input.robot	/^Keyword ${with variable} name$/;"	k
 Keyword 1	input.robot	/^Keyword 1$/;"	k
 Keyword 2	input.robot	/^Keyword 2$/;"	k
 Keyword 3	input.robot	/^Keyword_3$/;"	k
+Keyword 4	input.robot	/^Keyword_4    [Arguments]  @{arg1}$/;"	k
+Keyword_${with_variable}_name	input.robot	/^Keyword ${with variable} name$/;"	k
 Keyword_1	input.robot	/^Keyword 1$/;"	k
 Keyword_2	input.robot	/^Keyword 2$/;"	k
 Keyword_3	input.robot	/^Keyword_3$/;"	k
+Keyword_4	input.robot	/^Keyword_4    [Arguments]  @{arg1}$/;"	k
 Test case 1	input.robot	/^Test case 1$/;"	t
 Test_case_1	input.robot	/^Test case 1$/;"	t
 it's ok to be correct	input.robot	/^it's ok to be correct$/;"	k
