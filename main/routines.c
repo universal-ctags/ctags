@@ -582,8 +582,8 @@ extern bool isSameFile (const char *const name1, const char *const name2)
 # else
 		result = (bool) (strcmp (n1, n2) == 0);
 # endif
-		free (n1);
-		free (n2);
+		eFree (n1);
+		eFree (n2);
 	}
 #endif
 	return result;
@@ -863,7 +863,7 @@ extern char* relativeFilename (const char *file, const char *dir)
 
 	/* Add the file name relative to the common root of file and dir. */
 	strcat (res, fp + 1);
-	free (absdir);
+	eFree (absdir);
 
 	return res;
 }

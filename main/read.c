@@ -260,7 +260,7 @@ static void freeLineFposMap (inputLineFposMap *lineFposMap)
 {
 	if (lineFposMap->pos)
 	{
-		free (lineFposMap->pos);
+		eFree (lineFposMap->pos);
 		lineFposMap->pos = NULL;
 		lineFposMap->count = 0;
 		lineFposMap->size = 0;
