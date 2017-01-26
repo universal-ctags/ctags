@@ -95,6 +95,7 @@
 	PythonLoggingConfigParser, \
 	RParser, \
 	RexxParser, \
+	RobotParser, \
 	RpmSpecParser, \
 	RstParser, \
 	RubyParser, \

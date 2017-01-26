@@ -190,6 +190,7 @@
     <ClCompile Include="..\parsers\rst.c" />
     <ClCompile Include="..\parsers\r.c" />
     <ClCompile Include="..\parsers\rexx.c" />
+    <ClCompile Include="..\parsers\robot.c" />
     <ClCompile Include="..\main\routines.c" />
     <ClCompile Include="..\parsers\ruby.c" />
     <ClCompile Include="..\parsers\rust.c" />

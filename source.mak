@@ -184,6 +184,7 @@ PARSER_SRCS =				\
 	parsers/pythonloggingconfig.c	\
 	parsers/r.c			\
 	parsers/rexx.c			\
+	parsers/robot.c			\
 	parsers/rpmspec.c		\
 	parsers/rst.c			\
 	parsers/ruby.c			\

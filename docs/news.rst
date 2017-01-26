@@ -64,6 +64,7 @@ The following parsers have been added:
 * R
 * RelaxNG *libxml*
 * reStructuredText
+* Robot
 * RpmSpec
 * Rust
 * SystemdUnit
