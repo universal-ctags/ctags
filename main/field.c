@@ -26,14 +26,14 @@
 #include "routines.h"
 
 
-struct sFieldDesc {
+typedef struct sFieldDesc {
 	fieldSpec *spec;
 	unsigned int fixed:   1;   /* fields which cannot be disabled. */
 	vString     *buffer;
 	const char* nameWithPrefix;
 	langType language;
 	fieldType sibling;
-};
+} fieldDesc;
 
 static const char *renderFieldName (const tagEntryInfo *const tag, const char *value, vString* b, bool *rejected);
 static const char *renderFieldNameNoEscape (const tagEntryInfo *const tag, const char *value CTAGS_ATTR_UNUSED, vString* b,
