@@ -2380,7 +2380,7 @@ extern void freeEncodingResources (void)
 			if (EncodingMap [i])
 				eFree (EncodingMap [i]);
 		}
-		free(EncodingMap);
+		eFree (EncodingMap);
 	}
 	if (Option.inputEncoding)
 		eFree (Option.inputEncoding);
