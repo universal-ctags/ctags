@@ -42,3 +42,7 @@ Keyword ${with variable} name
 
 it's ok to be correct
     Python_keyword_2
+
+KeywordWithNoSpace
+    [Arguments]  ${arg}
+    python keyword 1

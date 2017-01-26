@@ -35,10 +35,11 @@ static void findRobotTags (void)
 	findRegexTags ();
 }
 
-static void whitespaceSwap (vString *const s)
+static bool whitespaceSwap (vString *const s)
 {
         char replaceWith = '_';
         char toReplace = ' ';
+		char changed = false;
 
         if(strchr(s->buffer, '_'))
         {
@@ -48,7 +49,12 @@ static void whitespaceSwap (vString *const s)
 
         for(int i=0; i < vStringLength(s); i++)
             if(s->buffer[i] == toReplace)
+			{
                 s->buffer[i] = replaceWith;
+				changed = true;
+			}
+
+		return changed;
 }
 
 static void changeSection (const char *const line, const regexMatch *const matches,
@@ -78,8 +84,8 @@ static void tagKeywordsAndTestCases (const char *const line, const regexMatch *c
         vString *const name = vStringNew ();
         vStringNCopyS (name, line + matches [1].start, matches [1].length);
         makeSimpleTag (name, RobotKinds, section);
-        whitespaceSwap(name);
-        makeSimpleTag (name, RobotKinds, section);
+        if (whitespaceSwap(name))
+			makeSimpleTag (name, RobotKinds, section);
         vStringDelete (name);
     }
 }
@@ -92,8 +98,8 @@ static void tagVariables (const char *const line, const regexMatch *const matche
         vString *const name = vStringNew ();
         vStringNCopyS (name, line + matches [1].start, matches [1].length);
         makeSimpleTag (name, RobotKinds, K_VARIABLE);
-        whitespaceSwap(name);
-        makeSimpleTag (name, RobotKinds, K_VARIABLE);
+        if (whitespaceSwap(name))
+			makeSimpleTag (name, RobotKinds, K_VARIABLE);
         vStringDelete (name);
     }
 }
