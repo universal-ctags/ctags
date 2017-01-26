@@ -3,6 +3,7 @@ Keyword 1	input.robot	/^Keyword 1$/;"	k
 Keyword 2	input.robot	/^Keyword 2$/;"	k
 Keyword 3	input.robot	/^Keyword_3$/;"	k
 Keyword 4	input.robot	/^Keyword_4    [Arguments]  @{arg1}$/;"	k
+KeywordWithNoSpace	input.robot	/^KeywordWithNoSpace$/;"	k
 Keyword_${with_variable}_name	input.robot	/^Keyword ${with variable} name$/;"	k
 Keyword_1	input.robot	/^Keyword 1$/;"	k
 Keyword_2	input.robot	/^Keyword 2$/;"	k
