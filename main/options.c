@@ -2464,7 +2464,7 @@ static bool* redirectToXtag(const booleanOption *const option)
 
 	enableXtag (t, default_value);
 
-	return &(getXtagDesc (t)->enabled);
+	return &(getXtagSpec (t)->enabled);
 }
 
 /*
