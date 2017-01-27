@@ -395,7 +395,7 @@ static void printField (fieldType i)
 	const char *language;
 	char  typefields [] = "---";
 
-	if (letter == FIELD_LETTER_NO_USE)
+	if (letter == NUL_FIELD_LETTER)
 		letter = '-';
 
 	if (! fieldDescs[i].spec->name)
