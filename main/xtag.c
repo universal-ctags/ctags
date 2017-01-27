@@ -84,7 +84,7 @@ extern xtagType  getXtagTypeForName (const char *name)
 #define PR_XTAG_WIDTH_LETTER     7
 #define PR_XTAG_WIDTH_NAME      22
 #define PR_XTAG_WIDTH_ENABLED   7
-#define PR_XTAG_WIDTH_SPEC      30
+#define PR_XTAG_WIDTH_DESC      30
 
 #define PR_XTAG_STR(X) PR_XTAG_WIDTH_##X
 #define PR_XTAG_FMT(X,T) "%-" STRINGIFY(PR_XTAG_STR(X)) STRINGIFY(T)
@@ -95,7 +95,7 @@ extern xtagType  getXtagTypeForName (const char *name)
 	" "					\
 	PR_XTAG_FMT (ENABLED,s)			\
 	" "					\
-	PR_XTAG_FMT (SPEC,s)			\
+	PR_XTAG_FMT (DESC,s)			\
 	"\n"
 
 static void printXtag (xtagType i)
