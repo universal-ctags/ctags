@@ -71,7 +71,7 @@ typedef enum eFieldDataType {
 
 #define FIELD_LETTER_NO_USE '\0'
 typedef struct sFieldSpec {
-	/* lettern, and ftype are initialized in the main part,
+	/* letter, and ftype are initialized in the main part,
 	   not in a parser. */
 #define NUL_FIELD_LETTER '\0'
 	unsigned char letter;
