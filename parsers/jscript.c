@@ -1215,13 +1215,6 @@ static bool parseBlock (tokenInfo *const token, tokenInfo *const orig_parent)
 				read_next_token = parseLine (token, parent, is_class);
 				vStringCopy(token->scope, saveScope);
 			}
-			else if (isKeyword (token, KEYWORD_function))
-			{
-				vStringCopy(saveScope, token->scope);
-				addToScope (token, parent->string);
-				parseFunction (token);
-				vStringCopy(token->scope, saveScope);
-			}
 			else if (isType (token, TOKEN_OPEN_CURLY))
 			{
 				/* Handle nested blocks */
@@ -2146,6 +2139,16 @@ static bool parseLine (tokenInfo *const token, tokenInfo *const parent, bool is_
 				readToken (token);
 				is_terminated = parseLine (token, parent, is_inside_class);
 				break;
+			case KEYWORD_function:
+			{
+				vString *saveScope = vStringNewCopy (token->scope);
+				if (parent)
+					addToScope (token, parent->string);
+				parseFunction (token);
+				vStringCopy (token->scope, saveScope);
+				vStringDelete (saveScope);
+				break;
+			}
 			case KEYWORD_class:
 				is_terminated = parseES6Class (token, parent, NULL);
 				break;
@@ -2177,9 +2180,7 @@ static void parseJsFile (tokenInfo *const token)
 	{
 		readToken (token);
 
-		if (isType (token, TOKEN_KEYWORD) && token->keyword == KEYWORD_function)
-			parseFunction (token);
-		else if (isType (token, TOKEN_KEYWORD) && token->keyword == KEYWORD_sap)
+		if (isType (token, TOKEN_KEYWORD) && token->keyword == KEYWORD_sap)
 			parseUI5 (token);
 		else
 			parseLine (token, NULL, false);
