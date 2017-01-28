@@ -1111,13 +1111,20 @@ static void parseFunction (tokenInfo *const token)
 		is_generator = true;
 		readToken (name);
 	}
-	if (!isType (name, TOKEN_IDENTIFIER))
+	if (isType (name, TOKEN_OPEN_PAREN))
+	{
+		/* anonymous function */
+		copyToken (token, name, false);
+		anonGenerate (name->string, "AnonymousFunction", JSTAG_FUNCTION);
+	}
+	else if (!isType (name, TOKEN_IDENTIFIER))
 		goto cleanUp;
+	else
+		readToken (token);
 
 	/* Add scope in case this is an INNER function */
 	addToScope(name, token->scope);
 
-	readToken (token);
 	while (isType (token, TOKEN_PERIOD))
 	{
 		readToken (token);
