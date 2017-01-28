@@ -2136,7 +2136,8 @@ static bool parseLine (tokenInfo *const token, tokenInfo *const parent, bool is_
 				parseSwitch (token);
 				break;
 			case KEYWORD_return:
-				is_terminated = findCmdTerm (token, true, false);
+				readToken (token);
+				is_terminated = parseLine (token, parent, is_inside_class);
 				break;
 			case KEYWORD_class:
 				is_terminated = parseES6Class (token, parent, NULL);
