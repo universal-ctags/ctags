@@ -1,5 +1,11 @@
 History of Onigmo (Oniguruma-mod)
 
+2017/01/29: Version 6.1.1
+
+2017/01/29: [dist] Update LTVERSION to "6:2:0".
+2017/01/29: [bug]  Fix that (?~\S+) might cause infinite loop.
+                   Reported at: http://sakura.qp.land.to/?BugReport%2F211
+
 2017/01/16: Version 6.1.0
 
 2017/01/16: [dist] Update LTVERSION to "6:1:0".
