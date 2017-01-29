@@ -940,7 +940,7 @@ static bool isFieldFixed (fieldType type)
 extern bool enableField (fieldType type, bool state, bool warnIfFixedField)
 {
 	fieldSpec *spec = getFieldDesc(type)->spec;
-	bool old = spec->enabled? true: false;
+	bool old = spec->enabled;
 	if (isFieldFixed (type))
 	{
 		if ((!state) && warnIfFixedField)
