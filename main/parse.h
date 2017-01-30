@@ -22,6 +22,7 @@
 #include "param.h"
 #include "parsers.h"  /* contains list of parsers */
 #include "strlist.h"
+#include "xtag.h"
 
 /*
 *   MACROS
@@ -103,6 +104,8 @@ struct sParserDefinition {
 	bool invisible;
 	fieldSpec *fieldSpecs;
 	unsigned int fieldSpecCount;
+	xtagSpec *xtagSpecs;
+	unsigned int xtagSpecCount;
 
 	parserDependency * dependencies;
 	unsigned int dependencyCount;

@@ -635,6 +635,7 @@ extern int main (int argc CTAGS_ATTR_UNUSED, char **argv)
 	sanitizeEnviron ();
 	checkRegex ();
 	initFieldDescs ();
+	initXtagDescs ();
 
 	args = cArgNewFromArgv (argv);
 	previewFirstOption (args);
