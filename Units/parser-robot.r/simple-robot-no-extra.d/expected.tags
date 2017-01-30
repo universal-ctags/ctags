@@ -1,0 +1,12 @@
+Keyword ${with variable} name	input.robot	/^Keyword ${with variable} name$/;"	k
+Keyword 1	input.robot	/^Keyword 1$/;"	k
+Keyword 2	input.robot	/^Keyword 2$/;"	k
+KeywordWithNoSpace	input.robot	/^KeywordWithNoSpace$/;"	k
+Keyword_3	input.robot	/^Keyword_3$/;"	k
+Keyword_4	input.robot	/^Keyword_4    [Arguments]  @{arg1}$/;"	k
+Test case 1	input.robot	/^Test case 1$/;"	t
+it's ok to be correct	input.robot	/^it's ok to be correct$/;"	k
+list 1	input.robot	/^@{list 1}   a  b  c$/;"	v
+list_2	input.robot	/^@{list_2}  d  e  f$/;"	v
+var 1	input.robot	/^${var 1}  a$/;"	v
+var_2	input.robot	/^${var_2}   b$/;"	v

@@ -30,6 +30,19 @@ static kindOption RobotKinds[COUNT_KIND] = {
 	{true, 'v', "variable",   "variables"},
 };
 
+typedef enum {
+	X_WHITESPACE_SWAPPED,
+} robotXtag;
+
+static xtagSpec RobotXtags [] = {
+	{
+		.enabled = true,
+		.name = "whitespaceSwapped",
+		.description = "Include tags swapping whitespace and underscore chars",
+	},
+};
+
+
 static void findRobotTags (void)
 {
 	findRegexTags ();
@@ -84,7 +97,8 @@ static void tagKeywordsAndTestCases (const char *const line, const regexMatch *c
         vString *const name = vStringNew ();
         vStringNCopyS (name, line + matches [1].start, matches [1].length);
         makeSimpleTag (name, RobotKinds, section);
-        if (whitespaceSwap(name))
+        if (isXtagEnabled (RobotXtags[X_WHITESPACE_SWAPPED].xtype)
+			&& whitespaceSwap(name))
 			makeSimpleTag (name, RobotKinds, section);
         vStringDelete (name);
     }
@@ -98,7 +112,8 @@ static void tagVariables (const char *const line, const regexMatch *const matche
         vString *const name = vStringNew ();
         vStringNCopyS (name, line + matches [1].start, matches [1].length);
         makeSimpleTag (name, RobotKinds, K_VARIABLE);
-        if (whitespaceSwap(name))
+        if (isXtagEnabled (RobotXtags[X_WHITESPACE_SWAPPED].xtype)
+			&& whitespaceSwap(name))
 			makeSimpleTag (name, RobotKinds, K_VARIABLE);
         vStringDelete (name);
     }
@@ -123,5 +138,7 @@ extern parserDefinition* RobotParser (void)
 	def->extensions = extensions;
 	def->initialize = initialize;
     def->parser     = findRobotTags;
+	def->xtagSpecs = RobotXtags;
+	def->xtagSpecCount = ARRAY_SIZE (RobotXtags);
 	return def;
 }
