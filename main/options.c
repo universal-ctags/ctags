@@ -2743,6 +2743,8 @@ static bool processLangSpecificFieldsOption (const char *const option,
 			break;
 		}
 	}
+#undef PREFIX_LEN
+#undef PREFIX
 	return true;
 }
 
