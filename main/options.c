@@ -1259,7 +1259,7 @@ static void processFieldsOption (
 			}
 
 			if (t == FIELD_UNKNOWN)
-				error(FATAL, "nosuch field: \'%s\'", vStringValue (longName));
+				error(FATAL, "no such field: \'%s\'", vStringValue (longName));
 
 			enableField (t, mode, true);
 
