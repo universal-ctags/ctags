@@ -272,7 +272,6 @@ extern bool makeKindSeparatorsPseudoTags (const langType language,
 extern bool makeKindDescriptionsPseudoTags (const langType language,
 					       const ptagDesc *pdesc);
 
-extern void anonReset (void);
 extern void anonGenerate (vString *buffer, const char *prefix, int kind);
 
 #endif  /* CTAGS_MAIN_PARSE_H */

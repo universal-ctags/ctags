@@ -25,6 +25,7 @@
 #include "parsers.h"
 #include "promise.h"
 #include "ptag.h"
+#include "ptrarray.h"
 #include "read.h"
 #include "routines.h"
 #include "trace.h"
@@ -54,6 +55,8 @@ typedef struct {
 	enum specType specType;
 }  parserCandidate;
 
+static ptrArray *parsersUsedInCurrentInput;
+
 /*
  * FUNCTION PROTOTYPES
  */
@@ -62,6 +65,8 @@ static void addParserPseudoTags (langType language);
 static void installKeywordTable (const langType language);
 static void installTagRegexTable (const langType language);
 static void installTagXpathTable (const langType language);
+static void anonResetMaybe (parserDefinition *lang);
+static void clearParsersUsedInCurrentInput (void);
 
 /*
 *   DATA DEFINITIONS
@@ -2212,6 +2217,8 @@ static bool createTagsWithFallback1 (const langType language)
 	addParserPseudoTags (language);
 	tagFilePosition (&tagfpos);
 
+	anonResetMaybe (LanguageTable [language]);
+
 	while ( ( whyRescan =
 		  createTagsForFile (language, ++passCount) )
 		!= RESCAN_NONE)
@@ -2466,6 +2473,8 @@ extern bool parseFileWithMio (const char *const fileName, MIO *mio)
 #endif
 
 		setupWriter ();
+
+		clearParsersUsedInCurrentInput ();
 
 		tagFileResized = createTagsWithFallback (fileName, language, req.mio);
 #ifdef HAVE_COPROC
@@ -2744,10 +2753,21 @@ extern bool makeKindDescriptionsPseudoTags (const langType language,
 *   Anonymous name generator
 */
 
-extern void anonReset (void)
+static void clearParsersUsedInCurrentInput (void)
 {
-	parserDefinition* lang = LanguageTable [getInputLanguage ()];
+	if (parsersUsedInCurrentInput)
+		ptrArrayClear (parsersUsedInCurrentInput);
+	else
+		parsersUsedInCurrentInput = ptrArrayNew (NULL);
+}
+
+static void anonResetMaybe (parserDefinition *lang)
+{
+	if (ptrArrayHas (parsersUsedInCurrentInput, lang))
+		return;
+
 	lang -> anonymousIdentiferId = 0;
+	ptrArrayAdd (parsersUsedInCurrentInput, lang);
 }
 
 static unsigned int anonHash(const unsigned char *str)
