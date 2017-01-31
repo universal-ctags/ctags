@@ -2693,8 +2693,12 @@ static bool processLangSpecificFieldsOption (const char *const option,
 		resetFieldsOption (language, true);
 		p++;
 	}
-	else if (*p == '{')
+	else if (*p == '{' || *p == '\0')
+	{
 		resetFieldsOption (language, false);
+		if (*p == '\0')
+			return true;
+	}
 	else if (*p != '+' && *p != '-')
 		error (WARNING, "Wrong per language field specification: %s", p);
 
