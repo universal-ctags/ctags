@@ -5955,7 +5955,7 @@ onig_reg_init(regex_t* reg, OnigOptionType option,
 extern int
 onig_new_without_alloc(regex_t* reg, const UChar* pattern,
           const UChar* pattern_end, OnigOptionType option, OnigEncoding enc,
-          OnigSyntaxType* syntax, OnigErrorInfo* einfo)
+          const OnigSyntaxType* syntax, OnigErrorInfo* einfo)
 {
   int r;
 
