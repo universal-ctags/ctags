@@ -16,9 +16,14 @@ ${CTAGS} ${O} --extras-Robot=-'{NOSUCHEXTRA}' --list-extras=NOSUCHLANG
 
 echo '#null' 1>&2
 ${CTAGS} ${O} --extras-= --list-extras
+
+# not an error, just set all extras to false.
 ${CTAGS} ${O} --extras-Robot= --list-extras
+
 ${CTAGS} ${O} --extras-Robot=-'{whitespaceSwapped}' --list-extras=
 
 echo '#null null' 1>&2
+
+# About --extras-Robot=, not an error, just set all extras to false.
 ${CTAGS} ${O} --extras-Robot= --list-extras=
 ${CTAGS} ${O} --extras-= --list-extras=

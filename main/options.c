@@ -2836,8 +2836,12 @@ static bool processLangSpecificExtraOption (const char *const option,
 		resetXtags (language, true);
 		p++;
 	}
-	else if (*p == '{')
+	else if (*p == '{' || *p == '\0')
+	{
 		resetXtags (language, false);
+		if (*p == '\0')
+			return true;
+	}
 	else if (*p != '+' && *p != '-')
 		error (WARNING, "Wrong per language extra specification: %s", p);
 

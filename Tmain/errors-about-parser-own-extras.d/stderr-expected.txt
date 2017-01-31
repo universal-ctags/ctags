@@ -8,7 +8,5 @@ ctags: no such extra: 'NOSUCHEXTRA'
 ctags: no such extra: 'NOSUCHEXTRA'
 #null
 ctags: No language given in "extras-" option
-ctags: Warning: Wrong per language extra specification: 
 #null null
-ctags: Warning: Wrong per language extra specification: 
 ctags: No language given in "extras-" option
