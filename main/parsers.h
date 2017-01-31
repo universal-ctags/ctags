@@ -61,6 +61,7 @@
 	DTSParser, \
 	DosBatchParser, \
 	EiffelParser, \
+  ElmParser, \
 	ErlangParser, \
 	FalconParser, \
 	FlexParser, \

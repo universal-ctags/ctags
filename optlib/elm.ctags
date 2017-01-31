@@ -1,0 +1,35 @@
+#
+#  Copyright (c) 2016, Mark Skipper
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,
+# USA.
+#
+#
+--langdef=elm
+--map-elm=+.elm
+--regex-elm=/^(port[[:blank:]]+)?module[[:blank:]]+([[:upper:]][[:alnum:]_.]*)/\2/m,module,Module/{scope=push}{exclusive}
+--regex-elm=/^import[[:blank:]]+[[:alnum:]_.]+[[:blank:]]+as[[:blank:]]+([[:alnum:]]+)/\1/n,namespace,Renamed Imported Module/{scope=clear}{exclusive}
+#
+# Following two patterns are just for clearing scope stack.
+# X in "import X" should be captured as a reference tag in the future.
+#
+--regex-elm=/^import[[:blank:]]+([[:alnum:]_.]+)[[:blank:]]exposing///{scope=clear}{exclusive}
+--regex-elm=/^import[[:blank:]]+([[:alnum:]_.]+)///{scope=clear}{exclusive}
+--regex-elm=/^port[[:blank:]]+([[:lower:]][[:alnum:]_]*).*/\1/p,port,Port/{scope=clear}{exclusive}
+--regex-elm=/^type +([[:upper:]][[:alnum:]_]*.*)/\1/t,type,Type Definition/{scope=set}{exclusive}
+--regex-elm=/^[[:blank:]]+[|=][[:blank:]]+([[:upper:]][[:alnum:]_]*.*)$/\1/c,constructor,Type Constructor/{scope=ref}{exclusive}
+--regex-elm=/^type[[:blank:]]+alias[[:blank:]]+([[:upper:]][[:alnum:]_]*[[:blank:][:alnum:]_]*)/\1/a,alias,Type Alias/{scope=set}{exclusive}
+--regex-elm=/^([[:lower:]_][[:alnum:]_]*)[^=]*=$/\1/f,function,Functions/{scope=set}
+--regex-elm=/^[[:blank:]]+([[:lower:]_][[:alnum:]_]*)[^=]*=$/\1/f,function,Functions/{scope=ref}
