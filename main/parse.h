@@ -125,7 +125,7 @@ struct sParserDefinition {
 	stringList* currentPatterns;   /* current list of file name patterns */
 	stringList* currentExtensions; /* current list of extensions */
 	stringList* currentAliases;    /* current list of aliases */
-	unsigned int anonumousIdentiferId; /* managed by anon* functions */
+	unsigned int anonymousIdentiferId; /* managed by anon* functions */
 };
 
 typedef parserDefinition* (parserDefinitionFunc) (void);

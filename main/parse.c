@@ -2747,7 +2747,7 @@ extern bool makeKindDescriptionsPseudoTags (const langType language,
 extern void anonReset (void)
 {
 	parserDefinition* lang = LanguageTable [getInputLanguage ()];
-	lang -> anonumousIdentiferId = 0;
+	lang -> anonymousIdentiferId = 0;
 }
 
 static unsigned int anonHash(const unsigned char *str)
@@ -2764,14 +2764,14 @@ static unsigned int anonHash(const unsigned char *str)
 extern void anonGenerate (vString *buffer, const char *prefix, int kind)
 {
 	parserDefinition* lang = LanguageTable [getInputLanguage ()];
-	lang -> anonumousIdentiferId ++;
+	lang -> anonymousIdentiferId ++;
 
 	char szNum[32];
 
 	vStringCopyS(buffer, prefix);
 
 	unsigned int uHash = anonHash((const unsigned char *)getInputFileName());
-	sprintf(szNum,"%08x%02x%02x",uHash,lang -> anonumousIdentiferId, kind);
+	sprintf(szNum,"%08x%02x%02x",uHash,lang -> anonymousIdentiferId, kind);
 	vStringCatS(buffer,szNum);
 }
 
