@@ -336,7 +336,7 @@ etags_basename_filter()
     sed "${etags_basename_filter_regex}"
 }
 
-xref_basename_filter_regex='s%\(.*[[:digit:]]\{1,\} \)\([^ ]\{1,\}.\{1,\}\)/\([^ ].\{1,\}.\{1,\}$\)%\1\3%'
+xref_basename_filter_regex='s%\(.*[[:digit:]]\{1,\} \)\([^ ]\{1,\}[^ ]\{1,\}\)/\([^ ].\{1,\}.\{1,\}$\)%\1\3%'
 xref_basename_filter()
 {
     sed "${xref_basename_filter_regex}"
