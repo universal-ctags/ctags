@@ -64,6 +64,12 @@ have its own directory under Units directory.
 	In such case you don't have to write ``-x`` to ``args.ctags``.
 	The test facility sets ``-x`` automatically.
 
+	If you want to test json output (specified with ``--output-format=json`` ),
+	Use **.tags-json** as suffix instead of **.tags**.
+	In such case you don't have to write ``--output-format=json`` to ``args.ctags``.
+	The test facility sets the option automatically.
+
+
 *Units/TEST/args.ctags* **optional**
 
 	``-o -`` is used as default optional argument when running a

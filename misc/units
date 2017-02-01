@@ -342,6 +342,12 @@ xref_basename_filter()
     sed "${xref_basename_filter_regex}"
 }
 
+json_basename_filter_regex='s%\("path": \)"[^"]\{1,\}/\([^/"]\{1,\}\)"%\1"\2"%'
+json_basename_filter()
+{
+    sed "${json_basename_filter_regex}"
+}
+
 run_record_cmdline ()
 {
     local ffilter="$1"
@@ -428,9 +434,10 @@ run_tcase ()
     # tags-e if for etags output(-e). TAGS is good
     # suffix but foo.tags and foo.TAGS may be the same on Windows.
     # tags-x is for cross reference output(-x).
+    # tags-json is for json output.
     #
     # fexpected must be set even if none of
-    # expected.{tags,tags-e,xref} exits.
+    # expected.{tags,tags-e,tags-x,tags-json} exits.
     #
     local fexpected="$t/expected.tags"
     local output_type=ctags
@@ -448,6 +455,11 @@ run_tcase ()
 	output_type=xref
 	output_label=/${output_type}
 	output_tflag=-x
+    elif [ -f "$t/expected.tags-json" ]; then
+	fexpected=$t/expected.tags-json
+	output_type=json
+	output_label=/${output_type}
+	output_tflag="--output-format=json"
     fi
 
     [ -x "$ffilter" ] || ffilter=cat
