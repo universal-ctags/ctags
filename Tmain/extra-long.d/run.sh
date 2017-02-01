@@ -5,20 +5,20 @@ CTAGS=$1
 
 echo '# resetting'
 ${CTAGS} --quiet --options=NONE --with-list-header=no \
-	 --extra='{subparser}' --list-extra
+	 --extras='{subparser}' --list-extras
 
 echo '# enabling 1'
 ${CTAGS} --quiet --options=NONE --with-list-header=no \
-	 --extra=+'{pseudo}' --list-extra
+	 --extras=+'{pseudo}' --list-extras
 
 echo '# disabling 1'
 ${CTAGS} --quiet --options=NONE --with-list-header=no \
-	 --extra=-'{fileScope}' --list-extra
+	 --extras=-'{fileScope}' --list-extras
 
 echo '# combination'
 ${CTAGS} --quiet --options=NONE --with-list-header=no \
-	 --extra=-'{fileScope}+{inputFile}{reference}' --list-extra
+	 --extras=-'{fileScope}+{inputFile}{reference}' --list-extras
 
 echo '# combination with letters'
 ${CTAGS} --quiet --options=NONE --with-list-header=no \
-	 --extra=-'{fileScope}+p{inputFile}q{reference}.-f' --list-extra
+	 --extras=-'{fileScope}+p{inputFile}q{reference}.-f' --list-extras

@@ -2,4 +2,4 @@
 --fields=+S
 -I MACRO2
 --fields=+r
---extra=+r
+--extras=+r

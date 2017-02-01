@@ -4,6 +4,6 @@
 ## This test case lost the original aim when
 ## `.` extra field is replaced with `end:` field.
 
---extra=+f
+--extras=+f
 --fields=+e
 --excmd=number

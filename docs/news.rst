@@ -110,7 +110,7 @@ Wildcard in options
 For the purpose of gathering as much as information as possible from
 source code the "wildcard"(``*``) option value has been introduced.
 
-``--extra=*``
+``--extras=*``
 
 	Enables all extra tags.
 
@@ -142,7 +142,7 @@ A letter is used for specifying a kind, a field, or an extra entry.
 In Universal-ctags a name can also be used.
 
 Surround the name with braces (`{` and `}`) in values assigned to the
-options, ``--kind-<LANG>=``, ``--fields=``, or ``--extra=``.
+options, ``--kind-<LANG>=``, ``--fields=``, or ``--extras=``.
 
 .. code-block:: console
 
@@ -241,8 +241,11 @@ On Windows mingw32, you must specify ``WITH_ICONV=yes`` like this::
 
 	C:\dev\ctags>mingw32-make -f mk_mingw.mak WITH_ICONV=yes
 
-Extra tag entries (``--extra``)
+Extra tag entries (``--extras``)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+``--extra`` option in Exuberant-ctags is renamed to ``--extras`` (plural) in
+Universal-ctags for making consistent with ``--kinds-<LANG>`` and ``--fields``.
+
 These extra tag entries are newly introduced.
 
 ``F``
@@ -261,7 +264,7 @@ Exuberant-ctags provides a way to inspect its internals via
 ``--list-kinds``, ``--list-languages``, and ``--list-maps``.
 
 This idea has been expanded in Universal-ctags with
-``--list-kinds-full``, ``--list-extensions``,  ``--list-extra``,
+``--list-kinds-full``, ``--list-extensions``,  ``--list-extras``,
 ``--list-features``, ``--list-fields``, ``--list-patterns``, and
 ``--list-pseudo-tags`` being added.
 
@@ -277,7 +280,7 @@ outputs the list in a format more suitable for processing by scripts.
 Tab characters are used as separators between columns. The alignment
 of columns is never considered when ``--machinable`` is given.
 
-Currently only ``--list-extra``, ``--list-fields`` and
+Currently only ``--list-extras``, ``--list-fields`` and
 ``--list-kinds-full`` support ``--machinable`` output.
 
 These new ``--list-`` options also print a column header, a line
@@ -369,9 +372,9 @@ newly introduced fields.
 
     $ cat /tmp/foo.h
     #include <stdio.h>
-    $ ./ctags -o - --extra=+r --fields=+r /tmp/foo.h
+    $ ./ctags -o - --extras=+r --fields=+r /tmp/foo.h
     stdio.h	/tmp/foo.h	/^#include <stdio.h>/;"	h	role:system
-    $ ./ctags --put-field-prefix -o - --extra=+r --fields=+r /tmp/foo.h
+    $ ./ctags --put-field-prefix -o - --extras=+r --fields=+r /tmp/foo.h
     stdio.h	/tmp/foo.h	/^#include <stdio.h>/;"	h	UCTAGSrole:system
 
 In this example, ``role`` is prefixed.
@@ -671,9 +674,9 @@ Output with the extra-tag ``r`` enabled:
 
 .. code-block:: console
 
-    $ ./ctags --list-extra | grep ^r
+    $ ./ctags --list-extras | grep ^r
     r	Include reference tags	off
-    $ ./ctags -o - --extra=+r reftag.c
+    $ ./ctags -o - --extras=+r reftag.c
     TYPE	reftag.c	/^#define TYPE /;"	d	file:
     TYPE	reftag.c	/^#undef TYPE$/;"	d	file:
     TYPE	reftag.c	/^struct TYPE { int x, y; };$/;"	s	file:
@@ -692,7 +695,7 @@ specialized role, `generic` is used as the name of role.
 
 .. code-block:: console
 
-    $  ./ctags -o - --extra=+r --fields=+r reftag.c
+    $  ./ctags -o - --extras=+r --fields=+r reftag.c
     TYPE	reftag.c	/^#define TYPE /;"	d	file:
     TYPE	reftag.c	/^#undef TYPE$/;"	d	file:	role:undef
     TYPE	reftag.c	/^struct TYPE { int x, y; };$/;"	s	file:
@@ -709,7 +712,7 @@ used for the new reference tags. The field can be used only with
 
 .. code-block:: console
 
-    $ ./ctags -x --_xformat="%R %-16N %4n %-16F %C" --extra=+r reftag.c
+    $ ./ctags -x --_xformat="%R %-16N %4n %-16F %C" --extras=+r reftag.c
     D TYPE                3 reftag.c         #define TYPE point
     D TYPE                4 reftag.c         struct TYPE { int x, y; };
     D p                   5 reftag.c         TYPE p;
@@ -801,7 +804,7 @@ Example output:
 
 .. code-block:: console
 
-    $ ./ctags -o - --extra=p --pseudo-tags='TAG_KIND_DESCRIPTION' foo.c
+    $ ./ctags -o - --extras=p --pseudo-tags='TAG_KIND_DESCRIPTION' foo.c
     !_TAG_KIND_DESCRIPTION!C	L,label	/goto label/
     !_TAG_KIND_DESCRIPTION!C	c,class	/classes/
     !_TAG_KIND_DESCRIPTION!C	d,macro	/macro definitions/
@@ -849,7 +852,7 @@ given.
 This is for describing separators placed between two kinds in a
 language.
 
-Tag entries including the separators are emitted when ``--extra=+q``
+Tag entries including the separators are emitted when ``--extras=+q``
 is given; fully qualified tags contain the separators. The separators
 are used in scope information, too.
 
@@ -881,7 +884,7 @@ Example output:
 
 .. code-block:: console
 
-    $ ./ctags -o - --extra=+p --pseudo-tags=  --pseudo-tags=+TAG_KIND_SEPARATOR input.php
+    $ ./ctags -o - --extras=+p --pseudo-tags=  --pseudo-tags=+TAG_KIND_SEPARATOR input.php
     !_TAG_KIND_SEPARATOR!PHP	::	/*c/
     ...
     !_TAG_KIND_SEPARATOR!PHP	\\	/c/
@@ -1009,7 +1012,7 @@ Parser own parameter
 .. NOT REVIEWED YET
 
 To control the detail of a parser, ``--param-<LANG>`` option.
-``--kinds-<LANG>``, ``--fields-<LANG>``, ``--extra-<LANG>`` (not implemented yet)
+``--kinds-<LANG>``, ``--fields-<LANG>``, ``--extras-<LANG>`` (not implemented yet)
 can be used for customizing the behavior of a parser specified with ``<LANG>``.
 
 ``--param-<LANG>`` should be used other aspects of the parser other
@@ -1321,7 +1324,7 @@ Create the tags file (*foo.tags*) with following command line
 
 .. code-block:: console
 
-	$ ./ctags --fields='*' --extra='*' -o foo.tags foo.py
+	$ ./ctags --fields='*' --extras='*' -o foo.tags foo.py
 
 for following input (*foo.py*)
 

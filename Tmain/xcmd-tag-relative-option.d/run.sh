@@ -15,7 +15,7 @@ cd ..
 		 --langdef=dog \
 		 --langmap=dog:.dog \
 		 --xcmd-dog=$d/xcmd-dog \
-		 --extra=+f \
+		 --extras=+f \
 		 --fields=+n \
 		 -o $d/tags \
 		 --append=yes \

@@ -81,7 +81,7 @@ for example.
 promise API
 ......................................................................
 (Currently the tagging via promise API is disabled by default.
- Use `--extra=+s` optoin for enabling it.)
+ Use `--extras=+s` optoin for enabling it.)
 
 Background and Idea
 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
@@ -396,7 +396,7 @@ If a parser uses the cork for recording and emitting scope
 information, ctags can reuse it for generating full qualified(FQ)
 tags. Set `requestAutomaticFQTag` field of `parserDefinition` to
 `TRUE` then the main part of ctags emits FQ tags on behalf of the parser
-if `--extra=+q` is given.
+if `--extras=+q` is given.
 
 An example can be found in DTS parser:
 

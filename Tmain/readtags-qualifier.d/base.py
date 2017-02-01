@@ -1,5 +1,5 @@
 #
-# ./ctags --fields='*' --extra='*' -o output.tags base.py
+# ./ctags --fields='*' --extras='*' -o output.tags base.py
 #
 class Foo:
     def aq ():

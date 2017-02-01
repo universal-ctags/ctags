@@ -30,7 +30,7 @@ specifying the format version.
 
 .. code-block:: console
 
-   $ ./ctags --extra='p' --pseudo-tags=JSON_OUTPUT_VERSION  --output-format=json /tmp/foo.py
+   $ ./ctags --extras='p' --pseudo-tags=JSON_OUTPUT_VERSION  --output-format=json /tmp/foo.py
    {"_type": "ptag", "name": "JSON_OUTPUT_VERSION", "path": "0.0", "pattern": "in development"}
    {"_type": "tag", "name": "Foo", "path": "/tmp/foo.py", "pattern": "/^class Foo:$/", "kind": "class"}
    ...

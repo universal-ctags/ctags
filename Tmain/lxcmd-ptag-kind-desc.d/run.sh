@@ -11,7 +11,7 @@ ${CTAGS} --quiet --options=NONE -o - \
 	 --langdef=foo \
 	 --xcmd-foo=./foo.sh \
 	 --langmap=foo:+.foo \
-         --extra=p \
+         --extras=p \
 	 --pseudo-tags=TAG_KIND_DESCRIPTION \
 	 input.foo
 

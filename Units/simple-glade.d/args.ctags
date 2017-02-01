@@ -1,4 +1,4 @@
---extra=+rf
+--extras=+rf
 --fields=+rKn
 --regex-Glade=/.*SYSTEM "([^"]*)">/\1/D,DOCTYPE/
 --sort=no
