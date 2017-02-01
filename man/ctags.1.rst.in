@@ -345,7 +345,7 @@ built-in language names.
 		are generally identical, making pattern searches useless
 		for finding all matches.
 
---extra=[+|-]flags|\*
+--extras=[+|-]flags|\*
 	Specifies whether to include extra tag entries for certain kinds of
 	information. The parameter flags is a set of one-letter flags, each
 	representing one kind of extra tag entry to include in the tag file.
@@ -378,6 +378,8 @@ built-in language names.
 		when multiple occurrences of a tag name occur in the tag file.
 		Note, however, that this could potentially more than double the
 		size of the tag file.
+
+	--extra option in Exuberant-ctags is renamed to --extras.
 
 --fields=[+|-]flags|*
 	Specifies the available extension fields which are to be included in
