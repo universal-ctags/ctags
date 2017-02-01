@@ -1176,7 +1176,7 @@ Incompatible changes in command line
 ``-D`` option
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-For ctags buinary that debugging output is enabled in build config
+For a ctags binary that had debugging output enabled in the build config
 stage, ``-D`` was used for specifying the level of debugging
 output. It is changed to ``-d``. This change is not critical because
 ``-D`` option was not described in ctags.1 man page.
