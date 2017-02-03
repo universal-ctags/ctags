@@ -35,5 +35,5 @@ ignore_xpath ()
     with_field f  c &&
     with_field S  c &&
     with_field t  c &&
-    with_field r  sh --extra=+r &&
-    with_field r  sh "--extra=+r -x --_xformat=%R/%r"
+    with_field r  sh --extras=+r &&
+    with_field r  sh "--extras=+r -x --_xformat=%R/%r"

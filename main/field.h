@@ -46,7 +46,7 @@ typedef enum eFieldType { /* extension field content control */
 	FIELD_ROLE,
 	FIELD_REF_MARK,
 	FIELD_SCOPE_KEY,
-	FIELD_EXTRA,
+	FIELD_EXTRAS,
 	FIELD_XPATH,
 	FIELD_SCOPE_KIND_LONG,
 	FIELD_END,

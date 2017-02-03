@@ -1,4 +1,4 @@
 --language-force=Automake
 --languages=-Make
 --fields=+r
---extra=+r
+--extras=+r

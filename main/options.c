@@ -249,7 +249,7 @@ static optionDescription LongOptionDescription [] = {
 #else
  {0,"       Uses the specified type of EX command to locate tags [mix]."},
 #endif
- {1,"  --extra=[+|-]flags"},
+ {1,"  --extras=[+|-]flags"},
  {1,"      Include extra tag entries for selected information (flags: \"Ffq.\") [F]."},
  {1,"  --fields=[+|-]flags"},
  {1,"      Include selected extension fields (flags: \"afmikKlnsStzZ\") [fks]."},
@@ -312,7 +312,7 @@ static optionDescription LongOptionDescription [] = {
  {1,"       Output list of alias patterns."},
  {1,"  --list-extensions=[language|all]"},
  {1,"       Output list of language extensions in mapping."},
- {1,"  --list-extra"},
+ {1,"  --list-extras"},
  {1,"       Output list of extra tag flags."},
  {1,"  --list-features"},
  {1,"       Output list of features."},
@@ -340,7 +340,7 @@ static optionDescription LongOptionDescription [] = {
  {1,"       Output list of flags which can be used in a regex parser definition."},
  {1,"  --machinable=[yes|no]"},
  {1,"       Use tab separated representation in --list- option output. [no]"},
- {1,"       --list-extra, --list-fields, --list-kinds-full, and --list-params support this option."},
+ {1,"       --list-extras, --list-fields, --list-kinds-full, and --list-params support this option."},
  {1,"       Suitable for scripting. Specify before --list-* option."},
  {1,"  --map-<LANG>=[+|-]pattern|extension"},
  {1,"       Set or add(+) a map for <LANG>."},
@@ -404,7 +404,7 @@ static optionDescription LongOptionDescription [] = {
  {1,"       Print version identifier to standard output."},
  {1,"  --with-list-header=[yes|no]"},
  {1,"       Preprend the column descriptions in --list- output. [yes]"},
- {1,"       --list-extra, --list-fields, --list-kinds-full, and --list-params support this option."},
+ {1,"       --list-extras, --list-fields, --list-kinds-full, and --list-params support this option."},
  {1,"       Specify before --list-* option."},
 #ifdef HAVE_COPROC
  {1,"  --xcmd-<LANG>=parser_command_path|parser_command_name"},
@@ -1129,6 +1129,9 @@ static void processExtraTagsOption (
 	bool inLongName = false;
 	const char *x;
 
+	if (strcmp (option, "extra") == 0)
+		error(WARNING, "--extra option is obsolete; use --extras instead");
+
 	if (*p == '*')
 	{
 		resetXtags (true);
@@ -1811,7 +1814,7 @@ static void processListAliasesOption (
 	exit (0);
 }
 
-static void processListExtraOption (
+static void processListExtrasOption (
 		const char *const option CTAGS_ATTR_UNUSED, const char *const parameter CTAGS_ATTR_UNUSED)
 {
 	printXtags ();
@@ -2478,6 +2481,7 @@ static parametricOption ParametricOptions [] = {
 	{ "exclude",                processExcludeOption,           false,  STAGE_ANY },
 	{ "excmd",                  processExcmdOption,             false,  STAGE_ANY },
 	{ "extra",                  processExtraTagsOption,         false,  STAGE_ANY },
+	{ "extras",                 processExtraTagsOption,         false,  STAGE_ANY },
 	{ "fields",                 processFieldsOption,            false,  STAGE_ANY },
 	{ "filter-terminator",      processFilterTerminatorOption,  true,   STAGE_ANY },
 	{ "format",                 processFormatOption,            true,   STAGE_ANY },
@@ -2500,7 +2504,7 @@ static parametricOption ParametricOptions [] = {
 	{ "license",                processLicenseOption,           true,   STAGE_ANY },
 	{ "list-aliases",           processListAliasesOption,       true,   STAGE_ANY },
 	{ "list-extensions",        processListExtensionsOption,    true,   STAGE_ANY },
-	{ "list-extra",             processListExtraOption,        true,   STAGE_ANY },
+	{ "list-extras",            processListExtrasOption,        true,   STAGE_ANY },
 	{ "list-features",          processListFeaturesOption,      true,   STAGE_ANY },
 	{ "list-fields",            processListFieldsOption,        true,   STAGE_ANY },
 	{ "list-file-kind",         processListFileKindOption,      true,   STAGE_ANY },

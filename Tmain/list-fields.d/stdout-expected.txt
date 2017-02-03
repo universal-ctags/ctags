@@ -18,7 +18,7 @@ z	kind	off	NONE	TRUE	s--	Include the "kind:" key in kind field (use k or K) in t
 r	role	off	NONE	TRUE	s--	Role
 R	NONE	off	NONE	TRUE	s--	Marker (R or D) representing whether tag is definition or reference
 Z	scope	off	NONE	TRUE	s--	Include the "scope:" key in scope field (use s) in tags output, scope name in xref output
-E	extra	off	NONE	TRUE	s--	Extra tag type information
+E	extras	off	NONE	TRUE	s--	Extra tag type information
 x	xpath	off	NONE	TRUE	s--	xpath for the tag
 p	scopeKind	off	NONE	TRUE	s--	Kind of scope as full name
 e	end	off	NONE	TRUE	-i-	end lines of various items

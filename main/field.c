@@ -58,7 +58,7 @@ static const char *renderFieldFile (const tagEntryInfo *const tag, const char *v
 static const char *renderFieldPattern (const tagEntryInfo *const tag, const char *value, vString* b, bool *rejected);
 static const char *renderFieldRole (const tagEntryInfo *const tag, const char *value, vString* b, bool *rejected);
 static const char *renderFieldRefMarker (const tagEntryInfo *const tag, const char *value, vString* b, bool *rejected);
-static const char *renderFieldExtra (const tagEntryInfo *const tag, const char *value, vString* b, bool *rejected);
+static const char *renderFieldExtras (const tagEntryInfo *const tag, const char *value, vString* b, bool *rejected);
 static const char *renderFieldXpath (const tagEntryInfo *const tag, const char *value, vString* b, bool *rejected);
 static const char *renderFieldScopeKindName(const tagEntryInfo *const tag, const char *value, vString* b, bool *rejected);
 static const char *renderFieldEnd (const tagEntryInfo *const tag, const char *value, vString* b, bool *rejected);
@@ -71,7 +71,7 @@ static bool     isAccessFieldAvailable    (const tagEntryInfo *const tag);
 static bool     isImplementationFieldAvailable (const tagEntryInfo *const tag);
 static bool     isSignatureFieldAvailable (const tagEntryInfo *const tag);
 static bool     isRoleFieldAvailable      (const tagEntryInfo *const tag);
-static bool     isExtraFieldAvailable     (const tagEntryInfo *const tag);
+static bool     isExtrasFieldAvailable    (const tagEntryInfo *const tag);
 static bool     isXpathFieldAvailable     (const tagEntryInfo *const tag);
 static bool     isEndFieldAvailable       (const tagEntryInfo *const tag);
 
@@ -199,11 +199,11 @@ static fieldSpec fieldSpecsUniversal [] = {
 			   [WRITER_U_CTAGS] = renderFieldScope,
 			   [WRITER_E_CTAGS] = renderFieldScopeNoEscape,
 			   [WRITER_JSON]    = renderFieldScopeNoEscape),
-	DEFINE_FIELD_SPEC_FULL ('E', "extra",   false,
+	DEFINE_FIELD_SPEC_FULL ('E', "extras",   false,
 			   "Extra tag type information",
-			   isExtraFieldAvailable,
+			   isExtrasFieldAvailable,
 			   FIELDTYPE_STRING,
-			   [WRITER_U_CTAGS] = renderFieldExtra),
+			   [WRITER_U_CTAGS] = renderFieldExtras),
 	DEFINE_FIELD_SPEC_FULL ('x', "xpath",   false,
 			   "xpath for the tag",
 			   isXpathFieldAvailable,
@@ -789,7 +789,7 @@ static const char *renderFieldRefMarker (const tagEntryInfo *const tag,
 	return renderAsIs (b, c);
 }
 
-static const char *renderFieldExtra (const tagEntryInfo *const tag,
+static const char *renderFieldExtras (const tagEntryInfo *const tag,
 				     const char *value CTAGS_ATTR_UNUSED,
 				     vString* b,
 					 bool *rejected)
@@ -901,7 +901,7 @@ static bool     isRoleFieldAvailable      (const tagEntryInfo *const tag)
 	return (tag->extensionFields.roleIndex != ROLE_INDEX_DEFINITION)? true: false;
 }
 
-static bool     isExtraFieldAvailable     (const tagEntryInfo *const tag)
+static bool     isExtrasFieldAvailable     (const tagEntryInfo *const tag)
 {
 	int i;
 	for (i = 0; i < sizeof (tag->extra); i++)
