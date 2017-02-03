@@ -15,9 +15,6 @@ typedef int langType;
 struct sTagEntryInfo;
 typedef struct sTagEntryInfo tagEntryInfo;
 
-struct sFieldDesc;
-typedef struct sFieldDesc fieldDesc;
-
 struct sPtagDesc;
 typedef struct sPtagDesc ptagDesc;
 

@@ -26,14 +26,14 @@
 #include "routines.h"
 
 
-struct sFieldDesc {
+typedef struct sFieldDesc {
 	fieldSpec *spec;
 	unsigned int fixed:   1;   /* fields which cannot be disabled. */
 	vString     *buffer;
 	const char* nameWithPrefix;
 	langType language;
 	fieldType sibling;
-};
+} fieldDesc;
 
 static const char *renderFieldName (const tagEntryInfo *const tag, const char *value, vString* b, bool *rejected);
 static const char *renderFieldNameNoEscape (const tagEntryInfo *const tag, const char *value CTAGS_ATTR_UNUSED, vString* b,
@@ -395,7 +395,7 @@ static void printField (fieldType i)
 	const char *language;
 	char  typefields [] = "---";
 
-	if (letter == FIELD_LETTER_NO_USE)
+	if (letter == NUL_FIELD_LETTER)
 		letter = '-';
 
 	if (! fieldDescs[i].spec->name)
@@ -940,7 +940,7 @@ static bool isFieldFixed (fieldType type)
 extern bool enableField (fieldType type, bool state, bool warnIfFixedField)
 {
 	fieldSpec *spec = getFieldDesc(type)->spec;
-	bool old = spec->enabled? true: false;
+	bool old = spec->enabled;
 	if (isFieldFixed (type))
 	{
 		if ((!state) && warnIfFixedField)

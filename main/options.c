@@ -1259,7 +1259,7 @@ static void processFieldsOption (
 			}
 
 			if (t == FIELD_UNKNOWN)
-				error(FATAL, "nosuch field: \'%s\'", vStringValue (longName));
+				error(FATAL, "no such field: \'%s\'", vStringValue (longName));
 
 			enableField (t, mode, true);
 
@@ -2464,7 +2464,7 @@ static bool* redirectToXtag(const booleanOption *const option)
 
 	enableXtag (t, default_value);
 
-	return &(getXtagDesc (t)->enabled);
+	return &(getXtagSpec (t)->enabled);
 }
 
 /*
@@ -2693,8 +2693,12 @@ static bool processLangSpecificFieldsOption (const char *const option,
 		resetFieldsOption (language, true);
 		p++;
 	}
-	else if (*p == '{')
+	else if (*p == '{' || *p == '\0')
+	{
 		resetFieldsOption (language, false);
+		if (*p == '\0')
+			return true;
+	}
 	else if (*p != '+' && *p != '-')
 		error (WARNING, "Wrong per language field specification: %s", p);
 
@@ -2743,6 +2747,8 @@ static bool processLangSpecificFieldsOption (const char *const option,
 			break;
 		}
 	}
+#undef PREFIX_LEN
+#undef PREFIX
 	return true;
 }
 
