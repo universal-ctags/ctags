@@ -33,6 +33,7 @@
 #include "routines.h"
 #include "vstring.h"
 #include "objpool.h"
+#include "trace.h"
 
 /*
  *	 MACROS
@@ -44,6 +45,52 @@
 		(c) == '@' || (c) == '_' || (c) == '#')
 #define newToken() (objPoolGet (TokenPool))
 #define deleteToken(t) (objPoolPut (TokenPool, (t)))
+
+/*
+ * Debugging
+ *
+ * Uncomment this to enable extensive debugging to stderr in jscript code.
+ * Please note that TRACING_ENABLED should be #defined in main/trace.h
+ * for this to work.
+ *
+ */
+//#define JSCRIPT_DEBUGGING_ENABLED 1
+
+#if defined(DO_TRACING) && defined(JSCRIPT_DEBUGGING_ENABLED)
+	#define JSCRIPT_DO_DEBUGGING
+#endif
+
+#ifdef JSCRIPT_DO_DEBUGGING
+
+#define JSCRIPT_DEBUG_ENTER() TRACE_ENTER()
+#define JSCRIPT_DEBUG_LEAVE() TRACE_LEAVE()
+
+#define JSCRIPT_DEBUG_ENTER_TEXT(_szFormat,...) \
+	TRACE_ENTER_TEXT(_szFormat,## __VA_ARGS__)
+
+#define JSCRIPT_DEBUG_LEAVE_TEXT(_szFormat,...) \
+	TRACE_LEAVE_TEXT(_szFormat,## __VA_ARGS__)
+
+#define JSCRIPT_DEBUG_PRINT(_szFormat,...) \
+	TRACE_PRINT(_szFormat,## __VA_ARGS__)
+
+#define JSCRIPT_DEBUG_ASSERT(_condition,_szFormat,...) \
+	TRACE_ASSERT(_condition,_szFormat,## __VA_ARGS__)
+
+#else //!JSCRIPT_DO_DEBUGGING
+
+#define JSCRIPT_DEBUG_ENTER() do { } while(0)
+#define JSCRIPT_DEBUG_LEAVE() do { } while(0)
+
+#define JSCRIPT_DEBUG_ENTER_TEXT(_szFormat,...) do { } while(0)
+#define JSCRIPT_DEBUG_LEAVE_TEXT(_szFormat,...) do { } while(0)
+
+#define JSCRIPT_DEBUG_PRINT(_szFormat,...) do { } while(0)
+
+#define JSCRIPT_DEBUG_ASSERT(_condition,_szFormat,...) do { } while(0)
+
+#endif //!JSCRIPT_DO_DEBUGGING
+
 
 /*
  *	 DATA DECLARATIONS
@@ -77,7 +124,10 @@ enum eKeywordId {
 	KEYWORD_catch,
 	KEYWORD_finally,
 	KEYWORD_sap,
-	KEYWORD_return
+	KEYWORD_return,
+	KEYWORD_class,
+	KEYWORD_extends,
+	KEYWORD_static,
 };
 typedef int keywordId; /* to allow KEYWORD_NONE */
 
@@ -170,7 +220,10 @@ static const keywordTable JsKeywordTable [] = {
 	{ "catch",		KEYWORD_catch				},
 	{ "finally",	KEYWORD_finally				},
 	{ "sap",	    KEYWORD_sap    				},
-	{ "return",		KEYWORD_return				}
+	{ "return",		KEYWORD_return				},
+	{ "class",		KEYWORD_class				},
+	{ "extends",	KEYWORD_extends				},
+	{ "static",		KEYWORD_static				},
 };
 
 /*
@@ -235,7 +288,8 @@ static void copyToken (tokenInfo *const dest, const tokenInfo *const src,
  *	 Tag generation functions
  */
 
-static void makeJsTag (tokenInfo *const token, const jsKind kind, vString *const signature)
+static void makeJsTag (const tokenInfo *const token, const jsKind kind,
+                       vString *const signature, vString *const inheritance)
 {
 	if (JsKinds [kind].enabled && ! token->ignoreTag )
 	{
@@ -254,11 +308,14 @@ static void makeJsTag (tokenInfo *const token, const jsKind kind, vString *const
 
 		initTagEntry (&e, name, &(JsKinds [kind]));
 
+		JSCRIPT_DEBUG_PRINT("Emitting tag for symbol '%s' of kind %02x",name,kind);
+
 		e.lineNumber   = token->lineNumber;
 		e.filePosition = token->filePosition;
 
 		if ( vStringLength(fullscope) > 0 )
 		{
+			/* FIXME: proper parent type */
 			jsKind parent_kind = JSTAG_CLASS;
 
 			/*
@@ -289,12 +346,16 @@ static void makeJsTag (tokenInfo *const token, const jsKind kind, vString *const
 			e.extensionFields.signature = vStringValue(signature);
 		}
 
+		if (inheritance)
+			e.extensionFields.inheritance = vStringValue(inheritance);
+
 		makeTagEntry (&e);
 		vStringDelete (fullscope);
 	}
 }
 
-static void makeClassTag (tokenInfo *const token, vString *const signature)
+static void makeClassTag (tokenInfo *const token, vString *const signature,
+                          vString *const inheritance)
 {
 	vString *	fulltag;
 
@@ -314,7 +375,7 @@ static void makeClassTag (tokenInfo *const token, vString *const signature)
 		if ( ! stringListHas(ClassNames, vStringValue (fulltag)) )
 		{
 			stringListAdd (ClassNames, vStringNewCopy (fulltag));
-			makeJsTag (token, JSTAG_CLASS, signature);
+			makeJsTag (token, JSTAG_CLASS, signature, inheritance);
 		}
 		vStringDelete (fulltag);
 	}
@@ -340,7 +401,7 @@ static void makeFunctionTag (tokenInfo *const token, vString *const signature, b
 		if ( ! stringListHas(FunctionNames, vStringValue (fulltag)) )
 		{
 			stringListAdd (FunctionNames, vStringNewCopy (fulltag));
-			makeJsTag (token, generator ? JSTAG_GENERATOR : JSTAG_FUNCTION, signature);
+			makeJsTag (token, generator ? JSTAG_GENERATOR : JSTAG_FUNCTION, signature, NULL);
 		}
 		vStringDelete (fulltag);
 	}
@@ -746,6 +807,7 @@ getNextChar:
 static void readToken (tokenInfo *const token)
 {
 	readTokenFull (token, false, NULL);
+	JSCRIPT_DEBUG_PRINT("token '%s' of type %02x",vStringValue(token->string),token->type);
 }
 
 /*
@@ -1049,13 +1111,20 @@ static void parseFunction (tokenInfo *const token)
 		is_generator = true;
 		readToken (name);
 	}
-	if (!isType (name, TOKEN_IDENTIFIER))
+	if (isType (name, TOKEN_OPEN_PAREN))
+	{
+		/* anonymous function */
+		copyToken (token, name, false);
+		anonGenerate (name->string, "AnonymousFunction", JSTAG_FUNCTION);
+	}
+	else if (!isType (name, TOKEN_IDENTIFIER))
 		goto cleanUp;
+	else
+		readToken (token);
 
 	/* Add scope in case this is an INNER function */
 	addToScope(name, token->scope);
 
-	readToken (token);
 	while (isType (token, TOKEN_PERIOD))
 	{
 		readToken (token);
@@ -1073,7 +1142,7 @@ static void parseFunction (tokenInfo *const token)
 	{
 		is_class = parseBlock (token, name);
 		if ( is_class )
-			makeClassTag (name, signature);
+			makeClassTag (name, signature, NULL);
 		else
 			makeFunctionTag (name, signature, is_generator);
 	}
@@ -1087,13 +1156,16 @@ static void parseFunction (tokenInfo *const token)
 
 static bool parseBlock (tokenInfo *const token, tokenInfo *const orig_parent)
 {
+	JSCRIPT_DEBUG_ENTER();
+
 	bool is_class = false;
 	bool read_next_token = true;
 	vString * saveScope = vStringNew ();
 	tokenInfo *const parent = newToken ();
 
 	/* backup the parent token to allow calls like parseBlock(token, token) */
-	copyToken (parent, orig_parent, true);
+	if (orig_parent)
+		copyToken (parent, orig_parent, true);
 
 	token->nestLevel++;
 	/*
@@ -1143,13 +1215,6 @@ static bool parseBlock (tokenInfo *const token, tokenInfo *const orig_parent)
 				read_next_token = parseLine (token, parent, is_class);
 				vStringCopy(token->scope, saveScope);
 			}
-			else if (isKeyword (token, KEYWORD_function))
-			{
-				vStringCopy(saveScope, token->scope);
-				addToScope (token, parent->string);
-				parseFunction (token);
-				vStringCopy(token->scope, saveScope);
-			}
 			else if (isType (token, TOKEN_OPEN_CURLY))
 			{
 				/* Handle nested blocks */
@@ -1185,11 +1250,16 @@ static bool parseBlock (tokenInfo *const token, tokenInfo *const orig_parent)
 	vStringDelete(saveScope);
 	token->nestLevel--;
 
+	JSCRIPT_DEBUG_LEAVE();
+
 	return is_class;
 }
 
-static bool parseMethods (tokenInfo *const token, tokenInfo *const class)
+static bool parseMethods (tokenInfo *const token, const tokenInfo *const class,
+                          const bool is_es6_class)
 {
+	JSCRIPT_DEBUG_ENTER();
+
 	tokenInfo *const name = newToken ();
 	bool has_methods = false;
 
@@ -1216,7 +1286,8 @@ static bool parseMethods (tokenInfo *const token, tokenInfo *const class)
 			goto cleanUp;
 		}
 
-		if (! isType (token, TOKEN_KEYWORD))
+		if (! isType (token, TOKEN_KEYWORD) &&
+		    ! isType (token, TOKEN_SEMICOLON))
 		{
 			bool is_generator = false;
 			bool is_shorthand = false; /* ES6 shorthand syntax */
@@ -1237,6 +1308,7 @@ static bool parseMethods (tokenInfo *const token, tokenInfo *const class)
 					readToken (token);
 				if ( is_shorthand || isKeyword (token, KEYWORD_function) )
 				{
+					JSCRIPT_DEBUG_PRINT("Seems to be a function or shorthand");
 					vString *const signature = vStringNew ();
 
 					if (! is_shorthand)
@@ -1258,19 +1330,22 @@ static bool parseMethods (tokenInfo *const token, tokenInfo *const class)
 					{
 						has_methods = true;
 						addToScope (name, class->string);
-						makeJsTag (name, is_generator ? JSTAG_GENERATOR : JSTAG_METHOD, signature);
+						makeJsTag (name, is_generator ? JSTAG_GENERATOR : JSTAG_METHOD, signature, NULL);
 						parseBlock (token, name);
 
 						/*
-						 * Read to the closing curly, check next
-						 * token, if a comma, we must loop again
+						 * If we aren't parsing an ES6 class (for which there
+						 * is no mandatory separators), read to the closing
+						 * curly, check next token, if a comma, we must loop
+						 * again.
 						 */
-						readToken (token);
+						if (! is_es6_class)
+							readToken (token);
 					}
 
 					vStringDelete (signature);
 				}
-				else
+				else if (! is_es6_class)
 				{
 						vString * saveScope = vStringNew ();
 						bool has_child_methods = false;
@@ -1285,7 +1360,7 @@ static bool parseMethods (tokenInfo *const token, tokenInfo *const class)
 								/* Recurse to find child properties/methods */
 								vStringCopy (saveScope, token->scope);
 								addToScope (token, class->string);
-								has_child_methods = parseMethods (token, name);
+								has_child_methods = parseMethods (token, name, false);
 								vStringCopy (token->scope, saveScope);
 								readToken (token);
 							}
@@ -1307,24 +1382,107 @@ static bool parseMethods (tokenInfo *const token, tokenInfo *const class)
 						has_methods = true;
 						addToScope (name, class->string);
 						if (has_child_methods)
-							makeJsTag (name, JSTAG_CLASS, NULL);
+							makeJsTag (name, JSTAG_CLASS, NULL, NULL);
 						else
-							makeJsTag (name, JSTAG_PROPERTY, NULL);
+							makeJsTag (name, JSTAG_PROPERTY, NULL, NULL);
 				}
 			}
 		}
-	} while ( isType(token, TOKEN_COMMA) );
+	} while ( isType(token, TOKEN_COMMA) ||
+	          ( is_es6_class && ! isType(token, TOKEN_EOF) ) );
+
+	JSCRIPT_DEBUG_PRINT("Finished parsing methods");
 
 	findCmdTerm (token, false, false);
 
 cleanUp:
 	deleteToken (name);
+	
+	JSCRIPT_DEBUG_LEAVE();
 
 	return has_methods;
 }
 
+static bool parseES6Class (tokenInfo *const token, const tokenInfo *const parent,
+                           const tokenInfo *targetName)
+{
+	JSCRIPT_DEBUG_ENTER();
+
+	tokenInfo * className = newToken ();
+	vString *inheritance = NULL;
+	bool is_anonymous = true;
+
+	copyToken (className, token, true);
+	readToken (className);
+	if (parent && ! targetName)
+		addToScope (className, parent->string);
+
+	/* optional name */
+	if (isType (className, TOKEN_IDENTIFIER))
+	{
+		readToken (token);
+		is_anonymous = false;
+	}
+	else
+	{
+		copyToken (token, className, true);
+		/* We create a fake name so we have a scope for the members */
+		if (! targetName)
+			anonGenerate (className->string, "AnonymousClass", JSTAG_CLASS);
+	}
+
+	if (! targetName)
+		targetName = className;
+
+	if (isKeyword (token, KEYWORD_extends))
+		inheritance = vStringNew ();
+
+	/* skip inheritance info */
+	while (! isType (token, TOKEN_OPEN_CURLY) &&
+	       ! isType (token, TOKEN_EOF) &&
+	       ! isType (token, TOKEN_SEMICOLON))
+		readTokenFull (token, false, inheritance);
+
+	/* remove the last added token (here we assume it's one char, "{" or ";" */
+	if (inheritance && vStringLength (inheritance) > 0 &&
+	    ! isType (token, TOKEN_EOF))
+	{
+		vStringChop (inheritance);
+		vStringStripTrailing (inheritance);
+		vStringStripLeading (inheritance);
+	}
+
+	JSCRIPT_DEBUG_PRINT("Emitting tag for class '%s'", vStringValue(targetName->string));
+
+	makeJsTag (targetName, JSTAG_CLASS, NULL, inheritance);
+
+	if (! is_anonymous && targetName != className)
+	{
+		/* FIXME: what to do with the secondary name?  It's local to the
+		 *        class itself, so not very useful... let's hope people
+		 *        don't give it another name than the target in case of
+		 *        	var MyClass = class MyClassSecondaryName { ... }
+		 *        I guess it could be an alias to MyClass, or duplicate it
+		 *        altogether, not sure. */
+		makeJsTag (className, JSTAG_CLASS, NULL, inheritance);
+	}
+
+	if (inheritance)
+		vStringDelete (inheritance);
+
+	if (isType (token, TOKEN_OPEN_CURLY))
+		parseMethods (token, targetName, true);
+
+	deleteToken (className);
+
+	JSCRIPT_DEBUG_LEAVE();
+	return true;
+}
+
 static bool parseStatement (tokenInfo *const token, tokenInfo *const parent, bool is_inside_class)
 {
+	JSCRIPT_DEBUG_ENTER();
+
 	tokenInfo *const name = newToken ();
 	tokenInfo *const secondary_name = newToken ();
 	tokenInfo *const method_body_token = newToken ();
@@ -1375,6 +1533,7 @@ static bool parseStatement (tokenInfo *const token, tokenInfo *const parent, boo
 		 isKeyword(token, KEYWORD_let) ||
 		 isKeyword(token, KEYWORD_const) )
 	{
+		JSCRIPT_DEBUG_PRINT("var/let/const case");
 		is_const = isKeyword(token, KEYWORD_const);
 		/*
 		 * Only create variables for global scope
@@ -1389,6 +1548,8 @@ static bool parseStatement (tokenInfo *const token, tokenInfo *const parent, boo
 nextVar:
 	if ( isKeyword(token, KEYWORD_this) )
 	{
+		JSCRIPT_DEBUG_PRINT("found 'this' keyword");
+
 		readToken(token);
 		if (isType (token, TOKEN_PERIOD))
 		{
@@ -1397,6 +1558,7 @@ nextVar:
 	}
 
 	copyToken(name, token, true);
+	JSCRIPT_DEBUG_PRINT("name becomes '%s'",vStringValue(name->string));
 
 	while (! isType (token, TOKEN_CLOSE_CURLY) &&
 	       ! isType (token, TOKEN_SEMICOLON)   &&
@@ -1463,7 +1625,7 @@ nextVar:
 						 */
 						goto cleanUp;
 
-					makeClassTag (name, NULL);
+					makeClassTag (name, NULL, NULL);
 					is_class = true;
 
 					/*
@@ -1498,7 +1660,7 @@ nextVar:
 									readToken (method_body_token);
 							}
 
-							makeJsTag (token, JSTAG_METHOD, signature);
+							makeJsTag (token, JSTAG_METHOD, signature, NULL);
 							vStringDelete (signature);
 
 							if ( isType (method_body_token, TOKEN_OPEN_CURLY))
@@ -1525,7 +1687,7 @@ nextVar:
 							 *         'validMethodTwo' : function(a,b) {}
 							 *     }
 							 */
-							parseMethods(token, name);
+							parseMethods(token, name, false);
 							/*
 							 * Find to the end of the statement
 							 */
@@ -1581,7 +1743,7 @@ nextVar:
 			 * Handles this syntax:
 			 *	   var g_var2;
 			 */
-			makeJsTag (name, is_const ? JSTAG_CONSTANT : JSTAG_VARIABLE, NULL);
+			makeJsTag (name, is_const ? JSTAG_CONSTANT : JSTAG_VARIABLE, NULL, NULL);
 		}
 		/*
 		 * Statement has ended.
@@ -1658,7 +1820,7 @@ nextVar:
 				 */
 				if ( is_inside_class )
 				{
-					makeJsTag (name, is_generator ? JSTAG_GENERATOR : JSTAG_METHOD, signature);
+					makeJsTag (name, is_generator ? JSTAG_GENERATOR : JSTAG_METHOD, signature, NULL);
 					if ( vStringLength(secondary_name->string) > 0 )
 						makeFunctionTag (secondary_name, signature, is_generator);
 					parseBlock (token, name);
@@ -1666,16 +1828,18 @@ nextVar:
 				else
 				{
 					if (! ( isType (name, TOKEN_IDENTIFIER)
-						|| isType (name, TOKEN_STRING) ) )
+					     || isType (name, TOKEN_STRING)
+					     || isType (name, TOKEN_KEYWORD) ) )
 					{
-                                                /* Unexpected input. Try to reset the parsing. */
+						/* Unexpected input. Try to reset the parsing. */
+						JSCRIPT_DEBUG_PRINT("Unexpected input, trying to reset");
 						vStringDelete (signature);
 						goto cleanUp;
 					}
 
 					is_class = parseBlock (token, name);
 					if ( is_class )
-						makeClassTag (name, signature);
+						makeClassTag (name, signature, NULL);
 					else
 						makeFunctionTag (name, signature, is_generator);
 
@@ -1685,6 +1849,10 @@ nextVar:
 			}
 
 			vStringDelete (signature);
+		}
+		else if (isKeyword (token, KEYWORD_class))
+		{
+			is_terminated = parseES6Class (token, name, name);
 		}
 		else if (isType (token, TOKEN_OPEN_CURLY))
 		{
@@ -1697,9 +1865,9 @@ nextVar:
 			 * Or checks if this is a hash variable.
 			 *     var z = {};
 			 */
-			has_methods = parseMethods(token, name);
+			has_methods = parseMethods(token, name, false);
 			if (has_methods)
-				makeJsTag (name, JSTAG_CLASS, NULL);
+				makeJsTag (name, JSTAG_CLASS, NULL, NULL);
 			else
 			{
 				/*
@@ -1734,7 +1902,7 @@ nextVar:
 					if ( ! stringListHas(FunctionNames, vStringValue (fulltag)) &&
 							! stringListHas(ClassNames, vStringValue (fulltag)) )
 					{
-						makeJsTag (name, is_const ? JSTAG_CONSTANT : JSTAG_VARIABLE, NULL);
+						makeJsTag (name, is_const ? JSTAG_CONSTANT : JSTAG_VARIABLE, NULL, NULL);
 					}
 					vStringDelete (fulltag);
 				}
@@ -1770,13 +1938,13 @@ nextVar:
 					{
 						if ( is_var )
 						{
-							makeJsTag (name, is_const ? JSTAG_CONSTANT : JSTAG_VARIABLE, NULL);
+							makeJsTag (name, is_const ? JSTAG_CONSTANT : JSTAG_VARIABLE, NULL, NULL);
 						}
 						else
 						{
 							if ( is_class )
 							{
-								makeClassTag (name, NULL);
+								makeClassTag (name, NULL, NULL);
 							} else {
 								/* FIXME: we cannot really get a meaningful
 								 * signature from a `new Function()` call,
@@ -1824,7 +1992,7 @@ nextVar:
 				if ( ! stringListHas(FunctionNames, vStringValue (fulltag)) &&
 						! stringListHas(ClassNames, vStringValue (fulltag)) )
 				{
-					makeJsTag (name, is_const ? JSTAG_CONSTANT : JSTAG_VARIABLE, NULL);
+					makeJsTag (name, is_const ? JSTAG_CONSTANT : JSTAG_VARIABLE, NULL, NULL);
 				}
 				vStringDelete (fulltag);
 			}
@@ -1877,6 +2045,8 @@ cleanUp:
 	deleteToken (method_body_token);
 	vStringDelete(saveScope);
 
+	JSCRIPT_DEBUG_LEAVE();
+
 	return is_terminated;
 }
 
@@ -1922,7 +2092,7 @@ static void parseUI5 (tokenInfo *const token)
 
 		do
 		{
-			parseMethods (token, name);
+			parseMethods (token, name, false);
 		} while (! isType (token, TOKEN_CLOSE_CURLY) &&
 				 ! isType (token, TOKEN_EOF));
 	}
@@ -1932,6 +2102,8 @@ static void parseUI5 (tokenInfo *const token)
 
 static bool parseLine (tokenInfo *const token, tokenInfo *const parent, bool is_inside_class)
 {
+	JSCRIPT_DEBUG_ENTER_TEXT("token is %s",vStringValue(token->string));
+
 	bool is_terminated = true;
 	/*
 	 * Detect the common statements, if, while, for, do, ...
@@ -1964,7 +2136,21 @@ static bool parseLine (tokenInfo *const token, tokenInfo *const parent, bool is_
 				parseSwitch (token);
 				break;
 			case KEYWORD_return:
-				is_terminated = findCmdTerm (token, true, false);
+				readToken (token);
+				is_terminated = parseLine (token, parent, is_inside_class);
+				break;
+			case KEYWORD_function:
+			{
+				vString *saveScope = vStringNewCopy (token->scope);
+				if (parent)
+					addToScope (token, parent->string);
+				parseFunction (token);
+				vStringCopy (token->scope, saveScope);
+				vStringDelete (saveScope);
+				break;
+			}
+			case KEYWORD_class:
+				is_terminated = parseES6Class (token, parent, NULL);
 				break;
 			default:
 				is_terminated = parseStatement (token, parent, is_inside_class);
@@ -1980,22 +2166,27 @@ static bool parseLine (tokenInfo *const token, tokenInfo *const parent, bool is_
 		 */
 		is_terminated = parseStatement (token, parent, is_inside_class);
 	}
+
+	JSCRIPT_DEBUG_LEAVE();
+
 	return is_terminated;
 }
 
 static void parseJsFile (tokenInfo *const token)
 {
+	JSCRIPT_DEBUG_ENTER();
+	
 	do
 	{
 		readToken (token);
 
-		if (isType (token, TOKEN_KEYWORD) && token->keyword == KEYWORD_function)
-			parseFunction (token);
-		else if (isType (token, TOKEN_KEYWORD) && token->keyword == KEYWORD_sap)
+		if (isType (token, TOKEN_KEYWORD) && token->keyword == KEYWORD_sap)
 			parseUI5 (token);
 		else
-			parseLine (token, token, false);
+			parseLine (token, NULL, false);
 	} while (! isType (token, TOKEN_EOF));
+
+	JSCRIPT_DEBUG_LEAVE();
 }
 
 static void initialize (const langType language)
@@ -2018,6 +2209,7 @@ static void findJsTags (void)
 {
 	tokenInfo *const token = newToken ();
 
+	anonReset ();
 	NextToken = NULL;
 	ClassNames = stringListNew ();
 	FunctionNames = stringListNew ();

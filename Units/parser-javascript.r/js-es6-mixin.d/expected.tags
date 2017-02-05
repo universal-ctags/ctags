@@ -1,0 +1,10 @@
+AnonymousClasse9b77f6a0101	input.js	/^  return class extends superclass {$/;"	c	class:Mixin	inherits:superclass
+Bar	input.js	/^class Bar extends Foo {$/;"	c	inherits:Foo
+Baz	input.js	/^class Baz extends Mixin(Bar) {$/;"	c	inherits:Mixin(Bar)
+Foo	input.js	/^class Foo {$/;"	c
+Mixin	input.js	/^function Mixin(superclass) {$/;"	f
+bar	input.js	/^  bar() { return "bar"; }$/;"	m	class:Bar
+foo	input.js	/^  foo() { return "foo"; }$/;"	m	class:Foo
+hello	input.js	/^    hello() {$/;"	m	class:Mixin.AnonymousClasse9b77f6a0101
+hi	input.js	/^  hi() {$/;"	m	class:Baz
+i	input.js	/^var i = new Baz();$/;"	v
