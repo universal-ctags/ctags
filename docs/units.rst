@@ -56,13 +56,19 @@ have its own directory under Units directory.
 
 	If you want to test etags output (specified with ``-e`` ),
 	Use **.tags-e** as suffix instead of **.tags**.
-	In such case you don't have write ``-e`` to ``args.ctags``.
+	In such case you don't have to write ``-e`` to ``args.ctags``.
 	The test facility sets ``-e`` automatically.
 
 	If you want to test cross reference output (specified with ``-x`` ),
 	Use **.tags-x** as suffix instead of **.tags**.
-	In such case you don't have write ``-x`` to ``args.ctags``.
+	In such case you don't have to write ``-x`` to ``args.ctags``.
 	The test facility sets ``-x`` automatically.
+
+	If you want to test json output (specified with ``--output-format=json`` ),
+	Use **.tags-json** as suffix instead of **.tags**.
+	In such case you don't have to write ``--output-format=json`` to ``args.ctags``,
+	and ``json`` to ``features``.
+	The test facility sets the option and the feature automatically.
 
 *Units/TEST/args.ctags* **optional**
 

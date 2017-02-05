@@ -193,8 +193,16 @@ check_units ()
 
 check_features()
 {
-    local ffile="$1"
-    shift
+    local flag="$1"
+    local ffile
+    local feature
+
+    if [ "${flag}" = "-f" ]; then
+	ffile="$2"
+    elif [ "${flag}" = "-e" ]; then
+	feature="$2"
+    fi
+    shift 2
 
     local f
     local found
@@ -202,7 +210,7 @@ check_features()
     local expected;
 
 
-    while read expected; do
+    for expected in $([ -f "$ffile" ] && cat "$ffile") ${feature}; do
 	    found=no
 	    found_unexpectedly=no
 	    for f in $( ${CTAGS} --quiet --options=NONE --list-features 2> /dev/null | "${_LINE_SPLITER}" ) ; do
@@ -216,7 +224,7 @@ check_features()
 		echo "$expected"
 		return 1
 	    fi
-    done < "$ffile"
+    done
 
     return 0
 }
@@ -336,10 +344,16 @@ etags_basename_filter()
     sed "${etags_basename_filter_regex}"
 }
 
-xref_basename_filter_regex='s%\(.*[[:digit:]]\{1,\} \)\([^ ]\{1,\}.\{1,\}\)/\([^ ].\{1,\}.\{1,\}$\)%\1\3%'
+xref_basename_filter_regex='s%\(.*[[:digit:]]\{1,\} \)\([^ ]\{1,\}[^ ]\{1,\}\)/\([^ ].\{1,\}.\{1,\}$\)%\1\3%'
 xref_basename_filter()
 {
     sed "${xref_basename_filter_regex}"
+}
+
+json_basename_filter_regex='s%\("path": \)"[^"]\{1,\}/\([^/"]\{1,\}\)"%\1"\2"%'
+json_basename_filter()
+{
+    sed "${json_basename_filter_regex}"
 }
 
 run_record_cmdline ()
@@ -428,14 +442,16 @@ run_tcase ()
     # tags-e if for etags output(-e). TAGS is good
     # suffix but foo.tags and foo.TAGS may be the same on Windows.
     # tags-x is for cross reference output(-x).
+    # tags-json is for json output.
     #
     # fexpected must be set even if none of
-    # expected.{tags,tags-e,xref} exits.
+    # expected.{tags,tags-e,tags-x,tags-json} exits.
     #
     local fexpected="$t/expected.tags"
     local output_type=ctags
     local output_label=
     local output_tflag=
+    local output_feature=
     if [ -f "$t/expected.tags" ]; then
 	:
     elif [ -f "$t/expected.tags-e" ]; then
@@ -448,6 +464,12 @@ run_tcase ()
 	output_type=xref
 	output_label=/${output_type}
 	output_tflag=-x
+    elif [ -f "$t/expected.tags-json" ]; then
+	fexpected=$t/expected.tags-json
+	output_type=json
+	output_label=/${output_type}
+	output_tflag="--output-format=json"
+	output_feature=json
     fi
 
     [ -x "$ffilter" ] || ffilter=cat
@@ -505,7 +527,8 @@ run_tcase ()
 
     printf '%-60s' "Testing ${name} as ${guessed_lang}${output_label}"
 
-    if [ -f "${ffeatures}" ] && ! tmp=$(check_features "${ffeatures}"); then
+    if tmp=$( ( [ -n "${output_feature}" ] && ! check_features -e "${output_feature}" ) ||
+	      ( [ -f "${ffeatures}" ] && ! check_features -f "${ffeatures}" ) ); then
 	L_SKIPPED_BY_FEATURES="$L_SKIPPED_BY_FEATURES ${category}/${name}"
 	case "${tmp}" in
 	    !*) run_result skip "${oresult}" "unwanted feature \"${tmp#?}\" is available";;

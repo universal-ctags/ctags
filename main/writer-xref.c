@@ -18,12 +18,14 @@
 
 static int writeXrefEntry  (tagWriter *writer CTAGS_ATTR_UNUSED,
 							MIO * mio, const tagEntryInfo *const tag);
+static void buildXrefFqTagCache (tagWriter *writer, tagEntryInfo *const tag);
 
 tagWriter xrefWriter = {
 	.writeEntry = writeXrefEntry,
 	.writePtagEntry = NULL,
 	.preWriteEntry = NULL,
 	.postWriteEntry = NULL,
+	.buildFqTagCache = buildXrefFqTagCache,
 	.useStdoutByDefault = true,
 };
 
@@ -59,4 +61,12 @@ static int writeXrefEntry (tagWriter *writer CTAGS_ATTR_UNUSED,
 	length++;
 
 	return length;
+}
+
+static void buildXrefFqTagCache (tagWriter *writer, tagEntryInfo *const tag)
+{
+	renderFieldEscaped (writer->type, FIELD_SCOPE_KIND_LONG, tag,
+			    NO_PARSER_FIELD, NULL);
+	renderFieldEscaped (writer->type, FIELD_SCOPE, tag,
+			    NO_PARSER_FIELD, NULL);
 }
