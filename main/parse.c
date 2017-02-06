@@ -55,8 +55,6 @@ typedef struct {
 	enum specType specType;
 }  parserCandidate;
 
-static ptrArray *parsersUsedInCurrentInput;
-
 /*
  * FUNCTION PROTOTYPES
  */
@@ -66,7 +64,8 @@ static void installKeywordTable (const langType language);
 static void installTagRegexTable (const langType language);
 static void installTagXpathTable (const langType language);
 static void anonResetMaybe (parserDefinition *lang);
-static void clearParsersUsedInCurrentInput (void);
+static void setupAnon (void);
+static void teardownAnon (void);
 
 /*
 *   DATA DEFINITIONS
@@ -2474,13 +2473,15 @@ extern bool parseFileWithMio (const char *const fileName, MIO *mio)
 
 		setupWriter ();
 
-		clearParsersUsedInCurrentInput ();
+		setupAnon ();
 
 		tagFileResized = createTagsWithFallback (fileName, language, req.mio);
 #ifdef HAVE_COPROC
 		if (LanguageTable [language]->method & METHOD_XCMD_AVAILABLE)
 			tagFileResized = createTagsWithXcmd (fileName, language, req.mio)? true: tagFileResized;
 #endif
+
+		teardownAnon ();
 
 		tagFileResized = teardownWriter (getSourceFileTagPath())? true: tagFileResized;
 
@@ -2752,13 +2753,16 @@ extern bool makeKindDescriptionsPseudoTags (const langType language,
 *
 *   Anonymous name generator
 */
+static ptrArray *parsersUsedInCurrentInput;
 
-static void clearParsersUsedInCurrentInput (void)
+static void setupAnon (void)
 {
-	if (parsersUsedInCurrentInput)
-		ptrArrayClear (parsersUsedInCurrentInput);
-	else
-		parsersUsedInCurrentInput = ptrArrayNew (NULL);
+	parsersUsedInCurrentInput = ptrArrayNew (NULL);
+}
+
+static void teardownAnon (void)
+{
+	ptrArrayDelete (parsersUsedInCurrentInput);
 }
 
 static void anonResetMaybe (parserDefinition *lang)
