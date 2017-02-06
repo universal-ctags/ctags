@@ -248,7 +248,7 @@ static void appendText (vString *text, vString *appendedText)
 	}
 }
 
-static bool readTagContent (tokenInfo *token, vString *text, long *line, int *lineOffset)
+static bool readTagContent (tokenInfo *token, vString *text, long *line, long *lineOffset)
 {
 	tokenType type;
 
@@ -318,9 +318,9 @@ static void readTag (tokenInfo *token, vString *text)
 		{
 			long startSourceLineNumber = getSourceLineNumber ();
 			long startLineNumber = getInputLineNumber ();
-			int startLineOffset = getInputLineOffset ();
+			long startLineOffset = getInputLineOffset ();
 			long endLineNumber;
-			int endLineOffset;
+			long endLineOffset;
 			bool tag_start2;
 
 			tag_start2 = readTagContent (token, text, &endLineNumber, &endLineOffset);

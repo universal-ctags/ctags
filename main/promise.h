@@ -17,8 +17,8 @@
 #include "parse.h"
 
 int  makePromise   (const char *parser,
-		    unsigned long startLine, int startCharOffset,
-		    unsigned long endLine, int endCharOffset,
+		    unsigned long startLine, long startCharOffset,
+		    unsigned long endLine, long endCharOffset,
 		    unsigned long sourceLineOffset);
 bool forcePromises (void);
 void breakPromisesAfter (int promise);
