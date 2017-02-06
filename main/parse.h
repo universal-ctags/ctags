@@ -210,8 +210,8 @@ extern bool doesParserRequireMemoryStream (const langType language);
 extern bool parseFile (const char *const fileName);
 extern bool parseFileWithMio (const char *const fileName, MIO *mio);
 extern bool runParserInNarrowedInputStream (const langType language,
-					       unsigned long startLine, int startCharOffset,
-					       unsigned long endLine, int endCharOffset,
+					       unsigned long startLine, long startCharOffset,
+					       unsigned long endLine, long endCharOffset,
 					       unsigned long sourceLineOffset);
 
 #ifdef HAVE_ICONV

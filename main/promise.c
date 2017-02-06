@@ -19,9 +19,9 @@
 struct promise {
 	langType lang;
 	unsigned long startLine;
-	int startCharOffset;
+	long startCharOffset;
 	unsigned long endLine;
-	int endCharOffset;
+	long endCharOffset;
 	unsigned long sourceLineOffset;
 };
 
@@ -30,8 +30,8 @@ static int promise_count;
 static int promise_allocated;
 
 int  makePromise   (const char *parser,
-		    unsigned long startLine, int startCharOffset,
-		    unsigned long endLine, int endCharOffset,
+		    unsigned long startLine, long startCharOffset,
+		    unsigned long endLine, long endCharOffset,
 		    unsigned long sourceLineOffset)
 {
 	struct promise *p;

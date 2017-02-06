@@ -2252,17 +2252,17 @@ static bool createTagsWithFallback1 (const langType language)
 }
 
 extern bool runParserInNarrowedInputStream (const langType language,
-					       unsigned long startLine, int startCharOffset,
-					       unsigned long endLine, int endCharOffset,
+					       unsigned long startLine, long startCharOffset,
+					       unsigned long endLine, long endCharOffset,
 					       unsigned long sourceLineOffset)
 {
 	bool tagFileResized;
 
 	verbose ("runParserInNarrowedInputStream: %s; "
 			 "file: %s, "
-			 "start(line: %lu, offset: %u, srcline: %lu)"
+			 "start(line: %lu, offset: %lu, srcline: %lu)"
 			 " - "
-			 "end(line: %lu, offset: %u)\n",
+			 "end(line: %lu, offset: %lu)\n",
 			 getLanguageName (language),
 			 getInputFileName (),
 			 startLine, startCharOffset, sourceLineOffset,
