@@ -44,7 +44,7 @@ static  void change_section (const char *line CTAGS_ATTR_UNUSED,
 	if (not_in_grammar_rules)
 	{
 		const unsigned char *tmp, *last;
-		int endCharOffset;
+		long endCharOffset;
 		unsigned long c_start;
 		unsigned long c_source_start;
 		unsigned long c_end;
