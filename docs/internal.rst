@@ -81,7 +81,7 @@ for example.
 promise API
 ......................................................................
 (Currently the tagging via promise API is disabled by default.
- Use `--extras=+s` optoin for enabling it.)
+ Use `--extras=+s` option for enabling it.)
 
 Background and Idea
 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
