@@ -1017,7 +1017,7 @@ To control the detail of a parser, ``--param-<LANG>`` option.
 can be used for customizing the behavior of a parser specified with ``<LANG>``.
 
 ``--param-<LANG>`` should be used other aspects of the parser other
-than the options(kinds, fields, etras).
+than the options(kinds, fields, extras).
 
 A parser defines a set of parameters. Each parameter has name and
 takes an argument. A user can set a parameter with following notation
