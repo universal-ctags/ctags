@@ -43,7 +43,7 @@ Several properties of functions and variables can be extracted
 and placed in a new field called ``properties``.
 The syntax to enable it is:
 
-.. code-block:: C
+.. code-block:: console
 
 	$ ctags ... --fields-c++=+{properties} ...
 
