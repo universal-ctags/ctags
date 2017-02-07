@@ -1013,7 +1013,7 @@ Parser own parameter
 .. NOT REVIEWED YET
 
 To control the detail of a parser, ``--param-<LANG>`` option.
-``--kinds-<LANG>``, ``--fields-<LANG>``, ``--extras-<LANG>`` (not implemented yet)
+``--kinds-<LANG>``, ``--fields-<LANG>``, ``--extras-<LANG>``
 can be used for customizing the behavior of a parser specified with ``<LANG>``.
 
 ``--param-<LANG>`` should be used other aspects of the parser other
