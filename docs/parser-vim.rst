@@ -7,7 +7,7 @@ The Vim parser
 Incompatible change
 ---------------------------------------------------------------------
 
-Quoted from ``:help script-variable`` in the Vim documentation:
+Quoted from ``:help script-variable`` in the Vim documentation::
 
 			    *script-variable* *s:var*
     In a Vim script variables starting with "s:" can be used. They
