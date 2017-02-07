@@ -473,6 +473,7 @@ Exceptions
    about the conversion.
 
 .. _compat-output:
+
 Compatible output and weakness
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
