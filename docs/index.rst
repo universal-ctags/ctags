@@ -36,6 +36,7 @@ This is a draft document. Proofreading and pull-requests are welcome!
 	contributions.rst
 	parsers.rst
 	output-format.rst
+	interactive-mode.rst
 	guessing.rst
 	building.rst
 	testing.rst
