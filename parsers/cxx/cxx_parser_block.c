@@ -366,7 +366,12 @@ process_token:
 
 						if(cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeStringConstant))
 						{
+							bool bSwitchToC = false;
 							// assume extern "language"
+
+							if (strcmp (vStringValue (g_cxx.pToken->pszWord), "\"C\"") == 0
+							    && cxxParserCurrentLanguageIsCPP())
+								bSwitchToC = true;
 
 							// Strictly speaking this is a C++ only syntax.
 							// However we allow it also in C as it doesn't really hurt.

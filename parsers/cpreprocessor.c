@@ -902,7 +902,7 @@ static int skipOverDComment (void)
 /*  Skips to the end of a string, returning a special character to
  *  symbolically represent a generic string.
  */
-static int skipToEndOfString (bool ignoreBackslash)
+static int skipToEndOfString (bool ignoreBackslash, vString *rawdata, unsigned int maxlen)
 {
 	int c;
 
@@ -912,6 +912,8 @@ static int skipToEndOfString (bool ignoreBackslash)
 			cppGetcFromUngetBufferOrFile ();  /* throw away next character, too */
 		else if (c == DOUBLE_QUOTE)
 			break;
+		else if (rawdata && (vStringLength (rawdata) < maxlen || maxlen == 0))
+			vStringPut (rawdata, c);
 	}
 	return STRING_SYMBOL;  /* symbolic representation of string */
 }
@@ -929,7 +931,7 @@ static int skipToEndOfCxxRawLiteralString (void)
 	if (c != '(' && ! isCxxRawLiteralDelimiterChar (c))
 	{
 		cppUngetc (c);
-		c = skipToEndOfString (false);
+		c = skipToEndOfString (false, NULL, 0);
 	}
 	else
 	{
@@ -1019,6 +1021,11 @@ static void attachEndFieldMaybe (int macroCorkIndex)
  */
 extern int cppGetc (void)
 {
+	return cppGetcFull (NULL, 0);
+}
+
+extern int cppGetcFull (vString *rawData, int maxlen)
+{
 	bool directive = false;
 	bool ignore = false;
 	int c;
@@ -1058,7 +1065,7 @@ process:
 				else
 				{
 					Cpp.directive.accept = false;
-					c = skipToEndOfString (false);
+					c = skipToEndOfString (false, rawData, maxlen);
 				}
 
 				break;
@@ -1177,7 +1184,7 @@ process:
 					if (next == DOUBLE_QUOTE)
 					{
 						Cpp.directive.accept = false;
-						c = skipToEndOfString (true);
+						c = skipToEndOfString (true, NULL, 0);
 						break;
 					}
 					else
