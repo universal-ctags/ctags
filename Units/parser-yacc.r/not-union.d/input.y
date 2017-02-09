@@ -284,3 +284,5 @@ int ssfilter_parse(struct ssfilter **f, int argc, char **argv, FILE *fp)
 	}
 	return 0;
 }
+#define END 1
+

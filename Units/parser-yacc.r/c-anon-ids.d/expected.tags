@@ -1,0 +1,8 @@
+__anon04bc23ae0108	input.y	/^	struct {$/;"	s	file:
+x	input.y	/^		int x, y;$/;"	m	struct:__anon04bc23ae0108	file:
+y	input.y	/^		int x, y;$/;"	m	struct:__anon04bc23ae0108	file:
+point	input.y	/^	} point;$/;"	v
+__anon04bc23ae0208	input.y	/^	struct {$/;"	s	file:
+x	input.y	/^		int x, y;$/;"	m	struct:__anon04bc23ae0208	file:
+y	input.y	/^		int x, y;$/;"	m	struct:__anon04bc23ae0208	file:
+vector	input.y	/^	} vector;$/;"	v

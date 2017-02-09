@@ -43,6 +43,8 @@ static  void change_section (const char *line CTAGS_ATTR_UNUSED,
 
 	if (not_in_grammar_rules)
 	{
+		const unsigned char *tmp, *last;
+		long endCharOffset;
 		unsigned long c_start;
 		unsigned long c_source_start;
 		unsigned long c_end;
@@ -52,12 +54,20 @@ static  void change_section (const char *line CTAGS_ATTR_UNUSED,
 		c_source_start = getSourceLineNumber();
 
 		/* Skip the lines for finding the EOF. */
-		while (readLineFromInputFile ())
-			;
+		endCharOffset = 0;
+		last = NULL;
+		while ((tmp = readLineFromInputFile ()))
+			last = tmp;
+		if (last)
+			endCharOffset = strlen ((const char *)last);
+		/* If `last' is too long, strlen returns a too large value
+		   for the positive area of `endCharOffset'. */
+		if (endCharOffset < 0)
+			endCharOffset = 0;
 
 		c_end = getInputLineNumber ();
 
-		makePromise ("C", c_start, 0, c_end, 0, c_source_start);
+		makePromise ("C", c_start, 0, c_end, endCharOffset, c_source_start);
 	}
 }
 

@@ -65,7 +65,7 @@ void cxxTokenAPIInit(void)
 
 void cxxTokenAPINewFile(void)
 {
-	anonReset ();
+	/* Stub */
 }
 
 void cxxTokenAPIDone(void)

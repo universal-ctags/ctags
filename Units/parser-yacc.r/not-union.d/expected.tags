@@ -14,3 +14,4 @@ yyerror	input.y	/^static void yyerror(char *s)$/;"	f	language:C	typeref:typename
 get_token_from_line	input.y	/^static char *get_token_from_line(char **ptr)$/;"	f	language:C	typeref:typename:char *	file:
 yylex	input.y	/^int yylex(void)$/;"	f	language:C	typeref:typename:int
 ssfilter_parse	input.y	/^int ssfilter_parse(struct ssfilter **f, int argc, char **argv, FILE *fp)$/;"	f	language:C	typeref:typename:int
+END	input.y	/^#define END /;"	d	language:C	file:

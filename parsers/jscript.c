@@ -2209,7 +2209,6 @@ static void findJsTags (void)
 {
 	tokenInfo *const token = newToken ();
 
-	anonReset ();
 	NextToken = NULL;
 	ClassNames = stringListNew ();
 	FunctionNames = stringListNew ();
