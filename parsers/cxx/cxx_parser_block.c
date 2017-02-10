@@ -22,6 +22,7 @@
 #include "debug.h"
 #include "keyword.h"
 #include "read.h"
+#include "promise.h"
 
 #include <string.h>
 
@@ -153,6 +154,33 @@ bool cxxParserParseBlockHandleOpeningBracket(void)
 	return true;
 }
 
+static bool cxxMakePromiseForCArea (void)
+{
+	int iBalance = 1;
+
+	long lStartSourceLineNumber = getSourceLineNumber ();
+	unsigned long ulStartLine = g_cxx.pToken->iLineNumber;
+	long lStartCharOffset = getInputLineOffset ();
+
+	while (cxxParserParseNextToken())
+	{
+		if (cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeOpeningBracket))
+			iBalance++;
+		else if (cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeClosingBracket))
+			iBalance--;
+		if (iBalance == 0)
+		{
+			makePromise ("C",
+				     ulStartLine,
+				     lStartCharOffset,
+				     g_cxx.pToken->iLineNumber,
+				     getInputLineOffset (),
+				     lStartSourceLineNumber);
+			return true;
+		}
+	}
+	return false;
+}
 
 static bool cxxParserParseBlockInternal(bool bExpectClosingBracket)
 {
@@ -366,7 +394,12 @@ process_token:
 
 						if(cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeStringConstant))
 						{
+							bool bSwitchToC = false;
 							// assume extern "language"
+
+							if (strcmp (vStringValue (g_cxx.pToken->pszWord), "\"C\"") == 0
+							    && cxxParserCurrentLanguageIsCPP())
+								bSwitchToC = true;
 
 							// Strictly speaking this is a C++ only syntax.
 							// However we allow it also in C as it doesn't really hurt.
@@ -391,6 +424,26 @@ process_token:
 							//
 							// So in this case we do NOT treat the inner declarations as extern
 							// and we don't need specific handling code for this case.
+
+
+							if (bSwitchToC)
+							{
+								if(!cxxParserParseNextToken())
+									goto found_eof;
+								if(cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeOpeningBracket))
+								{
+									/* C++ parser has found extern "C" {...} block.
+									   Let's schedule running C parser on the area, {...}. */
+
+									if (!cxxMakePromiseForCArea ())
+										goto found_eof;
+								}
+								else
+									goto process_token;
+							}
+
+
+
 						} else {
 							// something else: handle it the normal way
 							goto process_token;

@@ -26,13 +26,18 @@
 
 #define UINFO(c) (((c) < 0x80 && (c) >= 0) ? g_aCharTable[c].uType : 0)
 
-static void cxxParserSkipToNonWhiteSpace(void)
+static void cxxParserSkipToNonWhiteSpaceFull(vString *pRawdata, unsigned int uMaxlen)
 {
 	if(!isspace(g_cxx.iChar))
 		return;
 	do
-		g_cxx.iChar = cppGetc();
+		g_cxx.iChar = cppGetcFull(pRawdata, uMaxlen);
 	while(isspace(g_cxx.iChar));
+}
+
+static void cxxParserSkipToNonWhiteSpace(void)
+{
+	cxxParserSkipToNonWhiteSpaceFull (NULL, 0);
 }
 
 enum CXXCharType
@@ -1079,6 +1084,9 @@ bool cxxParserParseNextToken(void)
 {
 	CXXToken * t = cxxTokenCreate();
 
+	static vString *pRawdata;
+	pRawdata = vStringNewOrClear (pRawdata);
+
 	// The token chain should not be allowed to grow arbitrairly large.
 	// The token structures are quite big and it's easy to grow up to
 	// 5-6GB or memory usage. However this limit should be large enough
@@ -1093,7 +1101,7 @@ bool cxxParserParseNextToken(void)
 
 	g_cxx.pToken = t;
 
-	cxxParserSkipToNonWhiteSpace();
+	cxxParserSkipToNonWhiteSpaceFull(pRawdata, 3);
 
 	// FIXME: this cpp handling is kind of broken:
 	// it works only because the moon is in the correct phase.
@@ -1316,6 +1324,7 @@ bool cxxParserParseNextToken(void)
 	{
 		t->eType = CXXTokenTypeStringConstant;
 		vStringPut(t->pszWord,'"');
+		vStringCat(t->pszWord, pRawdata);
 		vStringPut(t->pszWord,'"');
 		g_cxx.iChar = cppGetc();
 		t->bFollowedBySpace = isspace(g_cxx.iChar);
