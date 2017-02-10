@@ -17,19 +17,16 @@
 
 static tagRegexTable cobolTagRegexTable[] = {
 	{"^[ \t]*[0-9]+[ \t]+([A-Z0-9][A-Z0-9-]*)[ \t]+("
-	 "BLANK|OCCURS|IS|JUST|PIC|REDEFINES|RENAMES|SIGN|SYNC|USAGE|VALUE"
+	 "BLANK|OCCURS|IS|JUST|PIC|REDEFINES|RENAMES|SIGN|SYNC|USAGE|VALUE|POINTER|BINARY-LONG|BINARY-SHORT|BINARY-FLOAT"
 	 ")", "\\1",
 	 "d,data,data items", "i"},
-	{"^[ \t]*[FSR]D[ \t]+([A-Z0-9][A-Z0-9-]*)\\.", "\\1",
-	 "f,file,file descriptions (FD, SD, RD)", "i"},
-	{"^[ \t]*[0-9]+[ \t]+([A-Z0-9][A-Z0-9-]*)\\.", "\\1",
-	 "g,group,group items", "i"},
-	{"^[ \t]*([A-Z0-9][A-Z0-9-]*)\\.", "\\1",
-	 "p,paragraph,paragraphs", "i"},
-	{"^[ \t]*PROGRAM-ID\\.[ \t]+([A-Z0-9][A-Z0-9-]*)\\.", "\\1",
-	 "P,program,program ids", "i"},
-	{"^[ \t]*([A-Z0-9][A-Z0-9-]*)[ \t]+SECTION\\.", "\\1",
-	 "s,section,sections", "i"},
+	{"^[ \t]*[FSR]D[ \t]+([A-Z0-9][A-Z0-9-]*)\\.", "\\1", "f,file,file descriptions (FD, SD, RD)", "i"},
+	{"^[ \t]*[0-9]+[ \t]+([A-Z0-9][A-Z0-9-]*)\\.", "\\1", "g,group,group items", "i"},
+	{"^[ \t]*([A-Z0-9][A-Z0-9-]*)\\.", "\\1", "p,paragraph,paragraphs", "i"},
+	{"^[ \t]*PROGRAM-ID\\.[ \t]+([A-Z0-9]_[A-Z0-9-]*).", "\\1", "P,program,program ids", "i"},
+	{ "^[ \t]+program-id.[ \t]+\"([a-zA-Z0-9][a-zA-Z0-9_-]*)\".", "\\1", "P,program,program ids", "i" },
+	{ "^[ \t]+entry[ \t]+\"([a-zA-Z0-9][a-zA-Z0-9_-]*)\"", "\\1", "P,program,program ids", "i" },
+	{"^[ \t]*([A-Z0-9][A-Z0-9-]*)[ \t]+SECTION\\.", "\\1", "s,section,sections", "i"},
 };
 
 /*
@@ -39,7 +36,7 @@ static tagRegexTable cobolTagRegexTable[] = {
 extern parserDefinition* CobolParser (void)
 {
 	static const char *const extensions [] = {
-			"cbl", "cob", "CBL", "COB", NULL };
+			"cbl", "cob", "CBL", "COB", "cpy", NULL };
 	parserDefinition* def = parserNew ("Cobol");
 	def->extensions = extensions;
 	def->tagRegexTable = cobolTagRegexTable;
