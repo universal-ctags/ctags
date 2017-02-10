@@ -36,10 +36,10 @@ extern unsigned int ptrArrayCount (const ptrArray *const current);
 extern void* ptrArrayItem (const ptrArray *const current, const unsigned int indx);
 extern void* ptrArrayLast (const ptrArray *const current);
 extern void ptrArrayDelete (ptrArray *const current);
-extern bool ptrArrayHasInsensitive (const ptrArray *const current, const void *const ptr);
 extern bool ptrArrayHasTest (const ptrArray *const current,
 				  bool (*test)(const void *ptr, void *userData),
 				  void *userData);
+extern bool ptrArrayHas (const ptrArray *const current, void *ptr);
 extern void ptrArrayReverse (const ptrArray *const current);
 extern void ptrArrayDeleteItem (ptrArray* const current, unsigned int indx);
 

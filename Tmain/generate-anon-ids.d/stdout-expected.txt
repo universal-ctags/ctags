@@ -1,0 +1,12 @@
+A	input1.c	/^} A;$/;"	v	typeref:struct:__anon840121570108
+B	input1.c	/^} B;$/;"	v	typeref:struct:__anon840121570208
+X	input0.c	/^} X;$/;"	v	typeref:struct:__anon84011d160108
+Y	input0.c	/^} Y;$/;"	v	typeref:struct:__anon84011d160208
+__anon84011d160108	input0.c	/^struct {$/;"	s	file:
+__anon84011d160208	input0.c	/^struct {$/;"	s	file:
+__anon840121570108	input1.c	/^struct {$/;"	s	file:
+__anon840121570208	input1.c	/^struct {$/;"	s	file:
+a	input1.c	/^	int a;$/;"	m	struct:__anon840121570108	typeref:typename:int	file:
+b	input1.c	/^	int b;$/;"	m	struct:__anon840121570208	typeref:typename:int	file:
+x	input0.c	/^	int x;$/;"	m	struct:__anon84011d160108	typeref:typename:int	file:
+y	input0.c	/^	int y;$/;"	m	struct:__anon84011d160208	typeref:typename:int	file:

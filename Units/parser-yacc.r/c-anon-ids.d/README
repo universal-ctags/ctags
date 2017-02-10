@@ -1,0 +1,6 @@
+This test case is for verifying that anonGenerate() works expectedly
+when a parser runs twice on different areas of the same input.
+
+input.y has two C areas.
+Anonymous structs are defined in each area.
+Four different anonIds must be generateda.

@@ -125,6 +125,16 @@ extern bool ptrArrayHasTest (const ptrArray *const current,
 	return result;
 }
 
+static bool ptrEq (const void *ptr, void *userData)
+{
+	return (ptr == userData);
+}
+
+extern bool ptrArrayHas (const ptrArray *const current, void *ptr)
+{
+	return ptrArrayHasTest (current, ptrEq, ptr);
+}
+
 extern void ptrArrayReverse (const ptrArray *const current)
 {
 	unsigned int i, j;

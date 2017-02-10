@@ -25,6 +25,7 @@
 #include "parsers.h"
 #include "promise.h"
 #include "ptag.h"
+#include "ptrarray.h"
 #include "read.h"
 #include "routines.h"
 #include "trace.h"
@@ -62,6 +63,9 @@ static void addParserPseudoTags (langType language);
 static void installKeywordTable (const langType language);
 static void installTagRegexTable (const langType language);
 static void installTagXpathTable (const langType language);
+static void anonResetMaybe (parserDefinition *lang);
+static void setupAnon (void);
+static void teardownAnon (void);
 
 /*
 *   DATA DEFINITIONS
@@ -2212,6 +2216,8 @@ static bool createTagsWithFallback1 (const langType language)
 	addParserPseudoTags (language);
 	tagFilePosition (&tagfpos);
 
+	anonResetMaybe (LanguageTable [language]);
+
 	while ( ( whyRescan =
 		  createTagsForFile (language, ++passCount) )
 		!= RESCAN_NONE)
@@ -2467,11 +2473,15 @@ extern bool parseFileWithMio (const char *const fileName, MIO *mio)
 
 		setupWriter ();
 
+		setupAnon ();
+
 		tagFileResized = createTagsWithFallback (fileName, language, req.mio);
 #ifdef HAVE_COPROC
 		if (LanguageTable [language]->method & METHOD_XCMD_AVAILABLE)
 			tagFileResized = createTagsWithXcmd (fileName, language, req.mio)? true: tagFileResized;
 #endif
+
+		teardownAnon ();
 
 		tagFileResized = teardownWriter (getSourceFileTagPath())? true: tagFileResized;
 
@@ -2743,11 +2753,25 @@ extern bool makeKindDescriptionsPseudoTags (const langType language,
 *
 *   Anonymous name generator
 */
+static ptrArray *parsersUsedInCurrentInput;
 
-extern void anonReset (void)
+static void setupAnon (void)
 {
-	parserDefinition* lang = LanguageTable [getInputLanguage ()];
-	lang -> anonumousIdentiferId = 0;
+	parsersUsedInCurrentInput = ptrArrayNew (NULL);
+}
+
+static void teardownAnon (void)
+{
+	ptrArrayDelete (parsersUsedInCurrentInput);
+}
+
+static void anonResetMaybe (parserDefinition *lang)
+{
+	if (ptrArrayHas (parsersUsedInCurrentInput, lang))
+		return;
+
+	lang -> anonymousIdentiferId = 0;
+	ptrArrayAdd (parsersUsedInCurrentInput, lang);
 }
 
 static unsigned int anonHash(const unsigned char *str)
@@ -2764,14 +2788,14 @@ static unsigned int anonHash(const unsigned char *str)
 extern void anonGenerate (vString *buffer, const char *prefix, int kind)
 {
 	parserDefinition* lang = LanguageTable [getInputLanguage ()];
-	lang -> anonumousIdentiferId ++;
+	lang -> anonymousIdentiferId ++;
 
 	char szNum[32];
 
 	vStringCopyS(buffer, prefix);
 
 	unsigned int uHash = anonHash((const unsigned char *)getInputFileName());
-	sprintf(szNum,"%08x%02x%02x",uHash,lang -> anonumousIdentiferId, kind);
+	sprintf(szNum,"%08x%02x%02x",uHash,lang -> anonymousIdentiferId, kind);
 	vStringCatS(buffer,szNum);
 }
 
