@@ -284,6 +284,14 @@ bool cxxParserParseNamespace(void)
 			"Should have an opening bracket here!"
 		);
 
+	if(!g_cxx.bConfirmedCPPLanguage)
+	{
+		CXX_DEBUG_PRINT(
+				"Succeeded in parsing a C++ namespace: this really seems to be C++"
+			);
+		g_cxx.bConfirmedCPPLanguage = true;
+	}
+
 	// Here we certainly got an opening bracket: namespace block
 
 	if(!cxxParserParseBlock(true))

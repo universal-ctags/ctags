@@ -153,6 +153,14 @@ bool cxxParserParseUsingClause(void)
 		}
 	}
 
+	if(!g_cxx.bConfirmedCPPLanguage)
+	{
+		CXX_DEBUG_PRINT(
+				"Succeeded in parsing C++ using: this really seems to be C++"
+			);
+		g_cxx.bConfirmedCPPLanguage = true;
+	}
+
 	CXX_DEBUG_LEAVE();
 	return true;
 }
