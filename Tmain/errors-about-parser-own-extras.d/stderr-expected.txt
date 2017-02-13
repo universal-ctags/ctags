@@ -1,0 +1,12 @@
+#lang
+ctags: Warning: Unknown language: NOSUCHLANG (ignoring "--extras-NOSUCHLANG")
+ctags: Warning: Unknown language: NOSUCHLANG (ignoring "--extras-NOSUCHLANG")
+ctags: Unknown language "NOSUCHLANG" in "list-extras" option
+#extras
+ctags: no such extra: 'NOSUCHEXTRA'
+ctags: no such extra: 'NOSUCHEXTRA'
+ctags: no such extra: 'NOSUCHEXTRA'
+#null
+ctags: No language given in "extras-" option
+#null null
+ctags: No language given in "extras-" option

@@ -1419,6 +1419,21 @@ static void installFieldSpec (const langType language)
 	}
 }
 
+static void installXtagSpec (const langType language)
+{
+	unsigned int i;
+	parserDefinition * parser;
+
+	Assert (0 <= language  &&  language < (int) LanguageCount);
+	parser = LanguageTable [language];
+
+	if (parser->xtagSpecs != NULL)
+	{
+		for (i = 0; i < parser->xtagSpecCount; i++)
+			defineXtag (& parser->xtagSpecs [i], language);
+	}
+}
+
 static void initializeParserOne (langType lang)
 {
 	parserDefinition *const parser = LanguageTable [lang];
@@ -1433,6 +1448,7 @@ static void initializeParserOne (langType lang)
 	installTagRegexTable (lang);
 	installTagXpathTable (lang);
 	installFieldSpec     (lang);
+	installXtagSpec      (lang);
 
 	if (hasScopeActionInRegex (lang)
 	    || parser->requestAutomaticFQTag)

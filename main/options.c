@@ -251,6 +251,9 @@ static optionDescription LongOptionDescription [] = {
 #endif
  {1,"  --extras=[+|-]flags"},
  {1,"      Include extra tag entries for selected information (flags: \"Ffq.\") [F]."},
+ {1,"  --extras-<LANG|*>=[+|-]flags"},
+ {1,"      Include <LANG> own extra tag entries for selected information"},
+ {1,"      (flags: --list-extras=<LANG>)."},
  {1,"  --fields=[+|-]flags"},
  {1,"      Include selected extension fields (flags: \"afmikKlnsStzZ\") [fks]."},
  {1,"  --fields-<LANG|*>=[+|-]flags"},
@@ -1111,11 +1114,12 @@ static void processExcmdOption (
 	}
 }
 
-static void resetXtags (bool mode)
+static void resetXtags (langType lang, bool mode)
 {
 	int i;
-	for (i = 0; i < XTAG_COUNT; i++)
-		enableXtag (i, mode);
+	for (i = 0; i < countXtags (); i++)
+		if ((lang == LANG_AUTO) || (lang == getXtagOwner (i)))
+			enableXtag (i, mode);
 }
 
 static void processExtraTagsOption (
@@ -1134,11 +1138,11 @@ static void processExtraTagsOption (
 
 	if (*p == '*')
 	{
-		resetXtags (true);
+		resetXtags (LANG_IGNORE, true);
 		p++;
 	}
 	else if (*p != '+'  &&  *p != '-')
-		resetXtags (false);
+		resetXtags (LANG_IGNORE, false);
 
 	longName = vStringNewOrClear (longName);
 
@@ -1171,7 +1175,7 @@ static void processExtraTagsOption (
 				      "unexpected character in extra specification: \'%c\'",
 				      c);
 			x = vStringValue (longName);
-			t = getXtagTypeForName (x);
+			t = getXtagTypeForNameAndLanguage (x, LANG_IGNORE);
 
 			if (t == XTAG_UNKNOWN)
 				error(WARNING, "Unsupported parameter '{%s}' for \"%s\" option",
@@ -1817,7 +1821,23 @@ static void processListAliasesOption (
 static void processListExtrasOption (
 		const char *const option CTAGS_ATTR_UNUSED, const char *const parameter CTAGS_ATTR_UNUSED)
 {
-	printXtags ();
+	if (parameter [0] == '\0' || strcasecmp (parameter, "all") == 0)
+	{
+		initializeParser (LANG_AUTO);
+		printXtags (LANG_AUTO);
+	}
+	else
+	{
+		langType language = getNamedLanguage (parameter, 0);
+		if (language == LANG_IGNORE)
+			error (FATAL, "Unknown language \"%s\" in \"%s\" option", parameter, option);
+		else
+		{
+			initializeParser (language);
+			printXtags (language);
+		}
+
+	}
 	exit (0);
 }
 
@@ -2656,6 +2676,24 @@ static void enableLanguageField (langType language, const char *field, bool mode
 	}
 }
 
+static void enableLanguageXtag (langType language, const char *xtag, bool mode)
+{
+
+	xtagType x;
+
+	x = getXtagTypeForNameAndLanguage (xtag, language);
+	if (x == XTAG_UNKNOWN)
+		error(FATAL, "no such extra: \'%s\'", xtag);
+	enableXtag (x, mode);
+	if (language == LANG_AUTO)
+	{
+		xtagType xtag_next = x;
+
+		while ((xtag_next = nextSiblingXtag (xtag_next)) != XTAG_UNKNOWN)
+			enableXtag (xtag_next, mode);
+	}
+}
+
 static bool processLangSpecificFieldsOption (const char *const option,
 						const char *const parameter)
 {
@@ -2756,6 +2794,105 @@ static bool processLangSpecificFieldsOption (const char *const option,
 	return true;
 }
 
+static bool processLangSpecificExtraOption (const char *const option,
+						const char *const parameter)
+{
+#define PREFIX "extras-"
+#define PREFIX_LEN strlen(PREFIX)
+	const char* lang;
+	size_t len;
+	langType language = LANG_IGNORE;
+	const char *p = parameter;
+	int c;
+	static vString * longName;
+	bool mode = true;
+	const char *x;
+	bool inLongName = false;
+
+	if ( strncmp (option, PREFIX, PREFIX_LEN) != 0 )
+		return false;
+
+	lang = option + PREFIX_LEN;
+	len = strlen (lang);
+
+	if (len == 0)
+		error (FATAL, "No language given in \"%s\" option", option);
+	else if (len == 1 && lang[0] == '*')
+		language = LANG_AUTO;
+	else
+		language = getNamedLanguage (lang, len);
+
+	if (language == LANG_IGNORE)
+	{
+		error (WARNING, "Unknown language: %s (ignoring \"--%s\")", lang, option);
+		/* The option is consumed in tihs function. */
+		return true;
+	}
+
+	initializeParser (language);
+
+	if (*p == '*')
+	{
+		resetXtags (language, true);
+		p++;
+	}
+	else if (*p == '{' || *p == '\0')
+	{
+		resetXtags (language, false);
+		if (*p == '\0')
+			return true;
+	}
+	else if (*p != '+' && *p != '-')
+		error (WARNING, "Wrong per language extra specification: %s", p);
+
+	longName = vStringNewOrClear (longName);
+	while ((c = *p++) != '\0')
+	{
+		switch (c)
+		{
+		case '+':
+			if (inLongName)
+				vStringPut (longName, c);
+			else
+				mode = true;
+			break;
+		case '-':
+			if (inLongName)
+				vStringPut (longName, c);
+			else
+				mode = false;
+			break;
+		case '{':
+			if (inLongName)
+				error (FATAL,
+				       "unexpected character in extra specification: \'%c\'",
+				       c);
+			inLongName = true;
+			break;
+		case '}':
+			if (!inLongName)
+				error (FATAL,
+				       "unexpected character in extra specification: \'%c\'",
+				       c);
+
+			x = vStringValue (longName);
+			enableLanguageXtag (language, x, mode);
+			inLongName = false;
+			vStringClear (longName);
+			break;
+		default:
+			if (inLongName)
+				vStringPut (longName, c);
+			else
+				error (FATAL,
+				       "only long name can be used in per language extra spec: \'%c\'",
+				       c);
+			break;
+		}
+	}
+	return true;
+}
+
 static void processLongOption (
 		const char *const option, const char *const parameter)
 {
@@ -2771,6 +2908,8 @@ static void processLongOption (
 		;
 	else if (processLangSpecificFieldsOption(option, parameter))
 		 ;
+	else if (processLangSpecificExtraOption(option, parameter))
+		;
 	else if (processParametricOption (option, parameter))
 		;
 	else if (processKindOption (option, parameter))
