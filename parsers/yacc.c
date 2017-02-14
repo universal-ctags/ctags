@@ -30,8 +30,8 @@ static tagRegexTable yaccTagRegexTable [] = {
 };
 
 struct cStart {
-	unsigned long input;
-	unsigned long source;
+	unsigned long c_input;
+	unsigned long c_source;
 };
 
 static  bool change_section (const char *line CTAGS_ATTR_UNUSED,
@@ -81,8 +81,8 @@ static bool enter_c_prologue (const char *line CTAGS_ATTR_UNUSED,
 
 
 	readLineFromInputFile ();
-	cstart->input  = getInputLineNumber ();
-	cstart->source = getSourceLineNumber ();
+	cstart->c_input  = getInputLineNumber ();
+	cstart->c_source = getSourceLineNumber ();
 	return true;
 }
 
@@ -95,7 +95,7 @@ static bool leave_c_prologue (const char *line CTAGS_ATTR_UNUSED,
 	unsigned long c_end;
 
 	c_end = getInputLineNumber ();
-	makePromise ("C", cstart->input, 0, c_end, 0, cstart->source);
+	makePromise ("C", cstart->c_input, 0, c_end, 0, cstart->c_source);
 	memset (cstart, 0, sizeof (*cstart));
 
 	return true;
@@ -111,8 +111,8 @@ static bool enter_union (const char *line CTAGS_ATTR_UNUSED,
 	if (not_in_grammar_rules)
 	{
 		in_union = true;
-		cstart->input = getInputLineNumber ();
-		cstart->source = getInputLineNumber ();
+		cstart->c_input = getInputLineNumber ();
+		cstart->c_source = getInputLineNumber ();
 	}
 	return true;
 }
@@ -124,15 +124,15 @@ static bool leave_union (const char *line CTAGS_ATTR_UNUSED,
 {
 	struct cStart *cstart = data;
 
-	if (not_in_grammar_rules && in_union && cstart->input && cstart->source)
+	if (not_in_grammar_rules && in_union && cstart->c_input && cstart->c_source)
 	{
 		unsigned long c_end;
 
 		c_end = getInputLineNumber ();
 
-		makePromise ("C", cstart->input, strlen ("%"),
+		makePromise ("C", cstart->c_input, strlen ("%"),
 			     c_end, strlen ("}"),
-			     cstart->source);
+			     cstart->c_source);
 
 		memset (cstart, 0, sizeof (*cstart));
 		in_union = false;
