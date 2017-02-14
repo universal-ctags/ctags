@@ -170,7 +170,8 @@ static void runYaccParser (void)
 	parserState.c_input = 0;
 	parserState.c_source = 0;
 
-	findRegexTags ();
+	while (readLineFromInputFile () != NULL)
+		;
 }
 
 extern parserDefinition* YaccParser (void)
