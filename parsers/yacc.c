@@ -140,6 +140,8 @@ static bool leave_union (const char *line CTAGS_ATTR_UNUSED,
 	return true;
 }
 
+static struct yaccParserState yaccState;
+
 static void initializeYaccParser (langType language)
 {
 	/*
@@ -153,23 +155,21 @@ static void initializeYaccParser (langType language)
 		C language
 	*/
 
-	static struct yaccParserState state;
-
-	memset (&state, 0, sizeof (state));
-
-	addLanguageCallbackRegex (language, "^%\\{", "{exclusive}", enter_c_prologue, NULL, &state);
-	addLanguageCallbackRegex (language, "^%\\}", "{exclusive}", leave_c_prologue, NULL, &state);
+	addLanguageCallbackRegex (language, "^%\\{", "{exclusive}", enter_c_prologue, NULL, &yaccState);
+	addLanguageCallbackRegex (language, "^%\\}", "{exclusive}", leave_c_prologue, NULL, &yaccState);
 
 	addLanguageCallbackRegex (language, "^%%", "{exclusive}", change_section, NULL, NULL);
 
-	addLanguageCallbackRegex (language, "^%union", "{exclusive}", enter_union, NULL, &state);
-	addLanguageCallbackRegex (language, "^}",      "{exclusive}", leave_union, NULL, &state);
+	addLanguageCallbackRegex (language, "^%union", "{exclusive}", enter_union, NULL, &yaccState);
+	addLanguageCallbackRegex (language, "^}",      "{exclusive}", leave_union, NULL, &yaccState);
 }
 
 static void runYaccParser (void)
 {
 	in_union = false;
 	not_in_grammar_rules = true;
+
+	memset (&yaccState, 0, sizeof (yaccState));
 
 	findRegexTags ();
 }
