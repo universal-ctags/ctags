@@ -19,29 +19,29 @@
 #include "mio.h"
 #include "promise.h"
 
-
-static bool not_in_grammar_rules = true;
-static bool in_union;
-static tagRegexTable yaccTagRegexTable [] = {
-	{"^([A-Za-z][A-Za-z_0-9]+)[ \t]*:", "\\1",
-	 "l,label,labels", NULL, &not_in_grammar_rules },
-	{"^([A-Za-z][A-Za-z_0-9]+)[ \t]*$", "\\1",
-	 "l,label,labels", NULL, &not_in_grammar_rules },
-};
-
-struct yaccParserState {
+static struct yaccParserState {
+	bool not_in_grammar_rules;
+	bool in_union;
 	unsigned long c_input;
 	unsigned long c_source;
+} parserState;
+
+static tagRegexTable yaccTagRegexTable [] = {
+	{"^([A-Za-z][A-Za-z_0-9]+)[ \t]*:", "\\1",
+	 "l,label,labels", NULL, &parserState.not_in_grammar_rules },
+	{"^([A-Za-z][A-Za-z_0-9]+)[ \t]*$", "\\1",
+	 "l,label,labels", NULL, &parserState.not_in_grammar_rules },
 };
 
 static  bool change_section (const char *line CTAGS_ATTR_UNUSED,
 			     const regexMatch *matches CTAGS_ATTR_UNUSED,
 			     unsigned int count CTAGS_ATTR_UNUSED,
-			     void *data CTAGS_ATTR_UNUSED)
+			     void *data)
 {
-	not_in_grammar_rules = !not_in_grammar_rules;
+	struct yaccParserState *state = data;
+	state->not_in_grammar_rules = !state->not_in_grammar_rules;
 
-	if (not_in_grammar_rules)
+	if (state->not_in_grammar_rules)
 	{
 		const unsigned char *tmp, *last;
 		long endCharOffset;
@@ -77,12 +77,12 @@ static bool enter_c_prologue (const char *line CTAGS_ATTR_UNUSED,
 			      unsigned int count CTAGS_ATTR_UNUSED,
 			      void *data)
 {
-	struct yaccParserState *cstart = data;
+	struct yaccParserState *state = data;
 
 
 	readLineFromInputFile ();
-	cstart->c_input  = getInputLineNumber ();
-	cstart->c_source = getSourceLineNumber ();
+	state->c_input  = getInputLineNumber ();
+	state->c_source = getSourceLineNumber ();
 	return true;
 }
 
@@ -91,13 +91,13 @@ static bool leave_c_prologue (const char *line CTAGS_ATTR_UNUSED,
 			      unsigned int count CTAGS_ATTR_UNUSED,
 			      void *data)
 {
-	struct yaccParserState *cstart = data;
+	struct yaccParserState *state = data;
 	unsigned long c_end;
 
 	c_end = getInputLineNumber ();
-	makePromise ("C", cstart->c_input, 0, c_end, 0, cstart->c_source);
-	memset (cstart, 0, sizeof (*cstart));
-
+	makePromise ("C", state->c_input, 0, c_end, 0, state->c_source);
+	state->c_input = 0;
+	state->c_source = 0;
 	return true;
 }
 
@@ -106,13 +106,13 @@ static bool enter_union (const char *line CTAGS_ATTR_UNUSED,
 			 unsigned int count CTAGS_ATTR_UNUSED,
 			 void *data)
 {
-	struct yaccParserState *cstart = data;
+	struct yaccParserState *state = data;
 
-	if (not_in_grammar_rules)
+	if (state->not_in_grammar_rules)
 	{
-		in_union = true;
-		cstart->c_input = getInputLineNumber ();
-		cstart->c_source = getInputLineNumber ();
+		state->in_union = true;
+		state->c_input = getInputLineNumber ();
+		state->c_source = getInputLineNumber ();
 	}
 	return true;
 }
@@ -122,25 +122,24 @@ static bool leave_union (const char *line CTAGS_ATTR_UNUSED,
 			 unsigned int count CTAGS_ATTR_UNUSED,
 			 void *data)
 {
-	struct yaccParserState *cstart = data;
+	struct yaccParserState *state = data;
 
-	if (not_in_grammar_rules && in_union && cstart->c_input && cstart->c_source)
+	if (state->not_in_grammar_rules && state->in_union && state->c_input && state->c_source)
 	{
 		unsigned long c_end;
 
 		c_end = getInputLineNumber ();
 
-		makePromise ("C", cstart->c_input, strlen ("%"),
+		makePromise ("C", state->c_input, strlen ("%"),
 			     c_end, strlen ("}"),
-			     cstart->c_source);
+			     state->c_source);
 
-		memset (cstart, 0, sizeof (*cstart));
-		in_union = false;
+		state->c_input = 0;
+		state->c_source = 0;
+		state->in_union = false;
 	}
 	return true;
 }
-
-static struct yaccParserState yaccState;
 
 static void initializeYaccParser (langType language)
 {
@@ -155,21 +154,21 @@ static void initializeYaccParser (langType language)
 		C language
 	*/
 
-	addLanguageCallbackRegex (language, "^%\\{", "{exclusive}", enter_c_prologue, NULL, &yaccState);
-	addLanguageCallbackRegex (language, "^%\\}", "{exclusive}", leave_c_prologue, NULL, &yaccState);
+	addLanguageCallbackRegex (language, "^%\\{", "{exclusive}", enter_c_prologue, NULL, &parserState);
+	addLanguageCallbackRegex (language, "^%\\}", "{exclusive}", leave_c_prologue, NULL, &parserState);
 
-	addLanguageCallbackRegex (language, "^%%", "{exclusive}", change_section, NULL, NULL);
+	addLanguageCallbackRegex (language, "^%%", "{exclusive}", change_section, NULL, &parserState);
 
-	addLanguageCallbackRegex (language, "^%union", "{exclusive}", enter_union, NULL, &yaccState);
-	addLanguageCallbackRegex (language, "^}",      "{exclusive}", leave_union, NULL, &yaccState);
+	addLanguageCallbackRegex (language, "^%union", "{exclusive}", enter_union, NULL, &parserState);
+	addLanguageCallbackRegex (language, "^}",      "{exclusive}", leave_union, NULL, &parserState);
 }
 
 static void runYaccParser (void)
 {
-	in_union = false;
-	not_in_grammar_rules = true;
-
-	memset (&yaccState, 0, sizeof (yaccState));
+	parserState.in_union = false;
+	parserState.not_in_grammar_rules = true;
+	parserState.c_input = 0;
+	parserState.c_source = 0;
 
 	findRegexTags ();
 }
