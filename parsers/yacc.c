@@ -29,7 +29,7 @@ static tagRegexTable yaccTagRegexTable [] = {
 	 "l,label,labels", NULL, &not_in_grammar_rules },
 };
 
-struct cStart {
+struct yaccParserState {
 	unsigned long c_input;
 	unsigned long c_source;
 };
@@ -77,7 +77,7 @@ static bool enter_c_prologue (const char *line CTAGS_ATTR_UNUSED,
 			      unsigned int count CTAGS_ATTR_UNUSED,
 			      void *data)
 {
-	struct cStart *cstart = data;
+	struct yaccParserState *cstart = data;
 
 
 	readLineFromInputFile ();
@@ -91,7 +91,7 @@ static bool leave_c_prologue (const char *line CTAGS_ATTR_UNUSED,
 			      unsigned int count CTAGS_ATTR_UNUSED,
 			      void *data)
 {
-	struct cStart *cstart = data;
+	struct yaccParserState *cstart = data;
 	unsigned long c_end;
 
 	c_end = getInputLineNumber ();
@@ -106,7 +106,7 @@ static bool enter_union (const char *line CTAGS_ATTR_UNUSED,
 			 unsigned int count CTAGS_ATTR_UNUSED,
 			 void *data)
 {
-	struct cStart *cstart = data;
+	struct yaccParserState *cstart = data;
 
 	if (not_in_grammar_rules)
 	{
@@ -122,7 +122,7 @@ static bool leave_union (const char *line CTAGS_ATTR_UNUSED,
 			 unsigned int count CTAGS_ATTR_UNUSED,
 			 void *data)
 {
-	struct cStart *cstart = data;
+	struct yaccParserState *cstart = data;
 
 	if (not_in_grammar_rules && in_union && cstart->c_input && cstart->c_source)
 	{
@@ -153,17 +153,17 @@ static void initializeYaccParser (langType language)
 		C language
 	*/
 
-	static struct cStart cStart;
+	static struct yaccParserState state;
 
-	memset (&cStart, 0, sizeof (cStart));
+	memset (&state, 0, sizeof (state));
 
-	addLanguageCallbackRegex (language, "^%\\{", "{exclusive}", enter_c_prologue, NULL, &cStart);
-	addLanguageCallbackRegex (language, "^%\\}", "{exclusive}", leave_c_prologue, NULL, &cStart);
+	addLanguageCallbackRegex (language, "^%\\{", "{exclusive}", enter_c_prologue, NULL, &state);
+	addLanguageCallbackRegex (language, "^%\\}", "{exclusive}", leave_c_prologue, NULL, &state);
 
 	addLanguageCallbackRegex (language, "^%%", "{exclusive}", change_section, NULL, NULL);
 
-	addLanguageCallbackRegex (language, "^%union", "{exclusive}", enter_union, NULL, &cStart);
-	addLanguageCallbackRegex (language, "^}",      "{exclusive}", leave_union, NULL, &cStart);
+	addLanguageCallbackRegex (language, "^%union", "{exclusive}", enter_union, NULL, &state);
+	addLanguageCallbackRegex (language, "^}",      "{exclusive}", leave_union, NULL, &state);
 }
 
 static void runYaccParser (void)
