@@ -99,8 +99,8 @@ static int writeEtagsEntry (tagWriter *writer,
 
 		len = strlen (line);
 
-		if (tag->truncateLine)
-			truncateTagLine (line, tag->name, true);
+		if (tag->truncateLineAfterTag)
+			truncateTagLineAfterTag (line, tag->name, true);
 		else
 			line [len - 1] = '\0';
 

@@ -594,7 +594,7 @@ static int makeDefineTag (const char *const name, const char* const signature, b
 		e.isFileScope  = isFileScope;
 		if (isFileScope)
 			markTagExtraBit (&e, XTAG_FILE_SCOPE);
-		e.truncateLine = true;
+		e.truncateLineAfterTag = true;
 		e.extensionFields.signature = signature;
 
 		r = makeTagEntry (&e);
@@ -633,7 +633,7 @@ static void makeIncludeTag (const  char *const name, bool systemHeader)
 
 		initRefTagEntry (&e, name, Cpp.headerKind, role_index);
 		e.isFileScope  = false;
-		e.truncateLine = true;
+		e.truncateLineAfterTag = true;
 		makeTagEntry (&e);
 
 		if (doesCPreProRunAsStandaloneParser ())

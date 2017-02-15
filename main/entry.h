@@ -44,7 +44,7 @@ struct sTagEntryInfo {
 	unsigned int lineNumberEntry:1;  /* pattern or line number entry */
 	unsigned int isFileScope    :1;  /* is tag visible only within input file? */
 	unsigned int isFileEntry    :1;  /* is this just an entry for a file name? */
-	unsigned int truncateLine   :1;  /* truncate tag line at end of tag name? */
+	unsigned int truncateLineAfterTag :1;  /* truncate tag line at end of tag name? */
 	unsigned int placeholder    :1;	 /* This is just a part of scope context.
 					    Put this entry to cork queue but
 					    don't print it to tags file. */
