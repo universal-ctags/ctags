@@ -287,6 +287,7 @@ skip_to_comma_or_end:
 			// then we might try to look for a C++ identifier here.
 			if(
 				cxxParserCurrentLanguageIsCPP() &&
+				(!g_cxx.bConfirmedCPPLanguage) &&
 				cxxTokenTypeIs(pLookupStart,CXXTokenTypeKeyword) &&
 				cxxKeywordIsCPPSpecific(pLookupStart->eKeyword)
 			)

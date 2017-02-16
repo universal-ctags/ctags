@@ -164,13 +164,6 @@ void cxxBuildKeywordHash(const langType eLangType,unsigned int uLanguage);
 bool cxxKeywordEnablePublicProtectedPrivate(bool bEnableIt);
 
 //
-// "namespace"
-//
-// This is not valid inside a class/struct/union
-//
-bool cxxKeywordEnableNamespace(bool bEnableIt);
-
-//
 // "final" keyword
 //
 // This is actually special at C++ level: it's a keyword only within a specific part
