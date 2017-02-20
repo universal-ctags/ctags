@@ -9,6 +9,7 @@
 
 #include "cxx_keyword.h"
 #include "cxx_parser_internal.h"
+#include "cxx_debug.h"
 
 #include "keyword.h"
 
@@ -21,7 +22,10 @@ enum CXXKeywordFlag
 	// virtual, inline, friend, static
 	CXXKeywordExcludeFromTypeNames = (1 << 2),
 	// true, false, nullptr
-	CXXKeywordIsConstant = (1 << 3)
+	CXXKeywordIsConstant = (1 << 3),
+	// certain keywords are disabled "on-the-fly" to better
+	// handle C / C++ guessing errors (public, protected, private, namespace etc..)
+	CXXKeywordIsDisabled = (1 << 4)
 };
 
 typedef struct _CXXKeywordDescriptor
@@ -33,7 +37,7 @@ typedef struct _CXXKeywordDescriptor
 
 
 // This array is indexed by the CXXKeywordType enum
-static const CXXKeywordDescriptor g_aCXXKeywordTable[] = {
+static CXXKeywordDescriptor g_aCXXKeywordTable[] = {
 	{
 		"__attribute__",
 		CXXLanguageC | CXXLanguageCPP | CXXLanguageCUDA,
@@ -548,11 +552,57 @@ bool cxxKeywordIsConstant(CXXKeyword eKeywordId)
 			CXXKeywordIsConstant;
 }
 
+bool cxxKeywordIsCPPSpecific(CXXKeyword eKeywordId)
+{
+	return g_aCXXKeywordTable[eKeywordId].uLanguages == CXXLanguageCPP;
+}
+
 bool cxxKeywordExcludeFromTypeNames(CXXKeyword eKeywordId)
 {
 	return g_aCXXKeywordTable[eKeywordId].uFlags &
 			CXXKeywordExcludeFromTypeNames;
 }
+
+bool cxxKeywordIsDisabled(CXXKeyword eKeywordId)
+{
+	return g_aCXXKeywordTable[eKeywordId].uFlags &
+			CXXKeywordIsDisabled;
+}
+
+bool cxxKeywordEnablePublicProtectedPrivate(bool bEnableIt)
+{
+	bool bEnabledNow =
+			!(g_aCXXKeywordTable[CXXKeywordPUBLIC].uFlags & CXXKeywordIsDisabled);
+
+	if(bEnabledNow == bEnableIt)
+		return bEnabledNow;
+	
+	if(bEnableIt)
+	{
+		CXX_DEBUG_PRINT("Enabling public/protected/private keywords");
+
+		g_aCXXKeywordTable[CXXKeywordPUBLIC].uFlags &= ~CXXKeywordIsDisabled;
+		g_aCXXKeywordTable[CXXKeywordPROTECTED].uFlags &= ~CXXKeywordIsDisabled;
+		g_aCXXKeywordTable[CXXKeywordPRIVATE].uFlags &= ~CXXKeywordIsDisabled;
+	} else {
+		CXX_DEBUG_PRINT("Disabling public/protected/private keywords");
+
+		g_aCXXKeywordTable[CXXKeywordPUBLIC].uFlags |= CXXKeywordIsDisabled;
+		g_aCXXKeywordTable[CXXKeywordPROTECTED].uFlags |= CXXKeywordIsDisabled;
+		g_aCXXKeywordTable[CXXKeywordPRIVATE].uFlags |= CXXKeywordIsDisabled;
+	}
+
+	return bEnabledNow;
+}
+
+void cxxKeywordEnableFinal(bool bEnableIt)
+{
+	if(bEnableIt)
+		g_aCXXKeywordTable[CXXKeywordFINAL].uFlags &= ~CXXKeywordIsDisabled;
+	else
+		g_aCXXKeywordTable[CXXKeywordFINAL].uFlags |= CXXKeywordIsDisabled;
+}
+
 
 void cxxBuildKeywordHash(const langType eLangType,unsigned int uLanguage)
 {

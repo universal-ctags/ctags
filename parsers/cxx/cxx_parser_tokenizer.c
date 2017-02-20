@@ -1167,19 +1167,7 @@ bool cxxParserParseNextToken(void)
 		int iCXXKeyword = lookupKeyword(t->pszWord->buffer,g_cxx.eLangType);
 		if(iCXXKeyword >= 0)
 		{
-			if(
-					(
-						(iCXXKeyword == CXXKeywordFINAL) &&
-						(!g_cxx.bParsingClassStructOrUnionDeclaration)
-					) || (
-						(
-							(iCXXKeyword == CXXKeywordPUBLIC) ||
-							(iCXXKeyword == CXXKeywordPROTECTED) ||
-							(iCXXKeyword == CXXKeywordPRIVATE)
-						) &&
-						(!g_cxx.bEnablePublicProtectedPrivateKeywords)
-					)
-				)
+			if(cxxKeywordIsDisabled((CXXKeyword)iCXXKeyword))
 			{
 				t->eType = CXXTokenTypeIdentifier;
 			} else {

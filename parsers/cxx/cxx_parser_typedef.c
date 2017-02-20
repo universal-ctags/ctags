@@ -257,6 +257,7 @@ skip_to_comma_or_end:
 		// Now look for the identifier
 		//
 		CXXTokenChain * pTParentChain;
+		CXXToken * pLookupStart = t;
 
 		if(cxxTokenTypeIs(t,CXXTokenTypeIdentifier))
 		{
@@ -281,8 +282,26 @@ skip_to_comma_or_end:
 
 		if(!t)
 		{
-			CXX_DEBUG_LEAVE_TEXT("Didn't find an identifier: something nasty is going on");
-			return;
+			// Not found yet.
+			// If we're in C++ mode but we haven't confirmed that the language is really C++
+			// then we might try to look for a C++ identifier here.
+			if(
+				cxxParserCurrentLanguageIsCPP() &&
+				(!g_cxx.bConfirmedCPPLanguage) &&
+				cxxTokenTypeIs(pLookupStart,CXXTokenTypeKeyword) &&
+				cxxKeywordIsCPPSpecific(pLookupStart->eKeyword)
+			)
+			{
+				// treat as identifier
+				pLookupStart->eType = CXXTokenTypeIdentifier;
+				t = pLookupStart;
+			}
+
+			if(!t)
+			{
+				CXX_DEBUG_LEAVE_TEXT("Didn't find an identifier: something nasty is going on");
+				return;
+			}
 		}
 
 		tagEntryInfo * tag = cxxTagBegin(CXXTagKindTYPEDEF,t);

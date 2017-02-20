@@ -129,12 +129,49 @@ bool cxxKeywordIsConstant(CXXKeyword eKeywordId);
 bool cxxKeywordMayBePartOfTypeName(CXXKeyword eKeywordId);
 bool cxxKeywordIsTypeRefMarker(CXXKeyword eKeywordId);
 bool cxxKeywordExcludeFromTypeNames(CXXKeyword eKeywordId);
+bool cxxKeywordIsCPPSpecific(CXXKeyword eKeywordId);
+
 
 const char * cxxKeywordName(CXXKeyword eKeywordId);
 
 // uLanguage is really CXXLanguage, but we keep it as unsigned int to avoid
 // problems with header inclusions. It works anyway.
 void cxxBuildKeywordHash(const langType eLangType,unsigned int uLanguage);
+
+// Keyword enabled/disabled state management.
+//
+// public, protected, private, class, namespace... keywords are C++ only.
+// However when parsing .h files we don't know if they belong to a C program or C++
+// one and thus for safety we parse them as C++. If our guess is wrong then the parser
+// may become confused and in some cases even bail out.
+//
+// For this reason we enable/disable the processing of certain keyword sets
+// in certain contexts.
+
+
+//
+// "public,protected,private" keywords
+//
+// In header files we disable processing of such keywords until we either figure
+// out that the file really contains C++ or we start parsing a struct/union.
+//
+// This flag is meaningful only when parsing a .h file as C++ since in C
+// public/protected/private are never keywords and we assume that .cpp files
+// have C++ content (so public/protected/private are always keywords).
+//
+// This function returns the previous state of the public/protected/private keywords
+// enabled flag so it can be easily restored.
+bool cxxKeywordEnablePublicProtectedPrivate(bool bEnableIt);
+
+//
+// "final" keyword
+//
+// This is actually special at C++ level: it's a keyword only within a specific part
+// of a class declaration. In other contexts it's not a keyword.
+void cxxKeywordEnableFinal(bool bEnableIt);
+
+// Is the specific keyword currently disabled?
+bool cxxKeywordIsDisabled(CXXKeyword eKeywordId);
 
 
 #endif //!ctags_cxx_keyword_h_

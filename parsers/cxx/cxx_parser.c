@@ -795,7 +795,7 @@ static bool cxxParserParseClassStructOrUnionInternal(
 	// Skip attr and class-head-name
 
 	// enable "final" keyword handling
-	g_cxx.bParsingClassStructOrUnionDeclaration = true;
+	cxxKeywordEnableFinal(true);
 
 	unsigned int uTerminatorTypes = CXXTokenTypeEOF | CXXTokenTypeSingleColon |
 			CXXTokenTypeSemicolon | CXXTokenTypeOpeningBracket |
@@ -812,7 +812,7 @@ static bool cxxParserParseClassStructOrUnionInternal(
 
 		if(!bRet)
 		{
-			g_cxx.bParsingClassStructOrUnionDeclaration = false;
+			cxxKeywordEnableFinal(false);
 			CXX_DEBUG_LEAVE_TEXT("Could not parse class/struct/union name");
 			return false;
 		}
@@ -838,13 +838,14 @@ static bool cxxParserParseClassStructOrUnionInternal(
 
 		if(!bRet)
 		{
-			g_cxx.bParsingClassStructOrUnionDeclaration = false;
+			cxxKeywordEnableFinal(false);
 			CXX_DEBUG_LEAVE_TEXT("Could not parse class/struct/union name");
 			return false;
 		}
 	}
 
-	g_cxx.bParsingClassStructOrUnionDeclaration = false;
+	// Once we reached the terminator, "final" is not a keyword anymore.
+	cxxKeywordEnableFinal(false);
 
 	if(cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeParenthesisChain))
 	{
@@ -907,6 +908,30 @@ static bool cxxParserParseClassStructOrUnionInternal(
 			g_cxx.pTokenChain,
 			CXXTokenTypeIdentifier
 		);
+
+	// If no identifier has been found we can try some fallbacks.
+	if(!pClassName)
+	{
+		// If we're in C++ mode, but C++ language hasn't been confirmed yet,
+		// and there is a C++ specific keyword just before the terminator we found
+		// then we'll try to use it as class/struct/union name.
+		if(
+			cxxParserCurrentLanguageIsCPP() &&
+			(!g_cxx.bConfirmedCPPLanguage) &&
+			(eKeyword != CXXKeywordCLASS) &&
+			(g_cxx.pTokenChain->iCount >= 3) &&
+			cxxTokenTypeIs(g_cxx.pToken->pPrev,CXXTokenTypeKeyword) &&
+			cxxKeywordIsCPPSpecific(g_cxx.pToken->pPrev->eKeyword)
+		)
+		{
+			pClassName = g_cxx.pToken->pPrev;
+			pClassName->eType = CXXTokenTypeIdentifier;
+			CXX_DEBUG_PRINT(
+					"Found no class/struct/union name identifier but there is '%s' which might look good",
+					vStringValue(pClassName->pszWord)
+				);
+		}
+	}
 
 	int iPushedScopes = 0;
 
@@ -977,6 +1002,17 @@ static bool cxxParserParseClassStructOrUnionInternal(
 		cxxTokenChainDestroyLast(g_cxx.pTokenChain); // remove the {
 	} else {
 		cxxTokenChainClear(g_cxx.pTokenChain);
+	}
+
+	// OK. This seems to be a valid class/struct/union declaration.
+
+	if(
+			(uTagKind == CXXTagCPPKindCLASS) &&
+			(!g_cxx.bConfirmedCPPLanguage)
+		)
+	{
+		CXX_DEBUG_PRINT("Succeeded in parsing a C++ class: this really seems to be C++");
+		g_cxx.bConfirmedCPPLanguage = true;
 	}
 
 	tagEntryInfo * tag = cxxTagBegin(uTagKind,pClassName);
@@ -1092,24 +1128,17 @@ bool cxxParserParseClassStructOrUnion(
 	// Trick for "smart" handling of public/protected/private keywords in .h files parsed as C++.
 	// See the declaration of bEnablePublicProtectedPrivateKeywords for more info.
 
-	// Save the state
-	bool bEnablePublicProtectedPrivateKeywords = g_cxx.bEnablePublicProtectedPrivateKeywords;
-
-	// If parsing of the keywords was disabled, we're in C++ mode and the keyword is "class" then
-	// we're fairly certain that the source code is *really* C++.
-	if(
-			(!bEnablePublicProtectedPrivateKeywords) &&
-			(eKeyword == CXXKeywordCLASS) &&
-			cxxParserCurrentLanguageIsCPP()
-		)
-		bEnablePublicProtectedPrivateKeywords = true; // leave it on for good.
-
-	// Enable public/protected/private keywords
-	g_cxx.bEnablePublicProtectedPrivateKeywords = true;
+	// Enable public/protected/private keywords and save the previous state
+	bool bEnablePublicProtectedPrivateKeywords = cxxKeywordEnablePublicProtectedPrivate(true);
 
 	bool bRet = cxxParserParseClassStructOrUnionInternal(eKeyword,uTagKind,uScopeType);
 
-	g_cxx.bEnablePublicProtectedPrivateKeywords = bEnablePublicProtectedPrivateKeywords;
+	// If parsing succeeded, we're in C++ mode and the keyword is "class" then
+	// we're fairly certain that the source code is *really* C++.
+	if(g_cxx.bConfirmedCPPLanguage)
+		bEnablePublicProtectedPrivateKeywords = true; // leave it on for good: we're (almost) sure it's C++
+
+	cxxKeywordEnablePublicProtectedPrivate(bEnablePublicProtectedPrivateKeywords);
 
 	return bRet;
 }
@@ -1284,12 +1313,18 @@ bool cxxParserParseAccessSpecifier(void)
 			(eScopeType != CXXScopeTypeStruct)
 		)
 	{
-		// this is a syntax error: we're in the wrong scope.
 		CXX_DEBUG_LEAVE_TEXT(
-				"Access specified in wrong context (%d): "
-					"bailing out to avoid reporting broken structure",
+				"Access specified in wrong context (%d)",
 				eScopeType
 			);
+
+		if(!g_cxx.bConfirmedCPPLanguage)
+		{
+			CXX_DEBUG_LEAVE_TEXT("C++ language is not confirmed: we try to be flexible and not bail out");
+			return true;
+		}
+		// this is a syntax error: we're in the wrong scope.
+		CXX_DEBUG_LEAVE_TEXT("C++ language is confirmed: bailing out to avoid reporting broken structure");
 		return false;
 	}
 
@@ -1444,6 +1479,10 @@ rescanReason cxxCParserMain(const unsigned int passCount)
 {
 	CXX_DEBUG_ENTER();
 	cxxTagInitForLanguage(g_cxx.eCLangType);
+
+	g_cxx.bConfirmedCPPLanguage = false;
+	cxxKeywordEnablePublicProtectedPrivate(false);
+
 	rescanReason r = cxxParserMain(passCount);
 	CXX_DEBUG_LEAVE();
 	return r;
@@ -1453,6 +1492,11 @@ rescanReason cxxCUDAParserMain(const unsigned int passCount)
 {
 	CXX_DEBUG_ENTER();
 	cxxTagInitForLanguage(g_cxx.eCUDALangType);
+
+	// CUDA is C.
+	g_cxx.bConfirmedCPPLanguage = false;
+	cxxKeywordEnablePublicProtectedPrivate(false);
+
 	rescanReason r = cxxParserMain(passCount);
 	CXX_DEBUG_LEAVE();
 	return r;
@@ -1466,9 +1510,8 @@ rescanReason cxxCppParserMain(const unsigned int passCount)
 	// In header files we disable processing of public/protected/private keywords
 	// until we either figure out that this is really C++ or we're start parsing
 	// a struct/union.
-	g_cxx.bEnablePublicProtectedPrivateKeywords = !isInputHeaderFile();
-
-	CXX_DEBUG_PRINT("Parsing of public/protected/private is %d",g_cxx.bEnablePublicProtectedPrivateKeywords);
+	g_cxx.bConfirmedCPPLanguage = !isInputHeaderFile();
+	cxxKeywordEnablePublicProtectedPrivate(g_cxx.bConfirmedCPPLanguage);
 
 	rescanReason r = cxxParserMain(passCount);
 	CXX_DEBUG_LEAVE();

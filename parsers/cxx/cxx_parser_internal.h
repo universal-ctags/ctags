@@ -297,25 +297,10 @@ typedef struct _CXXParserState
 	// Please note that the keywords appearing inside a () subchain are NOT marked.
 	unsigned int uKeywordState;
 
-	// This is used to handle the special case of "final" which is a keyword
-	// in class/struct/union declarations but not anywhere else
-	bool bParsingClassStructOrUnionDeclaration;
-
-	// public, protected and private keywords are C++ only.
-	// However when parsing .h files we don't know if they belong to
-	// a C program or C++ one and thus for safety we parse them as C++.
-	// If our guess is wrong then we might discard certain variable
-	// declarations thinking that they're composed of keywords.
-	//
-	// For public, protected, and private keywords we can try the following trick.
-	//
-	// In header files we disable processing of such keywords until we either figure
-	// out that the file really contains C++ or we start parsing a struct/union.
-	//
-	// This flag is meaningful only when parsing a .h file as C++ since in C
-	// public/protected/private are never keywords and we assume that .cpp files
-	// have C++ content (so public/protected/private are always keywords).
-	bool bEnablePublicProtectedPrivateKeywords;
+	// This is set to true when we're parsing a *.cpp file (cpp extension!)
+	// or we're parsing a header but we have encountered valid C++ constructs that
+	// definitely confirm we're parsing C++.
+	bool bConfirmedCPPLanguage;
 
 } CXXParserState;
 
