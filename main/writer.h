@@ -66,7 +66,7 @@ extern void writerBuildFqTagCache (tagEntryInfo *const tag);
 
 extern bool outputFormatUsedStdoutByDefault (void);
 
-extern void truncateTagLine (char *const line, const char *const token,
+extern void truncateTagLineAfterTag (char *const line, const char *const token,
 			     const bool discardNewline);
 extern void abort_if_ferror(MIO *const fp);
 

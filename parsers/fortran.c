@@ -528,7 +528,7 @@ static void makeFortranTag (tokenInfo *const token, tagType tag)
 		e.isFileScope	= isFileScope (token->tag);
 		if (e.isFileScope)
 			markTagExtraBit (&e, XTAG_FILE_SCOPE);
-		e.truncateLine	= (bool) (token->tag != TAG_LABEL);
+		e.truncateLineAfterTag = (bool) (token->tag != TAG_LABEL);
 
 		if (ancestorCount () > 0)
 		{
