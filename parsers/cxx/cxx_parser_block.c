@@ -206,7 +206,7 @@ process_token:
 					case CXXKeywordNAMESPACE:
 					{
 						enum CXXScopeType eScopeType = cxxScopeGetType();
-						
+
 						if(
 								(
 									// toplevel or nested within a namespace
