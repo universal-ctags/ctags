@@ -32,7 +32,7 @@
 // Returns -1 in case of error, 1 if a K&R style function declaration has been
 // found and parsed, 0 if no K&R style function declaration has been found.
 //
-int cxxParserMaybeExtractKnRStyleFunctionDefinition(int * piCorkQueueIndex)
+int cxxParserMaybeExtractKnRStyleFunctionDefinition(int * piCorkQueueIndex, bool onKeyword)
 {
 #ifdef CXX_DO_DEBUGGING
 	vString * pChain = cxxTokenChainJoin(g_cxx.pTokenChain,NULL,0);
@@ -47,6 +47,15 @@ int cxxParserMaybeExtractKnRStyleFunctionDefinition(int * piCorkQueueIndex)
 		*piCorkQueueIndex = CORK_NIL;
 
 	// Check if we are in the following situation:
+	// (onKeyword)
+	//
+	//   type1 function(arg1,arg2,...) struct ...
+	//   type1 function(arg1,arg2,...) enum ...
+	//   type1 function(arg1,arg2,...) union ...
+	//                                 ^
+	//                                 we're here
+	//
+	// (!onKeyword)
 	//
 	//   type1 function(arg1,arg2,...) type2 arg1; type3 arg2; {
 	//                                           ^
@@ -61,17 +70,29 @@ int cxxParserMaybeExtractKnRStyleFunctionDefinition(int * piCorkQueueIndex)
 			"At least one token should be there"
 		);
 	CXX_DEBUG_ASSERT(
+			onKeyword ||
 			cxxTokenTypeIs(cxxTokenChainLast(g_cxx.pTokenChain),CXXTokenTypeSemicolon),
 			"Only upon encountering a semicolon"
 		);
 
 	// The minimum possible case is:
 	//
+	// (onKeyword)
+	//   func(arg) KEYWORD
+	//
+	// (!onKeyword)
 	//   func(arg) type2 arg;
 	//
 	// where (arg) is a condensed parenthesis chain.
-	// So the minimum number of tokens required is 5: func, (arg), type2, arg, ;
-	if(g_cxx.pTokenChain->iCount < 5)
+	// So the minimum number of tokens required is
+	//
+	// (onKeyword)
+	// 3: func, (arg), KEYWORD
+	//
+	// (!onKeyword)
+	// 5: func, (arg), type2, arg, ;
+	if ((onKeyword && g_cxx.pTokenChain->iCount < 3)
+	    || ((!onKeyword) && g_cxx.pTokenChain->iCount < 5))
 		return 0; // no way
 
 	// There must be a parenthesis chain
@@ -89,49 +110,83 @@ int cxxParserMaybeExtractKnRStyleFunctionDefinition(int * piCorkQueueIndex)
 	if(!cxxTokenTypeIs(pIdentifier,CXXTokenTypeIdentifier))
 		return 0;
 
-	// And least three tokens after it
-	CXXToken * x = pParenthesis->pNext;
-	if(!x)
-		return 0;
-	x = x->pNext;
-	if(!x)
-		return 0;
-	x = x->pNext;
-	if(!x)
-		return 0;
+	CXXToken * x;
+	if (onKeyword)
+	{
+		// And least one tokens after it
+		x = pParenthesis->pNext;
+		if(!x)
+			return 0;
+	}
+	else
+	{
+		// And least three tokens after it
+		x = pParenthesis->pNext;
+		if(!x)
+			return 0;
+		x = x->pNext;
+		if(!x)
+			return 0;
+		x = x->pNext;
+		if(!x)
+			return 0;
+	}
 
-	// The tokens following must be only things allowed in a variable declaration
-	x = cxxTokenChainNextTokenNotOfType(
+	if (onKeyword)
+	{
+		/* register and const may be allowed at as tokens existing
+		   before struct|enum|union. */
+		x = pParenthesis->pNext;
+		if (cxxTokenIsKeyword (x, CXXKeywordREGISTER)
+		    || cxxTokenIsKeyword (x, CXXKeywordCONST))
+			x = x->pNext;
+	}
+	else
+	{
+		// The tokens following must be only things allowed in a variable declaration
+		x = cxxTokenChainNextTokenNotOfType(
 			pParenthesis,
 			CXXTokenTypeIdentifier | CXXTokenTypeKeyword |
 				CXXTokenTypeSquareParenthesisChain | CXXTokenTypeStar |
 				CXXTokenTypeComma | CXXTokenTypeSingleColon | CXXTokenTypeNumber
 		);
+	}
 
 	CXX_DEBUG_ASSERT(x,"There should be at least the terminator here!");
 	if(!x)
 		return 0;
 
-	if(!cxxTokenTypeIs(x,CXXTokenTypeSemicolon))
-		return 0; // does not look like a variable declaration.
+	if (onKeyword)
+	{
+		if(! (cxxTokenTypeIs(x, CXXTokenTypeKeyword)
+		      && ((x->eKeyword == CXXKeywordSTRUCT)
+			  || (x->eKeyword == CXXKeywordUNION)
+			  || (x->eKeyword == CXXKeywordENUM))))
+		   return 0; // does not look like a struct|enum|unon variable declaration.
+	}
+	else
+	{
+		if(!cxxTokenTypeIs(x,CXXTokenTypeSemicolon))
+			return 0; // does not look like a variable declaration.
 
-	x = cxxTokenChainPreviousTokenNotOfType(
+		x = cxxTokenChainPreviousTokenNotOfType(
 			x,
 			CXXTokenTypeSquareParenthesisChain | CXXTokenTypeSingleColon |
 				CXXTokenTypeNumber
 		);
 
-	CXX_DEBUG_ASSERT(x,"We should have found an identifier here");
-	if(!x)
-		return 0;
+		CXX_DEBUG_ASSERT(x,"We should have found an identifier here");
+		if(!x)
+			return 0;
 
-	if(!cxxTokenTypeIs(x,CXXTokenTypeIdentifier))
-		return 0; // does not look like a variable declaration.
+		if(!cxxTokenTypeIs(x,CXXTokenTypeIdentifier))
+			return 0; // does not look like a variable declaration.
 
-	CXX_DEBUG_ASSERT(
+		CXX_DEBUG_ASSERT(
 			pParenthesis->pChain,
 			"The parenthesis should be condensed here!"
 		);
+	}
 
 	CXXTokenChain * pParenthesisTokenChain = g_cxx.pTokenChain;
 
@@ -218,12 +273,17 @@ int cxxParserMaybeExtractKnRStyleFunctionDefinition(int * piCorkQueueIndex)
 	CXXToken * aExtraParameterStarts[MAX_EXTRA_KNR_PARAMETERS];
 	int iExtraStatementsInChain = 0;
 
-	// Now we should have no more than iParameterCount-1 parameters before
+	// Now we should have no more than
+	// (onKeyword)
+	//   iParameterCount
+	// (!onKeyword)
+	//   iParameterCount-1
+	// parameters before
 	// an opening bracket. There may be less declarations as each one may
 	// declare multiple variables and C89 supports the implicit "int" type rule.
 	// Note that we parse up to iParameterCount statements (which will be lost
 	// if we can't find an opening bracket).
-	while(iParameterCount > 0)
+	while(iParameterCount > (onKeyword? -1: 0))
 	{
 		CXXToken * pCurrentTail = g_cxx.pTokenChain->pTail;
 

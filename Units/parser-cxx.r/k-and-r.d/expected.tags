@@ -1,0 +1,48 @@
+f00	input.c	/^void f00(a00) int  a00; {}$/;"	f
+a00	input.c	/^void f00(a00) int  a00; {}$/;"	z	function:f00	typeref:typename:int	file:
+f01	input.c	/^void f01(a01) int *a01; {}$/;"	f
+a01	input.c	/^void f01(a01) int *a01; {}$/;"	z	function:f01	typeref:typename:int *	file:
+f10	input.c	/^void f10(a10) struct file *a10; {}$/;"	f
+a10	input.c	/^void f10(a10) struct file *a10; {}$/;"	z	function:f10	typeref:struct:file *	file:
+f11	input.c	/^void f11(a11, a12) struct file *a11; int a12; {}$/;"	f
+a11	input.c	/^void f11(a11, a12) struct file *a11; int a12; {}$/;"	z	function:f11	typeref:struct:file *	file:
+a12	input.c	/^void f11(a11, a12) struct file *a11; int a12; {}$/;"	z	function:f11	typeref:typename:int	file:
+f12	input.c	/^void f12(a13, a14) int a13; struct file *a14; {}$/;"	f
+a13	input.c	/^void f12(a13, a14) int a13; struct file *a14; {}$/;"	z	function:f12	typeref:typename:int	file:
+a14	input.c	/^void f12(a13, a14) int a13; struct file *a14; {}$/;"	z	function:f12	typeref:struct:file *	file:
+f13	input.c	/^void f13(a15) register struct file *a15; {}$/;"	f
+a15	input.c	/^void f13(a15) register struct file *a15; {}$/;"	z	function:f13	typeref:typename:register struct file *	file:
+f14	input.c	/^void f14(a16, a17) register struct file *a16; int a17; {}$/;"	f
+a16	input.c	/^void f14(a16, a17) register struct file *a16; int a17; {}$/;"	z	function:f14	typeref:typename:register struct file *	file:
+a17	input.c	/^void f14(a16, a17) register struct file *a16; int a17; {}$/;"	z	function:f14	typeref:typename:int	file:
+f15	input.c	/^void f15(a18, a19) register int a18; struct file *a19; {}$/;"	f
+a18	input.c	/^void f15(a18, a19) register int a18; struct file *a19; {}$/;"	z	function:f15	typeref:typename:register int	file:
+a19	input.c	/^void f15(a18, a19) register int a18; struct file *a19; {}$/;"	z	function:f15	typeref:struct:file *	file:
+f16	input.c	/^void f16(a19_1) const struct file *a19_1; {}$/;"	f
+a19_1	input.c	/^void f16(a19_1) const struct file *a19_1; {}$/;"	z	function:f16	typeref:typename:const struct file *	file:
+f17	input.c	/^void f17(a19_2, a19_3) const struct file *a19_2; int a19_3; {}$/;"	f
+a19_2	input.c	/^void f17(a19_2, a19_3) const struct file *a19_2; int a19_3; {}$/;"	z	function:f17	typeref:typename:const struct file *	file:
+a19_3	input.c	/^void f17(a19_2, a19_3) const struct file *a19_2; int a19_3; {}$/;"	z	function:f17	typeref:typename:int	file:
+f18	input.c	/^void f18(a19_4, a19_5) const int a19_4; struct file *a19_5; {}$/;"	f
+a19_4	input.c	/^void f18(a19_4, a19_5) const int a19_4; struct file *a19_5; {}$/;"	z	function:f18	typeref:typename:const int	file:
+a19_5	input.c	/^void f18(a19_4, a19_5) const int a19_4; struct file *a19_5; {}$/;"	z	function:f18	typeref:struct:file *	file:
+f20	input.c	/^void f20(a20) union file *a20; {}$/;"	f
+a20	input.c	/^void f20(a20) union file *a20; {}$/;"	z	function:f20	typeref:union:file *	file:
+f21	input.c	/^void f21(a21, a22) union file *a21; int a22; {}$/;"	f
+a21	input.c	/^void f21(a21, a22) union file *a21; int a22; {}$/;"	z	function:f21	typeref:union:file *	file:
+a22	input.c	/^void f21(a21, a22) union file *a21; int a22; {}$/;"	z	function:f21	typeref:typename:int	file:
+f22	input.c	/^void f22(a23, a24) int a23; union file *a24; {}$/;"	f
+a23	input.c	/^void f22(a23, a24) int a23; union file *a24; {}$/;"	z	function:f22	typeref:typename:int	file:
+a24	input.c	/^void f22(a23, a24) int a23; union file *a24; {}$/;"	z	function:f22	typeref:union:file *	file:
+f30	input.c	/^void f30(a30) enum file *a30; {}$/;"	f
+a30	input.c	/^void f30(a30) enum file *a30; {}$/;"	z	function:f30	typeref:enum:file *	file:
+f31	input.c	/^void f31(a31, a32) enum file *a31; int a32; {}$/;"	f
+a31	input.c	/^void f31(a31, a32) enum file *a31; int a32; {}$/;"	z	function:f31	typeref:enum:file *	file:
+a32	input.c	/^void f31(a31, a32) enum file *a31; int a32; {}$/;"	z	function:f31	typeref:typename:int	file:
+f32	input.c	/^void f32(a33, a34) int a33; enum file *a34; {}$/;"	f
+a33	input.c	/^void f32(a33, a34) int a33; enum file *a34; {}$/;"	z	function:f32	typeref:typename:int	file:
+a34	input.c	/^void f32(a33, a34) int a33; enum file *a34; {}$/;"	z	function:f32	typeref:enum:file *	file:
+f40	input.c	/^void f40 (a41, a42, a43) struct file a41;  union file a42; enum file a43; {}$/;"	f
+a41	input.c	/^void f40 (a41, a42, a43) struct file a41;  union file a42; enum file a43; {}$/;"	z	function:f40	typeref:struct:file	file:
+a42	input.c	/^void f40 (a41, a42, a43) struct file a41;  union file a42; enum file a43; {}$/;"	z	function:f40	typeref:union:file	file:
+a43	input.c	/^void f40 (a41, a42, a43) struct file a41;  union file a42; enum file a43; {}$/;"	z	function:f40	typeref:enum:file	file:

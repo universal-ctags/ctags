@@ -270,6 +270,36 @@ process_token:
 						cxxTokenChainClear(g_cxx.pTokenChain);
 					break;
 					case CXXKeywordENUM:
+						if(
+							(g_cxx.eLangType == g_cxx.eCLangType) &&
+							cxxScopeIsGlobal() &&
+							(!(g_cxx.uKeywordState & CXXParserKeywordStateSeenExtern)) &&
+							(!(g_cxx.uKeywordState & CXXParserKeywordStateSeenTypedef))
+							)
+						{
+							int iCorkQueueIndex = CORK_NIL;
+							switch(cxxParserMaybeExtractKnRStyleFunctionDefinition(&iCorkQueueIndex, true))
+							{
+							case 1:
+								// got K&R style function definition, one scope was pushed.
+								cxxParserNewStatement();
+								if(!cxxParserParseBlock(true))
+								{
+									CXX_DEBUG_LEAVE_TEXT("Failed to parse nested block");
+									return false;
+								}
+								if(iCorkQueueIndex > CORK_NIL)
+									cxxParserMarkEndLineForTagInCorkQueue(iCorkQueueIndex);
+								cxxScopePop();
+								break;
+							case 0:
+								break;
+							default:
+								CXX_DEBUG_LEAVE_TEXT("Failed to check for K&R style function definition");
+								return false;
+								break;
+							}
+						}
 						if(!cxxParserParseEnum())
 						{
 							CXX_DEBUG_LEAVE_TEXT("Failed to parse enum");
@@ -284,6 +314,36 @@ process_token:
 						}
 					break;
 					case CXXKeywordSTRUCT:
+						if(
+							(g_cxx.eLangType == g_cxx.eCLangType) &&
+							cxxScopeIsGlobal() &&
+							(!(g_cxx.uKeywordState & CXXParserKeywordStateSeenExtern)) &&
+							(!(g_cxx.uKeywordState & CXXParserKeywordStateSeenTypedef))
+							)
+						{
+							int iCorkQueueIndex = CORK_NIL;
+							switch(cxxParserMaybeExtractKnRStyleFunctionDefinition(&iCorkQueueIndex, true))
+							{
+							case 1:
+								// got K&R style function definition, one scope was pushed.
+								cxxParserNewStatement();
+								if(!cxxParserParseBlock(true))
+								{
+									CXX_DEBUG_LEAVE_TEXT("Failed to parse nested block");
+									return false;
+								}
+								if(iCorkQueueIndex > CORK_NIL)
+									cxxParserMarkEndLineForTagInCorkQueue(iCorkQueueIndex);
+								cxxScopePop();
+								break;
+							case 0:
+								break;
+							default:
+								CXX_DEBUG_LEAVE_TEXT("Failed to check for K&R style function definition");
+								return false;
+								break;
+							}
+						}
 						if(!cxxParserParseClassStructOrUnion(CXXKeywordSTRUCT,CXXTagKindSTRUCT,CXXScopeTypeStruct))
 						{
 							CXX_DEBUG_LEAVE_TEXT("Failed to parse class/struct/union");
@@ -291,6 +351,36 @@ process_token:
 						}
 					break;
 					case CXXKeywordUNION:
+						if(
+							(g_cxx.eLangType == g_cxx.eCLangType) &&
+							cxxScopeIsGlobal() &&
+							(!(g_cxx.uKeywordState & CXXParserKeywordStateSeenExtern)) &&
+							(!(g_cxx.uKeywordState & CXXParserKeywordStateSeenTypedef))
+							)
+						{
+							int iCorkQueueIndex = CORK_NIL;
+							switch(cxxParserMaybeExtractKnRStyleFunctionDefinition(&iCorkQueueIndex, true))
+							{
+							case 1:
+								// got K&R style function definition, one scope was pushed.
+								cxxParserNewStatement();
+								if(!cxxParserParseBlock(true))
+								{
+									CXX_DEBUG_LEAVE_TEXT("Failed to parse nested block");
+									return false;
+								}
+								if(iCorkQueueIndex > CORK_NIL)
+									cxxParserMarkEndLineForTagInCorkQueue(iCorkQueueIndex);
+								cxxScopePop();
+								break;
+							case 0:
+								break;
+							default:
+								CXX_DEBUG_LEAVE_TEXT("Failed to check for K&R style function definition");
+								return false;
+								break;
+							}
+						}
 						if(!cxxParserParseClassStructOrUnion(CXXKeywordUNION,CXXTagKindUNION,CXXScopeTypeUnion))
 						{
 							CXX_DEBUG_LEAVE_TEXT("Failed to parse class/struct/union");
@@ -494,7 +584,7 @@ process_token:
 					//                                        ^
 					//
 					int iCorkQueueIndex = CORK_NIL;
-					switch(cxxParserMaybeExtractKnRStyleFunctionDefinition(&iCorkQueueIndex))
+					switch(cxxParserMaybeExtractKnRStyleFunctionDefinition(&iCorkQueueIndex, false))
 					{
 						case 1:
 							// got K&R style function definition, one scope was pushed.
