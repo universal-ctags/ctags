@@ -23,7 +23,7 @@
 #include <setjmp.h>
 
 #include "debug.h"
-#include "meta-cpreprocessor.h"
+#include "cpreprocessor.h"
 #include "keyword.h"
 #include "options.h"
 #include "parse.h"

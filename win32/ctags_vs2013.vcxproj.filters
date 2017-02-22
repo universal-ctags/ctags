@@ -446,7 +446,7 @@
     <ClInclude Include="..\main\kind.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\parsers\meta-cpreprocessor.h">
+    <ClInclude Include="..\parsers\cpreprocessor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\main\main.h">
@@ -554,13 +554,13 @@
    <ClInclude Include="..\main\gcc-attr.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-   <ClInclude Include="..\parsers\meta-make.h">
+   <ClInclude Include="..\parsers\make.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-   <ClInclude Include="..\parsers\meta-iniconf.h">
+   <ClInclude Include="..\parsers\iniconf.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-   <ClInclude Include="..\parsers\meta-m4.h">
+   <ClInclude Include="..\parsers\m4.h">
       <Filter>Header Files</Filter>
     </ClInclude>
    <ClInclude Include="..\main\ptrarray.h">

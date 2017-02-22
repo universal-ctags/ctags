@@ -11,7 +11,7 @@
 
 #include <string.h>
 
-#include "meta-m4.h"
+#include "m4.h"
 
 #include "debug.h"
 #include "entry.h"

@@ -15,7 +15,7 @@
 #include <string.h>
 #include <ctype.h>
 
-#include "meta-make.h"
+#include "make.h"
 
 #include "kind.h"
 #include "options.h"

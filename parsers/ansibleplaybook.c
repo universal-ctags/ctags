@@ -12,7 +12,7 @@
 #include "debug.h"
 #include "entry.h"
 #include "kind.h"
-#include "meta-yaml.h"
+#include "yaml.h"
 #include "parse.h"
 
 

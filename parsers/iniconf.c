@@ -26,7 +26,7 @@
 
 #include "debug.h"
 #include "htable.h"
-#include "meta-iniconf.h"
+#include "iniconf.h"
 #include "parse.h"
 #include "read.h"
 #include "vstring.h"
