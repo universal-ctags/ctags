@@ -154,7 +154,7 @@ static void found_package_cb (const char *line,
 		vString *name = vStringNew ();
 		tagEntryInfo tag;
 
-		vStringNCopyS (name, line + matches[1].start, matches[1].length);
+		vStringNCopyS (name, line + matches[2].start, matches[2].length);
 		initTagEntry (&tag, vStringValue (name), RpmSpecKinds + K_PACKAGE);
 		tag.extensionFields.scopeIndex = *(int *)userData;
 		makeTagEntry (&tag);
@@ -179,7 +179,7 @@ static void initializeRpmSpecParser (langType language)
 			  "{exclusive}", found_macro_cb, &rejecting, &undef);
 	addCallbackRegex (language, "^%global[ \t]+([A-Za-z_][A-Za-z_0-9]+)(\\([^)]+\\))?",
 			  "{exclusive}", found_macro_cb, &rejecting, &global);
-	addCallbackRegex (language, "^%package[ \t]+([A-Za-z_][A-Za-z_0-9-]+)",
+	addCallbackRegex (language, "^%package[ \t]+(-n[ \t]+)?([A-Za-z_][A-Za-z_0-9-]+)",
 			  "{exclusive}", found_package_cb, &rejecting, &package_index);
 }
 
