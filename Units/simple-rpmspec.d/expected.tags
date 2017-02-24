@@ -15,3 +15,5 @@ perf_make	input.spec	/^%global perf_make make %{?_smp_mflags} -C tools\/perf -s 
 install_post	input.spec	/^%define install_post \\$/;"	kind:macro	line:28	end:35
 docs	input.spec	/^%package docs$/;"	kind:package	line:37	package:ctags
 ctags-docs	input.spec	/^%package docs$/;"	kind:package	line:37	package:ctags
+universal-ctags-devel	input.spec	/^%package -n universal-ctags-devel$/;"	kind:package	line:41	package:ctags
+ctags-universal-ctags-devel	input.spec	/^%package -n universal-ctags-devel$/;"	kind:package	line:41	package:ctags

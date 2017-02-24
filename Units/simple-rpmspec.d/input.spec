@@ -38,6 +38,10 @@ Install ctags if you are going to use your system for programming.
 %description docs
 Something must be written here.
 
+%package -n universal-ctags-devel
+%description universal-ctags-devel
+Something must be written here.
+
 %prep
 %setup -q
 
