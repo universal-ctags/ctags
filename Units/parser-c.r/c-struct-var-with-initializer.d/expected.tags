@@ -1,0 +1,10 @@
+__anon61565e570108	input.c	/^struct {$/;"	struct	file:
+a	input.c	/^  int a;$/;"	member	struct:__anon61565e570108	typeref:typename:int	file:
+b	input.c	/^} b = { 1 };$/;"	variable	typeref:struct:__anon61565e570108
+c	input.c	/^int c;$/;"	variable	typeref:typename:int
+d	input.c	/^int d(int e) {$/;"	function	typeref:typename:int
+e	input.c	/^int d(int e) {$/;"	parameter	function:d	typeref:typename:int	file:
+__anon61565e570208	input.c	/^  struct {$/;"	struct	function:d	file:
+f	input.c	/^    int f;$/;"	member	struct:d::__anon61565e570208	typeref:typename:int	file:
+g	input.c	/^  } g = { 1 };$/;"	local	function:d	typeref:struct:d::__anon61565e570208	file:
+h	input.c	/^  int h;$/;"	local	function:d	typeref:typename:int	file:
