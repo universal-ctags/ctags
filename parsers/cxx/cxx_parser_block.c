@@ -481,7 +481,7 @@ process_token:
 			case CXXTokenTypeSemicolon:
 			{
 				if(
-						(g_cxx.eLangType == g_cxx.eCLangType) &&
+						(cxxParserCurrentLanguageIsC()) &&
 						cxxScopeIsGlobal() &&
 						(!(g_cxx.uKeywordState & CXXParserKeywordStateSeenExtern)) &&
 						(!(g_cxx.uKeywordState & CXXParserKeywordStateSeenTypedef))
@@ -493,20 +493,10 @@ process_token:
 					//  type whatever fname(par1,par2) int par1; int par2; {
 					//                                        ^
 					//
-					int iCorkQueueIndex = CORK_NIL;
-					switch(cxxParserMaybeExtractKnRStyleFunctionDefinition(&iCorkQueueIndex))
+					switch(cxxParserMaybeParseKnRStyleFunctionDefinition())
 					{
 						case 1:
-							// got K&R style function definition, one scope was pushed.
-							cxxParserNewStatement();
-							if(!cxxParserParseBlock(true))
-							{
-								CXX_DEBUG_LEAVE_TEXT("Failed to parse nested block");
-								return false;
-							}
-							if(iCorkQueueIndex > CORK_NIL)
-								cxxParserMarkEndLineForTagInCorkQueue(iCorkQueueIndex);
-							cxxScopePop();
+							// K&R parser did the job and started a new statement
 						break;
 						case 0:
 							// something else
