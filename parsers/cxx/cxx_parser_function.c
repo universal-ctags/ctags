@@ -1730,6 +1730,7 @@ bool cxxParserTokenChainLooksLikeFunctionParameterList(
 		//    type variable[..]
 		//    type variable:bits
 		//    type (*variable)(args)
+		//    type ((*variable)(args))
 		//    <anything of the above> = default <-- C++ only
 		//    ... <-- vararg
 		//
@@ -1778,6 +1779,7 @@ try_again:
 			// Either part of function pointer declaration or a very ugly variable decl
 			// Examples are:
 			//    type (*name)(args)
+			//    type ((*name)(args))
 			//    type (*name)
 			//    type (&name)
 			//    type (&name)[something]
@@ -1798,7 +1800,13 @@ try_again:
 					cxxParserTokenChainLooksLikeFunctionParameterList(
 							t->pChain,
 							NULL
-						) // args
+						) || // (args)
+					!cxxTokenChainFirstTokenNotOfType(
+							t->pChain,
+							CXXTokenTypeOpeningParenthesis |
+								CXXTokenTypeParenthesisChain |
+								CXXTokenTypeClosingParenthesis
+						) // ((whatever)(whatever))
 				)
 			)
 				goto try_again;
