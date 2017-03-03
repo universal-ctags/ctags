@@ -901,30 +901,38 @@ bool cxxParserLookForFunctionSignature(
 				// The scanning process will skip all the following tokens until
 				// an exit condition is found.
 				//
-				// However, there is a very common special case that is nice to 
-				// handle automatically and it's something like:
+				// However, there are a couple of very common special cases that is nice to 
+				// handle automatically.
 				//
+				// Case 1:
 				//    MACRO(return_type) function(...)
+				// Case 2:
+				//    MACRO(return_type) variable;
 				//
-				// This *could* be handled by the user with -D 'MACRO(x) x' but since
-				// it's quite common we can't expect the user to look up and define
+				// These *could* be handled by the user with -D 'MACRO(x) x' but since
+				// they are quite common we can't expect the user to look up and define
 				// all macros for a large project. For this reason we use some heuristics
-				// to handle this special case automatically.
+				// to handle these special cases automatically.
 				if(
 						// Identifier is the first token of the chain
 						(!pIdentifierStart->pPrev) &&
 						// The token following the parenthesis is an identifier
 						pInfo->pParenthesis->pNext &&
 						cxxTokenTypeIs(pInfo->pParenthesis->pNext,CXXTokenTypeIdentifier) &&
-						// The token following the identifier is again a parenthesis chain
+						// There is something after the identifier
 						pInfo->pParenthesis->pNext->pNext &&
-						cxxTokenTypeIs(pInfo->pParenthesis->pNext->pNext,CXXTokenTypeParenthesisChain) &&
+						(
+							// The token following the identifier is again a parenthesis chain
+							cxxTokenTypeIs(pInfo->pParenthesis->pNext->pNext,CXXTokenTypeParenthesisChain) ||
+							// The token following the identifier is a semicolon
+							cxxTokenTypeIs(pInfo->pParenthesis->pNext->pNext,CXXTokenTypeSemicolon)
+						) &&
 						// The current parenthesis does not contain commas
 						// (...maybe this check is too much?)
 						(!cxxTokenChainFirstTokenOfType(pInfo->pParenthesis->pChain,CXXTokenTypeComma))
 					)
 				{
-					CXX_DEBUG_PRINT("Found special case of MACRO(return_type) function(): handling");
+					CXX_DEBUG_PRINT("Found special case of MACRO(return_type) function()/variable");
 					pInfo->pParenthesis = NULL;
 				}
 

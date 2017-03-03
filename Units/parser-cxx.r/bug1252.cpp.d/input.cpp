@@ -1,0 +1,1 @@
+PyAPI_DATA(PyTypeObject) _PyNone_Type;
