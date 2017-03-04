@@ -68,6 +68,11 @@ void (*f08(void (*)(int *f08a01)))(int *)
 	return 0;
 }
 
+int f09(char *((*f09a01)()))
+{
+	return 0;
+}
+
 // Valid function templates
 template <typename T> std::unique_ptr<T> t01(T && t01a01)
 {
