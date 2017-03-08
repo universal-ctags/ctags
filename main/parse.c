@@ -2282,9 +2282,9 @@ extern bool runParserInNarrowedInputStream (const langType language,
 
 	verbose ("runParserInNarrowedInputStream: %s; "
 			 "file: %s, "
-			 "start(line: %lu, offset: %lu, srcline: %lu)"
+			 "start(line: %lu, offset: %ld, srcline: %lu)"
 			 " - "
-			 "end(line: %lu, offset: %lu)\n",
+			 "end(line: %lu, offset: %ld)\n",
 			 getLanguageName (language),
 			 getInputFileName (),
 			 startLine, startCharOffset, sourceLineOffset,
