@@ -32,7 +32,7 @@
 // Returns -1 in case of error, 1 if a K&R style function declaration has been
 // found and parsed, 0 if no K&R style function declaration has been found.
 //
-int cxxParserMaybeExtractKnRStyleFunctionDefinition(int * piCorkQueueIndex)
+int cxxParserMaybeExtractKnRStyleFunctionDefinition(int * piCorkQueueIndex, bool onKeyword)
 {
 #ifdef CXX_DO_DEBUGGING
 	vString * pChain = cxxTokenChainJoin(g_cxx.pTokenChain,NULL,0);
@@ -47,6 +47,15 @@ int cxxParserMaybeExtractKnRStyleFunctionDefinition(int * piCorkQueueIndex)
 		*piCorkQueueIndex = CORK_NIL;
 
 	// Check if we are in the following situation:
+	// (onKeyword)
+	//
+	//   type1 function(arg1,arg2,...) struct ...
+	//   type1 function(arg1,arg2,...) enum ...
+	//   type1 function(arg1,arg2,...) union ...
+	//                                 ^
+	//                                 we're here
+	//
+	// (!onKeyword)
 	//
 	//   type1 function(arg1,arg2,...) type2 arg1; type3 arg2; {
 	//                                           ^
@@ -61,17 +70,29 @@ int cxxParserMaybeExtractKnRStyleFunctionDefinition(int * piCorkQueueIndex)
 			"At least one token should be there"
 		);
 	CXX_DEBUG_ASSERT(
+			onKeyword ||
 			cxxTokenTypeIs(cxxTokenChainLast(g_cxx.pTokenChain),CXXTokenTypeSemicolon),
 			"Only upon encountering a semicolon"
 		);
 
 	// The minimum possible case is:
 	//
+	// (onKeyword)
+	//   func(arg) KEYWORD
+	//
+	// (!onKeyword)
 	//   func(arg) type2 arg;
 	//
 	// where (arg) is a condensed parenthesis chain.
-	// So the minimum number of tokens required is 5: func, (arg), type2, arg, ;
-	if(g_cxx.pTokenChain->iCount < 5)
+	// So the minimum number of tokens required is
+	//
+	// (onKeyword)
+	// 3: func, (arg), KEYWORD
+	//
+	// (!onKeyword)
+	// 5: func, (arg), type2, arg, ;
+	if ((onKeyword && g_cxx.pTokenChain->iCount < 3)
+	    || ((!onKeyword) && g_cxx.pTokenChain->iCount < 5))
 		return 0; // no way
 
 	// There must be a parenthesis chain
@@ -89,49 +110,83 @@ int cxxParserMaybeExtractKnRStyleFunctionDefinition(int * piCorkQueueIndex)
 	if(!cxxTokenTypeIs(pIdentifier,CXXTokenTypeIdentifier))
 		return 0;
 
-	// And least three tokens after it
-	CXXToken * x = pParenthesis->pNext;
-	if(!x)
-		return 0;
-	x = x->pNext;
-	if(!x)
-		return 0;
-	x = x->pNext;
-	if(!x)
-		return 0;
+	CXXToken * x;
+	if (onKeyword)
+	{
+		// And least one tokens after it
+		x = pParenthesis->pNext;
+		if(!x)
+			return 0;
+	}
+	else
+	{
+		// And least three tokens after it
+		x = pParenthesis->pNext;
+		if(!x)
+			return 0;
+		x = x->pNext;
+		if(!x)
+			return 0;
+		x = x->pNext;
+		if(!x)
+			return 0;
+	}
 
-	// The tokens following must be only things allowed in a variable declaration
-	x = cxxTokenChainNextTokenNotOfType(
+	if (onKeyword)
+	{
+		/* register and const may be allowed at as tokens existing
+		   before struct|enum|union. */
+		x = pParenthesis->pNext;
+		if (cxxTokenIsKeyword (x, CXXKeywordREGISTER)
+		    || cxxTokenIsKeyword (x, CXXKeywordCONST))
+			x = x->pNext;
+	}
+	else
+	{
+		// The tokens following must be only things allowed in a variable declaration
+		x = cxxTokenChainNextTokenNotOfType(
 			pParenthesis,
 			CXXTokenTypeIdentifier | CXXTokenTypeKeyword |
 				CXXTokenTypeSquareParenthesisChain | CXXTokenTypeStar |
 				CXXTokenTypeComma | CXXTokenTypeSingleColon | CXXTokenTypeNumber
 		);
+	}
 
 	CXX_DEBUG_ASSERT(x,"There should be at least the terminator here!");
 	if(!x)
 		return 0;
 
-	if(!cxxTokenTypeIs(x,CXXTokenTypeSemicolon))
-		return 0; // does not look like a variable declaration.
+	if (onKeyword)
+	{
+		if(! (cxxTokenTypeIs(x, CXXTokenTypeKeyword)
+		      && ((x->eKeyword == CXXKeywordSTRUCT)
+			  || (x->eKeyword == CXXKeywordUNION)
+			  || (x->eKeyword == CXXKeywordENUM))))
+		   return 0; // does not look like a struct|enum|unon variable declaration.
+	}
+	else
+	{
+		if(!cxxTokenTypeIs(x,CXXTokenTypeSemicolon))
+			return 0; // does not look like a variable declaration.
 
-	x = cxxTokenChainPreviousTokenNotOfType(
+		x = cxxTokenChainPreviousTokenNotOfType(
 			x,
 			CXXTokenTypeSquareParenthesisChain | CXXTokenTypeSingleColon |
 				CXXTokenTypeNumber
 		);
 
-	CXX_DEBUG_ASSERT(x,"We should have found an identifier here");
-	if(!x)
-		return 0;
+		CXX_DEBUG_ASSERT(x,"We should have found an identifier here");
+		if(!x)
+			return 0;
 
-	if(!cxxTokenTypeIs(x,CXXTokenTypeIdentifier))
-		return 0; // does not look like a variable declaration.
+		if(!cxxTokenTypeIs(x,CXXTokenTypeIdentifier))
+			return 0; // does not look like a variable declaration.
 
-	CXX_DEBUG_ASSERT(
+		CXX_DEBUG_ASSERT(
 			pParenthesis->pChain,
 			"The parenthesis should be condensed here!"
 		);
+	}
 
 	CXXTokenChain * pParenthesisTokenChain = g_cxx.pTokenChain;
 
@@ -218,12 +273,17 @@ int cxxParserMaybeExtractKnRStyleFunctionDefinition(int * piCorkQueueIndex)
 	CXXToken * aExtraParameterStarts[MAX_EXTRA_KNR_PARAMETERS];
 	int iExtraStatementsInChain = 0;
 
-	// Now we should have no more than iParameterCount-1 parameters before
+	// Now we should have no more than
+	// (onKeyword)
+	//   iParameterCount
+	// (!onKeyword)
+	//   iParameterCount-1
+	// parameters before
 	// an opening bracket. There may be less declarations as each one may
 	// declare multiple variables and C89 supports the implicit "int" type rule.
 	// Note that we parse up to iParameterCount statements (which will be lost
 	// if we can't find an opening bracket).
-	while(iParameterCount > 0)
+	while(iParameterCount > (onKeyword? -1: 0))
 	{
 		CXXToken * pCurrentTail = g_cxx.pTokenChain->pTail;
 
@@ -394,7 +454,7 @@ bool cxxParserTokenChainLooksLikeFunctionCallParameterSet(
 				// which is assumed to be condensed)
 				return false;
 			}
-			
+
 			if(
 				bDealingWithParenthesisChain &&
 				(
@@ -408,7 +468,7 @@ bool cxxParserTokenChainLooksLikeFunctionCallParameterSet(
 				// assume this looks like a function call
 				return true;
 			}
-			
+
 			if(
 					(t->eKeyword != CXXKeywordNEW) &&
 					cxxTokenTypeIsOneOf(
@@ -535,7 +595,7 @@ bool cxxParserTokenChainLooksLikeConstructorParameterSet(
 
 //
 // Check the parenthesis chain and the identifier found by
-// cxxParserLookForFunctionSignature() to determine if its valid for 
+// cxxParserLookForFunctionSignature() to determine if its valid for
 // a function signature.
 //
 static bool cxxParserLookForFunctionSignatureCheckParenthesisAndIdentifier(
@@ -548,7 +608,7 @@ static bool cxxParserLookForFunctionSignatureCheckParenthesisAndIdentifier(
 	)
 {
 	CXX_DEBUG_ENTER();
-	
+
 	CXX_DEBUG_ASSERT(
 			pParenthesis && pIdentifierChain && pIdentifierStart && pIdentifierEnd && pInfo && pParamInfo,
 			"All parameters must be non null here"
@@ -592,7 +652,7 @@ static bool cxxParserLookForFunctionSignatureCheckParenthesisAndIdentifier(
 		CXX_DEBUG_LEAVE_TEXT("Looks like an __ARGS() case parenthesis chain");
 		return true;
 	}
-	
+
 	if(cxxParserTokenChainLooksLikeFunctionParameterList(
 			pParenthesis->pChain,
 			pParamInfo
@@ -608,7 +668,7 @@ static bool cxxParserLookForFunctionSignatureCheckParenthesisAndIdentifier(
 		CXX_DEBUG_LEAVE_TEXT("Looks like valid parenthesis chain");
 		return true;
 	}
-	
+
 	CXX_DEBUG_LEAVE_TEXT("Doesn't look like a valid parenthesis chain");
 	return false;
 }
@@ -674,7 +734,7 @@ bool cxxParserLookForFunctionSignature(
 	//
 	//    Since the identifier may be hidden within a parenthesis chain (and thus NOT be toplevel)
 	//    we must scan the inner parenthesis chains in a sequence of special cases.
-	// 
+	//
 	//    (Mainly) for this reason this loop first looks for a parenthesis chain (which is always
 	//    present at toplevel) and then looks for a suitable identifier near or inside it.
 	//
@@ -704,7 +764,7 @@ bool cxxParserLookForFunctionSignature(
 			CXX_DEBUG_PRINT("Found opening bracket, semicolon or EOF");
 			break;
 		}
-		
+
 		if(cxxTokenTypeIs(pToken,CXXTokenTypeComma))
 		{
 			// reached end, but we have a trailing comma.
@@ -727,7 +787,7 @@ bool cxxParserLookForFunctionSignature(
 			// With a pointer operator it might be trailing return type
 			CXX_DEBUG_PRINT("Found single colon");
 			break;
-		} 
+		}
 
 		// Check for tokens that should never appear at top level of a function signature
 
@@ -759,10 +819,10 @@ bool cxxParserLookForFunctionSignature(
 			CXX_DEBUG_PRINT("Skipped angle bracket chain");
 			goto next_token;
 		}
-		
+
 		// If we have already found a parenthesis+identifier just continue scanning
 		// until an exit condition is found. Do not look for parenthesis+identifier again.
-		
+
 		if(pInfo->pParenthesis)
 		{
 			CXX_DEBUG_PRINT("Already have a proper parenthesis: continuing loop to find terminator");
@@ -874,7 +934,7 @@ bool cxxParserLookForFunctionSignature(
 		// but we still handle them in case we find nothing else.
 
 		pTopLevelParenthesis = pToken;
-		
+
 		if(cxxTokenTypeIs(pToken->pPrev,CXXTokenTypeIdentifier))
 		{
 			// identifier before
@@ -885,7 +945,7 @@ bool cxxParserLookForFunctionSignature(
 
 			pIdentifierStart = pToken->pPrev;
 			pIdentifierEnd = pToken->pPrev;
-			
+
 			if(
 				cxxParserLookForFunctionSignatureCheckParenthesisAndIdentifier(
 						pTopLevelParenthesis,
@@ -901,7 +961,7 @@ bool cxxParserLookForFunctionSignature(
 				// The scanning process will skip all the following tokens until
 				// an exit condition is found.
 				//
-				// However, there is a very common special case that is nice to 
+				// However, there is a very common special case that is nice to
 				// handle automatically and it's something like:
 				//
 				//    MACRO(return_type) function(...)
@@ -930,7 +990,7 @@ bool cxxParserLookForFunctionSignature(
 
 				goto next_token;
 			}
-			
+
 			// If the check above failed, try different identifier possibilities
 		}
 
@@ -990,10 +1050,10 @@ bool cxxParserLookForFunctionSignature(
 					)
 				)
 				goto next_token;
-			
+
 			// If the check above failed, try different identifier possibilities
 		}
-		
+
 		if(
 				pToken->pPrev->pPrev &&
 				cxxTokenTypeIs(pToken->pPrev,CXXTokenTypeGreaterThanSign)
@@ -1036,9 +1096,9 @@ next_token:
 		CXX_DEBUG_LEAVE_TEXT("No suitable parenthesis chain found");
 		return false; // no function, no party
 	}
-	
+
 	// parenthesis + identifier has been found, this is a function signature.
-	
+
 	// Figure out the remainig parameters.
 
 	CXX_DEBUG_ASSERT(pTopLevelParenthesis,"This should have been set");
@@ -1201,7 +1261,7 @@ next_token:
 		pInfo->bTypeContainsIdentifierScopeAndSignature = true;
 	} else {
 		pToken = pInfo->pScopeStart ? pInfo->pScopeStart : pInfo->pIdentifierStart;
-		
+
 		if(pToken->pPrev)
 		{
 			CXXToken * pParenthesisOrConst = pInfo->pSignatureConst ?
@@ -1239,12 +1299,12 @@ next_token:
 				// probaby normal return type
 				pInfo->pTypeEnd = pToken->pPrev;
 				pInfo->pTypeStart = cxxTokenChainFirst(pChain);
-				
+
 				// Handle the common special case of
 				//
 				//   MACRO(return_type) function()
 				//
-				
+
 				if(
 						cxxTokenTypeIs(pInfo->pTypeEnd,CXXTokenTypeParenthesisChain) &&
 						(pInfo->pTypeEnd->pChain->iCount >= 3) &&
@@ -1317,7 +1377,7 @@ int cxxParserEmitFunctionTags(
 		)
 	)
 		pInfo->pTypeStart = pInfo->pIdentifierEnd->pNext;
-	
+
 	CXX_DEBUG_ASSERT(pInfo->pTypeEnd != pInfo->pIdentifierEnd,"The type should never end at identifier");
 
 	if(pInfo->pScopeStart)
@@ -1325,32 +1385,32 @@ int cxxParserEmitFunctionTags(
 		if(bPushScopes)
 		{
 			CXX_DEBUG_PRINT("There is a scope and we're requested to push scopes");
-	
+
 			// there is a scope
 			while(pInfo->pScopeStart != pInfo->pIdentifierStart)
 			{
 				CXXToken * pScopeId = pInfo->pScopeStart;
-				
+
 				pInfo->pScopeStart = cxxTokenChainNextTokenOfType(
 						pInfo->pScopeStart,
 						CXXTokenTypeMultipleColons
 					);
-				
+
 				CXX_DEBUG_ASSERT(pInfo->pScopeStart,"We should have found a next token here");
-				
+
 				pInfo->pScopeStart = pInfo->pScopeStart->pNext;
-				
+
 				cxxTokenChainDestroyRange(
 						pInfo->pIdentifierChain,
 						pScopeId->pNext,
 						pInfo->pScopeStart->pPrev
 					);
-	
+
 				cxxTokenChainTake(pInfo->pIdentifierChain,pScopeId);
-	
-	
+
+
 				CXX_DEBUG_PRINT("Pushing scope %s",vStringValue(pScopeId->pszWord));
-	
+
 				cxxScopePush(
 						pScopeId,
 						CXXScopeTypeClass,
@@ -1434,21 +1494,21 @@ int cxxParserEmitFunctionTags(
 				CXX_DEBUG_PRINT("Type contains identifier and scope");
 				// Special case: the type contains the identifier and parenthesis
 				// (generally things like int (*foo(void))[2] or similar).
-				
+
 				// Scope and identifier have already been removed.
 				// Remove the parenthesis, temporairly.
 				if(pInfo->pTypeStart == pInfo->pParenthesis)
 					pInfo->pTypeStart = pInfo->pParenthesis->pNext;
 				if(pInfo->pTypeEnd == pInfo->pParenthesis)
 					pInfo->pTypeEnd = pInfo->pParenthesis->pPrev;
-				
+
 				if(pInfo->pTypeStart && pInfo->pTypeEnd)
 				{
 					CXXToken * pTokenBeforeParenthesis = pInfo->pParenthesis->pPrev;
 					cxxTokenChainTake(pInfo->pParenthesisContainerChain,pInfo->pParenthesis);
-	
+
 					pTypeName = cxxTagCheckAndSetTypeField(pInfo->pTypeStart,pInfo->pTypeEnd);
-	
+
 					cxxTokenChainInsertAfter(
 							pInfo->pParenthesisContainerChain,
 							pTokenBeforeParenthesis,

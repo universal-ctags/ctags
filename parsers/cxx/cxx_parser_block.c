@@ -153,6 +153,57 @@ bool cxxParserParseBlockHandleOpeningBracket(void)
 	return true;
 }
 
+static bool cxxParserExtractKnRStyleFunctionDefinition(bool onKeyword)
+{
+	if(
+		(g_cxx.eLangType == g_cxx.eCLangType) &&
+		cxxScopeIsGlobal() &&
+		(!(g_cxx.uKeywordState & CXXParserKeywordStateSeenExtern)) &&
+		(!(g_cxx.uKeywordState & CXXParserKeywordStateSeenTypedef))
+		)
+	{
+		// Special handling of K&R style function declarations.
+		// We might be in the following situation:
+		//
+		// (onKeyword)
+		//    type whatever fname(par1,par2) struct
+		//                                 ^
+		// (!onKeyword)
+		//    type whatever fname(par1,par2) int par1; int par2; {
+		//
+		int iCorkQueueIndex = CORK_NIL;
+		switch(cxxParserMaybeExtractKnRStyleFunctionDefinition(&iCorkQueueIndex, onKeyword))
+		{
+		case 1:
+			// got K&R style function definition, one scope was pushed.
+			cxxParserNewStatement();
+			if(!cxxParserParseBlock(true))
+			{
+				CXX_DEBUG_LEAVE_TEXT("Failed to parse nested block");
+				return false;
+			}
+			if(iCorkQueueIndex > CORK_NIL)
+				cxxParserMarkEndLineForTagInCorkQueue(iCorkQueueIndex);
+			cxxScopePop();
+			break;
+		case 0:
+			if (!onKeyword)
+			{
+				// something else
+				cxxParserAnalyzeOtherStatement();
+			}
+			break;
+		default:
+			CXX_DEBUG_LEAVE_TEXT("Failed to check for K&R style function definition");
+			return false;
+			break;
+		}
+	} else if (!onKeyword) {
+		// K&R style function declarations not allowed here.
+		cxxParserAnalyzeOtherStatement();
+	}
+	return true;
+}
 
 static bool cxxParserParseBlockInternal(bool bExpectClosingBracket)
 {
@@ -206,7 +257,7 @@ process_token:
 					case CXXKeywordNAMESPACE:
 					{
 						enum CXXScopeType eScopeType = cxxScopeGetType();
-						
+
 						if(
 								(
 									// toplevel or nested within a namespace
@@ -270,6 +321,8 @@ process_token:
 						cxxTokenChainClear(g_cxx.pTokenChain);
 					break;
 					case CXXKeywordENUM:
+						if (! cxxParserExtractKnRStyleFunctionDefinition (true))
+							return false;
 						if(!cxxParserParseEnum())
 						{
 							CXX_DEBUG_LEAVE_TEXT("Failed to parse enum");
@@ -284,6 +337,8 @@ process_token:
 						}
 					break;
 					case CXXKeywordSTRUCT:
+						if (! cxxParserExtractKnRStyleFunctionDefinition (true))
+							return false;
 						if(!cxxParserParseClassStructOrUnion(CXXKeywordSTRUCT,CXXTagKindSTRUCT,CXXScopeTypeStruct))
 						{
 							CXX_DEBUG_LEAVE_TEXT("Failed to parse class/struct/union");
@@ -291,6 +346,8 @@ process_token:
 						}
 					break;
 					case CXXKeywordUNION:
+						if (! cxxParserExtractKnRStyleFunctionDefinition (true))
+							return false;
 						if(!cxxParserParseClassStructOrUnion(CXXKeywordUNION,CXXTagKindUNION,CXXScopeTypeUnion))
 						{
 							CXX_DEBUG_LEAVE_TEXT("Failed to parse class/struct/union");
@@ -480,47 +537,8 @@ process_token:
 			break;
 			case CXXTokenTypeSemicolon:
 			{
-				if(
-						(g_cxx.eLangType == g_cxx.eCLangType) &&
-						cxxScopeIsGlobal() &&
-						(!(g_cxx.uKeywordState & CXXParserKeywordStateSeenExtern)) &&
-						(!(g_cxx.uKeywordState & CXXParserKeywordStateSeenTypedef))
-					)
-				{
-					// Special handling of K&R style function declarations.
-					// We might be in the following situation:
-					//
-					//  type whatever fname(par1,par2) int par1; int par2; {
-					//                                        ^
-					//
-					int iCorkQueueIndex = CORK_NIL;
-					switch(cxxParserMaybeExtractKnRStyleFunctionDefinition(&iCorkQueueIndex))
-					{
-						case 1:
-							// got K&R style function definition, one scope was pushed.
-							cxxParserNewStatement();
-							if(!cxxParserParseBlock(true))
-							{
-								CXX_DEBUG_LEAVE_TEXT("Failed to parse nested block");
-								return false;
-							}
-							if(iCorkQueueIndex > CORK_NIL)
-								cxxParserMarkEndLineForTagInCorkQueue(iCorkQueueIndex);
-							cxxScopePop();
-						break;
-						case 0:
-							// something else
-							cxxParserAnalyzeOtherStatement();
-						break;
-						default:
-							CXX_DEBUG_LEAVE_TEXT("Failed to check for K&R style function definition");
-							return false;
-						break;
-					}
-				} else {
-					// K&R style function declarations not allowed here.
-					cxxParserAnalyzeOtherStatement();
-				}
+				if (! cxxParserExtractKnRStyleFunctionDefinition (false))
+					return false;
 				cxxParserNewStatement();
 			}
 			break;
