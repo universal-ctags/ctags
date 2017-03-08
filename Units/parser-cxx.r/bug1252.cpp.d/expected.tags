@@ -1,0 +1,1 @@
+_PyNone_Type	input.cpp	/^PyAPI_DATA(PyTypeObject) _PyNone_Type;/;"	v	typeref:typename:PyAPI_DATA (PyTypeObject)

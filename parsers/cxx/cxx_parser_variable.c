@@ -381,7 +381,26 @@ bool cxxParserExtractVariableDeclarations(CXXTokenChain * pChain,unsigned int uF
 		if(!pTokenBefore)
 		{
 			CXX_DEBUG_LEAVE_TEXT("Identifier not preceeded by a type");
-			return bGotVariable;
+			
+			// Here we can handle yet another one of the gazillion of special cases.
+			// 
+			//    MACRO(whatever) variable;
+			//
+			if(
+					cxxTokenTypeIs(t,CXXTokenTypeParenthesisChain) &&
+					t->pNext &&
+					cxxTokenTypeIs(t->pNext,CXXTokenTypeIdentifier) &&
+					t->pNext->pNext &&
+					cxxTokenTypeIs(t->pNext->pNext,CXXTokenTypeSemicolon)
+				)
+			{
+				CXX_DEBUG_PRINT("Looks like the 'MACRO(whatever) variable;' special case");
+				pIdentifier = t->pNext;
+				pTokenBefore = t;
+				t = t->pNext->pNext;
+			} else {
+				return bGotVariable;
+			}
 		}
 
 		CXXToken * pScopeEnd = pTokenBefore->pNext;
@@ -474,6 +493,15 @@ bool cxxParserExtractVariableDeclarations(CXXTokenChain * pChain,unsigned int uF
 							);
 						return bGotVariable;
 					}
+				} else if(
+						// Still 'MACRO(whatever) variable;' case
+						cxxTokenTypeIs(pTokenBefore,CXXTokenTypeParenthesisChain) &&
+						pTokenBefore->pPrev &&
+						cxxTokenTypeIs(pTokenBefore->pPrev,CXXTokenTypeIdentifier) &&
+						!pTokenBefore->pPrev->pPrev
+					)
+				{
+					CXX_DEBUG_PRINT("Type seems to be hidden in a macro");
 				} else {
 					CXX_DEBUG_LEAVE_TEXT(
 							"Token '%s' of type 0x%02x does not seem " \
