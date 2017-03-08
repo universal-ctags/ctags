@@ -73,6 +73,7 @@ extern void linkDependencyAtInitializeParsing (depType dtype,
 	{
 		slaveParser *s = xMalloc (1, slaveParser);
 
+		s->type = dtype;
 		s->id = slave->id;
 		s->data = data;
 		s->next = master->slaveParsers;

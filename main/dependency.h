@@ -30,6 +30,7 @@ typedef struct sParserDependency {
 } parserDependency;
 
 struct sSlaveParser {
+	depType type;
 	langType id;
 	void *data;
 	slaveParser *next;
