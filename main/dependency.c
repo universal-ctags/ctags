@@ -15,6 +15,7 @@
 #include "debug.h"
 #include "dependency.h"
 #include "parse.h"
+#include "subparser.h"
 
 #include <string.h>
 
@@ -117,4 +118,39 @@ extern void finalizeDependencies (parserDefinition *parser)
 		eFree (tmp);
 	}
 	parser->slaveParsers = NULL;
+}
+
+extern void notifyInputStart (void)
+{
+	subparser *s;
+
+	foreachSubparser(s)
+	{
+		if (s->inputStart)
+		{
+			enterSubparser(s);
+			s->inputStart (s);
+			leaveSubparser();
+		}
+	}
+}
+
+extern void notifyInputEnd   (void)
+{
+	subparser *s;
+
+	foreachSubparser(s)
+	{
+		if (s->inputEnd)
+		{
+			enterSubparser(s);
+			s->inputEnd (s);
+			leaveSubparser();
+		}
+	}
+}
+
+extern langType getSubparserLanguage (subparser *s)
+{
+	return s->slaveParser->id;
 }

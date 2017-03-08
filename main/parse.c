@@ -28,6 +28,7 @@
 #include "ptrarray.h"
 #include "read.h"
 #include "routines.h"
+#include "subparser.h"
 #include "trace.h"
 #include "vstring.h"
 #ifdef HAVE_ICONV
@@ -66,6 +67,8 @@ static void installTagXpathTable (const langType language);
 static void anonResetMaybe (parserDefinition *lang);
 static void setupAnon (void);
 static void teardownAnon (void);
+static void setupSubparsersInUse (parserDefinition *parser);
+static void teardownSubparsersInUse (parserDefinition *parser);
 
 /*
 *   DATA DEFINITIONS
@@ -2208,10 +2211,14 @@ static rescanReason createTagsForFile (const langType language,
 
 	Assert (lang->parser || lang->parser2);
 
+	notifyInputStart ();
+
 	if (lang->parser != NULL)
 		lang->parser ();
 	else if (lang->parser2 != NULL)
 		rescan = lang->parser2 (passCount);
+
+	notifyInputEnd ();
 
 	return rescan;
 }
@@ -2228,6 +2235,9 @@ static bool createTagsWithFallback1 (const langType language)
 
 	initializeParser (language);
 	parser = LanguageTable [language];
+
+	setupSubparsersInUse (parser);
+
 	if (parser->useCork)
 		corkTagFile();
 
@@ -2271,6 +2281,8 @@ static bool createTagsWithFallback1 (const langType language)
 
 	if (parser->useCork)
 		uncorkTagFile();
+
+	teardownSubparsersInUse (parser);
 
 	return tagFileResized;
 }
@@ -2843,6 +2855,93 @@ extern void applyParameter (const langType language, const char *name, const cha
 	}
 
 	error (FATAL, "no such parameter in %s: %s", parser->name, name);
+}
+
+extern subparser *getNextSubparser(subparser *last)
+{
+	langType lang = getInputLanguage ();
+	parserDefinition *parser = LanguageTable [lang];
+
+	if (last == NULL)
+		return parser->subparsersInUse;
+	else
+		return last->next;
+}
+
+extern void scheduleRunningBaseparser (int dependencyIndex)
+{
+	langType current = getInputLanguage ();
+	parserDefinition *current_parser = LanguageTable [current];
+	parserDependency *dep = NULL;
+
+	if (dependencyIndex == RUN_DEFAULT_SUBPARSERS)
+	{
+		for (int i = 0; i < current_parser->dependencyCount; ++i)
+			if (current_parser->dependencies[i].type == DEPTYPE_SUBPARSER)
+			{
+				dep = current_parser->dependencies + i;
+				break;
+			}
+	}
+	else
+		dep = current_parser->dependencies + dependencyIndex;
+
+	if (dep == NULL)
+		return;
+
+	const char *base_name = dep->upperParser;
+	langType base = getNamedLanguage (base_name, 0);
+	parserDefinition *base_parser = LanguageTable [base];
+
+	if (dependencyIndex == RUN_DEFAULT_SUBPARSERS)
+		base_parser->subparsersInUse = base_parser->subparsersDefault;
+	else
+	{
+		subparser *s = dep->data;
+		s->schedulingBaseparserExplicitly = true;
+		base_parser->subparsersInUse = s;
+	}
+
+	{
+		subparser *tmp;
+
+		verbose ("scheduleRunningBaseparser %s with subparsers: ", base_name);
+		pushLanguage (base);
+		foreachSubparser(tmp)
+			verbose ("%s ", getLanguageName (tmp->slaveParser->id));
+		popLanguage ();
+		verbose ("\n");
+	}
+
+
+	makePromise(base_name, THIN_STREAM_SPEC);
+}
+
+static void setupSubparsersInUse (parserDefinition *parser)
+{
+	if (!parser->subparsersInUse)
+		parser->subparsersInUse = parser->subparsersDefault;
+}
+
+static void teardownSubparsersInUse (parserDefinition *parser)
+{
+	subparser *s = parser->subparsersInUse;
+	if (s && s->schedulingBaseparserExplicitly)
+		s->schedulingBaseparserExplicitly = false;
+	parser->subparsersInUse = NULL;
+}
+
+
+extern subparser* getSubparserRunningBaseparser (void)
+{
+	langType current = getInputLanguage ();
+	parserDefinition *current_parser = LanguageTable [current];
+	subparser *s = current_parser->subparsersInUse;
+
+	if (s && s->schedulingBaseparserExplicitly)
+		return s;
+	else
+		return NULL;
 }
 
 /*
