@@ -13,6 +13,7 @@
 #include "general.h"
 #include "promise.h"
 #include "debug.h"
+#include "read.h"
 #include "xtag.h"
 
 
@@ -38,7 +39,12 @@ int  makePromise   (const char *parser,
 	int r;
 	langType lang;
 
-	if (!isXtagEnabled (XTAG_TAGS_GENERATED_BY_GUEST_PARSERS))
+	if ((!isThinStreamSpec(startLine,
+						   startCharOffset,
+						   endLine,
+						   endCharOffset,
+						   sourceLineOffset))
+		&& ( !isXtagEnabled (XTAG_TAGS_GENERATED_BY_GUEST_PARSERS)))
 		return -1;
 
 	lang = getNamedLanguage (parser, 0);

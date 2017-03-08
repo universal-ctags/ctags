@@ -119,4 +119,9 @@ extern langType popLanguage (void);
 
 extern unsigned long getInputLineNumberForFileOffset(long offset);
 
+#define THIN_STREAM_SPEC 0, 0, 0, 0, 0
+extern bool isThinStreamSpec(unsigned long startLine, long startCharOffset,
+							 unsigned long endLine, long endCharOffset,
+							 unsigned long sourceLineOffset);
+
 #endif  /* CTAGS_MAIN_READ_H */

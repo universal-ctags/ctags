@@ -112,6 +112,7 @@ typedef struct sInputFile {
 	stringList  * sourceTagPathHolder;
 	inputLineFposMap lineFposMap;
 	vString *allLines;
+	int thinDepth;
 } inputFile;
 
 
@@ -650,6 +651,7 @@ extern bool openInputFile (const char *const fileName, const langType language,
 		File.source.lineNumber = File.source.lineNumberOrigin;
 		allocLineFposMap (&File.lineFposMap);
 
+		File.thinDepth = 0;
 		verbose ("OPENING %s as %s language %sfile\n", fileName,
 				getLanguageName (language),
 				File.input.isHeader ? "include " : "");
@@ -1037,6 +1039,16 @@ extern void   pushNarrowedInputStream (const langType language,
 	MIOPos tmp;
 	MIO *subio;
 
+	if (isThinStreamSpec (startLine, startCharOffset,
+						  endLine, endCharOffset,
+						  sourceLineOffset))
+	{
+		File.thinDepth++;
+		verbose ("push thin stream (%d)\n", File.thinDepth);
+		return;
+	}
+	Assert (File.thinDepth == 0);
+
 	original = getInputFilePosition ();
 
 	tmp = getInputFilePositionForLine (startLine);
@@ -1095,6 +1107,12 @@ extern unsigned int getNestedInputBoundaryInfo (unsigned long lineNumber)
 }
 extern void   popNarrowedInputStream  (void)
 {
+	if (File.thinDepth)
+	{
+		File.thinDepth--;
+		verbose ("CLEARING thin flag(%d)\n", File.thinDepth);
+		return;
+	}
 	mio_free (File.mio);
 	File = BackupFile;
 	memset (&BackupFile, 0, sizeof (BackupFile));
@@ -1142,4 +1160,15 @@ static void     langStackPush (langStack *langStack, langType type)
 static langType langStackPop  (langStack *langStack)
 {
 	return langStack->languages [ -- langStack->count ];
+}
+
+extern bool isThinStreamSpec(unsigned long startLine, long startCharOffset,
+							 unsigned long endLine, long endCharOffset,
+							 unsigned long sourceLineOffset)
+{
+	return (startLine == 0 &&
+			startCharOffset == 0 &&
+			endLine == 0 &&
+			endCharOffset == 0 &&
+			sourceLineOffset == 0);
 }
