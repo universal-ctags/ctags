@@ -44,6 +44,7 @@ MAIN_HEADS =			\
 	main/selectors.h	\
 	main/sort.h		\
 	main/strlist.h		\
+	main/subparser.h	\
 	main/trace.h		\
 	main/tokeninfo.h	\
 	main/types.h		\

@@ -124,6 +124,8 @@ struct sParserDefinition {
 					      is emitted or not. */
 	slaveParser *slaveParsers;	/* The parsers on this list must be initialized when
 				   this parser is initialized. */
+	subparser   *subparsersDefault;
+	subparser   *subparsersInUse;
 
 	stringList* currentPatterns;   /* current list of file name patterns */
 	stringList* currentExtensions; /* current list of extensions */
