@@ -1067,14 +1067,19 @@ extern void   pushNarrowedInputStream (const langType language,
 	File.source.lineNumberOrigin = ((sourceLineOffset == 0)? 0: sourceLineOffset - 1);
 }
 
+extern bool doesParserRunAsGuest (void)
+{
+	return !(File.nestedInputStreamInfo.startLine == 0
+			 && File.nestedInputStreamInfo.startCharOffset == 0
+			 && File.nestedInputStreamInfo.endLine == 0
+			 && File.nestedInputStreamInfo.endCharOffset == 0);
+}
+
 extern unsigned int getNestedInputBoundaryInfo (unsigned long lineNumber)
 {
 	unsigned int info;
 
-	if (File.nestedInputStreamInfo.startLine == 0
-	    && File.nestedInputStreamInfo.startCharOffset == 0
-	    && File.nestedInputStreamInfo.endLine == 0
-	    && File.nestedInputStreamInfo.endCharOffset == 0)
+	if (!doesParserRunAsGuest())
 		/* Not in a nested input stream  */
 		return 0;
 
