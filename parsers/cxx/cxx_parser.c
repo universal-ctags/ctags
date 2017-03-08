@@ -346,10 +346,10 @@ void cxxParserMarkEndLineForTagInCorkQueue(int iCorkQueueIndex)
 
 // Make sure that the token chain contains only the specified keyword and eventually
 // the "const" or "volatile" type modifiers.
-static void cxxParserCleanupEnumStructClassOrUnionPrefixChain(CXXKeyword eKeyword)
+static void cxxParserCleanupEnumStructClassOrUnionPrefixChain(CXXKeyword eKeyword,CXXToken * pLastToken)
 {
 	CXXToken * pToken = cxxTokenChainFirst(g_cxx.pTokenChain);
-	while(pToken)
+	while(pToken && (pToken != pLastToken))
 	{
 		if(
 				cxxTokenTypeIs(pToken,CXXTokenTypeKeyword) &&
@@ -494,9 +494,8 @@ bool cxxParserParseEnum(void)
 	CXX_DEBUG_ENTER();
 
 	unsigned int uInitialKeywordState = g_cxx.uKeywordState;
-
-	if(g_cxx.pTokenChain->iCount > 1)
-		cxxParserCleanupEnumStructClassOrUnionPrefixChain(CXXKeywordENUM);
+	int iInitialTokenCount = g_cxx.pTokenChain->iCount;
+	CXXToken * pLastToken = cxxTokenChainLast(g_cxx.pTokenChain);
 
 	/*
 		Spec is:
@@ -572,6 +571,44 @@ bool cxxParserParseEnum(void)
 		CXX_DEBUG_LEAVE_TEXT("Probably a function declaration!");
 		return true;
 	}
+
+	// If we have found a semicolon then we might be in the special case of KnR function
+	// declaration. This requires at least 5 tokens and has some additional constraints.
+	// See cxxParserMaybeParseKnRStyleFunctionDefinition() for more informations.
+	if(
+			// found semicolon
+			cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeSemicolon) &&
+			// many tokens before the enum keyword
+			(iInitialTokenCount > 3) &&
+			// C language
+			cxxParserCurrentLanguageIsC() &&
+			// global scope
+			cxxScopeIsGlobal() &&
+			// no typedef
+			(!(uInitialKeywordState & CXXParserKeywordStateSeenTypedef))
+		)
+	{
+		CXX_DEBUG_PRINT("Maybe KnR funciton definition");
+
+		switch(cxxParserMaybeParseKnRStyleFunctionDefinition())
+		{
+			case 1:
+				// parser moved forward and started a new statement
+				CXX_DEBUG_LEAVE_TEXT("K&R parser did the job");
+				return true;
+			break;
+			case 0:
+				// something else, go ahead
+			break;
+			default:
+				CXX_DEBUG_LEAVE_TEXT("Failed to check for K&R style function definition");
+				return false;
+			break;
+		}
+	}
+
+	if(iInitialTokenCount > 1)
+		cxxParserCleanupEnumStructClassOrUnionPrefixChain(CXXKeywordENUM,pLastToken);
 
 	if(cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeSemicolon))
 	{
@@ -790,9 +827,8 @@ static bool cxxParserParseClassStructOrUnionInternal(
 	CXX_DEBUG_ENTER();
 
 	unsigned int uInitialKeywordState = g_cxx.uKeywordState;
-
-	if(g_cxx.pTokenChain->iCount > 1)
-		cxxParserCleanupEnumStructClassOrUnionPrefixChain(eKeyword);
+	int iInitialTokenCount = g_cxx.pTokenChain->iCount;
+	CXXToken * pLastToken = cxxTokenChainLast(g_cxx.pTokenChain);
 
 	/*
 		Spec is:
@@ -875,6 +911,45 @@ static bool cxxParserParseClassStructOrUnionInternal(
 		CXX_DEBUG_LEAVE_TEXT("Probably a function declaration!");
 		return true;
 	}
+
+	// If we have found a semicolon then we might be in the special case of KnR function
+	// declaration. This requires at least 5 tokens and has some additional constraints.
+	// See cxxParserMaybeParseKnRStyleFunctionDefinition() for more informations.
+	// FIXME: This block is duplicated in enum
+	if(
+			// found semicolon
+			cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeSemicolon) &&
+			// many tokens before the enum keyword
+			(iInitialTokenCount > 3) &&
+			// C language
+			cxxParserCurrentLanguageIsC() &&
+			// global scope
+			cxxScopeIsGlobal() &&
+			// no typedef
+			(!(uInitialKeywordState & CXXParserKeywordStateSeenTypedef))
+		)
+	{
+		CXX_DEBUG_PRINT("Maybe KnR funciton definition?");
+
+		switch(cxxParserMaybeParseKnRStyleFunctionDefinition())
+		{
+			case 1:
+				// parser moved forward and started a new statement
+				CXX_DEBUG_LEAVE_TEXT("K&R function definition parser did the job");
+				return true;
+			break;
+			case 0:
+				// something else, go ahead
+			break;
+			default:
+				CXX_DEBUG_LEAVE_TEXT("Failed to check for K&R style function definition");
+				return false;
+			break;
+		}
+	}
+
+	if(iInitialTokenCount > 1)
+		cxxParserCleanupEnumStructClassOrUnionPrefixChain(eKeyword,pLastToken);
 
 	// FIXME: This block is duplicated in enum
 	if(cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeSemicolon))
