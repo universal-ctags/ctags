@@ -2224,21 +2224,23 @@ static bool createTagsWithFallback1 (const langType language)
 	int lastPromise = getLastPromise ();
 	unsigned int passCount = 0;
 	rescanReason whyRescan;
+	parserDefinition *parser;
 
 	initializeParser (language);
-	if (LanguageTable [language]->useCork)
+	parser = LanguageTable [language];
+	if (parser->useCork)
 		corkTagFile();
 
 	addParserPseudoTags (language);
 	tagFilePosition (&tagfpos);
 
-	anonResetMaybe (LanguageTable [language]);
+	anonResetMaybe (parser);
 
 	while ( ( whyRescan =
 		  createTagsForFile (language, ++passCount) )
 		!= RESCAN_NONE)
 	{
-		if (LanguageTable [language]->useCork)
+		if (parser->useCork)
 		{
 			uncorkTagFile();
 			corkTagFile();
@@ -2267,7 +2269,7 @@ static bool createTagsWithFallback1 (const langType language)
 		while (readLineFromInputFile () != NULL)
 			; /* Do nothing */
 
-	if (LanguageTable [language]->useCork)
+	if (parser->useCork)
 		uncorkTagFile();
 
 	return tagFileResized;
