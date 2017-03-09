@@ -81,7 +81,7 @@ extern void linkDependencyAtInitializeParsing (depType dtype,
 	}
 }
 
-extern void initializeDependencies (const parserDefinition *parser)
+extern void initializeDependencies (parserDefinition *parser)
 {
 	unsigned int i;
 	slaveParser *sp;
