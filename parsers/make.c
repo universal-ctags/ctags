@@ -108,33 +108,19 @@ static bool isSpecialTarget (vString *const name)
 
 static void makeSimpleMakeTag (vString *const name, kindOption *MakeKinds, makeKind kind)
 {
-	static int make = LANG_IGNORE;
-
-	if (make == LANG_IGNORE)
-		make = getNamedLanguage ("Make", 0);
-
-	if (! isLanguageEnabled (make))
+	if (!isLanguageEnabled (getInputLanguage ()))
 		return;
 
-	pushLanguage (make);
 	makeSimpleTag (name, MakeKinds, kind);
-	popLanguage ();
 }
 
 static void makeSimpleMakeRefTag (const vString* const name, kindOption* const kinds, const int kind,
 				  int roleIndex)
 {
-	static int make = LANG_IGNORE;
-
-	if (make == LANG_IGNORE)
-		make = getNamedLanguage ("Make", 0);
-
-	if (! isLanguageEnabled (make))
+	if (!isLanguageEnabled (getInputLanguage ()))
 		return;
 
-	pushLanguage (make);
 	makeSimpleRefTag (name, kinds, kind, roleIndex);
-	popLanguage ();
 }
 
 static void newTarget (vString *const name)
@@ -147,12 +133,47 @@ static void newTarget (vString *const name)
 	makeSimpleMakeTag (name, MakeKinds, K_TARGET);
 }
 
-static void newMacro (vString *const name, bool with_define_directive, bool appending, struct makeParserClient *client, void *data)
+static void newMacro (vString *const name, bool with_define_directive, bool appending)
 {
+	subparser *s;
+
 	if (!appending)
 		makeSimpleMakeTag (name, MakeKinds, K_MACRO);
-	if (client->newMacro)
-		client->newMacro (client, name, with_define_directive, appending, data);
+
+	foreachSubparser(s)
+	{
+		makeSubparser *m = (makeSubparser *)s;
+		enterSubparser(s);
+		if (m->newMacroNotify)
+			m->newMacroNotify (m, vStringValue(name), with_define_directive, appending);
+		leaveSubparser();
+	}
+}
+
+static void valueFound (vString *const name)
+{
+	subparser *s;
+	foreachSubparser(s)
+	{
+		makeSubparser *m = (makeSubparser *)s;
+		enterSubparser(s);
+		if (m->valueNotify)
+			m->valueNotify (m, vStringValue (name));
+		leaveSubparser();
+	}
+}
+
+static void directiveFound (vString *const name)
+{
+	subparser *s;
+	foreachSubparser (s)
+	{
+		makeSubparser *m = (makeSubparser *)s;
+		enterSubparser(s);
+		if (m->directiveNotify)
+			m->directiveNotify (m, vStringValue (name));
+		leaveSubparser();
+	}
 }
 
 static void newInclude (vString *const name, bool optional)
@@ -185,7 +206,7 @@ static void readIdentifier (const int first, vString *const id)
 	ungetcToInputFile (c);
 }
 
-extern void runMakeParser (struct makeParserClient *client, void *data)
+static void findMakeTags (void)
 {
 	stringList *identifiers = stringListNew ();
 	bool newline = true;
@@ -195,14 +216,11 @@ extern void runMakeParser (struct makeParserClient *client, void *data)
 	bool variable_possible = true;
 	bool appending = false;
 	int c;
+	subparser *sub;
 
-	static int make = LANG_IGNORE;
-
-	if (make == LANG_IGNORE)
-	{
-		make = getNamedLanguage ("Make", 0);
-		initializeParser (make);
-	}
+	sub = getSubparserRunningBaseparser();
+	if (sub)
+		chooseExclusiveSubparser (sub, NULL);
 
 	while ((c = nextChar ()) != EOF)
 	{
@@ -261,7 +279,8 @@ extern void runMakeParser (struct makeParserClient *client, void *data)
 		else if (variable_possible && c == '=' &&
 				 stringListCount (identifiers) == 1)
 		{
-			newMacro (stringListItem (identifiers, 0), false, appending, client, data);
+			newMacro (stringListItem (identifiers, 0), false, appending);
+
 			in_value = true;
 			in_rule = false;
 			appending = false;
@@ -272,8 +291,8 @@ extern void runMakeParser (struct makeParserClient *client, void *data)
 			readIdentifier (c, name);
 			stringListAdd (identifiers, name);
 
-			if (in_value && client->valuesFound)
-				client->valuesFound (client, name, data);
+			if (in_value)
+				valueFound(name);
 
 			if (stringListCount (identifiers) == 1)
 			{
@@ -295,7 +314,8 @@ extern void runMakeParser (struct makeParserClient *client, void *data)
 					if (c == '\n')
 						ungetcToInputFile (c);
 					vStringStripTrailing (name);
-					newMacro (name, true, false, client, data);
+
+					newMacro (name, true, false);
 				}
 				else if (! strcmp (vStringValue (name), "export"))
 					stringListClear (identifiers);
@@ -330,27 +350,14 @@ extern void runMakeParser (struct makeParserClient *client, void *data)
 					}
 				}
 				else
-				{
-					if (client->directiveFound)
-						client->directiveFound (client, name, data);
-
-				}
+					directiveFound (name);
 			}
 		}
 		else
 			variable_possible = false;
 	}
-	stringListDelete (identifiers);
-}
 
-static void findMakeTags (void)
-{
-	struct makeParserClient client = {
-		.valuesFound    = NULL,
-		.directiveFound = NULL,
-		.newMacro = NULL,
-	};
-	runMakeParser (&client, NULL);
+	stringListDelete (identifiers);
 }
 
 
