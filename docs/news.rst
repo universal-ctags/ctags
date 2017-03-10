@@ -1018,7 +1018,7 @@ whether to include extra tag entries for certain kinds of information.
 This option is available in Universal-ctags, too.
 
 In Universal-ctags it is extended; a parser can define its own
-extra flags. They can be controlled with ``--extras-<LANG>=[+|-]{...}`.
+extra flags. They can be controlled with ``--extras-<LANG>=[+|-]{...}``.
 
 See some examples:
 
