@@ -31,13 +31,15 @@ typedef struct sParserDependency {
 
 struct sSlaveParser {
 	langType id;
+	void *data;
 	slaveParser *next;
 };
 
 
 extern void linkDependencyAtInitializeParsing (depType dtype,
 					       parserDefinition *const master,
-					       parserDefinition *const slave);
+					       parserDefinition *const slave,
+					       void *data);
 
 extern void initializeDependencies (const parserDefinition *parser);
 extern void finalizeDependencies (parserDefinition *parser);

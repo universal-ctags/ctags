@@ -1488,7 +1488,7 @@ static void linkDependenciesAtInitializeParsing (parserDefinition *const parser)
 		upper = getNamedLanguage (d->upperParser, 0);
 		upperParserDef = LanguageTable [upper];
 
-		linkDependencyAtInitializeParsing (d->type, upperParserDef, parser);
+		linkDependencyAtInitializeParsing (d->type, upperParserDef, parser, d->data);
 	}
 }
 

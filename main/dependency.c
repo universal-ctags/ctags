@@ -63,8 +63,9 @@ static void linkKindDependency (parserDefinition *const masterParser,
 }
 
 extern void linkDependencyAtInitializeParsing (depType dtype,
-					       parserDefinition *const master,
-						   parserDefinition *const slave)
+						   parserDefinition *const master,
+						   parserDefinition *const slave,
+						   void *data)
 {
 	if (dtype == DEPTYPE_KIND_OWNER)
 		linkKindDependency (master, slave);
@@ -73,6 +74,7 @@ extern void linkDependencyAtInitializeParsing (depType dtype,
 		slaveParser *s = xMalloc (1, slaveParser);
 
 		s->id = slave->id;
+		s->data = data;
 		s->next = master->slaveParsers;
 		master->slaveParsers = s;
 	}
