@@ -2223,6 +2223,28 @@ static rescanReason createTagsForFile (const langType language,
 	return rescan;
 }
 
+static bool doesParserUseCork (parserDefinition *parser)
+{
+	subparser *tmp;
+	bool r = false;
+
+	if (parser->useCork)
+		return true;
+
+	pushLanguage (parser->id);
+	foreachSubparser(tmp)
+	{
+		langType t = tmp->slaveParser->id;
+		if (LanguageTable[t]->useCork)
+		{
+			r = true;
+			break;
+		}
+	}
+	popLanguage ();
+	return r;
+}
+
 static bool createTagsWithFallback1 (const langType language)
 {
 	bool tagFileResized = false;
@@ -2232,13 +2254,15 @@ static bool createTagsWithFallback1 (const langType language)
 	unsigned int passCount = 0;
 	rescanReason whyRescan;
 	parserDefinition *parser;
+	bool useCork;
 
 	initializeParser (language);
 	parser = LanguageTable [language];
 
 	setupSubparsersInUse (parser);
 
-	if (parser->useCork)
+	useCork = doesParserUseCork(parser);
+	if (useCork)
 		corkTagFile();
 
 	addParserPseudoTags (language);
@@ -2250,7 +2274,7 @@ static bool createTagsWithFallback1 (const langType language)
 		  createTagsForFile (language, ++passCount) )
 		!= RESCAN_NONE)
 	{
-		if (parser->useCork)
+		if (useCork)
 		{
 			uncorkTagFile();
 			corkTagFile();
@@ -2279,7 +2303,7 @@ static bool createTagsWithFallback1 (const langType language)
 		while (readLineFromInputFile () != NULL)
 			; /* Do nothing */
 
-	if (parser->useCork)
+	if (useCork)
 		uncorkTagFile();
 
 	teardownSubparsersInUse (parser);
