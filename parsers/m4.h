@@ -15,42 +15,24 @@
 */
 #include "general.h"  /* must always come first */
 #include "types.h"
+#include "subparser.h"
 #include "vstring.h"
 
-struct m4HandleTokenResult
-{
-	int index;
-	bool consumed;
+typedef struct sM4Subparser m4Subparser;
+struct sM4Subparser {
+	subparser subparser;
+
+	bool (* probeLanguage) (m4Subparser *m4, const char* token);
+
+	/* return value: Cork index */
+	int  (* newMacroNotify) (m4Subparser *m4, const char* token);
+
+	bool (* doesLineCommentStart)   (m4Subparser *m4, int c, const char *token);
+	bool (* doesStringLiteralStart) (m4Subparser *m4, int c);
 };
-
-struct m4ParserClient
-{
-	langType lang;
-	void *data;
-
-	const char quoteOpen;
-	const char quoteClose;
-
-	/* Do something for new input file. Returned value is stored to
-	   `data' field. */
-	void*   (* inputStart) (void);
-	bool (* doesStartLineComment) (int c, const char *token, void *data);
-	bool (* doesStartStringLiteral) (int c, void *data);
-
-	/* If the token is the part of the language the parser deals with,
-	   return true. This can be called before `inputStart' method. */
-	bool (* probeLanguage) (const char* token);
-
-	struct m4HandleTokenResult (* handleMacro) (const char* token, void *data);
-
-	struct m4ParserClient *host; /* Used internally */
-};
-
-/* The entry points for m4 meta parser */
-extern void registerM4ParserClient (const char *hostLang, struct m4ParserClient *client);
-extern void runM4Parser (langType lang);
 
 /* Helpers functions */
 extern bool readM4MacroArgument(vString *const arg);
+extern void setM4Quotes(char openQuote, char closeQuote);
 
 #endif
