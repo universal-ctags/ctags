@@ -69,6 +69,7 @@ extern bool doesInputLanguageAllowNullTag (void);
 extern kindOption *getInputLanguageFileKind (void);
 extern bool doesInputLanguageRequestAutomaticFQTag (void);
 extern bool doesParserRunAsGuest (void);
+extern bool isParserMarkedNoEmission (void);
 
 extern void freeInputFileResources (void);
 extern const unsigned char *getInputFileData (size_t *size);

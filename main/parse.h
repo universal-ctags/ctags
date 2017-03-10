@@ -119,6 +119,8 @@ struct sParserDefinition {
 	/* used internally */
 	langType id;		    /* id assigned to language */
 	unsigned int enabled:1;	       /* currently enabled? */
+	unsigned int dontEmit:1;	   /* run but don't emit tags
+									  (a subparser requests run this parser.) */
 	unsigned int initialized:1;    /* initialize() is called or not */
 	unsigned int pseudoTagPrinted:1;   /* pseudo tags about this parser
 					      is emitted or not. */

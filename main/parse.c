@@ -2926,6 +2926,13 @@ extern void scheduleRunningBaseparser (int dependencyIndex)
 		base_parser->subparsersInUse = s;
 	}
 
+	if (!isLanguageEnabled (base))
+	{
+		enableLanguage (base, true);
+		base_parser->dontEmit = true;
+		verbose ("force enable \"%s\" as base parser\n", base_parser->name);
+	}
+
 	{
 		subparser *tmp;
 
@@ -2953,6 +2960,14 @@ static void teardownSubparsersInUse (parserDefinition *parser)
 	if (s && s->schedulingBaseparserExplicitly)
 		s->schedulingBaseparserExplicitly = false;
 	parser->subparsersInUse = NULL;
+}
+
+extern bool isParserMarkedNoEmission (void)
+{
+	langType lang = getInputLanguage();
+	parserDefinition *parser = LanguageTable [lang];
+
+	return parser->dontEmit;
 }
 
 

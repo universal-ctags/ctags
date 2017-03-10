@@ -1307,6 +1307,9 @@ extern void initTagEntryFull (tagEntryInfo *const e, const char *const name,
 
 	for ( i = 0; i < PRE_ALLOCATED_PARSER_FIELDS; i++ )
 		e->parserFields[i].ftype = FIELD_UNKNOWN;
+
+	if (isParserMarkedNoEmission ())
+		e->placeholder = 1;
 }
 
 extern void    markTagExtraBit     (tagEntryInfo *const tag, xtagType extra)
