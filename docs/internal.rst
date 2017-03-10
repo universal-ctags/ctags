@@ -78,16 +78,18 @@ used in ctags main part. The functions are used to load option files,
 for example.
 
 
+.. _promiseAPI:
+
 promise API
 ......................................................................
 (Currently the tagging via promise API is disabled by default.
- Use `--extras=+s` option for enabling it.)
+Use `--extras=+g` option for enabling it.)
 
 Background and Idea
 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 More than one programming languages can be used in one input text stream.
-promise API is introduced for running sub (guest) parser in the specified area
-of input text stream from the root (host) parser.
+promise API allows a host parser running a guest parser in the specified
+area of input text stream.
 
 e.g. Code written in c language (C code) is embedded
 in code written in Yacc language (Yacc code). Let's think about this
@@ -133,6 +135,9 @@ Ctags may choose the Yacc parser for the input. However, the parser
 doesn't know about C syntax. Implementing C parser in the Yacc parser
 is one of approach. However, ctags has already C parser.  The Yacc
 parser should utilize the existing C parser. The promise API allows this.
+
+More examples are in :ref:`Applying a parser to specified areas of input file <host-guest-parsres>`.
+
 
 Usage
 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
@@ -244,8 +249,7 @@ Automatic parser guessing
 Managing regular expression parsers
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Parser combination
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. NOT REVIEWED YET
 
 Parser written in C
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

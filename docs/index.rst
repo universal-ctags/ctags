@@ -38,6 +38,7 @@ This is a draft document. Proofreading and pull-requests are welcome!
 	output-format.rst
 	interactive-mode.rst
 	guessing.rst
+	running-multi-parsers.rst
 	building.rst
 	testing.rst
 	extending.rst

@@ -28,4 +28,5 @@ Finally, the parser uses the new funtionality of universal-ctags to use another
 parser for parsing other languages within a host language. This is used for
 parsing JavaScript within <script> tags and CSS within <style> tags. This
 simplifies the parser and generates much better results than having a simplified
-JavaScript or CSS parser within the HTML parser.
+JavaScript or CSS parser within the HTML parser. To run JavaScript and CSS parsers
+from HTML parser, use `--extras=+g` option.

@@ -1,5 +1,4 @@
 --sort=no
---extras=+s
+--extras=+g
 --kinds-C=+px
---fields=+l
-
+--fields=+lE

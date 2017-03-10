@@ -1303,6 +1303,8 @@ extern void initTagEntryFull (tagEntryInfo *const e, const char *const name,
 	e->extensionFields.roleIndex = roleIndex;
 	if (roleIndex > ROLE_INDEX_DEFINITION)
 		markTagExtraBit (e, XTAG_REFERENCE_TAGS);
+	if (doesParserRunAsGuest ())
+		markTagExtraBit (e, XTAG_TAGS_GENERATED_BY_GUEST_PARSERS);
 
 	e->sourceLanguage = sourceLanguage;
 	e->sourceFileName = sourceFileName;
