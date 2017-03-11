@@ -2885,11 +2885,22 @@ extern subparser *getNextSubparser(subparser *last)
 {
 	langType lang = getInputLanguage ();
 	parserDefinition *parser = LanguageTable [lang];
+	subparser *r;
+	langType t;
 
 	if (last == NULL)
-		return parser->subparsersInUse;
+		r = parser->subparsersInUse;
 	else
-		return last->next;
+		r = last->next;
+
+	if (r == NULL)
+		return r;
+
+	t = getSubparserLanguage(r);
+	if (isLanguageEnabled (t))
+		return r;
+	else
+		return getNextSubparser (r);
 }
 
 extern void scheduleRunningBaseparser (int dependencyIndex)
