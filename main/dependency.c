@@ -96,36 +96,21 @@ extern void initializeDependencies (parserDefinition *parser)
 			subparser *sub;
 
 			sub = (subparser *)sp->data;
-
-			if (/* TODO: Till all subparsers migrate to new subparser API,
-				   the next condition is needed. After migrating, this
-				   should be replaced with Assert. */
-				sub)
-				sub->slaveParser = sp;
+			sub->slaveParser = sp;
 		}
 
 		if (sp->type == DEPTYPE_KIND_OWNER
 			|| (sp->type == DEPTYPE_SUBPARSER &&
-				/* TODO: Till all subparsers migrate to new subparser API,
-				   the next condition is needed. After migrating, this
-				   should be replaced with Assert. */
-				((sp->data == NULL) ||
-				 (sp->data &&
-				  (((subparser *)sp->data)->direction & SUBPARSER_BASE_RUNS_SUB))
-					)))
+				(((subparser *)sp->data)->direction & SUBPARSER_BASE_RUNS_SUB)))
 		{
 			initializeParser (sp->id);
-			if (sp->type == DEPTYPE_SUBPARSER
-				/* TODO: Till all subparsers migrate to new subparser API,
-				   the next condition is needed. */
-				&& sp->data)
+			if (sp->type == DEPTYPE_SUBPARSER)
 			{
 				subparser *subparser = sp->data;
 				subparser->next = parser->subparsersDefault;
 				parser->subparsersDefault = subparser;
 			}
 		}
-
 	}
 
 	/* Initialize masters that act as base parsers. */
@@ -133,10 +118,6 @@ extern void initializeDependencies (parserDefinition *parser)
 	{
 		parserDependency *d = parser->dependencies + i;
 		if (d->type == DEPTYPE_SUBPARSER &&
-			/* TODO: Till all subparsers migrate to new subparser API,
-			   the next condition is needed. After migrating, this
-			   should be replaced with Assert. */
-			d->data &&
 			((subparser *)(d->data))->direction & SUBPARSER_SUB_RUNS_BASE)
 		{
 			langType baseParser;
