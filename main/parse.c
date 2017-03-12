@@ -2352,7 +2352,9 @@ static bool createTagsWithFallback (
 	tagFileResized = createTagsWithFallback1 (language);
 	tagFileResized = forcePromises()? true: tagFileResized;
 
+	pushLanguage (language);
 	makeFileTag (fileName);
+	popLanguage ();
 	closeInputFile ();
 
 	return tagFileResized;
