@@ -171,41 +171,34 @@ static void addCommonPseudoTags (void)
 
 extern void makeFileTag (const char *const fileName)
 {
-	xtagType     xtag = XTAG_UNKNOWN;
+	tagEntryInfo tag;
+	kindOption  *kind;
 
-	if (isXtagEnabled(XTAG_FILE_NAMES))
-		xtag = XTAG_FILE_NAMES;
+	if (!isXtagEnabled(XTAG_FILE_NAMES))
+		return;
 
-	if (xtag != XTAG_UNKNOWN)
+	kind = getInputLanguageFileKind();
+	Assert (kind);
+	kind->enabled = true;
+
+	initTagEntry (&tag, baseFilename (fileName), kind);
+
+	tag.isFileEntry     = true;
+	tag.lineNumberEntry = true;
+	markTagExtraBit (&tag, XTAG_FILE_NAMES);
+
+	tag.lineNumber = 1;
+	if (isFieldEnabled (FIELD_END))
 	{
-		tagEntryInfo tag;
-		kindOption  *kind;
-
-		kind = getInputLanguageFileKind();
-		Assert (kind);
-		kind->enabled = isXtagEnabled(XTAG_FILE_NAMES);
-
-		/* TODO: you can return here if enabled == false. */
-
-		initTagEntry (&tag, baseFilename (fileName), kind);
-
-		tag.isFileEntry     = true;
-		tag.lineNumberEntry = true;
-		markTagExtraBit (&tag, xtag);
-
-		tag.lineNumber = 1;
-		if (isFieldEnabled (FIELD_END))
-		{
-			/* isFieldEnabled is called again in the rendering
-			   stage. However, it is called here for avoiding
-			   unnecessary read line loop. */
-			while (readLineFromInputFile () != NULL)
-				; /* Do nothing */
-			tag.extensionFields.endLine = getInputLineNumber ();
-		}
-
-		makeTagEntry (&tag);
+		/* isFieldEnabled is called again in the rendering
+		   stage. However, it is called here for avoiding
+		   unnecessary read line loop. */
+		while (readLineFromInputFile () != NULL)
+			; /* Do nothing */
+		tag.extensionFields.endLine = getInputLineNumber ();
 	}
+
+	makeTagEntry (&tag);
 }
 
 static void updateSortedFlag (
