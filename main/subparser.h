@@ -35,10 +35,11 @@ struct sSubparser {
 
 	void (* inputStart) (subparser *s);
 	void (* inputEnd) (subparser *s);
+	void (* exclusiveSubparserChosenNotify) (subparser *s, void *data);
 };
 
 /* A base parser doesn't have to call the following two functions.
-   The main part calls them. */
+   The main part calls them internally. */
 extern void notifyInputStart (void);
 extern void notifyInputEnd   (void);
 extern langType getSubparserLanguage (subparser *s);
@@ -53,6 +54,7 @@ extern subparser *getNextSubparser(subparser *last);
 #define leaveSubparser()  popLanguage ()
 
 extern subparser* getSubparserRunningBaseparser (void);
+extern void chooseExclusiveSubparser (subparser *s, void *data);
 
 /* Interface for Subparsers   */
 #define RUN_DEFAULT_SUBPARSERS -1

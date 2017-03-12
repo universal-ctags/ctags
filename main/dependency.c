@@ -14,6 +14,7 @@
 
 #include "debug.h"
 #include "dependency.h"
+#include "options.h"
 #include "parse.h"
 #include "subparser.h"
 
@@ -194,4 +195,16 @@ extern void notifyInputEnd   (void)
 extern langType getSubparserLanguage (subparser *s)
 {
 	return s->slaveParser->id;
+}
+
+extern void chooseExclusiveSubparser (subparser *s, void *data)
+{
+	if (s->exclusiveSubparserChosenNotify)
+	{
+		enterSubparser(s);
+		s->exclusiveSubparserChosenNotify (s, data);
+		verbose ("%s is chosen as exclusive subparser\n",
+				 getLanguageName (getSubparserLanguage (s)));
+		leaveSubparser();
+	}
 }
