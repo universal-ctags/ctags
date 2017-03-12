@@ -68,7 +68,7 @@ static void anonResetMaybe (parserDefinition *lang);
 static void setupAnon (void);
 static void teardownAnon (void);
 static void setupSubparsersInUse (parserDefinition *parser);
-static void teardownSubparsersInUse (parserDefinition *parser);
+static subparser* teardownSubparsersInUse (parserDefinition *parser);
 
 /*
 *   DATA DEFINITIONS
@@ -2245,7 +2245,8 @@ static bool doesParserUseCork (parserDefinition *parser)
 	return r;
 }
 
-static bool createTagsWithFallback1 (const langType language)
+static bool createTagsWithFallback1 (const langType language,
+									 langType *exclusive_subparser)
 {
 	bool tagFileResized = false;
 	unsigned long numTags	= numTagsAdded ();
@@ -2306,7 +2307,11 @@ static bool createTagsWithFallback1 (const langType language)
 	if (useCork)
 		uncorkTagFile();
 
-	teardownSubparsersInUse (parser);
+	{
+		subparser *s = teardownSubparsersInUse (parser);
+		if (exclusive_subparser && s)
+			*exclusive_subparser = getSubparserLanguage (s);
+	}
 
 	return tagFileResized;
 }
@@ -2332,7 +2337,7 @@ extern bool runParserInNarrowedInputStream (const langType language,
 				 startLine, startCharOffset,
 				 endLine, endCharOffset,
 				 sourceLineOffset);
-	tagFileResized = createTagsWithFallback1 (language);
+	tagFileResized = createTagsWithFallback1 (language, NULL);
 	popNarrowedInputStream  ();
 	return tagFileResized;
 
@@ -2342,6 +2347,7 @@ static bool createTagsWithFallback (
 	const char *const fileName, const langType language,
 	MIO *mio)
 {
+	langType exclusive_subparser = LANG_IGNORE;
 	bool tagFileResized = false;
 
 	Assert (0 <= language  &&  language < (int) LanguageCount);
@@ -2349,10 +2355,13 @@ static bool createTagsWithFallback (
 	if (!openInputFile (fileName, language, mio))
 		return false;
 
-	tagFileResized = createTagsWithFallback1 (language);
+	tagFileResized = createTagsWithFallback1 (language,
+											  &exclusive_subparser);
 	tagFileResized = forcePromises()? true: tagFileResized;
 
-	pushLanguage (language);
+	pushLanguage ((exclusive_subparser == LANG_IGNORE)
+				  ? language
+				  : exclusive_subparser);
 	makeFileTag (fileName);
 	popLanguage ();
 	closeInputFile ();
@@ -2967,12 +2976,32 @@ static void setupSubparsersInUse (parserDefinition *parser)
 		parser->subparsersInUse = parser->subparsersDefault;
 }
 
-static void teardownSubparsersInUse (parserDefinition *parser)
+static subparser* teardownSubparsersInUse (parserDefinition *parser)
 {
-	subparser *s = parser->subparsersInUse;
-	if (s && s->schedulingBaseparserExplicitly)
-		s->schedulingBaseparserExplicitly = false;
+	subparser *tmp = parser->subparsersInUse;
+	subparser *s = NULL;
+
 	parser->subparsersInUse = NULL;
+
+	if (tmp && tmp->schedulingBaseparserExplicitly)
+	{
+		tmp->schedulingBaseparserExplicitly = false;
+		s = tmp;
+	}
+
+	if (s)
+		return s;
+
+	while (tmp)
+	{
+		if (tmp->chosenAsExclusiveSubparser)
+		{
+			s = tmp;
+		}
+		tmp = tmp->next;
+	}
+
+	return s;
 }
 
 extern bool isParserMarkedNoEmission (void)

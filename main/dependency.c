@@ -201,6 +201,7 @@ extern void chooseExclusiveSubparser (subparser *s, void *data)
 {
 	if (s->exclusiveSubparserChosenNotify)
 	{
+		s->chosenAsExclusiveSubparser = true;
 		enterSubparser(s);
 		s->exclusiveSubparserChosenNotify (s, data);
 		verbose ("%s is chosen as exclusive subparser\n",

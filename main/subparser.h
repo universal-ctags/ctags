@@ -29,6 +29,7 @@ struct sSubparser {
 	slaveParser *slaveParser;
 	subparser *next;
 	bool schedulingBaseparserExplicitly;
+	bool chosenAsExclusiveSubparser;
 
 	/* public to the parser */
 	subparserRunDirection direction;
