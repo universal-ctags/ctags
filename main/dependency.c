@@ -89,6 +89,19 @@ extern void initializeDependencies (const parserDefinition *parser)
 	/* Initialize slaves */
 	for (sp = parser->slaveParsers; sp; sp = sp->next)
 		initializeParser (sp->id);
+
+	/* Initialize masters that act as base parsers. */
+	for (i = 0; i < parser->dependencyCount; i++)
+	{
+		parserDependency *d = parser->dependencies + i;
+		if (d->type == DEPTYPE_SUBPARSER)
+		{
+			langType baseParser;
+			baseParser = getNamedLanguage (d->upperParser, 0);
+			Assert (baseParser != LANG_IGNORE);
+			initializeParser (baseParser);
+		}
+	}
 }
 
 extern void finalizeDependencies (parserDefinition *parser)
