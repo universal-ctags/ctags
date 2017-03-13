@@ -15,6 +15,7 @@
 #include "options.h"
 #include "parse.h"
 #include "read.h"
+#include "subparser.h"
 #include "types.h"
 #include "yaml.h"
 
@@ -64,33 +65,6 @@ static void yamlFini (yaml_parser_t *yaml)
 	yaml_parser_delete (yaml);
 }
 
-extern void runYamlParser (const yamlCallback callback, void* userData)
-{
-	yaml_parser_t yaml;
-	yaml_token_t token;
-	bool done;
-
-	yamlInit (&yaml);
-
-	findRegexTags ();
-
-	done = false;
-	while (!done)
-	{
-		if (!yaml_parser_scan (&yaml, &token))
-			break;
-
-		callback (&token, userData);
-		verbose("yaml token:%s<%d>@Line:%lu\n", tokenTypeName[token.type], token.type,
-				token.start_mark.line + 1);
-		if (token.type == YAML_STREAM_END_TOKEN)
-			done = true;
-
-		yaml_token_delete (&token);
-	}
-	yamlFini (&yaml);
-}
-
 extern void attachYamlPosition (tagEntryInfo *tag, yaml_token_t *token, bool asEndPosition)
 {
 	unsigned int ln = token->start_mark.line + 1;
@@ -102,44 +76,6 @@ extern void attachYamlPosition (tagEntryInfo *tag, yaml_token_t *token, bool asE
 		tag->lineNumber = ln;
 		tag->filePosition = getInputFilePositionForLine (tag->lineNumber);
 	}
-}
-
-static hashTable *yamlParserClients;
-extern void registerYamlParserClient (struct yamlParserClient *client)
-{
-	if (!yamlParserClients)
-		yamlParserClients = hashTableNew (5, hashInthash, hashInteq,
-										  NULL, NULL);
-	hashTablePutItem (yamlParserClients, &client->lang, client);
-}
-
-static void call_callback (void *key CTAGS_ATTR_UNUSED, void *value, void *user_data)
-{
-	yaml_token_t *token = user_data;
-	struct yamlParserClient *client = value;
-
-	if (!isLanguageEnabled (client->lang))
-		return;
-
-	if (token->type == YAML_STREAM_START_TOKEN
-		&& client->inputStart)
-		client->data = client->inputStart ();
-
-	pushLanguage (client->lang);
-	client->callback (token, client->data);
-	popLanguage ();
-
-	if (token->type == YAML_STREAM_END_TOKEN)
-	{
-		if (client->inputEnd)
-			client->inputEnd (client->data);
-		client->data = NULL;
-	}
-}
-
-static void multiplexer (yaml_token_t *token, void *data)
-{
-	hashTableForeachItem (yamlParserClients, call_callback, token);
 }
 
 enum YamlKind {
@@ -159,12 +95,7 @@ static kindOption YamlKinds [] = {
 	  .referenceOnly = false, ATTACH_ROLES(YamlAnchorRoles) },
 };
 
-static void findYamlTags (void)
-{
-	runYamlParser (multiplexer, NULL);
-}
-
-static void yaml (yaml_token_t *token, void *data CTAGS_ATTR_UNUSED)
+static void handlYamlToken (yaml_token_t *token)
 {
 	tagEntryInfo tag;
 
@@ -185,14 +116,43 @@ static void yaml (yaml_token_t *token, void *data CTAGS_ATTR_UNUSED)
 
 }
 
-static struct yamlParserClient YamlYamlClient = {
-	.callback = yaml,
-};
-
-static void initializeYamlParser (const langType language)
+static void findYamlTags (void)
 {
-	YamlYamlClient.lang = language;
-	registerYamlParserClient (&YamlYamlClient);
+	subparser *sub;
+	yaml_parser_t yaml;
+	yaml_token_t token;
+	bool done;
+
+	yamlInit (&yaml);
+
+	findRegexTags ();
+
+	sub = getSubparserRunningBaseparser();
+	if (sub)
+		chooseExclusiveSubparser (sub, NULL);
+
+	done = false;
+	while (!done)
+	{
+		if (!yaml_parser_scan (&yaml, &token))
+			break;
+
+		handlYamlToken (&token);
+		foreachSubparser(sub)
+		{
+			enterSubparser (sub);
+			((yamlSubparser *)sub)->newTokenNotfify ((yamlSubparser *)sub, &token);
+			leaveSubparser ();
+		}
+
+		verbose("yaml token:%s<%d>@Line:%lu\n", tokenTypeName[token.type], token.type,
+				token.start_mark.line + 1);
+		if (token.type == YAML_STREAM_END_TOKEN)
+			done = true;
+
+		yaml_token_delete (&token);
+	}
+	yamlFini (&yaml);
 }
 
 extern parserDefinition* YamlParser (void)
@@ -202,7 +162,6 @@ extern parserDefinition* YamlParser (void)
 
 	def->kinds = YamlKinds;
 	def->extensions = extensions;
-	def->initialize = initializeYamlParser;
 	def->parser     = findYamlTags;
 	def->useCork    = true;
 	def->kinds         = YamlKinds;
