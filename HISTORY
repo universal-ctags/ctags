@@ -1,5 +1,10 @@
 History of Onigmo (Oniguruma-mod)
 
+2017/03/14: [bug]  Import Ruby r57816
+                   Fix UTF-32 valid_encoding?.
+2017/02/20: [bug]  Import Ruby r57660
+                   Initialize return values.
+
 2017/01/29: Version 6.1.1
 
 2017/01/29: [dist] Update LTVERSION to "6:2:0".
