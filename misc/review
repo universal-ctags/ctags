@@ -303,7 +303,7 @@ main ()
     done
 
     if  [[ -z "$action" ]]; then
-	action=list
+	action=inspect
     fi
 
     if ! [[ -d ./Units ]]; then

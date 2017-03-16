@@ -12,11 +12,11 @@
 
 #include "general.h"  /* must always come first */
 
+#include "debug.h"
 #include "dependency.h"
 #include "parse.h"
 
 #include <string.h>
-
 
 static void linkKinds (kindOption *masterKind, kindOption *slaveKind)
 {
@@ -63,40 +63,45 @@ static void linkKindDependency (parserDefinition *const masterParser,
 }
 
 extern void linkDependencyAtInitializeParsing (depType dtype,
-					       parserDefinition *const masterParser,
-					       parserDefinition *const slaveParser)
+						   parserDefinition *const master,
+						   parserDefinition *const slave,
+						   void *data)
 {
 	if (dtype == DEPTYPE_KIND_OWNER)
-		linkKindDependency (masterParser, slaveParser);
+		linkKindDependency (master, slave);
 	else if (dtype == DEPTYPE_SUBPARSER)
 	{
-		subparser *s = xMalloc (1, subparser);
+		slaveParser *s = xMalloc (1, slaveParser);
 
-		s->id = slaveParser->id;
-		s->next = masterParser->subparsers;
-		masterParser->subparsers = s;
+		s->type = dtype;
+		s->id = slave->id;
+		s->data = data;
+		s->next = master->slaveParsers;
+		master->slaveParsers = s;
 	}
 }
 
-extern void initializeSubparsers (const parserDefinition *parser)
+extern void initializeDependencies (const parserDefinition *parser)
 {
-	subparser *sp;
+	unsigned int i;
+	slaveParser *sp;
 
-	for (sp = parser->subparsers; sp; sp = sp->next)
+	/* Initialize slaves */
+	for (sp = parser->slaveParsers; sp; sp = sp->next)
 		initializeParser (sp->id);
 }
 
-extern void finalizeSubparsers (parserDefinition *parser)
+extern void finalizeDependencies (parserDefinition *parser)
 {
-	subparser *sp;
-	subparser *tmp;
+	slaveParser *sp;
+	slaveParser *tmp;
 
-	for (sp = parser->subparsers; sp;)
+	for (sp = parser->slaveParsers; sp;)
 	{
 		tmp = sp;
 		sp = sp->next;
 		tmp->next = NULL;
 		eFree (tmp);
 	}
-	parser->subparsers = NULL;
+	parser->slaveParsers = NULL;
 }

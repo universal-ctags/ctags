@@ -13,7 +13,7 @@
 #include "tokeninfo.h"
 
 #include "entry.h"
-#include "meta-cpreprocessor.h"
+#include "cpreprocessor.h"
 #include "keyword.h"
 #include "read.h"
 #include "xtag.h"

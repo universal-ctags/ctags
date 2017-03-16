@@ -29,17 +29,20 @@ typedef struct sParserDependency {
 	void *data;
 } parserDependency;
 
-extern void linkDependencyAtInitializeParsing (depType dtype,
-					       parserDefinition *const masterParser,
-					       parserDefinition *const slaveParser);
-
-typedef struct sSubparser subparser;
-struct sSubparser {
+struct sSlaveParser {
+	depType type;
 	langType id;
-	subparser *next;
+	void *data;
+	slaveParser *next;
 };
 
-extern void initializeSubparsers (const parserDefinition *parser);
-extern void finalizeSubparsers (parserDefinition *parser);
+
+extern void linkDependencyAtInitializeParsing (depType dtype,
+					       parserDefinition *const master,
+					       parserDefinition *const slave,
+					       void *data);
+
+extern void initializeDependencies (const parserDefinition *parser);
+extern void finalizeDependencies (parserDefinition *parser);
 
 #endif	/* CTAGS_MAIN_DEPENDENCY_H */

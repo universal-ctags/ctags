@@ -10,14 +10,14 @@ This subsection explains some examples of running multiple parsers.
 An example includes cases people wants to run multiple parsers on an
 input file, parser APIs used in the implementation.
 
-There are two ways to combine parsers: host/guest and base/sub.
+There are two ways to combine parsers: guest/host and sub/base.
 
 .. _host-guest-parsres:
 
-Applying a parser to specified areas of input file (host/guest)
+Applying a parser to specified areas of input file (guest/host)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-host/guest combination considers the case that an input file has areas
+guest/host combination considers the case that an input file has areas
 written in languages different from the language for the input file.
 
 *host parser* parses the input file and detects the areas.
@@ -30,10 +30,10 @@ guest parsers are run only when `--extras=+g` is given.  If
 .. figure:: area-and-parsers.svg
 	    :scale: 80%
 
-Examples of host/guest combinations
+Examples of guest/host combinations
 ......................................................................
 
-HTML/{CSS,JavaScript} parser combination
+{CSS,JavaScript}/HTML parser combination
 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 
 For a html file, you may want to run HTML parser, of course. The
@@ -52,7 +52,7 @@ are guest parsers.
 See parsers/html.c.
 
 
-Yacc/C parser combination
+C/Yacc parser combination
 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 
 Similar case is found in YACC input. A yacc file has some areas
@@ -63,7 +63,7 @@ Here YACC parser is a host parser. C parser is a guest parser.
 See :ref:`promise API <promiseAPI>` and parsers/yacc.c.
 
 
-Perl/Pod parser combination
+Pod/Perl parser combination
 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 
 Pod (Plain Old Documentation) is a language for documentation.  Not

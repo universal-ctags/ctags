@@ -15,7 +15,7 @@
 
 #include <string.h>
 
-#include "meta-cpreprocessor.h"
+#include "cpreprocessor.h"
 #include "debug.h"
 #include "keyword.h"
 #include "parse.h"

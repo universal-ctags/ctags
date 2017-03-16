@@ -1457,7 +1457,7 @@ static void initializeParserOne (langType lang)
 	if (parser->initialize != NULL)
 		parser->initialize (lang);
 
-	initializeSubparsers (parser);
+	initializeDependencies (parser);
 
 	Assert (parser->fileKind != KIND_NULL);
 	Assert (!doesParserUseKind (parser, parser->fileKind->letter));
@@ -1488,7 +1488,7 @@ static void linkDependenciesAtInitializeParsing (parserDefinition *const parser)
 		upper = getNamedLanguage (d->upperParser, 0);
 		upperParserDef = LanguageTable [upper];
 
-		linkDependencyAtInitializeParsing (d->type, upperParserDef, parser);
+		linkDependencyAtInitializeParsing (d->type, upperParserDef, parser, d->data);
 	}
 }
 
@@ -1544,7 +1544,7 @@ extern void freeParserResources (void)
 		if (lang->finalize)
 			(lang->finalize)((langType)i, (bool)lang->initialized);
 
-		finalizeSubparsers (lang);
+		finalizeDependencies (lang);
 
 		if (lang->fileKind != &defaultFileKind)
 		{
@@ -2224,21 +2224,23 @@ static bool createTagsWithFallback1 (const langType language)
 	int lastPromise = getLastPromise ();
 	unsigned int passCount = 0;
 	rescanReason whyRescan;
+	parserDefinition *parser;
 
 	initializeParser (language);
-	if (LanguageTable [language]->useCork)
+	parser = LanguageTable [language];
+	if (parser->useCork)
 		corkTagFile();
 
 	addParserPseudoTags (language);
 	tagFilePosition (&tagfpos);
 
-	anonResetMaybe (LanguageTable [language]);
+	anonResetMaybe (parser);
 
 	while ( ( whyRescan =
 		  createTagsForFile (language, ++passCount) )
 		!= RESCAN_NONE)
 	{
-		if (LanguageTable [language]->useCork)
+		if (parser->useCork)
 		{
 			uncorkTagFile();
 			corkTagFile();
@@ -2267,7 +2269,7 @@ static bool createTagsWithFallback1 (const langType language)
 		while (readLineFromInputFile () != NULL)
 			; /* Do nothing */
 
-	if (LanguageTable [language]->useCork)
+	if (parser->useCork)
 		uncorkTagFile();
 
 	return tagFileResized;
@@ -2282,9 +2284,9 @@ extern bool runParserInNarrowedInputStream (const langType language,
 
 	verbose ("runParserInNarrowedInputStream: %s; "
 			 "file: %s, "
-			 "start(line: %lu, offset: %lu, srcline: %lu)"
+			 "start(line: %lu, offset: %ld, srcline: %lu)"
 			 " - "
-			 "end(line: %lu, offset: %lu)\n",
+			 "end(line: %lu, offset: %ld)\n",
 			 getLanguageName (language),
 			 getInputFileName (),
 			 startLine, startCharOffset, sourceLineOffset,

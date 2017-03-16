@@ -27,4 +27,7 @@ typedef struct sParserDefinition parserDefinition;
 struct _MIO;
 typedef const char * (*selectLanguage) (struct _MIO *, langType *, unsigned int);
 
+struct sSlaveParser;
+typedef struct sSlaveParser slaveParser;
+
 #endif	/* CTAGS_MAIN_TYPES_H */

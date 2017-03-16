@@ -18,7 +18,7 @@
 #include "debug.h"
 #include "entry.h"
 #include "htable.h"
-#include "meta-cpreprocessor.h"
+#include "cpreprocessor.h"
 #include "kind.h"
 #include "options.h"
 #include "read.h"

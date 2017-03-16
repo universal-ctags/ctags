@@ -223,6 +223,9 @@ the input character by character can obtain the current offset by calling
 Internal design
 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 
+.. figure:: promise.svg
+	    :scale: 80%
+
 A host parser cannot run a guest parser directly. What the host parser
 can do is just asking the ctags main part scheduling of running the
 guest parser for specified area which defined with the `start` and

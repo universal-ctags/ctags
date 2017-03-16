@@ -111,10 +111,10 @@ PARSER_HEADS = \
 	parsers/cxx/cxx_token.h \
 	parsers/cxx/cxx_token_chain.h \
 	\
-	parsers/meta-iniconf.h \
-	parsers/meta-m4.h \
-	parsers/meta-make.h \
-	parsers/meta-cpreprocessor.h \
+	parsers/iniconf.h \
+	parsers/m4.h \
+	parsers/make.h \
+	parsers/cpreprocessor.h \
 	\
 	$(NULL)
 
