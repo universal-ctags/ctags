@@ -37,6 +37,8 @@ To build on OSX, see `docs/osx.rst` for more information.
 Man page (ctags.1) is generated only in Autotools based building process.
 In addition rst2man command is needed.
 
+rst2man is part of the python-docutils package on Ubuntu.
+
 ## Difference ##
 
 You may be interested in how universal-ctags is different from
