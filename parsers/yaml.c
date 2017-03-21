@@ -155,7 +155,7 @@ static roleDesc YamlAnchorRoles [] = {
 };
 
 static kindOption YamlKinds [] = {
-	{ true,  'a', "anchor", "anchros",
+	{ true,  'a', "anchor", "anchors",
 	  .referenceOnly = false, ATTACH_ROLES(YamlAnchorRoles) },
 };
 
