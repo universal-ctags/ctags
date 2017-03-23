@@ -3,16 +3,13 @@
 Running multiple parsers on an input file
 ---------------------------------------------------------------------
 
-Universal-ctags provides parser developers ways to run multiple
-parsers for an input file.
+Universal-ctags provides parser developers ways(guest/host and
+sub/base) to run multiple parsers for an input file.
 
-This subsection explains some examples of running multiple parsers.
-An example includes cases people wants to run multiple parsers on an
-input file, parser APIs used in the implementation.
+This section shows concepts behind the running multiple parsers,
+real examples, and APIs.
 
-There are two ways to combine parsers: guest/host and sub/base.
-
-.. _host-guest-parsres:
+.. _host-guest-parsers:
 
 Applying a parser to specified areas of input file (guest/host)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -21,6 +18,7 @@ guest/host combination considers the case that an input file has areas
 written in languages different from the language for the input file.
 
 *host parser* parses the input file and detects the areas.
+*host parser* schedules *guest parsers* parsing the areas.
 *guest parsers* parses the areas.
 
 guest parsers are run only when `--extras=+g` is given.  If
@@ -49,15 +47,15 @@ JavaScript parsers on the area with promise API.
 Here HTML parser is a host parser. CSS and JavaScript parsers
 are guest parsers.
 
-See parsers/html.c.
+See :ref:`The new HTML parser <html>` and parsers/html.c.
 
 
 C/Yacc parser combination
 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 
-Similar case is found in YACC input. A yacc file has some areas
-written in C. Universal-ctags has both YACC and C parsers. You
-may want to run C parser for the areas from YACC parser.
+A yacc file has some areas written in C. Universal-ctags has both YACC
+and C parsers. You may want to run C parser for the areas from YACC
+parser.
 
 Here YACC parser is a host parser. C parser is a guest parser.
 See :ref:`promise API <promiseAPI>` and parsers/yacc.c.
@@ -66,17 +64,18 @@ See :ref:`promise API <promiseAPI>` and parsers/yacc.c.
 Pod/Perl parser combination
 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 
-Pod (Plain Old Documentation) is a language for documentation.  Not
-only the language can be used in stand alone file but also it can be
-used inside a perl script.
+Pod (Plain Old Documentation) is a language for documentation.  The language
+can be used not only in a stand alone file but also it can be
+used inside a Perl script.
 
 Universal-ctags has both parsers for Perl and Pod.
-The perl parser recognizes the area where Pod document is
-embedded and runs Pod parser as a guest parser on the area.
+The Perl parser recognizes the area where Pod document is
+embedded in a Perl script and schedules applying pod parser
+as a guest parser on the area.
 
 
 API for running a parser in an area
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+......................................................................
 
 :ref:`promise API <promiseAPI>` can be used.
 A host parser using the interface has responsibility to detect areas
