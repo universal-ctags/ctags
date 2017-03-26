@@ -16,6 +16,7 @@
 #include "dependency.h"
 #include "options.h"
 #include "parse.h"
+#include "read.h"
 #include "subparser.h"
 
 #include <string.h>
@@ -97,8 +98,12 @@ extern void initializeDependencies (parserDefinition *parser,
 				(((subparser *)sp->data)->direction & SUBPARSER_BASE_RUNS_SUB)))
 		{
 			initializeParser (sp->id);
-			if (sp->type == DEPTYPE_SUBPARSER)
-				attachSubparser (cb, sp->data);
+			if (sp->type == DEPTYPE_SUBPARSER
+				&& isXtagEnabled (XTAG_TAGS_GENERATED_BY_SUBPARSER))
+			{
+				subparser *subparser = sp->data;
+				attachSubparser (cb, subparser);
+			}
 		}
 		sp = sp->next;
 	}
@@ -229,4 +234,24 @@ extern subparser* teardownSubparsersInUse (struct slaveControlBlock *controlBloc
 	}
 
 	return s;
+}
+
+
+static int subparserDepth;
+
+extern void enterSubparser(subparser *subparser)
+{
+	subparserDepth++;
+	pushLanguage (getSubparserLanguage (subparser));
+}
+
+extern void leaveSubparser(void)
+{
+	popLanguage ();
+	subparserDepth--;
+}
+
+extern bool doesSubparserRun (void)
+{
+	return subparserDepth;
 }
