@@ -40,9 +40,6 @@ extern const char *renderRole (const roleDesc* const role, vString* b);
 
 #define KIND_FILE_ALT '!'
 
-#define KIND_GENERIC_REFERENCE '@'
-#define KIND_GENERIC_REFERENCE_DEFAULT_LONG "reference"
-
 #define KIND_WILDCARD '*'
 
 typedef struct sScopeSeparator {
