@@ -634,7 +634,7 @@ extern int main (int argc CTAGS_ATTR_UNUSED, char **argv)
 	setExecutableName (*argv++);
 	sanitizeEnviron ();
 	checkRegex ();
-	initFieldDescs ();
+	initFieldObjects ();
 	initXtagObjects ();
 
 	args = cArgNewFromArgv (argv);

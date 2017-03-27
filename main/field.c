@@ -26,14 +26,14 @@
 #include "routines.h"
 
 
-typedef struct sFieldDesc {
+typedef struct sFieldObject {
 	fieldDefinition *spec;
 	unsigned int fixed:   1;   /* fields which cannot be disabled. */
 	vString     *buffer;
 	const char* nameWithPrefix;
 	langType language;
 	fieldType sibling;
-} fieldDesc;
+} fieldObject;
 
 static const char *renderFieldName (const tagEntryInfo *const tag, const char *value, vString* b, bool *rejected);
 static const char *renderFieldNameNoEscape (const tagEntryInfo *const tag, const char *value CTAGS_ATTR_UNUSED, vString* b,
@@ -221,28 +221,28 @@ static fieldDefinition fieldDefinitionsUniversal [] = {
 };
 
 
-static unsigned int       fieldDescUsed = 0;
-static unsigned int       fieldDescAllocated = 0;
-static fieldDesc* fieldDescs = NULL;
+static unsigned int       fieldObjectUsed = 0;
+static unsigned int       fieldObjectAllocated = 0;
+static fieldObject* fieldObjects = NULL;
 
-extern void initFieldDescs (void)
+extern void initFieldObjects (void)
 {
 	int i;
-	fieldDesc *fdesc;
+	fieldObject *fdesc;
 
-	Assert (fieldDescs == NULL);
+	Assert (fieldObjects == NULL);
 
-	fieldDescAllocated
+	fieldObjectAllocated
 	  = ARRAY_SIZE (fieldDefinitionsFixed)
 	  + ARRAY_SIZE (fieldDefinitionsExuberant)
 	  + ARRAY_SIZE (fieldDefinitionsUniversal);
-	fieldDescs = xMalloc (fieldDescAllocated, fieldDesc);
+	fieldObjects = xMalloc (fieldObjectAllocated, fieldObject);
 
-	fieldDescUsed = 0;
+	fieldObjectUsed = 0;
 
 	for (i = 0; i < ARRAY_SIZE (fieldDefinitionsFixed); i++)
 	{
-		fdesc = fieldDescs + i + fieldDescUsed;
+		fdesc = fieldObjects + i + fieldObjectUsed;
 		fdesc->spec   = fieldDefinitionsFixed + i;
 		fdesc->fixed  = 1;
 		fdesc->buffer = NULL;
@@ -250,11 +250,11 @@ extern void initFieldDescs (void)
 		fdesc->language = LANG_IGNORE;
 		fdesc->sibling  = FIELD_UNKNOWN;
 	}
-	fieldDescUsed += ARRAY_SIZE (fieldDefinitionsFixed);
+	fieldObjectUsed += ARRAY_SIZE (fieldDefinitionsFixed);
 
 	for (i = 0; i < ARRAY_SIZE (fieldDefinitionsExuberant); i++)
 	{
-		fdesc = fieldDescs + i + fieldDescUsed;
+		fdesc = fieldObjects + i + fieldObjectUsed;
 		fdesc->spec = fieldDefinitionsExuberant +i;
 		fdesc->fixed = 0;
 		fdesc->buffer = NULL;
@@ -262,13 +262,13 @@ extern void initFieldDescs (void)
 		fdesc->language = LANG_IGNORE;
 		fdesc->sibling  = FIELD_UNKNOWN;
 	}
-	fieldDescUsed += ARRAY_SIZE (fieldDefinitionsExuberant);
+	fieldObjectUsed += ARRAY_SIZE (fieldDefinitionsExuberant);
 
 	for (i = 0; i < ARRAY_SIZE (fieldDefinitionsUniversal); i++)
 	{
 		char *nameWithPrefix;
 
-		fdesc = fieldDescs + i + fieldDescUsed;
+		fdesc = fieldObjects + i + fieldObjectUsed;
 		fdesc->spec = fieldDefinitionsUniversal + i;
 		fdesc->fixed = 0;
 		fdesc->buffer = NULL;
@@ -286,24 +286,24 @@ extern void initFieldDescs (void)
 		fdesc->language = LANG_IGNORE;
 		fdesc->sibling  = FIELD_UNKNOWN;
 	}
-	fieldDescUsed += ARRAY_SIZE (fieldDefinitionsUniversal);
+	fieldObjectUsed += ARRAY_SIZE (fieldDefinitionsUniversal);
 
-	Assert ( fieldDescAllocated == fieldDescUsed );
+	Assert ( fieldObjectAllocated == fieldObjectUsed );
 }
 
-static fieldDesc* getFieldDesc(fieldType type)
+static fieldObject* getFieldObject(fieldType type)
 {
-	Assert ((0 <= type) && (type < fieldDescUsed));
-	return fieldDescs + type;
+	Assert ((0 <= type) && (type < fieldObjectUsed));
+	return fieldObjects + type;
 }
 
 extern fieldType getFieldTypeForOption (char letter)
 {
 	unsigned int i;
 
-	for (i = 0; i < fieldDescUsed; i++)
+	for (i = 0; i < fieldObjectUsed; i++)
 	{
-		if (fieldDescs [i].spec->letter == letter)
+		if (fieldObjects [i].spec->letter == letter)
 			return i;
 	}
 	return FIELD_UNKNOWN;
@@ -330,12 +330,12 @@ extern fieldType getFieldTypeForNameAndLanguage (const char *fieldName, langType
 	else if (language != LANG_IGNORE && (initialized == false))
 		initializeParser (language);
 
-	for (i = 0; i < fieldDescUsed; i++)
+	for (i = 0; i < fieldObjectUsed; i++)
 	{
-		if (fieldDescs [i].spec->name
-		    && strcmp (fieldDescs [i].spec->name, fieldName) == 0
+		if (fieldObjects [i].spec->name
+		    && strcmp (fieldObjects [i].spec->name, fieldName) == 0
 		    && ((language == LANG_AUTO)
-			|| (fieldDescs [i].language == language)))
+			|| (fieldObjects [i].language == language)))
 			return i;
 	}
 
@@ -344,9 +344,9 @@ extern fieldType getFieldTypeForNameAndLanguage (const char *fieldName, langType
 
 extern const char* getFieldName(fieldType type)
 {
-	fieldDesc* fdesc;
+	fieldObject* fdesc;
 
-	fdesc = getFieldDesc (type);
+	fdesc = getFieldObject (type);
 	if (Option.putFieldPrefix)
 		return fdesc->nameWithPrefix;
 	else
@@ -355,8 +355,8 @@ extern const char* getFieldName(fieldType type)
 
 extern bool doesFieldHaveValue (fieldType type, const tagEntryInfo *tag)
 {
-	if (getFieldDesc(type)->spec->isValueAvailable)
-		return getFieldDesc(type)->spec->isValueAvailable(tag);
+	if (getFieldObject(type)->spec->isValueAvailable)
+		return getFieldObject(type)->spec->isValueAvailable(tag);
 	else
 		return true;
 }
@@ -390,7 +390,7 @@ extern bool doesFieldHaveValue (fieldType type, const tagEntryInfo *tag)
 
 static void printField (fieldType i)
 {
-	unsigned char letter = fieldDescs[i].spec->letter;
+	unsigned char letter = fieldObjects[i].spec->letter;
 	const char *name;
 	const char *language;
 	char  typefields [] = "---";
@@ -398,15 +398,15 @@ static void printField (fieldType i)
 	if (letter == NUL_FIELD_LETTER)
 		letter = '-';
 
-	if (! fieldDescs[i].spec->name)
+	if (! fieldObjects[i].spec->name)
 		name = "NONE";
 	else
 		name = getFieldName (i);
 
-	if (fieldDescs[i].language == LANG_IGNORE)
+	if (fieldObjects[i].language == LANG_IGNORE)
 		language = "NONE";
 	else
-		language = getLanguageName (fieldDescs[i].language);
+		language = getLanguageName (fieldObjects[i].language);
 
 	{
 		unsigned int bmask, offset;
@@ -423,9 +423,9 @@ static void printField (fieldType i)
 	       name,
 	       isFieldEnabled (i)? "on": "off",
 	       language,
-	       getFieldDesc (i)->spec->renderEscaped? "TRUE": "FALSE",
+	       getFieldObject (i)->spec->renderEscaped? "TRUE": "FALSE",
 		   typefields,
-	       fieldDescs[i].spec->description? fieldDescs[i].spec->description: "NONE");
+	       fieldObjects[i].spec->description? fieldObjects[i].spec->description: "NONE");
 }
 
 extern void printFields (int language)
@@ -436,7 +436,7 @@ extern void printFields (int language)
 		printf ((Option.machinable? "%s\t%s\t%s\t%s\t%s\t%s\t%s\n": MAKE_FIELD_FMT(s)),
 			"#LETTER", "NAME", "ENABLED", "LANGUAGE", "XFMT", "JSTYPE", "DESCRIPTION");
 
-	for (i = 0; i < fieldDescUsed; i++)
+	for (i = 0; i < fieldObjectUsed; i++)
 	{
 		if (language == LANG_AUTO || getFieldOwner (i) == language)
 			printField (i);
@@ -582,7 +582,7 @@ extern const char* renderFieldEscaped (writerType writer,
 				       int index,
 					   bool *rejected)
 {
-	fieldDesc *fdesc = fieldDescs + type;
+	fieldObject *fdesc = fieldObjects + type;
 	const char *value;
 	renderEscaped rfn;
 	bool stub;
@@ -929,17 +929,17 @@ static bool     isEndFieldAvailable       (const tagEntryInfo *const tag)
 
 extern bool isFieldEnabled (fieldType type)
 {
-	return getFieldDesc(type)->spec->enabled;
+	return getFieldObject(type)->spec->enabled;
 }
 
 static bool isFieldFixed (fieldType type)
 {
-	return getFieldDesc(type)->fixed? true: false;
+	return getFieldObject(type)->fixed? true: false;
 }
 
 extern bool enableField (fieldType type, bool state, bool warnIfFixedField)
 {
-	fieldDefinition *spec = getFieldDesc(type)->spec;
+	fieldDefinition *spec = getFieldObject(type)->spec;
 	bool old = spec->enabled;
 	if (isFieldFixed (type))
 	{
@@ -953,22 +953,22 @@ extern bool enableField (fieldType type, bool state, bool warnIfFixedField)
 				      spec->name);
 			else if (spec->letter != NUL_FIELD_LETTER)
 				error(WARNING, "Cannot disable fixed field: '%c'",
-				      getFieldDesc(type)->spec->letter);
+				      getFieldObject(type)->spec->letter);
 			else
 				AssertNotReached();
 		}
 	}
 	else
 	{
-		getFieldDesc(type)->spec->enabled = state;
+		getFieldObject(type)->spec->enabled = state;
 
 		if (isCommonField (type))
 			verbose ("enable field \"%s\": %s\n",
-				 getFieldDesc(type)->spec->name,
+				 getFieldObject(type)->spec->name,
 				 (state? "TRUE": "FALSE"));
 		else
 			verbose ("enable field \"%s\"<%s>: %s\n",
-				 getFieldDesc(type)->spec->name,
+				 getFieldObject(type)->spec->name,
 				 getLanguageName (getFieldOwner(type)),
 				 (state? "TRUE": "FALSE"));
 	}
@@ -982,40 +982,40 @@ extern bool isCommonField (fieldType type)
 
 extern int     getFieldOwner (fieldType type)
 {
-	return getFieldDesc(type)->language;
+	return getFieldObject(type)->language;
 }
 
 extern unsigned int getFieldDataType (fieldType type)
 {
-	return getFieldDesc(type)->spec->dataType;
+	return getFieldObject(type)->spec->dataType;
 }
 
 extern bool isFieldRenderable (fieldType type)
 {
-	return getFieldDesc(type)->spec->renderEscaped? true: false;
+	return getFieldObject(type)->spec->renderEscaped? true: false;
 }
 
 extern int countFields (void)
 {
-	return fieldDescUsed;
+	return fieldObjectUsed;
 }
 
 extern fieldType nextSiblingField (fieldType type)
 {
-	fieldDesc *fdesc;
+	fieldObject *fdesc;
 
-	fdesc = fieldDescs + type;
+	fdesc = fieldObjects + type;
 	return fdesc->sibling;
 }
 
 static void updateSiblingField (fieldType type, const char* name)
 {
 	int i;
-	fieldDesc *fdesc;
+	fieldObject *fdesc;
 
 	for (i = type; i > 0; i--)
 	{
-		fdesc = fieldDescs + i - 1;
+		fdesc = fieldObjects + i - 1;
 		if (fdesc->spec->name && (strcmp (fdesc->spec->name, name) == 0))
 		{
 			Assert (fdesc->sibling == FIELD_UNKNOWN);
@@ -1035,7 +1035,7 @@ static const char* defaultRenderer (const tagEntryInfo *const tag,
 
 extern int defineField (fieldDefinition *spec, langType language)
 {
-	fieldDesc *fdesc;
+	fieldObject *fdesc;
 	char *nameWithPrefix;
 	size_t i;
 
@@ -1047,13 +1047,13 @@ extern int defineField (fieldDefinition *spec, langType language)
 	}
 	spec->letter = NUL_FIELD_LETTER;
 
-	if (fieldDescUsed == fieldDescAllocated)
+	if (fieldObjectUsed == fieldObjectAllocated)
 	{
-		fieldDescAllocated *= 2;
-		fieldDescs = xRealloc (fieldDescs, fieldDescAllocated, fieldDesc);
+		fieldObjectAllocated *= 2;
+		fieldObjects = xRealloc (fieldObjects, fieldObjectAllocated, fieldObject);
 	}
-	fdesc = fieldDescs + (fieldDescUsed);
-	spec->ftype = fieldDescUsed++;
+	fdesc = fieldObjects + (fieldObjectUsed);
+	spec->ftype = fieldObjectUsed++;
 
 	if (spec->renderEscaped [WRITER_DEFAULT] == NULL)
 		spec->renderEscaped [WRITER_DEFAULT] = defaultRenderer;
