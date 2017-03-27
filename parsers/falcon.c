@@ -1,23 +1,23 @@
 /*
  * Copyright (c) 2011, 2012 Steven Oliver <oliver.steven@gmail.com>
- * 
+ *
  * This source code is released for free distribution under the terms of the
  * GNU General Public License version 2 or (at your option) any later version.
- * 
+ *
  * This module contains functions for generating tags for Falcon language
  * files.
  */
 
 
-/* 
- * INCLUDE FILES 
+/*
+ * INCLUDE FILES
  */
 #include "general.h"
 
 #include <string.h>
-#include <ctype.h>   
+#include <ctype.h>
 
-#include "read.h"  
+#include "read.h"
 #include "routines.h"
 
 /*
@@ -39,7 +39,7 @@ static kindDefinition FalconKinds [] = {
     {true, 'i', "namespace", "imports"}
 };
 
-/* 
+/*
  * Function Definitions
  */
 
@@ -52,7 +52,7 @@ static const unsigned char *skipSpace (const unsigned char *cp)
 {
     while (isspace ((int) *cp))
         ++cp;
-        
+
     return cp;
 }
 
@@ -78,7 +78,7 @@ static void findFalconTags (void)
         {
             cp += 8;
             cp = skipSpace (cp);
-            
+
             while (isIdentifierChar ((int) *cp))
             {
                 vStringPut (name, (int) *cp);
@@ -91,7 +91,7 @@ static void findFalconTags (void)
         {
             cp += 5;
             cp = skipSpace (cp);
-            
+
             while (isIdentifierChar ((int) *cp))
             {
                 vStringPut (name, (int) *cp);
@@ -104,7 +104,7 @@ static void findFalconTags (void)
         {
             cp += 4;
             cp = skipSpace (cp);
-            
+
             while (isIdentifierChar ((int) *cp))
             {
                 vStringPut (name, (int) *cp);
@@ -117,7 +117,7 @@ static void findFalconTags (void)
         {
             cp += 12;
             cp = skipSpace (cp);
-            
+
             while (isIdentifierChar ((int) *cp))
             {
                 vStringPut (name, (int) *cp);
@@ -130,7 +130,7 @@ static void findFalconTags (void)
     vStringDelete (name);
 }
 
-/* 
+/*
  * Parser definition structure
  */
 extern parserDefinition* FalconParser (void)
