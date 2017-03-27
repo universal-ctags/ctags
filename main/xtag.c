@@ -21,17 +21,17 @@
 #include <ctype.h>
 
 typedef struct sXtagDesc {
-	xtagSpec *spec;
+	xtagDefinition *spec;
 	langType language;
 	xtagType sibling;
 } xtagDesc;
 
-static bool isPseudoTagsEnabled (xtagSpec *pspec CTAGS_ATTR_UNUSED)
+static bool isPseudoTagsEnabled (xtagDefinition *pspec CTAGS_ATTR_UNUSED)
 {
 	return ! isDestinationStdout ();
 }
 
-static xtagSpec xtagSpecs [] = {
+static xtagDefinition xtagDefinitions [] = {
 	{ true, 'F',  "fileScope",
 	  "Include tags of file scope" },
 	{ false, 'f', "inputFile",
@@ -57,7 +57,7 @@ static xtagDesc* getXtagDesc (xtagType type)
 	return (xtagDescs + type);
 }
 
-extern xtagSpec* getXtagSpec (xtagType type)
+extern xtagDefinition* getXtagDefinition (xtagType type)
 {
 	Assert ((0 <= type) && (type < xtagDescUsed));
 
@@ -136,7 +136,7 @@ extern xtagType  getXtagTypeForNameAndLanguage (const char *name, langType langu
 
 static void printXtag (xtagType i)
 {
-	unsigned char letter = getXtagSpec (i)->letter;
+	unsigned char letter = getXtagDefinition (i)->letter;
 	langType lang;
 	const char *language;
 	const char *desc;
@@ -152,14 +152,14 @@ static void printXtag (xtagType i)
 	else
 		language = getLanguageName (lang);
 
-	desc = getXtagSpec (i)->description;
+	desc = getXtagDefinition (i)->description;
 	if (!desc)
 		desc = "NONE";
 
 	printf((Option.machinable? "%c\t%s\t%s\t%s\t%s\n": MAKE_XTAG_FMT(c)),
 	       letter,
 		   getXtagName (i),
-	       getXtagSpec (i)->enabled? "TRUE": "FALSE",
+	       getXtagDefinition (i)->enabled? "TRUE": "FALSE",
 		   language,
 	       desc);
 }
@@ -182,7 +182,7 @@ extern void printXtags (int language)
 
 extern bool isXtagEnabled (xtagType type)
 {
-	xtagSpec* spec = getXtagSpec (type);
+	xtagDefinition* spec = getXtagDefinition (type);
 
 	Assert (spec);
 
@@ -195,7 +195,7 @@ extern bool isXtagEnabled (xtagType type)
 extern bool enableXtag (xtagType type, bool state)
 {
 	bool old;
-	xtagSpec* spec = getXtagSpec (type);
+	xtagDefinition* spec = getXtagDefinition (type);
 
 	Assert (spec);
 
@@ -218,7 +218,7 @@ extern int     getXtagOwner (xtagType type)
 
 const char* getXtagName (xtagType type)
 {
-	xtagSpec* spec = getXtagSpec (type);
+	xtagDefinition* spec = getXtagDefinition (type);
 	if (spec)
 		return spec->name;
 	else
@@ -229,13 +229,13 @@ extern void initXtagDescs (void)
 {
 	xtagDesc *xdesc;
 
-	xtagDescAllocated = ARRAY_SIZE (xtagSpecs);
+	xtagDescAllocated = ARRAY_SIZE (xtagDefinitions);
 	xtagDescs = xMalloc (xtagDescAllocated, xtagDesc);
 
-	for (int i = 0; i < ARRAY_SIZE (xtagSpecs); i++)
+	for (int i = 0; i < ARRAY_SIZE (xtagDefinitions); i++)
 	{
 		xdesc = xtagDescs + i;
-		xdesc->spec = xtagSpecs + i;
+		xdesc->spec = xtagDefinitions + i;
 		xdesc->language = LANG_IGNORE;
 		xdesc->sibling = XTAG_UNKNOWN;
 		xtagDescUsed++;
@@ -264,7 +264,7 @@ static void updateSiblingXtag (xtagType type, const char* name)
 	}
 }
 
-extern int defineXtag (xtagSpec *spec, langType language)
+extern int defineXtag (xtagDefinition *spec, langType language)
 {
 	xtagDesc *xdesc;
 	size_t i;

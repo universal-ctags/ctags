@@ -34,7 +34,7 @@ typedef enum {
 	X_WHITESPACE_SWAPPED,
 } robotXtag;
 
-static xtagSpec RobotXtags [] = {
+static xtagDefinition RobotXtags [] = {
 	{
 		.enabled = true,
 		.name = "whitespaceSwapped",
@@ -138,7 +138,7 @@ extern parserDefinition* RobotParser (void)
 	def->extensions = extensions;
 	def->initialize = initialize;
     def->parser     = findRobotTags;
-	def->xtagSpecs = RobotXtags;
-	def->xtagSpecCount = ARRAY_SIZE (RobotXtags);
+	def->xtagDefinitions = RobotXtags;
+	def->xtagDefinitionCount = ARRAY_SIZE (RobotXtags);
 	return def;
 }
