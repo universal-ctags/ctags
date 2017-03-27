@@ -1177,43 +1177,43 @@ static bool includeTag (const tagType type, const bool isFileScope)
 {
 	bool result;
 	int k;
-	kindDefinition* kopt = NULL;
+	kindDefinition* kdef = NULL;
 
 	if (isFileScope  &&  ! isXtagEnabled(XTAG_FILE_SCOPE))
 		result = false;
 	else if (isInputLanguage (Lang_csharp))
 	{
 		k = csharpTagKindNoAssert (type);
-		kopt = CsharpKinds;
+		kdef = CsharpKinds;
 	}
 	else if (isInputLanguage (Lang_java))
 	{
 		k = javaTagKindNoAssert (type);
-		kopt = JavaKinds;
+		kdef = JavaKinds;
 	}
 	else if (isInputLanguage (Lang_d))
 	{
 		k = dTagKindNoAssert (type);
-		kopt = DKinds;
+		kdef = DKinds;
 	}
 	else if (isInputLanguage (Lang_vera))
 	{
 		k = veraTagKindNoAssert (type);
-		kopt = VeraKinds;
+		kdef = VeraKinds;
 	}
 	else
 	{
 		k = cTagKindNoAssert (type);
-		kopt = CKinds;
+		kdef = CKinds;
 	}
 
-	if (kopt)
+	if (kdef)
 	{
 		Assert (k >= COMMONK_UNDEFINED);
 		if (k == COMMONK_UNDEFINED)
 			result = false;
 		else
-			result = kopt [k].enabled;
+			result = kdef [k].enabled;
 	}
 
 	return result;

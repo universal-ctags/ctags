@@ -1705,17 +1705,17 @@ static kindDefinition *langKindLongOption (const langType language, const char *
 
 extern bool isLanguageKindEnabled (const langType language, char kind)
 {
-	const kindDefinition *kindOpt;
+	const kindDefinition *kindDef;
 
 	if (hasRegexKind (language, kind))
 		return isRegexKindEnabled (language, kind);
 	else if (hasXcmdKind (language, kind))
 		return isXcmdKindEnabled (language, kind);
 
-	kindOpt = langKindDefinition (language, kind);
-	Assert (kindOpt);
+	kindDef = langKindDefinition (language, kind);
+	Assert (kindDef);
 
-	return kindOpt->enabled;
+	return kindDef->enabled;
 }
 
 
@@ -1738,10 +1738,10 @@ static bool enableLanguageKind (
 		const langType language, const int kind, const bool mode)
 {
 	bool result = false;
-	kindDefinition* const opt = langKindDefinition (language, kind);
-	if (opt != NULL)
+	kindDefinition* const def = langKindDefinition (language, kind);
+	if (def != NULL)
 	{
-		enableKind (opt, mode);
+		enableKind (def, mode);
 		result = true;
 	}
 	result = enableRegexKind (language, kind, mode)? true: result;
@@ -1753,10 +1753,10 @@ static bool enableLanguageKindLong (
 	const langType language, const char * const kindLong, const bool mode)
 {
 	bool result = false;
-	kindDefinition* const opt = langKindLongOption (language, kindLong);
-	if (opt != NULL)
+	kindDefinition* const def = langKindLongOption (language, kindLong);
+	if (def != NULL)
 	{
-		enableKind (opt, mode);
+		enableKind (def, mode);
 		result = true;
 	}
 	result = enableRegexKindLong (language, kindLong, mode)? true: result;
