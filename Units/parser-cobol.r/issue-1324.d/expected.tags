@@ -1,0 +1,25 @@
+CONFIGURATION	input.cbl	/^       CONFIGURATION SECTION.$/;"	s
+SPECIAL-NAMES	input.cbl	/^       SPECIAL-NAMES.$/;"	p
+WORKING-STORAGE	input.cbl	/^       WORKING-STORAGE SECTION.$/;"	s
+WS-ABBRUCH-TYP	input.cbl	/^       01  WS-ABBRUCH-TYP          PIC 99.$/;"	d
+WS-ABBRUCH-EVENT	input.cbl	/^           88  WS-ABBRUCH-EVENT    VALUE 91.$/;"	d
+F-TEXT	input.cbl	/^       01  F-TEXT.$/;"	g
+F-TEXT-DB	input.cbl	/^           05 F-TEXT-DB            PIC X(5).$/;"	d
+FILLER	input.cbl	/^           05 FILLER               PIC X VALUE SPACE.$/;"	d
+F-TEXT-KEY1	input.cbl	/^           05 F-TEXT-KEY1          PIC 9(8).$/;"	d
+FILLER	input.cbl	/^           05 FILLER               PIC X VALUE '\/'.$/;"	d
+F-TEXT-KEY2	input.cbl	/^           05 F-TEXT-KEY2          PIC 9(8).$/;"	d
+FILLER	input.cbl	/^           05 FILLER               PIC X VALUE '\/'.$/;"	d
+F-TEXT-KEY3	input.cbl	/^           05 F-TEXT-KEY3          PIC 99.$/;"	d
+FILLER	input.cbl	/^           05 FILLER               PIC X(7) VALUE ' EVENT:'.$/;"	d
+F-TEXT-EVENT	input.cbl	/^           05 F-TEXT-EVENT         PIC X(10).$/;"	d
+LINKAGE	input.cbl	/^       LINKAGE SECTION.$/;"	s
+MAIN	input.cbl	/^       MAIN SECTION.$/;"	s
+MAIN-EX	input.cbl	/^       MAIN-EX. EXIT.$/;"	p
+E01-PRUEFEN	input.cbl	/^       E01-PRUEFEN SECTION.$/;"	s
+M01-VORLAUF	input.cbl	/^       M01-VORLAUF SECTION.$/;"	s
+M01-VORLAUF-EX	input.cbl	/^       M01-VORLAUF-EX.$/;"	p
+M02-NACHLAUF	input.cbl	/^       M02-NACHLAUF SECTION.$/;"	s
+M02-NACHLAUF-EX	input.cbl	/^       M02-NACHLAUF-EX.$/;"	p
+M99-ABBRUCH	input.cbl	/^       M99-ABBRUCH SECTION.$/;"	s
+M99-ABBRUCH-EX	input.cbl	/^       M99-ABBRUCH-EX. EXIT.$/;"	p
