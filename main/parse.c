@@ -63,6 +63,8 @@ typedef struct sParserObject {
 	stringList* currentExtensions; /* current list of extensions */
 	stringList* currentAliases;    /* current list of aliases */
 
+	unsigned int initialized:1;    /* initialize() is called or not */
+
 	unsigned int anonymousIdentiferId; /* managed by anon* functions */
 } parserObject;
 
@@ -1452,12 +1454,12 @@ static void installXtagDefinition (const langType language)
 
 static void initializeParserOne (langType lang)
 {
-	parserDefinition *const parser = LanguageTable [lang].def;
+	parserObject *const parser = LanguageTable + lang;
 
 	if (parser->initialized)
 		return;
 
-	verbose ("Initialize parser: %s\n", parser->name);
+	verbose ("Initialize parser: %s\n", parser->def->name);
 	parser->initialized = true;
 
 	installKeywordTable (lang);
@@ -1467,16 +1469,16 @@ static void initializeParserOne (langType lang)
 	installXtagDefinition      (lang);
 
 	if (hasScopeActionInRegex (lang)
-	    || parser->requestAutomaticFQTag)
-		parser->useCork = true;
+	    || parser->def->requestAutomaticFQTag)
+		parser->def->useCork = true;
 
-	if (parser->initialize != NULL)
-		parser->initialize (lang);
+	if (parser->def->initialize != NULL)
+		parser->def->initialize (lang);
 
-	initializeDependencies (parser);
+	initializeDependencies (parser->def);
 
-	Assert (parser->fileKind != KIND_NULL);
-	Assert (!doesParserUseKind (parser, parser->fileKind->letter));
+	Assert (parser->def->fileKind != KIND_NULL);
+	Assert (!doesParserUseKind (parser->def, parser->def->fileKind->letter));
 }
 
 extern void initializeParser (langType lang)
@@ -1559,7 +1561,7 @@ extern void freeParserResources (void)
 		parserObject* const parser = LanguageTable + i;
 
 		if (parser->def->finalize)
-			(parser->def->finalize)((langType)i, (bool)parser->def->initialized);
+			(parser->def->finalize)((langType)i, (bool)parser->initialized);
 
 		finalizeDependencies (parser->def);
 
