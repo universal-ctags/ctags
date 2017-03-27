@@ -128,10 +128,6 @@ struct sParserDefinition {
 				   this parser is initialized. */
 	subparser   *subparsersDefault;
 	subparser   *subparsersInUse;
-
-	stringList* currentPatterns;   /* current list of file name patterns */
-	stringList* currentExtensions; /* current list of extensions */
-	stringList* currentAliases;    /* current list of aliases */
 };
 
 typedef parserDefinition* (parserDefinitionFunc) (void);
