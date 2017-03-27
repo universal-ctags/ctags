@@ -27,7 +27,7 @@
 
 
 typedef struct sFieldDesc {
-	fieldSpec *spec;
+	fieldDefinition *spec;
 	unsigned int fixed:   1;   /* fields which cannot be disabled. */
 	vString     *buffer;
 	const char* nameWithPrefix;
@@ -91,7 +91,7 @@ static bool     isEndFieldAvailable       (const tagEntryInfo *const tag);
 
 #define WITH_DEFUALT_VALUE(str) ((str)?(str):"-")
 
-static fieldSpec fieldSpecsFixed [] = {
+static fieldDefinition fieldDefinitionsFixed [] = {
         /* FIXED FIELDS */
 	DEFINE_FIELD_SPEC ('N', "name",     true,
 			  "tag name (fixed field)",
@@ -113,7 +113,7 @@ static fieldSpec fieldSpecsFixed [] = {
 			   [WRITER_U_CTAGS] = renderFieldPattern),
 };
 
-static fieldSpec fieldSpecsExuberant [] = {
+static fieldDefinition fieldDefinitionsExuberant [] = {
 	DEFINE_FIELD_SPEC ('C', "compact",        false,
 			   "compact input line (fixed field, only used in -x option)",
 			   FIELDTYPE_STRING,
@@ -181,7 +181,7 @@ static fieldSpec fieldSpecsExuberant [] = {
 			   [WRITER_U_CTAGS] = renderFieldKindName),
 };
 
-static fieldSpec fieldSpecsUniversal [] = {
+static fieldDefinition fieldDefinitionsUniversal [] = {
 	DEFINE_FIELD_SPEC_FULL ('r', "role",    false,
 			   "Role",
 			   isRoleFieldAvailable,
@@ -233,43 +233,43 @@ extern void initFieldDescs (void)
 	Assert (fieldDescs == NULL);
 
 	fieldDescAllocated
-	  = ARRAY_SIZE (fieldSpecsFixed)
-	  + ARRAY_SIZE (fieldSpecsExuberant)
-	  + ARRAY_SIZE (fieldSpecsUniversal);
+	  = ARRAY_SIZE (fieldDefinitionsFixed)
+	  + ARRAY_SIZE (fieldDefinitionsExuberant)
+	  + ARRAY_SIZE (fieldDefinitionsUniversal);
 	fieldDescs = xMalloc (fieldDescAllocated, fieldDesc);
 
 	fieldDescUsed = 0;
 
-	for (i = 0; i < ARRAY_SIZE (fieldSpecsFixed); i++)
+	for (i = 0; i < ARRAY_SIZE (fieldDefinitionsFixed); i++)
 	{
 		fdesc = fieldDescs + i + fieldDescUsed;
-		fdesc->spec   = fieldSpecsFixed + i;
+		fdesc->spec   = fieldDefinitionsFixed + i;
 		fdesc->fixed  = 1;
 		fdesc->buffer = NULL;
 		fdesc->nameWithPrefix = fdesc->spec->name;
 		fdesc->language = LANG_IGNORE;
 		fdesc->sibling  = FIELD_UNKNOWN;
 	}
-	fieldDescUsed += ARRAY_SIZE (fieldSpecsFixed);
+	fieldDescUsed += ARRAY_SIZE (fieldDefinitionsFixed);
 
-	for (i = 0; i < ARRAY_SIZE (fieldSpecsExuberant); i++)
+	for (i = 0; i < ARRAY_SIZE (fieldDefinitionsExuberant); i++)
 	{
 		fdesc = fieldDescs + i + fieldDescUsed;
-		fdesc->spec = fieldSpecsExuberant +i;
+		fdesc->spec = fieldDefinitionsExuberant +i;
 		fdesc->fixed = 0;
 		fdesc->buffer = NULL;
 		fdesc->nameWithPrefix = fdesc->spec->name;
 		fdesc->language = LANG_IGNORE;
 		fdesc->sibling  = FIELD_UNKNOWN;
 	}
-	fieldDescUsed += ARRAY_SIZE (fieldSpecsExuberant);
+	fieldDescUsed += ARRAY_SIZE (fieldDefinitionsExuberant);
 
-	for (i = 0; i < ARRAY_SIZE (fieldSpecsUniversal); i++)
+	for (i = 0; i < ARRAY_SIZE (fieldDefinitionsUniversal); i++)
 	{
 		char *nameWithPrefix;
 
 		fdesc = fieldDescs + i + fieldDescUsed;
-		fdesc->spec = fieldSpecsUniversal + i;
+		fdesc->spec = fieldDefinitionsUniversal + i;
 		fdesc->fixed = 0;
 		fdesc->buffer = NULL;
 
@@ -286,7 +286,7 @@ extern void initFieldDescs (void)
 		fdesc->language = LANG_IGNORE;
 		fdesc->sibling  = FIELD_UNKNOWN;
 	}
-	fieldDescUsed += ARRAY_SIZE (fieldSpecsUniversal);
+	fieldDescUsed += ARRAY_SIZE (fieldDefinitionsUniversal);
 
 	Assert ( fieldDescAllocated == fieldDescUsed );
 }
@@ -939,7 +939,7 @@ static bool isFieldFixed (fieldType type)
 
 extern bool enableField (fieldType type, bool state, bool warnIfFixedField)
 {
-	fieldSpec *spec = getFieldDesc(type)->spec;
+	fieldDefinition *spec = getFieldDesc(type)->spec;
 	bool old = spec->enabled;
 	if (isFieldFixed (type))
 	{
@@ -1033,7 +1033,7 @@ static const char* defaultRenderer (const tagEntryInfo *const tag,
 	return value;
 }
 
-extern int defineField (fieldSpec *spec, langType language)
+extern int defineField (fieldDefinition *spec, langType language)
 {
 	fieldDesc *fdesc;
 	char *nameWithPrefix;

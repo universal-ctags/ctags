@@ -276,7 +276,7 @@ typedef struct _CXXParserState
 	unsigned int uKindOptionCount;
 
 	// The fields associated to the current language
-	fieldSpec * pFieldOptions;
+	fieldDefinition * pFieldOptions;
 	// The number of field options, used mainly for checking/debug purposes
 	unsigned int uFieldOptionCount;
 

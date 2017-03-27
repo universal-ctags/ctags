@@ -1404,21 +1404,21 @@ static bool doesParserUseKind (const parserDefinition *const parser, char letter
 }
 #endif
 
-static void installFieldSpec (const langType language)
+static void installFieldDefinition (const langType language)
 {
 	unsigned int i;
 	parserDefinition * parser;
 
 	Assert (0 <= language  &&  language < (int) LanguageCount);
 	parser = LanguageTable [language];
-	if (parser->fieldSpecCount > PRE_ALLOCATED_PARSER_FIELDS)
+	if (parser->fieldDefinitionCount > PRE_ALLOCATED_PARSER_FIELDS)
 		error (FATAL,
 		       "INTERNAL ERROR: in a parser, fields are defined more than PRE_ALLOCATED_PARSER_FIELDS\n");
 
-	if (parser->fieldSpecs != NULL)
+	if (parser->fieldDefinitions != NULL)
 	{
-		for (i = 0; i < parser->fieldSpecCount; i++)
-			defineField (& parser->fieldSpecs [i], language);
+		for (i = 0; i < parser->fieldDefinitionCount; i++)
+			defineField (& parser->fieldDefinitions [i], language);
 	}
 }
 
@@ -1450,7 +1450,7 @@ static void initializeParserOne (langType lang)
 	installKeywordTable (lang);
 	installTagRegexTable (lang);
 	installTagXpathTable (lang);
-	installFieldSpec     (lang);
+	installFieldDefinition     (lang);
 	installXtagDefinition      (lang);
 
 	if (hasScopeActionInRegex (lang)

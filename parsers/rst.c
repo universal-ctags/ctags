@@ -47,7 +47,7 @@ typedef enum {
 	F_SECTION_MARKER,
 } rstField;
 
-static fieldSpec RstFields [] = {
+static fieldDefinition RstFields [] = {
 	{
 		.name = "sectionMarker",
 		.description = "character used for declaring section",
@@ -269,8 +269,8 @@ extern parserDefinition* RstParser (void)
 	def->extensions = extensions;
 	def->parser = findRstTags;
 
-	def->fieldSpecs = RstFields;
-	def->fieldSpecCount = ARRAY_SIZE (RstFields);
+	def->fieldDefinitions = RstFields;
+	def->fieldDefinitionCount = ARRAY_SIZE (RstFields);
 
 	def->useCork = true;
 

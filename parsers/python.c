@@ -65,7 +65,7 @@ typedef enum {
 	COUNT_FIELD
 } pythonField;
 
-static fieldSpec PythonFields[COUNT_FIELD] = {
+static fieldDefinition PythonFields[COUNT_FIELD] = {
 	{ .name = "decorators",
 	  .description = "decorators on functions and classes",
 	  .enabled = false },
@@ -1360,8 +1360,8 @@ extern parserDefinition* PythonParser (void)
 	def->finalize = finalize;
 	def->keywordTable = PythonKeywordTable;
 	def->keywordCount = ARRAY_SIZE (PythonKeywordTable);
-	def->fieldSpecs = PythonFields;
-	def->fieldSpecCount = ARRAY_SIZE (PythonFields);
+	def->fieldDefinitions = PythonFields;
+	def->fieldDefinitionCount = ARRAY_SIZE (PythonFields);
 	def->useCork = true;
 	def->requestAutomaticFQTag = true;
 	return def;

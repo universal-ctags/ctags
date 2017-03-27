@@ -70,7 +70,7 @@ typedef enum eFieldDataType {
 } fieldDataType;
 
 #define FIELD_LETTER_NO_USE '\0'
-typedef struct sFieldSpec {
+typedef struct sFieldDefinition {
 	/* letter, and ftype are initialized in the main part,
 	   not in a parser. */
 #define NUL_FIELD_LETTER '\0'
@@ -83,7 +83,7 @@ typedef struct sFieldSpec {
 	fieldDataType dataType; /* used in json output */
 
 	unsigned int ftype;	/* Given from the main part */
-} fieldSpec;
+} fieldDefinition;
 
 
 extern fieldType getFieldTypeForOption (char letter);
@@ -122,7 +122,7 @@ extern int countFields (void);
 
 /* language should be typed to langType.
    Use int here to avoid circular dependency */
-extern int defineField (fieldSpec *spec, langType language);
+extern int defineField (fieldDefinition *spec, langType language);
 extern fieldType nextSiblingField (fieldType type);
 
 #endif	/* CTAGS_MAIN_FIELD_H */

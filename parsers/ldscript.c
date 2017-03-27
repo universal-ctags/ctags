@@ -138,7 +138,7 @@ typedef enum {
 	COUNT_FIELD
 } ldScriptFied;
 
-static fieldSpec LdScriptFields[COUNT_FIELD] = {
+static fieldDefinition LdScriptFields[COUNT_FIELD] = {
 	{ .name = "assignment",
 	  .description = "how a value is assigned to the symbol",
 	  .enabled = true },
@@ -737,8 +737,8 @@ extern parserDefinition* LdScriptParser (void)
 	def->keywordTable = LdScriptKeywordTable;
 	def->keywordCount = ARRAY_SIZE (LdScriptKeywordTable);
 	def->initialize = initialize;
-	def->fieldSpecs = LdScriptFields;
-	def->fieldSpecCount = ARRAY_SIZE (LdScriptFields);
+	def->fieldDefinitions = LdScriptFields;
+	def->fieldDefinitionCount = ARRAY_SIZE (LdScriptFields);
 
 	def->useCork    = true;
 

@@ -65,14 +65,14 @@ enum CXXTagCPPField
 };
 
 
-fieldSpec * cxxTagGetCPPFieldSpecifiers(void);
-int cxxTagGetCPPFieldSpecifierCount(void);
+fieldDefinition * cxxTagGetCPPFieldDefinitionifiers(void);
+int cxxTagGetCPPFieldDefinitionifierCount(void);
 
-fieldSpec * cxxTagGetCUDAFieldSpecifiers(void);
-int cxxTagGetCUDAFieldSpecifierCount(void);
+fieldDefinition * cxxTagGetCUDAFieldDefinitionifiers(void);
+int cxxTagGetCUDAFieldDefinitionifierCount(void);
 
-fieldSpec * cxxTagGetCFieldSpecifiers(void);
-int cxxTagGetCFieldSpecifierCount(void);
+fieldDefinition * cxxTagGetCFieldDefinitionifiers(void);
+int cxxTagGetCFieldDefinitionifierCount(void);
 
 bool cxxTagFieldEnabled(unsigned int uField);
 

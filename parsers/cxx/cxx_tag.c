@@ -94,11 +94,11 @@ static const char * g_aCXXAccessStrings [] = {
 		.enabled = false \
 	}
 
-static fieldSpec g_aCXXCFields [] = {
+static fieldDefinition g_aCXXCFields [] = {
 	CXX_COMMON_FIELDS
 };
 
-static fieldSpec g_aCXXCPPFields [] = {
+static fieldDefinition g_aCXXCPPFields [] = {
 	CXX_COMMON_FIELDS,
 	{
 		.name = "template",
@@ -117,7 +117,7 @@ static fieldSpec g_aCXXCPPFields [] = {
 	}
 };
 
-static fieldSpec g_aCXXCUDAFields [] = {
+static fieldDefinition g_aCXXCUDAFields [] = {
 	CXX_COMMON_FIELDS
 };
 
@@ -131,21 +131,21 @@ void cxxTagInitForLanguage(langType eLangType)
 		g_cxx.pKindOptions = g_aCXXCKinds;
 		g_cxx.uKindOptionCount = sizeof(g_aCXXCKinds) / sizeof(kindOption);
 		g_cxx.pFieldOptions = g_aCXXCFields;
-		g_cxx.uFieldOptionCount = sizeof(g_aCXXCFields) / sizeof(fieldSpec);
+		g_cxx.uFieldOptionCount = sizeof(g_aCXXCFields) / sizeof(fieldDefinition);
 	} else if(g_cxx.eLangType == g_cxx.eCPPLangType)
 	{
 		g_cxx.eLanguage = CXXLanguageCPP;
 		g_cxx.pKindOptions = g_aCXXCPPKinds;
 		g_cxx.uKindOptionCount = sizeof(g_aCXXCPPKinds) / sizeof(kindOption);
 		g_cxx.pFieldOptions = g_aCXXCPPFields;
-		g_cxx.uFieldOptionCount = sizeof(g_aCXXCPPFields) / sizeof(fieldSpec);
+		g_cxx.uFieldOptionCount = sizeof(g_aCXXCPPFields) / sizeof(fieldDefinition);
 	} else if(g_cxx.eLangType == g_cxx.eCUDALangType)
 	{
 		g_cxx.eLanguage = CXXLanguageCUDA;
 		g_cxx.pKindOptions = g_aCXXCUDAKinds;
 		g_cxx.uKindOptionCount = sizeof(g_aCXXCUDAKinds) / sizeof(kindOption);
 		g_cxx.pFieldOptions = g_aCXXCUDAFields;
-		g_cxx.uFieldOptionCount = sizeof(g_aCXXCUDAFields) / sizeof(fieldSpec);
+		g_cxx.uFieldOptionCount = sizeof(g_aCXXCUDAFields) / sizeof(fieldDefinition);
 	} else {
 		CXX_DEBUG_ASSERT(false,"Invalid language passed to cxxTagInitForLanguage()");
 	}
@@ -190,34 +190,34 @@ bool cxxTagKindEnabled(unsigned int uKind)
 	return g_cxx.pKindOptions[uKind].enabled;
 }
 
-fieldSpec * cxxTagGetCPPFieldSpecifiers(void)
+fieldDefinition * cxxTagGetCPPFieldDefinitionifiers(void)
 {
 	return g_aCXXCPPFields;
 }
 
-int cxxTagGetCPPFieldSpecifierCount(void)
+int cxxTagGetCPPFieldDefinitionifierCount(void)
 {
-	return sizeof(g_aCXXCPPFields) / sizeof(fieldSpec);
+	return sizeof(g_aCXXCPPFields) / sizeof(fieldDefinition);
 }
 
-fieldSpec * cxxTagGetCUDAFieldSpecifiers(void)
+fieldDefinition * cxxTagGetCUDAFieldDefinitionifiers(void)
 {
 	return g_aCXXCUDAFields;
 }
 
-int cxxTagGetCUDAFieldSpecifierCount(void)
+int cxxTagGetCUDAFieldDefinitionifierCount(void)
 {
-	return sizeof(g_aCXXCUDAFields) / sizeof(fieldSpec);
+	return sizeof(g_aCXXCUDAFields) / sizeof(fieldDefinition);
 }
 
-fieldSpec * cxxTagGetCFieldSpecifiers(void)
+fieldDefinition * cxxTagGetCFieldDefinitionifiers(void)
 {
 	return g_aCXXCFields;
 }
 
-int cxxTagGetCFieldSpecifierCount(void)
+int cxxTagGetCFieldDefinitionifierCount(void)
 {
-	return sizeof(g_aCXXCFields) / sizeof(fieldSpec);
+	return sizeof(g_aCXXCFields) / sizeof(fieldDefinition);
 }
 
 bool cxxTagFieldEnabled(unsigned int uField)
