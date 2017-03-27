@@ -44,7 +44,7 @@ typedef struct sXtagDefinition {
 	   to standared output, the tag is disabled by default.
 	   If it is connected to a regular file, the tag is enabled
 	   by default. */
-	bool (* isEnabled) (struct sXtagDefinition *spec);
+	bool (* isEnabled) (struct sXtagDefinition *def);
 
 	unsigned int xtype;	/* Given from the main part */
 } xtagDefinition;
@@ -63,7 +63,7 @@ extern void printXtags (langType language);
 extern void initXtagObjects (void);
 extern int countXtags (void);
 
-extern int defineXtag (xtagDefinition *spec, langType language);
+extern int defineXtag (xtagDefinition *def, langType language);
 extern xtagType nextSiblingXtag (xtagType type);
 
 #endif	/* CTAGS_MAIN_FIELD_H */

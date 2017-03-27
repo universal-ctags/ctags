@@ -21,12 +21,12 @@
 #include <ctype.h>
 
 typedef struct sXtagObject {
-	xtagDefinition *spec;
+	xtagDefinition *def;
 	langType language;
 	xtagType sibling;
 } xtagObject;
 
-static bool isPseudoTagsEnabled (xtagDefinition *pspec CTAGS_ATTR_UNUSED)
+static bool isPseudoTagsEnabled (xtagDefinition *pdef CTAGS_ATTR_UNUSED)
 {
 	return ! isDestinationStdout ();
 }
@@ -61,10 +61,10 @@ extern xtagDefinition* getXtagDefinition (xtagType type)
 {
 	Assert ((0 <= type) && (type < xtagObjectUsed));
 
-	return getXtagObject (type)->spec;
+	return getXtagObject (type)->def;
 }
 
-typedef bool (* xtagPredicate) (xtagObject *pdesc, langType language, const void *user_data);
+typedef bool (* xtagPredicate) (xtagObject *pobj, langType language, const void *user_data);
 static xtagType  getXtagTypeGeneric (xtagPredicate predicate, langType language, const void *user_data)
 {
 	static bool initialized = false;
@@ -86,10 +86,10 @@ static xtagType  getXtagTypeGeneric (xtagPredicate predicate, langType language,
 	return XTAG_UNKNOWN;
 }
 
-static bool xtagEqualByLetter (xtagObject *pdesc, langType language CTAGS_ATTR_UNUSED,
+static bool xtagEqualByLetter (xtagObject *pobj, langType language CTAGS_ATTR_UNUSED,
 							   const void *user_data)
 {
-	return (pdesc->spec->letter == *((char *)user_data))? true: false;
+	return (pobj->def->letter == *((char *)user_data))? true: false;
 }
 
 extern xtagType  getXtagTypeForLetter (char letter)
@@ -97,12 +97,12 @@ extern xtagType  getXtagTypeForLetter (char letter)
 	return getXtagTypeGeneric (xtagEqualByLetter, LANG_IGNORE, &letter);
 }
 
-static bool xtagEqualByNameAndLanguage (xtagObject *pdesc, langType language, const void *user_data)
+static bool xtagEqualByNameAndLanguage (xtagObject *pobj, langType language, const void *user_data)
 {
 	const char* name = user_data;
 
-	if ((language == LANG_AUTO || pdesc->language == language)
-		&& (strcmp (pdesc->spec->name, name) == 0))
+	if ((language == LANG_AUTO || pobj->language == language)
+		&& (strcmp (pobj->def->name, name) == 0))
 		return true;
 	else
 		return false;
@@ -182,26 +182,26 @@ extern void printXtags (int language)
 
 extern bool isXtagEnabled (xtagType type)
 {
-	xtagDefinition* spec = getXtagDefinition (type);
+	xtagDefinition* def = getXtagDefinition (type);
 
-	Assert (spec);
+	Assert (def);
 
-	if (spec->isEnabled)
-		return spec->isEnabled (spec);
+	if (def->isEnabled)
+		return def->isEnabled (def);
 	else
-		return spec->enabled;
+		return def->enabled;
 }
 
 extern bool enableXtag (xtagType type, bool state)
 {
 	bool old;
-	xtagDefinition* spec = getXtagDefinition (type);
+	xtagDefinition* def = getXtagDefinition (type);
 
-	Assert (spec);
+	Assert (def);
 
 	old = isXtagEnabled (type);
-	spec->enabled = state;
-	spec->isEnabled = NULL;
+	def->enabled = state;
+	def->isEnabled = NULL;
 
 	return old;
 }
@@ -218,26 +218,26 @@ extern int     getXtagOwner (xtagType type)
 
 const char* getXtagName (xtagType type)
 {
-	xtagDefinition* spec = getXtagDefinition (type);
-	if (spec)
-		return spec->name;
+	xtagDefinition* def = getXtagDefinition (type);
+	if (def)
+		return def->name;
 	else
 		return NULL;
 }
 
 extern void initXtagObjects (void)
 {
-	xtagObject *xdesc;
+	xtagObject *xobj;
 
 	xtagObjectAllocated = ARRAY_SIZE (xtagDefinitions);
 	xtagObjects = xMalloc (xtagObjectAllocated, xtagObject);
 
 	for (int i = 0; i < ARRAY_SIZE (xtagDefinitions); i++)
 	{
-		xdesc = xtagObjects + i;
-		xdesc->spec = xtagDefinitions + i;
-		xdesc->language = LANG_IGNORE;
-		xdesc->sibling = XTAG_UNKNOWN;
+		xobj = xtagObjects + i;
+		xobj->def = xtagDefinitions + i;
+		xobj->language = LANG_IGNORE;
+		xobj->sibling = XTAG_UNKNOWN;
 		xtagObjectUsed++;
 	}
 }
@@ -250,52 +250,52 @@ extern int countXtags (void)
 static void updateSiblingXtag (xtagType type, const char* name)
 {
 	int i;
-	xtagObject *xdesc;
+	xtagObject *xobj;
 
 	for (i = type; i > 0; i--)
 	{
-		xdesc = xtagObjects + i - 1;
-		if (xdesc->spec->name && (strcmp (xdesc->spec->name, name) == 0))
+		xobj = xtagObjects + i - 1;
+		if (xobj->def->name && (strcmp (xobj->def->name, name) == 0))
 		{
-			Assert (xdesc->sibling == XTAG_UNKNOWN);
-			xdesc->sibling = type;
+			Assert (xobj->sibling == XTAG_UNKNOWN);
+			xobj->sibling = type;
 			break;
 		}
 	}
 }
 
-extern int defineXtag (xtagDefinition *spec, langType language)
+extern int defineXtag (xtagDefinition *def, langType language)
 {
-	xtagObject *xdesc;
+	xtagObject *xobj;
 	size_t i;
 
-	Assert (spec);
-	Assert (spec->name);
-	for (i = 0; i < strlen (spec->name); i++)
+	Assert (def);
+	Assert (def->name);
+	for (i = 0; i < strlen (def->name); i++)
 	{
-		Assert ( isalnum (spec->name [i]) );
+		Assert ( isalnum (def->name [i]) );
 	}
-	spec->letter = NUL_XTAG_LETTER;
+	def->letter = NUL_XTAG_LETTER;
 
 	if (xtagObjectUsed == xtagObjectAllocated)
 	{
 		xtagObjectAllocated *= 2;
 		xtagObjects = xRealloc (xtagObjects, xtagObjectAllocated, xtagObject);
 	}
-	xdesc = xtagObjects + (xtagObjectUsed);
-	spec->xtype = xtagObjectUsed++;
-	xdesc->spec = spec;
-	xdesc->language = language;
-	xdesc->sibling  = XTAG_UNKNOWN;
+	xobj = xtagObjects + (xtagObjectUsed);
+	def->xtype = xtagObjectUsed++;
+	xobj->def = def;
+	xobj->language = language;
+	xobj->sibling  = XTAG_UNKNOWN;
 
-	updateSiblingXtag (spec->xtype, spec->name);
-	return spec->xtype;
+	updateSiblingXtag (def->xtype, def->name);
+	return def->xtype;
 }
 
 extern xtagType nextSiblingXtag (xtagType type)
 {
-	xtagObject *xdesc;
+	xtagObject *xobj;
 
-	xdesc = xtagObjects + type;
-	return xdesc->sibling;
+	xobj = xtagObjects + type;
+	return xobj->sibling;
 }
