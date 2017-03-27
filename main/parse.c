@@ -59,6 +59,8 @@ typedef struct {
 typedef struct sParserObject {
 	parserDefinition *def;
 
+	kindDefinition* fileKind;
+
 	stringList* currentPatterns;   /* current list of file name patterns */
 	stringList* currentExtensions; /* current list of extensions */
 	stringList* currentAliases;    /* current list of aliases */
@@ -185,11 +187,6 @@ extern bool isLanguageEnabled (const langType language)
 *   parserDescription mapping management
 */
 
-extern parserDefinition* parserNew (const char* name)
-{
-	return parserNewFull (name, 0);
-}
-
 static kindDefinition* fileKindNew (char letter)
 {
 	kindDefinition *fileKind;
@@ -200,15 +197,12 @@ static kindDefinition* fileKindNew (char letter)
 	return fileKind;
 }
 
-extern parserDefinition* parserNewFull (const char* name, char fileKind)
+extern parserDefinition* parserNew (const char* name)
 {
 	parserDefinition* result = xCalloc (1, parserDefinition);
 	result->name = eStrdup (name);
 
-	if (fileKind)
-		result->fileKind = fileKindNew(fileKind);
-	else
-		result->fileKind = &defaultFileKind;
+	result->fileKindLetter = KIND_FILE_DEFAULT;
 	result->enabled = true;
 	return result;
 }
@@ -244,7 +238,7 @@ extern kindDefinition* getLanguageFileKind (const langType language)
 
 	Assert (0 <= language  &&  language < (int) LanguageCount);
 
-	kind = LanguageTable [language].def->fileKind;
+	kind = LanguageTable [language].fileKind;
 
 	Assert (kind != KIND_NULL);
 
@@ -1487,8 +1481,8 @@ static void initializeParserOne (langType lang)
 
 	initializeDependencies (parser->def);
 
-	Assert (parser->def->fileKind != KIND_NULL);
-	Assert (!doesParserUseKind (parser->def, parser->def->fileKind->letter));
+	Assert (parser->fileKind != KIND_NULL);
+	Assert (!doesParserUseKind (parser->def, parser->fileKind->letter));
 }
 
 extern void initializeParser (langType lang)
@@ -1551,9 +1545,16 @@ extern void initializeParsing (void)
 				accepted = true;
 			if (accepted)
 			{
+				char fileKindLetter;
 				verbose ("%s%s", i > 0 ? ", " : "", def->name);
 				def->id = LanguageCount++;
 				LanguageTable [def->id].def = def;
+
+				fileKindLetter = LanguageTable [def->id].def->fileKindLetter;
+				if (fileKindLetter == KIND_FILE_DEFAULT)
+					LanguageTable [def->id].fileKind = &defaultFileKind;
+				else
+					LanguageTable [def->id].fileKind = fileKindNew(fileKindLetter);
 			}
 		}
 	}
@@ -1575,10 +1576,10 @@ extern void freeParserResources (void)
 
 		finalizeDependencies (parser->def);
 
-		if (parser->def->fileKind != &defaultFileKind)
+		if (parser->fileKind != &defaultFileKind)
 		{
-			eFree (parser->def->fileKind);
-			parser->def->fileKind = NULL;
+			eFree (parser->fileKind);
+			parser->fileKind = NULL;
 		}
 
 		freeList (&parser->currentPatterns);
@@ -1630,10 +1631,10 @@ static void lang_def_flag_file_kind_long (const char* const optflag, const char*
 	else if (param[1] != '\0')
 		error (WARNING, "Specify just a letter for \"%s\" flag of --langdef option", optflag);
 
-	if (def->fileKind != &defaultFileKind)
-		eFree (def->fileKind);
+	if (LanguageTable [def->id].fileKind != &defaultFileKind)
+		eFree (LanguageTable [def->id].fileKind);
 
-	def->fileKind = fileKindNew (param[0]);
+	LanguageTable [def->id].fileKind = fileKindNew (param[0]);
 }
 
 static flagDefinition LangDefFlagDef [] = {
@@ -1670,7 +1671,8 @@ extern void processLanguageDefineOption (
 		LanguageTable [i].def = def;
 		LanguageTable [i].currentPatterns = stringListNew ();
 		LanguageTable [i].currentExtensions = stringListNew ();
-
+		/* TODO: Unify these code with initializeParsing */
+		LanguageTable [i].fileKind = &defaultFileKind;
 		flagsEval (flags, LangDefFlagDef, ARRAY_SIZE (LangDefFlagDef), def);
 
 		eFree (name);
@@ -1974,12 +1976,12 @@ extern void printLanguageFileKind (const langType language)
 		unsigned int i;
 		for (i = 0  ;  i < LanguageCount  ;  ++i)
 		{
-			const parserDefinition* const lang = LanguageTable [i].def;
-			printf ("%s %c\n", lang->name, lang->fileKind->letter);
+			const parserObject* const parser = LanguageTable + i;
+			printf ("%s %c\n", parser->def->name, parser->fileKind->letter);
 		}
 	}
 	else
-		printf ("%c\n", LanguageTable [language].def->fileKind->letter);
+		printf ("%c\n", (LanguageTable + language)->fileKind->letter);
 }
 
 static void printKinds (langType language, bool allKindFields, bool indent)

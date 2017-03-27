@@ -82,7 +82,7 @@ struct sParserDefinition {
 	char* name;                    /* name of language */
 	kindDefinition* kindTable;	   /* tag kinds handled by parser */
 	unsigned int kindCount;        /* size of `kinds' list */
-	kindDefinition* fileKind;          /* kind for overriding the default fileKind */
+	char fileKindLetter;           /* kind for overriding the default fileKind */
 	const char *const *extensions; /* list of default extensions */
 	const char *const *patterns;   /* list of default file name patterns */
 	const char *const *aliases;    /* list of default aliases (alternative names) */
@@ -160,7 +160,6 @@ extern int makeSimpleTag (const vString* const name, kindDefinition* const kinds
 extern int makeSimpleRefTag (const vString* const name, kindDefinition* const kinds, const int kind,
 			     int roleIndex);
 extern parserDefinition* parserNew (const char* name);
-extern parserDefinition* parserNewFull (const char* name, char fileKind);
 extern bool doesLanguageAllowNullTag (const langType language);
 extern bool doesLanguageRequestAutomaticFQTag (const langType language);
 extern const char *getLanguageName (const langType language);
