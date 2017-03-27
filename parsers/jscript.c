@@ -1397,7 +1397,7 @@ static bool parseMethods (tokenInfo *const token, const tokenInfo *const class,
 
 cleanUp:
 	deleteToken (name);
-	
+
 	JSCRIPT_DEBUG_LEAVE();
 
 	return has_methods;
@@ -2064,7 +2064,7 @@ static void parseUI5 (tokenInfo *const token)
 	 *         }
 	 *     }
 	 *
-	 * Handle the parsing of the initial controller (and the 
+	 * Handle the parsing of the initial controller (and the
 	 * same for "view") and then allow the methods to be
 	 * parsed as usual.
 	 */
@@ -2175,7 +2175,7 @@ static bool parseLine (tokenInfo *const token, tokenInfo *const parent, bool is_
 static void parseJsFile (tokenInfo *const token)
 {
 	JSCRIPT_DEBUG_ENTER();
-	
+
 	do
 	{
 		readToken (token);
