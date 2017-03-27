@@ -45,4 +45,8 @@ extern void linkDependencyAtInitializeParsing (depType dtype,
 extern void initializeDependencies (parserDefinition *parser);
 extern void finalizeDependencies (parserDefinition *parser);
 
+extern void attachSlaveParser (langType master, slaveParser *slave);
+extern slaveParser *getNextSlaveParser (langType master, slaveParser * slave);
+extern slaveParser *detachSlaveParser (langType master);
+
 #endif	/* CTAGS_MAIN_DEPENDENCY_H */

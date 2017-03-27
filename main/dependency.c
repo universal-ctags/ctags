@@ -78,18 +78,17 @@ extern void linkDependencyAtInitializeParsing (depType dtype,
 		s->type = dtype;
 		s->id = slave->id;
 		s->data = data;
-		s->next = master->slaveParsers;
-		master->slaveParsers = s;
+		attachSlaveParser (master->id, s);
 	}
 }
 
 extern void initializeDependencies (parserDefinition *parser)
 {
 	unsigned int i;
-	slaveParser *sp;
+	slaveParser *sp = NULL;
 
 	/* Initialize slaves */
-	for (sp = parser->slaveParsers; sp; sp = sp->next)
+	while ((sp = getNextSlaveParser (parser->id, sp)))
 	{
 		if (sp->type == DEPTYPE_SUBPARSER)
 		{
@@ -107,8 +106,7 @@ extern void initializeDependencies (parserDefinition *parser)
 			if (sp->type == DEPTYPE_SUBPARSER)
 			{
 				subparser *subparser = sp->data;
-				subparser->next = parser->subparsersDefault;
-				parser->subparsersDefault = subparser;
+				attachSubparser (parser->id, subparser);
 			}
 		}
 	}
@@ -131,16 +129,9 @@ extern void initializeDependencies (parserDefinition *parser)
 extern void finalizeDependencies (parserDefinition *parser)
 {
 	slaveParser *sp;
-	slaveParser *tmp;
 
-	for (sp = parser->slaveParsers; sp;)
-	{
-		tmp = sp;
-		sp = sp->next;
-		tmp->next = NULL;
-		eFree (tmp);
-	}
-	parser->slaveParsers = NULL;
+	while ((sp = detachSlaveParser (parser->id)))
+		eFree (sp);
 }
 
 extern void notifyInputStart (void)

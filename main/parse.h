@@ -119,12 +119,6 @@ struct sParserDefinition {
 	/* used internally */
 	langType id;		    /* id assigned to language */
 	unsigned int enabled:1;	       /* currently enabled? */
-	unsigned int pseudoTagPrinted:1;   /* pseudo tags about this parser
-					      is emitted or not. */
-	slaveParser *slaveParsers;	/* The parsers on this list must be initialized when
-				   this parser is initialized. */
-	subparser   *subparsersDefault;
-	subparser   *subparsersInUse;
 };
 
 typedef parserDefinition* (parserDefinitionFunc) (void);

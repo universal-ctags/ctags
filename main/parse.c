@@ -70,6 +70,12 @@ typedef struct sParserObject {
 										  is emitted or not. */
 
 	unsigned int anonymousIdentiferId; /* managed by anon* functions */
+
+
+	slaveParser *slaveParsers;	/* The parsers on this list must be initialized when
+								   this parser is initialized. */
+	subparser   *subparsersDefault;
+	subparser   *subparsersInUse;
 } parserObject;
 
 /*
@@ -83,8 +89,8 @@ static void installTagXpathTable (const langType language);
 static void anonResetMaybe (parserObject *parser);
 static void setupAnon (void);
 static void teardownAnon (void);
-static void setupSubparsersInUse (parserDefinition *parser);
-static subparser* teardownSubparsersInUse (parserDefinition *parser);
+static void setupSubparsersInUse (parserObject *parser);
+static subparser* teardownSubparsersInUse (parserObject *parser);
 
 /*
 *   DATA DEFINITIONS
@@ -2283,7 +2289,7 @@ static bool createTagsWithFallback1 (const langType language,
 	initializeParser (language);
 	parser = &(LanguageTable [language]);
 
-	setupSubparsersInUse (parser->def);
+	setupSubparsersInUse (parser);
 
 	useCork = doesParserUseCork(parser->def);
 	if (useCork)
@@ -2331,7 +2337,7 @@ static bool createTagsWithFallback1 (const langType language,
 		uncorkTagFile();
 
 	{
-		subparser *s = teardownSubparsersInUse (parser->def);
+		subparser *s = teardownSubparsersInUse (parser);
 		if (exclusive_subparser && s)
 			*exclusive_subparser = getSubparserLanguage (s);
 	}
@@ -2919,7 +2925,7 @@ extern void applyParameter (const langType language, const char *name, const cha
 extern subparser *getNextSubparser(subparser *last)
 {
 	langType lang = getInputLanguage ();
-	parserDefinition *parser = LanguageTable [lang].def;
+	parserObject *parser = LanguageTable + lang;
 	subparser *r;
 	langType t;
 
@@ -2964,12 +2970,12 @@ extern void scheduleRunningBaseparser (int dependencyIndex)
 	parserObject *base_parser = LanguageTable + base;
 
 	if (dependencyIndex == RUN_DEFAULT_SUBPARSERS)
-		base_parser->def->subparsersInUse = base_parser->def->subparsersDefault;
+		base_parser->subparsersInUse = base_parser->subparsersDefault;
 	else
 	{
 		subparser *s = dep->data;
 		s->schedulingBaseparserExplicitly = true;
-		base_parser->def->subparsersInUse = s;
+		base_parser->subparsersInUse = s;
 	}
 
 	if (!isLanguageEnabled (base))
@@ -2994,13 +3000,13 @@ extern void scheduleRunningBaseparser (int dependencyIndex)
 	makePromise(base_name, THIN_STREAM_SPEC);
 }
 
-static void setupSubparsersInUse (parserDefinition *parser)
+static void setupSubparsersInUse (parserObject *parser)
 {
 	if (!parser->subparsersInUse)
 		parser->subparsersInUse = parser->subparsersDefault;
 }
 
-static subparser* teardownSubparsersInUse (parserDefinition *parser)
+static subparser* teardownSubparsersInUse (parserObject *parser)
 {
 	subparser *tmp = parser->subparsersInUse;
 	subparser *s = NULL;
@@ -3040,13 +3046,53 @@ extern bool isParserMarkedNoEmission (void)
 extern subparser* getSubparserRunningBaseparser (void)
 {
 	langType current = getInputLanguage ();
-	parserDefinition *current_parser = LanguageTable [current].def;
+	parserObject *current_parser = LanguageTable + current;
 	subparser *s = current_parser->subparsersInUse;
 
 	if (s && s->schedulingBaseparserExplicitly)
 		return s;
 	else
 		return NULL;
+}
+
+extern void attachSlaveParser (langType master, slaveParser *slave)
+{
+	parserObject *master_parser = LanguageTable + master;
+
+	slave->next = master_parser->slaveParsers;
+	master_parser->slaveParsers = slave;
+}
+
+extern slaveParser *getNextSlaveParser (langType master, slaveParser * slave)
+{
+	if (slave)
+		return slave->next;
+	else
+	{
+		parserObject *master_parser = LanguageTable + master;
+		return master_parser->slaveParsers;
+	}
+}
+
+extern slaveParser *detachSlaveParser (langType master)
+{
+	parserObject *master_parser = LanguageTable + master;
+	if (master_parser->slaveParsers)
+	{
+		slaveParser *tmp = master_parser->slaveParsers;
+		master_parser->slaveParsers = tmp->next;
+		tmp->next = NULL;
+		return tmp;
+	}
+	else
+		return NULL;
+}
+
+extern void attachSubparser (langType base, subparser *sub)
+{
+	parserObject *base_parser = LanguageTable + base;
+	sub->next = base_parser->subparsersDefault;
+	base_parser->subparsersDefault = sub;
 }
 
 /*
