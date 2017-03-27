@@ -64,6 +64,8 @@ typedef struct sParserObject {
 	stringList* currentAliases;    /* current list of aliases */
 
 	unsigned int initialized:1;    /* initialize() is called or not */
+	unsigned int dontEmit:1;	   /* run but don't emit tags
+									  (a subparser requests run this parser.) */
 
 	unsigned int anonymousIdentiferId; /* managed by anon* functions */
 } parserObject;
@@ -2956,22 +2958,22 @@ extern void scheduleRunningBaseparser (int dependencyIndex)
 
 	const char *base_name = dep->upperParser;
 	langType base = getNamedLanguage (base_name, 0);
-	parserDefinition *base_parser = LanguageTable [base].def;
+	parserObject *base_parser = LanguageTable + base;
 
 	if (dependencyIndex == RUN_DEFAULT_SUBPARSERS)
-		base_parser->subparsersInUse = base_parser->subparsersDefault;
+		base_parser->def->subparsersInUse = base_parser->def->subparsersDefault;
 	else
 	{
 		subparser *s = dep->data;
 		s->schedulingBaseparserExplicitly = true;
-		base_parser->subparsersInUse = s;
+		base_parser->def->subparsersInUse = s;
 	}
 
 	if (!isLanguageEnabled (base))
 	{
 		enableLanguage (base, true);
 		base_parser->dontEmit = true;
-		verbose ("force enable \"%s\" as base parser\n", base_parser->name);
+		verbose ("force enable \"%s\" as base parser\n", base_parser->def->name);
 	}
 
 	{
@@ -3026,7 +3028,7 @@ static subparser* teardownSubparsersInUse (parserDefinition *parser)
 extern bool isParserMarkedNoEmission (void)
 {
 	langType lang = getInputLanguage();
-	parserDefinition *parser = LanguageTable [lang].def;
+	parserObject *parser = LanguageTable + lang;
 
 	return parser->dontEmit;
 }
