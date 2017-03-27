@@ -58,6 +58,7 @@ typedef struct {
 
 typedef struct sParserObject {
 	parserDefinition *def;
+	unsigned int anonymousIdentiferId; /* managed by anon* functions */
 } parserObject;
 
 /*
@@ -68,7 +69,7 @@ static void addParserPseudoTags (langType language);
 static void installKeywordTable (const langType language);
 static void installTagRegexTable (const langType language);
 static void installTagXpathTable (const langType language);
-static void anonResetMaybe (parserDefinition *lang);
+static void anonResetMaybe (parserObject *parser);
 static void setupAnon (void);
 static void teardownAnon (void);
 static void setupSubparsersInUse (parserDefinition *parser);
@@ -2259,15 +2260,15 @@ static bool createTagsWithFallback1 (const langType language,
 	int lastPromise = getLastPromise ();
 	unsigned int passCount = 0;
 	rescanReason whyRescan;
-	parserDefinition *parser;
+	parserObject *parser;
 	bool useCork;
 
 	initializeParser (language);
-	parser = LanguageTable [language].def;
+	parser = &(LanguageTable [language]);
 
-	setupSubparsersInUse (parser);
+	setupSubparsersInUse (parser->def);
 
-	useCork = doesParserUseCork(parser);
+	useCork = doesParserUseCork(parser->def);
 	if (useCork)
 		corkTagFile();
 
@@ -2313,7 +2314,7 @@ static bool createTagsWithFallback1 (const langType language,
 		uncorkTagFile();
 
 	{
-		subparser *s = teardownSubparsersInUse (parser);
+		subparser *s = teardownSubparsersInUse (parser->def);
 		if (exclusive_subparser && s)
 			*exclusive_subparser = getSubparserLanguage (s);
 	}
@@ -2835,13 +2836,13 @@ static void teardownAnon (void)
 	ptrArrayDelete (parsersUsedInCurrentInput);
 }
 
-static void anonResetMaybe (parserDefinition *lang)
+static void anonResetMaybe (parserObject *parser)
 {
-	if (ptrArrayHas (parsersUsedInCurrentInput, lang))
+	if (ptrArrayHas (parsersUsedInCurrentInput, parser))
 		return;
 
-	lang -> anonymousIdentiferId = 0;
-	ptrArrayAdd (parsersUsedInCurrentInput, lang);
+	parser -> anonymousIdentiferId = 0;
+	ptrArrayAdd (parsersUsedInCurrentInput, parser);
 }
 
 static unsigned int anonHash(const unsigned char *str)
@@ -2857,15 +2858,15 @@ static unsigned int anonHash(const unsigned char *str)
 
 extern void anonGenerate (vString *buffer, const char *prefix, int kind)
 {
-	parserDefinition* lang = LanguageTable [getInputLanguage ()].def;
-	lang -> anonymousIdentiferId ++;
+	parserObject* parser = LanguageTable + getInputLanguage ();
+	parser -> anonymousIdentiferId ++;
 
 	char szNum[32];
 
 	vStringCopyS(buffer, prefix);
 
 	unsigned int uHash = anonHash((const unsigned char *)getInputFileName());
-	sprintf(szNum,"%08x%02x%02x",uHash,lang -> anonymousIdentiferId, kind);
+	sprintf(szNum,"%08x%02x%02x",uHash,parser -> anonymousIdentiferId, kind);
 	vStringCatS(buffer,szNum);
 }
 
