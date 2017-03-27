@@ -21,11 +21,22 @@
 typedef enum {
 	K_PARAGRAPH,
 	K_DATA,
+	K_SOURCEFILE,
 } cobolKind;
+
+typedef enum {
+	COBOL_SOURCEFILE_COPYED,
+} cobolSourcefileRole;
+
+static roleDesc CobolSourcefileRoles [] = {
+	{ true, "copyed", "copyed in source file" },
+};
 
 static kindOption CobolKinds[] = {
 	{ true, 'p', "paragraph", "paragraphs" },
 	{ true, 'd', "data", "data items"      },
+	{ true, 'S', "sourcefile", "source code file",
+	  .referenceOnly = true, ATTACH_ROLES(CobolSourcefileRoles)},
 };
 
 static tagRegexTable cobolTagRegexTable[] = {
@@ -95,6 +106,21 @@ static void make_tag_for_paragraph_maybe (const char *line,
 	cobol_make_tag_maybe (line, matches, count, *(langType *)data, 1, K_PARAGRAPH);
 }
 
+static void make_tag_for_copyed_in_sourcefile (const char *line,
+											   const regexMatch *matches,
+											   unsigned int count,
+											   void *data)
+{
+	if (count > 0)
+	{
+		vString *name = vStringNew ();
+
+		vStringNCopyS (name, line + matches[1].start, matches[1].length);
+		makeSimpleRefTag (name, CobolKinds, K_SOURCEFILE, COBOL_SOURCEFILE_COPYED);
+		vStringDelete (name);
+	}
+}
+
 static void initializeCobolParser (langType language)
 {
 	static langType cobol;
@@ -113,6 +139,10 @@ static void initializeCobolParser (langType language)
 					  "([A-Z0-9][A-Z0-9-]*)\\.",
 					  "{icase}",
 					  make_tag_for_paragraph_maybe, NULL, &cobol);
+	addCallbackRegex (cobol,
+					  "^[ \t]*COPY[ \t]+([A-Z0-9][A-Z0-9-]*)\\.",
+					  "{icase}",
+					  make_tag_for_copyed_in_sourcefile, NULL, NULL);
 }
 
 extern parserDefinition* CobolParser (void)

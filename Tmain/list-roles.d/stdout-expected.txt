@@ -19,6 +19,7 @@ C++	h	local	local header	on
 CPreProcessor	d	undef	undefined	on
 CPreProcessor	h	system	system header	on
 CPreProcessor	h	local	local header	on
+Cobol	S	copyed	copyed in source file	on
 CUDA	d	undef	undefined	on
 CUDA	h	system	system header	on
 CUDA	h	local	local header	on
@@ -72,6 +73,7 @@ C++	h	local	local header	on
 CPreProcessor	d	undef	undefined	on
 CPreProcessor	h	system	system header	on
 CPreProcessor	h	local	local header	on
+Cobol	S	copyed	copyed in source file	on
 CUDA	d	undef	undefined	on
 CUDA	h	system	system header	on
 CUDA	h	local	local header	on
