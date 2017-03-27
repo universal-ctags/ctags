@@ -259,7 +259,7 @@ Maven2Parser (void)
 		},
 	};
 
-	def->kinds         = Maven2Kinds;
+	def->kindTable         = Maven2Kinds;
 	def->kindCount     = ARRAY_SIZE (Maven2Kinds);
 	def->extensions    = extensions;
 	def->patterns      = patterns;

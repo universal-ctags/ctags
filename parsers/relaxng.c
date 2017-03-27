@@ -227,7 +227,7 @@ RelaxNGParser (void)
 	parserDefinition* const def = parserNew ("RelaxNG");
 	/* static selectLanguage selectors[] = { selectByDTD, NULL }; */
 
-	def->kinds         = RelaxNGKinds;
+	def->kindTable         = RelaxNGKinds;
 	def->kindCount     = ARRAY_SIZE (RelaxNGKinds);
 	def->extensions    = extensions;
 	def->parser        = findRelaxNGTags;

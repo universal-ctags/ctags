@@ -328,7 +328,7 @@ XsltParser (void)
 	static const char *const extensions [] = { "xsl", "xslt", NULL };
 	parserDefinition* const def = parserNew ("XSLT");
 
-	def->kinds         = XsltKinds;
+	def->kindTable         = XsltKinds;
 	def->kindCount     = ARRAY_SIZE (XsltKinds);
 	def->extensions    = extensions;
 	def->parser        = findXsltTags;

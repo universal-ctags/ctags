@@ -82,7 +82,7 @@ GladeParser (void)
 	static const char *const extensions [] = { "glade", NULL };
 	parserDefinition* const def = parserNew ("Glade");
 
-	def->kinds         = GladeKinds;
+	def->kindTable         = GladeKinds;
 	def->kindCount     = ARRAY_SIZE (GladeKinds);
 	def->extensions    = extensions;
 	def->parser        = findGladeTags;

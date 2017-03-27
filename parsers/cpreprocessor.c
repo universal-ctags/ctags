@@ -1754,7 +1754,7 @@ static parameterHandlerTable CpreProParameterHandlerTable [] = {
 extern parserDefinition* CPreProParser (void)
 {
 	parserDefinition* const def = parserNew ("CPreProcessor");
-	def->kinds      = CPreProKinds;
+	def->kindTable      = CPreProKinds;
 	def->kindCount  = ARRAY_SIZE (CPreProKinds);
 	def->initialize = initializeCpp;
 	def->parser     = findCppTags;

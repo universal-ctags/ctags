@@ -133,7 +133,7 @@ extern parserDefinition* RobotParser (void)
 {
 	static const char *const extensions[] = { "robot", NULL };
 	parserDefinition *def = parserNew ("Robot");
-    def->kinds      = RobotKinds;
+    def->kindTable      = RobotKinds;
     def->kindCount  = COUNT_KIND;
 	def->extensions = extensions;
 	def->initialize = initialize;

@@ -264,7 +264,7 @@ extern parserDefinition* RstParser (void)
 	static const char *const extensions [] = { "rest", "reST", "rst", NULL };
 	parserDefinition* const def = parserNew ("reStructuredText");
 
-	def->kinds = RstKinds;
+	def->kindTable = RstKinds;
 	def->kindCount = ARRAY_SIZE (RstKinds);
 	def->extensions = extensions;
 	def->parser = findRstTags;

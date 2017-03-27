@@ -973,7 +973,7 @@ extern parserDefinition *RustParser (void)
 {
 	static const char *const extensions[] = { "rs", NULL };
 	parserDefinition *def = parserNewFull ("Rust", KIND_FILE_ALT);
-	def->kinds = rustKinds;
+	def->kindTable = rustKinds;
 	def->kindCount = ARRAY_SIZE (rustKinds);
 	def->extensions = extensions;
 	def->parser = findRustTags;

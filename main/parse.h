@@ -80,7 +80,7 @@ typedef struct {
 struct sParserDefinition {
 	/* defined by parser */
 	char* name;                    /* name of language */
-	kindDefinition* kinds;             /* tag kinds handled by parser */
+	kindDefinition* kindTable;	   /* tag kinds handled by parser */
 	unsigned int kindCount;        /* size of `kinds' list */
 	kindDefinition* fileKind;          /* kind for overriding the default fileKind */
 	const char *const *extensions; /* list of default extensions */

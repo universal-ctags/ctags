@@ -3567,7 +3567,7 @@ extern parserDefinition* OldCParser (void)
 {
 	static const char *const extensions [] = { "c", NULL };
 	parserDefinition* def = parserNew ("OldC");
-	def->kinds      = CKinds;
+	def->kindTable      = CKinds;
 	def->kindCount  = ARRAY_SIZE (CKinds);
 	def->extensions = extensions;
 	def->parser2    = findCTags;
@@ -3580,7 +3580,7 @@ extern parserDefinition* DParser (void)
 {
 	static const char *const extensions [] = { "d", "di", NULL };
 	parserDefinition* def = parserNew ("D");
-	def->kinds      = DKinds;
+	def->kindTable      = DKinds;
 	def->kindCount  = ARRAY_SIZE (DKinds);
 	def->extensions = extensions;
 	def->parser2    = findCTags;
@@ -3602,7 +3602,7 @@ extern parserDefinition* OldCppParser (void)
 					      NULL };
 
 	parserDefinition* def = parserNew ("OldC++");
-	def->kinds      = CKinds;
+	def->kindTable      = CKinds;
 	def->kindCount  = ARRAY_SIZE (CKinds);
 	def->extensions = extensions;
 	def->parser2    = findCTags;
@@ -3617,7 +3617,7 @@ extern parserDefinition* CsharpParser (void)
 	static const char *const extensions [] = { "cs", NULL };
 	static const char *const aliases [] = { "csharp", NULL };
 	parserDefinition* def = parserNew ("C#");
-	def->kinds      = CsharpKinds;
+	def->kindTable      = CsharpKinds;
 	def->kindCount  = ARRAY_SIZE (CsharpKinds);
 	def->extensions = extensions;
 	def->aliases    = aliases;
@@ -3630,7 +3630,7 @@ extern parserDefinition* JavaParser (void)
 {
 	static const char *const extensions [] = { "java", NULL };
 	parserDefinition* def = parserNew ("Java");
-	def->kinds      = JavaKinds;
+	def->kindTable      = JavaKinds;
 	def->kindCount  = ARRAY_SIZE (JavaKinds);
 	def->extensions = extensions;
 	def->parser2    = findCTags;
@@ -3642,7 +3642,7 @@ extern parserDefinition* VeraParser (void)
 {
 	static const char *const extensions [] = { "vr", "vri", "vrh", NULL };
 	parserDefinition* def = parserNew ("Vera");
-	def->kinds      = VeraKinds;
+	def->kindTable      = VeraKinds;
 	def->kindCount  = ARRAY_SIZE (VeraKinds);
 	def->extensions = extensions;
 	def->parser2    = findCTags;

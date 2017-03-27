@@ -56,7 +56,7 @@ SvgParser (void)
 	static const char *const extensions [] = { "svg", NULL };
 	parserDefinition* const def = parserNew ("SVG");
 
-	def->kinds         = SvgKinds;
+	def->kindTable         = SvgKinds;
 	def->kindCount     = ARRAY_SIZE (SvgKinds);
 	def->extensions    = extensions;
 	def->parser        = findSvgTags;

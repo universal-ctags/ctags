@@ -2383,7 +2383,7 @@ extern parserDefinition* FlexParser (void)
 	/*
 	 * New definitions for parsing instead of regex
 	 */
-	def->kinds		= FlexKinds;
+	def->kindTable	= FlexKinds;
 	def->kindCount	= ARRAY_SIZE (FlexKinds);
 	def->parser		= findFlexTags;
 	def->initialize = initialize;

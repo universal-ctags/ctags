@@ -547,7 +547,7 @@ extern parserDefinition* PerlParser (void)
 	static selectLanguage selectors [] = { selectByPickingPerlVersion,
 					       NULL };
 	parserDefinition* def = parserNew ("Perl");
-	def->kinds      = PerlKinds;
+	def->kindTable      = PerlKinds;
 	def->kindCount  = ARRAY_SIZE (PerlKinds);
 	def->extensions = extensions;
 	def->parser     = findPerlTags;

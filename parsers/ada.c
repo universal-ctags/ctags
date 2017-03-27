@@ -2223,7 +2223,7 @@ extern parserDefinition* AdaParser(void)
 {
   static const char *const extensions[] = { "adb", "ads", "Ada", NULL };
   parserDefinition* def = parserNew("Ada");
-  def->kinds = AdaKinds;
+  def->kindTable = AdaKinds;
   def->kindCount = ADA_KIND_COUNT;
   def->extensions = extensions;
   def->parser = findAdaTags;

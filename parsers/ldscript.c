@@ -729,7 +729,7 @@ extern parserDefinition* LdScriptParser (void)
 	def->initialize = initialize;
 	def->parser     = findLdScriptTags;
 
-	def->kinds      = LdScriptKinds;
+	def->kindTable      = LdScriptKinds;
 	def->kindCount  = ARRAY_SIZE (LdScriptKinds);
 	def->extensions = extensions;
 	def->patterns   = patterns;

@@ -293,7 +293,7 @@ extern parserDefinition* ShParser (void)
 		NULL
 	};
 	parserDefinition* def = parserNew ("Sh");
-	def->kinds      = ShKinds;
+	def->kindTable      = ShKinds;
 	def->kindCount  = ARRAY_SIZE (ShKinds);
 	def->extensions = extensions;
 	def->aliases = aliases;

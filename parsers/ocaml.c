@@ -1880,7 +1880,7 @@ extern parserDefinition *OcamlParser (void)
 					       "caml",	 /* mode name of emacs */
 					       NULL };
 	parserDefinition *def = parserNew ("OCaml");
-	def->kinds = OcamlKinds;
+	def->kindTable = OcamlKinds;
 	def->kindCount = ARRAY_SIZE (OcamlKinds);
 	def->extensions = extensions;
 	def->aliases = aliases;

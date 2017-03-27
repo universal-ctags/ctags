@@ -527,7 +527,7 @@ extern parserDefinition* M4Parser (void)
 						   NULL };
 	parserDefinition* const def = parserNew("M4");
 
-	def->kinds = M4Kinds;
+	def->kindTable = M4Kinds;
 	def->kindCount = ARRAY_SIZE(M4Kinds);
 	def->extensions = extensions;
 	def->parser = findM4Tags;

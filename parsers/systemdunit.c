@@ -135,7 +135,7 @@ extern parserDefinition* SystemdUnitParser (void)
 
 	def->dependencies = dependencies;
 	def->dependencyCount = ARRAY_SIZE(dependencies);
-	def->kinds      = SystemdUnitKinds;
+	def->kindTable      = SystemdUnitKinds;
 	def->kindCount  = ARRAY_SIZE (SystemdUnitKinds);
 	def->extensions = extensions;
 	def->parser     = findSystemdUnitTags;

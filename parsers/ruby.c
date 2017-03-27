@@ -555,7 +555,7 @@ extern parserDefinition* RubyParser (void)
 {
 	static const char *const extensions [] = { "rb", "ruby", NULL };
 	parserDefinition* def = parserNewFull ("Ruby", KIND_FILE_ALT);
-	def->kinds      = RubyKinds;
+	def->kindTable      = RubyKinds;
 	def->kindCount  = ARRAY_SIZE (RubyKinds);
 	def->extensions = extensions;
 	def->parser     = findRubyTags;

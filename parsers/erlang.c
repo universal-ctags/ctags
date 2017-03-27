@@ -181,7 +181,7 @@ extern parserDefinition *ErlangParser (void)
 {
 	static const char *const extensions[] = { "erl", "ERL", "hrl", "HRL", NULL };
 	parserDefinition *def = parserNew ("Erlang");
-	def->kinds = ErlangKinds;
+	def->kindTable = ErlangKinds;
 	def->kindCount = ARRAY_SIZE (ErlangKinds);
 	def->extensions = extensions;
 	def->parser = findErlangTags;

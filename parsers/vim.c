@@ -718,7 +718,7 @@ extern parserDefinition *VimParser (void)
 	static const char *const patterns [] = { "vimrc", "[._]vimrc", "gvimrc",
 		"[._]gvimrc", NULL };
 	parserDefinition *def = parserNew ("Vim");
-	def->kinds      = VimKinds;
+	def->kindTable      = VimKinds;
 	def->kindCount  = ARRAY_SIZE (VimKinds);
 	def->extensions = extensions;
 	def->patterns   = patterns;

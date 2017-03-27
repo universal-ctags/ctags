@@ -160,11 +160,11 @@ extern parserDefinition* YamlParser (void)
 	static const char *const extensions [] = { "yml", NULL };
 	parserDefinition* const def = parserNew ("Yaml");
 
-	def->kinds = YamlKinds;
+	def->kindTable = YamlKinds;
 	def->extensions = extensions;
 	def->parser     = findYamlTags;
 	def->useCork    = true;
-	def->kinds         = YamlKinds;
+	def->kindTable         = YamlKinds;
 	def->kindCount     = ARRAY_SIZE (YamlKinds);
 
 	return def;

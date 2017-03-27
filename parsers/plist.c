@@ -162,7 +162,7 @@ PlistXMLParser (void)
 	static const char *const extensions [] = { "plist", NULL };
 	parserDefinition* const def = parserNew ("PlistXML");
 
-	def->kinds         = PlistKinds;
+	def->kindTable         = PlistKinds;
 	def->kindCount     = ARRAY_SIZE (PlistKinds);
 	def->extensions    = extensions;
 	def->parser        = findPlistTags;

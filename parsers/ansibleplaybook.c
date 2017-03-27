@@ -221,7 +221,7 @@ extern parserDefinition* AnsiblePlaybookParser (void)
 	def->dependencies = dependencies;
 	def->dependencyCount = ARRAY_SIZE (dependencies);
 
-	def->kinds         = AnsiblePlaybookKinds;
+	def->kindTable         = AnsiblePlaybookKinds;
 	def->kindCount     = ARRAY_SIZE (AnsiblePlaybookKinds);
 	def->parser        = findAnsiblePlaybookTags;
 	def->method        = METHOD_YAML;

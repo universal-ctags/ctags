@@ -1351,7 +1351,7 @@ extern parserDefinition* PythonParser (void)
 	static const char *const extensions[] = { "py", "pyx", "pxd", "pxi", "scons", NULL };
 	static const char *const aliases[] = { "python[23]*", "scons", NULL };
 	parserDefinition *def = parserNew ("Python");
-	def->kinds = PythonKinds;
+	def->kindTable = PythonKinds;
 	def->kindCount = ARRAY_SIZE (PythonKinds);
 	def->extensions = extensions;
 	def->aliases = aliases;

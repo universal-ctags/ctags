@@ -173,7 +173,7 @@ extern bool isLanguageEnabled (const langType language)
 
 	if ((lang->method & METHOD_XCMD) &&
 		 (!(lang->method & METHOD_XCMD_AVAILABLE)) &&
-		 (lang->kinds == NULL) &&
+		 (lang->kindTable == NULL) &&
 		 (!(lang->method & METHOD_REGEX)) &&
 		 (!(lang->method & METHOD_XPATH)))
 		return false;
@@ -1423,7 +1423,7 @@ static bool doesParserUseKind (const parserDefinition *const parser, char letter
 	unsigned int k;
 
 	for (k = 0; k < parser->kindCount; k++)
-		if (parser->kinds [k].letter == letter)
+		if (parser->kindTable [k].letter == letter)
 			return true;
 	return false;
 }
@@ -1685,8 +1685,8 @@ static kindDefinition *langKindDefinition (const langType language, const int fl
 	Assert (0 <= language  &&  language < (int) LanguageCount);
 	lang = LanguageTable [language].def;
 	for (i=0  ;  i < lang->kindCount  &&  result == NULL  ;  ++i)
-		if (lang->kinds [i].letter == flag)
-			result = &lang->kinds [i];
+		if (lang->kindTable [i].letter == flag)
+			result = &lang->kindTable [i];
 	return result;
 }
 
@@ -1698,8 +1698,8 @@ static kindDefinition *langKindLongOption (const langType language, const char *
 	Assert (0 <= language  &&  language < (int) LanguageCount);
 	lang = LanguageTable [language].def;
 	for (i=0  ;  i < lang->kindCount  &&  result == NULL  ;  ++i)
-		if (strcmp (lang->kinds [i].name, kindLong) == 0)
-			result = &lang->kinds [i];
+		if (strcmp (lang->kindTable [i].name, kindLong) == 0)
+			result = &lang->kindTable [i];
 	return result;
 }
 
@@ -1730,7 +1730,7 @@ static void resetLanguageKinds (const langType language, const bool mode)
 	{
 		unsigned int i;
 		for (i = 0  ;  i < lang->kindCount  ;  ++i)
-			enableKind (lang->kinds + i, mode);
+			enableKind (lang->kindTable + i, mode);
 	}
 }
 
@@ -1933,7 +1933,7 @@ static void printRoles (const langType language, const char* letters, bool allow
 
 		for (i = 0; i < lang->kindCount; ++i)
 		{
-			k = lang->kinds + i;
+			k = lang->kindTable + i;
 			if (*c == KIND_WILDCARD || k->letter == *c)
 			{
 				int j;
@@ -1989,14 +1989,14 @@ static void printKinds (langType language, bool allKindFields, bool indent)
 
 	initializeParser (language);
 	lang = LanguageTable [language].def;
-	if (lang->kinds != NULL)
+	if (lang->kindTable != NULL)
 	{
 		unsigned int i;
 		for (i = 0  ;  i < lang->kindCount  ;  ++i)
 		{
 			if (allKindFields && indent)
 				printf (Option.machinable? "%s": PR_KIND_FMT (LANG,s), lang->name);
-			printKind (lang->kinds + i, allKindFields, indent, Option.machinable);
+			printKind (lang->kindTable + i, allKindFields, indent, Option.machinable);
 		}
 	}
 	printRegexKinds (language, allKindFields, indent, Option.machinable);
@@ -2206,7 +2206,7 @@ static void printLanguage (const langType language, parserDefinition** ltable)
 	if (lang->method & METHOD_XCMD)
 		initializeParser (lang->id);
 
-	if (lang->kinds != NULL  ||  (lang->method & METHOD_REGEX) || (lang->method & METHOD_XCMD))
+	if (lang->kindTable != NULL  ||  (lang->method & METHOD_REGEX) || (lang->method & METHOD_XCMD))
 		printf ("%s%s\n", lang->name, isLanguageEnabled (lang->id) ? "" : " [disabled]");
 }
 
@@ -2722,7 +2722,7 @@ extern bool makeKindSeparatorsPseudoTags (const langType language,
 
 	Assert (0 <= language  &&  language < (int) LanguageCount);
 	lang = LanguageTable [language].def;
-	kinds = lang->kinds;
+	kinds = lang->kindTable;
 	kindCount = lang->kindCount;
 
 	if (kinds == NULL)
@@ -2824,7 +2824,7 @@ extern bool makeKindDescriptionsPseudoTags (const langType language,
 
 	Assert (0 <= language  &&  language < (int) LanguageCount);
 	lang = LanguageTable [language].def;
-	kinds = lang->kinds;
+	kinds = lang->kindTable;
 	kindCount = lang->kindCount;
 
 	data.langName = lang->name;
@@ -3162,7 +3162,7 @@ static parserDefinition *CTagsSelfTestParser (void)
 	static const char *const extensions[] = { NULL };
 	parserDefinition *const def = parserNew ("CTagsSelfTest");
 	def->extensions = extensions;
-	def->kinds = CTST_Kinds;
+	def->kindTable = CTST_Kinds;
 	def->kindCount = KIND_COUNT;
 	def->parser = createCTSTTags;
 	def->invisible = true;

@@ -254,7 +254,7 @@ extern parserDefinition* PascalParser (void)
 	static const char *const extensions [] = { "p", "pas", NULL };
 	parserDefinition* def = parserNew ("Pascal");
 	def->extensions = extensions;
-	def->kinds      = PascalKinds;
+	def->kindTable      = PascalKinds;
 	def->kindCount  = ARRAY_SIZE (PascalKinds);
 	def->parser     = findPascalTags;
 	return def;

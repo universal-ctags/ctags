@@ -206,7 +206,7 @@ extern parserDefinition *RParser (void)
 	static selectLanguage selectors[] = { selectByArrowOfR,
 					      NULL };
 	def->extensions = extensions;
-	def->kinds = RKinds;
+	def->kindTable = RKinds;
 	def->kindCount = KIND_COUNT;
 	def->parser = createRTags;
 	def->selectLanguage = selectors;

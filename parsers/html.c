@@ -397,7 +397,7 @@ extern parserDefinition* HtmlParser (void)
 {
 	static const char *const extensions [] = { "htm", "html", NULL };
 	parserDefinition* def = parserNew ("HTML");
-	def->kinds        = HtmlKinds;
+	def->kindTable        = HtmlKinds;
 	def->kindCount    = ARRAY_SIZE (HtmlKinds);
 	def->extensions   = extensions;
 	def->parser       = findHtmlTags;

@@ -233,7 +233,7 @@ extern parserDefinition* IniconfParser (void)
 	static const char *const extensions [] = { "ini", "conf", NULL };
 	parserDefinition* const def = parserNew ("Iniconf");
 
-	def->kinds      = IniconfKinds;
+	def->kindTable      = IniconfKinds;
 	def->kindCount  = ARRAY_SIZE (IniconfKinds);
 	def->extensions = extensions;
 	def->parser     = findIniconfTags;

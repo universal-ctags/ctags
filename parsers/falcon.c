@@ -137,7 +137,7 @@ extern parserDefinition* FalconParser (void)
 {
     static const char *const extensions [] = { "fal", "ftd", NULL };
     parserDefinition *def = parserNew ("Falcon");
-    def->kinds      = FalconKinds;
+    def->kindTable  = FalconKinds;
     def->kindCount  = ARRAY_SIZE (FalconKinds);
     def->extensions = extensions;
     def->parser     = findFalconTags;

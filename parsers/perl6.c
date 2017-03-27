@@ -329,7 +329,7 @@ Perl6Parser (void)
     static selectLanguage selectors [] = { selectByPickingPerlVersion,
 					   NULL };
     parserDefinition* def = parserNew("Perl6");
-    def->kinds      = perl6Kinds;
+    def->kindTable      = perl6Kinds;
     def->kindCount  = ARRAY_SIZE(perl6Kinds);
     def->extensions = extensions;
     def->parser     = findPerl6Tags;

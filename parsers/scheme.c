@@ -117,7 +117,7 @@ extern parserDefinition* SchemeParser (void)
 		"gosh", "guile", NULL
 	};
 	parserDefinition* def = parserNew ("Scheme");
-	def->kinds      = SchemeKinds;
+	def->kindTable      = SchemeKinds;
 	def->kindCount  = ARRAY_SIZE (SchemeKinds);
 	def->extensions = extensions;
 	def->aliases    = aliases;

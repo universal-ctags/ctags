@@ -208,7 +208,7 @@ extern parserDefinition *SmlParser (void)
 {
 	static const char *const extensions[] = { "sml", "sig", NULL };
 	parserDefinition *def = parserNew ("SML");
-	def->kinds = SmlKinds;
+	def->kindTable = SmlKinds;
 	def->kindCount = ARRAY_SIZE (SmlKinds);
 	def->extensions = extensions;
 	def->parser = findSmlTags;

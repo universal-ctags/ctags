@@ -10,18 +10,18 @@ _       no letter       on       FALSE   0                 kind with no letter
 L                       on       FALSE   0                 kind with no long name        
 
 # +K
-abnormal kindOption testing (no letter)	input.x	/^@$/;"	no letter
-abnormal kindOption testing (no long name)	input.x	/^L$/;"	L
+abnormal kindDefinition testing (no letter)	input.x	/^@$/;"	no letter
+abnormal kindDefinition testing (no long name)	input.x	/^L$/;"	L
 
 # +k
-abnormal kindOption testing (no letter)	input.x	/^@$/;"	no letter
-abnormal kindOption testing (no long name)	input.x	/^L$/;"	L
+abnormal kindDefinition testing (no letter)	input.x	/^@$/;"	no letter
+abnormal kindDefinition testing (no long name)	input.x	/^L$/;"	L
 
 # +zk
-abnormal kindOption testing (no letter)	input.x	/^@$/;"	kind:no letter
-abnormal kindOption testing (no long name)	input.x	/^L$/;"	kind:L
+abnormal kindDefinition testing (no letter)	input.x	/^@$/;"	kind:no letter
+abnormal kindDefinition testing (no long name)	input.x	/^L$/;"	kind:L
 
 # +Zk
-abnormal kindOption testing (no letter)	input.x	/^@$/;"	no letter
-abnormal kindOption testing (no long name)	input.x	/^L$/;"	L
+abnormal kindDefinition testing (no letter)	input.x	/^@$/;"	no letter
+abnormal kindDefinition testing (no long name)	input.x	/^L$/;"	L
 

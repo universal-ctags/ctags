@@ -154,7 +154,7 @@ DbusIntrospectParser (void)
 			.systemID   = "http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd",
 		},
 	};
-	def->kinds         = DbusIntrospectKinds;
+	def->kindTable         = DbusIntrospectKinds;
 	def->kindCount     = ARRAY_SIZE (DbusIntrospectKinds);
 	def->extensions    = extensions;
 	def->parser        = findDbusIntrospectTags;

@@ -181,7 +181,7 @@ extern parserDefinition* AutoconfParser (void)
 	def->dependencies = dependencies;
 	def->dependencyCount = ARRAY_SIZE (dependencies);
 
-	def->kinds = AutoconfKinds;
+	def->kindTable = AutoconfKinds;
 	def->kindCount = ARRAY_SIZE(AutoconfKinds);
 	def->patterns = patterns;
 	def->extensions = extensions;
