@@ -60,7 +60,7 @@ extern int  getXtagOwner (xtagType type);
 const char* getXtagName (xtagType type);
 extern void printXtags (langType language);
 
-extern void initXtagDescs (void);
+extern void initXtagObjects (void);
 extern int countXtags (void);
 
 extern int defineXtag (xtagDefinition *spec, langType language);
