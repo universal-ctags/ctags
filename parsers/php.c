@@ -121,7 +121,7 @@ static scopeSeparator PhpGenericSeparators [] = {
 	{ KIND_WILDCARD, "::" },
 };
 
-static kindOption PhpKinds[COUNT_KIND] = {
+static kindDefinition PhpKinds[COUNT_KIND] = {
 	{ true, 'c', "class",		"classes",
 	  ATTACH_SEPARATORS(PhpGenericSeparators) },
 	{ true, 'd', "define",		"constant definitions",

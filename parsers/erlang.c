@@ -28,7 +28,7 @@ typedef enum {
 	K_MACRO, K_FUNCTION, K_MODULE, K_RECORD, K_TYPE
 } erlangKind;
 
-static kindOption ErlangKinds[] = {
+static kindDefinition ErlangKinds[] = {
 	{true, 'd', "macro",    "macro definitions"},
 	{true, 'f', "function", "functions"},
 	{true, 'm', "module",   "modules"},

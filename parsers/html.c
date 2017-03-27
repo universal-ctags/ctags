@@ -29,7 +29,7 @@ typedef enum {
 } htmlKind;
 
 
-static kindOption HtmlKinds [] = {
+static kindDefinition HtmlKinds [] = {
 	{ true, 'a', "anchor",		"named anchors" },
 	{ true, 'h', "heading1",	"H1 headings" },
 	{ true, 'i', "heading2",	"H2 headings" },

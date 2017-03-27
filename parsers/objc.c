@@ -39,7 +39,7 @@ typedef enum {
 	K_MACRO
 } objcKind;
 
-static kindOption ObjcKinds[] = {
+static kindDefinition ObjcKinds[] = {
 	{true, 'i', "interface", "class interface"},
 	{true, 'I', "implementation", "class implementation"},
 	{true, 'P', "protocol", "Protocol"},

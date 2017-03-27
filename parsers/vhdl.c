@@ -181,7 +181,7 @@ typedef enum {
 	VHDLTAG_LOCAL
 } vhdlKind;
 
-static kindOption VhdlKinds[] = {
+static kindDefinition VhdlKinds[] = {
 	{true, 'c', "constant", "constant declarations"},
 	{true, 't', "type", "type definitions"},
 	{true, 'T', "subtype", "subtype definitions"},

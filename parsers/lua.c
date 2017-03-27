@@ -27,7 +27,7 @@ typedef enum {
 	K_FUNCTION
 } luaKind;
 
-static kindOption LuaKinds [] = {
+static kindDefinition LuaKinds [] = {
 	{ true, 'f', "function", "functions" }
 };
 

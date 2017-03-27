@@ -213,7 +213,7 @@ typedef enum {
 	SQLTAG_COUNT
 } sqlKind;
 
-static kindOption SqlKinds [] = {
+static kindDefinition SqlKinds [] = {
 	{ true,  'c', "cursor",		  "cursors"				   },
 	{ false, 'd', "prototype",	  "prototypes"			   },
 	{ true,  'f', "function",	  "functions"			   },

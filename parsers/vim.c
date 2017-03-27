@@ -50,7 +50,7 @@ typedef enum {
 	K_FILENAME
 } vimKind;
 
-static kindOption VimKinds [] = {
+static kindDefinition VimKinds [] = {
 	{ true,  'a', "augroup",  "autocommand groups" },
 	{ true,  'c', "command",  "user-defined commands" },
 	{ true,  'f', "function", "function definitions" },

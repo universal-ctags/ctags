@@ -24,7 +24,7 @@ typedef enum {
 
 static RobotKind section = -1;
 
-static kindOption RobotKinds[COUNT_KIND] = {
+static kindDefinition RobotKinds[COUNT_KIND] = {
 	{true, 't', "testcase",   "testcases"},
 	{true, 'k', "keyword",    "keywords"},
 	{true, 'v', "variable",   "variables"},

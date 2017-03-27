@@ -47,7 +47,7 @@ typedef enum {
 	K_NONE
 } RustKind;
 
-static kindOption rustKinds[] = {
+static kindDefinition rustKinds[] = {
 	{true, 'n', "module", "module"},
 	{true, 's', "struct", "structural type"},
 	{true, 'i', "interface", "trait interface"},

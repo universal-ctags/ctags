@@ -28,7 +28,7 @@ typedef enum {
 	K_FUNCTION, K_PROCEDURE
 } pascalKind;
 
-static kindOption PascalKinds [] = {
+static kindDefinition PascalKinds [] = {
 	{ true, 'f', "function",  "functions"},
 	{ true, 'p', "procedure", "procedures"}
 };

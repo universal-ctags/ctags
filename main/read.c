@@ -200,7 +200,7 @@ extern bool doesInputLanguageAllowNullTag (void)
 	return doesLanguageAllowNullTag (getInputLanguage ());
 }
 
-extern kindOption *getInputLanguageFileKind (void)
+extern kindDefinition *getInputLanguageFileKind (void)
 {
 	return getLanguageFileKind (getInputLanguage ());
 }

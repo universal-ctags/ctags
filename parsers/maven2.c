@@ -51,7 +51,7 @@ static roleDesc Maven2ArtifactIdRoles [] = {
 	{ true, "dependency", "dependency" },
 };
 
-static kindOption Maven2Kinds [] = {
+static kindDefinition Maven2Kinds [] = {
 	{ true,  'g', "groupId",    "group identifiers",
 	  .referenceOnly = false, ATTACH_ROLES (Maven2GroupIdRoles) },
 	{ true,  'a', "artifactId", "artifact identifiers",

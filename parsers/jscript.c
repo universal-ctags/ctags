@@ -189,7 +189,7 @@ typedef enum {
 	JSTAG_COUNT
 } jsKind;
 
-static kindOption JsKinds [] = {
+static kindDefinition JsKinds [] = {
 	{ true,  'f', "function",	  "functions"		   },
 	{ true,  'c', "class",		  "classes"			   },
 	{ true,  'm', "method",		  "methods"			   },

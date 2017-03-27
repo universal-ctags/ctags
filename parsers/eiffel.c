@@ -154,7 +154,7 @@ typedef enum {
 	EKIND_CLASS, EKIND_FEATURE, EKIND_LOCAL, EKIND_QUALIFIED_TAGS
 } eiffelKind;
 
-static kindOption EiffelKinds [] = {
+static kindDefinition EiffelKinds [] = {
 	{ true,  'c', "class",   "classes"},
 	{ true,  'f', "feature", "features"},
 	{ false, 'l', "local",   "local entities"}

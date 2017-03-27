@@ -35,7 +35,7 @@ typedef enum {
 	K_FRAGMENT, K_PATTERN, K_SLOT, K_VIRTUAL
 } betaKind;
 
-static kindOption BetaKinds [] = {
+static kindDefinition BetaKinds [] = {
 	{ true,  'f', "fragment", "fragment definitions"},
 	{ false, 'p', "pattern",  "all patterns"},
 	{ true,  's', "slot",     "slots (fragment uses)"},

@@ -37,7 +37,7 @@ typedef enum {
 	K_ID, K_CLASS, K_HANDLER,
 } gladeKind;
 
-static kindOption GladeKinds [] = {
+static kindDefinition GladeKinds [] = {
 	{ true,  'i', "id",	  "identifiers" },
 
 	/* These two are appeared on names in C source code. */

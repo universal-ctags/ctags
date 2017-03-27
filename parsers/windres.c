@@ -33,7 +33,7 @@ typedef enum _WindResKinds
 	K_ACCELERATORS
 } ResKind;
 
-static kindOption ResKinds [] = {
+static kindDefinition ResKinds [] = {
 	{ true, 'd', "dialog",			"dialogs"		},
 	{ true, 'm', "menu",			"menus"			},
 	{ true, 'i', "icon",			"icons"			},

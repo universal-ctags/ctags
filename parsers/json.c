@@ -72,7 +72,7 @@ typedef enum {
 
 static langType Lang_json;
 
-static kindOption JsonKinds [] = {
+static kindDefinition JsonKinds [] = {
 	{ true,  'o', "object",		"objects"	},
 	{ true,  'a', "array",		"arrays"	},
 	{ true,  'n', "number",		"numbers"	},

@@ -22,7 +22,7 @@ typedef enum {
 	K_ID,
 } svgKind;
 
-static kindOption SvgKinds [] = {
+static kindDefinition SvgKinds [] = {
 	{ true,  'i', "id", "id attributes" },
 };
 

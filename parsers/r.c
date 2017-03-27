@@ -35,7 +35,7 @@ typedef enum {
 	KIND_COUNT
 } rKind;
 
-static kindOption RKinds[KIND_COUNT] = {
+static kindDefinition RKinds[KIND_COUNT] = {
 	{true, 'f', "function", "functions"},
 	{true, 'l', "library", "libraries"},
 	{true, 's', "source", "sources"},

@@ -75,7 +75,7 @@ typedef struct {
 	union {
 		struct {
 			char *name_pattern;
-			kindOption *kind;
+			kindDefinition *kind;
 		} tag;
 		struct {
 			regexCallback function;
@@ -143,7 +143,7 @@ static void clearPatternSet (const langType language)
 */
 
 static int makeRegexTag (
-		const vString* const name, const kindOption* const kind, int scopeIndex, int placeholder,
+		const vString* const name, const kindDefinition* const kind, int scopeIndex, int placeholder,
 		unsigned long line, MIOPos *pos)
 {
 	Assert (kind != NULL);
@@ -310,9 +310,9 @@ static flagDefinition scopePtrnFlagDef[] = {
 	  NULL, "don't put this tag to tags file."},
 };
 
-static kindOption *kindNew ()
+static kindDefinition *kindNew ()
 {
-	kindOption *kind = xCalloc (1, kindOption);
+	kindDefinition *kind = xCalloc (1, kindDefinition);
 	kind->letter        = '\0';
 	kind->name = NULL;
 	kind->description = NULL;
@@ -325,7 +325,7 @@ static kindOption *kindNew ()
 
 static void kindFree (void *data)
 {
-	kindOption *kind = data;
+	kindDefinition *kind = data;
 	kind->letter = '\0';
 	if (kind->name)
 	{
@@ -346,7 +346,7 @@ static regexPattern* addCompiledTagCommon (const langType language,
 {
 	patternSet* set;
 	regexPattern *ptrn;
-	kindOption *kind = NULL;
+	kindDefinition *kind = NULL;
 
 	if (language > SetUpper)
 	{
@@ -972,14 +972,14 @@ extern bool processRegexOption (const char *const option,
 }
 
 struct kindCbHelperData {
-	bool (*func) (kindOption *, void *);
+	bool (*func) (kindDefinition *, void *);
 	void *func_data;
 	bool result;
 };
 
 static void kindCbHelper (void *key, void *value, void* user_data)
 {
-	kindOption *kind = value;
+	kindDefinition *kind = value;
 	struct kindCbHelperData *helper_data = user_data;
 
 	if (helper_data->result)
@@ -989,7 +989,7 @@ static void kindCbHelper (void *key, void *value, void* user_data)
 }
 
 extern void foreachRegexKinds (const langType language,
-			       bool (*func) (kindOption *, void *),
+			       bool (*func) (kindDefinition *, void *),
 			       void *data)
 {
 	initializeParser (language);
@@ -1007,7 +1007,7 @@ extern void foreachRegexKinds (const langType language,
 }
 
 
-static bool kind_reset_cb (kindOption *kind, void *data)
+static bool kind_reset_cb (kindDefinition *kind, void *data)
 {
 	kind->enabled = *(bool *)data;
 	return false;		/* continue */
@@ -1026,7 +1026,7 @@ struct kind_and_mode_and_result
 	bool result;
 };
 
-static bool enable_kind_cb (kindOption *kind, void *data)
+static bool enable_kind_cb (kindDefinition *kind, void *data)
 {
 	struct kind_and_mode_and_result *kmr = data;
 	if ((kmr->kind != KIND_NULL
@@ -1074,7 +1074,7 @@ struct kind_and_result
 	bool result;
 };
 
-static bool is_kind_enabled_cb (kindOption *kind, void *data)
+static bool is_kind_enabled_cb (kindDefinition *kind, void *data)
 {
 	bool r = false;
 	struct kind_and_result *kr = data;
@@ -1088,7 +1088,7 @@ static bool is_kind_enabled_cb (kindOption *kind, void *data)
 	return r;
 }
 
-static bool does_kind_exist_cb (kindOption *kind, void *data)
+static bool does_kind_exist_cb (kindDefinition *kind, void *data)
 {
 	bool r = false;
 	struct kind_and_result *kr = data;
@@ -1133,7 +1133,7 @@ struct printRegexKindCBData{
 	bool tabSeparated;
 };
 
-static bool printRegexKind (kindOption *kind, void *user_data)
+static bool printRegexKind (kindDefinition *kind, void *user_data)
 {
 	struct printRegexKindCBData *data = user_data;
 	if (kind->letter != KIND_GHOST)

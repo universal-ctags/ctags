@@ -76,7 +76,7 @@ typedef enum {
 	K_KEY,
 } makeKind;
 
-static kindOption IniconfKinds [] = {
+static kindDefinition IniconfKinds [] = {
 	{ true, 's', "section",  "sections"},
 	{ true, 'k', "key",      "keys"},
 };

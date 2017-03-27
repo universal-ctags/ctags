@@ -30,7 +30,7 @@ typedef enum {
 	K_REPO_ID,
 } yumRepoKind;
 
-static kindOption YumRepoKinds [] = {
+static kindDefinition YumRepoKinds [] = {
 	{ true, 'r', "repoid", "repository id" },
 };
 

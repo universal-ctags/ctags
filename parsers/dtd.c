@@ -58,7 +58,7 @@ typedef enum {
 	K_NOTATION,
 } dtdKind;
 
-static kindOption DtdKinds [] = {
+static kindDefinition DtdKinds [] = {
 	{ true, 'E', "entity",    "entities" },
 	{ true, 'p', "parameterEntity", "parameter entities",
 	  .referenceOnly = false, ATTACH_ROLES(DtdEntityRoles),

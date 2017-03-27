@@ -27,7 +27,7 @@ typedef enum {
 	K_FUNCTION, K_SET
 } schemeKind;
 
-static kindOption SchemeKinds [] = {
+static kindDefinition SchemeKinds [] = {
 	{ true, 'f', "function", "functions" },
 	{ true, 's', "set",      "sets" }
 };

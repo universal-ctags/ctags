@@ -26,7 +26,7 @@ typedef enum eAwkKinds {
 	K_FUNCTION
 } awkKind;
 
-static kindOption AwkKinds [] = {
+static kindDefinition AwkKinds [] = {
 	{ true, 'f', "function", "functions" }
 };
 

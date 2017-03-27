@@ -62,7 +62,7 @@ static roleDesc XsltNamedTemplateRoles [] = {
 };
 
 
-static kindOption XsltKinds [] = {
+static kindDefinition XsltKinds [] = {
 	{ true,  's', "stylesheet", "stylesheets",
 	  .referenceOnly = true, ATTACH_ROLES (XsltStylesheetRoles) },
 	{ true,  'p', "parameter", "parameters",

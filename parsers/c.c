@@ -333,7 +333,7 @@ typedef enum {
 	CK_EXTERN_VARIABLE, CK_LABEL
 } cKind;
 
-static kindOption CKinds [] = {
+static kindDefinition CKinds [] = {
 	{ true,  'c', "class",      "classes"},
 	{ true,  'd', "macro",      "macro definitions",
 	  .referenceOnly = false, ATTACH_ROLES(CMacroRoles)},
@@ -361,7 +361,7 @@ typedef enum {
 	CSK_NAMESPACE, CSK_PROPERTY, CSK_STRUCT, CSK_TYPEDEF
 } csharpKind;
 
-static kindOption CsharpKinds [] = {
+static kindDefinition CsharpKinds [] = {
 	{ true,  'c', "class",      "classes"},
 	{ true,  'd', "macro",      "macro definitions"},
 	{ true,  'e', "enumerator", "enumerators (values inside an enumeration)"},
@@ -386,7 +386,7 @@ typedef enum
 	DK_VARIABLE, DK_VERSION
 } dKind;
 
-static kindOption DKinds [] = {
+static kindDefinition DKinds [] = {
 	{ true,  'a', "alias",      "aliases"},
 	{ true,  'c', "class",      "classes"},
 	{ true,  'g', "enum",       "enumeration names"},
@@ -422,7 +422,7 @@ typedef enum {
 	JK_LOCAL, JK_METHOD, JK_PACKAGE, JK_ACCESS, JK_CLASS_PREFIX
 } javaKind;
 
-static kindOption JavaKinds [] = {
+static kindDefinition JavaKinds [] = {
 	{ true,  'a', "annotation",    "annotation declarations" },
 	{ true,  'c', "class",         "classes"},
 	{ true,  'e', "enumConstant",  "enum constants"},
@@ -463,7 +463,7 @@ typedef enum {
 	VK_EXTERN_VARIABLE, VK_HEADER
 } veraKind;
 
-static kindOption VeraKinds [] = {
+static kindDefinition VeraKinds [] = {
 	{ true,  'c', "class",      "classes"},
 	{ true,  'd', "macro",      "macro definitions",
 	  .referenceOnly = false, ATTACH_ROLES(VeraMacroRoles)},
@@ -1127,9 +1127,9 @@ static veraKind veraTagKindFull (const tagType type, bool with_assert) {
 	return result;
 }
 
-static const kindOption *kindForType (const tagType type)
+static const kindDefinition *kindForType (const tagType type)
 {
-	const kindOption * result;
+	const kindDefinition * result;
 	if (isInputLanguage (Lang_csharp))
 		result = &(CsharpKinds [csharpTagKind (type)]);
 	else if (isInputLanguage (Lang_java))
@@ -1177,7 +1177,7 @@ static bool includeTag (const tagType type, const bool isFileScope)
 {
 	bool result;
 	int k;
-	kindOption* kopt = NULL;
+	kindDefinition* kopt = NULL;
 
 	if (isFileScope  &&  ! isXtagEnabled(XTAG_FILE_SCOPE))
 		result = false;
@@ -1477,7 +1477,7 @@ static void makeTag (const tokenInfo *const token,
 		 * it's used in makeTagEntry().
 		 */
 		tagEntryInfo e;
-		const kindOption *kind;
+		const kindDefinition *kind;
 		int role;
 
 		role = roleForType (type);
@@ -3462,8 +3462,8 @@ static rescanReason findCTags (const unsigned int passCount)
 {
 	exception_t exception;
 	rescanReason rescan;
-	kindOption *kind_for_define = NULL;
-	kindOption *kind_for_header = NULL;
+	kindDefinition *kind_for_define = NULL;
+	kindDefinition *kind_for_header = NULL;
 	int role_for_macro_undef   = ROLE_INDEX_DEFINITION;
 	int role_for_header_system   = ROLE_INDEX_DEFINITION;
 	int role_for_header_local   = ROLE_INDEX_DEFINITION;

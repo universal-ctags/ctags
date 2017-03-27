@@ -110,7 +110,7 @@ static parserDefinitionFunc* BuiltInParsers[] = {
 };
 static parserObject* LanguageTable = NULL;
 static unsigned int LanguageCount = 0;
-static kindOption defaultFileKind = {
+static kindDefinition defaultFileKind = {
 	.enabled     = false,
 	.letter      = KIND_FILE_DEFAULT,
 	.name        = KIND_FILE_DEFAULT_LONG,
@@ -127,7 +127,7 @@ extern unsigned int countParsers (void)
 }
 
 extern int makeSimpleTag (
-		const vString* const name, kindOption* const kinds, const int kind)
+		const vString* const name, kindDefinition* const kinds, const int kind)
 {
 	int r = CORK_NIL;
 
@@ -141,7 +141,7 @@ extern int makeSimpleTag (
 	return r;
 }
 
-extern int makeSimpleRefTag (const vString* const name, kindOption* const kinds, const int kind,
+extern int makeSimpleRefTag (const vString* const name, kindDefinition* const kinds, const int kind,
 			     int roleIndex)
 {
 	int r = CORK_NIL;
@@ -190,11 +190,11 @@ extern parserDefinition* parserNew (const char* name)
 	return parserNewFull (name, 0);
 }
 
-static kindOption* fileKindNew (char letter)
+static kindDefinition* fileKindNew (char letter)
 {
-	kindOption *fileKind;
+	kindDefinition *fileKind;
 
-	fileKind = xMalloc (1, kindOption);
+	fileKind = xMalloc (1, kindDefinition);
 	*(fileKind) = defaultFileKind;
 	fileKind->letter = letter;
 	return fileKind;
@@ -238,9 +238,9 @@ extern const char *getLanguageName (const langType language)
 	return result;
 }
 
-extern kindOption* getLanguageFileKind (const langType language)
+extern kindDefinition* getLanguageFileKind (const langType language)
 {
-	kindOption* kind;
+	kindDefinition* kind;
 
 	Assert (0 <= language  &&  language < (int) LanguageCount);
 
@@ -1677,10 +1677,10 @@ extern void processLanguageDefineOption (
 	}
 }
 
-static kindOption *langKindOption (const langType language, const int flag)
+static kindDefinition *langKindDefinition (const langType language, const int flag)
 {
 	unsigned int i;
-	kindOption* result = NULL;
+	kindDefinition* result = NULL;
 	const parserDefinition* lang;
 	Assert (0 <= language  &&  language < (int) LanguageCount);
 	lang = LanguageTable [language].def;
@@ -1690,10 +1690,10 @@ static kindOption *langKindOption (const langType language, const int flag)
 	return result;
 }
 
-static kindOption *langKindLongOption (const langType language, const char *kindLong)
+static kindDefinition *langKindLongOption (const langType language, const char *kindLong)
 {
 	unsigned int i;
-	kindOption* result = NULL;
+	kindDefinition* result = NULL;
 	const parserDefinition* lang;
 	Assert (0 <= language  &&  language < (int) LanguageCount);
 	lang = LanguageTable [language].def;
@@ -1705,14 +1705,14 @@ static kindOption *langKindLongOption (const langType language, const char *kind
 
 extern bool isLanguageKindEnabled (const langType language, char kind)
 {
-	const kindOption *kindOpt;
+	const kindDefinition *kindOpt;
 
 	if (hasRegexKind (language, kind))
 		return isRegexKindEnabled (language, kind);
 	else if (hasXcmdKind (language, kind))
 		return isXcmdKindEnabled (language, kind);
 
-	kindOpt = langKindOption (language, kind);
+	kindOpt = langKindDefinition (language, kind);
 	Assert (kindOpt);
 
 	return kindOpt->enabled;
@@ -1738,7 +1738,7 @@ static bool enableLanguageKind (
 		const langType language, const int kind, const bool mode)
 {
 	bool result = false;
-	kindOption* const opt = langKindOption (language, kind);
+	kindDefinition* const opt = langKindDefinition (language, kind);
 	if (opt != NULL)
 	{
 		enableKind (opt, mode);
@@ -1753,7 +1753,7 @@ static bool enableLanguageKindLong (
 	const langType language, const char * const kindLong, const bool mode)
 {
 	bool result = false;
-	kindOption* const opt = langKindLongOption (language, kindLong);
+	kindDefinition* const opt = langKindLongOption (language, kindLong);
 	if (opt != NULL)
 	{
 		enableKind (opt, mode);
@@ -1764,7 +1764,7 @@ static bool enableLanguageKindLong (
 	return result;
 }
 
-static void processLangKindOption (
+static void processLangKindDefinition (
 		const langType language, const char *const option,
 		const char *const parameter)
 {
@@ -1841,25 +1841,25 @@ static void processLangKindOption (
 	}
 }
 
-struct langKindOptionStruct {
+struct langKindDefinitionStruct {
 	const char *const option;
 	const char *const parameter;
 };
-static void processLangKindOptionEach(
+static void processLangKindDefinitionEach(
 	langType lang, void* user_data)
 {
-	struct langKindOptionStruct *arg = user_data;
-	processLangKindOption (lang, arg->option, arg->parameter);
+	struct langKindDefinitionStruct *arg = user_data;
+	processLangKindDefinition (lang, arg->option, arg->parameter);
 }
 
-extern bool processKindOption (
+extern bool processKindDefinition (
 		const char *const option, const char *const parameter)
 {
 #define PREFIX "kinds-"
 #define PREFIX_LEN strlen(PREFIX)
 
 	bool handled = false;
-	struct langKindOptionStruct arg = {
+	struct langKindDefinitionStruct arg = {
 		.option = option,
 		.parameter = parameter,
 	};
@@ -1872,7 +1872,7 @@ extern bool processKindOption (
 		size_t len = dash - option;
 
 		if ((len == 1) && (*option == '*'))
-			foreachLanguage(processLangKindOptionEach, &arg);
+			foreachLanguage(processLangKindDefinitionEach, &arg);
 		else
 		{
 			vString* langName = vStringNew ();
@@ -1881,7 +1881,7 @@ extern bool processKindOption (
 			if (language == LANG_IGNORE)
 				error (WARNING, "Unknown language \"%s\" in \"%s\" option", vStringValue (langName), option);
 			else
-				processLangKindOption (language, option, parameter);
+				processLangKindDefinition (language, option, parameter);
 			vStringDelete (langName);
 		}
 		handled = true;
@@ -1897,7 +1897,7 @@ extern bool processKindOption (
 			error (WARNING, "No language given in \"%s\" option", option);
 		else if (len == 1 && lang[0] == '*')
 		{
-			foreachLanguage(processLangKindOptionEach, &arg);
+			foreachLanguage(processLangKindDefinitionEach, &arg);
 			handled = true;
 		}
 		else
@@ -1907,7 +1907,7 @@ extern bool processKindOption (
 				error (WARNING, "Unknown language \"%s\" in \"%s\" option", lang, option);
 			else
 			{
-				processLangKindOption (language, option, parameter);
+				processLangKindDefinition (language, option, parameter);
 				handled = true;
 			}
 		}
@@ -1929,7 +1929,7 @@ static void printRoles (const langType language, const char* letters, bool allow
 	for (c = letters; *c != '\0'; c++)
 	{
 		unsigned int i;
-		const kindOption *k;
+		const kindDefinition *k;
 
 		for (i = 0; i < lang->kindCount; ++i)
 		{
@@ -2714,7 +2714,7 @@ extern bool makeKindSeparatorsPseudoTags (const langType language,
 					     const ptagDesc *pdesc)
 {
 	parserDefinition* lang;
-	kindOption *kinds;
+	kindDefinition *kinds;
 	unsigned int kindCount;
 	unsigned int i, j;
 
@@ -2738,7 +2738,7 @@ extern bool makeKindSeparatorsPseudoTags (const langType language,
 		for (j = 0; j < kinds[i].separatorCount; ++j)
 		{
 			char name[5] = {[0] = '/', [3] = '/', [4] = '\0'};
-			const kindOption *upperKind;
+			const kindDefinition *upperKind;
 			const scopeSeparator *sep;
 
 			sep = kinds[i].separators + j;
@@ -2757,7 +2757,7 @@ extern bool makeKindSeparatorsPseudoTags (const langType language,
 			}
 			else
 			{
-				upperKind = langKindOption (language,
+				upperKind = langKindDefinition (language,
 							    sep->parentLetter);
 				if (!upperKind)
 					continue;
@@ -2784,7 +2784,7 @@ struct makeKindDescriptionPseudoTagData {
 	bool written;
 };
 
-static bool makeKindDescriptionPseudoTag (kindOption *kind,
+static bool makeKindDescriptionPseudoTag (kindDefinition *kind,
 					     void *user_data)
 {
 	struct makeKindDescriptionPseudoTagData *data = user_data;
@@ -2818,7 +2818,7 @@ extern bool makeKindDescriptionsPseudoTags (const langType language,
 {
 
 	parserDefinition* lang;
-	kindOption *kinds;
+	kindDefinition *kinds;
 	unsigned int kindCount, i;
 	struct makeKindDescriptionPseudoTagData data;
 
@@ -3113,7 +3113,7 @@ static roleDesc CTST_BrokenRoles [] = {
 	{true, "broken", "broken" },
 };
 
-static kindOption CTST_Kinds[KIND_COUNT] = {
+static kindDefinition CTST_Kinds[KIND_COUNT] = {
 	{true, 'b', "broken tag", "name with unwanted characters",
 	 .referenceOnly = false, ATTACH_ROLES (CTST_BrokenRoles) },
 	{true, KIND_NULL, "no letter", "kind with no letter"
@@ -3145,11 +3145,11 @@ static void createCTSTTags (void)
 						makeTagEntry (&e);
 						break;
 					case K_NO_LETTER:
-						initTagEntry (&e, "abnormal kindOption testing (no letter)", &CTST_Kinds[i]);
+						initTagEntry (&e, "abnormal kindDefinition testing (no letter)", &CTST_Kinds[i]);
 						makeTagEntry (&e);
 						break;
 					case K_NO_LONG_NAME:
-						initTagEntry (&e, "abnormal kindOption testing (no long name)", &CTST_Kinds[i]);
+						initTagEntry (&e, "abnormal kindDefinition testing (no long name)", &CTST_Kinds[i]);
 						makeTagEntry (&e);
 						break;
 				}

@@ -24,7 +24,7 @@ typedef enum {
 	K_FUNCTION
 } lispKind;
 
-static kindOption LispKinds [] = {
+static kindDefinition LispKinds [] = {
 	{ true, 'f', "function", "functions" }
 };
 

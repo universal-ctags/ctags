@@ -22,7 +22,7 @@ typedef enum {
 	K_PLAY
 } ansiblePlaybookKind;
 
-static kindOption AnsiblePlaybookKinds [] = {
+static kindDefinition AnsiblePlaybookKinds [] = {
 	{ true,  'p', "play", "plays" },
 };
 

@@ -60,7 +60,7 @@ static roleDesc AntAntfileRoles [] = {
         { true, "imported", "imported" },
 };
 
-static kindOption AntKinds [] = {
+static kindDefinition AntKinds [] = {
 	{ true,  'p', "project",  "projects"   },
 	{ true,  't', "target",   "targets"    },
 	{ true,  'P', "property", "properties(global)" },

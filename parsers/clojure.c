@@ -22,7 +22,7 @@ typedef enum {
 	K_NAMESPACE
 } clojureKind;
 
-static kindOption ClojureKinds[] = {
+static kindDefinition ClojureKinds[] = {
 	{true, 'f', "function", "functions"},
 	{true, 'n', "namespace", "namespaces"}
 };

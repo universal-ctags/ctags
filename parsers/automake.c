@@ -66,7 +66,7 @@ static scopeSeparator AutomakeSeparators [] = {
 	{ 'd'          , "/" },
 };
 
-static kindOption AutomakeKinds [] = {
+static kindDefinition AutomakeKinds [] = {
 	{ true, 'd', "directory", "directories",
 	  .referenceOnly = false, ATTACH_ROLES(AutomakeDirectoryRoles)},
 	{ true, 'P', "program",   "programs",

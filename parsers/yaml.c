@@ -90,7 +90,7 @@ static roleDesc YamlAnchorRoles [] = {
 	{ true, "alias", "alias" },
 };
 
-static kindOption YamlKinds [] = {
+static kindDefinition YamlKinds [] = {
 	{ true,  'a', "anchor", "anchors",
 	  .referenceOnly = false, ATTACH_ROLES(YamlAnchorRoles) },
 };

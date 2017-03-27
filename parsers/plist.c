@@ -26,7 +26,7 @@ typedef enum {
 	K_KEY,
 } plistKind;
 
-static kindOption PlistKinds [] = {
+static kindDefinition PlistKinds [] = {
 	{ true,  'k', "key",	  "keys" },
 };
 

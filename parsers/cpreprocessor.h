@@ -65,9 +65,9 @@ extern void cppInit (const bool state,
 		     const bool hasAtLiteralStrings,
 		     const bool hasCxxRawLiteralStrings,
 		     const bool hasSingleQuoteLiteralNumbers,
-		     const kindOption *defineMacroKind,
+		     const kindDefinition *defineMacroKind,
 		     int macroUndefRoleIndex,
-		     const kindOption *headerKind,
+		     const kindDefinition *headerKind,
 		     int headerSystemRoleIndex, int headerLocalRoleIndex);
 extern void cppTerminate (void);
 extern void cppBeginStatement (void);

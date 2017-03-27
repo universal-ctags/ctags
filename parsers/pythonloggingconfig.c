@@ -34,7 +34,7 @@ typedef enum {
 	K_LOGGER_QUALNAME,
 } pythonLoggingConfigKind;
 
-static kindOption PythonLoggingConfigKinds [] = {
+static kindDefinition PythonLoggingConfigKinds [] = {
 	{ true, 'L', "loggerSection", "logger sections" },
 	{ true, 'q', "qualname",      "logger qualnames" },
 };

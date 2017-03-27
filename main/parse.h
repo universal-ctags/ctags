@@ -80,9 +80,9 @@ typedef struct {
 struct sParserDefinition {
 	/* defined by parser */
 	char* name;                    /* name of language */
-	kindOption* kinds;             /* tag kinds handled by parser */
+	kindDefinition* kinds;             /* tag kinds handled by parser */
 	unsigned int kindCount;        /* size of `kinds' list */
-	kindOption* fileKind;          /* kind for overriding the default fileKind */
+	kindDefinition* fileKind;          /* kind for overriding the default fileKind */
 	const char *const *extensions; /* list of default extensions */
 	const char *const *patterns;   /* list of default file name patterns */
 	const char *const *aliases;    /* list of default aliases (alternative names) */
@@ -156,15 +156,15 @@ extern parserDefinitionFunc YAML_PARSER_LIST;
 
 
 /* Language processing and parsing */
-extern int makeSimpleTag (const vString* const name, kindOption* const kinds, const int kind);
-extern int makeSimpleRefTag (const vString* const name, kindOption* const kinds, const int kind,
+extern int makeSimpleTag (const vString* const name, kindDefinition* const kinds, const int kind);
+extern int makeSimpleRefTag (const vString* const name, kindDefinition* const kinds, const int kind,
 			     int roleIndex);
 extern parserDefinition* parserNew (const char* name);
 extern parserDefinition* parserNewFull (const char* name, char fileKind);
 extern bool doesLanguageAllowNullTag (const langType language);
 extern bool doesLanguageRequestAutomaticFQTag (const langType language);
 extern const char *getLanguageName (const langType language);
-extern kindOption* getLanguageFileKind (const langType language);
+extern kindDefinition* getLanguageFileKind (const langType language);
 extern langType getNamedLanguage (const char *const name, size_t len);
 extern langType getFileLanguage (const char *const fileName);
 extern bool isLanguageEnabled (const langType language);
@@ -229,7 +229,7 @@ extern bool isRegexKindEnabled (const langType language, const int kind);
 extern bool hasRegexKind (const langType language, const int kind);
 extern void printRegexKinds (const langType language, bool allKindFields, bool indent,
 			     bool tabSeparated);
-extern void foreachRegexKinds (const langType language, bool (* func) (kindOption*, void*), void *data);
+extern void foreachRegexKinds (const langType language, bool (* func) (kindDefinition*, void*), void *data);
 extern void freeRegexResources (void);
 extern bool checkRegex (void);
 extern void useRegexMethod (const langType language);
@@ -255,7 +255,7 @@ extern bool isXcmdKindEnabled (const langType language, const int kind);
 extern bool hasXcmdKind (const langType language, const int kind);
 extern void printXcmdKinds (const langType language, bool allKindFields, bool indent,
 			    bool tabSeparated);
-extern void foreachXcmdKinds (const langType language, bool (* func) (kindOption*, void*), void *data);
+extern void foreachXcmdKinds (const langType language, bool (* func) (kindDefinition*, void*), void *data);
 extern void freeXcmdResources (void);
 extern void useXcmdMethod (const langType language);
 extern void notifyAvailabilityXcmdMethod (const langType language);

@@ -33,7 +33,7 @@ typedef enum eCssKinds {
 	K_CLASS, K_SELECTOR, K_ID
 } cssKind;
 
-static kindOption CssKinds [] = {
+static kindDefinition CssKinds [] = {
 	{ true, 'c', "class",		"classes" },
 	{ true, 's', "selector",	"selectors" },
 	{ true, 'i', "id",			"identities" }

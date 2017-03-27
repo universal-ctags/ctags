@@ -155,9 +155,9 @@ typedef enum eAdaKinds
   ADA_KIND_COUNT            /* must be last */
 } adaKind;
 
-static kindOption AdaSeparateKind = { true, 'S', "separate", "something separately declared/defined" };
+static kindDefinition AdaSeparateKind = { true, 'S', "separate", "something separately declared/defined" };
 
-static kindOption AdaKinds[] =
+static kindDefinition AdaKinds[] =
 {
   { true,   'P', "packspec",    "package specifications" },
   { true,   'p', "package",     "packages" },

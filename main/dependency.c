@@ -20,9 +20,9 @@
 
 #include <string.h>
 
-static void linkKinds (kindOption *masterKind, kindOption *slaveKind)
+static void linkKinds (kindDefinition *masterKind, kindDefinition *slaveKind)
 {
-	kindOption *tail;
+	kindDefinition *tail;
 
 	slaveKind->master = masterKind;
 
@@ -41,7 +41,7 @@ static void linkKindDependency (parserDefinition *const masterParser,
 				parserDefinition *const slaveParser)
 {
 	unsigned int k_slave, k_master;
-	kindOption *kind_slave, *kind_master;
+	kindDefinition *kind_slave, *kind_master;
 
 	for (k_slave = 0; k_slave < slaveParser->kindCount; k_slave++)
 	{

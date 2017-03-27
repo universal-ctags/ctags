@@ -40,7 +40,7 @@ static roleDesc ShScriptRoles [] = {
 	{ true, "loaded", "loaded" },
 };
 
-static kindOption ShKinds [] = {
+static kindDefinition ShKinds [] = {
 	{ true, 'a', "alias", "aliases"},
 	{ true, 'f', "function", "functions"},
 	{ true, 's', "script", "script files",

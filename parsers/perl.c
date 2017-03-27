@@ -41,7 +41,7 @@ typedef enum {
 	K_SUBROUTINE_DECLARATION
 } perlKind;
 
-static kindOption PerlKinds [] = {
+static kindDefinition PerlKinds [] = {
 	{ true,  'c', "constant",               "constants" },
 	{ true,  'f', "format",                 "formats" },
 	{ true,  'l', "label",                  "labels" },

@@ -40,7 +40,7 @@ typedef enum {
 /*
  *   DATA DEFINITIONS
  */
-static kindOption SmlKinds[] = {
+static kindDefinition SmlKinds[] = {
 	{ true, 'e', "exception", "exception declarations" },
 	{ true, 'f', "function",  "function definitions" },
 	{ true, 'c', "functor",   "functor definitions" },

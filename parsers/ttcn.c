@@ -54,7 +54,7 @@ typedef enum {
     K_NONE  /* No tag */
 } ttcnKind_t;
 
-static kindOption ttcnKinds [] = {
+static kindDefinition ttcnKinds [] = {
     { true, 'M', "module",    "module definition" },
     { true, 't', "type",      "type definition" },
     { true, 'c', "const",     "constant definition" },

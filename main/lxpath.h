@@ -75,7 +75,7 @@ typedef struct sXpathFileSpec {
 /* Xpath interface */
 extern void findXMLTags (xmlXPathContext *ctx, xmlNode *root,
 			 const tagXpathTableTable *xpathTableTable,
-			 const kindOption* const kinds, void *userData);
+			 const kindDefinition* const kinds, void *userData);
 extern void addTagXpath (const langType language, tagXpathTable *xpathTable);
 
 #endif  /* CTAGS_LXPATH_PARSE_H */

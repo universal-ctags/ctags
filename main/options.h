@@ -176,7 +176,7 @@ extern langType getLanguageComponentInOption (const char *const option,
 
 extern void processLanguageDefineOption (const char *const option, const char *const parameter);
 extern bool processMapOption (const char *const option, const char *const parameter);
-extern bool processKindOption (const char *const option, const char *const parameter);
+extern bool processKindDefinition (const char *const option, const char *const parameter);
 extern bool processCorpusOption (const char *const option, const char *const parameter);
 extern bool processAliasOption (const char *const option, const char *const parameter);
 #ifdef HAVE_ICONV

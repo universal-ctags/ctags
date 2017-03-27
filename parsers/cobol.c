@@ -32,7 +32,7 @@ static roleDesc CobolSourcefileRoles [] = {
 	{ true, "copyed", "copyed in source file" },
 };
 
-static kindOption CobolKinds[] = {
+static kindDefinition CobolKinds[] = {
 	{ true, 'p', "paragraph", "paragraphs" },
 	{ true, 'd', "data", "data items"      },
 	{ true, 'S', "sourcefile", "source code file",

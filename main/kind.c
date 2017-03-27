@@ -78,7 +78,7 @@ extern void printKindListHeader (bool indent, bool tabSeparated)
 #undef KIND_HEADER_COMMON_FMT
 }
 
-extern void printKind (const kindOption* const kind, bool allKindFields, bool indent,
+extern void printKind (const kindDefinition* const kind, bool allKindFields, bool indent,
 		       bool tabSeparated)
 {
 #define KIND_FMT MAKE_KIND_FMT("", c, d)
@@ -109,7 +109,7 @@ extern void printKind (const kindOption* const kind, bool allKindFields, bool in
 #undef KIND_FMT
 }
 
-const char *scopeSeparatorFor (const kindOption *kind, char parentLetter)
+const char *scopeSeparatorFor (const kindDefinition *kind, char parentLetter)
 {
 	scopeSeparator *table;
 	Assert (kind);
@@ -143,9 +143,9 @@ const char *scopeSeparatorFor (const kindOption *kind, char parentLetter)
 		return ".";
 }
 
-extern void enableKind (kindOption *kind, bool enable)
+extern void enableKind (kindDefinition *kind, bool enable)
 {
-	kindOption *slave;
+	kindDefinition *slave;
 
 	if (kind->master)
 		enableKind (kind->master, enable);

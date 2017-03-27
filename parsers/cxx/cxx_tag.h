@@ -76,14 +76,14 @@ int cxxTagGetCFieldDefinitionifierCount(void);
 
 bool cxxTagFieldEnabled(unsigned int uField);
 
-kindOption * cxxTagGetCKindOptions(void);
-int cxxTagGetCKindOptionCount(void);
+kindDefinition * cxxTagGetCKindDefinitions(void);
+int cxxTagGetCKindDefinitionCount(void);
 
-kindOption * cxxTagGetCUDAKindOptions(void);
-int cxxTagGetCUDAKindOptionCount(void);
+kindDefinition * cxxTagGetCUDAKindDefinitions(void);
+int cxxTagGetCUDAKindDefinitionCount(void);
 
-kindOption * cxxTagGetCPPKindOptions(void);
-int cxxTagGetCPPKindOptionCount(void);
+kindDefinition * cxxTagGetCPPKindDefinitions(void);
+int cxxTagGetCPPKindDefinitionCount(void);
 
 // Returns true if the specified tag kind is enabled in the current language
 bool cxxTagKindEnabled(unsigned int uTagKind);

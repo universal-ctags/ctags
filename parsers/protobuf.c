@@ -72,7 +72,7 @@ typedef enum {
 	PK_RPC
 } protobufKind;
 
-static kindOption ProtobufKinds [] = {
+static kindDefinition ProtobufKinds [] = {
 	{ true,  'p', "package",    "packages" },
 	{ true,  'm', "message",    "messages" },
 	{ true,  'f', "field",      "fields" },

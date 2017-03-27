@@ -92,7 +92,7 @@ typedef enum {
 	GOTAG_MEMBER
 } goKind;
 
-static kindOption GoKinds[] = {
+static kindDefinition GoKinds[] = {
 	{true, 'p', "package", "packages"},
 	{true, 'f', "func", "functions"},
 	{true, 'c', "const", "constants"},

@@ -19,7 +19,7 @@ typedef enum {
 	K_KEY
 } javaPropertiesKind;
 
-static kindOption JavaPropertiesKinds [] = {
+static kindDefinition JavaPropertiesKinds [] = {
 	{ true, 'k', "key", "keys" },
 };
 

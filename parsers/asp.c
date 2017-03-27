@@ -27,7 +27,7 @@ typedef enum {
 	K_CONST, K_CLASS, K_FUNCTION, K_SUB, K_DIM
 } aspKind;
 
-static kindOption AspKinds [] = {
+static kindDefinition AspKinds [] = {
 	{ true, 'd', "constant",   "constants"},
 	{ true, 'c', "class",      "classes"}, 
 	{ true, 'f', "function",   "functions"},

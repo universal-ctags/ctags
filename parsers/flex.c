@@ -143,7 +143,7 @@ typedef enum {
 	FLEXTAG_COUNT
 } flexKind;
 
-static kindOption FlexKinds [] = {
+static kindDefinition FlexKinds [] = {
 	{ true,  'f', "function",	  "functions"		   },
 	{ true,  'c', "class",		  "classes"			   },
 	{ true,  'm', "method",		  "methods"			   },

@@ -31,7 +31,7 @@ enum {
 	DEFINITION_KIND,
 };
 
-static kindOption AutoconfKinds[] = {
+static kindDefinition AutoconfKinds[] = {
 	{ true, 'p', "package", "packages" },
 	{ true, 't', "template", "templates" },
 	{ true, 'm', "macro", "autoconf macros" },

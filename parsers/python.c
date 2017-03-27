@@ -128,7 +128,7 @@ static roleDesc PythonUnknownRoles [] = {
 	  "classes/variables/functions/modules imported in alternative name" },
 };
 
-static kindOption PythonKinds[COUNT_KIND] = {
+static kindDefinition PythonKinds[COUNT_KIND] = {
 	{true, 'c', "class",    "classes"},
 	{true, 'f', "function", "functions"},
 	{true, 'm', "member",   "class members"},

@@ -31,7 +31,7 @@ typedef enum eFalconKinds {
     K_NAMESPACE
 } falconKind;
 
-static kindOption FalconKinds [] = {
+static kindDefinition FalconKinds [] = {
     {true, 'c', "class",     "classes" },
     {true, 'f', "function",  "functions"},
     {true, 'm', "member",    "class members"},

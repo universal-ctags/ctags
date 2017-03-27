@@ -26,7 +26,7 @@ typedef enum {
 	K_INTERFACE, K_METHOD, K_SIGNAL, K_PROPERTY
 } dbusIntrospectKind;
 
-static kindOption DbusIntrospectKinds [] = {
+static kindDefinition DbusIntrospectKinds [] = {
 	{ true,  'i', "interface", "interfaces" },
 	{ true,  'm', "method",    "methods"    },
 	{ true,  's', "signal",    "signals"    },

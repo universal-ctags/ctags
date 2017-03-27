@@ -73,7 +73,7 @@ static roleDesc asmSectionRoles [] = {
 	{ true, "placement", "placement where the assembled code goes" },
 };
 
-static kindOption AsmKinds [] = {
+static kindDefinition AsmKinds [] = {
 	{ true, 'd', "define", "defines" },
 	{ true, 'l', "label",  "labels"  },
 	{ true, 'm', "macro",  "macros"  },

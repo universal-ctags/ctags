@@ -49,7 +49,7 @@ typedef enum {
 	K_INPUT_SECTION,
 } ldScriptKind;
 
-static kindOption LdScriptKinds [] = {
+static kindDefinition LdScriptKinds [] = {
 	{ true, 'S', "section", "sections" },
 	{ true, 's', "symbol",  "symbols",
 	  .referenceOnly = false, ATTACH_ROLES(LdScriptSymbolRoles)},

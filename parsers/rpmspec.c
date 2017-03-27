@@ -50,7 +50,7 @@ static scopeSeparator RpmSpecPackageSeparators [] = {
 	{ 'p'          , "-" },
 };
 
-static kindOption RpmSpecKinds[] = {
+static kindDefinition RpmSpecKinds[] = {
 	{ true, 't', "tag", "tags" },
 	{ true, 'm', "macro", "macros",
 	  .referenceOnly = false, ATTACH_ROLES(RpmSpecMacroRoles) },

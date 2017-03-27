@@ -36,7 +36,7 @@ typedef enum {
 	SECTION_COUNT
 } rstKind;
 
-static kindOption RstKinds[] = {
+static kindDefinition RstKinds[] = {
 	{ true, 'c', "chapter",       "chapters"},
 	{ true, 's', "section",       "sections" },
 	{ true, 'S', "subsection",    "subsections" },
