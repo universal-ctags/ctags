@@ -66,6 +66,8 @@ typedef struct sParserObject {
 	unsigned int initialized:1;    /* initialize() is called or not */
 	unsigned int dontEmit:1;	   /* run but don't emit tags
 									  (a subparser requests run this parser.) */
+	unsigned int pseudoTagPrinted:1;   /* pseudo tags about this parser
+										  is emitted or not. */
 
 	unsigned int anonymousIdentiferId; /* managed by anon* functions */
 } parserObject;
@@ -2483,12 +2485,13 @@ extern void freeEncodingResources (void)
 
 static void addParserPseudoTags (langType language)
 {
-	if (!LanguageTable[language].def->pseudoTagPrinted)
+	parserObject *parser = LanguageTable + language;
+	if (!parser->pseudoTagPrinted)
 	{
 		makePtagIfEnabled (PTAG_KIND_DESCRIPTION, &language);
 		makePtagIfEnabled (PTAG_KIND_SEPARATOR, &language);
 
-		LanguageTable[language].def->pseudoTagPrinted = 1;
+		parser->pseudoTagPrinted = 1;
 	}
 }
 
