@@ -27,22 +27,15 @@ lang *
 
 #include "general.h"
 
-#include "types.h"
+#include "subparser.h"
 
+typedef struct sIniconfSubparser iniconfSubparser;
+struct sIniconfSubparser {
+	subparser subparser;
 
-typedef void (*iniconfCallback) (const char *section, const char *key, const char *value, void *userData);
-
-
-struct iniconfParserClient {
-	langType lang;
-	void *data;
-
-	void* (* inputStart) (void);
-	bool (* probeLanguage) (const char *section, const char *key, const char *value);
-	iniconfCallback handleInputData;
+	bool  (* probeLanguage)  (const char *section, const char *key, const char *value);
+	void  (* newDataNotify)  (iniconfSubparser *s,
+							  const char *section, const char *key, const char *value);
 };
-
-extern void registerIniconfParserClient (struct iniconfParserClient *client);
-extern void runIniconfParser (const iniconfCallback callback, void* userData);
 
 #endif

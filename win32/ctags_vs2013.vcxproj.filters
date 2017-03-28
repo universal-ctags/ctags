@@ -569,6 +569,9 @@
    <ClInclude Include="..\main\objpool.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+   <ClInclude Include="..\main\subparser.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
    <ClInclude Include="..\main\tokeninfo.h">
       <Filter>Header Files</Filter>
     </ClInclude>

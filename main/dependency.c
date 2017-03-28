@@ -14,7 +14,9 @@
 
 #include "debug.h"
 #include "dependency.h"
+#include "options.h"
 #include "parse.h"
+#include "subparser.h"
 
 #include <string.h>
 
@@ -81,14 +83,49 @@ extern void linkDependencyAtInitializeParsing (depType dtype,
 	}
 }
 
-extern void initializeDependencies (const parserDefinition *parser)
+extern void initializeDependencies (parserDefinition *parser)
 {
 	unsigned int i;
 	slaveParser *sp;
 
 	/* Initialize slaves */
 	for (sp = parser->slaveParsers; sp; sp = sp->next)
-		initializeParser (sp->id);
+	{
+		if (sp->type == DEPTYPE_SUBPARSER)
+		{
+			subparser *sub;
+
+			sub = (subparser *)sp->data;
+			sub->slaveParser = sp;
+		}
+
+		if (sp->type == DEPTYPE_KIND_OWNER
+			|| (sp->type == DEPTYPE_SUBPARSER &&
+				(((subparser *)sp->data)->direction & SUBPARSER_BASE_RUNS_SUB)))
+		{
+			initializeParser (sp->id);
+			if (sp->type == DEPTYPE_SUBPARSER)
+			{
+				subparser *subparser = sp->data;
+				subparser->next = parser->subparsersDefault;
+				parser->subparsersDefault = subparser;
+			}
+		}
+	}
+
+	/* Initialize masters that act as base parsers. */
+	for (i = 0; i < parser->dependencyCount; i++)
+	{
+		parserDependency *d = parser->dependencies + i;
+		if (d->type == DEPTYPE_SUBPARSER &&
+			((subparser *)(d->data))->direction & SUBPARSER_SUB_RUNS_BASE)
+		{
+			langType baseParser;
+			baseParser = getNamedLanguage (d->upperParser, 0);
+			Assert (baseParser != LANG_IGNORE);
+			initializeParser (baseParser);
+		}
+	}
 }
 
 extern void finalizeDependencies (parserDefinition *parser)
@@ -104,4 +141,52 @@ extern void finalizeDependencies (parserDefinition *parser)
 		eFree (tmp);
 	}
 	parser->slaveParsers = NULL;
+}
+
+extern void notifyInputStart (void)
+{
+	subparser *s;
+
+	foreachSubparser(s)
+	{
+		if (s->inputStart)
+		{
+			enterSubparser(s);
+			s->inputStart (s);
+			leaveSubparser();
+		}
+	}
+}
+
+extern void notifyInputEnd   (void)
+{
+	subparser *s;
+
+	foreachSubparser(s)
+	{
+		if (s->inputEnd)
+		{
+			enterSubparser(s);
+			s->inputEnd (s);
+			leaveSubparser();
+		}
+	}
+}
+
+extern langType getSubparserLanguage (subparser *s)
+{
+	return s->slaveParser->id;
+}
+
+extern void chooseExclusiveSubparser (subparser *s, void *data)
+{
+	if (s->exclusiveSubparserChosenNotify)
+	{
+		s->chosenAsExclusiveSubparser = true;
+		enterSubparser(s);
+		s->exclusiveSubparserChosenNotify (s, data);
+		verbose ("%s is chosen as exclusive subparser\n",
+				 getLanguageName (getSubparserLanguage (s)));
+		leaveSubparser();
+	}
 }

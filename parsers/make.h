@@ -14,17 +14,21 @@
 *   INCLUDE FILES
 */
 #include "general.h"  /* must always come first */
+
+#include "subparser.h"
 #include "vstring.h"
 
-struct makeParserClient {
-	void (* valuesFound) (struct makeParserClient*, vString *name, void *data);
-	void (* directiveFound) (struct makeParserClient*, vString *name, void *data);
-	void (* newMacro) (struct makeParserClient*,
-			   vString *const name,
-			   bool withDefineDirective,
-			   bool appending, void *data);
-};
+typedef struct sMakeSubparser makeSubparser;
 
-extern void runMakeParser (struct makeParserClient *client, void *data);
+struct sMakeSubparser {
+	subparser subparser;
+
+	void (* valueNotify) (makeSubparser *s, char* name);
+	void (* directiveNotify) (makeSubparser *s, char* name);
+	void (* newMacroNotify) (makeSubparser *s,
+							 char* name,
+							 bool withDefineDirective,
+							 bool appending);
+};
 
 #endif

@@ -12,6 +12,7 @@
 #define CTAGS_YAML__H
 
 #include "general.h"
+#include "subparser.h"
 #include "types.h"
 
 #ifdef HAVE_LIBYAML
@@ -20,18 +21,12 @@
 #define yaml_token_t void
 #endif
 
-typedef void (* yamlCallback) (yaml_token_t *token, void *data);
-
-struct yamlParserClient {
-	langType lang;
-	yamlCallback callback;
-	void* (* inputStart) (void);
-	void  (* inputEnd) (void*);
-	void *data;
+typedef struct sYamlSubparser yamlSubparser;
+struct sYamlSubparser {
+	subparser subparser;
+	void (* newTokenNotfify) (yamlSubparser *s, yaml_token_t *token);
 };
 
-extern void registerYamlParserClient (struct yamlParserClient *client);
-extern void runYamlParser (const yamlCallback callback, void* userData);
 extern void attachYamlPosition (tagEntryInfo *tag, yaml_token_t *token, bool asEndPosition);
 
 #endif

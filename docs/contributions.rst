@@ -134,6 +134,7 @@ on non-GNU C style. Here non-GNU C style means
 "align a keyword for control flow and `{` of the block start".
 
 GNU style:
+
 .. code-block:: C
 
 	if (...)

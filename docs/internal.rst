@@ -136,7 +136,7 @@ doesn't know about C syntax. Implementing C parser in the Yacc parser
 is one of approach. However, ctags has already C parser.  The Yacc
 parser should utilize the existing C parser. The promise API allows this.
 
-More examples are in :ref:`Applying a parser to specified areas of input file <host-guest-parsres>`.
+More examples are in :ref:`Applying a parser to specified areas of input file <host-guest-parsers>`.
 
 
 Usage

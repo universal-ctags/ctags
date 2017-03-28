@@ -22,6 +22,7 @@
 #include "kind.h"
 #include "parse.h"
 #include "read.h"
+#include "subparser.h"
 
 
 typedef enum {
@@ -84,9 +85,6 @@ static kindOption AutomakeKinds [] = {
 	  .referenceOnly = true, ATTACH_ROLES(AutomakeConditionRoles) },
 };
 
-static hashTable* AutomakeDirectories;
-
-
 struct sBlacklist {
 	enum { BL_END, BL_PREFIX } type;
 	const char* substr;
@@ -96,6 +94,13 @@ struct sBlacklist {
 	{ BL_PREFIX, "noinst", 6 },
 	{ BL_PREFIX, "check",  5 },
 	{ BL_END,    NULL,     0 },
+};
+
+struct sAutomakeSubparser {
+	makeSubparser make;
+
+	hashTable* directories;
+	int index;
 };
 
 
@@ -108,9 +113,9 @@ static bool bl_check (const char *name, struct sBlacklist *blacklist)
 		return true;
 }
 
-static int lookupAutomakeDirectory (vString *const name)
+static int lookupAutomakeDirectory (hashTable* directories,  vString *const name)
 {
-	int *i = hashTableGetItem (AutomakeDirectories,  vStringValue (name));
+	int *i = hashTableGetItem (directories,  vStringValue (name));
 
 	if (i)
 		return *i;
@@ -118,28 +123,27 @@ static int lookupAutomakeDirectory (vString *const name)
 		return CORK_NIL;
 }
 
-static void addAutomakeDirectory (vString *const name, int corkIndex)
+static void addAutomakeDirectory (hashTable* directories, vString *const name, int corkIndex)
 {
 	char * k = eStrdup (vStringValue (name));
 	int  * i = xMalloc (1, int);
 
 	*i = corkIndex;
 
-	hashTablePutItem (AutomakeDirectories, k, i);
+	hashTablePutItem (directories, k, i);
 }
 
-static bool AutomakeMakeTag (vString *const name, const char* suffix, bool appending,
-			    int kindex, int rindex, struct sBlacklist *blacklist,
-			    void *data)
+static bool automakeMakeTag (struct sAutomakeSubparser* automake,
+							 char* name, const char* suffix, bool appending,
+							 int kindex, int rindex, struct sBlacklist *blacklist)
 {
-	int *index = data;
 	size_t expected_len;
 	size_t len;
 	char* tail;
 	vString *subname;
 	int i;
 
-	len = vStringLength (name);
+	len = strlen (name);
 	expected_len = strlen (suffix);
 
 	if (len <= expected_len)
@@ -147,49 +151,49 @@ static bool AutomakeMakeTag (vString *const name, const char* suffix, bool appen
 
 	for (i = 0; blacklist[i].type != BL_END; i++)
 	{
-		if (bl_check (vStringValue(name), blacklist + i) == false)
+		if (bl_check (name, blacklist + i) == false)
 			return false;
 	}
 
-	tail = vStringValue (name) + len - expected_len;
+	tail = name + len - expected_len;
 	if (strcmp (tail, suffix))
 		return false;
 
 	subname = vStringNew();
 
 	/* ??? dist, nodist, nobase, notrans,... */
-	if (strncmp (vStringValue(name), "dist_", 5) == 0)
-		vStringNCopyS(subname, vStringValue(name) + 5, len - expected_len - 5);
+	if (strncmp (name, "dist_", 5) == 0)
+		vStringNCopyS(subname, name + 5, len - expected_len - 5);
 	else
-		vStringNCopyS(subname, vStringValue(name), len - expected_len);
+		vStringNCopyS(subname, name, len - expected_len);
 
 	if (rindex == ROLE_INDEX_DEFINITION)
 	{
-		*index = makeSimpleTag (subname, AutomakeKinds, kindex);
-		addAutomakeDirectory (subname, *index);
+		automake->index = makeSimpleTag (subname, AutomakeKinds, kindex);
+		addAutomakeDirectory (automake->directories, subname, automake->index);
 	}
 	else
 	{
-		*index = CORK_NIL;
+		automake->index = CORK_NIL;
 		if (appending)
-			*index = lookupAutomakeDirectory (subname);
+			automake->index = lookupAutomakeDirectory (automake->directories, subname);
 
-		if ((!appending) || (*index == CORK_NIL))
-			*index = makeSimpleRefTag (subname, AutomakeKinds, kindex, rindex);
+		if ((!appending) || (automake->index == CORK_NIL))
+			automake->index = makeSimpleRefTag (subname, AutomakeKinds, kindex, rindex);
 	}
 
 	vStringDelete (subname);
 	return true;
 }
 
-static void valuesFoundAM (struct makeParserClient *client, vString *name, void *data)
+static void valueCallback (makeSubparser *make, char *name)
 {
-	int p;
+	struct sAutomakeSubparser *automake = (struct sAutomakeSubparser *)make;
+	int p = automake->index;
 	tagEntryInfo *parent;
 	int k;
 	tagEntryInfo elt;
 
-	p = *(int *)data;
 
 	if (p == CORK_NIL)
 		return;
@@ -199,7 +203,7 @@ static void valuesFoundAM (struct makeParserClient *client, vString *name, void 
 	    && (parent->extensionFields.roleIndex != ROLE_INDEX_DEFINITION))
 	{
 		k = K_AM_PROGRAM + parent->extensionFields.roleIndex;
-		initTagEntry (&elt, vStringValue (name), AutomakeKinds + k);
+		initTagEntry (&elt, name, AutomakeKinds + k);
 		elt.extensionFields.scopeIndex = p;
 		makeTagEntry (&elt);
 	}
@@ -230,11 +234,10 @@ static int skipToNonWhite (int c)
 	return c;
 }
 
-static void directiveFoundAM (struct makeParserClient *client,
-			      vString *directive, void *data)
+static void directiveCallback (makeSubparser *make, char *directive)
 {
 	int c;
-	if (! strcmp (vStringValue (directive), "if"))
+	if (! strcmp (directive, "if"))
 	{
 		vString *condition = vStringNew ();
 
@@ -256,61 +259,86 @@ static void directiveFoundAM (struct makeParserClient *client,
 	}
 }
 
-static void newMacroAM (struct makeParserClient *client,
-			vString *const name, bool with_define_directive,
-			bool appending, void * data)
+static void newMacroCallback (makeSubparser *make, char* name, bool with_define_directive,
+							  bool appending)
 {
-	*((int *)data)  = CORK_NIL;
+	struct sAutomakeSubparser *automake = (struct sAutomakeSubparser *)make;
+
+	automake->index = CORK_NIL;
 
 	if (with_define_directive)
 		return;
 
 	(void)(0
-	       || AutomakeMakeTag (name, "dir", appending,
-				   K_AM_DIR, ROLE_INDEX_DEFINITION, am_blacklist,
-				   data)
-	       || AutomakeMakeTag (name, "_PROGRAMS", appending,
-				   K_AM_DIR, R_AM_DIR_PROGRAMS, am_blacklist,
-				   data)
-	       || AutomakeMakeTag (name, "_MANS", appending,
-				   K_AM_DIR, R_AM_DIR_MANS, am_blacklist,
-				   data)
-	       || AutomakeMakeTag (name, "_LTLIBRARIES", appending,
-				   K_AM_DIR, R_AM_DIR_LTLIBRARIES, am_blacklist,
-				   data)
-	       || AutomakeMakeTag (name, "_LIBRARIES", appending,
-				   K_AM_DIR, R_AM_DIR_LIBRARIES, am_blacklist,
-				   data)
-	       || AutomakeMakeTag (name, "_SCRIPTS", appending,
-				   K_AM_DIR, R_AM_DIR_SCRIPTS, am_blacklist,
-				   data)
-	       || AutomakeMakeTag  (name, "_DATA", appending,
-				    K_AM_DIR, R_AM_DIR_DATA, am_blacklist,
-				    data)
+	       || automakeMakeTag (automake,
+							   name, "dir", appending,
+							   K_AM_DIR, ROLE_INDEX_DEFINITION, am_blacklist)
+	       || automakeMakeTag (automake,
+							   name, "_PROGRAMS", appending,
+							   K_AM_DIR, R_AM_DIR_PROGRAMS, am_blacklist)
+	       || automakeMakeTag (automake,
+							   name, "_MANS", appending,
+							   K_AM_DIR, R_AM_DIR_MANS, am_blacklist)
+	       || automakeMakeTag (automake,
+							   name, "_LTLIBRARIES", appending,
+							   K_AM_DIR, R_AM_DIR_LTLIBRARIES, am_blacklist)
+	       || automakeMakeTag (automake,
+							   name, "_LIBRARIES", appending,
+							   K_AM_DIR, R_AM_DIR_LIBRARIES, am_blacklist)
+	       || automakeMakeTag (automake,
+							   name, "_SCRIPTS", appending,
+							   K_AM_DIR, R_AM_DIR_SCRIPTS, am_blacklist)
+	       || automakeMakeTag  (automake,
+								name, "_DATA", appending,
+								K_AM_DIR, R_AM_DIR_DATA, am_blacklist)
 		);
+}
+
+static void inputStart (subparser *s)
+{
+	struct sAutomakeSubparser *automake = (struct sAutomakeSubparser*)s;
+
+	automake->directories = hashTableNew (11, hashCstrhash, hashCstreq, eFree, eFree);
+	automake->index = CORK_NIL;
+}
+
+static void inputEnd (subparser *s)
+{
+	struct sAutomakeSubparser *automake = (struct sAutomakeSubparser*)s;
+
+	hashTableDelete (automake->directories);
+	automake->directories = NULL;
 }
 
 static void findAutomakeTags (void)
 {
-	int index = CORK_NIL;
-	struct makeParserClient client = {
-		.valuesFound    = valuesFoundAM,
-		.directiveFound = directiveFoundAM,
-		.newMacro = newMacroAM,
-	};
-
-	AutomakeDirectories = hashTableNew (11, hashCstrhash, hashCstreq, eFree, eFree);
-
-	runMakeParser (&client, &index);
-
-	hashTableDelete (AutomakeDirectories);
+	scheduleRunningBaseparser (0);
 }
 
 extern parserDefinition* AutomakeParser (void)
 {
 	static const char *const patterns [] = { "Makefile.am", NULL };
+	static struct sAutomakeSubparser automakeSubparser = {
+		.make = {
+			.subparser = {
+				.direction = SUBPARSER_SUB_RUNS_BASE,
+				.inputStart = inputStart,
+				.inputEnd = inputEnd,
+			},
+			.valueNotify = valueCallback,
+			.directiveNotify = directiveCallback,
+			.newMacroNotify = newMacroCallback,
+		},
+	};
+	static parserDependency dependencies [] = {
+		[0] = { DEPTYPE_SUBPARSER, "Make", &automakeSubparser },
+	};
+
 	parserDefinition* const def = parserNew ("Automake");
 
+
+	def->dependencies = dependencies;
+	def->dependencyCount = ARRAY_SIZE(dependencies);
 	def->kinds      = AutomakeKinds;
 	def->kindCount  = ARRAY_SIZE (AutomakeKinds);
 	def->patterns   = patterns;

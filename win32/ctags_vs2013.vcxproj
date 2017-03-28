@@ -279,6 +279,7 @@
     <ClInclude Include="..\parsers\m4.h" />
     <ClInclude Include="..\main\ptrarray.h" />
     <ClInclude Include="..\main\objpool.h" />
+    <ClInclude Include="..\main\subparser.h" />
     <ClInclude Include="..\main\tokeninfo.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

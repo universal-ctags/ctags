@@ -66,25 +66,17 @@ static const keywordTable autoconfKeywordTable[] = {
 	{ "AC_DEFINE_UNQUOTED", KEYWORD_define, },
 };
 
-static void *autoconfInputStart (void)
-{
-	static int roleIndex;
-
-	roleIndex = ROLE_INDEX_DEFINITION;
-	return &roleIndex;
-}
-
-static bool autoconfDoesStartLineComment (int c, const char* token, void *data)
+static bool doesLineCommentStart (m4Subparser *m4, int c, const char* token)
 {
 	return (c == '#');
 }
 
-static bool autoconfDoesStartStringLiteral (int c, void *data)
+static bool doesStringLiteralStart (m4Subparser *m4, int c)
 {
 	return (c == '"') || (c == '\'') || (c == '`');
 }
 
-static bool autoconfProbeLanguage (const char* token)
+static bool probeLanguage (m4Subparser *m4, const char* token)
 {
 	return strncmp (token, "m4_", 3) == 0
 		|| strncmp (token, "AC_", 3) == 0
@@ -94,13 +86,10 @@ static bool autoconfProbeLanguage (const char* token)
 		;
 }
 
-static int autoconfMakeTag (int kind)
+static int makeAutoconfTag (int kind)
 {
 	int index = CORK_NIL;
 	vString * name;
-
-	if (!isLanguageEnabled (getInputLanguage ()))
-		return CORK_NIL;
 
 	name = vStringNew();
 	readM4MacroArgument(name);
@@ -115,19 +104,12 @@ static int autoconfMakeTag (int kind)
 	return index;
 }
 
-struct m4HandleTokenResult autoconfHandleMacro (const char* token, void *data)
+static int newMacroCallback (m4Subparser *m4, const char* token)
 {
-	static langType lang = LANG_IGNORE;
 	int keyword;
-	struct m4HandleTokenResult result = {
-		.index = CORK_NIL,
-		.consumed = true,
-	};
+	int index = CORK_NIL;
 
-	if (lang == LANG_IGNORE)
-		lang = getNamedLanguage ("Autoconf", 0);
-
-	keyword = lookupKeyword (token, lang);
+	keyword = lookupKeyword (token, getInputLanguage ());
 
 	/* TODO:
 	   AH_VERBATIM
@@ -135,63 +117,45 @@ struct m4HandleTokenResult autoconfHandleMacro (const char* token, void *data)
 	switch (keyword)
 	{
 	case KEYWORD_NONE:
-		result.consumed = false;
 		break;
 	case KEYWORD_init:
-		result.index = autoconfMakeTag (PACKAGE_KIND);
+		index = makeAutoconfTag (PACKAGE_KIND);
 		break;
 	case KEYWORD_template:
-		result.index = autoconfMakeTag (TEMPLATE_KIND);
+		index = makeAutoconfTag (TEMPLATE_KIND);
 		break;
 	case KEYWORD_defun:
-		result.index = autoconfMakeTag (MACRO_KIND);
+		index = makeAutoconfTag (MACRO_KIND);
 		break;
 	case KEYWORD_argwith:
-		result.index = autoconfMakeTag (OPTWITH_KIND);
+		index = makeAutoconfTag (OPTWITH_KIND);
 		break;
 	case KEYWORD_argenable:
-		result.index = autoconfMakeTag (OPTENABLE_KIND);
+		index = makeAutoconfTag (OPTENABLE_KIND);
 		break;
 	case KEYWORD_subst:
-		result.index = autoconfMakeTag (SUBST_KIND);
+		index = makeAutoconfTag (SUBST_KIND);
 		break;
 	case KEYWORD_conditional:
-		result.index = autoconfMakeTag (CONDITION_KIND);
+		index = makeAutoconfTag (CONDITION_KIND);
 		break;
 	case KEYWORD_define:
-		result.index = autoconfMakeTag (DEFINITION_KIND);
+		index = makeAutoconfTag (DEFINITION_KIND);
 		break;
 	default:
 		AssertNotReached ();
-		result.consumed = false;
 	}
-	return result;
+	return index;
 }
 
-static struct m4ParserClient AutoconfM4Client = {
-	/* the value will be updated when the Autoconf parser is initialized. */
-	.lang = LANG_IGNORE,
-
-	.quoteOpen = '[',
-	.quoteClose = ']',
-	.inputStart = autoconfInputStart,
-	.doesStartLineComment = autoconfDoesStartLineComment,
-	.doesStartStringLiteral = autoconfDoesStartStringLiteral,
-	.probeLanguage = autoconfProbeLanguage,
-	.handleMacro = autoconfHandleMacro,
-};
-
-static void initializeAutoconfParser (const langType language)
+static void exclusiveSubparserChosenCallback (subparser *s, void *data)
 {
-	AutoconfM4Client.lang = language;
-	registerM4ParserClient ("M4", &AutoconfM4Client);
+	setM4Quotes ('[', ']');
 }
 
 static void findAutoconfTags(void)
 {
-	langType lang = getInputLanguage ();
-
-	runM4Parser (lang);
+	scheduleRunningBaseparser (0);
 }
 
 extern parserDefinition* AutoconfParser (void)
@@ -200,8 +164,18 @@ extern parserDefinition* AutoconfParser (void)
 	static const char *const extensions [] = { "ac", NULL };
 	parserDefinition* const def = parserNew("Autoconf");
 
+	static m4Subparser autoconfSubparser = {
+		.subparser = {
+			.direction = SUBPARSER_BI_DIRECTION,
+			.exclusiveSubparserChosenNotify = exclusiveSubparserChosenCallback,
+		},
+		.probeLanguage  = probeLanguage,
+		.newMacroNotify = newMacroCallback,
+		.doesLineCommentStart = doesLineCommentStart,
+		.doesStringLiteralStart = doesStringLiteralStart,
+	};
 	static parserDependency dependencies [] = {
-		{ DEPTYPE_SUBPARSER, "M4" },
+		[0] = { DEPTYPE_SUBPARSER, "M4", &autoconfSubparser },
 	};
 
 	def->dependencies = dependencies;
@@ -212,7 +186,6 @@ extern parserDefinition* AutoconfParser (void)
 	def->patterns = patterns;
 	def->extensions = extensions;
 	def->parser = findAutoconfTags;
-	def->initialize = initializeAutoconfParser;
 	def->useCork = true;
 
 	def->keywordTable = autoconfKeywordTable;

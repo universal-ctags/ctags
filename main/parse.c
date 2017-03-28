@@ -28,6 +28,7 @@
 #include "ptrarray.h"
 #include "read.h"
 #include "routines.h"
+#include "subparser.h"
 #include "trace.h"
 #include "vstring.h"
 #ifdef HAVE_ICONV
@@ -66,6 +67,8 @@ static void installTagXpathTable (const langType language);
 static void anonResetMaybe (parserDefinition *lang);
 static void setupAnon (void);
 static void teardownAnon (void);
+static void setupSubparsersInUse (parserDefinition *parser);
+static subparser* teardownSubparsersInUse (parserDefinition *parser);
 
 /*
 *   DATA DEFINITIONS
@@ -2208,15 +2211,42 @@ static rescanReason createTagsForFile (const langType language,
 
 	Assert (lang->parser || lang->parser2);
 
+	notifyInputStart ();
+
 	if (lang->parser != NULL)
 		lang->parser ();
 	else if (lang->parser2 != NULL)
 		rescan = lang->parser2 (passCount);
 
+	notifyInputEnd ();
+
 	return rescan;
 }
 
-static bool createTagsWithFallback1 (const langType language)
+static bool doesParserUseCork (parserDefinition *parser)
+{
+	subparser *tmp;
+	bool r = false;
+
+	if (parser->useCork)
+		return true;
+
+	pushLanguage (parser->id);
+	foreachSubparser(tmp)
+	{
+		langType t = tmp->slaveParser->id;
+		if (LanguageTable[t]->useCork)
+		{
+			r = true;
+			break;
+		}
+	}
+	popLanguage ();
+	return r;
+}
+
+static bool createTagsWithFallback1 (const langType language,
+									 langType *exclusive_subparser)
 {
 	bool tagFileResized = false;
 	unsigned long numTags	= numTagsAdded ();
@@ -2225,10 +2255,15 @@ static bool createTagsWithFallback1 (const langType language)
 	unsigned int passCount = 0;
 	rescanReason whyRescan;
 	parserDefinition *parser;
+	bool useCork;
 
 	initializeParser (language);
 	parser = LanguageTable [language];
-	if (parser->useCork)
+
+	setupSubparsersInUse (parser);
+
+	useCork = doesParserUseCork(parser);
+	if (useCork)
 		corkTagFile();
 
 	addParserPseudoTags (language);
@@ -2240,7 +2275,7 @@ static bool createTagsWithFallback1 (const langType language)
 		  createTagsForFile (language, ++passCount) )
 		!= RESCAN_NONE)
 	{
-		if (parser->useCork)
+		if (useCork)
 		{
 			uncorkTagFile();
 			corkTagFile();
@@ -2269,8 +2304,14 @@ static bool createTagsWithFallback1 (const langType language)
 		while (readLineFromInputFile () != NULL)
 			; /* Do nothing */
 
-	if (parser->useCork)
+	if (useCork)
 		uncorkTagFile();
+
+	{
+		subparser *s = teardownSubparsersInUse (parser);
+		if (exclusive_subparser && s)
+			*exclusive_subparser = getSubparserLanguage (s);
+	}
 
 	return tagFileResized;
 }
@@ -2296,7 +2337,7 @@ extern bool runParserInNarrowedInputStream (const langType language,
 				 startLine, startCharOffset,
 				 endLine, endCharOffset,
 				 sourceLineOffset);
-	tagFileResized = createTagsWithFallback1 (language);
+	tagFileResized = createTagsWithFallback1 (language, NULL);
 	popNarrowedInputStream  ();
 	return tagFileResized;
 
@@ -2306,6 +2347,7 @@ static bool createTagsWithFallback (
 	const char *const fileName, const langType language,
 	MIO *mio)
 {
+	langType exclusive_subparser = LANG_IGNORE;
 	bool tagFileResized = false;
 
 	Assert (0 <= language  &&  language < (int) LanguageCount);
@@ -2313,10 +2355,15 @@ static bool createTagsWithFallback (
 	if (!openInputFile (fileName, language, mio))
 		return false;
 
-	tagFileResized = createTagsWithFallback1 (language);
+	tagFileResized = createTagsWithFallback1 (language,
+											  &exclusive_subparser);
 	tagFileResized = forcePromises()? true: tagFileResized;
 
+	pushLanguage ((exclusive_subparser == LANG_IGNORE)
+				  ? language
+				  : exclusive_subparser);
 	makeFileTag (fileName);
+	popLanguage ();
 	closeInputFile ();
 
 	return tagFileResized;
@@ -2843,6 +2890,139 @@ extern void applyParameter (const langType language, const char *name, const cha
 	}
 
 	error (FATAL, "no such parameter in %s: %s", parser->name, name);
+}
+
+extern subparser *getNextSubparser(subparser *last)
+{
+	langType lang = getInputLanguage ();
+	parserDefinition *parser = LanguageTable [lang];
+	subparser *r;
+	langType t;
+
+	if (last == NULL)
+		r = parser->subparsersInUse;
+	else
+		r = last->next;
+
+	if (r == NULL)
+		return r;
+
+	t = getSubparserLanguage(r);
+	if (isLanguageEnabled (t))
+		return r;
+	else
+		return getNextSubparser (r);
+}
+
+extern void scheduleRunningBaseparser (int dependencyIndex)
+{
+	langType current = getInputLanguage ();
+	parserDefinition *current_parser = LanguageTable [current];
+	parserDependency *dep = NULL;
+
+	if (dependencyIndex == RUN_DEFAULT_SUBPARSERS)
+	{
+		for (int i = 0; i < current_parser->dependencyCount; ++i)
+			if (current_parser->dependencies[i].type == DEPTYPE_SUBPARSER)
+			{
+				dep = current_parser->dependencies + i;
+				break;
+			}
+	}
+	else
+		dep = current_parser->dependencies + dependencyIndex;
+
+	if (dep == NULL)
+		return;
+
+	const char *base_name = dep->upperParser;
+	langType base = getNamedLanguage (base_name, 0);
+	parserDefinition *base_parser = LanguageTable [base];
+
+	if (dependencyIndex == RUN_DEFAULT_SUBPARSERS)
+		base_parser->subparsersInUse = base_parser->subparsersDefault;
+	else
+	{
+		subparser *s = dep->data;
+		s->schedulingBaseparserExplicitly = true;
+		base_parser->subparsersInUse = s;
+	}
+
+	if (!isLanguageEnabled (base))
+	{
+		enableLanguage (base, true);
+		base_parser->dontEmit = true;
+		verbose ("force enable \"%s\" as base parser\n", base_parser->name);
+	}
+
+	{
+		subparser *tmp;
+
+		verbose ("scheduleRunningBaseparser %s with subparsers: ", base_name);
+		pushLanguage (base);
+		foreachSubparser(tmp)
+			verbose ("%s ", getLanguageName (tmp->slaveParser->id));
+		popLanguage ();
+		verbose ("\n");
+	}
+
+
+	makePromise(base_name, THIN_STREAM_SPEC);
+}
+
+static void setupSubparsersInUse (parserDefinition *parser)
+{
+	if (!parser->subparsersInUse)
+		parser->subparsersInUse = parser->subparsersDefault;
+}
+
+static subparser* teardownSubparsersInUse (parserDefinition *parser)
+{
+	subparser *tmp = parser->subparsersInUse;
+	subparser *s = NULL;
+
+	parser->subparsersInUse = NULL;
+
+	if (tmp && tmp->schedulingBaseparserExplicitly)
+	{
+		tmp->schedulingBaseparserExplicitly = false;
+		s = tmp;
+	}
+
+	if (s)
+		return s;
+
+	while (tmp)
+	{
+		if (tmp->chosenAsExclusiveSubparser)
+		{
+			s = tmp;
+		}
+		tmp = tmp->next;
+	}
+
+	return s;
+}
+
+extern bool isParserMarkedNoEmission (void)
+{
+	langType lang = getInputLanguage();
+	parserDefinition *parser = LanguageTable [lang];
+
+	return parser->dontEmit;
+}
+
+
+extern subparser* getSubparserRunningBaseparser (void)
+{
+	langType current = getInputLanguage ();
+	parserDefinition *current_parser = LanguageTable [current];
+	subparser *s = current_parser->subparsersInUse;
+
+	if (s && s->schedulingBaseparserExplicitly)
+		return s;
+	else
+		return NULL;
 }
 
 /*

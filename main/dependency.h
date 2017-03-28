@@ -42,7 +42,7 @@ extern void linkDependencyAtInitializeParsing (depType dtype,
 					       parserDefinition *const slave,
 					       void *data);
 
-extern void initializeDependencies (const parserDefinition *parser);
+extern void initializeDependencies (parserDefinition *parser);
 extern void finalizeDependencies (parserDefinition *parser);
 
 #endif	/* CTAGS_MAIN_DEPENDENCY_H */

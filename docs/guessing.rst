@@ -1,3 +1,5 @@
+.. _guessing:
+
 ======================================================================
 Choosing a proper parser in ctags
 ======================================================================
@@ -6,8 +8,14 @@ Choosing a proper parser in ctags
 	:depth: 3
 	:local:
 
-Universal-ctags has multiple ways to guess the language of input
-files.
+.. NOT REVIEWED YET START
+
+Exuberant-ctags uses interpreter lines(`#!` line) of input file,
+file name extensions, and file name pattern for choosing proper
+parsers for an input file.
+
+Universal-ctags has more ways to guess the language of input files.
+.. NOT REVIEWED YET END
 
 Modeline based parser selection
 ---------------------------------------------------------------------

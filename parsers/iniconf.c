@@ -29,10 +29,8 @@
 #include "iniconf.h"
 #include "parse.h"
 #include "read.h"
+#include "subparser.h"
 #include "vstring.h"
-
-
-static void makeIniconfTagMaybe (langType iniconf, const char *section, const char *key, const char *value, void *userData);
 
 static bool isIdentifier (int c)
 {
@@ -45,66 +43,86 @@ static bool isValue (int c)
 	return (c != '\0');
 }
 
-static hashTable *iniconfParserClients;
-extern void registerIniconfParserClient (struct iniconfParserClient *client)
+static iniconfSubparser *maySwitchLanguage (const char *section, const char *key, const char *value)
 {
-	if (!iniconfParserClients)
-		iniconfParserClients = hashTableNew (5, hashInthash, hashInteq,
-						     NULL, NULL);
-	hashTablePutItem (iniconfParserClients, &client->lang, client);
+	iniconfSubparser *iniconf_subparser = NULL;
+	subparser *sub;
+
+	foreachSubparser (sub)
+	{
+		iniconfSubparser *s = (iniconfSubparser *)sub;
+		if ((sub->direction & SUBPARSER_BASE_RUNS_SUB)
+			&& s->probeLanguage)
+		{
+			bool r;
+
+			enterSubparser (s);
+			r = s->probeLanguage(section, key, value);
+			leaveSubparser ();
+			if (r)
+			{
+				iniconf_subparser = s;
+				chooseExclusiveSubparser (sub, NULL);
+				break;
+			}
+		}
+	}
+
+	return iniconf_subparser;
 }
 
+typedef enum {
+	K_SECTION,
+	K_KEY,
+} makeKind;
 
-struct probeData {
-	struct iniconfParserClient *client;
-	const char *section, *key, *value;
-
+static kindOption IniconfKinds [] = {
+	{ true, 's', "section",  "sections"},
+	{ true, 'k', "key",      "keys"},
 };
 
-static void mayRunProbe (void *key CTAGS_ATTR_UNUSED, void *value, void *user_data)
+static void makeIniconfTagMaybe (const char *section, const char *key, const char *value, int *index)
 {
-	struct probeData *probe_data = user_data;
-	struct iniconfParserClient *client = value;
+	tagEntryInfo e;
 
-	if (probe_data->client)
+	if (!isLanguageEnabled (getInputLanguage ()))
 		return;
 
-	if (client->probeLanguage && client->probeLanguage (probe_data->section,
-							    probe_data->key,
-							    probe_data->value))
-		probe_data->client = client;
-}
-
-static struct iniconfParserClient *maySwitchLanguage (const char *section, const char *key, const char *value)
-{
-	struct probeData probe_data = {
-		.client = NULL,
-		.section = section, .key = key, .value = value };
-
-	hashTableForeachItem (iniconfParserClients, mayRunProbe, &probe_data);
-	if (probe_data.client)
+	if (key)
 	{
-		probe_data.client->data = probe_data.client->inputStart ();
-		pushLanguage (probe_data.client->lang);
+		initTagEntry (&e, key, &(IniconfKinds [K_KEY]));
+		e.extensionFields.scopeIndex = *index;
+		makeTagEntry (&e);
 	}
-	return probe_data.client;
+	else
+	{
+		if (*index != CORK_NIL)
+		{
+			tagEntryInfo *last;
+
+			last = getEntryInCorkQueue (*index);
+			if (last)
+				last->extensionFields.endLine = getInputLineNumber ();
+		}
+
+		initTagEntry (&e, section, &(IniconfKinds [K_SECTION]));
+		*index = makeTagEntry (&e);
+	}
 }
 
-extern void runIniconfParser (const iniconfCallback callback, void* userData)
+static void findIniconfTags (void)
 {
-	iniconfCallback cb = callback;
-	static langType iniconf = LANG_IGNORE;
-	int sectionCorkIndex = CORK_NIL;
-
+	const unsigned char *line;
 	vString *val   = vStringNew ();
 	vString *name  = vStringNew ();
 	vString *scope = vStringNew ();
-	const unsigned char *line;
+	iniconfSubparser *sub;
+	int sectionCorkIndex = CORK_NIL;
 
-	if (iniconf == LANG_IGNORE)
-		iniconf = getNamedLanguage ("Iniconf", 0);
 
-	initializeParser (iniconf);
+	sub = (iniconfSubparser *)getSubparserRunningBaseparser();
+	if (sub)
+		chooseExclusiveSubparser ((subparser *)sub, NULL);
 
 	while ((line = readLineFromInputFile ()) != NULL)
 	{
@@ -125,22 +143,19 @@ extern void runIniconfParser (const iniconfCallback callback, void* userData)
 				++cp;
 			}
 
-			if (isLanguageEnabled (iniconf))
-				makeIniconfTagMaybe (iniconf, vStringValue (name), NULL, NULL,
-						     &sectionCorkIndex);
+			makeIniconfTagMaybe (vStringValue (name), NULL, NULL,
+								 &sectionCorkIndex);
 
-			if (!cb)
+
+			if (!sub)
+				sub = maySwitchLanguage (vStringValue (name), NULL, NULL);
+
+			if (sub)
 			{
-				struct iniconfParserClient *client;
-				client = maySwitchLanguage (vStringValue (name), NULL, NULL);
-				if (client)
-				{
-					cb = client->handleInputData;
-					userData = client->data;
-				}
+				enterSubparser(sub);
+				sub->newDataNotify (sub, vStringValue (name), NULL, NULL);
+				leaveSubparser ();
 			}
-			if (cb)
-				cb (vStringValue (name), NULL, NULL, userData);
 
 			vStringCopy (scope, name);
 			vStringClear (name);
@@ -173,35 +188,29 @@ extern void runIniconfParser (const iniconfCallback callback, void* userData)
 					}
 					vStringStripTrailing (val);
 
-					if (isLanguageEnabled (iniconf))
-						makeIniconfTagMaybe (iniconf,
-								     (vStringLength (scope) > 0)
-								     ? vStringValue (scope)
-								     : NULL,
-								     vStringValue (name),
-								     vStringValue (val),
-								     &sectionCorkIndex);
-					if (!cb)
+					makeIniconfTagMaybe ((vStringLength (scope) > 0)
+										 ? vStringValue (scope)
+										 : NULL,
+										 vStringValue (name),
+										 vStringValue (val),
+										 &sectionCorkIndex);
+					if (!sub)
+						sub = maySwitchLanguage ((vStringLength (scope) > 0)
+												 ? vStringValue (scope)
+												 : NULL,
+												 vStringValue (name),
+												 vStringValue (val));
+					if (sub)
 					{
-						struct iniconfParserClient *client;
-						client = maySwitchLanguage ((vStringLength (scope) > 0)
-									    ? vStringValue (scope)
-									    : NULL,
-									    vStringValue (name),
-									    vStringValue (val));
-						if (client)
-						{
-							cb = client->handleInputData;
-							userData = client->data;
-						}
+						enterSubparser (sub);
+						sub->newDataNotify (sub,
+											(vStringLength (scope) > 0)
+											? vStringValue (scope)
+											: NULL,
+											vStringValue (name),
+											vStringValue (val));
+						leaveSubparser ();
 					}
-					if (cb)
-						cb ((vStringLength (scope) > 0)
-							  ? vStringValue (scope)
-							  : NULL,
-							  vStringValue (name),
-							  vStringValue (val),
-							  userData);
 					vStringClear (val);
 				}
 				vStringClear (name);
@@ -217,50 +226,6 @@ extern void runIniconfParser (const iniconfCallback callback, void* userData)
 	vStringDelete (name);
 	vStringDelete (scope);
 	vStringDelete (val);
-}
-
-
-typedef enum {
-	K_SECTION,
-	K_KEY,
-} makeKind;
-
-static kindOption IniconfKinds [] = {
-	{ true, 's', "section",  "sections"},
-	{ true, 'k', "key",      "keys"},
-};
-
-static void makeIniconfTagMaybe (langType iniconf, const char *section, const char *key, const char *value, void *userData)
-{
-	tagEntryInfo e;
-
-	pushLanguage (iniconf);
-	if (key)
-	{
-		initTagEntry (&e, key, &(IniconfKinds [K_KEY]));
-		e.extensionFields.scopeIndex = *(int *)userData;
-		makeTagEntry (&e);
-	}
-	else
-	{
-		if (*(int *)userData != CORK_NIL)
-		{
-			tagEntryInfo *last;
-
-			last = getEntryInCorkQueue (*(int *)userData);
-			if (last)
-				last->extensionFields.endLine = getInputLineNumber ();
-		}
-
-		initTagEntry (&e, section, &(IniconfKinds [K_SECTION]));
-		*(int *)userData = makeTagEntry (&e);
-	}
-	popLanguage ();
-}
-
-static void findIniconfTags (void)
-{
-	runIniconfParser (NULL, NULL);
 }
 
 extern parserDefinition* IniconfParser (void)

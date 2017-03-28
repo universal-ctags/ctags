@@ -42,9 +42,13 @@ static kindOption PythonLoggingConfigKinds [] = {
 #define LOGGER_PREFIX "logger_"
 #define LOGGER_LEN (sizeof("logger_") - 1)
 
+struct sPythonLoggingConfigSubparser {
+	iniconfSubparser iniconf;
+	int index;
+};
 
-static void makePythonLoggingConfigTag (const char *section, const char *key, const char *value,
-					   void *userData)
+static void newDataCallback (iniconfSubparser *iniconf,
+							 const char *section, const char *key, const char *value)
 {
 	tagEntryInfo e;
 
@@ -57,13 +61,13 @@ static void makePythonLoggingConfigTag (const char *section, const char *key, co
 				goto out;
 
 			initTagEntry (&e, logger, PythonLoggingConfigKinds + K_LOGGER_SECTION);
-			*((int *)userData) = makeTagEntry (&e);
+			((struct sPythonLoggingConfigSubparser *)iniconf)->index = makeTagEntry (&e);
 		}
 		else if (key && (strcmp (key, "qualname") == 0)
 			 && value && value[0] != '\0')
 		{
 			initTagEntry (&e, value, PythonLoggingConfigKinds + K_LOGGER_QUALNAME);
-			e.extensionFields.scopeIndex = *((int *)userData);
+			e.extensionFields.scopeIndex = ((struct sPythonLoggingConfigSubparser*)iniconf)->index;
 			makeTagEntry (&e);
 		}
 	}
@@ -72,15 +76,7 @@ out:
 	return;
 }
 
-static void *pythonLoggingConfiginputStart (void)
-{
-	static int sectionIndex;
-
-	sectionIndex = CORK_NIL;
-	return &sectionIndex;
-}
-
-static bool pythonLoggingConfigProbeLanguage (const char *section, const char *key, const char *value)
+static bool probeLanguage (const char *section, const char *key, const char *value)
 {
 	if (section && (strncmp (LOGGER_PREFIX, section, LOGGER_LEN) == 0))
 		return true;
@@ -88,37 +84,36 @@ static bool pythonLoggingConfigProbeLanguage (const char *section, const char *k
 		return false;
 }
 
-static struct iniconfParserClient PythonLoggingConfigIniconfClient = {
-	.lang = LANG_IGNORE,
-	.inputStart         = pythonLoggingConfiginputStart,
-	.probeLanguage      = pythonLoggingConfigProbeLanguage,
-	.handleInputData    = makePythonLoggingConfigTag,
-};
+
+extern void exclusiveSubparserChosenCallback (subparser *s, void *data)
+{
+	((struct sPythonLoggingConfigSubparser *)s)->index = CORK_NIL;
+}
 
 static void findPythonLoggingConfigTags (void)
 {
-	int sectionIndex = CORK_NIL;
-
-	runIniconfParser (makePythonLoggingConfigTag, &sectionIndex);
-}
-
-static void initializePythonLoggingConfigParser (const langType language)
-{
-	PythonLoggingConfigIniconfClient.lang = language;
-	registerIniconfParserClient (&PythonLoggingConfigIniconfClient);
+	scheduleRunningBaseparser (0);
 }
 
 extern parserDefinition* PythonLoggingConfigParser (void)
 {
-	parserDefinition* const def = parserNew ("PythonLoggingConfig");
+	static struct sPythonLoggingConfigSubparser pythonLoggingConfigSubparser = {
+		.iniconf = {
+			.subparser = {
+				.direction = SUBPARSER_BI_DIRECTION,
+				.exclusiveSubparserChosenNotify = exclusiveSubparserChosenCallback,
+			},
+			.probeLanguage = probeLanguage,
+			.newDataNotify = newDataCallback,
+		},
+	};
 	static parserDependency dependencies [] = {
-		{ DEPTYPE_SUBPARSER, "Iniconf" },
+		[0] = { DEPTYPE_SUBPARSER, "Iniconf", &pythonLoggingConfigSubparser },
 	};
 
+	parserDefinition* const def = parserNew ("PythonLoggingConfig");
 	def->dependencies = dependencies;
 	def->dependencyCount = ARRAY_SIZE (dependencies);
-
-	def->initialize = initializePythonLoggingConfigParser;
 
 	def->kinds      = PythonLoggingConfigKinds;
 	def->kindCount  = ARRAY_SIZE (PythonLoggingConfigKinds);

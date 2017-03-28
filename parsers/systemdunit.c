@@ -28,6 +28,7 @@
 #include "xtag.h"
 
 
+
 /*
 *   DATA DEFINITIONS
 */
@@ -95,7 +96,8 @@ static void makeSystemdReferencedUnit (const char *value, kindOption* kind, int 
 	vStringDelete (unit);
 }
 
-static void makeSystemdUnitTag (const char *section, const char *key, const char *value, void *userData)
+static void newDataCallback (iniconfSubparser *s,
+							 const char *section, const char *key, const char *value)
 {
 	int r;
 
@@ -109,18 +111,30 @@ static void makeSystemdUnitTag (const char *section, const char *key, const char
 
 static void findSystemdUnitTags (void)
 {
-	int sectionIndex = CORK_NIL;
-	runIniconfParser (makeSystemdUnitTag, & sectionIndex);
+	scheduleRunningBaseparser (0);
 }
 
 extern parserDefinition* SystemdUnitParser (void)
 {
 	static const char *const extensions [] = { "unit", "service", "socket", "device",
-						   "mount", "automount", "swap", "target",
-						   "path", "timer", "snapshot", "scope",
-						   "slice", "time", /* ... */
-						   NULL };
+											   "mount", "automount", "swap", "target",
+											   "path", "timer", "snapshot", "scope",
+											   "slice", "time", /* ... */
+											   NULL };
+	static iniconfSubparser systemdUnitSubparser = {
+		.subparser = {
+			.direction = SUBPARSER_SUB_RUNS_BASE,
+		},
+		.newDataNotify = newDataCallback,
+	};
+	static parserDependency dependencies [] = {
+		[0] = { DEPTYPE_SUBPARSER, "Iniconf", &systemdUnitSubparser },
+	};
+
 	parserDefinition* const def = parserNew ("SystemdUnit");
+
+	def->dependencies = dependencies;
+	def->dependencyCount = ARRAY_SIZE(dependencies);
 	def->kinds      = SystemdUnitKinds;
 	def->kindCount  = ARRAY_SIZE (SystemdUnitKinds);
 	def->extensions = extensions;
