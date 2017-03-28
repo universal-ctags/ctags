@@ -18,17 +18,15 @@
 
 typedef enum {
 	K_PARAGRAPH,
+	K_DATA,
 } cobolKind;
 
 static kindOption CobolKinds[] = {
 	{ true, 'p', "paragraph", "paragraphs" },
+	{ true, 'd', "data", "data items"      },
 };
 
 static tagRegexTable cobolTagRegexTable[] = {
-	{"^[ \t]*[0-9]+[ \t]+([A-Z0-9][A-Z0-9-]*)[ \t]+("
-	 "BLANK|OCCURS|IS|JUST|PIC|REDEFINES|RENAMES|SIGN|SYNC|USAGE|VALUE"
-	 ")", "\\1",
-	 "d,data,data items", "i"},
 	{"^[ \t]*[FSR]D[ \t]+([A-Z0-9][A-Z0-9-]*)\\.", "\\1",
 	 "f,file,file descriptions (FD, SD, RD)", "i"},
 	{"^[ \t]*[0-9]+[ \t]+([A-Z0-9][A-Z0-9-]*)\\.", "\\1",
@@ -54,21 +52,38 @@ static const keywordTable cobolKeywordTable[] = {
 *   FUNCTION DEFINITIONS
 */
 
+static void cobol_make_tag_maybe (const char *line,
+								  const regexMatch *matches,
+								  unsigned int count,
+								  langType cobol,
+								  int matchIndex,
+								  int kindIndex)
+{
+	if (count > 0)
+	{
+		vString *name = vStringNew ();
+
+		vStringNCopyS (name, line + matches[matchIndex].start, matches[matchIndex].length);
+		if (lookupCaseKeyword (vStringValue (name), cobol) == KEYWORD_NONE)
+			makeSimpleTag (name, CobolKinds, kindIndex);
+		vStringDelete (name);
+	}
+}
+
+static void make_tag_for_data_maybe (const char *line,
+									 const regexMatch *matches,
+									 unsigned int count,
+									 void *data)
+{
+	cobol_make_tag_maybe (line, matches, count, *(langType *)data, 1, K_DATA);
+}
+
 static void make_tag_for_paragraph_maybe (const char *line,
 										  const regexMatch *matches,
 										  unsigned int count,
 										  void *data)
 {
-	if (count > 0)
-	{
-		vString *name = vStringNew ();
-		langType cobol = *(langType *)data;
-
-		vStringNCopyS (name, line + matches[1].start, matches[1].length);
-		if (lookupCaseKeyword (vStringValue (name), cobol) == KEYWORD_NONE)
-			makeSimpleTag (name, CobolKinds, K_PARAGRAPH);
-		vStringDelete (name);
-	}
+	cobol_make_tag_maybe (line, matches, count, *(langType *)data, 1, K_PARAGRAPH);
 }
 
 static void initializeCobolParser (langType language)
@@ -77,6 +92,12 @@ static void initializeCobolParser (langType language)
 
 	cobol = language;
 
+	addCallbackRegex (cobol,
+					  "^[ \t]*[0-9]+[ \t]+([A-Z0-9][A-Z0-9-]*)[ \t]+("
+					  "BLANK|OCCURS|IS|JUST|PIC|REDEFINES|RENAMES|SIGN|SYNC|USAGE|VALUE"
+					  ")",
+					  "{icase}",
+					  make_tag_for_data_maybe, NULL, &cobol);
 	addCallbackRegex (cobol,
 					  "^[ \t]*([A-Z0-9][A-Z0-9-]*)\\.",
 					  "{icase}",
