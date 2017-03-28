@@ -41,6 +41,9 @@ static tagRegexTable cobolTagRegexTable[] = {
 	{ COBOL_REGEX_PREFIX
 	  "([A-Z0-9][A-Z0-9-]*)[ \t]+SECTION\\.", "\\1",
 	 "s,section,sections", "i"},
+	{ COBOL_REGEX_PREFIX
+	  "([A-Z0-9][A-Z0-9-]*)[ \t]+DIVISION\\.", "\\1",
+	  "D,division,divisions", "i"},
 };
 
 typedef enum {

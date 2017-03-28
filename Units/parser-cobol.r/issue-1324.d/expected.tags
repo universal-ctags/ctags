@@ -1,5 +1,8 @@
+IDENTIFICATION	input.cbl	/^       IDENTIFICATION DIVISION.$/;"	D
+ENVIRONMENT	input.cbl	/^       ENVIRONMENT DIVISION.$/;"	D
 CONFIGURATION	input.cbl	/^       CONFIGURATION SECTION.$/;"	s
 SPECIAL-NAMES	input.cbl	/^       SPECIAL-NAMES.$/;"	p
+DATA	input.cbl	/^       DATA DIVISION.$/;"	D
 WORKING-STORAGE	input.cbl	/^       WORKING-STORAGE SECTION.$/;"	s
 WS-ABBRUCH-TYP	input.cbl	/^       01  WS-ABBRUCH-TYP          PIC 99.$/;"	d
 WS-ABBRUCH-EVENT	input.cbl	/^           88  WS-ABBRUCH-EVENT    VALUE 91.$/;"	d
@@ -13,6 +16,7 @@ F-TEXT-KEY2	input.cbl	/^           05 F-TEXT-KEY2          PIC 9(8).$/;"	d
 F-TEXT-KEY3	input.cbl	/^           05 F-TEXT-KEY3          PIC 99.$/;"	d
 F-TEXT-EVENT	input.cbl	/^           05 F-TEXT-EVENT         PIC X(10).$/;"	d
 LINKAGE	input.cbl	/^       LINKAGE SECTION.$/;"	s
+PROCEDURE	input.cbl	/^       PROCEDURE DIVISION.$/;"	D
 MAIN	input.cbl	/^       MAIN SECTION.$/;"	s
 MAIN-EX	input.cbl	/^       MAIN-EX. EXIT.$/;"	p
 E01-PRUEFEN	input.cbl	/^       E01-PRUEFEN SECTION.$/;"	s
