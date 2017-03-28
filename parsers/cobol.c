@@ -16,6 +16,8 @@
 #include "parse.h"
 #include "routines.h"
 
+#define COBOL_REGEX_PREFIX "^.......[ \t]*"
+
 typedef enum {
 	K_PARAGRAPH,
 	K_DATA,
@@ -27,13 +29,17 @@ static kindOption CobolKinds[] = {
 };
 
 static tagRegexTable cobolTagRegexTable[] = {
-	{"^[ \t]*[FSR]D[ \t]+([A-Z0-9][A-Z0-9-]*)\\.", "\\1",
+	{ COBOL_REGEX_PREFIX
+	  "[FSR]D[ \t]+([A-Z0-9][A-Z0-9-]*)\\.", "\\1",
 	 "f,file,file descriptions (FD, SD, RD)", "i"},
-	{"^[ \t]*[0-9]+[ \t]+([A-Z0-9][A-Z0-9-]*)\\.", "\\1",
+	{ COBOL_REGEX_PREFIX
+	  "[0-9]+[ \t]+([A-Z0-9][A-Z0-9-]*)\\.", "\\1",
 	 "g,group,group items", "i"},
-	{"^[ \t]*PROGRAM-ID\\.[ \t]+([A-Z0-9][A-Z0-9-]*)\\.", "\\1",
+	{ COBOL_REGEX_PREFIX
+	  "PROGRAM-ID\\.[ \t]+([A-Z0-9][A-Z0-9-]*)\\.", "\\1",
 	 "P,program,program ids", "i"},
-	{"^[ \t]*([A-Z0-9][A-Z0-9-]*)[ \t]+SECTION\\.", "\\1",
+	{ COBOL_REGEX_PREFIX
+	  "([A-Z0-9][A-Z0-9-]*)[ \t]+SECTION\\.", "\\1",
 	 "s,section,sections", "i"},
 };
 
@@ -93,13 +99,15 @@ static void initializeCobolParser (langType language)
 	cobol = language;
 
 	addCallbackRegex (cobol,
-					  "^[ \t]*[0-9]+[ \t]+([A-Z0-9][A-Z0-9-]*)[ \t]+("
+					  COBOL_REGEX_PREFIX
+					  "[0-9]+[ \t]+([A-Z0-9][A-Z0-9-]*)[ \t]+("
 					  "BLANK|OCCURS|IS|JUST|PIC|REDEFINES|RENAMES|SIGN|SYNC|USAGE|VALUE"
 					  ")",
 					  "{icase}",
 					  make_tag_for_data_maybe, NULL, &cobol);
 	addCallbackRegex (cobol,
-					  "^[ \t]*([A-Z0-9][A-Z0-9-]*)\\.",
+					  COBOL_REGEX_PREFIX
+					  "([A-Z0-9][A-Z0-9-]*)\\.",
 					  "{icase}",
 					  make_tag_for_paragraph_maybe, NULL, &cobol);
 }

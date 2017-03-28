@@ -3,6 +3,9 @@ SPECIAL-NAMES	input.cbl	/^       SPECIAL-NAMES.$/;"	p
 WORKING-STORAGE	input.cbl	/^       WORKING-STORAGE SECTION.$/;"	s
 WS-ABBRUCH-TYP	input.cbl	/^       01  WS-ABBRUCH-TYP          PIC 99.$/;"	d
 WS-ABBRUCH-EVENT	input.cbl	/^           88  WS-ABBRUCH-EVENT    VALUE 91.$/;"	d
+WS-ABBRUCH-OBJMGR	input.cbl	/^.          88  WS-ABBRUCH-OBJMGR   VALUE 92.$/;"	d
+WS-ABBRUCH-DB	input.cbl	/^.          88  WS-ABBRUCH-DB       VALUE 93.$/;"	d
+WS-ABBRUCH-PGM	input.cbl	/^.          88  WS-ABBRUCH-PGM      VALUE 94.$/;"	d
 F-TEXT	input.cbl	/^       01  F-TEXT.$/;"	g
 F-TEXT-DB	input.cbl	/^           05 F-TEXT-DB            PIC X(5).$/;"	d
 F-TEXT-KEY1	input.cbl	/^           05 F-TEXT-KEY1          PIC 9(8).$/;"	d
