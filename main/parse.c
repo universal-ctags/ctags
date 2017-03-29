@@ -2281,7 +2281,7 @@ static bool doesParserUseCork (parserDefinition *parser)
 	foreachSubparser(tmp)
 	{
 		langType t = tmp->slaveParser->id;
-		if (LanguageTable[t].def->useCork)
+		if (doesParserUseCork (LanguageTable[t].def))
 		{
 			r = true;
 			break;
