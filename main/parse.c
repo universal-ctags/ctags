@@ -73,11 +73,7 @@ typedef struct sParserObject {
 
 	unsigned int anonymousIdentiferId; /* managed by anon* functions */
 
-
-	slaveParser *slaveParsers;	/* The parsers on this list must be initialized when
-								   this parser is initialized. */
-	subparser   *subparsersDefault;
-	subparser   *subparsersInUse;
+	struct slaveControlBlock *slaveControlBlock;
 } parserObject;
 
 /*
@@ -91,8 +87,6 @@ static void installTagXpathTable (const langType language);
 static void anonResetMaybe (parserObject *parser);
 static void setupAnon (void);
 static void teardownAnon (void);
-static void setupSubparsersInUse (parserObject *parser);
-static subparser* teardownSubparsersInUse (parserObject *parser);
 
 /*
 *   DATA DEFINITIONS
@@ -1479,7 +1473,7 @@ static void initializeParserOne (langType lang)
 	if (parser->def->initialize != NULL)
 		parser->def->initialize (lang);
 
-	initializeDependencies (parser->def);
+	initializeDependencies (parser->def, parser->slaveControlBlock);
 
 	Assert (parser->fileKind != KIND_NULL);
 	Assert (!doesParserUseKind (parser->def, parser->fileKind->letter));
@@ -1502,15 +1496,17 @@ static void linkDependenciesAtInitializeParsing (parserDefinition *const parser)
 	unsigned int i;
 	parserDependency *d;
 	langType upper;
-	parserDefinition *upperParserDef;
+	parserObject *upperParser;
 
 	for (i = 0; i < parser->dependencyCount; i++)
 	{
 		d = parser->dependencies + i;
 		upper = getNamedLanguage (d->upperParser, 0);
-		upperParserDef = LanguageTable [upper].def;
+		upperParser = LanguageTable + upper;
 
-		linkDependencyAtInitializeParsing (d->type, upperParserDef, parser, d->data);
+		linkDependencyAtInitializeParsing (d->type, upperParser->def,
+										   upperParser->slaveControlBlock,
+										   parser, d->data);
 	}
 }
 
@@ -1518,6 +1514,7 @@ static void linkDependenciesAtInitializeParsing (parserDefinition *const parser)
 static void initializeParsingCommon (parserDefinition *def, bool is_builtin)
 {
 	char fileKindLetter;
+	parserObject *parser;
 
 	if (is_builtin)
 		verbose ("%s%s", LanguageCount > 0 ? ", " : "", def->name);
@@ -1525,13 +1522,16 @@ static void initializeParsingCommon (parserDefinition *def, bool is_builtin)
 		verbose ("Add optlib parser: %s\n", def->name);
 
 	def->id = LanguageCount++;
-	LanguageTable [def->id].def = def;
+	parser = LanguageTable + def->id;
+	parser->def = def;
 
-	fileKindLetter = LanguageTable [def->id].def->fileKindLetter;
+	fileKindLetter = parser->def->fileKindLetter;
 	if (fileKindLetter == KIND_FILE_DEFAULT)
-		LanguageTable [def->id].fileKind = &defaultFileKind;
+		parser->fileKind = &defaultFileKind;
 	else
-		LanguageTable [def->id].fileKind = fileKindNew(fileKindLetter);
+		parser->fileKind = fileKindNew(fileKindLetter);
+
+	parser->slaveControlBlock = allocSlaveControlBlock ();
 }
 
 extern void initializeParsing (void)
@@ -1583,7 +1583,9 @@ extern void freeParserResources (void)
 		if (parser->def->finalize)
 			(parser->def->finalize)((langType)i, (bool)parser->initialized);
 
-		finalizeDependencies (parser->def);
+		finalizeDependencies (parser->def, parser->slaveControlBlock);
+		freeSlaveControlBlock (parser->slaveControlBlock);
+		parser->slaveControlBlock = NULL;
 
 		if (parser->fileKind != &defaultFileKind)
 		{
@@ -2280,7 +2282,7 @@ static bool doesParserUseCork (parserDefinition *parser)
 	pushLanguage (parser->id);
 	foreachSubparser(tmp)
 	{
-		langType t = tmp->slaveParser->id;
+		langType t = getSubparserLanguage (tmp);
 		if (doesParserUseCork (LanguageTable[t].def))
 		{
 			r = true;
@@ -2306,7 +2308,7 @@ static bool createTagsWithFallback1 (const langType language,
 	initializeParser (language);
 	parser = &(LanguageTable [language]);
 
-	setupSubparsersInUse (parser);
+	setupSubparsersInUse (parser->slaveControlBlock);
 
 	useCork = doesParserUseCork(parser->def);
 	if (useCork)
@@ -2354,7 +2356,7 @@ static bool createTagsWithFallback1 (const langType language,
 		uncorkTagFile();
 
 	{
-		subparser *s = teardownSubparsersInUse (parser);
+		subparser *s = teardownSubparsersInUse (parser->slaveControlBlock);
 		if (exclusive_subparser && s)
 			*exclusive_subparser = getSubparserLanguage (s);
 	}
@@ -2966,7 +2968,7 @@ extern subparser *getNextSubparser(subparser *last)
 	langType t;
 
 	if (last == NULL)
-		r = parser->subparsersInUse;
+		r = getFirstSubparser(parser->slaveControlBlock);
 	else
 		r = last->next;
 
@@ -3006,13 +3008,10 @@ extern void scheduleRunningBaseparser (int dependencyIndex)
 	parserObject *base_parser = LanguageTable + base;
 
 	if (dependencyIndex == RUN_DEFAULT_SUBPARSERS)
-		base_parser->subparsersInUse = base_parser->subparsersDefault;
+		useDefaultSubparsers(base_parser->slaveControlBlock);
 	else
-	{
-		subparser *s = dep->data;
-		s->schedulingBaseparserExplicitly = true;
-		base_parser->subparsersInUse = s;
-	}
+		useSpecifiedSubparser (base_parser->slaveControlBlock,
+							   dep->data);
 
 	if (!isLanguageEnabled (base))
 	{
@@ -3036,40 +3035,6 @@ extern void scheduleRunningBaseparser (int dependencyIndex)
 	makePromise(base_name, THIN_STREAM_SPEC);
 }
 
-static void setupSubparsersInUse (parserObject *parser)
-{
-	if (!parser->subparsersInUse)
-		parser->subparsersInUse = parser->subparsersDefault;
-}
-
-static subparser* teardownSubparsersInUse (parserObject *parser)
-{
-	subparser *tmp = parser->subparsersInUse;
-	subparser *s = NULL;
-
-	parser->subparsersInUse = NULL;
-
-	if (tmp && tmp->schedulingBaseparserExplicitly)
-	{
-		tmp->schedulingBaseparserExplicitly = false;
-		s = tmp;
-	}
-
-	if (s)
-		return s;
-
-	while (tmp)
-	{
-		if (tmp->chosenAsExclusiveSubparser)
-		{
-			s = tmp;
-		}
-		tmp = tmp->next;
-	}
-
-	return s;
-}
-
 extern bool isParserMarkedNoEmission (void)
 {
 	langType lang = getInputLanguage();
@@ -3083,52 +3048,12 @@ extern subparser* getSubparserRunningBaseparser (void)
 {
 	langType current = getInputLanguage ();
 	parserObject *current_parser = LanguageTable + current;
-	subparser *s = current_parser->subparsersInUse;
+	subparser *s = getFirstSubparser (current_parser->slaveControlBlock);
 
 	if (s && s->schedulingBaseparserExplicitly)
 		return s;
 	else
 		return NULL;
-}
-
-extern void attachSlaveParser (langType master, slaveParser *slave)
-{
-	parserObject *master_parser = LanguageTable + master;
-
-	slave->next = master_parser->slaveParsers;
-	master_parser->slaveParsers = slave;
-}
-
-extern slaveParser *getNextSlaveParser (langType master, slaveParser * slave)
-{
-	if (slave)
-		return slave->next;
-	else
-	{
-		parserObject *master_parser = LanguageTable + master;
-		return master_parser->slaveParsers;
-	}
-}
-
-extern slaveParser *detachSlaveParser (langType master)
-{
-	parserObject *master_parser = LanguageTable + master;
-	if (master_parser->slaveParsers)
-	{
-		slaveParser *tmp = master_parser->slaveParsers;
-		master_parser->slaveParsers = tmp->next;
-		tmp->next = NULL;
-		return tmp;
-	}
-	else
-		return NULL;
-}
-
-extern void attachSubparser (langType base, subparser *sub)
-{
-	parserObject *base_parser = LanguageTable + base;
-	sub->next = base_parser->subparsersDefault;
-	base_parser->subparsersDefault = sub;
 }
 
 /*

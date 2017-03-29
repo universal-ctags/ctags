@@ -36,17 +36,20 @@ struct sSlaveParser {
 	slaveParser *next;
 };
 
+struct slaveControlBlock;	/* Opaque data type for parse.c */
+
 
 extern void linkDependencyAtInitializeParsing (depType dtype,
 					       parserDefinition *const master,
+					       struct slaveControlBlock *masterSCB,
 					       parserDefinition *const slave,
 					       void *data);
 
-extern void initializeDependencies (parserDefinition *parser);
-extern void finalizeDependencies (parserDefinition *parser);
-
-extern void attachSlaveParser (langType master, slaveParser *slave);
-extern slaveParser *getNextSlaveParser (langType master, slaveParser * slave);
-extern slaveParser *detachSlaveParser (langType master);
+extern struct slaveControlBlock *allocSlaveControlBlock (void);
+extern void freeSlaveControlBlock (struct slaveControlBlock *cb);
+extern void initializeDependencies (parserDefinition *parser,
+									struct slaveControlBlock *cb);
+extern void finalizeDependencies (parserDefinition *parser,
+								  struct slaveControlBlock *cb);
 
 #endif	/* CTAGS_MAIN_DEPENDENCY_H */
