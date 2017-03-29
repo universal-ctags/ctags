@@ -552,8 +552,11 @@ static bool parseLineDirective (char *s)
 /*
  *   Input file I/O operations
  */
-
+#ifdef DEBUG
+#define MAX_IN_MEMORY_FILE_SIZE 0
+#else
 #define MAX_IN_MEMORY_FILE_SIZE (1024*1024)
+#endif
 
 extern MIO *getMio (const char *const fileName, const char *const openMode,
 		    bool memStreamRequired)
