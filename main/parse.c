@@ -1514,6 +1514,26 @@ static void linkDependenciesAtInitializeParsing (parserDefinition *const parser)
 	}
 }
 
+/* Used in both builtin and optlib parsers. */
+static void initializeParsingCommon (parserDefinition *def, bool is_builtin)
+{
+	char fileKindLetter;
+
+	if (is_builtin)
+		verbose ("%s%s", LanguageCount > 0 ? ", " : "", def->name);
+	else
+		verbose ("Add optlib parser: %s\n", def->name);
+
+	def->id = LanguageCount++;
+	LanguageTable [def->id].def = def;
+
+	fileKindLetter = LanguageTable [def->id].def->fileKindLetter;
+	if (fileKindLetter == KIND_FILE_DEFAULT)
+		LanguageTable [def->id].fileKind = &defaultFileKind;
+	else
+		LanguageTable [def->id].fileKind = fileKindNew(fileKindLetter);
+}
+
 extern void initializeParsing (void)
 {
 	unsigned int builtInCount;
@@ -1544,18 +1564,7 @@ extern void initializeParsing (void)
 			else
 				accepted = true;
 			if (accepted)
-			{
-				char fileKindLetter;
-				verbose ("%s%s", i > 0 ? ", " : "", def->name);
-				def->id = LanguageCount++;
-				LanguageTable [def->id].def = def;
-
-				fileKindLetter = LanguageTable [def->id].def->fileKindLetter;
-				if (fileKindLetter == KIND_FILE_DEFAULT)
-					LanguageTable [def->id].fileKind = &defaultFileKind;
-				else
-					LanguageTable [def->id].fileKind = fileKindNew(fileKindLetter);
-			}
+				initializeParsingCommon (def, true);
 		}
 	}
 	verbose ("\n");
@@ -1641,6 +1650,17 @@ static flagDefinition LangDefFlagDef [] = {
 	{ '\0',  "fileKind", NULL, lang_def_flag_file_kind_long },
 };
 
+static parserDefinition* OptlibParser(const char *name)
+{
+	parserDefinition *def;
+
+	def = parserNew (name);
+	def->initialize        = lazyInitialize;
+	def->method            = METHOD_NOT_CRAFTED;
+
+	return def;
+}
+
 extern void processLanguageDefineOption (
 		const char *const option, const char *const parameter CTAGS_ATTR_UNUSED)
 {
@@ -1652,7 +1672,6 @@ extern void processLanguageDefineOption (
 	{
 		char *name;
 		char *flags;
-		unsigned int i;
 		parserDefinition*  def;
 
 		flags = strchr (parameter, LONG_FLAGS_OPEN);
@@ -1661,18 +1680,14 @@ extern void processLanguageDefineOption (
 		else
 			name = eStrdup (parameter);
 
-		i = LanguageCount++;
-		def = parserNew (name);
-		def->initialize        = lazyInitialize;
-		def->method            = METHOD_NOT_CRAFTED;
-		def->id                = i;
-		LanguageTable = xRealloc (LanguageTable, i + 1, parserObject);
-		memset (LanguageTable + i, 0, sizeof(parserObject));
-		LanguageTable [i].def = def;
-		LanguageTable [i].currentPatterns = stringListNew ();
-		LanguageTable [i].currentExtensions = stringListNew ();
-		/* TODO: Unify these code with initializeParsing */
-		LanguageTable [i].fileKind = &defaultFileKind;
+		LanguageTable = xRealloc (LanguageTable, LanguageCount + 1, parserObject);
+		memset (LanguageTable + LanguageCount, 0, sizeof(parserObject));
+
+		def = OptlibParser (name);
+		initializeParsingCommon (def, false);
+
+		LanguageTable [def->id].currentPatterns = stringListNew ();
+		LanguageTable [def->id].currentExtensions = stringListNew ();
 		flagsEval (flags, LangDefFlagDef, ARRAY_SIZE (LangDefFlagDef), def);
 
 		eFree (name);
