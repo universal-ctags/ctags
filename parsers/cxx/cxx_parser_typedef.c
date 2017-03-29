@@ -106,6 +106,14 @@ bool cxxParserParseGenericTypedef(void)
 //    [typedef] int (x)(void)
 //        x = int ()(void) <--- function type (not a pointer!)
 //
+//    [typedef] int (MACRO *x)(void);
+//        x = int (MACRO *)(void) <--- function pointer
+//    (WINAPI is an example of MACRO.)
+//
+//    [typedef] int (MACRO x)(void)
+//        x = int (MACRO)(void) <--- function type (not a pointer!)
+//    (WINAPI is an example of MACRO.)
+//
 //    [typedef] int ((x))(void)
 //        x = int ()(void) <--- same as above
 //
@@ -266,9 +274,12 @@ skip_to_comma_or_end:
 			pTParentChain = pChain;
 		} else if(pFirstParenthesis)
 		{
-			// look for the first nested identifier in here
+			// look for the last nested identifier in here
+			// e.g.
+			// typedef void (WINAPI *func_t) (void);
+			// We exepect func_t we want to capture is at the end of parenthesis chain.
 			CXX_DEBUG_PRINT("Identifier not at end, but got parenthesis chain");
-			t = cxxTokenChainFirstPossiblyNestedTokenOfType(
+			t = cxxTokenChainLastPossiblyNestedTokenOfType(
 					pFirstParenthesis->pChain,
 					CXXTokenTypeIdentifier,
 					&pTParentChain
