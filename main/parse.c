@@ -2524,7 +2524,7 @@ extern bool doesParserRequireMemoryStream (const langType language)
 	parserDefinition *const lang = LanguageTable [language].def;
 
 	if (lang->tagXpathTableCount > 0
-		|| lang->method & METHOD_YAML)
+		|| lang->useMemoryStreamInput)
 	{
 		verbose ("%s requires a memory stream for input\n", lang->name);
 		return true;

@@ -61,7 +61,6 @@ typedef enum {
 	METHOD_XCMD           = 1 << 2,
 	METHOD_XCMD_AVAILABLE = 1 << 3,
 	METHOD_XPATH          = 1 << 4,
-	METHOD_YAML           = 1 << 5,
 } parsingMethod;
 
 typedef struct {
@@ -93,6 +92,7 @@ struct sParserDefinition {
 	selectLanguage* selectLanguage; /* may be used to resolve conflicts */
 	unsigned int method;           /* See METHOD_ definitions above */
 	bool useCork;
+	bool useMemoryStreamInput;
 	bool allowNullTag;
 	bool requestAutomaticFQTag;
 	tagRegexTable *tagRegexTable;
