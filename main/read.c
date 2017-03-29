@@ -652,9 +652,11 @@ extern bool openInputFile (const char *const fileName, const langType language,
 		allocLineFposMap (&File.lineFposMap);
 
 		File.thinDepth = 0;
-		verbose ("OPENING %s as %s language %sfile\n", fileName,
+		verbose ("OPENING %s as %s language %sfile [%s%s]\n", fileName,
 				getLanguageName (language),
-				File.input.isHeader ? "include " : "");
+				 File.input.isHeader ? "include " : "",
+				 mio? "reused": "new",
+				 memStreamRequired? ",required": "");
 	}
 	return opened;
 }
