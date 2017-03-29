@@ -166,6 +166,7 @@ extern parserDefinition* YamlParser (void)
 	def->useCork    = true;
 	def->kindTable         = YamlKinds;
 	def->kindCount     = ARRAY_SIZE (YamlKinds);
+	def->method        = METHOD_YAML;
 
 	return def;
 }

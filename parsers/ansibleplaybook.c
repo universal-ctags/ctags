@@ -224,7 +224,6 @@ extern parserDefinition* AnsiblePlaybookParser (void)
 	def->kindTable         = AnsiblePlaybookKinds;
 	def->kindCount     = ARRAY_SIZE (AnsiblePlaybookKinds);
 	def->parser        = findAnsiblePlaybookTags;
-	def->method        = METHOD_YAML;
 	def->useCork       = true;
 	return def;
 }
