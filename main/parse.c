@@ -2522,12 +2522,30 @@ extern bool doesParserRequireMemoryStream (const langType language)
 {
 	Assert (0 <= language  &&  language < (int) LanguageCount);
 	parserDefinition *const lang = LanguageTable [language].def;
+	int i;
 
 	if (lang->tagXpathTableCount > 0
 		|| lang->useMemoryStreamInput)
 	{
 		verbose ("%s requires a memory stream for input\n", lang->name);
 		return true;
+	}
+
+	for (i = 0; i < lang->dependencyCount; i++)
+	{
+		parserDependency *d = lang->dependencies + i;
+		if (d->type == DEPTYPE_SUBPARSER &&
+			((subparser *)(d->data))->direction & SUBPARSER_SUB_RUNS_BASE)
+		{
+			langType baseParser;
+			baseParser = getNamedLanguage (d->upperParser, 0);
+			if (doesParserRequireMemoryStream(baseParser))
+			{
+				verbose ("%s/%s requires a memory stream for input\n", lang->name,
+						 LanguageTable[baseParser].def->name);
+				return true;
+			}
+		}
 	}
 
 	return false;
