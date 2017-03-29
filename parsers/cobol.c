@@ -40,6 +40,7 @@ static kindOption CobolKinds[] = {
 };
 
 static tagRegexTable cobolTagRegexTable[] = {
+	{ "......\\*.*", "", "", "{exclusive}" },
 	{ COBOL_REGEX_PREFIX
 	  "[FSR]D[ \t]+([A-Z0-9][A-Z0-9-]*)\\.", "\\1",
 	 "f,file,file descriptions (FD, SD, RD)", "i"},
