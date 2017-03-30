@@ -73,6 +73,7 @@ struct sKindDefinition {
 	langType syncWith;
 	kindDefinition *slave;
 	kindDefinition *master;
+	int id;
 };
 
 #define ATTACH_ROLES(RS) .nRoles = ARRAY_SIZE(RS), .roles = RS
@@ -95,5 +96,7 @@ struct kindControlBlock;
 typedef void (* freeKindDefFunc) (kindDefinition *);
 extern struct kindControlBlock* allocKindControlBlock (parserDefinition *parser);
 extern void freeKindControlBlock (struct kindControlBlock* kcb);
+extern int  defineKind (struct kindControlBlock* kcb, kindDefinition *def,
+						freeKindDefFunc freeKindDef);
 
 #endif	/* CTAGS_MAIN_KIND_H */

@@ -16,6 +16,7 @@
 #include "debug.h"
 #include "kind.h"
 #include "parse.h"
+#include "options.h"
 
 typedef struct sKindObject {
 	kindDefinition *def;
@@ -182,6 +183,7 @@ extern struct kindControlBlock* allocKindControlBlock (parserDefinition *parser)
 	{
 		kcb->kind [i].def = parser->kindTable + i;
 		kcb->kind [i].free = NULL;
+		kcb->kind [i].def->id = i;
 	}
 
 	return kcb;
@@ -198,4 +200,19 @@ extern void freeKindControlBlock (struct kindControlBlock* kcb)
 	}
 	eFree (kcb->kind);
 	eFree (kcb);
+}
+
+extern int  defineKind (struct kindControlBlock* kcb, kindDefinition *def,
+						freeKindDefFunc freeKindDef)
+{
+	def->id = kcb->count++;
+	kcb->kind = xRealloc (kcb->kind, kcb->count, kindObject);
+	kcb->kind [def->id].def = def;
+	kcb->kind [def->id].free = freeKindDef;
+
+	verbose ("Add kind[%d] \"%c,%s,%s\" to %s\n", def->id,
+			 def->letter, def->name, def->description,
+			 getLanguageName (kcb->owner));
+
+	return def->id;
 }
