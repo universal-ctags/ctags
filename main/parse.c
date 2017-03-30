@@ -74,6 +74,7 @@ typedef struct sParserObject {
 	unsigned int anonymousIdentiferId; /* managed by anon* functions */
 
 	struct slaveControlBlock *slaveControlBlock;
+	struct kindControlBlock  *kindControlBlock;
 } parserObject;
 
 /*
@@ -1531,6 +1532,7 @@ static void initializeParsingCommon (parserDefinition *def, bool is_builtin)
 	else
 		parser->fileKind = fileKindNew(fileKindLetter);
 
+	parser->kindControlBlock  = allocKindControlBlock (def);
 	parser->slaveControlBlock = allocSlaveControlBlock ();
 }
 
@@ -1582,6 +1584,9 @@ extern void freeParserResources (void)
 
 		if (parser->def->finalize)
 			(parser->def->finalize)((langType)i, (bool)parser->initialized);
+
+		freeKindControlBlock (parser->kindControlBlock);
+		parser->kindControlBlock = NULL;
 
 		finalizeDependencies (parser->def, parser->slaveControlBlock);
 		freeSlaveControlBlock (parser->slaveControlBlock);

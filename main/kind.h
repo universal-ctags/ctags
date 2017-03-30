@@ -91,4 +91,9 @@ extern void enableKind (kindDefinition *kind, bool enable);
 
 #define PR_KIND_WIDTH_LANG 15
 
+struct kindControlBlock;
+typedef void (* freeKindDefFunc) (kindDefinition *);
+extern struct kindControlBlock* allocKindControlBlock (parserDefinition *parser);
+extern void freeKindControlBlock (struct kindControlBlock* kcb);
+
 #endif	/* CTAGS_MAIN_KIND_H */

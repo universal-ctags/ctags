@@ -17,6 +17,17 @@
 #include "kind.h"
 #include "parse.h"
 
+typedef struct sKindObject {
+	kindDefinition *def;
+	freeKindDefFunc free;
+} kindObject;
+
+struct kindControlBlock {
+	kindObject *kind;
+	int count;
+	langType owner;
+};
+
 extern void printRole (const roleDesc* const role)
 {
 	if (role)
@@ -155,4 +166,36 @@ extern void enableKind (kindDefinition *kind, bool enable)
 		for (slave = kind->slave; slave; slave = slave->slave)
 			slave->enabled = enable;
 	}
+}
+
+extern struct kindControlBlock* allocKindControlBlock (parserDefinition *parser)
+{
+	unsigned int i;
+	struct kindControlBlock *kcb;
+
+	kcb = xMalloc (1, struct kindControlBlock);
+	kcb->kind = xMalloc (parser->kindCount, kindObject);
+	kcb->count = parser->kindCount;
+	kcb->owner = parser->id;
+
+	for (i = 0; i < parser->kindCount; ++i)
+	{
+		kcb->kind [i].def = parser->kindTable + i;
+		kcb->kind [i].free = NULL;
+	}
+
+	return kcb;
+}
+
+extern void freeKindControlBlock (struct kindControlBlock* kcb)
+{
+	int i;
+
+	for (i = 0; i < kcb->count; ++i)
+	{
+		if (kcb->kind [i].free)
+			kcb->kind [i].free (kcb->kind [i].def);
+	}
+	eFree (kcb->kind);
+	eFree (kcb);
 }
