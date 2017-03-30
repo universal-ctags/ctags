@@ -1937,7 +1937,7 @@ try_again:
 									) &&
 								(pIdentifier = cxxTokenChainLastPossiblyNestedTokenOfType(
 										t->pPrev->pPrev->pChain,
-										CXXTokenTypeIdentifier
+										CXXTokenTypeIdentifier, NULL
 									)) &&
 								pIdentifier->pPrev &&
 								cxxTokenTypeIs(pIdentifier->pPrev,CXXTokenTypeStar)
@@ -1945,7 +1945,7 @@ try_again:
 								// type (*&name)
 								(pIdentifier = cxxTokenChainLastPossiblyNestedTokenOfType(
 										t->pPrev->pChain,
-										CXXTokenTypeIdentifier
+										CXXTokenTypeIdentifier, NULL
 									)) &&
 								pIdentifier->pPrev &&
 								cxxTokenTypeIsOneOf(

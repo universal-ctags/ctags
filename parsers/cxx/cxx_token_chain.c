@@ -669,7 +669,8 @@ CXXToken * cxxTokenChainLastTokenOfType(
 
 CXXToken * cxxTokenChainLastPossiblyNestedTokenOfType(
 		CXXTokenChain * tc,
-		unsigned int uTokenTypes
+		unsigned int uTokenTypes,
+		CXXTokenChain ** ppParentChain
 	)
 {
 	if(!tc)
@@ -678,12 +679,17 @@ CXXToken * cxxTokenChainLastPossiblyNestedTokenOfType(
 	while(t)
 	{
 		if(t->eType & uTokenTypes)
+		{
+			if(ppParentChain)
+				*ppParentChain = tc;
 			return t;
+		}
 		if(t->eType == CXXTokenTypeParenthesisChain)
 		{
 			CXXToken * tmp = cxxTokenChainLastPossiblyNestedTokenOfType(
 					t->pChain,
-					uTokenTypes
+					uTokenTypes,
+					ppParentChain
 				);
 			if(tmp)
 				return tmp;

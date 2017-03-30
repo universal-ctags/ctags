@@ -72,7 +72,8 @@ CXXToken * cxxTokenChainLastTokenOfType(
 // in nested () chains (only (), not [], {}...)
 CXXToken * cxxTokenChainLastPossiblyNestedTokenOfType(
 		CXXTokenChain * tc,
-		unsigned int uTokenTypes
+		unsigned int uTokenTypes,
+		CXXTokenChain ** ppParentChain
 	);
 
 // Find the first token with one of the specified types. Look also

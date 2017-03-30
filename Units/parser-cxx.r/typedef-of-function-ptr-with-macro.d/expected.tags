@@ -1,0 +1,2 @@
+a	input.cpp	/^typedef void (WINAPI  a) (void);$/;"	t	typeref:typename:void (WINAPI)(void)	file:
+b	input.cpp	/^typedef void (WINAPI* b) (void);$/;"	t	typeref:typename:void (WINAPI *)(void)	file:
