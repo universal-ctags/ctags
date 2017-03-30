@@ -12,29 +12,139 @@
 *   INCLUDE FILES
 */
 #include "general.h"	/* must always come first */
+#include "keyword.h"
 #include "parse.h"
 #include "routines.h"
 
+#define COBOL_REGEX_PREFIX "^.......[ \t]*"
+
+typedef enum {
+	K_PARAGRAPH,
+	K_DATA,
+	K_SOURCEFILE,
+} cobolKind;
+
+typedef enum {
+	COBOL_SOURCEFILE_COPYED,
+} cobolSourcefileRole;
+
+static roleDesc CobolSourcefileRoles [] = {
+	{ true, "copyed", "copyed in source file" },
+};
+
+static kindOption CobolKinds[] = {
+	{ true, 'p', "paragraph", "paragraphs" },
+	{ true, 'd', "data", "data items"      },
+	{ true, 'S', "sourcefile", "source code file",
+	  .referenceOnly = true, ATTACH_ROLES(CobolSourcefileRoles)},
+};
+
 static tagRegexTable cobolTagRegexTable[] = {
-	{"^[ \t]*[0-9]+[ \t]+([A-Z0-9][A-Z0-9-]*)[ \t]+("
-	 "BLANK|OCCURS|IS|JUST|PIC|REDEFINES|RENAMES|SIGN|SYNC|USAGE|VALUE"
-	 ")", "\\1",
-	 "d,data,data items", "i"},
-	{"^[ \t]*[FSR]D[ \t]+([A-Z0-9][A-Z0-9-]*)\\.", "\\1",
+	{ "......\\*.*", "", "", "{exclusive}" },
+	{ COBOL_REGEX_PREFIX
+	  "[FSR]D[ \t]+([A-Z0-9][A-Z0-9-]*)\\.", "\\1",
 	 "f,file,file descriptions (FD, SD, RD)", "i"},
-	{"^[ \t]*[0-9]+[ \t]+([A-Z0-9][A-Z0-9-]*)\\.", "\\1",
+	{ COBOL_REGEX_PREFIX
+	  "[0-9]+[ \t]+([A-Z0-9][A-Z0-9-]*)\\.", "\\1",
 	 "g,group,group items", "i"},
-	{"^[ \t]*([A-Z0-9][A-Z0-9-]*)\\.", "\\1",
-	 "p,paragraph,paragraphs", "i"},
-	{"^[ \t]*PROGRAM-ID\\.[ \t]+([A-Z0-9][A-Z0-9-]*)\\.", "\\1",
+	{ COBOL_REGEX_PREFIX
+	  "PROGRAM-ID\\.[ \t]+([A-Z0-9][A-Z0-9-]*)\\.", "\\1",
 	 "P,program,program ids", "i"},
-	{"^[ \t]*([A-Z0-9][A-Z0-9-]*)[ \t]+SECTION\\.", "\\1",
+	{ COBOL_REGEX_PREFIX
+	  "([A-Z0-9][A-Z0-9-]*)[ \t]+SECTION\\.", "\\1",
 	 "s,section,sections", "i"},
+	{ COBOL_REGEX_PREFIX
+	  "([A-Z0-9][A-Z0-9-]*)[ \t]+DIVISION\\.", "\\1",
+	  "D,division,divisions", "i"},
+};
+
+typedef enum {
+	K,
+} cobolKeyword;
+
+static const keywordTable cobolKeywordTable[] = {
+	{ "CONTINUE", K },
+	{ "END-EXEC", K },
+	{ "EXIT", K },
+	{ "FILLER", K },
 };
 
 /*
 *   FUNCTION DEFINITIONS
 */
+
+static void cobol_make_tag_maybe (const char *line,
+								  const regexMatch *matches,
+								  unsigned int count,
+								  langType cobol,
+								  int matchIndex,
+								  int kindIndex)
+{
+	if (count > 0)
+	{
+		vString *name = vStringNew ();
+
+		vStringNCopyS (name, line + matches[matchIndex].start, matches[matchIndex].length);
+		if (lookupCaseKeyword (vStringValue (name), cobol) == KEYWORD_NONE)
+			makeSimpleTag (name, CobolKinds, kindIndex);
+		vStringDelete (name);
+	}
+}
+
+static void make_tag_for_data_maybe (const char *line,
+									 const regexMatch *matches,
+									 unsigned int count,
+									 void *data)
+{
+	cobol_make_tag_maybe (line, matches, count, *(langType *)data, 1, K_DATA);
+}
+
+static void make_tag_for_paragraph_maybe (const char *line,
+										  const regexMatch *matches,
+										  unsigned int count,
+										  void *data)
+{
+	cobol_make_tag_maybe (line, matches, count, *(langType *)data, 1, K_PARAGRAPH);
+}
+
+static void make_tag_for_copyed_in_sourcefile (const char *line,
+											   const regexMatch *matches,
+											   unsigned int count,
+											   void *data)
+{
+	if (count > 0)
+	{
+		vString *name = vStringNew ();
+
+		vStringNCopyS (name, line + matches[1].start, matches[1].length);
+		makeSimpleRefTag (name, CobolKinds, K_SOURCEFILE, COBOL_SOURCEFILE_COPYED);
+		vStringDelete (name);
+	}
+}
+
+static void initializeCobolParser (langType language)
+{
+	static langType cobol;
+
+	cobol = language;
+
+	addCallbackRegex (cobol,
+					  COBOL_REGEX_PREFIX
+					  "[0-9]+[ \t]+([A-Z0-9][A-Z0-9-]*)[ \t]+("
+					  "BLANK|OCCURS|IS|JUST|PIC|REDEFINES|RENAMES|SIGN|SYNC|USAGE|VALUE"
+					  ")",
+					  "{icase}",
+					  make_tag_for_data_maybe, NULL, &cobol);
+	addCallbackRegex (cobol,
+					  COBOL_REGEX_PREFIX
+					  "([A-Z0-9][A-Z0-9-]*)\\.",
+					  "{icase}",
+					  make_tag_for_paragraph_maybe, NULL, &cobol);
+	addCallbackRegex (cobol,
+					  "^[ \t]*COPY[ \t]+([A-Z0-9][A-Z0-9-]*)\\.",
+					  "{icase}",
+					  make_tag_for_copyed_in_sourcefile, NULL, NULL);
+}
 
 extern parserDefinition* CobolParser (void)
 {
@@ -42,8 +152,13 @@ extern parserDefinition* CobolParser (void)
 			"cbl", "cob", "CBL", "COB", NULL };
 	parserDefinition* def = parserNew ("Cobol");
 	def->extensions = extensions;
+	def->initialize = initializeCobolParser;
 	def->tagRegexTable = cobolTagRegexTable;
 	def->tagRegexCount = ARRAY_SIZE (cobolTagRegexTable);
 	def->method     = METHOD_NOT_CRAFTED|METHOD_REGEX;
+	def->kinds = CobolKinds;
+	def->kindCount = ARRAY_SIZE(CobolKinds);
+	def->keywordTable = cobolKeywordTable;
+	def->keywordCount = ARRAY_SIZE(cobolKeywordTable);
 	return def;
 }
