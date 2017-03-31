@@ -3202,5 +3202,6 @@ static parserDefinition *CTagsSelfTestParser (void)
 	def->kindCount = KIND_COUNT;
 	def->parser = createCTSTTags;
 	def->invisible = true;
+	def->useMemoryStreamInput = true;
 	return def;
 }
