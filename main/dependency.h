@@ -15,7 +15,7 @@
 #include "general.h"
 
 #include "types.h"
-
+#include "kind.h"
 
 typedef enum eDepType {
 	DEPTYPE_KIND_OWNER,
@@ -40,10 +40,12 @@ struct slaveControlBlock;	/* Opaque data type for parse.c */
 
 
 extern void linkDependencyAtInitializeParsing (depType dtype,
-					       parserDefinition *const master,
-					       struct slaveControlBlock *masterSCB,
-					       parserDefinition *const slave,
-					       void *data);
+						   parserDefinition *const master,
+						   struct slaveControlBlock *masterSCB,
+						   struct kindControlBlock *masterKCB,
+						   parserDefinition *const slave,
+						   struct kindControlBlock *slaveKCB,
+						   void *data);
 
 extern struct slaveControlBlock *allocSlaveControlBlock (void);
 extern void freeSlaveControlBlock (struct slaveControlBlock *cb);

@@ -257,6 +257,51 @@ extern kindDefinition *getKindForName (struct kindControlBlock* kcb, const char*
 	return NULL;
 }
 
+static void linkKinds (langType master, kindDefinition *masterKind, kindDefinition *slaveKind)
+{
+	kindDefinition *tail;
+
+	slaveKind->master = masterKind;
+
+	tail = slaveKind;
+	while (tail->slave)
+	{
+		tail->enabled = masterKind->enabled;
+		tail = tail->slave;
+	}
+
+	tail->slave = masterKind->slave;
+	masterKind->slave = slaveKind;
+
+	masterKind->syncWith = master;
+	slaveKind->syncWith = master;
+}
+
+extern void linkKindDependency (struct kindControlBlock *masterKCB,
+								struct kindControlBlock *slaveKCB)
+{
+	unsigned int k_slave, k_master;
+	kindDefinition *kind_slave, *kind_master;
+
+	for (k_slave = 0; k_slave < countKinds (slaveKCB); k_slave++)
+	{
+		kind_slave = getKind(slaveKCB, k_slave);
+		if (kind_slave->syncWith == LANG_AUTO)
+		{
+			for (k_master = 0; k_master < countKinds (masterKCB); k_master++)
+			{
+				kind_master = getKind(masterKCB, k_master);
+				if ((kind_slave->letter == kind_master->letter)
+				    && (strcmp (kind_slave->name, kind_master->name) == 0))
+				{
+					linkKinds (masterKCB->owner, kind_master, kind_slave);
+					break;
+				}
+			}
+		}
+	}
+}
+
 #ifdef DEBUG
 extern bool doesParserUseKind (struct kindControlBlock* kcb, char letter)
 {

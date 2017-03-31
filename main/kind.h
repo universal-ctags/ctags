@@ -61,6 +61,9 @@ struct sKindDefinition {
 	scopeSeparator *separators;
 	unsigned int separatorCount;
 
+	int id;
+
+	/* TODO:Following fields should be moved to kindObject. */
 	/* Usage of `syncWith' field is a bit tricky.
 
 	   If `LANG_AUTO' is specified to `syncWith' field of a kind
@@ -73,7 +76,6 @@ struct sKindDefinition {
 	langType syncWith;
 	kindDefinition *slave;
 	kindDefinition *master;
-	int id;
 };
 
 #define ATTACH_ROLES(RS) .nRoles = ARRAY_SIZE(RS), .roles = RS
@@ -102,6 +104,8 @@ extern int countKinds (struct kindControlBlock* kcb);
 extern kindDefinition *getKind (struct kindControlBlock* kcb, int kindIndex);
 extern kindDefinition *getKindForLetter (struct kindControlBlock* kcb, int letter);
 extern kindDefinition *getKindForName (struct kindControlBlock* kcb, const char* name);
+extern void linkKindDependency (struct kindControlBlock *masterKCB,
+								struct kindControlBlock *slaveKCB);
 
 #ifdef DEBUG
 extern bool doesParserUseKind (struct kindControlBlock* kcb, char letter);

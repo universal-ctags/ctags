@@ -1495,7 +1495,10 @@ static void linkDependenciesAtInitializeParsing (parserDefinition *const parser)
 
 		linkDependencyAtInitializeParsing (d->type, upperParser->def,
 										   upperParser->slaveControlBlock,
-										   parser, d->data);
+										   upperParser->kindControlBlock,
+										   parser,
+										   (LanguageTable + parser->id)->kindControlBlock,
+										   d->data);
 	}
 }
 
