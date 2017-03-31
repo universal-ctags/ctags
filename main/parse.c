@@ -1691,15 +1691,8 @@ extern void processLanguageDefineOption (
 
 static kindDefinition *langKindDefinition (const langType language, const int flag)
 {
-	unsigned int i;
-	kindDefinition* result = NULL;
-	const parserDefinition* lang;
 	Assert (0 <= language  &&  language < (int) LanguageCount);
-	lang = LanguageTable [language].def;
-	for (i=0  ;  i < lang->kindCount  &&  result == NULL  ;  ++i)
-		if (lang->kindTable [i].letter == flag)
-			result = &lang->kindTable [i];
-	return result;
+	return getKindForLetter (LanguageTable [language].kindControlBlock, flag);
 }
 
 static kindDefinition *langKindLongOption (const langType language, const char *kindLong)
