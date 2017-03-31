@@ -101,6 +101,7 @@ extern int  defineKind (struct kindControlBlock* kcb, kindDefinition *def,
 extern int countKinds (struct kindControlBlock* kcb);
 extern kindDefinition *getKind (struct kindControlBlock* kcb, int kindIndex);
 extern kindDefinition *getKindForLetter (struct kindControlBlock* kcb, int letter);
+extern kindDefinition *getKindForName (struct kindControlBlock* kcb, const char* name);
 
 #ifdef DEBUG
 extern bool doesParserUseKind (struct kindControlBlock* kcb, char letter);

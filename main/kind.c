@@ -13,6 +13,7 @@
 #include "general.h"
 
 #include <stdio.h>
+#include <string.h>
 #include "debug.h"
 #include "kind.h"
 #include "parse.h"
@@ -236,6 +237,21 @@ extern kindDefinition *getKindForLetter (struct kindControlBlock* kcb, int lette
 	{
 		kdef = getKind (kcb, i);
 		if (kdef->letter == letter)
+			return kdef;
+	}
+	return NULL;
+}
+
+extern kindDefinition *getKindForName (struct kindControlBlock* kcb, const char* name)
+{
+	int i;
+	kindDefinition * kdef;
+
+	for (i = 0;  i < countKinds (kcb);  ++i)
+	{
+		kdef = getKind (kcb, i);
+		Assert(kdef);
+		if (kdef->name && strcmp(kdef->name, name) == 0)
 			return kdef;
 	}
 	return NULL;
