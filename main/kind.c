@@ -227,6 +227,20 @@ extern kindDefinition *getKind (struct kindControlBlock* kcb, int kindIndex)
 	return kcb->kind [kindIndex].def;
 }
 
+extern kindDefinition *getKindForLetter (struct kindControlBlock* kcb, int letter)
+{
+	int i;
+	kindDefinition * kdef;
+
+	for (i = 0;  i < countKinds (kcb);  ++i)
+	{
+		kdef = getKind (kcb, i);
+		if (kdef->letter == letter)
+			return kdef;
+	}
+	return NULL;
+}
+
 #ifdef DEBUG
 extern bool doesParserUseKind (struct kindControlBlock* kcb, char letter)
 {
