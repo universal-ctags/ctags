@@ -1719,16 +1719,22 @@ extern bool isLanguageKindEnabled (const langType language, char kind)
 
 static void resetLanguageKinds (const langType language, const bool mode)
 {
-	const parserDefinition* lang;
+	const parserObject* parser;
+
 	Assert (0 <= language  &&  language < (int) LanguageCount);
-	lang = LanguageTable [language].def;
+	parser = LanguageTable + language;
 
 	resetRegexKinds (language, mode);
 	resetXcmdKinds (language, mode);
 	{
 		unsigned int i;
-		for (i = 0  ;  i < lang->kindCount  ;  ++i)
-			enableKind (lang->kindTable + i, mode);
+		struct kindControlBlock *kcb = parser->kindControlBlock;
+
+		for (i = 0  ;  i < countKinds (kcb)  ;  ++i)
+		{
+			kindDefinition *kdef = getKind (kcb, i);
+			enableKind (kdef, mode);
+		}
 	}
 }
 
