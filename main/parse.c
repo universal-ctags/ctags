@@ -3134,10 +3134,15 @@ extern void attachSubparser (langType base, subparser *sub)
 /*
  * A parser for CTagsSelfTest (CTST)
  */
+#define SELF_TEST_PARSER "CTagsSelfTest"
+
 typedef enum {
 	K_BROKEN,
 	K_NO_LETTER,
 	K_NO_LONG_NAME,
+	K_NOTHING_SPECIAL,
+	K_GUEST_BEGINNING,
+	K_GUEST_END,
 	KIND_COUNT
 } CTST_Kind;
 
@@ -3156,6 +3161,9 @@ static kindDefinition CTST_Kinds[KIND_COUNT] = {
 	 /* use '@' when testing. */
 	},
 	{true, 'L', NULL, "kind with no long name" },
+	{true, 'N', "nothingSpecial", "emit a normal tag" },
+	{true, 'B', NULL, "beginning of an area for a guest" },
+	{true, 'E', NULL, "end of an area for a guest" },
 };
 
 static void createCTSTTags (void)
@@ -3163,6 +3171,9 @@ static void createCTSTTags (void)
 	int i;
 	const unsigned char *line;
 	tagEntryInfo e;
+
+	unsigned long lb = 0;
+	unsigned long le = 0;
 
 	while ((line = readLineFromInputFile ()) != NULL)
 	{
@@ -3188,6 +3199,20 @@ static void createCTSTTags (void)
 						initTagEntry (&e, "abnormal kindDefinition testing (no long name)", &CTST_Kinds[i]);
 						makeTagEntry (&e);
 						break;
+					case K_NOTHING_SPECIAL:
+						if (!lb)
+						{
+							initTagEntry (&e, "NOTHING_SPEICAL", &CTST_Kinds[i]);
+							makeTagEntry (&e);
+						}
+						break;
+					case K_GUEST_BEGINNING:
+						lb = getInputLineNumber ();
+						break;
+					case K_GUEST_END:
+						le = getInputLineNumber ();
+						makePromise (SELF_TEST_PARSER, lb + 1, 0, le, 0, lb + 1);
+						break;
 				}
 			}
 	}
@@ -3196,7 +3221,7 @@ static void createCTSTTags (void)
 static parserDefinition *CTagsSelfTestParser (void)
 {
 	static const char *const extensions[] = { NULL };
-	parserDefinition *const def = parserNew ("CTagsSelfTest");
+	parserDefinition *const def = parserNew (SELF_TEST_PARSER);
 	def->extensions = extensions;
 	def->kindTable = CTST_Kinds;
 	def->kindCount = KIND_COUNT;
