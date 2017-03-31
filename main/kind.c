@@ -216,3 +216,13 @@ extern int  defineKind (struct kindControlBlock* kcb, kindDefinition *def,
 
 	return def->id;
 }
+
+extern int countKinds (struct kindControlBlock* kcb)
+{
+	return kcb->count;
+}
+
+extern kindDefinition *getKind (struct kindControlBlock* kcb, int kindIndex)
+{
+	return kcb->kind [kindIndex].def;
+}

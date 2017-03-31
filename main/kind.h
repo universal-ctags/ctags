@@ -98,5 +98,7 @@ extern struct kindControlBlock* allocKindControlBlock (parserDefinition *parser)
 extern void freeKindControlBlock (struct kindControlBlock* kcb);
 extern int  defineKind (struct kindControlBlock* kcb, kindDefinition *def,
 						freeKindDefFunc freeKindDef);
+extern int countKinds (struct kindControlBlock* kcb);
+extern kindDefinition *getKind (struct kindControlBlock* kcb, int kindIndex);
 
 #endif	/* CTAGS_MAIN_KIND_H */
