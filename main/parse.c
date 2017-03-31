@@ -1924,7 +1924,9 @@ extern bool processKindDefinition (
 
 static void printRoles (const langType language, const char* letters, bool allowMissingKind)
 {
-	const parserDefinition* const lang = LanguageTable [language].def;
+	parserObject *parser = LanguageTable + language;
+	struct kindControlBlock *kcb = parser->kindControlBlock;
+	const parserDefinition* const lang = parser->def;
 	const char *c;
 
 	if (lang->invisible)
@@ -1935,9 +1937,9 @@ static void printRoles (const langType language, const char* letters, bool allow
 		unsigned int i;
 		const kindDefinition *k;
 
-		for (i = 0; i < lang->kindCount; ++i)
+		for (i = 0; i < countKinds (kcb); ++i)
 		{
-			k = lang->kindTable + i;
+			k = getKind(kcb, i);
 			if (*c == KIND_WILDCARD || k->letter == *c)
 			{
 				int j;
@@ -1953,7 +1955,7 @@ static void printRoles (const langType language, const char* letters, bool allow
 					break;
 			}
 		}
-		if ((i == lang->kindCount) && (*c != KIND_WILDCARD) && (!allowMissingKind))
+		if ((i == countKinds (kcb)) && (*c != KIND_WILDCARD) && (!allowMissingKind))
 			error (FATAL, "No such letter kind in %s: %c\n", lang->name, *c);
 	}
 }
