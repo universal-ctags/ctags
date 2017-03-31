@@ -2845,23 +2845,29 @@ static bool makeKindDescriptionPseudoTag (kindDefinition *kind,
 extern bool makeKindDescriptionsPseudoTags (const langType language,
 					    const ptagDesc *pdesc)
 {
-
+	parserObject *parser;
+	struct kindControlBlock *kcb;
 	parserDefinition* lang;
-	kindDefinition *kinds;
+	kindDefinition *kind;
 	unsigned int kindCount, i;
 	struct makeKindDescriptionPseudoTagData data;
 
 	Assert (0 <= language  &&  language < (int) LanguageCount);
-	lang = LanguageTable [language].def;
-	kinds = lang->kindTable;
-	kindCount = lang->kindCount;
+	parser = LanguageTable + language;
+	kcb = parser->kindControlBlock;
+	lang = parser->def;
+
+	kindCount = countKinds(kcb);
 
 	data.langName = lang->name;
 	data.pdesc = pdesc;
 	data.written = false;
 
 	for (i = 0; i < kindCount; ++i)
-		makeKindDescriptionPseudoTag (kinds + i, &data);
+	{
+		kind = getKind (kcb, i);
+		makeKindDescriptionPseudoTag (kind, &data);
+	}
 
 	foreachRegexKinds (language, makeKindDescriptionPseudoTag, &data);
 	foreachXcmdKinds (language, makeKindDescriptionPseudoTag, &data);
