@@ -251,7 +251,7 @@ extern kindDefinition *getKindForName (struct kindControlBlock* kcb, const char*
 	{
 		kdef = getKind (kcb, i);
 		Assert(kdef);
-		if (kdef->name && strcmp(kdef->name, name) == 0)
+		if (kdef->name && (strcmp(kdef->name, name) == 0))
 			return kdef;
 	}
 	return NULL;
