@@ -2008,20 +2008,20 @@ extern void printLanguageFileKind (const langType language)
 
 static void printKinds (langType language, bool allKindFields, bool indent)
 {
-	const parserDefinition* lang;
+	const parserObject *parser;
+	struct kindControlBlock *kcb;
 	Assert (0 <= language  &&  language < (int) LanguageCount);
 
 	initializeParser (language);
-	lang = LanguageTable [language].def;
-	if (lang->kindTable != NULL)
+	parser = LanguageTable + language;
+	kcb = parser->kindControlBlock;
+
+	unsigned int i;
+	for (i = 0  ;  i < countKinds(kcb)  ;  ++i)
 	{
-		unsigned int i;
-		for (i = 0  ;  i < lang->kindCount  ;  ++i)
-		{
 			if (allKindFields && indent)
-				printf (Option.machinable? "%s": PR_KIND_FMT (LANG,s), lang->name);
-			printKind (lang->kindTable + i, allKindFields, indent, Option.machinable);
-		}
+				printf (Option.machinable? "%s": PR_KIND_FMT (LANG,s), parser->def->name);
+			printKind (getKind(kcb, i), allKindFields, indent, Option.machinable);
 	}
 	printRegexKinds (language, allKindFields, indent, Option.machinable);
 	printXcmdKinds (language, allKindFields, indent, Option.machinable);
