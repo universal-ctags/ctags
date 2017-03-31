@@ -1406,18 +1406,6 @@ extern void enableLanguages (const bool state)
 		enableLanguage (i, state);
 }
 
-#ifdef DEBUG
-static bool doesParserUseKind (const parserDefinition *const parser, char letter)
-{
-	unsigned int k;
-
-	for (k = 0; k < parser->kindCount; k++)
-		if (parser->kindTable [k].letter == letter)
-			return true;
-	return false;
-}
-#endif
-
 static void installFieldDefinition (const langType language)
 {
 	unsigned int i;
@@ -1477,7 +1465,7 @@ static void initializeParserOne (langType lang)
 	initializeDependencies (parser->def, parser->slaveControlBlock);
 
 	Assert (parser->fileKind != KIND_NULL);
-	Assert (!doesParserUseKind (parser->def, parser->fileKind->letter));
+	Assert (!doesParserUseKind (parser->kindControlBlock, parser->fileKind->letter));
 }
 
 extern void initializeParser (langType lang)

@@ -101,4 +101,8 @@ extern int  defineKind (struct kindControlBlock* kcb, kindDefinition *def,
 extern int countKinds (struct kindControlBlock* kcb);
 extern kindDefinition *getKind (struct kindControlBlock* kcb, int kindIndex);
 
+#ifdef DEBUG
+extern bool doesParserUseKind (struct kindControlBlock* kcb, char letter);
+#endif
+
 #endif	/* CTAGS_MAIN_KIND_H */
