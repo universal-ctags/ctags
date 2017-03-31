@@ -491,14 +491,14 @@ static int skipMacro (int c)
 	return c;
 }
 
-static verilogKind getKind (tokenInfo *const token)
+static verilogKind getKindForToken (tokenInfo *const token)
 {
 	return (verilogKind) lookupKeyword (vStringValue (token->name), getInputLanguage () );
 }
 
 static void updateKind (tokenInfo *const token)
 {
-	token->kind = getKind (token);
+	token->kind = getKindForToken (token);
 }
 
 static void createContext (tokenInfo *const scope)
@@ -955,7 +955,7 @@ static void tagNameList (tokenInfo* token, int c)
 		if (isIdentifierCharacter (c))
 		{
 			readIdentifier (token, c);
-			localKind = getKind (token);
+			localKind = getKindForToken (token);
 			/* Create tag in case name is not a known kind ... */
 			if (localKind == K_UNDEFINED)
 			{
@@ -1076,7 +1076,7 @@ static void findTag (tokenInfo *const token)
 		if (isIdentifierCharacter (c))
 		{
 			readIdentifier (token, c);
-			while (getKind (token) == K_IGNORE)
+			while (getKindForToken (token) == K_IGNORE)
 			{
 				c = skipWhite (vGetc ());
 				readIdentifier (token, c);
