@@ -2738,19 +2738,22 @@ extern xpathFileSpec* getXpathFileSpec (const langType language, unsigned int nt
 extern bool makeKindSeparatorsPseudoTags (const langType language,
 					     const ptagDesc *pdesc)
 {
+	parserObject* parser;
 	parserDefinition* lang;
-	kindDefinition *kinds;
+	struct kindControlBlock *kcb;
+	kindDefinition *kind;
 	unsigned int kindCount;
 	unsigned int i, j;
 
 	bool r = false;
 
 	Assert (0 <= language  &&  language < (int) LanguageCount);
-	lang = LanguageTable [language].def;
-	kinds = lang->kindTable;
-	kindCount = lang->kindCount;
+	parser = LanguageTable + language;
+	lang = parser->def;
+	kcb = parser->kindControlBlock;
+	kindCount = countKinds(kcb);
 
-	if (kinds == NULL)
+	if (kindCount == 0)
 		return r;
 
 	for (i = 0; i < kindCount; ++i)
@@ -2760,23 +2763,24 @@ extern bool makeKindSeparatorsPseudoTags (const langType language,
 		if (!sepval)
 			sepval = vStringNew ();
 
-		for (j = 0; j < kinds[i].separatorCount; ++j)
+		kind = getKind (kcb, i);
+		for (j = 0; j < kind->separatorCount; ++j)
 		{
 			char name[5] = {[0] = '/', [3] = '/', [4] = '\0'};
 			const kindDefinition *upperKind;
 			const scopeSeparator *sep;
 
-			sep = kinds[i].separators + j;
+			sep = kind->separators + j;
 
 			if (sep->parentLetter == KIND_WILDCARD)
 			{
 				name[1] = KIND_WILDCARD;
-				name[2] = kinds[i].letter;
+				name[2] = kind->letter;
 			}
 			else if (sep->parentLetter == KIND_NULL)
 			{
 				/* This is root separator: no upper item is here. */
-				name[1] = kinds[i].letter;
+				name[1] = kind->letter;
 				name[2] = name[3];
 				name[3] = '\0';
 			}
@@ -2788,7 +2792,7 @@ extern bool makeKindSeparatorsPseudoTags (const langType language,
 					continue;
 
 				name[1] = upperKind->letter;
-				name[2] = kinds[i].letter;
+				name[2] = kind->letter;
 			}
 
 
