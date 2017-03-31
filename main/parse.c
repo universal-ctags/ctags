@@ -1697,15 +1697,8 @@ static kindDefinition *langKindDefinition (const langType language, const int fl
 
 static kindDefinition *langKindLongOption (const langType language, const char *kindLong)
 {
-	unsigned int i;
-	kindDefinition* result = NULL;
-	const parserDefinition* lang;
 	Assert (0 <= language  &&  language < (int) LanguageCount);
-	lang = LanguageTable [language].def;
-	for (i=0  ;  i < lang->kindCount  &&  result == NULL  ;  ++i)
-		if (strcmp (lang->kindTable [i].name, kindLong) == 0)
-			result = &lang->kindTable [i];
-	return result;
+	return getKindForName (LanguageTable [language].kindControlBlock, kindLong);
 }
 
 extern bool isLanguageKindEnabled (const langType language, char kind)
