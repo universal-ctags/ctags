@@ -53,8 +53,8 @@ typedef struct sScopeSeparator {
 struct sKindDefinition {
 	bool enabled;          /* are tags for kind enabled? */
 	char  letter;               /* kind letter */
-	const char* name;		  /* kind name */
-	const char* description;	  /* displayed in --help output */
+	char* name;		  /* kind name */
+	char* description;	  /* displayed in --help output */
 	bool referenceOnly;
 	int nRoles;		/* The number of role elements. */
 	roleDesc *roles;

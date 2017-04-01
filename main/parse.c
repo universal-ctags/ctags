@@ -1848,6 +1848,106 @@ static void processLangKindDefinition (
 	}
 }
 
+static void freeKdef (kindDefinition *kdef)
+{
+	eFree (kdef->name);
+	eFree (kdef->description);
+	eFree (kdef);
+}
+
+static bool processLangDefineKind(const langType language,
+								  const char *const option,
+								  const char *const parameterx)
+{
+	parserObject *parser;
+
+	kindDefinition *kdef;
+	int letter;
+	const char * p = parameterx;
+	char *name;
+	char *description;
+	const char *tmp_start;
+	const char *tmp_end;
+
+
+	Assert (0 <= language  &&  language < (int) LanguageCount);
+	parser = LanguageTable + language;
+
+	Assert (p);
+
+	if (p[0] == '\0')
+		error (FATAL, "no kind definition specified in \"--%s\" option", option);
+
+	letter = p[0];
+	if (letter == ',')
+		error (FATAL, "no kind letter specified in \"--%s\" option", option);
+	if (!isalnum (letter))
+		error (FATAL, "the kind letter give in \"--%s\" option is not an alphabet or a number", option);
+	else if (letter == KIND_FILE_DEFAULT)
+		error (FATAL, "the kind letter `F' in \"--%s\" option is reserved for \"file\" kind", option);
+	else if (getKindForLetter (parser->kindControlBlock, letter))
+	{
+		error (WARNING, "the kind for letter `%c' specified in \"--%s\" option is already defined.",
+			   letter, option);
+		return true;
+	}
+
+	if (p[1] != ',')
+		error (FATAL, "wrong kind definition in \"--%s\" option: no comma after letter", option);
+
+	p += 2;
+	if (p[0] == '\0')
+		error (FATAL, "no kind name specified in \"--%s\" option", option);
+	tmp_end = strchr (p, ',');
+	if (!tmp_end)
+		error (FATAL, "no kind description specified in \"--%s\" option", option);
+
+	tmp_start = p;
+	while (p != tmp_end)
+	{
+		if (!isgraph (*p))
+			error (FATAL, "unacceptable char as part of kind name in \"--%s\" option", option);
+		p++;
+	}
+
+	if (tmp_end == tmp_start)
+		error (FATAL, "the kind name in \"--%s\" option is empty", option);
+
+	name = eStrndup (tmp_start, tmp_end - tmp_start);
+	if (getKindForName (parser->kindControlBlock, name))
+	{
+		error (WARNING, "the kind for name `%s' specified in \"--%s\" option is already defined.",
+			   name, option);
+		eFree (name);
+		return true;
+	}
+
+	p++;
+	if (p [0] == '\0')
+		error (FATAL, "found an empty kind description in \"--%s\" option", option);
+	description = eStrdup (p);
+
+	kdef = xCalloc (1, kindDefinition);
+	kdef->enabled = true;
+	kdef->letter = letter;
+	kdef->name = name;
+	kdef->description = description;
+
+	defineKind (parser->kindControlBlock, kdef, freeKdef);
+	return true;
+}
+
+extern bool processDefineKind (const char *const option, const char * const parameter)
+{
+	langType language;
+
+	language = getLanguageComponentInOption (option, "kinddef-");
+	if (language == LANG_IGNORE)
+		return false;
+
+	return processLangDefineKind (language, option, parameter);
+}
+
 struct langKindDefinitionStruct {
 	const char *const option;
 	const char *const parameter;
