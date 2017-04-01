@@ -75,6 +75,7 @@ typedef struct sParserObject {
 
 	struct slaveControlBlock *slaveControlBlock;
 	struct kindControlBlock  *kindControlBlock;
+	struct lregexControlBlock *lregexControlBlock;
 } parserObject;
 
 /*
@@ -1530,6 +1531,7 @@ static void initializeParsingCommon (parserDefinition *def, bool is_builtin)
 
 	parser->kindControlBlock  = allocKindControlBlock (def);
 	parser->slaveControlBlock = allocSlaveControlBlock ();
+	parser->lregexControlBlock = allocLregexControlBlock (def);
 }
 
 extern void initializeParsing (void)
@@ -1581,6 +1583,7 @@ extern void freeParserResources (void)
 		if (parser->def->finalize)
 			(parser->def->finalize)((langType)i, (bool)parser->initialized);
 
+		freeLregexControlBlock (parser->lregexControlBlock);
 		freeKindControlBlock (parser->kindControlBlock);
 		parser->kindControlBlock = NULL;
 

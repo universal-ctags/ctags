@@ -18,6 +18,7 @@
 #include "dependency.h"
 #include "field.h"
 #include "kind.h"
+#include "lregex.h"
 #include "lxpath.h"
 #include "param.h"
 #include "parsers.h"  /* contains list of parsers */
@@ -62,14 +63,6 @@ typedef enum {
 	METHOD_XCMD_AVAILABLE = 1 << 3,
 	METHOD_XPATH          = 1 << 4,
 } parsingMethod;
-
-typedef struct {
-	const char *const regex;
-	const char* const name;
-	const char* const kinds;
-	const char *const flags;
-	bool    *disabled;
-} tagRegexTable;
 
 typedef struct {
 	const char *name;
@@ -123,20 +116,11 @@ struct sParserDefinition {
 
 typedef parserDefinition* (parserDefinitionFunc) (void);
 
-typedef struct {
-	size_t start;   /* character index in line where match starts */
-	size_t length;  /* length of match */
-} regexMatch;
-
-typedef void (*regexCallback) (const char *line, const regexMatch *matches, unsigned int count,
-			       void *userData);
-
 typedef enum {
 	LMAP_PATTERN   = 1 << 0,
 	LMAP_EXTENSION = 1 << 1,
 	LMAP_ALL       = LMAP_PATTERN | LMAP_EXTENSION,
 } langmapType;
-
 
 /*
 *   FUNCTION PROTOTYPES

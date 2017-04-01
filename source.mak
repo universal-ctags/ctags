@@ -26,6 +26,7 @@ MAIN_HEADS =			\
 	main/interactive.h	\
 	main/keyword.h		\
 	main/kind.h		\
+	main/lregex.h		\
 	main/lxpath.h		\
 	main/main.h		\
 	main/mbcs.h		\

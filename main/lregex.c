@@ -95,6 +95,11 @@ typedef struct {
 	unsigned int multilinePatternsCount;
 } patternSet;
 
+
+struct lregexControlBlock {
+	langType owner;
+};
+
 /*
 *   DATA DEFINITIONS
 */
@@ -106,7 +111,6 @@ static int SetUpper = -1;  /* upper language index in list */
 /*
 *   FUNCTION DEFINITIONS
 */
-
 
 static void clearPatternSet (const langType language)
 {
@@ -136,6 +140,18 @@ static void clearPatternSet (const langType language)
 		hashTableDelete (set->kinds);
 		set->kinds = NULL;
 	}
+}
+
+extern struct lregexControlBlock* allocLregexControlBlock (parserDefinition *parser)
+{
+	struct lregexControlBlock *lcb = xCalloc (1, struct lregexControlBlock);
+	lcb->owner = parser->id;
+	return lcb;
+}
+
+extern void freeLregexControlBlock (struct lregexControlBlock* lcb)
+{
+	eFree (lcb);
 }
 
 /*
