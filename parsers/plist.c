@@ -26,7 +26,7 @@ typedef enum {
 	K_KEY,
 } plistKind;
 
-static kindOption PlistKinds [] = {
+static kindDefinition PlistKinds [] = {
 	{ true,  'k', "key",	  "keys" },
 };
 
@@ -162,7 +162,7 @@ PlistXMLParser (void)
 	static const char *const extensions [] = { "plist", NULL };
 	parserDefinition* const def = parserNew ("PlistXML");
 
-	def->kinds         = PlistKinds;
+	def->kindTable         = PlistKinds;
 	def->kindCount     = ARRAY_SIZE (PlistKinds);
 	def->extensions    = extensions;
 	def->parser        = findPlistTags;

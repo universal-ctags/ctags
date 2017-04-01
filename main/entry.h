@@ -57,7 +57,7 @@ struct sTagEntryInfo {
 	const char* language;         /* language of input file */
 	const char *inputFileName;   /* name of input file */
 	const char *name;             /* name of the tag */
-	const kindOption *kind;	      /* kind descriptor */
+	const kindDefinition *kind;	      /* kind descriptor */
 	unsigned char extra[ ((XTAG_COUNT) / 8) + 1 ];
 
 	struct {
@@ -66,7 +66,7 @@ struct sTagEntryInfo {
 		const char* implementation;
 		const char* inheritance;
 
-		const kindOption* scopeKind;
+		const kindDefinition* scopeKind;
 		const char* scopeName;
 		int         scopeIndex;   /* cork queue entry for upper scope tag.
 					     This field is meaningful if the value
@@ -116,15 +116,15 @@ extern void  setupWriter (void);
 extern bool  teardownWriter (const char *inputFilename);
 extern int makeTagEntry (const tagEntryInfo *const tag);
 extern void initTagEntry (tagEntryInfo *const e, const char *const name,
-			  const kindOption *kind);
+			  const kindDefinition *kind);
 extern void initRefTagEntry (tagEntryInfo *const e, const char *const name,
-			     const kindOption *kind, int roleIndex);
+			     const kindDefinition *kind, int roleIndex);
 extern void initTagEntryFull (tagEntryInfo *const e, const char *const name,
 			      unsigned long lineNumber,
 			      const char* language,
 			      MIOPos      filePosition,
 			      const char *inputFileName,
-			      const kindOption *kind,
+			      const kindDefinition *kind,
 			      int roleIndex,
 			      const char *sourceFileName,
 			      const char* sourceLanguage,

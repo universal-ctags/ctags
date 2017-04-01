@@ -200,7 +200,7 @@ extern bool doesInputLanguageAllowNullTag (void)
 	return doesLanguageAllowNullTag (getInputLanguage ());
 }
 
-extern kindOption *getInputLanguageFileKind (void)
+extern kindDefinition *getInputLanguageFileKind (void)
 {
 	return getLanguageFileKind (getInputLanguage ());
 }
@@ -552,8 +552,11 @@ static bool parseLineDirective (char *s)
 /*
  *   Input file I/O operations
  */
-
+#ifdef DEBUG
+#define MAX_IN_MEMORY_FILE_SIZE 0
+#else
 #define MAX_IN_MEMORY_FILE_SIZE (1024*1024)
+#endif
 
 extern MIO *getMio (const char *const fileName, const char *const openMode,
 		    bool memStreamRequired)
@@ -652,9 +655,11 @@ extern bool openInputFile (const char *const fileName, const langType language,
 		allocLineFposMap (&File.lineFposMap);
 
 		File.thinDepth = 0;
-		verbose ("OPENING %s as %s language %sfile\n", fileName,
+		verbose ("OPENING %s as %s language %sfile [%s%s]\n", fileName,
 				getLanguageName (language),
-				File.input.isHeader ? "include " : "");
+				 File.input.isHeader ? "include " : "",
+				 mio? "reused": "new",
+				 memStreamRequired? ",required": "");
 	}
 	return opened;
 }

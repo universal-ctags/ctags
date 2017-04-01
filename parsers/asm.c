@@ -73,7 +73,7 @@ static roleDesc asmSectionRoles [] = {
 	{ true, "placement", "placement where the assembled code goes" },
 };
 
-static kindOption AsmKinds [] = {
+static kindDefinition AsmKinds [] = {
 	{ true, 'd', "define", "defines" },
 	{ true, 'l', "label",  "labels"  },
 	{ true, 'm', "macro",  "macros"  },
@@ -393,7 +393,7 @@ extern parserDefinition* AsmParser (void)
 					      NULL };
 
 	parserDefinition* def = parserNew ("Asm");
-	def->kinds      = AsmKinds;
+	def->kindTable      = AsmKinds;
 	def->kindCount  = ARRAY_SIZE (AsmKinds);
 	def->extensions = extensions;
 	def->patterns   = patterns;

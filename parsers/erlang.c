@@ -28,7 +28,7 @@ typedef enum {
 	K_MACRO, K_FUNCTION, K_MODULE, K_RECORD, K_TYPE
 } erlangKind;
 
-static kindOption ErlangKinds[] = {
+static kindDefinition ErlangKinds[] = {
 	{true, 'd', "macro",    "macro definitions"},
 	{true, 'f', "function", "functions"},
 	{true, 'm', "module",   "modules"},
@@ -181,7 +181,7 @@ extern parserDefinition *ErlangParser (void)
 {
 	static const char *const extensions[] = { "erl", "ERL", "hrl", "HRL", NULL };
 	parserDefinition *def = parserNew ("Erlang");
-	def->kinds = ErlangKinds;
+	def->kindTable = ErlangKinds;
 	def->kindCount = ARRAY_SIZE (ErlangKinds);
 	def->extensions = extensions;
 	def->parser = findErlangTags;

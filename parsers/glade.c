@@ -37,7 +37,7 @@ typedef enum {
 	K_ID, K_CLASS, K_HANDLER,
 } gladeKind;
 
-static kindOption GladeKinds [] = {
+static kindDefinition GladeKinds [] = {
 	{ true,  'i', "id",	  "identifiers" },
 
 	/* These two are appeared on names in C source code. */
@@ -82,7 +82,7 @@ GladeParser (void)
 	static const char *const extensions [] = { "glade", NULL };
 	parserDefinition* const def = parserNew ("Glade");
 
-	def->kinds         = GladeKinds;
+	def->kindTable         = GladeKinds;
 	def->kindCount     = ARRAY_SIZE (GladeKinds);
 	def->extensions    = extensions;
 	def->parser        = findGladeTags;

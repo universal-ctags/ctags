@@ -61,4 +61,6 @@ extern void chooseExclusiveSubparser (subparser *s, void *data);
 #define RUN_DEFAULT_SUBPARSERS -1
 extern void scheduleRunningBaseparser (int dependencyIndex);
 
+extern void attachSubparser (langType base, subparser *sub);
+
 #endif	/* CTAGS_MAIN_SUBPARSER_H */

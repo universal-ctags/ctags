@@ -47,7 +47,7 @@ typedef enum {
 	K_NONE
 } RustKind;
 
-static kindOption rustKinds[] = {
+static kindDefinition rustKinds[] = {
 	{true, 'n', "module", "module"},
 	{true, 's', "struct", "structural type"},
 	{true, 'i', "interface", "trait interface"},
@@ -972,8 +972,9 @@ static void findRustTags (void)
 extern parserDefinition *RustParser (void)
 {
 	static const char *const extensions[] = { "rs", NULL };
-	parserDefinition *def = parserNewFull ("Rust", KIND_FILE_ALT);
-	def->kinds = rustKinds;
+	parserDefinition *def = parserNew ("Rust");
+	def->fileKindLetter = KIND_FILE_ALT;
+	def->kindTable = rustKinds;
 	def->kindCount = ARRAY_SIZE (rustKinds);
 	def->extensions = extensions;
 	def->parser = findRustTags;

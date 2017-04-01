@@ -33,7 +33,7 @@ typedef enum eCssKinds {
 	K_CLASS, K_SELECTOR, K_ID
 } cssKind;
 
-static kindOption CssKinds [] = {
+static kindDefinition CssKinds [] = {
 	{ true, 'c', "class",		"classes" },
 	{ true, 's', "selector",	"selectors" },
 	{ true, 'i', "id",			"identities" }
@@ -256,7 +256,7 @@ extern parserDefinition* CssParser (void)
 {
 	static const char *const extensions [] = { "css", NULL };
 	parserDefinition* def = parserNew ("CSS");
-	def->kinds      = CssKinds;
+	def->kindTable      = CssKinds;
 	def->kindCount  = ARRAY_SIZE (CssKinds);
 	def->extensions = extensions;
 	def->parser     = findCssTags;

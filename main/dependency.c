@@ -20,9 +20,9 @@
 
 #include <string.h>
 
-static void linkKinds (kindOption *masterKind, kindOption *slaveKind)
+static void linkKinds (kindDefinition *masterKind, kindDefinition *slaveKind)
 {
-	kindOption *tail;
+	kindDefinition *tail;
 
 	slaveKind->master = masterKind;
 
@@ -41,16 +41,16 @@ static void linkKindDependency (parserDefinition *const masterParser,
 				parserDefinition *const slaveParser)
 {
 	unsigned int k_slave, k_master;
-	kindOption *kind_slave, *kind_master;
+	kindDefinition *kind_slave, *kind_master;
 
 	for (k_slave = 0; k_slave < slaveParser->kindCount; k_slave++)
 	{
-		if (slaveParser->kinds [k_slave].syncWith == LANG_AUTO)
+		if (slaveParser->kindTable [k_slave].syncWith == LANG_AUTO)
 		{
-			kind_slave = slaveParser->kinds + k_slave;
+			kind_slave = slaveParser->kindTable + k_slave;
 			for (k_master = 0; k_master < masterParser->kindCount; k_master++)
 			{
-				kind_master = masterParser->kinds + k_master;
+				kind_master = masterParser->kindTable + k_master;
 				if ((kind_slave->letter == kind_master->letter)
 				    && (strcmp (kind_slave->name, kind_master->name) == 0))
 				{
@@ -78,18 +78,17 @@ extern void linkDependencyAtInitializeParsing (depType dtype,
 		s->type = dtype;
 		s->id = slave->id;
 		s->data = data;
-		s->next = master->slaveParsers;
-		master->slaveParsers = s;
+		attachSlaveParser (master->id, s);
 	}
 }
 
 extern void initializeDependencies (parserDefinition *parser)
 {
 	unsigned int i;
-	slaveParser *sp;
+	slaveParser *sp = NULL;
 
 	/* Initialize slaves */
-	for (sp = parser->slaveParsers; sp; sp = sp->next)
+	while ((sp = getNextSlaveParser (parser->id, sp)))
 	{
 		if (sp->type == DEPTYPE_SUBPARSER)
 		{
@@ -107,8 +106,7 @@ extern void initializeDependencies (parserDefinition *parser)
 			if (sp->type == DEPTYPE_SUBPARSER)
 			{
 				subparser *subparser = sp->data;
-				subparser->next = parser->subparsersDefault;
-				parser->subparsersDefault = subparser;
+				attachSubparser (parser->id, subparser);
 			}
 		}
 	}
@@ -131,16 +129,9 @@ extern void initializeDependencies (parserDefinition *parser)
 extern void finalizeDependencies (parserDefinition *parser)
 {
 	slaveParser *sp;
-	slaveParser *tmp;
 
-	for (sp = parser->slaveParsers; sp;)
-	{
-		tmp = sp;
-		sp = sp->next;
-		tmp->next = NULL;
-		eFree (tmp);
-	}
-	parser->slaveParsers = NULL;
+	while ((sp = detachSlaveParser (parser->id)))
+		eFree (sp);
 }
 
 extern void notifyInputStart (void)

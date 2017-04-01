@@ -154,7 +154,7 @@ typedef enum {
 	EKIND_CLASS, EKIND_FEATURE, EKIND_LOCAL, EKIND_QUALIFIED_TAGS
 } eiffelKind;
 
-static kindOption EiffelKinds [] = {
+static kindDefinition EiffelKinds [] = {
 	{ true,  'c', "class",   "classes"},
 	{ true,  'f', "feature", "features"},
 	{ false, 'l', "local",   "local entities"}
@@ -1110,7 +1110,7 @@ extern parserDefinition* EiffelParser (void)
 {
 	static const char *const extensions [] = { "e", NULL };
 	parserDefinition* def = parserNew ("Eiffel");
-	def->kinds      = EiffelKinds;
+	def->kindTable      = EiffelKinds;
 	def->kindCount  = ARRAY_SIZE (EiffelKinds);
 	def->extensions = extensions;
 	def->parser     = findEiffelTags;

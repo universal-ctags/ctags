@@ -27,7 +27,7 @@ typedef enum eXtagType { /* extra tag content control */
 	XTAG_COUNT
 } xtagType;
 
-typedef struct sXtagSpec {
+typedef struct sXtagDefinition {
 	bool enabled;
 	/* letter, and ftype are initialized in the main part,
 	   not in a parser. */
@@ -44,12 +44,12 @@ typedef struct sXtagSpec {
 	   to standared output, the tag is disabled by default.
 	   If it is connected to a regular file, the tag is enabled
 	   by default. */
-	bool (* isEnabled) (struct sXtagSpec *spec);
+	bool (* isEnabled) (struct sXtagDefinition *def);
 
 	unsigned int xtype;	/* Given from the main part */
-} xtagSpec;
+} xtagDefinition;
 
-extern xtagSpec* getXtagSpec (xtagType type);
+extern xtagDefinition* getXtagDefinition (xtagType type);
 extern xtagType  getXtagTypeForLetter (char letter);
 extern xtagType  getXtagTypeForNameAndLanguage (const char *name, langType language);
 extern bool isXtagEnabled (xtagType type);
@@ -60,10 +60,10 @@ extern int  getXtagOwner (xtagType type);
 const char* getXtagName (xtagType type);
 extern void printXtags (langType language);
 
-extern void initXtagDescs (void);
+extern void initXtagObjects (void);
 extern int countXtags (void);
 
-extern int defineXtag (xtagSpec *spec, langType language);
+extern int defineXtag (xtagDefinition *def, langType language);
 extern xtagType nextSiblingXtag (xtagType type);
 
 #endif	/* CTAGS_MAIN_FIELD_H */

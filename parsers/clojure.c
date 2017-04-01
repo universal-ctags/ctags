@@ -22,7 +22,7 @@ typedef enum {
 	K_NAMESPACE
 } clojureKind;
 
-static kindOption ClojureKinds[] = {
+static kindDefinition ClojureKinds[] = {
 	{true, 'f', "function", "functions"},
 	{true, 'n', "namespace", "namespaces"}
 };
@@ -139,7 +139,7 @@ extern parserDefinition *ClojureParser (void)
 	};
 
 	parserDefinition *def = parserNew ("Clojure");
-	def->kinds = ClojureKinds;
+	def->kindTable = ClojureKinds;
 	def->kindCount = ARRAY_SIZE (ClojureKinds);
 	def->extensions = extensions;
 	def->aliases = aliases;

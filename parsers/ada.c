@@ -155,9 +155,9 @@ typedef enum eAdaKinds
   ADA_KIND_COUNT            /* must be last */
 } adaKind;
 
-static kindOption AdaSeparateKind = { true, 'S', "separate", "something separately declared/defined" };
+static kindDefinition AdaSeparateKind = { true, 'S', "separate", "something separately declared/defined" };
 
-static kindOption AdaKinds[] =
+static kindDefinition AdaKinds[] =
 {
   { true,   'P', "packspec",    "package specifications" },
   { true,   'p', "package",     "packages" },
@@ -416,9 +416,9 @@ static adaTokenInfo *newAdaToken(const char *name, int len, adaKind kind,
   token->name = tmpName;
   token->parent = parent;
 
-  /* Now set the file scope for this tag.  A tag has file scope if its direct 
-   * parent is a package/subprogram/protected/task spec, or if it it's parent 
-   * is UNDEFINED (a 'root' token), and if this is not in a 'private' section 
+  /* Now set the file scope for this tag.  A tag has file scope if its direct
+   * parent is a package/subprogram/protected/task spec, or if it it's parent
+   * is UNDEFINED (a 'root' token), and if this is not in a 'private' section
    * of that spec. */
   if((parent != NULL) && (parent->isPrivate == false) &&
      ((parent->kind == ADA_KIND_UNDEFINED) ||
@@ -436,7 +436,7 @@ static adaTokenInfo *newAdaToken(const char *name, int len, adaKind kind,
     token->tag.isFileScope = true;
   }
 
-  /* add the kind info - unless this is a SEPARATE kind, in which case keep 
+  /* add the kind info - unless this is a SEPARATE kind, in which case keep
    * them blank because they get filled in later. */
   if(kind > ADA_KIND_UNDEFINED)
   {
@@ -1715,8 +1715,8 @@ static adaTokenInfo *adaParse(adaParseMode mode, adaTokenInfo *parent)
         }
         else if(adaKeywordCmp(ADA_KEYWORD_PRIVATE))
         {
-          /* if this is a private declaration then we need to set the global 
-           * file spec flag and then skip whitespace to get to the next bit of 
+          /* if this is a private declaration then we need to set the global
+           * file spec flag and then skip whitespace to get to the next bit of
            * code to parse. */
           if(parent != NULL)
           {
@@ -2093,7 +2093,7 @@ static void storeAdaTags(adaTokenInfo *token, const char *parentScope)
   }
 
   /* Now 'make' tags that have their options set, But only make anonymous
-   * tags if they have children tags.  Also, don't make this tag if the file 
+   * tags if they have children tags.  Also, don't make this tag if the file
    * scope flag is not set and this tag is a file scope tag. */
   if((token->kind > ADA_KIND_UNDEFINED) && (token->kind < ADA_KIND_COUNT) &&
      (AdaKinds[token->kind].enabled == true) &&
@@ -2106,9 +2106,9 @@ static void storeAdaTags(adaTokenInfo *token, const char *parentScope)
   {
     makeTagEntry(&token->tag);
 
-    /* before making the tag, if the --extra=+q flag is set we should create 
-     * an extra entry which is the full parent.tag name.  But only do this if 
-     * the parentScope flag is not NULL, and this token is not of a limited 
+    /* before making the tag, if the --extra=+q flag is set we should create
+     * an extra entry which is the full parent.tag name.  But only do this if
+     * the parentScope flag is not NULL, and this token is not of a limited
      * scope type such as a record component, enum literal, label, etc. */
     if((isXtagEnabled(XTAG_QUALIFIED_TAGS) == true) &&
        (token->kind != ADA_KIND_RECORD_COMPONENT) &&
@@ -2121,7 +2121,7 @@ static void storeAdaTags(adaTokenInfo *token, const char *parentScope)
     {
       if(parentScope != NULL)
       {
-        /* first create our new scope which is the parent scope + '.' + the 
+        /* first create our new scope which is the parent scope + '.' + the
          * current tag name. */
         currentScope = xMalloc(strlen(parentScope) + strlen(token->name) + 2,
                                char);
@@ -2137,9 +2137,9 @@ static void storeAdaTags(adaTokenInfo *token, const char *parentScope)
       } /* if(parentScope != NULL) */
       else
       {
-        /* if the parent scope is null then the current token does not have 
-         * a parent tag to prepend onto the current scope.  Therefore, just 
-         * setup the current scope as a copy of the current tag name, but make 
+        /* if the parent scope is null then the current token does not have
+         * a parent tag to prepend onto the current scope.  Therefore, just
+         * setup the current scope as a copy of the current tag name, but make
          * no extra entry. */
         currentScope = token->name;
       }
@@ -2184,7 +2184,7 @@ static void findAdaTags(void)
   matchLineNum = 0;
   eofCount = 0;
 
-  /* cannot just set matchFilePos to 0 because the fpos_t is not a simple 
+  /* cannot just set matchFilePos to 0 because the fpos_t is not a simple
    * integer on all systems. */
   matchFilePos = getInputFilePosition();
 
@@ -2223,7 +2223,7 @@ extern parserDefinition* AdaParser(void)
 {
   static const char *const extensions[] = { "adb", "ads", "Ada", NULL };
   parserDefinition* def = parserNew("Ada");
-  def->kinds = AdaKinds;
+  def->kindTable = AdaKinds;
   def->kindCount = ADA_KIND_COUNT;
   def->extensions = extensions;
   def->parser = findAdaTags;

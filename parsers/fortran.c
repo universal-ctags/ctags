@@ -219,7 +219,7 @@ static bool FreeSourceFormFound = false;
 static bool ParsingString;
 
 /* indexed by tagType */
-static kindOption FortranKinds [] = {
+static kindDefinition FortranKinds [] = {
 	{ true,  'b', "blockData",  "block data"},
 	{ true,  'c', "common",     "common blocks"},
 	{ true,  'e', "entry",      "entry points"},
@@ -2564,7 +2564,7 @@ extern parserDefinition* FortranParser (void)
 		NULL
 	};
 	parserDefinition* def = parserNew ("Fortran");
-	def->kinds      = FortranKinds;
+	def->kindTable      = FortranKinds;
 	def->kindCount  = ARRAY_SIZE (FortranKinds);
 	def->extensions = extensions;
 	def->parser2    = findFortranTags;

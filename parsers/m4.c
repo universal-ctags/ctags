@@ -47,7 +47,7 @@ static roleDesc M4MacrofileRoles [] = {
 	{ true, "sincluded", "silently included macro" },
 };
 
-static kindOption M4Kinds[] = {
+static kindDefinition M4Kinds[] = {
 	{ true, 'd', "macro", "macros",
 	  .referenceOnly = false, ATTACH_ROLES(M4MacroRoles) },
 	{ true, 'I', "macrofile", "macro files",
@@ -345,7 +345,7 @@ static int notifyNewMacro (m4Subparser *m4, const char *token)
 
 /* tag creation */
 
-static int makeM4RefTag(const kindOption *kind, const vString *const name, int role)
+static int makeM4RefTag(const kindDefinition *kind, const vString *const name, int role)
 {
 	tagEntryInfo e;
 
@@ -527,7 +527,7 @@ extern parserDefinition* M4Parser (void)
 						   NULL };
 	parserDefinition* const def = parserNew("M4");
 
-	def->kinds = M4Kinds;
+	def->kindTable = M4Kinds;
 	def->kindCount = ARRAY_SIZE(M4Kinds);
 	def->extensions = extensions;
 	def->parser = findM4Tags;

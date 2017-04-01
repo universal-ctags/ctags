@@ -22,7 +22,7 @@ typedef enum {
 	K_PLAY
 } ansiblePlaybookKind;
 
-static kindOption AnsiblePlaybookKinds [] = {
+static kindDefinition AnsiblePlaybookKinds [] = {
 	{ true,  'p', "play", "plays" },
 };
 
@@ -221,10 +221,9 @@ extern parserDefinition* AnsiblePlaybookParser (void)
 	def->dependencies = dependencies;
 	def->dependencyCount = ARRAY_SIZE (dependencies);
 
-	def->kinds         = AnsiblePlaybookKinds;
+	def->kindTable         = AnsiblePlaybookKinds;
 	def->kindCount     = ARRAY_SIZE (AnsiblePlaybookKinds);
 	def->parser        = findAnsiblePlaybookTags;
-	def->method        = METHOD_YAML;
 	def->useCork       = true;
 	return def;
 }

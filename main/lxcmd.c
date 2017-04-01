@@ -117,7 +117,7 @@ typedef struct {
 	} address;
 
 
-	const kindOption* kind;
+	const kindDefinition* kind;
 
 		/* is tag of file-limited scope? */
 	short fileScope;
@@ -135,7 +135,7 @@ typedef struct {
 
 typedef struct {
 	vString *path;
-	kindOption *kinds;
+	kindDefinition *kinds;
 	unsigned int n_kinds;
 	bool available;
 	unsigned int id;	/* not used yet */
@@ -167,7 +167,7 @@ static void clearPathSet (const langType language)
 			p->available = false;
 			for (k = 0; k < p->n_kinds; k++)
 			{
-				kindOption* kind = &(p->kinds[k]);
+				kindDefinition* kind = &(p->kinds[k]);
 
 				eFree ((void *)kind->name);
 				kind->name = NULL;
@@ -192,7 +192,7 @@ static bool loadPathKind (xcmdPath *const path, char* line, char *args[])
 	const char* backup = line;
 	char* off;
 	vString *desc;
-	kindOption *kind;
+	kindDefinition *kind;
 
 	if (line[0] == '\0')
 		return false;
@@ -202,7 +202,7 @@ static bool loadPathKind (xcmdPath *const path, char* line, char *args[])
 		return false;
 	}
 
-	path->kinds = xRealloc (path->kinds, path->n_kinds + 1, kindOption);
+	path->kinds = xRealloc (path->kinds, path->n_kinds + 1, kindDefinition);
 	kind = &path->kinds [path->n_kinds];
 	memset (kind, 0, sizeof (*kind));
 	kind->enabled = true;
@@ -407,7 +407,7 @@ static bool loadPathKinds  (xcmdPath *const path, const langType language)
 
 
 extern void foreachXcmdKinds (const langType language,
-			      bool (*func) (kindOption *, void *),
+			      bool (*func) (kindDefinition *, void *),
 			      void *data)
 {
 #ifdef HAVE_COPROC
@@ -430,7 +430,7 @@ extern void foreachXcmdKinds (const langType language,
 #endif
 }
 
-static bool kind_reset_cb (kindOption *kind, void *data)
+static bool kind_reset_cb (kindDefinition *kind, void *data)
 {
 	kind->enabled = *(bool *)data;
 	return false;		/* continue */
@@ -449,7 +449,7 @@ struct kind_and_mode_and_result
 	bool result;
 };
 
-static bool enable_kind_cb (kindOption *kind, void *data)
+static bool enable_kind_cb (kindDefinition *kind, void *data)
 {
 	struct kind_and_mode_and_result *kmr = data;
 	if ((kmr->kind != KIND_NULL
@@ -502,7 +502,7 @@ struct kind_and_result
 	bool result;
 };
 
-static bool is_kind_enabled_cb (kindOption *kind, void *data)
+static bool is_kind_enabled_cb (kindDefinition *kind, void *data)
 {
 	bool r = false;
 	struct kind_and_result *kr = data;
@@ -516,7 +516,7 @@ static bool is_kind_enabled_cb (kindOption *kind, void *data)
 	return r;
 }
 
-static bool does_kind_exist_cb (kindOption *kind, void *data)
+static bool does_kind_exist_cb (kindDefinition *kind, void *data)
 {
 	bool r = false;
 	struct kind_and_result *kr = data;
@@ -562,7 +562,7 @@ struct printXcmdKindCBData {
 };
 
 #ifdef HAVE_COPROC
-static bool printXcmdKind (kindOption *kind, void *user_data)
+static bool printXcmdKind (kindDefinition *kind, void *user_data)
 {
 	struct printXcmdKindCBData *data = user_data;
 
@@ -734,10 +734,10 @@ extern bool processXcmdOption (const char *const option, const char *const param
 }
 
 #ifdef HAVE_COPROC
-static const kindOption* lookupKindFromLetter (const xcmdPath* const path, char kind_letter)
+static const kindDefinition* lookupKindFromLetter (const xcmdPath* const path, char kind_letter)
 {
 	unsigned int k;
-	kindOption *kind;
+	kindDefinition *kind;
 
 	for (k = 0; k < path->n_kinds; k++)
 	{
@@ -749,10 +749,10 @@ static const kindOption* lookupKindFromLetter (const xcmdPath* const path, char 
 
 }
 
-static const kindOption* lookupKindFromName (const xcmdPath* const path, const char* const kind_name)
+static const kindDefinition* lookupKindFromName (const xcmdPath* const path, const char* const kind_name)
 {
 	unsigned int k;
-	kindOption *kind;
+	kindDefinition *kind;
 
 	for (k = 0; k < path->n_kinds; k++)
 	{
@@ -801,7 +801,7 @@ static const char* entryGetAnyUnpulledField (tagEntry *const entry, const char *
 static bool isKindEnabled (xcmdPath* path, const char* value)
 {
 	unsigned int k;
-	kindOption *kind;
+	kindDefinition *kind;
 
 	Assert (path->kinds);
 	Assert (value);
@@ -859,7 +859,7 @@ static bool parseExtensionFields (tagEntry *const entry, char *const string, xcm
 						entry->kind = lookupKindFromLetter (path, field[0]);
 						if (entry->kind == NULL)
 						{
-							kindOption *fileKind = getInputLanguageFileKind ();
+							kindDefinition *fileKind = getInputLanguageFileKind ();
 							if (fileKind && fileKind->letter == field[0])
 								/* ctags will make a tag for file. */
 								goto reject;
@@ -891,7 +891,7 @@ static bool parseExtensionFields (tagEntry *const entry, char *const string, xcm
 							entry->kind = lookupKindFromName (path, value);
 							if (entry->kind == NULL)
 							{
-								kindOption *fileKind = getInputLanguageFileKind ();
+								kindDefinition *fileKind = getInputLanguageFileKind ();
 								if (fileKind && (strcmp(fileKind->name, value) == 0))
 									/* ctags will make a tag for file. */
 									goto reject;

@@ -34,7 +34,7 @@ typedef enum {
 	K_LOGGER_QUALNAME,
 } pythonLoggingConfigKind;
 
-static kindOption PythonLoggingConfigKinds [] = {
+static kindDefinition PythonLoggingConfigKinds [] = {
 	{ true, 'L', "loggerSection", "logger sections" },
 	{ true, 'q', "qualname",      "logger qualnames" },
 };
@@ -115,7 +115,7 @@ extern parserDefinition* PythonLoggingConfigParser (void)
 	def->dependencies = dependencies;
 	def->dependencyCount = ARRAY_SIZE (dependencies);
 
-	def->kinds      = PythonLoggingConfigKinds;
+	def->kindTable      = PythonLoggingConfigKinds;
 	def->kindCount  = ARRAY_SIZE (PythonLoggingConfigKinds);
 	def->parser     = findPythonLoggingConfigTags;
 	def->useCork    = true;

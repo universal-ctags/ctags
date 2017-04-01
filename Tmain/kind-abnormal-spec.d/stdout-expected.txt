@@ -2,26 +2,32 @@
 b  name with unwanted characters
 _  kind with no letter
 L  kind with no long name
+N  emit a normal tag
+B  beginning of an area for a guest
+E  end of an area for a guest
 
 # list kinds-full
 #LETTER NAME            ENABLED  REFONLY NROLES MASTER     DESCRIPTION                   
 b       broken tag      on       FALSE   1                 name with unwanted characters 
 _       no letter       on       FALSE   0                 kind with no letter           
 L                       on       FALSE   0                 kind with no long name        
+N       nothingSpecial  on       FALSE   0                 emit a normal tag             
+B                       on       FALSE   0                 beginning of an area for a guest
+E                       on       FALSE   0                 end of an area for a guest    
 
 # +K
-abnormal kindOption testing (no letter)	input.x	/^@$/;"	no letter
-abnormal kindOption testing (no long name)	input.x	/^L$/;"	L
+abnormal kindDefinition testing (no letter)	input.x	/^@$/;"	no letter
+abnormal kindDefinition testing (no long name)	input.x	/^L$/;"	L
 
 # +k
-abnormal kindOption testing (no letter)	input.x	/^@$/;"	no letter
-abnormal kindOption testing (no long name)	input.x	/^L$/;"	L
+abnormal kindDefinition testing (no letter)	input.x	/^@$/;"	no letter
+abnormal kindDefinition testing (no long name)	input.x	/^L$/;"	L
 
 # +zk
-abnormal kindOption testing (no letter)	input.x	/^@$/;"	kind:no letter
-abnormal kindOption testing (no long name)	input.x	/^L$/;"	kind:L
+abnormal kindDefinition testing (no letter)	input.x	/^@$/;"	kind:no letter
+abnormal kindDefinition testing (no long name)	input.x	/^L$/;"	kind:L
 
 # +Zk
-abnormal kindOption testing (no letter)	input.x	/^@$/;"	no letter
-abnormal kindOption testing (no long name)	input.x	/^L$/;"	L
+abnormal kindDefinition testing (no letter)	input.x	/^@$/;"	no letter
+abnormal kindDefinition testing (no long name)	input.x	/^L$/;"	L
 

@@ -40,7 +40,7 @@ typedef enum {
 /*
  *   DATA DEFINITIONS
  */
-static kindOption SmlKinds[] = {
+static kindDefinition SmlKinds[] = {
 	{ true, 'e', "exception", "exception declarations" },
 	{ true, 'f', "function",  "function definitions" },
 	{ true, 'c', "functor",   "functor definitions" },
@@ -208,7 +208,7 @@ extern parserDefinition *SmlParser (void)
 {
 	static const char *const extensions[] = { "sml", "sig", NULL };
 	parserDefinition *def = parserNew ("SML");
-	def->kinds = SmlKinds;
+	def->kindTable = SmlKinds;
 	def->kindCount = ARRAY_SIZE (SmlKinds);
 	def->extensions = extensions;
 	def->parser = findSmlTags;

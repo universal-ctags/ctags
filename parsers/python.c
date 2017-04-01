@@ -65,7 +65,7 @@ typedef enum {
 	COUNT_FIELD
 } pythonField;
 
-static fieldSpec PythonFields[COUNT_FIELD] = {
+static fieldDefinition PythonFields[COUNT_FIELD] = {
 	{ .name = "decorators",
 	  .description = "decorators on functions and classes",
 	  .enabled = false },
@@ -128,7 +128,7 @@ static roleDesc PythonUnknownRoles [] = {
 	  "classes/variables/functions/modules imported in alternative name" },
 };
 
-static kindOption PythonKinds[COUNT_KIND] = {
+static kindDefinition PythonKinds[COUNT_KIND] = {
 	{true, 'c', "class",    "classes"},
 	{true, 'f', "function", "functions"},
 	{true, 'm', "member",   "class members"},
@@ -1351,7 +1351,7 @@ extern parserDefinition* PythonParser (void)
 	static const char *const extensions[] = { "py", "pyx", "pxd", "pxi", "scons", NULL };
 	static const char *const aliases[] = { "python[23]*", "scons", NULL };
 	parserDefinition *def = parserNew ("Python");
-	def->kinds = PythonKinds;
+	def->kindTable = PythonKinds;
 	def->kindCount = ARRAY_SIZE (PythonKinds);
 	def->extensions = extensions;
 	def->aliases = aliases;
@@ -1360,8 +1360,8 @@ extern parserDefinition* PythonParser (void)
 	def->finalize = finalize;
 	def->keywordTable = PythonKeywordTable;
 	def->keywordCount = ARRAY_SIZE (PythonKeywordTable);
-	def->fieldSpecs = PythonFields;
-	def->fieldSpecCount = ARRAY_SIZE (PythonFields);
+	def->fieldDefinitions = PythonFields;
+	def->fieldDefinitionCount = ARRAY_SIZE (PythonFields);
 	def->useCork = true;
 	def->requestAutomaticFQTag = true;
 	return def;

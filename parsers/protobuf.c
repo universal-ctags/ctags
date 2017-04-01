@@ -72,7 +72,7 @@ typedef enum {
 	PK_RPC
 } protobufKind;
 
-static kindOption ProtobufKinds [] = {
+static kindDefinition ProtobufKinds [] = {
 	{ true,  'p', "package",    "packages" },
 	{ true,  'm', "message",    "messages" },
 	{ true,  'f', "field",      "fields" },
@@ -263,7 +263,7 @@ extern parserDefinition* ProtobufParser (void)
 	parserDefinition* def = parserNew ("Protobuf");
 
 	def->extensions = extensions;
-	def->kinds      = ProtobufKinds;
+	def->kindTable      = ProtobufKinds;
 	def->initialize = initialize;
 	def->kindCount  = ARRAY_SIZE (ProtobufKinds);
 	def->parser     = findProtobufTags;

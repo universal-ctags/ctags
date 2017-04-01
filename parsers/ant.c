@@ -60,7 +60,7 @@ static roleDesc AntAntfileRoles [] = {
         { true, "imported", "imported" },
 };
 
-static kindOption AntKinds [] = {
+static kindDefinition AntKinds [] = {
 	{ true,  'p', "project",  "projects"   },
 	{ true,  't', "target",   "targets"    },
 	{ true,  'P', "property", "properties(global)" },
@@ -248,7 +248,7 @@ extern parserDefinition* AntParser (void)
 	def->extensions = extensions;
 	def->patterns = patterns;
 #ifdef HAVE_LIBXML
-	def->kinds = AntKinds;
+	def->kindTable = AntKinds;
 	def->kindCount = ARRAY_SIZE (AntKinds);
 	def->parser = findAntTags;
 	def->tagXpathTableTable = antXpathTableTable;

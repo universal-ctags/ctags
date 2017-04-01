@@ -333,7 +333,7 @@ typedef enum {
 	CK_EXTERN_VARIABLE, CK_LABEL
 } cKind;
 
-static kindOption CKinds [] = {
+static kindDefinition CKinds [] = {
 	{ true,  'c', "class",      "classes"},
 	{ true,  'd', "macro",      "macro definitions",
 	  .referenceOnly = false, ATTACH_ROLES(CMacroRoles)},
@@ -361,7 +361,7 @@ typedef enum {
 	CSK_NAMESPACE, CSK_PROPERTY, CSK_STRUCT, CSK_TYPEDEF
 } csharpKind;
 
-static kindOption CsharpKinds [] = {
+static kindDefinition CsharpKinds [] = {
 	{ true,  'c', "class",      "classes"},
 	{ true,  'd', "macro",      "macro definitions"},
 	{ true,  'e', "enumerator", "enumerators (values inside an enumeration)"},
@@ -386,7 +386,7 @@ typedef enum
 	DK_VARIABLE, DK_VERSION
 } dKind;
 
-static kindOption DKinds [] = {
+static kindDefinition DKinds [] = {
 	{ true,  'a', "alias",      "aliases"},
 	{ true,  'c', "class",      "classes"},
 	{ true,  'g', "enum",       "enumeration names"},
@@ -422,7 +422,7 @@ typedef enum {
 	JK_LOCAL, JK_METHOD, JK_PACKAGE, JK_ACCESS, JK_CLASS_PREFIX
 } javaKind;
 
-static kindOption JavaKinds [] = {
+static kindDefinition JavaKinds [] = {
 	{ true,  'a', "annotation",    "annotation declarations" },
 	{ true,  'c', "class",         "classes"},
 	{ true,  'e', "enumConstant",  "enum constants"},
@@ -463,7 +463,7 @@ typedef enum {
 	VK_EXTERN_VARIABLE, VK_HEADER
 } veraKind;
 
-static kindOption VeraKinds [] = {
+static kindDefinition VeraKinds [] = {
 	{ true,  'c', "class",      "classes"},
 	{ true,  'd', "macro",      "macro definitions",
 	  .referenceOnly = false, ATTACH_ROLES(VeraMacroRoles)},
@@ -1127,9 +1127,9 @@ static veraKind veraTagKindFull (const tagType type, bool with_assert) {
 	return result;
 }
 
-static const kindOption *kindForType (const tagType type)
+static const kindDefinition *kindForType (const tagType type)
 {
-	const kindOption * result;
+	const kindDefinition * result;
 	if (isInputLanguage (Lang_csharp))
 		result = &(CsharpKinds [csharpTagKind (type)]);
 	else if (isInputLanguage (Lang_java))
@@ -1177,43 +1177,43 @@ static bool includeTag (const tagType type, const bool isFileScope)
 {
 	bool result;
 	int k;
-	kindOption* kopt = NULL;
+	kindDefinition* kdef = NULL;
 
 	if (isFileScope  &&  ! isXtagEnabled(XTAG_FILE_SCOPE))
 		result = false;
 	else if (isInputLanguage (Lang_csharp))
 	{
 		k = csharpTagKindNoAssert (type);
-		kopt = CsharpKinds;
+		kdef = CsharpKinds;
 	}
 	else if (isInputLanguage (Lang_java))
 	{
 		k = javaTagKindNoAssert (type);
-		kopt = JavaKinds;
+		kdef = JavaKinds;
 	}
 	else if (isInputLanguage (Lang_d))
 	{
 		k = dTagKindNoAssert (type);
-		kopt = DKinds;
+		kdef = DKinds;
 	}
 	else if (isInputLanguage (Lang_vera))
 	{
 		k = veraTagKindNoAssert (type);
-		kopt = VeraKinds;
+		kdef = VeraKinds;
 	}
 	else
 	{
 		k = cTagKindNoAssert (type);
-		kopt = CKinds;
+		kdef = CKinds;
 	}
 
-	if (kopt)
+	if (kdef)
 	{
 		Assert (k >= COMMONK_UNDEFINED);
 		if (k == COMMONK_UNDEFINED)
 			result = false;
 		else
-			result = kopt [k].enabled;
+			result = kdef [k].enabled;
 	}
 
 	return result;
@@ -1477,7 +1477,7 @@ static void makeTag (const tokenInfo *const token,
 		 * it's used in makeTagEntry().
 		 */
 		tagEntryInfo e;
-		const kindOption *kind;
+		const kindDefinition *kind;
 		int role;
 
 		role = roleForType (type);
@@ -3462,8 +3462,8 @@ static rescanReason findCTags (const unsigned int passCount)
 {
 	exception_t exception;
 	rescanReason rescan;
-	kindOption *kind_for_define = NULL;
-	kindOption *kind_for_header = NULL;
+	kindDefinition *kind_for_define = NULL;
+	kindDefinition *kind_for_header = NULL;
 	int role_for_macro_undef   = ROLE_INDEX_DEFINITION;
 	int role_for_header_system   = ROLE_INDEX_DEFINITION;
 	int role_for_header_local   = ROLE_INDEX_DEFINITION;
@@ -3567,7 +3567,7 @@ extern parserDefinition* OldCParser (void)
 {
 	static const char *const extensions [] = { "c", NULL };
 	parserDefinition* def = parserNew ("OldC");
-	def->kinds      = CKinds;
+	def->kindTable      = CKinds;
 	def->kindCount  = ARRAY_SIZE (CKinds);
 	def->extensions = extensions;
 	def->parser2    = findCTags;
@@ -3580,7 +3580,7 @@ extern parserDefinition* DParser (void)
 {
 	static const char *const extensions [] = { "d", "di", NULL };
 	parserDefinition* def = parserNew ("D");
-	def->kinds      = DKinds;
+	def->kindTable      = DKinds;
 	def->kindCount  = ARRAY_SIZE (DKinds);
 	def->extensions = extensions;
 	def->parser2    = findCTags;
@@ -3602,7 +3602,7 @@ extern parserDefinition* OldCppParser (void)
 					      NULL };
 
 	parserDefinition* def = parserNew ("OldC++");
-	def->kinds      = CKinds;
+	def->kindTable      = CKinds;
 	def->kindCount  = ARRAY_SIZE (CKinds);
 	def->extensions = extensions;
 	def->parser2    = findCTags;
@@ -3617,7 +3617,7 @@ extern parserDefinition* CsharpParser (void)
 	static const char *const extensions [] = { "cs", NULL };
 	static const char *const aliases [] = { "csharp", NULL };
 	parserDefinition* def = parserNew ("C#");
-	def->kinds      = CsharpKinds;
+	def->kindTable      = CsharpKinds;
 	def->kindCount  = ARRAY_SIZE (CsharpKinds);
 	def->extensions = extensions;
 	def->aliases    = aliases;
@@ -3630,7 +3630,7 @@ extern parserDefinition* JavaParser (void)
 {
 	static const char *const extensions [] = { "java", NULL };
 	parserDefinition* def = parserNew ("Java");
-	def->kinds      = JavaKinds;
+	def->kindTable      = JavaKinds;
 	def->kindCount  = ARRAY_SIZE (JavaKinds);
 	def->extensions = extensions;
 	def->parser2    = findCTags;
@@ -3642,7 +3642,7 @@ extern parserDefinition* VeraParser (void)
 {
 	static const char *const extensions [] = { "vr", "vri", "vrh", NULL };
 	parserDefinition* def = parserNew ("Vera");
-	def->kinds      = VeraKinds;
+	def->kindTable      = VeraKinds;
 	def->kindCount  = ARRAY_SIZE (VeraKinds);
 	def->extensions = extensions;
 	def->parser2    = findCTags;

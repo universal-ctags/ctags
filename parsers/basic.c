@@ -41,7 +41,7 @@ typedef struct {
 	int skip;
 } KeyWord;
 
-static kindOption BasicKinds[] = {
+static kindDefinition BasicKinds[] = {
 	{true, 'c', "constant", "constants"},
 	{true, 'f', "function", "functions"},
 	{true, 'l', "label", "labels"},
@@ -190,7 +190,7 @@ parserDefinition *BasicParser (void)
 {
 	static char const *extensions[] = { "bas", "bi", "bb", "pb", NULL };
 	parserDefinition *def = parserNew ("Basic");
-	def->kinds = BasicKinds;
+	def->kindTable = BasicKinds;
 	def->kindCount = ARRAY_SIZE (BasicKinds);
 	def->extensions = extensions;
 	def->parser = findBasicTags;

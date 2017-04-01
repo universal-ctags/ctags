@@ -92,7 +92,7 @@ typedef enum {
 	GOTAG_MEMBER
 } goKind;
 
-static kindOption GoKinds[] = {
+static kindDefinition GoKinds[] = {
 	{true, 'p', "package", "packages"},
 	{true, 'f', "func", "functions"},
 	{true, 'c', "const", "constants"},
@@ -799,7 +799,7 @@ extern parserDefinition *GoParser (void)
 {
 	static const char *const extensions[] = { "go", NULL };
 	parserDefinition *def = parserNew ("Go");
-	def->kinds = GoKinds;
+	def->kindTable = GoKinds;
 	def->kindCount = ARRAY_SIZE (GoKinds);
 	def->extensions = extensions;
 	def->parser = findGoTags;

@@ -56,12 +56,12 @@ static roleDesc SystemdUnitUnitRoles [] = {
 	/* ... */
 };
 
-static kindOption SystemdUnitKinds [] = {
+static kindDefinition SystemdUnitKinds [] = {
 	{ true, 'u', "unit", "units",
 	  .referenceOnly = true, ATTACH_ROLES(SystemdUnitUnitRoles)},
 };
 
-static int roleOf (const char* key, kindOption* kind)
+static int roleOf (const char* key, kindDefinition* kind)
 {
 	int i;
 
@@ -74,7 +74,7 @@ static int roleOf (const char* key, kindOption* kind)
 	return -1;
 }
 
-static void makeSystemdReferencedUnit (const char *value, kindOption* kind, int role)
+static void makeSystemdReferencedUnit (const char *value, kindDefinition* kind, int role)
 {
 	vString *unit = vStringNew ();
 
@@ -135,7 +135,7 @@ extern parserDefinition* SystemdUnitParser (void)
 
 	def->dependencies = dependencies;
 	def->dependencyCount = ARRAY_SIZE(dependencies);
-	def->kinds      = SystemdUnitKinds;
+	def->kindTable      = SystemdUnitKinds;
 	def->kindCount  = ARRAY_SIZE (SystemdUnitKinds);
 	def->extensions = extensions;
 	def->parser     = findSystemdUnitTags;

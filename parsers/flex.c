@@ -143,7 +143,7 @@ typedef enum {
 	FLEXTAG_COUNT
 } flexKind;
 
-static kindOption FlexKinds [] = {
+static kindDefinition FlexKinds [] = {
 	{ true,  'f', "function",	  "functions"		   },
 	{ true,  'c', "class",		  "classes"			   },
 	{ true,  'm', "method",		  "methods"			   },
@@ -247,7 +247,7 @@ static void makeFlexTag (tokenInfo *const token, flexKind kind)
 
 	if (FlexKinds [kind].enabled && ! token->ignoreTag )
 	{
-	DebugStatement ( 
+	DebugStatement (
 			debugPrintf (DEBUG_PARSE
 				, "\n makeFlexTag start: token isClass:%d  scope:%s  name:%s\n"
 				, token->isClass
@@ -277,7 +277,7 @@ static void makeFlexTag (tokenInfo *const token, flexKind kind)
 }
 
 static void makeClassTag (tokenInfo *const token)
-{ 
+{
 	vString *	fulltag;
 
 	if ( ! token->ignoreTag )
@@ -303,7 +303,7 @@ static void makeClassTag (tokenInfo *const token)
 }
 
 static void makeMXTag (tokenInfo *const token)
-{ 
+{
 	vString *	fulltag;
 
 	if ( ! token->ignoreTag )
@@ -325,7 +325,7 @@ static void makeMXTag (tokenInfo *const token)
 }
 
 static void makeFunctionTag (tokenInfo *const token)
-{ 
+{
 	vString *	fulltag;
 
 	if ( ! token->ignoreTag )
@@ -485,7 +485,7 @@ getNextChar:
 		case '<':
 				  {
 					  /*
-					   * An XML comment looks like this 
+					   * An XML comment looks like this
 					   *   <!-- anything over multiple lines -->
 					   */
 					  int d = getcFromInputFile ();
@@ -500,7 +500,7 @@ getNextChar:
 						  token->type = TOKEN_LESS_THAN;
 						  token->lineNumber = getInputLineNumber ();
 						  token->filePosition = getInputFilePosition ();
-						  break;						
+						  break;
 					  }
 					  else
 					  {
@@ -537,7 +537,7 @@ getNextChar:
 											  {
 												  skipToCharacterInInputFile ('-');
 												  c = getcFromInputFile ();
-												  if (c == '-') 
+												  if (c == '-')
 												  {
 													  d = getcFromInputFile ();
 													  if (d == '>')
@@ -687,8 +687,8 @@ getNextChar:
 				  token->filePosition = getInputFilePosition ();
 				  break;
 
-		case '!': 
-				  token->type = TOKEN_EXCLAMATION;			
+		case '!':
+				  token->type = TOKEN_EXCLAMATION;
 				  /*token->lineNumber = getInputLineNumber ();
 				  token->filePosition = getInputFilePosition ();*/
 				  break;
@@ -756,7 +756,7 @@ static void skipArgumentList (tokenInfo *const token)
 					nest_level--;
 				}
 			}
-		} 
+		}
 		readToken (token);
 	}
 }
@@ -789,7 +789,7 @@ static void skipArrayList (tokenInfo *const token)
 					nest_level--;
 				}
 			}
-		} 
+		}
 		readToken (token);
 	}
 }
@@ -819,7 +819,7 @@ static void addToScope (tokenInfo* const token, vString* const extra)
 static void findCmdTerm (tokenInfo *const token)
 {
 	/*
-	 * Read until we find either a semicolon or closing brace. 
+	 * Read until we find either a semicolon or closing brace.
 	 * Any nested braces will be handled within.
 	 */
 	while (! ( isType (token, TOKEN_SEMICOLON) ||
@@ -830,16 +830,16 @@ static void findCmdTerm (tokenInfo *const token)
 		if ( isType (token, TOKEN_OPEN_CURLY))
 		{
 			parseBlock (token, token);
-		} 
+		}
 		else if ( isType (token, TOKEN_OPEN_PAREN) )
 		{
 			skipArgumentList(token);
 		}
-		else 
+		else
 		{
 			readToken (token);
 		}
-	} 
+	}
 }
 
 static void parseSwitch (tokenInfo *const token)
@@ -858,12 +858,12 @@ static void parseSwitch (tokenInfo *const token)
 
 	readToken (token);
 
-	if (isType (token, TOKEN_OPEN_PAREN)) 
+	if (isType (token, TOKEN_OPEN_PAREN))
 	{
 		skipArgumentList(token);
 	}
 
-	if (isType (token, TOKEN_OPEN_CURLY)) 
+	if (isType (token, TOKEN_OPEN_CURLY))
 	{
 		do
 		{
@@ -883,17 +883,17 @@ static void parseLoop (tokenInfo *const token)
 	 * Handles these statements
 	 *	   for (x=0; x<3; x++)
 	 *		   document.write("This text is repeated three times<br>");
-	 *	   
+	 *
 	 *	   for (x=0; x<3; x++)
 	 *	   {
 	 *		   document.write("This text is repeated three times<br>");
 	 *	   }
-	 *	   
+	 *
 	 *	   while (number<5){
 	 *		   document.write(number+"<br>");
 	 *		   number++;
 	 *	   }
-	 *	   
+	 *
 	 *	   do{
 	 *		   document.write(number+"<br>");
 	 *		   number++;
@@ -905,7 +905,7 @@ static void parseLoop (tokenInfo *const token)
 	{
 		readToken(token);
 
-		if (isType (token, TOKEN_OPEN_PAREN)) 
+		if (isType (token, TOKEN_OPEN_PAREN))
 		{
 			/*
 			 * Handle nameless functions, these will only
@@ -914,7 +914,7 @@ static void parseLoop (tokenInfo *const token)
 			skipArgumentList(token);
 		}
 
-		if (isType (token, TOKEN_OPEN_CURLY)) 
+		if (isType (token, TOKEN_OPEN_CURLY))
 		{
 			/*
 			 * This will be either a function or a class.
@@ -923,17 +923,17 @@ static void parseLoop (tokenInfo *const token)
 			 * it is a class, otherwise it is a function.
 			 */
 			parseBlock (token, token);
-		} 
-		else 
+		}
+		else
 		{
 			parseLine(token);
 		}
-	} 
+	}
 	else if (isKeyword (token, KEYWORD_do))
 	{
 		readToken(token);
 
-		if (isType (token, TOKEN_OPEN_CURLY)) 
+		if (isType (token, TOKEN_OPEN_CURLY))
 		{
 			/*
 			 * This will be either a function or a class.
@@ -942,8 +942,8 @@ static void parseLoop (tokenInfo *const token)
 			 * it is a class, otherwise it is a function.
 			 */
 			parseBlock (token, token);
-		} 
-		else 
+		}
+		else
 		{
 			parseLine(token);
 		}
@@ -954,7 +954,7 @@ static void parseLoop (tokenInfo *const token)
 		{
 			readToken(token);
 
-			if (isType (token, TOKEN_OPEN_PAREN)) 
+			if (isType (token, TOKEN_OPEN_PAREN))
 			{
 				/*
 				 * Handle nameless functions, these will only
@@ -974,11 +974,11 @@ static bool parseIf (tokenInfo *const token)
 	 *	   if ( ... )
 	 *		   one line;
 	 *
-	 *	   if ( ... )  
+	 *	   if ( ... )
 	 *		  statement;
 	 *	   else
 	 *		  statement
-	 *	    
+	 *
 	 *	   if ( ... ) {
 	 *		  multiple;
 	 *		  statements;
@@ -1004,7 +1004,7 @@ static bool parseIf (tokenInfo *const token)
 	 *		  without a semi-colon.  Currently this messes up
 	 *		  the parsing of blocks.
 	 *		  Need to somehow detect this has happened, and either
-	 *		  backup a token, or skip reading the next token if 
+	 *		  backup a token, or skip reading the next token if
 	 *		  that is possible from all code locations.
 	 *
 	 */
@@ -1019,16 +1019,16 @@ static bool parseIf (tokenInfo *const token)
 		readToken (token);
 	}
 
-	if (isType (token, TOKEN_OPEN_PAREN)) 
+	if (isType (token, TOKEN_OPEN_PAREN))
 	{
-		/* 
+		/*
 		 * Handle nameless functions, these will only
 		 * be considered methods.
 		 */
 		skipArgumentList(token);
 	}
 
-	if (isType (token, TOKEN_OPEN_CURLY)) 
+	if (isType (token, TOKEN_OPEN_CURLY))
 	{
 		/*
 		 * This will be either a function or a class.
@@ -1037,8 +1037,8 @@ static bool parseIf (tokenInfo *const token)
 		 * it is a class, otherwise it is a function.
 		 */
 		parseBlock (token, token);
-	} 
-	else 
+	}
+	else
 	{
 		findCmdTerm (token);
 
@@ -1048,30 +1048,30 @@ static bool parseIf (tokenInfo *const token)
 		 * multiline section, or another single line.
 		 */
 
-		if (isType (token, TOKEN_CLOSE_CURLY)) 
+		if (isType (token, TOKEN_CLOSE_CURLY))
 		{
 			/*
 			 * This statement did not have a line terminator.
 			 */
 			read_next_token = false;
-		} 
-		else 
+		}
+		else
 		{
 			readToken (token);
 
-			if (isType (token, TOKEN_CLOSE_CURLY)) 
+			if (isType (token, TOKEN_CLOSE_CURLY))
 			{
 				/*
 				* This statement did not have a line terminator.
 				*/
 				read_next_token = false;
-			} 
+			}
 			else
 			{
 				if (isKeyword (token, KEYWORD_else))
-					read_next_token = parseIf (token); 
+					read_next_token = parseIf (token);
 			}
-		} 
+		}
 	}
 	return read_next_token;
 }
@@ -1091,11 +1091,11 @@ static void parseFunction (tokenInfo *const token)
 	}
 
 	copyToken (name, token);
-	/* Add scope in case this is an INNER function 
+	/* Add scope in case this is an INNER function
 	addToScope(name, token->scope);
 	*/
 
-	DebugStatement ( 
+	DebugStatement (
 			debugPrintf (DEBUG_PARSE
 				, "\n parseFunction: token isClass:%d  scope:%s  name:%s\n"
 				, token->isClass
@@ -1103,7 +1103,7 @@ static void parseFunction (tokenInfo *const token)
 				, vStringValue(token->string)
 				);
 			);
-	DebugStatement ( 
+	DebugStatement (
 			debugPrintf (DEBUG_PARSE
 				, "\n parseFunction: name isClass:%d  scope:%s  name:%s\n"
 				, name->isClass
@@ -1120,7 +1120,7 @@ static void parseFunction (tokenInfo *const token)
 	if ( isType (token, TOKEN_COLON) )
 	{
 		/*
-		 *   function fname ():ReturnType 
+		 *   function fname ():ReturnType
 		 */
 		readToken (token);
 		readToken (token);
@@ -1128,7 +1128,7 @@ static void parseFunction (tokenInfo *const token)
 
 	if ( isType (token, TOKEN_OPEN_CURLY) )
 	{
-		DebugStatement ( 
+		DebugStatement (
 				debugPrintf (DEBUG_PARSE
 					, "\n parseFunction end: name isClass:%d  scope:%s  name:%s\n"
 					, name->isClass
@@ -1137,7 +1137,7 @@ static void parseFunction (tokenInfo *const token)
 					);
 				);
 		parseBlock (token, name);
-		DebugStatement ( 
+		DebugStatement (
 				debugPrintf (DEBUG_PARSE
 					, "\n parseFunction end2: token isClass:%d  scope:%s  name:%s\n"
 					, token->isClass
@@ -1145,7 +1145,7 @@ static void parseFunction (tokenInfo *const token)
 					, vStringValue(token->string)
 					);
 				);
-		DebugStatement ( 
+		DebugStatement (
 				debugPrintf (DEBUG_PARSE
 					, "\n parseFunction end2: token isClass:%d  scope:%s  name:%s\n"
 					, token->isClass
@@ -1153,7 +1153,7 @@ static void parseFunction (tokenInfo *const token)
 					, vStringValue(token->string)
 					);
 				);
-		DebugStatement ( 
+		DebugStatement (
 				debugPrintf (DEBUG_PARSE
 					, "\n parseFunction end3: name isClass:%d  scope:%s  name:%s\n"
 					, name->isClass
@@ -1176,7 +1176,7 @@ static bool parseBlock (tokenInfo *const token, tokenInfo *const parent)
 
 	vStringCopy (saveScope, token->scope);
 	token->nestLevel++;
-	DebugStatement ( 
+	DebugStatement (
 			debugPrintf (DEBUG_PARSE
 				, "\n parseBlock start: token isClass:%d  scope:%s  name:%s\n"
 				, token->isClass
@@ -1188,14 +1188,14 @@ static bool parseBlock (tokenInfo *const token, tokenInfo *const parent)
 	 * Make this routine a bit more forgiving.
 	 * If called on an open_curly advance it
 	 */
-	if ( isType (token, TOKEN_OPEN_CURLY) && 
+	if ( isType (token, TOKEN_OPEN_CURLY) &&
 			isKeyword(token, KEYWORD_NONE) )
 		readToken(token);
 
 	if (! isType (token, TOKEN_CLOSE_CURLY))
 	{
 		/*
-		 * Read until we find the closing brace, 
+		 * Read until we find the closing brace,
 		 * any nested braces will be handled within
 		 */
 		do
@@ -1204,8 +1204,8 @@ static bool parseBlock (tokenInfo *const token, tokenInfo *const parent)
 			{
 				/* Handle nested blocks */
 				parseBlock (token, parent);
-			} 
-			else 
+			}
+			else
 			{
 				/*
 				 * It is possible for a line to have no terminator
@@ -1220,11 +1220,11 @@ static bool parseBlock (tokenInfo *const token, tokenInfo *const parent)
 			 * Always read a new token unless we find a statement without
 			 * a ending terminator
 			 */
-			if( read_next_token ) 
+			if( read_next_token )
 				readToken(token);
 
 			/*
-			 * If we find a statement without a terminator consider the 
+			 * If we find a statement without a terminator consider the
 			 * block finished, otherwise the stack will be off by one.
 			 */
 		} while ((! isType (token, TOKEN_CLOSE_CURLY) && read_next_token )
@@ -1235,7 +1235,7 @@ static bool parseBlock (tokenInfo *const token, tokenInfo *const parent)
 	vStringDelete(saveScope);
 	token->nestLevel--;
 
-	DebugStatement ( 
+	DebugStatement (
 			debugPrintf (DEBUG_PARSE
 				, "\n parseBlock end: token isClass:%d  scope:%s  name:%s\n"
 				, token->isClass
@@ -1255,7 +1255,7 @@ static void parseMethods (tokenInfo *const token, tokenInfo *const class)
 	 *	   validProperty  : 2,
 	 *	   validMethod    : function(a,b) {}
 	 *	   'validMethod2' : function(a,b) {}
-     *     container.dirtyTab = {'url': false, 'title':false, 'snapshot':false, '*': false}		
+     *     container.dirtyTab = {'url': false, 'title':false, 'snapshot':false, '*': false}
 	 */
 
 	do
@@ -1277,7 +1277,7 @@ static void parseMethods (tokenInfo *const token, tokenInfo *const class)
 						skipArgumentList(token);
 					}
 
-					if (isType (token, TOKEN_OPEN_CURLY)) 
+					if (isType (token, TOKEN_OPEN_CURLY))
 					{
 						addToScope (name, class->string);
 						makeFlexTag (name, FLEXTAG_METHOD);
@@ -1361,7 +1361,7 @@ static bool parseVar (tokenInfo *const token, bool is_public)
 		/* if ( token->nestLevel == 0 && is_global ) */
 		if ( is_public )
 		{
-			if (isType (token, TOKEN_SEMICOLON)) 
+			if (isType (token, TOKEN_SEMICOLON))
 				makeFlexTag (name, FLEXTAG_VARIABLE);
 		}
 	}
@@ -1399,7 +1399,7 @@ static bool parseClass (tokenInfo *const token)
 	copyToken (name, token);
 	readToken(token);
 
-	DebugStatement ( 
+	DebugStatement (
 			debugPrintf (DEBUG_PARSE
 				, "\n parseClass start: token isClass:%d  scope:%s  name:%s\n"
 				, token->isClass
@@ -1413,7 +1413,7 @@ static bool parseClass (tokenInfo *const token)
 		parseBlock (token, name);
 	}
 
-	DebugStatement ( 
+	DebugStatement (
 			debugPrintf (DEBUG_PARSE
 				, "\n parseClass end: token isClass:%d  scope:%s  name:%s\n"
 				, token->isClass
@@ -1442,7 +1442,7 @@ static bool parseStatement (tokenInfo *const token)
 	vString *	fulltag;
 
 	vStringCopy (saveScope, token->scope);
-	DebugStatement ( 
+	DebugStatement (
 			debugPrintf (DEBUG_PARSE
 				, "\n parseStatement: token isClass:%d  scope:%s  name:%s\n"
 				, token->isClass
@@ -1462,14 +1462,14 @@ static bool parseStatement (tokenInfo *const token)
 	 *	   var D3 = new Function("a", "b", "return a+b;");
 	 * Class
 	 *	   testlib.extras.ValidClassOne = function(a,b) {
-	 *		   this.a = a; 
+	 *		   this.a = a;
 	 *	   }
 	 * Class Methods
 	 *	   testlib.extras.ValidClassOne.prototype = {
 	 *		   'validMethodOne' : function(a,b) {},
 	 *		   'validMethodTwo' : function(a,b) {}
 	 *	   }
-     *     ValidClassTwo = function () 
+     *     ValidClassTwo = function ()
      *     {
      *         this.validMethodThree = function() {}
      *         // unnamed method
@@ -1498,10 +1498,10 @@ static bool parseStatement (tokenInfo *const token)
 	{
 		switch (token->keyword)
 		{
-			case KEYWORD_for:	   
+			case KEYWORD_for:
 			case KEYWORD_while:
 			case KEYWORD_do:
-				parseLoop (token); 
+				parseLoop (token);
 				break;
 			case KEYWORD_if:
 			case KEYWORD_else:
@@ -1509,28 +1509,28 @@ static bool parseStatement (tokenInfo *const token)
 			case KEYWORD_catch:
 			case KEYWORD_finally:
 				/* Common semantics */
-				is_terminated = parseIf (token); 
+				is_terminated = parseIf (token);
 				break;
 			case KEYWORD_switch:
-				parseSwitch (token); 
+				parseSwitch (token);
 				break;
 			case KEYWORD_class:
-				parseClass (token); 
+				parseClass (token);
 				goto cleanUp;
 				break;
 			case KEYWORD_function:
-				parseFunction (token); 
+				parseFunction (token);
 				goto cleanUp;
 				break;
 			case KEYWORD_var:
-				parseVar (token, is_public); 
+				parseVar (token, is_public);
 				goto cleanUp;
 				break;
 			default:
 				readToken(token);
 				break;
 		}
-	} 
+	}
 
 	copyToken (name, token);
 
@@ -1556,11 +1556,11 @@ static bool parseStatement (tokenInfo *const token)
 					{
 						vStringCopy(saveScope, token->scope);
 						addToScope(token, name->string);
-					} 
-					else 
+					}
+					else
 						addContext (name, token);
-				} 
-				else if ( isKeyword(token, KEYWORD_prototype) ) 
+				}
+				else if ( isKeyword(token, KEYWORD_prototype) )
 				{
 					/*
 					 * When we reach the "prototype" tag, we infer:
@@ -1568,7 +1568,7 @@ static bool parseStatement (tokenInfo *const token)
 					 *     "build"     is a method
 					 *
 					 * function BindAgent( repeatableIdName, newParentIdName ) {
-					 * }	
+					 * }
 					 *
 					 * CASE 1
 					 * Specified function name: "build"
@@ -1612,18 +1612,18 @@ static bool parseStatement (tokenInfo *const token)
 							 */
 							token->ignoreTag = true;
 							/*
-							 * Find to the end of the statement 
+							 * Find to the end of the statement
 							 */
 							findCmdTerm (token);
 							token->ignoreTag = false;
 							is_terminated = true;
 							goto cleanUp;
 						}
-					} 
-					else if (isType (token, TOKEN_EQUAL_SIGN)) 
+					}
+					else if (isType (token, TOKEN_EQUAL_SIGN))
 					{
 						readToken (token);
-						if (isType (token, TOKEN_OPEN_CURLY)) 
+						if (isType (token, TOKEN_OPEN_CURLY))
 						{
 							/*
 							 * Handle CASE 2
@@ -1636,7 +1636,7 @@ static bool parseStatement (tokenInfo *const token)
 							 */
 							parseMethods(token, name);
 							/*
-							 * Find to the end of the statement 
+							 * Find to the end of the statement
 							 */
 							findCmdTerm (token);
 							token->ignoreTag = false;
@@ -1690,10 +1690,10 @@ static bool parseStatement (tokenInfo *const token)
 			 * Handles this syntax:
 			 *	   var g_var2;
 			 */
-			if (isType (token, TOKEN_SEMICOLON)) 
+			if (isType (token, TOKEN_SEMICOLON))
 				makeFlexTag (name, FLEXTAG_VARIABLE);
 		}
-		/* 
+		/*
 		 * Statement has ended.
 		 * This deals with calls to functions, like:
 		 *     alert(..);
@@ -1709,16 +1709,16 @@ static bool parseStatement (tokenInfo *const token)
 		{
 			readToken (token);
 
-			if ( isKeyword (token, KEYWORD_NONE) && 
+			if ( isKeyword (token, KEYWORD_NONE) &&
 					! isType (token, TOKEN_OPEN_PAREN) )
 			{
 				/*
 				 * Functions of this format:
-				 *	   var D2A = function theAdd(a, b) 
-				 *	   {					 
+				 *	   var D2A = function theAdd(a, b)
+				 *	   {
 				 *		  return a+b;
-				 *	   }					 
-				 * Are really two separate defined functions and 
+				 *	   }
+				 * Are really two separate defined functions and
 				 * can be referenced in two ways:
 				 *	   alert( D2A(1,2) );			  // produces 3
 				 *	   alert( theAdd(1,2) );		  // also produces 3
@@ -1736,7 +1736,7 @@ static bool parseStatement (tokenInfo *const token)
 			if ( isType (token, TOKEN_OPEN_PAREN) )
 				skipArgumentList(token);
 
-			if (isType (token, TOKEN_OPEN_CURLY)) 
+			if (isType (token, TOKEN_OPEN_CURLY))
 			{
 				/*
 				 * This will be either a function or a class.
@@ -1744,14 +1744,14 @@ static bool parseStatement (tokenInfo *const token)
 				 * of the function.  If we find a "this." we know
 				 * it is a class, otherwise it is a function.
 				 */
-				if ( token->isClass ) 
+				if ( token->isClass )
 				{
 					makeFlexTag (name, FLEXTAG_METHOD);
 					if ( vStringLength(secondary_name->string) > 0 )
 						makeFunctionTag (secondary_name);
 					parseBlock (token, name);
-				} 
-				else 
+				}
+				else
 				{
 					parseBlock (token, name);
 					makeFunctionTag (name);
@@ -1760,13 +1760,13 @@ static bool parseStatement (tokenInfo *const token)
 						makeFunctionTag (secondary_name);
 
 					/*
-					 * Find to the end of the statement 
+					 * Find to the end of the statement
 					 */
 					goto cleanUp;
 				}
 			}
-		} 
-		else if (isType (token, TOKEN_OPEN_PAREN)) 
+		}
+		else if (isType (token, TOKEN_OPEN_PAREN))
 		{
 			/*
 			 * Handle nameless functions
@@ -1774,7 +1774,7 @@ static bool parseStatement (tokenInfo *const token)
 			 */
 			skipArgumentList(token);
 
-			if (isType (token, TOKEN_OPEN_CURLY)) 
+			if (isType (token, TOKEN_OPEN_CURLY))
 			{
 				/*
 				 * Nameless functions are only setup as methods.
@@ -1782,8 +1782,8 @@ static bool parseStatement (tokenInfo *const token)
 				makeFlexTag (name, FLEXTAG_METHOD);
 				parseBlock (token, name);
 			}
-		} 
-		else if (isType (token, TOKEN_OPEN_CURLY)) 
+		}
+		else if (isType (token, TOKEN_OPEN_CURLY))
 		{
 			/*
 			 * Creates tags for each of these class methods
@@ -1793,7 +1793,7 @@ static bool parseStatement (tokenInfo *const token)
 			 *     }
 			 */
 			parseMethods(token, name);
-			if (isType (token, TOKEN_CLOSE_CURLY)) 
+			if (isType (token, TOKEN_CLOSE_CURLY))
 			{
 				/*
 				 * Assume the closing parantheses terminates
@@ -1805,12 +1805,12 @@ static bool parseStatement (tokenInfo *const token)
 		else if (isKeyword (token, KEYWORD_new))
 		{
 			readToken (token);
-			if ( isKeyword (token, KEYWORD_function) || 
+			if ( isKeyword (token, KEYWORD_function) ||
 					isKeyword (token, KEYWORD_capital_function) ||
 					isKeyword (token, KEYWORD_object) ||
 					isKeyword (token, KEYWORD_capital_object) )
 			{
-				if ( isKeyword (token, KEYWORD_object) || 
+				if ( isKeyword (token, KEYWORD_object) ||
 						isKeyword (token, KEYWORD_capital_object) )
 					is_class = true;
 
@@ -1818,7 +1818,7 @@ static bool parseStatement (tokenInfo *const token)
 				if ( isType (token, TOKEN_OPEN_PAREN) )
 					skipArgumentList(token);
 
-				if (isType (token, TOKEN_SEMICOLON)) 
+				if (isType (token, TOKEN_SEMICOLON))
 				{
 					if ( token->nestLevel == 0 )
 					{
@@ -1840,7 +1840,7 @@ static bool parseStatement (tokenInfo *const token)
 			if ( token->nestLevel == 0 && is_global )
 			{
 				/*
-				 * A pointer can be created to the function.  
+				 * A pointer can be created to the function.
 				 * If we recognize the function/class name ignore the variable.
 				 * This format looks identical to a variable definition.
 				 * A variable defined outside of a block is considered
@@ -1867,7 +1867,7 @@ static bool parseStatement (tokenInfo *const token)
 						! stringListHas(ClassNames, vStringValue (fulltag)) )
 				{
 					findCmdTerm (token);
-					if (isType (token, TOKEN_SEMICOLON)) 
+					if (isType (token, TOKEN_SEMICOLON))
 						makeFlexTag (name, FLEXTAG_VARIABLE);
 				}
 				vStringDelete (fulltag);
@@ -1877,7 +1877,7 @@ static bool parseStatement (tokenInfo *const token)
 	findCmdTerm (token);
 
 	/*
-	 * Statements can be optionally terminated in the case of 
+	 * Statements can be optionally terminated in the case of
 	 * statement prior to a close curly brace as in the
 	 * document.write line below:
 	 *
@@ -1888,7 +1888,7 @@ static bool parseStatement (tokenInfo *const token)
 	 *	   return 1;
 	 * }
 	 */
-	if ( ! is_terminated && isType (token, TOKEN_CLOSE_CURLY)) 
+	if ( ! is_terminated && isType (token, TOKEN_CLOSE_CURLY))
 		is_terminated = false;
 
 
@@ -1918,10 +1918,10 @@ static bool parseLine (tokenInfo *const token)
 	{
 		switch (token->keyword)
 		{
-			case KEYWORD_for:	   
+			case KEYWORD_for:
 			case KEYWORD_while:
 			case KEYWORD_do:
-				parseLoop (token); 
+				parseLoop (token);
 				break;
 			case KEYWORD_if:
 			case KEYWORD_else:
@@ -1929,24 +1929,24 @@ static bool parseLine (tokenInfo *const token)
 			case KEYWORD_catch:
 			case KEYWORD_finally:
 				/* Common semantics */
-				is_terminated = parseIf (token); 
+				is_terminated = parseIf (token);
 				break;
 			case KEYWORD_switch:
-				parseSwitch (token); 
+				parseSwitch (token);
 				break;
-			default:			   
-				parseStatement (token); 
+			default:
+				parseStatement (token);
 				break;
 		}
-	} 
-	else 
+	}
+	else
 	{
 		/*
 		 * Special case where single line statements may not be
 		 * SEMICOLON terminated.  parseBlock needs to know this
 		 * so that it does not read the next token.
 		 */
-		is_terminated = parseStatement (token); 
+		is_terminated = parseStatement (token);
 	}
 	return is_terminated;
 }
@@ -1956,7 +1956,7 @@ static bool parseCDATA (tokenInfo *const token)
 	if (isType (token, TOKEN_LESS_THAN))
 	{
 		/*
-		 * Handle these tags 
+		 * Handle these tags
 		 * <![CDATA[
 		 *    ...
 		 * ]]>
@@ -1997,10 +1997,10 @@ static bool parseCDATA (tokenInfo *const token)
 static bool parseNamespace (tokenInfo *const token)
 {
 	/*
-	 * If we have found a <, we know it is not a TOKEN_OPEN_MXML 
+	 * If we have found a <, we know it is not a TOKEN_OPEN_MXML
 	 * but it could potentially be a different namespace.
 	 * This means it will also have a closing tag, which will
-	 * mess up the parser if we do not properly recurse 
+	 * mess up the parser if we do not properly recurse
 	 * through these tags.
 	 */
 
@@ -2037,7 +2037,7 @@ static bool parseNamespace (tokenInfo *const token)
 		return true;
 	}
 
-	/* 
+	/*
 	 * Confirmed we are inside a namespace tag, so
 	 * process it until the close tag.
 	 *
@@ -2099,7 +2099,7 @@ static bool parseMXML (tokenInfo *const token)
 		if (isType (token, TOKEN_CLOSE_MXML))
 		{
 			/*
-			 * We have found a </mx:type> tag 
+			 * We have found a </mx:type> tag
 			 * Finish reading the "type" and ">"
 			 */
 			readToken (token);
@@ -2130,7 +2130,7 @@ static bool parseMXML (tokenInfo *const token)
 		if (isType (token, TOKEN_CLOSE_MXML))
 		{
 			/*
-			 * We have found a </mx:type> tag 
+			 * We have found a </mx:type> tag
 			 * Finish reading the "type" and ">"
 			 */
 			readToken (token);
@@ -2162,7 +2162,7 @@ static bool parseMXML (tokenInfo *const token)
 		{
 			if (vStringLength(name->string) == 0 )
 			{
-				/* 
+				/*
 				 * If we have already created the tag based on either "name"
 				 * or "id" do not do it again.
 				 */
@@ -2189,7 +2189,7 @@ static bool parseMXML (tokenInfo *const token)
 	if (isType (token, TOKEN_CLOSE_MXML))
 	{
 		/*
-		 * We have found a </mx:type> tag 
+		 * We have found a </mx:type> tag
 		 * Finish reading the "type" and ">"
 		 */
 		readToken (token);
@@ -2211,7 +2211,7 @@ static bool parseActionScript (tokenInfo *const token)
 		if (isType (token, TOKEN_LESS_THAN))
 		{
 			/*
-			 * Handle these tags 
+			 * Handle these tags
 			 * <![CDATA[
 			 *    ...
 			 * ]]>
@@ -2232,7 +2232,7 @@ static bool parseActionScript (tokenInfo *const token)
 		if (isType (token, TOKEN_CLOSE_SQUARE))
 		{
 			/*
-			 * Handle these tags 
+			 * Handle these tags
 			 * <![CDATA[
 			 *    ...
 			 * ]]>
@@ -2250,17 +2250,17 @@ static bool parseActionScript (tokenInfo *const token)
 		else if (isType (token, TOKEN_CLOSE_MXML))
 		{
 			/*
-			 * Read the Script> tags 
+			 * Read the Script> tags
 			 */
 			readToken (token);
 			readToken (token);
 			return true;
-		} 
+		}
 		else if (isType (token, TOKEN_OPEN_MXML))
 		{
 			parseMXML (token);
-		} 
-		else 
+		}
+		else
 		{
 			if (isType(token, TOKEN_KEYWORD))
 			{
@@ -2296,10 +2296,10 @@ static bool parseActionScript (tokenInfo *const token)
 					case KEYWORD_function:	parseFunction (token); break;
 					default:				parseLine (token); break;
 				}
-			} 
-			else 
+			}
+			else
 			{
-				parseLine (token); 
+				parseLine (token);
 			}
 		}
 	} while (!isEOF (token));
@@ -2315,7 +2315,7 @@ static void parseFlexFile (tokenInfo *const token)
 		if (isType (token, TOKEN_OPEN_MXML))
 		{
 			parseMXML (token);
-		} 
+		}
 		else if (isType (token, TOKEN_LESS_THAN))
 		{
 			readToken (token);
@@ -2328,7 +2328,7 @@ static void parseFlexFile (tokenInfo *const token)
 				while (! (isType (token, TOKEN_QUESTION_MARK) || isEOF (token)))
 				{
 					readToken (token);
-				} 
+				}
 				readToken (token);
 			}
 			else if (isKeyword (token, KEYWORD_NONE))
@@ -2342,10 +2342,10 @@ static void parseFlexFile (tokenInfo *const token)
 				while (! (isType (token, TOKEN_GREATER_THAN) || isEOF (token)))
 				{
 					readToken (token);
-				} 
+				}
 			}
-		} 
-		else 
+		}
+		else
 		{
 			parseActionScript (token);
 		}
@@ -2361,7 +2361,7 @@ static void initialize (const langType language)
 static void findFlexTags (void)
 {
 	tokenInfo *const token = newToken ();
-	
+
 	ClassNames = stringListNew ();
 	FunctionNames = stringListNew ();
 
@@ -2383,7 +2383,7 @@ extern parserDefinition* FlexParser (void)
 	/*
 	 * New definitions for parsing instead of regex
 	 */
-	def->kinds		= FlexKinds;
+	def->kindTable	= FlexKinds;
 	def->kindCount	= ARRAY_SIZE (FlexKinds);
 	def->parser		= findFlexTags;
 	def->initialize = initialize;

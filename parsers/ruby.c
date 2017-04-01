@@ -40,7 +40,7 @@ typedef enum {
 /*
 *   DATA DEFINITIONS
 */
-static kindOption RubyKinds [] = {
+static kindDefinition RubyKinds [] = {
 	{ true, 'c', "class",  "classes" },
 	{ true, 'f', "method", "methods" },
 	{ true, 'm', "module", "modules" },
@@ -554,8 +554,9 @@ static void findRubyTags (void)
 extern parserDefinition* RubyParser (void)
 {
 	static const char *const extensions [] = { "rb", "ruby", NULL };
-	parserDefinition* def = parserNewFull ("Ruby", KIND_FILE_ALT);
-	def->kinds      = RubyKinds;
+	parserDefinition* def = parserNew ("Ruby");
+	def->fileKindLetter = KIND_FILE_ALT;
+	def->kindTable      = RubyKinds;
 	def->kindCount  = ARRAY_SIZE (RubyKinds);
 	def->extensions = extensions;
 	def->parser     = findRubyTags;

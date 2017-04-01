@@ -72,7 +72,7 @@ typedef enum {
 
 static langType Lang_json;
 
-static kindOption JsonKinds [] = {
+static kindDefinition JsonKinds [] = {
 	{ true,  'o', "object",		"objects"	},
 	{ true,  'a', "array",		"arrays"	},
 	{ true,  'n', "number",		"numbers"	},
@@ -380,7 +380,7 @@ extern parserDefinition* JsonParser (void)
 	static const char *const extensions [] = { "json", NULL };
 	parserDefinition *const def = parserNew ("JSON");
 	def->extensions = extensions;
-	def->kinds		= JsonKinds;
+	def->kindTable	= JsonKinds;
 	def->kindCount	= ARRAY_SIZE (JsonKinds);
 	def->parser		= findJsonTags;
 	def->initialize = initialize;

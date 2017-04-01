@@ -32,7 +32,7 @@ typedef enum {
 	K_HUNK,
 } diffKind;
 
-static kindOption DiffKinds [] = {
+static kindDefinition DiffKinds [] = {
 	{ true, 'm', "modifiedFile",  "modified files"},
 	{ true, 'n', "newFile",       "newly created files"},
 	{ true, 'd', "deletedFile",   "deleted files"},
@@ -204,7 +204,7 @@ extern parserDefinition* DiffParser (void)
 {
 	static const char *const extensions [] = { "diff", "patch", NULL };
 	parserDefinition* const def = parserNew ("Diff");
-	def->kinds      = DiffKinds;
+	def->kindTable      = DiffKinds;
 	def->kindCount  = ARRAY_SIZE (DiffKinds);
 	def->extensions = extensions;
 	def->parser     = findDiffTags;

@@ -76,7 +76,7 @@ typedef enum {
 	K_KEY,
 } makeKind;
 
-static kindOption IniconfKinds [] = {
+static kindDefinition IniconfKinds [] = {
 	{ true, 's', "section",  "sections"},
 	{ true, 'k', "key",      "keys"},
 };
@@ -233,7 +233,7 @@ extern parserDefinition* IniconfParser (void)
 	static const char *const extensions [] = { "ini", "conf", NULL };
 	parserDefinition* const def = parserNew ("Iniconf");
 
-	def->kinds      = IniconfKinds;
+	def->kindTable      = IniconfKinds;
 	def->kindCount  = ARRAY_SIZE (IniconfKinds);
 	def->extensions = extensions;
 	def->parser     = findIniconfTags;

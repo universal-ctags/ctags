@@ -31,7 +31,7 @@ enum {
 	DEFINITION_KIND,
 };
 
-static kindOption AutoconfKinds[] = {
+static kindDefinition AutoconfKinds[] = {
 	{ true, 'p', "package", "packages" },
 	{ true, 't', "template", "templates" },
 	{ true, 'm', "macro", "autoconf macros" },
@@ -181,7 +181,7 @@ extern parserDefinition* AutoconfParser (void)
 	def->dependencies = dependencies;
 	def->dependencyCount = ARRAY_SIZE (dependencies);
 
-	def->kinds = AutoconfKinds;
+	def->kindTable = AutoconfKinds;
 	def->kindCount = ARRAY_SIZE(AutoconfKinds);
 	def->patterns = patterns;
 	def->extensions = extensions;

@@ -36,7 +36,7 @@ typedef enum {
 	SECTION_COUNT
 } rstKind;
 
-static kindOption RstKinds[] = {
+static kindDefinition RstKinds[] = {
 	{ true, 'c', "chapter",       "chapters"},
 	{ true, 's', "section",       "sections" },
 	{ true, 'S', "subsection",    "subsections" },
@@ -47,7 +47,7 @@ typedef enum {
 	F_SECTION_MARKER,
 } rstField;
 
-static fieldSpec RstFields [] = {
+static fieldDefinition RstFields [] = {
 	{
 		.name = "sectionMarker",
 		.description = "character used for declaring section",
@@ -264,13 +264,13 @@ extern parserDefinition* RstParser (void)
 	static const char *const extensions [] = { "rest", "reST", "rst", NULL };
 	parserDefinition* const def = parserNew ("reStructuredText");
 
-	def->kinds = RstKinds;
+	def->kindTable = RstKinds;
 	def->kindCount = ARRAY_SIZE (RstKinds);
 	def->extensions = extensions;
 	def->parser = findRstTags;
 
-	def->fieldSpecs = RstFields;
-	def->fieldSpecCount = ARRAY_SIZE (RstFields);
+	def->fieldDefinitions = RstFields;
+	def->fieldDefinitionCount = ARRAY_SIZE (RstFields);
 
 	def->useCork = true;
 

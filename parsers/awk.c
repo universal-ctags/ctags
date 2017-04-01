@@ -26,7 +26,7 @@ typedef enum eAwkKinds {
 	K_FUNCTION
 } awkKind;
 
-static kindOption AwkKinds [] = {
+static kindDefinition AwkKinds [] = {
 	{ true, 'f', "function", "functions" }
 };
 
@@ -70,7 +70,7 @@ extern parserDefinition* AwkParser (void)
 	static const char *const extensions [] = { "awk", "gawk", "mawk", NULL };
 	static const char *const aliases [] = { "gawk", "mawk", NULL };
 	parserDefinition* def = parserNew ("Awk");
-	def->kinds      = AwkKinds;
+	def->kindTable      = AwkKinds;
 	def->kindCount  = ARRAY_SIZE (AwkKinds);
 	def->extensions = extensions;
 	def->aliases    = aliases;

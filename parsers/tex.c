@@ -114,7 +114,7 @@ typedef enum {
 	TEXTAG_COUNT
 } texKind;
 
-static kindOption TexKinds [] = {
+static kindDefinition TexKinds [] = {
 	{ true,  'p', "part",			  "parts"			   },
 	{ true,  'c', "chapter",		  "chapters"		   },
 	{ true,  's', "section",		  "sections"		   },
@@ -226,7 +226,7 @@ static void getScopeInfo(texKind kind, vString *const parentKind,
 /*
  *	 Tag generation functions
  */
-static kindOption *kindFromName (const char *kind_name)
+static kindDefinition *kindFromName (const char *kind_name)
 {
 	int i;
 
@@ -577,7 +577,7 @@ extern parserDefinition* TexParser (void)
 	/*
 	 * New definitions for parsing instead of regex
 	 */
-	def->kinds		= TexKinds;
+	def->kindTable	= TexKinds;
 	def->kindCount	= ARRAY_SIZE (TexKinds);
 	def->parser		= findTexTags;
 	def->initialize = initialize;

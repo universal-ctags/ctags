@@ -90,7 +90,7 @@ static roleDesc YamlAnchorRoles [] = {
 	{ true, "alias", "alias" },
 };
 
-static kindOption YamlKinds [] = {
+static kindDefinition YamlKinds [] = {
 	{ true,  'a', "anchor", "anchors",
 	  .referenceOnly = false, ATTACH_ROLES(YamlAnchorRoles) },
 };
@@ -160,12 +160,13 @@ extern parserDefinition* YamlParser (void)
 	static const char *const extensions [] = { "yml", NULL };
 	parserDefinition* const def = parserNew ("Yaml");
 
-	def->kinds = YamlKinds;
+	def->kindTable = YamlKinds;
 	def->extensions = extensions;
 	def->parser     = findYamlTags;
 	def->useCork    = true;
-	def->kinds         = YamlKinds;
+	def->kindTable         = YamlKinds;
 	def->kindCount     = ARRAY_SIZE (YamlKinds);
+	def->useMemoryStreamInput = true;
 
 	return def;
 }

@@ -51,7 +51,7 @@ static roleDesc Maven2ArtifactIdRoles [] = {
 	{ true, "dependency", "dependency" },
 };
 
-static kindOption Maven2Kinds [] = {
+static kindDefinition Maven2Kinds [] = {
 	{ true,  'g', "groupId",    "group identifiers",
 	  .referenceOnly = false, ATTACH_ROLES (Maven2GroupIdRoles) },
 	{ true,  'a', "artifactId", "artifact identifiers",
@@ -158,7 +158,7 @@ typedef enum {
 	F_VERSION,
 } maven2Field;
 
-static fieldSpec Maven2Fields [] = {
+static fieldDefinition Maven2Fields [] = {
 	{
 		.name = "version",
 		.description = "version of artifact",
@@ -259,7 +259,7 @@ Maven2Parser (void)
 		},
 	};
 
-	def->kinds         = Maven2Kinds;
+	def->kindTable         = Maven2Kinds;
 	def->kindCount     = ARRAY_SIZE (Maven2Kinds);
 	def->extensions    = extensions;
 	def->patterns      = patterns;
@@ -268,8 +268,8 @@ Maven2Parser (void)
 	def->tagXpathTableCount  = ARRAY_SIZE (maven2XpathTableTable);
 	def->useCork = true;
 	def->selectLanguage = selectors;
-	def->fieldSpecs = Maven2Fields;
-	def->fieldSpecCount = ARRAY_SIZE (Maven2Fields);
+	def->fieldDefinitions = Maven2Fields;
+	def->fieldDefinitionCount = ARRAY_SIZE (Maven2Fields);
 	def->xpathFileSpecs = xpathFileSpecs;
 	def->xpathFileSpecCount = ARRAY_SIZE (xpathFileSpecs);
 	return def;

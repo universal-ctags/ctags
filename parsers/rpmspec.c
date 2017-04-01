@@ -50,7 +50,7 @@ static scopeSeparator RpmSpecPackageSeparators [] = {
 	{ 'p'          , "-" },
 };
 
-static kindOption RpmSpecKinds[] = {
+static kindDefinition RpmSpecKinds[] = {
 	{ true, 't', "tag", "tags" },
 	{ true, 'm', "macro", "macros",
 	  .referenceOnly = false, ATTACH_ROLES(RpmSpecMacroRoles) },
@@ -187,7 +187,7 @@ extern parserDefinition* RpmSpecParser (void)
 {
 	static const char *const extensions [] = { "spec", NULL };
 	parserDefinition* const def = parserNew ("RpmSpec");
-	def->kinds = RpmSpecKinds;
+	def->kindTable = RpmSpecKinds;
 	def->kindCount = ARRAY_SIZE (RpmSpecKinds);
 	def->extensions = extensions;
 	def->initialize = initializeRpmSpecParser;

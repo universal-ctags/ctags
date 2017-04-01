@@ -271,12 +271,12 @@ typedef struct _CXXParserState
 	langType eCUDALangType;
 
 	// The kind options associated to the current language
-	kindOption * pKindOptions;
+	kindDefinition * pKindDefinitions;
 	// The number of kind options, used mainly for checking/debug purposes
-	unsigned int uKindOptionCount;
+	unsigned int uKindDefinitionCount;
 
 	// The fields associated to the current language
-	fieldSpec * pFieldOptions;
+	fieldDefinition * pFieldOptions;
 	// The number of field options, used mainly for checking/debug purposes
 	unsigned int uFieldOptionCount;
 

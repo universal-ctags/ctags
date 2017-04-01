@@ -79,9 +79,9 @@ typedef struct sCppState {
 	bool hasCxxRawLiteralStrings; /* supports R"xxx(...)xxx" strings */
 	bool hasSingleQuoteLiteralNumbers; /* supports vera number literals:
 						 'h..., 'o..., 'd..., and 'b... */
-	const kindOption  *defineMacroKind;
+	const kindDefinition  *defineMacroKind;
 	int macroUndefRoleIndex;
-	const kindOption  *headerKind;
+	const kindDefinition  *headerKind;
 	int headerSystemRoleIndex;
 	int headerLocalRoleIndex;
 
@@ -119,7 +119,7 @@ typedef enum {
 	CPREPRO_MACRO, CPREPRO_HEADER,
 } cPreProkind;
 
-static kindOption CPreProKinds [] = {
+static kindDefinition CPreProKinds [] = {
 	{ true,  'd', "macro",      "macro definitions",
 	  .referenceOnly = false, ATTACH_ROLES(CPREPROMacroRoles)},
 	{ true, 'h', "header",     "included header files",
@@ -196,9 +196,9 @@ extern unsigned int cppGetDirectiveNestLevel (void)
 extern void cppInit (const bool state, const bool hasAtLiteralStrings,
 		     const bool hasCxxRawLiteralStrings,
 		     const bool hasSingleQuoteLiteralNumbers,
-		     const kindOption *defineMacroKind,
+		     const kindDefinition *defineMacroKind,
 		     int macroUndefRoleIndex,
-		     const kindOption *headerKind,
+		     const kindDefinition *headerKind,
 		     int headerSystemRoleIndex, int headerLocalRoleIndex)
 {
 	BraceFormat = state;
@@ -1754,7 +1754,7 @@ static parameterHandlerTable CpreProParameterHandlerTable [] = {
 extern parserDefinition* CPreProParser (void)
 {
 	parserDefinition* const def = parserNew ("CPreProcessor");
-	def->kinds      = CPreProKinds;
+	def->kindTable      = CPreProKinds;
 	def->kindCount  = ARRAY_SIZE (CPreProKinds);
 	def->initialize = initializeCpp;
 	def->parser     = findCppTags;

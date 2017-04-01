@@ -54,7 +54,7 @@ typedef enum {
     K_NONE  /* No tag */
 } ttcnKind_t;
 
-static kindOption ttcnKinds [] = {
+static kindDefinition ttcnKinds [] = {
     { true, 'M', "module",    "module definition" },
     { true, 't', "type",      "type definition" },
     { true, 'c', "const",     "constant definition" },
@@ -975,7 +975,7 @@ extern parserDefinition * TTCNParser (void)
 {
     static const char * const extensions [] = { "ttcn", "ttcn3", NULL };
     parserDefinition * def = parserNew ("TTCN");
-    def->kinds      = ttcnKinds;
+    def->kindTable      = ttcnKinds;
     def->kindCount  = ARRAY_SIZE(ttcnKinds);
     def->extensions = extensions;
     def->parser     = parseTTCN;

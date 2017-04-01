@@ -40,7 +40,7 @@ static roleDesc ShScriptRoles [] = {
 	{ true, "loaded", "loaded" },
 };
 
-static kindOption ShKinds [] = {
+static kindDefinition ShKinds [] = {
 	{ true, 'a', "alias", "aliases"},
 	{ true, 'f', "function", "functions"},
 	{ true, 's', "script", "script files",
@@ -293,7 +293,7 @@ extern parserDefinition* ShParser (void)
 		NULL
 	};
 	parserDefinition* def = parserNew ("Sh");
-	def->kinds      = ShKinds;
+	def->kindTable      = ShKinds;
 	def->kindCount  = ARRAY_SIZE (ShKinds);
 	def->extensions = extensions;
 	def->aliases = aliases;

@@ -43,7 +43,7 @@ static roleDesc MakeMakefileRoles [] = {
 	{ true, "optional", "optionally included"},
 };
 
-static kindOption MakeKinds [] = {
+static kindDefinition MakeKinds [] = {
 	{ true, 'm', "macro",  "macros"},
 	{ true, 't', "target", "targets"},
 	{ true, 'I', "makefile", "makefiles",
@@ -106,7 +106,7 @@ static bool isSpecialTarget (vString *const name)
 	return true;
 }
 
-static void makeSimpleMakeTag (vString *const name, kindOption *MakeKinds, makeKind kind)
+static void makeSimpleMakeTag (vString *const name, kindDefinition *MakeKinds, makeKind kind)
 {
 	if (!isLanguageEnabled (getInputLanguage ()))
 		return;
@@ -114,7 +114,7 @@ static void makeSimpleMakeTag (vString *const name, kindOption *MakeKinds, makeK
 	makeSimpleTag (name, MakeKinds, kind);
 }
 
-static void makeSimpleMakeRefTag (const vString* const name, kindOption* const kinds, const int kind,
+static void makeSimpleMakeRefTag (const vString* const name, kindDefinition* const kinds, const int kind,
 				  int roleIndex)
 {
 	if (!isLanguageEnabled (getInputLanguage ()))
@@ -366,7 +366,7 @@ extern parserDefinition* MakefileParser (void)
 	static const char *const patterns [] = { "[Mm]akefile", "GNUmakefile", NULL };
 	static const char *const extensions [] = { "mak", "mk", NULL };
 	parserDefinition* const def = parserNew ("Make");
-	def->kinds      = MakeKinds;
+	def->kindTable      = MakeKinds;
 	def->kindCount  = ARRAY_SIZE (MakeKinds);
 	def->patterns   = patterns;
 	def->extensions = extensions;

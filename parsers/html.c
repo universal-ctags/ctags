@@ -29,7 +29,7 @@ typedef enum {
 } htmlKind;
 
 
-static kindOption HtmlKinds [] = {
+static kindDefinition HtmlKinds [] = {
 	{ true, 'a', "anchor",		"named anchors" },
 	{ true, 'h', "heading1",	"H1 headings" },
 	{ true, 'i', "heading2",	"H2 headings" },
@@ -397,7 +397,7 @@ extern parserDefinition* HtmlParser (void)
 {
 	static const char *const extensions [] = { "htm", "html", NULL };
 	parserDefinition* def = parserNew ("HTML");
-	def->kinds        = HtmlKinds;
+	def->kindTable        = HtmlKinds;
 	def->kindCount    = ARRAY_SIZE (HtmlKinds);
 	def->extensions   = extensions;
 	def->parser       = findHtmlTags;

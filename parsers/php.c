@@ -121,7 +121,7 @@ static scopeSeparator PhpGenericSeparators [] = {
 	{ KIND_WILDCARD, "::" },
 };
 
-static kindOption PhpKinds[COUNT_KIND] = {
+static kindDefinition PhpKinds[COUNT_KIND] = {
 	{ true, 'c', "class",		"classes",
 	  ATTACH_SEPARATORS(PhpGenericSeparators) },
 	{ true, 'd', "define",		"constant definitions",
@@ -1697,7 +1697,7 @@ extern parserDefinition* PhpParser (void)
 {
 	static const char *const extensions [] = { "php", "php3", "php4", "php5", "php7", "phtml", NULL };
 	parserDefinition* def = parserNew ("PHP");
-	def->kinds      = PhpKinds;
+	def->kindTable      = PhpKinds;
 	def->kindCount  = ARRAY_SIZE (PhpKinds);
 	def->extensions = extensions;
 	def->parser     = findPhpTags;
@@ -1712,7 +1712,7 @@ extern parserDefinition* ZephirParser (void)
 {
 	static const char *const extensions [] = { "zep", NULL };
 	parserDefinition* def = parserNew ("Zephir");
-	def->kinds      = PhpKinds;
+	def->kindTable      = PhpKinds;
 	def->kindCount  = ARRAY_SIZE (PhpKinds);
 	def->extensions = extensions;
 	def->parser     = findZephirTags;

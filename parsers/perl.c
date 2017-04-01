@@ -41,7 +41,7 @@ typedef enum {
 	K_SUBROUTINE_DECLARATION
 } perlKind;
 
-static kindOption PerlKinds [] = {
+static kindDefinition PerlKinds [] = {
 	{ true,  'c', "constant",               "constants" },
 	{ true,  'f', "format",                 "formats" },
 	{ true,  'l', "label",                  "labels" },
@@ -547,7 +547,7 @@ extern parserDefinition* PerlParser (void)
 	static selectLanguage selectors [] = { selectByPickingPerlVersion,
 					       NULL };
 	parserDefinition* def = parserNew ("Perl");
-	def->kinds      = PerlKinds;
+	def->kindTable      = PerlKinds;
 	def->kindCount  = ARRAY_SIZE (PerlKinds);
 	def->extensions = extensions;
 	def->parser     = findPerlTags;

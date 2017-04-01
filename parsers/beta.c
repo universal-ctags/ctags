@@ -35,7 +35,7 @@ typedef enum {
 	K_FRAGMENT, K_PATTERN, K_SLOT, K_VIRTUAL
 } betaKind;
 
-static kindOption BetaKinds [] = {
+static kindDefinition BetaKinds [] = {
 	{ true,  'f', "fragment", "fragment definitions"},
 	{ false, 'p', "pattern",  "all patterns"},
 	{ true,  's', "slot",     "slots (fragment uses)"},
@@ -305,7 +305,7 @@ extern parserDefinition* BetaParser (void)
 {
 	static const char *const extensions [] = { "bet", NULL };
 	parserDefinition* def = parserNew ("BETA");
-	def->kinds      = BetaKinds;
+	def->kindTable      = BetaKinds;
 	def->kindCount  = ARRAY_SIZE (BetaKinds);
 	def->extensions = extensions;
 	def->parser     = findBetaTags;

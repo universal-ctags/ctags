@@ -19,7 +19,7 @@ typedef enum {
 	K_KEY
 } javaPropertiesKind;
 
-static kindOption JavaPropertiesKinds [] = {
+static kindDefinition JavaPropertiesKinds [] = {
 	{ true, 'k', "key", "keys" },
 };
 
@@ -118,7 +118,7 @@ JavaPropertiesParser (void)
 	static const char *const extensions [] = { "properties", NULL };
 	parserDefinition* const def = parserNew ("JavaProperties");
 
-	def->kinds = JavaPropertiesKinds;
+	def->kindTable = JavaPropertiesKinds;
 	def->kindCount = ARRAY_SIZE (JavaPropertiesKinds);
 	def->extensions = extensions;
 	def->parser = findJavaPropertiesTags;

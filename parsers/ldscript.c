@@ -49,7 +49,7 @@ typedef enum {
 	K_INPUT_SECTION,
 } ldScriptKind;
 
-static kindOption LdScriptKinds [] = {
+static kindDefinition LdScriptKinds [] = {
 	{ true, 'S', "section", "sections" },
 	{ true, 's', "symbol",  "symbols",
 	  .referenceOnly = false, ATTACH_ROLES(LdScriptSymbolRoles)},
@@ -138,7 +138,7 @@ typedef enum {
 	COUNT_FIELD
 } ldScriptFied;
 
-static fieldSpec LdScriptFields[COUNT_FIELD] = {
+static fieldDefinition LdScriptFields[COUNT_FIELD] = {
 	{ .name = "assignment",
 	  .description = "how a value is assigned to the symbol",
 	  .enabled = true },
@@ -729,7 +729,7 @@ extern parserDefinition* LdScriptParser (void)
 	def->initialize = initialize;
 	def->parser     = findLdScriptTags;
 
-	def->kinds      = LdScriptKinds;
+	def->kindTable      = LdScriptKinds;
 	def->kindCount  = ARRAY_SIZE (LdScriptKinds);
 	def->extensions = extensions;
 	def->patterns   = patterns;
@@ -737,8 +737,8 @@ extern parserDefinition* LdScriptParser (void)
 	def->keywordTable = LdScriptKeywordTable;
 	def->keywordCount = ARRAY_SIZE (LdScriptKeywordTable);
 	def->initialize = initialize;
-	def->fieldSpecs = LdScriptFields;
-	def->fieldSpecCount = ARRAY_SIZE (LdScriptFields);
+	def->fieldDefinitions = LdScriptFields;
+	def->fieldDefinitionCount = ARRAY_SIZE (LdScriptFields);
 
 	def->useCork    = true;
 

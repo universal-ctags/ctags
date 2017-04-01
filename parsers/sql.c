@@ -213,7 +213,7 @@ typedef enum {
 	SQLTAG_COUNT
 } sqlKind;
 
-static kindOption SqlKinds [] = {
+static kindDefinition SqlKinds [] = {
 	{ true,  'c', "cursor",		  "cursors"				   },
 	{ false, 'd', "prototype",	  "prototypes"			   },
 	{ true,  'f', "function",	  "functions"			   },
@@ -2479,8 +2479,9 @@ static void findSqlTags (void)
 extern parserDefinition* SqlParser (void)
 {
 	static const char *const extensions [] = { "sql", NULL };
-	parserDefinition* def = parserNewFull ("SQL", KIND_FILE_ALT);
-	def->kinds		= SqlKinds;
+	parserDefinition* def = parserNew ("SQL");
+	def->fileKindLetter = KIND_FILE_ALT;
+	def->kindTable	= SqlKinds;
 	def->kindCount	= ARRAY_SIZE (SqlKinds);
 	def->extensions = extensions;
 	def->parser		= findSqlTags;

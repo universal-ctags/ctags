@@ -92,7 +92,7 @@ static int Ungetc;
 static int Lang_verilog;
 static int Lang_systemverilog;
 
-static kindOption VerilogKinds [] = {
+static kindDefinition VerilogKinds [] = {
  { true, 'c', "constant",  "constants (define, parameter, specparam)" },
  { true, 'e', "event",     "events" },
  { true, 'f', "function",  "functions" },
@@ -104,7 +104,7 @@ static kindOption VerilogKinds [] = {
  { true, 'b', "block",     "blocks" }
 };
 
-static kindOption SystemVerilogKinds [] = {
+static kindDefinition SystemVerilogKinds [] = {
  { true, 'c', "constant",  "constants (define, parameter, specparam)" },
  { true, 'e', "event",     "events" },
  { true, 'f', "function",  "functions" },
@@ -312,7 +312,7 @@ static void pruneTokens (tokenInfo * token)
 	while ((token = popToken (token)));
 }
 
-static const kindOption *kindFromKind (const verilogKind kind)
+static const kindDefinition *kindFromKind (const verilogKind kind)
 {
 	if (isInputLanguage (Lang_systemverilog))
 		return &(SystemVerilogKinds[kind]);
@@ -1156,7 +1156,7 @@ extern parserDefinition* VerilogParser (void)
 {
 	static const char *const extensions [] = { "v", NULL };
 	parserDefinition* def = parserNew ("Verilog");
-	def->kinds      = VerilogKinds;
+	def->kindTable      = VerilogKinds;
 	def->kindCount  = ARRAY_SIZE (VerilogKinds);
 	def->extensions = extensions;
 	def->parser     = findVerilogTags;
@@ -1168,7 +1168,7 @@ extern parserDefinition* SystemVerilogParser (void)
 {
 	static const char *const extensions [] = { "sv", "svh", "svi", NULL };
 	parserDefinition* def = parserNew ("SystemVerilog");
-	def->kinds      = SystemVerilogKinds;
+	def->kindTable      = SystemVerilogKinds;
 	def->kindCount  = ARRAY_SIZE (SystemVerilogKinds);
 	def->extensions = extensions;
 	def->parser     = findVerilogTags;

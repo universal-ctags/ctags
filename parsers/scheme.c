@@ -27,7 +27,7 @@ typedef enum {
 	K_FUNCTION, K_SET
 } schemeKind;
 
-static kindOption SchemeKinds [] = {
+static kindDefinition SchemeKinds [] = {
 	{ true, 'f', "function", "functions" },
 	{ true, 's', "set",      "sets" }
 };
@@ -117,7 +117,7 @@ extern parserDefinition* SchemeParser (void)
 		"gosh", "guile", NULL
 	};
 	parserDefinition* def = parserNew ("Scheme");
-	def->kinds      = SchemeKinds;
+	def->kindTable      = SchemeKinds;
 	def->kindCount  = ARRAY_SIZE (SchemeKinds);
 	def->extensions = extensions;
 	def->aliases    = aliases;

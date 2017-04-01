@@ -39,7 +39,7 @@ typedef enum {
 	K_MACRO
 } objcKind;
 
-static kindOption ObjcKinds[] = {
+static kindDefinition ObjcKinds[] = {
 	{true, 'i', "interface", "class interface"},
 	{true, 'I', "implementation", "class implementation"},
 	{true, 'P', "protocol", "Protocol"},
@@ -1116,8 +1116,9 @@ extern parserDefinition *ObjcParser (void)
 	static selectLanguage selectors[] = { selectByObjectiveCAndMatLabKeywords,
 					      selectByObjectiveCKeywords,
 					      NULL };
-	parserDefinition *def = parserNewFull ("ObjectiveC", KIND_FILE_ALT);
-	def->kinds = ObjcKinds;
+	parserDefinition *def = parserNew ("ObjectiveC");
+	def->fileKindLetter = KIND_FILE_ALT;
+	def->kindTable = ObjcKinds;
 	def->kindCount = ARRAY_SIZE (ObjcKinds);
 	def->extensions = extensions;
 	def->aliases = aliases;

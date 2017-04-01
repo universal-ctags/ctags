@@ -30,7 +30,7 @@ typedef enum {
 	K_REPO_ID,
 } yumRepoKind;
 
-static kindOption YumRepoKinds [] = {
+static kindDefinition YumRepoKinds [] = {
 	{ true, 'r', "repoid", "repository id" },
 };
 
@@ -69,7 +69,7 @@ extern parserDefinition* YumRepoParser (void)
 
 	def->dependencies = dependencies;
 	def->dependencyCount = ARRAY_SIZE(dependencies);
-	def->kinds      = YumRepoKinds;
+	def->kindTable      = YumRepoKinds;
 	def->kindCount  = ARRAY_SIZE (YumRepoKinds);
 	def->extensions = extensions;
 	def->parser     = findYumRepoTags;

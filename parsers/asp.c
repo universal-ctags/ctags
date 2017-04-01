@@ -27,7 +27,7 @@ typedef enum {
 	K_CONST, K_CLASS, K_FUNCTION, K_SUB, K_DIM
 } aspKind;
 
-static kindOption AspKinds [] = {
+static kindDefinition AspKinds [] = {
 	{ true, 'd', "constant",   "constants"},
 	{ true, 'c', "class",      "classes"}, 
 	{ true, 'f', "function",   "functions"},
@@ -305,7 +305,7 @@ extern parserDefinition* AspParser (void)
 {
 	static const char *const extensions [] = { "asp", "asa", NULL };
 	parserDefinition* def = parserNew ("Asp");
-	def->kinds      = AspKinds;
+	def->kindTable      = AspKinds;
 	def->kindCount  = ARRAY_SIZE (AspKinds);
 	def->extensions = extensions;
 	def->parser     = findAspTags;

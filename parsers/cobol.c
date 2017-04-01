@@ -32,7 +32,7 @@ static roleDesc CobolSourcefileRoles [] = {
 	{ true, "copyed", "copyed in source file" },
 };
 
-static kindOption CobolKinds[] = {
+static kindDefinition CobolKinds[] = {
 	{ true, 'p', "paragraph", "paragraphs" },
 	{ true, 'd', "data", "data items"      },
 	{ true, 'S', "sourcefile", "source code file",
@@ -156,7 +156,7 @@ extern parserDefinition* CobolParser (void)
 	def->tagRegexTable = cobolTagRegexTable;
 	def->tagRegexCount = ARRAY_SIZE (cobolTagRegexTable);
 	def->method     = METHOD_NOT_CRAFTED|METHOD_REGEX;
-	def->kinds = CobolKinds;
+	def->kindTable = CobolKinds;
 	def->kindCount = ARRAY_SIZE(CobolKinds);
 	def->keywordTable = cobolKeywordTable;
 	def->keywordCount = ARRAY_SIZE(cobolKeywordTable);

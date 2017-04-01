@@ -28,7 +28,7 @@ typedef enum {
 	K_FUNCTION, K_PROCEDURE
 } pascalKind;
 
-static kindOption PascalKinds [] = {
+static kindDefinition PascalKinds [] = {
 	{ true, 'f', "function",  "functions"},
 	{ true, 'p', "procedure", "procedures"}
 };
@@ -254,7 +254,7 @@ extern parserDefinition* PascalParser (void)
 	static const char *const extensions [] = { "p", "pas", NULL };
 	parserDefinition* def = parserNew ("Pascal");
 	def->extensions = extensions;
-	def->kinds      = PascalKinds;
+	def->kindTable      = PascalKinds;
 	def->kindCount  = ARRAY_SIZE (PascalKinds);
 	def->parser     = findPascalTags;
 	return def;

@@ -181,7 +181,7 @@ typedef enum {
 	VHDLTAG_LOCAL
 } vhdlKind;
 
-static kindOption VhdlKinds[] = {
+static kindDefinition VhdlKinds[] = {
 	{true, 'c', "constant", "constant declarations"},
 	{true, 't', "type", "type definitions"},
 	{true, 'T', "subtype", "subtype definitions"},
@@ -804,7 +804,7 @@ extern parserDefinition *VhdlParser (void)
 {
 	static const char *const extensions[] = { "vhdl", "vhd", NULL };
 	parserDefinition *def = parserNew ("VHDL");
-	def->kinds = VhdlKinds;
+	def->kindTable = VhdlKinds;
 	def->kindCount = ARRAY_SIZE (VhdlKinds);
 	def->extensions = extensions;
 	def->parser = findVhdlTags;

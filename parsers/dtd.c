@@ -58,7 +58,7 @@ typedef enum {
 	K_NOTATION,
 } dtdKind;
 
-static kindOption DtdKinds [] = {
+static kindDefinition DtdKinds [] = {
 	{ true, 'E', "entity",    "entities" },
 	{ true, 'p', "parameterEntity", "parameter entities",
 	  .referenceOnly = false, ATTACH_ROLES(DtdEntityRoles),
@@ -612,7 +612,7 @@ extern parserDefinition* DtdParser (void)
 	def->initialize = initialize;
 	def->parser     = findDtdTags;
 
-	def->kinds      = DtdKinds;
+	def->kindTable      = DtdKinds;
 	def->kindCount  = ARRAY_SIZE (DtdKinds);
 	def->extensions = extensions;
 

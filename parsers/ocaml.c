@@ -37,7 +37,7 @@ typedef enum {
 	K_BEGIN_END,		/* ??? */
 } ocamlKind;
 
-static kindOption OcamlKinds[] = {
+static kindDefinition OcamlKinds[] = {
 	{true, 'c', "class", "classes"},
 	{true, 'm', "method", "Object's method"},
 	{true, 'M', "module", "Module or functor"},
@@ -561,7 +561,7 @@ static int getLastNamedIndex ( void )
 	return -1;
 }
 
-static const kindOption* contextDescription (contextType t)
+static const kindDefinition* contextDescription (contextType t)
 {
 	switch (t)
 	{
@@ -1880,7 +1880,7 @@ extern parserDefinition *OcamlParser (void)
 					       "caml",	 /* mode name of emacs */
 					       NULL };
 	parserDefinition *def = parserNew ("OCaml");
-	def->kinds = OcamlKinds;
+	def->kindTable = OcamlKinds;
 	def->kindCount = ARRAY_SIZE (OcamlKinds);
 	def->extensions = extensions;
 	def->aliases = aliases;

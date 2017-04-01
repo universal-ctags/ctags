@@ -23,7 +23,7 @@ typedef enum {
 	K_NAMED_PATTERN,
 } relaxngKind;
 
-static kindOption RelaxNGKinds [] = {
+static kindDefinition RelaxNGKinds [] = {
 	{ true,  'e', "element",     "elements"       },
 	{ true,  'a', "attribute",   "attributes"     },
 	{ true,  'n', "namedPattern", "named patterns" },
@@ -227,7 +227,7 @@ RelaxNGParser (void)
 	parserDefinition* const def = parserNew ("RelaxNG");
 	/* static selectLanguage selectors[] = { selectByDTD, NULL }; */
 
-	def->kinds         = RelaxNGKinds;
+	def->kindTable         = RelaxNGKinds;
 	def->kindCount     = ARRAY_SIZE (RelaxNGKinds);
 	def->extensions    = extensions;
 	def->parser        = findRelaxNGTags;

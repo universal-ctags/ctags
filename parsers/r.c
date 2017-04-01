@@ -35,7 +35,7 @@ typedef enum {
 	KIND_COUNT
 } rKind;
 
-static kindOption RKinds[KIND_COUNT] = {
+static kindDefinition RKinds[KIND_COUNT] = {
 	{true, 'f', "function", "functions"},
 	{true, 'l', "library", "libraries"},
 	{true, 's', "source", "sources"},
@@ -206,7 +206,7 @@ extern parserDefinition *RParser (void)
 	static selectLanguage selectors[] = { selectByArrowOfR,
 					      NULL };
 	def->extensions = extensions;
-	def->kinds = RKinds;
+	def->kindTable = RKinds;
 	def->kindCount = KIND_COUNT;
 	def->parser = createRTags;
 	def->selectLanguage = selectors;

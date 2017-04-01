@@ -172,7 +172,7 @@ static void addCommonPseudoTags (void)
 extern void makeFileTag (const char *const fileName)
 {
 	tagEntryInfo tag;
-	kindOption  *kind;
+	kindDefinition  *kind;
 
 	if (!isXtagEnabled(XTAG_FILE_NAMES))
 		return;
@@ -720,7 +720,7 @@ extern void truncateTagLineAfterTag (
 static char* getFullQualifiedScopeNameFromCorkQueue (const tagEntryInfo * inner_scope)
 {
 
-	const kindOption *kind = NULL;
+	const kindDefinition *kind = NULL;
 	const tagEntryInfo *scope = inner_scope;
 	stringList *queue = stringListNew ();
 	vString *v;
@@ -1237,7 +1237,7 @@ extern int makeQualifiedTagEntry (const tagEntryInfo *const e)
 }
 
 extern void initTagEntry (tagEntryInfo *const e, const char *const name,
-			  const kindOption *kind)
+			  const kindDefinition *kind)
 {
 	initTagEntryFull(e, name,
 			 getInputLineNumber (),
@@ -1252,7 +1252,7 @@ extern void initTagEntry (tagEntryInfo *const e, const char *const name,
 }
 
 extern void initRefTagEntry (tagEntryInfo *const e, const char *const name,
-			     const kindOption *kind, int roleIndex)
+			     const kindDefinition *kind, int roleIndex)
 {
 	initTagEntryFull(e, name,
 			 getInputLineNumber (),
@@ -1271,7 +1271,7 @@ extern void initTagEntryFull (tagEntryInfo *const e, const char *const name,
 			      const char* language,
 			      MIOPos      filePosition,
 			      const char *inputFileName,
-			      const kindOption *kind,
+			      const kindDefinition *kind,
 			      int roleIndex,
 			      const char *sourceFileName,
 			      const char* sourceLanguage,

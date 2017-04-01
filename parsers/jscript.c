@@ -189,7 +189,7 @@ typedef enum {
 	JSTAG_COUNT
 } jsKind;
 
-static kindOption JsKinds [] = {
+static kindDefinition JsKinds [] = {
 	{ true,  'f', "function",	  "functions"		   },
 	{ true,  'c', "class",		  "classes"			   },
 	{ true,  'm', "method",		  "methods"			   },
@@ -1397,7 +1397,7 @@ static bool parseMethods (tokenInfo *const token, const tokenInfo *const class,
 
 cleanUp:
 	deleteToken (name);
-	
+
 	JSCRIPT_DEBUG_LEAVE();
 
 	return has_methods;
@@ -2064,7 +2064,7 @@ static void parseUI5 (tokenInfo *const token)
 	 *         }
 	 *     }
 	 *
-	 * Handle the parsing of the initial controller (and the 
+	 * Handle the parsing of the initial controller (and the
 	 * same for "view") and then allow the methods to be
 	 * parsed as usual.
 	 */
@@ -2175,7 +2175,7 @@ static bool parseLine (tokenInfo *const token, tokenInfo *const parent, bool is_
 static void parseJsFile (tokenInfo *const token)
 {
 	JSCRIPT_DEBUG_ENTER();
-	
+
 	do
 	{
 		readToken (token);
@@ -2239,7 +2239,7 @@ extern parserDefinition* JavaScriptParser (void)
 	/*
 	 * New definitions for parsing instead of regex
 	 */
-	def->kinds		= JsKinds;
+	def->kindTable	= JsKinds;
 	def->kindCount	= ARRAY_SIZE (JsKinds);
 	def->parser		= findJsTags;
 	def->initialize = initialize;

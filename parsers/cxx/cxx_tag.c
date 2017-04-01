@@ -59,14 +59,14 @@ CXX_COMMON_HEADER_ROLES(CUDA);
 	{ false, 'z', "parameter",  "function parameters inside function definitions", .syncWith = _syncWith }, \
 	{ false, 'L', "label",      "goto labels", .syncWith = _syncWith }
 
-static kindOption g_aCXXCKinds [] = {
+static kindDefinition g_aCXXCKinds [] = {
 	/* All other than LANG_AUTO are ignored.
 	   LANG_IGNORE is specified as a just placeholder for the macro,
 	   and is not needed. */
 	CXX_COMMON_KINDS(C,"struct, and union members", LANG_IGNORE)
 };
 
-static kindOption g_aCXXCPPKinds [] = {
+static kindDefinition g_aCXXCPPKinds [] = {
 	CXX_COMMON_KINDS(CXX,"class, struct, and union members", LANG_AUTO),
 	{ true,  'c', "class",      "classes" },
 	{ true,  'n', "namespace",  "namespaces" },
@@ -76,7 +76,7 @@ static kindOption g_aCXXCPPKinds [] = {
 			.referenceOnly = true },
 };
 
-static kindOption g_aCXXCUDAKinds [] = {
+static kindDefinition g_aCXXCUDAKinds [] = {
 	CXX_COMMON_KINDS(CUDA,"struct, and union members", LANG_IGNORE)
 };
 
@@ -94,11 +94,11 @@ static const char * g_aCXXAccessStrings [] = {
 		.enabled = false \
 	}
 
-static fieldSpec g_aCXXCFields [] = {
+static fieldDefinition g_aCXXCFields [] = {
 	CXX_COMMON_FIELDS
 };
 
-static fieldSpec g_aCXXCPPFields [] = {
+static fieldDefinition g_aCXXCPPFields [] = {
 	CXX_COMMON_FIELDS,
 	{
 		.name = "template",
@@ -117,7 +117,7 @@ static fieldSpec g_aCXXCPPFields [] = {
 	}
 };
 
-static fieldSpec g_aCXXCUDAFields [] = {
+static fieldDefinition g_aCXXCUDAFields [] = {
 	CXX_COMMON_FIELDS
 };
 
@@ -128,96 +128,96 @@ void cxxTagInitForLanguage(langType eLangType)
 	if(g_cxx.eLangType == g_cxx.eCLangType)
 	{
 		g_cxx.eLanguage = CXXLanguageC;
-		g_cxx.pKindOptions = g_aCXXCKinds;
-		g_cxx.uKindOptionCount = sizeof(g_aCXXCKinds) / sizeof(kindOption);
+		g_cxx.pKindDefinitions = g_aCXXCKinds;
+		g_cxx.uKindDefinitionCount = sizeof(g_aCXXCKinds) / sizeof(kindDefinition);
 		g_cxx.pFieldOptions = g_aCXXCFields;
-		g_cxx.uFieldOptionCount = sizeof(g_aCXXCFields) / sizeof(fieldSpec);
+		g_cxx.uFieldOptionCount = sizeof(g_aCXXCFields) / sizeof(fieldDefinition);
 	} else if(g_cxx.eLangType == g_cxx.eCPPLangType)
 	{
 		g_cxx.eLanguage = CXXLanguageCPP;
-		g_cxx.pKindOptions = g_aCXXCPPKinds;
-		g_cxx.uKindOptionCount = sizeof(g_aCXXCPPKinds) / sizeof(kindOption);
+		g_cxx.pKindDefinitions = g_aCXXCPPKinds;
+		g_cxx.uKindDefinitionCount = sizeof(g_aCXXCPPKinds) / sizeof(kindDefinition);
 		g_cxx.pFieldOptions = g_aCXXCPPFields;
-		g_cxx.uFieldOptionCount = sizeof(g_aCXXCPPFields) / sizeof(fieldSpec);
+		g_cxx.uFieldOptionCount = sizeof(g_aCXXCPPFields) / sizeof(fieldDefinition);
 	} else if(g_cxx.eLangType == g_cxx.eCUDALangType)
 	{
 		g_cxx.eLanguage = CXXLanguageCUDA;
-		g_cxx.pKindOptions = g_aCXXCUDAKinds;
-		g_cxx.uKindOptionCount = sizeof(g_aCXXCUDAKinds) / sizeof(kindOption);
+		g_cxx.pKindDefinitions = g_aCXXCUDAKinds;
+		g_cxx.uKindDefinitionCount = sizeof(g_aCXXCUDAKinds) / sizeof(kindDefinition);
 		g_cxx.pFieldOptions = g_aCXXCUDAFields;
-		g_cxx.uFieldOptionCount = sizeof(g_aCXXCUDAFields) / sizeof(fieldSpec);
+		g_cxx.uFieldOptionCount = sizeof(g_aCXXCUDAFields) / sizeof(fieldDefinition);
 	} else {
 		CXX_DEBUG_ASSERT(false,"Invalid language passed to cxxTagInitForLanguage()");
 	}
 }
 
-kindOption * cxxTagGetCKindOptions(void)
+kindDefinition * cxxTagGetCKindDefinitions(void)
 {
 	return g_aCXXCKinds;
 }
 
-int cxxTagGetCKindOptionCount(void)
+int cxxTagGetCKindDefinitionCount(void)
 {
-	return sizeof(g_aCXXCKinds) / sizeof(kindOption);
+	return sizeof(g_aCXXCKinds) / sizeof(kindDefinition);
 }
 
-kindOption * cxxTagGetCUDAKindOptions(void)
+kindDefinition * cxxTagGetCUDAKindDefinitions(void)
 {
 	return g_aCXXCUDAKinds;
 }
 
-int cxxTagGetCUDAKindOptionCount(void)
+int cxxTagGetCUDAKindDefinitionCount(void)
 {
-	return sizeof(g_aCXXCUDAKinds) / sizeof(kindOption);
+	return sizeof(g_aCXXCUDAKinds) / sizeof(kindDefinition);
 }
 
-kindOption * cxxTagGetCPPKindOptions(void)
+kindDefinition * cxxTagGetCPPKindDefinitions(void)
 {
 	return g_aCXXCPPKinds;
 }
 
-int cxxTagGetCPPKindOptionCount(void)
+int cxxTagGetCPPKindDefinitionCount(void)
 {
-	return sizeof(g_aCXXCPPKinds) / sizeof(kindOption);
+	return sizeof(g_aCXXCPPKinds) / sizeof(kindDefinition);
 }
 
 bool cxxTagKindEnabled(unsigned int uKind)
 {
 	CXX_DEBUG_ASSERT(
-			uKind < g_cxx.uKindOptionCount,
+			uKind < g_cxx.uKindDefinitionCount,
 			"The kind must be associated to the current language!"
 		);
-	return g_cxx.pKindOptions[uKind].enabled;
+	return g_cxx.pKindDefinitions[uKind].enabled;
 }
 
-fieldSpec * cxxTagGetCPPFieldSpecifiers(void)
+fieldDefinition * cxxTagGetCPPFieldDefinitionifiers(void)
 {
 	return g_aCXXCPPFields;
 }
 
-int cxxTagGetCPPFieldSpecifierCount(void)
+int cxxTagGetCPPFieldDefinitionifierCount(void)
 {
-	return sizeof(g_aCXXCPPFields) / sizeof(fieldSpec);
+	return sizeof(g_aCXXCPPFields) / sizeof(fieldDefinition);
 }
 
-fieldSpec * cxxTagGetCUDAFieldSpecifiers(void)
+fieldDefinition * cxxTagGetCUDAFieldDefinitionifiers(void)
 {
 	return g_aCXXCUDAFields;
 }
 
-int cxxTagGetCUDAFieldSpecifierCount(void)
+int cxxTagGetCUDAFieldDefinitionifierCount(void)
 {
-	return sizeof(g_aCXXCUDAFields) / sizeof(fieldSpec);
+	return sizeof(g_aCXXCUDAFields) / sizeof(fieldDefinition);
 }
 
-fieldSpec * cxxTagGetCFieldSpecifiers(void)
+fieldDefinition * cxxTagGetCFieldDefinitionifiers(void)
 {
 	return g_aCXXCFields;
 }
 
-int cxxTagGetCFieldSpecifierCount(void)
+int cxxTagGetCFieldDefinitionifierCount(void)
 {
-	return sizeof(g_aCXXCFields) / sizeof(fieldSpec);
+	return sizeof(g_aCXXCFields) / sizeof(fieldDefinition);
 }
 
 bool cxxTagFieldEnabled(unsigned int uField)
@@ -235,9 +235,9 @@ static tagEntryInfo g_oCXXTag;
 
 tagEntryInfo * cxxTagBegin(unsigned int uKind,CXXToken * pToken)
 {
-	kindOption * pKindOptions = g_cxx.pKindOptions;
+	kindDefinition * pKindDefinitions = g_cxx.pKindDefinitions;
 
-	if(!pKindOptions[uKind].enabled)
+	if(!pKindDefinitions[uKind].enabled)
 	{
 		//CXX_DEBUG_PRINT("Tag kind %s is not enabled",g_aCXXKinds[eKind].name);
 		return NULL;
@@ -246,7 +246,7 @@ tagEntryInfo * cxxTagBegin(unsigned int uKind,CXXToken * pToken)
 	initTagEntry(
 			&g_oCXXTag,
 			vStringValue(pToken->pszWord),
-			pKindOptions + uKind
+			pKindDefinitions + uKind
 		);
 
 	g_oCXXTag.lineNumber = pToken->iLineNumber;
@@ -255,7 +255,7 @@ tagEntryInfo * cxxTagBegin(unsigned int uKind,CXXToken * pToken)
 
 	if(!cxxScopeIsGlobal())
 	{
-		g_oCXXTag.extensionFields.scopeKind = &(g_cxx.pKindOptions[cxxScopeGetKind()]);
+		g_oCXXTag.extensionFields.scopeKind = &(g_cxx.pKindDefinitions[cxxScopeGetKind()]);
 		g_oCXXTag.extensionFields.scopeName = cxxScopeGetFullName();
 	}
 

@@ -24,7 +24,7 @@ typedef enum {
 
 static RobotKind section = -1;
 
-static kindOption RobotKinds[COUNT_KIND] = {
+static kindDefinition RobotKinds[COUNT_KIND] = {
 	{true, 't', "testcase",   "testcases"},
 	{true, 'k', "keyword",    "keywords"},
 	{true, 'v', "variable",   "variables"},
@@ -34,7 +34,7 @@ typedef enum {
 	X_WHITESPACE_SWAPPED,
 } robotXtag;
 
-static xtagSpec RobotXtags [] = {
+static xtagDefinition RobotXtags [] = {
 	{
 		.enabled = true,
 		.name = "whitespaceSwapped",
@@ -133,12 +133,12 @@ extern parserDefinition* RobotParser (void)
 {
 	static const char *const extensions[] = { "robot", NULL };
 	parserDefinition *def = parserNew ("Robot");
-    def->kinds      = RobotKinds;
+    def->kindTable      = RobotKinds;
     def->kindCount  = COUNT_KIND;
 	def->extensions = extensions;
 	def->initialize = initialize;
     def->parser     = findRobotTags;
-	def->xtagSpecs = RobotXtags;
-	def->xtagSpecCount = ARRAY_SIZE (RobotXtags);
+	def->xtagDefinitions = RobotXtags;
+	def->xtagDefinitionCount = ARRAY_SIZE (RobotXtags);
 	return def;
 }
