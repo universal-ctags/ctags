@@ -42,9 +42,16 @@ my $options =
 	   parse_optlib ($1, $_[0]);
        } ],
      [ qr/^--langdef=(.*)/, sub {
-	   die "LANG is alrady defined as $_[0]->{'langdef'}: $1"
+	   die "LANG is already defined as $_[0]->{'langdef'}: $1"
 	       if (defined $_[0]->{'langdef'});
 	   $_[0]->{'langdef'} = $1;
+       } ],
+     [ qr/^--kinddef-(.*)=([^,]),([^,]+),(.*)/, sub {
+	 die "Don't use --kinddef-<LANG>=+ optoin before defining a language"
+	     if (! defined $_[0]->{'langdef'});
+	 die "Adding a kind is allowed only to the language specified with --langdef: $1"
+	   unless ($_[0]->{'langdef'} eq $1);
+	 push @{$_[0]->{'kinddefs'}}, { letter => $2, name => $3, desc => $4 };
        } ],
      [ qr/^--languages=-(.*)/, sub {
 	   die "Don't use --languages=- optoin before defining a language"
@@ -319,6 +326,24 @@ sub emit_patterns {
     emit_list $_[0], "patterns";
 }
 
+sub emit_kinddefs {
+    my $opts = shift;
+
+    return if (! @{$opts->{'kinddefs'}});
+
+    print <<EOF;
+	static kindDefinition $opts->{'Clangdef'}KindTable [] = {
+EOF
+    for (@{$opts->{'kinddefs'}}) {
+      print <<EOF;
+		{ true, \'$_->{'letter'}\', "$_->{'name'}", "$_->{'desc'}" },
+EOF
+    }
+    print <<EOF;
+	};
+EOF
+}
+
 sub emit_regexs {
     my $opts = shift;
 
@@ -362,6 +387,13 @@ sub emit_fields_initialization {
 	def->method        = ${method};
 EOF
 
+    if (@{$opts->{'kinddefs'}}) {
+	print <<EOF;
+	def->kindTable = $opts->{'Clangdef'}KindTable;
+	def->kindCount = ARRAY_SIZE($opts->{'Clangdef'}KindTable);
+EOF
+    }
+
     if (@{$opts->{'regexs'}}) {
 	print <<EOF;
 	def->tagRegexTable = $opts->{'Clangdef'}TagRegexTable;
@@ -389,6 +421,7 @@ EOF
     emit_extensions      $opts;
     emit_aliases         $opts;
     emit_patterns        $opts;
+    emit_kinddefs        $opts;
     emit_regexs          $opts;
 
     print "\n";
@@ -456,6 +489,8 @@ sub main {
 			  ],
 		xcmds => [# { xcmd => "", flags => "" },
 			 ],
+		kinddefs => [# { letter => '', name => "", desc => "" },
+			    ],
 	       );
 
     for (@_) {
