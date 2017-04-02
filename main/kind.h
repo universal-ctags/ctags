@@ -32,9 +32,11 @@ extern const char *renderRole (const roleDesc* const role, vString* b);
 
 #define KIND_NULL    '\0'
 
+#define KIND_GHOST_INDEX -1
 #define KIND_GHOST   ' '
 #define KIND_GHOST_LONG "ghost"
 
+#define KIND_FILE_INDEX -2
 #define KIND_FILE_DEFAULT 'F'
 #define KIND_FILE_DEFAULT_LONG "file"
 

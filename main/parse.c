@@ -228,6 +228,13 @@ extern const char *getLanguageName (const langType language)
 	return result;
 }
 
+
+static kindDefinition kindGhost = {
+	.letter = KIND_GHOST,
+	.name = KIND_GHOST_LONG,
+	.description = KIND_GHOST_LONG,
+};
+
 extern int defineLanguageKind (const langType language, kindDefinition *def,
 							   freeKindDefFunc freeKindDef)
 {
@@ -245,6 +252,9 @@ extern kindDefinition* getLanguageKind (const langType language, char kindIndex)
 	case KIND_FILE_INDEX:
 		kdef = LanguageTable [language].fileKind;
 		break;
+	case KIND_GHOST_INDEX:
+		kdef = &kindGhost;
+		break;
 	default:
 		kdef = getKind (LanguageTable [language].kindControlBlock, kindIndex);
 	}
@@ -256,6 +266,8 @@ extern kindDefinition* getLanguageKindForLetter (const langType language, char k
 	Assert (0 <= language  &&  language < (int) LanguageCount);
 	if (kindLetter == LanguageTable [language].fileKind->letter)
 		return LanguageTable [language].fileKind;
+	else if (kindLetter == KIND_GHOST)
+		return &kindGhost;
 	else
 		return getKindForLetter (LanguageTable [language].kindControlBlock, kindLetter);
 }
