@@ -234,22 +234,30 @@ extern int defineLanguageKind (const langType language, kindDefinition *def,
 	return defineKind (LanguageTable [language].kindControlBlock, def, freeKindDef);
 }
 
-extern kindDefinition* getLanguageKindForLetter (const langType language, char kind)
+extern kindDefinition* getLanguageKind (const langType language, char kindIndex)
 {
-	return getKindForLetter (LanguageTable [language].kindControlBlock, kind);
-}
-
-extern kindDefinition* getLanguageFileKind (const langType language)
-{
-	kindDefinition* kind;
+	kindDefinition* kdef;
 
 	Assert (0 <= language  &&  language < (int) LanguageCount);
 
-	kind = LanguageTable [language].fileKind;
+	switch (kindIndex)
+	{
+	case KIND_FILE_INDEX:
+		kdef = LanguageTable [language].fileKind;
+		break;
+	default:
+		kdef = getKind (LanguageTable [language].kindControlBlock, kindIndex);
+	}
+	return kdef;
+}
 
-	Assert (kind != KIND_NULL);
-
-	return kind;
+extern kindDefinition* getLanguageKindForLetter (const langType language, char kindLetter)
+{
+	Assert (0 <= language  &&  language < (int) LanguageCount);
+	if (kindLetter == LanguageTable [language].fileKind->letter)
+		return LanguageTable [language].fileKind;
+	else
+		return getKindForLetter (LanguageTable [language].kindControlBlock, kindLetter);
 }
 
 extern langType getNamedLanguage (const char *const name, size_t len)

@@ -147,8 +147,8 @@ extern parserDefinition* parserNew (const char* name);
 extern bool doesLanguageAllowNullTag (const langType language);
 extern bool doesLanguageRequestAutomaticFQTag (const langType language);
 extern const char *getLanguageName (const langType language);
-extern kindDefinition* getLanguageKindForLetter (const langType language, char kind);
-extern kindDefinition* getLanguageFileKind (const langType language);
+extern kindDefinition* getLanguageKindForLetter (const langType language, char kindLetter);
+extern kindDefinition* getLanguageKind(const langType language, char kindIndex);
 extern int defineLanguageKind (const langType language, kindDefinition *def,
 							   freeKindDefFunc freeKindDef);
 extern langType getNamedLanguage (const char *const name, size_t len);

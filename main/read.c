@@ -202,7 +202,7 @@ extern bool doesInputLanguageAllowNullTag (void)
 
 extern kindDefinition *getInputLanguageFileKind (void)
 {
-	return getLanguageFileKind (getInputLanguage ());
+	return getLanguageKind (getInputLanguage (), KIND_FILE_INDEX);
 }
 
 extern bool doesInputLanguageRequestAutomaticFQTag (void)

@@ -848,7 +848,7 @@ static regexPattern *addTagRegexInternal (struct lregexControlBlock *lcb,
 			char* description;
 
 			parseKinds (kinds, &kind, &kindName, &description);
-			if (kind == getLanguageFileKind (lcb->owner)->letter)
+			if (kind == getLanguageKind (lcb->owner, KIND_FILE_INDEX)->letter)
 				error (FATAL,
 				       "Kind letter \'%c\' used in regex definition \"%s\" of %s language is reserved in ctags main",
 				       kind,
