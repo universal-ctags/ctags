@@ -149,6 +149,8 @@ extern bool doesLanguageRequestAutomaticFQTag (const langType language);
 extern const char *getLanguageName (const langType language);
 extern kindDefinition* getLanguageKindForLetter (const langType language, char kind);
 extern kindDefinition* getLanguageFileKind (const langType language);
+extern int defineLanguageKind (const langType language, kindDefinition *def,
+							   freeKindDefFunc freeKindDef);
 extern langType getNamedLanguage (const char *const name, size_t len);
 extern langType getFileLanguage (const char *const fileName);
 extern bool isLanguageEnabled (const langType language);

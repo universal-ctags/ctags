@@ -228,6 +228,12 @@ extern const char *getLanguageName (const langType language)
 	return result;
 }
 
+extern int defineLanguageKind (const langType language, kindDefinition *def,
+							   freeKindDefFunc freeKindDef)
+{
+	return defineKind (LanguageTable [language].kindControlBlock, def, freeKindDef);
+}
+
 extern kindDefinition* getLanguageKindForLetter (const langType language, char kind)
 {
 	return getKindForLetter (LanguageTable [language].kindControlBlock, kind);
