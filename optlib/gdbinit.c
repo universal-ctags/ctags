@@ -8,8 +8,8 @@
 
 static void initializeGdbinitParser (const langType language)
 {
-	enableRegexKind (language, 'D', false);
-	enableRegexKind (language, 'l', false);
+	enableLanguageRegexKind (language, 'D', false);
+	enableLanguageRegexKind (language, 'l', false);
 }
 
 extern parserDefinition* GdbinitParser (void)

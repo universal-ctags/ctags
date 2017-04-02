@@ -128,19 +128,19 @@ static void initializeCobolParser (langType language)
 
 	cobol = language;
 
-	addCallbackRegex (cobol,
+	addLanguageCallbackRegex (cobol,
 					  COBOL_REGEX_PREFIX
 					  "[0-9]+[ \t]+([A-Z0-9][A-Z0-9-]*)[ \t]+("
 					  "BLANK|OCCURS|IS|JUST|PIC|REDEFINES|RENAMES|SIGN|SYNC|USAGE|VALUE"
 					  ")",
 					  "{icase}",
 					  make_tag_for_data_maybe, NULL, &cobol);
-	addCallbackRegex (cobol,
+	addLanguageCallbackRegex (cobol,
 					  COBOL_REGEX_PREFIX
 					  "([A-Z0-9][A-Z0-9-]*)\\.",
 					  "{icase}",
 					  make_tag_for_paragraph_maybe, NULL, &cobol);
-	addCallbackRegex (cobol,
+	addLanguageCallbackRegex (cobol,
 					  "^[ \t]*COPY[ \t]+([A-Z0-9][A-Z0-9-]*)\\.",
 					  "{icase}",
 					  make_tag_for_copyed_in_sourcefile, NULL, NULL);

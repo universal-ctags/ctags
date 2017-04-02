@@ -275,7 +275,7 @@ EOF
     }
     for (@{$opts->{'disabledKinds'}}) {
 	print <<EOF;
-	enableRegexKind (language, '$_', false);
+	enableLanguageRegexKind (language, '$_', false);
 EOF
     }
     print <<EOF;

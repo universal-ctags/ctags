@@ -121,11 +121,11 @@ static void tagVariables (const char *const line, const regexMatch *const matche
 
 static void initialize (const langType language)
 {
-    addCallbackRegex (language, "^\\*+ *([^* ].+[^* ]) *\\*+$",
+    addLanguageCallbackRegex (language, "^\\*+ *([^* ].+[^* ]) *\\*+$",
             "{exclusive}", changeSection, NULL, NULL);
-    addCallbackRegex (language, "(^[A-Za-z0-9]+([${}' _][${}A-Za-z0-9]+)*)",
+    addLanguageCallbackRegex (language, "(^[A-Za-z0-9]+([${}' _][${}A-Za-z0-9]+)*)",
             "{exclusive}", tagKeywordsAndTestCases, NULL, NULL);
-    addCallbackRegex (language, "^[$@]\\{([_A-Za-z0-9][' _A-Za-z0-9]+)\\}  [ ]*.+",
+    addLanguageCallbackRegex (language, "^[$@]\\{([_A-Za-z0-9][' _A-Za-z0-9]+)\\}  [ ]*.+",
             "{exclusive}", tagVariables, NULL, NULL);
 }
 

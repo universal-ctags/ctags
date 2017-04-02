@@ -1461,7 +1461,7 @@ static void initializeParserOne (langType lang)
 	installFieldDefinition     (lang);
 	installXtagDefinition      (lang);
 
-	if (hasScopeActionInRegex (lang)
+	if (hasLanguageScopeActionInRegex (lang)
 	    || parser->def->requestAutomaticFQTag)
 		parser->def->useCork = true;
 
@@ -1716,8 +1716,8 @@ extern bool isLanguageKindEnabled (const langType language, char kind)
 {
 	const kindDefinition *kindDef;
 
-	if (hasRegexKind (language, kind))
-		return isRegexKindEnabled (language, kind);
+	if (hasLanguageRegexKind (language, kind))
+		return isLanguageRegexKindEnabled (language, kind);
 	else if (hasXcmdKind (language, kind))
 		return isXcmdKindEnabled (language, kind);
 
@@ -1735,7 +1735,7 @@ static void resetLanguageKinds (const langType language, const bool mode)
 	Assert (0 <= language  &&  language < (int) LanguageCount);
 	parser = LanguageTable + language;
 
-	resetRegexKinds (language, mode);
+	resetLanguageRegexKinds (language, mode);
 	resetXcmdKinds (language, mode);
 	{
 		unsigned int i;
@@ -1759,7 +1759,7 @@ static bool enableLanguageKind (
 		enableKind (def, mode);
 		result = true;
 	}
-	result = enableRegexKind (language, kind, mode)? true: result;
+	result = enableLanguageRegexKind (language, kind, mode)? true: result;
 	result = enableXcmdKind (language, kind, mode)? true: result;
 	return result;
 }
@@ -1774,7 +1774,7 @@ static bool enableLanguageKindLong (
 		enableKind (def, mode);
 		result = true;
 	}
-	result = enableRegexKindLong (language, kindLong, mode)? true: result;
+	result = enableLanguageRegexKindLong (language, kindLong, mode)? true: result;
 	result = enableXcmdKindLong (language, kindLong, mode)? true: result;
 	return result;
 }
@@ -2446,7 +2446,7 @@ static bool createTagsWithFallback1 (const langType language,
 	}
 
 	/* Force filling allLines buffer and kick the multiline regex parser */
-	if (hasMultilineRegexPatterns (language))
+	if (hasMultilineRegexPatterns ((LanguageTable +language)->lregexControlBlock))
 		while (readLineFromInputFile () != NULL)
 			; /* Do nothing */
 
@@ -2734,6 +2734,157 @@ extern bool parseFileWithMio (const char *const fileName, MIO *mio)
 	return tagFileResized;
 }
 
+extern bool matchLanguageMultilineRegex (const langType language, const vString* const allLines)
+{
+	return matchMultilineRegex ((LanguageTable +language)->lregexControlBlock, allLines);
+}
+
+extern bool hasLanguageMultilineRegexPatterns (const langType language)
+{
+	return hasMultilineRegexPatterns ((LanguageTable +language)->lregexControlBlock);
+}
+
+struct kind_and_result
+{
+	int kind;
+	bool result;
+};
+
+static bool is_kind_enabled_cb (kindDefinition *kind, void *data)
+{
+	bool r = false;
+	struct kind_and_result *kr = data;
+
+	if (kind->letter == kr->kind)
+	{
+		kr->result = kind->enabled;
+		r = true;
+	}
+
+	return r;
+}
+
+static bool does_kind_exist_cb (kindDefinition *kind, void *data)
+{
+	bool r = false;
+	struct kind_and_result *kr = data;
+
+	if (kind->letter == kr->kind)
+	{
+		kr->result = true;
+		r = true;
+	}
+
+	return r;
+}
+
+extern bool isLanguageRegexKindEnabled (const langType language, const int kind)
+{
+	struct kind_and_result d;
+
+	d.kind = kind;
+	d.result = false;
+
+	foreachRegexKinds ((LanguageTable +language)->lregexControlBlock, is_kind_enabled_cb, &d);
+
+	return d.result;
+}
+
+extern bool hasLanguageRegexKind (const langType language, const int kind)
+{
+	struct kind_and_result d;
+
+	d.kind = kind;
+	d.result = false;
+
+	foreachRegexKinds ((LanguageTable +language)->lregexControlBlock, does_kind_exist_cb, &d);
+
+	return d.result;
+}
+
+
+struct kind_and_mode_and_result
+{
+	int kind;
+	const char *kindLong;
+	bool mode;
+	bool result;
+};
+
+static bool enable_kind_cb (kindDefinition *kind, void *data)
+{
+	struct kind_and_mode_and_result *kmr = data;
+	if ((kmr->kind != KIND_NULL
+	     && kind->letter == kmr->kind)
+	    || (kmr->kindLong && kind->name
+		&& (strcmp (kmr->kindLong, kind->name) == 0)))
+	{
+		kind->enabled = kmr->mode;
+		kmr->result = true;
+	}
+	/* continue:
+	   There can be more than one patterns which represents this kind. */
+	return false;
+}
+
+extern bool enableLanguageRegexKind (const langType language, const int kind, const bool mode)
+{
+	struct kind_and_mode_and_result kmr;
+
+	kmr.kind = kind;
+	kmr.kindLong = NULL;
+	kmr.mode = mode;
+	kmr.result = false;
+
+	foreachRegexKinds ((LanguageTable +language)->lregexControlBlock, enable_kind_cb, &kmr);
+	return kmr.result;
+}
+
+extern bool enableLanguageRegexKindLong (const langType language, const char *kindLong, const bool mode)
+{
+	struct kind_and_mode_and_result kmr;
+
+	kmr.kind = KIND_NULL;
+	kmr.kindLong = kindLong;
+	kmr.mode = mode;
+	kmr.result = false;
+
+	foreachRegexKinds ((LanguageTable +language)->lregexControlBlock, enable_kind_cb, &kmr);
+	return kmr.result;
+}
+
+static bool kind_reset_cb (kindDefinition *kind, void *data)
+{
+	kind->enabled = *(bool *)data;
+	return false;		/* continue */
+}
+
+extern void resetLanguageRegexKinds (const langType language, bool mode)
+{
+	foreachRegexKinds ((LanguageTable +language)->lregexControlBlock, kind_reset_cb, &mode);
+}
+
+extern void foreachLanguageRegexKinds (const langType language, bool (* func) (kindDefinition*, void*), void *data)
+{
+	foreachRegexKinds ((LanguageTable +language)->lregexControlBlock, func, data);
+}
+
+extern void addLanguageCallbackRegex (const langType language, const char *const regex, const char *const flags,
+									  const regexCallback callback, bool *disabled, void *userData)
+{
+	addCallbackRegex ((LanguageTable +language)->lregexControlBlock, regex, flags, callback, disabled, userData);
+}
+
+extern bool hasLanguageScopeActionInRegex (const langType language)
+{
+	return hasScopeActionInRegex ((LanguageTable +language)->lregexControlBlock);
+}
+
+extern bool matchLanguageRegex (const langType language, const vString* const line)
+{
+	return matchRegex ((LanguageTable +language)->lregexControlBlock, line);
+}
+
 extern bool processLanguageRegexOption (langType language,
 										const char *const parameter)
 {
@@ -2990,7 +3141,7 @@ extern bool makeKindDescriptionsPseudoTags (const langType language,
 		makeKindDescriptionPseudoTag (kind, &data);
 	}
 
-	foreachRegexKinds (language, makeKindDescriptionPseudoTag, &data);
+	foreachRegexKinds (parser->lregexControlBlock, makeKindDescriptionPseudoTag, &data);
 	foreachXcmdKinds (language, makeKindDescriptionPseudoTag, &data);
 
 	return data.written;

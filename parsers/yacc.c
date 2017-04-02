@@ -151,13 +151,13 @@ static void initializeYaccParser (langType language)
 
 	memset (&cStart, 0, sizeof (cStart));
 
-	addCallbackRegex (language, "^%\\{", "{exclusive}", enter_c_prologue, NULL, &cStart);
-	addCallbackRegex (language, "^%\\}", "{exclusive}", leave_c_prologue, NULL, &cStart);
+	addLanguageCallbackRegex (language, "^%\\{", "{exclusive}", enter_c_prologue, NULL, &cStart);
+	addLanguageCallbackRegex (language, "^%\\}", "{exclusive}", leave_c_prologue, NULL, &cStart);
 
-	addCallbackRegex (language, "^%%", "{exclusive}", change_section, NULL, NULL);
+	addLanguageCallbackRegex (language, "^%%", "{exclusive}", change_section, NULL, NULL);
 
-	addCallbackRegex (language, "^%union", "{exclusive}", enter_union, NULL, &cStart);
-	addCallbackRegex (language, "^}",      "{exclusive}", leave_union, NULL, &cStart);
+	addLanguageCallbackRegex (language, "^%union", "{exclusive}", enter_union, NULL, &cStart);
+	addLanguageCallbackRegex (language, "^}",      "{exclusive}", leave_union, NULL, &cStart);
 }
 
 static void runYaccParser (void)

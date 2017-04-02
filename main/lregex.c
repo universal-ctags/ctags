@@ -85,15 +85,11 @@ typedef struct {
 } regexPattern;
 
 
-typedef struct {
+struct lregexControlBlock {
 	regexPattern *patterns;
 	unsigned int count;
 	hashTable   *kinds;
 	unsigned int multilinePatternsCount;
-} patternSet;
-
-
-struct lregexControlBlock {
 	langType owner;
 };
 
@@ -101,49 +97,51 @@ struct lregexControlBlock {
 *   DATA DEFINITIONS
 */
 
-/* Array of pattern sets, indexed by language */
-static patternSet* Sets = NULL;
-static int SetUpper = -1;  /* upper language index in list */
-
 /*
 *   FUNCTION DEFINITIONS
 */
 
+static void kindFree (void *data);
 static void clearPatternSet (struct lregexControlBlock *lcb)
 {
-	const langType language = lcb->owner;
-	if (language <= SetUpper)
+	unsigned int i;
+	for (i = 0  ;  i < lcb->count  ;  ++i)
 	{
-		patternSet* const set = Sets + language;
-		unsigned int i;
-		for (i = 0  ;  i < set->count  ;  ++i)
-		{
-			regexPattern *p = &set->patterns [i];
-			regfree (p->pattern);
-			eFree (p->pattern);
-			p->pattern = NULL;
+		regexPattern *p = &lcb->patterns [i];
+		regfree (p->pattern);
+		eFree (p->pattern);
+		p->pattern = NULL;
 
-			if (p->type == PTRN_TAG)
-			{
-				eFree (p->u.tag.name_pattern);
-				p->u.tag.name_pattern = NULL;
-				p->u.tag.kind = NULL;
-			}
+		if (p->type == PTRN_TAG)
+		{
+			eFree (p->u.tag.name_pattern);
+			p->u.tag.name_pattern = NULL;
+			p->u.tag.kind = NULL;
 		}
-		if (set->patterns != NULL)
-			eFree (set->patterns);
-		set->patterns = NULL;
-		set->count = 0;
-		set->multilinePatternsCount = 0;
-		hashTableDelete (set->kinds);
-		set->kinds = NULL;
 	}
+	if (lcb->patterns != NULL)
+		eFree (lcb->patterns);
+	lcb->patterns = NULL;
+	lcb->count = 0;
+	lcb->multilinePatternsCount = 0;
+	hashTableDelete (lcb->kinds);
+	lcb->kinds = hashTableNew (11,
+							   hashPtrhash,
+							   hashPtreq,
+							   NULL,
+							   kindFree);
 }
 
 extern struct lregexControlBlock* allocLregexControlBlock (parserDefinition *parser)
 {
 	struct lregexControlBlock *lcb = xCalloc (1, struct lregexControlBlock);
 	lcb->owner = parser->id;
+	lcb->kinds = hashTableNew (11,
+							   hashPtrhash,
+							   hashPtreq,
+							   NULL,
+							   kindFree);
+
 	return lcb;
 }
 
@@ -355,55 +353,36 @@ static void kindFree (void *data)
 	eFree (kind);
 }
 
-static regexPattern* addCompiledTagCommon (const langType language,
+static regexPattern* addCompiledTagCommon (struct lregexControlBlock *lcb,
 					   regex_t* const pattern,
 					   char kind_letter)
 {
-	patternSet* set;
 	regexPattern *ptrn;
 	kindDefinition *kind = NULL;
 
-	if (language > SetUpper)
-	{
-		int i;
-		Sets = xRealloc (Sets, (language + 1), patternSet);
-		for (i = SetUpper + 1  ;  i <= language  ;  ++i)
-		{
-			Sets [i].patterns = NULL;
-			Sets [i].count = 0;
-			Sets [i].kinds = hashTableNew (11,
-						       hashPtrhash,
-						       hashPtreq,
-						       NULL,
-						       kindFree);
-			Sets [i].multilinePatternsCount = 0;
-		}
-		SetUpper = language;
-	}
-	set = Sets + language;
-	set->patterns = xRealloc (set->patterns, (set->count + 1), regexPattern);
+	lcb->patterns = xRealloc (lcb->patterns, (lcb->count + 1), regexPattern);
 
 	if (kind_letter)
 	{
 		union cptr c = { .p = NULL };
 
 		c.c = kind_letter;
-		kind = hashTableGetItem (set->kinds, c.p);
+		kind = hashTableGetItem (lcb->kinds, c.p);
 		if (!kind)
 		{
 			kind = kindNew ();
-			hashTablePutItem (set->kinds, c.p, (void *)kind);
+			hashTablePutItem (lcb->kinds, c.p, (void *)kind);
 		}
 	}
-	ptrn = &set->patterns [set->count];
+	ptrn = &lcb->patterns [lcb->count];
 	memset (ptrn, 0, sizeof (*ptrn));
 	ptrn->pattern = pattern;
 	ptrn->exclusive = false;
 	ptrn->accept_empty_name = false;
 	if (kind_letter)
 		ptrn->u.tag.kind = kind;
-	set->count += 1;
-	useRegexMethod(language);
+	lcb->count += 1;
+	useRegexMethod(lcb->owner);
 	return ptrn;
 }
 
@@ -434,7 +413,7 @@ static flagDefinition multilinePtrnFlagDef[] = {
 };
 
 
-static regexPattern *addCompiledTagPattern (const langType language, regex_t* const pattern,
+static regexPattern *addCompiledTagPattern (struct lregexControlBlock *lcb, regex_t* const pattern,
 					    const char* const name, char kind, const char* kindName,
 					    char *const description, const char* flags,
 					    bool *disabled)
@@ -453,7 +432,7 @@ static regexPattern *addCompiledTagPattern (const langType language, regex_t* co
 		kind = KIND_GHOST;
 		kindName = KIND_GHOST_LONG;
 	}
-	ptrn  = addCompiledTagCommon(language, pattern, kind);
+	ptrn  = addCompiledTagCommon(lcb, pattern, kind);
 	ptrn->type    = PTRN_TAG;
 	ptrn->u.tag.name_pattern = eStrdup (name);
 	ptrn->exclusive = exclusive;
@@ -461,7 +440,7 @@ static regexPattern *addCompiledTagPattern (const langType language, regex_t* co
 	ptrn->disabled = disabled;
 	ptrn->multiline = multiline;
 	if (multiline >= 0)
-		Sets [language].multilinePatternsCount++;
+		lcb->multilinePatternsCount++;
 
 	if (ptrn->u.tag.kind->letter == '\0')
 	{
@@ -476,14 +455,14 @@ static regexPattern *addCompiledTagPattern (const langType language, regex_t* co
 		/* When using a same kind letter for multiple regex patterns, the name of kind
 		   should be the same. */
 		error  (WARNING, "Don't reuse the kind letter `%c' in a language %s (old: \"%s\", new: \"%s\")",
-			ptrn->u.tag.kind->letter, getLanguageName (language),
+			ptrn->u.tag.kind->letter, getLanguageName (lcb->owner),
 			ptrn->u.tag.kind->name, kindName);
 	}
 
 	return ptrn;
 }
 
-static void addCompiledCallbackPattern (const langType language, regex_t* const pattern,
+static void addCompiledCallbackPattern (struct lregexControlBlock *lcb, regex_t* const pattern,
 					const regexCallback callback, const char* flags,
 					bool *disabled,
 					void *userData)
@@ -491,7 +470,7 @@ static void addCompiledCallbackPattern (const langType language, regex_t* const 
 	regexPattern * ptrn;
 	bool exclusive = false;
 	flagsEval (flags, prePtrnFlagDef, ARRAY_SIZE(prePtrnFlagDef), &exclusive);
-	ptrn  = addCompiledTagCommon(language, pattern, '\0');
+	ptrn  = addCompiledTagCommon(lcb, pattern, '\0');
 	ptrn->type    = PTRN_CALLBACK;
 	ptrn->u.callback.function = callback;
 	ptrn->u.callback.userData = userData;
@@ -800,25 +779,20 @@ static bool matchMultilineRegexPattern (const vString* const allLines,
 /* Match against all patterns for specified language. Returns true if at least
  * on pattern matched.
  */
-extern bool matchRegex (const vString* const line, const langType language)
+extern bool matchRegex (struct lregexControlBlock *lcb, const vString* const line)
 {
 	bool result = false;
-	if (language != LANG_IGNORE  &&  language <= SetUpper  &&
-		Sets [language].count > 0)
+	unsigned int i;
+	for (i = 0  ;  i < lcb->count  ;  ++i)
 	{
-		const patternSet* const set = Sets + language;
-		unsigned int i;
-		for (i = 0  ;  i < set->count  ;  ++i)
+		regexPattern* ptrn = lcb->patterns + i;
+		if (ptrn->multiline >= 0)
+			continue;
+		if (matchRegexPattern (line, ptrn))
 		{
-			regexPattern* ptrn = set->patterns + i;
-			if (ptrn->multiline >= 0)
-				continue;
-			if (matchRegexPattern (line, ptrn))
-			{
-				result = true;
-				if (ptrn->exclusive)
-					break;
-			}
+			result = true;
+			if (ptrn->exclusive)
+				break;
 		}
 	}
 	return result;
@@ -842,14 +816,13 @@ extern void findRegexTags (void)
 	findRegexTagsMainloop (fileReadLineDriver);
 }
 
-extern bool hasScopeActionInRegex (const langType language)
+extern bool hasScopeActionInRegex (struct lregexControlBlock *lcb)
 {
 	bool r = false;
 	unsigned int i;
 
-	if (language <= SetUpper  &&  Sets [language].count > 0)
-		for (i = 0; i < Sets [language].count; i++)
-			if (Sets[language].patterns[i].scopeActions)
+	for (i = 0; i < lcb->count; i++)
+			if (lcb->patterns[i].scopeActions)
 				r= true;
 
 	return r;
@@ -882,7 +855,7 @@ static regexPattern *addTagRegexInternal (struct lregexControlBlock *lcb,
 				       regex,
 				       getLanguageName (lcb->owner));
 
-			rptr = addCompiledTagPattern (lcb->owner, cp, name,
+			rptr = addCompiledTagPattern (lcb, cp, name,
 						      kind, kindName, description, flags,
 						      disabled);
 			if (kindName)
@@ -913,10 +886,10 @@ extern void addTagRegex (struct lregexControlBlock *lcb,
 	addTagRegexInternal (lcb, regex, name, kinds, flags, disabled);
 }
 
-extern void addCallbackRegex (const langType language CTAGS_ATTR_UNUSED,
-			      const char* const regex CTAGS_ATTR_UNUSED,
-			      const char* const flags CTAGS_ATTR_UNUSED,
-			      const regexCallback callback CTAGS_ATTR_UNUSED,
+extern void addCallbackRegex (struct lregexControlBlock *lcb,
+			      const char* const regex,
+			      const char* const flags,
+			      const regexCallback callback,
 			      bool *disabled,
 			      void * userData)
 {
@@ -925,7 +898,7 @@ extern void addCallbackRegex (const langType language CTAGS_ATTR_UNUSED,
 	{
 		regex_t* const cp = compileRegex (regex, flags);
 		if (cp != NULL)
-			addCompiledCallbackPattern (language, cp, callback, flags,
+			addCompiledCallbackPattern (lcb, cp, callback, flags,
 						    disabled, userData);
 	}
 }
@@ -993,142 +966,18 @@ static void kindCbHelper (void *key, void *value, void* user_data)
 	helper_data->result = helper_data->func (kind, helper_data->func_data);
 }
 
-extern void foreachRegexKinds (const langType language,
+extern void foreachRegexKinds (struct lregexControlBlock *lcb,
 			       bool (*func) (kindDefinition *, void *),
 			       void *data)
 {
-	initializeParser (language);
-	if (language <= SetUpper  &&  Sets [language].count > 0)
-	{
-		patternSet* const set = Sets + language;
-		hashTable *kinds = set->kinds;
-		struct kindCbHelperData helper_data = {
-			.func = func,
-			.func_data = data,
-			.result = false,
+	initializeParser (lcb->owner);
+	hashTable *kinds = lcb->kinds;
+	struct kindCbHelperData helper_data = {
+		.func = func,
+		.func_data = data,
+		.result = false,
 		};
-		hashTableForeachItem (kinds, kindCbHelper, &helper_data);
-	}
-}
-
-
-static bool kind_reset_cb (kindDefinition *kind, void *data)
-{
-	kind->enabled = *(bool *)data;
-	return false;		/* continue */
-}
-
-extern void resetRegexKinds (const langType language, bool mode)
-{
-	foreachRegexKinds (language, kind_reset_cb, &mode);
-}
-
-struct kind_and_mode_and_result
-{
-	int kind;
-	const char *kindLong;
-	bool mode;
-	bool result;
-};
-
-static bool enable_kind_cb (kindDefinition *kind, void *data)
-{
-	struct kind_and_mode_and_result *kmr = data;
-	if ((kmr->kind != KIND_NULL
-	     && kind->letter == kmr->kind)
-	    || (kmr->kindLong && kind->name
-		&& (strcmp (kmr->kindLong, kind->name) == 0)))
-	{
-		kind->enabled = kmr->mode;
-		kmr->result = true;
-	}
-	/* continue:
-	   There can be more than one patterns which represents this kind. */
-	return false;
-}
-
-extern bool enableRegexKind (const langType language, const int kind, const bool mode)
-{
-	struct kind_and_mode_and_result kmr;
-
-	kmr.kind = kind;
-	kmr.kindLong = NULL;
-	kmr.mode = mode;
-	kmr.result = false;
-
-	foreachRegexKinds (language, enable_kind_cb, &kmr);
-	return kmr.result;
-}
-
-extern bool enableRegexKindLong (const langType language, const char *kindLong, const bool mode)
-{
-	struct kind_and_mode_and_result kmr;
-
-	kmr.kind = KIND_NULL;
-	kmr.kindLong = kindLong;
-	kmr.mode = mode;
-	kmr.result = false;
-
-	foreachRegexKinds (language, enable_kind_cb, &kmr);
-	return kmr.result;
-}
-
-struct kind_and_result
-{
-	int kind;
-	bool result;
-};
-
-static bool is_kind_enabled_cb (kindDefinition *kind, void *data)
-{
-	bool r = false;
-	struct kind_and_result *kr = data;
-
-	if (kind->letter == kr->kind)
-	{
-		kr->result = kind->enabled;
-		r = true;
-	}
-
-	return r;
-}
-
-static bool does_kind_exist_cb (kindDefinition *kind, void *data)
-{
-	bool r = false;
-	struct kind_and_result *kr = data;
-
-	if (kind->letter == kr->kind)
-	{
-		kr->result = true;
-		r = true;
-	}
-
-	return r;
-}
-
-extern bool isRegexKindEnabled (const langType language, const int kind)
-{
-	struct kind_and_result d;
-
-	d.kind = kind;
-	d.result = false;
-
-	foreachRegexKinds (language, is_kind_enabled_cb, &d);
-
-	return d.result;
-}
-
-extern bool hasRegexKind (const langType language, const int kind)
-{
-	struct kind_and_result d;
-
-	d.kind = kind;
-	d.result = false;
-
-	foreachRegexKinds (language, does_kind_exist_cb, &d);
-
-	return d.result;
+	hashTableForeachItem (kinds, kindCbHelper, &helper_data);
 }
 
 struct printRegexKindCBData{
@@ -1151,6 +1000,7 @@ static bool printRegexKind (kindDefinition *kind, void *user_data)
 	return false;
 }
 
+/* This should be removed when kinds infras are unified.  */
 extern void printRegexKinds (const langType language,
 			     bool allKindFields,
 			     bool indent,
@@ -1163,7 +1013,7 @@ extern void printRegexKinds (const langType language,
 		.indent        = indent,
 		.tabSeparated  = tabSeparated,
 	};
-	foreachRegexKinds (language, printRegexKind, &data);
+	foreachLanguageRegexKinds (language, printRegexKind, &data);
 }
 
 extern void printRegexFlags (void)
@@ -1176,33 +1026,26 @@ extern void printRegexFlags (void)
 
 extern void freeRegexResources (void)
 {
-	if (Sets != NULL)
-		eFree (Sets);
-	Sets = NULL;
-	SetUpper = -1;
+	/* TODO: SHOULD BE REMOVED */
 }
 
-extern bool hasMultilineRegexPatterns (const langType language)
+extern bool hasMultilineRegexPatterns (struct lregexControlBlock *lcb)
 {
-	if (language <= SetUpper  &&  Sets [language].count > 0)
-		return !! (Sets [language].multilinePatternsCount > 0);
-	else
-		return false;
+	return lcb->multilinePatternsCount;
 }
 
-extern bool matchMultilineRegex (const vString* const allLines, const langType language)
+extern bool matchMultilineRegex (struct lregexControlBlock *lcb, const vString* const allLines)
 {
 	bool result = false;
-	if (language != LANG_IGNORE  &&  language <= SetUpper  &&
-	    Sets [language].count > 0)
-	{
-		const patternSet* const set = Sets + language;
-		unsigned int i;
-		unsigned int multilinePatternsCount = set->multilinePatternsCount;
 
-		for (i = 0; i < set->count && 0 < multilinePatternsCount; ++i)
+	if (lcb->count > 0)
+	{
+		unsigned int i;
+		unsigned int multilinePatternsCount = lcb->multilinePatternsCount;
+
+		for (i = 0; i < lcb->count && 0 < multilinePatternsCount; ++i)
 		{
-			regexPattern* ptrn = set->patterns + i;
+			regexPattern* ptrn = lcb->patterns + i;
 			if (ptrn->multiline < 0)
 				continue;
 
