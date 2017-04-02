@@ -37,4 +37,9 @@ struct lregexControlBlock;
 extern struct lregexControlBlock* allocLregexControlBlock (parserDefinition *parser);
 extern void freeLregexControlBlock (struct lregexControlBlock* lcb);
 
+extern void processTagRegexOption (struct lregexControlBlock *lcb,
+								   const char* const parameter);
+extern void addTagRegex (struct lregexControlBlock *lcb, const char* const regex,
+						 const char* const name, const char* const kinds, const char* const flags,
+						 bool *disabled);
 #endif	/* CTAGS_MAIN_LREGEX_H */

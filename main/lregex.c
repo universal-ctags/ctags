@@ -112,8 +112,9 @@ static int SetUpper = -1;  /* upper language index in list */
 *   FUNCTION DEFINITIONS
 */
 
-static void clearPatternSet (const langType language)
+static void clearPatternSet (struct lregexControlBlock *lcb)
 {
+	const langType language = lcb->owner;
 	if (language <= SetUpper)
 	{
 		patternSet* const set = Sets + language;
@@ -151,6 +152,7 @@ extern struct lregexControlBlock* allocLregexControlBlock (parserDefinition *par
 
 extern void freeLregexControlBlock (struct lregexControlBlock* lcb)
 {
+	clearPatternSet (lcb);
 	eFree (lcb);
 }
 
@@ -612,32 +614,6 @@ static void parseKinds (
 	}
 }
 
-static void processLanguageRegex (const langType language,
-		const char* const parameter)
-{
-	if (parameter == NULL  ||  parameter [0] == '\0')
-		clearPatternSet (language);
-	else if (parameter [0] != '@')
-		addLanguageRegex (language, parameter);
-	else if (! doesFileExist (parameter + 1))
-		error (WARNING, "cannot open regex file");
-	else
-	{
-		const char* regexfile = parameter + 1;
-		MIO* const mio = mio_new_file (regexfile, "r");
-		if (mio == NULL)
-			error (WARNING | PERROR, "%s", regexfile);
-		else
-		{
-			vString* const regex = vStringNew ();
-			while (readLineRaw (regex, mio))
-				addLanguageRegex (language, vStringValue (regex));
-			mio_free (mio);
-			vStringDelete (regex);
-		}
-	}
-}
-
 /*
 *   Regex pattern matching
 */
@@ -882,7 +858,7 @@ extern bool hasScopeActionInRegex (const langType language)
 	return r;
 }
 
-static regexPattern *addTagRegexInternal (const langType language,
+static regexPattern *addTagRegexInternal (struct lregexControlBlock *lcb,
 					  const char* const regex,
 					  const char* const name,
 					  const char* const kinds,
@@ -902,14 +878,14 @@ static regexPattern *addTagRegexInternal (const langType language,
 			char* description;
 
 			parseKinds (kinds, &kind, &kindName, &description);
-			if (kind == getLanguageFileKind (language)->letter)
+			if (kind == getLanguageFileKind (lcb->owner)->letter)
 				error (FATAL,
 				       "Kind letter \'%c\' used in regex definition \"%s\" of %s language is reserved in ctags main",
 				       kind,
 				       regex,
-				       getLanguageName (language));
+				       getLanguageName (lcb->owner));
 
-			rptr = addCompiledTagPattern (language, cp, name,
+			rptr = addCompiledTagPattern (lcb->owner, cp, name,
 						      kind, kindName, description, flags,
 						      disabled);
 			if (kindName)
@@ -930,14 +906,14 @@ static regexPattern *addTagRegexInternal (const langType language,
 	return rptr;
 }
 
-extern void addTagRegex (const langType language CTAGS_ATTR_UNUSED,
+extern void addTagRegex (struct lregexControlBlock *lcb,
 			 const char* const regex CTAGS_ATTR_UNUSED,
 			 const char* const name CTAGS_ATTR_UNUSED,
 			 const char* const kinds CTAGS_ATTR_UNUSED,
 			 const char* const flags CTAGS_ATTR_UNUSED,
 			 bool *disabled)
 {
-	addTagRegexInternal (language, regex, name, kinds, flags, disabled);
+	addTagRegexInternal (lcb, regex, name, kinds, flags, disabled);
 }
 
 extern void addCallbackRegex (const langType language CTAGS_ATTR_UNUSED,
@@ -957,18 +933,44 @@ extern void addCallbackRegex (const langType language CTAGS_ATTR_UNUSED,
 	}
 }
 
-extern void addLanguageRegex (
-		const langType language CTAGS_ATTR_UNUSED, const char* const regex CTAGS_ATTR_UNUSED)
+static void addTagRegexOption (struct lregexControlBlock *lcb,
+							   const char* const pattern)
 {
 	if (regexAvailable)
 	{
-		char *const regex_pat = eStrdup (regex);
+		char *const regex_pat = eStrdup (pattern);
 		char *name, *kinds, *flags;
 		if (parseTagRegex (regex_pat, &name, &kinds, &flags))
 		{
-			addTagRegexInternal (language, regex_pat, name, kinds, flags,
+			addTagRegexInternal (lcb, regex_pat, name, kinds, flags,
 					     NULL);
 			eFree (regex_pat);
+		}
+	}
+}
+
+extern void processTagRegexOption (struct lregexControlBlock *lcb,
+								   const char* const parameter)
+{
+	if (parameter == NULL  ||  parameter [0] == '\0')
+		clearPatternSet (lcb);
+	else if (parameter [0] != '@')
+		addTagRegexOption (lcb, parameter);
+	else if (! doesFileExist (parameter + 1))
+		error (WARNING, "cannot open regex file");
+	else
+	{
+		const char* regexfile = parameter + 1;
+		MIO* const mio = mio_new_file (regexfile, "r");
+		if (mio == NULL)
+			error (WARNING | PERROR, "%s", regexfile);
+		else
+		{
+			vString* const regex = vStringNew ();
+			while (readLineRaw (regex, mio))
+				addTagRegexOption (lcb, vStringValue (regex));
+			mio_free (mio);
+			vStringDelete (regex);
 		}
 	}
 }
@@ -976,20 +978,6 @@ extern void addLanguageRegex (
 /*
 *   Regex option parsing
 */
-
-extern bool processRegexOption (const char *const option,
-				   const char *const parameter CTAGS_ATTR_UNUSED)
-{
-	langType language;
-
-	language = getLanguageComponentInOption (option, "regex-");
-	if (language == LANG_IGNORE)
-		return false;
-
-	processLanguageRegex (language, parameter);
-
-	return true;
-}
 
 struct kindCbHelperData {
 	bool (*func) (kindDefinition *, void *);
@@ -1191,9 +1179,6 @@ extern void printRegexFlags (void)
 
 extern void freeRegexResources (void)
 {
-	int i;
-	for (i = 0  ;  i <= SetUpper  ;  ++i)
-		clearPatternSet (i);
 	if (Sets != NULL)
 		eFree (Sets);
 	Sets = NULL;

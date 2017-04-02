@@ -2895,6 +2895,20 @@ static bool processLangSpecificExtraOption (const char *const option,
 	return true;
 }
 
+static bool processRegexOption (const char *const option,
+								const char *const parameter)
+{
+	langType language;
+
+	language = getLanguageComponentInOption (option, "regex-");
+	if (language == LANG_IGNORE)
+		return false;
+
+	processLanguageRegexOption (language, parameter);
+
+	return true;
+}
+
 static void processLongOption (
 		const char *const option, const char *const parameter)
 {

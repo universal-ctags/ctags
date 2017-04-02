@@ -2734,6 +2734,14 @@ extern bool parseFileWithMio (const char *const fileName, MIO *mio)
 	return tagFileResized;
 }
 
+extern bool processLanguageRegexOption (langType language,
+										const char *const parameter)
+{
+	processTagRegexOption ((LanguageTable +language)->lregexControlBlock, parameter);
+
+	return true;
+}
+
 extern void useRegexMethod (const langType language)
 {
 	parserDefinition* lang;
@@ -2772,17 +2780,19 @@ extern void notifyAvailabilityXcmdMethod (const langType language)
 
 static void installTagRegexTable (const langType language)
 {
+	parserObject* parser;
 	parserDefinition* lang;
 	unsigned int i;
 
 	Assert (0 <= language  &&  language < (int) LanguageCount);
-	lang = LanguageTable [language].def;
+	parser = LanguageTable + language;
+	lang = parser->def;
 
 
 	if (lang->tagRegexTable != NULL)
 	{
 	    for (i = 0; i < lang->tagRegexCount; ++i)
-		    addTagRegex (language,
+		    addTagRegex (parser->lregexControlBlock,
 				 lang->tagRegexTable [i].regex,
 				 lang->tagRegexTable [i].name,
 				 lang->tagRegexTable [i].kinds,

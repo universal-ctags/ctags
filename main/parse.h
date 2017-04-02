@@ -197,13 +197,10 @@ extern void freeEncodingResources (void);
 
 
 /* Regex interface */
+extern bool processLanguageRegexOption (langType language, const char *const parameter);
 extern void findRegexTags (void);
 extern void findRegexTagsMainloop (int (* driver)(void));
 extern bool matchRegex (const vString* const line, const langType language);
-extern void addLanguageRegex (const langType language, const char* const regex);
-extern void addTagRegex (const langType language, const char* const regex,
-			 const char* const name, const char* const kinds, const char* const flags,
-			 bool *disabled);
 extern void addCallbackRegex (const langType language, const char *const regexo, const char *const flags,
 			      const regexCallback callback, bool *disabled, void *userData);
 extern void resetRegexKinds (const langType language, bool mode);
