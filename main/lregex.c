@@ -45,9 +45,6 @@ static unsigned long currentScope = CORK_NIL;
 /* Back-references \0 through \9 */
 #define BACK_REFERENCE_COUNT 10
 
-
-#define REGEX_NAME "Regex"
-
 /*
 *   DATA DECLARATIONS
 */
