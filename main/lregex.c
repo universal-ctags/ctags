@@ -838,10 +838,10 @@ static regexPattern *addTagRegexInternal (struct lregexControlBlock *lcb,
 }
 
 extern void addTagRegex (struct lregexControlBlock *lcb,
-			 const char* const regex CTAGS_ATTR_UNUSED,
-			 const char* const name CTAGS_ATTR_UNUSED,
-			 const char* const kinds CTAGS_ATTR_UNUSED,
-			 const char* const flags CTAGS_ATTR_UNUSED,
+			 const char* const regex,
+			 const char* const name,
+			 const char* const kinds,
+			 const char* const flags,
 			 bool *disabled)
 {
 	addTagRegexInternal (lcb, regex, name, kinds, flags, disabled);
