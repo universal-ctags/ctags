@@ -135,7 +135,7 @@ static xmlDocPtr makeXMLDoc (void)
 {
 	const unsigned char* data;
 	size_t size;
-	xmlDocPtr doc = NULL;
+	xmlDocPtr doc;
 
 	doc = getInputFileUserData ();
 	if (doc)

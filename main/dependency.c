@@ -79,7 +79,7 @@ extern void initializeDependencies (parserDefinition *parser,
 									struct slaveControlBlock *cb)
 {
 	unsigned int i;
-	slaveParser *sp = NULL;
+	slaveParser *sp;
 
 	/* Initialize slaves */
 	sp = cb->slaveParsers;

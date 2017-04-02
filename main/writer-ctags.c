@@ -181,7 +181,7 @@ static int addExtensionFields (tagWriter *writer, MIO *mio, const tagEntryInfo *
 
 	if (isFieldEnabled (FIELD_SCOPE))
 	{
-		const char* k = NULL, *v = NULL;
+		const char* k, *v;
 
 		k = escapeFieldValue (writer, tag, FIELD_SCOPE_KIND_LONG);
 		v = escapeFieldValue (writer, tag, FIELD_SCOPE);

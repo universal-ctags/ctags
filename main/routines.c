@@ -634,7 +634,7 @@ extern const char *baseFilename (const char *const filePath)
 extern const char *fileExtension (const char *const fileName)
 {
 	const char *extension;
-	const char *pDelimiter = NULL;
+	const char *pDelimiter;
 	const char *const base = baseFilename (fileName);
 
 	pDelimiter = strrchr (base, '.');
@@ -650,7 +650,7 @@ extern const char *fileExtension (const char *const fileName)
 extern char* baseFilenameSansExtensionNew (const char *const fileName,
 					   const char *const templateExt)
 {
-	const char *pDelimiter = NULL;
+	const char *pDelimiter;
 	const char *const base = baseFilename (fileName);
 	char* shorten_base;
 
@@ -667,7 +667,7 @@ extern char* baseFilenameSansExtensionNew (const char *const fileName,
 
 extern bool isAbsolutePath (const char *const path)
 {
-	bool result = false;
+	bool result;
 #if defined (MSDOS_STYLE_PATH)
 	if (isPathSeparator (path [0]))
 		result = true;
@@ -676,13 +676,18 @@ extern bool isAbsolutePath (const char *const path)
 		if (isPathSeparator (path [2]))
 			result = true;
 		else
+		{
+			result = false;
 			/*  We don't support non-absolute file names with a drive
 			 *  letter, like `d:NAME' (it's too much hassle).
 			 */
 			error (FATAL,
 				"%s: relative file names with drive letters not supported",
 				path);
+		}
 	}
+	else
+		result = false;
 #else
 	result = isPathSeparator (path [0]);
 #endif

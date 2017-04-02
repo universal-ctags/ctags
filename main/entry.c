@@ -772,8 +772,8 @@ extern void getTagScopeInformation (tagEntryInfo *const tag,
 	    && tag->extensionFields.scopeIndex != CORK_NIL
 	    && TagFile.corkQueue.count > 0)
 	{
-		const tagEntryInfo * scope = NULL;
-		char *full_qualified_scope_name = NULL;
+		const tagEntryInfo * scope;
+		char *full_qualified_scope_name;
 
 		scope = getEntryInCorkQueue (tag->extensionFields.scopeIndex);
 		full_qualified_scope_name = getFullQualifiedScopeNameFromCorkQueue(scope);

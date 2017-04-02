@@ -482,7 +482,7 @@ static flagDefinition regexFlagDefs[] = {
 static regex_t* compileRegex (const char* const regexp, const char* const flags)
 {
 	int cflags = REG_EXTENDED | REG_NEWLINE;
-	regex_t *result = NULL;
+	regex_t *result;
 	int errcode;
 
 	flagsEval (flags,
