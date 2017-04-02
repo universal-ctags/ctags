@@ -275,7 +275,10 @@ EOF
     }
     for (@{$opts->{'disabledKinds'}}) {
 	print <<EOF;
-	enableLanguageRegexKind (language, '$_', false);
+	{
+		kindDefinition *kdef = getLanguageKindForLetter (language, '$_');
+		enableKind (kdef, false);
+	}
 EOF
     }
     print <<EOF;

@@ -50,9 +50,6 @@ extern void addCallbackRegex (struct lregexControlBlock *lcb,
 							  const regexCallback callback,
 							  bool *disabled,
 							  void * userData);
-extern void foreachRegexKinds (struct lregexControlBlock *lcb,
-							   bool (*func) (kindDefinition *, void *),
-							   void *data);
 extern bool hasMultilineRegexPatterns (struct lregexControlBlock *lcb);
 extern bool matchMultilineRegex (struct lregexControlBlock *lcb, const vString* const allLines);
 

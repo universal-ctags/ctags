@@ -205,14 +205,6 @@ extern void findRegexTagsMainloop (int (* driver)(void));
 extern bool matchLanguageRegex (const langType language, const vString* const line);
 extern void addLanguageCallbackRegex (const langType language, const char *const regex, const char *const flags,
 									  const regexCallback callback, bool *disabled, void *userData);
-extern void resetLanguageRegexKinds (const langType language, bool mode);
-extern bool enableLanguageRegexKind (const langType language, const int kind, const bool mode);
-extern bool enableLanguageRegexKindLong (const langType language, const char *kindLong, const bool mode);
-extern bool isLanguageRegexKindEnabled (const langType language, const int kind);
-extern bool hasLanguageRegexKind (const langType language, const int kind);
-extern void printRegexKinds (const langType language, bool allKindFields, bool indent,
-			     bool tabSeparated);
-extern void foreachLanguageRegexKinds (const langType language, bool (* func) (kindDefinition*, void*), void *data);
 extern void freeRegexResources (void);
 extern bool checkRegex (void);
 extern void useRegexMethod (const langType language);

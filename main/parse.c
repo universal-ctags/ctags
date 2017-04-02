@@ -1742,9 +1742,7 @@ extern bool isLanguageKindEnabled (const langType language, char kind)
 {
 	const kindDefinition *kindDef;
 
-	if (hasLanguageRegexKind (language, kind))
-		return isLanguageRegexKindEnabled (language, kind);
-	else if (hasXcmdKind (language, kind))
+	if (hasXcmdKind (language, kind))
 		return isXcmdKindEnabled (language, kind);
 
 	kindDef = langKindDefinition (language, kind);
@@ -1761,7 +1759,6 @@ static void resetLanguageKinds (const langType language, const bool mode)
 	Assert (0 <= language  &&  language < (int) LanguageCount);
 	parser = LanguageTable + language;
 
-	resetLanguageRegexKinds (language, mode);
 	resetXcmdKinds (language, mode);
 	{
 		unsigned int i;
@@ -1785,7 +1782,6 @@ static bool enableLanguageKind (
 		enableKind (def, mode);
 		result = true;
 	}
-	result = enableLanguageRegexKind (language, kind, mode)? true: result;
 	result = enableXcmdKind (language, kind, mode)? true: result;
 	return result;
 }
@@ -1800,7 +1796,6 @@ static bool enableLanguageKindLong (
 		enableKind (def, mode);
 		result = true;
 	}
-	result = enableLanguageRegexKindLong (language, kindLong, mode)? true: result;
 	result = enableXcmdKindLong (language, kindLong, mode)? true: result;
 	return result;
 }
@@ -2142,7 +2137,6 @@ static void printKinds (langType language, bool allKindFields, bool indent)
 				printf (Option.machinable? "%s": PR_KIND_FMT (LANG,s), parser->def->name);
 			printKind (getKind(kcb, i), allKindFields, indent, Option.machinable);
 	}
-	printRegexKinds (language, allKindFields, indent, Option.machinable);
 	printXcmdKinds (language, allKindFields, indent, Option.machinable);
 }
 
@@ -2770,131 +2764,6 @@ extern bool hasLanguageMultilineRegexPatterns (const langType language)
 	return hasMultilineRegexPatterns ((LanguageTable +language)->lregexControlBlock);
 }
 
-struct kind_and_result
-{
-	int kind;
-	bool result;
-};
-
-static bool is_kind_enabled_cb (kindDefinition *kind, void *data)
-{
-	bool r = false;
-	struct kind_and_result *kr = data;
-
-	if (kind->letter == kr->kind)
-	{
-		kr->result = kind->enabled;
-		r = true;
-	}
-
-	return r;
-}
-
-static bool does_kind_exist_cb (kindDefinition *kind, void *data)
-{
-	bool r = false;
-	struct kind_and_result *kr = data;
-
-	if (kind->letter == kr->kind)
-	{
-		kr->result = true;
-		r = true;
-	}
-
-	return r;
-}
-
-extern bool isLanguageRegexKindEnabled (const langType language, const int kind)
-{
-	struct kind_and_result d;
-
-	d.kind = kind;
-	d.result = false;
-
-	foreachRegexKinds ((LanguageTable +language)->lregexControlBlock, is_kind_enabled_cb, &d);
-
-	return d.result;
-}
-
-extern bool hasLanguageRegexKind (const langType language, const int kind)
-{
-	struct kind_and_result d;
-
-	d.kind = kind;
-	d.result = false;
-
-	foreachRegexKinds ((LanguageTable +language)->lregexControlBlock, does_kind_exist_cb, &d);
-
-	return d.result;
-}
-
-
-struct kind_and_mode_and_result
-{
-	int kind;
-	const char *kindLong;
-	bool mode;
-	bool result;
-};
-
-static bool enable_kind_cb (kindDefinition *kind, void *data)
-{
-	struct kind_and_mode_and_result *kmr = data;
-	if ((kmr->kind != KIND_NULL
-	     && kind->letter == kmr->kind)
-	    || (kmr->kindLong && kind->name
-		&& (strcmp (kmr->kindLong, kind->name) == 0)))
-	{
-		kind->enabled = kmr->mode;
-		kmr->result = true;
-	}
-	/* continue:
-	   There can be more than one patterns which represents this kind. */
-	return false;
-}
-
-extern bool enableLanguageRegexKind (const langType language, const int kind, const bool mode)
-{
-	struct kind_and_mode_and_result kmr;
-
-	kmr.kind = kind;
-	kmr.kindLong = NULL;
-	kmr.mode = mode;
-	kmr.result = false;
-
-	foreachRegexKinds ((LanguageTable +language)->lregexControlBlock, enable_kind_cb, &kmr);
-	return kmr.result;
-}
-
-extern bool enableLanguageRegexKindLong (const langType language, const char *kindLong, const bool mode)
-{
-	struct kind_and_mode_and_result kmr;
-
-	kmr.kind = KIND_NULL;
-	kmr.kindLong = kindLong;
-	kmr.mode = mode;
-	kmr.result = false;
-
-	foreachRegexKinds ((LanguageTable +language)->lregexControlBlock, enable_kind_cb, &kmr);
-	return kmr.result;
-}
-
-static bool kind_reset_cb (kindDefinition *kind, void *data)
-{
-	kind->enabled = *(bool *)data;
-	return false;		/* continue */
-}
-
-extern void resetLanguageRegexKinds (const langType language, bool mode)
-{
-	foreachRegexKinds ((LanguageTable +language)->lregexControlBlock, kind_reset_cb, &mode);
-}
-
-extern void foreachLanguageRegexKinds (const langType language, bool (* func) (kindDefinition*, void*), void *data)
-{
-	foreachRegexKinds ((LanguageTable +language)->lregexControlBlock, func, data);
-}
-
 extern void addLanguageCallbackRegex (const langType language, const char *const regex, const char *const flags,
 									  const regexCallback callback, bool *disabled, void *userData)
 {
@@ -3167,7 +3036,6 @@ extern bool makeKindDescriptionsPseudoTags (const langType language,
 		makeKindDescriptionPseudoTag (kind, &data);
 	}
 
-	foreachRegexKinds (parser->lregexControlBlock, makeKindDescriptionPseudoTag, &data);
 	foreachXcmdKinds (language, makeKindDescriptionPseudoTag, &data);
 
 	return data.written;
