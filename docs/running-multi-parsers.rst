@@ -275,7 +275,7 @@ probing is one of them.
 
 Registering a `subparser var` to a base parser is enough for the
 bottom up choice. For handling the top down choice (e.g. specifying
---language-force=`subparser` in a command line), more code is needed.
+`--language-force=subparser` in a command line), more code is needed.
 
 call `scheduleRunningBaseparser` function from a function(`parser` method)
 assigned to `parser` member in `parserDefinition` of the subparser,
