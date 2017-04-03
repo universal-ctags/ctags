@@ -16,9 +16,16 @@ CASEFOLD_FILES = \
 	    $(UNICODE_VERSION)/UnicodeData.txt \
 	    $(UNICODE_VERSION)/SpecialCasing.txt
 
+update: update-unicode-header update-jis-header update-doc
 
-update: casefold.h name2ctype.h
+update-unicode-header: casefold.h name2ctype.h
 	cp casefold.h name2ctype.h ../enc/unicode
+
+update-jis-header: ../enc/jis/props.kwd
+	cd .. && ./tool/convert-jis-props.sh enc/jis/props.kwd enc/jis/props.h && cd -
+
+update-doc: $(PROP_FILES)
+	$(PYTHON) ./update-doc.py $(UNICODE_VERSION) > ../doc/UnicodeProps.txt
 
 download:
 	./download-ucd.sh $(UNICODE_VERSION)
