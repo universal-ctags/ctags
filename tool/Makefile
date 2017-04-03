@@ -9,7 +9,7 @@ PROP_FILES = \
 	    $(UNICODE_VERSION)/PropList.txt \
 	    $(UNICODE_VERSION)/Scripts.txt \
 	    $(UNICODE_VERSION)/UnicodeData.txt \
-	    $(UNICODE_VERSION)/GraphemeBreakProperty.txt
+	    $(UNICODE_VERSION)/auxiliary/GraphemeBreakProperty.txt
 
 CASEFOLD_FILES = \
 	    $(UNICODE_VERSION)/CaseFolding.txt \
@@ -34,4 +34,6 @@ name2ctype.h: $(PROP_FILES)
 clean:
 	-rm -f casefold.h name2ctype.kwd name2ctype.h
 	-rm -f $(PROP_FILES) $(CASEFOLD_FILES)
+	-rm -f GraphemeBreakProperty.txt
+	-rmdir $(UNICODE_VERSION)/auxiliary
 	-rmdir $(UNICODE_VERSION)
