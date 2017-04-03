@@ -622,6 +622,35 @@ can be used to control ctags generation programatically.
 
 See :ref:`--_interactive Mode <interactive-mode>` for more details.
 
+
+..
+	NOT REVIEWED YET
+
+Defining a kind
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+A new ``--kinddef-<LANG>=letter,name,description`` option reduces the
+typing defining a regex pattern with ``--regex-<LANG>=``, and keeps
+the consistency of dynamically defined kinds in a language.
+
+A kind letter defined with ``--kinddef-<LANG>`` can be referred in
+``--kinddef-<LANG>``.
+
+Previsouly you had to write in your optlib::
+
+    --regex-elm=/^([[:lower:]_][[:alnum:]_]*)[^=]*=$/\1/f,function,Functions/{scope=set}
+    --regex-elm=/^[[:blank:]]+([[:lower:]_][[:alnum:]_]*)[^=]*=$/\1/f,function,Functions/{scope=ref}
+
+With new ``--kinddef-<LANG>`` you can write the same things like::
+
+    --kinddef-elm=f,function,Functions
+    --regex-elm=/^([[:lower:]_][[:alnum:]_]*)[^=]*=$/\1/f/{scope=set}
+    --regex-elm=/^[[:blank:]]+([[:lower:]_][[:alnum:]_]*)[^=]*=$/\1/f/{scope=ref}
+
+We can say now "kind" is a first class object in Universal-ctags.
+
+
 Changes to the tags file format
 ---------------------------------------------------------------------
 
