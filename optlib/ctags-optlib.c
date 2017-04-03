@@ -26,7 +26,7 @@ extern parserDefinition* CtagsParser (void)
 	};
 
 	static kindDefinition CtagsKindTable [] = {
-		{ true, 'l', "landef", "language definitions" },
+		{ true, 'l', "langdef", "language definitions" },
 		{ true, 'k', "kind", "kind definitions" },
 	};
 	static tagRegexTable CtagsTagRegexTable [] = {

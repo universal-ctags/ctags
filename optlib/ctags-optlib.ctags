@@ -23,7 +23,7 @@
 #
 --langdef=ctags
 --map-ctags=+.ctags
---kinddef-ctags=l,landef,language definitions
+--kinddef-ctags=l,langdef,language definitions
 --kinddef-ctags=k,kind,kind definitions
 --regex-ctags=/^--langdef=([^ \t]+)$/\1/l/{scope=set}
 --regex-ctags=/^--regex-[^=]+=.*\/.,(.+)\/.*/\1/k/{scope=ref}
