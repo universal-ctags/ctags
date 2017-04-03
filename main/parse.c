@@ -2466,7 +2466,7 @@ static bool createTagsWithFallback1 (const langType language,
 	}
 
 	/* Force filling allLines buffer and kick the multiline regex parser */
-	if (hasMultilineRegexPatterns ((LanguageTable +language)->lregexControlBlock))
+	if (hasLanguageMultilineRegexPatterns (language))
 		while (readLineFromInputFile () != NULL)
 			; /* Do nothing */
 
@@ -2756,13 +2756,46 @@ extern bool parseFileWithMio (const char *const fileName, MIO *mio)
 
 extern void matchLanguageMultilineRegex (const langType language, const vString* const allLines)
 {
-	matchMultilineRegex ((LanguageTable +language)->lregexControlBlock, allLines);
+	subparser *tmp;
+
+	matchMultilineRegex ((LanguageTable + language)->lregexControlBlock, allLines);
+	foreachSubparser(tmp)
+	{
+		langType t = getSubparserLanguage (tmp);
+		enterSubparser (tmp);
+		matchLanguageMultilineRegex (t, allLines);
+		leaveSubparser ();
+	}
+}
+
+static bool lregexQueryParserAndSubparesrs (const langType language, bool (* predicate) (struct lregexControlBlock *))
+{
+	bool r;
+	subparser *tmp;
+
+	r = predicate ((LanguageTable + language)->lregexControlBlock);
+	if (!r)
+	{
+		foreachSubparser(tmp)
+		{
+			langType t = getSubparserLanguage (tmp);
+			enterSubparser (tmp);
+			r = lregexQueryParserAndSubparesrs (t, predicate);
+			leaveSubparser ();
+
+			if (r)
+				break;
+		}
+	}
+
+	return r;
 }
 
 extern bool hasLanguageMultilineRegexPatterns (const langType language)
 {
-	return hasMultilineRegexPatterns ((LanguageTable +language)->lregexControlBlock);
+	return lregexQueryParserAndSubparesrs (language, hasMultilineRegexPatterns);
 }
+
 
 extern void addLanguageCallbackRegex (const langType language, const char *const regex, const char *const flags,
 									  const regexCallback callback, bool *disabled, void *userData)
