@@ -19,17 +19,26 @@
 #
 --langdef=elm
 --map-elm=+.elm
---regex-elm=/^(port[[:blank:]]+)?module[[:blank:]]+([[:upper:]][[:alnum:]_.]*)/\2/m,module,Module/{scope=push}{exclusive}
---regex-elm=/^import[[:blank:]]+[[:alnum:]_.]+[[:blank:]]+as[[:blank:]]+([[:alnum:]]+)/\1/n,namespace,Renamed Imported Module/{scope=clear}{exclusive}
+
+--kinddef-elm=m,module,Module
+--kinddef-elm=n,namespace,Renamed Imported Module
+--kinddef-elm=p,port,Port
+--kinddef-elm=t,type,Type Definition
+--kinddef-elm=c,constructor,Type Constructor
+--kinddef-elm=a,alias,Type Alias
+--kinddef-elm=f,function,Functions
+
+--regex-elm=/^(port[[:blank:]]+)?module[[:blank:]]+([[:upper:]][[:alnum:]_.]*)/\2/m/{scope=push}{exclusive}
+--regex-elm=/^import[[:blank:]]+[[:alnum:]_.]+[[:blank:]]+as[[:blank:]]+([[:alnum:]]+)/\1/n/{scope=clear}{exclusive}
 #
 # Following two patterns are just for clearing scope stack.
 # X in "import X" should be captured as a reference tag in the future.
 #
 --regex-elm=/^import[[:blank:]]+([[:alnum:]_.]+)[[:blank:]]exposing///{scope=clear}{exclusive}
 --regex-elm=/^import[[:blank:]]+([[:alnum:]_.]+)///{scope=clear}{exclusive}
---regex-elm=/^port[[:blank:]]+([[:lower:]][[:alnum:]_]*).*/\1/p,port,Port/{scope=clear}{exclusive}
---regex-elm=/^type +([[:upper:]][[:alnum:]_]*.*)/\1/t,type,Type Definition/{scope=set}{exclusive}
---regex-elm=/^[[:blank:]]+[|=][[:blank:]]+([[:upper:]][[:alnum:]_]*.*)$/\1/c,constructor,Type Constructor/{scope=ref}{exclusive}
---regex-elm=/^type[[:blank:]]+alias[[:blank:]]+([[:upper:]][[:alnum:]_]*[[:blank:][:alnum:]_]*)/\1/a,alias,Type Alias/{scope=set}{exclusive}
---regex-elm=/^([[:lower:]_][[:alnum:]_]*)[^=]*=$/\1/f,function,Functions/{scope=set}
---regex-elm=/^[[:blank:]]+([[:lower:]_][[:alnum:]_]*)[^=]*=$/\1/f,function,Functions/{scope=ref}
+--regex-elm=/^port[[:blank:]]+([[:lower:]][[:alnum:]_]*).*/\1/p/{scope=clear}{exclusive}
+--regex-elm=/^type +([[:upper:]][[:alnum:]_]*.*)/\1/t/{scope=set}{exclusive}
+--regex-elm=/^[[:blank:]]+[|=][[:blank:]]+([[:upper:]][[:alnum:]_]*.*)$/\1/c/{scope=ref}{exclusive}
+--regex-elm=/^type[[:blank:]]+alias[[:blank:]]+([[:upper:]][[:alnum:]_]*[[:blank:][:alnum:]_]*)/\1/a/{scope=set}{exclusive}
+--regex-elm=/^([[:lower:]_][[:alnum:]_]*)[^=]*=$/\1/f/{scope=set}
+--regex-elm=/^[[:blank:]]+([[:lower:]_][[:alnum:]_]*)[^=]*=$/\1/f/{scope=ref}

@@ -25,27 +25,36 @@ extern parserDefinition* ElmParser (void)
 		NULL
 	};
 
+	static kindDefinition ElmKindTable [] = {
+		{ true, 'm', "module", "Module" },
+		{ true, 'n', "namespace", "Renamed Imported Module" },
+		{ true, 'p', "port", "Port" },
+		{ true, 't', "type", "Type Definition" },
+		{ true, 'c', "constructor", "Type Constructor" },
+		{ true, 'a', "alias", "Type Alias" },
+		{ true, 'f', "function", "Functions" },
+	};
 	static tagRegexTable ElmTagRegexTable [] = {
 		{"^(port[[:blank:]]+)?module[[:blank:]]+([[:upper:]][[:alnum:]_.]*)", "\\2",
-		"m,module,Module", "{scope=push}{exclusive}"},
+		"m", "{scope=push}{exclusive}"},
 		{"^import[[:blank:]]+[[:alnum:]_.]+[[:blank:]]+as[[:blank:]]+([[:alnum:]]+)", "\\1",
-		"n,namespace,Renamed Imported Module", "{scope=clear}{exclusive}"},
+		"n", "{scope=clear}{exclusive}"},
 		{"^import[[:blank:]]+([[:alnum:]_.]+)[[:blank:]]exposing", "",
 		"", "{scope=clear}{exclusive}"},
 		{"^import[[:blank:]]+([[:alnum:]_.]+)", "",
 		"", "{scope=clear}{exclusive}"},
 		{"^port[[:blank:]]+([[:lower:]][[:alnum:]_]*).*", "\\1",
-		"p,port,Port", "{scope=clear}{exclusive}"},
+		"p", "{scope=clear}{exclusive}"},
 		{"^type +([[:upper:]][[:alnum:]_]*.*)", "\\1",
-		"t,type,Type Definition", "{scope=set}{exclusive}"},
+		"t", "{scope=set}{exclusive}"},
 		{"^[[:blank:]]+[|=][[:blank:]]+([[:upper:]][[:alnum:]_]*.*)$", "\\1",
-		"c,constructor,Type Constructor", "{scope=ref}{exclusive}"},
+		"c", "{scope=ref}{exclusive}"},
 		{"^type[[:blank:]]+alias[[:blank:]]+([[:upper:]][[:alnum:]_]*[[:blank:][:alnum:]_]*)", "\\1",
-		"a,alias,Type Alias", "{scope=set}{exclusive}"},
+		"a", "{scope=set}{exclusive}"},
 		{"^([[:lower:]_][[:alnum:]_]*)[^=]*=$", "\\1",
-		"f,function,Functions", "{scope=set}"},
+		"f", "{scope=set}"},
 		{"^[[:blank:]]+([[:lower:]_][[:alnum:]_]*)[^=]*=$", "\\1",
-		"f,function,Functions", "{scope=ref}"},
+		"f", "{scope=ref}"},
 	};
 
 
@@ -56,6 +65,8 @@ extern parserDefinition* ElmParser (void)
 	def->patterns      = patterns;
 	def->aliases       = aliases;
 	def->method        = METHOD_NOT_CRAFTED|METHOD_REGEX;
+	def->kindTable = ElmKindTable;
+	def->kindCount = ARRAY_SIZE(ElmKindTable);
 	def->tagRegexTable = ElmTagRegexTable;
 	def->tagRegexCount = ARRAY_SIZE(ElmTagRegexTable);
 	def->initialize    = initializeElmParser;
