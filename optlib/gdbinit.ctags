@@ -25,6 +25,10 @@
 --languages=-gdbinit
 --map-gdbinit=+(.gdbinit)
 --map-gdbinit=+.gdb
+--kinddef-gdbinit=d,definition,definitions
+--kinddef-gdbinit=D,document,documents
+--kinddef-gdbinit=t,toplevelVariable,toplevel variables
+--kinddef-gdbinit=l,localVariable,local variables
 
 ##
 ## Ignore comments
@@ -34,21 +38,21 @@
 ##
 ## define
 ##
---regex-gdbinit=/^define[[:space:]]+([^[:space:]]+)$/\1/d,definition/
+--regex-gdbinit=/^define[[:space:]]+([^[:space:]]+)$/\1/d/
 
 ##
 ## document
 ##
---regex-gdbinit=/^document[[:space:]]+([^[:space:]]+)$/\1/D,document/
+--regex-gdbinit=/^document[[:space:]]+([^[:space:]]+)$/\1/D/
 --kinds-gdbinit=-D
 
 ##
 ## set $...
 ##
---regex-gdbinit=/^set[[:space:]]+\$([a-zA-Z0-9_]+)[[:space:]]*=/\1/t,toplevelVariable/
+--regex-gdbinit=/^set[[:space:]]+\$([a-zA-Z0-9_]+)[[:space:]]*=/\1/t/
 
 ##
 ## __...set $...
 ##
---regex-gdbinit=/^[[:space:]]+set[[:space:]]+\$([a-zA-Z0-9_]+)[[:space:]]*=/\1/l,localVariable/
+--regex-gdbinit=/^[[:space:]]+set[[:space:]]+\$([a-zA-Z0-9_]+)[[:space:]]*=/\1/l/
 --kinds-gdbinit=-l
