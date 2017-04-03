@@ -1,0 +1,5 @@
+Order	input.rb	/^RSpec.describe Order do$/;"	describe	language:RSpec
+with no items	input.rb	/^  context "with no items" do$/;"	context	language:RSpec
+with one item	input.rb	/^  context "with one item" do$/;"	context	language:RSpec
+Calculator	input.rb	/^RSpec.describe Calculator do$/;"	describe	language:RSpec
+#add	input.rb	/^  describe '#add' do$/;"	describe	language:RSpec

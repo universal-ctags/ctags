@@ -414,6 +414,9 @@
     <ClCompile Include="..\parsers\dtd.c">
       <Filter>Source Files\Main</Filter>
     </ClCompile>
+    <ClCompile Include="..\optlib\RSpec.c">
+      <Filter>Source Files\Main</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\main\e_msoft.h">

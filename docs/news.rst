@@ -81,6 +81,7 @@ The following parsers have been added:
 * CoffeeScript *xcmd*
 * ctags option library *optlib*
 * Myrddin
+* RSpec *optlib*
 
 See "Option library" for details on *optlib*.
 See "External parser command" for details on *xcmd*.
