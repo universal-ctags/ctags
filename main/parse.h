@@ -202,7 +202,7 @@ extern void freeEncodingResources (void);
 extern bool processLanguageRegexOption (langType language, const char *const parameter);
 extern void findRegexTags (void);
 extern void findRegexTagsMainloop (int (* driver)(void));
-extern bool matchLanguageRegex (const langType language, const vString* const line);
+extern void matchLanguageRegex (const langType language, const vString* const line);
 extern void addLanguageCallbackRegex (const langType language, const char *const regex, const char *const flags,
 									  const regexCallback callback, bool *disabled, void *userData);
 extern void freeRegexResources (void);
@@ -213,7 +213,7 @@ extern bool hasLanguageScopeActionInRegex (const langType language);
 
 /* Multiline Regex Interface */
 extern bool hasLanguageMultilineRegexPatterns (const langType language);
-extern bool matchLanguageMultilineRegex (const langType language, const vString* const allLines);
+extern void matchLanguageMultilineRegex (const langType language, const vString* const allLines);
 
 extern unsigned int   getXpathFileSpecCount (const langType language);
 extern xpathFileSpec* getXpathFileSpec (const langType language, unsigned int nth);

@@ -2754,9 +2754,9 @@ extern bool parseFileWithMio (const char *const fileName, MIO *mio)
 	return tagFileResized;
 }
 
-extern bool matchLanguageMultilineRegex (const langType language, const vString* const allLines)
+extern void matchLanguageMultilineRegex (const langType language, const vString* const allLines)
 {
-	return matchMultilineRegex ((LanguageTable +language)->lregexControlBlock, allLines);
+	matchMultilineRegex ((LanguageTable +language)->lregexControlBlock, allLines);
 }
 
 extern bool hasLanguageMultilineRegexPatterns (const langType language)
@@ -2775,9 +2775,9 @@ extern bool hasLanguageScopeActionInRegex (const langType language)
 	return hasScopeActionInRegex ((LanguageTable +language)->lregexControlBlock);
 }
 
-extern bool matchLanguageRegex (const langType language, const vString* const line)
+extern void matchLanguageRegex (const langType language, const vString* const line)
 {
-	return matchRegex ((LanguageTable +language)->lregexControlBlock, line);
+	matchRegex ((LanguageTable +language)->lregexControlBlock, line);
 }
 
 extern bool processLanguageRegexOption (langType language,
