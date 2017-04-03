@@ -2805,7 +2805,13 @@ extern void addLanguageCallbackRegex (const langType language, const char *const
 
 extern bool hasLanguageScopeActionInRegex (const langType language)
 {
-	return hasScopeActionInRegex ((LanguageTable +language)->lregexControlBlock);
+	bool hasScopeAction;
+
+	pushLanguage (language);
+	hasScopeAction = lregexQueryParserAndSubparesrs (language, hasScopeActionInRegex);
+	popLanguage ();
+
+	return hasScopeAction;
 }
 
 extern void matchLanguageRegex (const langType language, const vString* const line)
