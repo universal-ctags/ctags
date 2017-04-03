@@ -1658,6 +1658,33 @@ static void lazyInitialize (langType language)
 /*
 *   Option parsing
 */
+static void pre_lang_def_flag_base_long (const char* const optflag, const char* const param, void* data)
+{
+	char **name = data;
+	langType base;
+
+	if (param[0] == '\0')
+	{
+		error (WARNING, "No base parser specified for \"%s\" flag of --langdef option", optflag);
+		return;
+	}
+
+	base = getNamedLanguage (param, 0);
+	if (base == LANG_IGNORE)
+	{
+		error (WARNING, "Unknown laguage(%s) is specified for \"%s\" flag of --langdef option",
+			   param, optflag);
+		return;
+
+	}
+
+	*name = eStrdup(param);
+}
+
+static flagDefinition PreLangDefFlagDef [] = {
+	{ '\0',  "base", NULL, pre_lang_def_flag_base_long },
+};
+
 static void lang_def_flag_file_kind_long (const char* const optflag, const char* const param, void* data)
 {
 	parserDefinition*  def = data;
@@ -1682,13 +1709,43 @@ static flagDefinition LangDefFlagDef [] = {
 	{ '\0',  "fileKind", NULL, lang_def_flag_file_kind_long },
 };
 
-static parserDefinition* OptlibParser(const char *name)
+static void optlibFreeDep (langType lang, bool initialized)
+{
+	parserDefinition * pdef = LanguageTable [lang].def;
+
+	if (pdef->dependencyCount == 1)
+	{
+		parserDependency *dep = pdef->dependencies;
+
+		eFree ((char *)dep->upperParser); /* Dirty cast */
+		dep->upperParser = NULL;
+		eFree (dep->data);
+		dep->data = NULL;
+		eFree (dep);
+		pdef->dependencies = NULL;
+	}
+}
+
+static parserDefinition* OptlibParser(const char *name, const char *base)
 {
 	parserDefinition *def;
 
 	def = parserNew (name);
 	def->initialize        = lazyInitialize;
 	def->method            = METHOD_NOT_CRAFTED;
+	if (base)
+	{
+		subparser *sub = xCalloc (1, subparser);
+		parserDependency *dep = xCalloc (1, parserDependency);
+
+		sub->direction = SUBPARSER_BASE_RUNS_SUB;
+		dep->type = DEPTYPE_SUBPARSER;
+		dep->upperParser = eStrdup (base);
+		dep->data = sub;
+		def->dependencies = dep;
+		def->dependencyCount = 1;
+		def->finalize = optlibFreeDep;
+	}
 
 	return def;
 }
@@ -1715,8 +1772,15 @@ extern void processLanguageDefineOption (
 		LanguageTable = xRealloc (LanguageTable, LanguageCount + 1, parserObject);
 		memset (LanguageTable + LanguageCount, 0, sizeof(parserObject));
 
-		def = OptlibParser (name);
+		char *base = NULL;
+		flagsEval (flags, PreLangDefFlagDef, ARRAY_SIZE (PreLangDefFlagDef), &base);
+
+		def = OptlibParser (name, base);
+		if (base)
+			eFree (base);
+
 		initializeParsingCommon (def, false);
+		linkDependenciesAtInitializeParsing (def);
 
 		LanguageTable [def->id].currentPatterns = stringListNew ();
 		LanguageTable [def->id].currentExtensions = stringListNew ();
