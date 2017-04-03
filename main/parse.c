@@ -2777,7 +2777,16 @@ extern bool hasLanguageScopeActionInRegex (const langType language)
 
 extern void matchLanguageRegex (const langType language, const vString* const line)
 {
-	matchRegex ((LanguageTable +language)->lregexControlBlock, line);
+	subparser *tmp;
+
+	matchRegex ((LanguageTable + language)->lregexControlBlock, line);
+	foreachSubparser(tmp)
+	{
+		langType t = getSubparserLanguage (tmp);
+		enterSubparser (tmp);
+		matchLanguageRegex (t, line);
+		leaveSubparser ();
+	}
 }
 
 extern bool processLanguageRegexOption (langType language,
