@@ -41,10 +41,11 @@ my $options =
      [ qr/^--options=(.*)/, sub {
 	   parse_optlib ($1, $_[0]);
        } ],
-     [ qr/^--langdef=(.*)/, sub {
+     [ qr/^--langdef=([^\{]+)({base=([^\{]+)})?/, sub {
 	   die "LANG is already defined as $_[0]->{'langdef'}: $1"
 	       if (defined $_[0]->{'langdef'});
 	   $_[0]->{'langdef'} = $1;
+	   $_[0]->{'base'} = $3 if defined $3;
        } ],
      [ qr/^--kinddef-(.*)=([^,]),([^,]+),(.*)/, sub {
 	 die "Don't use --kinddef-<LANG>=+ optoin before defining a language"
@@ -243,7 +244,7 @@ sub parse_optlib {
 }
 
 sub emit_header {
-    my ($optlib) = @_;
+    my ($optlib, $opts) = @_;
 
     print <<EOF;
 /*
@@ -252,6 +253,14 @@ sub emit_header {
 #include "general.h"
 #include "parse.h"
 #include "routines.h"
+EOF
+
+    if (defined $opts->{'base'}) {
+    print <<EOF;
+#include "subparser.h"
+EOF
+    }
+    print <<EOF;
 
 
 EOF
@@ -366,6 +375,22 @@ EOF
 EOF
 }
 
+sub emit_dependencies {
+    my $opts = shift;
+
+    return if (! defined $opts->{'base'});
+
+    print <<EOF;
+	static subparser $opts->{'Clangdef'}Subparser = {
+		.direction = SUBPARSER_BASE_RUNS_SUB,
+	};
+	static parserDependency $opts->{'Clangdef'}Dependencies [] = {
+		[0] = { DEPTYPE_SUBPARSER, "$opts->{'base'}", &$opts->{'Clangdef'}Subparser },
+	};
+EOF
+
+}
+
 sub emit_fields_initialization {
     my $opts = shift;
     my $enabled = $opts->{"disabled"} ? "false": "true";
@@ -401,6 +426,13 @@ EOF
 EOF
     }
 
+    if (defined $opts->{'base'}) {
+	print <<EOF;
+	def->dependencies = $opts->{'Clangdef'}Dependencies;
+	def->dependencyCount = ARRAY_SIZE($opts->{'Clangdef'}Dependencies);
+EOF
+    }
+
     print <<EOF;
 	def->initialize    = initialize$opts->{'Clangdef'}Parser;
 
@@ -410,7 +442,7 @@ EOF
 sub emit {
     my ($optlib, $opts) = @_;
 
-    emit_header $optlib;
+    emit_header ($optlib, $opts);
     emit_initializer $opts;
 
     print <<EOF;
@@ -423,6 +455,7 @@ EOF
     emit_patterns        $opts;
     emit_kinddefs        $opts;
     emit_regexs          $opts;
+    emit_dependencies    $opts;
 
     print "\n";
 
@@ -491,6 +524,7 @@ sub main {
 			 ],
 		kinddefs => [# { letter => '', name => "", desc => "" },
 			    ],
+		base => undef,
 	       );
 
     for (@_) {
