@@ -33,15 +33,19 @@ extern parserDefinition* ManParser (void)
 		NULL
 	};
 
+	static kindDefinition ManKindTable [] = {
+		{ true, 't', "title", "titles" },
+		{ true, 's', "section", "sections" },
+	};
 	static tagRegexTable ManTagRegexTable [] = {
 		{"^\\.TH[[:space:]]{1,}\"([^\"]{1,})\".*", "\\1",
-		"t,title,titles", "{exclusive}{icase}{scope=push}"},
+		"t", "{exclusive}{icase}{scope=push}"},
 		{"^\\.TH[[:space:]]{1,}([^[:space:]]{1,}).*", "\\1",
-		"t,title,titles", "{exclusive}{icase}{scope=push}"},
+		"t", "{exclusive}{icase}{scope=push}"},
 		{"^\\.SH[[:space:]]{1,}\"([^\"]{1,})\".*", "\\1",
-		"s,section,sections", "{exclusive}{icase}{scope=ref}"},
+		"s", "{exclusive}{icase}{scope=ref}"},
 		{"^\\.SH[[:space:]]{1,}([^[:space:]]{1,}).*", "\\1",
-		"s,section,sections", "{exclusive}{icase}{scope=ref}"},
+		"s", "{exclusive}{icase}{scope=ref}"},
 	};
 
 
@@ -52,6 +56,8 @@ extern parserDefinition* ManParser (void)
 	def->patterns      = patterns;
 	def->aliases       = aliases;
 	def->method        = METHOD_NOT_CRAFTED|METHOD_REGEX;
+	def->kindTable = ManKindTable;
+	def->kindCount = ARRAY_SIZE(ManKindTable);
 	def->tagRegexTable = ManTagRegexTable;
 	def->tagRegexCount = ARRAY_SIZE(ManTagRegexTable);
 	def->initialize    = initializeManParser;
