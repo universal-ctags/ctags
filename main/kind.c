@@ -13,9 +13,22 @@
 #include "general.h"
 
 #include <stdio.h>
+#include <string.h>
 #include "debug.h"
 #include "kind.h"
 #include "parse.h"
+#include "options.h"
+
+typedef struct sKindObject {
+	kindDefinition *def;
+	freeKindDefFunc free;
+} kindObject;
+
+struct kindControlBlock {
+	kindObject *kind;
+	int count;
+	langType owner;
+};
 
 extern void printRole (const roleDesc* const role)
 {
@@ -156,3 +169,151 @@ extern void enableKind (kindDefinition *kind, bool enable)
 			slave->enabled = enable;
 	}
 }
+
+extern struct kindControlBlock* allocKindControlBlock (parserDefinition *parser)
+{
+	unsigned int i;
+	struct kindControlBlock *kcb;
+
+	kcb = xMalloc (1, struct kindControlBlock);
+	kcb->kind = xMalloc (parser->kindCount, kindObject);
+	kcb->count = parser->kindCount;
+	kcb->owner = parser->id;
+
+	for (i = 0; i < parser->kindCount; ++i)
+	{
+		kcb->kind [i].def = parser->kindTable + i;
+		kcb->kind [i].free = NULL;
+		kcb->kind [i].def->id = i;
+	}
+
+	return kcb;
+}
+
+extern void freeKindControlBlock (struct kindControlBlock* kcb)
+{
+	int i;
+
+	for (i = 0; i < kcb->count; ++i)
+	{
+		if (kcb->kind [i].free)
+			kcb->kind [i].free (kcb->kind [i].def);
+	}
+	eFree (kcb->kind);
+	eFree (kcb);
+}
+
+extern int  defineKind (struct kindControlBlock* kcb, kindDefinition *def,
+						freeKindDefFunc freeKindDef)
+{
+	def->id = kcb->count++;
+	kcb->kind = xRealloc (kcb->kind, kcb->count, kindObject);
+	kcb->kind [def->id].def = def;
+	kcb->kind [def->id].free = freeKindDef;
+
+	verbose ("Add kind[%d] \"%c,%s,%s\" to %s\n", def->id,
+			 def->letter, def->name, def->description,
+			 getLanguageName (kcb->owner));
+
+	return def->id;
+}
+
+extern int countKinds (struct kindControlBlock* kcb)
+{
+	return kcb->count;
+}
+
+extern kindDefinition *getKind (struct kindControlBlock* kcb, int kindIndex)
+{
+	return kcb->kind [kindIndex].def;
+}
+
+extern kindDefinition *getKindForLetter (struct kindControlBlock* kcb, int letter)
+{
+	int i;
+	kindDefinition * kdef;
+
+	for (i = 0;  i < countKinds (kcb);  ++i)
+	{
+		kdef = getKind (kcb, i);
+		if (kdef->letter == letter)
+			return kdef;
+	}
+	return NULL;
+}
+
+extern kindDefinition *getKindForName (struct kindControlBlock* kcb, const char* name)
+{
+	int i;
+	kindDefinition * kdef;
+
+	for (i = 0;  i < countKinds (kcb);  ++i)
+	{
+		kdef = getKind (kcb, i);
+		Assert(kdef);
+		if (kdef->name && strcmp(kdef->name, name) == 0)
+			return kdef;
+	}
+	return NULL;
+}
+
+static void linkKinds (langType master, kindDefinition *masterKind, kindDefinition *slaveKind)
+{
+	kindDefinition *tail;
+
+	slaveKind->master = masterKind;
+
+	tail = slaveKind;
+	while (tail->slave)
+	{
+		tail->enabled = masterKind->enabled;
+		tail = tail->slave;
+	}
+
+	tail->slave = masterKind->slave;
+	masterKind->slave = slaveKind;
+
+	masterKind->syncWith = master;
+	slaveKind->syncWith = master;
+}
+
+extern void linkKindDependency (struct kindControlBlock *masterKCB,
+								struct kindControlBlock *slaveKCB)
+{
+	unsigned int k_slave, k_master;
+	kindDefinition *kind_slave, *kind_master;
+
+	for (k_slave = 0; k_slave < countKinds (slaveKCB); k_slave++)
+	{
+		kind_slave = getKind(slaveKCB, k_slave);
+		if (kind_slave->syncWith == LANG_AUTO)
+		{
+			for (k_master = 0; k_master < countKinds (masterKCB); k_master++)
+			{
+				kind_master = getKind(masterKCB, k_master);
+				if ((kind_slave->letter == kind_master->letter)
+				    && (strcmp (kind_slave->name, kind_master->name) == 0))
+				{
+					linkKinds (masterKCB->owner, kind_master, kind_slave);
+					break;
+				}
+			}
+		}
+	}
+}
+
+#ifdef DEBUG
+extern bool doesParserUseKind (struct kindControlBlock* kcb, char letter)
+{
+	unsigned int k;
+	kindDefinition *kdef;
+
+	for (k = 0; k < countKinds (kcb); k++)
+	{
+		kdef = getKind(kcb, k);
+		if (kdef->letter == letter)
+			return true;
+	}
+	return false;
+}
+#endif

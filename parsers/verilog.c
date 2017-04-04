@@ -1,12 +1,12 @@
 /*
 *   Copyright (c) 2003, Darren Hiebert
-* 
+*
 *   This source code is released for free distribution under the terms of the
 *   GNU General Public License version 2 or (at your option) any later version.
-* 
+*
 *   This module contains functions for generating tags for the Verilog HDL
 *   (Hardware Description Language).
-* 
+*
 *   Language definition documents:
 *       http://www.eg.bucknell.edu/~cs320/verilog/verilog-manual.html
 *       http://www.sutherland-hdl.com/on-line_ref_guide/vlog_ref_top.html
@@ -491,14 +491,14 @@ static int skipMacro (int c)
 	return c;
 }
 
-static verilogKind getKind (tokenInfo *const token)
+static verilogKind getKindForToken (tokenInfo *const token)
 {
 	return (verilogKind) lookupKeyword (vStringValue (token->name), getInputLanguage () );
 }
 
 static void updateKind (tokenInfo *const token)
 {
-	token->kind = getKind (token);
+	token->kind = getKindForToken (token);
 }
 
 static void createContext (tokenInfo *const scope)
@@ -945,7 +945,7 @@ static void tagNameList (tokenInfo* token, int c)
 	c = skipWhite (c);
 
 	do
-	{ 
+	{
 		repeat = false;
 
 		while (c == '`' && c != EOF)
@@ -955,7 +955,7 @@ static void tagNameList (tokenInfo* token, int c)
 		if (isIdentifierCharacter (c))
 		{
 			readIdentifier (token, c);
-			localKind = getKind (token);
+			localKind = getKindForToken (token);
 			/* Create tag in case name is not a known kind ... */
 			if (localKind == K_UNDEFINED)
 			{
@@ -1076,7 +1076,7 @@ static void findTag (tokenInfo *const token)
 		if (isIdentifierCharacter (c))
 		{
 			readIdentifier (token, c);
-			while (getKind (token) == K_IGNORE)
+			while (getKindForToken (token) == K_IGNORE)
 			{
 				c = skipWhite (vGetc ());
 				readIdentifier (token, c);

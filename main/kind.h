@@ -53,14 +53,17 @@ typedef struct sScopeSeparator {
 struct sKindDefinition {
 	bool enabled;          /* are tags for kind enabled? */
 	char  letter;               /* kind letter */
-	const char* name;		  /* kind name */
-	const char* description;	  /* displayed in --help output */
+	char* name;		  /* kind name */
+	char* description;	  /* displayed in --help output */
 	bool referenceOnly;
 	int nRoles;		/* The number of role elements. */
 	roleDesc *roles;
 	scopeSeparator *separators;
 	unsigned int separatorCount;
 
+	int id;
+
+	/* TODO:Following fields should be moved to kindObject. */
 	/* Usage of `syncWith' field is a bit tricky.
 
 	   If `LANG_AUTO' is specified to `syncWith' field of a kind
@@ -90,5 +93,22 @@ extern void enableKind (kindDefinition *kind, bool enable);
 #define PR_KIND_FMT(X,T) "%-" STRINGIFY(PR_KIND_STR(X)) STRINGIFY(T)
 
 #define PR_KIND_WIDTH_LANG 15
+
+struct kindControlBlock;
+typedef void (* freeKindDefFunc) (kindDefinition *);
+extern struct kindControlBlock* allocKindControlBlock (parserDefinition *parser);
+extern void freeKindControlBlock (struct kindControlBlock* kcb);
+extern int  defineKind (struct kindControlBlock* kcb, kindDefinition *def,
+						freeKindDefFunc freeKindDef);
+extern int countKinds (struct kindControlBlock* kcb);
+extern kindDefinition *getKind (struct kindControlBlock* kcb, int kindIndex);
+extern kindDefinition *getKindForLetter (struct kindControlBlock* kcb, int letter);
+extern kindDefinition *getKindForName (struct kindControlBlock* kcb, const char* name);
+extern void linkKindDependency (struct kindControlBlock *masterKCB,
+								struct kindControlBlock *slaveKCB);
+
+#ifdef DEBUG
+extern bool doesParserUseKind (struct kindControlBlock* kcb, char letter);
+#endif
 
 #endif	/* CTAGS_MAIN_KIND_H */

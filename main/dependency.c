@@ -20,57 +20,23 @@
 
 #include <string.h>
 
-static void linkKinds (kindDefinition *masterKind, kindDefinition *slaveKind)
-{
-	kindDefinition *tail;
-
-	slaveKind->master = masterKind;
-
-	tail = slaveKind;
-	while (tail->slave)
-	{
-		tail->enabled = masterKind->enabled;
-		tail = tail->slave;
-	}
-
-	tail->slave = masterKind->slave;
-	masterKind->slave = slaveKind;
-}
-
-static void linkKindDependency (parserDefinition *const masterParser,
-				parserDefinition *const slaveParser)
-{
-	unsigned int k_slave, k_master;
-	kindDefinition *kind_slave, *kind_master;
-
-	for (k_slave = 0; k_slave < slaveParser->kindCount; k_slave++)
-	{
-		if (slaveParser->kindTable [k_slave].syncWith == LANG_AUTO)
-		{
-			kind_slave = slaveParser->kindTable + k_slave;
-			for (k_master = 0; k_master < masterParser->kindCount; k_master++)
-			{
-				kind_master = masterParser->kindTable + k_master;
-				if ((kind_slave->letter == kind_master->letter)
-				    && (strcmp (kind_slave->name, kind_master->name) == 0))
-				{
-					linkKinds (kind_master, kind_slave);
-					kind_slave->syncWith = masterParser->id;
-					kind_master->syncWith = masterParser->id;
-					break;
-				}
-			}
-		}
-	}
-}
+struct slaveControlBlock {
+	slaveParser *slaveParsers;	/* The parsers on this list must be initialized when
+								   this parser is initialized. */
+	subparser   *subparsersDefault;
+	subparser   *subparsersInUse;
+};
 
 extern void linkDependencyAtInitializeParsing (depType dtype,
 						   parserDefinition *const master,
+						   struct slaveControlBlock *masterSCB,
+						   struct kindControlBlock *masterKCB,
 						   parserDefinition *const slave,
+						   struct kindControlBlock *slaveKCB,
 						   void *data)
 {
 	if (dtype == DEPTYPE_KIND_OWNER)
-		linkKindDependency (master, slave);
+		linkKindDependency (masterKCB, slaveKCB);
 	else if (dtype == DEPTYPE_SUBPARSER)
 	{
 		slaveParser *s = xMalloc (1, slaveParser);
@@ -78,17 +44,45 @@ extern void linkDependencyAtInitializeParsing (depType dtype,
 		s->type = dtype;
 		s->id = slave->id;
 		s->data = data;
-		attachSlaveParser (master->id, s);
+
+		s->next = masterSCB->slaveParsers;
+		masterSCB->slaveParsers = s;
 	}
 }
 
-extern void initializeDependencies (parserDefinition *parser)
+static void attachSubparser (struct slaveControlBlock *base_sb, subparser *subparser)
+{
+	   subparser->next = base_sb->subparsersDefault;
+	   base_sb->subparsersDefault = subparser;
+}
+
+
+extern struct slaveControlBlock *allocSlaveControlBlock (void)
+{
+	struct slaveControlBlock *cb;
+
+	cb = xMalloc (1, struct slaveControlBlock);
+	cb->slaveParsers = NULL;
+	cb->subparsersDefault = NULL;
+	cb->subparsersInUse = NULL;
+
+	return cb;
+}
+
+extern void freeSlaveControlBlock (struct slaveControlBlock *cb)
+{
+	eFree (cb);
+}
+
+extern void initializeDependencies (parserDefinition *parser,
+									struct slaveControlBlock *cb)
 {
 	unsigned int i;
 	slaveParser *sp = NULL;
 
 	/* Initialize slaves */
-	while ((sp = getNextSlaveParser (parser->id, sp)))
+	sp = cb->slaveParsers;
+	while (sp != NULL)
 	{
 		if (sp->type == DEPTYPE_SUBPARSER)
 		{
@@ -104,11 +98,9 @@ extern void initializeDependencies (parserDefinition *parser)
 		{
 			initializeParser (sp->id);
 			if (sp->type == DEPTYPE_SUBPARSER)
-			{
-				subparser *subparser = sp->data;
-				attachSubparser (parser->id, subparser);
-			}
+				attachSubparser (cb, sp->data);
 		}
+		sp = sp->next;
 	}
 
 	/* Initialize masters that act as base parsers. */
@@ -126,12 +118,16 @@ extern void initializeDependencies (parserDefinition *parser)
 	}
 }
 
-extern void finalizeDependencies (parserDefinition *parser)
+extern void finalizeDependencies (parserDefinition *parser,
+								  struct slaveControlBlock *cb)
 {
-	slaveParser *sp;
-
-	while ((sp = detachSlaveParser (parser->id)))
+	while (cb->slaveParsers)
+	{
+		slaveParser *sp = cb->slaveParsers;
+		cb->slaveParsers = sp->next;
+		sp->next = NULL;
 		eFree (sp);
+	}
 }
 
 extern void notifyInputStart (void)
@@ -180,4 +176,57 @@ extern void chooseExclusiveSubparser (subparser *s, void *data)
 				 getLanguageName (getSubparserLanguage (s)));
 		leaveSubparser();
 	}
+}
+
+extern subparser *getFirstSubparser(struct slaveControlBlock *controlBlock)
+{
+	if (controlBlock)
+		return controlBlock->subparsersInUse;
+	return NULL;
+}
+
+extern void useDefaultSubparsers (struct slaveControlBlock *controlBlock)
+{
+	controlBlock->subparsersInUse = controlBlock->subparsersDefault;
+}
+
+extern void useSpecifiedSubparser (struct slaveControlBlock *controlBlock, subparser *s)
+{
+	s->schedulingBaseparserExplicitly = true;
+	controlBlock->subparsersInUse = s;
+}
+
+extern void setupSubparsersInUse (struct slaveControlBlock *controlBlock)
+{
+	if (!controlBlock->subparsersInUse)
+		useDefaultSubparsers(controlBlock);
+}
+
+extern subparser* teardownSubparsersInUse (struct slaveControlBlock *controlBlock)
+{
+	subparser *tmp;
+	subparser *s = NULL;
+
+	tmp = controlBlock->subparsersInUse;
+	controlBlock->subparsersInUse = NULL;
+
+	if (tmp && tmp->schedulingBaseparserExplicitly)
+	{
+		tmp->schedulingBaseparserExplicitly = false;
+		s = tmp;
+	}
+
+	if (s)
+		return s;
+
+	while (tmp)
+	{
+		if (tmp->chosenAsExclusiveSubparser)
+		{
+			s = tmp;
+		}
+		tmp = tmp->next;
+	}
+
+	return s;
 }

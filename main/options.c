@@ -290,6 +290,8 @@ static optionDescription LongOptionDescription [] = {
  {1,"  --input-encoding-<LANG>=encoding"},
  {1,"      Specify encoding of the LANG input files."},
 #endif
+ {1,"  --kinddef-<LANG>=letter,name,desc"},
+ {1,"       [THIS IS A STUB. DON'T USE THIS] Define new kind for <LANG>."},
  {1,"  --kinds-<LANG>=[+|-]kinds, or"},
  {1,"  --<LANG>-kinds=[+|-]kinds"},
  {1,"       Enable/disable tag kinds for language <LANG>."},
@@ -2911,6 +2913,8 @@ static void processLongOption (
 	else if (processLangSpecificExtraOption(option, parameter))
 		;
 	else if (processParametricOption (option, parameter))
+		;
+	else if (processDefineKind (option, parameter))
 		;
 	else if (processKindDefinition (option, parameter))
 		;
