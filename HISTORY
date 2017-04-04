@@ -6,6 +6,7 @@ History of Onigmo (Oniguruma-mod)
                    Fix UTF-32 valid_encoding?.
 2017/02/20: [bug]  Import Ruby r57660
                    Initialize return values.
+2017/01/31: [API]  Fix missing const on onig_new_without_alloc. (Issue #85)
 
 2017/01/29: Version 6.1.1
 
