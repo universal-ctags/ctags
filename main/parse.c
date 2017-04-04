@@ -3180,6 +3180,7 @@ static roleDesc CTST_BrokenRoles [] = {
 };
 
 static kindDefinition CTST_Kinds[KIND_COUNT] = {
+	/* `a' is reserved for kinddef testing */
 	{true, 'b', "broken tag", "name with unwanted characters",
 	 .referenceOnly = false, ATTACH_ROLES (CTST_BrokenRoles) },
 	{true, KIND_NULL, "no letter", "kind with no letter"
