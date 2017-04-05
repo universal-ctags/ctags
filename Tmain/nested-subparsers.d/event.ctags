@@ -1,0 +1,3 @@
+--langdef=Event{base=C}
+--kinddef-Event=e,event,events
+--regex-Event=/DEFINE_EVENT\((.*)\);/\1/e/
