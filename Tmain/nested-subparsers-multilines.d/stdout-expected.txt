@@ -1,0 +1,3 @@
+b	input.c	/^			 b);$/;"	event	language:Event
+i	input.c	/^			i);$/;"	hook	language:Hook
+main	input.c	/^main(void)$/;"	function	language:C	typeref:typename:int
