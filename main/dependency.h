@@ -54,4 +54,10 @@ extern void initializeDependencies (parserDefinition *parser,
 extern void finalizeDependencies (parserDefinition *parser,
 								  struct slaveControlBlock *cb);
 
+extern slaveParser *getFirstSlaveParser(struct slaveControlBlock *controlBlock);
+extern slaveParser *getNextSlaveParser(slaveParser *last);
+#define foreachSlaveParser(VAR)			\
+	VAR = NULL;								\
+	while ((VAR = getNextSlaveParser (VAR)) != NULL)
+
 #endif	/* CTAGS_MAIN_DEPENDENCY_H */

@@ -257,3 +257,10 @@ extern bool doesSubparserRun (void)
 {
 	return subparserDepth;
 }
+
+extern slaveParser *getFirstSlaveParser (struct slaveControlBlock *scb)
+{
+	if (scb)
+		return scb->slaveParsers;
+	return NULL;
+}

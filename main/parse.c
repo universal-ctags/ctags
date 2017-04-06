@@ -3285,6 +3285,20 @@ extern subparser *getNextSubparser(subparser *last)
 		return getNextSubparser (r);
 }
 
+extern slaveParser *getNextSlaveParser(slaveParser *last)
+{
+	langType lang = getInputLanguage ();
+	parserObject *parser = LanguageTable + lang;
+	slaveParser *r;
+
+	if (last == NULL)
+		r = getFirstSlaveParser(parser->slaveControlBlock);
+	else
+		r = last->next;
+
+	return r;
+}
+
 extern void scheduleRunningBaseparser (int dependencyIndex)
 {
 	langType current = getInputLanguage ();
