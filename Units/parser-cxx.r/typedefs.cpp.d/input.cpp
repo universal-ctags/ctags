@@ -23,9 +23,15 @@ typedef enum { E2 } T103;
 typedef int* T201;
 typedef const AClass* *  T202;
 
-// function pointers
+// function pointers and functions
 typedef int (*T301) (int &,int , AUnion *);
 typedef AClass &(* T302)(AClass &);
+typedef struct AStruct (*T303)(struct AStruct &);
+typedef int (T304)(int);
+typedef struct AStruct (T305)(int);
+typedef union AUnion & (T306)(int);
+typedef AClass (T307)(int);
+typedef enum AEnum (T308)(int);
 
 // arrays
 typedef int T401 [ 10];

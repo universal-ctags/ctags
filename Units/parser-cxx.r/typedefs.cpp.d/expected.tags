@@ -9,6 +9,12 @@ T201	input.cpp	/^typedef int* T201;$/;"	t	typeref:typename:int *	file:
 T202	input.cpp	/^typedef const AClass* *  T202;$/;"	t	typeref:typename:const AClass **	file:
 T301	input.cpp	/^typedef int (*T301) (int &,int , AUnion *);$/;"	t	typeref:typename:int (*)(int &,int,AUnion *)	file:
 T302	input.cpp	/^typedef AClass &(* T302)(AClass &);$/;"	t	typeref:typename:AClass & (*)(AClass &)	file:
+T303	input.cpp	/^typedef struct AStruct (*T303)(struct AStruct &);$/;"	t	typeref:struct:AStruct (*)(struct AStruct &)	file:
+T304	input.cpp	/^typedef int (T304)(int);$/;"	t	typeref:typename:int ()(int)	file:
+T305	input.cpp	/^typedef struct AStruct (T305)(int);$/;"	t	typeref:struct:AStruct ()(int)	file:
+T306	input.cpp	/^typedef union AUnion & (T306)(int);$/;"	t	typeref:union:AUnion & ()(int)	file:
+T307	input.cpp	/^typedef AClass (T307)(int);$/;"	t	typeref:typename:AClass ()(int)	file:
+T308	input.cpp	/^typedef enum AEnum (T308)(int);$/;"	t	typeref:enum:AEnum ()(int)	file:
 T401	input.cpp	/^typedef int T401 [ 10];$/;"	t	typeref:typename:int[10]	file:
 T501	input.cpp	/^typedef ATemplate1<int > T501;$/;"	t	typeref:typename:ATemplate1<int>	file:
 T502	input.cpp	/^typedef ATemplate1< unsigned short int> T502;$/;"	t	typeref:typename:ATemplate1<unsigned short int>	file:
