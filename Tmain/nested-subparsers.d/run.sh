@@ -3,7 +3,7 @@
 
 CTAGS="$1 --quiet --options=NONE  --fields=+lK"
 
-function list_kinds
+list_kinds()
 {
 	echo '#'
 	echo '#' list kinds$2 $1
@@ -14,6 +14,7 @@ function list_kinds
 			 --options=./plugin.ctags \
 			 --list-kinds$2=$1
 }
+
 list_kinds C
 list_kinds Event
 list_kinds Hook
@@ -97,3 +98,37 @@ ${CTAGS}  -o - \
 		 --options=./unused-attr.ctags \
 		 --kinds-UnusedAttr=-v \
 		 input.c
+
+echo List subparsers of C '(' 'EVENT' + 'HOOK' + PLUGIN + 'UA' ')'
+${CTAGS}  \
+		 --options=./event.ctags \
+		 --options=./hook.ctags \
+		 --options=./plugin.ctags \
+		 --options=./unused-attr.ctags \
+		 --list-subparsers=C
+
+echo List subparsers of C '(' 'EVENT' + 'HOOK' + PLUGIN + 'UA' ')' without the header
+${CTAGS} --with-list-header=no \
+		 --options=./event.ctags \
+		 --options=./hook.ctags \
+		 --options=./plugin.ctags \
+		 --options=./unused-attr.ctags \
+		 --list-subparsers=C
+
+echo List subparsers of C '(' 'EVENT' + 'HOOK' + PLUGIN + 'UA' ')' in machinable
+${CTAGS}  \
+		 --options=./event.ctags \
+		 --options=./hook.ctags \
+		 --options=./plugin.ctags \
+		 --options=./unused-attr.ctags \
+		 --machinable \
+		 --list-subparsers=C
+
+echo List subparsers of C '(' 'EVENT' + 'HOOK' + PLUGIN + 'UA' ')' in machinable without the header
+${CTAGS} --with-list-header=no \
+		 --options=./event.ctags \
+		 --options=./hook.ctags \
+		 --options=./plugin.ctags \
+		 --options=./unused-attr.ctags \
+		 --machinable \
+		 --list-subparsers=C
