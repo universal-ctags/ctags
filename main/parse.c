@@ -1556,7 +1556,7 @@ static void initializeParsingCommon (parserDefinition *def, bool is_builtin)
 		parser->fileKind = fileKindNew(fileKindLetter);
 
 	parser->kindControlBlock  = allocKindControlBlock (def);
-	parser->slaveControlBlock = allocSlaveControlBlock ();
+	parser->slaveControlBlock = allocSlaveControlBlock (def);
 	parser->lregexControlBlock = allocLregexControlBlock (def);
 }
 

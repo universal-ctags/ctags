@@ -26,6 +26,7 @@ struct slaveControlBlock {
 								   this parser is initialized. */
 	subparser   *subparsersDefault;
 	subparser   *subparsersInUse;
+	langType     owner;
 };
 
 extern void linkDependencyAtInitializeParsing (depType dtype,
@@ -58,7 +59,7 @@ static void attachSubparser (struct slaveControlBlock *base_sb, subparser *subpa
 }
 
 
-extern struct slaveControlBlock *allocSlaveControlBlock (void)
+extern struct slaveControlBlock *allocSlaveControlBlock (parserDefinition *parser)
 {
 	struct slaveControlBlock *cb;
 
@@ -66,6 +67,7 @@ extern struct slaveControlBlock *allocSlaveControlBlock (void)
 	cb->slaveParsers = NULL;
 	cb->subparsersDefault = NULL;
 	cb->subparsersInUse = NULL;
+	cb->owner = parser->id;
 
 	return cb;
 }

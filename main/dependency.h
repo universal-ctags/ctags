@@ -47,7 +47,7 @@ extern void linkDependencyAtInitializeParsing (depType dtype,
 						   struct kindControlBlock *slaveKCB,
 						   void *data);
 
-extern struct slaveControlBlock *allocSlaveControlBlock (void);
+extern struct slaveControlBlock *allocSlaveControlBlock (parserDefinition *parser);
 extern void freeSlaveControlBlock (struct slaveControlBlock *cb);
 extern void initializeDependencies (parserDefinition *parser,
 									struct slaveControlBlock *cb);
