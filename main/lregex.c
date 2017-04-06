@@ -394,7 +394,11 @@ static regexPattern* addCompiledTagCommon (const langType language,
 
 static void pre_ptrn_flag_multiline_long (const char* const s CTAGS_ATTR_UNUSED, const char* const v, void* data)
 {
-
+	if (!v)
+	{
+		error (WARNING, "no value is given for: %s", s);
+		return;
+	}
 	if (!strToInt (v, 10, data))
 	{
 		error (WARNING, "wrong multiline specificaiton: %s", v);
