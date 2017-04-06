@@ -3376,6 +3376,26 @@ extern subparser* getSubparserRunningBaseparser (void)
 		return NULL;
 }
 
+extern void printLanguageSubparsers (const langType language)
+{
+	for (int i = 0; i < (int) LanguageCount; i++)
+		initializeParserOne (i);
+
+
+	if (Option.withListHeader)
+		printSubparserListHeader (Option.machinable);
+
+	if (language == LANG_AUTO)
+	{
+		for (int i = 0; i < (int) LanguageCount; i++)
+			printSubparsers ((LanguageTable + i)->slaveControlBlock,
+								 Option.machinable);
+	}
+	else
+		printSubparsers ((LanguageTable + language)->slaveControlBlock,
+						 Option.machinable);
+}
+
 /*
  * A parser for CTagsSelfTest (CTST)
  */
