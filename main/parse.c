@@ -3329,7 +3329,10 @@ extern void scheduleRunningBaseparser (int dependencyIndex)
 		verbose ("scheduleRunningBaseparser %s with subparsers: ", base_name);
 		pushLanguage (base);
 		foreachSubparser(tmp)
-			verbose ("%s ", getLanguageName (tmp->slaveParser->id));
+		{
+			langType t = getSubparserLanguage (tmp);
+			verbose ("%s ", getLanguageName (t));
+		}
 		popLanguage ();
 		verbose ("\n");
 	}
