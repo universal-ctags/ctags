@@ -56,7 +56,7 @@ static iniconfSubparser *maySwitchLanguage (const char *section, const char *key
 		{
 			bool r;
 
-			enterSubparser (s);
+			enterSubparser ((subparser *)s);
 			r = s->probeLanguage(section, key, value);
 			leaveSubparser ();
 			if (r)
@@ -152,7 +152,7 @@ static void findIniconfTags (void)
 
 			if (sub)
 			{
-				enterSubparser(sub);
+				enterSubparser((subparser *)sub);
 				sub->newDataNotify (sub, vStringValue (name), NULL, NULL);
 				leaveSubparser ();
 			}
@@ -202,7 +202,7 @@ static void findIniconfTags (void)
 												 vStringValue (val));
 					if (sub)
 					{
-						enterSubparser (sub);
+						enterSubparser ((subparser *)sub);
 						sub->newDataNotify (sub,
 											(vStringLength (scope) > 0)
 											? vStringValue (scope)

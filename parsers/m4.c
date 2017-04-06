@@ -309,7 +309,7 @@ static bool doesLineCommentStart (m4Subparser *m4, int c, char *token)
 	if (m4 && m4->doesLineCommentStart)
 	{
 		bool r;
-		enterSubparser (m4);
+		enterSubparser ((subparser *)m4);
 		r = m4->doesLineCommentStart (m4, c, token);
 		leaveSubparser ();
 		if (r)
@@ -324,7 +324,7 @@ static bool doesStringLiteralStart (m4Subparser *m4, int c)
 	if (m4 && m4->doesStringLiteralStart)
 	{
 		bool r;
-		enterSubparser (m4);
+		enterSubparser ((subparser *)m4);
 		r = m4->doesStringLiteralStart (m4, c);
 		leaveSubparser ();
 		return r;
@@ -336,7 +336,7 @@ static int notifyNewMacro (m4Subparser *m4, const char *token)
 {
 	int index;
 
-	enterSubparser (m4);
+	enterSubparser ((subparser *)m4);
 	index = m4->newMacroNotify (m4, token);
 	leaveSubparser ();
 

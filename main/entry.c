@@ -1298,6 +1298,8 @@ extern void initTagEntryFull (tagEntryInfo *const e, const char *const name,
 		markTagExtraBit (e, XTAG_REFERENCE_TAGS);
 	if (doesParserRunAsGuest ())
 		markTagExtraBit (e, XTAG_TAGS_GENERATED_BY_GUEST_PARSERS);
+	if (doesSubparserRun ())
+		markTagExtraBit (e, XTAG_TAGS_GENERATED_BY_SUBPARSER);
 
 	e->sourceLanguage = sourceLanguage;
 	e->sourceFileName = sourceFileName;

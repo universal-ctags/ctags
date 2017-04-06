@@ -16,7 +16,6 @@
 
 #include "dependency.h"
 #include "types.h"
-#include "read.h"
 
 
 typedef enum eSubparserRunDirection {
@@ -52,8 +51,8 @@ extern subparser *getNextSubparser(subparser *last);
 	VAR = NULL;								\
 	while ((VAR = getNextSubparser (VAR)) != NULL)
 
-#define enterSubparser(S) pushLanguage (getSubparserLanguage ((subparser *)S))
-#define leaveSubparser()  popLanguage ()
+extern void enterSubparser(subparser *subparser);
+extern void leaveSubparser(void);
 
 extern subparser* getSubparserRunningBaseparser (void);
 extern void chooseExclusiveSubparser (subparser *s, void *data);

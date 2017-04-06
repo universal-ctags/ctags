@@ -275,7 +275,7 @@ probing is one of them.
 
 Registering a `subparser var` to a base parser is enough for the
 bottom up choice. For handling the top down choice (e.g. specifying
---language-force=`subparser` in a command line), more code is needed.
+`--language-force=subparser` in a command line), more code is needed.
 
 call `scheduleRunningBaseparser` function from a function(`parser` method)
 assigned to `parser` member in `parserDefinition` of the subparser,
@@ -646,6 +646,18 @@ The main part prepares `scheduleRunningBaseparser` function for the purpose.
 A subparser should call the function from `parser` method of `parserDefinition`
 of the subparser. `scheduleRunningBaseparser` takes an integer. It specifies
 an index of the dependency which is used for registering the subparser.
+
+User interface
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Running subparser can be controlled with `s` extras flag.
+By default it is enabled. To turning off the feature running
+subparser, specify `--extras=-s`.
+
+When `--extras=+E` option given, a tag entry recorded by a subparser
+is marked as follows::
+
+	TMPDIR	input.ac	/^AH_TEMPLATE([TMPDIR],$/;"	template	extras:subparser	end:4
 
 Examples of sub/base combinations
 ......................................................................
