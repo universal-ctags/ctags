@@ -2411,6 +2411,34 @@ static bool doesParserUseCork (parserDefinition *parser)
 	return r;
 }
 
+static void setupLanguageSubparsersInUse (const langType language)
+{
+	subparser *tmp;
+
+	setupSubparsersInUse ((LanguageTable + language)->slaveControlBlock);
+	foreachSubparser(tmp)
+	{
+		langType t = getSubparserLanguage (tmp);
+		enterSubparser (tmp);
+		setupLanguageSubparsersInUse(t);
+		leaveSubparser ();
+	}
+}
+
+static subparser* teardownLanguageSubparsersInUse (const langType language)
+{
+	subparser *tmp;
+
+	foreachSubparser(tmp)
+	{
+		langType t = getSubparserLanguage (tmp);
+		enterSubparser (tmp);
+		teardownLanguageSubparsersInUse(t);
+		leaveSubparser ();
+	}
+	return teardownSubparsersInUse ((LanguageTable + language)->slaveControlBlock);
+}
+
 static bool createTagsWithFallback1 (const langType language,
 									 langType *exclusive_subparser)
 {
@@ -2426,7 +2454,7 @@ static bool createTagsWithFallback1 (const langType language,
 	initializeParser (language);
 	parser = &(LanguageTable [language]);
 
-	setupSubparsersInUse (parser->slaveControlBlock);
+	setupLanguageSubparsersInUse (language);
 
 	useCork = doesParserUseCork(parser->def);
 	if (useCork)
@@ -2474,7 +2502,7 @@ static bool createTagsWithFallback1 (const langType language,
 		uncorkTagFile();
 
 	{
-		subparser *s = teardownSubparsersInUse (parser->slaveControlBlock);
+		subparser *s = teardownLanguageSubparsersInUse (language);
 		if (exclusive_subparser && s)
 			*exclusive_subparser = getSubparserLanguage (s);
 	}
