@@ -890,6 +890,8 @@ extern void processTagRegexOption (struct lregexControlBlock *lcb,
 	else
 	{
 		const char* regexfile = parameter + 1;
+
+		verbose ("open a regex file: %s\n", regexfile);
 		MIO* const mio = mio_new_file (regexfile, "r");
 		if (mio == NULL)
 			error (WARNING | PERROR, "%s", regexfile);
