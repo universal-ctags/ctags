@@ -899,7 +899,10 @@ extern void processTagRegexOption (struct lregexControlBlock *lcb,
 		{
 			vString* const regex = vStringNew ();
 			while (readLineRaw (regex, mio))
-				addTagRegexOption (lcb, vStringValue (regex));
+			{
+				if (vStringLength (regex) > 1 && vStringValue (regex)[0] != '\n')
+					addTagRegexOption (lcb, vStringValue (regex));
+			}
 			mio_free (mio);
 			vStringDelete (regex);
 		}
