@@ -1,0 +1,4 @@
+# Add a pattern
+eax	input.c	/^register(eax);$/;"	r
+x	input.c	/^DEFINE(x, 1);$/;"	d
+# Clear the pattern
