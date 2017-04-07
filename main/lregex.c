@@ -872,11 +872,9 @@ static void addTagRegexOption (struct lregexControlBlock *lcb,
 		char *const regex_pat = eStrdup (pattern);
 		char *name, *kinds, *flags;
 		if (parseTagRegex (regex_pat, &name, &kinds, &flags))
-		{
 			addTagRegexInternal (lcb, regex_pat, name, kinds, flags,
 					     NULL);
-			eFree (regex_pat);
-		}
+		eFree (regex_pat);
 	}
 }
 
