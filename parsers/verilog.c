@@ -20,7 +20,6 @@
 #include "general.h"  /* must always come first */
 
 #include <string.h>
-#include <setjmp.h>
 
 #include "debug.h"
 #include "cpreprocessor.h"
