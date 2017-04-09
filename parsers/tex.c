@@ -373,7 +373,6 @@ static bool parseTag (tokenInfo *const token, texKind kind)
 	bool        eof = false;
 
 	fullname = vStringNew ();
-	vStringClear (fullname);
 
 	/*
 	 * Tex tags are of these formats:
