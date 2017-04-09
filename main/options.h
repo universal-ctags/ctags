@@ -183,7 +183,6 @@ extern bool processAliasOption (const char *const option, const char *const para
 #ifdef HAVE_ICONV
 extern bool processLanguageEncodingOption (const char *const option, const char *const parameter);
 #endif
-extern bool processRegexOption (const char *const option, const char *const parameter);
 extern bool processXcmdOption (const char *const option, const char *const parameter, OptionLoadingStage stage);
 
 typedef void (* mainLoopFunc) (cookedArgs *args, void *data);

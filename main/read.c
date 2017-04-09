@@ -202,7 +202,7 @@ extern bool doesInputLanguageAllowNullTag (void)
 
 extern kindDefinition *getInputLanguageFileKind (void)
 {
-	return getLanguageFileKind (getInputLanguage ());
+	return getLanguageKind (getInputLanguage (), KIND_FILE_INDEX);
 }
 
 extern bool doesInputLanguageRequestAutomaticFQTag (void)
@@ -781,7 +781,8 @@ static vString *iFileGetLine (void)
 {
 	if (File.line == NULL)
 		File.line = vStringNew ();
-	if ((hasMultilineRegexPatterns (getInputLanguage ())) && File.allLines == NULL)
+
+	if ((hasLanguageMultilineRegexPatterns (getInputLanguage ())) && File.allLines == NULL)
 		File.allLines = vStringNew ();
 
 	readLine (File.line, File.mio);
@@ -796,17 +797,17 @@ static vString *iFileGetLine (void)
 
 		if (Option.lineDirectives && vStringChar (File.line, 0) == '#')
 			parseLineDirective (vStringValue (File.line) + 1);
-		matchRegex (File.line, getInputLanguage ());
+		matchLanguageRegex (getInputLanguage (), File.line);
 
-		if (hasMultilineRegexPatterns (getInputLanguage ()))
+		if (hasLanguageMultilineRegexPatterns (getInputLanguage ()))
 			vStringCat (File.allLines, File.line);
 		return File.line;
 	}
 	else
 	{
-		if (hasMultilineRegexPatterns (getInputLanguage ()))
+		if (hasLanguageMultilineRegexPatterns (getInputLanguage ()))
 		{
-			matchMultilineRegex (File.allLines, getInputLanguage ());
+			matchLanguageMultilineRegex (getInputLanguage (), File.allLines);
 			vStringDelete (File.allLines);
 			File.allLines = NULL;
 		}

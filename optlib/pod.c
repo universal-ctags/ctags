@@ -25,15 +25,21 @@ extern parserDefinition* PodParser (void)
 		NULL
 	};
 
+	static kindDefinition PodKindTable [] = {
+		{ true, 'c', "chapter", "chapters" },
+		{ true, 's', "section", "sections" },
+		{ true, 'S', "subsection", "subsections" },
+		{ true, 't', "subsubsection", "subsubsections" },
+	};
 	static tagRegexTable PodTagRegexTable [] = {
 		{"^=head1[ \\t]+(.+)", "\\1",
-		"c,chapter,chapters", NULL},
+		"c", NULL},
 		{"^=head2[ \\t]+(.+)", "\\1",
-		"s,section,sections", NULL},
+		"s", NULL},
 		{"^=head3[ \\t]+(.+)", "\\1",
-		"S,subsection,subsections", NULL},
+		"S", NULL},
 		{"^=head4[ \\t]+(.+)", "\\1",
-		"t,subsubsection,subsubsections", NULL},
+		"t", NULL},
 	};
 
 
@@ -44,6 +50,8 @@ extern parserDefinition* PodParser (void)
 	def->patterns      = patterns;
 	def->aliases       = aliases;
 	def->method        = METHOD_NOT_CRAFTED|METHOD_REGEX;
+	def->kindTable = PodKindTable;
+	def->kindCount = ARRAY_SIZE(PodKindTable);
 	def->tagRegexTable = PodTagRegexTable;
 	def->tagRegexCount = ARRAY_SIZE(PodTagRegexTable);
 	def->initialize    = initializePodParser;

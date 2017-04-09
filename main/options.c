@@ -343,6 +343,8 @@ static optionDescription LongOptionDescription [] = {
  {0,"       Output list of pseudo tags."},
  {1,"  --list-regex-flags"},
  {1,"       Output list of flags which can be used in a regex parser definition."},
+ {1,"  --list-subparsers=[baselang|all]"},
+ {1,"       Output list of subparsers for the base language."},
  {1,"  --machinable=[yes|no]"},
  {1,"       Use tab separated representation in --list- option output. [no]"},
  {1,"       --list-extras, --list-fields, --list-kinds-full, and --list-params support this option."},
@@ -1994,6 +1996,29 @@ static void processListRolesOptions (const char *const option CTAGS_ATTR_UNUSED,
 	printLanguageRoles (lang, kindletters);
 	exit (0);
 }
+
+static void processListSubparsersOptions (const char *const option CTAGS_ATTR_UNUSED,
+				     const char *const parameter)
+{
+	langType lang;
+
+
+	if (parameter == NULL || parameter[0] == '\0'
+		|| (strcmp(parameter, "all") == 0))
+	{
+		printLanguageSubparsers(LANG_AUTO);
+		exit (0);
+	}
+
+	lang = getNamedLanguage (parameter, 0);
+	if (lang == LANG_IGNORE)
+		error (FATAL, "Unknown language \"%s\" in \"%s\"", parameter, option);
+
+	printLanguageSubparsers(lang);
+	exit (0);
+}
+
+
 static void freeSearchPathList (searchPathList** pathList)
 {
 	stringListClear (*pathList);
@@ -2539,6 +2564,7 @@ static parametricOption ParametricOptions [] = {
 	{ "list-pseudo-tags",       processListPseudoTagsOptions,   true,   STAGE_ANY },
 	{ "list-regex-flags",       processListRegexFlagsOptions,   true,   STAGE_ANY },
 	{ "_list-roles",            processListRolesOptions,        true,   STAGE_ANY },
+	{ "list-subparsers",        processListSubparsersOptions,   true,   STAGE_ANY },
 	{ "maxdepth",               processMaxRecursionDepthOption, true,   STAGE_ANY },
 	{ "options",                processOptionFile,              false,  STAGE_ANY },
 	{ "output-format",          processOutputFormat,            true,   STAGE_ANY },
@@ -2892,6 +2918,20 @@ static bool processLangSpecificExtraOption (const char *const option,
 			break;
 		}
 	}
+	return true;
+}
+
+static bool processRegexOption (const char *const option,
+								const char *const parameter)
+{
+	langType language;
+
+	language = getLanguageComponentInOption (option, "regex-");
+	if (language == LANG_IGNORE)
+		return false;
+
+	processLanguageRegexOption (language, parameter);
+
 	return true;
 }
 

@@ -18,6 +18,7 @@
 #include "dependency.h"
 #include "field.h"
 #include "kind.h"
+#include "lregex.h"
 #include "lxpath.h"
 #include "param.h"
 #include "parsers.h"  /* contains list of parsers */
@@ -62,14 +63,6 @@ typedef enum {
 	METHOD_XCMD_AVAILABLE = 1 << 3,
 	METHOD_XPATH          = 1 << 4,
 } parsingMethod;
-
-typedef struct {
-	const char *const regex;
-	const char* const name;
-	const char* const kinds;
-	const char *const flags;
-	bool    *disabled;
-} tagRegexTable;
 
 typedef struct {
 	const char *name;
@@ -123,20 +116,11 @@ struct sParserDefinition {
 
 typedef parserDefinition* (parserDefinitionFunc) (void);
 
-typedef struct {
-	size_t start;   /* character index in line where match starts */
-	size_t length;  /* length of match */
-} regexMatch;
-
-typedef void (*regexCallback) (const char *line, const regexMatch *matches, unsigned int count,
-			       void *userData);
-
 typedef enum {
 	LMAP_PATTERN   = 1 << 0,
 	LMAP_EXTENSION = 1 << 1,
 	LMAP_ALL       = LMAP_PATTERN | LMAP_EXTENSION,
 } langmapType;
-
 
 /*
 *   FUNCTION PROTOTYPES
@@ -163,7 +147,10 @@ extern parserDefinition* parserNew (const char* name);
 extern bool doesLanguageAllowNullTag (const langType language);
 extern bool doesLanguageRequestAutomaticFQTag (const langType language);
 extern const char *getLanguageName (const langType language);
-extern kindDefinition* getLanguageFileKind (const langType language);
+extern kindDefinition* getLanguageKindForLetter (const langType language, char kindLetter);
+extern kindDefinition* getLanguageKind(const langType language, char kindIndex);
+extern int defineLanguageKind (const langType language, kindDefinition *def,
+							   freeKindDefFunc freeKindDef);
 extern langType getNamedLanguage (const char *const name, size_t len);
 extern langType getFileLanguage (const char *const fileName);
 extern bool isLanguageEnabled (const langType language);
@@ -198,6 +185,7 @@ extern void printLanguageRoles (const langType language, const char* letters);
 extern void printLanguageAliases (const langType language);
 extern void printLanguageList (void);
 extern void printLanguageParameters (const langType language);
+extern void printLanguageSubparsers (const langType language);
 extern bool doesParserRequireMemoryStream (const langType language);
 extern bool parseFile (const char *const fileName);
 extern bool parseFileWithMio (const char *const fileName, MIO *mio);
@@ -212,32 +200,21 @@ extern void freeEncodingResources (void);
 
 
 /* Regex interface */
+extern bool processLanguageRegexOption (langType language, const char *const parameter);
 extern void findRegexTags (void);
 extern void findRegexTagsMainloop (int (* driver)(void));
-extern bool matchRegex (const vString* const line, const langType language);
-extern void addLanguageRegex (const langType language, const char* const regex);
-extern void addTagRegex (const langType language, const char* const regex,
-			 const char* const name, const char* const kinds, const char* const flags,
-			 bool *disabled);
-extern void addCallbackRegex (const langType language, const char *const regexo, const char *const flags,
-			      const regexCallback callback, bool *disabled, void *userData);
-extern void resetRegexKinds (const langType language, bool mode);
-extern bool enableRegexKind (const langType language, const int kind, const bool mode);
-extern bool enableRegexKindLong (const langType language, const char *kindLong, const bool mode);
-extern bool isRegexKindEnabled (const langType language, const int kind);
-extern bool hasRegexKind (const langType language, const int kind);
-extern void printRegexKinds (const langType language, bool allKindFields, bool indent,
-			     bool tabSeparated);
-extern void foreachRegexKinds (const langType language, bool (* func) (kindDefinition*, void*), void *data);
+extern void matchLanguageRegex (const langType language, const vString* const line);
+extern void addLanguageCallbackRegex (const langType language, const char *const regex, const char *const flags,
+									  const regexCallback callback, bool *disabled, void *userData);
 extern void freeRegexResources (void);
 extern bool checkRegex (void);
 extern void useRegexMethod (const langType language);
 extern void printRegexFlags (void);
-extern bool hasScopeActionInRegex (const langType language);
+extern bool hasLanguageScopeActionInRegex (const langType language);
 
 /* Multiline Regex Interface */
-extern bool hasMultilineRegexPatterns (const langType language);
-extern bool matchMultilineRegex (const vString* const allLines, const langType language);
+extern bool hasLanguageMultilineRegexPatterns (const langType language);
+extern void matchLanguageMultilineRegex (const langType language, const vString* const allLines);
 
 extern unsigned int   getXpathFileSpecCount (const langType language);
 extern xpathFileSpec* getXpathFileSpec (const langType language, unsigned int nth);

@@ -8,8 +8,14 @@
 
 static void initializeGdbinitParser (const langType language)
 {
-	enableRegexKind (language, 'D', false);
-	enableRegexKind (language, 'l', false);
+	{
+		kindDefinition *kdef = getLanguageKindForLetter (language, 'D');
+		enableKind (kdef, false);
+	}
+	{
+		kindDefinition *kdef = getLanguageKindForLetter (language, 'l');
+		enableKind (kdef, false);
+	}
 }
 
 extern parserDefinition* GdbinitParser (void)
@@ -28,17 +34,23 @@ extern parserDefinition* GdbinitParser (void)
 		NULL
 	};
 
+	static kindDefinition GdbinitKindTable [] = {
+		{ true, 'd', "definition", "definitions" },
+		{ true, 'D', "document", "documents" },
+		{ true, 't', "toplevelVariable", "toplevel variables" },
+		{ true, 'l', "localVariable", "local variables" },
+	};
 	static tagRegexTable GdbinitTagRegexTable [] = {
 		{"^#.*", "",
 		"", "{exclusive}"},
 		{"^define[[:space:]]+([^[:space:]]+)$", "\\1",
-		"d,definition", NULL},
+		"d", NULL},
 		{"^document[[:space:]]+([^[:space:]]+)$", "\\1",
-		"D,document", NULL},
+		"D", NULL},
 		{"^set[[:space:]]+\\$([a-zA-Z0-9_]+)[[:space:]]*=", "\\1",
-		"t,toplevelVariable", NULL},
+		"t", NULL},
 		{"^[[:space:]]+set[[:space:]]+\\$([a-zA-Z0-9_]+)[[:space:]]*=", "\\1",
-		"l,localVariable", NULL},
+		"l", NULL},
 	};
 
 
@@ -49,6 +61,8 @@ extern parserDefinition* GdbinitParser (void)
 	def->patterns      = patterns;
 	def->aliases       = aliases;
 	def->method        = METHOD_NOT_CRAFTED|METHOD_REGEX;
+	def->kindTable = GdbinitKindTable;
+	def->kindCount = ARRAY_SIZE(GdbinitKindTable);
 	def->tagRegexTable = GdbinitTagRegexTable;
 	def->tagRegexCount = ARRAY_SIZE(GdbinitTagRegexTable);
 	def->initialize    = initializeGdbinitParser;

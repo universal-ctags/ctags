@@ -67,4 +67,7 @@ extern void useSpecifiedSubparser (struct slaveControlBlock *controlBlock, subpa
 extern void setupSubparsersInUse (struct slaveControlBlock *controlBlock);
 extern subparser* teardownSubparsersInUse (struct slaveControlBlock *controlBlock);
 
+extern void printSubparserListHeader (bool machinable);
+extern void printSubparsers (struct slaveControlBlock *scb, bool machinable);
+
 #endif	/* CTAGS_MAIN_SUBPARSER_H */

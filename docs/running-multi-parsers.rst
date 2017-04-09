@@ -82,6 +82,8 @@ A host parser using the interface has responsibility to detect areas
 from input stream and record them with name of guest parsers that will
 be applied to the areas.
 
+.. _base-sub-parsers:
+
 Tagging definitions of higher(upper) level language (sub/base)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -647,7 +649,7 @@ A subparser should call the function from `parser` method of `parserDefinition`
 of the subparser. `scheduleRunningBaseparser` takes an integer. It specifies
 an index of the dependency which is used for registering the subparser.
 
-User interface
+Command line interface
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Running subparser can be controlled with `s` extras flag.
@@ -658,6 +660,8 @@ When `--extras=+E` option given, a tag entry recorded by a subparser
 is marked as follows::
 
 	TMPDIR	input.ac	/^AH_TEMPLATE([TMPDIR],$/;"	template	extras:subparser	end:4
+
+See also :ref:`Defining a subparser <defining-subparsers>`.
 
 Examples of sub/base combinations
 ......................................................................

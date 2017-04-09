@@ -81,6 +81,7 @@ The following parsers have been added:
 * CoffeeScript *xcmd*
 * ctags option library *optlib*
 * Myrddin
+* RSpec *optlib*
 
 See "Option library" for details on *optlib*.
 See "External parser command" for details on *xcmd*.
@@ -621,6 +622,120 @@ A new ``--_interactive`` option launches a JSON based command REPL which
 can be used to control ctags generation programatically.
 
 See :ref:`--_interactive Mode <interactive-mode>` for more details.
+
+
+..
+	NOT REVIEWED YET
+
+Defining a kind
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+A new ``--kinddef-<LANG>=letter,name,description`` option reduces the
+typing defining a regex pattern with ``--regex-<LANG>=``, and keeps
+the consistency of dynamically defined kinds in a language.
+
+A kind letter defined with ``--kinddef-<LANG>`` can be referred in
+``--kinddef-<LANG>``.
+
+Previsouly you had to write in your optlib::
+
+    --regex-elm=/^([[:lower:]_][[:alnum:]_]*)[^=]*=$/\1/f,function,Functions/{scope=set}
+    --regex-elm=/^[[:blank:]]+([[:lower:]_][[:alnum:]_]*)[^=]*=$/\1/f,function,Functions/{scope=ref}
+
+With new ``--kinddef-<LANG>`` you can write the same things like::
+
+    --kinddef-elm=f,function,Functions
+    --regex-elm=/^([[:lower:]_][[:alnum:]_]*)[^=]*=$/\1/f/{scope=set}
+    --regex-elm=/^[[:blank:]]+([[:lower:]_][[:alnum:]_]*)[^=]*=$/\1/f/{scope=ref}
+
+We can say now "kind" is a first class object in Universal-ctags.
+
+
+.. _defining-subparsers:
+
+Defining a subparser
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+..
+	NOT REVIEWED YET
+
+About the concept of subparser, see :ref:`Tagging definitions of higher(upper) level language (sub/base) <base-sub-parsers>`.
+
+With ``base`` long flag of `--langdef=<LANG>` option, you can define
+a subparser for a specified base parser. Combining with ``--kinddef-<LANG>``
+and ``--regex-<KIND>`` options, you can extend an existing parser
+without risk of kind confliction.
+
+Let's see an example.
+
+input.c
+
+.. code-block:: C
+
+    static int set_one_prio(struct task_struct *p, int niceval, int error)
+    {
+    }
+
+    SYSCALL_DEFINE3(setpriority, int, which, int, who, int, niceval)
+    {
+	    ...;
+    }
+
+.. code-block:: console
+
+    $./ctags --options=NONE  -x --_xformat="%20N %10K %10l"  -o - input.c
+    ctags: Notice: No options will be read from files or environment
+	    set_one_prio   function          C
+	 SYSCALL_DEFINE3   function          C
+
+C parser doesn't understand that `SYSCALL_DEFINE3` is a macro for defining an
+entry point for a system.
+
+Let's define `linux` subparser which using C parser as a base parser:
+
+.. code-block:: console
+
+    $ cat linux.ctags
+    --langdef=linux{base=C}
+    --kinddef-linux=s,syscall,system calls
+    --regex-linux=/SYSCALL_DEFINE[0-9]\(([^, )]+)[\),]*/\1/s/
+
+The output is change as follows with `linux` parser:
+
+.. code-block:: console
+
+	$ ./ctags --options=NONE --options=./linux.ctags -x --_xformat="%20N %10K %10l"  -o - input.c
+	ctags: Notice: No options will be read from files or environment
+		 setpriority    syscall      linux
+		set_one_prio   function          C
+	     SYSCALL_DEFINE3   function          C
+
+`setpriority` is recognized as a `syscall` of `linux`.
+
+Using only `--regex-C=...` you can capture `setpriority`.
+However, there were concerns about kind confliction; when introducing
+a new kind with `--regex-C=...`, you cannot use a letter and name already
+used in C parser and `--regex-C=...` options sepcified in the other places.
+
+You can use a newly defined subparser as a new namespace of kinds.
+In addition you can enable/disable with the subparser usable
+`--languages=[+|-]` option:
+
+.. code-block::console
+
+    $ ./ctags --options=NONE --options=./linux.ctags --languages=-linux -x --_xformat="%20N %10K %10l"  -o - input.c
+    ctags: Notice: No options will be read from files or environment
+	    set_one_prio   function          C
+	 SYSCALL_DEFINE3   function          C
+
+Subparsers can be listed with ``--list-subparser``:
+
+.. code-block:: console
+
+    $ ./ctags --options=NONE --options=./linux.ctags --list-subparsers=C
+    ctags: Notice: No options will be read from files or environment
+    #NAME                          BASEPARSER           DIRECTION
+    linux                          C                    base => sub
 
 Changes to the tags file format
 ---------------------------------------------------------------------

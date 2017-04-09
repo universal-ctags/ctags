@@ -414,6 +414,9 @@
     <ClCompile Include="..\parsers\dtd.c">
       <Filter>Source Files\Main</Filter>
     </ClCompile>
+    <ClCompile Include="..\optlib\RSpec.c">
+      <Filter>Source Files\Main</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\main\e_msoft.h">
@@ -462,6 +465,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\main\parse.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\main\lregex.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\main\lxpath.h">

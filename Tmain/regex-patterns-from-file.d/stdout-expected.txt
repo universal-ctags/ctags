@@ -1,0 +1,2 @@
+x	input.c	/^DEFINE(x,1);$/;"	t
+y	input.c	/^REGISTER(y);$/;"	t

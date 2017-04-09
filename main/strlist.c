@@ -135,7 +135,7 @@ static int stringListIndex (
 extern bool stringListHas (
 		const stringList *const current, const char *const string)
 {
-	bool result = false;
+	bool result;
 	Assert (current != NULL);
 	result = stringListIndex (current, string, compareString) != -1;
 	return result;
@@ -160,7 +160,7 @@ static vString* stringListFinds (
 extern bool stringListHasInsensitive (
 		const stringList *const current, const char *const string)
 {
-	bool result = false;
+	bool result;
 	Assert (current != NULL);
 	Assert (string != NULL);
 	result = stringListIndex (current, string, compareStringInsensitive) != -1;

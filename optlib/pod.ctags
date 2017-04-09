@@ -23,8 +23,14 @@
 #
 --langdef=pod
 --map-pod=+.pod
---regex-pod=/^=head1[ \t]+(.+)/\1/c,chapter,chapters/
---regex-pod=/^=head2[ \t]+(.+)/\1/s,section,sections/
---regex-pod=/^=head3[ \t]+(.+)/\1/S,subsection,subsections/
---regex-pod=/^=head4[ \t]+(.+)/\1/t,subsubsection,subsubsections/
+
+--kinddef-pod=c,chapter,chapters
+--kinddef-pod=s,section,sections
+--kinddef-pod=S,subsection,subsections
+--kinddef-pod=t,subsubsection,subsubsections
+
+--regex-pod=/^=head1[ \t]+(.+)/\1/c/
+--regex-pod=/^=head2[ \t]+(.+)/\1/s/
+--regex-pod=/^=head3[ \t]+(.+)/\1/S/
+--regex-pod=/^=head4[ \t]+(.+)/\1/t/
 

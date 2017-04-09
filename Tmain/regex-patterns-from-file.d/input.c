@@ -1,0 +1,2 @@
+DEFINE(x,1);
+REGISTER(y);

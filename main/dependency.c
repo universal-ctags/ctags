@@ -26,6 +26,7 @@ struct slaveControlBlock {
 								   this parser is initialized. */
 	subparser   *subparsersDefault;
 	subparser   *subparsersInUse;
+	langType     owner;
 };
 
 extern void linkDependencyAtInitializeParsing (depType dtype,
@@ -58,7 +59,7 @@ static void attachSubparser (struct slaveControlBlock *base_sb, subparser *subpa
 }
 
 
-extern struct slaveControlBlock *allocSlaveControlBlock (void)
+extern struct slaveControlBlock *allocSlaveControlBlock (parserDefinition *parser)
 {
 	struct slaveControlBlock *cb;
 
@@ -66,6 +67,7 @@ extern struct slaveControlBlock *allocSlaveControlBlock (void)
 	cb->slaveParsers = NULL;
 	cb->subparsersDefault = NULL;
 	cb->subparsersInUse = NULL;
+	cb->owner = parser->id;
 
 	return cb;
 }
@@ -79,7 +81,7 @@ extern void initializeDependencies (parserDefinition *parser,
 									struct slaveControlBlock *cb)
 {
 	unsigned int i;
-	slaveParser *sp = NULL;
+	slaveParser *sp;
 
 	/* Initialize slaves */
 	sp = cb->slaveParsers;
@@ -254,4 +256,68 @@ extern void leaveSubparser(void)
 extern bool doesSubparserRun (void)
 {
 	return subparserDepth;
+}
+
+extern slaveParser *getFirstSlaveParser (struct slaveControlBlock *scb)
+{
+	if (scb)
+		return scb->slaveParsers;
+	return NULL;
+}
+
+#define PR_SUBPARSER_WIDTH_NAME          30
+#define PR_SUBPARSER_WIDTH_BASE_NAME     20
+#define PR_SUBPARSER_WIDTH_DIRECTION 9
+
+#define PR_SUBPARSER_STR(X) PR_SUBPARSER_WIDTH_##X
+#define PR_SUBPARSER_FMT(X,T) "%-" STRINGIFY(PR_SUBPARSER_STR(X)) STRINGIFY(T)
+
+#define MAKE_SUBPARSER_FMT()					\
+	PR_SUBPARSER_FMT (NAME,s)					\
+	" "											\
+	PR_SUBPARSER_FMT (BASE_NAME,s)				\
+	" "											\
+	PR_SUBPARSER_FMT (DIRECTION,s)				\
+	"\n"
+
+extern void printSubparserListHeader (bool machinable)
+{
+	if (Option.withListHeader)
+		printf ((machinable? "%s\t%s\t%s\n": MAKE_SUBPARSER_FMT()),
+				"#NAME", "BASEPARSER", "DIRECTION");
+}
+
+extern void printSubparsers (struct slaveControlBlock *scb, bool machinable)
+{
+	slaveParser *tmp;
+
+	pushLanguage (scb->owner);
+	foreachSlaveParser(tmp)
+	{
+		if (tmp->type == DEPTYPE_SUBPARSER)
+		{
+			char *direction;
+
+			switch (((subparser *)tmp->data)->direction)
+			{
+			case SUBPARSER_BASE_RUNS_SUB:
+				direction = "base => sub";
+				break;
+			case SUBPARSER_SUB_RUNS_BASE:
+				direction = "sub => base";
+				break;
+			case SUBPARSER_BI_DIRECTION:
+				direction = "sub <> base";
+				break;
+			default:
+				direction  = "UNKNOWN(INTERNAL BUG)";
+				break;
+			}
+
+			printf ((machinable? "%s\t%s\t%s\n": MAKE_SUBPARSER_FMT()),
+					getLanguageName (tmp->id),
+					getLanguageName (scb->owner), direction);
+		}
+	}
+	popLanguage ();
 }

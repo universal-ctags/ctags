@@ -47,11 +47,17 @@ extern void linkDependencyAtInitializeParsing (depType dtype,
 						   struct kindControlBlock *slaveKCB,
 						   void *data);
 
-extern struct slaveControlBlock *allocSlaveControlBlock (void);
+extern struct slaveControlBlock *allocSlaveControlBlock (parserDefinition *parser);
 extern void freeSlaveControlBlock (struct slaveControlBlock *cb);
 extern void initializeDependencies (parserDefinition *parser,
 									struct slaveControlBlock *cb);
 extern void finalizeDependencies (parserDefinition *parser,
 								  struct slaveControlBlock *cb);
+
+extern slaveParser *getFirstSlaveParser(struct slaveControlBlock *controlBlock);
+extern slaveParser *getNextSlaveParser(slaveParser *last);
+#define foreachSlaveParser(VAR)			\
+	VAR = NULL;								\
+	while ((VAR = getNextSlaveParser (VAR)) != NULL)
 
 #endif	/* CTAGS_MAIN_DEPENDENCY_H */

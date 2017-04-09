@@ -1,0 +1,5 @@
+--langdef=MYLANG{base=C}
+--kinddef-MYLANG=d,def,definitions
+--kinddef-MYLANG=r,reg,registers
+--regex-MYLANG=/define\(([a-zA-Z]+)[ \t]*,/\1/d/{icase}
+--regex-MYLANG=/REGISTER\(([a-zA-Z]+)\)/\1/r/i

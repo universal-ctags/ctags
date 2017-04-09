@@ -226,6 +226,7 @@
     <ClCompile Include="..\main\tokeninfo.c" />
     <ClCompile Include="..\parsers\ldscript.c" />
     <ClCompile Include="..\parsers\dtd.c" />
+    <ClCompile Include="..\optlib\RSpec.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\fnmatch\fnmatch.h" />
@@ -250,6 +251,7 @@
     <ClInclude Include="..\main\options.h" />
     <ClInclude Include="..\main\param.h" />
     <ClInclude Include="..\main\parse.h" />
+    <ClInclude Include="..\main\lregex.h" />
     <ClInclude Include="..\main\lxpath.h" />
     <ClInclude Include="..\main\parsers.h" />
     <ClInclude Include="..\main\ptag.h" />

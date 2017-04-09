@@ -171,15 +171,15 @@ static void initializeRpmSpecParser (langType language)
 	static struct macro_cb_data global = {K_GLOBAL, ROLE_INDEX_DEFINITION};
 	static struct macro_cb_data undef  = {K_MACOR,  R_MACRO_UNDEF};
 
-	addCallbackRegex (language,  "^([A-Za-z_][A-Za-z_0-9()]+)[ \t]*:[ \t]*([^ \t]*)",
+	addLanguageCallbackRegex (language,  "^([A-Za-z_][A-Za-z_0-9()]+)[ \t]*:[ \t]*([^ \t]*)",
 			  "{exclusive}", found_tag_cb, &rejecting, &package_index);
-	addCallbackRegex (language, "^%define[ \t]+([A-Za-z_][A-Za-z_0-9]+)(\\([^)]+\\))?",
+	addLanguageCallbackRegex (language, "^%define[ \t]+([A-Za-z_][A-Za-z_0-9]+)(\\([^)]+\\))?",
 			  "{exclusive}", found_macro_cb, &rejecting, &macro);
-	addCallbackRegex (language, "^%undef[ \t]+([A-Za-z_][A-Za-z_0-9]+)",
+	addLanguageCallbackRegex (language, "^%undef[ \t]+([A-Za-z_][A-Za-z_0-9]+)",
 			  "{exclusive}", found_macro_cb, &rejecting, &undef);
-	addCallbackRegex (language, "^%global[ \t]+([A-Za-z_][A-Za-z_0-9]+)(\\([^)]+\\))?",
+	addLanguageCallbackRegex (language, "^%global[ \t]+([A-Za-z_][A-Za-z_0-9]+)(\\([^)]+\\))?",
 			  "{exclusive}", found_macro_cb, &rejecting, &global);
-	addCallbackRegex (language, "^%package[ \t]+(-n[ \t]+)?([A-Za-z_][A-Za-z_0-9-]+)",
+	addLanguageCallbackRegex (language, "^%package[ \t]+(-n[ \t]+)?([A-Za-z_][A-Za-z_0-9-]+)",
 			  "{exclusive}", found_package_cb, &rejecting, &package_index);
 }
 

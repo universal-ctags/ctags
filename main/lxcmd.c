@@ -307,7 +307,7 @@ static bool loadPathKinds  (xcmdPath *const path, const langType language)
 	char * argv[3];
 	int status;
 	vString * opt;
-	char file_kind = getLanguageFileKind (language)->letter;
+	char file_kind = getLanguageKind (language, KIND_FILE_INDEX)->letter;
 
 	opt = vStringNewInit(XCMD_LIST_KIND_OPTION);
 	vStringPut (opt, '=');
@@ -568,7 +568,7 @@ static bool printXcmdKind (kindDefinition *kind, void *user_data)
 
 	if (data->allKindFields && data->indent)
 		printf (Option.machinable? "%s": PR_KIND_FMT (LANG,s), data->langName);
-	
+
 	printKind (kind, data->allKindFields, data->indent, data->tabSeparated);
 	return false;
 }

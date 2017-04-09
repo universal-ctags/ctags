@@ -32,7 +32,11 @@
 --map-man=+.7
 --map-man=+.8
 --map-man=+.9
---regex-man=/^\.TH[[:space:]]{1,}"([^"]{1,})".*/\1/t,title,titles/{exclusive}{icase}{scope=push}
---regex-man=/^\.TH[[:space:]]{1,}([^[:space:]]{1,}).*/\1/t,title,titles/{exclusive}{icase}{scope=push}
---regex-man=/^\.SH[[:space:]]{1,}"([^"]{1,})".*/\1/s,section,sections/{exclusive}{icase}{scope=ref}
---regex-man=/^\.SH[[:space:]]{1,}([^[:space:]]{1,}).*/\1/s,section,sections/{exclusive}{icase}{scope=ref}
+
+--kinddef-man=t,title,titles
+--kinddef-man=s,section,sections
+
+--regex-man=/^\.TH[[:space:]]{1,}"([^"]{1,})".*/\1/t/{exclusive}{icase}{scope=push}
+--regex-man=/^\.TH[[:space:]]{1,}([^[:space:]]{1,}).*/\1/t/{exclusive}{icase}{scope=push}
+--regex-man=/^\.SH[[:space:]]{1,}"([^"]{1,})".*/\1/s/{exclusive}{icase}{scope=ref}
+--regex-man=/^\.SH[[:space:]]{1,}([^[:space:]]{1,}).*/\1/s/{exclusive}{icase}{scope=ref}

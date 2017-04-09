@@ -41,10 +41,18 @@ my $options =
      [ qr/^--options=(.*)/, sub {
 	   parse_optlib ($1, $_[0]);
        } ],
-     [ qr/^--langdef=(.*)/, sub {
-	   die "LANG is alrady defined as $_[0]->{'langdef'}: $1"
+     [ qr/^--langdef=([^\{]+)({base=([^\{]+)})?/, sub {
+	   die "LANG is already defined as $_[0]->{'langdef'}: $1"
 	       if (defined $_[0]->{'langdef'});
 	   $_[0]->{'langdef'} = $1;
+	   $_[0]->{'base'} = $3 if defined $3;
+       } ],
+     [ qr/^--kinddef-(.*)=([^,]),([^,]+),(.*)/, sub {
+	 die "Don't use --kinddef-<LANG>=+ optoin before defining a language"
+	     if (! defined $_[0]->{'langdef'});
+	 die "Adding a kind is allowed only to the language specified with --langdef: $1"
+	   unless ($_[0]->{'langdef'} eq $1);
+	 push @{$_[0]->{'kinddefs'}}, { letter => $2, name => $3, desc => $4 };
        } ],
      [ qr/^--languages=-(.*)/, sub {
 	   die "Don't use --languages=- optoin before defining a language"
@@ -236,7 +244,7 @@ sub parse_optlib {
 }
 
 sub emit_header {
-    my ($optlib) = @_;
+    my ($optlib, $opts) = @_;
 
     print <<EOF;
 /*
@@ -245,6 +253,14 @@ sub emit_header {
 #include "general.h"
 #include "parse.h"
 #include "routines.h"
+EOF
+
+    if (defined $opts->{'base'}) {
+    print <<EOF;
+#include "subparser.h"
+EOF
+    }
+    print <<EOF;
 
 
 EOF
@@ -275,7 +291,10 @@ EOF
     }
     for (@{$opts->{'disabledKinds'}}) {
 	print <<EOF;
-	enableRegexKind (language, '$_', false);
+	{
+		kindDefinition *kdef = getLanguageKindForLetter (language, '$_');
+		enableKind (kdef, false);
+	}
 EOF
     }
     print <<EOF;
@@ -316,6 +335,24 @@ sub emit_patterns {
     emit_list $_[0], "patterns";
 }
 
+sub emit_kinddefs {
+    my $opts = shift;
+
+    return if (! @{$opts->{'kinddefs'}});
+
+    print <<EOF;
+	static kindDefinition $opts->{'Clangdef'}KindTable [] = {
+EOF
+    for (@{$opts->{'kinddefs'}}) {
+      print <<EOF;
+		{ true, \'$_->{'letter'}\', "$_->{'name'}", "$_->{'desc'}" },
+EOF
+    }
+    print <<EOF;
+	};
+EOF
+}
+
 sub emit_regexs {
     my $opts = shift;
 
@@ -336,6 +373,22 @@ EOF
 	};
 
 EOF
+}
+
+sub emit_dependencies {
+    my $opts = shift;
+
+    return if (! defined $opts->{'base'});
+
+    print <<EOF;
+	static subparser $opts->{'Clangdef'}Subparser = {
+		.direction = SUBPARSER_BASE_RUNS_SUB,
+	};
+	static parserDependency $opts->{'Clangdef'}Dependencies [] = {
+		[0] = { DEPTYPE_SUBPARSER, "$opts->{'base'}", &$opts->{'Clangdef'}Subparser },
+	};
+EOF
+
 }
 
 sub emit_fields_initialization {
@@ -359,10 +412,24 @@ sub emit_fields_initialization {
 	def->method        = ${method};
 EOF
 
+    if (@{$opts->{'kinddefs'}}) {
+	print <<EOF;
+	def->kindTable = $opts->{'Clangdef'}KindTable;
+	def->kindCount = ARRAY_SIZE($opts->{'Clangdef'}KindTable);
+EOF
+    }
+
     if (@{$opts->{'regexs'}}) {
 	print <<EOF;
 	def->tagRegexTable = $opts->{'Clangdef'}TagRegexTable;
 	def->tagRegexCount = ARRAY_SIZE($opts->{'Clangdef'}TagRegexTable);
+EOF
+    }
+
+    if (defined $opts->{'base'}) {
+	print <<EOF;
+	def->dependencies = $opts->{'Clangdef'}Dependencies;
+	def->dependencyCount = ARRAY_SIZE($opts->{'Clangdef'}Dependencies);
 EOF
     }
 
@@ -375,7 +442,7 @@ EOF
 sub emit {
     my ($optlib, $opts) = @_;
 
-    emit_header $optlib;
+    emit_header ($optlib, $opts);
     emit_initializer $opts;
 
     print <<EOF;
@@ -386,7 +453,9 @@ EOF
     emit_extensions      $opts;
     emit_aliases         $opts;
     emit_patterns        $opts;
+    emit_kinddefs        $opts;
     emit_regexs          $opts;
+    emit_dependencies    $opts;
 
     print "\n";
 
@@ -453,6 +522,9 @@ sub main {
 			  ],
 		xcmds => [# { xcmd => "", flags => "" },
 			 ],
+		kinddefs => [# { letter => '', name => "", desc => "" },
+			    ],
+		base => undef,
 	       );
 
     for (@_) {

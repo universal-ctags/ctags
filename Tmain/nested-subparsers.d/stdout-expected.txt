@@ -1,0 +1,136 @@
+#
+# list kinds C
+#
+d  macro definitions
+e  enumerators (values inside an enumeration)
+f  function definitions
+g  enumeration names
+l  local variables [off]
+m  struct, and union members
+p  function prototypes [off]
+s  structure names
+t  typedefs
+u  union names
+v  variable definitions
+x  external and forward variable declarations [off]
+z  function parameters inside function definitions [off]
+L  goto labels [off]
+#
+# list kinds Event
+#
+e  events
+#
+# list kinds Hook
+#
+h  hooks
+#
+# list kinds Plugin
+#
+f  files
+n  name
+#
+# list kinds-full C
+#
+#LETTER NAME            ENABLED  REFONLY NROLES MASTER     DESCRIPTION                   
+d       macro           on       FALSE   1      C          macro definitions             
+e       enumerator      on       FALSE   0      C          enumerators (values inside an enumeration)
+f       function        on       FALSE   0      C          function definitions          
+g       enum            on       FALSE   0      C          enumeration names             
+h       header          on       TRUE    2      C          included header files         
+l       local           off      FALSE   0      C          local variables               
+m       member          on       FALSE   0      C          struct, and union members     
+p       prototype       off      FALSE   0      C          function prototypes           
+s       struct          on       FALSE   0      C          structure names               
+t       typedef         on       FALSE   0      C          typedefs                      
+u       union           on       FALSE   0      C          union names                   
+v       variable        on       FALSE   0      C          variable definitions          
+x       externvar       off      FALSE   0      C          external and forward variable declarations
+z       parameter       off      FALSE   0      C          function parameters inside function definitions
+L       label           off      FALSE   0      C          goto labels                   
+#
+# list kinds-full Event
+#
+#LETTER NAME            ENABLED  REFONLY NROLES MASTER     DESCRIPTION                   
+e       event           on       FALSE   0                 events                        
+#
+# list kinds-full Hook
+#
+#LETTER NAME            ENABLED  REFONLY NROLES MASTER     DESCRIPTION                   
+h       hook            on       FALSE   0                 hooks                         
+#
+# list kinds-full Plugin
+#
+#LETTER NAME            ENABLED  REFONLY NROLES MASTER     DESCRIPTION                   
+f       file            on       FALSE   0                 files                         
+n       name            on       FALSE   0                 name                          
+C only
+main	input.c	/^main(void)$/;"	function	language:C	typeref:typename:int
+
+C + EVENT
+a	input.c	/^DEFINE_EVENT(a);$/;"	event	language:Event
+b	input.c	/^DEFINE_EVENT(b);$/;"	event	language:Event
+main	input.c	/^main(void)$/;"	function	language:C	typeref:typename:int
+
+C + EVENT + HOOK
+a	input.c	/^DEFINE_EVENT(a);$/;"	event	language:Event
+b	input.c	/^DEFINE_EVENT(b);$/;"	event	language:Event
+h	input.c	/^DEFINE_HOOK(h);$/;"	hook	language:Hook
+i	input.c	/^DEFINE_HOOK(i);$/;"	hook	language:Hook
+main	input.c	/^main(void)$/;"	function	language:C	typeref:typename:int
+
+C + EVENT + HOOK + PLUGIN
+a	input.c	/^DEFINE_EVENT(a);$/;"	event	language:Event
+b	input.c	/^DEFINE_EVENT(b);$/;"	event	language:Event
+h	input.c	/^DEFINE_HOOK(h);$/;"	hook	language:Hook
+i	input.c	/^DEFINE_HOOK(i);$/;"	hook	language:Hook
+isearch	input.c	/^	LOAD_PLUGIN(mylib.so, isearch);$/;"	name	language:Plugin
+main	input.c	/^main(void)$/;"	function	language:C	typeref:typename:int
+mylib.so	input.c	/^	LOAD_PLUGIN(mylib.so, isearch);$/;"	file	language:Plugin
+
+C + EVENT + HOOK + PLUGIN + UA
+a	input.c	/^DEFINE_EVENT(a);$/;"	event	language:Event
+b	input.c	/^DEFINE_EVENT(b);$/;"	event	language:Event
+h	input.c	/^DEFINE_HOOK(h);$/;"	hook	language:Hook
+i	input.c	/^DEFINE_HOOK(i);$/;"	hook	language:Hook
+isearch	input.c	/^	LOAD_PLUGIN(mylib.so, isearch);$/;"	name	language:Plugin
+main	input.c	/^main(void)$/;"	function	language:C	typeref:typename:int
+mylib.so	input.c	/^	LOAD_PLUGIN(mylib.so, isearch);$/;"	file	language:Plugin
+u	input.c	/^	int u __attribute__((unused));$/;"	varaible	language:UnusedAttr
+
+C(disabled) + EVENT + HOOK + PLUGIN + UA
+
+C + EVENT(disabled) + HOOK + PLUGIN + UA
+isearch	input.c	/^	LOAD_PLUGIN(mylib.so, isearch);$/;"	name	language:Plugin
+main	input.c	/^main(void)$/;"	function	language:C	typeref:typename:int
+mylib.so	input.c	/^	LOAD_PLUGIN(mylib.so, isearch);$/;"	file	language:Plugin
+
+C + EVENT + HOOK(disabled) + PLUGIN + UA
+a	input.c	/^DEFINE_EVENT(a);$/;"	event	language:Event
+b	input.c	/^DEFINE_EVENT(b);$/;"	event	language:Event
+isearch	input.c	/^	LOAD_PLUGIN(mylib.so, isearch);$/;"	name	language:Plugin
+main	input.c	/^main(void)$/;"	function	language:C	typeref:typename:int
+mylib.so	input.c	/^	LOAD_PLUGIN(mylib.so, isearch);$/;"	file	language:Plugin
+u	input.c	/^	int u __attribute__((unused));$/;"	varaible	language:UnusedAttr
+
+C + EVENT + HOOK + PLUGIN + UA(-v)
+a	input.c	/^DEFINE_EVENT(a);$/;"	event	language:Event
+b	input.c	/^DEFINE_EVENT(b);$/;"	event	language:Event
+h	input.c	/^DEFINE_HOOK(h);$/;"	hook	language:Hook
+i	input.c	/^DEFINE_HOOK(i);$/;"	hook	language:Hook
+isearch	input.c	/^	LOAD_PLUGIN(mylib.so, isearch);$/;"	name	language:Plugin
+main	input.c	/^main(void)$/;"	function	language:C	typeref:typename:int
+mylib.so	input.c	/^	LOAD_PLUGIN(mylib.so, isearch);$/;"	file	language:Plugin
+List subparsers of C ( EVENT + HOOK + PLUGIN + UA )
+#NAME                          BASEPARSER           DIRECTION
+Plugin                         C                    base => sub
+Event                          C                    base => sub
+List subparsers of C ( EVENT + HOOK + PLUGIN + UA ) without the header
+Plugin                         C                    base => sub
+Event                          C                    base => sub
+List subparsers of C ( EVENT + HOOK + PLUGIN + UA ) in machinable
+#NAME	BASEPARSER	DIRECTION
+Plugin	C	base => sub
+Event	C	base => sub
+List subparsers of C ( EVENT + HOOK + PLUGIN + UA ) in machinable without the header
+Plugin	C	base => sub
+Event	C	base => sub

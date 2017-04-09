@@ -581,17 +581,19 @@ static bool isSafeVar (const char* var)
 
 static void sanitizeEnviron (void)
 {
-	char **e = NULL;
+	char **e;
 	int i;
 
 #if HAVE_DECL___ENVIRON
 	e = __environ;
 #elif HAVE_DECL__NSGETENVIRON
-{
-	char ***ep = _NSGetEnviron();
-	if (ep)
-		e = *ep;
-}
+	{
+		char ***ep = _NSGetEnviron();
+		if (ep)
+			e = *ep;
+	}
+#else
+	e = NULL;
 #endif
 
 	if (!e)
