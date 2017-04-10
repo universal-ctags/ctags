@@ -532,7 +532,7 @@ method. The macro and functions are declare in *main/subparser.h* .
 	    subparser *tmp;
 	    m4Subparser *m4found = NULL;
 
-	    foreachSubparser (tmp)
+	    foreachSubparser (tmp, false)
 	    {
 		    m4Subparser *m4tmp = (m4Subparser *)tmp;
 

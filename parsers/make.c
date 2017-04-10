@@ -140,7 +140,7 @@ static void newMacro (vString *const name, bool with_define_directive, bool appe
 	if (!appending)
 		makeSimpleMakeTag (name, MakeKinds, K_MACRO);
 
-	foreachSubparser(s)
+	foreachSubparser(s, false)
 	{
 		makeSubparser *m = (makeSubparser *)s;
 		enterSubparser(s);
@@ -153,7 +153,7 @@ static void newMacro (vString *const name, bool with_define_directive, bool appe
 static void valueFound (vString *const name)
 {
 	subparser *s;
-	foreachSubparser(s)
+	foreachSubparser(s, false)
 	{
 		makeSubparser *m = (makeSubparser *)s;
 		enterSubparser(s);
@@ -166,7 +166,7 @@ static void valueFound (vString *const name)
 static void directiveFound (vString *const name)
 {
 	subparser *s;
-	foreachSubparser (s)
+	foreachSubparser (s, false)
 	{
 		makeSubparser *m = (makeSubparser *)s;
 		enterSubparser(s);

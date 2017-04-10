@@ -2462,7 +2462,7 @@ static bool doesParserUseCork (parserDefinition *parser)
 		return true;
 
 	pushLanguage (parser->id);
-	foreachSubparser(tmp)
+	foreachSubparser(tmp, true)
 	{
 		langType t = getSubparserLanguage (tmp);
 		if (doesParserUseCork (LanguageTable[t].def))
@@ -2480,7 +2480,7 @@ static void setupLanguageSubparsersInUse (const langType language)
 	subparser *tmp;
 
 	setupSubparsersInUse ((LanguageTable + language)->slaveControlBlock);
-	foreachSubparser(tmp)
+	foreachSubparser(tmp, true)
 	{
 		langType t = getSubparserLanguage (tmp);
 		enterSubparser (tmp);
@@ -2493,7 +2493,7 @@ static subparser* teardownLanguageSubparsersInUse (const langType language)
 {
 	subparser *tmp;
 
-	foreachSubparser(tmp)
+	foreachSubparser(tmp, true)
 	{
 		langType t = getSubparserLanguage (tmp);
 		enterSubparser (tmp);
@@ -2851,7 +2851,7 @@ extern void matchLanguageMultilineRegex (const langType language, const vString*
 	subparser *tmp;
 
 	matchMultilineRegex ((LanguageTable + language)->lregexControlBlock, allLines);
-	foreachSubparser(tmp)
+	foreachSubparser(tmp, true)
 	{
 		langType t = getSubparserLanguage (tmp);
 		enterSubparser (tmp);
@@ -2868,7 +2868,7 @@ static bool lregexQueryParserAndSubparesrs (const langType language, bool (* pre
 	r = predicate ((LanguageTable + language)->lregexControlBlock);
 	if (!r)
 	{
-		foreachSubparser(tmp)
+		foreachSubparser(tmp, true)
 		{
 			langType t = getSubparserLanguage (tmp);
 			enterSubparser (tmp);
@@ -2911,7 +2911,7 @@ extern void matchLanguageRegex (const langType language, const vString* const li
 	subparser *tmp;
 
 	matchRegex ((LanguageTable + language)->lregexControlBlock, line);
-	foreachSubparser(tmp)
+	foreachSubparser(tmp, true)
 	{
 		langType t = getSubparserLanguage (tmp);
 		enterSubparser (tmp);
@@ -3263,7 +3263,8 @@ extern void applyParameter (const langType language, const char *name, const cha
 	error (FATAL, "no such parameter in %s: %s", parser->name, name);
 }
 
-extern subparser *getNextSubparser(subparser *last)
+extern subparser *getNextSubparser(subparser *last,
+								   bool includingNoneCraftedParser)
 {
 	langType lang = getInputLanguage ();
 	parserObject *parser = LanguageTable + lang;
@@ -3279,10 +3280,13 @@ extern subparser *getNextSubparser(subparser *last)
 		return r;
 
 	t = getSubparserLanguage(r);
-	if (isLanguageEnabled (t))
+	if (isLanguageEnabled (t) &&
+		(includingNoneCraftedParser
+		 || (!includingNoneCraftedParser &&
+			 ((((LanguageTable + t)->def->method) && METHOD_NOT_CRAFTED) == 0))))
 		return r;
 	else
-		return getNextSubparser (r);
+		return getNextSubparser (r, includingNoneCraftedParser);
 }
 
 extern slaveParser *getNextSlaveParser(slaveParser *last)
@@ -3342,7 +3346,7 @@ extern void scheduleRunningBaseparser (int dependencyIndex)
 
 		verbose ("scheduleRunningBaseparser %s with subparsers: ", base_name);
 		pushLanguage (base);
-		foreachSubparser(tmp)
+		foreachSubparser(tmp, true)
 		{
 			langType t = getSubparserLanguage (tmp);
 			verbose ("%s ", getLanguageName (t));

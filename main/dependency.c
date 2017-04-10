@@ -141,7 +141,7 @@ extern void notifyInputStart (void)
 {
 	subparser *s;
 
-	foreachSubparser(s)
+	foreachSubparser(s, false)
 	{
 		if (s->inputStart)
 		{
@@ -156,7 +156,7 @@ extern void notifyInputEnd   (void)
 {
 	subparser *s;
 
-	foreachSubparser(s)
+	foreachSubparser(s, false)
 	{
 		if (s->inputEnd)
 		{
