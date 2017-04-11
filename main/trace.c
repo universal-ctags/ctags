@@ -74,5 +74,3 @@ void tracePrint(const char * szFunction,const char * szFormat,...)
 }
 
 #endif // DO_TRACING
-
-
