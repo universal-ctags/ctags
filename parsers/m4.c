@@ -213,7 +213,7 @@ static m4Subparser * maySwitchLanguage (const char* token)
 	subparser *tmp;
 	m4Subparser *m4found = NULL;
 
-	foreachSubparser (tmp)
+	foreachSubparser (tmp, false)
 	{
 		m4Subparser *m4tmp = (m4Subparser *)tmp;
 

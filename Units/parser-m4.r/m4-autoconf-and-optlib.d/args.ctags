@@ -1,0 +1,3 @@
+--langdef=NEWLANG{base=M4}
+--kinddef-NEWLANG=a,abc,abc def ghi
+--regex-NEWLANG=/SAMPLE (.*)/\1/a/

@@ -48,7 +48,7 @@ static iniconfSubparser *maySwitchLanguage (const char *section, const char *key
 	iniconfSubparser *iniconf_subparser = NULL;
 	subparser *sub;
 
-	foreachSubparser (sub)
+	foreachSubparser (sub, false)
 	{
 		iniconfSubparser *s = (iniconfSubparser *)sub;
 		if ((sub->direction & SUBPARSER_BASE_RUNS_SUB)

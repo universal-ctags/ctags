@@ -141,7 +141,7 @@ extern void notifyInputStart (void)
 {
 	subparser *s;
 
-	foreachSubparser(s)
+	foreachSubparser(s, false)
 	{
 		if (s->inputStart)
 		{
@@ -156,7 +156,7 @@ extern void notifyInputEnd   (void)
 {
 	subparser *s;
 
-	foreachSubparser(s)
+	foreachSubparser(s, false)
 	{
 		if (s->inputEnd)
 		{
@@ -304,10 +304,10 @@ extern void printSubparsers (struct slaveControlBlock *scb, bool machinable)
 				direction = "base => sub";
 				break;
 			case SUBPARSER_SUB_RUNS_BASE:
-				direction = "sub => base";
+				direction = "base <= sub";
 				break;
 			case SUBPARSER_BI_DIRECTION:
-				direction = "sub <> base";
+				direction = "base <> sub";
 				break;
 			default:
 				direction  = "UNKNOWN(INTERNAL BUG)";

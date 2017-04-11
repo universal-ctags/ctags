@@ -46,10 +46,10 @@ extern void notifyInputEnd   (void);
 extern langType getSubparserLanguage (subparser *s);
 
 /* Interface for Baseparser */
-extern subparser *getNextSubparser(subparser *last);
-#define foreachSubparser(VAR)				\
+extern subparser *getNextSubparser(subparser *last, bool includingNoneCraftedParser);
+#define foreachSubparser(VAR, INCLUDING_NONE_CRAFTED_PARSER)\
 	VAR = NULL;								\
-	while ((VAR = getNextSubparser (VAR)) != NULL)
+	while ((VAR = getNextSubparser (VAR, INCLUDING_NONE_CRAFTED_PARSER)) != NULL)
 
 extern void enterSubparser(subparser *subparser);
 extern void leaveSubparser(void);

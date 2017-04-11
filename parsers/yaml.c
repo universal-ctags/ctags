@@ -138,7 +138,7 @@ static void findYamlTags (void)
 			break;
 
 		handlYamlToken (&token);
-		foreachSubparser(sub)
+		foreachSubparser(sub, false)
 		{
 			enterSubparser (sub);
 			((yamlSubparser *)sub)->newTokenNotfify ((yamlSubparser *)sub, &token);
