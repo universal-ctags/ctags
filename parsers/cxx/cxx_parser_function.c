@@ -568,8 +568,8 @@ static bool cxxParserLookForFunctionSignatureCheckParenthesisAndIdentifier(
 	CXX_DEBUG_ENTER();
 	
 	CXX_DEBUG_ASSERT(
-			pParenthesis && pIdentifierChain && pIdentifierStart && pIdentifierEnd && pInfo && pParamInfo,
-			"All parameters must be non null here"
+			pParenthesis && pIdentifierChain && pIdentifierStart && pIdentifierEnd && pInfo,
+			"All parameters other than `pParamInfo' must be non null here"
 		);
 
 	// Even if we have found a parenthesis and proper identifier we still
