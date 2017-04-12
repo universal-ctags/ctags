@@ -18,7 +18,11 @@
 // Uncomment this to enable extensive debugging to stderr in code.
 // Use only for development as tracing reduces performance.
 //
+// "./configure --enable-debugging" defines DEBUG.
+//
+#ifdef DEBUG
 //#define TRACING_ENABLED 1
+#endif
 
 //
 // Currently this kind of debugging is supported only on gcc (because of
