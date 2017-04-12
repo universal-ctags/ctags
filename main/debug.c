@@ -16,6 +16,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdarg.h>
+#include <string.h>
 
 #include "debug.h"
 #include "options.h"
@@ -123,6 +124,35 @@ extern void debugAssert (const char *assertion, const char *file, unsigned int l
 	}
 	fflush(stderr);
 	abort();
+}
+
+static int debugScopeDepth;
+#define DEBUG_INDENT_UNIT 4
+
+static char debugPrefix[DEBUG_INDENT_UNIT + 1];
+
+extern void debugInit (void)
+{
+	memset(debugPrefix, ' ', DEBUG_INDENT_UNIT);
+	debugPrefix[DEBUG_INDENT_UNIT] = '\0';
+}
+
+extern void debugIndent(void)
+{
+	for(int i=0;i< debugScopeDepth;i++)
+		fputs(debugPrefix, stderr);
+}
+
+extern void debugInc(void)
+{
+	debugScopeDepth++;
+}
+
+extern void debugDec(void)
+{
+	debugScopeDepth--;
+	if(debugScopeDepth < 0)
+		debugScopeDepth = 0;
 }
 
 #endif

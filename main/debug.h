@@ -79,4 +79,13 @@ extern void debugCppIgnore (const bool ignore);
 extern void debugEntry (const tagEntryInfo *const tag);
 extern void debugAssert (const char *assertion, const char *file, unsigned int line, const char *function) attr__noreturn;
 
+#ifdef DEBUG
+#define DEBUG_INIT() debugInit()
+extern void debugInit (void);
+extern void debugIndent(void);
+extern void debugInc(void);
+extern void debugDec(void);
+#else
+#define DEBUG_INIT() do { } while(0)
+#endif	/* DEBUG */
 #endif  /* CTAGS_MAIN_DEBUG_H */
