@@ -34,6 +34,7 @@ extern hashTable* hashTableNew         (unsigned int size,
 					hashTableFreeFunc keyfreefn,
 					hashTableFreeFunc valfreefn);
 extern void       hashTableDelete      (hashTable *htable);
+extern void       hashTableClear       (hashTable *htable);
 extern void       hashTablePutItem     (hashTable *htable, void *key, void *value);
 extern void*      hashTableGetItem     (hashTable *htable, void *key);
 extern bool    hashTableHasItem     (hashTable *htable, void *key);
