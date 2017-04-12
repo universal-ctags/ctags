@@ -27,6 +27,8 @@
 */
 
 #ifdef DEBUG
+#include "htable.h"
+
 
 extern void lineBreak (void) {}  /* provides a line-specified break point */
 
@@ -153,6 +155,61 @@ extern void debugDec(void)
 	debugScopeDepth--;
 	if(debugScopeDepth < 0)
 		debugScopeDepth = 0;
+}
+
+
+
+struct circularRefChecker {
+	hashTable *visitTable;
+	int counter;
+};
+
+extern void circularRefCheckerDestroy (struct circularRefChecker * checker)
+{
+	hashTableDelete (checker->visitTable);
+	checker->visitTable = NULL;
+	eFree (checker);
+}
+
+extern struct circularRefChecker * circularRefCheckerNew (void)
+{
+	Assert (sizeof(void *) >= sizeof(int));
+
+	struct circularRefChecker *c = xMalloc (1, struct circularRefChecker);
+
+	c->visitTable = hashTableNew (17, hashPtrhash, hashPtreq, NULL, NULL);
+	c->counter = 0;
+
+	return c;
+}
+
+extern int circularRefCheckerCheck (struct circularRefChecker *c, void *ptr)
+{
+	union conv {
+		int i;
+		void *ptr;
+	} v;
+
+	v.ptr = hashTableGetItem(c->visitTable, ptr);
+	if (v.ptr)
+		return v.i;
+	else
+	{
+		v.i = ++c->counter;
+		hashTablePutItem (c->visitTable, ptr, v.ptr);
+		return 0;
+	}
+}
+
+extern int circularRefCheckerGetCurrent (struct circularRefChecker *c)
+{
+	return c->counter;
+}
+
+extern void circularRefCheckClear (struct circularRefChecker *c)
+{
+	hashTableClear (c->visitTable);
+	c->counter = 0;
 }
 
 #endif

@@ -85,6 +85,14 @@ extern void debugInit (void);
 extern void debugIndent(void);
 extern void debugInc(void);
 extern void debugDec(void);
+
+struct circularRefChecker;
+extern struct circularRefChecker * circularRefCheckerNew (void);
+extern void circularRefCheckerDestroy (struct circularRefChecker * checker);
+extern int circularRefCheckerCheck (struct circularRefChecker *c, void *ptr);
+extern int circularRefCheckerGetCurrent (struct circularRefChecker *c);
+extern void circularRefCheckClear (struct circularRefChecker *c);
+
 #else
 #define DEBUG_INIT() do { } while(0)
 #endif	/* DEBUG */
