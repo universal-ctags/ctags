@@ -24,4 +24,8 @@ extern TrashBoxDestroyItemProc trashBoxTakeBack  (TrashBox* trash_box, void* ite
 extern void      trashBoxFree      (TrashBox* trash_box, void* item);
 extern void      trashBoxMakeEmpty (TrashBox* trash_box);
 
+#define TRASH_BOX(PTR,PROC) trashBoxPut(NULL, PTR,PROC)
+extern void initDefaultTrashBox (void);
+extern void finiDefaultTrashBox  (void);
+
 #endif /* CTAGS_MAIN_TRASH_H */

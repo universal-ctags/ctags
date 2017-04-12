@@ -25,6 +25,8 @@ struct sTrashBox {
 	Trash *trash;
 };
 
+static TrashBox* defaultTrashBox;
+
 static Trash* trashPut (Trash* trash, void* item,
 			TrashDestroyItemProc destrctor);
 static Trash* trashTakeBack (Trash* trash, void* item, TrashDestroyItemProc* destrctor);
@@ -41,6 +43,9 @@ extern TrashBox* trashBoxStack     (TrashBox* trash_box)
 {
 	TrashBox *t = trashBoxNew();
 
+	if (!trash_box)
+		trash_box = defaultTrashBox;
+
 	trashBoxPut (trash_box, t, (TrashBoxDestroyItemProc) trashBoxDelete);
 
 	return t;
@@ -48,6 +53,9 @@ extern TrashBox* trashBoxStack     (TrashBox* trash_box)
 
 extern void trashBoxDelete (TrashBox* trash_box)
 {
+	if (!trash_box)
+		trash_box = defaultTrashBox;
+
 	trashBoxMakeEmpty(trash_box);
 
 	eFree (trash_box);
@@ -55,6 +63,9 @@ extern void trashBoxDelete (TrashBox* trash_box)
 
 extern void*  trashBoxPut (TrashBox* trash_box, void* item, TrashBoxDestroyItemProc destroy)
 {
+	if (!trash_box)
+		trash_box = defaultTrashBox;
+
 	trash_box->trash = trashPut(trash_box->trash, item, destroy);
 	return item;
 }
@@ -63,19 +74,28 @@ extern TrashBoxDestroyItemProc trashBoxTakeBack (TrashBox* trash_box, void* item
 {
 	TrashBoxDestroyItemProc d;
 
+	if (!trash_box)
+		trash_box = defaultTrashBox;
+
 	trash_box->trash = trashTakeBack(trash_box->trash, item, &d);
 	return d;
 }
 
 extern void   trashBoxMakeEmpty (TrashBox* trash_box)
 {
-  trash_box->trash = trashMakeEmpty (trash_box->trash);
+	if (!trash_box)
+		trash_box = defaultTrashBox;
+
+	trash_box->trash = trashMakeEmpty (trash_box->trash);
 }
 
 
 extern void      trashBoxFree      (TrashBox* trash_box, void* item)
 {
 	TrashBoxDestroyItemProc d;
+
+	if (!trash_box)
+		trash_box = defaultTrashBox;
 
 	d = trashBoxTakeBack (trash_box, item);
 	d (item);
@@ -143,6 +163,17 @@ static Trash* trashMakeEmpty (Trash* trash)
 		eFree (tmp);
 	}
 	return NULL;
+}
+
+extern void initDefaultTrashBox (void)
+{
+	defaultTrashBox = trashBoxNew ();
+}
+
+extern void finiDefaultTrashBox (void)
+{
+	trashBoxDelete (defaultTrashBox);
+	defaultTrashBox = NULL;
 }
 
 #ifdef TRASH_TEST
