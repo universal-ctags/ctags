@@ -48,6 +48,7 @@ MAIN_HEADS =			\
 	main/subparser.h	\
 	main/trace.h		\
 	main/tokeninfo.h	\
+	main/trashbox.h		\
 	main/types.h		\
 	main/vstring.h		\
 	main/writer.h		\
@@ -86,6 +87,7 @@ MAIN_SRCS =				\
 	main/sort.c			\
 	main/strlist.c			\
 	main/trace.c			\
+	main/trashbox.c			\
 	main/tokeninfo.c		\
 	main/vstring.c			\
 	main/writer.c			\
