@@ -16,7 +16,6 @@
 #include "general.h"  /* must always come first */
 
 #include <string.h>
-#include <setjmp.h>
 #ifdef DEBUG
 #include <stdio.h>
 #endif

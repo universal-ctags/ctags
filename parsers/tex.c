@@ -16,7 +16,6 @@
  */
 #include "general.h"	/* must always come first */
 #include <ctype.h>	/* to define isalpha () */
-#include <setjmp.h>
 #ifdef DEBUG
 #include <stdio.h>
 #endif
@@ -42,8 +41,6 @@
 /*
  *	 DATA DECLARATIONS
  */
-
-typedef enum eException { ExceptionNone, ExceptionEOF } exception_t;
 
 /*
  * Used to specify type of keyword.
@@ -92,8 +89,6 @@ typedef struct sTokenInfo {
  */
 
 static langType Lang_tex;
-
-static jmp_buf Exception;
 
 static vString *lastPart;
 static vString *lastChapter;
@@ -285,7 +280,7 @@ static void parseIdentifier (vString *const string, const int firstChar)
 		ungetcToInputFile (c);		/* unget non-identifier character */
 }
 
-static void readToken (tokenInfo *const token)
+static bool readToken (tokenInfo *const token)
 {
 	int c;
 
@@ -304,7 +299,7 @@ getNextChar:
 
 	switch (c)
 	{
-		case EOF: longjmp (Exception, (int)ExceptionEOF);	break;
+		case EOF: return false;
 		case '(': token->type = TOKEN_OPEN_PAREN;			break;
 		case ')': token->type = TOKEN_CLOSE_PAREN;			break;
 		case ',': token->type = TOKEN_COMMA;				break;
@@ -353,6 +348,7 @@ getNextChar:
 				  }
 				  break;
 	}
+	return true;
 }
 
 static void copyToken (tokenInfo *const dest, tokenInfo *const src)
@@ -374,9 +370,9 @@ static bool parseTag (tokenInfo *const token, texKind kind)
 	tokenInfo *const name = newToken ();
 	vString *	fullname;
 	bool		useLongName = true;
+	bool        eof = false;
 
 	fullname = vStringNew ();
-	vStringClear (fullname);
 
 	/*
 	 * Tex tags are of these formats:
@@ -391,14 +387,22 @@ static bool parseTag (tokenInfo *const token, texKind kind)
 	if (isType (token, TOKEN_KEYWORD))
 	{
 		copyToken (name, token);
-		readToken (token);
+		if (!readToken (token))
+		{
+			eof = true;
+			goto out;
+		}
 	}
 
 	if (isType (token, TOKEN_OPEN_SQUARE))
 	{
 		useLongName = false;
 
-		readToken (token);
+		if (!readToken (token))
+		{
+			eof = true;
+			goto out;
+		}
 		while (! isType (token, TOKEN_CLOSE_SQUARE) )
 		{
 			if (isType (token, TOKEN_IDENTIFIER))
@@ -407,7 +411,11 @@ static bool parseTag (tokenInfo *const token, texKind kind)
 					vStringPut (fullname, ' ');
 				vStringCatS (fullname, vStringValue (token->string));
 			}
-			readToken (token);
+			if (!readToken (token))
+			{
+				eof = true;
+				goto out;
+			}
 		}
 		vStringCopy (name->string, fullname);
 		makeTexTag (name, kind);
@@ -415,12 +423,20 @@ static bool parseTag (tokenInfo *const token, texKind kind)
 
 	if (isType (token, TOKEN_STAR))
 	{
-		readToken (token);
+		if (!readToken (token))
+		{
+			eof = true;
+			goto out;
+		}
 	}
 
 	if (isType (token, TOKEN_OPEN_CURLY))
 	{
-		readToken (token);
+		if (!readToken (token))
+		{
+			eof = true;
+			goto out;
+		}
 		while (! isType (token, TOKEN_CLOSE_CURLY) )
 		{
 			/* if (isType (token, TOKEN_IDENTIFIER) && useLongName) */
@@ -430,7 +446,11 @@ static bool parseTag (tokenInfo *const token, texKind kind)
 					vStringPut (fullname, ' ');
 				vStringCatS (fullname, vStringValue (token->string));
 			}
-			readToken (token);
+			if (!readToken (token))
+			{
+				eof = true;
+				goto out;
+			}
 		}
 		if (useLongName)
 		{
@@ -477,52 +497,58 @@ static bool parseTag (tokenInfo *const token, texKind kind)
 			break;
 	}
 
+ out:
 	deleteToken (name);
 	vStringDelete (fullname);
-	return true;
+	return eof;
 }
 
 static void parseTexFile (tokenInfo *const token)
 {
+	bool eof = false;
+
 	do
 	{
-		readToken (token);
+		if (!readToken (token))
+			break;
 
 		if (isType (token, TOKEN_KEYWORD))
 		{
 			switch (token->keyword)
 			{
 				case KEYWORD_part:
-					parseTag (token, TEXTAG_PART);
+					eof = parseTag (token, TEXTAG_PART);
 					break;
 				case KEYWORD_chapter:
-					parseTag (token, TEXTAG_CHAPTER);
+					eof = parseTag (token, TEXTAG_CHAPTER);
 					break;
 				case KEYWORD_section:
-					parseTag (token, TEXTAG_SECTION);
+					eof = parseTag (token, TEXTAG_SECTION);
 					break;
 				case KEYWORD_subsection:
-					parseTag (token, TEXTAG_SUBSECTION);
+					eof = parseTag (token, TEXTAG_SUBSECTION);
 					break;
 				case KEYWORD_subsubsection:
-					parseTag (token, TEXTAG_SUBSUBSECTION);
+					eof = parseTag (token, TEXTAG_SUBSUBSECTION);
 					break;
 				case KEYWORD_paragraph:
-					parseTag (token, TEXTAG_PARAGRAPH);
+					eof = parseTag (token, TEXTAG_PARAGRAPH);
 					break;
 				case KEYWORD_subparagraph:
-					parseTag (token, TEXTAG_SUBPARAGRAPH);
+					eof = parseTag (token, TEXTAG_SUBPARAGRAPH);
 					break;
 				case KEYWORD_label:
-					parseTag (token, TEXTAG_LABEL);
+					eof = parseTag (token, TEXTAG_LABEL);
 					break;
 				case KEYWORD_include:
-					parseTag (token, TEXTAG_INCLUDE);
+					eof = parseTag (token, TEXTAG_INCLUDE);
 					break;
 				default:
 					break;
 			}
 		}
+		if (eof)
+			break;
 	} while (true);
 }
 
@@ -559,11 +585,8 @@ static void finalize (const langType language CTAGS_ATTR_UNUSED,
 static void findTexTags (void)
 {
 	tokenInfo *const token = newToken ();
-	exception_t exception;
 
-	exception = (exception_t) (setjmp (Exception));
-	while (exception == ExceptionNone)
-		parseTexFile (token);
+	parseTexFile (token);
 
 	deleteToken (token);
 }
