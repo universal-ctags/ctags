@@ -1170,7 +1170,46 @@ bool cxxParserParseNextToken(void)
 			if(cxxKeywordIsDisabled((CXXKeyword)iCXXKeyword))
 			{
 				t->eType = CXXTokenTypeIdentifier;
+			} else if (isInputHeaderFile ()
+					   && (iCXXKeyword == CXXKeywordPUBLIC
+						   || iCXXKeyword == CXXKeywordPROTECTED
+						   || iCXXKeyword == CXXKeywordPRIVATE))
+			{
+				int c0 = g_cxx.iChar;
+
+				if (c0 == ':')
+				{
+					/* Specifying the scope of struct/union/class member */
+					goto assign_keyword;
+				}
+
+				if (isspace (c0))
+				{
+					int c1;
+
+					cxxParserSkipToNonWhiteSpace ();
+					c1 = g_cxx.iChar;
+					cppUngetc (c1);
+					g_cxx.iChar = c0;
+
+					if (c1 == ':')
+					{
+						/* Specifying the scope of struct/union/class member */
+						goto assign_keyword;
+					}
+					else if (isalpha (c1))
+					{
+
+						/* Specifying the scope of class inheritance */
+						goto assign_keyword;
+					}
+				}
+
+				t->eType = CXXTokenTypeIdentifier;
+				g_cxx.bConfirmedCPPLanguage = false;
+				cxxKeywordEnablePublicProtectedPrivate(false);
 			} else {
+			assign_keyword:
 				t->eType = CXXTokenTypeKeyword;
 				t->eKeyword = (CXXKeyword)iCXXKeyword;
 
