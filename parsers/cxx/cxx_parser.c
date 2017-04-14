@@ -1231,7 +1231,7 @@ bool cxxParserParseClassStructOrUnion(
 	)
 {
 	// Trick for "smart" handling of public/protected/private keywords in .h files parsed as C++.
-	// See the declaration of bEnablePublicProtectedPrivateKeywords for more info.
+	// See the declaration of cxxKeywordEnablePublicProtectedPrivate for more info.
 
 	// Enable public/protected/private keywords and save the previous state
 	bool bEnablePublicProtectedPrivateKeywords = cxxKeywordEnablePublicProtectedPrivate(true);
