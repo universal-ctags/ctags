@@ -495,6 +495,7 @@ run_tcase ()
     local timeout_value
     local tmp
 
+    local broke_args_ctags
 
     #
     # Filtered by UNIT
@@ -510,10 +511,7 @@ run_tcase ()
     [ -f "${fargs}" ] && _CMDLINE="${_CMDLINE} --options=${fargs}"
 
     if [ -f "${fargs}" ] && ! ${_CMDLINE} --_force-quit=0 > /dev/null 2>&1; then
-	printf '%-60s' "Verifying args.ctags of ${name}"
-	run_result error '/dev/null' "broken args.ctags?"
-	L_BROKEN_ARGS_CTAGS="${L_BROKEN_ARGS_CTAGS} ${category}/${name}"
-	return 1
+	broke_args_ctags=1
     fi
 
     #
@@ -550,6 +548,10 @@ run_tcase ()
     elif [ "$WITH_TIMEOUT" = 0 ] && [ "${class}" = 'i' ]; then
 	L_SKIPPED_BY_ILOOP="$L_SKIPPED_BY_ILOOP ${category}/${name}"
 	run_result skip "${oresult}" "may cause an infinite loop"
+	return 1
+    elif [ "$broke_args_ctags" = 1 ]; then
+	run_result error '/dev/null' "broken args.ctags?"
+	L_BROKEN_ARGS_CTAGS="${L_BROKEN_ARGS_CTAGS} ${category}/${name}/"
 	return 1
     fi
 
