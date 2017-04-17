@@ -1424,6 +1424,14 @@ static void printProgramIdentification (void)
 	printf ("  Compiled: %s, %s\n", __DATE__, __TIME__);
 	printf ("  URL: %s\n", PROGRAM_URL);
 
+	printf ("  DEBUG: %s\n",
+#ifdef DEBUG
+		"YES"
+#else
+		"NO"
+#endif		
+		);
+
 	printFeatureList ();
 }
 
