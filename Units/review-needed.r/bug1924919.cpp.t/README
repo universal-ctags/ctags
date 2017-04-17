@@ -1,0 +1,17 @@
+The orignal bug report can be found in https://sourceforge.net/p/ctags/bugs/217/
+
+I, Masatake YAMATO, think both a bug report and developer of e-ctags go wrong.
+
+Let's consider following input:
+
+    #include <string>
+    namespace mud {
+	    std::string MajorVersion;
+	    std::string MinorVersion;
+	    int (* foo) (void);
+    };
+    
+
+All MajorVersion, MinorVersion and foo are tagged with 'm' kind.
+This is less informative. Whether they are members or not can
+be known from "namespace:mud" field of tags file.
