@@ -567,7 +567,7 @@ int main(void) {
 }
 ])],[regcomp_works=yes],[regcomp_works=no],[AC_DEFINE(CHECK_REGCOMP)])
 AC_MSG_RESULT($regcomp_works)
-if test yes != "$regcomp_works"; then
+if test no = "$regcomp_works"; then
 	AC_MSG_ERROR([regcomp() on this system is broken.])
 fi
 have_regcomp=yes
