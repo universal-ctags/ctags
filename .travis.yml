@@ -13,7 +13,13 @@ compiler:
   - gcc
   - clang
 
+sudo: required
+
 env:
+  matrix:
+  - OS_TYPE=centos OS_VERSION=6
+  - OS_TYPE=centos OS_VERSION=7
+
   global:
     # The next declaration is the encrypted COVERITY_SCAN_TOKEN, created
     #   via the "travis encrypt" command using the project repo's public key
@@ -29,7 +35,8 @@ env:
     build_command:   "make -j 4 CFLAGS=-O0"
     branch_pattern: master
 
-sudo: false
+services:
+      - docker
 
 addons:
   apt:
@@ -47,6 +54,8 @@ env:
 # Only with gcc get the mingw-w64 cross compilers
 before_install:
   - if [ $CC = 'gcc' ] && [ $TRAVIS_OS_NAME = 'linux' ]; then gem install lcoveralls; fi
+  - if [ $OS_TYPE = 'centos' ]; then echo CC:$CC TRAVIS_OS_NAME:$TRAVIS_OS_NAME OS_TYPE:$OS_TYPE OS_VERSION:$OS_VERSION; fi
+
 # Build and run tests. Only with gcc cross compile
 script:
   - ./misc/travis-check.sh
