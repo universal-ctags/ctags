@@ -3221,17 +3221,24 @@ static unsigned int anonHash(const unsigned char *str)
 	return hash ;
 }
 
+extern void anonHashString (const char *filename, char buf[9])
+{
+	sprintf(buf, "%08x", anonHash((const unsigned char *)filename));
+}
+
+
 extern void anonGenerate (vString *buffer, const char *prefix, int kind)
 {
 	parserObject* parser = LanguageTable + getInputLanguage ();
 	parser -> anonymousIdentiferId ++;
 
 	char szNum[32];
+	char buf [9];
 
 	vStringCopyS(buffer, prefix);
 
-	unsigned int uHash = anonHash((const unsigned char *)getInputFileName());
-	sprintf(szNum,"%08x%02x%02x",uHash,parser -> anonymousIdentiferId, kind);
+	anonHashString (getInputFileName(), buf);
+	sprintf(szNum,"%s%02x%02x",buf,parser -> anonymousIdentiferId, kind);
 	vStringCatS(buffer,szNum);
 }
 
