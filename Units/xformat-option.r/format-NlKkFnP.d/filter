@@ -1,2 +1,2 @@
 #!/bin/sh
-sed -e 's|\./.*/input.m|input.m|'
+sed -e 's|\.\{1,\}/.*/input.m|input.m|'
