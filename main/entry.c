@@ -1230,6 +1230,7 @@ extern int makeQualifiedTagEntry (const tagEntryInfo *const e)
 #if 0
 		x.extensionFields.scopeKind = NULL;
 		x.extensionFields.scopeName = NULL;
+		x.extensionFields.scopeIndex = CORK_NIL;
 #endif
 		r = makeTagEntry (&x);
 	}
