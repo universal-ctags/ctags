@@ -992,7 +992,7 @@ extern unsigned int getFieldDataType (fieldType type)
 
 extern bool isFieldRenderable (fieldType type)
 {
-	return getFieldObject(type)->def->renderEscaped? true: false;
+	return getFieldObject(type)->def->renderEscaped [WRITER_DEFAULT]? true: false;
 }
 
 extern int countFields (void)
