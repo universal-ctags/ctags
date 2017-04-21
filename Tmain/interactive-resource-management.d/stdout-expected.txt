@@ -1,0 +1,4 @@
+--output-format=json -o - --sort=no => ok
+--output-format=json -o tags.json --sort=no => ok
+--output-format=json -o tags.json => ok
+--output-format=json -o - => ok

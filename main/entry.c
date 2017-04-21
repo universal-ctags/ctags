@@ -383,9 +383,20 @@ extern void openTagFile (void)
 	 */
 	if (TagsToStdout)
 	{
-		/* Open a tempfile with read and write mode. Read mode is used when
-		 * write the result to stdout. */
-		TagFile.mio = tempFile ("w+", &TagFile.name);
+		if (Option.sorted == SO_UNSORTED)
+		{
+			/* Passing NULL for keeping stdout open.
+			   stdout can be used for debugging purpose.*/
+			TagFile.mio = mio_new_fp(stdout, NULL);
+			TagFile.name = eStrdup ("/dev/stdout");
+		}
+		else
+		{
+			/* Open a tempfile with read and write mode. Read mode is used when
+			 * write the result to stdout. */
+			TagFile.mio = tempFile ("w+", &TagFile.name);
+		}
+
 		if (isXtagEnabled (XTAG_PSEUDO_TAGS))
 			addCommonPseudoTags ();
 	}
@@ -589,6 +600,14 @@ extern void closeTagFile (const bool resize)
 	if (Option.etags)
 		writeEtagsIncludes (TagFile.mio);
 	mio_flush (TagFile.mio);
+
+	if ((TagsToStdout && (Option.sorted == SO_UNSORTED)))
+	{
+		if (mio_free (TagFile.mio) != 0)
+			error (FATAL | PERROR, "cannot close tag file");
+		goto out;
+	}
+
 	abort_if_ferror (TagFile.mio);
 	desiredSize = mio_tell (TagFile.mio);
 	mio_seek (TagFile.mio, 0L, SEEK_END);
@@ -612,6 +631,8 @@ extern void closeTagFile (const bool resize)
 			error (FATAL | PERROR, "cannot close tag file");
 		remove (tagFileName ());  /* remove temporary file */
 	}
+
+ out:
 	eFree (TagFile.name);
 	TagFile.name = NULL;
 }

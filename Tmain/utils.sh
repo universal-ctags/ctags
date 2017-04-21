@@ -64,3 +64,26 @@ run_with_format()
     shift
     ${CTAGS} --quiet --options=NONE --output-format=$format "$@" -o - input.*
 }
+
+exit_status_for_input_c()
+{
+	local ctags=$1
+	shift
+
+	local remove_file=$1
+	shift
+
+	printf "%s => " "$*"
+	${ctags} --quiet --options=NONE "$@" input.c > /dev/null
+	local result_local=$?
+
+	if [ "$remove_file" != "none" ]; then
+		rm -f "$remove_file"
+	fi
+
+	if [ "$result_local" = 0 ]; then
+		echo "ok"
+	else
+		echo "failed"
+	fi
+}
