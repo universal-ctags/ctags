@@ -165,6 +165,7 @@ PARSER_SRCS =				\
 	parsers/go.c			\
 	parsers/html.c			\
 	parsers/iniconf.c		\
+	parsers/itcl.c			\
 	parsers/jprop.c			\
 	parsers/jscript.c		\
 	parsers/json.c			\

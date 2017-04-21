@@ -227,6 +227,7 @@
     <ClCompile Include="..\parsers\ldscript.c" />
     <ClCompile Include="..\parsers\dtd.c" />
     <ClCompile Include="..\optlib\RSpec.c" />
+    <ClCompile Include="..\parsers\itcl.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\fnmatch\fnmatch.h" />
@@ -282,6 +283,7 @@
     <ClInclude Include="..\main\objpool.h" />
     <ClInclude Include="..\main\subparser.h" />
     <ClInclude Include="..\main\tokeninfo.h" />
+    <ClInclude Include="..\parsers\tcl.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

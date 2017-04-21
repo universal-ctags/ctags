@@ -22,6 +22,7 @@
 #include "routines.h"
 #include "debug.h"
 #include "ptrarray.h"
+#include "tcl.h"
 
 #include <string.h>
 
@@ -62,17 +63,6 @@ static const keywordTable TclKeywordTable[] = {
 	{ "eval",			KEYWORD_EVAL		},
 };
 
-enum eTokenType {
-	/* 0..255 are the byte's value */
-	TOKEN_EOF = 256,
-	TOKEN_UNDEFINED,
-	TOKEN_KEYWORD,
-	TOKEN_IDENTIFIER,
-	TOKEN_VARIABLE,
-	TOKEN_EOL,
-	TOKEN_STRING,
-};
-
 /*
 *   FUNCTION DEFINITIONS
 */
@@ -94,10 +84,10 @@ struct tokenTypePair typePairs [] = {
 
 static struct tokenInfoClass tclTokenInfoClass = {
 	.nPreAlloc = 4,
-	.typeForUndefined = TOKEN_UNDEFINED,
+	.typeForUndefined = TOKEN_TCL_UNDEFINED,
 	.keywordNone      = KEYWORD_NONE,
-	.typeForKeyword   = TOKEN_KEYWORD,
-	.typeForEOF       = TOKEN_EOF,
+	.typeForKeyword   = TOKEN_TCL_KEYWORD,
+	.typeForEOF       = TOKEN_TCL_EOF,
 	.extraSpace       = sizeof (struct tokenExtra),
 	.pairs            = typePairs,
 	.pairCount        = ARRAY_SIZE (typePairs),
@@ -106,7 +96,7 @@ static struct tokenInfoClass tclTokenInfoClass = {
 	.copy             = copyToken,
 };
 
-static tokenInfo *newTclToken (void)
+extern tokenInfo *newTclToken (void)
 {
 	return newToken (&tclTokenInfoClass);
 }
@@ -182,7 +172,7 @@ static void readToken (tokenInfo *const token, void *data CTAGS_ATTR_UNUSED)
 	int c;
 	bool escaped;
 
-	token->type		= TOKEN_UNDEFINED;
+	token->type		= TOKEN_TCL_UNDEFINED;
 	token->keyword	= KEYWORD_NONE;
 	vStringClear (token->string);
 
@@ -214,11 +204,11 @@ static void readToken (tokenInfo *const token, void *data CTAGS_ATTR_UNUSED)
 	switch (c)
 	{
 	case EOF:
-		token->type = TOKEN_EOF;
+		token->type = TOKEN_TCL_EOF;
 		break;
 	case '\n':
 	case '\r':
-		token->type = TOKEN_EOL;
+		token->type = TOKEN_TCL_EOL;
 		break;
 	case '#':
 		if (!escaped)
@@ -231,7 +221,7 @@ static void readToken (tokenInfo *const token, void *data CTAGS_ATTR_UNUSED)
 	case '"':
 		if (!escaped)
 		{
-			token->type = TOKEN_STRING;
+			token->type = TOKEN_TCL_STRING;
 			vStringPut (token->string, c);
 			readString (token->string);
 			break;
@@ -249,7 +239,7 @@ static void readToken (tokenInfo *const token, void *data CTAGS_ATTR_UNUSED)
 		if (!escaped)
 		{
 			vStringPut (token->string, c);
-			token->type = TOKEN_VARIABLE;
+			token->type = TOKEN_TCL_VARIABLE;
 
 			int c0 = getcFromInputFile ();
 			if (c0 == EOF)
@@ -276,9 +266,9 @@ static void readToken (tokenInfo *const token, void *data CTAGS_ATTR_UNUSED)
 
 			token->keyword = resolveKeyword (token->string);
 			if (token->keyword == KEYWORD_NONE)
-				token->type = TOKEN_IDENTIFIER;
+				token->type = TOKEN_TCL_IDENTIFIER;
 			else
-				token->type = TOKEN_KEYWORD;
+				token->type = TOKEN_TCL_KEYWORD;
 			break;
 	}
 }
@@ -289,7 +279,7 @@ static void skipToEndOfCmdline (tokenInfo *const token)
 	do {
 		if (token->type == ';')
 			break;
-		else if (tokenIsType (token, EOL))
+		else if (tokenIsType (token, TCL_EOL))
 			break;
 		else if ((token->type == '[')
 				 || (token->type == '['))
@@ -314,6 +304,23 @@ static const char* getLastComponentInIdentifier(tokenInfo *const token)
 		return NULL;
 }
 
+static int notifyCommand (tokenInfo *const token, unsigned int parent)
+{
+	subparser *sub;
+	int r;
+
+	foreachSubparser (sub, false)
+	{
+		tclSubparser *tclsub = (tclSubparser *)sub;
+		enterSubparser(sub);
+		r = tclsub->commandNotify (tclsub, vStringValue (token->string), parent);
+		leaveSubparser();
+		if (r != CORK_NIL)
+			break;
+	}
+	return r;
+}
+
 static void parseProc (tokenInfo *const token,
 					   unsigned int parent)
 {
@@ -322,7 +329,7 @@ static void parseProc (tokenInfo *const token,
 
 	tokenRead (token);
 
-	if (tokenIsType(token, IDENTIFIER))
+	if (tokenIsType(token, TCL_IDENTIFIER))
 	{
 		const char *last = getLastComponentInIdentifier (token);
 		if (last)
@@ -421,7 +428,7 @@ static void parseNamespace (tokenInfo *const token,
 		return;
 
 	tokenRead (token);
-	if (!tokenIsType (token, IDENTIFIER))
+	if (!tokenIsType (token, TCL_IDENTIFIER))
 	{
 		skipToEndOfCmdline(token);
 		return;
@@ -447,6 +454,11 @@ static void parseNamespace (tokenInfo *const token,
 			parseNamespace (token, index);
 		else if (tokenIsKeyword (token, PROC))
 			parseProc (token, index);
+		else if (tokenIsType (token, TCL_IDENTIFIER))
+		{
+			notifyCommand (token, index);
+			skipToEndOfCmdline(token); /* ??? */
+		}
 		else if (token->type == '}')
 		{
 			tagEntryInfo *e = getEntryInCorkQueue (index);
@@ -468,6 +480,11 @@ static void findTclTags (void)
 			parseNamespace (token, CORK_NIL);
 		else if (tokenIsKeyword (token, PROC))
 			parseProc (token, CORK_NIL);
+		else if (tokenIsType (token, TCL_IDENTIFIER))
+		{
+			notifyCommand (token, CORK_NIL);
+			skipToEndOfCmdline(token); /* ??? */
+		}
 		else
 			skipToEndOfCmdline(token);
 	} while (!tokenIsEOF(token));
