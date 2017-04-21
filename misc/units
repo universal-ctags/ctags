@@ -420,6 +420,20 @@ direq ()
     return $?
 }
 
+anon_normalize ()
+{
+    local ctags=$1
+    local input_actual=$2
+
+    # TODO: "Units" should not be hardcoded.
+    local input_expected="./Units${input_actual#*/Units}"
+
+    local actual=$(${CTAGS} --quiet --options=NONE --_anonhash="${input_actual}")
+    local expected=$(${CTAGS} --quiet --options=NONE --_anonhash="${input_expected}")
+
+    sed -e s/${actual}/${expected}/g
+}
+
 run_tcase ()
 {
     local input="$1"
@@ -627,7 +641,9 @@ run_tcase ()
 	return 0
     fi
 
-    ${output_type}_basename_filter < "${orawout}" | "$ffilter" > "${ofiltered}"
+    ${output_type}_basename_filter < "${orawout}" | \
+	anon_normalize "${CTAGS}" "${input}" | \
+	$ffilter > "${ofiltered}"
 
     {
 	diff -U 0 -I '^!_TAG' --strip-trailing-cr "${fexpected}" "${ofiltered}" > "${odiff}"
