@@ -120,7 +120,7 @@ static tagXpathTableTable antXpathTableTable[] = {
 };
 
 #else
-static const tagRegexTable antTagRegexTable [] = {
+static tagRegexTable antTagRegexTable [] = {
 	{"^[ \t]*<[ \t]*project[^>]+name=\"([^\"]+)\".*", "\\1",
 	 "p,project,projects", NULL},
 	{"^[ \t]*<[ \t]*target[^>]+name=\"([^\"]+)\".*", "\\1",
