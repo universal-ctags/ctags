@@ -591,6 +591,8 @@ static void sanitizeEnviron (void)
 		char ***ep = _NSGetEnviron();
 		if (ep)
 			e = *ep;
+		else
+			e = NULL;
 	}
 #else
 	e = NULL;

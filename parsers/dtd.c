@@ -366,7 +366,7 @@ static void parseElement (tokenInfo *const token, bool skipToClose)
 	}
 	else if (tokenIsType(token, IDENTIFIER))
 		makeDtdTagMaybe (&e, token, K_ELEMENT, ROLE_INDEX_DEFINITION);
-	else if ((token->type == '('))
+	else if (token->type == '(')
 	{
 		do {
 			parseElement (token, false);
