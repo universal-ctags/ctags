@@ -281,7 +281,8 @@ extern void argForth (Arguments* const current)
 extern void argDelete (Arguments* const current)
 {
 	Assert (current != NULL);
-	if (current->type ==  ARG_STRING  &&  current->item != NULL)
+	if ((current->type ==  ARG_STRING
+		 || current->type ==  ARG_FILE) &&  current->item != NULL)
 		eFree (current->item);
 	memset (current, 0, sizeof (Arguments));
 	eFree (current);
