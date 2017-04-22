@@ -421,6 +421,8 @@ static optionDescription LongOptionDescription [] = {
  {1,"       Allow specifying --xcmd-<LANG> option in ~/.ctags and/or ~/.ctags/*."},
  {1,"       By default it is not allowed. This option itself can be specified only"},
  {1,"       in /etc or /usr/local/etc."},
+ {1,"  --_anonhash=fname"},
+ {1,"       Used in u-ctags test harness"},
  {1,"  --_echo=msg"},
  {1,"       Echo MSG to standard error. Useful to debug the chain"},
  {1,"       of loading option files."},
@@ -2339,6 +2341,17 @@ static void processIgnoreOption (const char *const list, int IgnoreOrDefine)
 		readIgnoreList (list);
 }
 
+static void processAnonHashOption (const char *const option, const char *const parameter)
+{
+	if (parameter == NULL || parameter[0] == '\0')
+		error (FATAL, "Something string is needed for \"%s\" option", option);
+	char buf [9];
+
+	anonHashString (parameter, buf);
+	printf("%s\n", buf);
+	exit (0);
+}
+
 static void processEchoOption (const char *const option, const char *const parameter)
 {
 	if (parameter == NULL || parameter[0] == '\0')
@@ -2573,6 +2586,7 @@ static parametricOption ParametricOptions [] = {
 	{ "sort",                   processSortOption,              true,   STAGE_ANY },
 	{ "tag-relative",           processTagRelative,             true,   STAGE_ANY },
 	{ "version",                processVersionOption,           true,   STAGE_ANY },
+	{ "_anonhash",              processAnonHashOption,          false,  STAGE_ANY },
 	{ "_echo",                  processEchoOption,              false,  STAGE_ANY },
 	{ "_force-quit",            processForceQuitOption,         false,  STAGE_ANY },
 	{ "_xformat",               processXformatOption,           false,  STAGE_ANY },
