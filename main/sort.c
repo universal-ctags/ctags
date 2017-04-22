@@ -69,13 +69,11 @@ extern void catFile (MIO *mio)
 */
 static void appendCstringWithQuotes (vString *dest, const char* cstr)
 {
-	const char* o;
-
 #ifdef WIN32
 	vStringCatS (dest, cstr);
 #else
 	vStringPut (dest, '\'');
-	for (o = cstr; *o; o++)
+	for (const char *o = cstr; *o; o++)
 	{
 		if (*o == '\'')
 			vStringCatS (dest, "'\"'\"'");
