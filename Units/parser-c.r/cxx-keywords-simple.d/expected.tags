@@ -1,0 +1,27 @@
+private	input.h	/^struct private {int x;} v24;$/;"	struct
+x	input.h	/^struct private {int x;} v24;$/;"	member	struct:private	typeref:typename:int
+v24	input.h	/^struct private {int x;} v24;$/;"	variable	typeref:struct:private
+protected	input.h	/^struct protected {int x;} v25;$/;"	struct
+x	input.h	/^struct protected {int x;} v25;$/;"	member	struct:protected	typeref:typename:int
+v25	input.h	/^struct protected {int x;} v25;$/;"	variable	typeref:struct:protected
+public	input.h	/^struct public {int x;} v26;$/;"	struct
+x	input.h	/^struct public {int x;} v26;$/;"	member	struct:public	typeref:typename:int
+v26	input.h	/^struct public {int x;} v26;$/;"	variable	typeref:struct:public
+s24	input.h	/^struct s24 {int private;} ;$/;"	struct
+private	input.h	/^struct s24 {int private;} ;$/;"	member	struct:s24	typeref:typename:int
+s25	input.h	/^struct s25 {int protected;} ;$/;"	struct
+protected	input.h	/^struct s25 {int protected;} ;$/;"	member	struct:s25	typeref:typename:int
+s26	input.h	/^struct s26 {int public;} ;$/;"	struct
+public	input.h	/^struct s26 {int public;} ;$/;"	member	struct:s26	typeref:typename:int
+private	input.h	/^typedef int private; \/* 24 *\/$/;"	typedef	typeref:typename:int
+protected	input.h	/^typedef int protected; \/* 25 *\/$/;"	typedef	typeref:typename:int
+public	input.h	/^typedef int public; \/* 26 *\/$/;"	typedef	typeref:typename:int
+v24	input.h	/^int v24, private;$/;"	variable	typeref:typename:int
+private	input.h	/^int v24, private;$/;"	variable	typeref:typename:int
+v25	input.h	/^int v25, protected;$/;"	variable	typeref:typename:int
+protected	input.h	/^int v25, protected;$/;"	variable	typeref:typename:int
+v26	input.h	/^int v26, public;$/;"	variable	typeref:typename:int
+public	input.h	/^int v26, public;$/;"	variable	typeref:typename:int
+private	input.h	/^int private (int a24);$/;"	prototype	typeref:typename:int
+protected	input.h	/^int protected (int a25);$/;"	prototype	typeref:typename:int
+public	input.h	/^int public (int a26);$/;"	prototype	typeref:typename:int

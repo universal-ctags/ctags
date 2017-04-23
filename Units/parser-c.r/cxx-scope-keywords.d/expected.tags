@@ -1,0 +1,18 @@
+data0	input.h	/^struct data0 {$/;"	struct
+private	input.h	/^	void *private;$/;"	member	struct:data0	typeref:typename:void *
+public	input.h	/^	void *public;$/;"	member	struct:data0	typeref:typename:void *
+protected	input.h	/^	void *protected;$/;"	member	struct:data0	typeref:typename:void *
+data1	input.h	/^struct data1 {$/;"	struct
+private	input.h	/^	void *private\/* comment *\/;$/;"	member	struct:data1	typeref:typename:void *
+public	input.h	/^	void *public\/* comment$/;"	member	struct:data1	typeref:typename:void *
+protected	input.h	/^	void *protected \/* comment$/;"	member	struct:data1	typeref:typename:void *
+data2	input.h	/^struct data2 {$/;"	struct
+private	input.h	/^	void *private ;$/;"	member	struct:data2	typeref:typename:void *
+public	input.h	/^	int   public:1 ;$/;"	member	struct:data2	typeref:typename:int:1
+protected	input.h	/^	void *protected __attribute__ ((aligned (8)))  ;$/;"	member	struct:data2	typeref:typename:void *
+foo	input.h	/^void foo(void) {$/;"	function	typeref:typename:void
+private	input.h	/^private:$/;"	label	function:foo	file:
+bar	input.h	/^void bar(void) {$/;"	function	typeref:typename:void
+private	input.h	/^private :$/;"	label	function:bar	file:
+baz	input.h	/^void baz(void) {$/;"	function	typeref:typename:void
+private	input.h	/^ private\/* coment *\/:$/;"	label	function:baz	file:
