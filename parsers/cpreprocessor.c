@@ -1555,7 +1555,7 @@ static void saveMacro(const char * macro)
 
 				CXX_DEBUG_PRINT("Check token '%.*s'",tokenLen,tokenBegin);
 
-				bool bIsVarArg = strncmp(tokenBegin,"__VA_ARGS__",tokenLen) == 0;
+				bool bIsVarArg = (tokenLen == 11) && (strncmp(tokenBegin,"__VA_ARGS__",11) == 0);
 
 				int i = 0;
 				for(;i<iParamCount;i++)

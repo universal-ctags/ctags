@@ -995,9 +995,7 @@ static bool cxxParserParseNextTokenSkipMacroParenthesis(CXXToken ** ppChain)
 	}
 
 	if(!cxxParserParseAndCondenseCurrentSubchain(
-			CXXTokenTypeOpeningParenthesis |
-				CXXTokenTypeOpeningSquareParenthesis |
-				CXXTokenTypeOpeningBracket,
+			CXXTokenTypeOpeningParenthesis,
 			false
 		))
 	{
