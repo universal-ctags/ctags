@@ -14,6 +14,11 @@ p5a	input.cpp	/^DECLARE_TWO_VERSIONS_OF_FUNCTIONS(p5,p6)$/;"	p	typeref:typename:
 p6a	input.cpp	/^DECLARE_TWO_VERSIONS_OF_FUNCTIONS(p5,p6)$/;"	p	typeref:typename:int	file:	signature:()
 STRINGIFY	input.cpp	/^#define STRINGIFY(/;"	d	file:	signature:(token)
 test	input.cpp	/^const char * test = "" STRINGIFY(; int notVisible;);$/;"	v	typeref:typename:const char *
+DECLARE_FUNCTION_4	input.cpp	/^#define DECLARE_FUNCTION_4(/;"	d	file:	signature:(Ret,Class,Method,...)
+DECLARE_FUNCTION_4_BEGIN	input.cpp	/^#define DECLARE_FUNCTION_4_BEGIN(/;"	d	file:	signature:(...)
+DECLARE_FUNCTION_4_END	input.cpp	/^#define DECLARE_FUNCTION_4_END(/;"	d	file:	signature:(...)
+foo__bar	input.cpp	/^DECLARE_FUNCTION_4(int,foo,bar,int x)$/;"	f	typeref:typename:int	signature:(foo * this,int x)
+x	input.cpp	/^DECLARE_FUNCTION_4(int,foo,bar,int x)$/;"	z	function:foo__bar	typeref:typename:int	file:
 IMPLEMENT_FUNCTIONS	input.cpp	/^#define IMPLEMENT_FUNCTIONS(/;"	d	file:	signature:(_prefix)
 f1a	input.cpp	/^IMPLEMENT_FUNCTIONS(f1);$/;"	f	typeref:typename:void	signature:()
 f1b	input.cpp	/^IMPLEMENT_FUNCTIONS(f1);$/;"	f	typeref:typename:void	signature:()
