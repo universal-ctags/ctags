@@ -159,4 +159,21 @@ void cxxDebugDumpChain (CXXTokenChain *pChain)
 {
 	cxxDebugDumpCommon (pChain, (cxxDebugDumpCommonFunc)cxxDebugDumpChain0);
 }
+
+const char* cxxDebugScopeDecode(enum CXXScopeType scope)
+{
+	const char * table[] = {
+		[CXXScopeTypeFunction]  = "function",
+		[CXXScopeTypeNamespace] = "namespace",
+		[CXXScopeTypeClass] = "class",
+		[CXXScopeTypeEnum] = "enum",
+		[CXXScopeTypeUnion] = "union",
+		[CXXScopeTypeStruct] = "structg",
+	};
+	if (sizeof(table) > scope)
+		return table[scope];
+	else
+		return NULL;
+}
+
 #endif
