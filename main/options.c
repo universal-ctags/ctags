@@ -2968,9 +2968,9 @@ static void processLongOption (
 		;
 	else if (processParametricOption (option, parameter))
 		;
-	else if (processDefineKind (option, parameter))
+	else if (processKinddefOption (option, parameter))
 		;
-	else if (processKindDefinition (option, parameter))
+	else if (processKindsOption (option, parameter))
 		;
 	else if (processAliasOption (option, parameter))
 		;
