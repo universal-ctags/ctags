@@ -2032,7 +2032,7 @@ static bool processLangDefineKind(const langType language,
 	tmp_start = p;
 	while (p != tmp_end)
 	{
-		if (!isgraph (*p))
+		if (!isalnum (*p))
 			error (FATAL, "unacceptable char as part of kind name in \"--%s\" option", option);
 		p++;
 	}
