@@ -2463,6 +2463,57 @@ extern void printLanguageList (void)
 	eFree (ltable);
 }
 
+static bool processLangDefineExtra (const langType language,
+									const char *const option,
+									const char *const parameterx)
+{
+	xtagDefinition *xdef;
+	const char * p = parameterx;
+	const char *desc;
+
+	Assert (0 <= language  &&  language < (int) LanguageCount);
+	Assert (p);
+
+	if (p[0] == '\0')
+		error (FATAL, "no extra definition specified in \"--%s\" option", option);
+
+	desc = strchr (p, ',');
+	if (!desc)
+		error (FATAL, "no extra description specified in \"--%s\" option", option);
+	else if (desc == p)
+		error (FATAL, "the extra name in \"--%s\" option is empty", option);
+
+	for (; p < desc; p++)
+	{
+		if (!isalnum (*p))
+			error (FATAL, "unacceptable char as part of extra name in \"--%s\" option",
+				   option);
+	}
+
+	xdef = xCalloc (1, xtagDefinition);
+	xdef->enabled = false;
+	xdef->letter = NUL_XTAG_LETTER;
+	xdef->name = eStrndup (parameterx, desc - parameterx);
+	xdef->description = eStrdup (desc + 1);
+	xdef->isEnabled = NULL;
+
+	defineXtag (xdef, language);
+
+	return true;
+}
+
+extern bool processExtradefOption (const char *const option, const char *const parameter)
+{
+	langType language;
+
+	language = getLanguageComponentInOption (option, "extradef-");
+	if (language == LANG_IGNORE)
+		return false;
+
+	return processLangDefineExtra (language, option, parameter);
+}
+
+
 /*
 *   File parsing
 */

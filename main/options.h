@@ -177,6 +177,7 @@ extern void processLanguageDefineOption (const char *const option, const char *c
 extern bool processMapOption (const char *const option, const char *const parameter);
 extern bool processKinddefOption (const char *const option, const char *const parameter);
 extern bool processKindsOption (const char *const option, const char *const parameter);
+extern bool processExtradefOption (const char *const option, const char *const parameter);
 extern bool processAliasOption (const char *const option, const char *const parameter);
 #ifdef HAVE_ICONV
 extern bool processLanguageEncodingOption (const char *const option, const char *const parameter);
