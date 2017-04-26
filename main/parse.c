@@ -1490,10 +1490,10 @@ static void installXtagDefinition (const langType language)
 	Assert (0 <= language  &&  language < (int) LanguageCount);
 	parser = LanguageTable [language].def;
 
-	if (parser->xtagDefinitions != NULL)
+	if (parser->xtagTable != NULL)
 	{
-		for (i = 0; i < parser->xtagDefinitionCount; i++)
-			defineXtag (& parser->xtagDefinitions [i], language);
+		for (i = 0; i < parser->xtagCount; i++)
+			defineXtag (& parser->xtagTable [i], language);
 	}
 }
 

@@ -138,7 +138,7 @@ extern parserDefinition* RobotParser (void)
 	def->extensions = extensions;
 	def->initialize = initialize;
     def->parser     = findRobotTags;
-	def->xtagDefinitions = RobotXtags;
-	def->xtagDefinitionCount = ARRAY_SIZE (RobotXtags);
+	def->xtagTable = RobotXtags;
+	def->xtagCount = ARRAY_SIZE (RobotXtags);
 	return def;
 }
