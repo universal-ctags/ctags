@@ -90,6 +90,15 @@ CXXToken * cxxTokenChainFirstTokenNotOfType(
 		unsigned int uTokenTypes
 	);
 
+
+// Find the first token with type that is not accepted by PREDICATOR.
+// PREDICATOR returns true when a token is acceptable.
+CXXToken * cxxTokenChainNextTokenNotOfGeneric(
+		CXXToken * t,
+		bool (* predicator) (CXXToken *, void *),
+		void *data
+	);
+
 // Find the first token with type that is not one of the specified types
 // that comes after the specified token
 CXXToken * cxxTokenChainNextTokenNotOfType(
