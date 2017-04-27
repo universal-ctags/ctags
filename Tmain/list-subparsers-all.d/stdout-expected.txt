@@ -5,3 +5,4 @@ PythonLoggingConfig            Iniconf              base <> sub
 Autoconf                       M4                   base <> sub
 Automake                       Make                 base <= sub
 RSpec                          Ruby                 base => sub
+ITcl                           Tcl                  base <> sub
