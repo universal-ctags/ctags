@@ -19,6 +19,9 @@
 #include "read.h"
 
 
+static CXXToken * cxxParserVardefInParenthesis (CXXToken *pToken, int depth);
+
+
 //
 // Attempt to extract variable declarations from the chain.
 // Returns true if at least one variable was extracted.
@@ -33,6 +36,8 @@
 //   type var{list initializer};
 //   type var = ...;
 //   type (*ident)();
+//   type (var[]); <--   type (var); is also valid in C syntax.
+//   type *(var);        However, it is handled as macro expansion.
 //   type var:bits;
 //   type var: range declaration <-- (FIXME: this is only inside for!)
 //   very complex type with modifiers() namespace::namespace::var = ...;
@@ -264,6 +269,28 @@ bool cxxParserExtractVariableDeclarations(CXXTokenChain * pChain,unsigned int uF
 					// ok, *might* be variable instantiation
 					pIdentifier = t->pPrev;
 					pTokenBefore = pIdentifier->pPrev;
+				} else if (
+					    (
+							// type *(var);
+							(
+								(t->pChain->iCount == 3) &&
+								// * is expected here but the other is acceptable.
+								!cxxTokenTypeIs(t->pPrev,CXXTokenTypeIdentifier)
+							) ||
+							// type (var []);
+							(
+								t->pChain->iCount > 3
+							)
+						) &&
+						(
+							// Inspect the inside parenthesis
+							pIdentifier = cxxParserVardefInParenthesis(cxxTokenChainFirst(t->pChain), 0)
+						)
+					)
+				{
+					CXX_DEBUG_LEAVE_TEXT("Parenthesis seems to surrounds a variable definition");
+					pTokenBefore = t->pPrev;
+					t = t->pNext;
 				} else {
 					CXX_DEBUG_LEAVE_TEXT("No recognizable parenthesis form for a variable");
 					return bGotVariable;
@@ -381,7 +408,6 @@ bool cxxParserExtractVariableDeclarations(CXXTokenChain * pChain,unsigned int uF
 		if(!pTokenBefore)
 		{
 			CXX_DEBUG_LEAVE_TEXT("Identifier not preceded by a type");
-
 			// Here we can handle yet another one of the gazillion of special cases.
 			//
 			//    MACRO(whatever) variable;
@@ -707,4 +733,41 @@ bool cxxParserExtractVariableDeclarations(CXXTokenChain * pChain,unsigned int uF
 
 	CXX_DEBUG_LEAVE_TEXT("Reached end");
 	return bGotVariable;
+}
+
+static bool isConstVolatileOrStar (CXXToken *t, void *data)
+{
+	if (cxxTokenTypeIs (t, CXXTokenTypeStar))
+		return true;
+
+	if (cxxTokenTypeIs (t, CXXTokenTypeKeyword) &&
+		((t->eKeyword == CXXKeywordCONST) ||
+		 (t->eKeyword == CXXKeywordVOLATILE)))
+		return true;
+
+	return false;
+}
+
+static CXXToken * cxxParserVardefInParenthesis (CXXToken *pToken, int depth)
+{
+	// ( const volatile * foo [] ) <- ended with CXXTokenTypeSquareParenthesisChain
+	// ( const volatile * foo ) <- ended with CXXTokenTypeClosingParenthesis
+	// ((const volatile * foo)) <- depth > 0
+
+	CXXToken *t;
+
+	t = cxxTokenChainNextTokenNotOfGeneric (pToken, isConstVolatileOrStar, NULL);
+	if (!t)
+		return NULL;
+
+	if (cxxTokenTypeIs(t, CXXTokenTypeParenthesisChain))
+		return cxxParserVardefInParenthesis (cxxTokenChainFirst(t->pChain),
+										   depth + 1);
+	else if (cxxTokenTypeIs (t, CXXTokenTypeIdentifier) &&
+			 ((t->pNext &&
+			   (cxxTokenTypeIsOneOf (t->pNext,
+									 CXXTokenTypeSquareParenthesisChain | CXXTokenTypeClosingParenthesis)))||
+			  (t->pNext && depth > 0)))
+		return t;
+	return NULL;
 }

@@ -1,0 +1,13 @@
+A	input.c	/^int (A);$/;"	v	typeref:typename:int ()
+B	input.c	/^int *(B);$/;"	v	typeref:typename:int * ()
+C	input.c	/^struct s *(C);$/;"	v	typeref:struct:s * ()
+a	input.c	/^int (a[1]);$/;"	v	typeref:typename:int ([1])
+b	input.c	/^int *(b[2]);$/;"	v	typeref:typename:int * ([2])
+c	input.c	/^int (c[1][2]);$/;"	v	typeref:typename:int ([1][2])
+d	input.c	/^int *(d[2][3]);$/;"	v	typeref:typename:int * ([2][3])
+e	input.c	/^int *(* const volatile * e[3]);$/;"	v	typeref:typename:int * (* const volatile * [3])
+s	input.c	/^struct s {$/;"	s	file:
+f	input.c	/^	int *(* const volatile * f[3][3]);$/;"	m	struct:s	typeref:typename:int * (* const volatile * [3][3])	file:
+g	input.c	/^	int (g[3]);$/;"	m	struct:s	typeref:typename:int ([3])	file:
+t	input.c	/^} t;$/;"	v	typeref:struct:s
+h	input.c	/^int (* volatile * (*h[1]));$/;"	v	typeref:typename:int (* volatile * (* [1]))
