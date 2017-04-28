@@ -43,7 +43,25 @@ typedef enum {
 	KEYWORD_a,
 	KEYWORD_script,
 	KEYWORD_style,
-	KEYWORD_name
+	KEYWORD_name,
+
+	/* void elements */
+	KEYWORD_area,
+	KEYWORD_base,
+	KEYWORD_br,
+	KEYWORD_col,
+	KEYWORD_command,
+	KEYWORD_embed,
+	KEYWORD_hr,
+	KEYWORD_img,
+	KEYWORD_input,
+	KEYWORD_keygen,
+	KEYWORD_link,
+	KEYWORD_meta,
+	KEYWORD_param,
+	KEYWORD_source,
+	KEYWORD_track,
+	KEYWORD_wbr
 } keywordId;
 
 static const keywordTable HtmlKeywordTable[] = {
@@ -54,6 +72,24 @@ static const keywordTable HtmlKeywordTable[] = {
 	{"script", KEYWORD_script},
 	{"style", KEYWORD_style},
 	{"name", KEYWORD_name},
+
+	/* void elements */
+	{"area", KEYWORD_area},
+	{"base", KEYWORD_base},
+	{"br", KEYWORD_br},
+	{"col", KEYWORD_col},
+	{"command", KEYWORD_command},
+	{"embed", KEYWORD_embed},
+	{"hr", KEYWORD_hr},
+	{"img", KEYWORD_img},
+	{"input", KEYWORD_input},
+	{"keygen", KEYWORD_keygen},
+	{"link", KEYWORD_link},
+	{"meta", KEYWORD_meta},
+	{"param", KEYWORD_param},
+	{"source", KEYWORD_source},
+	{"track", KEYWORD_track},
+	{"wbr", KEYWORD_wbr},
 };
 
 typedef enum {
@@ -283,9 +319,11 @@ static void readTag (tokenInfo *token, vString *text)
 	{
 		keywordId startTag;
 		bool isHeading;
+		bool isVoid;
 
 		startTag = lookupKeyword (vStringValue (token->string), Lang_html);
 		isHeading = (startTag == KEYWORD_h1 || startTag == KEYWORD_h2 || startTag == KEYWORD_h3);
+		isVoid = (startTag >= KEYWORD_area && startTag <= KEYWORD_wbr);
 		if (text == NULL && isHeading)
 		{
 			text = vStringNew ();
@@ -314,7 +352,7 @@ static void readTag (tokenInfo *token, vString *text)
 		while (token->type != TOKEN_TAG_END && token->type != TOKEN_TAG_END2 &&
 			   token->type != TOKEN_EOF);
 
-		if (token->type == TOKEN_TAG_END)
+		if (!isVoid && token->type == TOKEN_TAG_END)
 		{
 			long startSourceLineNumber = getSourceLineNumber ();
 			long startLineNumber = getInputLineNumber ();
