@@ -2,7 +2,7 @@
 # License: GPL-2
 
 CTAGS=$1
-ARGS=--quiet --options=NONE
+ARGS="--quiet --options=NONE"
 O=TAGS.TMP
 
 for x in no yes default; do

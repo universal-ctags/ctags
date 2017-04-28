@@ -7,7 +7,7 @@ P=$(pwd)
 
 . ../utils.sh
 
-if ! ${CTAGS} --help | grep -e --tag-relative | grep --quiet -e always; then
+if ! ${CTAGS} $O --help | grep -e --tag-relative | grep --quiet -e always; then
 	echo "--tag-relative=always|never is not available on this platform"
 	exit ${__SKIP__}
 fi
