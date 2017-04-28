@@ -18,3 +18,4 @@ This section deals with individual parser topics.
 	parser-python.rst
 	parser-html.rst
 	parser-asm.rst
+	parser-tcl.rst
