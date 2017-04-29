@@ -21,6 +21,7 @@ is_feature_available()
 {
     local ctags=$1
 	local tmp=$2
+	local o="--quiet --options=NONE"
 	local neg
 	local feat
 
@@ -32,11 +33,11 @@ is_feature_available()
 	fi
 
 	if [ "${neg}" = 1 ]; then
-		if ${ctags} --list-features | grep -q "$feat"; then
+		if ${ctags} $o --list-features | grep -q "$feat"; then
 			skip "feature \"$feat\" is available in $ctags"
 		fi
 	else
-		if ! ${ctags} --list-features | grep -q "$feat"; then
+		if ! ${ctags} $o --list-features | grep -q "$feat"; then
 			skip "feature \"$feat\" is not available in $ctags"
 		fi
 	fi

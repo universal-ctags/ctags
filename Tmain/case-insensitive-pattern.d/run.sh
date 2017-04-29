@@ -7,4 +7,4 @@ CTAGS=$1
 
 exit_if_no_case_insensitive_filenames "${CTAGS}"
 
-${CTAGS} --print-language MAKEFILE
+${CTAGS} --quiet --options=NONE --print-language MAKEFILE
