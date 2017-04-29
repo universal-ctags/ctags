@@ -717,7 +717,23 @@ static vString* extractVimFileType(MIO* input)
 	   [text]{white}{vi:|vim:|ex:}[white]{options} */
 }
 
-static vString* determineZshAutoloadTag (const char *const modeline)
+static vString* extractMarkGeneric (MIO* input,
+									vString * (* determiner)(const char *const, void *),
+									void *data)
+{
+	vString* const vLine = vStringNew ();
+	const char* const line = readLineRaw (vLine, input);
+	vString* mode = NULL;
+
+	if (line)
+		mode = determiner (line, data);
+
+	vStringDelete (vLine);
+	return mode;
+}
+
+static vString* determineZshAutoloadTag (const char *const modeline,
+										 void *data CTAGS_ATTR_UNUSED)
 {
 	/* See "Autoloaded files" in zsh info.
 	   -------------------------------------
@@ -734,16 +750,23 @@ static vString* determineZshAutoloadTag (const char *const modeline)
 
 static vString* extractZshAutoloadTag(MIO* input)
 {
-	vString* const vLine = vStringNew ();
-	const char* const line = readLineRaw (vLine, input);
-	vString* mode = NULL;
-
-	if (line)
-		mode = determineZshAutoloadTag (line);
-
-	vStringDelete (vLine);
-	return mode;
+	return extractMarkGeneric (input, determineZshAutoloadTag, NULL);
 }
+
+static vString* determinePHPMark(const char *const modeline,
+		void *data CTAGS_ATTR_UNUSED)
+{
+	if (strncmp (modeline, "<?php", 5) == 0)
+		return vStringNewInit ("php");
+	else
+		return NULL;
+}
+
+static vString* extractPHPMark(MIO* input)
+{
+	return extractMarkGeneric (input, determinePHPMark, NULL);
+}
+
 
 struct getLangCtx {
     const char *fileName;
@@ -809,6 +832,10 @@ static const struct taster {
 		.taste  = extractVimFileType,
 		.msg    = "vim modeline",
         },
+		{
+		.taste  = extractPHPMark,
+		.msg    = "PHP marker",
+		}
 };
 static langType tasteLanguage (struct getLangCtx *glc, const struct taster *const tasters, int n_tasters,
 			      langType *fallback);
