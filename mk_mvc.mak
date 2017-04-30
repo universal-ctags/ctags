@@ -27,10 +27,11 @@ INCLUDES = $(INCLUDES) -I$(ICONV_DIR)/include
 
 !ifdef DEBUG
 DEFINES = $(DEFINES) -DDEBUG
-OPT = $(OPT) /Zi
+PDB = yes
 !endif
 
 !ifdef PDB
+OPT = $(OPT) /Zi
 PDBFLAG = /debug
 !else
 PDBFLAG =
