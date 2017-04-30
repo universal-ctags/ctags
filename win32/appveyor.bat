@@ -67,7 +67,7 @@ copy %ICONV_BUILD_DIR%\msvc10\iconv.dll %APPVEYOR_BUILD_FOLDER% > nul
 :: Build ctags with nmake
 @echo on
 cd %APPVEYOR_BUILD_FOLDER%
-nmake -f mk_mvc.mak WITH_ICONV=yes ICONV_DIR=%ICONV_DIR%
+nmake -f mk_mvc.mak WITH_ICONV=yes ICONV_DIR=%ICONV_DIR% PDB=yes
 
 :: Check filetype (VC binaries)
 c:\cygwin\bin\file ctags.exe
@@ -123,6 +123,7 @@ if "%APPVEYOR_REPO_TAG_NAME%"=="" (
   set ver=%APPVEYOR_REPO_TAG_NAME%
 )
 7z a ctags-%ver%-%ARCH%.zip ctags.exe readtags.exe iconv.dll COPYING docs README.md
+7z a ctags-%ver%-%ARCH%.pdb.zip ctags.pdb readtags.pdb
 goto :eof
 
 

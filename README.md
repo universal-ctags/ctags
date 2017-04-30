@@ -22,6 +22,7 @@ If you want to try the latest universal-ctags without building it yourself...
   - Click the ```compiler=msvc_msys2, ARCH=x64, ...``` (or ```compiler=msvc_msys2, ARCH=x86, ...```) build.
   - View the *Artifacts* tab and download ```ctags-XXXXXX-x64.zip``` (or ```ctags-XXXXXX-x86.zip```). (```XXXXXX``` is a version number or a commit ID.)
   - Add the binary folder to your PATH.
+  - If you need PDB files for debugging, download ```ctags-XXXXXX-x64.pdb.zip``` (or ```ctags-XXXXXX-x86.pdb.zip```).
 
 ### Mac
 See [Homebrew Tap for Universal Ctags](https://github.com/universal-ctags/homebrew-universal-ctags)
