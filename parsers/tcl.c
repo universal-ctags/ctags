@@ -123,10 +123,11 @@ static void readString (vString *string)
 		switch (c)
 		{
 		case EOF:
-			break;
+			return;
 		case '\\':
 			vStringPut (string, c);
 			escaped = true;
+			break;
 		case '"':
 			vStringPut (string, c);
 			if (escaped)
@@ -135,6 +136,7 @@ static void readString (vString *string)
 				return;
 			break;
 		default:
+			escaped = false;
 			vStringPut (string, c);
 			break;
 		}
