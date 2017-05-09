@@ -1,0 +1,2 @@
+AlignasTestStruct	input.cpp	/^struct alignas( 64 ) AlignasTestStruct$/;"	s	file:
+AlignasTestStruct2	input.cpp	/^class alignas( 64 ) AlignasTestStruct2$/;"	c	file:
