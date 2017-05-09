@@ -274,8 +274,20 @@ bool cxxParserExtractVariableDeclarations(CXXTokenChain * pChain,unsigned int uF
 							// type *(var);
 							(
 								(t->pChain->iCount == 3) &&
-								// * is expected here but the other is acceptable.
-								!cxxTokenTypeIs(t->pPrev,CXXTokenTypeIdentifier)
+								// * is expected here but the others are also acceptable.
+								// e.g. type const (x);
+								(
+									// type foo_an_identifier (x)
+									// This looks like function call or declaration.
+									!cxxTokenTypeIs(t->pPrev,CXXTokenTypeIdentifier) &&
+									(
+										// type * (x): acceptable
+										// type const (x): acceptable
+										// type __declspec(dllexport): unacceptable
+										(!cxxTokenTypeIs(t->pPrev,CXXTokenTypeKeyword)) ||
+										cxxKeywordMayBePartOfTypeName (t->pPrev->eKeyword)
+									)
+								)
 							) ||
 							// type (var []);
 							(
