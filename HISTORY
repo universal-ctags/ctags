@@ -1,5 +1,8 @@
 History of Onigmo (Oniguruma-mod)
 
+2017/05/01: [bug]  Import Ruby r58468
+                   Fix macro expansion bug.
+2017/04/05: [doc]  Improve document about absence operator (Issue #87)
 2017/04/03: [impl] Import the latest enc-unicode.rb from Ruby r58070.
                    (Includes Ruby r58065, r58066, r58069 and r58070.)
 2017/03/14: [bug]  Import Ruby r57816
