@@ -29,15 +29,28 @@ echo '#include "cxx_token.h"'
 echo '#include "cxx_debug.h"'
 echo
 echo '#ifdef CXX_DO_DEBUGGING'
+echo "static bool append(vString *buf, const char *str, bool appended)"
+echo "{"
+echo "	if (appended) vStringPut(buf, ' ');"
+echo "	vStringCatS (buf, str);"
+echo "	return true;"
+echo "}"
+echo
 echo 'const char * cxxDebugTypeDecode (enum CXXTokenType eType)'
 echo '{'
-echo '	switch (eType) {'
-${CTAGS} -o - --language-force=C --kinds-C=e -x --_xformat="%N" "${INPUT}" \
+echo '	bool a = false;'
+echo '	static vString *buf;'
+echo '	buf = vStringNewOrClear (buf);'
+echo
+echo '	if (eType == CXXTokenTypeEOF) vStringCatS(buf, "EOF");'
+${CTAGS} -o - --sort=no --language-force=C --kinds-C=e -x --_xformat="%N" "${INPUT}" \
 	| grep ^CXXTokenType \
 	| while read N; do
-	echo "		case 	$N: return \"${N#CXXTokenType}\";"
+	if [ $N != CXXTokenTypeEOF ]; then
+		echo "	if (eType & $N) a = append (buf, \"${N#CXXTokenType}\", a);"
+	fi
 done
-echo '		default: return "REALLY-UNKNOWN";'
-echo '	}'
+echo '	if (vStringLength(buf) == 0) vStringCatS(buf, "REALLY-UNKNOWN");'
+echo '	return vStringValue (buf);'
 echo '}'
 echo '#endif'

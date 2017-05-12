@@ -20,6 +20,11 @@
 #include "keyword.h"
 #include "promise.h"
 
+/* The max. number of nested elements - prevents further recursion if the limit
+ * is exceeded and avoids stack overflow for invalid input containing too many
+ * open tags */
+#define MAX_DEPTH 1000
+
 
 typedef enum {
 	K_ANCHOR,
@@ -43,7 +48,25 @@ typedef enum {
 	KEYWORD_a,
 	KEYWORD_script,
 	KEYWORD_style,
-	KEYWORD_name
+	KEYWORD_name,
+
+	/* void elements */
+	KEYWORD_area,
+	KEYWORD_base,
+	KEYWORD_br,
+	KEYWORD_col,
+	KEYWORD_command,
+	KEYWORD_embed,
+	KEYWORD_hr,
+	KEYWORD_img,
+	KEYWORD_input,
+	KEYWORD_keygen,
+	KEYWORD_link,
+	KEYWORD_meta,
+	KEYWORD_param,
+	KEYWORD_source,
+	KEYWORD_track,
+	KEYWORD_wbr
 } keywordId;
 
 static const keywordTable HtmlKeywordTable[] = {
@@ -54,6 +77,24 @@ static const keywordTable HtmlKeywordTable[] = {
 	{"script", KEYWORD_script},
 	{"style", KEYWORD_style},
 	{"name", KEYWORD_name},
+
+	/* void elements */
+	{"area", KEYWORD_area},
+	{"base", KEYWORD_base},
+	{"br", KEYWORD_br},
+	{"col", KEYWORD_col},
+	{"command", KEYWORD_command},
+	{"embed", KEYWORD_embed},
+	{"hr", KEYWORD_hr},
+	{"img", KEYWORD_img},
+	{"input", KEYWORD_input},
+	{"keygen", KEYWORD_keygen},
+	{"link", KEYWORD_link},
+	{"meta", KEYWORD_meta},
+	{"param", KEYWORD_param},
+	{"source", KEYWORD_source},
+	{"track", KEYWORD_track},
+	{"wbr", KEYWORD_wbr},
 };
 
 typedef enum {
@@ -79,7 +120,7 @@ typedef struct {
 static int Lang_html;
 
 
-static void readTag (tokenInfo *token, vString *text);
+static void readTag (tokenInfo *token, vString *text, int depth);
 
 
 static void readTokenText (tokenInfo *const token, bool collectText)
@@ -248,7 +289,7 @@ static void appendText (vString *text, vString *appendedText)
 	}
 }
 
-static bool readTagContent (tokenInfo *token, vString *text, long *line, long *lineOffset)
+static bool readTagContent (tokenInfo *token, vString *text, long *line, long *lineOffset, int depth)
 {
 	tokenType type;
 
@@ -262,7 +303,7 @@ static bool readTagContent (tokenInfo *token, vString *text, long *line, long *l
 		readToken (token, false);
 		type = token->type;
 		if (type == TOKEN_TAG_START)
-			readTag (token, text);
+			readTag (token, text, depth + 1);
 		if (type == TOKEN_COMMENT || type == TOKEN_TAG_START)
 		{
 			readTokenText (token, text != NULL);
@@ -274,7 +315,7 @@ static bool readTagContent (tokenInfo *token, vString *text, long *line, long *l
 	return type == TOKEN_TAG_START2;
 }
 
-static void readTag (tokenInfo *token, vString *text)
+static void readTag (tokenInfo *token, vString *text, int depth)
 {
 	bool textCreated = false;
 
@@ -283,9 +324,11 @@ static void readTag (tokenInfo *token, vString *text)
 	{
 		keywordId startTag;
 		bool isHeading;
+		bool isVoid;
 
 		startTag = lookupKeyword (vStringValue (token->string), Lang_html);
 		isHeading = (startTag == KEYWORD_h1 || startTag == KEYWORD_h2 || startTag == KEYWORD_h3);
+		isVoid = (startTag >= KEYWORD_area && startTag <= KEYWORD_wbr);
 		if (text == NULL && isHeading)
 		{
 			text = vStringNew ();
@@ -314,7 +357,7 @@ static void readTag (tokenInfo *token, vString *text)
 		while (token->type != TOKEN_TAG_END && token->type != TOKEN_TAG_END2 &&
 			   token->type != TOKEN_EOF);
 
-		if (token->type == TOKEN_TAG_END)
+		if (!isVoid && token->type == TOKEN_TAG_END && depth < MAX_DEPTH)
 		{
 			long startSourceLineNumber = getSourceLineNumber ();
 			long startLineNumber = getInputLineNumber ();
@@ -323,7 +366,7 @@ static void readTag (tokenInfo *token, vString *text)
 			long endLineOffset;
 			bool tag_start2;
 
-			tag_start2 = readTagContent (token, text, &endLineNumber, &endLineOffset);
+			tag_start2 = readTagContent (token, text, &endLineNumber, &endLineOffset, depth);
 
 			if (tag_start2)
 			{
@@ -380,7 +423,7 @@ static void findHtmlTags (void)
 	{
 		readToken (&token, true);
 		if (token.type == TOKEN_TAG_START)
-			readTag (&token, NULL);
+			readTag (&token, NULL, 0);
 	}
 	while (token.type != TOKEN_EOF);
 

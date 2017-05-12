@@ -1,0 +1,15 @@
+A::B	input.tcl	/^namespace eval A::B {$/;"	n	end:2
+A	input.tcl	/^namespace eval A {$/;"	n	end:21
+pr1	input.tcl	/^    proc pr1 {s} {$/;"	p	namespace:A	end:7
+A::pr1	input.tcl	/^    proc pr1 {s} {$/;"	p	namespace:A	extras:qualified	end:7
+pr2	input.tcl	/^    proc B::pr2 {s} {$/;"	p	namespace:B	end:11
+B::pr2	input.tcl	/^    proc B::pr2 {s} {$/;"	p	extras:qualified	end:11
+C	input.tcl	/^    namespace eval C {$/;"	n	namespace:A	end:16
+A::C	input.tcl	/^    namespace eval C {$/;"	n	namespace:A	extras:qualified	end:16
+pr3	input.tcl	/^	proc pr3 {s} {$/;"	p	namespace:A::C	end:15
+A::C::pr3	input.tcl	/^	proc pr3 {s} {$/;"	p	namespace:A::C	extras:qualified	end:15
+pr4	input.tcl	/^    proc ::pr4 {s} {$/;"	p	end:19
+::pr4	input.tcl	/^    proc ::pr4 {s} {$/;"	p	extras:qualified	end:19
+pr5	input.tcl	/^proc ::pr5 {s} {$/;"	p	end:25
+::pr5	input.tcl	/^proc ::pr5 {s} {$/;"	p	extras:qualified	end:25
+pr6	input.tcl	/^proc pr6 {s} {$/;"	p	end:29

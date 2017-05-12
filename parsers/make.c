@@ -365,11 +365,16 @@ extern parserDefinition* MakefileParser (void)
 {
 	static const char *const patterns [] = { "[Mm]akefile", "GNUmakefile", NULL };
 	static const char *const extensions [] = { "mak", "mk", NULL };
+	static const char *const aliases [] = {
+		/* the mode name in emacs */
+		"makefile",
+		NULL };
 	parserDefinition* const def = parserNew ("Make");
 	def->kindTable      = MakeKinds;
 	def->kindCount  = ARRAY_SIZE (MakeKinds);
 	def->patterns   = patterns;
 	def->extensions = extensions;
+	def->aliases = aliases;
 	def->parser     = findMakeTags;
 	return def;
 }

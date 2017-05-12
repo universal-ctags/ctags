@@ -1,0 +1,3 @@
+This case depends on ~/.ctags.
+--options=NONE cannot be used in this test case.
+
