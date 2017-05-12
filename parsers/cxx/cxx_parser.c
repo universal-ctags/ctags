@@ -118,7 +118,7 @@ bool cxxParserParseAndCondenseSubchainsUpToOneOf(
 		unsigned int uInitialSubchainMarkerTypes
 	)
 {
-	CXX_DEBUG_ENTER_TEXT("Token types = 0x%x",uTokenTypes);
+	CXX_DEBUG_ENTER_TEXT("Token types = 0x%x(%s)", uTokenTypes, cxxDebugTypeDecode(uTokenTypes));
 	if(!cxxParserParseNextToken())
 	{
 		CXX_DEBUG_LEAVE_TEXT("Found EOF");

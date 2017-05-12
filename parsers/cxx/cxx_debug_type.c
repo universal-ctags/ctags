@@ -4,41 +4,51 @@
 #include "cxx_debug.h"
 
 #ifdef CXX_DO_DEBUGGING
+static bool append(vString *buf, const char *str, bool appended)
+{
+	if (appended) vStringPut(buf, ' ');
+	vStringCatS (buf, str);
+	return true;
+}
+
 const char * cxxDebugTypeDecode (enum CXXTokenType eType)
 {
-	switch (eType) {
-		case 	CXXTokenTypeAnd: return "And";
-		case 	CXXTokenTypeAngleBracketChain: return "AngleBracketChain";
-		case 	CXXTokenTypeAssignment: return "Assignment";
-		case 	CXXTokenTypeBracketChain: return "BracketChain";
-		case 	CXXTokenTypeCharacterConstant: return "CharacterConstant";
-		case 	CXXTokenTypeClosingBracket: return "ClosingBracket";
-		case 	CXXTokenTypeClosingParenthesis: return "ClosingParenthesis";
-		case 	CXXTokenTypeClosingSquareParenthesis: return "ClosingSquareParenthesis";
-		case 	CXXTokenTypeComma: return "Comma";
-		case 	CXXTokenTypeDotOperator: return "DotOperator";
-		case 	CXXTokenTypeEOF: return "EOF";
-		case 	CXXTokenTypeGreaterThanSign: return "GreaterThanSign";
-		case 	CXXTokenTypeIdentifier: return "Identifier";
-		case 	CXXTokenTypeKeyword: return "Keyword";
-		case 	CXXTokenTypeMultipleAnds: return "MultipleAnds";
-		case 	CXXTokenTypeMultipleColons: return "MultipleColons";
-		case 	CXXTokenTypeMultipleDots: return "MultipleDots";
-		case 	CXXTokenTypeNumber: return "Number";
-		case 	CXXTokenTypeOpeningBracket: return "OpeningBracket";
-		case 	CXXTokenTypeOpeningParenthesis: return "OpeningParenthesis";
-		case 	CXXTokenTypeOpeningSquareParenthesis: return "OpeningSquareParenthesis";
-		case 	CXXTokenTypeOperator: return "Operator";
-		case 	CXXTokenTypeParenthesisChain: return "ParenthesisChain";
-		case 	CXXTokenTypePointerOperator: return "PointerOperator";
-		case 	CXXTokenTypeSemicolon: return "Semicolon";
-		case 	CXXTokenTypeSingleColon: return "SingleColon";
-		case 	CXXTokenTypeSmallerThanSign: return "SmallerThanSign";
-		case 	CXXTokenTypeSquareParenthesisChain: return "SquareParenthesisChain";
-		case 	CXXTokenTypeStar: return "Star";
-		case 	CXXTokenTypeStringConstant: return "StringConstant";
-		case 	CXXTokenTypeUnknown: return "Unknown";
-		default: return "REALLY-UNKNOWN";
-	}
+	bool a = false;
+	static vString *buf;
+	buf = vStringNewOrClear (buf);
+
+	if (eType == CXXTokenTypeEOF) vStringCatS(buf, "EOF");
+	if (eType & CXXTokenTypeIdentifier) a = append (buf, "Identifier", a);
+	if (eType & CXXTokenTypeKeyword) a = append (buf, "Keyword", a);
+	if (eType & CXXTokenTypeNumber) a = append (buf, "Number", a);
+	if (eType & CXXTokenTypeSingleColon) a = append (buf, "SingleColon", a);
+	if (eType & CXXTokenTypeMultipleColons) a = append (buf, "MultipleColons", a);
+	if (eType & CXXTokenTypeSemicolon) a = append (buf, "Semicolon", a);
+	if (eType & CXXTokenTypeComma) a = append (buf, "Comma", a);
+	if (eType & CXXTokenTypeAssignment) a = append (buf, "Assignment", a);
+	if (eType & CXXTokenTypeOperator) a = append (buf, "Operator", a);
+	if (eType & CXXTokenTypeUnknown) a = append (buf, "Unknown", a);
+	if (eType & CXXTokenTypeDotOperator) a = append (buf, "DotOperator", a);
+	if (eType & CXXTokenTypePointerOperator) a = append (buf, "PointerOperator", a);
+	if (eType & CXXTokenTypeStringConstant) a = append (buf, "StringConstant", a);
+	if (eType & CXXTokenTypeStar) a = append (buf, "Star", a);
+	if (eType & CXXTokenTypeAnd) a = append (buf, "And", a);
+	if (eType & CXXTokenTypeMultipleAnds) a = append (buf, "MultipleAnds", a);
+	if (eType & CXXTokenTypeCharacterConstant) a = append (buf, "CharacterConstant", a);
+	if (eType & CXXTokenTypeMultipleDots) a = append (buf, "MultipleDots", a);
+	if (eType & CXXTokenTypeOpeningBracket) a = append (buf, "OpeningBracket", a);
+	if (eType & CXXTokenTypeOpeningParenthesis) a = append (buf, "OpeningParenthesis", a);
+	if (eType & CXXTokenTypeOpeningSquareParenthesis) a = append (buf, "OpeningSquareParenthesis", a);
+	if (eType & CXXTokenTypeSmallerThanSign) a = append (buf, "SmallerThanSign", a);
+	if (eType & CXXTokenTypeClosingBracket) a = append (buf, "ClosingBracket", a);
+	if (eType & CXXTokenTypeClosingParenthesis) a = append (buf, "ClosingParenthesis", a);
+	if (eType & CXXTokenTypeClosingSquareParenthesis) a = append (buf, "ClosingSquareParenthesis", a);
+	if (eType & CXXTokenTypeGreaterThanSign) a = append (buf, "GreaterThanSign", a);
+	if (eType & CXXTokenTypeBracketChain) a = append (buf, "BracketChain", a);
+	if (eType & CXXTokenTypeParenthesisChain) a = append (buf, "ParenthesisChain", a);
+	if (eType & CXXTokenTypeSquareParenthesisChain) a = append (buf, "SquareParenthesisChain", a);
+	if (eType & CXXTokenTypeAngleBracketChain) a = append (buf, "AngleBracketChain", a);
+	if (vStringLength(buf) == 0) vStringCatS(buf, "REALLY-UNKNOWN");
+	return vStringValue (buf);
 }
 #endif
