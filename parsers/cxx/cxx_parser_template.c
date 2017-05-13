@@ -63,7 +63,8 @@ static bool cxxParserParseTemplatePrefixAngleBrackets(void)
 					CXXTokenTypeOpeningBracket | CXXTokenTypeSemicolon |
 					CXXTokenTypeEOF | CXXTokenTypeAssignment,
 				CXXTokenTypeOpeningParenthesis |
-					CXXTokenTypeOpeningSquareParenthesis
+					CXXTokenTypeOpeningSquareParenthesis,
+				false
 			))
 		{
 			CXX_DEBUG_LEAVE_TEXT("Failed to parse up to '<>{EOF'");
@@ -113,7 +114,8 @@ evaluate_current_token:
 							if(!cxxParserParseAndCondenseCurrentSubchain(
 									CXXTokenTypeOpeningParenthesis |
 										CXXTokenTypeOpeningSquareParenthesis,
-									true
+									true,
+									false
 								))
 							{
 								CXX_DEBUG_LEAVE_TEXT("Failed to condense current subchain");
@@ -176,7 +178,8 @@ evaluate_current_token:
 						if(!cxxParserParseAndCondenseCurrentSubchain(
 								CXXTokenTypeOpeningParenthesis |
 									CXXTokenTypeOpeningSquareParenthesis,
-								true
+								true,
+								false
 							))
 						{
 							CXX_DEBUG_LEAVE_TEXT("Failed to condense current subchain");
@@ -200,7 +203,8 @@ evaluate_current_token:
 				if(!cxxParserParseUpToOneOf(
 						CXXTokenTypeGreaterThanSign | CXXTokenTypeComma |
 							CXXTokenTypeOpeningBracket | CXXTokenTypeSemicolon |
-							CXXTokenTypeEOF
+							CXXTokenTypeEOF,
+						false
 					))
 				{
 					CXX_DEBUG_LEAVE_TEXT("Failed to parse up to '}EOF'");
@@ -226,7 +230,7 @@ evaluate_current_token:
 							"but we try to recover..."
 					);
 				// skip the whole bracketed part.
-				if(!cxxParserParseUpToOneOf(CXXTokenTypeClosingBracket | CXXTokenTypeEOF))
+				if(!cxxParserParseUpToOneOf(CXXTokenTypeClosingBracket | CXXTokenTypeEOF, false))
 				{
 					CXX_DEBUG_LEAVE_TEXT("Failed to parse up to '}EOF'");
 					return false;
@@ -264,7 +268,8 @@ bool cxxParserParseTemplatePrefix(void)
 	cxxTokenChainDestroyLast(g_cxx.pTokenChain); // kill the template keyword
 
 	if(!cxxParserParseUpToOneOf(
-			CXXTokenTypeSmallerThanSign | CXXTokenTypeEOF | CXXTokenTypeSemicolon
+			CXXTokenTypeSmallerThanSign | CXXTokenTypeEOF | CXXTokenTypeSemicolon,
+			false
 		))
 	{
 		CXX_DEBUG_LEAVE_TEXT("Failed to parse up to the < sign");

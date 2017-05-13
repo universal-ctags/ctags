@@ -208,9 +208,11 @@ bool cxxParserParseClassStructOrUnion(
 	);
 bool cxxParserParseAndCondenseCurrentSubchain(
 		unsigned int uInitialSubchainMarkerTypes,
-		bool bAcceptEOF
+		bool bAcceptEOF,
+		bool bCanReduceInnerElements
 	);
-bool cxxParserParseUpToOneOf(unsigned int uTokenTypes);
+bool cxxParserParseUpToOneOf(unsigned int uTokenTypes,
+							 bool bCanReduceInnerElements);
 bool cxxParserParseIfForWhileSwitch(void);
 bool cxxParserParseTemplatePrefix(void);
 bool cxxParserParseUsingClause(void);
@@ -218,7 +220,8 @@ bool cxxParserParseAccessSpecifier(void);
 void cxxParserAnalyzeOtherStatement(void);
 bool cxxParserParseAndCondenseSubchainsUpToOneOf(
 		unsigned int uTokenTypes,
-		unsigned int uInitialSubchainMarkerTypes
+		unsigned int uInitialSubchainMarkerTypes,
+		bool bCanReduceInnerElements
 	);
 void cxxParserMarkEndLineForTagInCorkQueue(int iCorkQueueIndex);
 

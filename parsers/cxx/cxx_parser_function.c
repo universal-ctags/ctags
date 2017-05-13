@@ -233,7 +233,8 @@ int cxxParserMaybeParseKnRStyleFunctionDefinition()
 		CXXToken * pCurrentTail = g_cxx.pTokenChain->pTail;
 
 		if(!cxxParserParseUpToOneOf(
-				CXXTokenTypeSemicolon | CXXTokenTypeOpeningBracket | CXXTokenTypeEOF
+				CXXTokenTypeSemicolon | CXXTokenTypeOpeningBracket | CXXTokenTypeEOF,
+				false
 			))
 		{
 			cxxTokenDestroy(pIdentifier);
