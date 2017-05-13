@@ -18,7 +18,11 @@
 // Uncomment this to enable extensive debugging to stderr in code.
 // Use only for development as tracing reduces performance.
 //
+// "./configure --enable-debugging" defines DEBUG.
+//
+#ifdef DEBUG
 //#define TRACING_ENABLED 1
+#endif
 
 //
 // Currently this kind of debugging is supported only on gcc (because of
@@ -40,7 +44,6 @@
 	void traceEnter(const char * szFunction,const char * szFormat,...);
 	void traceLeave(const char * szFunction,const char * szFormat,...);
 	void tracePrint(const char * szFunction,const char * szFormat,...);
-	void traceInit(void);
 
 	#define TRACE_ENTER() traceEnter(__PRETTY_FUNCTION__,"")
 	#define TRACE_LEAVE() traceLeave(__PRETTY_FUNCTION__,"")
@@ -53,8 +56,6 @@
 
 	#define TRACE_PRINT(_szFormat,...) \
 		tracePrint(__PRETTY_FUNCTION__,_szFormat,## __VA_ARGS__)
-
-	#define TRACE_INIT() traceInit()
 
 	#define TRACE_ASSERT(_condition,_szFormat,...) \
 		do { \
@@ -74,8 +75,6 @@
 	#define TRACE_LEAVE_TEXT(_szFormat,...) do { } while(0)
 
 	#define TRACE_PRINT(_szFormat,...) do { } while(0)
-
-	#define TRACE_INIT() do { } while(0)
 
 	#define TRACE_ASSERT(_condition,_szFormat,...) do { } while(0)
 

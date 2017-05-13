@@ -142,6 +142,17 @@ extern hashTable *hashTableNew    (unsigned int size,
 
 extern void       hashTableDelete (hashTable *htable)
 {
+	if (!htable)
+		return;
+
+	hashTableClear (htable);
+
+	eFree (htable->table);
+	eFree (htable);
+}
+
+extern void       hashTableClear (hashTable *htable)
+{
 	unsigned int i;
 	if (!htable)
 		return;
@@ -154,8 +165,6 @@ extern void       hashTableDelete (hashTable *htable)
 		entry_reclaim (entry, htable->keyfreefn, htable->valfreefn);
 		htable->table[i] = NULL;
 	}
-	eFree (htable->table);
-	eFree (htable);
 }
 
 extern void       hashTablePutItem    (hashTable *htable, void *key, void *value)

@@ -79,4 +79,21 @@ extern void debugCppIgnore (const bool ignore);
 extern void debugEntry (const tagEntryInfo *const tag);
 extern void debugAssert (const char *assertion, const char *file, unsigned int line, const char *function) attr__noreturn;
 
+#ifdef DEBUG
+#define DEBUG_INIT() debugInit()
+extern void debugInit (void);
+extern void debugIndent(void);
+extern void debugInc(void);
+extern void debugDec(void);
+
+struct circularRefChecker;
+extern struct circularRefChecker * circularRefCheckerNew (void);
+extern void circularRefCheckerDestroy (struct circularRefChecker * checker);
+extern int circularRefCheckerCheck (struct circularRefChecker *c, void *ptr);
+extern int circularRefCheckerGetCurrent (struct circularRefChecker *c);
+extern void circularRefCheckClear (struct circularRefChecker *c);
+
+#else
+#define DEBUG_INIT() do { } while(0)
+#endif	/* DEBUG */
 #endif  /* CTAGS_MAIN_DEBUG_H */

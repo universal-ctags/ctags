@@ -75,6 +75,7 @@
 #include "read.h"
 #include "routines.h"
 #include "trace.h"
+#include "trashbox.h"
 #include "writer.h"
 
 #ifdef HAVE_JANSSON
@@ -628,7 +629,9 @@ extern int main (int argc CTAGS_ATTR_UNUSED, char **argv)
 {
 	cookedArgs *args;
 
-	TRACE_INIT();
+	initDefaultTrashBox ();
+
+	DEBUG_INIT();
 
 	setErrorPrinter (stderrDefaultErrorPrinter, NULL);
 	setMainLoop (batchMakeTags, NULL);
@@ -667,6 +670,8 @@ extern int main (int argc CTAGS_ATTR_UNUSED, char **argv)
 #ifdef HAVE_ICONV
 	freeEncodingResources ();
 #endif
+
+	finiDefaultTrashBox();
 
 	if (Option.printLanguage)
 		return (Option.printLanguage == true)? 0: 1;

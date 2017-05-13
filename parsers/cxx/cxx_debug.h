@@ -13,6 +13,7 @@
 #include "debug.h"
 #include "trace.h"
 #include "cxx_token.h"
+#include "cxx_scope.h"
 
 //
 // Uncomment this to enable extensive debugging to stderr in cxx code.
@@ -28,6 +29,9 @@
 #ifdef CXX_DO_DEBUGGING
 
 const char* cxxDebugTypeDecode(enum CXXTokenType);
+void cxxDebugDumpToken (CXXToken *pToken);
+void cxxDebugDumpChain (CXXTokenChain *pChain);
+const char* cxxDebugScopeDecode(enum CXXScopeType);
 
 #define CXX_DEBUG_ENTER() TRACE_ENTER()
 #define CXX_DEBUG_LEAVE() TRACE_LEAVE()
@@ -44,6 +48,8 @@ const char* cxxDebugTypeDecode(enum CXXTokenType);
 #define CXX_DEBUG_ASSERT(_condition,_szFormat,...) \
 	TRACE_ASSERT(_condition,_szFormat,## __VA_ARGS__)
 
+#define CXX_DEBUG_TOKEN(T)  cxxDebugDumpToken(T)
+#define CXX_DEBUG_CHAIN(C)  cxxDebugDumpChain(C)
 #else //!CXX_DO_DEBUGGING
 
 #define CXX_DEBUG_ENTER() do { } while(0)
@@ -56,7 +62,8 @@ const char* cxxDebugTypeDecode(enum CXXTokenType);
 
 #define CXX_DEBUG_ASSERT(_condition,_szFormat,...) do { } while(0)
 
-
+#define CXX_DEBUG_TOKEN(T) do { } while(0)
+#define CXX_DEBUG_CHAIN(T) do { } while(0)
 #endif //!CXX_DO_DEBUGGING
 
 

@@ -16,17 +16,9 @@
 #include <stdio.h>
 #include <stdarg.h>
 
-static int g_iTraceScopeLevel = 0;
-
-void traceInit(void)
-{
-	g_iTraceScopeLevel = 0;
-}
-
 void traceEnter(const char * szFunction,const char * szFormat,...)
 {
-	for(int i=0;i<g_iTraceScopeLevel;i++)
-		fprintf(stderr,"    ");
+	debugIndent ();
 
 	fprintf(stderr,"[>> %s][at %lu] ",szFunction,getInputLineNumber());
 
@@ -37,17 +29,14 @@ void traceEnter(const char * szFunction,const char * szFormat,...)
 
 	fprintf(stderr,"\n");
 
-	g_iTraceScopeLevel++;
+	debugInc();
 }
 
 void traceLeave(const char * szFunction,const char * szFormat,...)
 {
-	g_iTraceScopeLevel--;
-	if(g_iTraceScopeLevel < 0)
-		g_iTraceScopeLevel = 0;
+	debugDec();
+	debugIndent ();
 
-	for(int i=0;i<g_iTraceScopeLevel;i++)
-		fprintf(stderr,"    ");
 	fprintf(stderr,"[<< %s][at %lu] ",szFunction,getInputLineNumber());
 
 	va_list va;
@@ -60,8 +49,7 @@ void traceLeave(const char * szFunction,const char * szFormat,...)
 
 void tracePrint(const char * szFunction,const char * szFormat,...)
 {
-	for(int i=0;i<g_iTraceScopeLevel;i++)
-		fprintf(stderr,"    ");
+	debugIndent();
 
 	fprintf(stderr,"[%s][at %lu] ",szFunction,getInputLineNumber());
 
@@ -74,5 +62,3 @@ void tracePrint(const char * szFunction,const char * szFormat,...)
 }
 
 #endif // DO_TRACING
-
-
