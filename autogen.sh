@@ -1,5 +1,8 @@
 #!/bin/sh
 
+type autoreconf || exit 1
+type pkg-config || exit 1
+
 ctags_files=`make -f makefiles/list-translator-input.mak`
 misc/dist-test-cases > makefiles/test-cases.mak && \
     if autoreconf -vfi; then
