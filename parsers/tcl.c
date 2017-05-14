@@ -290,6 +290,11 @@ static void skipToEndOfCmdline (tokenInfo *const token)
 	} while (!tokenIsEOF (token));
 }
 
+extern void skipToEndOfTclCmdline (tokenInfo *const token)
+{
+	skipToEndOfCmdline (token);
+}
+
 static bool isAbsoluteIdentifier(tokenInfo *const token)
 {
 	return !strncmp (vStringValue (token->string), "::", 2);

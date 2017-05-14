@@ -42,5 +42,6 @@ struct sTclSubparser {
 };
 
 extern tokenInfo *newTclToken (void);
+extern void skipToEndOfTclCmdline (tokenInfo *const token);
 
 #endif	/* CTAGS_PARSER_TCL_H */
