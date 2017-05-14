@@ -42,13 +42,10 @@ echo '	bool a = false;'
 echo '	static vString *buf;'
 echo '	buf = vStringNewOrClear (buf);'
 echo
-echo '	if (eType == CXXTokenTypeEOF) vStringCatS(buf, "EOF");'
 ${CTAGS} -o - --sort=no --language-force=C --kinds-C=e -x --_xformat="%N" "${INPUT}" \
 	| grep ^CXXTokenType \
 	| while read N; do
-	if [ $N != CXXTokenTypeEOF ]; then
 		echo "	if (eType & $N) a = append (buf, \"${N#CXXTokenType}\", a);"
-	fi
 done
 echo '	if (vStringLength(buf) == 0) vStringCatS(buf, "REALLY-UNKNOWN");'
 echo '	return vStringValue (buf);'
