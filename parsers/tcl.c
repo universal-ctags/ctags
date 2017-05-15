@@ -339,11 +339,15 @@ static int notifyCommand (tokenInfo *const token, unsigned int parent)
 	foreachSubparser (sub, false)
 	{
 		tclSubparser *tclsub = (tclSubparser *)sub;
-		enterSubparser(sub);
-		r = tclsub->commandNotify (tclsub, vStringValue (token->string), parent);
-		leaveSubparser();
-		if (r != CORK_NIL)
-			break;
+
+		if (tclsub->commandNotify)
+		{
+			enterSubparser(sub);
+			r = tclsub->commandNotify (tclsub, vStringValue (token->string), parent);
+			leaveSubparser();
+			if (r != CORK_NIL)
+				break;
+		}
 	}
 	return r;
 }
