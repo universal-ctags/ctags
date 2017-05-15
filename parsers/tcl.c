@@ -331,6 +331,23 @@ static void notifyPackageRequirement (tokenInfo *const token)
 	}
 }
 
+static void notifyNamespaceImport (tokenInfo *const token)
+{
+	subparser *sub;
+
+	foreachSubparser (sub, false)
+	{
+		tclSubparser *tclsub = (tclSubparser *)sub;
+
+		if (tclsub->namespaceImportNotify)
+		{
+			enterSubparser(sub);
+			tclsub->namespaceImportNotify (tclsub, vStringValue (token->string));
+			leaveSubparser();
+		}
+	}
+}
+
 static int notifyCommand (tokenInfo *const token, unsigned int parent)
 {
 	subparser *sub;
@@ -455,7 +472,25 @@ static void parseNamespace (tokenInfo *const token,
 	if (tokenIsEOF(token))
 		return;
 
-	if (!tokenIsKeyword (token, EVAL))
+	if (tokenIsType (token, TCL_IDENTIFIER) &&
+		(strcmp(tokenString(token), "import") == 0))
+	{
+		while (1)
+		{
+			tokenRead (token);
+
+			if (!tokenIsType (token, TCL_IDENTIFIER))
+				break;
+
+			if (vStringValue(token->string)[0] == '-')
+				continue;
+
+			notifyNamespaceImport (token);
+		}
+		skipToEndOfCmdline(token);
+		return;
+	}
+	else if (!tokenIsKeyword (token, EVAL))
 		return;
 
 	tokenRead (token);
