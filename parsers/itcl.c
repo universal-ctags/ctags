@@ -195,7 +195,8 @@ static int parseClass (tclSubparser *s, int parentIndex)
 
 		do {
 			tokenRead (token);
-			if (tokenIsType (token, TCL_IDENTIFIER))
+			if (tokenIsType (token, TCL_IDENTIFIER)
+				|| tokenIsType (token, TCL_KEYWORD))
 			{
 				keywordId k = resolveKeyword (token->string);
 				switch (k)
@@ -221,17 +222,15 @@ static int parseClass (tclSubparser *s, int parentIndex)
 				case KEYWORD_PRIVATE:
 					protection = k;
 					continue;
+				case KEYWORD_PROC:
+					parseProc(token, r, protection);
+					protection = KEYWORD_NONE;
+					break;
 				default:
 					protection = KEYWORD_NONE;
 					skipToEndOfTclCmdline (token);
 					break;
 				}
-			}
-			else if (tokenIsType (token, TCL_KEYWORD)
-					 && (resolveKeyword (token->string) == KEYWORD_PROC))
-			{
-				parseProc(token, r, protection);
-				protection = KEYWORD_NONE;
 			}
 			else if (token->type == '}')
 			{
