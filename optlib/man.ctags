@@ -22,7 +22,6 @@
 #
 #
 --langdef=man
---languages=-man
 --map-man=+.1
 --map-man=+.2
 --map-man=+.3
