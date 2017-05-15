@@ -1,5 +1,8 @@
 History of Onigmo (Oniguruma-mod)
 
+2017/05/15: Version 6.1.2
+
+2017/05/15: [dist] Update LTVERSION to "6:3:0".
 2017/05/01: [bug]  Import Ruby r58468
                    Fix macro expansion bug.
 2017/04/05: [doc]  Improve document about absence operator (Issue #87)
