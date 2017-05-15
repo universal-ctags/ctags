@@ -469,7 +469,7 @@ static const char *renderEscapedName (const char* s,
 		{
 			verbose ("Unexpected character (0 < *c && *c < 0x20) included in a tagEntryInfo: %s\n", base);
 			verbose ("File: %s, Line: %lu, Lang: %s, Kind: %c\n",
-				 tag->inputFileName, tag->lineNumber, tag->language, tag->kind->letter);
+				 tag->inputFileName, tag->lineNumber, getLanguageName(tag->langType), tag->kind->letter);
 			verbose ("Escape the character\n");
 			break;
 		}
@@ -712,7 +712,7 @@ static const char *renderFieldLanguage (const tagEntryInfo *const tag,
 					vString* b,
 					bool *rejected)
 {
-	const char *l = tag->language;
+	const char *l = getLanguageName(tag->langType);
 
 	if (Option.lineDirectives && tag->sourceLanguage)
 		l = tag->sourceLanguage;
@@ -862,7 +862,7 @@ static const char *renderFieldEnd (const tagEntryInfo *const tag,
 
 static bool     isLanguageFieldAvailable (const tagEntryInfo *const tag)
 {
-	return (tag->language != NULL)? true: false;
+	return (tag->langType == LANG_IGNORE)? false: true;
 }
 
 static bool     isTyperefFieldAvailable  (const tagEntryInfo *const tag)

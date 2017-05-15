@@ -54,7 +54,7 @@ struct sTagEntryInfo {
 				       * (may be NULL if not present) *//*  */
 	unsigned int boundaryInfo;    /* info about nested input stream */
 	MIOPos      filePosition;     /* file position of line containing tag */
-	const char* language;         /* language of input file */
+	langType langType;         /* language of input file */
 	const char *inputFileName;   /* name of input file */
 	const char *name;             /* name of the tag */
 	const kindDefinition *kind;	      /* kind descriptor */
@@ -121,7 +121,7 @@ extern void initRefTagEntry (tagEntryInfo *const e, const char *const name,
 			     const kindDefinition *kind, int roleIndex);
 extern void initTagEntryFull (tagEntryInfo *const e, const char *const name,
 			      unsigned long lineNumber,
-			      const char* language,
+			      langType langType,
 			      MIOPos      filePosition,
 			      const char *inputFileName,
 			      const kindDefinition *kind,

@@ -1258,10 +1258,8 @@ extern int makeQualifiedTagEntry (const tagEntryInfo *const e)
 			= isTagExtraBitMarked (&x,
 								   XTAG_TAGS_GENERATED_BY_SUBPARSER);
 
-		/* TODO: very slow: entry should hold language-id,
-		   not langauge name. */
 		if (in_subparser)
-			pushLanguage(getNamedLanguage(x.language, 0));
+			pushLanguage(x.langType);
 
 		r = makeTagEntry (&x);
 
@@ -1276,7 +1274,7 @@ extern void initTagEntry (tagEntryInfo *const e, const char *const name,
 {
 	initTagEntryFull(e, name,
 			 getInputLineNumber (),
-			 getInputLanguageName (),
+			 getInputLanguage (),
 			 getInputFilePosition (),
 			 getInputFileTagPath (),
 			 kind,
@@ -1291,7 +1289,7 @@ extern void initRefTagEntry (tagEntryInfo *const e, const char *const name,
 {
 	initTagEntryFull(e, name,
 			 getInputLineNumber (),
-			 getInputLanguageName (),
+			 getInputLanguage (),
 			 getInputFilePosition (),
 			 getInputFileTagPath (),
 			 kind,
@@ -1303,7 +1301,7 @@ extern void initRefTagEntry (tagEntryInfo *const e, const char *const name,
 
 extern void initTagEntryFull (tagEntryInfo *const e, const char *const name,
 			      unsigned long lineNumber,
-			      const char* language,
+			      langType langType,
 			      MIOPos      filePosition,
 			      const char *inputFileName,
 			      const kindDefinition *kind,
@@ -1319,7 +1317,7 @@ extern void initTagEntryFull (tagEntryInfo *const e, const char *const name,
 	e->lineNumberEntry = (bool) (Option.locate == EX_LINENUM);
 	e->lineNumber      = lineNumber;
 	e->boundaryInfo    = getNestedInputBoundaryInfo (lineNumber);
-	e->language        = language;
+	e->langType        = langType;
 	e->filePosition    = filePosition;
 	e->inputFileName   = inputFileName;
 	e->name            = name;
