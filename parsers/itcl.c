@@ -17,6 +17,7 @@
 struct itclSubparser {
 	tclSubparser tcl;
 	bool foundITclPackageRequired;
+	bool foundITclNamespaceImported;
 };
 
 static scopeSeparator ITclGenericSeparators [] = {
@@ -258,7 +259,8 @@ static int commandNotify (tclSubparser *s, char *command,
 	if (!itcl->foundITclPackageRequired)
 		return r;
 
-	if ((strcmp (command, "class") == 0)
+	if ((itcl->foundITclNamespaceImported
+		 && (strcmp (command, "class") == 0))
 		|| (strcmp (command, "itcl::class") == 0))
 		r = parseClass (s, parentIndex);
 
@@ -272,11 +274,21 @@ static void packageRequirementNotify (tclSubparser *s, char *package)
 		itcl->foundITclPackageRequired = true;
 }
 
+static void namespaceImportNotify (tclSubparser *s, char *namespace)
+{
+	struct itclSubparser *itcl = (struct itclSubparser *)s;
+
+	if (strcmp(namespace, "itcl::*") == 0
+		|| strcmp(namespace, "itcl::class") == 0)
+		itcl->foundITclNamespaceImported = true;
+}
+
 static void inputStart (subparser *s)
 {
 	struct itclSubparser *itcl = (struct itclSubparser *)s;
 
 	itcl->foundITclPackageRequired = false;
+	itcl->foundITclNamespaceImported = false;
 }
 
 struct itclSubparser itclSubparser = {
@@ -287,6 +299,7 @@ struct itclSubparser itclSubparser = {
 		},
 		.commandNotify = commandNotify,
 		.packageRequirementNotify = packageRequirementNotify,
+		.namespaceImportNotify = namespaceImportNotify,
 	},
 };
 
