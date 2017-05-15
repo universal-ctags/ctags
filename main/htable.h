@@ -25,6 +25,9 @@ bool hashPtreq (const void * a, const void * constb);
 unsigned int hashCstrhash (const void * x);
 bool hashCstreq (const void * a, const void * b);
 
+unsigned int hashCstrcasehash (const void * x);
+bool hashCstrcaseeq (const void * a, const void * b);
+
 unsigned int hashInthash (const void * x);
 bool hashInteq (const void * a, const void * b);
 

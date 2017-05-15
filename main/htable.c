@@ -247,6 +247,23 @@ djb2(const unsigned char *str)
 	return hash;
 }
 
+static unsigned long
+casedjb2(const unsigned char *str)
+{
+	unsigned long hash = 5381;
+	int c;
+
+	while ((c = *str++))
+	{
+		if (('a' <= c) && (c <= 'z'))
+			c += ('A' - 'a');
+		hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
+	}
+
+	return hash;
+}
+
+
 unsigned int hashCstrhash (const void *const x)
 {
 	const char *const s = x;
@@ -276,4 +293,16 @@ bool hashInteq (const void *const a, const void *const b)
        int bi = *(int *)b;
 
        return !!(ai == bi);
+}
+
+
+unsigned int hashCstrcasehash (const void *const x)
+{
+	const char *const s = x;
+	return (unsigned int)casedjb2((const unsigned char *)s);
+}
+
+bool hashCstrcaseeq (const void *const a, const void *const b)
+{
+	return !!(strcasecmp (a, b) == 0);
 }
