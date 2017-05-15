@@ -32,6 +32,7 @@ enum TclTokenType {
 struct sTclSubparser {
 	subparser subparser;
 
+	void (* packageNotify) (tclSubparser *s, char *package);
 	/* Return CORK_NIL if the command line is NOT consumed.
 	   If a positive integer is returned, end: field may
 	   be attached by tcl base parser.
