@@ -1085,7 +1085,7 @@ static bool makeTagEntryFromTagEntry (xcmdPath* path, tagEntry* entry)
 			  entry->kind,
 			  ROLE_INDEX_DEFINITION,
 			  NULL,
-			  NULL,
+			  LANG_IGNORE,
 			  0);
 
 	tag.pattern = entry->address.pattern;

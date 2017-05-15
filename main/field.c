@@ -712,10 +712,12 @@ static const char *renderFieldLanguage (const tagEntryInfo *const tag,
 					vString* b,
 					bool *rejected)
 {
-	const char *l = getLanguageName(tag->langType);
+	const char *l;
 
-	if (Option.lineDirectives && tag->sourceLanguage)
-		l = tag->sourceLanguage;
+	if (Option.lineDirectives && (tag->sourceLangType != LANG_IGNORE))
+		l = getLanguageName(tag->sourceLangType);
+	else
+		l = getLanguageName(tag->langType);
 
 	return renderAsIs (b, WITH_DEFUALT_VALUE(l));
 }

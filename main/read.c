@@ -215,9 +215,9 @@ extern const char *getSourceFileTagPath (void)
 	return vStringValue (File.source.tagPath);
 }
 
-extern const char *getSourceLanguageName (void)
+extern langType getSourceLanguage (void)
 {
-	return getLanguageName (File.source.langInfo.type);
+	return File.source.langInfo.type;
 }
 
 extern unsigned long getSourceLineNumber (void)

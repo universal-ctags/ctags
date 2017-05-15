@@ -99,7 +99,7 @@ enum nestedInputBoundaryFlag {
 extern unsigned int getNestedInputBoundaryInfo (unsigned long lineNumber);
 
 extern const char *getSourceFileTagPath (void);
-extern const char *getSourceLanguageName (void);
+extern langType getSourceLanguage (void);
 extern unsigned long getSourceLineNumber (void);
 
 /* Raw: reading from given a parameter, mio */
