@@ -323,7 +323,7 @@ extern parserDefinition* ITclParser (void)
 	def->kindCount = ARRAY_SIZE(ITclKinds);
 
 	def->extensions = extensions;
-	def->parser = findITclTags;;
+	def->parser = findITclTags;
 	def->useCork = true;
 	def->requestAutomaticFQTag = true;
 
