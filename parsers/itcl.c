@@ -14,6 +14,11 @@
 #include "read.h"
 #include "keyword.h"
 
+struct itclSubparser {
+	tclSubparser tcl;
+	bool foundITclPackageRequired;
+};
+
 static scopeSeparator ITclGenericSeparators [] = {
 	{ KIND_WILDCARD, "::" },
 };
@@ -247,7 +252,11 @@ static int parseClass (tclSubparser *s, int parentIndex)
 static int commandNotify (tclSubparser *s, char *command,
 						  int parentIndex)
 {
+	struct itclSubparser *itcl = (struct itclSubparser *)s;
 	int r = CORK_NIL;
+
+	if (!itcl->foundITclPackageRequired)
+		return r;
 
 	if ((strcmp (command, "class") == 0)
 		|| (strcmp (command, "itcl::class") == 0))
@@ -255,6 +264,31 @@ static int commandNotify (tclSubparser *s, char *command,
 
 	return r;
 }
+
+static void packageRequirementNotify (tclSubparser *s, char *package)
+{
+	struct itclSubparser *itcl = (struct itclSubparser *)s;
+	if (strcmp (package, "Itcl") == 0)
+		itcl->foundITclPackageRequired = true;
+}
+
+static void inputStart (subparser *s)
+{
+	struct itclSubparser *itcl = (struct itclSubparser *)s;
+
+	itcl->foundITclPackageRequired = false;
+}
+
+struct itclSubparser itclSubparser = {
+	.tcl = {
+		.subparser = {
+			.direction = SUBPARSER_BI_DIRECTION,
+			.inputStart = inputStart,
+		},
+		.commandNotify = commandNotify,
+		.packageRequirementNotify = packageRequirementNotify,
+	},
+};
 
 static void findITclTags(void)
 {
@@ -266,12 +300,6 @@ extern parserDefinition* ITclParser (void)
 	static const char *const extensions [] = { "itcl", NULL };
 	parserDefinition* const def = parserNew("ITcl");
 
-	static tclSubparser itclSubparser = {
-		.subparser = {
-			.direction = SUBPARSER_BI_DIRECTION,
-		},
-		.commandNotify = commandNotify,
-	};
 	static parserDependency dependencies [] = {
 		[0] = { DEPTYPE_SUBPARSER, "Tcl", &itclSubparser },
 	};

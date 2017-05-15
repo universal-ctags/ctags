@@ -314,7 +314,7 @@ static const char* getLastComponentInIdentifier(tokenInfo *const token)
 		return NULL;
 }
 
-static void notifyPackage (tokenInfo *const token)
+static void notifyPackageRequirement (tokenInfo *const token)
 {
 	subparser *sub;
 
@@ -322,13 +322,10 @@ static void notifyPackage (tokenInfo *const token)
 	{
 		tclSubparser *tclsub = (tclSubparser *)sub;
 
-		if (tclsub->packageNotify == NULL)
-			continue;
-
-		if (tclsub->packageNotify)
+		if (tclsub->packageRequirementNotify)
 		{
 			enterSubparser(sub);
-			tclsub->packageNotify (tclsub, vStringValue (token->string));
+			tclsub->packageRequirementNotify (tclsub, vStringValue (token->string));
 			leaveSubparser();
 		}
 	}
@@ -517,7 +514,7 @@ static void parsePackage (tokenInfo *const token)
 			if (tokenIsType (token, TCL_IDENTIFIER)
 				&& (vStringLength (token->string) > 0))
 			{
-				notifyPackage (token);
+				notifyPackageRequirement (token);
 			}
 		}
 	}
