@@ -238,7 +238,7 @@ extern void initFieldObjects (void)
 	  + ARRAY_SIZE (fieldDefinitionsExuberant)
 	  + ARRAY_SIZE (fieldDefinitionsUniversal);
 	fieldObjects = xMalloc (fieldObjectAllocated, fieldObject);
-	TRASH_BOX(&fieldObjects, eFreeIndirect);
+	DEFAULT_TRASH_BOX(&fieldObjects, eFreeIndirect);
 
 	fieldObjectUsed = 0;
 
@@ -282,7 +282,7 @@ extern void initFieldObjects (void)
 			strcat (nameWithPrefix, CTAGS_FIELD_PREFIX);
 			strcat (nameWithPrefix, fobj->def->name);
 			fobj->nameWithPrefix = nameWithPrefix;
-			TRASH_BOX(nameWithPrefix, eFree);
+			DEFAULT_TRASH_BOX(nameWithPrefix, eFree);
 		}
 		else
 			fobj->nameWithPrefix = NULL;
@@ -1076,7 +1076,7 @@ extern int defineField (fieldDefinition *def, langType language)
 	strcat (nameWithPrefix, CTAGS_FIELD_PREFIX);
 	strcat (nameWithPrefix, def->name);
 	fobj->nameWithPrefix = nameWithPrefix;
-	TRASH_BOX(nameWithPrefix, eFree);
+	DEFAULT_TRASH_BOX(nameWithPrefix, eFree);
 
 	fobj->language = language;
 	fobj->sibling  = FIELD_UNKNOWN;

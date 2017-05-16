@@ -365,7 +365,7 @@ extern vString *vStringNewOrClearWithAutoRelease (vString *const string)
 
 	r = vStringNewOrClear(string);
 	if (autoRelease)
-		TRASH_BOX(r, vStringDelete);
+		DEFAULT_TRASH_BOX(r, vStringDelete);
 
 	return r;
 }

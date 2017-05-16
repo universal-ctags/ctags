@@ -618,7 +618,7 @@ extern bool openInputFile (const char *const fileName, const langType language,
 	if (File.sourceTagPathHolder == NULL)
 	{
 		File.sourceTagPathHolder = stringListNew ();
-		TRASH_BOX(File.sourceTagPathHolder, stringListDelete);
+		DEFAULT_TRASH_BOX(File.sourceTagPathHolder, stringListDelete);
 	}
 	stringListClear (File.sourceTagPathHolder);
 
@@ -1143,7 +1143,7 @@ static void langStackInit (langStack *langStack)
 	langStack->count = 0;
 	langStack->size  = 1;
 	langStack->languages = xCalloc (langStack->size, langType);
-	TRASH_BOX(&(langStack->languages), eFreeIndirect);
+	DEFAULT_TRASH_BOX(&(langStack->languages), eFreeIndirect);
 }
 
 static langType langStackTop (langStack *langStack)

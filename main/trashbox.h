@@ -24,8 +24,9 @@ extern TrashBoxDestroyItemProc trashBoxTakeBack  (TrashBox* trash_box, void* ite
 extern void      trashBoxFree      (TrashBox* trash_box, void* item);
 extern void      trashBoxMakeEmpty (TrashBox* trash_box);
 
-#define TRASH_BOX(PTR,PROC) trashBoxPut(NULL,PTR,(TrashBoxDestroyItemProc)PROC)
-#define TRASH_BOX_TAKE_BACK(PTR) trashBoxTakeBack(NULL,PTR)
+#define DEFAULT_TRASH_BOX(PTR,PROC) trashBoxPut(NULL,PTR,(TrashBoxDestroyItemProc)PROC)
+#define DEFAULT_TRASH_BOX_TAKE_BACK(PTR) trashBoxTakeBack(NULL,PTR)
+
 extern void initDefaultTrashBox (void);
 extern void finiDefaultTrashBox  (void);
 
