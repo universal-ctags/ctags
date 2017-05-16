@@ -76,6 +76,7 @@ extern void vStringSetLength (vString *const string);
 extern void vStringTruncate (vString *const string, const size_t length);
 
 extern vString *vStringNewOrClear (vString *const string);
+extern vString *vStringNewOrClearWithAutoRelease (vString *const string);
 
 extern vString *vStringNewOwn (char *s);
 extern char    *vStringDeleteUnwrap (vString *const string);

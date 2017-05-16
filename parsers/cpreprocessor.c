@@ -24,6 +24,7 @@
 #include "read.h"
 #include "vstring.h"
 #include "parse.h"
+#include "trashbox.h"
 #include "xtag.h"
 
 #include "cxx/cxx_debug.h"
@@ -1704,14 +1705,18 @@ static void initializeCpp (const langType language)
 	Cpp.lang = language;
 
 	defineMacroTable = makeMacroTable ();
+	TRASH_BOX(defineMacroTable,hashTableDelete);
 }
 
 static void CpreProInstallIgnoreToken (const langType language, const char *optname, const char *arg)
 {
 	if (arg == NULL || arg[0] == '\0')
 	{
+		TRASH_BOX_TAKE_BACK(defineMacroTable);
 		hashTableDelete(defineMacroTable);
 		defineMacroTable = makeMacroTable ();
+		TRASH_BOX(defineMacroTable,hashTableDelete);
+
 		verbose ("    clearing list\n");
 	} else {
 		saveIgnoreToken(arg);

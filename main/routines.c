@@ -253,6 +253,15 @@ extern void eFree (void *const ptr)
 	free (ptr);
 }
 
+extern void eFreeIndirect(void **ptr)
+{
+	if (ptr && *ptr)
+	{
+		eFree (*ptr);
+		*ptr = NULL;
+	}
+}
+
 /*
  *  String manipulation functions
  */
