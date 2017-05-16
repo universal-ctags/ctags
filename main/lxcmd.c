@@ -1074,7 +1074,6 @@ static bool makeTagEntryFromTagEntry (xcmdPath* path, tagEntry* entry)
 
 	memset(&filePosition, 0, sizeof(filePosition));
 
-	// TODO: getNamedLanguage is slow.
 	const char* lang = entryLookupField(entry, "language", true);
 	langType langType = getNamedLanguage (lang, 0);
 	initTagEntryFull (&tag, entry->name,
