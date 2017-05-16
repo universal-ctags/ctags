@@ -1,6 +1,1 @@
-itcl_class	input.tcl	/^itcl::class itcl_class$/;"	c
-method1	input.tcl	/^public method method1$/;"	m
-method2	input.tcl	/^protected method method2$/;"	m
-method3	input.tcl	/^private method method3$/;"	m
-simple1	input.tcl	/^proc simple1$/;"	p
-tcl_class	input.tcl	/^class tcl_class$/;"	c
+simple1	input.tcl	/^proc simple1 {} {$/;"	p

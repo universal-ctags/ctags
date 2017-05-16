@@ -283,11 +283,16 @@ static void skipToEndOfCmdline (tokenInfo *const token)
 			break;
 		else if (tokenIsType (token, TCL_EOL))
 			break;
-		else if ((token->type == '[')
+		else if ((token->type == '{')
 				 || (token->type == '['))
 			tokenSkipOverPair(token);
 		tokenRead (token);
 	} while (!tokenIsEOF (token));
+}
+
+extern void skipToEndOfTclCmdline (tokenInfo *const token)
+{
+	skipToEndOfCmdline (token);
 }
 
 static bool isAbsoluteIdentifier(tokenInfo *const token)

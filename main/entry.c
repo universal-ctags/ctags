@@ -1253,7 +1253,20 @@ extern int makeQualifiedTagEntry (const tagEntryInfo *const e)
 		x.extensionFields.scopeName = NULL;
 		x.extensionFields.scopeIndex = CORK_NIL;
 #endif
+
+		bool in_subparser
+			= isTagExtraBitMarked (&x,
+								   XTAG_TAGS_GENERATED_BY_SUBPARSER);
+
+		/* TODO: very slow: entry should hold language-id,
+		   not langauge name. */
+		if (in_subparser)
+			pushLanguage(getNamedLanguage(x.language, 0));
+
 		r = makeTagEntry (&x);
+
+		if (in_subparser)
+			popLanguage();
 	}
 	return r;
 }
