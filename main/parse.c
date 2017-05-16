@@ -31,6 +31,7 @@
 #include "routines.h"
 #include "subparser.h"
 #include "trace.h"
+#include "trashbox.h"
 #include "vstring.h"
 #ifdef HAVE_ICONV
 # include "mbcs.h"
@@ -2852,11 +2853,15 @@ extern bool parseFileWithMio (const char *const fileName, MIO *mio)
 
 		setupAnon ();
 
+		initParserTrashBox ();
+
 		tagFileResized = createTagsWithFallback (fileName, language, req.mio);
 #ifdef HAVE_COPROC
 		if (LanguageTable [language].def->method & METHOD_XCMD_AVAILABLE)
 			tagFileResized = createTagsWithXcmd (fileName, language, req.mio)? true: tagFileResized;
 #endif
+
+		finiParserTrashBox ();
 
 		teardownAnon ();
 
