@@ -110,6 +110,7 @@
 	SqlParser, \
 	SystemdUnitParser, \
 	TclParser, \
+	TclOOParser, \
 	TexParser, \
 	TTCNParser, \
 	VeraParser, \

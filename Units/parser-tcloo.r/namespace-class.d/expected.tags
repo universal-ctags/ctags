@@ -1,0 +1,2 @@
+X	input.tcl	/^oo::class create X {$/;"	c	language:TclOO
+Y	input.tcl	/^class create Y {$/;"	c	language:TclOO

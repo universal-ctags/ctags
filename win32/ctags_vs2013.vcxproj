@@ -229,6 +229,7 @@
     <ClCompile Include="..\optlib\RSpec.c" />
     <ClCompile Include="..\main\trashbox.c" />
     <ClCompile Include="..\parsers\itcl.c" />
+    <ClCompile Include="..\parsers\tcloo.c" />
     <ClCompile Include="mkstemp\mkstemp.c" />
   </ItemGroup>
   <ItemGroup>
