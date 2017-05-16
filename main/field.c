@@ -801,8 +801,9 @@ static const char *renderFieldExtras (const tagEntryInfo *const tag,
 {
 	int i;
 	bool hasExtra = false;
+	int c = countXtags();
 
-	for (i = 0; i < XTAG_COUNT; i++)
+	for (i = 0; i < c; i++)
 	{
 		const char *name = getXtagName (i);
 
@@ -912,6 +913,8 @@ static bool     isExtrasFieldAvailable     (const tagEntryInfo *const tag)
 	for (i = 0; i < sizeof (tag->extra); i++)
 	{
 		if (tag->extra [i])
+			return true;
+		else if (tag->extraDynamic)
 			return true;
 	}
 
