@@ -430,6 +430,8 @@ static optionDescription LongOptionDescription [] = {
  {1,"       of loading option files."},
  {1,"  --_fatal-warnings"},
  {1,"       Make all warnings fatal."},
+ {1,"  --_fielddef-<LANG>=name,description"},
+ {1,"       EXPERIMENTAL, Define new field for <LANG>."},
  {1,"  --_force-quit=[num]"},
  {1,"       Quit when the option is processed. Useful to debug the chain"},
  {1,"       of loading option files."},
@@ -2967,6 +2969,8 @@ static void processLongOption (
 	else if (processLangSpecificFieldsOption(option, parameter))
 		 ;
 	else if (processExtradefOption(option, parameter))
+		;
+	else if (processFielddefOption(option, parameter))
 		;
 	else if (processLangSpecificExtraOption(option, parameter))
 		;

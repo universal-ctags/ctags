@@ -2522,6 +2522,68 @@ extern bool processExtradefOption (const char *const option, const char *const p
 	return processLangDefineExtra (language, option, parameter);
 }
 
+static void fieldDefinitionDestroy (fieldDefinition *fdef)
+{
+	eFree ((void *)fdef->description);
+	eFree ((void *)fdef->name);
+	eFree (fdef);
+}
+
+static bool processLangDefineField (const langType language,
+									const char *const option,
+									const char *const parameter)
+{
+	fieldDefinition *fdef;
+	const char * p = parameter;
+	const char *desc;
+
+	Assert (0 <= language  &&  language < (int) LanguageCount);
+	Assert (p);
+
+	if (p[0] == '\0')
+		error (FATAL, "no field definition specified in \"--%s\" option", option);
+
+	desc = strchr (p, ',');
+	if (!desc)
+		error (FATAL, "no field description specified in \"--%s\" option", option);
+	else if (desc == p)
+		error (FATAL, "the field name in \"--%s\" option is empty", option);
+
+	for (; p < desc; p++)
+	{
+		if (!isalnum (*p))
+			error (FATAL, "unacceptable char as part of field name in \"--%s\" option",
+				   option);
+	}
+
+	if (strlen (desc + 1) == 0)
+		error (FATAL, "field description in \"--%s\" option is empty", option);
+
+	fdef = xCalloc (1, fieldDefinition);
+	fdef->enabled = false;
+	fdef->letter = NUL_FIELD_LETTER;
+	fdef->name = eStrndup(parameter, desc - parameter);
+	fdef->description = eStrdup (desc + 1);
+	fdef->isValueAvailable = NULL;
+	fdef->dataType = FIELDTYPE_STRING; /* TODO */
+	fdef->ftype = FIELD_UNKNOWN;
+	DEFAULT_TRASH_BOX(fdef, fieldDefinitionDestroy);
+
+	defineField (fdef, language);
+
+	return true;
+}
+
+extern bool processFielddefOption (const char *const option, const char *const parameter)
+{
+	langType language;
+
+	language = getLanguageComponentInOption (option, "_fielddef-");
+	if (language == LANG_IGNORE)
+		return false;
+
+	return processLangDefineField (language, option, parameter);
+}
 
 /*
 *   File parsing
