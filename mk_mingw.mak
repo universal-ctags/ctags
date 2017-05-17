@@ -72,4 +72,4 @@ clean:
 	$(SILENT) echo Cleaning
 	$(SILENT) rm -f ctags.exe readtags.exe
 	$(SILENT) rm -f tags
-	$(SILENT) rm -f main/*.o parsers/*.o gnu_regex/*.o fnmatch/*.o read/*.o
+	$(SILENT) rm -f main/*.o optlib/*.o parsers/*.o parsers/cxx/*.o gnu_regex/*.o fnmatch/*.o read/*.o
