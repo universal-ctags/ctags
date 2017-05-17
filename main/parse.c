@@ -2463,6 +2463,13 @@ extern void printLanguageList (void)
 	eFree (ltable);
 }
 
+static void xtagDefinitionDestroy (xtagDefinition *xdef)
+{
+	eFree ((void *)xdef->name);
+	eFree ((void *)xdef->description);
+	eFree (xdef);
+}
+
 static bool processLangDefineExtra (const langType language,
 									const char *const option,
 									const char *const parameterx)
@@ -2496,6 +2503,7 @@ static bool processLangDefineExtra (const langType language,
 	xdef->name = eStrndup (parameterx, desc - parameterx);
 	xdef->description = eStrdup (desc + 1);
 	xdef->isEnabled = NULL;
+	DEFAULT_TRASH_BOX(xdef, xtagDefinitionDestroy);
 
 	defineXtag (xdef, language);
 
