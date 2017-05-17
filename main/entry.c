@@ -48,6 +48,7 @@
 #include "ptag.h"
 #include "read.h"
 #include "routines.h"
+#include "ptrarray.h"
 #include "sort.h"
 #include "strlist.h"
 #include "trashbox.h"
@@ -889,17 +890,54 @@ extern char* makePatternString (const tagEntryInfo *const tag)
 	return vStringDeleteUnwrap (pattern);
 }
 
+static tagField * tagFieldNew(fieldType ftype, const char *value, bool valueOwner)
+{
+	tagField *f = xMalloc (1, tagField);
+
+	f->ftype = ftype;
+	f->value = value;
+	f->valueOwner = valueOwner;
+	return f;
+}
+
+static void tagFieldDelete (tagField * f)
+{
+	if (f->valueOwner)
+		eFree((void *)f->value);
+	eFree (f);
+}
+
+static void attachParserFieldGeneric (tagEntryInfo *const tag, fieldType ftype, const char * value,
+									  bool valueOwner)
+{
+	if (tag->usedParserFields < PRE_ALLOCATED_PARSER_FIELDS)
+	{
+		tag->parserFields [tag->usedParserFields].ftype = ftype;
+		tag->parserFields [tag->usedParserFields].value = value;
+		tag->parserFields [tag->usedParserFields].valueOwner = valueOwner;
+		tag->usedParserFields++;
+	}
+	else if (tag->parserFieldsDynamic == NULL)
+	{
+		tag->parserFieldsDynamic = ptrArrayNew((ptrArrayDeleteFunc)tagFieldDelete);
+		PARSER_TRASH_BOX(tag->parserFieldsDynamic, ptrArrayDelete);
+		attachParserFieldGeneric (tag, ftype, value, valueOwner);
+	}
+	else
+	{
+		tagField *f = tagFieldNew (ftype, value, valueOwner);
+		ptrArrayAdd(tag->parserFieldsDynamic, f);
+		tag->usedParserFields++;
+	}
+}
+
 extern void attachParserField (tagEntryInfo *const tag, fieldType ftype, const char * value)
 {
-	Assert (tag->usedParserFields < PRE_ALLOCATED_PARSER_FIELDS);
-
-	tag->parserFields [tag->usedParserFields].ftype = ftype;
-	tag->parserFields [tag->usedParserFields].value = value;
-	tag->usedParserFields++;
+	attachParserFieldGeneric (tag, ftype, value, false);
 }
 
 extern void attachParserFieldToCorkEntry (int index,
-					 fieldType type,
+					 fieldType ftype,
 					 const char *value)
 {
 	tagEntryInfo * tag;
@@ -912,7 +950,20 @@ extern void attachParserFieldToCorkEntry (int index,
 	Assert (tag != NULL);
 
 	v = eStrdup (value);
-	attachParserField (tag, type, v);
+	attachParserFieldGeneric (tag, ftype, v, true);
+}
+
+extern const tagField* getParserField (const tagEntryInfo * tag, int index)
+{
+	if (!(index < tag->usedParserFields))
+		return NULL;
+	else if (index < PRE_ALLOCATED_PARSER_FIELDS)
+		return tag->parserFields + index;
+	else
+	{
+		unsigned int n = index - PRE_ALLOCATED_PARSER_FIELDS;
+		return ptrArrayItem(tag->parserFieldsDynamic, n);
+	}
 }
 
 static void copyParserFields (const tagEntryInfo *const tag, tagEntryInfo* slot)
@@ -922,14 +973,19 @@ static void copyParserFields (const tagEntryInfo *const tag, tagEntryInfo* slot)
 
 	for (i = 0; i < tag->usedParserFields; i++)
 	{
-		value = tag->parserFields [i].value;
+		const tagField *f = getParserField (tag, i);
+		Assert(f);
+
+		value = f->value;
 		if (value)
 			value = eStrdup (value);
 
-		attachParserField (slot,
-				   tag->parserFields [i].ftype,
-				   value);
+		attachParserFieldGeneric (slot,
+								  f->ftype,
+								  value,
+								  true);
 	}
+
 }
 
 static void recordTagEntryInQueue (const tagEntryInfo *const tag, tagEntryInfo* slot)
@@ -974,21 +1030,34 @@ static void recordTagEntryInQueue (const tagEntryInfo *const tag, tagEntryInfo* 
 
 
 	slot->usedParserFields = 0;
+	slot->parserFieldsDynamic = NULL;
 	copyParserFields (tag, slot);
+	if (slot->parserFieldsDynamic)
+		PARSER_TRASH_BOX_TAKE_BACK(slot->parserFieldsDynamic);
 }
 
 extern void clearParserFields (tagEntryInfo *const tag)
 {
-	unsigned int i;
+	unsigned int i, n;
 	const char* value;
 
-	for (i = 0; i < tag->usedParserFields; i++)
+	if ( tag->usedParserFields < PRE_ALLOCATED_PARSER_FIELDS )
+		n = tag->usedParserFields;
+	else
+		n = PRE_ALLOCATED_PARSER_FIELDS;
+
+	for (i = 0; i < n; i++)
 	{
 		value = tag->parserFields[i].value;
-		if (value)
+		if (value && tag->parserFields[i].valueOwner)
 			eFree ((char *)value);
 		tag->parserFields[i].value = NULL;
 		tag->parserFields[i].ftype = FIELD_UNKNOWN;
+	}
+	if (tag->parserFieldsDynamic)
+	{
+		ptrArrayDelete (tag->parserFieldsDynamic);
+		tag->parserFieldsDynamic = NULL;
 	}
 }
 

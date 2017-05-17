@@ -1472,9 +1472,6 @@ static void installFieldDefinition (const langType language)
 
 	Assert (0 <= language  &&  language < (int) LanguageCount);
 	parser = LanguageTable [language].def;
-	if (parser->fieldDefinitionCount > PRE_ALLOCATED_PARSER_FIELDS)
-		error (FATAL,
-		       "INTERNAL ERROR: in a parser, fields are defined more than PRE_ALLOCATED_PARSER_FIELDS\n");
 
 	if (parser->fieldTable != NULL)
 	{
