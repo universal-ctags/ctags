@@ -1,0 +1,9 @@
+--langdef=unknown
+--kinddef-unknown=f,func,functions
+--map-unknown=+.unknown
+
+--_fielddef-unknown=protection,protections
+--_fielddef-unknown=signature,signatures
+
+--regex-unknown=/^((public|protected|private) +)?func ([^\(]+)\((.*)\)/\3/f/{_field=protection:\1}{_field=signature:(\4)}
+
