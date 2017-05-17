@@ -34,6 +34,8 @@
 #include "parse.h"
 #include "read.h"
 #include "routines.h"
+#include "ptrarray.h"
+#include "trashbox.h"
 
 static bool regexAvailable = false;
 static unsigned long currentScope = CORK_NIL;
@@ -59,6 +61,11 @@ enum scopeAction {
 	SCOPE_PLACEHOLDER = 1UL << 4,
 };
 
+struct fieldPattern {
+	fieldType ftype;
+	const char *template;
+};
+
 typedef struct {
 	regex_t *pattern;
 	enum pType type;
@@ -78,6 +85,7 @@ typedef struct {
 	bool *disabled;
 	int   multiline;
 	int   xtagType;
+	ptrArray *fieldPatterns;
 } regexPattern;
 
 
@@ -111,6 +119,12 @@ static void clearPatternSet (struct lregexControlBlock *lcb)
 			eFree (p->u.tag.name_pattern);
 			p->u.tag.name_pattern = NULL;
 		}
+
+		if (p->fieldPatterns)
+		{
+			ptrArrayDelete (p->fieldPatterns);
+			p->fieldPatterns = NULL;
+		}
 	}
 	if (lcb->patterns != NULL)
 		eFree (lcb->patterns);
@@ -136,31 +150,29 @@ extern void freeLregexControlBlock (struct lregexControlBlock* lcb)
 *   Regex pseudo-parser
 */
 
-static int makeRegexTag (
+static bool initRegexTag (tagEntryInfo *e,
 		const vString* const name, const kindDefinition* const kind, int scopeIndex, int placeholder,
 		unsigned long line, MIOPos *pos, int xtag_type)
 {
 	Assert (kind != NULL);
 	if (kind->enabled)
 	{
-		tagEntryInfo e;
 		Assert (name != NULL  &&  ((vStringLength (name) > 0) || placeholder));
-		initTagEntry (&e, vStringValue (name), kind);
-		e.extensionFields.scopeIndex = scopeIndex;
-		e.placeholder = !!placeholder;
+		initTagEntry (e, vStringValue (name), kind);
+		e->extensionFields.scopeIndex = scopeIndex;
+		e->placeholder = !!placeholder;
 		if (line)
 		{
-			e.lineNumber = line;
-			e.filePosition = *pos;
+			e->lineNumber = line;
+			e->filePosition = *pos;
 		}
 
 		if (xtag_type != XTAG_UNKNOWN)
-			markTagExtraBit (&e, xtag_type);
+			markTagExtraBit (e, xtag_type);
 
-		return makeTagEntry (&e);
+		return true;
 	}
-	else
-		return CORK_NIL;
+	return false;
 }
 
 /*
@@ -396,6 +408,89 @@ static flagDefinition extraSpecFlagDef[] = {
 	  "EXTRA", "record the tag only when the extra is enabled"},
 };
 
+struct fieldFlagData {
+	ptrArray *spec;
+	langType owner;
+};
+
+static struct fieldPattern * fieldPatternNew (fieldType ftype, const char *template)
+{
+	struct fieldPattern *fp;
+
+	fp = xMalloc(1, struct fieldPattern);
+	fp->ftype = ftype;
+	fp->template = eStrdup(template);
+
+	return fp;
+}
+
+static void fieldPatternDelete (struct fieldPattern *fp)
+{
+	eFree ((void *)fp->template);
+	eFree (fp);
+}
+
+static void pre_ptrn_flag_field_long (const char* const s CTAGS_ATTR_UNUSED, const char* const v, void* data)
+{
+	struct fieldFlagData *fdata = data;
+
+	struct fieldPattern *fp;
+	fieldType ftype;
+	char *fname;
+	const char* template;
+	char *tmp;
+
+	if (!v)
+	{
+		error (WARNING, "no value is given for: %s", s);
+		return;
+	}
+
+	tmp = strchr (v, ':');
+	if (tmp == NULL || tmp == v)
+	{
+		error (WARNING, "no field name is given for: %s", s);
+		return;
+	}
+
+	fname = eStrndup (v, tmp - v);
+	ftype = getFieldTypeForNameAndLanguage (fname, fdata->owner);
+	if (ftype == FIELD_UNKNOWN)
+	{
+		error (WARNING, "no such field \"%s\" in %s", fname, getLanguageName(fdata->owner));
+		eFree (fname);
+		return;
+	}
+
+	if (fdata->spec)
+	{
+		for (unsigned int i = 0; i < ptrArrayCount(fdata->spec); i++)
+		{
+			fp = ptrArrayItem(fdata->spec, i);
+			if (fp->ftype == ftype)
+			{
+				error (WARNING, "duplicated field specification \"%s\" in %s", fname, getLanguageName(fdata->owner));
+				eFree (fname);
+				return;
+			}
+		}
+	}
+	eFree (fname);
+
+	template = tmp + 1;
+	fp = fieldPatternNew (ftype, template);
+
+	if (fdata->spec == NULL)
+		fdata->spec = ptrArrayNew((ptrArrayDeleteFunc)fieldPatternDelete);
+	ptrArrayAdd(fdata->spec, fp);
+}
+
+static flagDefinition fieldSpecFlagDef[] = {
+#define EXPERIMENTAL "_"
+	{ '\0',  EXPERIMENTAL "field", NULL, pre_ptrn_flag_field_long ,
+	  "FIELD:VALUE", "record the matched string(VALUE) to FIELD of the tag"},
+};
+
 
 static regexPattern *addCompiledTagPattern (struct lregexControlBlock *lcb, regex_t* const pattern,
 					    const char* const name, char kindLetter, const char* kindName,
@@ -408,6 +503,10 @@ static regexPattern *addCompiledTagPattern (struct lregexControlBlock *lcb, rege
 	int multiline = -1;
 	struct extraFlagData extraFlagData = {
 		.xtype = XTAG_UNKNOWN,
+		.owner = lcb->owner,
+	};
+	struct fieldFlagData fieldFlagData = {
+		.spec  = NULL,
 		.owner = lcb->owner,
 	};
 
@@ -426,6 +525,9 @@ static regexPattern *addCompiledTagPattern (struct lregexControlBlock *lcb, rege
 	if (multiline >= 0)
 		lcb->multilinePatternsCount++;
 	ptrn->xtagType = extraFlagData.xtype;
+
+	flagsEval (flags, fieldSpecFlagDef, ARRAY_SIZE(fieldSpecFlagDef), &fieldFlagData);
+	ptrn->fieldPatterns = fieldFlagData.spec;
 
 	if (*name == '\0' && exclusive && kindLetter == KIND_REGEX_DEFAULT)
 		ptrn->u.tag.kindIndex = KIND_GHOST_INDEX;
@@ -660,6 +762,7 @@ static void matchTagPattern (struct lregexControlBlock *lcb,
 		unsigned long ln = 0;
 		MIOPos pos;
 		kindDefinition *kdef;
+		tagEntryInfo e;
 
 		if (patbuf->multiline >= 0)
 		{
@@ -667,9 +770,39 @@ static void matchTagPattern (struct lregexControlBlock *lcb,
 			pos = getInputFilePositionForLine (ln);
 		}
 
+		n = CORK_NIL;
 		kdef = getLanguageKind (lcb->owner, patbuf->u.tag.kindIndex);
-		n = makeRegexTag (name, kdef, scope, placeholder,
-				  ln, ln == 0? NULL: &pos, patbuf->xtagType);
+
+		if (initRegexTag (&e, name, kdef, scope, placeholder,
+						  ln, ln == 0? NULL: &pos, patbuf->xtagType))
+		{
+			static TrashBox* field_trashbox;
+			if (field_trashbox == NULL)
+			{
+				field_trashbox = trashBoxNew();
+				DEFAULT_TRASH_BOX (field_trashbox, trashBoxDelete);
+			}
+
+			if (patbuf->fieldPatterns)
+			{
+				for (int i = 0; i < ptrArrayCount(patbuf->fieldPatterns); i++)
+				{
+					struct fieldPattern *fp = ptrArrayItem(patbuf->fieldPatterns, i);
+					if (isFieldEnabled (fp->ftype))
+					{
+						vString * const value = substitute (line, fp->template,
+															BACK_REFERENCE_COUNT, pmatch,
+															!!(patbuf->multiline >= 0));
+						attachParserField (&e, fp->ftype, vStringValue (value));
+						trashBoxPut (field_trashbox, value,
+									 (TrashBoxDestroyItemProc)vStringDelete);
+					}
+				}
+			}
+			n = makeTagEntry (&e);
+
+			trashBoxMakeEmpty(field_trashbox);
+		}
 	}
 
 	if (patbuf->scopeActions & SCOPE_PUSH)
@@ -961,6 +1094,7 @@ extern void printRegexFlags (void)
 	flagPrintHelp (scopePtrnFlagDef, ARRAY_SIZE (scopePtrnFlagDef));
 	flagPrintHelp (multilinePtrnFlagDef, ARRAY_SIZE (multilinePtrnFlagDef));
 	flagPrintHelp (extraSpecFlagDef, ARRAY_SIZE (extraSpecFlagDef));
+	flagPrintHelp (fieldSpecFlagDef, ARRAY_SIZE (fieldSpecFlagDef));
 }
 
 extern void freeRegexResources (void)
