@@ -1,0 +1,8 @@
+a	input.tcl	/^proc a {} {$/;"	p
+b	input.tcl	/^proc b {} {}; proc c {} {$/;"	p
+c	input.tcl	/^proc b {} {}; proc c {} {$/;"	p
+d	input.tcl	/^}; proc d {} {$/;"	p
+e	input.tcl	/^}; proc e {} {};;;$/;"	p
+f	input.tcl	/^proc f {} {};;;;;;;; a \\$/;"	p
+g	input.tcl	/^    ; proc g {}  {} ; \\$/;"	p
+h	input.tcl	/^    proc h {} {}$/;"	p

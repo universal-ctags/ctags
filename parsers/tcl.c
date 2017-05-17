@@ -228,6 +228,7 @@ static void readToken (tokenInfo *const token, void *data CTAGS_ATTR_UNUSED)
 			readString (token->string);
 			break;
 		}
+	case ';':
 	case '{':
 	case '}':
 	case '[':
