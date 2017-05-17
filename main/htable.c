@@ -85,7 +85,7 @@ static void  entry_reclaim (hentry* entry,
 		entry = entry_destroy (entry, keyfreefn, valfreefn);
 }
 
-static void *entry_find (hentry* entry, void* key, hashTableEqualFunc equalfn)
+static void *entry_find (hentry* entry, const void* const key, hashTableEqualFunc equalfn)
 {
 	while (entry)
 	{
@@ -175,7 +175,7 @@ extern void       hashTablePutItem    (hashTable *htable, void *key, void *value
 	htable->table[i] = entry_new(key, value, htable->table[i]);
 }
 
-extern void*      hashTableGetItem   (hashTable *htable, void *key)
+extern void*      hashTableGetItem   (hashTable *htable, const void * key)
 {
 	unsigned int i;
 
@@ -192,7 +192,7 @@ extern bool     hashTableDeleteItem (hashTable *htable, void *key)
 			    htable->equalfn, htable->keyfreefn, htable->valfreefn);
 }
 
-extern bool    hashTableHasItem    (hashTable *htable, void *key)
+extern bool    hashTableHasItem    (hashTable *htable, const void *key)
 {
 	return hashTableGetItem (htable, key)? true: false;
 }
@@ -217,19 +217,18 @@ extern int        hashTableCountItem   (hashTable *htable)
 	hashTableForeachItem (htable, count, &c);
 	return c;
 }
-unsigned int hashPtrhash (void * x)
+
+unsigned int hashPtrhash (const void * const x)
 {
 	union {
-		void *ptr;
+		const void *const ptr;
 		unsigned int ui;
-	} v;
+	} v = {.ui = 0, .ptr = x};
 
-	v.ui = 0;
-	v.ptr = x;
 	return v.ui;
 }
 
-bool hashPtreq (void *a, void *b)
+bool hashPtreq (const void *const a, const void *const b)
 {
 	return (a == b)? true: false;
 }
@@ -237,7 +236,7 @@ bool hashPtreq (void *a, void *b)
 
 /* http://www.cse.yorku.ca/~oz/hash.html */
 static unsigned long
-djb2(unsigned char *str)
+djb2(const unsigned char *str)
 {
 	unsigned long hash = 5381;
 	int c;
@@ -248,18 +247,35 @@ djb2(unsigned char *str)
 	return hash;
 }
 
-unsigned int hashCstrhash (void * x)
+static unsigned long
+casedjb2(const unsigned char *str)
 {
-	char *s = x;
-	return (unsigned int)djb2((unsigned char *)s);
+	unsigned long hash = 5381;
+	int c;
+
+	while ((c = *str++))
+	{
+		if (('a' <= c) && (c <= 'z'))
+			c += ('A' - 'a');
+		hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
+	}
+
+	return hash;
 }
 
-bool hashCstreq (void *a, void *b)
+
+unsigned int hashCstrhash (const void *const x)
+{
+	const char *const s = x;
+	return (unsigned int)djb2((const unsigned char *)s);
+}
+
+bool hashCstreq (const void * const a, const void *const b)
 {
 	return !!(strcmp (a, b) == 0);
 }
 
-unsigned int hashInthash (void *x)
+unsigned int hashInthash (const void *const x)
 {
        union tmp {
                unsigned int u;
@@ -271,10 +287,22 @@ unsigned int hashInthash (void *x)
        return x0.u;
 }
 
-bool hashInteq (void *a, void *b)
+bool hashInteq (const void *const a, const void *const b)
 {
        int ai = *(int *)a;
        int bi = *(int *)b;
 
        return !!(ai == bi);
+}
+
+
+unsigned int hashCstrcasehash (const void *const x)
+{
+	const char *const s = x;
+	return (unsigned int)casedjb2((const unsigned char *)s);
+}
+
+bool hashCstrcaseeq (const void *const a, const void *const b)
+{
+	return !!(strcasecmp (a, b) == 0);
 }

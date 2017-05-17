@@ -18,6 +18,7 @@
 #include "debug.h"
 #include "entry.h"
 #include "flags.h"
+#include "htable.h"
 #include "keyword.h"
 #include "main.h"
 #define OPTION_WRITE
@@ -108,6 +109,7 @@ static parserDefinitionFunc* BuiltInParsers[] = {
 };
 static parserObject* LanguageTable = NULL;
 static unsigned int LanguageCount = 0;
+static hashTable* LanguageHTable = NULL;
 static kindDefinition defaultFileKind = {
 	.enabled     = false,
 	.letter      = KIND_FILE_DEFAULT,
@@ -278,27 +280,24 @@ extern langType getNamedLanguage (const char *const name, size_t len)
 	unsigned int i;
 	Assert (name != NULL);
 
-	for (i = 0  ;  i < LanguageCount  &&  result == LANG_IGNORE  ;  ++i)
+	if (len == 0)
 	{
-		const parserDefinition* const lang = LanguageTable [i].def;
-		if (lang->name != NULL)
-		{
-			if (len == 0)
-			{
-				if (strcasecmp (name, lang->name) == 0)
-					result = i;
-			}
-			else
-			{
-				vString* vstr = vStringNewInit (name);
-				vStringTruncate (vstr, len);
-
-				if (strcasecmp (vStringValue (vstr), lang->name) == 0)
-					result = i;
-				vStringDelete (vstr);
-			}
-		}
+		parserDefinition *def = (parserDefinition *)hashTableGetItem (LanguageHTable, name);
+		if (def)
+			result = def->id;
 	}
+	else
+		for (i = 0  ;  i < LanguageCount  &&  result == LANG_IGNORE  ;  ++i)
+		{
+			const parserDefinition* const lang = LanguageTable [i].def;
+			Assert (lang->name);
+			vString* vstr = vStringNewInit (name);
+			vStringTruncate (vstr, len);
+
+			if (strcasecmp (vStringValue (vstr), lang->name) == 0)
+				result = i;
+			vStringDelete (vstr);
+		}
 	return result;
 }
 
@@ -1576,6 +1575,8 @@ static void initializeParsingCommon (parserDefinition *def, bool is_builtin)
 	parser = LanguageTable + def->id;
 	parser->def = def;
 
+	hashTablePutItem (LanguageHTable, def->name, def);
+
 	fileKindLetter = parser->def->fileKindLetter;
 	if (fileKindLetter == KIND_FILE_DEFAULT)
 		parser->fileKind = &defaultFileKind;
@@ -1595,6 +1596,12 @@ extern void initializeParsing (void)
 	builtInCount = ARRAY_SIZE (BuiltInParsers);
 	LanguageTable = xMalloc (builtInCount, parserObject);
 	memset(LanguageTable, 0, builtInCount * sizeof (parserObject));
+
+	LanguageHTable = hashTableNew (127,
+								   hashCstrcasehash,
+								   hashCstrcaseeq,
+								   NULL,
+								   NULL);
 
 	verbose ("Installing parsers: ");
 	for (i = 0  ;  i < builtInCount  ;  ++i)

@@ -54,7 +54,7 @@ struct sTagEntryInfo {
 				       * (may be NULL if not present) *//*  */
 	unsigned int boundaryInfo;    /* info about nested input stream */
 	MIOPos      filePosition;     /* file position of line containing tag */
-	const char* language;         /* language of input file */
+	langType langType;         /* language of input file */
 	const char *inputFileName;   /* name of input file */
 	const char *name;             /* name of the tag */
 	const kindDefinition *kind;	      /* kind descriptor */
@@ -94,7 +94,7 @@ struct sTagEntryInfo {
 
 	/* Following source* fields are used only when #line is found
 	   in input and --line-directive is given in ctags command line. */
-	const char* sourceLanguage;
+	langType sourceLangType;
 	const char *sourceFileName;
 	unsigned long sourceLineNumberDifference;
 };
@@ -121,13 +121,13 @@ extern void initRefTagEntry (tagEntryInfo *const e, const char *const name,
 			     const kindDefinition *kind, int roleIndex);
 extern void initTagEntryFull (tagEntryInfo *const e, const char *const name,
 			      unsigned long lineNumber,
-			      const char* language,
+			      langType langType_,
 			      MIOPos      filePosition,
 			      const char *inputFileName,
 			      const kindDefinition *kind,
 			      int roleIndex,
 			      const char *sourceFileName,
-			      const char* sourceLanguage,
+			      langType sourceLangType,
 			      long sourceLineNumberDifference);
 extern int makeQualifiedTagEntry (const tagEntryInfo *const e);
 

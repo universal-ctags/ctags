@@ -959,8 +959,6 @@ static void recordTagEntryInQueue (const tagEntryInfo *const tag, tagEntryInfo* 
 		slot->extensionFields.xpath = eStrdup (slot->extensionFields.xpath);
 #endif
 
-	if (slot->sourceLanguage)
-		slot->sourceLanguage = eStrdup (slot->sourceLanguage);
 	if (slot->sourceFileName)
 		slot->sourceFileName = eStrdup (slot->sourceFileName);
 
@@ -1013,8 +1011,6 @@ static void clearTagEntryInQueue (tagEntryInfo* slot)
 		eFree ((char *)slot->extensionFields.xpath);
 #endif
 
-	if (slot->sourceLanguage)
-		eFree ((char *)slot->sourceLanguage);
 	if (slot->sourceFileName)
 		eFree ((char *)slot->sourceFileName);
 
@@ -1258,10 +1254,8 @@ extern int makeQualifiedTagEntry (const tagEntryInfo *const e)
 			= isTagExtraBitMarked (&x,
 								   XTAG_TAGS_GENERATED_BY_SUBPARSER);
 
-		/* TODO: very slow: entry should hold language-id,
-		   not langauge name. */
 		if (in_subparser)
-			pushLanguage(getNamedLanguage(x.language, 0));
+			pushLanguage(x.langType);
 
 		r = makeTagEntry (&x);
 
@@ -1276,13 +1270,13 @@ extern void initTagEntry (tagEntryInfo *const e, const char *const name,
 {
 	initTagEntryFull(e, name,
 			 getInputLineNumber (),
-			 getInputLanguageName (),
+			 getInputLanguage (),
 			 getInputFilePosition (),
 			 getInputFileTagPath (),
 			 kind,
 			 ROLE_INDEX_DEFINITION,
 			 getSourceFileTagPath(),
-			 getSourceLanguageName(),
+			 getSourceLanguage(),
 			 getSourceLineNumber() - getInputLineNumber ());
 }
 
@@ -1291,25 +1285,25 @@ extern void initRefTagEntry (tagEntryInfo *const e, const char *const name,
 {
 	initTagEntryFull(e, name,
 			 getInputLineNumber (),
-			 getInputLanguageName (),
+			 getInputLanguage (),
 			 getInputFilePosition (),
 			 getInputFileTagPath (),
 			 kind,
 			 roleIndex,
 			 getSourceFileTagPath(),
-			 getSourceLanguageName(),
+			 getSourceLanguage(),
 			 getSourceLineNumber() - getInputLineNumber ());
 }
 
 extern void initTagEntryFull (tagEntryInfo *const e, const char *const name,
 			      unsigned long lineNumber,
-			      const char* language,
+			      langType langType_,
 			      MIOPos      filePosition,
 			      const char *inputFileName,
 			      const kindDefinition *kind,
 			      int roleIndex,
 			      const char *sourceFileName,
-			      const char* sourceLanguage,
+			      langType sourceLangType,
 			      long sourceLineNumberDifference)
 {
 	int i;
@@ -1319,7 +1313,7 @@ extern void initTagEntryFull (tagEntryInfo *const e, const char *const name,
 	e->lineNumberEntry = (bool) (Option.locate == EX_LINENUM);
 	e->lineNumber      = lineNumber;
 	e->boundaryInfo    = getNestedInputBoundaryInfo (lineNumber);
-	e->language        = language;
+	e->langType        = langType_;
 	e->filePosition    = filePosition;
 	e->inputFileName   = inputFileName;
 	e->name            = name;
@@ -1336,7 +1330,7 @@ extern void initTagEntryFull (tagEntryInfo *const e, const char *const name,
 	if (doesSubparserRun ())
 		markTagExtraBit (e, XTAG_TAGS_GENERATED_BY_SUBPARSER);
 
-	e->sourceLanguage = sourceLanguage;
+	e->sourceLangType = sourceLangType;
 	e->sourceFileName = sourceFileName;
 	e->sourceLineNumberDifference = sourceLineNumberDifference;
 

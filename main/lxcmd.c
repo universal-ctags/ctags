@@ -1074,16 +1074,17 @@ static bool makeTagEntryFromTagEntry (xcmdPath* path, tagEntry* entry)
 
 	memset(&filePosition, 0, sizeof(filePosition));
 
-	// pseudo if (entry->name...);
+	const char* lang = entryLookupField(entry, "language", true);
+	langType langType = getNamedLanguage (lang, 0);
 	initTagEntryFull (&tag, entry->name,
 			  entry->address.lineNumber,
-			  entryLookupField(entry, "language", true),
+			  langType,
 			  filePosition,
 			  entry->file,
 			  entry->kind,
 			  ROLE_INDEX_DEFINITION,
 			  NULL,
-			  NULL,
+			  LANG_IGNORE,
 			  0);
 
 	tag.pattern = entry->address.pattern;
