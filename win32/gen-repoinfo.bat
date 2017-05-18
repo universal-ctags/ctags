@@ -1,4 +1,7 @@
 @echo off
+:: Copyright (C) 2017 Ken Takata
+:: License: GPL-2
+
 setlocal
 
 if "%1"=="" (
