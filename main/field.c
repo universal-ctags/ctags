@@ -24,6 +24,7 @@
 #include "options.h"
 #include "read.h"
 #include "routines.h"
+#include "trashbox.h"
 
 
 typedef struct sFieldObject {
@@ -237,6 +238,7 @@ extern void initFieldObjects (void)
 	  + ARRAY_SIZE (fieldDefinitionsExuberant)
 	  + ARRAY_SIZE (fieldDefinitionsUniversal);
 	fieldObjects = xMalloc (fieldObjectAllocated, fieldObject);
+	TRASH_BOX(&fieldObjects, eFreeIndirect);
 
 	fieldObjectUsed = 0;
 
@@ -280,6 +282,7 @@ extern void initFieldObjects (void)
 			strcat (nameWithPrefix, CTAGS_FIELD_PREFIX);
 			strcat (nameWithPrefix, fobj->def->name);
 			fobj->nameWithPrefix = nameWithPrefix;
+			TRASH_BOX(nameWithPrefix, eFree);
 		}
 		else
 			fobj->nameWithPrefix = NULL;
@@ -590,7 +593,7 @@ extern const char* renderFieldEscaped (writerType writer,
 	Assert (tag);
 	Assert (fobj->def->renderEscaped);
 
-	fobj->buffer = vStringNewOrClear (fobj->buffer);
+	fobj->buffer = vStringNewOrClearWithAutoRelease (fobj->buffer);
 
 	if (index >= 0)
 	{
@@ -655,7 +658,7 @@ static const char *renderFieldCompactInputLine (const tagEntryInfo *const tag,
 	const char *line;
 	static vString *tmp;
 
-	tmp = vStringNewOrClear (tmp);
+	tmp = vStringNewOrClearWithAutoRelease (tmp);
 
 	line = readLineFromBypassAnyway (tmp, tag, NULL);
 	if (line)
@@ -1073,6 +1076,7 @@ extern int defineField (fieldDefinition *def, langType language)
 	strcat (nameWithPrefix, CTAGS_FIELD_PREFIX);
 	strcat (nameWithPrefix, def->name);
 	fobj->nameWithPrefix = nameWithPrefix;
+	TRASH_BOX(nameWithPrefix, eFree);
 
 	fobj->language = language;
 	fobj->sibling  = FIELD_UNKNOWN;

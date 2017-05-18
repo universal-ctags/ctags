@@ -1150,7 +1150,7 @@ static void processExtraTagsOption (
 	else if (*p != '+'  &&  *p != '-')
 		resetXtags (LANG_IGNORE, false);
 
-	longName = vStringNewOrClear (longName);
+	longName = vStringNewOrClearWithAutoRelease (longName);
 
 	while ((c = *p++) != '\0')
 	{
@@ -1229,7 +1229,7 @@ static void processFieldsOption (
 	static vString * longName;
 	bool inLongName = false;
 
-	longName = vStringNewOrClear (longName);
+	longName = vStringNewOrClearWithAutoRelease (longName);
 
 	if (*p == '*')
 	{
@@ -2786,7 +2786,7 @@ static bool processLangSpecificFieldsOption (const char *const option,
 	else if (*p != '+' && *p != '-')
 		error (WARNING, "Wrong per language field specification: %s", p);
 
-	longName = vStringNewOrClear (longName);
+	longName = vStringNewOrClearWithAutoRelease (longName);
 	while ((c = *p++) != '\0')
 	{
 		switch (c)
@@ -2887,7 +2887,7 @@ static bool processLangSpecificExtraOption (const char *const option,
 	else if (*p != '+' && *p != '-')
 		error (WARNING, "Wrong per language extra specification: %s", p);
 
-	longName = vStringNewOrClear (longName);
+	longName = vStringNewOrClearWithAutoRelease (longName);
 	while ((c = *p++) != '\0')
 	{
 		switch (c)

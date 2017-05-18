@@ -1921,7 +1921,7 @@ static void processLangKindDefinition (
 	else if (*p != '+'  &&  *p != '-')
 		resetLanguageKinds (language, false);
 
-	longName = vStringNewOrClear (longName);
+	longName = vStringNewOrClearWithAutoRelease (longName);
 
 	while ((c = *p++) != '\0')
 	{

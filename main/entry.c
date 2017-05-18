@@ -853,7 +853,7 @@ static int   makePatternStringCommon (const tagEntryInfo *const tag,
 	if (!tag->truncateLineAfterTag)
 	{
 		making_cache = true;
-		cached_pattern = vStringNewOrClear (cached_pattern);
+		cached_pattern = vStringNewOrClearWithAutoRelease (cached_pattern);
 
 		puts_o_func = puts_func;
 		o_output    = output;
@@ -1214,7 +1214,7 @@ extern int makeQualifiedTagEntry (const tagEntryInfo *const e)
 		x = *e;
 		markTagExtraBit (&x, XTAG_QUALIFIED_TAGS);
 
-		fqn = vStringNewOrClear (fqn);
+		fqn = vStringNewOrClearWithAutoRelease (fqn);
 
 		if (e->extensionFields.scopeName)
 		{

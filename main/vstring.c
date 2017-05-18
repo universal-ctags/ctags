@@ -19,6 +19,7 @@
 #include "debug.h"
 #include "routines.h"
 #include "vstring.h"
+#include "trashbox.h"
 
 /*
 *   DATA DEFINITIONS
@@ -352,4 +353,19 @@ extern vString *vStringNewOrClear (vString *const string)
 	}
 	else
 		return vStringNew ();
+}
+
+extern vString *vStringNewOrClearWithAutoRelease (vString *const string)
+{
+	vString *r;
+
+	bool autoRelease = false;
+	if (!string)
+		autoRelease = true;
+
+	r = vStringNewOrClear(string);
+	if (autoRelease)
+		TRASH_BOX(r, vStringDelete);
+
+	return r;
 }

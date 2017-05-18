@@ -24,6 +24,7 @@
 #include "main.h"
 #include "routines.h"
 #include "options.h"
+#include "trashbox.h"
 #ifdef HAVE_ICONV
 # include "mbcs.h"
 #endif
@@ -615,7 +616,10 @@ extern bool openInputFile (const char *const fileName, const langType language,
 	invalidatePatternCache();
 
 	if (File.sourceTagPathHolder == NULL)
+	{
 		File.sourceTagPathHolder = stringListNew ();
+		TRASH_BOX(File.sourceTagPathHolder, stringListDelete);
+	}
 	stringListClear (File.sourceTagPathHolder);
 
 	memStreamRequired = doesParserRequireMemoryStream (language);
@@ -1139,6 +1143,7 @@ static void langStackInit (langStack *langStack)
 	langStack->count = 0;
 	langStack->size  = 1;
 	langStack->languages = xCalloc (langStack->size, langType);
+	TRASH_BOX(&(langStack->languages), eFreeIndirect);
 }
 
 static langType langStackTop (langStack *langStack)

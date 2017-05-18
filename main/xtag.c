@@ -15,6 +15,7 @@
 #include "main.h"
 #include "options.h"
 #include "routines.h"
+#include "trashbox.h"
 #include "xtag.h"
 
 #include <string.h>
@@ -233,6 +234,7 @@ extern void initXtagObjects (void)
 
 	xtagObjectAllocated = ARRAY_SIZE (xtagDefinitions);
 	xtagObjects = xMalloc (xtagObjectAllocated, xtagObject);
+	TRASH_BOX(&xtagObjects, eFreeIndirect);
 
 	for (int i = 0; i < ARRAY_SIZE (xtagDefinitions); i++)
 	{
