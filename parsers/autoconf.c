@@ -73,7 +73,8 @@ static bool doesLineCommentStart (m4Subparser *m4, int c, const char* token)
 
 static bool doesStringLiteralStart (m4Subparser *m4, int c)
 {
-	return (c == '"') || (c == '\'') || (c == '`');
+	// return (c == '"') || (c == '\'') || (c == '`');
+	return false;
 }
 
 static bool probeLanguage (m4Subparser *m4, const char* token)

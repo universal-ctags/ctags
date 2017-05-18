@@ -1,0 +1,3 @@
+dnl Taken from configure.ac of pacemaker
+AC_DEFINE_UNQUOTED(UUID_FILE,"$localstatedir/lib/heartbeat/hb_uuid", I'm a bad boy.)
+AC_DEFINE_UNQUOTED(HAVE_CONFDB, $HAVE_confdb, Have the old herarchial Corosync config API)
