@@ -94,18 +94,10 @@ extern void setM4Quotes(char openQuote, char closeQuote)
 static int getCloseQuote(int openQuote)
 {
 	if (openQuote == m4QuoteOpen)
-		return m4QuoteClose;
-	return 0;
-
-	switch (openQuote)
 	{
-		case '[': return ']';
-		case '`': return '\'';
-		case '\'':
-		case '"': return openQuote;
-
-		default: return 0;
+		return m4QuoteClose;
 	}
+	return 0;
 }
 
 static void skipQuotes(int c)
