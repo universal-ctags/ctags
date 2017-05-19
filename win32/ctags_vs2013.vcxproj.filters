@@ -19,6 +19,24 @@
     <Filter Include="Source Files\Main">
       <UniqueIdentifier>{45974afc-d1c3-4696-a74a-60eeaa6e1441}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\optlib">
+      <UniqueIdentifier>{3f3f2216-39c2-44f3-8bea-13db663a5c09}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Parsers\cxx">
+      <UniqueIdentifier>{f9b4c892-3488-4eac-9ab2-b69086a06c43}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\fnmatch">
+      <UniqueIdentifier>{748be28c-6285-41a4-b8cc-670c3d3ef67d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\win32">
+      <UniqueIdentifier>{492b86f3-82b5-455e-89cb-b4213f937614}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\win32\mkstemp">
+      <UniqueIdentifier>{71dfb57e-e1b2-4795-96d8-05a2d16af795}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\gnu_regex">
+      <UniqueIdentifier>{a49cb3ac-6c1b-4b33-9bb7-af130fadeee1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\parsers\ada.c">
@@ -42,9 +60,6 @@
     <ClCompile Include="..\parsers\beta.c">
       <Filter>Source Files\Parsers</Filter>
     </ClCompile>
-    <ClCompile Include="..\optlib\CoffeeScript.c">
-      <Filter>Source Files\Optlib</Filter>
-    </ClCompile>
     <ClCompile Include="..\parsers\c.c">
       <Filter>Source Files\Parsers</Filter>
     </ClCompile>
@@ -56,9 +71,6 @@
     </ClCompile>
     <ClCompile Include="..\parsers\css.c">
       <Filter>Source Files\Parsers</Filter>
-    </ClCompile>
-    <ClCompile Include="..\optlib\ctags-optlib.c">
-      <Filter>Source Files\Optlib</Filter>
     </ClCompile>
     <ClCompile Include="..\parsers\diff.c">
       <Filter>Source Files\Parsers</Filter>
@@ -83,9 +95,6 @@
     </ClCompile>
     <ClCompile Include="..\parsers\fortran.c">
       <Filter>Source Files\Parsers</Filter>
-    </ClCompile>
-    <ClCompile Include="..\optlib\gdbinit.c">
-      <Filter>Source Files\Optlib</Filter>
     </ClCompile>
     <ClCompile Include="..\parsers\go.c">
       <Filter>Source Files\Parsers</Filter>
@@ -118,9 +127,6 @@
       <Filter>Source Files\Parsers</Filter>
     </ClCompile>
     <ClCompile Include="..\parsers\automake.c">
-      <Filter>Source Files\Parsers</Filter>
-    </ClCompile>
-    <ClCompile Include="..\parsers\man.c">
       <Filter>Source Files\Parsers</Filter>
     </ClCompile>
     <ClCompile Include="..\parsers\matlab.c">
@@ -231,12 +237,6 @@
     <ClCompile Include="..\main\fmt.c">
       <Filter>Source Files\Main</Filter>
     </ClCompile>
-    <ClCompile Include="..\fnmatch\fnmatch.c">
-      <Filter>Source Files\Main</Filter>
-    </ClCompile>
-    <ClCompile Include="..\main\get.c">
-      <Filter>Source Files\Main</Filter>
-    </ClCompile>
     <ClCompile Include="..\main\htable.c">
       <Filter>Source Files\Main</Filter>
     </ClCompile>
@@ -244,12 +244,6 @@
       <Filter>Source Files\Main</Filter>
     </ClCompile>
     <ClCompile Include="..\main\kind.c">
-      <Filter>Source Files\Main</Filter>
-    </ClCompile>
-    <ClCompile Include="..\parsers\cpreprocessor.c">
-      <Filter>Source Files\Main</Filter>
-    </ClCompile>
-    <ClCompile Include="..\parsers\iniconf.c">
       <Filter>Source Files\Main</Filter>
     </ClCompile>
     <ClCompile Include="..\main\lregex.c">
@@ -291,9 +285,6 @@
     <ClCompile Include="..\main\read.c">
       <Filter>Source Files\Main</Filter>
     </ClCompile>
-    <ClCompile Include="..\gnu_regex\regex.c">
-      <Filter>Source Files\Main</Filter>
-    </ClCompile>
     <ClCompile Include="..\main\routines.c">
       <Filter>Source Files\Main</Filter>
     </ClCompile>
@@ -333,73 +324,10 @@
     <ClCompile Include="..\main\ptag.c">
       <Filter>Source Files\Main</Filter>
     </ClCompile>
-    <ClCompile Include="..\parsers\cxx\cxx.c">
-      <Filter>Source Files\Main</Filter>
-    </ClCompile>
-    <ClCompile Include="..\parsers\cxx\cxx_debug.c">
-      <Filter>Source Files\Main</Filter>
-    </ClCompile>
-    <ClCompile Include="..\parsers\cxx\cxx_debug_type.c">
-      <Filter>Source Files\Main</Filter>
-    </ClCompile>
-    <ClCompile Include="..\parsers\cxx\cxx_keyword.c">
-      <Filter>Source Files\Main</Filter>
-    </ClCompile>
-    <ClCompile Include="..\parsers\cxx\cxx_parser.c">
-      <Filter>Source Files\Main</Filter>
-    </ClCompile>
-    <ClCompile Include="..\parsers\cxx\cxx_parser_block.c">
-      <Filter>Source Files\Main</Filter>
-    </ClCompile>
-    <ClCompile Include="..\parsers\cxx\cxx_parser_function.c">
-      <Filter>Source Files\Main</Filter>
-    </ClCompile>
-    <ClCompile Include="..\parsers\cxx\cxx_parser_lambda.c">
-      <Filter>Source Files\Main</Filter>
-    </ClCompile>
-    <ClCompile Include="..\parsers\cxx\cxx_parser_namespace.c">
-      <Filter>Source Files\Main</Filter>
-    </ClCompile>
-    <ClCompile Include="..\parsers\cxx\cxx_parser_template.c">
-      <Filter>Source Files\Main</Filter>
-    </ClCompile>
-    <ClCompile Include="..\parsers\cxx\cxx_parser_tokenizer.c">
-      <Filter>Source Files\Main</Filter>
-    </ClCompile>
-    <ClCompile Include="..\parsers\cxx\cxx_parser_typedef.c">
-      <Filter>Source Files\Main</Filter>
-    </ClCompile>
-    <ClCompile Include="..\parsers\cxx\cxx_parser_using.c">
-      <Filter>Source Files\Main</Filter>
-    </ClCompile>
-    <ClCompile Include="..\parsers\cxx\cxx_scope.c">
-      <Filter>Source Files\Main</Filter>
-    </ClCompile>
-    <ClCompile Include="..\parsers\cxx\cxx_tag.c">
-      <Filter>Source Files\Main</Filter>
-    </ClCompile>
-    <ClCompile Include="..\parsers\cxx\cxx_token.c">
-      <Filter>Source Files\Main</Filter>
-    </ClCompile>
-    <ClCompile Include="..\parsers\cxx\cxx_token_chain.c">
-      <Filter>Source Files\Main</Filter>
-    </ClCompile>
-    <ClCompile Include="..\parsers\rpmspec.c">
-      <Filter>Source Files\Main</Filter>
-    </ClCompile>
     <ClCompile Include="..\main\promise.c">
       <Filter>Source Files\Main</Filter>
     </ClCompile>
     <ClCompile Include="..\main\dependency.c">
-      <Filter>Source Files\Main</Filter>
-    </ClCompile>
-    <ClCompile Include="..\optlib\pod.c">
-      <Filter>Source Files\Main</Filter>
-    </ClCompile>
-    <ClCompile Include="..\optlib\elm.c">
-      <Filter>Source Files\Main</Filter>
-    </ClCompile>
-    <ClCompile Include="..\parsers\protobuf.c">
       <Filter>Source Files\Main</Filter>
     </ClCompile>
     <ClCompile Include="..\main\ptrarray.c">
@@ -411,20 +339,110 @@
     <ClCompile Include="..\main\tokeninfo.c">
       <Filter>Source Files\Main</Filter>
     </ClCompile>
-    <ClCompile Include="..\parsers\ldscript.c">
-      <Filter>Source Files\Main</Filter>
+    <ClCompile Include="..\optlib\CoffeeScript.c">
+      <Filter>Source Files\optlib</Filter>
     </ClCompile>
-    <ClCompile Include="..\parsers\dtd.c">
-      <Filter>Source Files\Main</Filter>
+    <ClCompile Include="..\optlib\gdbinit.c">
+      <Filter>Source Files\optlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\optlib\man.c">
+      <Filter>Source Files\optlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\optlib\ctags-optlib.c">
+      <Filter>Source Files\optlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\optlib\elm.c">
+      <Filter>Source Files\optlib</Filter>
     </ClCompile>
     <ClCompile Include="..\optlib\RSpec.c">
-      <Filter>Source Files\Main</Filter>
+      <Filter>Source Files\optlib</Filter>
     </ClCompile>
-    <ClCompile Include="..\parsers\itcl.c">
-      <Filter>Source Files\Main</Filter>
+    <ClCompile Include="..\optlib\pod.c">
+      <Filter>Source Files\optlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\parsers\cxx\cxx_parser_variable.c">
+      <Filter>Source Files\Parsers\cxx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\parsers\cxx\cxx.c">
+      <Filter>Source Files\Parsers\cxx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\parsers\cxx\cxx_debug.c">
+      <Filter>Source Files\Parsers\cxx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\parsers\cxx\cxx_debug_type.c">
+      <Filter>Source Files\Parsers\cxx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\parsers\cxx\cxx_keyword.c">
+      <Filter>Source Files\Parsers\cxx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\parsers\cxx\cxx_parser.c">
+      <Filter>Source Files\Parsers\cxx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\parsers\cxx\cxx_parser_block.c">
+      <Filter>Source Files\Parsers\cxx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\parsers\cxx\cxx_parser_function.c">
+      <Filter>Source Files\Parsers\cxx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\parsers\cxx\cxx_parser_lambda.c">
+      <Filter>Source Files\Parsers\cxx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\parsers\cxx\cxx_parser_namespace.c">
+      <Filter>Source Files\Parsers\cxx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\parsers\cxx\cxx_parser_template.c">
+      <Filter>Source Files\Parsers\cxx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\parsers\cxx\cxx_parser_tokenizer.c">
+      <Filter>Source Files\Parsers\cxx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\parsers\cxx\cxx_parser_typedef.c">
+      <Filter>Source Files\Parsers\cxx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\parsers\cxx\cxx_parser_using.c">
+      <Filter>Source Files\Parsers\cxx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\parsers\cxx\cxx_scope.c">
+      <Filter>Source Files\Parsers\cxx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\parsers\cxx\cxx_tag.c">
+      <Filter>Source Files\Parsers\cxx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\parsers\cxx\cxx_token.c">
+      <Filter>Source Files\Parsers\cxx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\parsers\cxx\cxx_token_chain.c">
+      <Filter>Source Files\Parsers\cxx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\parsers\cpreprocessor.c">
+      <Filter>Source Files\Parsers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\parsers\dtd.c">
+      <Filter>Source Files\Parsers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\fnmatch\fnmatch.c">
+      <Filter>Source Files\fnmatch</Filter>
     </ClCompile>
     <ClCompile Include="mkstemp\mkstemp.c">
-      <Filter>Source Files\Main</Filter>
+      <Filter>Source Files\win32\mkstemp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gnu_regex\regex.c">
+      <Filter>Source Files\gnu_regex</Filter>
+    </ClCompile>
+    <ClCompile Include="..\parsers\ldscript.c">
+      <Filter>Source Files\Parsers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\parsers\protobuf.c">
+      <Filter>Source Files\Parsers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\parsers\rpmspec.c">
+      <Filter>Source Files\Parsers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\parsers\iniconf.c">
+      <Filter>Source Files\Parsers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\parsers\itcl.c">
+      <Filter>Source Files\Parsers</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -530,67 +548,67 @@
     <ClInclude Include="..\main\selectors.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-   <ClInclude Include="..\main\xtag.h">
+    <ClInclude Include="..\main\xtag.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\main\mio.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-   <ClInclude Include="..\main\ptag.h">
+    <ClInclude Include="..\main\ptag.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-   <ClInclude Include="..\parsers\cxx\cxx_debug.h">
+    <ClInclude Include="..\parsers\cxx\cxx_debug.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-   <ClInclude Include="..\parsers\cxx\cxx_keyword.h">
+    <ClInclude Include="..\parsers\cxx\cxx_keyword.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-   <ClInclude Include="..\parsers\cxx\cxx_parser.h">
+    <ClInclude Include="..\parsers\cxx\cxx_parser.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-   <ClInclude Include="..\parsers\cxx\cxx_parser_internal.h">
+    <ClInclude Include="..\parsers\cxx\cxx_parser_internal.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-   <ClInclude Include="..\parsers\cxx\cxx_scope.h">
+    <ClInclude Include="..\parsers\cxx\cxx_scope.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-   <ClInclude Include="..\parsers\cxx\cxx_tag.h">
+    <ClInclude Include="..\parsers\cxx\cxx_tag.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-   <ClInclude Include="..\parsers\cxx\cxx_token.h">
+    <ClInclude Include="..\parsers\cxx\cxx_token.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-   <ClInclude Include="..\parsers\cxx\cxx_token_chain.h">
+    <ClInclude Include="..\parsers\cxx\cxx_token_chain.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-   <ClInclude Include="..\main\promise.h">
+    <ClInclude Include="..\main\promise.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-   <ClInclude Include="..\main\depedency.h">
+    <ClInclude Include="..\parsers\make.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-   <ClInclude Include="..\parsers\make.h">
+    <ClInclude Include="..\parsers\iniconf.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-   <ClInclude Include="..\parsers\iniconf.h">
+    <ClInclude Include="..\parsers\m4.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-   <ClInclude Include="..\parsers\m4.h">
+    <ClInclude Include="..\main\ptrarray.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-   <ClInclude Include="..\main\ptrarray.h">
+    <ClInclude Include="..\main\objpool.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-   <ClInclude Include="..\main\objpool.h">
+    <ClInclude Include="..\main\subparser.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-   <ClInclude Include="..\main\subparser.h">
+    <ClInclude Include="..\main\tokeninfo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-   <ClInclude Include="..\main\tokeninfo.h">
+    <ClInclude Include="..\parsers\tcl.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-   <ClInclude Include="..\parsers\tcl.h">
+    <ClInclude Include="..\main\dependency.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
