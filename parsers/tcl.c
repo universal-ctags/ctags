@@ -589,10 +589,13 @@ static void findTclTags (void)
 extern parserDefinition* TclParser (void)
 {
 	static const char *const extensions [] = { "tcl", "tk", "wish", "itcl", NULL };
+	static const char *const aliases [] = {"expect", NULL };
+
 	parserDefinition* def = parserNew ("Tcl");
 	def->kindTable      = TclKinds;
 	def->kindCount  = ARRAY_SIZE (TclKinds);
 	def->extensions = extensions;
+	def->aliases = aliases;
 	def->keywordTable = TclKeywordTable;
 	def->keywordCount = ARRAY_SIZE (TclKeywordTable);
 
