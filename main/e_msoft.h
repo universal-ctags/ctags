@@ -27,12 +27,13 @@
 #define HAVE_STRSTR 1
 #define HAVE_STRERROR 1
 #define HAVE_FINDNEXT 1
-#define HAVE_TEMPNAM 1
+#define HAVE_MKSTEMP 1
 #define HAVE_FNMATCH 1
 #define HAVE_FNMATCH_H 1
 #define HAVE_PUTENV 1
-#define tempnam(dir,pfx) _tempnam(dir,pfx)
 #define TMPDIR "\\"
+
+int mkstemp (char *template_name);
 
 #ifdef _MSC_VER
 

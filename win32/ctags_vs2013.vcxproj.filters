@@ -423,6 +423,9 @@
     <ClCompile Include="..\parsers\itcl.c">
       <Filter>Source Files\Main</Filter>
     </ClCompile>
+    <ClCompile Include="mkstemp\mkstemp.c">
+      <Filter>Source Files\Main</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\main\e_msoft.h">
