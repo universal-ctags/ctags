@@ -51,6 +51,7 @@ enum {
 	KEYWORD_PROC,
 	KEYWORD_NAMESPACE,
 	KEYWORD_EVAL,
+	KEYWORD_PACKAGE,
 };
 
 typedef int keywordId; /* to allow KEYWORD_NONE */
@@ -61,6 +62,7 @@ static const keywordTable TclKeywordTable[] = {
 	{ "proc",			KEYWORD_PROC		},
 	{ "namespace",		KEYWORD_NAMESPACE	},
 	{ "eval",			KEYWORD_EVAL		},
+	{ "package",        KEYWORD_PACKAGE     },
 };
 
 /*
@@ -228,6 +230,7 @@ static void readToken (tokenInfo *const token, void *data CTAGS_ATTR_UNUSED)
 			readString (token->string);
 			break;
 		}
+	case ';':
 	case '{':
 	case '}':
 	case '[':
@@ -311,6 +314,40 @@ static const char* getLastComponentInIdentifier(tokenInfo *const token)
 		return NULL;
 }
 
+static void notifyPackageRequirement (tokenInfo *const token)
+{
+	subparser *sub;
+
+	foreachSubparser (sub, false)
+	{
+		tclSubparser *tclsub = (tclSubparser *)sub;
+
+		if (tclsub->packageRequirementNotify)
+		{
+			enterSubparser(sub);
+			tclsub->packageRequirementNotify (tclsub, vStringValue (token->string));
+			leaveSubparser();
+		}
+	}
+}
+
+static void notifyNamespaceImport (tokenInfo *const token)
+{
+	subparser *sub;
+
+	foreachSubparser (sub, false)
+	{
+		tclSubparser *tclsub = (tclSubparser *)sub;
+
+		if (tclsub->namespaceImportNotify)
+		{
+			enterSubparser(sub);
+			tclsub->namespaceImportNotify (tclsub, vStringValue (token->string));
+			leaveSubparser();
+		}
+	}
+}
+
 static int notifyCommand (tokenInfo *const token, unsigned int parent)
 {
 	subparser *sub;
@@ -319,11 +356,15 @@ static int notifyCommand (tokenInfo *const token, unsigned int parent)
 	foreachSubparser (sub, false)
 	{
 		tclSubparser *tclsub = (tclSubparser *)sub;
-		enterSubparser(sub);
-		r = tclsub->commandNotify (tclsub, vStringValue (token->string), parent);
-		leaveSubparser();
-		if (r != CORK_NIL)
-			break;
+
+		if (tclsub->commandNotify)
+		{
+			enterSubparser(sub);
+			r = tclsub->commandNotify (tclsub, vStringValue (token->string), parent);
+			leaveSubparser();
+			if (r != CORK_NIL)
+				break;
+		}
 	}
 	return r;
 }
@@ -431,7 +472,25 @@ static void parseNamespace (tokenInfo *const token,
 	if (tokenIsEOF(token))
 		return;
 
-	if (!tokenIsKeyword (token, EVAL))
+	if (tokenIsType (token, TCL_IDENTIFIER) &&
+		(strcmp(tokenString(token), "import") == 0))
+	{
+		while (1)
+		{
+			tokenRead (token);
+
+			if (!tokenIsType (token, TCL_IDENTIFIER))
+				break;
+
+			if (vStringValue(token->string)[0] == '-')
+				continue;
+
+			notifyNamespaceImport (token);
+		}
+		skipToEndOfCmdline(token);
+		return;
+	}
+	else if (!tokenIsKeyword (token, EVAL))
 		return;
 
 	tokenRead (token);
@@ -477,6 +536,31 @@ static void parseNamespace (tokenInfo *const token,
 	} while (!tokenIsEOF(token));
 }
 
+static void parsePackage (tokenInfo *const token)
+{
+	tokenRead (token);
+	if (tokenIsType (token, TCL_IDENTIFIER)
+		&& (strcmp (vStringValue (token->string), "require") == 0))
+	{
+	next:
+		tokenRead (token);
+		if (tokenIsType (token, TCL_IDENTIFIER)
+			&& (vStringLength (token->string) > 0))
+		{
+			if (vStringValue(token->string)[0] == '-')
+				goto next;
+
+			if (tokenIsType (token, TCL_IDENTIFIER)
+				&& (vStringLength (token->string) > 0))
+			{
+				notifyPackageRequirement (token);
+			}
+		}
+	}
+	skipToEndOfCmdline(token);
+}
+
+
 static void findTclTags (void)
 {
 	tokenInfo *const token = newTclToken ();
@@ -487,6 +571,8 @@ static void findTclTags (void)
 			parseNamespace (token, CORK_NIL);
 		else if (tokenIsKeyword (token, PROC))
 			parseProc (token, CORK_NIL);
+		else if (tokenIsKeyword (token, PACKAGE))
+			parsePackage (token);
 		else if (tokenIsType (token, TCL_IDENTIFIER))
 		{
 			notifyCommand (token, CORK_NIL);

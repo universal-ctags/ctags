@@ -73,6 +73,7 @@ The following parsers have been added:
 * SystemdUnit
 * SystemVerilog
 * SVG *libxml*
+* TclOO
 * TTCN
 * WindRes
 * XSLT v1.0 *libxml*

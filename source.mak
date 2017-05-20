@@ -201,6 +201,7 @@ PARSER_SRCS =				\
 	parsers/sql.c			\
 	parsers/systemdunit.c		\
 	parsers/tcl.c			\
+	parsers/tcloo.c			\
 	parsers/tex.c			\
 	parsers/ttcn.c			\
 	parsers/verilog.c		\

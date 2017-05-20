@@ -14,6 +14,12 @@
 #include "read.h"
 #include "keyword.h"
 
+struct itclSubparser {
+	tclSubparser tcl;
+	bool foundITclPackageRequired;
+	bool foundITclNamespaceImported;
+};
+
 static scopeSeparator ITclGenericSeparators [] = {
 	{ KIND_WILDCARD, "::" },
 };
@@ -189,7 +195,8 @@ static int parseClass (tclSubparser *s, int parentIndex)
 
 		do {
 			tokenRead (token);
-			if (tokenIsType (token, TCL_IDENTIFIER))
+			if (tokenIsType (token, TCL_IDENTIFIER)
+				|| tokenIsType (token, TCL_KEYWORD))
 			{
 				keywordId k = resolveKeyword (token->string);
 				switch (k)
@@ -215,17 +222,15 @@ static int parseClass (tclSubparser *s, int parentIndex)
 				case KEYWORD_PRIVATE:
 					protection = k;
 					continue;
+				case KEYWORD_PROC:
+					parseProc(token, r, protection);
+					protection = KEYWORD_NONE;
+					break;
 				default:
 					protection = KEYWORD_NONE;
 					skipToEndOfTclCmdline (token);
 					break;
 				}
-			}
-			else if (tokenIsType (token, TCL_KEYWORD)
-					 && (resolveKeyword (token->string) == KEYWORD_PROC))
-			{
-				parseProc(token, r, protection);
-				protection = KEYWORD_NONE;
 			}
 			else if (token->type == '}')
 			{
@@ -247,14 +252,55 @@ static int parseClass (tclSubparser *s, int parentIndex)
 static int commandNotify (tclSubparser *s, char *command,
 						  int parentIndex)
 {
+	struct itclSubparser *itcl = (struct itclSubparser *)s;
 	int r = CORK_NIL;
 
-	if ((strcmp (command, "class") == 0)
+	if (!itcl->foundITclPackageRequired)
+		return r;
+
+	if ((itcl->foundITclNamespaceImported
+		 && (strcmp (command, "class") == 0))
 		|| (strcmp (command, "itcl::class") == 0))
 		r = parseClass (s, parentIndex);
 
 	return r;
 }
+
+static void packageRequirementNotify (tclSubparser *s, char *package)
+{
+	struct itclSubparser *itcl = (struct itclSubparser *)s;
+	if (strcmp (package, "Itcl") == 0)
+		itcl->foundITclPackageRequired = true;
+}
+
+static void namespaceImportNotify (tclSubparser *s, char *namespace)
+{
+	struct itclSubparser *itcl = (struct itclSubparser *)s;
+
+	if (strcmp(namespace, "itcl::*") == 0
+		|| strcmp(namespace, "itcl::class") == 0)
+		itcl->foundITclNamespaceImported = true;
+}
+
+static void inputStart (subparser *s)
+{
+	struct itclSubparser *itcl = (struct itclSubparser *)s;
+
+	itcl->foundITclPackageRequired = false;
+	itcl->foundITclNamespaceImported = false;
+}
+
+struct itclSubparser itclSubparser = {
+	.tcl = {
+		.subparser = {
+			.direction = SUBPARSER_BI_DIRECTION,
+			.inputStart = inputStart,
+		},
+		.commandNotify = commandNotify,
+		.packageRequirementNotify = packageRequirementNotify,
+		.namespaceImportNotify = namespaceImportNotify,
+	},
+};
 
 static void findITclTags(void)
 {
@@ -266,12 +312,6 @@ extern parserDefinition* ITclParser (void)
 	static const char *const extensions [] = { "itcl", NULL };
 	parserDefinition* const def = parserNew("ITcl");
 
-	static tclSubparser itclSubparser = {
-		.subparser = {
-			.direction = SUBPARSER_BI_DIRECTION,
-		},
-		.commandNotify = commandNotify,
-	};
 	static parserDependency dependencies [] = {
 		[0] = { DEPTYPE_SUBPARSER, "Tcl", &itclSubparser },
 	};
@@ -283,7 +323,7 @@ extern parserDefinition* ITclParser (void)
 	def->kindCount = ARRAY_SIZE(ITclKinds);
 
 	def->extensions = extensions;
-	def->parser = findITclTags;;
+	def->parser = findITclTags;
 	def->useCork = true;
 	def->requestAutomaticFQTag = true;
 

@@ -1,0 +1,5 @@
+X	input.tcl	/^oo::class create X {$/;"	c	language:TclOO	inherits:Y;
+X::add	input.tcl	/^    method add v {$/;"	m	language:TclOO	class:X
+X::doSomething	input.tcl	/^    }; method doSomething {v} {$/;"	m	language:TclOO	class:X
+add	input.tcl	/^    method add v {$/;"	m	language:TclOO	class:X
+doSomething	input.tcl	/^    }; method doSomething {v} {$/;"	m	language:TclOO	class:X

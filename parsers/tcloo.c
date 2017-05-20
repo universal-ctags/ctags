@@ -1,0 +1,177 @@
+/*
+*   Copyright (c) 2017, Masatake YAMATO
+*
+*   This source code is released for free distribution under the terms of the
+*   GNU General Public License version 2 or (at your option) any later version.
+*
+*/
+
+#include "general.h"  /* must always come first */
+#include "tcl.h"
+#include "parse.h"
+#include "entry.h"
+#include "tokeninfo.h"
+
+#include <string.h>
+
+
+struct tclooSubparser {
+	tclSubparser tcl;
+	bool foundTclOONamespaceImported;
+};
+
+static scopeSeparator TclOOGenericSeparators [] = {
+	{ KIND_WILDCARD, "::" },
+};
+
+enum TclOOKind {
+	K_CLASS,
+	K_METHOD,
+};
+
+static kindDefinition TclOOKinds[] = {
+	{ true, 'c', "class", "classes" },
+	{ true, 'm', "method", "methods",
+	  ATTACH_SEPARATORS(TclOOGenericSeparators) },
+};
+
+static void parseMethod (tokenInfo *token, int parent)
+{
+	tokenRead (token);
+	if (tokenIsType (token, TCL_IDENTIFIER))
+	{
+		tagEntryInfo e;
+
+		initTagEntry(&e, vStringValue (token->string), TclOOKinds + K_METHOD);
+		e.extensionFields.scopeIndex = parent;
+		makeTagEntry (&e);
+	}
+	skipToEndOfTclCmdline (token);
+}
+
+static void parseSuperclass (tokenInfo *token, int parent)
+{
+	tokenRead (token);
+	if (tokenIsType (token, TCL_IDENTIFIER))
+	{
+		tagEntryInfo *e = getEntryInCorkQueue(parent);
+
+		if (e->extensionFields.inheritance)
+		{   /* superclass is used twice in a class. */
+			eFree ((void *)e->extensionFields.inheritance);
+		}
+		e->extensionFields.inheritance = eStrdup(tokenString(token));
+	}
+	skipToEndOfTclCmdline (token);
+}
+
+static int parseClass (tclSubparser *s, int parentIndex)
+{
+	tokenInfo *token = newTclToken ();
+	int r = CORK_NIL;
+
+	tokenRead (token);
+	if (tokenIsType (token, TCL_IDENTIFIER)
+		&& (strcmp(tokenString(token), "create") == 0))
+	{
+		tokenRead (token);
+		if (tokenIsType (token, TCL_IDENTIFIER))
+		{
+			tagEntryInfo e;
+
+			initTagEntry(&e, vStringValue (token->string), TclOOKinds + K_CLASS);
+			e.extensionFields.scopeIndex = parentIndex;
+			r = makeTagEntry (&e);
+		}
+
+		if (tokenSkipToType (token, '{'))
+		{
+			do {
+				tokenRead (token);
+				if (tokenIsType (token, TCL_IDENTIFIER)
+					|| tokenIsType (token, TCL_KEYWORD))
+				{
+					if (strcmp(tokenString(token), "method") == 0)
+						parseMethod(token, r);
+					else if (strcmp(tokenString(token), "superclass") == 0)
+						parseSuperclass(token, r);
+					else
+						skipToEndOfTclCmdline (token);
+				}
+				else if (token->type == '}')
+					break;
+			} while (!tokenIsEOF(token));
+		}
+	}
+
+	skipToEndOfTclCmdline (token);
+	tokenDestroy(token);
+	return r;
+}
+
+static int commandNotify (tclSubparser *s, char *command,
+						  int parentIndex)
+{
+	struct tclooSubparser *tcloo = (struct tclooSubparser *)s;
+	int r = CORK_NIL;
+
+	if ((tcloo->foundTclOONamespaceImported
+		 && (strcmp (command, "class") == 0))
+		|| (strcmp (command, "oo::class") == 0))
+		r = parseClass (s, parentIndex);
+
+	return r;
+}
+
+static void namespaceImportNotify (tclSubparser *s, char *namespace)
+{
+	struct tclooSubparser *tcloo = (struct tclooSubparser *)s;
+
+	if (strcmp(namespace, "oo::*") == 0
+		|| strcmp(namespace, "oo::class") == 0)
+		tcloo->foundTclOONamespaceImported = true;
+}
+
+static void inputStart (subparser *s)
+{
+	struct tclooSubparser *tcloo = (struct tclooSubparser *)s;
+
+	tcloo->foundTclOONamespaceImported = false;
+}
+
+struct tclooSubparser tclooSubparser = {
+	.tcl = {
+		.subparser = {
+			.direction = SUBPARSER_BI_DIRECTION,
+			.inputStart = inputStart,
+		},
+		.commandNotify = commandNotify,
+		.namespaceImportNotify = namespaceImportNotify,
+	},
+};
+
+static void findTclOOTags(void)
+{
+	scheduleRunningBaseparser (RUN_DEFAULT_SUBPARSERS);
+}
+
+extern parserDefinition* TclOOParser (void)
+{
+	parserDefinition* const def = parserNew("TclOO");
+
+	static parserDependency dependencies [] = {
+		[0] = { DEPTYPE_SUBPARSER, "Tcl", &tclooSubparser },
+	};
+
+	def->dependencies = dependencies;
+	def->dependencyCount = ARRAY_SIZE (dependencies);
+
+	def->kindTable = TclOOKinds;
+	def->kindCount = ARRAY_SIZE(TclOOKinds);
+
+	def->parser = findTclOOTags;
+	def->useCork = true;
+	def->requestAutomaticFQTag = true;
+
+	return def;
+}
