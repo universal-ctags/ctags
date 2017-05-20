@@ -1,0 +1,2 @@
+HAVE_CONFDB	input.ac	/^AC_DEFINE_UNQUOTED(HAVE_CONFDB, $HAVE_confdb, Have the old herarchial Corosync config API)$/;"	d
+UUID_FILE	input.ac	/^AC_DEFINE_UNQUOTED(UUID_FILE,"$localstatedir\/lib\/heartbeat\/hb_uuid", I'm a bad boy.)$/;"	d
