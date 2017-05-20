@@ -251,6 +251,9 @@ FNMATCH_HEADS = fnmatch/fnmatch.h
 FNMATCH_SRCS = fnmatch/fnmatch.c
 FNMATCH_OBJS = $(FNMATCH_SRCS:.c=.$(OBJEXT))
 
+WIN32_SRCS = win32/mkstemp/mkstemp.c
+WIN32_OBJS = $(WIN32_SRCS:.c=.$(OBJEXT))
+
 QUALIFIER_HEADS = dsl/es-lang-c-stdc99.h \
 		 dsl/qualifier.h \
 		 \

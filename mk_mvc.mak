@@ -16,7 +16,8 @@ INCLUDES = -I. -Imain -Ignu_regex -Ifnmatch -Iparsers
 OPT = /O2
 REGEX_OBJS = $(REGEX_SRCS:.c=.obj)
 FNMATCH_OBJS = $(FNMATCH_SRCS:.c=.obj)
-ALL_OBJS = $(ALL_SRCS:.c=.obj) $(REGEX_OBJS) $(FNMATCH_OBJS)
+WIN32_OBJS = $(WIN32_SRCS:.c=.obj)
+ALL_OBJS = $(ALL_SRCS:.c=.obj) $(REGEX_OBJS) $(FNMATCH_OBJS) $(WIN32_OBJS)
 READTAGS_OBJS = $(READTAGS_SRCS:.c=.obj)
 
 !if "$(WITH_ICONV)" == "yes"
@@ -51,6 +52,8 @@ PDBFLAG =
 	$(CC) $(OPT) $(DEFINES) $(INCLUDES) /Foparsers\cxx\ /c $<
 {read}.c{read}.obj::
 	$(CC) $(OPT) $(DEFINES) $(INCLUDES) /Foread\ /c $<
+{win32\mkstemp}.c{win32\mkstemp}.obj::
+	$(CC) $(OPT) $(DEFINES) $(INCLUDES) /Fowin32\mkstemp\ /c $<
 
 all: ctags.exe readtags.exe
 
@@ -72,6 +75,6 @@ main\repoinfo.obj: main\repoinfo.c main\repoinfo.h
 
 
 clean:
-	- del *.obj main\*.obj optlib\*.obj parsers\*.obj parsers\cxx\*.obj gnu_regex\*.obj fnmatch\*.obj read\*.obj main\repoinfo.h
+	- del *.obj main\*.obj optlib\*.obj parsers\*.obj parsers\cxx\*.obj gnu_regex\*.obj fnmatch\*.obj read\*.obj win32\mkstemp\*.obj main\repoinfo.h
 	- del ctags.exe readtags.exe
 	- del tags

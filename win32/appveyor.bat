@@ -122,7 +122,8 @@ if "%APPVEYOR_REPO_TAG_NAME%"=="" (
 ) else (
   set ver=%APPVEYOR_REPO_TAG_NAME%
 )
-7z a ctags-%ver%-%ARCH%.zip ctags.exe readtags.exe iconv.dll COPYING docs README.md
+copy win32\mkstemp\COPYING.MinGW-w64-runtime.txt . > nul
+7z a ctags-%ver%-%ARCH%.zip ctags.exe readtags.exe iconv.dll COPYING COPYING.MinGW-w64-runtime.txt docs README.md
 7z a ctags-%ver%-%ARCH%.pdb.zip ctags.pdb readtags.pdb
 goto :eof
 
