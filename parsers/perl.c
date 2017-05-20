@@ -528,6 +528,7 @@ static void findPerlTags (void)
 					initTagEntry (&fqe, vStringValue (qualifiedName),
 						      PerlKinds + kind);
 					markTagExtraBit (&fqe, XTAG_QUALIFIED_TAGS);
+					makeTagEntry (&fqe);
 					vStringDelete (qualifiedName);
 				}
 			}
