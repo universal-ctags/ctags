@@ -2032,7 +2032,7 @@ static bool processLangDefineKind(const langType language,
 	tmp_start = p;
 	while (p != tmp_end)
 	{
-		if (!isgraph (*p))
+		if (!isalnum (*p))
 			error (FATAL, "unacceptable char as part of kind name in \"--%s\" option", option);
 		p++;
 	}
@@ -2064,7 +2064,7 @@ static bool processLangDefineKind(const langType language,
 	return true;
 }
 
-extern bool processDefineKind (const char *const option, const char * const parameter)
+extern bool processKinddefOption (const char *const option, const char * const parameter)
 {
 	langType language;
 
@@ -2086,7 +2086,7 @@ static void processLangKindDefinitionEach(
 	processLangKindDefinition (lang, arg->option, arg->parameter);
 }
 
-extern bool processKindDefinition (
+extern bool processKindsOption (
 		const char *const option, const char *const parameter)
 {
 #define PREFIX "kinds-"

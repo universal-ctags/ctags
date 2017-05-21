@@ -92,7 +92,7 @@ void  flagPrintHelp (flagDefinition* def, unsigned int ndefs)
 		paramName = def[i].paramName;
 
 		if (def[i].shortChar == '\0')
-			strcpy (shortChar, "\\0");
+			strcpy (shortChar, "-");
 		else
 		{
 			shortChar[0] = def[i].shortChar;

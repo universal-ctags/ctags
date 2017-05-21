@@ -2,6 +2,6 @@ b	basic	interpreted as a Posix basic regular expression.
 e	extend	interpreted as a Posix extended regular expression (default)
 i	icase	applied in a case-insensitive manner
 x	exclusive	skip testing the other patterns if a line is matched to this pattern
-\0	scope=ACTION	use scope stack: ACTION = ref|push|pop|clear|set
-\0	placeholder	don't put this tag to tags file.
-\0	_multiline	match in muletline mode. cannot be combined with scope, placeholder, and exclusive
+-	scope=ACTION	use scope stack: ACTION = ref|push|pop|clear|set
+-	placeholder	don't put this tag to tags file.
+-	_multiline=NGROUP	match in multiline mode. cannot be combined with scope, placeholder, and exclusive

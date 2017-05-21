@@ -16,6 +16,7 @@
 #include "types.h"
 
 #include <stdio.h>
+#include <stdint.h>
 
 #include "field.h"
 #include "kind.h"
@@ -58,7 +59,7 @@ struct sTagEntryInfo {
 	const char *inputFileName;   /* name of input file */
 	const char *name;             /* name of the tag */
 	const kindDefinition *kind;	      /* kind descriptor */
-	unsigned char extra[ ((XTAG_COUNT) / 8) + 1 ];
+	uint8_t extra[ ((XTAG_COUNT) / 8) + 1 ];
 
 	struct {
 		const char* access;

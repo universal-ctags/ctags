@@ -500,7 +500,7 @@ Multiline pattern match
 
 .. NOT REVIEWED YET
 
-A pattern marked with `_multiline` is applied to whole file contents,
+A pattern marked with ``_multiline`` is applied to whole file contents,
 not line by line.
 
 Next example is based on an issue #219 posted by @andreicristianpetcu::
@@ -531,10 +531,10 @@ Next example is based on an issue #219 posted by @andreicristianpetcu::
     Event-SomeEvent	input.java	/^public void catchEvent(SomeEvent e)$/;"	s	line:2	language:javaspring
     recover-Exception	input.java	/^    recover(Exception e)$/;"	s	line:10	language:javaspring
 
-`{_multiline=N}`
+``{_multiline=N}``
 
 	This tells the patern should be applied to whole file
-	contents, not line by line.  `N` is the number of a group in the
+	contents, not line by line.  ``N`` is the number of a group in the
 	pattern. The specified group is used to record the line number
 	and the pattern of tag. In the above example 3 is
 	specified. The start position of the group 3 within the whole
