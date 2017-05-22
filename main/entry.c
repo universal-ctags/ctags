@@ -817,8 +817,8 @@ extern void getTagScopeInformation (tagEntryInfo *const tag,
 
 
 static int   makePatternStringCommon (const tagEntryInfo *const tag,
-				      int putc_func (char , void *),
-				      int puts_func (const char* , void *),
+				      int (* putc_func) (char , void *),
+				      int (* puts_func) (const char* , void *),
 				      void *output)
 {
 	int length = 0;

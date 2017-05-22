@@ -121,9 +121,9 @@ extern void toUpperString (char* str);
 extern char* newLowerString (const char* str);
 extern char* newUpperString (const char* str);
 extern bool strToUInt(const char *const str, int base, unsigned int *value);
-extern bool strToULong(const char *string, int base, unsigned long *value);
+extern bool strToULong(const char *const string, int base, unsigned long *value);
 extern bool strToInt(const char *const str, int base, int *value);
-extern bool strToLong(const char *string, int base, long *value);
+extern bool strToLong(const char *const string, int base, long *value);
 
 /* File system functions */
 extern void setCurrentDirectory (void);

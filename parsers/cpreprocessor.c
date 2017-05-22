@@ -1256,7 +1256,7 @@ static hashTable * defineMacroTable;
 
 /*  Determines whether or not "name" should be ignored, per the ignore list.
  */
-extern const cppMacroInfo * cppFindMacro(const char * name)
+extern const cppMacroInfo * cppFindMacro(const char *const name)
 {
 	if(!defineMacroTable)
 		return NULL;

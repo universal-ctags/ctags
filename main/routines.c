@@ -556,7 +556,7 @@ static char *strRSeparator (const char *s)
 		last = s;
 		s++;
 	}
-	return last;
+	return (char*) last;
 #else
 	return strrchr (s, PATH_SEPARATOR);
 #endif

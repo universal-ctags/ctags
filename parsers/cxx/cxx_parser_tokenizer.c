@@ -1061,7 +1061,7 @@ static void cxxParserParseNextTokenApplyReplacement(
 	if(pParameters)
 	{
 		cxxTokenChainDestroy(pParameters);
-		eFree(aParameters);
+		eFree((char**)aParameters);
 	}
 
 	CXX_DEBUG_PRINT("Applying complex replacement '%s'",vStringValue(pReplacement));
