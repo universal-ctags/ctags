@@ -445,7 +445,7 @@
       <Filter>Source Files\Parsers</Filter>
     </ClCompile>
     <ClCompile Include="..\parsers\tcloo.c">
-      <Filter>Source Files\Main</Filter>
+      <Filter>Source Files\Parsers</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
