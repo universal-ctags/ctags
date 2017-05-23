@@ -915,7 +915,7 @@ pickLanguageBySelection (selectLanguage selector, MIO *input,
 
 static int compareParsersByName (const void *a, const void* b)
 {
-	parserDefinition *const *la = a, *const *lb = b;
+	const parserDefinition *const *la = a, *const *lb = b;
 	return strcasecmp ((*la)->name, (*lb)->name);
 }
 

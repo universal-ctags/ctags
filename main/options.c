@@ -2519,7 +2519,7 @@ static void processPatternLengthLimit(const char *const option, const char *cons
 		error (FATAL, "-%s: Invalid pattern length limit", option);
 }
 
-static bool* redirectToXtag(const booleanOption *const option)
+static bool* redirectToXtag(booleanOption *const option)
 {
 	/* WARNING/TODO: This function breaks capsulization. */
 	xtagType t = (xtagType)option->pValue;
