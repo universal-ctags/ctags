@@ -52,6 +52,10 @@ If you want to build a debug version using ``mk_mvc.mak``, you must specify ``DE
 
         nmake -f mk_mvc.mak DEBUG=1
 
+If you want to create PDB files for debugging even for a release version, you must specify ``PDB=1`` like below::
+
+        nmake -f mk_mvc.mak PDB=1
+
 GCC
 .............................................................................
 
@@ -76,7 +80,7 @@ If you want to build a debug version, you must specify ``DEBUG=1`` like below::
 
         make -f mk_mingw.mak DEBUG=1
 
-**MSYS**
+**MSYS / MSYS2**
 
 From their site: MSYS is a collection of GNU utilities such as bash, make, gawk and grep to allow building of applications and programs which depend on traditional UNIX tools to be present. It is intended to supplement MinGW and the deficiencies of the cmd shell.
 
@@ -85,6 +89,7 @@ MSYS comes in two flavors. The original from MinGW and a MSYS2 http://sourceforg
 MSYS is old but still works. You can build ctags with it using ``make -f mk_mingw.mak``. The Autotools are too old on MSYS so you cannot use them.
 
 MSYS2 is a more maintained version of MSYS, but specially geared towards MinGW-w64. You can also use Autotools to build ctags.
+If you use Autotools you can enable parsers which require libxml2 or libyaml, and can also do the Units testing with `make units`.
 
 **Cygwin**
 
@@ -121,7 +126,7 @@ Microsoft Visual Studio
 
 As already mentioned Microsoft Visual Studio 2013 has the free Express and Community editions. For ctags the Windows Desktop Express Edition is enough to get the job done. The IDE has a proper debugger. Project files for VS2013 can be found in the win32 directory.
 
-Please know that when files are added to the sources.mak, these files need to be added to the .vcproj and .vcproj.filters files as well. The XML of these files should not be a problem.
+Please know that when files are added to the sources.mak, these files need to be added to the .vcxproj and .vcxproj.filters files as well. The XML of these files should not be a problem.
 
 Code::Blocks
 .............................................................................
