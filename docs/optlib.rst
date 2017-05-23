@@ -533,7 +533,7 @@ Next example is based on an issue #219 posted by @andreicristianpetcu::
 
 ``{_multiline=N}``
 
-	This tells the patern should be applied to whole file
+	This tells the pattern should be applied to whole file
 	contents, not line by line.  ``N`` is the number of a group in the
 	pattern. The specified group is used to record the line number
 	and the pattern of tag. In the above example 3 is

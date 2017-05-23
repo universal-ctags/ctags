@@ -80,6 +80,6 @@ i
 b
 	boolean
 
-For exapmle, The value for "inherits" field is represented in the string or boolean type.
+For example, The value for "inherits" field is represented in the string or boolean type.
 
 	
