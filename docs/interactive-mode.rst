@@ -4,7 +4,7 @@
 ``--_interactive`` Mode
 ======================================================================
 
-Universtal ctags can be run with ``--_interactive``, which enters a REPL that
+Universal ctags can be run with ``--_interactive``, which enters a REPL that
 can be used programatically to control ctags generation. In this mode, json
 commands are received over stdin, and corresponding responses are emitted over
 stdout.

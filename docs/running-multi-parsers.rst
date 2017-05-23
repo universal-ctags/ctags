@@ -735,7 +735,7 @@ In addition `bin` is tagged as directory, and `ctags` as program of Automake.
 
 `--extras=+r` is used in the example. `r` extra is needed to
 tag `bin`. `bin` is not defined in the line, `bin_PROGRAMS =`.
-`bin` is referenced as a name of directory where prgorams are
+`bin` is referenced as a name of directory where programs are
 stored. Therefore `r` is needed.
 
 For tagging `ctags`, the Automake parser must recognize

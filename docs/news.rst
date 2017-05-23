@@ -641,7 +641,7 @@ the consistency of dynamically defined kinds in a language.
 A kind letter defined with ``--kinddef-<LANG>`` can be referred in
 ``--kinddef-<LANG>``.
 
-Previsouly you had to write in your optlib::
+Previously you had to write in your optlib::
 
     --regex-elm=/^([[:lower:]_][[:alnum:]_]*)[^=]*=$/\1/f,function,Functions/{scope=set}
     --regex-elm=/^[[:blank:]]+([[:lower:]_][[:alnum:]_]*)[^=]*=$/\1/f,function,Functions/{scope=ref}
@@ -718,7 +718,7 @@ The output is change as follows with `linux` parser:
 Using only `--regex-C=...` you can capture `setpriority`.
 However, there were concerns about kind confliction; when introducing
 a new kind with `--regex-C=...`, you cannot use a letter and name already
-used in C parser and `--regex-C=...` options sepcified in the other places.
+used in C parser and `--regex-C=...` options specified in the other places.
 
 You can use a newly defined subparser as a new namespace of kinds.
 In addition you can enable/disable with the subparser usable

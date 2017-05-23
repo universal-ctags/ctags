@@ -24,7 +24,7 @@ It handles HTML comments correctly and in addition to existing tags it extracts
 also <h1>, <h2> and <h3> headings. It should be reasonably simple to add new
 tag types.
 
-Finally, the parser uses the new funtionality of universal-ctags to use another
+Finally, the parser uses the new functionality of universal-ctags to use another
 parser for parsing other languages within a host language. This is used for
 parsing JavaScript within <script> tags and CSS within <style> tags. This
 simplifies the parser and generates much better results than having a simplified
