@@ -1603,6 +1603,7 @@ extern void initializeParsing (void)
 								   hashCstrcaseeq,
 								   NULL,
 								   NULL);
+	DEFAULT_TRASH_BOX(LanguageHTable, hashTableDelete);
 
 	verbose ("Installing parsers: ");
 	for (i = 0  ;  i < builtInCount  ;  ++i)
