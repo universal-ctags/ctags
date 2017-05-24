@@ -48,14 +48,14 @@ my $options =
 	   $_[0]->{'base'} = $3 if defined $3;
        } ],
      [ qr/^--kinddef-(.*)=([^,]),([^,]+),(.*)/, sub {
-	 die "Don't use --kinddef-<LANG>=+ optoin before defining a language"
+	 die "Don't use --kinddef-<LANG>=+ option before defining the language"
 	     if (! defined $_[0]->{'langdef'});
 	 die "Adding a kind is allowed only to the language specified with --langdef: $1"
 	   unless ($_[0]->{'langdef'} eq $1);
 	 push @{$_[0]->{'kinddefs'}}, { letter => $2, name => $3, desc => $4 };
        } ],
      [ qr/^--languages=-(.*)/, sub {
-	   die "Don't use --languages=- optoin before defining a language"
+	   die "Don't use --languages=- option before defining the language"
 	       if (! defined $_[0]->{'langdef'});
 	   die "Only language specified with --langdef can be disabled: $1"
 	       unless ($_[0]->{'langdef'} eq $1);
@@ -65,7 +65,7 @@ my $options =
 	   die "--languages can be used only for disabling a language defined with --langdef: $1";
        } ],
      [ qr/^--map-([^=]*)=\+(.*)/, sub {
-	   die "Don't use --map-<LANG>=+ optoin before defining a language"
+	   die "Don't use --map-<LANG>=+ option before defining the language"
 	       if (! defined $_[0]->{'langdef'});
 	   die "Adding a map is allowed only to the language specified with --langdef: $1"
 	       unless ($_[0]->{'langdef'} eq $1);
@@ -82,7 +82,7 @@ my $options =
 	   die "map manipulation other than the appending(--map-<LANG>=+...) is not supported";
        } ],
      [ qr /^--alias-([^=]*)=\+(.*)/, sub {
-	   die "Don't use --alias-<LANG>=+ optoin before defining a language"
+	   die "Don't use --alias-<LANG>=+ option before defining the language"
 	       if (! defined $_[0]->{'langdef'});
 	   die "Adding an alias is allowed only to the language specified with --langdef: $1"
 	       unless ($_[0]->{'langdef'} eq $1);
@@ -92,22 +92,22 @@ my $options =
 	   die "alias manipulation other than the appending(--alias-<LANG>=+...) is not supported";
        } ],
      [ qr/^--regex-([^=]*)=(.*)/, sub {
-	   die "Don't use --regex-<LANG>= optoin before defining a language"
+	   die "Don't use --regex-<LANG>= option before defining the language"
 	       if (! defined $_[0]->{'langdef'});
 	   die "Adding a regex is allowed only to the language specified with --langdef: $1"
 	       unless ($_[0]->{'langdef'} eq $1);
 	   parse_regex ($2, $_[0]);
        } ],
      [ qr/^--kinds-([^=]*)=-(.*)/, sub {
-	   die "Don't use --kind-<LANG>= optoin before defining a language"
+	   die "Don't use --kind-<LANG>= option before defining the language"
 	       if (! defined $_[0]->{'langdef'});
 	   parse_kinds ($2, $_[0]);
        } ],
      [ qr/^--kinds-([^=]*)=(.*)/, sub {
 	   die "--kinds-<LANG>= can be used only for disabling a kind: $1";
        } ],
-     [ qr/^--xcmd-([^=]*)=([^{]*)({.*)?/, sub {
-	   die "Don't use --xcmd-<LANG>= optoin before defining a language"
+     [ qr/^--xcmd-([^=]*)=([^{]*)(\{.*)?/, sub {
+	   die "Don't use --xcmd-<LANG>= option before defining the language"
 	       if (! defined $_[0]->{'langdef'});
 	   die "Adding a xcmd is allowed only to the language specified with --langdef: $1"
 	       unless ($_[0]->{'langdef'} eq $1);
@@ -117,10 +117,10 @@ my $options =
 	   die "Use --map-<LANG> option instead of --langmap";
        } ],
      [ qr/^-.*/, sub {
-	   die "Unhandled option: $&";
+	   die "Unhandled option: \"$&\"";
        } ],
      [ qr/.*/, sub {
-	   die "Unhandled argument: $&";
+	   die "Unhandled argument: \"$&\"";
        } ],
     ];
 
