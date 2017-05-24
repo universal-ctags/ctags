@@ -117,11 +117,20 @@ bash -lc "make check APPVEYOR=1"
 goto :eof
 
 :msvc_msys2_package
+:: Build html docs
+bash -lc "for i in {1..3}; do pacman --noconfirm -Su mingw-w64-%MSYS2_ARCH%-python3-sphinx && break || sleep 15; done"
+bash -lc "cd docs; make html"
+move docs\_build\html docs > nul
+rd /s/q docs\_build
+
+:: Get version
 if "%APPVEYOR_REPO_TAG_NAME%"=="" (
   for /f %%i in ('git rev-parse --short HEAD') do set ver=%%i
 ) else (
   set ver=%APPVEYOR_REPO_TAG_NAME%
 )
+
+:: Create zip package
 copy win32\mkstemp\COPYING.MinGW-w64-runtime.txt . > nul
 7z a ctags-%ver%-%ARCH%.zip ctags.exe readtags.exe iconv.dll COPYING COPYING.MinGW-w64-runtime.txt docs README.md
 7z a ctags-%ver%-%ARCH%.pdb.zip ctags.pdb readtags.pdb

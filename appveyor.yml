@@ -11,7 +11,7 @@ environment:
       MSYSTEM: MINGW64
     - compiler: msvc_msys2
       ARCH: x86
-      MSYS2_ARCH: x86
+      MSYS2_ARCH: i686
       MSYS2_DIR: msys64
       MSYSTEM: MINGW32
     - compiler: mingw
