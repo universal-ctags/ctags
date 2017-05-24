@@ -900,6 +900,7 @@ static bool cxxParserParseNextTokenCondenseAttribute(void)
 			CXXTokenTypeOpeningParenthesis |
 				CXXTokenTypeOpeningSquareParenthesis |
 				CXXTokenTypeOpeningBracket,
+			false,
 			false
 		))
 	{
@@ -996,6 +997,7 @@ static bool cxxParserParseNextTokenSkipMacroParenthesis(CXXToken ** ppChain)
 
 	if(!cxxParserParseAndCondenseCurrentSubchain(
 			CXXTokenTypeOpeningParenthesis,
+			false,
 			false
 		))
 	{

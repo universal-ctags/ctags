@@ -173,7 +173,8 @@ bool cxxParserParseNamespace(void)
 				if(!cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeOpeningBracket))
 				{
 					if(!cxxParserParseUpToOneOf(
-							CXXTokenTypeOpeningBracket | CXXTokenTypeSemicolon | CXXTokenTypeEOF
+							CXXTokenTypeOpeningBracket | CXXTokenTypeSemicolon | CXXTokenTypeEOF,
+							false
 						))
 					{
 						CXX_DEBUG_LEAVE_TEXT("Failed to parse up to an opening bracket");

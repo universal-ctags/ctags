@@ -32,7 +32,8 @@ bool cxxParserParseGenericTypedef(void)
 	{
 		if(!cxxParserParseUpToOneOf(
 				CXXTokenTypeSemicolon | CXXTokenTypeEOF |
-				CXXTokenTypeClosingBracket | CXXTokenTypeKeyword
+				CXXTokenTypeClosingBracket | CXXTokenTypeKeyword,
+				false
 			))
 		{
 			CXX_DEBUG_LEAVE_TEXT("Failed to parse fast statement");

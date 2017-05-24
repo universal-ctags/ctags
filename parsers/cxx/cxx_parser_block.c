@@ -93,7 +93,8 @@ bool cxxParserParseBlockHandleOpeningBracket(void)
 		bool bRet = cxxParserParseAndCondenseCurrentSubchain(
 				CXXTokenTypeOpeningBracket | CXXTokenTypeOpeningParenthesis |
 					CXXTokenTypeOpeningSquareParenthesis,
-				false
+				false,
+				true
 			);
 
 		CXX_DEBUG_LEAVE_TEXT("Handled array or list-like initialisation or return");
@@ -206,7 +207,7 @@ process_token:
 					case CXXKeywordNAMESPACE:
 					{
 						enum CXXScopeType eScopeType = cxxScopeGetType();
-						
+
 						if(
 								(
 									// toplevel or nested within a namespace
@@ -345,7 +346,8 @@ process_token:
 							g_cxx.uKeywordState |= CXXParserKeywordStateSeenReturn;
 						} else {
 							// ignore
-							if(!cxxParserParseUpToOneOf(CXXTokenTypeSemicolon | CXXTokenTypeEOF))
+							if(!cxxParserParseUpToOneOf(CXXTokenTypeSemicolon | CXXTokenTypeEOF,
+								   false))
 							{
 								CXX_DEBUG_LEAVE_TEXT("Failed to parse return");
 								return false;
@@ -357,7 +359,8 @@ process_token:
 					case CXXKeywordBREAK:
 					case CXXKeywordGOTO:
 						// ignore
-						if(!cxxParserParseUpToOneOf(CXXTokenTypeSemicolon | CXXTokenTypeEOF))
+						if(!cxxParserParseUpToOneOf(CXXTokenTypeSemicolon | CXXTokenTypeEOF,
+							   false))
 						{
 							CXX_DEBUG_LEAVE_TEXT("Failed to parse continue/break/goto");
 							return false;
@@ -368,7 +371,8 @@ process_token:
 						// ignore when inside a function
 						if(cxxScopeGetType() == CXXScopeTypeFunction)
 						{
-							if(!cxxParserParseUpToOneOf(CXXTokenTypeSemicolon | CXXTokenTypeEOF))
+							if(!cxxParserParseUpToOneOf(CXXTokenTypeSemicolon | CXXTokenTypeEOF,
+								   false))
 							{
 								CXX_DEBUG_LEAVE_TEXT("Failed to parse return/continue/break");
 								return false;
@@ -379,7 +383,8 @@ process_token:
 					case CXXKeywordCASE:
 						// ignore
 						if(!cxxParserParseUpToOneOf(
-								CXXTokenTypeSemicolon | CXXTokenTypeEOF | CXXTokenTypeSingleColon
+								CXXTokenTypeSemicolon | CXXTokenTypeEOF | CXXTokenTypeSingleColon,
+								false
 							))
 						{
 							CXX_DEBUG_LEAVE_TEXT("Failed to parse case keyword");
@@ -564,7 +569,8 @@ process_token:
 				if(!cxxParserParseAndCondenseCurrentSubchain(
 						CXXTokenTypeOpeningBracket | CXXTokenTypeOpeningParenthesis |
 							CXXTokenTypeOpeningSquareParenthesis,
-						true
+						true,
+						false
 					))
 				{
 					CXX_DEBUG_LEAVE_TEXT("Parsing the parenthesis failed");

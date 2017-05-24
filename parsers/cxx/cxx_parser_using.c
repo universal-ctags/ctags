@@ -37,7 +37,8 @@ bool cxxParserParseUsingClause(void)
 
 	// skip to the next ; without leaving scope.
 	if(!cxxParserParseUpToOneOf(
-			CXXTokenTypeSemicolon | CXXTokenTypeClosingBracket | CXXTokenTypeEOF
+			CXXTokenTypeSemicolon | CXXTokenTypeClosingBracket | CXXTokenTypeEOF,
+			false
 		))
 	{
 		CXX_DEBUG_LEAVE_TEXT("Failed to parse up to the next ;");
