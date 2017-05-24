@@ -106,7 +106,7 @@ my $options =
      [ qr/^--kinds-([^=]*)=(.*)/, sub {
 	   die "--kinds-<LANG>= can be used only for disabling a kind: $1";
        } ],
-     [ qr/^--xcmd-([^=]*)=([^{]*)({.*)?/, sub {
+     [ qr/^--xcmd-([^=]*)=([^{]*)(\{.*)?/, sub {
 	   die "Don't use --xcmd-<LANG>= option before defining the language"
 	       if (! defined $_[0]->{'langdef'});
 	   die "Adding a xcmd is allowed only to the language specified with --langdef: $1"
