@@ -31,6 +31,7 @@
 #include "routines.h"
 #include "subparser.h"
 #include "trace.h"
+#include "trashbox.h"
 #include "vstring.h"
 #ifdef HAVE_ICONV
 # include "mbcs.h"
@@ -1490,10 +1491,10 @@ static void installXtagDefinition (const langType language)
 	Assert (0 <= language  &&  language < (int) LanguageCount);
 	parser = LanguageTable [language].def;
 
-	if (parser->xtagDefinitions != NULL)
+	if (parser->xtagTable != NULL)
 	{
-		for (i = 0; i < parser->xtagDefinitionCount; i++)
-			defineXtag (& parser->xtagDefinitions [i], language);
+		for (i = 0; i < parser->xtagCount; i++)
+			defineXtag (& parser->xtagTable [i], language);
 	}
 }
 
@@ -2852,11 +2853,15 @@ extern bool parseFileWithMio (const char *const fileName, MIO *mio)
 
 		setupAnon ();
 
+		initParserTrashBox ();
+
 		tagFileResized = createTagsWithFallback (fileName, language, req.mio);
 #ifdef HAVE_COPROC
 		if (LanguageTable [language].def->method & METHOD_XCMD_AVAILABLE)
 			tagFileResized = createTagsWithXcmd (fileName, language, req.mio)? true: tagFileResized;
 #endif
+
+		finiParserTrashBox ();
 
 		teardownAnon ();
 

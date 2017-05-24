@@ -11,6 +11,7 @@
 
 #include <string.h>
 
+#include "entry.h"
 #include "parse.h"
 #include "vstring.h"
 #include "routines.h"
@@ -89,6 +90,16 @@ static void changeSection (const char *const line, const regexMatch *const match
     }
 }
 
+static void makeSimpleXTag (const vString* const name, kindDefinition* const kinds, const int kind,
+							unsigned int xtagType)
+{
+	tagEntryInfo e;
+
+	initTagEntry (&e, vStringValue(name), kinds + kind);
+	markTagExtraBit (&e, xtagType);
+	makeTagEntry (&e);
+}
+
 static void tagKeywordsAndTestCases (const char *const line, const regexMatch *const matches,
                                const unsigned int count, void *data)
 {
@@ -99,7 +110,8 @@ static void tagKeywordsAndTestCases (const char *const line, const regexMatch *c
         makeSimpleTag (name, RobotKinds, section);
         if (isXtagEnabled (RobotXtags[X_WHITESPACE_SWAPPED].xtype)
 			&& whitespaceSwap(name))
-			makeSimpleTag (name, RobotKinds, section);
+			makeSimpleXTag (name, RobotKinds, section,
+							RobotXtags[X_WHITESPACE_SWAPPED].xtype);
         vStringDelete (name);
     }
 }
@@ -114,7 +126,8 @@ static void tagVariables (const char *const line, const regexMatch *const matche
         makeSimpleTag (name, RobotKinds, K_VARIABLE);
         if (isXtagEnabled (RobotXtags[X_WHITESPACE_SWAPPED].xtype)
 			&& whitespaceSwap(name))
-			makeSimpleTag (name, RobotKinds, K_VARIABLE);
+			makeSimpleXTag (name, RobotKinds, K_VARIABLE,
+							RobotXtags[X_WHITESPACE_SWAPPED].xtype);
         vStringDelete (name);
     }
 }
@@ -138,7 +151,7 @@ extern parserDefinition* RobotParser (void)
 	def->extensions = extensions;
 	def->initialize = initialize;
     def->parser     = findRobotTags;
-	def->xtagDefinitions = RobotXtags;
-	def->xtagDefinitionCount = ARRAY_SIZE (RobotXtags);
+	def->xtagTable = RobotXtags;
+	def->xtagCount = ARRAY_SIZE (RobotXtags);
 	return def;
 }

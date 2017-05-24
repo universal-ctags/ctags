@@ -97,8 +97,8 @@ struct sParserDefinition {
 	bool invisible;
 	fieldDefinition *fieldDefinitions;
 	unsigned int fieldDefinitionCount;
-	xtagDefinition *xtagDefinitions;
-	unsigned int xtagDefinitionCount;
+	xtagDefinition *xtagTable;
+	unsigned int xtagCount;
 
 	parserDependency * dependencies;
 	unsigned int dependencyCount;

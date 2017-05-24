@@ -26,6 +26,7 @@ struct sTrashBox {
 };
 
 static TrashBox* defaultTrashBox;
+static TrashBox* parserTrashBox;
 
 static Trash* trashPut (Trash* trash, void* item,
 			TrashDestroyItemProc destrctor);
@@ -174,6 +175,27 @@ extern void finiDefaultTrashBox (void)
 {
 	trashBoxDelete (defaultTrashBox);
 	defaultTrashBox = NULL;
+}
+
+extern void initParserTrashBox (void)
+{
+	parserTrashBox = trashBoxNew ();
+}
+
+extern void finiParserTrashBox  (void)
+{
+	trashBoxDelete (parserTrashBox);
+	parserTrashBox = NULL;
+}
+
+extern void* parserTrashBoxPut  (void* item, TrashBoxDestroyItemProc destroy)
+{
+	return trashBoxPut(parserTrashBox, item, destroy);
+}
+
+extern TrashBoxDestroyItemProc parserTrashBoxTakeBack  (void* item)
+{
+	return trashBoxTakeBack(parserTrashBox, item);
 }
 
 #ifdef TRASH_TEST
