@@ -1509,10 +1509,14 @@ static void initializeParserOne (langType lang)
 	parser->initialized = true;
 
 	installKeywordTable (lang);
-	installTagRegexTable (lang);
 	installTagXpathTable (lang);
 	installFieldDefinition     (lang);
 	installXtagDefinition      (lang);
+
+	/* regex definitions refers xtag definitions.
+	   So installing RegexTable must be after installing
+	   xtag definitions. */
+	installTagRegexTable (lang);
 
 	if (hasLanguageScopeActionInRegex (lang)
 	    || parser->def->requestAutomaticFQTag)

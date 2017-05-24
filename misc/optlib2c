@@ -54,6 +54,13 @@ my $options =
 	   unless ($_[0]->{'langdef'} eq $1);
 	 push @{$_[0]->{'kinddefs'}}, { letter => $2, name => $3, desc => $4 };
        } ],
+     [ qr/^--extradef-(.*)=([^,]+),(.+)/, sub {
+	 die "Don't use --extradef-<LANG>=+ option before defining the language"
+	     if (! defined $_[0]->{'langdef'});
+	 die "Adding an extra is allowed only to the language specified with --langdef: $1"
+	     unless ($_[0]->{'langdef'} eq $1);
+	 push @{$_[0]->{'extradefs'}}, { name => $2, desc => $3 };
+       } ],
      [ qr/^--languages=-(.*)/, sub {
 	   die "Don't use --languages=- option before defining the language"
 	       if (! defined $_[0]->{'langdef'});
@@ -105,6 +112,21 @@ my $options =
        } ],
      [ qr/^--kinds-([^=]*)=(.*)/, sub {
 	   die "--kinds-<LANG>= can be used only for disabling a kind: $1";
+       } ],
+     [ qr/^--extras-([^=]*)=([-+])\{(.+)\}$/, sub {
+	   die "Don't use --kind-<LANG>= option before defining the language"
+	       if (! defined $_[0]->{'langdef'});
+	   die "Enabling/disabling an extra is allowed only to the language specified with --langdef: $1"
+	       unless ($_[0]->{'langdef'} eq $1);
+	   die "Specifing multiple extras in one --extras-... is not handled: {$3}"
+	       if ( index ($3, '{') != -1 );
+	   parse_extras ($2, $3, $_[0]);
+       } ],
+     [ qr/^--extras-([^=]*)=\{/, sub {
+	 die "--extras-<LANG>= can be used only for enabling or disabling an extra: $1";
+       } ],
+     [ qr/^--extras-([^=]*)=(.)\{/, sub {
+	 die "Unknown flag($2) is passed to --extras-<LANG>= option";
        } ],
      [ qr/^--xcmd-([^=]*)=([^{]*)(\{.*)?/, sub {
 	   die "Don't use --xcmd-<LANG>= option before defining the language"
@@ -391,6 +413,28 @@ EOF
 
 }
 
+sub emit_xtags {
+    my $opts = shift;
+
+    return if (! @{$opts->{'extradefs'}});
+
+    print <<EOF;
+	static xtagDefinition $opts->{'Clangdef'}XtagTable [] = {
+EOF
+    for (@{$opts->{'extradefs'}}) {
+      print <<EOF;
+		{
+		  .enabled     = false,
+		  .name        = "$_->{'name'}",
+		  .description = "$_->{'desc'}",
+		},
+EOF
+    }
+    print <<EOF;
+	};
+EOF
+}
+
 sub emit_fields_initialization {
     my $opts = shift;
     my $enabled = $opts->{"disabled"} ? "false": "true";
@@ -416,6 +460,13 @@ EOF
 	print <<EOF;
 	def->kindTable = $opts->{'Clangdef'}KindTable;
 	def->kindCount = ARRAY_SIZE($opts->{'Clangdef'}KindTable);
+EOF
+    }
+
+    if (@{$opts->{'extradefs'}}) {
+	print <<EOF;
+	def->xtagTable = $opts->{'Clangdef'}XtagTable;
+	def->xtagCount = ARRAY_SIZE($opts->{'Clangdef'}XtagTable);
 EOF
     }
 
@@ -454,6 +505,7 @@ EOF
     emit_aliases         $opts;
     emit_patterns        $opts;
     emit_kinddefs        $opts;
+    emit_xtags           $opts;
     emit_regexs          $opts;
     emit_dependencies    $opts;
 
@@ -524,6 +576,8 @@ sub main {
 			 ],
 		kinddefs => [# { letter => '', name => "", desc => "" },
 			    ],
+		extradefs => [ # { name => "", desc => "", enabled => 1|0 },
+			     ],
 		base => undef,
 	       );
 
