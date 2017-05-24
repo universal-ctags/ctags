@@ -111,5 +111,6 @@ void cxxTokenAPIInit(void);
 void cxxTokenAPINewFile(void);
 void cxxTokenAPIDone(void);
 
+void cxxTokenReduceBackward (CXXToken *pStart);
 
 #endif //!ctags_cxx_token_h_

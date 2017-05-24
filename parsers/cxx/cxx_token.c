@@ -153,3 +153,20 @@ void cxxTokenAppendToString(vString * s,CXXToken * t)
 		break;
 	}
 }
+
+void cxxTokenReduceBackward (CXXToken *pStart)
+{
+	enum CXXTokenType eSentinelType = pStart->eType >> 4;
+	CXXToken *pTmp = pStart->pPrev;
+	CXXToken *pReducingCandidate;
+
+	while (pTmp && (!cxxTokenTypeIsOneOf (pTmp, eSentinelType)))
+	{
+		pReducingCandidate = pTmp;
+		pTmp = pTmp->pPrev;
+		pTmp->pNext = pReducingCandidate->pNext;
+		pReducingCandidate->pNext->pPrev = pTmp;
+		CXX_DEBUG_PRINT("reduce inner token: %p",pReducingCandidate);
+		cxxTokenDestroy (pReducingCandidate);
+	}
+}
