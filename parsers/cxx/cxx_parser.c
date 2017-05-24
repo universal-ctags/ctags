@@ -878,6 +878,14 @@ static bool cxxParserParseClassStructOrUnionInternal(
 			return false;
 		}
 
+		// skip alignas specifier:
+		// struct alignas(n) ...
+		//               ^ g_cxx.pToken points this.
+		if(cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeParenthesisChain) &&
+		   cxxTokenTypeIs(g_cxx.pToken->pPrev,CXXTokenTypeKeyword) &&
+		   g_cxx.pToken->pPrev->eKeyword == CXXKeywordALIGNAS)
+				continue;
+
 		if(!cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeSmallerThanSign))
 			break;
 
