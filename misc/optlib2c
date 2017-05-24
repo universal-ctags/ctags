@@ -117,10 +117,10 @@ my $options =
 	   die "Use --map-<LANG> option instead of --langmap";
        } ],
      [ qr/^-.*/, sub {
-	   die "Unhandled option: $&";
+	   die "Unhandled option: \"$&\"";
        } ],
      [ qr/.*/, sub {
-	   die "Unhandled argument: $&";
+	   die "Unhandled argument: \"$&\"";
        } ],
     ];
 
