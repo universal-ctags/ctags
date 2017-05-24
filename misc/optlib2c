@@ -265,6 +265,20 @@ sub parse_optlib {
     return $opts;
 }
 
+sub parse_extras {
+    my ($flag, $extra, $opts) = @_;
+
+    $flag = ( $flag eq '+' )?1: 0;
+
+    # TODO: Hash table should be used for manage 'extradefs'.
+    for (@{$opts->{'extradefs'}}) {
+	if ($_->{'name'} eq $extra)
+	{
+	    $_->{'enabled'} = $flag;
+	}
+    }
+}
+
 sub emit_header {
     my ($optlib, $opts) = @_;
 
@@ -422,9 +436,10 @@ sub emit_xtags {
 	static xtagDefinition $opts->{'Clangdef'}XtagTable [] = {
 EOF
     for (@{$opts->{'extradefs'}}) {
+      my $enabled = $_->{"enabled"}? "true": "false";
       print <<EOF;
 		{
-		  .enabled     = false,
+		  .enabled     = $enabled,
 		  .name        = "$_->{'name'}",
 		  .description = "$_->{'desc'}",
 		},
