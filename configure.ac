@@ -179,8 +179,8 @@ AC_ARG_ENABLE(external-sort,
 		[use internal sort algorithm instead of sort program])])
 
 AC_ARG_ENABLE(iconv,
-	[AS_HELP_STRING([--enable-iconv],
-		[support multibyte character encoding])])
+	[AS_HELP_STRING([--disable-iconv],
+		[disable multibyte character encoding support])])
 
 AC_ARG_ENABLE(custom-config,
 	[AS_HELP_STRING([--enable-custom-config=FILE],
@@ -664,7 +664,7 @@ fi
 # Process library configuration options
 # -------------------------------------
 
-if test "$enable_iconv" = yes ; then
+if test "$enable_iconv" != no ; then
 	save_LIBS="$LIBS"
 	LIBS="$LIBS -liconv"
 	AC_MSG_CHECKING(for iconv_open with -liconv)
