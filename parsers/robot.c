@@ -123,7 +123,7 @@ static void initialize (const langType language)
 {
     addLanguageCallbackRegex (language, "^\\*+ *([^* ].+[^* ]) *\\*+$",
             "{exclusive}", changeSection, NULL, NULL);
-    addLanguageCallbackRegex (language, "(^[A-Za-z0-9]+([${}' _][${}A-Za-z0-9]+)*)",
+    addLanguageCallbackRegex (language, "(^[A-Za-z0-9]+([${}' _][-${}A-Za-z0-9]+)*)",
             "{exclusive}", tagKeywordsAndTestCases, NULL, NULL);
     addLanguageCallbackRegex (language, "^[$@]\\{([_A-Za-z0-9][' _A-Za-z0-9]+)\\}  [ ]*.+",
             "{exclusive}", tagVariables, NULL, NULL);
