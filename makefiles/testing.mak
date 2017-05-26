@@ -172,5 +172,5 @@ CPPCHECK_UNDEFS = -UDEBUG -UMIO_DEBUG -UCXX_DEBUGGING_ENABLED
 CPPCHECK_FLAGS  = --enable=all
 
 cppcheck:
-	cppcheck $(CPPCHECK_DEFS) $(CPPCHECK_UNDEFS) $(CPPCHECK_UNDEFS) $(CPPCHECK_FLAGS) \
+	cppcheck $(CPPCHECK_DEFS) $(CPPCHECK_UNDEFS) $(CPPCHECK_FLAGS) \
 		 $$(git  ls-files | grep '^\(parsers\|main\)/.*\.[ch]' )
