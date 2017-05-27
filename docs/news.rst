@@ -64,6 +64,7 @@ The following parsers have been added:
 * PropertiyList(plist) *libxml*
 * Protobuf
 * PythonLoggingConfig
+* QemuHX *optlib*
 * R
 * RelaxNG *libxml*
 * reStructuredText
