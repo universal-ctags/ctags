@@ -240,7 +240,7 @@ static kindDefinition FortranKinds [] = {
 	{ true,  'v', "variable",   "program (global) and module variables"}
 };
 
-/* For efinitions of Fortran 77 with extensions:
+/* For definitions of Fortran 77 with extensions:
  * http://www.fortran.com/fortran/F77_std/rjcnf0001.html
  * http://scienide.uwaterloo.ca/MIPSpro7/007-2362-004/sgi_html/index.html
  *
@@ -1396,7 +1396,7 @@ static void parseNonOverridableQualifier (tokenInfo *const token,
  *      or DEFERRED
  *      or NON_OVERRIDABLE
  *      or ABSTRACT
- * 
+ *
  *  component-attr-spec
  *      is POINTER
  *      or DIMENSION ( component-array-spec )
@@ -1659,16 +1659,16 @@ static void parseMap (tokenInfo *const token)
 
 /* UNION
  *      MAP
- *          [field-definition] [field-definition] ... 
+ *          [field-definition] [field-definition] ...
  *      END MAP
  *      MAP
- *          [field-definition] [field-definition] ... 
+ *          [field-definition] [field-definition] ...
  *      END MAP
  *      [MAP
  *          [field-definition]
- *          [field-definition] ... 
+ *          [field-definition] ...
  *      END MAP] ...
- *  END UNION 
+ *  END UNION
  *      *
  *
  *  Typed data declarations (variables or arrays) in structure declarations
@@ -1683,7 +1683,7 @@ static void parseMap (tokenInfo *const token)
  *  share a common location within the containing structure. When initializing
  *  the fields within a UNION, the final initialization value assigned
  *  overlays any value previously assigned to a field definition that shares
- *  that field. 
+ *  that field.
  */
 static void parseUnionStmt (tokenInfo *const token)
 {
@@ -1705,11 +1705,11 @@ static void parseUnionStmt (tokenInfo *const token)
  *  structure-name
  *		identifies the structure in a subsequent RECORD statement.
  *		Substructures can be established within a structure by means of either
- *		a nested STRUCTURE declaration or a RECORD statement. 
+ *		a nested STRUCTURE declaration or a RECORD statement.
  *
  *   field-names
  *		(for substructure declarations only) one or more names having the
- *		structure of the substructure being defined. 
+ *		structure of the substructure being defined.
  *
  *   field-definition
  *		can be one or more of the following:
@@ -1724,7 +1724,7 @@ static void parseUnionStmt (tokenInfo *const token)
  *			statements. The syntax of a UNION declaration is described below.
  *
  *			PARAMETER statements, which do not affect the form of the
- *			structure. 
+ *			structure.
  */
 static void parseStructureStmt (tokenInfo *const token)
 {

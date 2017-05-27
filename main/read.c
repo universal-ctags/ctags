@@ -109,7 +109,7 @@ typedef struct sInputFile {
 	   be referred from tagsEntryInfo instances. sourceTagPathHolder
 	   is used keeping the buffer till all processing about the current
 	   input file is done. After all processing is done, the buffers
-	   in sourceTagPathHolder are destroied. */
+	   in sourceTagPathHolder are destroyed. */
 	stringList  * sourceTagPathHolder;
 	inputLineFposMap lineFposMap;
 	vString *allLines;
@@ -763,7 +763,7 @@ static void readLine (vString *const vLine, MIO *const mio)
 
 		/* Turn line breaks into a canonical form. The three commonly
 		 * used forms of line breaks are: LF (UNIX/Mac OS X), CR-LF (MS-DOS) and
-		 * CR (Mac OS 9). As CR-only EOL isn't haneled by gets() and Mac OS 9
+		 * CR (Mac OS 9). As CR-only EOL isn't handled by gets() and Mac OS 9
 		 * is dead, we only handle CR-LF EOLs and convert them into LF. */
 		if (newLine && vStringLength (vLine) > 1 &&
 			vStringItem (vLine, vStringLength (vLine) - 2) == '\r')

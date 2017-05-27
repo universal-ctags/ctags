@@ -1079,10 +1079,10 @@ bool cxxParserParseNextToken(void)
 {
 	CXXToken * t = cxxTokenCreate();
 
-	// The token chain should not be allowed to grow arbitrairly large.
+	// The token chain should not be allowed to grow arbitrarily large.
 	// The token structures are quite big and it's easy to grow up to
 	// 5-6GB or memory usage. However this limit should be large enough
-	// to accomodate all the reasonable statements that could have some
+	// to accommodate all the reasonable statements that could have some
 	// information in them. This includes multiple function prototypes
 	// in a single statement (ImageMagick has some examples) but probably
 	// does NOT include large data tables.

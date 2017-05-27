@@ -338,7 +338,7 @@ static bool parseCommand (const unsigned char *line)
 		 *
 		 * If the following lines do not have a line continuation
 		 * the command must not be spanning multiple lines and should
-		 * be synatically incorrect.
+		 * be syntactically incorrect.
 		 */
 		if (*cp == '\\')
 			++cp;

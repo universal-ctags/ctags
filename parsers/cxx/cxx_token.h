@@ -43,7 +43,7 @@ enum CXXTokenType
 
 	// These must come in pairs. Note that the opening
 	// tokens can be shifted by 4 to get the matching closing
-	// tokens can be shiftet by 8 to get the matching subchain marker below
+	// tokens can be shifted by 8 to get the matching subchain marker below
 	CXXTokenTypeOpeningBracket = (1 << 19), // {
 	CXXTokenTypeOpeningParenthesis = (1 << 20), // (
 	CXXTokenTypeOpeningSquareParenthesis = (1 << 21), // [

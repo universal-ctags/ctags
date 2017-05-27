@@ -42,7 +42,7 @@ typedef struct sXtagDefinition {
 
 	   "enabled" field of Pseudo extra tag depends on where
 	   the output stream is connected to. If it is connected
-	   to standared output, the tag is disabled by default.
+	   to standard output, the tag is disabled by default.
 	   If it is connected to a regular file, the tag is enabled
 	   by default. */
 	bool (* isEnabled) (struct sXtagDefinition *def);

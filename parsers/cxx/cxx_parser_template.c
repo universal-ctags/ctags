@@ -34,7 +34,7 @@ static bool cxxParserParseTemplatePrefixAngleBrackets(void)
 {
 	CXX_DEBUG_ENTER();
 
-	// Here we have the big prolem of <> characters which may be
+	// Here we have the big problem of <> characters which may be
 	// template argument delimiters, less than/greater than operators,
 	// shift left/right operators.
 	//

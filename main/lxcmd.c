@@ -460,7 +460,7 @@ static bool enable_kind_cb (kindDefinition *kind, void *data)
 		kind->enabled = kmr->mode;
 		kmr->result = true;
 	}
-	/* conitnue:
+	/* continue:
 	   There can be more than one paths which deals this kind.
 	   Consider /bin/X and /bin/Y are both parser for a language L.
 	   ctags --langdef=L --xcmd-L=/bin/X --xcmd-L=/bin/Y ... */

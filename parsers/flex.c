@@ -735,7 +735,7 @@ static void skipArgumentList (tokenInfo *const token)
 	 * Other databases can have arguments with fully declared
 	 * datatypes:
 	 *	 (	name varchar(30), text binary(10)  )
-	 * So we must check for nested open and closing parantheses
+	 * So we must check for nested open and closing parentheses
 	 */
 
 	if (isType (token, TOKEN_OPEN_PAREN))	/* arguments? */
@@ -1796,7 +1796,7 @@ static bool parseStatement (tokenInfo *const token)
 			if (isType (token, TOKEN_CLOSE_CURLY))
 			{
 				/*
-				 * Assume the closing parantheses terminates
+				 * Assume the closing parenthesis terminates
 				 * this statements.
 				 */
 				is_terminated = true;

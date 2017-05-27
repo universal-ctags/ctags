@@ -26,11 +26,11 @@ typedef enum {
 } gladeHandleRoler;
 
 static roleDesc GladeClassRoles [] = {
-	{ true, "widget", "specifed as a widget constructor" },
+	{ true, "widget", "specified as a widget constructor" },
 };
 
 static roleDesc GladeHandlerRoles [] = {
-	{ true, "handler", "specifed as a callback for signal emission" },
+	{ true, "handler", "specified as a callback for signal emission" },
 };
 
 typedef enum {

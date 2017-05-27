@@ -1501,7 +1501,7 @@ static bool parseVariable (tokenInfo *const token)
  * 	namespace Foo;
  * 	namespace Foo\Bar;
  * 	namespace;
- * 	napespace {} */
+ * 	namespace {} */
 static bool parseNamespace (tokenInfo *const token)
 {
 	tokenInfo *nsToken = newToken ();

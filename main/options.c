@@ -410,7 +410,7 @@ static optionDescription LongOptionDescription [] = {
  {1,"  --version"},
  {1,"       Print version identifier to standard output."},
  {1,"  --with-list-header=[yes|no]"},
- {1,"       Preprend the column descriptions in --list- output. [yes]"},
+ {1,"       Prepend the column descriptions in --list- output. [yes]"},
  {1,"       --list-extras, --list-fields, --list-kinds-full, and --list-params support this option."},
  {1,"       Specify before --list-* option."},
 #ifdef HAVE_COPROC
@@ -1981,7 +1981,7 @@ static void processListRolesOptions (const char *const option CTAGS_ATTR_UNUSED,
 		vString* vstr = vStringNewInit (parameter);
 		vStringCatS (vstr, (sep? "*": ".*"));
 		processListRolesOptions (option, vStringValue (vstr));
-		/* The control should never reache here. */
+		/* The control should never reached here. */
 	}
 
 	kindletters = sep + 1;
@@ -2766,7 +2766,7 @@ static bool processLangSpecificFieldsOption (const char *const option,
 	if (language == LANG_IGNORE)
 	{
 		error (WARNING, "Unknown language: %s (ignoring \"--%s\")", lang, option);
-		/* The option is consumed in tihs function. */
+		/* The option is consumed in this function. */
 		return true;
 	}
 
@@ -2867,7 +2867,7 @@ static bool processLangSpecificExtraOption (const char *const option,
 	if (language == LANG_IGNORE)
 	{
 		error (WARNING, "Unknown language: %s (ignoring \"--%s\")", lang, option);
-		/* The option is consumed in tihs function. */
+		/* The option is consumed in this function. */
 		return true;
 	}
 

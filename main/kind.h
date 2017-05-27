@@ -66,7 +66,7 @@ struct sKindDefinition {
 	/* Usage of `syncWith' field is a bit tricky.
 
 	   If `LANG_AUTO' is specified to `syncWith' field of a kind
-	   (target kind), the main part of ctags updtes the field with
+	   (target kind), the main part of ctags updates the field with
 	   the id of a  parser (master parser) when initializing
 	   parsers. It also updates `slave' and `master' fields.
 

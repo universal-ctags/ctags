@@ -732,7 +732,7 @@ size_t mio_write (MIO *mio,
  * Writes a character to a #MIO stream. This function behaves the same as
  * fputc().
  *
- * Returns: The written wharacter, or %EOF on error.
+ * Returns: The written character, or %EOF on error.
  */
 int mio_putc (MIO *mio, int c)
 {
@@ -796,7 +796,7 @@ int mio_puts (MIO *mio, const char *s)
 /**
  * mio_vprintf:
  * @mio: A #MIO object
- * @format: A printf fomrat string
+ * @format: A printf format string
  * @ap: The variadic argument list for the format
  *
  * Writes a formatted string into a #MIO stream. This function behaves the same
@@ -1100,7 +1100,7 @@ int mio_error (MIO *mio)
  *          SEEK_CUR from the current position and SEEK_SET from the end of the
  *          stream.
  *
- * Sets the curosr position on a #MIO stream. This functions behaves the same as
+ * Sets the cursor position on a #MIO stream. This functions behaves the same as
  * fseek(). See also mio_tell() and mio_setpos().
  *
  * Returns: 0 on success, -1 otherwise, in which case errno should be set to

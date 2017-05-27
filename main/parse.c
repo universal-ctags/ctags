@@ -1117,7 +1117,7 @@ getFileLanguageForRequestInternal (struct GetLanguageRequest *req)
        candidates.
 
        If a hint chooses multiple candidates, and selection failure is
-       occured, the hint records one of the candidates as FALLBACK for
+       occurred, the hint records one of the candidates as FALLBACK for
        the hint. (The candidates are stored in an array. The first
        element of the array is recorded. However, there is no
        specification about the order of elements in the array.)
@@ -1707,7 +1707,7 @@ static void pre_lang_def_flag_base_long (const char* const optflag, const char* 
 	base = getNamedLanguage (param, 0);
 	if (base == LANG_IGNORE)
 	{
-		error (WARNING, "Unknown laguage(%s) is specified for \"%s\" flag of --langdef option",
+		error (WARNING, "Unknown language(%s) is specified for \"%s\" flag of --langdef option",
 			   param, optflag);
 		return;
 
@@ -3518,7 +3518,7 @@ static void createCTSTTags (void)
 					case K_NOTHING_SPECIAL:
 						if (!lb)
 						{
-							initTagEntry (&e, "NOTHING_SPEICAL", &CTST_Kinds[i]);
+							initTagEntry (&e, "NOTHING_SPECIAL", &CTST_Kinds[i]);
 							makeTagEntry (&e);
 						}
 						break;

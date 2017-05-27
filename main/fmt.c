@@ -278,7 +278,7 @@ extern fmtElement *fmtNew (const char*  fmtString)
 				if (width)
 				{
 					if(!strToLong (vStringValue (width), 0, &column_width))
-						error (FATAL | PERROR, "coverting failed: %s", vStringValue (width));
+						error (FATAL | PERROR, "converting failed: %s", vStringValue (width));
 					vStringDelete (width);
 					width = NULL;
 					column_width *= justification_right;

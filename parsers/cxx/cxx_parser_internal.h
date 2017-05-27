@@ -157,7 +157,7 @@ typedef struct _CXXFunctionParameterInfo
 	CXXToken * aDeclarationStarts[CXX_MAX_EXTRACTED_PARAMETERS];
 	// The final tokens of the declaration
 	CXXToken * aDeclarationEnds[CXX_MAX_EXTRACTED_PARAMETERS];
-	// The identifier tokens (betweeh initial and final)
+	// The identifier tokens (between initial and final)
 	CXXToken * aIdentifiers[CXX_MAX_EXTRACTED_PARAMETERS];
 } CXXFunctionParameterInfo;
 
@@ -234,7 +234,7 @@ typedef enum _CXXParserKeywordState
 	// an inline keyword
 	CXXParserKeywordStateSeenInline = (1 << 1),
 	// We are parsing a statement that comes right after
-	// a extern keyword
+	// an extern keyword
 	CXXParserKeywordStateSeenExtern = (1 << 2),
 	// We are parsing a statement that comes right after
 	// a static keyword

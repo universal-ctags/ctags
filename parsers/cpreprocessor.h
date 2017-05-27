@@ -78,7 +78,7 @@ extern int cppGetc (void);
 extern int cppSkipOverCComment (void);
 
 /* notify the external parser state for the purpose of conditional
-   branche choice. The CXX parser stores the block level here. */
+   branch choice. The CXX parser stores the block level here. */
 extern void cppPushExternalParserBlock();
 extern void cppPopExternalParserBlock();
 
