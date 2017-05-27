@@ -1,1 +1,1 @@
-NOTHING_SPEICAL	input.cst	/^N$/;"	N
+NOTHING_SPECIAL	input.cst	/^N$/;"	N
