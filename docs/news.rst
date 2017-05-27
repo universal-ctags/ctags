@@ -29,8 +29,8 @@ Fully rewritten parsers
 * C++ (see :ref:`The new C/C++ parser <cxx>`)
 * Python (see :ref:`The new Python parser <python>`)
 * HTML (see :ref:`The new HTML parser <html>`)
-* Tcl
-* ITcl
+* Tcl (see :ref:`The new Tcl parser <tcl>`)
+* ITcl (see :ref:`The new Tcl parser <tcl>`)
 
 New parsers
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -74,7 +74,7 @@ The following parsers have been added:
 * SystemdUnit
 * SystemVerilog
 * SVG *libxml*
-* TclOO
+* TclOO (see :ref:`The new Tcl parser <tcl>`)
 * TTCN
 * WindRes
 * XSLT v1.0 *libxml*
