@@ -655,6 +655,18 @@ With new ``--kinddef-<LANG>`` you can write the same things like::
 
 We can say now "kind" is a first class object in Universal-ctags.
 
+..
+	NOT REVIEWED YET
+
+Defining an extra
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+A new ``--extradef-<LANG>=name,description`` option allows you to
+defining a parser own extra which turning on and off can be
+referred from a regex based parser for ``<LANG>``.
+
+See :ref:`Conditional tagging with extras <extras>` for more details.
+
 
 .. _defining-subparsers:
 

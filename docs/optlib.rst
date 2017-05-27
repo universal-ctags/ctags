@@ -542,6 +542,7 @@ Next example is based on an issue #219 posted by @andreicristianpetcu::
 
 NOTE: This flag doesn't work well with scope related flags and ``exclusive`` flags.
 
+.. _extras:
 
 Conditional tagging with extras
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
