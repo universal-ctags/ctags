@@ -77,6 +77,7 @@ typedef struct {
 	unsigned int scopeActions;
 	bool *disabled;
 	int   multiline;
+	int   xtagType;
 } regexPattern;
 
 
@@ -137,7 +138,7 @@ extern void freeLregexControlBlock (struct lregexControlBlock* lcb)
 
 static int makeRegexTag (
 		const vString* const name, const kindDefinition* const kind, int scopeIndex, int placeholder,
-		unsigned long line, MIOPos *pos)
+		unsigned long line, MIOPos *pos, int xtag_type)
 {
 	Assert (kind != NULL);
 	if (kind->enabled)
@@ -152,6 +153,9 @@ static int makeRegexTag (
 			e.lineNumber = line;
 			e.filePosition = *pos;
 		}
+
+		if (xtag_type != XTAG_UNKNOWN)
+			markTagExtraBit (&e, xtag_type);
 
 		return makeTagEntry (&e);
 	}
@@ -340,7 +344,7 @@ static regexPattern* addCompiledTagCommon (struct lregexControlBlock *lcb,
 	return ptrn;
 }
 
-static void pre_ptrn_flag_multiline_long (const char* const s CTAGS_ATTR_UNUSED, const char* const v, void* data)
+static void pre_ptrn_flag_multiline_long (const char* const s, const char* const v, void* data)
 {
 	if (!v)
 	{
@@ -366,6 +370,32 @@ static flagDefinition multilinePtrnFlagDef[] = {
 	  "NGROUP", "match in multiline mode. cannot be combined with scope, placeholder, and exclusive"},
 };
 
+struct extraFlagData {
+	int xtype;
+	langType owner;
+};
+
+static void pre_ptrn_flag_extra_long (const char* const s CTAGS_ATTR_UNUSED, const char* const v, void* data)
+{
+	struct extraFlagData * xdata = data;
+
+	if (!v)
+	{
+		error (WARNING, "no value is given for: %s", s);
+		return;
+	}
+
+	xdata->xtype = getXtagTypeForNameAndLanguage (v, xdata->owner);
+	if (xdata->xtype == XTAG_UNKNOWN)
+		error (WARNING, "no such extra \"%s\" in %s", v, getLanguageName(xdata->owner));
+}
+
+static flagDefinition extraSpecFlagDef[] = {
+#define EXPERIMENTAL "_"
+	{ '-',  EXPERIMENTAL "extra", NULL, pre_ptrn_flag_extra_long ,
+	  "EXTRA", "record the tag only when the extra is enabled"},
+};
+
 
 static regexPattern *addCompiledTagPattern (struct lregexControlBlock *lcb, regex_t* const pattern,
 					    const char* const name, char kindLetter, const char* kindName,
@@ -376,10 +406,15 @@ static regexPattern *addCompiledTagPattern (struct lregexControlBlock *lcb, rege
 	bool exclusive = false;
 	unsigned long scopeActions = 0UL;
 	int multiline = -1;
+	struct extraFlagData extraFlagData = {
+		.xtype = XTAG_UNKNOWN,
+		.owner = lcb->owner,
+	};
 
 	flagsEval (flags, prePtrnFlagDef, ARRAY_SIZE(prePtrnFlagDef), &exclusive);
 	flagsEval (flags, scopePtrnFlagDef, ARRAY_SIZE(scopePtrnFlagDef), &scopeActions);
 	flagsEval (flags, multilinePtrnFlagDef, ARRAY_SIZE(multilinePtrnFlagDef), &multiline);
+	flagsEval (flags, extraSpecFlagDef, ARRAY_SIZE(extraSpecFlagDef), &extraFlagData);
 
 	ptrn  = addCompiledTagCommon(lcb, pattern);
 	ptrn->type    = PTRN_TAG;
@@ -390,6 +425,7 @@ static regexPattern *addCompiledTagPattern (struct lregexControlBlock *lcb, rege
 	ptrn->multiline = multiline;
 	if (multiline >= 0)
 		lcb->multilinePatternsCount++;
+	ptrn->xtagType = extraFlagData.xtype;
 
 	if (*name == '\0' && exclusive && kindLetter == KIND_REGEX_DEFAULT)
 		ptrn->u.tag.kindIndex = KIND_GHOST_INDEX;
@@ -633,7 +669,7 @@ static void matchTagPattern (struct lregexControlBlock *lcb,
 
 		kdef = getLanguageKind (lcb->owner, patbuf->u.tag.kindIndex);
 		n = makeRegexTag (name, kdef, scope, placeholder,
-				  ln, ln == 0? NULL: &pos);
+				  ln, ln == 0? NULL: &pos, patbuf->xtagType);
 	}
 
 	if (patbuf->scopeActions & SCOPE_PUSH)
@@ -749,6 +785,11 @@ extern bool matchRegex (struct lregexControlBlock *lcb, const vString* const lin
 		regexPattern* ptrn = lcb->patterns + i;
 		if (ptrn->multiline >= 0)
 			continue;
+
+		if ((ptrn->xtagType != XTAG_UNKNOWN)
+			&& (!isXtagEnabled (ptrn->xtagType)))
+				continue;
+
 		if (matchRegexPattern (lcb, line, ptrn))
 		{
 			result = true;
@@ -919,6 +960,7 @@ extern void printRegexFlags (void)
 	flagPrintHelp (prePtrnFlagDef, ARRAY_SIZE (prePtrnFlagDef));
 	flagPrintHelp (scopePtrnFlagDef, ARRAY_SIZE (scopePtrnFlagDef));
 	flagPrintHelp (multilinePtrnFlagDef, ARRAY_SIZE (multilinePtrnFlagDef));
+	flagPrintHelp (extraSpecFlagDef, ARRAY_SIZE (extraSpecFlagDef));
 }
 
 extern void freeRegexResources (void)
@@ -947,6 +989,11 @@ extern bool matchMultilineRegex (struct lregexControlBlock *lcb, const vString* 
 				continue;
 
 			multilinePatternsCount--;
+
+			if ((ptrn->xtagType != XTAG_UNKNOWN)
+				&& (!isXtagEnabled (ptrn->xtagType)))
+				continue;
+
 			result = matchMultilineRegexPattern (lcb, allLines, ptrn) || result;
 		}
 	}

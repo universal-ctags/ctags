@@ -249,6 +249,8 @@ static optionDescription LongOptionDescription [] = {
 #else
  {0,"       Uses the specified type of EX command to locate tags [mix]."},
 #endif
+ {1,"  --extradef-<LANG>=name,desc"},
+ {1,"       Define new extra for <LANG>. \"--extra-<LANG>=+{name}\" enables it."},
  {1,"  --extras=[+|-]flags"},
  {1,"      Include extra tag entries for selected information (flags: \"Ffq.\") [F]."},
  {1,"  --extras-<LANG|*>=[+|-]flags"},
@@ -2964,6 +2966,8 @@ static void processLongOption (
 		;
 	else if (processLangSpecificFieldsOption(option, parameter))
 		 ;
+	else if (processExtradefOption(option, parameter))
+		;
 	else if (processLangSpecificExtraOption(option, parameter))
 		;
 	else if (processParametricOption (option, parameter))

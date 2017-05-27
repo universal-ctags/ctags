@@ -1,0 +1,5 @@
+help	input.hx	/^@item help or ? [@var{cmd}]$/;"	i
+-version	input.hx	/^@item -version$/;"	i
+check	input.hx	/^@item check [-q] [-f @var{fmt}] [--output=@var{ofmt}] [-r [leaks | all]] [-T @var{src_cache}] @v/;"	i
+create	input.hx	/^@item create [-q] [-f @var{fmt}] [-o @var{options}] @var{filename} [@var{size}]$/;"	i
+quit	input.hx	/^quit$/;"	q

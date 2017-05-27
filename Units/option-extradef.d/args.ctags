@@ -1,0 +1,4 @@
+--extradef-Python=main,__main__ entry points
+--extras-Python=+{main}
+--regex-Python=/^if __name__ == '__main__':/__main__/f/{_extra=main}
+--fields=+E

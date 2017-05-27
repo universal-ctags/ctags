@@ -6,5 +6,6 @@ TRANSLATOR_INPUT = \
 	optlib/gdbinit.ctags			\
 	optlib/man.ctags			\
 	optlib/pod.ctags			\
+	optlib/qemuhx.ctags			\
 	\
 	$(NULL)

@@ -1,0 +1,46 @@
+#
+#
+#  Copyright (c) 2017, Red Hat, Inc.
+#  Copyright (c) 2017, Masatake YAMATO
+#
+#  Author: Masatake YAMATO <yamato@redhat.com>
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,
+# USA.
+#
+#
+# `hxtool' is a tool used in QEMU build process.
+# It converts an input file to both a C haeder file code and Texinfo document.
+#
+# `.hx' is the suffix for the tool.
+#
+# This optlib is a testbed for --extradef option and `extra' regex long flag.
+#
+
+--langdef=QemuHX
+	--kinddef-QemuHX=q,qmp,QEMU Managment Protocol dispatch table entries
+	--kinddef-QemuHX=i,infoitem,item in texinfo doc
+	--map-QemuHX=+.hx
+	--extradef-QemuHX=funcmap,mapping SQMP to C function name
+	--extras-QemuHX=+{funcmap}
+	--regex-QemuHX=/^SQMP[[:space:]]([-a-z_0-9A-Z]+)[[:space:]]---/\1/q/{_multiline=1}
+	--regex-QemuHX=/^SQMP[[:space:]]([-a-z_0-9A-Z]+)[[:space:]]---/qmp_\1/q/{_multiline=1}{_extra=funcmap}
+	--regex-QemuHX=/^@item[[:space:]]{1,}([-.a-z_0-9A-Z]{1,})/\1/i/
+
+#
+# TODO: introducing "tr" long flag.
+#       Convert `-' in the name to `_'.
+#	--regex-QemuHX=/^SQMP[[:space:]]([-a-z_0-9A-Z]+)[[:space:]]---/qmp_\1/S/{_multiline=1}{extra=funcmap}{tr=-_}
+#

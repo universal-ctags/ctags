@@ -543,6 +543,37 @@ Next example is based on an issue #219 posted by @andreicristianpetcu::
 NOTE: This flag doesn't work well with scope related flags and ``exclusive`` flags.
 
 
+Conditional tagging with extras
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. NOT REVIEWED YET
+
+If a pattern matching should be done only when an extra is enabled,
+mark a pattern with ``{_extra=XNAME}``. Here ``XNAME`` is the name of
+extra. You must define ``XNAME`` with ``--extradef-<LANG>=XNAME,DESCRIPTION`` option
+before defining a pattern marked ``{_extra=XNAME}``.
+
+.. code-block:: python
+
+	if __name__ == '__main__':
+		do_something()
+
+To capture above lines in a python program(*input.py*), an extra can be used.
+
+.. code-block:: ctags
+
+	--extradef-Python=main,__main__ entry points
+	--regex-Python=/^if __name__ == '__main__':/__main__/f/{_extra=main}
+
+The above optlib(*python-main.ctags*) introduces ``main`` extra to Python parser.
+The pattern matching is done only when the ``main`` is enabled.
+
+.. code-block:: ctags
+
+	$ ./ctags --options=python-main.ctags -o - --extras-Python='+{main}' input.py
+	__main__	input.py	/^if __name__ == '__main__':$/;"	f		
+
+
 Submitting an optlib to universal-ctags project
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

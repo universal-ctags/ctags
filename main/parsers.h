@@ -95,6 +95,7 @@
 	ProtobufParser, \
 	PythonParser, \
 	PythonLoggingConfigParser, \
+	QemuHXParser, \
 	RParser, \
 	RSpecParser, \
 	RexxParser, \

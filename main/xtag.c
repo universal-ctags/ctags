@@ -293,6 +293,12 @@ extern int defineXtag (xtagDefinition *def, langType language)
 	xobj->sibling  = XTAG_UNKNOWN;
 
 	updateSiblingXtag (def->xtype, def->name);
+
+	verbose ("Add extra[%d]: %s,%s in %s\n",
+			 def->xtype,
+			 def->name, def->description,
+			 getLanguageName (language));
+
 	return def->xtype;
 }
 
