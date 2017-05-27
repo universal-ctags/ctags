@@ -1032,6 +1032,8 @@ This pseudo tag represents output mode: u-ctags or e-ctags.
 
 See also :ref:`Compatible output and weakness <compat-output>`.
 
+.. _parser-own-fields:
+
 Parser own fields
 ---------------------------------------------------------------------
 
