@@ -168,6 +168,8 @@ robocopy win32\license package\license > nul
 copy COPYING package\license > nul
 copy win32\mkstemp\COPYING.MinGW-w64-runtime.txt package\license > nul
 cd package
+7z a ..\ctags-%ver%-%ARCH%.debug.zip %filelist% docs license
+strip *.exe
 7z a ..\ctags-%ver%-%ARCH%.zip %filelist% docs license
 cd ..
 goto :eof
