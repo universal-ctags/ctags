@@ -415,7 +415,7 @@ static ocamlKeyword lex (lexingState * st)
 		return lex (st);
 	}
 	/* OCaml permit the definition of our own operators
-	 * so here we check all the consecuting chars which
+	 * so here we check all the consecutive chars which
 	 * are operators to discard them. */
 	else if (isOperator[*st->cp])
 		return eatOperator (st);
