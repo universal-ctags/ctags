@@ -29,8 +29,8 @@ Fully rewritten parsers
 * C++ (see :ref:`The new C/C++ parser <cxx>`)
 * Python (see :ref:`The new Python parser <python>`)
 * HTML (see :ref:`The new HTML parser <html>`)
-* Tcl
-* ITcl
+* Tcl (see :ref:`The new Tcl parser <tcl>`)
+* ITcl (see :ref:`The new Tcl parser <tcl>`)
 
 New parsers
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -64,6 +64,7 @@ The following parsers have been added:
 * PropertiyList(plist) *libxml*
 * Protobuf
 * PythonLoggingConfig
+* QemuHX *optlib*
 * R
 * RelaxNG *libxml*
 * reStructuredText
@@ -73,7 +74,7 @@ The following parsers have been added:
 * SystemdUnit
 * SystemVerilog
 * SVG *libxml*
-* TclOO
+* TclOO (see :ref:`The new Tcl parser <tcl>`)
 * TTCN
 * WindRes
 * XSLT v1.0 *libxml*
@@ -653,6 +654,18 @@ With new ``--kinddef-<LANG>`` you can write the same things like::
     --regex-elm=/^[[:blank:]]+([[:lower:]_][[:alnum:]_]*)[^=]*=$/\1/f/{scope=ref}
 
 We can say now "kind" is a first class object in Universal-ctags.
+
+..
+	NOT REVIEWED YET
+
+Defining an extra
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+A new ``--extradef-<LANG>=name,description`` option allows you to
+defining a parser own extra which turning on and off can be
+referred from a regex based parser for ``<LANG>``.
+
+See :ref:`Conditional tagging with extras <extras>` for more details.
 
 
 .. _defining-subparsers:
