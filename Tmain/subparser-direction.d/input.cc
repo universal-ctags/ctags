@@ -1,0 +1,4 @@
+ ABC();
+int main(void)
+{
+}
