@@ -738,7 +738,7 @@ Subparsers can be listed with ``--list-subparser``:
     $ ./ctags --options=NONE --options=./linux.ctags --list-subparsers=C
     ctags: Notice: No options will be read from files or environment
     #NAME                          BASEPARSER           DIRECTION
-    linux                          C                    base => sub
+    linux                          C                    base => sub {shared}
 
 Changes to the tags file format
 ---------------------------------------------------------------------

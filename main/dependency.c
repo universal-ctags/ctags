@@ -301,13 +301,13 @@ extern void printSubparsers (struct slaveControlBlock *scb, bool machinable)
 			switch (((subparser *)tmp->data)->direction)
 			{
 			case SUBPARSER_BASE_RUNS_SUB:
-				direction = "base => sub";
+				direction = "base => sub {shared}";
 				break;
 			case SUBPARSER_SUB_RUNS_BASE:
-				direction = "base <= sub";
+				direction = "base <= sub {dedicated}";
 				break;
 			case SUBPARSER_BI_DIRECTION:
-				direction = "base <> sub";
+				direction = "base <> sub {bidirectional}";
 				break;
 			default:
 				direction  = "UNKNOWN(INTERNAL BUG)";
