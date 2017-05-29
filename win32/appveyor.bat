@@ -128,7 +128,7 @@ bash -lc "./autogen.sh"
 :: Workaround for "./configure: line 557: 0: Bad file descriptor"
 perl -i".bak" -pe "s/^test -n \".DJDIR\"/#$&/" configure
 :: Use static link.
-bash -lc "./configure --enable-iconv --disable-external-sort EXTRA_CFLAGS='-static -DLIBXML_STATIC' LIBS='-lz -llzma -lws2_32' && make"
+bash -lc "./configure --enable-iconv --disable-external-sort EXTRA_CFLAGS=-DLIBXML_STATIC LDFLAGS=-static LIBS='-lz -llzma -lws2_32' && make"
 
 @echo off
 goto :eof
