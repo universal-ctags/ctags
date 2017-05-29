@@ -612,12 +612,12 @@ built-in language names.
 	suffixed with .ctags or .conf under the directory are read. (On MSDOS or
 	MSWindows this directory traverse feature is temporary disable because
 	the contributor of this feature has no access to the platforms.
-	Volunters are welcome). As a special case, if --options=NONE is
+	Volunteers are welcome). As a special case, if --options=NONE is
 	specified as the first option on the command line, it will disable
 	the automatic reading of any configuration options from either a file
 	or the environment (see FILES).
 
- --quiet[=yes|no]
+--quiet[=yes|no]
 		Write fewer messages(default is no).
 
 --recurse[=yes|no]
@@ -1005,7 +1005,7 @@ TMPDIR
 	files only if either (1) an emacs-style tag file is being
 	generated, (2) the tag file is being sent to standard output, or
 	(3) the program was compiled to use an internal sort algorithm to sort
-	the tag files instead of the the sort utility of the operating system.
+	the tag files instead of the sort utility of the operating system.
 	If the sort utility of the operating system is being used, it will
 	generally observe this variable also. Note that if @CTAGS_NAME_EXECUTABLE@
 	is setuid, the value of TMPDIR will be ignored.
