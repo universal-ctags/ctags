@@ -89,7 +89,26 @@ MSYS comes in two flavors. The original from MinGW and a MSYS2 http://sourceforg
 MSYS is old but still works. You can build ctags with it using ``make -f mk_mingw.mak``. The Autotools are too old on MSYS so you cannot use them.
 
 MSYS2 is a more maintained version of MSYS, but specially geared towards MinGW-w64. You can also use Autotools to build ctags.
-If you use Autotools you can enable parsers which require libxml2 or libyaml, and can also do the Units testing with `make units`.
+If you use Autotools you can enable parsers which require jansson, libxml2 or libyaml, and can also do the Units testing with ``make units``.
+
+The following packages are needed to build a full-featured version:
+
+- base-devel (make, autoconf)
+- mingw-w64-{i686,x86_64}-toolchain (mingw-w64-{i686,x86_64}-gcc, mingw-w64-{i686,x86_64}-pkg-config)
+- mingw-w64-{i686,x86_64}-jansson
+- mingw-w64-{i686,x86_64}-libxml2
+- mingw-w64-{i686,x86_64}-libyaml
+- mingw-w64-{i686,x86_64}-xz
+
+If you want to build a single static-linked binary, you can use the following command:
+
+.. code-block:: bash
+
+        ./autogen.sh
+        ./configure --disable-external-sort EXTRA_CFLAGS=-DLIBXML_STATIC LDFLAGS=-static LIBS='-lz -llzma -lws2_32'
+        make
+
+``--disable-external-sort`` is a recommended option for Windows builds.
 
 **Cygwin**
 
@@ -107,7 +126,7 @@ You can also build a native Windows version using Autotools.
 	./configure --host=i686-w64-mingw32 --disable-external-sort
 	make
 
-If you use Autotools you can also do the Units testing with `make units`. Some tests fail, that needs to be investigated.
+If you use Autotools you can also do the Units testing with ``make units``.
 
 Some anti-virus software slows down the build and test process significantly, especially when ``./configure`` is running and during the Units tests. In that case it could help to temporarily disable them. But be aware of the risks when you disable your anti-virus software.
 
