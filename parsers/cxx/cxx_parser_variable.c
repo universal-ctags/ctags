@@ -380,10 +380,10 @@ bool cxxParserExtractVariableDeclarations(CXXTokenChain * pChain,unsigned int uF
 
 		if(!pTokenBefore)
 		{
-			CXX_DEBUG_LEAVE_TEXT("Identifier not preceeded by a type");
-			
+			CXX_DEBUG_LEAVE_TEXT("Identifier not preceded by a type");
+
 			// Here we can handle yet another one of the gazillion of special cases.
-			// 
+			//
 			//    MACRO(whatever) variable;
 			//
 			if(
@@ -419,8 +419,8 @@ bool cxxParserExtractVariableDeclarations(CXXTokenChain * pChain,unsigned int uF
 			if(!pTokenBefore)
 			{
 				CXX_DEBUG_LEAVE_TEXT(
-						"Identifier preceeded by multiple colons " \
-							"but not preceeded by a type"
+						"Identifier preceded by multiple colons " \
+							"but not preceded by a type"
 					);
 				return bGotVariable;
 			}
@@ -431,7 +431,7 @@ bool cxxParserExtractVariableDeclarations(CXXTokenChain * pChain,unsigned int uF
 				if((!pAux) || (!pAux->pPrev))
 				{
 					CXX_DEBUG_LEAVE_TEXT(
-							"Identifier preceeded by multiple colons " \
+							"Identifier preceded by multiple colons " \
 								"and by a >, but failed to skip back to starting <"
 						);
 					return bGotVariable;
@@ -443,7 +443,7 @@ bool cxxParserExtractVariableDeclarations(CXXTokenChain * pChain,unsigned int uF
 			if(!cxxTokenTypeIs(pTokenBefore,CXXTokenTypeIdentifier))
 			{
 				CXX_DEBUG_LEAVE_TEXT(
-						"Identifier preceeded by multiple colons " \
+						"Identifier preceded by multiple colons " \
 							"with probable syntax error"
 					);
 				return bGotVariable;
@@ -455,8 +455,8 @@ bool cxxParserExtractVariableDeclarations(CXXTokenChain * pChain,unsigned int uF
 			if(!pTokenBefore)
 			{
 				CXX_DEBUG_LEAVE_TEXT(
-						"Identifier preceeded by multiple colons " \
-							"but not preceeded by a type"
+						"Identifier preceded by multiple colons " \
+							"but not preceded by a type"
 					);
 				return bGotVariable;
 			}

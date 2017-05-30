@@ -6,7 +6,7 @@
 *   This source code is released for free distribution under the terms of the
 *   GNU General Public License version 2 or (at your option) any later version.
 *
-*   Facility for delayed memory releasing, insptired from AutoreleasePool
+*   Facility for delayed memory releasing, inspired from AutoreleasePool
 *   of OpenStep.
 */
 

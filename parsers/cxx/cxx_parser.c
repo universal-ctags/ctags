@@ -105,11 +105,11 @@ bool cxxParserParseAndCondenseCurrentSubchain(
 
 //
 // This function parses input until one of the specified tokens appears.
-// The current token is NOT checked agains the specified tokens.
+// The current token is NOT checked against the specified tokens.
 //
 // The algorithm will also build subchains of matching
 // pairs ([...],(...),<...>,{...}): within the subchain analysis
-// of uTokenTypes is completly disabled. Subchains do nest.
+// of uTokenTypes is completely disabled. Subchains do nest.
 //
 // Returns true if it stops before EOF or it stops at EOF and CXXTokenTypeEOF
 // is present in uTokenTypes. Returns false in all the other stop conditions
@@ -221,7 +221,7 @@ bool cxxParserParseAndCondenseSubchainsUpToOneOf(
 			continue; // jump up to avoid checking for mismatched pairs below
 		}
 
-		// Check for mismatched brackets/parenthis
+		// Check for mismatched brackets/parentheses
 		// Note that if we were looking for one of [({ then we would have matched
 		// it at the top of the for
 		if(cxxTokenTypeIsOneOf(g_cxx.pToken,uFinalSubchainMarkerTypes))
@@ -247,10 +247,10 @@ bool cxxParserParseAndCondenseSubchainsUpToOneOf(
 
 //
 // This function parses input until one of the specified tokens appears.
-// The current token is NOT checked agains the specified tokens.
+// The current token is NOT checked against the specified tokens.
 //
 // The algorithm will also build subchains of matching pairs ([...],(...),{...}).
-// Within the subchain analysis of uTokenTypes is completly disabled.
+// Within the subchain analysis of uTokenTypes is completely disabled.
 // Subchains do nest.
 //
 // Please note that this function will skip entire scopes (matching {} pairs)
@@ -921,7 +921,7 @@ static bool cxxParserParseClassStructOrUnionInternal(
 		// }
 
 		// FIXME: Should we add the specialisation arguments somewhere?
-		//        Maye as a separate field?
+		//        Maybe as a separate field?
 
 		bRet = cxxParserParseAndCondenseCurrentSubchain(
 					CXXTokenTypeOpeningParenthesis | CXXTokenTypeOpeningBracket |
@@ -973,7 +973,7 @@ static bool cxxParserParseClassStructOrUnionInternal(
 			(!(uInitialKeywordState & CXXParserKeywordStateSeenTypedef))
 		)
 	{
-		CXX_DEBUG_PRINT("Maybe KnR funciton definition?");
+		CXX_DEBUG_PRINT("Maybe KnR function definition?");
 
 		switch(cxxParserMaybeParseKnRStyleFunctionDefinition())
 		{

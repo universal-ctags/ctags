@@ -125,7 +125,7 @@ typedef enum _CXXTagProperty
 	CXXTagPropertyPure = (1 << 6),
 	// Function is marked as override
 	CXXTagPropertyOverride = (1 << 7),
-	// Functoin is marked as default
+	// Function is marked as default
 	CXXTagPropertyDefault = (1 << 8),
 	// Function is marked as final
 	CXXTagPropertyFinal = (1 << 9),
@@ -166,7 +166,7 @@ void cxxTagSetCorkQueueField(
 		const char * szValue
 	);
 
-// Commit the composed tag. Must follow a succesfull cxxTagBegin() call.
+// Commit the composed tag. Must follow a successful cxxTagBegin() call.
 // Returns the index of the tag in the cork queue.
 int cxxTagCommit(void);
 

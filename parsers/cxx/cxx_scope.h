@@ -40,7 +40,7 @@ void cxxScopeClear(void);
 const char * cxxScopeGetFullName(void);
 
 // Returns the current scope name of NULL if there is no
-// scope currnetly. This name does not include namespaces so
+// scope currently. This name does not include namespaces so
 // it is always a single identifier.
 const char * cxxScopeGetName(void);
 

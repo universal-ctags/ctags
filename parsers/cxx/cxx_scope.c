@@ -221,7 +221,7 @@ void cxxScopePush(
 {
 	CXX_DEBUG_ASSERT(
 			t->eType == CXXTokenTypeIdentifier,
-			"The scope name must be an identifer"
+			"The scope name must be an identifier"
 		);
 	CXX_DEBUG_ASSERT(
 			t->pszWord,

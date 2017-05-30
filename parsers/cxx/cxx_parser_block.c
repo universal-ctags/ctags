@@ -71,7 +71,7 @@ bool cxxParserParseBlockHandleOpeningBracket(void)
 						(strcmp(vStringValue(g_cxx.pToken->pPrev->pszWord),"override") != 0)
 					) || (
 						// type var[][][]..[] { ... }
-						// (but not '[] { ... }' which is a parameterelss lambda)
+						// (but not '[] { ... }' which is a parameterless lambda)
 						cxxTokenTypeIs(g_cxx.pToken->pPrev,CXXTokenTypeSquareParenthesisChain) &&
 						(
 							pAux = cxxTokenChainPreviousTokenNotOfType(

@@ -228,11 +228,11 @@ static void verifyVersion (xmlNode *node,
 	{
 		if (strcmp (version, "1.0") == 0)
 		{
-			verbose ("xslt: accept versoin: %s\n", version);
+			verbose ("xslt: accept version: %s\n", version);
 			*acceptable = true;
 		}
 		else
-			verbose ("xslt: unsupported versoin: %s\n", version);
+			verbose ("xslt: unsupported version: %s\n", version);
 
 		eFree (version);
 	}

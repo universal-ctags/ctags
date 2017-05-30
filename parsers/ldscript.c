@@ -720,7 +720,7 @@ extern parserDefinition* LdScriptParser (void)
 	/* File name patters are picked from Linux kernel. */
 	static const char *const extensions [] = { "lds", "scr", "ld", NULL };
 
-	/* lds.S msut be here because Asm parser registers .S as an extension. */
+	/* lds.S must be here because Asm parser registers .S as an extension. */
 	static const char *const patterns [] = { "*.lds.S", "ld.*", NULL };
 
 	/* Emacs's mode */

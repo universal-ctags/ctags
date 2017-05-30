@@ -23,7 +23,7 @@
 #ifdef HAVE_JANSSON
 #include <jansson.h>
 
-#ifndef json_boolean /* compat with jannson < 2.4 */
+#ifndef json_boolean /* compat with jansson < 2.4 */
 #define json_boolean(val)      ((val) ? json_true() : json_false())
 #endif
 

@@ -353,12 +353,12 @@ static void pre_ptrn_flag_multiline_long (const char* const s, const char* const
 	}
 	if (!strToInt (v, 10, data))
 	{
-		error (WARNING, "wrong multiline specificaiton: %s", v);
+		error (WARNING, "wrong multiline specification: %s", v);
 		*((int *)data) = -1;
 	}
 	else if (*((int *)data) < 0 || *((int *)data) >= BACK_REFERENCE_COUNT)
 	{
-		error (WARNING, "out of range(0 ~ %d) multiline specificaiton: %s",
+		error (WARNING, "out of range(0 ~ %d) multiline specification: %s",
 		       (BACK_REFERENCE_COUNT - 1), v);
 		*((int *)data) = -1;
 	}

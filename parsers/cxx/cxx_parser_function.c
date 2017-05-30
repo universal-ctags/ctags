@@ -32,7 +32,7 @@
 //
 // The possible return values are:
 //   1: The parser has moved forward, the statement has been parsed and cleared.
-//      A K&R function declaration has possibly been extracted (but not necessairly).
+//      A K&R function declaration has possibly been extracted (but not necessarily).
 //      Anyway, a new statement has been started.
 //   0: The parser has NOT moved forward and the current statement hasn't been cleared:
 //      other options may be evaluated.
@@ -178,7 +178,7 @@ int cxxParserMaybeParseKnRStyleFunctionDefinition()
 			bGotMultipleDots = true;
 		else {
 			// not valid (note that (void) is not allowed here since we
-			// wouln't have a following variable declaration)
+			// wouldn't have a following variable declaration)
 			return 0;
 		}
 
@@ -196,7 +196,7 @@ int cxxParserMaybeParseKnRStyleFunctionDefinition()
 
 	if(iParameterCount < 1)
 	{
-		// we should have found at least one paremeter
+		// we should have found at least one parameter
 		// (the one that we found before the ;)
 		return 0;
 	}
@@ -359,7 +359,7 @@ int cxxParserMaybeParseKnRStyleFunctionDefinition()
 // 100% accurate, but it tries to exclude the obvious cases. If it says
 // "no" then the specified chain CAN'T be a set of parameters to
 // a function call. If it says "yes" then the result has to be considered
-// a guess: the chain *might* be a set of parameters to a functino call.
+// a guess: the chain *might* be a set of parameters to a function call.
 //
 // This function is used to check both () and {} parenthesis chains.
 //     function(...)
@@ -567,7 +567,7 @@ static bool cxxParserLookForFunctionSignatureCheckParenthesisAndIdentifier(
 	)
 {
 	CXX_DEBUG_ENTER();
-	
+
 	CXX_DEBUG_ASSERT(
 			pParenthesis && pIdentifierChain && pIdentifierStart && pIdentifierEnd && pInfo,
 			"All parameters other than `pParamInfo' must be non null here"
@@ -772,7 +772,7 @@ bool cxxParserLookForFunctionSignature(
 			pToken = cxxTokenChainSkipToEndOfTemplateAngleBracket(pToken);
 			if(!pToken)
 			{
-				CXX_DEBUG_LEAVE_TEXT("Couln't skip past angle bracket chain");
+				CXX_DEBUG_LEAVE_TEXT("Couldn't skip past angle bracket chain");
 				return false;
 			}
 			CXX_DEBUG_PRINT("Skipped angle bracket chain");
@@ -1066,7 +1066,7 @@ next_token:
 
 	// parenthesis + identifier has been found, this is a function signature.
 
-	// Figure out the remainig parameters.
+	// Figure out the remaining parameters.
 
 	CXX_DEBUG_ASSERT(pTopLevelParenthesis,"This should have been set");
 
@@ -1263,7 +1263,7 @@ next_token:
 				)
 					pInfo->pTypeEnd = pInfo->pTypeEnd->pNext;
 			} else {
-				// probaby normal return type
+				// probably normal return type
 				pInfo->pTypeEnd = pToken->pPrev;
 				pInfo->pTypeStart = cxxTokenChainFirst(pChain);
 
@@ -1463,7 +1463,7 @@ int cxxParserEmitFunctionTags(
 				// (generally things like int (*foo(void))[2] or similar).
 
 				// Scope and identifier have already been removed.
-				// Remove the parenthesis, temporairly.
+				// Remove the parenthesis, temporarily.
 				if(pInfo->pTypeStart == pInfo->pParenthesis)
 					pInfo->pTypeStart = pInfo->pParenthesis->pNext;
 				if(pInfo->pTypeEnd == pInfo->pParenthesis)

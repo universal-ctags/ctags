@@ -905,7 +905,7 @@ static adaTokenInfo *adaParseBlock(adaTokenInfo *parent, adaKind kind)
   }
 
   /* we must parse until we hit the "is" string to reach the end of
-   * this package declaration, or a "reanames" keyword */
+   * this package declaration, or a "renames" keyword */
   while(token != NULL)
   {
     skipWhiteSpace();

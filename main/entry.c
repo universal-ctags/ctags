@@ -1245,7 +1245,7 @@ extern int makeQualifiedTagEntry (const tagEntryInfo *const e)
 			if (sep == NULL)
 			{
 				/* No root separator. The name of the
-				   oritinal tag and that of full qualified tag
+				   optional tag and that of full qualified tag
 				   are the same; recording the full qualified tag
 				   is meaningless. */
 				return r;
@@ -1257,7 +1257,7 @@ extern int makeQualifiedTagEntry (const tagEntryInfo *const e)
 
 		x.name = vStringValue (fqn);
 		/* makeExtraTagEntry of c.c doesn't clear scope
-		   releated fields. */
+		   related fields. */
 #if 0
 		x.extensionFields.scopeKind = NULL;
 		x.extensionFields.scopeName = NULL;

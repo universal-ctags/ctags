@@ -24,9 +24,9 @@
 #define OCAML_MAX_STACK_SIZE 256
 
 typedef enum {
-	K_CLASS,        /* Ocaml class, relatively rare */
+	K_CLASS,        /* OCaml class, relatively rare */
 	K_METHOD,       /* class method */
-	K_MODULE,       /* Ocaml module OR functor */
+	K_MODULE,       /* OCaml module OR functor */
 	K_VAR,
 	K_TYPE,         /* name of an OCaml type */
 	K_FUNCTION,
@@ -113,48 +113,48 @@ typedef struct sOcaKeywordDesc {
 typedef ocamlKeyword ocaToken;
 
 static const keywordTable OcamlKeywordTable[] = {
-	{ "and"       , OcaKEYWORD_and       }, 
-	{ "begin"     , OcaKEYWORD_begin     }, 
-	{ "class"     , OcaKEYWORD_class     }, 
-	{ "do"        , OcaKEYWORD_do        }, 
-	{ "done"      , OcaKEYWORD_done      }, 
-	{ "else"      , OcaKEYWORD_else      }, 
-	{ "end"       , OcaKEYWORD_end       }, 
-	{ "exception" , OcaKEYWORD_exception }, 
-	{ "for"       , OcaKEYWORD_for       }, 
-	{ "fun"       , OcaKEYWORD_fun       }, 
-	{ "function"  , OcaKEYWORD_fun       }, 
-	{ "functor"   , OcaKEYWORD_functor   }, 
-	{ "in"        , OcaKEYWORD_in        }, 
-	{ "let"       , OcaKEYWORD_let       }, 
-	{ "match"     , OcaKEYWORD_match     }, 
-	{ "method"    , OcaKEYWORD_method    }, 
-	{ "module"    , OcaKEYWORD_module    }, 
-	{ "mutable"   , OcaKEYWORD_mutable   }, 
-	{ "object"    , OcaKEYWORD_object    }, 
-	{ "of"        , OcaKEYWORD_of        }, 
-	{ "rec"       , OcaKEYWORD_rec       }, 
-	{ "sig"       , OcaKEYWORD_sig       }, 
-	{ "struct"    , OcaKEYWORD_struct    }, 
-	{ "then"      , OcaKEYWORD_then      }, 
-	{ "try"       , OcaKEYWORD_try       }, 
-	{ "type"      , OcaKEYWORD_type      }, 
-	{ "val"       , OcaKEYWORD_val       }, 
+	{ "and"       , OcaKEYWORD_and       },
+	{ "begin"     , OcaKEYWORD_begin     },
+	{ "class"     , OcaKEYWORD_class     },
+	{ "do"        , OcaKEYWORD_do        },
+	{ "done"      , OcaKEYWORD_done      },
+	{ "else"      , OcaKEYWORD_else      },
+	{ "end"       , OcaKEYWORD_end       },
+	{ "exception" , OcaKEYWORD_exception },
+	{ "for"       , OcaKEYWORD_for       },
+	{ "fun"       , OcaKEYWORD_fun       },
+	{ "function"  , OcaKEYWORD_fun       },
+	{ "functor"   , OcaKEYWORD_functor   },
+	{ "in"        , OcaKEYWORD_in        },
+	{ "let"       , OcaKEYWORD_let       },
+	{ "match"     , OcaKEYWORD_match     },
+	{ "method"    , OcaKEYWORD_method    },
+	{ "module"    , OcaKEYWORD_module    },
+	{ "mutable"   , OcaKEYWORD_mutable   },
+	{ "object"    , OcaKEYWORD_object    },
+	{ "of"        , OcaKEYWORD_of        },
+	{ "rec"       , OcaKEYWORD_rec       },
+	{ "sig"       , OcaKEYWORD_sig       },
+	{ "struct"    , OcaKEYWORD_struct    },
+	{ "then"      , OcaKEYWORD_then      },
+	{ "try"       , OcaKEYWORD_try       },
+	{ "type"      , OcaKEYWORD_type      },
+	{ "val"       , OcaKEYWORD_val       },
 	{ "value"     , OcaKEYWORD_value     }, /* just to handle revised syntax */
-	{ "virtual"   , OcaKEYWORD_virtual   }, 
-	{ "while"     , OcaKEYWORD_while     }, 
-	{ "with"      , OcaKEYWORD_with      }, 
+	{ "virtual"   , OcaKEYWORD_virtual   },
+	{ "while"     , OcaKEYWORD_while     },
+	{ "with"      , OcaKEYWORD_with      },
 
-	{ "or"        , Tok_Op               }, 
-	{ "mod "      , Tok_Op               }, 
-	{ "land "     , Tok_Op               }, 
-	{ "lor "      , Tok_Op               }, 
-	{ "lxor "     , Tok_Op               }, 
-	{ "lsl "      , Tok_Op               }, 
-	{ "lsr "      , Tok_Op               }, 
-	{ "asr"       , Tok_Op               }, 
-	{ "->"        , Tok_To               }, 
-	{ "true"      , Tok_Val              }, 
+	{ "or"        , Tok_Op               },
+	{ "mod "      , Tok_Op               },
+	{ "land "     , Tok_Op               },
+	{ "lor "      , Tok_Op               },
+	{ "lxor "     , Tok_Op               },
+	{ "lsl "      , Tok_Op               },
+	{ "lsr "      , Tok_Op               },
+	{ "asr"       , Tok_Op               },
+	{ "->"        , Tok_To               },
+	{ "true"      , Tok_Val              },
 	{ "false"     , Tok_Val              }
 };
 
@@ -415,7 +415,7 @@ static ocamlKeyword lex (lexingState * st)
 		return lex (st);
 	}
 	/* OCaml permit the definition of our own operators
-	 * so here we check all the consecuting chars which
+	 * so here we check all the consecutive chars which
 	 * are operators to discard them. */
 	else if (isOperator[*st->cp])
 		return eatOperator (st);
@@ -677,7 +677,7 @@ static void popLastNamed ( void )
 	}
 	else
 	{
-		/* ok, no named context found... 
+		/* ok, no named context found...
 		 * (should not happen). */
 		stackIndex = 0;
 		toDoNext = &globalScope;
@@ -953,7 +953,7 @@ static void exceptionDecl (vString * const ident, ocaToken what)
 		addTag (ident, K_EXCEPTION);
 	}
     else /* probably ill-formed, give back to global scope */
-    { 
+    {
         globalScope (ident, what);
     }
 	toDoNext = &globalScope;
@@ -1372,7 +1372,7 @@ static void letParam (vString * const ident, ocaToken what)
 			break;
 
 			/* parse something like
-			 * ~varname:type 
+			 * ~varname:type
 			 * or
 			 * ~varname
 			 * or
@@ -1383,7 +1383,7 @@ static void letParam (vString * const ident, ocaToken what)
 			break;
 
 			/* Optional argument with syntax like this :
-			 * ?(bla = value) 
+			 * ?(bla = value)
 			 * or
 			 * ?bla */
 		case '?':

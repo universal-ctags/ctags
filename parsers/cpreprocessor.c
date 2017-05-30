@@ -1639,7 +1639,7 @@ static void saveMacro(const char * macro)
 					while(*c == '#')
 						c++;
 
-					// we just skip this part and the followin spaces
+					// we just skip this part and the following spaces
 					while(*c && isspacetab(*c))
 						c++;
 

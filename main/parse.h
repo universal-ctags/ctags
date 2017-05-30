@@ -51,7 +51,7 @@ typedef void (*parserInitialize) (langType language);
 
    The finalizer is called even when the initializer of the
    same parser is called or not. However, the finalizer can know
-   whether the assoiciated initializer is invoked or not with the
+   whether the associated initializer is invoked or not with the
    second parameter: INITIALIZED. If it is true, the initializer
    is called. */
 typedef void (*parserFinalize) (langType language, bool initialized);

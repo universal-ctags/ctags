@@ -75,7 +75,7 @@ extern bool isParserMarkedNoEmission (void);
 extern void freeInputFileResources (void);
 extern const unsigned char *getInputFileData (size_t *size);
 
-/* Stream opend by getMio can be passed to openInputFile as the 3rd
+/* Stream opened by getMio can be passed to openInputFile as the 3rd
    argument. If the 3rd argument is NULL, openInputFile calls getMio
    internally. The 3rd argument is introduced for reusing mio object
    created in parser guessing stage. */
