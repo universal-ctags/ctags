@@ -2,7 +2,8 @@ include $(top_srcdir)/source.mak
 
 # Test cases are added to EXTRA_DIST in makefiles/test-cases.mak
 EXTRA_DIST   = gnu_regex/regcomp.c gnu_regex/regexec.c \
-	       gnu_regex/regex_internal.c gnu_regex/regex_internal.h
+	       gnu_regex/regex_internal.c gnu_regex/regex_internal.h \
+	       $(WIN32_HEADS) $(WIN32_SRCS)
 
 bin_PROGRAMS = ctags
 
@@ -82,7 +83,7 @@ OPTLIB2C = $(srcdir)/misc/optlib2c
 %.c: %.ctags $(OPTLIB2C) Makefile
 	$(optlib2c_verbose)$(OPTLIB2C) --transform-xcmd="$(program_transform_name)" $< > $@
 endif
-dist_ctags_SOURCES = $(ALL_HEADS) $(ALL_SRCS) $(WIN32_HEADS) $(WIN32_SRCS)
+dist_ctags_SOURCES = $(ALL_HEADS) $(ALL_SRCS)
 
 if ENABLE_XCMD
 driversdir = $(pkglibexecdir)/drivers
