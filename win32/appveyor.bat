@@ -12,7 +12,7 @@ if "%1"=="" (
   set target=%1
 )
 
-for %%i in (msbuild msvc_msys2 mingw cygwin) do if "%compiler%"=="%%i" goto %compiler%_%target%
+for %%i in (msbuild msvc msys2 mingw cygwin) do if "%compiler%"=="%%i" goto %compiler%_%target%
 
 echo Unknown build target.
 exit 1
@@ -43,16 +43,19 @@ goto :eof
 goto :eof
 
 
-:msvc_msys2_build
+:msvc_build
 :: ----------------------------------------------------------------------
 :: Using VC12 (VC2013) with nmake, iconv enabled
 :: Also build with msys2 and test the VC binary on msys2.
+set MSYS2_ARCH=x86_64
+set MSYS2_DIR=msys64
+set MSYSTEM=MINGW64
 call "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat" %ARCH%
 
 :: Build libiconv (MSVC port)
 set ICONV_BUILD_DIR=C:\projects\libiconv
 set "INCLUDE=%INCLUDE%;C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Include"
-git clone -q --branch=master https://github.com/koron/libiconv.git %ICONV_BUILD_DIR%
+git clone -q --branch=master --depth=1 https://github.com/koron/libiconv.git %ICONV_BUILD_DIR%
 cd %ICONV_BUILD_DIR%\msvc10
 nmake NODEBUG=1 NOMSVCRT=1
 
@@ -69,57 +72,84 @@ copy %ICONV_BUILD_DIR%\msvc10\iconv.dll %APPVEYOR_BUILD_FOLDER% > nul
 cd %APPVEYOR_BUILD_FOLDER%
 nmake -f mk_mvc.mak WITH_ICONV=yes ICONV_DIR=%ICONV_DIR% PDB=yes
 
+:: Backup VC binaries
+mkdir vc
+move *.exe vc > nul
+
+:: Build with msys2
+path C:\%MSYS2_DIR%\usr\bin;%PATH%
+set CHERE_INVOKING=yes
+:: Install and update necessary packages
+rem bash -lc "for i in {1..3}; do pacman --noconfirm -S mingw-w64-%MSYS2_ARCH%-{python3-sphinx,jansson,libxml2,libyaml} && break || sleep 15; done"
+
+bash -lc "./autogen.sh"
+:: Patching configure.
+:: Workaround for "./configure: line 557: 0: Bad file descriptor"
+perl -i".bak" -pe "s/^test -n \".DJDIR\"/#$&/" configure
+bash -lc "./configure && make"
+
+:: Restore VC binaries
+copy vc\*.exe . /y > nul
+touch *.exe
+
+@echo off
+goto :eof
+
+:msvc_test
+@echo on
 :: Check filetype (VC binaries)
 c:\cygwin\bin\file ctags.exe
 c:\cygwin\bin\file readtags.exe
 :: Check if it works
 .\ctags --version || exit 1
 
-:: Backup VC binaries
-mkdir vc
-move *.exe vc > nul
-
-:: Build with msys2
-PATH C:\%MSYS2_DIR%\%MSYSTEM%\bin;C:\%MSYS2_DIR%\usr\bin;%PATH%
-set CHERE_INVOKING=yes
-:: Install and update necessary packages
-rem bash -lc "for i in {1..3}; do update-core && break || sleep 15; done"
-rem bash -lc "for i in {1..3}; do pacman --noconfirm -Su mingw-w64-%MSYS2_ARCH%-{gcc,libiconv} automake autoconf make dos2unix && break || sleep 15; done"
-
-bash -lc "./autogen.sh"
-:: Patching configure.
-:: Workaround for "./configure: line 557: 0: Bad file descriptor"
-perl -i".bak" -pe "s/^test -n \".DJDIR\"/#$&/" configure
-bash -lc "./configure --enable-iconv && make"
-
-:: Check filetype (msys2 binaries)
-c:\cygwin\bin\file ctags.exe
-c:\cygwin\bin\file readtags.exe
-:: Check if it works
-.\ctags --version || exit 1
-
-:: Backup msys2 binaries (Currently not used.)
-mkdir msys2
-move *.exe msys2 > nul
-
-:: Restore VC binaries
-copy vc\*.exe . /y > nul
-
-@echo off
-goto :eof
-
-:msvc_msys2_test
-@echo on
 :: Run tests
 bash -lc "make check APPVEYOR=1"
 
 @echo off
 goto :eof
 
-:msvc_msys2_package
+:msvc_package
+:: Do nothing.
+goto :eof
+
+
+:msys2_build
+:: ----------------------------------------------------------------------
+:: Using msys2
+@echo on
+PATH C:\%MSYS2_DIR%\%MSYSTEM%\bin;C:\%MSYS2_DIR%\usr\bin;%PATH%
+set CHERE_INVOKING=yes
+:: Install and update necessary packages
+bash -lc "for i in {1..3}; do pacman --noconfirm -S mingw-w64-%MSYS2_ARCH%-{python3-sphinx,jansson,libxml2,libyaml} && break || sleep 15; done"
+
+bash -lc "./autogen.sh"
+:: Patching configure.
+:: Workaround for "./configure: line 557: 0: Bad file descriptor"
+perl -i".bak" -pe "s/^test -n \".DJDIR\"/#$&/" configure
+:: Use static link.
+bash -lc "./configure --enable-iconv --disable-external-sort EXTRA_CFLAGS=-DLIBXML_STATIC LDFLAGS=-static LIBS='-lz -llzma -lws2_32' && make"
+
+@echo off
+goto :eof
+
+:msys2_test
+@echo on
+:: Check filetype (msys2 binaries)
+c:\cygwin\bin\file ctags.exe
+c:\cygwin\bin\file readtags.exe
+:: Check if it works
+.\ctags --version || exit 1
+
+:: Run tests
+bash -lc "make check APPVEYOR=1"
+
+@echo off
+goto :eof
+
+:msys2_package
 md package
 :: Build html docs
-bash -lc "for i in {1..3}; do pacman --noconfirm -Su mingw-w64-%MSYS2_ARCH%-python3-sphinx && break || sleep 15; done"
 bash -lc "cd docs; make html"
 move docs\_build\html package\docs > nul
 rd /s/q package\docs\_sources
@@ -132,13 +162,16 @@ if "%APPVEYOR_REPO_TAG_NAME%"=="" (
 )
 
 :: Create zip package
-copy win32\mkstemp\COPYING.MinGW-w64-runtime.txt . > nul
-set filelist=ctags.exe readtags.exe iconv.dll COPYING COPYING.MinGW-w64-runtime.txt README.md
+set filelist=ctags.exe readtags.exe README.md
 robocopy . package %filelist% > nul
+robocopy win32\license package\license > nul
+copy COPYING package\license > nul
+copy win32\mkstemp\COPYING.MinGW-w64-runtime.txt package\license > nul
 cd package
-7z a ..\ctags-%ver%-%ARCH%.zip %filelist% docs
+7z a ..\ctags-%ver%-%ARCH%.debug.zip %filelist% docs license
+strip *.exe
+7z a ..\ctags-%ver%-%ARCH%.zip %filelist% docs license
 cd ..
-7z a ctags-%ver%-%ARCH%.pdb.zip ctags.pdb readtags.pdb
 goto :eof
 
 
