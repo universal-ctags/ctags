@@ -43,4 +43,6 @@ extern bool ptrArrayHas (const ptrArray *const current, void *ptr);
 extern void ptrArrayReverse (const ptrArray *const current);
 extern void ptrArrayDeleteItem (ptrArray* const current, unsigned int indx);
 
+extern void ptrArraySort (ptrArray *const current, int (*compare)(const void *, const void *));
+
 #endif  /* CTAGS_MAIN_PTRARRAY_H */

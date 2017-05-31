@@ -48,6 +48,9 @@
     <ClCompile Include="..\main\args.c">
       <Filter>Source Files\Main</Filter>
     </ClCompile>
+    <ClCompile Include="..\main\colprint.c">
+      <Filter>Source Files\Main</Filter>
+    </ClCompile>
     <ClCompile Include="..\main\debug.c">
       <Filter>Source Files\Main</Filter>
     </ClCompile>
@@ -459,6 +462,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\main\args.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\main\colprint.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\main\ctags.h">

@@ -1,14 +1,18 @@
 # Local variables
+ap
+buf
 dev
 dictfile
 dirs
 downcase
 dup
 ffile
+fn
 fname
 foldcase
 funcmap
 iname
+indx
 input0
 langs
 len
@@ -16,7 +20,10 @@ msg
 mydict
 oname
 optname
+slist
 submode
 subtag
 tokeninfo
 uuid
+vcol
+vstr

@@ -80,6 +80,8 @@ close
 cmd
 cmdline
 cnf
+colprint
+column
 combine
 comment
 common
