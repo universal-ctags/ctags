@@ -1360,8 +1360,8 @@ extern parserDefinition* PythonParser (void)
 	def->finalize = finalize;
 	def->keywordTable = PythonKeywordTable;
 	def->keywordCount = ARRAY_SIZE (PythonKeywordTable);
-	def->fieldDefinitions = PythonFields;
-	def->fieldDefinitionCount = ARRAY_SIZE (PythonFields);
+	def->fieldTable = PythonFields;
+	def->fieldCount = ARRAY_SIZE (PythonFields);
 	def->useCork = true;
 	def->requestAutomaticFQTag = true;
 	return def;
