@@ -244,7 +244,7 @@ extern int defineLanguageKind (const langType language, kindDefinition *def,
 	return defineKind (LanguageTable [language].kindControlBlock, def, freeKindDef);
 }
 
-extern kindDefinition* getLanguageKind (const langType language, char kindIndex)
+extern kindDefinition* getLanguageKind (const langType language, signed char kindIndex)
 {
 	kindDefinition* kdef;
 
