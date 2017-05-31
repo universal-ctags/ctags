@@ -1,0 +1,24 @@
+# input: input.cc, optlib: shared
+ABC	input.cc	/^ ABC();$/;"	f	language:mojom
+main	input.cc	/^int main(void)$/;"	f	language:C++	typeref:typename:int
+# input: input.mojom, optlib: shared
+ABC	input.mojom	/^ ABC();$/;"	f	language:mojom
+
+# input: input.cc, optlib: dedicated
+main	input.cc	/^int main(void)$/;"	f	language:C++	typeref:typename:int
+# input: input.mojom, optlib: dedicated
+ABC	input.mojom	/^ ABC();$/;"	f	language:mojom
+main	input.mojom	/^int main(void)$/;"	f	language:C++	typeref:typename:int
+
+# input: input.cc, optlib: bidirectional
+ABC	input.cc	/^ ABC();$/;"	f	language:mojom
+main	input.cc	/^int main(void)$/;"	f	language:C++	typeref:typename:int
+# input: input.mojom, optlib: bidirectional
+ABC	input.mojom	/^ ABC();$/;"	f	language:mojom
+main	input.mojom	/^int main(void)$/;"	f	language:C++	typeref:typename:int
+
+# input: input.cc, optlib: <default>
+ABC	input.cc	/^ ABC();$/;"	f	language:mojom
+main	input.cc	/^int main(void)$/;"	f	language:C++	typeref:typename:int
+# input: input.mojom, optlib: <default>
+ABC	input.mojom	/^ ABC();$/;"	f	language:mojom

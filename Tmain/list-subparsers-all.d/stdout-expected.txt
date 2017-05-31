@@ -1,9 +1,9 @@
 #NAME                          BASEPARSER           DIRECTION
-YumRepo                        Iniconf              base <= sub
-SystemdUnit                    Iniconf              base <= sub
-PythonLoggingConfig            Iniconf              base <> sub
-Autoconf                       M4                   base <> sub
-Automake                       Make                 base <= sub
-RSpec                          Ruby                 base => sub
-TclOO                          Tcl                  base <> sub
-ITcl                           Tcl                  base <> sub
+YumRepo                        Iniconf              base <= sub {dedicated}
+SystemdUnit                    Iniconf              base <= sub {dedicated}
+PythonLoggingConfig            Iniconf              base <> sub {bidirectional}
+Autoconf                       M4                   base <> sub {bidirectional}
+Automake                       Make                 base <= sub {dedicated}
+RSpec                          Ruby                 base => sub {shared}
+TclOO                          Tcl                  base <> sub {bidirectional}
+ITcl                           Tcl                  base <> sub {bidirectional}

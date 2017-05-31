@@ -28,7 +28,7 @@
 # 
 #    RSpec Code added. Courtesy: mortice
 #
---langdef=RSpec{base=Ruby}
+--langdef=RSpec{base=Ruby}{shared}
 	--kinddef-RSpec=d,describe,describes
 	--kinddef-RSpec=c,context,contexts
 	--regex-RSpec=/^[ \t]*RSpec\.describe[ \t]+([^"']+)[ \t]+do/\1/d/

@@ -1683,25 +1683,48 @@ static void doNothing (void)
 {
 }
 
+static void optlibRunBaseParser (void)
+{
+	scheduleRunningBaseparser (0);
+}
+
+static bool optlibIsDedicatedSubparser (parserDefinition* def)
+{
+	return (def->dependencies
+			&& (def->dependencies->type == DEPTYPE_SUBPARSER)
+			&& ((subparser *)def->dependencies->data)->direction & SUBPARSER_SUB_RUNS_BASE);
+}
+
 static void lazyInitialize (langType language)
 {
-	parserDefinition* lang;
+	parserDefinition* def;
 
 	Assert (0 <= language  &&  language < (int) LanguageCount);
-	lang = LanguageTable [language].def;
+	def = LanguageTable [language].def;
 
-	lang->parser = doNothing;
+	def->parser = doNothing;
 
-	if (lang->method & METHOD_REGEX)
-		lang->parser = findRegexTags;
+	if (def->method & METHOD_REGEX)
+	{
+		if (optlibIsDedicatedSubparser (def))
+			def->parser = optlibRunBaseParser;
+		else
+			def->parser = findRegexTags;
+	}
 }
 
 /*
 *   Option parsing
 */
+struct preLangDefFlagData
+{
+	char *base;
+	subparserRunDirection direction;
+};
+
 static void pre_lang_def_flag_base_long (const char* const optflag, const char* const param, void* data)
 {
-	char **name = data;
+	struct preLangDefFlagData * flag_data = data;
 	langType base;
 
 	if (param[0] == '\0')
@@ -1719,11 +1742,31 @@ static void pre_lang_def_flag_base_long (const char* const optflag, const char* 
 
 	}
 
-	*name = eStrdup(param);
+	flag_data->base = eStrdup(param);
+}
+
+#define LANGDEF_FLAG_DEDICATED "dedicated"
+#define LANGDEF_FLAG_SHARED    "shared"
+#define LANGDEF_FLAG_BIDIR     "bidirectional"
+static void pre_lang_def_flag_direction_long (const char* const optflag, const char* const param, void* data)
+{
+	struct preLangDefFlagData * flag_data = data;
+
+	if (strcmp(optflag, LANGDEF_FLAG_DEDICATED) == 0)
+		flag_data->direction = SUBPARSER_SUB_RUNS_BASE;
+	else if (strcmp(optflag, LANGDEF_FLAG_SHARED) == 0)
+		flag_data->direction = SUBPARSER_BASE_RUNS_SUB;
+	else if (strcmp(optflag, LANGDEF_FLAG_BIDIR) == 0)
+		flag_data->direction = SUBPARSER_BI_DIRECTION;
+	else
+		AssertNotReached ();
 }
 
 static flagDefinition PreLangDefFlagDef [] = {
-	{ '\0',  "base", NULL, pre_lang_def_flag_base_long },
+	{ '\0',  "base",      NULL, pre_lang_def_flag_base_long },
+	{ '\0',  LANGDEF_FLAG_DEDICATED,  NULL, pre_lang_def_flag_direction_long },
+	{ '\0',  LANGDEF_FLAG_SHARED,     NULL, pre_lang_def_flag_direction_long },
+	{ '\0',  LANGDEF_FLAG_BIDIR,      NULL, pre_lang_def_flag_direction_long },
 };
 
 static void lang_def_flag_file_kind_long (const char* const optflag, const char* const param, void* data)
@@ -1767,7 +1810,8 @@ static void optlibFreeDep (langType lang, bool initialized)
 	}
 }
 
-static parserDefinition* OptlibParser(const char *name, const char *base)
+static parserDefinition* OptlibParser(const char *name, const char *base,
+									  subparserRunDirection direction)
 {
 	parserDefinition *def;
 
@@ -1779,7 +1823,7 @@ static parserDefinition* OptlibParser(const char *name, const char *base)
 		subparser *sub = xCalloc (1, subparser);
 		parserDependency *dep = xCalloc (1, parserDependency);
 
-		sub->direction = SUBPARSER_BASE_RUNS_SUB;
+		sub->direction = direction;
 		dep->type = DEPTYPE_SUBPARSER;
 		dep->upperParser = eStrdup (base);
 		dep->data = sub;
@@ -1792,7 +1836,7 @@ static parserDefinition* OptlibParser(const char *name, const char *base)
 }
 
 extern void processLanguageDefineOption (
-		const char *const option, const char *const parameter CTAGS_ATTR_UNUSED)
+		const char *const option, const char *const parameter)
 {
 	if (parameter [0] == '\0')
 		error (WARNING, "No language specified for \"%s\" option", option);
@@ -1813,12 +1857,21 @@ extern void processLanguageDefineOption (
 		LanguageTable = xRealloc (LanguageTable, LanguageCount + 1, parserObject);
 		memset (LanguageTable + LanguageCount, 0, sizeof(parserObject));
 
-		char *base = NULL;
-		flagsEval (flags, PreLangDefFlagDef, ARRAY_SIZE (PreLangDefFlagDef), &base);
+		struct preLangDefFlagData data = {
+			.base = NULL,
+			.direction = SUBPARSER_UNKNOWN_DIRECTION,
+		};
+		flagsEval (flags, PreLangDefFlagDef, ARRAY_SIZE (PreLangDefFlagDef), &data);
 
-		def = OptlibParser (name, base);
-		if (base)
-			eFree (base);
+		if (data.base == NULL && data.direction != SUBPARSER_UNKNOWN_DIRECTION)
+			error (WARNING, "Ignore the direction of subparser because \"{base=}\" is not given");
+
+		if (data.base && data.direction == SUBPARSER_UNKNOWN_DIRECTION)
+			data.direction = SUBPARSER_BASE_RUNS_SUB;
+
+		def = OptlibParser (name, data.base, data.direction);
+		if (data.base)
+			eFree (data.base);
 
 		initializeParsingCommon (def, false);
 		linkDependenciesAtInitializeParsing (def);

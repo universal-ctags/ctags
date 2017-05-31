@@ -122,15 +122,15 @@ main	input.c	/^main(void)$/;"	function	language:C	typeref:typename:int
 mylib.so	input.c	/^	LOAD_PLUGIN(mylib.so, isearch);$/;"	file	language:Plugin
 List subparsers of C ( EVENT + HOOK + PLUGIN + UA )
 #NAME                          BASEPARSER           DIRECTION
-Plugin                         C                    base => sub
-Event                          C                    base => sub
+Plugin                         C                    base => sub {shared}
+Event                          C                    base => sub {shared}
 List subparsers of C ( EVENT + HOOK + PLUGIN + UA ) without the header
-Plugin                         C                    base => sub
-Event                          C                    base => sub
+Plugin                         C                    base => sub {shared}
+Event                          C                    base => sub {shared}
 List subparsers of C ( EVENT + HOOK + PLUGIN + UA ) in machinable
 #NAME	BASEPARSER	DIRECTION
-Plugin	C	base => sub
-Event	C	base => sub
+Plugin	C	base => sub {shared}
+Event	C	base => sub {shared}
 List subparsers of C ( EVENT + HOOK + PLUGIN + UA ) in machinable without the header
-Plugin	C	base => sub
-Event	C	base => sub
+Plugin	C	base => sub {shared}
+Event	C	base => sub {shared}
