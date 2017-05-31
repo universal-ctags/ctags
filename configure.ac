@@ -301,7 +301,7 @@ AC_SYS_LARGEFILE
 AC_CHECK_PROGS([perl_found], [perl], [yes], [no])
 AM_CONDITIONAL([RUN_OPTLIB2C], [test "${perl_found}" = "yes"])
 
-AC_PATH_PROGS(RST2MAN, [rst2man rst2man.py], [no])
+AC_PATH_PROGS(RST2MAN, [rst2man rst2man.py rst2man3 rst2man3.py], [no])
 AM_CONDITIONAL([HAVE_RST2MAN], [test "x$RST2MAN" != "xno"])
 
 # Checks for operating environment
