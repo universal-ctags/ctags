@@ -61,6 +61,13 @@ my $options =
 	     unless ($_[0]->{'langdef'} eq $1);
 	 push @{$_[0]->{'extradefs'}}, { name => $2, desc => $3 };
        } ],
+     [ qr/^--_fielddef-(.*)=([^,]+),(.+)/, sub {
+	 die "Don't use --_fielddef-<LANG>=+ option before defining the language"
+	     if (! defined $_[0]->{'langdef'});
+	 die "Adding a field is allowed only to the language specified with --langdef: $1"
+	     unless ($_[0]->{'langdef'} eq $1);
+	 push @{$_[0]->{'fielddefs'}}, { name => $2, desc => $3 };
+       } ],
      [ qr/^--languages=-(.*)/, sub {
 	   die "Don't use --languages=- option before defining the language"
 	       if (! defined $_[0]->{'langdef'});
@@ -127,6 +134,21 @@ my $options =
        } ],
      [ qr/^--extras-([^=]*)=(.)\{/, sub {
 	 die "Unknown flag($2) is passed to --extras-<LANG>= option";
+       } ],
+     [ qr/^--fields-([^=]*)=([-+])\{(.+)\}$/, sub {
+	   die "Don't use --fields-<LANG>= option before defining the language"
+	       if (! defined $_[0]->{'langdef'});
+	   die "Enabling/disabling a field is allowed only to the language specified with --langdef: $1"
+	       unless ($_[0]->{'langdef'} eq $1);
+	   die "Specifing multiple fields in one --fields-... is not handled: {$3}"
+	       if ( index ($3, '{') != -1 );
+	   parse_fields ($2, $3, $_[0]);
+       } ],
+     [ qr/^--fields-([^=]*)=\{/, sub {
+	 die "--fields-<LANG>= can be used only for enabling or disabling a field: $1";
+       } ],
+     [ qr/^--fields-([^=]*)=(.)\{/, sub {
+	 die "Unknown flag($2) is passed to --fields-<LANG>= option";
        } ],
      [ qr/^--xcmd-([^=]*)=([^{]*)(\{.*)?/, sub {
 	   die "Don't use --xcmd-<LANG>= option before defining the language"
@@ -273,6 +295,20 @@ sub parse_extras {
     # TODO: Hash table should be used for manage 'extradefs'.
     for (@{$opts->{'extradefs'}}) {
 	if ($_->{'name'} eq $extra)
+	{
+	    $_->{'enabled'} = $flag;
+	}
+    }
+}
+
+sub parse_fields {
+    my ($flag, $field, $opts) = @_;
+
+    $flag = ( $flag eq '+' )?1: 0;
+
+    # TODO: Hash table should be used for manage 'fielddefs'.
+    for (@{$opts->{'fielddefs'}}) {
+	if ($_->{'name'} eq $field)
 	{
 	    $_->{'enabled'} = $flag;
 	}
@@ -449,6 +485,29 @@ EOF
 EOF
 }
 
+sub emit_fields {
+    my $opts = shift;
+
+    return if (! @{$opts->{'fielddefs'}});
+
+    print <<EOF;
+	static fieldDefinition $opts->{'Clangdef'}FieldTable [] = {
+EOF
+    for (@{$opts->{'fielddefs'}}) {
+      my $enabled = $_->{"enabled"}? "true": "false";
+      print <<EOF;
+		{
+		  .enabled     = $enabled,
+		  .name        = "$_->{'name'}",
+		  .description = "$_->{'desc'}",
+		},
+EOF
+    }
+    print <<EOF;
+	};
+EOF
+}
+
 sub emit_fields_initialization {
     my $opts = shift;
     my $enabled = $opts->{"disabled"} ? "false": "true";
@@ -474,6 +533,13 @@ EOF
 	print <<EOF;
 	def->kindTable = $opts->{'Clangdef'}KindTable;
 	def->kindCount = ARRAY_SIZE($opts->{'Clangdef'}KindTable);
+EOF
+    }
+
+    if (@{$opts->{'fielddefs'}}) {
+	print <<EOF;
+	def->fieldTable = $opts->{'Clangdef'}FieldTable;
+	def->fieldCount = ARRAY_SIZE($opts->{'Clangdef'}FieldTable);
 EOF
     }
 
@@ -519,6 +585,7 @@ EOF
     emit_aliases         $opts;
     emit_patterns        $opts;
     emit_kinddefs        $opts;
+    emit_fields          $opts;
     emit_xtags           $opts;
     emit_regexs          $opts;
     emit_dependencies    $opts;
@@ -592,6 +659,8 @@ sub main {
 			    ],
 		extradefs => [ # { name => "", desc => "", enabled => 1|0 },
 			     ],
+		fielddefs => [ # { name => "", desc => "", enabled => 1|0 },
+			      ],
 		base => undef,
 	       );
 
