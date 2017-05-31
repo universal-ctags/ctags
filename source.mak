@@ -115,10 +115,11 @@ PARSER_HEADS = \
 	parsers/cxx/cxx_token.h \
 	parsers/cxx/cxx_token_chain.h \
 	\
+	parsers/cpreprocessor.h \
 	parsers/iniconf.h \
 	parsers/m4.h \
 	parsers/make.h \
-	parsers/cpreprocessor.h \
+	parsers/tcl.h \
 	\
 	$(NULL)
 
@@ -227,7 +228,7 @@ XML_SRCS = \
 	 \
 	 $(NULL)
 
-YAML_HEAD = parsers/meta-yaml.h
+YAML_HEADS = parsers/yaml.h
 YAML_SRCS = \
 	  parsers/yaml.c		\
 	  \
@@ -241,7 +242,7 @@ DEBUG_SRCS = main/debug.c
 ALL_HEADS = $(MAIN_HEADS) $(PARSER_HEADS) $(DEBUG_HEADS)
 ALL_SRCS = $(MAIN_SRCS) $(PARSER_SRCS) $(DEBUG_SRCS)
 
-ENVIRONMENT_HEADS = e_msoft.h
+ENVIRONMENT_HEADS =
 ENVIRONMENT_SRCS =
 
 REGEX_HEADS = gnu_regex/regex.h
@@ -252,6 +253,7 @@ FNMATCH_HEADS = fnmatch/fnmatch.h
 FNMATCH_SRCS = fnmatch/fnmatch.c
 FNMATCH_OBJS = $(FNMATCH_SRCS:.c=.$(OBJEXT))
 
+WIN32_HEADS = main/e_msoft.h
 WIN32_SRCS = win32/mkstemp/mkstemp.c
 WIN32_OBJS = $(WIN32_SRCS:.c=.$(OBJEXT))
 

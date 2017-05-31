@@ -2,6 +2,8 @@
 
 check: tmain units
 
+clean-local: clean-units clean-tmain
+
 CTAGS_TEST = ./ctags$(EXEEXT)
 READ_TEST = ./readtags$(EXEEXT)
 TIMEOUT=
