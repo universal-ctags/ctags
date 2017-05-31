@@ -106,7 +106,7 @@ my $options =
 	   parse_regex ($2, $_[0]);
        } ],
      [ qr/^--kinds-([^=]*)=-(.*)/, sub {
-	   die "Don't use --kind-<LANG>= option before defining the language"
+	   die "Don't use --kinds-<LANG>= option before defining the language"
 	       if (! defined $_[0]->{'langdef'});
 	   parse_kinds ($2, $_[0]);
        } ],
@@ -114,7 +114,7 @@ my $options =
 	   die "--kinds-<LANG>= can be used only for disabling a kind: $1";
        } ],
      [ qr/^--extras-([^=]*)=([-+])\{(.+)\}$/, sub {
-	   die "Don't use --kind-<LANG>= option before defining the language"
+	   die "Don't use --extras-<LANG>= option before defining the language"
 	       if (! defined $_[0]->{'langdef'});
 	   die "Enabling/disabling an extra is allowed only to the language specified with --langdef: $1"
 	       unless ($_[0]->{'langdef'} eq $1);
@@ -404,7 +404,6 @@ EOF
 		"$_->{'kind'}", $flags},
 EOF
     }
-
     print <<EOF;
 	};
 
