@@ -259,6 +259,7 @@ extern kindDefinition* getLanguageKind (const langType language, signed char kin
 		kdef = &kindGhost;
 		break;
 	default:
+		Assert (kindIndex >= 0);
 		kdef = getKind (LanguageTable [language].kindControlBlock, kindIndex);
 	}
 	return kdef;
