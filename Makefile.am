@@ -1,11 +1,14 @@
 include $(top_srcdir)/source.mak
 
 # Test cases are added to EXTRA_DIST in makefiles/test-cases.mak
-EXTRA_DIST   = README.md \
-	       gnu_regex/regcomp.c gnu_regex/regexec.c \
+EXTRA_DIST   = README.md autogen.sh \
+	       .ctags .dir-locals.el .editorconfig .gdbinit .gitignore \
+	       .indent.pro .uncrustify.cfg \
+	       gnu_regex/README.txt gnu_regex/regcomp.c gnu_regex/regexec.c \
 	       gnu_regex/regex_internal.c gnu_regex/regex_internal.h \
 	       $(WIN32_HEADS) $(WIN32_SRCS) mk_mingw.mak mk_mvc.mak \
-	       win32/appveyor.bat win32/ctags_vs2013.sln \
+	       win32/mkstemp/COPYING.MinGW-w64-runtime.txt \
+	       win32/ctags_vs2013.sln \
 	       win32/ctags_vs2013.vcxproj win32/ctags_vs2013.vcxproj.filters \
 	       win32/gen-repoinfo.bat
 
