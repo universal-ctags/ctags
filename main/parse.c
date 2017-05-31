@@ -84,6 +84,7 @@ typedef struct sParserObject {
  * FUNCTION PROTOTYPES
  */
 
+static void lazyInitialize (langType language);
 static void addParserPseudoTags (langType language);
 static void installKeywordTable (const langType language);
 static void installTagRegexTable (const langType language);
@@ -1473,14 +1474,11 @@ static void installFieldDefinition (const langType language)
 
 	Assert (0 <= language  &&  language < (int) LanguageCount);
 	parser = LanguageTable [language].def;
-	if (parser->fieldDefinitionCount > PRE_ALLOCATED_PARSER_FIELDS)
-		error (FATAL,
-		       "INTERNAL ERROR: in a parser, fields are defined more than PRE_ALLOCATED_PARSER_FIELDS\n");
 
-	if (parser->fieldDefinitions != NULL)
+	if (parser->fieldTable != NULL)
 	{
-		for (i = 0; i < parser->fieldDefinitionCount; i++)
-			defineField (& parser->fieldDefinitions [i], language);
+		for (i = 0; i < parser->fieldCount; i++)
+			defineField (& parser->fieldTable [i], language);
 	}
 }
 
@@ -1504,7 +1502,7 @@ static void initializeParserOne (langType lang)
 	parserObject *const parser = LanguageTable + lang;
 
 	if (parser->initialized)
-		return;
+		goto out;
 
 	verbose ("Initialize parser: %s\n", parser->def->name);
 	parser->initialized = true;
@@ -1530,6 +1528,29 @@ static void initializeParserOne (langType lang)
 
 	Assert (parser->fileKind != KIND_NULL);
 	Assert (!doesParserUseKind (parser->kindControlBlock, parser->fileKind->letter));
+
+	return;
+
+ out:
+	/* lazyInitialize() installs findRegexTags() to parser->parser.
+	   findRegexTags() should be installed to a parser if the parser is
+	   optlib based(created by --langdef) and has some regex patterns(defined
+	   with --regex-<LANG>). findRegexTags() makes regex matching work.
+
+	   If a parser can be initialized during evaluating options,
+	   --fields-<LANG>=+{something}, for an example.
+	   If such option is evaluated first, evaluating --regex-<LANG>=...
+	   option doesn't cause installing findRegexTags. As the result
+	   regex matching doesn't work. lazyInitialize was called only
+	   once when --fields-<LANG>=+{something} was evaluated. In the
+	   timing ctags had not seen --regex-<LANG>=.... Even though
+	   ctags saw --regex-<LANG>=.... after initializing, there
+	   was no chance to install findRegexTags() to parser->parser.
+
+	   Following code block gives extra chances to call lazyInitialize9)
+	   which installs findRegexTags() to parser->parser.	 */
+	if (parser->def->initialize == lazyInitialize)
+		parser->def->initialize (lang);
 }
 
 extern void initializeParser (langType lang)
@@ -2579,6 +2600,68 @@ extern bool processExtradefOption (const char *const option, const char *const p
 	return processLangDefineExtra (language, option, parameter);
 }
 
+static void fieldDefinitionDestroy (fieldDefinition *fdef)
+{
+	eFree ((void *)fdef->description);
+	eFree ((void *)fdef->name);
+	eFree (fdef);
+}
+
+static bool processLangDefineField (const langType language,
+									const char *const option,
+									const char *const parameter)
+{
+	fieldDefinition *fdef;
+	const char * p = parameter;
+	const char *desc;
+
+	Assert (0 <= language  &&  language < (int) LanguageCount);
+	Assert (p);
+
+	if (p[0] == '\0')
+		error (FATAL, "no field definition specified in \"--%s\" option", option);
+
+	desc = strchr (p, ',');
+	if (!desc)
+		error (FATAL, "no field description specified in \"--%s\" option", option);
+	else if (desc == p)
+		error (FATAL, "the field name in \"--%s\" option is empty", option);
+
+	for (; p < desc; p++)
+	{
+		if (!isalnum (*p))
+			error (FATAL, "unacceptable char as part of field name in \"--%s\" option",
+				   option);
+	}
+
+	if (strlen (desc + 1) == 0)
+		error (FATAL, "field description in \"--%s\" option is empty", option);
+
+	fdef = xCalloc (1, fieldDefinition);
+	fdef->enabled = false;
+	fdef->letter = NUL_FIELD_LETTER;
+	fdef->name = eStrndup(parameter, desc - parameter);
+	fdef->description = eStrdup (desc + 1);
+	fdef->isValueAvailable = NULL;
+	fdef->dataType = FIELDTYPE_STRING; /* TODO */
+	fdef->ftype = FIELD_UNKNOWN;
+	DEFAULT_TRASH_BOX(fdef, fieldDefinitionDestroy);
+
+	defineField (fdef, language);
+
+	return true;
+}
+
+extern bool processFielddefOption (const char *const option, const char *const parameter)
+{
+	langType language;
+
+	language = getLanguageComponentInOption (option, "_fielddef-");
+	if (language == LANG_IGNORE)
+		return false;
+
+	return processLangDefineField (language, option, parameter);
+}
 
 /*
 *   File parsing

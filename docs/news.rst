@@ -59,6 +59,7 @@ The following parsers have been added:
 * Maven2 *libxml*
 * M4
 * ObjectiveC
+* passwd
 * Perl6
 * Pod *optlib*
 * PropertiyList(plist) *libxml*
@@ -1164,6 +1165,8 @@ separator; the third line has higher priority than the first.
 This pseudo tag represents output mode: u-ctags or e-ctags.
 
 See also :ref:`Compatible output and weakness <compat-output>`.
+
+.. _parser-own-fields:
 
 Parser own fields
 ---------------------------------------------------------------------

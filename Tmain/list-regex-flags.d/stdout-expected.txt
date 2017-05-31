@@ -6,3 +6,4 @@ x	exclusive	skip testing the other patterns if a line is matched to this pattern
 -	placeholder	don't put this tag to tags file.
 -	_multiline=NGROUP	match in multiline mode. cannot be combined with scope, placeholder, and exclusive
 -	_extra=EXTRA	record the tag only when the extra is enabled
+-	_field=FIELD:VALUE	record the matched string(VALUE) to FIELD of the tag

@@ -592,13 +592,15 @@ extern const char* renderFieldEscaped (writerType writer,
 
 	Assert (tag);
 	Assert (fobj->def->renderEscaped);
+	Assert (tag->usedParserFields > index);
 
 	fobj->buffer = vStringNewOrClearWithAutoRelease (fobj->buffer);
 
 	if (index >= 0)
 	{
-		Assert ( tag->usedParserFields > index );
-		value = tag->parserFields[ index ].value;
+		const tagField *f = getParserField (tag, index);
+
+		value = f->value;
 	}
 	else
 		value = NULL;

@@ -269,8 +269,8 @@ extern parserDefinition* RstParser (void)
 	def->extensions = extensions;
 	def->parser = findRstTags;
 
-	def->fieldDefinitions = RstFields;
-	def->fieldDefinitionCount = ARRAY_SIZE (RstFields);
+	def->fieldTable = RstFields;
+	def->fieldCount = ARRAY_SIZE (RstFields);
 
 	def->useCork = true;
 

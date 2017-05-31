@@ -95,8 +95,8 @@ struct sParserDefinition {
 	tagXpathTableTable *tagXpathTableTable;
 	unsigned int tagXpathTableCount;
 	bool invisible;
-	fieldDefinition *fieldDefinitions;
-	unsigned int fieldDefinitionCount;
+	fieldDefinition *fieldTable;
+	unsigned int fieldCount;
 	xtagDefinition *xtagTable;
 	unsigned int xtagCount;
 

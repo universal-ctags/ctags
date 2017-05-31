@@ -1,0 +1,3 @@
+public func foo(n, m);
+protected func bar(n);
+private func baz(n,...);

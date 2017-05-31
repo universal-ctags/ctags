@@ -737,8 +737,8 @@ extern parserDefinition* LdScriptParser (void)
 	def->keywordTable = LdScriptKeywordTable;
 	def->keywordCount = ARRAY_SIZE (LdScriptKeywordTable);
 	def->initialize = initialize;
-	def->fieldDefinitions = LdScriptFields;
-	def->fieldDefinitionCount = ARRAY_SIZE (LdScriptFields);
+	def->fieldTable = LdScriptFields;
+	def->fieldCount = ARRAY_SIZE (LdScriptFields);
 
 	def->useCork    = true;
 

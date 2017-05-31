@@ -86,8 +86,8 @@ parserDefinition * CParser (void)
 
 	def->kindTable = cxxTagGetCKindDefinitions();
 	def->kindCount = cxxTagGetCKindDefinitionCount();
-	def->fieldDefinitions = cxxTagGetCFieldDefinitionifiers();
-	def->fieldDefinitionCount = cxxTagGetCFieldDefinitionifierCount();
+	def->fieldTable = cxxTagGetCFieldDefinitionifiers();
+	def->fieldCount = cxxTagGetCFieldDefinitionifierCount();
 	def->extensions = extensions;
 	def->parser2 = cxxCParserMain;
 	def->initialize = cxxCParserInitialize;
@@ -121,8 +121,8 @@ parserDefinition * CppParser (void)
 	def->dependencyCount = ARRAY_SIZE (dependencies);
 	def->kindTable = cxxTagGetCPPKindDefinitions();
 	def->kindCount = cxxTagGetCPPKindDefinitionCount();
-	def->fieldDefinitions = cxxTagGetCPPFieldDefinitionifiers();
-	def->fieldDefinitionCount = cxxTagGetCPPFieldDefinitionifierCount();
+	def->fieldTable = cxxTagGetCPPFieldDefinitionifiers();
+	def->fieldCount = cxxTagGetCPPFieldDefinitionifierCount();
 	def->extensions = extensions;
 	def->parser2 = cxxCppParserMain;
 	def->initialize = cxxCppParserInitialize;
@@ -150,8 +150,8 @@ parserDefinition * CUDAParser (void)
 	def->dependencyCount = ARRAY_SIZE (dependencies);
 	def->kindTable = cxxTagGetCUDAKindDefinitions();
 	def->kindCount = cxxTagGetCUDAKindDefinitionCount();
-	def->fieldDefinitions = cxxTagGetCUDAFieldDefinitionifiers();
-	def->fieldDefinitionCount = cxxTagGetCUDAFieldDefinitionifierCount();
+	def->fieldTable = cxxTagGetCUDAFieldDefinitionifiers();
+	def->fieldCount = cxxTagGetCUDAFieldDefinitionifierCount();
 	def->extensions = extensions;
 	def->parser2 = cxxCUDAParserMain;
 	def->initialize = cxxCUDAParserInitialize;

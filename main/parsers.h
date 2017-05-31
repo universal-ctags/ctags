@@ -87,6 +87,7 @@
 	OldCppParser, \
 	OldCParser, \
 	OcamlParser, \
+	PasswdParser, \
 	PascalParser, \
 	PerlParser, \
 	Perl6Parser, \

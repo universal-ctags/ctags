@@ -1,0 +1,16 @@
+# disabling fields
+bar	input.unknown	/^protected func bar(n);$/;"	f
+baz	input.unknown	/^private func baz(n,...);$/;"	f
+foo	input.unknown	/^public func foo(n, m);$/;"	f
+# enabling signature only
+bar	input.unknown	/^protected func bar(n);$/;"	f	signature:(n)
+baz	input.unknown	/^private func baz(n,...);$/;"	f	signature:(n,...)
+foo	input.unknown	/^public func foo(n, m);$/;"	f	signature:(n, m)
+# enabling protection only
+bar	input.unknown	/^protected func bar(n);$/;"	f	protection:protected 
+baz	input.unknown	/^private func baz(n,...);$/;"	f	protection:private 
+foo	input.unknown	/^public func foo(n, m);$/;"	f	protection:public 
+# enabling both signature and protection
+bar	input.unknown	/^protected func bar(n);$/;"	f	protection:protected 	signature:(n)
+baz	input.unknown	/^private func baz(n,...);$/;"	f	protection:private 	signature:(n,...)
+foo	input.unknown	/^public func foo(n, m);$/;"	f	protection:public 	signature:(n, m)
