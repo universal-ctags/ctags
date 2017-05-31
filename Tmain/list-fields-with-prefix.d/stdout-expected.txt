@@ -11,5 +11,7 @@ e       UCTAGSend       off     NONE             TRUE   -i-    end lines of vari
 -       UCTAGSname      on      C++              TRUE   s--    aliased names                 
 -       UCTAGSproperties off     CUDA             TRUE   s--    properties (static, inline, mutable,...)
 -       UCTAGSassignment on      LdScript         TRUE   s--    how a value is assigned to the symbol
+-       UCTAGShome      on      passwd           TRUE   s--    home directory                
+-       UCTAGSshell     on      passwd           TRUE   s--    login shell                   
 -       UCTAGSdecorators off     Python           TRUE   s--    decorators on functions and classes
 -       UCTAGSsectionMarker off     reStructuredText TRUE   s--    character used for declaring section

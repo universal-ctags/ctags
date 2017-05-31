@@ -180,6 +180,9 @@
     <ClCompile Include="..\optlib\man.c">
       <Filter>Source Files\optlib</Filter>
     </ClCompile>
+    <ClCompile Include="..\optlib\passwd.c">
+      <Filter>Source Files\optlib</Filter>
+    </ClCompile>
     <ClCompile Include="..\optlib\pod.c">
       <Filter>Source Files\optlib</Filter>
     </ClCompile>

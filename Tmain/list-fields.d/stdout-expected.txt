@@ -29,6 +29,8 @@ e	end	off	NONE	TRUE	-i-	end lines of various items
 -	name	on	C++	TRUE	s--	aliased names
 -	properties	off	CUDA	TRUE	s--	properties (static, inline, mutable,...)
 -	assignment	on	LdScript	TRUE	s--	how a value is assigned to the symbol
+-	home	on	passwd	TRUE	s--	home directory
+-	shell	on	passwd	TRUE	s--	login shell
 -	decorators	off	Python	TRUE	s--	decorators on functions and classes
 -	sectionMarker	off	reStructuredText	TRUE	s--	character used for declaring section
 #

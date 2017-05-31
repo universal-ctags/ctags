@@ -655,6 +655,8 @@ When defining a new parser own field, it is disabled by default. Enable the
 field explicitly to use the field. See :ref:`Parser own fields <parser-own-fields>`
 about `--fields-<LANG>` option.
 
+`passwd` parser is a simple example that uses `--fields-<LANG>` option.
+
 
 Submitting an optlib to universal-ctags project
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

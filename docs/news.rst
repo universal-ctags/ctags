@@ -59,6 +59,7 @@ The following parsers have been added:
 * Maven2 *libxml*
 * M4
 * ObjectiveC
+* passwd
 * Perl6
 * Pod *optlib*
 * PropertiyList(plist) *libxml*
