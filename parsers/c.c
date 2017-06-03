@@ -1459,10 +1459,11 @@ static void makeExtraTagEntry (const tagType type, tagEntryInfo *const e,
 	}
 }
 
-static void makeTag (const tokenInfo *const token,
+static int makeTag (const tokenInfo *const token,
 					 const statementInfo *const st,
 					 bool isFileScope, const tagType type)
 {
+	int corkIndex = CORK_NIL;
 	/*  Nothing is really of file scope when it appears in a header file.
 	 */
 	isFileScope = (bool) (isFileScope && ! isInputHeaderFile ());
@@ -1482,7 +1483,7 @@ static void makeTag (const tokenInfo *const token,
 
 		role = roleForType (type);
 		if (! (role == ROLE_INDEX_DEFINITION || isXtagEnabled (XTAG_REFERENCE_TAGS)))
-			return;
+			return CORK_NIL;
 
 		scope  = vStringNew ();
 		typeRef = vStringNew ();
@@ -1502,12 +1503,13 @@ static void makeTag (const tokenInfo *const token,
 		isScopeBuilt = findScopeHierarchy (scope, st);
 		addOtherFields (&e, type, st, scope, typeRef);
 
-		makeTagEntry (&e);
+		corkIndex = makeTagEntry (&e);
 		if (isScopeBuilt)
 			makeExtraTagEntry (type, &e, scope);
 		vStringDelete (scope);
 		vStringDelete (typeRef);
 	}
+	return corkIndex;
 }
 
 static bool isValidTypeSpecifier (const declType declaration)
@@ -1532,16 +1534,19 @@ static bool isValidTypeSpecifier (const declType declaration)
 	return result;
 }
 
-static void qualifyEnumeratorTag (const statementInfo *const st,
-								  const tokenInfo *const nameToken)
+static int qualifyEnumeratorTag (const statementInfo *const st,
+								 const tokenInfo *const nameToken)
 {
+	int corkIndex = CORK_NIL;
 	if (isType (nameToken, TOKEN_NAME))
-		makeTag (nameToken, st, true, TAG_ENUMERATOR);
+		corkIndex = makeTag (nameToken, st, true, TAG_ENUMERATOR);
+	return corkIndex;
 }
 
-static void qualifyFunctionTag (const statementInfo *const st,
+static int qualifyFunctionTag (const statementInfo *const st,
 								const tokenInfo *const nameToken)
 {
+	int corkIndex = CORK_NIL;
 	if (isType (nameToken, TOKEN_NAME))
 	{
 		tagType type;
@@ -1554,26 +1559,30 @@ static void qualifyFunctionTag (const statementInfo *const st,
 			type = TAG_TASK;
 		else
 			type = TAG_FUNCTION;
-		makeTag (nameToken, st, isFileScope, type);
+		corkIndex = makeTag (nameToken, st, isFileScope, type);
 	}
+	return corkIndex;
 }
 
-static void qualifyFunctionDeclTag (const statementInfo *const st,
+static int qualifyFunctionDeclTag (const statementInfo *const st,
 									const tokenInfo *const nameToken)
 {
+	int corkIndex = CORK_NIL;
 	if (! isType (nameToken, TOKEN_NAME))
 		;
 	else if (isInputLanguage (Lang_java) || isInputLanguage (Lang_csharp))
-		qualifyFunctionTag (st, nameToken);
+		corkIndex = qualifyFunctionTag (st, nameToken);
 	else if (st->scope == SCOPE_TYPEDEF)
-		makeTag (nameToken, st, true, TAG_TYPEDEF);
+		corkIndex = makeTag (nameToken, st, true, TAG_TYPEDEF);
 	else if (isValidTypeSpecifier (st->declaration) && ! isInputLanguage (Lang_csharp))
-		makeTag (nameToken, st, true, TAG_PROTOTYPE);
+		corkIndex = makeTag (nameToken, st, true, TAG_PROTOTYPE);
+	return corkIndex;
 }
 
-static void qualifyCompoundTag (const statementInfo *const st,
+static int qualifyCompoundTag (const statementInfo *const st,
 								const tokenInfo *const nameToken)
 {
+	int corkIndex = CORK_NIL;
 	if (isType (nameToken, TOKEN_NAME))
 	{
 		const tagType type = declToTagType (st->declaration);
@@ -1583,13 +1592,15 @@ static void qualifyCompoundTag (const statementInfo *const st,
 				   isInputLanguage (Lang_vera)));
 
 		if (type != TAG_UNDEFINED)
-			makeTag (nameToken, st, fileScoped, type);
+			corkIndex = makeTag (nameToken, st, fileScoped, type);
 	}
+	return corkIndex;
 }
 
-static void qualifyBlockTag (statementInfo *const st,
+static int qualifyBlockTag (statementInfo *const st,
 							 const tokenInfo *const nameToken)
 {
+	int corkIndex = CORK_NIL;
 	switch (st->declaration)
 	{
 
@@ -1603,15 +1614,17 @@ static void qualifyBlockTag (statementInfo *const st,
 		case DECL_TEMPLATE:
 		case DECL_VERSION:
 		case DECL_ANNOTATION:
-			qualifyCompoundTag (st, nameToken);
+			corkIndex = qualifyCompoundTag (st, nameToken);
 			break;
 		default: break;
 	}
+	return corkIndex;
 }
 
-static void qualifyVariableTag (const statementInfo *const st,
+static int qualifyVariableTag (const statementInfo *const st,
 								const tokenInfo *const nameToken)
 {
+	int corkIndex = CORK_NIL;
 	/*	We have to watch that we do not interpret a declaration of the
 	 *	form "struct tag;" as a variable definition. In such a case, the
 	 *	token preceding the name will be a keyword.
@@ -1619,16 +1632,16 @@ static void qualifyVariableTag (const statementInfo *const st,
 	if (! isType (nameToken, TOKEN_NAME))
 		;
 	else if (st->scope == SCOPE_TYPEDEF)
-		makeTag (nameToken, st, true, TAG_TYPEDEF);
+		corkIndex = makeTag (nameToken, st, true, TAG_TYPEDEF);
 	else if (st->declaration == DECL_EVENT)
-		makeTag (nameToken, st, (bool) (st->member.access == ACCESS_PRIVATE),
-				TAG_EVENT);
+		corkIndex = makeTag (nameToken, st, (bool) (st->member.access == ACCESS_PRIVATE),
+							 TAG_EVENT);
 	else if (st->declaration == DECL_PACKAGE)
-		makeTag (nameToken, st, false, TAG_PACKAGE);
+		corkIndex = makeTag (nameToken, st, false, TAG_PACKAGE);
 	else if (st->declaration == DECL_PACKAGEREF)
-		makeTag (nameToken, st, false, TAG_PACKAGEREF);
+		corkIndex = makeTag (nameToken, st, false, TAG_PACKAGEREF);
 	else if (st->declaration == DECL_USING && st->assignment)
-		makeTag (nameToken, st, true, TAG_TYPEDEF);
+		corkIndex = makeTag (nameToken, st, true, TAG_TYPEDEF);
 	else if (isValidTypeSpecifier (st->declaration))
 	{
 		if (st->notVariable)
@@ -1636,23 +1649,24 @@ static void qualifyVariableTag (const statementInfo *const st,
 		else if (isMember (st))
 		{
 			if (isInputLanguage (Lang_java) || isInputLanguage (Lang_csharp))
-				makeTag (nameToken, st,
-						(bool) (st->member.access == ACCESS_PRIVATE), TAG_FIELD);
+				corkIndex = makeTag (nameToken, st,
+									 (bool) (st->member.access == ACCESS_PRIVATE), TAG_FIELD);
 			else if (st->scope == SCOPE_GLOBAL  ||  st->scope == SCOPE_STATIC)
-				makeTag (nameToken, st, true, TAG_MEMBER);
+				corkIndex = makeTag (nameToken, st, true, TAG_MEMBER);
 		}
 		else
 		{
 			if (st->scope == SCOPE_EXTERN  ||  ! st->haveQualifyingName)
-				makeTag (nameToken, st, false, TAG_EXTERN_VAR);
+				corkIndex = makeTag (nameToken, st, false, TAG_EXTERN_VAR);
 			else if (st->inFunction)
-				makeTag (nameToken, st, (bool) (st->scope == SCOPE_STATIC),
-						TAG_LOCAL);
+				corkIndex = makeTag (nameToken, st, (bool) (st->scope == SCOPE_STATIC),
+									 TAG_LOCAL);
 			else
-				makeTag (nameToken, st, (bool) (st->scope == SCOPE_STATIC),
-						TAG_VARIABLE);
+				corkIndex = makeTag (nameToken, st, (bool) (st->scope == SCOPE_STATIC),
+									 TAG_VARIABLE);
 		}
 	}
+	return corkIndex;
 }
 
 /*
@@ -3193,9 +3207,15 @@ static bool isStatementEnd (const statementInfo *const st)
 	return isEnd;
 }
 
-static void checkStatementEnd (statementInfo *const st)
+static void checkStatementEnd (statementInfo *const st, int corkIndex)
 {
 	const tokenInfo *const token = activeToken (st);
+
+	if (corkIndex != CORK_NIL)
+	{
+		tagEntryInfo *e = getEntryInCorkQueue (corkIndex);
+		e->extensionFields.endLine = token->lineNumber;
+	}
 
 	if (isType (token, TOKEN_COMMA))
 		reinitStatement (st, true);
@@ -3248,18 +3268,20 @@ static void nest (statementInfo *const st, const unsigned int nestLevel)
 	setToken (st, TOKEN_BRACE_CLOSE);
 }
 
-static void tagCheck (statementInfo *const st)
+static int tagCheck (statementInfo *const st)
 {
 	const tokenInfo *const token = activeToken (st);
 	const tokenInfo *const prev  = prevToken (st, 1);
 	const tokenInfo *const prev2 = prevToken (st, 2);
+	int corkIndex = CORK_NIL;
+
 	switch (token->type)
 	{
 		case TOKEN_NAME:
 			if (insideEnumBody (st))
-				qualifyEnumeratorTag (st, token);
+				corkIndex = qualifyEnumeratorTag (st, token);
 			if (st->declaration == DECL_MIXIN)
-				makeTag (token, st, false, TAG_MIXIN);
+				corkIndex = makeTag (token, st, false, TAG_MIXIN);
 			if (isInputLanguage (Lang_vera) && insideInterfaceBody (st))
 			{
 				/* Quoted from
@@ -3299,22 +3321,22 @@ static void tagCheck (statementInfo *const st)
 				      && isSignalDirection(prev) ) ||
 				    ( isType (prev2, TOKEN_KEYWORD)
 				      && isSignalDirection(prev) ))
-					makeTag (token, st, false, TAG_SIGNAL);
+					corkIndex = makeTag (token, st, false, TAG_SIGNAL);
 			}
 			break;
 #if 0
 		case TOKEN_PACKAGE:
 			if (st->haveQualifyingName)
-				makeTag (token, st, false, TAG_PACKAGE);
+				corkIndex = makeTag (token, st, false, TAG_PACKAGE);
 			break;
 #endif
 		case TOKEN_BRACE_OPEN:
 			if (isType (prev, TOKEN_ARGS))
 			{
 				if (st->declaration == DECL_TEMPLATE)
-					qualifyBlockTag (st, prev2);
+					corkIndex = qualifyBlockTag (st, prev2);
 				else if (st->declaration == DECL_FUNCTION_TEMPLATE) {
-					qualifyFunctionTag (st, st->blockName);
+					corkIndex = qualifyFunctionTag (st, st->blockName);
 				}
 				else if (st->haveQualifyingName)
 				{
@@ -3325,7 +3347,7 @@ static void tagCheck (statementInfo *const st)
 					if (isInputLanguage (Lang_d) &&
 						(st->declaration == DECL_CLASS || st->declaration == DECL_STRUCT ||
 						st->declaration == DECL_INTERFACE || st->declaration == DECL_UNION))
-						qualifyBlockTag (st, prev2);
+						corkIndex = qualifyBlockTag (st, prev2);
 					else if(isInputLanguage (Lang_cpp) && st->inFunction)
 					{
 						/* Ignore. C/C++ allows nested function prototypes but
@@ -3336,7 +3358,7 @@ static void tagCheck (statementInfo *const st)
 					{
 						if (! isInputLanguage (Lang_vera))
 							st->declaration = DECL_FUNCTION;
-						qualifyFunctionTag (st, prev2);
+						corkIndex = qualifyFunctionTag (st, prev2);
 					}
 				}
 			}
@@ -3367,16 +3389,16 @@ static void tagCheck (statementInfo *const st)
 					st->blockName->type = TOKEN_NAME;
 					st->blockName->keyword = KEYWORD_NONE;
 				}
-				qualifyBlockTag (st, name_token);
+				corkIndex = qualifyBlockTag (st, name_token);
 			}
 			else if (isInputLanguage (Lang_csharp))
-				makeTag (prev, st, false, TAG_PROPERTY);
+				corkIndex = makeTag (prev, st, false, TAG_PROPERTY);
 			break;
 
 		case TOKEN_KEYWORD:
 
 			if (token->keyword == KEYWORD_DEFAULT && isType(prev, TOKEN_ARGS) && insideAnnotationBody(st)) {
-				qualifyFunctionDeclTag(st, prev2);
+				corkIndex = qualifyFunctionDeclTag(st, prev2);
 			}
 			break;
 
@@ -3387,9 +3409,9 @@ static void tagCheck (statementInfo *const st)
 			else if (isType (prev, TOKEN_NAME))
 			{
 				if (isContextualKeyword (prev2))
-					makeTag (prev, st, true, TAG_EXTERN_VAR);
+					corkIndex = makeTag (prev, st, true, TAG_EXTERN_VAR);
 				else
-					qualifyVariableTag (st, prev);
+					corkIndex = qualifyVariableTag (st, prev);
 			}
 			else if (isType (prev, TOKEN_ARGS)  &&  isType (prev2, TOKEN_NAME))
 			{
@@ -3397,10 +3419,10 @@ static void tagCheck (statementInfo *const st)
 				{
 					/* If it looks like a pointer or we are in a function body then
 					   it's far more likely to be a variable. */
-					qualifyVariableTag (st, prev2);
+					corkIndex = qualifyVariableTag (st, prev2);
 				}
 				else
-					qualifyFunctionDeclTag (st, prev2);
+					corkIndex = qualifyFunctionDeclTag (st, prev2);
 			}
 			if (isInputLanguage (Lang_java) && token->type == TOKEN_SEMICOLON && insideEnumBody (st))
 			{
@@ -3413,6 +3435,8 @@ static void tagCheck (statementInfo *const st)
 
 		default: break;
 	}
+
+	return corkIndex;
 }
 
 /*  Parses the current file and decides whether to write out and tags that
@@ -3448,10 +3472,10 @@ static void createTags (const unsigned int nestLevel,
 		}
 		else
 		{
-			tagCheck (st);
+			int corkIndex = tagCheck (st);
 			if (isType (token, TOKEN_BRACE_OPEN))
 				nest (st, nestLevel + 1);
-			checkStatementEnd (st);
+			checkStatementEnd (st, corkIndex);
 		}
 	}
 	deleteStatement ();
@@ -3585,6 +3609,8 @@ extern parserDefinition* DParser (void)
 	def->extensions = extensions;
 	def->parser2    = findCTags;
 	def->initialize = initializeDParser;
+	// end: field is not tested.
+	// def->useCork    = true;
 	return def;
 }
 
@@ -3623,6 +3649,8 @@ extern parserDefinition* CsharpParser (void)
 	def->aliases    = aliases;
 	def->parser2    = findCTags;
 	def->initialize = initializeCsharpParser;
+	// end: field is not tested.
+	// def->useCork    = true;
 	return def;
 }
 
@@ -3635,6 +3663,7 @@ extern parserDefinition* JavaParser (void)
 	def->extensions = extensions;
 	def->parser2    = findCTags;
 	def->initialize = initializeJavaParser;
+	def->useCork    = true;
 	return def;
 }
 
@@ -3647,5 +3676,7 @@ extern parserDefinition* VeraParser (void)
 	def->extensions = extensions;
 	def->parser2    = findCTags;
 	def->initialize = initializeVeraParser;
+	// end: field is not tested.
+	// def->useCork    = true;
 	return def;
 }
