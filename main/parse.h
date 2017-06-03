@@ -154,6 +154,8 @@ extern langType getFileLanguage (const char *const fileName);
 extern bool isLanguageEnabled (const langType language);
 extern bool isLanguageKindEnabled (const langType language, char kind);
 
+extern bool isLanguageVisible (const langType language);
+
 extern void installLanguageMapDefault (const langType language);
 extern void installLanguageMapDefaults (void);
 extern void clearLanguageMap (const langType language);

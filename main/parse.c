@@ -178,6 +178,13 @@ extern bool isLanguageEnabled (const langType language)
 		return true;
 }
 
+extern bool isLanguageVisible (const langType language)
+{
+	const parserDefinition* const lang = LanguageTable [language].def;
+
+	return !lang->invisible;
+}
+
 /*
 *   parserDescription mapping management
 */
