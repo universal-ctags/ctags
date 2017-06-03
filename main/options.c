@@ -1870,23 +1870,31 @@ static void processListAliasesOption (
 static void processListExtrasOption (
 		const char *const option CTAGS_ATTR_UNUSED, const char *const parameter CTAGS_ATTR_UNUSED)
 {
+	struct colprintTable * table = xtagColprintTableNew ();
+
 	if (parameter [0] == '\0' || strcasecmp (parameter, "all") == 0)
 	{
+		xtagColprintAddCommonLines (table);
+
 		initializeParser (LANG_AUTO);
-		printXtags (LANG_AUTO);
+		for (unsigned int i = 0; i < countParsers (); i++)
+		{
+			if (isLanguageVisible(i))
+				xtagColprintAddLanguageLines (table, i);
+		}
 	}
 	else
 	{
 		langType language = getNamedLanguage (parameter, 0);
 		if (language == LANG_IGNORE)
 			error (FATAL, "Unknown language \"%s\" in \"%s\" option", parameter, option);
-		else
-		{
-			initializeParser (language);
-			printXtags (language);
-		}
 
+		initializeParser (language);
+		xtagColprintAddLanguageLines (table, language);
 	}
+
+	xtagColprintTablePrint (table, Option.withListHeader, Option.machinable, stdout);
+	colprintTableDelete (table);
 	exit (0);
 }
 
