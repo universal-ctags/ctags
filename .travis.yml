@@ -31,3 +31,4 @@ script:
 after_success:
   - lcov -c -d .libs -o coverage.info
   - lcoveralls --retry-count 5 coverage.info
+  - bash <(curl -s https://codecov.io/bash)
