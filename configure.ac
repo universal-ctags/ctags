@@ -703,6 +703,8 @@ AC_CHECK_FUNCS([mblen], [], [HAVE_MBLEN=1], [])
 
 AC_CONFIG_FILES([Makefile
 		 man/ctags.1.rst
+		 man/ctags-incompatibilities.1.rst
+		 man/ctags-optlib.1.rst
 		 ])
 
 AC_OUTPUT
