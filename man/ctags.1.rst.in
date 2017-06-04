@@ -24,7 +24,7 @@ The **@CTAGS_NAME_EXECUTABLE@** and **@ETAGS_NAME_EXECUTABLE@** programs
 except where distinguished) generate an index (or "tag") file for a
 variety of language objects found in file(s). This tag file allows
 these items to be quickly and easily located by a text editor or other
-utility. A "tag" signifies a language object for which an index entry is
+utilities. A "tag" signifies a language object for which an index entry is
 available (or, alternatively, the index entry created for that object).
 
 Alternatively, @CTAGS_NAME_EXECUTABLE@ can generate a cross reference
@@ -67,7 +67,7 @@ SOURCE FILES
 
 Unless the ``--language-force`` option is specified, the language of each source
 file is automatically selected based upon a mapping of file names to
-languages. The mappings in effect for each language may be display using
+languages. The mappings in effect for each language may be displayed using
 the ``--list-maps`` option and may be changed using the ``--langmap`` option. On
 platforms which support it, if the name of a file is not mapped to a
 language and the file is executable, the first line of the file is checked
