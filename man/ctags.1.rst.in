@@ -66,13 +66,14 @@ file is automatically selected based upon a mapping of file names to
 languages. The mappings in effect for each language may be displayed using
 the ``--list-maps`` option and may be changed using the ``--langmap`` option. On
 platforms which support it, if the name of a file is not mapped to a
-language and the file is executable, the first line of the file is checked
-to see if the file is a "#!" script for a recognized language.
+language, @CTAGS_NAME_EXECUTABLE@ tries to guess the language for
+the file by inspecting its content. See "GUESSING PARSER".
 
-By default, all other files names are ignored. This permits running
-@CTAGS_NAME_EXECUTABLE@ on all files in either a single directory (e.g.
-"@CTAGS_NAME_EXECUTABLE@ \*"), or on all files in an entire source directory
-tree (e.g. "@CTAGS_NAME_EXECUTABLE@ -R"), since only those files whose
+All files that have no file name mapping and no guessed parser are
+ignored. This permits running @CTAGS_NAME_EXECUTABLE@ on all files in
+either a single directory (e.g.  "@CTAGS_NAME_EXECUTABLE@ \*"), or on
+all files in an entire source directory tree
+(e.g. "@CTAGS_NAME_EXECUTABLE@ -R"), since only those files whose
 names are mapped to languages will be scanned.
 
 [The reason that .h extensions are mapped to C++ files rather than C files
