@@ -33,15 +33,11 @@ source objects found in a set of language files.
 
 Tag index files are supported by numerous editors, which allow the user to
 locate the object associated with a name appearing in a source file and
-jump to the file and line which defines the name. Those known about at
-the time of this release are:
+jump to the file and line which defines the name. See the manual of your
+favorite editor about utilizing @CTAGS_NAME_EXECUTABLE@ command and
+the tag index files in the editor.
 
-	**Vi** (1) and its derivatives (e.g. Elvis, Vim, Vile, Lemmy), **CRiSP**,
-	**Emacs**, **FTE** (Folding Text Editor), **JED**, **jEdit**, **Mined**,
-	**NEdit** (Nirvana Edit), **TSE** (The SemWare Editor), **UltraEdit**,
-	**WorkSpace**, **X2**, **Zeus**
-
-**@CTAGS_NAME_EXECUTABLE@** is capable of generating different kinds of tags
+@CTAGS_NAME_EXECUTABLE@ is capable of generating different kinds of tags
 for each of many different languages. For a complete list of supported
 languages, the names by which they are recognized, and the kinds of tags
 which are generated for each, see the ``--list-languages`` and ``--list-kinds``
