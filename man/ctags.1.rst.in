@@ -20,14 +20,14 @@ DESCRIPTION
 -----------
 
 The **@CTAGS_NAME_EXECUTABLE@** and **@ETAGS_NAME_EXECUTABLE@** programs
-(hereinafter collectively referred to as **@CTAGS_NAME_EXECUTABLE@**,
+(hereinafter collectively referred to as @CTAGS_NAME_EXECUTABLE@,
 except where distinguished) generate an index (or "tag") file for a
 variety of language objects found in file(s). This tag file allows
 these items to be quickly and easily located by a text editor or other
 utility. A "tag" signifies a language object for which an index entry is
 available (or, alternatively, the index entry created for that object).
 
-Alternatively, **@CTAGS_NAME_EXECUTABLE@** can generate a cross reference
+Alternatively, @CTAGS_NAME_EXECUTABLE@ can generate a cross reference
 file which lists, in human readable form, information about the various
 source objects found in a set of language files.
 
