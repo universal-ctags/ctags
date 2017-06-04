@@ -1,0 +1,6 @@
+Rules for writing man pages
+---------------------------------------------------------------------
+
+* put two single quotes around an option name like ``--help``.
+
+* .. code-block:: .. cannot be handled well in rst2man.
