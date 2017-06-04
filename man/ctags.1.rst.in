@@ -86,6 +86,108 @@ options. (The heuristics are applied either ``--guess-language-eagerly`` is
 given or not.)
 
 
+.. TODO: Mapping of file names
+
+Guessing parser
+~~~~~~~~~~~~~~~
+
+If ctags cannot select a parser from the mapping of file names,
+various tests are conducted for the guessing:
+
+template file name testing
+	If the file name has ".in" extension, apply the mapping to the file
+	name without the extension. For example, "config.h" is tested for a file
+	named "config.h.in".
+
+"interpreter" testing
+	The first line of the file is checked to see if the file is a "#!"
+	script for a recognized language.  @CTAGS_NAME_EXECUTABLE@ looks for
+	a parser having the same name.
+
+	If @CTAGS_NAME_EXECUTABLE@ finds no such parser,
+	@CTAGS_NAME_EXECUTABLE@ looks for the name in alias lists. For
+	example, consider if the first line is "#!/bin/sh".  Though
+	@CTAGS_NAME_EXECUTABLE@ has "shell" parser, it doesn't have "sh"
+	parser. However, "sh" is listed as an alias for "shell",
+	@CTAGS_NAME_EXECUTABLE@ selects the "shell" parser for the file.
+
+	An exception is "env". If "env" is specified, @CTAGS_NAME_EXECUTABLE@
+	reads more lines to find real interpreter specification.
+
+	To display the list of aliases, use ``--list-aliases`` option.
+	To add/remove an item to/from the list, use ``--alias-<LANG>=[+|-]aliasPattern``
+	option.
+
+"zsh autoload tag" testing
+	If the first line is started with "#compdef" or "#autoload",
+	@CTAGS_NAME_EXECUTABLE@ regards the line as "zsh".
+
+"emacs mode at the first line" testing
+	Emacs editor has multiple editing modes specialized to programming
+	languages. Emacs can recognize a marker called modeline in a file
+	and utilize the marker for the mode selection. This testing does
+	the same as what Emacs does.
+
+	ctags treats *MODE* as a name of interpreter and applies the same
+	rule of "interpreter" testing if the first line has one of
+	the following patterns::
+
+		-*- mode: MODE -*-
+
+	or::
+
+		-*- MODE -*-
+
+"emacs mode at the EOF" testing
+	Emacs editor recognizes another marker at the end of file as a
+	mode specifier. This testing does the same as what Emacs does.
+
+	ctags treats *MODE* as a name of interpreter and applies the same
+	rule of "interpreter" testing if the lines at the tail of the file
+	have the following pattern::
+
+		Local Variables:
+		..
+		mode: MODE
+		...
+		End:
+
+	3000 characters are seeked from the end of file to find the pattern.
+
+"vim modeline" testing
+	Like the modeline of Emacs editor, Vim editor has the same concept.
+	ctags treats *TYPE* as a name of interpreter and applies the same
+	rule of "interpreter" testing if the last 5 lines of the file
+	have one of the following patterns::
+
+		filetype=TYPE
+
+	or::
+
+		ft=TYPE
+
+"PHP marker" testing
+	If the first line is started with "<?php",
+	@CTAGS_NAME_EXECUTABLE@ regards the line as "php".
+
+Looking into the file contents is more expensive operation than file
+name matching. So @CTAGS_NAME_EXECUTABLE@ runs the testings in limited
+conditions.  "interpreter" testing is enabled only when a file is
+executable or ``--guess-language-eagerly`` (``-G`` in short) option is
+given. The other testings are enabled only when ``-G`` option is
+given.
+
+``--print-language`` can be used just for printing the results of
+parser selections for given files instead of making tags file.
+
+Examples::
+	$ @CTAGS_NAME_EXECUTABLE@ --print-language config.h.in input.m input.unknown
+	config.h.in: C++
+	input.m: MatLab
+	input.unknown: NONE
+
+``NONE`` means that ctags does not select any parser for the file.
+
 
 OPTIONS
 -------

@@ -4,6 +4,8 @@
 Choosing a proper parser in ctags
 ======================================================================
 
+.. IN MAN PAGE
+
 .. contents:: `Table of contents`
 	:depth: 3
 	:local:
@@ -19,6 +21,9 @@ Universal-ctags has more ways to guess the language of input files.
 
 Modeline based parser selection
 ---------------------------------------------------------------------
+
+.. IN MAN PAGE
+
 Exuberant-ctags has the ability to choose a proper parser based on shebang
 lines (e.g. *#!/bin/sh*).
 
@@ -80,6 +85,9 @@ can be placed in the .ctags file to have this feature always enabled.
 
 Better parser selection for template files
 ---------------------------------------------------------------------
+
+.. IN MAN PAGE
+
 The suffix *.in* is popularly used for template files. A well-known
 example is *config.h.in* used in GNU Autotools.
 
@@ -90,6 +98,9 @@ suffix *.in* and then matches against the new filename suffix *.c*.
 
 Specialized language selectors
 ---------------------------------------------------------------------
+
+.. IN MAN PAGE (partially written)
+
 In some cases, a special function may be used to figure out which parser
 to choose.  (For example, Perl 6 files may have extension .pm, just like
 Perl files do.)  To implement such selector, set ``selectLanguage`` in
@@ -101,6 +112,9 @@ function, this function will be called to pick the language.
 
 Dry running
 ---------------------------------------------------------------------
+
+.. IN MAN PAGE
+
 The parser selector of ctags can be tested with ``--print-language``.
 e.g.::
 
