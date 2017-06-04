@@ -9,6 +9,11 @@ indent_size = 4
 indent_style = tab
 trim_trailing_whitespace = true
 
+[*.rst.in]
+indent_size = 4
+indent_style = tab
+trim_trailing_whitespace = true
+
 [win32/*]
 end_of_line = crlf
 
