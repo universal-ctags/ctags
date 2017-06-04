@@ -57,6 +57,10 @@ define a new parser from command line. Extending this feature is one
 of the major topics in Universal-ctags development. ctags-optlib(1)
 describes how the feature is extended.
 
+Newly introduced premature features are not explained here. If you
+are interested in such features and ctags internal,
+visit http://docs.ctags.io/en/latest/.
+
 
 SOURCE FILES
 ------------
