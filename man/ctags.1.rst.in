@@ -76,9 +76,16 @@ all files in an entire source directory tree
 (e.g. "@CTAGS_NAME_EXECUTABLE@ -R"), since only those files whose
 names are mapped to languages will be scanned.
 
-[The reason that .h extensions are mapped to C++ files rather than C files
-is because it is common to use .h extensions in C++, and no harm
-results in treating them as C++ files.]
+The same extensions are mapped to multiple parsers. For example, ".h"
+are mapped to C++, C and ObjectiveC. These mappings can cause a
+trouble. @CTAGS_NAME_EXECUTABLE@ tries to select the proper parser
+for the input by applying kinds of heuristics to its content. However,
+it is not perfect.  In that case use ``--language-for=<LANG>``,
+``--langmap=map[,map[...]]``, or ``--map-<LANG>=-pattern|extension``
+options. (The heuristics are applied either ``--guess-language-eagerly`` is
+given or not.)
+
+
 
 OPTIONS
 -------
