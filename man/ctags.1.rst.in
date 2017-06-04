@@ -152,7 +152,7 @@ template file name testing
 		...
 		End:
 
-	3000 characters are seeked from the end of file to find the pattern.
+	3000 characters are sought from the end of file to find the pattern.
 
 "vim modeline" testing
 	Like the modeline of Emacs editor, Vim editor has the same concept.
