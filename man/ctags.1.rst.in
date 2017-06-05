@@ -67,7 +67,7 @@ languages. The mappings in effect for each language may be displayed using
 the ``--list-maps`` option and may be changed using the ``--langmap`` option. On
 platforms which support it, if the name of a file is not mapped to a
 language, @CTAGS_NAME_EXECUTABLE@ tries to guess the language for
-the file by inspecting its content. See "GUESSING PARSER".
+the file by inspecting its content. See "Guessing parser".
 
 All files that have no file name mapping and no guessed parser are
 ignored. This permits running @CTAGS_NAME_EXECUTABLE@ on all files in
