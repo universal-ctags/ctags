@@ -134,7 +134,9 @@ template file name testing
 
 		-*- mode: MODE -*-
 
-	or::
+	or
+
+	::
 
 		-*- MODE -*-
 
@@ -162,7 +164,9 @@ template file name testing
 
 		filetype=TYPE
 
-	or::
+	or
+
+	::
 
 		ft=TYPE
 
@@ -180,7 +184,10 @@ given.
 ``--print-language`` can be used just for printing the results of
 parser selections for given files instead of making tags file.
 
-Examples::
+Examples:
+
+.. code-block::
+
 	$ @CTAGS_NAME_EXECUTABLE@ --print-language config.h.in input.m input.unknown
 	config.h.in: C++
 	input.m: MatLab
