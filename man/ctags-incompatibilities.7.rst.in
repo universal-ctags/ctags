@@ -1,0 +1,27 @@
+.. _ctags-incompatibilities(7):
+
+==============================================================
+@CTAGS_NAME_EXECUTABLE@
+==============================================================
+--------------------------------------------------------------
+Incompatibilities between Universal-ctags and Exuberant-ctags
+--------------------------------------------------------------
+:Version: @VERSION@
+:Manual group: Universal-ctags
+:Manual section: 7
+
+SYNOPSIS
+--------
+|	**@CTAGS_NAME_EXECUTABLE@** [options] [file(s)]
+|	**@ETAGS_NAME_EXECUTABLE@** [options] [file(s)]
+
+DESCRIPTION
+-----------
+
+TO BE WRITTEN.
+
+Incompatibilities in command line interface
+-------------------------------------------------------------
+
+Incompatibilities in tags file format
+-------------------------------------------------------------

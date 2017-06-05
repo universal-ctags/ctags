@@ -1,0 +1,21 @@
+.. _ctags-optlib(7):
+
+==============================================================
+@CTAGS_NAME_EXECUTABLE@
+==============================================================
+--------------------------------------------------------------
+Universal-ctags parser definition language
+--------------------------------------------------------------
+:Version: @VERSION@
+:Manual group: Universal-ctags
+:Manual section: 7
+
+SYNOPSIS
+--------
+|	**@CTAGS_NAME_EXECUTABLE@** [options] [file(s)]
+|	**@ETAGS_NAME_EXECUTABLE@** [options] [file(s)]
+
+DESCRIPTION
+-----------
+
+TO BE WRITTEN.

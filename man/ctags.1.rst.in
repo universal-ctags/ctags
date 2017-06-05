@@ -20,32 +20,42 @@ DESCRIPTION
 -----------
 
 The **@CTAGS_NAME_EXECUTABLE@** and **@ETAGS_NAME_EXECUTABLE@** programs
-(hereinafter collectively referred to as **@CTAGS_NAME_EXECUTABLE@**,
+(hereinafter collectively referred to as @CTAGS_NAME_EXECUTABLE@,
 except where distinguished) generate an index (or "tag") file for a
 variety of language objects found in file(s). This tag file allows
 these items to be quickly and easily located by a text editor or other
-utility. A "tag" signifies a language object for which an index entry is
+utilities. A "tag" signifies a language object for which an index entry is
 available (or, alternatively, the index entry created for that object).
 
-Alternatively, **@CTAGS_NAME_EXECUTABLE@** can generate a cross reference
+Alternatively, @CTAGS_NAME_EXECUTABLE@ can generate a cross reference
 file which lists, in human readable form, information about the various
 source objects found in a set of language files.
 
 Tag index files are supported by numerous editors, which allow the user to
 locate the object associated with a name appearing in a source file and
-jump to the file and line which defines the name. Those known about at
-the time of this release are:
+jump to the file and line which defines the name. See the manual of your
+favorite editor about utilizing @CTAGS_NAME_EXECUTABLE@ command and
+the tag index files in the editor.
 
-	**Vi** (1) and its derivatives (e.g. Elvis, Vim, Vile, Lemmy), **CRiSP**,
-	**Emacs**, **FTE** (Folding Text Editor), **JED**, **jEdit**, **Mined**,
-	**NEdit** (Nirvana Edit), **TSE** (The SemWare Editor), **UltraEdit**,
-	**WorkSpace**, **X2**, **Zeus**
-
-**@CTAGS_NAME_EXECUTABLE@** is capable of generating different kinds of tags
+@CTAGS_NAME_EXECUTABLE@ is capable of generating different kinds of tags
 for each of many different languages. For a complete list of supported
 languages, the names by which they are recognized, and the kinds of tags
 which are generated for each, see the ``--list-languages`` and ``--list-kinds``
 options.
+
+This man page describes Universal-ctags, an implementation of ctags
+derived from Exuberant-ctags. The major incompatible changes between
+Universal-ctags and Exuberant-ctags are enumerated in
+ctags-incompatibilities(7).
+
+One of the advantages of Exuberant-ctags is that it allows an user to
+define a new parser from command line. Extending this feature is one
+of the major topics in Universal-ctags development. ctags-optlib(7)
+describes how the feature is extended.
+
+Newly introduced premature features are not explained here. If you
+are interested in such features and ctags internal,
+visit http://docs.ctags.io/en/latest/.
 
 
 SOURCE FILES
@@ -53,21 +63,131 @@ SOURCE FILES
 
 Unless the ``--language-force`` option is specified, the language of each source
 file is automatically selected based upon a mapping of file names to
-languages. The mappings in effect for each language may be display using
+languages. The mappings in effect for each language may be displayed using
 the ``--list-maps`` option and may be changed using the ``--langmap`` option. On
 platforms which support it, if the name of a file is not mapped to a
-language and the file is executable, the first line of the file is checked
-to see if the file is a "#!" script for a recognized language.
+language, @CTAGS_NAME_EXECUTABLE@ tries to guess the language for
+the file by inspecting its content. See "Guessing parser".
 
-By default, all other files names are ignored. This permits running
-@CTAGS_NAME_EXECUTABLE@ on all files in either a single directory (e.g.
-"@CTAGS_NAME_EXECUTABLE@ \*"), or on all files in an entire source directory
-tree (e.g. "@CTAGS_NAME_EXECUTABLE@ -R"), since only those files whose
+All files that have no file name mapping and no guessed parser are
+ignored. This permits running @CTAGS_NAME_EXECUTABLE@ on all files in
+either a single directory (e.g.  "@CTAGS_NAME_EXECUTABLE@ \*"), or on
+all files in an entire source directory tree
+(e.g. "@CTAGS_NAME_EXECUTABLE@ -R"), since only those files whose
 names are mapped to languages will be scanned.
 
-[The reason that .h extensions are mapped to C++ files rather than C files
-is because it is common to use .h extensions in C++, and no harm
-results in treating them as C++ files.]
+The same extensions are mapped to multiple parsers. For example, ".h"
+are mapped to C++, C and ObjectiveC. These mappings can cause a
+trouble. @CTAGS_NAME_EXECUTABLE@ tries to select the proper parser
+for the input by applying kinds of heuristics to its content. However,
+it is not perfect.  In that case use ``--language-for=<LANG>``,
+``--langmap=map[,map[...]]``, or ``--map-<LANG>=-pattern|extension``
+options. (The heuristics are applied either ``--guess-language-eagerly`` is
+given or not.)
+
+
+.. TODO: Mapping of file names
+
+Guessing parser
+~~~~~~~~~~~~~~~
+
+If ctags cannot select a parser from the mapping of file names,
+various tests are conducted for the guessing:
+
+template file name testing
+	If the file name has ".in" extension, apply the mapping to the file
+	name without the extension. For example, "config.h" is tested for a file
+	named "config.h.in".
+
+"interpreter" testing
+	The first line of the file is checked to see if the file is a "#!"
+	script for a recognized language.  @CTAGS_NAME_EXECUTABLE@ looks for
+	a parser having the same name.
+
+	If @CTAGS_NAME_EXECUTABLE@ finds no such parser,
+	@CTAGS_NAME_EXECUTABLE@ looks for the name in alias lists. For
+	example, consider if the first line is "#!/bin/sh".  Though
+	@CTAGS_NAME_EXECUTABLE@ has "shell" parser, it doesn't have "sh"
+	parser. However, "sh" is listed as an alias for "shell",
+	@CTAGS_NAME_EXECUTABLE@ selects the "shell" parser for the file.
+
+	An exception is "env". If "env" is specified, @CTAGS_NAME_EXECUTABLE@
+	reads more lines to find real interpreter specification.
+
+	To display the list of aliases, use ``--list-aliases`` option.
+	To add/remove an item to/from the list, use ``--alias-<LANG>=[+|-]aliasPattern``
+	option.
+
+"zsh autoload tag" testing
+	If the first line is started with "#compdef" or "#autoload",
+	@CTAGS_NAME_EXECUTABLE@ regards the line as "zsh".
+
+"emacs mode at the first line" testing
+	Emacs editor has multiple editing modes specialized to programming
+	languages. Emacs can recognize a marker called modeline in a file
+	and utilize the marker for the mode selection. This testing does
+	the same as what Emacs does.
+
+	ctags treats *MODE* as a name of interpreter and applies the same
+	rule of "interpreter" testing if the first line has one of
+	the following patterns::
+
+		-*- mode: MODE -*-
+
+	or::
+
+		-*- MODE -*-
+
+"emacs mode at the EOF" testing
+	Emacs editor recognizes another marker at the end of file as a
+	mode specifier. This testing does the same as what Emacs does.
+
+	ctags treats *MODE* as a name of interpreter and applies the same
+	rule of "interpreter" testing if the lines at the tail of the file
+	have the following pattern::
+
+		Local Variables:
+		..
+		mode: MODE
+		...
+		End:
+
+	3000 characters are sought from the end of file to find the pattern.
+
+"vim modeline" testing
+	Like the modeline of Emacs editor, Vim editor has the same concept.
+	ctags treats *TYPE* as a name of interpreter and applies the same
+	rule of "interpreter" testing if the last 5 lines of the file
+	have one of the following patterns::
+
+		filetype=TYPE
+
+	or::
+
+		ft=TYPE
+
+"PHP marker" testing
+	If the first line is started with "<?php",
+	@CTAGS_NAME_EXECUTABLE@ regards the line as "php".
+
+Looking into the file contents is more expensive operation than file
+name matching. So @CTAGS_NAME_EXECUTABLE@ runs the testings in limited
+conditions.  "interpreter" testing is enabled only when a file is
+executable or ``--guess-language-eagerly`` (``-G`` in short) option is
+given. The other testings are enabled only when ``-G`` option is
+given.
+
+``--print-language`` can be used just for printing the results of
+parser selections for given files instead of making tags file.
+
+Examples::
+	$ @CTAGS_NAME_EXECUTABLE@ --print-language config.h.in input.m input.unknown
+	config.h.in: C++
+	input.m: MatLab
+	input.unknown: NONE
+
+``NONE`` means that ctags does not select any parser for the file.
+
 
 OPTIONS
 -------
