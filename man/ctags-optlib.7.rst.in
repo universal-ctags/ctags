@@ -1,4 +1,4 @@
-.. _ctags-optlib(1):
+.. _ctags-optlib(7):
 
 ==============================================================
 @CTAGS_NAME_EXECUTABLE@
@@ -8,7 +8,7 @@ Universal-ctags parser definition language
 --------------------------------------------------------------
 :Version: @VERSION@
 :Manual group: Universal-ctags
-:Manual section: 1
+:Manual section: 7
 
 SYNOPSIS
 --------

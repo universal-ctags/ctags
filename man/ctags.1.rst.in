@@ -46,11 +46,11 @@ options.
 This man page describes Universal-ctags, an implementation of ctags
 derived from Exuberant-ctags. The major incompatible changes between
 Universal-ctags and Exuberant-ctags are enumerated in
-ctags-incompatibilities(1).
+ctags-incompatibilities(7).
 
 One of the advantages of Exuberant-ctags is that it allows an user to
 define a new parser from command line. Extending this feature is one
-of the major topics in Universal-ctags development. ctags-optlib(1)
+of the major topics in Universal-ctags development. ctags-optlib(7)
 describes how the feature is extended.
 
 Newly introduced premature features are not explained here. If you

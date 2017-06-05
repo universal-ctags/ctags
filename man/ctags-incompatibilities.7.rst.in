@@ -1,4 +1,4 @@
-.. _ctags-incompatibilities(1):
+.. _ctags-incompatibilities(7):
 
 ==============================================================
 @CTAGS_NAME_EXECUTABLE@
@@ -8,7 +8,7 @@ Incompatibilities between Universal-ctags and Exuberant-ctags
 --------------------------------------------------------------
 :Version: @VERSION@
 :Manual group: Universal-ctags
-:Manual section: 1
+:Manual section: 7
 
 SYNOPSIS
 --------
