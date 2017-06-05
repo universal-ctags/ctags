@@ -508,19 +508,44 @@ built-in language names.
 	each representing one type of extension field to include, with the
 	following meanings (disabled by default unless indicated):
 
-	a	Access (or export) of class members
-	f	File-restricted scoping [enabled]
-	i	Inheritance information
-	k	Kind of tag as a single letter [enabled]
-	K	Kind of tag as full name
-	l	Language of source file containing tag
-	m	Implementation information
-	n	Line number of tag definition
-	s	Scope of tag definition [enabled]
-	S	Signature of routine (e.g. prototype or parameter list)
-	t	Type and name of a variable or typedef as "typeref:" field [enabled]
-	z	Include the "kind:" key in kind field
-	Z	Include the "scope:" key in scope field
+	a
+		Access (or export) of class members
+
+	f
+		File-restricted scoping [enabled]
+
+	i
+		Inheritance information
+
+	k
+		Kind of tag as a single letter [enabled]
+
+	K
+		Kind of tag as full name
+
+	l
+		Language of source file containing tag
+
+	m
+		Implementation information
+
+	n
+		Line number of tag definition
+
+	s
+		Scope of tag definition [enabled]
+
+	S
+		Signature of routine (e.g. prototype or parameter list)
+
+	t
+		Type and name of a variable or typedef as "typeref:" field [enabled]
+
+	z
+		Include the "kind:" key in kind field
+
+	Z
+		Include the "scope:" key in scope field
 
 	Each letter or group of letters may be preceded by either '+' to add it
 	to the default set, or '-' to exclude it. In the absence of any
@@ -784,11 +809,14 @@ built-in language names.
 	"r,regex". Finally, flags are one or more single-letter characters having
 	the following effect upon the interpretation of regexp:
 
-		b	The pattern is interpreted as a Posix basic regular expression.
+		b
+			The pattern is interpreted as a Posix basic regular expression.
 
-		e	The pattern is interpreted as a Posix extended regular expression(default).
+		e
+			The pattern is interpreted as a Posix extended regular expression(default).
 
-		i	The regular expression is to be applied in a case-insensitive manner.
+		i
+			The regular expression is to be applied in a case-insensitive manner.
 
 	Note that this option is available only if @CTAGS_NAME_EXECUTABLE@ was
 	compiled with support for regular expressions, which depends upon your
