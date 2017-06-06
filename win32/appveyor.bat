@@ -148,7 +148,7 @@ bash -lc "make check APPVEYOR=1"
 goto :eof
 
 :msys2_package
-md package\man
+md package
 :: Build html docs
 bash -lc "cd docs; make html"
 move docs\_build\html package\docs > nul
@@ -168,7 +168,7 @@ robocopy . package %filelist% > nul
 robocopy win32\license package\license > nul
 copy COPYING package\license > nul
 copy win32\mkstemp\COPYING.MinGW-w64-runtime.txt package\license > nul
-copy man\ctags.1.rst package\man > nul
+robocopy man package\man *.rst > nul
 cd package
 7z a ..\ctags-%ver%-%ARCH%.debug.zip %filelist% %dirlist%
 strip *.exe
