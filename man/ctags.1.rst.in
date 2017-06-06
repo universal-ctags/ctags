@@ -211,7 +211,7 @@ are optional.
 
 Note also that the boolean parameters to the long form options (those
 beginning with "--" and that take a "[=yes|no]" parameter) may be omitted,
-in which case "=yes" is implied. (e.g. --sort is equivalent to --sort=yes).
+in which case "=yes" is implied. (e.g. ``--sort`` is equivalent to ``--sort=yes``).
 Note further that "=1" and "=on" are considered synonyms for "=yes",
 and that "=0" and "=off" are considered synonyms for "=no".
 
@@ -223,23 +223,23 @@ files which follow the option. A few options, however, must appear
 before the first file name and will be noted as such.
 
 Options taking language names will accept those names in either upper or
-lower case. See the --list-languages option for a complete list of the
+lower case. See the ``--list-languages`` option for a complete list of the
 built-in language names.
 
--a
+``-a``
 	Equivalent to ``--append``.
 
--B
+``-B``
 	Use backward searching patterns (e.g. ?pattern?). [Ignored in etags mode]
 
--e
+``-e``
 	Enable etags mode, which will create a tag file for use with the Emacs
 	editor. Alternatively, if @CTAGS_NAME_EXECUTABLE@ is invoked by a
 	name containing the string "@ETAGS_NAME_EXECUTABLE@" (either by renaming,
 	or creating a link to, the executable), etags mode will be enabled.
 	This option must appear before the first file name.
 
--f tagfile
+``-f tagfile``
 	Use the name specified by tagfile for the tag file (default is "tags",
 	or "TAGS" when running in etags mode). If tagfile is specified as "-",
 	then the tag file is written to standard output instead. @CTAGS_NAME_EXECUTABLE@
@@ -255,11 +255,11 @@ built-in language names.
 	appear before the first file name. If this option is specified more
 	than once, only the last will apply.
 
--F
+``-F``
 	Use forward searching patterns (e.g. /pattern/) (default). [Ignored
 	in etags mode]
 
--h list
+``-h list``
 	Specifies a list of file extensions, separated by periods, which are
 	to be interpreted as include (or header) files. To indicate files having
 	no extension, use a period not followed by a non-period character
@@ -273,13 +273,13 @@ built-in language names.
 	will be considered to have file-limited scope. If the first character
 	in the list is a plus sign, then the extensions in the list will be
 	appended to the current list; otherwise, the list will replace the
-	current list. See, also, the --file-scope option. The default list is
-	".h.H.hh.hpp.hxx.h++.inc.def". To restore the default list, specify -h
+	current list. See, also, the ``--file-scope`` option. The default list is
+	".h.H.hh.hpp.hxx.h++.inc.def". To restore the default list, specify ``-h``
 	default. Note that if an extension supplied to this option is not
 	already mapped to a particular language (see SOURCE FILES, above),
-	you will also need to use either the --langmap or --language-force option.
+	you will also need to use either the ``--langmap`` or ``--language-force`` option.
 
--I identifier-list
+``-I identifier-list``
 	Specifies a list of identifiers which are to be specially handled while
 	parsing C and C++ source files. This option is specifically provided
 	to handle special cases arising through the use of preprocessor macros.
@@ -298,7 +298,7 @@ built-in language names.
 	Otherwise, identifier-list is a list of identifiers (or identifier
 	pairs) to be specially handled, each delimited by a either a comma or
 	by white space (in which case the list should be quoted to keep the
-	entire list as one command line argument). Multiple -I options may be
+	entire list as one command line argument). Multiple ``-I`` options may be
 	supplied. To clear the list of ignore identifiers, supply a single
 	dash ("-") for identifier-list.
 
@@ -314,7 +314,7 @@ built-in language names.
 
 	In the above example, the macro "ARGDECL4" would be mistakenly
 	interpreted to be the name of the function instead of the correct name
-	of "foo". Specifying -I ARGDECL4 results in the correct behavior.
+	of "foo". Specifying "-I ARGDECL4" results in the correct behavior.
 
 	.. code-block::
 
@@ -327,7 +327,7 @@ built-in language names.
 	much like a K&R style function parameter declaration). In fact, this
 	seeming function definition could possibly even cause the rest of the
 	file to be skipped over while trying to complete the definition.
-	Specifying -I MODULE_VERSION+ would avoid such a problem.
+	Specifying "-I MODULE_VERSION+" would avoid such a problem.
 
 	.. code-block::
 
@@ -340,9 +340,9 @@ built-in language names.
 	defined as "class __declspec(dllexport)" on Win32 platforms and simply
 	"class" on UNIX. Normally, the absence of the C++ keyword "class"
 	would cause the source file to be incorrectly parsed. Correct behavior
-	can be restored by specifying -I CLASS=class.
+	can be restored by specifying "-I CLASS=class".
 
--L file
+``-L file``
 	Read from file a list of file names for which tags should be generated.
 	If file is specified as "-", then file names are read from standard
 	input. File names read using this option are processed following file
@@ -354,29 +354,29 @@ built-in language names.
 	(however, trailing white space is stripped from lines); this can affect
 	how options are parsed if included in the input.
 
--n
-	Equivalent to --excmd=number.
+``-n``
+	Equivalent to ``--excmd=number``.
 
--N
-	Equivalent to --excmd=pattern.
+``-N``
+	Equivalent to ``--excmd=pattern``.
 
--o tagfile
-	Equivalent to -f tagfile.
+``-o tagfile``
+	Equivalent to ``-f tagfile``.
 
--R
-	Equivalent to --recurse.
+``-R``
+	Equivalent to ``--recurse``.
 
--u
-	Equivalent to --sort=no (i.e. "unsorted").
+``-u``
+	Equivalent to ``--sort=no`` (i.e. "unsorted").
 
--V
-	Equivalent to --verbose.
+``-V``
+	Equivalent to ``--verbose``.
 
--w
+``-w``
 	This option is silently ignored for backward-compatibility with the
 	ctags of SVR4 Unix.
 
--x
+``-x``
 	Print a tabular, human-readable cross reference (xref) file to standard
 	output instead of generating a tag file. The information contained in
 	the output includes: the tag name; the kind of tag; the line number,
@@ -384,23 +384,23 @@ built-in language names.
 	file which defines the tag. No tag file is written and all options
 	affecting tag file output will be ignored. Example applications for this
 	feature are generating a listing of all functions located in a source
-	file (e.g. @CTAGS_NAME_EXECUTABLE@ -x --c-kinds=f file), or generating
+	file (e.g. "@CTAGS_NAME_EXECUTABLE@ -x --c-kinds=f file"), or generating
 	a list of all externally visible global variables located in a source
-	file (e.g. @CTAGS_NAME_EXECUTABLE@ -x --c-kinds=v --file-scope=no file).
+	file (e.g. "@CTAGS_NAME_EXECUTABLE@ -x --c-kinds=v --file-scope=no file").
 	This option must appear before the first file name.
 
---append[=yes|no]
+``--append[=yes|no]``
 	Indicates whether tags generated from the specified files should be
 	appended to those already present in the tag file or should replace them.
 	This option is off by default. This option must appear before the
 	first file name.
 
---etags-include=file
+``--etags-include=file``
 	Include a reference to file in the tag file. This option may be specified
 	as many times as desired. This supports Emacs' capability to use a
 	tag file which "includes" other tag files. [Available only in etags mode]
 
---exclude=[pattern]
+``--exclude=[pattern]``
 	Add pattern to a list of excluded files and directories. This option may
 	be specified as many times as desired. For each file name considered
 	by @CTAGS_NAME_EXECUTABLE@, each pattern specified using this option
@@ -414,7 +414,7 @@ built-in language names.
 	being expanded by the shell before being passed to @CTAGS_NAME_EXECUTABLE@;
 	also be aware that wildcards can match the slash character, '/').
 	You can determine if shell wildcards are available on your platform by
-	examining the output of the --version option, which will include
+	examining the output of the ``--version`` option, which will include
 	"+wildcards" in the compiled feature list; otherwise, pattern is matched
 	against file names using a simple textual comparison.
 
@@ -424,9 +424,9 @@ built-in language names.
 	cleared. Note that at program startup, the default exclude list contains
 	"EIFGEN", "SCCS", "RCS", and "CVS", which are names of directories for
 	which it is generally not desirable to descend while processing the
-	--recurse option.
+	``--recurse`` option.
 
---excmd=type
+``--excmd=type``
 	Determines the type of EX command used to locate tags in the source
 	file. [Ignored in etags mode]
 
@@ -472,7 +472,7 @@ built-in language names.
 		are generally identical, making pattern searches useless
 		for finding all matches.
 
---extras=[+|-]flags|\*
+``--extras=[+|-]flags|\*``
 	Specifies whether to include extra tag entries for certain kinds of
 	information. The parameter flags is a set of one-letter flags, each
 	representing one kind of extra tag entry to include in the tag file.
@@ -482,7 +482,7 @@ built-in language names.
 	included  if '*' is given. The meaning of each flag is as follows:
 
 	F
-		Equivalent to --file-scope.
+		Equivalent to ``--file-scope``.
 		This option is on by default.
 
 	f
@@ -506,9 +506,9 @@ built-in language names.
 		Note, however, that this could potentially more than double the
 		size of the tag file.
 
-	--extra option in Exuberant-ctags is renamed to --extras.
+	``--extra`` option in Exuberant-ctags is renamed to ``--extras``.
 
---fields=[+|-]flags|*
+``--fields=[+|-]flags|*``
 	Specifies the available extension fields which are to be included in
 	the entries of the tag file (see TAG FILE FORMAT, below, for more
 	information). The parameter flags is a set of one-letter flags,
@@ -559,40 +559,40 @@ built-in language names.
 	preceding '+' or '-' sign, only those kinds explicitly listed in flags
 	will be included in the output (i.e. overriding the default set). All
 	fields are included if '*' is given. This option is ignored if the
-	option --format=1 has been specified. The default value of this option
+	option ``--format=1`` has been specified. The default value of this option
 	is fkst.
 
---file-scope[=yes|no]
+``--file-scope[=yes|no]``
 	Indicates whether tags scoped only for a single file (i.e. tags which
 	cannot be seen outside of the file in which they are defined, such as
-	"static" tags) should be included in the output. See, also, the -h
+	"static" tags) should be included in the output. See, also, the ``-h``
 	option. This option is enabled by default.
 
---filter[=yes|no]
+``--filter[=yes|no]``
 	Causes @CTAGS_NAME_EXECUTABLE@ to behave as a filter, reading source
 	file names from standard input and printing their tags to standard
-	output on a file-by-file basis. If --sorted is enabled, tags are sorted
+	output on a file-by-file basis. If ``--sort`` is enabled, tags are sorted
 	only within the source file in which they are defined. File names are
-	read from standard input in line-oriented input mode (see note for -L
+	read from standard input in line-oriented input mode (see note for ``-L``
 	option) and only after file names listed on the command line or from
-	any file supplied using the -L option. When this option is enabled,
-	the options -f, -o, and --totals are ignored. This option is quite
+	any file supplied using the ``-L`` option. When this option is enabled,
+	the options ``-f``, ``-o``, and ``--totals`` are ignored. This option is quite
 	esoteric and is disabled by default. This option must appear before
 	the first file name.
 
---filter-terminator=string
+``--filter-terminator=string``
 	Specifies a string to print to standard output following the tags for
-	each file name parsed when the --filter option is enabled. This may
+	each file name parsed when the ``--filter`` option is enabled. This may
 	permit an application reading the output of @CTAGS_NAME_EXECUTABLE@
 	to determine when the output for each file is finished. Note that if the
-	file name read is a directory and --recurse is enabled, this string will
+	file name read is a directory and ``--recurse`` is enabled, this string will
 	be printed only once at the end of all tags found for by descending
 	the directory. This string will always be separated from the last tag
 	line for the file by its terminating newline. This option is quite
 	esoteric and is empty by default. This option must appear before
 	the first file name.
 
---format=level
+``--format=level``
 	Change the format of the output tag file. Currently the only valid
 	values for level are 1 or 2. Level 1 specifies the original tag file
 	format and level 2 specifies a new extended format containing extension
@@ -600,10 +600,10 @@ built-in language names.
 	original vi(1) implementations). The default level is 2. This option
 	must appear before the first file name. [Ignored in etags mode]
 
---help
+``--help``
 	Prints to standard output a detailed usage description, and then exits.
 
---if0[=yes|no]
+``--if0[=yes|no]``
 	Indicates a preference as to whether code within an "#if 0" branch of a
 	preprocessor conditional should be examined for non-macro tags (macro
 	tags are always included). Because the intent of this construct is to
@@ -613,15 +613,15 @@ built-in language names.
 	tags when preprocessor conditionals are too complex follows all branches
 	of a conditional. This option is disabled by default.
 
---<LANG>-kinds=[+|-]kinds|*
+``--<LANG>-kinds=[+|-]kinds|*``
 	Specifies a list of language-specific kinds of tags (or kinds) to
 	include in the output file for a particular language, where <LANG> is
 	case-insensitive and is one of the built-in language names (see the
-	--list-languages option for a complete list). The parameter kinds is a group
+	``--list-languages`` option for a complete list). The parameter kinds is a group
 	of one-letter flags designating kinds of tags (particular to the language)
 	to either include or exclude from the output. The specific sets of
 	flags recognized for each language, their meanings and defaults may be
-	list using the --list-kinds option. Each letter or group of letters
+	list using the ``--list-kinds`` option. Each letter or group of letters
 	may be preceded by either '+' to add it to, or '-' to remove it from,
 	the default set. In the absence of any preceding '+' or '-' sign, only
 	those kinds explicitly listed in kinds will be included in the output
@@ -634,18 +634,18 @@ built-in language names.
 
 	As an example for the C language, in order to add prototypes and
 	external variable declarations to the default set of tag kinds,
-	but exclude macros, use --c-kinds=+px-d; to include only tags for
-	functions, use --c-kinds=f.
+	but exclude macros, use "--c-kinds=+px-d"; to include only tags for
+	functions, use "--c-kinds=f".
 
---langdef=name
+``--langdef=name``
 	Defines a new user-defined language, name, to be parsed with regular
 	expressions. Once defined, name may be used in other options taking
 	language names. The typical use of this option is to first define the
-	language, then map file names to it using --langmap, then specify regular
-	expressions using --regex-<LANG> to define how its tags are found.
+	language, then map file names to it using ``--langmap``, then specify regular
+	expressions using ``--regex-<LANG>`` to define how its tags are found.
 
---langmap=map[,map[...]]
-	Controls how file names are mapped to languages (see the --list-maps
+``--langmap=map[,map[...]]``
+	Controls how file names are mapped to languages (see the ``--list-maps``
 	option). Each comma-separated map consists of the language name (either
 	a built-in or user-defined language), a colon, and a list of file
 	extensions and/or file name patterns. A file extension is specified by
@@ -657,7 +657,7 @@ built-in language names.
 	protect the wildcards from being expanded by the shell before being
 	passed to @CTAGS_NAME_EXECUTABLE@). You can determine if shell wildcards
 	are available on your platform by examining the output of the
-	--version option, which will include "+wildcards" in the compiled
+	``--version`` option, which will include "+wildcards" in the compiled
 	feature list; otherwise, the file name patterns are matched against
 	file names using a simple textual comparison. When mapping a file
 	extension, it will first be unmapped from any other languages.
@@ -682,7 +682,7 @@ built-in language names.
 	the language of a file. This order of Universal-ctags is different from
 	Exuberant-ctags.
 
---language-force=language
+``--language-force=language``
 	By default, @CTAGS_NAME_EXECUTABLE@ automatically selects the language
 	of a source file, ignoring those files whose language cannot be
 	determined (see SOURCE FILES, above). This option forces the specified
@@ -692,7 +692,7 @@ built-in language names.
 	that the language should be automatically selected (which effectively
 	disables this option).
 
---languages=[+|-]list
+``--languages=[+|-]list``
 	Specifies the languages for which tag generation is enabled, with list
 	containing a comma-separated list of language names (case-insensitive;
 	either built-in or user-defined). If the first language of list is not
@@ -711,10 +711,10 @@ built-in language names.
 	is "all", which is also accepted as a valid argument. See the
 	--list-languages option for a complete list of the built-in language names.
 
---license
+``--license``
 	Prints a summary of the software license to standard output, and then exits.
 
---line-directives[=yes|no]
+``--line-directives[=yes|no]``
 	Specifies whether "#line" directives should be recognized. These are
 	present in the output of preprocessors and contain the line number, and
 	possibly the file name, of the original source file(s) from which the
@@ -727,63 +727,63 @@ built-in language names.
 	the original source files are located relative to the preprocessor
 	output file (unless, of course, the #line directive specifies an
 	absolute path). This option is off by default. Note: This option is generally
-	only useful when used together with the --excmd=number (-n) option.
-	Also, you may have to use either the --langmap or --language-force option
+	only useful when used together with the ``--excmd=number`` (``-n``) option.
+	Also, you may have to use either the ``--langmap`` or ``--language-force`` option
 	if the extension of the preprocessor output file is not known to
 	@CTAGS_NAME_EXECUTABLE@.
 
---links[=yes|no]
+``--links[=yes|no]``
 	Indicates whether symbolic links (if supported) should be followed.
 	When disabled, symbolic links are ignored. This option is on by default.
 
---list-kinds[=language|all]
+``--list-kinds[=language|all]``
 	Lists the tag kinds recognized for either the specified language or all
 	languages, and then exits. Each kind of tag recorded in the tag file
 	is represented by a one-letter flag, which is also used to filter the
-	tags placed into the output through use of the --<LANG>-kinds option.
+	tags placed into the output through use of the ``--<LANG>-kinds`` option.
 	Note that some languages and/or tag kinds may be implemented using
 	regular expressions and may not be available if regex support is not
-	compiled into @CTAGS_NAME_EXECUTABLE@ (see the --regex-<LANG> option).
+	compiled into @CTAGS_NAME_EXECUTABLE@ (see the ``--regex-<LANG>`` option).
 	Each kind listed is enabled unless followed by "[off]".
 
---list-maps[=language|all]
+``--list-maps[=language|all]``
 	Lists the file extensions and file name patterns which associate a file
 	name with a language for either the specified language or all
-	languages, and then exits. See the --langmap option, and SOURCE FILES, above.
+	languages, and then exits. See the ``--langmap`` option, and SOURCE FILES, above.
 
---list-languages
+``--list-languages``
 	Lists the names of the languages understood by @CTAGS_NAME_EXECUTABLE@,
 	and then exits. These language names are case insensitive and may be
-	used in the --language-force, --languages, --<LANG>-kinds,
-	and --regex-<LANG> options.
+	used in the ``--language-force``, ``--languages``, ``--<LANG>-kinds``,
+	and ``--regex-<LANG>`` options.
 
---options=file|directory
+``--options=file|directory``
 	Read additional options from file or directory. If a file is specified,
 	it should contain one option per line. If a directory is specified
 	(and scandir function is available at build configuration time), files
 	suffixed with .ctags or .conf under the directory are read. (On MSDOS or
 	MSWindows this directory traverse feature is temporary disable because
 	the contributor of this feature has no access to the platforms.
-	Volunteers are welcome). As a special case, if --options=NONE is
+	Volunteers are welcome). As a special case, if "--options=NONE" is
 	specified as the first option on the command line, it will disable
 	the automatic reading of any configuration options from either a file
 	or the environment (see FILES).
 
---quiet[=yes|no]
+``--quiet[=yes|no]``
 		Write fewer messages(default is no).
 
---recurse[=yes|no]
+``--recurse[=yes|no]``
 	Recurse into directories encountered in the list of supplied files.
 	If the list of supplied files is empty and no file list is specified with
 	the -L option, then the current directory (i.e. ".") is assumed.
 	Symbolic links are followed. If you don't like these behaviors, either
 	explicitly specify the files or pipe the output of find(1) into
 	@CTAGS_NAME_EXECUTABLE@ -L- instead. Note: This option is not supported on
-	all platforms at present. It is available if the output of the --help
-	option includes this option. See, also, the --exclude to limit
+	all platforms at present. It is available if the output of the ``--help``
+	option includes this option. See, also, the ``--exclude`` to limit
 	recursion.
 
---regex-<LANG>=/regexp/replacement/[kind-spec/][flags]
+``--regex-<LANG>=/regexp/replacement/[kind-spec/][flags]``
 	The /regexp/replacement/ pair define a regular expression replacement
 	pattern, similar in style to sed substitution commands, with which to
 	generate tags from source files mapped to the named language, <LANG>,
@@ -811,7 +811,7 @@ built-in language names.
 	kind-spec is in the form of a single letter, a comma, a name (without
 	spaces), a comma, a description, followed by a separator, which specify
 	the short and long forms of the kind value and its textual description
-	(displayed using --list-kinds). Either the kind name and/or the
+	(displayed using ``--list-kinds``). Either the kind name and/or the
 	description may be omitted. If kind-spec is omitted, it defaults to
 	"r,regex". Finally, flags are one or more single-letter characters having
 	the following effect upon the interpretation of regexp:
@@ -828,14 +828,14 @@ built-in language names.
 	Note that this option is available only if @CTAGS_NAME_EXECUTABLE@ was
 	compiled with support for regular expressions, which depends upon your
 	platform. You can determine if support for regular expressions is
-	compiled in by examining the output of the --version option, which will
+	compiled in by examining the output of the ``--version`` option, which will
 	include "+regex" in the compiled feature list.
 
 	For more information on the regular expressions used by
 	@CTAGS_NAME_EXECUTABLE@, see either the regex(5,7) man page, or the GNU
 	info documentation for regex (e.g. "info regex").
 
---sort[=yes|no|foldcase]
+``--sort[=yes|no|foldcase]``
 	Indicates whether the tag file should be sorted on the tag name
 	(default is yes). Note that the original vi(1) required sorted tags.
 	The foldcase value specifies case insensitive (or case-folded) sorting.
@@ -845,25 +845,25 @@ built-in language names.
 	(using "set ignorecase"). This option must appear before the first file
 	name. [Ignored in etags mode]
 
---tag-relative[=yes|no]
+``--tag-relative[=yes|no]``
 	Indicates that the file paths recorded in the tag file should be
 	relative to the directory containing the tag file, rather than relative
 	to the current directory, unless the files supplied on the command line
 	are specified with absolute paths. This option must appear before the
 	first file name. The default is yes when running in etags mode (see
-	the -e option), no otherwise.
+	the ``-e`` option), no otherwise.
 
---totals[=yes|no]
+``--totals[=yes|no]``
 	Prints statistics about the source files read and the tag file written
 	during the current invocation of @CTAGS_NAME_EXECUTABLE@. This option
 	is off by default. This option must appear before the first file name.
 
---undef[=yes|no]
+``--undef[=yes|no]``
 	Specifies whether a macro tag should be generated from an #undef CPP
 	directive (in a C/C++ file), as if it were a #define directive. This
 	option is enabled by default.
 
---verbose[=yes|no]
+``--verbose[=yes|no]``
 	Enable verbose mode. This prints out information on option processing
 	and a brief message describing what action is being taken for each file
 	considered by @CTAGS_NAME_EXECUTABLE@. Normally, @CTAGS_NAME_EXECUTABLE@
@@ -873,7 +873,7 @@ built-in language names.
 	the command line, it will take effect before any options are read from
 	these sources. The default is no.
 
---version
+``--version``
 	Prints a version identifier for @CTAGS_NAME_EXECUTABLE@ to standard
 	output, and then exits. This is guaranteed to always contain the string
 	"Universal Ctags".
@@ -962,7 +962,7 @@ The fields and separators of these lines are specified as follows:
 	4.	single tab character
 	5.	EX command used to locate the tag within the file; generally a
 		search pattern (either /pattern/ or ?pattern?) or line number (see
-		--excmd). Tag file format 2 (see --format) extends this EX command
+		``--excmd``). Tag file format 2 (see ``--format``) extends this EX command
 		under certain circumstances to include a set of extension fields
 		(described below) embedded in an EX comment immediately appended
 		to the EX command, which leaves it backward-compatible with original
@@ -978,12 +978,12 @@ Note that the name of each source file will be recorded in the tag file
 exactly as it appears on the command line. Therefore, if the path you
 specified on the command line was relative to the current directory, then
 it will be recorded in that same manner in the tag file. See, however,
-the --tag-relative option for how this behavior can be modified.
+the ``--tag-relative`` option for how this behavior can be modified.
 
 Extension fields are tab-separated key-value pairs appended to the end of
 the EX command as a comment, as described above. These key value pairs
 appear in the general form "key:value". Their presence in the lines of the
-tag file are controlled by the --fields option. The possible keys and
+tag file are controlled by the ``--fields`` option. The possible keys and
 the meaning of their values are as follows:
 
 access
@@ -997,9 +997,9 @@ file
 kind
 	Indicates the type, or kind, of tag. Its value is either one of the
 	corresponding one-letter flags described under the various
-	--<LANG>-kinds options above, or a full name. It is permitted
+	``--<LANG>-kinds`` options above, or a full name. It is permitted
 	(and is, in fact, the default) for the key portion of this field to be
-	omitted. The optional behaviors are controlled with the --fields option.
+	omitted. The optional behaviors are controlled with the ``--fields`` option.
 
 implementation
 	When present, this indicates a limited implementation (abstract vs.
@@ -1073,7 +1073,7 @@ HOW TO USE WITH NEDIT
 ---------------------
 
 NEdit version 5.1 and later can handle the new extended tag file format
-(see --format). To make NEdit use the tag file, select "File->Load Tags
+(see ``--format``). To make NEdit use the tag file, select "File->Load Tags
 File". To jump to the definition for a tag, highlight the word, then press
 Ctrl-D. NEdit 5.1 can can read multiple tag files from different
 directories. Setting the X resource nedit.tagFile to the name of a tag
@@ -1090,10 +1090,10 @@ missing tags or improperly generating inappropriate tags. Although
 this is the single biggest cause of reported problems. In particular,
 the use of preprocessor constructs which alter the textual syntax of C
 can fool @CTAGS_NAME_EXECUTABLE@. You can work around many such problems
-by using the -I option.
+by using the ``-I`` option.
 
 Note that since @CTAGS_NAME_EXECUTABLE@ generates patterns for locating
-tags (see the --excmd option), it is entirely possible that the wrong line
+tags (see the ``--excmd`` option), it is entirely possible that the wrong line
 may be found by your editor if there exists another source line which is
 identical to the line containing the tag. The following example
 demonstrates this condition:
@@ -1113,7 +1113,7 @@ Depending upon which editor you use and where in the code you happen to be,
 it is possible that the search pattern may locate the local parameter
 declaration in foo() before it finds the actual global variable definition,
 since the lines (and therefore their search patterns are identical).
-This can be avoided by use of the --excmd=n option.
+This can be avoided by use of the ``--excmd=n`` option.
 
 BUGS
 ----
@@ -1128,7 +1128,7 @@ is defined outside of the class declaration (the usual case), the access
 specification (i.e. public, protected, or private) and implementation
 information (e.g. virtual, pure virtual) contained in the function
 declaration are not known when the tag is generated for the function
-definition. It will, however be available for prototypes (e.g --c++-kinds=+p).
+definition. It will, however be available for prototypes (e.g "--c++-kinds=+p").
 
 No qualified tags are generated for language objects inherited into a class.
 
@@ -1188,7 +1188,7 @@ ctags.cnf (on MSDOS, MSWindows only)
 	possible to set up site-wide, personal or project-level defaults. It
 	is possible to compile @CTAGS_NAME_EXECUTABLE@ to read an additional
 	configuration file before any of those shown above, which will be
-	indicated if the output produced by the --version option lists the
+	indicated if the output produced by the ``--version`` option lists the
 	"custom-conf" feature. Options appearing in the CTAGS environment
 	variable or on the command line will override options specified in these
 	files. Only options will be read from these files. Note that the option

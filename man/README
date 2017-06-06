@@ -3,5 +3,8 @@ Rules for writing man pages
 
 * put two single quotes around an option name like ``--help``.
 
+* put double quotes an exapmle of command line or option usage like
+  "--langdef=MyLang".
+
 * .. code-block:: LANGUAGE.. cannot be handled well in rst2man.
   However, if LANGUAGE is not given, it works.
