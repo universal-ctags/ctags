@@ -955,7 +955,8 @@ extern void attachParserFieldToCorkEntry (int index,
 
 extern const tagField* getParserField (const tagEntryInfo * tag, int index)
 {
-	if (!(index < tag->usedParserFields))
+	if (index < 0
+		|| tag->usedParserFields <= ((unsigned int)index) )
 		return NULL;
 	else if (index < PRE_ALLOCATED_PARSER_FIELDS)
 		return tag->parserFields + index;

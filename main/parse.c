@@ -897,7 +897,7 @@ pickLanguageBySelection (selectLanguage selector, MIO *input,
 {
 	const char *lang;
 	langType *cs = xMalloc(nCandidates, langType);
-	int i;
+	unsigned int i;
 
 	for (i = 0; i < nCandidates; i++)
 		cs[i] = candidates[i].lang;
@@ -1557,7 +1557,7 @@ extern void initializeParser (langType lang)
 {
 	if (lang == LANG_AUTO)
 	{
-		int i;
+		unsigned int i;
 		for (i = 0; i < countParsers(); i++)
 			initializeParserOne (i);
 	}
@@ -2939,7 +2939,7 @@ extern void freeEncodingResources (void)
 {
 	if (EncodingMap)
 	{
-		int i;
+		unsigned int i;
 		for (i = 0  ;  i <= EncodingMapMax  ; ++i)
 		{
 			if (EncodingMap [i])
@@ -2970,7 +2970,7 @@ extern bool doesParserRequireMemoryStream (const langType language)
 {
 	Assert (0 <= language  &&  language < (int) LanguageCount);
 	parserDefinition *const lang = LanguageTable [language].def;
-	int i;
+	unsigned int i;
 
 	if (lang->tagXpathTableCount > 0
 		|| lang->useMemoryStreamInput)
@@ -3558,7 +3558,7 @@ extern void scheduleRunningBaseparser (int dependencyIndex)
 
 	if (dependencyIndex == RUN_DEFAULT_SUBPARSERS)
 	{
-		for (int i = 0; i < current_parser->dependencyCount; ++i)
+		for (unsigned int i = 0; i < current_parser->dependencyCount; ++i)
 			if (current_parser->dependencies[i].type == DEPTYPE_SUBPARSER)
 			{
 				dep = current_parser->dependencies + i;

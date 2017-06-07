@@ -785,7 +785,7 @@ static void matchTagPattern (struct lregexControlBlock *lcb,
 
 			if (patbuf->fieldPatterns)
 			{
-				for (int i = 0; i < ptrArrayCount(patbuf->fieldPatterns); i++)
+				for (unsigned int i = 0; i < ptrArrayCount(patbuf->fieldPatterns); i++)
 				{
 					struct fieldPattern *fp = ptrArrayItem(patbuf->fieldPatterns, i);
 					if (isFieldEnabled (fp->ftype))

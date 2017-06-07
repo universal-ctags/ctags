@@ -228,7 +228,7 @@ static fieldObject* fieldObjects = NULL;
 
 extern void initFieldObjects (void)
 {
-	int i;
+	unsigned int i;
 	fieldObject *fobj;
 
 	Assert (fieldObjects == NULL);
@@ -296,7 +296,7 @@ extern void initFieldObjects (void)
 
 static fieldObject* getFieldObject(fieldType type)
 {
-	Assert ((0 <= type) && (type < fieldObjectUsed));
+	Assert ((0 <= type) && ((unsigned int)type < fieldObjectUsed));
 	return fieldObjects + type;
 }
 
@@ -592,7 +592,7 @@ extern const char* renderFieldEscaped (writerType writer,
 
 	Assert (tag);
 	Assert (fobj->def->renderEscaped);
-	Assert (tag->usedParserFields > index);
+	Assert (index < 0 || ((unsigned int)index) < tag->usedParserFields);
 
 	fobj->buffer = vStringNewOrClearWithAutoRelease (fobj->buffer);
 
@@ -911,7 +911,7 @@ static bool     isRoleFieldAvailable      (const tagEntryInfo *const tag)
 
 static bool     isExtrasFieldAvailable     (const tagEntryInfo *const tag)
 {
-	int i;
+	unsigned int i;
 	for (i = 0; i < sizeof (tag->extra); i++)
 	{
 		if (tag->extra [i])

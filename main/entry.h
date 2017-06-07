@@ -91,9 +91,14 @@ struct sTagEntryInfo {
 		unsigned long endLine;
 	} extensionFields;  /* list of extension fields*/
 
+	/* `usedParserFields' tracks how many parser own fields are
+	   used. If it is a few (less than PRE_ALLOCATED_PARSER_FIELDS),
+	   statically allocated parserFields is used. If more fields than
+	   PRE_ALLOCATED_PARSER_FIELDS is defined and attached, parserFieldsDynamic
+	   is used. */
+	unsigned int usedParserFields;
 #define PRE_ALLOCATED_PARSER_FIELDS 5
 #define NO_PARSER_FIELD -1
-	int usedParserFields;
 	tagField     parserFields [PRE_ALLOCATED_PARSER_FIELDS];
 	ptrArray *   parserFieldsDynamic;
 

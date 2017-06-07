@@ -160,7 +160,7 @@ extern MIOPos getInputFilePosition (void)
 	return File.filePosition.pos;
 }
 
-extern MIOPos getInputFilePositionForLine (int line)
+extern MIOPos getInputFilePositionForLine (unsigned int line)
 {
 	return File.lineFposMap.pos[(((File.lineFposMap.count > (line - 1)) \
 				      && (line > 0))? (line - 1): 0)].pos;
