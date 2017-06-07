@@ -92,9 +92,9 @@ static xmlNode *getPrevKeyElement (xmlNode *node)
 }
 
 static void plistFindTagsUnderKey (xmlNode *node,
-				   const struct sTagXpathRecurSpec *spec,
+				   const struct sTagXpathRecurSpec *spec CTAGS_ATTR_UNUSED,
 				   xmlXPathContext *ctx,
-				   void *userData)
+				   void *userData CTAGS_ATTR_UNUSED)
 {
 	xmlNode *current;
 	xmlNode *prev;
@@ -140,8 +140,8 @@ static void plistFindTagsUnderKey (xmlNode *node,
 	vStringDelete (path);
 }
 
-static void makeTagWithScope (xmlNode *node,
-			      const struct sTagXpathMakeTagSpec *spec,
+static void makeTagWithScope (xmlNode *node CTAGS_ATTR_UNUSED,
+			      const struct sTagXpathMakeTagSpec *spec CTAGS_ATTR_UNUSED,
 			      struct sTagEntryInfo *tag,
 			      void *userData)
 {

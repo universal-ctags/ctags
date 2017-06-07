@@ -28,8 +28,8 @@
 # define DebugStatement(x) x
 # define PrintStatus(x)    if (debug(DEBUG_STATUS)) printf x;
 # ifdef NDEBUG
-#  define Assert(c)
-#  define AssertNotReached()
+#  define Assert(c) do {} while(0)
+#  define AssertNotReached() do {} while(0)
 # else
    /* based on glibc's assert.h __ASSERT_FUNCTION */
 #  if defined (__GNUC__) && (__GNUC__ > 2 || (__GNUC__ == 2 && __GNUC_MINOR__ >= 4))
@@ -45,8 +45,8 @@
 #else
 # define DebugStatement(x)
 # define PrintStatus(x)
-# define Assert(c)
-# define AssertNotReached()
+# define Assert(c) do {} while(0)
+# define AssertNotReached() do {} while(0)
 # ifndef NDEBUG
 #  define NDEBUG
 # endif

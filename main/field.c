@@ -228,7 +228,7 @@ static fieldObject* fieldObjects = NULL;
 
 extern void initFieldObjects (void)
 {
-	int i;
+	unsigned int i;
 	fieldObject *fobj;
 
 	Assert (fieldObjects == NULL);
@@ -296,7 +296,7 @@ extern void initFieldObjects (void)
 
 static fieldObject* getFieldObject(fieldType type)
 {
-	Assert ((0 <= type) && (type < fieldObjectUsed));
+	Assert ((0 <= type) && ((unsigned int)type < fieldObjectUsed));
 	return fieldObjects + type;
 }
 
@@ -491,7 +491,7 @@ static const char *renderEscapedName (const char* s,
 }
 
 static const char *renderFieldName (const tagEntryInfo *const tag, const char *value CTAGS_ATTR_UNUSED, vString* b,
-									bool *rejected)
+									bool *rejected CTAGS_ATTR_UNUSED)
 {
 	return renderEscapedName (tag->name, tag, b);
 }
@@ -508,7 +508,7 @@ static const char *renderFieldNameNoEscape (const tagEntryInfo *const tag, const
 }
 
 static const char *renderFieldInput (const tagEntryInfo *const tag, const char *value CTAGS_ATTR_UNUSED, vString* b,
-									 bool *rejected)
+									 bool *rejected CTAGS_ATTR_UNUSED)
 {
 	const char *f = tag->inputFileName;
 
@@ -517,7 +517,7 @@ static const char *renderFieldInput (const tagEntryInfo *const tag, const char *
 	return renderEscapedString (f, tag, b);
 }
 
-static const char *renderFieldInputNoEscape (const tagEntryInfo *const tag, const char *value, vString* b,
+static const char *renderFieldInputNoEscape (const tagEntryInfo *const tag, const char *value CTAGS_ATTR_UNUSED, vString* b,
 											 bool *rejected)
 {
 	const char *f = tag->inputFileName;
@@ -535,14 +535,14 @@ static const char *renderFieldInputNoEscape (const tagEntryInfo *const tag, cons
 }
 
 static const char *renderFieldSignature (const tagEntryInfo *const tag, const char *value CTAGS_ATTR_UNUSED, vString* b,
-										 bool *rejected)
+										 bool *rejected CTAGS_ATTR_UNUSED)
 {
 	return renderEscapedString (WITH_DEFUALT_VALUE (tag->extensionFields.signature),
 				    tag, b);
 }
 
 static const char *renderFieldScope (const tagEntryInfo *const tag, const char *value CTAGS_ATTR_UNUSED, vString* b,
-									 bool *rejected)
+									 bool *rejected CTAGS_ATTR_UNUSED)
 {
 	const char* scope;
 
@@ -566,14 +566,14 @@ static const char *renderFieldScopeNoEscape (const tagEntryInfo *const tag, cons
 }
 
 static const char *renderFieldInherits (const tagEntryInfo *const tag, const char *value CTAGS_ATTR_UNUSED, vString* b,
-										bool *rejected)
+										bool *rejected CTAGS_ATTR_UNUSED)
 {
 	return renderEscapedString (WITH_DEFUALT_VALUE (tag->extensionFields.inheritance),
 				    tag, b);
 }
 
 static const char *renderFieldTyperef (const tagEntryInfo *const tag, const char *value CTAGS_ATTR_UNUSED, vString* b,
-									   bool *rejected)
+									   bool *rejected CTAGS_ATTR_UNUSED)
 {
 	return renderEscapedName (WITH_DEFUALT_VALUE (tag->extensionFields.typeRef [1]), tag, b);
 }
@@ -592,7 +592,7 @@ extern const char* renderFieldEscaped (writerType writer,
 
 	Assert (tag);
 	Assert (fobj->def->renderEscaped);
-	Assert (tag->usedParserFields > index);
+	Assert (index < 0 || ((unsigned int)index) < tag->usedParserFields);
 
 	fobj->buffer = vStringNewOrClearWithAutoRelease (fobj->buffer);
 
@@ -647,7 +647,7 @@ static const char* renderCompactInputLine (vString *b,  const char *const line)
 }
 
 static const char *renderFieldKindName (const tagEntryInfo *const tag, const char *value CTAGS_ATTR_UNUSED, vString* b,
-										bool *rejected)
+										bool *rejected CTAGS_ATTR_UNUSED)
 {
 	return renderAsIs (b, tag->kind->name);
 }
@@ -655,7 +655,7 @@ static const char *renderFieldKindName (const tagEntryInfo *const tag, const cha
 static const char *renderFieldCompactInputLine (const tagEntryInfo *const tag,
 						const char *value CTAGS_ATTR_UNUSED,
 						 vString* b,
-						bool *rejected)
+						bool *rejected CTAGS_ATTR_UNUSED)
 {
 	const char *line;
 	static vString *tmp;
@@ -680,7 +680,7 @@ static const char *renderFieldCompactInputLine (const tagEntryInfo *const tag,
 static const char *renderFieldLineNumber (const tagEntryInfo *const tag,
 					  const char *value CTAGS_ATTR_UNUSED,
 					  vString* b,
-					  bool *rejected)
+					  bool *rejected CTAGS_ATTR_UNUSED)
 {
 	long ln = tag->lineNumber;
 	char buf[32] = {[0] = '\0'};
@@ -695,7 +695,7 @@ static const char *renderFieldLineNumber (const tagEntryInfo *const tag,
 static const char *renderFieldRole (const tagEntryInfo *const tag,
 				    const char *value CTAGS_ATTR_UNUSED,
 				    vString* b,
-					bool *rejected)
+					bool *rejected CTAGS_ATTR_UNUSED)
 {
 	int rindex = tag->extensionFields.roleIndex;
 	const roleDesc * role;
@@ -715,7 +715,7 @@ static const char *renderFieldRole (const tagEntryInfo *const tag,
 static const char *renderFieldLanguage (const tagEntryInfo *const tag,
 					const char *value CTAGS_ATTR_UNUSED,
 					vString* b,
-					bool *rejected)
+					bool *rejected CTAGS_ATTR_UNUSED)
 {
 	const char *l;
 
@@ -728,9 +728,9 @@ static const char *renderFieldLanguage (const tagEntryInfo *const tag,
 }
 
 static const char *renderFieldAccess (const tagEntryInfo *const tag,
-				      const char *value,
+				      const char *value CTAGS_ATTR_UNUSED,
 				      vString* b,
-					  bool *rejected)
+					  bool *rejected CTAGS_ATTR_UNUSED)
 {
 	return renderAsIs (b, WITH_DEFUALT_VALUE (tag->extensionFields.access));
 }
@@ -738,7 +738,7 @@ static const char *renderFieldAccess (const tagEntryInfo *const tag,
 static const char *renderFieldKindLetter (const tagEntryInfo *const tag,
 					  const char *value CTAGS_ATTR_UNUSED,
 					  vString* b,
-					  bool *rejected)
+					  bool *rejected CTAGS_ATTR_UNUSED)
 {
 	static char c[2] = { [1] = '\0' };
 
@@ -750,7 +750,7 @@ static const char *renderFieldKindLetter (const tagEntryInfo *const tag,
 static const char *renderFieldImplementation (const tagEntryInfo *const tag,
 					      const char *value CTAGS_ATTR_UNUSED,
 					      vString* b,
-						  bool *rejected)
+						  bool *rejected CTAGS_ATTR_UNUSED)
 {
 	return renderAsIs (b, WITH_DEFUALT_VALUE (tag->extensionFields.implementation));
 }
@@ -758,7 +758,7 @@ static const char *renderFieldImplementation (const tagEntryInfo *const tag,
 static const char *renderFieldFile (const tagEntryInfo *const tag,
 				    const char *value CTAGS_ATTR_UNUSED,
 				    vString* b,
-					bool *rejected)
+					bool *rejected CTAGS_ATTR_UNUSED)
 {
 	return renderAsIs (b, tag->isFileScope? "file": "-");
 }
@@ -766,7 +766,7 @@ static const char *renderFieldFile (const tagEntryInfo *const tag,
 static const char *renderFieldPattern (const tagEntryInfo *const tag,
 				       const char *value CTAGS_ATTR_UNUSED,
 				       vString* b,
-					   bool *rejected)
+					   bool *rejected CTAGS_ATTR_UNUSED)
 {
 	if (tag->lineNumberEntry)
 		return NULL;
@@ -787,7 +787,7 @@ static const char *renderFieldPattern (const tagEntryInfo *const tag,
 static const char *renderFieldRefMarker (const tagEntryInfo *const tag,
 					 const char *value CTAGS_ATTR_UNUSED,
 					 vString* b,
-					 bool *rejected)
+					 bool *rejected CTAGS_ATTR_UNUSED)
 {
 	static char c[2] = { [1] = '\0' };
 
@@ -799,7 +799,7 @@ static const char *renderFieldRefMarker (const tagEntryInfo *const tag,
 static const char *renderFieldExtras (const tagEntryInfo *const tag,
 				     const char *value CTAGS_ATTR_UNUSED,
 				     vString* b,
-					 bool *rejected)
+					 bool *rejected CTAGS_ATTR_UNUSED)
 {
 	int i;
 	bool hasExtra = false;
@@ -829,9 +829,9 @@ static const char *renderFieldExtras (const tagEntryInfo *const tag,
 }
 
 static const char *renderFieldXpath (const tagEntryInfo *const tag,
-				     const char *value,
+				     const char *value CTAGS_ATTR_UNUSED,
 				     vString* b,
-					 bool *rejected)
+					 bool *rejected CTAGS_ATTR_UNUSED)
 {
 #ifdef HAVE_LIBXML
 	if (tag->extensionFields.xpath)
@@ -842,9 +842,9 @@ static const char *renderFieldXpath (const tagEntryInfo *const tag,
 }
 
 static const char *renderFieldScopeKindName(const tagEntryInfo *const tag,
-					    const char *value,
+					    const char *value CTAGS_ATTR_UNUSED,
 					    vString* b,
-						bool *rejected)
+						bool *rejected CTAGS_ATTR_UNUSED)
 {
 	const char* kind;
 
@@ -853,9 +853,9 @@ static const char *renderFieldScopeKindName(const tagEntryInfo *const tag,
 }
 
 static const char *renderFieldEnd (const tagEntryInfo *const tag,
-				   const char *value,
+				   const char *value CTAGS_ATTR_UNUSED,
 				   vString* b,
-				   bool *rejected)
+				   bool *rejected CTAGS_ATTR_UNUSED)
 {
 	static char buf[16];
 
@@ -911,7 +911,7 @@ static bool     isRoleFieldAvailable      (const tagEntryInfo *const tag)
 
 static bool     isExtrasFieldAvailable     (const tagEntryInfo *const tag)
 {
-	int i;
+	unsigned int i;
 	for (i = 0; i < sizeof (tag->extra); i++)
 	{
 		if (tag->extra [i])
@@ -1035,10 +1035,10 @@ static void updateSiblingField (fieldType type, const char* name)
 	}
 }
 
-static const char* defaultRenderer (const tagEntryInfo *const tag,
+static const char* defaultRenderer (const tagEntryInfo *const tag CTAGS_ATTR_UNUSED,
 				    const char *value,
-				    vString * buffer,
-					bool *rejected)
+				    vString * buffer CTAGS_ATTR_UNUSED,
+					bool *rejected CTAGS_ATTR_UNUSED)
 {
 	return value;
 }

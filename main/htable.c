@@ -221,9 +221,11 @@ extern int        hashTableCountItem   (hashTable *htable)
 unsigned int hashPtrhash (const void * const x)
 {
 	union {
-		const void *const ptr;
+		const void * ptr;
 		unsigned int ui;
-	} v = {.ui = 0, .ptr = x};
+	} v;
+	v.ui = 0;
+	v.ptr = x;
 
 	return v.ui;
 }

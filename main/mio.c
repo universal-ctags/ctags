@@ -390,8 +390,8 @@ MIO *mio_new_mio (MIO *base, long start, size_t size)
 		if (mio_seek (base, 0, SEEK_END) != 0)
 			return NULL;
 		end = mio_tell (base);
+		Assert (end >= start);
 		size = end - start;
-		Assert (size >= 0);
 	}
 
 	if (mio_seek (base, start, SEEK_SET) != 0)

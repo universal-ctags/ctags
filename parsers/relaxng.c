@@ -181,17 +181,20 @@ setScope (struct sTagEntryInfo *tag, int index)
 }
 
 static void
-makeTagWithUpdatingScope (xmlNode *node,
-			  const struct sTagXpathMakeTagSpec *spec,
+makeTagWithUpdatingScope (xmlNode *node CTAGS_ATTR_UNUSED,
+			  const struct sTagXpathMakeTagSpec *spec CTAGS_ATTR_UNUSED,
 			  struct sTagEntryInfo *tag,
 			  void *userData)
 {
 	int *corkIndex = userData;
 
 
+#if 0
 	if (*corkIndex == CORK_NIL)
-		/* mark tag as an entry point */
+		/* TODO: mark tag as an entry point */
 		;
+#endif
+
 	setScope (tag, *corkIndex);
 
 	*corkIndex = makeTagEntry (tag);

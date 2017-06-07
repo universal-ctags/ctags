@@ -174,7 +174,7 @@ static void parseCommon (tokenInfo *token, int r, keywordId protection)
 	parseSubobject(token, r, K_COMMON, protection);
 }
 
-static int parseClass (tclSubparser *s, int parentIndex)
+static int parseClass (tclSubparser *s CTAGS_ATTR_UNUSED, int parentIndex)
 {
 	tokenInfo *token = newTclToken ();
 	int r = CORK_NIL;

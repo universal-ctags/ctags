@@ -56,13 +56,13 @@ static xtagObject* xtagObjects;
 
 static xtagObject* getXtagObject (xtagType type)
 {
-	Assert ((0 <= type) && (type < xtagObjectUsed));
+	Assert ((0 <= type) && ((unsigned int)type < xtagObjectUsed));
 	return (xtagObjects + type);
 }
 
 extern xtagDefinition* getXtagDefinition (xtagType type)
 {
-	Assert ((0 <= type) && (type < xtagObjectUsed));
+	Assert ((0 <= type) && ((unsigned int)type < xtagObjectUsed));
 
 	return getXtagObject (type)->def;
 }
@@ -71,7 +71,7 @@ typedef bool (* xtagPredicate) (xtagObject *pobj, langType language, const void 
 static xtagType  getXtagTypeGeneric (xtagPredicate predicate, langType language, const void *user_data)
 {
 	static bool initialized = false;
-	int i;
+	unsigned int i;
 
 	if (language == LANG_AUTO && (initialized == false))
 	{
@@ -236,7 +236,7 @@ extern void initXtagObjects (void)
 	xtagObjects = xMalloc (xtagObjectAllocated, xtagObject);
 	DEFAULT_TRASH_BOX(&xtagObjects, eFreeIndirect);
 
-	for (int i = 0; i < ARRAY_SIZE (xtagDefinitions); i++)
+	for (unsigned int i = 0; i < ARRAY_SIZE (xtagDefinitions); i++)
 	{
 		xobj = xtagObjects + i;
 		xobj->def = xtagDefinitions + i;

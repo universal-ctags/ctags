@@ -61,7 +61,7 @@ static bool whitespaceSwap (vString *const s)
             toReplace = '_';
         }
 
-        for(int i=0; i < vStringLength(s); i++)
+        for(unsigned int i=0; i < vStringLength(s); i++)
             if(s->buffer[i] == toReplace)
 			{
                 s->buffer[i] = replaceWith;
@@ -72,7 +72,7 @@ static bool whitespaceSwap (vString *const s)
 }
 
 static void changeSection (const char *const line, const regexMatch *const matches,
-                               const unsigned int count, void *data)
+                               const unsigned int count CTAGS_ATTR_UNUSED, void *data CTAGS_ATTR_UNUSED)
 {
     const char * const matchedSection = line + matches[1].start;
 
@@ -101,7 +101,7 @@ static void makeSimpleXTag (const vString* const name, kindDefinition* const kin
 }
 
 static void tagKeywordsAndTestCases (const char *const line, const regexMatch *const matches,
-                               const unsigned int count, void *data)
+                               const unsigned int count, void *data CTAGS_ATTR_UNUSED)
 {
     if (count > 1 && ( section == K_KEYWORD || section == K_TESTCASE) )
     {
@@ -117,7 +117,7 @@ static void tagKeywordsAndTestCases (const char *const line, const regexMatch *c
 }
 
 static void tagVariables (const char *const line, const regexMatch *const matches,
-                               const unsigned int count, void *data)
+                               const unsigned int count, void *data CTAGS_ATTR_UNUSED)
 {
     if (count > 1 && section == K_VARIABLE)
     {

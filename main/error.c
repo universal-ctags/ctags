@@ -62,7 +62,8 @@ extern void error (const errorSelection selection,
 }
 
 #if HAVE_JANSSON
-bool jsonErrorPrinter (const errorSelection selection, const char *const format, va_list ap, void *data)
+bool jsonErrorPrinter (const errorSelection selection, const char *const format, va_list ap,
+					   void *data CTAGS_ATTR_UNUSED)
 {
 #define ERR_BUFFER_SIZE 4096
 	static char reason[ERR_BUFFER_SIZE];

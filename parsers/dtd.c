@@ -324,7 +324,7 @@ static void parseEntity (tokenInfo *const token)
 		backpatchEndField (index, token->lineNumber);
 }
 
-static tokenInfo *const parserParameterEntityRef (tokenInfo *const token)
+static tokenInfo *parserParameterEntityRef (tokenInfo *const token)
 {
 	tokenRead (token);
 	if (tokenIsType(token, IDENTIFIER))
@@ -427,7 +427,9 @@ static void parseAttDefs (tokenInfo *const token)
 			if (tokenIsKeyword(token, FIXED))
 				tokenRead (token);
 			else if (tokenIsKeyword(token, ATTR_DEFAULT_DECLS))
-				;				/* Just consuming */
+			{
+				/* Just consuming */
+			}
 		}
 		else if (tokenIsType (token, STRING))
 			;					/* DefaultDecl -> Just consuming */

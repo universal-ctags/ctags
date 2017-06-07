@@ -96,8 +96,8 @@ static void makeSystemdReferencedUnit (const char *value, kindDefinition* kind, 
 	vStringDelete (unit);
 }
 
-static void newDataCallback (iniconfSubparser *s,
-							 const char *section, const char *key, const char *value)
+static void newDataCallback (iniconfSubparser *s CTAGS_ATTR_UNUSED,
+							 const char *section CTAGS_ATTR_UNUSED, const char *key, const char *value)
 {
 	int r;
 

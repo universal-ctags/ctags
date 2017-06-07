@@ -167,7 +167,7 @@ bool tokenSkipOverPair (tokenInfo *token)
 {
 	int start = token->type;
 	int end = token->klass->typeForUndefined;
-	int i;
+	unsigned int i;
 
 	for (i = 0; i < token->klass->pairCount; i++)
 		if (start == token->klass->pairs[i].start)

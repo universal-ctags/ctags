@@ -35,7 +35,7 @@ static kindDefinition YumRepoKinds [] = {
 };
 
 
-static void newDataCallback (iniconfSubparser *s,
+static void newDataCallback (iniconfSubparser *s CTAGS_ATTR_UNUSED,
 							 const char *section, const char *key, const char *value)
 {
 	tagEntryInfo e;

@@ -58,7 +58,7 @@ extern unsigned long getInputLineNumber (void);
 extern int getInputLineOffset (void);
 extern const char *getInputFileName (void);
 extern MIOPos getInputFilePosition (void);
-extern MIOPos getInputFilePositionForLine (int line);
+extern MIOPos getInputFilePositionForLine (unsigned int line);
 extern langType getInputLanguage (void);
 extern const char *getInputLanguageName (void);
 extern const char *getInputFileTagPath (void);

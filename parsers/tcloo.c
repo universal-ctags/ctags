@@ -65,7 +65,7 @@ static void parseSuperclass (tokenInfo *token, int parent)
 	skipToEndOfTclCmdline (token);
 }
 
-static int parseClass (tclSubparser *s, int parentIndex)
+static int parseClass (tclSubparser *s CTAGS_ATTR_UNUSED, int parentIndex)
 {
 	tokenInfo *token = newTclToken ();
 	int r = CORK_NIL;

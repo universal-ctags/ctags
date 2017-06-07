@@ -217,8 +217,8 @@ static tagXpathTable xsltXpathTemplateInternalTable [] = {
 };
 
 static void verifyVersion (xmlNode *node,
-			   const tagXpathRecurSpec *spec,
-			   xmlXPathContext *ctx,
+			   const tagXpathRecurSpec *spec CTAGS_ATTR_UNUSED,
+			   xmlXPathContext *ctx CTAGS_ATTR_UNUSED,
 			   void *userData)
 {
 	bool *acceptable = userData;
@@ -262,7 +262,7 @@ static tagXpathTableTable xsltXpathTableTable[] = {
 
 
 static void makeTagRecursivelyWithVersionVerification (xmlNode *node,
-						       const tagXpathRecurSpec *spec,
+						       const tagXpathRecurSpec *spec CTAGS_ATTR_UNUSED,
 						       xmlXPathContext *ctx,
 						       void *userData)
 {
@@ -300,8 +300,8 @@ static void makeTagRecursively (xmlNode *node,
 	*(int *)userData = backup;
 }
 
-static void makeTagWithProvidingScope (xmlNode *node,
-				       const tagXpathMakeTagSpec *spec,
+static void makeTagWithProvidingScope (xmlNode *node CTAGS_ATTR_UNUSED,
+				       const tagXpathMakeTagSpec *spec CTAGS_ATTR_UNUSED,
 				       struct sTagEntryInfo *tag,
 				       void *userData)
 {

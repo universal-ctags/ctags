@@ -76,7 +76,7 @@ out:
 	return;
 }
 
-static bool probeLanguage (const char *section, const char *key, const char *value)
+static bool probeLanguage (const char *section, const char *key CTAGS_ATTR_UNUSED, const char *value CTAGS_ATTR_UNUSED)
 {
 	if (section && (strncmp (LOGGER_PREFIX, section, LOGGER_LEN) == 0))
 		return true;
@@ -85,7 +85,7 @@ static bool probeLanguage (const char *section, const char *key, const char *val
 }
 
 
-extern void exclusiveSubparserChosenCallback (subparser *s, void *data)
+extern void exclusiveSubparserChosenCallback (subparser *s, void *data CTAGS_ATTR_UNUSED)
 {
 	((struct sPythonLoggingConfigSubparser *)s)->index = CORK_NIL;
 }

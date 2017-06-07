@@ -26,7 +26,7 @@ typedef struct sKindObject {
 
 struct kindControlBlock {
 	kindObject *kind;
-	int count;
+	unsigned int count;
 	langType owner;
 };
 
@@ -192,7 +192,7 @@ extern struct kindControlBlock* allocKindControlBlock (parserDefinition *parser)
 
 extern void freeKindControlBlock (struct kindControlBlock* kcb)
 {
-	int i;
+	unsigned int i;
 
 	for (i = 0; i < kcb->count; ++i)
 	{
@@ -218,7 +218,7 @@ extern int  defineKind (struct kindControlBlock* kcb, kindDefinition *def,
 	return def->id;
 }
 
-extern int countKinds (struct kindControlBlock* kcb)
+extern unsigned int countKinds (struct kindControlBlock* kcb)
 {
 	return kcb->count;
 }
@@ -230,7 +230,7 @@ extern kindDefinition *getKind (struct kindControlBlock* kcb, int kindIndex)
 
 extern kindDefinition *getKindForLetter (struct kindControlBlock* kcb, int letter)
 {
-	int i;
+	unsigned int i;
 	kindDefinition * kdef;
 
 	for (i = 0;  i < countKinds (kcb);  ++i)
@@ -244,7 +244,7 @@ extern kindDefinition *getKindForLetter (struct kindControlBlock* kcb, int lette
 
 extern kindDefinition *getKindForName (struct kindControlBlock* kcb, const char* name)
 {
-	int i;
+	unsigned int i;
 	kindDefinition * kdef;
 
 	for (i = 0;  i < countKinds (kcb);  ++i)
