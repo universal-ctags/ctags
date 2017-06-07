@@ -98,7 +98,7 @@ static void leave_c_prologue (const char *line CTAGS_ATTR_UNUSED,
 }
 
 static void enter_union (const char *line CTAGS_ATTR_UNUSED,
-			 const regexMatch *matches,
+			 const regexMatch *matches CTAGS_ATTR_UNUSED,
 			 unsigned int count CTAGS_ATTR_UNUSED,
 			 void *data)
 {
@@ -113,7 +113,7 @@ static void enter_union (const char *line CTAGS_ATTR_UNUSED,
 }
 
 static void leave_union (const char *line CTAGS_ATTR_UNUSED,
-			 const regexMatch *matches,
+			 const regexMatch *matches CTAGS_ATTR_UNUSED,
 			 unsigned int count CTAGS_ATTR_UNUSED,
 			 void *data)
 {

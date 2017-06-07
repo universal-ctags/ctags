@@ -110,7 +110,7 @@ static void make_tag_for_paragraph_maybe (const char *line,
 static void make_tag_for_copyed_in_sourcefile (const char *line,
 											   const regexMatch *matches,
 											   unsigned int count,
-											   void *data)
+											   void *data CTAGS_ATTR_UNUSED)
 {
 	if (count > 0)
 	{

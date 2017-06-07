@@ -66,18 +66,18 @@ static const keywordTable autoconfKeywordTable[] = {
 	{ "AC_DEFINE_UNQUOTED", KEYWORD_define, },
 };
 
-static bool doesLineCommentStart (m4Subparser *m4, int c, const char* token)
+static bool doesLineCommentStart (m4Subparser *m4 CTAGS_ATTR_UNUSED, int c, const char* token CTAGS_ATTR_UNUSED)
 {
 	return (c == '#');
 }
 
-static bool doesStringLiteralStart (m4Subparser *m4, int c)
+static bool doesStringLiteralStart (m4Subparser *m4 CTAGS_ATTR_UNUSED, int c CTAGS_ATTR_UNUSED)
 {
 	// return (c == '"') || (c == '\'') || (c == '`');
 	return false;
 }
 
-static bool probeLanguage (m4Subparser *m4, const char* token)
+static bool probeLanguage (m4Subparser *m4 CTAGS_ATTR_UNUSED, const char* token)
 {
 	return strncmp (token, "m4_", 3) == 0
 		|| strncmp (token, "AC_", 3) == 0
@@ -105,7 +105,7 @@ static int makeAutoconfTag (int kind)
 	return index;
 }
 
-static int newMacroCallback (m4Subparser *m4, const char* token)
+static int newMacroCallback (m4Subparser *m4 CTAGS_ATTR_UNUSED, const char* token)
 {
 	int keyword;
 	int index = CORK_NIL;
@@ -149,7 +149,7 @@ static int newMacroCallback (m4Subparser *m4, const char* token)
 	return index;
 }
 
-static void exclusiveSubparserChosenCallback (subparser *s, void *data)
+static void exclusiveSubparserChosenCallback (subparser *s CTAGS_ATTR_UNUSED, void *data CTAGS_ATTR_UNUSED)
 {
 	setM4Quotes ('[', ']');
 }

@@ -40,7 +40,7 @@ tagWriter uCtagsWriter = {
 	.useStdoutByDefault = false,
 };
 
-static void *beginECtagsFile (tagWriter *writer, MIO * mio)
+static void *beginECtagsFile (tagWriter *writer CTAGS_ATTR_UNUSED, MIO * mio CTAGS_ATTR_UNUSED)
 {
 	static struct rejection rej;
 
@@ -49,7 +49,7 @@ static void *beginECtagsFile (tagWriter *writer, MIO * mio)
 	return &rej;
 }
 
-static bool endECTagsFile (tagWriter *writer, MIO * mio, const char* filename)
+static bool endECTagsFile (tagWriter *writer, MIO * mio CTAGS_ATTR_UNUSED, const char* filename CTAGS_ATTR_UNUSED)
 {
 	struct rejection *rej = writer->private;
 	return rej->rejectedInThisInput;

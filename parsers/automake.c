@@ -234,7 +234,7 @@ static int skipToNonWhite (int c)
 	return c;
 }
 
-static void directiveCallback (makeSubparser *make, char *directive)
+static void directiveCallback (makeSubparser *make CTAGS_ATTR_UNUSED, char *directive)
 {
 	int c;
 	if (! strcmp (directive, "if"))

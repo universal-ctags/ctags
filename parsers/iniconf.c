@@ -81,7 +81,7 @@ static kindDefinition IniconfKinds [] = {
 	{ true, 'k', "key",      "keys"},
 };
 
-static void makeIniconfTagMaybe (const char *section, const char *key, const char *value, int *index)
+static void makeIniconfTagMaybe (const char *section, const char *key, const char *value CTAGS_ATTR_UNUSED, int *index)
 {
 	tagEntryInfo e;
 

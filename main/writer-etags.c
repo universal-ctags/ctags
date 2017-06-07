@@ -40,7 +40,7 @@ struct sEtags {
 
 
 
-static void *beginEtagsFile (tagWriter *writer CTAGS_ATTR_UNUSED, MIO *mio)
+static void *beginEtagsFile (tagWriter *writer CTAGS_ATTR_UNUSED, MIO *mio CTAGS_ATTR_UNUSED)
 {
 	static struct sEtags etags = { NULL, NULL, 0, NULL };
 

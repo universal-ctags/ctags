@@ -181,8 +181,8 @@ setScope (struct sTagEntryInfo *tag, int index)
 }
 
 static void
-makeTagWithUpdatingScope (xmlNode *node,
-			  const struct sTagXpathMakeTagSpec *spec,
+makeTagWithUpdatingScope (xmlNode *node CTAGS_ATTR_UNUSED,
+			  const struct sTagXpathMakeTagSpec *spec CTAGS_ATTR_UNUSED,
 			  struct sTagEntryInfo *tag,
 			  void *userData)
 {

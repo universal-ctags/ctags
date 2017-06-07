@@ -1769,7 +1769,7 @@ static void pre_lang_def_flag_base_long (const char* const optflag, const char* 
 #define LANGDEF_FLAG_DEDICATED "dedicated"
 #define LANGDEF_FLAG_SHARED    "shared"
 #define LANGDEF_FLAG_BIDIR     "bidirectional"
-static void pre_lang_def_flag_direction_long (const char* const optflag, const char* const param, void* data)
+static void pre_lang_def_flag_direction_long (const char* const optflag, const char* const param CTAGS_ATTR_UNUSED, void* data)
 {
 	struct preLangDefFlagData * flag_data = data;
 

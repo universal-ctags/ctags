@@ -1708,7 +1708,7 @@ static void initializeCpp (const langType language)
 	DEFAULT_TRASH_BOX(defineMacroTable,hashTableDelete);
 }
 
-static void CpreProInstallIgnoreToken (const langType language, const char *optname, const char *arg)
+static void CpreProInstallIgnoreToken (const langType language CTAGS_ATTR_UNUSED, const char *optname CTAGS_ATTR_UNUSED, const char *arg)
 {
 	if (arg == NULL || arg[0] == '\0')
 	{
@@ -1723,7 +1723,7 @@ static void CpreProInstallIgnoreToken (const langType language, const char *optn
 	}
 }
 
-static void CpreProInstallMacroToken (const langType language, const char *optname, const char *arg)
+static void CpreProInstallMacroToken (const langType language CTAGS_ATTR_UNUSED, const char *optname CTAGS_ATTR_UNUSED, const char *arg)
 {
 	if (arg == NULL || arg[0] == '\0')
 	{
@@ -1735,7 +1735,7 @@ static void CpreProInstallMacroToken (const langType language, const char *optna
 	}
 }
 
-static void CpreProSetIf0 (const langType language, const char *name, const char *arg)
+static void CpreProSetIf0 (const langType language CTAGS_ATTR_UNUSED, const char *name CTAGS_ATTR_UNUSED, const char *arg)
 {
 	if (strcmp (arg, "true") == 0)
 		doesExaminCodeWithInIf0Branch = true;

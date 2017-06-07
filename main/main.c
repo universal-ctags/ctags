@@ -494,7 +494,7 @@ static void batchMakeTags (cookedArgs *args, void *user CTAGS_ATTR_UNUSED)
 }
 
 #ifdef HAVE_JANSSON
-void interactiveLoop (cookedArgs *args, void *user CTAGS_ATTR_UNUSED)
+void interactiveLoop (cookedArgs *args CTAGS_ATTR_UNUSED, void *user CTAGS_ATTR_UNUSED)
 {
 	char buffer[1024];
 	json_t *request;

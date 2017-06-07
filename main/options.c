@@ -1320,7 +1320,7 @@ static void processFormatOption (
 }
 
 #ifdef HAVE_ICONV
-static void processInputEncodingOption(const char *const option,
+static void processInputEncodingOption(const char *const option CTAGS_ATTR_UNUSED,
 				const char *const parameter)
 {
 	if (Option.inputEncoding)
@@ -1333,7 +1333,7 @@ static void processInputEncodingOption(const char *const option,
 	Option.inputEncoding = eStrdup(parameter);
 }
 
-static void processOutputEncodingOption(const char *const option,
+static void processOutputEncodingOption(const char *const option CTAGS_ATTR_UNUSED,
 				const char *const parameter)
 {
 	if (Option.outputEncoding)
