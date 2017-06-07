@@ -427,7 +427,9 @@ static void parseAttDefs (tokenInfo *const token)
 			if (tokenIsKeyword(token, FIXED))
 				tokenRead (token);
 			else if (tokenIsKeyword(token, ATTR_DEFAULT_DECLS))
-				;				/* Just consuming */
+			{
+				/* Just consuming */
+			}
 		}
 		else if (tokenIsType (token, STRING))
 			;					/* DefaultDecl -> Just consuming */
