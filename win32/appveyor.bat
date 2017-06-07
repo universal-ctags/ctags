@@ -151,8 +151,8 @@ goto :eof
 
 :msys2_package
 md package
-:: Build html docs
-bash -lc "cd docs; make html"
+:: Build html docs and man pages
+bash -lc "make -C docs html && make -C man RST2HTML=rst2html3"
 move docs\_build\html package\docs > nul
 rd /s/q package\docs\_sources
 
@@ -170,7 +170,7 @@ robocopy . package %filelist% > nul
 robocopy win32\license package\license > nul
 copy COPYING package\license > nul
 copy win32\mkstemp\COPYING.MinGW-w64-runtime.txt package\license > nul
-robocopy man package\man *.rst > nul
+robocopy man package\man *.html > nul
 cd package
 7z a ..\ctags-%ver%-%ARCH%.debug.zip %filelist% %dirlist%
 strip *.exe
