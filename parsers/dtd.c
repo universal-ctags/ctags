@@ -324,7 +324,7 @@ static void parseEntity (tokenInfo *const token)
 		backpatchEndField (index, token->lineNumber);
 }
 
-static tokenInfo *const parserParameterEntityRef (tokenInfo *const token)
+static tokenInfo *parserParameterEntityRef (tokenInfo *const token)
 {
 	tokenRead (token);
 	if (tokenIsType(token, IDENTIFIER))
