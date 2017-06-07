@@ -189,9 +189,12 @@ makeTagWithUpdatingScope (xmlNode *node CTAGS_ATTR_UNUSED,
 	int *corkIndex = userData;
 
 
+#if 0
 	if (*corkIndex == CORK_NIL)
-		/* mark tag as an entry point */
+		/* TODO: mark tag as an entry point */
 		;
+#endif
+
 	setScope (tag, *corkIndex);
 
 	*corkIndex = makeTagEntry (tag);
