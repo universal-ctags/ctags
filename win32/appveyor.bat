@@ -70,7 +70,7 @@ copy %ICONV_BUILD_DIR%\msvc10\iconv.dll %APPVEYOR_BUILD_FOLDER% > nul
 :: Build ctags with nmake
 @echo on
 cd %APPVEYOR_BUILD_FOLDER%
-nmake -f mk_mvc.mak WITH_ICONV=yes ICONV_DIR=%ICONV_DIR% PDB=yes
+nmake -f mk_mvc.mak WITH_ICONV=yes ICONV_DIR=%ICONV_DIR% PDB=yes || exit 1
 
 :: Backup VC binaries
 mkdir vc
@@ -120,8 +120,10 @@ goto :eof
 @echo on
 PATH C:\%MSYS2_DIR%\%MSYSTEM%\bin;C:\%MSYS2_DIR%\usr\bin;%PATH%
 set CHERE_INVOKING=yes
+:: Synchronize package databases and upgrade the core system
+C:\%MSYS2_DIR%\usr\bin\pacman --noconfirm --noprogressbar -Suuy
 :: Install and update necessary packages
-bash -lc "for i in {1..3}; do pacman --noconfirm -S mingw-w64-%MSYS2_ARCH%-{python3-sphinx,jansson,libxml2,libyaml} && break || sleep 15; done"
+bash -lc "for i in {1..3}; do pacman --noconfirm --noprogressbar -Su mingw-w64-%MSYS2_ARCH%-{python3-sphinx,jansson,libxml2,libyaml} && break || sleep 15; done"
 
 bash -lc "./autogen.sh"
 :: Patching configure.
@@ -210,7 +212,6 @@ goto :eof
 c:\cygwin\setup-x86.exe -qnNdO -R C:/cygwin -s http://cygwin.mirror.constant.com -l C:/cygwin/var/cache/setup -P dos2unix,libiconv-devel
 PATH c:\cygwin\bin;%PATH%
 set CHERE_INVOKING=yes
-bash -lc ""
 bash -lc "./autogen.sh"
 :: Patching configure.
 :: Workaround for "./configure: line 557: 0: Bad file descriptor"
