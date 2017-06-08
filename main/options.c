@@ -431,6 +431,10 @@ static optionDescription LongOptionDescription [] = {
  {0,"  --_interactive"},
  {0,"       Enter interactive mode (json over stdio)."},
 #endif
+#ifdef HAVE_SECCOMP
+ {0,"  --_secure"},
+ {0,"       Enter secure interactive mode (json over stdio, input over stdin)."},
+#endif
  {1,"  --_list-roles=[[language|all]:[kindletters|*]]"},
  {1,"       Output list of all roles of tag kind(s) specified for language(s)."},
  {1,"       e.g. --_list-roles=Make:I"},
@@ -490,6 +494,9 @@ static const char *const Features [] = {
 #ifdef HAVE_JANSSON
 	"json",
 	"interactive",
+#endif
+#ifdef HAVE_SECCOMP
+	"secure",
 #endif
 #ifdef HAVE_LIBYAML
 	"yaml",
@@ -1450,6 +1457,14 @@ static void processInteractiveOption (
 	enablePtag (PTAG_JSON_OUTPUT_VERSION, true);
 
 	json_set_alloc_funcs (eMalloc, eFree);
+}
+
+static void processSecureOption (
+		const char *const option,
+		const char *const parameter)
+{
+        Option.secure = true;
+        processInteractiveOption(option, parameter);
 }
 #endif
 
@@ -2488,9 +2503,6 @@ static parametricOption ParametricOptions [] = {
 	{ "filter-terminator",      processFilterTerminatorOption,  true,   STAGE_ANY },
 	{ "format",                 processFormatOption,            true,   STAGE_ANY },
 	{ "help",                   processHelpOption,              true,   STAGE_ANY },
-#ifdef HAVE_JANSSON
-	{ "_interactive",            processInteractiveOption,       true,   STAGE_ANY },
-#endif
 	{ "if0",                    processIf0Option,               false,  STAGE_ANY },
 #ifdef HAVE_ICONV
 	{ "input-encoding",         processInputEncodingOption,     false,  STAGE_ANY },
@@ -2530,6 +2542,12 @@ static parametricOption ParametricOptions [] = {
 	{ "_echo",                  processEchoOption,              false,  STAGE_ANY },
 	{ "_force-initializing",    processForceInitOption,         false, STAGE_ANY },
 	{ "_force-quit",            processForceQuitOption,         false,  STAGE_ANY },
+#ifdef HAVE_JANSSON
+	{ "_interactive",           processInteractiveOption,       true,   STAGE_ANY },
+#endif
+#ifdef HAVE_SECCOMP
+	{ "_secure",                processSecureOption,            true,   STAGE_ANY },
+#endif
 	{ "_xformat",               processXformatOption,           false,  STAGE_ANY },
 };
 
