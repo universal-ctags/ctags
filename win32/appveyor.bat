@@ -120,10 +120,22 @@ goto :eof
 @echo on
 PATH C:\%MSYS2_DIR%\%MSYSTEM%\bin;C:\%MSYS2_DIR%\usr\bin;%PATH%
 set CHERE_INVOKING=yes
-:: Synchronize package databases and upgrade the core system
-C:\%MSYS2_DIR%\usr\bin\pacman --noconfirm --noprogressbar -Sy --needed filesystem mintty bash pacman pacman-mirrors msys2-runtime msys2-runtime-devel
-:: Install and update necessary packages
-bash -lc "for i in {1..3}; do pacman --noconfirm --noprogressbar -S --needed mingw-w64-%MSYS2_ARCH%-{python3-sphinx,jansson,libxml2,libyaml,libiconv} && break || sleep 15; done"
+bash -lc 'if [ "x$(checkupdates)" != x ]; then exit 1; fi'
+if ERRORLEVEL 1 (
+	@rem Update found
+	@rem Remove unused toolchain to reduce the time for updating
+	if "%MSYSTEM%"=="MINGW64" (
+		bash -lc "pacman --noconfirm -Rs mingw-w64-i686-toolchain"
+	) else if "%MSYSTEM%"=="MINGW32" (
+		bash -lc "pacman --noconfirm -Rs mingw-w64-x86_64-toolchain"
+	)
+	@rem Synchronize package databases and upgrade the core system
+	C:\%MSYS2_DIR%\usr\bin\pacman --noconfirm --noprogressbar -Syu
+	@rem Run again to update the rest of packages
+	C:\%MSYS2_DIR%\usr\bin\pacman --noconfirm --noprogressbar -Su
+)
+:: Install necessary packages
+bash -lc "for i in {1..3}; do pacman --noconfirm --noprogressbar -S --needed mingw-w64-%MSYS2_ARCH%-{python3-sphinx,jansson,libxml2,libyaml} && break || sleep 15; done"
 
 bash -lc "./autogen.sh"
 :: Patching configure.
@@ -209,7 +221,7 @@ goto :eof
 :: ----------------------------------------------------------------------
 :: Using Cygwin, iconv enabled
 @echo on
-c:\cygwin\setup-x86.exe -qnNdO -R C:/cygwin -s http://cygwin.mirror.constant.com -l C:/cygwin/var/cache/setup -P dos2unix,libiconv-devel
+c:\cygwin\setup-x86.exe -qnNdO -P dos2unix,libiconv-devel
 PATH c:\cygwin\bin;%PATH%
 set CHERE_INVOKING=yes
 bash -lc "./autogen.sh"
