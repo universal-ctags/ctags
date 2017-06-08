@@ -336,7 +336,7 @@ state of all kinds in the kind group as specified with the option.
 
 The example output indicates that the `d` kinds of both the C++ and C
 parsers are in the same group and that the `C` parser manages the
-group. 
+group.
 
 .. code-block:: console
 
@@ -629,6 +629,13 @@ A new ``--_interactive`` option launches a JSON based command REPL which
 can be used to control ctags generation programatically.
 
 See :ref:`--_interactive Mode <interactive-mode>` for more details.
+
+``--_secure`` Mode
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+A new ``--_secure`` option adds up seccomp filter to
+``--_interactive``.  See :ref:`--_secure Mode <secure-mode>` for more
+details.
 
 
 ..

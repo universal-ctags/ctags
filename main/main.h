@@ -22,5 +22,6 @@
 extern void addTotals (const unsigned int files, const long unsigned int lines, const long unsigned int bytes);
 extern bool isDestinationStdout (void);
 extern int main (int argc, char **argv);
+extern int installSyscallFilter();
 
 #endif  /* CTAGS_MAIN_MAIN_H */
