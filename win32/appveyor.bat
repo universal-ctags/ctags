@@ -70,7 +70,7 @@ copy %ICONV_BUILD_DIR%\msvc10\iconv.dll %APPVEYOR_BUILD_FOLDER% > nul
 :: Build ctags with nmake
 @echo on
 cd %APPVEYOR_BUILD_FOLDER%
-nmake -f mk_mvc.mak WITH_ICONV=yes ICONV_DIR=%ICONV_DIR% PDB=yes
+nmake -f mk_mvc.mak WITH_ICONV=yes ICONV_DIR=%ICONV_DIR% PDB=yes || exit 1
 
 :: Backup VC binaries
 mkdir vc
@@ -120,8 +120,10 @@ goto :eof
 @echo on
 PATH C:\%MSYS2_DIR%\%MSYSTEM%\bin;C:\%MSYS2_DIR%\usr\bin;%PATH%
 set CHERE_INVOKING=yes
+:: Synchronize package databases and upgrade the core system
+C:\%MSYS2_DIR%\usr\bin\pacman --noconfirm --noprogressbar -Sy --needed filesystem mintty bash pacman pacman-mirrors msys2-runtime msys2-runtime-devel
 :: Install and update necessary packages
-bash -lc "for i in {1..3}; do pacman --noconfirm -S mingw-w64-%MSYS2_ARCH%-{python3-sphinx,jansson,libxml2,libyaml} && break || sleep 15; done"
+bash -lc "for i in {1..3}; do pacman --noconfirm --noprogressbar -S --needed mingw-w64-%MSYS2_ARCH%-{python3-sphinx,jansson,libxml2,libyaml,libiconv} && break || sleep 15; done"
 
 bash -lc "./autogen.sh"
 :: Patching configure.
@@ -149,8 +151,8 @@ goto :eof
 
 :msys2_package
 md package
-:: Build html docs
-bash -lc "cd docs; make html"
+:: Build html docs and man pages
+bash -lc "make -C docs html && make -C man RST2HTML=rst2html3"
 move docs\_build\html package\docs > nul
 rd /s/q package\docs\_sources
 
@@ -168,7 +170,7 @@ robocopy . package %filelist% > nul
 robocopy win32\license package\license > nul
 copy COPYING package\license > nul
 copy win32\mkstemp\COPYING.MinGW-w64-runtime.txt package\license > nul
-robocopy man package\man *.rst > nul
+robocopy man package\man *.html > nul
 cd package
 7z a ..\ctags-%ver%-%ARCH%.debug.zip %filelist% %dirlist%
 strip *.exe
@@ -210,7 +212,6 @@ goto :eof
 c:\cygwin\setup-x86.exe -qnNdO -R C:/cygwin -s http://cygwin.mirror.constant.com -l C:/cygwin/var/cache/setup -P dos2unix,libiconv-devel
 PATH c:\cygwin\bin;%PATH%
 set CHERE_INVOKING=yes
-bash -lc ""
 bash -lc "./autogen.sh"
 :: Patching configure.
 :: Workaround for "./configure: line 557: 0: Bad file descriptor"
