@@ -10,6 +10,8 @@
 
 #include "general.h"  /* must always come first */
 
+#include <inttypes.h>
+
 #include "debug.h"
 #include "htable.h"
 #include "options.h"
@@ -145,7 +147,7 @@ static void findYamlTags (void)
 			leaveSubparser ();
 		}
 
-		verbose("yaml token:%s<%d>@Line:%lu\n", tokenTypeName[token.type], token.type,
+		verbose("yaml token:%s<%d>@Line:%"PRIuPTR"\n", tokenTypeName[token.type], token.type,
 				token.start_mark.line + 1);
 		if (token.type == YAML_STREAM_END_TOKEN)
 			done = true;
