@@ -76,7 +76,7 @@ nmake -f mk_mvc.mak WITH_ICONV=yes ICONV_DIR=%ICONV_DIR% PDB=yes || exit 1
 mkdir vc
 move *.exe vc > nul
 
-:: Build with msys2
+:: Create Makefile with msys2
 path C:\%MSYS2_DIR%\usr\bin;%PATH%
 set CHERE_INVOKING=yes
 :: Install and update necessary packages
@@ -86,7 +86,7 @@ bash -lc "./autogen.sh"
 :: Patching configure.
 :: Workaround for "./configure: line 557: 0: Bad file descriptor"
 perl -i".bak" -pe "s/^test -n \".DJDIR\"/#$&/" configure
-bash -lc "./configure && make"
+bash -lc "./configure && make -t"
 
 :: Restore VC binaries
 copy vc\*.exe . /y > nul
@@ -103,7 +103,7 @@ c:\cygwin\bin\file readtags.exe
 :: Check if it works
 .\ctags --version || exit 1
 
-:: Run tests
+:: Run tests on msys2
 bash -lc "make check APPVEYOR=1"
 
 @echo off
