@@ -447,47 +447,9 @@ Override the letter for file kind
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 (See also #317.)
 
-Background
-......................................................................
-``F`` is widely used as a kind letter for file kind. The ``F`` was
-hardcoded in ctags internal. However, we found some built-in parsers
-including Ruby uses ``F`` for their own kind. So if you find a tag
-having ``F`` as a kind letter, you cannot say what it is well: a
-file name or something peculiar in a language. Long kind description
-strings may help you but I am not sure all tools utilizing ``tags``
-file refer the long kind description strings.
+Overriding the letter for file kind is not allowed in Universal-ctags.
+Don't use `F` as a kind letter in your parser.
 
-To fix the issue for letters for the kind
-we modified ctags as follows:
-we let the built-in parsers use ``!`` as a letter for file kind
-instead of ``F``.
-
-This modification breaks the backward-compatibility of meaning of tags
-file. Forcing to use ``F`` for file kinds to the parsers was another
-choice but it also breaks the backward-compatibility. We assumed the
-impact of using ``!`` for the parsers may be weaker than forcing
-t to use ``F``.
-
-Usage
-......................................................................
-For overriding add ``fileKind`` long flag ``--langdef=LANG`` option.
-Following is an example to use ``Z`` as a kind letter in a language named
-``foo``::
-
-	$ ctags --langdef=foo'{fileKind=Z}' ...
-
-Single quote is used here to avoid the expansion and evaluate the breaths
-by shell.
-
-To know the fileKind of languages, use ``--list-file-kind``::
-
-	$ ctags --list-file-kind 
-	Ada F
-	Ant F
-	Asm F
-	...
-	Ruby !
-	...
 
 Multiline pattern match
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

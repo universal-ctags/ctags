@@ -1,5 +1,5 @@
 longtable	input.sql	/^create table longtable (longcol long) tablespace TOOLS;$/;"	t
-longcol	input.sql	/^create table longtable (longcol long) tablespace TOOLS;$/;"	F	table:longtable
+longcol	input.sql	/^create table longtable (longcol long) tablespace TOOLS;$/;"	E	table:longtable
 cur1	input.sql	/^  cur1       PLS_INTEGER         := DBMS_SQL.OPEN_CURSOR;;$/;"	v
 rc	input.sql	/^  rc         NUMBER;$/;"	v
 long_piece	input.sql	/^  long_piece VARCHAR2(256);$/;"	v

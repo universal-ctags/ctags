@@ -2,11 +2,11 @@ SomeLongStructName	input.rs	/^impl SomeLongStructName {$/;"	c
 SomeLongStructName	input.rs	/^pub struct SomeLongStructName {v:isize}$/;"	s
 SomeStruct	input.rs	/^	pub struct SomeStruct{$/;"	s	module:fruit
 another_function	input.rs	/^	pub fn another_function(a:isize,b:isize,c:isize)->isize {$/;"	f	module:veg	signature:(a:isize,b:isize,c:isize)->isize
-baaz	input.rs	/^	fn baaz() {$/;"	F	implementation:SomeLongStructName	signature:()
+baaz	input.rs	/^	fn baaz() {$/;"	P	implementation:SomeLongStructName	signature:()
 blue_value	input.rs	/^		pub blue_value: isize$/;"	m	struct:fruit::SomeStruct
 chalk	input.rs	/^	fn chalk() {$/;"	f	module:mineral	signature:()
 foo_bar_test_func	input.rs	/^pub fn foo_bar_test_func(apples:fruit::SomeStruct,(oranges,lemon):(isize,isize))->isize{$/;"	f	signature:(apples:fruit::SomeStruct,(oranges,lemon):(isize,isize))->isize
-fooo	input.rs	/^	fn fooo() {$/;"	F	implementation:SomeLongStructName	signature:()
+fooo	input.rs	/^	fn fooo() {$/;"	P	implementation:SomeLongStructName	signature:()
 free_func	input.rs	/^fn free_func() {$/;"	f	signature:()
 fruit	input.rs	/^pub mod fruit {$/;"	n
 granite	input.rs	/^	fn granite() {$/;"	f	module:mineral	signature:()

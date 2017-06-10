@@ -44,7 +44,7 @@ static kindDefinition RubyKinds [] = {
 	{ true, 'c', "class",  "classes" },
 	{ true, 'f', "method", "methods" },
 	{ true, 'm', "module", "modules" },
-	{ true, 'F', "singletonMethod", "singleton methods" },
+	{ true, 'S', "singletonMethod", "singleton methods" },
 #if 0
 	/* Following two kinds are reserved. */
 	{ true, 'd', "describe", "describes and contexts for Rspec" },
@@ -555,7 +555,6 @@ extern parserDefinition* RubyParser (void)
 {
 	static const char *const extensions [] = { "rb", "ruby", NULL };
 	parserDefinition* def = parserNew ("Ruby");
-	def->fileKindLetter = KIND_FILE_ALT;
 	def->kindTable      = RubyKinds;
 	def->kindCount  = ARRAY_SIZE (RubyKinds);
 	def->extensions = extensions;

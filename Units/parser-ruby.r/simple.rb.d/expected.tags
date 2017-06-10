@@ -5,5 +5,5 @@ class_method	input.rb	/^        def class_method$/;"	f	class:ModuleExample.Class
 class_method_exclamation!	input.rb	/^        def class_method_exclamation!$/;"	f	class:ModuleExample.ClassExample
 class_method_question?	input.rb	/^        def class_method_question?$/;"	f	class:ModuleExample.ClassExample
 module_method	input.rb	/^    def module_method$/;"	f	module:ModuleExample
-singleton_class_method	input.rb	/^        def ClassExample.singleton_class_method$/;"	F	class:ModuleExample.ClassExample
-singleton_module_method	input.rb	/^    def ModuleExample.singleton_module_method$/;"	F	module:ModuleExample
+singleton_class_method	input.rb	/^        def ClassExample.singleton_class_method$/;"	S	class:ModuleExample.ClassExample
+singleton_module_method	input.rb	/^    def ModuleExample.singleton_module_method$/;"	S	module:ModuleExample

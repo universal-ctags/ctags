@@ -182,22 +182,11 @@ extern bool isLanguageEnabled (const langType language)
 *   parserDescription mapping management
 */
 
-static kindDefinition* fileKindNew (char letter)
-{
-	kindDefinition *fileKind;
-
-	fileKind = xMalloc (1, kindDefinition);
-	*(fileKind) = defaultFileKind;
-	fileKind->letter = letter;
-	return fileKind;
-}
-
 extern parserDefinition* parserNew (const char* name)
 {
 	parserDefinition* result = xCalloc (1, parserDefinition);
 	result->name = eStrdup (name);
 
-	result->fileKindLetter = KIND_FILE_DEFAULT;
 	result->enabled = true;
 	return result;
 }
@@ -1585,7 +1574,6 @@ static void linkDependenciesAtInitializeParsing (parserDefinition *const parser)
 /* Used in both builtin and optlib parsers. */
 static void initializeParsingCommon (parserDefinition *def, bool is_builtin)
 {
-	char fileKindLetter;
 	parserObject *parser;
 
 	if (is_builtin)
@@ -1599,11 +1587,7 @@ static void initializeParsingCommon (parserDefinition *def, bool is_builtin)
 
 	hashTablePutItem (LanguageHTable, def->name, def);
 
-	fileKindLetter = parser->def->fileKindLetter;
-	if (fileKindLetter == KIND_FILE_DEFAULT)
-		parser->fileKind = &defaultFileKind;
-	else
-		parser->fileKind = fileKindNew(fileKindLetter);
+	parser->fileKind = &defaultFileKind;
 
 	parser->kindControlBlock  = allocKindControlBlock (def);
 	parser->slaveControlBlock = allocSlaveControlBlock (def);
@@ -1673,12 +1657,6 @@ extern void freeParserResources (void)
 		finalizeDependencies (parser->def, parser->slaveControlBlock);
 		freeSlaveControlBlock (parser->slaveControlBlock);
 		parser->slaveControlBlock = NULL;
-
-		if (parser->fileKind != &defaultFileKind)
-		{
-			eFree (parser->fileKind);
-			parser->fileKind = NULL;
-		}
 
 		freeList (&parser->currentPatterns);
 		freeList (&parser->currentExtensions);
@@ -1785,30 +1763,6 @@ static flagDefinition PreLangDefFlagDef [] = {
 	{ '\0',  LANGDEF_FLAG_BIDIR,      NULL, pre_lang_def_flag_direction_long },
 };
 
-static void lang_def_flag_file_kind_long (const char* const optflag, const char* const param, void* data)
-{
-	parserDefinition*  def = data;
-
-	Assert (def);
-	Assert (param);
-	Assert (optflag);
-
-
-	if (param[0] == '\0')
-		error (WARNING, "No letter specified for \"%s\" flag of --langdef option", optflag);
-	else if (param[1] != '\0')
-		error (WARNING, "Specify just a letter for \"%s\" flag of --langdef option", optflag);
-
-	if (LanguageTable [def->id].fileKind != &defaultFileKind)
-		eFree (LanguageTable [def->id].fileKind);
-
-	LanguageTable [def->id].fileKind = fileKindNew (param[0]);
-}
-
-static flagDefinition LangDefFlagDef [] = {
-	{ '\0',  "fileKind", NULL, lang_def_flag_file_kind_long },
-};
-
 static void optlibFreeDep (langType lang, bool initialized)
 {
 	parserDefinition * pdef = LanguageTable [lang].def;
@@ -1894,7 +1848,6 @@ extern void processLanguageDefineOption (
 
 		LanguageTable [def->id].currentPatterns = stringListNew ();
 		LanguageTable [def->id].currentExtensions = stringListNew ();
-		flagsEval (flags, LangDefFlagDef, ARRAY_SIZE (LangDefFlagDef), def);
 
 		eFree (name);
 	}
@@ -2271,21 +2224,6 @@ extern void printLanguageRoles (const langType language, const char* letters)
 	else
 		printRoles (language, letters, false);
 
-}
-
-extern void printLanguageFileKind (const langType language)
-{
-	if (language == LANG_AUTO)
-	{
-		unsigned int i;
-		for (i = 0  ;  i < LanguageCount  ;  ++i)
-		{
-			const parserObject* const parser = LanguageTable + i;
-			printf ("%s %c\n", parser->def->name, parser->fileKind->letter);
-		}
-	}
-	else
-		printf ("%c\n", (LanguageTable + language)->fileKind->letter);
 }
 
 static void printKinds (langType language, bool allKindFields, bool indent)
