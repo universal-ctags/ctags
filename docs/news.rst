@@ -456,6 +456,8 @@ the langmap in a parser-centric manner.
 Guessing parser from file contents (``-G`` option)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+.. IN MAN PAGE
+
 See "Choosing a proper parser in ctags" section.
 
 

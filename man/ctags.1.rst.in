@@ -259,6 +259,9 @@ built-in language names.
 	Use forward searching patterns (e.g. /pattern/) (default). [Ignored
 	in etags mode]
 
+``-G``
+	Equivalent to ``--guess-language-eagerly``.
+
 ``-h list``
 	Specifies a list of file extensions, separated by periods, which are
 	to be interpreted as include (or header) files. To indicate files having
@@ -600,6 +603,10 @@ built-in language names.
 	original vi(1) implementations). The default level is 2. This option
 	must appear before the first file name. [Ignored in etags mode]
 
+``--guess-language-eagerly``
+	Looks into the file contents for guessing the proper parser.
+	See "Guessing parser".
+
 ``--help``
 	Prints to standard output a detailed usage description, and then exits.
 
@@ -768,6 +775,9 @@ built-in language names.
 	specified as the first option on the command line, it will disable
 	the automatic reading of any configuration options from either a file
 	or the environment (see FILES).
+
+``--print-language``
+	Just prints the parsers for specified input files, and then exits.
 
 ``--quiet[=yes|no]``
 	Write fewer messages(default is no).
