@@ -111,6 +111,24 @@ typedef enum {
 	TOKEN_OTHER
 } tokenType;
 
+#ifdef DEBUG
+const char *tokenTypes[] = {
+#define E(X) [TOKEN_##X] = #X
+	E(EOF),
+	E(NAME),
+	E(STRING),
+	E(TEXT),
+	E(TAG_START),
+	E(TAG_START2),
+	E(TAG_END),
+	E(TAG_END2),
+	E(EQUAL),
+	E(COMMENT),
+	E(OTHER),
+#undef E
+};
+#endif
+
 typedef struct {
 	tokenType type;
 	vString *string;
@@ -122,6 +140,14 @@ static int Lang_html;
 
 static void readTag (tokenInfo *token, vString *text, int depth);
 
+#ifdef DEBUG
+static void dumpToken (tokenInfo *token, const char *context, const char* extra_context)
+{
+	fprintf (stderr, "[%7s] %-20s@%s.%s\n",
+			 tokenTypes[token->type], vStringValue(token->string),
+			 context, extra_context? extra_context: "_");
+}
+#endif
 
 static void readTokenText (tokenInfo *const token, bool collectText)
 {
