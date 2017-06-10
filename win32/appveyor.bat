@@ -31,7 +31,7 @@ goto :eof
 cd win32
 @echo on
 :: Check filetype
-c:\cygwin\bin\file %CONFIGURATION%\ctags.exe
+c:\cygwin64\bin\file %CONFIGURATION%\ctags.exe
 :: Check if it works
 %CONFIGURATION%\ctags --version || exit 1
 
@@ -98,8 +98,8 @@ goto :eof
 :msvc_test
 @echo on
 :: Check filetype (VC binaries)
-c:\cygwin\bin\file ctags.exe
-c:\cygwin\bin\file readtags.exe
+c:\cygwin64\bin\file ctags.exe
+c:\cygwin64\bin\file readtags.exe
 :: Check if it works
 .\ctags --version || exit 1
 
@@ -150,8 +150,8 @@ goto :eof
 :msys2_test
 @echo on
 :: Check filetype (msys2 binaries)
-c:\cygwin\bin\file ctags.exe
-c:\cygwin\bin\file readtags.exe
+c:\cygwin64\bin\file ctags.exe
+c:\cygwin64\bin\file readtags.exe
 :: Check if it works
 .\ctags --version || exit 1
 
@@ -204,8 +204,8 @@ goto :eof
 :mingw_test
 @echo on
 :: Check filetype
-c:\cygwin\bin\file ctags.exe
-c:\cygwin\bin\file readtags.exe
+c:\cygwin64\bin\file ctags.exe
+c:\cygwin64\bin\file readtags.exe
 :: Check if it works
 .\ctags --version || exit 1
 
@@ -221,8 +221,8 @@ goto :eof
 :: ----------------------------------------------------------------------
 :: Using Cygwin, iconv enabled
 @echo on
-c:\cygwin\setup-x86.exe -qnNdO -P dos2unix,libiconv-devel
-PATH c:\cygwin\bin;%PATH%
+c:\cygwin64\setup-x86_64.exe -qnNdO -P dos2unix,libiconv-devel
+PATH c:\cygwin64\bin;%PATH%
 set CHERE_INVOKING=yes
 bash -lc "./autogen.sh"
 :: Patching configure.
@@ -236,8 +236,8 @@ goto :eof
 :cygwin_test
 @echo on
 :: Check filetype
-c:\cygwin\bin\file ctags.exe
-c:\cygwin\bin\file readtags.exe
+c:\cygwin64\bin\file ctags.exe
+c:\cygwin64\bin\file readtags.exe
 :: Check if it works
 .\ctags --version || exit 1
 :: Run tests
