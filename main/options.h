@@ -98,7 +98,6 @@ typedef struct sOptionValues {
 	bool printLanguage;  /* --print-language */
 	bool guessLanguageEagerly; /* --guess-language-eagerly|-G */
 	bool quiet;		      /* --quiet */
-	bool allowXcmdInHomeDir;     /* --_allow-xcmd-in-homedir */
 	bool fatalWarnings;	/* --_fatal-warnings */
 	unsigned int patternLengthLimit; /* --pattern-length-limit=N */
 	bool putFieldPrefix;		 /* --put-field-prefix */
@@ -166,10 +165,6 @@ extern void freeOptionResources (void);
 extern void freeEncodingResources (void);
 #endif
 
-/* Return vString must be freed by caller side. */
-extern vString* expandOnDriversPathList (const char* leaf);
-
-
 extern langType getLanguageComponentInOption (const char *const option,
 					      const char *const prefix);
 
@@ -183,7 +178,6 @@ extern bool processAliasOption (const char *const option, const char *const para
 #ifdef HAVE_ICONV
 extern bool processLanguageEncodingOption (const char *const option, const char *const parameter);
 #endif
-extern bool processXcmdOption (const char *const option, const char *const parameter, OptionLoadingStage stage);
 
 typedef void (* mainLoopFunc) (cookedArgs *args, void *data);
 extern void setMainLoop (mainLoopFunc func, void *data);

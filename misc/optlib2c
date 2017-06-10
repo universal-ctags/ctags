@@ -26,7 +26,7 @@ sub show_help {
     print<<EOF;
 Usage:
 	$0 --help
-	$0 [--transform-xcmd=PROGRAM_TRANSFORM_NAME] FILE.ctags > FILE.c
+	$0 FILE.ctags > FILE.c
 EOF
 }
 
@@ -150,13 +150,6 @@ my $options =
        } ],
      [ qr/^--fields-([^=]*)=(.)\{/, sub {
 	 die "Unknown flag($2) is passed to --fields-<LANG>= option";
-       } ],
-     [ qr/^--xcmd-([^=]*)=([^{]*)(\{.*)?/, sub {
-	   die "Don't use --xcmd-<LANG>= option before defining the language"
-	       if (! defined $_[0]->{'langdef'});
-	   die "Adding a xcmd is allowed only to the language specified with --langdef: $1"
-	       unless ($_[0]->{'langdef'} eq $1);
-	   push @{$_[0]->{'xcmds'}}, { xcmd => $2, flags => $3 };
        } ],
      [ qr/^--langmap=.*/, sub {
 	   die "Use --map-<LANG> option instead of --langmap";
@@ -348,20 +341,12 @@ EOF
 
 sub emit_initializer {
     my $opts = shift;
-    my $may_unused = (@{$opts->{'xcmds'}} || @{$opts->{'disabledKinds'}}) ? "": " CTAGS_ATTR_UNUSED";
+    my $may_unused = (@{$opts->{'disabledKinds'}}) ? "": " CTAGS_ATTR_UNUSED";
 
     print <<EOF;
 static void initialize$opts->{'Clangdef'}Parser (const langType language$may_unused)
 {
 EOF
-    for (@{$opts->{'xcmds'}}) {
-	my ($p, $f) = ($_ -> {'xcmd'}, $_ -> {'flags'});
-	$f = defined ($f) ? $f: "";
-
-	print <<EOF;
-	addLanguageXcmd (language, "$p$f");
-EOF
-    }
     for (@{$opts->{'disabledKinds'}}) {
 	print <<EOF;
 	{
@@ -534,9 +519,6 @@ sub emit_fields_initialization {
     if (@{$opts->{"regexs"}}) {
 	$method = "${method}|METHOD_REGEX";
     }
-    if (@{$opts->{"xcmds"}}) {
-	$method = "${method}|METHOD_XCMD";
-    }
 
     print <<EOF;
 	def->enabled       = ${enabled};
@@ -628,27 +610,14 @@ EOF
 #
 ########################################################################
 
-sub  transform_xcmd {
-    my ($xcmd, $trxcmd) = @_;
-
-    $xcmd->{'xcmd'} =  `echo $xcmd->{'xcmd'} | sed -e '${trxcmd}'`;
-    chomp $xcmd->{'xcmd'};
-}
-
 sub rearrange {
-    my ($trxcmd, $opts) = @_;
+    my ($opts) = @_;
     my $langdef = $opts -> {'langdef'};
     my $c = substr ($langdef, 0, 1);
 
     $c =~ tr/a-z/A-Z/;
 
     $opts -> {'Clangdef'} = $c . substr ($langdef, 1);
-
-    if ($trxcmd) {
-	for (@{$opts->{'xcmds'}}) {
-	    transform_xcmd $_, $trxcmd;
-	}
-    }
 }
 
 
@@ -659,7 +628,6 @@ sub rearrange {
 ########################################################################
 
 sub main {
-    my $trxcmd;
     my $optlib;
     my %opts = (langdef  => undef,
 		Clangdef => undef,
@@ -670,8 +638,6 @@ sub main {
 		disabledKinds => [],
 		regexs => [# { regex => "", name => "", kind => "", flags => "" },
 			  ],
-		xcmds => [# { xcmd => "", flags => "" },
-			 ],
 		kinddefs => [# { letter => '', name => "", desc => "" },
 			    ],
 		extradefs => [ # { name => "", desc => "", enabled => 1|0 },
@@ -685,8 +651,6 @@ sub main {
 	if ( ($_ eq '-h') || ($_ eq '--help') ) {
 	    show_help;
 	    exit 0;
-	} elsif ( s/^--transform-xcmd=// ) {
-	    $trxcmd=$_;
 	} elsif ( /^-.*/ ) {
 	    die "unrecongnized option: $_";
 	} else {
@@ -705,7 +669,7 @@ sub main {
 	exit 1;
     }
 
-    rearrange ($trxcmd, \%opts);
+    rearrange (\%opts);
 
     if (! emit ($optlib, \%opts) ) {
 	exit 1;

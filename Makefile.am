@@ -88,14 +88,9 @@ optlib2c_verbose_ = $(optlib2c_verbose_@AM_DEFAULT_V@)
 optlib2c_verbose_0 = @echo OPTLIB2C "  $@";
 OPTLIB2C = $(srcdir)/misc/optlib2c
 %.c: %.ctags $(OPTLIB2C) Makefile
-	$(optlib2c_verbose)$(OPTLIB2C) --transform-xcmd="$(program_transform_name)" $< > $@
+	$(optlib2c_verbose)$(OPTLIB2C) $< > $@
 endif
 dist_ctags_SOURCES = $(ALL_HEADS) $(ALL_SRCS)
-
-if ENABLE_XCMD
-driversdir = $(pkglibexecdir)/drivers
-dist_drivers_SCRIPTS = libexec/drivers/coffeetags
-endif
 
 if INSTALL_ETAGS
 install-exec-hook:

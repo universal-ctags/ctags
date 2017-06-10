@@ -3,7 +3,7 @@
 # Copyright: 2016 Masatake YAMATO
 # License: GPL-2
 
-READTAGS=$4
+READTAGS=$3
 
 #V="valgrind --leak-check=full -v"
 V=

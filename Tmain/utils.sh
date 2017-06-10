@@ -43,11 +43,6 @@ is_feature_available()
 	fi
 }
 
-exit_if_no_coproc()
-{
-    is_feature_available $1 coproc
-}
-
 exit_if_win32()
 {
 	is_feature_available $1 '!' win32

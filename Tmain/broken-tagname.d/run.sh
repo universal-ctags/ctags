@@ -4,7 +4,7 @@
 # License: GPL-2
 
 CTAGS=$1
-BUILD_SUBDIR=$3
+BUILD_SUBDIR=$2
 stderr_tmp=${BUILD_SUBDIR}/stderr-actual.txt.tmp
 
 ${CTAGS} --options=NONE -o - --language-force=CTagsSelfTest --verbose input.cst \

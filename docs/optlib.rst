@@ -468,12 +468,6 @@ choice but it also breaks the backward-compatibility. We assumed the
 impact of using ``!`` for the parsers may be weaker than forcing
 t to use ``F``.
 
-For xcmd and regex parsers we prepare the way to override the default
-file kind letter, ``F``. Though using this in regex parser is not
-recommend.  Try not using ``F`` as a kind letter in your regex
-parser. In xcmd parser you may have no choice if the back-end tags file
-generator uses ``F`` for its own purpose.
-
 Usage
 ......................................................................
 For overriding add ``fileKind`` long flag ``--langdef=LANG`` option.

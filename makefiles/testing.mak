@@ -26,7 +26,6 @@ fuzz: $(CTAGS_TEST)
 	c="$(srcdir)/misc/units fuzz \
 		--ctags=$(CTAGS_TEST) \
 		--languages=$(LANGUAGES) \
-		--libexecdir=$(srcdir)/libexec \
 		$${VALGRIND} --run-shrink \
 		--with-timeout=$(TIMEOUT)"; \
 	$(SHELL) $${c} $(srcdir)/Units
@@ -43,7 +42,6 @@ noise: $(CTAGS_TEST)
 	c="$(srcdir)/misc/units noise \
 		--ctags=$(CTAGS_TEST) \
 		--languages=$(LANGUAGES) \
-		--libexecdir=$(srcdir)/libexec \
 		$${VALGRIND} --run-shrink \
 		--with-timeout=$(TIMEOUT)"; \
 	$(SHELL) $${c} $(srcdir)/Units
@@ -60,7 +58,6 @@ chop: $(CTAGS_TEST)
 	c="$(srcdir)/misc/units chop \
 		--ctags=$(CTAGS_TEST) \
 		--languages=$(LANGUAGES) \
-		--libexecdir=$(srcdir)/libexec \
 		$${VALGRIND} --run-shrink \
 		--with-timeout=$(TIMEOUT)"; \
 	$(SHELL) $${c} $(srcdir)/Units
@@ -86,7 +83,6 @@ units: $(CTAGS_TEST)
 		--languages=$(LANGUAGES) \
 		--categories=$(CATEGORIES) \
 		--units=$(UNITS) \
-		--libexecdir=$(srcdir)/libexec \
 		$${VALGRIND} --run-shrink \
 		--with-timeout=$(TIMEOUT) \
 		$${SHOW_DIFF_OUTPUT}"; \
@@ -116,7 +112,6 @@ tmain: $(CTAGS_TEST)
 	\
 	c="$(srcdir)/misc/units tmain \
 		--ctags=$(CTAGS_TEST) \
-		--libexecdir=$(srcdir)/libexec \
 		$${VALGRIND} \
 		$${SHOW_DIFF_OUTPUT}"; \
 	TRAVIS=$(TRAVIS) APPVEYOR=$(APPVEYOR) \

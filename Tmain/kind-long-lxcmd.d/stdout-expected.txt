@@ -1,9 +1,0 @@
-# default
-v       variable        on       FALSE   0                 variable                      
-m       macro           on       FALSE   0                 macro                         
-# disabling
-v       variable        off      FALSE   0                 variable                      
-m       macro           off      FALSE   0                 macro                         
-# enabling again
-v       variable        on       FALSE   0                 variable                      
-m       macro           on       FALSE   0                 macro                         

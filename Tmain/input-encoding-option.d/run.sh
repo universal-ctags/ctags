@@ -4,7 +4,7 @@
 # License: GPL-2
 
 CTAGS=$1
-BUILDDIR=$3
+BUILDDIR=$2
 
 . ../utils.sh
 

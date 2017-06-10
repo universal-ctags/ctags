@@ -47,12 +47,6 @@ struct sPtagDesc {
 	bool commonInParsers;
 };
 
-struct ptagXcmdData {
-	const char *fileName;
-	const char *pattern;
-	const char *language;
-};
-
 extern bool makePtagIfEnabled (ptagType type, void *data);
 extern ptagDesc* getPtagDesc (ptagType type);
 extern ptagType  getPtagTypeForName (const char *name);

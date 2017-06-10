@@ -39,11 +39,8 @@ In the example, *Tmain* does:
 `run.sh` is run with following 4 arguments:
 
 1. the path for the target ctags
-2. the path for `libexec` directory
-3. the path for `builddir` directory
-4. the path for the target readtags
-
-The `libexec` directory is for testing the handling of xcmd.
+2. the path for `builddir` directory
+3. the path for the target readtags
 
 The path for readtags is not reliable; readtags command is not
 available if --disable-readcmd was given in configure time.  A case,

@@ -666,7 +666,6 @@ extern int main (int argc CTAGS_ATTR_UNUSED, char **argv)
 	freeOptionResources ();
 	freeParserResources ();
 	freeRegexResources ();
-	freeXcmdResources ();
 #ifdef HAVE_ICONV
 	freeEncodingResources ();
 #endif

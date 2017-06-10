@@ -81,9 +81,6 @@
     <ClCompile Include="..\main\lregex.c">
       <Filter>Source Files\Main</Filter>
     </ClCompile>
-    <ClCompile Include="..\main\lxcmd.c">
-      <Filter>Source Files\Main</Filter>
-    </ClCompile>
     <ClCompile Include="..\main\lxpath.c">
       <Filter>Source Files\Main</Filter>
     </ClCompile>
@@ -161,9 +158,6 @@
     </ClCompile>
     <ClCompile Include="..\main\xtag.c">
       <Filter>Source Files\Main</Filter>
-    </ClCompile>
-    <ClCompile Include="..\optlib\CoffeeScript.c">
-      <Filter>Source Files\optlib</Filter>
     </ClCompile>
     <ClCompile Include="..\optlib\RSpec.c">
       <Filter>Source Files\optlib</Filter>

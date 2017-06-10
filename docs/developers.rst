@@ -38,7 +38,7 @@ Masatake YAMATO <yamato@redhat.com>
 	is to improve the robustness of parsers: I introduced Units
 	test facility and badinput command for achieving the goal.
 	The secondary goal is to support more languages and formats: I
-	introduced optlib and xcmd. I'm working on Fedora. I don't
+	introduced optlib. I'm working on Fedora. I don't
 	have access to the other platforms.
 
 Qingming He <906459647@qq.com>
