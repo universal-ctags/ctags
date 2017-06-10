@@ -770,7 +770,7 @@ built-in language names.
 	or the environment (see FILES).
 
 ``--quiet[=yes|no]``
-		Write fewer messages(default is no).
+	Write fewer messages(default is no).
 
 ``--recurse[=yes|no]``
 	Recurse into directories encountered in the list of supplied files.
