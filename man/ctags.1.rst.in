@@ -475,7 +475,7 @@ built-in language names.
 		are generally identical, making pattern searches useless
 		for finding all matches.
 
-``--extras=[+|-]flags|\*``
+``--extras=[+|-]flags|*``
 	Specifies whether to include extra tag entries for certain kinds of
 	information. The parameter flags is a set of one-letter flags, each
 	representing one kind of extra tag entry to include in the tag file.
