@@ -764,6 +764,10 @@ built-in language names.
 	used in the ``--language-force``, ``--languages``, ``--<LANG>-kinds``,
 	and ``--regex-<LANG>`` options.
 
+``--maxdepth``
+	Limits the depth of directory recursion enabled with the ``--recurse``
+	(``-R``) option.
+
 ``--options=file|directory``
 	Read additional options from file or directory. If a file is specified,
 	it should contain one option per line. If a directory is specified

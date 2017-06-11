@@ -389,6 +389,8 @@ In this example, ``role`` is prefixed.
 ``--maxdepth`` option
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+.. IN MAN PAGE
+
 ``--maxdepth`` limits the depth of directory recursion enabled with
 the ``-R`` option.
 
