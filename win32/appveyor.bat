@@ -12,6 +12,20 @@ if "%1"=="" (
   set target=%1
 )
 
+:: Daily builds or tag builds should be only built by msys2
+set normalbuild=yes
+if "%APPVEYOR_SCHEDULED_BUILD%"=="True" (
+  set normalbuild=no
+)
+if not "%APPVEYOR_REPO_TAG_NAME%"=="" (
+  set normalbuild=no
+)
+if "%normalbuild%"=="no" (
+  if not "%compiler%"=="msys2" (
+    exit 0
+  )
+)
+
 for %%i in (msbuild msvc msys2 mingw cygwin) do if "%compiler%"=="%%i" goto %compiler%_%target%
 
 echo Unknown build target.
@@ -46,7 +60,7 @@ goto :eof
 :msvc_build
 :: ----------------------------------------------------------------------
 :: Using VC12 (VC2013) with nmake, iconv enabled
-:: Also build with msys2 and test the VC binary on msys2.
+:: Also create Makefile with msys2 and test the VC binary on msys2.
 set MSYS2_ARCH=x86_64
 set MSYS2_DIR=msys64
 set MSYSTEM=MINGW64
@@ -120,22 +134,25 @@ goto :eof
 @echo on
 PATH C:\%MSYS2_DIR%\%MSYSTEM%\bin;C:\%MSYS2_DIR%\usr\bin;%PATH%
 set CHERE_INVOKING=yes
-bash -lc 'if [ "x$(checkupdates)" != x ]; then exit 1; fi'
-if ERRORLEVEL 1 (
-	@rem Update found
-	@rem Remove unused toolchain to reduce the time for updating
-	if "%MSYSTEM%"=="MINGW64" (
-		bash -lc "pacman --noconfirm -Rs mingw-w64-i686-toolchain"
-	) else if "%MSYSTEM%"=="MINGW32" (
-		bash -lc "pacman --noconfirm -Rs mingw-w64-x86_64-toolchain"
-	)
-	@rem Synchronize package databases and upgrade the core system
-	C:\%MSYS2_DIR%\usr\bin\pacman --noconfirm --noprogressbar -Syu
-	@rem Run again to update the rest of packages
-	C:\%MSYS2_DIR%\usr\bin\pacman --noconfirm --noprogressbar -Su
+if "%normalbuild%"=="no" (
+  @rem Change build message: "Daily build: YYYY-MM-DD"
+  for /f "tokens=2-4 delims=/ " %%i in ('date /t') do appveyor UpdateBuild -Message "Daily build: %%k-%%i-%%j"
+
+  @rem Remove unused toolchain to reduce the time for updating
+  if "%MSYSTEM%"=="MINGW64" (
+    bash -lc "pacman --noconfirm -Rs mingw-w64-i686-toolchain"
+  ) else if "%MSYSTEM%"=="MINGW32" (
+    bash -lc "pacman --noconfirm -Rs mingw-w64-x86_64-toolchain"
+  )
+  @rem Synchronize package databases and upgrade the core system
+  C:\%MSYS2_DIR%\usr\bin\pacman --noconfirm --noprogressbar -Syu
+  @rem Run again to update the rest of packages
+  C:\%MSYS2_DIR%\usr\bin\pacman --noconfirm --noprogressbar -Su
+  @rem Also install packages needed for creating zip package
+  bash -lc "for i in {1..3}; do pacman --noconfirm --noprogressbar -S --needed mingw-w64-%MSYS2_ARCH%-python3-sphinx && break || sleep 15; done"
 )
 :: Install necessary packages
-bash -lc "for i in {1..3}; do pacman --noconfirm --noprogressbar -S --needed mingw-w64-%MSYS2_ARCH%-{python3-sphinx,jansson,libxml2,libyaml} && break || sleep 15; done"
+bash -lc "for i in {1..3}; do pacman --noconfirm --noprogressbar -S --needed mingw-w64-%MSYS2_ARCH%-{jansson,libxml2,libyaml} && break || sleep 15; done"
 
 bash -lc "./autogen.sh"
 :: Patching configure.
@@ -156,12 +173,20 @@ c:\cygwin64\bin\file readtags.exe
 .\ctags --version || exit 1
 
 :: Run tests
+if "%normalbuild%-%ARCH%"=="yes-x64" (
+  @echo Tests for msys2 x64 are skipped.
+  exit 0
+)
 bash -lc "make check APPVEYOR=1"
 
 @echo off
 goto :eof
 
 :msys2_package
+:: Only daily builds or tag builds need to create zip packages
+if "%normalbuild%"=="yes" (
+  exit 0
+)
 md package
 :: Build html docs and man pages
 bash -lc "make -C docs html && make -C man RST2HTML=rst2html3"
