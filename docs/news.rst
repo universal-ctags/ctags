@@ -387,6 +387,8 @@ In this example, ``role`` is prefixed.
 ``--maxdepth`` option
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+.. IN MAN PAGE
+
 ``--maxdepth`` limits the depth of directory recursion enabled with
 the ``-R`` option.
 
@@ -453,6 +455,8 @@ the langmap in a parser-centric manner.
 
 Guessing parser from file contents (``-G`` option)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. IN MAN PAGE
 
 See "Choosing a proper parser in ctags" section.
 

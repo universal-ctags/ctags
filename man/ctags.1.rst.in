@@ -259,6 +259,9 @@ built-in language names.
 	Use forward searching patterns (e.g. /pattern/) (default). [Ignored
 	in etags mode]
 
+``-G``
+	Equivalent to ``--guess-language-eagerly``.
+
 ``-h list``
 	Specifies a list of file extensions, separated by periods, which are
 	to be interpreted as include (or header) files. To indicate files having
@@ -472,7 +475,7 @@ built-in language names.
 		are generally identical, making pattern searches useless
 		for finding all matches.
 
-``--extras=[+|-]flags|\*``
+``--extras=[+|-]flags|*``
 	Specifies whether to include extra tag entries for certain kinds of
 	information. The parameter flags is a set of one-letter flags, each
 	representing one kind of extra tag entry to include in the tag file.
@@ -599,6 +602,10 @@ built-in language names.
 	fields (but in a manner which retains backward-compatibility with
 	original vi(1) implementations). The default level is 2. This option
 	must appear before the first file name. [Ignored in etags mode]
+
+``--guess-language-eagerly``
+	Looks into the file contents for guessing the proper parser.
+	See "Guessing parser".
 
 ``--help``
 	Prints to standard output a detailed usage description, and then exits.
@@ -757,6 +764,10 @@ built-in language names.
 	used in the ``--language-force``, ``--languages``, ``--<LANG>-kinds``,
 	and ``--regex-<LANG>`` options.
 
+``--maxdepth``
+	Limits the depth of directory recursion enabled with the ``--recurse``
+	(``-R``) option.
+
 ``--options=file|directory``
 	Read additional options from file or directory. If a file is specified,
 	it should contain one option per line. If a directory is specified
@@ -769,8 +780,11 @@ built-in language names.
 	the automatic reading of any configuration options from either a file
 	or the environment (see FILES).
 
+``--print-language``
+	Just prints the parsers for specified input files, and then exits.
+
 ``--quiet[=yes|no]``
-		Write fewer messages(default is no).
+	Write fewer messages (default is no).
 
 ``--recurse[=yes|no]``
 	Recurse into directories encountered in the list of supplied files.
@@ -820,7 +834,7 @@ built-in language names.
 			The pattern is interpreted as a Posix basic regular expression.
 
 		e
-			The pattern is interpreted as a Posix extended regular expression(default).
+			The pattern is interpreted as a Posix extended regular expression (default).
 
 		i
 			The regular expression is to be applied in a case-insensitive manner.

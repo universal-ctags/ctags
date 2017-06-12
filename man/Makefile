@@ -2,7 +2,7 @@
 # This is a stand-alone Makefile for Universal-ctags maintainers.
 # GNU Make is needed.
 #
-# This doesn't work with Makefile.am at the top source tree.
+# This doesn't work with Makefile.am at the top of source tree.
 #
 #	Copyright (c) 2017, Masatake YAMMATO
 #	Copyright (c) 2017, Red Hat, Inc.
