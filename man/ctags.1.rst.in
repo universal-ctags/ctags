@@ -784,7 +784,7 @@ built-in language names.
 	Just prints the parsers for specified input files, and then exits.
 
 ``--quiet[=yes|no]``
-	Write fewer messages(default is no).
+	Write fewer messages (default is no).
 
 ``--recurse[=yes|no]``
 	Recurse into directories encountered in the list of supplied files.
@@ -834,7 +834,7 @@ built-in language names.
 			The pattern is interpreted as a Posix basic regular expression.
 
 		e
-			The pattern is interpreted as a Posix extended regular expression(default).
+			The pattern is interpreted as a Posix extended regular expression (default).
 
 		i
 			The regular expression is to be applied in a case-insensitive manner.
