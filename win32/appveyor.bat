@@ -97,9 +97,6 @@ set CHERE_INVOKING=yes
 rem bash -lc "for i in {1..3}; do pacman --noconfirm -S mingw-w64-%MSYS2_ARCH%-{python3-sphinx,jansson,libxml2,libyaml} && break || sleep 15; done"
 
 bash -lc "./autogen.sh"
-:: Patching configure.
-:: Workaround for "./configure: line 557: 0: Bad file descriptor"
-perl -i".bak" -pe "s/^test -n \".DJDIR\"/#$&/" configure
 bash -lc "./configure && make -t"
 
 :: Restore VC binaries
@@ -155,9 +152,6 @@ if "%normalbuild%"=="no" (
 bash -lc "for i in {1..3}; do pacman --noconfirm --noprogressbar -S --needed mingw-w64-%MSYS2_ARCH%-{jansson,libxml2,libyaml} && break || sleep 15; done"
 
 bash -lc "./autogen.sh"
-:: Patching configure.
-:: Workaround for "./configure: line 557: 0: Bad file descriptor"
-perl -i".bak" -pe "s/^test -n \".DJDIR\"/#$&/" configure
 :: Use static link.
 bash -lc "./configure --enable-iconv --disable-external-sort EXTRA_CFLAGS=-DLIBXML_STATIC LDFLAGS=-static LIBS='-lz -llzma -lws2_32' && make"
 
@@ -250,9 +244,6 @@ c:\cygwin64\setup-x86_64.exe -qnNdO -P dos2unix,libiconv-devel
 PATH c:\cygwin64\bin;%PATH%
 set CHERE_INVOKING=yes
 bash -lc "./autogen.sh"
-:: Patching configure.
-:: Workaround for "./configure: line 557: 0: Bad file descriptor"
-perl -i".bak" -pe "s/^test -n \".DJDIR\"/#$&/" configure
 bash -lc "./configure --enable-iconv && make"
 
 @echo off
