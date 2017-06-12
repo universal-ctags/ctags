@@ -22,13 +22,6 @@
 #include <string.h>
 
 
-static bool writePseudoTagForXcmdData (ptagDesc *desc,
-					  struct ptagXcmdData *pdata)
-{
-	return writePseudoTag (desc,
-			       pdata->fileName,  pdata->pattern, pdata->language);
-}
-
 static bool ptagMakeFormat (ptagDesc *desc, void *data CTAGS_ATTR_UNUSED)
 {
 	char format [11];
@@ -52,37 +45,22 @@ static bool ptagMakeHowSorted (ptagDesc *desc, void *data CTAGS_ATTR_UNUSED)
 			       NULL);
 }
 
-static bool ptagMakeAuthor (ptagDesc *desc, void *data)
+static bool ptagMakeAuthor (ptagDesc *desc, void *data CTAGS_ATTR_UNUSED)
 {
-	struct ptagXcmdData *pdata = data;
-
-	if (pdata)
-		return writePseudoTagForXcmdData (desc, data);
-	else
-		return writePseudoTag (desc,
-				       AUTHOR_NAME,  "", NULL);
+	return writePseudoTag (desc,
+						   AUTHOR_NAME,  "", NULL);
 }
 
-static bool ptagMakeProgName (ptagDesc *desc, void *data)
+static bool ptagMakeProgName (ptagDesc *desc, void *data CTAGS_ATTR_UNUSED)
 {
-	struct ptagXcmdData *pdata = data;
-
-	if (pdata)
-		return writePseudoTagForXcmdData (desc, data);
-	else
-		return writePseudoTag (desc,
-				PROGRAM_NAME,  "Derived from Exuberant Ctags", NULL);
+	return writePseudoTag (desc,
+						   PROGRAM_NAME,  "Derived from Exuberant Ctags", NULL);
 }
 
-static bool ptagMakeProgURL (ptagDesc *desc, void *data)
+static bool ptagMakeProgURL (ptagDesc *desc, void *data CTAGS_ATTR_UNUSED)
 {
-	struct ptagXcmdData *pdata = data;
-
-	if (pdata)
-		return writePseudoTagForXcmdData (desc, data);
-	else
-		return writePseudoTag (desc,
-				       PROGRAM_URL, "official site", NULL);
+	return writePseudoTag (desc,
+						   PROGRAM_URL, "official site", NULL);
 }
 
 static bool ptagMakeProgVersion (ptagDesc *desc, void *data CTAGS_ATTR_UNUSED)

@@ -36,7 +36,6 @@ MAIN_HEADS =			\
 	main/param.h		\
 	main/parse.h		\
 	main/parsers.h		\
-	main/pcoproc.h		\
 	main/promise.h		\
 	main/ptag.h		\
 	main/ptrarray.h		\
@@ -68,7 +67,6 @@ MAIN_SRCS =				\
 	main/keyword.c			\
 	main/kind.c			\
 	main/lregex.c			\
-	main/lxcmd.c			\
 	main/lxpath.c			\
 	main/main.c			\
 	main/mbcs.c			\
@@ -77,7 +75,6 @@ MAIN_SRCS =				\
 	main/options.c			\
 	main/param.c			\
 	main/parse.c			\
-	main/pcoproc.c			\
 	main/promise.c			\
 	main/ptag.c			\
 	main/ptrarray.c			\

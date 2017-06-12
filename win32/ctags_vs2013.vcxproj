@@ -109,7 +109,6 @@
     <ClCompile Include="..\main\keyword.c" />
     <ClCompile Include="..\main\kind.c" />
     <ClCompile Include="..\main\lregex.c" />
-    <ClCompile Include="..\main\lxcmd.c" />
     <ClCompile Include="..\main\lxpath.c" />
     <ClCompile Include="..\main\main.c" />
     <ClCompile Include="..\main\mio.c" />
@@ -136,7 +135,6 @@
     <ClCompile Include="..\main\writer-xref.c" />
     <ClCompile Include="..\main\writer.c" />
     <ClCompile Include="..\main\xtag.c" />
-    <ClCompile Include="..\optlib\CoffeeScript.c" />
     <ClCompile Include="..\optlib\RSpec.c" />
     <ClCompile Include="..\optlib\ctags-optlib.c" />
     <ClCompile Include="..\optlib\elm.c" />

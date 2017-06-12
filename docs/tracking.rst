@@ -436,25 +436,4 @@ Wiki
 
 	https://github.com/majutsushi/tagbar/wiki
 
-This is a gold mine of xcmd and optlib.
-
-	
-External command(xcmd)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Near feature universal-ctags can invoke external command as a
-specialized parser though some glue code or script may be
-needed. Sometimes we may have to hack the external command to adjust
-the interface between the command and universal-ctags.
-
-So let's track external commands maintained out universal-ctags. If we
-prepare glue code or script, mark it with <>, and if not, mark it with
-().
-
-<`CoffeeTags <https://github.com/lukaszkorecki/CoffeeTags>`_>
-	
-	This is the primary target during developing xcmd
-	feature. CoffeeTags side hacking is done.
-
-(`perl-tags <https://github.com/dtikhonov/perl-tags>`_)
-
+This is a gold mine of optlibs.

@@ -170,14 +170,9 @@ extern bool isLanguageEnabled (const langType language)
 	if (!lang->enabled)
 		return false;
 
-	if (lang->method & METHOD_XCMD)
-		initializeParser (language);
-
-	if ((lang->method & METHOD_XCMD) &&
-		 (!(lang->method & METHOD_XCMD_AVAILABLE)) &&
-		 (lang->kindTable == NULL) &&
-		 (!(lang->method & METHOD_REGEX)) &&
-		 (!(lang->method & METHOD_XPATH)))
+	if ((lang->kindTable == NULL) &&
+		(!(lang->method & METHOD_REGEX)) &&
+		(!(lang->method & METHOD_XPATH)))
 		return false;
 	else
 		return true;
@@ -1223,7 +1218,7 @@ static langType getFileLanguageForRequest (struct GetLanguageRequest *req)
 	else if (! isLanguageEnabled (l))
 	{
 		error (FATAL,
-		       "%s parser specified with --language-force is disabled or not available(xcmd)",
+		       "%s parser specified with --language-force is disabled",
 		       getLanguageName (l));
 		/* For suppressing warnings. */
 		return LANG_AUTO;
@@ -1921,9 +1916,6 @@ extern bool isLanguageKindEnabled (const langType language, char kind)
 {
 	const kindDefinition *kindDef;
 
-	if (hasXcmdKind (language, kind))
-		return isXcmdKindEnabled (language, kind);
-
 	kindDef = langKindDefinition (language, kind);
 	Assert (kindDef);
 
@@ -1938,7 +1930,6 @@ static void resetLanguageKinds (const langType language, const bool mode)
 	Assert (0 <= language  &&  language < (int) LanguageCount);
 	parser = LanguageTable + language;
 
-	resetXcmdKinds (language, mode);
 	{
 		unsigned int i;
 		struct kindControlBlock *kcb = parser->kindControlBlock;
@@ -1961,7 +1952,6 @@ static bool enableLanguageKind (
 		enableKind (def, mode);
 		result = true;
 	}
-	result = enableXcmdKind (language, kind, mode)? true: result;
 	return result;
 }
 
@@ -1975,7 +1965,6 @@ static bool enableLanguageKindLong (
 		enableKind (def, mode);
 		result = true;
 	}
-	result = enableXcmdKindLong (language, kindLong, mode)? true: result;
 	return result;
 }
 
@@ -2316,7 +2305,6 @@ static void printKinds (langType language, bool allKindFields, bool indent)
 				printf (Option.machinable? "%s": PR_KIND_FMT (LANG,s), parser->def->name);
 			printKind (getKind(kcb, i), allKindFields, indent, Option.machinable);
 	}
-	printXcmdKinds (language, allKindFields, indent, Option.machinable);
 }
 
 extern void printLanguageKinds (const langType language, bool allKindFields)
@@ -2519,10 +2507,7 @@ static void printLanguage (const langType language, parserDefinition** ltable)
 	if (lang->invisible)
 		return;
 
-	if (lang->method & METHOD_XCMD)
-		initializeParser (lang->id);
-
-	if (lang->kindTable != NULL  ||  (lang->method & METHOD_REGEX) || (lang->method & METHOD_XCMD))
+	if (lang->kindTable != NULL  ||  (lang->method & METHOD_REGEX))
 		printf ("%s%s\n", lang->name, isLanguageEnabled (lang->id) ? "" : " [disabled]");
 }
 
@@ -2863,26 +2848,6 @@ static bool createTagsWithFallback (
 	return tagFileResized;
 }
 
-#ifdef HAVE_COPROC
-static bool createTagsWithXcmd (
-		const char *const fileName, const langType language,
-		MIO *mio)
-{
-	bool tagFileResized = false;
-
-	if (openInputFile (fileName, language, mio))
-	{
-		tagFileResized = invokeXcmd (fileName, language);
-
-		/* TODO: File.lineNumber must be adjusted for the case
-		 *  Option.printTotals is non-zero. */
-		closeInputFile ();
-	}
-
-	return tagFileResized;
-}
-#endif
-
 static void printGuessedParser (const char* const fileName, langType language)
 {
 	const char *parserName;
@@ -3029,18 +2994,10 @@ extern bool parseFileWithMio (const char *const fileName, MIO *mio)
 	if (language == LANG_IGNORE)
 		verbose ("ignoring %s (unknown language/language disabled)\n",
 			 fileName);
-	else if (! isLanguageEnabled (language))
-	{
-		/* This block is needed. In the parser choosing stage, each
-		   parser is not initialized for making ctags starting up faster.
-		   So the chooser can choose a XCMD based parser.
-		   However, at the stage the chooser cannot know whether
-		   the XCMD is available or not. This isLanguageEnabled
-		   invocation verify the availability. */
-		verbose ("ignoring %s (language disabled)\n", fileName);
-	}
 	else
 	{
+		Assert(isLanguageEnabled (language));
+
 		if (Option.filter && ! Option.interactive)
 			openTagFile ();
 
@@ -3057,10 +3014,6 @@ extern bool parseFileWithMio (const char *const fileName, MIO *mio)
 		initParserTrashBox ();
 
 		tagFileResized = createTagsWithFallback (fileName, language, req.mio);
-#ifdef HAVE_COPROC
-		if (LanguageTable [language].def->method & METHOD_XCMD_AVAILABLE)
-			tagFileResized = createTagsWithXcmd (fileName, language, req.mio)? true: tagFileResized;
-#endif
 
 		finiParserTrashBox ();
 
@@ -3177,15 +3130,6 @@ extern void useRegexMethod (const langType language)
 	lang->method |= METHOD_REGEX;
 }
 
-extern void useXcmdMethod (const langType language)
-{
-	parserDefinition* lang;
-
-	Assert (0 <= language  &&  language < (int) LanguageCount);
-	lang = LanguageTable [language].def;
-	lang->method |= METHOD_XCMD;
-}
-
 extern void useXpathMethod (const langType language)
 {
 	parserDefinition* lang;
@@ -3193,15 +3137,6 @@ extern void useXpathMethod (const langType language)
 	Assert (0 <= language  &&  language < (int) LanguageCount);
 	lang = LanguageTable [language].def;
 	lang->method |= METHOD_XPATH;
-}
-
-extern void notifyAvailabilityXcmdMethod (const langType language)
-{
-	parserDefinition* lang;
-
-	Assert (0 <= language  &&  language < (int) LanguageCount);
-	lang = LanguageTable [language].def;
-	lang->method |= METHOD_XCMD_AVAILABLE;
 }
 
 static void installTagRegexTable (const langType language)
@@ -3415,8 +3350,6 @@ extern bool makeKindDescriptionsPseudoTags (const langType language,
 		kind = getKind (kcb, i);
 		makeKindDescriptionPseudoTag (kind, &data);
 	}
-
-	foreachXcmdKinds (language, makeKindDescriptionPseudoTag, &data);
 
 	return data.written;
 }

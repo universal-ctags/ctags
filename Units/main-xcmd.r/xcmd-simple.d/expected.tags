@@ -1,3 +1,0 @@
-cat	input.dog	/^define: cat/;"	d	line:2
-dog	input.dog	/^define: dog$/;"	d	line:1
-input.dog	input.dog	1;"	F	line:1

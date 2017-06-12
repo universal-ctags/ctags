@@ -165,5 +165,4 @@ There other things where building ctags on Microsoft Windows differs from buildi
 - The tools used to build ctags do understand Unix-line endings without problems. There is no need to convert the line-ending of existing files in the repository.
 - Due to the differences between the GNU/Linux and Windows C runtime library there are some things that need to be added to ctags to make the program as powerful as it is on GNU/Linux. At this moment regex and fnmatch are borrowed from glibc.
 - Because there is no default scandir() for Windows, the optlib feature is not yet available for Windows. Various implementations of scandir() for Windows do exist, but still have to be investigated.
-- The xcmd feature is not yet available for Windows. This needs to be investigated.
 - Units testing needs a decent ``bash`` shell. It is only tested using Cygwin or MSYS2.

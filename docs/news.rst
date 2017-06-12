@@ -83,13 +83,11 @@ The following parsers have been added:
 * Yaml *libyaml*
 * YumRepo
 * Zephir
-* CoffeeScript *xcmd*
 * ctags option library *optlib*
 * Myrddin
 * RSpec *optlib*
 
 See "Option library" for details on *optlib*.
-See "External parser command" for details on *xcmd*.
 Libxml2 is required to use the parser(s) marked with *libxml*.
 Libyaml is required to use the parser(s) marked with *libyaml*.
 

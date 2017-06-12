@@ -582,9 +582,6 @@ AM_CONDITIONAL([HAVE_REGCOMP], [test "xyes" = "x$have_regcomp"])
 
 AC_CHECK_FUNCS(scandir)
 
-AC_CHECK_FUNCS(fork waitpid execv pipe,[enable_xcmd=yes],[enable_xcmd=no])
-AM_CONDITIONAL([ENABLE_XCMD], [test "xyes" = "x$enable_xcmd"])
-
 AC_ARG_ENABLE([xml],
 	[AS_HELP_STRING([--disable-xml],
 		[disable xml support])])
