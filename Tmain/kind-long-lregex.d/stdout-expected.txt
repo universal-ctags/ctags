@@ -1,6 +1,6 @@
 # definition
-d       definition      on       FALSE   0                 definitions                   
+d       definition on      FALSE   0      NONE   definitions
 # disabling
-d       definition      off      FALSE   0                 definitions                   
+d       definition off     FALSE   0      NONE   definitions
 # enabling again
-d       definition      on       FALSE   0                 definitions                   
+d       definition on      FALSE   0      NONE   definitions

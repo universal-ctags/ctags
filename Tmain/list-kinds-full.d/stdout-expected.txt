@@ -1,4 +1,5 @@
 #LETTER	NAME	ENABLED	REFONLY	NROLES	MASTER	DESCRIPTION
+L	label	off	FALSE	0	C	goto labels
 d	macro	on	FALSE	1	C	macro definitions
 e	enumerator	on	FALSE	0	C	enumerators (values inside an enumeration)
 f	function	on	FALSE	0	C	function definitions
@@ -13,8 +14,12 @@ u	union	on	FALSE	0	C	union names
 v	variable	on	FALSE	0	C	variable definitions
 x	externvar	off	FALSE	0	C	external and forward variable declarations
 z	parameter	off	FALSE	0	C	function parameters inside function definitions
-L	label	off	FALSE	0	C	goto labels
 #LETTER	NAME	ENABLED	REFONLY	NROLES	MASTER	DESCRIPTION
+A	alias	off	FALSE	0	NONE	namespace aliases
+L	label	off	FALSE	0	C	goto labels
+N	name	off	FALSE	0	NONE	names imported via using scope::symbol
+U	using	off	TRUE	0	NONE	using namespace statements
+c	class	on	FALSE	0	NONE	classes
 d	macro	on	FALSE	1	C	macro definitions
 e	enumerator	on	FALSE	0	C	enumerators (values inside an enumeration)
 f	function	on	FALSE	0	C	function definitions
@@ -22,6 +27,7 @@ g	enum	on	FALSE	0	C	enumeration names
 h	header	on	TRUE	2	C	included header files
 l	local	off	FALSE	0	C	local variables
 m	member	on	FALSE	0	C	class, struct, and union members
+n	namespace	on	FALSE	0	NONE	namespaces
 p	prototype	off	FALSE	0	C	function prototypes
 s	struct	on	FALSE	0	C	structure names
 t	typedef	on	FALSE	0	C	typedefs
@@ -29,9 +35,3 @@ u	union	on	FALSE	0	C	union names
 v	variable	on	FALSE	0	C	variable definitions
 x	externvar	off	FALSE	0	C	external and forward variable declarations
 z	parameter	off	FALSE	0	C	function parameters inside function definitions
-L	label	off	FALSE	0	C	goto labels
-c	class	on	FALSE	0		classes
-n	namespace	on	FALSE	0		namespaces
-A	alias	off	FALSE	0		namespace aliases
-N	name	off	FALSE	0		names imported via using scope::symbol
-U	using	off	TRUE	0		using namespace statements

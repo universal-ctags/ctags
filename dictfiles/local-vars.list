@@ -14,10 +14,13 @@ funcmap
 iname
 indx
 input0
+kcb
+kdef
 langs
 len
 msg
 mydict
+noparser
 oname
 optname
 slist

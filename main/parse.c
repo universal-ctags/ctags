@@ -2233,7 +2233,8 @@ extern void printLanguageRoles (const langType language, const char* letters)
 
 }
 
-static void printKinds (langType language, bool allKindFields, bool indent)
+static void printKinds (langType language, bool indent,
+						struct colprintTable * table)
 {
 	const parserObject *parser;
 	struct kindControlBlock *kcb;
@@ -2243,42 +2244,44 @@ static void printKinds (langType language, bool allKindFields, bool indent)
 	parser = LanguageTable + language;
 	kcb = parser->kindControlBlock;
 
-	unsigned int i;
-	for (i = 0  ;  i < countKinds(kcb)  ;  ++i)
+	if (table)
+		kindColprintAddLanguageLines (table, kcb);
+	else
 	{
-			if (allKindFields && indent)
-				printf (Option.machinable? "%s": PR_KIND_FMT (LANG,s), parser->def->name);
-			printKind (getKind(kcb, i), allKindFields, indent, Option.machinable);
+		for (unsigned int i = 0  ;  i < countKinds(kcb)  ;  ++i)
+			printKind (getKind(kcb, i), indent);
 	}
 }
 
 extern void printLanguageKinds (const langType language, bool allKindFields)
 {
+	struct colprintTable * table = NULL;
+
+	if (allKindFields)
+		table = kindColprintTableNew ();
+
 	if (language == LANG_AUTO)
 	{
-		unsigned int i;
-
-		if (Option.withListHeader && allKindFields)
-			printKindListHeader (true, Option.machinable);
-
-		for (i = 0  ;  i < LanguageCount  ;  ++i)
+		for (unsigned int i = 0  ;  i < LanguageCount  ;  ++i)
 		{
 			const parserDefinition* const lang = LanguageTable [i].def;
 
 			if (lang->invisible)
 				continue;
 
-			if (!allKindFields)
+			if (!table)
 				printf ("%s%s\n", lang->name, isLanguageEnabled (i) ? "" : " [disabled]");
-			printKinds (i, allKindFields, true);
+			printKinds (i, true, table);
 		}
 	}
 	else
-	{
-		if (Option.withListHeader && allKindFields)
-			printKindListHeader (false, Option.machinable);
+		printKinds (language, false, table);
 
-		printKinds (language, allKindFields, false);
+	if (allKindFields)
+	{
+		kindColprintTablePrint(table, (language == LANG_AUTO)? 0: 1,
+							   Option.withListHeader, Option.machinable, stdout);
+		colprintTableDelete (table);
 	}
 }
 

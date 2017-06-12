@@ -5,13 +5,17 @@ http
 https
 mvc
 nerrors
+nosuchlang
+nroles
 outdir
 readme
+refonly
 sqmp
 src
 tmp
 todo
 travis
+typedefs
 unix
 vg
 vs2013
