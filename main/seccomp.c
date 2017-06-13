@@ -8,9 +8,7 @@
 *
 */
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
+#include "general.h"
 
 #if HAVE_SECCOMP
 #include <seccomp.h>
