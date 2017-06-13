@@ -1834,22 +1834,6 @@ static void processListExtrasOption (
 	exit (0);
 }
 
-static void processListFileKindDefinition (
-		const char *const option, const char *const parameter)
-{
-	if (parameter [0] == '\0' || strcasecmp (parameter, "all") == 0)
-		printLanguageFileKind (LANG_AUTO);
-	else
-	{
-		langType language = getNamedLanguage (parameter, 0);
-		if (language == LANG_IGNORE)
-			error (FATAL, "Unknown language \"%s\" in \"%s\" option", parameter, option);
-		else
-			printLanguageFileKind (language);
-	}
-	exit (0);
-}
-
 static void processListKindsOption (
 		const char *const option, const char *const parameter)
 {
@@ -2508,7 +2492,6 @@ static parametricOption ParametricOptions [] = {
 	{ "list-extras",            processListExtrasOption,        true,   STAGE_ANY },
 	{ "list-features",          processListFeaturesOption,      true,   STAGE_ANY },
 	{ "list-fields",            processListFieldsOption,        true,   STAGE_ANY },
-	{ "list-file-kind",         processListFileKindDefinition,      true,   STAGE_ANY },
 	{ "list-kinds",             processListKindsOption,         true,   STAGE_ANY },
 	{ "list-kinds-full",        processListKindsOption,         true,   STAGE_ANY },
 	{ "list-languages",         processListLanguagesOption,     true,   STAGE_ANY },

@@ -72,7 +72,6 @@ struct sParserDefinition {
 	char* name;                    /* name of language */
 	kindDefinition* kindTable;	   /* tag kinds handled by parser */
 	unsigned int kindCount;        /* size of `kinds' list */
-	char fileKindLetter;           /* kind for overriding the default fileKind */
 	const char *const *extensions; /* list of default extensions */
 	const char *const *patterns;   /* list of default file name patterns */
 	const char *const *aliases;    /* list of default aliases (alternative names) */
@@ -178,7 +177,6 @@ extern void initializeParsing (void);
 extern void initializeParser (langType language);
 extern unsigned int countParsers (void);
 extern void freeParserResources (void);
-extern void printLanguageFileKind (const langType language);
 extern void printLanguageKinds (const langType language, bool allKindFields);
 extern void printLanguageRoles (const langType language, const char* letters);
 extern void printLanguageAliases (const langType language);

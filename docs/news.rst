@@ -106,6 +106,32 @@ Heavily improved parsers
 * Verilog
 
 
+`F` kind usage
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+``F`` is used as a kind letter for file kind in Exuberant-ctags; the
+``F`` was hard-coded in ctags internal. However, we found some built-in
+parsers including Ruby uses ``F`` for their own purpose. So if you
+find a tag having ``F`` as a kind letter, you cannot say what it is
+well: a file name or something peculiar in the language. Long kind
+description strings may help you but we are not sure all tools
+utilizing ``tags`` file refer the long kind description strings.
+
+Universal-ctags disallows parsers to use ``F`` their own purpose
+in both built-in and optlib parsers.
+
+``F`` in built-in parsers are replaced as follows:
+
+============  ================  ===========
+Language      Long description  Replacement
+============  ================  ===========
+ObjectiveC    field             E
+Ruby          singletonMethod   S
+Rust          method            P
+SQL           field             E
+============  ================  ===========
+
+
+
 New and extended options
 ---------------------------------------------------------------------
 

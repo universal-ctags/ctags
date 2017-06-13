@@ -59,7 +59,7 @@ static kindDefinition rustKinds[] = {
 	{true, 'M', "macro", "Macro Definition"},
 	{true, 'm', "field", "A struct field"},
 	{true, 'e', "enumerator", "An enum variant"},
-	{true, 'F', "method", "A method"},
+	{true, 'P', "method", "A method"},
 };
 
 typedef enum {
@@ -973,7 +973,6 @@ extern parserDefinition *RustParser (void)
 {
 	static const char *const extensions[] = { "rs", NULL };
 	parserDefinition *def = parserNew ("Rust");
-	def->fileKindLetter = KIND_FILE_ALT;
 	def->kindTable = rustKinds;
 	def->kindCount = ARRAY_SIZE (rustKinds);
 	def->extensions = extensions;

@@ -217,7 +217,7 @@ static kindDefinition SqlKinds [] = {
 	{ true,  'c', "cursor",		  "cursors"				   },
 	{ false, 'd', "prototype",	  "prototypes"			   },
 	{ true,  'f', "function",	  "functions"			   },
-	{ true,  'F', "field",		  "record fields"		   },
+	{ true,  'E', "field",		  "record fields"		   },
 	{ false, 'l', "local",		  "local variables"		   },
 	{ true,  'L', "label",		  "block label"			   },
 	{ true,  'P', "package",	  "packages"			   },
@@ -2480,7 +2480,6 @@ extern parserDefinition* SqlParser (void)
 {
 	static const char *const extensions [] = { "sql", NULL };
 	parserDefinition* def = parserNew ("SQL");
-	def->fileKindLetter = KIND_FILE_ALT;
 	def->kindTable	= SqlKinds;
 	def->kindCount	= ARRAY_SIZE (SqlKinds);
 	def->extensions = extensions;
