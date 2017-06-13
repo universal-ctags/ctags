@@ -14,6 +14,7 @@
 #include "promise.h"
 #include "debug.h"
 #include "read.h"
+#include "trashbox.h"
 #include "xtag.h"
 
 
@@ -54,7 +55,10 @@ int  makePromise   (const char *parser,
 	if ( promise_count == promise_allocated)
 	{
 		size_t c = promise_allocated? (promise_allocated * 2): 8;
+		if (promises)
+			DEFAULT_TRASH_BOX_TAKE_BACK(promises);
 		promises = xRealloc (promises, c, struct promise);
+		DEFAULT_TRASH_BOX(promises, eFree);
 		promise_allocated = c;
 	}
 
