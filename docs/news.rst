@@ -656,16 +656,8 @@ can be used to control ctags generation programatically.
 
 See :ref:`--_interactive Mode <interactive-mode>` for more details.
 
-``--_secure`` Mode
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-A new ``--_secure`` option adds up seccomp filter to
-``--_interactive``.  See :ref:`--_secure Mode <secure-mode>` for more
-details.
-
-
-..
-	NOT REVIEWED YET
+``--_interactive=sandbox`` adds up seccomp filter. See
+:ref:`sandbox submode <sandbox-submode>` for more details.
 
 Defining a kind
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

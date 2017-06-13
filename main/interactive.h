@@ -12,7 +12,13 @@
 #include "general.h"
 #include "options.h"
 
-void interactiveLoop (cookedArgs *args, void *user CTAGS_ATTR_UNUSED);
+
+struct interactiveModeArgs
+{
+	bool sandbox;
+};
+
+void interactiveLoop (cookedArgs *args, void *user);
 bool jsonErrorPrinter (const errorSelection selection, const char *const format, va_list ap,
 					  void *data);
 int installSyscallFilter (void);

@@ -105,7 +105,6 @@ typedef struct sOptionValues {
 	bool machinable;		/* --machinable */
 	bool withListHeader;		/* --with-list-header */
 	bool interactive; /* --interactive */
-	bool secure; /* --_secure; implies --_interactive */
 #ifdef DEBUG
 	long debugLevel;        /* -d  debugging output */
 	unsigned long breakLine;/* -b  input line at which to call lineBreak() */

@@ -428,12 +428,15 @@ static optionDescription LongOptionDescription [] = {
  {1,"       Quit when the option is processed. Useful to debug the chain"},
  {1,"       of loading option files."},
 #ifdef HAVE_JANSSON
- {0,"  --_interactive"},
- {0,"       Enter interactive mode (json over stdio)."},
-#endif
+ {0,"  --_interactive"
 #ifdef HAVE_SECCOMP
- {0,"  --_secure"},
- {0,"       Enter secure interactive mode (json over stdio, input over stdin)."},
+  "=[default|sandbox]"
+#endif
+ },
+ {0,"       Enter interactive mode (json over stdio)."},
+#ifdef HAVE_SECCOMP
+ {0,"       Enter file I/O limited interactive mode if sandbox is specified. [default]"},
+#endif
 #endif
  {1,"  --_list-roles=[[language|all]:[kindletters|*]]"},
  {1,"       Output list of all roles of tag kind(s) specified for language(s)."},
@@ -496,7 +499,7 @@ static const char *const Features [] = {
 	"interactive",
 #endif
 #ifdef HAVE_SECCOMP
-	"secure",
+	"sandbox",
 #endif
 #ifdef HAVE_LIBYAML
 	"yaml",
@@ -1447,24 +1450,35 @@ static void processHelpOption (
 #ifdef HAVE_JANSSON
 static void processInteractiveOption (
 		const char *const option CTAGS_ATTR_UNUSED,
-		const char *const parameter CTAGS_ATTR_UNUSED)
+		const char *const parameter)
 {
+	static struct interactiveModeArgs args;
+
 	Option.interactive = true;
+
+	if (parameter && (strcmp (parameter, "sandbox") == 0))
+	{
+#ifdef HAVE_SECCOMP
+		args.sandbox = true;
+#else
+		error (FATAL, "sandbox submode is not supported on this platform");
+#endif
+	}
+	else if (parameter && (strcmp (parameter, "default") == 0))
+		args.sandbox = false;
+	else if ((!parameter) || *parameter == '\0')
+		args.sandbox = false;
+	else
+		error (FATAL, "Unknown option argument \"%s\" for --%s option",
+			   parameter, option);
+
 	Option.sorted = SO_UNSORTED;
-	setMainLoop (interactiveLoop, NULL);
+	setMainLoop (interactiveLoop, &args);
 	setErrorPrinter (jsonErrorPrinter, NULL);
 	setTagWriter (WRITER_JSON);
 	enablePtag (PTAG_JSON_OUTPUT_VERSION, true);
 
 	json_set_alloc_funcs (eMalloc, eFree);
-}
-
-static void processSecureOption (
-		const char *const option,
-		const char *const parameter)
-{
-        Option.secure = true;
-        processInteractiveOption(option, parameter);
 }
 #endif
 
@@ -2544,9 +2558,6 @@ static parametricOption ParametricOptions [] = {
 	{ "_force-quit",            processForceQuitOption,         false,  STAGE_ANY },
 #ifdef HAVE_JANSSON
 	{ "_interactive",           processInteractiveOption,       true,   STAGE_ANY },
-#endif
-#ifdef HAVE_SECCOMP
-	{ "_secure",                processSecureOption,            true,   STAGE_ANY },
 #endif
 	{ "_xformat",               processXformatOption,           false,  STAGE_ANY },
 };
