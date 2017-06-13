@@ -507,8 +507,11 @@ void interactiveLoop (cookedArgs *args CTAGS_ATTR_UNUSED, void *user)
 		json_decref (tmp);
 
 		if (installSyscallFilter ()) {
-			// TODO: does this exit in interactive mode?
 			error (FATAL, "install_syscall_filter failed");
+			/* The explicit exit call is needed because
+			   "error (FATAL,..." just prints a message in
+			   interactive mode. */
+			exit (1);
 		}
 	}
 
