@@ -555,6 +555,14 @@ void interactiveLoop (cookedArgs *args CTAGS_ATTR_UNUSED, void *user CTAGS_ATTR_
 			openTagFile ();
 			if (size == -1)
 			{					/* read from disk */
+#ifdef HAVE_SECCOMP
+				struct interactiveModeArgs *iargs = user;
+				if (iargs->sandbox) {
+					error (FATAL,
+						   "invalid request in sandbox submode: reading file contents from a file is limited");
+					goto next;
+				}
+#endif
 				createTagsForEntry (filename);
 			}
 			else
