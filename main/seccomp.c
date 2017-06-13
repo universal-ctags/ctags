@@ -9,10 +9,11 @@
 */
 
 #include "general.h"
+#include "debug.h"
+#include "interactive.h"
 
 #if HAVE_SECCOMP
 #include <seccomp.h>
-#include "options.h"
 
 
 int installSyscallFilter (void)
@@ -61,4 +62,11 @@ int installSyscallFilter (void)
    (https://dev.chromium.org/developers/design-documents/sandbox/osx-sandboxing-design)
    should be used for equivalent functionality.
  */
+
+#else
+int installSyscallFilter (void)
+{
+	AssertNotReached ();
+	return -1;
+}
 #endif
