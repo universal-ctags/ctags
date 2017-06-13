@@ -12,7 +12,8 @@
 
 #if HAVE_SECCOMP
 #include <seccomp.h>
-#include <stdio.h>
+#include "options.h"
+
 
 int installSyscallFilter (void)
 {
@@ -42,12 +43,12 @@ int installSyscallFilter (void)
 	// main/parse.c:2764 : tagFilePosition (&tagfpos);
 	seccomp_rule_add (ctx, SCMP_ACT_ALLOW, SCMP_SYS (lseek), 0);
 
-	// TODO: print verbose progress
+	verbose ("Entering sandbox\n");
 	int err = seccomp_load (ctx);
 	if (err < 0)
 	{
-		// TODO: use logging framework
-		fprintf (stderr, "seccomp_load: %d", err);
+		error (WARNING, "Failed to install syscall filter");
+		/* Error handling is done in upper layer. */
 	}
 
 	seccomp_release (ctx);
