@@ -1,0 +1,4 @@
+{"_type": "program", "name": "Universal Ctags", "version": "0.0.0"}
+{"_type": "error", "message": "invalid request in sandbox submode: reading file contents from a file is limited", "fatal": true}
+{"_type": "tag", "name": "foo", "path": "input.el", "pattern": "/^(defun foo () 0)/", "kind": "function"}
+{"_type": "completed", "command": "generate-tags"}
