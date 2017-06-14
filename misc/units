@@ -1967,7 +1967,9 @@ action_tmain ()
 		tmain_dir="$1"
 		shift
 		build_dir=${1:-${tmain_dir}}
-		shift
+		if [ -n "$1" ]; then
+		    shift
+		fi
 		break
 		;;
 	esac
