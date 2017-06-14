@@ -113,6 +113,7 @@ tmain: $(CTAGS_TEST)
 	\
 	c="$(srcdir)/misc/units tmain \
 		--ctags=$(CTAGS_TEST) \
+		--units=$(UNITS) \
 		$${VALGRIND} \
 		$${SHOW_DIFF_OUTPUT}"; \
 	TRAVIS=$(TRAVIS) APPVEYOR=$(APPVEYOR) \
