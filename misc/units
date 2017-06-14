@@ -2065,8 +2065,10 @@ EOF
 help_chop ()
 {
 cat <<EOF
-$0 noise [OPTIONS] UNITS-DIR
+$0 chop [OPTIONS] UNITS-DIR
+
 	   OPTIONS:
+
 		--ctags CTAGS: ctags exectuable file for testing
 		--languages PARSER1[,PARSER2,...]: run only PARSER* related cases
 		--quiet: don't print dots as passed test cases.
