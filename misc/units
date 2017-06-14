@@ -2010,14 +2010,15 @@ help_tmain ()
     cat <<EOF
 $0 tmain [OPTIONS] TMAIN-DIR [BUILD-DIR]
 
-	Run tests for main part of ctags.
+	   Run tests for main part of ctags.
+	   If BUILD-DIR is not given, TMAIN-DIR is reused as BUILD-DIR.
 
-	--ctags CTAGS: ctags exectuable file for testing
-	--colorized-output yes|no: print the result in color.
-	--with-valgrind: (not implemented) run a test case under valgrind
-	--show-diff-output: (not implemented)show diff output for failed test cases in the summary.
+	   OPTIONS:
 
-	If BUILD-DIR is not given, TMAIN-DIR is reused as BUILD-DIR.
+		--ctags CTAGS: ctags exectuable file for testing
+		--colorized-output yes|no: print the result in color.
+		--with-valgrind: (not implemented) run a test case under valgrind
+		--show-diff-output: (not implemented)show diff output for failed test cases in the summary.
 EOF
 }
 
