@@ -491,6 +491,9 @@ static const char *const Features [] = {
 #ifdef CASE_INSENSITIVE_FILENAMES
 	"case-insensitive-filenames",
 #endif
+#ifdef ENABLE_GCOV
+	"gcov",
+#endif
 	NULL
 };
 

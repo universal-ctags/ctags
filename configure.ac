@@ -80,6 +80,8 @@ AH_TEMPLATE([NON_CONST_PUTENV_PROTOTYPE],
 	doesn't declare its argument as "const char *".])
 AH_TEMPLATE([MSDOS_STYLE_PATH],
 	[Define to 1 if your system uses MS-DOS style path.])
+AH_TEMPLATE([ENABLE_GCOV],
+	[Define to 1 if gcov is instrumented.])
 
 
 # Report system info
@@ -290,6 +292,7 @@ fi
 if test "${enable_coverage_gcov}" = "yes"; then
 	COVERAGE_CFLAGS="--coverage"
 	COVERAGE_LDFLAGS="--coverage"
+	AC_DEFINE(ENABLE_GCOV)
 fi
 AC_SUBST([COVERAGE_CFLAGS])
 AC_SUBST([COVERAGE_LDFLAGS])
