@@ -1,3 +1,4 @@
+# -*- makefile -*-
 .PHONY: check units fuzz noise tmain tinst clean-units clean-tmain clean-gcov run-gcov codecheck cppcheck
 
 check: tmain units

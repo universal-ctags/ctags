@@ -1,3 +1,4 @@
+# -*- makefile -*-
 .PHONY: help
 help:
 	@echo "Compilation targets:"

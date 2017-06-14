@@ -1,3 +1,4 @@
+# -*- makefile -*-
 include makefiles/translator_input.mak
 .PHONY: list-translator-input
 list-translator-input:
