@@ -136,47 +136,51 @@ static const char *const HeaderExtensions [] = {
 };
 
 optionValues Option = {
-	false,      /* -a */
-	false,      /* -B */
-	false,      /* -e */
+	.append = false,
+	.backward = false,
+	.etags = false,
+	.locate =
 #ifdef MACROS_USE_PATTERNS
-	EX_PATTERN, /* -n, --excmd */
+	EX_PATTERN
 #else
-	EX_MIX,     /* -n, --excmd */
+	EX_MIX
 #endif
-	false,      /* -R */
-	SO_SORTED,  /* -u, --sort */
-	false,      /* -V */
-	false,      /* -x */
+	,
+	.recurse = false,
+	.sorted = SO_SORTED,
+	.verbose = false,
+	.xref = false,
 	.customXfmt = NULL,
-	NULL,       /* -L */
-	NULL,       /* -o */
-	NULL,       /* -h */
-	NULL,		/* --config-filename */
-	NULL,       /* --etags-include */
-	DEFAULT_FILE_FORMAT,/* --format */
+	.fileList = NULL,
+	.tagFileName = NULL,
+	.headerExt = NULL,
+	.configFilename = NULL,
+	.etagsInclude = NULL,
+	.tagFileFormat = DEFAULT_FILE_FORMAT,
 #ifdef HAVE_ICONV
-	NULL,		/* --input-encoding */
-	NULL,		/* --output-encoding */
+	.inputEncoding= NULL,
+	.outputEncoding = NULL,
 #endif
-	LANG_AUTO,  /* --lang */
-	true,       /* --links */
-	false,      /* --filter */
-	NULL,       /* --filter-terminator */
-	false,      /* --tag-relative */
-	false,      /* --totals */
-	false,      /* --line-directives */
-	false,	    /* --print-language */
-	false,	    /* --guess-language-eagerly(-G) */
-	false,	    /* --quiet */
-	false,	    /* --_fatal-warnings */
+	.language = LANG_AUTO,
+	.followLinks = true,
+	.filter = false,
+	.filterTerminator = NULL,
+	.tagRelative = false,
+	.printTotals = false,
+	.lineDirectives = false,
+	.printLanguage =false,
+	.guessLanguageEagerly = false,
+	.quiet = false,
+	.fatalWarnings = false,
 	.patternLengthLimit = 96,
 	.putFieldPrefix = false,
 	.maxRecursionDepth = 0xffffffff,
 	.machinable = false,
 	.withListHeader = true,
+	.interactive = false,
 #ifdef DEBUG
-	0, 0        /* -d, -b */
+	.debugLevel = 0,
+	.breakLine = 0,
 #endif
 };
 
