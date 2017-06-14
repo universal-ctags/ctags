@@ -208,7 +208,7 @@ extern void addLanguageCallbackRegex (const langType language, const char *const
 extern void freeRegexResources (void);
 extern bool checkRegex (void);
 extern void useRegexMethod (const langType language);
-extern void printRegexFlags (void);
+extern void printRegexFlags (bool withListHeader, bool machinable, FILE *fp);
 extern bool hasLanguageScopeActionInRegex (const langType language);
 
 /* Multiline Regex Interface */

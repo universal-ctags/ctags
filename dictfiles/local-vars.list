@@ -20,9 +20,15 @@ langs
 len
 msg
 mydict
+ndefs
+nerrors
+ngroup
 noparser
+nroles
 oname
 optname
+outdir
+ptrn
 slist
 submode
 subtag

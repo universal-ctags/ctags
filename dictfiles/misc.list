@@ -3,11 +3,10 @@ gpl
 gtk
 http
 https
+icase
 mvc
-nerrors
 nosuchlang
-nroles
-outdir
+posix
 readme
 refonly
 sqmp

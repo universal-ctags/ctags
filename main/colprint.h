@@ -9,6 +9,8 @@
 #define CTAGS_MAIN_COLPRINT_H
 
 #include "general.h"
+
+#include "vstring.h"
 #include <stdio.h>
 
 struct colprintTable;
@@ -23,6 +25,7 @@ void colprintTableSort  (struct colprintTable *table, int (* compareFn) (struct 
 struct colprintLine *colprintTableGetNewLine (struct colprintTable *table);
 
 void colprintLineAppendColumnCString (struct colprintLine *line, const char* column);
+void colprintLineAppendColumnVString (struct colprintLine *line, vString* column);
 void colprintLineAppendColumnChar (struct colprintLine *line, char column);
 void colprintLineAppendColumnInt  (struct colprintLine *line, unsigned int column);
 

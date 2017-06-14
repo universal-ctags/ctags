@@ -1991,7 +1991,7 @@ static void processListRegexFlagsOptions (
 		const char *const option CTAGS_ATTR_UNUSED,
 		const char *const parameter CTAGS_ATTR_UNUSED)
 {
-	printRegexFlags ();
+	printRegexFlags (Option.withListHeader, Option.machinable, stdout);
 	exit (0);
 }
 
