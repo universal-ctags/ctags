@@ -422,6 +422,8 @@ static optionDescription LongOptionDescription [] = {
  {1,"       Make all warnings fatal."},
  {1,"  --_fielddef-<LANG>=name,description"},
  {1,"       EXPERIMENTAL, Define new field for <LANG>."},
+ {1,"  --_force-initializing"},
+ {1,"       Initialize all parsers in early stage"},
  {1,"  --_force-quit=[num]"},
  {1,"       Quit when the option is processed. Useful to debug the chain"},
  {1,"       of loading option files."},
@@ -2329,6 +2331,13 @@ static void processEchoOption (const char *const option, const char *const param
 	notice ("%s", parameter);
 }
 
+static void processForceInitOption (const char *const option CTAGS_ATTR_UNUSED,
+				    const char *const parameter)
+{
+	verbose ("force initializing all built-in parsers\n");
+	initializeParser (LANG_AUTO);
+}
+
 static void processForceQuitOption (const char *const option CTAGS_ATTR_UNUSED,
 				    const char *const parameter)
 {
@@ -2516,6 +2525,7 @@ static parametricOption ParametricOptions [] = {
 	{ "version",                processVersionOption,           true,   STAGE_ANY },
 	{ "_anonhash",              processAnonHashOption,          false,  STAGE_ANY },
 	{ "_echo",                  processEchoOption,              false,  STAGE_ANY },
+	{ "_force-initializing",    processForceInitOption,         false, STAGE_ANY },
 	{ "_force-quit",            processForceQuitOption,         false,  STAGE_ANY },
 	{ "_xformat",               processXformatOption,           false,  STAGE_ANY },
 };
