@@ -1,0 +1,4 @@
+name1	input.ini	/^[name1]$/;"	s	line:1
+name2	input.ini	/^name2=1$/;"	k	line:2	section:name1
+name3	input.ini	/^[name3]$/;"	s	line:3
+name4	input.ini	/^name4=2$/;"	k	line:4	section:name3
