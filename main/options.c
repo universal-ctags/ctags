@@ -323,8 +323,6 @@ static optionDescription LongOptionDescription [] = {
  {1,"       Output list of features."},
  {1,"  --list-fields=[language|all]"},
  {1,"       Output list of fields. This works with --machinable."},
- {1,"  --list-file-kind"},
- {1,"       List kind letter for file."},
  {1,"  --list-kinds=[language|all]"},
  {1,"       Output a list of all tag kinds for specified language or all."},
  {1,"  --list-kinds-full=[language|all]"},
