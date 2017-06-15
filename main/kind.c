@@ -248,7 +248,7 @@ extern bool doesParserUseKind (struct kindControlBlock* kcb, char letter)
 
 extern struct colprintTable * kindColprintTableNew (void)
 {
-	return colprintTableNew ("L:PARSER", "L:LETTER", "L:NAME", "L:ENABLED",
+	return colprintTableNew ("L:LANGUAGE", "L:LETTER", "L:NAME", "L:ENABLED",
 							 "L:REFONLY", "L:NROLES", "L:MASTER",
 							 "L:DESCRIPTION",
 							 NULL);
