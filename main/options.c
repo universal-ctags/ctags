@@ -1928,14 +1928,18 @@ static void processListParametersOption (const char *const option,
 										 const char *const parameter)
 {
 	if (parameter [0] == '\0' || strcasecmp (parameter, "all") == 0)
-		printLanguageParameters (LANG_AUTO);
+		printLanguageParameters (LANG_AUTO,
+								 Option.withListHeader, Option.machinable,
+								 stdout);
 	else
 	{
 		langType language = getNamedLanguage (parameter, 0);
 		if (language == LANG_IGNORE)
 			error (FATAL, "Unknown language \"%s\" in \"%s\" option", parameter, option);
 		else
-			printLanguageParameters (language);
+			printLanguageParameters (language,
+									 Option.withListHeader, Option.machinable,
+									 stdout);
 	}
 	exit (0);
 }

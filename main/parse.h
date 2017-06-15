@@ -183,7 +183,8 @@ extern void printLanguageKinds (const langType language, bool allKindFields);
 extern void printLanguageRoles (const langType language, const char* letters);
 extern void printLanguageAliases (const langType language);
 extern void printLanguageList (void);
-extern void printLanguageParameters (const langType language);
+extern void printLanguageParameters (const langType language,
+									 bool withListHeader, bool machinable, FILE *fp);
 extern void printLanguageSubparsers (const langType language);
 extern bool doesParserRequireMemoryStream (const langType language);
 extern bool parseFile (const char *const fileName);

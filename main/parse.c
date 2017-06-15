@@ -2285,7 +2285,7 @@ extern void printLanguageKinds (const langType language, bool allKindFields)
 	}
 }
 
-static void printParameters (langType language, bool indent)
+static void printParameters (struct colprintTable *table, langType language)
 {
 	const parserDefinition* lang;
 	Assert (0 <= language  &&  language < (int) LanguageCount);
@@ -2294,42 +2294,35 @@ static void printParameters (langType language, bool indent)
 	lang = LanguageTable [language].def;
 	if (lang->parameterHandlerTable != NULL)
 	{
-		unsigned int i;
-
-		for (i = 0; i < lang->parameterHandlerCount; ++i)
-		{
-			if (indent)
-				printf (Option.machinable? "%s": PR_PARAM_FMT (LANG,s), lang->name);
-			printParameter (lang->parameterHandlerTable + i, indent, Option.machinable);
-		}
+		for (unsigned int i = 0; i < lang->parameterHandlerCount; ++i)
+			paramColprintAddParameter(table, language, lang->parameterHandlerTable + i);
 	}
 
 }
 
-extern void printLanguageParameters (const langType language)
+extern void printLanguageParameters (const langType language,
+									 bool withListHeader, bool machinable, FILE *fp)
 {
+	struct colprintTable *table =  paramColprintTableNew();
+
 	if (language == LANG_AUTO)
 	{
-		unsigned int i;
-
-		if (Option.withListHeader)
-			printParameterListHeader (true, Option.machinable);
-		for (i = 0; i < LanguageCount ; ++i)
+		for (unsigned int i = 0; i < LanguageCount ; ++i)
 		{
 			const parserDefinition* const lang = LanguageTable [i].def;
 
 			if (lang->invisible)
 				continue;
-			printParameters (i, true);
+
+			printParameters (table, i);
 		}
 	}
 	else
-	{
-		if (Option.withListHeader)
-			printParameterListHeader (false, Option.machinable);
+		printParameters (table, language);
 
-		printParameters (language, false);
-	}
+	paramColprintTablePrint (table, (language != LANG_AUTO),
+							 withListHeader, machinable, fp);
+	colprintTableDelete (table);
 }
 
 static void processLangAliasOption (const langType language,

@@ -1,34 +1,34 @@
 # ALL
-#PARSER         NAME     DESCRIPTION                   
-CPreProcessor   if0      examine code within "#if 0" branch (true or [false])
-CPreProcessor   ignore   a token to be specially handled
-CPreProcessor   define   define replacement for an identifier
+#LANGUAGE      NAME   DESCRIPTION
+CPreProcessor  define define replacement for an identifier
+CPreProcessor  if0    examine code within "#if 0" branch (true or [false])
+CPreProcessor  ignore a token to be specially handled
 
 # ALL MACHINABLE
-#PARSER	NAME	DESCRIPTION
+#LANGUAGE	NAME	DESCRIPTION
+CPreProcessor	define	define replacement for an identifier
 CPreProcessor	if0	examine code within "#if 0" branch (true or [false])
 CPreProcessor	ignore	a token to be specially handled
-CPreProcessor	define	define replacement for an identifier
 
 # ALL MACHINABLE NOHEADER
+CPreProcessor	define	define replacement for an identifier
 CPreProcessor	if0	examine code within "#if 0" branch (true or [false])
 CPreProcessor	ignore	a token to be specially handled
-CPreProcessor	define	define replacement for an identifier
 
 # CPP
-NAME     DESCRIPTION                   
-if0      examine code within "#if 0" branch (true or [false])
-ignore   a token to be specially handled
-define   define replacement for an identifier
+#NAME   DESCRIPTION
+define  define replacement for an identifier
+if0     examine code within "#if 0" branch (true or [false])
+ignore  a token to be specially handled
 
 # CPP MACHINABLE
-NAME	DESCRIPTION
+#NAME	DESCRIPTION
+define	define replacement for an identifier
 if0	examine code within "#if 0" branch (true or [false])
 ignore	a token to be specially handled
-define	define replacement for an identifier
 
 # CPP MACHINABLE NOHEADER
+define	define replacement for an identifier
 if0	examine code within "#if 0" branch (true or [false])
 ignore	a token to be specially handled
-define	define replacement for an identifier
 

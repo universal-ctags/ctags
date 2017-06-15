@@ -14,42 +14,44 @@
 #include "param.h"
 #include "options.h"
 
-#define PR_PARAM_WIDTH_NAME         8
-#define PR_PARAM_WIDTH_DESCRIPTION 30
+#include <string.h>
 
-#define MAKE_PARAM_FMT(PREFIX)					\
-	PREFIX										\
-	PR_PARAM_FMT (NAME,s)						\
-	" "										    \
-	PR_PARAM_FMT (DESCRIPTION,s)				\
-	"\n"
 
-extern void printParameterListHeader (bool indent, bool tabSeparated)
+extern struct colprintTable * paramColprintTableNew (void)
 {
-#define PARAM_HEADER_COMMON_FMT MAKE_PARAM_FMT("%s")
-
-	const char *fmt = tabSeparated
-		? "%s%s%s\t%s\n"
-		: (indent
-		   ? PR_PARAM_FMT (LANG,s) PARAM_HEADER_COMMON_FMT
-		   : "%s" PARAM_HEADER_COMMON_FMT)
-		;
-	printf (fmt,
-			(indent? "#PARSER": ""),
-			(indent? (tabSeparated? "\t": " "): ""),
-			"NAME",
-			"DESCRIPTION");
+	return colprintTableNew ("L:LANGUAGE", "L:NAME","L:DESCRIPTION", NULL);
 }
 
-extern void printParameter (const parameterHandlerTable *const paramHandler, bool indent, bool tabSeparated)
+extern void paramColprintAddParameter (struct colprintTable *table,
+									   langType language,
+									   const parameterHandlerTable *const paramHandler)
 {
-#define PARAM_FMT MAKE_PARAM_FMT("")
+	struct colprintLine *line = colprintTableGetNewLine(table);
 
-	printf ((tabSeparated
-			 ? "%s%s\t%s\n"
-			 : "%s" PARAM_FMT),
-			(indent? (tabSeparated? "\t": " "): ""),
-			paramHandler->name,
-			paramHandler->desc);
+	colprintLineAppendColumnCString (line, getLanguageName (language));
+	colprintLineAppendColumnCString (line, paramHandler->name);
+	colprintLineAppendColumnCString (line, paramHandler->desc);
+}
 
+static int paramColprintCompareLines (struct colprintLine *a , struct colprintLine *b)
+{
+	const char *a_parser = colprintLineGetColumn (a, 0);
+	const char *b_parser = colprintLineGetColumn (b, 0);
+
+	int r;
+	r = strcmp (a_parser, b_parser);
+	if (r != 0)
+		return r;
+
+	const char *a_name = colprintLineGetColumn (a, 1);
+	const char *b_name = colprintLineGetColumn (b, 1);
+
+	return strcmp(a_name, b_name);
+}
+
+extern void paramColprintTablePrint (struct colprintTable *table, bool noparser,
+									bool withListHeader, bool machinable, FILE *fp)
+{
+	colprintTableSort (table, paramColprintCompareLines);
+	colprintTablePrint (table, noparser? 1: 0, withListHeader, machinable, fp);
 }
