@@ -496,6 +496,22 @@ static void batchMakeTags (cookedArgs *args, void *user CTAGS_ATTR_UNUSED)
 #ifdef HAVE_JANSSON
 void interactiveLoop (cookedArgs *args CTAGS_ATTR_UNUSED, void *user CTAGS_ATTR_UNUSED)
 {
+#ifdef HAVE_SECCOMP
+	if (Option.secure) {
+		/* As of jansson 2.6, the object hashing is seeded off
+		   of /dev/urandom, so trigger the hash seeding
+		   before installing the syscall filter.
+		*/
+		json_t * tmp = json_object ();
+		json_decref (tmp);
+
+		if (installSyscallFilter ()) {
+			// TODO: does this exit in interactive mode?
+			error (FATAL, "install_syscall_filter failed");
+		}
+	}
+#endif
+
 	char buffer[1024];
 	json_t *request;
 
