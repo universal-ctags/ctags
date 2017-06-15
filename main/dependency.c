@@ -265,59 +265,64 @@ extern slaveParser *getFirstSlaveParser (struct slaveControlBlock *scb)
 	return NULL;
 }
 
-#define PR_SUBPARSER_WIDTH_NAME          30
-#define PR_SUBPARSER_WIDTH_BASE_NAME     20
-#define PR_SUBPARSER_WIDTH_DIRECTION 9
-
-#define PR_SUBPARSER_STR(X) PR_SUBPARSER_WIDTH_##X
-#define PR_SUBPARSER_FMT(X,T) "%-" STRINGIFY(PR_SUBPARSER_STR(X)) STRINGIFY(T)
-
-#define MAKE_SUBPARSER_FMT()					\
-	PR_SUBPARSER_FMT (NAME,s)					\
-	" "											\
-	PR_SUBPARSER_FMT (BASE_NAME,s)				\
-	" "											\
-	PR_SUBPARSER_FMT (DIRECTION,s)				\
-	"\n"
-
-extern void printSubparserListHeader (bool machinable)
+extern struct colprintTable * subparserColprintTableNew (void)
 {
-	if (Option.withListHeader)
-		printf ((machinable? "%s\t%s\t%s\n": MAKE_SUBPARSER_FMT()),
-				"#NAME", "BASEPARSER", "DIRECTION");
+	return colprintTableNew ("L:NAME", "L:BASEPARSER", "L:DIRECTIONS", NULL);
 }
 
-extern void printSubparsers (struct slaveControlBlock *scb, bool machinable)
+extern void subparserColprintAddSubparsers (struct colprintTable *table,
+											struct slaveControlBlock *scb)
 {
 	slaveParser *tmp;
 
 	pushLanguage (scb->owner);
 	foreachSlaveParser(tmp)
 	{
-		if (tmp->type == DEPTYPE_SUBPARSER)
+		struct colprintLine *line = colprintTableGetNewLine(table);
+
+		colprintLineAppendColumnCString (line, getLanguageName (tmp->id));
+		colprintLineAppendColumnCString (line, getLanguageName (scb->owner));
+
+		char *direction;
+		switch (((subparser *)tmp->data)->direction)
 		{
-			char *direction;
-
-			switch (((subparser *)tmp->data)->direction)
-			{
-			case SUBPARSER_BASE_RUNS_SUB:
-				direction = "base => sub {shared}";
-				break;
-			case SUBPARSER_SUB_RUNS_BASE:
-				direction = "base <= sub {dedicated}";
-				break;
-			case SUBPARSER_BI_DIRECTION:
-				direction = "base <> sub {bidirectional}";
-				break;
-			default:
-				direction  = "UNKNOWN(INTERNAL BUG)";
-				break;
-			}
-
-			printf ((machinable? "%s\t%s\t%s\n": MAKE_SUBPARSER_FMT()),
-					getLanguageName (tmp->id),
-					getLanguageName (scb->owner), direction);
+		case SUBPARSER_BASE_RUNS_SUB:
+			direction = "base => sub {shared}";
+			break;
+		case SUBPARSER_SUB_RUNS_BASE:
+			direction = "base <= sub {dedicated}";
+			break;
+		case SUBPARSER_BI_DIRECTION:
+			direction = "base <> sub {bidirectional}";
+			break;
+		default:
+			direction  = "UNKNOWN(INTERNAL BUG)";
+			break;
 		}
+		colprintLineAppendColumnCString (line, direction);
 	}
 	popLanguage ();
+}
+
+static int subparserColprintCompareLines (struct colprintLine *a , struct colprintLine *b)
+{
+	const char *a_name = colprintLineGetColumn (a, 0);
+	const char *b_name = colprintLineGetColumn (b, 0);
+
+	int r;
+	r = strcmp (a_name, b_name);
+	if (r != 0)
+		return r;
+
+	const char *a_baseparser = colprintLineGetColumn (a, 1);
+	const char *b_baseparser = colprintLineGetColumn (b, 1);
+
+	return strcmp(a_baseparser, b_baseparser);
+}
+
+extern void subparserColprintTablePrint (struct colprintTable *table,
+										 bool withListHeader, bool machinable, FILE *fp)
+{
+	colprintTableSort (table, subparserColprintCompareLines);
+	colprintTablePrint (table, 0, withListHeader, machinable, fp);
 }

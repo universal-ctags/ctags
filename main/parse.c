@@ -3501,24 +3501,38 @@ extern subparser* getSubparserRunningBaseparser (void)
 		return NULL;
 }
 
-extern void printLanguageSubparsers (const langType language)
+extern void printLanguageSubparsers (const langType language,
+									 bool withListHeader, bool machinable, FILE *fp)
 {
 	for (int i = 0; i < (int) LanguageCount; i++)
 		initializeParserOne (i);
 
-
-	if (Option.withListHeader)
-		printSubparserListHeader (Option.machinable);
+	struct colprintTable * table = subparserColprintTableNew();
+	parserObject *parser;
 
 	if (language == LANG_AUTO)
 	{
 		for (int i = 0; i < (int) LanguageCount; i++)
-			printSubparsers ((LanguageTable + i)->slaveControlBlock,
-								 Option.machinable);
+		{
+			parser = LanguageTable + i;
+			if (parser->def->invisible)
+				continue;
+
+			subparserColprintAddSubparsers (table,
+											parser->slaveControlBlock);
+		}
 	}
 	else
-		printSubparsers ((LanguageTable + language)->slaveControlBlock,
-						 Option.machinable);
+	{
+		parser = (LanguageTable + language);
+		subparserColprintAddSubparsers (table,
+										parser->slaveControlBlock);
+	}
+
+	subparserColprintTablePrint (table,
+								 withListHeader, machinable,
+								 fp);
+	colprintTableDelete (table);
 }
 
 /*

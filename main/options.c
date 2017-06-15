@@ -2055,7 +2055,9 @@ static void processListSubparsersOptions (const char *const option CTAGS_ATTR_UN
 	if (parameter == NULL || parameter[0] == '\0'
 		|| (strcmp(parameter, "all") == 0))
 	{
-		printLanguageSubparsers(LANG_AUTO);
+		printLanguageSubparsers(LANG_AUTO,
+								Option.withListHeader, Option.machinable,
+								stdout);
 		exit (0);
 	}
 
@@ -2063,7 +2065,9 @@ static void processListSubparsersOptions (const char *const option CTAGS_ATTR_UN
 	if (lang == LANG_IGNORE)
 		error (FATAL, "Unknown language \"%s\" in \"%s\"", parameter, option);
 
-	printLanguageSubparsers(lang);
+	printLanguageSubparsers(lang,
+							Option.withListHeader, Option.machinable,
+							stdout);
 	exit (0);
 }
 

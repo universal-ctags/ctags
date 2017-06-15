@@ -14,6 +14,7 @@
 
 #include "general.h"
 
+#include "colprint.h"
 #include "dependency.h"
 #include "types.h"
 
@@ -68,7 +69,10 @@ extern void useSpecifiedSubparser (struct slaveControlBlock *controlBlock, subpa
 extern void setupSubparsersInUse (struct slaveControlBlock *controlBlock);
 extern subparser* teardownSubparsersInUse (struct slaveControlBlock *controlBlock);
 
-extern void printSubparserListHeader (bool machinable);
-extern void printSubparsers (struct slaveControlBlock *scb, bool machinable);
+extern struct colprintTable * subparserColprintTableNew (void);
+extern void subparserColprintAddSubparsers (struct colprintTable *table,
+											struct slaveControlBlock *scb);
+extern void subparserColprintTablePrint (struct colprintTable *table,
+										 bool withListHeader, bool machinable, FILE *fp);
 
 #endif	/* CTAGS_MAIN_SUBPARSER_H */

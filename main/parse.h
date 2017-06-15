@@ -185,7 +185,8 @@ extern void printLanguageAliases (const langType language);
 extern void printLanguageList (void);
 extern void printLanguageParameters (const langType language,
 									 bool withListHeader, bool machinable, FILE *fp);
-extern void printLanguageSubparsers (const langType language);
+extern void printLanguageSubparsers (const langType language,
+									 bool withListHeader, bool machinable, FILE *fp);
 extern bool doesParserRequireMemoryStream (const langType language);
 extern bool parseFile (const char *const fileName);
 extern bool parseFileWithMio (const char *const fileName, MIO *mio);
