@@ -1457,13 +1457,7 @@ static void processInteractiveOption (
 	Option.interactive = true;
 
 	if (parameter && (strcmp (parameter, "sandbox") == 0))
-	{
-#ifdef HAVE_SECCOMP
 		args.sandbox = true;
-#else
-		error (FATAL, "sandbox submode is not supported on this platform");
-#endif
-	}
 	else if (parameter && (strcmp (parameter, "default") == 0))
 		args.sandbox = false;
 	else if ((!parameter) || *parameter == '\0')
@@ -1471,6 +1465,16 @@ static void processInteractiveOption (
 	else
 		error (FATAL, "Unknown option argument \"%s\" for --%s option",
 			   parameter, option);
+
+#ifndef HAVE_SECCOMP
+	if (args.sandbox)
+		error (FATAL, "sandbox submode is not supported on this platform");
+#endif
+
+#ifdef ENABLE_GCOV
+	if (args.sandbox)
+		error (FATAL, "sandbox submode does not work if gcov is instrumented");
+#endif
 
 	Option.sorted = SO_UNSORTED;
 	setMainLoop (interactiveLoop, &args);
