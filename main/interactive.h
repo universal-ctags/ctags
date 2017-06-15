@@ -9,6 +9,9 @@
 #ifndef CTAGS_MAIN_INTERACTIVE_H
 #define CTAGS_MAIN_INTERACTIVE_H
 
+#include "general.h"
+#include "options.h"
+
 void interactiveLoop (cookedArgs *args, void *user CTAGS_ATTR_UNUSED);
 bool jsonErrorPrinter (const errorSelection selection, const char *const format, va_list ap,
 					  void *data);
