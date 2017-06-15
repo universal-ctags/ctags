@@ -1,37 +1,37 @@
 #LETTER	NAME	ENABLED	LANGUAGE	XFMT	JSTYPE	DESCRIPTION
-N	name	on	NONE	TRUE	s--	tag name (fixed field)
-F	input	on	NONE	TRUE	s--	input file (fixed field)
-P	pattern	on	NONE	TRUE	s--	pattern (fixed field)
 C	compact	off	NONE	TRUE	s--	compact input line (fixed field, only used in -x option)
+E	extras	off	NONE	TRUE	s--	Extra tag type information
+F	input	on	NONE	TRUE	s--	input file (fixed field)
+K	NONE	off	NONE	TRUE	s--	Kind of tag as full name
+N	name	on	NONE	TRUE	s--	tag name (fixed field)
+P	pattern	on	NONE	TRUE	s--	pattern (fixed field)
+R	NONE	off	NONE	TRUE	s--	Marker (R or D) representing whether tag is definition or reference
+S	signature	off	NONE	TRUE	s--	Signature of routine (e.g. prototype or parameter list)
+Z	scope	off	NONE	TRUE	s--	Include the "scope:" key in scope field (use s) in tags output, scope name in xref output
 a	access	off	NONE	TRUE	s--	Access (or export) of class members
+e	end	off	NONE	TRUE	-i-	end lines of various items
 f	file	on	NONE	TRUE	--b	File-restricted scoping
 i	inherits	off	NONE	TRUE	s-b	Inheritance information
-K	NONE	off	NONE	TRUE	s--	Kind of tag as full name
 k	NONE	on	NONE	TRUE	s--	Kind of tag as a single letter
 l	language	off	NONE	TRUE	s--	Language of input file containing tag
 m	implementation	off	NONE	TRUE	s--	Implementation information
 n	line	off	NONE	TRUE	-i-	Line number of tag definition
-S	signature	off	NONE	TRUE	s--	Signature of routine (e.g. prototype or parameter list)
+p	scopeKind	off	NONE	TRUE	s--	Kind of scope as full name
+r	role	off	NONE	TRUE	s--	Role
 s	NONE	on	NONE	TRUE	s--	Scope of tag definition (`p' can be used for printing its kind)
 t	typeref	on	NONE	TRUE	s--	Type and name of a variable or typedef
-z	kind	off	NONE	TRUE	s--	Include the "kind:" key in kind field (use k or K) in tags output, kind full name in xref output
-r	role	off	NONE	TRUE	s--	Role
-R	NONE	off	NONE	TRUE	s--	Marker (R or D) representing whether tag is definition or reference
-Z	scope	off	NONE	TRUE	s--	Include the "scope:" key in scope field (use s) in tags output, scope name in xref output
-E	extras	off	NONE	TRUE	s--	Extra tag type information
 x	xpath	off	NONE	TRUE	s--	xpath for the tag
-p	scopeKind	off	NONE	TRUE	s--	Kind of scope as full name
-e	end	off	NONE	TRUE	-i-	end lines of various items
+z	kind	off	NONE	TRUE	s--	Include the "kind:" key in kind field (use k or K) in tags output, kind full name in xref output
 -	properties	off	C	TRUE	s--	properties (static, inline, mutable,...)
--	properties	off	C++	TRUE	s--	properties (static, inline, mutable,...)
--	template	off	C++	TRUE	s--	template parameters
 -	captures	off	C++	TRUE	s--	lambda capture list
 -	name	on	C++	TRUE	s--	aliased names
+-	properties	off	C++	TRUE	s--	properties (static, inline, mutable,...)
+-	template	off	C++	TRUE	s--	template parameters
 -	properties	off	CUDA	TRUE	s--	properties (static, inline, mutable,...)
 -	assignment	on	LdScript	TRUE	s--	how a value is assigned to the symbol
+-	decorators	off	Python	TRUE	s--	decorators on functions and classes
 -	home	on	passwd	TRUE	s--	home directory
 -	shell	on	passwd	TRUE	s--	login shell
--	decorators	off	Python	TRUE	s--	decorators on functions and classes
 -	sectionMarker	off	reStructuredText	TRUE	s--	character used for declaring section
 #
 Foo	input.java	/^abstract public class Foo extends Bar$/

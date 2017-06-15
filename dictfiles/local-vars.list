@@ -1,5 +1,6 @@
 # Local variables
 ap
+bmask
 buf
 dev
 dictfile
@@ -10,11 +11,13 @@ endline
 ffile
 fn
 fname
+fobj
 foldcase
 funcmap
 iname
 indx
 input0
+jstype
 kcb
 kdef
 langs
@@ -35,6 +38,7 @@ slist
 submode
 subtag
 tokeninfo
+typefields
 uuid
 vcol
 vstr

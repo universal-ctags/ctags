@@ -1,17 +1,17 @@
-r       UCTAGSrole      off     NONE             TRUE   s--    Role                          
-Z       UCTAGSscope     off     NONE             TRUE   s--    Include the "scope:" key in scope field (use s) in tags output, scope name in xref output
-E       UCTAGSextras    off     NONE             TRUE   s--    Extra tag type information    
-x       UCTAGSxpath     off     NONE             TRUE   s--    xpath for the tag             
-p       UCTAGSscopeKind off     NONE             TRUE   s--    Kind of scope as full name    
-e       UCTAGSend       off     NONE             TRUE   -i-    end lines of various items    
--       UCTAGSproperties off     C                TRUE   s--    properties (static, inline, mutable,...)
--       UCTAGSproperties off     C++              TRUE   s--    properties (static, inline, mutable,...)
--       UCTAGStemplate  off     C++              TRUE   s--    template parameters           
--       UCTAGScaptures  off     C++              TRUE   s--    lambda capture list           
--       UCTAGSname      on      C++              TRUE   s--    aliased names                 
--       UCTAGSproperties off     CUDA             TRUE   s--    properties (static, inline, mutable,...)
--       UCTAGSassignment on      LdScript         TRUE   s--    how a value is assigned to the symbol
--       UCTAGShome      on      passwd           TRUE   s--    home directory                
--       UCTAGSshell     on      passwd           TRUE   s--    login shell                   
--       UCTAGSdecorators off     Python           TRUE   s--    decorators on functions and classes
--       UCTAGSsectionMarker off     reStructuredText TRUE   s--    character used for declaring section
+E       UCTAGSextras        off     NONE             TRUE s--    Extra tag type information
+Z       UCTAGSscope         off     NONE             TRUE s--    Include the "scope:" key in scope field (use s) in tags output, scope name in xref output
+e       UCTAGSend           off     NONE             TRUE -i-    end lines of various items
+p       UCTAGSscopeKind     off     NONE             TRUE s--    Kind of scope as full name
+r       UCTAGSrole          off     NONE             TRUE s--    Role
+x       UCTAGSxpath         off     NONE             TRUE s--    xpath for the tag
+-       UCTAGSproperties    off     C                TRUE s--    properties (static, inline, mutable,...)
+-       UCTAGScaptures      off     C++              TRUE s--    lambda capture list
+-       UCTAGSname          on      C++              TRUE s--    aliased names
+-       UCTAGSproperties    off     C++              TRUE s--    properties (static, inline, mutable,...)
+-       UCTAGStemplate      off     C++              TRUE s--    template parameters
+-       UCTAGSproperties    off     CUDA             TRUE s--    properties (static, inline, mutable,...)
+-       UCTAGSassignment    on      LdScript         TRUE s--    how a value is assigned to the symbol
+-       UCTAGSdecorators    off     Python           TRUE s--    decorators on functions and classes
+-       UCTAGShome          on      passwd           TRUE s--    home directory
+-       UCTAGSshell         on      passwd           TRUE s--    login shell
+-       UCTAGSsectionMarker off     reStructuredText TRUE s--    character used for declaring section

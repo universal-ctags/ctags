@@ -1401,23 +1401,31 @@ static void processListFeaturesOption(const char *const option CTAGS_ATTR_UNUSED
 static void processListFieldsOption(const char *const option CTAGS_ATTR_UNUSED,
 				    const char *const parameter)
 {
+	struct colprintTable * table = fieldColprintTableNew ();
+
 	if (parameter [0] == '\0' || strcasecmp (parameter, "all") == 0)
 	{
+		fieldColprintAddCommonLines (table);
+
 		initializeParser (LANG_AUTO);
-		printFields (LANG_AUTO);
+		for (unsigned int i = 0; i < countParsers (); i++)
+		{
+			if (isLanguageVisible(i))
+				fieldColprintAddLanguageLines (table, i);
+		}
 	}
 	else
 	{
 		langType language = getNamedLanguage (parameter, 0);
 		if (language == LANG_IGNORE)
 			error (FATAL, "Unknown language \"%s\" in \"%s\" option", parameter, option);
-		else
-		{
-			initializeParser (language);
-			printFields (language);
-		}
 
+		initializeParser (language);
+		fieldColprintAddLanguageLines (table, language);
 	}
+
+	fieldColprintTablePrint (table, Option.withListHeader, Option.machinable, stdout);
+	colprintTableDelete (table);
 	exit (0);
 }
 

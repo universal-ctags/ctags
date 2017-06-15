@@ -13,6 +13,7 @@
 #define CTAGS_MAIN_FIELD_H
 
 #include "general.h"
+#include "colprint.h"
 #include "writer.h"
 #include "types.h"
 
@@ -124,5 +125,12 @@ extern int countFields (void);
    Use int here to avoid circular dependency */
 extern int defineField (fieldDefinition *spec, langType language);
 extern fieldType nextSiblingField (fieldType type);
+
+/* --list-fields implementation. LANGUAGE must be initialized. */
+extern struct colprintTable * fieldColprintTableNew (void);
+extern void fieldColprintAddCommonLines (struct colprintTable *table);
+extern void fieldColprintAddLanguageLines (struct colprintTable *table, langType language);
+extern void fieldColprintTablePrint (struct colprintTable *table,
+									 bool withListHeader, bool machinable, FILE *fp);
 
 #endif	/* CTAGS_MAIN_FIELD_H */

@@ -364,88 +364,6 @@ extern bool doesFieldHaveValue (fieldType type, const tagEntryInfo *tag)
 		return true;
 }
 
-#define PR_FIELD_WIDTH_LETTER     7
-#define PR_FIELD_WIDTH_NAME      15
-#define PR_FIELD_WIDTH_LANGUAGE  16
-#define PR_FIELD_WIDTH_DESC      30
-#define PR_FIELD_WIDTH_XFMT      6
-#define PR_FIELD_WIDTH_JSTYPE    6
-#define PR_FIELD_WIDTH_ENABLED   7
-
-#define PR_FIELD_STR(X) PR_FIELD_WIDTH_##X
-#define PR_FIELD_FMT(X,T) "%-" STRINGIFY(PR_FIELD_STR(X)) STRINGIFY(T)
-
-#define MAKE_FIELD_FMT(LETTER_SPEC)		\
-	PR_FIELD_FMT (LETTER,LETTER_SPEC)	\
-	" "					\
-	PR_FIELD_FMT (NAME,s)			\
-	" "					\
-	PR_FIELD_FMT (ENABLED,s)		\
-	" "					\
-	PR_FIELD_FMT (LANGUAGE,s)		\
-	" "					\
-	PR_FIELD_FMT (XFMT,s)		\
-	" "					\
-	PR_FIELD_FMT (JSTYPE,s)		\
-	" "					\
-	PR_FIELD_FMT (DESC,s)			\
-	"\n"
-
-static void printField (fieldType i)
-{
-	unsigned char letter = fieldObjects[i].def->letter;
-	const char *name;
-	const char *language;
-	char  typefields [] = "---";
-
-	if (letter == NUL_FIELD_LETTER)
-		letter = '-';
-
-	if (! fieldObjects[i].def->name)
-		name = "NONE";
-	else
-		name = getFieldName (i);
-
-	if (fieldObjects[i].language == LANG_IGNORE)
-		language = "NONE";
-	else
-		language = getLanguageName (fieldObjects[i].language);
-
-	{
-		unsigned int bmask, offset;
-		unsigned int dt = getFieldDataType(i);
-		for (bmask = 1, offset = 0;
-			 bmask < FIELDTYPE_END_MARKER;
-			 bmask <<= 1, offset++)
-			if (dt & bmask)
-				typefields[offset] = fieldDataTypeFalgs[offset];
-	}
-
-	printf((Option.machinable? "%c\t%s\t%s\t%s\t%s\t%s\t%s\n": MAKE_FIELD_FMT(c)),
-	       letter,
-	       name,
-	       isFieldEnabled (i)? "on": "off",
-	       language,
-	       getFieldObject (i)->def->renderEscaped? "TRUE": "FALSE",
-		   typefields,
-	       fieldObjects[i].def->description? fieldObjects[i].def->description: "NONE");
-}
-
-extern void printFields (int language)
-{
-	unsigned int i;
-
-	if (Option.withListHeader)
-		printf ((Option.machinable? "%s\t%s\t%s\t%s\t%s\t%s\t%s\n": MAKE_FIELD_FMT(s)),
-			"#LETTER", "NAME", "ENABLED", "LANGUAGE", "XFMT", "JSTYPE", "DESCRIPTION");
-
-	for (i = 0; i < fieldObjectUsed; i++)
-	{
-		if (language == LANG_AUTO || getFieldOwner (i) == language)
-			printField (i);
-	}
-}
-
 static const char *renderAsIs (vString* b CTAGS_ATTR_UNUSED, const char *s)
 {
 	return s;
@@ -1088,4 +1006,102 @@ extern int defineField (fieldDefinition *def, langType language)
 
 	updateSiblingField (def->ftype, def->name);
 	return def->ftype;
+}
+
+extern struct colprintTable * fieldColprintTableNew (void)
+{
+	return colprintTableNew ("L:LETTER", "L:NAME", "L:ENABLED",
+							 "L:LANGUAGE", "L:XFMT", "L:JSTYPE", "L:DESCRIPTION", NULL);
+}
+
+static void  fieldColprintAddLine (struct colprintTable *table, int i)
+{
+	fieldObject *fobj = getFieldObject(i);
+	fieldDefinition *fdef = fobj->def;
+
+	struct colprintLine *line = colprintTableGetNewLine(table);
+
+	colprintLineAppendColumnChar (line,
+								  (fdef->letter == NUL_FIELD_LETTER)
+								  ? '-'
+								  : fdef->letter);
+
+	const char *name = getFieldName (i);
+	colprintLineAppendColumnCString (line, name? name: "NONE");
+	colprintLineAppendColumnCString (line, fdef->enabled? "on": "off");
+	colprintLineAppendColumnCString (line,
+									 fobj->language == LANG_IGNORE
+									 ?"NONE"
+									 : getLanguageName (fobj->language));
+
+	colprintLineAppendColumnCString (line, fdef->renderEscaped[WRITER_DEFAULT]? "TRUE": "FALSE");
+
+	char  typefields [] = "---";
+	{
+		unsigned int bmask, offset;
+		unsigned int type = getFieldDataType(i);
+		for (bmask = 1, offset = 0;
+			 bmask < FIELDTYPE_END_MARKER;
+			 bmask <<= 1, offset++)
+			if (type & bmask)
+				typefields[offset] = fieldDataTypeFalgs[offset];
+	}
+	colprintLineAppendColumnCString (line, typefields);
+	colprintLineAppendColumnCString (line, fdef->description);
+}
+
+extern void fieldColprintAddCommonLines (struct colprintTable *table)
+{
+	for (int i = 0; i <= FIELD_BUILTIN_LAST; i++)
+		fieldColprintAddLine(table, i);
+}
+
+extern void fieldColprintAddLanguageLines (struct colprintTable *table, langType language)
+{
+	for (int i = FIELD_BUILTIN_LAST + 1; i < fieldObjectUsed; i++)
+	{
+		fieldObject *fobj = getFieldObject(i);
+		if (fobj->language == language)
+			fieldColprintAddLine (table, i);
+	}
+}
+
+static int fieldColprintCompareLines (struct colprintLine *a , struct colprintLine *b)
+{
+	const char *a_parser = colprintLineGetColumn (a, 3);
+	const char *b_parser = colprintLineGetColumn (b, 3);
+
+	if (strcmp (a_parser, "NONE") == 0
+		&& strcmp (b_parser, "NONE") != 0)
+		return -1;
+	else if (strcmp (a_parser, "NONE") != 0
+			 && strcmp (b_parser, "NONE") == 0)
+		return 1;
+	else if (strcmp (a_parser, "NONE") != 0
+			 && strcmp (b_parser, "NONE") != 0)
+	{
+		int r;
+		r = strcmp (a_parser, b_parser);
+		if (r != 0)
+			return r;
+
+		const char *a_name = colprintLineGetColumn (a, 1);
+		const char *b_name = colprintLineGetColumn (b, 1);
+
+		return strcmp(a_name, b_name);
+	}
+	else
+	{
+		const char *a_letter = colprintLineGetColumn (a, 0);
+		const char *b_letter = colprintLineGetColumn (b, 0);
+
+		return strcmp(a_letter, b_letter);
+	}
+}
+
+extern void fieldColprintTablePrint (struct colprintTable *table,
+									 bool withListHeader, bool machinable, FILE *fp)
+{
+	colprintTableSort (table, fieldColprintCompareLines);
+	colprintTablePrint (table, 0, withListHeader, machinable, fp);
 }

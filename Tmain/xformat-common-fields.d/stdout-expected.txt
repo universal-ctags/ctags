@@ -1,9 +1,14 @@
 field: #LETTER
 status: 1
 
-field: N
-output: Foo Foo
-output: doIt doIt
+field: C
+output: Foo class Foo:
+output: doIt def doIt():
+status: 0
+
+field: E
+output: Foo 
+output: doIt 
 status: 0
 
 field: F
@@ -11,19 +16,44 @@ output: Foo input.py
 output: doIt input.py
 status: 0
 
+field: K
+output: Foo class
+output: doIt member
+status: 0
+
+field: N
+output: Foo Foo
+output: doIt doIt
+status: 0
+
 field: P
 output: Foo /^class Foo:$/
 output: doIt /^    def doIt():$/
 status: 0
 
-field: C
-output: Foo class Foo:
-output: doIt def doIt():
+field: R
+output: Foo D
+output: doIt D
+status: 0
+
+field: S
+output: Foo -
+output: doIt ()
+status: 0
+
+field: Z
+output: Foo 
+output: doIt Foo
 status: 0
 
 field: a
 output: Foo public
 output: doIt public
+status: 0
+
+field: e
+output: Foo 3
+output: doIt 3
 status: 0
 
 field: f
@@ -34,11 +64,6 @@ status: 0
 field: i
 output: Foo 
 output: doIt -
-status: 0
-
-field: K
-output: Foo class
-output: doIt member
 status: 0
 
 field: k
@@ -61,9 +86,14 @@ output: Foo 1
 output: doIt 2
 status: 0
 
-field: S
-output: Foo -
-output: doIt ()
+field: p
+output: Foo 
+output: doIt class
+status: 0
+
+field: r
+output: Foo 
+output: doIt 
 status: 0
 
 field: s
@@ -76,43 +106,13 @@ output: Foo -
 output: doIt -
 status: 0
 
-field: z
-output: Foo class
-output: doIt member
-status: 0
-
-field: r
-output: Foo 
-output: doIt 
-status: 0
-
-field: R
-output: Foo D
-output: doIt D
-status: 0
-
-field: Z
-output: Foo 
-output: doIt Foo
-status: 0
-
-field: E
-output: Foo 
-output: doIt 
-status: 0
-
 field: x
 output: Foo 
 output: doIt 
 status: 0
 
-field: p
-output: Foo 
-output: doIt class
-status: 0
-
-field: e
-output: Foo 3
-output: doIt 3
+field: z
+output: Foo class
+output: doIt member
 status: 0
 
