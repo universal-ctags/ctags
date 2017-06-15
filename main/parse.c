@@ -3522,6 +3522,9 @@ extern void printLanguageSubparsers (const langType language)
  * A parser for CTagsSelfTest (CTST)
  */
 #define SELF_TEST_PARSER "CTagsSelfTest"
+#ifdef DEBUG
+extern void getppid(void);
+#endif
 
 typedef enum {
 	K_BROKEN,
@@ -3530,6 +3533,9 @@ typedef enum {
 	K_NOTHING_SPECIAL,
 	K_GUEST_BEGINNING,
 	K_GUEST_END,
+#ifdef DEBUG
+	K_CALL_GETPPID,
+#endif
 	KIND_COUNT
 } CTST_Kind;
 
@@ -3552,6 +3558,9 @@ static kindDefinition CTST_Kinds[KIND_COUNT] = {
 	{true, 'N', "nothingSpecial", "emit a normal tag" },
 	{true, 'B', NULL, "beginning of an area for a guest" },
 	{true, 'E', NULL, "end of an area for a guest" },
+#ifdef DEBUG
+	{true, 'P', "callGetPPid", "trigger calling getppid(2) that seccomp sandbox disallows"},
+#endif
 };
 
 static void createCTSTTags (void)
@@ -3601,6 +3610,11 @@ static void createCTSTTags (void)
 						le = getInputLineNumber ();
 						makePromise (SELF_TEST_PARSER, lb + 1, 0, le, 0, lb + 1);
 						break;
+#ifdef DEBUG
+				    case K_CALL_GETPPID:
+						getppid();
+						break;
+#endif
 				}
 			}
 	}

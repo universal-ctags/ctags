@@ -80,6 +80,7 @@ MAIN_SRCS =				\
 	main/ptrarray.c			\
 	main/read.c			\
 	main/routines.c			\
+	main/seccomp.c			\
 	main/selectors.c		\
 	main/sort.c			\
 	main/strlist.c			\

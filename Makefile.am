@@ -68,6 +68,7 @@ ctags_LDADD  =
 ctags_LDADD += $(LIBXML_LIBS)
 ctags_LDADD += $(JANSSON_LIBS)
 ctags_LDADD += $(LIBYAML_LIBS)
+ctags_LDADD += $(SECCOMP_LIBS)
 
 nodist_ctags_SOURCES = $(REPOINFO_HEADS)
 BUILT_SOURCES = $(REPOINFO_HEADS)
@@ -117,4 +118,3 @@ SUFFIXES = .1.rst .1 .7.rst .7
 .7.rst.7:
 	$(rst2man_verbose)$(RST2MAN) $< $@
 endif
-

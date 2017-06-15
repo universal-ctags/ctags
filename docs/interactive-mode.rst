@@ -33,7 +33,7 @@ The ``generate-tags`` command takes two arguments:
 - ``filename``: name of the file to generate tags for (required)
 - ``size``: size in bytes of the file, if the contents will be received over stdin (optional)
 
-The simplest way to generate tags for a file is by passing its path on disk. The response will include
+The simplest way to generate tags for a file is by passing its path on filesystem(``file request``). The response will include
 one json object per line representing each tag, followed by a single json object with the ``completed``
 field emitted once the file has been fully processed.
 
@@ -44,7 +44,7 @@ field emitted once the file has been fully processed.
     {"_type": "tag", "name": "foobar", "path": "test.rb", "pattern": "/^  def foobar$/", "kind": "method", "scope": "Test", "scopeKind": "class"}
     {"_type":"completed", "command": "generate-tags"}
 
-The ``generate-tags`` command can also be used to generate tags for code which is not present on disk. For example,
+The ``generate-tags`` command can also be used to generate tags for code which is not present on filesystem(``inline request``). For example,
 an IDE might want to generate ctags for an unsaved buffer while the user is editing code. When ``size`` is specified,
 the corresponding number of bytes are read over stdin after the json object and newline.
 
@@ -59,3 +59,36 @@ the corresponding number of bytes are read over stdin after the json object and 
     {"_type": "completed", "command": "generate-tags"}
 
 .. _json lines: http://jsonlines.org/
+
+.. _sandbox-submode:
+
+sandbox submode
+--------------------------
+
+``sandbox`` submode can be used with ``--_interactive=sandbox``.  This
+submode will activate a sandbox, to this limits the damage that the
+can be achieved when exploiting a buffer overflow in Universal-ctags.
+
+In the sandbox submode ctags can generate tags only for inline
+requests because ctags has to use open system call to handle file
+requests. The open system call is not allowed in the sandbox.
+
+This feature uses seccomp-bpf, and is only supported on Linux.
+To use the submode libseccomp is needed at build-time. If ctags was
+built with seccomp support, ``sandbox`` is listed in the output of
+``--list-features`` option.
+
+.. code-block:: console
+
+	$ ./ctags --list-features | grep sandbox
+	sandbox
+
+.. code-block:: console
+
+    $ (
+      echo '{"command":"generate-tags", "filename":"test.rb", "size": 17}'
+      echo 'def foobaz() end'
+    ) | ctags --_interactive=sandbox
+    {"_type": "program", "name": "Universal Ctags", "version": "0.0.0"}
+    {"_type": "tag", "name": "foobaz", "path": "test.rb", "pattern": "/^def foobaz() end$/", "kind": "method"}
+    {"_type": "completed", "command": "generate-tags"}

@@ -362,7 +362,7 @@ state of all kinds in the kind group as specified with the option.
 
 The example output indicates that the `d` kinds of both the C++ and C
 parsers are in the same group and that the `C` parser manages the
-group. 
+group.
 
 .. code-block:: console
 
@@ -656,9 +656,8 @@ can be used to control ctags generation programatically.
 
 See :ref:`--_interactive Mode <interactive-mode>` for more details.
 
-
-..
-	NOT REVIEWED YET
+``--_interactive=sandbox`` adds up seccomp filter. See
+:ref:`sandbox submode <sandbox-submode>` for more details.
 
 Defining a kind
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

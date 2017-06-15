@@ -494,8 +494,27 @@ static void batchMakeTags (cookedArgs *args, void *user CTAGS_ATTR_UNUSED)
 }
 
 #ifdef HAVE_JANSSON
-void interactiveLoop (cookedArgs *args CTAGS_ATTR_UNUSED, void *user CTAGS_ATTR_UNUSED)
+void interactiveLoop (cookedArgs *args CTAGS_ATTR_UNUSED, void *user)
 {
+	struct interactiveModeArgs *iargs = user;
+
+	if (iargs->sandbox) {
+		/* As of jansson 2.6, the object hashing is seeded off
+		   of /dev/urandom, so trigger the hash seeding
+		   before installing the syscall filter.
+		*/
+		json_t * tmp = json_object ();
+		json_decref (tmp);
+
+		if (installSyscallFilter ()) {
+			error (FATAL, "install_syscall_filter failed");
+			/* The explicit exit call is needed because
+			   "error (FATAL,..." just prints a message in
+			   interactive mode. */
+			exit (1);
+		}
+	}
+
 	char buffer[1024];
 	json_t *request;
 
@@ -537,6 +556,12 @@ void interactiveLoop (cookedArgs *args CTAGS_ATTR_UNUSED, void *user CTAGS_ATTR_
 			openTagFile ();
 			if (size == -1)
 			{					/* read from disk */
+				if (iargs->sandbox) {
+					error (FATAL,
+						   "invalid request in sandbox submode: reading file contents from a file is limited");
+					goto next;
+				}
+
 				createTagsForEntry (filename);
 			}
 			else

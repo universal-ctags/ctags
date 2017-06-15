@@ -9,9 +9,19 @@
 #ifndef CTAGS_MAIN_INTERACTIVE_H
 #define CTAGS_MAIN_INTERACTIVE_H
 
-void interactiveLoop (cookedArgs *args, void *user CTAGS_ATTR_UNUSED);
+#include "general.h"
+#include "options.h"
+
+
+struct interactiveModeArgs
+{
+	bool sandbox;
+};
+
+void interactiveLoop (cookedArgs *args, void *user);
 bool jsonErrorPrinter (const errorSelection selection, const char *const format, va_list ap,
 					  void *data);
+int installSyscallFilter (void);
 
 #endif  /* CTAGS_MAIN_INTERACTIVE_H */
 

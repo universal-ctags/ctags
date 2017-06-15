@@ -15,17 +15,37 @@
 
 make --version
 
-./autogen.sh
+#
+# Our sandbox doesn't work with gcov.
+# Follwoing cases target ctags without gcov.
+#
+SANDBOX_CASES=sandbox,sandbox-crash,sandbox-default-req,sandbox-unknown-submode
 
-./configure --enable-debugging --enable-iconv --enable-coverage-gcov
 
 if [ "$TARGET" = "Unix" ]; then
+
+	./autogen.sh
+	CONFIGURE_CMDLINE="./configure --enable-debugging --enable-iconv "
+
     if [ "$TRAVIS_OS_NAME" = "linux" ] && [ "$CC" = "gcc" ]; then
-        make -j2 COVERAGE=1
-    else
+
+        ${CONFIGURE_CMDLINE}
         make -j2
+        echo 'Run "make tmain (sandbox only)" without gcov'
+        make -j2 tmain TRAVIS=1 UNITS=${SANDBOX_CASES}
+
+        make clean
+
+		${CONFIGURE_CMDLINE} --enable-coverage-gcov
+        make -j2 COVERAGE=1
+        echo 'Run "make check" with gcov'
+        make -j2 check TRAVIS=1
+
+    else
+		${CONFIGURE_CMDLINE}
+        make -j2
+        make -j2 check TRAVIS=1
     fi
-    make -j2 check TRAVIS=1
 elif [ "$TARGET" = "Mingw32" ]; then
     make -j2 CC=i686-w64-mingw32-gcc -f mk_mingw.mak
     # Don't run test units in Mingw32 target

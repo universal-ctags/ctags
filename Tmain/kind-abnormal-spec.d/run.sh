@@ -5,11 +5,11 @@ CTAGS=$1
 O="--quiet --options=NONE"
 
 echo '# list kinds'
-${CTAGS} ${O} --languages=+CTagsSelfTest --list-kinds=CTagsSelfTest | tr '\0' '_'
+${CTAGS} ${O} --languages=+CTagsSelfTest --list-kinds=CTagsSelfTest | tr '\0' '_' | grep -v seccomp
 echo
 
 echo '# list kinds-full'
-${CTAGS} ${O} --languages=+CTagsSelfTest --list-kinds-full=CTagsSelfTest | tr '\0' '_'
+${CTAGS} ${O} --languages=+CTagsSelfTest --list-kinds-full=CTagsSelfTest | tr '\0' '_' | grep -v seccomp
 echo
 
 echo '# +K'

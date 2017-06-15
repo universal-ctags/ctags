@@ -39,6 +39,7 @@ addons:
       - gcc-mingw-w64-i686
       - libjansson-dev
       - libyaml-dev
+      - libseccomp-dev
 
 env:
   - TARGET=Unix

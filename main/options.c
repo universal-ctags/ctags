@@ -428,8 +428,15 @@ static optionDescription LongOptionDescription [] = {
  {1,"       Quit when the option is processed. Useful to debug the chain"},
  {1,"       of loading option files."},
 #ifdef HAVE_JANSSON
- {0,"  --_interactive"},
+ {0,"  --_interactive"
+#ifdef HAVE_SECCOMP
+  "=[default|sandbox]"
+#endif
+ },
  {0,"       Enter interactive mode (json over stdio)."},
+#ifdef HAVE_SECCOMP
+ {0,"       Enter file I/O limited interactive mode if sandbox is specified. [default]"},
+#endif
 #endif
  {1,"  --_list-roles=[[language|all]:[kindletters|*]]"},
  {1,"       Output list of all roles of tag kind(s) specified for language(s)."},
@@ -490,6 +497,9 @@ static const char *const Features [] = {
 #ifdef HAVE_JANSSON
 	"json",
 	"interactive",
+#endif
+#ifdef HAVE_SECCOMP
+	"sandbox",
 #endif
 #ifdef HAVE_LIBYAML
 	"yaml",
@@ -1440,11 +1450,34 @@ static void processHelpOption (
 #ifdef HAVE_JANSSON
 static void processInteractiveOption (
 		const char *const option CTAGS_ATTR_UNUSED,
-		const char *const parameter CTAGS_ATTR_UNUSED)
+		const char *const parameter)
 {
+	static struct interactiveModeArgs args;
+
 	Option.interactive = true;
+
+	if (parameter && (strcmp (parameter, "sandbox") == 0))
+		args.sandbox = true;
+	else if (parameter && (strcmp (parameter, "default") == 0))
+		args.sandbox = false;
+	else if ((!parameter) || *parameter == '\0')
+		args.sandbox = false;
+	else
+		error (FATAL, "Unknown option argument \"%s\" for --%s option",
+			   parameter, option);
+
+#ifndef HAVE_SECCOMP
+	if (args.sandbox)
+		error (FATAL, "sandbox submode is not supported on this platform");
+#endif
+
+#ifdef ENABLE_GCOV
+	if (args.sandbox)
+		error (FATAL, "sandbox submode does not work if gcov is instrumented");
+#endif
+
 	Option.sorted = SO_UNSORTED;
-	setMainLoop (interactiveLoop, NULL);
+	setMainLoop (interactiveLoop, &args);
 	setErrorPrinter (jsonErrorPrinter, NULL);
 	setTagWriter (WRITER_JSON);
 	enablePtag (PTAG_JSON_OUTPUT_VERSION, true);
@@ -2488,9 +2521,6 @@ static parametricOption ParametricOptions [] = {
 	{ "filter-terminator",      processFilterTerminatorOption,  true,   STAGE_ANY },
 	{ "format",                 processFormatOption,            true,   STAGE_ANY },
 	{ "help",                   processHelpOption,              true,   STAGE_ANY },
-#ifdef HAVE_JANSSON
-	{ "_interactive",            processInteractiveOption,       true,   STAGE_ANY },
-#endif
 	{ "if0",                    processIf0Option,               false,  STAGE_ANY },
 #ifdef HAVE_ICONV
 	{ "input-encoding",         processInputEncodingOption,     false,  STAGE_ANY },
@@ -2530,6 +2560,9 @@ static parametricOption ParametricOptions [] = {
 	{ "_echo",                  processEchoOption,              false,  STAGE_ANY },
 	{ "_force-initializing",    processForceInitOption,         false, STAGE_ANY },
 	{ "_force-quit",            processForceQuitOption,         false,  STAGE_ANY },
+#ifdef HAVE_JANSSON
+	{ "_interactive",           processInteractiveOption,       true,   STAGE_ANY },
+#endif
 	{ "_xformat",               processXformatOption,           false,  STAGE_ANY },
 };
 
