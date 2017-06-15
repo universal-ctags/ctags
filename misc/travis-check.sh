@@ -18,11 +18,13 @@ make --version
 if [ "$TARGET" = "Unix" ]; then
 
 	./autogen.sh
-	./configure --enable-debugging --enable-iconv --enable-coverage-gcov
+	CONFIGURE_CMDLINE="./configure --enable-debugging --enable-iconv "
 
     if [ "$TRAVIS_OS_NAME" = "linux" ] && [ "$CC" = "gcc" ]; then
+		${CONFIGURE_CMDLINE} --enable-coverage-gcov
         make -j2 COVERAGE=1
     else
+		${CONFIGURE_CMDLINE}
         make -j2
     fi
     make -j2 check TRAVIS=1
