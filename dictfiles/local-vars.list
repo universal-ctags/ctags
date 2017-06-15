@@ -6,6 +6,7 @@ dictfile
 dirs
 downcase
 dup
+endline
 ffile
 fn
 fname
@@ -29,6 +30,7 @@ oname
 optname
 outdir
 ptrn
+sep
 slist
 submode
 subtag
