@@ -1819,6 +1819,9 @@ tmain_run ()
 {
     local topdir=$1
     local build_topdir=$2
+    shift 2
+    local units="$@"
+
     local subdir
     local basedir
 
@@ -1845,11 +1848,16 @@ tmain_run ()
 	    return 1
 	fi
 
+	test_name=$(basename ${subdir} .d)
+
+	if [ -n "${units}" ] && ! member_p "${test_name}" ${units}; then
+	    continue
+	fi
+
 	build_subdir=${build_topdir}/$(basename ${subdir})
 	if ! mkdir -p ${build_subdir}; then
 	    return 1
 	fi
-	test_name=$(basename ${subdir} .d)
 
 	rm -f ${build_subdir}/*-actual.txt
 
@@ -1960,6 +1968,15 @@ action_tmain ()
 		READTAGS="${1#--readtags=}"
 		shift
 		;;
+	    --units)
+		shift
+		UNITS=$(echo "$1" | tr ',' ' ')
+		shift
+		;;
+	    --units=*)
+		UNITS=$(echo "${1#--units=}" | tr ',' ' ')
+		shift
+		;;
 	    -*)
 		ERROR 1 "unknown option \"${1}\" for ${action} action"
 		;;
@@ -1967,7 +1984,9 @@ action_tmain ()
 		tmain_dir="$1"
 		shift
 		build_dir=${1:-${tmain_dir}}
-		shift
+		if [ -n "$1" ]; then
+		    shift
+		fi
 		break
 		;;
 	esac
@@ -2001,7 +2020,7 @@ action_tmain ()
 	ERROR 1 "unexpected option argument for --colorized-output: ${COLORIZED_OUTPUT}"
     fi
 
-    tmain_run ${tmain_dir} ${build_dir}
+    tmain_run ${tmain_dir} ${build_dir} ${UNITS}
     return $?
 }
 
@@ -2010,14 +2029,16 @@ help_tmain ()
     cat <<EOF
 $0 tmain [OPTIONS] TMAIN-DIR [BUILD-DIR]
 
-	Run tests for main part of ctags.
+	   Run tests for main part of ctags.
+	   If BUILD-DIR is not given, TMAIN-DIR is reused as BUILD-DIR.
 
-	--ctags CTAGS: ctags exectuable file for testing
-	--colorized-output yes|no: print the result in color.
-	--with-valgrind: (not implemented) run a test case under valgrind
-	--show-diff-output: (not implemented)show diff output for failed test cases in the summary.
+	   OPTIONS:
 
-	If BUILD-DIR is not given, TMAIN-DIR is reused as BUILD-DIR.
+		--ctags CTAGS: ctags exectuable file for testing
+		--colorized-output yes|no: print the result in color.
+		--with-valgrind: (not implemented) run a test case under valgrind
+		--show-diff-output: (not implemented)show diff output for failed test cases in the summary.
+		--units UNITS1[,UNITS2,...]: run only Tmain/UNIT*.d (.d is not needed)
 EOF
 }
 
@@ -2065,8 +2086,10 @@ EOF
 help_chop ()
 {
 cat <<EOF
-$0 noise [OPTIONS] UNITS-DIR
+$0 chop [OPTIONS] UNITS-DIR
+
 	   OPTIONS:
+
 		--ctags CTAGS: ctags exectuable file for testing
 		--languages PARSER1[,PARSER2,...]: run only PARSER* related cases
 		--quiet: don't print dots as passed test cases.

@@ -1,3 +1,4 @@
+# -*- makefile -*-
 .PHONY: help
 help:
 	@echo "Compilation targets:"
@@ -20,3 +21,5 @@ help:
 	@echo "VG=1                              - Run test cases with Valgrind memory profiler"
 	@echo "LANGUAGES=<language>[,<language>] - Only run test cases of the selected languages"
 	@echo "CATEGORIES=<category>             - Only run tests available under folder Units/<category>.r"
+	@echo "UNITS=<case>[,<case>]             - Only run tests named Units/[category.r/]/<case>.d in units target"
+	@echo "                                                         Tmain/<case>.d in tmain target"

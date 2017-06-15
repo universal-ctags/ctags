@@ -1,3 +1,4 @@
+# -*- makefile -*-
 TRANSLATOR_INPUT = \
 	optlib/RSpec.ctags		\
 	optlib/ctags-optlib.ctags		\

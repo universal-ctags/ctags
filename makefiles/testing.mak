@@ -1,3 +1,4 @@
+# -*- makefile -*-
 .PHONY: check units fuzz noise tmain tinst clean-units clean-tmain clean-gcov run-gcov codecheck cppcheck
 
 check: tmain units
@@ -112,6 +113,7 @@ tmain: $(CTAGS_TEST)
 	\
 	c="$(srcdir)/misc/units tmain \
 		--ctags=$(CTAGS_TEST) \
+		--units=$(UNITS) \
 		$${VALGRIND} \
 		$${SHOW_DIFF_OUTPUT}"; \
 	TRAVIS=$(TRAVIS) APPVEYOR=$(APPVEYOR) \
