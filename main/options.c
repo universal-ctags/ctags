@@ -317,7 +317,7 @@ static optionDescription LongOptionDescription [] = {
  {1,"       Output list of alias patterns."},
  {1,"  --list-extensions=[language|all]"},
  {1,"       Output list of language extensions in mapping."},
- {1,"  --list-extras"},
+ {1,"  --list-extras=[language|all]"},
  {1,"       Output list of extra tag flags."},
  {1,"  --list-features"},
  {1,"       Output list of features."},
