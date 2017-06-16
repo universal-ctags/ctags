@@ -1116,6 +1116,7 @@ extern void   pushNarrowedInputStream (const langType language,
 	BackupFile = File;
 
 	File.mio = subio;
+	File.bomFound = false;
 	File.nestedInputStreamInfo.startLine = startLine;
 	File.nestedInputStreamInfo.startCharOffset = startCharOffset;
 	File.nestedInputStreamInfo.endLine = endLine;
