@@ -1007,7 +1007,7 @@ this option.
 
 Although the facility for collecting reference tags is implemented,
 only a few parsers currently utilize it. All available roles can be
-listed with ``--list-roles``:
+listed with ``--_list-roles``:
 
 .. code-block:: console
 
@@ -1034,7 +1034,7 @@ The third column shows the name of the role.
 The fourth column shows the description of the role.
 The fifth column shows whether the role is enabled or not.
 
-Currently ctags doesn't provide the means for disabling a
+Currently ctags doesn't provide the way for disabling a
 specified role.
 
 
