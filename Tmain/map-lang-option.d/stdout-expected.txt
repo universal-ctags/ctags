@@ -1,4 +1,4 @@
-Automake Makefile.am
+Automake *.am Makefile.am
 HTML     *.htm *.html
 Make     *.mak *.mk [Mm]akefile GNUmakefile
 Ruby     *.rb *.ruby
