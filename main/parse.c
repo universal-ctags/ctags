@@ -2182,55 +2182,34 @@ extern bool processKindsOption (
 #undef PREFIX_LEN
 }
 
-static void printRoles (const langType language, const char* letters, bool allowMissingKind)
+extern void printLanguageRoles (const langType language, const char* letters,
+								bool withListHeader, bool machinable, FILE *fp)
 {
-	parserObject *parser = LanguageTable + language;
-	struct kindControlBlock *kcb = parser->kindControlBlock;
-	const parserDefinition* const lang = parser->def;
-	const char *c;
+	struct colprintTable *table = roleColprintTableNew();
+	parserObject *parser;
 
-	if (lang->invisible)
-		return;
+	initializeParser (language);
 
-	for (c = letters; *c != '\0'; c++)
-	{
-		unsigned int i;
-		const kindDefinition *k;
-
-		for (i = 0; i < countKinds (kcb); ++i)
-		{
-			k = getKind(kcb, i);
-			if (*c == KIND_WILDCARD || k->letter == *c)
-			{
-				int j;
-				const roleDesc *r;
-
-				for (j = 0; j < k->nRoles; j++)
-				{
-					r = k->roles + j;
-					printf ("%s\t%c\t", lang->name, k->letter);
-					printRole (r);
-				}
-				if (*c != KIND_WILDCARD)
-					break;
-			}
-		}
-		if ((i == countKinds (kcb)) && (*c != KIND_WILDCARD) && (!allowMissingKind))
-			error (FATAL, "No such letter kind in %s: %c\n", lang->name, *c);
-	}
-}
-
-extern void printLanguageRoles (const langType language, const char* letters)
-{
 	if (language == LANG_AUTO)
 	{
-		unsigned int i;
-		for (i = 0  ;  i < LanguageCount  ;  ++i)
-			printRoles (i, letters, true);
+		for (unsigned int i = 0  ;  i < LanguageCount  ;  ++i)
+		{
+			if (!isLanguageVisible (i))
+				continue;
+
+			parser = LanguageTable + i;
+			roleColprintAddRoles (table, parser->kindControlBlock, letters);
+		}
 	}
 	else
-		printRoles (language, letters, false);
+	{
+		parser = LanguageTable + language;
+		roleColprintAddRoles (table, parser->kindControlBlock, letters);
+	}
 
+	roleColprintTablePrint (table, (language != LANG_AUTO),
+							withListHeader, machinable, fp);
+	colprintTableDelete (table);
 }
 
 static void printKinds (langType language, bool indent,

@@ -9,6 +9,7 @@ dirs
 downcase
 dup
 endline
+entrypoint
 ffile
 fn
 fname
@@ -21,6 +22,9 @@ input0
 jstype
 kcb
 kdef
+kindletters
+kindln
+kletters
 langs
 len
 msg

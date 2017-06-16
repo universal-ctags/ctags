@@ -19,7 +19,6 @@ typedef struct sRoleDesc {
 	const char* description;	  /* displayed in --help output */
 } roleDesc;
 
-extern void printRole (const roleDesc* const role); /* for --help */
 extern const char *renderRole (const roleDesc* const role, vString* b);
 
 /*
@@ -103,6 +102,13 @@ extern struct colprintTable * kindColprintTableNew (void);
 extern void kindColprintAddLanguageLines (struct colprintTable *table,
 										  struct kindControlBlock* kcb);
 extern void kindColprintTablePrint (struct colprintTable *table, bool noparser,
+									bool withListHeader, bool machinable, FILE *fp);
+
+extern struct colprintTable * roleColprintTableNew (void);
+extern void roleColprintAddRoles (struct colprintTable *table,
+								  struct kindControlBlock* kcb,
+								  const char *kletters);
+extern void roleColprintTablePrint (struct colprintTable *table, bool noparser,
 									bool withListHeader, bool machinable, FILE *fp);
 
 #ifdef DEBUG

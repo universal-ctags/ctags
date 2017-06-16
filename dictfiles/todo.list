@@ -17,3 +17,9 @@ ccld
 xffffffff
 # 0UL
 ul
+# roles?
+ltlibraries
+ltlibrary
+macrofile
+sincluded
+sourcefile

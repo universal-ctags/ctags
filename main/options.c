@@ -447,9 +447,9 @@ static optionDescription LongOptionDescription [] = {
  {0,"       Enter file I/O limited interactive mode if sandbox is specified. [default]"},
 #endif
 #endif
- {1,"  --_list-roles=[[language|all]:[kindletters|*]]"},
+ {1,"  --_list-roles=[[language|all].[kindletters|*]]"},
  {1,"       Output list of all roles of tag kind(s) specified for language(s)."},
- {1,"       e.g. --_list-roles=Make:I"},
+ {1,"       e.g. --_list-roles=Make.I"},
  {1,"  --_xformat=field_format"},
  {1,"       Specify custom format for tabular cross reference (-x)."},
  {1,"       Fields can be specified with letter listed in --list-fields."},
@@ -2040,7 +2040,10 @@ static void processListRolesOptions (const char *const option CTAGS_ATTR_UNUSED,
 
 	if (parameter == NULL || parameter[0] == '\0')
 	{
-		printLanguageRoles (LANG_AUTO, "*");
+		printLanguageRoles (LANG_AUTO, "*",
+							localOption.withListHeader,
+							localOption.machinable,
+							stdout);
 		exit (0);
 	}
 
@@ -2065,7 +2068,10 @@ static void processListRolesOptions (const char *const option CTAGS_ATTR_UNUSED,
 		if (lang == LANG_IGNORE)
 			error (FATAL, "Unknown language \"%s\" in \"%s\"", parameter, option);
 	}
-	printLanguageRoles (lang, kindletters);
+	printLanguageRoles (lang, kindletters,
+						localOption.withListHeader,
+						localOption.machinable,
+						stdout);
 	exit (0);
 }
 

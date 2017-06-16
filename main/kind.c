@@ -18,6 +18,7 @@
 #include "kind.h"
 #include "parse.h"
 #include "options.h"
+#include "vstring.h"
 
 typedef struct sKindObject {
 	kindDefinition *def;
@@ -29,12 +30,6 @@ struct kindControlBlock {
 	unsigned int count;
 	langType owner;
 };
-
-extern void printRole (const roleDesc* const role)
-{
-	if (role)
-		printf ("%s\t%s\t%s\n", role->name, role->description, role->enabled? "on": "off");
-}
 
 extern const char *renderRole (const roleDesc* const role, vString* b)
 {
@@ -310,5 +305,91 @@ extern void kindColprintTablePrint (struct colprintTable *table, bool noparser,
 									bool withListHeader, bool machinable, FILE *fp)
 {
 	colprintTableSort (table, kindColprintCompareLines);
+	colprintTablePrint (table, noparser? 1: 0, withListHeader, machinable, fp);
+}
+
+
+extern struct colprintTable * roleColprintTableNew (void)
+{
+	return colprintTableNew ("L:LANGUAGE", "L:KIND(L/N)", "L:NAME",
+							 "L:ENABLED", "L:DESCRIPTION", NULL);
+}
+
+extern void roleColprintAddRoles (struct colprintTable *table, struct kindControlBlock *kcb,
+								  const char *kletters)
+{
+	const char* lang;
+	vString *kind_l_and_n;
+
+	lang = getLanguageName (kcb->owner);
+	kind_l_and_n = vStringNew ();
+	for (const char *c = kletters; *c != '\0'; c++)
+	{
+		for (unsigned int i = 0; i < countKinds (kcb); i++)
+		{
+			const kindDefinition *k = getKind (kcb, i);
+			if (*c == KIND_WILDCARD || k->letter == *c)
+			{
+				for (int j = 0; j < k->nRoles; j++)
+				{
+					const roleDesc *r = k->roles + j;
+					struct colprintLine *line = colprintTableGetNewLine(table);
+
+					colprintLineAppendColumnCString (line, lang);
+
+					vStringPut (kind_l_and_n, k->letter);
+					vStringPut (kind_l_and_n, '/');
+					vStringCatS (kind_l_and_n, k->name);
+					colprintLineAppendColumnVString (line, kind_l_and_n);
+					vStringClear (kind_l_and_n);
+
+					colprintLineAppendColumnCString (line, r->name);
+					colprintLineAppendColumnCString (line,
+													 r->enabled ? "on" : "off");
+					colprintLineAppendColumnCString (line, r->description);
+				}
+				if (*c != KIND_WILDCARD)
+					break;
+			}
+		}
+	}
+	vStringDelete (kind_l_and_n);
+#if 0
+	if ((i == countKinds (kcb)) && (*c != KIND_WILDCARD) && (!allowMissingKind))
+		error (FATAL, "No such letter kind in %s: %c\n", lang->name, *c);
+#endif
+}
+
+static int roleColprintCompareLines(struct colprintLine *a, struct colprintLine *b)
+{
+	int r;
+
+	const char *a_parser, *b_parser;
+	a_parser = colprintLineGetColumn (a, 0);
+	b_parser = colprintLineGetColumn (b, 0);
+
+	r = strcmp(a_parser, b_parser);
+	if (r != 0)
+		return r;
+
+	const char *a_kindln, *b_kindln;
+	a_kindln = colprintLineGetColumn (a, 1);
+	b_kindln = colprintLineGetColumn (b, 1);
+
+	r = strcmp(a_kindln, b_kindln);
+	if (r != 0)
+		return r;
+
+	const char *a_role, *b_role;
+	a_role = colprintLineGetColumn (a, 2);
+	b_role = colprintLineGetColumn (b, 2);
+
+	return strcmp(a_role, b_role);
+}
+
+extern void roleColprintTablePrint (struct colprintTable *table, bool noparser,
+									bool withListHeader, bool machinable, FILE *fp)
+{
+	colprintTableSort (table, roleColprintCompareLines);
 	colprintTablePrint (table, noparser? 1: 0, withListHeader, machinable, fp);
 }
