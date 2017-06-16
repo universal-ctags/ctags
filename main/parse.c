@@ -2253,7 +2253,8 @@ static void printKinds (langType language, bool indent,
 	}
 }
 
-extern void printLanguageKinds (const langType language, bool allKindFields)
+extern void printLanguageKinds (const langType language, bool allKindFields,
+								bool withListHeader, bool machinable, FILE *fp)
 {
 	struct colprintTable * table = NULL;
 
@@ -2280,7 +2281,7 @@ extern void printLanguageKinds (const langType language, bool allKindFields)
 	if (allKindFields)
 	{
 		kindColprintTablePrint(table, (language == LANG_AUTO)? 0: 1,
-							   Option.withListHeader, Option.machinable, stdout);
+							   withListHeader, machinable, fp);
 		colprintTableDelete (table);
 	}
 }

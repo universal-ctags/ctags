@@ -176,13 +176,19 @@ optionValues Option = {
 	.patternLengthLimit = 96,
 	.putFieldPrefix = false,
 	.maxRecursionDepth = 0xffffffff,
-	.machinable = false,
-	.withListHeader = true,
 	.interactive = false,
 #ifdef DEBUG
 	.debugLevel = 0,
 	.breakLine = 0,
 #endif
+};
+
+struct localOptionValues {
+	bool machinable;			/* --machinable */
+	bool withListHeader;		/* --with-list-header */
+} localOption = {
+	.machinable = false,
+	.withListHeader = true,
 };
 
 static OptionLoadingStage Stage = OptionLoadingStageNone;
@@ -1407,7 +1413,7 @@ static void processListFeaturesOption(const char *const option CTAGS_ATTR_UNUSED
 	}
 
 	colprintTableSort (table, featureCompare);
-	colprintTablePrint (table, 0, Option.withListHeader, Option.machinable, stdout);
+	colprintTablePrint (table, 0, localOption.withListHeader, localOption.machinable, stdout);
 	colprintTableDelete (table);
 
 	if (i == 0)
@@ -1441,7 +1447,7 @@ static void processListFieldsOption(const char *const option CTAGS_ATTR_UNUSED,
 		fieldColprintAddLanguageLines (table, language);
 	}
 
-	fieldColprintTablePrint (table, Option.withListHeader, Option.machinable, stdout);
+	fieldColprintTablePrint (table, localOption.withListHeader, localOption.machinable, stdout);
 	colprintTableDelete (table);
 	exit (0);
 }
@@ -1918,7 +1924,7 @@ static void processListExtrasOption (
 		xtagColprintAddLanguageLines (table, language);
 	}
 
-	xtagColprintTablePrint (table, Option.withListHeader, Option.machinable, stdout);
+	xtagColprintTablePrint (table, localOption.withListHeader, localOption.machinable, stdout);
 	colprintTableDelete (table);
 	exit (0);
 }
@@ -1929,14 +1935,16 @@ static void processListKindsOption (
 	bool print_all = (strcmp (option, "list-kinds-full") == 0)? true: false;
 
 	if (parameter [0] == '\0' || strcasecmp (parameter, "all") == 0)
-		printLanguageKinds (LANG_AUTO, print_all);
+		printLanguageKinds (LANG_AUTO, print_all,
+							localOption.withListHeader, localOption.machinable, stdout);
 	else
 	{
 		langType language = getNamedLanguage (parameter, 0);
 		if (language == LANG_IGNORE)
 			error (FATAL, "Unknown language \"%s\" in \"%s\" option", parameter, option);
 		else
-			printLanguageKinds (language, print_all);
+			printLanguageKinds (language, print_all,
+								localOption.withListHeader, localOption.machinable, stdout);
 	}
 	exit (0);
 }
@@ -1946,7 +1954,7 @@ static void processListParametersOption (const char *const option,
 {
 	if (parameter [0] == '\0' || strcasecmp (parameter, "all") == 0)
 		printLanguageParameters (LANG_AUTO,
-								 Option.withListHeader, Option.machinable,
+								 localOption.withListHeader, localOption.machinable,
 								 stdout);
 	else
 	{
@@ -1955,7 +1963,7 @@ static void processListParametersOption (const char *const option,
 			error (FATAL, "Unknown language \"%s\" in \"%s\" option", parameter, option);
 		else
 			printLanguageParameters (language,
-									 Option.withListHeader, Option.machinable,
+									 localOption.withListHeader, localOption.machinable,
 									 stdout);
 	}
 	exit (0);
@@ -2010,7 +2018,7 @@ static void processListPseudoTagsOptions (
 		const char *const option CTAGS_ATTR_UNUSED,
 		const char *const parameter CTAGS_ATTR_UNUSED)
 {
-	printPtags (Option.withListHeader, Option.machinable, stdout);
+	printPtags (localOption.withListHeader, localOption.machinable, stdout);
 	exit (0);
 }
 
@@ -2018,7 +2026,7 @@ static void processListRegexFlagsOptions (
 		const char *const option CTAGS_ATTR_UNUSED,
 		const char *const parameter CTAGS_ATTR_UNUSED)
 {
-	printRegexFlags (Option.withListHeader, Option.machinable, stdout);
+	printRegexFlags (localOption.withListHeader, localOption.machinable, stdout);
 	exit (0);
 }
 
@@ -2071,7 +2079,7 @@ static void processListSubparsersOptions (const char *const option CTAGS_ATTR_UN
 		|| (strcmp(parameter, "all") == 0))
 	{
 		printLanguageSubparsers(LANG_AUTO,
-								Option.withListHeader, Option.machinable,
+								localOption.withListHeader, localOption.machinable,
 								stdout);
 		exit (0);
 	}
@@ -2081,7 +2089,7 @@ static void processListSubparsersOptions (const char *const option CTAGS_ATTR_UN
 		error (FATAL, "Unknown language \"%s\" in \"%s\"", parameter, option);
 
 	printLanguageSubparsers(lang,
-							Option.withListHeader, Option.machinable,
+							localOption.withListHeader, localOption.machinable,
 							stdout);
 	exit (0);
 }
@@ -2636,7 +2644,7 @@ static booleanOption BooleanOptions [] = {
 	{ "guess-language-eagerly", &Option.guessLanguageEagerly, false, STAGE_ANY },
 	{ "line-directives",&Option.lineDirectives,         false, STAGE_ANY },
 	{ "links",          &Option.followLinks,            false, STAGE_ANY },
-	{ "machinable",     &Option.machinable,             true,  STAGE_ANY },
+	{ "machinable",     &localOption.machinable,             true,  STAGE_ANY },
 	{ "put-field-prefix", &Option.putFieldPrefix,       false, STAGE_ANY },
 	{ "print-language", &Option.printLanguage,          true,  STAGE_ANY },
 	{ "quiet",          &Option.quiet,                  false, STAGE_ANY },
@@ -2645,7 +2653,7 @@ static booleanOption BooleanOptions [] = {
 #endif
 	{ "totals",         &Option.printTotals,            true,  STAGE_ANY },
 	{ "verbose",        &Option.verbose,                false, STAGE_ANY },
-	{ "with-list-header", &Option.withListHeader,       true,  STAGE_ANY },
+	{ "with-list-header", &localOption.withListHeader,       true,  STAGE_ANY },
 	{ "_fatal-warnings",&Option.fatalWarnings,          false, STAGE_ANY },
 };
 
