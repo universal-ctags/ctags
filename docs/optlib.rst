@@ -174,7 +174,7 @@ NOTE: This feature requires ``scandir`` library function. This feature may
 be disabled on which platform scandir is not available. Check ``option-directory``
 in the supported features::
 
-	$ ./ctags --list-features
+	$ ./ctags --list-features --with-list-header=no
 	wildcards
 	regex
 	option-directory

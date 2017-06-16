@@ -10,8 +10,10 @@ isupper
 isxdigit
 printf
 putc
+putchar
 puts
 qsort
+scandir
 stdarg
 strcat
 strchr

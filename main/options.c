@@ -1385,14 +1385,31 @@ static void printFeatureList (void)
 }
 
 
+static int featureCompare (struct colprintLine *a, struct colprintLine *b)
+{
+	return strcmp (colprintLineGetColumn (a, 0),
+				   colprintLineGetColumn (b, 0));
+}
+
 static void processListFeaturesOption(const char *const option CTAGS_ATTR_UNUSED,
 				      const char *const parameter CTAGS_ATTR_UNUSED)
 {
 	int i;
 
+	struct colprintTable *table = colprintTableNew ("L:NAME", NULL);
+
 	for (i = 0 ; Features [i] != NULL ; ++i)
+	{
+		struct colprintLine * line = colprintTableGetNewLine (table);
 		if (strcmp (Features [i], "regex") != 0 || checkRegex ())
-			printf ("%s\n", Features [i]);
+			colprintLineAppendColumnCString (line, Features [i]);
+
+	}
+
+	colprintTableSort (table, featureCompare);
+	colprintTablePrint (table, 0, Option.withListHeader, Option.machinable, stdout);
+	colprintTableDelete (table);
+
 	if (i == 0)
 		putchar ('\n');
 	exit (0);
