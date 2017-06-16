@@ -1763,7 +1763,7 @@ static flagDefinition PreLangDefFlagDef [] = {
 	{ '\0',  LANGDEF_FLAG_BIDIR,      NULL, pre_lang_def_flag_direction_long },
 };
 
-static void optlibFreeDep (langType lang, bool initialized)
+static void optlibFreeDep (langType lang, bool initialized CTAGS_ATTR_UNUSED)
 {
 	parserDefinition * pdef = LanguageTable [lang].def;
 
