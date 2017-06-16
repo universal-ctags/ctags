@@ -2366,7 +2366,7 @@ static void processEchoOption (const char *const option, const char *const param
 }
 
 static void processForceInitOption (const char *const option CTAGS_ATTR_UNUSED,
-				    const char *const parameter)
+				    const char *const parameter CTAGS_ATTR_UNUSED)
 {
 	verbose ("force initializing all built-in parsers\n");
 	initializeParser (LANG_AUTO);
