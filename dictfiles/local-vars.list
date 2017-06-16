@@ -2,6 +2,7 @@
 ap
 bmask
 buf
+descs
 dev
 dictfile
 dirs
@@ -32,6 +33,8 @@ nroles
 oname
 optname
 outdir
+pdesc
+ptags
 ptrn
 scb
 sep

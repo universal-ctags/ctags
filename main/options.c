@@ -2010,9 +2010,7 @@ static void processListPseudoTagsOptions (
 		const char *const option CTAGS_ATTR_UNUSED,
 		const char *const parameter CTAGS_ATTR_UNUSED)
 {
-	int i;
-	for (i = 0; i < PTAG_COUNT; i++)
-		printPtag (i);
+	printPtags (Option.withListHeader, Option.machinable, stdout);
 	exit (0);
 }
 

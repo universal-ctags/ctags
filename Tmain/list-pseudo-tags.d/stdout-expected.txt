@@ -1,10 +1,11 @@
-JSON_OUTPUT_VERSION	the version of json output stream format	off
-TAG_FILE_FORMAT	the version of tags file format	on
-TAG_FILE_SORTED	how tags are sorted	on
-TAG_PROGRAM_AUTHOR	the author of this ctags implementation	on
-TAG_PROGRAM_NAME	the name of this ctags implementation	on
-TAG_PROGRAM_URL	the official site URL of this ctags implementation	on
-TAG_PROGRAM_VERSION	the version of this ctags implementation	on
-TAG_KIND_SEPARATOR	the separators used in kinds	off
-TAG_KIND_DESCRIPTION	the letters, names and descriptions of kinds in a parser	off
-TAG_OUTPUT_MODE	the output mode: u-ctags or e-ctags	on
+#NAME                 ENABLED DESCRIPTION
+JSON_OUTPUT_VERSION   off     the version of json output stream format
+TAG_FILE_FORMAT       on      the version of tags file format
+TAG_FILE_SORTED       on      how tags are sorted
+TAG_KIND_DESCRIPTION  off     the letters, names and descriptions of kinds in a parser
+TAG_KIND_SEPARATOR    off     the separators used in kinds
+TAG_OUTPUT_MODE       on      the output mode: u-ctags or e-ctags
+TAG_PROGRAM_AUTHOR    on      the author of this ctags implementation
+TAG_PROGRAM_NAME      on      the name of this ctags implementation
+TAG_PROGRAM_URL       on      the official site URL of this ctags implementation
+TAG_PROGRAM_VERSION   on      the version of this ctags implementation
