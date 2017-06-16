@@ -602,7 +602,7 @@ static bool checkUTF8BOM (MIO *mio, bool skipIfFound)
 		&& (0xBF == mio_getc (mio)))
 		r = true;
 
-	if (r && skipIfFound)
+	if (! (r && skipIfFound))
 		mio_rewind (mio);
 	return r;
 }

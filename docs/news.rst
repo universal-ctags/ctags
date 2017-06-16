@@ -1636,7 +1636,7 @@ file is skipped when parsing.
 TODO:
 
 * Do the same in guessing and selecting parser stage.
-* Refect the BON detection to encoding option
+* Refect the BOM detection to encoding option
 
 
 Readtags
