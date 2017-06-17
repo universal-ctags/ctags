@@ -1049,6 +1049,8 @@ See "Choosing a proper parser in ctags" section.
 Incompatible changes to file name pattern and extension handling
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+.. IN MAN PAGE
+
 When guessing a proper parser for a given input file, Exuberant-ctags
 tests file name patterns AFTER file extensions (e-order).
 Universal-ctags does this differently; it tests file name patterns
