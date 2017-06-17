@@ -8,3 +8,5 @@ Rules for writing man pages
 
 * .. code-block:: LANGUAGE.. cannot be handled well in rst2man.
   However, if LANGUAGE is not given, it works.
+
+  See https://sourceforge.net/p/docutils/patches/141/
