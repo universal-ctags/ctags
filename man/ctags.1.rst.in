@@ -12,8 +12,8 @@ Generate tag files for source code
 
 SYNOPSIS
 --------
-|	**@CTAGS_NAME_EXECUTABLE@** [options] [file(s)]
-|	**@ETAGS_NAME_EXECUTABLE@** [options] [file(s)]
+|	**@CTAGS_NAME_EXECUTABLE@** [options] [source_file(s)]
+|	**@ETAGS_NAME_EXECUTABLE@** [options] [source_file(s)]
 
 
 DESCRIPTION
@@ -22,14 +22,14 @@ DESCRIPTION
 The **@CTAGS_NAME_EXECUTABLE@** and **@ETAGS_NAME_EXECUTABLE@** programs
 (hereinafter collectively referred to as @CTAGS_NAME_EXECUTABLE@,
 except where distinguished) generate an index (or "tag") file for a
-variety of language objects found in file(s). This tag file allows
+variety of **language objects** found in **source file(s)**. This tag file allows
 these items to be quickly and easily located by a text editor or other
-utilities. A "tag" signifies a language object for which an index entry is
+utilities (**client tools**). A **tag** signifies a language object for which an index entry is
 available (or, alternatively, the index entry created for that object).
 
 Alternatively, @CTAGS_NAME_EXECUTABLE@ can generate a cross reference
 file which lists, in human readable form, information about the various
-source objects found in a set of language files.
+language objects found in a set of source files.
 
 Tag index files are supported by numerous editors, which allow the user to
 locate the object associated with a name appearing in a source file and
@@ -37,14 +37,14 @@ jump to the file and line which defines the name. See the manual of your
 favorite editor about utilizing @CTAGS_NAME_EXECUTABLE@ command and
 the tag index files in the editor.
 
-@CTAGS_NAME_EXECUTABLE@ is capable of generating different kinds of tags
-for each of many different languages. For a complete list of supported
+@CTAGS_NAME_EXECUTABLE@ is capable of generating different **kinds** of tags
+for each of many different **languages**. For a complete list of supported
 languages, the names by which they are recognized, and the kinds of tags
 which are generated for each, see the ``--list-languages`` and ``--list-kinds``
 options.
 
-This man page describes Universal-ctags, an implementation of ctags
-derived from Exuberant-ctags. The major incompatible changes between
+This man page describes **Universal-ctags**, an implementation of ctags
+derived from **Exuberant-ctags**. The major incompatible changes between
 Universal-ctags and Exuberant-ctags are enumerated in
 ctags-incompatibilities(7).
 
@@ -62,7 +62,7 @@ SOURCE FILES
 ------------
 
 Unless the ``--language-force`` option is specified, the language of each source
-file is automatically selected based upon a mapping of file names to
+file is automatically selected based upon a **mapping** of file names to
 languages. The mappings in effect for each language may be displayed using
 the ``--list-maps`` option and may be changed using the ``--langmap`` option. On
 platforms which support it, if the name of a file is not mapped to a
@@ -79,7 +79,7 @@ names are mapped to languages will be scanned.
 The same extensions are mapped to multiple parsers. For example, ".h"
 are mapped to C++, C and ObjectiveC. These mappings can cause a
 trouble. @CTAGS_NAME_EXECUTABLE@ tries to select the proper parser
-for the input by applying kinds of heuristics to its content. However,
+for the source file by applying kinds of heuristics to its content. However,
 it is not perfect.  In that case use ``--language-for=<LANG>``,
 ``--langmap=map[,map[...]]``, or ``--map-<LANG>=-pattern|extension``
 options. (The heuristics are applied either ``--guess-language-eagerly`` is
@@ -781,7 +781,7 @@ built-in language names.
 	or the environment (see FILES).
 
 ``--print-language``
-	Just prints the parsers for specified input files, and then exits.
+	Just prints the parsers for specified source files, and then exits.
 
 ``--quiet[=yes|no]``
 	Write fewer messages (default is no).
