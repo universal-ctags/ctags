@@ -1764,10 +1764,19 @@ static void pre_lang_def_flag_direction_long (const char* const optflag, const c
 }
 
 static flagDefinition PreLangDefFlagDef [] = {
-	{ '\0',  "base",      NULL, pre_lang_def_flag_base_long },
-	{ '\0',  LANGDEF_FLAG_DEDICATED,  NULL, pre_lang_def_flag_direction_long },
-	{ '\0',  LANGDEF_FLAG_SHARED,     NULL, pre_lang_def_flag_direction_long },
-	{ '\0',  LANGDEF_FLAG_BIDIR,      NULL, pre_lang_def_flag_direction_long },
+	{ '\0',  "base", NULL, pre_lang_def_flag_base_long,
+	  "BASEPARSER", "utilize as a base parser"},
+	{ '\0',  LANGDEF_FLAG_DEDICATED,  NULL,
+	  pre_lang_def_flag_direction_long,
+	  NULL, "make the base parser dedicated to this subparser"},
+	{ '\0',  LANGDEF_FLAG_SHARED,     NULL,
+	  pre_lang_def_flag_direction_long,
+	  NULL, "share the base parser with the other subparsers"
+	},
+	{ '\0',  LANGDEF_FLAG_BIDIR,      NULL,
+	  pre_lang_def_flag_direction_long,
+	  NULL, "utilize the base parser both 'dedicated' and 'shared' way"
+	},
 };
 
 static void optlibFreeDep (langType lang, bool initialized CTAGS_ATTR_UNUSED)
@@ -3513,6 +3522,18 @@ extern void printLanguageSubparsers (const langType language,
 								 withListHeader, machinable,
 								 fp);
 	colprintTableDelete (table);
+}
+
+extern void printLangdefFlags (bool withListHeader, bool machinable, FILE *fp)
+{
+	struct colprintTable * table;
+
+	table = flagsColprintTableNew ();
+
+	flagsColprintAddDefinitions (table, PreLangDefFlagDef, ARRAY_SIZE (PreLangDefFlagDef));
+
+	flagsColprintTablePrint (table, withListHeader, machinable, fp);
+	colprintTableDelete(table);
 }
 
 /*

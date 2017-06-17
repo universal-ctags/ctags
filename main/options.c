@@ -335,7 +335,9 @@ static optionDescription LongOptionDescription [] = {
  {1,"  --list-kinds-full=[language|all]"},
  {1,"       List the details of all tag kinds for specified language or all"},
  {1,"       For each line, associated language name is printed when \"all\" is"},
- {1,"       specified as language. This works with --machinable."},
+ {1,"       specified as language."},
+ {1,"  --list-langdef-flags"},
+ {1,"       Output list of flags which can be used with --langdef option."},
  {1,"  --list-languages"},
  {1,"       Output list of supported languages."},
  {1,"  --list-maps=[language|all]"},
@@ -2030,6 +2032,15 @@ static void processListRegexFlagsOptions (
 	exit (0);
 }
 
+static void processListLangdefFlagsOptions (
+		const char *const option CTAGS_ATTR_UNUSED,
+		const char *const parameter CTAGS_ATTR_UNUSED)
+{
+	printLangdefFlags (localOption.withListHeader, localOption.machinable, stdout);
+	exit (0);
+}
+
+
 static void processListRolesOptions (const char *const option CTAGS_ATTR_UNUSED,
 				     const char *const parameter)
 {
@@ -2614,6 +2625,7 @@ static parametricOption ParametricOptions [] = {
 	{ "list-fields",            processListFieldsOption,        true,   STAGE_ANY },
 	{ "list-kinds",             processListKindsOption,         true,   STAGE_ANY },
 	{ "list-kinds-full",        processListKindsOption,         true,   STAGE_ANY },
+	{ "list-langdef-flags",     processListLangdefFlagsOptions, true,   STAGE_ANY },
 	{ "list-languages",         processListLanguagesOption,     true,   STAGE_ANY },
 	{ "list-maps",              processListMapsOption,          true,   STAGE_ANY },
 	{ "list-params",            processListParametersOption,    true,   STAGE_ANY },
