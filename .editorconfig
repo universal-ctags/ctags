@@ -9,7 +9,7 @@ indent_size = 4
 indent_style = tab
 trim_trailing_whitespace = true
 
-[*.rst.in]
+[*.rst*]
 indent_size = 4
 indent_style = tab
 trim_trailing_whitespace = true
