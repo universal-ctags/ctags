@@ -91,7 +91,7 @@ given or not.)
 	``--langmap=map[,map[...]]`` (done)
 	``--language-force=language``
 	``--languages=[+|-]list``
-	``--list-maps[=language|all]``
+	``--list-maps[=language|all]`` (done)
 	``--list-map-extensions``
 	``--list-map-patterns``
 
@@ -770,7 +770,7 @@ built-in language names.
 
 ``--list-maps[=language|all]``
 	Lists the file extensions and file name patterns which associate a file
-	name with a language for either the specified language or all
+	name with a language for either the specified *language* or **all**
 	languages, and then exits. See the ``--langmap`` option, and "SOURCE FILES", above.
 
 ``--list-languages``
