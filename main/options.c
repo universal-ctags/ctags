@@ -322,8 +322,6 @@ static optionDescription LongOptionDescription [] = {
  {1,"       Indicate whether symbolic links should be followed [yes]."},
  {1,"  --list-aliases=[language|all]"},
  {1,"       Output list of alias patterns."},
- {1,"  --list-extensions=[language|all]"},
- {1,"       Output list of language extensions in mapping."},
  {1,"  --list-extras=[language|all]"},
  {1,"       Output list of extra tag flags."},
  {1,"  --list-features"},
@@ -340,12 +338,14 @@ static optionDescription LongOptionDescription [] = {
  {1,"       Output list of flags which can be used with --langdef option."},
  {1,"  --list-languages"},
  {1,"       Output list of supported languages."},
+ {1,"  --list-map-extensions=[language|all]"},
+ {1,"       Output list of language extensions in mapping."},
+ {1,"  --list-map-patterns=[language|all]"},
+ {1,"       Output list of language patterns in mapping."},
  {1,"  --list-maps=[language|all]"},
  {1,"       Output list of language mappings(both extensions and patterns)."},
  {1,"  --list-params=[language|all]"},
  {1,"       Output list of language parameters. This works with --machinable."},
- {1,"  --list-patterns=[language|all]"},
- {1,"       Output list of language patterns in mapping."},
  {0,"  --list-pseudo-tags"},
  {0,"       Output list of pseudo tags."},
  {1,"  --list-regex-flags"},
@@ -1992,13 +1992,13 @@ static void processListMapsOptionForType (const char *const option CTAGS_ATTR_UN
 	exit (0);
 }
 
-static void processListExtensionsOption (const char *const option,
+static void processListMapExtensionsOption (const char *const option,
 					 const char *const parameter)
 {
 	processListMapsOptionForType (option, parameter, LMAP_EXTENSION);
 }
 
-static void processListPatternsOption (const char *const option,
+static void processListMapPatternsOption (const char *const option,
 				       const char *const parameter)
 {
 	processListMapsOptionForType (option, parameter, LMAP_PATTERN);
@@ -2622,7 +2622,6 @@ static parametricOption ParametricOptions [] = {
 	{ "langmap",                processLanguageMapOption,       false,  STAGE_ANY },
 	{ "license",                processLicenseOption,           true,   STAGE_ANY },
 	{ "list-aliases",           processListAliasesOption,       true,   STAGE_ANY },
-	{ "list-extensions",        processListExtensionsOption,    true,   STAGE_ANY },
 	{ "list-extras",            processListExtrasOption,        true,   STAGE_ANY },
 	{ "list-features",          processListFeaturesOption,      true,   STAGE_ANY },
 	{ "list-fields",            processListFieldsOption,        true,   STAGE_ANY },
@@ -2631,8 +2630,9 @@ static parametricOption ParametricOptions [] = {
 	{ "list-langdef-flags",     processListLangdefFlagsOptions, true,   STAGE_ANY },
 	{ "list-languages",         processListLanguagesOption,     true,   STAGE_ANY },
 	{ "list-maps",              processListMapsOption,          true,   STAGE_ANY },
+	{ "list-map-extensions",    processListMapExtensionsOption, true,   STAGE_ANY },
+	{ "list-map-patterns",      processListMapPatternsOption,   true,   STAGE_ANY },
 	{ "list-params",            processListParametersOption,    true,   STAGE_ANY },
-	{ "list-patterns",          processListPatternsOption,      true,   STAGE_ANY },
 	{ "list-pseudo-tags",       processListPseudoTagsOptions,   true,   STAGE_ANY },
 	{ "list-regex-flags",       processListRegexFlagsOptions,   true,   STAGE_ANY },
 	{ "list-roles",             processListRolesOptions,        true,   STAGE_ANY },

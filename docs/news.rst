@@ -295,8 +295,8 @@ Exuberant-ctags provides a way to inspect its internals via
 ``--list-kinds``, ``--list-languages``, and ``--list-maps``.
 
 This idea has been expanded in Universal-ctags with
-``--list-kinds-full``, ``--list-extensions``,  ``--list-extras``,
-``--list-features``, ``--list-fields``, ``--list-patterns``, and
+``--list-kinds-full``, ``--list-map-extensions``,  ``--list-extras``,
+``--list-features``, ``--list-fields``, ``--list-map-patterns``, and
 ``--list-pseudo-tags`` being added.
 
 The original three ``--list-`` options are not changed for
