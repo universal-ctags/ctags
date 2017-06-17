@@ -80,7 +80,7 @@ The same extensions are mapped to multiple parsers. For example, ".h"
 are mapped to C++, C and ObjectiveC. These mappings can cause a
 trouble. @CTAGS_NAME_EXECUTABLE@ tries to select the proper parser
 for the source file by applying kinds of heuristics to its content. However,
-it is not perfect.  In that case use ``--language-for=<LANG>``,
+it is not perfect.  In that case use ``--language-force=<LANG>``,
 ``--langmap=map[,map[...]]``, or ``--map-<LANG>=-pattern|extension``
 options. (The heuristics are applied either ``--guess-language-eagerly`` is
 given or not.)
