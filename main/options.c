@@ -1431,7 +1431,7 @@ static void processListFieldsOption(const char *const option CTAGS_ATTR_UNUSED,
 {
 	struct colprintTable * table = fieldColprintTableNew ();
 
-	if (parameter [0] == '\0' || strcasecmp (parameter, "all") == 0)
+	if (parameter [0] == '\0' || strcasecmp (parameter, RSV_LANG_ALL) == 0)
 	{
 		fieldColprintAddCommonLines (table);
 
@@ -1550,7 +1550,7 @@ static void processLanguageForceOption (
 		const char *const option, const char *const parameter)
 {
 	langType language;
-	if (strcasecmp (parameter, "auto") == 0)
+	if (strcasecmp (parameter, RSV_LANG_AUTO) == 0)
 		language = LANG_AUTO;
 	else
 		language = getNamedLanguage (parameter, 0);
@@ -1689,7 +1689,7 @@ static char* processLanguageMap (char* map)
 		language = getNamedLanguage (map, 0);
 		if (language != LANG_IGNORE)
 		{
-			const char *const deflt = "default";
+			const char *const deflt = RSV_LANGMAP_DEFAULT;
 			char* p;
 			if (*list == '+')
 				++list;
@@ -1730,7 +1730,7 @@ static void processLanguageMapOption (
 	char *const maps = eStrdup (parameter);
 	char *map = maps;
 
-	if (strcmp (parameter, "default") == 0)
+	if (strcmp (parameter, RSV_LANGMAP_DEFAULT) == 0)
 	{
 		verbose ("    Restoring default language maps:\n");
 		installLanguageMapDefaults ();
@@ -1775,7 +1775,7 @@ static void processLanguagesOption (
 			*end = '\0';
 		if (lang [0] != '\0')
 		{
-			if (strcmp (lang, "all") == 0)
+			if (strcmp (lang, RSV_LANG_ALL) == 0)
 				enableLanguages ((bool) (mode != Remove));
 			else
 			{
@@ -1890,7 +1890,7 @@ static void processLicenseOption (
 static void processListAliasesOption (
 		const char *const option, const char *const parameter)
 {
-	if (parameter [0] == '\0' || strcasecmp (parameter, "all") == 0)
+	if (parameter [0] == '\0' || strcasecmp (parameter, RSV_LANG_ALL) == 0)
 		printLanguageAliases (LANG_AUTO);
 	else
 	{
@@ -1908,7 +1908,7 @@ static void processListExtrasOption (
 {
 	struct colprintTable * table = xtagColprintTableNew ();
 
-	if (parameter [0] == '\0' || strcasecmp (parameter, "all") == 0)
+	if (parameter [0] == '\0' || strcasecmp (parameter, RSV_LANG_ALL) == 0)
 	{
 		xtagColprintAddCommonLines (table);
 
@@ -1939,7 +1939,7 @@ static void processListKindsOption (
 {
 	bool print_all = (strcmp (option, "list-kinds-full") == 0)? true: false;
 
-	if (parameter [0] == '\0' || strcasecmp (parameter, "all") == 0)
+	if (parameter [0] == '\0' || strcasecmp (parameter, RSV_LANG_ALL) == 0)
 		printLanguageKinds (LANG_AUTO, print_all,
 							localOption.withListHeader, localOption.machinable, stdout);
 	else
@@ -1957,7 +1957,7 @@ static void processListKindsOption (
 static void processListParametersOption (const char *const option,
 										 const char *const parameter)
 {
-	if (parameter [0] == '\0' || strcasecmp (parameter, "all") == 0)
+	if (parameter [0] == '\0' || strcasecmp (parameter, RSV_LANG_ALL) == 0)
 		printLanguageParameters (LANG_AUTO,
 								 localOption.withListHeader, localOption.machinable,
 								 stdout);
@@ -1979,7 +1979,7 @@ static void processListMapsOptionForType (const char *const option CTAGS_ATTR_UN
 					  const char *const  parameter,
 					  langmapType type)
 {
-	if (parameter [0] == '\0' || strcasecmp (parameter, "all") == 0)
+	if (parameter [0] == '\0' || strcasecmp (parameter, RSV_LANG_ALL) == 0)
 		printLanguageMaps (LANG_AUTO, type);
 	else
 	{
@@ -2096,7 +2096,7 @@ static void processListSubparsersOptions (const char *const option CTAGS_ATTR_UN
 
 
 	if (parameter == NULL || parameter[0] == '\0'
-		|| (strcmp(parameter, "all") == 0))
+		|| (strcmp(parameter, RSV_LANG_ALL) == 0))
 	{
 		printLanguageSubparsers(LANG_AUTO,
 								localOption.withListHeader, localOption.machinable,

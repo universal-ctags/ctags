@@ -4,6 +4,7 @@ baselang
 bmask
 buf
 descs
+deflt
 dev
 dictfile
 dirs
