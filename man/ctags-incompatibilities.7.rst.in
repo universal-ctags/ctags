@@ -48,6 +48,10 @@ parser.
 So Universal-ctags uses the u-map-order even though it introduces an
 incompatibility.
 
+``--list-map-extensions=language`` and ``--list-map-patterns=language``
+options are helpful to verify and the file extensions and the file
+name patterns of given *language*.
+
 
 Incompatibilities in tags file format
 -------------------------------------------------------------

@@ -92,8 +92,8 @@ given or not.)
 	``--language-force=language``
 	``--languages=[+|-]list``
 	``--list-maps[=language|all]`` (done)
-	``--list-map-extensions``
-	``--list-map-patterns``
+	``--list-map-extensions`` (done)
+	``--list-map-patterns`` (done)
 
 Guessing parser
 ~~~~~~~~~~~~~~~
@@ -768,10 +768,24 @@ built-in language names.
 	compiled into @CTAGS_NAME_EXECUTABLE@ (see the ``--regex-<LANG>`` option).
 	Each kind listed is enabled unless followed by "[off]".
 
+``--list-map-extensions[=language|all]``
+	Lists the file extensions which associate a file
+	name with a language for either the specified *language* or **all**
+	languages, and then exits.
+
+``--list-map-patterns[=language|all]``
+	Lists the file name patterns which associate a file
+	name with a language for either the specified *language* or **all**
+	languages, and then exits.
+
 ``--list-maps[=language|all]``
 	Lists the file extensions and file name patterns which associate a file
 	name with a language for either the specified *language* or **all**
 	languages, and then exits. See the ``--langmap`` option, and "SOURCE FILES", above.
+
+	To list the file extensions or file name patterns individually, use
+	``--list-map-extensions`` or ``--list-map-patterns`` option.
+	See the ``--langmap`` option, and "SOURCE FILES", above.
 
 ``--list-languages``
 	Lists the names of the languages understood by @CTAGS_NAME_EXECUTABLE@,
