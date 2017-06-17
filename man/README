@@ -11,4 +11,9 @@ Rules for writing man pages
 
   See https://sourceforge.net/p/docutils/patches/141/
 
-* use two asterisks for newly introduced conceptual **word**.
+* use two asterisks for newly introduced conceptual **word** and reserved
+  words. The reserved words are
+
+  * "default" in --langmap
+
+* use asterisks for option parameter like *LANG* in --kind-<LANG> option.

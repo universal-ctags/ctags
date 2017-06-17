@@ -86,7 +86,14 @@ options. (The heuristics are applied either ``--guess-language-eagerly`` is
 given or not.)
 
 
-.. TODO: Mapping of file names
+.. options should be revised here
+	``--map-<LANG>``
+	``--langmap=map[,map[...]]`` (done)
+	``--language-force=language``
+	``--languages=[+|-]list``
+	``--list-maps[=language|all]``
+	``--list-map-extensions``
+	``--list-map-patterns``
 
 Guessing parser
 ~~~~~~~~~~~~~~~
@@ -653,23 +660,27 @@ built-in language names.
 
 ``--langmap=map[,map[...]]``
 	Controls how file names are mapped to languages (see the ``--list-maps``
-	option). Each comma-separated map consists of the language name (either
-	a built-in or user-defined language), a colon, and a list of file
-	extensions and/or file name patterns. A file extension is specified by
+	option). Each comma-separated *map* consists of the language name (either
+	a built-in or user-defined language), a colon, and a list of **file
+	extensions** and/or **file name patterns**. A file extension is specified by
 	preceding the extension with a period (e.g. ".c"). A file name pattern
 	is specified by enclosing the pattern in parentheses (e.g.
-	"([Mm]akefile)"). If appropriate support is available from the runtime
+	"([Mm]akefile)").
+
+	If appropriate support is available from the runtime
 	library of your C compiler, then the file name pattern may contain the usual
 	shell wildcards common on Unix (be sure to quote the option parameter to
 	protect the wildcards from being expanded by the shell before being
 	passed to @CTAGS_NAME_EXECUTABLE@). You can determine if shell wildcards
 	are available on your platform by examining the output of the
-	``--version`` option, which will include "+wildcards" in the compiled
+	``--list-features`` option, which will include "wildcards" in the compiled
 	feature list; otherwise, the file name patterns are matched against
-	file names using a simple textual comparison. When mapping a file
-	extension, it will first be unmapped from any other languages.
+	file names using a simple textual comparison.
 
-	If the first character in a map is a plus sign, then the extensions and
+	When mapping a file extension with ``--langmap`` option,
+	it will first be unmapped from any other languages.
+
+	If the first character in a map is a plus sign ('+'), then the extensions and
 	file name patterns in that map will be appended to the current map
 	for that language; otherwise, the map will replace the current map.
 	For example, to specify that only files with extensions of .c and .x are
@@ -679,15 +690,19 @@ built-in language names.
 	"Makefile", "makefile", or having the extension ".mak") to a language
 	called "make", specify "--langmap=make:([Mm]akefile).mak". To map files
 	having no extension, specify a period not followed by a non-period
-	character (e.g. ".", "..x", ".x."). To clear the mapping for a
+	character (e.g. ".", "..x", ".x.").
+
+	To clear the mapping for a
 	particular language (thus inhibiting automatic generation of tags for
 	that language), specify an empty extension list (e.g. "--langmap=fortran:").
 	To restore the default language mappings for all a particular language,
 	supply the keyword "default" for the mapping. To specify restore the
 	default language mappings for all languages, specify "--langmap=default".
+
 	Note that file name patterns are tested before file extensions when inferring
 	the language of a file. This order of Universal-ctags is different from
-	Exuberant-ctags.
+	Exuberant-ctags. See ctags-incompatibilities(7) for the background of
+	this incompatible change.
 
 ``--language-force=language``
 	By default, @CTAGS_NAME_EXECUTABLE@ automatically selects the language
