@@ -1309,8 +1309,12 @@ service to humanity."
 
 CREDITS
 -------
+This version of @CTAGS_NAME_EXECUTABLE@ (Universal-ctags) derived from
+the repository, known as **fishman-ctags**, started by Reza Jelveh.
 
-This version of @CTAGS_NAME_EXECUTABLE@ was originally derived from and
+The fishman-ctags was derived from Exuberant-ctags.
+
+Exuberant-ctags was originally derived from and
 inspired by the ctags program by Steve Kirkendall <kirkenda@cs.pdx.edu>
 that comes with the Elvis vi clone (though virtually none of the original
 code remains).
