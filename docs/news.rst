@@ -1007,11 +1007,11 @@ this option.
 
 Although the facility for collecting reference tags is implemented,
 only a few parsers currently utilize it. All available roles can be
-listed with ``--_list-roles``:
+listed with ``--list-roles``:
 
 .. code-block:: console
 
-    $ ./ctags --_list-roles
+    $ ./ctags --list-roles
     #LANGUAGE      KIND(L/N)         NAME                ENABLED DESCRIPTION
     SystemdUnit    u/unit            Requires            on      referred in Requires key
     SystemdUnit    u/unit            Wants               on      referred in Wants key

@@ -32,16 +32,16 @@ ignore_old()
 }
 
 title ''
-${CTAGS} --quiet --options=NONE --_list-roles= | ignore_xml | ignore_old | ignore_yaml
+${CTAGS} --quiet --options=NONE --list-roles= | ignore_xml | ignore_old | ignore_yaml
 
 title 'all.*'
-${CTAGS} --quiet --options=NONE --_list-roles='all.*' | ignore_xml | ignore_old | ignore_yaml
+${CTAGS} --quiet --options=NONE --list-roles='all.*' | ignore_xml | ignore_old | ignore_yaml
 
 title 'C.*'
-${CTAGS} --quiet --options=NONE --_list-roles='C.*'
+${CTAGS} --quiet --options=NONE --list-roles='C.*'
 
-title 'all.h'
-${CTAGS} --quiet --options=NONE --_list-roles='all.h' | ignore_xml | ignore_old | ignore_yaml
+title 'all.d'
+${CTAGS} --quiet --options=NONE --list-roles='all.d' | ignore_xml | ignore_old | ignore_yaml
 
 title 'Sh.s'
-${CTAGS} --quiet --options=NONE --_list-roles='Sh.s'
+${CTAGS} --quiet --options=NONE --list-roles='Sh.s'
