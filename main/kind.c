@@ -316,19 +316,42 @@ extern struct colprintTable * roleColprintTableNew (void)
 }
 
 extern void roleColprintAddRoles (struct colprintTable *table, struct kindControlBlock *kcb,
-								  const char *kletters)
+								  const char *kindspecs)
 {
 	const char* lang;
 	vString *kind_l_and_n;
 
 	lang = getLanguageName (kcb->owner);
 	kind_l_and_n = vStringNew ();
-	for (const char *c = kletters; *c != '\0'; c++)
+	for (const char *c = kindspecs; *c != '\0'; c++)
 	{
+		const char *kname = NULL;
+		size_t kname_len;
+
+		if (*c == '{')
+		{
+			const char *start = c + 1;
+			const char *end = strchr(c, '}');
+
+			if (!end)
+				error (FATAL, "'{' is not closed with '}' in \"%s\"", c);
+			if (start == end)
+				error (FATAL, "empty kind name is given in \"%s\"", c);
+
+			kname = start;
+			kname_len = end - start;
+			c = end;
+		}
+
 		for (unsigned int i = 0; i < countKinds (kcb); i++)
 		{
 			const kindDefinition *k = getKind (kcb, i);
-			if (*c == KIND_WILDCARD || k->letter == *c)
+
+			if ((kname
+				 && strlen (k->name) == kname_len
+				 && strncmp (k->name, kname, kname_len) == 0)
+				|| (!kname && *c == k->letter)
+				|| (!kname && *c == KIND_WILDCARD))
 			{
 				for (int j = 0; j < k->nRoles; j++)
 				{
@@ -348,7 +371,7 @@ extern void roleColprintAddRoles (struct colprintTable *table, struct kindContro
 													 r->enabled ? "on" : "off");
 					colprintLineAppendColumnCString (line, r->description);
 				}
-				if (*c != KIND_WILDCARD)
+				if (! (!kname && *c == KIND_WILDCARD))
 					break;
 			}
 		}

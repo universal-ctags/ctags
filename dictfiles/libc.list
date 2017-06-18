@@ -18,4 +18,5 @@ stdarg
 strcat
 strchr
 strcmp
+strncmp
 va

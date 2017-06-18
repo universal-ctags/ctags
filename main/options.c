@@ -451,9 +451,10 @@ static optionDescription LongOptionDescription [] = {
  {0,"       Enter file I/O limited interactive mode if sandbox is specified. [default]"},
 #endif
 #endif
- {1,"  --_list-roles=[[language|all].[kindletters|*]]"},
+ {1,"  --_list-roles=[[language|all].[kindspecs|*]]"},
  {1,"       Output list of all roles of tag kind(s) specified for language(s)."},
- {1,"       e.g. --_list-roles=Make.I"},
+ {1,"       Both letters and names can be used in kindspecs."},
+ {1,"       e.g. --_list-roles=C.{header}d"},
  {1,"  --_xformat=field_format"},
  {1,"       Specify custom format for tabular cross reference (-x)."},
  {1,"       Fields can be specified with letter listed in --list-fields."},
@@ -2047,7 +2048,7 @@ static void processListRolesOptions (const char *const option CTAGS_ATTR_UNUSED,
 				     const char *const parameter)
 {
 	const char* sep;
-	const char *kindletters;
+	const char *kindspecs;
 	langType lang;
 
 
@@ -2070,7 +2071,7 @@ static void processListRolesOptions (const char *const option CTAGS_ATTR_UNUSED,
 		/* The control should never reached here. */
 	}
 
-	kindletters = sep + 1;
+	kindspecs = sep + 1;
 	if (strncmp (parameter, "all.", 4) == 0
 	    || strncmp (parameter, "*.", 1) == 0
 	    || strncmp (parameter, ".", 1) == 0)
@@ -2081,7 +2082,7 @@ static void processListRolesOptions (const char *const option CTAGS_ATTR_UNUSED,
 		if (lang == LANG_IGNORE)
 			error (FATAL, "Unknown language \"%s\" in \"%s\"", parameter, option);
 	}
-	printLanguageRoles (lang, kindletters,
+	printLanguageRoles (lang, kindspecs,
 						localOption.withListHeader,
 						localOption.machinable,
 						stdout);

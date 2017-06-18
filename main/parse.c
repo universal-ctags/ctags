@@ -2191,7 +2191,7 @@ extern bool processKindsOption (
 #undef PREFIX_LEN
 }
 
-extern void printLanguageRoles (const langType language, const char* letters,
+extern void printLanguageRoles (const langType language, const char* kindspecs,
 								bool withListHeader, bool machinable, FILE *fp)
 {
 	struct colprintTable *table = roleColprintTableNew();
@@ -2207,13 +2207,13 @@ extern void printLanguageRoles (const langType language, const char* letters,
 				continue;
 
 			parser = LanguageTable + i;
-			roleColprintAddRoles (table, parser->kindControlBlock, letters);
+			roleColprintAddRoles (table, parser->kindControlBlock, kindspecs);
 		}
 	}
 	else
 	{
 		parser = LanguageTable + language;
-		roleColprintAddRoles (table, parser->kindControlBlock, letters);
+		roleColprintAddRoles (table, parser->kindControlBlock, kindspecs);
 	}
 
 	roleColprintTablePrint (table, (language != LANG_AUTO),

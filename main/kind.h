@@ -107,7 +107,7 @@ extern void kindColprintTablePrint (struct colprintTable *table, bool noparser,
 extern struct colprintTable * roleColprintTableNew (void);
 extern void roleColprintAddRoles (struct colprintTable *table,
 								  struct kindControlBlock* kcb,
-								  const char *kletters);
+								  const char *kindspecs);
 extern void roleColprintTablePrint (struct colprintTable *table, bool noparser,
 									bool withListHeader, bool machinable, FILE *fp);
 
