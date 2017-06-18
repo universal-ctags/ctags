@@ -54,7 +54,7 @@ of the major topics in Universal-ctags development. ctags-optlib(7)
 describes how the feature is extended.
 
 Newly introduced premature features are not explained here. If you
-are interested in such features and ctags internal,
+are interested in such features and @CTAGS_NAME_EXECUTABLE@ internal,
 visit http://docs.ctags.io/en/latest/.
 
 
@@ -97,7 +97,7 @@ given or not.)
 Guessing parser
 ~~~~~~~~~~~~~~~
 
-If ctags cannot select a parser from the mapping of file names,
+If @CTAGS_NAME_EXECUTABLE@ cannot select a parser from the mapping of file names,
 various tests are conducted for the guessing:
 
 template file name testing
@@ -134,7 +134,7 @@ template file name testing
 	and utilize the marker for the mode selection. This testing does
 	the same as what Emacs does.
 
-	ctags treats *MODE* as a name of interpreter and applies the same
+	@CTAGS_NAME_EXECUTABLE@ treats *MODE* as a name of interpreter and applies the same
 	rule of "interpreter" testing if the first line has one of
 	the following patterns::
 
@@ -150,7 +150,7 @@ template file name testing
 	Emacs editor recognizes another marker at the end of file as a
 	mode specifier. This testing does the same as what Emacs does.
 
-	ctags treats *MODE* as a name of interpreter and applies the same
+	@CTAGS_NAME_EXECUTABLE@ treats *MODE* as a name of interpreter and applies the same
 	rule of "interpreter" testing if the lines at the tail of the file
 	have the following pattern::
 
@@ -164,7 +164,7 @@ template file name testing
 
 "vim modeline" testing
 	Like the modeline of Emacs editor, Vim editor has the same concept.
-	ctags treats *TYPE* as a name of interpreter and applies the same
+	@CTAGS_NAME_EXECUTABLE@ treats *TYPE* as a name of interpreter and applies the same
 	rule of "interpreter" testing if the last 5 lines of the file
 	have one of the following patterns::
 
@@ -199,7 +199,7 @@ Examples:
 	input.m: MatLab
 	input.unknown: NONE
 
-``NONE`` means that ctags does not select any parser for the file.
+``NONE`` means that @CTAGS_NAME_EXECUTABLE@ does not select any parser for the file.
 
 
 OPTIONS
