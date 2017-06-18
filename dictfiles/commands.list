@@ -2,6 +2,7 @@ basename
 cgcc
 dos2unix
 gcc
+gdb
 mkdir
 pwd
 sed

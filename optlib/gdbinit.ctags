@@ -22,7 +22,6 @@
 #
 #
 --langdef=gdbinit
---languages=-gdbinit
 --map-gdbinit=+(.gdbinit)
 --map-gdbinit=+.gdb
 --kinddef-gdbinit=d,definition,definitions
