@@ -85,9 +85,8 @@ it is not perfect.  In that case use ``--language-force=language``,
 options. (The heuristics are applied either ``--guess-language-eagerly`` is
 given or not.)
 
-
 .. options should be revised here
-	``--map-<LANG>``
+	``--map-<LANG>`` (done)
 	``--langmap=map[,map[...]]`` (done)
 	``--language-force=language`` (done)
 	``--languages=[+|-]list`` (done)
@@ -678,7 +677,8 @@ built-in language names.
 	file names using a simple textual comparison.
 
 	When mapping a file extension with ``--langmap`` option,
-	it will first be unmapped from any other languages.
+	it will first be unmapped from any other languages. (``--map-<LANG>``
+	option provides more fine-grained control.)
 
 	If the first character in a map is a plus sign ('+'), then the extensions and
 	file name patterns in that map will be appended to the current map
@@ -799,6 +799,27 @@ built-in language names.
 	and then exits. These language names are case insensitive and may be
 	used in the ``--language-force``, ``--languages``, ``--<LANG>-kinds``,
 	and ``--regex-<LANG>`` options.
+
+``--map-<LANG>=[+|-]extension|pattern``
+	This option provides the way to control mapping(s) of file names to
+	languages more fine-grained way than ``--langmap`` option.
+
+	In @CTAGS_NAME_EXECUTABLE@, more than one language can map to a
+	file name pattern or file extension (*N:1 map*). Alternatively,
+	``--langmap`` option handle only *1:1 map*, only one language
+	mapping to one file name pattern or file extension.  A typical N:1
+	map is seen in C++ and ObjectiveC language; both languages have
+	a map to ".h" as a file extension.
+
+	A file extension is specified by preceding the extension with a period (e.g. ".c").
+	A file name pattern is specified by enclosing the pattern in parentheses (e.g.
+	"([Mm]akefile)"). A prefixed plus ('+') sign is for adding, and
+	minus ('-') is for removing. No prefix means replacing the map of *<LANG>*.
+
+	Unlike ``--langmap``, *extension* (or *pattern*) is not a list.
+	``--map-<LANG>`` takes one *extension* (or *pattern*). However,
+	the option can be specified with different arguments multiple times
+	in a command line.
 
 ``--maxdepth``
 	Limits the depth of directory recursion enabled with the ``--recurse``

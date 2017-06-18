@@ -421,6 +421,8 @@ the ``-R`` option.
 ``--map-<LANG>`` option
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+.. IN MAN PAGE
+
 ``--map-<LANG>`` is newly introduced to control the file name
 to language mappings (langmap) with finer granularity than
 ``--langmap`` allows.
