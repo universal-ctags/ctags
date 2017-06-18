@@ -317,6 +317,7 @@ static void findAutomakeTags (void)
 
 extern parserDefinition* AutomakeParser (void)
 {
+	static const char *const extensions [] = { "am", NULL };
 	static const char *const patterns [] = { "Makefile.am", NULL };
 	static struct sAutomakeSubparser automakeSubparser = {
 		.make = {
@@ -341,6 +342,7 @@ extern parserDefinition* AutomakeParser (void)
 	def->dependencyCount = ARRAY_SIZE(dependencies);
 	def->kindTable      = AutomakeKinds;
 	def->kindCount  = ARRAY_SIZE (AutomakeKinds);
+	def->extensions = extensions;
 	def->patterns   = patterns;
 	def->parser     = findAutomakeTags;
 	def->useCork    = true;
