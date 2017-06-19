@@ -371,7 +371,7 @@ static optionDescription LongOptionDescription [] = {
 #endif
  },
  {0,"      Specify the output format. [u-ctags]"},
- {1,"  --param-<LANG>=name:argument"},
+ {1,"  --param-<LANG>:name=argument"},
  {1,"       Set <LANG> specific parameter. Available parameters can be listed with --list-params."},
  {0,"  --pattern-length-limit=N"},
  {0,"      Cutoff patterns of tag entries after N characters. Disable by setting to 0. [96]"},
@@ -738,7 +738,7 @@ extern langType getLanguageComponentInOption (const char *const option,
 			return LANG_IGNORE;
 	}
 
-	/* --para-<LANG>:<PARAM>=... */
+	/* --param-<LANG>:<PARAM>=... */
 	colon = strchr (lang, ':');
 	if (colon)
 		lang_len = colon - lang;
