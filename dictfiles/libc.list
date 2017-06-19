@@ -1,0 +1,14 @@
+boolean
+fprintf
+isalnum
+isalpha
+isdigit
+islower
+isupper
+isxdigit
+printf
+putc
+puts
+strcat
+strchr
+strcmp
