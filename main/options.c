@@ -416,6 +416,8 @@ static optionDescription LongOptionDescription [] = {
  {1,"       Used in u-ctags test harness"},
  {1,"  --_dump-keywords"},
  {1,"       Dump keywords of initialized parser(s)."},
+ {1,"  --_dump-options"},
+ {1,"       Dump options."},
  {1,"  --_echo=msg"},
  {1,"       Echo MSG to standard error. Useful to debug the chain"},
  {1,"       of loading option files."},
@@ -2526,6 +2528,8 @@ static bool* redirectToXtag(booleanOption *const option)
  *  Option tables
  */
 
+static void processDumpOptionsOption (const char *const option, const char *const parameter);
+
 static parametricOption ParametricOptions [] = {
 	{ "config-filename",		processConfigFilenameOption,	true,   STAGE_ANY },
 	{ "data-dir",               processDataDir,                 false,  STAGE_ANY },
@@ -2575,6 +2579,7 @@ static parametricOption ParametricOptions [] = {
 	{ "version",                processVersionOption,           true,   STAGE_ANY },
 	{ "_anonhash",              processAnonHashOption,          false,  STAGE_ANY },
 	{ "_dump-keywords",         processDumpKeywordsOption,      false,  STAGE_ANY },
+	{ "_dump-options",          processDumpOptionsOption,       false,  STAGE_ANY },
 	{ "_echo",                  processEchoOption,              false,  STAGE_ANY },
 	{ "_force-initializing",    processForceInitOption,         false, STAGE_ANY },
 	{ "_force-quit",            processForceQuitOption,         false,  STAGE_ANY },
@@ -3549,4 +3554,15 @@ extern void freeOptionResources (void)
 	freeSearchPathList (&PreloadPathList);
 
 	freeList (&OptionFiles);
+}
+
+static void processDumpOptionsOption (const char *const option CTAGS_ATTR_UNUSED, const char *const parameter CTAGS_ATTR_UNUSED)
+{
+	fprintf(stdout, "# %s\n", "ParametricOptions");
+	for (unsigned int i = 0; i < ARRAY_SIZE(ParametricOptions); i++)
+		fprintf(stdout, "%s\n", ParametricOptions[i].name);
+
+	fprintf(stdout, "# %s\n", "BooleanOptions");
+	for (unsigned int i = 0; i < ARRAY_SIZE(BooleanOptions); i++)
+		fprintf(stdout, "%s\n", BooleanOptions[i].name);
 }
