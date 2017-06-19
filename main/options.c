@@ -1452,14 +1452,22 @@ static void processInteractiveOption (
 {
 	static struct interactiveModeArgs args;
 
-	Option.interactive = true;
 
 	if (parameter && (strcmp (parameter, "sandbox") == 0))
+	{
+		Option.interactive = INTERACTIVE_SANDBOX;
 		args.sandbox = true;
+	}
 	else if (parameter && (strcmp (parameter, "default") == 0))
+	{
+		Option.interactive = INTERACTIVE_DEFAULT;
 		args.sandbox = false;
+	}
 	else if ((!parameter) || *parameter == '\0')
+	{
+		Option.interactive = INTERACTIVE_DEFAULT;
 		args.sandbox = false;
+	}
 	else
 		error (FATAL, "Unknown option argument \"%s\" for --%s option",
 			   parameter, option);
