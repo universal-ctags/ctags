@@ -27,6 +27,7 @@
 #include "ctags.h"
 #include "debug.h"
 #include "field.h"
+#include "keyword.h"
 #include "main.h"
 #define OPTION_WRITE
 #include "options.h"
@@ -413,6 +414,8 @@ static optionDescription LongOptionDescription [] = {
  {1,"       Specify before --list-* option."},
  {1,"  --_anonhash=fname"},
  {1,"       Used in u-ctags test harness"},
+ {1,"  --_dump-keywords"},
+ {1,"       Dump keywords of initialized parser(s)."},
  {1,"  --_echo=msg"},
  {1,"       Echo MSG to standard error. Useful to debug the chain"},
  {1,"       of loading option files."},
@@ -2369,6 +2372,11 @@ static void processAnonHashOption (const char *const option, const char *const p
 	exit (0);
 }
 
+static void processDumpKeywordsOption (const char *const option CTAGS_ATTR_UNUSED, const char *const parameter CTAGS_ATTR_UNUSED)
+{
+	dumpKeywordTable (stdout);
+}
+
 static void processEchoOption (const char *const option, const char *const parameter)
 {
 	if (parameter == NULL || parameter[0] == '\0')
@@ -2566,6 +2574,7 @@ static parametricOption ParametricOptions [] = {
 	{ "tag-relative",           processTagRelative,             true,   STAGE_ANY },
 	{ "version",                processVersionOption,           true,   STAGE_ANY },
 	{ "_anonhash",              processAnonHashOption,          false,  STAGE_ANY },
+	{ "_dump-keywords",         processDumpKeywordsOption,      false,  STAGE_ANY },
 	{ "_echo",                  processEchoOption,              false,  STAGE_ANY },
 	{ "_force-initializing",    processForceInitOption,         false, STAGE_ANY },
 	{ "_force-quit",            processForceQuitOption,         false,  STAGE_ANY },
