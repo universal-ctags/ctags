@@ -1,0 +1,16 @@
+GtkMainLoopObject               fileScope /^typedef struct sGtkMainLoopObject GtkMainLoopObject;$/
+Gtk                     fileScope,subword /^typedef struct sGtkMainLoopObject GtkMainLoopObject;$/
+Main                    fileScope,subword /^typedef struct sGtkMainLoopObject GtkMainLoopObject;$/
+Loop                    fileScope,subword /^typedef struct sGtkMainLoopObject GtkMainLoopObject;$/
+Object                  fileScope,subword /^typedef struct sGtkMainLoopObject GtkMainLoopObject;$/
+main_loop                       fileScope /^static GtkMainLoopObject *main_loop = NULL;$/
+main                    fileScope,subword /^static GtkMainLoopObject *main_loop = NULL;$/
+loop                    fileScope,subword /^static GtkMainLoopObject *main_loop = NULL;$/
+NSObject                        fileScope /^typedef struct sNSObject NSObject;$/
+NS                      fileScope,subword /^typedef struct sNSObject NSObject;$/
+Object                  fileScope,subword /^typedef struct sNSObject NSObject;$/
+nsLoop                          fileScope /^static NSMainLoop *nsLoop = NULL;$/
+ns                      fileScope,subword /^static NSMainLoop *nsLoop = NULL;$/
+Loop                    fileScope,subword /^static NSMainLoop *nsLoop = NULL;$/
+main                                      /^main(void)$/
+main                              subword /^main(void)$/

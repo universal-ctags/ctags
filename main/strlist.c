@@ -301,6 +301,14 @@ extern stringList *stringListNewBySplittingWordIntoSubwords (const char* origina
 		}
 		else if (isdigit(*cursor))
 			vStringPut(subword, *cursor);
+		else
+		{
+			if (vStringLength(subword) > 0)
+			{
+				stringListAdd (list, subword);
+				subword = vStringNew();
+			}
+		}
 	}
 
 	if (vStringLength(subword) > 0)

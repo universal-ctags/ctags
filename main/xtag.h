@@ -24,6 +24,7 @@ typedef enum eXtagType { /* extra tag content control */
 	XTAG_REFERENCE_TAGS,
 	XTAG_TAGS_GENERATED_BY_GUEST_PARSERS,
 	XTAG_TAGS_GENERATED_BY_SUBPARSER,
+	XTAG_SUBWORD,
 
 	XTAG_COUNT
 } xtagType;

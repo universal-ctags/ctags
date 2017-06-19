@@ -1,0 +1,4 @@
+--sort=no
+-x
+--_xformat=%-20N %20{extras} %P
+--extras=+{subword}
