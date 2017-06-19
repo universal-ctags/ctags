@@ -2361,7 +2361,7 @@ static void processIgnoreOption (const char *const list, int IgnoreOrDefine)
 		readIgnoreList (list);
 }
 
-static void processAnonHashOption (const char *const option, const char *const parameter)
+static void processAnonHashOption (const char *const option CTAGS_ATTR_UNUSED, const char *const parameter CTAGS_ATTR_UNUSED)
 {
 	if (parameter == NULL || parameter[0] == '\0')
 		error (FATAL, "Something string is needed for \"%s\" option", option);
