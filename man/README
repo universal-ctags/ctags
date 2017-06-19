@@ -6,11 +6,6 @@ Rules for writing man pages
 * put double quotes an example of command line, option usage like
   "--langdef=MyLang" and referring a section.
 
-* .. code-block:: LANGUAGE.. cannot be handled well in rst2man.
-  However, if LANGUAGE is not given, it works.
-
-  See https://sourceforge.net/p/docutils/patches/141/
-
 * use two asterisks for newly introduced conceptual **word** and reserved
   words. The reserved words are
 

@@ -192,7 +192,7 @@ parser selections for given files instead of making tags file.
 
 Examples:
 
-.. code-block::
+.. code-block:: console
 
 	$ @CTAGS_NAME_EXECUTABLE@ --print-language config.h.in input.m input.unknown
 	config.h.in: C++
@@ -317,7 +317,7 @@ built-in language names.
 	the presence of syntax-busting macros in source files (see CAVEATS).
 	Some examples will illustrate this point.
 
-	.. code-block::
+	.. code-block:: C
 
 		int foo ARGDECL4(void *, ptr, long int, nbytes)
 
@@ -325,7 +325,7 @@ built-in language names.
 	interpreted to be the name of the function instead of the correct name
 	of "foo". Specifying "-I ARGDECL4" results in the correct behavior.
 
-	.. code-block::
+	.. code-block:: C
 
 		/* creates an RCS version string in module */
 		MODULE_VERSION("$Revision$")
@@ -338,7 +338,7 @@ built-in language names.
 	file to be skipped over while trying to complete the definition.
 	Specifying "-I MODULE_VERSION+" would avoid such a problem.
 
-	.. code-block::
+	.. code-block:: C
 
 		CLASS Example {
 			// your content here
@@ -977,7 +977,7 @@ only the first branch of that conditional (except in the special case of
 this is that failing to pursue only one branch can result in ambiguous
 syntax, as in the following example:
 
-.. code-block::
+.. code-block:: C
 
 	#ifdef TWO_ALTERNATIVES
 	struct {
@@ -1169,7 +1169,7 @@ may be found by your editor if there exists another source line which is
 identical to the line containing the tag. The following example
 demonstrates this condition:
 
-.. code-block::
+.. code-block:: C
 
 	int variable;
 
