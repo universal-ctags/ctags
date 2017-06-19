@@ -1,0 +1,3 @@
+exapmle          word         17 input.patch -* put double quotes an exapmle of command line or option usage like
+exapmle          word         19 input.patch +* put double quotes an exapmle of command line, option usage like
+seciton          word         20 input.patch + "--langdef=MyLang" and referring a seciton.

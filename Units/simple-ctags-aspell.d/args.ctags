@@ -1,0 +1,7 @@
+-x
+--languages=+UCtagsAspell
+--param-UCtagsAspell:dictfile=Units/simple-ctags-aspell.d/mydict.list
+--param-UCtagsAspell:subwords=true
+--language-force=UCtagsAspell
+--extras=+r
+--fields=+r

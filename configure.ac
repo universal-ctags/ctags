@@ -648,6 +648,18 @@ AS_IF([test "x$enable_yaml" != "xno"], [
 ])
 AM_CONDITIONAL(HAVE_LIBYAML, test "x$have_libyaml" = xyes)
 
+AH_TEMPLATE([HAVE_ASPELL],
+	[Define this value if aspell is available.])
+AC_ARG_ENABLE([aspell],
+	[AS_HELP_STRING([--disable-aspell],
+		[disable aspell support])])
+AS_IF([test "x$enable_aspell" != "xno"], [
+	PKG_CHECK_MODULES(ASPELL, aspell,
+			       [have_aspell=yes
+			       AC_DEFINE(HAVE_ASPELL)],
+			       [AS_IF([test "x$enable_aspell" = "xyes"], [
+			           AC_MSG_ERROR([Aspell not found])])])
+])
 
 
 # Checks for missing prototypes

@@ -508,6 +508,9 @@ static const char *const Features [] = {
 #ifdef ENABLE_GCOV
 	"gcov",
 #endif
+#ifdef HAVE_ASPELL
+	"aspell",
+#endif
 	NULL
 };
 
