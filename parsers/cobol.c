@@ -25,11 +25,11 @@ typedef enum {
 } cobolKind;
 
 typedef enum {
-	COBOL_SOURCEFILE_COPYED,
+	COBOL_SOURCEFILE_COPIED,
 } cobolSourcefileRole;
 
 static roleDesc CobolSourcefileRoles [] = {
-	{ true, "copyed", "copyed in source file" },
+	{ true, "copied", "copied in source file" },
 };
 
 static kindDefinition CobolKinds[] = {
@@ -107,7 +107,7 @@ static void make_tag_for_paragraph_maybe (const char *line,
 	cobol_make_tag_maybe (line, matches, count, *(langType *)data, 1, K_PARAGRAPH);
 }
 
-static void make_tag_for_copyed_in_sourcefile (const char *line,
+static void make_tag_for_copied_in_sourcefile (const char *line,
 											   const regexMatch *matches,
 											   unsigned int count,
 											   void *data CTAGS_ATTR_UNUSED)
@@ -117,7 +117,7 @@ static void make_tag_for_copyed_in_sourcefile (const char *line,
 		vString *name = vStringNew ();
 
 		vStringNCopyS (name, line + matches[1].start, matches[1].length);
-		makeSimpleRefTag (name, CobolKinds, K_SOURCEFILE, COBOL_SOURCEFILE_COPYED);
+		makeSimpleRefTag (name, CobolKinds, K_SOURCEFILE, COBOL_SOURCEFILE_COPIED);
 		vStringDelete (name);
 	}
 }
@@ -143,7 +143,7 @@ static void initializeCobolParser (langType language)
 	addLanguageCallbackRegex (cobol,
 					  "^[ \t]*COPY[ \t]+([A-Z0-9][A-Z0-9-]*)\\.",
 					  "{icase}",
-					  make_tag_for_copyed_in_sourcefile, NULL, NULL);
+					  make_tag_for_copied_in_sourcefile, NULL, NULL);
 }
 
 extern parserDefinition* CobolParser (void)
