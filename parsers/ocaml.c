@@ -27,7 +27,7 @@ typedef enum {
 	K_CLASS,        /* OCaml class, relatively rare */
 	K_METHOD,       /* class method */
 	K_MODULE,       /* OCaml module OR functor */
-	K_VAR,
+	K_VARIABLE,
 	K_TYPE,         /* name of an OCaml type */
 	K_FUNCTION,
 	K_CONSTRUCTOR,  /* Constructor of a sum type */
@@ -1120,7 +1120,7 @@ static void parseLabel (vString * const ident, ocaToken what)
 		{
 
 			if (exportLocalInfo)
-				addTag (ident, K_VAR);
+				addTag (ident, K_VARIABLE);
 
 			dirtySpecialParam = true;
 		}
@@ -1173,7 +1173,7 @@ static void parseOptionnal (vString * const ident, ocaToken what)
 		if (!dirtySpecialParam)
 		{
 			if (exportLocalInfo)
-				addTag (ident, K_VAR);
+				addTag (ident, K_VARIABLE);
 
 			dirtySpecialParam = true;
 
@@ -1229,14 +1229,14 @@ static void localLet (vString * const ident, ocaToken what)
 		/* Can be a weiiird binding, or an '_' */
 	case Tok_Val:
 		if (exportLocalInfo)
-			addTag (ident, K_VAR);
+			addTag (ident, K_VARIABLE);
 		pushSoftContext (mayRedeclare, ident, ContextValue);
 		toDoNext = &letParam;
 		break;
 
 	case OcaIDENTIFIER:
 		if (exportLocalInfo)
-			addTag (ident, K_VAR);
+			addTag (ident, K_VARIABLE);
 		pushSoftContext (mayRedeclare, ident, ContextValue);
 		toDoNext = &letParam;
 		break;
@@ -1357,7 +1357,7 @@ static void letParam (vString * const ident, ocaToken what)
 
 	case OcaIDENTIFIER:
 		if (exportLocalInfo)
-			addTag (ident, K_VAR);
+			addTag (ident, K_VARIABLE);
 		break;
 
 	case Tok_Op:
@@ -1582,7 +1582,7 @@ static void globalLet (vString * const ident, ocaToken what)
 		break;
 
 	case OcaIDENTIFIER:
-		addTag (ident, K_VAR);
+		addTag (ident, K_VARIABLE);
 		pushStrongContext (ident, ContextValue);
 		requestStrongPoping ();
 		toDoNext = &letParam;
