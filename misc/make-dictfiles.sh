@@ -55,7 +55,7 @@ for d in ${DIRS}; do
 		print_header_for_generate_files
 		git ls-files ${d}  \
 		| ${CTAGS} --kinds-'*'='*' -L - -x --_xformat='%{name}	%{extras}' --extras=+'{subword}' \
-		| grep '	subword' \
+		| grep 'subword' \
 		| grep -v 'anon[0-9a-f]' \
 		| tr A-Z a-z \
 		| grep -v '^.$' \
