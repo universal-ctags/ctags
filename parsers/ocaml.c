@@ -204,6 +204,7 @@ static bool isNum (char c)
 {
 	return c >= '0' && c <= '9';
 }
+
 static bool isLowerAlpha (char c)
 {
 	return c >= 'a' && c <= 'z';
@@ -473,12 +474,10 @@ static ocamlKeyword lex (lexingState * st)
 		case '\\':
 			st->cp++;
 			return Tok_Backslash;
-
 		default:
 			st->cp++;
 			break;
 		}
-
 	/* default return if nothing is recognized,
 	 * shouldn't happen, but at least, it will
 	 * be handled without destroying the parsing. */
@@ -600,7 +599,6 @@ static char contextTypeSuffix (contextType t)
 	case ContextBlock:
 		return ' ';
 	}
-
 	return '$';
 }
 
@@ -615,7 +613,6 @@ static void pushContext (contextKind kind, contextType type, parseNext after,
 		verbose ("OCaml Maximum depth reached");
 		return;
 	}
-
 
 	stack[stackIndex].kind = kind;
 	stack[stackIndex].type = type;
@@ -776,7 +773,6 @@ static void contextualTillToken (vString * const ident CTAGS_ATTR_UNUSED, ocaTok
 
 	if (what == waitedToken && parentheses == 0 && bracket == 0 && curly == 0)
 		toDoNext = comeAfter;
-
 	else if (what == OcaKEYWORD_end)
 	{
 		popStrongContext ();
@@ -827,7 +823,6 @@ static void killCurrentState ( void )
 	 * really strong entity, repop */
 	switch (popStrongContext ())
 	{
-
 	case ContextValue:
 		popStrongContext ();
 		break;
@@ -837,7 +832,6 @@ static void killCurrentState ( void )
 	case ContextMethod:
 		popStrongContext ();
 		break;
-
 	case ContextType:
 		popStrongContext();
 		break;
@@ -1012,7 +1006,6 @@ static void constructorValidation (vString * const ident, ocaToken what)
 	}
 }
 
-
 /* Parse beginning of type definition
  * type 'avar ident =
  * or
@@ -1107,7 +1100,6 @@ static void typeSpecification (vString * const ident, ocaToken what)
 
 static bool dirtySpecialParam = false;
 
-
 /* parse the ~label and ~label:type parameter */
 static void parseLabel (vString * const ident, ocaToken what)
 {
@@ -1118,7 +1110,6 @@ static void parseLabel (vString * const ident, ocaToken what)
 	case OcaIDENTIFIER:
 		if (!dirtySpecialParam)
 		{
-
 			if (exportLocalInfo)
 				addTag (ident, K_VARIABLE);
 
@@ -1159,13 +1150,11 @@ static void parseLabel (vString * const ident, ocaToken what)
 	}
 }
 
-
 /* Optional argument with syntax like this :
  * ?(foo = value) */
 static void parseOptionnal (vString * const ident, ocaToken what)
 {
 	static int parCount = 0;
-
 
 	switch (what)
 	{
@@ -1197,7 +1186,6 @@ static void parseOptionnal (vString * const ident, ocaToken what)
 	}
 }
 
-
 /** handle let inside functions (so like it's name
  * say : local let */
 static void localLet (vString * const ident, ocaToken what)
@@ -1221,7 +1209,6 @@ static void localLet (vString * const ident, ocaToken what)
 		 * function definition */
 		if (exportLocalInfo)
 			addTag (ident, K_FUNCTION);
-
 		pushSoftContext (mayRedeclare, ident, ContextFunction);
 		toDoNext = &letParam;
 		break;
@@ -1401,7 +1388,6 @@ static void letParam (vString * const ident, ocaToken what)
 	}
 }
 
-
 /* parse object ...
  * used to be sure the class definition is not a type
  * alias */
@@ -1424,7 +1410,6 @@ static void classSpecif (vString * const ident CTAGS_ATTR_UNUSED, ocaToken what)
  * nearly a copy/paste of globalLet. */
 static void methodDecl (vString * const ident, ocaToken what)
 {
-
 	switch (what)
 	{
 	case Tok_PARL:
@@ -1462,7 +1447,6 @@ static void methodDecl (vString * const ident, ocaToken what)
  * context stacking. */
 static vString *lastModule;
 
-
 /* parse
  * ... struct (* new global scope *) end
  * or
@@ -1472,7 +1456,6 @@ static vString *lastModule;
  */
 static void moduleSpecif (vString * const ident, ocaToken what)
 {
-
 	switch (what)
 	{
 	case OcaKEYWORD_functor:
@@ -1677,7 +1660,9 @@ static void localScope (vString * const ident, ocaToken what)
 {
 	switch (what)
 	{
+
 	case Tok_Pipe:
+
 	case Tok_PARR:
 	case Tok_BRR:
 	case Tok_CurlR:
@@ -1759,7 +1744,6 @@ static void localScope (vString * const ident, ocaToken what)
 		killCurrentState ();
 		break;
 
-
 	case OcaKEYWORD_fun:
 		comeAfter = &mayRedeclare;
 		toDoNext = &tillToken;
@@ -1840,6 +1824,7 @@ static void findOcamlTags (void)
 	ocaToken tok;
 
 	initStack ();
+
 	computeModuleName ();
 	tempIdent = vStringNew ();
 	lastModule = vStringNew ();
