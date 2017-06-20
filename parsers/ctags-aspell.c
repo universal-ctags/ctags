@@ -167,6 +167,26 @@ static void aspell_subwords_handler (const langType language CTAGS_ATTR_UNUSED,
 		splittingIntoSubwords = true;
 }
 
+static int add_word_to_dict (const char *word, hashTable * dict, bool split)
+{
+	int count = 0;
+
+	stringList * list = word2subwords (word, splittingIntoSubwords);
+	for (unsigned int j = 0; j < stringListCount (list); j++)
+	{
+		vString *item = stringListItem (list, j);
+		if (!hashTableHasItem (dict, vStringValue(item)))
+		{
+			char* subword = eStrdup (vStringValue(item));
+			downcase_word (subword);
+			hashTablePutItem (dict, subword, subword);
+			count++;
+		}
+	}
+	stringListDelete(list);
+	return count;
+}
+
 static hashTable *userDict;
 static void aspell_dictfile_handler (const langType language CTAGS_ATTR_UNUSED,
 									 const char *optname CTAGS_ATTR_UNUSED,
@@ -208,19 +228,8 @@ static void aspell_dictfile_handler (const langType language CTAGS_ATTR_UNUSED,
 			else
 				word [i - 1] = '\0';
 
-		stringList * list = word2subwords (word, splittingIntoSubwords);
-		for (unsigned int j = 0; j < stringListCount (list); j++)
-		{
-			vString *item = stringListItem (list, j);
-			if (!hashTableHasItem (userDict, vStringValue(item)))
-			{
-				char* subword = eStrdup (vStringValue(item));
-				downcase_word (subword);
-				hashTablePutItem (userDict, subword, subword);
-				count++;
-			}
-		}
-		stringListDelete(list);
+		count += add_word_to_dict(word, userDict, splittingIntoSubwords);
+
 	}
 
 	verbose ("UCtagsAspell: load %d word(s)\n", count);
