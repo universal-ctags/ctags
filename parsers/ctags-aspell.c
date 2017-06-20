@@ -61,7 +61,9 @@ static kindDefinition AspellParserKinds [] = {
 static void aspell_dictfile_handler (const langType language CTAGS_ATTR_UNUSED,
 									 const char *optname CTAGS_ATTR_UNUSED,
 									 const char *arg);
-
+static void aspell_dictword_handler (const langType language CTAGS_ATTR_UNUSED,
+									 const char *optname CTAGS_ATTR_UNUSED,
+									 const char *arg);
 static void aspell_subwords_handler (const langType language CTAGS_ATTR_UNUSED,
 									 const char *optname CTAGS_ATTR_UNUSED,
 									 const char *arg);
@@ -74,6 +76,10 @@ static parameterHandlerTable AspellParameterHandlerTable [] = {
 	{ .name = "dictfile",
 	  .desc = "line oriented words list; FILENAME is expected, accumulative",
 	  .handleParameter = aspell_dictfile_handler,
+	},
+	{ .name = "dictword",
+	  .desc = "known correctly spelled word",
+	  .handleParameter = aspell_dictword_handler,
 	},
 };
 
@@ -188,6 +194,12 @@ static int add_word_to_dict (const char *word, hashTable * dict, bool split)
 }
 
 static hashTable *userDict;
+
+static hashTable *makeDict (void)
+{
+	return hashTableNew (257, hashCstrhash, hashCstreq, eFree, NULL);
+}
+
 static void aspell_dictfile_handler (const langType language CTAGS_ATTR_UNUSED,
 									 const char *optname CTAGS_ATTR_UNUSED,
 									 const char *arg)
@@ -211,7 +223,7 @@ static void aspell_dictfile_handler (const langType language CTAGS_ATTR_UNUSED,
 	verbose ("UCtagsAspell: loading a user dictionary: %s\n", arg);
 
 	if (!userDict)
-		userDict = hashTableNew (257, hashCstrhash, hashCstreq, eFree, NULL);
+		userDict = makeDict();
 
 	vString *line = vStringNew();
 
@@ -237,6 +249,21 @@ static void aspell_dictfile_handler (const langType language CTAGS_ATTR_UNUSED,
 	vStringDelete (line);
 
 	mio_free (mio);
+}
+
+static void aspell_dictword_handler (const langType language CTAGS_ATTR_UNUSED,
+									 const char *optname CTAGS_ATTR_UNUSED,
+									 const char *arg)
+{
+	int count = 0;
+
+	if (!userDict)
+		userDict = makeDict();
+
+	if (arg && arg[0] != '\0')
+		count += add_word_to_dict(arg, userDict, splittingIntoSubwords);
+
+	verbose ("UCtagsAspell: add %d word(s)\n", count);
 }
 
 #ifdef HAVE_ASPELL

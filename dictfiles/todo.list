@@ -5,6 +5,8 @@ typeref
 cpreprocessor
 makefiles
 dictsdir
+# This is a parameter. --list-params can make the list.
+dictword
 # ???
 ok
 # ???
