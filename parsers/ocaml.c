@@ -421,6 +421,7 @@ static ocamlKeyword lex (lexingState * st)
 	else if (isOperator[*st->cp])
 		return eatOperator (st);
 	else
+	{
 		switch (*st->cp)
 		{
 		case '(':
@@ -478,6 +479,7 @@ static ocamlKeyword lex (lexingState * st)
 			st->cp++;
 			break;
 		}
+	}
 	/* default return if nothing is recognized,
 	 * shouldn't happen, but at least, it will
 	 * be handled without destroying the parsing. */
