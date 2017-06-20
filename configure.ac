@@ -201,10 +201,6 @@ AC_ARG_WITH([ctags-sysconfdir],
 	[AS_HELP_STRING([--with-ctags-sysconfdir=DIR],
 		['universal-ctags'-specific read-only single-machine data [SYSCONFDIR/ctags]])])
 
-AC_ARG_WITH([ctags-libexecdir],
-	[AS_HELP_STRING([--with-ctags-libexecdir=DIR],
-		['universal-ctags'-specific program executables [LIBEXECDIR/ctags]])])
-
 AC_ARG_ENABLE([debugging],
 	[AS_HELP_STRING([--enable-debugging],
 		[enable debugging features])])
@@ -221,28 +217,16 @@ case "${with_ctags_sysconfdir+set}"-"$with_ctags_sysconfdir" in #(
 *)	     ctags_sysconfdir="${sysconfdir}/ctags"	 ;;
 esac
 
-case "${with_ctags_libexecdir+set}"-"$with_ctags_libexecdir" in #(
-"set"-"yes") ctags_libexecdir="${libexecdir}/ctags"	 ;; #(
-"set"-"no")  ctags_libexecdir="${libexecdir}"		 ;; #(
-"set"-*)     ctags_libexecdir="${with_ctags_libexecdir}" ;; #(
-*)	     ctags_libexecdir="${libexecdir}/ctags"	 ;;
-esac
-
 pkgsysconfdir="${ctags_sysconfdir}"
-pkglibexecdir="${ctags_libexecdir}"
 
 AC_SUBST([pkgsysconfdir])
-AC_SUBST([pkglibexecdir])
 
 AH_TEMPLATE([PKGSYSCONFDIR], [installation directory of 'universal-ctags'-specific read-only single-machine data.])
-AH_TEMPLATE([PKGLIBEXECDIR], [installation directory of 'universal-ctags'-specific program executables.])
 
 AC_CONFIG_COMMANDS_PRE([
 	PKGSYSCONFDIR="PRETTY_VAR_EXPAND([pkgsysconfdir])"
-	PKGLIBEXECDIR="PRETTY_VAR_EXPAND([pkglibexecdir])"
 
 	AC_DEFINE_UNQUOTED([PKGSYSCONFDIR], ["${PKGSYSCONFDIR}"])
-	AC_DEFINE_UNQUOTED([PKGLIBEXECDIR], ["${PKGLIBEXECDIR}"])
 ])
 
 AM_CONDITIONAL(INSTALL_LIB, [test "x$enable_readlib" = "xyes"])
