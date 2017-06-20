@@ -293,10 +293,10 @@ static void eatComment (lexingState * st)
 
 			c = st->cp;
 			if (c == NULL)
-			    return;
+				return;
 
 			lastIsStar = false;
-            c++;
+			c++;
 		}
 		/* OCaml has a rule which says :
 		 *
@@ -306,17 +306,17 @@ static void eatComment (lexingState * st)
 		 * So if we encounter a string beginning, we must parse it to
 		 * get a good comment nesting (bug ID: 3117537)
 		 */
-        else if (*c == '"')
-        {
-            st->cp = c;
-            eatString (st);
-            c = st->cp;
-        }
+		else if (*c == '"')
+		{
+			st->cp = c;
+			eatString (st);
+			c = st->cp;
+		}
 		else
-        {
+		{
 			lastIsStar = '*' == *c;
-            c++;
-        }
+			c++;
+		}
 	}
 
 	st->cp = c;
@@ -552,7 +552,7 @@ static int getLastNamedIndex ( void )
 
 	for (i = stackIndex - 1; i >= 0; --i)
 	{
-        if (vStringLength (stack[i].contextName) > 0)
+		if (vStringLength (stack[i].contextName) > 0)
 		{
 			return i;
 		}
@@ -606,7 +606,7 @@ static char contextTypeSuffix (contextType t)
 
 /* Push a new context, handle null string */
 static void pushContext (contextKind kind, contextType type, parseNext after,
-        vString const *contextName)
+	vString const *contextName)
 {
 	int parentIndex;
 
@@ -952,10 +952,10 @@ static void exceptionDecl (vString * const ident, ocaToken what)
 	{
 		addTag (ident, K_EXCEPTION);
 	}
-    else /* probably ill-formed, give back to global scope */
-    {
-        globalScope (ident, what);
-    }
+	else /* probably ill-formed, give back to global scope */
+	{
+		globalScope (ident, what);
+	}
 	toDoNext = &globalScope;
 }
 
@@ -1262,11 +1262,11 @@ static void localLet (vString * const ident, ocaToken what)
  * because their syntax is similar.  */
 static void matchPattern (vString * const ident, ocaToken what)
 {
-    /* keep track of [], as it
-     * can be used in patterns and can
-     * mean the end of match expression in
-     * revised syntax */
-    static int braceCount = 0;
+	/* keep track of [], as it
+	 * can be used in patterns and can
+	 * mean the end of match expression in
+	 * revised syntax */
+	static int braceCount = 0;
 
 	switch (what)
 	{
@@ -1275,14 +1275,14 @@ static void matchPattern (vString * const ident, ocaToken what)
 		toDoNext = &mayRedeclare;
 		break;
 
-    case Tok_BRL:
-        braceCount++;
-        break;
+	case Tok_BRL:
+	braceCount++;
+	break;
 
-    case OcaKEYWORD_value:
+	case OcaKEYWORD_value:
 		popLastNamed ();
-        globalScope (ident, what);
-        break;
+	globalScope (ident, what);
+	break;
 
 	case OcaKEYWORD_in:
 		popLastNamed ();
@@ -1300,10 +1300,10 @@ static void mayRedeclare (vString * const ident, ocaToken what)
 {
 	switch (what)
 	{
-    case OcaKEYWORD_value:
-        /* let globalScope handle it */
-        globalScope (ident, what);
-        break;
+	case OcaKEYWORD_value:
+	/* let globalScope handle it */
+	globalScope (ident, what);
+	break;
 
 	case OcaKEYWORD_let:
 	case OcaKEYWORD_val:
@@ -1823,7 +1823,7 @@ static void initStack ( void )
 	int i;
 	for (i = 0; i < OCAML_MAX_STACK_SIZE; ++i)
 		stack[i].contextName = vStringNew ();
-    stackIndex = 0;
+	stackIndex = 0;
 }
 
 static void clearStack ( void )
@@ -1877,8 +1877,8 @@ extern parserDefinition *OcamlParser (void)
 {
 	static const char *const extensions[] = { "ml", "mli", "aug", NULL };
 	static const char *const aliases[] = { "tuareg", /* mode name of emacs */
-					       "caml",	 /* mode name of emacs */
-					       NULL };
+										   "caml",	 /* mode name of emacs */
+										   NULL };
 	parserDefinition *def = parserNew ("OCaml");
 	def->kindTable = OcamlKinds;
 	def->kindCount = ARRAY_SIZE (OcamlKinds);
