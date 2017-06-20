@@ -1,8 +1,8 @@
-#LETTER NAME                   ENABLED LANGUAGE         DESCRIPTION                   
--       whitespaceSwapped      TRUE    Robot            Include tags swapping whitespace and underscore chars
--       whitespaceSwapped      FALSE   Robot            Include tags swapping whitespace and underscore chars
--       whitespaceSwapped      TRUE    Robot            Include tags swapping whitespace and underscore chars
--       whitespaceSwapped      FALSE   Robot            Include tags swapping whitespace and underscore chars
--       whitespaceSwapped      TRUE    Robot            Include tags swapping whitespace and underscore chars
--       whitespaceSwapped      TRUE    Robot            Include tags swapping whitespace and underscore chars
--       whitespaceSwapped      TRUE    Robot            Include tags swapping whitespace and underscore chars
+#LETTER NAME              ENABLED LANGUAGE DESCRIPTION
+-       whitespaceSwapped TRUE    Robot    Include tags swapping whitespace and underscore chars
+-       whitespaceSwapped FALSE   Robot    Include tags swapping whitespace and underscore chars
+-       whitespaceSwapped TRUE    Robot    Include tags swapping whitespace and underscore chars
+-       whitespaceSwapped FALSE   Robot    Include tags swapping whitespace and underscore chars
+-       whitespaceSwapped TRUE    Robot    Include tags swapping whitespace and underscore chars
+-       whitespaceSwapped TRUE    Robot    Include tags swapping whitespace and underscore chars
+-       whitespaceSwapped TRUE    Robot    Include tags swapping whitespace and underscore chars

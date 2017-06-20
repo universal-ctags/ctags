@@ -118,71 +118,87 @@ extern xtagType  getXtagTypeForNameAndLanguage (const char *name, langType langu
 	return getXtagTypeGeneric (xtagEqualByNameAndLanguage, language, name);
 }
 
-
-#define PR_XTAG_WIDTH_LETTER     7
-#define PR_XTAG_WIDTH_NAME      22
-#define PR_XTAG_WIDTH_ENABLED   7
-#define PR_XTAG_WIDTH_LANGUAGE  16
-#define PR_XTAG_WIDTH_DESC      30
-
-#define PR_XTAG_STR(X) PR_XTAG_WIDTH_##X
-#define PR_XTAG_FMT(X,T) "%-" STRINGIFY(PR_XTAG_STR(X)) STRINGIFY(T)
-#define MAKE_XTAG_FMT(LETTER_SPEC)		\
-	PR_XTAG_FMT (LETTER,LETTER_SPEC)	\
-	" "					\
-	PR_XTAG_FMT (NAME,s)			\
-	" "					\
-	PR_XTAG_FMT (ENABLED,s)			\
-	" "					\
-	PR_XTAG_FMT (LANGUAGE,s)		\
-	" "					\
-	PR_XTAG_FMT (DESC,s)			\
-	"\n"
-
-static void printXtag (xtagType i)
+extern struct colprintTable * xtagColprintTableNew (void)
 {
-	unsigned char letter = getXtagDefinition (i)->letter;
-	langType lang;
-	const char *language;
-	const char *desc;
-
-	if (letter == NUL_XTAG_LETTER)
-		letter = '-';
-
-
-	lang = getXtagObject (i)->language;
-
-	if (lang == LANG_IGNORE)
-		language = "NONE";
-	else
-		language = getLanguageName (lang);
-
-	desc = getXtagDefinition (i)->description;
-	if (!desc)
-		desc = "NONE";
-
-	printf((Option.machinable? "%c\t%s\t%s\t%s\t%s\n": MAKE_XTAG_FMT(c)),
-	       letter,
-		   getXtagName (i),
-	       getXtagDefinition (i)->enabled? "TRUE": "FALSE",
-		   language,
-	       desc);
+	return colprintTableNew ("L:LETTER", "L:NAME", "L:ENABLED",
+							 "L:LANGUAGE", "L:DESCRIPTION", NULL);
 }
 
-extern void printXtags (int language)
+static void  xtagColprintAddLine (struct colprintTable *table, int xtype)
 {
-	unsigned int i;
+	xtagObject* xobj = getXtagObject (xtype);
+	xtagDefinition *xdef = xobj->def;
 
-	if (Option.withListHeader)
-		printf ((Option.machinable? "%s\t%s\t%s\t%s\t%s\n": MAKE_XTAG_FMT(s)),
-				"#LETTER", "NAME", "ENABLED", "LANGUAGE", "DESCRIPTION");
+	struct colprintLine *line = colprintTableGetNewLine(table);
 
-	for (i = 0; i < xtagObjectUsed; i++)
+	colprintLineAppendColumnChar (line,
+								  (xdef->letter == NUL_XTAG_LETTER)
+								  ? '-'
+								  : xdef->letter);
+	colprintLineAppendColumnCString (line, xdef->name);
+	colprintLineAppendColumnCString (line, xdef->enabled? "TRUE": "FALSE");
+	colprintLineAppendColumnCString (line,
+									 xobj->language == LANG_IGNORE
+									 ?"NONE"
+									 : getLanguageName (xobj->language));
+	colprintLineAppendColumnCString (line, xdef->description);
+}
+
+extern void xtagColprintAddCommonLines (struct colprintTable *table)
+{
+	for (int i = 0; i < XTAG_COUNT; i++)
+		xtagColprintAddLine (table, i);
+}
+
+extern void xtagColprintAddLanguageLines (struct colprintTable *table, langType language)
+{
+	for (int i = XTAG_COUNT; i < xtagObjectUsed; i++)
 	{
-		if (language == LANG_AUTO || getXtagOwner (i) == language)
-			printXtag (i);
-	}
+		xtagObject* xobj = getXtagObject (i);
 
+		if (xobj->language == language)
+			xtagColprintAddLine (table, i);
+	}
+}
+
+static int xtagColprintCompareLines (struct colprintLine *a , struct colprintLine *b)
+{
+	const char *a_parser = colprintLineGetColumn (a, 3);
+	const char *b_parser = colprintLineGetColumn (b, 3);
+
+	if (strcmp (a_parser, "NONE") == 0
+		&& strcmp (b_parser, "NONE") != 0)
+		return -1;
+	else if (strcmp (a_parser, "NONE") != 0
+			 && strcmp (b_parser, "NONE") == 0)
+		return 1;
+	else if (strcmp (a_parser, "NONE") != 0
+			 && strcmp (b_parser, "NONE") != 0)
+	{
+		int r;
+		r = strcmp (a_parser, b_parser);
+		if (r != 0)
+			return r;
+
+		const char *a_name = colprintLineGetColumn (a, 1);
+		const char *b_name = colprintLineGetColumn (b, 1);
+
+		return strcmp(a_name, b_name);
+	}
+	else
+	{
+		const char *a_letter = colprintLineGetColumn (a, 0);
+		const char *b_letter = colprintLineGetColumn (b, 0);
+
+		return strcmp(a_letter, b_letter);
+	}
+}
+
+extern void xtagColprintTablePrint (struct colprintTable *table,
+									bool withListHeader, bool machinable, FILE *fp)
+{
+	colprintTableSort (table, xtagColprintCompareLines);
+	colprintTablePrint (table, 0, withListHeader, machinable, fp);
 }
 
 extern bool isXtagEnabled (xtagType type)

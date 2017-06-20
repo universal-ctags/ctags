@@ -13,6 +13,7 @@
 
 #include "general.h"  /* must always come first */
 
+#include "colprint.h"
 #include "ctags.h"
 #include "debug.h"
 #include "options.h"
@@ -207,10 +208,30 @@ extern bool isPtagCommonInParsers  (ptagType type)
 	return pdesc->commonInParsers;
 }
 
-extern void printPtag (ptagType type)
+static int ptagCompare (struct colprintLine *a, struct colprintLine *b)
 {
-	printf("%s\t%s\t%s\n",
-	       ptagDescs[type].name,
-	       ptagDescs[type].description? ptagDescs[type].description: "NONE",
-	       ptagDescs[type].enabled? "on": "off");
+	const char *a_name = colprintLineGetColumn (a, 0);
+	const char *b_name = colprintLineGetColumn (b, 0);
+	return strcmp(a_name, b_name);
+}
+
+extern void printPtags (bool withListHeader, bool machinable, FILE *fp)
+{
+	struct colprintTable *table = colprintTableNew ("L:NAME",
+													"L:ENABLED",
+													"L:DESCRIPTION",
+													NULL);
+	for (unsigned int i = 0; i < PTAG_COUNT; i++)
+	{
+		struct colprintLine *line = colprintTableGetNewLine (table);
+		colprintLineAppendColumnCString (line, ptagDescs[i].name);
+		colprintLineAppendColumnCString (line, ptagDescs[i].enabled
+										 ? "on"
+										 : "off");
+		colprintLineAppendColumnCString (line, ptagDescs[i].description);
+	}
+
+	colprintTableSort (table, ptagCompare);
+	colprintTablePrint (table, 0, withListHeader, machinable, fp);
+	colprintTableDelete (table);
 }

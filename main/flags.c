@@ -77,31 +77,75 @@ void flagsEval (const char* flags_original, flagDefinition* defs, unsigned int n
 	eFree (flags);
 }
 
-void  flagPrintHelp (flagDefinition* def, unsigned int ndefs)
+extern struct colprintTable * flagsColprintTableNew (void)
 {
+	return colprintTableNew ("L:LETTER", "L:NAME", "L:DESCRIPTION", NULL);
+}
 
-	unsigned int i;
-	const char *longStr;
-	const char *description;
-	const char *paramName;
-	char shortChar[3];
-	for ( i = 0; i < ndefs; ++i )
+extern void flagsColprintAddDefinitions (struct colprintTable *table, flagDefinition* def,
+										 unsigned int ndefs)
+{
+	vString *longName = vStringNew ();
+
+	for (unsigned int i = 0; i < ndefs; i++)
 	{
-		longStr = def[i].longStr? def[i].longStr: "";
-		description = def[i].description? def[i].description: "";
+		struct colprintLine * line;
+		char shortChar;
+		const char *paramName;
+		const char *description;
+
+
+		line = colprintTableGetNewLine(table);
+
+		shortChar = def[i].shortChar;
+		if (shortChar == '\0')
+			shortChar = '-';
+		colprintLineAppendColumnChar (line, shortChar);
+
+		vStringCopyS (longName, def[i].longStr? def[i].longStr: "NONE");
 		paramName = def[i].paramName;
-
-		if (def[i].shortChar == '\0')
-			strcpy (shortChar, "-");
-		else
-		{
-			shortChar[0] = def[i].shortChar;
-			shortChar[1] = '\0';
-		}
-
 		if (paramName)
-			printf ("%s\t%s=%s\t%s\n", shortChar, longStr, paramName, description);
-		else
-			printf ("%s\t%s\t%s\n", shortChar, longStr, description);
+		{
+			vStringPut (longName, '=');
+			vStringCatS (longName, paramName);
+		}
+		colprintLineAppendColumnVString (line, longName);
+		vStringClear(longName);
+
+		description = def[i].description? def[i].description: "";
+		colprintLineAppendColumnCString (line, description);
 	}
+
+	vStringDelete(longName);
+}
+
+static int flagsColprintCompareLines(struct colprintLine *a , struct colprintLine *b)
+{
+	const char *a_letter = colprintLineGetColumn (a, 0);
+	const char *b_letter = colprintLineGetColumn (b, 0);
+
+	if (a_letter[0] != '-' && b_letter[0] == '-')
+		return -1;
+	else if (a_letter[0] == '-' && b_letter[0] != '-')
+		return 1;
+	else if (a_letter[0] != '-' && b_letter[0] != '-')
+		return strcmp(a_letter, b_letter);
+
+
+	const char *a_name = colprintLineGetColumn (a, 1);
+	const char *b_name = colprintLineGetColumn (b, 1);
+
+	if (a_name[0] != '_' && b_name[0] == '_')
+		return -1;
+	else if (a_name[0] == '_' && b_name[0] != '_')
+		return 1;
+
+	return strcmp(a_name, b_name);
+}
+
+extern void flagsColprintTablePrint (struct colprintTable *table,
+									 bool withListHeader, bool machinable, FILE *fp)
+{
+	colprintTableSort (table, flagsColprintCompareLines);
+	colprintTablePrint (table, 0, withListHeader, machinable, fp);
 }

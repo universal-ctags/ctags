@@ -178,6 +178,13 @@ extern bool isLanguageEnabled (const langType language)
 		return true;
 }
 
+extern bool isLanguageVisible (const langType language)
+{
+	const parserDefinition* const lang = LanguageTable [language].def;
+
+	return !lang->invisible;
+}
+
 /*
 *   parserDescription mapping management
 */
@@ -1757,10 +1764,19 @@ static void pre_lang_def_flag_direction_long (const char* const optflag, const c
 }
 
 static flagDefinition PreLangDefFlagDef [] = {
-	{ '\0',  "base",      NULL, pre_lang_def_flag_base_long },
-	{ '\0',  LANGDEF_FLAG_DEDICATED,  NULL, pre_lang_def_flag_direction_long },
-	{ '\0',  LANGDEF_FLAG_SHARED,     NULL, pre_lang_def_flag_direction_long },
-	{ '\0',  LANGDEF_FLAG_BIDIR,      NULL, pre_lang_def_flag_direction_long },
+	{ '\0',  "base", NULL, pre_lang_def_flag_base_long,
+	  "BASEPARSER", "utilize as a base parser"},
+	{ '\0',  LANGDEF_FLAG_DEDICATED,  NULL,
+	  pre_lang_def_flag_direction_long,
+	  NULL, "make the base parser dedicated to this subparser"},
+	{ '\0',  LANGDEF_FLAG_SHARED,     NULL,
+	  pre_lang_def_flag_direction_long,
+	  NULL, "share the base parser with the other subparsers"
+	},
+	{ '\0',  LANGDEF_FLAG_BIDIR,      NULL,
+	  pre_lang_def_flag_direction_long,
+	  NULL, "utilize the base parser both 'dedicated' and 'shared' way"
+	},
 };
 
 static void optlibFreeDep (langType lang, bool initialized CTAGS_ATTR_UNUSED)
@@ -2175,58 +2191,38 @@ extern bool processKindsOption (
 #undef PREFIX_LEN
 }
 
-static void printRoles (const langType language, const char* letters, bool allowMissingKind)
+extern void printLanguageRoles (const langType language, const char* kindspecs,
+								bool withListHeader, bool machinable, FILE *fp)
 {
-	parserObject *parser = LanguageTable + language;
-	struct kindControlBlock *kcb = parser->kindControlBlock;
-	const parserDefinition* const lang = parser->def;
-	const char *c;
+	struct colprintTable *table = roleColprintTableNew();
+	parserObject *parser;
 
-	if (lang->invisible)
-		return;
+	initializeParser (language);
 
-	for (c = letters; *c != '\0'; c++)
-	{
-		unsigned int i;
-		const kindDefinition *k;
-
-		for (i = 0; i < countKinds (kcb); ++i)
-		{
-			k = getKind(kcb, i);
-			if (*c == KIND_WILDCARD || k->letter == *c)
-			{
-				int j;
-				const roleDesc *r;
-
-				for (j = 0; j < k->nRoles; j++)
-				{
-					r = k->roles + j;
-					printf ("%s\t%c\t", lang->name, k->letter);
-					printRole (r);
-				}
-				if (*c != KIND_WILDCARD)
-					break;
-			}
-		}
-		if ((i == countKinds (kcb)) && (*c != KIND_WILDCARD) && (!allowMissingKind))
-			error (FATAL, "No such letter kind in %s: %c\n", lang->name, *c);
-	}
-}
-
-extern void printLanguageRoles (const langType language, const char* letters)
-{
 	if (language == LANG_AUTO)
 	{
-		unsigned int i;
-		for (i = 0  ;  i < LanguageCount  ;  ++i)
-			printRoles (i, letters, true);
+		for (unsigned int i = 0  ;  i < LanguageCount  ;  ++i)
+		{
+			if (!isLanguageVisible (i))
+				continue;
+
+			parser = LanguageTable + i;
+			roleColprintAddRoles (table, parser->kindControlBlock, kindspecs);
+		}
 	}
 	else
-		printRoles (language, letters, false);
+	{
+		parser = LanguageTable + language;
+		roleColprintAddRoles (table, parser->kindControlBlock, kindspecs);
+	}
 
+	roleColprintTablePrint (table, (language != LANG_AUTO),
+							withListHeader, machinable, fp);
+	colprintTableDelete (table);
 }
 
-static void printKinds (langType language, bool allKindFields, bool indent)
+static void printKinds (langType language, bool indent,
+						struct colprintTable * table)
 {
 	const parserObject *parser;
 	struct kindControlBlock *kcb;
@@ -2236,46 +2232,49 @@ static void printKinds (langType language, bool allKindFields, bool indent)
 	parser = LanguageTable + language;
 	kcb = parser->kindControlBlock;
 
-	unsigned int i;
-	for (i = 0  ;  i < countKinds(kcb)  ;  ++i)
+	if (table)
+		kindColprintAddLanguageLines (table, kcb);
+	else
 	{
-			if (allKindFields && indent)
-				printf (Option.machinable? "%s": PR_KIND_FMT (LANG,s), parser->def->name);
-			printKind (getKind(kcb, i), allKindFields, indent, Option.machinable);
+		for (unsigned int i = 0  ;  i < countKinds(kcb)  ;  ++i)
+			printKind (getKind(kcb, i), indent);
 	}
 }
 
-extern void printLanguageKinds (const langType language, bool allKindFields)
+extern void printLanguageKinds (const langType language, bool allKindFields,
+								bool withListHeader, bool machinable, FILE *fp)
 {
+	struct colprintTable * table = NULL;
+
+	if (allKindFields)
+		table = kindColprintTableNew ();
+
 	if (language == LANG_AUTO)
 	{
-		unsigned int i;
-
-		if (Option.withListHeader && allKindFields)
-			printKindListHeader (true, Option.machinable);
-
-		for (i = 0  ;  i < LanguageCount  ;  ++i)
+		for (unsigned int i = 0  ;  i < LanguageCount  ;  ++i)
 		{
 			const parserDefinition* const lang = LanguageTable [i].def;
 
 			if (lang->invisible)
 				continue;
 
-			if (!allKindFields)
+			if (!table)
 				printf ("%s%s\n", lang->name, isLanguageEnabled (i) ? "" : " [disabled]");
-			printKinds (i, allKindFields, true);
+			printKinds (i, true, table);
 		}
 	}
 	else
-	{
-		if (Option.withListHeader && allKindFields)
-			printKindListHeader (false, Option.machinable);
+		printKinds (language, false, table);
 
-		printKinds (language, allKindFields, false);
+	if (allKindFields)
+	{
+		kindColprintTablePrint(table, (language == LANG_AUTO)? 0: 1,
+							   withListHeader, machinable, fp);
+		colprintTableDelete (table);
 	}
 }
 
-static void printParameters (langType language, bool indent)
+static void printParameters (struct colprintTable *table, langType language)
 {
 	const parserDefinition* lang;
 	Assert (0 <= language  &&  language < (int) LanguageCount);
@@ -2284,42 +2283,35 @@ static void printParameters (langType language, bool indent)
 	lang = LanguageTable [language].def;
 	if (lang->parameterHandlerTable != NULL)
 	{
-		unsigned int i;
-
-		for (i = 0; i < lang->parameterHandlerCount; ++i)
-		{
-			if (indent)
-				printf (Option.machinable? "%s": PR_PARAM_FMT (LANG,s), lang->name);
-			printParameter (lang->parameterHandlerTable + i, indent, Option.machinable);
-		}
+		for (unsigned int i = 0; i < lang->parameterHandlerCount; ++i)
+			paramColprintAddParameter(table, language, lang->parameterHandlerTable + i);
 	}
 
 }
 
-extern void printLanguageParameters (const langType language)
+extern void printLanguageParameters (const langType language,
+									 bool withListHeader, bool machinable, FILE *fp)
 {
+	struct colprintTable *table =  paramColprintTableNew();
+
 	if (language == LANG_AUTO)
 	{
-		unsigned int i;
-
-		if (Option.withListHeader)
-			printParameterListHeader (true, Option.machinable);
-		for (i = 0; i < LanguageCount ; ++i)
+		for (unsigned int i = 0; i < LanguageCount ; ++i)
 		{
 			const parserDefinition* const lang = LanguageTable [i].def;
 
 			if (lang->invisible)
 				continue;
-			printParameters (i, true);
+
+			printParameters (table, i);
 		}
 	}
 	else
-	{
-		if (Option.withListHeader)
-			printParameterListHeader (false, Option.machinable);
+		printParameters (table, language);
 
-		printParameters (language, false);
-	}
+	paramColprintTablePrint (table, (language != LANG_AUTO),
+							 withListHeader, machinable, fp);
+	colprintTableDelete (table);
 }
 
 static void processLangAliasOption (const langType language,
@@ -3498,24 +3490,50 @@ extern subparser* getSubparserRunningBaseparser (void)
 		return NULL;
 }
 
-extern void printLanguageSubparsers (const langType language)
+extern void printLanguageSubparsers (const langType language,
+									 bool withListHeader, bool machinable, FILE *fp)
 {
 	for (int i = 0; i < (int) LanguageCount; i++)
 		initializeParserOne (i);
 
-
-	if (Option.withListHeader)
-		printSubparserListHeader (Option.machinable);
+	struct colprintTable * table = subparserColprintTableNew();
+	parserObject *parser;
 
 	if (language == LANG_AUTO)
 	{
 		for (int i = 0; i < (int) LanguageCount; i++)
-			printSubparsers ((LanguageTable + i)->slaveControlBlock,
-								 Option.machinable);
+		{
+			parser = LanguageTable + i;
+			if (parser->def->invisible)
+				continue;
+
+			subparserColprintAddSubparsers (table,
+											parser->slaveControlBlock);
+		}
 	}
 	else
-		printSubparsers ((LanguageTable + language)->slaveControlBlock,
-						 Option.machinable);
+	{
+		parser = (LanguageTable + language);
+		subparserColprintAddSubparsers (table,
+										parser->slaveControlBlock);
+	}
+
+	subparserColprintTablePrint (table,
+								 withListHeader, machinable,
+								 fp);
+	colprintTableDelete (table);
+}
+
+extern void printLangdefFlags (bool withListHeader, bool machinable, FILE *fp)
+{
+	struct colprintTable * table;
+
+	table = flagsColprintTableNew ();
+
+	flagsColprintAddDefinitions (table, PreLangDefFlagDef, ARRAY_SIZE (PreLangDefFlagDef));
+
+	flagsColprintTablePrint (table, withListHeader, machinable, fp);
+	colprintTableDelete(table);
 }
 
 /*

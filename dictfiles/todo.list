@@ -13,3 +13,13 @@ ok
 english
 # make parser should pickup this.
 ccld
+# HEX
+xffffffff
+# 0UL
+ul
+# roles?
+ltlibraries
+ltlibrary
+macrofile
+sincluded
+sourcefile

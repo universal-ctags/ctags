@@ -1,5 +1,7 @@
 boolean
 fprintf
+fputc
+fputs
 isalnum
 isalpha
 isdigit
@@ -8,7 +10,13 @@ isupper
 isxdigit
 printf
 putc
+putchar
 puts
+qsort
+scandir
+stdarg
 strcat
 strchr
 strcmp
+strncmp
+va

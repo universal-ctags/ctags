@@ -1011,30 +1011,32 @@ listed with ``--list-roles``:
 
 .. code-block:: console
 
-    $ ./ctags --_list-roles
-    C	d	undef	undefined	on
-    C	h	system	system header	on
-    C	h	local	local header	on
-    C++	d	undef	undefined	on
-    C++	h	system	system header	on
-    C++	h	local	local header	on
-    DTS	d	undef	undefined	on
-    DTS	h	system	system header	on
-    DTS	h	local	local header	on
-    Make	I	included	included	on
-    Make	I	optional	optionally included	on
-    Sh	s	loaded	loaded	on
-    Vera	d	undef	undefined	on
-    Vera	h	system	system header	on
-    Vera	h	local	local header	on
+    $ ./ctags --list-roles
+    #LANGUAGE      KIND(L/N)         NAME                ENABLED DESCRIPTION
+    SystemdUnit    u/unit            Requires            on      referred in Requires key
+    SystemdUnit    u/unit            Wants               on      referred in Wants key
+    SystemdUnit    u/unit            After               on      referred in After key
+    SystemdUnit    u/unit            Before              on      referred in Before key
+    SystemdUnit    u/unit            RequiredBy          on      referred in RequiredBy key
+    SystemdUnit    u/unit            WantedBy            on      referred in WantedBy key
+    Yaml           a/anchor          alias               on      alias
+    DTD            e/element         attOwner            on      attributes owner
+    Automake       c/condition       branched            on      used for branching
+    Cobol          S/sourcefile      copied              on      copied in source file
+    Maven2         g/groupId         dependency          on      dependency
+    DTD            p/parameterEntity elementName         on      element names
+    DTD            p/parameterEntity condition           on      conditions
+    LdScript       s/symbol          entrypoint          on      entry points
+    LdScript       i/inputSection    discarded           on      discarded when linking
+    ...
 
 The first column shows the name of the parser.
-The second column shows the name of the kind.
+The second column shows the letter/name of the kind.
 The third column shows the name of the role.
-The fourth column shows the description of the role.
-The fifth column shows whether the role is enabled or not.
+The fourth column shows whether the role is enabled or not.
+The fifth column shows the description of the role.
 
-Currently ctags doesn't provide the means for disabling a
+Currently ctags doesn't provide the way for disabling a
 specified role.
 
 

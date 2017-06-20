@@ -102,8 +102,6 @@ typedef struct sOptionValues {
 	unsigned int patternLengthLimit; /* --pattern-length-limit=N */
 	bool putFieldPrefix;		 /* --put-field-prefix */
 	unsigned int maxRecursionDepth; /* --maxdepth=<max-recursion-depth> */
-	bool machinable;		/* --machinable */
-	bool withListHeader;		/* --with-list-header */
 	enum interactiveMode { INTERACTIVE_NONE = 0,
 						   INTERACTIVE_DEFAULT,
 						   INTERACTIVE_SANDBOX, } interactive; /* --interactive */

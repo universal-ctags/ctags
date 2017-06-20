@@ -1,0 +1,66 @@
+{header}
+#LANGUAGE      KIND(L/N) NAME   ENABLED DESCRIPTION
+C              h/header  local  on      local header
+C              h/header  system on      system header
+C++            h/header  local  on      local header
+C++            h/header  system on      system header
+CPreProcessor  h/header  local  on      local header
+CPreProcessor  h/header  system on      system header
+CUDA           h/header  local  on      local header
+CUDA           h/header  system on      system header
+OldC           h/header  local  on      local header
+OldC           h/header  system on      system header
+OldC++         h/header  local  on      local header
+OldC++         h/header  system on      system header
+Vera           h/header  local  on      local header
+Vera           h/header  system on      system header
+{header}I
+#LANGUAGE      KIND(L/N)   NAME      ENABLED DESCRIPTION
+C              h/header    local     on      local header
+C              h/header    system    on      system header
+C++            h/header    local     on      local header
+C++            h/header    system    on      system header
+CPreProcessor  h/header    local     on      local header
+CPreProcessor  h/header    system    on      system header
+CUDA           h/header    local     on      local header
+CUDA           h/header    system    on      system header
+M4             I/macrofile included  on      included macro
+M4             I/macrofile sincluded on      silently included macro
+Make           I/makefile  included  on      included
+Make           I/makefile  optional  on      optionally included
+OldC           h/header    local     on      local header
+OldC           h/header    system    on      system header
+OldC++         h/header    local     on      local header
+OldC++         h/header    system    on      system header
+Vera           h/header    local     on      local header
+Vera           h/header    system    on      system header
+d{header}
+#LANGUAGE      KIND(L/N)   NAME      ENABLED DESCRIPTION
+Automake       d/directory data      on      directory for DATA primary
+Automake       d/directory library   on      directory for LIBRARIES primary
+Automake       d/directory ltlibrary on      directory for LTLIBRARIES primary
+Automake       d/directory man       on      directory for MANS primary
+Automake       d/directory program   on      directory for PROGRAMS primary
+Automake       d/directory script    on      directory for SCRIPTS primary
+C              d/macro     undef     on      undefined
+C              h/header    local     on      local header
+C              h/header    system    on      system header
+C++            d/macro     undef     on      undefined
+C++            h/header    local     on      local header
+C++            h/header    system    on      system header
+CPreProcessor  d/macro     undef     on      undefined
+CPreProcessor  h/header    local     on      local header
+CPreProcessor  h/header    system    on      system header
+CUDA           d/macro     undef     on      undefined
+CUDA           h/header    local     on      local header
+CUDA           h/header    system    on      system header
+M4             d/macro     undef     on      undefined
+OldC           d/macro     undef     on      undefined
+OldC           h/header    local     on      local header
+OldC           h/header    system    on      system header
+OldC++         d/macro     undef     on      undefined
+OldC++         h/header    local     on      local header
+OldC++         h/header    system    on      system header
+Vera           d/macro     undef     on      undefined
+Vera           h/header    local     on      local header
+Vera           h/header    system    on      system header

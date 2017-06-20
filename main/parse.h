@@ -154,6 +154,8 @@ extern langType getFileLanguage (const char *const fileName);
 extern bool isLanguageEnabled (const langType language);
 extern bool isLanguageKindEnabled (const langType language, char kind);
 
+extern bool isLanguageVisible (const langType language);
+
 extern void installLanguageMapDefault (const langType language);
 extern void installLanguageMapDefaults (void);
 extern void clearLanguageMap (const langType language);
@@ -177,12 +179,17 @@ extern void initializeParsing (void);
 extern void initializeParser (langType language);
 extern unsigned int countParsers (void);
 extern void freeParserResources (void);
-extern void printLanguageKinds (const langType language, bool allKindFields);
-extern void printLanguageRoles (const langType language, const char* letters);
+extern void printLanguageKinds (const langType language, bool allKindFields,
+								bool withListHeader, bool machinable, FILE *fp);
+extern void printLanguageRoles (const langType language, const char* letters,
+								bool withListHeader, bool machinable, FILE *fp);
 extern void printLanguageAliases (const langType language);
 extern void printLanguageList (void);
-extern void printLanguageParameters (const langType language);
-extern void printLanguageSubparsers (const langType language);
+extern void printLanguageParameters (const langType language,
+									 bool withListHeader, bool machinable, FILE *fp);
+extern void printLanguageSubparsers (const langType language,
+									 bool withListHeader, bool machinable, FILE *fp);
+extern void printLangdefFlags (bool withListHeader, bool machinable, FILE *fp);
 extern bool doesParserRequireMemoryStream (const langType language);
 extern bool parseFile (const char *const fileName);
 extern bool parseFileWithMio (const char *const fileName, MIO *mio);
@@ -206,7 +213,7 @@ extern void addLanguageCallbackRegex (const langType language, const char *const
 extern void freeRegexResources (void);
 extern bool checkRegex (void);
 extern void useRegexMethod (const langType language);
-extern void printRegexFlags (void);
+extern void printRegexFlags (bool withListHeader, bool machinable, FILE *fp);
 extern bool hasLanguageScopeActionInRegex (const langType language);
 
 /* Multiline Regex Interface */

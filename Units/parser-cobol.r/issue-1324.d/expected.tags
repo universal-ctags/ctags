@@ -15,9 +15,9 @@ F-TEXT-KEY1	input.cbl	/^           05 F-TEXT-KEY1          PIC 9(8).$/;"	d
 F-TEXT-KEY2	input.cbl	/^           05 F-TEXT-KEY2          PIC 9(8).$/;"	d
 F-TEXT-KEY3	input.cbl	/^           05 F-TEXT-KEY3          PIC 99.$/;"	d
 F-TEXT-EVENT	input.cbl	/^           05 F-TEXT-EVENT         PIC X(10).$/;"	d
-TCTOENV	input.cbl	/^       COPY TCTOENV.$/;"	S	role:copyed
-TCWFLENG	input.cbl	/^       COPY TCWFLENG.$/;"	S	role:copyed
-TCPR	input.cbl	/^       COPY TCPR.$/;"	S	role:copyed
+TCTOENV	input.cbl	/^       COPY TCTOENV.$/;"	S	role:copied
+TCWFLENG	input.cbl	/^       COPY TCWFLENG.$/;"	S	role:copied
+TCPR	input.cbl	/^       COPY TCPR.$/;"	S	role:copied
 LINKAGE	input.cbl	/^       LINKAGE SECTION.$/;"	s
 PROCEDURE	input.cbl	/^       PROCEDURE DIVISION.$/;"	D
 MAIN	input.cbl	/^       MAIN SECTION.$/;"	s

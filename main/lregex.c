@@ -26,6 +26,7 @@
 #include <regex.h>
 
 #include "debug.h"
+#include "colprint.h"
 #include "entry.h"
 #include "flags.h"
 #include "htable.h"
@@ -1087,14 +1088,21 @@ extern void processTagRegexOption (struct lregexControlBlock *lcb,
 *   Regex option parsing
 */
 
-extern void printRegexFlags (void)
+extern void printRegexFlags (bool withListHeader, bool machinable, FILE *fp)
 {
-	flagPrintHelp (regexFlagDefs,  ARRAY_SIZE (regexFlagDefs));
-	flagPrintHelp (prePtrnFlagDef, ARRAY_SIZE (prePtrnFlagDef));
-	flagPrintHelp (scopePtrnFlagDef, ARRAY_SIZE (scopePtrnFlagDef));
-	flagPrintHelp (multilinePtrnFlagDef, ARRAY_SIZE (multilinePtrnFlagDef));
-	flagPrintHelp (extraSpecFlagDef, ARRAY_SIZE (extraSpecFlagDef));
-	flagPrintHelp (fieldSpecFlagDef, ARRAY_SIZE (fieldSpecFlagDef));
+	struct colprintTable * table;
+
+	table = flagsColprintTableNew ();
+
+	flagsColprintAddDefinitions (table, regexFlagDefs,  ARRAY_SIZE (regexFlagDefs));
+	flagsColprintAddDefinitions (table, prePtrnFlagDef, ARRAY_SIZE (prePtrnFlagDef));
+	flagsColprintAddDefinitions (table, scopePtrnFlagDef, ARRAY_SIZE (scopePtrnFlagDef));
+	flagsColprintAddDefinitions (table, multilinePtrnFlagDef, ARRAY_SIZE (multilinePtrnFlagDef));
+	flagsColprintAddDefinitions (table, extraSpecFlagDef, ARRAY_SIZE (extraSpecFlagDef));
+	flagsColprintAddDefinitions (table, fieldSpecFlagDef, ARRAY_SIZE (fieldSpecFlagDef));
+
+	flagsColprintTablePrint (table, withListHeader, machinable, fp);
+	colprintTableDelete(table);
 }
 
 extern void freeRegexResources (void)

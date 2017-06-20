@@ -176,13 +176,19 @@ optionValues Option = {
 	.patternLengthLimit = 96,
 	.putFieldPrefix = false,
 	.maxRecursionDepth = 0xffffffff,
-	.machinable = false,
-	.withListHeader = true,
 	.interactive = false,
 #ifdef DEBUG
 	.debugLevel = 0,
 	.breakLine = 0,
 #endif
+};
+
+struct localOptionValues {
+	bool machinable;			/* --machinable */
+	bool withListHeader;		/* --with-list-header */
+} localOption = {
+	.machinable = false,
+	.withListHeader = true,
 };
 
 static OptionLoadingStage Stage = OptionLoadingStageNone;
@@ -323,13 +329,15 @@ static optionDescription LongOptionDescription [] = {
  {1,"  --list-features"},
  {1,"       Output list of features."},
  {1,"  --list-fields=[language|all]"},
- {1,"       Output list of fields. This works with --machinable."},
+ {1,"       Output list of fields."},
  {1,"  --list-kinds=[language|all]"},
  {1,"       Output a list of all tag kinds for specified language or all."},
  {1,"  --list-kinds-full=[language|all]"},
  {1,"       List the details of all tag kinds for specified language or all"},
  {1,"       For each line, associated language name is printed when \"all\" is"},
- {1,"       specified as language. This works with --machinable."},
+ {1,"       specified as language."},
+ {1,"  --list-langdef-flags"},
+ {1,"       Output list of flags which can be used with --langdef option."},
  {1,"  --list-languages"},
  {1,"       Output list of supported languages."},
  {1,"  --list-maps=[language|all]"},
@@ -342,11 +350,16 @@ static optionDescription LongOptionDescription [] = {
  {0,"       Output list of pseudo tags."},
  {1,"  --list-regex-flags"},
  {1,"       Output list of flags which can be used in a regex parser definition."},
+ {1,"  --list-roles=[[language|all].[kindspecs|*]]"},
+ {1,"       Output list of all roles of tag kind(s) specified for language(s)."},
+ {1,"       Both letters and names can be used in kindspecs."},
+ {1,"       e.g. --list-roles=C.{header}d"},
  {1,"  --list-subparsers=[baselang|all]"},
  {1,"       Output list of subparsers for the base language."},
  {1,"  --machinable=[yes|no]"},
  {1,"       Use tab separated representation in --list- option output. [no]"},
- {1,"       --list-extras, --list-fields, --list-kinds-full, and --list-params support this option."},
+ {1,"       --list-{extras,features,fields,kind-full,langdef-flags,params," },
+ {1,"       pseudo-tags,regex-flags,roles,subparsers} support this option."},
  {1,"       Suitable for scripting. Specify before --list-* option."},
  {1,"  --map-<LANG>=[+|-]pattern|extension"},
  {1,"       Set or add(+) a map for <LANG>."},
@@ -410,7 +423,8 @@ static optionDescription LongOptionDescription [] = {
  {1,"       Print version identifier to standard output."},
  {1,"  --with-list-header=[yes|no]"},
  {1,"       Prepend the column descriptions in --list- output. [yes]"},
- {1,"       --list-extras, --list-fields, --list-kinds-full, and --list-params support this option."},
+ {1,"       --list-{extras,features,fields,kind-full,langdef-flags,params," },
+ {1,"       pseudo-tags,regex-flags,roles,subparsers} support this option."},
  {1,"       Specify before --list-* option."},
  {1,"  --_anonhash=fname"},
  {1,"       Used in u-ctags test harness"},
@@ -441,9 +455,6 @@ static optionDescription LongOptionDescription [] = {
  {0,"       Enter file I/O limited interactive mode if sandbox is specified. [default]"},
 #endif
 #endif
- {1,"  --_list-roles=[[language|all]:[kindletters|*]]"},
- {1,"       Output list of all roles of tag kind(s) specified for language(s)."},
- {1,"       e.g. --_list-roles=Make:I"},
  {1,"  --_xformat=field_format"},
  {1,"       Specify custom format for tabular cross reference (-x)."},
  {1,"       Fields can be specified with letter listed in --list-fields."},
@@ -1385,14 +1396,31 @@ static void printFeatureList (void)
 }
 
 
+static int featureCompare (struct colprintLine *a, struct colprintLine *b)
+{
+	return strcmp (colprintLineGetColumn (a, 0),
+				   colprintLineGetColumn (b, 0));
+}
+
 static void processListFeaturesOption(const char *const option CTAGS_ATTR_UNUSED,
 				      const char *const parameter CTAGS_ATTR_UNUSED)
 {
 	int i;
 
+	struct colprintTable *table = colprintTableNew ("L:NAME", NULL);
+
 	for (i = 0 ; Features [i] != NULL ; ++i)
+	{
+		struct colprintLine * line = colprintTableGetNewLine (table);
 		if (strcmp (Features [i], "regex") != 0 || checkRegex ())
-			printf ("%s\n", Features [i]);
+			colprintLineAppendColumnCString (line, Features [i]);
+
+	}
+
+	colprintTableSort (table, featureCompare);
+	colprintTablePrint (table, 0, localOption.withListHeader, localOption.machinable, stdout);
+	colprintTableDelete (table);
+
 	if (i == 0)
 		putchar ('\n');
 	exit (0);
@@ -1401,23 +1429,31 @@ static void processListFeaturesOption(const char *const option CTAGS_ATTR_UNUSED
 static void processListFieldsOption(const char *const option CTAGS_ATTR_UNUSED,
 				    const char *const parameter)
 {
+	struct colprintTable * table = fieldColprintTableNew ();
+
 	if (parameter [0] == '\0' || strcasecmp (parameter, "all") == 0)
 	{
+		fieldColprintAddCommonLines (table);
+
 		initializeParser (LANG_AUTO);
-		printFields (LANG_AUTO);
+		for (unsigned int i = 0; i < countParsers (); i++)
+		{
+			if (isLanguageVisible(i))
+				fieldColprintAddLanguageLines (table, i);
+		}
 	}
 	else
 	{
 		langType language = getNamedLanguage (parameter, 0);
 		if (language == LANG_IGNORE)
 			error (FATAL, "Unknown language \"%s\" in \"%s\" option", parameter, option);
-		else
-		{
-			initializeParser (language);
-			printFields (language);
-		}
 
+		initializeParser (language);
+		fieldColprintAddLanguageLines (table, language);
 	}
+
+	fieldColprintTablePrint (table, localOption.withListHeader, localOption.machinable, stdout);
+	colprintTableDelete (table);
 	exit (0);
 }
 
@@ -1870,23 +1906,31 @@ static void processListAliasesOption (
 static void processListExtrasOption (
 		const char *const option CTAGS_ATTR_UNUSED, const char *const parameter CTAGS_ATTR_UNUSED)
 {
+	struct colprintTable * table = xtagColprintTableNew ();
+
 	if (parameter [0] == '\0' || strcasecmp (parameter, "all") == 0)
 	{
+		xtagColprintAddCommonLines (table);
+
 		initializeParser (LANG_AUTO);
-		printXtags (LANG_AUTO);
+		for (unsigned int i = 0; i < countParsers (); i++)
+		{
+			if (isLanguageVisible(i))
+				xtagColprintAddLanguageLines (table, i);
+		}
 	}
 	else
 	{
 		langType language = getNamedLanguage (parameter, 0);
 		if (language == LANG_IGNORE)
 			error (FATAL, "Unknown language \"%s\" in \"%s\" option", parameter, option);
-		else
-		{
-			initializeParser (language);
-			printXtags (language);
-		}
 
+		initializeParser (language);
+		xtagColprintAddLanguageLines (table, language);
 	}
+
+	xtagColprintTablePrint (table, localOption.withListHeader, localOption.machinable, stdout);
+	colprintTableDelete (table);
 	exit (0);
 }
 
@@ -1896,14 +1940,16 @@ static void processListKindsOption (
 	bool print_all = (strcmp (option, "list-kinds-full") == 0)? true: false;
 
 	if (parameter [0] == '\0' || strcasecmp (parameter, "all") == 0)
-		printLanguageKinds (LANG_AUTO, print_all);
+		printLanguageKinds (LANG_AUTO, print_all,
+							localOption.withListHeader, localOption.machinable, stdout);
 	else
 	{
 		langType language = getNamedLanguage (parameter, 0);
 		if (language == LANG_IGNORE)
 			error (FATAL, "Unknown language \"%s\" in \"%s\" option", parameter, option);
 		else
-			printLanguageKinds (language, print_all);
+			printLanguageKinds (language, print_all,
+								localOption.withListHeader, localOption.machinable, stdout);
 	}
 	exit (0);
 }
@@ -1912,14 +1958,18 @@ static void processListParametersOption (const char *const option,
 										 const char *const parameter)
 {
 	if (parameter [0] == '\0' || strcasecmp (parameter, "all") == 0)
-		printLanguageParameters (LANG_AUTO);
+		printLanguageParameters (LANG_AUTO,
+								 localOption.withListHeader, localOption.machinable,
+								 stdout);
 	else
 	{
 		langType language = getNamedLanguage (parameter, 0);
 		if (language == LANG_IGNORE)
 			error (FATAL, "Unknown language \"%s\" in \"%s\" option", parameter, option);
 		else
-			printLanguageParameters (language);
+			printLanguageParameters (language,
+									 localOption.withListHeader, localOption.machinable,
+									 stdout);
 	}
 	exit (0);
 }
@@ -1973,9 +2023,7 @@ static void processListPseudoTagsOptions (
 		const char *const option CTAGS_ATTR_UNUSED,
 		const char *const parameter CTAGS_ATTR_UNUSED)
 {
-	int i;
-	for (i = 0; i < PTAG_COUNT; i++)
-		printPtag (i);
+	printPtags (localOption.withListHeader, localOption.machinable, stdout);
 	exit (0);
 }
 
@@ -1983,21 +2031,33 @@ static void processListRegexFlagsOptions (
 		const char *const option CTAGS_ATTR_UNUSED,
 		const char *const parameter CTAGS_ATTR_UNUSED)
 {
-	printRegexFlags ();
+	printRegexFlags (localOption.withListHeader, localOption.machinable, stdout);
 	exit (0);
 }
+
+static void processListLangdefFlagsOptions (
+		const char *const option CTAGS_ATTR_UNUSED,
+		const char *const parameter CTAGS_ATTR_UNUSED)
+{
+	printLangdefFlags (localOption.withListHeader, localOption.machinable, stdout);
+	exit (0);
+}
+
 
 static void processListRolesOptions (const char *const option CTAGS_ATTR_UNUSED,
 				     const char *const parameter)
 {
 	const char* sep;
-	const char *kindletters;
+	const char *kindspecs;
 	langType lang;
 
 
 	if (parameter == NULL || parameter[0] == '\0')
 	{
-		printLanguageRoles (LANG_AUTO, "*");
+		printLanguageRoles (LANG_AUTO, "*",
+							localOption.withListHeader,
+							localOption.machinable,
+							stdout);
 		exit (0);
 	}
 
@@ -2011,7 +2071,7 @@ static void processListRolesOptions (const char *const option CTAGS_ATTR_UNUSED,
 		/* The control should never reached here. */
 	}
 
-	kindletters = sep + 1;
+	kindspecs = sep + 1;
 	if (strncmp (parameter, "all.", 4) == 0
 	    || strncmp (parameter, "*.", 1) == 0
 	    || strncmp (parameter, ".", 1) == 0)
@@ -2022,7 +2082,10 @@ static void processListRolesOptions (const char *const option CTAGS_ATTR_UNUSED,
 		if (lang == LANG_IGNORE)
 			error (FATAL, "Unknown language \"%s\" in \"%s\"", parameter, option);
 	}
-	printLanguageRoles (lang, kindletters);
+	printLanguageRoles (lang, kindspecs,
+						localOption.withListHeader,
+						localOption.machinable,
+						stdout);
 	exit (0);
 }
 
@@ -2035,7 +2098,9 @@ static void processListSubparsersOptions (const char *const option CTAGS_ATTR_UN
 	if (parameter == NULL || parameter[0] == '\0'
 		|| (strcmp(parameter, "all") == 0))
 	{
-		printLanguageSubparsers(LANG_AUTO);
+		printLanguageSubparsers(LANG_AUTO,
+								localOption.withListHeader, localOption.machinable,
+								stdout);
 		exit (0);
 	}
 
@@ -2043,7 +2108,9 @@ static void processListSubparsersOptions (const char *const option CTAGS_ATTR_UN
 	if (lang == LANG_IGNORE)
 		error (FATAL, "Unknown language \"%s\" in \"%s\"", parameter, option);
 
-	printLanguageSubparsers(lang);
+	printLanguageSubparsers(lang,
+							localOption.withListHeader, localOption.machinable,
+							stdout);
 	exit (0);
 }
 
@@ -2561,13 +2628,14 @@ static parametricOption ParametricOptions [] = {
 	{ "list-fields",            processListFieldsOption,        true,   STAGE_ANY },
 	{ "list-kinds",             processListKindsOption,         true,   STAGE_ANY },
 	{ "list-kinds-full",        processListKindsOption,         true,   STAGE_ANY },
+	{ "list-langdef-flags",     processListLangdefFlagsOptions, true,   STAGE_ANY },
 	{ "list-languages",         processListLanguagesOption,     true,   STAGE_ANY },
 	{ "list-maps",              processListMapsOption,          true,   STAGE_ANY },
 	{ "list-params",            processListParametersOption,    true,   STAGE_ANY },
 	{ "list-patterns",          processListPatternsOption,      true,   STAGE_ANY },
 	{ "list-pseudo-tags",       processListPseudoTagsOptions,   true,   STAGE_ANY },
 	{ "list-regex-flags",       processListRegexFlagsOptions,   true,   STAGE_ANY },
-	{ "_list-roles",            processListRolesOptions,        true,   STAGE_ANY },
+	{ "list-roles",             processListRolesOptions,        true,   STAGE_ANY },
 	{ "list-subparsers",        processListSubparsersOptions,   true,   STAGE_ANY },
 	{ "maxdepth",               processMaxRecursionDepthOption, true,   STAGE_ANY },
 	{ "options",                processOptionFile,              false,  STAGE_ANY },
@@ -2597,7 +2665,7 @@ static booleanOption BooleanOptions [] = {
 	{ "guess-language-eagerly", &Option.guessLanguageEagerly, false, STAGE_ANY },
 	{ "line-directives",&Option.lineDirectives,         false, STAGE_ANY },
 	{ "links",          &Option.followLinks,            false, STAGE_ANY },
-	{ "machinable",     &Option.machinable,             true,  STAGE_ANY },
+	{ "machinable",     &localOption.machinable,             true,  STAGE_ANY },
 	{ "put-field-prefix", &Option.putFieldPrefix,       false, STAGE_ANY },
 	{ "print-language", &Option.printLanguage,          true,  STAGE_ANY },
 	{ "quiet",          &Option.quiet,                  false, STAGE_ANY },
@@ -2606,7 +2674,7 @@ static booleanOption BooleanOptions [] = {
 #endif
 	{ "totals",         &Option.printTotals,            true,  STAGE_ANY },
 	{ "verbose",        &Option.verbose,                false, STAGE_ANY },
-	{ "with-list-header", &Option.withListHeader,       true,  STAGE_ANY },
+	{ "with-list-header", &localOption.withListHeader,       true,  STAGE_ANY },
 	{ "_fatal-warnings",&Option.fatalWarnings,          false, STAGE_ANY },
 };
 

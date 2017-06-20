@@ -13,6 +13,7 @@
 #include "general.h"  /* must always come first */
 
 #include <string.h>
+#include <stdlib.h>
 
 #include "debug.h"
 #include "ptrarray.h"
@@ -159,4 +160,20 @@ extern void ptrArrayDeleteItem (ptrArray* const current, unsigned int indx)
 	memmove (current->array + indx, current->array + indx + 1,
 			(current->count - indx) * sizeof (*current->array));
 	--current->count;
+}
+
+static int (*ptrArraySortCompareVar)(const void *, const void *);
+
+static int ptrArraySortCompare(const void *a0, const void *b0)
+{
+	void *const *a = (void *const *)a0;
+	void *const *b = (void *const *)b0;
+
+	return ptrArraySortCompareVar (*a, *b);
+}
+
+extern void ptrArraySort (ptrArray *const current, int (*compare)(const void *, const void *))
+{
+	ptrArraySortCompareVar = compare;
+	qsort (current->array, current->count, sizeof (void *), ptrArraySortCompare);
 }

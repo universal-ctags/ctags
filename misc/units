@@ -50,7 +50,7 @@ readonly _TIMEOUT_EXIT=124
 readonly _VG_TIMEOUT_FACTOR=10
 readonly _VALGRIND_EXIT=58
 readonly _BASH_INTERRUPT_EXIT=59
-readonly _LINE_SPLITER=$(if type dos2unix > /dev/null 2>&1; then echo "dos2unix"; else echo "cat"; fi)
+readonly _LINE_SPLITTER=$(if type dos2unix > /dev/null 2>&1; then echo "dos2unix"; else echo "cat"; fi)
 readonly _STDERR_OUTPUT_NAME="STDERR.tmp"
 readonly _DIFF_OUTPUT_NAME="DIFF.tmp"
 readonly _NOISE_REPORT_MAX_COLUMN=50
@@ -213,7 +213,7 @@ check_features()
     for expected in $([ -f "$ffile" ] && cat "$ffile") ${feature}; do
 	    found=no
 	    found_unexpectedly=no
-	    for f in $( ${CTAGS} --quiet --options=NONE --list-features 2> /dev/null | "${_LINE_SPLITER}" ) ; do
+	    for f in $( ${CTAGS} --quiet --options=NONE --list-features --with-list-header=no 2> /dev/null | "${_LINE_SPLITTER}" ) ; do
 		[ "$expected" = "$f" ] && found=yes
 		[ "$expected" = '!'"$f" ] && found_unexpectedly=yes
 	    done
@@ -244,7 +244,7 @@ check_languages()
     #
     while read expected; do
 	    found=no
-	    for l in $( ${_CMDLINE} --list-languages 2>/dev/null | "${_LINE_SPLITER}" |sed -e 's/ //' ); do
+	    for l in $( ${_CMDLINE} --list-languages 2>/dev/null | "${_LINE_SPLITTER}" |sed -e 's/ //' ); do
 		[ "$expected" = "$l" ] && found=yes
 	    done
 	    if ! [ "$found" = yes ]; then
@@ -1517,7 +1517,7 @@ action_fuzz_common ()
 	_CMDLINE_FOR_SHRINKING="timeout --foreground 1 ${_CMDLINE_FOR_SHRINKING}"
     fi
 
-    for lang in $( ${cmdline} --list-languages 2>/dev/null | "${_LINE_SPLITER}" |sed -e 's/ //' ) ; do
+    for lang in $( ${cmdline} --list-languages 2>/dev/null | "${_LINE_SPLITTER}" |sed -e 's/ //' ) ; do
 	if [ -n "${LANGUAGES}" ] && ! member_p "${lang}" ${LANGUAGES}; then
 	    continue
 	fi

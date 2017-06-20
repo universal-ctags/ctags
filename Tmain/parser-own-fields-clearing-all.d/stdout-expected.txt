@@ -1,4 +1,4 @@
 # default
--       assignment      on      LdScript         TRUE   s--    how a value is assigned to the symbol
+-       assignment on      LdScript TRUE s--    how a value is assigned to the symbol
 # clear all
--       assignment      off     LdScript         TRUE   s--    how a value is assigned to the symbol
+-       assignment off     LdScript TRUE s--    how a value is assigned to the symbol

@@ -13,6 +13,7 @@
 #define CTAGS_MAIN_FIELD_H
 
 #include "general.h"
+#include "colprint.h"
 #include "writer.h"
 #include "types.h"
 
@@ -49,8 +50,8 @@ typedef enum eFieldType { /* extension field content control */
 	FIELD_EXTRAS,
 	FIELD_XPATH,
 	FIELD_SCOPE_KIND_LONG,
-	FIELD_END,
-	FIELD_BUILTIN_LAST = FIELD_END,
+	FIELD_END_LINE,
+	FIELD_BUILTIN_LAST = FIELD_END_LINE,
 } fieldType ;
 
 typedef const char* (* renderEscaped) (const tagEntryInfo *const tag,
@@ -124,5 +125,12 @@ extern int countFields (void);
    Use int here to avoid circular dependency */
 extern int defineField (fieldDefinition *spec, langType language);
 extern fieldType nextSiblingField (fieldType type);
+
+/* --list-fields implementation. LANGUAGE must be initialized. */
+extern struct colprintTable * fieldColprintTableNew (void);
+extern void fieldColprintAddCommonLines (struct colprintTable *table);
+extern void fieldColprintAddLanguageLines (struct colprintTable *table, langType language);
+extern void fieldColprintTablePrint (struct colprintTable *table,
+									 bool withListHeader, bool machinable, FILE *fp);
 
 #endif	/* CTAGS_MAIN_FIELD_H */

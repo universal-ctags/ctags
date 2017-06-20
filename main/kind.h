@@ -10,7 +10,7 @@
 
 #include "general.h"
 #include "types.h"
-#include "routines.h"		/* for STRINGIFY */
+#include "routines.h"
 #include "vstring.h"
 
 typedef struct sRoleDesc {
@@ -19,7 +19,6 @@ typedef struct sRoleDesc {
 	const char* description;	  /* displayed in --help output */
 } roleDesc;
 
-extern void printRole (const roleDesc* const role); /* for --help */
 extern const char *renderRole (const roleDesc* const role, vString* b);
 
 /*
@@ -78,18 +77,12 @@ struct sKindDefinition {
 #define ATTACH_ROLES(RS) .nRoles = ARRAY_SIZE(RS), .roles = RS
 #define ATTACH_SEPARATORS(S) .separators = S, .separatorCount = ARRAY_SIZE(S)
 
-/* The value of `tabSeparated' is meaningfull only when `allKindFields' is true. */
-extern void printKind (const kindDefinition* const kind, bool allKindFields, bool indent,
-		       bool tabSeparated);
-extern void printKindListHeader (bool indent, bool tabSeparated);
+/* for the obsolete --list-kinds option */
+extern void printKind (const kindDefinition* const kind, bool indent);
+
 extern const char *scopeSeparatorFor (const kindDefinition *kind, char parentLetter);
 
 extern void enableKind (kindDefinition *kind, bool enable);
-
-#define PR_KIND_STR(X) PR_KIND_WIDTH_##X
-#define PR_KIND_FMT(X,T) "%-" STRINGIFY(PR_KIND_STR(X)) STRINGIFY(T)
-
-#define PR_KIND_WIDTH_LANG 15
 
 struct kindControlBlock;
 typedef void (* freeKindDefFunc) (kindDefinition *);
@@ -103,6 +96,20 @@ extern kindDefinition *getKindForLetter (struct kindControlBlock* kcb, int lette
 extern kindDefinition *getKindForName (struct kindControlBlock* kcb, const char* name);
 extern void linkKindDependency (struct kindControlBlock *masterKCB,
 								struct kindControlBlock *slaveKCB);
+
+/* for --list-kinds-full option. LANGUAGE must be initialized. */
+extern struct colprintTable * kindColprintTableNew (void);
+extern void kindColprintAddLanguageLines (struct colprintTable *table,
+										  struct kindControlBlock* kcb);
+extern void kindColprintTablePrint (struct colprintTable *table, bool noparser,
+									bool withListHeader, bool machinable, FILE *fp);
+
+extern struct colprintTable * roleColprintTableNew (void);
+extern void roleColprintAddRoles (struct colprintTable *table,
+								  struct kindControlBlock* kcb,
+								  const char *kindspecs);
+extern void roleColprintTablePrint (struct colprintTable *table, bool noparser,
+									bool withListHeader, bool machinable, FILE *fp);
 
 #ifdef DEBUG
 extern bool doesParserUseKind (struct kindControlBlock* kcb, char letter);

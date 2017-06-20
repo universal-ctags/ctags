@@ -1,2 +1,2 @@
-L       label           on       FALSE   0      C          goto labels                   
-d       macro           off      FALSE   1      C          macro definitions             
+L       label      on      FALSE   0      C      goto labels
+d       macro      off     FALSE   1      C      macro definitions

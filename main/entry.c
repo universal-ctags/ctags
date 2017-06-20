@@ -192,7 +192,7 @@ extern void makeFileTag (const char *const fileName)
 	markTagExtraBit (&tag, XTAG_FILE_NAMES);
 
 	tag.lineNumber = 1;
-	if (isFieldEnabled (FIELD_END))
+	if (isFieldEnabled (FIELD_END_LINE))
 	{
 		/* isFieldEnabled is called again in the rendering
 		   stage. However, it is called here for avoiding

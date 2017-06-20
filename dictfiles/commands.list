@@ -1,7 +1,9 @@
 basename
 cgcc
+dos2unix
 gcc
 mkdir
 pwd
 sed
+valgrind
 wc

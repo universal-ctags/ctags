@@ -13,6 +13,8 @@
 #define CTAGS_MAIN_PARAM_H
 
 #include "general.h"
+
+#include "colprint.h"
 #include "types.h"
 
 typedef struct sParameterHandlerTable {
@@ -23,13 +25,11 @@ typedef struct sParameterHandlerTable {
 
 extern void applyParameter (const langType language, const char *name, const char *args);
 
-extern void printParameterListHeader (bool indent, bool tabSeparated);
-extern void printParameter (const parameterHandlerTable *const paramHandler, bool indent, bool tabSeparated);
-
-
-#define PR_PARAM_STR(X) PR_PARAM_WIDTH_##X
-#define PR_PARAM_FMT(X,T) "%-" STRINGIFY(PR_PARAM_STR(X)) STRINGIFY(T)
-
-#define PR_PARAM_WIDTH_LANG 15
+extern struct colprintTable * paramColprintTableNew (void);
+extern void paramColprintAddParameter (struct colprintTable *table,
+									   langType language,
+									   const parameterHandlerTable *const paramHandler);
+extern void paramColprintTablePrint (struct colprintTable *table, bool noparser,
+									bool withListHeader, bool machinable, FILE *fp);
 
 #endif	/* CTAGS_MAIN_PARAM_H */

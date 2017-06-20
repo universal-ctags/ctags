@@ -33,11 +33,11 @@ is_feature_available()
 	fi
 
 	if [ "${neg}" = 1 ]; then
-		if ${ctags} $o --list-features | grep -q "$feat"; then
+		if ${ctags} $o --list-features --with-list-header=no | grep -q "$feat"; then
 			skip "feature \"$feat\" is available in $ctags"
 		fi
 	else
-		if ! ${ctags} $o --list-features | grep -q "$feat"; then
+		if ! ${ctags} $o --list-features --with-list-header=no | grep -q "$feat"; then
 			skip "feature \"$feat\" is not available in $ctags"
 		fi
 	fi

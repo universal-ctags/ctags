@@ -18,6 +18,7 @@
 #include "kind.h"
 #include "parse.h"
 #include "options.h"
+#include "vstring.h"
 
 typedef struct sKindObject {
 	kindDefinition *def;
@@ -30,96 +31,18 @@ struct kindControlBlock {
 	langType owner;
 };
 
-extern void printRole (const roleDesc* const role)
-{
-	if (role)
-		printf ("%s\t%s\t%s\n", role->name, role->description, role->enabled? "on": "off");
-}
-
 extern const char *renderRole (const roleDesc* const role, vString* b)
 {
 	vStringCatS (b, role->name);
 	return vStringValue (b);
 }
 
-#define PR_KIND_WIDTH_LETTER         7
-#define PR_KIND_WIDTH_NAME          15
-#define PR_KIND_WIDTH_DESCRIPTION   30
-#define PR_KIND_WIDTH_ENABLED        8
-#define PR_KIND_WIDTH_REFONLY        7
-#define PR_KIND_WIDTH_NROLE          6
-#define PR_KIND_WIDTH_MASTER	    10
-#define MAKE_KIND_FMT(PREFIX,LETTER_SPEC,NROLL_SPEC)		\
-	PREFIX							\
-	PR_KIND_FMT (LETTER,LETTER_SPEC)			\
-	" "							\
-	PR_KIND_FMT (NAME,s)					\
-	" "							\
-	PR_KIND_FMT (ENABLED,s)					\
-	" "							\
-	PR_KIND_FMT (REFONLY,s)					\
-	" "							\
-	PR_KIND_FMT (NROLE,NROLL_SPEC)				\
-	" "							\
-	PR_KIND_FMT (MASTER,s)					\
-	" "							\
-	PR_KIND_FMT (DESCRIPTION,s)				\
-	"\n"
-
-extern void printKindListHeader (bool indent, bool tabSeparated)
+extern void printKind (const kindDefinition* const kind, bool indent)
 {
-#define KIND_HEADER_COMMON_FMT MAKE_KIND_FMT("%s", s, s)
-
-	const char *fmt = tabSeparated
-		? "%s%s%s\t%s\t%s\t%s\t%s\t%s\t%s\n"
-		: (indent
-		   ? PR_KIND_FMT (LANG,s) KIND_HEADER_COMMON_FMT
-		   : "%s"                 KIND_HEADER_COMMON_FMT)
-		;
-
-	printf (fmt,
-		(indent? "#PARSER": ""),
-		(indent? (tabSeparated? "\t": " "): ""),
-		(indent? "LETTER": "#LETTER"),
-		"NAME",
-		"ENABLED",
-		"REFONLY",
-		"NROLES",
-		"MASTER",
-		"DESCRIPTION");
-
-#undef KIND_HEADER_COMMON_FMT
-}
-
-extern void printKind (const kindDefinition* const kind, bool allKindFields, bool indent,
-		       bool tabSeparated)
-{
-#define KIND_FMT MAKE_KIND_FMT("", c, d)
-
-	if (allKindFields)
-	{
-		printf ((tabSeparated
-			 ?"%s%c\t%s\t%s\t%s\t%d\t%s\t%s\n"
-			 :"%s" KIND_FMT),
-			(indent? (tabSeparated? "\t": " "): ""),
-			kind->letter,
-			kind->name        != NULL ? kind->name        : "",
-			kind->enabled             ? "on"              : "off",
-			kind->referenceOnly       ? "TRUE"            : "FALSE",
-			kind->nRoles,
-			(kind->master
-			 || kind->slave ) ? getLanguageName (kind->syncWith): "",
-			kind->description != NULL ? kind->description : "");
-	}
-	else if (!kind->referenceOnly)
-	{
-		printf ("%s%c  %s%s\n", indent ? "    " : "", kind->letter,
+	printf ("%s%c  %s%s\n", indent ? "    " : "", kind->letter,
 			kind->description != NULL ? kind->description :
 			(kind->name != NULL ? kind->name : ""),
 			kind->enabled ? "" : " [off]");
-	}
-
-#undef KIND_FMT
 }
 
 const char *scopeSeparatorFor (const kindDefinition *kind, char parentLetter)
@@ -317,3 +240,179 @@ extern bool doesParserUseKind (struct kindControlBlock* kcb, char letter)
 	return false;
 }
 #endif
+
+extern struct colprintTable * kindColprintTableNew (void)
+{
+	return colprintTableNew ("L:LANGUAGE", "L:LETTER", "L:NAME", "L:ENABLED",
+							 "L:REFONLY", "L:NROLES", "L:MASTER",
+							 "L:DESCRIPTION",
+							 NULL);
+}
+
+extern void kindColprintFillLine (struct colprintLine *line,
+								  const char *lang,
+								  kindDefinition *kdef)
+{
+	colprintLineAppendColumnCString (line, lang);
+	colprintLineAppendColumnChar (line, kdef->letter);
+	colprintLineAppendColumnCString (line, kdef->name
+									 ? kdef->name
+									 : "ThisShouldNotBePrintedKindNameMustBeGiven");
+	colprintLineAppendColumnCString (line, kdef->enabled? "on": "off");
+	colprintLineAppendColumnCString (line, kdef->referenceOnly? "TRUE": "FALSE");
+	colprintLineAppendColumnInt (line, kdef->nRoles);
+	colprintLineAppendColumnCString (line, (kdef->master
+											|| kdef->slave ) ?
+									 getLanguageName (kdef->syncWith): "NONE");
+	colprintLineAppendColumnCString (line, kdef->description? kdef->description: "NO DESCRIPTION GIVEN");
+}
+
+extern void kindColprintAddLanguageLines (struct colprintTable *table,
+										  struct kindControlBlock* kcb)
+{
+	const char *lang = getLanguageName (kcb->owner);
+	for (unsigned int i = 0; i < countKinds (kcb); i++)
+	{
+		kindDefinition *kdef = getKind (kcb, i);
+		struct colprintLine *line = colprintTableGetNewLine(table);
+
+		kindColprintFillLine (line, lang, kdef);
+	}
+}
+
+static int kindColprintCompareLines (struct colprintLine *a , struct colprintLine *b)
+{
+	const char *a_parser = colprintLineGetColumn (a, 0);
+	const char *b_parser = colprintLineGetColumn (b, 0);
+	const char *a_letter;
+	const char *b_letter;
+	int r;
+
+	r = strcmp (a_parser, b_parser);
+	if (r != 0)
+		return r;
+
+	a_letter = colprintLineGetColumn (a, 1);
+	b_letter = colprintLineGetColumn (b, 1);
+	r = strcmp (a_letter, b_letter);
+	if (r != 0)
+		return r;
+
+	return 0;
+}
+
+extern void kindColprintTablePrint (struct colprintTable *table, bool noparser,
+									bool withListHeader, bool machinable, FILE *fp)
+{
+	colprintTableSort (table, kindColprintCompareLines);
+	colprintTablePrint (table, noparser? 1: 0, withListHeader, machinable, fp);
+}
+
+
+extern struct colprintTable * roleColprintTableNew (void)
+{
+	return colprintTableNew ("L:LANGUAGE", "L:KIND(L/N)", "L:NAME",
+							 "L:ENABLED", "L:DESCRIPTION", NULL);
+}
+
+extern void roleColprintAddRoles (struct colprintTable *table, struct kindControlBlock *kcb,
+								  const char *kindspecs)
+{
+	const char* lang;
+	vString *kind_l_and_n;
+
+	lang = getLanguageName (kcb->owner);
+	kind_l_and_n = vStringNew ();
+	for (const char *c = kindspecs; *c != '\0'; c++)
+	{
+		const char *kname = NULL;
+		size_t kname_len;
+
+		if (*c == '{')
+		{
+			const char *start = c + 1;
+			const char *end = strchr(c, '}');
+
+			if (!end)
+				error (FATAL, "'{' is not closed with '}' in \"%s\"", c);
+			if (start == end)
+				error (FATAL, "empty kind name is given in \"%s\"", c);
+
+			kname = start;
+			kname_len = end - start;
+			c = end;
+		}
+
+		for (unsigned int i = 0; i < countKinds (kcb); i++)
+		{
+			const kindDefinition *k = getKind (kcb, i);
+
+			if ((kname
+				 && strlen (k->name) == kname_len
+				 && strncmp (k->name, kname, kname_len) == 0)
+				|| (!kname && *c == k->letter)
+				|| (!kname && *c == KIND_WILDCARD))
+			{
+				for (int j = 0; j < k->nRoles; j++)
+				{
+					const roleDesc *r = k->roles + j;
+					struct colprintLine *line = colprintTableGetNewLine(table);
+
+					colprintLineAppendColumnCString (line, lang);
+
+					vStringPut (kind_l_and_n, k->letter);
+					vStringPut (kind_l_and_n, '/');
+					vStringCatS (kind_l_and_n, k->name);
+					colprintLineAppendColumnVString (line, kind_l_and_n);
+					vStringClear (kind_l_and_n);
+
+					colprintLineAppendColumnCString (line, r->name);
+					colprintLineAppendColumnCString (line,
+													 r->enabled ? "on" : "off");
+					colprintLineAppendColumnCString (line, r->description);
+				}
+				if (! (!kname && *c == KIND_WILDCARD))
+					break;
+			}
+		}
+	}
+	vStringDelete (kind_l_and_n);
+#if 0
+	if ((i == countKinds (kcb)) && (*c != KIND_WILDCARD) && (!allowMissingKind))
+		error (FATAL, "No such letter kind in %s: %c\n", lang->name, *c);
+#endif
+}
+
+static int roleColprintCompareLines(struct colprintLine *a, struct colprintLine *b)
+{
+	int r;
+
+	const char *a_parser, *b_parser;
+	a_parser = colprintLineGetColumn (a, 0);
+	b_parser = colprintLineGetColumn (b, 0);
+
+	r = strcmp(a_parser, b_parser);
+	if (r != 0)
+		return r;
+
+	const char *a_kindln, *b_kindln;
+	a_kindln = colprintLineGetColumn (a, 1);
+	b_kindln = colprintLineGetColumn (b, 1);
+
+	r = strcmp(a_kindln, b_kindln);
+	if (r != 0)
+		return r;
+
+	const char *a_role, *b_role;
+	a_role = colprintLineGetColumn (a, 2);
+	b_role = colprintLineGetColumn (b, 2);
+
+	return strcmp(a_role, b_role);
+}
+
+extern void roleColprintTablePrint (struct colprintTable *table, bool noparser,
+									bool withListHeader, bool machinable, FILE *fp)
+{
+	colprintTableSort (table, roleColprintCompareLines);
+	colprintTablePrint (table, noparser? 1: 0, withListHeader, machinable, fp);
+}
