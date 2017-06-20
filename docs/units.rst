@@ -110,6 +110,12 @@ have its own directory under Units directory.
 	language parsers enabled/available can be checked with passing
 	``--list-languages`` to ctags.
 
+
+*Units/TEST/dictfile* **optional**
+
+	Used in spell checking.
+	See :ref:`cspell <cspell>` for more details.
+
 Note for importing a test case from Test directory
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

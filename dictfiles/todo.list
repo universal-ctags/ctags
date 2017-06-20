@@ -11,3 +11,5 @@ dictword
 ok
 # ???
 english
+# make parser should pickup this.
+ccld
