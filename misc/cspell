@@ -74,6 +74,12 @@ for commit in $(git log --format=%H ${base}...); do
 	fi
     done
 
+    for w in $(git log ${commit} \
+		   | grep '^[ \t]*CSPELL:' \
+		   | sed -e 's/^[ \t]*CSPELL:\(.*\)/\1/'); do
+	CTAGS_LOCAL_OPTIONS="${CTAGS_LOCAL_OPTIONS} --param-UCtagsAspell:dictword=${w}"
+    done
+
     printf "checking ${commit}..."
     ${CTAGS} ${CTAGS_OPTION} ${CTAGS_LOCAL_OPTIONS} ${OUTDIR}/${iname}.txt > ${OUTDIR}/${oname}
     nerrors=$(wc -l < "${OUTDIR}/${iname}-misspelling.tags")
