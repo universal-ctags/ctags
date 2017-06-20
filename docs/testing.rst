@@ -20,3 +20,4 @@ ctags in limited resources.
 	chop.rst
 	tmain.rst
 	tinst.rst
+	cspell.rst

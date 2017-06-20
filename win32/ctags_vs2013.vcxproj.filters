@@ -225,6 +225,9 @@
     <ClCompile Include="..\parsers\css.c">
       <Filter>Source Files\Parsers</Filter>
     </ClCompile>
+    <ClCompile Include="..\parsers\ctags-aspell.c">
+      <Filter>Source Files\Parsers</Filter>
+    </ClCompile>
     <ClCompile Include="..\parsers\cxx\cxx.c">
       <Filter>Source Files\Parsers\cxx</Filter>
     </ClCompile>

@@ -136,6 +136,7 @@ PARSER_SRCS =				\
 	parsers/css.c			\
 	parsers/cobol.c			\
 	parsers/cpreprocessor.c		\
+	parsers/ctags-aspell.c		\
 	parsers/cxx/cxx.c		\
 	parsers/cxx/cxx_debug.c		\
 	parsers/cxx/cxx_debug_type.c	\

@@ -27,6 +27,7 @@
 #include "ctags.h"
 #include "debug.h"
 #include "field.h"
+#include "keyword.h"
 #include "main.h"
 #define OPTION_WRITE
 #include "options.h"
@@ -371,7 +372,7 @@ static optionDescription LongOptionDescription [] = {
 #endif
  },
  {0,"      Specify the output format. [u-ctags]"},
- {1,"  --param-<LANG>=name:argument"},
+ {1,"  --param-<LANG>:name=argument"},
  {1,"       Set <LANG> specific parameter. Available parameters can be listed with --list-params."},
  {0,"  --pattern-length-limit=N"},
  {0,"      Cutoff patterns of tag entries after N characters. Disable by setting to 0. [96]"},
@@ -413,6 +414,10 @@ static optionDescription LongOptionDescription [] = {
  {1,"       Specify before --list-* option."},
  {1,"  --_anonhash=fname"},
  {1,"       Used in u-ctags test harness"},
+ {1,"  --_dump-keywords"},
+ {1,"       Dump keywords of initialized parser(s)."},
+ {1,"  --_dump-options"},
+ {1,"       Dump options."},
  {1,"  --_echo=msg"},
  {1,"       Echo MSG to standard error. Useful to debug the chain"},
  {1,"       of loading option files."},
@@ -507,6 +512,9 @@ static const char *const Features [] = {
 #endif
 #ifdef ENABLE_GCOV
 	"gcov",
+#endif
+#ifdef HAVE_ASPELL
+	"aspell",
 #endif
 	NULL
 };
@@ -738,7 +746,7 @@ extern langType getLanguageComponentInOption (const char *const option,
 			return LANG_IGNORE;
 	}
 
-	/* --para-<LANG>:<PARAM>=... */
+	/* --param-<LANG>:<PARAM>=... */
 	colon = strchr (lang, ':');
 	if (colon)
 		lang_len = colon - lang;
@@ -1452,14 +1460,22 @@ static void processInteractiveOption (
 {
 	static struct interactiveModeArgs args;
 
-	Option.interactive = true;
 
 	if (parameter && (strcmp (parameter, "sandbox") == 0))
+	{
+		Option.interactive = INTERACTIVE_SANDBOX;
 		args.sandbox = true;
+	}
 	else if (parameter && (strcmp (parameter, "default") == 0))
+	{
+		Option.interactive = INTERACTIVE_DEFAULT;
 		args.sandbox = false;
+	}
 	else if ((!parameter) || *parameter == '\0')
+	{
+		Option.interactive = INTERACTIVE_DEFAULT;
 		args.sandbox = false;
+	}
 	else
 		error (FATAL, "Unknown option argument \"%s\" for --%s option",
 			   parameter, option);
@@ -2347,7 +2363,7 @@ static void processIgnoreOption (const char *const list, int IgnoreOrDefine)
 		readIgnoreList (list);
 }
 
-static void processAnonHashOption (const char *const option, const char *const parameter)
+static void processAnonHashOption (const char *const option CTAGS_ATTR_UNUSED, const char *const parameter CTAGS_ATTR_UNUSED)
 {
 	if (parameter == NULL || parameter[0] == '\0')
 		error (FATAL, "Something string is needed for \"%s\" option", option);
@@ -2356,6 +2372,11 @@ static void processAnonHashOption (const char *const option, const char *const p
 	anonHashString (parameter, buf);
 	printf("%s\n", buf);
 	exit (0);
+}
+
+static void processDumpKeywordsOption (const char *const option CTAGS_ATTR_UNUSED, const char *const parameter CTAGS_ATTR_UNUSED)
+{
+	dumpKeywordTable (stdout);
 }
 
 static void processEchoOption (const char *const option, const char *const parameter)
@@ -2507,6 +2528,8 @@ static bool* redirectToXtag(booleanOption *const option)
  *  Option tables
  */
 
+static void processDumpOptionsOption (const char *const option, const char *const parameter);
+
 static parametricOption ParametricOptions [] = {
 	{ "config-filename",		processConfigFilenameOption,	true,   STAGE_ANY },
 	{ "data-dir",               processDataDir,                 false,  STAGE_ANY },
@@ -2555,6 +2578,8 @@ static parametricOption ParametricOptions [] = {
 	{ "tag-relative",           processTagRelative,             true,   STAGE_ANY },
 	{ "version",                processVersionOption,           true,   STAGE_ANY },
 	{ "_anonhash",              processAnonHashOption,          false,  STAGE_ANY },
+	{ "_dump-keywords",         processDumpKeywordsOption,      false,  STAGE_ANY },
+	{ "_dump-options",          processDumpOptionsOption,       false,  STAGE_ANY },
 	{ "_echo",                  processEchoOption,              false,  STAGE_ANY },
 	{ "_force-initializing",    processForceInitOption,         false, STAGE_ANY },
 	{ "_force-quit",            processForceQuitOption,         false,  STAGE_ANY },
@@ -3529,4 +3554,15 @@ extern void freeOptionResources (void)
 	freeSearchPathList (&PreloadPathList);
 
 	freeList (&OptionFiles);
+}
+
+static void processDumpOptionsOption (const char *const option CTAGS_ATTR_UNUSED, const char *const parameter CTAGS_ATTR_UNUSED)
+{
+	fprintf(stdout, "# %s\n", "ParametricOptions");
+	for (unsigned int i = 0; i < ARRAY_SIZE(ParametricOptions); i++)
+		fprintf(stdout, "%s\n", ParametricOptions[i].name);
+
+	fprintf(stdout, "# %s\n", "BooleanOptions");
+	for (unsigned int i = 0; i < ARRAY_SIZE(BooleanOptions); i++)
+		fprintf(stdout, "%s\n", BooleanOptions[i].name);
 }

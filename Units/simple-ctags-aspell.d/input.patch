@@ -1,0 +1,54 @@
+commit fa57ee16a61c9306f8cfb7578624c229b91e3641
+Author: Masatake YAMATO <yamato@redhat.com>
+Date:   Sun Jun 18 07:32:36 2017 +0900
+
+    docs(man): put double quotes words referring another section
+    
+    Signed-off-by: Masatake YAMATO <yamato@redhat.com>
+
+diff --git a/man/README b/man/README
+index 04711c8..3718f68 100644
+--- a/man/README
++++ b/man/README
+@@ -3,8 +3,8 @@ Rules for writing man pages
+ 
+ * put two single quotes around an option name like ``--help``.
+ 
+-* put double quotes an exapmle of command line or option usage like
+-  "--langdef=MyLang".
++* put double quotes an exapmle of command line, option usage like
++  "--langdef=MyLang" and referring a seciton.
+ 
+ * .. code-block:: LANGUAGE.. cannot be handled well in rst2man.
+   However, if LANGUAGE is not given, it works.
+diff --git a/man/ctags.1.rst.in b/man/ctags.1.rst.in
+index fb934fd..d392c06 100644
+--- a/man/ctags.1.rst.in
++++ b/man/ctags.1.rst.in
+@@ -286,7 +286,7 @@ built-in language names.
+ 	current list. See, also, the ``--file-scope`` option. The default list is
+ 	".h.H.hh.hpp.hxx.h++.inc.def". To restore the default list, specify ``-h``
+ 	default. Note that if an extension supplied to this option is not
+-	already mapped to a particular language (see SOURCE FILES, above),
++	already mapped to a particular language (see "SOURCE FILES", above),
+ 	you will also need to use either the ``--langmap`` or ``--language-force`` option.
+ 
+ ``-I identifier-list``
+@@ -707,7 +707,7 @@ built-in language names.
+ ``--language-force=language``
+ 	By default, @CTAGS_NAME_EXECUTABLE@ automatically selects the language
+ 	of a source file, ignoring those files whose language cannot be
+-	determined (see SOURCE FILES, above). This option forces the specified
++	determined (see "SOURCE FILES", above). This option forces the specified
+ 	language (case-insensitive; either built-in or user-defined) to be used
+ 	for every supplied file instead of automatically selecting the language
+ 	based upon its extension. In addition, the special value auto indicates
+@@ -771,7 +771,7 @@ built-in language names.
+ ``--list-maps[=language|all]``
+ 	Lists the file extensions and file name patterns which associate a file
+ 	name with a language for either the specified language or all
+-	languages, and then exits. See the ``--langmap`` option, and SOURCE FILES, above.
++	languages, and then exits. See the ``--langmap`` option, and "SOURCE FILES", above.
+ 
+ ``--list-languages``
+ 	Lists the names of the languages understood by @CTAGS_NAME_EXECUTABLE@,

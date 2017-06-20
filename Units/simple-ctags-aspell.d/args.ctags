@@ -1,0 +1,8 @@
+-x
+--languages=+UCtagsAspell
+--param-UCtagsAspell:dictfile=Units/simple-ctags-aspell.d/mydict.list
+--param-UCtagsAspell:subwords=true
+--param-UCtagsAspell:dictword=seciton
+--language-force=UCtagsAspell
+--extras=+r
+--fields=+r

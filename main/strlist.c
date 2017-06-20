@@ -263,3 +263,58 @@ extern void stringListReverse (const stringList *const current)
 {
 	ptrArrayReverse (current);
 }
+
+extern stringList *stringListNewBySplittingWordIntoSubwords (const char* originalWord)
+{
+	stringList *list = stringListNew ();
+
+	vString *subword = vStringNew();
+	for (const char *cursor = originalWord; *cursor != '\0'; cursor++)
+	{
+		if (islower(*cursor))
+		{
+			if (vStringLength (subword) > 1 &&
+				isupper(vStringLast(subword)) &&
+				isupper(vStringItem(subword, vStringLength (subword) - 2)))
+			{
+				/* ABC + d => AB, Cd */
+				char last = vStringLast(subword);
+				vStringTruncate (subword, vStringLength (subword) - 1);
+				stringListAdd (list, subword);
+				subword = vStringNew();
+				vStringPut(subword, last);
+			}
+			/* A + b => Ab,
+			   a + b => ab */
+			vStringPut(subword, *cursor);
+		}
+		else if (isupper(*cursor))
+		{
+			/* a + B => a, B */
+			if (vStringLength (subword) > 0 && islower(vStringLast(subword)))
+			{
+				stringListAdd (list, subword);
+				subword = vStringNew();
+			}
+			/* A + B => AB */
+			vStringPut(subword, *cursor);
+		}
+		else if (isdigit(*cursor))
+			vStringPut(subword, *cursor);
+		else
+		{
+			if (vStringLength(subword) > 0)
+			{
+				stringListAdd (list, subword);
+				subword = vStringNew();
+			}
+		}
+	}
+
+	if (vStringLength(subword) > 0)
+		stringListAdd (list, subword);
+	else
+		vStringDelete(subword);
+
+	return list;
+}

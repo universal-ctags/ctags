@@ -51,4 +51,6 @@ extern vString* stringListFileFinds (const stringList* const list, const char* c
 extern void stringListPrint (const stringList *const current, FILE *fp);
 extern void stringListReverse (const stringList *const current);
 
+extern stringList *stringListNewBySplittingWordIntoSubwords (const char* originalWord);
+
 #endif  /* CTAGS_MAIN_STRLIST_H */

@@ -14,7 +14,7 @@
 {"_type": "tag", "name": "main", "path": "input.c", "pattern": "/^main(void)$/", "language": "C", "line": 9, "signature": "(void)", "typeref": "int", "kind": "function", "end": 12}
 {"_type": "tag", "name": "main", "path": "input.go", "pattern": "/^func main() {$/", "language": "Go", "line": 3, "signature": "()", "kind": "func"}
 {"_type": "tag", "name": "main", "path": "input.go", "pattern": "/^package main$/", "language": "Go", "line": 1, "kind": "package"}
-# json --languages=+man --fields=* --extras=*
+# json --languages=+man --fields=* --extras=*-{subword}
 {"_type": "ptag", "name": "JSON_OUTPUT_VERSION", "path": "0.0", "pattern": "in development"}
 {"_type": "ptag", "name": "TAG_FILE_FORMAT", "path": "2", "pattern": "extended format; --format=1 will not append ;\" to lines"}
 {"_type": "ptag", "name": "TAG_FILE_SORTED", "path": "1", "pattern": "0=unsorted, 1=sorted, 2=foldcase"}

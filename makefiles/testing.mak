@@ -1,5 +1,5 @@
 # -*- makefile -*-
-.PHONY: check units fuzz noise tmain tinst clean-units clean-tmain clean-gcov run-gcov codecheck cppcheck
+.PHONY: check units fuzz noise tmain tinst clean-units clean-tmain clean-gcov run-gcov codecheck cppcheck dicts cspell
 
 check: tmain units
 
@@ -173,3 +173,11 @@ CPPCHECK_FLAGS  = --enable=all
 cppcheck:
 	cppcheck $(CPPCHECK_DEFS) $(CPPCHECK_UNDEFS) $(CPPCHECK_FLAGS) \
 		 $$(git  ls-files | grep '^\(parsers\|main\)/.*\.[ch]' )
+
+#
+# Spelling
+#
+dicts: $(CTAGS_TEST)
+	${SHELL} misc/make-dictfiles.sh
+cspell: $(CTAGS_TEST)
+	${SHELL} misc/cspell

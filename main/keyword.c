@@ -240,3 +240,18 @@ extern void printKeywordTable (void)
 }
 
 #endif
+
+extern void dumpKeywordTable (FILE *fp)
+{
+	unsigned int i;
+	for (i = 0  ;  i < TableSize  ;  ++i)
+	{
+		hashEntry **const table = getHashTable ();
+		hashEntry *entry = table [i];
+		while (entry != NULL)
+		{
+			fprintf(fp, "%s	%s\n", entry->string, getLanguageName (entry->language));
+			entry = entry->next;
+		}
+	}
+}
