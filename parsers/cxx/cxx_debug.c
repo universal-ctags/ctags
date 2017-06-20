@@ -135,13 +135,13 @@ void cxxDebugDumpCommon (void *data,
 	if (!pTokenChecker)
 	{
 		pTokenChecker = circularRefCheckerNew();
-		TRASH_BOX(pTokenChecker, (TrashBoxDestroyItemProc)circularRefCheckerDestroy);
+		DEFAULT_TRASH_BOX(pTokenChecker, (TrashBoxDestroyItemProc)circularRefCheckerDestroy);
 	}
 
 	if (!pChainChecker)
 	{
 		pChainChecker = circularRefCheckerNew();
-		TRASH_BOX(pChainChecker, (TrashBoxDestroyItemProc)circularRefCheckerDestroy);
+		DEFAULT_TRASH_BOX(pChainChecker, (TrashBoxDestroyItemProc)circularRefCheckerDestroy);
 	}
 
 	func(data, pTokenChecker, pChainChecker, true);
