@@ -4,6 +4,7 @@ dictfile
 dirs
 downcase
 dup
+ffile
 fname
 foldcase
 funcmap
