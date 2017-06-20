@@ -36,7 +36,7 @@ typedef enum {
 
 static roleDesc DtdEntityRoles [] = {
 	{ true, "elementName", "element names" },
-	{ true, "condition",    "condtions" },
+	{ true, "condition",    "conditions" },
 	{ true, "partOfAttDef", "part of attribute definition" },
 };
 

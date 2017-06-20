@@ -24,7 +24,7 @@ CUDA	d	undef	undefined	on
 CUDA	h	system	system header	on
 CUDA	h	local	local header	on
 DTD	p	elementName	element names	on
-DTD	p	condition	condtions	on
+DTD	p	condition	conditions	on
 DTD	p	partOfAttDef	part of attribute definition	on
 DTD	e	attOwner	attributes owner	on
 Java	p	imported	imported package	on
@@ -78,7 +78,7 @@ CUDA	d	undef	undefined	on
 CUDA	h	system	system header	on
 CUDA	h	local	local header	on
 DTD	p	elementName	element names	on
-DTD	p	condition	condtions	on
+DTD	p	condition	conditions	on
 DTD	p	partOfAttDef	part of attribute definition	on
 DTD	e	attOwner	attributes owner	on
 Java	p	imported	imported package	on
