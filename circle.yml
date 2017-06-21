@@ -1,11 +1,14 @@
-machine
-  services:
-    - docker
+jobs:
+  build:
+    docker:
+      - image docker.io/centos:centos7
+
 dependencies:
-  pre:
-   - docker pull masatake/ctags-centos6
+  override:
+    - sudo yum -y install gcc automake autoconf git
 
 test:
-  post:
-    - docker run masatake/ctags-centos6
-
+  pre:
+    - bash ./autogen.sh
+  override:
+    - bash misc/circleci.sh CIRCLECI=1
