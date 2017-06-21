@@ -18,7 +18,7 @@ if exist %repoinfo_header% (
 )
 
 set newinfo=%oldinfo%
-if exist .git\nul (
+if exist .git (
   for /f %%i in ('cmd /c "git describe --tag --exact-match HEAD 2> nul || git rev-parse --short HEAD"') do set newinfo=#define CTAGS_REPOINFO "%%i"
 )
 

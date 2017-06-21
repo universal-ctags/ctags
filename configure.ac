@@ -311,7 +311,7 @@ AM_CONDITIONAL([HAVE_RST2MAN], [test "x$RST2MAN" != "xno"])
 # --------------------------------
 in_git_repo=no
 AC_MSG_CHECKING(building in a git repository)
-if test -f "${srcdir}/.git/HEAD"; then
+if test -f "${srcdir}/.git/HEAD" || test -f "${srcdir}/.git"; then
 	in_git_repo=yes
 fi
 AC_MSG_RESULT(${in_git_repo})
