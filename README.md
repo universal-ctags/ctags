@@ -3,6 +3,7 @@
 [![Coverage Status](https://coveralls.io/repos/universal-ctags/ctags/badge.svg?branch=master&service=github)](https://coveralls.io/github/universal-ctags/ctags?branch=master)
 [![Build status](https://ci.appveyor.com/api/projects/status/6hk2p5lv6jsrd9o7/branch/master?svg=true)](https://ci.appveyor.com/project/universalctags/ctags/branch/master)
 [![RTD build status](https://readthedocs.org/projects/ctags/badge)](http://docs.ctags.io)
+[![CircleCI Build Status](https://circleci.com/gh/universal-ctags/ctags.svg?style=shield&circle-token=2e582261da84ebc6d21725b05381f410bc5de29d)](https://circleci.com/gh/universal-ctags/ctags.svg)
 
 universal-ctags has the objective of continuing the development from
 what existed in the Sourceforge area. Github exuberant-ctags
