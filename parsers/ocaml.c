@@ -28,12 +28,12 @@ typedef enum {
 	K_METHOD,       /* class method */
 	K_MODULE,       /* OCaml module OR functor */
 	K_VARIABLE,
+	K_VAL,
 	K_TYPE,         /* name of an OCaml type */
 	K_FUNCTION,
 	K_CONSTRUCTOR,  /* Constructor of a sum type */
 	K_RECORDFIELD,
 	K_EXCEPTION,
-	K_VALUE,		/* ??? */
 	K_BEGIN_END,		/* ??? */
 } ocamlKind;
 
@@ -42,12 +42,12 @@ static kindDefinition OcamlKinds[] = {
 	{true, 'm', "method", "Object's method"},
 	{true, 'M', "module", "Module or functor"},
 	{true, 'v', "var", "Global variable"},
+	{true, 'p', "val", "A value ???"},
 	{true, 't', "type", "Type name"},
 	{true, 'f', "function", "A function"},
 	{true, 'C', "Constructor", "A constructor"},
 	{true, 'r', "RecordField", "A 'structure' field"},
 	{true, 'e', "Exception", "An exception"},
-	{true, 'V', "value", "A value ???"},
 	{true, 'B', "beginEnd", "A begin end ???"},
 };
 
@@ -571,7 +571,7 @@ static const kindDefinition* contextDescription (contextType t)
 	case ContextMethod:
 		return &(OcamlKinds[K_METHOD]);
 	case ContextValue:
-		return &(OcamlKinds[K_VALUE]);
+		return &(OcamlKinds[K_VAL]);
 	case ContextModule:
 		return &(OcamlKinds[K_MODULE]);
 	case ContextType:
