@@ -41,7 +41,7 @@ situation:
 
 Which parser should be used for parsing "build.xml"?  The assumption
 of Universal-ctags is the user may want to use the "Ant" parser; the
-fie name pattern it declares is more specific than the file extension
+file name pattern it declares is more specific than the file extension
 that the "XML" parser declares. However, e-map-order chooses the "XML"
 parser.
 
