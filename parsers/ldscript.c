@@ -136,7 +136,7 @@ static struct tokenInfoClass ldScriptTokenInfoClass = {
 typedef enum {
 	F_ASSIGNMENT,
 	COUNT_FIELD
-} ldScriptFied;
+} ldScriptField;
 
 static fieldDefinition LdScriptFields[COUNT_FIELD] = {
 	{ .name = "assignment",
