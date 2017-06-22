@@ -512,8 +512,6 @@ static ocaToken waitedToken;
  * context stacking. */
 static vString *lastClass;
 
-static vString *voidName;
-
 typedef enum _sContextKind {
 	ContextStrong,
 	ContextSoft
@@ -1302,7 +1300,7 @@ static void mayRedeclare (vString * const ident, ocaToken what)
 	case OcaKEYWORD_object:
 		vStringClear (lastClass);
 		pushContext (ContextStrong, ContextClass,
-			&localScope, NULL /*voidName */ );
+			&localScope, NULL);
 		needStrongPoping = false;
 		toDoNext = &globalScope;
 		break;
@@ -1830,8 +1828,6 @@ static void findOcamlTags (void)
 	tempIdent = vStringNew ();
 	lastModule = vStringNew ();
 	lastClass = vStringNew ();
-	voidName = vStringNew ();
-	vStringCopyS (voidName, "_");
 
 	st.name = vStringNew ();
 	st.cp = readLineFromInputFile ();
@@ -1844,7 +1840,6 @@ static void findOcamlTags (void)
 	}
 
 	vStringDelete (st.name);
-	vStringDelete (voidName);
 	vStringDelete (tempIdent);
 	vStringDelete (lastModule);
 	vStringDelete (lastClass);
