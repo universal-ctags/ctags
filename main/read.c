@@ -737,10 +737,17 @@ extern void ungetcToInputFile (int c)
 		File.ungetchBuf[File.ungetchIdx++] = c;
 }
 
-static void readLine (vString *const vLine, MIO *const mio)
+typedef enum eEolType {
+	eol_eof = 0,
+	eol_nl,
+	eol_cr_nl,
+} eolType;
+
+static eolType readLine (vString *const vLine, MIO *const mio)
 {
 	char *str;
 	size_t size;
+	eolType r = eol_nl;
 
 	vStringClear (vLine);
 
@@ -760,6 +767,8 @@ static void readLine (vString *const vLine, MIO *const mio)
 		vStringSetLength (vLine);
 		newLine = vStringLength (vLine) > 0 && vStringLast (vLine) == '\n';
 		eof = mio_eof (mio);
+		if (eof)
+			r = eol_eof;
 
 		/* Turn line breaks into a canonical form. The three commonly
 		 * used forms of line breaks are: LF (UNIX/Mac OS X), CR-LF (MS-DOS) and
@@ -770,6 +779,7 @@ static void readLine (vString *const vLine, MIO *const mio)
 		{
 			vStringItem (vLine, vStringLength (vLine) - 2) = '\n';
 			vStringChop (vLine);
+			r = eol_cr_nl;
 		}
 
 		if (newLine || eof)
@@ -779,17 +789,21 @@ static void readLine (vString *const vLine, MIO *const mio)
 		str = vStringValue (vLine) + vStringLength (vLine);
 		size = vStringSize (vLine) - vStringLength (vLine);
 	}
+	return r;
 }
 
 static vString *iFileGetLine (void)
 {
+	eolType eol;
+	bool use_multiline = hasLanguageMultilineRegexPatterns (getInputLanguage ());
+
 	if (File.line == NULL)
 		File.line = vStringNew ();
 
-	if ((hasLanguageMultilineRegexPatterns (getInputLanguage ())) && File.allLines == NULL)
+	if (use_multiline && File.allLines == NULL)
 		File.allLines = vStringNew ();
 
-	readLine (File.line, File.mio);
+	eol = readLine (File.line, File.mio);
 
 	if (vStringLength (File.line) > 0)
 	{
@@ -803,13 +817,22 @@ static vString *iFileGetLine (void)
 			parseLineDirective (vStringValue (File.line) + 1);
 		matchLanguageRegex (getInputLanguage (), File.line);
 
-		if (hasLanguageMultilineRegexPatterns (getInputLanguage ()))
+		if (use_multiline)
+		{
 			vStringCat (File.allLines, File.line);
+			if (eol == eol_cr_nl)
+			{
+				/* Re-convert the end of line characters to adjust the length
+				   of line. */
+				vStringItem (File.allLines, vStringLength (File.allLines) - 1) = '\r';
+				vStringPut (File.allLines, '\n');
+			}
+		}
 		return File.line;
 	}
 	else
 	{
-		if (hasLanguageMultilineRegexPatterns (getInputLanguage ()))
+		if (use_multiline)
 		{
 			matchLanguageMultilineRegex (getInputLanguage (), File.allLines);
 			vStringDelete (File.allLines);
