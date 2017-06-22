@@ -1821,7 +1821,6 @@ static void clearStack ( void )
 
 static void findOcamlTags (void)
 {
-	vString *name = vStringNew ();
 	lexingState st;
 	ocaToken tok;
 
@@ -1845,7 +1844,6 @@ static void findOcamlTags (void)
 	}
 
 	vStringDelete (st.name);
-	vStringDelete (name);
 	vStringDelete (voidName);
 	vStringDelete (tempIdent);
 	vStringDelete (lastModule);
