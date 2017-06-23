@@ -16,6 +16,12 @@ RST2MAN  = rst2man
 RST2HTML = rst2html
 RST2PDF  = rst2pdf
 
+# rst2man had a bug about code-block:: handling.
+# https://sourceforge.net/p/docutils/patches/141
+RST2MAN_FLAGS = --syntax-highlight=none
+RST2HTML_FLAGS =
+RST2PDF_FLAGS =
+
 # To avoid running configure for quick previewing do:
 #
 # $ make QUICK=1
@@ -55,11 +61,11 @@ else
 endif
 
 %: %.rst
-	$(RST2MAN) $< > $@
+	$(RST2MAN) $(RST2MAN_FLAGS) $< > $@
 %.html: %.rst
-	$(RST2HTML) $< > $@
+	$(RST2HTML) $(RST2HTML_FLAGS)  $< > $@
 %.pdf: %.rst
-	$(RST2PDF) $< > $@
+	$(RST2PDF) $(RST2PDF_FLAGS) $< > $@
 
 clean:
 	rm -f $(man_pages) $(html_pages)

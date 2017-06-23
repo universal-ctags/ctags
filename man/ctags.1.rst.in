@@ -12,8 +12,8 @@ Generate tag files for source code
 
 SYNOPSIS
 --------
-|	**@CTAGS_NAME_EXECUTABLE@** [options] [file(s)]
-|	**@ETAGS_NAME_EXECUTABLE@** [options] [file(s)]
+|	**@CTAGS_NAME_EXECUTABLE@** [options] [source_file(s)]
+|	**@ETAGS_NAME_EXECUTABLE@** [options] [source_file(s)]
 
 
 DESCRIPTION
@@ -22,14 +22,14 @@ DESCRIPTION
 The **@CTAGS_NAME_EXECUTABLE@** and **@ETAGS_NAME_EXECUTABLE@** programs
 (hereinafter collectively referred to as @CTAGS_NAME_EXECUTABLE@,
 except where distinguished) generate an index (or "tag") file for a
-variety of language objects found in file(s). This tag file allows
+variety of **language objects** found in **source file(s)**. This tag file allows
 these items to be quickly and easily located by a text editor or other
-utilities. A "tag" signifies a language object for which an index entry is
+utilities (**client tools**). A **tag** signifies a language object for which an index entry is
 available (or, alternatively, the index entry created for that object).
 
 Alternatively, @CTAGS_NAME_EXECUTABLE@ can generate a cross reference
 file which lists, in human readable form, information about the various
-source objects found in a set of language files.
+language objects found in a set of source files.
 
 Tag index files are supported by numerous editors, which allow the user to
 locate the object associated with a name appearing in a source file and
@@ -37,14 +37,14 @@ jump to the file and line which defines the name. See the manual of your
 favorite editor about utilizing @CTAGS_NAME_EXECUTABLE@ command and
 the tag index files in the editor.
 
-@CTAGS_NAME_EXECUTABLE@ is capable of generating different kinds of tags
-for each of many different languages. For a complete list of supported
+@CTAGS_NAME_EXECUTABLE@ is capable of generating different **kinds** of tags
+for each of many different **languages**. For a complete list of supported
 languages, the names by which they are recognized, and the kinds of tags
 which are generated for each, see the ``--list-languages`` and ``--list-kinds``
 options.
 
-This man page describes Universal-ctags, an implementation of ctags
-derived from Exuberant-ctags. The major incompatible changes between
+This man page describes **Universal-ctags**, an implementation of ctags
+derived from **Exuberant-ctags**. The major incompatible changes between
 Universal-ctags and Exuberant-ctags are enumerated in
 ctags-incompatibilities(7).
 
@@ -54,7 +54,7 @@ of the major topics in Universal-ctags development. ctags-optlib(7)
 describes how the feature is extended.
 
 Newly introduced premature features are not explained here. If you
-are interested in such features and ctags internal,
+are interested in such features and @CTAGS_NAME_EXECUTABLE@ internal,
 visit http://docs.ctags.io/en/latest/.
 
 
@@ -62,7 +62,7 @@ SOURCE FILES
 ------------
 
 Unless the ``--language-force`` option is specified, the language of each source
-file is automatically selected based upon a mapping of file names to
+file is automatically selected based upon a **mapping** of file names to
 languages. The mappings in effect for each language may be displayed using
 the ``--list-maps`` option and may be changed using the ``--langmap`` option. On
 platforms which support it, if the name of a file is not mapped to a
@@ -79,19 +79,25 @@ names are mapped to languages will be scanned.
 The same extensions are mapped to multiple parsers. For example, ".h"
 are mapped to C++, C and ObjectiveC. These mappings can cause a
 trouble. @CTAGS_NAME_EXECUTABLE@ tries to select the proper parser
-for the input by applying kinds of heuristics to its content. However,
-it is not perfect.  In that case use ``--language-for=<LANG>``,
+for the source file by applying kinds of heuristics to its content. However,
+it is not perfect.  In that case use ``--language-force=language``,
 ``--langmap=map[,map[...]]``, or ``--map-<LANG>=-pattern|extension``
 options. (The heuristics are applied either ``--guess-language-eagerly`` is
 given or not.)
 
-
-.. TODO: Mapping of file names
+.. options should be revised here
+	``--map-<LANG>`` (done)
+	``--langmap=map[,map[...]]`` (done)
+	``--language-force=language`` (done)
+	``--languages=[+|-]list`` (done)
+	``--list-maps[=language|all]`` (done)
+	``--list-map-extensions`` (done)
+	``--list-map-patterns`` (done)
 
 Guessing parser
 ~~~~~~~~~~~~~~~
 
-If ctags cannot select a parser from the mapping of file names,
+If @CTAGS_NAME_EXECUTABLE@ cannot select a parser from the mapping of file names,
 various tests are conducted for the guessing:
 
 template file name testing
@@ -128,7 +134,7 @@ template file name testing
 	and utilize the marker for the mode selection. This testing does
 	the same as what Emacs does.
 
-	ctags treats *MODE* as a name of interpreter and applies the same
+	@CTAGS_NAME_EXECUTABLE@ treats *MODE* as a name of interpreter and applies the same
 	rule of "interpreter" testing if the first line has one of
 	the following patterns::
 
@@ -144,12 +150,12 @@ template file name testing
 	Emacs editor recognizes another marker at the end of file as a
 	mode specifier. This testing does the same as what Emacs does.
 
-	ctags treats *MODE* as a name of interpreter and applies the same
+	@CTAGS_NAME_EXECUTABLE@ treats *MODE* as a name of interpreter and applies the same
 	rule of "interpreter" testing if the lines at the tail of the file
 	have the following pattern::
 
 		Local Variables:
-		..
+		...
 		mode: MODE
 		...
 		End:
@@ -158,7 +164,7 @@ template file name testing
 
 "vim modeline" testing
 	Like the modeline of Emacs editor, Vim editor has the same concept.
-	ctags treats *TYPE* as a name of interpreter and applies the same
+	@CTAGS_NAME_EXECUTABLE@ treats *TYPE* as a name of interpreter and applies the same
 	rule of "interpreter" testing if the last 5 lines of the file
 	have one of the following patterns::
 
@@ -186,14 +192,14 @@ parser selections for given files instead of making tags file.
 
 Examples:
 
-.. code-block::
+.. code-block:: console
 
 	$ @CTAGS_NAME_EXECUTABLE@ --print-language config.h.in input.m input.unknown
 	config.h.in: C++
 	input.m: MatLab
 	input.unknown: NONE
 
-``NONE`` means that ctags does not select any parser for the file.
+``NONE`` means that @CTAGS_NAME_EXECUTABLE@ does not select any parser for the file.
 
 
 OPTIONS
@@ -279,7 +285,7 @@ built-in language names.
 	current list. See, also, the ``--file-scope`` option. The default list is
 	".h.H.hh.hpp.hxx.h++.inc.def". To restore the default list, specify ``-h``
 	default. Note that if an extension supplied to this option is not
-	already mapped to a particular language (see SOURCE FILES, above),
+	already mapped to a particular language (see "SOURCE FILES", above),
 	you will also need to use either the ``--langmap`` or ``--language-force`` option.
 
 ``-I identifier-list``
@@ -311,7 +317,7 @@ built-in language names.
 	the presence of syntax-busting macros in source files (see CAVEATS).
 	Some examples will illustrate this point.
 
-	.. code-block::
+	.. code-block:: C
 
 		int foo ARGDECL4(void *, ptr, long int, nbytes)
 
@@ -319,7 +325,7 @@ built-in language names.
 	interpreted to be the name of the function instead of the correct name
 	of "foo". Specifying "-I ARGDECL4" results in the correct behavior.
 
-	.. code-block::
+	.. code-block:: C
 
 		/* creates an RCS version string in module */
 		MODULE_VERSION("$Revision$")
@@ -332,7 +338,7 @@ built-in language names.
 	file to be skipped over while trying to complete the definition.
 	Specifying "-I MODULE_VERSION+" would avoid such a problem.
 
-	.. code-block::
+	.. code-block:: C
 
 		CLASS Example {
 			// your content here
@@ -653,23 +659,28 @@ built-in language names.
 
 ``--langmap=map[,map[...]]``
 	Controls how file names are mapped to languages (see the ``--list-maps``
-	option). Each comma-separated map consists of the language name (either
-	a built-in or user-defined language), a colon, and a list of file
-	extensions and/or file name patterns. A file extension is specified by
+	option). Each comma-separated *map* consists of the language name (either
+	a built-in or user-defined language), a colon, and a list of **file
+	extensions** and/or **file name patterns**. A file extension is specified by
 	preceding the extension with a period (e.g. ".c"). A file name pattern
 	is specified by enclosing the pattern in parentheses (e.g.
-	"([Mm]akefile)"). If appropriate support is available from the runtime
+	"([Mm]akefile)").
+
+	If appropriate support is available from the runtime
 	library of your C compiler, then the file name pattern may contain the usual
 	shell wildcards common on Unix (be sure to quote the option parameter to
 	protect the wildcards from being expanded by the shell before being
 	passed to @CTAGS_NAME_EXECUTABLE@). You can determine if shell wildcards
 	are available on your platform by examining the output of the
-	``--version`` option, which will include "+wildcards" in the compiled
+	``--list-features`` option, which will include "wildcards" in the compiled
 	feature list; otherwise, the file name patterns are matched against
-	file names using a simple textual comparison. When mapping a file
-	extension, it will first be unmapped from any other languages.
+	file names using a simple textual comparison.
 
-	If the first character in a map is a plus sign, then the extensions and
+	When mapping a file extension with ``--langmap`` option,
+	it will first be unmapped from any other languages. (``--map-<LANG>``
+	option provides more fine-grained control.)
+
+	If the first character in a map is a plus sign ('+'), then the extensions and
 	file name patterns in that map will be appended to the current map
 	for that language; otherwise, the map will replace the current map.
 	For example, to specify that only files with extensions of .c and .x are
@@ -679,44 +690,55 @@ built-in language names.
 	"Makefile", "makefile", or having the extension ".mak") to a language
 	called "make", specify "--langmap=make:([Mm]akefile).mak". To map files
 	having no extension, specify a period not followed by a non-period
-	character (e.g. ".", "..x", ".x."). To clear the mapping for a
+	character (e.g. ".", "..x", ".x.").
+
+	To clear the mapping for a
 	particular language (thus inhibiting automatic generation of tags for
 	that language), specify an empty extension list (e.g. "--langmap=fortran:").
 	To restore the default language mappings for all a particular language,
 	supply the keyword "default" for the mapping. To specify restore the
 	default language mappings for all languages, specify "--langmap=default".
+
 	Note that file name patterns are tested before file extensions when inferring
 	the language of a file. This order of Universal-ctags is different from
-	Exuberant-ctags.
+	Exuberant-ctags. See ctags-incompatibilities(7) for the background of
+	this incompatible change.
 
 ``--language-force=language``
 	By default, @CTAGS_NAME_EXECUTABLE@ automatically selects the language
 	of a source file, ignoring those files whose language cannot be
-	determined (see SOURCE FILES, above). This option forces the specified
-	language (case-insensitive; either built-in or user-defined) to be used
+	determined (see "SOURCE FILES", above). This option forces the specified
+	*language* (case-insensitive; either built-in or user-defined) to be used
 	for every supplied file instead of automatically selecting the language
-	based upon its extension. In addition, the special value auto indicates
+	based upon its extension. In addition, the special value "auto" indicates
 	that the language should be automatically selected (which effectively
 	disables this option).
 
 ``--languages=[+|-]list``
-	Specifies the languages for which tag generation is enabled, with list
+	Specifies the languages for which tag generation is enabled, with *list*
 	containing a comma-separated list of language names (case-insensitive;
-	either built-in or user-defined). If the first language of list is not
-	preceded by either a '+' or '-', the current list will be cleared
-	before adding or removing the languages in list. Until a '-' is
-	encountered, each language in the list will be added to the current list.
-	As either the '+' or '-' is encountered in the list, the languages
+	either built-in or user-defined). If the first language of *list* is not
+	preceded by either a '+' or '-', the current list (the current settings
+	of enabled/disabled languages managed in @CTAGS_NAME_EXECUTABLE@ internally)
+	will be cleared before adding or removing the languages in *list*. Until a '-' is
+	encountered, each language in the *list* will be added to the current list.
+	As either the '+' or '-' is encountered in the *list*, the languages
 	following it are added or removed from the current list, respectively.
 	Thus, it becomes simple to replace the current list with a new one, or
-	to add or remove languages from the current list. The actual list of
+	to add or remove languages from the current list.
+
+	The actual list of
 	files for which tags will be generated depends upon the language
-	extension mapping in effect (see the --langmap option). Note that all
+	extension mapping in effect (see the ``--langmap`` option). Note that the most of all
 	languages, including user-defined languages are enabled unless explicitly
 	disabled using this option. Language names included in list may be any
-	builtin language or one previously defined with --langdef. The default
+	built-in language or one previously defined with ``--langdef``. The default
 	is "all", which is also accepted as a valid argument. See the
-	--list-languages option for a complete list of the built-in language names.
+	``--list-languages`` option for a list of the all (built-in and user-defined)
+	language names.
+
+	Note ``--languages=`` option works cumulative way; the option can be
+	specified with different arguments multiple times in a command line.
 
 ``--license``
 	Prints a summary of the software license to standard output, and then exits.
@@ -753,16 +775,51 @@ built-in language names.
 	compiled into @CTAGS_NAME_EXECUTABLE@ (see the ``--regex-<LANG>`` option).
 	Each kind listed is enabled unless followed by "[off]".
 
+``--list-map-extensions[=language|all]``
+	Lists the file extensions which associate a file
+	name with a language for either the specified *language* or **all**
+	languages, and then exits.
+
+``--list-map-patterns[=language|all]``
+	Lists the file name patterns which associate a file
+	name with a language for either the specified *language* or **all**
+	languages, and then exits.
+
 ``--list-maps[=language|all]``
 	Lists the file extensions and file name patterns which associate a file
-	name with a language for either the specified language or all
-	languages, and then exits. See the ``--langmap`` option, and SOURCE FILES, above.
+	name with a language for either the specified *language* or **all**
+	languages, and then exits. See the ``--langmap`` option, and "SOURCE FILES", above.
+
+	To list the file extensions or file name patterns individually, use
+	``--list-map-extensions`` or ``--list-map-patterns`` option.
+	See the ``--langmap`` option, and "SOURCE FILES", above.
 
 ``--list-languages``
 	Lists the names of the languages understood by @CTAGS_NAME_EXECUTABLE@,
 	and then exits. These language names are case insensitive and may be
 	used in the ``--language-force``, ``--languages``, ``--<LANG>-kinds``,
 	and ``--regex-<LANG>`` options.
+
+``--map-<LANG>=[+|-]extension|pattern``
+	This option provides the way to control mapping(s) of file names to
+	languages more fine-grained way than ``--langmap`` option.
+
+	In @CTAGS_NAME_EXECUTABLE@, more than one language can map to a
+	file name pattern or file extension (*N:1 map*). Alternatively,
+	``--langmap`` option handle only *1:1 map*, only one language
+	mapping to one file name pattern or file extension.  A typical N:1
+	map is seen in C++ and ObjectiveC language; both languages have
+	a map to ".h" as a file extension.
+
+	A file extension is specified by preceding the extension with a period (e.g. ".c").
+	A file name pattern is specified by enclosing the pattern in parentheses (e.g.
+	"([Mm]akefile)"). A prefixed plus ('+') sign is for adding, and
+	minus ('-') is for removing. No prefix means replacing the map of *<LANG>*.
+
+	Unlike ``--langmap``, *extension* (or *pattern*) is not a list.
+	``--map-<LANG>`` takes one *extension* (or *pattern*). However,
+	the option can be specified with different arguments multiple times
+	in a command line.
 
 ``--maxdepth``
 	Limits the depth of directory recursion enabled with the ``--recurse``
@@ -781,7 +838,7 @@ built-in language names.
 	or the environment (see FILES).
 
 ``--print-language``
-	Just prints the parsers for specified input files, and then exits.
+	Just prints the parsers for specified source files, and then exits.
 
 ``--quiet[=yes|no]``
 	Write fewer messages (default is no).
@@ -920,7 +977,7 @@ only the first branch of that conditional (except in the special case of
 this is that failing to pursue only one branch can result in ambiguous
 syntax, as in the following example:
 
-.. code-block::
+.. code-block:: C
 
 	#ifdef TWO_ALTERNATIVES
 	struct {
@@ -1112,7 +1169,7 @@ may be found by your editor if there exists another source line which is
 identical to the line containing the tag. The following example
 demonstrates this condition:
 
-.. code-block::
+.. code-block:: C
 
 	int variable;
 
@@ -1234,6 +1291,9 @@ http://www.vim.org/
 AUTHOR
 ------
 
+Universal-ctags project
+https://ctags.io
+
 Darren Hiebert <dhiebert@users.sourceforge.net>
 http://DarrenHiebert.com/
 
@@ -1252,8 +1312,12 @@ service to humanity."
 
 CREDITS
 -------
+This version of @CTAGS_NAME_EXECUTABLE@ (Universal-ctags) derived from
+the repository, known as **fishman-ctags**, started by Reza Jelveh.
 
-This version of @CTAGS_NAME_EXECUTABLE@ was originally derived from and
+The fishman-ctags was derived from Exuberant-ctags.
+
+Exuberant-ctags was originally derived from and
 inspired by the ctags program by Steve Kirkendall <kirkenda@cs.pdx.edu>
 that comes with the Elvis vi clone (though virtually none of the original
 code remains).

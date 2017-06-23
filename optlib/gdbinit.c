@@ -56,7 +56,7 @@ extern parserDefinition* GdbinitParser (void)
 
 	parserDefinition* const def = parserNew ("gdbinit");
 
-	def->enabled       = false;
+	def->enabled       = true;
 	def->extensions    = extensions;
 	def->patterns      = patterns;
 	def->aliases       = aliases;

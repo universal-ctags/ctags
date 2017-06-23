@@ -1,3 +1,4 @@
+argdecl4
 fixup
 gpl
 gtk
@@ -5,6 +6,7 @@ http
 https
 icase
 mvc
+nbytes
 noheader
 nosuchlang
 posix

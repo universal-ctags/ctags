@@ -1,10 +1,14 @@
-# TODO: --list-extensions may help
+# TODO: .gitignore and --list-extensions may help
+gitignore
 hh
 hpp
 hxx
 mak
 mk
+od
+pdf
 py
+ssexwsp
 txt
 vcxproj
 yml

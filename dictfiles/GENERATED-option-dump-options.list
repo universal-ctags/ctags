@@ -39,7 +39,7 @@ list-params
 list-patterns
 list-pseudo-tags
 list-regex-flags
-_list-roles
+list-roles
 list-subparsers
 maxdepth
 options

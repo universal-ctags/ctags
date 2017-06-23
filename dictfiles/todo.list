@@ -23,6 +23,7 @@ ltlibrary
 macrofile
 sincluded
 sourcefile
+uctags
 #
 libexec
 xcmd

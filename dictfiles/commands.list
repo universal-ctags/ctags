@@ -1,9 +1,15 @@
 basename
 cgcc
 dos2unix
+elvis
 gcc
+gdb
 mkdir
 pwd
+rcs
+rst2html
+rts2man
+rst2pdf
 sed
 valgrind
 wc

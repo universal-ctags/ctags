@@ -295,8 +295,8 @@ Exuberant-ctags provides a way to inspect its internals via
 ``--list-kinds``, ``--list-languages``, and ``--list-maps``.
 
 This idea has been expanded in Universal-ctags with
-``--list-kinds-full``, ``--list-extensions``,  ``--list-extras``,
-``--list-features``, ``--list-fields``, ``--list-patterns``, and
+``--list-kinds-full``, ``--list-map-extensions``,  ``--list-extras``,
+``--list-features``, ``--list-fields``, ``--list-map-patterns``, and
 ``--list-pseudo-tags`` being added.
 
 The original three ``--list-`` options are not changed for
@@ -420,6 +420,8 @@ the ``-R`` option.
 
 ``--map-<LANG>`` option
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. IN MAN PAGE
 
 ``--map-<LANG>`` is newly introduced to control the file name
 to language mappings (langmap) with finer granularity than
@@ -1048,6 +1050,8 @@ See "Choosing a proper parser in ctags" section.
 
 Incompatible changes to file name pattern and extension handling
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. IN MAN PAGE
 
 When guessing a proper parser for a given input file, Exuberant-ctags
 tests file name patterns AFTER file extensions (e-order).

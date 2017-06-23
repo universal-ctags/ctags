@@ -18,10 +18,40 @@ SYNOPSIS
 DESCRIPTION
 -----------
 
-TO BE WRITTEN.
+This page describes major incompatible changes introduced to
+Universal-ctags forked from Exuberant-ctags.
 
 Incompatibilities in command line interface
 -------------------------------------------------------------
+
+``--langmap``
+~~~~~~~~~~~~~~
+
+When applying mappings for a name of given source file,
+Exuberant-ctags tests file name patterns AFTER file extensions
+(**e-map-order**). Universal-ctags does this differently; it tests file
+name patterns BEFORE file extensions (**u-map-order**).
+
+This incompatible change is introduced to deal with the following
+situation:
+
+	* "build.xml" as a source file,
+	* The "Ant" parser declares it handles a file name pattern "build.xml", and
+	* The "XML" parser declares it handles a file extension "xml".
+
+Which parser should be used for parsing "build.xml"?  The assumption
+of Universal-ctags is the user may want to use the "Ant" parser; the
+file name pattern it declares is more specific than the file extension
+that the "XML" parser declares. However, e-map-order chooses the "XML"
+parser.
+
+So Universal-ctags uses the u-map-order even though it introduces an
+incompatibility.
+
+``--list-map-extensions=language`` and ``--list-map-patterns=language``
+options are helpful to verify and the file extensions and the file
+name patterns of given *language*.
+
 
 Incompatibilities in tags file format
 -------------------------------------------------------------

@@ -30,5 +30,11 @@
 extern const char* ctags_repoinfo;
 #define CTAGS_FIELD_PREFIX "UCTAGS"
 
+/*
+ * Reserved words
+ */
+#define RSV_LANGMAP_DEFAULT "default"
+#define RSV_LANG_ALL "all"
+#define RSV_LANG_AUTO "auto"
 
 #endif	/* CTAGS_MAIN_CTAGS_H */

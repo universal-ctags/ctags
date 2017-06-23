@@ -322,8 +322,6 @@ static optionDescription LongOptionDescription [] = {
  {1,"       Indicate whether symbolic links should be followed [yes]."},
  {1,"  --list-aliases=[language|all]"},
  {1,"       Output list of alias patterns."},
- {1,"  --list-extensions=[language|all]"},
- {1,"       Output list of language extensions in mapping."},
  {1,"  --list-extras=[language|all]"},
  {1,"       Output list of extra tag flags."},
  {1,"  --list-features"},
@@ -340,12 +338,14 @@ static optionDescription LongOptionDescription [] = {
  {1,"       Output list of flags which can be used with --langdef option."},
  {1,"  --list-languages"},
  {1,"       Output list of supported languages."},
+ {1,"  --list-map-extensions=[language|all]"},
+ {1,"       Output list of language extensions in mapping."},
+ {1,"  --list-map-patterns=[language|all]"},
+ {1,"       Output list of language patterns in mapping."},
  {1,"  --list-maps=[language|all]"},
  {1,"       Output list of language mappings(both extensions and patterns)."},
  {1,"  --list-params=[language|all]"},
  {1,"       Output list of language parameters. This works with --machinable."},
- {1,"  --list-patterns=[language|all]"},
- {1,"       Output list of language patterns in mapping."},
  {0,"  --list-pseudo-tags"},
  {0,"       Output list of pseudo tags."},
  {1,"  --list-regex-flags"},
@@ -361,11 +361,11 @@ static optionDescription LongOptionDescription [] = {
  {1,"       --list-{extras,features,fields,kind-full,langdef-flags,params," },
  {1,"       pseudo-tags,regex-flags,roles,subparsers} support this option."},
  {1,"       Suitable for scripting. Specify before --list-* option."},
- {1,"  --map-<LANG>=[+|-]pattern|extension"},
- {1,"       Set or add(+) a map for <LANG>."},
- {1,"       Unlike --langmap, only one pattern or one extension can be specified"},
- {1,"       at once. Unlike, --langmap adding one affects the map of LANG; it does"},
- {1,"       not affect the maps of the other languages."},
+ {1,"  --map-<LANG>=[+|-]extension|pattern"},
+ {1,"       Set, add(+) or remove(-) the map for <LANG>."},
+ {1,"       Unlike --langmap, this doesn't take a list; only one file name pattern"},
+ {1,"       or one file extension can be specified at once."},
+ {1,"       Unlike --langmap the change with this option affects mapping of <LANG> only."},
  {1,"  --maxdepth=N"},
 #ifdef RECURSE_SUPPORTED
  {1,"       Specify maximum recursion depth."},
@@ -1431,7 +1431,7 @@ static void processListFieldsOption(const char *const option CTAGS_ATTR_UNUSED,
 {
 	struct colprintTable * table = fieldColprintTableNew ();
 
-	if (parameter [0] == '\0' || strcasecmp (parameter, "all") == 0)
+	if (parameter [0] == '\0' || strcasecmp (parameter, RSV_LANG_ALL) == 0)
 	{
 		fieldColprintAddCommonLines (table);
 
@@ -1550,7 +1550,7 @@ static void processLanguageForceOption (
 		const char *const option, const char *const parameter)
 {
 	langType language;
-	if (strcasecmp (parameter, "auto") == 0)
+	if (strcasecmp (parameter, RSV_LANG_AUTO) == 0)
 		language = LANG_AUTO;
 	else
 		language = getNamedLanguage (parameter, 0);
@@ -1689,7 +1689,7 @@ static char* processLanguageMap (char* map)
 		language = getNamedLanguage (map, 0);
 		if (language != LANG_IGNORE)
 		{
-			const char *const deflt = "default";
+			const char *const deflt = RSV_LANGMAP_DEFAULT;
 			char* p;
 			if (*list == '+')
 				++list;
@@ -1730,7 +1730,7 @@ static void processLanguageMapOption (
 	char *const maps = eStrdup (parameter);
 	char *map = maps;
 
-	if (strcmp (parameter, "default") == 0)
+	if (strcmp (parameter, RSV_LANGMAP_DEFAULT) == 0)
 	{
 		verbose ("    Restoring default language maps:\n");
 		installLanguageMapDefaults ();
@@ -1775,7 +1775,7 @@ static void processLanguagesOption (
 			*end = '\0';
 		if (lang [0] != '\0')
 		{
-			if (strcmp (lang, "all") == 0)
+			if (strcmp (lang, RSV_LANG_ALL) == 0)
 				enableLanguages ((bool) (mode != Remove));
 			else
 			{
@@ -1890,7 +1890,7 @@ static void processLicenseOption (
 static void processListAliasesOption (
 		const char *const option, const char *const parameter)
 {
-	if (parameter [0] == '\0' || strcasecmp (parameter, "all") == 0)
+	if (parameter [0] == '\0' || strcasecmp (parameter, RSV_LANG_ALL) == 0)
 		printLanguageAliases (LANG_AUTO);
 	else
 	{
@@ -1908,7 +1908,7 @@ static void processListExtrasOption (
 {
 	struct colprintTable * table = xtagColprintTableNew ();
 
-	if (parameter [0] == '\0' || strcasecmp (parameter, "all") == 0)
+	if (parameter [0] == '\0' || strcasecmp (parameter, RSV_LANG_ALL) == 0)
 	{
 		xtagColprintAddCommonLines (table);
 
@@ -1939,7 +1939,7 @@ static void processListKindsOption (
 {
 	bool print_all = (strcmp (option, "list-kinds-full") == 0)? true: false;
 
-	if (parameter [0] == '\0' || strcasecmp (parameter, "all") == 0)
+	if (parameter [0] == '\0' || strcasecmp (parameter, RSV_LANG_ALL) == 0)
 		printLanguageKinds (LANG_AUTO, print_all,
 							localOption.withListHeader, localOption.machinable, stdout);
 	else
@@ -1957,7 +1957,7 @@ static void processListKindsOption (
 static void processListParametersOption (const char *const option,
 										 const char *const parameter)
 {
-	if (parameter [0] == '\0' || strcasecmp (parameter, "all") == 0)
+	if (parameter [0] == '\0' || strcasecmp (parameter, RSV_LANG_ALL) == 0)
 		printLanguageParameters (LANG_AUTO,
 								 localOption.withListHeader, localOption.machinable,
 								 stdout);
@@ -1979,7 +1979,7 @@ static void processListMapsOptionForType (const char *const option CTAGS_ATTR_UN
 					  const char *const  parameter,
 					  langmapType type)
 {
-	if (parameter [0] == '\0' || strcasecmp (parameter, "all") == 0)
+	if (parameter [0] == '\0' || strcasecmp (parameter, RSV_LANG_ALL) == 0)
 		printLanguageMaps (LANG_AUTO, type);
 	else
 	{
@@ -1992,13 +1992,13 @@ static void processListMapsOptionForType (const char *const option CTAGS_ATTR_UN
 	exit (0);
 }
 
-static void processListExtensionsOption (const char *const option,
+static void processListMapExtensionsOption (const char *const option,
 					 const char *const parameter)
 {
 	processListMapsOptionForType (option, parameter, LMAP_EXTENSION);
 }
 
-static void processListPatternsOption (const char *const option,
+static void processListMapPatternsOption (const char *const option,
 				       const char *const parameter)
 {
 	processListMapsOptionForType (option, parameter, LMAP_PATTERN);
@@ -2096,7 +2096,7 @@ static void processListSubparsersOptions (const char *const option CTAGS_ATTR_UN
 
 
 	if (parameter == NULL || parameter[0] == '\0'
-		|| (strcmp(parameter, "all") == 0))
+		|| (strcmp(parameter, RSV_LANG_ALL) == 0))
 	{
 		printLanguageSubparsers(LANG_AUTO,
 								localOption.withListHeader, localOption.machinable,
@@ -2622,7 +2622,6 @@ static parametricOption ParametricOptions [] = {
 	{ "langmap",                processLanguageMapOption,       false,  STAGE_ANY },
 	{ "license",                processLicenseOption,           true,   STAGE_ANY },
 	{ "list-aliases",           processListAliasesOption,       true,   STAGE_ANY },
-	{ "list-extensions",        processListExtensionsOption,    true,   STAGE_ANY },
 	{ "list-extras",            processListExtrasOption,        true,   STAGE_ANY },
 	{ "list-features",          processListFeaturesOption,      true,   STAGE_ANY },
 	{ "list-fields",            processListFieldsOption,        true,   STAGE_ANY },
@@ -2631,8 +2630,9 @@ static parametricOption ParametricOptions [] = {
 	{ "list-langdef-flags",     processListLangdefFlagsOptions, true,   STAGE_ANY },
 	{ "list-languages",         processListLanguagesOption,     true,   STAGE_ANY },
 	{ "list-maps",              processListMapsOption,          true,   STAGE_ANY },
+	{ "list-map-extensions",    processListMapExtensionsOption, true,   STAGE_ANY },
+	{ "list-map-patterns",      processListMapPatternsOption,   true,   STAGE_ANY },
 	{ "list-params",            processListParametersOption,    true,   STAGE_ANY },
-	{ "list-patterns",          processListPatternsOption,      true,   STAGE_ANY },
 	{ "list-pseudo-tags",       processListPseudoTagsOptions,   true,   STAGE_ANY },
 	{ "list-regex-flags",       processListRegexFlagsOptions,   true,   STAGE_ANY },
 	{ "list-roles",             processListRolesOptions,        true,   STAGE_ANY },

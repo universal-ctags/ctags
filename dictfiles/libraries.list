@@ -1,5 +1,7 @@
 coffeetags
 cygwin
+docutils
+editorconfig
 jansson
 libaspell
 libc

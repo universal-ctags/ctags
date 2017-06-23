@@ -530,11 +530,11 @@ keyword
 keywords
 kind
 kinddef
-kindletters
 kindln
 kinds
+kindspecs
 klass
-kletters
+kname
 l
 la
 lab
@@ -563,7 +563,6 @@ len3
 length
 lengths
 letter
-letters
 level
 levels
 license
@@ -881,6 +880,7 @@ root
 routine
 routines
 rptr
+rsv
 run
 running
 runs
