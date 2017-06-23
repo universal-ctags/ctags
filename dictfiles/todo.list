@@ -23,3 +23,7 @@ ltlibrary
 macrofile
 sincluded
 sourcefile
+#
+libexec
+xcmd
+man1
