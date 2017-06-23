@@ -626,7 +626,7 @@ built-in language names.
 	tags when preprocessor conditionals are too complex follows all branches
 	of a conditional. This option is disabled by default.
 
-``--<LANG>-kinds=[+|-]kinds|*``
+``--kinds-<LANG>=[+|-]kinds|*``
 	Specifies a list of language-specific kinds of tags (or kinds) to
 	include in the output file for a particular language, where <LANG> is
 	case-insensitive and is one of the built-in language names (see the
@@ -649,6 +649,10 @@ built-in language names.
 	external variable declarations to the default set of tag kinds,
 	but exclude macros, use "--c-kinds=+px-d"; to include only tags for
 	functions, use "--c-kinds=f".
+
+``--<LANG>-kinds=[+|-]kinds|*``
+	Equivalent to ``--kinds-<LANG>=...``. This option is kept for
+	backward-compatibility with Exuberant-ctags.
 
 ``--langdef=name``
 	Defines a new user-defined language, name, to be parsed with regular
