@@ -31,3 +31,4 @@ object (self)
     method fooMethod = x
 end
 
+exception ConnectionNotReachable
