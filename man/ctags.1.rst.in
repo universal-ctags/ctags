@@ -729,7 +729,7 @@ built-in language names.
 
 	The actual list of
 	files for which tags will be generated depends upon the language
-	extension mapping in effect (see the ``--langmap`` option). Note all
+	extension mapping in effect (see the ``--langmap`` option). Note that the most of all
 	languages, including user-defined languages are enabled unless explicitly
 	disabled using this option. Language names included in list may be any
 	built-in language or one previously defined with ``--langdef``. The default
