@@ -155,7 +155,7 @@ template file name testing
 	have the following pattern::
 
 		Local Variables:
-		..
+		...
 		mode: MODE
 		...
 		End:
