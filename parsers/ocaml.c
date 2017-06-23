@@ -27,13 +27,13 @@ typedef enum {
 	K_CLASS,        /* OCaml class, relatively rare */
 	K_METHOD,       /* class method */
 	K_MODULE,       /* OCaml module OR functor */
-	K_VAR,
+	K_VARIABLE,
+	K_VAL,
 	K_TYPE,         /* name of an OCaml type */
 	K_FUNCTION,
 	K_CONSTRUCTOR,  /* Constructor of a sum type */
 	K_RECORDFIELD,
 	K_EXCEPTION,
-	K_VALUE,		/* ??? */
 	K_BEGIN_END,		/* ??? */
 } ocamlKind;
 
@@ -42,12 +42,12 @@ static kindDefinition OcamlKinds[] = {
 	{true, 'm', "method", "Object's method"},
 	{true, 'M', "module", "Module or functor"},
 	{true, 'v', "var", "Global variable"},
+	{true, 'p', "val", "A value ???"},
 	{true, 't', "type", "Type name"},
 	{true, 'f', "function", "A function"},
 	{true, 'C', "Constructor", "A constructor"},
 	{true, 'r', "RecordField", "A 'structure' field"},
 	{true, 'e', "Exception", "An exception"},
-	{true, 'V', "value", "A value ???"},
 	{true, 'B', "beginEnd", "A begin end ???"},
 };
 
@@ -204,6 +204,7 @@ static bool isNum (char c)
 {
 	return c >= '0' && c <= '9';
 }
+
 static bool isLowerAlpha (char c)
 {
 	return c >= 'a' && c <= 'z';
@@ -293,10 +294,10 @@ static void eatComment (lexingState * st)
 
 			c = st->cp;
 			if (c == NULL)
-			    return;
+				return;
 
 			lastIsStar = false;
-            c++;
+			c++;
 		}
 		/* OCaml has a rule which says :
 		 *
@@ -306,17 +307,17 @@ static void eatComment (lexingState * st)
 		 * So if we encounter a string beginning, we must parse it to
 		 * get a good comment nesting (bug ID: 3117537)
 		 */
-        else if (*c == '"')
-        {
-            st->cp = c;
-            eatString (st);
-            c = st->cp;
-        }
+		else if (*c == '"')
+		{
+			st->cp = c;
+			eatString (st);
+			c = st->cp;
+		}
 		else
-        {
+		{
 			lastIsStar = '*' == *c;
-            c++;
-        }
+			c++;
+		}
 	}
 
 	st->cp = c;
@@ -420,6 +421,7 @@ static ocamlKeyword lex (lexingState * st)
 	else if (isOperator[*st->cp])
 		return eatOperator (st);
 	else
+	{
 		switch (*st->cp)
 		{
 		case '(':
@@ -473,12 +475,11 @@ static ocamlKeyword lex (lexingState * st)
 		case '\\':
 			st->cp++;
 			return Tok_Backslash;
-
 		default:
 			st->cp++;
 			break;
 		}
-
+	}
 	/* default return if nothing is recognized,
 	 * shouldn't happen, but at least, it will
 	 * be handled without destroying the parsing. */
@@ -552,7 +553,7 @@ static int getLastNamedIndex ( void )
 
 	for (i = stackIndex - 1; i >= 0; --i)
 	{
-        if (vStringLength (stack[i].contextName) > 0)
+		if (vStringLength (stack[i].contextName) > 0)
 		{
 			return i;
 		}
@@ -570,7 +571,7 @@ static const kindDefinition* contextDescription (contextType t)
 	case ContextMethod:
 		return &(OcamlKinds[K_METHOD]);
 	case ContextValue:
-		return &(OcamlKinds[K_VALUE]);
+		return &(OcamlKinds[K_VAL]);
 	case ContextModule:
 		return &(OcamlKinds[K_MODULE]);
 	case ContextType:
@@ -600,13 +601,12 @@ static char contextTypeSuffix (contextType t)
 	case ContextBlock:
 		return ' ';
 	}
-
 	return '$';
 }
 
 /* Push a new context, handle null string */
 static void pushContext (contextKind kind, contextType type, parseNext after,
-        vString const *contextName)
+	vString const *contextName)
 {
 	int parentIndex;
 
@@ -615,7 +615,6 @@ static void pushContext (contextKind kind, contextType type, parseNext after,
 		verbose ("OCaml Maximum depth reached");
 		return;
 	}
-
 
 	stack[stackIndex].kind = kind;
 	stack[stackIndex].type = type;
@@ -776,7 +775,6 @@ static void contextualTillToken (vString * const ident CTAGS_ATTR_UNUSED, ocaTok
 
 	if (what == waitedToken && parentheses == 0 && bracket == 0 && curly == 0)
 		toDoNext = comeAfter;
-
 	else if (what == OcaKEYWORD_end)
 	{
 		popStrongContext ();
@@ -827,7 +825,6 @@ static void killCurrentState ( void )
 	 * really strong entity, repop */
 	switch (popStrongContext ())
 	{
-
 	case ContextValue:
 		popStrongContext ();
 		break;
@@ -837,7 +834,6 @@ static void killCurrentState ( void )
 	case ContextMethod:
 		popStrongContext ();
 		break;
-
 	case ContextType:
 		popStrongContext();
 		break;
@@ -952,10 +948,10 @@ static void exceptionDecl (vString * const ident, ocaToken what)
 	{
 		addTag (ident, K_EXCEPTION);
 	}
-    else /* probably ill-formed, give back to global scope */
-    {
-        globalScope (ident, what);
-    }
+	else /* probably ill-formed, give back to global scope */
+	{
+		globalScope (ident, what);
+	}
 	toDoNext = &globalScope;
 }
 
@@ -1011,7 +1007,6 @@ static void constructorValidation (vString * const ident, ocaToken what)
 		globalScope (ident, what);
 	}
 }
-
 
 /* Parse beginning of type definition
  * type 'avar ident =
@@ -1107,7 +1102,6 @@ static void typeSpecification (vString * const ident, ocaToken what)
 
 static bool dirtySpecialParam = false;
 
-
 /* parse the ~label and ~label:type parameter */
 static void parseLabel (vString * const ident, ocaToken what)
 {
@@ -1118,9 +1112,8 @@ static void parseLabel (vString * const ident, ocaToken what)
 	case OcaIDENTIFIER:
 		if (!dirtySpecialParam)
 		{
-
 			if (exportLocalInfo)
-				addTag (ident, K_VAR);
+				addTag (ident, K_VARIABLE);
 
 			dirtySpecialParam = true;
 		}
@@ -1159,13 +1152,11 @@ static void parseLabel (vString * const ident, ocaToken what)
 	}
 }
 
-
 /* Optional argument with syntax like this :
  * ?(foo = value) */
 static void parseOptionnal (vString * const ident, ocaToken what)
 {
 	static int parCount = 0;
-
 
 	switch (what)
 	{
@@ -1173,7 +1164,7 @@ static void parseOptionnal (vString * const ident, ocaToken what)
 		if (!dirtySpecialParam)
 		{
 			if (exportLocalInfo)
-				addTag (ident, K_VAR);
+				addTag (ident, K_VARIABLE);
 
 			dirtySpecialParam = true;
 
@@ -1196,7 +1187,6 @@ static void parseOptionnal (vString * const ident, ocaToken what)
 		break;
 	}
 }
-
 
 /** handle let inside functions (so like it's name
  * say : local let */
@@ -1221,7 +1211,6 @@ static void localLet (vString * const ident, ocaToken what)
 		 * function definition */
 		if (exportLocalInfo)
 			addTag (ident, K_FUNCTION);
-
 		pushSoftContext (mayRedeclare, ident, ContextFunction);
 		toDoNext = &letParam;
 		break;
@@ -1229,14 +1218,14 @@ static void localLet (vString * const ident, ocaToken what)
 		/* Can be a weiiird binding, or an '_' */
 	case Tok_Val:
 		if (exportLocalInfo)
-			addTag (ident, K_VAR);
+			addTag (ident, K_VARIABLE);
 		pushSoftContext (mayRedeclare, ident, ContextValue);
 		toDoNext = &letParam;
 		break;
 
 	case OcaIDENTIFIER:
 		if (exportLocalInfo)
-			addTag (ident, K_VAR);
+			addTag (ident, K_VARIABLE);
 		pushSoftContext (mayRedeclare, ident, ContextValue);
 		toDoNext = &letParam;
 		break;
@@ -1262,11 +1251,11 @@ static void localLet (vString * const ident, ocaToken what)
  * because their syntax is similar.  */
 static void matchPattern (vString * const ident, ocaToken what)
 {
-    /* keep track of [], as it
-     * can be used in patterns and can
-     * mean the end of match expression in
-     * revised syntax */
-    static int braceCount = 0;
+	/* keep track of [], as it
+	 * can be used in patterns and can
+	 * mean the end of match expression in
+	 * revised syntax */
+	static int braceCount = 0;
 
 	switch (what)
 	{
@@ -1275,14 +1264,14 @@ static void matchPattern (vString * const ident, ocaToken what)
 		toDoNext = &mayRedeclare;
 		break;
 
-    case Tok_BRL:
-        braceCount++;
-        break;
+	case Tok_BRL:
+	braceCount++;
+	break;
 
-    case OcaKEYWORD_value:
+	case OcaKEYWORD_value:
 		popLastNamed ();
-        globalScope (ident, what);
-        break;
+	globalScope (ident, what);
+	break;
 
 	case OcaKEYWORD_in:
 		popLastNamed ();
@@ -1300,10 +1289,10 @@ static void mayRedeclare (vString * const ident, ocaToken what)
 {
 	switch (what)
 	{
-    case OcaKEYWORD_value:
-        /* let globalScope handle it */
-        globalScope (ident, what);
-        break;
+	case OcaKEYWORD_value:
+	/* let globalScope handle it */
+	globalScope (ident, what);
+	break;
 
 	case OcaKEYWORD_let:
 	case OcaKEYWORD_val:
@@ -1357,7 +1346,7 @@ static void letParam (vString * const ident, ocaToken what)
 
 	case OcaIDENTIFIER:
 		if (exportLocalInfo)
-			addTag (ident, K_VAR);
+			addTag (ident, K_VARIABLE);
 		break;
 
 	case Tok_Op:
@@ -1401,7 +1390,6 @@ static void letParam (vString * const ident, ocaToken what)
 	}
 }
 
-
 /* parse object ...
  * used to be sure the class definition is not a type
  * alias */
@@ -1424,7 +1412,6 @@ static void classSpecif (vString * const ident CTAGS_ATTR_UNUSED, ocaToken what)
  * nearly a copy/paste of globalLet. */
 static void methodDecl (vString * const ident, ocaToken what)
 {
-
 	switch (what)
 	{
 	case Tok_PARL:
@@ -1462,7 +1449,6 @@ static void methodDecl (vString * const ident, ocaToken what)
  * context stacking. */
 static vString *lastModule;
 
-
 /* parse
  * ... struct (* new global scope *) end
  * or
@@ -1472,7 +1458,6 @@ static vString *lastModule;
  */
 static void moduleSpecif (vString * const ident, ocaToken what)
 {
-
 	switch (what)
 	{
 	case OcaKEYWORD_functor:
@@ -1582,7 +1567,7 @@ static void globalLet (vString * const ident, ocaToken what)
 		break;
 
 	case OcaIDENTIFIER:
-		addTag (ident, K_VAR);
+		addTag (ident, K_VARIABLE);
 		pushStrongContext (ident, ContextValue);
 		requestStrongPoping ();
 		toDoNext = &letParam;
@@ -1677,7 +1662,9 @@ static void localScope (vString * const ident, ocaToken what)
 {
 	switch (what)
 	{
+
 	case Tok_Pipe:
+
 	case Tok_PARR:
 	case Tok_BRR:
 	case Tok_CurlR:
@@ -1759,7 +1746,6 @@ static void localScope (vString * const ident, ocaToken what)
 		killCurrentState ();
 		break;
 
-
 	case OcaKEYWORD_fun:
 		comeAfter = &mayRedeclare;
 		toDoNext = &tillToken;
@@ -1823,7 +1809,7 @@ static void initStack ( void )
 	int i;
 	for (i = 0; i < OCAML_MAX_STACK_SIZE; ++i)
 		stack[i].contextName = vStringNew ();
-    stackIndex = 0;
+	stackIndex = 0;
 }
 
 static void clearStack ( void )
@@ -1840,6 +1826,7 @@ static void findOcamlTags (void)
 	ocaToken tok;
 
 	initStack ();
+
 	computeModuleName ();
 	tempIdent = vStringNew ();
 	lastModule = vStringNew ();
@@ -1877,8 +1864,8 @@ extern parserDefinition *OcamlParser (void)
 {
 	static const char *const extensions[] = { "ml", "mli", "aug", NULL };
 	static const char *const aliases[] = { "tuareg", /* mode name of emacs */
-					       "caml",	 /* mode name of emacs */
-					       NULL };
+										   "caml",	 /* mode name of emacs */
+										   NULL };
 	parserDefinition *def = parserNew ("OCaml");
 	def->kindTable = OcamlKinds;
 	def->kindCount = ARRAY_SIZE (OcamlKinds);

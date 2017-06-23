@@ -54,6 +54,8 @@ for commit in $(git log --format=%H ${base}...); do
     oname=${iname}-misspelling.tags
     git show ${commit} \
 	| grep -v -e '^-[^-]' \
+	| grep -v -e '^diff ' \
+	| grep -v -e '^rename from ' \
 	| sed -e 's/\(@@.*@@\).*/\1/' \
 	      > ${OUTDIR}/${iname}.txt
 

@@ -134,7 +134,6 @@ check()
     T_existing /bin/ctags -f -x
     T_existing /bin/readtags -f -x
 
-    T_existing /libexec/ctags/drivers/coffeetags -f -x
     T_existing /share/man/man1/ctags.1 -f -r
 }
 
