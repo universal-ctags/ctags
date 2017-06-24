@@ -2375,14 +2375,14 @@ static void printMaps (const langType language, langmapType type)
 	Assert (0 <= language  &&  language < (int) LanguageCount);
 	parser = LanguageTable + language;
 	printf ("%-8s", parser->def->name);
-	if (parser->currentExtensions != NULL && (type & LMAP_EXTENSION))
-		for (i = 0  ;  i < stringListCount (parser->currentExtensions)  ;  ++i)
-			printf (" *.%s", vStringValue (
-						stringListItem (parser->currentExtensions, i)));
 	if (parser->currentPatterns != NULL && (type & LMAP_PATTERN))
 		for (i = 0  ;  i < stringListCount (parser->currentPatterns)  ;  ++i)
 			printf (" %s", vStringValue (
 						stringListItem (parser->currentPatterns, i)));
+	if (parser->currentExtensions != NULL && (type & LMAP_EXTENSION))
+		for (i = 0  ;  i < stringListCount (parser->currentExtensions)  ;  ++i)
+			printf (" *.%s", vStringValue (
+						stringListItem (parser->currentExtensions, i)));
 	putchar ('\n');
 }
 

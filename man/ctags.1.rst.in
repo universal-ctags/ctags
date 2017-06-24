@@ -786,7 +786,7 @@ built-in language names.
 	languages, and then exits.
 
 ``--list-maps[=language|all]``
-	Lists the file extensions and file name patterns which associate a file
+	Lists file name patterns and the file extensions which associate a file
 	name with a language for either the specified *language* or **all**
 	languages, and then exits. See the ``--langmap`` option, and "SOURCE FILES", above.
 

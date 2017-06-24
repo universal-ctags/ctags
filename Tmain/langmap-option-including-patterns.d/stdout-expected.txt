@@ -1,12 +1,12 @@
 1.
-Automake *.am Makefile.am
+Automake Makefile.am *.am
 foo      [Mm]akefile GNUmakefile
 2.
-Ruby     *.rb *.ruby *.html [Mm]akefile GNUmakefile
+Ruby     [Mm]akefile GNUmakefile *.rb *.ruby *.html
 3.
-Automake *.am Makefile.am
-Ruby     *.rb *.ruby *.html [Mm]akefile GNUmakefile
+Automake Makefile.am *.am
+Ruby     [Mm]akefile GNUmakefile *.rb *.ruby *.html
 4.
-Ruby     *.rb *.ruby *.html [Mm]akefile GNUmakefile
+Ruby     [Mm]akefile GNUmakefile *.rb *.ruby *.html
 5.
 HTML     *.htm *.html
