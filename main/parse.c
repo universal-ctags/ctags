@@ -2372,7 +2372,7 @@ static void printMaps (const langType language, langmapType type)
 {
 	const parserObject* parser;
 	unsigned int i;
-	Assert (0 <= language  &&  language < (int) LanguageCount);
+
 	parser = LanguageTable + language;
 	printf ("%-8s", parser->def->name);
 	if (parser->currentPatterns != NULL && (type & LMAP_PATTERN))
@@ -2386,16 +2386,108 @@ static void printMaps (const langType language, langmapType type)
 	putchar ('\n');
 }
 
-extern void printLanguageMaps (const langType language, langmapType type)
+static struct colprintTable *mapColprintTableNew (langmapType type)
 {
+	if ((type & LMAP_ALL) == LMAP_ALL)
+		return colprintTableNew ("L:LANGUAGE", "L:TYPE", "L:MAP", NULL);
+	else if (type & LMAP_PATTERN)
+		return colprintTableNew ("L:LANGUAGE", "L:PATTERN", NULL);
+	else if (type & LMAP_EXTENSION)
+		return colprintTableNew ("L:LANGUAGE", "L:EXTENSION", NULL);
+	else
+	{
+		AssertNotReached ();
+		return NULL;
+	}
+}
+
+static void mapColprintAddLanguage (struct colprintTable * table,
+									langmapType type,
+									const parserObject* parser)
+{
+	struct colprintLine * line;
+	unsigned int count;
+	unsigned int i;
+
+	if ((type & LMAP_PATTERN) && (0 < (count = stringListCount (parser->currentPatterns))))
+	{
+		for (i = 0; i < count; i++)
+		{
+			line = colprintTableGetNewLine (table);
+			vString *pattern = stringListItem (parser->currentPatterns, i);
+
+			colprintLineAppendColumnCString (line, parser->def->name);
+			if (type & LMAP_EXTENSION)
+				colprintLineAppendColumnCString (line, "pattern");
+			colprintLineAppendColumnVString (line, pattern);
+		}
+	}
+
+	if ((type & LMAP_EXTENSION) && (0 < (count = stringListCount (parser->currentExtensions))))
+	{
+		for (i = 0; i < count; i++)
+		{
+			line = colprintTableGetNewLine (table);
+			vString *extension = stringListItem (parser->currentExtensions, i);
+
+			colprintLineAppendColumnCString (line, parser->def->name);
+			if (type & LMAP_PATTERN)
+				colprintLineAppendColumnCString (line, "extension");
+			colprintLineAppendColumnVString (line, extension);
+		}
+	}
+}
+
+extern void printLanguageMaps (const langType language, langmapType type,
+							   bool withListHeader, bool machinable, FILE *fp)
+{
+	/* DON'T SORT THE LIST
+
+	   The order of listing should be equal to the order of matching
+	   for the parser selection. */
+
+	struct colprintTable * table = NULL;
+	if (type & LMAP_TABLE_OUTPUT)
+		table = mapColprintTableNew(type);
+
 	if (language == LANG_AUTO)
 	{
-		unsigned int i;
-		for (i = 0  ;  i < LanguageCount  ;  ++i)
-			printMaps (i, type);
+		for (unsigned int i = 0  ;  i < LanguageCount  ;  ++i)
+		{
+			if (!isLanguageVisible (i))
+				continue;
+
+			if (type & LMAP_TABLE_OUTPUT)
+			{
+				const parserObject* parser = LanguageTable + i;
+
+				mapColprintAddLanguage (table, type, parser);
+			}
+			else
+				printMaps (i, type);
+		}
 	}
 	else
-		printMaps (language, type);
+	{
+		Assert (0 <= language  &&  language < (int) LanguageCount);
+
+		if (type & LMAP_TABLE_OUTPUT)
+		{
+			const parserObject* parser = LanguageTable + language;
+
+			mapColprintAddLanguage (table, type, parser);
+		}
+		else
+			printMaps (language, type);
+	}
+
+
+	if (type & LMAP_TABLE_OUTPUT)
+	{
+		colprintTablePrint (table, (language == LANG_AUTO)? 0: 1,
+							withListHeader, machinable, fp);
+		colprintTableDelete (table);
+	}
 }
 
 static struct colprintTable *aliasColprintTableNew (void)

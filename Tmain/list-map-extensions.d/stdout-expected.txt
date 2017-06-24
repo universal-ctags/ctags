@@ -1,0 +1,10 @@
+## all|grep LdScript
+#LANGUAGE         EXTENSION
+LdScript          lds
+LdScript          scr
+LdScript          ld
+## LdScript
+#EXTENSION
+lds
+scr
+ld

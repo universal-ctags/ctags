@@ -1982,14 +1982,18 @@ static void processListMapsOptionForType (const char *const option CTAGS_ATTR_UN
 					  langmapType type)
 {
 	if (parameter [0] == '\0' || strcasecmp (parameter, RSV_LANG_ALL) == 0)
-		printLanguageMaps (LANG_AUTO, type);
+		printLanguageMaps (LANG_AUTO, type,
+						   localOption.withListHeader, localOption.machinable,
+						   stdout);
 	else
 	{
 		langType language = getNamedLanguage (parameter, 0);
 		if (language == LANG_IGNORE)
 			error (FATAL, "Unknown language \"%s\" in \"%s\" option", parameter, option);
 		else
-			printLanguageMaps (language, type);
+			printLanguageMaps (language, type,
+							   localOption.withListHeader, localOption.machinable,
+							   stdout);
 	}
 	exit (0);
 }
@@ -1997,13 +2001,13 @@ static void processListMapsOptionForType (const char *const option CTAGS_ATTR_UN
 static void processListMapExtensionsOption (const char *const option,
 					 const char *const parameter)
 {
-	processListMapsOptionForType (option, parameter, LMAP_EXTENSION);
+	processListMapsOptionForType (option, parameter, LMAP_EXTENSION|LMAP_TABLE_OUTPUT);
 }
 
 static void processListMapPatternsOption (const char *const option,
 				       const char *const parameter)
 {
-	processListMapsOptionForType (option, parameter, LMAP_PATTERN);
+	processListMapsOptionForType (option, parameter, LMAP_PATTERN|LMAP_TABLE_OUTPUT);
 }
 
 static void processListMapsOption (
