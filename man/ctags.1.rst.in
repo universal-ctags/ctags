@@ -769,6 +769,11 @@ built-in language names.
 	Indicates whether symbolic links (if supported) should be followed.
 	When disabled, symbolic links are ignored. This option is on by default.
 
+``--list-aliases[=language|all]``
+	Lists the aliases for either the specified language or all
+	languages, and then exits. The aliases are used in when guessing
+	a parser for a source file.
+
 ``--list-kinds[=language|all]``
 	Lists the tag kinds recognized for either the specified language or all
 	languages, and then exits. Each kind of tag recorded in the tag file
