@@ -279,6 +279,9 @@ However, labels in the header will not change. So by scanning
 the header, a client tool can find the index for the target
 column.
 
+.. options should be explained and revised here
+   ``--list-features`` (done)
+
 
 OPTION ITEMS
 ------------
@@ -474,8 +477,8 @@ OPTION ITEMS
 	being expanded by the shell before being passed to @CTAGS_NAME_EXECUTABLE@;
 	also be aware that wildcards can match the slash character, '/').
 	You can determine if shell wildcards are available on your platform by
-	examining the output of the ``--version`` option, which will include
-	"+wildcards" in the compiled feature list; otherwise, pattern is matched
+	examining the output of the ``--list-features`` option, which will include
+	"wildcards" in the compiled feature list; otherwise, pattern is matched
 	against file names using a simple textual comparison.
 
 	If pattern begins with the character '@', then the rest of the string
@@ -825,6 +828,9 @@ OPTION ITEMS
 	languages, and then exits. The aliases are used in when guessing
 	a parser for a source file.
 
+``--list-features``
+	Lists the compiled features.
+
 ``--list-kinds[=language|all]``
 	Lists the tag kinds recognized for either the specified language or all
 	languages, and then exits. Each kind of tag recorded in the tag file
@@ -959,8 +965,8 @@ OPTION ITEMS
 	Note that this option is available only if @CTAGS_NAME_EXECUTABLE@ was
 	compiled with support for regular expressions, which depends upon your
 	platform. You can determine if support for regular expressions is
-	compiled in by examining the output of the ``--version`` option, which will
-	include "+regex" in the compiled feature list.
+	compiled in by examining the output of the ``--list-features`` option, which will
+	include "regex" in the compiled feature list.
 
 	For more information on the regular expressions used by
 	@CTAGS_NAME_EXECUTABLE@, see either the regex(5,7) man page, or the GNU
