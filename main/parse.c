@@ -1247,7 +1247,7 @@ static void foreachLanguage(languageCallback callback, void *user_data)
 	}
 }
 
-extern void printLanguageMap (const langType language, FILE *fp)
+static void printLanguageMap (const langType language, FILE *fp)
 {
 	bool first = true;
 	unsigned int i;

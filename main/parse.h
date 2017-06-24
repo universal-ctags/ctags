@@ -171,7 +171,6 @@ extern void installLanguageAliasesDefaults (void);
 extern void clearLanguageAliases (const langType language);
 extern void addLanguageAlias (const langType language, const char* alias);
 
-extern void printLanguageMap (const langType language, FILE *fp);
 extern void printLanguageMaps (const langType language, langmapType type);
 extern void enableLanguages (const bool state);
 extern void enableLanguage (const langType language, const bool state);
