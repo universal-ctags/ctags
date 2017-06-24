@@ -202,8 +202,8 @@ Examples:
 ``NONE`` means that @CTAGS_NAME_EXECUTABLE@ does not select any parser for the file.
 
 
-OPTIONS
--------
+COMMAND LINE INTERFACE
+----------------------
 
 Despite the wealth of available options, defaults are set so that
 @CTAGS_NAME_EXECUTABLE@ is most commonly executed without any options (e.g.
@@ -280,8 +280,8 @@ the header, a client tool can find the index for the target
 column.
 
 
-Option items
-~~~~~~~~~~~~
+OPTION ITEMS
+------------
 
 ``-a``
 	Equivalent to ``--append``.
