@@ -19,8 +19,8 @@ together.
 If you want to try the latest universal-ctags without building it yourself...
 
 ### Windows
-- Daily builds are available at the [ctags-win32](https://github.com/universal-ctags/ctags-win32) project.
-  - Go to the [releases](https://github.com/universal-ctags/ctags-win32/releases) page to download zip packages.
+Daily builds are available at the [ctags-win32](https://github.com/universal-ctags/ctags-win32) project.
+Go to the [releases](https://github.com/universal-ctags/ctags-win32/releases) page to download zip packages.
 
 ### Mac
 See [Homebrew Tap for Universal Ctags](https://github.com/universal-ctags/homebrew-universal-ctags)
