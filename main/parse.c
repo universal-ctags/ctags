@@ -1311,7 +1311,6 @@ extern void installLanguageMapDefaults (void)
 	}
 }
 
-static void printAliases (const langType language, FILE *fp);
 extern void installLanguageAliasesDefault (const langType language)
 {
 	parserObject* parser;
@@ -1328,10 +1327,14 @@ extern void installLanguageAliasesDefault (const langType language)
 			stringListNewFromArgv (parser->def->aliases);
 	}
 	BEGIN_VERBOSE(vfp);
-	printAliases (language, vfp);
+	if (parser->currentAliases != NULL)
+		for (unsigned int i = 0  ;  i < stringListCount (parser->currentAliases)  ;  ++i)
+			fprintf (vfp, " %s", vStringValue (
+						 stringListItem (parser->currentAliases, i)));
 	putc ('\n', vfp);
 	END_VERBOSE();
 }
+
 extern void installLanguageAliasesDefaults (void)
 {
 	unsigned int i;
@@ -2381,19 +2384,6 @@ static void printMaps (const langType language, langmapType type)
 			printf (" %s", vStringValue (
 						stringListItem (parser->currentPatterns, i)));
 	putchar ('\n');
-}
-
-static void printAliases (const langType language, FILE *fp)
-{
-	const parserObject* parser;
-	unsigned int i;
-	Assert (0 <= language  &&  language < (int) LanguageCount);
-	parser = LanguageTable + language;
-
-	if (parser->currentAliases != NULL)
-		for (i = 0  ;  i < stringListCount (parser->currentAliases)  ;  ++i)
-			fprintf (fp, " %s", vStringValue (
-					stringListItem (parser->currentAliases, i)));
 }
 
 extern void printLanguageMaps (const langType language, langmapType type)
