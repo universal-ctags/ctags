@@ -358,7 +358,7 @@ static optionDescription LongOptionDescription [] = {
  {1,"       Output list of subparsers for the base language."},
  {1,"  --machinable=[yes|no]"},
  {1,"       Use tab separated representation in --list- option output. [no]"},
- {1,"       --list-{extras,features,fields,kind-full,langdef-flags,params," },
+ {1,"       --list-{aliases,extras,features,fields,kind-full,langdef-flags,params," },
  {1,"       pseudo-tags,regex-flags,roles,subparsers} support this option."},
  {1,"       Suitable for scripting. Specify before --list-* option."},
  {1,"  --map-<LANG>=[+|-]extension|pattern"},
@@ -423,7 +423,7 @@ static optionDescription LongOptionDescription [] = {
  {1,"       Print version identifier to standard output."},
  {1,"  --with-list-header=[yes|no]"},
  {1,"       Prepend the column descriptions in --list- output. [yes]"},
- {1,"       --list-{extras,features,fields,kind-full,langdef-flags,params," },
+ {1,"       --list-{aliases,extras,features,fields,kind-full,langdef-flags,params," },
  {1,"       pseudo-tags,regex-flags,roles,subparsers} support this option."},
  {1,"       Specify before --list-* option."},
  {1,"  --_anonhash=fname"},
@@ -1891,14 +1891,16 @@ static void processListAliasesOption (
 		const char *const option, const char *const parameter)
 {
 	if (parameter [0] == '\0' || strcasecmp (parameter, RSV_LANG_ALL) == 0)
-		printLanguageAliases (LANG_AUTO);
+		printLanguageAliases (LANG_AUTO,
+							  localOption.withListHeader, localOption.machinable, stdout);
 	else
 	{
 		langType language = getNamedLanguage (parameter, 0);
 		if (language == LANG_IGNORE)
 			error (FATAL, "Unknown language \"%s\" in \"%s\" option", parameter, option);
 		else
-			printLanguageAliases (language);
+			printLanguageAliases (language,
+								  localOption.withListHeader, localOption.machinable, stdout);
 	}
 	exit (0);
 }

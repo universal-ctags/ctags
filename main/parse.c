@@ -2408,24 +2408,61 @@ extern void printLanguageMaps (const langType language, langmapType type)
 		printMaps (language, type);
 }
 
-extern void printLanguageAliases (const langType language)
+static struct colprintTable *aliasColprintTableNew (void)
 {
+	return colprintTableNew ("L:LANGUAGE", "L:ALIAS", NULL);
+}
+
+static void aliasColprintAddLanguage (struct colprintTable * table,
+									  const parserObject* parser)
+{
+	unsigned int count;
+
+	if (parser->currentAliases && (0 < (count = stringListCount (parser->currentAliases))))
+	{
+		for (unsigned int i = 0; i < count; i++)
+		{
+			struct colprintLine * line = colprintTableGetNewLine (table);
+			vString *alias = stringListItem (parser->currentAliases, i);;
+
+			colprintLineAppendColumnCString (line, parser->def->name);
+			colprintLineAppendColumnVString (line, alias);
+		}
+	}
+}
+
+extern void printLanguageAliases (const langType language,
+								  bool withListHeader, bool machinable, FILE *fp)
+{
+	/* DON'T SORT THE LIST
+
+	   The order of listing should be equal to the order of matching
+	   for the parser selection. */
+
+	struct colprintTable * table = aliasColprintTableNew();
+	const parserObject* parser;
+
 	if (language == LANG_AUTO)
 	{
-		unsigned int i;
-		for (i = 0  ;  i < LanguageCount  ;  ++i)
-			printLanguageAliases (i);
+		for (unsigned int i = 0; i < LanguageCount; ++i)
+		{
+			parser = LanguageTable + i;
+			if (parser->def->invisible)
+				continue;
+
+			aliasColprintAddLanguage (table, parser);
+		}
 	}
 	else
 	{
-		const parserDefinition* lang;
-
 		Assert (0 <= language  &&  language < (int) LanguageCount);
-		lang = LanguageTable [language].def;
-		printf ("%-8s", lang->name);
-		printAliases (language, stdout);
-		putchar ('\n');
+		parser = LanguageTable + language;
+		aliasColprintAddLanguage (table, parser);
 	}
+
+	colprintTablePrint (table, (language == LANG_AUTO)? 0: 1,
+						withListHeader, machinable, fp);
+	colprintTableDelete (table);
 }
 
 static void printLanguage (const langType language, parserDefinition** ltable)

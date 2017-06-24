@@ -183,7 +183,8 @@ extern void printLanguageKinds (const langType language, bool allKindFields,
 								bool withListHeader, bool machinable, FILE *fp);
 extern void printLanguageRoles (const langType language, const char* letters,
 								bool withListHeader, bool machinable, FILE *fp);
-extern void printLanguageAliases (const langType language);
+extern void printLanguageAliases (const langType language,
+								  bool withListHeader, bool machinable, FILE *fp);
 extern void printLanguageList (void);
 extern void printLanguageParameters (const langType language,
 									 bool withListHeader, bool machinable, FILE *fp);

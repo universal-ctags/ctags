@@ -1,0 +1,7 @@
+#ALIAS
+sh
+bash
+ksh
+zsh
+ash
+shell-script
