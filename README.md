@@ -19,12 +19,8 @@ together.
 If you want to try the latest universal-ctags without building it yourself...
 
 ### Windows
-- Go to https://ci.appveyor.com/project/universalctags/ctags/history
-  - Select one of the builds named ```Daily build: YYYY-MM-DD```.
-  - Click the ```compiler=msys2, ARCH=x64, ...``` (or ```compiler=msys2, ARCH=x86, ...```) job.
-  - View the *Artifacts* tab and download ```ctags-XXXXXX-x64.zip``` (or ```ctags-XXXXXX-x86.zip```). (```XXXXXX``` is a version number or a commit ID.)
-  - Add the binary folder to your PATH.
-  - If you need unstripped binaries for debugging, download ```ctags-XXXXXX-x64.debug.zip``` (or ```ctags-XXXXXX-x86.debug.zip```).
+- Daily builds are available at the [ctags-win32](https://github.com/universal-ctags/ctags-win32) project.
+  - Go to the [releases](https://github.com/universal-ctags/ctags-win32/releases) page to download zip packages.
 
 ### Mac
 See [Homebrew Tap for Universal Ctags](https://github.com/universal-ctags/homebrew-universal-ctags)
