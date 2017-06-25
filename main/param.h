@@ -32,4 +32,7 @@ extern void paramColprintAddParameter (struct colprintTable *table,
 extern void paramColprintTablePrint (struct colprintTable *table, bool noparser,
 									bool withListHeader, bool machinable, FILE *fp);
 
+extern bool paramParserBool (const char *value, bool fallback,
+							 const char *errWhat, const char *errCategory);
+
 #endif	/* CTAGS_MAIN_PARAM_H */

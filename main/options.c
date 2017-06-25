@@ -1052,6 +1052,23 @@ static bool isTrue (const char *parameter)
 		strcasecmp (parameter, "true" ) == 0);
 }
 
+extern bool paramParserBool (const char *value, bool fallback,
+							 const char *errWhat, const char *errCategory)
+{
+	bool r = fallback;
+
+	if (value [0] == '\0')
+		r = true;
+	else if (isFalse (value))
+		r = false;
+	else if (isTrue (value))
+		r = true;
+	else
+		error (FATAL, "Invalid value for \"%s\" %s", errWhat, errCategory);
+
+	return r;
+}
+
 /*  Determines whether the specified file name is considered to be a header
  *  file for the purposes of determining whether enclosed tags are global or
  *  static.
@@ -2726,18 +2743,7 @@ static bool processParametricOption (
 static bool getBooleanOption (
 		const char *const option, const char *const parameter)
 {
-	bool selection = true;
-
-	if (parameter [0] == '\0')
-		selection = true;
-	else if (isFalse (parameter))
-		selection = false;
-	else if (isTrue (parameter))
-		selection = true;
-	else
-		error (FATAL, "Invalid value for \"%s\" option", option);
-
-	return selection;
+	return paramParserBool (parameter, true, option, "option");
 }
 
 static bool processBooleanOption (

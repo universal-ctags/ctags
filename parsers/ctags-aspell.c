@@ -166,11 +166,11 @@ static stringList *word2subwords (const char* word, bool split)
 
 static bool splittingIntoSubwords;
 static void aspell_subwords_handler (const langType language CTAGS_ATTR_UNUSED,
-									 const char *optname CTAGS_ATTR_UNUSED,
+									 const char *name,
 									 const char *arg)
 {
-	if (strcmp(arg, "true") == 0)
-		splittingIntoSubwords = true;
+	splittingIntoSubwords = paramParserBool (arg, splittingIntoSubwords,
+											 name, "parameter");
 }
 
 static int add_word_to_dict (const char *word, hashTable * dict, bool split)
