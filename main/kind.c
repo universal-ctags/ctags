@@ -258,8 +258,8 @@ extern void kindColprintFillLine (struct colprintLine *line,
 	colprintLineAppendColumnCString (line, kdef->name
 									 ? kdef->name
 									 : "ThisShouldNotBePrintedKindNameMustBeGiven");
-	colprintLineAppendColumnCString (line, kdef->enabled? "on": "off");
-	colprintLineAppendColumnCString (line, kdef->referenceOnly? "TRUE": "FALSE");
+	colprintLineAppendColumnBool (line, kdef->enabled);
+	colprintLineAppendColumnBool (line, kdef->referenceOnly);
 	colprintLineAppendColumnInt (line, kdef->nRoles);
 	colprintLineAppendColumnCString (line, (kdef->master
 											|| kdef->slave ) ?

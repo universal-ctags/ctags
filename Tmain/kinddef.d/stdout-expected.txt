@@ -2,7 +2,7 @@
 ctags: Unknown language "NOSUCHLANG" in "kinddef-NOSUCHLANG" option
 # define "a"
 #LETTER NAME ENABLED REFONLY NROLES MASTER DESCRIPTION
-a       aa   on      FALSE   0      NONE   aaa
+a       aa   yes     no      0      NONE   aaa
 # no description 1
 ctags: found an empty kind description in "--kinddef-MYTEST" option
 # no description 2

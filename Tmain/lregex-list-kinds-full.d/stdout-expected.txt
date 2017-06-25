@@ -1,5 +1,5 @@
 #LETTER	NAME	ENABLED	REFONLY	NROLES	MASTER	DESCRIPTION
-a	x y	on	FALSE	0	NONE	x y z
-b	regex	off	FALSE	0	NONE	regex
-c	regex	off	FALSE	0	NONE	regex
-d	regex	on	FALSE	0	NONE	regex
+a	x y	yes	no	0	NONE	x y z
+b	regex	no	no	0	NONE	regex
+c	regex	no	no	0	NONE	regex
+d	regex	yes	no	0	NONE	regex

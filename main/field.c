@@ -893,12 +893,12 @@ extern bool enableField (fieldType type, bool state, bool warnIfFixedField)
 		if (isCommonField (type))
 			verbose ("enable field \"%s\": %s\n",
 				 getFieldObject(type)->def->name,
-				 (state? "TRUE": "FALSE"));
+				 (state? "yes": "no"));
 		else
 			verbose ("enable field \"%s\"<%s>: %s\n",
 				 getFieldObject(type)->def->name,
 				 getLanguageName (getFieldOwner(type)),
-				 (state? "TRUE": "FALSE"));
+				 (state? "yes": "no"));
 	}
 	return old;
 }
@@ -1028,13 +1028,13 @@ static void  fieldColprintAddLine (struct colprintTable *table, int i)
 
 	const char *name = getFieldName (i);
 	colprintLineAppendColumnCString (line, name? name: "NONE");
-	colprintLineAppendColumnCString (line, fdef->enabled? "on": "off");
+	colprintLineAppendColumnBool (line, fdef->enabled);
 	colprintLineAppendColumnCString (line,
 									 fobj->language == LANG_IGNORE
 									 ?"NONE"
 									 : getLanguageName (fobj->language));
 
-	colprintLineAppendColumnCString (line, fdef->renderEscaped[WRITER_DEFAULT]? "TRUE": "FALSE");
+	colprintLineAppendColumnBool (line, fdef->renderEscaped[WRITER_DEFAULT]? true: false);
 
 	char  typefields [] = "---";
 	{
