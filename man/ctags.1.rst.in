@@ -218,8 +218,8 @@ are optional.
 Note also that the boolean parameters to the long form options (those
 beginning with "--" and that take a "[=yes|no]" parameter) may be omitted,
 in which case "=yes" is implied. (e.g. ``--sort`` is equivalent to ``--sort=yes``).
-Note further that "=1" and "=on" are considered synonyms for "=yes",
-and that "=0" and "=off" are considered synonyms for "=no".
+Note further that "=1", "=on", and "=true" are considered synonyms for "=yes",
+and that "=0", "=off", and "=false" are considered synonyms for "=no".
 
 Some options are either ignored or useful only when used while running in
 etags mode (see -e option). Such options will be noted.
