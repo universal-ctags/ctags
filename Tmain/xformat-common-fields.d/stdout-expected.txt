@@ -1,6 +1,21 @@
 field: #LETTER
 status: 1
 
+field: N
+output: Foo Foo
+output: doIt doIt
+status: 0
+
+field: F
+output: Foo input.py
+output: doIt input.py
+status: 0
+
+field: P
+output: Foo /^class Foo:$/
+output: doIt /^    def doIt():$/
+status: 0
+
 field: C
 output: Foo class Foo:
 output: doIt def doIt():
@@ -11,24 +26,9 @@ output: Foo
 output: doIt 
 status: 0
 
-field: F
-output: Foo input.py
-output: doIt input.py
-status: 0
-
 field: K
 output: Foo class
 output: doIt member
-status: 0
-
-field: N
-output: Foo Foo
-output: doIt doIt
-status: 0
-
-field: P
-output: Foo /^class Foo:$/
-output: doIt /^    def doIt():$/
 status: 0
 
 field: R
