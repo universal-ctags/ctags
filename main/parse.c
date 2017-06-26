@@ -2932,6 +2932,7 @@ extern bool parseFileWithMio (const char *const fileName, MIO *mio)
 			openTagFile ();
 
 #ifdef HAVE_ICONV
+		/* TODO: checkUTF8BOM can be used to update the encodings. */
 		openConverter (EncodingMap && language <= EncodingMapMax &&
 				EncodingMap [language] ?
 					EncodingMap[language] : Option.inputEncoding, Option.outputEncoding);

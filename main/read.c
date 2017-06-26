@@ -95,6 +95,7 @@ typedef struct sInputFile {
 	unsigned int ungetchIdx;
 	int         ungetchBuf[3]; /* characters that were ungotten */
 
+	bool bomFound;
 	/*  Contains data pertaining to the original `source' file in which the tag
 	 *  was defined. This may be different from the `input' file when #line
 	 *  directives are processed (i.e. the input file is preprocessor output).
@@ -592,6 +593,36 @@ extern MIO *getMio (const char *const fileName, const char *const openMode,
 	return mio_new_memory (data, size, eRealloc, eFree);
 }
 
+/* Return true if utf8 BOM is found */
+static bool checkUTF8BOM (MIO *mio, bool skipIfFound)
+{
+	bool r = false;
+	if ((0xEF == mio_getc (mio))
+		&& (0xBB == mio_getc (mio))
+		&& (0xBF == mio_getc (mio)))
+		r = true;
+
+	if (! (r && skipIfFound))
+		mio_rewind (mio);
+	return r;
+}
+
+static void rewindInputFile (inputFile *f)
+{
+	mio_rewind (f->mio);
+	if (f->bomFound)
+	{
+		int c;
+
+		c = mio_getc (f->mio);
+		Assert (c == 0xEF);
+		c = mio_getc (f->mio);
+		Assert (c == 0xBB);
+		c = mio_getc (f->mio);
+		Assert (c == 0xBF);
+	}
+}
+
 /*  This function opens an input file, and resets the line counter.  If it
  *  fails, it will display an error message and leave the File.mio set to NULL.
  */
@@ -641,6 +672,9 @@ extern bool openInputFile (const char *const fileName, const langType language,
 	{
 		opened = true;
 
+
+		File.bomFound = checkUTF8BOM (File.mio, true);
+
 		setOwnerDirectoryOfInputFile (fileName);
 		mio_getpos (File.mio, &StartOfLine.pos);
 		mio_getpos (File.mio, &File.filePosition.pos);
@@ -659,8 +693,10 @@ extern bool openInputFile (const char *const fileName, const langType language,
 		allocLineFposMap (&File.lineFposMap);
 
 		File.thinDepth = 0;
-		verbose ("OPENING %s as %s language %sfile [%s%s]\n", fileName,
-				getLanguageName (language),
+		verbose ("OPENING%s %s as %s language %sfile [%s%s]\n",
+				 (File.bomFound? "(skipping utf-8 bom)": ""),
+				 fileName,
+				 getLanguageName (language),
 				 File.input.isHeader ? "include " : "",
 				 mio? "reused": "new",
 				 memStreamRequired? ",required": "");
@@ -672,7 +708,7 @@ extern void resetInputFile (const langType language)
 {
 	Assert (File.mio);
 
-	mio_rewind (File.mio);
+	rewindInputFile  (&File);
 	mio_getpos (File.mio, &StartOfLine.pos);
 	mio_getpos (File.mio, &File.filePosition.pos);
 	File.filePosition.offset = StartOfLine.offset = mio_tell (File.mio);
@@ -1015,7 +1051,7 @@ extern char *readLineFromBypassSlow (vString *const vLine,
 		unsigned long n;
 
 		mio_getpos (File.mio, &originalPosition);
-		mio_rewind (File.mio);
+		rewindInputFile (&File);
 		line = NULL;
 		pos = 0;
 		for (n = 0; n < lineNumber; n++)
@@ -1103,6 +1139,7 @@ extern void   pushNarrowedInputStream (const langType language,
 	BackupFile = File;
 
 	File.mio = subio;
+	File.bomFound = false;
 	File.nestedInputStreamInfo.startLine = startLine;
 	File.nestedInputStreamInfo.startCharOffset = startCharOffset;
 	File.nestedInputStreamInfo.endLine = endLine;

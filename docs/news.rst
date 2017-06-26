@@ -1633,6 +1633,18 @@ output. It is changed to ``-d``. This change is not critical because
 Instead ``-D`` is used for defining a macro in CPreProcessor parser.
 
 
+Skipping utf-8 BOM
+---------------------------------------------------------------------
+
+The three bytes sequence('\xEF\xBB\xBF') at the head of an input
+file is skipped when parsing.
+
+TODO:
+
+* Do the same in guessing and selecting parser stage.
+* Refect the BOM detection to encoding option
+
+
 Readtags
 ---------------------------------------------------------------------
 
