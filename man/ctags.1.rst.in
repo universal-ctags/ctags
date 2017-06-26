@@ -267,7 +267,7 @@ adjust the output of the most of ``--list-...`` options.
 
 The default setting (``--with-list-header=yes`` and ``--machinable=no``)
 is for using interactively from a terminal. The header that explains
-the meaning of columns simply is added to the output, and each column is
+the meaning of columns is simply added to the output, and each column is
 aligned in all lines. The header line starts with a hash ('#') character.
 
 For scripting in a client tool, ``--with-list-header=no`` and
