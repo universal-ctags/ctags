@@ -567,7 +567,9 @@ static void tillTokenWithCapturingSignature (vString * const ident, objcToken wh
 	}
 }
 
-static void parseMethodsName (vString * const ident, objcToken what)
+static void parseMethodsNameCommon (vString * const ident, objcToken what,
+									parseNext reEnter,
+									parseNext nextAction)
 {
 	unsigned int index;
 
@@ -575,7 +577,7 @@ static void parseMethodsName (vString * const ident, objcToken what)
 	{
 	case Tok_PARL:
 		toDoNext = &tillToken;
-		comeAfter = &parseMethodsName;
+		comeAfter = reEnter;
 		waitedToken = Tok_PARR;
 
 		if (! (vStringLength(prevIdent) == 0
@@ -628,7 +630,7 @@ static void parseMethodsName (vString * const ident, objcToken what)
 		else
 			index = addTag (prevIdent, methodKind);
 
-		toDoNext = &parseMethods;
+		toDoNext = nextAction;
 		parseImplemMethods (ident, what);
 		vStringClear (prevIdent);
 
@@ -652,45 +654,14 @@ static void parseMethodsName (vString * const ident, objcToken what)
 	}
 }
 
+static void parseMethodsName (vString * const ident, objcToken what)
+{
+	parseMethodsNameCommon (ident, what, parseMethodsName, parseMethods);
+}
+
 static void parseMethodsImplemName (vString * const ident, objcToken what)
 {
-	switch (what)
-	{
-	case Tok_PARL:
-		toDoNext = &tillToken;
-		comeAfter = &parseMethodsImplemName;
-		waitedToken = Tok_PARR;
-		break;
-
-	case Tok_dpoint:
-		vStringCat (fullMethodName, prevIdent);
-		vStringPut (fullMethodName, ':');
-		vStringClear (prevIdent);
-		break;
-
-	case ObjcIDENTIFIER:
-		vStringCopy (prevIdent, ident);
-		break;
-
-	case Tok_CurlL:
-	case Tok_semi:
-		/* method name is not simple */
-		if (vStringLength (fullMethodName) != '\0')
-		{
-			addTag (fullMethodName, methodKind);
-			vStringClear (fullMethodName);
-		}
-		else
-			addTag (prevIdent, methodKind);
-
-		toDoNext = &parseImplemMethods;
-		parseImplemMethods (ident, what);
-		vStringClear (prevIdent);
-		break;
-
-	default:
-		break;
-	}
+	parseMethodsNameCommon (ident, what, parseMethodsImplemName, parseImplemMethods);
 }
 
 static void parseImplemMethods (vString * const ident, objcToken what)

@@ -16,3 +16,18 @@
 - (void*)doVoidPtr: idarg1 andWithStruct: (struct foo *) idarg2PtrExplicit;
 - (void*)doVoidUInt: (unsigned int) idarg1 andWithStruct: (struct foo *) idarg2PtrExplicit;
 @end
+
+@implementation X
+- doNothing
+{
+  return nil;
+}
+- doNothing: idarg
+{
+  return nil;
+}
+- (void*)doVoidUInt: (unsigned int) idarg1 andWithStruct: (struct foo *) idarg2PtrExplicit
+{
+  return NULL;
+}
+@end
