@@ -111,6 +111,24 @@ typedef enum {
 	TOKEN_OTHER
 } tokenType;
 
+#ifdef DEBUG
+const char *tokenTypes[] = {
+#define E(X) [TOKEN_##X] = #X
+	E(EOF),
+	E(NAME),
+	E(STRING),
+	E(TEXT),
+	E(TAG_START),
+	E(TAG_START2),
+	E(TAG_END),
+	E(TAG_END2),
+	E(EQUAL),
+	E(COMMENT),
+	E(OTHER),
+#undef E
+};
+#endif
+
 typedef struct {
 	tokenType type;
 	vString *string;
@@ -122,6 +140,14 @@ static int Lang_html;
 
 static void readTag (tokenInfo *token, vString *text, int depth);
 
+#ifdef DEBUG
+static void dumpToken (tokenInfo *token, const char *context, const char* extra_context)
+{
+	fprintf (stderr, "[%7s] %-20s@%s.%s\n",
+			 tokenTypes[token->type], vStringValue(token->string),
+			 context, extra_context? extra_context: "_");
+}
+#endif
 
 static void readTokenText (tokenInfo *const token, bool collectText)
 {
@@ -315,6 +341,46 @@ static bool readTagContent (tokenInfo *token, vString *text, long *line, long *l
 	return type == TOKEN_TAG_START2;
 }
 
+static bool skipScriptContent (tokenInfo *token, long *line, long *lineOffset)
+{
+	bool found_start = false;
+	bool found_script = false;
+
+	long line_tmp[2];
+	long lineOffset_tmp[2];
+
+	tokenType type;
+
+	do
+	{
+		line_tmp[0] = getInputLineNumber ();
+		lineOffset_tmp[0] = getInputLineOffset ();
+
+		readToken (token, false);
+		type = token->type;
+
+		if (type == TOKEN_TAG_START2)
+		{
+			found_start = true;
+			line_tmp[1] = line_tmp[0];
+			lineOffset_tmp[1] = lineOffset_tmp[0];
+		}
+		else if (found_start
+				 && type == TOKEN_NAME
+				 && lookupKeyword (vStringValue (token->string), Lang_html) == KEYWORD_script)
+		{
+			found_script = true;;
+			*line = line_tmp[1];
+			*lineOffset = lineOffset_tmp[1];
+		}
+		else
+			found_start = false;
+	}
+	while ((type != TOKEN_EOF) && (!found_script));
+
+	return type != TOKEN_EOF;
+}
+
 static void readTag (tokenInfo *token, vString *text, int depth)
 {
 	bool textCreated = false;
@@ -366,8 +432,17 @@ static void readTag (tokenInfo *token, vString *text, int depth)
 			long endLineOffset;
 			bool tag_start2;
 
-			tag_start2 = readTagContent (token, text, &endLineNumber, &endLineOffset, depth);
+			if (startTag == KEYWORD_script)
+			{
+				bool script = skipScriptContent (token, &endLineNumber, &endLineOffset);
+				if (script)
+					makePromise ("JavaScript", startLineNumber, startLineOffset,
+								 endLineNumber, endLineOffset, startSourceLineNumber);
+				readToken (token, true);
+				goto out;
+			}
 
+			tag_start2 = readTagContent (token, text, &endLineNumber, &endLineOffset, depth);
 			if (tag_start2)
 			{
 				readToken (token, true);
@@ -389,13 +464,6 @@ static void readTag (tokenInfo *token, vString *text, int depth)
 						makeSimpleTag (text, HtmlKinds, headingKind);
 					}
 				}
-				else if (startTag == KEYWORD_script)
-				{
-					keywordId endTag = lookupKeyword (vStringValue (token->string), Lang_html);
-					if (startTag == endTag)
-						makePromise ("JavaScript", startLineNumber, startLineOffset,
-									 endLineNumber, endLineOffset, startSourceLineNumber);
-				}
 				else if (startTag == KEYWORD_style)
 				{
 					keywordId endTag = lookupKeyword (vStringValue (token->string), Lang_html);
@@ -409,6 +477,7 @@ static void readTag (tokenInfo *token, vString *text, int depth)
 		}
 	}
 
+ out:
 	if (textCreated)
 		vStringDelete (text);
 }
