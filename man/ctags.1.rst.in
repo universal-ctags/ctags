@@ -202,6 +202,114 @@ Examples:
 ``NONE`` means that @CTAGS_NAME_EXECUTABLE@ does not select any parser for the file.
 
 
+TAG ENTRY
+---------
+
+A tag is an index for a language object. Concepts of tag and related
+things in Exuberant-ctags are refined and extended in Universal-ctags.
+
+A tag is categorized into **definition tags** or **reference tags**.
+Though some exceptions are, Exuberant-ctags tags only definitions of
+language objects; it tags language objects introducing new names in
+source files. In addition, Universal-ctags has infrastructure for
+tagging references of language objects. However, the area where
+reference tags are implemented is very limited in the current version.
+
+
+Fields
+~~~~~~
+
+A tag can has various information. They are called **fields**. The
+essential fields are **name** of language objects, **input**,
+**pattern**, and **line**. ``input:`` is the name of source file where
+``name:`` is defined or referenced. ``pattern:`` can be used to search
+the `**name**`` in ``input:``. **line** is the line number where
+``name:`` is defined or referenced in
+``input:``.
+
+@CTAGS_NAME_EXECUTABLE@ offers extension fields. See also the
+descriptions of ``--list-fields`` option and ``--fields`` option.
+
+
+Kinds
+~~~~~~
+
+``kind:`` is a field which represents the *kind* of language object
+specified by a tag. Kinds used and defined are very different between
+parsers. For example, C language defines "macro", "function",
+"variable", "typedef", etc. See also the descriptions of
+``--list-kinds`` option and ``--kinds-<LANG>`` option.
+
+
+Extras
+~~~~~~
+
+BASICALLY, @CTAGS_NAME_EXECUTABLE@ tags only language objects appeared
+on source files as is. In other words, a value for a ``name:`` field
+should be found on the source file associated with the ``name:``.  An
+extra tag (*extra*) is for tagging a language object with processed
+name or for tagging not associated with a language object. Typical
+extra tag is "qualified". That tags a language object with
+class-qualified or scope-qualified name.
+
+The following example demonstrates "qualified" extra tag.
+
+.. code-block:: Java
+
+	package Bar;
+	import Baz;
+
+	class Foo {
+		// ...
+	}
+
+For the source file, @CTAGS_NAME_EXECUTABLE@ tags "Bar" and "Foo" by
+default.  If "qualified" extra is enabled from command line, "Bar.Foo"
+is also tagged though the string "Bar.Foo" is not in the source code.
+
+See also the descriptions of ``--list-extras`` option and ``--extras``
+option.
+
+Roles
+~~~~~~
+
+*Role* is newly introduced concept in Universal-ctags. Role is a
+concept related with reference tags. Role is not for definition
+tags. Role is not implemented widely yet.
+
+A kind represents what is the language object specified with a tag.  A
+role is introduced for representing how the language object specified
+with a tag is referenced. Roles are defined in a kind.
+
+For the source file used for demonstrating in "Extras" subsection,
+"Baz" is tagged as a reference tag with kind "package" and with
+role "imported".
+
+See also the descriptions of ``--list-roles`` option.
+
+
+Language own fields and extras
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Exuberant-ctags has concepts of fields and extras. They are common
+between parsers. In addition, Universal-ctags provides language own
+fields and extras.
+
+
+.. options should be explained and revised here
+   ``--list-languages``
+   ``--list-kinds``
+   ``--list-kinds-full``
+   ``--list-fields``
+   ``--list-extras``
+   ``--list-roles``
+   ``--kinds-<LANG>=``
+   ``--fields=``
+   ``--fields-<LANG>``
+   ``--extras=``
+   ``--extras-<LANG>=``
+
+
 COMMAND LINE INTERFACE
 ----------------------
 
