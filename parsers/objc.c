@@ -93,6 +93,7 @@ typedef enum {
 	Tok_dpoint,	/* ':' */
 	Tok_Sharp,	/* '#' */
 	Tok_Backslash,	/* '\\' */
+	Tok_Asterisk,	/* '*' */
 	Tok_EOL,	/* '\r''\n' */
 	Tok_any,
 
@@ -381,6 +382,9 @@ static objcKeyword lex (lexingState * st)
 		case '-':
 			st->cp++;
 			return Tok_MINUS;
+		case '*':
+			st->cp++;
+			return Tok_Asterisk;
 
 		default:
 			st->cp++;
@@ -446,15 +450,15 @@ static void popEnclosingContext (void)
 
 /* Used to centralise tag creation, and be able to add
  * more information to it in the future */
-static void addTag (vString * const ident, int kind)
+static int addTag (vString * const ident, int kind)
 {
 	tagEntryInfo toCreate;
 
 	if (! ObjcKinds[kind].enabled)
-		return;
+		return CORK_NIL;
 
 	prepareTag (&toCreate, ident, kind);
-	makeTagEntry (&toCreate);
+	return makeTagEntry (&toCreate);
 }
 
 static objcToken waitedToken, fallBackToken;
@@ -541,24 +545,75 @@ static objcKind methodKind;
 
 static vString *fullMethodName;
 static vString *prevIdent;
+static vString *signature;
+
+static void tillTokenWithCapturingSignature (vString * const ident, objcToken what)
+{
+	tillToken (ident, what);
+
+	if (what != waitedToken)
+	{
+		if (what == Tok_Asterisk)
+			vStringPut (signature, '*');
+		else if (vStringLength (ident) > 0)
+		{
+			if (! (vStringLast (signature) == ','
+				   || vStringLast (signature) == '('
+				   || vStringLast (signature) == ' '))
+				vStringPut (signature, ' ');
+
+			vStringCat (signature, ident);
+		}
+	}
+}
 
 static void parseMethodsName (vString * const ident, objcToken what)
 {
+	unsigned int index;
+
 	switch (what)
 	{
 	case Tok_PARL:
 		toDoNext = &tillToken;
 		comeAfter = &parseMethodsName;
 		waitedToken = Tok_PARR;
+
+		if (! (vStringLength(prevIdent) == 0
+			   && vStringLength(fullMethodName) == 0))
+			toDoNext = &tillTokenWithCapturingSignature;
 		break;
 
 	case Tok_dpoint:
 		vStringCat (fullMethodName, prevIdent);
 		vStringPut (fullMethodName, ':');
 		vStringClear (prevIdent);
+
+		if (vStringLength (signature) > 1)
+			vStringPut (signature, ',');
 		break;
 
 	case ObjcIDENTIFIER:
+		if ((vStringLength (prevIdent) > 0
+			 /* "- initWithObject: o0 withAnotherObject: o1;"
+				Overwriting the last value of prevIdent ("o0");
+				a parameter name ("o0") was stored to prevIdent,
+				and a part of selector("withAnotherObject")
+				overwrites it.
+				If type for the parameter specified explicitly,
+				the last char of signature should not be ',' nor
+				'('. In this case, "id" must be put as the type for
+				the parameter. */
+			 && (vStringLast (signature) == ','
+				 || vStringLast (signature) == '('))
+			|| (/* "- initWithObject: object;"
+				   In this case no overwriting happens.
+				   However, "id" for "object" is part
+				   of signature. */
+				vStringLength (prevIdent) == 0
+				&& vStringLength (fullMethodName) > 0
+				&& vStringLast (signature) == '('))
+			vStringCatS (signature, "id");
+
 		vStringCopy (prevIdent, ident);
 		break;
 
@@ -567,15 +622,29 @@ static void parseMethodsName (vString * const ident, objcToken what)
 		/* method name is not simple */
 		if (vStringLength (fullMethodName) != '\0')
 		{
-			addTag (fullMethodName, methodKind);
+			index = addTag (fullMethodName, methodKind);
 			vStringClear (fullMethodName);
 		}
 		else
-			addTag (prevIdent, methodKind);
+			index = addTag (prevIdent, methodKind);
 
 		toDoNext = &parseMethods;
 		parseImplemMethods (ident, what);
 		vStringClear (prevIdent);
+
+		if (index != CORK_NIL)
+		{
+			tagEntryInfo *e = getEntryInCorkQueue (index);
+
+			if (vStringLast (signature) == ',')
+				vStringCatS (signature, "id");
+			vStringPut (signature, ')');
+
+			e->extensionFields.signature = eStrdup (vStringValue (signature));
+
+			vStringClear (signature);
+			vStringPut (signature, '(');
+		}
 		break;
 
 	default:
@@ -1068,6 +1137,7 @@ static void findObjcTags (void)
 	tempName = vStringNew ();
 	fullMethodName = vStringNew ();
 	prevIdent = vStringNew ();
+	signature = vStringNewInit ("(");
 
 	/* (Re-)initialize state variables, this might be a second file */
 	comeAfter = NULL;
@@ -1096,6 +1166,8 @@ static void findObjcTags (void)
 	vStringDelete (tempName);
 	vStringDelete (fullMethodName);
 	vStringDelete (prevIdent);
+	vStringDelete (signature);
+	signature = NULL;
 	parentName = NULL;
 	tempName = NULL;
 	prevIdent = NULL;
@@ -1126,5 +1198,6 @@ extern parserDefinition *ObjcParser (void)
 	def->selectLanguage = selectors;
 	def->keywordTable = objcKeywordTable;
 	def->keywordCount = ARRAY_SIZE (objcKeywordTable);
+	def->useCork = true;
 	return def;
 }
