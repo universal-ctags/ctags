@@ -430,7 +430,7 @@ static void prepareTag (tagEntryInfo * tag, vString const *name, objcKind kind)
 {
 	initTagEntry (tag, vStringValue (name), &(ObjcKinds[kind]));
 
-	if (parentName != NULL)
+	if (vStringLength (parentName) > 0)
 	{
 		tag->extensionFields.scopeKind = &(ObjcKinds[parentType]);
 		tag->extensionFields.scopeName = vStringValue (parentName);

@@ -1,4 +1,4 @@
-X	input.m	/^@interface X: NSObject$/;"	i	interface:
+X	input.m	/^@interface X: NSObject$/;"	i
 doNothing	input.m	/^- doNothing;$/;"	m	interface:X	signature:()
 doVoidReturn	input.m	/^- (void)doVoidReturn;$/;"	m	interface:X	signature:()
 doVoidPtrReturn	input.m	/^- (void*)doVoidPtrReturn;$/;"	m	interface:X	signature:()

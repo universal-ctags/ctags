@@ -1,5 +1,5 @@
-FileTree	input.m	/^@implementation FileTree$/;"	I	interface:
-FolderTree	input.m	/^@implementation FolderTree$/;"	I	implementation:
+FileTree	input.m	/^@implementation FileTree$/;"	I
+FolderTree	input.m	/^@implementation FolderTree$/;"	I
 addChild:	input.m	/^{$/;"	m	implementation:FolderTree
 createFileList:atPlace:	input.m	/^{$/;"	c	implementation:FolderTree
 createLayoutTree	input.m	/^{$/;"	m	implementation:FileTree

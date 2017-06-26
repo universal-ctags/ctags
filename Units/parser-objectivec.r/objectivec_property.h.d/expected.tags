@@ -1,4 +1,4 @@
-Person	input.h	/^@interface Person : NSObject {$/;"	i	interface:
+Person	input.h	/^@interface Person : NSObject {$/;"	i
 initWithAge:	input.h	/^-(id)initWithAge:(int)age;$/;"	m	interface:Person
 m_age	input.h	/^        int m_age;$/;"	E	interface:Person
 m_name	input.h	/^        NSString *m_name;$/;"	E	interface:Person

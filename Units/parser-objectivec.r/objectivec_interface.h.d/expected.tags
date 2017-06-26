@@ -1,9 +1,9 @@
-ANOTHER_MACRO	input.h	/^ # define ANOTHER_MACRO( WITH, MOAR ) \\$/;"	kind:macro	line:21	language:ObjectiveC	interface:
-A_MACRO_TEST	input.h	/^#define       A_MACRO_TEST$/;"	kind:macro	line:15	language:ObjectiveC	interface:
+ANOTHER_MACRO	input.h	/^ # define ANOTHER_MACRO( WITH, MOAR ) \\$/;"	kind:macro	line:21	language:ObjectiveC
+A_MACRO_TEST	input.h	/^#define       A_MACRO_TEST$/;"	kind:macro	line:15	language:ObjectiveC
 FileTree	input.h	/^@interface FileTree : NSObject {$/;"	kind:interface	line:33	language:ObjectiveC	struct:aStruct
-FolderTree	input.h	/^@interface FolderTree : FileTree {$/;"	kind:interface	line:52	language:ObjectiveC	interface:
-SampleTypedefObjC	input.h	/^typedef something SampleTypedefObjC;$/;"	kind:typedef	line:17	language:ObjectiveC	interface:
-aStruct	input.h	/^struct aStruct$/;"	kind:struct	line:25	language:ObjectiveC	interface:
+FolderTree	input.h	/^@interface FolderTree : FileTree {$/;"	kind:interface	line:52	language:ObjectiveC
+SampleTypedefObjC	input.h	/^typedef something SampleTypedefObjC;$/;"	kind:typedef	line:17	language:ObjectiveC
+aStruct	input.h	/^struct aStruct$/;"	kind:struct	line:25	language:ObjectiveC
 aStructMember	input.h	/^    int aStructMember;$/;"	kind:field	line:27	language:ObjectiveC	struct:aStruct
 addChild:	input.h	/^- (FolderTree*)addChild:(FileTree*)subTree;$/;"	kind:method	line:60	language:ObjectiveC	interface:FolderTree	signature:(FileTree*)
 anotherStructMember	input.h	/^    char *anotherStructMember[ NOT_IN_TAG ];$/;"	kind:field	line:28	language:ObjectiveC	struct:aStruct
