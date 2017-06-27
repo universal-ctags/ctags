@@ -2861,7 +2861,7 @@ extern bool runParserInNarrowedInputStream (const langType language,
 			 startLine, startCharOffset, sourceLineOffset,
 			 endLine, endCharOffset);
 
-	pushNarrowedInputStream (language,
+	pushNarrowedInputStream (
 				 startLine, startCharOffset,
 				 endLine, endCharOffset,
 				 sourceLineOffset);

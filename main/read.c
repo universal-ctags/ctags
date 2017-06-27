@@ -1098,7 +1098,7 @@ out:
 	return result;
 }
 
-extern void   pushNarrowedInputStream (const langType language,
+extern void   pushNarrowedInputStream (
 				       unsigned long startLine, long startCharOffset,
 				       unsigned long endLine, long endCharOffset,
 				       unsigned long sourceLineOffset)
