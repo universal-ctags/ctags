@@ -218,8 +218,8 @@ are optional.
 Note also that the boolean parameters to the long form options (those
 beginning with "--" and that take a "[=yes|no]" parameter) may be omitted,
 in which case "=yes" is implied. (e.g. ``--sort`` is equivalent to ``--sort=yes``).
-Note further that "=1" and "=on" are considered synonyms for "=yes",
-and that "=0" and "=off" are considered synonyms for "=no".
+Note further that "=1", "=on", and "=true" are considered synonyms for "=yes",
+and that "=0", "=off", and "=false" are considered synonyms for "=no".
 
 Some options are either ignored or useful only when used while running in
 etags mode (see -e option). Such options will be noted.
@@ -786,7 +786,7 @@ built-in language names.
 	languages, and then exits.
 
 ``--list-maps[=language|all]``
-	Lists the file extensions and file name patterns which associate a file
+	Lists file name patterns and the file extensions which associate a file
 	name with a language for either the specified *language* or **all**
 	languages, and then exits. See the ``--langmap`` option, and "SOURCE FILES", above.
 

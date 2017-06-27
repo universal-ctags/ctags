@@ -95,28 +95,28 @@ static bool     isEndFieldAvailable       (const tagEntryInfo *const tag);
 static fieldDefinition fieldDefinitionsFixed [] = {
         /* FIXED FIELDS */
 	DEFINE_FIELD ('N', "name",     true,
-			  "tag name (fixed field)",
+			  "tag name",
 			  FIELDTYPE_STRING,
 			  [WRITER_U_CTAGS] = renderFieldName,
 			  [WRITER_E_CTAGS] = renderFieldNameNoEscape,
 			  [WRITER_JSON]    = renderFieldNameNoEscape,
 			  ),
 	DEFINE_FIELD ('F', "input",    true,
-			   "input file (fixed field)",
+			   "input file",
 			   FIELDTYPE_STRING,
 			   [WRITER_U_CTAGS] = renderFieldInput,
 			   [WRITER_E_CTAGS] = renderFieldInputNoEscape,
 			   [WRITER_JSON]    = renderFieldInputNoEscape,
 		),
 	DEFINE_FIELD ('P', "pattern",  true,
-			   "pattern (fixed field)",
+			   "pattern",
 			   FIELDTYPE_STRING,
 			   [WRITER_U_CTAGS] = renderFieldPattern),
 };
 
 static fieldDefinition fieldDefinitionsExuberant [] = {
 	DEFINE_FIELD ('C', "compact",        false,
-			   "compact input line (fixed field, only used in -x option)",
+			   "compact input line (used only in xref output)",
 			   FIELDTYPE_STRING,
 			   [WRITER_U_CTAGS] = renderFieldCompactInputLine),
 
@@ -893,12 +893,12 @@ extern bool enableField (fieldType type, bool state, bool warnIfFixedField)
 		if (isCommonField (type))
 			verbose ("enable field \"%s\": %s\n",
 				 getFieldObject(type)->def->name,
-				 (state? "TRUE": "FALSE"));
+				 (state? "yes": "no"));
 		else
 			verbose ("enable field \"%s\"<%s>: %s\n",
 				 getFieldObject(type)->def->name,
 				 getLanguageName (getFieldOwner(type)),
-				 (state? "TRUE": "FALSE"));
+				 (state? "yes": "no"));
 	}
 	return old;
 }
@@ -1011,7 +1011,7 @@ extern int defineField (fieldDefinition *def, langType language)
 extern struct colprintTable * fieldColprintTableNew (void)
 {
 	return colprintTableNew ("L:LETTER", "L:NAME", "L:ENABLED",
-							 "L:LANGUAGE", "L:XFMT", "L:JSTYPE", "L:DESCRIPTION", NULL);
+							 "L:LANGUAGE", "L:XFMT", "L:JSTYPE", "L:FIXED", "L:DESCRIPTION", NULL);
 }
 
 static void  fieldColprintAddLine (struct colprintTable *table, int i)
@@ -1028,13 +1028,13 @@ static void  fieldColprintAddLine (struct colprintTable *table, int i)
 
 	const char *name = getFieldName (i);
 	colprintLineAppendColumnCString (line, name? name: "NONE");
-	colprintLineAppendColumnCString (line, fdef->enabled? "on": "off");
+	colprintLineAppendColumnBool (line, fdef->enabled);
 	colprintLineAppendColumnCString (line,
 									 fobj->language == LANG_IGNORE
 									 ?"NONE"
 									 : getLanguageName (fobj->language));
 
-	colprintLineAppendColumnCString (line, fdef->renderEscaped[WRITER_DEFAULT]? "TRUE": "FALSE");
+	colprintLineAppendColumnBool (line, fdef->renderEscaped[WRITER_DEFAULT]? true: false);
 
 	char  typefields [] = "---";
 	{
@@ -1047,6 +1047,7 @@ static void  fieldColprintAddLine (struct colprintTable *table, int i)
 				typefields[offset] = fieldDataTypeFalgs[offset];
 	}
 	colprintLineAppendColumnCString (line, typefields);
+	colprintLineAppendColumnBool (line, fobj->fixed);
 	colprintLineAppendColumnCString (line, fdef->description);
 }
 
@@ -1068,8 +1069,45 @@ extern void fieldColprintAddLanguageLines (struct colprintTable *table, langType
 
 static int fieldColprintCompareLines (struct colprintLine *a , struct colprintLine *b)
 {
+	const char *a_fixed  = colprintLineGetColumn (a, 6);
+	const char *b_fixed  = colprintLineGetColumn (b, 6);
 	const char *a_parser = colprintLineGetColumn (a, 3);
 	const char *b_parser = colprintLineGetColumn (b, 3);
+
+	if ((strcmp (a_fixed, "yes") == 0)
+		&& (strcmp (a_fixed, "yes") == 0))
+	{
+		/* name, input, pattern, compact */
+		const char *a_name  = colprintLineGetColumn (a, 1);
+		const char *b_name  = colprintLineGetColumn (b, 1);
+		const char *ref_name;
+		unsigned int a_index = ~0U;
+		unsigned int b_index = ~0U;
+
+		for (unsigned int i = 0; i < ARRAY_SIZE(fieldDefinitionsFixed); i++)
+		{
+			ref_name = fieldDefinitionsFixed [i].name;
+			if (strcmp (a_name, ref_name) == 0)
+				a_index = i;
+			if (strcmp (b_name, ref_name) == 0)
+				b_index = i;
+			if ((a_index != ~0U) || (b_index != ~0U))
+				break;
+		}
+
+		if (a_index < b_index)
+			return -1;
+		else if (a_index == b_index)
+			return 0;			/* ??? */
+		else
+			return 1;
+	}
+	else if ((strcmp (a_fixed, "yes") == 0)
+			  && (strcmp (b_fixed, "yes") != 0))
+		return -1;
+	else if ((strcmp (a_fixed, "yes") != 0)
+			 && (strcmp (b_fixed, "yes") == 0))
+		return 1;
 
 	if (strcmp (a_parser, "NONE") == 0
 		&& strcmp (b_parser, "NONE") != 0)

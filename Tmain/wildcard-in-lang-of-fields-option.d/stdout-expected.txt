@@ -1,2 +1,2 @@
-S       signature      on      NONE             TRUE s--    Signature of routine (e.g. prototype or parameter list)
-t       typeref        off     NONE             TRUE s--    Type and name of a variable or typedef
+S       signature      yes     NONE             yes  s--    no    Signature of routine (e.g. prototype or parameter list)
+t       typeref        no      NONE             yes  s--    no    Type and name of a variable or typedef

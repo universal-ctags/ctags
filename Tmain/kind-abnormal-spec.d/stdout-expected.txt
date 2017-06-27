@@ -8,12 +8,12 @@ E  end of an area for a guest
 
 # list kinds-full
 #LETTER NAME                                      ENABLED REFONLY NROLES MASTER DESCRIPTION
-        no letter                                 on      FALSE   0      NONE   kind with no letter
-B       ThisShouldNotBePrintedKindNameMustBeGiven on      FALSE   0      NONE   beginning of an area for a guest
-E       ThisShouldNotBePrintedKindNameMustBeGiven on      FALSE   0      NONE   end of an area for a guest
-L       ThisShouldNotBePrintedKindNameMustBeGiven on      FALSE   0      NONE   kind with no long name
-N       nothingSpecial                            on      FALSE   0      NONE   emit a normal tag
-b       broken tag                                on      FALSE   1      NONE   name with unwanted characters
+        no letter                                 yes     no      0      NONE   kind with no letter
+B       ThisShouldNotBePrintedKindNameMustBeGiven yes     no      0      NONE   beginning of an area for a guest
+E       ThisShouldNotBePrintedKindNameMustBeGiven yes     no      0      NONE   end of an area for a guest
+L       ThisShouldNotBePrintedKindNameMustBeGiven yes     no      0      NONE   kind with no long name
+N       nothingSpecial                            yes     no      0      NONE   emit a normal tag
+b       broken tag                                yes     no      1      NONE   name with unwanted characters
 
 # +K
 abnormal kindDefinition testing (no letter)	input.x	/^@$/;"	no letter

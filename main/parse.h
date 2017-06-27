@@ -117,6 +117,7 @@ typedef enum {
 	LMAP_PATTERN   = 1 << 0,
 	LMAP_EXTENSION = 1 << 1,
 	LMAP_ALL       = LMAP_PATTERN | LMAP_EXTENSION,
+	LMAP_TABLE_OUTPUT = 1 << 2,
 } langmapType;
 
 /*
@@ -171,8 +172,8 @@ extern void installLanguageAliasesDefaults (void);
 extern void clearLanguageAliases (const langType language);
 extern void addLanguageAlias (const langType language, const char* alias);
 
-extern void printLanguageMap (const langType language, FILE *fp);
-extern void printLanguageMaps (const langType language, langmapType type);
+extern void printLanguageMaps (const langType language, langmapType type,
+							   bool withListHeader, bool machinable, FILE *fp);
 extern void enableLanguages (const bool state);
 extern void enableLanguage (const langType language, const bool state);
 extern void initializeParsing (void);
@@ -183,7 +184,8 @@ extern void printLanguageKinds (const langType language, bool allKindFields,
 								bool withListHeader, bool machinable, FILE *fp);
 extern void printLanguageRoles (const langType language, const char* letters,
 								bool withListHeader, bool machinable, FILE *fp);
-extern void printLanguageAliases (const langType language);
+extern void printLanguageAliases (const langType language,
+								  bool withListHeader, bool machinable, FILE *fp);
 extern void printLanguageList (void);
 extern void printLanguageParameters (const langType language,
 									 bool withListHeader, bool machinable, FILE *fp);

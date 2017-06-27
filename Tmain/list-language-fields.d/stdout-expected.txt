@@ -1,2 +1,2 @@
-#LETTER	NAME	ENABLED	LANGUAGE	XFMT	JSTYPE	DESCRIPTION
--	sectionMarker	off	reStructuredText	TRUE	s--	character used for declaring section
+#LETTER	NAME	ENABLED	LANGUAGE	XFMT	JSTYPE	FIXED	DESCRIPTION
+-	sectionMarker	no	reStructuredText	yes	s--	no	character used for declaring section

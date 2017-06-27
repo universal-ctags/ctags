@@ -29,6 +29,9 @@ void colprintLineAppendColumnVString (struct colprintLine *line, vString* column
 void colprintLineAppendColumnChar (struct colprintLine *line, char column);
 void colprintLineAppendColumnInt  (struct colprintLine *line, unsigned int column);
 
+/* Appends "yes" or "no". */
+void colprintLineAppendColumnBool (struct colprintLine *line, bool column);
+
 const char *colprintLineGetColumn (struct colprintLine *line, unsigned int column);
 
 #endif /* CTAGS_MAIN_COLPRINT_H */

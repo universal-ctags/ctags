@@ -1735,10 +1735,10 @@ static void CpreProInstallMacroToken (const langType language CTAGS_ATTR_UNUSED,
 	}
 }
 
-static void CpreProSetIf0 (const langType language CTAGS_ATTR_UNUSED, const char *name CTAGS_ATTR_UNUSED, const char *arg)
+static void CpreProSetIf0 (const langType language CTAGS_ATTR_UNUSED, const char *name, const char *arg)
 {
-	if (strcmp (arg, "true") == 0)
-		doesExaminCodeWithInIf0Branch = true;
+	doesExaminCodeWithInIf0Branch = paramParserBool (arg, doesExaminCodeWithInIf0Branch,
+													 name, "parameter");
 }
 
 static parameterHandlerTable CpreProParameterHandlerTable [] = {

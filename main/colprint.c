@@ -277,6 +277,11 @@ void colprintLineAppendColumnInt  (struct colprintLine *line, unsigned int colum
 	colprintLineAppendColumnCString	(line, buf);
 }
 
+void colprintLineAppendColumnBool  (struct colprintLine *line, bool column)
+{
+	colprintLineAppendColumnCString	(line, column? "yes": "no");
+}
+
 const char *colprintLineGetColumn (struct colprintLine *line, unsigned int column)
 {
 	stringList *slist = (stringList *)line;
