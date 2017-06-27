@@ -612,7 +612,7 @@ static void rewindInputFile (inputFile *f)
 	mio_rewind (f->mio);
 	if (f->bomFound)
 	{
-		int c;
+		int c CTAGS_ATTR_UNUSED;
 
 		c = mio_getc (f->mio);
 		Assert (c == 0xEF);
