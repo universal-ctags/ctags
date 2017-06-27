@@ -378,7 +378,7 @@ static bool skipScriptContent (tokenInfo *token, long *line, long *lineOffset)
 	}
 	while ((type != TOKEN_EOF) && (!found_script));
 
-	return type != TOKEN_EOF;
+	return found_script;
 }
 
 static void readTag (tokenInfo *token, vString *text, int depth)
