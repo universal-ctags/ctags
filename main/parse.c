@@ -1161,10 +1161,10 @@ getFileLanguageForRequestInternal (struct GetLanguageRequest *req)
         }
     }
 
-    fstatus = eStat (fileName);
-    if (fstatus && fstatus->exists)
+	/* If the input is already opened, we don't have to verify the existence. */
+    if (glc.input || ((fstatus = eStat (fileName)) && fstatus->exists))
     {
-	    if (fstatus->isExecutable || Option.guessLanguageEagerly)
+	    if ((fstatus && fstatus->isExecutable) || Option.guessLanguageEagerly)
 	    {
 		    GLC_FOPEN_IF_NECESSARY (&glc, cleanup, false);
 		    language = tasteLanguage(&glc, eager_tasters, 1,

@@ -1,0 +1,3 @@
+{"_type": "program", "name": "Universal Ctags", "version": "0.0.0"}
+{"_type": "tag", "name": "main", "path": "input.unknown", "pattern": "/^\\/* -*- c -*- *\\/ int main(void) { return 0; }/", "typeref": "int", "kind": "function"}
+{"_type": "completed", "command": "generate-tags"}
