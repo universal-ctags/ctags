@@ -201,6 +201,10 @@ Examples:
 
 ``NONE`` means that @CTAGS_NAME_EXECUTABLE@ does not select any parser for the file.
 
+.. options should be explained and revised here
+   ``--list-aliases=`` (done)
+   ``--alias-<LANG>=`` (done)
+
 
 TAG ENTRY
 ---------
@@ -559,6 +563,14 @@ OPTION ITEMS
 	a list of all externally visible global variables located in a source
 	file (e.g. "@CTAGS_NAME_EXECUTABLE@ -x --c-kinds=v --file-scope=no file").
 	This option must appear before the first file name.
+
+``--alias-<LANG>=[+|-]aliasPattern``
+	Adds ('+') or removes ('-') an alias pattern to a language specified
+	with *<LANG>*. @CTAGS_NAME_EXECUTABLE@ refers the alias pattern in
+	"Guessing parser" stage.
+
+	*aliasPattern* is not a list. Use this option multiple times in a
+	command line to add or remove multiple alias patterns
 
 ``--append[=yes|no]``
 	Indicates whether tags generated from the specified files should be
