@@ -1,0 +1,14 @@
+Input	input.ml	/^(* "let rec ... and ..." *)$/;"	module
+f	input.ml	/^let rec f x = (g x) + 1$/;"	function
+g	input.ml	/^and g x = (f x) - 1$/;"	function
+A	input.ml	/^module rec A : sig$/;"	module
+t	input.ml	/^                 type t = Leaf of string | Node of ASet.t$/;"	type	module:A
+Leaf	input.ml	/^                 type t = Leaf of string | Node of ASet.t$/;"	Constructor	type:A/t
+Node	input.ml	/^                 type t = Leaf of string | Node of ASet.t$/;"	Constructor	type:A/t
+compare	input.ml	/^                 val compare: t -> t -> int$/;"	val	type:A/t
+t	input.ml	/^                 type t = Leaf of string | Node of ASet.t$/;"	type	module:A
+Leaf	input.ml	/^                 type t = Leaf of string | Node of ASet.t$/;"	Constructor	type:A/t
+Node	input.ml	/^                 type t = Leaf of string | Node of ASet.t$/;"	Constructor	type:A/t
+compare	input.ml	/^                 let compare t1 t2 =$/;"	function	module:A
+ASet	input.ml	/^        and ASet : Set.S with type elt = A.t$/;"	module
+elt	input.ml	/^        and ASet : Set.S with type elt = A.t$/;"	type

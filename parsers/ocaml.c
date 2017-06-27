@@ -35,6 +35,7 @@ typedef enum {
 	K_RECORDFIELD,
 	K_EXCEPTION,
 	K_BEGIN_END,		/* ??? */
+	K_MATCH,
 } ocamlKind;
 
 static kindDefinition OcamlKinds[] = {
@@ -42,13 +43,14 @@ static kindDefinition OcamlKinds[] = {
 	{true, 'm', "method", "Object's method"},
 	{true, 'M', "module", "Module or functor"},
 	{true, 'v', "var", "Global variable"},
-	{true, 'p', "val", "A value ???"},
+	{true, 'p', "val", "Signature item"},
 	{true, 't', "type", "Type name"},
 	{true, 'f', "function", "A function"},
 	{true, 'C', "Constructor", "A constructor"},
 	{true, 'r', "RecordField", "A 'structure' field"},
 	{true, 'e', "Exception", "An exception"},
 	{true, 'B', "beginEnd", "A begin end ???"},
+	{true, 'A', "match", "A match ???"},
 };
 
 typedef enum {
@@ -63,6 +65,7 @@ typedef enum {
 	OcaKEYWORD_for,
 	OcaKEYWORD_functor,
 	OcaKEYWORD_fun,
+	OcaKEYWORD_function,
 	OcaKEYWORD_if,
 	OcaKEYWORD_in,
 	OcaKEYWORD_let,
@@ -99,6 +102,7 @@ typedef enum {
 	Tok_semi,       /* ';' */
 	Tok_comma,      /* ',' */
 	Tok_To,         /* '->' */
+	Tok_Of,         /* ':' */
 	Tok_Sharp,      /* '#' */
 	Tok_Backslash,  /* '\\' */
 
@@ -125,6 +129,7 @@ static const keywordTable OcamlKeywordTable[] = {
 	{ "fun"       , OcaKEYWORD_fun       },
 	{ "function"  , OcaKEYWORD_fun       },
 	{ "functor"   , OcaKEYWORD_functor   },
+	{ "if"        , OcaKEYWORD_if        },
 	{ "in"        , OcaKEYWORD_in        },
 	{ "let"       , OcaKEYWORD_let       },
 	{ "match"     , OcaKEYWORD_match     },
@@ -154,6 +159,7 @@ static const keywordTable OcamlKeywordTable[] = {
 	{ "lsr "      , Tok_Op               },
 	{ "asr"       , Tok_Op               },
 	{ "->"        , Tok_To               },
+	{ ":"         , Tok_Of               },
 	{ "true"      , Tok_Val              },
 	{ "false"     , Tok_Val              }
 };
@@ -284,7 +290,10 @@ static void eatComment (lexingState * st)
 		}
 		/* we've reached the end of the comment */
 		else if (*c == ')' && lastIsStar)
+		{
 			unfinished = false;
+			c++;
+		}
 		/* here we deal with imbricated comment, which
 		 * are allowed in OCaml */
 		else if (c[0] == '(' && c[1] == '*')
@@ -370,12 +379,16 @@ static ocamlKeyword eatOperator (lexingState * st)
 			return Tok_Pipe;
 		case '=':
 			return Tok_EQ;
+		case ':':
+			return Tok_Of;
 		default:
 			return Tok_Op;
 		}
 	}
 	else if (count == 2 && root[0] == '-' && root[1] == '>')
 		return Tok_To;
+	else if (count == 2 && root[0] == '|' && root[1] == '>')
+		return Tok_Op;
 	else
 		return Tok_Op;
 }
@@ -415,6 +428,12 @@ static ocamlKeyword lex (lexingState * st)
 		eatWhiteSpace (st);
 		return lex (st);
 	}
+	else if (*st->cp == '_')
+	{	// special
+		readIdentifier (st);
+		return Tok_Val;
+	}
+
 	/* OCaml permit the definition of our own operators
 	 * so here we check all the consecutive chars which
 	 * are operators to discard them. */
@@ -466,9 +485,6 @@ static ocamlKeyword lex (lexingState * st)
 		case '"':
 			eatString (st);
 			return Tok_Val;
-		case '_':
-			st->cp++;
-			return Tok_Val;
 		case '#':
 			st->cp++;
 			return Tok_Sharp;
@@ -488,7 +504,7 @@ static ocamlKeyword lex (lexingState * st)
 
 /*//////////////////////////////////////////////////////////////////////
 //// Parsing                                    */
-typedef void (*parseNext) (vString * const ident, ocaToken what);
+typedef void (*parseNext) (vString * const ident, ocaToken what, ocaToken whatNext);
 
 /********** Helpers */
 /* This variable hold the 'parser' which is going to
@@ -512,8 +528,6 @@ static ocaToken waitedToken;
  * context stacking. */
 static vString *lastClass;
 
-static vString *voidName;
-
 typedef enum _sContextKind {
 	ContextStrong,
 	ContextSoft
@@ -526,7 +540,8 @@ typedef enum _sContextType {
 	ContextValue,
 	ContextFunction,
 	ContextMethod,
-	ContextBlock
+	ContextBlock,
+	ContextMatch
 } contextType;
 
 typedef struct _sOcamlContext {
@@ -543,7 +558,7 @@ static ocamlContext stack[OCAML_MAX_STACK_SIZE];
 static int stackIndex;
 
 /* special function, often recalled, so putting it here */
-static void globalScope (vString * const ident, ocaToken what);
+static void globalScope (vString * const ident, ocaToken what, ocaToken whatNext);
 
 /* Return : index of the last named context if one
  *          is found, -1 otherwise */
@@ -580,6 +595,8 @@ static const kindDefinition* contextDescription (contextType t)
 		return &(OcamlKinds[K_CLASS]);
 	case ContextBlock:
 		return &(OcamlKinds[K_BEGIN_END]);
+	case ContextMatch:
+		return &(OcamlKinds[K_MATCH]);
 	}
 
 	return NULL;
@@ -600,8 +617,11 @@ static char contextTypeSuffix (contextType t)
 		return '#';
 	case ContextBlock:
 		return ' ';
+	case ContextMatch:
+		return '|';
+	default:
+		return '$';
 	}
-	return '$';
 }
 
 /* Push a new context, handle null string */
@@ -726,10 +746,28 @@ static contextType popStrongContext ( void )
 	return -1;
 }
 
+/* Reset everything before the last match. */
+static void jumpToMatchContext ( void )
+{
+	int i;
+	for (i = stackIndex; i >= 0; --i)
+	{
+		if (stack[i].type == ContextMatch)
+		{
+			stackIndex = i + 1;
+			toDoNext = stack[i].callback;	// this should always be
+							// matchPattern
+			stack[i + 1].callback = NULL;
+			vStringClear (stack[i + 1].contextName);
+			return;
+		}
+	}
+}
+
 /* Ignore everything till waitedToken and jump to comeAfter.
  * If the "end" keyword is encountered break, doesn't remember
  * why though. */
-static void tillToken (vString * const ident CTAGS_ATTR_UNUSED, ocaToken what)
+static void tillToken (vString * const ident CTAGS_ATTR_UNUSED, ocaToken what, ocaToken whatNext CTAGS_ATTR_UNUSED)
 {
 	if (what == waitedToken)
 		toDoNext = comeAfter;
@@ -742,7 +780,7 @@ static void tillToken (vString * const ident CTAGS_ATTR_UNUSED, ocaToken what)
 
 /* Ignore everything till a waitedToken is seen, but
  * take care of balanced parentheses/bracket use */
-static void contextualTillToken (vString * const ident CTAGS_ATTR_UNUSED, ocaToken what)
+static void contextualTillToken (vString * const ident, ocaToken what, ocaToken whatNext)
 {
 	static int parentheses = 0;
 	static int bracket = 0;
@@ -776,39 +814,35 @@ static void contextualTillToken (vString * const ident CTAGS_ATTR_UNUSED, ocaTok
 	if (what == waitedToken && parentheses == 0 && bracket == 0 && curly == 0)
 		toDoNext = comeAfter;
 	else if (what == OcaKEYWORD_end)
-	{
-		popStrongContext ();
-		toDoNext = &globalScope;
-	}
+		globalScope (ident, what, whatNext);
 }
 
 /* Wait for waitedToken and jump to comeAfter or let
  * the globalScope handle declarations */
-static void tillTokenOrFallback (vString * const ident, ocaToken what)
+static void tillTokenOrFallback (vString * const ident, ocaToken what, ocaToken whatNext)
 {
 	if (what == waitedToken)
 		toDoNext = comeAfter;
 	else
-		globalScope (ident, what);
+		globalScope (ident, what, whatNext);
 }
 
 /* ignore token till waitedToken, or give up if find
  * terminatingToken. Use globalScope to handle new
  * declarations. */
-static void tillTokenOrTerminatingOrFallback (vString * const ident,
-	ocaToken what)
+static void tillTokenOrTerminatingOrFallback (vString * const ident, ocaToken what, ocaToken whatNext)
 {
 	if (what == waitedToken)
 		toDoNext = comeAfter;
 	else if (what == terminatingToken)
 		toDoNext = globalScope;
 	else
-		globalScope (ident, what);
+		globalScope (ident, what, whatNext);
 }
 
 /* ignore the next token in the stream and jump to the
  * given comeAfter state */
-static void ignoreToken (vString * const ident CTAGS_ATTR_UNUSED, ocaToken what CTAGS_ATTR_UNUSED)
+static void ignoreToken (vString * const ident CTAGS_ATTR_UNUSED, ocaToken what CTAGS_ATTR_UNUSED, ocaToken whatNext CTAGS_ATTR_UNUSED)
 {
 	toDoNext = comeAfter;
 }
@@ -817,25 +851,29 @@ static void ignoreToken (vString * const ident CTAGS_ATTR_UNUSED, ocaToken what 
 /* the purpose of each function is detailed near their
  * implementation */
 
-static void killCurrentState ( void )
+static contextType killCurrentState ( void )
 {
+	contextType popped = popStrongContext ();
 
 	/* Tracking the kind of previous strong
 	 * context, if it doesn't match with a
 	 * really strong entity, repop */
-	switch (popStrongContext ())
+	switch (popped)
 	{
 	case ContextValue:
-		popStrongContext ();
+		popped = popStrongContext ();
 		break;
 	case ContextFunction:
-		popStrongContext ();
+		popped = popStrongContext ();
 		break;
 	case ContextMethod:
-		popStrongContext ();
+		popped = popStrongContext ();
 		break;
 	case ContextType:
-		popStrongContext();
+		popped = popStrongContext ();
+		break;
+	case ContextMatch:
+		popped = popStrongContext ();
 		break;
 	case ContextBlock:
 		break;
@@ -847,21 +885,28 @@ static void killCurrentState ( void )
 		/* nothing more */
 		break;
 	}
+	return popped;
 }
 
-/* used to prepare tag for OCaml, just in case their is a need to
+/* Keep track of our _true_ line number and file pos,
+ * as the lookahead token gives us false values. */
+static unsigned long ocaLineNumber;
+static MIOPos ocaFilePosition;
+
+/* Used to prepare an OCaml tag, just in case there is a need to
  * add additional information to the tag. */
 static void prepareTag (tagEntryInfo * tag, vString const *name, ocamlKind kind)
 {
 	int parentIndex;
 
 	initTagEntry (tag, vStringValue (name), &(OcamlKinds[kind]));
+	/* Ripped out of read.h initTagEntry, because of line number
+	 * shenanigans.
+	 * Ugh. Lookahead is harder than I expected. */
+	tag->lineNumberEntry = (bool) (Option.locate == EX_LINENUM);
+	tag->lineNumber = ocaLineNumber;
+	tag->filePosition = ocaFilePosition;
 
-	if (kind == K_MODULE)
-	{
-		tag->lineNumberEntry = true;
-		tag->lineNumber = 1;
-	}
 	parentIndex = getLastNamedIndex ();
 	if (parentIndex >= 0)
 	{
@@ -901,10 +946,10 @@ static void cleanupPreviousParser ( void )
 
 /* Due to some circular dependencies, the following functions
  * must be forward-declared. */
-static void letParam (vString * const ident, ocaToken what);
-static void localScope (vString * const ident, ocaToken what);
-static void mayRedeclare (vString * const ident, ocaToken what);
-static void typeSpecification (vString * const ident, ocaToken what);
+static void letParam (vString * const ident, ocaToken what, ocaToken whatNext);
+static void localScope (vString * const ident, ocaToken what, ocaToken whatNext);
+static void mayRedeclare (vString * const ident, ocaToken what, ocaToken whatNext);
+static void typeSpecification (vString * const ident, ocaToken what, ocaToken whatNext);
 
 /*
  * Parse a record type
@@ -914,7 +959,7 @@ static void typeSpecification (vString * const ident, ocaToken what);
  *      ident2: type2;
  *  }
  */
-static void typeRecord (vString * const ident, ocaToken what)
+static void typeRecord (vString * const ident, ocaToken what, ocaToken whatNext CTAGS_ATTR_UNUSED)
 {
 	switch (what)
 	{
@@ -932,6 +977,8 @@ static void typeRecord (vString * const ident, ocaToken what)
 
 	case Tok_CurlR:
 		popStrongContext ();
+		// don't pop the module context when going to another expression
+		needStrongPoping = false;
 		toDoNext = &globalScope;
 		break;
 
@@ -942,7 +989,7 @@ static void typeRecord (vString * const ident, ocaToken what)
 
 /* handle :
  * exception ExceptionName of ... */
-static void exceptionDecl (vString * const ident, ocaToken what)
+static void exceptionDecl (vString * const ident, ocaToken what, ocaToken whatNext)
 {
 	if (what == OcaIDENTIFIER)
 	{
@@ -950,7 +997,7 @@ static void exceptionDecl (vString * const ident, ocaToken what)
 	}
 	else /* probably ill-formed, give back to global scope */
 	{
-		globalScope (ident, what);
+		globalScope (ident, what, whatNext);
 	}
 	toDoNext = &globalScope;
 }
@@ -960,7 +1007,7 @@ static vString *tempIdent;
 
 /* Ensure a constructor is not a type path beginning
  * with a module */
-static void constructorValidation (vString * const ident, ocaToken what)
+static void constructorValidation (vString * const ident, ocaToken what, ocaToken whatNext)
 {
 	switch (what)
 	{
@@ -1000,11 +1047,13 @@ static void constructorValidation (vString * const ident, ocaToken what)
 		comeAfter = &typeSpecification;
 		waitedToken = Tok_Pipe;
 
-		/* nothing in the context, discard it */
 		popStrongContext ();
 
+		// don't pop the module context when going to another expression
+		needStrongPoping = false;
+
 		/* to be sure we use this token */
-		globalScope (ident, what);
+		globalScope (ident, what, whatNext);
 	}
 }
 
@@ -1013,7 +1062,7 @@ static void constructorValidation (vString * const ident, ocaToken what)
  * or
  * type ('var1, 'var2) ident =
  */
-static void typeDecl (vString * const ident, ocaToken what)
+static void typeDecl (vString * const ident, ocaToken what, ocaToken whatNext)
 {
 	switch (what)
 	{
@@ -1031,15 +1080,51 @@ static void typeDecl (vString * const ident, ocaToken what)
 
 	case OcaIDENTIFIER:
 		addTag (ident, K_TYPE);
-		pushStrongContext (ident, ContextType);
-		requestStrongPoping ();
-		waitedToken = Tok_EQ;
-		comeAfter = &typeSpecification;
-		toDoNext = &tillTokenOrFallback;
+		// true type declaration
+		if (whatNext == Tok_EQ)
+		{
+			pushStrongContext (ident, ContextType);
+			requestStrongPoping ();
+			toDoNext = &typeSpecification;
+		}
+		else // we're in a sig
+			toDoNext = &globalScope;
 		break;
 
 	default:
-		globalScope (ident, what);
+		globalScope (ident, what, whatNext);
+	}
+}
+
+/** handle 'val' signatures in sigs and .mli files
+  * val ident : String.t -> Val.t
+  * Eventually, this will do cool things to annotate
+  * functions with their actual signatures. But for now,
+  * it's basically globalLet */
+static void val (vString * const ident, ocaToken what, ocaToken whatNext CTAGS_ATTR_UNUSED)
+{
+	switch (what)
+	{
+	case Tok_PARL:
+	case OcaKEYWORD_rec:
+		break;
+
+	case Tok_Op:
+		/* we are defining a new operator, it's a
+		 * function definition */
+		addTag (ident, K_VAL);
+		toDoNext = &globalScope;
+		break;
+
+	case Tok_Val:	/* Can be a weiiird binding, or an '_' */
+	case OcaIDENTIFIER:
+		addTag (ident, K_VAL);
+		toDoNext = &globalScope;	// sig parser ?
+		break;
+
+	default:
+		toDoNext = &globalScope;
+		break;
 	}
 }
 
@@ -1052,7 +1137,7 @@ static void typeDecl (vString * const ident, ocaToken what)
  *
  * when type bidule = { ... } is detected,
  * let typeRecord handle it. */
-static void typeSpecification (vString * const ident, ocaToken what)
+static void typeSpecification (vString * const ident, ocaToken what, ocaToken whatNext CTAGS_ATTR_UNUSED)
 {
 	switch (what)
 	{
@@ -1084,6 +1169,10 @@ static void typeSpecification (vString * const ident, ocaToken what)
 		toDoNext = &typeDecl;
 		break;
 
+	case OcaKEYWORD_val:
+		toDoNext = &val;
+		break;
+
 	case Tok_BRL:	/* the '[' & ']' are ignored to accommodate */
 	case Tok_BRR:	/* with the revised syntax */
 	case Tok_Pipe:
@@ -1103,7 +1192,7 @@ static void typeSpecification (vString * const ident, ocaToken what)
 static bool dirtySpecialParam = false;
 
 /* parse the ~label and ~label:type parameter */
-static void parseLabel (vString * const ident, ocaToken what)
+static void parseLabel (vString * const ident, ocaToken what, ocaToken whatNext)
 {
 	static int parCount = 0;
 
@@ -1138,7 +1227,7 @@ static void parseLabel (vString * const ident, ocaToken what)
 		else if (parCount == 0 && dirtySpecialParam)
 		{
 			toDoNext = &letParam;
-			letParam (ident, what);
+			letParam (ident, what, whatNext);
 		}
 		break;
 
@@ -1146,7 +1235,7 @@ static void parseLabel (vString * const ident, ocaToken what)
 		if (parCount == 0 && dirtySpecialParam)
 		{
 			toDoNext = &letParam;
-			letParam (ident, what);
+			letParam (ident, what, whatNext);
 		}
 		break;
 	}
@@ -1154,7 +1243,7 @@ static void parseLabel (vString * const ident, ocaToken what)
 
 /* Optional argument with syntax like this :
  * ?(foo = value) */
-static void parseOptionnal (vString * const ident, ocaToken what)
+static void parseOptionnal (vString * const ident, ocaToken what, ocaToken whatNext CTAGS_ATTR_UNUSED)
 {
 	static int parCount = 0;
 
@@ -1190,7 +1279,7 @@ static void parseOptionnal (vString * const ident, ocaToken what)
 
 /** handle let inside functions (so like it's name
  * say : local let */
-static void localLet (vString * const ident, ocaToken what)
+static void localLet (vString * const ident, ocaToken what, ocaToken whatNext)
 {
 	switch (what)
 	{
@@ -1215,23 +1304,27 @@ static void localLet (vString * const ident, ocaToken what)
 		toDoNext = &letParam;
 		break;
 
-		/* Can be a weiiird binding, or an '_' */
-	case Tok_Val:
-		if (exportLocalInfo)
-			addTag (ident, K_VARIABLE);
-		pushSoftContext (mayRedeclare, ident, ContextValue);
-		toDoNext = &letParam;
-		break;
-
+	case Tok_Val:	/* Can be a weiiird binding, or an '_' */
 	case OcaIDENTIFIER:
-		if (exportLocalInfo)
-			addTag (ident, K_VARIABLE);
-		pushSoftContext (mayRedeclare, ident, ContextValue);
+		// if we're an identifier, and the next token is too, then
+		// we're definitely a function.
+		if (whatNext == OcaIDENTIFIER || whatNext == Tok_PARL)
+		{
+			if (exportLocalInfo)
+				addTag (ident, K_FUNCTION);
+			pushSoftContext (mayRedeclare, ident, ContextFunction);
+		}
+		else
+		{
+			if (exportLocalInfo)
+				addTag (ident, K_VARIABLE);
+			pushSoftContext (mayRedeclare, ident, ContextValue);
+		}
 		toDoNext = &letParam;
 		break;
 
 	case OcaKEYWORD_end:
-		popStrongContext ();
+		localScope (ident, what, whatNext);
 		break;
 
 	default:
@@ -1247,9 +1340,9 @@ static void localLet (vString * const ident, ocaToken what)
  * we ignore all identifiers declared in the pattern,
  * because their scope is likely to be even more limited
  * than the let definitions.
- * Used after a match ... with, or a function ... or fun ...
+ * Used after a match ... with, or a function ...
  * because their syntax is similar.  */
-static void matchPattern (vString * const ident, ocaToken what)
+static void matchPattern (vString * const ident, ocaToken what, ocaToken whatNext)
 {
 	/* keep track of [], as it
 	 * can be used in patterns and can
@@ -1270,8 +1363,11 @@ static void matchPattern (vString * const ident, ocaToken what)
 
 	case OcaKEYWORD_value:
 		popLastNamed ();
-	globalScope (ident, what);
-	break;
+	case OcaKEYWORD_and:
+	case OcaKEYWORD_end:
+		// why was this global? matches only make sense in local scope
+		localScope (ident, what, whatNext);
+		break;
 
 	case OcaKEYWORD_in:
 		popLastNamed ();
@@ -1285,24 +1381,26 @@ static void matchPattern (vString * const ident, ocaToken what)
 /* Used at the beginning of a new scope (begin of a
  * definition, parenthesis...) to catch inner let
  * definition that may be in. */
-static void mayRedeclare (vString * const ident, ocaToken what)
+static void mayRedeclare (vString * const ident, ocaToken what, ocaToken whatNext)
 {
 	switch (what)
 	{
 	case OcaKEYWORD_value:
 	/* let globalScope handle it */
-	globalScope (ident, what);
-	break;
+	globalScope (ident, what, whatNext);
 
 	case OcaKEYWORD_let:
+		toDoNext = &localLet;
+		break;
+
 	case OcaKEYWORD_val:
-		toDoNext = localLet;
+		toDoNext = &val;
 		break;
 
 	case OcaKEYWORD_object:
 		vStringClear (lastClass);
 		pushContext (ContextStrong, ContextClass,
-			&localScope, NULL /*voidName */ );
+			&localScope, NULL);
 		needStrongPoping = false;
 		toDoNext = &globalScope;
 		break;
@@ -1316,11 +1414,16 @@ static void mayRedeclare (vString * const ident, ocaToken what)
 
 	case OcaKEYWORD_try:
 		toDoNext = &mayRedeclare;
-		pushSoftContext (matchPattern, ident, ContextFunction);
+		pushSoftContext (&matchPattern, ident, ContextFunction);
+		break;
+
+	case OcaKEYWORD_function:
+		toDoNext = &matchPattern;
+		pushSoftContext (&matchPattern, NULL, ContextMatch);
 		break;
 
 	case OcaKEYWORD_fun:
-		toDoNext = &matchPattern;
+		toDoNext = &letParam;
 		break;
 
 		/* Handle the special ;; from the OCaml
@@ -1328,7 +1431,7 @@ static void mayRedeclare (vString * const ident, ocaToken what)
 	case Tok_semi:
 	default:
 		toDoNext = &localScope;
-		localScope (ident, what);
+		localScope (ident, what, whatNext);
 	}
 }
 
@@ -1336,10 +1439,11 @@ static void mayRedeclare (vString * const ident, ocaToken what)
  * p1 p2 ... pn = ...
  * or
  * ?(p1=v) p2 ~p3 ~pn:ja ... = ... */
-static void letParam (vString * const ident, ocaToken what)
+static void letParam (vString * const ident, ocaToken what, ocaToken whatNext CTAGS_ATTR_UNUSED)
 {
 	switch (what)
 	{
+	case Tok_To:
 	case Tok_EQ:
 		toDoNext = &mayRedeclare;
 		break;
@@ -1393,7 +1497,7 @@ static void letParam (vString * const ident, ocaToken what)
 /* parse object ...
  * used to be sure the class definition is not a type
  * alias */
-static void classSpecif (vString * const ident CTAGS_ATTR_UNUSED, ocaToken what)
+static void classSpecif (vString * const ident CTAGS_ATTR_UNUSED, ocaToken what, ocaToken whatNext CTAGS_ATTR_UNUSED)
 {
 	switch (what)
 	{
@@ -1410,7 +1514,7 @@ static void classSpecif (vString * const ident CTAGS_ATTR_UNUSED, ocaToken what)
 
 /* Handle a method ... class declaration.
  * nearly a copy/paste of globalLet. */
-static void methodDecl (vString * const ident, ocaToken what)
+static void methodDecl (vString * const ident, ocaToken what, ocaToken whatNext)
 {
 	switch (what)
 	{
@@ -1436,7 +1540,7 @@ static void methodDecl (vString * const ident, ocaToken what)
 		break;
 
 	case OcaKEYWORD_end:
-		popStrongContext ();
+		localScope (ident, what, whatNext);
 		break;
 
 	default:
@@ -1456,7 +1560,7 @@ static vString *lastModule;
  * or
  * functor ... -> moduleSpecif
  */
-static void moduleSpecif (vString * const ident, ocaToken what)
+static void moduleSpecif (vString * const ident, ocaToken what, ocaToken whatNext)
 {
 	switch (what)
 	{
@@ -1470,38 +1574,54 @@ static void moduleSpecif (vString * const ident, ocaToken what)
 	case OcaKEYWORD_sig:
 		pushStrongContext (lastModule, ContextModule);
 		toDoNext = &globalScope;
+		needStrongPoping = false;
 		break;
 
 	case Tok_PARL:	/* ( */
 		toDoNext = &contextualTillToken;
 		comeAfter = &globalScope;
 		waitedToken = Tok_PARR;
-		contextualTillToken (ident, what);
+		contextualTillToken (ident, what, whatNext);
+		break;
+
+	case Tok_Of:
+	case Tok_EQ:
 		break;
 
 	default:
 		vStringClear (lastModule);
 		toDoNext = &globalScope;
+		break;
 	}
 }
 
 /* parse :
  * module name = ...
  * then pass the token stream to moduleSpecif */
-static void moduleDecl (vString * const ident, ocaToken what)
+static void moduleDecl (vString * const ident, ocaToken what, ocaToken whatNext)
 {
 	switch (what)
 	{
+	case OcaKEYWORD_rec:
+		/* recursive modules are _weird_, but they happen */
 	case OcaKEYWORD_type:
-		/* just ignore it, name come after */
+		/* this is technically a special type, but whatever */
 		break;
 
 	case OcaIDENTIFIER:
 		addTag (ident, K_MODULE);
 		vStringCopy (lastModule, ident);
-		waitedToken = Tok_EQ;
-		comeAfter = &moduleSpecif;
-		toDoNext = &contextualTillToken;
+		if (whatNext == Tok_Of || whatNext == Tok_EQ)
+			toDoNext = &moduleSpecif;
+		else
+		{
+			// default to waiting on a '=' since
+			// module M : sig ... end = struct ... end
+			// is rarer
+			waitedToken = Tok_EQ;
+			comeAfter = &moduleSpecif;
+			toDoNext = &contextualTillToken;
+		}
 		break;
 
 	default:	/* don't care */
@@ -1513,7 +1633,7 @@ static void moduleDecl (vString * const ident, ocaToken what)
  * class name = ...
  * or
  * class virtual ['a,'b] classname = ... */
-static void classDecl (vString * const ident, ocaToken what)
+static void classDecl (vString * const ident, ocaToken what, ocaToken whatNext CTAGS_ATTR_UNUSED)
 {
 	switch (what)
 	{
@@ -1540,7 +1660,7 @@ static void classDecl (vString * const ident, ocaToken what)
  * let ident ...
  * or
  * let rec ident ... */
-static void globalLet (vString * const ident, ocaToken what)
+static void globalLet (vString * const ident, ocaToken what, ocaToken whatNext)
 {
 	switch (what)
 	{
@@ -1548,7 +1668,16 @@ static void globalLet (vString * const ident, ocaToken what)
 		/* We ignore this token to be able to parse such
 		 * declarations :
 		 * let (ident : type) = ...
-		 */
+		 * but () is the toplevel function name, so fake ourselves
+		 * as an ident and make a new function */
+		if (whatNext == Tok_PARR)
+		{
+			vString *fakeIdent = vStringNewInit ("()");
+			addTag (fakeIdent, K_FUNCTION);
+			pushStrongContext (fakeIdent, ContextFunction);
+			requestStrongPoping ();
+			toDoNext = &letParam;
+		}
 		break;
 
 	case OcaKEYWORD_mutable:
@@ -1566,15 +1695,33 @@ static void globalLet (vString * const ident, ocaToken what)
 		toDoNext = &letParam;
 		break;
 
+	case Tok_Val:
+		if (vStringValue (ident)[0] == '_')
+			addTag (ident, K_FUNCTION);
+		pushStrongContext (ident, ContextFunction);
+		requestStrongPoping ();
+		toDoNext = &letParam;
+		break;
+
 	case OcaIDENTIFIER:
-		addTag (ident, K_VARIABLE);
-		pushStrongContext (ident, ContextValue);
+		// if we're an identifier, and the next token is too, then
+		// we're definitely a function.
+		if (whatNext == OcaIDENTIFIER || whatNext == Tok_PARL)
+		{
+			addTag (ident, K_FUNCTION);
+			pushStrongContext (ident, ContextFunction);
+		}
+		else
+		{
+			addTag (ident, K_VARIABLE);
+			pushStrongContext (ident, ContextValue);
+		}
 		requestStrongPoping ();
 		toDoNext = &letParam;
 		break;
 
 	case OcaKEYWORD_end:
-		popStrongContext ();
+		globalScope (ident, what, whatNext);
 		break;
 
 	default:
@@ -1585,7 +1732,7 @@ static void globalLet (vString * const ident, ocaToken what)
 
 /* Handle the "strong" top levels, all 'big' declarations
  * happen here */
-static void globalScope (vString * const ident CTAGS_ATTR_UNUSED, ocaToken what)
+static void globalScope (vString * const ident CTAGS_ATTR_UNUSED, ocaToken what, ocaToken whatNext)
 {
 	/* Do not touch, this is used only by the global scope
 	 * to handle an 'and' */
@@ -1595,6 +1742,7 @@ static void globalScope (vString * const ident CTAGS_ATTR_UNUSED, ocaToken what)
 	{
 	case OcaKEYWORD_and:
 		cleanupPreviousParser ();
+		// deal with module M = struct ... end _and_ N = struct ... end
 		toDoNext = previousParser;
 		break;
 
@@ -1616,10 +1764,23 @@ static void globalScope (vString * const ident CTAGS_ATTR_UNUSED, ocaToken what)
 		previousParser = &moduleDecl;
 		break;
 
-	case OcaKEYWORD_end:
+	case OcaKEYWORD_end:;
+		contextType popped = killCurrentState ();
+
+		/** so here, end can legally be followed by = or and in the
+		 * situation of
+		 * module M : sig ... end = struct ... end  and
+		 * module M struct ... end and N = struct ... end
+		 * and we need to make sure we know we're still inside of a
+		 * struct */
+		if (whatNext == Tok_EQ && popped == ContextModule)
+		{
+			previousParser = &moduleDecl;
+			toDoNext = &moduleSpecif;
+		}
+		else if (whatNext == OcaKEYWORD_and && popped == ContextModule)
+			toDoNext = &moduleDecl;
 		needStrongPoping = false;
-		killCurrentState ();
-		/*popStrongContext(); */
 		break;
 
 	case OcaKEYWORD_method:
@@ -1628,10 +1789,11 @@ static void globalScope (vString * const ident CTAGS_ATTR_UNUSED, ocaToken what)
 		/* and is not allowed in methods */
 		break;
 
-		/* val is mixed with let as global
-		 * to be able to handle mli & new syntax */
 	case OcaKEYWORD_val:
-	case OcaKEYWORD_value:
+		toDoNext = &val;
+		/* and is not allowed in sigs */
+		break;
+
 	case OcaKEYWORD_let:
 		cleanupPreviousParser ();
 		toDoNext = &globalLet;
@@ -1658,12 +1820,15 @@ static void globalScope (vString * const ident CTAGS_ATTR_UNUSED, ocaToken what)
 
 /* Parse expression. Well ignore it is more the case,
  * ignore all tokens except "shocking" keywords */
-static void localScope (vString * const ident, ocaToken what)
+static void localScope (vString * const ident, ocaToken what, ocaToken whatNext)
 {
 	switch (what)
 	{
 
+		// we're probably in a match, so let's go to the last one
 	case Tok_Pipe:
+		jumpToMatchContext ();
+		break;
 
 	case Tok_PARR:
 	case Tok_BRR:
@@ -1681,8 +1846,12 @@ static void localScope (vString * const ident, ocaToken what)
 		toDoNext = &mayRedeclare;
 		break;
 
+		/* An in keyword signals the end of the previous context and the
+		 * start of a new one. */
 	case OcaKEYWORD_in:
 		popLastNamed ();
+		pushEmptyContext (&localScope);
+		toDoNext = &mayRedeclare;
 		break;
 
 		/* Ok, we got a '{', which is much likely to create
@@ -1693,12 +1862,23 @@ static void localScope (vString * const ident, ocaToken what)
 		toDoNext = &contextualTillToken;
 		waitedToken = Tok_CurlR;
 		comeAfter = &localScope;
-		contextualTillToken (ident, what);
+		contextualTillToken (ident, what, whatNext);
 		break;
 
 		/* Yeah imperative feature of OCaml,
 		 * a ';' like in C */
 	case Tok_semi:
+		/* ';;' case should end all scopes */
+		if (whatNext == Tok_semi)
+		{
+			popStrongContext ();
+			toDoNext = &globalScope;
+			break;
+		}	/* else fallthrough */
+
+		/* Every standard operator has very high precedence
+		 * e.g. expr * expr needs no parentheses */
+	case Tok_Op:
 		toDoNext = &mayRedeclare;
 		break;
 
@@ -1709,13 +1889,27 @@ static void localScope (vString * const ident, ocaToken what)
 		break;
 
 	case OcaKEYWORD_and:
-		popSoftContext ();
-		if (toDoNext != &mayRedeclare)
-			toDoNext(ident, what);
+		if (toDoNext == &mayRedeclare)
+		{
+			popSoftContext ();
+			pushEmptyContext (localScope);
+			toDoNext = &localLet;
+		}
 		else
 		{
-			pushEmptyContext(localScope);
-			toDoNext = &localLet;
+			/* a local 'and' keyword jumps up a context to the last
+			 * named. For ex
+			 * in `with let IDENT ... and IDENT2 ...` ident and
+			 * ident2 are on
+			 * same level, the same as `let IDENT ... in let IDENT2
+			 * ...`
+			 * a 'let' is the only 'and'-chainable construct allowed
+			 * locally
+			 * (thus we had to be one to get here), so we either go
+			 * to
+			 * globalLet or localLet depending on our scope. */
+			popLastNamed ();
+			toDoNext = stackIndex == 0 ? &globalLet : &localLet;
 		}
 		break;
 
@@ -1739,27 +1933,20 @@ static void localScope (vString * const ident, ocaToken what)
 	case OcaKEYWORD_with:
 		popSoftContext ();
 		toDoNext = &matchPattern;
-		pushEmptyContext (&matchPattern);
-		break;
-
-	case OcaKEYWORD_end:
-		killCurrentState ();
+		pushSoftContext (&matchPattern, NULL, ContextMatch);
 		break;
 
 	case OcaKEYWORD_fun:
-		comeAfter = &mayRedeclare;
-		toDoNext = &tillToken;
-		waitedToken = Tok_To;
+		toDoNext = &letParam;
 		break;
 
 	case OcaKEYWORD_done:
-	case OcaKEYWORD_val:
 		/* doesn't care */
 		break;
 
 	default:
 		requestStrongPoping ();
-		globalScope (ident, what);
+		globalScope (ident, what, whatNext);
 		break;
 	}
 }
@@ -1770,10 +1957,12 @@ static void localScope (vString * const ident, ocaToken what)
  * with it first letter put in upper case */
 static void computeModuleName ( void )
 {
-	/* in Ocaml the file name define a module.
-	 * so we define a module =)
+	/* in OCaml the file name define a module.
+	 * so we define a module if the file has
+	 * things in it. =)
 	 */
 	const char *filename = getInputFileName ();
+
 	int beginIndex = 0;
 	int endIndex = strlen (filename) - 1;
 	vString *moduleName = vStringNew ();
@@ -1821,32 +2010,61 @@ static void clearStack ( void )
 
 static void findOcamlTags (void)
 {
-	vString *name = vStringNew ();
 	lexingState st;
 	ocaToken tok;
 
+	/* One-token lookahead gives us the ability to
+	 * do much more accurate analysis */
+	lexingState nextSt;
+	ocaToken nextTok;
+
 	initStack ();
 
-	computeModuleName ();
 	tempIdent = vStringNew ();
 	lastModule = vStringNew ();
 	lastClass = vStringNew ();
-	voidName = vStringNew ();
-	vStringCopyS (voidName, "_");
+	vString *temp_cp = vStringNew ();
 
-	st.name = vStringNew ();
-	st.cp = readLineFromInputFile ();
+	nextSt.name = vStringNew ();
+	nextSt.cp = readLineFromInputFile ();
 	toDoNext = &globalScope;
-	tok = lex (&st);
+	nextTok = lex (&nextSt);
+
+	if (nextTok != Tok_EOF)
+		computeModuleName ();
+
+	/* prime the lookahead token */
+	st = nextSt;	// preserve the old state for our first token
+	st.name = vStringNewCopy (st.name);
+	st.cp = (const unsigned char *) temp_cp->buffer;
+	tok = nextTok;
+	ocaLineNumber = getInputLineNumber(); /* ??? getSourceLineNumber() */
+	ocaFilePosition = getInputFilePosition();
+	nextTok = lex (&nextSt);
+
+	/* main loop */
 	while (tok != Tok_EOF)
 	{
-		(*toDoNext) (st.name, tok);
-		tok = lex (&st);
+		(*toDoNext) (st.name, tok, nextTok);
+
+		tok = nextTok;
+		ocaLineNumber = getInputLineNumber(); /* ??? */
+		ocaFilePosition = getInputFilePosition();
+
+		if (nextTok != Tok_EOF)
+		{
+			vStringCopyS (temp_cp, (const char *) nextSt.cp);
+			st.cp = (const unsigned char *) temp_cp->buffer;
+			vStringCopy (st.name, nextSt.name);
+			nextTok = lex (&nextSt);
+		}
+		else
+			break;
 	}
 
 	vStringDelete (st.name);
-	vStringDelete (name);
-	vStringDelete (voidName);
+	vStringDelete (nextSt.name);
+	vStringDelete (temp_cp);
 	vStringDelete (tempIdent);
 	vStringDelete (lastModule);
 	vStringDelete (lastClass);
