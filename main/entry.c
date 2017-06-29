@@ -100,7 +100,7 @@ typedef struct eTagFile {
 *   DATA DEFINITIONS
 */
 
-tagFile TagFile = {
+static tagFile TagFile = {
     NULL,               /* tag file name */
     NULL,               /* tag file directory (absolute) */
     NULL,               /* file pointer */
