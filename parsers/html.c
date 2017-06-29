@@ -369,7 +369,7 @@ static bool skipScriptContent (tokenInfo *token, long *line, long *lineOffset)
 				 && type == TOKEN_NAME
 				 && lookupKeyword (vStringValue (token->string), Lang_html) == KEYWORD_script)
 		{
-			found_script = true;;
+			found_script = true;
 			*line = line_tmp[1];
 			*lineOffset = lineOffset_tmp[1];
 		}
@@ -378,7 +378,7 @@ static bool skipScriptContent (tokenInfo *token, long *line, long *lineOffset)
 	}
 	while ((type != TOKEN_EOF) && (!found_script));
 
-	return type != TOKEN_EOF;
+	return found_script;
 }
 
 static void readTag (tokenInfo *token, vString *text, int depth)

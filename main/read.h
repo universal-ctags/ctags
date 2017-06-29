@@ -110,7 +110,7 @@ extern char *readLineFromBypass (vString *const vLine, MIOPos location, long *co
 extern char *readLineFromBypassSlow (vString *const vLine, unsigned long lineNumber,
 				     const char *pattern, long *const pSeekValue);
 
-extern void   pushNarrowedInputStream (const langType language,
+extern void   pushNarrowedInputStream (
 				       unsigned long startLine, long startCharOffset,
 				       unsigned long endLine, long endCharOffset,
 				       unsigned long sourceLineOffset);

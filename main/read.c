@@ -612,7 +612,7 @@ static void rewindInputFile (inputFile *f)
 	mio_rewind (f->mio);
 	if (f->bomFound)
 	{
-		int c;
+		int c CTAGS_ATTR_UNUSED;
 
 		c = mio_getc (f->mio);
 		Assert (c == 0xEF);
@@ -1098,7 +1098,7 @@ out:
 	return result;
 }
 
-extern void   pushNarrowedInputStream (const langType language,
+extern void   pushNarrowedInputStream (
 				       unsigned long startLine, long startCharOffset,
 				       unsigned long endLine, long endCharOffset,
 				       unsigned long sourceLineOffset)
