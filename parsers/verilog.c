@@ -355,7 +355,7 @@ static void extendSystemVerilogKeywords (langType language, Barrel *barrel)
 			/* TODO: Ugly */
 			&& ((e->kind - SystemVerilogKinds) == K_TYPEDEF))
 		{
-			addKeyword (eStrdup (e->name), language, K_TYPEDEF); /* MEMLEAK */
+			addKeywordStrdup (e->name, language, K_TYPEDEF);
 			verbose ("SystemVerilog extends keyword table: %s\n",
 					 e->name);
 		}
