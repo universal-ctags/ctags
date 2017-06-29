@@ -28,6 +28,7 @@ int installSyscallFilter (void)
 	// Memory allocation.
 	seccomp_rule_add (ctx, SCMP_ACT_ALLOW, SCMP_SYS (mmap), 0);
 	seccomp_rule_add (ctx, SCMP_ACT_ALLOW, SCMP_SYS (munmap), 0);
+	seccomp_rule_add (ctx, SCMP_ACT_ALLOW, SCMP_SYS (mremap), 0);
 	seccomp_rule_add (ctx, SCMP_ACT_ALLOW, SCMP_SYS (brk), 0);
 
 	// I/O
