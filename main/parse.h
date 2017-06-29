@@ -37,12 +37,16 @@
 typedef enum {
 	RESCAN_NONE,   /* No rescan needed */
 	RESCAN_FAILED, /* Scan failed, clear out tags added, rescan */
-	RESCAN_APPEND  /* Scan succeeded, rescan */
+	RESCAN_APPEND, /* Scan succeeded, rescan */
 } rescanReason;
 
 typedef void (*createRegexTag) (const vString* const name);
 typedef void (*simpleParser) (void);
-typedef rescanReason (*rescanParser) (const unsigned int passCount);
+
+/* passCount >= 0 in single source file multi pass processing.
+   passCount <  0 in multiple source files multi pass processing. */
+typedef rescanReason (*rescanParser) (const int passCount);
+
 typedef void (*parserInitialize) (langType language);
 
 /* Per language finalizer is called anytime when ctags exits.

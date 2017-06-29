@@ -14,9 +14,9 @@
 #include "parse.h"
 
 // public parser api
-rescanReason cxxCParserMain(const unsigned int passCount);
-rescanReason cxxCppParserMain(const unsigned int passCount);
-rescanReason cxxCUDAParserMain(const unsigned int passCount);
+rescanReason cxxCParserMain(const int passCount);
+rescanReason cxxCppParserMain(const int passCount);
+rescanReason cxxCUDAParserMain(const int passCount);
 
 void cxxCParserInitialize(const langType language);
 void cxxCppParserInitialize(const langType language);

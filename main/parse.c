@@ -2702,7 +2702,7 @@ extern bool processFielddefOption (const char *const option, const char *const p
 */
 
 static rescanReason createTagsForFile (const langType language,
-				       const unsigned int passCount)
+				       const int passCount)
 {
 	parserDefinition *const lang = LanguageTable [language].def;
 	rescanReason rescan = RESCAN_NONE;
@@ -2780,7 +2780,7 @@ static bool createTagsWithFallback1 (const langType language,
 	unsigned long numTags	= numTagsAdded ();
 	MIOPos tagfpos;
 	int lastPromise = getLastPromise ();
-	unsigned int passCount = 0;
+	int passCount = 0;
 	rescanReason whyRescan;
 	parserObject *parser;
 	bool useCork;

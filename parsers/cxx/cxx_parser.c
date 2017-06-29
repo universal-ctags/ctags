@@ -1572,7 +1572,7 @@ bool cxxParserParseIfForWhileSwitch(void)
 	return bRet;
 }
 
-static rescanReason cxxParserMain(const unsigned int passCount)
+static rescanReason cxxParserMain(const int passCount)
 {
 	cxxScopeClear();
 	cxxTokenAPINewFile();
@@ -1617,7 +1617,7 @@ static rescanReason cxxParserMain(const unsigned int passCount)
 	return RESCAN_NONE;
 }
 
-rescanReason cxxCParserMain(const unsigned int passCount)
+rescanReason cxxCParserMain(const int passCount)
 {
 	CXX_DEBUG_ENTER();
 	cxxTagInitForLanguage(g_cxx.eCLangType);
@@ -1630,7 +1630,7 @@ rescanReason cxxCParserMain(const unsigned int passCount)
 	return r;
 }
 
-rescanReason cxxCUDAParserMain(const unsigned int passCount)
+rescanReason cxxCUDAParserMain(const int passCount)
 {
 	CXX_DEBUG_ENTER();
 	cxxTagInitForLanguage(g_cxx.eCUDALangType);
@@ -1644,7 +1644,7 @@ rescanReason cxxCUDAParserMain(const unsigned int passCount)
 	return r;
 }
 
-rescanReason cxxCppParserMain(const unsigned int passCount)
+rescanReason cxxCppParserMain(const int passCount)
 {
 	CXX_DEBUG_ENTER();
 	cxxTagInitForLanguage(g_cxx.eCPPLangType);
