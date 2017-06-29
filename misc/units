@@ -213,7 +213,11 @@ check_features()
     for expected in $([ -f "$ffile" ] && cat "$ffile") ${feature}; do
 	    found=no
 	    found_unexpectedly=no
-	    for f in $( ${CTAGS} --quiet --options=NONE --list-features --with-list-header=no 2> /dev/null | "${_LINE_SPLITTER}" ) ; do
+	    for f in $( ${CTAGS} --quiet --options=NONE \
+				 --list-features --with-list-header=no \
+				 2> /dev/null \
+			    | "${_LINE_SPLITTER}" \
+			    | cut -f 1 -d ' ') ; do
 		[ "$expected" = "$f" ] && found=yes
 		[ "$expected" = '!'"$f" ] && found_unexpectedly=yes
 	    done

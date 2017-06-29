@@ -325,7 +325,7 @@ static optionDescription LongOptionDescription [] = {
  {1,"  --list-extras=[language|all]"},
  {1,"       Output list of extra tag flags."},
  {1,"  --list-features"},
- {1,"       Output list of features."},
+ {1,"       Output list of compiled features."},
  {1,"  --list-fields=[language|all]"},
  {1,"       Output list of fields."},
  {1,"  --list-kinds=[language|all]"},
@@ -481,53 +481,58 @@ static const char* const License2 =
 /*  Contains a set of strings describing the set of "features" compiled into
  *  the code.
  */
-static const char *const Features [] = {
+static struct Feature {
+	const char *name;
+	const char *description;
+} Features [] = {
 #ifdef WIN32
-	"win32",
+	{"win32", "TO BE WRITTEN"},
 #endif
-	"wildcards",		/* Always available on universal ctags */
-	"regex",		/* Always available on universal ctags */
+	/* Following two features are always available on universal ctags */
+	{"wildcards", "can use glob matching"},
+	{"regex", "can use regular expression based pattern matching"},
+
 #ifndef EXTERNAL_SORT
-	"internal-sort",
+	{"internal-sort", "uses internal sort routine instead of invoking sort command"},
 #endif
 #ifdef CUSTOM_CONFIGURATION_FILE
-	"custom-conf",
+	{"custom-conf", "read \"" CUSTOM_CONFIGURATION_FILE "\" as config file"},
 #endif
 #if defined (WIN32) && defined (UNIX_PATH_SEPARATOR)
-	"unix-path-separator",
+	{"unix-path-separator", "can use '/' as file name separator"},
 #endif
 #ifdef HAVE_ICONV
-	"multibyte",
+	{"multibyte", "TO BE WRITTEN"},
 #endif
 #ifdef DEBUG
-	"debug",
+	{"debug", "TO BE WRITTEN"},
 #endif
 #ifdef HAVE_SCANDIR
-	"option-directory",
+	{"option-directory", "TO BE WRITTEN"},
 #endif
 #ifdef HAVE_LIBXML
-	"xpath",
+	{"xpath", "linked with library for parsing xml input"},
 #endif
 #ifdef HAVE_JANSSON
-	"json",
-	"interactive",
+	{"json", "supports json format output"},
+	{"interactive", "accepts source code from stdin"},
 #endif
 #ifdef HAVE_SECCOMP
-	"sandbox",
+	{"sandbox", "linked with code for system call level sandbox"},
 #endif
 #ifdef HAVE_LIBYAML
-	"yaml",
+	{"yaml", "linked with library for parsing yaml input"},
 #endif
 #ifdef CASE_INSENSITIVE_FILENAMES
-	"case-insensitive-filenames",
+	{"case-insensitive-filenames", "TO BE WRITTEN"},
 #endif
 #ifdef ENABLE_GCOV
-	"gcov",
+	{"gcov", "linked with code for coverage analysis"},
 #endif
 #ifdef HAVE_ASPELL
-	"aspell",
+	{"aspell", "linked with code for spell checking (internal use)"},
 #endif
-	NULL
+	{NULL,}
 };
 
 static const char *const StageDescription [] = {
@@ -1399,14 +1404,14 @@ static void printFeatureList (void)
 {
 	int i;
 
-	for (i = 0 ; Features [i] != NULL ; ++i)
+	for (i = 0 ; Features [i].name != NULL ; ++i)
 	{
 		if (i == 0)
 			printf ("  Optional compiled features: ");
-		if (strcmp (Features [i], "regex") != 0 || checkRegex ())
-			printf ("%s+%s", (i>0 ? ", " : ""), Features [i]);
+		if (strcmp (Features [i].name, "regex") != 0 || checkRegex ())
+			printf ("%s+%s", (i>0 ? ", " : ""), Features [i].name);
 #ifdef CUSTOM_CONFIGURATION_FILE
-		if (strcmp (Features [i], "custom-conf") == 0)
+		if (strcmp (Features [i].name, "custom-conf") == 0)
 			printf ("=%s", CUSTOM_CONFIGURATION_FILE);
 #endif
 	}
@@ -1426,13 +1431,16 @@ static void processListFeaturesOption(const char *const option CTAGS_ATTR_UNUSED
 {
 	int i;
 
-	struct colprintTable *table = colprintTableNew ("L:NAME", NULL);
+	struct colprintTable *table = colprintTableNew ("L:NAME", "L:DESCRIPTION", NULL);
 
-	for (i = 0 ; Features [i] != NULL ; ++i)
+	for (i = 0 ; Features [i].name != NULL ; ++i)
 	{
 		struct colprintLine * line = colprintTableGetNewLine (table);
-		if (strcmp (Features [i], "regex") != 0 || checkRegex ())
-			colprintLineAppendColumnCString (line, Features [i]);
+		if (strcmp (Features [i].name, "regex") != 0 || checkRegex ())
+		{
+			colprintLineAppendColumnCString (line, Features [i].name);
+			colprintLineAppendColumnCString (line, Features [i].description);
+		}
 
 	}
 
