@@ -656,11 +656,11 @@ static int createTag (tokenInfo *const token)
 	return createTagCommon (token, false);
 }
 
-static int createSystemVerilogTagForVariable (tokenInfo *const token)
+static int createSystemVerilogTagForMember (tokenInfo *const token)
 {
 	/* This function is for capturing "variable"
 	   fond in the 2nd(== -2) MM pass. */
-	return createTagCommon (token, false);
+	return createTagCommon (token, true);
 }
 
 static bool findBlockName (tokenInfo *const token)
@@ -1109,7 +1109,7 @@ static void findTag (tokenInfo *const token)
 			{
 				readIdentifier (token, c);
 				token->kind = K_MEMBER;
-				createTagCommon (token, true);
+				createSystemVerilogTagForMember(token);
 				/* TODO: typeref field can be filled. */
 			}
 		}
