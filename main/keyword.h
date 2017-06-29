@@ -25,7 +25,13 @@
 /*
 *   FUNCTION PROTOTYPES
 */
+
+/* `string' should be allocated statically. */
 extern void addKeyword (const char *const string, langType language, int value);
+
+/* addKeywordStrdup does strdup `string'.
+   Duplicated string is freed in  freeKeywordTable() */
+extern void addKeywordStrdup (const char *const string, langType language, int value);
 extern int lookupKeyword (const char *const string, langType language);
 extern int lookupCaseKeyword (const char *const string, langType language);
 extern void freeKeywordTable (void);
