@@ -40,8 +40,6 @@ addons:
       - libjansson-dev
       - libyaml-dev
       - libseccomp-dev
-      - libaspell-dev
-      - aspell-en
 
 env:
   - TARGET=Unix

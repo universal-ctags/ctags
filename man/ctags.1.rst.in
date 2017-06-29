@@ -202,8 +202,8 @@ Examples:
 ``NONE`` means that @CTAGS_NAME_EXECUTABLE@ does not select any parser for the file.
 
 
-OPTIONS
--------
+COMMAND LINE INTERFACE
+----------------------
 
 Despite the wealth of available options, defaults are set so that
 @CTAGS_NAME_EXECUTABLE@ is most commonly executed without any options (e.g.
@@ -231,6 +231,57 @@ before the first file name and will be noted as such.
 Options taking language names will accept those names in either upper or
 lower case. See the ``--list-languages`` option for a complete list of the
 built-in language names.
+
+
+Letters and names
+~~~~~~~~~~~~~~~~~
+
+Some options take letters as flags (e.g. ``--kinds-<LANG>`` option).
+Specifying just letters help a user make a complicated command line
+quickly.  However, the command line including sequence of the letters
+becomes difficult to be understood.
+
+Universal-ctags accepts names in
+addition to such letters. The names and letters can be mixed in a
+option parameter by surrounding each name by braces. Thus, for an
+example, following three notations for ``--kinds-C`` option have
+the same meaning::
+
+	--kinds-C=+pLl
+	--kinds-C=+{prototype}{label}{local}
+	--kinds-C=+{prototype}L{local}
+
+Note that braces may be meta characters in your shell. Put
+single quotes in such case.
+
+``--list-...`` options shows letters and associated names.
+
+
+List options
+~~~~~~~~~~~~
+
+Universal-ctags introduces many ``--list-...`` options that provide
+the internal data of Universal-ctags. Both users and client tools may
+use the data. ``--with-list-header`` and ``--machinable`` options
+adjust the output of the most of ``--list-...`` options.
+
+The default setting (``--with-list-header=yes`` and ``--machinable=no``)
+is for using interactively from a terminal. The header that explains
+the meaning of columns is simply added to the output, and each column is
+aligned in all lines. The header line starts with a hash ('#') character.
+
+For scripting in a client tool, ``--with-list-header=no`` and
+``--machinable=yes`` may be useful. The header is not added to the
+output, and each column is separated by tab characters.
+
+Note the order of columns will change in the future release.
+However, labels in the header will not change. So by scanning
+the header, a client tool can find the index for the target
+column.
+
+
+OPTION ITEMS
+------------
 
 ``-a``
 	Equivalent to ``--append``.
@@ -626,7 +677,7 @@ built-in language names.
 	tags when preprocessor conditionals are too complex follows all branches
 	of a conditional. This option is disabled by default.
 
-``--<LANG>-kinds=[+|-]kinds|*``
+``--kinds-<LANG>=[+|-]kinds|*``
 	Specifies a list of language-specific kinds of tags (or kinds) to
 	include in the output file for a particular language, where <LANG> is
 	case-insensitive and is one of the built-in language names (see the
@@ -649,6 +700,10 @@ built-in language names.
 	external variable declarations to the default set of tag kinds,
 	but exclude macros, use "--c-kinds=+px-d"; to include only tags for
 	functions, use "--c-kinds=f".
+
+``--<LANG>-kinds=[+|-]kinds|*``
+	Equivalent to ``--kinds-<LANG>=...``. This option is kept for
+	backward-compatibility with Exuberant-ctags.
 
 ``--langdef=name``
 	Defines a new user-defined language, name, to be parsed with regular
@@ -764,6 +819,11 @@ built-in language names.
 ``--links[=yes|no]``
 	Indicates whether symbolic links (if supported) should be followed.
 	When disabled, symbolic links are ignored. This option is on by default.
+
+``--list-aliases[=language|all]``
+	Lists the aliases for either the specified language or all
+	languages, and then exits. The aliases are used in when guessing
+	a parser for a source file.
 
 ``--list-kinds[=language|all]``
 	Lists the tag kinds recognized for either the specified language or all
@@ -1314,6 +1374,10 @@ CREDITS
 -------
 This version of @CTAGS_NAME_EXECUTABLE@ (Universal-ctags) derived from
 the repository, known as **fishman-ctags**, started by Reza Jelveh.
+
+Some parsers are taken from **tagmanager** of **Geany** (https://www.geany.org/)
+project.
+
 
 The fishman-ctags was derived from Exuberant-ctags.
 
