@@ -24,6 +24,7 @@
 #include "debug.h"
 #include "cpreprocessor.h"
 #include "keyword.h"
+#include "mm.h"
 #include "options.h"
 #include "parse.h"
 #include "read.h"
@@ -194,6 +195,8 @@ static const keywordAssoc KeywordTable [] = {
 
 static tokenInfo *currentContext = NULL;
 
+static int systemVerilogPassCount;
+
 /*
  *   FUNCTION DEFINITIONS
  */
@@ -336,6 +339,24 @@ static void buildKeywordHash (const langType language, unsigned int idx)
 		const keywordAssoc *p = &KeywordTable [i];
 		if (p->isValid [idx])
 			addKeyword (p->keyword, language, (int) p->kind);
+	}
+}
+
+static void extendSystemVerilogKeywords (langType language, Barrel *barrel)
+{
+	unsigned int count = countEntryInBarrel (barrel);
+	for (unsigned int i = 0; i < count; i++)
+	{
+		tagEntryInfo *e = getEntryInBarrel (barrel, i);
+
+		if (e->langType == language
+			/* TODO: Ugly */
+			&& ((e->kind - SystemVerilogKinds) == K_TYPEDEF))
+		{
+			addKeyword (eStrdup (e->name), language, K_TYPEDEF); /* MEMLEAK */
+			verbose ("SystemVerilog extends keyword table: %s\n",
+					 e->name);
+		}
 	}
 }
 
@@ -550,10 +571,11 @@ static void dropContext (tokenInfo *const token)
 }
 
 
-static void createTag (tokenInfo *const token)
+static int createTagCommon (tokenInfo *const token, bool capturedInMMPass)
 {
 	tagEntryInfo tag;
 	verilogKind kind;
+	int r = CORK_NIL;
 
 	/* Determine if kind is prototype */
 	if (currentContext->prototype)
@@ -568,7 +590,7 @@ static void createTag (tokenInfo *const token)
 	/* Do nothing it tag name is empty or tag kind is disabled */
 	if (vStringLength (token->name) == 0 || ! kindEnabled (kind))
 	{
-		return;
+		return r;
 	}
 
 	/* Create tag */
@@ -592,7 +614,10 @@ static void createTag (tokenInfo *const token)
 		tag.extensionFields.inheritance = vStringValue (token->inheritance);
 		verbose ("Class %s extends %s\n", vStringValue (token->name), tag.extensionFields.inheritance);
 	}
-	makeTagEntry (&tag);
+
+	if (systemVerilogPassCount >= 0 || capturedInMMPass)
+		r = makeTagEntry (&tag);
+
 	if (isXtagEnabled(XTAG_QUALIFIED_TAGS) && currentContext->kind != K_UNDEFINED)
 	{
 		vString *const scopedName = vStringNew ();
@@ -620,6 +645,20 @@ static void createTag (tokenInfo *const token)
 
 	/* Clear no longer required inheritance information */
 	vStringClear (token->inheritance);
+
+	return r;
+}
+
+static int createTag (tokenInfo *const token)
+{
+	return createTagCommon (token, false);
+}
+
+static int createSystemVerilogTagForVariable (tokenInfo *const token)
+{
+	/* This function is for capturing "variable"
+	   fond in the 2nd(== -2) MM pass. */
+	return createTagCommon (token, false);
 }
 
 static bool findBlockName (tokenInfo *const token)
@@ -846,7 +885,13 @@ static void processTypedef (tokenInfo *const token)
 		vUngetc (c);
 	}
 	/* Use last identifier to create tag */
-	createTag (token);
+	int r = createTag (token);
+	if (r != CORK_NIL)
+	{
+		/* pass this typedef to myself (SystemVerilog parser) in
+		   the next MM pass */
+		handOverEntryToNextMMPass (r);
+	}
 }
 
 static void processClass (tokenInfo *const token)
@@ -1151,6 +1196,18 @@ static void findVerilogTags (void)
 	currentContext = NULL;
 }
 
+static rescanReason findSystemVerilogTagsMM (const int passCount)
+{
+	verbose ("SystemVerilog enters pass %d\n", passCount);
+	systemVerilogPassCount = passCount;
+	findVerilogTags ();
+
+	if (passCount < 0)
+		return RESCAN_NONE;
+	else
+		return RESCAN_MM;
+}
+
 extern parserDefinition* VerilogParser (void)
 {
 	static const char *const extensions [] = { "v", NULL };
@@ -1170,7 +1227,15 @@ extern parserDefinition* SystemVerilogParser (void)
 	def->kindTable      = SystemVerilogKinds;
 	def->kindCount  = ARRAY_SIZE (SystemVerilogKinds);
 	def->extensions = extensions;
-	def->parser     = findVerilogTags;
+
+	/* setupMM is called when entering new MM pass.
+	   In SystemVerilog parser, extends the keyword table
+	   of SystemVerilog; put typedefs in Barrel to
+	   the keyword table. */
+	def->setupMM    = extendSystemVerilogKeywords;
+	def->parser2    = findSystemVerilogTagsMM;
+	def->useCork    = true;
+
 	def->initialize = initializeSystemVerilog;
 	return def;
 }
