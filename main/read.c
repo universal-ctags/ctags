@@ -22,6 +22,7 @@
 #include "debug.h"
 #include "entry.h"
 #include "main.h"
+#include "mm.h"
 #include "routines.h"
 #include "options.h"
 #include "trashbox.h"
@@ -831,7 +832,9 @@ static eolType readLine (vString *const vLine, MIO *const mio)
 static vString *iFileGetLine (void)
 {
 	eolType eol;
-	bool use_multiline = hasLanguageMultilineRegexPatterns (getInputLanguage ());
+	bool in_mm_pass = inMMPass ();
+	bool use_multiline = (!in_mm_pass) &&
+		hasLanguageMultilineRegexPatterns (getInputLanguage ());
 
 	if (File.line == NULL)
 		File.line = vStringNew ();
@@ -849,9 +852,12 @@ static vString *iFileGetLine (void)
 		mio_getpos (File.mio, &StartOfLine.pos);
 		StartOfLine.offset = mio_tell (File.mio);
 
-		if (Option.lineDirectives && vStringChar (File.line, 0) == '#')
-			parseLineDirective (vStringValue (File.line) + 1);
-		matchLanguageRegex (getInputLanguage (), File.line);
+		if (!in_mm_pass)
+		{
+			if (Option.lineDirectives && vStringChar (File.line, 0) == '#')
+				parseLineDirective (vStringValue (File.line) + 1);
+			matchLanguageRegex (getInputLanguage (), File.line);
+		}
 
 		if (use_multiline)
 		{

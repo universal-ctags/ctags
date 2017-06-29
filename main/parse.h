@@ -38,6 +38,7 @@ typedef enum {
 	RESCAN_NONE,   /* No rescan needed */
 	RESCAN_FAILED, /* Scan failed, clear out tags added, rescan */
 	RESCAN_APPEND, /* Scan succeeded, rescan */
+	RESCAN_MM,     /* Rescan is needed after parsing all specified source files. */
 } rescanReason;
 
 typedef void (*createRegexTag) (const vString* const name);

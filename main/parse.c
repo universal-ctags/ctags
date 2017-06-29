@@ -21,6 +21,7 @@
 #include "htable.h"
 #include "keyword.h"
 #include "main.h"
+#include "mm.h"
 #define OPTION_WRITE
 #include "options.h"
 #include "parsers.h"
@@ -2781,6 +2782,7 @@ static bool createTagsWithFallback1 (const langType language,
 	MIOPos tagfpos;
 	int lastPromise = getLastPromise ();
 	int passCount = 0;
+	bool in_mm_pass = inMMPass ();
 	rescanReason whyRescan;
 	parserObject *parser;
 	bool useCork;
@@ -2800,7 +2802,8 @@ static bool createTagsWithFallback1 (const langType language,
 	anonResetMaybe (parser);
 
 	while ( ( whyRescan =
-		  createTagsForFile (language, ++passCount) )
+		  createTagsForFile (language,
+							 (in_mm_pass? mmCurrentPass(): ++passCount)))
 		!= RESCAN_NONE)
 	{
 		if (useCork)
@@ -2809,8 +2812,13 @@ static bool createTagsWithFallback1 (const langType language,
 			corkTagFile();
 		}
 
-
-		if (whyRescan == RESCAN_FAILED)
+		if (whyRescan == RESCAN_MM)
+		{
+			const char *fname = getInputFileName();
+			mmSchedule (fname, language);
+			break;
+		}
+		else if (whyRescan == RESCAN_FAILED)
 		{
 			/*  Restore prior state of tag file.
 			*/
@@ -2828,7 +2836,7 @@ static bool createTagsWithFallback1 (const langType language,
 	}
 
 	/* Force filling allLines buffer and kick the multiline regex parser */
-	if (hasLanguageMultilineRegexPatterns (language))
+	if ((!in_mm_pass) && hasLanguageMultilineRegexPatterns (language))
 		while (readLineFromInputFile () != NULL)
 			; /* Do nothing */
 
@@ -2890,7 +2898,10 @@ static bool createTagsWithFallback (
 	pushLanguage ((exclusive_subparser == LANG_IGNORE)
 				  ? language
 				  : exclusive_subparser);
-	makeFileTag (fileName);
+
+	if (mmCurrentPass() >= 0)
+		makeFileTag (fileName);
+
 	popLanguage ();
 	closeInputFile ();
 

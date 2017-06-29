@@ -31,6 +31,7 @@ MAIN_HEADS =			\
 	main/lxpath.h		\
 	main/main.h		\
 	main/mbcs.h		\
+	main/mm.h		\
 	main/nestlevel.h	\
 	main/objpool.h		\
 	main/options.h		\
@@ -72,6 +73,7 @@ MAIN_SRCS =				\
 	main/lxpath.c			\
 	main/main.c			\
 	main/mbcs.c			\
+	main/mm.c			\
 	main/nestlevel.c		\
 	main/objpool.c			\
 	main/options.c			\
