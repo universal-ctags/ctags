@@ -77,6 +77,54 @@ extern bool inMMPass (void)
 	return !(currentPass >= 0);
 }
 
+struct barrelEntry {
+	tagEntryInfo e;
+};
+
+static void barrelEntryDelete (void *p)
+{
+	struct barrelEntry *b = p;
+	clearTagEntry (&(b->e));
+	eFree (b);
+}
+
+static ptrArray *barrel;
+
+void pourEntryToBarrel (tagEntryInfo *e)
+{
+	struct barrelEntry * b_entry = xMalloc (1, struct barrelEntry);
+	(b_entry->e) = *e;
+
+	if (!barrel)
+		barrel = ptrArrayNew (barrelEntryDelete);
+
+	ptrArrayAdd (barrel, b_entry);
+}
+
+static Barrel *barrelRollOut (void)
+{
+	ptrArray *tmp = barrel;
+	barrel = NULL;
+	return (Barrel *)tmp;
+}
+
+void barrelDelete (Barrel * b)
+{
+	ptrArray *tmp = (ptrArray *)b;
+	ptrArrayDelete (tmp);
+}
+
+unsigned int countEntryInBarrel (Barrel *b)
+{
+	return b? ptrArrayCount ((ptrArray *)b): 0;
+}
+
+tagEntryInfo* getEntryInBarrel (Barrel *b, unsigned int index)
+{
+	ptrArray *tmp = (ptrArray *)b;
+	return ptrArrayItem (tmp, index);
+}
+
 static bool mmRun0 (void)
 {
 	bool resize = false;
@@ -84,19 +132,24 @@ static bool mmRun0 (void)
 
 	while ((mm_sources = mmTakeOverSourceFiles ()) != NULL)
 	{
-		mmEnterPass ();
+		Barrel *barrel = barrelRollOut();
+		int pass = mmEnterPass ();
+
 		for (unsigned int i = 0; i < ptrArrayCount (mm_sources); i++)
 		{
 			struct mmEntry *mm_entry = ptrArrayItem (mm_sources, i);
 			Option.language = mm_entry->lang;
+
+			setupParserMM (mm_entry->lang, pass, barrel);
 			resize = parseFile (mm_entry->fileName)? true: resize;
 		}
 		ptrArrayDelete (mm_sources);
+
+		barrelDelete (barrel);
 	}
 
 	return resize;
 }
-
 
 extern bool mmRun (void)
 {

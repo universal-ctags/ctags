@@ -79,6 +79,7 @@ typedef struct sParserObject {
 	struct slaveControlBlock *slaveControlBlock;
 	struct kindControlBlock  *kindControlBlock;
 	struct lregexControlBlock *lregexControlBlock;
+	int mmPassCount;
 } parserObject;
 
 /*
@@ -3665,6 +3666,19 @@ extern void printLangdefFlags (bool withListHeader, bool machinable, FILE *fp)
 
 	flagsColprintTablePrint (table, withListHeader, machinable, fp);
 	colprintTableDelete(table);
+}
+
+extern bool setupParserMM (langType lang, int mmPassCount, Barrel *barrel)
+{
+	parserObject *parser = (LanguageTable + lang);
+
+	if (parser->mmPassCount != mmPassCount)
+	{
+		parser->def->setupMM (lang, barrel);
+		parser->mmPassCount = mmPassCount;
+		return true;
+	}
+	return false;
 }
 
 /*

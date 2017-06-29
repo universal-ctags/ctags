@@ -26,4 +26,13 @@ bool mmRun (void);
 int mmCurrentPass (void);
 bool inMMPass (void);
 
+void pourEntryToBarrel (tagEntryInfo *e);
+
+struct sBarrel;
+typedef struct sBarrel Barrel;
+
+unsigned int countEntryInBarrel (Barrel *b);
+tagEntryInfo* getEntryInBarrel (Barrel *b, unsigned int index);
+
+
 #endif

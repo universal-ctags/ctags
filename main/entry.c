@@ -44,6 +44,7 @@
 #include "fmt.h"
 #include "kind.h"
 #include "main.h"
+#include "mm.h"
 #include "options.h"
 #include "ptag.h"
 #include "read.h"
@@ -1062,8 +1063,15 @@ extern void clearParserFields (tagEntryInfo *const tag)
 	}
 }
 
-static void clearTagEntryInQueue (tagEntryInfo* slot)
+extern void clearTagEntry (tagEntryInfo* slot)
 {
+	if (slot->barrel)
+	{
+		slot->barrel = 0;
+		pourEntryToBarrel (slot);
+		return;
+	}
+
 	if (slot->pattern)
 		eFree ((char *)slot->pattern);
 	eFree ((char *)slot->inputFileName);
@@ -1224,7 +1232,7 @@ extern void uncorkTagFile(void)
 			makeQualifiedTagEntry (tag);
 	}
 	for (i = 1; i < TagFile.corkQueue.count; i++)
-		clearTagEntryInQueue (TagFile.corkQueue.queue + i);
+		clearTagEntry (TagFile.corkQueue.queue + i);
 
 	memset (TagFile.corkQueue.queue, 0,
 		sizeof (*TagFile.corkQueue.queue) * TagFile.corkQueue.count);
@@ -1557,4 +1565,12 @@ extern void setTagFilePosition (MIOPos *p)
 extern const char* getTagFileDirectory (void)
 {
 	return TagFile.directory;
+}
+
+void handOverEntryToNextMMPass (unsigned int n)
+{
+	Assert (n != CORK_NIL);
+
+	tagEntryInfo *e = getEntryInCorkQueue (n);
+	e->barrel = 1;
 }

@@ -20,6 +20,7 @@
 #include "kind.h"
 #include "lregex.h"
 #include "lxpath.h"
+#include "mm.h"
 #include "param.h"
 #include "parsers.h"  /* contains list of parsers */
 #include "strlist.h"
@@ -48,6 +49,7 @@ typedef void (*simpleParser) (void);
    passCount <  0 in multiple source files multi pass processing. */
 typedef rescanReason (*rescanParser) (const int passCount);
 
+typedef void (* parserSetupMM) (langType language, Barrel *barrel);
 typedef void (*parserInitialize) (langType language);
 
 /* Per language finalizer is called anytime when ctags exits.
@@ -84,6 +86,7 @@ struct sParserDefinition {
 	parserFinalize finalize;       /* finalize routine, if needed */
 	simpleParser parser;           /* simple parser (common case) */
 	rescanParser parser2;          /* rescanning parser (unusual case) */
+	parserSetupMM setupMM;
 	selectLanguage* selectLanguage; /* may be used to resolve conflicts */
 	unsigned int method;           /* See METHOD_ definitions above */
 	bool useCork;
@@ -237,5 +240,7 @@ extern bool makeKindDescriptionsPseudoTags (const langType language,
 
 extern void anonGenerate (vString *buffer, const char *prefix, int kind);
 extern void anonHashString (const char *filename, char buf[9]);
+
+extern bool setupParserMM (langType lang, int mmPassCount, Barrel *barrel);
 
 #endif  /* CTAGS_MAIN_PARSE_H */
