@@ -62,7 +62,8 @@ typedef enum {
 	K_PROGRAM,
 	K_PROTOTYPE,
 	K_PROPERTY,
-	K_TYPEDEF
+	K_TYPEDEF,
+	K_MEMBER,
 } verilogKind;
 
 typedef struct {
@@ -123,7 +124,8 @@ static kindDefinition SystemVerilogKinds [] = {
  { true, 'P', "program",   "programs" },
  { false,'Q', "prototype", "prototypes" },
  { true, 'R', "property",  "properties" },
- { true, 'T', "typedef",   "type declarations" }
+ { true, 'T', "typedef",   "type declarations" },
+ { true, 'v', "member",    "member elements" },
 };
 
 static const keywordAssoc KeywordTable [] = {
@@ -1097,7 +1099,20 @@ static void findTag (tokenInfo *const token)
 	}
 	else if (token->kind == K_TYPEDEF)
 	{
-		processTypedef (token);
+		if (strcmp (vStringValue (token->name), "typedef") == 0)
+			processTypedef (token);
+		else if (currentContext->kind == K_CLASS)
+		{
+			int c;
+			c = skipWhite (vGetc ());
+			if (isIdentifierCharacter (c))
+			{
+				readIdentifier (token, c);
+				token->kind = K_MEMBER;
+				createTagCommon (token, true);
+				/* TODO: typeref field can be filled. */
+			}
+		}
 	}
 	else if (token->kind == K_CLASS)
 	{
