@@ -423,15 +423,22 @@ direq ()
 anon_normalize ()
 {
     local ctags=$1
-    local input_actual=$2
+    local input_actual
 
-    # TODO: "Units" should not be hardcoded.
-    local input_expected="./Units${input_actual#*/Units}"
+    if [ -n "$2" ]; then
+	input_actual=$2
+	shift 2
 
-    local actual=$(${CTAGS} --quiet --options=NONE --_anonhash="${input_actual}")
-    local expected=$(${CTAGS} --quiet --options=NONE --_anonhash="${input_expected}")
+	# TODO: "Units" should not be hardcoded.
+	local input_expected="./Units${input_actual#*/Units}"
 
-    sed -e s/${actual}/${expected}/g
+	local actual=$(${CTAGS} --quiet --options=NONE --_anonhash="${input_actual}")
+	local expected=$(${CTAGS} --quiet --options=NONE --_anonhash="${input_expected}")
+
+	sed -e s/${actual}/${expected}/g | anon_normalize "${ctags}" "$@"
+    else
+	cat
+    fi
 }
 
 run_tcase ()
@@ -443,6 +450,7 @@ run_tcase ()
     local category="$5"
     local build_t="$6"
     shift 6
+    # The rest of arguments ($@) are extra inputs
 
     # I violate the naming convention of build_* to reduce typing
     local o=${build_t}
@@ -466,6 +474,8 @@ run_tcase ()
     local output_label=
     local output_tflag=
     local output_feature=
+    local output_lang_extras=
+
     if [ -f "$t/expected.tags" ]; then
 	:
     elif [ -f "$t/expected.tags-e" ]; then
@@ -484,6 +494,10 @@ run_tcase ()
 	output_label=/${output_type}
 	output_tflag="--output-format=json"
 	output_feature=json
+    fi
+
+    if [ $# -gt 0 ]; then
+	output_lang_extras=" (multi inputs)"
     fi
 
     [ -x "$ffilter" ] || ffilter=cat
@@ -544,7 +558,7 @@ run_tcase ()
     fi
 
 
-    printf '%-60s' "Testing ${name} as ${guessed_lang}${output_label}"
+    printf '%-60s' "Testing ${name} as ${guessed_lang}${output_lang_extras}${output_label}"
 
     if tmp=$( ( [ -n "${output_feature}" ] && ! check_features -e "${output_feature}" ) ||
 	      ( [ -f "${ffeatures}" ] && ! check_features -f "${ffeatures}" ) ); then
@@ -569,7 +583,7 @@ run_tcase ()
     fi
 
     cmdline_template="${_CMDLINE} --language-force=${guessed_lang} %s > /dev/null 2>&1"
-    _CMDLINE="${_CMDLINE} ${output_tflag} ${input}"
+    _CMDLINE="${_CMDLINE} ${output_tflag} ${input} $@"
 
     timeout_value=$WITH_TIMEOUT
     if [ "$WITH_VALGRIND" = yes ]; then
@@ -614,7 +628,9 @@ run_tcase ()
 	    L_FAILED_BY_TIMEED_OUT="${L_FAILED_BY_TIMEED_OUT} ${category}/${name}"
 	    run_result error "${oresult}" "TIMED OUT"
 	    run_record_cmdline "${ffilter}" "${ocmdline}"
-	    [ "${RUN_SHRINK}" = 'yes' ] && run_shrink "${cmdline_template}" "${input}" "${oshrink}" "${guessed_lang}"
+	    [ "${RUN_SHRINK}" = 'yes' ] \
+		&& [ $# -eq 0 ] \
+		&& run_shrink "${cmdline_template}" "${input}" "${oshrink}" "${guessed_lang}"
 	    return 1
 	elif [ "$WITH_VALGRIND" = 'yes' ] && [ "${tmp}" = "${_VALGRIND_EXIT}" ] && ! [ "${class}" = v ]; then
 	    L_VALGRIND="${L_VALGRIND} ${category}/${name}"
@@ -625,13 +641,17 @@ run_tcase ()
 	    L_KNOWN_BUGS="$L_KNOWN_BUGS ${category}/${name}"
 	    run_result known_error "${oresult}"
 	    run_record_cmdline "${ffilter}" "${ocmdline}"
-	    [ "${RUN_SHRINK}" = 'yes' ] && run_shrink "${cmdline_template}" "${input}" "${oshrink}" "${guessed_lang}"
+	    [ "${RUN_SHRINK}" = 'yes' ] \
+		&& [ $# -eq 0 ] \
+		&& run_shrink "${cmdline_template}" "${input}" "${oshrink}" "${guessed_lang}"
 	    return 0
 	else
 	    L_FAILED_BY_STATUS="$L_FAILED_BY_STATUS ${category}/${name}"
 	    run_result error  "${oresult}" "unexpected exit status: $tmp"
 	    run_record_cmdline "${ffilter}" "${ocmdline}"
-	    [ "${RUN_SHRINK}" = 'yes' ] && run_shrink "${cmdline_template}" "${input}" "${oshrink}" "${guessed_lang}"
+	    [ "${RUN_SHRINK}" = 'yes' ] \
+		&& [ $# -eq 0 ] \
+		&& run_shrink "${cmdline_template}" "${input}" "${oshrink}" "${guessed_lang}"
 	    return 1
 	fi
     elif [ "$WITH_VALGRIND" = 'yes' ] && [ "$class" = 'v' ]; then
@@ -651,7 +671,7 @@ run_tcase ()
     fi
 
     ${output_type}_basename_filter < "${orawout}" | \
-	anon_normalize "${CTAGS}" "${input}" | \
+	anon_normalize "${CTAGS}" "${input}" "$@" | \
 	$ffilter > "${ofiltered}"
 
     {
@@ -685,6 +705,18 @@ run_tcase ()
 }
 
 
+unwanted_file ()
+{
+    local file=$1
+    # ignore backup files
+    if echo "$file" | grep -q '~$'; then
+	return 0
+    elif echo "$file" | grep -q '\*'; then
+	return 0
+    fi
+    return 1
+}
+
 run_dir ()
 {
     local category="$1"
@@ -698,6 +730,9 @@ run_dir ()
     local name
     local class
 
+    local extra_tmp
+    local extra_inputs
+
     #
     # Filtered by CATEGORIES
     #
@@ -709,19 +744,24 @@ run_dir ()
     echo "Category: $category"
     line
     for input in ${base_dir}/*.[dbtiv]/input.*; do
-	# ignore backup files
-	if echo "$input" | grep -q '~$'; then
-	    continue
-	elif echo "$input" | grep -q '\*'; then
+	if unwanted_file "$input"; then
 	    continue
 	fi
+
+	extra_inputs=$(for extra_tmp in $(dirname $input)/input-[0-9].* \
+					$(dirname $input)/input-[0-9]-*.* ; do
+	    if unwanted_file "$extra_tmp"; then
+		continue
+	    fi
+	    echo "$extra_tmp"
+	done | sort)
 
 	tcase_dir="${input%/input.*}"
 	build_tcase_dir="${build_base_dir}/${tcase_dir#${base_dir}/}"
 	name="${tcase_dir%.[dbtiv]}"
 	name="${name##*/}"
 	class="${tcase_dir#*${name}.}"
-	run_tcase "${input}" "${tcase_dir}" "${name}" "${class}" "${category}" "${build_tcase_dir}"
+	run_tcase "${input}" "${tcase_dir}" "${name}" "${class}" "${category}" "${build_tcase_dir}" ${extra_inputs}
     done
 
     return 0

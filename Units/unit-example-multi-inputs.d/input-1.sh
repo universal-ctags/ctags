@@ -1,0 +1,4 @@
+function shell_func
+{
+	:
+}
