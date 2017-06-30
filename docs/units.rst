@@ -46,6 +46,11 @@ have its own directory under Units directory.
 	Input file name must have a *input* as basename. *TEST*
 	part should explain the test case well.
 
+*Units/TEST/input-[0-9].\** *Units/TEST/input-[0-9]-*.\** **optional**
+
+	Optional input file names. They are put next to *input.\** in
+	testing command line.
+
 *Units/TEST/expected.tags* **optional**
 
 	Expected output file must have a name *expected.tags*. It

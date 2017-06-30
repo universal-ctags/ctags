@@ -1,0 +1,11 @@
+main	input.c	/^main(void)$/;"	f	language:C	typeref:typename:int
+point	input-0.h	/^struct point {$/;"	s	language:C++
+x	input-0.h	/^	int x;$/;"	m	language:C++	struct:point	typeref:typename:int
+y	input-0.h	/^	int y;$/;"	m	language:C++	struct:point	typeref:typename:int
+shell_func	input-1.sh	/^function shell_func$/;"	f	language:Sh
+__anon3cd860c60108	input-2.c	/^struct {$/;"	s	language:C	file:
+name	input-2.c	/^	char *name;$/;"	m	language:C	struct:__anon3cd860c60108	typeref:typename:char *	file:
+x	input-2.c	/^} x;$/;"	v	language:C	typeref:struct:__anon3cd860c60108
+__anon3cd865070108	input-3.c	/^struct {$/;"	s	language:C	file:
+age	input-3.c	/^	int age;$/;"	m	language:C	struct:__anon3cd865070108	typeref:typename:int	file:
+y	input-3.c	/^} y;$/;"	v	language:C	typeref:struct:__anon3cd865070108
