@@ -2027,6 +2027,8 @@ static void findOcamlTags (void)
 
 	nextSt.name = vStringNew ();
 	nextSt.cp = readLineFromInputFile ();
+	ocaLineNumber = getInputLineNumber();
+	ocaFilePosition = getInputFilePosition();
 	toDoNext = &globalScope;
 	nextTok = lex (&nextSt);
 
