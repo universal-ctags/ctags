@@ -1,0 +1,4 @@
+Input	input.ml	/^let foo_function a b = (a, b)$/;"	M	line:1
+foo_function	input.ml	/^let foo_function a b = (a, b)$/;"	f	line:1
+Input-0	input-0.ml	/^let bar_function x y = (x, y)$/;"	M	line:1
+bar_function	input-0.ml	/^let bar_function x y = (x, y)$/;"	f	line:1

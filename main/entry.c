@@ -100,7 +100,7 @@ typedef struct eTagFile {
 *   DATA DEFINITIONS
 */
 
-tagFile TagFile = {
+static tagFile TagFile = {
     NULL,               /* tag file name */
     NULL,               /* tag file directory (absolute) */
     NULL,               /* file pointer */
@@ -444,10 +444,14 @@ extern void openTagFile (void)
 		if (TagFile.mio == NULL)
 			error (FATAL | PERROR, "cannot open tag file");
 	}
-	if (TagsToStdout)
-		TagFile.directory = eStrdup (CurrentDirectory);
-	else
-		TagFile.directory = absoluteDirname (TagFile.name);
+
+	if (TagFile.directory == NULL)
+	{
+		if (TagsToStdout)
+			TagFile.directory = eStrdup (CurrentDirectory);
+		else
+			TagFile.directory = absoluteDirname (TagFile.name);
+	}
 }
 
 #ifdef USE_REPLACEMENT_TRUNCATE

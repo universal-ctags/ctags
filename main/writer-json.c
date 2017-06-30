@@ -150,11 +150,13 @@ static void addExtensionFields (json_t *response, const tagEntryInfo *const tag)
 static int writeJsonEntry (tagWriter *writer CTAGS_ATTR_UNUSED,
 			       MIO * mio, const tagEntryInfo *const tag)
 {
-	json_t *response = json_pack ("{ss ss ss so}",
+	json_t *pat = escapeFieldValue(tag, FIELD_PATTERN, true);
+	json_t *response = json_pack ("{ss ss ss sO}",
 		"_type", "tag",
 		"name", tag->name,
 		"path", tag->sourceFileName,
-		"pattern", escapeFieldValue(tag, FIELD_PATTERN, true));
+		"pattern", pat);
+	json_decref (pat);
 
 	if (includeExtensionFlags ())
 	{
