@@ -305,7 +305,7 @@ fields and extras.
    ``--list-kinds``     (done)
    ``--list-kinds-full``(done)
    ``--list-fields``
-   ``--list-extras``
+   ``--list-extras``    (done)
    ``--list-roles``
    ``--kinds-<LANG>=``  (done)
    ``--fields=``
@@ -952,6 +952,33 @@ OPTION ITEMS
 	Lists the aliases for either the specified language or all
 	languages, and then exits. The aliases are used in when guessing
 	a parser for a source file.
+
+``--list-extras[=languages|all]``
+	Lists the extras recognized for either the specified language or
+	"all" languages. See "Extras" subsection to know what are extras.
+
+	An extra can be enabled or disabled with ``--extras=`` for common
+	extras in all languages, or ``--extras-<LANG>=`` for the specified
+	language.  These option takes one-letter flag or name as a parameter
+	for specifying an extra.
+
+	The meaning of columns are as follows:
+
+	LETTER
+		One-letter flag. '-' means the extra does not have one-letter flag.
+
+	NAME
+		The name of extra. The name is used in ``extras:`` field.
+
+	ENABLED
+		Whether the extra is enabled or not. It takes "yes" or "no".
+
+	LANGUAGE
+		The name of language if the extra is owned by a parser.
+		"NONE" means the extra is common in parsers.
+
+	DESCRIPTION
+		Human readable description for the extra.
 
 ``--list-features``
 	Lists the compiled features.
