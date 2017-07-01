@@ -1065,6 +1065,9 @@ OPTION ITEMS
 	``--list-map-extensions`` or ``--list-map-patterns`` option.
 	See the ``--langmap`` option, and "SOURCE FILES", above.
 
+	This option does not work with ``--machinable`` nor
+	``--with-list-header``.
+
 ``--list-languages``
 	Lists the names of the languages understood by @CTAGS_NAME_EXECUTABLE@,
 	and then exits. These language names are case insensitive and may be
