@@ -302,8 +302,8 @@ fields and extras.
 
 .. options should be explained and revised here
    ``--list-languages`` (done)
-   ``--list-kinds``
-   ``--list-kinds-full``
+   ``--list-kinds``     (done)
+   ``--list-kinds-full``(done)
    ``--list-fields``
    ``--list-extras``
    ``--list-roles``
@@ -953,14 +953,94 @@ OPTION ITEMS
 	Lists the compiled features.
 
 ``--list-kinds[=language|all]``
-	Lists the tag kinds recognized for either the specified language or all
-	languages, and then exits. Each kind of tag recorded in the tag file
-	is represented by a one-letter flag, which is also used to filter the
-	tags placed into the output through use of the ``--<LANG>-kinds`` option.
-	Note that some languages and/or tag kinds may be implemented using
-	regular expressions and may not be available if regex support is not
-	compiled into @CTAGS_NAME_EXECUTABLE@ (see the ``--regex-<LANG>`` option).
-	Each kind listed is enabled unless followed by "[off]".
+	Subset of ``--list-kinds-full``. This option is kept for
+	backward-compatibility with Exuberant-ctags.
+
+	This option prints only LETTER, DESCRIPTION, and ENABLED fields
+	of ``--list-kinds-full`` output. However, the presentation of
+	ENABLED column is different from that of ``--list-kinds-full``
+	option; "[off]" follows after description if the kind is disabled,
+	and nothing follows	if enabled. The most of all kinds are enabled
+	by default.
+
+	The critical weakness of this option is that this option does not
+	print the name of kind. Universal-ctags introduces
+	``--list-kinds-full`` because it considers that names are
+	important.
+
+	This option does not work with ``--machinable`` nor
+	``--with-list-header``.
+
+``--list-kinds-full[=language|all]``
+	Lists the tag kinds recognized for either the specified language
+	or "all" languages, and then exits. See "Kinds" subsection to
+	know what are kinds.
+
+	Each kind of tag recorded in the tag file is represented by a
+	one-letter flag, or name. They are also used to filter the tags
+	placed into the output through use of the ``--kinds-<LANG>``
+	option.
+
+	The meaning of columns are as follows:
+
+	LANGUAGE
+		The name of language having the kind.
+
+	LETTER
+		One-letter flag. This must be unique in a language.
+
+	NAME
+		Name of the kind. This can be used as the alternative
+		one-letter flag described above. If enabling 'K' field with
+		`--fields=+K`, @CTAGS_NAME_EXECUTABLE@ uses name instead of
+		letter in tags output. To enable/disable a kind with
+		``--kinds-<LANG>`` option, name surrounded by braces instead
+		of letter. See "Letters and names" for details. This must be
+		unique in a language.
+
+	ENABLED
+		Whether the kind is enabled or not. It takes "yes" or "no".
+
+	REFONLY
+		Whether the kind is specialized for reference tagging or not.
+		If the column is "yes", the kind is for reference tagging, and
+		it is never used for definition tagging. See also "TAG ENTRY".
+
+	NROLES
+		The number of roles this kind has. See also "Roles".
+
+	MASTER
+		The master parser controlling enablment of the kind.
+		A kind belongs to a language (owner) in Universal-ctags;
+		enabling and disabling a kind in a language has no effect on
+		a kind in another language even if the both kinds has the
+		same letter and/or the same name. In other words,
+		the namespace of kinds are separated by language.
+
+		However, Exuberant-ctags does not separate the kinds of C and
+		C++. Enabling/disabling kindX in C language enables/disables a
+		kind in C++ language having the same name with kindX. To
+		emulate this behavior in Universal-ctags, a concept named
+		"master parser" is introduced. Enabling/disabling some kinds
+		are synchronized under the control of a master language.
+
+		.. code-block:: console
+
+			$ ctags --kinds-C=+'{local}' --list-kinds-full \
+			  | grep -E '^(#|C\+\+ .* local)'
+			#LANGUAGE  LETTER NAME   ENABLED REFONLY NROLES MASTER DESCRIPTION
+			C++        l      local  yes     no      0      C      local variables
+			$ ctags --kinds-C=-'{local}' --list-kinds-full \
+			  | grep -E '^(#|C\+\+ .* local)'
+			#LANGUAGE  LETTER NAME   ENABLED REFONLY NROLES MASTER DESCRIPTION
+			C++        l      local  no      no      0      C      local variables
+
+		You see "ENABLED" field of "local" kind of C++ language is changed
+		Though "local" kind of C language is enabled/disabled. If you swap the languages, you
+		see the same result.
+
+	DESCRIPTION
+		Human readable description for the kind.
 
 ``--list-map-extensions[=language|all]``
 	Lists the file extensions which associate a file
