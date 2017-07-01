@@ -2152,14 +2152,15 @@ extern bool processKindsOption (
 			foreachLanguage(processLangKindDefinitionEach, &arg);
 		else
 		{
-			vString* langName = vStringNew ();
-			vStringNCopyS (langName, option, len);
-			language = getNamedLanguage (vStringValue (langName), 0);
+			language = getNamedLanguage (option, len);
 			if (language == LANG_IGNORE)
-				error (WARNING, "Unknown language \"%s\" in \"%s\" option", vStringValue (langName), option);
+			{
+				char *langName = eStrndup (option, len);
+				error (WARNING, "Unknown language \"%s\" in \"%s\" option", langName, option);
+				eFree (langName);
+			}
 			else
 				processLangKindDefinition (language, option, parameter);
-			vStringDelete (langName);
 		}
 		handled = true;
 	}
