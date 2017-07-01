@@ -307,7 +307,7 @@ fields and extras.
    ``--list-fields``
    ``--list-extras``
    ``--list-roles``
-   ``--kinds-<LANG>=``
+   ``--kinds-<LANG>=``  (done)
    ``--fields=``
    ``--fields-<LANG>``
    ``--extras=``
