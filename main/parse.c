@@ -2148,7 +2148,7 @@ extern bool processKindsOption (
 	{
 		size_t len = dash - option;
 
-		if ((len == 1) && (*option == '*'))
+		if ((len == 3) && (strncmp (option, RSV_LANG_ALL, len) == 0))
 			foreachLanguage(processLangKindDefinitionEach, &arg);
 		else
 		{
@@ -2167,13 +2167,11 @@ extern bool processKindsOption (
 	else if ( strncmp (option, PREFIX, PREFIX_LEN) == 0 )
 	{
 		const char* lang;
-		size_t len;
 
 		lang = option + PREFIX_LEN;
-		len = strlen (lang);
-		if (len == 0)
+		if (lang[0] == '\0')
 			error (WARNING, "No language given in \"%s\" option", option);
-		else if (len == 1 && lang[0] == '*')
+		else if (strcmp (lang, RSV_LANG_ALL) == 0)
 			foreachLanguage(processLangKindDefinitionEach, &arg);
 		else
 		{
