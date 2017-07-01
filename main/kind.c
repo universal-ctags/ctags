@@ -14,6 +14,8 @@
 
 #include <stdio.h>
 #include <string.h>
+
+#include "ctags.h"
 #include "debug.h"
 #include "kind.h"
 #include "parse.h"
@@ -263,7 +265,7 @@ extern void kindColprintFillLine (struct colprintLine *line,
 	colprintLineAppendColumnInt (line, kdef->nRoles);
 	colprintLineAppendColumnCString (line, (kdef->master
 											|| kdef->slave ) ?
-									 getLanguageName (kdef->syncWith): "NONE");
+									 getLanguageName (kdef->syncWith): RSV_NONE);
 	colprintLineAppendColumnCString (line, kdef->description? kdef->description: "NO DESCRIPTION GIVEN");
 }
 

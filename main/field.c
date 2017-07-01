@@ -1027,11 +1027,11 @@ static void  fieldColprintAddLine (struct colprintTable *table, int i)
 								  : fdef->letter);
 
 	const char *name = getFieldName (i);
-	colprintLineAppendColumnCString (line, name? name: "NONE");
+	colprintLineAppendColumnCString (line, name? name: RSV_NONE);
 	colprintLineAppendColumnBool (line, fdef->enabled);
 	colprintLineAppendColumnCString (line,
 									 fobj->language == LANG_IGNORE
-									 ?"NONE"
+									 ? RSV_NONE
 									 : getLanguageName (fobj->language));
 
 	colprintLineAppendColumnBool (line, fdef->renderEscaped[WRITER_DEFAULT]? true: false);
@@ -1109,14 +1109,14 @@ static int fieldColprintCompareLines (struct colprintLine *a , struct colprintLi
 			 && (strcmp (b_fixed, "yes") == 0))
 		return 1;
 
-	if (strcmp (a_parser, "NONE") == 0
-		&& strcmp (b_parser, "NONE") != 0)
+	if (strcmp (a_parser, RSV_NONE) == 0
+		&& strcmp (b_parser, RSV_NONE) != 0)
 		return -1;
-	else if (strcmp (a_parser, "NONE") != 0
-			 && strcmp (b_parser, "NONE") == 0)
+	else if (strcmp (a_parser, RSV_NONE) != 0
+			 && strcmp (b_parser, RSV_NONE) == 0)
 		return 1;
-	else if (strcmp (a_parser, "NONE") != 0
-			 && strcmp (b_parser, "NONE") != 0)
+	else if (strcmp (a_parser, RSV_NONE) != 0
+			 && strcmp (b_parser, RSV_NONE) != 0)
 	{
 		int r;
 		r = strcmp (a_parser, b_parser);

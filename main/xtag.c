@@ -11,6 +11,7 @@
  */
 
 #include "general.h"  /* must always come first */
+#include "ctags.h"
 #include "debug.h"
 #include "main.h"
 #include "options.h"
@@ -139,7 +140,7 @@ static void  xtagColprintAddLine (struct colprintTable *table, int xtype)
 	colprintLineAppendColumnBool (line, xdef->enabled);
 	colprintLineAppendColumnCString (line,
 									 xobj->language == LANG_IGNORE
-									 ?"NONE"
+									 ? RSV_NONE
 									 : getLanguageName (xobj->language));
 	colprintLineAppendColumnCString (line, xdef->description);
 }
@@ -166,14 +167,14 @@ static int xtagColprintCompareLines (struct colprintLine *a , struct colprintLin
 	const char *a_parser = colprintLineGetColumn (a, 3);
 	const char *b_parser = colprintLineGetColumn (b, 3);
 
-	if (strcmp (a_parser, "NONE") == 0
-		&& strcmp (b_parser, "NONE") != 0)
+	if (strcmp (a_parser, RSV_NONE) == 0
+		&& strcmp (b_parser, RSV_NONE) != 0)
 		return -1;
-	else if (strcmp (a_parser, "NONE") != 0
-			 && strcmp (b_parser, "NONE") == 0)
+	else if (strcmp (a_parser, RSV_NONE) != 0
+			 && strcmp (b_parser, RSV_NONE) == 0)
 		return 1;
-	else if (strcmp (a_parser, "NONE") != 0
-			 && strcmp (b_parser, "NONE") != 0)
+	else if (strcmp (a_parser, RSV_NONE) != 0
+			 && strcmp (b_parser, RSV_NONE) != 0)
 	{
 		int r;
 		r = strcmp (a_parser, b_parser);

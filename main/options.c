@@ -2583,7 +2583,7 @@ static void processDataDir (
 		path = parameter + 1;
 		prependToDataPathList (path, true);
 	}
-	else if (!strcmp (parameter, "NONE"))
+	else if (!strcmp (parameter, RSV_NONE))
 		resetDataPathList ();
 	else
 	{
@@ -3274,7 +3274,7 @@ extern void previewFirstOption (cookedArgs* const args)
 		    || strcmp (args->item, "quiet") == 0)
 			parseOption (args);
 		else if (strcmp (args->item, "options") == 0  &&
-				strcmp (args->parameter, "NONE") == 0)
+				strcmp (args->parameter, RSV_NONE) == 0)
 		{
 			notice ("No options will be read from files or environment");
 			SkipConfiguration = true;

@@ -15,6 +15,7 @@
 
 #include <string.h>
 
+#include "ctags.h"
 #include "debug.h"
 #include "entry.h"
 #include "flags.h"
@@ -2904,7 +2905,7 @@ static void printGuessedParser (const char* const fileName, langType language)
 	if (language == LANG_IGNORE)
 	{
 		Option.printLanguage = ((int)true) + 1;
-		parserName = "NONE";
+		parserName = RSV_NONE;
 	}
 	else
 		parserName = LanguageTable [language].def->name;

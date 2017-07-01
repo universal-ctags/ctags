@@ -16,6 +16,7 @@
 #include <string.h>
 #include <stdio.h>
 
+#include "ctags.h"
 #include "flags.h"
 #include "vstring.h"
 #include "routines.h"
@@ -102,7 +103,7 @@ extern void flagsColprintAddDefinitions (struct colprintTable *table, flagDefini
 			shortChar = '-';
 		colprintLineAppendColumnChar (line, shortChar);
 
-		vStringCopyS (longName, def[i].longStr? def[i].longStr: "NONE");
+		vStringCopyS (longName, def[i].longStr? def[i].longStr: RSV_NONE);
 		paramName = def[i].paramName;
 		if (paramName)
 		{
