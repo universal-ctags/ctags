@@ -392,8 +392,9 @@ the header, a client tool can find the index for the target
 column.
 
 .. options should be explained and revised here
-   ``--list-features`` (done)
-
+   ``--list-features``    (done)
+   ``--machinable``       (done)
+   ``--with-list-header`` (done)
 
 OPTION ITEMS
 ------------
@@ -986,6 +987,11 @@ OPTION ITEMS
 	used in the ``--language-force``, ``--languages``, ``--<LANG>-kinds``,
 	and ``--regex-<LANG>`` options.
 
+``--machinable[=yes|no]``
+	Use tab character as separators for ``--list-`` option output.  It
+	may be suitable for scripting. See "List options" for considered
+	use cases. Disabled by default.
+
 ``--map-<LANG>=[+|-]extension|pattern``
 	This option provides the way to control mapping(s) of file names to
 	languages more fine-grained way than ``--langmap`` option.
@@ -1129,6 +1135,10 @@ OPTION ITEMS
 	environment variable. However, if this option is the first argument on
 	the command line, it will take effect before any options are read from
 	these sources. The default is no.
+
+``--with-list-header[=yes|no]``
+	Print headers describing columns in ``--list-`` option output.
+	See also "List options".
 
 ``--version``
 	Prints a version identifier for @CTAGS_NAME_EXECUTABLE@ to standard
