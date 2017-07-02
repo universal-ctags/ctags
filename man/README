@@ -19,6 +19,8 @@ Testing and verification
 
   - "default"
   - "all"
+  - "NONE"
+  - '-'
 
 * verify whether + and - can be used as part of language names:
 
