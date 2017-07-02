@@ -1,17 +1,17 @@
-E       UCTAGSextras        no      NONE             yes  s--    no    Extra tag type information
-Z       UCTAGSscope         no      NONE             yes  s--    no    Include the "scope:" key in scope field (use s) in tags output, scope name in xref output
-e       UCTAGSend           no      NONE             yes  -i-    no    end lines of various items
-p       UCTAGSscopeKind     no      NONE             yes  s--    no    Kind of scope as full name
-r       UCTAGSrole          no      NONE             yes  s--    no    Role
-x       UCTAGSxpath         no      NONE             yes  s--    no    xpath for the tag
--       UCTAGSproperties    no      C                yes  s--    no    properties (static, inline, mutable,...)
--       UCTAGScaptures      no      C++              yes  s--    no    lambda capture list
--       UCTAGSname          yes     C++              yes  s--    no    aliased names
--       UCTAGSproperties    no      C++              yes  s--    no    properties (static, inline, mutable,...)
--       UCTAGStemplate      no      C++              yes  s--    no    template parameters
--       UCTAGSproperties    no      CUDA             yes  s--    no    properties (static, inline, mutable,...)
--       UCTAGSassignment    yes     LdScript         yes  s--    no    how a value is assigned to the symbol
--       UCTAGSdecorators    no      Python           yes  s--    no    decorators on functions and classes
--       UCTAGShome          yes     passwd           yes  s--    no    home directory
--       UCTAGSshell         yes     passwd           yes  s--    no    login shell
--       UCTAGSsectionMarker no      reStructuredText yes  s--    no    character used for declaring section
+E       UCTAGSextras        no      NONE             s--    no    Extra tag type information
+Z       UCTAGSscope         no      NONE             s--    no    Include the "scope:" key in scope field (use s) in tags output, scope name in xref output
+e       UCTAGSend           no      NONE             -i-    no    end lines of various items
+p       UCTAGSscopeKind     no      NONE             s--    no    Kind of scope as full name
+r       UCTAGSrole          no      NONE             s--    no    Role
+x       UCTAGSxpath         no      NONE             s--    no    xpath for the tag
+-       UCTAGSproperties    no      C                s--    no    properties (static, inline, mutable,...)
+-       UCTAGScaptures      no      C++              s--    no    lambda capture list
+-       UCTAGSname          yes     C++              s--    no    aliased names
+-       UCTAGSproperties    no      C++              s--    no    properties (static, inline, mutable,...)
+-       UCTAGStemplate      no      C++              s--    no    template parameters
+-       UCTAGSproperties    no      CUDA             s--    no    properties (static, inline, mutable,...)
+-       UCTAGSassignment    yes     LdScript         s--    no    how a value is assigned to the symbol
+-       UCTAGSdecorators    no      Python           s--    no    decorators on functions and classes
+-       UCTAGShome          yes     passwd           s--    no    home directory
+-       UCTAGSshell         yes     passwd           s--    no    login shell
+-       UCTAGSsectionMarker no      reStructuredText s--    no    character used for declaring section
