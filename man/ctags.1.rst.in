@@ -310,8 +310,8 @@ fields and extras.
    ``--kinds-<LANG>=``  (done)
    ``--fields=``
    ``--fields-<LANG>``
-   ``--extras=``
-   ``--extras-<LANG>=``
+   ``--extras=``        (done)
+   ``--extras-<LANG>=`` (done)
 
 
 COMMAND LINE INTERFACE
@@ -656,41 +656,87 @@ OPTION ITEMS
 		are generally identical, making pattern searches useless
 		for finding all matches.
 
+``--extra=[+|-]flags|*``
+	Equivalent to ``--extras=[+|-]flags|*``, which is introduced to
+	make the option naming convention align to the other options
+	like ``--kinds-<LANG>=`` and ``--fields=``.
+
+	This option is kept for backward-compatibility with Exuberant-ctags.
+
+``--extras-<LANG>=[+|-]flags|*``
+	Specifies whether to include extra tag entries for certain kinds of
+	information about <LANG>. Universal-ctags
+	introduces language own extras. (See "Language own fields and
+	extras" about the concept). This option is for controlling them.
+
+	Specifies "all" as <LANG> to apply the parameter flags to all
+	extras; all extras are enabled with specifying '*' as the
+	parameter flags. If specifying nothing as the parameter flags
+	("--extras-all="), all extras are disabled. These two combinations
+	are useful for testing.
+
 ``--extras=[+|-]flags|*``
 	Specifies whether to include extra tag entries for certain kinds of
-	information. The parameter flags is a set of one-letter flags, each
+	information. See also "Extras" subsection to know what are kinds.
+
+	The parameter flags is a set of one-letter flags, each
 	representing one kind of extra tag entry to include in the tag file.
 	If flags is preceded by either the '+' or '-' character, the effect of
 	each flag is added to, or removed from, those currently enabled;
 	otherwise the flags replace any current settings. All entries are
-	included  if '*' is given. The meaning of each flag is as follows:
+	included  if '*' is given.
 
-	F
+	This ``--extras=`` option is for controlling extras common in
+	languages (or language in-depends extras).  Universal-ctags
+	introduces language own extras. (See "Language own fields and
+	extras" about the concept). Use ``--extras-<LANG>=`` option for
+	controlling them.
+
+	The meaning of major extras is as follows (one-letter flag/name):
+
+	F/fileScope
 		Equivalent to ``--file-scope``.
-		This option is on by default.
 
-	f
+	f/inputFile
 		Include an entry for the base file name of every source file
 		(e.g. "example.c"), which addresses the first line of the file.
+		If ``end:`` field is enabled, the end line number of the file
+		can be attached to the tag.
 
-	p
+	p/pseudo
 		Include pseudo tags. Enabled by default unless the tag file is
 		written to standard output.
 
-	q
-		Include an extra class-qualified tag entry for each tag which is a
-		member of a class (for languages for which this information is
-		extracted; currently C++, Eiffel, Java, and Perl). The actual form
-		of the qualified tag depends upon the language from which the tag
-		was derived (using a form that is most natural for how qualified
-		calls are specified in the language). For C++ and Perl, it is in the
-		form "class::member"; for Eiffel and Java, it is in the form
-		"class.member". This may allow easier location of a specific tags
-		when multiple occurrences of a tag name occur in the tag file.
-		Note, however, that this could potentially more than double the
-		size of the tag file.
+	q/qualified
+		Include an extra class-qualified or namespace-qualified tag entry
+		for each tag which is a member of a class or a namespace.
 
-	``--extra`` option in Exuberant-ctags is renamed to ``--extras``.
+		This may allow easier location of a specific tags when
+		multiple occurrences of a tag name occur in the tag file.
+		Note, however, that this could potentially more than double
+		the size of the tag file.
+
+		The actual form of the qualified tag depends upon the language
+		from which the tag was derived (using a form that is most
+		natural for how qualified calls are specified in the
+		language). For C++ and Perl, it is in the form
+		"class::member"; for Eiffel and Java, it is in the form
+		"class.member".
+
+		Note: Using backslash characters as separators forming
+		qualified name in PHP. However, in tags output of
+		Universal-ctags, a backslash character in a name is escaped
+		with a backslash character.
+
+		.. TODO: Write about the detail of escaping in somewhere.
+
+	Inquire the output of ``--list-extras`` option for the other minor
+	extras.
+
+	A name associated with an extra can be used as alternative to to a
+	one-letter flag. Some minor extras have no one-letters flag. In
+	that case, names must be specified anyway. See "Letters and names"
+	for more details.
 
 ``--fields=[+|-]flags|*``
 	Specifies the available extension fields which are to be included in
@@ -751,6 +797,11 @@ OPTION ITEMS
 	cannot be seen outside of the file in which they are defined, such as
 	"static" tags) should be included in the output. See, also, the ``-h``
 	option. This option is enabled by default.
+
+	Universal-ctags provides alternative way to control this option,
+	"F/fileScope" extra, and recommends users to use the
+	extra. However, this extra can cause a trouble.
+	See ctags-incompatibilities(7).
 
 ``--filter[=yes|no]``
 	Causes @CTAGS_NAME_EXECUTABLE@ to behave as a filter, reading source
