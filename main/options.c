@@ -2945,7 +2945,7 @@ static bool processLangSpecificExtraOption (const char *const option,
 
 	if (len == 0)
 		error (FATAL, "No language given in \"%s\" option", option);
-	else if (len == 1 && lang[0] == '*')
+	else if (len == 3 && (strncmp(lang, RSV_LANG_ALL, len) == 0))
 		language = LANG_AUTO;
 	else
 		language = getNamedLanguage (lang, len);
