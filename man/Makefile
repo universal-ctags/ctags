@@ -54,7 +54,10 @@ pdf: $(pdf_pages)
 ifeq ($(QUICK),)
 	(cd ..; ./configure $(CONFIGURE_FLAGS))
 else
-	cp $< $@
+	sed \
+		-e s/@CTAGS_NAME_EXECUTABLE@/ctags/g \
+		-e s/@ETAGS_NAME_EXECUTABLE@/etags/g \
+	< $< > $@
 endif
 
 %: %.rst
