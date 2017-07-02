@@ -24,8 +24,8 @@ Universal-ctags forked from Exuberant-ctags.
 Incompatibilities in command line interface
 -------------------------------------------------------------
 
-``--langmap``
-~~~~~~~~~~~~~~
+The order of application of patterns and extensions in ``--langmap``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 When applying mappings for a name of given source file,
 Exuberant-ctags tests file name patterns AFTER file extensions
