@@ -348,7 +348,7 @@ built-in language names.
 Letters and names
 ~~~~~~~~~~~~~~~~~
 
-Some options take letters as flags (e.g. ``--kinds-<LANG>`` option).
+Some options take letters as parameters (e.g. ``--kinds-<LANG>`` option).
 Specifying just letters help a user make a complicated command line
 quickly.  However, the command line including sequence of the letters
 becomes difficult to be understood.
