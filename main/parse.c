@@ -2174,22 +2174,16 @@ extern bool processKindsOption (
 		if (len == 0)
 			error (WARNING, "No language given in \"%s\" option", option);
 		else if (len == 1 && lang[0] == '*')
-		{
 			foreachLanguage(processLangKindDefinitionEach, &arg);
-			handled = true;
-		}
 		else
 		{
 			language = getNamedLanguage (lang, 0);
 			if (language == LANG_IGNORE)
 				error (WARNING, "Unknown language \"%s\" in \"%s\" option", lang, option);
 			else
-			{
 				processLangKindDefinition (language, option, parameter);
-				handled = true;
-			}
 		}
-
+		handled = true;
 	}
 	return handled;
 #undef PREFIX
