@@ -12,3 +12,6 @@ libxml2
 libyaml
 mingw
 seccomp
+#
+incref
+decref
