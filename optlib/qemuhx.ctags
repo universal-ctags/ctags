@@ -30,10 +30,10 @@
 #
 
 --langdef=QemuHX
-	--kinddef-QemuHX=q,qmp,QEMU Managment Protocol dispatch table entries
+	--kinddef-QemuHX=q,qmp,QEMU Management Protocol dispatch table entries
 	--kinddef-QemuHX=i,infoitem,item in texinfo doc
 	--map-QemuHX=+.hx
-	--extradef-QemuHX=funcmap,mapping SQMP to C function name
+	--extradef-QemuHX=funcmap,Include mapping SQMP to C function name
 	--extras-QemuHX=+{funcmap}
 	--regex-QemuHX=/^SQMP[[:space:]]([-a-z_0-9A-Z]+)[[:space:]]---/\1/q/{_multiline=1}
 	--regex-QemuHX=/^SQMP[[:space:]]([-a-z_0-9A-Z]+)[[:space:]]---/qmp_\1/q/{_multiline=1}{_extra=funcmap}
