@@ -825,6 +825,9 @@ OPTION ITEMS
 	but exclude macros, use "--c-kinds=+px-d"; to include only tags for
 	functions, use "--c-kinds=f".
 
+	A name associated with a kind can be used as alternative to to a
+	one-letter flag. See "Letters and names" for more details.
+
 ``--<LANG>-kinds=[+|-]kinds|*``
 	Equivalent to ``--kinds-<LANG>=...``. This option is kept for
 	backward-compatibility with Exuberant-ctags.
