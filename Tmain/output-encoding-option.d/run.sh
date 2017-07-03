@@ -16,6 +16,5 @@ if ${CTAGS} --quiet --options=NONE --list-features | grep -q multibyte ; then
   fi
   exit $?
 else
-  echo "multibyte feature is not available"
-  exit 77
+	skip "multibyte feature is not available"
 fi

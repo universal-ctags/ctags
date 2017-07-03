@@ -5,17 +5,17 @@
 
 READTAGS=$3
 
+. ../utils.sh
+
 #V="valgrind --leak-check=full -v"
 V=
 
 if ! [ -x "${READTAGS}" ]; then
-    echo "no readtags"
-    eixt 77
+	skip "no readtags"
 fi
 
 if ! ( "${READTAGS}" -h | grep -q -e -Q ); then
-    echo "no qualifier function in readtags"
-    exit 77
+    skip "no qualifier function in readtags"
 fi
 
 echo ';; (suffix? $name "q")' &&

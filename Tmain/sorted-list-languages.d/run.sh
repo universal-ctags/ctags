@@ -2,9 +2,10 @@
 # License: GPL-2
 CTAGS=$1
 
+. ../utils.sh
+
 if ! sort --help | grep --quiet GNU; then
-    echo "GNU sort is needed to run this test case"
-    exit 77
+    skip "GNU sort is needed to run this test case"
 fi
 
 list_languages()
@@ -18,5 +19,3 @@ diff -uN ./ll.tmp ./sorted-ll.tmp
 r=$?
 rm ./ll.tmp ./sorted-ll.tmp
 exit $r
-
-

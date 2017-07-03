@@ -3,9 +3,10 @@
 
 CTAGS=$1
 
+. ../utils.sh
+
 if ! sort --help | grep --quiet GNU; then
-    echo "GNU sort is needed to run this test case"
-    exit 77
+    skip "GNU sort is needed to run this test case"
 fi
 
 print_help()
