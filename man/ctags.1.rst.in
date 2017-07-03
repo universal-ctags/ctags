@@ -306,7 +306,7 @@ fields and extras.
    ``--list-kinds-full``(done)
    ``--list-fields``    (done)
    ``--list-extras``    (done)
-   ``--list-roles``
+   ``--list-roles``     (done)
    ``--kinds-<LANG>=``  (done)
    ``--fields=``        (done)
    ``--fields-<LANG>``  (done)
@@ -730,6 +730,9 @@ OPTION ITEMS
 
 		.. TODO: Write about the detail of escaping in somewhere.
 
+	r/reference
+		Include reference tags. See "TAG ENTRIES" about reference tags.
+
 	Inquire the output of ``--list-extras`` option for the other minor
 	extras.
 
@@ -805,6 +808,9 @@ OPTION ITEMS
 
 	p/scopeKind
 		Kind of scope as full name
+
+	r/role
+		Role of reference tag
 
 	s
 		Scope of tag definition. Enabled by default.
@@ -1247,6 +1253,32 @@ OPTION ITEMS
 
 	This option does not work with ``--machinable`` nor
 	``--with-list-header``.
+
+``--list-roles[=language|all[.kinds]]``
+	List the roles for either the specified language or "all"
+	languages. If the parameter kinds is given after the parameter
+	language or "all" with concatenating with '.', list only roles
+	defined in the kinds. Both one-letter flags and names surrounded
+	by braces are acceptable as the parameter kinds.
+
+	The meaning of columns are as follows:
+
+	LANGUAGE
+		Name of language having the role.
+
+	KIND(L/N)
+		One-letter flag and name of kind having the role.
+
+	NAME
+		Name of the role.
+
+	ENABLED
+		Whether the kind is enabled or not. It takes "yes" or "no".
+		(Currently all roles are enabled. No option for disabling
+		a specified role is not implemented yet.)
+
+	DESCRIPTION
+		Human readable description for the role.
 
 ``--machinable[=yes|no]``
 	Use tab character as separators for ``--list-`` option output.  It
