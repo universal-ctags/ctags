@@ -245,19 +245,28 @@ function tmain_inspect_cmd_shell
     )
 }
 
+function tmain_inspect_run
+{
+    local t=$1
+    make tmain UNITS=$(basename $t .d)
+}
+
 do_tmain_inspect()
 {
     local next=0
     local r
     local t=$1
 
-    select r in '<n>ext' '<S>hell' '<q>uit'; do
+    select r in '<n>ext' '<S>hell' '<R>un' '<q>uit'; do
 	case $r-$REPLY in
 	    ("<n>ext"-*|-n)
 		next=1
 		;;
 	    ("<S>hell"-*|-S)
 		tmain_inspect_cmd_shell "$t"
+		;;
+	    ("<R>un"-*|-R)
+		tmain_inspect_run "$t"
 		;;
 	    ("<q>uit"-*|-q|-quit)
 		inspect_cmd_quit
