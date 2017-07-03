@@ -481,7 +481,7 @@ OPTION ITEMS
 	This feature is useful when preprocessor macros are used in such a way
 	that they cause syntactic confusion due to their presence. Indeed,
 	this is the best way of working around a number of problems caused by
-	the presence of syntax-busting macros in source files (see CAVEATS).
+	the presence of syntax-busting macros in source files (see "CAVEATS").
 	Some examples will illustrate this point.
 
 	.. code-block:: C
@@ -627,7 +627,7 @@ OPTION ITEMS
 			some editors, such as vim, are able to recover in many such
 			instances).
 		3.	Eliminates finding identical matching, but incorrect, source
-			lines (see BUGS).
+			lines (see "BUGS").
 		4.	Retains separate entries in the tag file for lines which are
 			identical in content. In pattern mode, duplicate entries are
 			dropped because the search patterns they generate are identical,
@@ -1199,7 +1199,7 @@ OPTION ITEMS
 	Volunteers are welcome). As a special case, if "--options=NONE" is
 	specified as the first option on the command line, it will disable
 	the automatic reading of any configuration options from either a file
-	or the environment (see FILES).
+	or the environment (see "FILES").
 
 ``--print-language``
 	Just prints the parsers for specified source files, and then exits.
@@ -1242,7 +1242,7 @@ OPTION ITEMS
 	to a non-empty string of characters, or a warning message will be
 	reported. An optional kind specifier for tags matching regexp may follow
 	replacement, which will determine what kind of tag is reported in the
-	"kind" extension field (see TAG FILE FORMAT, below). The full form of
+	"kind" extension field (see "TAG FILE FORMAT", below). The full form of
 	kind-spec is in the form of a single letter, a comma, a name (without
 	spaces), a comma, a description, followed by a separator, which specify
 	the short and long forms of the kind value and its textual description
@@ -1303,7 +1303,7 @@ OPTION ITEMS
 	and a brief message describing what action is being taken for each file
 	considered by @CTAGS_NAME_EXECUTABLE@. Normally, @CTAGS_NAME_EXECUTABLE@
 	does not read command line arguments until after options are read
-	from the configuration files (see FILES, below) and the CTAGS
+	from the configuration files (see "FILES", below) and the CTAGS
 	environment variable. However, if this option is the first argument on
 	the command line, it will take effect before any options are read from
 	these sources. The default is no.
@@ -1329,7 +1329,7 @@ Unix-style "#!" specification (if supported on the platform). If a
 language was identified, the file is opened and then the appropriate
 language parser is called to operate on the currently open file. The parser
 parses through the file and adds an entry to the tag file for each
-language object it is written to handle. See TAG FILE FORMAT, below, for
+language object it is written to handle. See "TAG FILE FORMAT", below, for
 details on these entries.
 
 This implementation of @CTAGS_NAME_EXECUTABLE@ imposes no formatting
