@@ -146,10 +146,10 @@ static bool recurseUsingOpendir (const char *const dirName)
 				if (strcmp (dirName, ".") == 0)
 					filePath = entry->d_name;
 				else
-				  {
+				{
 					filePath = combinePathAndFile (dirName, entry->d_name);
 					free_p = true;
-				  }
+				}
 				resize |= createTagsForEntry (filePath);
 				if (free_p)
 					eFree (filePath);

@@ -1088,10 +1088,10 @@ extern bool isIncludeFile (const char *const fileName)
 
  static void processConfigFilenameOption (
 		const char *const option CTAGS_ATTR_UNUSED, const char *const parameter)
- {
+{
 	freeString (&Option.configFilename);
 	Option.configFilename = stringCopy (parameter);
- }
+}
 
 static void processEtagsInclude (
 		const char *const option, const char *const parameter)

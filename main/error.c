@@ -37,11 +37,13 @@ extern bool stderrDefaultErrorPrinter (const errorSelection selection,
 		 selected (selection, WARNING) ? "Warning: " : "");
 	vfprintf (stderr, format, ap);
 	if (selected (selection, PERROR))
+	{
 #ifdef HAVE_STRERROR
 		fprintf (stderr, " : %s", strerror (errno));
 #else
-	perror (" ");
+		perror (" ");
 #endif
+	}
 	fputs ("\n", stderr);
 
 	return (selected (selection, FATAL) || Option.fatalWarnings)? true: false;

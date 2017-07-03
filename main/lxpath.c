@@ -98,10 +98,10 @@ static void findXMLTagsCore (xmlXPathContext *ctx, xmlNode *root,
 #if 0
 		/* Older version of libxml2 doesn't have xmlXPathSetContextNode. */
 		if (xmlXPathSetContextNode (root, ctx) != 0)
-		  {
-		    error (WARNING, "Failed to set node to XpathContext");
-		    return;
-		  }
+		{
+			error (WARNING, "Failed to set node to XpathContext");
+			return;
+		}
 #else
 		ctx->node = root;
 #endif
