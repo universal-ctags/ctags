@@ -1213,6 +1213,19 @@ OPTION ITEMS
 	DESCRIPTION
 		Human readable description for the kind.
 
+``--list-languages``
+	Lists the names of the languages understood by @CTAGS_NAME_EXECUTABLE@,
+	and then exits. These language names are case insensitive and may be
+	used in the the many other options like ``--language-force``,
+	``--languages``, ``--kinds-<LANG>``, ``--regex-<LANG>``, and so on.
+
+	Each language listed is disabled if followed by "[disabled]".
+	To use the parser for such a language, specify the language as an
+	argument of ``--languages=+`` option.
+
+	This option does not work with ``--machinable`` nor
+	``--with-list-header``.
+
 ``--list-map-extensions[=language|all]``
 	Lists the file extensions which associate a file
 	name with a language for either the specified *language* or **all**
@@ -1231,19 +1244,6 @@ OPTION ITEMS
 	To list the file extensions or file name patterns individually, use
 	``--list-map-extensions`` or ``--list-map-patterns`` option.
 	See the ``--langmap`` option, and "SOURCE FILES", above.
-
-	This option does not work with ``--machinable`` nor
-	``--with-list-header``.
-
-``--list-languages``
-	Lists the names of the languages understood by @CTAGS_NAME_EXECUTABLE@,
-	and then exits. These language names are case insensitive and may be
-	used in the the many other options like ``--language-force``,
-	``--languages``, ``--kinds-<LANG>``, ``--regex-<LANG>``, and so on.
-
-	Each language listed is disabled if followed by "[disabled]".
-	To use the parser for such a language, specify the language as an
-	argument of ``--languages=+`` option.
 
 	This option does not work with ``--machinable`` nor
 	``--with-list-header``.
