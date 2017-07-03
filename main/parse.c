@@ -2319,10 +2319,14 @@ static void processLangAliasOption (const langType language,
 
 	Assert (0 <= language  &&  language < (int) LanguageCount);
 	Assert (parameter);
-	Assert (parameter[0]);
 	parser = LanguageTable + language;
 
-	if (parameter[0] == '+')
+	if (parameter[0] == '\0')
+	{
+		clearLanguageAliases (language);
+		verbose ("clear alias for %s\n", parser->def->name);
+	}
+	else if (parameter[0] == '+')
 	{
 		alias = parameter + 1;
 		addLanguageAlias(language, alias);
