@@ -1163,7 +1163,7 @@ OPTION ITEMS
 	NAME
 		Name of the kind. This can be used as the alternative
 		one-letter flag described above. If enabling 'K' field with
-		`--fields=+K`, @CTAGS_NAME_EXECUTABLE@ uses name instead of
+		``--fields=+K``, @CTAGS_NAME_EXECUTABLE@ uses name instead of
 		letter in tags output. To enable/disable a kind with
 		``--kinds-<LANG>`` option, name surrounded by braces instead
 		of letter. See "Letters and names" for details. This must be
