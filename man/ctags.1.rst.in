@@ -206,8 +206,8 @@ Examples:
    ``--alias-<LANG>=`` (done)
 
 
-TAG ENTRY
----------
+TAG ENTRIES
+-----------
 
 A tag is an index for a language object. Concepts of tag and related
 things in Exuberant-ctags are refined and extended in Universal-ctags.
@@ -277,7 +277,7 @@ option.
 Roles
 ~~~~~~
 
-*Role* is newly introduced concept in Universal-ctags. Role is a
+*Role* is a newly introduced concept in Universal-ctags. Role is a
 concept related with reference tags. Role is not for definition
 tags. Role is not implemented widely yet.
 
@@ -733,7 +733,7 @@ OPTION ITEMS
 	Inquire the output of ``--list-extras`` option for the other minor
 	extras.
 
-	A name associated with an extra can be used as alternative to to a
+	A name associated with an extra can be used as alternative to a
 	one-letter flag. Some minor extras have no one-letters flag. In
 	that case, names must be specified anyway. See "Letters and names"
 	for more details.
@@ -877,7 +877,7 @@ OPTION ITEMS
 	but exclude macros, use "--c-kinds=+px-d"; to include only tags for
 	functions, use "--c-kinds=f".
 
-	A name associated with a kind can be used as alternative to to a
+	A name associated with a kind can be used as alternative to a
 	one-letter flag. See "Letters and names" for more details.
 
 ``--<LANG>-kinds=[+|-]kinds|*``
@@ -1086,7 +1086,7 @@ OPTION ITEMS
 	REFONLY
 		Whether the kind is specialized for reference tagging or not.
 		If the column is "yes", the kind is for reference tagging, and
-		it is never used for definition tagging. See also "TAG ENTRY".
+		it is never used for definition tagging. See also "TAG ENTRIES".
 
 	NROLES
 		The number of roles this kind has. See also "Roles".
