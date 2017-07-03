@@ -308,8 +308,8 @@ fields and extras.
    ``--list-extras``    (done)
    ``--list-roles``
    ``--kinds-<LANG>=``  (done)
-   ``--fields=``
-   ``--fields-<LANG>``
+   ``--fields=``        (done)
+   ``--fields-<LANG>``  (done)
    ``--extras=``        (done)
    ``--extras-<LANG>=`` (done)
 
@@ -738,59 +738,99 @@ OPTION ITEMS
 	that case, names must be specified anyway. See "Letters and names"
 	for more details.
 
+``--fields-<LANG>=[+|-]flags|*``
+	Specifies the language own fields which are to be included in
+	the entries of the tag file. Universal-ctags
+	introduces language own fields. (See "Language own fields and
+	extras" about the concept). This option is for controlling them.
+
+	Specifies "all" as <LANG> to apply the parameter flags to all
+	fields; all fields are enabled with specifying '*' as the
+	parameter flags. If specifying nothing as the parameter flags
+	("--fields-all="), all extras are disabled. These two combinations
+	are useful for testing.
+
+
 ``--fields=[+|-]flags|*``
 	Specifies the available extension fields which are to be included in
-	the entries of the tag file (see TAG FILE FORMAT, below, for more
-	information). The parameter flags is a set of one-letter flags,
-	each representing one type of extension field to include, with the
-	following meanings (disabled by default unless indicated):
+	the entries of the tag file (see "TAG FILE FORMAT", below, and, "Fields", above, for more
+	information).
 
-	a
+	The parameter flags is a set of one-letter flags,
+	each representing one type of extension field to include.
+	Each letter or group of letters may be preceded by either '+' to add it
+	to the default set, or '-' to exclude it. In the absence of any
+	preceding '+' or '-' sign, only those fields explicitly listed in flags
+	will be included in the output (i.e. overriding the default set). All
+	fields are included if '*' is given. This option is ignored if the
+	option ``--format=1`` has been specified.
+
+	This ``--fields=`` option is for controlling fields common in
+	languages (or language in-depends fields).  Universal-ctags
+	introduces language own fields. (See "Language own fields and
+	extras" about the concept). Use ``--fields-<LANG>=`` option for
+	controlling them.
+
+
+	The meaning of major fields is as follows (one-letter flag/name):
+
+	a/access
 		Access (or export) of class members
 
-	f
-		File-restricted scoping [enabled]
+	e/end
+		End lines of various items
 
-	i
-		Inheritance information
+	f/file
+		File-restricted scoping. Enabled by default.
+
+	i/inherits
+		Inheritance information.
 
 	k
-		Kind of tag as a single letter [enabled]
+		Kind of tag as a single letter. Enabled by default.
+		Exceptionally this has no name.
 
 	K
 		Kind of tag as full name
+		Exceptionally this has no name.
 
-	l
+	l/language
 		Language of source file containing tag
 
-	m
+	m/implementation
 		Implementation information
 
-	n
+	n/line
 		Line number of tag definition
 
-	s
-		Scope of tag definition [enabled]
+	p/scopeKind
+		Kind of scope as full name
 
-	S
+	s
+		Scope of tag definition. Enabled by default.
+		Exceptionally this has no name.
+
+	S/signature
 		Signature of routine (e.g. prototype or parameter list)
 
-	t
-		Type and name of a variable or typedef as "typeref:" field [enabled]
+	t/typeref
+		Type and name of a variable or typedef as "typeref:" field.
+		Enabled by default.
 
-	z
+	z/kind
 		Include the "kind:" key in kind field
 
 	Z
-		Include the "scope:" key in scope field
+		Include the "scope:" key in scope field.
+		Exceptionally this has no name.
 
-	Each letter or group of letters may be preceded by either '+' to add it
-	to the default set, or '-' to exclude it. In the absence of any
-	preceding '+' or '-' sign, only those kinds explicitly listed in flags
-	will be included in the output (i.e. overriding the default set). All
-	fields are included if '*' is given. This option is ignored if the
-	option ``--format=1`` has been specified. The default value of this option
-	is fkst.
+	Inquire the output of ``--list-fields`` option for the other minor
+	fields.
+
+	A name associated with a field can be used as alternative to a
+	one-letter flag. Some minor fields have no one-letters flag. In
+	that case, names must be specified anyway. See "Letters and names"
+	for more details.
 
 ``--file-scope[=yes|no]``
 	Indicates whether tags scoped only for a single file (i.e. tags which
