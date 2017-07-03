@@ -304,7 +304,7 @@ fields and extras.
    ``--list-languages`` (done)
    ``--list-kinds``     (done)
    ``--list-kinds-full``(done)
-   ``--list-fields``
+   ``--list-fields``    (done)
    ``--list-extras``    (done)
    ``--list-roles``
    ``--kinds-<LANG>=``  (done)
@@ -1033,6 +1033,55 @@ OPTION ITEMS
 
 ``--list-features``
 	Lists the compiled features.
+
+``--list-fields[=language|all]``
+	Lists the fields recognized for either the specified language or
+	"all" languages. See "Fields" subsection to know what are fields.
+
+	.. TODO? xref output
+
+	A field can be enabled or disabled with ``--fields=`` for common
+	extras in all languages, or ``--fields-<LANG>=`` for the specified
+	language.  These option takes one-letter flag or name as a parameter
+	for specifying a field.
+
+	The meaning of columns are as follows:
+
+	LETTER
+		One-letter flag. '-' means the field does not have one-letter flag.
+
+	NAME
+		The name of field.
+
+	ENABLED
+		Whether the field is enabled or not. It takes "yes" or "no".
+
+	LANGUAGE
+		The name of language if the field is owned by a parser.
+		"NONE" means the extra is common in parsers.
+
+	JSTYPE
+		Json type used in printing the value of field when "--output-format=json"
+		is specified.
+
+		Following characters are used for representing types.
+
+		s
+			string
+		i
+			integer
+		b
+			boolean (true or false)
+
+		The representation of this field and the output format used in
+		"--output-format=json" are still experimental.
+
+	FIXED
+	   Whether this field can be disabled or not. Some fields are printed always
+	   in tags output. They have "yes" as the value for this column.
+
+	DESCRIPTION
+		Human readable description for the field.
 
 ``--list-kinds[=language|all]``
 	Subset of ``--list-kinds-full``. This option is kept for
