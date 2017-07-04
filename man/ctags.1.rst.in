@@ -571,7 +571,7 @@ OPTION ITEMS
 	"Guessing parser" stage.
 
 	*aliasPattern* is not a list. Use this option multiple times in a
-	command line to add or remove multiple alias patterns
+	command line to add or remove multiple alias patterns.
 
 ``--append[=yes|no]``
 	Indicates whether tags generated from the specified files should be
