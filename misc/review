@@ -202,7 +202,7 @@ do_units_inspect()
     local r
     local t=$1
 
-    select r in '<a>ccept' '<s>kip' '<d>iff' 'show args.<c>tags' 'show <i>nput' '<q>uit'; do
+    select r in '<a>ccept' '<s>kip' '<S>hell' '<d>iff' 'show args.<c>tags' 'show <i>nput' '<q>uit'; do
 	case $r-$REPLY in
 	    ("<a>ccept"-*|-a)
 		if units_inspect_cmd_accept "$t"; then
@@ -212,6 +212,9 @@ do_units_inspect()
 	    ("<s>kip"-*|-s|-!|-skip)
 		units_inspect_cmd_skip "$t"
 		next=1
+		;;
+	    ("<S>hell"-*|-S)
+		inspect_cmd_shell Units "$t"
 		;;
 	    ("<d>iff"-*|-d|-=|-diff)
 		units_inspect_cmd_show_diff "$t"
@@ -235,12 +238,13 @@ do_units_inspect()
     done
 }
 
-function tmain_inspect_cmd_shell
+function inspect_cmd_shell
 {
-    local t=$1
+    local prefix=$1
+    local t=$2
 
     (
-	cd Tmain/$t
+	cd $prefix/$t
 	PS1="review> " bash
     )
 }
@@ -263,7 +267,7 @@ do_tmain_inspect()
 		next=1
 		;;
 	    ("<S>hell"-*|-S)
-		tmain_inspect_cmd_shell "$t"
+		inspect_cmd_shell Tmain "$t"
 		;;
 	    ("<R>un"-*|-R)
 		tmain_inspect_run "$t"
