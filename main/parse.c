@@ -2324,13 +2324,18 @@ static void processLangAliasOption (const langType language,
 	if (parameter[0] == '\0')
 	{
 		clearLanguageAliases (language);
-		verbose ("clear alias for %s\n", parser->def->name);
+		verbose ("clear aliases for %s\n", parser->def->name);
+	}
+	else if (strcmp (parameter, RSV_LANGMAP_DEFAULT) == 0)
+	{
+		installLanguageAliasesDefault (language);
+		verbose ("reset aliases for %s\n", parser->def->name);
 	}
 	else if (parameter[0] == '+')
 	{
 		alias = parameter + 1;
 		addLanguageAlias(language, alias);
-		verbose ("add alias %s to %s\n", alias, parser->def->name);
+		verbose ("add an alias %s to %s\n", alias, parser->def->name);
 	}
 	else if (parameter[0] == '-')
 	{
@@ -2339,7 +2344,7 @@ static void processLangAliasOption (const langType language,
 			alias = parameter + 1;
 			if (stringListDeleteItemExtension (parser->currentAliases, alias))
 			{
-				verbose ("remove alias %s from %s\n", alias, parser->def->name);
+				verbose ("remove an alias %s from %s\n", alias, parser->def->name);
 			}
 		}
 	}

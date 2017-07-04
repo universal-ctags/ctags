@@ -1,0 +1,6 @@
+# clear
+# add
+expect
+abc
+# reset
+expect
