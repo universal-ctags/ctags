@@ -1349,7 +1349,7 @@ extern void installLanguageAliasesDefaults (void)
 extern void clearLanguageMap (const langType language)
 {
 	Assert (0 <= language  &&  language < (int) LanguageCount);
-	stringListClear ((LanguageTable + language) ->currentPatterns);
+	stringListClear ((LanguageTable + language)->currentPatterns);
 	stringListClear ((LanguageTable + language)->currentExtensions);
 }
 
