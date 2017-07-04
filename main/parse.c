@@ -1356,7 +1356,10 @@ extern void clearLanguageMap (const langType language)
 extern void clearLanguageAliases (const langType language)
 {
 	Assert (0 <= language  &&  language < (int) LanguageCount);
-	stringListClear ((LanguageTable + language)->currentAliases);
+
+	parserObject* parser = (LanguageTable + language);
+	if (parser->currentAliases)
+		stringListClear (parser->currentAliases);
 }
 
 static bool removeLanguagePatternMap1(const langType language, const char *const pattern)
