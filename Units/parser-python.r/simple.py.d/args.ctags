@@ -1,4 +1,4 @@
 --sort=no
 --extras=*-p{subword}
 --fields=*
---fields-*=*
+--fields-all=*
