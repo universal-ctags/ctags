@@ -2321,7 +2321,6 @@ static void processLangAliasOption (const langType language,
 	const parserObject * parser;
 
 	Assert (0 <= language  &&  language < (int) LanguageCount);
-	Assert (parameter);
 	parser = LanguageTable + language;
 
 	if (parameter[0] == '\0')
@@ -2366,9 +2365,38 @@ extern bool processAliasOption (
 {
 	langType language;
 
+	Assert (parameter);
+
+#define PREFIX "alias-"
+	if (strcmp (option, "alias-" RSV_LANG_ALL) == 0)
+	{
+		if ((parameter[0] == '\0')
+			|| (strcmp (parameter, RSV_LANGMAP_DEFAULT) == 0))
+		{
+			for (unsigned int i = 0; i < LanguageCount; i++)
+			{
+				clearLanguageAliases (i);
+				verbose ("clear aliases for %s\n", getLanguageName(i));
+			}
+
+			if (parameter[0] != '\0')
+			{
+				verbose ("  Installing default language aliases:\n");
+				installLanguageAliasesDefaults ();
+			}
+		}
+		else
+		{
+			error (WARNING, "Use \"%s\" option for reset (\"default\") or clearing (\"\")", option);
+			return false;
+		}
+		return true;
+	}
+
 	language = getLanguageComponentInOption (option, "alias-");
 	if (language == LANG_IGNORE)
 		return false;
+#undef PREFIX
 
 	processLangAliasOption (language, parameter);
 	return true;
