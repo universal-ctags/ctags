@@ -816,9 +816,10 @@ OPTION ITEMS
 	(i.e. overriding the default for the specified language).
 
 	Specifies '*' as the parameter kinds to include all kinds implemented
-	in <LANG> in the output. Further more if '*' is given as <LANG>,
+	in <LANG> in the output. Further more if "all" is given as <LANG>,
 	specification of the parameter kinds affects all languages defined
-	in @CTAGS_NAME_EXECUTABLE@.
+	in @CTAGS_NAME_EXECUTABLE@. Giving "all" makes sense only when '*' is
+	given as the parameter kinds.
 
 	As an example for the C language, in order to add prototypes and
 	external variable declarations to the default set of tag kinds,
