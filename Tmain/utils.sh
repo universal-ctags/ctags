@@ -83,3 +83,41 @@ exit_status_for_input_c()
 		echo "failed"
 	fi
 }
+
+get_column_index()
+{
+	local index=0
+	local ctags=$1
+	local option=$2
+	local column=$3
+
+	for x in $($ctags  --quiet --options=NONE --with-list-header "$option" | sed -ne 's/^#\(.*\)$/\1/p'); do
+		if [ "$x" = "$column" ]; then
+			echo $index
+			return 0
+		fi
+		index=$(expr $index + 1)
+	done
+
+	echo -1
+	return 1
+}
+
+filter_by_column_index()
+{
+	local index=$1
+
+	local line
+	local column
+	local tmp
+
+	while read line; do
+		tmp=0
+		for column in $line; do
+			if [ $tmp = $index ]; then
+				echo $column
+			fi
+			tmp=$(expr $tmp + 1)
+		done
+	done
+}

@@ -157,11 +157,11 @@ source code the "wildcard"(``*``) option value has been introduced.
 
 	Alternative representation of ``--<LANG>-kinds=*``.
 
-``--*-kinds=SPEC``
+``--all-kinds=SPEC``
 
 	Applies SPEC as kinds to all available language parsers.
 
-``--*-kinds=*``
+``--all-kinds=*``
 
 	Enables all available kinds for all available language parsers.
 
@@ -1397,7 +1397,7 @@ I don't say all parsers follows this idea.
       A operator+ (int);
     };
 
-    $ ./ctags --kinds-'*'='*' --fields= -o - input.cc
+    $ ./ctags --kinds-all='*' --fields= -o - input.cc
     A	input.cc	/^class A$/
     operator +	input.cc	/^  A operator+ (int);$/
 

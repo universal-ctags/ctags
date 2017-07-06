@@ -5,6 +5,7 @@ elvis
 gcc
 gdb
 mkdir
+mv
 pwd
 rcs
 rst2html

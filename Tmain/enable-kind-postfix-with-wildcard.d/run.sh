@@ -2,5 +2,5 @@
 # License: GPL-2
 
 CTAGS=$1
-${CTAGS} --quiet --options=NONE '--*-kinds=*' --list-kinds | grep '\[off\]'
+${CTAGS} --quiet --options=NONE '--all-kinds=*' --list-kinds | grep '\[off\]'
 

@@ -26,14 +26,14 @@ extern parserDefinition* QemuHXParser (void)
 	};
 
 	static kindDefinition QemuHXKindTable [] = {
-		{ true, 'q', "qmp", "QEMU Managment Protocol dispatch table entries" },
+		{ true, 'q', "qmp", "QEMU Management Protocol dispatch table entries" },
 		{ true, 'i', "infoitem", "item in texinfo doc" },
 	};
 	static xtagDefinition QemuHXXtagTable [] = {
 		{
 		  .enabled     = true,
 		  .name        = "funcmap",
-		  .description = "mapping SQMP to C function name",
+		  .description = "Include mapping SQMP to C function name",
 		},
 	};
 	static tagRegexTable QemuHXTagRegexTable [] = {

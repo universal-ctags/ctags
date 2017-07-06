@@ -1,2 +1,2 @@
 --sort=no
---fields-*=+{end}
+--fields-all=+{end}

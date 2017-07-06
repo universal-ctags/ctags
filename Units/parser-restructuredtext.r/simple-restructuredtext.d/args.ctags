@@ -1,2 +1,2 @@
---fields-*=+{sectionMarker}
+--fields-all=+{sectionMarker}
 --fields=+{end}

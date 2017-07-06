@@ -1008,10 +1008,17 @@ extern int defineField (fieldDefinition *def, langType language)
 	return def->ftype;
 }
 
+#define FIELD_COL_LETTER      0
+#define FIELD_COL_NAME        1
+#define FIELD_COL_ENABLED     2
+#define FIELD_COL_LANGUAGE    3
+#define FIELD_COL_JSTYPE      4
+#define FIELD_COL_FIXED       5
+#define FIELD_COL_DESCRIPTION 6
 extern struct colprintTable * fieldColprintTableNew (void)
 {
 	return colprintTableNew ("L:LETTER", "L:NAME", "L:ENABLED",
-							 "L:LANGUAGE", "L:XFMT", "L:JSTYPE", "L:FIXED", "L:DESCRIPTION", NULL);
+							 "L:LANGUAGE", "L:JSTYPE", "L:FIXED", "L:DESCRIPTION", NULL);
 }
 
 static void  fieldColprintAddLine (struct colprintTable *table, int i)
@@ -1027,14 +1034,12 @@ static void  fieldColprintAddLine (struct colprintTable *table, int i)
 								  : fdef->letter);
 
 	const char *name = getFieldName (i);
-	colprintLineAppendColumnCString (line, name? name: "NONE");
+	colprintLineAppendColumnCString (line, name? name: RSV_NONE);
 	colprintLineAppendColumnBool (line, fdef->enabled);
 	colprintLineAppendColumnCString (line,
 									 fobj->language == LANG_IGNORE
-									 ?"NONE"
+									 ? RSV_NONE
 									 : getLanguageName (fobj->language));
-
-	colprintLineAppendColumnBool (line, fdef->renderEscaped[WRITER_DEFAULT]? true: false);
 
 	char  typefields [] = "---";
 	{
@@ -1069,17 +1074,17 @@ extern void fieldColprintAddLanguageLines (struct colprintTable *table, langType
 
 static int fieldColprintCompareLines (struct colprintLine *a , struct colprintLine *b)
 {
-	const char *a_fixed  = colprintLineGetColumn (a, 6);
-	const char *b_fixed  = colprintLineGetColumn (b, 6);
-	const char *a_parser = colprintLineGetColumn (a, 3);
-	const char *b_parser = colprintLineGetColumn (b, 3);
+	const char *a_fixed  = colprintLineGetColumn (a, FIELD_COL_FIXED);
+	const char *b_fixed  = colprintLineGetColumn (b, FIELD_COL_FIXED);
+	const char *a_parser = colprintLineGetColumn (a, FIELD_COL_LANGUAGE);
+	const char *b_parser = colprintLineGetColumn (b, FIELD_COL_LANGUAGE);
 
 	if ((strcmp (a_fixed, "yes") == 0)
 		&& (strcmp (a_fixed, "yes") == 0))
 	{
 		/* name, input, pattern, compact */
-		const char *a_name  = colprintLineGetColumn (a, 1);
-		const char *b_name  = colprintLineGetColumn (b, 1);
+		const char *a_name  = colprintLineGetColumn (a, FIELD_COL_NAME);
+		const char *b_name  = colprintLineGetColumn (b, FIELD_COL_NAME);
 		const char *ref_name;
 		unsigned int a_index = ~0U;
 		unsigned int b_index = ~0U;
@@ -1109,29 +1114,29 @@ static int fieldColprintCompareLines (struct colprintLine *a , struct colprintLi
 			 && (strcmp (b_fixed, "yes") == 0))
 		return 1;
 
-	if (strcmp (a_parser, "NONE") == 0
-		&& strcmp (b_parser, "NONE") != 0)
+	if (strcmp (a_parser, RSV_NONE) == 0
+		&& strcmp (b_parser, RSV_NONE) != 0)
 		return -1;
-	else if (strcmp (a_parser, "NONE") != 0
-			 && strcmp (b_parser, "NONE") == 0)
+	else if (strcmp (a_parser, RSV_NONE) != 0
+			 && strcmp (b_parser, RSV_NONE) == 0)
 		return 1;
-	else if (strcmp (a_parser, "NONE") != 0
-			 && strcmp (b_parser, "NONE") != 0)
+	else if (strcmp (a_parser, RSV_NONE) != 0
+			 && strcmp (b_parser, RSV_NONE) != 0)
 	{
 		int r;
 		r = strcmp (a_parser, b_parser);
 		if (r != 0)
 			return r;
 
-		const char *a_name = colprintLineGetColumn (a, 1);
-		const char *b_name = colprintLineGetColumn (b, 1);
+		const char *a_name = colprintLineGetColumn (a, FIELD_COL_NAME);
+		const char *b_name = colprintLineGetColumn (b, FIELD_COL_NAME);
 
 		return strcmp(a_name, b_name);
 	}
 	else
 	{
-		const char *a_letter = colprintLineGetColumn (a, 0);
-		const char *b_letter = colprintLineGetColumn (b, 0);
+		const char *a_letter = colprintLineGetColumn (a, FIELD_COL_LETTER);
+		const char *b_letter = colprintLineGetColumn (b, FIELD_COL_LETTER);
 
 		return strcmp(a_letter, b_letter);
 	}

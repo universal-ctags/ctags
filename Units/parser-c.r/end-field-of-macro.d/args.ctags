@@ -1,2 +1,2 @@
---fields-*=+{end}
+--fields-all=+{end}
 --fields=+{line}

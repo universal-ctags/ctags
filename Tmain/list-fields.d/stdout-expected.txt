@@ -1,38 +1,38 @@
-#LETTER	NAME	ENABLED	LANGUAGE	XFMT	JSTYPE	FIXED	DESCRIPTION
-N	name	yes	NONE	yes	s--	yes	tag name
-F	input	yes	NONE	yes	s--	yes	input file
-P	pattern	yes	NONE	yes	s--	yes	pattern
-C	compact	no	NONE	yes	s--	no	compact input line (used only in xref output)
-E	extras	no	NONE	yes	s--	no	Extra tag type information
-K	NONE	no	NONE	yes	s--	no	Kind of tag as full name
-R	NONE	no	NONE	yes	s--	no	Marker (R or D) representing whether tag is definition or reference
-S	signature	no	NONE	yes	s--	no	Signature of routine (e.g. prototype or parameter list)
-Z	scope	no	NONE	yes	s--	no	Include the "scope:" key in scope field (use s) in tags output, scope name in xref output
-a	access	no	NONE	yes	s--	no	Access (or export) of class members
-e	end	no	NONE	yes	-i-	no	end lines of various items
-f	file	yes	NONE	yes	--b	no	File-restricted scoping
-i	inherits	no	NONE	yes	s-b	no	Inheritance information
-k	NONE	yes	NONE	yes	s--	no	Kind of tag as a single letter
-l	language	no	NONE	yes	s--	no	Language of input file containing tag
-m	implementation	no	NONE	yes	s--	no	Implementation information
-n	line	no	NONE	yes	-i-	no	Line number of tag definition
-p	scopeKind	no	NONE	yes	s--	no	Kind of scope as full name
-r	role	no	NONE	yes	s--	no	Role
-s	NONE	yes	NONE	yes	s--	no	Scope of tag definition (`p' can be used for printing its kind)
-t	typeref	yes	NONE	yes	s--	no	Type and name of a variable or typedef
-x	xpath	no	NONE	yes	s--	no	xpath for the tag
-z	kind	no	NONE	yes	s--	no	Include the "kind:" key in kind field (use k or K) in tags output, kind full name in xref output
--	properties	no	C	yes	s--	no	properties (static, inline, mutable,...)
--	captures	no	C++	yes	s--	no	lambda capture list
--	name	yes	C++	yes	s--	no	aliased names
--	properties	no	C++	yes	s--	no	properties (static, inline, mutable,...)
--	template	no	C++	yes	s--	no	template parameters
--	properties	no	CUDA	yes	s--	no	properties (static, inline, mutable,...)
--	assignment	yes	LdScript	yes	s--	no	how a value is assigned to the symbol
--	decorators	no	Python	yes	s--	no	decorators on functions and classes
--	home	yes	passwd	yes	s--	no	home directory
--	shell	yes	passwd	yes	s--	no	login shell
--	sectionMarker	no	reStructuredText	yes	s--	no	character used for declaring section
+#LETTER	NAME	ENABLED	LANGUAGE	JSTYPE	FIXED	DESCRIPTION
+N	name	yes	NONE	s--	yes	tag name
+F	input	yes	NONE	s--	yes	input file
+P	pattern	yes	NONE	s--	yes	pattern
+C	compact	no	NONE	s--	no	compact input line (used only in xref output)
+E	extras	no	NONE	s--	no	Extra tag type information
+K	NONE	no	NONE	s--	no	Kind of tag as full name
+R	NONE	no	NONE	s--	no	Marker (R or D) representing whether tag is definition or reference
+S	signature	no	NONE	s--	no	Signature of routine (e.g. prototype or parameter list)
+Z	scope	no	NONE	s--	no	Include the "scope:" key in scope field (use s) in tags output, scope name in xref output
+a	access	no	NONE	s--	no	Access (or export) of class members
+e	end	no	NONE	-i-	no	end lines of various items
+f	file	yes	NONE	--b	no	File-restricted scoping
+i	inherits	no	NONE	s-b	no	Inheritance information
+k	NONE	yes	NONE	s--	no	Kind of tag as a single letter
+l	language	no	NONE	s--	no	Language of input file containing tag
+m	implementation	no	NONE	s--	no	Implementation information
+n	line	no	NONE	-i-	no	Line number of tag definition
+p	scopeKind	no	NONE	s--	no	Kind of scope as full name
+r	role	no	NONE	s--	no	Role
+s	NONE	yes	NONE	s--	no	Scope of tag definition (`p' can be used for printing its kind)
+t	typeref	yes	NONE	s--	no	Type and name of a variable or typedef
+x	xpath	no	NONE	s--	no	xpath for the tag
+z	kind	no	NONE	s--	no	Include the "kind:" key in kind field (use k or K) in tags output, kind full name in xref output
+-	properties	no	C	s--	no	properties (static, inline, mutable,...)
+-	captures	no	C++	s--	no	lambda capture list
+-	name	yes	C++	s--	no	aliased names
+-	properties	no	C++	s--	no	properties (static, inline, mutable,...)
+-	template	no	C++	s--	no	template parameters
+-	properties	no	CUDA	s--	no	properties (static, inline, mutable,...)
+-	assignment	yes	LdScript	s--	no	how a value is assigned to the symbol
+-	decorators	no	Python	s--	no	decorators on functions and classes
+-	home	yes	passwd	s--	no	home directory
+-	shell	yes	passwd	s--	no	login shell
+-	sectionMarker	no	reStructuredText	s--	no	character used for declaring section
 #
 Foo	input.java	/^abstract public class Foo extends Bar$/
 x	input.java	/^    public int x;$/

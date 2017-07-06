@@ -15,6 +15,9 @@ puts
 qsort
 scandir
 stdarg
+stderr
+stdin
+stdout
 strcat
 strchr
 strcmp

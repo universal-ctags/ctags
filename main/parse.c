@@ -15,6 +15,7 @@
 
 #include <string.h>
 
+#include "ctags.h"
 #include "debug.h"
 #include "entry.h"
 #include "flags.h"
@@ -1348,14 +1349,17 @@ extern void installLanguageAliasesDefaults (void)
 extern void clearLanguageMap (const langType language)
 {
 	Assert (0 <= language  &&  language < (int) LanguageCount);
-	stringListClear ((LanguageTable + language) ->currentPatterns);
+	stringListClear ((LanguageTable + language)->currentPatterns);
 	stringListClear ((LanguageTable + language)->currentExtensions);
 }
 
 extern void clearLanguageAliases (const langType language)
 {
 	Assert (0 <= language  &&  language < (int) LanguageCount);
-	stringListClear ((LanguageTable + language)->currentAliases);
+
+	parserObject* parser = (LanguageTable + language);
+	if (parser->currentAliases)
+		stringListClear (parser->currentAliases);
 }
 
 static bool removeLanguagePatternMap1(const langType language, const char *const pattern)
@@ -2147,47 +2151,40 @@ extern bool processKindsOption (
 	{
 		size_t len = dash - option;
 
-		if ((len == 1) && (*option == '*'))
+		if ((len == 3) && (strncmp (option, RSV_LANG_ALL, len) == 0))
 			foreachLanguage(processLangKindDefinitionEach, &arg);
 		else
 		{
-			vString* langName = vStringNew ();
-			vStringNCopyS (langName, option, len);
-			language = getNamedLanguage (vStringValue (langName), 0);
+			language = getNamedLanguage (option, len);
 			if (language == LANG_IGNORE)
-				error (WARNING, "Unknown language \"%s\" in \"%s\" option", vStringValue (langName), option);
+			{
+				char *langName = eStrndup (option, len);
+				error (WARNING, "Unknown language \"%s\" in \"%s\" option", langName, option);
+				eFree (langName);
+			}
 			else
 				processLangKindDefinition (language, option, parameter);
-			vStringDelete (langName);
 		}
 		handled = true;
 	}
 	else if ( strncmp (option, PREFIX, PREFIX_LEN) == 0 )
 	{
 		const char* lang;
-		size_t len;
 
 		lang = option + PREFIX_LEN;
-		len = strlen (lang);
-		if (len == 0)
+		if (lang[0] == '\0')
 			error (WARNING, "No language given in \"%s\" option", option);
-		else if (len == 1 && lang[0] == '*')
-		{
+		else if (strcmp (lang, RSV_LANG_ALL) == 0)
 			foreachLanguage(processLangKindDefinitionEach, &arg);
-			handled = true;
-		}
 		else
 		{
 			language = getNamedLanguage (lang, 0);
 			if (language == LANG_IGNORE)
 				error (WARNING, "Unknown language \"%s\" in \"%s\" option", lang, option);
 			else
-			{
 				processLangKindDefinition (language, option, parameter);
-				handled = true;
-			}
 		}
-
+		handled = true;
 	}
 	return handled;
 #undef PREFIX
@@ -2324,15 +2321,23 @@ static void processLangAliasOption (const langType language,
 	const parserObject * parser;
 
 	Assert (0 <= language  &&  language < (int) LanguageCount);
-	Assert (parameter);
-	Assert (parameter[0]);
 	parser = LanguageTable + language;
 
-	if (parameter[0] == '+')
+	if (parameter[0] == '\0')
+	{
+		clearLanguageAliases (language);
+		verbose ("clear aliases for %s\n", parser->def->name);
+	}
+	else if (strcmp (parameter, RSV_LANGMAP_DEFAULT) == 0)
+	{
+		installLanguageAliasesDefault (language);
+		verbose ("reset aliases for %s\n", parser->def->name);
+	}
+	else if (parameter[0] == '+')
 	{
 		alias = parameter + 1;
 		addLanguageAlias(language, alias);
-		verbose ("add alias %s to %s\n", alias, parser->def->name);
+		verbose ("add an alias %s to %s\n", alias, parser->def->name);
 	}
 	else if (parameter[0] == '-')
 	{
@@ -2341,7 +2346,7 @@ static void processLangAliasOption (const langType language,
 			alias = parameter + 1;
 			if (stringListDeleteItemExtension (parser->currentAliases, alias))
 			{
-				verbose ("remove alias %s from %s\n", alias, parser->def->name);
+				verbose ("remove an alias %s from %s\n", alias, parser->def->name);
 			}
 		}
 	}
@@ -2360,9 +2365,38 @@ extern bool processAliasOption (
 {
 	langType language;
 
+	Assert (parameter);
+
+#define PREFIX "alias-"
+	if (strcmp (option, "alias-" RSV_LANG_ALL) == 0)
+	{
+		if ((parameter[0] == '\0')
+			|| (strcmp (parameter, RSV_LANGMAP_DEFAULT) == 0))
+		{
+			for (unsigned int i = 0; i < LanguageCount; i++)
+			{
+				clearLanguageAliases (i);
+				verbose ("clear aliases for %s\n", getLanguageName(i));
+			}
+
+			if (parameter[0] != '\0')
+			{
+				verbose ("  Installing default language aliases:\n");
+				installLanguageAliasesDefaults ();
+			}
+		}
+		else
+		{
+			error (WARNING, "Use \"%s\" option for reset (\"default\") or clearing (\"\")", option);
+			return false;
+		}
+		return true;
+	}
+
 	language = getLanguageComponentInOption (option, "alias-");
 	if (language == LANG_IGNORE)
 		return false;
+#undef PREFIX
 
 	processLangAliasOption (language, parameter);
 	return true;
@@ -2904,7 +2938,7 @@ static void printGuessedParser (const char* const fileName, langType language)
 	if (language == LANG_IGNORE)
 	{
 		Option.printLanguage = ((int)true) + 1;
-		parserName = "NONE";
+		parserName = RSV_NONE;
 	}
 	else
 		parserName = LanguageTable [language].def->name;

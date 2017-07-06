@@ -22,7 +22,7 @@ print_help()
 {
     echo Usage:
     printf "	%-20s %-30s %s\n" "$0" "help|--help|-h" "show this message"
-    printf "	%-20s %-30s %s\n" "$0" "[list] [-b]" "list failed Units"
+    printf "	%-20s %-30s %s\n" "$0" "[list] [-b]" "list failed Units and Tmain"
     help_list
     printf "	%-20s %-30s %s\n" "$0" "inspect [-b]" "inspect difference interactively"
     help_inspect
@@ -62,9 +62,14 @@ do_list ()
 	n=$(dirname "$d")
 	if (( ! is_known_bug $(basename "$n") ) || [[ -n ${including_known_bugs} ]] ) \
 	       && [[ -e "$n"/expected.tags ]]; then
-	    echo ${n#Units/}
+	    echo ${n}
 	fi
     done
+
+    for d in $(find Tmain -name "std*diff.txt"); do
+	n=$(dirname "$d")
+	echo ${n}
+    done | sort -u
 }
 
 help_list()
@@ -72,12 +77,12 @@ help_list()
     printf "	%-20s %-30s %s\n" "" "-b" "list .b (known bug) marked cases"
 }
 
-inspect_cmd_accept ()
+units_inspect_cmd_accept ()
 {
     local from=./Units/$1/FILTERED.tmp
     local to=./Units/$1/expected.tags
     local r
-    
+
     if [[ ! -e "${from}" ]]; then
 	echo "./Units/$1/FILTERED.tmp is not found" 1>&2
 	echo "Remove DIFF.tmp?"
@@ -94,7 +99,7 @@ inspect_cmd_accept ()
     fi
 
     echo "Do you really want do following shell command?"
-    echo 
+    echo
     echo "   mv \"$from\"" '\'
     echo "      \"$to\" "
     echo
@@ -121,7 +126,7 @@ inspect_cmd_accept ()
     return $r
 }
 
-inspect_cmd_skip ()
+units_inspect_cmd_skip ()
 {
     echo "SKIPPING $1" 1>&2
 }
@@ -142,7 +147,7 @@ inspect_cmd_show_generic ()
     echo '# ' "$f"
 }
 
-inspect_cmd_show_diff ()
+units_inspect_cmd_show_diff ()
 {
     local cmd=cat
 
@@ -153,7 +158,7 @@ inspect_cmd_show_diff ()
     inspect_cmd_show_generic $1 DIFF.tmp cat | ${cmd}
 }
 
-inspect_show_args_ctags ()
+units_inspect_show_args_ctags ()
 {
     inspect_cmd_show_generic $1 args.ctags cat
 }
@@ -167,7 +172,7 @@ pygmentize_or_cat ()
     fi
 }
 
-inspect_show_input ()
+units_inspect_show_input ()
 {
     local tcase=$1
 
@@ -191,12 +196,97 @@ help_inspect ()
     printf "	%-20s %-30s %s\n" "" "-b" "inspect .b (known bug) marked cases"
 }
 
+do_units_inspect()
+{
+    local next=0
+    local r
+    local t=$1
+
+    select r in '<a>ccept' '<s>kip' '<S>hell' '<d>iff' 'show args.<c>tags' 'show <i>nput' '<q>uit'; do
+	case $r-$REPLY in
+	    ("<a>ccept"-*|-a)
+		if units_inspect_cmd_accept "$t"; then
+		    next=1
+		fi
+		;;
+	    ("<s>kip"-*|-s|-!|-skip)
+		units_inspect_cmd_skip "$t"
+		next=1
+		;;
+	    ("<S>hell"-*|-S)
+		inspect_cmd_shell Units "$t"
+		;;
+	    ("<d>iff"-*|-d|-=|-diff)
+		units_inspect_cmd_show_diff "$t"
+		;;
+	    ("<q>uit"-*|-q|-quit)
+		inspect_cmd_quit
+		;;
+	    ("show args.<c>tags"-*|-c|-A|-args.ctags)
+		units_inspect_show_args_ctags "$t"
+		;;
+	    ("show <i>nput"-*|-i|-input)
+		units_inspect_show_input "$t"
+		;;
+	    (*)
+		inspect_cmd_unknown
+		;;
+	esac
+	if [[ $next == 1 ]]; then
+	    break
+	fi
+    done
+}
+
+function inspect_cmd_shell
+{
+    local prefix=$1
+    local t=$2
+
+    (
+	cd $prefix/$t
+	PS1="review> " bash
+    )
+}
+
+function tmain_inspect_run
+{
+    local t=$1
+    make tmain UNITS=$(basename $t .d)
+}
+
+do_tmain_inspect()
+{
+    local next=0
+    local r
+    local t=$1
+
+    select r in '<n>ext' '<S>hell' '<R>un' '<q>uit'; do
+	case $r-$REPLY in
+	    ("<n>ext"-*|-n)
+		next=1
+		;;
+	    ("<S>hell"-*|-S)
+		inspect_cmd_shell Tmain "$t"
+		;;
+	    ("<R>un"-*|-R)
+		tmain_inspect_run "$t"
+		;;
+	    ("<q>uit"-*|-q|-quit)
+		inspect_cmd_quit
+		;;
+	esac
+	if [[ $next == 1 ]]; then
+	    break
+	fi
+    done
+}
+
 do_inspect ()
 {
     local a
+    local t0
     local t
-    local r
-    local next
     local including_known_bugs
 
     for a in "$@"; do
@@ -215,65 +305,17 @@ do_inspect ()
 	esac
     done
 
-    for t in $(do_list ${including_known_bugs}); do
-	next=0
-	PS3="[[ $t ]]? "
-	select r in '<a>ccept' '<s>kip' '<d>iff' 'show args.<c>tags' 'show <i>nput' '<q>uit'; do
-	    case $r in
-		(accept)
-		    if inspect_cmd_accept "$t"; then
-			next=1
-		    fi
-		    ;;
-		(skip)
-		    inspect_cmd_skip "$t"
-		    next=1
-		    ;;
-		(diff)
-		    inspect_cmd_show_diff "$t"
-		    ;;
-		(quit)
-		    inspect_cmd_quit
-		    ;;
-		("show args.ctags")
-		    inspect_show_args_ctags "$t"
-		    ;;
-		("show input")
-		    inspect_show_input "$t"
-		    ;;
-		(*)
-		    case $REPLY in
-			(a|accept)
-			    if inspect_cmd_accept "$t"; then
-				next=1
-			    fi
-			    ;;
-			(!|s|skip)
-			    inspect_cmd_skip "$t"
-			    next=1
-			    ;;
-			(=|d|diff)
-			    inspect_cmd_show_diff "$t"
-			    ;;
-			(q|quit)
-			    inspect_cmd_quit
-			    ;;
-			(c|A|args.ctags)
-			    inspect_show_args_ctags "$t"
-			    ;;
-			(i|input)
-			    inspect_show_input "$t"
-			    ;;
-			(*)
-			    inspect_cmd_unknown
-			    ;;
-		    esac
-		    ;;
-	    esac
-	    if [[ $next == 1 ]]; then
-		break
-	    fi
-	done
+    for t0 in $(do_list ${including_known_bugs}); do
+	PS3="[[ $t0 ]]? "
+
+	t=${t0#Units/}
+	t=${t#Tmain/}
+
+	if [[ "$t0" =~ ^Units ]]; then
+	    do_units_inspect "$t"
+	else
+	    do_tmain_inspect "$t"
+	fi
     done
 }
 
@@ -308,6 +350,11 @@ main ()
 
     if ! [[ -d ./Units ]]; then
 	echo "$0: cannot find ./Units directory" 1>&2
+	exit 1
+    fi
+
+    if ! [[ -d ./Tmain ]]; then
+	echo "$0: cannot find ./Tmain directory" 1>&2
 	exit 1
     fi
 
