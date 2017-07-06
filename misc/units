@@ -778,7 +778,7 @@ run_show_diff_output ()
 
     printf "	"
     line .
-    sed -e 's/^.*$/	\0/' ${units_dir}/${t}.*/${_DIFF_OUTPUT_NAME}
+    sed -e 's/^.*$/	&/' ${units_dir}/${t}.*/${_DIFF_OUTPUT_NAME}
     echo
 }
 
@@ -789,7 +789,7 @@ run_show_stderr_output ()
 
     printf "	"
     line .
-    sed -e 's/^.*$/	\0/' ${units_dir}/${t}.*/${_STDERR_OUTPUT_NAME} | tail -50
+    sed -e 's/^.*$/	&/' ${units_dir}/${t}.*/${_STDERR_OUTPUT_NAME} | tail -50
     echo
 }
 
@@ -1830,7 +1830,7 @@ tmain_compare_result()
 	if [ -f "$f" ]; then
 	    echo "$f"
 	    echo
-	    cat "$f" | sed -e 's|.*|	\0|'
+	    cat "$f" | sed -e 's|.*|	&|'
 	    echo
 	fi
     done
