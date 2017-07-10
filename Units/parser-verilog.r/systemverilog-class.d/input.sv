@@ -8,6 +8,15 @@
 class test;
     reg a;
     logic b;
+    enum {enum_simple1, enum_simple2} enum_simple;
+    enum {enum_const1, enum_const2} enum_var1, enum_var2;
+    enum bit [1:0] {
+      enum_bit1,
+      enum_bit2='x,
+      enum_bit3=2'b01,
+      enum_bit4[0:10]=2'b10,
+      enum_bit5 [9:0] = 2'b10 ,
+    } enum_complex;
     function mult (a, input b = 0);
         return a * b;
     endfunction : mult
