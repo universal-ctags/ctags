@@ -1545,7 +1545,7 @@ static void initializeParserOne (langType lang)
 	   ctags saw --regex-<LANG>=.... after initializing, there
 	   was no chance to install findRegexTags() to parser->parser.
 
-	   Following code block gives extra chances to call lazyInitialize9)
+	   Following code block gives extra chances to call lazyInitialize)
 	   which installs findRegexTags() to parser->parser.	 */
 	if (parser->def->initialize == lazyInitialize)
 		parser->def->initialize (lang);
