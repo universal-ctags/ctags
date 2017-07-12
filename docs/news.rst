@@ -324,6 +324,8 @@ header is easy because it starts with a `#` character.
 Kinds synchronization
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+.. IN MAN PAGE
+
 In Universal-ctags, as in Exuberant-ctags, most kinds are parser
 local; enabling (or disabling) a kind in a parser has no effect on
 kinds in any other parsers even those with the same name and/or

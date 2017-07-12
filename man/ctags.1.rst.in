@@ -201,6 +201,118 @@ Examples:
 
 ``NONE`` means that @CTAGS_NAME_EXECUTABLE@ does not select any parser for the file.
 
+.. options should be explained and revised here
+   ``--list-aliases=`` (done)
+   ``--alias-<LANG>=`` (done)
+
+
+TAG ENTRIES
+-----------
+
+A tag is an index for a language object. Concepts of tag and related
+things in Exuberant-ctags are refined and extended in Universal-ctags.
+
+A tag is categorized into **definition tags** or **reference tags**.
+Though some exceptions are, Exuberant-ctags tags only definitions of
+language objects; it tags language objects introducing new names in
+source files. In addition, Universal-ctags has infrastructure for
+tagging references of language objects. However, the area where
+reference tags are implemented is very limited in the current version.
+
+
+Fields
+~~~~~~
+
+A tag can has various information. They are called **fields**. The
+essential fields are **name** of language objects, **input**,
+**pattern**, and **line**. ``input:`` is the name of source file where
+``name:`` is defined or referenced. ``pattern:`` can be used to search
+the `**name**`` in ``input:``. **line** is the line number where
+``name:`` is defined or referenced in
+``input:``.
+
+@CTAGS_NAME_EXECUTABLE@ offers extension fields. See also the
+descriptions of ``--list-fields`` option and ``--fields`` option.
+
+
+Kinds
+~~~~~~
+
+``kind:`` is a field which represents the *kind* of language object
+specified by a tag. Kinds used and defined are very different between
+parsers. For example, C language defines "macro", "function",
+"variable", "typedef", etc. See also the descriptions of
+``--list-kinds`` option and ``--kinds-<LANG>`` option.
+
+
+Extras
+~~~~~~
+
+BASICALLY, @CTAGS_NAME_EXECUTABLE@ tags only language objects appeared
+on source files as is. In other words, a value for a ``name:`` field
+should be found on the source file associated with the ``name:``.  An
+extra tag (*extra*) is for tagging a language object with processed
+name or for tagging not associated with a language object. Typical
+extra tag is "qualified". That tags a language object with
+class-qualified or scope-qualified name.
+
+The following example demonstrates "qualified" extra tag.
+
+.. code-block:: Java
+
+	package Bar;
+	import Baz;
+
+	class Foo {
+		// ...
+	}
+
+For the source file, @CTAGS_NAME_EXECUTABLE@ tags "Bar" and "Foo" by
+default.  If "qualified" extra is enabled from command line, "Bar.Foo"
+is also tagged though the string "Bar.Foo" is not in the source code.
+
+See also the descriptions of ``--list-extras`` option and ``--extras``
+option.
+
+Roles
+~~~~~~
+
+*Role* is a newly introduced concept in Universal-ctags. Role is a
+concept related with reference tags. Role is not for definition
+tags. Role is not implemented widely yet.
+
+A kind represents what is the language object specified with a tag.  A
+role is introduced for representing how the language object specified
+with a tag is referenced. Roles are defined in a kind.
+
+For the source file used for demonstrating in "Extras" subsection,
+"Baz" is tagged as a reference tag with kind "package" and with
+role "imported".
+
+See also the descriptions of ``--list-roles`` option.
+
+
+Language own fields and extras
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Exuberant-ctags has concepts of fields and extras. They are common
+between parsers. In addition, Universal-ctags provides language own
+fields and extras.
+
+
+.. options should be explained and revised here
+   ``--list-languages`` (done)
+   ``--list-kinds``     (done)
+   ``--list-kinds-full``(done)
+   ``--list-fields``    (done)
+   ``--list-extras``    (done)
+   ``--list-roles``     (done)
+   ``--kinds-<LANG>=``  (done)
+   ``--fields=``        (done)
+   ``--fields-<LANG>``  (done)
+   ``--extras=``        (done)
+   ``--extras-<LANG>=`` (done)
+
 
 COMMAND LINE INTERFACE
 ----------------------
@@ -236,7 +348,7 @@ built-in language names.
 Letters and names
 ~~~~~~~~~~~~~~~~~
 
-Some options take letters as flags (e.g. ``--kinds-<LANG>`` option).
+Some options take letters as parameters (e.g. ``--kinds-<LANG>`` option).
 Specifying just letters help a user make a complicated command line
 quickly.  However, the command line including sequence of the letters
 becomes difficult to be understood.
@@ -279,6 +391,10 @@ However, labels in the header will not change. So by scanning
 the header, a client tool can find the index for the target
 column.
 
+.. options should be explained and revised here
+   ``--list-features``    (done)
+   ``--machinable``       (done)
+   ``--with-list-header`` (done)
 
 OPTION ITEMS
 ------------
@@ -365,7 +481,7 @@ OPTION ITEMS
 	This feature is useful when preprocessor macros are used in such a way
 	that they cause syntactic confusion due to their presence. Indeed,
 	this is the best way of working around a number of problems caused by
-	the presence of syntax-busting macros in source files (see CAVEATS).
+	the presence of syntax-busting macros in source files (see "CAVEATS").
 	Some examples will illustrate this point.
 
 	.. code-block:: C
@@ -449,6 +565,25 @@ OPTION ITEMS
 	file (e.g. "@CTAGS_NAME_EXECUTABLE@ -x --c-kinds=v --file-scope=no file").
 	This option must appear before the first file name.
 
+``--alias-<LANG>=[+|-]aliasPattern``
+	Adds ('+') or removes ('-') an alias pattern to a language specified
+	with *<LANG>*. @CTAGS_NAME_EXECUTABLE@ refers the alias pattern in
+	"Guessing parser" stage.
+
+	The parameter aliasPattern is not a list. Use this option multiple
+	times in a command line to add or remove multiple alias
+	patterns.
+
+	To restore the default language aliases, specify "default" as the
+	parameter aliasPattern. Using "all" for *<LANG>* has meaning in
+	following two cases:
+
+	"--alias-all="
+		This clears aliases setting of all languages.
+
+	"--alias-all=default"
+		This restores the default languages aliases for all languages.
+
 ``--append[=yes|no]``
 	Indicates whether tags generated from the specified files should be
 	appended to those already present in the tag file or should replace them.
@@ -474,8 +609,8 @@ OPTION ITEMS
 	being expanded by the shell before being passed to @CTAGS_NAME_EXECUTABLE@;
 	also be aware that wildcards can match the slash character, '/').
 	You can determine if shell wildcards are available on your platform by
-	examining the output of the ``--version`` option, which will include
-	"+wildcards" in the compiled feature list; otherwise, pattern is matched
+	examining the output of the ``--list-features`` option, which will include
+	"wildcards" in the compiled feature list; otherwise, pattern is matched
 	against file names using a simple textual comparison.
 
 	If pattern begins with the character '@', then the rest of the string
@@ -503,7 +638,7 @@ OPTION ITEMS
 			some editors, such as vim, are able to recover in many such
 			instances).
 		3.	Eliminates finding identical matching, but incorrect, source
-			lines (see BUGS).
+			lines (see "BUGS").
 		4.	Retains separate entries in the tag file for lines which are
 			identical in content. In pattern mode, duplicate entries are
 			dropped because the search patterns they generate are identical,
@@ -532,101 +667,198 @@ OPTION ITEMS
 		are generally identical, making pattern searches useless
 		for finding all matches.
 
+``--extra=[+|-]flags|*``
+	Equivalent to ``--extras=[+|-]flags|*``, which is introduced to
+	make the option naming convention align to the other options
+	like ``--kinds-<LANG>=`` and ``--fields=``.
+
+	This option is kept for backward-compatibility with Exuberant-ctags.
+
+``--extras-<LANG>=[+|-]flags|*``
+	Specifies whether to include extra tag entries for certain kinds of
+	information about <LANG>. Universal-ctags
+	introduces language own extras. (See "Language own fields and
+	extras" about the concept). This option is for controlling them.
+
+	Specifies "all" as <LANG> to apply the parameter flags to all
+	extras; all extras are enabled with specifying '*' as the
+	parameter flags. If specifying nothing as the parameter flags
+	("--extras-all="), all extras are disabled. These two combinations
+	are useful for testing.
+
 ``--extras=[+|-]flags|*``
 	Specifies whether to include extra tag entries for certain kinds of
-	information. The parameter flags is a set of one-letter flags, each
+	information. See also "Extras" subsection to know what are kinds.
+
+	The parameter flags is a set of one-letter flags, each
 	representing one kind of extra tag entry to include in the tag file.
 	If flags is preceded by either the '+' or '-' character, the effect of
 	each flag is added to, or removed from, those currently enabled;
 	otherwise the flags replace any current settings. All entries are
-	included  if '*' is given. The meaning of each flag is as follows:
+	included  if '*' is given.
 
-	F
+	This ``--extras=`` option is for controlling extras common in
+	languages (or language in-depends extras).  Universal-ctags
+	introduces language own extras. (See "Language own fields and
+	extras" about the concept). Use ``--extras-<LANG>=`` option for
+	controlling them.
+
+	The meaning of major extras is as follows (one-letter flag/name):
+
+	F/fileScope
 		Equivalent to ``--file-scope``.
-		This option is on by default.
 
-	f
+	f/inputFile
 		Include an entry for the base file name of every source file
 		(e.g. "example.c"), which addresses the first line of the file.
+		If ``end:`` field is enabled, the end line number of the file
+		can be attached to the tag.
 
-	p
+	p/pseudo
 		Include pseudo tags. Enabled by default unless the tag file is
 		written to standard output.
 
-	q
-		Include an extra class-qualified tag entry for each tag which is a
-		member of a class (for languages for which this information is
-		extracted; currently C++, Eiffel, Java, and Perl). The actual form
-		of the qualified tag depends upon the language from which the tag
-		was derived (using a form that is most natural for how qualified
-		calls are specified in the language). For C++ and Perl, it is in the
-		form "class::member"; for Eiffel and Java, it is in the form
-		"class.member". This may allow easier location of a specific tags
-		when multiple occurrences of a tag name occur in the tag file.
-		Note, however, that this could potentially more than double the
-		size of the tag file.
+	q/qualified
+		Include an extra class-qualified or namespace-qualified tag entry
+		for each tag which is a member of a class or a namespace.
 
-	``--extra`` option in Exuberant-ctags is renamed to ``--extras``.
+		This may allow easier location of a specific tags when
+		multiple occurrences of a tag name occur in the tag file.
+		Note, however, that this could potentially more than double
+		the size of the tag file.
+
+		The actual form of the qualified tag depends upon the language
+		from which the tag was derived (using a form that is most
+		natural for how qualified calls are specified in the
+		language). For C++ and Perl, it is in the form
+		"class::member"; for Eiffel and Java, it is in the form
+		"class.member".
+
+		Note: Using backslash characters as separators forming
+		qualified name in PHP. However, in tags output of
+		Universal-ctags, a backslash character in a name is escaped
+		with a backslash character.
+
+		.. TODO: Write about the detail of escaping in somewhere.
+
+	r/reference
+		Include reference tags. See "TAG ENTRIES" about reference tags.
+
+	Inquire the output of ``--list-extras`` option for the other minor
+	extras.
+
+	A name associated with an extra can be used as alternative to a
+	one-letter flag. Some minor extras have no one-letters flag. In
+	that case, names must be specified anyway. See "Letters and names"
+	for more details.
+
+``--fields-<LANG>=[+|-]flags|*``
+	Specifies the language own fields which are to be included in
+	the entries of the tag file. Universal-ctags
+	introduces language own fields. (See "Language own fields and
+	extras" about the concept). This option is for controlling them.
+
+	Specifies "all" as <LANG> to apply the parameter flags to all
+	fields; all fields are enabled with specifying '*' as the
+	parameter flags. If specifying nothing as the parameter flags
+	("--fields-all="), all extras are disabled. These two combinations
+	are useful for testing.
+
 
 ``--fields=[+|-]flags|*``
 	Specifies the available extension fields which are to be included in
-	the entries of the tag file (see TAG FILE FORMAT, below, for more
-	information). The parameter flags is a set of one-letter flags,
-	each representing one type of extension field to include, with the
-	following meanings (disabled by default unless indicated):
+	the entries of the tag file (see "TAG FILE FORMAT", below, and, "Fields", above, for more
+	information).
 
-	a
+	The parameter flags is a set of one-letter flags,
+	each representing one type of extension field to include.
+	Each letter or group of letters may be preceded by either '+' to add it
+	to the default set, or '-' to exclude it. In the absence of any
+	preceding '+' or '-' sign, only those fields explicitly listed in flags
+	will be included in the output (i.e. overriding the default set). All
+	fields are included if '*' is given. This option is ignored if the
+	option ``--format=1`` has been specified.
+
+	This ``--fields=`` option is for controlling fields common in
+	languages (or language in-depends fields).  Universal-ctags
+	introduces language own fields. (See "Language own fields and
+	extras" about the concept). Use ``--fields-<LANG>=`` option for
+	controlling them.
+
+
+	The meaning of major fields is as follows (one-letter flag/name):
+
+	a/access
 		Access (or export) of class members
 
-	f
-		File-restricted scoping [enabled]
+	e/end
+		End lines of various items
 
-	i
-		Inheritance information
+	f/file
+		File-restricted scoping. Enabled by default.
+
+	i/inherits
+		Inheritance information.
 
 	k
-		Kind of tag as a single letter [enabled]
+		Kind of tag as a single letter. Enabled by default.
+		Exceptionally this has no name.
 
 	K
 		Kind of tag as full name
+		Exceptionally this has no name.
 
-	l
+	l/language
 		Language of source file containing tag
 
-	m
+	m/implementation
 		Implementation information
 
-	n
+	n/line
 		Line number of tag definition
 
-	s
-		Scope of tag definition [enabled]
+	p/scopeKind
+		Kind of scope as full name
 
-	S
+	r/role
+		Role of reference tag
+
+	s
+		Scope of tag definition. Enabled by default.
+		Exceptionally this has no name.
+
+	S/signature
 		Signature of routine (e.g. prototype or parameter list)
 
-	t
-		Type and name of a variable or typedef as "typeref:" field [enabled]
+	t/typeref
+		Type and name of a variable or typedef as "typeref:" field.
+		Enabled by default.
 
-	z
+	z/kind
 		Include the "kind:" key in kind field
 
 	Z
-		Include the "scope:" key in scope field
+		Include the "scope:" key in scope field.
+		Exceptionally this has no name.
 
-	Each letter or group of letters may be preceded by either '+' to add it
-	to the default set, or '-' to exclude it. In the absence of any
-	preceding '+' or '-' sign, only those kinds explicitly listed in flags
-	will be included in the output (i.e. overriding the default set). All
-	fields are included if '*' is given. This option is ignored if the
-	option ``--format=1`` has been specified. The default value of this option
-	is fkst.
+	Inquire the output of ``--list-fields`` option for the other minor
+	fields.
+
+	A name associated with a field can be used as alternative to a
+	one-letter flag. Some minor fields have no one-letters flag. In
+	that case, names must be specified anyway. See "Letters and names"
+	for more details.
 
 ``--file-scope[=yes|no]``
 	Indicates whether tags scoped only for a single file (i.e. tags which
 	cannot be seen outside of the file in which they are defined, such as
 	"static" tags) should be included in the output. See, also, the ``-h``
 	option. This option is enabled by default.
+
+	Universal-ctags provides alternative way to control this option,
+	"F/fileScope" extra, and recommends users to use the
+	extra. However, this extra can cause a trouble.
+	See ctags-incompatibilities(7).
 
 ``--filter[=yes|no]``
 	Causes @CTAGS_NAME_EXECUTABLE@ to behave as a filter, reading source
@@ -692,14 +924,18 @@ OPTION ITEMS
 	(i.e. overriding the default for the specified language).
 
 	Specifies '*' as the parameter kinds to include all kinds implemented
-	in <LANG> in the output. Further more if '*' is given as <LANG>,
+	in <LANG> in the output. Further more if "all" is given as <LANG>,
 	specification of the parameter kinds affects all languages defined
-	in @CTAGS_NAME_EXECUTABLE@.
+	in @CTAGS_NAME_EXECUTABLE@. Giving "all" makes sense only when '*' is
+	given as the parameter kinds.
 
 	As an example for the C language, in order to add prototypes and
 	external variable declarations to the default set of tag kinds,
 	but exclude macros, use "--c-kinds=+px-d"; to include only tags for
 	functions, use "--c-kinds=f".
+
+	A name associated with a kind can be used as alternative to a
+	one-letter flag. See "Letters and names" for more details.
 
 ``--<LANG>-kinds=[+|-]kinds|*``
 	Equivalent to ``--kinds-<LANG>=...``. This option is kept for
@@ -750,7 +986,7 @@ OPTION ITEMS
 	To clear the mapping for a
 	particular language (thus inhibiting automatic generation of tags for
 	that language), specify an empty extension list (e.g. "--langmap=fortran:").
-	To restore the default language mappings for all a particular language,
+	To restore the default language mappings for a particular language,
 	supply the keyword "default" for the mapping. To specify restore the
 	default language mappings for all languages, specify "--langmap=default".
 
@@ -825,15 +1061,187 @@ OPTION ITEMS
 	languages, and then exits. The aliases are used in when guessing
 	a parser for a source file.
 
+``--list-extras[=languages|all]``
+	Lists the extras recognized for either the specified language or
+	"all" languages. See "Extras" subsection to know what are extras.
+
+	An extra can be enabled or disabled with ``--extras=`` for common
+	extras in all languages, or ``--extras-<LANG>=`` for the specified
+	language.  These option takes one-letter flag or name as a parameter
+	for specifying an extra.
+
+	The meaning of columns are as follows:
+
+	LETTER
+		One-letter flag. '-' means the extra does not have one-letter flag.
+
+	NAME
+		The name of extra. The name is used in ``extras:`` field.
+
+	ENABLED
+		Whether the extra is enabled or not. It takes "yes" or "no".
+
+	LANGUAGE
+		The name of language if the extra is owned by a parser.
+		"NONE" means the extra is common in parsers.
+
+	DESCRIPTION
+		Human readable description for the extra.
+
+``--list-features``
+	Lists the compiled features.
+
+``--list-fields[=language|all]``
+	Lists the fields recognized for either the specified language or
+	"all" languages. See "Fields" subsection to know what are fields.
+
+	.. TODO? xref output
+
+	A field can be enabled or disabled with ``--fields=`` for common
+	extras in all languages, or ``--fields-<LANG>=`` for the specified
+	language.  These option takes one-letter flag or name as a parameter
+	for specifying a field.
+
+	The meaning of columns are as follows:
+
+	LETTER
+		One-letter flag. '-' means the field does not have one-letter flag.
+
+	NAME
+		The name of field.
+
+	ENABLED
+		Whether the field is enabled or not. It takes "yes" or "no".
+
+	LANGUAGE
+		The name of language if the field is owned by a parser.
+		"NONE" means the extra is common in parsers.
+
+	JSTYPE
+		Json type used in printing the value of field when "--output-format=json"
+		is specified.
+
+		Following characters are used for representing types.
+
+		s
+			string
+		i
+			integer
+		b
+			boolean (true or false)
+
+		The representation of this field and the output format used in
+		"--output-format=json" are still experimental.
+
+	FIXED
+	   Whether this field can be disabled or not. Some fields are printed always
+	   in tags output. They have "yes" as the value for this column.
+
+	DESCRIPTION
+		Human readable description for the field.
+
 ``--list-kinds[=language|all]``
-	Lists the tag kinds recognized for either the specified language or all
-	languages, and then exits. Each kind of tag recorded in the tag file
-	is represented by a one-letter flag, which is also used to filter the
-	tags placed into the output through use of the ``--<LANG>-kinds`` option.
-	Note that some languages and/or tag kinds may be implemented using
-	regular expressions and may not be available if regex support is not
-	compiled into @CTAGS_NAME_EXECUTABLE@ (see the ``--regex-<LANG>`` option).
-	Each kind listed is enabled unless followed by "[off]".
+	Subset of ``--list-kinds-full``. This option is kept for
+	backward-compatibility with Exuberant-ctags.
+
+	This option prints only LETTER, DESCRIPTION, and ENABLED fields
+	of ``--list-kinds-full`` output. However, the presentation of
+	ENABLED column is different from that of ``--list-kinds-full``
+	option; "[off]" follows after description if the kind is disabled,
+	and nothing follows	if enabled. The most of all kinds are enabled
+	by default.
+
+	The critical weakness of this option is that this option does not
+	print the name of kind. Universal-ctags introduces
+	``--list-kinds-full`` because it considers that names are
+	important.
+
+	This option does not work with ``--machinable`` nor
+	``--with-list-header``.
+
+``--list-kinds-full[=language|all]``
+	Lists the tag kinds recognized for either the specified language
+	or "all" languages, and then exits. See "Kinds" subsection to
+	know what are kinds.
+
+	Each kind of tag recorded in the tag file is represented by a
+	one-letter flag, or name. They are also used to filter the tags
+	placed into the output through use of the ``--kinds-<LANG>``
+	option.
+
+	The meaning of columns are as follows:
+
+	LANGUAGE
+		The name of language having the kind.
+
+	LETTER
+		One-letter flag. This must be unique in a language.
+
+	NAME
+		Name of the kind. This can be used as the alternative
+		one-letter flag described above. If enabling 'K' field with
+		``--fields=+K``, @CTAGS_NAME_EXECUTABLE@ uses name instead of
+		letter in tags output. To enable/disable a kind with
+		``--kinds-<LANG>`` option, name surrounded by braces instead
+		of letter. See "Letters and names" for details. This must be
+		unique in a language.
+
+	ENABLED
+		Whether the kind is enabled or not. It takes "yes" or "no".
+
+	REFONLY
+		Whether the kind is specialized for reference tagging or not.
+		If the column is "yes", the kind is for reference tagging, and
+		it is never used for definition tagging. See also "TAG ENTRIES".
+
+	NROLES
+		The number of roles this kind has. See also "Roles".
+
+	MASTER
+		The master parser controlling enablment of the kind.
+		A kind belongs to a language (owner) in Universal-ctags;
+		enabling and disabling a kind in a language has no effect on
+		a kind in another language even if the both kinds has the
+		same letter and/or the same name. In other words,
+		the namespace of kinds are separated by language.
+
+		However, Exuberant-ctags does not separate the kinds of C and
+		C++. Enabling/disabling kindX in C language enables/disables a
+		kind in C++ language having the same name with kindX. To
+		emulate this behavior in Universal-ctags, a concept named
+		"master parser" is introduced. Enabling/disabling some kinds
+		are synchronized under the control of a master language.
+
+		.. code-block:: console
+
+			$ ctags --kinds-C=+'{local}' --list-kinds-full \
+			  | grep -E '^(#|C\+\+ .* local)'
+			#LANGUAGE  LETTER NAME   ENABLED REFONLY NROLES MASTER DESCRIPTION
+			C++        l      local  yes     no      0      C      local variables
+			$ ctags --kinds-C=-'{local}' --list-kinds-full \
+			  | grep -E '^(#|C\+\+ .* local)'
+			#LANGUAGE  LETTER NAME   ENABLED REFONLY NROLES MASTER DESCRIPTION
+			C++        l      local  no      no      0      C      local variables
+
+		You see "ENABLED" field of "local" kind of C++ language is changed
+		Though "local" kind of C language is enabled/disabled. If you swap the languages, you
+		see the same result.
+
+	DESCRIPTION
+		Human readable description for the kind.
+
+``--list-languages``
+	Lists the names of the languages understood by @CTAGS_NAME_EXECUTABLE@,
+	and then exits. These language names are case insensitive and may be
+	used in the the many other options like ``--language-force``,
+	``--languages``, ``--kinds-<LANG>``, ``--regex-<LANG>``, and so on.
+
+	Each language listed is disabled if followed by "[disabled]".
+	To use the parser for such a language, specify the language as an
+	argument of ``--languages=+`` option.
+
+	This option does not work with ``--machinable`` nor
+	``--with-list-header``.
 
 ``--list-map-extensions[=language|all]``
 	Lists the file extensions which associate a file
@@ -854,11 +1262,39 @@ OPTION ITEMS
 	``--list-map-extensions`` or ``--list-map-patterns`` option.
 	See the ``--langmap`` option, and "SOURCE FILES", above.
 
-``--list-languages``
-	Lists the names of the languages understood by @CTAGS_NAME_EXECUTABLE@,
-	and then exits. These language names are case insensitive and may be
-	used in the ``--language-force``, ``--languages``, ``--<LANG>-kinds``,
-	and ``--regex-<LANG>`` options.
+	This option does not work with ``--machinable`` nor
+	``--with-list-header``.
+
+``--list-roles[=language|all[.kinds]]``
+	List the roles for either the specified language or "all"
+	languages. If the parameter kinds is given after the parameter
+	language or "all" with concatenating with '.', list only roles
+	defined in the kinds. Both one-letter flags and names surrounded
+	by braces are acceptable as the parameter kinds.
+
+	The meaning of columns are as follows:
+
+	LANGUAGE
+		Name of language having the role.
+
+	KIND(L/N)
+		One-letter flag and name of kind having the role.
+
+	NAME
+		Name of the role.
+
+	ENABLED
+		Whether the kind is enabled or not. It takes "yes" or "no".
+		(Currently all roles are enabled. No option for disabling
+		a specified role is not implemented yet.)
+
+	DESCRIPTION
+		Human readable description for the role.
+
+``--machinable[=yes|no]``
+	Use tab character as separators for ``--list-`` option output.  It
+	may be suitable for scripting. See "List options" for considered
+	use cases. Disabled by default.
 
 ``--map-<LANG>=[+|-]extension|pattern``
 	This option provides the way to control mapping(s) of file names to
@@ -895,7 +1331,7 @@ OPTION ITEMS
 	Volunteers are welcome). As a special case, if "--options=NONE" is
 	specified as the first option on the command line, it will disable
 	the automatic reading of any configuration options from either a file
-	or the environment (see FILES).
+	or the environment (see "FILES").
 
 ``--print-language``
 	Just prints the parsers for specified source files, and then exits.
@@ -938,7 +1374,7 @@ OPTION ITEMS
 	to a non-empty string of characters, or a warning message will be
 	reported. An optional kind specifier for tags matching regexp may follow
 	replacement, which will determine what kind of tag is reported in the
-	"kind" extension field (see TAG FILE FORMAT, below). The full form of
+	"kind" extension field (see "TAG FILE FORMAT", below). The full form of
 	kind-spec is in the form of a single letter, a comma, a name (without
 	spaces), a comma, a description, followed by a separator, which specify
 	the short and long forms of the kind value and its textual description
@@ -959,8 +1395,8 @@ OPTION ITEMS
 	Note that this option is available only if @CTAGS_NAME_EXECUTABLE@ was
 	compiled with support for regular expressions, which depends upon your
 	platform. You can determine if support for regular expressions is
-	compiled in by examining the output of the ``--version`` option, which will
-	include "+regex" in the compiled feature list.
+	compiled in by examining the output of the ``--list-features`` option, which will
+	include "regex" in the compiled feature list.
 
 	For more information on the regular expressions used by
 	@CTAGS_NAME_EXECUTABLE@, see either the regex(5,7) man page, or the GNU
@@ -999,10 +1435,14 @@ OPTION ITEMS
 	and a brief message describing what action is being taken for each file
 	considered by @CTAGS_NAME_EXECUTABLE@. Normally, @CTAGS_NAME_EXECUTABLE@
 	does not read command line arguments until after options are read
-	from the configuration files (see FILES, below) and the CTAGS
+	from the configuration files (see "FILES", below) and the CTAGS
 	environment variable. However, if this option is the first argument on
 	the command line, it will take effect before any options are read from
 	these sources. The default is no.
+
+``--with-list-header[=yes|no]``
+	Print headers describing columns in ``--list-`` option output.
+	See also "List options".
 
 ``--version``
 	Prints a version identifier for @CTAGS_NAME_EXECUTABLE@ to standard
@@ -1021,7 +1461,7 @@ Unix-style "#!" specification (if supported on the platform). If a
 language was identified, the file is opened and then the appropriate
 language parser is called to operate on the currently open file. The parser
 parses through the file and adds an entry to the tag file for each
-language object it is written to handle. See TAG FILE FORMAT, below, for
+language object it is written to handle. See "TAG FILE FORMAT", below, for
 details on these entries.
 
 This implementation of @CTAGS_NAME_EXECUTABLE@ imposes no formatting

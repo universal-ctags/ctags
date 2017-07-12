@@ -24,8 +24,8 @@ Universal-ctags forked from Exuberant-ctags.
 Incompatibilities in command line interface
 -------------------------------------------------------------
 
-``--langmap``
-~~~~~~~~~~~~~~
+The order of application of patterns and extensions in ``--langmap``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 When applying mappings for a name of given source file,
 Exuberant-ctags tests file name patterns AFTER file extensions
@@ -51,6 +51,24 @@ incompatibility.
 ``--list-map-extensions=language`` and ``--list-map-patterns=language``
 options are helpful to verify and the file extensions and the file
 name patterns of given *language*.
+
+Unexpected synchronization between ``--file-scope`` option and "F/fileScope" extra
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Universal-ctags introduces "F/fileScope" extra as the alternative to
+``--file-scope`` option.
+
+Providing the two way to control the same thing in Universal-ctags
+internal can cause a trouble.
+
+A user, expecting "--file-scope=yes" is enabled by default, gives
+"--extras=q". The intention of the user may be just enabling
+"q/qualified". However, "--extras=q" is evaluated as "disabling all
+extras including F/fileScope, then enabling only
+q/qualified". Unexpectedly the command line becomes as if
+"--file-scope=no" is set.
+
+In this case the user should set "--extras=+q" instead of "--extras=q".
 
 
 Incompatibilities in tags file format

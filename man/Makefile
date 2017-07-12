@@ -44,20 +44,20 @@ man_pages  = $(basename $(rst_files))
 html_pages = $(addsuffix .html,$(man_pages))
 pdf_pages  = $(addsuffix .pdf,$(man_pages))
 
-#
-# pdf files are not created because rst2pdf requires a language name after
-#
-#   .. code-block::
-#
-# though rst2man doesn't accept it. docutils must be fixed.
-#
-all: $(man_pages) $(html_pages) # $(pdf_pages)
+all: man html pdf
+
+man: $(man_pages)
+html: $(html_pages)
+pdf: $(pdf_pages)
 
 %.rst: %.rst.in
 ifeq ($(QUICK),)
 	(cd ..; ./configure $(CONFIGURE_FLAGS))
 else
-	cp $< $@
+	sed \
+		-e s/@CTAGS_NAME_EXECUTABLE@/ctags/g \
+		-e s/@ETAGS_NAME_EXECUTABLE@/etags/g \
+	< $< > $@
 endif
 
 %: %.rst
@@ -65,7 +65,7 @@ endif
 %.html: %.rst
 	$(RST2HTML) $(RST2HTML_FLAGS)  $< > $@
 %.pdf: %.rst
-	$(RST2PDF) $(RST2PDF_FLAGS) $< > $@
+	$(RST2PDF) $(RST2PDF_FLAGS) $< -o $@
 
 clean:
-	rm -f $(man_pages) $(html_pages)
+	rm -f $(man_pages) $(html_pages) $(pdf_pages)
