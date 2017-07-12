@@ -4543,8 +4543,10 @@ onig_scan(regex_t* reg, const UChar* str, const UChar* end,
       if (rs != 0)
 	return rs;
 
-      if (region->end[0] == start - str)
-	start++;
+      if (region->end[0] == start - str) {
+	if (start >= end) break;
+	start += enclen(reg->enc, start, end);
+      }
       else
 	start = str + region->end[0];
 
