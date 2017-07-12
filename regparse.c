@@ -4767,6 +4767,12 @@ parse_char_class(Node** np, Node** asc_np, OnigToken* tok, UChar** src, UChar* e
 	  CC_ESC_WARN(env, (UChar* )"-");
 	  goto range_end_val;
 	}
+
+	if (val_type == CCV_CLASS) {
+	  r = ONIGERR_UNMATCHED_RANGE_SPECIFIER_IN_CHAR_CLASS;
+	  goto err;
+	}
+
 	state = CCS_RANGE;
       }
       else if (state == CCS_START) {
