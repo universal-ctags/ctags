@@ -28,6 +28,7 @@ typedef struct sHashEntry {
 	const char *string;
 	langType language;
 	int value;
+	bool dynamic;
 } hashEntry;
 
 /*
@@ -87,7 +88,7 @@ static unsigned int hashValue (const char *const string, langType language)
 }
 
 static hashEntry *newEntry (
-		const char *const string, langType language, int value)
+	const char *const string, langType language, int value, bool dynamic)
 {
 	hashEntry *const entry = xMalloc (1, hashEntry);
 
@@ -95,6 +96,7 @@ static hashEntry *newEntry (
 	entry->string   = string;
 	entry->language = language;
 	entry->value    = value;
+	entry->dynamic  = dynamic;
 
 	return entry;
 }
@@ -104,7 +106,7 @@ static hashEntry *newEntry (
  *  should be added in lower case. If we encounter a case-sensitive language
  *  whose keywords are in upper case, we will need to redesign this.
  */
-extern void addKeyword (const char *const string, langType language, int value)
+static void addKeywordCommon (const char *const string, langType language, int value, bool dynamic)
 {
 	const unsigned int index = hashValue (string, language) % TableSize;
 	hashEntry *entry = getHashTableEntry (index);
@@ -112,7 +114,7 @@ extern void addKeyword (const char *const string, langType language, int value)
 	if (entry == NULL)
 	{
 		hashEntry **const table = getHashTable ();
-		table [index] = newEntry (string, language, value);
+		table [index] = newEntry (string, language, value, dynamic);
 	}
 	else
 	{
@@ -131,9 +133,21 @@ extern void addKeyword (const char *const string, langType language, int value)
 		if (entry == NULL)
 		{
 			Assert (prev != NULL);
-			prev->next = newEntry (string, language, value);
+			prev->next = newEntry (string, language, value, dynamic);
 		}
 	}
+}
+
+extern void addKeyword (const char *const string, langType language, int value)
+{
+	addKeywordCommon (string, language, value, false);
+}
+
+extern void addKeywordStrdup (const char *const string, langType language, int value)
+{
+
+	char *s = eStrdup (string);
+	addKeywordCommon (s, language, value, true);
 }
 
 static int lookupKeywordFull (const char *const string, bool caseSensitive, langType language)
@@ -179,6 +193,8 @@ extern void freeKeywordTable (void)
 			while (entry != NULL)
 			{
 				hashEntry *next = entry->next;
+				if (entry->dynamic)
+					eFree ((char *)entry->string);
 				eFree (entry);
 				entry = next;
 			}

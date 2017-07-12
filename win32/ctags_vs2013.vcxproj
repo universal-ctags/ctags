@@ -113,6 +113,7 @@
     <ClCompile Include="..\main\lxpath.c" />
     <ClCompile Include="..\main\main.c" />
     <ClCompile Include="..\main\mio.c" />
+    <ClCompile Include="..\main\mm.c" />
     <ClCompile Include="..\main\nestlevel.c" />
     <ClCompile Include="..\main\objpool.c" />
     <ClCompile Include="..\main\options.c" />
@@ -257,6 +258,7 @@
     <ClInclude Include="..\main\lxpath.h" />
     <ClInclude Include="..\main\main.h" />
     <ClInclude Include="..\main\mio.h" />
+    <ClInclude Include="..\main\mm.h" />
     <ClInclude Include="..\main\nestlevel.h" />
     <ClInclude Include="..\main\objpool.h" />
     <ClInclude Include="..\main\options.h" />

@@ -3482,7 +3482,7 @@ static void createTags (const unsigned int nestLevel,
 	DebugStatement ( if (nestLevel > 0) debugParseNest (false, nestLevel - 1); )
 }
 
-static rescanReason findCTags (const unsigned int passCount)
+static rescanReason findCTags (const int passCount)
 {
 	exception_t exception;
 	rescanReason rescan;

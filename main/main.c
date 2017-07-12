@@ -70,6 +70,7 @@
 #include "error.h"
 #include "field.h"
 #include "keyword.h"
+#include "mm.h"
 #include "main.h"
 #include "options.h"
 #include "read.h"
@@ -480,6 +481,8 @@ static void batchMakeTags (cookedArgs *args, void *user CTAGS_ATTR_UNUSED)
 	}
 	if (! files  &&  Option.recurse)
 		resize = recurseIntoDirectory (".");
+
+	resize = mmRun ()? true: resize;
 
 	timeStamp (1);
 

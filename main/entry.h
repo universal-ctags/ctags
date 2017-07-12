@@ -51,6 +51,7 @@ struct sTagEntryInfo {
 	unsigned int placeholder    :1;	 /* This is just a part of scope context.
 					    Put this entry to cork queue but
 					    don't print it to tags file. */
+	unsigned int barrel: 1;		/* store to barrel */
 
 	unsigned long lineNumber;     /* line number of tag */
 	const char* pattern;	      /* pattern for locating input line
@@ -172,6 +173,9 @@ void          uncorkTagFile(void);
 tagEntryInfo *getEntryInCorkQueue   (unsigned int n);
 tagEntryInfo *getEntryOfNestingLevel (const NestingLevel *nl);
 size_t        countEntryInCorkQueue (void);
+void          handOverEntryToNextMMPass (unsigned int n);
+
+extern void clearTagEntry (tagEntryInfo* slot);
 
 extern void makeFileTag (const char *const fileName);
 

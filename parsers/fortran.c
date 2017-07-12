@@ -2522,7 +2522,7 @@ static void parseProgramUnit (tokenInfo *const token)
 	} while (! isType (token, TOKEN_EOF));
 }
 
-static rescanReason findFortranTags (const unsigned int passCount)
+static rescanReason findFortranTags (const int passCount)
 {
 	tokenInfo *token;
 	rescanReason rescan;

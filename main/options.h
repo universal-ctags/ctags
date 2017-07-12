@@ -88,7 +88,7 @@ typedef struct sOptionValues {
 	char *inputEncoding;	/* --input-encoding	convert text into --output-encoding */
 	char *outputEncoding;	/* --output-encoding	write tags file as this encoding */
 #endif
-	langType language;      /* --lang specified language override */
+	langType language;      /* --language-force specified language override */
 	bool followLinks;    /* --link  follow symbolic links? */
 	bool filter;         /* --filter  behave as filter: files in, tags out */
 	char* filterTerminator; /* --filter-terminator  string to output */

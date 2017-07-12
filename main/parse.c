@@ -22,6 +22,7 @@
 #include "htable.h"
 #include "keyword.h"
 #include "main.h"
+#include "mm.h"
 #define OPTION_WRITE
 #include "options.h"
 #include "parsers.h"
@@ -79,6 +80,7 @@ typedef struct sParserObject {
 	struct slaveControlBlock *slaveControlBlock;
 	struct kindControlBlock  *kindControlBlock;
 	struct lregexControlBlock *lregexControlBlock;
+	int mmPassCount;
 } parserObject;
 
 /*
@@ -2736,7 +2738,7 @@ extern bool processFielddefOption (const char *const option, const char *const p
 */
 
 static rescanReason createTagsForFile (const langType language,
-				       const unsigned int passCount)
+				       const int passCount)
 {
 	parserDefinition *const lang = LanguageTable [language].def;
 	rescanReason rescan = RESCAN_NONE;
@@ -2814,7 +2816,8 @@ static bool createTagsWithFallback1 (const langType language,
 	unsigned long numTags	= numTagsAdded ();
 	MIOPos tagfpos;
 	int lastPromise = getLastPromise ();
-	unsigned int passCount = 0;
+	int passCount = 0;
+	bool in_mm_pass = inMMPass ();
 	rescanReason whyRescan;
 	parserObject *parser;
 	bool useCork;
@@ -2834,7 +2837,8 @@ static bool createTagsWithFallback1 (const langType language,
 	anonResetMaybe (parser);
 
 	while ( ( whyRescan =
-		  createTagsForFile (language, ++passCount) )
+		  createTagsForFile (language,
+							 (in_mm_pass? mmCurrentPass(): ++passCount)))
 		!= RESCAN_NONE)
 	{
 		if (useCork)
@@ -2843,8 +2847,13 @@ static bool createTagsWithFallback1 (const langType language,
 			corkTagFile();
 		}
 
-
-		if (whyRescan == RESCAN_FAILED)
+		if (whyRescan == RESCAN_MM)
+		{
+			const char *fname = getInputFileName();
+			mmSchedule (fname, language);
+			break;
+		}
+		else if (whyRescan == RESCAN_FAILED)
 		{
 			/*  Restore prior state of tag file.
 			*/
@@ -2862,7 +2871,7 @@ static bool createTagsWithFallback1 (const langType language,
 	}
 
 	/* Force filling allLines buffer and kick the multiline regex parser */
-	if (hasLanguageMultilineRegexPatterns (language))
+	if ((!in_mm_pass) && hasLanguageMultilineRegexPatterns (language))
 		while (readLineFromInputFile () != NULL)
 			; /* Do nothing */
 
@@ -2924,7 +2933,10 @@ static bool createTagsWithFallback (
 	pushLanguage ((exclusive_subparser == LANG_IGNORE)
 				  ? language
 				  : exclusive_subparser);
-	makeFileTag (fileName);
+
+	if (mmCurrentPass() >= 0)
+		makeFileTag (fileName);
+
 	popLanguage ();
 	closeInputFile ();
 
@@ -3688,6 +3700,19 @@ extern void printLangdefFlags (bool withListHeader, bool machinable, FILE *fp)
 
 	flagsColprintTablePrint (table, withListHeader, machinable, fp);
 	colprintTableDelete(table);
+}
+
+extern bool setupParserMM (langType lang, int mmPassCount, Barrel *barrel)
+{
+	parserObject *parser = (LanguageTable + lang);
+
+	if (parser->mmPassCount != mmPassCount)
+	{
+		parser->def->setupMM (lang, barrel);
+		parser->mmPassCount = mmPassCount;
+		return true;
+	}
+	return false;
 }
 
 /*

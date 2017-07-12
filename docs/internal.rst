@@ -420,3 +420,110 @@ An example can be found in DTS parser:
 
 Setting `requestAutomaticFQTag` to `TRUE` implies setting
 `useCork` to `TRUE`.
+
+Multi passes parsing over multi input files
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The main part of Universal-ctags provides APIs for Multi passes
+parsing over Multi source files (MM). The main part applies
+a parser to the same input files more than once. Each application
+is called "pass". Tags captured in a pass can be passed the next
+pass via data structure called "barrel". A parser can use
+"barrel" for two purpose: filling fields of tags and hinting.
+
+
+What you can do MM
+......................................................................
+
+Let's see the next code (input.py) of python:
+
+.. code-block:: python
+
+	from X import Y
+	...
+
+.. code-block:: console
+
+	$ ctags --extras=+r --fields=+rK -o - input.py
+	X	input.py	/^from X import Y$/;"	module	role:namespace
+	Y	input.py	/^from X import Y$/;"	unknown	role:imported
+
+The Kind for "Y" is "unknown"; as far as parsing only
+``input.py``, ctags cannot know the kind of "Y". "Y" can be a class, a
+variable, a function, etc. To decide the kind, at least, the knowledge
+about module "X" (X.py).
+
+.. code-block:: python
+
+	class Y:
+		...
+
+If ``X.py`` is passed an input file to ctags, The python parser can know "Y"
+is a class.
+
+.. code-block:: console
+
+	$ ctags --extras=+r --fields=+rK -o - X.py
+	Y	X.py	/^class Y:$/;"	class
+
+However, python parser could not know this when parsing ``input.py``.
+
+Here comes MM.
+
+.. code-block:: console
+
+	$ ctags --extras=+r --fields=+rK -o - input.py X.py
+
+At the first pass, the python parser puts following tags captured
+from the two source files to "barrel"::
+
+	Y	input.py	/^from X import Y$/;"	unknown	role:imported
+	Y	X.py	/^class Y:$/;"	class
+
+At the second pass, the python parser receives above "barrel", and
+decides the kind of "Y" referenced in input.py like::
+
+	Y	input.py	/^from X import Y$/;"	class	role:imported
+
+At the first pass, the writing out "Y" in input.py to tags file can be
+delayed. At the second pass, the python parser writes the tag for "Y"
+to tags file with deciding the kind field.
+
+This is just an example showing how useful MM is. What ctags can do at
+the second pass is similar to what gcc can do at the linking stage.
+
+MM/Barrel API
+......................................................................
+
+.. figure:: barrel.svg
+	    :scale: 80%
+
+MM parser must enable cork and use ``parser2`` method instead of
+``parser`` method. ``parser2`` method has ``passCount`` parameter.
+In MM process, a negative integer passed to ``parser2`` method via
+``passCount``; -1 is for the first pass, -2 is for the second pass,
+and so on. Positive integers are for Multi passes parsing over single
+input file.
+
+If a parser in a pass wants to process current input file,
+return ``RESCAN_MM`` from ``parser2`` method of ``parserDefinition``.
+
+The ctags main part gathers all input files which parsers
+ask "next pass" with ``RESCAN_MM``. After all input files are
+processed in the current pass, the main part starts the
+next pass. Before applying ``parser2`` methods of parsers
+to the input files marked ``RESCAN_MM``, the main part
+calls ``setupMM`` method of the parsers with "Barrel".
+
+A tag passed to ``makeTagEntry`` has two destinations:
+tags file and/or "Barrel".
+
+If ``placeholder`` field of a tag is 0, the tag is
+written to tags file when corkQueue is flushed.
+
+If ``barrel`` field of a tag is 1, the tag is stored to
+"Barrel". ``handOverEntryToNextMMPass`` helper function is for setting
+the ``barrel`` field to 1.
+
+If ``placeholder`` field of a tag is 0, and ``barrel`` field of the
+same tag is 1, the tag is written to tags file and stored to "Barrel".
