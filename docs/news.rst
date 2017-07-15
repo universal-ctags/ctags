@@ -669,6 +669,7 @@ See :ref:`--_interactive Mode <interactive-mode>` for more details.
 Defining a kind
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+.. IN MAN PAGE
 
 A new ``--kinddef-<LANG>=letter,name,description`` option reduces the
 typing defining a regex pattern with ``--regex-<LANG>=``, and keeps
