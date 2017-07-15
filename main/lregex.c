@@ -85,6 +85,7 @@ typedef struct {
 	unsigned int scopeActions;
 	bool *disabled;
 #define NO_MULTILINE -1
+#define IS_MULTILINE(PTRBUF) ((PTRBUF)->multiline >= 0)
 	int   multiline;
 	int   xtagType;
 	ptrArray *fieldPatterns;
@@ -524,7 +525,7 @@ static regexPattern *addCompiledTagPattern (struct lregexControlBlock *lcb, rege
 	ptrn->scopeActions = scopeActions;
 	ptrn->disabled = disabled;
 	ptrn->multiline = multiline;
-	if (multiline >= 0)
+	if (IS_MULTILINE(ptrn))
 		lcb->multilinePatternsCount++;
 	ptrn->xtagType = extraFlagData.xtype;
 
@@ -723,7 +724,7 @@ static void matchTagPattern (struct lregexControlBlock *lcb,
 {
 	vString *const name = substitute (line,
 			patbuf->u.tag.name_pattern, BACK_REFERENCE_COUNT, pmatch,
-			!!(patbuf->multiline >= 0));
+			(IS_MULTILINE(patbuf)));
 	bool placeholder = !!((patbuf->scopeActions & SCOPE_PLACEHOLDER) == SCOPE_PLACEHOLDER);
 	unsigned long scope = CORK_NIL;
 	int n;
@@ -753,7 +754,7 @@ static void matchTagPattern (struct lregexControlBlock *lcb,
 		if (patbuf->accept_empty_name == false)
 			error (WARNING, "%s:%lu: null expansion of name pattern \"%s\"",
 			       getInputFileName (),
-			       (patbuf->multiline >= 0)
+				   IS_MULTILINE(patbuf)
 			       ? getInputLineNumberForFileOffset (offset)
 			       : getInputLineNumber (),
 			       patbuf->u.tag.name_pattern);
@@ -766,7 +767,7 @@ static void matchTagPattern (struct lregexControlBlock *lcb,
 		kindDefinition *kdef;
 		tagEntryInfo e;
 
-		if (patbuf->multiline >= 0)
+		if (IS_MULTILINE(patbuf))
 		{
 			ln = getInputLineNumberForFileOffset (offset);
 			pos = getInputFilePositionForLine (ln);
@@ -794,7 +795,7 @@ static void matchTagPattern (struct lregexControlBlock *lcb,
 					{
 						vString * const value = substitute (line, fp->template,
 															BACK_REFERENCE_COUNT, pmatch,
-															!!(patbuf->multiline >= 0));
+															IS_MULTILINE(patbuf));
 						attachParserField (&e, fp->ftype, vStringValue (value));
 						trashBoxPut (field_trashbox, value,
 									 (TrashBoxDestroyItemProc)vStringDelete);
@@ -918,7 +919,7 @@ extern bool matchRegex (struct lregexControlBlock *lcb, const vString* const lin
 	for (i = 0  ;  i < lcb->count  ;  ++i)
 	{
 		regexPattern* ptrn = lcb->patterns + i;
-		if (ptrn->multiline >= 0)
+		if (IS_MULTILINE(ptrn))
 			continue;
 
 		if ((ptrn->xtagType != XTAG_UNKNOWN)
@@ -1128,7 +1129,7 @@ extern bool matchMultilineRegex (struct lregexControlBlock *lcb, const vString* 
 		for (i = 0; i < lcb->count && 0 < multilinePatternsCount; ++i)
 		{
 			regexPattern* ptrn = lcb->patterns + i;
-			if (ptrn->multiline < 0)
+			if (!IS_MULTILINE(ptrn))
 				continue;
 
 			multilinePatternsCount--;
