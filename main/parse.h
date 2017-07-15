@@ -216,6 +216,7 @@ extern void freeRegexResources (void);
 extern bool checkRegex (void);
 extern void useRegexMethod (const langType language);
 extern void printRegexFlags (bool withListHeader, bool machinable, FILE *fp);
+extern void printMultilineRegexFlags (bool withListHeader, bool machinable, FILE *fp);
 extern bool hasLanguageScopeActionInRegex (const langType language);
 
 /* Multiline Regex Interface */

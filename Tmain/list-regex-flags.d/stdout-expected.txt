@@ -3,7 +3,6 @@ b       basic              interpreted as a Posix basic regular expression.
 e       extend             interpreted as a Posix extended regular expression (default)
 i       icase              applied in a case-insensitive manner
 x       exclusive          skip testing the other patterns if a line is matched to this pattern
--       mgroup=N           a group in pattern determining the line number of tag
 -       placeholder        don't put this tag to tags file.
 -       scope=ACTION       use scope stack: ACTION = ref|push|pop|clear|set
 -       _extra=EXTRA       record the tag only when the extra is enabled

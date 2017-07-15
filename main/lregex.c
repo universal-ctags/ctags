@@ -1115,6 +1115,20 @@ extern void printRegexFlags (bool withListHeader, bool machinable, FILE *fp)
 	flagsColprintAddDefinitions (table, regexFlagDefs,  ARRAY_SIZE (regexFlagDefs));
 	flagsColprintAddDefinitions (table, prePtrnFlagDef, ARRAY_SIZE (prePtrnFlagDef));
 	flagsColprintAddDefinitions (table, scopePtrnFlagDef, ARRAY_SIZE (scopePtrnFlagDef));
+	flagsColprintAddDefinitions (table, extraSpecFlagDef, ARRAY_SIZE (extraSpecFlagDef));
+	flagsColprintAddDefinitions (table, fieldSpecFlagDef, ARRAY_SIZE (fieldSpecFlagDef));
+
+	flagsColprintTablePrint (table, withListHeader, machinable, fp);
+	colprintTableDelete(table);
+}
+
+extern void printMultilineRegexFlags (bool withListHeader, bool machinable, FILE *fp)
+{
+	struct colprintTable * table;
+
+	table = flagsColprintTableNew ();
+
+	flagsColprintAddDefinitions (table, regexFlagDefs,  ARRAY_SIZE (regexFlagDefs));
 	flagsColprintAddDefinitions (table, multilinePtrnFlagDef, ARRAY_SIZE (multilinePtrnFlagDef));
 	flagsColprintAddDefinitions (table, extraSpecFlagDef, ARRAY_SIZE (extraSpecFlagDef));
 	flagsColprintAddDefinitions (table, fieldSpecFlagDef, ARRAY_SIZE (fieldSpecFlagDef));
