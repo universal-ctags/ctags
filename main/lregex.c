@@ -84,6 +84,7 @@ typedef struct {
 	} u;
 	unsigned int scopeActions;
 	bool *disabled;
+#define NO_MULTILINE -1
 	int   multiline;
 	int   xtagType;
 	ptrArray *fieldPatterns;
@@ -367,13 +368,13 @@ static void pre_ptrn_flag_multiline_long (const char* const s, const char* const
 	if (!strToInt (v, 10, data))
 	{
 		error (WARNING, "wrong multiline specification: %s", v);
-		*((int *)data) = -1;
+		*((int *)data) = NO_MULTILINE;
 	}
 	else if (*((int *)data) < 0 || *((int *)data) >= BACK_REFERENCE_COUNT)
 	{
 		error (WARNING, "out of range(0 ~ %d) multiline specification: %s",
 		       (BACK_REFERENCE_COUNT - 1), v);
-		*((int *)data) = -1;
+		*((int *)data) = NO_MULTILINE;
 	}
 }
 
@@ -501,7 +502,7 @@ static regexPattern *addCompiledTagPattern (struct lregexControlBlock *lcb, rege
 	regexPattern * ptrn;
 	bool exclusive = false;
 	unsigned long scopeActions = 0UL;
-	int multiline = -1;
+	int multiline = NO_MULTILINE;
 	struct extraFlagData extraFlagData = {
 		.xtype = XTAG_UNKNOWN,
 		.owner = lcb->owner,
@@ -571,7 +572,7 @@ static void addCompiledCallbackPattern (struct lregexControlBlock *lcb, regex_t*
 	ptrn->u.callback.userData = userData;
 	ptrn->exclusive = exclusive;
 	ptrn->disabled = disabled;
-	ptrn->multiline = -1;
+	ptrn->multiline = NO_MULTILINE;
 }
 
 
