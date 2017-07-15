@@ -1,5 +1,5 @@
 --langdef=Hook{base=Event}
 --kinddef-Hook=h,hook,hooks
---regex-Hook=/DEFINE_HOOK\(([^;]|[[:space:]])*[[:space:],]([a-zA-Z_][a-zA-Z0-9_]*)\);/\2/h/{_multiline=1}
+--mline-regex-Hook=/DEFINE_HOOK\(([^;]|[[:space:]])*[[:space:],]([a-zA-Z_][a-zA-Z0-9_]*)\);/\2/h/{mgroup=1}
 
 

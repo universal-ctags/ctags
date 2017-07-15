@@ -367,6 +367,8 @@ static optionDescription LongOptionDescription [] = {
  {1,"       or one file extension can be specified at once."},
  {1,"       Unlike --langmap the change with this option affects mapping of <LANG> only."},
  {1,"  --maxdepth=N"},
+ {1,"  --mline-regex-<LANG>=/line_pattern/name_pattern/[flags]"},
+ {1,"       Define multieline regular expression for locating tags in specific language."},
 #ifdef RECURSE_SUPPORTED
  {1,"       Specify maximum recursion depth."},
 #else
@@ -3030,7 +3032,21 @@ static bool processRegexOption (const char *const option,
 	if (language == LANG_IGNORE)
 		return false;
 
-	processLanguageRegexOption (language, parameter);
+	processLanguageRegexOption (language, false, parameter);
+
+	return true;
+}
+
+static bool processMultilineRegexOption (const char *const option,
+										 const char *const parameter)
+{
+	langType language;
+
+	language = getLanguageComponentInOption (option, "mline-regex-");
+	if (language == LANG_IGNORE)
+		return false;
+
+	processLanguageRegexOption (language, true, parameter);
 
 	return true;
 }
@@ -3065,6 +3081,8 @@ static void processLongOption (
 	else if (processAliasOption (option, parameter))
 		;
 	else if (processRegexOption (option, parameter))
+		;
+	else if (processMultilineRegexOption (option, parameter))
 		;
 	else if (processMapOption (option, parameter))
 		;

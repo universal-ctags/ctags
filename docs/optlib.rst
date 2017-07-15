@@ -330,7 +330,7 @@ is imperfect approach for ignoring text insides comments but it may
 be better than nothing. Ghost kind is assigned to the empty name
 pattern. (See "Ghost kind in regex parser".)
 
-NOTE: This flag doesn't work well with ``_multiline``.
+NOTE: This flag doesn't make sense in ``--mline-regex-<LANG>``.
 
 
 Ghost kind in regex parser
@@ -440,7 +440,7 @@ Example 2::
 NOTE: Giving a scope long flag implies setting `useCork` of the parser
 to `TRUE`. See `cork API`.
 
-NOTE: This flag doesn't work well with ``multiline``.
+NOTE: This flag doesn't work well with ``--mline-regex-<LANG>=``.
 
 
 Override the letter for file kind
@@ -456,8 +456,8 @@ Multiline pattern match
 
 .. NOT REVIEWED YET
 
-A pattern marked with ``_multiline`` is applied to whole file contents,
-not line by line.
+Newly introduced ``--mline-regex-<LANG>=`` is similar ``--regex-<LANG>``
+but the pattern is applied to whole file contents, not line by line.
 
 Next example is based on an issue #219 posted by @andreicristianpetcu::
 
@@ -479,7 +479,7 @@ Next example is based on an issue #219 posted by @andreicristianpetcu::
     $ cat spring.ctags
     --langdef=javaspring
     --langmap=javaspring:.java
-    --regex-javaspring=/@Subscribe([[:space:]])*([a-z ]+)[[:space:]]*([a-zA-Z]*)\(([a-zA-Z]*)/\3-\4/s,subscription/{_multiline=3}
+    --multiline-regex-javaspring=/@Subscribe([[:space:]])*([a-z ]+)[[:space:]]*([a-zA-Z]*)\(([a-zA-Z]*)/\3-\4/s,subscription/{mgroup=3}
     --excmd=mixed
     --fields=+ln
 
@@ -487,7 +487,7 @@ Next example is based on an issue #219 posted by @andreicristianpetcu::
     Event-SomeEvent	input.java	/^public void catchEvent(SomeEvent e)$/;"	s	line:2	language:javaspring
     recover-Exception	input.java	/^    recover(Exception e)$/;"	s	line:10	language:javaspring
 
-``{_multiline=N}``
+``{mgroup=N}``
 
 	This tells the pattern should be applied to whole file
 	contents, not line by line.  ``N`` is the number of a group in the
@@ -528,7 +528,7 @@ The pattern matching is done only when the ``main`` is enabled.
 .. code-block:: ctags
 
 	$ ./ctags --options=python-main.ctags -o - --extras-Python='+{main}' input.py
-	__main__	input.py	/^if __name__ == '__main__':$/;"	f		
+	__main__	input.py	/^if __name__ == '__main__':$/;"	f
 
 Attaching parser own fields
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -698,7 +698,7 @@ Big test cases are good if smaller test cases exist.
 
 See also *parser-m4.r/m4-simple.d* especially *parser-m4.r/m4-simple.d/args.ctags*.
 Your test cases need ctags having already loaded your option
-library, swine.ctags. You must specify loading it in the 
+library, swine.ctags. You must specify loading it in the
 test case own *args.ctags*.
 
 Assume your test name is *swine-simile.d*. Put ``--option=swine`` in
@@ -711,7 +711,7 @@ Add your optlib file, *swine.ctags* to ``PRELOAD_OPTLIB`` variable of
 
 
 If you don't want your optlib loaded automatically when ctags starting up,
-put your optlib file to ``OPTLIB`` of *Makefile.in* instead of 
+put your optlib file to ``OPTLIB`` of *Makefile.in* instead of
 ``PRELOAD_OPTLIB``.
 
 Verification

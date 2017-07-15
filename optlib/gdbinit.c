@@ -42,15 +42,15 @@ extern parserDefinition* GdbinitParser (void)
 	};
 	static tagRegexTable GdbinitTagRegexTable [] = {
 		{"^#.*", "",
-		"", "{exclusive}"},
+		"", "{exclusive}", NULL, false},
 		{"^define[[:space:]]+([^[:space:]]+)$", "\\1",
-		"d", NULL},
+		"d", NULL, NULL, false},
 		{"^document[[:space:]]+([^[:space:]]+)$", "\\1",
-		"D", NULL},
+		"D", NULL, NULL, false},
 		{"^set[[:space:]]+\\$([a-zA-Z0-9_]+)[[:space:]]*=", "\\1",
-		"t", NULL},
+		"t", NULL, NULL, false},
 		{"^[[:space:]]+set[[:space:]]+\\$([a-zA-Z0-9_]+)[[:space:]]*=", "\\1",
-		"l", NULL},
+		"l", NULL, NULL, false},
 	};
 
 

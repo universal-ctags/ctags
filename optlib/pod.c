@@ -33,13 +33,13 @@ extern parserDefinition* PodParser (void)
 	};
 	static tagRegexTable PodTagRegexTable [] = {
 		{"^=head1[ \\t]+(.+)", "\\1",
-		"c", NULL},
+		"c", NULL, NULL, false},
 		{"^=head2[ \\t]+(.+)", "\\1",
-		"s", NULL},
+		"s", NULL, NULL, false},
 		{"^=head3[ \\t]+(.+)", "\\1",
-		"S", NULL},
+		"S", NULL, NULL, false},
 		{"^=head4[ \\t]+(.+)", "\\1",
-		"t", NULL},
+		"t", NULL, NULL, false},
 	};
 
 

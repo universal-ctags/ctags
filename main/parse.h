@@ -206,7 +206,7 @@ extern void freeEncodingResources (void);
 
 
 /* Regex interface */
-extern bool processLanguageRegexOption (langType language, const char *const parameter);
+extern bool processLanguageRegexOption (langType language, bool multiline, const char *const parameter);
 extern void findRegexTags (void);
 extern void findRegexTagsMainloop (int (* driver)(void));
 extern void matchLanguageRegex (const langType language, const vString* const line);

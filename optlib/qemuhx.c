@@ -38,11 +38,11 @@ extern parserDefinition* QemuHXParser (void)
 	};
 	static tagRegexTable QemuHXTagRegexTable [] = {
 		{"^SQMP[[:space:]]([-a-z_0-9A-Z]+)[[:space:]]---", "\\1",
-		"q", "{_multiline=1}"},
+		"q", "{mgroup=1}", NULL, true},
 		{"^SQMP[[:space:]]([-a-z_0-9A-Z]+)[[:space:]]---", "qmp_\\1",
-		"q", "{_multiline=1}{_extra=funcmap}"},
+		"q", "{mgroup=1}{_extra=funcmap}", NULL, true},
 		{"^@item[[:space:]]{1,}([-.a-z_0-9A-Z]{1,})", "\\1",
-		"i", NULL},
+		"i", NULL, NULL, false},
 	};
 
 
