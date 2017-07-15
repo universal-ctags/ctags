@@ -694,8 +694,7 @@ static void parseKinds (
 
 static vString* substitute (
 		const char* const in, const char* out,
-		const int nmatch, const regmatch_t* const pmatch,
-		bool allow_multiple)
+		const int nmatch, const regmatch_t* const pmatch)
 {
 	vString* result = vStringNew ();
 	const char* p;
@@ -710,7 +709,7 @@ static vString* substitute (
 				vStringNCatS (result, in + pmatch [dig].rm_so, diglen);
 			}
 		}
-		else if (allow_multiple || (*p != '\n'  &&  *p != '\r'))
+		else if (*p != '\n'  &&  *p != '\r')
 			vStringPut (result, *p);
 	}
 	return result;
@@ -723,8 +722,7 @@ static void matchTagPattern (struct lregexControlBlock *lcb,
 			     off_t offset)
 {
 	vString *const name = substitute (line,
-			patbuf->u.tag.name_pattern, BACK_REFERENCE_COUNT, pmatch,
-			(IS_MULTILINE(patbuf)));
+			patbuf->u.tag.name_pattern, BACK_REFERENCE_COUNT, pmatch);
 	bool placeholder = !!((patbuf->scopeActions & SCOPE_PLACEHOLDER) == SCOPE_PLACEHOLDER);
 	unsigned long scope = CORK_NIL;
 	int n;
@@ -794,8 +792,7 @@ static void matchTagPattern (struct lregexControlBlock *lcb,
 					if (isFieldEnabled (fp->ftype))
 					{
 						vString * const value = substitute (line, fp->template,
-															BACK_REFERENCE_COUNT, pmatch,
-															IS_MULTILINE(patbuf));
+															BACK_REFERENCE_COUNT, pmatch);
 						attachParserField (&e, fp->ftype, vStringValue (value));
 						trashBoxPut (field_trashbox, value,
 									 (TrashBoxDestroyItemProc)vStringDelete);
