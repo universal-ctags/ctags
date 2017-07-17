@@ -1,3 +1,7 @@
+auto_function	input.sv	/^function automatic auto_function (x);$/;"	f
+auto_function.x	input.sv	/^function automatic auto_function (x);$/;"	p	function:auto_function
+auto_static	input.sv	/^function static auto_static (x);$/;"	f
+auto_static.x	input.sv	/^function static auto_static (x);$/;"	p	function:auto_static
 ext_func	input.sv	/^extern function ext_func (x, y);$/;"	Q
 ext_func.x	input.sv	/^extern function ext_func (x, y);$/;"	p	prototype:ext_func
 ext_func.y	input.sv	/^extern function ext_func (x, y);$/;"	p	prototype:ext_func
@@ -52,6 +56,8 @@ x	input.sv	/^extern pure virtual task ext_pure_virt_task (x);$/;"	p	prototype:ex
 x	input.sv	/^extern static function ext_static_func (x, y);$/;"	p	prototype:ext_static_func
 x	input.sv	/^extern static task ext_static_task (x, y);$/;"	p	prototype:ext_static_task
 x	input.sv	/^extern task ext_task (x, y);$/;"	p	prototype:ext_task
+x	input.sv	/^function automatic auto_function (x);$/;"	p	function:auto_function
+x	input.sv	/^function static auto_static (x);$/;"	p	function:auto_static
 x	input.sv	/^pure virtual function pure_virt_func (x);$/;"	p	prototype:pure_virt_func
 x	input.sv	/^pure virtual local function pure_virt_local_func (x);$/;"	p	prototype:pure_virt_local_func
 x	input.sv	/^pure virtual local task pure_virt_local_task (x);$/;"	p	prototype:pure_virt_local_task

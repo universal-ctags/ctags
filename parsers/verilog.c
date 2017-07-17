@@ -55,12 +55,14 @@ typedef enum {
 	K_ASSERTION,
 	K_CLASS,
 	K_COVERGROUP,
+	K_ENUM,
 	K_INTERFACE,
 	K_MODPORT,
 	K_PACKAGE,
 	K_PROGRAM,
 	K_PROTOTYPE,
 	K_PROPERTY,
+	K_STRUCT,
 	K_TYPEDEF
 } verilogKind;
 
@@ -80,8 +82,8 @@ typedef struct sTokenInfo {
 	verilogKind         lastKind;      /* Kind of last found tag */
 	vString*            blockName;     /* Current block name */
 	vString*            inheritance;   /* Class inheritance */
-	bool             prototype;     /* Is only a prototype */
-	bool             classScope;    /* Context is local to the current sub-context */
+	bool                prototype;     /* Is only a prototype */
+	bool                classScope;    /* Context is local to the current sub-context */
 } tokenInfo;
 
 /*
@@ -104,7 +106,7 @@ static kindDefinition VerilogKinds [] = {
 };
 
 static kindDefinition SystemVerilogKinds [] = {
- { true, 'c', "constant",  "constants (define, parameter, specparam)" },
+ { true, 'c', "constant",  "constants (define, parameter, specparam, enum values)" },
  { true, 'e', "event",     "events" },
  { true, 'f', "function",  "functions" },
  { true, 'm', "module",    "modules" },
@@ -116,12 +118,14 @@ static kindDefinition SystemVerilogKinds [] = {
  { true, 'A', "assert",    "assertions" },
  { true, 'C', "class",     "classes" },
  { true, 'V', "covergroup","covergroups" },
+ { true, 'E', "enum",      "enumerators" },
  { true, 'I', "interface", "interfaces" },
  { true, 'M', "modport",   "modports" },
  { true, 'K', "package",   "packages" },
  { true, 'P', "program",   "programs" },
  { false,'Q', "prototype", "prototypes" },
  { true, 'R', "property",  "properties" },
+ { true, 'S', "struct",    "structs and unions" },
  { true, 'T', "typedef",   "type declarations" }
 };
 
@@ -169,6 +173,7 @@ static const keywordAssoc KeywordTable [] = {
 	{ "class",     K_CLASS,     { 1, 0 } },
 	{ "cover",     K_ASSERTION, { 1, 0 } },
 	{ "covergroup",K_COVERGROUP,{ 1, 0 } },
+	{ "enum",      K_ENUM,      { 1, 0 } },
 	{ "extern",    K_IGNORE,    { 1, 0 } },
 	{ "int",       K_REGISTER,  { 1, 0 } },
 	{ "interface", K_INTERFACE, { 1, 0 } },
@@ -185,14 +190,17 @@ static const keywordAssoc KeywordTable [] = {
 	{ "shortreal", K_REGISTER,  { 1, 0 } },
 	{ "static",    K_IGNORE,    { 1, 0 } },
 	{ "string",    K_REGISTER,  { 1, 0 } },
+	{ "struct",    K_STRUCT,    { 1, 0 } },
 	{ "type",      K_IGNORE,    { 1, 0 } },
 	{ "typedef",   K_TYPEDEF,   { 1, 0 } },
+	{ "union",     K_STRUCT,    { 1, 0 } },
 	{ "unsigned",  K_IGNORE,    { 1, 0 } },
 	{ "virtual",   K_IGNORE,    { 1, 0 } },
 	{ "void",      K_IGNORE,    { 1, 0 } }
 };
 
 static tokenInfo *currentContext = NULL;
+static tokenInfo *tagContents = NULL;
 
 /*
  *   FUNCTION DEFINITIONS
@@ -212,6 +220,20 @@ static short isContainer (tokenInfo const* token)
 		case K_PACKAGE:
 		case K_PROGRAM:
 		case K_PROPERTY:
+		case K_TYPEDEF:
+		case K_ENUM:
+			return true;
+		default:
+			return false;
+	}
+}
+
+static short isTempContext (tokenInfo const* token)
+{
+	switch (token->kind)
+	{
+		case K_TYPEDEF:
+		case K_ENUM:
 			return true;
 		default:
 			return false;
@@ -521,7 +543,7 @@ static void createContext (tokenInfo *const scope)
 	}
 }
 
-static void dropContext (tokenInfo *const token)
+static void dropEndContext (tokenInfo *const token)
 {
 	verbose ("current context %s; context kind %0d; nest level %0d\n", vStringValue (currentContext->name), currentContext->kind, currentContext->nestLevel);
 	vString *endTokenName = vStringNewInit("end");
@@ -568,6 +590,7 @@ static void createTag (tokenInfo *const token)
 	/* Do nothing it tag name is empty or tag kind is disabled */
 	if (vStringLength (token->name) == 0 || ! kindEnabled (kind))
 	{
+		verbose ("Unexpected empty token or kind disabled\n");
 		return;
 	}
 
@@ -616,6 +639,26 @@ static void createTag (tokenInfo *const token)
 		vStringCopy (newScope->name, token->name);
 		newScope->kind = kind;
 		createContext (newScope);
+
+		/* Include found contents in context */
+		if (tagContents != NULL)
+		{
+			tokenInfo* content = tagContents;
+
+			verbose ("Including tagContents\n");
+			do
+			{
+				createTag (content);
+				content = content->scope;
+			} while (content);
+		}
+
+		/* Drop temporary contexts */
+		if (isTempContext (currentContext))
+		{
+			verbose ("Dropping context %s\n", vStringValue (currentContext->name));
+			currentContext = popToken (currentContext);
+		}
 	}
 
 	/* Clear no longer required inheritance information */
@@ -786,9 +829,107 @@ static void processFunction (tokenInfo *const token)
 	}
 }
 
+static void tagNameList (tokenInfo* token, int c);
+
+static void processEnum (tokenInfo *const token)
+{
+	int c;
+
+	/* Read enum type */
+	c = skipWhite (vGetc ());
+	if (isIdentifierCharacter (c))
+	{
+		tokenInfo* typeQueue = NULL;
+		tokenInfo* type;
+
+		do
+		{
+			type = newToken ();
+
+			readIdentifier (type, c);
+			updateKind (type);
+			typeQueue = pushToken (typeQueue, type);
+			verbose ("Enum type %s\n", vStringValue (type->name));
+			c = skipWhite (vGetc ());
+		} while (isIdentifierCharacter (c));
+
+		/* Undefined kind means that we've reached the end of the
+		 * declaration without having any contents defined, which
+		 * indicates that this is in fact a forward declaration */
+		if (type->kind == K_UNDEFINED && (typeQueue->scope == NULL || typeQueue->scope->kind != K_UNDEFINED))
+		{
+			verbose ("Prototype enum found \"%s\"\n", vStringValue (type->name));
+			type->kind = K_PROTOTYPE;
+			createTag (type);
+			pruneTokens (typeQueue);
+			return;
+		}
+
+		/* Cleanup type queue */
+		pruneTokens (typeQueue);
+	}
+
+	/* Skip bus width definition */
+	if (c == '[')
+	{
+		c = skipWhite (skipPastMatch ("[]"));
+	}
+
+	/* Search enum elements */
+	if (c == '{')
+	{
+		c = skipWhite (vGetc ());
+		while (isIdentifierCharacter (c))
+		{
+			tokenInfo *content = newToken ();
+
+			readIdentifier (content, c);
+			content->kind = K_CONSTANT;
+			tagContents = pushToken (tagContents, content);
+			verbose ("Pushed enum element \"%s\"\n", vStringValue (content->name));
+
+			c = skipWhite (vGetc ());
+			/* Skip element ranges */
+			/* TODO Implement element ranges */
+			if (c == '[')
+			{
+				c = skipWhite (skipPastMatch ("[]"));
+			}
+			/* Skip value assignments */
+			if (c == '=')
+			{
+				while (c != '}' && c != ',' && c != EOF)
+				{
+					c = skipWhite (vGetc ());
+
+					/* Skip enum value concatenations */
+					if (c == '{')
+					{
+						c = skipWhite (skipPastMatch ("{}"));
+					}
+				}
+			}
+			/* Skip comma */
+			if (c == ',')
+			{
+				c = skipWhite (vGetc ());
+			}
+			/* End of enum elements list */
+			if (c == '}')
+			{
+				c = skipWhite (vGetc ());
+				break;
+			}
+		}
+	}
+
+	/* Following identifiers are tag names */
+	verbose ("Find enum tags. Token %s kind %d\n", vStringValue (token->name), token->kind);
+	tagNameList (token, c);
+}
+
 static void processTypedef (tokenInfo *const token)
 {
-	/*Note: At the moment, only identifies typedef name and not its contents */
 	int c;
 
 	/* Get typedef type */
@@ -796,33 +937,57 @@ static void processTypedef (tokenInfo *const token)
 	if (isIdentifierCharacter (c))
 	{
 		readIdentifier (token, c);
-		/* A typedef class is just a prototype */
-		if (strcmp (vStringValue (token->name), "class") == 0)
-		{
-			currentContext->prototype = true;
-		}
-	}
+		updateKind (token);
 
-	/* Skip remaining identifiers */
-	c = skipWhite (vGetc ());
-	while (isIdentifierCharacter (c))
-	{
-		readIdentifier (token, c);
+		switch (token->kind)
+		{
+			case K_INTERFACE:
+				/* Expecting `typedef interface class` */
+				c = skipWhite (vGetc ());
+				readIdentifier (token, c);
+				updateKind (token);
+			case K_CLASS:
+				/* A typedef class is just a prototype */
+				currentContext->prototype = true;
+				break;
+			case K_ENUM:
+				/* Call enum processing function */
+				token->kind = K_TYPEDEF;
+				processEnum (token);
+				return;
+			default :
+				break;
+		}
+
 		c = skipWhite (vGetc ());
 	}
 
 	/* Skip bus width definition */
 	if (c == '[')
 	{
-		skipPastMatch ("[]");
+		c = skipWhite (skipPastMatch ("[]"));
+	}
+
+	/* Skip remaining identifiers */
+	while (isIdentifierCharacter (c))
+	{
+		readIdentifier (token, c);
 		c = skipWhite (vGetc ());
 	}
 
 	/* Skip typedef contents */
 	if (c == '{')
 	{
-		skipPastMatch ("{}");
-		c = skipWhite (vGetc ());
+		c = skipWhite (skipPastMatch ("{}"));
+	}
+	else
+	{
+		/* Typedefs of struct/union that have no contents are forward
+		 * declarations and are considered prototypes */
+		if (token->kind == K_STRUCT)
+		{
+			currentContext->prototype = true;
+		}
 	}
 
 	/* Skip past class parameter override */
@@ -831,8 +996,7 @@ static void processTypedef (tokenInfo *const token)
 		c = skipWhite (vGetc ());
 		if (c == '(')
 		{
-			skipPastMatch ("()");
-			c = skipWhite (vGetc ());
+			c = skipWhite (skipPastMatch ("()"));
 		}
 	}
 
@@ -844,8 +1008,17 @@ static void processTypedef (tokenInfo *const token)
 	else
 	{
 		vUngetc (c);
+
+		/* Empty typedefs are forward declarations and are considered
+		 * prototypes */
+		if (token->kind == K_UNDEFINED)
+		{
+			currentContext->prototype = true;
+		}
 	}
-	/* Use last identifier to create tag */
+
+	/* Use last identifier to create tag, but always with kind typedef */
+	token->kind = K_TYPEDEF;
 	createTag (token);
 }
 
@@ -1013,7 +1186,7 @@ static void findTag (tokenInfo *const token)
 	if (currentContext->kind != K_UNDEFINED)
 	{
 		/* Drop context, but only if an end token is found */
-		dropContext (token);
+		dropEndContext (token);
 	}
 
 	if (token->kind == K_CONSTANT && vStringItem (token->name, 0) == '`')
@@ -1053,6 +1226,10 @@ static void findTag (tokenInfo *const token)
 	else if (token->kind == K_TYPEDEF)
 	{
 		processTypedef (token);
+	}
+	else if (token->kind == K_ENUM)
+	{
+		processEnum (token);
 	}
 	else if (token->kind == K_CLASS)
 	{
@@ -1121,9 +1298,9 @@ static void findVerilogTags (void)
 					skipPastMatch ("()");
 				}
 				break;
-			/* Drop context on prototypes because they don't have an end
-			 * statement */
 			case ';':
+				/* Drop context on prototypes because they don't have an
+				 * end statement */
 				if (currentContext->scope && currentContext->scope->prototype)
 				{
 					verbose ("Dropping context %s\n", vStringValue (currentContext->name));
@@ -1135,7 +1312,11 @@ static void findVerilogTags (void)
 				{
 					currentContext->prototype = false;
 				}
-				break;
+				/* Cleanup tag contents list at end of declaration */
+				while (tagContents)
+				{
+					tagContents = popToken (tagContents);
+				}
 			default :
 				if (isIdentifierCharacter (c))
 				{
