@@ -3644,7 +3644,7 @@ fetch_token(OnigToken* tok, UChar** src, UChar* end, ScanEnv* env)
       if (IS_SYNTAX_OP(syn, ONIG_SYN_OP_ESC_OCTAL3)) {
 	prev = p;
 	num = scan_unsigned_octal_number(&p, end, (c == '0' ? 2:3), enc);
-	if (num < 0) return ONIGERR_TOO_BIG_NUMBER;
+	if (num < 0 || 0xff < num) return ONIGERR_TOO_BIG_NUMBER;
 	if (p == prev) {  /* can't read nothing. */
 	  num = 0; /* but, it's not error */
 	}
@@ -4767,6 +4767,12 @@ parse_char_class(Node** np, Node** asc_np, OnigToken* tok, UChar** src, UChar* e
 	  CC_ESC_WARN(env, (UChar* )"-");
 	  goto range_end_val;
 	}
+
+	if (val_type == CCV_CLASS) {
+	  r = ONIGERR_UNMATCHED_RANGE_SPECIFIER_IN_CHAR_CLASS;
+	  goto err;
+	}
+
 	state = CCS_RANGE;
       }
       else if (state == CCS_START) {
