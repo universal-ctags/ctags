@@ -26,17 +26,17 @@ update-unicode-header: casefold.h name2ctype.h
 update-jis-header: ../enc/jis/props.kwd
 	cd .. && ./tool/convert-jis-props.sh enc/jis/props.kwd enc/jis/props.h && cd -
 
-update-doc: $(PROP_FILES)
+update-doc: $(PROP_FILES) update-doc.py
 	$(PYTHON) ./update-doc.py $(UNICODE_VERSION) > ../doc/UnicodeProps.txt
 
 download:
 	./download-ucd.sh $(UNICODE_VERSION) $(EMOJI_VERSION)
 
 
-casefold.h: $(CASEFOLD_FILES)
+casefold.h: $(CASEFOLD_FILES) case-folding.rb
 	$(RUBY) ./case-folding.rb -m $(UNICODE_VERSION) -o casefold.h
 
-name2ctype.h: $(PROP_FILES)
+name2ctype.h: $(PROP_FILES) enc-unicode.rb
 	$(RUBY) ./enc-unicode.rb --header $(UNICODE_VERSION) > name2ctype.h || rm -f name2ctype.h
 
 
