@@ -891,7 +891,7 @@ static bool matchMultilineRegexPattern (struct lregexControlBlock *lcb,
 			if (patbuf->type == PTRN_TAG)
 			{
 				matchTagPattern (lcb, current, patbuf, pmatch,
-						 (current + pmatch [patbuf->multiline].rm_eo) - start);
+						 (current + pmatch [patbuf->multiline].rm_so) - start);
 				result = true;
 			}
 			else if (patbuf->type == PTRN_CALLBACK)
