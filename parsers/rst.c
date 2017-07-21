@@ -216,7 +216,7 @@ static void findRstTags (void)
 	MIOPos filepos;
 	const unsigned char *line;
 
-	memset(&filepos, 0, sizeof(MIOPos));
+	memset(&filepos, 0, sizeof(filepos));
 	memset(kindchars, 0, sizeof kindchars);
 	nestingLevels = nestingLevelsNew(0);
 
