@@ -496,6 +496,83 @@ Next example is based on an issue #219 posted by @andreicristianpetcu::
 	specified. The start position of the group 3 within the whole
 	file contents is used.
 
+``{_advanceTo=N[start|end]}``
+
+	A pattern is applied to whole file contents iteratively.
+	This long flag specifies from where the pattern should
+	be applied in next iteration when the pattern is matched.
+	When a pattern matches, the next pattern application
+	starts from the start or end of group ``N``. By default
+	it starts from the end of ``N``. If this long flag is not
+	given, 0 is assumed for ``N``.
+
+
+	Let's think about following input
+	::
+
+	   def def abc
+
+	Consider two sets of options, foo and bar.
+
+	*foo.ctags*
+	::
+
+	   --langdef=foo
+	   --langmap=foo:.foo
+	   --kinddef-foo=a,something,something
+	   --mline-regex-foo=/def *([a-z]+)/\1/a/{mgroup=1}
+
+
+	 *bar.ctags*
+	 ::
+
+		--langdef=bar
+		--langmap=bar:.bar
+		--kinddef-bar=a,something,something
+		--mline-regex-bar=/def *([a-z]+)/\1/a/{mgroup=1}{_advanceTo=1start}
+
+	 *foo.ctags* emits following tags output::
+
+	   def	input.foo	/^def def abc$/;"	a
+
+	 *bar.ctgs* emits following tags output::
+
+	   def	input-0.bar	/^def def abc$/;"	a
+	   abc	input-0.bar	/^def def abc$/;"	a
+
+	 ``_advanceTo=1start`` is specified in *bar.ctags*.
+	 That causes ctags allow to capture "abc".
+
+	 At the first iteration, the patterns of both
+	 *foo.ctags* and *bar.ctags" match as follows
+	 ::
+		0   1       (start)
+        v   v
+		def def abc
+		       ^
+			   0,1  (end)
+
+	 "def" at the group 1 is captured as a tag in the
+	 both languages. At the next iteration, the positions
+	 where the pattern matching is applied to are not the
+	 same in the language.
+
+	 *foo.ctags*
+	 ::
+               0end (default)
+               v
+		def def abc
+
+
+	 *bar.ctags*
+	 ::
+            1start (as specified in _advanceTo long flag)
+            v
+		def def abc
+
+	This difference of positions makes the difference of tags output.
+
+
 NOTE: This flag doesn't work well with scope related flags and ``exclusive`` flags.
 
 .. _extras:

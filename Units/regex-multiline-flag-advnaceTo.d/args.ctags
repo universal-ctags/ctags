@@ -1,0 +1,16 @@
+--sort=no
+
+--langdef=foo
+--langmap=foo:.foo
+--kinddef-foo=a,something,something
+--mline-regex-foo=/def *([a-z]+)/\1/a/{mgroup=1}
+
+--langdef=bar
+--langmap=bar:.bar
+--kinddef-bar=a,something,something
+--mline-regex-bar=/def *([a-z]+)/\1/a/{mgroup=1}{_advanceTo=1start}
+
+--langdef=baz
+--langmap=baz:.baz
+--kinddef-baz=a,something,something
+--mline-regex-baz=/def *([a-z]+)/\1/a/{mgroup=1}{_advanceTo=1end}

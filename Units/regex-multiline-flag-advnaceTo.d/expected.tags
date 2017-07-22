@@ -1,0 +1,7 @@
+def	input.foo	/^def def def abc$/;"	a
+abc	input.foo	/^def def def abc$/;"	a
+def	input-0.bar	/^def def def abc$/;"	a
+def	input-0.bar	/^def def def abc$/;"	a
+abc	input-0.bar	/^def def def abc$/;"	a
+def	input-1.baz	/^def def def abc$/;"	a
+abc	input-1.baz	/^def def def abc$/;"	a

@@ -67,6 +67,13 @@ struct fieldPattern {
 	const char *template;
 };
 
+struct mGroupSpec {
+	int forLineNumberDetermination;
+	int forNextScanning;
+	/* true => start, false => end */
+	bool nextFromStart;
+};
+
 typedef struct {
 	regex_t *pattern;
 	enum pType type;
@@ -85,8 +92,8 @@ typedef struct {
 	unsigned int scopeActions;
 	bool *disabled;
 #define NO_MULTILINE -1
-#define IS_MULTILINE(PTRBUF) ((PTRBUF)->mgroup >= 0)
-	int   mgroup;
+#define IS_MULTILINE(PTRBUF) ((PTRBUF)->mgroup.forLineNumberDetermination >= 0)
+	struct mGroupSpec mgroup;
 	int   xtagType;
 	ptrArray *fieldPatterns;
 } regexPattern;
@@ -106,6 +113,13 @@ struct lregexControlBlock {
 /*
 *   FUNCTION DEFINITIONS
 */
+
+static void initMgroup(struct mGroupSpec *mgroup)
+{
+	mgroup->forLineNumberDetermination = NO_MULTILINE;
+	mgroup->forNextScanning = NO_MULTILINE;
+	mgroup->nextFromStart = false;
+}
 
 static void clearPatternSet (struct lregexControlBlock *lcb)
 {
@@ -360,32 +374,86 @@ static regexPattern* addCompiledTagCommon (struct lregexControlBlock *lcb,
 	ptrn->accept_empty_name = false;
 	lcb->count += 1;
 	useRegexMethod(lcb->owner);
+
+	initMgroup(&ptrn->mgroup);
+
 	return ptrn;
 }
 
 static void pre_ptrn_flag_mgroup_long (const char* const s, const char* const v, void* data)
 {
+	struct mGroupSpec *mgroup = data;
 	if (!v)
 	{
 		error (WARNING, "no value is given for: %s", s);
 		return;
 	}
-	if (!strToInt (v, 10, data))
+	if (!strToInt (v, 10, &mgroup->forLineNumberDetermination))
 	{
-		error (WARNING, "wrong mgroup specification: %s", v);
-		*((int *)data) = NO_MULTILINE;
+		error (WARNING, "wrong %s specification: %s", s, v);
+		mgroup->forLineNumberDetermination = NO_MULTILINE;
 	}
-	else if (*((int *)data) < 0 || *((int *)data) >= BACK_REFERENCE_COUNT)
+	else if (mgroup->forLineNumberDetermination < 0
+			 || mgroup->forLineNumberDetermination >= BACK_REFERENCE_COUNT)
 	{
-		error (WARNING, "out of range(0 ~ %d) mgroup specification: %s",
-		       (BACK_REFERENCE_COUNT - 1), v);
-		*((int *)data) = NO_MULTILINE;
+		error (WARNING, "out of range(0 ~ %d) %s specification: %s",
+			   (BACK_REFERENCE_COUNT - 1),
+			   s, v);
+		mgroup->forLineNumberDetermination = NO_MULTILINE;
 	}
+
+	if (mgroup->forLineNumberDetermination != NO_MULTILINE
+		&& mgroup->forNextScanning == NO_MULTILINE)
+	{
+		mgroup->forNextScanning = 0;
+		mgroup->nextFromStart = false;
+	}
+}
+
+static void pre_ptrn_flag_advanceTo_long (const char* const s, const char* const v, void* data)
+{
+	struct mGroupSpec *mgroup = data;
+	char *vdup;
+	char *tmp;
+
+
+	if (!v)
+	{
+		error (WARNING, "no value is given for: %s", s);
+		return;
+	}
+
+	vdup = eStrdup (v);
+
+	mgroup->nextFromStart = false;
+	if ((tmp = strstr(vdup, "start")))
+	{
+		mgroup->nextFromStart = true;
+		*tmp = '\0';
+	}
+	else if ((tmp = strstr(vdup, "end")))
+		*tmp = '\0';
+
+	if (!strToInt (vdup, 10, &(mgroup->forNextScanning)))
+	{
+		error (WARNING, "wrong %s specification: %s", s, vdup);
+		mgroup->nextFromStart = false;
+	}
+	else if (mgroup->forNextScanning < 0 || mgroup->forNextScanning >= BACK_REFERENCE_COUNT)
+	{
+		error (WARNING, "out of range(0 ~ %d) %s specification: %s",
+			   (BACK_REFERENCE_COUNT - 1), s, vdup);
+		mgroup->nextFromStart = false;
+	}
+
+	eFree (vdup);
 }
 
 static flagDefinition multilinePtrnFlagDef[] = {
 	{ '\0',  "mgroup", NULL, pre_ptrn_flag_mgroup_long ,
 	  "N", "a group in pattern determining the line number of tag"},
+	{ '\0',  "_advanceTo", NULL, pre_ptrn_flag_advanceTo_long,
+	  "N[start|end]", "a group in pattern from where the next scan starts [0end]"},
 };
 
 struct extraFlagData {
@@ -506,7 +574,6 @@ static regexPattern *addCompiledTagPattern (struct lregexControlBlock *lcb, bool
 	regexPattern * ptrn;
 	bool exclusive = false;
 	unsigned long scopeActions = 0UL;
-	int mgroup = multiline? 0: NO_MULTILINE;
 	struct extraFlagData extraFlagData = {
 		.xtype = XTAG_UNKNOWN,
 		.owner = lcb->owner,
@@ -522,18 +589,17 @@ static regexPattern *addCompiledTagPattern (struct lregexControlBlock *lcb, bool
 		flagsEval (flags, scopePtrnFlagDef, ARRAY_SIZE(scopePtrnFlagDef), &scopeActions);
 	}
 
-	if (multiline)
-		flagsEval (flags, multilinePtrnFlagDef, ARRAY_SIZE(multilinePtrnFlagDef), &mgroup);
-
 	flagsEval (flags, extraSpecFlagDef, ARRAY_SIZE(extraSpecFlagDef), &extraFlagData);
 
 	ptrn  = addCompiledTagCommon(lcb, pattern);
+	if (multiline)
+		flagsEval (flags, multilinePtrnFlagDef, ARRAY_SIZE(multilinePtrnFlagDef), &ptrn->mgroup);
+
 	ptrn->type    = PTRN_TAG;
 	ptrn->u.tag.name_pattern = eStrdup (name);
 	ptrn->exclusive = exclusive;
 	ptrn->scopeActions = scopeActions;
 	ptrn->disabled = disabled;
-	ptrn->mgroup = mgroup;
 	if (IS_MULTILINE(ptrn))
 		lcb->multilinePatternsCount++;
 	ptrn->xtagType = extraFlagData.xtype;
@@ -582,7 +648,6 @@ static void addCompiledCallbackPattern (struct lregexControlBlock *lcb, regex_t*
 	ptrn->u.callback.userData = userData;
 	ptrn->exclusive = exclusive;
 	ptrn->disabled = disabled;
-	ptrn->mgroup = NO_MULTILINE;
 }
 
 
@@ -888,7 +953,9 @@ static bool matchMultilineRegexPattern (struct lregexControlBlock *lcb,
 	start = vStringValue (allLines);
 	for (current = start;
 	     match == 0 && current < start + strlen(vStringValue (allLines));
-	     current += pmatch [0].rm_eo)
+	     current += (patbuf->mgroup.nextFromStart
+					 ? pmatch [patbuf->mgroup.forNextScanning].rm_so
+					 : pmatch [patbuf->mgroup.forNextScanning].rm_eo))
 	{
 		match = regexec (patbuf->pattern, current,
 				 BACK_REFERENCE_COUNT, pmatch, 0);
@@ -897,7 +964,9 @@ static bool matchMultilineRegexPattern (struct lregexControlBlock *lcb,
 			if (patbuf->type == PTRN_TAG)
 			{
 				matchTagPattern (lcb, current, patbuf, pmatch,
-						 (current + pmatch [patbuf->mgroup].rm_so) - start);
+								 (current
+								  + pmatch [patbuf->mgroup.forLineNumberDetermination].rm_so)
+								 - start);
 				result = true;
 			}
 			else if (patbuf->type == PTRN_CALLBACK)
