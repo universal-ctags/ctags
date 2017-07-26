@@ -707,7 +707,7 @@ fi
 # Output files
 # ------------
 
-AC_CHECK_FUNCS([mblen], [], [HAVE_MBLEN=1], [])
+AC_CHECK_FUNCS(mblen)
 
 AC_CONFIG_FILES([Makefile
 		 man/ctags.1.rst
