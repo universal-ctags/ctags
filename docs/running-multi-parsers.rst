@@ -34,7 +34,7 @@ Examples of guest/host combinations
 {CSS,JavaScript}/HTML parser combination
 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 
-For a html file, you may want to run HTML parser, of course. The
+For an html file, you may want to run HTML parser, of course. The
 html file may have CSS areas and JavaScript areas. In other hand
 Universal-ctags has both CSS and JavaScript parsers. Don't you
 think it is useful if you can apply these parsers to the areas?
@@ -468,7 +468,7 @@ Making a tag in a subparser
 Via calling callback functions defined in subparsers, their base parser
 gives chance to them making tag entries.
 
-The m4 parser calls `newMacroNotify` method when it finds a m4 macro is used.
+The m4 parser calls `newMacroNotify` method when it finds an m4 macro is used.
 The Autoconf parser connects `newMacroCallback` function defined in *parser/autoconf.c*.
 
 
@@ -552,10 +552,10 @@ method. The macro and functions are declare in *main/subparser.h* .
 	    return m4found;
     }
 
-`foreachSubparser` takes an variable having type `subparser`.
+`foreachSubparser` takes a variable having type `subparser`.
 For each iteration, the value for the variable is updated.
 
-`enterSubparser` takes an variable having type `subparser`.  With the
+`enterSubparser` takes a variable having type `subparser`.  With the
 calling `enterSubparser`, the current language(the value returned from
 `getInputLanguage`) can be temporary switched to the language specified
 with the variable. One of the effect of switching is that `language`
@@ -692,7 +692,7 @@ kind "Program". The Automake parser can tag it with getting help from
 the Make parser.
 
 The Automake parser is an exclusive subparser. It is chosen in top
-down way; a input file name "Makefile.am" gives enough information for
+down way; an input file name "Makefile.am" gives enough information for
 choosing the Automake parser.
 
 To give chances to the Automake parser to capture Automake own

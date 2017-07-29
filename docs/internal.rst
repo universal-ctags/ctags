@@ -48,7 +48,7 @@ in the current input text stream.
 A case when a tool generates the input file from another file, a tool
 can record the original source file to the generated file with using
 the `#line` directive. `source` is used for tracking/recording the
-informations appeared on #line directives.
+information appeared on #line directives.
 
 Regex pattern matching are also done behind calling the functions of
 this group.
@@ -284,7 +284,7 @@ Output tag stream
 	    :scale: 80%
 
 Ctags provides `makeTagEntry` to parsers as an entry point for writing
-tag informations to MIO. `makeTagEntry` calls `writeTagEntry` if the
+tag information to MIO. `makeTagEntry` calls `writeTagEntry` if the
 parser does not set `useCork` field. `writeTagEntry` calls `writerWriteTag`.
 `writerWriteTag` just calls `writeEntry` of writer backends.
 `writerTable` variable holds the four backends: ctagsWriter, etagsWriter,

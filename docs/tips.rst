@@ -52,7 +52,7 @@ printed. The detail can be shown in *\*.gcov*. files. *\*.gcda* files
 and *\*.gcov* files can be removed with ``make clean-gcov``.
 
 
-Reviewing the resulf of Units test
+Reviewing the result of Units test
 ------------------------------------------------------------
 
 Try misc/review. [TBW]

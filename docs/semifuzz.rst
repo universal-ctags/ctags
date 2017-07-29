@@ -51,5 +51,5 @@ following parameters:
 		``Units/\*/VALGRIND-${language}.tmp``.
 
 As the same as units target, this semi-fuzz test target also calls
-*misc/units shrink* when an test case is failed. See "*Units* test facility"
+*misc/units shrink* when a test case is failed. See "*Units* test facility"
 about the shrunk result.
