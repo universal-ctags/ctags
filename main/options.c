@@ -20,10 +20,6 @@
 #include <stdio.h>
 #include <ctype.h>  /* to declare isspace () */
 
-#if defined(HAVE_SCANDIR)
-#include <dirent.h>
-#endif
-
 #include "ctags.h"
 #include "debug.h"
 #include "field.h"
@@ -516,7 +512,7 @@ static struct Feature {
 #ifdef DEBUG
 	{"debug", "TO BE WRITTEN"},
 #endif
-#ifdef HAVE_SCANDIR
+#if defined(HAVE_SCANDIR) || defined (HAVE_DIRENT_H) || defined (_MSC_VER)
 	{"option-directory", "TO BE WRITTEN"},
 #endif
 #ifdef HAVE_LIBXML
@@ -3396,7 +3392,7 @@ static void parseConfigurationFileOptionsInDirectory (const char* directory)
 #endif
 }
 
-#if defined(HAVE_SCANDIR)
+#if defined(HAVE_SCANDIR) || defined (HAVE_DIRENT_H) || defined (_MSC_VER)
 static int ignore_dot_file(const struct dirent* dent)
 {
 	/* Ignore a file which name is started from dot. */
@@ -3438,13 +3434,19 @@ static int accept_only_dot_ctags(const struct dirent* dent)
 	return 0;
 }
 
+static int local_insenstive_alphasort(const struct dirent ** a,
+									  const struct dirent ** b)
+{
+	return strcmp ((*a)->d_name, (*b)->d_name);
+}
+
 static bool parseAllConfigurationFilesOptionsInDirectory (const char* const dirName,
 							     stringList* const already_loaded_files)
 {
 	struct dirent **dents;
 	int i, n;
 
-	n = scandir (dirName, &dents, ignore_dot_file, alphasort);
+	n = scanDirectory (dirName, &dents, ignore_dot_file, local_insenstive_alphasort);
 	if (n < 0)
 		return false;
 

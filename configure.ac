@@ -574,7 +574,11 @@ have_regcomp=no])
 AC_SUBST([REGCOMP_CPPFLAGS])
 AM_CONDITIONAL([HAVE_REGCOMP], [test "xyes" = "x$have_regcomp"])
 
-AC_CHECK_FUNCS(scandir)
+have_scandir=no
+AC_CHECK_FUNCS(scandir,have_scandir=yes)
+
+have_dirent_h=no
+AC_CHECK_HEADERS(dirent.h,have_dirent_h=yes)
 
 AC_ARG_ENABLE([xml],
 	[AS_HELP_STRING([--disable-xml],

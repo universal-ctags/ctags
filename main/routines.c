@@ -134,7 +134,6 @@
 #  define stat    _stat
 #  define getcwd  _getcwd
 #  define currentdrive() (_getdrive() + 'A' - 1)
-#  define PATH_MAX  _MAX_PATH
 # else
 #  define currentdrive() 'C'
 # endif
