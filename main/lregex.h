@@ -23,6 +23,7 @@ typedef struct {
 	const char* const kinds;
 	const char *const flags;
 	bool    *disabled;
+	bool  mline;
 } tagRegexTable;
 
 typedef struct {
@@ -38,10 +39,14 @@ extern struct lregexControlBlock* allocLregexControlBlock (parserDefinition *par
 extern void freeLregexControlBlock (struct lregexControlBlock* lcb);
 
 extern void processTagRegexOption (struct lregexControlBlock *lcb,
+								   bool multiline,
 								   const char* const parameter);
 extern void addTagRegex (struct lregexControlBlock *lcb, const char* const regex,
 						 const char* const name, const char* const kinds, const char* const flags,
 						 bool *disabled);
+extern void addTagMultiLineRegex (struct lregexControlBlock *lcb, const char* const regex,
+								  const char* const name, const char* const kinds, const char* const flags,
+								  bool *disabled);
 extern bool matchRegex (struct lregexControlBlock *lcb, const vString* const line);
 extern bool hasScopeActionInRegex (struct lregexControlBlock *lcb);
 extern void addCallbackRegex (struct lregexControlBlock *lcb,

@@ -35,8 +35,8 @@
 	--map-QemuHX=+.hx
 	--extradef-QemuHX=funcmap,Include mapping SQMP to C function name
 	--extras-QemuHX=+{funcmap}
-	--regex-QemuHX=/^SQMP[[:space:]]([-a-z_0-9A-Z]+)[[:space:]]---/\1/q/{_multiline=1}
-	--regex-QemuHX=/^SQMP[[:space:]]([-a-z_0-9A-Z]+)[[:space:]]---/qmp_\1/q/{_multiline=1}{_extra=funcmap}
+	--mline-regex-QemuHX=/^SQMP[[:space:]]([-a-z_0-9A-Z]+)[[:space:]]---/\1/q/{mgroup=1}
+	--mline-regex-QemuHX=/^SQMP[[:space:]]([-a-z_0-9A-Z]+)[[:space:]]---/qmp_\1/q/{mgroup=1}{_extra=funcmap}
 	--regex-QemuHX=/^@item[[:space:]]{1,}([-.a-z_0-9A-Z]{1,})/\1/i/
 
 #

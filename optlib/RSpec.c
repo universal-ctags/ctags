@@ -31,19 +31,19 @@ extern parserDefinition* RSpecParser (void)
 	};
 	static tagRegexTable RSpecTagRegexTable [] = {
 		{"^[ \\t]*RSpec\\.describe[ \\t]+([^\"']+)[ \\t]+do", "\\1",
-		"d", NULL},
+		"d", NULL, NULL, false},
 		{"^[ \\t]*describe[ \\t]+\"([^\"]+)\"[ \\t]+do", "\\1",
-		"d", NULL},
+		"d", NULL, NULL, false},
 		{"^[ \\t]*describe[ \\t]+'([^']+)'[ \\t]+do", "\\1",
-		"d", "	"},
+		"d", "	", NULL, false},
 		{"^[ \\t]*describe[ \\t]+([^\"']+)[ \\t]+do", "\\1",
-		"d", NULL},
+		"d", NULL, NULL, false},
 		{"^[ \\t]*context[ \\t]+\"([^\"]+)\"[ \\t]+do", "\\1",
-		"c", NULL},
+		"c", NULL, NULL, false},
 		{"^[ \\t]*context[ \\t]+'([^']+)'[ \\t]+do", "\\1",
-		"c", "	"},
+		"c", "	", NULL, false},
 		{"^[ \\t]*context[ \\t]+([^\"']+)[ \\t]+do", "\\1",
-		"c", NULL},
+		"c", NULL, NULL, false},
 	};
 
 	static subparser RSpecSubparser = {

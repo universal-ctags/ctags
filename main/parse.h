@@ -206,7 +206,7 @@ extern void freeEncodingResources (void);
 
 
 /* Regex interface */
-extern bool processLanguageRegexOption (langType language, const char *const parameter);
+extern bool processLanguageRegexOption (langType language, bool multiline, const char *const parameter);
 extern void findRegexTags (void);
 extern void findRegexTagsMainloop (int (* driver)(void));
 extern void matchLanguageRegex (const langType language, const vString* const line);
@@ -216,6 +216,7 @@ extern void freeRegexResources (void);
 extern bool checkRegex (void);
 extern void useRegexMethod (const langType language);
 extern void printRegexFlags (bool withListHeader, bool machinable, FILE *fp);
+extern void printMultilineRegexFlags (bool withListHeader, bool machinable, FILE *fp);
 extern bool hasLanguageScopeActionInRegex (const langType language);
 
 /* Multiline Regex Interface */

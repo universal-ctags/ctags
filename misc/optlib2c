@@ -111,8 +111,16 @@ my $options =
 	       if (! defined $_[0]->{'langdef'});
 	   die "Adding a regex is allowed only to the language specified with --langdef: $1"
 	       unless ($_[0]->{'langdef'} eq $1);
-	   parse_regex ($2, $_[0]);
+	   parse_regex ($2, $_[0], 0);
        } ],
+     [ qr/^--mline-regex-([^=]*)=(.*)/, sub {
+	   die "Don't use --mline-regex-<LANG>= option before defining the language"
+	       if (! defined $_[0]->{'langdef'});
+	   die "Adding a multiline regex is allowed only to the language specified with --langdef: $1"
+	       unless ($_[0]->{'langdef'} eq $1);
+	   parse_regex ($2, $_[0], 1);
+       } ],
+
      [ qr/^--kinds-([^=]*)=-(.*)/, sub {
 	   die "Don't use --kinds-<LANG>= option before defining the language"
 	       if (! defined $_[0]->{'langdef'});
@@ -207,12 +215,19 @@ sub gather_chars {
 }
 
 sub parse_regex {
-    my ($regspec, $opts) = @_;
+    my ($regspec, $opts, $mline) = @_;
 
     my @chars = split //, $regspec;
 
+    # TODO:
+    #	ctags allows using a char other than '/'
+    #
     if (! ($chars[0] eq '/')) {
-	die "--regex-<LANG>= option is not started from /: $regspec";
+	if (!$mline) {
+	    die "--regex-<LANG>= option is not started from /: $regspec";
+	} else {
+	    die "--mline-regex-<LANG>= option is not started from /: $regspec";
+	}
     }
 
     shift @chars;
@@ -221,7 +236,11 @@ sub parse_regex {
     my $regex;
     ($regex, $last_char) = gather_chars (\@chars);
     if (! ($last_char eq '/')) {
-	die "The pattern in --regex-<LANG>= option is not ended with /: $regspec";
+	if (!$mline) {
+	    die "The pattern in --regex-<LANG>= option is not ended with /: $regspec";
+	} else {
+	    die "The pattern in --mline-regex-<LANG>= option is not ended with /: $regspec";
+	}
     }
 
     my $name;
@@ -250,6 +269,7 @@ sub parse_regex {
 				 'name'  => $name,
 				 'kind'  => $kind,
 				 'flags' => $flags,
+				 'mline' => $mline,
 			       };
 }
 
@@ -421,9 +441,10 @@ sub emit_regexs {
 EOF
     for (@{$opts->{'regexs'}}) {
 	my $flags = $_-> {'flags'}? '"' . $_-> {'flags'} . '"': "NULL";
+	my $mline = $_-> {'mline'}? "true": "false";
 	print <<EOF;
 		{"$_->{'regex'}", "$_->{'name'}",
-		"$_->{'kind'}", $flags},
+		"$_->{'kind'}", $flags, NULL, $mline},
 EOF
     }
     print <<EOF;
@@ -636,7 +657,7 @@ sub main {
 		extensions => [],
 		aliases => [],
 		disabledKinds => [],
-		regexs => [# { regex => "", name => "", kind => "", flags => "" },
+		regexs => [# { regex => "", name => "", kind => "", flags => "", mline => 1|0 },
 			  ],
 		kinddefs => [# { letter => '', name => "", desc => "" },
 			    ],

@@ -39,7 +39,7 @@ extern parserDefinition* PasswdParser (void)
 	};
 	static tagRegexTable PasswdTagRegexTable [] = {
 		{"^([^:]+):([^:]+):([^:]+):([^:]+):([^:]*):([^:]+):([^:]+)", "\\1",
-		"u,username,user names", "{_field=home:\\6}{_field=shell:\\7}"},
+		"u,username,user names", "{_field=home:\\6}{_field=shell:\\7}", NULL, false},
 	};
 
 

@@ -71,6 +71,7 @@ typedef struct sComputPos {
 	MIOPos  pos;
 	long    offset;
 	bool open;
+	int crAdjustment;
 } compoundPos;
 
 typedef struct sInputLineFposMap {
@@ -278,8 +279,11 @@ static void allocLineFposMap (inputLineFposMap *lineFposMap)
 	lineFposMap->count = 0;
 }
 
-static void appendLineFposMap (inputLineFposMap *lineFposMap, compoundPos *pos)
+static void appendLineFposMap (inputLineFposMap *lineFposMap, compoundPos *pos,
+							   bool crAdjustment)
 {
+	int lastCrAdjustment = 0;
+
 	if (lineFposMap->size == lineFposMap->count)
 	{
 		lineFposMap->size *= 2;
@@ -289,9 +293,15 @@ static void appendLineFposMap (inputLineFposMap *lineFposMap, compoundPos *pos)
 	}
 
 	if (lineFposMap->count != 0)
+	{
 		lineFposMap->pos [lineFposMap->count - 1].open = false;
+		lastCrAdjustment = lineFposMap->pos [lineFposMap->count - 1].crAdjustment;
+	}
+
 	lineFposMap->pos [lineFposMap->count] = *pos;
 	lineFposMap->pos [lineFposMap->count].open = true;
+	lineFposMap->pos [lineFposMap->count].crAdjustment
+		= lastCrAdjustment + ((crAdjustment)? 1: 0);
 	lineFposMap->count++;
 }
 
@@ -301,11 +311,11 @@ static int compoundPosForOffset (const void* oft, const void *p)
 	const compoundPos *pos = p;
 	const compoundPos *next = (compoundPos *)(((char *)pos) + sizeof (compoundPos));
 
-	if (offset < pos->offset)
+	if (offset < (pos->offset - pos->crAdjustment))
 		return -1;
-	else if (pos->offset <= offset
+	else if (((pos->offset - pos->crAdjustment) <= offset)
 		 && (pos->open
-		     || offset < next->offset))
+		     || (offset < (next->offset - next->crAdjustment))))
 		return 0;
 	else
 		return 1;
@@ -750,12 +760,13 @@ extern void *getInputFileUserData(void)
 
 /*  Action to take for each encountered input newline.
  */
-static void fileNewline (void)
+static void fileNewline (bool crAdjustment)
 {
 	File.filePosition = StartOfLine;
 
 	if (BackupFile.mio == NULL)
-		appendLineFposMap (&File.lineFposMap, &File.filePosition);
+		appendLineFposMap (&File.lineFposMap, &File.filePosition,
+						   crAdjustment);
 
 	File.input.lineNumber++;
 	File.source.lineNumber++;
@@ -844,7 +855,7 @@ static vString *iFileGetLine (void)
 	if (vStringLength (File.line) > 0)
 	{
 		/* Use StartOfLine from previous iFileGetLine() call */
-		fileNewline ();
+		fileNewline (eol == eol_cr_nl);
 		/* Store StartOfLine for the next iFileGetLine() call */
 		mio_getpos (File.mio, &StartOfLine.pos);
 		StartOfLine.offset = mio_tell (File.mio);
@@ -854,16 +865,8 @@ static vString *iFileGetLine (void)
 		matchLanguageRegex (getInputLanguage (), File.line);
 
 		if (use_multiline)
-		{
 			vStringCat (File.allLines, File.line);
-			if (eol == eol_cr_nl)
-			{
-				/* Re-convert the end of line characters to adjust the length
-				   of line. */
-				vStringItem (File.allLines, vStringLength (File.allLines) - 1) = '\r';
-				vStringPut (File.allLines, '\n');
-			}
-		}
+
 		return File.line;
 	}
 	else

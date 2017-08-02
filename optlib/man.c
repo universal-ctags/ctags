@@ -39,13 +39,13 @@ extern parserDefinition* ManParser (void)
 	};
 	static tagRegexTable ManTagRegexTable [] = {
 		{"^\\.TH[[:space:]]{1,}\"([^\"]{1,})\".*", "\\1",
-		"t", "{exclusive}{icase}{scope=push}"},
+		"t", "{exclusive}{icase}{scope=push}", NULL, false},
 		{"^\\.TH[[:space:]]{1,}([^[:space:]]{1,}).*", "\\1",
-		"t", "{exclusive}{icase}{scope=push}"},
+		"t", "{exclusive}{icase}{scope=push}", NULL, false},
 		{"^\\.SH[[:space:]]{1,}\"([^\"]{1,})\".*", "\\1",
-		"s", "{exclusive}{icase}{scope=ref}"},
+		"s", "{exclusive}{icase}{scope=ref}", NULL, false},
 		{"^\\.SH[[:space:]]{1,}([^[:space:]]{1,}).*", "\\1",
-		"s", "{exclusive}{icase}{scope=ref}"},
+		"s", "{exclusive}{icase}{scope=ref}", NULL, false},
 	};
 
 

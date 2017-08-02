@@ -3198,9 +3198,11 @@ extern void matchLanguageRegex (const langType language, const vString* const li
 }
 
 extern bool processLanguageRegexOption (langType language,
+										bool multiline,
 										const char *const parameter)
 {
-	processTagRegexOption ((LanguageTable +language)->lregexControlBlock, parameter);
+	processTagRegexOption ((LanguageTable +language)->lregexControlBlock,
+						   multiline, parameter);
 
 	return true;
 }
@@ -3237,12 +3239,22 @@ static void installTagRegexTable (const langType language)
 	if (lang->tagRegexTable != NULL)
 	{
 	    for (i = 0; i < lang->tagRegexCount; ++i)
-		    addTagRegex (parser->lregexControlBlock,
-				 lang->tagRegexTable [i].regex,
-				 lang->tagRegexTable [i].name,
-				 lang->tagRegexTable [i].kinds,
-				 lang->tagRegexTable [i].flags,
-				 (lang->tagRegexTable [i].disabled));
+		{
+			if (lang->tagRegexTable [i].mline)
+				addTagMultiLineRegex (parser->lregexControlBlock,
+									  lang->tagRegexTable [i].regex,
+									  lang->tagRegexTable [i].name,
+									  lang->tagRegexTable [i].kinds,
+									  lang->tagRegexTable [i].flags,
+									  (lang->tagRegexTable [i].disabled));
+			else
+				addTagRegex (parser->lregexControlBlock,
+							 lang->tagRegexTable [i].regex,
+							 lang->tagRegexTable [i].name,
+							 lang->tagRegexTable [i].kinds,
+							 lang->tagRegexTable [i].flags,
+							 (lang->tagRegexTable [i].disabled));
+		}
 	}
 }
 

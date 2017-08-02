@@ -31,11 +31,11 @@ extern parserDefinition* CtagsParser (void)
 	};
 	static tagRegexTable CtagsTagRegexTable [] = {
 		{"^--langdef=([^ \\t]+)$", "\\1",
-		"l", "{scope=set}"},
+		"l", "{scope=set}", NULL, false},
 		{"^--regex-[^=]+=.*\\/.,(.+)\\/.*", "\\1",
-		"k", "{scope=ref}"},
+		"k", "{scope=ref}", NULL, false},
 		{"^--kinddef-[^=]+=.,([^,]+),.*", "\\1",
-		"k", "{scope=ref}"},
+		"k", "{scope=ref}", NULL, false},
 	};
 
 
