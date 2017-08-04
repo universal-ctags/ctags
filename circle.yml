@@ -9,7 +9,7 @@ jobs:
        - run:
            name: Install build tools
            command: |
-             dnf -y install gcc automake autoconf pkgconfig make aspell-devel aspell-en libxml2-devel jansson-devel libyaml-devel
+             dnf -y install gcc automake autoconf pkgconfig make aspell-devel aspell-en libxml2-devel jansson-devel libyaml-devel || :
        - run:
            name: Build
            command: |
