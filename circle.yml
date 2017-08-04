@@ -9,6 +9,9 @@ jobs:
        - run:
            name: Install build tools
            command: |
+             # See https://bugzilla.redhat.com/show_bug.cgi?id=555315
+             #     https://bugzilla.redhat.com/show_bug.cgi?id=553998
+             cd /var/lib/rpm; db_recover; db_recover
              dnf -y install gcc automake autoconf pkgconfig make aspell-devel aspell-en libxml2-devel jansson-devel libyaml-devel
        - run:
            name: Build
