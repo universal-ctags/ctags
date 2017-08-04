@@ -53,9 +53,6 @@
 #ifdef HAVE_DIRECT_H
 # include <direct.h>  /* to _getcwd */
 #endif
-#ifdef HAVE_DIR_H
-# include <dir.h>  /* to declare findfirst() and findnext() */
-#endif
 #ifdef HAVE_IO_H
 # include <io.h>  /* to declare open() */
 #endif

@@ -56,9 +56,6 @@
 #ifdef HAVE_DIRECT_H
 # include <direct.h>  /* to _getcwd() */
 #endif
-#ifdef HAVE_DIR_H
-# include <dir.h>  /* to declare findfirst() and findnext */
-#endif
 #ifdef HAVE_IO_H
 # include <io.h>  /* to declare _findfirst() */
 #endif
@@ -160,7 +157,7 @@ static bool recurseUsingOpendir (const char *const dirName)
 	return resize;
 }
 
-#elif defined (HAVE_FINDFIRST) || defined (HAVE__FINDFIRST)
+#elif defined (HAVE__FINDFIRST)
 
 static bool createTagsForWildcardEntry (
 		const char *const pattern, const size_t dirLength,
@@ -183,16 +180,7 @@ static bool createTagsForWildcardUsingFindfirst (const char *const pattern)
 {
 	bool resize = false;
 	const size_t dirLength = baseFilename (pattern) - pattern;
-#if defined (HAVE_FINDFIRST)
-	struct ffblk fileInfo;
-	int result = findfirst (pattern, &fileInfo, FA_DIREC);
-	while (result == 0)
-	{
-		const char *const entry = (const char *) fileInfo.ff_name;
-		resize |= createTagsForWildcardEntry (pattern, dirLength, entry);
-		result = findnext (&fileInfo);
-	}
-#elif defined (HAVE__FINDFIRST)
+#if defined (HAVE__FINDFIRST)
 	struct _finddata_t fileInfo;
 	findfirst_t hFile = _findfirst (pattern, &fileInfo);
 	if (hFile != -1L)
@@ -230,7 +218,7 @@ static bool recurseIntoDirectory (const char *const dirName)
 		verbose ("RECURSING into directory \"%s\"\n", dirName);
 #if defined (HAVE_OPENDIR)
 		resize = recurseUsingOpendir (dirName);
-#elif defined (HAVE_FINDFIRST) || defined (HAVE__FINDFIRST)
+#elif defined (HAVE__FINDFIRST)
 		{
 			vString *const pattern = vStringNew ();
 			vStringCopyS (pattern, dirName);
@@ -278,9 +266,9 @@ static bool createTagsForWildcardArg (const char *const arg)
 	vString *const pattern = vStringNewInit (arg);
 	char *patternS = vStringValue (pattern);
 
-#if defined (HAVE_FINDFIRST) || defined (HAVE__FINDFIRST)
+#if defined (HAVE__FINDFIRST)
 	/*  We must transform the "." and ".." forms into something that can
-	 *  be expanded by the findfirst/_findfirst functions.
+	 *  be expanded by the _findfirst function.
 	 */
 	if (Option.recurse  &&
 		(strcmp (patternS, ".") == 0  ||  strcmp (patternS, "..") == 0))

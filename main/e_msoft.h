@@ -59,7 +59,6 @@ typedef enum { false, true } bool;
 
 # include <_mingw.h>
 # define HAVE_STDBOOL_H 1
-# define HAVE_DIR_H 1
 # define HAVE_DIRENT_H 1
 # define HAVE__FINDFIRST 1
 # define findfirst_t long

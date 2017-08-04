@@ -71,7 +71,7 @@
 # define DEFAULT_FILE_FORMAT  2
 #endif
 
-#if defined (HAVE_OPENDIR) || defined (HAVE_FINDFIRST) || defined (HAVE__FINDFIRST)
+#if defined (HAVE_OPENDIR) || defined (HAVE__FINDFIRST)
 # define RECURSE_SUPPORTED
 #endif
 
