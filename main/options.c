@@ -369,13 +369,13 @@ static optionDescription LongOptionDescription [] = {
  {1,"       or one file extension can be specified at once."},
  {1,"       Unlike --langmap the change with this option affects mapping of <LANG> only."},
  {1,"  --maxdepth=N"},
- {1,"  --mline-regex-<LANG>=/line_pattern/name_pattern/[flags]"},
- {1,"       Define multieline regular expression for locating tags in specific language."},
 #ifdef RECURSE_SUPPORTED
  {1,"       Specify maximum recursion depth."},
 #else
  {1,"       Not supported on this platform."},
 #endif
+ {1,"  --mline-regex-<LANG>=/line_pattern/name_pattern/[flags]"},
+ {1,"       Define multieline regular expression for locating tags in specific language."},
  {1,"  --options=file"},
  {1,"       Specify file from which command line options should be read."},
 #ifdef HAVE_ICONV
