@@ -375,7 +375,7 @@ static optionDescription LongOptionDescription [] = {
  {1,"       Not supported on this platform."},
 #endif
  {1,"  --mline-regex-<LANG>=/line_pattern/name_pattern/[flags]"},
- {1,"       Define multieline regular expression for locating tags in specific language."},
+ {1,"       Define multiline regular expression for locating tags in specific language."},
  {1,"  --options=file"},
  {1,"       Specify file from which command line options should be read."},
 #ifdef HAVE_ICONV
