@@ -1052,31 +1052,32 @@ static regexPattern *addTagRegexInternal (struct lregexControlBlock *lcb,
 	regexPattern *rptr = NULL;
 	Assert (regex != NULL);
 	Assert (name != NULL);
-	if (regexAvailable)
+
+	if (!regexAvailable)
+		return NULL;
+
+	regex_t* const cp = compileRegex (regex, flags);
+	if (cp != NULL)
 	{
-		regex_t* const cp = compileRegex (regex, flags);
-		if (cp != NULL)
-		{
-			char kind;
-			char* kindName;
-			char* description;
+		char kind;
+		char* kindName;
+		char* description;
 
-			parseKinds (kinds, &kind, &kindName, &description);
-			if (kind == getLanguageKind (lcb->owner, KIND_FILE_INDEX)->letter)
-				error (FATAL,
-				       "Kind letter \'%c\' used in regex definition \"%s\" of %s language is reserved in ctags main",
-				       kind,
-				       regex,
-				       getLanguageName (lcb->owner));
+		parseKinds (kinds, &kind, &kindName, &description);
+		if (kind == getLanguageKind (lcb->owner, KIND_FILE_INDEX)->letter)
+			error (FATAL,
+				   "Kind letter \'%c\' used in regex definition \"%s\" of %s language is reserved in ctags main",
+				   kind,
+				   regex,
+				   getLanguageName (lcb->owner));
 
-			rptr = addCompiledTagPattern (lcb, multiline, cp, name,
-						      kind, kindName, description, flags,
-						      disabled);
-			if (kindName)
-				eFree (kindName);
-			if (description)
-				eFree (description);
-		}
+		rptr = addCompiledTagPattern (lcb, multiline, cp, name,
+									  kind, kindName, description, flags,
+									  disabled);
+		if (kindName)
+			eFree (kindName);
+		if (description)
+			eFree (description);
 	}
 
 	if (*name == '\0')
@@ -1115,28 +1116,30 @@ extern void addCallbackRegex (struct lregexControlBlock *lcb,
 			      void * userData)
 {
 	Assert (regex != NULL);
-	if (regexAvailable)
-	{
-		regex_t* const cp = compileRegex (regex, flags);
-		if (cp != NULL)
-			addCompiledCallbackPattern (lcb, cp, callback, flags,
-						    disabled, userData);
-	}
+
+	if (!regexAvailable)
+		return;
+
+
+	regex_t* const cp = compileRegex (regex, flags);
+	if (cp != NULL)
+		addCompiledCallbackPattern (lcb, cp, callback, flags,
+									disabled, userData);
 }
 
 static void addTagRegexOption (struct lregexControlBlock *lcb,
 							   bool multiline,
 							   const char* const pattern)
 {
-	if (regexAvailable)
-	{
-		char *const regex_pat = eStrdup (pattern);
-		char *name, *kinds, *flags;
-		if (parseTagRegex (multiline, regex_pat, &name, &kinds, &flags))
-			addTagRegexInternal (lcb, multiline, regex_pat, name, kinds, flags,
-					     NULL);
-		eFree (regex_pat);
-	}
+	if (!regexAvailable)
+		return;
+
+	char *const regex_pat = eStrdup (pattern);
+	char *name, *kinds, *flags;
+	if (parseTagRegex (multiline, regex_pat, &name, &kinds, &flags))
+		addTagRegexInternal (lcb, multiline, regex_pat, name, kinds, flags,
+							 NULL);
+	eFree (regex_pat);
 }
 
 extern void processTagRegexOption (struct lregexControlBlock *lcb,
