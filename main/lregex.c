@@ -1247,7 +1247,7 @@ extern bool matchMultilineRegex (struct lregexControlBlock *lcb, const vString* 
 			result = matchMultilineRegexPattern (lcb, allLines, ptrn) || result;
 		}
 	}
-	return false;
+	return result;
 }
 
 
