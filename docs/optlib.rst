@@ -479,7 +479,7 @@ Next example is based on an issue #219 posted by @andreicristianpetcu::
     $ cat spring.ctags
     --langdef=javaspring
     --langmap=javaspring:.java
-    --multiline-regex-javaspring=/@Subscribe([[:space:]])*([a-z ]+)[[:space:]]*([a-zA-Z]*)\(([a-zA-Z]*)/\3-\4/s,subscription/{mgroup=3}
+    --mline-regex-javaspring=/@Subscribe([[:space:]])*([a-z ]+)[[:space:]]*([a-zA-Z]*)\(([a-zA-Z]*)/\3-\4/s,subscription/{mgroup=3}
     --excmd=mixed
     --fields=+ln
 
