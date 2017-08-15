@@ -207,6 +207,8 @@ extern void freeEncodingResources (void);
 
 /* Regex interface */
 extern bool processLanguageRegexOption (langType language, enum regexParserType regptype, const char *const parameter);
+extern void notifyLanguageRegexInputStart (langType language);
+extern void notifyLanguageRegexInputEnd (langType language);
 extern void findRegexTags (void);
 extern void findRegexTagsMainloop (int (* driver)(void));
 extern void matchLanguageRegex (const langType language, const vString* const line);

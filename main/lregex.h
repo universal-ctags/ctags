@@ -63,4 +63,7 @@ extern void addCallbackRegex (struct lregexControlBlock *lcb,
 extern bool hasMultilineRegexPatterns (struct lregexControlBlock *lcb);
 extern bool matchMultilineRegex (struct lregexControlBlock *lcb, const vString* const allLines);
 
+extern void notifyRegexInputStart (struct lregexControlBlock *lcb);
+extern void notifyRegexInputEnd (struct lregexControlBlock *lcb);
+
 #endif	/* CTAGS_MAIN_LREGEX_H */

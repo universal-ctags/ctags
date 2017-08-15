@@ -39,7 +39,6 @@
 #include "trashbox.h"
 
 static bool regexAvailable = false;
-static unsigned long currentScope = CORK_NIL;
 
 /*
 *   MACROS
@@ -101,6 +100,7 @@ typedef struct {
 
 
 struct lregexControlBlock {
+	unsigned long currentScope;
 	ptrArray *patterns [2];
 	langType owner;
 };
@@ -825,17 +825,19 @@ static void matchTagPattern (struct lregexControlBlock *lcb,
 	{
 		tagEntryInfo *entry;
 
-		scope = currentScope;
+		scope = lcb->currentScope;
 		while ((entry = getEntryInCorkQueue (scope)) && entry->placeholder)
 			/* Look at parent */
 			scope = entry->extensionFields.scopeIndex;
 	}
 	if (patbuf->scopeActions & SCOPE_CLEAR)
-		currentScope = CORK_NIL;
+	{
+		lcb->currentScope = CORK_NIL;
+	}
 	if (patbuf->scopeActions & SCOPE_POP)
 	{
-		tagEntryInfo *entry = getEntryInCorkQueue (currentScope);
-		currentScope = entry? entry->extensionFields.scopeIndex: CORK_NIL;
+		tagEntryInfo *entry = getEntryInCorkQueue (lcb->currentScope);
+		lcb->currentScope = entry? entry->extensionFields.scopeIndex: CORK_NIL;
 	}
 
 	if (vStringLength (name) == 0 && (placeholder == false))
@@ -897,7 +899,7 @@ static void matchTagPattern (struct lregexControlBlock *lcb,
 	}
 
 	if (patbuf->scopeActions & SCOPE_PUSH)
-		currentScope = n;
+		lcb->currentScope = n;
 
 	vStringDelete (name);
 }
@@ -1026,9 +1028,18 @@ extern bool matchRegex (struct lregexControlBlock *lcb, const vString* const lin
 	return result;
 }
 
+extern void notifyRegexInputStart (struct lregexControlBlock *lcb)
+{
+	lcb->currentScope = CORK_NIL;
+}
+
+extern void notifyRegexInputEnd (struct lregexControlBlock *lcb)
+{
+	/* stub */
+}
+
 extern void findRegexTagsMainloop (int (* driver)(void))
 {
-	currentScope = CORK_NIL;
 	/* merely read all lines of the file */
 	while (driver () != EOF)
 		;
