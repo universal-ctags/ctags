@@ -840,11 +840,26 @@ static void matchTagPattern (struct lregexControlBlock *lcb,
 	}
 	if (patbuf->scopeActions & SCOPE_CLEAR)
 	{
+		tagEntryInfo *entry;
+		unsigned int n = lcb->currentScope;
+		unsigned long endline = getInputLineNumberInRegPType(patbuf->regptype, offset);
+
+		while ((entry = getEntryInCorkQueue (n))
+			   && (entry->extensionFields.endLine == 0))
+		{
+			entry->extensionFields.endLine = endline;
+			n = entry->extensionFields.scopeIndex;
+		}
+
 		lcb->currentScope = CORK_NIL;
 	}
 	if (patbuf->scopeActions & SCOPE_POP)
 	{
 		tagEntryInfo *entry = getEntryInCorkQueue (lcb->currentScope);
+
+		if (entry && (entry->extensionFields.endLine == 0))
+			entry->extensionFields.endLine = getInputLineNumberInRegPType(patbuf->regptype, offset);
+
 		lcb->currentScope = entry? entry->extensionFields.scopeIndex: CORK_NIL;
 	}
 

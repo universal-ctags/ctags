@@ -1,5 +1,6 @@
 # To check the output easier
 --sort=no
+--fields=+e
 
 --langdef=foo
     --map-foo=+.foo
