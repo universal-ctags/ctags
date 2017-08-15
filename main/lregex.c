@@ -814,6 +814,19 @@ static unsigned long getInputLineNumberInRegPType (enum regexParserType regptype
 		: getInputLineNumber ();
 }
 
+static void fillEndLineFieldOfUpperScopes (struct lregexControlBlock *lcb, unsigned long endline)
+{
+	tagEntryInfo *entry;
+	unsigned int n = lcb->currentScope;
+
+	while ((entry = getEntryInCorkQueue (n))
+		   && (entry->extensionFields.endLine == 0))
+	{
+		entry->extensionFields.endLine = endline;
+		n = entry->extensionFields.scopeIndex;
+	}
+}
+
 static void matchTagPattern (struct lregexControlBlock *lcb,
 		const char* line,
 		const regexPattern* const patbuf,
@@ -840,17 +853,8 @@ static void matchTagPattern (struct lregexControlBlock *lcb,
 	}
 	if (patbuf->scopeActions & SCOPE_CLEAR)
 	{
-		tagEntryInfo *entry;
-		unsigned int n = lcb->currentScope;
 		unsigned long endline = getInputLineNumberInRegPType(patbuf->regptype, offset);
-
-		while ((entry = getEntryInCorkQueue (n))
-			   && (entry->extensionFields.endLine == 0))
-		{
-			entry->extensionFields.endLine = endline;
-			n = entry->extensionFields.scopeIndex;
-		}
-
+		fillEndLineFieldOfUpperScopes (lcb, endline);
 		lcb->currentScope = CORK_NIL;
 	}
 	if (patbuf->scopeActions & SCOPE_POP)
@@ -1056,7 +1060,8 @@ extern void notifyRegexInputStart (struct lregexControlBlock *lcb)
 
 extern void notifyRegexInputEnd (struct lregexControlBlock *lcb)
 {
-	/* stub */
+	unsigned long endline = getInputLineNumber ();
+	fillEndLineFieldOfUpperScopes (lcb, endline);
 }
 
 extern void findRegexTagsMainloop (int (* driver)(void))

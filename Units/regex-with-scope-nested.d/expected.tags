@@ -15,7 +15,7 @@ q	input.foo	/^   define q {$/;"	d	definition:NS2.p	end:21
 v_g1	input.foo	/^var v_g1$/;"	v
 d_g	input.foo	/^define d_g {$/;"	d	end:28
 v_l	input.foo	/^       var v_l$/;"	v	definition:d_g
-NS3	input.foo	/^ns NS3$/;"	n
+NS3	input.foo	/^ns NS3$/;"	n	end:47
 PACKAGE	input.foo	/^package PACKAGE$/;"	p	namespace:NS3	end:44
 p	input.foo	/^define p {$/;"	d	package:NS3.PACKAGE	end:41
 q	input.foo	/^   define q {$/;"	d	definition:NS3.PACKAGE.p	end:38
