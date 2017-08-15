@@ -3198,11 +3198,11 @@ extern void matchLanguageRegex (const langType language, const vString* const li
 }
 
 extern bool processLanguageRegexOption (langType language,
-										bool multiline,
+										enum regexParserType regptype,
 										const char *const parameter)
 {
 	processTagRegexOption ((LanguageTable +language)->lregexControlBlock,
-						   multiline, parameter);
+						   regptype, parameter);
 
 	return true;
 }

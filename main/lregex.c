@@ -91,8 +91,10 @@ typedef struct {
 	} u;
 	unsigned int scopeActions;
 	bool *disabled;
+
+	enum regexParserType regptype;
 #define NO_MULTILINE -1
-#define IS_MULTILINE(PTRBUF) ((PTRBUF)->mgroup.forLineNumberDetermination >= 0)
+#define IS_MULTILINE(PTRBUF) ((PTRBUF)->regptype == REG_PARSER_MULTI_LINE)
 	struct mGroupSpec mgroup;
 	int   xtagType;
 	ptrArray *fieldPatterns;
@@ -204,7 +206,7 @@ static bool initRegexTag (tagEntryInfo *e,
  * Returns pointer to terminating separator.  Works in place.  Null
  * terminates name string.
  */
-static char* scanSeparators (char* name, bool multiline)
+static char* scanSeparators (char* name, enum regexParserType regptype)
 {
 	char sep = name [0];
 	char *copyto = name;
@@ -218,7 +220,7 @@ static char* scanSeparators (char* name, bool multiline)
 				*copyto++ = sep;
 			else if (*name == 't')
 				*copyto++ = '\t';
-			else if (multiline && *name == 'n')
+			else if ((regptype == REG_PARSER_MULTI_LINE) && *name == 'n')
 				*copyto++ = '\n';
 			else
 			{
@@ -251,14 +253,14 @@ static char* scanSeparators (char* name, bool multiline)
  * correct format, a false value is returned.
  */
 static bool parseTagRegex (
-		bool multiline,
+		enum regexParserType regptype,
 		char* const regexp, char** const name,
 		char** const kinds, char** const flags)
 {
 	bool result = false;
 	const int separator = (unsigned char) regexp [0];
 
-	*name = scanSeparators (regexp, multiline);
+	*name = scanSeparators (regexp, regptype);
 	if (*regexp == '\0')
 		error (WARNING, "empty regexp");
 	else if (**name != separator)
@@ -361,7 +363,8 @@ static void kindFree (kindDefinition *kind)
 }
 
 static regexPattern* addCompiledTagCommon (struct lregexControlBlock *lcb,
-					   regex_t* const pattern)
+					   regex_t* const pattern,
+					   enum regexParserType regptype)
 {
 	regexPattern *ptrn;
 
@@ -372,6 +375,7 @@ static regexPattern* addCompiledTagCommon (struct lregexControlBlock *lcb,
 	ptrn->pattern = pattern;
 	ptrn->exclusive = false;
 	ptrn->accept_empty_name = false;
+	ptrn->regptype = regptype;
 	lcb->count += 1;
 	useRegexMethod(lcb->owner);
 
@@ -566,7 +570,7 @@ static flagDefinition fieldSpecFlagDef[] = {
 };
 
 
-static regexPattern *addCompiledTagPattern (struct lregexControlBlock *lcb, bool multiline, regex_t* const pattern,
+static regexPattern *addCompiledTagPattern (struct lregexControlBlock *lcb, enum regexParserType regptype, regex_t* const pattern,
 					    const char* const name, char kindLetter, const char* kindName,
 					    char *const description, const char* flags,
 					    bool *disabled)
@@ -583,7 +587,7 @@ static regexPattern *addCompiledTagPattern (struct lregexControlBlock *lcb, bool
 		.owner = lcb->owner,
 	};
 
-	if (!multiline)
+	if (regptype == REG_PARSER_SINGLE_LINE)
 	{
 		flagsEval (flags, prePtrnFlagDef, ARRAY_SIZE(prePtrnFlagDef), &exclusive);
 		flagsEval (flags, scopePtrnFlagDef, ARRAY_SIZE(scopePtrnFlagDef), &scopeActions);
@@ -591,8 +595,8 @@ static regexPattern *addCompiledTagPattern (struct lregexControlBlock *lcb, bool
 
 	flagsEval (flags, extraSpecFlagDef, ARRAY_SIZE(extraSpecFlagDef), &extraFlagData);
 
-	ptrn  = addCompiledTagCommon(lcb, pattern);
-	if (multiline)
+	ptrn  = addCompiledTagCommon(lcb, pattern, regptype);
+	if (regptype == REG_PARSER_MULTI_LINE)
 		flagsEval (flags, multilinePtrnFlagDef, ARRAY_SIZE(multilinePtrnFlagDef), &ptrn->mgroup);
 
 	ptrn->type    = PTRN_TAG;
@@ -642,7 +646,7 @@ static void addCompiledCallbackPattern (struct lregexControlBlock *lcb, regex_t*
 	regexPattern * ptrn;
 	bool exclusive = false;
 	flagsEval (flags, prePtrnFlagDef, ARRAY_SIZE(prePtrnFlagDef), &exclusive);
-	ptrn  = addCompiledTagCommon(lcb, pattern);
+	ptrn = addCompiledTagCommon(lcb, pattern, REG_PARSER_SINGLE_LINE);
 	ptrn->type    = PTRN_CALLBACK;
 	ptrn->u.callback.function = callback;
 	ptrn->u.callback.userData = userData;
@@ -1042,7 +1046,7 @@ extern bool hasScopeActionInRegex (struct lregexControlBlock *lcb)
 }
 
 static regexPattern *addTagRegexInternal (struct lregexControlBlock *lcb,
-					  bool multiline,
+					  enum regexParserType regptype,
 					  const char* const regex,
 					  const char* const name,
 					  const char* const kinds,
@@ -1071,7 +1075,7 @@ static regexPattern *addTagRegexInternal (struct lregexControlBlock *lcb,
 				   regex,
 				   getLanguageName (lcb->owner));
 
-		rptr = addCompiledTagPattern (lcb, multiline, cp, name,
+		rptr = addCompiledTagPattern (lcb, regptype, cp, name,
 									  kind, kindName, description, flags,
 									  disabled);
 		if (kindName)
@@ -1098,14 +1102,14 @@ extern void addTagRegex (struct lregexControlBlock *lcb,
 			 const char* const flags,
 			 bool *disabled)
 {
-	addTagRegexInternal (lcb, false, regex, name, kinds, flags, disabled);
+	addTagRegexInternal (lcb, REG_PARSER_SINGLE_LINE, regex, name, kinds, flags, disabled);
 }
 
 extern void addTagMultiLineRegex (struct lregexControlBlock *lcb, const char* const regex,
 								  const char* const name, const char* const kinds, const char* const flags,
 								  bool *disabled)
 {
-	addTagRegexInternal (lcb, true, regex, name, kinds, flags, disabled);
+	addTagRegexInternal (lcb, REG_PARSER_MULTI_LINE, regex, name, kinds, flags, disabled);
 }
 
 extern void addCallbackRegex (struct lregexControlBlock *lcb,
@@ -1128,7 +1132,7 @@ extern void addCallbackRegex (struct lregexControlBlock *lcb,
 }
 
 static void addTagRegexOption (struct lregexControlBlock *lcb,
-							   bool multiline,
+							   enum regexParserType regptype,
 							   const char* const pattern)
 {
 	if (!regexAvailable)
@@ -1136,20 +1140,20 @@ static void addTagRegexOption (struct lregexControlBlock *lcb,
 
 	char *const regex_pat = eStrdup (pattern);
 	char *name, *kinds, *flags;
-	if (parseTagRegex (multiline, regex_pat, &name, &kinds, &flags))
-		addTagRegexInternal (lcb, multiline, regex_pat, name, kinds, flags,
+	if (parseTagRegex (regptype, regex_pat, &name, &kinds, &flags))
+		addTagRegexInternal (lcb, regptype, regex_pat, name, kinds, flags,
 							 NULL);
 	eFree (regex_pat);
 }
 
 extern void processTagRegexOption (struct lregexControlBlock *lcb,
-								   bool multiline,
+								   enum regexParserType regptype,
 								   const char* const parameter)
 {
 	if (parameter == NULL  ||  parameter [0] == '\0')
 		clearPatternSet (lcb);
 	else if (parameter [0] != '@')
-		addTagRegexOption (lcb, multiline, parameter);
+		addTagRegexOption (lcb, regptype, parameter);
 	else if (! doesFileExist (parameter + 1))
 		error (WARNING, "cannot open regex file");
 	else
@@ -1166,7 +1170,7 @@ extern void processTagRegexOption (struct lregexControlBlock *lcb,
 			while (readLineRaw (regex, mio))
 			{
 				if (vStringLength (regex) > 1 && vStringValue (regex)[0] != '\n')
-					addTagRegexOption (lcb, multiline, vStringValue (regex));
+					addTagRegexOption (lcb, regptype, vStringValue (regex));
 			}
 			mio_free (mio);
 			vStringDelete (regex);

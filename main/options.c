@@ -3043,7 +3043,7 @@ static bool processRegexOption (const char *const option,
 	if (language == LANG_IGNORE)
 		return false;
 
-	processLanguageRegexOption (language, false, parameter);
+	processLanguageRegexOption (language, REG_PARSER_SINGLE_LINE, parameter);
 
 	return true;
 }
@@ -3057,7 +3057,7 @@ static bool processMultilineRegexOption (const char *const option,
 	if (language == LANG_IGNORE)
 		return false;
 
-	processLanguageRegexOption (language, true, parameter);
+	processLanguageRegexOption (language, REG_PARSER_MULTI_LINE, parameter);
 
 	return true;
 }
