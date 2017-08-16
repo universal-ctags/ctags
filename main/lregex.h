@@ -34,6 +34,7 @@ typedef struct {
 enum regexParserType {
 	REG_PARSER_SINGLE_LINE,
 	REG_PARSER_MULTI_LINE,
+	REG_PARSER_MULTI_TABLE,
 };
 
 typedef void (*regexCallback) (const char *line, const regexMatch *matches, unsigned int count,

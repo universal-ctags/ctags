@@ -459,6 +459,8 @@ static optionDescription LongOptionDescription [] = {
  {0,"       Enter file I/O limited interactive mode if sandbox is specified. [default]"},
 #endif
 #endif
+ {1,"  --_mtable-regex-<LANG>=table/line_pattern/name_pattern/[flags]"},
+ {1,"       Define multitable regular expression for locating tags in specific language."},
  {1,"  --_tabledef-<LANG>=name"},
  {1,"       Define new regex table for <LANG>."},
  {1,"  --_xformat=field_format"},
@@ -3064,6 +3066,20 @@ static bool processMultilineRegexOption (const char *const option,
 	return true;
 }
 
+static bool processMultitableRegexOption (const char *const option,
+										  const char *const parameter)
+{
+	langType language;
+
+	language = getLanguageComponentInOption (option, "_mtable-regex-");
+	if (language == LANG_IGNORE)
+		return false;
+
+	processLanguageRegexOption (language, REG_PARSER_MULTI_TABLE, parameter);
+
+	return true;
+}
+
 static void processLongOption (
 		const char *const option, const char *const parameter)
 {
@@ -3102,6 +3118,8 @@ static void processLongOption (
 	else if (processParamOption (option, parameter))
 		;
 	else if (processTabledefOption (option, parameter))
+		;
+	else if (processMultitableRegexOption (option, parameter))
 		;
 #ifdef HAVE_ICONV
 	else if (processLanguageEncodingOption (option, parameter))
