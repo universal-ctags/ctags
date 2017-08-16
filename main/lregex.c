@@ -1439,7 +1439,7 @@ extern void freeRegexResources (void)
 	/* TODO: SHOULD BE REMOVED */
 }
 
-extern bool hasMultilineRegexPatterns (struct lregexControlBlock *lcb)
+extern bool regexNeedsMultilineBuffer (struct lregexControlBlock *lcb)
 {
 	return ptrArrayCount(lcb->patterns [REG_PARSER_MULTI_LINE]) > 0;
 }

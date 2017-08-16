@@ -3186,7 +3186,7 @@ static bool lregexQueryParserAndSubparesrs (const langType language, bool (* pre
 
 extern bool hasLanguageMultilineRegexPatterns (const langType language)
 {
-	return lregexQueryParserAndSubparesrs (language, hasMultilineRegexPatterns);
+	return lregexQueryParserAndSubparesrs (language, regexNeedsMultilineBuffer);
 }
 
 
