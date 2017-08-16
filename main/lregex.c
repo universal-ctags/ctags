@@ -806,6 +806,14 @@ static vString* substitute (
 	return result;
 }
 
+static unsigned long getInputLineNumberInRegPType (enum regexParserType regptype,
+												   off_t offset)
+{
+	return (regptype == REG_PARSER_MULTI_LINE)
+		? getInputLineNumberForFileOffset (offset)
+		: getInputLineNumber ();
+}
+
 static void matchTagPattern (struct lregexControlBlock *lcb,
 		const char* line,
 		const regexPattern* const patbuf,
@@ -845,9 +853,7 @@ static void matchTagPattern (struct lregexControlBlock *lcb,
 		if (patbuf->accept_empty_name == false)
 			error (WARNING, "%s:%lu: null expansion of name pattern \"%s\"",
 			       getInputFileName (),
-				   patbuf->regptype == REG_PARSER_MULTI_LINE
-			       ? getInputLineNumberForFileOffset (offset)
-			       : getInputLineNumber (),
+				   getInputLineNumberInRegPType(patbuf->regptype, offset),
 			       patbuf->u.tag.name_pattern);
 		n = CORK_NIL;
 	}
