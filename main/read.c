@@ -876,6 +876,7 @@ static vString *iFileGetLine (void)
 		if (use_multiline)
 		{
 			matchLanguageMultilineRegex (getInputLanguage (), File.allLines);
+			matchLanguageMultitableRegex (getInputLanguage (), File.allLines);
 			vStringDelete (File.allLines);
 			File.allLines = NULL;
 		}

@@ -3147,18 +3147,32 @@ extern bool parseFileWithMio (const char *const fileName, MIO *mio)
 	return tagFileResized;
 }
 
-extern void matchLanguageMultilineRegex (const langType language, const vString* const allLines)
+static void matchLanguageMultilineRegexCommon (const langType language,
+											   bool (* func) (struct lregexControlBlock *, const vString* const),
+											   const vString* const allLines)
 {
 	subparser *tmp;
 
-	matchMultilineRegex ((LanguageTable + language)->lregexControlBlock, allLines);
+	func ((LanguageTable + language)->lregexControlBlock, allLines);
 	foreachSubparser(tmp, true)
 	{
 		langType t = getSubparserLanguage (tmp);
 		enterSubparser (tmp);
-		matchLanguageMultilineRegex (t, allLines);
+		matchLanguageMultilineRegexCommon (t, func, allLines);
 		leaveSubparser ();
 	}
+}
+
+extern void matchLanguageMultilineRegex (const langType language,
+										 const vString* const allLines)
+{
+	matchLanguageMultilineRegexCommon(language, matchMultilineRegex, allLines);
+}
+
+extern void matchLanguageMultitableRegex (const langType language,
+										  const vString* const allLines)
+{
+	matchLanguageMultilineRegexCommon(language, matchMultitableRegex, allLines);
 }
 
 static bool lregexQueryParserAndSubparesrs (const langType language, bool (* predicate) (struct lregexControlBlock *))

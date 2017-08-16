@@ -1,0 +1,28 @@
+function foo
+{
+	var a, b,
+
+
+/* 
+
+, 
+
+
+*/
+
+
+// D,
+
+c, e = "x";
+}
+
+function bar
+{
+	var y;
+	function baz
+	{
+		var z;
+	}
+
+}
+
