@@ -66,4 +66,6 @@ extern bool matchMultilineRegex (struct lregexControlBlock *lcb, const vString* 
 extern void notifyRegexInputStart (struct lregexControlBlock *lcb);
 extern void notifyRegexInputEnd (struct lregexControlBlock *lcb);
 
+extern void addRegexTable (struct lregexControlBlock *lcb, const char *name);
+
 #endif	/* CTAGS_MAIN_LREGEX_H */

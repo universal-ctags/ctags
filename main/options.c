@@ -459,6 +459,8 @@ static optionDescription LongOptionDescription [] = {
  {0,"       Enter file I/O limited interactive mode if sandbox is specified. [default]"},
 #endif
 #endif
+ {1,"  --_tabledef-<LANG>=name"},
+ {1,"       Define new regex table for <LANG>."},
  {1,"  --_xformat=field_format"},
  {1,"       Specify custom format for tabular cross reference (-x)."},
  {1,"       Fields can be specified with letter listed in --list-fields."},
@@ -3098,6 +3100,8 @@ static void processLongOption (
 	else if (processMapOption (option, parameter))
 		;
 	else if (processParamOption (option, parameter))
+		;
+	else if (processTabledefOption (option, parameter))
 		;
 #ifdef HAVE_ICONV
 	else if (processLanguageEncodingOption (option, parameter))

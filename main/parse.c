@@ -3231,6 +3231,21 @@ extern bool processLanguageRegexOption (langType language,
 	return true;
 }
 
+extern bool processTabledefOption (const char *const option, const char *const parameter)
+{
+	langType language;
+
+	language = getLanguageComponentInOption (option, "_tabledef-");
+	if (language == LANG_IGNORE)
+		return false;
+
+	if (parameter == NULL || parameter[0] == '\0')
+		error (FATAL, "A parameter is needed after \"%s\" option", option);
+
+	addRegexTable((LanguageTable +language)->lregexControlBlock, parameter);
+	return true;
+}
+
 extern void useRegexMethod (const langType language)
 {
 	parserDefinition* lang;

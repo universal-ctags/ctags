@@ -99,9 +99,17 @@ typedef struct {
 } regexPattern;
 
 
+struct regexTable {
+	char *name;
+	ptrArray *patterns;
+};
+
 struct lregexControlBlock {
 	unsigned long currentScope;
 	ptrArray *patterns [2];
+
+	ptrArray *tables;
+
 	langType owner;
 };
 
@@ -112,6 +120,15 @@ struct lregexControlBlock {
 /*
 *   FUNCTION DEFINITIONS
 */
+
+static void deleteTable (void *ptrn)
+{
+	struct regexTable *t = ptrn;
+
+	ptrArrayDelete (t->patterns);
+	eFree (t->name);
+	eFree (t);
+}
 
 static void deletePattern (void *ptrn)
 {
@@ -140,6 +157,7 @@ static void clearPatternSet (struct lregexControlBlock *lcb)
 {
 	ptrArrayClear (lcb->patterns [REG_PARSER_SINGLE_LINE]);
 	ptrArrayClear (lcb->patterns [REG_PARSER_MULTI_LINE]);
+	ptrArrayClear (lcb->tables);
 }
 
 extern struct lregexControlBlock* allocLregexControlBlock (parserDefinition *parser)
@@ -148,6 +166,7 @@ extern struct lregexControlBlock* allocLregexControlBlock (parserDefinition *par
 
 	lcb->patterns[REG_PARSER_SINGLE_LINE] = ptrArrayNew(deletePattern);
 	lcb->patterns[REG_PARSER_MULTI_LINE] = ptrArrayNew(deletePattern);
+	lcb->tables = ptrArrayNew(deleteTable);
 	lcb->owner = parser->id;
 
 	return lcb;
@@ -161,6 +180,9 @@ extern void freeLregexControlBlock (struct lregexControlBlock* lcb)
 	lcb->patterns [REG_PARSER_SINGLE_LINE] = NULL;
 	ptrArrayDelete (lcb->patterns [REG_PARSER_MULTI_LINE]);
 	lcb->patterns [REG_PARSER_MULTI_LINE] = NULL;
+
+	ptrArrayDelete (lcb->tables);
+	lcb->tables = NULL;
 
 	eFree (lcb);
 }
@@ -1293,6 +1315,39 @@ extern bool matchMultilineRegex (struct lregexControlBlock *lcb, const vString* 
 	return result;
 }
 
+static int getTableIndexForName (struct lregexControlBlock *lcb, const char *name)
+{
+	unsigned int i;
+
+	for (i = 0; i < ptrArrayCount(lcb->tables); i++)
+	{
+		struct regexTable *table = ptrArrayItem(lcb->tables, i);
+		if (strcmp (table->name, name) == 0)
+			return (int)i;
+	}
+
+	return -1;
+}
+
+extern void addRegexTable (struct lregexControlBlock *lcb, const char *name)
+{
+	const char *c;
+	for (c = name; *c; c++)
+		if (! (isalnum(*c) || *c == '_'))
+			error (FATAL, "`%c' in \"%s\" is not acceptable as part of table name", *c, name);
+
+	if (getTableIndexForName(lcb, name) >= 0)
+	{
+		error (WARNING, "regex table \"%s\" is already defined", name);
+		return;
+	}
+
+	struct regexTable *table = xCalloc(1, struct regexTable);
+	table->name = eStrdup (name);
+	table->patterns = ptrArrayNew(deletePattern);
+
+	ptrArrayAdd (lcb->tables, table);
+}
 
 /* Return true if available. */
 extern bool checkRegex (void)
