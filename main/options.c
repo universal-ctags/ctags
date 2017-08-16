@@ -459,6 +459,8 @@ static optionDescription LongOptionDescription [] = {
  {0,"       Enter file I/O limited interactive mode if sandbox is specified. [default]"},
 #endif
 #endif
+ {1,"  --_list-mtable-regex-flags"},
+ {1,"       Output list of flags which can be used in a multitable regex parser definition."},
  {1,"  --_mtable-regex-<LANG>=table/line_pattern/name_pattern/[flags]"},
  {1,"       Define multitable regular expression for locating tags in specific language."},
  {1,"  --_tabledef-<LANG>=name"},
@@ -2084,6 +2086,14 @@ static void processListMultilineRegexFlagsOptions (
 	exit (0);
 }
 
+static void processListMultitableRegexFlagsOptions (
+		const char *const option CTAGS_ATTR_UNUSED,
+		const char *const parameter CTAGS_ATTR_UNUSED)
+{
+	printMultitableRegexFlags (localOption.withListHeader, localOption.machinable, stdout);
+	exit (0);
+}
+
 static void processListLangdefFlagsOptions (
 		const char *const option CTAGS_ATTR_UNUSED,
 		const char *const parameter CTAGS_ATTR_UNUSED)
@@ -2704,6 +2714,7 @@ static parametricOption ParametricOptions [] = {
 #ifdef HAVE_JANSSON
 	{ "_interactive",           processInteractiveOption,       true,   STAGE_ANY },
 #endif
+	{ "_list-mtable-regex-flags", processListMultitableRegexFlagsOptions, true, STAGE_ANY },
 	{ "_xformat",               processXformatOption,           false,  STAGE_ANY },
 };
 
