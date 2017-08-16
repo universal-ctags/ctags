@@ -3175,6 +3175,29 @@ extern void matchLanguageMultitableRegex (const langType language,
 	matchLanguageMultilineRegexCommon(language, matchMultitableRegex, allLines);
 }
 
+extern void processLanguageMultitableExtendingOption (langType language, const char *const parameter)
+{
+	const char* src;
+	char* dist;
+	const char *tmp;
+
+	tmp = strchr(parameter, '+');
+
+	if (!tmp)
+		error (FATAL, "no separator(+) found: %s", parameter);
+
+	if (tmp == parameter)
+		error (FATAL, "the name of source table is empty in table extending: %s", parameter);
+
+	src = tmp + 1;
+	if (!*src)
+		error (FATAL, "the name of dist table is empty in table extending: %s", parameter);
+
+	dist = eStrndup(parameter, tmp  - parameter);
+	extendRegexTable(((LanguageTable + language)->lregexControlBlock), src, dist);
+	eFree (dist);
+}
+
 static bool lregexQueryParserAndSubparesrs (const langType language, bool (* predicate) (struct lregexControlBlock *))
 {
 	bool r;

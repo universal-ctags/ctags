@@ -429,6 +429,12 @@ static void initTaction(struct mTableActionSpec *taction)
 	taction->table = NULL;
 }
 
+static regexPattern * refPattern (regexPattern * ptrn)
+{
+	ptrn->refcount++;
+	return ptrn;
+}
+
 static regexPattern * newPattern (regex_t* const pattern,
 								  enum regexParserType regptype)
 {
@@ -1601,6 +1607,7 @@ static struct regexTable * matchMultitableRegexTable (struct lregexControlBlock 
 				case TACTION_NOP:
 					break;
 				case TACTION_ENTER:
+					/* TODO: Limit the depth of tstack.  */
 					ptrArrayAdd (lcb->tstack, table);
 					next = taction->table;
 					break;
@@ -1646,6 +1653,32 @@ static struct regexTable * matchMultitableRegexTable (struct lregexControlBlock 
 		ptrArrayRemoveLast (lcb->tstack);
 	}
 	return next;
+}
+
+extern void extendRegexTable (struct lregexControlBlock *lcb, const char *src, const char *dist)
+{
+
+	int i;
+	struct regexTable * src_table;
+	struct regexTable * dist_table;
+
+	verbose ("extend regex table  \"%s\" with \"%s\"\n", dist, src);
+
+	i = getTableIndexForName (lcb, src);
+	if (i < 0)
+		error (FATAL, "no such regex table in %s: %s", getLanguageName(lcb->owner), src);
+	src_table = ptrArrayItem(lcb->tables, i);
+
+	i = getTableIndexForName (lcb, dist);
+	if (i < 0)
+		error (FATAL, "no such regex table in %s: %s", getLanguageName(lcb->owner), dist);
+	dist_table = ptrArrayItem(lcb->tables, i);
+
+	for (i = 0; i < ptrArrayCount(src_table->patterns); i++)
+	{
+		regexPattern *ptrn = ptrArrayItem (src_table->patterns, i);
+		ptrArrayAdd(dist_table->patterns, refPattern(ptrn));
+	}
 }
 
 extern bool matchMultitableRegex (struct lregexControlBlock *lcb, const vString* const allLines)

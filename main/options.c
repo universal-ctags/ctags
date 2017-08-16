@@ -461,6 +461,8 @@ static optionDescription LongOptionDescription [] = {
 #endif
  {1,"  --_list-mtable-regex-flags"},
  {1,"       Output list of flags which can be used in a multitable regex parser definition."},
+ {1,"  --_mtable-extend-<LANG>=disttable+srctable."},
+ {1,"       Copy patterns of a regex table to another regex table."},
  {1,"  --_mtable-regex-<LANG>=table/line_pattern/name_pattern/[flags]"},
  {1,"       Define multitable regular expression for locating tags in specific language."},
  {1,"  --_tabledef-<LANG>=name"},
@@ -3091,6 +3093,20 @@ static bool processMultitableRegexOption (const char *const option,
 	return true;
 }
 
+static bool processMultitableExtendingOption (const char *const option,
+											  const char *const parameter)
+{
+	langType language;
+
+	language = getLanguageComponentInOption (option, "_mtable-extend-");
+	if (language == LANG_IGNORE)
+		return false;
+
+	processLanguageMultitableExtendingOption (language, parameter);
+
+	return true;
+}
+
 static void processLongOption (
 		const char *const option, const char *const parameter)
 {
@@ -3131,6 +3147,8 @@ static void processLongOption (
 	else if (processTabledefOption (option, parameter))
 		;
 	else if (processMultitableRegexOption (option, parameter))
+		;
+	else if (processMultitableExtendingOption (option, parameter))
 		;
 #ifdef HAVE_ICONV
 	else if (processLanguageEncodingOption (option, parameter))

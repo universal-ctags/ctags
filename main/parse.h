@@ -227,6 +227,8 @@ extern bool hasLanguageMultilineRegexPatterns (const langType language);
 extern void matchLanguageMultilineRegex (const langType language, const vString* const allLines);
 extern void matchLanguageMultitableRegex (const langType language, const vString* const allLines);
 
+extern void processLanguageMultitableExtendingOption (langType language, const char *const parameter);
+
 extern unsigned int   getXpathFileSpecCount (const langType language);
 extern xpathFileSpec* getXpathFileSpec (const langType language, unsigned int nth);
 
