@@ -112,6 +112,8 @@ typedef struct {
 
 	int   xtagType;
 	ptrArray *fieldPatterns;
+
+	int refcount;
 } regexPattern;
 
 
@@ -152,6 +154,11 @@ static void deleteTable (void *ptrn)
 static void deletePattern (void *ptrn)
 {
 	regexPattern *p = ptrn;
+
+	p->refcount--;
+
+	if (p->refcount > 0)
+		return;
 
 	regfree (p->pattern);
 	eFree (p->pattern);
@@ -437,6 +444,7 @@ static regexPattern * newPattern (regex_t* const pattern,
 	if (regptype == REG_PARSER_MULTI_TABLE)
 		initTaction(&ptrn->taction);
 
+	ptrn->refcount = 1;
 	return ptrn;
 }
 
