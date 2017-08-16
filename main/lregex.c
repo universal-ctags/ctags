@@ -996,7 +996,7 @@ static bool matchMultilineRegexPattern (struct lregexControlBlock *lcb,
 
 	start = vStringValue (allLines);
 	for (current = start;
-	     match == 0 && current < start + strlen(vStringValue (allLines));
+	     match == 0 && current < start + vStringLength (allLines);
 	     current += (patbuf->mgroup.nextFromStart
 					 ? pmatch [patbuf->mgroup.forNextScanning].rm_so
 					 : pmatch [patbuf->mgroup.forNextScanning].rm_eo))
