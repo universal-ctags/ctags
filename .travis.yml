@@ -47,12 +47,24 @@ env:
 
 # Only with gcc get the mingw-w64 cross compilers
 before_install:
-  - if [ $CC = 'gcc' ] && [ $TRAVIS_OS_NAME = 'linux' ]; then gem install lcoveralls; fi
+  - |
+    if [ $CC = 'gcc' ] && [ $TRAVIS_OS_NAME = 'linux' ]; then
+    	gem install lcoveralls
+    fi
+
 # Build and run tests. Only with gcc cross compile
 script:
   - ./misc/travis-check.sh
 after_success:
-  - if [ $CC = 'gcc' ] && [ $TRAVIS_OS_NAME = 'linux' ]; then lcov -c -b . -d . -o coverage.info && lcoveralls --root . --retry-count 5 coverage.info; fi
+  - |
+    if [ $CC = 'gcc' ] && [ $TRAVIS_OS_NAME = 'linux' ]; then
+        (
+            for f in /home/travis/.rvm/gems/ruby-2*/gems/lcoveralls-*/lib/lcoveralls/color_formatter.rb; do
+                    sed -i -e 's/severity.capitalize!/severity = severity.capitalize/' $f
+            done
+        ) || :
+        lcov -c -b . -d . -o coverage.info && lcoveralls --root . --retry-count 5 coverage.info
+    fi
 
 # Build Matrix configuration
 # By default Travis CI runs all possible environment/target combinations.
