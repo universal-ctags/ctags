@@ -656,7 +656,7 @@ will be processed as
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 A new ``--_interactive`` option launches a JSON based command REPL which
-can be used to control ctags generation programatically.
+can be used to control ctags generation programmatically.
 
 See :ref:`--_interactive Mode <interactive-mode>` for more details.
 

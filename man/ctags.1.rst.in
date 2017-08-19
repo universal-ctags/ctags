@@ -48,7 +48,7 @@ derived from **Exuberant-ctags**. The major incompatible changes between
 Universal-ctags and Exuberant-ctags are enumerated in
 ctags-incompatibilities(7).
 
-One of the advantages of Exuberant-ctags is that it allows an user to
+One of the advantages of Exuberant-ctags is that it allows a user to
 define a new parser from command line. Extending this feature is one
 of the major topics in Universal-ctags development. ctags-optlib(7)
 describes how the feature is extended.
@@ -354,7 +354,7 @@ quickly.  However, the command line including sequence of the letters
 becomes difficult to be understood.
 
 Universal-ctags accepts names in
-addition to such letters. The names and letters can be mixed in a
+addition to such letters. The names and letters can be mixed in an
 option parameter by surrounding each name by braces. Thus, for an
 example, following three notations for ``--kinds-C`` option have
 the same meaning::
@@ -472,7 +472,7 @@ OPTION ITEMS
 	letter (e.g. "C:"), the parameter identifier-list will be interpreted as
 	a filename from which to read a list of identifiers, one per input line.
 	Otherwise, identifier-list is a list of identifiers (or identifier
-	pairs) to be specially handled, each delimited by a either a comma or
+	pairs) to be specially handled, each delimited by either a comma or
 	by white space (in which case the list should be quoted to keep the
 	entire list as one command line argument). Multiple ``-I`` options may be
 	supplied. To clear the list of ignore identifiers, supply a single
@@ -1198,7 +1198,7 @@ OPTION ITEMS
 		The number of roles this kind has. See also "Roles".
 
 	MASTER
-		The master parser controlling enablment of the kind.
+		The master parser controlling enablement of the kind.
 		A kind belongs to a language (owner) in Universal-ctags;
 		enabling and disabling a kind in a language has no effect on
 		a kind in another language even if the both kinds has the
@@ -1233,7 +1233,7 @@ OPTION ITEMS
 ``--list-languages``
 	Lists the names of the languages understood by @CTAGS_NAME_EXECUTABLE@,
 	and then exits. These language names are case insensitive and may be
-	used in the the many other options like ``--language-force``,
+	used in many other options like ``--language-force``,
 	``--languages``, ``--kinds-<LANG>``, ``--regex-<LANG>``, and so on.
 
 	Each language listed is disabled if followed by "[disabled]".
@@ -1646,7 +1646,7 @@ HOW TO USE WITH NEDIT
 NEdit version 5.1 and later can handle the new extended tag file format
 (see ``--format``). To make NEdit use the tag file, select "File->Load Tags
 File". To jump to the definition for a tag, highlight the word, then press
-Ctrl-D. NEdit 5.1 can can read multiple tag files from different
+Ctrl-D. NEdit 5.1 can read multiple tag files from different
 directories. Setting the X resource nedit.tagFile to the name of a tag
 file instructs NEdit to automatically load that tag file at startup time.
 
@@ -1699,7 +1699,7 @@ is defined outside of the class declaration (the usual case), the access
 specification (i.e. public, protected, or private) and implementation
 information (e.g. virtual, pure virtual) contained in the function
 declaration are not known when the tag is generated for the function
-definition. It will, however be available for prototypes (e.g "--c++-kinds=+p").
+definition. It will, however be available for prototypes (e.g. "--c++-kinds=+p").
 
 No qualified tags are generated for language objects inherited into a class.
 

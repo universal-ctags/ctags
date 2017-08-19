@@ -250,7 +250,7 @@ with two restrictions:
 
   To customize one of file under
   */usr/share/ctags/preload/something.d*, copy
-  */usr/share/ctags/preload/something.d* to *~/.ctags.d/somethind.d* recursively.
+  */usr/share/ctags/preload/something.d* to *~/.ctags.d/something.d* recursively.
   Symbolic links can also be used. After copying or symbolic linking, edit
   one of the copied file.
 
@@ -616,11 +616,11 @@ Exuberant-ctags allows one of the specified group in a regex pattern can be
 used as a part of the name of a tagEntry. Universal-ctags offers using
 the other groups in the regex pattern.
 
-A optlib parser can have its own fields. The groups can be used as a
+An optlib parser can have its own fields. The groups can be used as a
 value of the fields of a tagEntry.
 
 Let's think about *Unknown*, an imaginary language.
-Here is an source file(``input.unknown``) written in *Unknown*:
+Here is a source file(``input.unknown``) written in *Unknown*:
 
     public func foo(n, m);
     protected func bar(n);
