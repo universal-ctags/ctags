@@ -509,13 +509,16 @@ static void parseTemplateString (vString *const string)
 	do
 	{
 		c = getcFromInputFile ();
-		if (c == '`')
+		if (c == '`' || c == EOF)
 			break;
+
 		vStringPut (string, c);
+
 		if (c == '\\')
 		{
 			c = getcFromInputFile();
-			vStringPut(string, c);
+			if (c != EOF)
+				vStringPut(string, c);
 		}
 		else if (c == '$')
 		{
@@ -579,7 +582,7 @@ getNextChar:
 	token->lineNumber   = getInputLineNumber ();
 	token->filePosition = getInputFilePosition ();
 
-	if (repr)
+	if (repr && c != EOF)
 	{
 		if (i > 1)
 			vStringPut (repr, ' ');
