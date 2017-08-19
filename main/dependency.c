@@ -143,6 +143,9 @@ extern void notifyInputStart (void)
 
 	foreachSubparser(s, false)
 	{
+		langType lang = getSubparserLanguage (s);
+		notifyLanguageRegexInputStart (lang);
+
 		if (s->inputStart)
 		{
 			enterSubparser(s);
@@ -164,6 +167,9 @@ extern void notifyInputEnd   (void)
 			s->inputEnd (s);
 			leaveSubparser();
 		}
+
+		langType lang = getSubparserLanguage (s);
+		notifyLanguageRegexInputEnd (lang);
 	}
 }
 

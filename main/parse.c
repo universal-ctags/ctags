@@ -2745,6 +2745,7 @@ static rescanReason createTagsForFile (const langType language,
 
 	Assert (lang->parser || lang->parser2);
 
+	notifyLanguageRegexInputStart (language);
 	notifyInputStart ();
 
 	if (lang->parser != NULL)
@@ -2753,8 +2754,19 @@ static rescanReason createTagsForFile (const langType language,
 		rescan = lang->parser2 (passCount);
 
 	notifyInputEnd ();
+	notifyLanguageRegexInputEnd (language);
 
 	return rescan;
+}
+
+extern void notifyLanguageRegexInputStart (langType language)
+{
+	notifyRegexInputStart((LanguageTable + language)->lregexControlBlock);
+}
+
+extern void notifyLanguageRegexInputEnd (langType language)
+{
+	notifyRegexInputEnd((LanguageTable + language)->lregexControlBlock);
 }
 
 static bool doesParserUseCork (parserDefinition *parser)
@@ -3198,11 +3210,11 @@ extern void matchLanguageRegex (const langType language, const vString* const li
 }
 
 extern bool processLanguageRegexOption (langType language,
-										bool multiline,
+										enum regexParserType regptype,
 										const char *const parameter)
 {
 	processTagRegexOption ((LanguageTable +language)->lregexControlBlock,
-						   multiline, parameter);
+						   regptype, parameter);
 
 	return true;
 }

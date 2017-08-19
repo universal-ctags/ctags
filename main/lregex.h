@@ -31,6 +31,11 @@ typedef struct {
 	size_t length;  /* length of match */
 } regexMatch;
 
+enum regexParserType {
+	REG_PARSER_SINGLE_LINE,
+	REG_PARSER_MULTI_LINE,
+};
+
 typedef void (*regexCallback) (const char *line, const regexMatch *matches, unsigned int count,
 			       void *userData);
 
@@ -39,7 +44,7 @@ extern struct lregexControlBlock* allocLregexControlBlock (parserDefinition *par
 extern void freeLregexControlBlock (struct lregexControlBlock* lcb);
 
 extern void processTagRegexOption (struct lregexControlBlock *lcb,
-								   bool multiline,
+								   enum regexParserType,
 								   const char* const parameter);
 extern void addTagRegex (struct lregexControlBlock *lcb, const char* const regex,
 						 const char* const name, const char* const kinds, const char* const flags,
@@ -57,5 +62,8 @@ extern void addCallbackRegex (struct lregexControlBlock *lcb,
 							  void * userData);
 extern bool hasMultilineRegexPatterns (struct lregexControlBlock *lcb);
 extern bool matchMultilineRegex (struct lregexControlBlock *lcb, const vString* const allLines);
+
+extern void notifyRegexInputStart (struct lregexControlBlock *lcb);
+extern void notifyRegexInputEnd (struct lregexControlBlock *lcb);
 
 #endif	/* CTAGS_MAIN_LREGEX_H */
