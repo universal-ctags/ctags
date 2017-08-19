@@ -84,7 +84,8 @@ If you want to build a debug version, you must specify ``DEBUG=1`` like below::
 
 From their site: MSYS is a collection of GNU utilities such as bash, make, gawk and grep to allow building of applications and programs which depend on traditional UNIX tools to be present. It is intended to supplement MinGW and the deficiencies of the cmd shell.
 
-MSYS comes in two flavors. The original from MinGW and an MSYS2 http://sourceforge.net/projects/msys2/
+MSYS comes in two flavors; the original from MinGW and MSYS2.
+See http://sourceforge.net/projects/msys2/ about MSYS2.
 
 MSYS is old but still works. You can build ctags with it using ``make -f mk_mingw.mak``. The Autotools are too old on MSYS so you cannot use them.
 
