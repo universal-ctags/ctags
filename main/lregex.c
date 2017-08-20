@@ -113,6 +113,7 @@ typedef struct {
 	int   xtagType;
 	ptrArray *fieldPatterns;
 
+	char *pattern_string;
 	int refcount;
 } regexPattern;
 
@@ -176,6 +177,7 @@ static void deletePattern (void *ptrn)
 		p->fieldPatterns = NULL;
 	}
 
+	eFree (p->pattern_string);
 	eFree (ptrn);
 }
 
@@ -793,7 +795,7 @@ static regexPattern *addCompiledTagPattern (struct lregexControlBlock *lcb,
 	return ptrn;
 }
 
-static void addCompiledCallbackPattern (struct lregexControlBlock *lcb, regex_t* const pattern,
+static regexPattern *addCompiledCallbackPattern (struct lregexControlBlock *lcb, regex_t* const pattern,
 					const regexCallback callback, const char* flags,
 					bool *disabled,
 					void *userData)
@@ -807,6 +809,7 @@ static void addCompiledCallbackPattern (struct lregexControlBlock *lcb, regex_t*
 	ptrn->u.callback.userData = userData;
 	ptrn->exclusive = exclusive;
 	ptrn->disabled = disabled;
+	return ptrn;
 }
 
 
@@ -1260,6 +1263,28 @@ extern bool hasScopeActionInRegex (struct lregexControlBlock *lcb)
 	return false;
 }
 
+static char *escapeRegexPattern (const char* pattern)
+{
+	vString *p = vStringNew ();
+
+	while (*pattern != '\0')
+	{
+		char c = *pattern;
+		if (c == '\n')
+			vStringCatS(p, "\\n");
+		else if (c == '\t')
+			vStringCatS(p, "\\t");
+		else if (c == '\\')
+			vStringCatS(p, "\\\\");
+		else
+			vStringPut(p, c);
+
+		pattern++;
+	}
+
+	return vStringDeleteUnwrap (p);
+}
+
 static regexPattern *addTagRegexInternal (struct lregexControlBlock *lcb,
 										  int table_index,
 					  enum regexParserType regptype,
@@ -1296,6 +1321,7 @@ static regexPattern *addTagRegexInternal (struct lregexControlBlock *lcb,
 									  regptype, cp, name,
 									  kind, kindName, description, flags,
 									  disabled);
+		rptr->pattern_string = escapeRegexPattern(regex);
 		if (kindName)
 			eFree (kindName);
 		if (description)
@@ -1348,8 +1374,11 @@ extern void addCallbackRegex (struct lregexControlBlock *lcb,
 
 	regex_t* const cp = compileRegex (REG_PARSER_SINGLE_LINE, regex, flags);
 	if (cp != NULL)
-		addCompiledCallbackPattern (lcb, cp, callback, flags,
-									disabled, userData);
+	{
+		regexPattern *rptr = addCompiledCallbackPattern (lcb, cp, callback, flags,
+														 disabled, userData);
+		rptr->pattern_string = escapeRegexPattern(regex);
+	}
 }
 
 static void addTagRegexOption (struct lregexControlBlock *lcb,
