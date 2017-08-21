@@ -86,6 +86,9 @@ struct mGroupSpec {
 struct mTableActionSpec {
 	enum tableAction action;
 	struct regexTable *table;
+
+	/* used when action == TACTION_ENTER */
+	struct regexTable *continuation_table;
 };
 
 typedef struct {
@@ -695,19 +698,47 @@ static void pre_ptrn_flag_mtable_long (const char* const s, const char* const v,
 
 	if (taking_table)
 	{
+		int t;
+		char *continuation = NULL;
+
+
 		if (!v || (!*v))
 			error (FATAL, "no table is given for table action: %s", s);
 
-		int t = getTableIndexForName (mdata->lcb, v);
-		if (t < 0)
-			error (FATAL, "table is not defined: %s", v);
-		taction->table = ptrArrayItem (mdata->lcb->tables, t);
+		if (taction->action == TACTION_ENTER
+			&& (continuation = strchr (v, ',')))
+		{
+			char *tableEnterTo;
+
+			tableEnterTo = eStrndup (v, continuation - v);
+			t = getTableIndexForName (mdata->lcb, tableEnterTo);
+			if (t < 0)
+				error (FATAL, "table is not defined: %s", tableEnterTo);
+			taction->table = ptrArrayItem (mdata->lcb->tables, t);
+			eFree (tableEnterTo);
+
+			if (!*(continuation + 1))
+				error (FATAL, "no continuation table is given for: %s", v);
+
+			int t_cont = getTableIndexForName (mdata->lcb, continuation + 1);
+			if (t_cont < 0)
+				error (FATAL, "table for continuation is not defined: %s", continuation + 1);
+			taction->continuation_table = ptrArrayItem (mdata->lcb->tables, t_cont);
+		}
+		else
+		{
+			t = getTableIndexForName (mdata->lcb, v);
+			if (t < 0)
+				error (FATAL, "table is not defined: %s", v);
+			taction->table = ptrArrayItem (mdata->lcb->tables, t);
+			taction->continuation_table = NULL;
+		}
 	}
 }
 
 static flagDefinition multitablePtrnFlagDef[] = {
 	{ '\0',  "tenter", NULL, pre_ptrn_flag_mtable_long ,
-	  "TABLE", "enter to given regext table"},
+	  "TABLE[,CONT]", "enter to given regext table (with specifying continuation)"},
 	{ '\0',  "tleave", NULL, pre_ptrn_flag_mtable_long ,
 	  NULL, "leave from the current regext table"},
 	{ '\0',  "tjump", NULL, pre_ptrn_flag_mtable_long ,
@@ -1637,7 +1668,11 @@ static struct regexTable * matchMultitableRegexTable (struct lregexControlBlock 
 					break;
 				case TACTION_ENTER:
 					/* TODO: Limit the depth of tstack.  */
-					ptrArrayAdd (lcb->tstack, table);
+
+					ptrArrayAdd (lcb->tstack,
+								 taction->continuation_table
+								 ? taction->continuation_table
+								 : table);
 					next = taction->table;
 					break;
 				case TACTION_LEAVE:

@@ -1,0 +1,34 @@
+--fields=+nKZe
+
+--langdef=X
+--langmap=X:.mtable
+--kinddef-X=c,class,classes
+
+--_tabledef-X=toplevel
+--_tabledef-X=class
+--_tabledef-X=classEnd
+--_tabledef-X=blockHead
+--_tabledef-X=block
+--_tabledef-X=blockEnd
+--_tabledef-X=separator
+
+--_mtable-regex-X=toplevel/class[ \t\n]//{tenter=class}
+--_mtable-regex-X=toplevel/[ \n\t]//
+--_mtable-regex-X=toplevel/.//{tenter=separator}
+
+--_mtable-regex-X=separator/[ \n\t]//{tleave}
+--_mtable-regex-X=separator/.//
+
+--_mtable-regex-X=class/([a-zA-Z0-9]+)/\1/c/{tenter=blockHead,classEnd}{scope=push}
+--_mtable-regex-X=class/.//
+
+--_mtable-regex-X=blockHead/\{//{tenter=block,blockEnd}
+--_mtable-regex-X=blockHead/.//
+
+--_mtable-regex-X=block/\}//{tleave}
+--_mtable-extend-X=block+toplevel
+# --_mtable-regex-X=block/.//
+
+--_mtable-regex-X=classEnd///{tleave}{scope=pop}
+--_mtable-regex-X=blockEnd///{tleave}
+
