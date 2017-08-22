@@ -758,8 +758,8 @@ static void parseProtocol (vString * const ident, objcToken what)
 {
 	if (what == ObjcIDENTIFIER)
 	{
-		pushEnclosingContext (ident, K_PROTOCOL);
 		addTag (ident, K_PROTOCOL);
+		pushEnclosingContext (ident, K_PROTOCOL);
 	}
 	toDoNext = &parseMethods;
 }
