@@ -1,5 +1,7 @@
 #!/bin/sh
 
+set -xe
+
 type autoreconf || exit 1
 type pkg-config || exit 1
 
