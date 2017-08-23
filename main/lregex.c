@@ -1618,6 +1618,39 @@ extern void addRegexTable (struct lregexControlBlock *lcb, const char *name)
 	ptrArrayAdd (lcb->tables, table);
 }
 
+static void dumpSstack(FILE* fp, unsigned long scope)
+{
+	fprintf (fp, "scope: ");
+	while (scope != CORK_NIL)
+	{
+		tagEntryInfo *entry = getEntryInCorkQueue (scope);
+		fprintf(fp, "%s", entry->name);
+
+		scope = entry->extensionFields.scopeIndex;
+		if (scope != CORK_NIL)
+			fprintf(fp, "%c", '/');
+	}
+	fprintf (fp, "\n");
+}
+
+static void dumpTstack(FILE* fp, ptrArray *tstack)
+{
+	for (unsigned int i = ptrArrayCount(tstack); i > 0; i--)
+	{
+		char tmp[2];
+		struct regexTable *t = ptrArrayItem(tstack, i - 1);
+		if (i == 1)
+			tmp[0] = '\0';
+		else
+		{
+			tmp[0] = '/';
+			tmp[1] = '\0';
+		}
+		fprintf(fp, "%s%s", t->name, tmp);
+	}
+	fprintf(fp, "\n");
+}
+
 static struct regexTable * matchMultitableRegexTable (struct lregexControlBlock *lcb,
 													  struct regexTable *table, const vString *const start, unsigned int *offset)
 {
@@ -1638,8 +1671,45 @@ static struct regexTable * matchMultitableRegexTable (struct lregexControlBlock 
 
 	for (unsigned int i = 0; i < ptrArrayCount(table->patterns); i++)
 	{
-		verbose ("regex pattern: %s[%u], offset: %u\n", table->name, i, *offset);
 		regexPattern* ptrn = ptrArrayItem(table->patterns, i);
+
+		BEGIN_VERBOSE(vfp);
+		{
+			char s[3];
+			if (*current == '\n')
+			{
+				s [0] = '\\';
+				s [1] = 'n';
+				s [2] = '\0';
+			}
+			else if (*current == '\t')
+			{
+				s [0] = '\\';
+				s [1] = 't';
+				s [2] = '\0';
+			}
+			else if (*current == '\\')
+			{
+				s [0] = '\\';
+				s [1] = '\\';
+				s [2] = '\0';
+			}
+			else
+			{
+				s[0] = *current;
+				s[1] = '\0';
+			}
+
+			if (s[1] == '\0')
+				fprintf (vfp, "match : '%s' %15s[%2u] /", s, table->name, i);
+			else if (s[0] == '\0')
+				fprintf (vfp, "match :  '' %15s[%2u] /", table->name, i);
+			else
+				fprintf (vfp, "match :'%s' %15s[%2u] / ", s, table->name, i);
+			fprintf (vfp, "%s/\n", ptrn->pattern_string);
+		}
+		END_VERBOSE();
+
 		int match = 0;
 
 		if (ptrn->disabled && *(ptrn->disabled))
@@ -1658,6 +1728,12 @@ static struct regexTable * matchMultitableRegexTable (struct lregexControlBlock 
 								 (current
 								  + pmatch [ptrn->mgroup.forLineNumberDetermination].rm_so)
 								 - cstart);
+				BEGIN_VERBOSE(vfp);
+				{
+					dumpSstack (vfp, lcb->currentScope);
+				}
+				END_VERBOSE();
+
 				*offset += (ptrn->mgroup.nextFromStart
 							? pmatch [ptrn->mgroup.forNextScanning].rm_so
 							: pmatch [ptrn->mgroup.forNextScanning].rm_eo);
@@ -1665,17 +1741,39 @@ static struct regexTable * matchMultitableRegexTable (struct lregexControlBlock 
 				switch (taction->action)
 				{
 				case TACTION_NOP:
+					BEGIN_VERBOSE(vfp);
+					{
+						fprintf(vfp, "action: NOP in {%s}, stack: /", table->name);
+						dumpTstack(vfp, lcb->tstack);
+					}
+					END_VERBOSE();
 					break;
 				case TACTION_ENTER:
 					/* TODO: Limit the depth of tstack.  */
-
 					ptrArrayAdd (lcb->tstack,
 								 taction->continuation_table
 								 ? taction->continuation_table
 								 : table);
 					next = taction->table;
+					BEGIN_VERBOSE(vfp);
+					{
+						if (taction->continuation_table)
+							fprintf(vfp, "action: [enter] to {%s}, cont: {%s}, stack: /",
+									next->name,
+									taction->continuation_table->name);
+						else
+							fprintf(vfp, "action: [enter] to {%s}, stack: /", next->name);
+						dumpTstack(vfp, lcb->tstack);
+					}
+					END_VERBOSE();
 					break;
 				case TACTION_LEAVE:
+					BEGIN_VERBOSE(vfp);
+					{
+						fprintf(vfp, "action: [leave] from {%s}, stack: /", table->name);
+						dumpTstack(vfp, lcb->tstack);
+					}
+					END_VERBOSE();
 					if (ptrArrayCount (lcb->tstack) == 0)
 					{
 						error (WARNING, "leave is specified as regex table action but the table stack is empty");
@@ -1686,12 +1784,31 @@ static struct regexTable * matchMultitableRegexTable (struct lregexControlBlock 
 					break;
 				case TACTION_JUMP:
 					next = taction->table;
+					BEGIN_VERBOSE(vfp);
+					{
+						fprintf(vfp, "action: [jump] from {%s} to {%s}, stack: /", table->name, next->name);
+						dumpTstack(vfp, lcb->tstack);
+					}
+					END_VERBOSE();
+
 					break;
 				case TACTION_RESET:
-					ptrArrayClear (lcb->tstack);
 					next = taction->table;
+					BEGIN_VERBOSE(vfp);
+					{
+						fprintf(vfp, "action: [reset] to {%s}, stack: /", next->name);
+					}
+					END_VERBOSE();
+
+					ptrArrayClear (lcb->tstack);
 					break;
 				case TACTION_QUIT:
+					BEGIN_VERBOSE(vfp);
+					{
+						fprintf(vfp, "action: [quit], stack: /");
+						dumpTstack(vfp, lcb->tstack);
+					}
+					END_VERBOSE();
 					return NULL;
 				}
 
@@ -1713,7 +1830,10 @@ static struct regexTable * matchMultitableRegexTable (struct lregexControlBlock 
 #endif
 	if (next == NULL && ptrArrayCount (lcb->tstack) > 0)
 	{
+		static int apop_count = 0;
 		next = ptrArrayLast(lcb->tstack);
+		verbose("stack: autopop<%d> from %s to %s @ %lu\n", apop_count++, table->name, next->name,
+				getInputLineNumberForFileOffset(*offset));
 		ptrArrayRemoveLast (lcb->tstack);
 	}
 	return next;
@@ -1755,7 +1875,19 @@ extern bool matchMultitableRegex (struct lregexControlBlock *lcb, const vString*
 
 	while (table)
 	{
-		verbose ("regex table: %s\n", table->name);
+
+		BEGIN_VERBOSE(vfp);
+		{
+			vString *v = vStringNew ();
+			for (const char *c = vStringValue(allLines) + offset; *c && (*c != '\n'); c++)
+				vStringPut(v, *c);
+
+			fprintf (vfp, "input : \"%s\" L%lu\n",
+					 vStringValue (v),
+					 getInputLineNumberForFileOffset(offset));
+			vStringDelete(v);
+		}
+		END_VERBOSE();
 		table = matchMultitableRegexTable(lcb, table, allLines, &offset);
 	}
 
