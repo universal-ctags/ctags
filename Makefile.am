@@ -79,6 +79,18 @@ $(REPOINFO_OBJS): $(REPOINFO_SRCS) $(REPOINFO_HEADS)
 if BUILD_IN_GIT_REPO
 GEN_REPOINFO = $(srcdir)/misc/gen-repoinfo
 $(REPOINFO_HEADS): FORCE
+	@echo DEBUGGING OUTPUT FOR HOMEBREW BUILDING
+	@echo ID
+	@id || :
+	@echo PWD
+	@pwd || :
+	@echo EXECUTABLE
+	@ls -l $(GEN_REPOINFO) || :
+	@echo ARGUMENT
+	@ls -l $@ || :
+	@echo ENVIRON
+	env || :
+	@echo RUN
 	$(GEN_REPOINFO) $@
 FORCE:
 else
