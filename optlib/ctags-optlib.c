@@ -30,9 +30,9 @@ extern parserDefinition* CtagsParser (void)
 		{ true, 'k', "kind", "kind definitions" },
 	};
 	static tagRegexTable CtagsTagRegexTable [] = {
-		{"^--langdef=([^ \\t]+)$", "\\1",
+		{"^--langdef=([^ \t]+)$", "\\1",
 		"l", "{scope=set}", NULL, false},
-		{"^--regex-[^=]+=.*\\/.,(.+)\\/.*", "\\1",
+		{"^--regex-[^=]+=.*/.,(.+)/.*", "\\1",
 		"k", "{scope=ref}", NULL, false},
 		{"^--kinddef-[^=]+=.,([^,]+),.*", "\\1",
 		"k", "{scope=ref}", NULL, false},
@@ -46,6 +46,7 @@ extern parserDefinition* CtagsParser (void)
 	def->patterns      = patterns;
 	def->aliases       = aliases;
 	def->method        = METHOD_NOT_CRAFTED|METHOD_REGEX;
+	def->useCork       = 1;
 	def->kindTable = CtagsKindTable;
 	def->kindCount = ARRAY_SIZE(CtagsKindTable);
 	def->tagRegexTable = CtagsTagRegexTable;

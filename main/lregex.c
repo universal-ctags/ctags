@@ -1402,6 +1402,21 @@ extern void addTagMultiLineRegex (struct lregexControlBlock *lcb, const char* co
 						 REG_PARSER_MULTI_LINE, regex, name, kinds, flags, disabled);
 }
 
+extern void addTagMultiTableRegex(struct lregexControlBlock *lcb,
+								  const char* const table_name,
+								  const char* const regex,
+								  const char* const name, const char* const kinds, const char* const flags,
+								  bool *disabled)
+{
+	int table_index = getTableIndexForName (lcb, table_name);
+
+	if (table_index < 0)
+		error (FATAL, "unknown table name: %s", table_name);
+
+	addTagRegexInternal (lcb, table_index, REG_PARSER_MULTI_TABLE, regex, name, kinds, flags,
+						 disabled);
+}
+
 extern void addCallbackRegex (struct lregexControlBlock *lcb,
 			      const char* const regex,
 			      const char* const flags,

@@ -53,6 +53,12 @@ extern void addTagRegex (struct lregexControlBlock *lcb, const char* const regex
 extern void addTagMultiLineRegex (struct lregexControlBlock *lcb, const char* const regex,
 								  const char* const name, const char* const kinds, const char* const flags,
 								  bool *disabled);
+extern void addTagMultiTableRegex(struct lregexControlBlock *lcb,
+								  const char* const table_name,
+								  const char* const regex,
+								  const char* const name, const char* const kinds, const char* const flags,
+								  bool *disabled);
+
 extern bool matchRegex (struct lregexControlBlock *lcb, const vString* const line);
 extern bool hasScopeActionInRegex (struct lregexControlBlock *lcb);
 extern void addCallbackRegex (struct lregexControlBlock *lcb,

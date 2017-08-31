@@ -30,19 +30,19 @@ extern parserDefinition* RSpecParser (void)
 		{ true, 'c', "context", "contexts" },
 	};
 	static tagRegexTable RSpecTagRegexTable [] = {
-		{"^[ \\t]*RSpec\\.describe[ \\t]+([^\"']+)[ \\t]+do", "\\1",
+		{"^[ \t]*RSpec\\.describe[ \t]+([^\"']+)[ \t]+do", "\\1",
 		"d", NULL, NULL, false},
-		{"^[ \\t]*describe[ \\t]+\"([^\"]+)\"[ \\t]+do", "\\1",
+		{"^[ \t]*describe[ \t]+\"([^\"]+)\"[ \t]+do", "\\1",
 		"d", NULL, NULL, false},
-		{"^[ \\t]*describe[ \\t]+'([^']+)'[ \\t]+do", "\\1",
+		{"^[ \t]*describe[ \t]+'([^']+)'[ \t]+do", "\\1",
 		"d", "	", NULL, false},
-		{"^[ \\t]*describe[ \\t]+([^\"']+)[ \\t]+do", "\\1",
+		{"^[ \t]*describe[ \t]+([^\"']+)[ \t]+do", "\\1",
 		"d", NULL, NULL, false},
-		{"^[ \\t]*context[ \\t]+\"([^\"]+)\"[ \\t]+do", "\\1",
+		{"^[ \t]*context[ \t]+\"([^\"]+)\"[ \t]+do", "\\1",
 		"c", NULL, NULL, false},
-		{"^[ \\t]*context[ \\t]+'([^']+)'[ \\t]+do", "\\1",
+		{"^[ \t]*context[ \t]+'([^']+)'[ \t]+do", "\\1",
 		"c", "	", NULL, false},
-		{"^[ \\t]*context[ \\t]+([^\"']+)[ \\t]+do", "\\1",
+		{"^[ \t]*context[ \t]+([^\"']+)[ \t]+do", "\\1",
 		"c", NULL, NULL, false},
 	};
 

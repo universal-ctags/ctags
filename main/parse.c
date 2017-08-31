@@ -3785,6 +3785,23 @@ extern void printLanguageMultitableStatistics (langType language, FILE *vfp)
 							   vfp);
 }
 
+extern void addLanguageRegexTable (const langType language, const char *name)
+{
+	parserObject* const parser = LanguageTable + language;
+	addRegexTable (parser->lregexControlBlock, name);
+}
+
+extern void addLanguageTagMultiTableRegex(const langType language,
+										  const char* const table_name,
+										  const char* const regex,
+										  const char* const name, const char* const kinds, const char* const flags,
+										  bool *disabled)
+{
+	parserObject* const parser = LanguageTable + language;
+	addTagMultiTableRegex (parser->lregexControlBlock, table_name, regex,
+						   name, kinds, flags, disabled);
+}
+
 /*
  * A parser for CTagsSelfTest (CTST)
  */

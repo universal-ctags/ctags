@@ -227,7 +227,13 @@ extern bool hasLanguageMultilineRegexPatterns (const langType language);
 extern void matchLanguageMultilineRegex (const langType language, const vString* const allLines);
 extern void matchLanguageMultitableRegex (const langType language, const vString* const allLines);
 
+extern void addLanguageRegexTable (const langType language, const char *name);
 extern void processLanguageMultitableExtendingOption (langType language, const char *const parameter);
+extern void addLanguageTagMultiTableRegex(const langType language,
+										  const char* const table_name,
+										  const char* const regex,
+										  const char* const name, const char* const kinds, const char* const flags,
+										  bool *disabled);
 
 extern unsigned int   getXpathFileSpecCount (const langType language);
 extern xpathFileSpec* getXpathFileSpec (const langType language, unsigned int nth);
