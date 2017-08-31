@@ -1,0 +1,5 @@
+puppetManifest parser is a test bench parser for evaluating
+the quality and usefulness mtable regex metaparser.
+
+Input for test cases started from puppet- under this directory are
+taken from puppet-3.8.7/spec/fixtures/unit/parser/lexer/*.pp.

@@ -1,0 +1,2 @@
+value	input.pp	/^$value = false$/;"	variable	line:1	language:puppetManifest
+/tmp/falsevalues$value	input.pp	/^file { "\/tmp\/falsevalues$value": ensure => file }$/;"	resource	line:3	language:puppetManifest	end:3

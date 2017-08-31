@@ -1,0 +1,11 @@
+value1	input.pp	/^$value1 = ""$/;"	variable	line:1	language:puppetManifest
+value2	input.pp	/^$value2 = true$/;"	variable	line:2	language:puppetManifest
+value3	input.pp	/^$value3 = false$/;"	variable	line:3	language:puppetManifest
+value4	input.pp	/^$value4 = yay$/;"	variable	line:4	language:puppetManifest
+test	input.pp	/^$test = "yay"$/;"	variable	line:6	language:puppetManifest
+mode1	input.pp	/^$mode1 = $value1 ? {$/;"	variable	line:8	language:puppetManifest
+mode2	input.pp	/^$mode2 = $value2 ? {$/;"	variable	line:12	language:puppetManifest
+mode3	input.pp	/^$mode3 = $value3 ? {$/;"	variable	line:16	language:puppetManifest
+/tmp/singleselector1	input.pp	/^file { "\/tmp\/singleselector1": ensure => file, mode => $mode1 }$/;"	resource	line:20	language:puppetManifest	end:20
+/tmp/singleselector2	input.pp	/^file { "\/tmp\/singleselector2": ensure => file, mode => $mode2 }$/;"	resource	line:21	language:puppetManifest	end:21
+/tmp/singleselector3	input.pp	/^file { "\/tmp\/singleselector3": ensure => file, mode => $mode3 }$/;"	resource	line:22	language:puppetManifest	end:22

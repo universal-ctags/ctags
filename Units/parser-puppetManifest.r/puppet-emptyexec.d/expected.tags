@@ -1,0 +1,1 @@
+touch /tmp/emptyexectest	input.pp	/^exec { "touch \/tmp\/emptyexectest":$/;"	resource	line:1	language:puppetManifest	end:3
