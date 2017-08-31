@@ -184,13 +184,9 @@ bool cxxParserParseNamespace(void)
 					if(!cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeOpeningBracket))
 					{
 						// tolerate syntax error
-						CXX_DEBUG_LEAVE_TEXT("Found semicolon just after namespace declaration");
+						CXX_DEBUG_LEAVE_TEXT("Found semicolon/EOF just after namespace declaration");
 						return true;
 					}
-
-					CXX_DEBUG_LEAVE_TEXT("Was expecting an opening bracket here");
-					// FIXME: Maybe we could attempt to recover here?
-					return true;
 				}
 			break;
 			case CXXTokenTypeOpeningBracket:
@@ -201,6 +197,24 @@ bool cxxParserParseNamespace(void)
 				// tolerate syntax error
 				CXX_DEBUG_LEAVE_TEXT("Found semicolon just after namespace declaration");
 				return true;
+			break;
+			case CXXTokenTypeIdentifier:
+				// Probably some kind of macro
+				if(!cxxParserParseUpToOneOf(
+						CXXTokenTypeOpeningBracket | CXXTokenTypeSemicolon | CXXTokenTypeEOF,
+						false
+					))
+				{
+					CXX_DEBUG_LEAVE_TEXT("Failed to parse up to an opening bracket");
+					return false;
+				}
+
+				if(!cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeOpeningBracket))
+				{
+					// tolerate syntax error
+					CXX_DEBUG_LEAVE_TEXT("Found semicolon/EOF just after namespace declaration");
+					return true;
+				}
 			break;
 			default:
 				CXX_DEBUG_LEAVE_TEXT("Some kind of syntax error here");
