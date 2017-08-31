@@ -49,7 +49,14 @@ namespace e1 = a1::a2::a3;
 
 namespace e2 = b1::b2 __attribute__((abi_tag("blah")));
 
-namespace z1 { };
+namespace f1 _SOME_MACRO(default)
+{
+}
 
+namespace f2::f3 _SOME_MACRO("blah","foo")
+{
+}
+
+namespace z1 { };
 
 
