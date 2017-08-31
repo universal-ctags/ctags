@@ -313,6 +313,10 @@ sub parse_regex {
 				   'mline' => $mline,
 				 };
     }
+
+    if ($flags =~ '{scope=') {
+	$opts->{'useCork'} = 1;
+    }
 }
 
 sub extend_table {
@@ -622,6 +626,11 @@ sub emit_fields_initialization {
 	def->method        = ${method};
 EOF
 
+    if ($opts->{'useCork'}) {
+	print <<EOF;
+	def->useCork       = 1;
+EOF
+    }
     if (@{$opts->{'kinddefs'}}) {
 	print <<EOF;
 	def->kindTable = $opts->{'Clangdef'}KindTable;

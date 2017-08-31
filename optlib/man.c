@@ -56,6 +56,7 @@ extern parserDefinition* ManParser (void)
 	def->patterns      = patterns;
 	def->aliases       = aliases;
 	def->method        = METHOD_NOT_CRAFTED|METHOD_REGEX;
+	def->useCork       = 1;
 	def->kindTable = ManKindTable;
 	def->kindCount = ARRAY_SIZE(ManKindTable);
 	def->tagRegexTable = ManTagRegexTable;
