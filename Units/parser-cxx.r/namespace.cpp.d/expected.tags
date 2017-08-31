@@ -27,4 +27,7 @@ d4	input.cpp	/^	inline namespace d3::d4 {$/;"	n	namespace:d1::d2::d3	file:	end:4
 d1_d2_d3_d4_f	input.cpp	/^		void d1_d2_d3_d4_f() { }$/;"	f	namespace:d1::d2::d3::d4	typeref:typename:void	end:44
 e1	input.cpp	/^namespace e1 = a1::a2::a3;$/;"	A	file:	name:a1::a2::a3
 e2	input.cpp	/^namespace e2 = b1::b2 __attribute__((abi_tag("blah")));$/;"	A	file:	name:b1::b2
-z1	input.cpp	/^namespace z1 { };$/;"	n	file:	end:52
+f1	input.cpp	/^namespace f1 _SOME_MACRO(default)$/;"	n	file:	end:54
+f2	input.cpp	/^namespace f2::f3 _SOME_MACRO("blah","foo")$/;"	n	file:	end:58
+f3	input.cpp	/^namespace f2::f3 _SOME_MACRO("blah","foo")$/;"	n	namespace:f2	file:	end:58
+z1	input.cpp	/^namespace z1 { };$/;"	n	file:	end:60
