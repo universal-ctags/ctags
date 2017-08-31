@@ -28,3 +28,13 @@ uctags
 libexec
 xcmd
 man1
+
+mtable
+multitable
+tabledef
+nop
+tjump
+tenter
+tleave
+tquit
+treset
