@@ -3778,6 +3778,13 @@ extern void printLangdefFlags (bool withListHeader, bool machinable, FILE *fp)
 	colprintTableDelete(table);
 }
 
+extern void printLanguageMultitableStatistics (langType language, FILE *vfp)
+{
+	parserObject* const parser = LanguageTable + language;
+	printMultitableStatistics (parser->lregexControlBlock,
+							   vfp);
+}
+
 /*
  * A parser for CTagsSelfTest (CTST)
  */

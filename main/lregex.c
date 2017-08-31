@@ -117,6 +117,11 @@ typedef struct {
 	ptrArray *fieldPatterns;
 
 	char *pattern_string;
+	struct {
+		unsigned int match;
+		unsigned int unmatch;
+	} statistics;
+
 	int refcount;
 } regexPattern;
 
@@ -1135,7 +1140,7 @@ static void matchCallbackPattern (
 
 static bool matchRegexPattern (struct lregexControlBlock *lcb,
 				  const vString* const line,
-				  const regexPattern* const patbuf)
+				  regexPattern* patbuf)
 {
 	bool result = false;
 	regmatch_t pmatch [BACK_REFERENCE_COUNT];
@@ -1149,6 +1154,8 @@ static bool matchRegexPattern (struct lregexControlBlock *lcb,
 	if (match == 0)
 	{
 		result = true;
+		patbuf->statistics.match++;
+
 		if (patbuf->type == PTRN_TAG)
 			matchTagPattern (lcb, vStringValue (line), patbuf, pmatch, 0);
 		else if (patbuf->type == PTRN_CALLBACK)
@@ -1159,12 +1166,14 @@ static bool matchRegexPattern (struct lregexControlBlock *lcb,
 			result = false;
 		}
 	}
+	else
+		patbuf->statistics.unmatch++;
 	return result;
 }
 
 static bool matchMultilineRegexPattern (struct lregexControlBlock *lcb,
 					const vString* const allLines,
-					const regexPattern* const patbuf)
+					regexPattern* patbuf)
 {
 	const char *start;
 	const char *current;
@@ -1187,6 +1196,7 @@ static bool matchMultilineRegexPattern (struct lregexControlBlock *lcb,
 				 BACK_REFERENCE_COUNT, pmatch, 0);
 		if (match == 0)
 		{
+			patbuf->statistics.match++;
 			if (patbuf->type == PTRN_TAG)
 			{
 				matchTagPattern (lcb, current, patbuf, pmatch,
@@ -1204,6 +1214,8 @@ static bool matchMultilineRegexPattern (struct lregexControlBlock *lcb,
 				break;
 			}
 		}
+		else
+			patbuf->statistics.unmatch++;
 	}
 	return result;
 }
@@ -1720,6 +1732,7 @@ static struct regexTable * matchMultitableRegexTable (struct lregexControlBlock 
 
 		if (match == 0)
 		{
+			ptrn->statistics.match++;
 			if (ptrn->type == PTRN_TAG)
 			{
 				struct mTableActionSpec *taction = &(ptrn->taction);
@@ -1824,6 +1837,8 @@ static struct regexTable * matchMultitableRegexTable (struct lregexControlBlock 
 			}
 			goto restart;
 		}
+		else
+			ptrn->statistics.unmatch++;
 	}
 #if 0
  out:
@@ -1862,6 +1877,33 @@ extern void extendRegexTable (struct lregexControlBlock *lcb, const char *src, c
 	{
 		regexPattern *ptrn = ptrArrayItem (src_table->patterns, i);
 		ptrArrayAdd(dist_table->patterns, refPattern(ptrn));
+	}
+}
+
+extern void printMultitableStatistics (struct lregexControlBlock *lcb, FILE *vfp)
+{
+	struct regexTable *table = ptrArrayItem (lcb->tables, 0);
+
+	if (ptrArrayCount(lcb->tables) == 0)
+		return;
+
+	fprintf(vfp, "MTABLE REGEX STATISTICS of %s\n", getLanguageName (lcb->owner));
+	fputs("==============================================\n", vfp);
+	for (unsigned int i = 0; i < ptrArrayCount(lcb->tables); i++)
+	{
+		table = ptrArrayItem (lcb->tables, i);
+		fprintf(vfp, "%s\n", table->name);
+		fputs("-----------------------\n", vfp);
+		for (unsigned int j = 0; j < ptrArrayCount(table->patterns); j++)
+		{
+			regexPattern* ptrn = ptrArrayItem (table->patterns, j);
+			fprintf(vfp, "%10u/%-10u%-40s ref: %d\n",
+					ptrn->statistics.match,
+					ptrn->statistics.unmatch + ptrn->statistics.match,
+					ptrn->pattern_string,
+					ptrn->refcount);
+		}
+		fputc('\n', vfp);
 	}
 }
 

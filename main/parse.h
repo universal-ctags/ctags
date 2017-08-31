@@ -240,4 +240,5 @@ extern bool makeKindDescriptionsPseudoTags (const langType language,
 extern void anonGenerate (vString *buffer, const char *prefix, int kind);
 extern void anonHashString (const char *filename, char buf[9]);
 
+extern void printLanguageMultitableStatistics (langType language, FILE *vfp);
 #endif  /* CTAGS_MAIN_PARSE_H */
