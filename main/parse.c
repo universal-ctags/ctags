@@ -124,6 +124,18 @@ static kindDefinition defaultFileKind = {
 *   FUNCTION DEFINITIONS
 */
 
+static bool isLanguageNameChar(int c)
+{
+	if (isgraph(c))
+	{
+		if (c == '\'' || c == '"' || c == ';')
+			return false;
+		return true;
+	}
+	else
+		return false;
+}
+
 extern unsigned int countParsers (void)
 {
 	return LanguageCount;
@@ -524,7 +536,7 @@ static vString* determineEmacsModeAtFirstLine (const char* const line)
 		p += strlen("mode:");
 		for ( ;  isspace ((int) *p)  ;  ++p)
 			;  /* no-op */
-		for ( ;  *p != '\0'  &&  (isalnum ((int) *p)  || *p == '-')  ;  ++p)
+		for ( ;  *p != '\0'  &&  isLanguageNameChar ((int) *p)  ;  ++p)
 			vStringPut (mode, (int) *p);
 	}
 	else
@@ -535,7 +547,7 @@ static vString* determineEmacsModeAtFirstLine (const char* const line)
 		if (end == NULL)
 			goto out;
 
-		for ( ;  p < end &&  (isalnum ((int) *p) || *p == '-')  ;  ++p)
+		for ( ;  p < end &&  isLanguageNameChar ((int) *p)  ;  ++p)
 			vStringPut (mode, (int) *p);
 
 		for ( ;  isspace ((int) *p)  ;  ++p)
@@ -586,7 +598,7 @@ static vString* determineEmacsModeAtEOF (MIO* const fp)
 			p += strlen ("mode:");
 			for ( ;  isspace ((int) *p)  ;  ++p)
 				;  /* no-op */
-			for ( ;  *p != '\0'  &&  (isalnum ((int) *p)  || *p == '-')  ;  ++p)
+			for ( ;  *p != '\0'  &&  isLanguageNameChar ((int) *p)  ;  ++p)
 				vStringPut (mode, (int) *p);
 		}
 		else if (headerFound && (p = strstr(line, "End:")))
