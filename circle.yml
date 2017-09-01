@@ -5,6 +5,10 @@ jobs:
      docker:
        - image: docker.io/fedora:latest
      steps:
+       - run:
+           name: Install Git
+           command: |
+             dnf -y install git || :
        - checkout
        - run:
            name: Install build tools
