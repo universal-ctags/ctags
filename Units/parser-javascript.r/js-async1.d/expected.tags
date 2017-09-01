@@ -1,0 +1,3 @@
+add1	input.js	/^async function add1(x) {$/;"	f
+add2	input.js	/^async function add2(x) {$/;"	f
+resolveAfter2Seconds	input.js	/^function resolveAfter2Seconds(x) {$/;"	f

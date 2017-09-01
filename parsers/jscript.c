@@ -130,6 +130,7 @@ enum eKeywordId {
 	KEYWORD_static,
 	KEYWORD_default,
 	KEYWORD_export,
+	KEYWORD_async,
 };
 typedef int keywordId; /* to allow KEYWORD_NONE */
 
@@ -226,8 +227,9 @@ static const keywordTable JsKeywordTable [] = {
 	{ "class",		KEYWORD_class				},
 	{ "extends",	KEYWORD_extends				},
 	{ "static",		KEYWORD_static				},
-	{ "default",		KEYWORD_default				},
+	{ "default",	KEYWORD_default				},
 	{ "export",		KEYWORD_export				},
+	{ "async",		KEYWORD_async				},
 };
 
 /*
@@ -1293,6 +1295,9 @@ static bool parseMethods (tokenInfo *const token, const tokenInfo *const class,
 			goto cleanUp;
 		}
 
+		if (isKeyword (token, KEYWORD_async))
+			readToken (token);
+
 		if (! isType (token, TOKEN_KEYWORD) &&
 		    ! isType (token, TOKEN_SEMICOLON))
 		{
@@ -1312,7 +1317,11 @@ static bool parseMethods (tokenInfo *const token, const tokenInfo *const class,
 			if ( isType (token, TOKEN_COLON) || is_shorthand )
 			{
 				if (! is_shorthand)
+				{
 					readToken (token);
+					if (isKeyword (token, KEYWORD_async))
+						readToken (token);
+				}
 				if ( is_shorthand || isKeyword (token, KEYWORD_function) )
 				{
 					JSCRIPT_DEBUG_PRINT("Seems to be a function or shorthand");
@@ -1778,6 +1787,9 @@ nextVar:
 			readToken (token);
 		}
 
+		if (isKeyword (token, KEYWORD_async))
+			readToken (token);
+
 		if ( isKeyword (token, KEYWORD_function) )
 		{
 			vString *const signature = vStringNew ();
@@ -2143,6 +2155,7 @@ static bool parseLine (tokenInfo *const token, tokenInfo *const parent, bool is_
 				parseSwitch (token);
 				break;
 			case KEYWORD_return:
+			case KEYWORD_async:
 				readToken (token);
 				is_terminated = parseLine (token, parent, is_inside_class);
 				break;
