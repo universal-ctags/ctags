@@ -154,6 +154,8 @@ extern int getInputLineOffset (void)
 
 extern const char *getInputFileName (void)
 {
+	if (!File.input.name)
+		return NULL;
 	return vStringValue (File.input.name);
 }
 
