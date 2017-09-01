@@ -3,7 +3,7 @@ jobs:
    build:
      working_directory: ~/universal-ctags
      docker:
-       - image: docker.io/fedora:rawhide
+       - image: docker.io/fedora:latest
      steps:
        - checkout
        - run:
