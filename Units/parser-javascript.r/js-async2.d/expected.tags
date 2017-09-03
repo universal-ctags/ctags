@@ -1,0 +1,9 @@
+Class	input.js	/^var Class = {$/;"	c
+ES6Class	input.js	/^class ES6Class {$/;"	c
+asyncAnonymousFunc	input.js	/^var asyncAnonymousFunc = async function() {$/;"	f
+es6AsyncMethod	input.js	/^  async es6AsyncMethod() {}$/;"	m	class:ES6Class
+es6Method	input.js	/^  es6Method() {}$/;"	m	class:ES6Class
+method1	input.js	/^  method1 : function() {$/;"	m	class:Class
+method2	input.js	/^  method2 : async function() {$/;"	m	class:Class
+method3	input.js	/^  method3() {$/;"	m	class:Class
+method4	input.js	/^  async method4() {$/;"	m	class:Class
