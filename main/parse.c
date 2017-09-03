@@ -1536,7 +1536,7 @@ static void initializeParserOne (langType lang)
 
 	initializeDependencies (parser->def, parser->slaveControlBlock);
 
-	Assert (parser->fileKind != KIND_NULL);
+	Assert (parser->fileKind != NULL);
 	Assert (!doesParserUseKind (parser->kindControlBlock, parser->fileKind->letter));
 
 	return;
