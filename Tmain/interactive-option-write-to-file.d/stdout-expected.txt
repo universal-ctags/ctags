@@ -1,0 +1,5 @@
+{"_type": "program", "name": "Universal Ctags", "version": "0.0.0"}
+{"_type": "tag", "name": "Test", "path": "test.rb", "pattern": "/^class Test$/", "kind": "class"}
+{"_type": "tag", "name": "foobar", "path": "test.rb", "pattern": "/^  def foobar$/", "kind": "method", "scope": "Test", "scopeKind": "class"}
+{"_type": "tag", "name": "baz", "path": "test.rb", "pattern": "/^  def baz(a=1)$/", "kind": "method", "scope": "Test", "scopeKind": "class"}
+{"_type": "completed", "command": "generate-tags"}
