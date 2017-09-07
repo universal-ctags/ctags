@@ -1099,7 +1099,7 @@ static int fieldColprintCompareLines (struct colprintLine *a , struct colprintLi
 	const char *b_parser = colprintLineGetColumn (b, FIELD_COL_LANGUAGE);
 
 	if ((strcmp (a_fixed, "yes") == 0)
-		&& (strcmp (a_fixed, "yes") == 0))
+		&& (strcmp (b_fixed, "yes") == 0))
 	{
 		/* name, input, pattern, compact */
 		const char *a_name  = colprintLineGetColumn (a, FIELD_COL_NAME);
