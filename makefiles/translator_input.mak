@@ -8,5 +8,6 @@ TRANSLATOR_INPUT = \
 	optlib/passwd.ctags			\
 	optlib/pod.ctags			\
 	optlib/qemuhx.ctags			\
+	optlib/puppetManifest.ctags		\
 	\
 	$(NULL)

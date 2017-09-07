@@ -1,0 +1,318 @@
+#
+# puppetManifest.ctags --- multitable regex parser for Puppet's manifest file
+#
+#  Copyright (c) 2017, Red Hat, Inc.
+#  Copyright (c) 2017, Masatake YAMATO
+#
+#  Author: Masatake YAMATO <yamato@redhat.com>
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,
+# USA.
+#
+#
+# References:
+#
+# - https://github.com/puppetlabs/puppet-specifications/blob/master/language/intro.md
+# - https://docs.puppet.com/puppet/5.1/lang_visual_index.html
+#
+--langdef=puppetManifest
+--map-puppetManifest=+.pp
+
+#
+# Kinds
+#
+--kinddef-puppetManifest=c,class,classes
+--kinddef-puppetManifest=d,definition,definitions
+--kinddef-puppetManifest=n,node,nodes
+--kinddef-puppetManifest=r,resource,resources
+--kinddef-puppetManifest=v,variable,variables
+
+#
+# Tables
+#
+--_tabledef-puppetManifest=main
+--_tabledef-puppetManifest=separator
+--_tabledef-puppetManifest=any
+--_tabledef-puppetManifest=ignoreWhiteSpace
+--_tabledef-puppetManifest=end
+--_tabledef-puppetManifest=endWithPop
+
+--_tabledef-puppetManifest=ssliteral
+--_tabledef-puppetManifest=dsliteral
+
+--_tabledef-puppetManifest=comment
+
+--_tabledef-puppetManifest=blockStart
+--_tabledef-puppetManifest=blockHead
+--_tabledef-puppetManifest=blockHeadPopAtLast
+--_tabledef-puppetManifest=block
+
+--_tabledef-puppetManifest=classStart
+#--_tabledef-puppetManifest=resourceBlock{args=end}
+--_tabledef-puppetManifest=resourceBlock
+
+--_tabledef-puppetManifest=skipLiteral
+--_tabledef-puppetManifest=skipBlock
+--_tabledef-puppetManifest=skipArray
+--_tabledef-puppetManifest=skipArgs
+--_tabledef-puppetManifest=skipCollector
+
+--_tabledef-puppetManifest=var
+
+--_tabledef-puppetManifest=defineStart
+--_tabledef-puppetManifest=caseStart
+--_tabledef-puppetManifest=ifStart
+
+--_tabledef-puppetManifest=nodeStart
+
+#
+# Utilities
+#
+--_mtable-regex-puppetManifest=separator/[a-zA-Z0-9]//
+--_mtable-regex-puppetManifest=separator///{tleave}
+
+--_mtable-regex-puppetManifest=any/.//
+--_mtable-regex-puppetManifest=ignoreWhiteSpace/[ \t\n]//
+--_mtable-regex-puppetManifest=end///{tleave}
+--_mtable-regex-puppetManifest=endWithPop///{tleave}{scope=pop}
+
+--_mtable-regex-puppetManifest=ssliteral/'//{tleave}
+--_mtable-extend-puppetManifest=ssliteral+any
+--_mtable-regex-puppetManifest=dsliteral/"//{tleave}
+--_mtable-extend-puppetManifest=dsliteral+any
+
+#
+# comment
+#
+--_tabledef-puppetManifest=comment_multiline
+--_tabledef-puppetManifest=comment_oneline
+--_mtable-regex-puppetManifest=comment/\/\*//{tenter=comment_multiline}
+--_mtable-regex-puppetManifest=comment/\#//{tenter=comment_oneline}
+--_mtable-regex-puppetManifest=comment_multiline/\*\///{tleave}
+--_mtable-extend-puppetManifest=comment_multiline+any
+--_mtable-regex-puppetManifest=comment_oneline/\n//{tleave}
+--_mtable-extend-puppetManifest=comment_oneline+any
+
+#
+# skipLiteral
+#
+--_mtable-regex-puppetManifest=skipLiteral/'//{tenter=ssliteral}
+--_mtable-regex-puppetManifest=skipLiteral/"//{tenter=dsliteral}
+
+#
+# skipBlock
+#
+--_mtable-extend-puppetManifest=skipBlock+comment
+--_mtable-extend-puppetManifest=skipBlock+skipLiteral
+--_mtable-regex-puppetManifest=skipBlock/\{//{tenter=skipBlock}
+--_mtable-regex-puppetManifest=skipBlock/\}//{tleave}
+--_mtable-extend-puppetManifest=skipBlock+any
+
+#
+# skipArray
+#
+--_mtable-extend-puppetManifest=skipArray+comment
+--_mtable-extend-puppetManifest=skipArray+skipLiteral
+--_mtable-regex-puppetManifest=skipArray/\[//{tenter=skipArray}
+--_mtable-regex-puppetManifest=skipArray/\]//{tleave}
+--_mtable-extend-puppetManifest=skipArray+any
+
+#
+# skipArgs
+#
+--_mtable-extend-puppetManifest=skipArgs+comment
+--_mtable-extend-puppetManifest=skipArgs+skipLiteral
+--_mtable-regex-puppetManifest=skipArgs/\(//{tenter=skipArgs}
+--_mtable-regex-puppetManifest=skipArgs/\)//{tleave}
+--_mtable-extend-puppetManifest=skipArgs+any
+
+#
+# skipCollector
+#
+--_mtable-extend-puppetManifest=skipCollector+comment
+--_mtable-extend-puppetManifest=skipCollector+skipLiteral
+--_mtable-regex-puppetManifest=skipCollector/<<?\|//{tenter=skipCollector}
+--_mtable-regex-puppetManifest=skipCollector/\|>>?//{tleave}
+--_mtable-extend-puppetManifest=skipCollector+any
+
+
+
+#
+# block
+#
+--_mtable-regex-puppetManifest=blockStart/@?::[a-zA-Z0-9:]+[ \t\n]*\{//{tenter=resourceBlock}
+--_mtable-regex-puppetManifest=blockStart/@?[a-zA-Z][a-zA-Z0-9:]*[ \t\n]*\{//{tenter=resourceBlock}
+--_mtable-regex-puppetManifest=blockStart/class[ \t\n]+//{tenter=classStart}
+--_mtable-regex-puppetManifest=blockStart/define[ \t\n]+//{tenter=defineStart}
+--_mtable-regex-puppetManifest=blockStart/case[ \t\n]+//{tenter=caseStart}
+--_mtable-regex-puppetManifest=blockStart/(if|elsif|else|unless)[ \t\n]+//{tenter=ifStart}
+--_mtable-regex-puppetManifest=blockStart/node[ \t\n]+//{tenter=nodeStart}
+
+
+--_mtable-extend-puppetManifest=blockHead+comment
+--_mtable-regex-puppetManifest=blockHead/\{//{tenter=block,end}
+--_mtable-extend-puppetManifest=blockHead+any
+
+--_mtable-extend-puppetManifest=blockHeadPopAtLast+comment
+--_mtable-regex-puppetManifest=blockHeadPopAtLast/\{//{tenter=block,endWithPop}
+--_mtable-extend-puppetManifest=blockHeadPopAtLast+any
+
+--_mtable-extend-puppetManifest=block+comment
+--_mtable-extend-puppetManifest=block+ignoreWhiteSpace
+--_mtable-extend-puppetManifest=block+skipLiteral
+--_mtable-regex-puppetManifest=block/<<?\|//{tenter=skipCollector}
+--_mtable-extend-puppetManifest=block+blockStart
+
+# Following stack manipulation for handling following input.
+# A {
+#     "a": b => c;
+#     "d": e => f;
+# }
+# B {
+#     "g": h => i;
+#     "j": k => k /* THIS COMMENT CANNOT BE IGNORED WELL */
+# }
+--_mtable-regex-puppetManifest=block/;?[ \t\n]*\}//{tleave}
+--_mtable-regex-puppetManifest=block/;//{tjump=resourceBlock}{scope=pop}
+#--_mtable-regex-puppetManifest=block/;//{tleave}{scope=pop}
+--_mtable-regex-puppetManifest=block/://
+--_mtable-regex-puppetManifest=block/.//{tenter=separator}
+
+#
+# main
+#
+--_mtable-extend-puppetManifest=main+comment
+--_mtable-extend-puppetManifest=main+ignoreWhiteSpace
+--_mtable-extend-puppetManifest=main+skipLiteral
+--_mtable-regex-puppetManifest=main/<<?\|//{tenter=skipCollector}
+--_mtable-regex-puppetManifest=main/\$//{tenter=var}
+--_mtable-extend-puppetManifest=main+blockStart
+--_mtable-regex-puppetManifest=main/\(//{tenter=skipArgs}
+--_mtable-regex-puppetManifest=main/\{//{tenter=skipBlock}
+--_mtable-regex-puppetManifest=main/.//{tenter=separator}
+
+#
+# class
+#
+# TODO: inherits:
+#
+--_mtable-extend-puppetManifest=classStart+comment
+--_mtable-regex-puppetManifest=classStart/(::[a-zA-Z0-9:]+)/\1/c/{tenter=blockHead,endWithPop}{scope=push}
+--_mtable-regex-puppetManifest=classStart/([a-zA-Z][a-zA-Z0-9:]*)/\1/c/{tenter=blockHead,endWithPop}{scope=push}
+
+#
+# resource
+#
+--_tabledef-puppetManifest=resourceName
+--_tabledef-puppetManifest=resourceNameInArray
+--_tabledef-puppetManifest=resourceBody
+--_tabledef-puppetManifest=resourceArray
+--_tabledef-puppetManifest=resourceCollector
+
+--_mtable-extend-puppetManifest=resourceBlock+comment
+--_mtable-extend-puppetManifest=resourceBlock+ignoreWhiteSpace
+--_mtable-regex-puppetManifest=resourceBlock/'//{tenter=resourceName}{_advanceTo=0start}
+--_mtable-regex-puppetManifest=resourceBlock/"//{tenter=resourceName}{_advanceTo=0start}
+--_mtable-regex-puppetManifest=resourceBlock/\[//{tenter=resourceArray}
+--_mtable-regex-puppetManifest=resourceBlock/\}//{tleave}
+--_mtable-regex-puppetManifest=resourceBlock/.//{tenter=resourceBody}{scope=push}{placeholder}
+
+--_mtable-regex-puppetManifest=resourceName/'([^']+)'/\1/r/{tenter=resourceBody,end}{scope=push}
+--_mtable-regex-puppetManifest=resourceName/"([^"]+)"/\1/r/{tenter=resourceBody,end}{scope=push}
+--_mtable-regex-puppetManifest=resourceName///{tquit}
+--_mtable-regex-puppetManifest=resourceNameInArray/'([^']+)'/\1/r/{tleave}
+--_mtable-regex-puppetManifest=resourceNameInArray/"([^"]+)"/\1/r/{tleave}
+--_mtable-regex-puppetManifest=resourceNameInArray////{tquit}
+
+--_mtable-extend-puppetManifest=resourceBody+comment
+--_mtable-extend-puppetManifest=resourceBody+ignoreWhiteSpace
+--_mtable-regex-puppetManifest=resourceBody/\{//{tenter=skipBlock}
+--_mtable-regex-puppetManifest=resourceBody/'//{tenter=ssliteral}
+--_mtable-regex-puppetManifest=resourceBody/"//{tenter=dsliteral}
+--_mtable-regex-puppetManifest=resourceBody/;//{tleave}{scope=pop}
+--_mtable-regex-puppetManifest=resourceBody/\}//{tleave}{_advanceTo=0start}{scope=pop}
+--_mtable-regex-puppetManifest=resourceBody/<<?\|//{tenter=skipCollector}
+--_mtable-extend-puppetManifest=resourceBody+any
+
+--_mtable-extend-puppetManifest=resourceArray+comment
+--_mtable-extend-puppetManifest=resourceArray+ignoreWhiteSpace
+--_mtable-regex-puppetManifest=resourceArray/'//{tenter=resourceNameInArray}{_advanceTo=0start}
+--_mtable-regex-puppetManifest=resourceArray/"//{tenter=resourceNameInArray}{_advanceTo=0start}
+--_mtable-regex-puppetManifest=resourceArray/\]//{tleave}
+--_mtable-extend-puppetManifest=resourceArray+any
+
+#
+# var
+#
+--_tabledef-puppetManifest=varexpr
+--_mtable-regex-puppetManifest=var/(::[a-zA-Z0-9:]+)[ \t\n]*=/\1/v/{tenter=varexpr,end}
+--_mtable-regex-puppetManifest=var/([a-zA-Z][a-zA-Z0-9:]*)[ \t\n]*=/\1/v/{tenter=varexpr,end}
+
+--_mtable-extend-puppetManifest=varexpr+comment
+--_mtable-regex-puppetManifest=varexpr/'//{tenter=ssliteral,end}
+--_mtable-regex-puppetManifest=varexpr/"//{tenter=dsliteral,end}
+--_mtable-regex-puppetManifest=varexpr/\[//{tenter=skipArray,end}
+--_mtable-regex-puppetManifest=varexpr/\{//{tenter=skipBlock,end}
+--_mtable-regex-puppetManifest=varexpr/\(//{tenter=skipArgs,end}
+--_mtable-regex-puppetManifest=varexpr/\$[a-zA-Z:][0-9a-zA-Z"]*//
+--_mtable-regex-puppetManifest=varexpr/[0-9]+(\.[0-9]+(e([+-][0-9]+)))?//
+--_mtable-regex-puppetManifest=varexpr/[a-zA-Z0-9:][0-9a-zA-Z:]*//
+--_mtable-regex-puppetManifest=varexpr/[ \t]//
+--_mtable-regex-puppetManifest=varexpr/\n//{tleave}
+--_mtable-regex-puppetManifest=varexpr/.//
+
+#
+# define
+#
+--_mtable-extend-puppetManifest=defineStart+comment
+--_mtable-regex-puppetManifest=defineStart/([a-zA-Z:][a-zA-Z0-9:]*)[ \n\t]*\(/\1/d/{tenter=skipArgs,blockHeadPopAtLast}{scope=push}
+--_mtable-regex-puppetManifest=defineStart/([a-zA-Z:][a-zA-Z0-9:]*)[ \n\t]*\{/\1/d/{tenter=block,endWithPop}{scope=push}
+
+#
+# case
+#
+--_tabledef-puppetManifest=caseBlock
+
+--_mtable-extend-puppetManifest=caseStart+comment
+--_mtable-extend-puppetManifest=caseStart+ignoreWhiteSpace
+--_mtable-regex-puppetManifest=caseStart/\{//{tenter=caseBlock}
+--_mtable-regex-puppetManifest=caseStart/}//{tleave}
+--_mtable-extend-puppetManifest=caseStart+any
+
+--_mtable-extend-puppetManifest=caseBlock+comment
+--_mtable-extend-puppetManifest=caseBlock+ignoreWhiteSpace
+--_mtable-extend-puppetManifest=caseBlock+skipLiteral
+--_mtable-regex-puppetManifest=caseBlock/://{tenter=block}
+--_mtable-regex-puppetManifest=caseBlock/}//{tleave}{_advanceTo=0start}
+--_mtable-extend-puppetManifest=caseBlock+any
+
+#
+# if/elsif/else
+#
+--_mtable-extend-puppetManifest=ifStart+comment
+--_mtable-extend-puppetManifest=ifStart+ignoreWhiteSpace
+--_mtable-extend-puppetManifest=ifStart+skipLiteral
+--_mtable-regex-puppetManifest=ifStart/\{//{tenter=block,end}
+--_mtable-extend-puppetManifest=ifStart+any
+
+#
+# node
+#
+--_mtable-extend-puppetManifest=nodeStart+comment
+--_mtable-extend-puppetManifest=nodeStart+ignoreWhiteSpace
+--_mtable-regex-puppetManifest=nodeStart/'([^']+)'/\1/n/
+--_mtable-regex-puppetManifest=nodeStart/"([^"]+)"/\1/n/
+--_mtable-regex-puppetManifest=nodeStart/\{///{tenter=block,end}
+--_mtable-extend-puppetManifest=nodeStart+any

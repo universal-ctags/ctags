@@ -154,6 +154,8 @@ extern int getInputLineOffset (void)
 
 extern const char *getInputFileName (void)
 {
+	if (!File.input.name)
+		return NULL;
 	return vStringValue (File.input.name);
 }
 
@@ -874,6 +876,7 @@ static vString *iFileGetLine (void)
 		if (use_multiline)
 		{
 			matchLanguageMultilineRegex (getInputLanguage (), File.allLines);
+			matchLanguageMultitableRegex (getInputLanguage (), File.allLines);
 			vStringDelete (File.allLines);
 			File.allLines = NULL;
 		}

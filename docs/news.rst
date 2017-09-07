@@ -60,9 +60,10 @@ The following parsers have been added:
 * M4
 * ObjectiveC
 * passwd
+* puppetManifest *optlib*
 * Perl6
 * Pod *optlib*
-* PropertiyList(plist) *libxml*
+* PropertyList(plist) *libxml*
 * Protobuf
 * PythonLoggingConfig
 * QemuHX *optlib*

@@ -21,6 +21,8 @@
 
 use strict;
 use warnings;
+#use Data::Dumper;
+#print Dumper(X);
 
 sub show_help {
     print<<EOF;
@@ -160,13 +162,35 @@ my $options =
 	 die "Unknown flag($2) is passed to --fields-<LANG>= option";
        } ],
      [ qr/^--langmap=.*/, sub {
-	   die "Use --map-<LANG> option instead of --langmap";
+	 die "Use --map-<LANG> option instead of --langmap";
+       } ],
+     [ qr/^--_tabledef-([^=]*)=(.*)/, sub {
+	 die "Don't use --_tabledef-<LANG>= option before defining the language"
+	   if (! defined $_[0]->{'langdef'});
+	 die "Adding a table is allowed only to the language specified with --langdef: $1"
+	   unless ($_[0]->{'langdef'} eq $1);
+	 $_[0]->{'tabledefs'}->{$2} = [];
+	 push @{$_[0]->{'tablenames'}}, "$2";
+       } ],
+     [ qr/^--_mtable-regex-([^=]*)=([^\/]+)(\/.*)/, sub {
+	 die "Don't use --_mtable-regex-<LANG>= option before defining the language"
+	   if (! defined $_[0]->{'langdef'});
+	 die "Adding a multitable regex is allowed only to the language specified with --langdef: $1"
+	   unless ($_[0]->{'langdef'} eq $1);
+	 parse_regex ($3, $_[0], 1, $2);
+       } ],
+     [ qr/^--_mtable-extend-([^=]*)=(.*)\+(.*)/, sub {
+	 die "Don't use --_mline-extend-<LANG>= option before defining the language"
+	   if (! defined $_[0]->{'langdef'});
+	 die "Extending a multitable regex is allowed only to the language specified with --langdef: $1"
+	   unless ($_[0]->{'langdef'} eq $1);
+	 extend_table($_[0], $2, $3);
        } ],
      [ qr/^-.*/, sub {
-	   die "Unhandled option: \"$&\"";
+	 die "Unhandled option: \"$&\"";
        } ],
      [ qr/.*/, sub {
-	   die "Unhandled argument: \"$&\"";
+	 die "Unhandled argument: \"$&\"";
        } ],
     ];
 
@@ -192,22 +216,27 @@ sub gather_chars {
     my $escape = 0;
     my $c;
 
+    # See scanSeparators() of lregex.c.
     while (defined ($c = shift @{$input})) {
-	if ($c eq '/') {
-	    if ($escape) {
+	if ($escape) {
+	    if ($c eq '/') {
 		$output = $output . $c;
-		$escape = 0;
+	    } elsif ($c eq 't') {
+		$output = $output . '\\' . 't';
+	    } elsif ($c eq 'n') {
+		$output = $output . '\\' . 'n';
 	    } else {
-		last;
+		$output = $output . '\\' . '\\' . $c;
 	    }
-	} elsif ($c eq '\\') {
-	    $output = $output . $c . $c;
-	    $escape = $escape? 0: 1;
-	  } elsif ($c eq '"') {
+	    $escape = 0;
+	} elsif ($c eq '"') {
 	    $output = $output . '\\' . $c;
+	} elsif ($c eq '\\') {
+	    $escape = 1;
+	} elsif ($c eq '/') {
+	    last;
 	} else {
 	    $output = $output . $c;
-	    $escape = 0;
 	}
     }
 
@@ -215,7 +244,7 @@ sub gather_chars {
 }
 
 sub parse_regex {
-    my ($regspec, $opts, $mline) = @_;
+    my ($regspec, $opts, $mline, $table) = @_;
 
     my @chars = split //, $regspec;
 
@@ -265,12 +294,37 @@ sub parse_regex {
 	($flags, $last_char) = gather_chars (\@chars);
     }
 
-    push @{$opts->{'regexs'}}, { 'regex' => $regex,
-				 'name'  => $name,
-				 'kind'  => $kind,
-				 'flags' => $flags,
-				 'mline' => $mline,
-			       };
+    if (defined $table) {
+
+      if (! (substr ($regex, 0, 1) eq '^')) {
+	$regex = '^' . $regex;
+      }
+      push @{$opts->{'tabledefs'}->{"$table"}}, { 'regex' => $regex,
+						  'name'  => $name,
+						  'kind'  => $kind,
+						  'flags' => $flags,
+						  'mline' => $mline,
+						};
+    } else {
+      push @{$opts->{'regexs'}}, { 'regex' => $regex,
+				   'name'  => $name,
+				   'kind'  => $kind,
+				   'flags' => $flags,
+				   'mline' => $mline,
+				 };
+    }
+
+    if ($flags =~ '{scope=') {
+	$opts->{'useCork'} = 1;
+    }
+}
+
+sub extend_table {
+  my ($opts, $dist, $src) = @_;
+
+  for (@{$opts->{'tabledefs'}->{$src}}) {
+    push @{$opts->{'tabledefs'}->{$dist}}, $_;
+  }
 }
 
 sub parse_kinds {
@@ -374,6 +428,29 @@ EOF
 		enableKind (kdef, false);
 	}
 EOF
+      }
+
+    if ($opts->{'tablenames'}) {
+      print "\n";
+
+      for (@{$opts->{'tablenames'}}) {
+	print <<EOF;
+	addLanguageRegexTable (language, "$_");
+EOF
+      }
+
+      print "\n";
+
+      for (@{$opts->{'tablenames'}}) {
+	my $table = $_;
+	for (@{$opts->{'tabledefs'}->{"$table"}}) {
+	  print <<EOF;
+	addLanguageTagMultiTableRegex (language, "$table",
+	                               "$_->{'regex'}",
+	                               "$_->{'name'}", "$_->{'kind'}", "$_->{'flags'}", NULL);
+EOF
+	}
+      }
     }
     print <<EOF;
 }
@@ -537,7 +614,7 @@ sub emit_fields_initialization {
     my $method;
 
     $method  = "METHOD_NOT_CRAFTED";
-    if (@{$opts->{"regexs"}}) {
+    if (@{$opts->{"regexs"}} || $opts->{'tablenames'}) {
 	$method = "${method}|METHOD_REGEX";
     }
 
@@ -549,6 +626,11 @@ sub emit_fields_initialization {
 	def->method        = ${method};
 EOF
 
+    if ($opts->{'useCork'}) {
+	print <<EOF;
+	def->useCork       = 1;
+EOF
+    }
     if (@{$opts->{'kinddefs'}}) {
 	print <<EOF;
 	def->kindTable = $opts->{'Clangdef'}KindTable;
@@ -666,6 +748,11 @@ sub main {
 		fielddefs => [ # { name => "", desc => "", enabled => 1|0 },
 			      ],
 		base => undef,
+		tableNames => [ # ""
+			       ],
+		tabledefs => { # "" => [{ regex => "", name => "", kind => "", flags => "" }...],
+			     },
+		useCork   => 0,
 	       );
 
     for (@_) {

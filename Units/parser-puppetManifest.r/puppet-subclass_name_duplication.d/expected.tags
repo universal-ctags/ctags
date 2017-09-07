@@ -1,0 +1,4 @@
+one::fake	input.pp	/^class one::fake {$/;"	class	line:3	language:puppetManifest	end:5
+/tmp/subclass_name_duplication1	input.pp	/^    file { "\/tmp\/subclass_name_duplication1": ensure => present }$/;"	resource	line:4	language:puppetManifest	scope:class:one::fake	end:4
+two::fake	input.pp	/^class two::fake {$/;"	class	line:7	language:puppetManifest	end:9
+/tmp/subclass_name_duplication2	input.pp	/^    file { "\/tmp\/subclass_name_duplication2": ensure => present }$/;"	resource	line:8	language:puppetManifest	scope:class:two::fake	end:8

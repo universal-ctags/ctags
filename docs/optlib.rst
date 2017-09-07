@@ -577,6 +577,267 @@ NOTE: This flag doesn't work well with scope related flags and ``exclusive`` fla
 
 .. _extras:
 
+
+Byte oriented pattern matching with multiple regex tables
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. NOT REVIEWED YET
+
+(This is highly experimental feature. This will not go to
+the man page of 6.0.)
+
+`--_tabledef-<LANG>` and `--_mtable-regex-<LANG>` options are
+experimental, and are for defining a parser using multiple regex
+tables. The feature is inspired by `lex`, the fast lexical analyzer
+generator, which is a popular tool on Unix environment for writing a
+parser, and `RegexLexer` of Pygments. The knowledge about them
+help you understand the options.
+
+As usable, let me explain the feature with an example.  Consider a
+imaginary language "X" has similar syntax with JavaScript; "var" is
+used as defining variable(s), , and "/* ... */" makes block comment.
+
+*input.x*
+::
+
+   /* BLOCK COMMENT
+   var dont_capture_me;
+   */
+   var a /* ANOTHER BLOCK COMMENT */, b;
+
+Here ctags should capture `a` and `b`.
+It is difficult to write a parser ignoring `dont_capture_me` in the comment
+with a classical regex parser defined with `--regex-<LANG>=`.
+
+A classical regex parser has no way to know where the input is in
+comment or not.
+
+A classical regex parser is line oriented, so capturing `b` will
+be hard.
+
+A parser written with `--_tabledef-<LANG>` and `--_mtable-regex-<LANG>`
+option(mtable parser) can capture only `a` and `b` well.
+
+
+Here is the 1st version of X.ctags.
+::
+
+   --langdef=X
+   --map-X=.x
+   --kinddef-X=v,var,variables
+
+Not so interesting.
+
+When writing a mtable parser, you have to think about necessary states
+of parsing. About the input the parser should have following
+states.
+
+* `toplevel` (initial state)
+* `comment` (inside comment)
+* `vars` (var statements)
+
+Before enumerating regular expressions, you have to
+declare tables for each states with `--_tabledef-<LANG>=<TABLE>` option:
+
+Here is the 2nd version of X.ctags.
+::
+
+   --langdef=X
+   --map-X=.x
+   --kinddef-X=v,var,variables
+
+   --_tabledef-X=toplevel
+   --_tabledef-X=comment
+   --_tabledef-X=vars
+
+As the part of table, chars in `[0-9a-zA-Z_]` are acceptable.
+A mtable parser chooses the first table for each new input.
+In `X.ctags`, `toplevel` is the one.
+
+
+`--_mtable-regex-<LANG>` is an option for adding a regex pattern
+to table.
+
+| `--_mtable-regex-<LANG>=<TABLE>/<PATTERN>/<NAME>/<KIND>/LONGFLAGS`
+
+Parameters for `--_mtable-regex-<LANG>` looks complicated. However,
+`<PATTERN>`, `<NAME>`, and `<KIND>` are the same as parameters of
+`--regex-<LANG>`. `<TABLE>` is the name of a table defined with
+`--_tabledef-<LANG>` option.
+
+A regex added to a parser with `--_mtable-regex-<LANG>` is matched
+against the input at the current byte position, not line. Even if you
+do not specified `^` at the start of the pattern, ctags adds `^` to
+the patter automatically. Different from `--regex-<LANG>` option, `^`
+does not mean "begging of line" in `--_mtable-regex-<LANG>`.  `^`
+means the current byte position in `--_mtable-regex-<LANG>`.
+
+
+Skipping block comments
+......................................................................
+
+The most interesting part if `LONGFLAGS`.
+
+Here is the 3rd version of X.ctags.
+::
+
+   --langdef=X
+   --map-X=.x
+   --kinddef-X=v,var,variables
+
+   --_tabledef-X=toplevel
+   --_tabledef-X=comment
+   --_tabledef-X=vars
+
+   --_mtable-regex-X=toplevel/\/\*//{tenter=comment}
+   --_mtable-regex-X=toplevel/.//
+
+   --_mtable-regex-X=comment/\*\///{tleave}
+   --_mtable-regex-X=comment/.//
+
+Four `--_mtable-regex-X` liens are added for skipping the block comment.
+
+Let's see the one by one.
+
+For new input, ctags chooses the first pattern of the first table of
+the parser.
+
+|    --_mtable-regex-X=toplevel/\/\*//{tenter=comment}
+
+A pattern for `/*` is added to `toplevel` table. It tells ctags
+the start of block comment. Backslash chars are used for avoiding chars
+(`/` and `*`) evaluated as meta characters. The last `//` means ctags should
+not tag `/*`.  `tenter` is a long flag for switching the table. `{tenter=comment}`
+means "switch the table from toplevel to comment".
+
+ctags chooses the first pattern of the new table of the parser.
+
+|    --_mtable-regex-X=comment/\*\///{tleave}
+
+A pattern for `*/` tells ctags that `*/` is the end of block comment.
+
+*input.x*
+::
+
+   /* BLOCK COMMENT
+   var dont_capture_me;
+   */
+   var a /* ANOTHER BLOCK COMMENT */, b;
+
+The pattern doesn't match for the position just after `/*`. The char
+at the position is a whitespace. So ctags tries next pattern in the
+same table.
+
+|    --_mtable-regex-X=comment/.//
+
+This pattern matches any one byte; the current position moves one byte
+forward. Now the char at the current position is `B`. The first
+pattern of the table `*/` still does not match with the input. So
+ctags uses next pattern again. When the current position moves to
+the `/*` of the 3rd line of input.
+
+|    --_mtable-regex-X=comment/\*\///{tleave}
+
+The pattern match the input finally. In this pattern, `{tleave}` is
+specified. This triggers table switching again. `{tleave}` makes
+ctags switch the table back to the last table used before doing
+`{tenter}`. In this case, toplevel is the table. ctags manages
+a stack where references to tables are put. `{tenter}` pushes
+the current table to the stack. `{tleave}` pops the table at
+the top of the stack and chooses it.
+
+|    --_mtable-regex-X=toplevel/.//
+
+This version of X.ctags does nothing more; toplevel table
+ignores all other than the comment starter.
+
+
+
+Capturing variables in a sequence
+......................................................................
+
+Here is the 4th version of X.ctags.
+
+::
+
+	--langdef=X
+	--map-X=.x
+	--kinddef-X=v,var,variables
+
+	--_tabledef-X=toplevel
+	--_tabledef-X=comment
+	--_tabledef-X=vars
+
+	--_mtable-regex-X=toplevel/\/\*//{tenter=comment}
+	# NEW
+	--_mtable-regex-X=toplevel/var[ \n\t]//{tenter=vars}
+	--_mtable-regex-X=toplevel/.//
+
+	--_mtable-regex-X=comment/\*\///{tleave}
+	--_mtable-regex-X=comment/.//
+
+	# NEW
+	--_mtable-regex-X=vars/;//{tleave}
+	--_mtable-regex-X=vars/\/\*//{tenter=comment}
+	--_mtable-regex-X=vars/([a-zA-Z][a-zA-Z0-9]*)/\1/v/
+	--_mtable-regex-X=vars/.//
+
+1 pattern to `toplevel` and 4 patterns to `vars` are added.
+
+| --_mtable-regex-X=toplevel/var[ \n\t]//{tenter=vars}
+
+The first pattern to `toplevel` intents switching to `vars` table
+when `var` keyword is found in the input stream.
+
+|	--_mtable-regex-X=vars/;//{tleave}
+
+`vars` table is for capturing variables. vars table is used
+till `;` is found.
+
+|	--_mtable-regex-X=vars/\/\*//{tenter=comment}
+
+Block comments can be in variable definitions:
+
+::
+
+   var a /* ANOTHER BLOCK COMMENT */, b;
+
+To skip block comment in such position, pattern `/*` is matched even
+in `vars` table.
+
+|	--_mtable-regex-X=vars/([a-zA-Z][a-zA-Z0-9]*)/\1/v/
+
+This is nothing special: capturing a variable name as
+`variable` kind tag.
+
+|	--_mtable-regex-X=vars/.//
+
+This makes ctags ignore the rest like `,`.
+
+
+Running
+......................................................................
+
+.. code-block:: console
+
+	$ cat input.x
+	cat input.x
+	/* BLOCK COMMENT
+	var dont_capture_me;
+	*/
+	var a /* ANOTHER BLOCK COMMENT */, b;
+
+	$ u-ctags -o - --fields=+n --options=X.ctags input.x
+	u-ctags -o - --fields=+n --options=X.ctags input.x
+	a	input.x	/^var a \/* ANOTHER BLOCK COMMENT *\/, b;$/;"	v	line:4
+	b	input.x	/^var a \/* ANOTHER BLOCK COMMENT *\/, b;$/;"	v	line:4
+
+Fine!
+
+See `puppetManifest` parser as s serious example.
+It is the primary parser for testing mtable meta parser.
+
+
 Conditional tagging with extras
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

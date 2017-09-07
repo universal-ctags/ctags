@@ -183,6 +183,9 @@
     <ClCompile Include="..\optlib\pod.c">
       <Filter>Source Files\optlib</Filter>
     </ClCompile>
+    <ClCompile Include="..\optlib\puppetManifest.c">
+      <Filter>Source Files\optlib</Filter>
+    </ClCompile>
     <ClCompile Include="..\optlib\qemuhx.c">
       <Filter>Source Files\optlib</Filter>
     </ClCompile>

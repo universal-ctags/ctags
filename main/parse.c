@@ -1536,7 +1536,7 @@ static void initializeParserOne (langType lang)
 
 	initializeDependencies (parser->def, parser->slaveControlBlock);
 
-	Assert (parser->fileKind != KIND_NULL);
+	Assert (parser->fileKind != NULL);
 	Assert (!doesParserUseKind (parser->kindControlBlock, parser->fileKind->letter));
 
 	return;
@@ -3147,18 +3147,55 @@ extern bool parseFileWithMio (const char *const fileName, MIO *mio)
 	return tagFileResized;
 }
 
-extern void matchLanguageMultilineRegex (const langType language, const vString* const allLines)
+static void matchLanguageMultilineRegexCommon (const langType language,
+											   bool (* func) (struct lregexControlBlock *, const vString* const),
+											   const vString* const allLines)
 {
 	subparser *tmp;
 
-	matchMultilineRegex ((LanguageTable + language)->lregexControlBlock, allLines);
+	func ((LanguageTable + language)->lregexControlBlock, allLines);
 	foreachSubparser(tmp, true)
 	{
 		langType t = getSubparserLanguage (tmp);
 		enterSubparser (tmp);
-		matchLanguageMultilineRegex (t, allLines);
+		matchLanguageMultilineRegexCommon (t, func, allLines);
 		leaveSubparser ();
 	}
+}
+
+extern void matchLanguageMultilineRegex (const langType language,
+										 const vString* const allLines)
+{
+	matchLanguageMultilineRegexCommon(language, matchMultilineRegex, allLines);
+}
+
+extern void matchLanguageMultitableRegex (const langType language,
+										  const vString* const allLines)
+{
+	matchLanguageMultilineRegexCommon(language, matchMultitableRegex, allLines);
+}
+
+extern void processLanguageMultitableExtendingOption (langType language, const char *const parameter)
+{
+	const char* src;
+	char* dist;
+	const char *tmp;
+
+	tmp = strchr(parameter, '+');
+
+	if (!tmp)
+		error (FATAL, "no separator(+) found: %s", parameter);
+
+	if (tmp == parameter)
+		error (FATAL, "the name of source table is empty in table extending: %s", parameter);
+
+	src = tmp + 1;
+	if (!*src)
+		error (FATAL, "the name of dist table is empty in table extending: %s", parameter);
+
+	dist = eStrndup(parameter, tmp  - parameter);
+	extendRegexTable(((LanguageTable + language)->lregexControlBlock), src, dist);
+	eFree (dist);
 }
 
 static bool lregexQueryParserAndSubparesrs (const langType language, bool (* predicate) (struct lregexControlBlock *))
@@ -3186,7 +3223,7 @@ static bool lregexQueryParserAndSubparesrs (const langType language, bool (* pre
 
 extern bool hasLanguageMultilineRegexPatterns (const langType language)
 {
-	return lregexQueryParserAndSubparesrs (language, hasMultilineRegexPatterns);
+	return lregexQueryParserAndSubparesrs (language, regexNeedsMultilineBuffer);
 }
 
 
@@ -3228,6 +3265,21 @@ extern bool processLanguageRegexOption (langType language,
 	processTagRegexOption ((LanguageTable +language)->lregexControlBlock,
 						   regptype, parameter);
 
+	return true;
+}
+
+extern bool processTabledefOption (const char *const option, const char *const parameter)
+{
+	langType language;
+
+	language = getLanguageComponentInOption (option, "_tabledef-");
+	if (language == LANG_IGNORE)
+		return false;
+
+	if (parameter == NULL || parameter[0] == '\0')
+		error (FATAL, "A parameter is needed after \"%s\" option", option);
+
+	addRegexTable((LanguageTable +language)->lregexControlBlock, parameter);
 	return true;
 }
 
@@ -3724,6 +3776,30 @@ extern void printLangdefFlags (bool withListHeader, bool machinable, FILE *fp)
 
 	flagsColprintTablePrint (table, withListHeader, machinable, fp);
 	colprintTableDelete(table);
+}
+
+extern void printLanguageMultitableStatistics (langType language, FILE *vfp)
+{
+	parserObject* const parser = LanguageTable + language;
+	printMultitableStatistics (parser->lregexControlBlock,
+							   vfp);
+}
+
+extern void addLanguageRegexTable (const langType language, const char *name)
+{
+	parserObject* const parser = LanguageTable + language;
+	addRegexTable (parser->lregexControlBlock, name);
+}
+
+extern void addLanguageTagMultiTableRegex(const langType language,
+										  const char* const table_name,
+										  const char* const regex,
+										  const char* const name, const char* const kinds, const char* const flags,
+										  bool *disabled)
+{
+	parserObject* const parser = LanguageTable + language;
+	addTagMultiTableRegex (parser->lregexControlBlock, table_name, regex,
+						   name, kinds, flags, disabled);
 }
 
 /*

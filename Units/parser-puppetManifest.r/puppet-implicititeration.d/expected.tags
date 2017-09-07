@@ -1,0 +1,7 @@
+files	input.pp	/^$files = ["\/tmp\/iterationatest", "\/tmp\/iterationbtest"]$/;"	variable	line:3	language:puppetManifest
+/tmp/iterationctest	input.pp	/^file { ["\/tmp\/iterationctest", "\/tmp\/iterationdtest"]:$/;"	resource	line:7	language:puppetManifest
+/tmp/iterationdtest	input.pp	/^file { ["\/tmp\/iterationctest", "\/tmp\/iterationdtest"]:$/;"	resource	line:7	language:puppetManifest
+/tmp/iterationetest	input.pp	/^    ["\/tmp\/iterationetest", "\/tmp\/iterationftest"]: ensure => file, mode => '0755';$/;"	resource	line:13	language:puppetManifest
+/tmp/iterationftest	input.pp	/^    ["\/tmp\/iterationetest", "\/tmp\/iterationftest"]: ensure => file, mode => '0755';$/;"	resource	line:13	language:puppetManifest
+/tmp/iterationgtest	input.pp	/^    ["\/tmp\/iterationgtest", "\/tmp\/iterationhtest"]: ensure => file, mode => '0755';$/;"	resource	line:14	language:puppetManifest
+/tmp/iterationhtest	input.pp	/^    ["\/tmp\/iterationgtest", "\/tmp\/iterationhtest"]: ensure => file, mode => '0755';$/;"	resource	line:14	language:puppetManifest

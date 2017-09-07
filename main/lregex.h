@@ -34,6 +34,7 @@ typedef struct {
 enum regexParserType {
 	REG_PARSER_SINGLE_LINE,
 	REG_PARSER_MULTI_LINE,
+	REG_PARSER_MULTI_TABLE,
 };
 
 typedef void (*regexCallback) (const char *line, const regexMatch *matches, unsigned int count,
@@ -52,6 +53,12 @@ extern void addTagRegex (struct lregexControlBlock *lcb, const char* const regex
 extern void addTagMultiLineRegex (struct lregexControlBlock *lcb, const char* const regex,
 								  const char* const name, const char* const kinds, const char* const flags,
 								  bool *disabled);
+extern void addTagMultiTableRegex(struct lregexControlBlock *lcb,
+								  const char* const table_name,
+								  const char* const regex,
+								  const char* const name, const char* const kinds, const char* const flags,
+								  bool *disabled);
+
 extern bool matchRegex (struct lregexControlBlock *lcb, const vString* const line);
 extern bool hasScopeActionInRegex (struct lregexControlBlock *lcb);
 extern void addCallbackRegex (struct lregexControlBlock *lcb,
@@ -60,10 +67,16 @@ extern void addCallbackRegex (struct lregexControlBlock *lcb,
 							  const regexCallback callback,
 							  bool *disabled,
 							  void * userData);
-extern bool hasMultilineRegexPatterns (struct lregexControlBlock *lcb);
+extern bool regexNeedsMultilineBuffer (struct lregexControlBlock *lcb);
 extern bool matchMultilineRegex (struct lregexControlBlock *lcb, const vString* const allLines);
+extern bool matchMultitableRegex (struct lregexControlBlock *lcb, const vString* const allLines);
 
 extern void notifyRegexInputStart (struct lregexControlBlock *lcb);
 extern void notifyRegexInputEnd (struct lregexControlBlock *lcb);
+
+extern void addRegexTable (struct lregexControlBlock *lcb, const char *name);
+extern void extendRegexTable (struct lregexControlBlock *lcb, const char *src, const char *dist);
+
+extern void printMultitableStatistics (struct lregexControlBlock *lcb, FILE *vfp);
 
 #endif	/* CTAGS_MAIN_LREGEX_H */

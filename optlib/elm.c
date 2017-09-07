@@ -65,6 +65,7 @@ extern parserDefinition* ElmParser (void)
 	def->patterns      = patterns;
 	def->aliases       = aliases;
 	def->method        = METHOD_NOT_CRAFTED|METHOD_REGEX;
+	def->useCork       = 1;
 	def->kindTable = ElmKindTable;
 	def->kindCount = ARRAY_SIZE(ElmKindTable);
 	def->tagRegexTable = ElmTagRegexTable;

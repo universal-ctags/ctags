@@ -1,0 +1,1 @@
+/tmp/x	input.pp	/^       file { "\/tmp\/x": }$/;"	resource	line:2	language:puppetManifest	end:2

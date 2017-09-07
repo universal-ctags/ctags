@@ -1,0 +1,3 @@
+www1.example.com	input.pp	/^node 'www1.example.com' {$/;"	node	line:2	language:puppetManifest
+www2.example.com	input.pp	/^node 'www2.example.com', 'www3.example.com' {$/;"	node	line:12	language:puppetManifest
+www3.example.com	input.pp	/^node 'www2.example.com', 'www3.example.com' {$/;"	node	line:12	language:puppetManifest

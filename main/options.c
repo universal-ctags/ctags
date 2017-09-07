@@ -459,6 +459,14 @@ static optionDescription LongOptionDescription [] = {
  {0,"       Enter file I/O limited interactive mode if sandbox is specified. [default]"},
 #endif
 #endif
+ {1,"  --_list-mtable-regex-flags"},
+ {1,"       Output list of flags which can be used in a multitable regex parser definition."},
+ {1,"  --_mtable-extend-<LANG>=disttable+srctable."},
+ {1,"       Copy patterns of a regex table to another regex table."},
+ {1,"  --_mtable-regex-<LANG>=table/line_pattern/name_pattern/[flags]"},
+ {1,"       Define multitable regular expression for locating tags in specific language."},
+ {1,"  --_tabledef-<LANG>=name"},
+ {1,"       Define new regex table for <LANG>."},
  {1,"  --_xformat=field_format"},
  {1,"       Specify custom format for tabular cross reference (-x)."},
  {1,"       Fields can be specified with letter listed in --list-fields."},
@@ -2080,6 +2088,14 @@ static void processListMultilineRegexFlagsOptions (
 	exit (0);
 }
 
+static void processListMultitableRegexFlagsOptions (
+		const char *const option CTAGS_ATTR_UNUSED,
+		const char *const parameter CTAGS_ATTR_UNUSED)
+{
+	printMultitableRegexFlags (localOption.withListHeader, localOption.machinable, stdout);
+	exit (0);
+}
+
 static void processListLangdefFlagsOptions (
 		const char *const option CTAGS_ATTR_UNUSED,
 		const char *const parameter CTAGS_ATTR_UNUSED)
@@ -2700,6 +2716,7 @@ static parametricOption ParametricOptions [] = {
 #ifdef HAVE_JANSSON
 	{ "_interactive",           processInteractiveOption,       true,   STAGE_ANY },
 #endif
+	{ "_list-mtable-regex-flags", processListMultitableRegexFlagsOptions, true, STAGE_ANY },
 	{ "_xformat",               processXformatOption,           false,  STAGE_ANY },
 };
 
@@ -3062,6 +3079,34 @@ static bool processMultilineRegexOption (const char *const option,
 	return true;
 }
 
+static bool processMultitableRegexOption (const char *const option,
+										  const char *const parameter)
+{
+	langType language;
+
+	language = getLanguageComponentInOption (option, "_mtable-regex-");
+	if (language == LANG_IGNORE)
+		return false;
+
+	processLanguageRegexOption (language, REG_PARSER_MULTI_TABLE, parameter);
+
+	return true;
+}
+
+static bool processMultitableExtendingOption (const char *const option,
+											  const char *const parameter)
+{
+	langType language;
+
+	language = getLanguageComponentInOption (option, "_mtable-extend-");
+	if (language == LANG_IGNORE)
+		return false;
+
+	processLanguageMultitableExtendingOption (language, parameter);
+
+	return true;
+}
+
 static void processLongOption (
 		const char *const option, const char *const parameter)
 {
@@ -3098,6 +3143,12 @@ static void processLongOption (
 	else if (processMapOption (option, parameter))
 		;
 	else if (processParamOption (option, parameter))
+		;
+	else if (processTabledefOption (option, parameter))
+		;
+	else if (processMultitableRegexOption (option, parameter))
+		;
+	else if (processMultitableExtendingOption (option, parameter))
 		;
 #ifdef HAVE_ICONV
 	else if (processLanguageEncodingOption (option, parameter))

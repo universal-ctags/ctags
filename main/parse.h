@@ -219,11 +219,21 @@ extern bool checkRegex (void);
 extern void useRegexMethod (const langType language);
 extern void printRegexFlags (bool withListHeader, bool machinable, FILE *fp);
 extern void printMultilineRegexFlags (bool withListHeader, bool machinable, FILE *fp);
+extern void printMultitableRegexFlags (bool withListHeader, bool machinable, FILE *fp);
 extern bool hasLanguageScopeActionInRegex (const langType language);
 
 /* Multiline Regex Interface */
 extern bool hasLanguageMultilineRegexPatterns (const langType language);
 extern void matchLanguageMultilineRegex (const langType language, const vString* const allLines);
+extern void matchLanguageMultitableRegex (const langType language, const vString* const allLines);
+
+extern void addLanguageRegexTable (const langType language, const char *name);
+extern void processLanguageMultitableExtendingOption (langType language, const char *const parameter);
+extern void addLanguageTagMultiTableRegex(const langType language,
+										  const char* const table_name,
+										  const char* const regex,
+										  const char* const name, const char* const kinds, const char* const flags,
+										  bool *disabled);
 
 extern unsigned int   getXpathFileSpecCount (const langType language);
 extern xpathFileSpec* getXpathFileSpec (const langType language, unsigned int nth);
@@ -236,4 +246,5 @@ extern bool makeKindDescriptionsPseudoTags (const langType language,
 extern void anonGenerate (vString *buffer, const char *prefix, int kind);
 extern void anonHashString (const char *filename, char buf[9]);
 
+extern void printLanguageMultitableStatistics (langType language, FILE *vfp);
 #endif  /* CTAGS_MAIN_PARSE_H */
