@@ -3634,8 +3634,7 @@ extern subparser *getNextSubparser(subparser *last,
 	t = getSubparserLanguage(r);
 	if (isLanguageEnabled (t) &&
 		(includingNoneCraftedParser
-		 || (!includingNoneCraftedParser &&
-			 ((((LanguageTable + t)->def->method) && METHOD_NOT_CRAFTED) == 0))))
+		 || ((((LanguageTable + t)->def->method) && METHOD_NOT_CRAFTED) == 0)))
 		return r;
 	else
 		return getNextSubparser (r, includingNoneCraftedParser);
