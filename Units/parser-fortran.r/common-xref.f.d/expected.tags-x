@@ -1,0 +1,4 @@
+common1          common        2 input.f /^        COMMON \/common1\//
+common2          common        3 input.f /^        COMMON \/common2\//
+common3          common        3 input.f /^        COMMON \/common2\/ c2a (1:3), c2b \/common3\//
+main             program       1 input.f /^        PROGRAM main$/

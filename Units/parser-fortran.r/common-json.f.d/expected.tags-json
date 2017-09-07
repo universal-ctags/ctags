@@ -1,0 +1,4 @@
+{"_type": "tag", "name": "common1", "path": "input.f", "pattern": "/^        COMMON \\/common1\\//", "kind": "common", "scope": "main", "scopeKind": "program"}
+{"_type": "tag", "name": "common2", "path": "input.f", "pattern": "/^        COMMON \\/common2\\//", "kind": "common", "scope": "main", "scopeKind": "program"}
+{"_type": "tag", "name": "common3", "path": "input.f", "pattern": "/^        COMMON \\/common2\\/ c2a (1:3), c2b \\/common3\\//", "kind": "common", "scope": "main", "scopeKind": "program"}
+{"_type": "tag", "name": "main", "path": "input.f", "pattern": "/^        PROGRAM main$/", "kind": "program"}

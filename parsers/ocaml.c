@@ -903,7 +903,6 @@ static void prepareTag (tagEntryInfo * tag, vString const *name, ocamlKind kind)
 	/* Ripped out of read.h initTagEntry, because of line number
 	 * shenanigans.
 	 * Ugh. Lookahead is harder than I expected. */
-	tag->lineNumberEntry = (bool) (Option.locate == EX_LINENUM);
 	tag->lineNumber = ocaLineNumber;
 	tag->filePosition = ocaFilePosition;
 
