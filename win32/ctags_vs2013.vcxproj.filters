@@ -506,6 +506,9 @@
     <ClInclude Include="..\main\htable.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\main\inline.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="..\main\keyword.h">
       <Filter>Header Files</Filter>
     </ClInclude>

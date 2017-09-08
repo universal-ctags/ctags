@@ -20,6 +20,7 @@
 
 #include <stdio.h>
 
+#include "inline.h"
 #include "mio.h"
 
 /*
@@ -88,7 +89,7 @@ extern void vStringCatSWithEscapingAsPattern (vString *output, const char* input
 *   INLINE FUNCTIONS
 */
 
-static __inline void vStringPut (vString *const string, const int c)
+CTAGS_INLINE void vStringPut (vString *const string, const int c)
 {
 	if (string->length + 1 == string->size)  /*  check for buffer overflow */
 		vStringResize (string, string->size * 2);
