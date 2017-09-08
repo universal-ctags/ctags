@@ -137,7 +137,7 @@ static void  xtagColprintAddLine (struct colprintTable *table, int xtype)
 								  ? '-'
 								  : xdef->letter);
 	colprintLineAppendColumnCString (line, xdef->name);
-	colprintLineAppendColumnBool (line, xdef->enabled);
+	colprintLineAppendColumnBool (line, isXtagEnabled(xdef->xtype));
 	colprintLineAppendColumnCString (line,
 									 xobj->language == LANG_IGNORE
 									 ? RSV_NONE
