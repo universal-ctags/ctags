@@ -37,6 +37,14 @@ static bool isPseudoTagsEnabled (xtagDefinition *pdef CTAGS_ATTR_UNUSED)
 	return ! isDestinationStdout ();
 }
 
+static bool isPseudoTagsFixed (xtagDefinition *pdef CTAGS_ATTR_UNUSED)
+{
+	if (!writerCanPrintPtag())
+		return true;
+	else
+		return false;
+}
+
 static xtagDefinition xtagDefinitions [] = {
 	{ true, 'F',  "fileScope",
 	  "Include tags of file scope" },
@@ -44,7 +52,8 @@ static xtagDefinition xtagDefinitions [] = {
 	  "Include an entry for the base file name of every input file"},
 	{ false, 'p', "pseudo",
 	  "Include pseudo tags",
-	  isPseudoTagsEnabled},
+	  isPseudoTagsEnabled,
+	  isPseudoTagsFixed},
 	{ false, 'q', "qualified",
 	  "Include an extra class-qualified tag entry for each tag"},
 	{ false, 'r', "reference",
@@ -218,6 +227,18 @@ extern bool isXtagEnabled (xtagType type)
 		return def->enabled;
 }
 
+extern bool isXtagFixed (xtagType type)
+{
+	xtagDefinition* def = getXtagDefinition (type);
+
+	Assert (def);
+
+	if (def->isFixed)
+		return def->isFixed (def);
+
+	return false;
+}
+
 extern bool enableXtag (xtagType type, bool state)
 {
 	bool old;
@@ -226,7 +247,12 @@ extern bool enableXtag (xtagType type, bool state)
 	Assert (def);
 
 	old = isXtagEnabled (type);
-	def->enabled = state;
+
+	if (isXtagFixed(type))
+		def->enabled = old;
+	else
+		def->enabled = state;
+
 	def->isEnabled = NULL;
 
 	return old;
