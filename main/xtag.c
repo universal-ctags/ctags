@@ -259,6 +259,7 @@ extern void initXtagObjects (void)
 	{
 		xobj = xtagObjects + i;
 		xobj->def = xtagDefinitions + i;
+		xobj->def->xtype = i;
 		xobj->language = LANG_IGNORE;
 		xobj->sibling = XTAG_UNKNOWN;
 		xtagObjectUsed++;
