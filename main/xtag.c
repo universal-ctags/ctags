@@ -17,6 +17,7 @@
 #include "options.h"
 #include "routines.h"
 #include "trashbox.h"
+#include "writer.h"
 #include "xtag.h"
 
 #include <string.h>
@@ -30,6 +31,9 @@ typedef struct sXtagObject {
 
 static bool isPseudoTagsEnabled (xtagDefinition *pdef CTAGS_ATTR_UNUSED)
 {
+	if (!writerCanPrintPtag())
+		return false;
+
 	return ! isDestinationStdout ();
 }
 

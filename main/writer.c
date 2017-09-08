@@ -98,3 +98,8 @@ extern bool ptagMakeCtagsOutputMode (ptagDesc *desc, void *data CTAGS_ATTR_UNUSE
 						   "u-ctags or e-ctags",
 						   NULL);
 }
+
+extern bool writerCanPrintPtag (void)
+{
+	return (writer->writePtagEntry)? true: false;
+}
