@@ -135,7 +135,7 @@ extern xtagType  getXtagTypeForNameAndLanguage (const char *name, langType langu
 extern struct colprintTable * xtagColprintTableNew (void)
 {
 	return colprintTableNew ("L:LETTER", "L:NAME", "L:ENABLED",
-							 "L:LANGUAGE", "L:DESCRIPTION", NULL);
+							 "L:LANGUAGE", "L:FIXED", "L:DESCRIPTION", NULL);
 }
 
 static void  xtagColprintAddLine (struct colprintTable *table, int xtype)
@@ -155,6 +155,7 @@ static void  xtagColprintAddLine (struct colprintTable *table, int xtype)
 									 xobj->language == LANG_IGNORE
 									 ? RSV_NONE
 									 : getLanguageName (xobj->language));
+	colprintLineAppendColumnBool (line, isXtagFixed(xdef->xtype));
 	colprintLineAppendColumnCString (line, xdef->description);
 }
 
