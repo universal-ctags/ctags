@@ -1,1 +1,2 @@
 FOO	input.mak	/^FOO ?= bar$/;"	m
+URL	input.mak	/^URL ?= \\$/;"	m
