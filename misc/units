@@ -1858,6 +1858,19 @@ tmain_compare()
     fi
 }
 
+failed_git_marker ()
+{
+    local f=$1
+    local l
+
+    if type "git" > /dev/null 2>&1; then
+	l=$(git ls-files -- "$f")
+	if [ -z "$l" ]; then
+	    echo '<G>'
+	fi
+    fi
+}
+
 CODE_FOR_IGNORING_THIS_TMAIN_TEST=77
 tmain_run ()
 {
@@ -1943,6 +1956,7 @@ tmain_run ()
 		    rm ${build_subdir}/${aspect}-actual.txt
 		else
 		    failed="${failed} ${test_name}/${aspect}-${engine}"
+		    failed="${failed}$(failed_git_marker ${subdir}/${aspect}-expected.txt)"
 		    status_=1
 		fi
 	    elif [ -f ${build_subdir}/${aspect}-actual.txt ]; then
@@ -1958,7 +1972,7 @@ tmain_run ()
 	echo Failed tests
 	line '='
 	for f in ${failed}; do
-	    echo $f
+	    echo $f | sed -e 's|<G>| (not committed/cached yet)|'
 	done
 	echo
 
