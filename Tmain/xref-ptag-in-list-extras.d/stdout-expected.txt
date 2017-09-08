@@ -1,0 +1,12 @@
+# tags regular file
+p       pseudo            yes     NONE     no    Include pseudo tags
+# tags -
+p       pseudo            no      NONE     no    Include pseudo tags
+# tags NOTHING
+p       pseudo            yes     NONE     no    Include pseudo tags
+# xref regular file
+p       pseudo            no      NONE     yes   Include pseudo tags
+# xref -
+p       pseudo            no      NONE     yes   Include pseudo tags
+# xref NOTHING
+p       pseudo            no      NONE     yes   Include pseudo tags

@@ -26,7 +26,7 @@ tagWriter xrefWriter = {
 	.preWriteEntry = NULL,
 	.postWriteEntry = NULL,
 	.buildFqTagCache = buildXrefFqTagCache,
-	.useStdoutByDefault = true,
+	.defaultFileName = NULL,
 };
 
 static int writeXrefEntry (tagWriter *writer CTAGS_ATTR_UNUSED,

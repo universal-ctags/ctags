@@ -1,0 +1,2 @@
+{"_type": "tag", "name": "foo", "path": "input.c", "pattern": "/^static int foo (void)$/", "file": true, "typeref": "int", "kind": "function"}
+{"_type": "tag", "name": "main", "path": "input.c", "pattern": "/^main(void)$/", "typeref": "int", "kind": "function"}

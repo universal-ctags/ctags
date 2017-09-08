@@ -1,0 +1,6 @@
+# json regular file
+p       pseudo            yes     NONE     no    Include pseudo tags
+# json -
+p       pseudo            no      NONE     no    Include pseudo tags
+# json NOTHING
+p       pseudo            no      NONE     no    Include pseudo tags

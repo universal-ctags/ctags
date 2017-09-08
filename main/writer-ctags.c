@@ -17,6 +17,9 @@
 #include "writer.h"
 
 
+#define CTAGS_FILE  "tags"
+
+
 static int writeCtagsEntry (tagWriter *writer CTAGS_ATTR_UNUSED,
 							MIO * mio, const tagEntryInfo *const tag);
 static int writeCtagsPtagEntry (tagWriter *writer CTAGS_ATTR_UNUSED,
@@ -37,7 +40,7 @@ tagWriter uCtagsWriter = {
 	.preWriteEntry = NULL,
 	.postWriteEntry = NULL,
 	.buildFqTagCache = buildCtagsFqTagCache,
-	.useStdoutByDefault = false,
+	.defaultFileName = CTAGS_FILE,
 };
 
 static void *beginECtagsFile (tagWriter *writer CTAGS_ATTR_UNUSED, MIO * mio CTAGS_ATTR_UNUSED)
@@ -61,7 +64,7 @@ tagWriter eCtagsWriter = {
 	.preWriteEntry = beginECtagsFile,
 	.postWriteEntry = endECTagsFile,
 	.buildFqTagCache = buildCtagsFqTagCache,
-	.useStdoutByDefault = false,
+	.defaultFileName = CTAGS_FILE,
 };
 
 static const char* escapeFieldValue (tagWriter *writer, const tagEntryInfo * tag, fieldType ftype)
