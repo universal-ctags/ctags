@@ -262,7 +262,7 @@ static void findMakeTags (void)
 			variable_possible = (c == '=');
 			appending = true;
 		}
-		else if (variable_possible && c == ':' &&
+		else if ((! in_value) && variable_possible && c == ':' &&
 				 stringListCount (identifiers) > 0)
 		{
 			c = nextChar ();
