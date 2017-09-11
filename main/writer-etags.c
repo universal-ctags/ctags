@@ -20,6 +20,9 @@
 #include "writer.h"
 
 
+#define ETAGS_FILE  "TAGS"
+
+
 static int writeEtagsEntry  (tagWriter *writer, MIO * mio, const tagEntryInfo *const tag);
 static void *beginEtagsFile (tagWriter *writer, MIO * mio);
 static bool  endEtagsFile   (tagWriter *writer, MIO * mio, const char* filename);
@@ -29,6 +32,7 @@ tagWriter etagsWriter = {
 	.writePtagEntry = NULL,
 	.preWriteEntry = beginEtagsFile,
 	.postWriteEntry = endEtagsFile,
+	.defaultFileName = ETAGS_FILE,
 };
 
 struct sEtags {

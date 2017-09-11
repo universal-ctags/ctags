@@ -17,6 +17,7 @@
 #include "options.h"
 #include "routines.h"
 #include "trashbox.h"
+#include "writer.h"
 #include "xtag.h"
 
 #include <string.h>
@@ -30,7 +31,18 @@ typedef struct sXtagObject {
 
 static bool isPseudoTagsEnabled (xtagDefinition *pdef CTAGS_ATTR_UNUSED)
 {
+	if (!writerCanPrintPtag())
+		return false;
+
 	return ! isDestinationStdout ();
+}
+
+static bool isPseudoTagsFixed (xtagDefinition *pdef CTAGS_ATTR_UNUSED)
+{
+	if (!writerCanPrintPtag())
+		return true;
+	else
+		return false;
 }
 
 static xtagDefinition xtagDefinitions [] = {
@@ -40,7 +52,8 @@ static xtagDefinition xtagDefinitions [] = {
 	  "Include an entry for the base file name of every input file"},
 	{ false, 'p', "pseudo",
 	  "Include pseudo tags",
-	  isPseudoTagsEnabled},
+	  isPseudoTagsEnabled,
+	  isPseudoTagsFixed},
 	{ false, 'q', "qualified",
 	  "Include an extra class-qualified tag entry for each tag"},
 	{ false, 'r', "reference",
@@ -122,7 +135,7 @@ extern xtagType  getXtagTypeForNameAndLanguage (const char *name, langType langu
 extern struct colprintTable * xtagColprintTableNew (void)
 {
 	return colprintTableNew ("L:LETTER", "L:NAME", "L:ENABLED",
-							 "L:LANGUAGE", "L:DESCRIPTION", NULL);
+							 "L:LANGUAGE", "L:FIXED", "L:DESCRIPTION", NULL);
 }
 
 static void  xtagColprintAddLine (struct colprintTable *table, int xtype)
@@ -137,11 +150,12 @@ static void  xtagColprintAddLine (struct colprintTable *table, int xtype)
 								  ? '-'
 								  : xdef->letter);
 	colprintLineAppendColumnCString (line, xdef->name);
-	colprintLineAppendColumnBool (line, xdef->enabled);
+	colprintLineAppendColumnBool (line, isXtagEnabled(xdef->xtype));
 	colprintLineAppendColumnCString (line,
 									 xobj->language == LANG_IGNORE
 									 ? RSV_NONE
 									 : getLanguageName (xobj->language));
+	colprintLineAppendColumnBool (line, isXtagFixed(xdef->xtype));
 	colprintLineAppendColumnCString (line, xdef->description);
 }
 
@@ -214,6 +228,18 @@ extern bool isXtagEnabled (xtagType type)
 		return def->enabled;
 }
 
+extern bool isXtagFixed (xtagType type)
+{
+	xtagDefinition* def = getXtagDefinition (type);
+
+	Assert (def);
+
+	if (def->isFixed)
+		return def->isFixed (def);
+
+	return false;
+}
+
 extern bool enableXtag (xtagType type, bool state)
 {
 	bool old;
@@ -222,7 +248,12 @@ extern bool enableXtag (xtagType type, bool state)
 	Assert (def);
 
 	old = isXtagEnabled (type);
-	def->enabled = state;
+
+	if (isXtagFixed(type))
+		def->enabled = old;
+	else
+		def->enabled = state;
+
 	def->isEnabled = NULL;
 
 	return old;
@@ -259,6 +290,7 @@ extern void initXtagObjects (void)
 	{
 		xobj = xtagObjects + i;
 		xobj->def = xtagDefinitions + i;
+		xobj->def->xtype = i;
 		xobj->language = LANG_IGNORE;
 		xobj->sibling = XTAG_UNKNOWN;
 		xtagObjectUsed++;

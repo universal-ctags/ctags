@@ -1,0 +1,2 @@
+foo              function      3 input.c          static int foo (void)
+main             function      9 input.c          main(void)

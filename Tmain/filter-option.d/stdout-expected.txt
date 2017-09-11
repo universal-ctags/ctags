@@ -1,0 +1,2 @@
+main	./input.c	/^int main(void) { return 0; }$/;"	f	typeref:typename:int
+main             function      1 ./input.c        int main(void) { return 0; }

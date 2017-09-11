@@ -42,7 +42,7 @@ struct sTagWriter {
 	   In such case the callee may do truncate output file. */
 	bool (* postWriteEntry)  (tagWriter *writer, MIO * mio, const char* filename);
 	void (* buildFqTagCache) (tagWriter *writer, tagEntryInfo *const tag);
-	bool useStdoutByDefault;
+	const char *defaultFileName;
 
 	/* The value returned from preWriteEntry is stored `private' field.
 	   The value must be released in postWriteEntry. */
@@ -64,7 +64,7 @@ int writerWritePtag (MIO * mio,
 
 extern void writerBuildFqTagCache (tagEntryInfo *const tag);
 
-extern bool outputFormatUsedStdoutByDefault (void);
+extern const char *outputDefaultFileName (void);
 
 extern void truncateTagLineAfterTag (char *const line, const char *const token,
 			     const bool discardNewline);
@@ -72,5 +72,7 @@ extern void abort_if_ferror(MIO *const fp);
 
 extern bool ptagMakeJsonOutputVersion (ptagDesc *desc, void *data CTAGS_ATTR_UNUSED);
 extern bool ptagMakeCtagsOutputMode (ptagDesc *desc, void *data CTAGS_ATTR_UNUSED);
+
+extern bool writerCanPrintPtag (void);
 
 #endif

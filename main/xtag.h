@@ -49,6 +49,7 @@ typedef struct sXtagDefinition {
 	   If it is connected to a regular file, the tag is enabled
 	   by default. */
 	bool (* isEnabled) (struct sXtagDefinition *def);
+	bool (* isFixed)   (struct sXtagDefinition *def);
 
 	unsigned int xtype;	/* Given from the main part */
 } xtagDefinition;
@@ -58,6 +59,7 @@ extern xtagType  getXtagTypeForLetter (char letter);
 extern xtagType  getXtagTypeForNameAndLanguage (const char *name, langType language);
 extern bool isXtagEnabled (xtagType type);
 extern bool enableXtag (xtagType type, bool state);
+extern bool isXtagFixed (xtagType type);
 extern bool isCommonXtag (xtagType type);
 extern int  getXtagOwner (xtagType type);
 

@@ -44,7 +44,7 @@ tagWriter jsonWriter = {
 	.preWriteEntry = NULL,
 	.postWriteEntry = NULL,
 	.buildFqTagCache = buildJsonFqTagCache,
-	.useStdoutByDefault = true,
+	.defaultFileName = NULL,
 };
 
 
@@ -232,7 +232,7 @@ tagWriter jsonWriter = {
 	.writePtagEntry = NULL,
 	.preWriteEntry = NULL,
 	.postWriteEntry = NULL,
-	.useStdoutByDefault = true,
+	.defaultFileName = "-",
 };
 
 extern bool ptagMakeJsonOutputVersion (ptagDesc *desc, void *data CTAGS_ATTR_UNUSED)

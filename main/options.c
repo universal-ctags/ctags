@@ -53,9 +53,6 @@
 #define CTAGS_ENVIRONMENT  "CTAGS"
 #define ETAGS_ENVIRONMENT  "ETAGS"
 
-#define CTAGS_FILE  "tags"
-#define ETAGS_FILE  "TAGS"
-
 #ifndef ETAGS
 # define ETAGS	"etags"  /* name which causes default use of to -e */
 #endif
@@ -704,13 +701,20 @@ extern void freeList (stringList** const pList)
 }
 
 extern void setDefaultTagFileName (void)
+
 {
-	if (Option.tagFileName != NULL)
-		;  /* accept given name */
-	else if (Option.etags)
-		Option.tagFileName = stringCopy (ETAGS_FILE);
-	else
-		Option.tagFileName = stringCopy (CTAGS_FILE);
+	if (Option.filter || Option.interactive)
+		return;
+
+	if (Option.tagFileName == NULL)
+	{
+		const char *tmp = outputDefaultFileName ();
+
+		if (tmp == NULL)
+			tmp = "-";
+
+		Option.tagFileName = stringCopy (tmp);
+	}
 }
 
 extern bool filesRequired (void)

@@ -33,11 +33,6 @@ extern void setTagWriter (writerType wtype)
 	writer->type = wtype;
 }
 
-extern bool outputFormatUsedStdoutByDefault (void)
-{
-	return writer->useStdoutByDefault;
-}
-
 extern void writerSetup (MIO *mio)
 {
 	if (writer->preWriteEntry)
@@ -97,4 +92,14 @@ extern bool ptagMakeCtagsOutputMode (ptagDesc *desc, void *data CTAGS_ATTR_UNUSE
 						   mode,
 						   "u-ctags or e-ctags",
 						   NULL);
+}
+
+extern const char *outputDefaultFileName (void)
+{
+	return writer->defaultFileName;
+}
+
+extern bool writerCanPrintPtag (void)
+{
+	return (writer->writePtagEntry)? true: false;
 }
