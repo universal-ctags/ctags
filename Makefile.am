@@ -64,6 +64,7 @@ ctags_CFLAGS  += $(LIBXML_CFLAGS)
 ctags_CFLAGS  += $(JANSSON_CFLAGS)
 ctags_CFLAGS  += $(LIBYAML_CFLAGS)
 ctags_CFLAGS  += $(ASPELL_CFLAGS)
+ctags_CFLAGS  += $(SECCOMP_CFLAGS)
 
 ctags_LDADD  =
 ctags_LDADD += $(LIBXML_LIBS)
