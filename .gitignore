@@ -21,6 +21,7 @@ a.out
 aclocal.m4
 autom4te.cache
 badinput
+BSDmakefile
 commit-stamp
 compile
 config.cache
