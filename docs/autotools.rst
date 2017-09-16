@@ -4,7 +4,7 @@ Like most Autotools-based projects, you need to do::
 
     $ ./autogen.sh
     $ ./configure --prefix=/where/you/want # defaults to /usr/local
-    $ make
+    $ make # under BSD, GNU Make (`gmake`) should be used instead
     $ make install # may require extra privileges depending on where to install
 
 After installation the `ctags` executable will be in `$prefix/bin/`.
