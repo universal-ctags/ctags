@@ -306,6 +306,13 @@ if ! test "${GIT+set}" = "set"; then
 fi
 AM_CONDITIONAL([BUILD_IN_GIT_REPO], [test "x${in_git_repo}" = "xyes"])
 
+have_timeout=no
+AC_CHECK_PROGS([TESTING_TIMEOUT], [timeout])
+if test "${TESTING_TIMEOUT+set}" = "set"; then
+	have_timeout=yes
+fi
+AM_CONDITIONAL([HAVE_TIMEOUT], [test "x${have_timeout}" = "xyes"])
+
 
 # Check for temporary directory
 AC_MSG_CHECKING(directory to use for temporary files)

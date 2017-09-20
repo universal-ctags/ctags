@@ -7,7 +7,13 @@ clean-local: clean-units clean-tmain
 
 CTAGS_TEST = ./ctags$(EXEEXT)
 READ_TEST = ./readtags$(EXEEXT)
-TIMEOUT=
+
+if HAVE_TIMEOUT
+TIMEOUT = 1
+else
+TIMEOUT = 0
+endif
+
 LANGUAGES=
 CATEGORIES=
 UNITS=
@@ -17,7 +23,6 @@ UNITS=
 #
 # SHELL must be dash or bash.
 #
-fuzz: TIMEOUT := $(shell timeout --version > /dev/null 2>&1 && echo 1 || echo 0)
 fuzz: $(CTAGS_TEST)
 	@ \
 	if test -n "$${ZSH_VERSION+set}"; then set -o SH_WORD_SPLIT; fi; \
@@ -66,7 +71,6 @@ chop: $(CTAGS_TEST)
 #
 # UNITS Target
 #
-units: TIMEOUT := $(shell timeout --version > /dev/null 2>&1 && echo 10 || echo 0)
 units: $(CTAGS_TEST)
 	@ \
 	if test -n "$${ZSH_VERSION+set}"; then set -o SH_WORD_SPLIT; fi; \
@@ -85,7 +89,7 @@ units: $(CTAGS_TEST)
 		--categories=$(CATEGORIES) \
 		--units=$(UNITS) \
 		$${VALGRIND} --run-shrink \
-		--with-timeout=$(TIMEOUT) \
+		--with-timeout=`$(TIMEOUT) '*' 10`\
 		$${SHOW_DIFF_OUTPUT}"; \
 	 TRAVIS=$(TRAVIS) APPVEYOR=$(APPVEYOR) \
 		 $(SHELL) $${c} $(srcdir)/Units $${builddir}/Units
