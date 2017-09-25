@@ -43,7 +43,6 @@ typedef enum {
 	OP_ENDP,
 	OP_ENDS,
 	OP_EQU,
-	OP_EQUIV,
 	OP_EQUAL,
 	OP_LABEL,
 	OP_MACRO,
@@ -91,7 +90,6 @@ static const keywordTable AsmKeywords [] = {
 	{ "endp",     OP_ENDP        },
 	{ "ends",     OP_ENDS        },
 	{ "equ",      OP_EQU         },
-	{ "equiv",    OP_EQUIV       },
 	{ "label",    OP_LABEL       },
 	{ "macro",    OP_MACRO       },
 	{ ":=",       OP_COLON_EQUAL },
@@ -100,8 +98,10 @@ static const keywordTable AsmKeywords [] = {
 	{ "record",   OP_RECORD      },
 	{ "sections", OP_SECTIONS    },
 
-	/* This one is used in GNU as. */
+	/* These are used in GNU as. */
 	{ "section",  OP_SECTION     },
+	{ "equiv",    OP_EQU         },
+	{ "eqv",      OP_EQU         },
 
 	{ "set",      OP_SET         },
 	{ "struct",   OP_STRUCT      }
@@ -117,7 +117,6 @@ static const opKind OpKinds [] = {
 	{ OP_ENDP,        K_NONE   },
 	{ OP_ENDS,        K_NONE   },
 	{ OP_EQU,         K_DEFINE },
-	{ OP_EQUIV,       K_DEFINE },
 	{ OP_EQUAL,       K_DEFINE },
 	{ OP_LABEL,       K_LABEL  },
 	{ OP_MACRO,       K_MACRO  },
