@@ -11,3 +11,6 @@
 	sum     "(\from+1)",\to
 	.endif
 	.endm
+.equ _EQU equ1
+.equiv _EQUIV equiv2
+.eqv _EQV eqv3
