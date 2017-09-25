@@ -2159,7 +2159,7 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
 	s += n;
       }
       MOP_OUT;
-      NEXT;
+      JUMP;
 
     CASE(OP_ANYCHAR_ML_STAR)  MOP_IN(OP_ANYCHAR_ML_STAR);
       while (DATA_ENSURE_CHECK1) {
@@ -2176,7 +2176,7 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
 	}
       }
       MOP_OUT;
-      NEXT;
+      JUMP;
 
     CASE(OP_ANYCHAR_STAR_PEEK_NEXT)  MOP_IN(OP_ANYCHAR_STAR_PEEK_NEXT);
       while (DATA_ENSURE_CHECK1) {
