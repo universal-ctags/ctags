@@ -1285,6 +1285,9 @@ def main():
     x3("\\(((?:[^(]|(\\g<0>))*)\\)", "((abc)(abc))", 6, 11, 2)
     n("[\\6000", "a", err=onigmo.ONIGERR_TOO_BIG_NUMBER)   # CVE-2017-9226
     n("[\\H- ]", "", err=onigmo.ONIGERR_UNMATCHED_RANGE_SPECIFIER_IN_CHAR_CLASS)  # CVE-2017-9228
+    x2("c.*\\b", "abc", 2, 3)           # Issue #96
+    x2("abc.*\\b", "abc", 0, 3)         # Issue #96
+    x2("\\b.*abc.*\\b", "abc", 0, 3)    # Issue #96
 
     # ONIG_OPTION_FIND_LONGEST option
     x2("foo|foobar", "foobar", 0, 3)

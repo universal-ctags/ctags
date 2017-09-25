@@ -2159,7 +2159,7 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
 	s += n;
       }
       MOP_OUT;
-      NEXT;
+      JUMP;
 
     CASE(OP_ANYCHAR_ML_STAR)  MOP_IN(OP_ANYCHAR_ML_STAR);
       while (DATA_ENSURE_CHECK1) {
@@ -2176,7 +2176,7 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
 	}
       }
       MOP_OUT;
-      NEXT;
+      JUMP;
 
     CASE(OP_ANYCHAR_STAR_PEEK_NEXT)  MOP_IN(OP_ANYCHAR_STAR_PEEK_NEXT);
       while (DATA_ENSURE_CHECK1) {
@@ -3997,7 +3997,7 @@ forward_search_range(regex_t* reg, const UChar* str, const UChar* end, UChar* s,
     }
     else {
       if (reg->dmax != ONIG_INFINITE_DISTANCE) {
-	if (p - str < reg->dmax) {
+	if (p < str + reg->dmax) {
 	  *low = (UChar* )str;
 	  if (low_prev)
 	    *low_prev = onigenc_get_prev_char_head(reg->enc, str, *low, end);
