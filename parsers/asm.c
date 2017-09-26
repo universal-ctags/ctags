@@ -98,8 +98,10 @@ static const keywordTable AsmKeywords [] = {
 	{ "record",   OP_RECORD      },
 	{ "sections", OP_SECTIONS    },
 
-	/* This one is used in GNU as. */
+	/* These are used in GNU as. */
 	{ "section",  OP_SECTION     },
+	{ "equiv",    OP_EQU         },
+	{ "eqv",      OP_EQU         },
 
 	{ "set",      OP_SET         },
 	{ "struct",   OP_STRUCT      }
