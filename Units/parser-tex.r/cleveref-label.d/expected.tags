@@ -1,0 +1,2 @@
+eqs:einstein	input.tex	/^  \\label[pluralequation]{eqs:einstein}$/;"	l
+eqs:einstein2	input.tex	/^  \\label{eqs:einstein2}$/;"	l

@@ -382,7 +382,11 @@ static bool parseTag (tokenInfo *const token, texKind kind)
 	 *
 	 * When a keyword is found, loop through all words within
 	 * the curly braces for the tag name.
+	 *
+	 * If the keyword is label like \label, words in the square
+	 * brackets are skipped.
 	 */
+	bool enterSquare = (kind == TEXTAG_LABEL)? false: true;
 
 	if (isType (token, TOKEN_KEYWORD))
 	{
@@ -396,7 +400,8 @@ static bool parseTag (tokenInfo *const token, texKind kind)
 
 	if (isType (token, TOKEN_OPEN_SQUARE))
 	{
-		useLongName = false;
+		if (enterSquare)
+			useLongName = false;
 
 		if (!readToken (token))
 		{
@@ -405,7 +410,8 @@ static bool parseTag (tokenInfo *const token, texKind kind)
 		}
 		while (! isType (token, TOKEN_CLOSE_SQUARE) )
 		{
-			if (isType (token, TOKEN_IDENTIFIER))
+			if (enterSquare
+				&& isType (token, TOKEN_IDENTIFIER))
 			{
 				if (vStringLength (fullname) > 0)
 					vStringPut (fullname, ' ');
@@ -417,8 +423,16 @@ static bool parseTag (tokenInfo *const token, texKind kind)
 				goto out;
 			}
 		}
-		vStringCopy (name->string, fullname);
-		makeTexTag (name, kind);
+		if (enterSquare)
+		{
+			vStringCopy (name->string, fullname);
+			makeTexTag (name, kind);
+		}
+		else if (!readToken (token))
+		{
+			eof = true;
+			goto out;
+		}
 	}
 
 	if (isType (token, TOKEN_STAR))
