@@ -1,4 +1,4 @@
-Onigmo (Oniguruma-mod) Unicode Properties  Version 6.0.0    2016/10/15
+Onigmo (Oniguruma-mod) Unicode Properties  Version 6.2.0    2017/07/17
 
 * POSIX brackets
     Alpha
@@ -136,6 +136,7 @@ Onigmo (Oniguruma-mod) Unicode Properties  Version 6.0.0    2016/10/15
     Mandaic
     Manichaean
     Marchen
+    Masaram_Gondi
     Meetei_Mayek
     Mende_Kikakui
     Meroitic_Cursive
@@ -150,6 +151,7 @@ Onigmo (Oniguruma-mod) Unicode Properties  Version 6.0.0    2016/10/15
     New_Tai_Lue
     Newa
     Nko
+    Nushu
     Ogham
     Ol_Chiki
     Old_Hungarian
@@ -178,6 +180,7 @@ Onigmo (Oniguruma-mod) Unicode Properties  Version 6.0.0    2016/10/15
     SignWriting
     Sinhala
     Sora_Sompeng
+    Soyombo
     Sundanese
     Syloti_Nagri
     Syriac
@@ -200,6 +203,7 @@ Onigmo (Oniguruma-mod) Unicode Properties  Version 6.0.0    2016/10/15
     Vai
     Warang_Citi
     Yi
+    Zanabazar_Square
 
 * DerivedCoreProperties
     Alphabetic
@@ -250,12 +254,20 @@ Onigmo (Oniguruma-mod) Unicode Properties  Version 6.0.0    2016/10/15
     Prepended_Concatenation_Mark
     Quotation_Mark
     Radical
+    Regional_Indicator
     Sentence_Terminal
     Soft_Dotted
     Terminal_Punctuation
     Unified_Ideograph
     Variation_Selector
     White_Space
+
+* Emoji
+    Emoji
+    Emoji_Component
+    Emoji_Modifier
+    Emoji_Modifier_Base
+    Emoji_Presentation
 
 * PropertyAliases
     AHex
@@ -294,6 +306,7 @@ Onigmo (Oniguruma-mod) Unicode Properties  Version 6.0.0    2016/10/15
     Pat_Syn
     Pat_WS
     QMark
+    RI
     SD
     STerm
     Term
@@ -378,6 +391,7 @@ Onigmo (Oniguruma-mod) Unicode Properties  Version 6.0.0    2016/10/15
     Ethi
     Geor
     Glag
+    Gonm
     Goth
     Gran
     Grek
@@ -426,6 +440,7 @@ Onigmo (Oniguruma-mod) Unicode Properties  Version 6.0.0    2016/10/15
     Narb
     Nbat
     Nkoo
+    Nshu
     Ogam
     Olck
     Orkh
@@ -453,6 +468,7 @@ Onigmo (Oniguruma-mod) Unicode Properties  Version 6.0.0    2016/10/15
     Sind
     Sinh
     Sora
+    Soyo
     Sund
     Sylo
     Syrc
@@ -475,6 +491,7 @@ Onigmo (Oniguruma-mod) Unicode Properties  Version 6.0.0    2016/10/15
     Xpeo
     Xsux
     Yiii
+    Zanb
     Zinh
     Qaai
     Zyyy
@@ -482,6 +499,7 @@ Onigmo (Oniguruma-mod) Unicode Properties  Version 6.0.0    2016/10/15
 
 * DerivedAges
     Age=1.1
+    Age=10.0
     Age=2.0
     Age=2.1
     Age=3.0
@@ -520,6 +538,7 @@ Onigmo (Oniguruma-mod) Unicode Properties  Version 6.0.0    2016/10/15
     In_NKo
     In_Samaritan
     In_Mandaic
+    In_Syriac_Supplement
     In_Arabic_Extended_A
     In_Devanagari
     In_Bengali
@@ -722,9 +741,12 @@ Onigmo (Oniguruma-mod) Unicode Properties  Version 6.0.0    2016/10/15
     In_Takri
     In_Ahom
     In_Warang_Citi
+    In_Zanabazar_Square
+    In_Soyombo
     In_Pau_Cin_Hau
     In_Bhaiksuki
     In_Marchen
+    In_Masaram_Gondi
     In_Cuneiform
     In_Cuneiform_Numbers_and_Punctuation
     In_Early_Dynastic_Cuneiform
@@ -739,6 +761,8 @@ Onigmo (Oniguruma-mod) Unicode Properties  Version 6.0.0    2016/10/15
     In_Tangut
     In_Tangut_Components
     In_Kana_Supplement
+    In_Kana_Extended_A
+    In_Nushu
     In_Duployan
     In_Shorthand_Format_Controls
     In_Byzantine_Musical_Symbols
@@ -769,6 +793,7 @@ Onigmo (Oniguruma-mod) Unicode Properties  Version 6.0.0    2016/10/15
     In_CJK_Unified_Ideographs_Extension_C
     In_CJK_Unified_Ideographs_Extension_D
     In_CJK_Unified_Ideographs_Extension_E
+    In_CJK_Unified_Ideographs_Extension_F
     In_CJK_Compatibility_Ideographs_Supplement
     In_Tags
     In_Variation_Selectors_Supplement

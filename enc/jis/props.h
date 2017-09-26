@@ -127,10 +127,12 @@ gperf_case_strncmp (s1, s2, n)
 }
 #endif
 
-#if (defined (__STDC_VERSION__) && __STDC_VERSION__ >= 199901L) || defined(__cplusplus) || defined(__GNUC_STDC_INLINE__)
-inline
-#elif defined(__GNUC__)
+#ifdef __GNUC__
 __inline
+#else
+#ifdef __cplusplus
+inline
+#endif
 #endif
 static unsigned int
 onig_jis_property_hash (str, len)
