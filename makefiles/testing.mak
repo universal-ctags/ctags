@@ -89,7 +89,7 @@ units: $(CTAGS_TEST)
 		--categories=$(CATEGORIES) \
 		--units=$(UNITS) \
 		$${VALGRIND} --run-shrink \
-		--with-timeout=`$(TIMEOUT) '*' 10`\
+		--with-timeout=`expr $(TIMEOUT) '*' 10`\
 		$${SHOW_DIFF_OUTPUT}"; \
 	 TRAVIS=$(TRAVIS) APPVEYOR=$(APPVEYOR) \
 		 $(SHELL) $${c} $(srcdir)/Units $${builddir}/Units
