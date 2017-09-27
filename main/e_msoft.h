@@ -66,6 +66,10 @@ typedef enum { false, true } bool;
 # define FA_DIREC _A_SUBDIR
 # define ff_name name
 
+# if defined(__USE_MINGW_ANSI_STDIO) && defined(__MINGW64_VERSION_MAJOR)
+#  define HAVE_ASPRINTF 1
+# endif
+
 #endif
 
 #endif
