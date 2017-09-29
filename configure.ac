@@ -301,14 +301,14 @@ fi
 AC_MSG_RESULT(${in_git_repo})
 
 AC_CHECK_PROGS([GIT], [git])
-if ! test "${GIT+set}" = "set"; then
+if ! test "${GIT:+set}" = "set"; then
 	in_git_repo=no
 fi
 AM_CONDITIONAL([BUILD_IN_GIT_REPO], [test "x${in_git_repo}" = "xyes"])
 
 have_timeout=no
 AC_CHECK_PROGS([TESTING_TIMEOUT], [timeout])
-if test "${TESTING_TIMEOUT+set}" = "set"; then
+if test "${TESTING_TIMEOUT:+set}" = "set"; then
 	have_timeout=yes
 fi
 AM_CONDITIONAL([HAVE_TIMEOUT], [test "x${have_timeout}" = "xyes"])
