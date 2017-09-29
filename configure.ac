@@ -485,6 +485,7 @@ AC_SUBST([FNMATCH_CPPFLAGS])
 AC_CHECK_HEADERS(fnmatch.h)
 AM_CONDITIONAL([HAVE_FNMATCH], [test "x$have_fnmatch" = "xyes"])
 
+AC_CHECK_FUNCS(asprintf)
 AC_CHECK_FUNCS(strstr)
 AC_CHECK_FUNCS(strcasecmp stricmp, break)
 AC_CHECK_FUNCS(strncasecmp strnicmp, break)
