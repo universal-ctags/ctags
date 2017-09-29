@@ -23,4 +23,4 @@ jobs:
        - run:
            name: Test
            command: |
-             bmake check
+             bmake check CIRCLECI=1

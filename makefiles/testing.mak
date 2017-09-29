@@ -77,7 +77,7 @@ units: $(CTAGS_TEST)
 	if test x$(VG) = x1; then		\
 		VALGRIND=--with-valgrind;	\
 	fi;					\
-	if test x$(TRAVIS) = x1 || test x$(APPVEYOR) = x1; then	\
+	if ! test x$(TRAVIS)$(APPVEYOR)$(CIRCLECI) = x; then	\
 		SHOW_DIFF_OUTPUT=--show-diff-output;		\
 	fi;							\
 	builddir=$$(pwd); \
@@ -91,7 +91,7 @@ units: $(CTAGS_TEST)
 		$${VALGRIND} --run-shrink \
 		--with-timeout=`expr $(TIMEOUT) '*' 10`\
 		$${SHOW_DIFF_OUTPUT}"; \
-	 TRAVIS=$(TRAVIS) APPVEYOR=$(APPVEYOR) \
+	 TRAVIS=$(TRAVIS) APPVEYOR=$(APPVEYOR) CIRCLECI=$(CIRCLECI)\
 		 $(SHELL) $${c} $(srcdir)/Units $${builddir}/Units
 
 clean-units:
@@ -109,7 +109,7 @@ tmain: $(CTAGS_TEST)
 	if test x$(VG) = x1; then		\
 		VALGRIND=--with-valgrind;	\
 	fi;					\
-	if test x$(TRAVIS) = x1 || test x$(APPVEYOR) = x1; then	\
+	if ! test x$(TRAVIS)$(APPVEYOR)$(CIRCLECI) = x; then	\
 		SHOW_DIFF_OUTPUT=--show-diff-output;		\
 	fi;							\
 	builddir=$$(pwd); \
@@ -120,7 +120,7 @@ tmain: $(CTAGS_TEST)
 		--units=$(UNITS) \
 		$${VALGRIND} \
 		$${SHOW_DIFF_OUTPUT}"; \
-	TRAVIS=$(TRAVIS) APPVEYOR=$(APPVEYOR) \
+	TRAVIS=$(TRAVIS) APPVEYOR=$(APPVEYOR) CIRCLECI=$(CIRCLECI)\
 		$(SHELL) $${c} $(srcdir)/Tmain $${builddir}/Tmain
 
 clean-tmain:
