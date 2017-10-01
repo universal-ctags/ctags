@@ -157,26 +157,33 @@ void cppPopExternalParserBlock()
 
 
 static cppState Cpp = {
-	LANG_IGNORE,
-	NULL,        /* ungetBuffer */
-	0,           /* ungetBufferSize */
-	NULL,        /* ungetPointer */
-	0,           /* ungetDataSize */
-	false,       /* resolveRequired */
-	false,       /* hasAtLiteralStrings */
-	false,       /* hasCxxRawLiteralStrings */
-	false,	     /* hasSingleQuoteLiteralNumbers */
-	NULL,        /* defineMacroKind */
-	.macroUndefRoleIndex   = ROLE_INDEX_DEFINITION,
-	NULL,	     /* headerKind */
+	.lang = LANG_IGNORE,
+	.ungetBuffer = NULL,
+	.ungetBufferSize = 0,
+	.ungetPointer = NULL,
+	.ungetDataSize = 0,
+	.resolveRequired = false,
+	.hasAtLiteralStrings = false,
+	.hasCxxRawLiteralStrings = false,
+	.hasSingleQuoteLiteralNumbers = false,
+	.defineMacroKind = NULL,
+	.macroUndefRoleIndex = ROLE_INDEX_DEFINITION,
+	.headerKind = NULL,
 	.headerSystemRoleIndex = ROLE_INDEX_DEFINITION,
 	.headerLocalRoleIndex = ROLE_INDEX_DEFINITION,
-	{
-		DRCTV_NONE,  /* state */
-		false,       /* accept */
-		NULL,        /* tag name */
-		0,           /* nestLevel */
-		{ {false,false,false,false} }  /* ifdef array */
+	.directive = {
+		.state = DRCTV_NONE,
+		.accept = false,
+		.name = NULL,
+		.nestLevel = 0,
+		.ifdef = {
+			{
+				.ignoreAllBranches = false,
+				.singleBranch = false,
+				.singleBranch = false,
+				.ignoring = false,
+			}
+		}
 	}  /* directive */
 };
 
