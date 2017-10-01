@@ -69,9 +69,6 @@
 
 #define isCompoundOption(c)  (bool) (strchr ("fohiILpdDb", (c)) != NULL)
 
-#define SUBDIR_OPTLIB "optlib"
-#define SUBDIR_PRELOAD "preload"
-
 #define ENTER(STAGE) do {												\
 		Assert (Stage <= OptionLoadingStage##STAGE);					\
 		if (Stage != OptionLoadingStage##STAGE)							\
@@ -237,8 +234,6 @@ static optionDescription LongOptionDescription [] = {
  {1,"      for LANG."},
  {1,"  --append=[yes|no]"},
  {1,"       Should tags should be appended to existing tag file [no]?"},
- {1,"  --data-dir=[+]DIR"},
- {1,"      Add or set DIR to data directory search path."},
  {1,"  --etags-include=file"},
  {1,"      Include reference to 'file' in Emacs-style tag file (requires -e)."},
  {1,"  --exclude=pattern"},
@@ -371,6 +366,8 @@ static optionDescription LongOptionDescription [] = {
  {1,"       Define multiline regular expression for locating tags in specific language."},
  {1,"  --options=file"},
  {1,"       Specify file from which command line options should be read."},
+ {1,"  --optlib-dir=[+]DIR"},
+ {1,"      Add or set DIR to optlib search path."},
 #ifdef HAVE_ICONV
  {1,"  --output-encoding=encoding"},
  {1,"      The encoding to write the tag file in. Defaults to UTF-8 if --input-encoding"},
@@ -2540,77 +2537,77 @@ static void processXformatOption (const char *const option CTAGS_ATTR_UNUSED,
 	Option.customXfmt = fmtNew (parameter);
 }
 
-static void resetPathList (searchPathList** pathList, const char *const varname)
+enum howExtendingPathList { APPEND_PATH_LIST, PREPEND_PATH_LIST };
+static void extendPathList (searchPathList * path_list, const char *const dir,
+							enum howExtendingPathList how, bool report_in_verbose)
 {
-	freeSearchPathList (pathList);
-	verbose ("Reset %s\n", varname);
-	*pathList = stringListNew ();
-}
+	const char* list_name;
+	vString *elt = vStringNewInit(dir);
 
-static void resetDataPathList (void)
-{
-	resetPathList (&OptlibPathList, "OptlibPathList");
-}
+	if (path_list == PreloadPathList)
+		list_name = "PreloadPathList";
+	else
+		list_name = "OptlibPathList";
 
-static void appendToPathList (const char *const dir, const char *const subdir, searchPathList* const pathList, const char *const varname,
-				   bool report_in_verbose, const char* const action)
-{
-	char* path;
+	if (how == PREPEND_PATH_LIST)
+		stringListReverse (path_list);
 
-	path = combinePathAndFile (dir, subdir);
 	if (report_in_verbose)
-		verbose ("%s %s to %s\n", action, path, varname);
-	stringListAdd (pathList, vStringNewOwn (path));
+		verbose ("%s %s to %s\n",
+				 (how == PREPEND_PATH_LIST)? "Prepend": "Append",
+				 dir, list_name);
+
+	stringListAdd (path_list, elt);
+
+	if (how == PREPEND_PATH_LIST)
+		stringListReverse (path_list);
 }
 
-static void prependToPathList (const char *const dir, const char *const subdir, searchPathList* const pathList, const char *const varname,
-				    bool report_in_verbose, const char* const action)
+static void appendToPreloadPathList (const char *const dir, bool report_in_verbose)
 {
-	stringListReverse (pathList);
-	appendToPathList(dir, subdir, pathList, varname, report_in_verbose, action);
-	stringListReverse (pathList);
-
+	extendPathList (PreloadPathList, dir, APPEND_PATH_LIST, report_in_verbose);
 }
 
-static void appendToDataPathList (const char *const dir, bool from_cmdline)
+static void appendToOptlibPathList (const char *const dir, bool report_in_verbose)
 {
-	appendToPathList (dir, SUBDIR_OPTLIB, OptlibPathList, "OptlibPathList",
-			       from_cmdline, from_cmdline? "Append": NULL);
-
-	if (!from_cmdline)
-		appendToPathList (dir, SUBDIR_PRELOAD, PreloadPathList, "PreloadPathList",
-				       false, NULL);
+	extendPathList (OptlibPathList, dir, APPEND_PATH_LIST, report_in_verbose);
 }
 
-static void prependToDataPathList (const char *const dir, bool from_cmdline)
+static void prependToOptlibPathList (const char *const dir, bool report_in_verbose)
 {
-	prependToPathList (dir, SUBDIR_OPTLIB, OptlibPathList, "OptlibPathList",
-				from_cmdline, from_cmdline? "Prepend": NULL);
-	if (!from_cmdline)
-		prependToPathList (dir, SUBDIR_PRELOAD, PreloadPathList, "PreloadPathList",
-					false, NULL);
+	extendPathList (OptlibPathList, dir, PREPEND_PATH_LIST, report_in_verbose);
 }
 
-static void processDataDir (
+static void resetOptlibPathList (bool report_in_verbose)
+{
+	freeSearchPathList (&OptlibPathList);
+	if (report_in_verbose)
+		verbose ("Reset OptlibPathList\n");
+	OptlibPathList = stringListNew ();
+}
+
+static void processOptlibDir (
 		const char *const option, const char *const parameter)
 {
 	const char* path;
 
-	if (parameter == NULL || parameter[0] == '\0')
-		error (FATAL, "Path for a directory is needed for \"%s\" option", option);
+	Assert (parameter);
 
-	if (parameter[0] == '+')
+
+	if (parameter[0] == '\0')
+		resetOptlibPathList (true);
+	else if (parameter[0] == '+')
 	{
 		path = parameter + 1;
-		prependToDataPathList (path, true);
+		if (path[0] == '\0')
+			return;
+		prependToOptlibPathList (path, true);
 	}
-	else if (!strcmp (parameter, RSV_NONE))
-		resetDataPathList ();
 	else
 	{
-		resetDataPathList ();
+		resetOptlibPathList (true);
 		path = parameter;
-		appendToDataPathList (path, true);
+		appendToOptlibPathList (path, true);
 	}
 }
 
@@ -2652,7 +2649,6 @@ static bool* redirectToXtag(booleanOption *const option)
 static void processDumpOptionsOption (const char *const option, const char *const parameter);
 
 static parametricOption ParametricOptions [] = {
-	{ "data-dir",               processDataDir,                 false,  STAGE_ANY },
 	{ "etags-include",          processEtagsInclude,            false,  STAGE_ANY },
 	{ "exclude",                processExcludeOption,           false,  STAGE_ANY },
 	{ "excmd",                  processExcmdOption,             false,  STAGE_ANY },
@@ -2692,6 +2688,7 @@ static parametricOption ParametricOptions [] = {
 	{ "list-roles",             processListRolesOptions,        true,   STAGE_ANY },
 	{ "list-subparsers",        processListSubparsersOptions,   true,   STAGE_ANY },
 	{ "maxdepth",               processMaxRecursionDepthOption, true,   STAGE_ANY },
+	{ "optlib-dir",             processOptlibDir,               false,  STAGE_ANY },
 	{ "options",                processOptionFile,              false,  STAGE_ANY },
 	{ "output-format",          processOutputFormat,            true,   STAGE_ANY },
 	{ "pattern-length-limit",   processPatternLengthLimit,      true,   STAGE_ANY },
@@ -3548,9 +3545,13 @@ extern void readOptionConfiguration (void)
 	}
 }
 
-static void installDataPathList (void)
+static void installOptlibPathList (void)
 {
 	OptlibPathList = stringListNew ();
+}
+
+static void installPreloadPathList (void)
+{
 	PreloadPathList = stringListNew ();
 
 	{
@@ -3561,7 +3562,8 @@ static void installDataPathList (void)
 
 			ctags_d = combinePathAndFile (vStringValue (home), ".ctags.d");
 
-			appendToDataPathList (ctags_d, false);
+			appendToPreloadPathList (ctags_d, false);
+
 			eFree (ctags_d);
 			vStringDelete (home);
 		}
@@ -3575,7 +3577,9 @@ static void installDataPathList (void)
 extern void initOptions (void)
 {
 	OptionFiles = stringListNew ();
-	installDataPathList ();
+	installOptlibPathList ();
+	installPreloadPathList ();
+
 	verboseSearchPathList (OptlibPathList,  "OptlibPathList");
 	verboseSearchPathList (PreloadPathList, "PreloadPathList");
 
