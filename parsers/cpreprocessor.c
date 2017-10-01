@@ -69,6 +69,7 @@ enum eState {
  */
 typedef struct sCppState {
 	langType lang;
+	langType clientLang;
 
 	int * ungetBuffer;       /* memory buffer for unget characters */
 	int ungetBufferSize;      /* the current unget buffer size */
@@ -158,6 +159,7 @@ void cppPopExternalParserBlock()
 
 static cppState Cpp = {
 	.lang = LANG_IGNORE,
+	.clientLang = LANG_IGNORE,
 	.ungetBuffer = NULL,
 	.ungetBufferSize = 0,
 	.ungetPointer = NULL,
@@ -201,7 +203,8 @@ extern unsigned int cppGetDirectiveNestLevel (void)
 	return Cpp.directive.nestLevel;
 }
 
-extern void cppInit (const bool state, const bool hasAtLiteralStrings,
+static void cppInitCommon(langType clientLang,
+		     const bool state, const bool hasAtLiteralStrings,
 		     const bool hasCxxRawLiteralStrings,
 		     const bool hasSingleQuoteLiteralNumbers,
 		     const kindDefinition *defineMacroKind,
@@ -223,6 +226,7 @@ extern void cppInit (const bool state, const bool hasAtLiteralStrings,
 		initializeParser (t);
 	}
 
+	Cpp.clientLang = clientLang;
 	Cpp.ungetBuffer = NULL;
 	Cpp.ungetPointer = NULL;
 
@@ -253,6 +257,22 @@ extern void cppInit (const bool state, const bool hasAtLiteralStrings,
 	Cpp.directive.name = vStringNewOrClear (Cpp.directive.name);
 }
 
+extern void cppInit (const bool state, const bool hasAtLiteralStrings,
+		     const bool hasCxxRawLiteralStrings,
+		     const bool hasSingleQuoteLiteralNumbers,
+		     const kindDefinition *defineMacroKind,
+		     int macroUndefRoleIndex,
+		     const kindDefinition *headerKind,
+		     int headerSystemRoleIndex, int headerLocalRoleIndex)
+{
+	langType client = getInputLanguage ();
+
+	cppInitCommon (client, state, hasAtLiteralStrings,
+				   hasCxxRawLiteralStrings, hasSingleQuoteLiteralNumbers,
+				   defineMacroKind, macroUndefRoleIndex, headerKind,
+				   headerSystemRoleIndex, headerLocalRoleIndex);
+}
+
 extern void cppTerminate (void)
 {
 	if (Cpp.directive.name != NULL)
@@ -266,6 +286,8 @@ extern void cppTerminate (void)
 		eFree(Cpp.ungetBuffer);
 		Cpp.ungetBuffer = NULL;
 	}
+
+	Cpp.clientLang = LANG_IGNORE;
 }
 
 extern void cppBeginStatement (void)
@@ -584,8 +606,11 @@ static int makeDefineTag (const char *const name, const char* const signature, b
 {
 	const bool isFileScope = (bool) (! isInputHeaderFile ());
 
-	if (!isLanguageEnabled (Cpp.lang))
-		return CORK_NIL;
+	if (!isLanguageEnabled (
+			doesCPreProRunAsStandaloneParser(CPREPRO_MACRO)
+			? Cpp.lang
+			: Cpp.clientLang))
+			return CORK_NIL;
 
 	if (!Cpp.defineMacroKind)
 		return CORK_NIL;
@@ -633,8 +658,11 @@ static void makeIncludeTag (const  char *const name, bool systemHeader)
 	tagEntryInfo e;
 	int role_index;
 
-	if (!isLanguageEnabled (Cpp.lang))
-		return;
+	if (!isLanguageEnabled (
+			doesCPreProRunAsStandaloneParser(CPREPRO_HEADER)
+			? Cpp.lang
+			: Cpp.clientLang))
+			return;
 
 	role_index = systemHeader? Cpp.headerSystemRoleIndex: Cpp.headerLocalRoleIndex;
 	if (role_index == ROLE_INDEX_DEFINITION)
@@ -1254,8 +1282,8 @@ process:
 
 static void findCppTags (void)
 {
-	cppInit (0, false, false, false,
-			 NULL, 0, NULL, 0, 0);
+	cppInitCommon (Cpp.lang, 0, false, false, false,
+				   NULL, 0, NULL, 0, 0);
 
 	findRegexTagsMainloop (cppGetc);
 

@@ -1,0 +1,2 @@
+X	input.c	/^#define X /;"	d	file:
+main	input.c	/^main(int argc)$/;"	f	typeref:typename:int

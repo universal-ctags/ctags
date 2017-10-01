@@ -3,5 +3,5 @@
 int
 main(int argc)
 {
-	return X;
+       return X;
 }

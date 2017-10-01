@@ -1,0 +1,3 @@
+0x00	input.dts	/^	     phandle = <0x00>;$/;"	p	label:label
+label	input.dts	/^label: test {$/;"	l
+label2	input.dts	/^	     label2: chosen { } ;$/;"	l	label:label
