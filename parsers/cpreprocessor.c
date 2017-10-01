@@ -579,7 +579,7 @@ static int makeDefineTag (const char *const name, const char* const signature, b
 	if (isFileScope && !isXtagEnabled(XTAG_FILE_SCOPE))
 		return CORK_NIL;
 
-	if (Cpp.macroUndefRoleIndex == ROLE_INDEX_DEFINITION)
+	if (undef && (Cpp.macroUndefRoleIndex == ROLE_INDEX_DEFINITION))
 		return CORK_NIL;
 
 	if ( /* condition for definition tag */
