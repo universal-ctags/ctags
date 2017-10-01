@@ -567,6 +567,19 @@ static bool popConditional (void)
 	return isIgnore ();
 }
 
+static bool doesCPreProRunAsStandaloneParser (int kind)
+{
+	if (kind == CPREPRO_HEADER)
+		return (Cpp.headerKind == CPreProKinds + CPREPRO_HEADER);
+	else if (kind == CPREPRO_MACRO)
+		return (Cpp.defineMacroKind == CPreProKinds + CPREPRO_MACRO);
+	else
+	{
+		AssertNotReached();
+		return true;
+	}
+}
+
 static int makeDefineTag (const char *const name, const char* const signature, bool undef)
 {
 	const bool isFileScope = (bool) (! isInputHeaderFile ());
@@ -591,7 +604,7 @@ static int makeDefineTag (const char *const name, const char* const signature, b
 		tagEntryInfo e;
 		int r;
 
-		if (Cpp.defineMacroKind == CPreProKinds + CPREPRO_MACRO)
+		if (doesCPreProRunAsStandaloneParser(CPREPRO_MACRO))
 			pushLanguage (Cpp.lang);
 
 		if (undef)
@@ -607,17 +620,12 @@ static int makeDefineTag (const char *const name, const char* const signature, b
 
 		r = makeTagEntry (&e);
 
-		if (Cpp.defineMacroKind == CPreProKinds + CPREPRO_MACRO)
+		if (doesCPreProRunAsStandaloneParser(CPREPRO_MACRO))
 			popLanguage ();
 
 		return r;
 	}
 	return CORK_NIL;
-}
-
-static bool doesCPreProRunAsStandaloneParser (void)
-{
-	return (Cpp.headerKind == CPreProKinds + CPREPRO_HEADER);
 }
 
 static void makeIncludeTag (const  char *const name, bool systemHeader)
@@ -636,7 +644,7 @@ static void makeIncludeTag (const  char *const name, bool systemHeader)
 	    && isXtagEnabled (XTAG_REFERENCE_TAGS)
 	    && Cpp.headerKind->roles [ role_index ].enabled)
 	{
-		if (doesCPreProRunAsStandaloneParser ())
+		if (doesCPreProRunAsStandaloneParser (CPREPRO_HEADER))
 			pushLanguage (Cpp.lang);
 
 		initRefTagEntry (&e, name, Cpp.headerKind, role_index);
@@ -644,7 +652,7 @@ static void makeIncludeTag (const  char *const name, bool systemHeader)
 		e.truncateLineAfterTag = true;
 		makeTagEntry (&e);
 
-		if (doesCPreProRunAsStandaloneParser ())
+		if (doesCPreProRunAsStandaloneParser (CPREPRO_HEADER))
 			popLanguage ();
 	}
 }
