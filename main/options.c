@@ -3566,9 +3566,6 @@ static void installDataPathList (void)
 			vStringDelete (home);
 		}
 	}
-#ifdef PKGSYSCONFDIR
-	appendToDataPathList (PKGSYSCONFDIR, false);
-#endif
 }
 
 /*
