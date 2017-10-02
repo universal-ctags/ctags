@@ -73,9 +73,13 @@
 #define SUBDIR_OPTLIB "optlib"
 #define SUBDIR_PRELOAD "preload"
 
-#define ENTER(STAGE) do {							\
-		Assert (Stage <= OptionLoadingStage##STAGE); \
-		Stage = OptionLoadingStage##STAGE;	\
+#define ENTER(STAGE) do {												\
+		Assert (Stage <= OptionLoadingStage##STAGE);					\
+		if (Stage != OptionLoadingStage##STAGE)							\
+		{																\
+			Stage = OptionLoadingStage##STAGE;							\
+			verbose ("Entering configuration stage: loading %s\n", StageDescription[Stage]); \
+		}																\
 	} while (0)
 #define ACCEPT(STAGE) (1UL << OptionLoadingStage##STAGE)
 
