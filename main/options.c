@@ -2136,7 +2136,6 @@ static void processListSubparsersOptions (const char *const option CTAGS_ATTR_UN
 	exit (0);
 }
 
-
 static void freeSearchPathList (searchPathList** pathList)
 {
 	stringListClear (*pathList);
@@ -2144,23 +2143,14 @@ static void freeSearchPathList (searchPathList** pathList)
 	*pathList = NULL;
 }
 
-static void verboseSearchPathList (const searchPathList* pathList, const char *const varname)
-{
-	unsigned int i;
-
-	verbose ("Install %s:\n", varname);
-	for (i = 0; i < stringListCount (pathList); ++i)
-		verbose ("  %s\n", vStringValue (stringListItem (pathList, i)));
-}
-
 static vString* expandOnSearchPathList (searchPathList *pathList, const char* leaf,
 					bool (* check) (const char *const))
 {
 	unsigned int i;
 
-	for (i = 0; i < stringListCount (pathList); ++i)
+	for (i = stringListCount (pathList); i > 0; --i)
 	{
-		const char* const body = vStringValue (stringListItem (pathList, i));
+		const char* const body = vStringValue (stringListItem (pathList, i - 1));
 		char* tmp = combinePathAndFile (body, leaf);
 
 		if ((* check) (tmp))
@@ -2174,35 +2164,11 @@ static vString* expandOnSearchPathList (searchPathList *pathList, const char* le
 	return NULL;
 }
 
-static bool isDirectory (const char *const dirName)
-{
-	fileStatus *status = eStat (dirName);
-	return status->exists && status->isDirectory;
-}
-
 static vString* expandOnOptlibPathList (const char* leaf)
 {
-	vString* r;
-	vString* leaf_with_suffix;
 
-	leaf_with_suffix = vStringNewInit (leaf);
-	vStringCatS (leaf_with_suffix, ".d");
-
-	r = expandOnSearchPathList (OptlibPathList, vStringValue (leaf_with_suffix),
-				    isDirectory);
-
-
-	if (!r)
-	{
-		vStringCopyS (leaf_with_suffix, leaf);
-		vStringCatS (leaf_with_suffix, ".ctags");
-		r = expandOnSearchPathList (OptlibPathList, vStringValue (leaf_with_suffix),
-					    doesFileExist);
-	}
-
-	vStringDelete (leaf_with_suffix);
-
-	return r;
+	return expandOnSearchPathList (OptlibPathList, leaf,
+								   doesFileExist);
 }
 
 static void processOptionFile (
@@ -2491,36 +2457,15 @@ static void processXformatOption (const char *const option CTAGS_ATTR_UNUSED,
 	Option.customXfmt = fmtNew (parameter);
 }
 
-enum howExtendingPathList { APPEND_PATH_LIST, PREPEND_PATH_LIST };
-static void extendOptlibPathList (const char *const dir,
-								  enum howExtendingPathList how, bool report_in_verbose)
-{
-	searchPathList * path_list = OptlibPathList;
-	const char* list_name = "OptlibPathList";
-	vString *elt = vStringNewInit(dir);
-
-	if (how == PREPEND_PATH_LIST)
-		stringListReverse (path_list);
-
-	if (report_in_verbose)
-		verbose ("%s %s to %s\n",
-				 (how == PREPEND_PATH_LIST)? "Prepend": "Append",
-				 dir, list_name);
-
-	stringListAdd (path_list, elt);
-
-	if (how == PREPEND_PATH_LIST)
-		stringListReverse (path_list);
-}
-
-static void appendToOptlibPathList (const char *const dir, bool report_in_verbose)
-{
-	extendOptlibPathList (dir, APPEND_PATH_LIST, report_in_verbose);
-}
-
 static void prependToOptlibPathList (const char *const dir, bool report_in_verbose)
 {
-	extendOptlibPathList (dir, PREPEND_PATH_LIST, false);
+	vString *elt = vStringNewInit (dir);
+
+	if (report_in_verbose)
+		verbose ("Prepend %s to %s\n",
+				 dir, "OptlibPathList");
+
+	stringListAdd (OptlibPathList, elt);
 }
 
 static void resetOptlibPathList (bool report_in_verbose)
@@ -2552,7 +2497,7 @@ static void processOptlibDir (
 	{
 		resetOptlibPathList (true);
 		path = parameter;
-		appendToOptlibPathList (path, true);
+		prependToOptlibPathList (path, true);
 	}
 }
 
@@ -3315,18 +3260,6 @@ static int ignore_dot_file(const struct dirent* dent)
 		return 1;
 }
 
-static int accept_only_dot_d(const struct dirent* dent)
-{
-	size_t len;
-
-	/* accept only a directory ended with ".d" */
-	len = strlen(dent->d_name);
-
-	if (len < 3)
-		return 0;
-	return !strcmp(dent->d_name + (len - 2), ".d");
-}
-
 static int accept_only_dot_ctags(const struct dirent* dent)
 {
 	size_t len;
@@ -3371,12 +3304,9 @@ static bool parseAllConfigurationFilesOptionsInDirectory (const char* const dirN
 		path = combinePathAndFile (dirName, dents[i]->d_name);
 		s = eStat (path);
 
-		if (s->exists && s->isDirectory && accept_only_dot_d(dents[i]))
-			parseAllConfigurationFilesOptionsInDirectory (path,
-								      already_loaded_files);
-		else if (s->exists && accept_only_dot_ctags(dents[i]))
+		if (s->exists && accept_only_dot_ctags(dents[i]))
 			parseConfigurationFileOptionsInDirectoryWithLeafname (dirName,
-									      dents[i]->d_name);
+																  dents[i]->d_name);
 		eStatFree (s);
 		free (dents[i]);
 		eFree (path);
@@ -3565,8 +3495,6 @@ extern void initOptions (void)
 {
 	OptionFiles = stringListNew ();
 	OptlibPathList = stringListNew ();
-
-	verboseSearchPathList (OptlibPathList,  "OptlibPathList");
 
 	verbose ("Setting option defaults\n");
 	installHeaderListDefaults ();
