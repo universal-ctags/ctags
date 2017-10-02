@@ -2191,13 +2191,6 @@ static vString* expandOnOptlibPathList (const char* leaf)
 	r = expandOnSearchPathList (OptlibPathList, vStringValue (leaf_with_suffix),
 				    isDirectory);
 
-	if (!r)
-	{
-		vStringCopyS (leaf_with_suffix, leaf);
-		vStringCatS (leaf_with_suffix, ".conf");
-		r = expandOnSearchPathList (OptlibPathList, vStringValue (leaf_with_suffix),
-					    doesFileExist);
-	}
 
 	if (!r)
 	{
@@ -2206,16 +2199,6 @@ static vString* expandOnOptlibPathList (const char* leaf)
 		r = expandOnSearchPathList (OptlibPathList, vStringValue (leaf_with_suffix),
 					    doesFileExist);
 	}
-
-#ifdef MSDOS_STYLE_PATH
-	if (!r)
-	{
-		vStringCopyS (leaf_with_suffix, leaf);
-		vStringCatS (leaf_with_suffix, ".cnf");
-		r = expandOnSearchPathList (OptlibPathList, vStringValue (leaf_with_suffix),
-					    doesFileExist);
-	}
-#endif
 
 	vStringDelete (leaf_with_suffix);
 
@@ -3348,13 +3331,8 @@ static int accept_only_dot_ctags(const struct dirent* dent)
 {
 	size_t len;
 
-	/* accept only a file ended with ".conf" or ".ctags" */
+	/* accept only a file ended with ".ctags" */
 	len = strlen(dent->d_name);
-
-	if (len < 6)
-		return 0;
-	if (strcmp(dent->d_name + (len - 5), ".conf") == 0)
-		return 1;
 
 	if (len < 7)
 		return 0;
