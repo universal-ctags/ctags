@@ -119,7 +119,6 @@ static stringList *OptionFiles;
 
 typedef stringList searchPathList;
 static searchPathList *OptlibPathList;
-static searchPathList *PreloadPathList;
 
 static stringList* Excluded;
 static bool FilesRequired = true;
@@ -561,34 +560,6 @@ static bool getBooleanOption (const char *const option, const char *const parame
 /*
 *   FUNCTION DEFINITIONS
 */
-
-
-static vString* getHome (void)
-{
-	const char* const home = getenv ("HOME");
-
-	if (home)
-		return vStringNewInit (home);
-	else
-	{
-#ifdef MSDOS_STYLE_PATH
-		/*
-		 * Windows users don't usually set HOME.
-		 * The OS sets HOMEDRIVE and HOMEPATH for them.
-		 */
-		const char* homeDrive = getenv ("HOMEDRIVE");
-		const char* homePath = getenv ("HOMEPATH");
-		if (homeDrive != NULL && homePath != NULL)
-		{
-			vString* const windowsHome = vStringNew ();
-			vStringCatS (windowsHome, homeDrive);
-			vStringCatS (windowsHome, homePath);
-			return windowsHome;
-		}
-#endif
-		return NULL;
-	}
-}
 
 #ifndef HAVE_ASPRINTF
 
@@ -2538,16 +2509,12 @@ static void processXformatOption (const char *const option CTAGS_ATTR_UNUSED,
 }
 
 enum howExtendingPathList { APPEND_PATH_LIST, PREPEND_PATH_LIST };
-static void extendPathList (searchPathList * path_list, const char *const dir,
-							enum howExtendingPathList how, bool report_in_verbose)
+static void extendOptlibPathList (const char *const dir,
+								  enum howExtendingPathList how, bool report_in_verbose)
 {
-	const char* list_name;
+	searchPathList * path_list = OptlibPathList;
+	const char* list_name = "OptlibPathList";
 	vString *elt = vStringNewInit(dir);
-
-	if (path_list == PreloadPathList)
-		list_name = "PreloadPathList";
-	else
-		list_name = "OptlibPathList";
 
 	if (how == PREPEND_PATH_LIST)
 		stringListReverse (path_list);
@@ -2563,19 +2530,14 @@ static void extendPathList (searchPathList * path_list, const char *const dir,
 		stringListReverse (path_list);
 }
 
-static void appendToPreloadPathList (const char *const dir, bool report_in_verbose)
-{
-	extendPathList (PreloadPathList, dir, APPEND_PATH_LIST, report_in_verbose);
-}
-
 static void appendToOptlibPathList (const char *const dir, bool report_in_verbose)
 {
-	extendPathList (OptlibPathList, dir, APPEND_PATH_LIST, report_in_verbose);
+	extendOptlibPathList (dir, APPEND_PATH_LIST, report_in_verbose);
 }
 
 static void prependToOptlibPathList (const char *const dir, bool report_in_verbose)
 {
-	extendPathList (OptlibPathList, dir, PREPEND_PATH_LIST, report_in_verbose);
+	extendOptlibPathList (dir, PREPEND_PATH_LIST, false);
 }
 
 static void resetOptlibPathList (bool report_in_verbose)
@@ -3360,14 +3322,6 @@ static void parseConfigurationFileOptionsInDirectoryWithLeafname (const char* di
 	eFree (pathname);
 }
 
-static void parseConfigurationFileOptionsInDirectory (const char* directory)
-{
-	parseConfigurationFileOptionsInDirectoryWithLeafname (directory, ".ctags");
-#ifdef MSDOS_STYLE_PATH
-	parseConfigurationFileOptionsInDirectoryWithLeafname (directory, "ctags.cnf");
-#endif
-}
-
 #if defined(HAVE_SCANDIR) || defined (HAVE_DIRENT_H) || defined (_MSC_VER)
 static int ignore_dot_file(const struct dirent* dent)
 {
@@ -3460,53 +3414,133 @@ static bool parseAllConfigurationFilesOptionsInDirectory (const char* const dirN
 }
 #endif
 
-static void preload (const searchPathList *const pathList)
+typedef char* (* preloadMakePathFunc) (const char*, const char*);
+
+struct preloadPathElt {
+	const char *path;			/* NULL means the end of list */
+	bool isDirectory;
+	preloadMakePathFunc makePath;
+	const char *extra;
+	OptionLoadingStage stage;
+};
+
+static char* prependEnvvar (const char *path, const char* envvar)
+{
+	char *full_path = NULL;
+
+	const char* const envval = getenv (envvar);
+	if (envval)
+		full_path = combinePathAndFile(envval, path);
+
+	return full_path;
+}
+
+#ifdef WIN32
+static char *getConfigAtHomeOnWindows (const char *path,
+									   const char* extra CTAGS_ATTR_UNUSED)
+{
+	/*
+	 * Windows users don't usually set HOME.
+	 * The OS sets HOMEDRIVE and HOMEPATH for them.
+	 */
+	const char* homeDrive = getenv ("HOMEDRIVE");
+	const char* homePath = getenv ("HOMEPATH");
+	if (homeDrive != NULL && homePath != NULL)
+	{
+		vString* const windowsHome = vStringNew ();
+		vStringCatS (windowsHome, homeDrive);
+		vStringCatS (windowsHome, homePath);
+
+		char *tmp = combinePathAndFile (vStringValue(windowsHome), path);
+		vStringDelete (windowsHome);
+
+		return tmp;
+	}
+	return NULL;
+}
+#endif
+
+static void preload (struct preloadPathElt *pathList)
 {
 	unsigned int i;
 	stringList* loaded;
 
 	loaded = stringListNew ();
-	for (i = 0; i < stringListCount (pathList); ++i)
+	for (i = 0; pathList[i].path != NULL; ++i)
 	{
-		const char* const dir = vStringValue (stringListItem (pathList, i));
-		parseAllConfigurationFilesOptionsInDirectory (dir, loaded);
+		struct preloadPathElt *elt = pathList + i;
+		preloadMakePathFunc maker = elt->makePath;
+		const char *path = elt->path;
+
+
+		if (maker)
+			path = maker(elt->path, elt->extra);
+
+		if (path == NULL)
+			continue;
+
+		Assert (Stage <= elt->stage);
+		if (Stage != elt->stage)
+		{
+			Stage = elt->stage;
+			verbose ("Entering configuration stage: loading %s\n", StageDescription[Stage]);
+		}
+
+		if (elt->isDirectory)
+			parseAllConfigurationFilesOptionsInDirectory (path, loaded);
+		else
+			parseFileOptions (path);
+
+		if (path != elt->path)
+			eFree ((void *)path);
 	}
 	stringListClear (loaded);
 	stringListDelete (loaded);
 }
 
+static struct preloadPathElt preload_path_list [] = {
+#ifdef CUSTOM_CONFIGURATION_FILE
+	{
+		.path = CUSTOM_CONFIGURATION_FILE,
+		.isDirectory = false,
+		.makePath = NULL,
+		.stage = OptionLoadingStageCustom,
+	},
+#endif
+	{
+		.path = ".ctags.d",
+		.isDirectory = true,
+		.makePath = prependEnvvar,
+		.extra = "HOME",
+		.stage = OptionLoadingStageHomeRecursive,
+	},
+#ifdef WIN32
+	{
+		.path = "ctags.d",
+		.isDirectory = true,
+		.makePath = getConfigAtHomeOnWindows,
+		.extra = NULL,
+		.stage = OptionLoadingStageHomeRecursive,
+	},
+#endif
+	{
+		.path = ".ctags.d",
+		.isDirectory = true,
+		.makePath = NULL,
+		.stage = OptionLoadingStageCurrentRecursive,
+	},
+	{
+		.path = "ctags.d",
+		.isDirectory = true,
+		.makePath = NULL,
+		.stage = OptionLoadingStageCurrentRecursive,
+	},
+	{ .path = NULL },
+};
+
 static void parseConfigurationFileOptions (void)
 {
-	vString *home;
-	/* We parse .ctags on all systems, and additionally ctags.cnf on DOS. */
-
-#ifdef CUSTOM_CONFIGURATION_FILE
-	ENTER(Custom);
-	parseFileOptions (CUSTOM_CONFIGURATION_FILE);
-#endif
-#ifdef MSDOS_STYLE_PATH
-	ENTER(DosCnf);
-	parseFileOptions ("ctags.cnf");
-#endif
-	ENTER(Etc);
-	parseFileOptions ("/etc/ctags.conf");
-
-	ENTER(LocalEtc);
-	parseFileOptions ("/usr/local/etc/ctags.conf");
-
-	home = getHome ();
-	if (home != NULL)
-	{
-		ENTER(HomeRecursive);
-		parseConfigurationFileOptionsInDirectory (vStringValue (home));
-		vStringDelete (home);
-	}
-
-	ENTER(CurrentRecursive);
-	parseConfigurationFileOptionsInDirectory (".");
-
-	ENTER(Preload);
-	preload (PreloadPathList);
+	preload (preload_path_list);
 }
 
 static void parseEnvironmentOptions (void)
@@ -3550,26 +3584,6 @@ static void installOptlibPathList (void)
 	OptlibPathList = stringListNew ();
 }
 
-static void installPreloadPathList (void)
-{
-	PreloadPathList = stringListNew ();
-
-	{
-		vString *home = getHome ();
-		if (home != NULL)
-		{
-			char *ctags_d;
-
-			ctags_d = combinePathAndFile (vStringValue (home), ".ctags.d");
-
-			appendToPreloadPathList (ctags_d, false);
-
-			eFree (ctags_d);
-			vStringDelete (home);
-		}
-	}
-}
-
 /*
 *   Option initialization
 */
@@ -3578,10 +3592,8 @@ extern void initOptions (void)
 {
 	OptionFiles = stringListNew ();
 	installOptlibPathList ();
-	installPreloadPathList ();
 
 	verboseSearchPathList (OptlibPathList,  "OptlibPathList");
-	verboseSearchPathList (PreloadPathList, "PreloadPathList");
 
 	verbose ("Setting option defaults\n");
 	installHeaderListDefaults ();
@@ -3664,7 +3676,6 @@ extern void freeOptionResources (void)
 	freeList (&Option.etagsInclude);
 
 	freeSearchPathList (&OptlibPathList);
-	freeSearchPathList (&PreloadPathList);
 
 	freeList (&OptionFiles);
 }
