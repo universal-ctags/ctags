@@ -5,6 +5,6 @@
 CTAGS=$1
 O=/tmp/ctags-tmain-$$.txt
 
-echo ./input.c | $CTAGS --filter -o $O
+echo ./input.c | $CTAGS --quiet --options=NONE --filter -o $O
 
 rm -f ${O}

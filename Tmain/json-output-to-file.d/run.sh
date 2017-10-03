@@ -9,7 +9,7 @@ O=/tmp/ctags-tmain-$$.json
 
 is_feature_available "${CTAGS}" json
 
-$CTAGS --extras=-p --output-format=json  -f ${O} input.c > /dev/null && cat ${O}
+$CTAGS --quiet --options=NONE --extras=-p --output-format=json  -f ${O} input.c > /dev/null && cat ${O}
 s=$?
 
 rm -f ${O}

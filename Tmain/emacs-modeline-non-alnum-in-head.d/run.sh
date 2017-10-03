@@ -2,4 +2,4 @@
 # License: GPL-2
 
 CTAGS=$1
-$CTAGS -G --print-language input
+$CTAGS --quiet --options=NONE -G --print-language input
