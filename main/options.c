@@ -2560,21 +2560,21 @@ static void resetDataPathList (void)
 }
 
 static void appendToPathList (const char *const dir, const char *const subdir, searchPathList* const pathList, const char *const varname,
-				   bool report_in_verboe, const char* const action)
+				   bool report_in_verbose, const char* const action)
 {
 	char* path;
 
 	path = combinePathAndFile (dir, subdir);
-	if (report_in_verboe)
+	if (report_in_verbose)
 		verbose ("%s %s to %s\n", action, path, varname);
 	stringListAdd (pathList, vStringNewOwn (path));
 }
 
 static void prependToPathList (const char *const dir, const char *const subdir, searchPathList* const pathList, const char *const varname,
-				    bool report_in_verboe, const char* const action)
+				    bool report_in_verbose, const char* const action)
 {
 	stringListReverse (pathList);
-	appendToPathList(dir, subdir, pathList, varname, report_in_verboe, action);
+	appendToPathList(dir, subdir, pathList, varname, report_in_verbose, action);
 	stringListReverse (pathList);
 
 }
