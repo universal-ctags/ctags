@@ -1,0 +1,11 @@
+main	input.go	/^package main$/;"	p
+Point	input.go	/^type Point struct { X, Y int }$/;"	s	package:main
+main.Point	input.go	/^type Point struct { X, Y int }$/;"	s	package:main
+X	input.go	/^type Point struct { X, Y int }$/;"	m	struct:main.Point
+main.Point.X	input.go	/^type Point struct { X, Y int }$/;"	m	struct:main.Point
+Y	input.go	/^type Point struct { X, Y int }$/;"	m	struct:main.Point
+main.Point.Y	input.go	/^type Point struct { X, Y int }$/;"	m	struct:main.Point
+Render	input.go	/^func (p *Point) Render() {$/;"	f	package:main
+main.Render	input.go	/^func (p *Point) Render() {$/;"	f	package:main
+main	input.go	/^func main() {$/;"	f	package:main
+main.main	input.go	/^func main() {$/;"	f	package:main

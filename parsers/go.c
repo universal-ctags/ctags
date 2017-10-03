@@ -77,7 +77,6 @@ typedef struct sTokenInfo {
 */
 
 static int Lang_go;
-static vString *scope;
 static vString *signature = NULL;
 
 typedef enum {
@@ -501,9 +500,8 @@ static bool skipType (tokenInfo *const token)
 	return false;
 }
 
-static void makeTag (tokenInfo *const token, const goKind kind,
-	tokenInfo *const parent_token, const goKind parent_kind,
-	const char *argList)
+static int makeTag (tokenInfo *const token, const goKind kind,
+	const int scope, const char *argList)
 {
 	const char *const name = vStringValue (token->string);
 
@@ -511,48 +509,29 @@ static void makeTag (tokenInfo *const token, const goKind kind,
 	initTagEntry (&e, name, &(GoKinds [kind]));
 
 	if (!GoKinds [kind].enabled)
-		return;
+		return CORK_NIL;
 
 	e.lineNumber = token->lineNumber;
 	e.filePosition = token->filePosition;
 	if (argList)
 		e.extensionFields.signature = argList;
 
-	if (parent_kind != GOTAG_UNDEFINED && parent_token != NULL)
-	{
-		e.extensionFields.scopeKind = &(GoKinds[parent_kind]);
-		e.extensionFields.scopeName = vStringValue (parent_token->string);
-	}
-	makeTagEntry (&e);
-
-	if (scope && isXtagEnabled(XTAG_QUALIFIED_TAGS))
-	{
-		vString *qualifiedName = vStringNew ();
-		vStringCopy (qualifiedName, scope);
-		vStringPut (qualifiedName, '.');
-		vStringCat (qualifiedName, token->string);
-		e.name = vStringValue (qualifiedName);
-		markTagExtraBit (&e, XTAG_QUALIFIED_TAGS);
-		makeTagEntry (&e);
-		vStringDelete (qualifiedName);
-	}
+	e.extensionFields.scopeIndex = scope;
+	return makeTagEntry (&e);
 }
 
-static void parsePackage (tokenInfo *const token)
+static int parsePackage (tokenInfo *const token)
 {
 	readToken (token);
 	if (isType (token, TOKEN_IDENTIFIER))
 	{
-		makeTag (token, GOTAG_PACKAGE, NULL, GOTAG_UNDEFINED, NULL);
-		if (!scope && isXtagEnabled(XTAG_QUALIFIED_TAGS))
-		{
-			scope = vStringNew ();
-			vStringCopy (scope, token->string);
-		}
+		return makeTag (token, GOTAG_PACKAGE, CORK_NIL, NULL);
 	}
+	else
+		return CORK_NIL;
 }
 
-static void parseFunctionOrMethod (tokenInfo *const token)
+static void parseFunctionOrMethod (tokenInfo *const token, const int scope)
 {
 	// FunctionDecl = "func" identifier Signature [ Body ] .
 	// Body         = Block.
@@ -581,7 +560,7 @@ static void parseFunctionOrMethod (tokenInfo *const token)
 
 		vStringStripLeading (signature);
 		vStringStripTrailing (signature);
-		makeTag (functionToken, GOTAG_FUNCTION, NULL, GOTAG_UNDEFINED, signature->buffer);
+		makeTag (functionToken, GOTAG_FUNCTION, scope, signature->buffer);
 		deleteToken (functionToken);
 		vStringDelete(signature);
 
@@ -599,7 +578,7 @@ static void parseFunctionOrMethod (tokenInfo *const token)
 	}
 }
 
-static void parseStructMembers (tokenInfo *const token, tokenInfo *const parent_token)
+static void parseStructMembers (tokenInfo *const token, const int scope)
 {
 	// StructType     = "struct" "{" { FieldDecl ";" } "}" .
 	// FieldDecl      = (IdentifierList Type | AnonymousField) [ Tag ] .
@@ -632,11 +611,11 @@ static void parseStructMembers (tokenInfo *const token, tokenInfo *const parent_
 					if (memberCandidate)
 					{
 						// if we are here, there was a comma and memberCandidate isn't an anonymous field
-						makeTag (memberCandidate, GOTAG_MEMBER, parent_token, GOTAG_STRUCT, NULL);
+						makeTag (memberCandidate, GOTAG_MEMBER, scope, NULL);
 						deleteToken (memberCandidate);
 						memberCandidate = NULL;
 					}
-					makeTag (token, GOTAG_MEMBER, parent_token, GOTAG_STRUCT, NULL);
+					makeTag (token, GOTAG_MEMBER, scope, NULL);
 				}
 				readToken (token);
 			}
@@ -649,7 +628,7 @@ static void parseStructMembers (tokenInfo *const token, tokenInfo *const parent_
 		// type into memberCandidate and skipType() should return false so no tag should
 		// be generated in this case.
 		if (skipType (token) && memberCandidate)
-			makeTag (memberCandidate, GOTAG_MEMBER, parent_token, GOTAG_STRUCT, NULL);
+			makeTag (memberCandidate, GOTAG_MEMBER, scope, NULL);
 
 		if (memberCandidate)
 			deleteToken (memberCandidate);
@@ -669,7 +648,7 @@ static void parseStructMembers (tokenInfo *const token, tokenInfo *const parent_
 	}
 }
 
-static void parseConstTypeVar (tokenInfo *const token, goKind kind)
+static void parseConstTypeVar (tokenInfo *const token, goKind kind, const int scope)
 {
 	// ConstDecl      = "const" ( ConstSpec | "(" { ConstSpec ";" } ")" ) .
 	// ConstSpec      = IdentifierList [ [ Type ] "=" ExpressionList ] .
@@ -680,6 +659,7 @@ static void parseConstTypeVar (tokenInfo *const token, goKind kind)
 	// VarDecl     = "var" ( VarSpec | "(" { VarSpec ";" } ")" ) .
 	// VarSpec     = IdentifierList ( Type [ "=" ExpressionList ] | "=" ExpressionList ) .
 	bool usesParens = false;
+	int member_scope = scope;
 
 	readToken (token);
 
@@ -703,15 +683,15 @@ static void parseConstTypeVar (tokenInfo *const token, goKind kind)
 					copyToken (typeToken, token);
 					readToken (token);
 					if (isKeyword (token, KEYWORD_struct))
-						makeTag (typeToken, GOTAG_STRUCT, NULL, GOTAG_UNDEFINED, NULL);
+						member_scope = makeTag (typeToken, GOTAG_STRUCT, scope, NULL);
 					else if (isKeyword (token, KEYWORD_interface))
-						makeTag (typeToken, GOTAG_INTERFACE, NULL, GOTAG_UNDEFINED, NULL);
+						member_scope = makeTag (typeToken, GOTAG_INTERFACE, scope, NULL);
 					else
-						makeTag (typeToken, kind, NULL, GOTAG_UNDEFINED, NULL);
+						member_scope = makeTag (typeToken, kind, scope, NULL);
 					break;
 				}
 				else
-					makeTag (token, kind, NULL, GOTAG_UNDEFINED, NULL);
+					makeTag (token, kind, scope, NULL);
 				readToken (token);
 			}
 			if (!isType (token, TOKEN_COMMA))
@@ -722,7 +702,7 @@ static void parseConstTypeVar (tokenInfo *const token, goKind kind)
 		if (typeToken)
 		{
 			if (isKeyword (token, KEYWORD_struct))
-				parseStructMembers (token, typeToken);
+				parseStructMembers (token, member_scope);
 			else
 				skipType (token);
 			deleteToken (typeToken);
@@ -749,6 +729,7 @@ static void parseConstTypeVar (tokenInfo *const token, goKind kind)
 
 static void parseGoFile (tokenInfo *const token)
 {
+	int scope = CORK_NIL;
 	do
 	{
 		readToken (token);
@@ -758,19 +739,19 @@ static void parseGoFile (tokenInfo *const token)
 			switch (token->keyword)
 			{
 				case KEYWORD_package:
-					parsePackage (token);
+					scope = parsePackage (token);
 					break;
 				case KEYWORD_func:
-					parseFunctionOrMethod (token);
+					parseFunctionOrMethod (token, scope);
 					break;
 				case KEYWORD_const:
-					parseConstTypeVar (token, GOTAG_CONST);
+					parseConstTypeVar (token, GOTAG_CONST, scope);
 					break;
 				case KEYWORD_type:
-					parseConstTypeVar (token, GOTAG_TYPE);
+					parseConstTypeVar (token, GOTAG_TYPE, scope);
 					break;
 				case KEYWORD_var:
-					parseConstTypeVar (token, GOTAG_VAR);
+					parseConstTypeVar (token, GOTAG_VAR, scope);
 					break;
 				default:
 					break;
@@ -791,8 +772,6 @@ static void findGoTags (void)
 	parseGoFile (token);
 
 	deleteToken (token);
-	vStringDelete (scope);
-	scope = NULL;
 }
 
 extern parserDefinition *GoParser (void)
@@ -806,5 +785,7 @@ extern parserDefinition *GoParser (void)
 	def->initialize = initialize;
 	def->keywordTable = GoKeywordTable;
 	def->keywordCount = ARRAY_SIZE (GoKeywordTable);
+	def->useCork = true;
+	def->requestAutomaticFQTag = true;
 	return def;
 }
