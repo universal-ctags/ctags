@@ -3,6 +3,6 @@ f1	input.go	/^func f1() {$/;"	f	package:main	signature:()
 f2	input.go	/^func f2(a int) {$/;"	f	package:main	signature:(a int)
 f3	input.go	/^func f3(a int) string {$/;"	f	package:main	signature:(a int)
 f4	input.go	/^func f4(a, b, c <-chan int, d, e, f string) (A, B, C int, D string) {$/;"	f	package:main	signature:(a, b, c <-chan int, d, e, f string)
-f5	input.go	/^func (t *T) f5(\/* comment *\/ a, \/*comment*\/ \/*comment*\/       b string, $/;"	f	package:main	signature:( a, b string, c []int)
+f5	input.go	/^func (t *T) f5(\/* comment *\/ a, \/*comment*\/ \/*comment*\/       b string, $/;"	f	unknown:main.T	signature:( a, b string, c []int)
 main	input.go	/^func main() {$/;"	f	package:main	signature:()
 main	input.go	/^package main$/;"	p

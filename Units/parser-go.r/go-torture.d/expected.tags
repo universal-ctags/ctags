@@ -29,8 +29,8 @@ e	input.go	/^e T4$/;"	v	package:main
 f	input.go	/^f interface{})$/;"	v	package:main
 f1	input.go	/^func f1() {};func f2() {};type\/*no newline here*\/T9 int\/*var ignored int$/;"	f	package:main	signature:()
 f2	input.go	/^func f1() {};func f2() {};type\/*no newline here*\/T9 int\/*var ignored int$/;"	f	package:main	signature:()
-f3	input.go	/^func (t *T1) f3() (a, b int){$/;"	f	package:main	signature:()
-f4	input.go	/^func (tt * T7) f4(a func () func ()) (func (), int) {return func (){}, 1};func f5(){};const H=1$/;"	f	package:main	signature:(a func () func ())
+f3	input.go	/^func (t *T1) f3() (a, b int){$/;"	f	unknown:main.T1	signature:()
+f4	input.go	/^func (tt * T7) f4(a func () func ()) (func (), int) {return func (){}, 1};func f5(){};const H=1$/;"	f	unknown:main.T7	signature:(a func () func ())
 f5	input.go	/^func (tt * T7) f4(a func () func ()) (func (), int) {return func (){}, 1};func f5(){};const H=1$/;"	f	package:main	signature:()
 g	input.go	/^const ignored int*\/const (G=6); var g int$/;"	v	package:main
 h	input.go	/^}; var h int$/;"	v	package:main

@@ -28,6 +28,7 @@ DTD            e/element         attOwner            on      attributes owner
 DTD            p/parameterEntity condition           on      conditions
 DTD            p/parameterEntity elementName         on      element names
 DTD            p/parameterEntity partOfAttDef        on      part of attribute definition
+Go             u/unknown         receiverType        on      receiver type
 Java           p/package         imported            on      imported package
 LdScript       i/inputSection    discarded           on      discarded when linking
 LdScript       i/inputSection    mapped              on      mapped to output section
@@ -83,6 +84,7 @@ DTD            e/element         attOwner            on      attributes owner
 DTD            p/parameterEntity condition           on      conditions
 DTD            p/parameterEntity elementName         on      element names
 DTD            p/parameterEntity partOfAttDef        on      part of attribute definition
+Go             u/unknown         receiverType        on      receiver type
 Java           p/package         imported            on      imported package
 LdScript       i/inputSection    discarded           on      discarded when linking
 LdScript       i/inputSection    mapped              on      mapped to output section
