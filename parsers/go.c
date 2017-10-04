@@ -89,6 +89,7 @@ typedef enum {
 	GOTAG_STRUCT,
 	GOTAG_INTERFACE,
 	GOTAG_MEMBER,
+	GOTAG_ANONMEMBER,
 	GOTAG_UNKNOWN,
 } goKind;
 
@@ -109,6 +110,7 @@ static kindDefinition GoKinds[] = {
 	{true, 's', "struct", "structs"},
 	{true, 'i', "interface", "interfaces"},
 	{true, 'm', "member", "struct members"},
+	{true, 'M', "anonMember", "struct anonymous members"},
 	{true, 'u', "unknown", "unknown",
 	 .referenceOnly = true, ATTACH_ROLES (GoUnknownRoles)},
 };
@@ -683,11 +685,37 @@ static void parseStructMembers (tokenInfo *const token, const int scope)
 			readToken (token);
 		}
 
+		if (((!first) && isType (token, TOKEN_DOT))
+			|| (first && isType (token, TOKEN_STAR)))
+		{
+			// TypeName of AnonymousField has a dot like package"."type.
+			// Pick up the last package component, and store it to
+			// memberCandidate.
+			readToken (token);
+			while (isType (token, TOKEN_IDENTIFIER) ||
+				   isType (token, TOKEN_DOT))
+			{
+				if (isType (token, TOKEN_IDENTIFIER))
+				{
+					if (!memberCandidate)
+						memberCandidate = newToken ();
+					copyToken (memberCandidate, token);
+				}
+				readToken (token);
+			}
+		}
+
 		// in the case of  an anonymous field, we already read part of the
 		// type into memberCandidate and skipType() should return false so no tag should
 		// be generated in this case.
-		if (skipType (token) && memberCandidate)
-			makeTag (memberCandidate, GOTAG_MEMBER, scope, NULL);
+		if (memberCandidate)
+		{
+			if (skipType (token))
+				makeTag (memberCandidate, GOTAG_MEMBER, scope, NULL);
+			else
+				makeTag (memberCandidate, GOTAG_ANONMEMBER, scope, NULL);
+		}
+
 
 		if (memberCandidate)
 			deleteToken (memberCandidate);
