@@ -1,0 +1,21 @@
+main	input.go	/^package main$/;"	p
+Point	input.go	/^type Point struct { X, Y int }$/;"	s	package:main
+main.Point	input.go	/^type Point struct { X, Y int }$/;"	s	package:main
+X	input.go	/^type Point struct { X, Y int }$/;"	m	struct:main.Point
+main.Point.X	input.go	/^type Point struct { X, Y int }$/;"	m	struct:main.Point
+Y	input.go	/^type Point struct { X, Y int }$/;"	m	struct:main.Point
+main.Point.Y	input.go	/^type Point struct { X, Y int }$/;"	m	struct:main.Point
+Render	input.go	/^func (p *Point) Render() {$/;"	f	unknown:main.Point
+main.Point.Render	input.go	/^func (p *Point) Render() {$/;"	f	unknown:main.Point
+main	input.go	/^func main() {$/;"	f	package:main
+main.main	input.go	/^func main() {$/;"	f	package:main
+doNothing0	input.go	/^func (*Point) doNothing0() {$/;"	f	unknown:main.Point
+main.Point.doNothing0	input.go	/^func (*Point) doNothing0() {$/;"	f	unknown:main.Point
+doNothing1	input.go	/^func (Point) doNothing1() {$/;"	f	unknown:main.Point
+main.Point.doNothing1	input.go	/^func (Point) doNothing1() {$/;"	f	unknown:main.Point
+wrongSyntax0	input.go	/^func () wrongSyntax0() {$/;"	f	package:main
+main.wrongSyntax0	input.go	/^func () wrongSyntax0() {$/;"	f	package:main
+wrongSyntax1	input.go	/^func (+) wrongSyntax1() {$/;"	f	package:main
+main.wrongSyntax1	input.go	/^func (+) wrongSyntax1() {$/;"	f	package:main
+wrongSyntax2	input.go	/^func (a-) wrongSyntax2() {$/;"	f	unknown:main.a
+main.a.wrongSyntax2	input.go	/^func (a-) wrongSyntax2() {$/;"	f	unknown:main.a

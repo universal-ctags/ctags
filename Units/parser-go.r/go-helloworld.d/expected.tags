@@ -1,2 +1,2 @@
-main	input.go	/^func main() {$/;"	f	signature:()
+main	input.go	/^func main() {$/;"	f	package:main	signature:()
 main	input.go	/^package main$/;"	p
