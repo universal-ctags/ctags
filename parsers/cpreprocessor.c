@@ -69,6 +69,7 @@ enum eState {
  */
 typedef struct sCppState {
 	langType lang;
+	langType clientLang;
 
 	int * ungetBuffer;       /* memory buffer for unget characters */
 	int ungetBufferSize;      /* the current unget buffer size */
@@ -157,26 +158,34 @@ void cppPopExternalParserBlock()
 
 
 static cppState Cpp = {
-	LANG_IGNORE,
-	NULL,        /* ungetBuffer */
-	0,           /* ungetBufferSize */
-	NULL,        /* ungetPointer */
-	0,           /* ungetDataSize */
-	false,       /* resolveRequired */
-	false,       /* hasAtLiteralStrings */
-	false,       /* hasCxxRawLiteralStrings */
-	false,	     /* hasSingleQuoteLiteralNumbers */
-	NULL,        /* defineMacroKind */
-	.macroUndefRoleIndex   = ROLE_INDEX_DEFINITION,
-	NULL,	     /* headerKind */
+	.lang = LANG_IGNORE,
+	.clientLang = LANG_IGNORE,
+	.ungetBuffer = NULL,
+	.ungetBufferSize = 0,
+	.ungetPointer = NULL,
+	.ungetDataSize = 0,
+	.resolveRequired = false,
+	.hasAtLiteralStrings = false,
+	.hasCxxRawLiteralStrings = false,
+	.hasSingleQuoteLiteralNumbers = false,
+	.defineMacroKind = NULL,
+	.macroUndefRoleIndex = ROLE_INDEX_DEFINITION,
+	.headerKind = NULL,
 	.headerSystemRoleIndex = ROLE_INDEX_DEFINITION,
 	.headerLocalRoleIndex = ROLE_INDEX_DEFINITION,
-	{
-		DRCTV_NONE,  /* state */
-		false,       /* accept */
-		NULL,        /* tag name */
-		0,           /* nestLevel */
-		{ {false,false,false,false} }  /* ifdef array */
+	.directive = {
+		.state = DRCTV_NONE,
+		.accept = false,
+		.name = NULL,
+		.nestLevel = 0,
+		.ifdef = {
+			{
+				.ignoreAllBranches = false,
+				.singleBranch = false,
+				.singleBranch = false,
+				.ignoring = false,
+			}
+		}
 	}  /* directive */
 };
 
@@ -194,7 +203,8 @@ extern unsigned int cppGetDirectiveNestLevel (void)
 	return Cpp.directive.nestLevel;
 }
 
-extern void cppInit (const bool state, const bool hasAtLiteralStrings,
+static void cppInitCommon(langType clientLang,
+		     const bool state, const bool hasAtLiteralStrings,
 		     const bool hasCxxRawLiteralStrings,
 		     const bool hasSingleQuoteLiteralNumbers,
 		     const kindDefinition *defineMacroKind,
@@ -216,6 +226,7 @@ extern void cppInit (const bool state, const bool hasAtLiteralStrings,
 		initializeParser (t);
 	}
 
+	Cpp.clientLang = clientLang;
 	Cpp.ungetBuffer = NULL;
 	Cpp.ungetPointer = NULL;
 
@@ -246,6 +257,22 @@ extern void cppInit (const bool state, const bool hasAtLiteralStrings,
 	Cpp.directive.name = vStringNewOrClear (Cpp.directive.name);
 }
 
+extern void cppInit (const bool state, const bool hasAtLiteralStrings,
+		     const bool hasCxxRawLiteralStrings,
+		     const bool hasSingleQuoteLiteralNumbers,
+		     const kindDefinition *defineMacroKind,
+		     int macroUndefRoleIndex,
+		     const kindDefinition *headerKind,
+		     int headerSystemRoleIndex, int headerLocalRoleIndex)
+{
+	langType client = getInputLanguage ();
+
+	cppInitCommon (client, state, hasAtLiteralStrings,
+				   hasCxxRawLiteralStrings, hasSingleQuoteLiteralNumbers,
+				   defineMacroKind, macroUndefRoleIndex, headerKind,
+				   headerSystemRoleIndex, headerLocalRoleIndex);
+}
+
 extern void cppTerminate (void)
 {
 	if (Cpp.directive.name != NULL)
@@ -259,6 +286,8 @@ extern void cppTerminate (void)
 		eFree(Cpp.ungetBuffer);
 		Cpp.ungetBuffer = NULL;
 	}
+
+	Cpp.clientLang = LANG_IGNORE;
 }
 
 extern void cppBeginStatement (void)
@@ -560,19 +589,35 @@ static bool popConditional (void)
 	return isIgnore ();
 }
 
+static bool doesCPreProRunAsStandaloneParser (int kind)
+{
+	if (kind == CPREPRO_HEADER)
+		return (Cpp.headerKind == CPreProKinds + CPREPRO_HEADER);
+	else if (kind == CPREPRO_MACRO)
+		return (Cpp.defineMacroKind == CPreProKinds + CPREPRO_MACRO);
+	else
+	{
+		AssertNotReached();
+		return true;
+	}
+}
+
 static int makeDefineTag (const char *const name, const char* const signature, bool undef)
 {
 	const bool isFileScope = (bool) (! isInputHeaderFile ());
 
-	if (!isLanguageEnabled (Cpp.lang))
-		return CORK_NIL;
+	if (!isLanguageEnabled (
+			doesCPreProRunAsStandaloneParser(CPREPRO_MACRO)
+			? Cpp.lang
+			: Cpp.clientLang))
+			return CORK_NIL;
 
 	if (!Cpp.defineMacroKind)
 		return CORK_NIL;
 	if (isFileScope && !isXtagEnabled(XTAG_FILE_SCOPE))
 		return CORK_NIL;
 
-	if (Cpp.macroUndefRoleIndex == ROLE_INDEX_DEFINITION)
+	if (undef && (Cpp.macroUndefRoleIndex == ROLE_INDEX_DEFINITION))
 		return CORK_NIL;
 
 	if ( /* condition for definition tag */
@@ -584,7 +629,7 @@ static int makeDefineTag (const char *const name, const char* const signature, b
 		tagEntryInfo e;
 		int r;
 
-		if (Cpp.defineMacroKind == CPreProKinds + CPREPRO_MACRO)
+		if (doesCPreProRunAsStandaloneParser(CPREPRO_MACRO))
 			pushLanguage (Cpp.lang);
 
 		if (undef)
@@ -600,7 +645,7 @@ static int makeDefineTag (const char *const name, const char* const signature, b
 
 		r = makeTagEntry (&e);
 
-		if (Cpp.defineMacroKind == CPreProKinds + CPREPRO_MACRO)
+		if (doesCPreProRunAsStandaloneParser(CPREPRO_MACRO))
 			popLanguage ();
 
 		return r;
@@ -608,18 +653,16 @@ static int makeDefineTag (const char *const name, const char* const signature, b
 	return CORK_NIL;
 }
 
-static bool doesCPreProRunAsStandaloneParser (void)
-{
-	return (Cpp.headerKind == CPreProKinds + CPREPRO_HEADER);
-}
-
 static void makeIncludeTag (const  char *const name, bool systemHeader)
 {
 	tagEntryInfo e;
 	int role_index;
 
-	if (!isLanguageEnabled (Cpp.lang))
-		return;
+	if (!isLanguageEnabled (
+			doesCPreProRunAsStandaloneParser(CPREPRO_HEADER)
+			? Cpp.lang
+			: Cpp.clientLang))
+			return;
 
 	role_index = systemHeader? Cpp.headerSystemRoleIndex: Cpp.headerLocalRoleIndex;
 	if (role_index == ROLE_INDEX_DEFINITION)
@@ -629,7 +672,7 @@ static void makeIncludeTag (const  char *const name, bool systemHeader)
 	    && isXtagEnabled (XTAG_REFERENCE_TAGS)
 	    && Cpp.headerKind->roles [ role_index ].enabled)
 	{
-		if (doesCPreProRunAsStandaloneParser ())
+		if (doesCPreProRunAsStandaloneParser (CPREPRO_HEADER))
 			pushLanguage (Cpp.lang);
 
 		initRefTagEntry (&e, name, Cpp.headerKind, role_index);
@@ -637,7 +680,7 @@ static void makeIncludeTag (const  char *const name, bool systemHeader)
 		e.truncateLineAfterTag = true;
 		makeTagEntry (&e);
 
-		if (doesCPreProRunAsStandaloneParser ())
+		if (doesCPreProRunAsStandaloneParser (CPREPRO_HEADER))
 			popLanguage ();
 	}
 }
@@ -1239,8 +1282,8 @@ process:
 
 static void findCppTags (void)
 {
-	cppInit (0, false, false, false,
-			 NULL, 0, NULL, 0, 0);
+	cppInitCommon (Cpp.lang, 0, false, false, false,
+				   NULL, 0, NULL, 0, 0);
 
 	findRegexTagsMainloop (cppGetc);
 
