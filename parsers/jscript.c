@@ -314,7 +314,7 @@ static void makeJsTag (const tokenInfo *const token, const jsKind kind,
 
 		initTagEntry (&e, name, &(JsKinds [kind]));
 
-		JSCRIPT_DEBUG_PRINT("Emitting tag for symbol '%s' of kind %02x",name,kind);
+		JSCRIPT_DEBUG_PRINT("Emitting tag for symbol '%s' of kind %02x with scope '%s'",name,kind,vStringValue(fullscope));
 
 		e.lineNumber   = token->lineNumber;
 		e.filePosition = token->filePosition;
@@ -813,10 +813,19 @@ getNextChar:
 	LastTokenType = token->type;
 }
 
+#ifdef JSCRIPT_DO_DEBUGGING
+/* trace readTokenFull() */
+static void readTokenFullDebug (tokenInfo *const token, bool include_newlines, vString *const repr)
+{
+	readTokenFull (token, include_newlines, repr);
+	JSCRIPT_DEBUG_PRINT("token '%s' of type %02x with scope '%s'",vStringValue(token->string),token->type, vStringValue(token->scope));
+}
+# define readTokenFull readTokenFullDebug
+#endif
+
 static void readToken (tokenInfo *const token)
 {
 	readTokenFull (token, false, NULL);
-	JSCRIPT_DEBUG_PRINT("token '%s' of type %02x",vStringValue(token->string),token->type);
 }
 
 /*
@@ -2121,7 +2130,7 @@ static void parseUI5 (tokenInfo *const token)
 
 static bool parseLine (tokenInfo *const token, tokenInfo *const parent, bool is_inside_class)
 {
-	JSCRIPT_DEBUG_ENTER_TEXT("token is %s",vStringValue(token->string));
+	JSCRIPT_DEBUG_ENTER_TEXT("token is '%s' of type %02x",vStringValue(token->string),token->type);
 
 	bool is_terminated = true;
 	/*
