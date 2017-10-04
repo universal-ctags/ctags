@@ -1,0 +1,10 @@
+Cls	input.js	/^  var Cls = function() {$/;"	c	line:16	function:doesnt_extend
+Cls	input.js	/^var Cls = function() {$/;"	c	line:1
+assert	input.js	/^  function assert(expr, message) {$/;"	f	line:37	function:main
+doesnt_extend	input.js	/^function doesnt_extend() {$/;"	f	line:14
+dummy1	input.js	/^    this.dummy1 = function() {}$/;"	m	line:18	class:doesnt_extend.Cls
+dummy2	input.js	/^  Cls.prototype.dummy2 = function() {$/;"	m	line:20	class:doesnt_extend.Cls
+extend	input.js	/^function extend() {$/;"	f	line:7
+extended	input.js	/^  Cls.prototype.extended = function() {$/;"	m	line:9	class:Cls
+init	input.js	/^  this.init = function() {$/;"	m	line:2	class:Cls
+main	input.js	/^function main() {$/;"	f	line:36
