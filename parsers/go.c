@@ -110,7 +110,7 @@ static kindDefinition GoKinds[] = {
 	{true, 'i', "interface", "interfaces"},
 	{true, 'm', "member", "struct members"},
 	{true, 'u', "unknown", "unknown",
-	 .referenceOnly = false, ATTACH_ROLES (GoUnknownRoles)},
+	 .referenceOnly = true, ATTACH_ROLES (GoUnknownRoles)},
 };
 
 static const keywordTable GoKeywordTable[] = {
