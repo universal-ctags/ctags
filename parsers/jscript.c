@@ -776,7 +776,6 @@ getNextChar:
 		#define IS_STMT_SEPARATOR(t) ((t) == TOKEN_SEMICOLON    || \
 		                              (t) == TOKEN_EOF          || \
 		                              (t) == TOKEN_COMMA        || \
-		                              (t) == TOKEN_CLOSE_CURLY  || \
 		                              (t) == TOKEN_OPEN_CURLY)
 		/* these cannot be the start or end of a statement */
 		#define IS_BINARY_OPERATOR(t) ((t) == TOKEN_EQUAL_SIGN      || \
@@ -1927,13 +1926,13 @@ nextVar:
 					vStringDelete (fulltag);
 				}
 			}
+			/* Here we should be at the end of the block, on the close curly.
+			 * If so, read the next token not to confuse that close curly with
+			 * the end of the current statement. */
 			if (isType (token, TOKEN_CLOSE_CURLY))
 			{
-				/*
-				 * Assume the closing parentheses terminates
-				 * this statements.
-				 */
-				is_terminated = true;
+				readTokenFull(token, true, NULL);
+				is_terminated = isType (token, TOKEN_SEMICOLON);
 			}
 		}
 		else if (isKeyword (token, KEYWORD_new))

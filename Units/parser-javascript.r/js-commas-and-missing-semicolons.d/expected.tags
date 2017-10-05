@@ -1,0 +1,11 @@
+A	input.js	/^var A = {}, b = 2;$/;"	v
+b	input.js	/^var A = {}, b = 2;$/;"	v
+c	input.js	/^var c = 3, d = 4;$/;"	v
+d	input.js	/^var c = 3, d = 4;$/;"	v
+mem1	input.js	/^A.mem1 = function() {return 42;}, A.mem2 = function() {return 43;}$/;"	f	function:A
+mem2	input.js	/^A.mem1 = function() {return 42;}, A.mem2 = function() {return 43;}$/;"	f	function:A
+x	input.js	/^var x = {}, y = {}, z = {}$/;"	v
+y	input.js	/^var x = {}, y = {}, z = {}$/;"	v
+z	input.js	/^var x = {}, y = {}, z = {}$/;"	v
+func1	input.js	/^function func1(){var x = {}} function func2(){}$/;"	f
+func2	input.js	/^function func1(){var x = {}} function func2(){}$/;"	f
