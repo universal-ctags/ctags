@@ -1719,7 +1719,7 @@ nextVar:
 			} while (isType (token, TOKEN_PERIOD));
 		}
 		else
-			readToken (token);
+			readTokenFull (token, true, NULL);
 
 		if ( isType (token, TOKEN_OPEN_PAREN) )
 			skipArgumentList(token, false, NULL);
