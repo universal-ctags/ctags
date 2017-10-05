@@ -514,7 +514,7 @@ static bool skipType (tokenInfo *const token)
 }
 
 static int makeTag (tokenInfo *const token, const goKind kind,
-	const int scope, const char *argList)
+	const int scope, const char *argList, const char *typeref)
 {
 	const char *const name = vStringValue (token->string);
 
@@ -533,6 +533,12 @@ static int makeTag (tokenInfo *const token, const goKind kind,
 	e.filePosition = token->filePosition;
 	if (argList)
 		e.extensionFields.signature = argList;
+	if (typeref)
+	{
+		/* Follows Cxx parser convention */
+		e.extensionFields.typeRef [0] = "typename";
+		e.extensionFields.typeRef [1] = typeref;
+	}
 
 	e.extensionFields.scopeIndex = scope;
 	return makeTagEntry (&e);
@@ -543,7 +549,7 @@ static int parsePackage (tokenInfo *const token)
 	readToken (token);
 	if (isType (token, TOKEN_IDENTIFIER))
 	{
-		return makeTag (token, GOTAG_PACKAGE, CORK_NIL, NULL);
+		return makeTag (token, GOTAG_PACKAGE, CORK_NIL, NULL, NULL);
 	}
 	else
 		return CORK_NIL;
@@ -615,10 +621,11 @@ static void parseFunctionOrMethod (tokenInfo *const token, const int scope)
 		vStringStripTrailing (signature);
 		if (receiver_type_token)
 			func_scope = makeTag(receiver_type_token, GOTAG_UNKNOWN,
-								 scope, NULL);
+								 scope, NULL, NULL);
 		else
 			func_scope = scope;
-		makeTag (functionToken, GOTAG_FUNCTION, func_scope, signature->buffer);
+		makeTag (functionToken, GOTAG_FUNCTION,
+				 func_scope, signature->buffer, NULL);
 		deleteToken (functionToken);
 		vStringDelete(signature);
 
@@ -650,6 +657,8 @@ static void parseStructMembers (tokenInfo *const token, const int scope)
 	if (!isType (token, TOKEN_OPEN_CURLY))
 		return;
 
+	vString *typeForAnonMember = vStringNew ();
+
 	readToken (token);
 	while (!isType (token, TOKEN_EOF) && !isType (token, TOKEN_CLOSE_CURLY))
 	{
@@ -672,11 +681,11 @@ static void parseStructMembers (tokenInfo *const token, const int scope)
 					if (memberCandidate)
 					{
 						// if we are here, there was a comma and memberCandidate isn't an anonymous field
-						makeTag (memberCandidate, GOTAG_MEMBER, scope, NULL);
+						makeTag (memberCandidate, GOTAG_MEMBER, scope, NULL, NULL);
 						deleteToken (memberCandidate);
 						memberCandidate = NULL;
 					}
-					makeTag (token, GOTAG_MEMBER, scope, NULL);
+					makeTag (token, GOTAG_MEMBER, scope, NULL, NULL);
 				}
 				readToken (token);
 			}
@@ -684,6 +693,12 @@ static void parseStructMembers (tokenInfo *const token, const int scope)
 				break;
 			readToken (token);
 		}
+
+		if (first && isType (token, TOKEN_STAR))
+			vStringPut (typeForAnonMember, '*');
+
+		if (memberCandidate)
+			vStringCat (typeForAnonMember, memberCandidate->string);
 
 		if (((!first) && isType (token, TOKEN_DOT))
 			|| (first && isType (token, TOKEN_STAR)))
@@ -700,6 +715,11 @@ static void parseStructMembers (tokenInfo *const token, const int scope)
 					if (!memberCandidate)
 						memberCandidate = newToken ();
 					copyToken (memberCandidate, token);
+					if (vStringLength (typeForAnonMember) > 0
+						&& (! (vStringLength (typeForAnonMember) == 1
+							   && vStringItem(typeForAnonMember, 0) == '*')))
+						vStringPut (typeForAnonMember, '.');
+					vStringCat (typeForAnonMember, memberCandidate->string);
 				}
 				readToken (token);
 			}
@@ -711,14 +731,17 @@ static void parseStructMembers (tokenInfo *const token, const int scope)
 		if (memberCandidate)
 		{
 			if (skipType (token))
-				makeTag (memberCandidate, GOTAG_MEMBER, scope, NULL);
+				makeTag (memberCandidate, GOTAG_MEMBER, scope, NULL, NULL);
 			else
-				makeTag (memberCandidate, GOTAG_ANONMEMBER, scope, NULL);
+				makeTag (memberCandidate, GOTAG_ANONMEMBER, scope, NULL,
+						 vStringValue(typeForAnonMember));
 		}
 
 
 		if (memberCandidate)
 			deleteToken (memberCandidate);
+
+		vStringClear (typeForAnonMember);
 
 		while (!isType (token, TOKEN_SEMICOLON) && !isType (token, TOKEN_CLOSE_CURLY)
 				&& !isType (token, TOKEN_EOF))
@@ -733,6 +756,8 @@ static void parseStructMembers (tokenInfo *const token, const int scope)
 			readToken (token);
 		}
 	}
+
+	vStringDelete (typeForAnonMember);
 }
 
 static void parseConstTypeVar (tokenInfo *const token, goKind kind, const int scope)
@@ -770,15 +795,18 @@ static void parseConstTypeVar (tokenInfo *const token, goKind kind, const int sc
 					copyToken (typeToken, token);
 					readToken (token);
 					if (isKeyword (token, KEYWORD_struct))
-						member_scope = makeTag (typeToken, GOTAG_STRUCT, scope, NULL);
+						member_scope = makeTag (typeToken, GOTAG_STRUCT,
+												scope, NULL, NULL);
 					else if (isKeyword (token, KEYWORD_interface))
-						member_scope = makeTag (typeToken, GOTAG_INTERFACE, scope, NULL);
+						member_scope = makeTag (typeToken, GOTAG_INTERFACE,
+												scope, NULL, NULL);
 					else
-						member_scope = makeTag (typeToken, kind, scope, NULL);
+						member_scope = makeTag (typeToken, kind,
+												scope, NULL, NULL);
 					break;
 				}
 				else
-					makeTag (token, kind, scope, NULL);
+					makeTag (token, kind, scope, NULL, NULL);
 				readToken (token);
 			}
 			if (!isType (token, TOKEN_COMMA))
