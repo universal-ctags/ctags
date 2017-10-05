@@ -11,6 +11,7 @@
 #include "keyword.h"
 #include "read.h"
 #include "main.h"
+#include "objpool.h"
 #include "routines.h"
 #include "vstring.h"
 #include "options.h"
@@ -24,6 +25,8 @@
 #define isKeyword(token,k) (bool) ((token)->keyword == (k))
 #define isStartIdentChar(c) (isalpha (c) ||  (c) == '_' || (c) > 128) /* XXX UTF-8 */
 #define isIdentChar(c) (isStartIdentChar (c) || isdigit (c))
+#define newToken() (objPoolGet (TokenPool))
+#define deleteToken(t) (objPoolPut (TokenPool, (t)))
 
 /*
  *	 DATA DECLARATIONS
@@ -77,6 +80,7 @@ typedef struct sTokenInfo {
 */
 
 static int Lang_go;
+static objPool *TokenPool = NULL;
 static vString *signature = NULL;
 
 typedef enum {
@@ -132,20 +136,22 @@ static const keywordTable GoKeywordTable[] = {
 *   FUNCTION DEFINITIONS
 */
 
-static void initialize (const langType language)
-{
-	Lang_go = language;
-}
-
-static tokenInfo *newToken (void)
+static void *newPoolToken (void *createArg CTAGS_ATTR_UNUSED)
 {
 	tokenInfo *const token = xMalloc (1, tokenInfo);
+	token->string = vStringNew ();
+	return token;
+}
+
+static void clearPoolToken (void *data)
+{
+	tokenInfo *token = data;
+
 	token->type = TOKEN_NONE;
 	token->keyword = KEYWORD_NONE;
-	token->string = vStringNew ();
-	token->lineNumber = getInputLineNumber ();
+	token->lineNumber   = getInputLineNumber ();
 	token->filePosition = getInputFilePosition ();
-	return token;
+	vStringClear (token->string);
 }
 
 static void copyToken (tokenInfo *const dest, const tokenInfo *const other)
@@ -157,13 +163,26 @@ static void copyToken (tokenInfo *const dest, const tokenInfo *const other)
 	dest->filePosition = other->filePosition;
 }
 
-static void deleteToken (tokenInfo * const token)
+static void deletePoolToken (void* data)
 {
-	if (token != NULL)
-	{
-		vStringDelete (token->string);
-		eFree (token);
-	}
+	tokenInfo * const token = data;
+
+	vStringDelete (token->string);
+	eFree (token);
+}
+
+static void initialize (const langType language)
+{
+	Lang_go = language;
+	TokenPool = objPoolNew (16, newPoolToken, deletePoolToken, clearPoolToken, NULL);
+}
+
+static void finalize (const langType language, bool initialized)
+{
+	if (!initialized)
+		return;
+
+	objPoolDelete (TokenPool);
 }
 
 /*
@@ -898,6 +917,7 @@ extern parserDefinition *GoParser (void)
 	def->extensions = extensions;
 	def->parser = findGoTags;
 	def->initialize = initialize;
+	def->finalize = finalize;
 	def->keywordTable = GoKeywordTable;
 	def->keywordCount = ARRAY_SIZE (GoKeywordTable);
 	def->useCork = true;
