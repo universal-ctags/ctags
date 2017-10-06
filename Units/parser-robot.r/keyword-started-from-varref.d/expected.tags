@@ -1,0 +1,17 @@
+myvar	input.robot	/^${myvar}    variable_value$/;"	v
+My Regular Keyword	input.robot	/^My Regular Keyword$/;"	k
+My_Regular_Keyword	input.robot	/^My Regular Keyword$/;"	k
+${embedded arg} Starting Single	input.robot	/^${embedded arg} Starting Single$/;"	k
+${embedded_arg}_Starting_Single	input.robot	/^${embedded arg} Starting Single$/;"	k
+${embedded arg1} Starting ${embedded arg2} Multiple	input.robot	/^${embedded arg1} Starting ${embedded arg2} Multiple$/;"	k
+${embedded_arg1}_Starting_${embedded_arg2}_Multiple	input.robot	/^${embedded arg1} Starting ${embedded arg2} Multiple$/;"	k
+${embedded arg1} Starting And ${embedded arg2} Ending ${embedded arg3}	input.robot	/^${embedded arg1} Starting And ${embedded arg2} Ending ${embedded arg3}$/;"	k
+${embedded_arg1}_Starting_And_${embedded_arg2}_Ending_${embedded_arg3}	input.robot	/^${embedded arg1} Starting And ${embedded arg2} Ending ${embedded arg3}$/;"	k
+Middle ${embedded arg} Single Arguments	input.robot	/^Middle ${embedded arg} Single Arguments$/;"	k
+Middle_${embedded_arg}_Single_Arguments	input.robot	/^Middle ${embedded arg} Single Arguments$/;"	k
+Middle ${embedded arg1} Multiple ${embedded arg2} Arguments	input.robot	/^Middle ${embedded arg1} Multiple ${embedded arg2} Arguments$/;"	k
+Middle_${embedded_arg1}_Multiple_${embedded_arg2}_Arguments	input.robot	/^Middle ${embedded arg1} Multiple ${embedded arg2} Arguments$/;"	k
+Ending Single ${embedded arg}	input.robot	/^Ending Single ${embedded arg}$/;"	k
+Ending_Single_${embedded_arg}	input.robot	/^Ending Single ${embedded arg}$/;"	k
+Ending Multiple ${embedded arg1} And ${embedded arg2}	input.robot	/^Ending Multiple ${embedded arg1} And ${embedded arg2}$/;"	k
+Ending_Multiple_${embedded_arg1}_And_${embedded_arg2}	input.robot	/^Ending Multiple ${embedded arg1} And ${embedded arg2}$/;"	k
