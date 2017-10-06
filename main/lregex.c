@@ -1116,7 +1116,7 @@ static void matchTagPattern (struct lregexControlBlock *lcb,
 	vStringDelete (name);
 }
 
-static void matchCallbackPattern (
+static bool matchCallbackPattern (
 		const vString* const line, const regexPattern* const patbuf,
 		const regmatch_t* const pmatch)
 {
@@ -1134,7 +1134,7 @@ static void matchCallbackPattern (
 		if (pmatch [i].rm_so != -1)
 			count = i + 1;
 	}
-	patbuf->u.callback.function (vStringValue (line), matches, count,
+	return patbuf->u.callback.function (vStringValue (line), matches, count,
 				     patbuf->u.callback.userData);
 }
 
@@ -1159,7 +1159,7 @@ static bool matchRegexPattern (struct lregexControlBlock *lcb,
 		if (patbuf->type == PTRN_TAG)
 			matchTagPattern (lcb, vStringValue (line), patbuf, pmatch, 0);
 		else if (patbuf->type == PTRN_CALLBACK)
-			matchCallbackPattern (line, patbuf, pmatch);
+			result = matchCallbackPattern (line, patbuf, pmatch);
 		else
 		{
 			Assert ("invalid pattern type" == NULL);
