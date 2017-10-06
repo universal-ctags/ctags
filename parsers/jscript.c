@@ -1031,7 +1031,13 @@ static bool parseLoop (tokenInfo *const token)
 				skipArgumentList(token, true, NULL);
 			}
 			if (! isType (token, TOKEN_SEMICOLON))
-				is_terminated = false;
+			{
+				/* oddly enough, `do {} while (0) var foo = 42` is perfectly
+				 * valid JS, so explicitly handle the remaining of the line
+				 * for the sake of the root scope handling (as parseJsFile()
+				 * always advances a token not to ever get stuck) */
+				is_terminated = parseLine(token, false);
+			}
 		}
 	}
 
