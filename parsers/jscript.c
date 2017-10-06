@@ -1187,9 +1187,11 @@ static bool parseBlock (tokenInfo *const token, const vString *const parentScope
 
 	vStringCopy(saveScope, token->scope);
 	if (parentScope)
+	{
 		addToScope (token, parentScope);
+		token->nestLevel++;
+	}
 
-	token->nestLevel++;
 	/*
 	 * Make this routine a bit more forgiving.
 	 * If called on an open_curly advance it
@@ -1263,7 +1265,8 @@ static bool parseBlock (tokenInfo *const token, const vString *const parentScope
 
 	vStringCopy(token->scope, saveScope);
 	vStringDelete(saveScope);
-	token->nestLevel--;
+	if (parentScope)
+		token->nestLevel--;
 
 	JSCRIPT_DEBUG_LEAVE();
 
