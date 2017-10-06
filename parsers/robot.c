@@ -144,7 +144,7 @@ static void initialize (const langType language)
 
     addLanguageCallbackRegex (
 		language,
-		"(^([A-Za-z0-9]+|\\$\\{[_A-Za-z0-9][' _A-Za-z0-9]+\\})([${}' _][-${}A-Za-z0-9]+)*)",
+		"(^([A-Za-z0-9]+|\\$\\{[_A-Za-z0-9][' _A-Za-z0-9]*(:([^}]|\\\\|)+)*\\})([${}' _]([-_$A-Za-z0-9]+|\\{[_A-Za-z0-9][' _A-Za-z0-9]*(:([^}]|\\\\|)+)*\\})+)*)",
 		"{exclusive}", tagKeywordsAndTestCases, NULL, NULL);
 
     addLanguageCallbackRegex (language, "^[$@]\\{([_A-Za-z0-9][' _A-Za-z0-9]+)\\}  [ ]*.+",
