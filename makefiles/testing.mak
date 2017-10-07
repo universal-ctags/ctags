@@ -67,6 +67,18 @@ chop: $(CTAGS_TEST)
 		$${VALGRIND} --run-shrink \
 		--with-timeout=$(TIMEOUT)"; \
 	$(SHELL) $${c} $(srcdir)/Units
+slap: $(CTAGS_TEST)
+	@ \
+	if test -n "$${ZSH_VERSION+set}"; then set -o SH_WORD_SPLIT; fi; \
+	if test x$(VG) = x1; then		\
+		VALGRIND=--with-valgrind;	\
+	fi;					\
+	c="$(srcdir)/misc/units slap \
+		--ctags=$(CTAGS_TEST) \
+		--languages=$(LANGUAGES) \
+		$${VALGRIND} --run-shrink \
+		--with-timeout=$(TIMEOUT)"; \
+	$(SHELL) $${c} $(srcdir)/Units
 
 #
 # UNITS Target

@@ -2144,7 +2144,7 @@ EOF
 help_chop ()
 {
 cat <<EOF
-$0 chop [OPTIONS] UNITS-DIR
+$0 chop|slap [OPTIONS] UNITS-DIR
 
 	   OPTIONS:
 
@@ -2163,22 +2163,40 @@ EOF
 
 action_chop ()
 {
-    action_fuzz_common chop_lang "$@"
+    if [ "$1" = "chop" ]; then
+	action_fuzz_common chop_lang "$@"
+    else
+	action_fuzz_common slap_lang "$@"
+    fi
 }
 
-chop_lang ()
+chop_lang()
 {
+    chop_lang_common "tail" "$@"
+}
+
+slap_lang()
+{
+    chop_lang_common "head" "$@"
+}
+
+chop_lang_common ()
+{
+    local endpoint=$1
+    shift 1
+
     local lang="$1"
     local dir="$2"
     shift 2
     local f
     local r
-    printf '%-60s\n' "Fuzzing by chopping input (${lang})"
+
+    printf '%-60s\n' "Fuzzing by truncating input from ${endpoint} (${lang})"
     line '-'
 
     r=0
     for f in $(find "${dir}" -type f -name 'input.*'); do
-	if ! chop_lang_file "${lang}" "${f}"; then
+	if ! chop_lang_file "$1" "${lang}" "${f}"; then
 	    r=1
 	    break
 	fi
@@ -2189,6 +2207,9 @@ chop_lang ()
 
 chop_lang_file ()
 {
+    local endpoint=$1
+    shift 1
+
     local lang="$1"
     local input="$2"
     shift 2
@@ -2210,7 +2231,7 @@ chop_lang_file ()
 
     r=0
     while [ "$i" -lt "$len" ]; do
-	if chop_lang_file_chopspec "${input}" "${len}" "$i" "${lang}"; then
+	if chop_lang_file_chopspec "${endpoint}" "${input}" "${len}" "$i" "${lang}"; then
 	    i=$(( i + 1 ))
 	else
 	    r=1
@@ -2223,14 +2244,23 @@ chop_lang_file ()
 
 chop()
 {
-    local input=$1
-    local pos=$2
+    local endpoint=$1
+    local input=$2
+    local pos=$3
+    local len=$4
 
-    dd if=$input bs=1 count=$pos
+    if [ "${endpoint}" = "tail" ]; then
+	dd if=$input bs=1 count=$pos
+    else
+	dd if=$input bs=1 count=$((len - pos)) skip=$pos
+    fi
 }
 
 chop_lang_file_chopspec()
 {
+    local endpoint=$1
+    shift 1
+
     local input="$1"
     local len="$2"
     local pos="$3"
@@ -2257,7 +2287,7 @@ chop_lang_file_chopspec()
     fi
     cmdline_for_shirking="${_CMDLINE_FOR_SHRINKING} --language-force=${lang} %s"
 
-    chop "${input}" "${pos}" > "$ochopped"  2> /dev/null
+    chop "${endpoint}" "${input}" "${pos}" "${len}" > "$ochopped"  2> /dev/null
 
     progress_offset=$(( pos % _NOISE_REPORT_MAX_COLUMN ))
     if [ "${progress_offset}" -eq 0 ]; then
@@ -2353,6 +2383,10 @@ main ()
 	    return $?
 	    ;;
 	chop)
+	    action_chop "$@"
+	    return $?
+	    ;;
+	slap)
 	    action_chop "$@"
 	    return $?
 	    ;;
