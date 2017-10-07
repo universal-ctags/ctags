@@ -1739,24 +1739,20 @@ TMPDIR
 FILES
 -----
 
-/ctags.cnf (on MSDOS, MSWindows only)
 
-/etc/ctags.conf
+$HOME/.ctags.d/\*.ctags
 
-@prefix@/etc/ctags.conf
+$HOMEDRIVE$HOMEPATH/ctags.d/\*.ctags
 
-$HOME/.ctags
+.ctags.d/\*.ctags
 
-$HOME/ctags.cnf (on MSDOS, MSWindows only)
+ctags.d/\*.ctags
 
-.ctags
-
-ctags.cnf (on MSDOS, MSWindows only)
 	If any of these configuration files exist, each will be expected to
 	contain a set of default options which are read in the order listed
 	when @CTAGS_NAME_EXECUTABLE@ starts, but before the CTAGS environment
 	variable is read or any command line options are read. This makes it
-	possible to set up site-wide, personal or project-level defaults. It
+	possible to set up personal or project-level defaults. It
 	is possible to compile @CTAGS_NAME_EXECUTABLE@ to read an additional
 	configuration file before any of those shown above, which will be
 	indicated if the output produced by the ``--version`` option lists the
@@ -1764,9 +1760,13 @@ ctags.cnf (on MSDOS, MSWindows only)
 	variable or on the command line will override options specified in these
 	files. Only options will be read from these files. Note that the option
 	files are read in line-oriented mode in which spaces are significant
-	(since shell quoting is not possible). Each line of the file is read as
+	(since shell quoting is not possible) but spaces at the beginning
+	of a line are ignored. Each line of the file is read as
 	one command line parameter (as if it were quoted with single quotes).
 	Therefore, use new lines to indicate separate command-line arguments.
+	A line started with '#' is treated as a comment.
+
+	\*.ctags files in a directory is loaded in alphabetical order.
 
 tags
 	The default tag file created by @CTAGS_NAME_EXECUTABLE@.
