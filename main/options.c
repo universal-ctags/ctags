@@ -363,8 +363,8 @@ static optionDescription LongOptionDescription [] = {
 #endif
  {1,"  --mline-regex-<LANG>=/line_pattern/name_pattern/[flags]"},
  {1,"       Define multiline regular expression for locating tags in specific language."},
- {1,"  --options=file"},
- {1,"       Specify file from which command line options should be read."},
+ {1,"  --options=path"},
+ {1,"       Specify file(or directory) from which command line options should be read."},
  {1,"  --optlib-dir=[+]DIR"},
  {1,"      Add or set DIR to optlib search path."},
 #ifdef HAVE_ICONV
