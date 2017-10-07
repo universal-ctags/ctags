@@ -3275,7 +3275,7 @@ static int accept_only_dot_ctags(const struct dirent* dent)
 	return 0;
 }
 
-static int local_insenstive_alphasort(const struct dirent ** a,
+static int alphaSort(const struct dirent ** a,
 									  const struct dirent ** b)
 {
 	return strcmp ((*a)->d_name, (*b)->d_name);
@@ -3287,7 +3287,7 @@ static bool parseAllConfigurationFilesOptionsInDirectory (const char* const dirN
 	struct dirent **dents;
 	int i, n;
 
-	n = scanDirectory (dirName, &dents, ignore_dot_file, local_insenstive_alphasort);
+	n = scanDirectory (dirName, &dents, ignore_dot_file, alphaSort);
 	if (n < 0)
 		return false;
 
