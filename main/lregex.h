@@ -37,7 +37,10 @@ enum regexParserType {
 	REG_PARSER_MULTI_TABLE,
 };
 
-typedef void (*regexCallback) (const char *line, const regexMatch *matches, unsigned int count,
+/* Return value is referred when {exclusive} is also specified.
+   The input line is consumed when "{exclusive}" is specified and
+   the value returned from the callback function is true. */
+typedef bool (*regexCallback) (const char *line, const regexMatch *matches, unsigned int count,
 			       void *userData);
 
 struct lregexControlBlock;

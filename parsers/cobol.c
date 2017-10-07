@@ -91,23 +91,25 @@ static void cobol_make_tag_maybe (const char *line,
 	}
 }
 
-static void make_tag_for_data_maybe (const char *line,
+static bool make_tag_for_data_maybe (const char *line,
 									 const regexMatch *matches,
 									 unsigned int count,
 									 void *data)
 {
 	cobol_make_tag_maybe (line, matches, count, *(langType *)data, 1, K_DATA);
+	return true;
 }
 
-static void make_tag_for_paragraph_maybe (const char *line,
+static bool make_tag_for_paragraph_maybe (const char *line,
 										  const regexMatch *matches,
 										  unsigned int count,
 										  void *data)
 {
 	cobol_make_tag_maybe (line, matches, count, *(langType *)data, 1, K_PARAGRAPH);
+	return true;
 }
 
-static void make_tag_for_copied_in_sourcefile (const char *line,
+static bool make_tag_for_copied_in_sourcefile (const char *line,
 											   const regexMatch *matches,
 											   unsigned int count,
 											   void *data CTAGS_ATTR_UNUSED)
@@ -120,6 +122,7 @@ static void make_tag_for_copied_in_sourcefile (const char *line,
 		makeSimpleRefTag (name, CobolKinds, K_SOURCEFILE, COBOL_SOURCEFILE_COPIED);
 		vStringDelete (name);
 	}
+	return true;
 }
 
 static void initializeCobolParser (langType language)

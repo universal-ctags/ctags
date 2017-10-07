@@ -34,7 +34,7 @@ struct cStart {
 	unsigned long source;
 };
 
-static  void change_section (const char *line CTAGS_ATTR_UNUSED,
+static  bool change_section (const char *line CTAGS_ATTR_UNUSED,
 			     const regexMatch *matches CTAGS_ATTR_UNUSED,
 			     unsigned int count CTAGS_ATTR_UNUSED,
 			     void *data CTAGS_ATTR_UNUSED)
@@ -69,9 +69,10 @@ static  void change_section (const char *line CTAGS_ATTR_UNUSED,
 
 		makePromise ("C", c_start, 0, c_end, endCharOffset, c_source_start);
 	}
+	return true;
 }
 
-static void enter_c_prologue (const char *line CTAGS_ATTR_UNUSED,
+static bool enter_c_prologue (const char *line CTAGS_ATTR_UNUSED,
 			      const regexMatch *matches CTAGS_ATTR_UNUSED,
 			      unsigned int count CTAGS_ATTR_UNUSED,
 			      void *data)
@@ -82,9 +83,10 @@ static void enter_c_prologue (const char *line CTAGS_ATTR_UNUSED,
 	readLineFromInputFile ();
 	cstart->input  = getInputLineNumber ();
 	cstart->source = getSourceLineNumber ();
+	return true;
 }
 
-static void leave_c_prologue (const char *line CTAGS_ATTR_UNUSED,
+static bool leave_c_prologue (const char *line CTAGS_ATTR_UNUSED,
 			      const regexMatch *matches CTAGS_ATTR_UNUSED,
 			      unsigned int count CTAGS_ATTR_UNUSED,
 			      void *data)
@@ -95,9 +97,11 @@ static void leave_c_prologue (const char *line CTAGS_ATTR_UNUSED,
 	c_end = getInputLineNumber ();
 	makePromise ("C", cstart->input, 0, c_end, 0, cstart->source);
 	memset (cstart, 0, sizeof (*cstart));
+
+	return true;
 }
 
-static void enter_union (const char *line CTAGS_ATTR_UNUSED,
+static bool enter_union (const char *line CTAGS_ATTR_UNUSED,
 			 const regexMatch *matches CTAGS_ATTR_UNUSED,
 			 unsigned int count CTAGS_ATTR_UNUSED,
 			 void *data)
@@ -110,9 +114,10 @@ static void enter_union (const char *line CTAGS_ATTR_UNUSED,
 		cstart->input = getInputLineNumber ();
 		cstart->source = getInputLineNumber ();
 	}
+	return true;
 }
 
-static void leave_union (const char *line CTAGS_ATTR_UNUSED,
+static bool leave_union (const char *line CTAGS_ATTR_UNUSED,
 			 const regexMatch *matches CTAGS_ATTR_UNUSED,
 			 unsigned int count CTAGS_ATTR_UNUSED,
 			 void *data)
@@ -132,6 +137,7 @@ static void leave_union (const char *line CTAGS_ATTR_UNUSED,
 		memset (cstart, 0, sizeof (*cstart));
 		in_union = false;
 	}
+	return true;
 }
 
 static void initializeYaccParser (langType language)

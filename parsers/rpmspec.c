@@ -76,7 +76,7 @@ static bool is_line_continued(const char *line)
 		|| ((len >= 2) && (line[len - 1] == '\n') && (line[len - 2] == '\\')))? true: false;
 }
 
-static void found_macro_cb (const char *line,
+static bool found_macro_cb (const char *line,
 			    const regexMatch *matches,
 			    unsigned int count,
 			    void *uesrData)
@@ -117,9 +117,10 @@ static void found_macro_cb (const char *line,
 		if (signature)
 			vStringDelete (signature);
 	}
+	return true;
 }
 
-static void found_tag_cb (const char *line,
+static bool found_tag_cb (const char *line,
 			  const regexMatch *matches,
 			  unsigned int count,
 			  void *userData)
@@ -142,9 +143,10 @@ static void found_tag_cb (const char *line,
 		}
 		vStringDelete (name);
 	}
+	return true;
 }
 
-static void found_package_cb (const char *line,
+static bool found_package_cb (const char *line,
 			      const regexMatch *matches,
 			      unsigned int count,
 			      void *userData)
@@ -160,6 +162,7 @@ static void found_package_cb (const char *line,
 		makeTagEntry (&tag);
 		vStringDelete (name);
 	}
+	return true;
 }
 
 static void initializeRpmSpecParser (langType language)

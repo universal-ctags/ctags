@@ -1,0 +1,33 @@
+myvar	input.robot	/^${myvar}    variable_value$/;"	v
+My Regular Keyword	input.robot	/^My Regular Keyword$/;"	k
+My_Regular_Keyword	input.robot	/^My Regular Keyword$/;"	k
+${embedded arg} Starting Single	input.robot	/^${embedded arg} Starting Single$/;"	k
+${embedded_arg}_Starting_Single	input.robot	/^${embedded arg} Starting Single$/;"	k
+${e} Starting Single Letter	input.robot	/^${e} Starting Single Letter$/;"	k
+${e}_Starting_Single_Letter	input.robot	/^${e} Starting Single Letter$/;"	k
+${embedded arg:value1|value2} Starting Single With Regex	input.robot	/^${embedded arg:value1|value2} Starting Single With Regex$/;"	k
+${embedded_arg:value1|value2}_Starting_Single_With_Regex	input.robot	/^${embedded arg:value1|value2} Starting Single With Regex$/;"	k
+${embedded arg1} Starting ${embedded arg2} Multiple	input.robot	/^${embedded arg1} Starting ${embedded arg2} Multiple$/;"	k
+${embedded_arg1}_Starting_${embedded_arg2}_Multiple	input.robot	/^${embedded arg1} Starting ${embedded arg2} Multiple$/;"	k
+${embedded arg1} Starting ${embedded arg2:value1|value2} Multiple With Regex	input.robot	/^${embedded arg1} Starting ${embedded arg2:value1|value2} Multiple With Regex$/;"	k
+${embedded_arg1}_Starting_${embedded_arg2:value1|value2}_Multiple_With_Regex	input.robot	/^${embedded arg1} Starting ${embedded arg2:value1|value2} Multiple With Regex$/;"	k
+${embedded arg1} Starting And ${embedded arg2} Ending ${embedded arg3}	input.robot	/^${embedded arg1} Starting And ${embedded arg2} Ending ${embedded arg3}$/;"	k
+${embedded_arg1}_Starting_And_${embedded_arg2}_Ending_${embedded_arg3}	input.robot	/^${embedded arg1} Starting And ${embedded arg2} Ending ${embedded arg3}$/;"	k
+Middle ${embedded arg} Single Arguments	input.robot	/^Middle ${embedded arg} Single Arguments$/;"	k
+Middle_${embedded_arg}_Single_Arguments	input.robot	/^Middle ${embedded arg} Single Arguments$/;"	k
+Middle ${embedded arg1} Multiple ${embedded arg2} Arguments	input.robot	/^Middle ${embedded arg1} Multiple ${embedded arg2} Arguments$/;"	k
+Middle_${embedded_arg1}_Multiple_${embedded_arg2}_Arguments	input.robot	/^Middle ${embedded arg1} Multiple ${embedded arg2} Arguments$/;"	k
+Middle ${embedded arg:value1|value2} Single Arguments With Regex	input.robot	/^Middle ${embedded arg:value1|value2} Single Arguments With Regex$/;"	k
+Middle_${embedded_arg:value1|value2}_Single_Arguments_With_Regex	input.robot	/^Middle ${embedded arg:value1|value2} Single Arguments With Regex$/;"	k
+Middle ${e} Single Letter Arguments	input.robot	/^Middle ${e} Single Letter Arguments$/;"	k
+Middle_${e}_Single_Letter_Arguments	input.robot	/^Middle ${e} Single Letter Arguments$/;"	k
+Ending Single ${embedded arg}	input.robot	/^Ending Single ${embedded arg}$/;"	k
+Ending_Single_${embedded_arg}	input.robot	/^Ending Single ${embedded arg}$/;"	k
+Ending Multiple ${embedded arg1} And ${embedded arg2}	input.robot	/^Ending Multiple ${embedded arg1} And ${embedded arg2}$/;"	k
+Ending_Multiple_${embedded_arg1}_And_${embedded_arg2}	input.robot	/^Ending Multiple ${embedded arg1} And ${embedded arg2}$/;"	k
+My Keyword_with_underscore-and-dashes	input.robot	/^My Keyword_with_underscore-and-dashes$/;"	k
+My Keyword with underscore-and-dashes	input.robot	/^My Keyword_with_underscore-and-dashes$/;"	k
+My Keyword_With $ dollar sign	input.robot	/^My Keyword_With $ dollar sign$/;"	k
+My Keyword With $ dollar sign	input.robot	/^My Keyword_With $ dollar sign$/;"	k
+My Test With Template1	input.robot	/^My Test With Template1        My Kw 1        My Kw 2$/;"	t
+My_Test_With_Template1	input.robot	/^My Test With Template1        My Kw 1        My Kw 2$/;"	t

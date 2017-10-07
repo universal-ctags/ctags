@@ -71,7 +71,7 @@ static bool whitespaceSwap (vString *const s)
 		return changed;
 }
 
-static void changeSection (const char *const line, const regexMatch *const matches,
+static bool changeSection (const char *const line, const regexMatch *const matches,
                                const unsigned int count CTAGS_ATTR_UNUSED, void *data CTAGS_ATTR_UNUSED)
 {
     const char * const matchedSection = line + matches[1].start;
@@ -88,6 +88,7 @@ static void changeSection (const char *const line, const regexMatch *const match
     {
         section = K_VARIABLE;
     }
+	return true;
 }
 
 static void makeSimpleXTag (const vString* const name, kindDefinition* const kinds, const int kind,
@@ -100,7 +101,7 @@ static void makeSimpleXTag (const vString* const name, kindDefinition* const kin
 	makeTagEntry (&e);
 }
 
-static void tagKeywordsAndTestCases (const char *const line, const regexMatch *const matches,
+static bool tagKeywordsAndTestCases (const char *const line, const regexMatch *const matches,
                                const unsigned int count, void *data CTAGS_ATTR_UNUSED)
 {
     if (count > 1 && ( section == K_KEYWORD || section == K_TESTCASE) )
@@ -113,10 +114,12 @@ static void tagKeywordsAndTestCases (const char *const line, const regexMatch *c
 			makeSimpleXTag (name, RobotKinds, section,
 							RobotXtags[X_WHITESPACE_SWAPPED].xtype);
         vStringDelete (name);
+		return true;
     }
+	return false;
 }
 
-static void tagVariables (const char *const line, const regexMatch *const matches,
+static bool tagVariables (const char *const line, const regexMatch *const matches,
                                const unsigned int count, void *data CTAGS_ATTR_UNUSED)
 {
     if (count > 1 && section == K_VARIABLE)
@@ -129,15 +132,21 @@ static void tagVariables (const char *const line, const regexMatch *const matche
 			makeSimpleXTag (name, RobotKinds, K_VARIABLE,
 							RobotXtags[X_WHITESPACE_SWAPPED].xtype);
         vStringDelete (name);
+		return true;
     }
+	return false;
 }
 
 static void initialize (const langType language)
 {
     addLanguageCallbackRegex (language, "^\\*+ *([^* ].+[^* ]) *\\*+$",
             "{exclusive}", changeSection, NULL, NULL);
-    addLanguageCallbackRegex (language, "(^[A-Za-z0-9]+([${}' _][-${}A-Za-z0-9]+)*)",
-            "{exclusive}", tagKeywordsAndTestCases, NULL, NULL);
+
+    addLanguageCallbackRegex (
+		language,
+		"(^([A-Za-z0-9]+|\\$\\{[_A-Za-z0-9][' _A-Za-z0-9]*(:([^}]|\\\\|.{0})+)*\\})([${}' _]([-_$A-Za-z0-9]+|\\{[_A-Za-z0-9][' _A-Za-z0-9]*(:([^}]|\\\\|.{0})+)*\\})+)*)",
+		"{exclusive}", tagKeywordsAndTestCases, NULL, NULL);
+
     addLanguageCallbackRegex (language, "^[$@]\\{([_A-Za-z0-9][' _A-Za-z0-9]+)\\}  [ ]*.+",
             "{exclusive}", tagVariables, NULL, NULL);
 }
