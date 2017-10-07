@@ -1,4 +1,4 @@
-*Chop* testing
+*Chop* and *slap* testing
 ---------------------------------------------------------------------
 
 :Maintainer: Masatake YAMATO <yamato@redhat.com>
@@ -19,3 +19,6 @@ positions.
 It takes a long time, especially with ``VG=1``, so this cannot be run
 under Travis CI. However, it is a good idea to run it locally.
 
+slap target is derived from chop target. While chop target truncates
+the existing input files from tail, the slap target does the same
+from head.
