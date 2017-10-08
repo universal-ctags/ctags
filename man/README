@@ -5,15 +5,15 @@ Rules for writing man pages
 
 * put two single quotes with colon around field name like ``field:``.
 
-* put double quotes an example of command line, option usage like
-  "--langdef=MyLang" and referring a section.
+* put double quotes aground an example of command line, option usage like
+  "--langdef=MyLang", referring a section, and a file path.
 
 * use two asterisks for newly introduced conceptual **word** and reserved
   words. The reserved words are
 
   * "default" in --langmap
 
-* use asterisks for option parameter like *LANG* in --kind-<LANG> option.
+* use one asterisk for option parameter like *LANG* in --kind-<LANG> option.
 
 Testing and verification
 ---------------------------------------------------------------------
