@@ -1,0 +1,11 @@
+# specifying files
+ctags: Notice: No options will be read from files or environment
+ctags: Notice: hello
+ctags: Notice: world
+# specifying a dir
+ctags: Notice: No options will be read from files or environment
+ctags: Notice: hello
+ctags: Notice: world
+# reset
+ctags: Notice: No options will be read from files or environment
+ctags: cannot stat "optlib" : No such file or directory
