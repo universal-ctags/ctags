@@ -1333,6 +1333,10 @@ OPTION ITEMS
 	the automatic reading of any configuration options from either a file
 	or the environment (see "FILES").
 
+``--options-maybe=file|directory``
+	Does the same as ``--options`` but doesn't make an error if *file*
+	(or *directory*) doesn't exist.
+
 ``--print-language``
 	Just prints the parsers for specified source files, and then exits.
 

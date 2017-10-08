@@ -365,6 +365,8 @@ static optionDescription LongOptionDescription [] = {
  {1,"       Define multiline regular expression for locating tags in specific language."},
  {1,"  --options=path"},
  {1,"       Specify file(or directory) from which command line options should be read."},
+ {1,"  --options-maybe=path"},
+ {1,"       Do the same as --options but this doesn't make an error for non-existing file."},
  {1,"  --optlib-dir=[+]DIR"},
  {1,"      Add or set DIR to optlib search path."},
 #ifdef HAVE_ICONV
@@ -2171,8 +2173,9 @@ static vString* expandOnOptlibPathList (const char* leaf)
 								   doesFileExist);
 }
 
-static void processOptionFile (
-		const char *const option, const char *const parameter)
+static void processOptionFileCommon (
+	const char *const option, const char *const parameter,
+	bool allowNonExistingFile)
 {
 	const char* path;
 	vString* vpath = NULL;
@@ -2192,7 +2195,8 @@ static void processOptionFile (
 	status = eStat (path);
 	if (!status->exists)
 	{
-		error (FATAL | PERROR, "cannot stat \"%s\"", path);
+		if (!allowNonExistingFile)
+			error (FATAL | PERROR, "cannot stat \"%s\"", path);
 	}
 	else if (status->isDirectory)
 	{
@@ -2208,6 +2212,18 @@ static void processOptionFile (
 	eStatFree (status);
 	if (vpath)
 		vStringDelete (vpath);
+}
+
+static void processOptionFile (
+	const char *const option, const char *const parameter)
+{
+	processOptionFileCommon(option, parameter, false);
+}
+
+static void processOptionFileMaybe (
+	const char *const option, const char *const parameter)
+{
+	processOptionFileCommon(option, parameter, true);
 }
 
 static void processOutputFormat (const char *const option CTAGS_ATTR_UNUSED,
@@ -2580,6 +2596,7 @@ static parametricOption ParametricOptions [] = {
 	{ "maxdepth",               processMaxRecursionDepthOption, true,   STAGE_ANY },
 	{ "optlib-dir",             processOptlibDir,               false,  STAGE_ANY },
 	{ "options",                processOptionFile,              false,  STAGE_ANY },
+	{ "options-maybe",          processOptionFileMaybe,         false,  STAGE_ANY },
 	{ "output-format",          processOutputFormat,            true,   STAGE_ANY },
 	{ "pattern-length-limit",   processPatternLengthLimit,      true,   STAGE_ANY },
 	{ "pseudo-tags",            processPseudoTags,              false,  STAGE_ANY },
