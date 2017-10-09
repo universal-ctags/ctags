@@ -94,7 +94,7 @@ typedef struct sInputFile {
 	MIO        *mio;           /* MIO stream used for reading the file */
 	compoundPos    filePosition;  /* file position of current line */
 	unsigned int ungetchIdx;
-	int         ungetchBuf[3]; /* characters that were ungotten */
+	int         ungetchBuf[8]; /* characters that were ungotten */
 
 	bool bomFound;
 	/*  Contains data pertaining to the original `source' file in which the tag
