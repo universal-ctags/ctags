@@ -68,7 +68,7 @@ example in *Units/simple-ctags-aspell.d/dictfile* of Universal-ctags
 source tree.
 
 For documentations, there is no good way. Suggestions are welcome.
-"CSPELL:" prefix line is a temporary solution.  A line started from
+"CSPELL:" prefix line is a temporary solution.  A line starting from
 "CSPELL:" in a commit log is treated specially by ``make cspell`` when
 spell-checking the commit; whitespace separated words in the line are
 added to a temporary dictionary.
