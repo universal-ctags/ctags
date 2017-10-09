@@ -1755,7 +1755,7 @@ FILES
 
 $HOME/.ctags.d/\*.ctags
 
-$HOMEDRIVE$HOMEPATH/ctags.d/\*.ctags
+$HOMEDRIVE$HOMEPATH/ctags.d/\*.ctags (on MSWindows only)
 
 .ctags.d/\*.ctags
 
