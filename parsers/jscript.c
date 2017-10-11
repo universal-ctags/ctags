@@ -443,7 +443,7 @@ static int handleUnicodeCodePoint (uint32_t point)
 	if (isConverting () && JSUnicodeConverter == (iconv_t) -2)
 	{
 		/* if we didn't try creating the converter yet, try and do so */
-		JSUnicodeConverter = iconv_open (Option.outputEncoding, "UTF-32");
+		JSUnicodeConverter = iconv_open (getLanguageEncoding (Lang_js), "UTF-32");
 	}
 	if (isConverting () && JSUnicodeConverter != (iconv_t) -1)
 	{
@@ -488,7 +488,7 @@ static int handleUnicodeCodePoint (uint32_t point)
 	else
 #endif
 	{
-		/* when no encoding is specified (or no iconv), assume UTF-8 output is good.
+		/* when no encoding is specified (or no iconv), assume UTF-8 is good.
 		 * Why UTF-8?  Because it's an ASCII-compatible common Unicode encoding. */
 		if (point < 0x80)
 			c = (unsigned char) point;
