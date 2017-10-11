@@ -173,6 +173,11 @@ static void addCommonPseudoTags (void)
 	}
 }
 
+static kindDefinition *getInputLanguageFileKind (void)
+{
+	return getLanguageKind (getInputLanguage (), KIND_FILE_INDEX);
+}
+
 extern void makeFileTag (const char *const fileName)
 {
 	tagEntryInfo tag;

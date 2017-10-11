@@ -66,7 +66,6 @@ extern bool isInputLanguage (langType lang);
 extern bool isInputHeaderFile (void);
 extern bool isInputLanguageKindEnabled (char c);
 extern bool doesInputLanguageAllowNullTag (void);
-extern kindDefinition *getInputLanguageFileKind (void);
 extern bool doesInputLanguageRequestAutomaticFQTag (void);
 extern bool doesParserRunAsGuest (void);
 extern bool doesSubparserRun (void);
