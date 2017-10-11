@@ -195,9 +195,9 @@ extern bool isInputHeaderFile (void)
 	return File.input.isHeader;
 }
 
-extern bool isInputLanguageKindEnabled (char c)
+extern bool isInputLanguageKindEnabled (int kindIndex)
 {
-	return isLanguageKindEnabled (getInputLanguage (), c);
+	return isLanguageKindEnabled (getInputLanguage (), kindIndex);
 }
 
 extern unsigned int countInputLanguageKinds (void)

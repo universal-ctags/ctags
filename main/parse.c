@@ -1910,11 +1910,11 @@ static kindDefinition *langKindLongOption (const langType language, const char *
 	return getKindForName (LanguageTable [language].kindControlBlock, kindLong);
 }
 
-extern bool isLanguageKindEnabled (const langType language, char kind)
+extern bool isLanguageKindEnabled (const langType language, int kindIndex)
 {
 	const kindDefinition *kindDef;
 
-	kindDef = langKindDefinition (language, kind);
+	kindDef = langKindDefinition (language, kindIndex);
 	Assert (kindDef);
 
 	return kindDef->enabled;

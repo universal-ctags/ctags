@@ -155,7 +155,7 @@ extern unsigned int countLanguageRoles (const langType language, int kindIndex);
 extern langType getNamedLanguage (const char *const name, size_t len);
 extern langType getFileLanguage (const char *const fileName);
 extern bool isLanguageEnabled (const langType language);
-extern bool isLanguageKindEnabled (const langType language, char kind);
+extern bool isLanguageKindEnabled (const langType language, int kindIndex);
 
 extern bool isLanguageVisible (const langType language);
 
