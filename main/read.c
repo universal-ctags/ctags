@@ -200,6 +200,12 @@ extern bool isInputLanguageKindEnabled (int kindIndex)
 	return isLanguageKindEnabled (getInputLanguage (), kindIndex);
 }
 
+extern bool isInputLanguageRoleEnabled (int kindIndex, int roleIndex)
+{
+	return isLanguageRoleEnabled (getInputLanguage (),
+								  kindIndex, roleIndex);
+}
+
 extern unsigned int countInputLanguageKinds (void)
 {
 	return countLanguageKinds (getInputLanguage ());

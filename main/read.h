@@ -65,6 +65,7 @@ extern const char *getInputFileTagPath (void);
 extern bool isInputLanguage (langType lang);
 extern bool isInputHeaderFile (void);
 extern bool isInputLanguageKindEnabled (int kindIndex);
+extern bool isInputLanguageRoleEnabled (int kindIndex, int roleIndex);
 extern unsigned int countInputLanguageKinds (void);
 extern unsigned int countInputLanguageRoles (int kindIndex);
 extern bool doesInputLanguageAllowNullTag (void);

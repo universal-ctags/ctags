@@ -1916,6 +1916,12 @@ extern bool isLanguageKindEnabled (const langType language, int kindIndex)
 						 kindIndex);
 }
 
+extern bool isLanguageRoleEnabled (const langType language, int kindIndex, int roleIndex)
+{
+	return isRoleEnabled(LanguageTable [language].kindControlBlock,
+						 kindIndex, roleIndex);
+}
+
 static void resetLanguageKinds (const langType language, const bool mode)
 {
 	const parserObject* parser;
