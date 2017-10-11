@@ -1309,7 +1309,9 @@ extern int makeTagEntry (const tagEntryInfo *const tag_const)
 
 	if (getInputLanguageFileKind() != tag->kind)
 	{
-		if (! isInputLanguageKindEnabled (tag->kind->letter) &&
+		/* TODO: don't access the internal of kind directly.
+		   Use isInputLanguageKindEnabled () instead. */
+		if (! tag->kind->enabled &&
 		    (tag->extensionFields.roleIndex == ROLE_INDEX_DEFINITION))
 			return CORK_NIL;
 		if ((tag->extensionFields.roleIndex != ROLE_INDEX_DEFINITION)

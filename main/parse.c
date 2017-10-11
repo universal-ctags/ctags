@@ -1912,14 +1912,9 @@ static kindDefinition *langKindLongOption (const langType language, const char *
 
 extern bool isLanguageKindEnabled (const langType language, int kindIndex)
 {
-	const kindDefinition *kindDef;
-
-	kindDef = langKindDefinition (language, kindIndex);
-	Assert (kindDef);
-
-	return kindDef->enabled;
+	return isKindEnabled(LanguageTable [language].kindControlBlock,
+						 kindIndex);
 }
-
 
 static void resetLanguageKinds (const langType language, const bool mode)
 {
