@@ -384,7 +384,7 @@ static void parseProc (tokenInfo *const token,
 		{
 			tagEntryInfo e;
 
-			initTagEntry (&e, last, TclKinds + K_PROCEDURE);
+			initTagEntry (&e, last, K_PROCEDURE);
 			e.lineNumber = token->lineNumber;
 			e.filePosition = token->filePosition;
 
@@ -419,7 +419,7 @@ static void parseProc (tokenInfo *const token,
 				vStringCatS (ns, "::");
 				vStringCatS (ns, last);
 
-				index_fq = makeSimpleTag (ns, TclKinds, K_PROCEDURE);
+				index_fq = makeSimpleTag (ns, K_PROCEDURE);
 				tagEntryInfo *e_fq = getEntryInCorkQueue (index_fq);
 				markTagExtraBit (e_fq, XTAG_QUALIFIED_TAGS);
 			}
@@ -428,7 +428,7 @@ static void parseProc (tokenInfo *const token,
 		else
 		{
 			tagEntryInfo *ep;
-			index = makeSimpleTag (token->string, TclKinds, K_PROCEDURE);
+			index = makeSimpleTag (token->string, K_PROCEDURE);
 			ep = getEntryInCorkQueue (index);
 			ep->extensionFields.scopeIndex = parent;
 		}
@@ -500,7 +500,7 @@ static void parseNamespace (tokenInfo *const token,
 		return;
 	}
 
-	int index = makeSimpleTag (token->string, TclKinds, K_NAMESPACE);
+	int index = makeSimpleTag (token->string, K_NAMESPACE);
 	if (parent != CORK_NIL && strncmp(vStringValue (token->string), "::", 2))
 	{
 		tagEntryInfo *e = getEntryInCorkQueue (index);

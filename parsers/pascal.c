@@ -41,10 +41,10 @@ static void createPascalTag (
 		tagEntryInfo* const tag, const vString* const name, const int kind)
 {
 	if (PascalKinds [kind].enabled  &&  name != NULL  &&  vStringLength (name) > 0)
-		initTagEntry (tag, vStringValue (name), &(PascalKinds [kind]));
+		initTagEntry (tag, vStringValue (name), kind);
 	else
 		/* TODO: Passing NULL as name makes an assertion behind initTagEntry failure */
-		initTagEntry (tag, NULL, NULL);
+		initTagEntry (tag, NULL, KIND_GHOST_INDEX);
 }
 
 static void makePascalTag (const tagEntryInfo* const tag)

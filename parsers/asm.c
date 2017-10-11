@@ -198,18 +198,18 @@ static void makeAsmTag (
 		if (found)
 		{
 			if (kind > K_NONE)
-				makeSimpleTag (name, AsmKinds, kind);
+				makeSimpleTag (name, kind);
 		}
 		else if (isDefineOperator (operator))
 		{
 			if (! nameFollows)
-				makeSimpleTag (name, AsmKinds, K_DEFINE);
+				makeSimpleTag (name, K_DEFINE);
 		}
 		else if (labelCandidate)
 		{
 			operatorKind (name, &found);
 			if (! found)
-				makeSimpleTag (name, AsmKinds, K_LABEL);
+				makeSimpleTag (name, K_LABEL);
 		}
 		else if (directive)
 		{
@@ -223,7 +223,6 @@ static void makeAsmTag (
 				break;
 			case K_MACRO:
 				*lastMacroCorkIndex = makeSimpleTag (operator,
-													 AsmKinds,
 													 kind_for_directive);
 				break;
 			case K_PSUEDO_MACRO_END:
@@ -236,12 +235,11 @@ static void makeAsmTag (
 				break;
 			case K_SECTION:
 				makeSimpleRefTag (operator,
-								  AsmKinds,
 								  kind_for_directive,
 								  ASM_SECTION_PLACEMENT);
 				break;
 			default:
-				makeSimpleTag (operator, AsmKinds, kind_for_directive);
+				makeSimpleTag (operator, kind_for_directive);
 			}
 		}
 	}
@@ -305,7 +303,7 @@ static void findAsmTags (void)
 	const unsigned char *line;
 
 	cppInit (false, false, false, false,
-			 NULL, 0, NULL, 0, 0);
+			 KIND_GHOST_INDEX, 0, KIND_GHOST_INDEX, 0, 0);
 
 	unsigned int lastMacroCorkIndex = CORK_NIL;
 

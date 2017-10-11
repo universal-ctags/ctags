@@ -124,9 +124,9 @@ typedef enum eAdaParseMode
 
 typedef enum eAdaKinds
 {
-  ADA_KIND_SEPARATE = -2,   /* for defining the parent token name of a child
+  ADA_KIND_SEPARATE = -3,   /* for defining the parent token name of a child
                              * sub-unit */
-  ADA_KIND_UNDEFINED = -1,  /* for default/initialization values */
+  ADA_KIND_UNDEFINED = KIND_GHOST_INDEX,  /* for default/initialization values */
   ADA_KIND_PACKAGE_SPEC,
   ADA_KIND_PACKAGE,
   ADA_KIND_TYPE_SPEC,
@@ -406,7 +406,7 @@ static adaTokenInfo *newAdaToken(const char *name, int len, adaKind kind,
   }
 
   /* init the tag */
-  initTagEntry(&token->tag, tmpName, NULL);
+  initTagEntry(&token->tag, tmpName, ADA_KIND_UNDEFINED);
 
   token->kind = kind;
   token->isSpec = isSpec;

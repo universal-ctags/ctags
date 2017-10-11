@@ -182,7 +182,7 @@ static int makeLdScriptTagMaybe (tagEntryInfo *const e, tokenInfo *const token,
 		return CORK_NIL;
 
 	initRefTagEntry (e, tokenString (token),
-					 LdScriptKinds + kind,
+					 kind,
 					 role);
 	e->lineNumber = token->lineNumber;
 	e->filePosition = token->filePosition;
@@ -677,7 +677,7 @@ static void findLdScriptTags (void)
 	tokenInfo *const tmp = newLdScriptToken ();
 
 	cppInit (false, false, false, false,
-			 NULL, 0, NULL, 0, 0);
+			 KIND_GHOST_INDEX, 0, KIND_GHOST_INDEX, 0, 0);
 
 	do {
 		tokenRead (token);

@@ -42,7 +42,7 @@ static void newDataCallback (iniconfSubparser *s CTAGS_ATTR_UNUSED,
 
 	if (section && key == NULL && value == NULL)
 	{
-		initTagEntry (&e, section, YumRepoKinds + K_REPO_ID);
+		initTagEntry (&e, section, K_REPO_ID);
 		makeTagEntry (&e);
 	}
 }

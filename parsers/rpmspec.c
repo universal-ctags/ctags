@@ -94,9 +94,9 @@ static bool found_macro_cb (const char *line,
 		vStringNCopyS (name, line + matches[1].start, matches[1].length);
 
 		if (data->rindex == ROLE_INDEX_DEFINITION)
-			initTagEntry (&tag, vStringValue (name), &(RpmSpecKinds[data->kindex]));
+			initTagEntry (&tag, vStringValue (name), data->kindex);
 		else
-			initRefTagEntry (&tag, vStringValue (name), &(RpmSpecKinds[data->kindex]), data->rindex);
+			initRefTagEntry (&tag, vStringValue (name), data->kindex, data->rindex);
 
 		if (signature)
 			tag.extensionFields.signature = vStringValue (signature);
@@ -129,7 +129,7 @@ static bool found_tag_cb (const char *line,
 	{
 		vString *name = vStringNew ();
 		vStringNCopyS (name, line + matches[1].start, matches[1].length);
-		makeSimpleTag (name, RpmSpecKinds, K_TAG);
+		makeSimpleTag (name, K_TAG);
 
 		if (count > 1)
 		{
@@ -137,7 +137,7 @@ static bool found_tag_cb (const char *line,
 			{
 				vString *package = vStringNew ();
 				vStringNCopyS (package, line + matches[2].start, matches[2].length);
-				*((int *)userData) = makeSimpleTag (package, RpmSpecKinds, K_PACKAGE);
+				*((int *)userData) = makeSimpleTag (package, K_PACKAGE);
 				vStringDelete (package);
 			}
 		}
@@ -157,7 +157,7 @@ static bool found_package_cb (const char *line,
 		tagEntryInfo tag;
 
 		vStringNCopyS (name, line + matches[2].start, matches[2].length);
-		initTagEntry (&tag, vStringValue (name), RpmSpecKinds + K_PACKAGE);
+		initTagEntry (&tag, vStringValue (name), K_PACKAGE);
 		tag.extensionFields.scopeIndex = *(int *)userData;
 		makeTagEntry (&tag);
 		vStringDelete (name);

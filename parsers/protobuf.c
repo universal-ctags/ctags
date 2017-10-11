@@ -167,7 +167,7 @@ static void createProtobufTag (const vString *name, int kind)
 
 	if (ProtobufKinds [kind].enabled)
 	{
-		initTagEntry (&tag, vStringValue (name), ProtobufKinds +kind);
+		initTagEntry (&tag, vStringValue (name), kind);
 		makeTagEntry (&tag);
 	}
 }
@@ -224,7 +224,7 @@ static void parseStatement (int kind)
 static void findProtobufTags (void)
 {
 	cppInit (false, false, false, false,
-			 NULL, 0, NULL, 0, 0);
+			 KIND_GHOST_INDEX, 0, KIND_GHOST_INDEX, 0, 0);
 	token.value = vStringNew ();
 
 	nextToken ();

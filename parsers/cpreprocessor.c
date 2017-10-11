@@ -81,9 +81,13 @@ typedef struct sCppState {
 	bool hasCxxRawLiteralStrings; /* supports R"xxx(...)xxx" strings */
 	bool hasSingleQuoteLiteralNumbers; /* supports vera number literals:
 						 'h..., 'o..., 'd..., and 'b... */
-	const kindDefinition  *defineMacroKind;
+
+	bool useClientLangDefineMacroKindIndex;
+	int defineMacroKindIndex;
 	int macroUndefRoleIndex;
-	const kindDefinition  *headerKind;
+
+	bool useClientLangHeaderKindIndex;
+	int headerKindIndex;
 	int headerSystemRoleIndex;
 	int headerLocalRoleIndex;
 
@@ -168,11 +172,13 @@ static cppState Cpp = {
 	.hasAtLiteralStrings = false,
 	.hasCxxRawLiteralStrings = false,
 	.hasSingleQuoteLiteralNumbers = false,
-	.defineMacroKind = NULL,
-	.macroUndefRoleIndex = ROLE_INDEX_DEFINITION,
-	.headerKind = NULL,
-	.headerSystemRoleIndex = ROLE_INDEX_DEFINITION,
-	.headerLocalRoleIndex = ROLE_INDEX_DEFINITION,
+	.useClientLangDefineMacroKindIndex = false,
+	.defineMacroKindIndex = CPREPRO_MACRO,
+	.macroUndefRoleIndex = CPREPRO_MACRO_KIND_UNDEF_ROLE,
+	.useClientLangHeaderKindIndex = false,
+	.headerKindIndex = CPREPRO_HEADER,
+	.headerSystemRoleIndex = CPREPRO_HEADER_KIND_SYSTEM_ROLE,
+	.headerLocalRoleIndex = CPREPRO_HEADER_KIND_LOCAL_ROLE,
 	.directive = {
 		.state = DRCTV_NONE,
 		.accept = false,
@@ -207,9 +213,9 @@ static void cppInitCommon(langType clientLang,
 		     const bool state, const bool hasAtLiteralStrings,
 		     const bool hasCxxRawLiteralStrings,
 		     const bool hasSingleQuoteLiteralNumbers,
-		     const kindDefinition *defineMacroKind,
+		     int defineMacroKindIndex,
 		     int macroUndefRoleIndex,
-		     const kindDefinition *headerKind,
+		     int headerKindIndex,
 		     int headerSystemRoleIndex, int headerLocalRoleIndex)
 {
 	BraceFormat = state;
@@ -234,16 +240,38 @@ static void cppInitCommon(langType clientLang,
 	Cpp.hasAtLiteralStrings = hasAtLiteralStrings;
 	Cpp.hasCxxRawLiteralStrings = hasCxxRawLiteralStrings;
 	Cpp.hasSingleQuoteLiteralNumbers = hasSingleQuoteLiteralNumbers;
-	Cpp.defineMacroKind
-		= defineMacroKind? defineMacroKind: CPreProKinds + CPREPRO_MACRO;
-	Cpp.macroUndefRoleIndex
-		= defineMacroKind? macroUndefRoleIndex: CPREPRO_MACRO_KIND_UNDEF_ROLE;
-	Cpp.headerKind
-		= headerKind? headerKind: CPreProKinds + CPREPRO_HEADER;
-	Cpp.headerSystemRoleIndex
-		= headerKind? headerSystemRoleIndex: CPREPRO_HEADER_KIND_SYSTEM_ROLE;
-	Cpp.headerLocalRoleIndex
-		= headerKind? headerLocalRoleIndex: CPREPRO_HEADER_KIND_LOCAL_ROLE;
+
+	if (defineMacroKindIndex != KIND_GHOST_INDEX)
+	{
+		Cpp.defineMacroKindIndex = defineMacroKindIndex;
+		Cpp.useClientLangDefineMacroKindIndex = true;
+
+		Cpp.macroUndefRoleIndex = macroUndefRoleIndex;
+	}
+	else
+	{
+		Cpp.defineMacroKindIndex = CPREPRO_MACRO;
+		Cpp.useClientLangDefineMacroKindIndex = false;
+
+		Cpp.macroUndefRoleIndex = CPREPRO_MACRO_KIND_UNDEF_ROLE;
+	}
+
+	if (headerKindIndex != KIND_GHOST_INDEX)
+	{
+		Cpp.headerKindIndex = headerKindIndex;
+		Cpp.useClientLangHeaderKindIndex = true;
+
+		Cpp.headerSystemRoleIndex = headerSystemRoleIndex;
+		Cpp.headerLocalRoleIndex =  headerLocalRoleIndex;
+	}
+	else
+	{
+		Cpp.headerKindIndex = CPREPRO_HEADER;
+		Cpp.useClientLangHeaderKindIndex = false;
+
+		Cpp.headerSystemRoleIndex = CPREPRO_HEADER_KIND_SYSTEM_ROLE;
+		Cpp.headerLocalRoleIndex = CPREPRO_HEADER_KIND_LOCAL_ROLE;
+	}
 
 	Cpp.directive.state     = DRCTV_NONE;
 	Cpp.directive.accept    = true;
@@ -260,16 +288,16 @@ static void cppInitCommon(langType clientLang,
 extern void cppInit (const bool state, const bool hasAtLiteralStrings,
 		     const bool hasCxxRawLiteralStrings,
 		     const bool hasSingleQuoteLiteralNumbers,
-		     const kindDefinition *defineMacroKind,
+		     int defineMacroKindIndex,
 		     int macroUndefRoleIndex,
-		     const kindDefinition *headerKind,
+			 int headerKindIndex,
 		     int headerSystemRoleIndex, int headerLocalRoleIndex)
 {
 	langType client = getInputLanguage ();
 
 	cppInitCommon (client, state, hasAtLiteralStrings,
 				   hasCxxRawLiteralStrings, hasSingleQuoteLiteralNumbers,
-				   defineMacroKind, macroUndefRoleIndex, headerKind,
+				   defineMacroKindIndex, macroUndefRoleIndex, headerKindIndex,
 				   headerSystemRoleIndex, headerLocalRoleIndex);
 }
 
@@ -592,9 +620,9 @@ static bool popConditional (void)
 static bool doesCPreProRunAsStandaloneParser (int kind)
 {
 	if (kind == CPREPRO_HEADER)
-		return (Cpp.headerKind == CPreProKinds + CPREPRO_HEADER);
+		return !Cpp.useClientLangDefineMacroKindIndex;
 	else if (kind == CPREPRO_MACRO)
-		return (Cpp.defineMacroKind == CPreProKinds + CPREPRO_MACRO);
+		return !Cpp.useClientLangHeaderKindIndex;
 	else
 	{
 		AssertNotReached();
@@ -604,39 +632,44 @@ static bool doesCPreProRunAsStandaloneParser (int kind)
 
 static int makeDefineTag (const char *const name, const char* const signature, bool undef)
 {
+	bool standing_alone = doesCPreProRunAsStandaloneParser(CPREPRO_MACRO);
+	langType lang = standing_alone ? Cpp.lang: Cpp.clientLang;
 	const bool isFileScope = (bool) (! isInputHeaderFile ());
 
-	if (!isLanguageEnabled (
-			doesCPreProRunAsStandaloneParser(CPREPRO_MACRO)
-			? Cpp.lang
-			: Cpp.clientLang))
+	if (!isLanguageEnabled (lang))
 			return CORK_NIL;
 
-	if (!Cpp.defineMacroKind)
-		return CORK_NIL;
+	Assert (Cpp.defineMacroKindIndex != KIND_GHOST_INDEX);
+
 	if (isFileScope && !isXtagEnabled(XTAG_FILE_SCOPE))
 		return CORK_NIL;
 
 	if (undef && (Cpp.macroUndefRoleIndex == ROLE_INDEX_DEFINITION))
 		return CORK_NIL;
 
-	if ( /* condition for definition tag */
-		((!undef) && Cpp.defineMacroKind->enabled)
+	if (! isLanguageKindEnabled (lang,
+								 Cpp.defineMacroKindIndex))
+		return CORK_NIL;
+
+	if (
+		/* condition for definition tag */
+		(!undef)
 		|| /* condition for reference tag */
 		(undef && isXtagEnabled(XTAG_REFERENCE_TAGS) &&
-		 Cpp.defineMacroKind->roles [ Cpp.macroUndefRoleIndex ].enabled))
+		 isLanguageRoleEnabled(lang, Cpp.defineMacroKindIndex,
+							   Cpp.macroUndefRoleIndex)))
 	{
 		tagEntryInfo e;
 		int r;
 
-		if (doesCPreProRunAsStandaloneParser(CPREPRO_MACRO))
+		if (standing_alone)
 			pushLanguage (Cpp.lang);
 
 		if (undef)
-			initRefTagEntry (&e, name, Cpp.defineMacroKind,
-					 Cpp.macroUndefRoleIndex);
+			initRefTagEntry (&e, name, Cpp.defineMacroKindIndex,
+							 Cpp.macroUndefRoleIndex);
 		else
-			initTagEntry (&e, name, Cpp.defineMacroKind);
+			initTagEntry (&e, name, Cpp.defineMacroKindIndex);
 		e.isFileScope  = isFileScope;
 		if (isFileScope)
 			markTagExtraBit (&e, XTAG_FILE_SCOPE);
@@ -645,7 +678,7 @@ static int makeDefineTag (const char *const name, const char* const signature, b
 
 		r = makeTagEntry (&e);
 
-		if (doesCPreProRunAsStandaloneParser(CPREPRO_MACRO))
+		if (standing_alone)
 			popLanguage ();
 
 		return r;
@@ -655,27 +688,32 @@ static int makeDefineTag (const char *const name, const char* const signature, b
 
 static void makeIncludeTag (const  char *const name, bool systemHeader)
 {
+	bool standing_alone = doesCPreProRunAsStandaloneParser(CPREPRO_HEADER);
+	langType lang = standing_alone ? Cpp.lang: Cpp.clientLang;
 	tagEntryInfo e;
 	int role_index;
 
-	if (!isLanguageEnabled (
-			doesCPreProRunAsStandaloneParser(CPREPRO_HEADER)
-			? Cpp.lang
-			: Cpp.clientLang))
-			return;
+	if (!isLanguageEnabled (lang))
+		return;
+
+	Assert (Cpp.headerKindIndex != KIND_GHOST_INDEX);
 
 	role_index = systemHeader? Cpp.headerSystemRoleIndex: Cpp.headerLocalRoleIndex;
 	if (role_index == ROLE_INDEX_DEFINITION)
 		return;
 
-	if (Cpp.headerKind && Cpp.headerKind->enabled
-	    && isXtagEnabled (XTAG_REFERENCE_TAGS)
-	    && Cpp.headerKind->roles [ role_index ].enabled)
+	if (!isXtagEnabled (XTAG_REFERENCE_TAGS))
+		return;
+
+	if (!isLanguageKindEnabled(lang, Cpp.headerKindIndex))
+		return;
+
+	if (isLanguageRoleEnabled(lang, Cpp.headerKindIndex, role_index))
 	{
 		if (doesCPreProRunAsStandaloneParser (CPREPRO_HEADER))
 			pushLanguage (Cpp.lang);
 
-		initRefTagEntry (&e, name, Cpp.headerKind, role_index);
+		initRefTagEntry (&e, name, Cpp.headerKindIndex, role_index);
 		e.isFileScope  = false;
 		e.truncateLineAfterTag = true;
 		makeTagEntry (&e);
@@ -1283,7 +1321,7 @@ process:
 static void findCppTags (void)
 {
 	cppInitCommon (Cpp.lang, 0, false, false, false,
-				   NULL, 0, NULL, 0, 0);
+				   KIND_GHOST_INDEX, 0, KIND_GHOST_INDEX, 0, 0);
 
 	findRegexTagsMainloop (cppGetc);
 

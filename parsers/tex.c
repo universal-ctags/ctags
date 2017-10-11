@@ -241,7 +241,7 @@ static void makeTexTag (tokenInfo *const token, texKind kind)
 		vString *parentKind = vStringNew();
 		vString *parentName = vStringNew();
 		tagEntryInfo e;
-		initTagEntry (&e, name, &(TexKinds [kind]));
+		initTagEntry (&e, name, kind);
 
 		e.lineNumber   = token->lineNumber;
 		e.filePosition = token->filePosition;

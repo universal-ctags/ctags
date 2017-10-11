@@ -138,8 +138,8 @@ extern parserDefinitionFunc YAML_PARSER_LIST;
 
 
 /* Language processing and parsing */
-extern int makeSimpleTag (const vString* const name, kindDefinition* const kinds, const int kind);
-extern int makeSimpleRefTag (const vString* const name, kindDefinition* const kinds, const int kind,
+extern int makeSimpleTag (const vString* const name, const int kindIndex);
+extern int makeSimpleRefTag (const vString* const name, const int kindIndex,
 			     int roleIndex);
 extern parserDefinition* parserNew (const char* name);
 extern bool doesLanguageAllowNullTag (const langType language);

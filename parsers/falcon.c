@@ -84,7 +84,7 @@ static void findFalconTags (void)
                 vStringPut (name, (int) *cp);
                 ++cp;
             }
-            makeSimpleTag (name, FalconKinds, K_FUNCTION);
+            makeSimpleTag (name, K_FUNCTION);
             vStringClear (name);
         }
         else if (strncmp ((const char*) cp, "class", (size_t) 5) == 0)
@@ -97,7 +97,7 @@ static void findFalconTags (void)
                 vStringPut (name, (int) *cp);
                 ++cp;
             }
-            makeSimpleTag (name, FalconKinds, K_CLASS);
+            makeSimpleTag (name, K_CLASS);
             vStringClear (name);
         }
         else if (strncmp ((const char*) cp, "load", (size_t) 4) == 0)
@@ -110,7 +110,7 @@ static void findFalconTags (void)
                 vStringPut (name, (int) *cp);
                 ++cp;
             }
-            makeSimpleTag (name, FalconKinds, K_NAMESPACE);
+            makeSimpleTag (name, K_NAMESPACE);
             vStringClear (name);
         }
         else if (strncmp ((const char*) cp, "import from", (size_t) 11) == 0)
@@ -123,7 +123,7 @@ static void findFalconTags (void)
                 vStringPut (name, (int) *cp);
                 ++cp;
             }
-            makeSimpleTag (name, FalconKinds, K_NAMESPACE);
+            makeSimpleTag (name, K_NAMESPACE);
             vStringClear (name);
         }
     }

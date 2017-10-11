@@ -415,7 +415,7 @@ static void readTag (tokenInfo *token, vString *text, int depth)
 					{
 						readToken (token, true);
 						if (token->type == TOKEN_STRING || token->type == TOKEN_NAME)
-							makeSimpleTag (token->string, HtmlKinds, K_ANCHOR);
+							makeSimpleTag (token->string, K_ANCHOR);
 					}
 				}
 			}
@@ -461,7 +461,7 @@ static void readTag (tokenInfo *token, vString *text, int depth)
 							headingKind = K_HEADING3;
 
 						vStringStripTrailing (text);
-						makeSimpleTag (text, HtmlKinds, headingKind);
+						makeSimpleTag (text, headingKind);
 					}
 				}
 				else if (startTag == KEYWORD_style)

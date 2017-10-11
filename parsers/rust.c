@@ -439,7 +439,7 @@ static void addTag (vString* ident, const char* arg_list, int kind, unsigned lon
 	if (kind == K_NONE || ! rustKinds[kind].enabled)
 		return;
 	tagEntryInfo tag;
-	initTagEntry(&tag, ident->buffer, &(rustKinds[kind]));
+	initTagEntry(&tag, ident->buffer, kind);
 
 	tag.lineNumber = line;
 	tag.filePosition = pos;

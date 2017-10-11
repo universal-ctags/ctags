@@ -367,7 +367,6 @@ static void findMisspelling (void)
 			char *word = vStringValue (item);
 
 			makeSimpleRefTag (item,
-							  AspellParserKinds,
 							  K_WORD,
 							  R_WORD_TRACED);
 
@@ -377,7 +376,6 @@ static void findMisspelling (void)
 				continue;
 
 			makeSimpleRefTag (item,
-							  AspellParserKinds,
 							  K_WORD,
 							  R_WORD_MISSPELLED);
 		}

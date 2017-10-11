@@ -116,8 +116,8 @@ static int match_keyword (const char *p, KeyWord const *kw)
 	for (j = 0; j < 1 + kw->skip; j++)
 	{
 		p = extract_name (p, name);
-	}	
-	makeSimpleTag (name, BasicKinds, kw->kind);
+	}
+	makeSimpleTag (name, kw->kind);
 	vStringDelete (name);
 	return 1;
 }
@@ -132,7 +132,7 @@ static void match_colon_label (char const *p)
 	{
 		vString *name = vStringNew ();
 		vStringNCatS (name, p, end - p);
-		makeSimpleTag (name, BasicKinds, K_LABEL);
+		makeSimpleTag (name, K_LABEL);
 		vStringDelete (name);
 	}
 }
@@ -144,7 +144,7 @@ static void match_dot_label (char const *p)
 	{
 		vString *name = vStringNew ();
 		extract_name (p + 1, name);
-		makeSimpleTag (name, BasicKinds, K_LABEL);
+		makeSimpleTag (name, K_LABEL);
 		vStringDelete (name);
 	}
 }

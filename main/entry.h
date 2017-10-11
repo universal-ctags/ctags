@@ -126,15 +126,15 @@ extern void  setupWriter (void);
 extern bool  teardownWriter (const char *inputFilename);
 extern int makeTagEntry (const tagEntryInfo *const tag);
 extern void initTagEntry (tagEntryInfo *const e, const char *const name,
-			  const kindDefinition *kind);
+			  int kindIndex);
 extern void initRefTagEntry (tagEntryInfo *const e, const char *const name,
-			     const kindDefinition *kind, int roleIndex);
+			     int kindIndex, int roleIndex);
 extern void initTagEntryFull (tagEntryInfo *const e, const char *const name,
 			      unsigned long lineNumber,
 			      langType langType_,
 			      MIOPos      filePosition,
 			      const char *inputFileName,
-			      const kindDefinition *kind,
+			      int kindIndex,
 			      int roleIndex,
 			      const char *sourceFileName,
 			      langType sourceLangType,

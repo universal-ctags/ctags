@@ -246,7 +246,7 @@ tagEntryInfo * cxxTagBegin(unsigned int uKind,CXXToken * pToken)
 	initTagEntry(
 			&g_oCXXTag,
 			vStringValue(pToken->pszWord),
-			pKindDefinitions + uKind
+			uKind
 		);
 
 	g_oCXXTag.lineNumber = pToken->iLineNumber;

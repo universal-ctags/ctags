@@ -676,7 +676,7 @@ static int parseID (ttcnKind_t kind)
 	if (pTok)
 	{
 		if (kind < K_NONE)
-			makeSimpleTag(pTok->value, ttcnKinds, kind);
+			makeSimpleTag(pTok->value, kind);
 		return 1;
 	}
 	return 0;

@@ -117,7 +117,7 @@ static int parseHunk (const unsigned char* cp, vString *hunk, int scope_index)
 		if (*c == '\t')
 			return i;
 	vStringNCopyS (hunk, start, end - start);
-	i = makeSimpleTag (hunk, DiffKinds, K_HUNK);
+	i = makeSimpleTag (hunk, K_HUNK);
 	if (i > CORK_NIL && scope_index > CORK_NIL)
 	{
 		tagEntryInfo *e =  getEntryInCorkQueue (i);
@@ -173,7 +173,7 @@ static void findDiffTags (void)
 					kind = K_NEW_FILE;
 				else
 					kind = K_MODIFIED_FILE;
-				scope_index = makeSimpleTag (filename, DiffKinds, kind);
+				scope_index = makeSimpleTag (filename, kind);
 				vStringClear (filename);
 			}
 

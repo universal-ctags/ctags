@@ -142,21 +142,21 @@ extern unsigned int countParsers (void)
 }
 
 extern int makeSimpleTag (
-		const vString* const name, kindDefinition* const kinds, const int kind)
+		const vString* const name, const int kindIndex)
 {
 	int r = CORK_NIL;
 
-	if (kinds [kind].enabled  &&  name != NULL  &&  vStringLength (name) > 0)
+	if (isInputLanguageKindEnabled(kindIndex) &&  name != NULL  &&  vStringLength (name) > 0)
 	{
 		tagEntryInfo e;
-		initTagEntry (&e, vStringValue (name), & kinds [kind]);
+		initTagEntry (&e, vStringValue (name), kindIndex);
 
 		r = makeTagEntry (&e);
 	}
 	return r;
 }
 
-extern int makeSimpleRefTag (const vString* const name, kindDefinition* const kinds, const int kind,
+extern int makeSimpleRefTag (const vString* const name, const int kindIndex,
 			     int roleIndex)
 {
 	int r = CORK_NIL;
@@ -164,12 +164,12 @@ extern int makeSimpleRefTag (const vString* const name, kindDefinition* const ki
 	if (! isXtagEnabled (XTAG_REFERENCE_TAGS))
 		return r;
 
-	Assert (roleIndex < kinds[kind].nRoles);
+	Assert (roleIndex < countInputLanguageRoles(kindIndex));
 
-	if (kinds[kind].roles[roleIndex].enabled)
+	if (isInputLanguageRoleEnabled(kindIndex, roleIndex))
 	{
 	    tagEntryInfo e;
-	    initRefTagEntry (&e, vStringValue (name), & kinds [kind], roleIndex);
+	    initRefTagEntry (&e, vStringValue (name), kindIndex, roleIndex);
 
 	    r = makeTagEntry (&e);
 	}
@@ -3877,23 +3877,23 @@ static void createCTSTTags (void)
 				switch (i)
 				{
 					case K_BROKEN:
-						initTagEntry (&e, "one\nof\rbroken\tname", &CTST_Kinds[i]);
+						initTagEntry (&e, "one\nof\rbroken\tname", i);
 						e.extensionFields.scopeKind = & (CTST_Kinds [K_BROKEN]);
 						e.extensionFields.scopeName = "\\Broken\tContext";
 						makeTagEntry (&e);
 						break;
 					case K_NO_LETTER:
-						initTagEntry (&e, "abnormal kindDefinition testing (no letter)", &CTST_Kinds[i]);
+						initTagEntry (&e, "abnormal kindDefinition testing (no letter)", i);
 						makeTagEntry (&e);
 						break;
 					case K_NO_LONG_NAME:
-						initTagEntry (&e, "abnormal kindDefinition testing (no long name)", &CTST_Kinds[i]);
+						initTagEntry (&e, "abnormal kindDefinition testing (no long name)", i);
 						makeTagEntry (&e);
 						break;
 					case K_NOTHING_SPECIAL:
 						if (!lb)
 						{
-							initTagEntry (&e, "NOTHING_SPECIAL", &CTST_Kinds[i]);
+							initTagEntry (&e, "NOTHING_SPECIAL", i);
 							makeTagEntry (&e);
 						}
 						break;

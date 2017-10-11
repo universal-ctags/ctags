@@ -229,7 +229,7 @@ static void initPythonEntry (tagEntryInfo *const e, const tokenInfo *const token
 	int parentKind = -1;
 	NestingLevel *nl;
 
-	initTagEntry (e, vStringValue (token->string), &(PythonKinds[kind]));
+	initTagEntry (e, vStringValue (token->string), kind);
 
 	e->lineNumber	= token->lineNumber;
 	e->filePosition	= token->filePosition;
@@ -333,7 +333,7 @@ static int makeSimplePythonRefTag (const tokenInfo *const token,
 		tagEntryInfo e;
 
 		initRefTagEntry (&e, vStringValue (altName ? altName : token->string),
-		                 &(PythonKinds[kind]), roleIndex);
+		                 kind, roleIndex);
 
 		e.lineNumber	= token->lineNumber;
 		e.filePosition	= token->filePosition;
