@@ -200,6 +200,16 @@ extern bool isInputLanguageKindEnabled (char c)
 	return isLanguageKindEnabled (getInputLanguage (), c);
 }
 
+extern unsigned int countInputLanguageKinds (void)
+{
+	return countLanguageKinds (getInputLanguage ());
+}
+
+extern unsigned int countInputLanguageRoles (int kindIndex)
+{
+	return countLanguageRoles (getInputLanguage (), kindIndex);
+}
+
 extern bool doesInputLanguageAllowNullTag (void)
 {
 	return doesLanguageAllowNullTag (getInputLanguage ());

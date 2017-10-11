@@ -65,6 +65,8 @@ extern const char *getInputFileTagPath (void);
 extern bool isInputLanguage (langType lang);
 extern bool isInputHeaderFile (void);
 extern bool isInputLanguageKindEnabled (char c);
+extern unsigned int countInputLanguageKinds (void);
+extern unsigned int countInputLanguageRoles (int kindIndex);
 extern bool doesInputLanguageAllowNullTag (void);
 extern bool doesInputLanguageRequestAutomaticFQTag (void);
 extern bool doesParserRunAsGuest (void);

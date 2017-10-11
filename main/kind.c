@@ -148,6 +148,11 @@ extern unsigned int countKinds (struct kindControlBlock* kcb)
 	return kcb->count;
 }
 
+extern unsigned int countRoles (struct kindControlBlock* kcb, int kindIndex)
+{
+	return kcb->kind [kindIndex].def->nRoles;
+}
+
 extern kindDefinition *getKind (struct kindControlBlock* kcb, int kindIndex)
 {
 	return kcb->kind [kindIndex].def;
