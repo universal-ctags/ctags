@@ -591,6 +591,16 @@ static bool readUnicodeEscapeSequenceValue (uint32_t *const value,
 	return valid;
 }
 
+static int valueToXDigit (unsigned char v)
+{
+	Assert (v <= 0xF);
+
+	if (v >= 0xA)
+		return 'A' + (v - 0xA);
+	else
+		return '0' + v;
+}
+
 /* Reads and expands a Unicode escape sequence after the "\" prefix.  If the
  * escape sequence is a UTF16 high surrogate, also try and read the low
  * surrogate to emit the proper code point.
@@ -617,14 +627,21 @@ static int readUnicodeEscapeSequence (const int fallback)
 
 			if (d != '\\' || ! readUnicodeEscapeSequenceValue (&low, &isUTF16))
 				ungetcToInputFile (d);
-			else if (! isUTF16 || (low & 0xfc00) != 0xdc00)
-			{	/* not a low surrogate, so it's invalid input */
-				/* FIXME: better handle the invalid 'HIGH HIGH LOW' sequence so
-				 * that only the first HIGH is invalid, but the following
-				 * 'HIGH LOW' is properly expanded? It's more tricky and not
-				 * very useful as it's invalid Unicode anyway. */
+			else if (! isUTF16)
+			{	/* not UTF-16 low surrogate but a plain code point */
 				d = handleUnicodeCodePoint (low);
 				ungetcToInputFile (d);
+			}
+			else if ((low & 0xfc00) != 0xdc00)
+			{	/* not a low surrogate, so put back the escaped representation
+				 * in case it was another high surrogate we should read as part
+				 * of another pair. */
+				ungetcToInputFile (valueToXDigit ((unsigned char) ((low & 0x000f) >>  0)));
+				ungetcToInputFile (valueToXDigit ((unsigned char) ((low & 0x00f0) >>  4)));
+				ungetcToInputFile (valueToXDigit ((unsigned char) ((low & 0x0f00) >>  8)));
+				ungetcToInputFile (valueToXDigit ((unsigned char) ((low & 0xf000) >> 12)));
+				ungetcToInputFile ('u');
+				ungetcToInputFile ('\\');
 			}
 			else
 				value = 0x010000 + ((value & 0x03ff) << 10) + (low & 0x03ff);

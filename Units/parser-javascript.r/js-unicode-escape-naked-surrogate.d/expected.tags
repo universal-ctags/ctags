@@ -1,0 +1,12 @@
+Ì†Ä	input.js	/^  '\\uD800': function() {},$/;"	m	class:object
+ÌºÄ	input.js	/^  '\\uDF00': function() {},$/;"	m	class:object
+ÌºÄÌ†Ä	input.js	/^  '\\uDF00\\uD800': function() {},$/;"	m	class:object
+ÌºÄêåÄ	input.js	/^  '\\uDF00\\uD800\\uDF00': function() {},$/;"	m	class:object
+Ì†ÄêåÄ	input.js	/^  '\\uD800\\uD800\\uDF00': function() {},$/;"	m	class:object
+Ì†Äa1	input.js	/^  '\\uD800a1': function() {},$/;"	m	class:object
+Ì†Äa2	input.js	/^  '\\uD800\\u{61}2': function() {},$/;"	m	class:object
+ÌºÄa1	input.js	/^  '\\uDF00a1': function() {},$/;"	m	class:object
+ÌºÄa2	input.js	/^  '\\uDF00\\u{61}2': function() {},$/;"	m	class:object
+ÌºÄÌ†Äa1	input.js	/^  '\\uDF00\\uD800a1': function() {},$/;"	m	class:object
+ÌºÄÌ†Äa2	input.js	/^  '\\uDF00\\uD800\\u{61}2': function() {},$/;"	m	class:object
+object	input.js	/^var object = {$/;"	c
