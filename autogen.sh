@@ -5,7 +5,7 @@ set -xe
 type autoreconf || exit 1
 type pkg-config || exit 1
 
-ctags_files=`make -f makefiles/list-translator-input.mak`
+ctags_files=`make -s -f makefiles/list-translator-input.mak`
 misc/dist-test-cases > makefiles/test-cases.mak && \
     if autoreconf -vfi; then
 	if type perl > /dev/null; then
