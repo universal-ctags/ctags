@@ -20,10 +20,6 @@
 #include <stdio.h>
 #include <ctype.h>  /* to declare isspace () */
 
-#if defined(HAVE_SCANDIR)
-#include <dirent.h>
-#endif
-
 #include "ctags.h"
 #include "debug.h"
 #include "field.h"
@@ -49,7 +45,6 @@
 */
 #define INVOCATION  "Usage: %s [options] [file(s)]\n"
 
-#define CTAGS_DATA_PATH_ENVIRONMENT "CTAGS_DATA_PATH"
 #define CTAGS_ENVIRONMENT  "CTAGS"
 #define ETAGS_ENVIRONMENT  "ETAGS"
 
@@ -74,12 +69,13 @@
 
 #define isCompoundOption(c)  (bool) (strchr ("fohiILpdDb", (c)) != NULL)
 
-#define SUBDIR_OPTLIB "optlib"
-#define SUBDIR_PRELOAD "preload"
-
-#define ENTER(STAGE) do {							\
-		Assert (Stage <= OptionLoadingStage##STAGE); \
-		Stage = OptionLoadingStage##STAGE;	\
+#define ENTER(STAGE) do {												\
+		Assert (Stage <= OptionLoadingStage##STAGE);					\
+		if (Stage != OptionLoadingStage##STAGE)							\
+		{																\
+			Stage = OptionLoadingStage##STAGE;							\
+			verbose ("Entering configuration stage: loading %s\n", StageDescription[Stage]); \
+		}																\
 	} while (0)
 #define ACCEPT(STAGE) (1UL << OptionLoadingStage##STAGE)
 
@@ -123,7 +119,6 @@ static stringList *OptionFiles;
 
 typedef stringList searchPathList;
 static searchPathList *OptlibPathList;
-static searchPathList *PreloadPathList;
 
 static stringList* Excluded;
 static bool FilesRequired = true;
@@ -152,7 +147,6 @@ optionValues Option = {
 	.fileList = NULL,
 	.tagFileName = NULL,
 	.headerExt = NULL,
-	.configFilename = NULL,
 	.etagsInclude = NULL,
 	.tagFileFormat = DEFAULT_FILE_FORMAT,
 #ifdef HAVE_ICONV
@@ -239,10 +233,6 @@ static optionDescription LongOptionDescription [] = {
  {1,"      for LANG."},
  {1,"  --append=[yes|no]"},
  {1,"       Should tags should be appended to existing tag file [no]?"},
- {1,"  --config-filename=fileName"},
- {1,"      Use 'fileName' instead of 'ctags' in option file names."},
- {1,"  --data-dir=[+]DIR"},
- {1,"      Add or set DIR to data directory search path."},
  {1,"  --etags-include=file"},
  {1,"      Include reference to 'file' in Emacs-style tag file (requires -e)."},
  {1,"  --exclude=pattern"},
@@ -373,8 +363,12 @@ static optionDescription LongOptionDescription [] = {
 #endif
  {1,"  --mline-regex-<LANG>=/line_pattern/name_pattern/[flags]"},
  {1,"       Define multiline regular expression for locating tags in specific language."},
- {1,"  --options=file"},
- {1,"       Specify file from which command line options should be read."},
+ {1,"  --options=path"},
+ {1,"       Specify file(or directory) from which command line options should be read."},
+ {1,"  --options-maybe=path"},
+ {1,"       Do the same as --options but this doesn't make an error for non-existing file."},
+ {1,"  --optlib-dir=[+]DIR"},
+ {1,"      Add or set DIR to optlib search path."},
 #ifdef HAVE_ICONV
  {1,"  --output-encoding=encoding"},
  {1,"      The encoding to write the tag file in. Defaults to UTF-8 if --input-encoding"},
@@ -516,7 +510,7 @@ static struct Feature {
 #ifdef DEBUG
 	{"debug", "TO BE WRITTEN"},
 #endif
-#ifdef HAVE_SCANDIR
+#if defined(HAVE_SCANDIR) || defined (HAVE_DIRENT_H) || defined (_MSC_VER)
 	{"option-directory", "TO BE WRITTEN"},
 #endif
 #ifdef HAVE_LIBXML
@@ -568,34 +562,6 @@ static bool getBooleanOption (const char *const option, const char *const parame
 /*
 *   FUNCTION DEFINITIONS
 */
-
-
-static vString* getHome (void)
-{
-	const char* const home = getenv ("HOME");
-
-	if (home)
-		return vStringNewInit (home);
-	else
-	{
-#ifdef MSDOS_STYLE_PATH
-		/*
-		 * Windows users don't usually set HOME.
-		 * The OS sets HOMEDRIVE and HOMEPATH for them.
-		 */
-		const char* homeDrive = getenv ("HOMEDRIVE");
-		const char* homePath = getenv ("HOMEPATH");
-		if (homeDrive != NULL && homePath != NULL)
-		{
-			vString* const windowsHome = vStringNew ();
-			vStringCatS (windowsHome, homeDrive);
-			vStringCatS (windowsHome, homePath);
-			return windowsHome;
-		}
-#endif
-		return NULL;
-	}
-}
 
 #ifndef HAVE_ASPRINTF
 
@@ -1106,13 +1072,6 @@ extern bool isIncludeFile (const char *const fileName)
 /*
  *  Specific option processing
  */
-
- static void processConfigFilenameOption (
-		const char *const option CTAGS_ATTR_UNUSED, const char *const parameter)
-{
-	freeString (&Option.configFilename);
-	Option.configFilename = stringCopy (parameter);
-}
 
 static void processEtagsInclude (
 		const char *const option, const char *const parameter)
@@ -2179,7 +2138,6 @@ static void processListSubparsersOptions (const char *const option CTAGS_ATTR_UN
 	exit (0);
 }
 
-
 static void freeSearchPathList (searchPathList** pathList)
 {
 	stringListClear (*pathList);
@@ -2187,23 +2145,14 @@ static void freeSearchPathList (searchPathList** pathList)
 	*pathList = NULL;
 }
 
-static void verboseSearchPathList (const searchPathList* pathList, const char *const varname)
-{
-	unsigned int i;
-
-	verbose ("Install %s:\n", varname);
-	for (i = 0; i < stringListCount (pathList); ++i)
-		verbose ("  %s\n", vStringValue (stringListItem (pathList, i)));
-}
-
 static vString* expandOnSearchPathList (searchPathList *pathList, const char* leaf,
 					bool (* check) (const char *const))
 {
 	unsigned int i;
 
-	for (i = 0; i < stringListCount (pathList); ++i)
+	for (i = stringListCount (pathList); i > 0; --i)
 	{
-		const char* const body = vStringValue (stringListItem (pathList, i));
+		const char* const body = vStringValue (stringListItem (pathList, i - 1));
 		char* tmp = combinePathAndFile (body, leaf);
 
 		if ((* check) (tmp))
@@ -2217,56 +2166,16 @@ static vString* expandOnSearchPathList (searchPathList *pathList, const char* le
 	return NULL;
 }
 
-static bool isDirectory (const char *const dirName)
-{
-	fileStatus *status = eStat (dirName);
-	return status->exists && status->isDirectory;
-}
-
 static vString* expandOnOptlibPathList (const char* leaf)
 {
-	vString* r;
-	vString* leaf_with_suffix;
 
-	leaf_with_suffix = vStringNewInit (leaf);
-	vStringCatS (leaf_with_suffix, ".d");
-
-	r = expandOnSearchPathList (OptlibPathList, vStringValue (leaf_with_suffix),
-				    isDirectory);
-
-	if (!r)
-	{
-		vStringCopyS (leaf_with_suffix, leaf);
-		vStringCatS (leaf_with_suffix, ".conf");
-		r = expandOnSearchPathList (OptlibPathList, vStringValue (leaf_with_suffix),
-					    doesFileExist);
-	}
-
-	if (!r)
-	{
-		vStringCopyS (leaf_with_suffix, leaf);
-		vStringCatS (leaf_with_suffix, ".ctags");
-		r = expandOnSearchPathList (OptlibPathList, vStringValue (leaf_with_suffix),
-					    doesFileExist);
-	}
-
-#ifdef MSDOS_STYLE_PATH
-	if (!r)
-	{
-		vStringCopyS (leaf_with_suffix, leaf);
-		vStringCatS (leaf_with_suffix, ".cnf");
-		r = expandOnSearchPathList (OptlibPathList, vStringValue (leaf_with_suffix),
-					    doesFileExist);
-	}
-#endif
-
-	vStringDelete (leaf_with_suffix);
-
-	return r;
+	return expandOnSearchPathList (OptlibPathList, leaf,
+								   doesFileExist);
 }
 
-static void processOptionFile (
-		const char *const option, const char *const parameter)
+static void processOptionFileCommon (
+	const char *const option, const char *const parameter,
+	bool allowNonExistingFile)
 {
 	const char* path;
 	vString* vpath = NULL;
@@ -2286,7 +2195,8 @@ static void processOptionFile (
 	status = eStat (path);
 	if (!status->exists)
 	{
-		error (FATAL | PERROR, "cannot stat \"%s\"", path);
+		if (!allowNonExistingFile)
+			error (FATAL | PERROR, "cannot stat \"%s\"", path);
 	}
 	else if (status->isDirectory)
 	{
@@ -2302,6 +2212,18 @@ static void processOptionFile (
 	eStatFree (status);
 	if (vpath)
 		vStringDelete (vpath);
+}
+
+static void processOptionFile (
+	const char *const option, const char *const parameter)
+{
+	processOptionFileCommon(option, parameter, false);
+}
+
+static void processOptionFileMaybe (
+	const char *const option, const char *const parameter)
+{
+	processOptionFileCommon(option, parameter, true);
 }
 
 static void processOutputFormat (const char *const option CTAGS_ATTR_UNUSED,
@@ -2551,77 +2473,47 @@ static void processXformatOption (const char *const option CTAGS_ATTR_UNUSED,
 	Option.customXfmt = fmtNew (parameter);
 }
 
-static void resetPathList (searchPathList** pathList, const char *const varname)
+static void prependToOptlibPathList (const char *const dir, bool report_in_verbose)
 {
-	freeSearchPathList (pathList);
-	verbose ("Reset %s\n", varname);
-	*pathList = stringListNew ();
+	vString *elt = vStringNewInit (dir);
+
+	if (report_in_verbose)
+		verbose ("Prepend %s to %s\n",
+				 dir, "OptlibPathList");
+
+	stringListAdd (OptlibPathList, elt);
 }
 
-static void resetDataPathList (void)
+static void resetOptlibPathList (bool report_in_verbose)
 {
-	resetPathList (&OptlibPathList, "OptlibPathList");
+	freeSearchPathList (&OptlibPathList);
+	if (report_in_verbose)
+		verbose ("Reset OptlibPathList\n");
+	OptlibPathList = stringListNew ();
 }
 
-static void appendToPathList (const char *const dir, const char *const subdir, searchPathList* const pathList, const char *const varname,
-				   bool report_in_verboe, const char* const action)
-{
-	char* path;
-
-	path = combinePathAndFile (dir, subdir);
-	if (report_in_verboe)
-		verbose ("%s %s to %s\n", action, path, varname);
-	stringListAdd (pathList, vStringNewOwn (path));
-}
-
-static void prependToPathList (const char *const dir, const char *const subdir, searchPathList* const pathList, const char *const varname,
-				    bool report_in_verboe, const char* const action)
-{
-	stringListReverse (pathList);
-	appendToPathList(dir, subdir, pathList, varname, report_in_verboe, action);
-	stringListReverse (pathList);
-
-}
-
-static void appendToDataPathList (const char *const dir, bool from_cmdline)
-{
-	appendToPathList (dir, SUBDIR_OPTLIB, OptlibPathList, "OptlibPathList",
-			       from_cmdline, from_cmdline? "Append": NULL);
-
-	if (!from_cmdline)
-		appendToPathList (dir, SUBDIR_PRELOAD, PreloadPathList, "PreloadPathList",
-				       false, NULL);
-}
-
-static void prependToDataPathList (const char *const dir, bool from_cmdline)
-{
-	prependToPathList (dir, SUBDIR_OPTLIB, OptlibPathList, "OptlibPathList",
-				from_cmdline, from_cmdline? "Prepend": NULL);
-	if (!from_cmdline)
-		prependToPathList (dir, SUBDIR_PRELOAD, PreloadPathList, "PreloadPathList",
-					false, NULL);
-}
-
-static void processDataDir (
+static void processOptlibDir (
 		const char *const option, const char *const parameter)
 {
 	const char* path;
 
-	if (parameter == NULL || parameter[0] == '\0')
-		error (FATAL, "Path for a directory is needed for \"%s\" option", option);
+	Assert (parameter);
 
-	if (parameter[0] == '+')
+
+	if (parameter[0] == '\0')
+		resetOptlibPathList (true);
+	else if (parameter[0] == '+')
 	{
 		path = parameter + 1;
-		prependToDataPathList (path, true);
+		if (path[0] == '\0')
+			return;
+		prependToOptlibPathList (path, true);
 	}
-	else if (!strcmp (parameter, RSV_NONE))
-		resetDataPathList ();
 	else
 	{
-		resetDataPathList ();
+		resetOptlibPathList (true);
 		path = parameter;
-		appendToDataPathList (path, true);
+		prependToOptlibPathList (path, true);
 	}
 }
 
@@ -2663,8 +2555,6 @@ static bool* redirectToXtag(booleanOption *const option)
 static void processDumpOptionsOption (const char *const option, const char *const parameter);
 
 static parametricOption ParametricOptions [] = {
-	{ "config-filename",		processConfigFilenameOption,	true,   STAGE_ANY },
-	{ "data-dir",               processDataDir,                 false,  STAGE_ANY },
 	{ "etags-include",          processEtagsInclude,            false,  STAGE_ANY },
 	{ "exclude",                processExcludeOption,           false,  STAGE_ANY },
 	{ "excmd",                  processExcmdOption,             false,  STAGE_ANY },
@@ -2704,7 +2594,9 @@ static parametricOption ParametricOptions [] = {
 	{ "list-roles",             processListRolesOptions,        true,   STAGE_ANY },
 	{ "list-subparsers",        processListSubparsersOptions,   true,   STAGE_ANY },
 	{ "maxdepth",               processMaxRecursionDepthOption, true,   STAGE_ANY },
+	{ "optlib-dir",             processOptlibDir,               false,  STAGE_ANY },
 	{ "options",                processOptionFile,              false,  STAGE_ANY },
+	{ "options-maybe",          processOptionFileMaybe,         false,  STAGE_ANY },
 	{ "output-format",          processOutputFormat,            true,   STAGE_ANY },
 	{ "pattern-length-limit",   processPatternLengthLimit,      true,   STAGE_ANY },
 	{ "pseudo-tags",            processPseudoTags,              false,  STAGE_ANY },
@@ -3354,7 +3246,6 @@ extern void previewFirstOption (cookedArgs* const args)
 	{
 		if (strcmp (args->item, "V") == 0
 		    || strcmp (args->item, "verbose") == 0
-		    || strcmp (args->item, "config-filename") == 0
 		    || strcmp (args->item, "quiet") == 0)
 			parseOption (args);
 		else if (strcmp (args->item, "options") == 0  &&
@@ -3376,27 +3267,7 @@ static void parseConfigurationFileOptionsInDirectoryWithLeafname (const char* di
 	eFree (pathname);
 }
 
-static void parseConfigurationFileOptionsInDirectory (const char* directory)
-{
-	char	*leafname = NULL;
-
-	if (asprintf (&leafname,".%s",(Option.configFilename)?Option.configFilename:"ctags") == -1)
-	{
-		error (FATAL, "error in asprintf");
-	}
-	parseConfigurationFileOptionsInDirectoryWithLeafname (directory, leafname);
-	free (leafname);
-#ifdef MSDOS_STYLE_PATH
-	if (asprintf (&leafname,"%s.cnf",(Option.configFilename)?Option.configFilename:"ctags") == -1)
-	{
-		error (FATAL, "error in asprintf");
-	}
-	parseConfigurationFileOptionsInDirectoryWithLeafname (directory, leafname);
-	free (leafname);
-#endif
-}
-
-#if defined(HAVE_SCANDIR)
+#if defined(HAVE_SCANDIR) || defined (HAVE_DIRENT_H) || defined (_MSC_VER)
 static int ignore_dot_file(const struct dirent* dent)
 {
 	/* Ignore a file which name is started from dot. */
@@ -3406,29 +3277,12 @@ static int ignore_dot_file(const struct dirent* dent)
 		return 1;
 }
 
-static int accept_only_dot_d(const struct dirent* dent)
-{
-	size_t len;
-
-	/* accept only a directory ended with ".d" */
-	len = strlen(dent->d_name);
-
-	if (len < 3)
-		return 0;
-	return !strcmp(dent->d_name + (len - 2), ".d");
-}
-
 static int accept_only_dot_ctags(const struct dirent* dent)
 {
 	size_t len;
 
-	/* accept only a file ended with ".conf" or ".ctags" */
+	/* accept only a file ended with ".ctags" */
 	len = strlen(dent->d_name);
-
-	if (len < 6)
-		return 0;
-	if (strcmp(dent->d_name + (len - 5), ".conf") == 0)
-		return 1;
 
 	if (len < 7)
 		return 0;
@@ -3438,13 +3292,19 @@ static int accept_only_dot_ctags(const struct dirent* dent)
 	return 0;
 }
 
+static int alphaSort(const struct dirent ** a,
+									  const struct dirent ** b)
+{
+	return strcmp ((*a)->d_name, (*b)->d_name);
+}
+
 static bool parseAllConfigurationFilesOptionsInDirectory (const char* const dirName,
 							     stringList* const already_loaded_files)
 {
 	struct dirent **dents;
 	int i, n;
 
-	n = scandir (dirName, &dents, ignore_dot_file, alphasort);
+	n = scanDirectory (dirName, &dents, ignore_dot_file, alphaSort);
 	if (n < 0)
 		return false;
 
@@ -3461,12 +3321,9 @@ static bool parseAllConfigurationFilesOptionsInDirectory (const char* const dirN
 		path = combinePathAndFile (dirName, dents[i]->d_name);
 		s = eStat (path);
 
-		if (s->exists && s->isDirectory && accept_only_dot_d(dents[i]))
-			parseAllConfigurationFilesOptionsInDirectory (path,
-								      already_loaded_files);
-		else if (s->exists && accept_only_dot_ctags(dents[i]))
+		if (s->exists && accept_only_dot_ctags(dents[i]))
 			parseConfigurationFileOptionsInDirectoryWithLeafname (dirName,
-									      dents[i]->d_name);
+																  dents[i]->d_name);
 		eStatFree (s);
 		free (dents[i]);
 		eFree (path);
@@ -3482,72 +3339,133 @@ static bool parseAllConfigurationFilesOptionsInDirectory (const char* const dirN
 }
 #endif
 
-static void preload (const searchPathList *const pathList)
+typedef char* (* preloadMakePathFunc) (const char*, const char*);
+
+struct preloadPathElt {
+	const char *path;			/* NULL means the end of list */
+	bool isDirectory;
+	preloadMakePathFunc makePath;
+	const char *extra;
+	OptionLoadingStage stage;
+};
+
+static char* prependEnvvar (const char *path, const char* envvar)
+{
+	char *full_path = NULL;
+
+	const char* const envval = getenv (envvar);
+	if (envval)
+		full_path = combinePathAndFile(envval, path);
+
+	return full_path;
+}
+
+#ifdef WIN32
+static char *getConfigAtHomeOnWindows (const char *path,
+									   const char* extra CTAGS_ATTR_UNUSED)
+{
+	/*
+	 * Windows users don't usually set HOME.
+	 * The OS sets HOMEDRIVE and HOMEPATH for them.
+	 */
+	const char* homeDrive = getenv ("HOMEDRIVE");
+	const char* homePath = getenv ("HOMEPATH");
+	if (homeDrive != NULL && homePath != NULL)
+	{
+		vString* const windowsHome = vStringNew ();
+		vStringCatS (windowsHome, homeDrive);
+		vStringCatS (windowsHome, homePath);
+
+		char *tmp = combinePathAndFile (vStringValue(windowsHome), path);
+		vStringDelete (windowsHome);
+
+		return tmp;
+	}
+	return NULL;
+}
+#endif
+
+static void preload (struct preloadPathElt *pathList)
 {
 	unsigned int i;
 	stringList* loaded;
 
 	loaded = stringListNew ();
-	for (i = 0; i < stringListCount (pathList); ++i)
+	for (i = 0; pathList[i].path != NULL; ++i)
 	{
-		const char* const dir = vStringValue (stringListItem (pathList, i));
-		parseAllConfigurationFilesOptionsInDirectory (dir, loaded);
+		struct preloadPathElt *elt = pathList + i;
+		preloadMakePathFunc maker = elt->makePath;
+		const char *path = elt->path;
+
+
+		if (maker)
+			path = maker(elt->path, elt->extra);
+
+		if (path == NULL)
+			continue;
+
+		Assert (Stage <= elt->stage);
+		if (Stage != elt->stage)
+		{
+			Stage = elt->stage;
+			verbose ("Entering configuration stage: loading %s\n", StageDescription[Stage]);
+		}
+
+		if (elt->isDirectory)
+			parseAllConfigurationFilesOptionsInDirectory (path, loaded);
+		else
+			parseFileOptions (path);
+
+		if (path != elt->path)
+			eFree ((void *)path);
 	}
 	stringListClear (loaded);
 	stringListDelete (loaded);
 }
 
+static struct preloadPathElt preload_path_list [] = {
+#ifdef CUSTOM_CONFIGURATION_FILE
+	{
+		.path = CUSTOM_CONFIGURATION_FILE,
+		.isDirectory = false,
+		.makePath = NULL,
+		.stage = OptionLoadingStageCustom,
+	},
+#endif
+	{
+		.path = ".ctags.d",
+		.isDirectory = true,
+		.makePath = prependEnvvar,
+		.extra = "HOME",
+		.stage = OptionLoadingStageHomeRecursive,
+	},
+#ifdef WIN32
+	{
+		.path = "ctags.d",
+		.isDirectory = true,
+		.makePath = getConfigAtHomeOnWindows,
+		.extra = NULL,
+		.stage = OptionLoadingStageHomeRecursive,
+	},
+#endif
+	{
+		.path = ".ctags.d",
+		.isDirectory = true,
+		.makePath = NULL,
+		.stage = OptionLoadingStageCurrentRecursive,
+	},
+	{
+		.path = "ctags.d",
+		.isDirectory = true,
+		.makePath = NULL,
+		.stage = OptionLoadingStageCurrentRecursive,
+	},
+	{ .path = NULL },
+};
+
 static void parseConfigurationFileOptions (void)
 {
-	vString *home;
-	/* We parse .ctags on all systems, and additionally ctags.cnf on DOS. */
-	char *filename = NULL;
-	const char *filename_body;
-
-#ifdef CUSTOM_CONFIGURATION_FILE
-	ENTER(Custom);
-	parseFileOptions (CUSTOM_CONFIGURATION_FILE);
-#endif
-	filename_body = (Option.configFilename)?Option.configFilename:"ctags";
-#ifdef MSDOS_STYLE_PATH
-
-	if (asprintf (&filename,"/%s.cnf", filename_body) == -1)
-	{
-		error (FATAL, "error in asprintf");
-	}
-	ENTER(DosCnf);
-	parseFileOptions (filename);
-	free (filename);
-#endif
-	if (asprintf (&filename,"/etc/%s.conf", filename_body) == -1)
-	{
-		error (FATAL, "error in asprintf");
-	}
-	ENTER(Etc);
-	parseFileOptions (filename);
-	free (filename);
-
-	if (asprintf (&filename,"/usr/local/etc/%s.conf", filename_body) == -1)
-	{
-		error (FATAL, "error in asprintf");
-	}
-	ENTER(LocalEtc);
-	parseFileOptions (filename);
-	free (filename);
-
-	home = getHome ();
-	if (home != NULL)
-	{
-		ENTER(HomeRecursive);
-		parseConfigurationFileOptionsInDirectory (vStringValue (home));
-		vStringDelete (home);
-	}
-
-	ENTER(CurrentRecursive);
-	parseConfigurationFileOptionsInDirectory (".");
-
-	ENTER(Preload);
-	preload (PreloadPathList);
+	preload (preload_path_list);
 }
 
 static void parseEnvironmentOptions (void)
@@ -3586,53 +3504,6 @@ extern void readOptionConfiguration (void)
 	}
 }
 
-static void installDataPathList (void)
-{
-	char* dataPath = getenv (CTAGS_DATA_PATH_ENVIRONMENT);
-
-	OptlibPathList = stringListNew ();
-	PreloadPathList = stringListNew ();
-
-	if (dataPath)
-	{
-		char* needle;
-
-		while (dataPath[0])
-		{
-			needle = strchr (dataPath, ':');
-			if (needle)
-				*needle = '\0';
-
-			appendToDataPathList (dataPath, false);
-
-			if (needle)
-			{
-				*needle = ':';
-				dataPath = needle + 1;
-			}
-			else
-				break;
-		}
-	}
-
-	{
-		vString *home = getHome ();
-		if (home != NULL)
-		{
-			char *ctags_d;
-
-			ctags_d = combinePathAndFile (vStringValue (home), ".ctags.d");
-
-			appendToDataPathList (ctags_d, false);
-			eFree (ctags_d);
-			vStringDelete (home);
-		}
-	}
-#ifdef PKGSYSCONFDIR
-	appendToDataPathList (PKGSYSCONFDIR, false);
-#endif
-}
-
 /*
 *   Option initialization
 */
@@ -3640,9 +3511,7 @@ static void installDataPathList (void)
 extern void initOptions (void)
 {
 	OptionFiles = stringListNew ();
-	installDataPathList ();
-	verboseSearchPathList (OptlibPathList,  "OptlibPathList");
-	verboseSearchPathList (PreloadPathList, "PreloadPathList");
+	OptlibPathList = stringListNew ();
 
 	verbose ("Setting option defaults\n");
 	installHeaderListDefaults ();
@@ -3725,7 +3594,6 @@ extern void freeOptionResources (void)
 	freeList (&Option.etagsInclude);
 
 	freeSearchPathList (&OptlibPathList);
-	freeSearchPathList (&PreloadPathList);
 
 	freeList (&OptionFiles);
 }

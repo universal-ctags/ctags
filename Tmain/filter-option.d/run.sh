@@ -4,5 +4,5 @@
 
 CTAGS=$1
 
-echo ./input.c | $CTAGS --filter
-echo ./input.c | $CTAGS --filter --output-format=xref
+echo ./input.c | $CTAGS --quiet --options=NONE --filter
+echo ./input.c | $CTAGS --quiet --options=NONE --filter --output-format=xref

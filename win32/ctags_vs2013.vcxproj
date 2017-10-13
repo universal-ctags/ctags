@@ -118,6 +118,7 @@
     <ClCompile Include="..\main\options.c" />
     <ClCompile Include="..\main\param.c" />
     <ClCompile Include="..\main\parse.c" />
+    <ClCompile Include="..\main\portable-scandir.c" />
     <ClCompile Include="..\main\promise.c" />
     <ClCompile Include="..\main\ptag.c" />
     <ClCompile Include="..\main\ptrarray.c" />
@@ -265,6 +266,7 @@
     <ClInclude Include="..\main\param.h" />
     <ClInclude Include="..\main\parse.h" />
     <ClInclude Include="..\main\parsers.h" />
+    <ClInclude Include="..\main\portable-dirent.h" />
     <ClInclude Include="..\main\promise.h" />
     <ClInclude Include="..\main\ptag.h" />
     <ClInclude Include="..\main\ptrarray.h" />

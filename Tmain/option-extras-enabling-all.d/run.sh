@@ -12,9 +12,9 @@ if ! column_for_enabled=$(get_column_index $CTAGS --list-extras "ENABLED"); then
 	exit $?
 fi
 
-$CTAGS --extras-all= \
+$CTAGS --quiet --options=NONE --extras-all= \
 	   --with-list-header=no --list-extras \
 	| filter_by_column_index $column_for_enabled | sort | uniq
-$CTAGS --extras-all='*' \
+$CTAGS --quiet --options=NONE --extras-all='*' \
 	   --with-list-header=no --list-extras \
 	| filter_by_column_index $column_for_enabled | sort | uniq

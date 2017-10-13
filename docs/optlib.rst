@@ -7,255 +7,186 @@ Extending ctags with Regex parser(*optlib*)
 
 ----
 
-Writing regex parser and using it as option library(*optlib*)
+.. NOT REVIEWED
+
+Option files
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Option file is a file in which command line options are written line
+by line. ctags loads it and runs as if the options in the file are
+passed in command line.
+
+Following file is an example of option file.
+.. code-block::
+
+	# Exclude directories that don't contain real code
+	--exclude=Units
+		--exclude=tinst-root
+		--exclude=Tmain
+
+`#` can be used as a start marker of a line comment.
+Whitespaces at the start of lines are ignored during loading.
+
+Preload and optlib are the category of option files.
+
+Preload option file
+......................................................................
+
+Preload option files are option files loaded at starting up time.
+Which files are loaded at starting up time are very different from
+Exuberant-ctags.
+
+At starting up time, Universal-ctags loads files having *.ctags* as
+file extension under following statically defined directories(preload
+path list):
+
+#. *$HOME/.ctags.d*
+#. *$HOMEDRIVE$HOMEPATH/.ctags.d*
+#. *.ctags.d*
+#. *ctags.d*
+
+ctags visits the directories in the order as listed for loading files.
+ctags loads files having *.ctags* as file extension in alphabetical
+order(strcmp(3) is used for comparing).
+
+Quoted from man page of Exuberant-ctags:
+
+	FILES
+		   /ctags.cnf (on MSDOS, MSWindows only)
+		   /etc/ctags.conf
+		   /usr/local/etc/ctags.conf
+		   $HOME/.ctags
+		   $HOME/ctags.cnf (on MSDOS, MSWindows only)
+		   .ctags
+		   ctags.cnf (on MSDOS, MSWindows only)
+				  If any of these configuration files exist, each will
+				  be expected to contain a set of default options
+				  which are read in the order listed when ctags
+				  starts, but before the CTAGS environment variable is
+				  read or any command line options are read.  This
+				  makes it possible to set up site-wide, personal or
+				  project-level defaults. It is possible to compile
+				  ctags to read an additional configuration file
+				  before any of those shown above, which will be
+				  indicated if the output produced by the --version
+				  option lists the "custom-conf" feature. Options
+				  appearing in the CTAGS environment variable or on
+				  the command line will override options specified in
+				  these files. Only options will be read from these
+				  files.  Note that the option files are read in
+				  line-oriented mode in which spaces are significant
+				  (since shell quoting is not possible). Each line of
+				  the file is read as one command line parameter (as
+				  if it were quoted with single quotes). Therefore,
+				  use new lines to indicate separate command-line
+				  arguments.
 
-exuberant-ctags provides the way to customize ctags with options like
-``--langdef=<LANG>`` and ``--regex-<LANG>``. An option file where options are
-written can be loaded with ``--options=OPTION_FILE``.
+Let me explain the differences and their intentions.
 
-This feature was extended such that ctags treats option files
-as libraries. Developers of universal-ctags can maintain option files
-as part of universal-ctags, making part of its release. With ``make
-install`` they are also installed along with ctags command.
 
-universal-ctags prepares directories where the option files are installed.
+Directory oriented configuration management
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 
-Consider a GNU/Linux distribution.
-The following directories are searched when loading an option file:
+Exuberant-ctags provides the way to customize ctags with options like
+``--langdef=<LANG>`` and ``--regex-<LANG>``. These options are
+powerful and make ctags popular in programmers.
 
-#. *~/.ctags.d/optlib*
-#. */etc/ctags/optlib*
-#. */usr/share/ctags/optlib*
+Universal-ctags extends this idea; we have added new options for
+defining a parser, and have extended existing options. Defining
+a new parser with the options is more than "customizing" in
+Universal-ctags.
 
-The name of an option file must have .conf or .ctags as suffix.
+To make a maintain a parser easier defined with the options, put one
+parser to one file. Universal-ctags doesn't load a specified
+file. Instead, Universal-ctags loads files having *.ctags* as
+extension under specified directories. If you have multiple parser
+definitions, put them to different files.
 
-If ctags is invoked with following command line::
+Avoiding troubles about option incompatibility
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 
-	$ ctags --options=m4 ...
+Universal-ctags doesn't load any files Exuberant-ctags loads at
+starting up. The options of Universal-ctags are different from
+Exuberant-ctags. It will cause a trouble that Exuberant-ctags loads
+an option file in which a user uses options newly introduced in
+Universal-ctags and vice versa.
 
-Following files are searched with following order for finding ``m4``:
+No system wide configuration
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 
-#.  *~/.ctags.d/optlib/m4.conf*
-#.  *~/.ctags.d/optlib/m4.ctags*
-#.  */etc/ctags/optlib/m4.conf*
-#.  */etc/ctags/optlib/m4.ctags*
-#.  */usr/share/ctags/optlib/m4.conf*
-#.  */usr/share/ctags/optlib/m4.ctags*
+To make preload path list short, Universal-ctags loads no option file for
+system wide configuration.
 
-These are called built-in search paths.
+Use *.ctags* as file extension
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 
-If these search paths are not desired, the full path of the option
-file can be directly specified with ``--options``. The parameter must
-start with */* (absolute path) or *./* (relative path) like::
+Extensions *.cnf* and *.conf* are obsolete.
+Use *.ctags*, the unified extension only.
 
-	$ ctags --option=/home/user/test/m4.cf
-	$ ctags --option=./test/m4.cf
 
-Here the suffix restriction doesn't exist.
+Optlib option file
+......................................................................
 
-On GNU/Linux more directories can be added with the environment variable
-``CTAGS_DATA_PATH``.
+In syntax level, there is no difference between optlib option file
+and preload option file; options are written line by line in a file.
 
-::
+Optlib option files are option files not loaded at starting up time
+automatically. For loading an optlib option file, specify a pathname
+for an optlib option file with ``--options=PATHNAME`` option
+explicitly.
 
-	$ CTAGS_DATA_PATH=A:B ctags --options=m4 ...
+Exuberant-ctags has ``--options``. With the option, you can specify
+a file to load. Universal-ctags extends the option two aspects.
 
-The files are searched with the order described below for finding *m4*:
 
-#. *A/optlib/m4.conf*
-#. *A/optlib/m4.ctags*
-#. *B/optlib/m4.conf*
-#. *B/optlib/m4.ctags*
-#. *~/.ctags.d/optlib/m4.conf*
-#.  ...
+Specifying a directory
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 
-Further more ``--data-path=[+]PATH`` can be used for adding more
-directories with environment variable::
+If you specify a directory instead of a file as argument for
+the option, Universal-ctags load all files having *.ctags*
+as extension under the directory in alphabetical order.
 
-	$ CTAGS_DATA_PATH=A:B ctags --data-path=+C --options=m4 ...
+Optlib path list
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 
-In this case files are searched with the following order to find
-*m4*:
+For loading a file (or directory) specified in ``--options``, ctags
+searches "optlib path list" first if the option argument(pathname)
+doesn't start with '/' or '.'. If ctags finds a file, ctags loads
+it.
 
-#. *C/optlib/m4.conf*
-#. *C/optlib/m4.ctags*
-#. *A/optlib/m4.conf*
-#. *A/optlib/m4.ctags*
-#. *B/optlib/m4.conf*
-#. *B/optlib/m4.ctags*
-#. *~/.ctags.d/optlib/m4.conf*
-#. ...
+If ctags doesn't find a file in the path list, ctags loads
+a file (or directory) at the specified pathname.
 
-If *+* is omitted, the directory is set instead of added::
+By default, optlib path list is empty. To set or add a directory
+path to the list, use ``--optlib-dir``.
 
-	$ CTAGS_DATA_PATH=A:B ctags --data-path=C --options=m4 ...
+For setting (adding one after clearing)
 
-In this case files are searched with the following order to find
-*m4*:
+	``--optlib-dir=PATH``
 
-#. *C/config/m4.conf*
-#. *C/config/m4.ctags*
+For adding
 
-The directory list can be emptied using the reserved file name ``NONE``::
+	``--optlib-dir=+PATH``
 
-	$ CTAGS_DATA_PATH=A:B ctags --data-path=NONE --options=m4 ...
+Tips about writing option file
+......................................................................
 
-In this case ctags only tries to load *./m4*.
+* ``--quiet --options=NONE`` is for disabling preloading. This phrase
+  is used well in Tmain test cases.
 
-See also "Loading option recursively".
+* Two options are introduced for debugging the process of loading
+  option files.
 
-How a directory is set/added to the search path can be reviewed using
-``--verbose`` option. This is useful for debugging this feature.
+	``--_echo=MSG``
 
-Pull requests with updated or new option files are welcome by ctags
-developers.
+		Print MSG to standard error immediately.
 
-NOTE: Although ``--data-path`` has highest priority, ``--data-path`` doesn't
-affect a stage of automatic option file loading. Following files are
-automatically loaded when ctags starts:
+	``--_force-quit=[NUM]``
 
-#. */ctags.cnf* (on MSDOS, MSWindows only)
-#. */etc/ctags.conf*
-#. */usr/local/etc/ctags.conf*
-#. *$HOME/.ctags*
-#. *$HOME /ctags.cnf* (on MSDOS, MSWindows only)
-#. *.ctags*
-#. *ctags.cnf* (on MSDOS, MSWindows only)
+		Exit immediately with status specified NUM.
 
-NOTE: This feature is still experimental. The name of directories,
-suffix rules and other conventions may change.
-
-.. TODO
-..
-.. * Write about MSWindows more(*.cnf*).
-.. * ``accept_only_dot_ctags()`` doesn't  check *.cnf*.
-
-See "Contributing an optlib" if you have a good optlib.
-
-Loading option recursively
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-The option file loading rules explained in "Option library" is more
-complex. If a directory is specified as parameter for ``--option`` instead
-of a file, universal-ctags loads option files under the directory
-recursively.
-
-Consider the following command line on a GNU/Linux distribution::
-
-	$ ctags --options=bundle ...
-
-The following directories are searched first:
-
-#. *~/.ctags.d/optlib/bundle.d*
-#. */etc/ctags/optlib/bundle.d*
-#. */usr/share/ctags/optlib/bundle.d*
-
-If *bundle.d* is found and is a directory, files (*\*.ctags*
-and *\*.conf*), directories (\*.d) are loaded recursively.
-
-.. TODO
-
-NOTE: If *bundle.d* is not found above list, file
-*bundle.ctags* or *bundle.conf* is searched. This rule is a bit
-ugly. Following search rules look better.
-
-#. *~/.ctags.d/optlib/bundle.d*
-#. *~/.ctags.d/optlib/bundle.ctags*
-#. *~/.ctags.d/optlib/bundle.conf*
-#. */etc/ctags/optlib/bundle.d*
-#. */etc/ctags/optlib/bundle.ctags*
-#. */etc/ctags/optlib/bundle.conf*
-#. */usr/share/ctags/optlib/bundle.d*
-#. */usr/share/ctags/optlib/bundle.ctags*
-#. */usr/share/ctags/optlib/bundle.conf*
-
-NOTE: This feature requires ``scandir`` library function. This feature may
-be disabled on which platform scandir is not available. Check ``option-directory``
-in the supported features::
-
-	$ ./ctags --list-features --with-list-header=no
-	wildcards
-	regex
-	option-directory
-
-
-Directories for preloading
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-As written in "Option library", option libraries can be loaded with
-``--options`` option. However, loading them without explicitly
-specifying it may be desired.
-
-Following files can be used for this purpose.
-
-* ~/.ctags
-* /ctags.cnf (on MSDOS, MSWindows only)
-* /etc/ctags.conf
-* /usr/local/etc/ctags.conf
-
-This preloading feature comes from universal-ctags. However, two
-weaknesses exist in this implementation.
-
-* The file must be edited when an option library is to be loaded.
-
-  If one wants to add or remove an ``--options=`` in a *ctags.conf*,
-  currently one may have to use sed or something tool for adding or
-  removing the line for the entry in */usr/local/etc/ctags.conf* (or
-  */etc/ctags.conf*).
-
-  There is a discussion about a similar issue in
-  *http://marc.info/?t=129794755000003&r=1&w=2* about */etc/exports*
-  of NFS.
-
-* The configuration defined by the system administrator cannot be
-  overridden.
-
-  A user must accept all configuration including ``--options=``
-  in */etc/ctags.conf* and */usr/local/etc/ctags.conf*.
-
-The following directories were introduced for preloading purpose.
-
-#. *~/.ctags.d/preload*
-#. */etc/ctags/preload*
-#. */usr/share/ctags/preload*
-
-All files and directories under the directories are loaded recursively,
-with two restrictions:
-
-* file/directory name
-
-  The same suffix rules written in "Option library" and
-  "Loading option recursively" are applied in preloading, too.
-
-* overriding
-
-  The traversing and loading are done in the order listed above.
-  Once a file is loaded, another file with the same name is not loaded.
-  Once a directory is traversed, another directory with the same name is
-  not traversed.
-
-  universal-ctags prepares */usr/share/ctags/preload/default.ctags*.
-  If you want ctags not to load it, make an empty file at
-  *~/.ctags/default.ctags*. To customize
-  */usr/share/ctags/preload/default.ctags*, copy the file to
-  *~/.ctags.d/default.ctags* and edit it as desired.
-
-  Assume */usr/share/ctags/preload/something.d* exits.
-  Some *.ctags* files are in the directory. With making
-  an empty directory at *~/.ctags.d/something.d*, you
-  can make ctags not to traverse */usr/share/ctags/preload/something.d*.
-  As the result *.ctags* files under */usr/share/ctags/preload/something.d*
-  are not loaded.
-
-  To customize one of file under
-  */usr/share/ctags/preload/something.d*, copy
-  */usr/share/ctags/preload/something.d* to *~/.ctags.d/something.d* recursively.
-  Symbolic links can also be used. After copying or symbolic linking, edit
-  one of the copied file.
-
-This feature is heavily inspired by systemd.
-
+* Universal-ctags has optlib2c command that translator a option file
+  into C file. Your optlib parser can be a built-in parser.
+  Examples are in *optlib* directory in Universal-ctags source tree.
 
 Long regex flag
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1073,5 +1004,8 @@ Let's verify all your work here.
 Pull-request
 ......................................................................
 
-Remember your *.ctags* is treasure and can be shared as a first class
-software component in universal-ctags.  Again, pull-requests are welcome.
+Please, consider submitting your well written optlib parser to
+Universal-ctags. Your *.ctags* is treasure and can be shared as a
+first class software component in universal-ctags.
+
+Pull-requests are welcome.

@@ -1,0 +1,1 @@
+foo	input-maybe.c	/^int foo (void)$/;"	f	typeref:typename:int

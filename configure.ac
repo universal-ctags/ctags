@@ -136,13 +136,6 @@ AC_DEFUN([PRETTY_ARG_VAR], [
 	fi
 ])
 
-# PRETTY_VAR_EXPAND(VARIABLE)
-# ---------------------------
-# Expand nested variable.
-# e.g. "\$\{prefix\}/bin" to "/usr/local/bin"
-AC_DEFUN([PRETTY_VAR_EXPAND],
-	 [$(eval "$as_echo_n" $(eval "$as_echo_n" "${$1}"))])
-
 # Checks for configuration options
 # --------------------------------
 
@@ -197,10 +190,6 @@ AC_ARG_ENABLE(tmpdir,
 		[default directory for temporary files [ARG=/tmp]])],
 	tmpdir_specified=yes)
 
-AC_ARG_WITH([ctags-sysconfdir],
-	[AS_HELP_STRING([--with-ctags-sysconfdir=DIR],
-		['universal-ctags'-specific read-only single-machine data [SYSCONFDIR/ctags]])])
-
 AC_ARG_ENABLE([debugging],
 	[AS_HELP_STRING([--enable-debugging],
 		[enable debugging features])])
@@ -209,25 +198,6 @@ AC_ARG_PROGRAM
 
 # Process configuration options
 # -----------------------------
-
-case "${with_ctags_sysconfdir+set}"-"$with_ctags_sysconfdir" in #(
-"set"-"yes") ctags_sysconfdir="${sysconfdir}/ctags"	 ;; #(
-"set"-"no")  ctags_sysconfdir="${sysconfdir}"		 ;; #(
-"set"-*)     ctags_sysconfdir="${with_ctags_sysconfdir}" ;; #(
-*)	     ctags_sysconfdir="${sysconfdir}/ctags"	 ;;
-esac
-
-pkgsysconfdir="${ctags_sysconfdir}"
-
-AC_SUBST([pkgsysconfdir])
-
-AH_TEMPLATE([PKGSYSCONFDIR], [installation directory of 'universal-ctags'-specific read-only single-machine data.])
-
-AC_CONFIG_COMMANDS_PRE([
-	PKGSYSCONFDIR="PRETTY_VAR_EXPAND([pkgsysconfdir])"
-
-	AC_DEFINE_UNQUOTED([PKGSYSCONFDIR], ["${PKGSYSCONFDIR}"])
-])
 
 AM_CONDITIONAL(INSTALL_LIB, [test "x$enable_readlib" = "xyes"])
 AM_CONDITIONAL(INSTALL_ETAGS, [test "x$enable_etags" = "xyes"])
@@ -574,7 +544,11 @@ have_regcomp=no])
 AC_SUBST([REGCOMP_CPPFLAGS])
 AM_CONDITIONAL([HAVE_REGCOMP], [test "xyes" = "x$have_regcomp"])
 
-AC_CHECK_FUNCS(scandir)
+have_scandir=no
+AC_CHECK_FUNCS(scandir,have_scandir=yes)
+
+have_dirent_h=no
+AC_CHECK_HEADERS(dirent.h,have_dirent_h=yes)
 
 AC_ARG_ENABLE([xml],
 	[AS_HELP_STRING([--disable-xml],

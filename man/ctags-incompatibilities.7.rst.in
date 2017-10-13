@@ -73,3 +73,11 @@ In this case the user should set "--extras=+q" instead of "--extras=q".
 
 Incompatibilities in tags file format
 -------------------------------------------------------------
+
+
+Option files loading at starting up time (preload files)
+-------------------------------------------------------------
+
+File paths for preload files are changed.
+Universal-ctags doesn't load "~/.ctags" at starting up time.
+See "FILES" section of ctags(1).

@@ -1321,17 +1321,30 @@ OPTION ITEMS
 	Limits the depth of directory recursion enabled with the ``--recurse``
 	(``-R``) option.
 
-``--options=file|directory``
-	Read additional options from file or directory. If a file is specified,
-	it should contain one option per line. If a directory is specified
-	(and scandir function is available at build configuration time), files
-	suffixed with .ctags or .conf under the directory are read. (On MSDOS or
-	MSWindows this directory traverse feature is temporary disable because
-	the contributor of this feature has no access to the platforms.
-	Volunteers are welcome). As a special case, if "--options=NONE" is
-	specified as the first option on the command line, it will disable
-	the automatic reading of any configuration options from either a file
-	or the environment (see "FILES").
+``--optlib-dir=[+]directory``
+	Add an optlib *directory* to or reset **optlib** path list.
+	By default, the optlib path list is empty.
+
+``--options=pathname``
+	Read additional options from file or directory.
+
+	@CTAGS_NAME_EXECUTABLE@ searches *pathname* in optlib path list
+	first. If @CTAGS_NAME_EXECUTABLE@ cannot find a file or directory
+	in the list, @CTAGS_NAME_EXECUTABLE@ reads a file or directory
+	at the specified *pathname*.
+
+	If a file is specified, it should contain one option per line. If
+	a directory is specified, files suffixed with ".ctags" under it
+	are read in alphabetical order.
+
+	As a special case, if "--options=NONE" is specified as the first
+	option on the command line, preloading is disabled; the option
+	will disable the automatic reading of any configuration options
+	from either a file or the environment (see "FILES").
+
+``--options-maybe=pathname``
+	Same as ``--options`` but doesn't cause an error if file
+	(or directory) specified with *pathname* doesn't exist.
 
 ``--print-language``
 	Just prints the parsers for specified source files, and then exits.
@@ -1739,24 +1752,20 @@ TMPDIR
 FILES
 -----
 
-/ctags.cnf (on MSDOS, MSWindows only)
 
-/etc/ctags.conf
+$HOME/.ctags.d/\*.ctags
 
-@prefix@/etc/ctags.conf
+$HOMEDRIVE$HOMEPATH/ctags.d/\*.ctags (on MSWindows only)
 
-$HOME/.ctags
+.ctags.d/\*.ctags
 
-$HOME/ctags.cnf (on MSDOS, MSWindows only)
+ctags.d/\*.ctags
 
-.ctags
-
-ctags.cnf (on MSDOS, MSWindows only)
 	If any of these configuration files exist, each will be expected to
 	contain a set of default options which are read in the order listed
 	when @CTAGS_NAME_EXECUTABLE@ starts, but before the CTAGS environment
 	variable is read or any command line options are read. This makes it
-	possible to set up site-wide, personal or project-level defaults. It
+	possible to set up personal or project-level defaults. It
 	is possible to compile @CTAGS_NAME_EXECUTABLE@ to read an additional
 	configuration file before any of those shown above, which will be
 	indicated if the output produced by the ``--version`` option lists the
@@ -1764,9 +1773,13 @@ ctags.cnf (on MSDOS, MSWindows only)
 	variable or on the command line will override options specified in these
 	files. Only options will be read from these files. Note that the option
 	files are read in line-oriented mode in which spaces are significant
-	(since shell quoting is not possible). Each line of the file is read as
+	(since shell quoting is not possible) but spaces at the beginning
+	of a line are ignored. Each line of the file is read as
 	one command line parameter (as if it were quoted with single quotes).
 	Therefore, use new lines to indicate separate command-line arguments.
+	A line starting with '#' is treated as a comment.
+
+	\*.ctags files in a directory are loaded in alphabetical order.
 
 tags
 	The default tag file created by @CTAGS_NAME_EXECUTABLE@.
