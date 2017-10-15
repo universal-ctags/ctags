@@ -13,6 +13,8 @@ function f3(
 function f4(a, b, c) {
 }
 
+function f5(a="hello", b='hi', c=42){}
+
 function Cls(name) {
   this.name = name;
 }

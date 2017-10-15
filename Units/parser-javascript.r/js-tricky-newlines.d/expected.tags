@@ -4,3 +4,9 @@ c	input.js	/^,   c = 1$/;"	v
 d	input.js	/^let d$/;"	v
 e	input.js	/^,   e$/;"	v
 f	input.js	/^,   f$/;"	v
+g	input.js	/^var g, h$/;"	v
+h	input.js	/^var g, h$/;"	v
+i	input.js	/^var i, j$/;"	v
+j	input.js	/^var i, j$/;"	v
+k	input.js	/^var k$/;"	f
+l	input.js	/^l$/;"	f

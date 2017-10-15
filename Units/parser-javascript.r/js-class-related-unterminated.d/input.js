@@ -33,8 +33,9 @@ Cls.B.prototype.m5 = function(e) {
    * then parser then thinks it's a child of this very scope.  it isn't really
    * possible to fix this as the only reason it's actually not a child of the
    * current scope is because it exists in the root scope but not in this one */
-  var Sub = Cls.B.Sub;
-  Sub.prototype.dyn1 = this.m4
+  //var Sub = Cls.B.Sub;
+  //Sub.prototype.dyn1 = this.m4
+  Cls.B.Sub.prototype.dyn1 = this.m4
 }
 Cls.B.prototype.m6 = function(f) {
 }

@@ -1,0 +1,12 @@
+v1	input.js	/^var v1, v2$/;"	v
+v2	input.js	/^var v1, v2$/;"	v
+v3	input.js	/^var v3 = 1$/;"	v
+v4	input.js	/^,   v4 = 2$/;"	v
+v5	input.js	/^,   v5 = 3$/;"	v
+f1_c1_m1	input.js	/^    f1_c1_m1:$/;"	m	class:f1.f1_c1
+f1_c1_m2	input.js	/^    f1_c1_m2$/;"	m	class:f1.f1_c1
+f1_c1	input.js	/^  var f1_c1 = {$/;"	c	class:f1
+f1	input.js	/^function f1() {$/;"	f
+v6	input.js	/^var v6 = "hello\\$/;"	v
+v7	input.js	/^var v7 = "hello\\$/;"	v
+v8	input.js	/^var v8;$/;"	v

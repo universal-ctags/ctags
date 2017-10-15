@@ -10,7 +10,7 @@ InnerClass2	input.js	/^	class InnerClass2 {$/;"	c	class:func1
 func1	input.js	/^function func1() {$/;"	f
 func2	input.js	/^function func2() {$/;"	f
 method1	input.js	/^	method1(arg1,arg2)$/;"	m	class:Class1
-method10	input.js	/^		method10() {$/;"	m	class:InnerClass2
+method10	input.js	/^		method10() {$/;"	m	class:func1.InnerClass2
 method11	input.js	/^	method11() {};$/;"	m	class:Class5
 method12	input.js	/^	method12() {};$/;"	m	class:Class5
 method2	input.js	/^	method2(arg1,arg2)$/;"	m	class:Class1
@@ -20,4 +20,4 @@ method5	input.js	/^	static method5(){}$/;"	m	class:Class3
 method6	input.js	/^	method6(){}$/;"	m	class:Class4
 method7	input.js	/^	static method7(){}$/;"	m	class:Class4
 method8	input.js	/^	method8(n) { return n * n; }$/;"	m	class:AnonymousClass152c525b0101
-method9	input.js	/^		method9() {$/;"	m	class:InnerClass1
+method9	input.js	/^		method9() {$/;"	m	class:func1.InnerClass1
