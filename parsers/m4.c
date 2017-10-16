@@ -337,7 +337,7 @@ static int notifyNewMacro (m4Subparser *m4, const char *token)
 
 /* tag creation */
 
-static int makeM4RefTag(const kindDefinition *kind, const vString *const name, int role)
+static int makeM4RefTag(int kind, const vString *const name, int role)
 {
 	tagEntryInfo e;
 
@@ -360,7 +360,7 @@ static int makeM4Tag (int kind, int role)
 		{
 			name = vStringNew();
 			readM4MacroArgument(name);
-			index = makeM4RefTag (M4Kinds + kind, name, role);
+			index = makeM4RefTag (kind, name, role);
 		}
 		else if (role == M4_MACRO_ROLE_UNDEF)
 		{
@@ -371,7 +371,7 @@ static int makeM4Tag (int kind, int role)
 				/* TODO: The cork indexes are thrown away here.
 				   `end' field cannot be attached to multiple
 				   indexes. */
-				makeM4RefTag (M4Kinds + kind, name, role);
+				makeM4RefTag (kind, name, role);
 				vStringClear (name);
 				if (more)
 					getcFromInputFile ();
@@ -385,7 +385,7 @@ static int makeM4Tag (int kind, int role)
 	{
 		name = vStringNew();
 		readM4MacroArgument(name);
-		index = makeM4RefTag (M4Kinds + kind, name, role);
+		index = makeM4RefTag (kind, name, role);
 	}
 
 	if (name)

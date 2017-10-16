@@ -78,7 +78,7 @@ static void makeMemberTag (
 	if (ErlangKinds [kind].enabled  &&  vStringLength (identifier) > 0)
 	{
 		tagEntryInfo tag;
-		initTagEntry (&tag, vStringValue (identifier), &(ErlangKinds[kind]));
+		initTagEntry (&tag, vStringValue (identifier), kind);
 
 		if (module != NULL  &&  vStringLength (module) > 0)
 		{
@@ -93,7 +93,7 @@ static void parseModuleTag (const unsigned char *cp, vString *const module)
 {
 	vString *const identifier = vStringNew ();
 	parseIdentifier (cp, identifier);
-	makeSimpleTag (identifier, ErlangKinds, K_MODULE);
+	makeSimpleTag (identifier, K_MODULE);
 
 	/* All further entries go in the new module */
 	vStringCopy (module, identifier);
@@ -104,7 +104,7 @@ static void parseSimpleTag (const unsigned char *cp, erlangKind kind)
 {
 	vString *const identifier = vStringNew ();
 	parseIdentifier (cp, identifier);
-	makeSimpleTag (identifier, ErlangKinds, kind);
+	makeSimpleTag (identifier, kind);
 	vStringDelete (identifier);
 }
 
@@ -148,7 +148,7 @@ static void parseDirective (const unsigned char *cp, vString *const module)
 	else if (strcmp (drtv, "module") == 0)
 		parseModuleTag (cp, module);
 	/* Otherwise, it was an import, export, etc. */
-	
+
 	vStringDelete (directive);
 }
 

@@ -216,7 +216,7 @@ static void emitRubyTag (vString* name, rubyKind kind)
 	else
 		unqualified_name = qualified_name;
 
-	initTagEntry (&tag, unqualified_name, &(RubyKinds [kind]));
+	initTagEntry (&tag, unqualified_name, kind);
 	if (vStringLength (scope) > 0) {
 		Assert (0 <= parent_kind &&
 		        (size_t) parent_kind < (ARRAY_SIZE (RubyKinds)));
@@ -378,7 +378,8 @@ static void enterUnnamedScope (void)
 	if (e_parent)
 	{
 		tagEntryInfo e;
-		initTagEntry (&e, "", e_parent->kind);
+		initTagEntry (&e, "", KIND_GHOST_INDEX);
+		e.kind = e_parent->kind; /* TODO */
 		e.placeholder = 1;
 		r = makeTagEntry (&e);
 	}

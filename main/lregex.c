@@ -232,14 +232,13 @@ extern void freeLregexControlBlock (struct lregexControlBlock* lcb)
 */
 
 static bool initRegexTag (tagEntryInfo *e,
-		const vString* const name, const kindDefinition* const kind, int scopeIndex, int placeholder,
+		const vString* const name, int kindIndex, int scopeIndex, int placeholder,
 		unsigned long line, MIOPos *pos, int xtag_type)
 {
-	Assert (kind != NULL);
-	if (kind->enabled)
+	if (isInputLanguageKindEnabled (kindIndex))
 	{
 		Assert (name != NULL  &&  ((vStringLength (name) > 0) || placeholder));
-		initTagEntry (e, vStringValue (name), kind);
+		initTagEntry (e, vStringValue (name), kindIndex);
 		e->extensionFields.scopeIndex = scopeIndex;
 		e->placeholder = !!placeholder;
 		if (line)
@@ -1066,8 +1065,8 @@ static void matchTagPattern (struct lregexControlBlock *lcb,
 	{
 		unsigned long ln = 0;
 		MIOPos pos;
-		kindDefinition *kdef;
 		tagEntryInfo e;
+		int kind;
 
 		if ((patbuf->regptype == REG_PARSER_MULTI_LINE)
 			|| (patbuf->regptype == REG_PARSER_MULTI_TABLE))
@@ -1077,9 +1076,9 @@ static void matchTagPattern (struct lregexControlBlock *lcb,
 		}
 
 		n = CORK_NIL;
-		kdef = getLanguageKind (lcb->owner, patbuf->u.tag.kindIndex);
+		kind = patbuf->u.tag.kindIndex;
 
-		if (initRegexTag (&e, name, kdef, scope, placeholder,
+		if (initRegexTag (&e, name, kind, scope, placeholder,
 						  ln, ln == 0? NULL: &pos, patbuf->xtagType))
 		{
 			static TrashBox* field_trashbox;

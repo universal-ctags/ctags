@@ -49,7 +49,7 @@ static void makeRTag (const vString * const name, rKind kind)
 
 	Assert (kind < KIND_COUNT);
 
-	initTagEntry (&e, vStringValue (name), &(RKinds[kind]));
+	initTagEntry (&e, vStringValue (name), kind);
 
 	makeTagEntry (&e);
 }

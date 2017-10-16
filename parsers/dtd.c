@@ -286,7 +286,7 @@ static int makeDtdTagMaybe (tagEntryInfo *const e, tokenInfo *const token,
 		return CORK_NIL;
 
 	initRefTagEntry (e, tokenString (token),
-					 DtdKinds + kind,
+					 kind,
 					 role);
 	e->lineNumber = token->lineNumber;
 	e->filePosition = token->filePosition;

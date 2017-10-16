@@ -1578,8 +1578,8 @@ static rescanReason cxxParserMain(const unsigned int passCount)
 	cxxTokenAPINewFile();
 	cxxParserNewStatement();
 
-	kindDefinition * kind_for_define = g_cxx.pKindDefinitions + CXXTagKindMACRO;
-	kindDefinition * kind_for_header = g_cxx.pKindDefinitions + CXXTagKindINCLUDE;
+	int kind_for_define = CXXTagKindMACRO;
+	int kind_for_header = CXXTagKindINCLUDE;
 	int role_for_macro_undef = CR_MACRO_UNDEF;
 	int role_for_header_system = CR_HEADER_SYSTEM;
 	int role_for_header_local = CR_HEADER_LOCAL;

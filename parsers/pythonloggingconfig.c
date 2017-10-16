@@ -60,13 +60,13 @@ static void newDataCallback (iniconfSubparser *iniconf,
 			if (logger [0] == '\0')
 				goto out;
 
-			initTagEntry (&e, logger, PythonLoggingConfigKinds + K_LOGGER_SECTION);
+			initTagEntry (&e, logger, K_LOGGER_SECTION);
 			((struct sPythonLoggingConfigSubparser *)iniconf)->index = makeTagEntry (&e);
 		}
 		else if (key && (strcmp (key, "qualname") == 0)
 			 && value && value[0] != '\0')
 		{
-			initTagEntry (&e, value, PythonLoggingConfigKinds + K_LOGGER_QUALNAME);
+			initTagEntry (&e, value, K_LOGGER_QUALNAME);
 			e.extensionFields.scopeIndex = ((struct sPythonLoggingConfigSubparser*)iniconf)->index;
 			makeTagEntry (&e);
 		}

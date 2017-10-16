@@ -125,7 +125,7 @@ static void makeJsonTag (tokenInfo *const token, const jsonKind kind)
 	if (! JsonKinds[kind].enabled)
 		return;
 
-	initTagEntry (&e, vStringValue (token->string), &(JsonKinds[kind]));
+	initTagEntry (&e, vStringValue (token->string), kind);
 
 	e.lineNumber	= token->lineNumber;
 	e.filePosition	= token->filePosition;

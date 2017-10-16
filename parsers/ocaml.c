@@ -895,11 +895,11 @@ static MIOPos ocaFilePosition;
 
 /* Used to prepare an OCaml tag, just in case there is a need to
  * add additional information to the tag. */
-static void prepareTag (tagEntryInfo * tag, vString const *name, ocamlKind kind)
+static void prepareTag (tagEntryInfo * tag, vString const *name, int kind)
 {
 	int parentIndex;
 
-	initTagEntry (tag, vStringValue (name), &(OcamlKinds[kind]));
+	initTagEntry (tag, vStringValue (name), kind);
 	/* Ripped out of read.h initTagEntry, because of line number
 	 * shenanigans.
 	 * Ugh. Lookahead is harder than I expected. */

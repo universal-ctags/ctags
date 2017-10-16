@@ -96,7 +96,7 @@ static void makeSimpleXTag (const vString* const name, kindDefinition* const kin
 {
 	tagEntryInfo e;
 
-	initTagEntry (&e, vStringValue(name), kinds + kind);
+	initTagEntry (&e, vStringValue(name), kind);
 	markTagExtraBit (&e, xtagType);
 	makeTagEntry (&e);
 }
@@ -108,7 +108,7 @@ static bool tagKeywordsAndTestCases (const char *const line, const regexMatch *c
     {
         vString *const name = vStringNew ();
         vStringNCopyS (name, line + matches [1].start, matches [1].length);
-        makeSimpleTag (name, RobotKinds, section);
+        makeSimpleTag (name, section);
         if (isXtagEnabled (RobotXtags[X_WHITESPACE_SWAPPED].xtype)
 			&& whitespaceSwap(name))
 			makeSimpleXTag (name, RobotKinds, section,
@@ -126,7 +126,7 @@ static bool tagVariables (const char *const line, const regexMatch *const matche
     {
         vString *const name = vStringNew ();
         vStringNCopyS (name, line + matches [1].start, matches [1].length);
-        makeSimpleTag (name, RobotKinds, K_VARIABLE);
+        makeSimpleTag (name, K_VARIABLE);
         if (isXtagEnabled (RobotXtags[X_WHITESPACE_SWAPPED].xtype)
 			&& whitespaceSwap(name))
 			makeSimpleXTag (name, RobotKinds, K_VARIABLE,

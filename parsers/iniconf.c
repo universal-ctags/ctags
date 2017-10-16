@@ -90,7 +90,7 @@ static void makeIniconfTagMaybe (const char *section, const char *key, const cha
 
 	if (key)
 	{
-		initTagEntry (&e, key, &(IniconfKinds [K_KEY]));
+		initTagEntry (&e, key, K_KEY);
 		e.extensionFields.scopeIndex = *index;
 		makeTagEntry (&e);
 	}
@@ -105,7 +105,7 @@ static void makeIniconfTagMaybe (const char *section, const char *key, const cha
 				last->extensionFields.endLine = getInputLineNumber ();
 		}
 
-		initTagEntry (&e, section, &(IniconfKinds [K_SECTION]));
+		initTagEntry (&e, section, K_SECTION);
 		*index = makeTagEntry (&e);
 	}
 }

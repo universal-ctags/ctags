@@ -56,7 +56,7 @@ static void findAwkTags (void)
 			while (isspace ((int) *cp))
 				++cp;
 			if (*cp == '(')
-				makeSimpleTag (name, AwkKinds, K_FUNCTION);
+				makeSimpleTag (name, K_FUNCTION);
 			vStringClear (name);
 			if (*cp != '\0')
 				++cp;

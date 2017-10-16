@@ -268,9 +268,9 @@ static void findShTags (void)
 			if (found_kind != K_NOTHING)
 			{
 				if (found_kind == K_SOURCE)
-					makeSimpleRefTag (name, ShKinds, K_SOURCE, R_SOURCE_GENERIC);
+					makeSimpleRefTag (name, K_SOURCE, R_SOURCE_GENERIC);
 				else
-					makeSimpleTag (name, ShKinds, found_kind);
+					makeSimpleTag (name, found_kind);
 				found_kind = K_NOTHING;
 			}
 			vStringClear (name);

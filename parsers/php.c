@@ -311,7 +311,7 @@ static void initPhpEntry (tagEntryInfo *const e, const tokenInfo *const token,
 
 	}
 
-	initTagEntry (e, vStringValue (token->string), &(PhpKinds[kind]));
+	initTagEntry (e, vStringValue (token->string), kind);
 
 	e->lineNumber	= token->lineNumber;
 	e->filePosition	= token->filePosition;
@@ -364,7 +364,7 @@ static void makeNamespacePhpTag (const tokenInfo *const token, const vString *co
 	{
 		tagEntryInfo e;
 
-		initTagEntry (&e, vStringValue (name), &(PhpKinds[K_NAMESPACE]));
+		initTagEntry (&e, vStringValue (name), K_NAMESPACE);
 
 		e.lineNumber	= token->lineNumber;
 		e.filePosition	= token->filePosition;

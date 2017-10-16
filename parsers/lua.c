@@ -90,7 +90,7 @@ static void extract_next_token (const char *begin, const char *end_sentinel, vSt
 
 	if (found)
 	{
-		makeSimpleTag (name, LuaKinds, K_FUNCTION);
+		makeSimpleTag (name, K_FUNCTION);
 		vStringClear (name);
 	}
 
@@ -120,7 +120,7 @@ static void extract_prev_token (const char *end, const char *begin_sentinel, vSt
 	if (end - begin)
 	{
 		vStringNCatS (name, begin + 1, end - begin);
-		makeSimpleTag (name, LuaKinds, K_FUNCTION);
+		makeSimpleTag (name, K_FUNCTION);
 		vStringClear (name);
 	}
 }
@@ -142,7 +142,7 @@ static void findLuaTags (void)
 			continue;
 
 		q = strchr ((const char*) line, '=');
-		
+
 		if (q == NULL) {
 			p = p + 9;  /* skip the `function' word */
 			q = strchr ((const char*) p, '(');

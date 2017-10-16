@@ -139,7 +139,7 @@ static void parseSubobject (tokenInfo *token, int parent, enum ITclKind kind, ke
 	{
 		tagEntryInfo e;
 
-		initTagEntry(&e, vStringValue (token->string), ITclKinds + kind);
+		initTagEntry(&e, vStringValue (token->string), kind);
 		e.extensionFields.scopeIndex = parent;
 		attachProtectionMaybe (&e, protection);
 		r = makeTagEntry (&e);
@@ -184,7 +184,7 @@ static int parseClass (tclSubparser *s CTAGS_ATTR_UNUSED, int parentIndex)
 	{
 		tagEntryInfo e;
 
-		initTagEntry(&e, vStringValue (token->string), ITclKinds + K_CLASS);
+		initTagEntry(&e, vStringValue (token->string), K_CLASS);
 		e.extensionFields.scopeIndex = parentIndex;
 		r = makeTagEntry (&e);
 	}

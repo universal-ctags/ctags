@@ -312,7 +312,7 @@ static void makeJsTag (const tokenInfo *const token, const jsKind kind,
 			name = p + 1;
 		}
 
-		initTagEntry (&e, name, &(JsKinds [kind]));
+		initTagEntry (&e, name, kind);
 
 		JSCRIPT_DEBUG_PRINT("Emitting tag for symbol '%s' of kind %02x with scope '%s'",name,kind,vStringValue(fullscope));
 

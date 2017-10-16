@@ -173,6 +173,11 @@ static void addCommonPseudoTags (void)
 	}
 }
 
+static kindDefinition *getInputLanguageFileKind (void)
+{
+	return getLanguageKind (getInputLanguage (), KIND_FILE_INDEX);
+}
+
 extern void makeFileTag (const char *const fileName)
 {
 	tagEntryInfo tag;
@@ -185,7 +190,7 @@ extern void makeFileTag (const char *const fileName)
 	Assert (kind);
 	kind->enabled = true;
 
-	initTagEntry (&tag, baseFilename (fileName), kind);
+	initTagEntry (&tag, baseFilename (fileName), KIND_FILE_INDEX);
 
 	tag.isFileEntry     = true;
 	tag.lineNumberEntry = true;
@@ -1304,7 +1309,9 @@ extern int makeTagEntry (const tagEntryInfo *const tag_const)
 
 	if (getInputLanguageFileKind() != tag->kind)
 	{
-		if (! isInputLanguageKindEnabled (tag->kind->letter) &&
+		/* TODO: don't access the internal of kind directly.
+		   Use isInputLanguageKindEnabled () instead. */
+		if (! tag->kind->enabled &&
 		    (tag->extensionFields.roleIndex == ROLE_INDEX_DEFINITION))
 			return CORK_NIL;
 		if ((tag->extensionFields.roleIndex != ROLE_INDEX_DEFINITION)
@@ -1409,14 +1416,14 @@ extern int makeQualifiedTagEntry (const tagEntryInfo *const e)
 }
 
 extern void initTagEntry (tagEntryInfo *const e, const char *const name,
-			  const kindDefinition *kind)
+						  int kindIndex)
 {
 	initTagEntryFull(e, name,
 			 getInputLineNumber (),
 			 getInputLanguage (),
 			 getInputFilePosition (),
 			 getInputFileTagPath (),
-			 kind,
+			 kindIndex,
 			 ROLE_INDEX_DEFINITION,
 			 getSourceFileTagPath(),
 			 getSourceLanguage(),
@@ -1424,14 +1431,14 @@ extern void initTagEntry (tagEntryInfo *const e, const char *const name,
 }
 
 extern void initRefTagEntry (tagEntryInfo *const e, const char *const name,
-			     const kindDefinition *kind, int roleIndex)
+			     int kindIndex, int roleIndex)
 {
 	initTagEntryFull(e, name,
 			 getInputLineNumber (),
 			 getInputLanguage (),
 			 getInputFilePosition (),
 			 getInputFileTagPath (),
-			 kind,
+			 kindIndex,
 			 roleIndex,
 			 getSourceFileTagPath(),
 			 getSourceLanguage(),
@@ -1443,13 +1450,15 @@ extern void initTagEntryFull (tagEntryInfo *const e, const char *const name,
 			      langType langType_,
 			      MIOPos      filePosition,
 			      const char *inputFileName,
-			      const kindDefinition *kind,
+			      int kindIndex,
 			      int roleIndex,
 			      const char *sourceFileName,
 			      langType sourceLangType,
 			      long sourceLineNumberDifference)
 {
 	int i;
+	kindDefinition *kind = getLanguageKind(langType_, kindIndex);
+
 	Assert (getInputFileName() != NULL);
 
 	memset (e, 0, sizeof (tagEntryInfo));

@@ -111,7 +111,7 @@ static void makeSimpleMakeTag (vString *const name, kindDefinition *MakeKinds, m
 	if (!isLanguageEnabled (getInputLanguage ()))
 		return;
 
-	makeSimpleTag (name, MakeKinds, kind);
+	makeSimpleTag (name, kind);
 }
 
 static void makeSimpleMakeRefTag (const vString* const name, kindDefinition* const kinds, const int kind,
@@ -120,7 +120,7 @@ static void makeSimpleMakeRefTag (const vString* const name, kindDefinition* con
 	if (!isLanguageEnabled (getInputLanguage ()))
 		return;
 
-	makeSimpleRefTag (name, kinds, kind, roleIndex);
+	makeSimpleRefTag (name, kind, roleIndex);
 }
 
 static void newTarget (vString *const name)

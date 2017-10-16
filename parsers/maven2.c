@@ -79,7 +79,7 @@ static void makeTagForProperties (xmlNode *node,
 	tagEntryInfo tag;
 
 	str = node->name;
-	initTagEntry (&tag, (char *)str, Maven2Kinds + K_PROPERTY);
+	initTagEntry (&tag, (char *)str, K_PROPERTY);
 	tag.lineNumber = xmlGetLineNo (node);
 	tag.filePosition = getInputFilePositionForLine (tag.lineNumber);
 

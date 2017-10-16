@@ -257,7 +257,7 @@ static void parseFunction (const unsigned char *line)
 					vStringPut (name, (int) *cp);
 					++cp;
 				} while (isalnum ((int) *cp) || *cp == '_' || *cp == '.' || *cp == '#');
-				index = makeSimpleTag (name, VimKinds, K_FUNCTION);
+				index = makeSimpleTag (name, K_FUNCTION);
 				vStringClear (name);
 			}
 		}
@@ -301,7 +301,7 @@ static void parseAutogroup (const unsigned char *line)
 			if (end > cp && strncasecmp ((const char *) cp, "end", end - cp) != 0)
 			{
 				vStringNCatS (name, (const char *) cp, end - cp);
-				makeSimpleTag (name, VimKinds, K_AUGROUP);
+				makeSimpleTag (name, K_AUGROUP);
 				vStringClear (name);
 			}
 		}
@@ -425,7 +425,7 @@ static bool parseCommand (const unsigned char *line)
 		++cp;
 	} while (isalnum ((int) *cp) || *cp == '_');
 
-	makeSimpleTag (name, VimKinds, K_COMMAND);
+	makeSimpleTag (name, K_COMMAND);
 	vStringClear (name);
 
 cleanUp:
@@ -484,7 +484,7 @@ static void parseLet (const unsigned char *line, int infunction)
 			vStringPut (name, (int) *cp);
 			++cp;
 		} while (isalnum ((int) *cp) || *cp == '_' || *cp == '#' || *cp == ':' || *cp == '$');
-		makeSimpleTag (name, VimKinds, K_VARIABLE);
+		makeSimpleTag (name, K_VARIABLE);
 		vStringClear (name);
 	}
 
@@ -563,7 +563,7 @@ static bool parseMap (const unsigned char *line)
 		++cp;
 	} while (*cp && *cp != ' ');
 
-	makeSimpleTag (name, VimKinds, K_MAP);
+	makeSimpleTag (name, K_MAP);
 	vStringClear (name);
 
 	vStringDelete (name);
@@ -658,7 +658,7 @@ static void parseVimBallFile (const unsigned char *line)
 				vStringPut (fname, (int) *cp);
 				++cp;
 			} while (isalnum ((int) *cp) || *cp == '.' || *cp == '/' || *cp == '\\');
-			makeSimpleTag (fname, VimKinds, K_FILENAME);
+			makeSimpleTag (fname, K_FILENAME);
 			vStringClear (fname);
 		}
 

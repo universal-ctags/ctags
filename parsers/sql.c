@@ -423,7 +423,7 @@ static void makeSqlTag (tokenInfo *const token, const sqlKind kind)
 	{
 		const char *const name = vStringValue (token->string);
 		tagEntryInfo e;
-		initTagEntry (&e, name, &(SqlKinds [kind]));
+		initTagEntry (&e, name, kind);
 
 		e.lineNumber   = token->lineNumber;
 		e.filePosition = token->filePosition;

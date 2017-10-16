@@ -90,7 +90,10 @@ extern struct kindControlBlock* allocKindControlBlock (parserDefinition *parser)
 extern void freeKindControlBlock (struct kindControlBlock* kcb);
 extern int  defineKind (struct kindControlBlock* kcb, kindDefinition *def,
 						freeKindDefFunc freeKindDef);
+extern bool isKindEnabled (struct kindControlBlock* kcb, int kindIndex);
+extern bool isRoleEnabled (struct kindControlBlock* kcb, int kindIndex, int roleIndex);
 extern unsigned int countKinds (struct kindControlBlock* kcb);
+extern unsigned int countRoles (struct kindControlBlock* kcb, int kindIndex);
 extern kindDefinition *getKind (struct kindControlBlock* kcb, int kindIndex);
 extern kindDefinition *getKindForLetter (struct kindControlBlock* kcb, int letter);
 extern kindDefinition *getKindForName (struct kindControlBlock* kcb, const char* name);

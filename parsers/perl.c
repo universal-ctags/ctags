@@ -199,13 +199,13 @@ static void makeTagFromLeftSide (const char *begin, const char *end,
 		return;			/* Left side of => has an invalid identifier. */
 	vStringClear(name);
 	vStringNCatS(name, b, e - b + 1);
-	initTagEntry(&entry, vStringValue(name), &(PerlKinds[K_CONSTANT]));
+	initTagEntry(&entry, vStringValue(name), K_CONSTANT);
 	makeTagEntry(&entry);
 	if (isXtagEnabled (XTAG_QUALIFIED_TAGS) && package && vStringLength(package)) {
 		vStringClear(name);
 		vStringCopy(name, package);
 		vStringNCatS(name, b, e - b + 1);
-		initTagEntry(&entry, vStringValue(name), &(PerlKinds[K_CONSTANT]));
+		initTagEntry(&entry, vStringValue(name), K_CONSTANT);
 		markTagExtraBit (&entry, XTAG_QUALIFIED_TAGS);
 		makeTagEntry(&entry);
 	}
@@ -486,7 +486,7 @@ static void findPerlTags (void)
 				 * isSubroutineDeclaration() may consume several lines.  So
 				 * we record line positions.
 				 */
-				initTagEntry(&e, vStringValue(name), NULL);
+				initTagEntry(&e, vStringValue(name), KIND_GHOST_INDEX);
 
 				if (true == isSubroutineDeclaration(cp)) {
 					if (true == PerlKinds[K_SUBROUTINE_DECLARATION].enabled) {
@@ -499,7 +499,7 @@ static void findPerlTags (void)
 					continue;
 				}
 
-				e.kind     = &(PerlKinds[kind]);
+				e.kind     = &(PerlKinds[kind]); /* FIXME */
 
 				makeTagEntry(&e);
 
@@ -516,7 +516,7 @@ static void findPerlTags (void)
 				}
 			} else if (vStringLength (name) > 0)
 			{
-				makeSimpleTag (name, PerlKinds, kind);
+				makeSimpleTag (name, kind);
 				if (isXtagEnabled(XTAG_QUALIFIED_TAGS) && qualified &&
 					K_PACKAGE != kind &&
 					package != NULL  && vStringLength (package) > 0)
@@ -525,8 +525,7 @@ static void findPerlTags (void)
 					vString *const qualifiedName = vStringNew ();
 					vStringCopy (qualifiedName, package);
 					vStringCat (qualifiedName, name);
-					initTagEntry (&fqe, vStringValue (qualifiedName),
-						      PerlKinds + kind);
+					initTagEntry (&fqe, vStringValue (qualifiedName), kind);
 					markTagExtraBit (&fqe, XTAG_QUALIFIED_TAGS);
 					makeTagEntry (&fqe);
 					vStringDelete (qualifiedName);

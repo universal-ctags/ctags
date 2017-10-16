@@ -74,7 +74,7 @@ static int roleOf (const char* key, kindDefinition* kind)
 	return -1;
 }
 
-static void makeSystemdReferencedUnit (const char *value, kindDefinition* kind, int role)
+static void makeSystemdReferencedUnit (const char *value, int kind, int role)
 {
 	vString *unit = vStringNew ();
 
@@ -82,7 +82,7 @@ static void makeSystemdReferencedUnit (const char *value, kindDefinition* kind, 
 	{
 		if (*value == ',')
 		{
-			makeSimpleRefTag (unit, kind, 0, role);
+			makeSimpleRefTag (unit, kind, role);
 			vStringClear (unit);
 		}
 		else if (! isspace ((int) *value))
@@ -92,7 +92,7 @@ static void makeSystemdReferencedUnit (const char *value, kindDefinition* kind, 
 	}
 
 	if (vStringLength (unit) > 0)
-		makeSimpleRefTag (unit, kind, 0, role);
+		makeSimpleRefTag (unit, kind, role);
 	vStringDelete (unit);
 }
 
@@ -105,7 +105,7 @@ static void newDataCallback (iniconfSubparser *s CTAGS_ATTR_UNUSED,
 	{
 		r = roleOf (key, SystemdUnitKinds + K_UNIT);
 		if (r >= 0)
-			makeSystemdReferencedUnit (value, SystemdUnitKinds + K_UNIT, r);
+			makeSystemdReferencedUnit (value, K_UNIT, r);
 	}
 }
 

@@ -597,7 +597,7 @@ static void createTag (tokenInfo *const token)
 	/* Create tag */
 	initTagEntry (&tag,
 		      vStringValue (token->name),
-		      kindFromKind (kind));
+		      kind);
 	tag.lineNumber = token->lineNumber;
 	tag.filePosition = token->filePosition;
 
