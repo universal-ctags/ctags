@@ -178,8 +178,7 @@ getNextChar:
 					c = ' ';
 				if (c != ' ' || lastC != ' ')
 				{
-					if (collectText)
-						vStringPut (token->string, c);
+					vStringPut (token->string, c);
 					lastC = c;
 				}
 			}
