@@ -382,34 +382,39 @@ static const char *renderEscapedString (const char *s,
 	return vStringValue (b);
 }
 
-static const char *renderEscapedName (const char* s,
+static const char *renderEscapedName (const bool isTagName,
+				      const char* s,
 				      const tagEntryInfo *const tag,
 				      vString* b)
 {
-	const char* base = s;
+	int unexpected_byte = 0;
 
-	for (; *s; s++)
+	if (isTagName && (*s == ' ' || *s == '!'))
 	{
-		int c = *s;
-		if ((c > 0x00 && c <= 0x1F) || c == 0x7F)
-		{
-			const kindDefinition *kdef = getTagKind (tag);
-			verbose ("Unexpected character (0 < *c && *c < 0x20) included in a tagEntryInfo: %s\n", base);
-			verbose ("File: %s, Line: %lu, Lang: %s, Kind: %c\n",
-				 tag->inputFileName, tag->lineNumber, getLanguageName(tag->langType), kdef->letter);
-			verbose ("Escape the character\n");
-			break;
-		}
-		else if (c == '\\')
-			break;
-		else
-			continue;
+		/* Don't allow a leading space or exclamation mark as it conflicts with
+		 * pseudo-tags when sorting.  Anything with a lower byte value is
+		 * escaped by renderEscapedString() already. */
+		unexpected_byte = *s;
+		vStringPut (b, '\\');
+	}
+	else
+	{
+		/* Find the first byte needing escaping for the warning message */
+		const char *p = s;
+
+		while (*p > 0x1F && *p != 0x7F)
+			p++;
+		unexpected_byte = *p;
 	}
 
-	if (*s == '\0')
-		return base;
-
-	vStringNCatS (b, base, s - base);
+	if (unexpected_byte)
+	{
+		const kindDefinition *kdef = getTagKind (tag);
+		verbose ("Unexpected character %#04x included in a tagEntryInfo: %s\n", unexpected_byte, s);
+		verbose ("File: %s, Line: %lu, Lang: %s, Kind: %c\n",
+			 tag->inputFileName, tag->lineNumber, getLanguageName(tag->langType), kdef->letter);
+		verbose ("Escape the character\n");
+	}
 
 	return renderEscapedString (s, tag, b);
 }
@@ -417,7 +422,7 @@ static const char *renderEscapedName (const char* s,
 static const char *renderFieldName (const tagEntryInfo *const tag, const char *value CTAGS_ATTR_UNUSED, vString* b,
 									bool *rejected CTAGS_ATTR_UNUSED)
 {
-	return renderEscapedName (tag->name, tag, b);
+	return renderEscapedName (true, tag->name, tag, b);
 }
 
 static const char *renderFieldNameNoEscape (const tagEntryInfo *const tag, const char *value CTAGS_ATTR_UNUSED, vString* b,
@@ -471,7 +476,7 @@ static const char *renderFieldScope (const tagEntryInfo *const tag, const char *
 	const char* scope;
 
 	getTagScopeInformation ((tagEntryInfo *const)tag, NULL, &scope);
-	return scope? renderEscapedName (scope, tag, b): NULL;
+	return scope? renderEscapedName (false, scope, tag, b): NULL;
 }
 
 static const char *renderFieldScopeNoEscape (const tagEntryInfo *const tag, const char *value CTAGS_ATTR_UNUSED, vString* b,
@@ -499,7 +504,7 @@ static const char *renderFieldInherits (const tagEntryInfo *const tag, const cha
 static const char *renderFieldTyperef (const tagEntryInfo *const tag, const char *value CTAGS_ATTR_UNUSED, vString* b,
 									   bool *rejected CTAGS_ATTR_UNUSED)
 {
-	return renderEscapedName (WITH_DEFUALT_VALUE (tag->extensionFields.typeRef [1]), tag, b);
+	return renderEscapedName (false, WITH_DEFUALT_VALUE (tag->extensionFields.typeRef [1]), tag, b);
 }
 
 
