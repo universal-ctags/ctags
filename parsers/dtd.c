@@ -21,11 +21,11 @@
 
 
 static scopeSeparator DtdParameterEntrySeparators [] = {
-	{ KIND_WILDCARD, "/%" },
+	{ KIND_WILDCARD_INDEX, "/%" },
 };
 
 static scopeSeparator DtdAttSeparators [] = {
-	{ KIND_WILDCARD, "/@" },
+	{ KIND_WILDCARD_INDEX, "/@" },
 };
 
 typedef enum {

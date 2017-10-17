@@ -47,11 +47,10 @@ extern void printKind (const kindDefinition* const kind, bool indent)
 			kind->enabled ? "" : " [off]");
 }
 
-const char *scopeSeparatorFor (const kindDefinition *kind, char parentLetter)
+const char *scopeSeparatorFor (langType lang, int kindIndex, int parentKindIndex)
 {
-	scopeSeparator *table;
-	Assert (kind);
-	table = kind->separators;
+	kindDefinition *kind = getLanguageKind (lang, kindIndex);
+	scopeSeparator *table = kind->separators;
 
 	/* If no table is given, use the default generic separator ".".
 	   The exception is if a root separator is looked up. In this case,
@@ -59,7 +58,7 @@ const char *scopeSeparatorFor (const kindDefinition *kind, char parentLetter)
 
 	if (table == NULL)
 	{
-		if (parentLetter == KIND_NULL)
+		if (parentKindIndex == KIND_GHOST_INDEX)
 			return NULL;
 		else
 			return ".";
@@ -69,13 +68,13 @@ const char *scopeSeparatorFor (const kindDefinition *kind, char parentLetter)
 	{
 		/* KIND_WILDCARD cannot be used as a key for finding
 		   a root separator.*/
-		if ( (table->parentLetter == KIND_WILDCARD
-		       && parentLetter != KIND_NULL)
-		    || table->parentLetter == parentLetter)
+		if ( (table->parentKindIndex == KIND_WILDCARD_INDEX
+		       && parentKindIndex != KIND_GHOST_INDEX)
+		    || table->parentKindIndex == parentKindIndex)
 			return table->separator;
 		table++;
 	}
-	if (parentLetter == KIND_NULL)
+	if (parentKindIndex == KIND_GHOST_INDEX)
 		return NULL;
 	else
 		return ".";

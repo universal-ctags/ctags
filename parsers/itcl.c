@@ -21,7 +21,7 @@ struct itclSubparser {
 };
 
 static scopeSeparator ITclGenericSeparators [] = {
-	{ KIND_WILDCARD, "::" },
+	{ KIND_WILDCARD_INDEX, "::" },
 };
 
 enum ITclKind {

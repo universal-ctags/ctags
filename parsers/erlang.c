@@ -82,7 +82,7 @@ static void makeMemberTag (
 
 		if (module != NULL  &&  vStringLength (module) > 0)
 		{
-			tag.extensionFields.scopeKind = &(ErlangKinds [K_MODULE]);
+			tag.extensionFields.scopeKindIndex = K_MODULE;
 			tag.extensionFields.scopeName = vStringValue (module);
 		}
 		makeTagEntry (&tag);

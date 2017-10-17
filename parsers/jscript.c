@@ -331,7 +331,7 @@ static void makeJsTag (const tokenInfo *const token, const jsKind kind,
 			if (kind == JSTAG_FUNCTION)
 				parent_kind = JSTAG_FUNCTION;
 
-			e.extensionFields.scopeKind = &(JsKinds [parent_kind]);
+			e.extensionFields.scopeKindIndex = parent_kind;
 			e.extensionFields.scopeName = vStringValue (fullscope);
 		}
 

@@ -194,7 +194,7 @@ static void makeTagWithScope (xmlNode *node,
 	int i;
 	char* version = NULL;
 
-	if (tag->kind == Maven2Kinds + K_ARTIFACT_ID)
+	if (tag->kindIndex == K_ARTIFACT_ID)
 		version = attachVersionIfExisting (tag, node);
 
 	i = makeTagEntry (tag);
@@ -202,8 +202,8 @@ static void makeTagWithScope (xmlNode *node,
 	if (version)
 		xmlFree (version);
 
-	if ((tag->kind == Maven2Kinds + K_GROUP_ID)
-	    || (tag->kind == Maven2Kinds + K_ARTIFACT_ID))
+	if ((tag->kindIndex == K_GROUP_ID)
+	    || (tag->kindIndex == K_ARTIFACT_ID))
 		corkIndexes [spec->kind] = i;
 }
 

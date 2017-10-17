@@ -47,7 +47,7 @@ static roleDesc RpmSpecMacroRoles [] = {
 };
 
 static scopeSeparator RpmSpecPackageSeparators [] = {
-	{ 'p'          , "-" },
+	{ K_PACKAGE , "-" },
 };
 
 static kindDefinition RpmSpecKinds[] = {

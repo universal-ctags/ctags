@@ -33,7 +33,7 @@
 */
 
 static scopeSeparator TclGenericSeparators [] = {
-	{ KIND_WILDCARD, "::" },
+	{ KIND_WILDCARD_INDEX, "::" },
 };
 
 typedef enum {
@@ -408,7 +408,7 @@ static void parseProc (tokenInfo *const token,
 
 			if (vStringLength(ns) > 0)
 			{
-				e.extensionFields.scopeKind = TclKinds + K_NAMESPACE;
+				e.extensionFields.scopeKindIndex = K_NAMESPACE;
 				e.extensionFields.scopeName = vStringValue (ns);
 			}
 

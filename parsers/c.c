@@ -1143,22 +1143,6 @@ static int kindIndexForType (const tagType type)
 	return result;
 }
 
-static const kindDefinition *kindDefForType (const tagType type)
-{
-	const kindDefinition * result;
-	if (isInputLanguage (Lang_csharp))
-		result = &(CsharpKinds [csharpTagKind (type)]);
-	else if (isInputLanguage (Lang_java))
-		result = &(JavaKinds [javaTagKind (type)]);
-	else if (isInputLanguage (Lang_d))
-		result = &(DKinds [dTagKind (type)]);
-	else if (isInputLanguage (Lang_vera))
-		result = &(VeraKinds [veraTagKind (type)]);
-	else
-		result = &(CKinds [cTagKind (type)]);
-	return result;
-}
-
 static int roleForType (const tagType type)
 {
 	int result;
@@ -1193,44 +1177,24 @@ static bool includeTag (const tagType type, const bool isFileScope)
 {
 	bool result;
 	int k;
-	kindDefinition* kdef = NULL;
 
-	if (isFileScope  &&  ! isXtagEnabled(XTAG_FILE_SCOPE))
-		result = false;
+	if (isFileScope && !isXtagEnabled(XTAG_FILE_SCOPE))
+		return false;
 	else if (isInputLanguage (Lang_csharp))
-	{
 		k = csharpTagKindNoAssert (type);
-		kdef = CsharpKinds;
-	}
 	else if (isInputLanguage (Lang_java))
-	{
 		k = javaTagKindNoAssert (type);
-		kdef = JavaKinds;
-	}
 	else if (isInputLanguage (Lang_d))
-	{
 		k = dTagKindNoAssert (type);
-		kdef = DKinds;
-	}
 	else if (isInputLanguage (Lang_vera))
-	{
 		k = veraTagKindNoAssert (type);
-		kdef = VeraKinds;
-	}
 	else
-	{
 		k = cTagKindNoAssert (type);
-		kdef = CKinds;
-	}
 
-	if (kdef)
-	{
-		Assert (k >= COMMONK_UNDEFINED);
-		if (k == COMMONK_UNDEFINED)
-			result = false;
-		else
-			result = kdef [k].enabled;
-	}
+	if (k == COMMONK_UNDEFINED)
+		result = false;
+	else
+		result = isInputLanguageKindEnabled (k);
 
 	return result;
 }
@@ -1321,13 +1285,13 @@ static void addOtherFields (tagEntryInfo* const tag, const tagType type,
 
 				if (isType (st->context, TOKEN_NAME))
 				{
-					tag->extensionFields.scopeKind = kindDefForType (TAG_CLASS);
+					tag->extensionFields.scopeKindIndex = kindIndexForType (TAG_CLASS);
 					tag->extensionFields.scopeName = vStringValue (scope);
 				}
 				else if ((ptype = declToTagType (parentDecl (st))) &&
 					 includeTag (ptype, isXtagEnabled(XTAG_FILE_SCOPE)))
 				{
-					tag->extensionFields.scopeKind = kindDefForType (ptype);
+					tag->extensionFields.scopeKindIndex = kindIndexForType (ptype);
 					tag->extensionFields.scopeName = vStringValue (scope);
 				}
 			}

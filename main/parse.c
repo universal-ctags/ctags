@@ -259,7 +259,7 @@ extern unsigned int countLanguageRoles (const langType language, int kindIndex)
 	return countRoles (LanguageTable [language].kindControlBlock, kindIndex);
 }
 
-extern kindDefinition* getLanguageKind (const langType language, signed char kindIndex)
+extern kindDefinition* getLanguageKind (const langType language, int kindIndex)
 {
 	kindDefinition* kdef;
 
@@ -3437,12 +3437,12 @@ extern bool makeKindSeparatorsPseudoTags (const langType language,
 
 			sep = kind->separators + j;
 
-			if (sep->parentLetter == KIND_WILDCARD)
+			if (sep->parentKindIndex == KIND_WILDCARD_INDEX)
 			{
 				name[1] = KIND_WILDCARD;
 				name[2] = kind->letter;
 			}
-			else if (sep->parentLetter == KIND_NULL)
+			else if (sep->parentKindIndex == KIND_GHOST_INDEX)
 			{
 				/* This is root separator: no upper item is here. */
 				name[1] = kind->letter;
@@ -3451,8 +3451,8 @@ extern bool makeKindSeparatorsPseudoTags (const langType language,
 			}
 			else
 			{
-				upperKind = langKindDefinition (language,
-							    sep->parentLetter);
+				upperKind = getLanguageKind (language,
+							    sep->parentKindIndex);
 				if (!upperKind)
 					continue;
 
@@ -3878,7 +3878,7 @@ static void createCTSTTags (void)
 				{
 					case K_BROKEN:
 						initTagEntry (&e, "one\nof\rbroken\tname", i);
-						e.extensionFields.scopeKind = & (CTST_Kinds [K_BROKEN]);
+						e.extensionFields.scopeKindIndex = K_BROKEN;
 						e.extensionFields.scopeName = "\\Broken\tContext";
 						makeTagEntry (&e);
 						break;
