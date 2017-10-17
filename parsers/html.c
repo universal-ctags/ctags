@@ -460,6 +460,7 @@ static void readTag (tokenInfo *token, vString *text, int depth)
 						else
 							headingKind = K_HEADING3;
 
+						vStringStripLeading (text);
 						vStringStripTrailing (text);
 						makeSimpleTag (text, headingKind);
 					}

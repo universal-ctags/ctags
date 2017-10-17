@@ -1,0 +1,3 @@
+heading1	input.html	/^<\/h1>$/;"	h
+heading2	input.html	/^<h1>  heading2  <\/h1>$/;"	h
+heading 3	input.html	/^<h1>heading  3  <\/h1>$/;"	h
