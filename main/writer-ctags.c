@@ -47,7 +47,7 @@ static void *beginECtagsFile (tagWriter *writer CTAGS_ATTR_UNUSED, MIO * mio CTA
 {
 	static struct rejection rej;
 
-	rej.rejectedInThisInput = false;;
+	rej.rejectedInThisInput = false;
 
 	return &rej;
 }
