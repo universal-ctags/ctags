@@ -447,6 +447,9 @@
     <ClCompile Include="..\parsers\vim.c">
       <Filter>Source Files\Parsers</Filter>
     </ClCompile>
+    <ClCompile Include="..\parsers\vue.c">
+      <Filter>Source Files\Parsers</Filter>
+    </ClCompile>
     <ClCompile Include="..\parsers\windres.c">
       <Filter>Source Files\Parsers</Filter>
     </ClCompile>

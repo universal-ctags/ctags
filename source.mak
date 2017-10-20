@@ -212,6 +212,7 @@ PARSER_SRCS =				\
 	parsers/verilog.c		\
 	parsers/vhdl.c			\
 	parsers/vim.c			\
+	parsers/vue.c			\
 	parsers/windres.c		\
 	parsers/yacc.c			\
 	parsers/yumrepo.c		\
