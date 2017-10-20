@@ -2192,6 +2192,26 @@ static bool parseLine (tokenInfo *const token, tokenInfo *const parent, bool is_
 	return is_terminated;
 }
 
+static void parseExport (tokenInfo *const token)
+{
+	readToken (token);
+
+	if (! (isType (token, TOKEN_KEYWORD) && (token->keyword == KEYWORD_default)))
+		return;
+
+	tokenInfo *const parent = newToken ();
+	copyToken(parent, token, false);
+
+	readToken (token);
+	if (!isType (token, TOKEN_OPEN_CURLY))
+		goto out;
+
+	parseMethods (token, parent, false);
+
+ out:
+	deletePoolToken (parent);
+}
+
 static void parseJsFile (tokenInfo *const token)
 {
 	JSCRIPT_DEBUG_ENTER();
@@ -2202,9 +2222,8 @@ static void parseJsFile (tokenInfo *const token)
 
 		if (isType (token, TOKEN_KEYWORD) && token->keyword == KEYWORD_sap)
 			parseUI5 (token);
-		else if (isType (token, TOKEN_KEYWORD) && (token->keyword == KEYWORD_export ||
-		                                           token->keyword == KEYWORD_default))
-			/* skip those at top-level */;
+		if (isType (token, TOKEN_KEYWORD) && (token->keyword == KEYWORD_export))
+			parseExport (token);
 		else
 			parseLine (token, NULL, false);
 	} while (! isType (token, TOKEN_EOF));
