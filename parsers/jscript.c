@@ -35,6 +35,8 @@
 #include "objpool.h"
 #include "trace.h"
 
+#include "jscript.h"
+
 /*
  *	 MACROS
  */
@@ -181,17 +183,6 @@ static langType Lang_js;
 
 static objPool *TokenPool = NULL;
 
-typedef enum {
-	JSTAG_FUNCTION,
-	JSTAG_CLASS,
-	JSTAG_METHOD,
-	JSTAG_PROPERTY,
-	JSTAG_CONSTANT,
-	JSTAG_VARIABLE,
-	JSTAG_GENERATOR,
-	JSTAG_COUNT
-} jsKind;
-
 static kindDefinition JsKinds [] = {
 	{ true,  'f', "function",	  "functions"		   },
 	{ true,  'c', "class",		  "classes"			   },
@@ -293,6 +284,18 @@ static void copyToken (tokenInfo *const dest, const tokenInfo *const src,
 /*
  *	 Tag generation functions
  */
+static void notifyTagEntry (tagEntryInfo *tag)
+{
+	subparser *s;
+	foreachSubparser (s, false)
+	{
+		javaScriptSubparser *j = (javaScriptSubparser *)s;
+		enterSubparser(s);
+		if (j->tagEntryNotify)
+			j->tagEntryNotify(j, tag);
+		leaveSubparser();
+	}
+}
 
 static void makeJsTag (const tokenInfo *const token, const jsKind kind,
                        vString *const signature, vString *const inheritance)
@@ -356,6 +359,8 @@ static void makeJsTag (const tokenInfo *const token, const jsKind kind,
 			e.extensionFields.inheritance = vStringValue(inheritance);
 
 		makeTagEntry (&e);
+		notifyTagEntry (&e);
+
 		vStringDelete (fullscope);
 	}
 }
