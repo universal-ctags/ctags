@@ -5,6 +5,12 @@ var c = [
   { a: "hello", b: 42 },
   { a: "hi", b: 41 }
 ];
+var d = [
+  [1, 2],
+  [3, 4],
+  [5, 6],
+  [7, [8, 9]]
+];
 
 var class = function() {
   this.test1 = {

@@ -1127,19 +1127,19 @@ static veraKind veraTagKindFull (const tagType type, bool with_assert) {
 	return result;
 }
 
-static const kindDefinition *kindForType (const tagType type)
+static int kindIndexForType (const tagType type)
 {
-	const kindDefinition * result;
+	int result;
 	if (isInputLanguage (Lang_csharp))
-		result = &(CsharpKinds [csharpTagKind (type)]);
+		result = csharpTagKind (type);
 	else if (isInputLanguage (Lang_java))
-		result = &(JavaKinds [javaTagKind (type)]);
+		result = javaTagKind (type);
 	else if (isInputLanguage (Lang_d))
-		result = &(DKinds [dTagKind (type)]);
+		result = dTagKind (type);
 	else if (isInputLanguage (Lang_vera))
-		result = &(VeraKinds [veraTagKind (type)]);
+		result = veraTagKind (type);
 	else
-		result = &(CKinds [cTagKind (type)]);
+		result = cTagKind (type);
 	return result;
 }
 
@@ -1177,44 +1177,24 @@ static bool includeTag (const tagType type, const bool isFileScope)
 {
 	bool result;
 	int k;
-	kindDefinition* kdef = NULL;
 
-	if (isFileScope  &&  ! isXtagEnabled(XTAG_FILE_SCOPE))
-		result = false;
+	if (isFileScope && !isXtagEnabled(XTAG_FILE_SCOPE))
+		return false;
 	else if (isInputLanguage (Lang_csharp))
-	{
 		k = csharpTagKindNoAssert (type);
-		kdef = CsharpKinds;
-	}
 	else if (isInputLanguage (Lang_java))
-	{
 		k = javaTagKindNoAssert (type);
-		kdef = JavaKinds;
-	}
 	else if (isInputLanguage (Lang_d))
-	{
 		k = dTagKindNoAssert (type);
-		kdef = DKinds;
-	}
 	else if (isInputLanguage (Lang_vera))
-	{
 		k = veraTagKindNoAssert (type);
-		kdef = VeraKinds;
-	}
 	else
-	{
 		k = cTagKindNoAssert (type);
-		kdef = CKinds;
-	}
 
-	if (kdef)
-	{
-		Assert (k >= COMMONK_UNDEFINED);
-		if (k == COMMONK_UNDEFINED)
-			result = false;
-		else
-			result = kdef [k].enabled;
-	}
+	if (k == COMMONK_UNDEFINED)
+		result = false;
+	else
+		result = isInputLanguageKindEnabled (k);
 
 	return result;
 }
@@ -1305,13 +1285,13 @@ static void addOtherFields (tagEntryInfo* const tag, const tagType type,
 
 				if (isType (st->context, TOKEN_NAME))
 				{
-					tag->extensionFields.scopeKind = kindForType (TAG_CLASS);
+					tag->extensionFields.scopeKindIndex = kindIndexForType (TAG_CLASS);
 					tag->extensionFields.scopeName = vStringValue (scope);
 				}
 				else if ((ptype = declToTagType (parentDecl (st))) &&
 					 includeTag (ptype, isXtagEnabled(XTAG_FILE_SCOPE)))
 				{
-					tag->extensionFields.scopeKind = kindForType (ptype);
+					tag->extensionFields.scopeKindIndex = kindIndexForType (ptype);
 					tag->extensionFields.scopeName = vStringValue (scope);
 				}
 			}
@@ -1478,7 +1458,7 @@ static int makeTag (const tokenInfo *const token,
 		 * it's used in makeTagEntry().
 		 */
 		tagEntryInfo e;
-		const kindDefinition *kind;
+		int kind;
 		int role;
 
 		role = roleForType (type);
@@ -1488,7 +1468,7 @@ static int makeTag (const tokenInfo *const token,
 		scope  = vStringNew ();
 		typeRef = vStringNew ();
 
-		kind  = kindForType (type);
+		kind  = kindIndexForType(type);
 		if (role == ROLE_INDEX_DEFINITION)
 			initTagEntry (&e, vStringValue (token->name), kind);
 		else
@@ -3486,8 +3466,8 @@ static rescanReason findCTags (const unsigned int passCount)
 {
 	exception_t exception;
 	rescanReason rescan;
-	kindDefinition *kind_for_define = NULL;
-	kindDefinition *kind_for_header = NULL;
+	int kind_for_define = KIND_GHOST_INDEX;
+	int kind_for_header = KIND_GHOST_INDEX;
 	int role_for_macro_undef   = ROLE_INDEX_DEFINITION;
 	int role_for_header_system   = ROLE_INDEX_DEFINITION;
 	int role_for_header_local   = ROLE_INDEX_DEFINITION;
@@ -3498,16 +3478,16 @@ static rescanReason findCTags (const unsigned int passCount)
 
 	if (isInputLanguage (Lang_c) || isInputLanguage (Lang_cpp))
 	{
-		kind_for_define = CKinds+CK_DEFINE;
-		kind_for_header = CKinds+CK_HEADER;
+		kind_for_define = CK_DEFINE;
+		kind_for_header = CK_HEADER;
 		role_for_macro_undef = CR_MACRO_UNDEF;
 		role_for_header_system = CR_HEADER_SYSTEM;
 		role_for_header_local = CR_HEADER_LOCAL;
 	}
 	else if (isInputLanguage (Lang_vera))
 	{
-		kind_for_define = VeraKinds+VK_DEFINE;
-		kind_for_header = VeraKinds+VK_HEADER;
+		kind_for_define = VK_DEFINE;
+		kind_for_header = VK_HEADER;
 		role_for_macro_undef = VR_MACRO_UNDEF;
 		role_for_header_system = VR_HEADER_SYSTEM;
 		role_for_header_local = VR_HEADER_LOCAL;

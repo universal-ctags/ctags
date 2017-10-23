@@ -577,29 +577,29 @@ static int getLastNamedIndex ( void )
 	return -1;
 }
 
-static const kindDefinition* contextDescription (contextType t)
+static int contextDescription (contextType t)
 {
 	switch (t)
 	{
 	case ContextFunction:
-		return &(OcamlKinds[K_FUNCTION]);
+		return K_FUNCTION;
 	case ContextMethod:
-		return &(OcamlKinds[K_METHOD]);
+		return K_METHOD;
 	case ContextValue:
-		return &(OcamlKinds[K_VAL]);
+		return K_VAL;
 	case ContextModule:
-		return &(OcamlKinds[K_MODULE]);
+		return K_MODULE;
 	case ContextType:
-		return &(OcamlKinds[K_TYPE]);
+		return K_TYPE;
 	case ContextClass:
-		return &(OcamlKinds[K_CLASS]);
+		return K_CLASS;
 	case ContextBlock:
-		return &(OcamlKinds[K_BEGIN_END]);
+		return K_BEGIN_END;
 	case ContextMatch:
-		return &(OcamlKinds[K_MATCH]);
+		return K_MATCH;
 	}
 
-	return NULL;
+	return KIND_GHOST_INDEX;
 }
 
 static char contextTypeSuffix (contextType t)
@@ -895,11 +895,11 @@ static MIOPos ocaFilePosition;
 
 /* Used to prepare an OCaml tag, just in case there is a need to
  * add additional information to the tag. */
-static void prepareTag (tagEntryInfo * tag, vString const *name, ocamlKind kind)
+static void prepareTag (tagEntryInfo * tag, vString const *name, int kind)
 {
 	int parentIndex;
 
-	initTagEntry (tag, vStringValue (name), &(OcamlKinds[kind]));
+	initTagEntry (tag, vStringValue (name), kind);
 	/* Ripped out of read.h initTagEntry, because of line number
 	 * shenanigans.
 	 * Ugh. Lookahead is harder than I expected. */
@@ -909,7 +909,7 @@ static void prepareTag (tagEntryInfo * tag, vString const *name, ocamlKind kind)
 	parentIndex = getLastNamedIndex ();
 	if (parentIndex >= 0)
 	{
-		tag->extensionFields.scopeKind =
+		tag->extensionFields.scopeKindIndex =
 			contextDescription (stack[parentIndex].type);
 		tag->extensionFields.scopeName =
 			vStringValue (stack[parentIndex].contextName);

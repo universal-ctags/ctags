@@ -66,7 +66,7 @@ static int makeNamespaceTag (vString * const name, const char *dbp)
 	if (vStringLength (name) > 0 && ClojureKinds[K_NAMESPACE].enabled)
 	{
 		tagEntryInfo e;
-		initTagEntry (&e, vStringValue (name), &(ClojureKinds[K_NAMESPACE]));
+		initTagEntry (&e, vStringValue (name), K_NAMESPACE);
 		e.lineNumber = getInputLineNumber ();
 		e.filePosition = getInputFilePosition ();
 
@@ -82,7 +82,7 @@ static void makeFunctionTag (vString * const name, const char *dbp, int scope_in
 	if (vStringLength (name) > 0 && ClojureKinds[K_FUNCTION].enabled)
 	{
 		tagEntryInfo e;
-		initTagEntry (&e, vStringValue (name), &(ClojureKinds[K_FUNCTION]));
+		initTagEntry (&e, vStringValue (name), K_FUNCTION);
 		e.lineNumber = getInputLineNumber ();
 		e.filePosition = getInputFilePosition ();
 

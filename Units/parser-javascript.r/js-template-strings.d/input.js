@@ -23,5 +23,7 @@ var c = `
 
 var d = `$\{42`;
 
+var e = `${{_:{}} || 1}`;
+
 // just to be sure the last element is not eaten
 var z = 42;

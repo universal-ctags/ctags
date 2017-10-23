@@ -195,19 +195,30 @@ extern bool isInputHeaderFile (void)
 	return File.input.isHeader;
 }
 
-extern bool isInputLanguageKindEnabled (char c)
+extern bool isInputLanguageKindEnabled (int kindIndex)
 {
-	return isLanguageKindEnabled (getInputLanguage (), c);
+	return isLanguageKindEnabled (getInputLanguage (), kindIndex);
+}
+
+extern bool isInputLanguageRoleEnabled (int kindIndex, int roleIndex)
+{
+	return isLanguageRoleEnabled (getInputLanguage (),
+								  kindIndex, roleIndex);
+}
+
+extern unsigned int countInputLanguageKinds (void)
+{
+	return countLanguageKinds (getInputLanguage ());
+}
+
+extern unsigned int countInputLanguageRoles (int kindIndex)
+{
+	return countLanguageRoles (getInputLanguage (), kindIndex);
 }
 
 extern bool doesInputLanguageAllowNullTag (void)
 {
 	return doesLanguageAllowNullTag (getInputLanguage ());
-}
-
-extern kindDefinition *getInputLanguageFileKind (void)
-{
-	return getLanguageKind (getInputLanguage (), KIND_FILE_INDEX);
 }
 
 extern bool doesInputLanguageRequestAutomaticFQTag (void)

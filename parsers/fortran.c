@@ -518,7 +518,7 @@ static void makeFortranTag (tokenInfo *const token, tagType tag)
 		const char *const name = vStringValue (token->string);
 		tagEntryInfo e;
 
-		initTagEntry (&e, name, &(FortranKinds [token->tag]));
+		initTagEntry (&e, name, token->tag);
 
 		if (token->tag == TAG_COMMON_BLOCK)
 			e.lineNumberEntry = (bool) (Option.locate != EX_PATTERN);
@@ -535,7 +535,7 @@ static void makeFortranTag (tokenInfo *const token, tagType tag)
 			const tokenInfo* const scope = ancestorScope ();
 			if (scope != NULL)
 			{
-				e.extensionFields.scopeKind = &(FortranKinds [scope->tag]);
+				e.extensionFields.scopeKindIndex = scope->tag;
 				e.extensionFields.scopeName = vStringValue (scope->string);
 			}
 		}

@@ -70,7 +70,7 @@ static void makeBetaTag (const char* const name, const betaKind kind)
 	if (BetaKinds [kind].enabled)
 	{
 		tagEntryInfo e;
-		initTagEntry (&e, name, & (BetaKinds [kind]));
+		initTagEntry (&e, name, kind);
 		makeTagEntry (&e);
 	}
 }
@@ -103,9 +103,9 @@ static void findBetaTags (void)
 		while (first < last && isspace ((int) vStringChar (line, first))) first++;
 		/* if line still has a reasonable length and ... */
 		if (last - first > 4 &&
-			(vStringChar (line, first)     == '-' && 
-			 vStringChar (line, first + 1) == '-' && 
-			 vStringChar (line, last)      == '-' && 
+			(vStringChar (line, first)     == '-' &&
+			 vStringChar (line, first + 1) == '-' &&
+			 vStringChar (line, last)      == '-' &&
 			 vStringChar (line, last - 1)  == '-'))
 		{
 			if (!incomment && !inquote)
@@ -162,10 +162,10 @@ static void findBetaTags (void)
 					goto commenttext;
 				}
 				/*
-				 * SLOT definition looks like this: 
-				 * <<SLOT nameofslot: dopart>> 
+				 * SLOT definition looks like this:
+				 * <<SLOT nameofslot: dopart>>
 				 * or
-				 * <<SLOT nameofslot: descriptor>> 
+				 * <<SLOT nameofslot: descriptor>>
 				 */
 				if (!foundfragmenthere &&
 					vStringChar (line, pos) == '<' &&

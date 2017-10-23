@@ -229,7 +229,7 @@ static void initPythonEntry (tagEntryInfo *const e, const tokenInfo *const token
 	int parentKind = -1;
 	NestingLevel *nl;
 
-	initTagEntry (e, vStringValue (token->string), &(PythonKinds[kind]));
+	initTagEntry (e, vStringValue (token->string), kind);
 
 	e->lineNumber	= token->lineNumber;
 	e->filePosition	= token->filePosition;
@@ -247,11 +247,11 @@ static void initPythonEntry (tagEntryInfo *const e, const tokenInfo *const token
 		 * fucked up as there's nothing to look up.  Damn. */
 		if (nlEntry)
 		{
-			parentKind = (int) (nlEntry->kind - PythonKinds);
+			parentKind = nlEntry->kindIndex;
 
 			/* functions directly inside classes are methods, fix it up */
 			if (kind == K_FUNCTION && parentKind == K_CLASS)
-				e->kind = &(PythonKinds[K_METHOD]);
+				e->kindIndex = K_METHOD;
 		}
 	}
 
@@ -333,7 +333,7 @@ static int makeSimplePythonRefTag (const tokenInfo *const token,
 		tagEntryInfo e;
 
 		initRefTagEntry (&e, vStringValue (altName ? altName : token->string),
-		                 &(PythonKinds[kind]), roleIndex);
+		                 kind, roleIndex);
 
 		e.lineNumber	= token->lineNumber;
 		e.filePosition	= token->filePosition;
@@ -1287,7 +1287,7 @@ static void findPythonTags (void)
 			tagEntryInfo *lvEntry = getEntryOfNestingLevel (lv);
 			pythonKind kind = K_VARIABLE;
 
-			if (lvEntry && lvEntry->kind != &(PythonKinds[K_CLASS]))
+			if (lvEntry && lvEntry->kindIndex != K_CLASS)
 				kind = K_LOCAL_VARIABLE;
 
 			readNext = parseVariable (token, kind);

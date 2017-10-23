@@ -97,7 +97,7 @@ static int makeAutoconfTag (int kind)
 	if (vStringLength (name) > 0)
 	{
 		tagEntryInfo e;
-		initTagEntry (&e, vStringValue(name), AutoconfKinds + kind);
+		initTagEntry (&e, vStringValue(name), kind);
 		index = makeTagEntry(&e);
 	}
 	vStringDelete (name);

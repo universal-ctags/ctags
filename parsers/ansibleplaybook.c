@@ -146,7 +146,7 @@ static void	ansiblePlaybookPlayStateMachine (struct sAnsiblePlaybookSubparser *a
 		{
 			tagEntryInfo tag;
 			initTagEntry (&tag, (char *)token->data.scalar.value,
-						  AnsiblePlaybookKinds + K_PLAY);
+						  K_PLAY);
 			attachYamlPosition (&tag, token, false);
 
 			Assert (ansible->type_stack->associatedCorkIndex == CORK_NIL);

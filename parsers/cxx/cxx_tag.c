@@ -246,7 +246,7 @@ tagEntryInfo * cxxTagBegin(unsigned int uKind,CXXToken * pToken)
 	initTagEntry(
 			&g_oCXXTag,
 			vStringValue(pToken->pszWord),
-			pKindDefinitions + uKind
+			uKind
 		);
 
 	g_oCXXTag.lineNumber = pToken->iLineNumber;
@@ -255,7 +255,7 @@ tagEntryInfo * cxxTagBegin(unsigned int uKind,CXXToken * pToken)
 
 	if(!cxxScopeIsGlobal())
 	{
-		g_oCXXTag.extensionFields.scopeKind = &(g_cxx.pKindDefinitions[cxxScopeGetKind()]);
+		g_oCXXTag.extensionFields.scopeKindIndex = cxxScopeGetKind();
 		g_oCXXTag.extensionFields.scopeName = cxxScopeGetFullName();
 	}
 

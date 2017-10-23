@@ -69,7 +69,7 @@ static void L_getit (vString *const name, const unsigned char *dbp)
 		vStringPut (name, *p);
 
 	if (vStringLength (name) > 0)
-		makeSimpleTag (name, LispKinds, K_FUNCTION);
+		makeSimpleTag (name, K_FUNCTION);
 	vStringClear (name);
 }
 

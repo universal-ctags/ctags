@@ -61,20 +61,20 @@ static kindDefinition SystemdUnitKinds [] = {
 	  .referenceOnly = true, ATTACH_ROLES(SystemdUnitUnitRoles)},
 };
 
-static int roleOf (const char* key, kindDefinition* kind)
+static int roleOf (const char* key, int kind)
 {
 	int i;
 
-	for (i = 0; i < kind->nRoles; i++)
+	for (i = 0; i < SystemdUnitKinds [kind].nRoles; i++)
 	{
-		if (strcmp (kind->roles[i].name, key) == 0)
+		if (strcmp (SystemdUnitKinds [kind].roles[i].name, key) == 0)
 			return i;
 	}
 
 	return -1;
 }
 
-static void makeSystemdReferencedUnit (const char *value, kindDefinition* kind, int role)
+static void makeSystemdReferencedUnit (const char *value, int kind, int role)
 {
 	vString *unit = vStringNew ();
 
@@ -82,7 +82,7 @@ static void makeSystemdReferencedUnit (const char *value, kindDefinition* kind, 
 	{
 		if (*value == ',')
 		{
-			makeSimpleRefTag (unit, kind, 0, role);
+			makeSimpleRefTag (unit, kind, role);
 			vStringClear (unit);
 		}
 		else if (! isspace ((int) *value))
@@ -92,7 +92,7 @@ static void makeSystemdReferencedUnit (const char *value, kindDefinition* kind, 
 	}
 
 	if (vStringLength (unit) > 0)
-		makeSimpleRefTag (unit, kind, 0, role);
+		makeSimpleRefTag (unit, kind, role);
 	vStringDelete (unit);
 }
 
@@ -103,9 +103,9 @@ static void newDataCallback (iniconfSubparser *s CTAGS_ATTR_UNUSED,
 
 	if (isXtagEnabled (XTAG_REFERENCE_TAGS) && value)
 	{
-		r = roleOf (key, SystemdUnitKinds + K_UNIT);
+		r = roleOf (key, K_UNIT);
 		if (r >= 0)
-			makeSystemdReferencedUnit (value, SystemdUnitKinds + K_UNIT, r);
+			makeSystemdReferencedUnit (value, K_UNIT, r);
 	}
 }
 

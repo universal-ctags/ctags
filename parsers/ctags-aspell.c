@@ -65,7 +65,7 @@ static void aspell_dictword_handler (const langType language CTAGS_ATTR_UNUSED,
 									 const char *optname CTAGS_ATTR_UNUSED,
 									 const char *arg);
 static void aspell_subwords_handler (const langType language CTAGS_ATTR_UNUSED,
-									 const char *optname CTAGS_ATTR_UNUSED,
+									 const char *optname,
 									 const char *arg);
 
 static parameterHandlerTable AspellParameterHandlerTable [] = {
@@ -367,7 +367,6 @@ static void findMisspelling (void)
 			char *word = vStringValue (item);
 
 			makeSimpleRefTag (item,
-							  AspellParserKinds,
 							  K_WORD,
 							  R_WORD_TRACED);
 
@@ -377,7 +376,6 @@ static void findMisspelling (void)
 				continue;
 
 			makeSimpleRefTag (item,
-							  AspellParserKinds,
 							  K_WORD,
 							  R_WORD_MISSPELLED);
 		}

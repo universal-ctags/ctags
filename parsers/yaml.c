@@ -104,14 +104,14 @@ static void handlYamlToken (yaml_token_t *token)
 	if (token->type == YAML_ANCHOR_TOKEN)
 	{
 		initTagEntry (&tag, (char *)token->data.anchor.value,
-					  YamlKinds + K_ANCHOR);
+					  K_ANCHOR);
 		attachYamlPosition (&tag, token, false);
 		makeTagEntry (&tag);
 	}
 	else if (token->type == YAML_ALIAS_TOKEN)
 	{
 		initRefTagEntry (&tag, (char *)token->data.alias.value,
-						 YamlKinds + K_ANCHOR, R_ANCHOR_ALIAS);
+						 K_ANCHOR, R_ANCHOR_ALIAS);
 		attachYamlPosition (&tag, token, false);
 		makeTagEntry (&tag);
 	}

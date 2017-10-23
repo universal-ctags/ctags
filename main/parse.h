@@ -138,8 +138,8 @@ extern parserDefinitionFunc YAML_PARSER_LIST;
 
 
 /* Language processing and parsing */
-extern int makeSimpleTag (const vString* const name, kindDefinition* const kinds, const int kind);
-extern int makeSimpleRefTag (const vString* const name, kindDefinition* const kinds, const int kind,
+extern int makeSimpleTag (const vString* const name, const int kindIndex);
+extern int makeSimpleRefTag (const vString* const name, const int kindIndex,
 			     int roleIndex);
 extern parserDefinition* parserNew (const char* name);
 extern bool doesLanguageAllowNullTag (const langType language);
@@ -147,13 +147,16 @@ extern bool doesLanguageRequestAutomaticFQTag (const langType language);
 extern const char *getLanguageName (const langType language);
 /* kindIndex has to be explicitly signed because char is not signed in all platforms. */
 extern kindDefinition* getLanguageKindForLetter (const langType language, char kindLetter);
-extern kindDefinition* getLanguageKind(const langType language, signed char kindIndex);
+extern kindDefinition* getLanguageKind(const langType language, int kindIndex);
 extern int defineLanguageKind (const langType language, kindDefinition *def,
 							   freeKindDefFunc freeKindDef);
+extern unsigned int countLanguageKinds (const langType language);
+extern unsigned int countLanguageRoles (const langType language, int kindIndex);
 extern langType getNamedLanguage (const char *const name, size_t len);
 extern langType getFileLanguage (const char *const fileName);
 extern bool isLanguageEnabled (const langType language);
-extern bool isLanguageKindEnabled (const langType language, char kind);
+extern bool isLanguageKindEnabled (const langType language, int kindIndex);
+extern bool isLanguageRoleEnabled (const langType language, int kindIndex, int roleIndex);
 
 extern bool isLanguageVisible (const langType language);
 

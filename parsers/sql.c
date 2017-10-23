@@ -423,7 +423,7 @@ static void makeSqlTag (tokenInfo *const token, const sqlKind kind)
 	{
 		const char *const name = vStringValue (token->string);
 		tagEntryInfo e;
-		initTagEntry (&e, name, &(SqlKinds [kind]));
+		initTagEntry (&e, name, kind);
 
 		e.lineNumber   = token->lineNumber;
 		e.filePosition = token->filePosition;
@@ -431,7 +431,7 @@ static void makeSqlTag (tokenInfo *const token, const sqlKind kind)
 		if (vStringLength (token->scope) > 0)
 		{
 			Assert (token->scopeKind < SQLTAG_COUNT);
-			e.extensionFields.scopeKind = &(SqlKinds [token->scopeKind]);
+			e.extensionFields.scopeKindIndex = token->scopeKind;
 			e.extensionFields.scopeName = vStringValue (token->scope);
 
 			if (isXtagEnabled (XTAG_QUALIFIED_TAGS))

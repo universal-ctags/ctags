@@ -29,7 +29,7 @@ typedef enum {
 
 static kindDefinition AspKinds [] = {
 	{ true, 'd', "constant",   "constants"},
-	{ true, 'c', "class",      "classes"}, 
+	{ true, 'c', "class",      "classes"},
 	{ true, 'f', "function",   "functions"},
 	{ true, 's', "subroutine", "subroutines"},
 	{ true, 'v', "variable",   "variables"}
@@ -62,10 +62,10 @@ static void findAspTags (void)
 					cp++;
 			}
 
-			/* jump over comments */ 
+			/* jump over comments */
 			else if (*cp == '\'')
 				break;
-			
+
 			/* jump over end function/sub lines */
 			else if (strncasecmp ((const char*) cp, "end", (size_t) 3)== 0)
 			{
@@ -130,7 +130,7 @@ static void findAspTags (void)
 						    vStringPut (name, (int) *cp);
 						    ++cp;
 					    }
-					    makeSimpleTag (name, AspKinds, K_FUNCTION);
+					    makeSimpleTag (name, K_FUNCTION);
 					    vStringClear (name);
 					}
 					else if (strncasecmp ((const char*) cp, "sub", (size_t) 3) == 0)
@@ -143,7 +143,7 @@ static void findAspTags (void)
 						    vStringPut (name, (int) *cp);
 						    ++cp;
 					    }
-					    makeSimpleTag (name, AspKinds, K_SUB);
+					    makeSimpleTag (name, K_SUB);
 					    vStringClear (name);
 					}
 					else {
@@ -152,7 +152,7 @@ static void findAspTags (void)
 						    vStringPut (name, (int) *cp);
 						    ++cp;
 					    }
-					    makeSimpleTag (name, AspKinds, K_DIM);
+					    makeSimpleTag (name, K_DIM);
 					    vStringClear (name);
 					}
 				}
@@ -174,7 +174,7 @@ static void findAspTags (void)
 						    vStringPut (name, (int) *cp);
 						    ++cp;
 					    }
-					    makeSimpleTag (name, AspKinds, K_FUNCTION);
+					    makeSimpleTag (name, K_FUNCTION);
 					    vStringClear (name);
 					}
 					else if (strncasecmp ((const char*) cp, "sub", (size_t) 3) == 0)
@@ -187,7 +187,7 @@ static void findAspTags (void)
 						    vStringPut (name, (int) *cp);
 						    ++cp;
 					    }
-					    makeSimpleTag (name, AspKinds, K_SUB);
+					    makeSimpleTag (name, K_SUB);
 					    vStringClear (name);
 					}
 					else {
@@ -196,7 +196,7 @@ static void findAspTags (void)
 						    vStringPut (name, (int) *cp);
 						    ++cp;
 					    }
-					    makeSimpleTag (name, AspKinds, K_DIM);
+					    makeSimpleTag (name, K_DIM);
 					    vStringClear (name);
 					}
 				}
@@ -216,7 +216,7 @@ static void findAspTags (void)
 						vStringPut (name, (int) *cp);
 						++cp;
 					}
-					makeSimpleTag (name, AspKinds, K_FUNCTION);
+					makeSimpleTag (name, K_FUNCTION);
 					vStringClear (name);
 				}
 			}
@@ -234,7 +234,7 @@ static void findAspTags (void)
 						vStringPut (name, (int) *cp);
 						++cp;
 					}
-					makeSimpleTag (name, AspKinds, K_SUB);
+					makeSimpleTag (name, K_SUB);
 					vStringClear (name);
 				}
 			}
@@ -252,7 +252,7 @@ static void findAspTags (void)
 						vStringPut (name, (int) *cp);
 						++cp;
 					}
-					makeSimpleTag (name, AspKinds, K_DIM);
+					makeSimpleTag (name, K_DIM);
 					vStringClear (name);
 				}
 			}
@@ -270,7 +270,7 @@ static void findAspTags (void)
 						vStringPut (name, (int) *cp);
 						++cp;
 					}
-					makeSimpleTag (name, AspKinds, K_CLASS);
+					makeSimpleTag (name, K_CLASS);
 					vStringClear (name);
 				}
 			}
@@ -288,7 +288,7 @@ static void findAspTags (void)
 						vStringPut (name, (int) *cp);
 						++cp;
 					}
-					makeSimpleTag (name, AspKinds, K_CONST);
+					makeSimpleTag (name, K_CONST);
 					vStringClear (name);
 				}
 			}

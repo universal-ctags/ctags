@@ -244,7 +244,7 @@ static void makeEiffelClassTag (tokenInfo *const token)
 		const char *const name = vStringValue (token->string);
 		tagEntryInfo e;
 
-		initTagEntry (&e, name, &(EiffelKinds [EKIND_CLASS]));
+		initTagEntry (&e, name, EKIND_CLASS);
 
 		makeTagEntry (&e);
 	}
@@ -259,12 +259,12 @@ static void makeEiffelFeatureTag (tokenInfo *const token)
 		const char *const name = vStringValue (token->string);
 		tagEntryInfo e;
 
-		initTagEntry (&e, name, &(EiffelKinds [EKIND_FEATURE]));
+		initTagEntry (&e, name, EKIND_FEATURE);
 
 		e.isFileScope = (bool) (! token->isExported);
 		if (e.isFileScope)
 			markTagExtraBit (&e, XTAG_FILE_SCOPE);
-		e.extensionFields.scopeKind = &(EiffelKinds [EKIND_CLASS]);
+		e.extensionFields.scopeKindIndex = EKIND_CLASS;
 		e.extensionFields.scopeName = vStringValue (token->className);
 
 		makeTagEntry (&e);
@@ -291,7 +291,7 @@ static void makeEiffelLocalTag (tokenInfo *const token)
 		vString* scope = vStringNew ();
 		tagEntryInfo e;
 
-		initTagEntry (&e, name, &(EiffelKinds [EKIND_LOCAL]));
+		initTagEntry (&e, name, EKIND_LOCAL);
 
 		e.isFileScope = true;
 		markTagExtraBit (&e, XTAG_FILE_SCOPE);
@@ -300,7 +300,7 @@ static void makeEiffelLocalTag (tokenInfo *const token)
 		vStringPut (scope, '.');
 		vStringCat (scope, token->featureName);
 
-		e.extensionFields.scopeKind = &(EiffelKinds [EKIND_FEATURE]);
+		e.extensionFields.scopeKindIndex = EKIND_FEATURE;
 		e.extensionFields.scopeName = vStringValue (scope);
 
 		makeTagEntry (&e);

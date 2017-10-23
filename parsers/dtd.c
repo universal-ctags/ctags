@@ -21,11 +21,11 @@
 
 
 static scopeSeparator DtdParameterEntrySeparators [] = {
-	{ KIND_WILDCARD, "/%" },
+	{ KIND_WILDCARD_INDEX, "/%" },
 };
 
 static scopeSeparator DtdAttSeparators [] = {
-	{ KIND_WILDCARD, "/@" },
+	{ KIND_WILDCARD_INDEX, "/@" },
 };
 
 typedef enum {
@@ -286,7 +286,7 @@ static int makeDtdTagMaybe (tagEntryInfo *const e, tokenInfo *const token,
 		return CORK_NIL;
 
 	initRefTagEntry (e, tokenString (token),
-					 DtdKinds + kind,
+					 kind,
 					 role);
 	e->lineNumber = token->lineNumber;
 	e->filePosition = token->filePosition;

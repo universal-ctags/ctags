@@ -39,10 +39,11 @@ extern const char *renderRole (const roleDesc* const role, vString* b);
 #define KIND_FILE_DEFAULT 'F'
 #define KIND_FILE_DEFAULT_LONG "file"
 
+#define KIND_WILDCARD_INDEX -3
 #define KIND_WILDCARD '*'
 
 typedef struct sScopeSeparator {
-	char  parentLetter;
+	int parentKindIndex;
 	const char *separator;
 } scopeSeparator;
 
@@ -80,7 +81,7 @@ struct sKindDefinition {
 /* for the obsolete --list-kinds option */
 extern void printKind (const kindDefinition* const kind, bool indent);
 
-extern const char *scopeSeparatorFor (const kindDefinition *kind, char parentLetter);
+extern const char *scopeSeparatorFor (langType lang, int kindIndex, int parentKindIndex);
 
 extern void enableKind (kindDefinition *kind, bool enable);
 
@@ -90,7 +91,10 @@ extern struct kindControlBlock* allocKindControlBlock (parserDefinition *parser)
 extern void freeKindControlBlock (struct kindControlBlock* kcb);
 extern int  defineKind (struct kindControlBlock* kcb, kindDefinition *def,
 						freeKindDefFunc freeKindDef);
+extern bool isKindEnabled (struct kindControlBlock* kcb, int kindIndex);
+extern bool isRoleEnabled (struct kindControlBlock* kcb, int kindIndex, int roleIndex);
 extern unsigned int countKinds (struct kindControlBlock* kcb);
+extern unsigned int countRoles (struct kindControlBlock* kcb, int kindIndex);
 extern kindDefinition *getKind (struct kindControlBlock* kcb, int kindIndex);
 extern kindDefinition *getKindForLetter (struct kindControlBlock* kcb, int letter);
 extern kindDefinition *getKindForName (struct kindControlBlock* kcb, const char* name);

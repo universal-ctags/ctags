@@ -519,10 +519,10 @@ static int makeTag (tokenInfo *const token, const goKind kind,
 	tagEntryInfo e;
 
 	if (kind == GOTAG_UNKNOWN)
-		initRefTagEntry (&e, name, &(GoKinds [kind]),
+		initRefTagEntry (&e, name, kind,
 						 R_GOTAG_UNKNOWN_RECEIVER);
 	else
-		initTagEntry (&e, name, &(GoKinds [kind]));
+		initTagEntry (&e, name, kind);
 
 	if (!GoKinds [kind].enabled)
 		return CORK_NIL;

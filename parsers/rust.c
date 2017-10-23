@@ -439,7 +439,7 @@ static void addTag (vString* ident, const char* arg_list, int kind, unsigned lon
 	if (kind == K_NONE || ! rustKinds[kind].enabled)
 		return;
 	tagEntryInfo tag;
-	initTagEntry(&tag, ident->buffer, &(rustKinds[kind]));
+	initTagEntry(&tag, ident->buffer, kind);
 
 	tag.lineNumber = line;
 	tag.filePosition = pos;
@@ -448,7 +448,7 @@ static void addTag (vString* ident, const char* arg_list, int kind, unsigned lon
 	/*tag.extensionFields.varType = type;*/ /* FIXME: map to typeRef[1]? */
 	if (parent_kind != K_NONE)
 	{
-		tag.extensionFields.scopeKind = &(rustKinds[parent_kind]);
+		tag.extensionFields.scopeKindIndex = parent_kind;
 		tag.extensionFields.scopeName = scope->buffer;
 	}
 	makeTagEntry(&tag);

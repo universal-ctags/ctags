@@ -86,7 +86,7 @@ static void cobol_make_tag_maybe (const char *line,
 
 		vStringNCopyS (name, line + matches[matchIndex].start, matches[matchIndex].length);
 		if (lookupCaseKeyword (vStringValue (name), cobol) == KEYWORD_NONE)
-			makeSimpleTag (name, CobolKinds, kindIndex);
+			makeSimpleTag (name, kindIndex);
 		vStringDelete (name);
 	}
 }
@@ -119,7 +119,7 @@ static bool make_tag_for_copied_in_sourcefile (const char *line,
 		vString *name = vStringNew ();
 
 		vStringNCopyS (name, line + matches[1].start, matches[1].length);
-		makeSimpleRefTag (name, CobolKinds, K_SOURCEFILE, COBOL_SOURCEFILE_COPIED);
+		makeSimpleRefTag (name, K_SOURCEFILE, COBOL_SOURCEFILE_COPIED);
 		vStringDelete (name);
 	}
 	return true;

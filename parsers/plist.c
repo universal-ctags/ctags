@@ -145,7 +145,7 @@ static void makeTagWithScope (xmlNode *node CTAGS_ATTR_UNUSED,
 			      struct sTagEntryInfo *tag,
 			      void *userData)
 {
-	tag->extensionFields.scopeKind  = userData? PlistKinds + K_KEY: NULL;
+	tag->extensionFields.scopeKindIndex = userData? K_KEY: KIND_GHOST_INDEX;
 	tag->extensionFields.scopeName  = userData;
 	makeTagEntry (tag);
 }

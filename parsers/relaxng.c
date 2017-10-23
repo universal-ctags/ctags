@@ -174,7 +174,7 @@ relaxngFindTags (xmlNode *node,
 static void
 setScope (struct sTagEntryInfo *tag, int index)
 {
-	tag->extensionFields.scopeKind  = NULL;
+	tag->extensionFields.scopeKindIndex = KIND_GHOST_INDEX;
 	tag->extensionFields.scopeName  = NULL;
 	tag->extensionFields.scopeIndex = index;
 

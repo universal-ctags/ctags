@@ -6,12 +6,12 @@
  **************************************************************************/
 #include "general.h"
 
-#include <string.h> 
-#include <ctype.h> 
+#include <string.h>
+#include <ctype.h>
 
 #include "entry.h"
-#include "parse.h" 
-#include "read.h" 
+#include "parse.h"
+#include "read.h"
 #include "routines.h"
 
 #define isSelectorChar(c) \
@@ -224,7 +224,7 @@ static void findCssTags (void)
 			if (CssKinds[kind].enabled)
 			{
 				tagEntryInfo e;
-				initTagEntry (&e, vStringValue (selector), &(CssKinds[kind]));
+				initTagEntry (&e, vStringValue (selector), kind);
 
 				e.lineNumber	= lineNumber;
 				e.filePosition	= filePosition;
@@ -262,4 +262,3 @@ extern parserDefinition* CssParser (void)
 	def->parser     = findCssTags;
 	return def;
 }
-

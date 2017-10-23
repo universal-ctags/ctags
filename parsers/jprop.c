@@ -86,7 +86,7 @@ static void findJavaPropertiesTags (void)
 		key = vStringNew ();
 	else
 		vStringClear (key);
-	
+
 	while ((line = readLineFromInputFile ()) != NULL)
 	{
 		if (in_value)
@@ -103,7 +103,7 @@ static void findJavaPropertiesTags (void)
 			continue;
 
 		line = extractKey (line, key);
-		makeSimpleTag (key, JavaPropertiesKinds, K_KEY);
+		makeSimpleTag (key, K_KEY);
 		vStringClear (key);
 
 		value_continues = doesValueContinue (line);
@@ -124,5 +124,3 @@ JavaPropertiesParser (void)
 	def->parser = findJavaPropertiesTags;
 	return def;
 }
-
-

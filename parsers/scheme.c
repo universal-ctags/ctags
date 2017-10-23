@@ -80,7 +80,7 @@ static void findSchemeTags (void)
 			if (line == NULL)
 				break;
 			readIdentifier (name, cp);
-			makeSimpleTag (name, SchemeKinds, K_FUNCTION);
+			makeSimpleTag (name, K_FUNCTION);
 		}
 		if (cp [0] == '(' &&
 			(cp [1] == 'S' || cp [1] == 's') &&
@@ -102,7 +102,7 @@ static void findSchemeTags (void)
 			if (line == NULL)
 				break;
 			readIdentifier (name, cp);
-			makeSimpleTag (name, SchemeKinds, K_SET);
+			makeSimpleTag (name, K_SET);
 		}
 	}
 	vStringDelete (name);

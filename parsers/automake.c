@@ -63,7 +63,7 @@ static roleDesc AutomakeConditionRoles [] = {
 };
 
 static scopeSeparator AutomakeSeparators [] = {
-	{ 'd'          , "/" },
+	{ K_AM_DIR        , "/" },
 };
 
 static kindDefinition AutomakeKinds [] = {
@@ -169,7 +169,7 @@ static bool automakeMakeTag (struct sAutomakeSubparser* automake,
 
 	if (rindex == ROLE_INDEX_DEFINITION)
 	{
-		automake->index = makeSimpleTag (subname, AutomakeKinds, kindex);
+		automake->index = makeSimpleTag (subname, kindex);
 		addAutomakeDirectory (automake->directories, subname, automake->index);
 	}
 	else
@@ -179,7 +179,7 @@ static bool automakeMakeTag (struct sAutomakeSubparser* automake,
 			automake->index = lookupAutomakeDirectory (automake->directories, subname);
 
 		if ((!appending) || (automake->index == CORK_NIL))
-			automake->index = makeSimpleRefTag (subname, AutomakeKinds, kindex, rindex);
+			automake->index = makeSimpleRefTag (subname, kindex, rindex);
 	}
 
 	vStringDelete (subname);
@@ -199,11 +199,11 @@ static void valueCallback (makeSubparser *make, char *name)
 		return;
 
 	parent = getEntryInCorkQueue (p);
-	if (((parent->kind - AutomakeKinds) == K_AM_DIR)
+	if ((parent->kindIndex == K_AM_DIR)
 	    && (parent->extensionFields.roleIndex != ROLE_INDEX_DEFINITION))
 	{
 		k = K_AM_PROGRAM + parent->extensionFields.roleIndex;
-		initTagEntry (&elt, name, AutomakeKinds + k);
+		initTagEntry (&elt, name, k);
 		elt.extensionFields.scopeIndex = p;
 		makeTagEntry (&elt);
 	}
@@ -211,7 +211,7 @@ static void valueCallback (makeSubparser *make, char *name)
 
 static void refCondtionAM (vString *directive)
 {
-	makeSimpleRefTag (directive, AutomakeKinds,
+	makeSimpleRefTag (directive,
 			  K_AM_CONDITION, R_AM_CONDITION_BRANCHED);
 }
 

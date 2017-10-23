@@ -56,7 +56,7 @@ typedef enum _WindResParserState
 static void makeResTag(vString *name, ResKind kind)
 {
 	vStringStripTrailing(name);
-	makeSimpleTag(name, ResKinds, kind);
+	makeSimpleTag(name, kind);
 	vStringClear(name);
 }
 
