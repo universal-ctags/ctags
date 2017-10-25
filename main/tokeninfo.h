@@ -89,6 +89,8 @@ void tokenCopy       (tokenInfo *dest, tokenInfo *src);
    language object type t.
    return false if it reaches EOF. */
 bool tokenSkipToType (tokenInfo *token, tokenType t);
+bool tokenSkipToTypeFull (tokenInfo *token, tokenType t, void *data);
 bool tokenSkipOverPair (tokenInfo *token);
+bool tokenSkipOverPairFull (tokenInfo *token, void *data);
 
 #endif

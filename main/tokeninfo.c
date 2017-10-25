@@ -144,13 +144,18 @@ void *newTokenByCopyingFull (tokenInfo *src, void *data)
 	return dest;
 }
 
-bool tokenSkipToType (tokenInfo *token, tokenType t)
+bool tokenSkipToTypeFull (tokenInfo *token, tokenType t, void *data)
 {
 	while (! (tokenIsEOF (token)
 			  || token->type == t))
-		tokenRead (token);
+		tokenReadFull (token, data);
 
 	return (token->type == t)? true: false;
+}
+
+bool tokenSkipToType (tokenInfo *token, tokenType t)
+{
+	return tokenSkipToTypeFull (token, t, NULL);
 }
 
 void tokenUnreadFull (tokenInfo *token, void *data)
@@ -172,6 +177,10 @@ void tokenUnread      (tokenInfo *token)
 
 bool tokenSkipOverPair (tokenInfo *token)
 {
+	return tokenSkipOverPairFull(token, NULL);
+}
+bool tokenSkipOverPairFull (tokenInfo *token, void *data)
+{
 	int start = token->type;
 	int end = token->klass->typeForUndefined;
 	unsigned int i;
@@ -185,7 +194,7 @@ bool tokenSkipOverPair (tokenInfo *token)
 
 	int depth = 1;
 	do {
-		tokenRead (token);
+		tokenReadFull (token, data);
 		if (token->type == start)
 			depth ++;
 		else if (token->type == end)
