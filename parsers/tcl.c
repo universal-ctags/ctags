@@ -70,12 +70,21 @@ static const keywordTable TclKeywordTable[] = {
 */
 
 
-static void readToken (tokenInfo *const token, void *data CTAGS_ATTR_UNUSED);
+static void initToken (tokenInfo *token, void *data);
+static void readToken (tokenInfo *const token, void *data);
 static void clearToken (tokenInfo *token);
 static void copyToken (tokenInfo *dest, tokenInfo *src, void *data CTAGS_ATTR_UNUSED);
 
+struct sTclParserState {
+	enum TclTokenType lastTokenType;
+};
+
+#define TOKEN_PSTATE(TOKEN) \
+	TOKENX(TOKEN, struct tokenExtra)->pstate
+
 struct tokenExtra {
 	int scopeIndex;
+	struct sTclParserState *pstate;
 };
 
 struct tokenTypePair typePairs [] = {
@@ -93,25 +102,29 @@ static struct tokenInfoClass tclTokenInfoClass = {
 	.extraSpace       = sizeof (struct tokenExtra),
 	.pairs            = typePairs,
 	.pairCount        = ARRAY_SIZE (typePairs),
+	.init             = initToken,
 	.read             = readToken,
 	.clear            = clearToken,
 	.copy             = copyToken,
 };
 
-extern tokenInfo *newTclToken (void)
+extern tokenInfo *newTclToken (void *pstate)
 {
-	return newToken (&tclTokenInfoClass);
+	return newTokenFull (&tclTokenInfoClass, pstate);
 }
 
 static void clearToken (tokenInfo *token)
 {
 	TOKENX (token, struct tokenExtra)->scopeIndex = CORK_NIL;
+	TOKENX (token, struct tokenExtra)->pstate = NULL;
 }
 
 static void copyToken (tokenInfo *dest, tokenInfo *src, void *data CTAGS_ATTR_UNUSED)
 {
 	TOKENX (dest, struct tokenExtra)->scopeIndex =
 		TOKENX (src, struct tokenExtra)->scopeIndex;
+	TOKENX (dest, struct tokenExtra)->pstate =
+		TOKENX (src, struct tokenExtra)->pstate;
 }
 
 static void readString (vString *string)
@@ -171,11 +184,18 @@ static keywordId resolveKeyword (vString *string)
 	return lookupKeyword (s, lang);
 }
 
-static void readToken (tokenInfo *const token, void *data CTAGS_ATTR_UNUSED)
+static void initToken (tokenInfo *token, void *data)
 {
-	int c;
-	bool escaped;
+	TOKENX (token, struct tokenExtra)->pstate = data;
+}
 
+static void readToken0 (tokenInfo *const token, struct sTclParserState *pstate)
+{
+	int c = EOF;
+	bool escaped;
+	bool bol = (pstate->lastTokenType == TOKEN_TCL_EOL
+				|| pstate->lastTokenType == ';'
+				|| pstate->lastTokenType == TOKEN_TCL_UNDEFINED);
 	token->type		= TOKEN_TCL_UNDEFINED;
 	token->keyword	= KEYWORD_NONE;
 	vStringClear (token->string);
@@ -189,6 +209,7 @@ static void readToken (tokenInfo *const token, void *data CTAGS_ATTR_UNUSED)
 
 	if (c == '\\')
 	{
+		bol = false;
 		int c0 = getcFromInputFile ();
 		switch (c0)
 		{
@@ -217,9 +238,12 @@ static void readToken (tokenInfo *const token, void *data CTAGS_ATTR_UNUSED)
 	case '#':
 		if (!escaped)
 		{
-			do
-				c = getcFromInputFile ();
-			while (c != EOF && c != '\r' && c != '\n');
+			if (bol)
+			{
+				do
+					c = getcFromInputFile ();
+				while (c != EOF && c != '\r' && c != '\n');
+			}
 			goto getNextChar;
 		}
 	case '"':
@@ -278,6 +302,14 @@ static void readToken (tokenInfo *const token, void *data CTAGS_ATTR_UNUSED)
 	}
 }
 
+static void readToken (tokenInfo *const token, void *data CTAGS_ATTR_UNUSED)
+{
+	struct sTclParserState *pstate = TOKEN_PSTATE(token);
+
+	readToken0 (token, pstate);
+
+	pstate->lastTokenType = token->type;
+}
 
 static void skipToEndOfCmdline (tokenInfo *const token)
 {
@@ -325,7 +357,8 @@ static void notifyPackageRequirement (tokenInfo *const token)
 		if (tclsub->packageRequirementNotify)
 		{
 			enterSubparser(sub);
-			tclsub->packageRequirementNotify (tclsub, vStringValue (token->string));
+			tclsub->packageRequirementNotify (tclsub, vStringValue (token->string),
+											  TOKEN_PSTATE(token));
 			leaveSubparser();
 		}
 	}
@@ -342,7 +375,8 @@ static void notifyNamespaceImport (tokenInfo *const token)
 		if (tclsub->namespaceImportNotify)
 		{
 			enterSubparser(sub);
-			tclsub->namespaceImportNotify (tclsub, vStringValue (token->string));
+			tclsub->namespaceImportNotify (tclsub, vStringValue (token->string),
+										   TOKEN_PSTATE(token));
 			leaveSubparser();
 		}
 	}
@@ -360,7 +394,8 @@ static int notifyCommand (tokenInfo *const token, unsigned int parent)
 		if (tclsub->commandNotify)
 		{
 			enterSubparser(sub);
-			r = tclsub->commandNotify (tclsub, vStringValue (token->string), parent);
+			r = tclsub->commandNotify (tclsub, vStringValue (token->string), parent,
+									   TOKEN_PSTATE(token));
 			leaveSubparser();
 			if (r != CORK_NIL)
 				break;
@@ -563,7 +598,10 @@ static void parsePackage (tokenInfo *const token)
 
 static void findTclTags (void)
 {
-	tokenInfo *const token = newTclToken ();
+	struct sTclParserState pstate = {
+		.lastTokenType = TOKEN_TCL_UNDEFINED,
+	};
+	tokenInfo *const token = newTclToken (&pstate);
 
 	do {
 		tokenRead (token);
