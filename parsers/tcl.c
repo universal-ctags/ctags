@@ -311,18 +311,24 @@ static void readToken (tokenInfo *const token, void *data CTAGS_ATTR_UNUSED)
 	pstate->lastTokenType = token->type;
 }
 
+static bool tokenIsEOL (tokenInfo *const token)
+{
+	if (token->type == ';'
+		|| tokenIsType (token, TCL_EOL)
+		|| tokenIsEOF (token))
+		return true;
+	return false;
+}
+
 static void skipToEndOfCmdline (tokenInfo *const token)
 {
-	do {
-		if (token->type == ';')
-			break;
-		else if (tokenIsType (token, TCL_EOL))
-			break;
-		else if ((token->type == '{')
-				 || (token->type == '['))
+	while (!tokenIsEOL (token))
+	{
+		if ((token->type == '{')
+			|| (token->type == '['))
 			tokenSkipOverPair(token);
 		tokenRead (token);
-	} while (!tokenIsEOF (token));
+	}
 }
 
 extern void skipToEndOfTclCmdline (tokenInfo *const token)
@@ -469,33 +475,23 @@ static void parseProc (tokenInfo *const token,
 		}
 	}
 
-	tokenRead (token);
-
-	if (token->type == '{')
-		tokenSkipOverPair(token);
-	else
+	if (!tokenIsEOL (token))
 	{
+		tokenRead (token);
 		skipToEndOfCmdline(token);
-		return;
 	}
 
-	if (tokenSkipToType(token, '{'))
+	if (index != CORK_NIL)
 	{
-		if (tokenSkipOverPair(token))
+		tagEntryInfo *e;
+
+		e = getEntryInCorkQueue (index);
+		e->extensionFields.endLine = token->lineNumber;
+
+		if (index_fq != CORK_NIL)
 		{
-			if (index != CORK_NIL)
-			{
-				tagEntryInfo *e;
-
-				e = getEntryInCorkQueue (index);
-				e->extensionFields.endLine = token->lineNumber;
-
-				if (index_fq != CORK_NIL)
-				{
-					e = getEntryInCorkQueue (index_fq);
-					e->extensionFields.endLine = token->lineNumber;
-				}
-			}
+			e = getEntryInCorkQueue (index_fq);
+			e->extensionFields.endLine = token->lineNumber;
 		}
 	}
 }
