@@ -54,6 +54,11 @@ static void destroyToken (void *data)
 
 void *newToken (struct tokenInfoClass *klass)
 {
+	return newTokenFull (klass, NULL);
+}
+
+void *newTokenFull (struct tokenInfoClass *klass, void *data)
+{
 	tokenInfo *token = NULL;
 
 	if (klass->nPreAlloc == 0)
@@ -72,6 +77,8 @@ void *newToken (struct tokenInfoClass *klass)
 		goto retry;
 	}
 
+	if (klass->init)
+		klass->init (token, data);
 	return token;
 }
 

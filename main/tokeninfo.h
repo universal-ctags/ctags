@@ -49,6 +49,7 @@ struct tokenInfoClass {
 	size_t extraSpace;
 	struct tokenTypePair   *pairs;
 	unsigned int        pairCount;
+	void (*init)   (tokenInfo *token, void *data);
 	void (*read)   (tokenInfo *token, void *data);
 	void (*clear)  (tokenInfo *token);
 	void (*destroy) (tokenInfo *token);
@@ -58,6 +59,7 @@ struct tokenInfoClass {
 };
 
 void *newToken       (struct tokenInfoClass *klass);
+void *newTokenFull   (struct tokenInfoClass *klass, void *data);
 void *newTokenByCopying (tokenInfo *src);
 void *newTokenByCopyingFull (tokenInfo *src, void *data);
 
