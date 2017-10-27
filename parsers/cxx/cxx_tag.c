@@ -255,7 +255,7 @@ tagEntryInfo * cxxTagBegin(unsigned int uKind,CXXToken * pToken)
 
 	if(!cxxScopeIsGlobal())
 	{
-		g_oCXXTag.extensionFields.scopeKind = &(g_cxx.pKindDefinitions[cxxScopeGetKind()]);
+		g_oCXXTag.extensionFields.scopeKindIndex = cxxScopeGetKind();
 		g_oCXXTag.extensionFields.scopeName = cxxScopeGetFullName();
 	}
 

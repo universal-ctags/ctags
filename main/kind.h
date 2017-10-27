@@ -39,10 +39,11 @@ extern const char *renderRole (const roleDesc* const role, vString* b);
 #define KIND_FILE_DEFAULT 'F'
 #define KIND_FILE_DEFAULT_LONG "file"
 
+#define KIND_WILDCARD_INDEX -3
 #define KIND_WILDCARD '*'
 
 typedef struct sScopeSeparator {
-	char  parentLetter;
+	int parentKindIndex;
 	const char *separator;
 } scopeSeparator;
 
@@ -80,7 +81,7 @@ struct sKindDefinition {
 /* for the obsolete --list-kinds option */
 extern void printKind (const kindDefinition* const kind, bool indent);
 
-extern const char *scopeSeparatorFor (const kindDefinition *kind, char parentLetter);
+extern const char *scopeSeparatorFor (langType lang, int kindIndex, int parentKindIndex);
 
 extern void enableKind (kindDefinition *kind, bool enable);
 

@@ -19,6 +19,7 @@
 #include <string.h>
 
 #include "debug.h"
+#include "entry_private.h"
 #include "options.h"
 #include "read.h"
 
@@ -77,11 +78,13 @@ extern void debugEntry (const tagEntryInfo *const tag)
 
 	if (debug (DEBUG_PARSE))
 	{
-		printf ("<#%s%s:%s", scope, tag->kind->name, tag->name);
+		kindDefinition *scopeKindDef = getLanguageKind(tag->langType,
+													   tag->extensionFields.scopeKindIndex);
+		printf ("<#%s%s:%s", scope, getTagKindName(tag), tag->name);
 
-		if (tag->extensionFields.scopeKind != NULL  &&
+		if (tag->extensionFields.scopeKindIndex != KIND_GHOST_INDEX  &&
 				tag->extensionFields.scopeName != NULL)
-			printf (" [%s:%s]", tag->extensionFields.scopeKind->name,
+			printf (" [%s:%s]", scopeKindDef->name,
 					tag->extensionFields.scopeName);
 
 		if (isFieldEnabled (FIELD_INHERITANCE) &&

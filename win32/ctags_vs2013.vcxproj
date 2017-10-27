@@ -102,6 +102,7 @@
     <ClCompile Include="..\main\debug.c" />
     <ClCompile Include="..\main\dependency.c" />
     <ClCompile Include="..\main\entry.c" />
+    <ClCompile Include="..\main\entry_private.c" />
     <ClCompile Include="..\main\error.c" />
     <ClCompile Include="..\main\field.c" />
     <ClCompile Include="..\main\flags.c" />
@@ -246,6 +247,7 @@
     <ClInclude Include="..\main\dependency.h" />
     <ClInclude Include="..\main\e_msoft.h" />
     <ClInclude Include="..\main\entry.h" />
+    <ClInclude Include="..\main\entry_private.h" />
     <ClInclude Include="..\main\error.h" />
     <ClInclude Include="..\main\field.h" />
     <ClInclude Include="..\main\flags.h" />

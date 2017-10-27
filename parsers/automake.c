@@ -63,7 +63,7 @@ static roleDesc AutomakeConditionRoles [] = {
 };
 
 static scopeSeparator AutomakeSeparators [] = {
-	{ 'd'          , "/" },
+	{ K_AM_DIR        , "/" },
 };
 
 static kindDefinition AutomakeKinds [] = {
@@ -199,7 +199,7 @@ static void valueCallback (makeSubparser *make, char *name)
 		return;
 
 	parent = getEntryInCorkQueue (p);
-	if (((parent->kind - AutomakeKinds) == K_AM_DIR)
+	if ((parent->kindIndex == K_AM_DIR)
 	    && (parent->extensionFields.roleIndex != ROLE_INDEX_DEFINITION))
 	{
 		k = K_AM_PROGRAM + parent->extensionFields.roleIndex;

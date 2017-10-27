@@ -448,7 +448,7 @@ static void addTag (vString* ident, const char* arg_list, int kind, unsigned lon
 	/*tag.extensionFields.varType = type;*/ /* FIXME: map to typeRef[1]? */
 	if (parent_kind != K_NONE)
 	{
-		tag.extensionFields.scopeKind = &(rustKinds[parent_kind]);
+		tag.extensionFields.scopeKindIndex = parent_kind;
 		tag.extensionFields.scopeName = scope->buffer;
 	}
 	makeTagEntry(&tag);

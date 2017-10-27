@@ -196,7 +196,7 @@ static void emitRubyTag (vString* name, rubyKind kind)
 	lvl = nestingLevelsGetCurrent (nesting);
 	parent = getEntryOfNestingLevel (lvl);
 	if (parent)
-		parent_kind =  parent->kind - RubyKinds;
+		parent_kind =  parent->kindIndex;
 
 	qualified_name = vStringValue (name);
 	unqualified_name = strrchr (qualified_name, SCOPE_SEPARATOR);
@@ -221,7 +221,7 @@ static void emitRubyTag (vString* name, rubyKind kind)
 		Assert (0 <= parent_kind &&
 		        (size_t) parent_kind < (ARRAY_SIZE (RubyKinds)));
 
-		tag.extensionFields.scopeKind = &(RubyKinds [parent_kind]);
+		tag.extensionFields.scopeKindIndex = parent_kind;
 		tag.extensionFields.scopeName = vStringValue (scope);
 	}
 	r = makeTagEntry (&tag);
@@ -378,8 +378,7 @@ static void enterUnnamedScope (void)
 	if (e_parent)
 	{
 		tagEntryInfo e;
-		initTagEntry (&e, "", KIND_GHOST_INDEX);
-		e.kind = e_parent->kind; /* TODO */
+		initTagEntry (&e, "", e_parent->kindIndex);
 		e.placeholder = 1;
 		r = makeTagEntry (&e);
 	}
@@ -485,7 +484,7 @@ static void findRubyTags (void)
 			 *   end
 			 * end
 			 */
-			if (e && (e->kind - RubyKinds) == K_CLASS && strlen (e->name) == 0)
+			if (e && e->kindIndex == K_CLASS && strlen (e->name) == 0)
 				kind = K_SINGLETON;
 			readAndEmitTag (&cp, kind);
 		}

@@ -117,8 +117,8 @@ typedef enum {
 
 #define NAMESPACE_SEPARATOR "\\"
 static scopeSeparator PhpGenericSeparators [] = {
-	{ 'n'          , NAMESPACE_SEPARATOR },
-	{ KIND_WILDCARD, "::" },
+	{ K_NAMESPACE        , NAMESPACE_SEPARATOR },
+	{ KIND_WILDCARD_INDEX, "::" },
 };
 
 static kindDefinition PhpKinds[COUNT_KIND] = {
@@ -265,10 +265,8 @@ static objPool *TokenPool = NULL;
 static const char *phpScopeSeparatorFor (int phpKind,
 					 int phpUpperScopeKind)
 {
-	char letter;
-
-	letter = PhpKinds[phpUpperScopeKind].letter;
-	return scopeSeparatorFor (&(PhpKinds[phpKind]), letter);
+	return scopeSeparatorFor (getInputLanguage(),
+							  phpKind, phpUpperScopeKind);
 }
 
 static const char *accessToString (const accessType access)
@@ -336,7 +334,7 @@ static void initPhpEntry (tagEntryInfo *const e, const tokenInfo *const token,
 	{
 		Assert (parentKind >= 0);
 
-		e->extensionFields.scopeKind = &(PhpKinds[parentKind]);
+		e->extensionFields.scopeKindIndex = parentKind;
 		e->extensionFields.scopeName = vStringValue (FullScope);
 	}
 }

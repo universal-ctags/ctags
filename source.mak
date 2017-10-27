@@ -17,6 +17,7 @@ MAIN_HEADS =			\
 	main/ctags.h		\
 	main/dependency.h	\
 	main/entry.h		\
+	main/entry_private.h	\
 	main/error.h		\
 	main/field.h		\
 	main/flags.h		\
@@ -63,6 +64,7 @@ MAIN_SRCS =				\
 	main/colprint.c			\
 	main/dependency.c		\
 	main/entry.c			\
+	main/entry_private.c		\
 	main/error.c			\
 	main/field.c			\
 	main/flags.c			\

@@ -21,7 +21,7 @@ struct tclooSubparser {
 };
 
 static scopeSeparator TclOOGenericSeparators [] = {
-	{ KIND_WILDCARD, "::" },
+	{ KIND_WILDCARD_INDEX, "::" },
 };
 
 enum TclOOKind {

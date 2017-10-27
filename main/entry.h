@@ -60,7 +60,7 @@ struct sTagEntryInfo {
 	langType langType;         /* language of input file */
 	const char *inputFileName;   /* name of input file */
 	const char *name;             /* name of the tag */
-	const kindDefinition *kind;	      /* kind descriptor */
+	int kindIndex;	      /* kind descriptor */
 	uint8_t extra[ ((XTAG_COUNT) / 8) + 1 ];
 	uint8_t *extraDynamic;		/* Dynamically allocated but freed by per parser TrashBox */
 
@@ -70,7 +70,7 @@ struct sTagEntryInfo {
 		const char* implementation;
 		const char* inheritance;
 
-		const kindDefinition* scopeKind;
+		int         scopeKindIndex;
 		const char* scopeName;
 		int         scopeIndex;   /* cork queue entry for upper scope tag.
 					     This field is meaningful if the value

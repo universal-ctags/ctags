@@ -61,13 +61,13 @@ static kindDefinition SystemdUnitKinds [] = {
 	  .referenceOnly = true, ATTACH_ROLES(SystemdUnitUnitRoles)},
 };
 
-static int roleOf (const char* key, kindDefinition* kind)
+static int roleOf (const char* key, int kind)
 {
 	int i;
 
-	for (i = 0; i < kind->nRoles; i++)
+	for (i = 0; i < SystemdUnitKinds [kind].nRoles; i++)
 	{
-		if (strcmp (kind->roles[i].name, key) == 0)
+		if (strcmp (SystemdUnitKinds [kind].roles[i].name, key) == 0)
 			return i;
 	}
 
@@ -103,7 +103,7 @@ static void newDataCallback (iniconfSubparser *s CTAGS_ATTR_UNUSED,
 
 	if (isXtagEnabled (XTAG_REFERENCE_TAGS) && value)
 	{
-		r = roleOf (key, SystemdUnitKinds + K_UNIT);
+		r = roleOf (key, K_UNIT);
 		if (r >= 0)
 			makeSystemdReferencedUnit (value, K_UNIT, r);
 	}

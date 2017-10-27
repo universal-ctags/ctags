@@ -106,7 +106,7 @@ static bool isSpecialTarget (vString *const name)
 	return true;
 }
 
-static void makeSimpleMakeTag (vString *const name, kindDefinition *MakeKinds, makeKind kind)
+static void makeSimpleMakeTag (vString *const name, makeKind kind)
 {
 	if (!isLanguageEnabled (getInputLanguage ()))
 		return;
@@ -114,7 +114,7 @@ static void makeSimpleMakeTag (vString *const name, kindDefinition *MakeKinds, m
 	makeSimpleTag (name, kind);
 }
 
-static void makeSimpleMakeRefTag (const vString* const name, kindDefinition* const kinds, const int kind,
+static void makeSimpleMakeRefTag (const vString* const name, const int kind,
 				  int roleIndex)
 {
 	if (!isLanguageEnabled (getInputLanguage ()))
@@ -130,7 +130,7 @@ static void newTarget (vString *const name)
 	{
 		return;
 	}
-	makeSimpleMakeTag (name, MakeKinds, K_TARGET);
+	makeSimpleMakeTag (name, K_TARGET);
 }
 
 static void newMacro (vString *const name, bool with_define_directive, bool appending)
@@ -138,7 +138,7 @@ static void newMacro (vString *const name, bool with_define_directive, bool appe
 	subparser *s;
 
 	if (!appending)
-		makeSimpleMakeTag (name, MakeKinds, K_MACRO);
+		makeSimpleMakeTag (name, K_MACRO);
 
 	foreachSubparser(s, false)
 	{
@@ -178,7 +178,7 @@ static void directiveFound (vString *const name)
 
 static void newInclude (vString *const name, bool optional)
 {
-	makeSimpleMakeRefTag (name, MakeKinds, K_INCLUDE,
+	makeSimpleMakeRefTag (name, K_INCLUDE,
 			      optional? R_INCLUDE_OPTIONAL: R_INCLUDE_GENERIC);
 }
 

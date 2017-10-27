@@ -754,7 +754,8 @@ extern void truncateTagLineAfterTag (
 static char* getFullQualifiedScopeNameFromCorkQueue (const tagEntryInfo * inner_scope)
 {
 
-	const kindDefinition *kind = NULL;
+	int kindIndex = KIND_GHOST_INDEX;
+	langType lang;
 	const tagEntryInfo *scope = inner_scope;
 	stringList *queue = stringListNew ();
 	vString *v;
@@ -766,16 +767,17 @@ static char* getFullQualifiedScopeNameFromCorkQueue (const tagEntryInfo * inner_
 	{
 		if (!scope->placeholder)
 		{
-			if (kind)
+			if (kindIndex != KIND_GHOST_INDEX)
 			{
-				sep = scopeSeparatorFor (kind, scope->kind->letter);
+				sep = scopeSeparatorFor (lang, kindIndex, scope->kindIndex);
 				v = vStringNewInit (sep);
 				stringListAdd (queue, v);
 			}
 			/* TODO: scope field of SCOPE can be used for optimization. */
 			v = vStringNewInit (scope->name);
 			stringListAdd (queue, v);
-			kind = scope->kind;
+			kindIndex = scope->kindIndex;
+			lang = scope->langType;
 		}
 		scope =  getEntryInCorkQueue (scope->extensionFields.scopeIndex);
 	}
@@ -801,7 +803,7 @@ extern void getTagScopeInformation (tagEntryInfo *const tag,
 	if (name)
 		*name = NULL;
 
-	if (tag->extensionFields.scopeKind == NULL
+	if (tag->extensionFields.scopeKindIndex == KIND_GHOST_INDEX
 	    && tag->extensionFields.scopeName == NULL
 	    && tag->extensionFields.scopeIndex != CORK_NIL
 	    && TagFile.corkQueue.count > 0)
@@ -814,15 +816,19 @@ extern void getTagScopeInformation (tagEntryInfo *const tag,
 		Assert (full_qualified_scope_name);
 
 		/* Make the information reusable to generate full qualified entry, and xformat output*/
-		tag->extensionFields.scopeKind = scope->kind;
+		tag->extensionFields.scopeKindIndex = scope->kindIndex;
 		tag->extensionFields.scopeName = full_qualified_scope_name;
 	}
 
-	if (tag->extensionFields.scopeKind != NULL  &&
+	if (tag->extensionFields.scopeKindIndex != KIND_GHOST_INDEX  &&
 	    tag->extensionFields.scopeName != NULL)
 	{
 		if (kind)
-			*kind = tag->extensionFields.scopeKind->name;
+		{
+			kindDefinition *kdef = getLanguageKind (tag->langType,
+													tag->extensionFields.scopeKindIndex);
+			*kind = kdef->name;
+		}
 		if (name)
 			*name = tag->extensionFields.scopeName;
 	}
@@ -1086,8 +1092,6 @@ static void clearTagEntryInQueue (tagEntryInfo* slot)
 		eFree ((char *)slot->extensionFields.implementation);
 	if (slot->extensionFields.inheritance)
 		eFree ((char *)slot->extensionFields.inheritance);
-	if (slot->extensionFields.scopeKind)
-		slot->extensionFields.scopeKind = NULL;
 	if (slot->extensionFields.scopeName)
 		eFree ((char *)slot->extensionFields.scopeName);
 	if (slot->extensionFields.signature)
@@ -1155,7 +1159,12 @@ static void writeTagEntry (const tagEntryInfo *const tag)
 
 	if (tag->placeholder)
 		return;
-	if (! tag->kind->enabled)
+	if (tag->kindIndex == KIND_FILE_INDEX)
+	{
+		if (! getInputLanguageFileKind ()->enabled)
+			return;
+	}
+	else if (! isLanguageKindEnabled(tag->langType, tag->kindIndex))
 		return;
 	if (tag->extensionFields.roleIndex != ROLE_INDEX_DEFINITION
 	    && ! isXtagEnabled (XTAG_REFERENCE_TAGS))
@@ -1227,7 +1236,7 @@ extern void uncorkTagFile(void)
 		writeTagEntry (tag);
 		if (doesInputLanguageRequestAutomaticFQTag ()
 		    && isXtagEnabled (XTAG_QUALIFIED_TAGS)
-		    && tag->extensionFields.scopeKind
+		    && (tag->extensionFields.scopeKindIndex != KIND_GHOST_INDEX)
 		    && tag->extensionFields.scopeName
 		    && tag->extensionFields.scopeIndex)
 			makeQualifiedTagEntry (tag);
@@ -1307,15 +1316,16 @@ extern int makeTagEntry (const tagEntryInfo *const tag_const)
 	int r = CORK_NIL;
 	Assert (tag->name != NULL);
 
-	if (getInputLanguageFileKind() != tag->kind)
+	if (KIND_FILE_INDEX != tag->kindIndex)
 	{
 		/* TODO: don't access the internal of kind directly.
 		   Use isInputLanguageKindEnabled () instead. */
-		if (! tag->kind->enabled &&
+		if (! getLanguageKind(tag->langType, tag->kindIndex) &&
 		    (tag->extensionFields.roleIndex == ROLE_INDEX_DEFINITION))
 			return CORK_NIL;
 		if ((tag->extensionFields.roleIndex != ROLE_INDEX_DEFINITION)
-		    && (! tag->kind->roles[tag->extensionFields.roleIndex].enabled))
+		    && (! isLanguageRoleEnabled (tag->langType, tag->kindIndex,
+										 tag->extensionFields.roleIndex)))
 			return CORK_NIL;
 	}
 
@@ -1355,7 +1365,7 @@ extern int makeQualifiedTagEntry (const tagEntryInfo *const e)
 {
 	int r = CORK_NIL;
 	tagEntryInfo x;
-	char xk;
+	int xk;
 	const char *sep;
 	static vString *fqn;
 
@@ -1369,15 +1379,15 @@ extern int makeQualifiedTagEntry (const tagEntryInfo *const e)
 		if (e->extensionFields.scopeName)
 		{
 			vStringCatS (fqn, e->extensionFields.scopeName);
-			xk = e->extensionFields.scopeKind->letter;
-			sep = scopeSeparatorFor (e->kind, xk);
+			xk = e->extensionFields.scopeKindIndex;
+			sep = scopeSeparatorFor (e->langType, e->kindIndex, xk);
 			vStringCatS (fqn, sep);
 		}
 		else
 		{
 			/* This is an top level item. prepend a root separator
 			   if the kind of the item has. */
-			sep = scopeSeparatorFor (e->kind, KIND_NULL);
+			sep = scopeSeparatorFor (e->langType, e->kindIndex, KIND_GHOST_INDEX);
 			if (sep == NULL)
 			{
 				/* No root separator. The name of the
@@ -1469,8 +1479,9 @@ extern void initTagEntryFull (tagEntryInfo *const e, const char *const name,
 	e->filePosition    = filePosition;
 	e->inputFileName   = inputFileName;
 	e->name            = name;
+	e->extensionFields.scopeKindIndex = KIND_GHOST_INDEX;
 	e->extensionFields.scopeIndex     = CORK_NIL;
-	e->kind = kind;
+	e->kindIndex = kindIndex;
 
 	Assert (roleIndex >= ROLE_INDEX_DEFINITION);
 	Assert (kind == NULL || roleIndex < kind->nRoles);

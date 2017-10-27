@@ -150,16 +150,17 @@ static int addExtensionFields (tagWriter *writer, MIO *mio, const tagEntryInfo *
 	int length = 0;
 
 	const char *str = NULL;;
-	const char kind_letter_str[2] = {tag->kind->letter, '\0'};
+	kindDefinition *kdef = getLanguageKind(tag->langType, tag->kindIndex);
+	const char kind_letter_str[2] = {kdef->letter, '\0'};
 
-	if (tag->kind->name != NULL && (isFieldEnabled (FIELD_KIND_LONG)  ||
-		 (isFieldEnabled (FIELD_KIND)  && tag->kind->letter == KIND_NULL)))
+	if (kdef->name != NULL && (isFieldEnabled (FIELD_KIND_LONG)  ||
+		 (isFieldEnabled (FIELD_KIND)  && kdef->letter == KIND_NULL)))
 	{
 		/* Use kind long name */
-		str = tag->kind->name;
+		str = kdef->name;
 	}
-	else if (tag->kind->letter != KIND_NULL  && (isFieldEnabled (FIELD_KIND) ||
-			(isFieldEnabled (FIELD_KIND_LONG) &&  tag->kind->name == NULL)))
+	else if (kdef->letter != KIND_NULL  && (isFieldEnabled (FIELD_KIND) ||
+			(isFieldEnabled (FIELD_KIND_LONG) &&  kdef->name == NULL)))
 	{
 		/* Use kind letter */
 		str = kind_letter_str;

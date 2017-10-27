@@ -134,7 +134,7 @@ static void makeJsonTag (tokenInfo *const token, const jsonKind kind)
 	{
 		Assert (token->scopeKind > TAG_NONE && token->scopeKind < TAG_COUNT);
 
-		e.extensionFields.scopeKind = &(JsonKinds[token->scopeKind]);
+		e.extensionFields.scopeKindIndex = token->scopeKind;
 		e.extensionFields.scopeName = vStringValue (token->scope);
 	}
 

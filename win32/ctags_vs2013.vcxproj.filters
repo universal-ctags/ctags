@@ -60,6 +60,9 @@
     <ClCompile Include="..\main\entry.c">
       <Filter>Source Files\Main</Filter>
     </ClCompile>
+    <ClCompile Include="..\main\entry_private.c">
+      <Filter>Source Files\Main</Filter>
+    </ClCompile>
     <ClCompile Include="..\main\error.c">
       <Filter>Source Files\Main</Filter>
     </ClCompile>
@@ -486,6 +489,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\main\entry.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\main\entry_private.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\main\error.h">

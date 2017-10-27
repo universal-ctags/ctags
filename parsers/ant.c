@@ -184,7 +184,7 @@ static void makeTagForTargetName (xmlNode *node CTAGS_ATTR_UNUSED,
 	int *corkIndex = (int *)userData;
 	int parentIndex = *corkIndex;
 
-	tag->extensionFields.scopeKind  = NULL;
+	tag->extensionFields.scopeKindIndex = KIND_GHOST_INDEX;
 	tag->extensionFields.scopeName  = NULL;
 	tag->extensionFields.scopeIndex = parentIndex;
 
@@ -196,7 +196,7 @@ static void makeTagWithScope (xmlNode *node CTAGS_ATTR_UNUSED,
 			      struct sTagEntryInfo *tag,
 			      void *userData)
 {
-	tag->extensionFields.scopeKind  = NULL;
+	tag->extensionFields.scopeKindIndex = KIND_GHOST_INDEX;
 	tag->extensionFields.scopeName  = NULL;
 	tag->extensionFields.scopeIndex = *(int *)userData;
 

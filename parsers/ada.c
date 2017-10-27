@@ -124,8 +124,6 @@ typedef enum eAdaParseMode
 
 typedef enum eAdaKinds
 {
-  ADA_KIND_SEPARATE = -3,   /* for defining the parent token name of a child
-                             * sub-unit */
   ADA_KIND_UNDEFINED = KIND_GHOST_INDEX,  /* for default/initialization values */
   ADA_KIND_PACKAGE_SPEC,
   ADA_KIND_PACKAGE,
@@ -152,10 +150,10 @@ typedef enum eAdaKinds
   ADA_KIND_IDENTIFIER,
   ADA_KIND_AUTOMATIC_VARIABLE,
   ADA_KIND_ANONYMOUS,      /* for non-identified loops and blocks */
+  ADA_KIND_SEPARATE,       /* for defining the parent token name of a child
+							* sub-unit */
   ADA_KIND_COUNT            /* must be last */
 } adaKind;
-
-static kindDefinition AdaSeparateKind = { true, 'S', "separate", "something separately declared/defined" };
 
 static kindDefinition AdaKinds[] =
 {
@@ -183,7 +181,9 @@ static kindDefinition AdaKinds[] =
   { true,   'b', "label",       "labels" },
   { true,   'i', "identifier",  "loop/declare identifiers"},
   { false,  'a', "autovar",     "automatic variables" },
-  { false,  'y', "anon",        "loops and blocks with no identifier" }
+  { false,  'y', "anon",        "loops and blocks with no identifier" },
+  // something separately declared/defined
+  { true,   'S', "separate",    "(ctags internal use)" }
 };
 
 typedef struct sAdaTokenList
@@ -440,11 +440,11 @@ static adaTokenInfo *newAdaToken(const char *name, int len, adaKind kind,
    * them blank because they get filled in later. */
   if(kind > ADA_KIND_UNDEFINED)
   {
-    token->tag.kind = &(AdaKinds[kind]);
+    token->tag.kindIndex = kind;
   }
   else
   {
-    token->tag.kind = NULL;
+    token->tag.kindIndex = KIND_GHOST_INDEX;
   }
 
   /* setup the parent and children pointers */
@@ -2063,7 +2063,7 @@ static void storeAdaTags(adaTokenInfo *token, const char *parentScope)
 
       if(token->kind != ADA_KIND_UNDEFINED)
       {
-        token->tag.kind = &(AdaKinds[token->kind]);
+        token->tag.kindIndex = token->kind;
       }
     }
 
@@ -2073,12 +2073,12 @@ static void storeAdaTags(adaTokenInfo *token, const char *parentScope)
       if(token->parent->kind > ADA_KIND_UNDEFINED &&
          token->parent->kind < ADA_KIND_COUNT)
       {
-        token->tag.extensionFields.scopeKind = &(AdaKinds[token->parent->kind]);
+        token->tag.extensionFields.scopeKindIndex = token->parent->kind;
         token->tag.extensionFields.scopeName = token->parent->name;
       }
       else if(token->parent->kind == ADA_KIND_SEPARATE)
       {
-        token->tag.extensionFields.scopeKind = &(AdaSeparateKind);
+        token->tag.extensionFields.scopeKindIndex = ADA_KIND_SEPARATE;
         token->tag.extensionFields.scopeName = token->parent->name;
       }
     } /* else if(token->parent->kind == ADA_KIND_ANONYMOUS) */

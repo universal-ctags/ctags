@@ -499,7 +499,7 @@ static void findPerlTags (void)
 					continue;
 				}
 
-				e.kind     = &(PerlKinds[kind]); /* FIXME */
+				e.kindIndex = kind;
 
 				makeTagEntry(&e);
 

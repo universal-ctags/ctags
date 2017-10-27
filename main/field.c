@@ -19,6 +19,7 @@
 #include "ctags.h"
 #include "debug.h"
 #include "entry.h"
+#include "entry_private.h"
 #include "field.h"
 #include "kind.h"
 #include "options.h"
@@ -392,9 +393,10 @@ static const char *renderEscapedName (const char* s,
 		int c = *s;
 		if ((c > 0x00 && c <= 0x1F) || c == 0x7F)
 		{
+			kindDefinition *kdef = getTagKind (tag);
 			verbose ("Unexpected character (0 < *c && *c < 0x20) included in a tagEntryInfo: %s\n", base);
 			verbose ("File: %s, Line: %lu, Lang: %s, Kind: %c\n",
-				 tag->inputFileName, tag->lineNumber, getLanguageName(tag->langType), tag->kind->letter);
+				 tag->inputFileName, tag->lineNumber, getLanguageName(tag->langType), kdef->letter);
 			verbose ("Escape the character\n");
 			break;
 		}
@@ -571,7 +573,8 @@ static const char* renderCompactInputLine (vString *b,  const char *const line)
 static const char *renderFieldKindName (const tagEntryInfo *const tag, const char *value CTAGS_ATTR_UNUSED, vString* b,
 										bool *rejected CTAGS_ATTR_UNUSED)
 {
-	return renderAsIs (b, tag->kind->name);
+	const char* name = getTagKindName (tag);
+	return renderAsIs (b, name);
 }
 
 static const char *renderFieldCompactInputLine (const tagEntryInfo *const tag,
@@ -626,8 +629,9 @@ static const char *renderFieldRole (const tagEntryInfo *const tag,
 		vStringClear (b);
 	else
 	{
-		Assert (rindex < tag->kind->nRoles);
-		role  = & (tag->kind->roles [rindex]);
+		kindDefinition *kdef = getTagKind(tag);
+		Assert (rindex < kdef->nRoles);
+		role  = & (kdef->roles [rindex]);
 		return renderRole (role, b);
 	}
 
@@ -664,7 +668,7 @@ static const char *renderFieldKindLetter (const tagEntryInfo *const tag,
 {
 	static char c[2] = { [1] = '\0' };
 
-	c [0] = tag->kind->letter;
+	c [0] = getTagKindLetter(tag);
 
 	return renderAsIs (b, c);
 }

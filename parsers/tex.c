@@ -159,9 +159,9 @@ static void deleteToken (tokenInfo *const token)
 	eFree (token);
 }
 
-static void getScopeInfo(texKind kind, vString *const parentKind,
-	vString *const parentName)
+static int getScopeInfo(texKind kind, vString *const parentName)
 {
+	int parentKind = KIND_GHOST_INDEX;
 	int i;
 
 	/*
@@ -169,25 +169,26 @@ static void getScopeInfo(texKind kind, vString *const parentKind,
 	 * Is this The Right Thing To Do?
 	 */
 	if (kind >= TEXTAG_LABEL) {
-		return;
+		goto out;
 	}
 
 	/*
 	 * This abuses the enum internals somewhat, but it should be ok in this
 	 * case.
 	 */
+	/* TODO: This loop and conditions can be squashed. */
 	for (i = kind - 1; i >= TEXTAG_PART; --i) {
 		if (i == TEXTAG_SUBSECTION && vStringLength(lastSubS) > 0) {
-			vStringCopyS(parentKind, "subsection");
+			parentKind = i;
 			break;
 		} else if (i == TEXTAG_SECTION && vStringLength(lastSection) > 0) {
-			vStringCopyS(parentKind, "section");
+			parentKind = i;
 			break;
 		} else if (i == TEXTAG_CHAPTER && vStringLength(lastChapter) > 0) {
-			vStringCopyS(parentKind, "chapter");
+			parentKind = i;
 			break;
 		} else if (i == TEXTAG_PART && vStringLength(lastPart) > 0) {
-			vStringCopyS(parentKind, "part");
+			parentKind = i;
 			break;
 		}
 	}
@@ -216,29 +217,19 @@ static void getScopeInfo(texKind kind, vString *const parentKind,
 			vStringCat(parentName, lastSubS);
 		}
 	}
+ out:
+	return parentKind;
 }
 
 /*
  *	 Tag generation functions
  */
-static kindDefinition *kindFromName (const char *kind_name)
-{
-	int i;
-
-	for (i = 0; i < TEXTAG_COUNT; i++)
-	{
-		if ( strcmp (kind_name, TexKinds[i].name) == 0)
-			return &(TexKinds[i]);
-	}
-	return NULL;
-}
-
 static void makeTexTag (tokenInfo *const token, texKind kind)
 {
 	if (TexKinds [kind].enabled)
 	{
 		const char *const name = vStringValue (token->string);
-		vString *parentKind = vStringNew();
+		int parentKind = KIND_GHOST_INDEX;
 		vString *parentName = vStringNew();
 		tagEntryInfo e;
 		initTagEntry (&e, name, kind);
@@ -246,14 +237,13 @@ static void makeTexTag (tokenInfo *const token, texKind kind)
 		e.lineNumber   = token->lineNumber;
 		e.filePosition = token->filePosition;
 
-		getScopeInfo(kind, parentKind, parentName);
-		if (vStringLength(parentKind) > 0) {
-			e.extensionFields.scopeKind = kindFromName (vStringValue(parentKind));
+		parentKind = getScopeInfo(kind, parentName);
+		if (parentKind != KIND_GHOST_INDEX) {
+			e.extensionFields.scopeKindIndex = parentKind;
 			e.extensionFields.scopeName = vStringValue(parentName);
 		}
 
 		makeTagEntry (&e);
-		vStringDelete (parentKind);
 		vStringDelete (parentName);
 	}
 }

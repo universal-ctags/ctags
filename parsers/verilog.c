@@ -333,12 +333,12 @@ static void pruneTokens (tokenInfo * token)
 	while ((token = popToken (token)));
 }
 
-static const kindDefinition *kindFromKind (const verilogKind kind)
+static const char *getNameForKind (const verilogKind kind)
 {
 	if (isInputLanguage (Lang_systemverilog))
-		return &(SystemVerilogKinds[kind]);
+		return (SystemVerilogKinds[kind]).name;
 	else /* isInputLanguage (Lang_verilog) */
-		return &(VerilogKinds[kind]);
+		return (VerilogKinds[kind]).name;
 }
 
 static char kindEnabled (const verilogKind kind)
@@ -556,7 +556,7 @@ static void dropEndContext (tokenInfo *const token)
 	}
 	else
 	{
-		vStringCatS (endTokenName, kindFromKind (currentContext->kind)->name);
+		vStringCatS (endTokenName, getNameForKind (currentContext->kind));
 		if (strcmp (vStringValue (token->name), vStringValue (endTokenName)) == 0)
 		{
 			verbose ("Dropping context %s\n", vStringValue (currentContext->name));
@@ -606,7 +606,7 @@ static void createTag (tokenInfo *const token)
 	{
 		verbose (" to context %s\n", vStringValue (currentContext->name));
 		currentContext->lastKind = kind;
-		tag.extensionFields.scopeKind = kindFromKind (currentContext->kind);
+		tag.extensionFields.scopeKindIndex = currentContext->kind;
 		tag.extensionFields.scopeName = vStringValue (currentContext->name);
 	}
 	verbose ("\n");
