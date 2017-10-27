@@ -358,6 +358,17 @@ static langType getNameOrAliasesLanguageAndSpec (const char *const key, langType
 	return result;
 }
 
+extern langType getLanguageForCommand (const char *const command, langType startFrom)
+{
+	const char *const tmp_command = baseFilename (command);
+	char *tmp_spec;
+	enum specType tmp_specType;
+
+	return getNameOrAliasesLanguageAndSpec (tmp_command, startFrom,
+											(const char **const)&tmp_spec,
+											&tmp_specType);
+}
+
 static langType getPatternLanguageAndSpec (const char *const baseName, langType start_index,
 					   const char **const spec, enum specType *specType)
 {
