@@ -213,24 +213,21 @@ static void findShTags (void)
 				found_kind = K_ALIAS;
 				cp += 5;
 			}
-			else if (isXtagEnabled (XTAG_REFERENCE_TAGS)
-				 && ShKinds [K_SOURCE].enabled)
-			{
-				if (cp [0] == '.'
+			else if (cp [0] == '.'
 				    && isspace((int) cp [1]))
-				{
-					found_kind = K_SOURCE;
-					++cp;
-				}
-				else if (strncmp ((const char*) cp, "source", (size_t) 6) == 0
-					 && isspace((int) cp [6]))
-				{
-					found_kind = K_SOURCE;
-					cp += 6;
-				}
-				if (found_kind == K_SOURCE)
-					check_char = isFileChar;
+			{
+				found_kind = K_SOURCE;
+				++cp;
+				check_char = isFileChar;
 			}
+			else if (strncmp ((const char*) cp, "source", (size_t) 6) == 0
+					 && isspace((int) cp [6]))
+			{
+				found_kind = K_SOURCE;
+				cp += 6;
+				check_char = isFileChar;
+			}
+
 			if (found_kind != K_NOTHING)
 				while (isspace ((int) *cp))
 					++cp;
@@ -268,7 +265,11 @@ static void findShTags (void)
 			if (found_kind != K_NOTHING)
 			{
 				if (found_kind == K_SOURCE)
-					makeSimpleRefTag (name, K_SOURCE, R_SOURCE_GENERIC);
+				{
+					if (isXtagEnabled (XTAG_REFERENCE_TAGS)
+						&& ShKinds [K_SOURCE].enabled)
+						makeSimpleRefTag (name, K_SOURCE, R_SOURCE_GENERIC);
+				}
 				else
 					makeSimpleTag (name, found_kind);
 				found_kind = K_NOTHING;
