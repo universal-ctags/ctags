@@ -15,6 +15,7 @@
 
 #include <string.h>
 
+#include "entry.h"
 #include "kind.h"
 #include "parse.h"
 #include "read.h"
@@ -30,6 +31,7 @@ typedef enum {
 	K_ALIAS,
 	K_FUNCTION,
 	K_SOURCE,
+	K_HEREDOCLABEL,
 } shKind;
 
 typedef enum {
@@ -45,6 +47,7 @@ static kindDefinition ShKinds [] = {
 	{ true, 'f', "function", "functions"},
 	{ true, 's', "script", "script files",
 	  .referenceOnly = true, ATTACH_ROLES (ShScriptRoles) },
+	{ true, 'h', "heredoc", "label for here document" },
 };
 
 /*
@@ -105,6 +108,7 @@ static void findShTags (void)
 	const unsigned char *line;
 	vString *hereDocDelimiter = NULL;
 	bool hereDocIndented = false;
+	int hereDocTagIndex = CORK_NIL;
 	bool (* check_char)(int);
 
 	while ((line = readLineFromInputFile ()) != NULL)
@@ -121,6 +125,12 @@ static void findShTags (void)
 			}
 			if (strcmp ((const char *) cp, vStringValue (hereDocDelimiter)) == 0)
 			{
+				if (hereDocTagIndex != CORK_NIL)
+				{
+					tagEntryInfo *tag = getEntryInCorkQueue (hereDocTagIndex);
+					tag->extensionFields.endLine = getInputLineNumber ();
+					hereDocTagIndex = CORK_NIL;
+				}
 				vStringDelete (hereDocDelimiter);
 				hereDocDelimiter = NULL;
 			}
@@ -195,6 +205,8 @@ static void findShTags (void)
 							start++;
 						vStringPut (hereDocDelimiter, *start);
 					}
+					if (vStringLength(hereDocDelimiter) > 0)
+						hereDocTagIndex = makeSimpleTag(hereDocDelimiter, K_HEREDOCLABEL);
 				}
 			}
 
@@ -299,5 +311,6 @@ extern parserDefinition* ShParser (void)
 	def->extensions = extensions;
 	def->aliases = aliases;
 	def->parser     = findShTags;
+	def->useCork    = true;
 	return def;
 }
