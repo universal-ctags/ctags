@@ -1,0 +1,19 @@
+X	input.go	/^type X struct {$/;"	s
+T1	input.go	/^	T1$/;"	M	struct:X	typeref:typename:T1
+T2	input.go	/^	*T2$/;"	M	struct:X	typeref:typename:*T2
+T3	input.go	/^	P.T3$/;"	M	struct:X	typeref:typename:P.T3
+T4	input.go	/^	*P.T4$/;"	M	struct:X	typeref:typename:*P.T4
+age	input.go	/^	age T5$/;"	m	struct:X
+skill	input.go	/^	skill *T6$/;"	m	struct:X
+address	input.go	/^	address, hometown T7$/;"	m	struct:X
+hometown	input.go	/^	address, hometown T7$/;"	m	struct:X
+natualLang	input.go	/^	natualLang,programmingLang *T8$/;"	m	struct:X
+programmingLang	input.go	/^	natualLang,programmingLang *T8$/;"	m	struct:X
+person	input.go	/^	person P.T9$/;"	m	struct:X
+parent	input.go	/^	parent *P.T10$/;"	m	struct:X
+lang1	input.go	/^	lang1, lang2 P.LANG$/;"	m	struct:X
+lang2	input.go	/^	lang1, lang2 P.LANG$/;"	m	struct:X
+lang3	input.go	/^	lang3, lang4 *P.Q.LANG$/;"	m	struct:X
+lang4	input.go	/^	lang3, lang4 *P.Q.LANG$/;"	m	struct:X
+T11	input.go	/^	P.Q.T11$/;"	M	struct:X	typeref:typename:P.Q.T11
+T12	input.go	/^	*P.Q.T12$/;"	M	struct:X	typeref:typename:*P.Q.T12

@@ -11,6 +11,7 @@
 #include "keyword.h"
 #include "read.h"
 #include "main.h"
+#include "objpool.h"
 #include "routines.h"
 #include "vstring.h"
 #include "options.h"
@@ -24,6 +25,8 @@
 #define isKeyword(token,k) (bool) ((token)->keyword == (k))
 #define isStartIdentChar(c) (isalpha (c) ||  (c) == '_' || (c) > 128) /* XXX UTF-8 */
 #define isIdentChar(c) (isStartIdentChar (c) || isdigit (c))
+#define newToken() (objPoolGet (TokenPool))
+#define deleteToken(t) (objPoolPut (TokenPool, (t)))
 
 /*
  *	 DATA DECLARATIONS
@@ -77,6 +80,7 @@ typedef struct sTokenInfo {
 */
 
 static int Lang_go;
+static objPool *TokenPool = NULL;
 static vString *signature = NULL;
 
 typedef enum {
@@ -89,6 +93,7 @@ typedef enum {
 	GOTAG_STRUCT,
 	GOTAG_INTERFACE,
 	GOTAG_MEMBER,
+	GOTAG_ANONMEMBER,
 	GOTAG_UNKNOWN,
 } goKind;
 
@@ -109,8 +114,9 @@ static kindDefinition GoKinds[] = {
 	{true, 's', "struct", "structs"},
 	{true, 'i', "interface", "interfaces"},
 	{true, 'm', "member", "struct members"},
+	{true, 'M', "anonMember", "struct anonymous members"},
 	{true, 'u', "unknown", "unknown",
-	 .referenceOnly = false, ATTACH_ROLES (GoUnknownRoles)},
+	 .referenceOnly = true, ATTACH_ROLES (GoUnknownRoles)},
 };
 
 static const keywordTable GoKeywordTable[] = {
@@ -130,20 +136,22 @@ static const keywordTable GoKeywordTable[] = {
 *   FUNCTION DEFINITIONS
 */
 
-static void initialize (const langType language)
-{
-	Lang_go = language;
-}
-
-static tokenInfo *newToken (void)
+static void *newPoolToken (void *createArg CTAGS_ATTR_UNUSED)
 {
 	tokenInfo *const token = xMalloc (1, tokenInfo);
+	token->string = vStringNew ();
+	return token;
+}
+
+static void clearPoolToken (void *data)
+{
+	tokenInfo *token = data;
+
 	token->type = TOKEN_NONE;
 	token->keyword = KEYWORD_NONE;
-	token->string = vStringNew ();
-	token->lineNumber = getInputLineNumber ();
+	token->lineNumber   = getInputLineNumber ();
 	token->filePosition = getInputFilePosition ();
-	return token;
+	vStringClear (token->string);
 }
 
 static void copyToken (tokenInfo *const dest, const tokenInfo *const other)
@@ -155,13 +163,26 @@ static void copyToken (tokenInfo *const dest, const tokenInfo *const other)
 	dest->filePosition = other->filePosition;
 }
 
-static void deleteToken (tokenInfo * const token)
+static void deletePoolToken (void* data)
 {
-	if (token != NULL)
-	{
-		vStringDelete (token->string);
-		eFree (token);
-	}
+	tokenInfo * const token = data;
+
+	vStringDelete (token->string);
+	eFree (token);
+}
+
+static void initialize (const langType language)
+{
+	Lang_go = language;
+	TokenPool = objPoolNew (16, newPoolToken, deletePoolToken, clearPoolToken, NULL);
+}
+
+static void finalize (const langType language, bool initialized)
+{
+	if (!initialized)
+		return;
+
+	objPoolDelete (TokenPool);
 }
 
 /*
@@ -512,7 +533,7 @@ static bool skipType (tokenInfo *const token)
 }
 
 static int makeTag (tokenInfo *const token, const goKind kind,
-	const int scope, const char *argList)
+	const int scope, const char *argList, const char *typeref)
 {
 	const char *const name = vStringValue (token->string);
 
@@ -531,6 +552,12 @@ static int makeTag (tokenInfo *const token, const goKind kind,
 	e.filePosition = token->filePosition;
 	if (argList)
 		e.extensionFields.signature = argList;
+	if (typeref)
+	{
+		/* Follows Cxx parser convention */
+		e.extensionFields.typeRef [0] = "typename";
+		e.extensionFields.typeRef [1] = typeref;
+	}
 
 	e.extensionFields.scopeIndex = scope;
 	return makeTagEntry (&e);
@@ -541,7 +568,7 @@ static int parsePackage (tokenInfo *const token)
 	readToken (token);
 	if (isType (token, TOKEN_IDENTIFIER))
 	{
-		return makeTag (token, GOTAG_PACKAGE, CORK_NIL, NULL);
+		return makeTag (token, GOTAG_PACKAGE, CORK_NIL, NULL, NULL);
 	}
 	else
 		return CORK_NIL;
@@ -613,10 +640,11 @@ static void parseFunctionOrMethod (tokenInfo *const token, const int scope)
 		vStringStripTrailing (signature);
 		if (receiver_type_token)
 			func_scope = makeTag(receiver_type_token, GOTAG_UNKNOWN,
-								 scope, NULL);
+								 scope, NULL, NULL);
 		else
 			func_scope = scope;
-		makeTag (functionToken, GOTAG_FUNCTION, func_scope, signature->buffer);
+		makeTag (functionToken, GOTAG_FUNCTION,
+				 func_scope, signature->buffer, NULL);
 		deleteToken (functionToken);
 		vStringDelete(signature);
 
@@ -648,6 +676,8 @@ static void parseStructMembers (tokenInfo *const token, const int scope)
 	if (!isType (token, TOKEN_OPEN_CURLY))
 		return;
 
+	vString *typeForAnonMember = vStringNew ();
+
 	readToken (token);
 	while (!isType (token, TOKEN_EOF) && !isType (token, TOKEN_CLOSE_CURLY))
 	{
@@ -670,11 +700,11 @@ static void parseStructMembers (tokenInfo *const token, const int scope)
 					if (memberCandidate)
 					{
 						// if we are here, there was a comma and memberCandidate isn't an anonymous field
-						makeTag (memberCandidate, GOTAG_MEMBER, scope, NULL);
+						makeTag (memberCandidate, GOTAG_MEMBER, scope, NULL, NULL);
 						deleteToken (memberCandidate);
 						memberCandidate = NULL;
 					}
-					makeTag (token, GOTAG_MEMBER, scope, NULL);
+					makeTag (token, GOTAG_MEMBER, scope, NULL, NULL);
 				}
 				readToken (token);
 			}
@@ -683,14 +713,54 @@ static void parseStructMembers (tokenInfo *const token, const int scope)
 			readToken (token);
 		}
 
+		if (first && isType (token, TOKEN_STAR))
+			vStringPut (typeForAnonMember, '*');
+
+		if (memberCandidate)
+			vStringCat (typeForAnonMember, memberCandidate->string);
+
+		if (((!first) && isType (token, TOKEN_DOT))
+			|| (first && isType (token, TOKEN_STAR)))
+		{
+			// TypeName of AnonymousField has a dot like package"."type.
+			// Pick up the last package component, and store it to
+			// memberCandidate.
+			readToken (token);
+			while (isType (token, TOKEN_IDENTIFIER) ||
+				   isType (token, TOKEN_DOT))
+			{
+				if (isType (token, TOKEN_IDENTIFIER))
+				{
+					if (!memberCandidate)
+						memberCandidate = newToken ();
+					copyToken (memberCandidate, token);
+					if (vStringLength (typeForAnonMember) > 0
+						&& (! (vStringLength (typeForAnonMember) == 1
+							   && vStringItem(typeForAnonMember, 0) == '*')))
+						vStringPut (typeForAnonMember, '.');
+					vStringCat (typeForAnonMember, memberCandidate->string);
+				}
+				readToken (token);
+			}
+		}
+
 		// in the case of  an anonymous field, we already read part of the
 		// type into memberCandidate and skipType() should return false so no tag should
 		// be generated in this case.
-		if (skipType (token) && memberCandidate)
-			makeTag (memberCandidate, GOTAG_MEMBER, scope, NULL);
+		if (memberCandidate)
+		{
+			if (skipType (token))
+				makeTag (memberCandidate, GOTAG_MEMBER, scope, NULL, NULL);
+			else
+				makeTag (memberCandidate, GOTAG_ANONMEMBER, scope, NULL,
+						 vStringValue(typeForAnonMember));
+		}
+
 
 		if (memberCandidate)
 			deleteToken (memberCandidate);
+
+		vStringClear (typeForAnonMember);
 
 		while (!isType (token, TOKEN_SEMICOLON) && !isType (token, TOKEN_CLOSE_CURLY)
 				&& !isType (token, TOKEN_EOF))
@@ -705,6 +775,8 @@ static void parseStructMembers (tokenInfo *const token, const int scope)
 			readToken (token);
 		}
 	}
+
+	vStringDelete (typeForAnonMember);
 }
 
 static void parseConstTypeVar (tokenInfo *const token, goKind kind, const int scope)
@@ -742,15 +814,18 @@ static void parseConstTypeVar (tokenInfo *const token, goKind kind, const int sc
 					copyToken (typeToken, token);
 					readToken (token);
 					if (isKeyword (token, KEYWORD_struct))
-						member_scope = makeTag (typeToken, GOTAG_STRUCT, scope, NULL);
+						member_scope = makeTag (typeToken, GOTAG_STRUCT,
+												scope, NULL, NULL);
 					else if (isKeyword (token, KEYWORD_interface))
-						member_scope = makeTag (typeToken, GOTAG_INTERFACE, scope, NULL);
+						member_scope = makeTag (typeToken, GOTAG_INTERFACE,
+												scope, NULL, NULL);
 					else
-						member_scope = makeTag (typeToken, kind, scope, NULL);
+						member_scope = makeTag (typeToken, kind,
+												scope, NULL, NULL);
 					break;
 				}
 				else
-					makeTag (token, kind, scope, NULL);
+					makeTag (token, kind, scope, NULL, NULL);
 				readToken (token);
 			}
 			if (!isType (token, TOKEN_COMMA))
@@ -842,6 +917,7 @@ extern parserDefinition *GoParser (void)
 	def->extensions = extensions;
 	def->parser = findGoTags;
 	def->initialize = initialize;
+	def->finalize = finalize;
 	def->keywordTable = GoKeywordTable;
 	def->keywordCount = ARRAY_SIZE (GoKeywordTable);
 	def->useCork = true;
