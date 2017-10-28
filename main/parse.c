@@ -1268,7 +1268,7 @@ static langType getFileLanguageForRequest (struct GetLanguageRequest *req)
 		return Option.language;
 }
 
-extern langType getFileLanguage (const char *const fileName)
+extern langType getLanguageForFilenameAndContents (const char *const fileName)
 {
 	struct GetLanguageRequest req = {
 		.type = GLR_DISCARD,
