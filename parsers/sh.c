@@ -144,6 +144,103 @@ static int readDestfileName (const unsigned char *cp, vString *destfile)
 	return 0;
 }
 
+struct hereDocParsingState {
+	vString *args[2];
+	vString *destfile;
+	langType sublang;
+	unsigned long startLine;
+};
+
+static void hdocStateInit (struct hereDocParsingState *hstate)
+{
+	hstate->args[0] = vStringNew ();
+	hstate->args[1] = vStringNew ();
+	hstate->destfile = vStringNew ();
+
+	hstate->sublang = LANG_IGNORE;
+}
+
+static void hdocStateClear (struct hereDocParsingState *hstate)
+{
+	vStringClear (hstate->args[0]);
+	vStringClear (hstate->args[1]);
+	vStringClear (hstate->destfile);
+}
+
+static void hdocStateFini (struct hereDocParsingState *hstate)
+{
+	vStringDelete (hstate->args[0]);
+	vStringDelete (hstate->args[1]);
+	vStringDelete (hstate->destfile);
+}
+
+static void hdocStateUpdateArgs (struct hereDocParsingState *hstate,
+										   vString *name)
+{
+	if (vStringIsEmpty(hstate->args[0]))
+		vStringCopy(hstate->args[0], name);
+	else if (vStringIsEmpty(hstate->args[1]))
+		vStringCopy(hstate->args[1], name);
+}
+
+static void hdocStateMakePromiseMaybe (struct hereDocParsingState *hstate)
+{
+	if (hstate->sublang != LANG_IGNORE)
+		makePromise (getLanguageName(hstate->sublang),
+					 hstate->startLine, 0,
+					 getInputLineNumber(), 0,
+					 0);
+	hstate->sublang = LANG_IGNORE;
+}
+
+static void hdocStateRecordStartlineFromDestfileMaybe (struct hereDocParsingState *hstate)
+{
+	const char *f = vStringValue(hstate->destfile);
+
+	if (hstate->sublang != LANG_IGNORE)
+		return;
+
+	hstate->sublang = getLanguageForFilename (f, 0);
+	if (hstate->sublang != LANG_IGNORE)
+		hstate->startLine = getInputLineNumber () + 1;
+	vStringClear (hstate->destfile);
+}
+
+static void hdocStateRecordStatelineMaybe (struct hereDocParsingState *hstate)
+{
+	if (!vStringIsEmpty(hstate->args[0]))
+	{
+		const char *cmd;
+
+		cmd = vStringValue(hstate->args[0]);
+		if (isEnvCommand (hstate->args[0]))
+		{
+			cmd = NULL;
+			if (!vStringIsEmpty(hstate->args[1]))
+				cmd = vStringValue(hstate->args[1]);
+		}
+
+		hstate->sublang = getLanguageForCommand (cmd, 0);
+		if (hstate->sublang != LANG_IGNORE)
+			hstate->startLine = getInputLineNumber () + 1;
+	}
+
+	if (vStringLength(hstate->destfile) > 0)
+		hdocStateRecordStartlineFromDestfileMaybe (hstate);
+}
+
+static int hdocStateReadDestfileName (struct hereDocParsingState *hstate,
+									  const unsigned char* cp,
+									  const vString *const hereDocDelimiter)
+{
+	int d = readDestfileName (cp, hstate->destfile);
+
+	if (d > 0 && hereDocDelimiter)
+		hdocStateRecordStartlineFromDestfileMaybe (hstate);
+
+	return d;
+}
+
 static void findShTags (void)
 {
 	vString *name = vStringNew ();
@@ -153,15 +250,8 @@ static void findShTags (void)
 	int hereDocTagIndex = CORK_NIL;
 	bool (* check_char)(int);
 
-	vString *args[2];
-	vString *destfile;
-	langType sublang = LANG_IGNORE;
-	unsigned long startLine;
-	long startCharOffset;
-
-	args[0] = vStringNew ();
-	args[1] = vStringNew ();
-	destfile = vStringNew ();
+	struct hereDocParsingState hstate;
+	hdocStateInit (&hstate);
 
 	while ((line = readLineFromInputFile ()) != NULL)
 	{
@@ -184,12 +274,7 @@ static void findShTags (void)
 					hereDocTagIndex = CORK_NIL;
 				}
 
-				if (sublang != LANG_IGNORE)
-					makePromise (getLanguageName(sublang),
-								 startLine, startCharOffset,
-								 getInputLineNumber(), 0,
-								 startCharOffset);
-				sublang = LANG_IGNORE;
+				hdocStateMakePromiseMaybe (&hstate);
 
 				vStringDelete (hereDocDelimiter);
 				hereDocDelimiter = NULL;
@@ -197,10 +282,7 @@ static void findShTags (void)
 			continue;
 		}
 
-		vStringClear(args[0]);
-		vStringClear(args[1]);
-
-		vStringClear(destfile);
+		hdocStateClear (&hstate);
 		while (*cp != '\0')
 		{
 			/* jump over whitespace */
@@ -272,40 +354,7 @@ static void findShTags (void)
 					if (vStringLength(hereDocDelimiter) > 0)
 						hereDocTagIndex = makeSimpleTag(hereDocDelimiter, K_HEREDOCLABEL);
 
-					if (!vStringIsEmpty(args[0]))
-					{
-						const char *cmd;
-
-						cmd = vStringValue(args[0]);
-						if (isEnvCommand (args[0]))
-						{
-							cmd = NULL;
-							if (!vStringIsEmpty(args[1]))
-								cmd = vStringValue(args[1]);
-						}
-						if (cmd)
-							cmd = baseFilename(cmd);
-
-						sublang = getLanguageForCommand (cmd, 0);
-						if (sublang != LANG_IGNORE)
-						{
-							startLine = getInputLineNumber () + 1;
-							startCharOffset = 0;
-						}
-					}
-
-					if (sublang == LANG_IGNORE && (vStringLength(destfile) > 0))
-					{
-						const char *f = vStringValue(destfile);
-
-						sublang = getLanguageForFilename (f, 0);
-						if (sublang != LANG_IGNORE)
-						{
-							startLine = getInputLineNumber () + 1;
-							startCharOffset = 0;
-						}
-						vStringClear (destfile);
-					}
+					hdocStateRecordStatelineMaybe(&hstate);
 				}
 			}
 
@@ -346,26 +395,12 @@ static void findShTags (void)
 			// Get the name of the function, alias or file to be read by source
 			if (! check_char ((int) *cp))
 			{
-				int d;
 				found_kind = K_NOTHING;
 
-				d = readDestfileName (cp, destfile);
+				int d = hdocStateReadDestfileName (&hstate, cp,
+												   hereDocDelimiter);
 				if (d > 0)
-				{
 					cp += d;
-					if (hereDocDelimiter && sublang == LANG_IGNORE)
-					{
-						const char *f = vStringValue(destfile);
-
-						sublang = getLanguageForFilename (f, 0);
-						if (sublang != LANG_IGNORE)
-						{
-							startLine = getInputLineNumber () + 1;
-							startCharOffset = 0;
-						}
-						vStringClear (destfile);
-					}
-				}
 				else if (*cp != '\0')
 					++cp;
 				continue;
@@ -405,18 +440,11 @@ static void findShTags (void)
 				found_kind = K_NOTHING;
 			}
 			else if (!hereDocDelimiter)
-			{
-				if (vStringIsEmpty(args[0]))
-					vStringCopy(args[0], name);
-				else if (vStringIsEmpty(args[1]))
-					vStringCopy(args[1], name);
-			}
+				hdocStateUpdateArgs (&hstate, name);
 			vStringClear (name);
 		}
 	}
-	vStringDelete (destfile);
-	vStringDelete (args[0]);
-	vStringDelete (args[1]);
+	hdocStateFini (&hstate);
 	vStringDelete (name);
 	if (hereDocDelimiter)
 		vStringDelete (hereDocDelimiter);
