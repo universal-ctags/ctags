@@ -43,12 +43,21 @@ static roleDesc ShScriptRoles [] = {
 	{ true, "loaded", "loaded" },
 };
 
+typedef enum {
+	R_HEREDOC_ENDMARKER,
+} shHeredocRole;
+
+static roleDesc ShHeredocRoles [] = {
+	{ true, "endmarker", "end marker" },
+};
+
 static kindDefinition ShKinds [] = {
 	{ true, 'a', "alias", "aliases"},
 	{ true, 'f', "function", "functions"},
 	{ true, 's', "script", "script files",
 	  .referenceOnly = true, ATTACH_ROLES (ShScriptRoles) },
-	{ true, 'h', "heredoc", "label for here document" },
+	{ true, 'h', "heredoc", "label for here document",
+	  .referenceOnly = false, ATTACH_ROLES (ShHeredocRoles) },
 };
 
 /*
@@ -282,6 +291,8 @@ static void findShTags (void)
 				hdocStateUpdateTag (&hstate, getInputLineNumber ());
 				hdocStateMakePromiseMaybe (&hstate);
 
+				if (!vStringIsEmpty(hereDocDelimiter))
+					makeSimpleRefTag(hereDocDelimiter, K_HEREDOCLABEL, R_HEREDOC_ENDMARKER);
 				vStringDelete (hereDocDelimiter);
 				hereDocDelimiter = NULL;
 			}
