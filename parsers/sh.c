@@ -36,7 +36,7 @@ typedef enum {
 } shKind;
 
 typedef enum {
-	R_SOURCE_GENERIC,
+	R_SCRIPT_LOADED,
 } shScriptRole;
 
 static roleDesc ShScriptRoles [] = {
@@ -439,7 +439,7 @@ static void findShTags (void)
 				{
 					if (isXtagEnabled (XTAG_REFERENCE_TAGS)
 						&& ShKinds [K_SOURCE].enabled)
-						makeSimpleRefTag (name, K_SOURCE, R_SOURCE_GENERIC);
+						makeSimpleRefTag (name, K_SOURCE, R_SCRIPT_LOADED);
 				}
 				else
 					makeSimpleTag (name, found_kind);
