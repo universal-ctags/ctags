@@ -1149,6 +1149,8 @@ extern void   pushNarrowedInputStream (
 
 	mio_setpos (File.mio, &original);
 
+	invalidatePatternCache();
+
 	subio = mio_new_mio (File.mio, p, q - p);
 	if (subio == NULL)
 		error (FATAL, "memory for mio may be exhausted");
