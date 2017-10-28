@@ -149,6 +149,8 @@ struct hereDocParsingState {
 	vString *destfile;
 	langType sublang;
 	unsigned long startLine;
+
+	int corkIndex;
 };
 
 static void hdocStateInit (struct hereDocParsingState *hstate)
@@ -157,6 +159,7 @@ static void hdocStateInit (struct hereDocParsingState *hstate)
 	hstate->args[1] = vStringNew ();
 	hstate->destfile = vStringNew ();
 
+	hstate->corkIndex = CORK_NIL;
 	hstate->sublang = LANG_IGNORE;
 }
 
@@ -241,13 +244,22 @@ static int hdocStateReadDestfileName (struct hereDocParsingState *hstate,
 	return d;
 }
 
+static void hdocStateUpdateTag (struct hereDocParsingState *hstate, unsigned long endLine)
+{
+	if (hstate->corkIndex != CORK_NIL)
+	{
+		tagEntryInfo *tag = getEntryInCorkQueue (hstate->corkIndex);
+		tag->extensionFields.endLine = endLine;
+		hstate->corkIndex = CORK_NIL;
+	}
+}
+
 static void findShTags (void)
 {
 	vString *name = vStringNew ();
 	const unsigned char *line;
 	vString *hereDocDelimiter = NULL;
 	bool hereDocIndented = false;
-	int hereDocTagIndex = CORK_NIL;
 	bool (* check_char)(int);
 
 	struct hereDocParsingState hstate;
@@ -267,13 +279,7 @@ static void findShTags (void)
 			}
 			if (strcmp ((const char *) cp, vStringValue (hereDocDelimiter)) == 0)
 			{
-				if (hereDocTagIndex != CORK_NIL)
-				{
-					tagEntryInfo *tag = getEntryInCorkQueue (hereDocTagIndex);
-					tag->extensionFields.endLine = getInputLineNumber ();
-					hereDocTagIndex = CORK_NIL;
-				}
-
+				hdocStateUpdateTag (&hstate, getInputLineNumber ());
 				hdocStateMakePromiseMaybe (&hstate);
 
 				vStringDelete (hereDocDelimiter);
@@ -352,7 +358,7 @@ static void findShTags (void)
 						vStringPut (hereDocDelimiter, *start);
 					}
 					if (vStringLength(hereDocDelimiter) > 0)
-						hereDocTagIndex = makeSimpleTag(hereDocDelimiter, K_HEREDOCLABEL);
+						hstate.corkIndex = makeSimpleTag(hereDocDelimiter, K_HEREDOCLABEL);
 
 					hdocStateRecordStatelineMaybe(&hstate);
 				}
