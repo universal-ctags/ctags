@@ -111,6 +111,39 @@ static bool isEnvCommand (const vString *cmd)
 	return (strcmp(tmp, "env") == 0);
 }
 
+static int readDestfileName (const unsigned char *cp, vString *destfile)
+{
+	const unsigned char *origin = cp;
+
+	while (isspace ((int) *cp))
+		++cp;
+
+	/* >... */
+	if (*cp != '>')
+		return 0;
+
+	/* >>... */
+	if (*cp == '>')
+		++cp;
+
+	while (isspace ((int) *cp))
+		++cp;
+
+	if (!isFileChar ((int) *cp))
+		return 0;
+
+	vStringClear(destfile);
+	do {
+		vStringPut (destfile, (int) *cp);
+		++cp;
+	} while (isFileChar ((int) *cp));
+
+	if (vStringLength(destfile) > 0)
+		return cp - origin;
+
+	return 0;
+}
+
 static void findShTags (void)
 {
 	vString *name = vStringNew ();
@@ -121,12 +154,14 @@ static void findShTags (void)
 	bool (* check_char)(int);
 
 	vString *args[2];
+	vString *destfile;
 	langType sublang = LANG_IGNORE;
 	unsigned long startLine;
 	long startCharOffset;
 
 	args[0] = vStringNew ();
 	args[1] = vStringNew ();
+	destfile = vStringNew ();
 
 	while ((line = readLineFromInputFile ()) != NULL)
 	{
@@ -164,6 +199,8 @@ static void findShTags (void)
 
 		vStringClear(args[0]);
 		vStringClear(args[1]);
+
+		vStringClear(destfile);
 		while (*cp != '\0')
 		{
 			/* jump over whitespace */
@@ -256,6 +293,19 @@ static void findShTags (void)
 							startCharOffset = 0;
 						}
 					}
+
+					if (sublang == LANG_IGNORE && (vStringLength(destfile) > 0))
+					{
+						const char *f = vStringValue(destfile);
+
+						sublang = getLanguageForFilename (f, 0);
+						if (sublang != LANG_IGNORE)
+						{
+							startLine = getInputLineNumber () + 1;
+							startCharOffset = 0;
+						}
+						vStringClear (destfile);
+					}
 				}
 			}
 
@@ -297,6 +347,9 @@ static void findShTags (void)
 			if (! check_char ((int) *cp))
 			{
 				found_kind = K_NOTHING;
+
+				cp += readDestfileName (cp, destfile);
+
 				if (*cp != '\0')
 					++cp;
 				continue;
@@ -345,6 +398,7 @@ static void findShTags (void)
 			vStringClear (name);
 		}
 	}
+	vStringDelete (destfile);
 	vStringDelete (args[0]);
 	vStringDelete (args[1]);
 	vStringDelete (name);

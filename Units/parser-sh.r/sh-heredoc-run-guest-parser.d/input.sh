@@ -54,6 +54,13 @@ var n_pr1 = function (msg) {
 n_pr1 ('hello');
 JSCODE4
 
+cat > foo.php <<EOF3
+<?php
+$z = 5 /* + 15 */ + 5;
+echo $z;
+?>
+EOF3
+
 function sh1
 {
 	:
