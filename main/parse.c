@@ -427,6 +427,17 @@ found:
 	return result;
 }
 
+extern langType getLanguageForFilename (const char *const filename, langType startFrom)
+{
+	const char *const tmp_filename = baseFilename (filename);
+	char *tmp_spec;
+	enum specType tmp_specType;
+
+	return getPatternLanguageAndSpec (tmp_filename, startFrom,
+									  (const char **const)&tmp_spec,
+									  &tmp_specType);
+}
+
 static parserCandidate* parserCandidateNew(unsigned int count CTAGS_ATTR_UNUSED)
 {
 	parserCandidate* candidates;
