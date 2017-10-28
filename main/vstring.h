@@ -31,6 +31,7 @@
 #define vStringItem(vs,i)     ((vs)->buffer[i])
 #define vStringLast(vs)       ((vs)->buffer[(vs)->length - 1])
 #define vStringLength(vs)     ((vs)->length)
+#define vStringIsEmpty(vs)    ((vs)->length == 0)
 #define vStringSize(vs)       ((vs)->size)
 #define vStringChar(vs,i)     ((vs)->buffer[i])
 #define vStringLower(vs)      toLowerString((vs)->buffer)
