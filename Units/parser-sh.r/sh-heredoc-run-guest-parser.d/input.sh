@@ -61,6 +61,13 @@ echo $z;
 ?>
 EOF3
 
+cat <<EOF4 > foo.php
+<?php
+$a = 5 /* + 15 */ + 5;
+echo $a;
+?>
+EOF4
+
 function sh1
 {
 	:

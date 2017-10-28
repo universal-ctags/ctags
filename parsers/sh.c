@@ -346,11 +346,27 @@ static void findShTags (void)
 			// Get the name of the function, alias or file to be read by source
 			if (! check_char ((int) *cp))
 			{
+				int d;
 				found_kind = K_NOTHING;
 
-				cp += readDestfileName (cp, destfile);
+				d = readDestfileName (cp, destfile);
+				if (d > 0)
+				{
+					cp += d;
+					if (hereDocDelimiter && sublang == LANG_IGNORE)
+					{
+						const char *f = vStringValue(destfile);
 
-				if (*cp != '\0')
+						sublang = getLanguageForFilename (f, 0);
+						if (sublang != LANG_IGNORE)
+						{
+							startLine = getInputLineNumber () + 1;
+							startCharOffset = 0;
+						}
+						vStringClear (destfile);
+					}
+				}
+				else if (*cp != '\0')
 					++cp;
 				continue;
 			}
