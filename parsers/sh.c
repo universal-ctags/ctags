@@ -19,6 +19,7 @@
 #include "kind.h"
 #include "parse.h"
 #include "read.h"
+#include "promise.h"
 #include "routines.h"
 #include "vstring.h"
 #include "xtag.h"
@@ -102,6 +103,14 @@ static const unsigned char *skipSingleString (const unsigned char *cp)
 	return cp;
 }
 
+static bool isEnvCommand (const vString *cmd)
+{
+	const char *lc = vStringValue(cmd);
+	const char * tmp = baseFilename (lc);
+
+	return (strcmp(tmp, "env") == 0);
+}
+
 static void findShTags (void)
 {
 	vString *name = vStringNew ();
@@ -110,6 +119,14 @@ static void findShTags (void)
 	bool hereDocIndented = false;
 	int hereDocTagIndex = CORK_NIL;
 	bool (* check_char)(int);
+
+	vString *args[2];
+	langType sublang = LANG_IGNORE;
+	unsigned long startLine;
+	long startCharOffset;
+
+	args[0] = vStringNew ();
+	args[1] = vStringNew ();
 
 	while ((line = readLineFromInputFile ()) != NULL)
 	{
@@ -131,12 +148,22 @@ static void findShTags (void)
 					tag->extensionFields.endLine = getInputLineNumber ();
 					hereDocTagIndex = CORK_NIL;
 				}
+
+				if (sublang != LANG_IGNORE)
+					makePromise (getLanguageName(sublang),
+								 startLine, startCharOffset,
+								 getInputLineNumber(), 0,
+								 startCharOffset);
+				sublang = LANG_IGNORE;
+
 				vStringDelete (hereDocDelimiter);
 				hereDocDelimiter = NULL;
 			}
 			continue;
 		}
 
+		vStringClear(args[0]);
+		vStringClear(args[1]);
 		while (*cp != '\0')
 		{
 			/* jump over whitespace */
@@ -207,6 +234,28 @@ static void findShTags (void)
 					}
 					if (vStringLength(hereDocDelimiter) > 0)
 						hereDocTagIndex = makeSimpleTag(hereDocDelimiter, K_HEREDOCLABEL);
+
+					if (!vStringIsEmpty(args[0]))
+					{
+						const char *cmd;
+
+						cmd = vStringValue(args[0]);
+						if (isEnvCommand (args[0]))
+						{
+							cmd = NULL;
+							if (!vStringIsEmpty(args[1]))
+								cmd = vStringValue(args[1]);
+						}
+						if (cmd)
+							cmd = baseFilename(cmd);
+
+						sublang = getLanguageForCommand (cmd, 0);
+						if (sublang != LANG_IGNORE)
+						{
+							startLine = getInputLineNumber () + 1;
+							startCharOffset = 0;
+						}
+					}
 				}
 			}
 
@@ -286,9 +335,18 @@ static void findShTags (void)
 					makeSimpleTag (name, found_kind);
 				found_kind = K_NOTHING;
 			}
+			else if (!hereDocDelimiter)
+			{
+				if (vStringIsEmpty(args[0]))
+					vStringCopy(args[0], name);
+				else if (vStringIsEmpty(args[1]))
+					vStringCopy(args[1], name);
+			}
 			vStringClear (name);
 		}
 	}
+	vStringDelete (args[0]);
+	vStringDelete (args[1]);
 	vStringDelete (name);
 	if (hereDocDelimiter)
 		vStringDelete (hereDocDelimiter);
