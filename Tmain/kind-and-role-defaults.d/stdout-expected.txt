@@ -1,0 +1,28 @@
+# 
+enabled-kind-no-role	input.cst	/^e$/;"	e
+
+# --kinds-CTagsSelfTest=-e
+
+# --kinds-CTagsSelfTest=-e+d
+disable-kind-no-role	input.cst	/^d$/;"	d
+
+# --kinds-CTagsSelfTest=+d
+disable-kind-no-role	input.cst	/^d$/;"	d
+enabled-kind-no-role	input.cst	/^e$/;"	e
+
+# --extras=+r --fields=+r
+enabled-kind-enabled-role	input.cst	/^e$/;"	e	role:enabled	extras:reference
+enabled-kind-no-role	input.cst	/^e$/;"	e
+
+# --extras=+r --fields=+r --kinds-CTagsSelfTest=-e
+
+# --extras=+r --fields=+r --kinds-CTagsSelfTest=-e+d
+disable-kind-enabled-role	input.cst	/^d$/;"	d	role:enabled	extras:reference
+disable-kind-no-role	input.cst	/^d$/;"	d
+
+# --extras=+r --fields=+r --kinds-CTagsSelfTest=+d
+disable-kind-enabled-role	input.cst	/^d$/;"	d	role:enabled	extras:reference
+disable-kind-no-role	input.cst	/^d$/;"	d
+enabled-kind-enabled-role	input.cst	/^e$/;"	e	role:enabled	extras:reference
+enabled-kind-no-role	input.cst	/^e$/;"	e
+

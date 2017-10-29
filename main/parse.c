@@ -3830,6 +3830,8 @@ typedef enum {
 #ifdef DEBUG
 	K_CALL_GETPPID,
 #endif
+	K_DISABLED,
+	K_ENABLED,
 	KIND_COUNT
 } CTST_Kind;
 
@@ -3839,6 +3841,26 @@ typedef enum {
 
 static roleDesc CTST_BrokenRoles [] = {
 	{true, "broken", "broken" },
+};
+
+typedef enum {
+	R_DISABLED_KIND_DISABLED_ROLE,
+	R_DISABLED_KIND_ENABLED_ROLE,
+} CTST_DisabledKindRole;
+
+static roleDesc CTST_DisabledKindRoles [] = {
+	{ false, "disabled", "disbaled role attached to disabled kind" },
+	{ true,  "enabled",  "enabled role attached to disabled kind"  },
+};
+
+typedef enum {
+	R_ENABLED_KIND_DISABLED_ROLE,
+	R_ENABLED_KIND_ENABLED_ROLE,
+} CTST_EnabledKindRole;
+
+static roleDesc CTST_EnabledKindRoles [] = {
+	{ false, "disabled", "disbaled role attached to enabled kind" },
+	{ true,  "enabled",  "enabled role attached to enabled kind"  },
 };
 
 static kindDefinition CTST_Kinds[KIND_COUNT] = {
@@ -3855,6 +3877,10 @@ static kindDefinition CTST_Kinds[KIND_COUNT] = {
 #ifdef DEBUG
 	{true, 'P', "callGetPPid", "trigger calling getppid(2) that seccomp sandbox disallows"},
 #endif
+	{false,'d', "disabled", "a kind disabled by default",
+	 .referenceOnly = false, ATTACH_ROLES (CTST_DisabledKindRoles)},
+	{true, 'e', "enabled", "a kind enabled by default",
+	 .referenceOnly = false, ATTACH_ROLES (CTST_EnabledKindRoles)},
 };
 
 static void createCTSTTags (void)
@@ -3865,6 +3891,8 @@ static void createCTSTTags (void)
 
 	unsigned long lb = 0;
 	unsigned long le = 0;
+
+	int found_enabled_disabled[2] = {0, 0};
 
 	while ((line = readLineFromInputFile ()) != NULL)
 	{
@@ -3909,6 +3937,40 @@ static void createCTSTTags (void)
 						getppid();
 						break;
 #endif
+				    case K_DISABLED:
+				    case K_ENABLED:
+						{
+							int role;
+							char *name;
+							if (found_enabled_disabled[i == K_DISABLED]++ == 0)
+							{
+								role = ROLE_INDEX_DEFINITION;
+								name = (i == K_DISABLED)
+									? "disable-kind-no-role"
+									: "enabled-kind-no-role";
+							}
+							else if (found_enabled_disabled[i == K_DISABLED]++ == 1)
+							{
+								role = (i == K_DISABLED)
+									? R_DISABLED_KIND_DISABLED_ROLE
+									: R_ENABLED_KIND_DISABLED_ROLE;
+								name = (i == K_DISABLED)
+									? "disable-kind-disabled-role"
+									: "enabled-kind-disabled-role";
+							}
+							else
+							{
+								role = (i == K_DISABLED)
+									? R_DISABLED_KIND_ENABLED_ROLE
+									: R_ENABLED_KIND_ENABLED_ROLE;
+								name = (i == K_DISABLED)
+									? "disable-kind-enabled-role"
+									: "enabled-kind-enabled-role";
+							}
+							initRefTagEntry (&e, name, i, role);
+							makeTagEntry (&e);
+							break;
+						}
 				}
 			}
 	}
