@@ -32,18 +32,22 @@ enum TclTokenType {
 struct sTclSubparser {
 	subparser subparser;
 
-	void (* packageRequirementNotify) (tclSubparser *s, char *package);
-	void (* namespaceImportNotify) (tclSubparser *s, char *namespace);
+	/* `pstate' is needed to call newTclToken(). */
+	void (* packageRequirementNotify) (tclSubparser *s, char *package,
+									   void *pstate);
+	void (* namespaceImportNotify) (tclSubparser *s, char *namespace,
+									void *pstate);
 	/* Return CORK_NIL if the command line is NOT consumed.
 	   If a positive integer is returned, end: field may
 	   be attached by tcl base parser.
 	   Return CORK_NIL - 1 if the command line is consumed
 	   but not tag is made. */
 	int (* commandNotify) (tclSubparser *s, char *command,
-							int parentIndex);
+						   int parentIndex,
+						   void *pstate);
 };
 
-extern tokenInfo *newTclToken (void);
+extern tokenInfo *newTclToken (void *pstate);
 extern void skipToEndOfTclCmdline (tokenInfo *const token);
 
 #endif	/* CTAGS_PARSER_TCL_H */

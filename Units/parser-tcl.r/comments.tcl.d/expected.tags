@@ -1,0 +1,5 @@
+f1	input.tcl	/^proc f1 {} {$/;"	procedure	line:1	language:Tcl	end:3
+f2	input.tcl	/^proc f2 {} {puts "hello"} ; # proc g3 {} {    puts "hello"}$/;"	procedure	line:7	language:Tcl	end:7
+f3	input.tcl	/^proc f3 {} {puts "hello"} proc g4 {} {    puts "hello"}$/;"	procedure	line:8	language:Tcl	end:8
+f4	input.tcl	/^proc f4 {} {puts "hello" # proc g5 {} {    puts "hello"}$/;"	procedure	line:9	language:Tcl	end:11
+f5	input.tcl	/^} proc g7 {} {    puts "hello"} { } # proc g8 {} {} ; proc f5 {} { puts "hello"\\$/;"	procedure	line:11	language:Tcl	end:12

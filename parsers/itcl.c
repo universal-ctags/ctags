@@ -174,9 +174,10 @@ static void parseCommon (tokenInfo *token, int r, keywordId protection)
 	parseSubobject(token, r, K_COMMON, protection);
 }
 
-static int parseClass (tclSubparser *s CTAGS_ATTR_UNUSED, int parentIndex)
+static int parseClass (tclSubparser *s CTAGS_ATTR_UNUSED, int parentIndex,
+					   void *pstate)
 {
-	tokenInfo *token = newTclToken ();
+	tokenInfo *token = newTclToken (pstate);
 	int r = CORK_NIL;
 
 	tokenRead (token);
@@ -250,7 +251,7 @@ static int parseClass (tclSubparser *s CTAGS_ATTR_UNUSED, int parentIndex)
 }
 
 static int commandNotify (tclSubparser *s, char *command,
-						  int parentIndex)
+						  int parentIndex, void *pstate)
 {
 	struct itclSubparser *itcl = (struct itclSubparser *)s;
 	int r = CORK_NIL;
@@ -261,19 +262,21 @@ static int commandNotify (tclSubparser *s, char *command,
 	if ((itcl->foundITclNamespaceImported
 		 && (strcmp (command, "class") == 0))
 		|| (strcmp (command, "itcl::class") == 0))
-		r = parseClass (s, parentIndex);
+		r = parseClass (s, parentIndex, pstate);
 
 	return r;
 }
 
-static void packageRequirementNotify (tclSubparser *s, char *package)
+static void packageRequirementNotify (tclSubparser *s, char *package,
+									  void *pstate CTAGS_ATTR_UNUSED)
 {
 	struct itclSubparser *itcl = (struct itclSubparser *)s;
 	if (strcmp (package, "Itcl") == 0)
 		itcl->foundITclPackageRequired = true;
 }
 
-static void namespaceImportNotify (tclSubparser *s, char *namespace)
+static void namespaceImportNotify (tclSubparser *s, char *namespace,
+								   void *pstate CTAGS_ATTR_UNUSED)
 {
 	struct itclSubparser *itcl = (struct itclSubparser *)s;
 

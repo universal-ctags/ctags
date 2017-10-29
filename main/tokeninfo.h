@@ -49,6 +49,7 @@ struct tokenInfoClass {
 	size_t extraSpace;
 	struct tokenTypePair   *pairs;
 	unsigned int        pairCount;
+	void (*init)   (tokenInfo *token, void *data);
 	void (*read)   (tokenInfo *token, void *data);
 	void (*clear)  (tokenInfo *token);
 	void (*destroy) (tokenInfo *token);
@@ -58,6 +59,7 @@ struct tokenInfoClass {
 };
 
 void *newToken       (struct tokenInfoClass *klass);
+void *newTokenFull   (struct tokenInfoClass *klass, void *data);
 void *newTokenByCopying (tokenInfo *src);
 void *newTokenByCopyingFull (tokenInfo *src, void *data);
 
@@ -87,6 +89,8 @@ void tokenCopy       (tokenInfo *dest, tokenInfo *src);
    language object type t.
    return false if it reaches EOF. */
 bool tokenSkipToType (tokenInfo *token, tokenType t);
+bool tokenSkipToTypeFull (tokenInfo *token, tokenType t, void *data);
 bool tokenSkipOverPair (tokenInfo *token);
+bool tokenSkipOverPairFull (tokenInfo *token, void *data);
 
 #endif
