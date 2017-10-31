@@ -5,6 +5,8 @@ L  kind with no long name
 N  emit a normal tag
 B  beginning of an area for a guest
 E  end of an area for a guest
+d  a kind disabled by default [off]
+e  a kind enabled by default
 
 # list kinds-full
 #LETTER NAME                                      ENABLED REFONLY NROLES MASTER DESCRIPTION
@@ -14,6 +16,8 @@ E       ThisShouldNotBePrintedKindNameMustBeGiven yes     no      0      NONE   
 L       ThisShouldNotBePrintedKindNameMustBeGiven yes     no      0      NONE   kind with no long name
 N       nothingSpecial                            yes     no      0      NONE   emit a normal tag
 b       broken tag                                yes     no      1      NONE   name with unwanted characters
+d       disabled                                  no      no      2      NONE   a kind disabled by default
+e       enabled                                   yes     no      2      NONE   a kind enabled by default
 
 # +K
 abnormal kindDefinition testing (no letter)	input.x	/^@$/;"	no letter
