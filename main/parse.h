@@ -145,6 +145,7 @@ extern parserDefinition* parserNew (const char* name);
 extern bool doesLanguageAllowNullTag (const langType language);
 extern bool doesLanguageRequestAutomaticFQTag (const langType language);
 extern const char *getLanguageName (const langType language);
+extern const char *getLanguageKindName (const langType language, const int kindIndex);
 /* kindIndex has to be explicitly signed because char is not signed in all platforms. */
 extern kindDefinition* getLanguageKindForLetter (const langType language, char kindLetter);
 extern kindDefinition* getLanguageKind(const langType language, int kindIndex);
