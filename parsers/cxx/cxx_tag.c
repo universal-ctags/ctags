@@ -536,7 +536,7 @@ int cxxTagCommit(void)
 	CXX_DEBUG_PRINT(
 			"Emitting tag for symbol '%s', kind '%s', line %d",
 			g_oCXXTag.name,
-			g_oCXXTag.kind->name,
+			getLanguageKindName(g_oCXXTag.langType, g_oCXXTag.kindIndex),
 			g_oCXXTag.lineNumber
 		);
 	if(
@@ -598,7 +598,7 @@ int cxxTagCommit(void)
 	CXX_DEBUG_PRINT(
 			"Emitting extra tag for symbol '%s', kind '%s', line %d",
 			g_oCXXTag.name,
-			g_oCXXTag.kind->name,
+			getLanguageKindName(g_oCXXTag.langType, g_oCXXTag.kindIndex),
 			g_oCXXTag.lineNumber
 		);
 
