@@ -236,6 +236,11 @@ extern const char *getLanguageName (const langType language)
 	return result;
 }
 
+extern const char *getLanguageKindName (const langType language, int kindIndex)
+{
+	kindDefinition* kdef = getLanguageKind (language, kindIndex);
+	return kdef->name;
+}
 
 static kindDefinition kindGhost = {
 	.letter = KIND_GHOST,
