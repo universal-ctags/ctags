@@ -173,6 +173,21 @@ extern void notifyInputEnd   (void)
 	}
 }
 
+extern void notifyMakeTagEntry (const tagEntryInfo *tag, int corkIndex)
+{
+	subparser *s;
+
+	foreachSubparser(s, false)
+	{
+		if (s->makeTagEntryNotify)
+		{
+			enterSubparser(s);
+			s->makeTagEntryNotify (s, tag, corkIndex);
+			leaveSubparser();
+		}
+	}
+}
+
 extern langType getSubparserLanguage (subparser *s)
 {
 	return s->slaveParser->id;

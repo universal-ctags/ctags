@@ -51,6 +51,7 @@
 #include "ptrarray.h"
 #include "sort.h"
 #include "strlist.h"
+#include "subparser.h"
 #include "trashbox.h"
 #include "writer.h"
 #include "xtag.h"
@@ -1349,6 +1350,8 @@ extern int makeTagEntry (const tagEntryInfo *const tag_const)
 		r = queueTagEntry (tag);
 	else
 		writeTagEntry (tag);
+
+	notifyMakeTagEntry (tag, r);
 
 	if (isXtagEnabled (XTAG_SUBWORD))
 	{

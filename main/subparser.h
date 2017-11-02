@@ -39,12 +39,15 @@ struct sSubparser {
 	void (* inputStart) (subparser *s);
 	void (* inputEnd) (subparser *s);
 	void (* exclusiveSubparserChosenNotify) (subparser *s, void *data);
+	void (* makeTagEntryNotify) (subparser *s, const tagEntryInfo *tag, int corkIndex);
 };
 
-/* A base parser doesn't have to call the following two functions.
+/* A base parser doesn't have to call the following three functions.
    The main part calls them internally. */
 extern void notifyInputStart (void);
 extern void notifyInputEnd   (void);
+extern void notifyMakeTagEntry (const tagEntryInfo *info, int corkIndex);
+
 extern langType getSubparserLanguage (subparser *s);
 
 /* Interface for Baseparser */
