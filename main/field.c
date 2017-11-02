@@ -393,7 +393,7 @@ static const char *renderEscapedName (const char* s,
 		int c = *s;
 		if ((c > 0x00 && c <= 0x1F) || c == 0x7F)
 		{
-			kindDefinition *kdef = getTagKind (tag);
+			const kindDefinition *kdef = getTagKind (tag);
 			verbose ("Unexpected character (0 < *c && *c < 0x20) included in a tagEntryInfo: %s\n", base);
 			verbose ("File: %s, Line: %lu, Lang: %s, Kind: %c\n",
 				 tag->inputFileName, tag->lineNumber, getLanguageName(tag->langType), kdef->letter);
@@ -629,7 +629,7 @@ static const char *renderFieldRole (const tagEntryInfo *const tag,
 		vStringClear (b);
 	else
 	{
-		kindDefinition *kdef = getTagKind(tag);
+		const kindDefinition *kdef = getTagKind(tag);
 		Assert (rindex < kdef->nRoles);
 		role  = & (kdef->roles [rindex]);
 		return renderRole (role, b);

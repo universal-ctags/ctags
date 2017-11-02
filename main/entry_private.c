@@ -11,7 +11,7 @@
 #include "entry_private.h"
 #include "parse.h"
 
-extern kindDefinition* getTagKind(const tagEntryInfo *const tag)
+extern const kindDefinition* getTagKind(const tagEntryInfo *const tag)
 {
 	return getLanguageKind(tag->langType, tag->kindIndex);
 }
@@ -22,7 +22,7 @@ extern char getTagKindLetter(const tagEntryInfo *const tag)
 	return kdef->letter;
 }
 
-extern char* getTagKindName(const tagEntryInfo *const tag)
+extern const char* getTagKindName(const tagEntryInfo *const tag)
 {
 	kindDefinition *kdef = getLanguageKind(tag->langType, tag->kindIndex);
 	return kdef->name;
