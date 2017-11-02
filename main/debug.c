@@ -78,7 +78,10 @@ extern void debugEntry (const tagEntryInfo *const tag)
 
 	if (debug (DEBUG_PARSE))
 	{
-		kindDefinition *scopeKindDef = getLanguageKind(tag->langType,
+		langType lang = (tag->langType == LANG_AUTO)
+			? tag->langType
+			: tag->extensionFields.scopeLangType;
+		kindDefinition *scopeKindDef = getLanguageKind(lang,
 													   tag->extensionFields.scopeKindIndex);
 		printf ("<#%s%s:%s", scope, getTagKindName(tag), tag->name);
 

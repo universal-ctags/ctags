@@ -817,6 +817,7 @@ extern void getTagScopeInformation (tagEntryInfo *const tag,
 		Assert (full_qualified_scope_name);
 
 		/* Make the information reusable to generate full qualified entry, and xformat output*/
+		tag->extensionFields.scopeLangType = scope->langType;
 		tag->extensionFields.scopeKindIndex = scope->kindIndex;
 		tag->extensionFields.scopeName = full_qualified_scope_name;
 	}
@@ -826,7 +827,10 @@ extern void getTagScopeInformation (tagEntryInfo *const tag,
 	{
 		if (kind)
 		{
-			kindDefinition *kdef = getLanguageKind (tag->langType,
+			langType lang = (tag->extensionFields.scopeLangType == LANG_AUTO)
+				? tag->langType
+				: tag->extensionFields.scopeLangType;
+			kindDefinition *kdef = getLanguageKind (lang,
 													tag->extensionFields.scopeKindIndex);
 			*kind = kdef->name;
 		}
@@ -1482,6 +1486,7 @@ extern void initTagEntryFull (tagEntryInfo *const e, const char *const name,
 	e->filePosition    = filePosition;
 	e->inputFileName   = inputFileName;
 	e->name            = name;
+	e->extensionFields.scopeLangType = LANG_AUTO;
 	e->extensionFields.scopeKindIndex = KIND_GHOST_INDEX;
 	e->extensionFields.scopeIndex     = CORK_NIL;
 	e->kindIndex = kindIndex;
