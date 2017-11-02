@@ -27,6 +27,11 @@
 #ifdef HAVE_ICONV
 #include <iconv.h>
 #include <errno.h>
+#	ifdef WORDS_BIGENDIAN
+#		define INTERNAL_ENCODING "UTF-32BE"
+#	else
+#		define INTERNAL_ENCODING "UTF-32LE"
+#	endif /* WORDS_BIGENDIAN */
 #endif
 
 #include <string.h>
@@ -443,7 +448,7 @@ static int handleUnicodeCodePoint (uint32_t point)
 	if (isConverting () && JSUnicodeConverter == (iconv_t) -2)
 	{
 		/* if we didn't try creating the converter yet, try and do so */
-		JSUnicodeConverter = iconv_open (getLanguageEncoding (Lang_js), "UTF-32");
+		JSUnicodeConverter = iconv_open (getLanguageEncoding (Lang_js), INTERNAL_ENCODING);
 	}
 	if (isConverting () && JSUnicodeConverter != (iconv_t) -1)
 	{
