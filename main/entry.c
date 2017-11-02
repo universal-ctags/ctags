@@ -1052,7 +1052,7 @@ static void recordTagEntryInQueue (const tagEntryInfo *const tag, tagEntryInfo* 
 		PARSER_TRASH_BOX_TAKE_BACK(slot->parserFieldsDynamic);
 }
 
-extern void clearParserFields (tagEntryInfo *const tag)
+static void clearParserFields (tagEntryInfo *const tag)
 {
 	unsigned int i, n;
 	const char* value;
