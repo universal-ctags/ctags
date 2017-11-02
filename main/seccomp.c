@@ -12,7 +12,7 @@
 #include "debug.h"
 #include "interactive.h"
 
-#if HAVE_SECCOMP
+#ifdef HAVE_SECCOMP
 #include <seccomp.h>
 
 

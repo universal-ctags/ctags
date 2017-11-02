@@ -14,7 +14,7 @@
 #include "error.h"
 #include "options.h"
 
-#if HAVE_JANSSON
+#ifdef HAVE_JANSSON
 #include <jansson.h>
 #endif
 
@@ -63,7 +63,7 @@ extern void error (const errorSelection selection,
 		exit (1);
 }
 
-#if HAVE_JANSSON
+#ifdef HAVE_JANSSON
 bool jsonErrorPrinter (const errorSelection selection, const char *const format, va_list ap,
 					   void *data CTAGS_ATTR_UNUSED)
 {
