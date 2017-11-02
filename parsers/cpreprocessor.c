@@ -188,7 +188,7 @@ static cppState Cpp = {
 			{
 				.ignoreAllBranches = false,
 				.singleBranch = false,
-				.singleBranch = false,
+				.branchChosen = false,
 				.ignoring = false,
 			}
 		}
