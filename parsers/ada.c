@@ -346,7 +346,6 @@ static adaTokenInfo *adaParse(adaParseMode mode, adaTokenInfo *parent);
 /* prototypes of the functions used by ctags */
 static void storeAdaTags(adaTokenInfo *token, const char *parentScope);
 static void findAdaTags(void);
-extern parserDefinition* AdaParser(void);
 
 static void makeSpec(adaKind *kind)
 {

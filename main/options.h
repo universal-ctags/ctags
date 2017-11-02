@@ -160,9 +160,6 @@ extern void previewFirstOption (cookedArgs* const cargs);
 extern void readOptionConfiguration (void);
 extern void initOptions (void);
 extern void freeOptionResources (void);
-#ifdef HAVE_ICONV
-extern void freeEncodingResources (void);
-#endif
 
 extern langType getLanguageComponentInOption (const char *const option,
 					      const char *const prefix);
