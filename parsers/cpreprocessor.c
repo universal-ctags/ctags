@@ -150,12 +150,12 @@ static int externalParserBlockNestLevel;
  */
 static bool BraceFormat = false;
 
-void cppPushExternalParserBlock()
+void cppPushExternalParserBlock(void)
 {
 	externalParserBlockNestLevel++;
 }
 
-void cppPopExternalParserBlock()
+void cppPopExternalParserBlock(void)
 {
 	externalParserBlockNestLevel--;
 }
