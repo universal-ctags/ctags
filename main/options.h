@@ -166,6 +166,7 @@ extern langType getLanguageComponentInOption (const char *const option,
 
 extern void processLanguageDefineOption (const char *const option, const char *const parameter);
 extern bool processMapOption (const char *const option, const char *const parameter);
+extern bool processParamOption (const char *const option, const char *const value);
 extern bool processKinddefOption (const char *const option, const char *const parameter);
 extern bool processKindsOption (const char *const option, const char *const parameter);
 extern bool processExtradefOption (const char *const option, const char *const parameter);
