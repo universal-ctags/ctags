@@ -714,48 +714,64 @@ static void parseStructMembers (tokenInfo *const token, const int scope)
 		}
 
 		if (first && isType (token, TOKEN_STAR))
+		{
 			vStringPut (typeForAnonMember, '*');
-
-		if (memberCandidate)
+			readToken (token);
+		}
+		else if (memberCandidate &&
+				 (isType (token, TOKEN_DOT) ||
+				  isType (token, TOKEN_STRING) ||
+				  isType (token, TOKEN_SEMICOLON)))
+			// memberCandidate is part of anonymous type
 			vStringCat (typeForAnonMember, memberCandidate->string);
 
-		if (((!first) && isType (token, TOKEN_DOT))
-			|| (first && isType (token, TOKEN_STAR)))
+		// the above two cases that set typeForAnonMember guarantee
+		// this is an anonymous member
+		if (vStringLength (typeForAnonMember) > 0)
 		{
+			tokenInfo *anonMember = NULL;
+
+			if (memberCandidate)
+			{
+				anonMember = newToken ();
+				copyToken (anonMember, memberCandidate);
+			}
+
 			// TypeName of AnonymousField has a dot like package"."type.
 			// Pick up the last package component, and store it to
 			// memberCandidate.
-			readToken (token);
 			while (isType (token, TOKEN_IDENTIFIER) ||
 				   isType (token, TOKEN_DOT))
 			{
 				if (isType (token, TOKEN_IDENTIFIER))
 				{
-					if (!memberCandidate)
-						memberCandidate = newToken ();
-					copyToken (memberCandidate, token);
-					if (vStringLength (typeForAnonMember) > 0
-						&& (! (vStringLength (typeForAnonMember) == 1
-							   && vStringItem(typeForAnonMember, 0) == '*')))
-						vStringPut (typeForAnonMember, '.');
-					vStringCat (typeForAnonMember, memberCandidate->string);
+					if (!anonMember)
+						anonMember = newToken ();
+					copyToken (anonMember, token);
+					vStringCat (typeForAnonMember, anonMember->string);
 				}
+				else if (isType (token, TOKEN_DOT))
+					vStringPut (typeForAnonMember, '.');
 				readToken (token);
 			}
-		}
 
-		// in the case of  an anonymous field, we already read part of the
-		// type into memberCandidate and skipType() should return false so no tag should
-		// be generated in this case.
-		if (memberCandidate)
+			// optional tag
+			if (isType (token, TOKEN_STRING))
+				readToken (token);
+
+			if (anonMember)
+			{
+				makeTag (anonMember, GOTAG_ANONMEMBER, scope, NULL,
+						 vStringValue (typeForAnonMember));
+				deleteToken (anonMember);
+			}
+		}
+		else if (memberCandidate)
 		{
-			if (skipType (token))
-				makeTag (memberCandidate, GOTAG_MEMBER, scope, NULL, NULL);
-			else
-				makeTag (memberCandidate, GOTAG_ANONMEMBER, scope, NULL,
-						 vStringValue(typeForAnonMember));
+			// memberCandidate is a non-anonymous member
+			makeTag (memberCandidate, GOTAG_MEMBER, scope, NULL, NULL);
+			skipType (token);
 		}
-
 
 		if (memberCandidate)
 			deleteToken (memberCandidate);
