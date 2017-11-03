@@ -17,3 +17,13 @@ lang3	input.go	/^	lang3, lang4 *P.Q.LANG$/;"	m	struct:X
 lang4	input.go	/^	lang3, lang4 *P.Q.LANG$/;"	m	struct:X
 T11	input.go	/^	P.Q.T11$/;"	M	struct:X	typeref:typename:P.Q.T11
 T12	input.go	/^	*P.Q.T12$/;"	M	struct:X	typeref:typename:*P.Q.T12
+Y	input.go	/^type Y struct {$/;"	s
+byte	input.go	/^	byte$/;"	M	struct:Y	typeref:typename:byte
+b	input.go	/^	b byte$/;"	m	struct:Y
+ss	input.go	/^	ss []string$/;"	m	struct:Y
+bss	input.go	/^	bss [][]byte$/;"	m	struct:Y
+f	input.go	/^	f func() error$/;"	m	struct:Y
+ifaces	input.go	/^	ifaces []interface{}$/;"	m	struct:Y
+tags	input.go	/^	tags  map[string]struct{}$/;"	m	struct:Y
+notify	input.go	/^	notify chan<- struct{}$/;"	m	struct:Y
+p	input.go	/^	p *struct {$/;"	m	struct:Y

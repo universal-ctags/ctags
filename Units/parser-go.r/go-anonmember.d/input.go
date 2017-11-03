@@ -14,3 +14,19 @@ type X struct {
 	P.Q.T11
 	*P.Q.T12
 }
+
+type Y struct {
+	byte
+	b byte
+	ss []string
+	bss [][]byte
+	f func() error
+	ifaces []interface{}
+	tags  map[string]struct{}
+	notify chan<- struct{}
+	p *struct {
+		x int
+		y int
+		z int
+	}
+}
