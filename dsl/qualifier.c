@@ -337,7 +337,7 @@ static EsObject* builtin_not  (EsObject *args, tagEntry *entry)
 			return es_true;					\
 		else							\
 			return es_false;				\
-	} static EsObject* builtin_##N  (EsObject *args, tagEntry *entry)
+	}
 
 static EsObject* builtin_eq  (EsObject *args, tagEntry *entry)
 {
