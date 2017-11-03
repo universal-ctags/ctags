@@ -96,8 +96,8 @@ static void eFree (void *const ptr)
 	free (ptr);
 }
 
-#  define Assert(c)
-#  define AssertNotReached()
+#  define Assert(c) do {} while(0)
+#  define AssertNotReached() do {} while(0)
 #endif
 
 /* minimal reallocation chunk size */
