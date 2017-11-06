@@ -282,6 +282,9 @@
     <ClCompile Include="..\parsers\cxx\cxx_parser_variable.c">
       <Filter>Source Files\Parsers\cxx</Filter>
     </ClCompile>
+    <ClCompile Include="..\parsers\cxx\cxx_qtmoc.c">
+      <Filter>Source Files\Parsers\cxx</Filter>
+    </ClCompile>
     <ClCompile Include="..\parsers\cxx\cxx_scope.c">
       <Filter>Source Files\Parsers\cxx</Filter>
     </ClCompile>

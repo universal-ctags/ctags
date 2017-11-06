@@ -67,6 +67,7 @@ The following parsers have been added:
 * Protobuf
 * PythonLoggingConfig
 * QemuHX *optlib*
+* QtMoc
 * R
 * RelaxNG *libxml*
 * reStructuredText

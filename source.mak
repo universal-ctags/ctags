@@ -161,6 +161,7 @@ PARSER_SRCS =				\
 	parsers/cxx/cxx_parser_using.c		\
 	parsers/cxx/cxx_parser_variable.c		\
 	parsers/cxx/cxx_subparser.c	\
+	parsers/cxx/cxx_qtmoc.c		\
 	parsers/cxx/cxx_scope.c		\
 	parsers/cxx/cxx_tag.c		\
 	parsers/cxx/cxx_token.c		\
