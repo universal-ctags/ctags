@@ -1,0 +1,18 @@
+sh0	input.sh	/^function sh0$/;"	f	line:3	language:Sh
+EOF1	input.sh	/^\/usr\/bin\/env php<<EOF1$/;"	h	line:8	language:Sh	end:13
+EOF2	input.sh	/^php<<EOF2$/;"	h	line:15	language:Sh	end:20
+JSCODE1	input.sh	/^node <<JSCODE1$/;"	h	line:22	language:Sh	end:27
+JSCODE2	input.sh	/^\/usr\/bin\/node <<JSCODE2$/;"	h	line:29	language:Sh	end:34
+JSCODE3	input.sh	/^cat \/usr\/bin\/node <<JSCODE3$/;"	h	line:36	language:Sh	end:41
+JSCODE3	input.sh	/^\/usr\/bin\/env \/usr\/bin\/node <<JSCODE3$/;"	h	line:43	language:Sh	end:48
+JSCODE4	input.sh	/^\/usr\/bin\/env dummy node <<JSCODE4$/;"	h	line:50	language:Sh	end:55
+EOF3	input.sh	/^cat > foo.php <<EOF3$/;"	h	line:57	language:Sh	end:62
+EOF4	input.sh	/^cat <<EOF4 > foo.php$/;"	h	line:64	language:Sh	end:69
+sh1	input.sh	/^function sh1$/;"	f	line:71	language:Sh
+x	input.sh	/^$x = 5 \/* + 15 *\/ + 5;$/;"	v	line:10	language:PHP
+y	input.sh	/^$y = 5 \/* + 15 *\/ + 5;$/;"	v	line:17	language:PHP
+pr1	input.sh	/^var pr1 = function (msg) {$/;"	f	line:23	language:JavaScript
+pr2	input.sh	/^var pr2 = function (msg) {$/;"	f	line:30	language:JavaScript
+pr3	input.sh	/^var pr3 = function (msg) {$/;"	f	line:44	language:JavaScript
+z	input.sh	/^$z = 5 \/* + 15 *\/ + 5;$/;"	v	line:59	language:PHP
+a	input.sh	/^$a = 5 \/* + 15 *\/ + 5;$/;"	v	line:66	language:PHP

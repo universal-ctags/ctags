@@ -363,6 +363,17 @@ static langType getNameOrAliasesLanguageAndSpec (const char *const key, langType
 	return result;
 }
 
+extern langType getLanguageForCommand (const char *const command, langType startFrom)
+{
+	const char *const tmp_command = baseFilename (command);
+	char *tmp_spec;
+	enum specType tmp_specType;
+
+	return getNameOrAliasesLanguageAndSpec (tmp_command, startFrom,
+											(const char **const)&tmp_spec,
+											&tmp_specType);
+}
+
 static langType getPatternLanguageAndSpec (const char *const baseName, langType start_index,
 					   const char **const spec, enum specType *specType)
 {
@@ -419,6 +430,17 @@ static langType getPatternLanguageAndSpec (const char *const baseName, langType 
 	}
 found:
 	return result;
+}
+
+extern langType getLanguageForFilename (const char *const filename, langType startFrom)
+{
+	const char *const tmp_filename = baseFilename (filename);
+	char *tmp_spec;
+	enum specType tmp_specType;
+
+	return getPatternLanguageAndSpec (tmp_filename, startFrom,
+									  (const char **const)&tmp_spec,
+									  &tmp_specType);
 }
 
 static parserCandidate* parserCandidateNew(unsigned int count CTAGS_ATTR_UNUSED)
@@ -1251,7 +1273,7 @@ static langType getFileLanguageForRequest (struct GetLanguageRequest *req)
 		return Option.language;
 }
 
-extern langType getFileLanguage (const char *const fileName)
+extern langType getLanguageForFilenameAndContents (const char *const fileName)
 {
 	struct GetLanguageRequest req = {
 		.type = GLR_DISCARD,

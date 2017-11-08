@@ -154,7 +154,9 @@ extern int defineLanguageKind (const langType language, kindDefinition *def,
 extern unsigned int countLanguageKinds (const langType language);
 extern unsigned int countLanguageRoles (const langType language, int kindIndex);
 extern langType getNamedLanguage (const char *const name, size_t len);
-extern langType getFileLanguage (const char *const fileName);
+extern langType getLanguageForFilenameAndContents (const char *const fileName);
+extern langType getLanguageForCommand (const char *const command, langType startFrom);
+extern langType getLanguageForFilename (const char *const filename, langType startFrom);
 extern bool isLanguageEnabled (const langType language);
 extern bool isLanguageKindEnabled (const langType language, int kindIndex);
 extern bool isLanguageRoleEnabled (const langType language, int kindIndex, int roleIndex);

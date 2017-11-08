@@ -15,9 +15,11 @@
 
 #include <string.h>
 
+#include "entry.h"
 #include "kind.h"
 #include "parse.h"
 #include "read.h"
+#include "promise.h"
 #include "routines.h"
 #include "vstring.h"
 #include "xtag.h"
@@ -30,14 +32,23 @@ typedef enum {
 	K_ALIAS,
 	K_FUNCTION,
 	K_SOURCE,
+	K_HEREDOCLABEL,
 } shKind;
 
 typedef enum {
-	R_SOURCE_GENERIC,
+	R_SCRIPT_LOADED,
 } shScriptRole;
 
 static roleDesc ShScriptRoles [] = {
 	{ true, "loaded", "loaded" },
+};
+
+typedef enum {
+	R_HEREDOC_ENDMARKER,
+} shHeredocRole;
+
+static roleDesc ShHeredocRoles [] = {
+	{ true, "endmarker", "end marker" },
 };
 
 static kindDefinition ShKinds [] = {
@@ -45,6 +56,8 @@ static kindDefinition ShKinds [] = {
 	{ true, 'f', "function", "functions"},
 	{ true, 's', "script", "script files",
 	  .referenceOnly = true, ATTACH_ROLES (ShScriptRoles) },
+	{ true, 'h', "heredoc", "label for here document",
+	  .referenceOnly = false, ATTACH_ROLES (ShHeredocRoles) },
 };
 
 /*
@@ -99,6 +112,157 @@ static const unsigned char *skipSingleString (const unsigned char *cp)
 	return cp;
 }
 
+static bool isEnvCommand (const vString *cmd)
+{
+	const char *lc = vStringValue(cmd);
+	const char * tmp = baseFilename (lc);
+
+	return (strcmp(tmp, "env") == 0);
+}
+
+static int readDestfileName (const unsigned char *cp, vString *destfile)
+{
+	const unsigned char *origin = cp;
+
+	while (isspace ((int) *cp))
+		++cp;
+
+	/* >... */
+	if (*cp != '>')
+		return 0;
+
+	/* >>... */
+	if (*cp == '>')
+		++cp;
+
+	while (isspace ((int) *cp))
+		++cp;
+
+	if (!isFileChar ((int) *cp))
+		return 0;
+
+	vStringClear(destfile);
+	do {
+		vStringPut (destfile, (int) *cp);
+		++cp;
+	} while (isFileChar ((int) *cp));
+
+	if (vStringLength(destfile) > 0)
+		return cp - origin;
+
+	return 0;
+}
+
+struct hereDocParsingState {
+	vString *args[2];
+	vString *destfile;
+	langType sublang;
+	unsigned long startLine;
+
+	int corkIndex;
+};
+
+static void hdocStateInit (struct hereDocParsingState *hstate)
+{
+	hstate->args[0] = vStringNew ();
+	hstate->args[1] = vStringNew ();
+	hstate->destfile = vStringNew ();
+
+	hstate->corkIndex = CORK_NIL;
+	hstate->sublang = LANG_IGNORE;
+}
+
+static void hdocStateClear (struct hereDocParsingState *hstate)
+{
+	vStringClear (hstate->args[0]);
+	vStringClear (hstate->args[1]);
+	vStringClear (hstate->destfile);
+}
+
+static void hdocStateFini (struct hereDocParsingState *hstate)
+{
+	vStringDelete (hstate->args[0]);
+	vStringDelete (hstate->args[1]);
+	vStringDelete (hstate->destfile);
+}
+
+static void hdocStateUpdateArgs (struct hereDocParsingState *hstate,
+										   vString *name)
+{
+	if (vStringIsEmpty(hstate->args[0]))
+		vStringCopy(hstate->args[0], name);
+	else if (vStringIsEmpty(hstate->args[1]))
+		vStringCopy(hstate->args[1], name);
+}
+
+static void hdocStateMakePromiseMaybe (struct hereDocParsingState *hstate)
+{
+	if (hstate->sublang != LANG_IGNORE)
+		makePromise (getLanguageName(hstate->sublang),
+					 hstate->startLine, 0,
+					 getInputLineNumber(), 0,
+					 0);
+	hstate->sublang = LANG_IGNORE;
+}
+
+static void hdocStateRecordStartlineFromDestfileMaybe (struct hereDocParsingState *hstate)
+{
+	const char *f = vStringValue(hstate->destfile);
+
+	if (hstate->sublang != LANG_IGNORE)
+		return;
+
+	hstate->sublang = getLanguageForFilename (f, 0);
+	if (hstate->sublang != LANG_IGNORE)
+		hstate->startLine = getInputLineNumber () + 1;
+	vStringClear (hstate->destfile);
+}
+
+static void hdocStateRecordStatelineMaybe (struct hereDocParsingState *hstate)
+{
+	if (!vStringIsEmpty(hstate->args[0]))
+	{
+		const char *cmd;
+
+		cmd = vStringValue(hstate->args[0]);
+		if (isEnvCommand (hstate->args[0]))
+		{
+			cmd = NULL;
+			if (!vStringIsEmpty(hstate->args[1]))
+				cmd = vStringValue(hstate->args[1]);
+		}
+
+		hstate->sublang = getLanguageForCommand (cmd, 0);
+		if (hstate->sublang != LANG_IGNORE)
+			hstate->startLine = getInputLineNumber () + 1;
+	}
+
+	if (vStringLength(hstate->destfile) > 0)
+		hdocStateRecordStartlineFromDestfileMaybe (hstate);
+}
+
+static int hdocStateReadDestfileName (struct hereDocParsingState *hstate,
+									  const unsigned char* cp,
+									  const vString *const hereDocDelimiter)
+{
+	int d = readDestfileName (cp, hstate->destfile);
+
+	if (d > 0 && hereDocDelimiter)
+		hdocStateRecordStartlineFromDestfileMaybe (hstate);
+
+	return d;
+}
+
+static void hdocStateUpdateTag (struct hereDocParsingState *hstate, unsigned long endLine)
+{
+	if (hstate->corkIndex != CORK_NIL)
+	{
+		tagEntryInfo *tag = getEntryInCorkQueue (hstate->corkIndex);
+		tag->extensionFields.endLine = endLine;
+		hstate->corkIndex = CORK_NIL;
+	}
+}
+
 static void findShTags (void)
 {
 	vString *name = vStringNew ();
@@ -106,6 +270,9 @@ static void findShTags (void)
 	vString *hereDocDelimiter = NULL;
 	bool hereDocIndented = false;
 	bool (* check_char)(int);
+
+	struct hereDocParsingState hstate;
+	hdocStateInit (&hstate);
 
 	while ((line = readLineFromInputFile ()) != NULL)
 	{
@@ -121,12 +288,18 @@ static void findShTags (void)
 			}
 			if (strcmp ((const char *) cp, vStringValue (hereDocDelimiter)) == 0)
 			{
+				hdocStateUpdateTag (&hstate, getInputLineNumber ());
+				hdocStateMakePromiseMaybe (&hstate);
+
+				if (!vStringIsEmpty(hereDocDelimiter))
+					makeSimpleRefTag(hereDocDelimiter, K_HEREDOCLABEL, R_HEREDOC_ENDMARKER);
 				vStringDelete (hereDocDelimiter);
 				hereDocDelimiter = NULL;
 			}
 			continue;
 		}
 
+		hdocStateClear (&hstate);
 		while (*cp != '\0')
 		{
 			/* jump over whitespace */
@@ -195,6 +368,10 @@ static void findShTags (void)
 							start++;
 						vStringPut (hereDocDelimiter, *start);
 					}
+					if (vStringLength(hereDocDelimiter) > 0)
+						hstate.corkIndex = makeSimpleTag(hereDocDelimiter, K_HEREDOCLABEL);
+
+					hdocStateRecordStatelineMaybe(&hstate);
 				}
 			}
 
@@ -213,24 +390,21 @@ static void findShTags (void)
 				found_kind = K_ALIAS;
 				cp += 5;
 			}
-			else if (isXtagEnabled (XTAG_REFERENCE_TAGS)
-				 && ShKinds [K_SOURCE].enabled)
-			{
-				if (cp [0] == '.'
+			else if (cp [0] == '.'
 				    && isspace((int) cp [1]))
-				{
-					found_kind = K_SOURCE;
-					++cp;
-				}
-				else if (strncmp ((const char*) cp, "source", (size_t) 6) == 0
-					 && isspace((int) cp [6]))
-				{
-					found_kind = K_SOURCE;
-					cp += 6;
-				}
-				if (found_kind == K_SOURCE)
-					check_char = isFileChar;
+			{
+				found_kind = K_SOURCE;
+				++cp;
+				check_char = isFileChar;
 			}
+			else if (strncmp ((const char*) cp, "source", (size_t) 6) == 0
+					 && isspace((int) cp [6]))
+			{
+				found_kind = K_SOURCE;
+				cp += 6;
+				check_char = isFileChar;
+			}
+
 			if (found_kind != K_NOTHING)
 				while (isspace ((int) *cp))
 					++cp;
@@ -239,7 +413,12 @@ static void findShTags (void)
 			if (! check_char ((int) *cp))
 			{
 				found_kind = K_NOTHING;
-				if (*cp != '\0')
+
+				int d = hdocStateReadDestfileName (&hstate, cp,
+												   hereDocDelimiter);
+				if (d > 0)
+					cp += d;
+				else if (*cp != '\0')
 					++cp;
 				continue;
 			}
@@ -268,14 +447,17 @@ static void findShTags (void)
 			if (found_kind != K_NOTHING)
 			{
 				if (found_kind == K_SOURCE)
-					makeSimpleRefTag (name, K_SOURCE, R_SOURCE_GENERIC);
+						makeSimpleRefTag (name, K_SOURCE, R_SCRIPT_LOADED);
 				else
 					makeSimpleTag (name, found_kind);
 				found_kind = K_NOTHING;
 			}
+			else if (!hereDocDelimiter)
+				hdocStateUpdateArgs (&hstate, name);
 			vStringClear (name);
 		}
 	}
+	hdocStateFini (&hstate);
 	vStringDelete (name);
 	if (hereDocDelimiter)
 		vStringDelete (hereDocDelimiter);
@@ -298,5 +480,6 @@ extern parserDefinition* ShParser (void)
 	def->extensions = extensions;
 	def->aliases = aliases;
 	def->parser     = findShTags;
+	def->useCork    = true;
 	return def;
 }

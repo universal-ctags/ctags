@@ -448,7 +448,7 @@ static void setSourceFileParameters (vString *const fileName, const langType lan
 
 static bool setSourceFileName (vString *const fileName)
 {
-	const langType language = getFileLanguage (vStringValue (fileName));
+	const langType language = getLanguageForFilenameAndContents (vStringValue (fileName));
 	bool result = false;
 	if (language != LANG_IGNORE)
 	{
