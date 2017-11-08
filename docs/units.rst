@@ -299,10 +299,18 @@ reported as *TIMED-OUT*.
 Categories
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+.. NOT REVIEWED
+
 With *.r* suffix, you can put test cases under a sub directory
 of *Units*. ``Units/parser-ada.r`` is an example. If *misc/units*
 test harness, the sub directory is called a category. ``parser-ada.r``
 is the name category in the above example.
+
+*CATEGORIES* macro of make is for running units in specified categories.
+Following command line is for running units in
+``Units/parser-sh.r`` and ``Units/parser-ada.r``::
+
+  $ make units CATEGORIES='parser-sh,parser-ada'
 
 
 Finding minimal bad input
