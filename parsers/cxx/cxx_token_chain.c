@@ -751,6 +751,24 @@ CXXToken * cxxTokenChainFirstTokenNotOfType(
 	return NULL;
 }
 
+CXXToken * cxxTokenChainNextTokenNotOfGeneric(
+		CXXToken * t,
+		bool (* predicator) (CXXToken *, void *),
+		void *data
+	)
+{
+	if(!t)
+		return NULL;
+	t = t->pNext;
+	while(t)
+	{
+		if(!predicator (t, data))
+			return t;
+		t = t->pNext;
+	}
+	return NULL;
+}
+
 CXXToken * cxxTokenChainNextTokenNotOfType(
 		CXXToken * t,
 		unsigned int uTokenTypes
