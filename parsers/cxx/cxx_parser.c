@@ -144,19 +144,7 @@ bool cxxParserParseAndCondenseSubchainsUpToOneOf(
 		if(cxxTokenTypeIsOneOf(g_cxx.pToken,uTokenTypes))
 		{
 			if (bCanReduceInnerElements)
-			{
-				enum CXXTokenType eSentinelType = g_cxx.pToken->eType >> 4;
-				CXXToken *pTmp = g_cxx.pToken->pPrev, *pReducingCandidate;
-				while (pTmp && (!cxxTokenTypeIsOneOf (pTmp, eSentinelType)))
-				{
-					pReducingCandidate = pTmp;
-					pTmp = pTmp->pPrev;
-					pTmp->pNext = pReducingCandidate->pNext;
-					pReducingCandidate->pNext->pPrev = pTmp;
-					CXX_DEBUG_PRINT("reduce inner token: %p",pReducingCandidate);
-					cxxTokenDestroy (pReducingCandidate);
-				}
-			}
+				cxxTokenReduceBackward (g_cxx.pToken);
 			CXX_DEBUG_LEAVE_TEXT(
 					"Got terminator token '%s' 0x%x",
 					vStringValue(g_cxx.pToken->pszWord),
