@@ -1,0 +1,11 @@
+std	input.hh	/^namespace std {$/;"	n
+hash	input.hh	/^  struct hash<::sockaddr_in> {$/;"	s	namespace:std
+a	input.hh	/^    int a;$/;"	m	struct:std::hash	typeref:typename:int
+A	input.hh	/^int A <::> = {1, 2};$/;"	v	typeref:typename:int[]
+B	input.hh	/^int B <:2:> = {1, 2};$/;"	v	typeref:typename:int[2]
+N	input.hh	/^#define N /;"	d
+C	input.hh	/^int C <:N:> = {1, 2};$/;"	v	typeref:typename:int[]
+D	input.hh	/^int D [] = {1, 2};$/;"	v	typeref:typename:int[]
+M	input.hh	/^const int M = 3;$/;"	v	typeref:typename:const int
+E	input.hh	/^int E <:::M:> = {1, 2};$/;"	v	typeref:typename:int[]
+foo	input.hh	/^int foo (void)$/;"	f	typeref:typename:int

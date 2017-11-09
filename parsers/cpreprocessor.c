@@ -1222,12 +1222,44 @@ process:
 			 */
 			case '<':
 			{
-				int next = cppGetcFromUngetBufferOrFile ();
-				switch (next)
+				/*
+				   Quoted from http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2011/n3237.html:
+				   ------
+				   if the next three characters are <:: and the
+				   subsequent character is neither : nor >, the < is
+				   treated as a preprocessor token by itself (and not as
+				   the first character of the alternative token */
+				int next[3];
+				next[0] = cppGetcFromUngetBufferOrFile ();
+				switch (next[0])
 				{
-					case ':':	c = '['; break;
+					case ':':
+						next[1] = cppGetcFromUngetBufferOrFile ();
+						if (next[1] == ':')
+						{
+							next[2] = cppGetcFromUngetBufferOrFile ();
+							if (! (next[2] == ':' || next[2] == '>'))
+							{
+								cppUngetc (next[2]);
+								cppUngetc (next[1]);
+								cppUngetc (next[0]);
+								c = '<';
+							}
+							else
+							{
+								cppUngetc (next[2]);
+								cppUngetc (next[1]);
+								c = '[';
+							}
+						}
+						else
+						{
+							cppUngetc (next[1]);
+							c = '[';
+						}
+						break;
 					case '%':	c = '{'; break;
-					default: cppUngetc (next);
+					default: cppUngetc (next[0]);
 				}
 				goto enter;
 			}
