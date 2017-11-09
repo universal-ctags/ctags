@@ -1,0 +1,4 @@
+All functions	input.au3	/^#Region All functions$/;"	r
+MyDouble	input.au3	/^Func MyDouble($iValue)$/;"	f
+MyDouble0	input.au3	/^func MyDouble0($iValue)$/;"	f
+MyDouble1	input.au3	/^    	FUNC MyDouble1($iValue)$/;"	f
