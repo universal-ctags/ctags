@@ -152,6 +152,7 @@
     <ClCompile Include="..\parsers\asm.c" />
     <ClCompile Include="..\parsers\asp.c" />
     <ClCompile Include="..\parsers\autoconf.c" />
+    <ClCompile Include="..\parsers\autoit.c" />
     <ClCompile Include="..\parsers\automake.c" />
     <ClCompile Include="..\parsers\awk.c" />
     <ClCompile Include="..\parsers\basic.c" />
