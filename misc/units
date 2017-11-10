@@ -890,6 +890,8 @@ action_run ()
     local build_d
     local category
 
+    local c
+
     while [ $# -gt 0 ]; do
 	case $1 in
 	    --ctags)
@@ -903,11 +905,15 @@ action_run ()
 		;;
 	    --categories)
 		shift
-		CATEGORIES=$(echo "$1" | tr ',' ' ')
+		for c in $(echo "$1" | tr ',' ' '); do
+		    CATEGORIES="$CATEGORIES ${c%.r}.r"
+		done
 		shift
 		;;
 	    --categories=*)
-		CATEGORIES=$(echo "${1#--categories=}" | tr ',' ' ')
+		for c in $(echo "${1#--categories=}" | tr ',' ' '); do
+		    CATEGORIES="$CATEGORIES ${c%.r}.r"
+		done
 		shift
 		;;
 	    --units)
