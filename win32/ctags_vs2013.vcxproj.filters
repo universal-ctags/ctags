@@ -210,6 +210,9 @@
     <ClCompile Include="..\parsers\autoconf.c">
       <Filter>Source Files\Parsers</Filter>
     </ClCompile>
+    <ClCompile Include="..\parsers\autoit.c">
+      <Filter>Source Files\Parsers</Filter>
+    </ClCompile>
     <ClCompile Include="..\parsers\automake.c">
       <Filter>Source Files\Parsers</Filter>
     </ClCompile>

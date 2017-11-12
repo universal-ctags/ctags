@@ -40,6 +40,7 @@ The following parsers have been added:
 * AnsiblePlaybook *libyaml*
 * Autoconf
 * Automake
+* AutoIt
 * Clojure
 * CSS
 * CUDA
