@@ -1,10 +1,12 @@
 /*
-*   Copyright (c) 2000-2006, Darren Hiebert, Elias Pschernig
+*   Copyright (c) 2017, S
 *
 *   This source code is released for free distribution under the terms of the
 *   GNU General Public License version 2 or (at your option) any later version.
 *
 *   This module contains functions for generating tags for AutoIt functions.
+*   Homepage https://www.autoitscript.com/site/autoit/
+*   Online Documentation https://www.autoitscript.com/autoit3/docs/
 */
 
 /*
@@ -41,7 +43,9 @@ static void findAutoItTags (void)
 	while ((line = readLineFromInputFile ()) != NULL)
 	{
 		const unsigned char* cp = line;
-		if ((line[0] == 'F' || line[0] == 'f') &&
+		/* Min. string "func a()" == 8 */
+		if (strlen ((const char *) line) >= 8 &&
+			(line[0] == 'F' || line[0] == 'f') &&
 			(line[1] == 'U' || line[1] == 'u') &&
 			(line[2] == 'N' || line[2] == 'n') &&
 			(line[3] == 'C' || line[3] == 'c') &&
