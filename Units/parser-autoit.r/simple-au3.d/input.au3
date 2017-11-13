@@ -22,6 +22,6 @@ func MyDouble0($iValue)
     Return $iValue
 EndFunc   ;==>MyDouble
 
-FUNC MyDouble1($iValue)
+    	FUNC MyDouble1($iValue)
     $iValue = $iValue * 2
     Return $iValue

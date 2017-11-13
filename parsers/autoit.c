@@ -42,6 +42,8 @@ static void findAutoItTags (void)
 
 	while ((line = readLineFromInputFile ()) != NULL)
 	{
+		while (isspace ((int) *line))
+			++line;
 		const unsigned char* cp = line;
 		/* Min. string "func a()" == 8 */
 		if (strlen ((const char *) line) >= 8 &&
