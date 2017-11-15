@@ -395,7 +395,12 @@ static const char *renderEscapedName (const bool isTagName,
 		 * pseudo-tags when sorting.  Anything with a lower byte value is
 		 * escaped by renderEscapedString() already. */
 		unexpected_byte = *s;
-		vStringPut (b, '\\');
+		switch (*s)
+		{
+			case ' ': vStringCatS (b, "\\x20"); s++; break;
+			case '!': vStringCatS (b, "\\x21"); s++; break;
+			default: AssertNotReached();
+		}
 	}
 	else
 	{
