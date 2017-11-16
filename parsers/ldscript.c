@@ -192,7 +192,7 @@ static int makeLdScriptTagMaybe (tagEntryInfo *const e, tokenInfo *const token,
 	if ((kind == K_SYMBOL)
 		&& LdScriptFields[F_ASSIGNMENT].enabled)
 	{
-		char *assignment = NULL;
+		const char *assignment = NULL;
 
 		switch (TOKENX (token, struct tokenExtra)->assignment)
 		{

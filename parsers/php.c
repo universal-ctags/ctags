@@ -262,11 +262,9 @@ static unsigned int AnonymousID;
 
 static objPool *TokenPool = NULL;
 
-static const char *phpScopeSeparatorFor (int phpKind,
-					 int phpUpperScopeKind)
+static const char *phpScopeSeparatorFor (int kind, int upperScopeKind)
 {
-	return scopeSeparatorFor (getInputLanguage(),
-							  phpKind, phpUpperScopeKind);
+	return scopeSeparatorFor (getInputLanguage(), kind, upperScopeKind);
 }
 
 static const char *accessToString (const accessType access)

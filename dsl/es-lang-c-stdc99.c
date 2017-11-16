@@ -689,13 +689,13 @@ es_symbol_p    (const EsObject*   object)
 }
 
 const char*
-es_symbol_name  (const EsObject*   object)
+es_symbol_get  (const EsObject*   object)
 {
   if (es_symbol_p(object))
     return es_singleton_get((EsSingleton*)object);
   else
     {
-      mio_printf(mio_stderr(), ";; es_symbol_name, Wrong type argument: ");
+      mio_printf(mio_stderr(), ";; es_symbol_get, Wrong type argument: ");
       es_print(object, mio_stderr());
       mio_putc(mio_stderr(), '\n');
       return NULL;
@@ -757,7 +757,7 @@ es_symbol_print(const EsObject* object, MIO* fp)
   int needs_bar;
   int i;
 
-  string = es_symbol_name(object);
+  string = es_symbol_get(object);
   if (!string)
     return;
 
@@ -2513,7 +2513,7 @@ es_vmatch_atom(EsObject* input, EsObject* fmt_object, va_list *ap)
   else if (fmt_object == pattern_S)
     {
       if (es_symbol_p(input))
-	*(va_arg(*ap, const char**)) = /* strdup */(es_symbol_name(input));
+	*(va_arg(*ap, const char**)) = /* strdup */(es_symbol_get(input));
       else
 	return ES_READER_ERROR;
     }

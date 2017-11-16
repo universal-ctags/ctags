@@ -141,7 +141,7 @@ typedef struct _CXXFunctionSignatureInfo
 
 } CXXFunctionSignatureInfo;
 
-int cxxParserMaybeParseKnRStyleFunctionDefinition();
+int cxxParserMaybeParseKnRStyleFunctionDefinition(void);
 int cxxParserExtractFunctionSignatureBeforeOpeningBracket(int * piCorkQueueIndex);
 
 #define CXX_MAX_EXTRACTED_PARAMETERS 24

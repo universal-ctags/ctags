@@ -3330,7 +3330,7 @@ extern void useRegexMethod (const langType language)
 	lang->method |= METHOD_REGEX;
 }
 
-extern void useXpathMethod (const langType language)
+static void useXpathMethod (const langType language)
 {
 	parserDefinition* lang;
 
