@@ -14,8 +14,8 @@
 #include "entry.h"
 #include "types.h"
 
-extern kindDefinition* getTagKind(const tagEntryInfo *const tag);
+extern const kindDefinition* getTagKind(const tagEntryInfo *const tag);
 extern char getTagKindLetter(const tagEntryInfo *const tag);
-extern char* getTagKindName(const tagEntryInfo *const tag);
+extern const char* getTagKindName(const tagEntryInfo *const tag);
 
 #endif	/* CTAGS_PRIVATE_ENTRY_H */

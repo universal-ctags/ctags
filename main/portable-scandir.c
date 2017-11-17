@@ -108,11 +108,12 @@
  *
  */
 
+#include "routines.h"
+
 #if HAVE_SCANDIR
 #include <dirent.h>
 #else
 #define USE_SCANDIR_COMPARE_STRUCT_DIRENT
-#include "routines.h"
 
 #include <sys/types.h>
 

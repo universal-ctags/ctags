@@ -391,8 +391,6 @@ static void parseElement (tokenInfo *const token, bool skipToClose)
 
 static void parseAttDefs (tokenInfo *const token)
 {
-	tagEntryInfo e;
-
 	/*  [53]   	AttDef	   ::=   	S Name S AttType S DefaultDecl */
 
 	do {
@@ -401,6 +399,7 @@ static void parseAttDefs (tokenInfo *const token)
 		/* Name */
 		if (tokenIsType(token, IDENTIFIER))
 		{
+			tagEntryInfo e;
 			makeDtdTagMaybe (&e, token,
 							 K_ATTRIBUTE, ROLE_INDEX_DEFINITION);
 		}
@@ -435,10 +434,10 @@ static void parseAttDefs (tokenInfo *const token)
 			;					/* DefaultDecl -> Just consuming */
 		else if (token->type == '%')
 		{
-			tagEntryInfo e;
 			tokenInfo * identifier = parserParameterEntityRef (token);
 			if (identifier)
 			{
+				tagEntryInfo e;
 				makeDtdTagMaybe (&e, identifier,
 								 K_PARAMETER_ENTITY,
 								 DTD_PARAMETER_ENTITY_PART_OF_ATT_DEF);

@@ -1648,7 +1648,7 @@ rescanReason cxxCppParserMain(const unsigned int passCount)
 	return r;
 }
 
-static void cxxParserFirstInit()
+static void cxxParserFirstInit(void)
 {
 	memset(&g_cxx,0,sizeof(CXXParserState));
 

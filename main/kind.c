@@ -265,7 +265,7 @@ extern struct colprintTable * kindColprintTableNew (void)
 							 NULL);
 }
 
-extern void kindColprintFillLine (struct colprintLine *line,
+static void kindColprintFillLine (struct colprintLine *line,
 								  const char *lang,
 								  kindDefinition *kdef)
 {

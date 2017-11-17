@@ -289,7 +289,7 @@ extern void subparserColprintAddSubparsers (struct colprintTable *table,
 		colprintLineAppendColumnCString (line, getLanguageName (tmp->id));
 		colprintLineAppendColumnCString (line, getLanguageName (scb->owner));
 
-		char *direction;
+		const char *direction;
 		switch (((subparser *)tmp->data)->direction)
 		{
 		case SUBPARSER_BASE_RUNS_SUB:
