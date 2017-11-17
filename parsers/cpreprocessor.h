@@ -80,8 +80,8 @@ extern int cppSkipOverCComment (void);
 
 /* notify the external parser state for the purpose of conditional
    branch choice. The CXX parser stores the block level here. */
-extern void cppPushExternalParserBlock();
-extern void cppPopExternalParserBlock();
+extern void cppPushExternalParserBlock(void);
+extern void cppPopExternalParserBlock(void);
 
 #define CPP_MACRO_REPLACEMENT_FLAG_VARARGS 1
 #define CPP_MACRO_REPLACEMENT_FLAG_STRINGIFY 2

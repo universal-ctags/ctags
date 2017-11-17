@@ -38,7 +38,7 @@
 //      other options may be evaluated.
 //  -1: unrecoverable error
 //
-int cxxParserMaybeParseKnRStyleFunctionDefinition()
+int cxxParserMaybeParseKnRStyleFunctionDefinition(void)
 {
 #ifdef CXX_DO_DEBUGGING
 	vString * pChain = cxxTokenChainJoin(g_cxx.pTokenChain,NULL,0);

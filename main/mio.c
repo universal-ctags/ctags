@@ -48,7 +48,7 @@
 #define xCalloc(n,Type)    (Type *)eCalloc((size_t)(n), sizeof (Type))
 #define xRealloc(p,n,Type) (Type *)eRealloc((p), (n) * sizeof (Type))
 
-extern void *eMalloc (const size_t size)
+static void *eMalloc (const size_t size)
 {
 	void *buffer = malloc (size);
 
@@ -61,7 +61,7 @@ extern void *eMalloc (const size_t size)
 	return buffer;
 }
 
-extern void *eCalloc (const size_t count, const size_t size)
+static void *eCalloc (const size_t count, const size_t size)
 {
 	void *buffer = calloc (count, size);
 
@@ -74,7 +74,7 @@ extern void *eCalloc (const size_t count, const size_t size)
 	return buffer;
 }
 
-extern void *eRealloc (void *const ptr, const size_t size)
+static void *eRealloc (void *const ptr, const size_t size)
 {
 	void *buffer;
 	if (ptr == NULL)
@@ -91,13 +91,13 @@ extern void *eRealloc (void *const ptr, const size_t size)
 	return buffer;
 }
 
-extern void eFree (void *const ptr)
+static void eFree (void *const ptr)
 {
 	free (ptr);
 }
 
-#  define Assert(c)
-#  define AssertNotReached()
+#  define Assert(c) do {} while(0)
+#  define AssertNotReached() do {} while(0)
 #endif
 
 /* minimal reallocation chunk size */

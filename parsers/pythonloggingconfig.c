@@ -85,7 +85,7 @@ static bool probeLanguage (const char *section, const char *key CTAGS_ATTR_UNUSE
 }
 
 
-extern void exclusiveSubparserChosenCallback (subparser *s, void *data CTAGS_ATTR_UNUSED)
+static void exclusiveSubparserChosenCallback (subparser *s, void *data CTAGS_ATTR_UNUSED)
 {
 	((struct sPythonLoggingConfigSubparser *)s)->index = CORK_NIL;
 }
