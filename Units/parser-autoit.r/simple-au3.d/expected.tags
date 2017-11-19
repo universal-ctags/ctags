@@ -1,3 +1,7 @@
+All functions	input.au3	/^#Region All functions$/;"	r
+Constants.au3	input.au3	/^#include <Constants.au3>$/;"	i
+GUIConstantsEx.au3	input.au3	/^#include<GUIConstantsEx.au3>$/;"	i
 MyDouble	input.au3	/^Func MyDouble($iValue)$/;"	f
 MyDouble0	input.au3	/^func MyDouble0($iValue)$/;"	f
 MyDouble1	input.au3	/^    	FUNC MyDouble1($iValue)$/;"	f
+WindowsConstants.au3	input.au3	/^#include "WindowsConstants.au3"$/;"	i

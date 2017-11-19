@@ -1,6 +1,8 @@
 ; Taken from https://www.autoitscript.com/autoit3/docs/intro/lang_functions.htm
 
 #include <Constants.au3>
+#include<GUIConstantsEx.au3>
+#include "WindowsConstants.au3"
 
 Local $iNumber = 10
 Local $iDoubled = 0
@@ -12,6 +14,7 @@ For $i = 1 To 10
 Next
 Exit
 
+#Region All functions
 Func MyDouble($iValue)
     $iValue = $iValue * 2
     Return $iValue
@@ -25,3 +28,5 @@ EndFunc   ;==>MyDouble
     	FUNC MyDouble1($iValue)
     $iValue = $iValue * 2
     Return $iValue
+EndFunc
+#EndRegion All functions
