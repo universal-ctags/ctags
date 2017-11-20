@@ -8,9 +8,8 @@
 *   Homepage             https://www.autoitscript.com/site/autoit/
 *   Online Documentation https://www.autoitscript.com/autoit3/docs/
 *
-*   Functions:     (?i)^func[ \t]{1,}([a-z0-9_]{1,}) >> \1
-*   Include Files: (?i)^#include(.*?)(<|")(.*?)("|>) >> \3
-*   Regions:       (?i)^#region[ \t]*(.*?)           >> \1
+*   Functions: (?i)^func[ \t]{1,}([a-z0-9_]{1,}) >> \1
+*   Regions:   (?i)^#region[ \t]*(.*?)           >> \1
 */
 
 /*
@@ -53,31 +52,8 @@ static void findAutoItTags (void)
 		const unsigned char* p = line;
 		if (p [0] == '#')
 		{
-			/* min. string "#include<a> == 11 */
-			if ((p [1] == 'I' || p [1] == 'i') &&
-				strlen ((const char *) p) >= 11 &&
-				(p [2] == 'N' || p [2] == 'n') &&
-				(p [3] == 'C' || p [3] == 'c') &&
-				(p [4] == 'L' || p [4] == 'l') &&
-				(p [5] == 'U' || p [5] == 'u') &&
-				(p [6] == 'D' || p [6] == 'd') &&
-				(p [7] == 'E' || p [7] == 'e') &&
-				(isspace ((int) p [8]) || p [8] == '"' || p [8] == '<'))
-			{
-				p += 9;
-				while (isspace ((int) *p) || *p == '"' || *p == '<')
-					++p;
-				while (*p != '\0')
-				{
-					if (*p != '"' && *p != '>')
-						vStringPut (name, (int) *p);
-					++p;
-				}
-				makeSimpleTag (name, K_INCLUDE);
-				vStringClear (name);
-			}
 			/* min. string "#region" > 7 */
-			else if ((p [1] == 'R' || p [1] == 'r') &&
+			if ((p [1] == 'R' || p [1] == 'r') &&
 				strlen ((const char *) p) > 8 &&
 				(p [2] == 'E' || p [2] == 'e') &&
 				(p [3] == 'G' || p [3] == 'g') &&
