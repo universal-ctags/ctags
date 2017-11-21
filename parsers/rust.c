@@ -683,8 +683,12 @@ static void parseImpl (lexerState *lexer, vString *scope, int parent_kind)
 
 	if (lexer->cur_token == TOKEN_IDENT && strcmp(vStringValue(lexer->token_str), "for") == 0)
 	{
+		vString *target_name = vStringNew();
 		advanceToken(lexer, true);
-		parseQualifiedType(lexer, name);
+		parseQualifiedType(lexer, target_name);
+		vStringCatS(name, " for ");
+		vStringCat(name, target_name);
+		vStringDelete(target_name);
 	}
 
 	addTag(name, NULL, K_IMPL, line, pos, scope, parent_kind);
