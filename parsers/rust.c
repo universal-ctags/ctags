@@ -97,8 +97,7 @@ static void parseBlock (lexerState *lexer, bool delim, int kind, vString *scope)
 /* Resets the scope string to the old length */
 static void resetScope (vString *scope, size_t old_len)
 {
-	scope->length = old_len;
-	scope->buffer[old_len] = '\0';
+	vStringTruncate (scope, old_len);
 }
 
 /* Adds a name to the end of the scope string */
