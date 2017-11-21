@@ -88,7 +88,7 @@ typedef struct {
 *   FUNCTION PROTOTYPES
 */
 
-static void parseBlock (lexerState *lexer, bool delim, int kind, vString *scope);
+static unsigned long parseBlock (lexerState *lexer, bool delim, int kind, vString *scope);
 
 /*
 *   FUNCTION DEFINITIONS
@@ -702,7 +702,13 @@ static void parseImpl (lexerState *lexer, vString *scope, int parent_kind)
 		trait = NULL;
 	}
 
-	parseBlock(lexer, true, K_IMPL, scope);
+	unsigned long end_line = parseBlock(lexer, true, K_IMPL, scope);
+	if (corkInex != CORK_NIL)
+	{
+		tagEntryInfo *tag;
+		tag = getEntryInCorkQueue(corkInex);
+		tag->extensionFields.endLine = end_line;
+	}
 
 	vStringDelete(name);
 }
@@ -881,14 +887,17 @@ static void parseMacroRules (lexerState *lexer, vString *scope, int parent_kind)
 
 /*
  * Rust is very liberal with nesting, so this function is used pretty much for any block
+ * Returns end of the line of the block.
  */
-static void parseBlock (lexerState *lexer, bool delim, int kind, vString *scope)
+static unsigned long parseBlock (lexerState *lexer, bool delim, int kind, vString *scope)
 {
+	unsigned long end_line = 0;
+
 	int level = 1;
 	if (delim)
 	{
 		if (lexer->cur_token != '{')
-			return;
+			return lexer->line;
 		advanceToken(lexer, true);
 	}
 	while (lexer->cur_token != TOKEN_EOF)
@@ -950,6 +959,8 @@ static void parseBlock (lexerState *lexer, bool delim, int kind, vString *scope)
 		else if (lexer->cur_token == '}')
 		{
 			level--;
+			if (level == 0)
+				end_line = lexer->line;
 			advanceToken(lexer, true);
 		}
 		else if (lexer->cur_token == '\'')
@@ -966,6 +977,11 @@ static void parseBlock (lexerState *lexer, bool delim, int kind, vString *scope)
 		if (delim && level <= 0)
 			break;
 	}
+
+	if (lexer->cur_token == TOKEN_EOF && end_line == 0)
+		end_line = lexer->line;
+
+	return end_line;
 }
 
 static void findRustTags (void)
