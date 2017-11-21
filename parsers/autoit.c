@@ -29,13 +29,11 @@
 */
 typedef enum {
 	K_FUNCTION,
-	K_INCLUDE,
 	K_REGION
 } AutoItKind;
 
 static kindDefinition AutoItKinds [] = {
 	{ true, 'f', "func", "functions" },
-	{ true, 'i', "include", "include files" },
 	{ true, 'r', "region", "regions" }
 };
 
