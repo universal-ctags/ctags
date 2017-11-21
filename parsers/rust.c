@@ -638,27 +638,25 @@ static void skipTypeBlock (lexerState *lexer)
 	}
 }
 
-/* Essentially grabs the last ident before 'for', '<' and '{', which
+/* Essentially grabs everything between impl<...> and '{', which
  * tends to correspond to what we want as the impl tag entry name */
 static void parseQualifiedType (lexerState *lexer, vString* name)
 {
+	vStringClear(name);
 	while (lexer->cur_token != TOKEN_EOF)
 	{
 		if (lexer->cur_token == TOKEN_IDENT)
 		{
-			if (strcmp(vStringValue(lexer->token_str), "for") == 0
-				|| strcmp(vStringValue(lexer->token_str), "where") == 0)
+			if (strcmp(vStringValue(lexer->token_str), "where") == 0)
 				break;
-			vStringClear(name);
-			vStringCat(name, lexer->token_str);
 		}
-		else if (lexer->cur_token == '<' || lexer->cur_token == '{')
+		else if (lexer->cur_token == '{')
 		{
 			break;
 		}
-		advanceToken(lexer, true);
+		writeCurTokenToStr(lexer, name);
+		advanceToken(lexer, false);
 	}
-	skipTypeBlock(lexer);
 }
 
 /* Impl format:
@@ -690,7 +688,7 @@ static void parseImpl (lexerState *lexer, vString *scope, int parent_kind)
 		advanceToken(lexer, true);
 		parseQualifiedType(lexer, name);
 	}
-
+	vStringStripTrailing(name);
 	corkInex = addTag(name, NULL, K_IMPL, line, pos, scope, parent_kind);
 	addToScope(scope, name);
 
