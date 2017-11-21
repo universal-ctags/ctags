@@ -97,8 +97,7 @@ static void parseBlock (lexerState *lexer, bool delim, int kind, vString *scope)
 /* Resets the scope string to the old length */
 static void resetScope (vString *scope, size_t old_len)
 {
-	scope->length = old_len;
-	scope->buffer[old_len] = '\0';
+	vStringTruncate (scope, old_len);
 }
 
 /* Adds a name to the end of the scope string */
@@ -439,7 +438,7 @@ static void addTag (vString* ident, const char* arg_list, int kind, unsigned lon
 	if (kind == K_NONE || ! rustKinds[kind].enabled)
 		return;
 	tagEntryInfo tag;
-	initTagEntry(&tag, ident->buffer, kind);
+	initTagEntry(&tag, vStringValue(ident), kind);
 
 	tag.lineNumber = line;
 	tag.filePosition = pos;
@@ -449,7 +448,7 @@ static void addTag (vString* ident, const char* arg_list, int kind, unsigned lon
 	if (parent_kind != K_NONE)
 	{
 		tag.extensionFields.scopeKindIndex = parent_kind;
-		tag.extensionFields.scopeName = scope->buffer;
+		tag.extensionFields.scopeName = vStringValue(scope);
 	}
 	makeTagEntry(&tag);
 }
@@ -582,7 +581,7 @@ static void parseFn (lexerState *lexer, vString *scope, int parent_kind)
 	if (valid_signature)
 	{
 		vStringStripTrailing(arg_list);
-		addTag(name, arg_list->buffer, kind, line, pos, scope, parent_kind);
+		addTag(name, vStringValue(arg_list), kind, line, pos, scope, parent_kind);
 		addToScope(scope, name);
 		parseBlock(lexer, true, kind, scope);
 	}
@@ -647,8 +646,8 @@ static void parseQualifiedType (lexerState *lexer, vString* name)
 	{
 		if (lexer->cur_token == TOKEN_IDENT)
 		{
-			if (strcmp(lexer->token_str->buffer, "for") == 0
-				|| strcmp(lexer->token_str->buffer, "where") == 0)
+			if (strcmp(vStringValue(lexer->token_str), "for") == 0
+				|| strcmp(vStringValue(lexer->token_str), "where") == 0)
 				break;
 			vStringClear(name);
 			vStringCat(name, lexer->token_str);
@@ -682,7 +681,7 @@ static void parseImpl (lexerState *lexer, vString *scope, int parent_kind)
 
 	parseQualifiedType(lexer, name);
 
-	if (lexer->cur_token == TOKEN_IDENT && strcmp(lexer->token_str->buffer, "for") == 0)
+	if (lexer->cur_token == TOKEN_IDENT && strcmp(vStringValue(lexer->token_str), "for") == 0)
 	{
 		advanceToken(lexer, true);
 		parseQualifiedType(lexer, name);
@@ -704,7 +703,7 @@ static void parseStatic (lexerState *lexer, vString *scope, int parent_kind)
 	advanceToken(lexer, true);
 	if (lexer->cur_token != TOKEN_IDENT)
 		return;
-	if (strcmp(lexer->token_str->buffer, "mut") == 0)
+	if (strcmp(vStringValue(lexer->token_str), "mut") == 0)
 	{
 		advanceToken(lexer, true);
 	}
@@ -778,8 +777,8 @@ static void parseStructOrEnum (lexerState *lexer, vString *scope, int parent_kin
 			}
 			if (lexer->cur_token == TOKEN_IDENT)
 			{
-				if (strcmp(lexer->token_str->buffer, "priv") == 0
-				    || strcmp(lexer->token_str->buffer, "pub") == 0)
+				if (strcmp(vStringValue(lexer->token_str), "priv") == 0
+				    || strcmp(vStringValue(lexer->token_str), "pub") == 0)
 				{
 					advanceToken(lexer, true);
 					if (lexer->cur_token != TOKEN_IDENT)
@@ -885,39 +884,39 @@ static void parseBlock (lexerState *lexer, bool delim, int kind, vString *scope)
 		if (lexer->cur_token == TOKEN_IDENT)
 		{
 			size_t old_scope_len = vStringLength(scope);
-			if (strcmp(lexer->token_str->buffer, "fn") == 0)
+			if (strcmp(vStringValue(lexer->token_str), "fn") == 0)
 			{
 				parseFn(lexer, scope, kind);
 			}
-			else if(strcmp(lexer->token_str->buffer, "mod") == 0)
+			else if(strcmp(vStringValue(lexer->token_str), "mod") == 0)
 			{
 				parseMod(lexer, scope, kind);
 			}
-			else if(strcmp(lexer->token_str->buffer, "static") == 0)
+			else if(strcmp(vStringValue(lexer->token_str), "static") == 0)
 			{
 				parseStatic(lexer, scope, kind);
 			}
-			else if(strcmp(lexer->token_str->buffer, "trait") == 0)
+			else if(strcmp(vStringValue(lexer->token_str), "trait") == 0)
 			{
 				parseTrait(lexer, scope, kind);
 			}
-			else if(strcmp(lexer->token_str->buffer, "type") == 0)
+			else if(strcmp(vStringValue(lexer->token_str), "type") == 0)
 			{
 				parseType(lexer, scope, kind);
 			}
-			else if(strcmp(lexer->token_str->buffer, "impl") == 0)
+			else if(strcmp(vStringValue(lexer->token_str), "impl") == 0)
 			{
 				parseImpl(lexer, scope, kind);
 			}
-			else if(strcmp(lexer->token_str->buffer, "struct") == 0)
+			else if(strcmp(vStringValue(lexer->token_str), "struct") == 0)
 			{
 				parseStructOrEnum(lexer, scope, kind, true);
 			}
-			else if(strcmp(lexer->token_str->buffer, "enum") == 0)
+			else if(strcmp(vStringValue(lexer->token_str), "enum") == 0)
 			{
 				parseStructOrEnum(lexer, scope, kind, false);
 			}
-			else if(strcmp(lexer->token_str->buffer, "macro_rules") == 0)
+			else if(strcmp(vStringValue(lexer->token_str), "macro_rules") == 0)
 			{
 				parseMacroRules(lexer, scope, kind);
 			}
@@ -945,7 +944,7 @@ static void parseBlock (lexerState *lexer, bool delim, int kind, vString *scope)
 		{
 			/* Skip over the 'static lifetime, as it confuses the static parser above */
 			advanceToken(lexer, true);
-			if (lexer->cur_token == TOKEN_IDENT && strcmp(lexer->token_str->buffer, "static") == 0)
+			if (lexer->cur_token == TOKEN_IDENT && strcmp(vStringValue(lexer->token_str), "static") == 0)
 				advanceToken(lexer, true);
 		}
 		else
