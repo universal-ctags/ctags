@@ -433,10 +433,10 @@ static void deInitLexer (lexerState *lexer)
 	lexer->token_str = NULL;
 }
 
-static void addTag (vString* ident, const char* arg_list, int kind, unsigned long line, MIOPos pos, vString *scope, int parent_kind)
+static int addTag (vString* ident, const char* arg_list, int kind, unsigned long line, MIOPos pos, vString *scope, int parent_kind)
 {
 	if (kind == K_NONE || ! rustKinds[kind].enabled)
-		return;
+		return CORK_NIL;
 	tagEntryInfo tag;
 	initTagEntry(&tag, vStringValue(ident), kind);
 
@@ -450,7 +450,7 @@ static void addTag (vString* ident, const char* arg_list, int kind, unsigned lon
 		tag.extensionFields.scopeKindIndex = parent_kind;
 		tag.extensionFields.scopeName = vStringValue(scope);
 	}
-	makeTagEntry(&tag);
+	return makeTagEntry(&tag);
 }
 
 /* Skip tokens until one of the goal tokens is hit. Escapes when level = 0 if there are no goal tokens.
@@ -666,9 +666,11 @@ static void parseQualifiedType (lexerState *lexer, vString* name)
  */
 static void parseImpl (lexerState *lexer, vString *scope, int parent_kind)
 {
+	unsigned int corkInex;
 	unsigned long line;
 	MIOPos pos;
 	vString *name;
+	char *trait = NULL;
 
 	advanceToken(lexer, true);
 
@@ -683,12 +685,22 @@ static void parseImpl (lexerState *lexer, vString *scope, int parent_kind)
 
 	if (lexer->cur_token == TOKEN_IDENT && strcmp(vStringValue(lexer->token_str), "for") == 0)
 	{
+		if (isFieldEnabled(FIELD_INHERITANCE))
+			trait = eStrdup (vStringValue (name));
 		advanceToken(lexer, true);
 		parseQualifiedType(lexer, name);
 	}
 
-	addTag(name, NULL, K_IMPL, line, pos, scope, parent_kind);
+	corkInex = addTag(name, NULL, K_IMPL, line, pos, scope, parent_kind);
 	addToScope(scope, name);
+
+	if (trait && (corkInex != CORK_NIL))
+	{
+		tagEntryInfo *tag;
+		tag = getEntryInCorkQueue(corkInex);
+		tag->extensionFields.inheritance = trait;
+		trait = NULL;
+	}
 
 	parseBlock(lexer, true, K_IMPL, scope);
 
@@ -976,6 +988,7 @@ extern parserDefinition *RustParser (void)
 	def->kindCount = ARRAY_SIZE (rustKinds);
 	def->extensions = extensions;
 	def->parser = findRustTags;
+	def->useCork = true;
 
 	return def;
 }
