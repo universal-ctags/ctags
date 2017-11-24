@@ -18,6 +18,10 @@ LANGUAGES=
 CATEGORIES=
 UNITS=
 
+SILENT = $(SILENT_@AM_V@)
+SILENT_ = $(SILENT_@AM_DEFAULT_V@)
+SILENT_0 = @
+
 V_RUN = $(V_RUN_@AM_V@)
 V_RUN_ = $(V_RUN_@AM_DEFAULT_V@)
 V_RUN_0 = @echo "  RUN      $@";
