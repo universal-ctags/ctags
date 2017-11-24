@@ -159,10 +159,14 @@ tinst:
 #
 # Test readtags
 #
+if USE_READCMD
 roundtrip: $(READ_TEST)
 	$(V_RUN) \
 	builddir=$$(pwd); \
 	$(SHELL) $(srcdir)/misc/roundtrip $(READ_TEST) $${builddir}/Units
+else
+roundtrip:
+endif
 
 #
 # Checking code in ctags own rules
