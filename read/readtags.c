@@ -93,6 +93,59 @@ static const char *const PseudoTagPrefix = "!_";
 *   FUNCTION DEFINITIONS
 */
 
+/* Converts a hexadecimal digit to its value */
+static int xdigitValue (char digit)
+{
+	if (digit >= '0' && digit <= '9')
+		return digit - '0';
+	else if (digit >= 'a' && digit <= 'f')
+		return 10 + digit - 'a';
+	else if (digit >= 'A' && digit <= 'F')
+		return 10 + digit - 'A';
+	else
+		return 0;
+}
+
+/*
+ * Reads the first character from the string, possibly un-escaping it, and
+ * advances *s to the start of the next character.
+ */
+static int readTagCharacter (const char **s)
+{
+	int c = **s;
+
+	(*s)++;
+
+	if (c == '\\')
+	{
+		switch (**s)
+		{
+			case 't': c = '\t'; (*s)++; break;
+			case 'r': c = '\r'; (*s)++; break;
+			case 'n': c = '\n'; (*s)++; break;
+			case '\\': c = '\\'; (*s)++; break;
+			/* Universal-CTags extensions */
+			case 'a': c = '\a'; (*s)++; break;
+			case 'b': c = '\b'; (*s)++; break;
+			case 'v': c = '\v'; (*s)++; break;
+			case 'f': c = '\f'; (*s)++; break;
+			case 'x':
+				if (isxdigit ((*s)[1]) && isxdigit ((*s)[2]))
+				{
+					int val = (xdigitValue ((*s)[1]) << 4) | xdigitValue ((*s)[2]);
+					if (val < 0x80)
+					{
+						(*s) += 3;
+						c = val;
+					}
+				}
+				break;
+		}
+	}
+
+	return c;
+}
+
 /*
  * Compare two strings, ignoring case.
  * Return 0 for match, < 0 for smaller, > 0 for bigger
@@ -100,23 +153,59 @@ static const char *const PseudoTagPrefix = "!_";
  * This makes a difference when one of the chars lies between upper and lower
  * ie. one of the chars [ \ ] ^ _ ` for ascii. (The '_' in particular !)
  */
-static int struppercmp (const char *s1, const char *s2)
+static int taguppercmp (const char *s1, const char *s2)
 {
 	int result;
+	int c1, c2;
 	do
 	{
-		result = toupper ((int) *s1) - toupper ((int) *s2);
-	} while (result == 0  &&  *s1++ != '\0'  &&  *s2++ != '\0');
+		c1 = *s1++;
+		c2 = readTagCharacter (&s2);
+
+		result = toupper (c1) - toupper (c2);
+	} while (result == 0  &&  c1 != '\0'  &&  c2 != '\0');
 	return result;
 }
 
-static int strnuppercmp (const char *s1, const char *s2, size_t n)
+static int tagnuppercmp (const char *s1, const char *s2, size_t n)
 {
 	int result;
+	int c1, c2;
 	do
 	{
-		result = toupper ((int) *s1) - toupper ((int) *s2);
-	} while (result == 0  &&  --n > 0  &&  *s1++ != '\0'  &&  *s2++ != '\0');
+		c1 = *s1++;
+		c2 = readTagCharacter (&s2);
+
+		result = toupper (c1) - toupper (c2);
+	} while (result == 0  &&  --n > 0  &&  c1 != '\0'  &&  c2 != '\0');
+	return result;
+}
+
+static int tagcmp (const char *s1, const char *s2)
+{
+	int result;
+	int c1, c2;
+	do
+	{
+		c1 = *s1++;
+		c2 = readTagCharacter (&s2);
+
+		result = c1 - c2;
+	} while (result == 0  &&  c1 != '\0'  &&  c2 != '\0');
+	return result;
+}
+
+static int tagncmp (const char *s1, const char *s2, size_t n)
+{
+	int result;
+	int c1, c2;
+	do
+	{
+		c1 = *s1++;
+		c2 = readTagCharacter (&s2);
+
+		result = c1 - c2;
+	} while (result == 0  &&  --n > 0  &&  c1 != '\0'  &&  c2 != '\0');
 	return result;
 }
 
@@ -311,6 +400,7 @@ static void parseTagLine (tagFile *file, tagEntry *const entry)
 {
 	int i;
 	char *p = file->line.buffer;
+	size_t p_len = strlen (p);
 	char *tab = strchr (p, TAB);
 
 	entry->fields.list = NULL;
@@ -322,6 +412,25 @@ static void parseTagLine (tagFile *file, tagEntry *const entry)
 	if (tab != NULL)
 	{
 		*tab = '\0';
+	}
+	while (*p != '\0')
+	{
+		const char *next = p;
+		int ch = readTagCharacter (&next);
+		size_t skip = next - p;
+
+		*p = (char) ch;
+		p++;
+		p_len -= skip;
+		if (skip > 1)
+		{
+			memmove (p, next, p_len);
+			tab -= skip - 1;
+		}
+	}
+
+	if (tab != NULL)
+	{
 		p = tab + 1;
 		entry->file = p;
 		tab = strchr (p, TAB);
@@ -561,18 +670,18 @@ static int nameComparison (tagFile *const file)
 	if (file->search.ignorecase)
 	{
 		if (file->search.partial)
-			result = strnuppercmp (file->search.name, file->name.buffer,
+			result = tagnuppercmp (file->search.name, file->name.buffer,
 					file->search.nameLength);
 		else
-			result = struppercmp (file->search.name, file->name.buffer);
+			result = taguppercmp (file->search.name, file->name.buffer);
 	}
 	else
 	{
 		if (file->search.partial)
-			result = strncmp (file->search.name, file->name.buffer,
+			result = tagncmp (file->search.name, file->name.buffer,
 					file->search.nameLength);
 		else
-			result = strcmp (file->search.name, file->name.buffer);
+			result = tagcmp (file->search.name, file->name.buffer);
 	}
 	return result;
 }
