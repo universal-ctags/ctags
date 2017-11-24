@@ -15,6 +15,9 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+# Avoid trouble with weird bytes on non-C locales
+export LC_ALL=C
+
 READTAGS=${1:-./readtags}
 UNITS=${2:-./Units}
 s=0
