@@ -1,7 +1,7 @@
 # -*- makefile -*-
 .PHONY: check units fuzz noise tmain tinst clean-units clean-tmain clean-gcov run-gcov codecheck cppcheck dicts cspell
 
-check: tmain units
+check: tmain units roundtrip
 
 clean-local: clean-units clean-tmain
 
@@ -159,10 +159,16 @@ tinst:
 #
 # Test readtags
 #
+if USE_READCMD
 roundtrip: $(READ_TEST)
 	$(V_RUN) \
 	builddir=$$(pwd); \
 	$(SHELL) $(srcdir)/misc/roundtrip $(READ_TEST) $${builddir}/Units
+else
+# apparently Automake doesn't like adding an extra dependency in a conditional,
+# so add it unconditionally and simply have it not do anything if it's disabled.
+roundtrip:
+endif
 
 #
 # Checking code in ctags own rules
