@@ -35,6 +35,34 @@ if ! [ -x "${UNITS}" ]; then
 fi
 
 
+# Expand CTags escape sequences (and keep the original, too)
+# See docs/format.rst
+expandEscapeSequences()
+{
+    local original
+    local expanded
+
+    read -r original
+    expanded="$(
+	echo "$original" |
+	sed 's/\\\\/\\/g' |
+	sed 's/\\t/\t/g' |
+	sed 's/\\r/\r/g' |
+	sed 's/\\n/\n/g' |
+	sed 's/\\a/\a/g' |
+	sed 's/\\b/\b/g' |
+	sed 's/\\v/\v/g' |
+	sed 's/\\f/\f/g' |
+	sed 's/\\x21/!/g' |
+	sed 's/\\x20/ /g'
+    )"
+
+    if [ "$expanded" != "$original" ]; then
+	echo "$expanded"
+    fi
+    echo "$original"
+}
+
 # disable path expansion, because we don't need it and it's applied on the
 # result of the commands used to loop on, and we don't want that.
 set -f
@@ -44,7 +72,7 @@ IFS='
 '
 
 for tags in $(find "$UNITS" -name expected.tags); do
-    for t in $(sed -e 's/^\([^\t]*\)\t.*/\1/' "$tags"); do
+    for t in $(sed -e 's/^\([^\t]*\)\t.*/\1/' "$tags" | expandEscapeSequences); do
 	if [ 1 -gt $("${READTAGS}" -t "$tags" - "$t" 2>/dev/null | wc -l) ]; then
 	    printf "FAILED[%3d]: " $?
 	    echo "${READTAGS}" -t "$tags" - "$t"
