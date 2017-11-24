@@ -73,7 +73,7 @@ set -f
 OLD_IFS="$IFS"
 IFS='
 '
-
+set -x
 for tags in $(find "$UNITS" -name expected.tags); do
     for t in $(sed -e 's/^\([^	]*\)	.*/\1/' "$tags" | expandEscapeSequences); do
 	if [ 1 -gt $("${READTAGS}" -t "$tags" - "$t" 2>/dev/null | wc -l) ]; then
