@@ -49,7 +49,7 @@ expandEscapeSequences()
     expanded="$(
 	echo "$original" |
 	sed 's/\\\\/\\/g' |
-	sed 's/\\t/\t/g' |
+	sed 's/\\t/	/g' |
 	sed 's/\\r/\r/g' |
 	sed 's/\\n/\n/g' |
 	sed 's/\\a/\a/g' |
@@ -75,7 +75,7 @@ IFS='
 '
 
 for tags in $(find "$UNITS" -name expected.tags); do
-    for t in $(sed -e 's/^\([^\t]*\)\t.*/\1/' "$tags" | expandEscapeSequences); do
+    for t in $(sed -e 's/^\([^	]*\)	.*/\1/' "$tags" | expandEscapeSequences); do
 	if [ 1 -gt $("${READTAGS}" -t "$tags" - "$t" 2>/dev/null | wc -l) ]; then
 	    printf "FAILED[%3d]: " $?
 	    echo "${READTAGS}" -t "$tags" - "$t"
