@@ -1,0 +1,12 @@
+\x21hello	input.js	/^  '!hello': function(){},$/;"	m	class:object
+\x20hello	input.js	/^  ' hello': function(){},$/;"	m	class:object
+<hello	input.js	/^  '<hello': function(){},$/;"	m	class:object
+>hello	input.js	/^  '>hello': function(){},$/;"	m	class:object
+\thello	input.js	/^  '	hello': function(){},$/;"	m	class:object
+\\hello	input.js	/^  '\\\\hello': function(){},$/;"	m	class:object
+;"hello	input.js	/^  ';"hello': function(){},$/;"	m	class:object
+"hello	input.js	/^  '"hello': function(){},$/;"	m	class:object
+'hello	input.js	/^  "'hello": function(){},$/;"	m	class:object
+hello!	input.js	/^  'hello!': function(){},$/;"	m	class:object
+hello 	input.js	/^  'hello ': function(){},$/;"	m	class:object
+object	input.js	/^var object = {$/;"	c

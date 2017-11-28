@@ -3,8 +3,11 @@ Reading command line arguments
 CTagsSelfTest requires a memory stream for input
 OPENING input.cst as CTagsSelfTest language file [new,required]
 Initialize parser: CTagsSelfTest
-Unexpected character (0 < *c && *c < 0x20) included in a tagEntryInfo: one
+Unexpected character 0x0a included in a tagEntryInfo: one
 ofbroken	name
+File: input.cst, Line: 1, Lang: CTagsSelfTest, Kind: b
+Escape the character
+Unexpected character 0x09 included in a tagEntryInfo: \Broken	Context
 File: input.cst, Line: 1, Lang: CTagsSelfTest, Kind: b
 Escape the character
 sorting tag file

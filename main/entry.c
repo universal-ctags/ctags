@@ -1294,25 +1294,8 @@ static void makeTagEntriesForSubwords (tagEntryInfo *const subtag)
 	stringListDelete (list);
 }
 
-static char *trimPrefixedWhitespaces (const char *name)
+extern int makeTagEntry (const tagEntryInfo *const tag)
 {
-	const char *start;
-
-	for (start = name; isspace(*start); start++)
-		;
-
-	if (start != name)
-		return eStrdup (start);
-
-	return NULL;
-}
-
-extern int makeTagEntry (const tagEntryInfo *const tag_const)
-{
-	char *trimmed_name;
-	const tagEntryInfo *tag = tag_const;
-	tagEntryInfo tag_backingstore;
-
 	int r = CORK_NIL;
 	Assert (tag->name != NULL);
 
@@ -1327,14 +1310,6 @@ extern int makeTagEntry (const tagEntryInfo *const tag_const)
 		    && (! isLanguageRoleEnabled (tag->langType, tag->kindIndex,
 										 tag->extensionFields.roleIndex)))
 			return CORK_NIL;
-	}
-
-	trimmed_name = trimPrefixedWhitespaces (tag->name);
-	if (trimmed_name)
-	{
-		tag_backingstore = *tag_const;
-		tag = &tag_backingstore;
-		tag_backingstore.name = trimmed_name;
 	}
 
 	if (tag->name [0] == '\0' && (!tag->placeholder))
@@ -1356,8 +1331,6 @@ extern int makeTagEntry (const tagEntryInfo *const tag_const)
 		makeTagEntriesForSubwords (&subtag);
 	}
 out:
-	if (trimmed_name)
-		eFree (trimmed_name);
 	return r;
 }
 

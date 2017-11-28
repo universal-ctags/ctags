@@ -178,8 +178,7 @@ getNextChar:
 					c = ' ';
 				if (c != ' ' || lastC != ' ')
 				{
-					if (collectText)
-						vStringPut (token->string, c);
+					vStringPut (token->string, c);
 					lastC = c;
 				}
 			}
@@ -460,6 +459,7 @@ static void readTag (tokenInfo *token, vString *text, int depth)
 						else
 							headingKind = K_HEADING3;
 
+						vStringStripLeading (text);
 						vStringStripTrailing (text);
 						makeSimpleTag (text, headingKind);
 					}
