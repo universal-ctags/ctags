@@ -159,7 +159,7 @@ static int taguppercmp (const char *s1, const char *s2)
 	int c1, c2;
 	do
 	{
-		c1 = readTagCharacter (&s1);
+		c1 = *s1++;
 		c2 = readTagCharacter (&s2);
 
 		result = toupper (c1) - toupper (c2);
@@ -173,7 +173,7 @@ static int tagnuppercmp (const char *s1, const char *s2, size_t n)
 	int c1, c2;
 	do
 	{
-		c1 = readTagCharacter (&s1);
+		c1 = *s1++;
 		c2 = readTagCharacter (&s2);
 
 		result = toupper (c1) - toupper (c2);
@@ -187,7 +187,7 @@ static int tagcmp (const char *s1, const char *s2)
 	int c1, c2;
 	do
 	{
-		c1 = readTagCharacter (&s1);
+		c1 = *s1++;
 		c2 = readTagCharacter (&s2);
 
 		result = c1 - c2;
@@ -201,7 +201,7 @@ static int tagncmp (const char *s1, const char *s2, size_t n)
 	int c1, c2;
 	do
 	{
-		c1 = readTagCharacter (&s1);
+		c1 = *s1++;
 		c2 = readTagCharacter (&s2);
 
 		result = c1 - c2;
