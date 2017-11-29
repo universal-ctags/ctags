@@ -116,10 +116,12 @@ IFS='
 
 tagfiles=$(find "$UNITS" -name expected.tags)
 for tags in $tagfiles; do
-    tagnames=$(sed -e 's/^\([^	]*\)	.*/\1/' "$tags" | expandEscapeSequences)
+    tagnames=$(sed -e 's/^\([^	]*\)	.*/\1/' "$tags")
     for name in $tagnames; do
-	if [ 1 -gt $("${READTAGS}" -t "$tags" - "$name" | wc -l) ]; then
-	    printf 'FAILED: "%s" -t "%s" - "%s"\n' "${READTAGS}" "$tags" "$name"
+	# don't expand in the loop to handle "\n" sequence properly
+	t=$(printf '%s' "$name" | expandEscapeSequences)
+	if [ 1 -gt $("${READTAGS}" -t "$tags" - "$t" | wc -l) ]; then
+	    printf 'FAILED: "%s" -t "%s" - "%s"\n' "${READTAGS}" "$tags" "$t"
 	    s=1
 	fi
     done
