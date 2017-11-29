@@ -15,6 +15,8 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+set -e
+
 # Avoid trouble with weird bytes on non-C locales
 export LC_ALL=C
 
@@ -112,8 +114,10 @@ OLD_IFS="$IFS"
 IFS='
 '
 set -x
-for tags in $(find "$UNITS" -name expected.tags); do
-    for name in $(sed -e 's/^\([^	]*\)	.*/\1/' "$tags"); do
+tagfiles="$(find "$UNITS" -name expected.tags)"
+for tags in $tagfiles; do
+    tagnames="$(sed -e 's/^\([^	]*\)	.*/\1/' "$tags")"
+    for name in $tagnames; do
 	# Yes, there is a reason for this craziness.  We need to properly
 	# handle embedded newlines (expanded from "\n"), including trailing
 	# ones the shell would strip automatically.  To work around this, we
