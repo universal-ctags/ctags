@@ -117,11 +117,10 @@ for tags in $(find "$UNITS" -name expected.tags); do
 	# don't expand in the loop to handle "\n" sequence properly
 	t="$(printf '%s' "$name" | expandEscapeSequences)"
 	if [ 1 -gt $("${READTAGS}" -t "$tags" - "$t" 2>/dev/null | wc -l) ]; then
-	    printf "FAILED[%3d]: " $?
-	    echo "${READTAGS}" -t "$tags" - "$t"
+	    printf 'FAILED: "%s" -t "%s" - "%s"\n' "${READTAGS}" "$tags" "$t"
 	    s=1
 	fi
-    done 
+    done
 done
 
 IFS="$OLD_IFS"
