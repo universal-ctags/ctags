@@ -53,7 +53,7 @@ expandEscapeSequences()
 :again
     s/\\/__BACKSLASH__/
     T out
-    s/__BACKSLASH__\\/__LASTBACKSLASH__/;	t again
+    s/__BACKSLASH__\\/__LITBACKSLASH__/;	t again
     s/__BACKSLASH__t/	/;			t again
     s/__BACKSLASH__r/'"$(printf '\r')"'/;	t again
     s/__BACKSLASH__n/\n/;			t again
@@ -100,7 +100,7 @@ expandEscapeSequences()
     # replace lonely "\"es
     s/__BACKSLASH__/\\/g
     # replace literal "\"es ("\\" from the input)
-    s/__LASTBACKSLASH__/\\/g
+    s/__LITBACKSLASH__/\\/g
 '
 }
 
