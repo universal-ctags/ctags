@@ -99,9 +99,9 @@ static int xdigitValue (char digit)
 	if (digit >= '0' && digit <= '9')
 		return digit - '0';
 	else if (digit >= 'a' && digit <= 'f')
-		return 16 + digit - 'a';
+		return 10 + digit - 'a';
 	else if (digit >= 'A' && digit <= 'F')
-		return 16 + digit - 'A';
+		return 10 + digit - 'A';
 	else
 		return 0;
 }
