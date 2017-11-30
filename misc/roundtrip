@@ -113,7 +113,7 @@ set -f
 OLD_IFS="$IFS"
 IFS='
 '
-set -x
+
 tagfiles="$(find "$UNITS" -name expected.tags)"
 for tags in $tagfiles; do
     tagnames="$(sed -e 's/^\([^	]*\)	.*/\1/' "$tags")"
