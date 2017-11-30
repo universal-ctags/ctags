@@ -54,7 +54,6 @@ expandEscapeSequences()
 # reserved placeholders.
 :again
     s/\\/__BACKSLASH__/
-    T out
     s/__BACKSLASH__\\/__LITBACKSLASH__/;	t again
     s/__BACKSLASH__t/	/;			t again
     s/__BACKSLASH__r/'"$(printf '\r')"'/;	t again
