@@ -54,11 +54,11 @@ expandEscapeSequences()
 # reserved placeholders.
 :again
     s/\\/__BACKSLASH__/
-    T out
     s/__BACKSLASH__\\/__LITBACKSLASH__/;	t again
     s/__BACKSLASH__t/	/;			t again
     s/__BACKSLASH__r/'"$(printf '\r')"'/;	t again
-    s/__BACKSLASH__n/\n/;			t again
+    s/__BACKSLASH__n/\
+/;						t again
     s/__BACKSLASH__a//;			t again
     s/__BACKSLASH__b/'"$(printf '\b')"'/;	t again
     s/__BACKSLASH__v//;			t again
@@ -72,7 +72,8 @@ expandEscapeSequences()
     s/__BACKSLASH__x07//;			t again
     s/__BACKSLASH__x08//;			t again
     s/__BACKSLASH__x09/	/;			t again
-    s/__BACKSLASH__x0[aA]/\n/;			t again
+    s/__BACKSLASH__x0[aA]/\
+/;						t again
     s/__BACKSLASH__x0[bB]//;			t again
     s/__BACKSLASH__x0[cC]//;			t again
     s/__BACKSLASH__x0[dD]/'"$(printf '\r')"'/;	t again
