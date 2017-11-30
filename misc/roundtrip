@@ -46,7 +46,7 @@ expandEscapeSequences()
 {
     sed -e '
 # early out if there is no escape sequence (common case)
-/\\/!q
+/\\/!b
 
 # loop until we handled all occurrences of \.
 # as it is not possible to do all replacements at once and we need not to
@@ -96,6 +96,7 @@ expandEscapeSequences()
     s/__BACKSLASH__x21/!/;			t again
     s/__BACKSLASH__x20/ /;			t again
     s/__BACKSLASH__x7[fF]//;			t again
+    /\\/b again
 
 :out
     # replace lonely "\"es
