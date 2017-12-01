@@ -57,7 +57,8 @@ expandEscapeSequences()
     s/__BACKSLASH__\\/__LITBACKSLASH__/;	t again
     s/__BACKSLASH__t/	/;			t again
     s/__BACKSLASH__r/'"$(printf '\r')"'/;	t again
-    s/__BACKSLASH__n/\n/;			t again
+    s/__BACKSLASH__n/\
+/;						t again
     s/__BACKSLASH__a//;			t again
     s/__BACKSLASH__b/'"$(printf '\b')"'/;	t again
     s/__BACKSLASH__v//;			t again
