@@ -76,6 +76,9 @@ static void findTag (const char *const name, const int options)
 	{
 		if (SortOverride)
 			tagsSetSortType (file, SortMethod);
+		if (debugMode)
+			fprintf (stderr, "%s: searching for \"%s\" in \"%s\"\n",
+					 ProgramName, name, TagFileName);
 		if (tagsFind (file, &entry, name, options) == TagSuccess)
 		{
 			do
