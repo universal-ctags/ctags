@@ -130,7 +130,7 @@ for tags in $tagfiles; do
 	t="${t%
 _}"
 
-	if [ 1 -gt $("${READTAGS}" -t "$tags" - "$t" 2>/dev/null | wc -l) ]; then
+	if [ 1 -gt $("${READTAGS}" -t "$tags" - "$t" | wc -l) ]; then
 	    printf 'FAILED: "%s" -t "%s" - "%s"\n' "${READTAGS}" "$tags" "$t"
 	    printf '	The raw tag name was "%s"\n' "$name"
 	    s=1
