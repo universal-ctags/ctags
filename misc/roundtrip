@@ -52,7 +52,7 @@ tagfiles=$(find "$UNITS" -name expected.tags)
 for tags in $tagfiles; do
     tagnames=$(sed -e 's/^\([^	]*\)	.*/\1/' "$tags")
     for name in $tagnames; do
-	if [ 1 -gt $("${READTAGS}" -t "$tags" - "$name" 2>/dev/null | wc -l) ]; then
+	if [ 1 -gt $("${READTAGS}" -t "$tags" - "$name" | wc -l) ]; then
 	    printf 'FAILED: "%s" -t "%s" - "%s"\n' "${READTAGS}" "$tags" "$name"
 	    s=1
 	fi
