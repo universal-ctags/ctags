@@ -163,7 +163,8 @@ if USE_READCMD
 roundtrip: $(READ_TEST)
 	$(V_RUN) \
 	builddir=$$(pwd); \
-	$(SHELL) $(srcdir)/misc/roundtrip $(READ_TEST) $${builddir}/Units
+	APPVEYOR=$(APPVEYOR) \
+		$(SHELL) $(srcdir)/misc/roundtrip $(READ_TEST) $${builddir}/Units
 else
 # apparently Automake doesn't like adding an extra dependency in a conditional,
 # so add it unconditionally and simply have it not do anything if it's disabled.

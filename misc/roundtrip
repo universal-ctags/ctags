@@ -108,6 +108,23 @@ expandEscapeSequences()
 '
 }
 
+# Escape characters MSYS2 would convert when calling readtags
+if [ -n "$APPVEYOR" ]; then
+    MSYS2_READTAGS="${READTAGS}"
+    msys2_readtags()
+    {
+	# should be called as "$0 -t FILE - NAME"
+	[ "$1" = -t -a "$3" = - ] || exit 1
+
+	name="$(printf '%s\n' "$4" | sed -e 's,[:*\\/],\\\0,g'; printf _)"
+	name="${name%
+_}"
+
+	"${MSYS2_READTAGS}" -t "$2" - "$name"
+    }
+    READTAGS=msys2_readtags
+fi
+
 # disable path expansion, because we don't need it and it's applied on the
 # result of the commands used to loop on, and we don't want that.
 set -f
