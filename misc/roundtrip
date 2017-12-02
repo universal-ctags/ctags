@@ -116,7 +116,7 @@ if [ -n "$APPVEYOR" ]; then
 	# should be called as "$0 -t FILE - NAME"
 	[ "$1" = -t -a "$3" = - ] || exit 1
 
-	name="$(printf '%s\n' "$4" | sed -e 's,[:*\\/],\\\0,g'; printf _)"
+	name="$(printf '%s\n' "$4" | sed -e 's,[:*\\/],^\0,g'; printf _)"
 	name="${name%
 _}"
 
