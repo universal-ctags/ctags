@@ -113,14 +113,8 @@ if [ -n "$APPVEYOR" ]; then
     MSYS2_READTAGS="${READTAGS}"
     msys2_readtags()
     {
-	# should be called as "$0 -t FILE - NAME"
-	[ "$1" = -t -a "$3" = - ] || exit 1
-
-	name="$(printf '%s\n' "$4" | sed -e 's,[:*\\/],^\0,g'; printf _)"
-	name="${name%
-_}"
-
-	"${MSYS2_READTAGS}" -t "$2" - "$name"
+	MSYS2_ARG_CONV_EXCL="$4" \
+	"${MSYS2_READTAGS}" "$@"
     }
     READTAGS=msys2_readtags
 fi
