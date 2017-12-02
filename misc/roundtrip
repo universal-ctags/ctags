@@ -72,7 +72,8 @@ expandEscapeSequences()
     s/__BACKSLASH__x07//;			t again
     s/__BACKSLASH__x08//;			t again
     s/__BACKSLASH__x09/	/;			t again
-    s/__BACKSLASH__x0[aA]/\n/;			t again
+    s/__BACKSLASH__x0[aA]/\
+/;						t again
     s/__BACKSLASH__x0[bB]//;			t again
     s/__BACKSLASH__x0[cC]//;			t again
     s/__BACKSLASH__x0[dD]/'"$(printf '\r')"'/;	t again
