@@ -28,11 +28,12 @@ Building Manually (i.e. for development)
 
 You can simply run the build instructions in README.md.
 
-Noticeably, the ``libiconv`` installed by MacPorts renames the symbols of ``_iconv``, ``_iconv_open``, and ``_iconv_close`` to  ``_libiconv``, ``_libiconv_open``, and ``_libiconv_close``. You need to create a temporary workaround if you use MacPorts by 
+Noticeably, the ``libiconv`` installed by MacPorts renames the symbols of ``_iconv``, ``_iconv_open``, and ``_iconv_close`` to  ``_libiconv``, ``_libiconv_open``, and ``_libiconv_close``. You need to create a temporary workaround if you use MacPorts by::
 
     $ sudo port -f deactivate libiconv
-    $ ...build the project...
+    ...build this project...
     $ sudo port activate libiconv
+
 
 Building with Homebrew
 .............................................................................
