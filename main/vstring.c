@@ -369,3 +369,12 @@ extern vString *vStringNewOrClearWithAutoRelease (vString *const string)
 
 	return r;
 }
+
+extern void vStringTranslate(vString *const string, char fromC, char toC)
+{
+	for (int i = 0; i < vStringLength(string); i++)
+	{
+		if (string->buffer[i] == fromC)
+			string->buffer[i] = toC;
+	}
+}
