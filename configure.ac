@@ -654,6 +654,7 @@ fi
 # Process library configuration options
 # -------------------------------------
 
+ICONV_LIBS=
 if test "$enable_iconv" != no ; then
 	save_LIBS="$LIBS"
 	LIBS="$LIBS -liconv"
@@ -661,12 +662,15 @@ if test "$enable_iconv" != no ; then
 	AC_LINK_IFELSE([AC_LANG_PROGRAM([
 			#include <iconv.h>
 		], [iconv_open("fr", "to")])], [
+			LIBS="$save_LIBS"
+			ICONV_LIBS=-liconv
 			AC_MSG_RESULT(yes)
 			AC_DEFINE(HAVE_ICONV)
 		], [LIBS="$save_LIBS"
 			AC_MSG_RESULT(no)
 			AC_CHECK_FUNC(iconv_open, [AC_DEFINE(HAVE_ICONV)],
 				[AC_MSG_ERROR([Could not find libiconv. Please install libiconv and libiconv-devel.])])])
+	AC_SUBST([ICONV_LIBS])
 fi
 
 # Checks for declaration
