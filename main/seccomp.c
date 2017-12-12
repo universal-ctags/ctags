@@ -46,6 +46,9 @@ int installSyscallFilter (void)
 	// main/parse.c:2764 : tagFilePosition (&tagfpos);
 	seccomp_rule_add (ctx, SCMP_ACT_ALLOW, SCMP_SYS (lseek), 0);
 
+	// libxml2 uses pthread_once, which in turn uses a futex
+	seccomp_rule_add (ctx, SCMP_ACT_ALLOW, SCMP_SYS (futex), 0);
+
 	verbose ("Entering sandbox\n");
 	int err = seccomp_load (ctx);
 	if (err < 0)
