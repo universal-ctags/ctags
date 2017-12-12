@@ -714,12 +714,12 @@ AC_CHECK_DECLS([_NSGetEnviron],[],[],[
 [#include <crt_externs.h>]
 ])
 
-if test "$ctags_name_executable" != ctags ; then
-	AC_MSG_NOTICE(Changing name of 'ctags' for $ctags_name_executable)
+if test "$CTAGS_NAME_EXECUTABLE" != ctags ; then
+	AC_MSG_NOTICE(Changing name of 'ctags' for $CTAGS_NAME_EXECUTABLE)
 fi
 
-if test "$etags_name_executable" != etags ; then
-	AC_MSG_NOTICE(Changing name of 'etags' for $etags_name_executable)
+if test "$ETAGS_NAME_EXECUTABLE" != etags ; then
+	AC_MSG_NOTICE(Changing name of 'etags' for $ETAGS_NAME_EXECUTABLE)
 fi
 
 # Output files
