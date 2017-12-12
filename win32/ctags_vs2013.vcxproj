@@ -177,7 +177,9 @@
     <ClCompile Include="..\parsers\cxx\cxx_parser_typedef.c" />
     <ClCompile Include="..\parsers\cxx\cxx_parser_using.c" />
     <ClCompile Include="..\parsers\cxx\cxx_parser_variable.c" />
+    <ClCompile Include="..\parsers\cxx\cxx_qtmoc.c" />
     <ClCompile Include="..\parsers\cxx\cxx_scope.c" />
+    <ClCompile Include="..\parsers\cxx\cxx_subparser.c" />
     <ClCompile Include="..\parsers\cxx\cxx_tag.c" />
     <ClCompile Include="..\parsers\cxx\cxx_token.c" />
     <ClCompile Include="..\parsers\cxx\cxx_token_chain.c" />
@@ -291,6 +293,8 @@
     <ClInclude Include="..\parsers\cxx\cxx_parser.h" />
     <ClInclude Include="..\parsers\cxx\cxx_parser_internal.h" />
     <ClInclude Include="..\parsers\cxx\cxx_scope.h" />
+    <ClInclude Include="..\parsers\cxx\cxx_subparser.h" />
+    <ClInclude Include="..\parsers\cxx\cxx_subparser_internal.h" />
     <ClInclude Include="..\parsers\cxx\cxx_tag.h" />
     <ClInclude Include="..\parsers\cxx\cxx_token.h" />
     <ClInclude Include="..\parsers\cxx\cxx_token_chain.h" />

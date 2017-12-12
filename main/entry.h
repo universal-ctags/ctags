@@ -70,6 +70,10 @@ struct sTagEntryInfo {
 		const char* implementation;
 		const char* inheritance;
 
+		/* Which scopeKindIndex belong to. If the value is LANG_AUTO,
+		   the value for langType field of this structure is used as default value.
+		   LANG_AUTO is set automatically in initTagEntryInfo. */
+		langType    scopeLangType;
 		int         scopeKindIndex;
 		const char* scopeName;
 		int         scopeIndex;   /* cork queue entry for upper scope tag.

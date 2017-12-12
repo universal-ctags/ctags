@@ -15,6 +15,7 @@
 #include "cxx_token_chain.h"
 #include "cxx_scope.h"
 #include "cxx_tag.h"
+#include "cxx_subparser_internal.h"
 
 #include "parse.h"
 #include "vstring.h"
@@ -22,6 +23,8 @@
 #include "debug.h"
 #include "keyword.h"
 #include "read.h"
+#include "ptrarray.h"
+#include "trashbox.h"
 
 #include <string.h>
 
@@ -1433,7 +1436,16 @@ bool cxxParserParseAccessSpecifier(void)
 {
 	CXX_DEBUG_ENTER();
 
+	unsigned int uExtraType = 0;
+
 	enum CXXScopeType eScopeType = cxxScopeGetType();
+
+	static ptrArray *pSubparsers;
+	if (!pSubparsers)
+	{
+		pSubparsers = ptrArrayNew(NULL);
+		DEFAULT_TRASH_BOX (pSubparsers, ptrArrayDelete);
+	}
 
 	if(
 			(eScopeType != CXXScopeTypeClass) &&
@@ -1456,6 +1468,10 @@ bool cxxParserParseAccessSpecifier(void)
 		return false;
 	}
 
+
+	if (cxxSubparserNotifyParseAccessSpecifier (pSubparsers))
+		uExtraType = CXXTokenTypeIdentifier;
+
 	switch(g_cxx.pToken->eKeyword)
 	{
 		case CXXKeywordPUBLIC:
@@ -1473,17 +1489,28 @@ bool cxxParserParseAccessSpecifier(void)
 	}
 
 	// skip to the next :, without leaving scope.
+ findColon:
 	if(!cxxParserParseUpToOneOf(
+		    uExtraType |
 			CXXTokenTypeSingleColon | CXXTokenTypeSemicolon |
 				CXXTokenTypeClosingBracket | CXXTokenTypeEOF,
 			false
 		))
 	{
 		CXX_DEBUG_LEAVE_TEXT("Failed to parse up to the next ;");
+		ptrArrayClear (pSubparsers);
 		return false;
 	}
 
+	if (uExtraType && cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeIdentifier))
+	{
+		cxxSubparserNotifyfoundExtraIdentifierAsAccessSpecifier (pSubparsers,
+																 g_cxx.pToken);
+		goto findColon;
+	}
+
 	cxxTokenChainClear(g_cxx.pTokenChain);
+	ptrArrayClear (pSubparsers);
 	CXX_DEBUG_LEAVE();
 	return true;
 }

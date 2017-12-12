@@ -51,6 +51,7 @@
 #include "ptrarray.h"
 #include "sort.h"
 #include "strlist.h"
+#include "subparser.h"
 #include "trashbox.h"
 #include "writer.h"
 #include "xtag.h"
@@ -816,6 +817,7 @@ extern void getTagScopeInformation (tagEntryInfo *const tag,
 		Assert (full_qualified_scope_name);
 
 		/* Make the information reusable to generate full qualified entry, and xformat output*/
+		tag->extensionFields.scopeLangType = scope->langType;
 		tag->extensionFields.scopeKindIndex = scope->kindIndex;
 		tag->extensionFields.scopeName = full_qualified_scope_name;
 	}
@@ -825,7 +827,10 @@ extern void getTagScopeInformation (tagEntryInfo *const tag,
 	{
 		if (kind)
 		{
-			kindDefinition *kdef = getLanguageKind (tag->langType,
+			langType lang = (tag->extensionFields.scopeLangType == LANG_AUTO)
+				? tag->langType
+				: tag->extensionFields.scopeLangType;
+			kindDefinition *kdef = getLanguageKind (lang,
 													tag->extensionFields.scopeKindIndex);
 			*kind = kdef->name;
 		}
@@ -1325,6 +1330,8 @@ extern int makeTagEntry (const tagEntryInfo *const tag)
 	else
 		writeTagEntry (tag);
 
+	notifyMakeTagEntry (tag, r);
+
 	if (isXtagEnabled (XTAG_SUBWORD))
 	{
 		tagEntryInfo subtag = *tag;
@@ -1452,6 +1459,7 @@ extern void initTagEntryFull (tagEntryInfo *const e, const char *const name,
 	e->filePosition    = filePosition;
 	e->inputFileName   = inputFileName;
 	e->name            = name;
+	e->extensionFields.scopeLangType = LANG_AUTO;
 	e->extensionFields.scopeKindIndex = KIND_GHOST_INDEX;
 	e->extensionFields.scopeIndex     = CORK_NIL;
 	e->kindIndex = kindIndex;

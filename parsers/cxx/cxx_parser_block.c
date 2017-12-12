@@ -23,6 +23,8 @@
 #include "keyword.h"
 #include "read.h"
 
+#include "cxx_subparser_internal.h"
+
 #include <string.h>
 
 bool cxxParserParseBlockHandleOpeningBracket(void)
@@ -197,6 +199,14 @@ process_token:
 				vStringValue(g_cxx.pToken->pszWord),
 				g_cxx.pToken->eType
 			);
+
+		if (cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeIdentifier)
+			&& cxxScopeGetType() == CXXScopeTypeClass
+			&& cxxSubparserNewIdentifierAsHeadOfMemberNotify(g_cxx.pToken))
+		{
+			cxxTokenChainDestroyLast(g_cxx.pTokenChain);
+			continue;
+		}
 
 		switch(g_cxx.pToken->eType)
 		{
@@ -600,6 +610,8 @@ process_token:
 					}
 					cxxParserNewStatement();
 				}
+				else if (cxxScopeGetType() == CXXScopeTypeClass)
+					cxxSubparserUnknownIdentifierInClassNotify(g_cxx.pToken);
 			break;
 			default:
 				// something else we didn't handle
@@ -621,8 +633,13 @@ process_token:
 //
 bool cxxParserParseBlock(bool bExpectClosingBracket)
 {
+	cxxSubparserNotifyEnterBlock ();
+
 	cppPushExternalParserBlock();
 	bool bRet = cxxParserParseBlockInternal(bExpectClosingBracket);
 	cppPopExternalParserBlock();
+
+	cxxSubparserNotifyLeaveBlock ();
+
 	return bRet;
 }
