@@ -48,6 +48,11 @@ exit_if_win32()
 	is_feature_available $1 '!' win32
 }
 
+exit_unless_win32()
+{
+	is_feature_available $1 win32
+}
+
 exit_if_no_case_insensitive_filenames()
 {
 	is_feature_available $1 case-insensitive-filenames
