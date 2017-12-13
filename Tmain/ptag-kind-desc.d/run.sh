@@ -3,7 +3,7 @@
 
 CTAGS=$1
 
-source ../utils.sh
+. ../utils.sh
 
 {
     echo '# BUILTIN'
