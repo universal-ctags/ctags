@@ -33,6 +33,7 @@ This is a draft document. Proofreading and pull-requests are welcome!
 	:maxdepth: 2
 
 	news.rst
+	reporting.rst
 	contributions.rst
 	parsers.rst
 	output-format.rst
