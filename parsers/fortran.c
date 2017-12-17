@@ -129,6 +129,7 @@ enum eKeywordId {
 	KEYWORD_static,
 	KEYWORD_stdcall,
 	KEYWORD_structure,
+	KEYWORD_submodule,
 	KEYWORD_subroutine,
 	KEYWORD_target,
 	KEYWORD_then,
@@ -159,7 +160,8 @@ typedef enum eTokenType {
 	TOKEN_SQUARE_CLOSE,
 	TOKEN_PERCENT,
 	TOKEN_STATEMENT_END,
-	TOKEN_STRING
+	TOKEN_STRING,
+	TOKEN_COLON,
 } tokenType;
 
 typedef enum eTagType {
@@ -182,6 +184,7 @@ typedef enum eTagType {
 	TAG_SUBROUTINE,
 	TAG_DERIVED_TYPE,
 	TAG_VARIABLE,
+	TAG_SUBMODULE,
 	TAG_COUNT  /* must be last */
 } tagType;
 
@@ -237,7 +240,8 @@ static kindDefinition FortranKinds [] = {
 	{ false, 'P', "prototype",  "subprogram prototypes"},
 	{ true,  's', "subroutine", "subroutines"},
 	{ true,  't', "type",       "derived types and structures"},
-	{ true,  'v', "variable",   "program (global) and module variables"}
+	{ true,  'v', "variable",   "program (global) and module variables"},
+	{ true,  'S', "submodule",  "submodules"},
 };
 
 /* For definitions of Fortran 77 with extensions:
@@ -324,6 +328,7 @@ static const keywordTable FortranKeywordTable [] = {
 	{ "static",         KEYWORD_static       },
 	{ "stdcall",        KEYWORD_stdcall      },
 	{ "structure",      KEYWORD_structure    },
+	{ "submodule",      KEYWORD_submodule   },
 	{ "subroutine",     KEYWORD_subroutine   },
 	{ "target",         KEYWORD_target       },
 	{ "then",           KEYWORD_then         },
@@ -541,7 +546,7 @@ static void makeFortranTag (tokenInfo *const token, tagType tag)
 		}
 		if (token->parentType != NULL &&
 		    vStringLength (token->parentType) > 0 &&
-		    token->tag == TAG_DERIVED_TYPE)
+		    (token->tag == TAG_DERIVED_TYPE || (token->tag == TAG_SUBMODULE)))
 			e.extensionFields.inheritance = vStringValue (token->parentType);
 		if (token->implementation != IMP_DEFAULT)
 			e.extensionFields.implementation =
@@ -1071,7 +1076,7 @@ getNextChar:
 			else
 			{
 				ungetChar (c);
-				token->type = TOKEN_UNDEFINED;
+				token->type = TOKEN_COLON;
 			}
 			break;
 
@@ -1336,11 +1341,17 @@ static bool skipStatementIfKeyword (tokenInfo *const token, keywordId keyword)
  * parenthesis.
  */
 
+static void attachParentType (tokenInfo *const token, vString* parentType)
+{
+	if (token->parentType)
+		vStringDelete (token->parentType);
+	token->parentType = parentType;
+}
+
 static void makeParentType (tokenInfo *const token, void *userData)
 {
-	if (((tokenInfo *)userData)->parentType)
-		vStringDelete (((tokenInfo *)userData)->parentType);
-	((tokenInfo *)userData)->parentType = vStringNewCopy (token->string);
+	attachParentType ((tokenInfo *const)userData,
+					  vStringNewCopy (token->string));
 }
 
 static void parseExtendsQualifier (tokenInfo *const token,
@@ -1476,6 +1487,7 @@ static tagType variableTagType (tokenInfo *const st)
 		const tokenInfo* const parent = ancestorTop ();
 		switch (parent->tag)
 		{
+			case TAG_SUBMODULE:	/* Fall through */
 			case TAG_MODULE:       result = TAG_VARIABLE;  break;
 			case TAG_DERIVED_TYPE:
 				if (st && st->isMethod)
@@ -2284,6 +2296,56 @@ static void parseInternalSubprogramPart (tokenInfo *const token)
 	} while (! done && ! isType (token, TOKEN_EOF));
 }
 
+/* submodule is
+ *     submodule-stmt (is SUBMODULE ( parent-identifier ) submodule-name)
+ *          [specification-part]
+ *          [module-subprogram-part]
+ *          end-submodule-stmt (is END [SUBMODULE [submodule-name]])
+ *
+ * parent-identifier is
+ *     ancestor_module_name [ : parent_submodule_name ]*
+ *
+ * ------------------------------------------------------------------
+ * XL Fortran for AIX, V15.1.3
+ * Language Reference
+ * Program units and procedures
+ *   https://www.ibm.com/support/knowledgecenter/en/SSGH4D_15.1.3/com.ibm.xlf1513.aix.doc/language_ref/submodules.html
+ * -------------------------------------------------------------------
+ */
+static vString *parserParentIdentifierOfSubmoduleStatement (tokenInfo *const token)
+{
+	vString *parentId;
+
+	if (!isType (token, TOKEN_PAREN_OPEN))
+		return NULL;
+
+	parentId = vStringNew();
+
+	while (1)
+	{
+		readToken (token);
+		if (isType (token, TOKEN_IDENTIFIER))
+			vStringCat (parentId, token->string);
+		else if (isType (token, TOKEN_COLON))
+			vStringPut (parentId, ':');
+		else if (isType (token, TOKEN_PAREN_CLOSE))
+			break;
+		else
+		{
+			/* Unexpected token (including EOF) */
+			vStringClear (parentId);
+			break;
+		}
+	}
+
+	if (vStringLength (parentId) == 0)
+	{
+		vStringDelete (parentId);
+		parentId = NULL;
+	}
+	return parentId;
+}
+
 /*  module is
  *      module-stmt (is MODULE module-name)
  *          [specification-part]
@@ -2299,12 +2361,36 @@ static void parseInternalSubprogramPart (tokenInfo *const token)
  *      is function-subprogram
  *      or subroutine-subprogram
  */
-static void parseModule (tokenInfo *const token)
+static void parseModule (tokenInfo *const token, bool isSubmodule)
 {
-	Assert (isKeyword (token, KEYWORD_module));
+	vString *parentIdentifier = NULL;
+
+	Assert (((!isSubmodule) && isKeyword (token, KEYWORD_module))
+			|| (isSubmodule && isKeyword (token, KEYWORD_submodule)));
+
+
+	if (isSubmodule)
+	{
+		readToken (token);
+		parentIdentifier = parserParentIdentifierOfSubmoduleStatement (token);
+		if (parentIdentifier == NULL)
+		{
+			/* Unexpected syntax */
+			skipToNextStatement (token);
+			return;
+		}
+	}
+
 	readToken (token);
 	if (isType (token, TOKEN_IDENTIFIER))
-		makeFortranTag (token, TAG_MODULE);
+	{
+		if (isSubmodule)
+		{
+			attachParentType (token, parentIdentifier);
+			parentIdentifier = NULL;
+		}
+		makeFortranTag (token, isSubmodule? TAG_SUBMODULE: TAG_MODULE);
+	}
 	ancestorPush (token);
 	skipToNextStatement (token);
 	parseSpecificationPart (token);
@@ -2317,6 +2403,9 @@ static void parseModule (tokenInfo *const token)
 	/* secondary token should be KEYWORD_NONE or KEYWORD_module token */
 	skipToNextStatement (token);
 	ancestorPop ();
+
+	if (parentIdentifier)
+		vStringDelete (parentIdentifier);
 }
 
 /*  execution-part
@@ -2504,7 +2593,8 @@ static void parseProgramUnit (tokenInfo *const token)
 			case KEYWORD_end:        skipToNextStatement (token);       break;
 			case KEYWORD_function:
 			case KEYWORD_subroutine: parseSubprogram (token);           break;
-			case KEYWORD_module:     parseModule (token);               break;
+			case KEYWORD_submodule:  parseModule (token, true);         break;
+			case KEYWORD_module:     parseModule (token, false);        break;
 			case KEYWORD_program:    parseMainProgram (token);          break;
 
 			default:

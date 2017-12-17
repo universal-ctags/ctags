@@ -1,0 +1,6 @@
+example_smod	input.f90	/^submodule (example_mod) example_smod$/;"	submodule	inherits:example_mod
+g	input.f90	/^    module function g(/;"	function	submodule:example_smod
+example_ssmod	input.f90	/^submodule (example_mod:example_smod) example_ssmod$/;"	submodule	inherits:example_mod:example_smod
+g2	input.f90	/^    module function g2(/;"	function	submodule:example_ssmod
+x	input.f90	/^        integer :: x,/;"	variable
+y	input.f90	/^        integer :: x,y$/;"	variable
