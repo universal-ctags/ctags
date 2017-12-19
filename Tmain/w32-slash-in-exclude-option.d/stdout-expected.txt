@@ -1,0 +1,2 @@
+capture_me_0	input.d\\input.c	/^int capture_me_0(void)$/;"	f	typeref:typename:int
+capture_me_1	input.d\\capture_me\\input.c	/^int capture_me_1(void)$/;"	f	typeref:typename:int

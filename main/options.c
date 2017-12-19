@@ -1108,6 +1108,9 @@ static void processExcludeOption (
 	else
 	{
 		vString *const item = vStringNewInit (parameter);
+#if defined (WIN32)
+		vStringTranslate(item, '\\', '/');
+#endif
 		if (Excluded == NULL)
 			Excluded = stringListNew ();
 		stringListAdd (Excluded, item);

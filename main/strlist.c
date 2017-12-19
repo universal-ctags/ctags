@@ -243,11 +243,24 @@ extern vString* stringListFileFinds (
 	vString* vstr = NULL;
 	bool matched = false;
 	unsigned int i;
+	const char * normalized = fileName;
+
+#if defined (WIN32)
+	vString *tmp = vStringNewInit (fileName);
+	vStringTranslate (tmp, '\\', '/');
+	normalized = vStringValue (tmp);
+#endif
+
 	for (i = 0  ;  ! matched  &&  i < stringListCount (current)  ;  ++i)
 	{
 		vstr = stringListItem (current, i);
-		matched = fileNameMatched (vstr, fileName);
+		matched = fileNameMatched (vstr, normalized);
 	}
+
+#if defined (WIN32) && defined (UNIX_PATH_SEPARATOR)
+	vStringDelete (tmp);
+#endif
+
 	return matched? vstr: NULL;
 }
 

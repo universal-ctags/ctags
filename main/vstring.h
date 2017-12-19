@@ -76,6 +76,7 @@ extern void vStringNCopyS (vString *const string, const char *const s, const siz
 extern void vStringCopyToLower (vString *const dest, const vString *const src);
 extern void vStringSetLength (vString *const string);
 extern void vStringTruncate (vString *const string, const size_t length);
+extern void vStringTranslate(vString *const string, char fromC, char toC);
 
 extern vString *vStringNewOrClear (vString *const string);
 extern vString *vStringNewOrClearWithAutoRelease (vString *const string);
