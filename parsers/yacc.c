@@ -23,9 +23,9 @@
 static bool not_in_grammar_rules = true;
 static bool in_union;
 static tagRegexTable yaccTagRegexTable [] = {
-	{"^([A-Za-z][A-Za-z_0-9]+)[ \t]*:", "\\1",
+	{"^[ \t]*([A-Za-z][A-Za-z_0-9]+)[ \t]*:", "\\1",
 	 "l,label,labels", NULL, &not_in_grammar_rules },
-	{"^([A-Za-z][A-Za-z_0-9]+)[ \t]*$", "\\1",
+	{"^[ \t]*([A-Za-z][A-Za-z_0-9]+)[ \t]*$", "\\1",
 	 "l,label,labels", NULL, &not_in_grammar_rules },
 };
 
