@@ -3959,7 +3959,7 @@ static void createCTSTTags (void)
 						le = getInputLineNumber ();
 						makePromise (SELF_TEST_PARSER, lb + 1, 0, le, 0, lb + 1);
 						break;
-#ifdef DEBUG
+#if ! __MINGW32__ && DEBUG
 				    case K_CALL_GETPPID:
 						getppid();
 						break;
