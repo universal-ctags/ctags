@@ -146,7 +146,7 @@ static void initializeYaccParser (langType language)
 	   %{ ...
 		C language
 	   %}
-		TOKE DEFINITIONS
+		TOKEN DEFINITIONS
 	   %%
 		SYNTAX
 	   %%
