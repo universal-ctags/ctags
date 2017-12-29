@@ -1447,7 +1447,9 @@ extern void initTagEntryFull (tagEntryInfo *const e, const char *const name,
 			      long sourceLineNumberDifference)
 {
 	int i;
+#if DEBUG
 	kindDefinition *kind = getLanguageKind(langType_, kindIndex);
+#endif
 
 	Assert (getInputFileName() != NULL);
 
