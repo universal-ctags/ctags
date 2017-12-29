@@ -3236,7 +3236,7 @@ extern void processLanguageMultitableExtendingOption (langType language, const c
 	eFree (dist);
 }
 
-static bool lregexQueryParserAndSubparesrs (const langType language, bool (* predicate) (struct lregexControlBlock *))
+static bool lregexQueryParserAndSubparsers (const langType language, bool (* predicate) (struct lregexControlBlock *))
 {
 	bool r;
 	subparser *tmp;
@@ -3248,7 +3248,7 @@ static bool lregexQueryParserAndSubparesrs (const langType language, bool (* pre
 		{
 			langType t = getSubparserLanguage (tmp);
 			enterSubparser (tmp);
-			r = lregexQueryParserAndSubparesrs (t, predicate);
+			r = lregexQueryParserAndSubparsers (t, predicate);
 			leaveSubparser ();
 
 			if (r)
@@ -3261,7 +3261,7 @@ static bool lregexQueryParserAndSubparesrs (const langType language, bool (* pre
 
 extern bool hasLanguageMultilineRegexPatterns (const langType language)
 {
-	return lregexQueryParserAndSubparesrs (language, regexNeedsMultilineBuffer);
+	return lregexQueryParserAndSubparsers (language, regexNeedsMultilineBuffer);
 }
 
 
@@ -3276,7 +3276,7 @@ extern bool hasLanguageScopeActionInRegex (const langType language)
 	bool hasScopeAction;
 
 	pushLanguage (language);
-	hasScopeAction = lregexQueryParserAndSubparesrs (language, hasScopeActionInRegex);
+	hasScopeAction = lregexQueryParserAndSubparsers (language, hasScopeActionInRegex);
 	popLanguage ();
 
 	return hasScopeAction;
