@@ -485,10 +485,10 @@ Compatible output and weakness
 
 .. NOT REVIEWED YET
 
-Default behavior (``--output-format=u-ctags`` option) has the
-exceptions.  In other hand, with ``--output-format=e-ctags`` option
+Default behavior (``--format=3`` option) has the
+exceptions.  In other hand, with ``--format=2`` option
 ctags has no exception; Universal-ctags command may use the same file
-format as Exuberant-ctags. However, ``--output-format=e-ctags`` throws
+format as Exuberant-ctags. However, ``--format=2`` throws
 away a tag entry which name includes a space or a tab
-character. ``TAG_OUTPUT_MODE`` pseudo tag tells which format is
+character. ``TAG_FILE_FORMAT`` pseudo tag tells which format is
 used when ctags generating tags file.

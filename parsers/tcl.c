@@ -391,7 +391,7 @@ static void notifyNamespaceImport (tokenInfo *const token)
 static int notifyCommand (tokenInfo *const token, unsigned int parent)
 {
 	subparser *sub;
-	int r;
+	int r = CORK_NIL;
 
 	foreachSubparser (sub, false)
 	{

@@ -3236,7 +3236,7 @@ extern void processLanguageMultitableExtendingOption (langType language, const c
 	eFree (dist);
 }
 
-static bool lregexQueryParserAndSubparesrs (const langType language, bool (* predicate) (struct lregexControlBlock *))
+static bool lregexQueryParserAndSubparsers (const langType language, bool (* predicate) (struct lregexControlBlock *))
 {
 	bool r;
 	subparser *tmp;
@@ -3248,7 +3248,7 @@ static bool lregexQueryParserAndSubparesrs (const langType language, bool (* pre
 		{
 			langType t = getSubparserLanguage (tmp);
 			enterSubparser (tmp);
-			r = lregexQueryParserAndSubparesrs (t, predicate);
+			r = lregexQueryParserAndSubparsers (t, predicate);
 			leaveSubparser ();
 
 			if (r)
@@ -3261,7 +3261,7 @@ static bool lregexQueryParserAndSubparesrs (const langType language, bool (* pre
 
 extern bool hasLanguageMultilineRegexPatterns (const langType language)
 {
-	return lregexQueryParserAndSubparesrs (language, regexNeedsMultilineBuffer);
+	return lregexQueryParserAndSubparsers (language, regexNeedsMultilineBuffer);
 }
 
 
@@ -3276,7 +3276,7 @@ extern bool hasLanguageScopeActionInRegex (const langType language)
 	bool hasScopeAction;
 
 	pushLanguage (language);
-	hasScopeAction = lregexQueryParserAndSubparesrs (language, hasScopeActionInRegex);
+	hasScopeAction = lregexQueryParserAndSubparsers (language, hasScopeActionInRegex);
 	popLanguage ();
 
 	return hasScopeAction;
@@ -3843,7 +3843,7 @@ extern void addLanguageTagMultiTableRegex(const langType language,
  * A parser for CTagsSelfTest (CTST)
  */
 #define SELF_TEST_PARSER "CTagsSelfTest"
-#ifdef DEBUG
+#if defined(DEBUG) && defined(HAVE_SECCOMP)
 extern void getppid(void);
 #endif
 
@@ -3854,7 +3854,7 @@ typedef enum {
 	K_NOTHING_SPECIAL,
 	K_GUEST_BEGINNING,
 	K_GUEST_END,
-#ifdef DEBUG
+#if defined(DEBUG) && defined(HAVE_SECCOMP)
 	K_CALL_GETPPID,
 #endif
 	K_DISABLED,
@@ -3901,7 +3901,7 @@ static kindDefinition CTST_Kinds[KIND_COUNT] = {
 	{true, 'N', "nothingSpecial", "emit a normal tag" },
 	{true, 'B', NULL, "beginning of an area for a guest" },
 	{true, 'E', NULL, "end of an area for a guest" },
-#ifdef DEBUG
+#if defined(DEBUG) && defined(HAVE_SECCOMP)
 	{true, 'P', "callGetPPid", "trigger calling getppid(2) that seccomp sandbox disallows"},
 #endif
 	{false,'d', "disabled", "a kind disabled by default",
@@ -3959,7 +3959,7 @@ static void createCTSTTags (void)
 						le = getInputLineNumber ();
 						makePromise (SELF_TEST_PARSER, lb + 1, 0, le, 0, lb + 1);
 						break;
-#ifdef DEBUG
+#if defined(DEBUG) && defined(HAVE_SECCOMP)
 				    case K_CALL_GETPPID:
 						getppid();
 						break;

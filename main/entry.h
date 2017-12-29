@@ -31,6 +31,7 @@
 */
 #define WHOLE_FILE  -1L
 #define includeExtensionFlags()         (Option.tagFileFormat > 1)
+#define escapeMetacharacters()          (Option.tagFileFormat > 2)
 
 /*
 *   DATA DECLARATIONS

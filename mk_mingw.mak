@@ -33,7 +33,7 @@ endif
 #
 # Silent/verbose commands
 #
-# when V is not set the output of commands is omited or simplified
+# when V is not set the output of commands is omitted or simplified
 #
 V	 ?= 0
 
