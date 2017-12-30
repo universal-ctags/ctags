@@ -969,7 +969,7 @@ extern const unsigned char *readLineFromInputFile (void)
 	{
 		result = (const unsigned char*) vStringValue (line);
 		vStringStripNewline (line);
-		DebugStatement ( debugPrintf (DEBUG_READ, "%s\n", result); )
+		DebugStatement ( debugPrintf (DEBUG_READ, "[%04d] |%s|\n", (int)getInputLineNumber (), result); )
 	}
 	return result;
 }
