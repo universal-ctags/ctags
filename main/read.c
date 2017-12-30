@@ -877,7 +877,7 @@ static vString *iFileGetLine (void)
 			parseLineDirective (vStringValue (File.line) + 1);
 		matchLanguageRegex (getInputLanguage (), File.line);
 
-		if (use_multiline)
+		if (use_multiline && File.allLines)
 			vStringCat (File.allLines, File.line);
 
 		return File.line;
