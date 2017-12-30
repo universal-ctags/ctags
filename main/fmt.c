@@ -64,7 +64,7 @@ static int printTagField (fmtSpec* fspec, MIO* fp, const tagEntryInfo * tag)
 	else
 	{
 		unsigned int findex;
-		const tagField *f;
+		const tagField *f = NULL;
 
 		for (findex = 0; findex < tag->usedParserFields; findex++)
 		{
@@ -73,7 +73,7 @@ static int printTagField (fmtSpec* fspec, MIO* fp, const tagEntryInfo * tag)
 				break;
 		}
 
-		if (findex == tag->usedParserFields)
+		if (!f)
 			str = "";
 		else if (isFieldEnabled (f->ftype))
 			/* TODO: Don't use WRITER_XREF directly */
