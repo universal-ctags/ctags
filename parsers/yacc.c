@@ -26,10 +26,11 @@ static bool not_in_section2 = true;
 static bool not_in_section3 = true;
 static bool in_union;
 static tagRegexTable yaccTagRegexTable [] = {
-	{"^([A-Za-z][A-Za-z_0-9]+)[ \t]*:", "\\1",
-	 "l,label,labels", NULL, &not_in_grammar_rules },
-	{"^([A-Za-z][A-Za-z_0-9]+)[ \t]*$", "\\1",
-	 "l,label,labels", NULL, &not_in_grammar_rules },
+	{"^[[:blank:]]*([a-zA-Z][a-zA-Z0-9_.-]+)"
+	  "(/[*]+([*]+[^/]|[^*/]|/|\\s)*[*]+/|//[^\\n]*|\\s)*"
+	  ":",
+	  "\\1","n,nonterminal,non-terminals", "{mgroup=1}",
+	  &not_in_section2, true },
 };
 
 struct cStart {
