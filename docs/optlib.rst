@@ -214,7 +214,7 @@ Here is the mapping between the standard short flag names and long flag names:
 short flag  long flag
 =========== ===========
 b           basic
-e           extend
+x           extend
 i           icase
 =========== ===========
 
