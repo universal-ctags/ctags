@@ -23,9 +23,9 @@
 static bool not_in_grammar_rules = true;
 static bool in_union;
 static tagRegexTable yaccTagRegexTable [] = {
-	{"^([A-Za-z][A-Za-z_0-9]+)[ \t]*:", "\\1",
+	{"^[ \t]*([A-Za-z][A-Za-z_0-9]+)[ \t]*:", "\\1",
 	 "l,label,labels", NULL, &not_in_grammar_rules },
-	{"^([A-Za-z][A-Za-z_0-9]+)[ \t]*$", "\\1",
+	{"^[ \t]*([A-Za-z][A-Za-z_0-9]+)[ \t]*$", "\\1",
 	 "l,label,labels", NULL, &not_in_grammar_rules },
 };
 
@@ -146,7 +146,7 @@ static void initializeYaccParser (langType language)
 	   %{ ...
 		C language
 	   %}
-		TOKE DEFINITIONS
+		TOKEN DEFINITIONS
 	   %%
 		SYNTAX
 	   %%
@@ -157,7 +157,7 @@ static void initializeYaccParser (langType language)
 
 	memset (&cStart, 0, sizeof (cStart));
 
-	addLanguageCallbackRegex (language, "^%\\{", "{exclusive}", enter_c_prologue, NULL, &cStart);
+	addLanguageCallbackRegex (language, "^(%code[ \\t]+(requires|provides|top|imports)[ \\t]*|%code[ \\t]*|%)\\{", "{exclusive}", enter_c_prologue, NULL, &cStart);
 	addLanguageCallbackRegex (language, "^%\\}", "{exclusive}", leave_c_prologue, NULL, &cStart);
 
 	addLanguageCallbackRegex (language, "^%%", "{exclusive}", change_section, NULL, NULL);
