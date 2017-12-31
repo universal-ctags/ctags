@@ -69,6 +69,8 @@ AH_VERBATIM([EXTERNAL_SORT], [
 ])
 AH_TEMPLATE([HAVE_ICONV],
 	[Define this value if support multibyte character encoding.])
+AH_TEMPLATE([ICONV_USE_LIB_PREFIX],
+	[Define this value if the platform uses "lib" as prefix for iconv functions.])
 AH_TEMPLATE([TMPDIR],
 	[If you wish to change the directory in which temporary files are stored,
 	define this label to the directory desired.])
@@ -654,19 +656,53 @@ fi
 # Process library configuration options
 # -------------------------------------
 
+ICONV_LIBS=
 if test "$enable_iconv" != no ; then
 	save_LIBS="$LIBS"
+	#
+	# Working around for issue #1620
+	#
+	LIBS="$LIBS $LIBXML_LIBS"
+	LIBS="$LIBS $JANSSON_LIBS"
+	LIBS="$LIBS $SECCOMP_LIBS"
+	LIBS="$LIBS $LIBYAML_LIBS"
+	LIBS="$LIBS $ASPELL_LIBS"
 	LIBS="$LIBS -liconv"
-	AC_MSG_CHECKING(for iconv_open with -liconv)
+	#
+	AC_MSG_CHECKING(for iconv_open or libiconv_open with -liconv)
 	AC_LINK_IFELSE([AC_LANG_PROGRAM([
 			#include <iconv.h>
 		], [iconv_open("fr", "to")])], [
-			AC_MSG_RESULT(yes)
-			AC_DEFINE(HAVE_ICONV)
-		], [LIBS="$save_LIBS"
-			AC_MSG_RESULT(no)
-			AC_CHECK_FUNC(iconv_open, [AC_DEFINE(HAVE_ICONV)],
-				[AC_MSG_ERROR([Could not find libiconv. Please install libiconv and libiconv-devel.])])])
+		#
+		# iconv_open is available in libiconv.
+		#
+		LIBS="$save_LIBS"
+		ICONV_LIBS=-liconv
+		AC_MSG_RESULT([yes(iconv)])
+		AC_DEFINE(HAVE_ICONV)
+		], [AC_LINK_IFELSE([AC_LANG_PROGRAM([
+		#include <iconv.h>
+		], [libiconv_open("fr", "to")])],[
+		#
+		# libiconv_open is available in libiconv
+		#
+		LIBS="$save_LIBS"
+		ICONV_LIBS=-liconv
+		AC_MSG_RESULT([yes(libiconv_open)])
+		AC_DEFINE(HAVE_ICONV)
+		AC_DEFINE(ICONV_USE_LIB_PREFIX)
+		],[LIBS="$save_LIBS"
+		AC_MSG_RESULT(no)
+		AC_CHECK_FUNC(iconv_open, [
+		#
+		# iconv_open is available in libc.
+		# No extra -l flag is needed.
+		#
+		AC_DEFINE(HAVE_ICONV)
+		], [
+		AC_MSG_ERROR([Could not find libiconv. Please install libiconv and libiconv-devel.])])])
+		])
+	AC_SUBST([ICONV_LIBS])
 fi
 
 # Checks for declaration
@@ -678,12 +714,12 @@ AC_CHECK_DECLS([_NSGetEnviron],[],[],[
 [#include <crt_externs.h>]
 ])
 
-if test "$ctags_name_executable" != ctags ; then
-	AC_MSG_NOTICE(Changing name of 'ctags' for $ctags_name_executable)
+if test "$CTAGS_NAME_EXECUTABLE" != ctags ; then
+	AC_MSG_NOTICE(Changing name of 'ctags' for $CTAGS_NAME_EXECUTABLE)
 fi
 
-if test "$etags_name_executable" != etags ; then
-	AC_MSG_NOTICE(Changing name of 'etags' for $etags_name_executable)
+if test "$ETAGS_NAME_EXECUTABLE" != etags ; then
+	AC_MSG_NOTICE(Changing name of 'etags' for $ETAGS_NAME_EXECUTABLE)
 fi
 
 # Output files
