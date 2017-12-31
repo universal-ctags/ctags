@@ -21,6 +21,9 @@
 
 
 static bool not_in_grammar_rules = true;
+static int section = 1;
+static bool not_in_section2 = true;
+static bool not_in_section3 = true;
 static bool in_union;
 static tagRegexTable yaccTagRegexTable [] = {
 	{"^([A-Za-z][A-Za-z_0-9]+)[ \t]*:", "\\1",
@@ -40,8 +43,11 @@ static  bool change_section (const char *line CTAGS_ATTR_UNUSED,
 			     void *data CTAGS_ATTR_UNUSED)
 {
 	not_in_grammar_rules = !not_in_grammar_rules;
+	section++;
+	not_in_section2 = section != 2;
+	not_in_section3 = section != 3;
 
-	if (not_in_grammar_rules)
+	if ( section == 3 )
 	{
 		const unsigned char *tmp, *last;
 		long endCharOffset;
@@ -143,13 +149,16 @@ static bool leave_union (const char *line CTAGS_ATTR_UNUSED,
 static void initializeYaccParser (langType language)
 {
 	/*
+	  SECTION 1:
 	   %{ ...
 		C language
 	   %}
-		TOKE DEFINITIONS
+		TOKEN DEFINITIONS
 	   %%
-		SYNTAX
+	  SECTION 2:
+		GRAMMAR
 	   %%
+	  SECTION 3:
 		C language
 	*/
 
@@ -170,6 +179,8 @@ static void runYaccParser (void)
 {
 	in_union = false;
 	not_in_grammar_rules = true;
+	section = 1;
+	not_in_section2 = not_in_section3 = true;
 
 	findRegexTags ();
 }
