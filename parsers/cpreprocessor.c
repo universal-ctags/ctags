@@ -1335,6 +1335,13 @@ process:
 						}
 					}
 				}
+				else if(isxdigit(c))
+				{
+					/* Check for digit separator. If we find it we just skip it */
+					int next = cppGetcFromUngetBufferOrFile();
+					if(next != SINGLE_QUOTE)
+						cppUngetc(next);
+				}
 			enter:
 				Cpp.directive.accept = false;
 				if (directive)
