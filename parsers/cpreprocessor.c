@@ -1334,7 +1334,8 @@ process:
 							break;
 						}
 					}
-				} else if(isxdigit(c))
+				}
+				else if(isxdigit(c))
 				{
 					/* Check for digit separator. If we find it we just skip it */
 					int next = cppGetcFromUngetBufferOrFile();
