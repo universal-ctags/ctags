@@ -1334,11 +1334,7 @@ process:
 							break;
 						}
 					}
-				} else if(
-						((c >= '0') && (c <= '9')) ||
-						((c >= 'a') && (c <= 'f')) ||
-						((c >= 'A') && (c <= 'F'))
-					)
+				} else if(isxdigit(c))
 				{
 					/* Check for digit separator. If we find it we just skip it */
 					int next = cppGetcFromUngetBufferOrFile();
