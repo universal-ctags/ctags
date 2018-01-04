@@ -1511,7 +1511,7 @@ Customizing xref output
 The notation for FORMAT is similar to that employed by `printf(3)` in
 the C language; `%` represents a slot which is substituted with a
 field value when printing. You can specify multiple slots in FORMAT.
-Here field means an item listed with ``-list-fields`` option.
+Here field means an item listed with ``--list-fields`` option.
 
 The notation of a slot::
 
