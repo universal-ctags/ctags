@@ -95,6 +95,11 @@ static void findTag (const char *const name, const int options)
 				printTag (&entry);
 			} while (tagsFindNext (file, &entry) == TagSuccess);
 		}
+		else
+		{
+			fprintf (stderr, "%s: no match found for \"%s\" in \"%s\"\n",
+					ProgramName, name, TagFileName);
+		}
 		tagsClose (file);
 	}
 }
