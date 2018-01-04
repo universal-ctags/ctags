@@ -17,6 +17,7 @@ static int extensionFields;
 static int SortOverride;
 static sortType SortMethod;
 static int allowPrintLineNumber;
+static int debugMode;
 #ifdef QUALIFIER
 #include "dsl/qualifier.h"
 static QCode *Qualifier;
@@ -143,6 +144,7 @@ static const char *const Usage =
 #endif
 	"[-s[0|1]] [-t file] [-] [name(s)]\n\n"
 	"Options:\n"
+	"    -d           Turn on debugging output.\n"
 	"    -e           Include extension fields in output.\n"
 	"    -h           Print this help message.\n"
 	"    -i           Perform case-insensitive matching.\n"
@@ -220,6 +222,7 @@ extern int main (int argc, char **argv)
 			{
 				switch (arg [j])
 				{
+					case 'd': debugMode++; break;
 					case 'h': printUsage (stdout, 0); break;
 					case 'e': extensionFields = 1;         break;
 					case 'i': options |= TAG_IGNORECASE;   break;
