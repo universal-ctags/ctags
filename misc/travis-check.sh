@@ -39,12 +39,12 @@ if [ "$TARGET" = "Unix" ]; then
 		${CONFIGURE_CMDLINE} --enable-coverage-gcov
         make -j2 COVERAGE=1
         echo 'Run "make check" with gcov'
-        make -j2 check TRAVIS=1
+        make -j2 check roundtrip TRAVIS=1
 
     else
 		${CONFIGURE_CMDLINE}
         make -j2
-        make -j2 check TRAVIS=1
+        make -j2 check roundtrip TRAVIS=1
     fi
 elif [ "$TARGET" = "Mingw32" ]; then
     make -j2 CC=i686-w64-mingw32-gcc -f mk_mingw.mak
