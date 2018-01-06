@@ -13,7 +13,7 @@ jobs:
        - run:
            name: Install build tools
            command: |
-             dnf -y install gcc automake autoconf pkgconfig bmake aspell-devel aspell-en libxml2-devel jansson-devel libyaml-devel || :
+             dnf -y install gcc automake autoconf pkgconfig bmake aspell-devel aspell-en libxml2-devel jansson-devel libyaml-devel findutils || :
        - run:
            name: Build
            command: |
@@ -23,4 +23,4 @@ jobs:
        - run:
            name: Test
            command: |
-             bmake check CIRCLECI=1
+             bmake check roundtrip CIRCLECI=1
