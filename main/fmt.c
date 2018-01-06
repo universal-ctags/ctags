@@ -77,7 +77,7 @@ static int printTagField (fmtSpec* fspec, MIO* fp, const tagEntryInfo * tag)
 			str = "";
 		else if (isFieldEnabled (f->ftype))
 			/* TODO: Don't use WRITER_XREF directly */
-			str = renderFieldEscaped (WRITER_XREF, tag->parserFields [findex].ftype,
+			str = renderFieldEscaped (WRITER_XREF, f->ftype,
 						  tag, findex, NULL);
 	}
 

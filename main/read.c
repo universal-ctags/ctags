@@ -855,7 +855,8 @@ static eolType readLine (vString *const vLine, MIO *const mio)
 static vString *iFileGetLine (void)
 {
 	eolType eol;
-	bool use_multiline = hasLanguageMultilineRegexPatterns (getInputLanguage ());
+	langType lang = getInputLanguage();
+	bool use_multiline = hasLanguageMultilineRegexPatterns (lang);
 
 	if (File.line == NULL)
 		File.line = vStringNew ();
@@ -875,7 +876,7 @@ static vString *iFileGetLine (void)
 
 		if (Option.lineDirectives && vStringChar (File.line, 0) == '#')
 			parseLineDirective (vStringValue (File.line) + 1);
-		matchLanguageRegex (getInputLanguage (), File.line);
+		matchLanguageRegex (lang, File.line);
 
 		if (use_multiline)
 			vStringCat (File.allLines, File.line);
@@ -886,8 +887,8 @@ static vString *iFileGetLine (void)
 	{
 		if (use_multiline)
 		{
-			matchLanguageMultilineRegex (getInputLanguage (), File.allLines);
-			matchLanguageMultitableRegex (getInputLanguage (), File.allLines);
+			matchLanguageMultilineRegex (lang, File.allLines);
+			matchLanguageMultitableRegex (lang, File.allLines);
 			vStringDelete (File.allLines);
 			File.allLines = NULL;
 		}

@@ -1,0 +1,18 @@
+X	input.cpp	/^class X$/;"	c	file:
+a1	input.cpp	/^long a1=1'048'576;$/;"	v	typeref:typename:long
+a2	input.cpp	/^long a2=0x10'0000;$/;"	v	typeref:typename:long
+a3	input.cpp	/^long a3=00'04'00'00'00;$/;"	v	typeref:typename:long
+a4	input.cpp	/^long a4=0b100'000000'000000'000000;$/;"	v	typeref:typename:long
+b1	input.cpp	/^	long b1=1'048'576;$/;"	l	function:test	typeref:typename:long	file:
+b2	input.cpp	/^	long b2=0x10'0000;$/;"	l	function:test	typeref:typename:long	file:
+b3	input.cpp	/^	long b3=00'04'00'00'00;$/;"	l	function:test	typeref:typename:long	file:
+b4	input.cpp	/^	long b4=0b100'000000'000000'000000;$/;"	l	function:test	typeref:typename:long	file:
+c1	input.cpp	/^	long c1 = 'a';$/;"	l	function:test	typeref:typename:long	file:
+c2	input.cpp	/^	long c2 = 'a';$/;"	l	function:test	typeref:typename:long	file:
+c3	input.cpp	/^	long c3 = 'a';$/;"	l	function:test	typeref:typename:long	file:
+c4	input.cpp	/^	long c4 = 'a';$/;"	l	function:test	typeref:typename:long	file:
+m1	input.cpp	/^	long m1=1'048'576;$/;"	m	class:X	typeref:typename:long	file:
+m2	input.cpp	/^	long m2=0x10'0000;$/;"	m	class:X	typeref:typename:long	file:
+m3	input.cpp	/^	long m3=00'04'00'00'00;$/;"	m	class:X	typeref:typename:long	file:
+m4	input.cpp	/^	long m4=0b100'000000'000000'000000;$/;"	m	class:X	typeref:typename:long	file:
+test	input.cpp	/^void test()$/;"	f	typeref:typename:void

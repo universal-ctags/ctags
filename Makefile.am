@@ -17,6 +17,7 @@ bin_PROGRAMS = ctags
 if USE_READCMD
 bin_PROGRAMS+= readtags
 readtags_CPPFLAGS = -I. -I$(srcdir) -I$(srcdir)/main -I$(srcdir)/read
+readtags_CFLAGS = $(COVERAGE_CFLAGS)
 dist_readtags_SOURCES = $(READTAGS_SRCS) $(READTAGS_HEADS)
 readtags_CPPFLAGS += -DQUALIFIER -I$(srcdir)/dsl
 dist_readtags_SOURCES += $(QUALIFIER_SRCS) $(QUALIFIER_HEADS)
@@ -72,6 +73,7 @@ ctags_LDADD += $(JANSSON_LIBS)
 ctags_LDADD += $(LIBYAML_LIBS)
 ctags_LDADD += $(SECCOMP_LIBS)
 ctags_LDADD += $(ASPELL_LIBS)
+ctags_LDADD += $(ICONV_LIBS)
 
 nodist_ctags_SOURCES = $(REPOINFO_HEADS)
 BUILT_SOURCES = $(REPOINFO_HEADS)
