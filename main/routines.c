@@ -918,7 +918,7 @@ extern MIO *tempFile (const char *const mode, char **const pName)
 	fd = open (name, O_RDWR | O_CREAT | O_EXCL, S_IRUSR | S_IWUSR);
 #endif
 	if (fd == -1)
-		error (FATAL | PERROR, "cannot open temporary file");
+		error (FATAL | PERROR, "cannot open temporary file: %s", name);
 	fp = fdopen (fd, mode);
 	if (fp == NULL)
 		error (FATAL | PERROR, "cannot open temporary file");

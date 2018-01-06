@@ -18,13 +18,21 @@ LANGUAGES=
 CATEGORIES=
 UNITS=
 
+SILENT = $(SILENT_@AM_V@)
+SILENT_ = $(SILENT_@AM_DEFAULT_V@)
+SILENT_0 = @
+
+V_RUN = $(V_RUN_@AM_V@)
+V_RUN_ = $(V_RUN_@AM_DEFAULT_V@)
+V_RUN_0 = @echo "  RUN      $@";
+
 #
 # FUZZ Target
 #
 # SHELL must be dash or bash.
 #
 fuzz: $(CTAGS_TEST)
-	@ \
+	$(V_RUN) \
 	if test -n "$${ZSH_VERSION+set}"; then set -o SH_WORD_SPLIT; fi; \
 	if test x$(VG) = x1; then		\
 		VALGRIND=--with-valgrind;	\
@@ -40,7 +48,7 @@ fuzz: $(CTAGS_TEST)
 # NOISE Target
 #
 noise: $(CTAGS_TEST)
-	@ \
+	$(V_RUN) \
 	if test -n "$${ZSH_VERSION+set}"; then set -o SH_WORD_SPLIT; fi; \
 	if test x$(VG) = x1; then		\
 		VALGRIND=--with-valgrind;	\
@@ -56,7 +64,7 @@ noise: $(CTAGS_TEST)
 # CHOP Target
 #
 chop: $(CTAGS_TEST)
-	@ \
+	$(V_RUN) \
 	if test -n "$${ZSH_VERSION+set}"; then set -o SH_WORD_SPLIT; fi; \
 	if test x$(VG) = x1; then		\
 		VALGRIND=--with-valgrind;	\
@@ -68,7 +76,7 @@ chop: $(CTAGS_TEST)
 		--with-timeout=$(TIMEOUT)"; \
 	$(SHELL) $${c} $(srcdir)/Units
 slap: $(CTAGS_TEST)
-	@ \
+	$(V_RUN) \
 	if test -n "$${ZSH_VERSION+set}"; then set -o SH_WORD_SPLIT; fi; \
 	if test x$(VG) = x1; then		\
 		VALGRIND=--with-valgrind;	\
@@ -84,7 +92,7 @@ slap: $(CTAGS_TEST)
 # UNITS Target
 #
 units: $(CTAGS_TEST)
-	@ \
+	$(V_RUN) \
 	if test -n "$${ZSH_VERSION+set}"; then set -o SH_WORD_SPLIT; fi; \
 	if test x$(VG) = x1; then		\
 		VALGRIND=--with-valgrind;	\
@@ -115,8 +123,7 @@ clean-units:
 # Test main part, not parsers
 #
 tmain: $(CTAGS_TEST)
-	@ \
-	\
+	$(V_RUN) \
 	if test -n "$${ZSH_VERSION+set}"; then set -o SH_WORD_SPLIT; fi; \
 	if test x$(VG) = x1; then		\
 		VALGRIND=--with-valgrind;	\
@@ -144,22 +151,22 @@ clean-tmain:
 # Test installation
 #
 tinst:
-	@ \
-	\
+	$(V_RUN) \
 	builddir=$$(pwd); \
 	rm -rf $$builddir/$(TINST_ROOT); \
-	\
 	$(SHELL) $(srcdir)/misc/tinst $(srcdir) $$builddir/$(TINST_ROOT)
 
 #
 # Test readtags
 #
+if USE_READCMD
 roundtrip: $(READ_TEST)
-	@ \
-	\
+	$(V_RUN) \
 	builddir=$$(pwd); \
-	\
 	$(SHELL) $(srcdir)/misc/roundtrip $(READ_TEST) $${builddir}/Units
+else
+roundtrip:
+endif
 
 #
 # Checking code in ctags own rules
