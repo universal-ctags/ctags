@@ -2053,35 +2053,34 @@ static void storeAdaTags(adaTokenInfo *token, const char *parentScope)
   char *currentScope = NULL;
   adaTokenInfo *tmp = NULL;
 
-  if(token != NULL)
+  Assert(token);
+
+  /* do a spec transition if necessary */
+  if(token->isSpec == true)
   {
-    /* do a spec transition if necessary */
-    if(token->isSpec == true)
-    {
-      makeSpec(&token->kind);
+	makeSpec(&token->kind);
 
-      if(token->kind != ADA_KIND_UNDEFINED)
-      {
-        token->tag.kindIndex = token->kind;
-      }
-    }
+	if(token->kind != ADA_KIND_UNDEFINED)
+	{
+	  token->tag.kindIndex = token->kind;
+	}
+  }
 
-    /* fill in the scope data */
-    if(token->parent != NULL)
-    {
-      if(token->parent->kind > ADA_KIND_UNDEFINED &&
-         token->parent->kind < ADA_KIND_COUNT)
-      {
-        token->tag.extensionFields.scopeKindIndex = token->parent->kind;
-        token->tag.extensionFields.scopeName = token->parent->name;
-      }
-      else if(token->parent->kind == ADA_KIND_SEPARATE)
-      {
-        token->tag.extensionFields.scopeKindIndex = ADA_KIND_SEPARATE;
-        token->tag.extensionFields.scopeName = token->parent->name;
-      }
-    } /* else if(token->parent->kind == ADA_KIND_ANONYMOUS) */
-  } /* if(token->parent != NULL) */
+  /* fill in the scope data */
+  if(token->parent != NULL)
+  {
+	if(token->parent->kind > ADA_KIND_UNDEFINED &&
+	   token->parent->kind < ADA_KIND_COUNT)
+	{
+	  token->tag.extensionFields.scopeKindIndex = token->parent->kind;
+	  token->tag.extensionFields.scopeName = token->parent->name;
+	}
+	else if(token->parent->kind == ADA_KIND_SEPARATE)
+	{
+	  token->tag.extensionFields.scopeKindIndex = ADA_KIND_SEPARATE;
+	  token->tag.extensionFields.scopeName = token->parent->name;
+	}
+  } /* else if(token->parent->kind == ADA_KIND_ANONYMOUS) */
 
   /* one check before we try to make a tag... If this is an anonymous
    * declare block then it's name is empty.  Give it one */
