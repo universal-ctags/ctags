@@ -1,0 +1,6 @@
+S::T::E::alpha and S::T::E::beta are not included intentionally
+Taken from the comments of cxx_tag.c::
+
+	// If the scope kind is enumeration then we need to remove the
+	// last scope part. This is what old ctags did.
+
