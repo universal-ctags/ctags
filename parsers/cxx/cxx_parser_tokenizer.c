@@ -867,11 +867,20 @@ static CXXCharTypeData g_aCharTable[128] =
 	{ 0, 0, 0 }
 };
 
+//
 // The __attribute__((...)) sequence complicates parsing quite a lot.
 // For this reason we attempt to "hide" it from the rest of the parser
 // at tokenizer level.
+//
+// Returns false if it finds an EOF. This is an important invariant required by
+// cxxParserParseNextToken(), the only caller.
+//
 static bool cxxParserParseNextTokenCondenseAttribute(void)
 {
+	// Since cxxParserParseNextToken() returns false only when it has found
+	// an EOF, this function must do the same.
+	// This means that any broken input must be discarded here.
+
 	CXX_DEBUG_ENTER();
 
 	CXX_DEBUG_ASSERT(
@@ -896,6 +905,7 @@ static bool cxxParserParseNextTokenCondenseAttribute(void)
 		return true;
 	}
 
+	// Do NOT accept EOF as a valid terminator as it implies broken input.
 	if(!cxxParserParseAndCondenseCurrentSubchain(
 			CXXTokenTypeOpeningParenthesis |
 				CXXTokenTypeOpeningSquareParenthesis |
@@ -904,8 +914,20 @@ static bool cxxParserParseNextTokenCondenseAttribute(void)
 			false
 		))
 	{
-		CXX_DEBUG_LEAVE_TEXT("Failed to parse and condense subchains");
-		return false;
+		// Pasing and/or condensation of the subchain failed. This implies broken
+		// input (mismatched parenthesis/bracket, early EOF).
+
+		CXX_DEBUG_LEAVE_TEXT("Failed to parse subchains. The input is broken...");
+
+		// However our invariant (see comment at the beginning of the function)
+		// forbids us to return false if we didn't find an EOF. So we attempt
+		// to resume parsing anyway. If there is an EOF, cxxParserParseNextToken()
+		// will report it.
+
+		// Kill the token chain
+		cxxTokenDestroy(cxxTokenChainTakeLast(g_cxx.pTokenChain));
+
+		return cxxParserParseNextToken();
 	}
 
 	CXX_DEBUG_ASSERT(
@@ -1075,6 +1097,10 @@ static void cxxParserParseNextTokenApplyReplacement(
 	CXX_DEBUG_LEAVE();
 }
 
+// Returns false if it finds an EOF. Returns true otherwise.
+//
+// In some special cases this function may parse more than one token,
+// however only a single token will always be returned.
 bool cxxParserParseNextToken(void)
 {
 	CXXToken * t = cxxTokenCreate();
