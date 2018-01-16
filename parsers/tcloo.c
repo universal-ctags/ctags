@@ -56,11 +56,14 @@ static void parseSuperclass (tokenInfo *token, int this_class)
 	{
 		tagEntryInfo *e = getEntryInCorkQueue(this_class);
 
-		if (e->extensionFields.inheritance)
-		{   /* superclass is used twice in a class. */
-			eFree ((void *)e->extensionFields.inheritance);
+		if (e)
+		{
+			if (e->extensionFields.inheritance)
+			{   /* superclass is used twice in a class. */
+				eFree ((void *)e->extensionFields.inheritance);
+			}
+			e->extensionFields.inheritance = eStrdup(tokenString(token));
 		}
-		e->extensionFields.inheritance = eStrdup(tokenString(token));
 	}
 	skipToEndOfTclCmdline (token);
 }
