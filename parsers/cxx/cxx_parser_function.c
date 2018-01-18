@@ -1730,6 +1730,12 @@ bool cxxParserTokenChainLooksLikeFunctionParameterList(
 			"At least linitial and final parenthesis should be there"
 		);
 
+	CXX_DEBUG_ASSERT(
+			(cxxTokenChainFirst(tc)->eType == CXXTokenTypeOpeningParenthesis) &&
+			(cxxTokenChainLast(tc)->eType == CXXTokenTypeClosingParenthesis),
+			"The first and last token should be parentheses here"
+		);
+
 	if(pParamInfo)
 	{
 		pParamInfo->uParameterCount = 0;

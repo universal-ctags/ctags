@@ -60,12 +60,22 @@ void cxxParserNewStatement(void)
 }
 
 //
-// Parse a subchain of input delimited by matching pairs: [],(),{},<>
-// [WARNING: no other subchain types are recognized!]. This function expects
-// g_cxx.pToken to point to the initial token of the pair ([{<.
-// It will parse input until the matching terminator token is found.
-// Inner parsing is done by cxxParserParseAndCondenseSubchainsUpToOneOf()
-// so this is actually a recursive subchain nesting algorithm.
+// Parse a subchain of input delimited by matching pairs selected from
+// [],(),{} and <>.
+//
+// On entry g_cxx.pToken is expected to point to the initial token of the pair,
+// that is one of ([{<. The function will parse input until the matching
+// terminator token is found. Inner parsing is done by
+// cxxParserParseAndCondenseSubchainsUpToOneOf() so this is actually a recursive
+// subchain nesting algorithm.
+//
+// Returns true if it has succesfully extracted and "condensed" a subchain
+// replacing the current token with a subchain subtree. Returns false if
+// extraction fails for some reason.
+//
+// This function never leaves the token chain in an incoerent state.
+// The current token is always replaced with a subchain tree. If the subchain
+// is broken, its contents are discarded, regardless of the return value.
 //
 bool cxxParserParseAndCondenseCurrentSubchain(
 		unsigned int uInitialSubchainMarkerTypes,
@@ -73,6 +83,8 @@ bool cxxParserParseAndCondenseCurrentSubchain(
 		bool bCanReduceInnerElements
 	)
 {
+	CXX_DEBUG_ENTER();
+
 	CXXTokenChain * pCurrentChain = g_cxx.pTokenChain;
 
 	g_cxx.pTokenChain = cxxTokenChainCreate();
@@ -92,17 +104,67 @@ bool cxxParserParseAndCondenseCurrentSubchain(
 
 	// see the declaration of CXXTokenType enum.
 	// Shifting by 4 gives the corresponding closing token type
-	unsigned int uTokenTypes = g_cxx.pToken->eType << 4;
+	enum CXXTokenType eTermType = (enum CXXTokenType)(g_cxx.pToken->eType << 4);
+
+	unsigned int uTokenTypes = eTermType;
 	if(bAcceptEOF)
 		uTokenTypes |= CXXTokenTypeEOF;
+
 	bool bRet = cxxParserParseAndCondenseSubchainsUpToOneOf(
 			uTokenTypes,
 			uInitialSubchainMarkerTypes,
 			bCanReduceInnerElements
 		);
+
+	if(
+		// Parsing the subchain failed: input is broken
+		(!bRet) ||
+		// Mismatched terminator (i.e EOF was accepted and encountered)
+		(!cxxTokenTypeIs(cxxTokenChainLast(g_cxx.pTokenChain),eTermType))
+	)
+	{
+		// Input is probably broken: discard it in any case, so no one
+		// is tempted to parse it later.
+
+		CXX_DEBUG_PRINT(
+				"Parsing the subchain failed or EOF found. Discarding broken subtree"
+			);
+
+		while(g_cxx.pTokenChain->iCount > 1)
+			cxxTokenDestroy(cxxTokenChainTakeLast(g_cxx.pTokenChain));
+
+		// Fake the terminator
+		CXXToken * pFakeLast = cxxTokenCreate();
+		pFakeLast->iLineNumber = pChainToken->iLineNumber;
+		pFakeLast->oFilePosition = pChainToken->oFilePosition;
+		switch(eTermType)
+		{
+			case CXXTokenTypeClosingBracket:
+				vStringPut(pFakeLast->pszWord,'}');
+			break;
+			case CXXTokenTypeClosingParenthesis:
+				vStringPut(pFakeLast->pszWord,')');
+			break;
+			case CXXTokenTypeClosingSquareParenthesis:
+				vStringPut(pFakeLast->pszWord,']');
+			break;
+			case CXXTokenTypeGreaterThanSign:
+				vStringPut(pFakeLast->pszWord,'>');
+			break;
+			default:
+				CXX_DEBUG_ASSERT(false,"Unhandled terminator type");
+			break;
+		}
+		pFakeLast->eType = eTermType;
+		pFakeLast->pChain = NULL;
+		
+		cxxTokenChainAppend(g_cxx.pTokenChain,pFakeLast);
+	}
+
 	g_cxx.pTokenChain = pCurrentChain;
 	g_cxx.pToken = pCurrentChain->pTail;
 
+	CXX_DEBUG_LEAVE();
 	return bRet;
 }
 
@@ -126,6 +188,7 @@ bool cxxParserParseAndCondenseSubchainsUpToOneOf(
 {
 	CXX_DEBUG_ENTER_TEXT("Token types = 0x%x(%s), reduce = %d", uTokenTypes, cxxDebugTypeDecode(uTokenTypes),
 						 bCanReduceInnerElements);
+
 	if(!cxxParserParseNextToken())
 	{
 		CXX_DEBUG_LEAVE_TEXT("Found EOF");
