@@ -1,0 +1,4 @@
+.rodata	input.ld	/^  .rodata : {$/;"	S
+.text	input.ld	/^  .text : {$/;"	S
+_start	input.ld	/^    _start = .;$/;"	s	section:.text
+message	input.ld	/^    message = .;$/;"	s	section:.rodata

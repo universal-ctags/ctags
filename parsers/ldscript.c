@@ -71,6 +71,7 @@ enum {
 	KEYWORD_INPUT_SECTION_FLAGS,
 	KEYWORD_COMMON,
 	KEYWORD_KEEP,
+	KEYWORD_DATA,
 };
 typedef int keywordId; /* to allow KEYWORD_NONE */
 
@@ -87,8 +88,14 @@ static const keywordTable LdScriptKeywordTable[] = {
 	{ "HIDDEN",	        KEYWORD_HIDDEN	        },
 	{ "EXCLUDE_FILE",   KEYWORD_EXCLUDE_FILE    },
 	{ "INPUT_SECTION_FLAGS", KEYWORD_INPUT_SECTION_FLAGS },
-	{ "COMMON",         KEYWORD_COMMON },
-	{ "KEEP",           KEYWORD_KEEP },
+	{ "COMMON",			KEYWORD_COMMON },
+	{ "KEEP",			KEYWORD_KEEP },
+	{ "BYTE",			KEYWORD_DATA },
+	{ "SHORT",			KEYWORD_DATA },
+	{ "LONG",			KEYWORD_DATA },
+	{ "QUAD",			KEYWORD_DATA },
+	{ "SQUAD",			KEYWORD_DATA },
+	{ "FILL",			KEYWORD_DATA },
 };
 
 enum eTokenType {
