@@ -787,8 +787,13 @@ bool cxxParserParseEnum(void)
 			{
 				CXXToken * pNext = pNamespaceBegin->pNext;
 				cxxTokenChainTake(g_cxx.pTokenChain,pNamespaceBegin);
-				// FIXME: We don't really know if it's a class!
-				cxxScopePush(pNamespaceBegin,CXXScopeTypeClass,CXXScopeAccessUnknown);
+				if(cxxParserCurrentLanguageIsCPP())
+				{
+					// FIXME: We don't really know if it's a class!
+					cxxScopePush(pNamespaceBegin,CXXScopeTypeClass,CXXScopeAccessUnknown);
+				} else {
+					// it's a syntax error, but be tolerant
+				}
 				iPushedScopes++;
 				pNamespaceBegin = pNext->pNext;
 			}
@@ -1151,9 +1156,14 @@ static bool cxxParserParseClassStructOrUnionInternal(
 		{
 			CXXToken * pNext = pNamespaceBegin->pNext;
 			cxxTokenChainTake(g_cxx.pTokenChain,pNamespaceBegin);
-			// FIXME: We don't really know if it's a class!
-			cxxScopePush(pNamespaceBegin,CXXScopeTypeClass,CXXScopeAccessUnknown);
-			iPushedScopes++;
+			if(cxxParserCurrentLanguageIsCPP())
+			{
+				// FIXME: We don't really know if it's a class!
+				cxxScopePush(pNamespaceBegin,CXXScopeTypeClass,CXXScopeAccessUnknown);
+				iPushedScopes++;
+			} else {
+				// it's a syntax error, but be tolerant
+			}
 			pNamespaceBegin = pNext->pNext;
 		}
 
