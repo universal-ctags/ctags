@@ -1674,6 +1674,7 @@ static void globalLet (vString * const ident, ocaToken what, ocaToken whatNext)
 			vString *fakeIdent = vStringNewInit ("()");
 			addTag (fakeIdent, K_FUNCTION);
 			pushStrongContext (fakeIdent, ContextFunction);
+			vStringDelete (fakeIdent);
 			requestStrongPoping ();
 			toDoNext = &letParam;
 		}
