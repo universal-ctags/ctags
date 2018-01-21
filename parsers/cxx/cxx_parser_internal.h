@@ -255,6 +255,8 @@ typedef enum _CXXParserKeywordState
 	CXXParserKeywordStateSeenVolatile = (1 << 10),
 	// __attribute__((deprecated)) has been seen
 	CXXParserKeywordStateSeenAttributeDeprecated = (1 << 11),
+	// "friend" has been seen at block level
+	CXXParserKeywordStateSeenFriend = (1 << 12),
 } CXXParserKeywordState;
 
 

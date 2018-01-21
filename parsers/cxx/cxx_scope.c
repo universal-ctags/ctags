@@ -213,11 +213,7 @@ void cxxScopeSetAccess(enum CXXScopeAccess eAccess)
 	g_pScope->pTail->uInternalScopeAccess = (unsigned char)eAccess;
 }
 
-void cxxScopePush(
-		CXXToken * t,
-		enum CXXScopeType eScopeType,
-		enum CXXScopeAccess eInitialAccess
-	)
+void cxxScopePushTop(CXXToken * t)
 {
 	CXX_DEBUG_ASSERT(
 			t->eType == CXXTokenTypeIdentifier,
@@ -227,9 +223,8 @@ void cxxScopePush(
 			t->pszWord,
 			"The scope name should have a text"
 		);
+
 	cxxTokenChainAppend(g_pScope,t);
-	t->uInternalScopeType = (unsigned char)eScopeType;
-	t->uInternalScopeAccess = (unsigned char)eInitialAccess;
 	g_bScopeNameDirty = true;
 
 #ifdef CXX_DO_DEBUGGING
@@ -239,14 +234,14 @@ void cxxScopePush(
 #endif
 }
 
-void cxxScopePop(void)
+CXXToken * cxxScopeTakeTop(void)
 {
 	CXX_DEBUG_ASSERT(
 			g_pScope->iCount > 0,
 			"When popping as scope there must be a scope to pop"
 		);
 
-	cxxTokenDestroy(cxxTokenChainTakeLast(g_pScope));
+	CXXToken * t = cxxTokenChainTakeLast(g_pScope);
 	g_bScopeNameDirty = true;
 
 #ifdef CXX_DO_DEBUGGING
@@ -254,4 +249,21 @@ void cxxScopePop(void)
 
 	CXX_DEBUG_PRINT("Popped scope: '%s'",szScopeName ? szScopeName : "");
 #endif
+	return t;
+}
+
+void cxxScopePush(
+		CXXToken * t,
+		enum CXXScopeType eScopeType,
+		enum CXXScopeAccess eInitialAccess
+	)
+{
+	t->uInternalScopeType = (unsigned char)eScopeType;
+	t->uInternalScopeAccess = (unsigned char)eInitialAccess;
+	cxxScopePushTop(t);
+}
+
+void cxxScopePop(void)
+{
+	cxxTokenDestroy(cxxScopeTakeTop());
 }

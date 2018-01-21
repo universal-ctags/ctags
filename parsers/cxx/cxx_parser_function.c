@@ -1414,7 +1414,41 @@ int cxxParserEmitFunctionTags(
 
 	CXX_DEBUG_PRINT("Identifier is '%s'",vStringValue(pIdentifier->pszWord));
 
-	tagEntryInfo * tag = cxxTagBegin(uTagKind,pIdentifier);
+	tagEntryInfo * tag;
+	
+	if(
+			(uTagKind == CXXTagKindFUNCTION) &&
+			(g_cxx.uKeywordState & CXXParserKeywordStateSeenFriend) &&
+			(!cxxScopeIsGlobal())
+		)
+	{
+		// When "friend" has been seen, and uTagKind == CXXTagKindFUNCTION
+		// the scope we're using is off by one level. This is the "friend definition"
+		// trick:
+		//
+		//  class X
+		//  {
+		//   inline friend void y(){ ... }
+		//  }
+		// 
+		// Here y() is implicitly defined as a function in the namespace contaning X
+		// (so it is NOT X::y()).
+
+		CXXToken * pSavedScope = cxxScopeTakeTop();
+		tag = cxxTagBegin(uTagKind,pIdentifier);
+		cxxScopePushTop(pSavedScope);
+
+		// We shouldn't really push back the last scope while the function is being
+		// parsed, but this is hard to do with the current implementation. We would need
+		// to store this scope somewhere and push it back after the body of the function
+		// has been parsed. It can be done, but it's expensive.
+		//
+		// Friend declarations are very rare and are implicitly inlined per C++ standard
+		// so "sane" such declarations are short and usually don't have meaningful tags inside.
+
+	} else {
+		tag = cxxTagBegin(uTagKind,pIdentifier);
+	}
 
 	if(tag)
 	{
@@ -1628,6 +1662,9 @@ int cxxParserExtractFunctionSignatureBeforeOpeningBracket(int * piCorkQueueIndex
 		CXX_DEBUG_LEAVE_TEXT("No parenthesis found: no function");
 		return 0;
 	}
+
+	// Note that emitting the tag is ok even if 'friend' has been seen,
+	// but the scope will be adjusted inside cxxParserEmitFunctionTags()
 
 	int iScopesPushed = cxxParserEmitFunctionTags(
 			&oInfo,
