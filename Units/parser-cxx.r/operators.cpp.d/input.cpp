@@ -51,11 +51,13 @@ public:
 		return 0;
 	}
 	
+	// This should appear as member of the global namespace
 	inline friend X operator*(const X &a, const X &b)
 	{
 		return *this;
 	}
 	
+	// This should NOT appear at all
 	friend X operator && (const X &a,const X & b);
 	
 	void * operator new(size_t);
