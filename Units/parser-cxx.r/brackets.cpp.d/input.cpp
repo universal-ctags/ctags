@@ -3,6 +3,8 @@
 #include <string>
 #include <memory>
 
+#define EMPTY_MACRO
+
 namespace n01 {
 
 	std::string g01 { "" };
@@ -45,6 +47,17 @@ namespace n01 {
 			std::string l04 { "" };
 			C01 l05{ "" };
 		}
+		
+		std::string f02() const EMPTY_MACRO { }
+		int m04 { 0 };
+		
+		std::string f03() const EMPTY_MACRO { }
+		std::string f04() const EMPTY_MACRO { }
+		int m05 { 0 };
+		
+		std::string f05() const EMPTY_MACRO { }
+		std::string f06() const { }
+		std::string f07() { }
 	};
 }
 
