@@ -66,6 +66,8 @@ int main(int argc,char ** argv)
 	std::string * l30{ new std::string("test") };
 	std::string * l31(new std::string("test"));
 
+	auto l32 = new std::basic_string<wchar_t, std::char_traits<wchar_t>, std::allocator<wchar_t> >;
+
 	return 0;
 }
 
