@@ -60,14 +60,28 @@ bool cxxParserParseBlockHandleOpeningBracket(void)
 						// Class::Class() : member { arg1, arg2, ... } { (4)
 						cxxTokenTypeIs(g_cxx.pToken->pPrev,CXXTokenTypeIdentifier) &&
 						(
+							// case 1
 							(!g_cxx.pToken->pPrev->pPrev) ||
-							(cxxTokenTypeIsOneOf(
+							// case 4
+							cxxTokenTypeIsOneOf(
 									g_cxx.pToken->pPrev->pPrev,
-									CXXTokenTypeIdentifier | CXXTokenTypeStar | CXXTokenTypeAnd |
-									CXXTokenTypeGreaterThanSign | CXXTokenTypeKeyword |
-									// FIXME: This check could be made stricter?
 									CXXTokenTypeSingleColon | CXXTokenTypeComma
-							))
+							) ||
+							// cases 1,2,3 but not 4
+							(
+								// more parts of typename or maybe the "new" keyword before the identifier
+								cxxTokenTypeIsOneOf(
+										g_cxx.pToken->pPrev->pPrev,
+										CXXTokenTypeIdentifier | CXXTokenTypeStar | CXXTokenTypeAnd |
+										CXXTokenTypeGreaterThanSign | CXXTokenTypeKeyword
+								) &&
+								// but no parenthesis (discard things like bool test() Q_DECL_NO_THROW { ... })
+								(!(pAux = cxxTokenChainPreviousTokenOfType(
+										g_cxx.pToken->pPrev->pPrev,
+										CXXTokenTypeParenthesisChain
+									))
+								)
+							)
 						) &&
 						// "override" is handled as identifier since it's a keyword only after function signatures
 						(strcmp(vStringValue(g_cxx.pToken->pPrev->pszWord),"override") != 0)
