@@ -9,8 +9,7 @@ operator ()	input.cpp	/^	inline void *** operator()()$/;"	f	class:X	typeref:type
 operator ++	input.cpp	/^	inline X & operator++()$/;"	f	class:X	typeref:typename:X &	file:
 operator --	input.cpp	/^	X & operator--()$/;"	f	class:X	typeref:typename:X &	file:
 operator []	input.cpp	/^	int operator[](int)$/;"	f	class:X	typeref:typename:int	file:
-operator *	input.cpp	/^	inline friend X operator*(const X &a, const X &b)$/;"	f	class:X	typeref:typename:X	file:
-operator &&	input.cpp	/^	friend X operator && (const X &a,const X & b);$/;"	p	class:X	typeref:typename:X	file:
+operator *	input.cpp	/^	inline friend X operator*(const X &a, const X &b)$/;"	f	typeref:typename:X	file:
 operator new	input.cpp	/^	void * operator new(size_t);$/;"	p	class:X	typeref:typename:void *	file:
 operator delete	input.cpp	/^	void operator delete(void *);$/;"	p	class:X	typeref:typename:void	file:
 operator new[]	input.cpp	/^	void * operator new[](size_t);$/;"	p	class:X	typeref:typename:void *	file:

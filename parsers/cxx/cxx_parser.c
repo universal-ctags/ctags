@@ -1054,7 +1054,6 @@ static bool cxxParserParseClassStructOrUnionInternal(
 	if(iInitialTokenCount > 1)
 		cxxParserCleanupEnumStructClassOrUnionPrefixChain(eKeyword,pLastToken);
 
-	// FIXME: This block is duplicated in enum
 	if(cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeSemicolon))
 	{
 		if(g_cxx.pTokenChain->iCount > 3)
@@ -1062,7 +1061,7 @@ static bool cxxParserParseClassStructOrUnionInternal(
 			// [typedef] struct X Y; <-- typedef has been removed!
 			if(uInitialKeywordState & CXXParserKeywordStateSeenTypedef)
 				cxxParserExtractTypedef(g_cxx.pTokenChain,true);
-			else
+			else if(!(g_cxx.uKeywordState & CXXParserKeywordStateSeenFriend))
 				cxxParserExtractVariableDeclarations(g_cxx.pTokenChain,0);
 		}
 
@@ -1449,13 +1448,24 @@ check_function_signature:
 
 	if(cxxParserLookForFunctionSignature(g_cxx.pTokenChain,&oInfo,NULL))
 	{
-		int iScopesPushed = cxxParserEmitFunctionTags(&oInfo,CXXTagKindPROTOTYPE,CXXEmitFunctionTagsPushScopes,NULL);
-		while(iScopesPushed > 0)
+		CXX_DEBUG_PRINT("Found function prototype");
+
+		if(g_cxx.uKeywordState & CXXParserKeywordStateSeenFriend)
 		{
-			cxxScopePop();
-			iScopesPushed--;
+			// class X {
+			//   friend void aFunction();
+			// };
+			// 'aFunction' is NOT X::aFunction() and in complex cases we can't figure
+			// out its proper scope. Better avoid emitting this one.
+			CXX_DEBUG_PRINT("But it has been preceeded by the 'friend' keyword: this is not a real prototype");
+		} else {
+			int iScopesPushed = cxxParserEmitFunctionTags(&oInfo,CXXTagKindPROTOTYPE,CXXEmitFunctionTagsPushScopes,NULL);
+			while(iScopesPushed > 0)
+			{
+				cxxScopePop();
+				iScopesPushed--;
+			}
 		}
-		CXX_DEBUG_LEAVE_TEXT("Found function prototype");
 
 		if(oInfo.pTrailingComma)
 		{
@@ -1479,6 +1489,7 @@ check_function_signature:
 			goto check_function_signature;
 		}
 
+		CXX_DEBUG_LEAVE();
 		return;
 	}
 

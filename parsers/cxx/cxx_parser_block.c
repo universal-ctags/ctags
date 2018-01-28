@@ -469,6 +469,9 @@ process_token:
 						g_cxx.uKeywordState |= CXXParserKeywordStateSeenMutable;
 						cxxTokenChainDestroyLast(g_cxx.pTokenChain);
 					break;
+					case CXXKeywordFRIEND:
+						g_cxx.uKeywordState |= CXXParserKeywordStateSeenFriend;
+					break;
 					// "const" and "volatile" are part of the type. Don't treat them specially
 					// and don't attempt to extract an eventual typedef yet,
 					// as there might be a struct/class/union keyword following.
