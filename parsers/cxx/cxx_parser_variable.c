@@ -710,13 +710,22 @@ bool cxxParserExtractVariableDeclarations(CXXTokenChain * pChain,unsigned int uF
 				CXXTokenTypeComma | CXXTokenTypeSemicolon | CXXTokenTypeOpeningBracket
 			))
 		{
+			// look for it, but also check for "<" signs: these usually indicate an uncondensed
+			// template. We give up on them as they are too complicated in this context.
+			// It's rather unlikely to have multiple declarations with templates after the first one
 			t = cxxTokenChainNextTokenOfType(
 					t,
-					CXXTokenTypeComma | CXXTokenTypeSemicolon | CXXTokenTypeOpeningBracket
+					CXXTokenTypeComma | CXXTokenTypeSemicolon | CXXTokenTypeOpeningBracket |
+					CXXTokenTypeSmallerThanSign
 				);
 			if(!t)
 			{
 				CXX_DEBUG_LEAVE_TEXT("Didn't find a comma, semicolon or {");
+				return bGotVariable;
+			}
+			if(cxxTokenTypeIs(t,CXXTokenTypeSmallerThanSign))
+			{
+				CXX_DEBUG_LEAVE_TEXT("Found '<': probably a template on the right side of declaration");
 				return bGotVariable;
 			}
 		}
