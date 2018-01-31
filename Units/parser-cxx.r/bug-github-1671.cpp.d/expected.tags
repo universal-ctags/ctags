@@ -1,0 +1,5 @@
+my_function	input.cpp	/^void my_function()$/;"	f	typeref:typename:void
+tabs	input.cpp	/^struct tabs { const static long value = x; };$/;"	s	file:
+tabs	input.cpp	/^struct tabs<x,typename enable_if_c<(x<0)>::type> { const static long value = -x; };$/;"	s	file:
+value	input.cpp	/^struct tabs { const static long value = x; };$/;"	m	struct:tabs	typeref:typename:const long	file:
+value	input.cpp	/^struct tabs<x,typename enable_if_c<(x<0)>::type> { const static long value = -x; };$/;"	m	struct:tabs	typeref:typename:const long	file:
