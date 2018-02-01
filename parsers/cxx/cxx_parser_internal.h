@@ -215,6 +215,7 @@ bool cxxParserParseUpToOneOf(unsigned int uTokenTypes,
 							 bool bCanReduceInnerElements);
 bool cxxParserParseIfForWhileSwitch(void);
 bool cxxParserParseTemplatePrefix(void);
+bool cxxParserParseTemplateAngleBracketsToSeparateChain(void);
 bool cxxParserParseUsingClause(void);
 bool cxxParserParseAccessSpecifier(void);
 void cxxParserAnalyzeOtherStatement(void);

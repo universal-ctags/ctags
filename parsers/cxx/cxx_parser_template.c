@@ -26,11 +26,10 @@
 
 
 //
-// Parses the <parameters> part of the template prefix.
-// Here we are pointing at the initial < (but the token chain has been
-// emptied by cxxParserParseTemplatePrefix())
+// Parses the <parameters> part of a template specification.
+// Here we are pointing at the initial <.
 //
-static bool cxxParserParseTemplatePrefixAngleBrackets(void)
+static bool cxxParserParseTemplateAngleBrackets(void)
 {
 	CXX_DEBUG_ENTER();
 
@@ -52,6 +51,11 @@ static bool cxxParserParseTemplatePrefixAngleBrackets(void)
 	// around but without proper state (include headers, macro expansion, full type
 	// database etc) we simply can't do the same. However, we try to recover if we
 	// figure out we (or the programmer?) screwed up.
+
+	CXX_DEBUG_ASSERT(
+			cxxTokenTypeIs(cxxTokenChainLast(g_cxx.pTokenChain),CXXTokenTypeSmallerThanSign),
+			"We should be pointing at the opening angle bracket here"
+		);
 
 	int iTemplateLevel = 0;
 
@@ -253,12 +257,50 @@ evaluate_current_token:
 }
 
 //
+// Parses the template angle brackets and puts it in g_cxx.pTemplateTokenChain.
+//
+bool cxxParserParseTemplateAngleBracketsToSeparateChain(void)
+{
+	CXX_DEBUG_ENTER();
+
+	CXX_DEBUG_ASSERT(cxxParserCurrentLanguageIsCPP(),"This should be called only in C++");
+
+	CXX_DEBUG_ASSERT(
+			cxxTokenTypeIs(cxxTokenChainLast(g_cxx.pTokenChain),CXXTokenTypeSmallerThanSign),
+			"We should be pointing at the opening angle bracket here"
+		);
+
+	CXXTokenChain * pSave = g_cxx.pTokenChain;
+	g_cxx.pTokenChain = cxxTokenChainCreate();
+	cxxTokenChainAppend(g_cxx.pTokenChain,cxxTokenChainTakeLast(pSave));
+
+	if(!cxxParserParseTemplateAngleBrackets())
+	{
+		CXX_DEBUG_LEAVE_TEXT("Failed to parse angle brackets");
+		cxxTokenChainDestroy(pSave);
+		return false;
+	}
+
+	if(g_cxx.pTemplateTokenChain)
+		cxxTokenChainDestroy(g_cxx.pTemplateTokenChain);
+
+	g_cxx.pTemplateTokenChain = g_cxx.pTokenChain;
+	g_cxx.pTokenChain = pSave;
+	
+	CXX_DEBUG_LEAVE();
+	return true;
+}
+
+
+//
 // Parses a template<anything> prefix.
 // The parsed template parameter definition is stored in a separate token chain.
 //
 bool cxxParserParseTemplatePrefix(void)
 {
 	CXX_DEBUG_ENTER();
+
+	CXX_DEBUG_ASSERT(cxxParserCurrentLanguageIsCPP(),"This should be called only in C++");
 
 	CXX_DEBUG_ASSERT(
 			cxxTokenTypeIs(cxxTokenChainLast(g_cxx.pTokenChain),CXXTokenTypeKeyword),
@@ -283,23 +325,8 @@ bool cxxParserParseTemplatePrefix(void)
 		return true; // tolerate syntax error
 	}
 
-	CXXTokenChain * pSave = g_cxx.pTokenChain;
-	g_cxx.pTokenChain = cxxTokenChainCreate();
-	cxxTokenChainAppend(g_cxx.pTokenChain,cxxTokenChainTakeLast(pSave));
-
-	if(!cxxParserParseTemplatePrefixAngleBrackets())
-	{
-		CXX_DEBUG_LEAVE_TEXT("Failed to parse angle brackets");
-		cxxTokenChainDestroy(pSave);
-		return false;
-	}
-
-	if(g_cxx.pTemplateTokenChain)
-		cxxTokenChainDestroy(g_cxx.pTemplateTokenChain);
-
-	g_cxx.pTemplateTokenChain = g_cxx.pTokenChain;
-	g_cxx.pTokenChain = pSave;
+	bool bRet = cxxParserParseTemplateAngleBracketsToSeparateChain();
 
 	CXX_DEBUG_LEAVE();
-	return true;
+	return bRet;
 }
