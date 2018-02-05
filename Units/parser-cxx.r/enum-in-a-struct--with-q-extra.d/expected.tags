@@ -1,0 +1,12 @@
+S	input.cc	/^namespace S {$/;"	n	file:
+T	input.cc	/^  struct T {$/;"	s	namespace:S	file:
+S::T	input.cc	/^  struct T {$/;"	s	namespace:S	file:
+E	input.cc	/^    enum E {$/;"	g	struct:S::T	file:
+S::T::E	input.cc	/^    enum E {$/;"	g	struct:S::T	file:
+alpha	input.cc	/^      alpha, beta,$/;"	e	enum:S::T::E	file:
+S::T::alpha	input.cc	/^      alpha, beta,$/;"	e	enum:S::T::E	file:
+beta	input.cc	/^      alpha, beta,$/;"	e	enum:S::T::E	file:
+S::T::beta	input.cc	/^      alpha, beta,$/;"	e	enum:S::T::E	file:
+elt	input.cc	/^    } elt;$/;"	m	struct:S::T	typeref:enum:S::T::E	file:
+S::T::elt	input.cc	/^    } elt;$/;"	m	struct:S::T	typeref:enum:S::T::E	file:
+s	input.cc	/^struct S::T s = { .elt = S::T::E::alpha };$/;"	v	typeref:struct:S::T

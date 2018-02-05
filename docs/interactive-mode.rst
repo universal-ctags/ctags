@@ -9,6 +9,14 @@ can be used programmatically to control ctags generation. In this mode, json
 commands are received over stdin, and corresponding responses are emitted over
 stdout.
 
+This feature needs ctags to be built with json support and this requires libjansson to be installed
+at build-time. If it's supported it will be listed in the output of ``--list-features``:
+
+.. code-block:: console
+
+	$ ./ctags --list-features | grep json
+	json
+
 Communication with Universal ctags over stdio uses the `json lines`_ format, where each
 json object appears on a single line and is terminated with a newline.
 

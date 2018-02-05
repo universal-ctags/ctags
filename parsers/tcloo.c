@@ -35,7 +35,7 @@ static kindDefinition TclOOKinds[] = {
 	  ATTACH_SEPARATORS(TclOOGenericSeparators) },
 };
 
-static void parseMethod (tokenInfo *token, int parent)
+static void parseMethod (tokenInfo *token, int owner)
 {
 	tokenRead (token);
 	if (tokenIsType (token, TCL_IDENTIFIER))
@@ -43,24 +43,27 @@ static void parseMethod (tokenInfo *token, int parent)
 		tagEntryInfo e;
 
 		initTagEntry(&e, vStringValue (token->string), K_METHOD);
-		e.extensionFields.scopeIndex = parent;
+		e.extensionFields.scopeIndex = owner;
 		makeTagEntry (&e);
 	}
 	skipToEndOfTclCmdline (token);
 }
 
-static void parseSuperclass (tokenInfo *token, int parent)
+static void parseSuperclass (tokenInfo *token, int this_class)
 {
 	tokenRead (token);
 	if (tokenIsType (token, TCL_IDENTIFIER))
 	{
-		tagEntryInfo *e = getEntryInCorkQueue(parent);
+		tagEntryInfo *e = getEntryInCorkQueue(this_class);
 
-		if (e->extensionFields.inheritance)
-		{   /* superclass is used twice in a class. */
-			eFree ((void *)e->extensionFields.inheritance);
+		if (e)
+		{
+			if (e->extensionFields.inheritance)
+			{   /* superclass is used twice in a class. */
+				eFree ((void *)e->extensionFields.inheritance);
+			}
+			e->extensionFields.inheritance = eStrdup(tokenString(token));
 		}
-		e->extensionFields.inheritance = eStrdup(tokenString(token));
 	}
 	skipToEndOfTclCmdline (token);
 }
