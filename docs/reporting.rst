@@ -2,7 +2,7 @@
     NOT REVIEWED YET
 
 ======================================================================
-Request for extenting a parser (or Reporting a bug of parser)
+Request for extending a parser (or Reporting a bug of parser)
 ======================================================================
 
 :Maintainer: Masatake YAMATO <yamato@redhat.com>

@@ -60,12 +60,22 @@ void cxxParserNewStatement(void)
 }
 
 //
-// Parse a subchain of input delimited by matching pairs: [],(),{},<>
-// [WARNING: no other subchain types are recognized!]. This function expects
-// g_cxx.pToken to point to the initial token of the pair ([{<.
-// It will parse input until the matching terminator token is found.
-// Inner parsing is done by cxxParserParseAndCondenseSubchainsUpToOneOf()
-// so this is actually a recursive subchain nesting algorithm.
+// Parse a subchain of input delimited by matching pairs selected from
+// [],(),{} and <>.
+//
+// On entry g_cxx.pToken is expected to point to the initial token of the pair,
+// that is one of ([{<. The function will parse input until the matching
+// terminator token is found. Inner parsing is done by
+// cxxParserParseAndCondenseSubchainsUpToOneOf() so this is actually a recursive
+// subchain nesting algorithm.
+//
+// Returns true if it has succesfully extracted and "condensed" a subchain
+// replacing the current token with a subchain subtree. Returns false if
+// extraction fails for some reason.
+//
+// This function never leaves the token chain in an incoerent state.
+// The current token is always replaced with a subchain tree. If the subchain
+// is broken, its contents are discarded, regardless of the return value.
 //
 bool cxxParserParseAndCondenseCurrentSubchain(
 		unsigned int uInitialSubchainMarkerTypes,
@@ -73,6 +83,8 @@ bool cxxParserParseAndCondenseCurrentSubchain(
 		bool bCanReduceInnerElements
 	)
 {
+	CXX_DEBUG_ENTER();
+
 	CXXTokenChain * pCurrentChain = g_cxx.pTokenChain;
 
 	g_cxx.pTokenChain = cxxTokenChainCreate();
@@ -92,17 +104,67 @@ bool cxxParserParseAndCondenseCurrentSubchain(
 
 	// see the declaration of CXXTokenType enum.
 	// Shifting by 4 gives the corresponding closing token type
-	unsigned int uTokenTypes = g_cxx.pToken->eType << 4;
+	enum CXXTokenType eTermType = (enum CXXTokenType)(g_cxx.pToken->eType << 4);
+
+	unsigned int uTokenTypes = eTermType;
 	if(bAcceptEOF)
 		uTokenTypes |= CXXTokenTypeEOF;
+
 	bool bRet = cxxParserParseAndCondenseSubchainsUpToOneOf(
 			uTokenTypes,
 			uInitialSubchainMarkerTypes,
 			bCanReduceInnerElements
 		);
+
+	if(
+		// Parsing the subchain failed: input is broken
+		(!bRet) ||
+		// Mismatched terminator (i.e EOF was accepted and encountered)
+		(!cxxTokenTypeIs(cxxTokenChainLast(g_cxx.pTokenChain),eTermType))
+	)
+	{
+		// Input is probably broken: discard it in any case, so no one
+		// is tempted to parse it later.
+
+		CXX_DEBUG_PRINT(
+				"Parsing the subchain failed or EOF found. Discarding broken subtree"
+			);
+
+		while(g_cxx.pTokenChain->iCount > 1)
+			cxxTokenDestroy(cxxTokenChainTakeLast(g_cxx.pTokenChain));
+
+		// Fake the terminator
+		CXXToken * pFakeLast = cxxTokenCreate();
+		pFakeLast->iLineNumber = pChainToken->iLineNumber;
+		pFakeLast->oFilePosition = pChainToken->oFilePosition;
+		switch(eTermType)
+		{
+			case CXXTokenTypeClosingBracket:
+				vStringPut(pFakeLast->pszWord,'}');
+			break;
+			case CXXTokenTypeClosingParenthesis:
+				vStringPut(pFakeLast->pszWord,')');
+			break;
+			case CXXTokenTypeClosingSquareParenthesis:
+				vStringPut(pFakeLast->pszWord,']');
+			break;
+			case CXXTokenTypeGreaterThanSign:
+				vStringPut(pFakeLast->pszWord,'>');
+			break;
+			default:
+				CXX_DEBUG_ASSERT(false,"Unhandled terminator type");
+			break;
+		}
+		pFakeLast->eType = eTermType;
+		pFakeLast->pChain = NULL;
+		
+		cxxTokenChainAppend(g_cxx.pTokenChain,pFakeLast);
+	}
+
 	g_cxx.pTokenChain = pCurrentChain;
 	g_cxx.pToken = pCurrentChain->pTail;
 
+	CXX_DEBUG_LEAVE();
 	return bRet;
 }
 
@@ -126,6 +188,7 @@ bool cxxParserParseAndCondenseSubchainsUpToOneOf(
 {
 	CXX_DEBUG_ENTER_TEXT("Token types = 0x%x(%s), reduce = %d", uTokenTypes, cxxDebugTypeDecode(uTokenTypes),
 						 bCanReduceInnerElements);
+
 	if(!cxxParserParseNextToken())
 	{
 		CXX_DEBUG_LEAVE_TEXT("Found EOF");
@@ -724,8 +787,13 @@ bool cxxParserParseEnum(void)
 			{
 				CXXToken * pNext = pNamespaceBegin->pNext;
 				cxxTokenChainTake(g_cxx.pTokenChain,pNamespaceBegin);
-				// FIXME: We don't really know if it's a class!
-				cxxScopePush(pNamespaceBegin,CXXScopeTypeClass,CXXScopeAccessUnknown);
+				if(cxxParserCurrentLanguageIsCPP())
+				{
+					// FIXME: We don't really know if it's a class!
+					cxxScopePush(pNamespaceBegin,CXXScopeTypeClass,CXXScopeAccessUnknown);
+				} else {
+					// it's a syntax error, but be tolerant
+				}
 				iPushedScopes++;
 				pNamespaceBegin = pNext->pNext;
 			}
@@ -906,6 +974,12 @@ static bool cxxParserParseClassStructOrUnionInternal(
 			break;
 
 		// Probably a template specialisation
+		if(!cxxParserCurrentLanguageIsCPP())
+		{
+			cxxKeywordEnableFinal(false);
+			CXX_DEBUG_LEAVE_TEXT("Template specialization in C language?");
+			return false;
+		}
 
 		// template<typename T> struct X<int>
 		// {
@@ -913,14 +987,8 @@ static bool cxxParserParseClassStructOrUnionInternal(
 
 		// FIXME: Should we add the specialisation arguments somewhere?
 		//        Maybe as a separate field?
-
-		bRet = cxxParserParseAndCondenseCurrentSubchain(
-					CXXTokenTypeOpeningParenthesis | CXXTokenTypeOpeningBracket |
-						CXXTokenTypeOpeningSquareParenthesis |
-						CXXTokenTypeSmallerThanSign,
-					false,
-					false
-				);
+		
+		bRet = cxxParserParseTemplateAngleBracketsToSeparateChain();
 
 		if(!bRet)
 		{
@@ -986,7 +1054,6 @@ static bool cxxParserParseClassStructOrUnionInternal(
 	if(iInitialTokenCount > 1)
 		cxxParserCleanupEnumStructClassOrUnionPrefixChain(eKeyword,pLastToken);
 
-	// FIXME: This block is duplicated in enum
 	if(cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeSemicolon))
 	{
 		if(g_cxx.pTokenChain->iCount > 3)
@@ -994,7 +1061,7 @@ static bool cxxParserParseClassStructOrUnionInternal(
 			// [typedef] struct X Y; <-- typedef has been removed!
 			if(uInitialKeywordState & CXXParserKeywordStateSeenTypedef)
 				cxxParserExtractTypedef(g_cxx.pTokenChain,true);
-			else
+			else if(!(g_cxx.uKeywordState & CXXParserKeywordStateSeenFriend))
 				cxxParserExtractVariableDeclarations(g_cxx.pTokenChain,0);
 		}
 
@@ -1088,9 +1155,14 @@ static bool cxxParserParseClassStructOrUnionInternal(
 		{
 			CXXToken * pNext = pNamespaceBegin->pNext;
 			cxxTokenChainTake(g_cxx.pTokenChain,pNamespaceBegin);
-			// FIXME: We don't really know if it's a class!
-			cxxScopePush(pNamespaceBegin,CXXScopeTypeClass,CXXScopeAccessUnknown);
-			iPushedScopes++;
+			if(cxxParserCurrentLanguageIsCPP())
+			{
+				// FIXME: We don't really know if it's a class!
+				cxxScopePush(pNamespaceBegin,CXXScopeTypeClass,CXXScopeAccessUnknown);
+				iPushedScopes++;
+			} else {
+				// it's a syntax error, but be tolerant
+			}
 			pNamespaceBegin = pNext->pNext;
 		}
 
@@ -1376,13 +1448,24 @@ check_function_signature:
 
 	if(cxxParserLookForFunctionSignature(g_cxx.pTokenChain,&oInfo,NULL))
 	{
-		int iScopesPushed = cxxParserEmitFunctionTags(&oInfo,CXXTagKindPROTOTYPE,CXXEmitFunctionTagsPushScopes,NULL);
-		while(iScopesPushed > 0)
+		CXX_DEBUG_PRINT("Found function prototype");
+
+		if(g_cxx.uKeywordState & CXXParserKeywordStateSeenFriend)
 		{
-			cxxScopePop();
-			iScopesPushed--;
+			// class X {
+			//   friend void aFunction();
+			// };
+			// 'aFunction' is NOT X::aFunction() and in complex cases we can't figure
+			// out its proper scope. Better avoid emitting this one.
+			CXX_DEBUG_PRINT("But it has been preceeded by the 'friend' keyword: this is not a real prototype");
+		} else {
+			int iScopesPushed = cxxParserEmitFunctionTags(&oInfo,CXXTagKindPROTOTYPE,CXXEmitFunctionTagsPushScopes,NULL);
+			while(iScopesPushed > 0)
+			{
+				cxxScopePop();
+				iScopesPushed--;
+			}
 		}
-		CXX_DEBUG_LEAVE_TEXT("Found function prototype");
 
 		if(oInfo.pTrailingComma)
 		{
@@ -1406,6 +1489,7 @@ check_function_signature:
 			goto check_function_signature;
 		}
 
+		CXX_DEBUG_LEAVE();
 		return;
 	}
 

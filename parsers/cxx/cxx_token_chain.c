@@ -291,7 +291,7 @@ void cxxTokenChainJoinRangeInString(
 	while(t && (t != to))
 	{
 		t = t->pNext;
-		if(t)
+		if(!t)
 			return;
 
 		if(szSeparator)

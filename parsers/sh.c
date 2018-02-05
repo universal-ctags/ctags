@@ -232,9 +232,12 @@ static void hdocStateRecordStatelineMaybe (struct hereDocParsingState *hstate)
 				cmd = vStringValue(hstate->args[1]);
 		}
 
-		hstate->sublang = getLanguageForCommand (cmd, 0);
-		if (hstate->sublang != LANG_IGNORE)
-			hstate->startLine = getInputLineNumber () + 1;
+		if (cmd)
+		{
+			hstate->sublang = getLanguageForCommand (cmd, 0);
+			if (hstate->sublang != LANG_IGNORE)
+				hstate->startLine = getInputLineNumber () + 1;
+		}
 	}
 
 	if (vStringLength(hstate->destfile) > 0)

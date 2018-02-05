@@ -584,7 +584,7 @@ static void pre_ptrn_flag_extra_long (const char* const s CTAGS_ATTR_UNUSED, con
 
 static flagDefinition extraSpecFlagDef[] = {
 #define EXPERIMENTAL "_"
-	{ '-',  EXPERIMENTAL "extra", NULL, pre_ptrn_flag_extra_long ,
+	{ '\0',  EXPERIMENTAL "extra", NULL, pre_ptrn_flag_extra_long ,
 	  "EXTRA", "record the tag only when the extra is enabled"},
 };
 

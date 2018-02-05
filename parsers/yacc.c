@@ -19,56 +19,38 @@
 #include "mio.h"
 #include "promise.h"
 
-
-static bool not_in_grammar_rules = true;
-static bool in_union;
-static tagRegexTable yaccTagRegexTable [] = {
-	{"^([A-Za-z][A-Za-z_0-9]+)[ \t]*:", "\\1",
-	 "l,label,labels", NULL, &not_in_grammar_rules },
-	{"^([A-Za-z][A-Za-z_0-9]+)[ \t]*$", "\\1",
-	 "l,label,labels", NULL, &not_in_grammar_rules },
+enum yaccParsingArea {
+	YACC_TOP_LEVEL,
+	YACC_C_PROLOGUE,
+	YACC_UNION,
+	YACC_GRAMMAR,
+	YACC_C_EPILOGUE,
 };
 
-struct cStart {
-	unsigned long input;
-	unsigned long source;
+static struct yaccParserState {
+	bool not_in_grammar_rules;
+	enum yaccParsingArea area;
+} parserState;
+
+static tagRegexTable yaccTagRegexTable [] = {
+	{"^([A-Za-z][A-Za-z_0-9]+)[ \t]*:", "\\1",
+	 "l,label,labels", NULL, &parserState.not_in_grammar_rules },
+	{"^([A-Za-z][A-Za-z_0-9]+)[ \t]*$", "\\1",
+	 "l,label,labels", NULL, &parserState.not_in_grammar_rules },
 };
 
 static  bool change_section (const char *line CTAGS_ATTR_UNUSED,
-			     const regexMatch *matches CTAGS_ATTR_UNUSED,
-			     unsigned int count CTAGS_ATTR_UNUSED,
-			     void *data CTAGS_ATTR_UNUSED)
+							 const regexMatch *matches CTAGS_ATTR_UNUSED,
+							 unsigned int count CTAGS_ATTR_UNUSED,
+							 void *data)
 {
-	not_in_grammar_rules = !not_in_grammar_rules;
+	struct yaccParserState *state = data;
 
-	if (not_in_grammar_rules)
-	{
-		const unsigned char *tmp, *last;
-		long endCharOffset;
-		unsigned long c_start;
-		unsigned long c_source_start;
-		unsigned long c_end;
-
-		readLineFromInputFile ();
-		c_start = getInputLineNumber ();
-		c_source_start = getSourceLineNumber();
-
-		/* Skip the lines for finding the EOF. */
-		endCharOffset = 0;
-		last = NULL;
-		while ((tmp = readLineFromInputFile ()))
-			last = tmp;
-		if (last)
-			endCharOffset = strlen ((const char *)last);
-		/* If `last' is too long, strlen returns a too large value
-		   for the positive area of `endCharOffset'. */
-		if (endCharOffset < 0)
-			endCharOffset = 0;
-
-		c_end = getInputLineNumber ();
-
-		makePromise ("C", c_start, 0, c_end, endCharOffset, c_source_start);
-	}
+	state->not_in_grammar_rules = !state->not_in_grammar_rules;
+	if (state->area == YACC_GRAMMAR)
+		state->area = YACC_C_EPILOGUE;
+	else
+		state->area = YACC_GRAMMAR;
 	return true;
 }
 
@@ -77,12 +59,9 @@ static bool enter_c_prologue (const char *line CTAGS_ATTR_UNUSED,
 			      unsigned int count CTAGS_ATTR_UNUSED,
 			      void *data)
 {
-	struct cStart *cstart = data;
+	struct yaccParserState *state = data;
 
-
-	readLineFromInputFile ();
-	cstart->input  = getInputLineNumber ();
-	cstart->source = getSourceLineNumber ();
+	state->area = YACC_C_PROLOGUE;
 	return true;
 }
 
@@ -91,13 +70,9 @@ static bool leave_c_prologue (const char *line CTAGS_ATTR_UNUSED,
 			      unsigned int count CTAGS_ATTR_UNUSED,
 			      void *data)
 {
-	struct cStart *cstart = data;
-	unsigned long c_end;
+	struct yaccParserState *state = data;
 
-	c_end = getInputLineNumber ();
-	makePromise ("C", cstart->input, 0, c_end, 0, cstart->source);
-	memset (cstart, 0, sizeof (*cstart));
-
+	state->area = YACC_TOP_LEVEL;
 	return true;
 }
 
@@ -106,14 +81,10 @@ static bool enter_union (const char *line CTAGS_ATTR_UNUSED,
 			 unsigned int count CTAGS_ATTR_UNUSED,
 			 void *data)
 {
-	struct cStart *cstart = data;
+	struct yaccParserState *state = data;
 
-	if (not_in_grammar_rules)
-	{
-		in_union = true;
-		cstart->input = getInputLineNumber ();
-		cstart->source = getInputLineNumber ();
-	}
+	if (state->area == YACC_TOP_LEVEL)
+		state->area = YACC_UNION;
 	return true;
 }
 
@@ -122,22 +93,38 @@ static bool leave_union (const char *line CTAGS_ATTR_UNUSED,
 			 unsigned int count CTAGS_ATTR_UNUSED,
 			 void *data)
 {
-	struct cStart *cstart = data;
+	struct yaccParserState *state = data;
 
-	if (not_in_grammar_rules && in_union && cstart->input && cstart->source)
-	{
-		unsigned long c_end;
-
-		c_end = getInputLineNumber ();
-
-		makePromise ("C", cstart->input, strlen ("%"),
-			     c_end, strlen ("}"),
-			     cstart->source);
-
-		memset (cstart, 0, sizeof (*cstart));
-		in_union = false;
-	}
+	if (state->area == YACC_UNION)
+		state->area = YACC_TOP_LEVEL;
 	return true;
+}
+
+static void make_promise_for_epilogue (void)
+{
+	const unsigned char *tmp, *last;
+	long endCharOffset;
+	unsigned long c_start;
+	unsigned long c_source_start;
+	unsigned long c_end;
+
+	c_start = getInputLineNumber ();
+	c_source_start = getSourceLineNumber();
+
+	/* Skip the lines for finding the EOF. */
+	endCharOffset = 0;
+	last = NULL;
+	while ((tmp = readLineFromInputFile ()))
+		last = tmp;
+	if (last)
+		endCharOffset = strlen ((const char *)last);
+	/* If `last' is too long, strlen returns a too large value
+	   for the positive area of `endCharOffset'. */
+	if (endCharOffset < 0)
+		endCharOffset = 0;
+
+	c_end = getInputLineNumber ();
+	makePromise ("C", c_start, 0, c_end, endCharOffset, c_source_start);
 }
 
 static void initializeYaccParser (langType language)
@@ -153,25 +140,71 @@ static void initializeYaccParser (langType language)
 		C language
 	*/
 
-	static struct cStart cStart;
+	addLanguageCallbackRegex (language, "^%\\{", "{exclusive}", enter_c_prologue, NULL, &parserState);
+	addLanguageCallbackRegex (language, "^%\\}", "{exclusive}", leave_c_prologue, NULL, &parserState);
 
-	memset (&cStart, 0, sizeof (cStart));
+	addLanguageCallbackRegex (language, "^%%", "{exclusive}", change_section, NULL, &parserState);
 
-	addLanguageCallbackRegex (language, "^%\\{", "{exclusive}", enter_c_prologue, NULL, &cStart);
-	addLanguageCallbackRegex (language, "^%\\}", "{exclusive}", leave_c_prologue, NULL, &cStart);
-
-	addLanguageCallbackRegex (language, "^%%", "{exclusive}", change_section, NULL, NULL);
-
-	addLanguageCallbackRegex (language, "^%union", "{exclusive}", enter_union, NULL, &cStart);
-	addLanguageCallbackRegex (language, "^}",      "{exclusive}", leave_union, NULL, &cStart);
+	addLanguageCallbackRegex (language, "^%union", "{exclusive}", enter_union, NULL, &parserState);
+	addLanguageCallbackRegex (language, "^}",      "{exclusive}", leave_union, NULL, &parserState);
 }
 
 static void runYaccParser (void)
 {
-	in_union = false;
-	not_in_grammar_rules = true;
+	enum yaccParsingArea last_area;
 
-	findRegexTags ();
+	unsigned long c_input = 0;
+	unsigned long c_source = 0;
+
+	parserState.not_in_grammar_rules = true;
+
+	c_input = 0;
+	c_source = 0;
+	parserState.area = YACC_TOP_LEVEL;
+	last_area = parserState.area;
+
+	while (readLineFromInputFile () != NULL)
+	{
+		if (last_area == YACC_TOP_LEVEL &&
+			parserState.area == YACC_C_PROLOGUE)
+		{
+			if (readLineFromInputFile ())
+			{
+				c_input  = getInputLineNumber ();
+				c_source = getSourceLineNumber ();
+			}
+		}
+		else if (last_area == YACC_C_PROLOGUE
+				 && parserState.area == YACC_TOP_LEVEL)
+		{
+			unsigned long c_end = getInputLineNumber ();
+			makePromise ("C", c_input, 0, c_end, 0, c_source);
+			c_input = 0;
+			c_source = 0;
+		}
+		else if (last_area == YACC_TOP_LEVEL
+				 && parserState.area == YACC_UNION)
+		{
+			c_input = getInputLineNumber ();
+			c_source = getInputLineNumber ();
+		}
+		else if (last_area == YACC_UNION
+				 && parserState.area == YACC_TOP_LEVEL)
+		{
+			unsigned long c_end = getInputLineNumber ();
+			makePromise ("C", c_input, strlen ("%"), c_end, strlen ("}"),
+						 c_source);
+			c_input = 0;
+			c_source = 0;
+		}
+		else if (parserState.area == YACC_C_EPILOGUE)
+		{
+			if (readLineFromInputFile ())
+				make_promise_for_epilogue ();
+		}
+		last_area = parserState.area;
+	}
+
 }
 
 extern parserDefinition* YaccParser (void)

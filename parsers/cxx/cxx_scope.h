@@ -71,8 +71,12 @@ void cxxScopePush(
 		enum CXXScopeAccess eInitialAccess
 	);
 void cxxScopeSetAccess(enum CXXScopeAccess eAccess);
+// Remove the last token from the scope chain
 void cxxScopePop(void);
 
-
+// Special management: pop one scope level but keep it so it can be pushed back
+CXXToken * cxxScopeTakeTop(void);
+// Special management: push back a scope taken earlier via cxxScopeTakeTop()
+void cxxScopePushTop(CXXToken * t);
 
 #endif //!ctags_cxx_scope_h_
