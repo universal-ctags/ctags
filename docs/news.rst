@@ -1515,7 +1515,7 @@ Here field means an item listed with ``--list-fields`` option.
 
 The notation of a slot::
 
-   %[WIDTH-AND-ADJUSTMENT]FIELD-SPECIFIER
+   %[-][.][WIDTH-AND-ADJUSTMENT]FIELD-SPECIFIER
 
 ``FIELD-SPECIFIER`` specifies a field whose value is printed.
 Short notation and long notation are available. They can be mixed
@@ -1535,11 +1535,14 @@ case both common and parser own fields are activated and printed.
 If a common field and a parser own field have the same name,
 the common field has higher priority.
 
-`WIDTH-AND-ADJUSTMENT` is a positive or negative number.
-The absolute value of the number is used as the width of
+`WIDTH-AND-ADJUSTMENT` is a positive number.
+The value of the number is used as the width of
 the column where a field is printed. The printing is
-right adjusted when a positive value is given, and left
-adjusted when negative.
+right adjusted by default, and left
+adjusted when `-` is given as prefix.
+The output is not truncated by default even if its field width is
+specified and smaller than width of output value. For truncating
+the output to the specified width, use `.` as prefix.
 
 An example of specifying common fields:
 
