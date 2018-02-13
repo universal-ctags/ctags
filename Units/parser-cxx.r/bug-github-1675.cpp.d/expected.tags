@@ -1,0 +1,9 @@
+longlong3	input.cpp	/^struct __device_builtin__ longlong3$/;"	s	file:
+longlong4	input.cpp	/^struct __device_builtin__ __builtin_align__(16) longlong4$/;"	s	file:
+w	input.cpp	/^    long long int x, y, z, w;$/;"	m	struct:longlong4	typeref:typename:long long int	file:
+x	input.cpp	/^    long long int x, y, z, w;$/;"	m	struct:longlong4	typeref:typename:long long int	file:
+x	input.cpp	/^    long long int x, y, z;$/;"	m	struct:longlong3	typeref:typename:long long int	file:
+y	input.cpp	/^    long long int x, y, z, w;$/;"	m	struct:longlong4	typeref:typename:long long int	file:
+y	input.cpp	/^    long long int x, y, z;$/;"	m	struct:longlong3	typeref:typename:long long int	file:
+z	input.cpp	/^    long long int x, y, z, w;$/;"	m	struct:longlong4	typeref:typename:long long int	file:
+z	input.cpp	/^    long long int x, y, z;$/;"	m	struct:longlong3	typeref:typename:long long int	file:
