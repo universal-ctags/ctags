@@ -1832,5 +1832,9 @@ void cxxParserCleanup(langType language CTAGS_ATTR_UNUSED,bool initialized CTAGS
 
 	cxxScopeDone();
 
+#ifdef CXX_DO_DEBUGGING
+	cxxDebugTypeCleanup();
+#endif
+
 	cxxTokenAPIDone();
 }
