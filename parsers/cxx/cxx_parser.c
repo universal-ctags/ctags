@@ -1169,6 +1169,7 @@ static bool cxxParserParseClassStructOrUnionInternal(
 				iPushedScopes++;
 			} else {
 				// it's a syntax error, but be tolerant
+				cxxTokenDestroy(pNamespaceBegin);
 			}
 			pNamespaceBegin = pNext->pNext;
 		}
@@ -1831,6 +1832,10 @@ void cxxParserCleanup(langType language CTAGS_ATTR_UNUSED,bool initialized CTAGS
 		cxxTokenChainDestroy(g_cxx.pTemplateTokenChain);
 
 	cxxScopeDone();
+
+#ifdef CXX_DO_DEBUGGING
+	cxxDebugTypeCleanup();
+#endif
 
 	cxxTokenAPIDone();
 }

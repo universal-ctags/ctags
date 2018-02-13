@@ -36,18 +36,25 @@ echo "	vStringCatS (buf, str);"
 echo "	return true;"
 echo "}"
 echo
+echo "static vString * g_pDebugBuffer = NULL;"
+echo
 echo 'const char * cxxDebugTypeDecode (enum CXXTokenType eType)'
 echo '{'
 echo '	bool a = false;'
-echo '	static vString *buf;'
-echo '	buf = vStringNewOrClear (buf);'
+echo '	g_pDebugBuffer = vStringNewOrClear (g_pDebugBuffer);'
 echo
 ${CTAGS} -o - --sort=no --language-force=C --kinds-C=e -x --_xformat="%N" "${INPUT}" \
 	| grep ^CXXTokenType \
 	| while read N; do
-		echo "	if (eType & $N) a = append (buf, \"${N#CXXTokenType}\", a);"
+		echo "	if (eType & $N) a = append (g_pDebugBuffer, \"${N#CXXTokenType}\", a);"
 done
-echo '	if (vStringLength(buf) == 0) vStringCatS(buf, "REALLY-UNKNOWN");'
-echo '	return vStringValue (buf);'
+echo '	if (vStringLength(g_pDebugBuffer) == 0) vStringCatS(g_pDebugBuffer, "REALLY-UNKNOWN");'
+echo '	return vStringValue (g_pDebugBuffer);'
 echo '}'
+echo ""
+echo "void cxxDebugTypeCleanup()"
+echo "{"
+echo "	if(g_pDebugBuffer)"
+echo "		vStringFree(g_pDebugBuffer);"
+echo "}"
 echo '#endif'

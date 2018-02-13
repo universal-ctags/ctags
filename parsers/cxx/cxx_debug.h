@@ -32,6 +32,7 @@ const char* cxxDebugTypeDecode(enum CXXTokenType);
 void cxxDebugDumpToken (CXXToken *pToken);
 void cxxDebugDumpChain (CXXTokenChain *pChain);
 const char* cxxDebugScopeDecode(enum CXXScopeType);
+void cxxDebugTypeCleanup();
 
 #define CXX_DEBUG_ENTER() TRACE_ENTER()
 #define CXX_DEBUG_LEAVE() TRACE_LEAVE()
