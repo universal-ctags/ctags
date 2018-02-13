@@ -11,44 +11,54 @@ static bool append(vString *buf, const char *str, bool appended)
 	return true;
 }
 
+static vString * g_pDebugBuffer = NULL;
+
 const char * cxxDebugTypeDecode (enum CXXTokenType eType)
 {
 	bool a = false;
-	static vString *buf;
-	buf = vStringNewOrClear (buf);
+	g_pDebugBuffer = vStringNewOrClear (g_pDebugBuffer);
 
-	if (eType & CXXTokenTypeEOF) a = append (buf, "EOF", a);
-	if (eType & CXXTokenTypeIdentifier) a = append (buf, "Identifier", a);
-	if (eType & CXXTokenTypeKeyword) a = append (buf, "Keyword", a);
-	if (eType & CXXTokenTypeNumber) a = append (buf, "Number", a);
-	if (eType & CXXTokenTypeSingleColon) a = append (buf, "SingleColon", a);
-	if (eType & CXXTokenTypeMultipleColons) a = append (buf, "MultipleColons", a);
-	if (eType & CXXTokenTypeSemicolon) a = append (buf, "Semicolon", a);
-	if (eType & CXXTokenTypeComma) a = append (buf, "Comma", a);
-	if (eType & CXXTokenTypeAssignment) a = append (buf, "Assignment", a);
-	if (eType & CXXTokenTypeOperator) a = append (buf, "Operator", a);
-	if (eType & CXXTokenTypeUnknown) a = append (buf, "Unknown", a);
-	if (eType & CXXTokenTypeDotOperator) a = append (buf, "DotOperator", a);
-	if (eType & CXXTokenTypePointerOperator) a = append (buf, "PointerOperator", a);
-	if (eType & CXXTokenTypeStringConstant) a = append (buf, "StringConstant", a);
-	if (eType & CXXTokenTypeStar) a = append (buf, "Star", a);
-	if (eType & CXXTokenTypeAnd) a = append (buf, "And", a);
-	if (eType & CXXTokenTypeMultipleAnds) a = append (buf, "MultipleAnds", a);
-	if (eType & CXXTokenTypeCharacterConstant) a = append (buf, "CharacterConstant", a);
-	if (eType & CXXTokenTypeMultipleDots) a = append (buf, "MultipleDots", a);
-	if (eType & CXXTokenTypeOpeningBracket) a = append (buf, "OpeningBracket", a);
-	if (eType & CXXTokenTypeOpeningParenthesis) a = append (buf, "OpeningParenthesis", a);
-	if (eType & CXXTokenTypeOpeningSquareParenthesis) a = append (buf, "OpeningSquareParenthesis", a);
-	if (eType & CXXTokenTypeSmallerThanSign) a = append (buf, "SmallerThanSign", a);
-	if (eType & CXXTokenTypeClosingBracket) a = append (buf, "ClosingBracket", a);
-	if (eType & CXXTokenTypeClosingParenthesis) a = append (buf, "ClosingParenthesis", a);
-	if (eType & CXXTokenTypeClosingSquareParenthesis) a = append (buf, "ClosingSquareParenthesis", a);
-	if (eType & CXXTokenTypeGreaterThanSign) a = append (buf, "GreaterThanSign", a);
-	if (eType & CXXTokenTypeBracketChain) a = append (buf, "BracketChain", a);
-	if (eType & CXXTokenTypeParenthesisChain) a = append (buf, "ParenthesisChain", a);
-	if (eType & CXXTokenTypeSquareParenthesisChain) a = append (buf, "SquareParenthesisChain", a);
-	if (eType & CXXTokenTypeAngleBracketChain) a = append (buf, "AngleBracketChain", a);
-	if (vStringLength(buf) == 0) vStringCatS(buf, "REALLY-UNKNOWN");
-	return vStringValue (buf);
+	if (eType & CXXTokenTypeEOF) a = append (g_pDebugBuffer, "EOF", a);
+	if (eType & CXXTokenTypeIdentifier) a = append (g_pDebugBuffer, "Identifier", a);
+	if (eType & CXXTokenTypeKeyword) a = append (g_pDebugBuffer, "Keyword", a);
+	if (eType & CXXTokenTypeNumber) a = append (g_pDebugBuffer, "Number", a);
+	if (eType & CXXTokenTypeSingleColon) a = append (g_pDebugBuffer, "SingleColon", a);
+	if (eType & CXXTokenTypeMultipleColons) a = append (g_pDebugBuffer, "MultipleColons", a);
+	if (eType & CXXTokenTypeSemicolon) a = append (g_pDebugBuffer, "Semicolon", a);
+	if (eType & CXXTokenTypeComma) a = append (g_pDebugBuffer, "Comma", a);
+	if (eType & CXXTokenTypeAssignment) a = append (g_pDebugBuffer, "Assignment", a);
+	if (eType & CXXTokenTypeOperator) a = append (g_pDebugBuffer, "Operator", a);
+	if (eType & CXXTokenTypeUnknown) a = append (g_pDebugBuffer, "Unknown", a);
+	if (eType & CXXTokenTypeDotOperator) a = append (g_pDebugBuffer, "DotOperator", a);
+	if (eType & CXXTokenTypePointerOperator) a = append (g_pDebugBuffer, "PointerOperator", a);
+	if (eType & CXXTokenTypeStringConstant) a = append (g_pDebugBuffer, "StringConstant", a);
+	if (eType & CXXTokenTypeStar) a = append (g_pDebugBuffer, "Star", a);
+	if (eType & CXXTokenTypeAnd) a = append (g_pDebugBuffer, "And", a);
+	if (eType & CXXTokenTypeMultipleAnds) a = append (g_pDebugBuffer, "MultipleAnds", a);
+	if (eType & CXXTokenTypeCharacterConstant) a = append (g_pDebugBuffer, "CharacterConstant", a);
+	if (eType & CXXTokenTypeMultipleDots) a = append (g_pDebugBuffer, "MultipleDots", a);
+	if (eType & CXXTokenTypeOpeningBracket) a = append (g_pDebugBuffer, "OpeningBracket", a);
+	if (eType & CXXTokenTypeOpeningParenthesis) a = append (g_pDebugBuffer, "OpeningParenthesis", a);
+	if (eType & CXXTokenTypeOpeningSquareParenthesis) a = append (g_pDebugBuffer, "OpeningSquareParenthesis", a);
+	if (eType & CXXTokenTypeSmallerThanSign) a = append (g_pDebugBuffer, "SmallerThanSign", a);
+	if (eType & CXXTokenTypeClosingBracket) a = append (g_pDebugBuffer, "ClosingBracket", a);
+	if (eType & CXXTokenTypeClosingParenthesis) a = append (g_pDebugBuffer, "ClosingParenthesis", a);
+	if (eType & CXXTokenTypeClosingSquareParenthesis) a = append (g_pDebugBuffer, "ClosingSquareParenthesis", a);
+	if (eType & CXXTokenTypeGreaterThanSign) a = append (g_pDebugBuffer, "GreaterThanSign", a);
+	if (eType & CXXTokenTypeBracketChain) a = append (g_pDebugBuffer, "BracketChain", a);
+	if (eType & CXXTokenTypeParenthesisChain) a = append (g_pDebugBuffer, "ParenthesisChain", a);
+	if (eType & CXXTokenTypeSquareParenthesisChain) a = append (g_pDebugBuffer, "SquareParenthesisChain", a);
+	if (eType & CXXTokenTypeAngleBracketChain) a = append (g_pDebugBuffer, "AngleBracketChain", a);
+	if (vStringLength(g_pDebugBuffer) == 0) vStringCatS(g_pDebugBuffer, "REALLY-UNKNOWN");
+	return vStringValue (g_pDebugBuffer);
+}
+
+void cxxDebugTypeCleanup()
+{
+	if(g_pDebugBuffer)
+	{
+		vStringDelete(g_pDebugBuffer);
+		g_pDebugBuffer = NULL;
+	}
 }
 #endif
