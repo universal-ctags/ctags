@@ -15,7 +15,7 @@ const char * cxxDebugTypeDecode (enum CXXTokenType eType)
 {
 	bool a = false;
 	static vString *buf;
-	buf = vStringNewOrClear (buf);
+	buf = vStringNewOrClearWithAutoRelease (buf);
 
 	if (eType & CXXTokenTypeEOF) a = append (buf, "EOF", a);
 	if (eType & CXXTokenTypeIdentifier) a = append (buf, "Identifier", a);

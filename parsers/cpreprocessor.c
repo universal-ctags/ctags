@@ -742,7 +742,7 @@ static int directiveDefine (const int c, bool undef)
 			p = cppGetcFromUngetBufferOrFile ();
 			if (p == '(')
 			{
-				signature = vStringNewOrClear (signature);
+				signature = vStringNewOrClearWithAutoRelease (signature);
 				do {
 					if (!isspacetab(p))
 						vStringPut (signature, p);
