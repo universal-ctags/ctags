@@ -25,7 +25,7 @@ typedef union uFmtSpec {
 	struct {
 		fieldType ftype;
 		int width;
-		bool truncation;
+		char *raw_fmtstr;
 	} field;
 } fmtSpec;
 
@@ -85,11 +85,8 @@ static int printTagField (fmtSpec* fspec, MIO* fp, const tagEntryInfo * tag)
 	if (str == NULL)
 		str = "";
 
-	bool trunc = fspec->field.truncation;
-	if (width < 0)
-		i = mio_printf (fp, (trunc? "%-.*s": "%-*s"), -1 * width, str);
-	else if (width > 0)
-		i = mio_printf (fp, (trunc? "%.*s": "%*s"), width, str);
+	if (width)
+		i = mio_printf (fp, fspec->field.raw_fmtstr, width, str);
 	else
 	{
 		mio_puts (fp, str);
@@ -205,7 +202,16 @@ static fmtElement** queueTagField (fmtElement **last, long width, bool truncatio
 
 	cur->spec.field.width = width;
 	cur->spec.field.ftype = ftype;
-	cur->spec.field.truncation = truncation;
+
+	if (width < 0)
+	{
+		cur->spec.field.width *= -1;
+		cur->spec.field.raw_fmtstr = (truncation? "%-.*s": "%-*s");
+	}
+	else if (width > 0)
+		cur->spec.field.raw_fmtstr = (truncation? "%.*s": "%*s");
+	else
+		cur->spec.field.raw_fmtstr = NULL;
 
 	enableField (ftype, true, false);
 	if (language == LANG_AUTO)
