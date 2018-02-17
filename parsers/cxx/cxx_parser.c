@@ -1169,6 +1169,7 @@ static bool cxxParserParseClassStructOrUnionInternal(
 				iPushedScopes++;
 			} else {
 				// it's a syntax error, but be tolerant
+				cxxTokenDestroy(pNamespaceBegin);
 			}
 			pNamespaceBegin = pNext->pNext;
 		}
