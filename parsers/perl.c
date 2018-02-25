@@ -56,12 +56,12 @@ static kindDefinition PerlKinds [] = {
 
 static bool isIdentifier1 (int c)
 {
-	return (bool) (isalpha (c) || c == '_');
+	return (bool) (is_alpha (c) || c == '_');
 }
 
 static bool isIdentifier (int c)
 {
-	return (bool) (isalnum (c) || c == '_');
+	return (bool) (is_alnum (c) || c == '_');
 }
 
 static bool isPodWord (const char *word)
@@ -182,7 +182,7 @@ static void makeTagFromLeftSide (const char *begin, const char *end,
 	const char *b, *e;
 	if (! PerlKinds[K_CONSTANT].enabled)
 		return;
-	for (e = end - 1; e > begin && isspace(*e); --e)
+	for (e = end - 1; e > begin && is_space(*e); --e)
 		;
 	if (e < begin)
 		return;
@@ -191,7 +191,7 @@ static void makeTagFromLeftSide (const char *begin, const char *end,
 	/* Identifier must be either beginning of line of have some whitespace
 	 * on its left:
 	 */
-	if (b < begin || isspace(*b) || ',' == *b)
+	if (b < begin || is_space(*b) || ',' == *b)
 		++b;
 	else if (b != begin)
 		return;
@@ -336,7 +336,7 @@ static void findPerlTags (void)
 		else if (line [0] == '#')
 			continue;
 
-		while (isspace (*cp))
+		while (is_space (*cp))
 			cp++;
 
 		if (strncmp((const char*) cp, "sub", (size_t) 3) == 0)
@@ -350,9 +350,9 @@ static void findPerlTags (void)
 		else if (strncmp((const char*) cp, "use", (size_t) 3) == 0)
 		{
 			cp += 3;
-			if (!isspace(*cp))
+			if (!is_space(*cp))
 				continue;
-			while (*cp && isspace (*cp))
+			while (*cp && is_space (*cp))
 				++cp;
 			if (strncmp((const char*) cp, "AutoLoader", (size_t) 10) == 0) {
 				respect_token &= ~RESPECT_END;
@@ -368,13 +368,13 @@ static void findPerlTags (void)
 			/* Skip up to the first non-space character, skipping empty
 			 * and comment lines.
 			 */
-			while (isspace(*cp))
+			while (is_space(*cp))
 				cp++;
 			while (!*cp || '#' == *cp) {
 				cp = readLineFromInputFile ();
 				if (!cp)
 					goto END_MAIN_WHILE;
-				while (isspace (*cp))
+				while (is_space (*cp))
 					cp++;
 			}
 			if ('{' == *cp) {
@@ -390,16 +390,16 @@ static void findPerlTags (void)
 			qualified = true;
 		}
 		else if (strncmp((const char*) cp, "package", (size_t) 7) == 0 &&
-				 ('\0' == cp[7] || isspace(cp[7])))
+				 ('\0' == cp[7] || is_space(cp[7])))
 		{
 			cp += 7;
-			while (isspace (*cp))
+			while (is_space (*cp))
 				cp++;
 			while (!*cp || '#' == *cp) {
 				cp = readLineFromInputFile ();
 				if (!cp)
 					goto END_MAIN_WHILE;
-				while (isspace (*cp))
+				while (is_space (*cp))
 					cp++;
 			}
 			if (package == NULL)
@@ -407,7 +407,7 @@ static void findPerlTags (void)
 			else
 				vStringClear (package);
 			const unsigned char *const first = cp;
-			while (*cp && (int) *cp != ';'  &&  !isspace ((int) *cp))
+			while (*cp && (int) *cp != ';'  &&  !is_space ((int) *cp))
 			{
 				vStringPut (package, (int) *cp);
 				cp++;
@@ -433,7 +433,7 @@ static void findPerlTags (void)
 				const unsigned char *p = cp;
 				while (isIdentifier (*p))
 					++p;
-				while (isspace (*p))
+				while (is_space (*p))
 					++p;
 				if ((int) *p == ':' && (int) *(p + 1) != ':')
 					kind = K_LABEL;
@@ -442,11 +442,11 @@ static void findPerlTags (void)
 		if (kind != K_NONE)
 		{
 			TRACE("cp0: %s\n", (const char *) cp);
-			if (spaceRequired && *cp && !isspace (*cp))
+			if (spaceRequired && *cp && !is_space (*cp))
 				continue;
 
 			TRACE("cp1: %s\n", (const char *) cp);
-			while (isspace (*cp))
+			while (is_space (*cp))
 				cp++;
 
 			while (!*cp || '#' == *cp) { /* Gobble up empty lines
@@ -454,7 +454,7 @@ static void findPerlTags (void)
 				cp = readLineFromInputFile ();
 				if (!cp)
 					goto END_MAIN_WHILE;
-				while (isspace (*cp))
+				while (is_space (*cp))
 					cp++;
 			}
 

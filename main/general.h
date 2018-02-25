@@ -77,4 +77,22 @@ extern char *getenv (const char *);
 #define iconv_close libiconv_close
 #endif
 
+/*
+*   Safe wrappers around <ctype.h> functions
+*/
+
+#define is_alnum(ch) isalnum((unsigned char) (ch))
+#define is_alpha(ch) isalpha((unsigned char) (ch))
+#define is_cntrl(ch) iscntrl((unsigned char) (ch))
+#define is_digit(ch) isdigit((unsigned char) (ch))
+#define is_graph(ch) isgraph((unsigned char) (ch))
+#define is_lower(ch) islower((unsigned char) (ch))
+#define is_print(ch) isprint((unsigned char) (ch))
+#define is_punct(ch) ispunct((unsigned char) (ch))
+#define is_space(ch) isspace((unsigned char) (ch))
+#define is_upper(ch) isupper((unsigned char) (ch))
+#define is_xdigit(ch) isxdigit((unsigned char) (ch))
+#define to_lower(ch) tolower((unsigned char) (ch))
+#define to_upper(ch) toupper((unsigned char) (ch))
+
 #endif  /* CTAGS_MAIN_GENERAL_H */

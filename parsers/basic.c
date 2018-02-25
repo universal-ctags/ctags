@@ -92,10 +92,10 @@ static KeyWord freebasic_keywords[] = {
 /* Match the name of a tag (function, variable, type, ...) starting at pos. */
 static char const *extract_name (char const *pos, vString * name)
 {
-	while (isspace (*pos))
+	while (is_space (*pos))
 		pos++;
 	vStringClear (name);
-	for (; *pos && !isspace (*pos) && *pos != '(' && *pos != ','; pos++)
+	for (; *pos && !is_space (*pos) && *pos != '(' && *pos != ','; pos++)
 		vStringPut (name, *pos);
 	return pos;
 }
@@ -108,7 +108,7 @@ static int match_keyword (const char *p, KeyWord const *kw)
 	int j;
 	for (i = 0; i < strlen (kw->token); i++)
 	{
-		if (tolower (p[i]) != kw->token[i])
+		if (to_lower (p[i]) != kw->token[i])
 			return 0;
 	}
 	name = vStringNew ();
@@ -126,7 +126,7 @@ static int match_keyword (const char *p, KeyWord const *kw)
 static void match_colon_label (char const *p)
 {
 	char const *end = p + strlen (p) - 1;
-	while (isspace (*end))
+	while (is_space (*end))
 		end--;
 	if (*end == ':')
 	{
@@ -167,7 +167,7 @@ static void findBasicTags (void)
 		const char *p = line;
 		KeyWord const *kw;
 
-		while (isspace (*p))
+		while (is_space (*p))
 			p++;
 
 		/* Empty line? */

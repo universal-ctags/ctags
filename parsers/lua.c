@@ -47,7 +47,7 @@ static bool is_a_code_line (const unsigned char *line)
 {
 	bool result;
 	const unsigned char *p = line;
-	while (isspace ((int) *p))
+	while (is_space ((int) *p))
 		p++;
 	if (p [0] == '\0')
 		result = false;
@@ -60,7 +60,7 @@ static bool is_a_code_line (const unsigned char *line)
 
 static bool isLuaIdentifier (char c)
 {
-	return (bool) !(isspace(c)  || c == '(' || c == ')' || c == '=');
+	return (bool) !(is_space(c)  || c == '(' || c == ')' || c == '=');
 }
 
 static void extract_next_token (const char *begin, const char *end_sentinel, vString *name)
@@ -73,7 +73,7 @@ static void extract_next_token (const char *begin, const char *end_sentinel, vSt
 	if (! (begin < end_sentinel))
 		return;
 
-	while (isspace ((int) *begin))
+	while (is_space ((int) *begin))
 	{
 		begin++;
 		if (! (begin < end_sentinel))
@@ -106,7 +106,7 @@ static void extract_prev_token (const char *end, const char *begin_sentinel, vSt
 	if (! (begin_sentinel <= end))
 		return;
 
-	while (isspace ((int) *end))
+	while (is_space ((int) *end))
 	{
 		end--;
 		if (! (begin_sentinel <= end))

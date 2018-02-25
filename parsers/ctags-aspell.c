@@ -124,7 +124,7 @@ static void readAspellToken (tokenInfo *const token, void *data CTAGS_ATTR_UNUSE
 			token->type = TOKEN_EOF;
 			return;
 		}
-		else if (isalpha (c))
+		else if (is_alpha (c))
 			break;
 	}
 
@@ -136,7 +136,7 @@ static void readAspellToken (tokenInfo *const token, void *data CTAGS_ATTR_UNUSE
 
 	while ((c = getcFromInputFile ()) != EOF)
 	{
-		if (isalnum(c))
+		if (is_alnum(c))
 			tokenPutc(token, c);
 		else
 			break;
@@ -147,7 +147,7 @@ static void downcase_word (char *word)
 {
 	for (unsigned int i = 0; word[i] != '\0'; i++)
 	{
-		if (isupper (word[i]))
+		if (is_upper (word[i]))
 			word[i] = (word[i] - ('A' - 'a'));
 	}
 }
@@ -235,7 +235,7 @@ static void aspell_dictfile_handler (const langType language CTAGS_ATTR_UNUSED,
 			continue;
 
 		for (unsigned int i = vStringLength(line); 0 < i; i--)
-			if (isalnum (word[i - 1]))
+			if (is_alnum (word[i - 1]))
 				break;
 			else
 				word [i - 1] = '\0';
@@ -305,7 +305,7 @@ static bool isPartOfUUID (const char *word)
 	for (cursor = word; *cursor != '\0'; cursor++)
 	{
 		/* TODO: reject [A-F]. */
-		if (isxdigit(*cursor))
+		if (is_xdigit(*cursor))
 			continue;
 
 		return false;

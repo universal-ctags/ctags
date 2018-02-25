@@ -1455,7 +1455,7 @@ static void addTagRegexOption (struct lregexControlBlock *lcb,
 		const char *c;
 		for (c = pattern; *c; c++)
 		{
-			if (! (isalnum(*c) || *c == '_'))
+			if (! (is_alnum(*c) || *c == '_'))
 			{
 				if (*c &&  (*(c + 1) != '^'))
 				{
@@ -1628,7 +1628,7 @@ extern void addRegexTable (struct lregexControlBlock *lcb, const char *name)
 {
 	const char *c;
 	for (c = name; *c; c++)
-		if (! (isalnum(*c) || *c == '_'))
+		if (! (is_alnum(*c) || *c == '_'))
 			error (FATAL, "`%c' in \"%s\" is not acceptable as part of table name", *c, name);
 
 	if (getTableIndexForName(lcb, name) >= 0)

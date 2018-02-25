@@ -155,7 +155,7 @@ static char* nextFileLine (FILE* const fp)
 
 static bool isCommentLine (char* line)
 {
-	while (isspace(*line))
+	while (is_space(*line))
 		++line;
 	return (*line == '#');
 }

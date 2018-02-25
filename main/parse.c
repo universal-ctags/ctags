@@ -783,9 +783,9 @@ static vString* determineZshAutoloadTag (const char *const modeline,
 	   #compdef ...
 	   #autoload [ OPTIONS ] */
 
-	if (((strncmp (modeline, "#compdef", 8) == 0) && isspace (*(modeline + 8)))
+	if (((strncmp (modeline, "#compdef", 8) == 0) && is_space (*(modeline + 8)))
 	    || ((strncmp (modeline, "#autoload", 9) == 0)
-		&& (isspace (*(modeline + 9)) || *(modeline + 9) == '\0')))
+		&& (is_space (*(modeline + 9)) || *(modeline + 9) == '\0')))
 		return vStringNewInit ("zsh");
 	else
 		return NULL;
@@ -2128,7 +2128,7 @@ static bool processLangDefineKind(const langType language,
 	tmp_start = p;
 	while (p != tmp_end)
 	{
-		if (!isalnum (*p))
+		if (!is_alnum (*p))
 			error (FATAL, "unacceptable char as part of kind name in \"--%s\" option", option);
 		p++;
 	}
@@ -2689,7 +2689,7 @@ static bool processLangDefineExtra (const langType language,
 
 	for (; p < desc; p++)
 	{
-		if (!isalnum (*p))
+		if (!is_alnum (*p))
 			error (FATAL, "unacceptable char as part of extra name in \"--%s\" option",
 				   option);
 	}
@@ -2747,7 +2747,7 @@ static bool processLangDefineField (const langType language,
 
 	for (; p < desc; p++)
 	{
-		if (!isalnum (*p))
+		if (!is_alnum (*p))
 			error (FATAL, "unacceptable char as part of field name in \"--%s\" option",
 				   option);
 	}

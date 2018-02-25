@@ -284,11 +284,11 @@ extern stringList *stringListNewBySplittingWordIntoSubwords (const char* origina
 	vString *subword = vStringNew();
 	for (const char *cursor = originalWord; *cursor != '\0'; cursor++)
 	{
-		if (islower(*cursor))
+		if (is_lower(*cursor))
 		{
 			if (vStringLength (subword) > 1 &&
-				isupper(vStringLast(subword)) &&
-				isupper(vStringItem(subword, vStringLength (subword) - 2)))
+				is_upper(vStringLast(subword)) &&
+				is_upper(vStringItem(subword, vStringLength (subword) - 2)))
 			{
 				/* ABC + d => AB, Cd */
 				char last = vStringLast(subword);
@@ -301,10 +301,10 @@ extern stringList *stringListNewBySplittingWordIntoSubwords (const char* origina
 			   a + b => ab */
 			vStringPut(subword, *cursor);
 		}
-		else if (isupper(*cursor))
+		else if (is_upper(*cursor))
 		{
 			/* a + B => a, B */
-			if (vStringLength (subword) > 0 && islower(vStringLast(subword)))
+			if (vStringLength (subword) > 0 && is_lower(vStringLast(subword)))
 			{
 				stringListAdd (list, subword);
 				subword = vStringNew();
@@ -312,7 +312,7 @@ extern stringList *stringListNewBySplittingWordIntoSubwords (const char* origina
 			/* A + B => AB */
 			vStringPut(subword, *cursor);
 		}
-		else if (isdigit(*cursor))
+		else if (is_digit(*cursor))
 			vStringPut(subword, *cursor);
 		else
 		{

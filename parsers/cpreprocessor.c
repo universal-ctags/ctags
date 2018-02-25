@@ -460,7 +460,7 @@ static bool readDirective (int c, char *const name, unsigned int maxLength)
 		if (i > 0)
 		{
 			c = cppGetcFromUngetBufferOrFile ();
-			if (c == EOF  ||  ! isalpha (c))
+			if (c == EOF  ||  ! is_alpha (c))
 			{
 				cppUngetc (c);
 				break;
@@ -1070,9 +1070,9 @@ static int skipToEndOfChar (void)
 		}
 		else if (Cpp.hasSingleQuoteLiteralNumbers)
 		{
-			if (count == 1  &&  strchr ("DHOB", toupper (c)) != NULL)
+			if (count == 1  &&  strchr ("DHOB", to_upper (c)) != NULL)
 				veraBase = c;
-			else if (veraBase != '\0'  &&  ! isalnum (c))
+			else if (veraBase != '\0'  &&  ! is_alnum (c))
 			{
 				cppUngetc (c);
 				break;
@@ -1522,7 +1522,7 @@ static void saveMacro(const char * macro)
 		return;
 	}
 
-	if(!(isalpha(*c) || (*c == '_')))
+	if(!(is_alpha(*c) || (*c == '_')))
 	{
 		CXX_DEBUG_LEAVE_TEXT("Macro does not start with an alphanumeric character");
 		return; // must be a sequence of letters and digits
@@ -1530,7 +1530,7 @@ static void saveMacro(const char * macro)
 
 	const char * identifierBegin = c;
 
-	while(*c && (isalnum(*c) || (*c == '_')))
+	while(*c && (is_alnum(*c) || (*c == '_')))
 		c++;
 
 	const char * identifierEnd = c;
@@ -1661,14 +1661,14 @@ static void saveMacro(const char * macro)
 
 		while(*c)
 		{
-			if(isalpha(*c) || (*c == '_'))
+			if(is_alpha(*c) || (*c == '_'))
 			{
 				if(c > begin)
 					ADD_CONSTANT_REPLACEMENT(begin,c - begin);
 
 				const char * tokenBegin = c;
 
-				while(*c && (isalnum(*c) || (*c == '_')))
+				while(*c && (is_alnum(*c) || (*c == '_')))
 					c++;
 
 				// check if it is a parameter

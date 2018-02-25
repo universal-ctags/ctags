@@ -79,14 +79,14 @@ static void skipLine (void)
 
 static int skipToNonWhite (int c)
 {
-	while (c != '\n' && isspace (c))
+	while (c != '\n' && is_space (c))
 		c = nextChar ();
 	return c;
 }
 
 static bool isIdentifier (int c)
 {
-	return (bool)(c != '\0' && (isalnum (c)  ||  strchr (".-_/$(){}%", c) != NULL));
+	return (bool)(c != '\0' && (is_alnum (c)  ||  strchr (".-_/$(){}%", c) != NULL));
 }
 
 static bool isSpecialTarget (vString *const name)
@@ -98,7 +98,7 @@ static bool isSpecialTarget (vString *const name)
 	}
 	while (i < vStringLength (name)) {
 		char ch = vStringChar (name, i++);
-		if (ch != '_' && !isupper (ch))
+		if (ch != '_' && !is_upper (ch))
 		{
 			return false;
 		}
@@ -245,7 +245,7 @@ static void findMakeTags (void)
 		}
 		if (c == '\n')
 			newline = true;
-		else if (isspace (c))
+		else if (is_space (c))
 			continue;
 		else if (c == '#')
 			skipLine ();
@@ -341,7 +341,7 @@ static void findMakeTags (void)
 						 */
 						do
 							c = nextChar ();
-						while (c != EOF && c != '\n' && (!isspace (c)));
+						while (c != EOF && c != '\n' && (!is_space (c)));
 						if (c == '\n')
 							ungetcToInputFile (c);
 
