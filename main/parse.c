@@ -2091,6 +2091,7 @@ static bool processLangDefineKind(const langType language,
 	char *description;
 	const char *tmp_start;
 	const char *tmp_end;
+	size_t tmp_len;
 
 
 	Assert (0 <= language  &&  language < (int) LanguageCount);
@@ -2136,7 +2137,13 @@ static bool processLangDefineKind(const langType language,
 	if (tmp_end == tmp_start)
 		error (FATAL, "the kind name in \"--%s\" option is empty", option);
 
-	name = eStrndup (tmp_start, tmp_end - tmp_start);
+	tmp_len = tmp_end - tmp_start;
+	if (strncmp (tmp_start, KIND_FILE_DEFAULT_LONG, tmp_len) == 0)
+		error (FATAL,
+			   "the kind name " KIND_FILE_DEFAULT_LONG " in \"--%s\" option is reserved",
+			   option);
+
+	name = eStrndup (tmp_start, tmp_len);
 	if (getKindForName (parser->kindControlBlock, name))
 	{
 		error (WARNING, "the kind for name `%s' specified in \"--%s\" option is already defined.",

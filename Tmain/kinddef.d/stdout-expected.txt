@@ -33,5 +33,7 @@ ctags: no kind letter specified in "--kinddef-MYTEST" option
 ctags: no kind definition specified in "--kinddef-MYTEST" option
 # wrong letter
 ctags: the kind letter give in "--kinddef-MYTEST" option is not an alphabet or a number
-# reusing file kind
+# reusing the letter for file kind
 ctags: the kind letter `F' in "--kinddef-MYTEST" option is reserved for "file" kind
+# reusing the name for file kind
+ctags: the kind name file in "--kinddef-MYTEST" option is reserved

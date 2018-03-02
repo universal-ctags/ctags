@@ -85,6 +85,12 @@ removed in the future.
 
 The former form may be friendly to shell completion engines.
 
+Disallowing to define a kind with "file" as name
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The kind name "file" is reserved.  Using it as part of kind spec in
+``--regex-<LANG>`` option is now disallowed.
+
 Incompatibilities in tags file format
 -------------------------------------------------------------
 

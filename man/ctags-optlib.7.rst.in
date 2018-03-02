@@ -164,6 +164,9 @@ OPTION ITEMS
 	since Exuberant-ctags.
 
 	*name* also must come from alphabetical characters ('[0-9a-zA-Z]+').
+	Do not use "file" as *name*. It has been reserved for representing
+	a file since Exuberant-ctags.
+
 	Both *letter*, *name* and their combination must be unique in
 	a *<LANG>*.
 
