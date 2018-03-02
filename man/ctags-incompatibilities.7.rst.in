@@ -95,3 +95,18 @@ Option files loading at starting up time (preload files)
 File paths for preload files are changed.
 Universal-ctags doesn't load "~/.ctags" at starting up time.
 See "FILES" section of ctags(1).
+
+Kind letters and names
+-------------------------------------------------------------
+
+A kind letter "F" and a kind name "file" are reserved in the
+main part. A parser cannot have a kind conflicting with
+these reserved ones. Some incompatible changes are introduced
+to follow the above rule.
+
+* Cobol's "file" kind is renamed to "fileDesc" because the
+  kind name "file" is reserved.
+
+* Ruby's "F" (singletonMethod) is changed to "S".
+
+* SQL's "F" (field) is changed to "E".
