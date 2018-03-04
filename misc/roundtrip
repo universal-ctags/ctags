@@ -40,6 +40,74 @@ if ! [ -x "${UNITS}" ]; then
 fi
 
 
+# Expand CTags escape sequences (and keep the original, too)
+# See docs/format.rst
+expandEscapeSequences()
+{
+    sed -e '
+# early out if there is no escape sequence (common case)
+/\\/!b
+
+# loop until we handled all occurrences of \.
+# as it is not possible to do all replacements at once and we need not to
+# ever use the result of an replacement to perform another one, use two
+# reserved placeholders.
+:again
+    s/\\/__BACKSLASH__/
+    s/__BACKSLASH__\\/__LITBACKSLASH__/;	t again
+    s/__BACKSLASH__t/	/;			t again
+    s/__BACKSLASH__r/'"$(printf '\r')"'/;	t again
+    s/__BACKSLASH__n/\
+/;						t again
+    s/__BACKSLASH__a//;			t again
+    s/__BACKSLASH__b/'"$(printf '\b')"'/;	t again
+    s/__BACKSLASH__v//;			t again
+    s/__BACKSLASH__f//;			t again
+    s/__BACKSLASH__x01//;			t again
+    s/__BACKSLASH__x02//;			t again
+    s/__BACKSLASH__x03//;			t again
+    s/__BACKSLASH__x04//;			t again
+    s/__BACKSLASH__x05//;			t again
+    s/__BACKSLASH__x06//;			t again
+    s/__BACKSLASH__x07//;			t again
+    s/__BACKSLASH__x08//;			t again
+    s/__BACKSLASH__x09/	/;			t again
+    s/__BACKSLASH__x0[aA]/\
+/;						t again
+    s/__BACKSLASH__x0[bB]//;			t again
+    s/__BACKSLASH__x0[cC]//;			t again
+    s/__BACKSLASH__x0[dD]/'"$(printf '\r')"'/;	t again
+    s/__BACKSLASH__x0[eE]//;			t again
+    s/__BACKSLASH__x0[fF]//;			t again
+    s/__BACKSLASH__x10//;			t again
+    s/__BACKSLASH__x11//;			t again
+    s/__BACKSLASH__x12//;			t again
+    s/__BACKSLASH__x13//;			t again
+    s/__BACKSLASH__x14//;			t again
+    s/__BACKSLASH__x15//;			t again
+    s/__BACKSLASH__x16//;			t again
+    s/__BACKSLASH__x17//;			t again
+    s/__BACKSLASH__x18//;			t again
+    s/__BACKSLASH__x19//;			t again
+    s/__BACKSLASH__x1[aA]//;			t again
+    s/__BACKSLASH__x1[bB]//;			t again
+    s/__BACKSLASH__x1[cC]//;			t again
+    s/__BACKSLASH__x1[dD]//;			t again
+    s/__BACKSLASH__x1[eE]//;			t again
+    s/__BACKSLASH__x1[fF]//;			t again
+    s/__BACKSLASH__x21/!/;			t again
+    s/__BACKSLASH__x20/ /;			t again
+    s/__BACKSLASH__x7[fF]//;			t again
+    /\\/b again
+
+:out
+    # replace lonely "\"es
+    s/__BACKSLASH__/\\/g
+    # replace literal "\"es ("\\" from the input)
+    s/__LITBACKSLASH__/\\/g
+'
+}
+
 # disable path expansion, because we don't need it and it's applied on the
 # result of the commands used to loop on, and we don't want that.
 set -f
@@ -52,8 +120,19 @@ tagfiles=$(find "$UNITS" -name expected.tags)
 for tags in $tagfiles; do
     tagnames=$(sed -e 's/^\([^	]*\)	.*/\1/' "$tags")
     for name in $tagnames; do
-	if [ 1 -gt $("${READTAGS}" -t "$tags" - "$name" | wc -l) ]; then
-	    printf 'FAILED: "%s" -t "%s" - "%s"\n' "${READTAGS}" "$tags" "$name"
+	# Yes, there is a reason for this craziness.  We need to properly
+	# handle embedded newlines (expanded from "\n"), including trailing
+	# ones the shell would strip automatically.  To work around this, we
+	# add a dummy character at the end to inhibit stripping, and then
+	# remove it, plus the extra newline, using variable substitutions.
+	# Note: we use "printf '%s\n'" instead of "echo" because Dash's "echo"
+	# unconditionally expands some sequences, like "\t" and alike.
+	t="$(printf '%s\n' "$name" | expandEscapeSequences; printf _)"
+	t="${t%
+_}"
+	if [ 1 -gt $("${READTAGS}" -t "$tags" - "$t" | wc -l) ]; then
+	    printf 'FAILED: "%s" -t "%s" - "%s"\n' "${READTAGS}" "$tags" "$t"
+	    printf '	The raw tag name was "%s"\n' "$name"
 	    s=1
 	fi
     done

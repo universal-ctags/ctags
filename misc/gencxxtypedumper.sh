@@ -40,7 +40,7 @@ echo 'const char * cxxDebugTypeDecode (enum CXXTokenType eType)'
 echo '{'
 echo '	bool a = false;'
 echo '	static vString *buf;'
-echo '	buf = vStringNewOrClear (buf);'
+echo '	buf = vStringNewOrClearWithAutoRelease (buf);'
 echo
 ${CTAGS} -o - --sort=no --language-force=C --kinds-C=e -x --_xformat="%N" "${INPUT}" \
 	| grep ^CXXTokenType \
