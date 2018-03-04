@@ -164,10 +164,15 @@ static int writeJsonEntry (tagWriter *writer CTAGS_ATTR_UNUSED,
 		addParserFields (response, tag);
 	}
 
+	int length = 0;
 	char *buf = json_dumps (response, JSON_PRESERVE_ORDER);
-	int length = mio_printf (mio, "%s\n", buf);
+	if (!buf)
+		goto out;
+
+	length = mio_printf (mio, "%s\n", buf);
 
 	free (buf);
+ out:
 	json_decref (response);
 
 	return length;

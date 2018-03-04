@@ -962,13 +962,19 @@ static bool cxxParserParseClassStructOrUnionInternal(
 			return false;
 		}
 
-		// skip alignas specifier:
-		// struct alignas(n) ...
-		//               ^ g_cxx.pToken points this.
-		if(cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeParenthesisChain) &&
-		   cxxTokenTypeIs(g_cxx.pToken->pPrev,CXXTokenTypeKeyword) &&
-		   g_cxx.pToken->pPrev->eKeyword == CXXKeywordALIGNAS)
-				continue;
+		if(
+			cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeParenthesisChain) &&
+			(
+				(
+					// struct alignas(n) ...
+					cxxTokenIsKeyword(g_cxx.pToken->pPrev,CXXKeywordALIGNAS)
+				) || (
+					// things like __builtin_align__(16)
+					!cxxParserTokenChainLooksLikeFunctionParameterList(g_cxx.pToken->pChain,NULL)
+				)
+			)
+		)
+			continue;
 
 		if(!cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeSmallerThanSign))
 			break;
@@ -1008,6 +1014,7 @@ static bool cxxParserParseClassStructOrUnionInternal(
 			CXX_DEBUG_LEAVE_TEXT("Found parenthesis after typedef: parsing as generic typedef");
 			return cxxParserParseGenericTypedef();
 		}
+
 		// probably a function declaration/prototype
 		// something like struct x * func()....
 		// do not clear statement
@@ -1162,6 +1169,7 @@ static bool cxxParserParseClassStructOrUnionInternal(
 				iPushedScopes++;
 			} else {
 				// it's a syntax error, but be tolerant
+				cxxTokenDestroy(pNamespaceBegin);
 			}
 			pNamespaceBegin = pNext->pNext;
 		}
