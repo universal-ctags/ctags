@@ -131,6 +131,8 @@ goto :eof
 @echo on
 PATH C:\%MSYS2_DIR%\%MSYSTEM%\bin;C:\%MSYS2_DIR%\usr\bin;%PATH%
 set CHERE_INVOKING=yes
+@rem Reduce time required to install packages by disabling pacman's disk space checking.
+bash -lc "sed -i 's/^CheckSpace/#CheckSpace/g' /etc/pacman.conf"
 if "%normalbuild%"=="no" (
   @rem Change build message: "Daily build: YYYY-MM-DD"
   for /f "tokens=2-4 delims=/ " %%i in ('date /t') do appveyor UpdateBuild -Message "Daily build: %%k-%%i-%%j"
