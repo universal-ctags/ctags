@@ -18,4 +18,292 @@ SYNOPSIS
 DESCRIPTION
 -----------
 
-TO BE WRITTEN.
+**Exuberant-ctags**, the ancestor of **Universal-ctags**, has provided
+the way to define a new parser from command line.  Universal-ctags
+extends and refines this feature. **optlib parser** is the name for such
+parser in Universal-ctags. "opt" intents a parser is defined with
+combination of command line options. "lib" intents an optlib parser
+can be more than ad-hoc personal configuration.
+
+This man page is for people who wants to define an optlib parser. The
+reader should read ctags(1) of Universal-ctags first. Following
+options are for defining (or customizing) a parser:
+
+* ``--langdef=``
+* ``--kindedef-<LANG>=``
+* ``--fielddef-<LANG>=``
+* ``--extradef-<LANG>=``
+* ``--map-<LANG>=``
+* ``--regex-<LANG>=``
+
+Following options are for controlling loading parser
+definition:
+
+* ``--optlib-dir=[+]directory``
+* ``--options=file|directory``
+* ``--options-maybe=pathname``
+
+The design of options and notations for defining a parser in
+Exuberant-ctags may focus on reducing the number of typing by user.
+Reducing the number of typing is important for users who want to
+define (or customize) a parser quickly.
+
+On the other hand, the design in Universal-ctags focuses on
+maintainability. The notation of Universal-ctags is redundant than
+that of Exuberant-ctags; the newly introduced kind should be declared
+explicitly, (long) names are approved than single letter flags
+specifying kinds, and naming rules are stricter.
+
+
+Storing a parser definition to a file
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Though it is possible to define a parser from command line, you don't
+want to type the same command line each time when you need the parser.
+You can store options for defining a parser into a file.
+
+@CTAGS_NAME_EXECUTABLE@ loads files (preload files) listed in "FILES"
+section of ctags(1) at program starting up. You can put your parser
+definition needed usually to the files.
+
+``--options=pathname``, ``--options-maybe=pathname``, and
+``--optlib-dir=[+]directory`` are for loading optlib files you need
+occasionally. See "COMMAND LINE INTERFACE" section of ctags(1) for
+these options.
+
+As explained in FILES section of ctags(1), options for defining a
+parser listed line by line in an optlib file. Prefixed white spaces are
+ignored. A line starting with '#' is treated as a comment.  Escaping
+shell meta character is not needed.
+
+Use ".ctags" as file extension for optlib file. You can define
+multiple parsers in an optlib file but it is better to make a file for
+each parser definition.
+
+``--_echo=msg`` and ``--_force-quit=[num]`` options are for debugging
+optlib parser.
+
+
+Overview for defining a parser
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+1. Design the parser
+
+   You need know both the target language and the ctags'
+   concepts (definition, reference, kind, role, field, extra). About
+   the concepts, ctags(1) of Universal-ctags may help you.
+
+2. Give a file pattern or file extension for activating the parser
+
+   Use ``--map-<LANG>=[+|-]extension|pattern``.
+
+3. Give a name to the parser
+
+   Use ``--langdef=name`` option. *NAME* is referred as *<LANG>* in
+   the later steps.
+
+4. Define kinds
+
+   Use ``--kinddef-<LANG>=letter,name,description`` option.
+   Universal-ctags introduces this option.  Exuberant-ctags doesn't
+   have. In Exuberant-ctags, a kind is defined as a side effect of
+   specifying ``--regex-<LANG>=`` option. So user doesn't have a
+   chance to recognize how important the definition of kind.
+
+5. Define patterns
+
+   Use ``--regex-<LANG>=/regexp/replacement/[kind-spec/][flags]`` option.
+
+   As *KIND-SPEC*, you can use the letter defined with
+   ``--kinddef-<LANG>=letter,name,description`` option.
+
+EXAMPLE
+------------
+
+This is the definition (pod.ctags) used in ctags for parsing pod
+(https://perldoc.perl.org/perlpod.html) file.
+
+::
+
+   --langdef=pod
+   --map-pod=+.pod
+
+   --kinddef-pod=c,chapter,chapters
+   --kinddef-pod=s,section,sections
+   --kinddef-pod=S,subsection,subsections
+   --kinddef-pod=t,subsubsection,subsubsections
+
+   --regex-pod=/^=head1[ \t]+(.+)/\1/c/
+   --regex-pod=/^=head2[ \t]+(.+)/\1/s/
+   --regex-pod=/^=head3[ \t]+(.+)/\1/S/
+   --regex-pod=/^=head4[ \t]+(.+)/\1/t/
+
+
+OPTION ITEMS
+------------
+
+``--extradef-<LANG>=...``
+	TBW
+
+``--fielddef-<LANG>=...``
+	TBW
+
+``--langdef=name``
+	Defines a new user-defined language, *name*, to be parsed with regular
+	expressions. Once defined, name may be used in other options taking
+	language names.
+
+``--list-regex-flags``
+	Lists the flags that can be used in ``--regex-<LANG>`` option.
+
+``--kinddef-<LANG>=letter,name,description``
+    Define a kind for *<LANG>*.
+	Be not confused this with ``--kinds-<LANG>``.
+
+	*letter* must be an alphabetical character ('[0-9a-zA-EG-Z]')
+	other than "F". "F" has been reserved for representing a file
+	since Exuberant-ctags.
+
+	*name* also must come from alphabetical characters ('[0-9a-zA-Z]+').
+	Do not use "file" as *name*. It has been reserved for representing
+	a file since Exuberant-ctags.
+
+	Both *letter*, *name* and their combination must be unique in
+	a *<LANG>*.
+
+	This option is newly introduced in Universal-ctags.  This option
+	reduces the typing defining a regex pattern with
+	``--regex-<LANG>=``, and keeps the consistency of kind
+	definitions in a language.
+
+	The *letter* can be used as an argument for ``--kinds-<LANG>``
+	option to enable or disable the kind. Unless ``K`` field is
+	enabled, the *letter* is used as value in the "kind" extension
+	field in tags output.
+
+	The *name* surrounded by braces can be used as an argument for
+	``--kind-<LANG>`` option. If ``K`` field is enabled, the *name*
+	is used as value in the "kind" extension field in tags output.
+
+	The *description* and *letter* are listed in ``--list-kinds``
+	output. All three elements of kind-spec are listed in
+	``--list-kinds-full`` output. Don't use braces in the
+	*description*. They will be used meta characters in the future.
+
+``--regex-<LANG>=/regexp/replacement/[kind-spec/][flags]``
+	The /regexp/replacement/ pair defines a regular expression
+	replacement pattern, similar in style to sed substitution
+	commands, with which to generate tags from source files mapped to
+	the named language, *<LANG>*, (case-insensitive; either a built-in
+	or user-defined language). The regular expression, regexp, defines
+	an extended regular expression (roughly that used by egrep(1)),
+	which is used to locate a single source line containing a tag and
+	may specify tab characters using \t. When a matching line is
+	found, a tag will be generated for the name defined by
+	replacement, which generally will contain the special
+	back-references \1 through \9 to refer to matching sub-expression
+	groups within regexp.  The '/' separator characters shown in the
+	parameter to the option can actually be replaced by any
+	character. Note that whichever separator character is used will
+	have to be escaped with a backslash ('\') character wherever it is
+	used in the parameter as something other than a separator. The
+	regular expression defined by this option is added to the current
+	list of regular expressions for the specified language unless the
+	parameter is omitted, in which case the current list is cleared.
+
+	Unless modified by flags, regexp is interpreted as a Posix
+	extended regular expression. The replacement should expand for all
+	matching lines to a non-empty string of characters, or a warning
+	message will be reported. An optional kind specifier for tags
+	matching regexp may follow replacement, which will determine what
+	kind of tag is reported in the "kind" extension field (see
+	ctags-tags(5)).
+
+	kind-spec has two forms: letter only form and full form.  The
+	letter form assumes using ``--regex-<LANG>`` option with
+	``--kinddef-<LANG>`` option. The kind-spec in ``--regex-<LANG>``
+	option just refers a letter defined with
+	``--kinddef-<LANG>``. This form is recommended in Universal-ctags.
+
+	The full form of kind-spec is in the form of a single *letter*, a
+	comma, a *name* (only out of alphabetical characters), a comma, a
+	*description*. See the description of
+	``--kinddef-<LANG>=letter,name,description`` option about how the
+	elements are used.
+
+	Either the kind *name* and/or the *description* can be omitted.
+	However, unless the *letter* is not defined with
+	``--kinddef-<LANG>`` option, omitting is not recommended in in
+	Universal-ctags. The omitting form is supported only for keeping
+	the compatibility with Exuberant-ctags. Supporting the omitting
+	form will be removed from Universal-ctags in the future.  If
+	kind-spec is omitted, it defaults to "r,regex".
+
+	About *flag*, see "Flags for ``--regex-<LANG>`` option".
+
+``--_echo=msg``
+	Print *msg* to the standard error stream.  This is helpful to
+	understand (and debug) optlib loading feature of Universal-ctags.
+
+``--_force-quit=[num]``
+    Exits immediately when this option is processed.  If *num* is used
+	as exit status. The default is 0.  This is helpful to debug optlib
+	loading feature of Universal-ctags.
+
+
+FLAGS FOR ``--regex-<LANG>`` OPTION
+-----------------------------------
+
+You can specify more than one flag at the end of ``--regex-<LANG>`` to
+control how Universal-ctags uses the pattern.
+
+Exuberant-ctags uses a *letter* to represent a flag. In
+Universal-ctags, a *name* surrounded by braces (name form) can be used
+in addition to *letter*. The name form makes a user reading an optlib
+file easier. The most of all flags newly added in Universal-ctags
+don't have the letter representation. All of them have only the name
+representation. ``--list-regex-flags`` lists all the flags.
+
+``basic`` (letter form ``b``)
+	The pattern is interpreted as a Posix basic regular expression.
+
+``exclusive`` (letter form ``x``)
+	skip testing the other patterns if a line is matched to this
+	pattern. This is useful to avoid using CPU to parse line comments.
+
+``extend`` (letter form ``e``)
+	The pattern is interpreted as a Posix extended regular
+	expression (default).
+
+``icase`` (letter form ``i``)
+	The regular expression is to be applied in a case-insensitive
+	manner.
+
+``placeholder``
+	TBW
+
+``scope``
+	TBW
+
+For more information on the regular expressions used by
+@CTAGS_NAME_EXECUTABLE@, see either the regex(5,7) man page, or the
+GNU info documentation for regex (e.g. "info regex").
+
+SEE ALSO
+--------
+
+The official Universal-ctags web site at:
+
+https://ctags.io/
+
+ctags(1), regex(5,7), egrep(1)
+
+AUTHOR
+------
+
+Universal-ctags project
+https://ctags.io
+(This man page partially derived from ctags(1) of
+Executable-ctags)
+
+Darren Hiebert <dhiebert@users.sourceforge.net>
+http://DarrenHiebert.com/

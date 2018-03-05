@@ -62,7 +62,7 @@ h       hook yes     no      0      NONE   hooks
 # list kinds-full Plugin
 #
 #LETTER NAME ENABLED REFONLY NROLES MASTER DESCRIPTION
-f       file yes     no      0      NONE   files
+f       File yes     no      0      NONE   files
 n       name yes     no      0      NONE   name
 C only
 main	input.c	/^main(void)$/;"	function	language:C	typeref:typename:int
@@ -86,7 +86,7 @@ h	input.c	/^DEFINE_HOOK(h);$/;"	hook	language:Hook
 i	input.c	/^DEFINE_HOOK(i);$/;"	hook	language:Hook
 isearch	input.c	/^	LOAD_PLUGIN(mylib.so, isearch);$/;"	name	language:Plugin
 main	input.c	/^main(void)$/;"	function	language:C	typeref:typename:int
-mylib.so	input.c	/^	LOAD_PLUGIN(mylib.so, isearch);$/;"	file	language:Plugin
+mylib.so	input.c	/^	LOAD_PLUGIN(mylib.so, isearch);$/;"	File	language:Plugin
 
 C + EVENT + HOOK + PLUGIN + UA
 a	input.c	/^DEFINE_EVENT(a);$/;"	event	language:Event
@@ -95,7 +95,7 @@ h	input.c	/^DEFINE_HOOK(h);$/;"	hook	language:Hook
 i	input.c	/^DEFINE_HOOK(i);$/;"	hook	language:Hook
 isearch	input.c	/^	LOAD_PLUGIN(mylib.so, isearch);$/;"	name	language:Plugin
 main	input.c	/^main(void)$/;"	function	language:C	typeref:typename:int
-mylib.so	input.c	/^	LOAD_PLUGIN(mylib.so, isearch);$/;"	file	language:Plugin
+mylib.so	input.c	/^	LOAD_PLUGIN(mylib.so, isearch);$/;"	File	language:Plugin
 u	input.c	/^	int u __attribute__((unused));$/;"	varaible	language:UnusedAttr
 
 C(disabled) + EVENT + HOOK + PLUGIN + UA
@@ -103,14 +103,14 @@ C(disabled) + EVENT + HOOK + PLUGIN + UA
 C + EVENT(disabled) + HOOK + PLUGIN + UA
 isearch	input.c	/^	LOAD_PLUGIN(mylib.so, isearch);$/;"	name	language:Plugin
 main	input.c	/^main(void)$/;"	function	language:C	typeref:typename:int
-mylib.so	input.c	/^	LOAD_PLUGIN(mylib.so, isearch);$/;"	file	language:Plugin
+mylib.so	input.c	/^	LOAD_PLUGIN(mylib.so, isearch);$/;"	File	language:Plugin
 
 C + EVENT + HOOK(disabled) + PLUGIN + UA
 a	input.c	/^DEFINE_EVENT(a);$/;"	event	language:Event
 b	input.c	/^DEFINE_EVENT(b);$/;"	event	language:Event
 isearch	input.c	/^	LOAD_PLUGIN(mylib.so, isearch);$/;"	name	language:Plugin
 main	input.c	/^main(void)$/;"	function	language:C	typeref:typename:int
-mylib.so	input.c	/^	LOAD_PLUGIN(mylib.so, isearch);$/;"	file	language:Plugin
+mylib.so	input.c	/^	LOAD_PLUGIN(mylib.so, isearch);$/;"	File	language:Plugin
 u	input.c	/^	int u __attribute__((unused));$/;"	varaible	language:UnusedAttr
 
 C + EVENT + HOOK + PLUGIN + UA(-v)
@@ -120,7 +120,7 @@ h	input.c	/^DEFINE_HOOK(h);$/;"	hook	language:Hook
 i	input.c	/^DEFINE_HOOK(i);$/;"	hook	language:Hook
 isearch	input.c	/^	LOAD_PLUGIN(mylib.so, isearch);$/;"	name	language:Plugin
 main	input.c	/^main(void)$/;"	function	language:C	typeref:typename:int
-mylib.so	input.c	/^	LOAD_PLUGIN(mylib.so, isearch);$/;"	file	language:Plugin
+mylib.so	input.c	/^	LOAD_PLUGIN(mylib.so, isearch);$/;"	File	language:Plugin
 List subparsers of C ( EVENT + HOOK + PLUGIN + UA )
 #NAME   BASEPARSER DIRECTIONS
 Event   C          base => sub {shared}

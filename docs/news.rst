@@ -111,6 +111,9 @@ Heavily improved parsers
 
 `F` kind usage
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. IN MAN PAGE
+
 ``F`` is used as a kind letter for file kind in Exuberant-ctags; the
 ``F`` was hard-coded in ctags internal. However, we found some built-in
 parsers including Ruby uses ``F`` for their own purpose. So if you
@@ -669,6 +672,7 @@ See :ref:`--_interactive Mode <interactive-mode>` for more details.
 Defining a kind
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+.. IN MAN PAGE
 
 A new ``--kinddef-<LANG>=letter,name,description`` option reduces the
 typing defining a regex pattern with ``--regex-<LANG>=``, and keeps
