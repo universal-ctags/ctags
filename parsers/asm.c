@@ -69,7 +69,7 @@ typedef struct {
 */
 static langType Lang_asm;
 
-static roleDesc asmSectionRoles [] = {
+static roleDefinition asmSectionRoles [] = {
 	{ true, "placement", "placement where the assembled code goes" },
 };
 

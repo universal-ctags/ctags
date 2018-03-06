@@ -41,12 +41,12 @@ typedef enum {
 	R_ARTIFACT_ID_DEPENDENCY,
 } maven2ArtifactIdRole;
 
-static roleDesc Maven2GroupIdRoles [] = {
+static roleDefinition Maven2GroupIdRoles [] = {
 	{ true, "parent", "parent" },
 	{ true, "dependency", "dependency" },
 };
 
-static roleDesc Maven2ArtifactIdRoles [] = {
+static roleDefinition Maven2ArtifactIdRoles [] = {
 	{ true, "parent", "parent" },
 	{ true, "dependency", "dependency" },
 };

@@ -13,13 +13,16 @@
 #include "routines.h"
 #include "vstring.h"
 
-typedef struct sRoleDesc {
+struct sRoleDefinition {
 	bool enabled;
 	const char* name;		  /* role name */
 	const char* description;	  /* displayed in --help output */
-} roleDesc;
 
-extern const char *renderRole (const roleDesc* const role, vString* b);
+	int id;
+};
+
+typedef void (* freeRoleDefFunc) (roleDefinition *);
+extern const char *renderRole (const roleDefinition* const def, vString* b);
 
 /*
  * Predefined kinds
@@ -54,7 +57,7 @@ struct sKindDefinition {
 	char* description;	  /* displayed in --help output */
 	bool referenceOnly;
 	int nRoles;		/* The number of role elements. */
-	roleDesc *roles;
+	roleDefinition *roles;
 	scopeSeparator *separators;
 	unsigned int separatorCount;
 
@@ -98,6 +101,7 @@ extern unsigned int countRoles (struct kindControlBlock* kcb, int kindIndex);
 extern kindDefinition *getKind (struct kindControlBlock* kcb, int kindIndex);
 extern kindDefinition *getKindForLetter (struct kindControlBlock* kcb, int letter);
 extern kindDefinition *getKindForName (struct kindControlBlock* kcb, const char* name);
+extern roleDefinition* getRole(struct kindControlBlock* kcb, int kindIndex, int roleIndex);
 extern void linkKindDependency (struct kindControlBlock *masterKCB,
 								struct kindControlBlock *slaveKCB);
 

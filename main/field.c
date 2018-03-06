@@ -631,10 +631,9 @@ static const char *renderFieldRoles (const tagEntryInfo *const tag,
 					bool *rejected CTAGS_ATTR_UNUSED)
 {
 	roleBitsType rbits = tag->extensionFields.roleBits;
-	const roleDesc * role;
+	const roleDefinition * role;
 	if (rbits)
 	{
-		const kindDefinition *kdef = getTagKind(tag);
 		int roleCount = countLanguageRoles (tag->langType, tag->kindIndex);
 		int nRoleWritten = 0;
 
@@ -646,7 +645,7 @@ static const char *renderFieldRoles (const tagEntryInfo *const tag,
 				if (nRoleWritten > 0)
 					vStringPut(b, ',');
 
-				role  = & (kdef->roles [roleIndex]);
+				role = getTagRole(tag, roleIndex);
 				renderRole (role, b);
 				nRoleWritten++;
 			}

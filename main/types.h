@@ -18,6 +18,9 @@ typedef struct sTagEntryInfo tagEntryInfo;
 struct sPtagDesc;
 typedef struct sPtagDesc ptagDesc;
 
+struct sRoleDefinition;
+typedef struct sRoleDefinition roleDefinition;
+
 struct sKindDefinition;
 typedef struct sKindDefinition kindDefinition;
 

@@ -309,6 +309,11 @@ extern kindDefinition* getLanguageKindForName (const langType language, const ch
 		return getKindForName (LanguageTable [language].kindControlBlock, kindName);
 }
 
+extern roleDefinition* getLanguageRole(const langType language, int kindIndex, int roleIndex)
+{
+	return getRole (LanguageTable [language].kindControlBlock, kindIndex, roleIndex);
+}
+
 extern langType getNamedLanguage (const char *const name, size_t len)
 {
 	langType result = LANG_IGNORE;
@@ -3947,7 +3952,7 @@ typedef enum {
 	R_BROKEN_REF,
 } CTST_BrokenRole;
 
-static roleDesc CTST_BrokenRoles [] = {
+static roleDefinition CTST_BrokenRoles [] = {
 	{true, "broken", "broken" },
 };
 
@@ -3956,7 +3961,7 @@ typedef enum {
 	R_DISABLED_KIND_ENABLED_ROLE,
 } CTST_DisabledKindRole;
 
-static roleDesc CTST_DisabledKindRoles [] = {
+static roleDefinition CTST_DisabledKindRoles [] = {
 	{ false, "disabled", "disbaled role attached to disabled kind" },
 	{ true,  "enabled",  "enabled role attached to disabled kind"  },
 };
@@ -3966,7 +3971,7 @@ typedef enum {
 	R_ENABLED_KIND_ENABLED_ROLE,
 } CTST_EnabledKindRole;
 
-static roleDesc CTST_EnabledKindRoles [] = {
+static roleDefinition CTST_EnabledKindRoles [] = {
 	{ false, "disabled", "disbaled role attached to enabled kind" },
 	{ true,  "enabled",  "enabled role attached to enabled kind"  },
 };
@@ -3978,7 +3983,7 @@ typedef enum {
 	R_ROLES_KIND_D_ROLE,
 } CTST_RolesKindRole;
 
-static roleDesc CTST_RolesKindRoles [] = {
+static roleDefinition CTST_RolesKindRoles [] = {
 	{ true,  "a", "A role" },
 	{ true,  "b", "B role" },
 	{ false, "c", "C role" },
@@ -3991,7 +3996,7 @@ typedef enum {
 } CTST_RolesDisableKindRole;
 
 
-static roleDesc CTST_RolesDisabledKindRoles [] = {
+static roleDefinition CTST_RolesDisabledKindRoles [] = {
 	{ true,  "A", "A role" },
 	{ true,  "B", "B role" },
 };
