@@ -227,7 +227,7 @@ A tag can has various information. They are called **fields**. The
 essential fields are **name** of language objects, **input**,
 **pattern**, and **line**. ``input:`` is the name of source file where
 ``name:`` is defined or referenced. ``pattern:`` can be used to search
-the `**name**`` in ``input:``. **line** is the line number where
+the **name** in ``input:``. **line** is the line number where
 ``name:`` is defined or referenced in
 ``input:``.
 
@@ -688,6 +688,9 @@ are not listed here. They are experimental or debugging purpose.
 	parameter flags. If specifying nothing as the parameter flags
 	("--extras-all="), all extras are disabled. These two combinations
 	are useful for testing.
+
+	Inquire the output of ``--list-extras=<LANG>`` option for the
+	extras of <LANG>.
 
 ``--extras=[+|-]flags|*``
 	Specifies whether to include extra tag entries for certain kinds of
