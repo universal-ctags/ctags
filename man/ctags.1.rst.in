@@ -1207,7 +1207,7 @@ are not listed here. They are experimental or debugging purpose.
 		The master parser controlling enablement of the kind.
 		A kind belongs to a language (owner) in Universal-ctags;
 		enabling and disabling a kind in a language has no effect on
-		a kind in another language even if the both kinds has the
+		a kind in another language even if both kinds has the
 		same letter and/or the same name. In other words,
 		the namespace of kinds are separated by language.
 
