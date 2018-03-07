@@ -6,4 +6,5 @@ x       exclusive          skip testing the other patterns if a line is matched 
 -       placeholder        don't put this tag to tags file.
 -       scope=ACTION       use scope stack: ACTION = ref|push|pop|clear|set
 -       _extra=EXTRA       record the tag only when the extra is enabled
--       _field=FIELD:VALUE record the matched string(VALUE) to FIELD of the tag
+-       _field=FIELD:VALUE record the matched string(VALUE) to parser own FIELD of the tag
+-       _role=ROLE         Set given ROLE to roles field

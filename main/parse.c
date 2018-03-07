@@ -314,6 +314,12 @@ extern roleDefinition* getLanguageRole(const langType language, int kindIndex, i
 	return getRole (LanguageTable [language].kindControlBlock, kindIndex, roleIndex);
 }
 
+extern roleDefinition* getLanguageRoleForName (const langType language, int kindIndex,
+											   const char *roleName)
+{
+	return getRoleForName (LanguageTable [language].kindControlBlock, kindIndex, roleName);
+}
+
 extern langType getNamedLanguage (const char *const name, size_t len)
 {
 	langType result = LANG_IGNORE;

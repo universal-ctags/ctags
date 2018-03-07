@@ -150,6 +150,8 @@ extern kindDefinition* getLanguageKind(const langType language, int kindIndex);
 extern kindDefinition* getLanguageKindForLetter (const langType language, char kindLetter);
 extern kindDefinition* getLanguageKindForName (const langType language, const char *kindName);
 extern roleDefinition* getLanguageRole(const langType language, int kindIndex, int roleIndex);
+extern roleDefinition* getLanguageRoleForName (const langType language, int kindIndex,
+											   const char *roleName);
 extern int defineLanguageKind (const langType language, kindDefinition *def,
 							   freeKindDefFunc freeKindDef);
 extern unsigned int countLanguageKinds (const langType language);
