@@ -456,6 +456,8 @@ static optionDescription LongOptionDescription [] = {
  {1,"       Copy patterns of a regex table to another regex table."},
  {1,"  --_mtable-regex-<LANG>=table/line_pattern/name_pattern/[flags]"},
  {1,"       Define multitable regular expression for locating tags in specific language."},
+ {1,"  --_roledef-<LANG>=kind_letter.role_name,role_desc"},
+ {1,"       Define new role for kind specified with <kind_letter> in <LANG>."},
  {1,"  --_tabledef-<LANG>=name"},
  {1,"       Define new regex table for <LANG>."},
  {1,"  --_xformat=field_format"},
@@ -3058,6 +3060,8 @@ static void processLongOption (
 	else if (strcmp (option, "recurse") == 0)
 		error (WARNING, "%s option not supported on this host", option);
 #endif
+	else if (processRoledefOption (option, parameter))
+		;
 	else
 		error (FATAL, "Unknown option: --%s", option);
 }

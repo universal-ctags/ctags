@@ -15,8 +15,8 @@
 
 struct sRoleDefinition {
 	bool enabled;
-	const char* name;		  /* role name */
-	const char* description;	  /* displayed in --help output */
+	char* name;		  /* role name */
+	char* description;	  /* displayed in --help output */
 
 	int id;
 };
@@ -94,6 +94,8 @@ extern struct kindControlBlock* allocKindControlBlock (parserDefinition *parser)
 extern void freeKindControlBlock (struct kindControlBlock* kcb);
 extern int  defineKind (struct kindControlBlock* kcb, kindDefinition *def,
 						freeKindDefFunc freeKindDef);
+extern int defineRole (struct kindControlBlock* kcb, int kindIndex,
+					   roleDefinition *def, freeRoleDefFunc freeRoleDef);
 extern bool isRoleEnabled (struct kindControlBlock* kcb, int kindIndex, int roleIndex);
 
 extern unsigned int countKinds (struct kindControlBlock* kcb);
@@ -102,6 +104,7 @@ extern kindDefinition *getKind (struct kindControlBlock* kcb, int kindIndex);
 extern kindDefinition *getKindForLetter (struct kindControlBlock* kcb, int letter);
 extern kindDefinition *getKindForName (struct kindControlBlock* kcb, const char* name);
 extern roleDefinition* getRole(struct kindControlBlock* kcb, int kindIndex, int roleIndex);
+extern roleDefinition* getRoleForName(struct kindControlBlock* kcb, int kindIndex, const char* name);
 extern void linkKindDependency (struct kindControlBlock *masterKCB,
 								struct kindControlBlock *slaveKCB);
 

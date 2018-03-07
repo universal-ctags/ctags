@@ -190,6 +190,30 @@ extern int  defineKind (struct kindControlBlock* kcb, kindDefinition *def,
 	return def->id;
 }
 
+extern int defineRole (struct kindControlBlock* kcb, int kindIndex,
+					   roleDefinition *def, freeRoleDefFunc freeRoleDef)
+{
+	struct roleControlBlock *rcb = kcb->kind[kindIndex].rcb;
+	int roleIndex = rcb->count++;
+	roleObject *role;
+
+	if (roleIndex == ROLE_MAX_COUNT)
+	{
+		rcb->count--;
+		error (FATAL, "Too many role definition for kind \"%s\" of language \"%s\" (> %d)",
+			   kcb->kind[kindIndex].def->name,
+			   getLanguageName (kcb->owner),
+			   (int)(ROLE_MAX_COUNT - 1));
+	}
+
+	rcb->role = xRealloc (rcb->role, rcb->count, roleObject);
+	role = rcb->role + roleIndex;
+	role->def = def;
+	role->free = freeRoleDef;
+	role->def->id = roleIndex;
+	return roleIndex;
+}
+
 extern bool isRoleEnabled (struct kindControlBlock* kcb, int kindIndex, int roleIndex)
 {
 	roleDefinition *rdef = getRole (kcb, kindIndex, roleIndex);
@@ -244,6 +268,22 @@ extern roleDefinition* getRole(struct kindControlBlock* kcb, int kindIndex, int 
 {
 	struct roleControlBlock *rcb = kcb->kind[kindIndex].rcb;
 	return rcb->role [roleIndex].def;
+}
+
+extern roleDefinition* getRoleForName(struct kindControlBlock* kcb,
+									  int kindIndex, const char* name)
+{
+	unsigned int i;
+	roleDefinition *rdef;
+
+	for (i = 0; i < countRoles (kcb, kindIndex); ++i)
+	{
+		rdef = getRole(kcb, kindIndex, i);
+		Assert(rdef);
+		if (rdef->name && (strcmp(rdef->name, name) == 0))
+			return rdef;
+	}
+	return NULL;
 }
 
 static void linkKinds (langType master, kindDefinition *masterKind, kindDefinition *slaveKind)
