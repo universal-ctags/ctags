@@ -750,7 +750,7 @@ static contextType popStrongContext ( void )
 static void jumpToMatchContext ( void )
 {
 	int i;
-	for (i = stackIndex; i >= 0; --i)
+	for (i = stackIndex - 1; i >= 0; --i)
 	{
 		if (stack[i].type == ContextMatch)
 		{
