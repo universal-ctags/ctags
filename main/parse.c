@@ -4020,6 +4020,18 @@ extern void printLangdefFlags (bool withListHeader, bool machinable, FILE *fp)
 	colprintTableDelete(table);
 }
 
+extern void printKinddefFlags (bool withListHeader, bool machinable, FILE *fp)
+{
+	struct colprintTable * table;
+
+	table = flagsColprintTableNew ();
+
+	flagsColprintAddDefinitions (table, PreKindDefFlagDef, ARRAY_SIZE (PreKindDefFlagDef));
+
+	flagsColprintTablePrint (table, withListHeader, machinable, fp);
+	colprintTableDelete(table);
+}
+
 extern void printLanguageMultitableStatistics (langType language, FILE *vfp)
 {
 	parserObject* const parser = LanguageTable + language;
