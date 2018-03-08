@@ -64,4 +64,31 @@ ${CTAGS} --kinddef-MYTEST=F --list-kinds-full=MYTEST 2>&1
 echo '# reusing the name for file kind'
 ${CTAGS} --kinddef-MYTEST=x,file,desc --list-kinds-full=MYTEST 2>&1
 
+echo '# inject a flag separator'
+${CTAGS} --kinddef-MYTEST='x,kind,desc{foo}' --list-kinds-full=MYTEST 2>&1
+
+echo '# inject a broken flag separator(1)'
+${CTAGS} --kinddef-MYTEST='x,kind,desc{foo' --list-kinds-full=MYTEST 2>&1
+
+echo '# inject a broken flag separator(2)'
+${CTAGS} --kinddef-MYTEST='x,kind,desc{' --list-kinds-full=MYTEST 2>&1
+
+echo '# use a { in description (1)'
+${CTAGS} --kinddef-MYTEST='x,kind,desc\{' --list-kinds-full=MYTEST 2>&1
+
+echo '# use a { in description (2)'
+${CTAGS} --kinddef-MYTEST='x,kind,desc\{}' --list-kinds-full=MYTEST 2>&1
+
+# echo '# use a { and \t in description'
+# ${CTAGS} --kinddef-MYTEST='x,kind,desc\{}\t' --list-kinds-full=MYTEST 2>&1
+
+echo '# use a \\ in description'
+${CTAGS} --kinddef-MYTEST='x,kind,desc\\backslash' --list-kinds-full=MYTEST 2>&1
+
+echo '# description started from {'
+${CTAGS} --kinddef-MYTEST='x,kind,{' --list-kinds-full=MYTEST 2>&1
+
+echo '# description started from \{'
+${CTAGS} --kinddef-MYTEST='x,kind,\{' --list-kinds-full=MYTEST 2>&1
+
 } | sed -e 's/\.exe//'

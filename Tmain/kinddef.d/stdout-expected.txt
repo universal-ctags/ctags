@@ -37,3 +37,26 @@ ctags: the kind letter give in "--kinddef-MYTEST" option is not an alphabet or a
 ctags: the kind letter `F' in "--kinddef-MYTEST" option is reserved for "file" kind
 # reusing the name for file kind
 ctags: the kind name file in "--kinddef-MYTEST" option is reserved
+# inject a flag separator
+#LETTER NAME ENABLED REFONLY NROLES MASTER DESCRIPTION
+x       kind yes     no      0      NONE   desc
+# inject a broken flag separator(1)
+#LETTER NAME ENABLED REFONLY NROLES MASTER DESCRIPTION
+x       kind yes     no      0      NONE   desc
+# inject a broken flag separator(2)
+#LETTER NAME ENABLED REFONLY NROLES MASTER DESCRIPTION
+x       kind yes     no      0      NONE   desc
+# use a { in description (1)
+#LETTER NAME ENABLED REFONLY NROLES MASTER DESCRIPTION
+x       kind yes     no      0      NONE   desc{
+# use a { in description (2)
+#LETTER NAME ENABLED REFONLY NROLES MASTER DESCRIPTION
+x       kind yes     no      0      NONE   desc{}
+# use a \\ in description
+#LETTER NAME ENABLED REFONLY NROLES MASTER DESCRIPTION
+x       kind yes     no      0      NONE   desc\backslash
+# description started from {
+ctags: found an empty kind description in "--kinddef-MYTEST" option
+# description started from \{
+#LETTER NAME ENABLED REFONLY NROLES MASTER DESCRIPTION
+x       kind yes     no      0      NONE   {
