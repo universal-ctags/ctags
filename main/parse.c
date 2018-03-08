@@ -2754,7 +2754,7 @@ static bool processLangDefineField (const langType language,
 
 	for (; p < desc; p++)
 	{
-		if (!isalnum (*p))
+		if (!isalpha (*p))
 			error (FATAL, "unacceptable char as part of field name in \"--%s\" option",
 				   option);
 	}
