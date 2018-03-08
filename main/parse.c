@@ -2126,6 +2126,18 @@ static char *extractDescriptionAndFlags(const char *input, const char **flags)
 	return vStringDeleteUnwrap(vdesc);
 }
 
+static void pre_kind_def_flag_refonly_long (const char* const optflag,
+											const char* const param, void* data)
+{
+	kindDefinition *kdef = data;
+	kdef->referenceOnly = true;
+}
+
+static flagDefinition PreKindDefFlagDef [] = {
+	{ '\0', "_refonly", NULL, pre_kind_def_flag_refonly_long,
+	  NULL, "use this kind reference tags only"},
+};
+
 static bool processLangDefineKind(const langType language,
 								  const char *const option,
 								  const char *const parameterx)
@@ -2213,7 +2225,7 @@ static bool processLangDefineKind(const langType language,
 	kdef->name = name;
 	kdef->description = description;
 	if (flags)
-		flagsEval (flags, NULL, 0, kdef);
+		flagsEval (flags, PreKindDefFlagDef, ARRAY_SIZE (PreKindDefFlagDef), kdef);
 
 	defineKind (parser->kindControlBlock, kdef, freeKdef);
 	return true;

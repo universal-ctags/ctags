@@ -91,4 +91,9 @@ ${CTAGS} --kinddef-MYTEST='x,kind,{' --list-kinds-full=MYTEST 2>&1
 echo '# description started from \{'
 ${CTAGS} --kinddef-MYTEST='x,kind,\{' --list-kinds-full=MYTEST 2>&1
 
+echo '# _refonly flag'
+${CTAGS} --kinddef-MYTEST='x,kind,desc' --list-kinds-full=MYTEST
+${CTAGS} --kinddef-MYTEST='x,kind,desc' --_roledef-MYTEST=x.role,roleDesc --list-kinds-full=MYTEST
+${CTAGS} --kinddef-MYTEST='x,kind,desc{_refonly}' --_roledef-MYTEST=x.role,roleDesc --list-kinds-full=MYTEST
+
 } | sed -e 's/\.exe//'
