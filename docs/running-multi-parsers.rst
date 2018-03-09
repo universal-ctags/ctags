@@ -260,7 +260,7 @@ API for making a combination of base parser and subparsers
 Outline
 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 
-You have to work on the both sides: a base parser and subparsers.
+You have to work on both sides: a base parser and subparsers.
 
 A base parser must define a data structure type(`baseMethodTable`) for
 its subparsers by extending `struct subparser` defined in
@@ -332,7 +332,7 @@ A subparser must fill the fields of `subparser`.
 subparser runs exclusively and is chosen in top down way, set
 `SUBPARSER_SUB_RUNS_BASE` flag. If a subparser runs coexisting way and
 is chosen in bottom up way, set `SUBPARSER_BASE_RUNS_SUB`.  Use
-`SUBPARSER_BI_DIRECTION` if The both cases can be considered.
+`SUBPARSER_BI_DIRECTION` if both cases can be considered.
 
 SystemdUnit parser runs as a subparser of iniconf base parser.
 SystemdUnit parser specifies `SUBPARSER_SUB_RUNS_BASE` because
@@ -770,4 +770,3 @@ m4 parser. The most parts of tokens in input files are handled by
 M4. Autoconf parser gives hints for parsing `configure.ac` and
 registers callback functions to
 Autoconf parser.
-
