@@ -124,6 +124,7 @@ PARSER_HEADS = \
 	\
 	parsers/cpreprocessor.h \
 	parsers/iniconf.h \
+	parsers/jscript.h \
 	parsers/m4.h \
 	parsers/make.h \
 	parsers/tcl.h \
@@ -219,6 +220,8 @@ PARSER_SRCS =				\
 	parsers/verilog.c		\
 	parsers/vhdl.c			\
 	parsers/vim.c			\
+	parsers/vue.c			\
+	parsers/vuejscript.c		\
 	parsers/windres.c		\
 	parsers/yacc.c			\
 	parsers/yumrepo.c		\

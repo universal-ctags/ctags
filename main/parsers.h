@@ -123,6 +123,8 @@
 	UCtagsAspellParser, \
 	VhdlParser, \
 	VimParser, \
+	VueParser, \
+    VueJavaScriptParser, \
 	WindResParser, \
 	YaccParser, \
 	YumRepoParser, \
