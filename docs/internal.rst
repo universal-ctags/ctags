@@ -161,7 +161,7 @@ Let's see the actual code from parsers/yacc.c.
 		unsigned long source;
 	};
 
-The both two fields are for recording `start`. `input` field
+Both fields are for recording `start`. `input` field
 is for recording the value returned from `getInputLineNumber`.
 `source` is for `getSourceLineNumber`. See `inputFile`_ for the
 difference of the two.

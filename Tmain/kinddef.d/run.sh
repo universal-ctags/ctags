@@ -58,7 +58,10 @@ ${CTAGS} --kinddef-MYTEST= --list-kinds-full=MYTEST 2>&1
 echo '# wrong letter'
 ${CTAGS} --kinddef-MYTEST=^ --list-kinds-full=MYTEST 2>&1
 
-echo '# reusing file kind'
+echo '# reusing the letter for file kind'
 ${CTAGS} --kinddef-MYTEST=F --list-kinds-full=MYTEST 2>&1
+
+echo '# reusing the name for file kind'
+${CTAGS} --kinddef-MYTEST=x,file,desc --list-kinds-full=MYTEST 2>&1
 
 } | sed -e 's/\.exe//'
