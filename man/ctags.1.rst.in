@@ -227,7 +227,7 @@ A tag can has various information. They are called **fields**. The
 essential fields are **name** of language objects, **input**,
 **pattern**, and **line**. ``input:`` is the name of source file where
 ``name:`` is defined or referenced. ``pattern:`` can be used to search
-the `**name**`` in ``input:``. **line** is the line number where
+the **name** in ``input:``. **line** is the line number where
 ``name:`` is defined or referenced in
 ``input:``.
 
@@ -398,6 +398,9 @@ column.
 
 OPTION ITEMS
 ------------
+@CTAGS_NAME_EXECUTABLE@ has more options listed here.
+Options started from underscore character like ``--_echo=msg``
+are not listed here. They are experimental or debugging purpose.
 
 ``-a``
 	Equivalent to ``--append``.
@@ -686,6 +689,9 @@ OPTION ITEMS
 	("--extras-all="), all extras are disabled. These two combinations
 	are useful for testing.
 
+	Inquire the output of ``--list-extras=<LANG>`` option for the
+	extras of <LANG>.
+
 ``--extras=[+|-]flags|*``
 	Specifies whether to include extra tag entries for certain kinds of
 	information. See also "Extras" subsection to know what are kinds.
@@ -909,6 +915,10 @@ OPTION ITEMS
 	tags when preprocessor conditionals are too complex follows all branches
 	of a conditional. This option is disabled by default.
 
+``--kinddef-<LANG>=letter,name,description``
+	See ctags-optlib(7).
+	Be not confused this with ``--kinds-<LANG>``.
+
 ``--kinds-<LANG>=[+|-]kinds|*``
 	Specifies a list of language-specific kinds of tags (or kinds) to
 	include in the output file for a particular language, where <LANG> is
@@ -942,11 +952,7 @@ OPTION ITEMS
 	backward-compatibility with Exuberant-ctags.
 
 ``--langdef=name``
-	Defines a new user-defined language, name, to be parsed with regular
-	expressions. Once defined, name may be used in other options taking
-	language names. The typical use of this option is to first define the
-	language, then map file names to it using ``--langmap``, then specify regular
-	expressions using ``--regex-<LANG>`` to define how its tags are found.
+	See ctags-optlib(7).
 
 ``--langmap=map[,map[...]]``
 	Controls how file names are mapped to languages (see the ``--list-maps``
@@ -1201,7 +1207,7 @@ OPTION ITEMS
 		The master parser controlling enablement of the kind.
 		A kind belongs to a language (owner) in Universal-ctags;
 		enabling and disabling a kind in a language has no effect on
-		a kind in another language even if the both kinds has the
+		a kind in another language even if both kinds has the
 		same letter and/or the same name. In other words,
 		the namespace of kinds are separated by language.
 
@@ -1264,6 +1270,9 @@ OPTION ITEMS
 
 	This option does not work with ``--machinable`` nor
 	``--with-list-header``.
+
+``--list-regex-flags``
+	See ctags-optlib(7).
 
 ``--list-roles[=language|all[.kinds]]``
 	List the roles for either the specified language or "all"
@@ -1364,56 +1373,7 @@ OPTION ITEMS
 	recursion.
 
 ``--regex-<LANG>=/regexp/replacement/[kind-spec/][flags]``
-	The /regexp/replacement/ pair define a regular expression replacement
-	pattern, similar in style to sed substitution commands, with which to
-	generate tags from source files mapped to the named language, <LANG>,
-	(case-insensitive; either a built-in or user-defined language). The
-	regular expression, regexp, defines an extended regular expression
-	(roughly that used by egrep(1)), which is used to locate a single source
-	line containing a tag and may specify tab characters using \t. When a
-	matching line is found, a tag will be generated for the name defined by
-	replacement, which generally will contain the special back-references
-	\1 through \9 to refer to matching sub-expression groups within regexp.
-	The '/' separator characters shown in the parameter to the option can
-	actually be replaced by any character. Note that whichever separator
-	character is used will have to be escaped with a backslash ('\')
-	character wherever it is used in the parameter as something other than a
-	separator. The regular expression defined by this option is added to the
-	current list of regular expressions for the specified language
-	unless the parameter is omitted, in which case the current list is cleared.
-
-	Unless modified by flags, regexp is interpreted as a Posix extended
-	regular expression. The replacement should expand for all matching lines
-	to a non-empty string of characters, or a warning message will be
-	reported. An optional kind specifier for tags matching regexp may follow
-	replacement, which will determine what kind of tag is reported in the
-	"kind" extension field (see "TAG FILE FORMAT", below). The full form of
-	kind-spec is in the form of a single letter, a comma, a name (without
-	spaces), a comma, a description, followed by a separator, which specify
-	the short and long forms of the kind value and its textual description
-	(displayed using ``--list-kinds``). Either the kind name and/or the
-	description may be omitted. If kind-spec is omitted, it defaults to
-	"r,regex". Finally, flags are one or more single-letter characters having
-	the following effect upon the interpretation of regexp:
-
-		b
-			The pattern is interpreted as a Posix basic regular expression.
-
-		e
-			The pattern is interpreted as a Posix extended regular expression (default).
-
-		i
-			The regular expression is to be applied in a case-insensitive manner.
-
-	Note that this option is available only if @CTAGS_NAME_EXECUTABLE@ was
-	compiled with support for regular expressions, which depends upon your
-	platform. You can determine if support for regular expressions is
-	compiled in by examining the output of the ``--list-features`` option, which will
-	include "regex" in the compiled feature list.
-
-	For more information on the regular expressions used by
-	@CTAGS_NAME_EXECUTABLE@, see either the regex(5,7) man page, or the GNU
-	info documentation for regex (e.g. "info regex").
+	See ctags-optlib(7).
 
 ``--sort[=yes|no|foldcase]``
 	Indicates whether the tag file should be sorted on the tag name
@@ -1790,6 +1750,9 @@ TAGS
 
 SEE ALSO
 --------
+
+See ctags-optlib(7) for defining (or extending) a parser
+in a configuration file.
 
 The official Universal-ctags web site at:
 

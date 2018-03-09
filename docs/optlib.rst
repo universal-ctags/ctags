@@ -173,6 +173,8 @@ Tips about writing option file
 * ``--quiet --options=NONE`` is for disabling preloading. This phrase
   is used well in Tmain test cases.
 
+.. IN MAN PAGE
+
 * Two options are introduced for debugging the process of loading
   option files.
 
@@ -379,6 +381,8 @@ Override the letter for file kind
 (See also #317.)
 
 Overriding the letter for file kind is not allowed in Universal-ctags.
+
+.. IN MAN PAGE
 Don't use `F` as a kind letter in your parser.
 
 

@@ -1014,7 +1014,7 @@ extern int defineField (fieldDefinition *def, langType language)
 	Assert (def->name);
 	for (i = 0; i < strlen (def->name); i++)
 	{
-		Assert ( isalnum (def->name [i]) );
+		Assert ( isalpha (def->name [i]) );
 	}
 	def->letter = NUL_FIELD_LETTER;
 

@@ -70,6 +70,26 @@ q/qualified". Unexpectedly the command line becomes as if
 
 In this case the user should set "--extras=+q" instead of "--extras=q".
 
+Obsoleting ``--<LANG>-kinds`` option
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Some options have *<LANG>* as parameterized parts in their name like
+``--foo-<LANG>=...`` or ``--<LANG>-foo=...``. The most of all such
+options in Exuberant-ctags have the former form, ``--foo-<LANG>=...``.
+The exception is ``--<LANG>-kinds``.
+
+Universal-ctags uses the former form for all *<LANG>* parameterized
+option. Use ``--kinds-<LANG>`` instead of ``--<LANG>-kinds`` in
+Universal-ctags. ``--<LANG>-kinds`` still works but it will be
+removed in the future.
+
+The former form may be friendly to shell completion engines.
+
+Disallowing to define a kind with "file" as name
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The kind name "file" is reserved.  Using it as part of kind spec in
+``--regex-<LANG>`` option is now disallowed.
 
 Incompatibilities in tags file format
 -------------------------------------------------------------
@@ -81,3 +101,18 @@ Option files loading at starting up time (preload files)
 File paths for preload files are changed.
 Universal-ctags doesn't load "~/.ctags" at starting up time.
 See "FILES" section of ctags(1).
+
+Kind letters and names
+-------------------------------------------------------------
+
+A kind letter "F" and a kind name "file" are reserved in the
+main part. A parser cannot have a kind conflicting with
+these reserved ones. Some incompatible changes are introduced
+to follow the above rule.
+
+* Cobol's "file" kind is renamed to "fileDesc" because the
+  kind name "file" is reserved.
+
+* Ruby's "F" (singletonMethod) is changed to "S".
+
+* SQL's "F" (field) is changed to "E".

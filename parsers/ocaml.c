@@ -14,8 +14,9 @@
 
 #include <string.h>
 
-#include "keyword.h"
+#include "debug.h"
 #include "entry.h"
+#include "keyword.h"
 #include "options.h"
 #include "read.h"
 #include "routines.h"
@@ -34,8 +35,6 @@ typedef enum {
 	K_CONSTRUCTOR,  /* Constructor of a sum type */
 	K_RECORDFIELD,
 	K_EXCEPTION,
-	K_BEGIN_END,		/* ??? */
-	K_MATCH,
 } ocamlKind;
 
 static kindDefinition OcamlKinds[] = {
@@ -49,8 +48,6 @@ static kindDefinition OcamlKinds[] = {
 	{true, 'C', "Constructor", "A constructor"},
 	{true, 'r', "RecordField", "A 'structure' field"},
 	{true, 'e', "Exception", "An exception"},
-	{true, 'B', "beginEnd", "A begin end ???"},
-	{true, 'A', "match", "A match ???"},
 };
 
 typedef enum {
@@ -593,13 +590,10 @@ static int contextDescription (contextType t)
 		return K_TYPE;
 	case ContextClass:
 		return K_CLASS;
-	case ContextBlock:
-		return K_BEGIN_END;
-	case ContextMatch:
-		return K_MATCH;
+	default:
+		AssertNotReached();
+		return KIND_GHOST_INDEX;
 	}
-
-	return KIND_GHOST_INDEX;
 }
 
 static char contextTypeSuffix (contextType t)
@@ -750,7 +744,7 @@ static contextType popStrongContext ( void )
 static void jumpToMatchContext ( void )
 {
 	int i;
-	for (i = stackIndex; i >= 0; --i)
+	for (i = stackIndex - 1; i >= 0; --i)
 	{
 		if (stack[i].type == ContextMatch)
 		{
