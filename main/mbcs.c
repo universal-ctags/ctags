@@ -29,7 +29,7 @@
 
 static iconv_t iconv_fd = (iconv_t) -1;
 
-extern bool openConverter (char* inputEncoding, char* outputEncoding)
+extern bool openConverter (const char* inputEncoding, const char* outputEncoding)
 {
 	if (!inputEncoding || !outputEncoding)
 	{

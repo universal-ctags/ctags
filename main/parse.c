@@ -3069,6 +3069,14 @@ extern void freeEncodingResources (void)
 	if (Option.outputEncoding)
 		eFree (Option.outputEncoding);
 }
+
+extern const char *getLanguageEncoding (const langType language)
+{
+	if (EncodingMap && language <= EncodingMapMax && EncodingMap [language])
+		return EncodingMap[language];
+	else
+		return Option.inputEncoding;
+}
 #endif
 
 static void addParserPseudoTags (langType language)
@@ -3155,9 +3163,7 @@ extern bool parseFileWithMio (const char *const fileName, MIO *mio)
 
 #ifdef HAVE_ICONV
 		/* TODO: checkUTF8BOM can be used to update the encodings. */
-		openConverter (EncodingMap && language <= EncodingMapMax &&
-				EncodingMap [language] ?
-					EncodingMap[language] : Option.inputEncoding, Option.outputEncoding);
+		openConverter (getLanguageEncoding (language), Option.outputEncoding);
 #endif
 
 		setupWriter ();

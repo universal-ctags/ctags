@@ -207,6 +207,7 @@ extern bool runParserInNarrowedInputStream (const langType language,
 
 #ifdef HAVE_ICONV
 extern void freeEncodingResources (void);
+extern const char *getLanguageEncoding (const langType language);
 #endif
 
 
