@@ -1464,6 +1464,8 @@ extern void initTagEntryFull (tagEntryInfo *const e, const char *const name,
 	e->extensionFields.scopeLangType = LANG_AUTO;
 	e->extensionFields.scopeKindIndex = KIND_GHOST_INDEX;
 	e->extensionFields.scopeIndex     = CORK_NIL;
+
+	Assert (kindIndex < 0 || kindIndex < countLanguageKinds(langType_));
 	e->kindIndex = kindIndex;
 
 	Assert (roleIndex >= ROLE_INDEX_DEFINITION);
