@@ -185,6 +185,7 @@ extern void initializeParsing (void);
 extern void initializeParser (langType language);
 extern unsigned int countParsers (void);
 extern void freeParserResources (void);
+extern void enableDefaultFileKind (bool state);
 extern void printLanguageKinds (const langType language, bool allKindFields,
 								bool withListHeader, bool machinable, FILE *fp);
 extern void printLanguageRoles (const langType language, const char* letters,

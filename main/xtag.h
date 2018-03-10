@@ -50,6 +50,7 @@ typedef struct sXtagDefinition {
 	   by default. */
 	bool (* isEnabled) (struct sXtagDefinition *def);
 	bool (* isFixed)   (struct sXtagDefinition *def);
+	void (* enable)    (struct sXtagDefinition *def, bool state);
 
 	unsigned int xtype;	/* Given from the main part */
 } xtagDefinition;

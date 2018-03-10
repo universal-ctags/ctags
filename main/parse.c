@@ -1770,6 +1770,11 @@ static void lazyInitialize (langType language)
 	}
 }
 
+extern void enableDefaultFileKind (bool state)
+{
+	defaultFileKind.enabled = state;
+}
+
 /*
 *   Option parsing
 */

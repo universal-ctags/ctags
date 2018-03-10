@@ -15,6 +15,7 @@
 #include "debug.h"
 #include "main.h"
 #include "options.h"
+#include "parse.h"
 #include "routines.h"
 #include "trashbox.h"
 #include "writer.h"
@@ -45,11 +46,20 @@ static bool isPseudoTagsFixed (xtagDefinition *pdef CTAGS_ATTR_UNUSED)
 		return false;
 }
 
+static void enableFileKind (xtagDefinition *pdef, bool state)
+{
+	enableDefaultFileKind(state);
+	pdef->enabled = state;
+}
+
 static xtagDefinition xtagDefinitions [] = {
 	{ true, 'F',  "fileScope",
 	  "Include tags of file scope" },
 	{ false, 'f', "inputFile",
-	  "Include an entry for the base file name of every input file"},
+	  "Include an entry for the base file name of every input file",
+	  NULL,
+	  NULL,
+	  enableFileKind},
 	{ false, 'p', "pseudo",
 	  "Include pseudo tags",
 	  isPseudoTagsEnabled,
@@ -251,6 +261,8 @@ extern bool enableXtag (xtagType type, bool state)
 
 	if (isXtagFixed(type))
 		def->enabled = old;
+	else if (def->enable)
+		def->enable (def, state);
 	else
 		def->enabled = state;
 

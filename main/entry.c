@@ -182,14 +182,9 @@ static kindDefinition *getInputLanguageFileKind (void)
 extern void makeFileTag (const char *const fileName)
 {
 	tagEntryInfo tag;
-	kindDefinition  *kind;
 
 	if (!isXtagEnabled(XTAG_FILE_NAMES))
 		return;
-
-	kind = getInputLanguageFileKind();
-	Assert (kind);
-	kind->enabled = true;
 
 	initTagEntry (&tag, baseFilename (fileName), KIND_FILE_INDEX);
 
