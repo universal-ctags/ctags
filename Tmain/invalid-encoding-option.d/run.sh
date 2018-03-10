@@ -7,9 +7,9 @@ CTAGS=$1
 
 . ../utils.sh
 
-if ${CTAGS} --quiet --options=NONE --list-features | grep -q multibyte ; then
+if ${CTAGS} --quiet --options=NONE --list-features | grep -q iconv; then
   ${CTAGS} --quiet --options=NONE --input-encoding-java=invalid	--input-encoding-javascript=euc-jp input.js input.java
   exit $?
 else
-  skip "multibyte feature is not available"
+  skip "iconv feature is not available"
 fi

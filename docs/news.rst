@@ -278,6 +278,10 @@ On Windows mingw32, you must specify ``WITH_ICONV=yes`` like this::
 
 	C:\dev\ctags>mingw32-make -f mk_mingw.mak WITH_ICONV=yes
 
+``--list-features`` helps you to know whether your ctags executable
+links to libiconv or not. You will find ``iconv`` in the output if it
+links to.
+
 Extra tag entries (``--extras``)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ``--extra`` option in Exuberant-ctags is renamed to ``--extras`` (plural) in

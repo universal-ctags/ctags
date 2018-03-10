@@ -505,7 +505,7 @@ static struct Feature {
 	{"unix-path-separator", "can use '/' as file name separator"},
 #endif
 #ifdef HAVE_ICONV
-	{"multibyte", "TO BE WRITTEN"},
+	{"iconv", "can convert input/output encodings"},
 #endif
 #ifdef DEBUG
 	{"debug", "TO BE WRITTEN"},
