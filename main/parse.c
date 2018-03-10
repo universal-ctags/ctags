@@ -1955,6 +1955,12 @@ extern bool isLanguageRoleEnabled (const langType language, int kindIndex, int r
 						 kindIndex, roleIndex);
 }
 
+extern bool isLanguageKindRefOnly (const langType language, int kindIndex)
+{
+	kindDefinition * def =  getLanguageKind(language, kindIndex);
+	return def->referenceOnly;
+}
+
 static void resetLanguageKinds (const langType language, const bool mode)
 {
 	const parserObject* parser;
