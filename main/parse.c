@@ -1944,8 +1944,14 @@ static kindDefinition *langKindLongOption (const langType language, const char *
 
 extern bool isLanguageKindEnabled (const langType language, int kindIndex)
 {
-	return isKindEnabled(LanguageTable [language].kindControlBlock,
-						 kindIndex);
+	if (kindIndex == KIND_FILE_INDEX)
+	{
+		kindDefinition * kdef = getLanguageKind (language, KIND_FILE_INDEX);
+		return kdef->enabled;
+	}
+	else
+		return isKindEnabled(LanguageTable [language].kindControlBlock,
+							 kindIndex);
 }
 
 extern bool isLanguageRoleEnabled (const langType language, int kindIndex, int roleIndex)

@@ -174,11 +174,6 @@ static void addCommonPseudoTags (void)
 	}
 }
 
-static kindDefinition *getInputLanguageFileKind (void)
-{
-	return getLanguageKind (getInputLanguage (), KIND_FILE_INDEX);
-}
-
 extern void makeFileTag (const char *const fileName)
 {
 	tagEntryInfo tag;
@@ -1159,12 +1154,7 @@ static void writeTagEntry (const tagEntryInfo *const tag)
 
 	if (tag->placeholder)
 		return;
-	if (tag->kindIndex == KIND_FILE_INDEX)
-	{
-		if (! getInputLanguageFileKind ()->enabled)
-			return;
-	}
-	else if (! isLanguageKindEnabled(tag->langType, tag->kindIndex))
+	if (! isLanguageKindEnabled(tag->langType, tag->kindIndex))
 	{
 		/* This condition is checked already in makeTagEntry.
 		   However, there is a case that a parser updates
