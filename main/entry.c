@@ -1170,7 +1170,12 @@ static void writeTagEntry (const tagEntryInfo *const tag)
 			return;
 	}
 	else if (! isLanguageKindEnabled(tag->langType, tag->kindIndex))
+	{
+		/* This condition is checked already in makeTagEntry.
+		   However, there is a case that a parser updates
+		   the tag after calling makeTagEntry via Cork. */
 		return;
+	}
 	if (tag->extensionFields.roleIndex != ROLE_INDEX_DEFINITION
 	    && ! isXtagEnabled (XTAG_REFERENCE_TAGS))
 		return;
@@ -1306,9 +1311,7 @@ extern int makeTagEntry (const tagEntryInfo *const tag)
 
 	if (KIND_FILE_INDEX != tag->kindIndex)
 	{
-		/* TODO: don't access the internal of kind directly.
-		   Use isInputLanguageKindEnabled () instead. */
-		if (! getLanguageKind(tag->langType, tag->kindIndex) &&
+		if (! isLanguageKindEnabled(tag->langType, tag->kindIndex) &&
 		    (tag->extensionFields.roleIndex == ROLE_INDEX_DEFINITION))
 			return CORK_NIL;
 		if ((tag->extensionFields.roleIndex != ROLE_INDEX_DEFINITION)
