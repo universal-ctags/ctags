@@ -30,4 +30,6 @@ echo ';; (not ($ "signature"))' &&
 ${V} ${READTAGS}  -e -t output.tags -Q '(not ($ "signature"))' -l &&
 echo ';; (< 1 2)' &&
 ${V} ${READTAGS}  -e -t output.tags -Q '(< 1 2)' -l &&
+echo ';; (member "superClass" $roles)' &&
+${V} ${READTAGS}  -e -n -t roles.tags -Q '(member "superClass" $roles)' -l &&
 :
