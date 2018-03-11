@@ -1148,21 +1148,33 @@ extern bool teardownWriter (const char *filename)
 	return writerTeardown (TagFile.mio, filename);
 }
 
-static void writeTagEntry (const tagEntryInfo *const tag)
+static bool isTagWritable(const tagEntryInfo *const tag)
+{
+	if (tag->placeholder)
+		return false;
+
+	if (! isLanguageKindEnabled(tag->langType, tag->kindIndex))
+		return false;
+
+	if (tag->extensionFields.roleIndex != ROLE_INDEX_DEFINITION)
+	{
+		if (!isXtagEnabled (XTAG_REFERENCE_TAGS))
+			return false;
+		if (! isLanguageRoleEnabled (tag->langType, tag->kindIndex,
+									 tag->extensionFields.roleIndex))
+			return false;
+	}
+
+	return true;
+}
+
+static void writeTagEntry (const tagEntryInfo *const tag, bool checkingNeeded)
 {
 	int length = 0;
 
-	if (tag->placeholder)
-		return;
-	if (! isLanguageKindEnabled(tag->langType, tag->kindIndex))
-	{
-		/* This condition is checked already in makeTagEntry.
-		   However, there is a case that a parser updates
-		   the tag after calling makeTagEntry via Cork. */
-		return;
-	}
-	if (tag->extensionFields.roleIndex != ROLE_INDEX_DEFINITION
-	    && ! isXtagEnabled (XTAG_REFERENCE_TAGS))
+	Assert (tag->kindIndex != KIND_GHOST_INDEX);
+
+	if (checkingNeeded && !isTagWritable(tag))
 		return;
 
 	DebugStatement ( debugEntry (tag); )
@@ -1228,7 +1240,7 @@ extern void uncorkTagFile(void)
 	for (i = 1; i < TagFile.corkQueue.count; i++)
 	{
 		tagEntryInfo *tag = TagFile.corkQueue.queue + i;
-		writeTagEntry (tag);
+		writeTagEntry (tag, true);
 		if (doesInputLanguageRequestAutomaticFQTag ()
 		    && isXtagEnabled (XTAG_QUALIFIED_TAGS)
 		    && (tag->extensionFields.scopeKindIndex != KIND_GHOST_INDEX)
@@ -1284,7 +1296,7 @@ static void makeTagEntriesForSubwords (tagEntryInfo *const subtag)
 		if (TagFile.cork)
 			queueTagEntry (subtag);
 		else
-			writeTagEntry (subtag);
+			writeTagEntry (subtag, false);
 	}
 	stringListDelete (list);
 }
@@ -1294,16 +1306,9 @@ extern int makeTagEntry (const tagEntryInfo *const tag)
 	int r = CORK_NIL;
 	Assert (tag->name != NULL);
 
-	if (KIND_FILE_INDEX != tag->kindIndex)
-	{
-		if (! isLanguageKindEnabled(tag->langType, tag->kindIndex) &&
-		    (tag->extensionFields.roleIndex == ROLE_INDEX_DEFINITION))
-			return CORK_NIL;
-		if ((tag->extensionFields.roleIndex != ROLE_INDEX_DEFINITION)
-		    && (! isLanguageRoleEnabled (tag->langType, tag->kindIndex,
-										 tag->extensionFields.roleIndex)))
-			return CORK_NIL;
-	}
+	if (!TagFile.cork)
+		if (!isTagWritable (tag))
+			goto out;
 
 	if (tag->name [0] == '\0' && (!tag->placeholder))
 	{
@@ -1316,7 +1321,7 @@ extern int makeTagEntry (const tagEntryInfo *const tag)
 	if (TagFile.cork)
 		r = queueTagEntry (tag);
 	else
-		writeTagEntry (tag);
+		writeTagEntry (tag, false);
 
 	notifyMakeTagEntry (tag, r);
 
