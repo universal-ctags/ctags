@@ -1,6 +1,6 @@
 A.B	input.py	/^from A.B import C as D$/;"	i	role:namespace
 C	input.py	/^from A.B import C as D$/;"	x	role:indirectly-imported
-D	input.py	/^from A.B import C as D$/;"	x
+D	input.py	/^from A.B import C as D$/;"	x	role:def
 .	input.py	/^from . import E$/;"	i	role:namespace
 E	input.py	/^from . import E$/;"	x	role:imported
 .F	input.py	/^from .F import G$/;"	i	role:namespace

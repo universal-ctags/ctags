@@ -7,7 +7,7 @@ $(wildcard *.h)	input.mk	/^include $(1) $* Z0 $(shell) $(wildcard *.h) $(SHELL)$
 A	input.mk	/^include A$/;"	I	role:included
 B	input.mk	/^sinclude B$/;"	I	role:optional
 C	input.mk	/^-include C$/;"	I	role:optional
-D	input.mk	/^define D$/;"	m
+D	input.mk	/^define D$/;"	m	role:def
 F	input.mk	/^include F G H$/;"	I	role:included
 G	input.mk	/^include F G H$/;"	I	role:included
 H	input.mk	/^include F G H$/;"	I	role:included

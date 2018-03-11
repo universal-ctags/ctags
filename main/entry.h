@@ -87,6 +87,7 @@ struct sTagEntryInfo {
 		const char* typeRef [2];  /* e.g., "struct" and struct name */
 
 #define ROLE_INDEX_DEFINITION -1
+#define ROLE_NAME_DEFINITION "def"
 		int roleIndex; /* for role of reference tag */
 
 #ifdef HAVE_LIBXML

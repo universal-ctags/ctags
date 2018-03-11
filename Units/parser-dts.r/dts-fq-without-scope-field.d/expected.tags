@@ -1,8 +1,8 @@
-0x00	input.dts	/^	     phandle = <0x00>;$/;"	p
-bar	input.dts	/^#define bar /;"	d	file:
+0x00	input.dts	/^	     phandle = <0x00>;$/;"	p	role:def
+bar	input.dts	/^#define bar /;"	d	file:	role:def
 bar	input.dts	/^#undef bar$/;"	d	file:	role:undef
 foo.dtsi	input.dts	/^#include "foo.dtsi"/;"	h	role:local
-label	input.dts	/^label: test {$/;"	l
-label.0x00	input.dts	/^	     phandle = <0x00>;$/;"	p
-label.label2	input.dts	/^	     label2: chosen { } ;$/;"	l
-label2	input.dts	/^	     label2: chosen { } ;$/;"	l
+label	input.dts	/^label: test {$/;"	l	role:def
+label.0x00	input.dts	/^	     phandle = <0x00>;$/;"	p	role:def
+label.label2	input.dts	/^	     label2: chosen { } ;$/;"	l	role:def
+label2	input.dts	/^	     label2: chosen { } ;$/;"	l	role:def

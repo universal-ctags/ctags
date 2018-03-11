@@ -5,14 +5,14 @@ B4	input.m4	/^m4_undefine([B4])$/;"	d	role:undef
 C0	input.m4	/^undefine(C0)$/;"	d	role:undef
 I0	input.m4	/^include(`I0')$/;"	I	role:included
 I4	input.m4	/^m4_include(`I4')$/;"	I	role:included
-INDENT_1	input.m4	/^  define(`INDENT_1',x)$/;"	d
-INDENT_2	input.m4	/^ define([INDENT_2],y)$/;"	d
-INDENT_3	input.m4	/^ define({INDENT_3},z)$/;"	d
-INDENT_5	input.m4	/^ define(INDENT_5, v)$/;"	d
-INDENT_6	input.m4	/^    m4_define(`INDENT_6',x)$/;"	d
-INDENT_7	input.m4	/^    m4_define([INDENT_7],y)$/;"	d
-INDENT_8	input.m4	/^    m4_define({INDENT_8},z)$/;"	d
-INDENT_A	input.m4	/^    m4_define(INDENT_A,v)$/;"	d
+INDENT_1	input.m4	/^  define(`INDENT_1',x)$/;"	d	role:def
+INDENT_2	input.m4	/^ define([INDENT_2],y)$/;"	d	role:def
+INDENT_3	input.m4	/^ define({INDENT_3},z)$/;"	d	role:def
+INDENT_5	input.m4	/^ define(INDENT_5, v)$/;"	d	role:def
+INDENT_6	input.m4	/^    m4_define(`INDENT_6',x)$/;"	d	role:def
+INDENT_7	input.m4	/^    m4_define([INDENT_7],y)$/;"	d	role:def
+INDENT_8	input.m4	/^    m4_define({INDENT_8},z)$/;"	d	role:def
+INDENT_A	input.m4	/^    m4_define(INDENT_A,v)$/;"	d	role:def
 INDENT_B	input.m4	/^    undefine(`INDENT_B')$/;"	d	role:undef
 INDENT_C	input.m4	/^    undefine([INDENT_C])$/;"	d	role:undef
 INDENT_D	input.m4	/^    undefine(INDENT_D)$/;"	d	role:undef
@@ -40,11 +40,11 @@ T0	input.m4	/^sinclude([T0])$/;"	I	role:sincluded
 T4	input.m4	/^m4_sinclude([T4])$/;"	I	role:sincluded
 U0	input.m4	/^sinclude(U0)$/;"	I	role:sincluded
 U4	input.m4	/^m4_sinclude(U4)$/;"	I	role:sincluded
-V0	input.m4	/^define(V0, v)$/;"	d
-V4	input.m4	/^m4_define(V4,v)$/;"	d
-X0	input.m4	/^define(`X0',x)$/;"	d
-X4	input.m4	/^m4_define(`X4',x)$/;"	d
-Y0	input.m4	/^define([Y0],y)$/;"	d
-Y4	input.m4	/^m4_define([Y4],y)$/;"	d
-Z0	input.m4	/^define({Z0},z)$/;"	d
-Z4	input.m4	/^m4_define({Z4},z)$/;"	d
+V0	input.m4	/^define(V0, v)$/;"	d	role:def
+V4	input.m4	/^m4_define(V4,v)$/;"	d	role:def
+X0	input.m4	/^define(`X0',x)$/;"	d	role:def
+X4	input.m4	/^m4_define(`X4',x)$/;"	d	role:def
+Y0	input.m4	/^define([Y0],y)$/;"	d	role:def
+Y4	input.m4	/^m4_define([Y4],y)$/;"	d	role:def
+Z0	input.m4	/^define({Z0},z)$/;"	d	role:def
+Z4	input.m4	/^m4_define({Z4},z)$/;"	d	role:def

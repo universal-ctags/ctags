@@ -1,6 +1,6 @@
-.eh_frame	input.lds	/^	.eh_frame	: { KEEP (*(.eh_frame)) }	:text$/;"	S
+.eh_frame	input.lds	/^	.eh_frame	: { KEEP (*(.eh_frame)) }	:text$/;"	S	role:def
 .eh_frame	input.lds	/^	.eh_frame	: { KEEP (*(.eh_frame)) }	:text$/;"	i	section:.eh_frame	role:mapped
-.dynamic	input.lds	/^	.dynamic	: { *(.dynamic) }		:text	:dynamic$/;"	S
+.dynamic	input.lds	/^	.dynamic	: { *(.dynamic) }		:text	:dynamic$/;"	S	role:def
 .dynamic	input.lds	/^	.dynamic	: { *(.dynamic) }		:text	:dynamic$/;"	i	section:.dynamic	role:mapped
 .note.GNU-stack	input.lds	/^		*(.note.GNU-stack)$/;"	i	role:discarded
 .data	input.lds	/^		*(.data .data.* .gnu.linkonce.d.* .sdata*)$/;"	i	role:discarded

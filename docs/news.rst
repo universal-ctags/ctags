@@ -983,22 +983,24 @@ Output with the extra-tag ``r`` enabled:
 
 `#undef X` and two `#include` are newly collected.
 
-A reference tag may have "role" information representing how it is
-referenced.  Universal-ctags prints the role information when the `r`
-field is enabled with ``--fields=+r``. If a tag doesn't have a
-specialized role, `generic` is used as the name of role.
+"role" is a newly introduced field in Universal-ctags. The field
+is for recording how a tag is referenced. If a tag is definition
+tag, the role field has "def" as its value.
+
+Universal-ctags prints the role information when the `r`
+field is enabled with ``--fields=+r``.
 
 .. code-block:: console
 
     $  ./ctags -o - --extras=+r --fields=+r reftag.c
     TYPE	reftag.c	/^#define TYPE /;"	d	file:
     TYPE	reftag.c	/^#undef TYPE$/;"	d	file:	role:undef
-    TYPE	reftag.c	/^struct TYPE { int x, y; };$/;"	s	file:
+    TYPE	reftag.c	/^struct TYPE { int x, y; };$/;"	s	file:	role:def
     foo.h	reftag.c	/^#include "foo.h"/;"	h	role:local
-    p	reftag.c	/^TYPE p;$/;"	v	typeref:typename:TYPE
+    p	reftag.c	/^TYPE p;$/;"	v	typeref:typename:TYPE	role:def
     stdio.h	reftag.c	/^#include <stdio.h>/;"	h	role:system
-    x	reftag.c	/^struct TYPE { int x, y; };$/;"	m	struct:TYPE	typeref:typename:int	file:
-    y	reftag.c	/^struct TYPE { int x, y; };$/;"	m	struct:TYPE	typeref:typename:int	file:
+    x	reftag.c	/^struct TYPE { int x, y; };$/;"	m	struct:TYPE	typeref:typename:int	file:	role:def
+    y	reftag.c	/^struct TYPE { int x, y; };$/;"	m	struct:TYPE	typeref:typename:int	file:	role:def
 
 The `Reference tag marker` field, ``R``, is a specialized GNU global
 requirement; D is used for the traditional definition tags, and R is

@@ -73,7 +73,6 @@ static bool     isInheritsFieldAvailable  (const tagEntryInfo *const tag);
 static bool     isAccessFieldAvailable    (const tagEntryInfo *const tag);
 static bool     isImplementationFieldAvailable (const tagEntryInfo *const tag);
 static bool     isSignatureFieldAvailable (const tagEntryInfo *const tag);
-static bool     isRoleFieldAvailable      (const tagEntryInfo *const tag);
 static bool     isExtrasFieldAvailable    (const tagEntryInfo *const tag);
 static bool     isXpathFieldAvailable     (const tagEntryInfo *const tag);
 static bool     isEndFieldAvailable       (const tagEntryInfo *const tag);
@@ -188,9 +187,8 @@ static fieldDefinition fieldDefinitionsExuberant [] = {
 };
 
 static fieldDefinition fieldDefinitionsUniversal [] = {
-	DEFINE_FIELD_FULL ('r', "role",    false,
+	DEFINE_FIELD ('r', "role",    false,
 			   "Role",
-			   isRoleFieldAvailable,
 			   FIELDTYPE_STRING,
 			   [WRITER_U_CTAGS] = renderFieldRole),
 	DEFINE_FIELD ('R',  NULL,     false,
@@ -636,7 +634,10 @@ static const char *renderFieldRole (const tagEntryInfo *const tag,
 	const roleDesc * role;
 
 	if (rindex == ROLE_INDEX_DEFINITION)
-		vStringClear (b);
+	{
+		vStringCatS (b, ROLE_NAME_DEFINITION);
+		return vStringValue (b);
+	}
 	else
 	{
 		const kindDefinition *kdef = getTagKind(tag);
@@ -644,8 +645,6 @@ static const char *renderFieldRole (const tagEntryInfo *const tag,
 		role  = & (kdef->roles [rindex]);
 		return renderRole (role, b);
 	}
-
-	return vStringValue (b);
 }
 
 static const char *renderFieldLanguage (const tagEntryInfo *const tag,
@@ -853,11 +852,6 @@ static bool     isImplementationFieldAvailable (const tagEntryInfo *const tag)
 static bool     isSignatureFieldAvailable (const tagEntryInfo *const tag)
 {
 	return (tag->extensionFields.signature != NULL)? true: false;
-}
-
-static bool     isRoleFieldAvailable      (const tagEntryInfo *const tag)
-{
-	return (tag->extensionFields.roleIndex != ROLE_INDEX_DEFINITION)? true: false;
 }
 
 static bool     isExtrasFieldAvailable     (const tagEntryInfo *const tag)

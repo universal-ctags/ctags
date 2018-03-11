@@ -278,8 +278,7 @@ Roles
 ~~~~~~
 
 *Role* is a newly introduced concept in Universal-ctags. Role is a
-concept related with reference tags. Role is not for definition
-tags. Role is not implemented widely yet.
+concept related with reference tags. Role is not implemented widely yet.
 
 A kind represents what is the language object specified with a tag.  A
 role is introduced for representing how the language object specified
@@ -827,7 +826,8 @@ are not listed here. They are experimental or debugging purpose.
 		Kind of scope as full name
 
 	r/role
-		Role of reference tag
+		Role of reference tag.
+		For a definition tag, this field takes "def" as a value.
 
 	s
 		Scope of tag definition. Enabled by default.
