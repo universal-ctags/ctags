@@ -1930,12 +1930,6 @@ extern void processLanguageDefineOption (
 	}
 }
 
-static kindDefinition *langKindDefinition (const langType language, const int flag)
-{
-	Assert (0 <= language  &&  language < (int) LanguageCount);
-	return getKindForLetter (LanguageTable [language].kindControlBlock, flag);
-}
-
 static kindDefinition *langKindLongOption (const langType language, const char *kindLong)
 {
 	Assert (0 <= language  &&  language < (int) LanguageCount);
@@ -1973,11 +1967,11 @@ static void resetLanguageKinds (const langType language, const bool mode)
 	}
 }
 
-static bool enableLanguageKind (
+static bool enableLanguageKindForLetter (
 		const langType language, const int kind, const bool mode)
 {
 	bool result = false;
-	kindDefinition* const def = langKindDefinition (language, kind);
+	kindDefinition* const def = getLanguageKindForLetter (language, kind);
 	if (def != NULL)
 	{
 		enableKind (def, mode);
@@ -2066,7 +2060,7 @@ static void processLangKindDefinition (
 				vStringPut (longName, c);
 			else
 			{
-				r = enableLanguageKind (language, c, mode);
+				r = enableLanguageKindForLetter (language, c, mode);
 				if (! r)
 					error (WARNING, "Unsupported kind: '%c' for --%s option",
 					       c, option);
