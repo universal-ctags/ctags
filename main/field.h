@@ -44,7 +44,7 @@ typedef enum eFieldType { /* extension field content control */
 	FIELD_KIND_KEY,
 
 	/* EXTENSION FIELDS NEWLY INTRODUCED IN UCTAGS */
-	FIELD_ROLE,
+	FIELD_ROLES,
 	FIELD_REF_MARK,
 	FIELD_SCOPE_KEY,
 	FIELD_EXTRAS,

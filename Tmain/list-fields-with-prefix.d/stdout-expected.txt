@@ -2,7 +2,7 @@ E       UCTAGSextras        no      NONE             s--    no    Extra tag type
 Z       UCTAGSscope         no      NONE             s--    no    Include the "scope:" key in scope field (use s) in tags output, scope name in xref output
 e       UCTAGSend           no      NONE             -i-    no    end lines of various items
 p       UCTAGSscopeKind     no      NONE             s--    no    Kind of scope as full name
-r       UCTAGSrole          no      NONE             s--    no    Role
+r       UCTAGSroles         no      NONE             s--    no    Roles
 x       UCTAGSxpath         no      NONE             s--    no    xpath for the tag
 -       UCTAGSproperties    no      C                s--    no    properties (static, inline, mutable,...)
 -       UCTAGScaptures      no      C++              s--    no    lambda capture list

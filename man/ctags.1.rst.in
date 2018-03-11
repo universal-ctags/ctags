@@ -825,8 +825,8 @@ are not listed here. They are experimental or debugging purpose.
 	p/scopeKind
 		Kind of scope as full name
 
-	r/role
-		Role of reference tag.
+	r/roles
+		Roles assigned to the tag.
 		For a definition tag, this field takes "def" as a value.
 
 	s

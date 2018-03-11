@@ -416,11 +416,11 @@ newly introduced fields.
     $ cat /tmp/foo.h
     #include <stdio.h>
     $ ./ctags -o - --extras=+r --fields=+r /tmp/foo.h
-    stdio.h	/tmp/foo.h	/^#include <stdio.h>/;"	h	role:system
+    stdio.h	/tmp/foo.h	/^#include <stdio.h>/;"	h	roles:system
     $ ./ctags --put-field-prefix -o - --extras=+r --fields=+r /tmp/foo.h
-    stdio.h	/tmp/foo.h	/^#include <stdio.h>/;"	h	UCTAGSrole:system
+    stdio.h	/tmp/foo.h	/^#include <stdio.h>/;"	h	UCTAGSroles:system
 
-In this example, ``role`` is prefixed.
+In this example, ``roles`` is prefixed.
 
 ``--maxdepth`` option
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -983,9 +983,9 @@ Output with the extra-tag ``r`` enabled:
 
 `#undef X` and two `#include` are newly collected.
 
-"role" is a newly introduced field in Universal-ctags. The field
-is for recording how a tag is referenced. If a tag is definition
-tag, the role field has "def" as its value.
+"roles" is a newly introduced field in Universal-ctags. The field
+named is for recording how a tag is referenced. If a tag is definition
+tag, the roles field has "def" as its value.
 
 Universal-ctags prints the role information when the `r`
 field is enabled with ``--fields=+r``.
@@ -994,13 +994,13 @@ field is enabled with ``--fields=+r``.
 
     $  ./ctags -o - --extras=+r --fields=+r reftag.c
     TYPE	reftag.c	/^#define TYPE /;"	d	file:
-    TYPE	reftag.c	/^#undef TYPE$/;"	d	file:	role:undef
-    TYPE	reftag.c	/^struct TYPE { int x, y; };$/;"	s	file:	role:def
-    foo.h	reftag.c	/^#include "foo.h"/;"	h	role:local
-    p	reftag.c	/^TYPE p;$/;"	v	typeref:typename:TYPE	role:def
-    stdio.h	reftag.c	/^#include <stdio.h>/;"	h	role:system
-    x	reftag.c	/^struct TYPE { int x, y; };$/;"	m	struct:TYPE	typeref:typename:int	file:	role:def
-    y	reftag.c	/^struct TYPE { int x, y; };$/;"	m	struct:TYPE	typeref:typename:int	file:	role:def
+    TYPE	reftag.c	/^#undef TYPE$/;"	d	file:	roles:undef
+    TYPE	reftag.c	/^struct TYPE { int x, y; };$/;"	s	file:	roles:def
+    foo.h	reftag.c	/^#include "foo.h"/;"	h	roles:local
+    p	reftag.c	/^TYPE p;$/;"	v	typeref:typename:TYPE	roles:def
+    stdio.h	reftag.c	/^#include <stdio.h>/;"	h	roles:system
+    x	reftag.c	/^struct TYPE { int x, y; };$/;"	m	struct:TYPE	typeref:typename:int	file:	roles:def
+    y	reftag.c	/^struct TYPE { int x, y; };$/;"	m	struct:TYPE	typeref:typename:int	file:	roles:def
 
 The `Reference tag marker` field, ``R``, is a specialized GNU global
 requirement; D is used for the traditional definition tags, and R is

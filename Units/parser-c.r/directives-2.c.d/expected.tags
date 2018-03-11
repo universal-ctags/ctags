@@ -1,2 +1,2 @@
-func	input.c	/^int func()$/;"	f	typeref:typename:int	role:def
-main	input.c	/^int main()$/;"	f	typeref:typename:int	role:def
+func	input.c	/^int func()$/;"	f	typeref:typename:int	roles:def
+main	input.c	/^int main()$/;"	f	typeref:typename:int	roles:def

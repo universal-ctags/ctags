@@ -1156,13 +1156,38 @@ static bool isTagWritable(const tagEntryInfo *const tag)
 	if (! isLanguageKindEnabled(tag->langType, tag->kindIndex))
 		return false;
 
-	if (tag->extensionFields.roleIndex != ROLE_INDEX_DEFINITION)
+	if (tag->extensionFields.roleBits)
 	{
 		if (!isXtagEnabled (XTAG_REFERENCE_TAGS))
 			return false;
-		if (! isLanguageRoleEnabled (tag->langType, tag->kindIndex,
-									 tag->extensionFields.roleIndex))
+
+		if (tag->extensionFields.roleBits >=
+			(makeRoleBit(countLanguageRoles(tag->langType,
+											tag->kindIndex))))
 			return false;
+
+		/* TODO: optimization
+		   A Bitmasks represeting all enabled roles can be calculated at the
+		   end of initializing the parser. Calculating each time when checking
+		   a tag entry is not needed. */
+		for (unsigned int roleIndex = 0; roleIndex < ROLE_MAX_COUNT; roleIndex++)
+		{
+			if (isRoleAssigned(tag, roleIndex))
+			{
+				if (isLanguageRoleEnabled (tag->langType, tag->kindIndex,
+											 roleIndex))
+					return true;
+			}
+
+		}
+		return false;
+	}
+	else if (isLanguageKindRefOnly(tag->langType, tag->kindIndex))
+	{
+		error (WARNING, "definition tag for refonly kind(%s) is made: %s",
+			   getLanguageKind(tag->langType, tag->kindIndex)->name,
+			   tag->name);
+		/* This one is not so critical. */
 	}
 
 	return true;
@@ -1407,7 +1432,7 @@ extern void initTagEntry (tagEntryInfo *const e, const char *const name,
 			 getInputFilePosition (),
 			 getInputFileTagPath (),
 			 kindIndex,
-			 ROLE_INDEX_DEFINITION,
+			 0,
 			 getSourceFileTagPath(),
 			 getSourceLanguage(),
 			 getSourceLineNumber() - getInputLineNumber ());
@@ -1422,7 +1447,7 @@ extern void initRefTagEntry (tagEntryInfo *const e, const char *const name,
 			 getInputFilePosition (),
 			 getInputFileTagPath (),
 			 kindIndex,
-			 roleIndex,
+			 makeRoleBit(roleIndex),
 			 getSourceFileTagPath(),
 			 getSourceLanguage(),
 			 getSourceLineNumber() - getInputLineNumber ());
@@ -1434,15 +1459,12 @@ extern void initTagEntryFull (tagEntryInfo *const e, const char *const name,
 			      MIOPos      filePosition,
 			      const char *inputFileName,
 			      int kindIndex,
-			      int roleIndex,
+			      roleBitsType roleBits,
 			      const char *sourceFileName,
 			      langType sourceLangType,
 			      long sourceLineNumberDifference)
 {
 	int i;
-#if DEBUG
-	kindDefinition *kind = getLanguageKind(langType_, kindIndex);
-#endif
 
 	Assert (getInputFileName() != NULL);
 
@@ -1461,11 +1483,12 @@ extern void initTagEntryFull (tagEntryInfo *const e, const char *const name,
 	Assert (kindIndex < 0 || kindIndex < countLanguageKinds(langType_));
 	e->kindIndex = kindIndex;
 
-	Assert (roleIndex >= ROLE_INDEX_DEFINITION);
-	Assert (kind == NULL || roleIndex < kind->nRoles);
-	e->extensionFields.roleIndex = roleIndex;
-	if (roleIndex > ROLE_INDEX_DEFINITION)
+	Assert (roleBits == 0
+			|| (roleBits < (makeRoleBit(countLanguageRoles(langType_, kindIndex)))));
+	e->extensionFields.roleBits = roleBits;
+	if (roleBits)
 		markTagExtraBit (e, XTAG_REFERENCE_TAGS);
+
 	if (doesParserRunAsGuest ())
 		markTagExtraBit (e, XTAG_TAGS_GENERATED_BY_GUEST_PARSERS);
 	if (doesSubparserRun ())
@@ -1484,7 +1507,7 @@ extern void initTagEntryFull (tagEntryInfo *const e, const char *const name,
 		e->placeholder = 1;
 }
 
-extern void    markTagExtraBit     (tagEntryInfo *const tag, xtagType extra)
+static void    markTagExtraBitFull     (tagEntryInfo *const tag, xtagType extra, bool mark)
 {
 	unsigned int index;
 	unsigned int offset;
@@ -1517,7 +1540,15 @@ extern void    markTagExtraBit     (tagEntryInfo *const tag, xtagType extra)
 		return;
 	}
 
-	slot [ index ] |= (1 << offset);
+	if (mark)
+		slot [ index ] |= (1 << offset);
+	else
+		slot [ index ] &= ~(1 << offset);
+}
+
+extern void    markTagExtraBit     (tagEntryInfo *const tag, xtagType extra)
+{
+	markTagExtraBitFull (tag, extra, true);
 }
 
 extern bool isTagExtraBitMarked (const tagEntryInfo *const tag, xtagType extra)
@@ -1546,6 +1577,43 @@ extern bool isTagExtraBitMarked (const tagEntryInfo *const tag, xtagType extra)
 
 	}
 	return !! ((slot [ index ]) & (1 << offset));
+}
+
+static void assignRoleFull(tagEntryInfo *const e, int roleIndex, bool assign)
+{
+	if (roleIndex == ROLE_INDEX_DEFINITION)
+	{
+		if (assign)
+		{
+			e->extensionFields.roleBits = 0;
+			markTagExtraBitFull (e, XTAG_REFERENCE_TAGS, false);
+		}
+	}
+	else if (roleIndex > ROLE_INDEX_DEFINITION)
+	{
+		Assert (roleIndex < countLanguageRoles(e->langType, e->kindIndex));
+
+		if (assign)
+			e->extensionFields.roleBits |= (makeRoleBit(roleIndex));
+		else
+			e->extensionFields.roleBits &= ~(makeRoleBit(roleIndex));
+		markTagExtraBitFull (e, XTAG_REFERENCE_TAGS, e->extensionFields.roleBits);
+	}
+	else
+		AssertNotReached();
+}
+
+extern void assignRole(tagEntryInfo *const e, int roleIndex)
+{
+	assignRoleFull(e, roleIndex, true);
+}
+
+extern bool isRoleAssigned(const tagEntryInfo *const e, int roleIndex)
+{
+	if (roleIndex == ROLE_INDEX_DEFINITION)
+		return (!e->extensionFields.roleBits);
+	else
+		return (e->extensionFields.roleBits & makeRoleBit(roleIndex));
 }
 
 extern unsigned long numTagsAdded(void)
