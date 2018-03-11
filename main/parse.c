@@ -296,6 +296,19 @@ extern kindDefinition* getLanguageKindForLetter (const langType language, char k
 		return getKindForLetter (LanguageTable [language].kindControlBlock, kindLetter);
 }
 
+extern kindDefinition* getLanguageKindForName (const langType language, const char *kindName)
+{
+	Assert (0 <= language  &&  language < (int) LanguageCount);
+	Assert (kindName);
+
+	if (strcmp(kindName, LanguageTable [language].fileKind->name) == 0)
+		return LanguageTable [language].fileKind;
+	else if (strcmp(kindName, KIND_GHOST_LONG) == 0)
+		return &kindGhost;
+	else
+		return getKindForName (LanguageTable [language].kindControlBlock, kindName);
+}
+
 extern langType getNamedLanguage (const char *const name, size_t len)
 {
 	langType result = LANG_IGNORE;
@@ -1930,12 +1943,6 @@ extern void processLanguageDefineOption (
 	}
 }
 
-static kindDefinition *langKindLongOption (const langType language, const char *kindLong)
-{
-	Assert (0 <= language  &&  language < (int) LanguageCount);
-	return getKindForName (LanguageTable [language].kindControlBlock, kindLong);
-}
-
 extern bool isLanguageKindEnabled (const langType language, int kindIndex)
 {
 	kindDefinition * kdef = getLanguageKind (language, kindIndex);
@@ -1980,11 +1987,11 @@ static bool enableLanguageKindForLetter (
 	return result;
 }
 
-static bool enableLanguageKindLong (
-	const langType language, const char * const kindLong, const bool mode)
+static bool enableLanguageKindForName (
+	const langType language, const char * const name, const bool mode)
 {
 	bool result = false;
-	kindDefinition* const def = langKindLongOption (language, kindLong);
+	kindDefinition* const def = getLanguageKindForName (language, name);
 	if (def != NULL)
 	{
 		enableKind (def, mode);
@@ -2047,7 +2054,7 @@ static void processLangKindDefinition (
 				      "unexpected character in kind specification: \'%c\'",
 				      c);
 			k = vStringValue (longName);
-			r = enableLanguageKindLong (language, k, mode);
+			r = enableLanguageKindForName (language, k, mode);
 			if (! r)
 				error (WARNING, "Unsupported kind: '%s' for --%s option",
 				       k, option);

@@ -146,8 +146,9 @@ extern bool doesLanguageAllowNullTag (const langType language);
 extern bool doesLanguageRequestAutomaticFQTag (const langType language);
 extern const char *getLanguageName (const langType language);
 extern const char *getLanguageKindName (const langType language, const int kindIndex);
-extern kindDefinition* getLanguageKindForLetter (const langType language, char kindLetter);
 extern kindDefinition* getLanguageKind(const langType language, int kindIndex);
+extern kindDefinition* getLanguageKindForLetter (const langType language, char kindLetter);
+extern kindDefinition* getLanguageKindForName (const langType language, const char *kindName);
 extern int defineLanguageKind (const langType language, kindDefinition *def,
 							   freeKindDefFunc freeKindDef);
 extern unsigned int countLanguageKinds (const langType language);
