@@ -35,7 +35,6 @@
 #include "parse.h"
 #include "read.h"
 #include "routines.h"
-#include "ptrarray.h"
 #include "trashbox.h"
 
 static bool regexAvailable = false;
@@ -447,7 +446,7 @@ static regexPattern * refPattern (regexPattern * ptrn)
 static regexPattern * newPattern (regex_t* const pattern,
 								  enum regexParserType regptype)
 {
-	regexPattern*ptrn = xCalloc(1, regexPattern);
+	regexPattern *ptrn = xCalloc(1, regexPattern);
 
 	ptrn->pattern = pattern;
 	ptrn->exclusive = false;

@@ -94,6 +94,13 @@ extern vString *vStringNewInit (const char *const s)
 	return vs;
 }
 
+extern vString *vStringNewNInit (const char *const s, const size_t length)
+{
+	vString *vs = vStringNew ();
+	vStringNCatS (vs, s, length);
+	return vs;
+}
+
 static void stringCat (
 		vString *const string, const char *const s, const size_t length)
 {

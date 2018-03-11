@@ -2092,6 +2092,7 @@ static bool processLangDefineKind(const langType language,
 	const char *tmp_start;
 	const char *tmp_end;
 	size_t tmp_len;
+	const char *flags = NULL;
 
 
 	Assert (0 <= language  &&  language < (int) LanguageCount);
@@ -2153,15 +2154,40 @@ static bool processLangDefineKind(const langType language,
 	}
 
 	p++;
-	if (p [0] == '\0')
+	if (p [0] == '\0' || p [0] == LONG_FLAGS_OPEN)
 		error (FATAL, "found an empty kind description in \"--%s\" option", option);
-	description = eStrdup (p);
+	{
+		vString *vdesc = vStringNew();
+		bool escaped = false;
+		while (*p != '\0')
+		{
+			if (escaped)
+			{
+				vStringPut (vdesc, *p);
+				escaped = false;
+
+			}
+			else if (*p == '\\')
+				escaped = true;
+			else if (*p == LONG_FLAGS_OPEN)
+			{
+				flags = p;
+				break;
+			}
+			else
+				vStringPut (vdesc, *p);
+			p++;
+		}
+		description = vStringDeleteUnwrap(vdesc);
+	}
 
 	kdef = xCalloc (1, kindDefinition);
 	kdef->enabled = true;
 	kdef->letter = letter;
 	kdef->name = name;
 	kdef->description = description;
+	if (flags)
+		flagsEval (flags, NULL, 0, kdef);
 
 	defineKind (parser->kindControlBlock, kdef, freeKdef);
 	return true;

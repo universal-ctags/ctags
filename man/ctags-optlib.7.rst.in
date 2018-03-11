@@ -167,6 +167,12 @@ OPTION ITEMS
 	Do not use "file" as *name*. It has been reserved for representing
 	a file since Exuberant-ctags.
 
+	*description* comes from any printable ASCII characters. The
+	exception is "{" and "\". "{" is reserved for adding flags
+	this option in the future. So put "\" before "{" to include
+	"{" to a description. To include "\" itself to a description,
+	put "\" before "\".
+
 	Both *letter*, *name* and their combination must be unique in
 	a *<LANG>*.
 
