@@ -1,0 +1,6 @@
+# rolesDisabled is kept disabled
+multiRolesTarget	input.x	/^r$/;"	roles	roles:a,b,d
+# rolesDisabled is enabled
+multiRolesTarget	input.x	/^r$/;"	roles	roles:a,b,d
+multiRolesDisabledTarget	input.x	/^R$/;"	rolesDisabled	roles:A
+multiRolesDisabledTarget	input.x	/^R$/;"	rolesDisabled	roles:B

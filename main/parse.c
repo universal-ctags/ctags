@@ -3910,6 +3910,8 @@ typedef enum {
 #endif
 	K_DISABLED,
 	K_ENABLED,
+	K_ROLES,
+	K_ROLES_DISABLED,
 	KIND_COUNT
 } CTST_Kind;
 
@@ -3941,6 +3943,31 @@ static roleDesc CTST_EnabledKindRoles [] = {
 	{ true,  "enabled",  "enabled role attached to enabled kind"  },
 };
 
+typedef enum {
+	R_ROLES_KIND_A_ROLE,
+	R_ROLES_KIND_B_ROLE,
+	R_ROLES_KIND_C_ROLE,
+	R_ROLES_KIND_D_ROLE,
+} CTST_RolesKindRole;
+
+static roleDesc CTST_RolesKindRoles [] = {
+	{ true,  "a", "A role" },
+	{ true,  "b", "B role" },
+	{ false, "c", "C role" },
+	{ true,  "d", "D role"  },
+};
+
+typedef enum {
+	R_ROLES_DISABLED_KIND_A_ROLE,
+	R_ROLES_DISABLED_KIND_B_ROLE,
+} CTST_RolesDisableKindRole;
+
+
+static roleDesc CTST_RolesDisabledKindRoles [] = {
+	{ true,  "A", "A role" },
+	{ true,  "B", "B role" },
+};
+
 static kindDefinition CTST_Kinds[KIND_COUNT] = {
 	/* `a' is reserved for kinddef testing */
 	{true, 'b', "broken tag", "name with unwanted characters",
@@ -3959,6 +3986,10 @@ static kindDefinition CTST_Kinds[KIND_COUNT] = {
 	 .referenceOnly = false, ATTACH_ROLES (CTST_DisabledKindRoles)},
 	{true, 'e', "enabled", "a kind enabled by default",
 	 .referenceOnly = false, ATTACH_ROLES (CTST_EnabledKindRoles)},
+	{true, 'r', "roles", "emit a tag with multi roles",
+	 .referenceOnly = true, ATTACH_ROLES (CTST_RolesKindRoles)},
+	{false, 'R', "rolesDisabled", "emit a tag with multi roles(disabled by default)",
+	 .referenceOnly = true, ATTACH_ROLES (CTST_RolesDisabledKindRoles)},
 };
 
 static void createCTSTTags (void)
@@ -4049,6 +4080,31 @@ static void createCTSTTags (void)
 							makeTagEntry (&e);
 							break;
 						}
+					case K_ROLES:
+					{
+						char *name = "multiRolesTarget";
+						int qindex;
+						tagEntryInfo *qe;
+
+						initTagEntry (&e, name, i);
+						assignRole(&e, R_ROLES_KIND_A_ROLE);
+						assignRole(&e, R_ROLES_KIND_C_ROLE);
+						assignRole(&e, R_ROLES_KIND_D_ROLE);
+						qindex = makeTagEntry (&e);
+						qe = getEntryInCorkQueue (qindex);
+						assignRole(qe, R_ROLES_KIND_B_ROLE);
+						break;
+					}
+					case K_ROLES_DISABLED:
+					{
+						char *name = "multiRolesDisabledTarget";
+
+						initRefTagEntry (&e, name, i, R_ROLES_DISABLED_KIND_A_ROLE);
+						makeTagEntry (&e);
+						initRefTagEntry (&e, name, i, R_ROLES_DISABLED_KIND_B_ROLE);
+						makeTagEntry (&e);
+						break;
+					}
 				}
 			}
 	}
@@ -4064,5 +4120,6 @@ static parserDefinition *CTagsSelfTestParser (void)
 	def->parser = createCTSTTags;
 	def->invisible = true;
 	def->useMemoryStreamInput = true;
+	def->useCork = true;
 	return def;
 }
