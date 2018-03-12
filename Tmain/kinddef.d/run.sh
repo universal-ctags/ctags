@@ -82,7 +82,7 @@ ${CTAGS} --kinddef-MYTEST='x,kind,desc\{}' --list-kinds-full=MYTEST 2>&1
 # echo '# use a { and \t in description'
 # ${CTAGS} --kinddef-MYTEST='x,kind,desc\{}\t' --list-kinds-full=MYTEST 2>&1
 
-echo '# use a \\ in description'
+echo '# use a \ in description'
 ${CTAGS} --kinddef-MYTEST='x,kind,desc\\backslash' --list-kinds-full=MYTEST 2>&1
 
 echo '# description started from {'

@@ -52,7 +52,7 @@ x       kind yes     no      0      NONE   desc{
 # use a { in description (2)
 #LETTER NAME ENABLED REFONLY NROLES MASTER DESCRIPTION
 x       kind yes     no      0      NONE   desc{}
-# use a \\ in description
+# use a \ in description
 #LETTER NAME ENABLED REFONLY NROLES MASTER DESCRIPTION
 x       kind yes     no      0      NONE   desc\backslash
 # description started from {
