@@ -6,8 +6,8 @@ CTAGS="$1 --quiet --options=NONE"
 {
 {
 echo '# echo unknown lang'
-${CTAGS} --_fielddef-NOSUCHLANG --_quit
-${CTAGS} --_fielddef-NOSUCHLANG=field,desc --_quit
+${CTAGS} --_fielddef-NOSUCHLANG
+${CTAGS} --_fielddef-NOSUCHLANG=field,desc
 
 echo '# no option value'
 ${CTAGS} --langdef=IMAGINARY --_fielddef-IMAGINARY
