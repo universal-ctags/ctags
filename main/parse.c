@@ -2727,7 +2727,9 @@ static bool processLangDefineExtra (const langType language,
 {
 	xtagDefinition *xdef;
 	const char * p = parameterx;
+	const char *name_end;
 	const char *desc;
+	const char *flags;
 
 	Assert (0 <= language  &&  language < (int) LanguageCount);
 	Assert (p);
@@ -2735,26 +2737,35 @@ static bool processLangDefineExtra (const langType language,
 	if (p[0] == '\0')
 		error (FATAL, "no extra definition specified in \"--%s\" option", option);
 
-	desc = strchr (p, ',');
-	if (!desc)
+	name_end = strchr (p, ',');
+	if (!name_end)
 		error (FATAL, "no extra description specified in \"--%s\" option", option);
-	else if (desc == p)
+	else if (name_end == p)
 		error (FATAL, "the extra name in \"--%s\" option is empty", option);
 
-	for (; p < desc; p++)
+	for (; p < name_end; p++)
 	{
 		if (!isalnum (*p))
 			error (FATAL, "unacceptable char as part of extra name in \"--%s\" option",
 				   option);
 	}
 
+	p++;
+	if (p [0] == '\0' || p [0] == LONG_FLAGS_OPEN)
+		error (FATAL, "extra description in \"--%s\" option is empty", option);
+
+	desc = extractDescriptionAndFlags (p, &flags);
+
 	xdef = xCalloc (1, xtagDefinition);
 	xdef->enabled = false;
 	xdef->letter = NUL_XTAG_LETTER;
-	xdef->name = eStrndup (parameterx, desc - parameterx);
-	xdef->description = eStrdup (desc + 1);
+	xdef->name = eStrndup (parameterx, name_end - parameterx);
+	xdef->description = desc;
 	xdef->isEnabled = NULL;
 	DEFAULT_TRASH_BOX(xdef, xtagDefinitionDestroy);
+
+	if (flags)
+		flagsEval (flags, NULL, 0, xdef);
 
 	defineXtag (xdef, language);
 
