@@ -2090,6 +2090,37 @@ static void freeKdef (kindDefinition *kdef)
 	eFree (kdef);
 }
 
+static char *extractDescriptionAndFlags(const char *input, const char **flags)
+{
+	vString *vdesc = vStringNew();
+	bool escaped = false;
+
+	if (flags)
+		*flags = NULL;
+
+	while (*input != '\0')
+	{
+		if (escaped)
+		{
+			vStringPut (vdesc, *input);
+			escaped = false;
+
+		}
+		else if (*input == '\\')
+			escaped = true;
+		else if (*input == LONG_FLAGS_OPEN)
+		{
+			if (flags)
+				*flags = input;
+			break;
+		}
+		else
+			vStringPut (vdesc, *input);
+		input++;
+	}
+	return vStringDeleteUnwrap(vdesc);
+}
+
 static bool processLangDefineKind(const langType language,
 								  const char *const option,
 								  const char *const parameterx)
@@ -2104,7 +2135,7 @@ static bool processLangDefineKind(const langType language,
 	const char *tmp_start;
 	const char *tmp_end;
 	size_t tmp_len;
-	const char *flags = NULL;
+	const char *flags;
 
 
 	Assert (0 <= language  &&  language < (int) LanguageCount);
@@ -2168,30 +2199,8 @@ static bool processLangDefineKind(const langType language,
 	p++;
 	if (p [0] == '\0' || p [0] == LONG_FLAGS_OPEN)
 		error (FATAL, "found an empty kind description in \"--%s\" option", option);
-	{
-		vString *vdesc = vStringNew();
-		bool escaped = false;
-		while (*p != '\0')
-		{
-			if (escaped)
-			{
-				vStringPut (vdesc, *p);
-				escaped = false;
 
-			}
-			else if (*p == '\\')
-				escaped = true;
-			else if (*p == LONG_FLAGS_OPEN)
-			{
-				flags = p;
-				break;
-			}
-			else
-				vStringPut (vdesc, *p);
-			p++;
-		}
-		description = vStringDeleteUnwrap(vdesc);
-	}
+	description = extractDescriptionAndFlags (p, &flags);
 
 	kdef = xCalloc (1, kindDefinition);
 	kdef->enabled = true;
