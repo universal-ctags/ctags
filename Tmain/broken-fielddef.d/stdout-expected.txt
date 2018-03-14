@@ -19,3 +19,26 @@ ctags: no field description specified in "--_fielddef-IMAGINARY" option
 ctags: field description in "--_fielddef-IMAGINARY" option is empty
 # no input file
 ctags: No files specified. Try "ctags --help".
+# inject a flag separator
+#LETTER NAME  ENABLED LANGUAGE  JSTYPE FIXED DESCRIPTION
+-       field no      IMAGINARY s--    no    desc
+# inject a broken flag separator(1)
+#LETTER NAME  ENABLED LANGUAGE  JSTYPE FIXED DESCRIPTION
+-       field no      IMAGINARY s--    no    desc
+# inject a broken flag separator(2)
+#LETTER NAME  ENABLED LANGUAGE  JSTYPE FIXED DESCRIPTION
+-       field no      IMAGINARY s--    no    desc
+# use a { in description (1)
+#LETTER NAME  ENABLED LANGUAGE  JSTYPE FIXED DESCRIPTION
+-       field no      IMAGINARY s--    no    desc{
+# use a { in description (2)
+#LETTER NAME  ENABLED LANGUAGE  JSTYPE FIXED DESCRIPTION
+-       field no      IMAGINARY s--    no    desc{}
+# use a \ in description
+#LETTER NAME  ENABLED LANGUAGE  JSTYPE FIXED DESCRIPTION
+-       field no      IMAGINARY s--    no    desc\backslash
+# description started from {
+ctags: field description in "--_fielddef-IMAGINARY" option is empty
+# description started from \{
+#LETTER NAME  ENABLED LANGUAGE  JSTYPE FIXED DESCRIPTION
+-       field no      IMAGINARY s--    no    {

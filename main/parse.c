@@ -2785,7 +2785,9 @@ static bool processLangDefineField (const langType language,
 {
 	fieldDefinition *fdef;
 	const char * p = parameter;
+	const char *name_end;
 	const char *desc;
+	const char *flags;
 
 	Assert (0 <= language  &&  language < (int) LanguageCount);
 	Assert (p);
@@ -2793,31 +2795,37 @@ static bool processLangDefineField (const langType language,
 	if (p[0] == '\0')
 		error (FATAL, "no field definition specified in \"--%s\" option", option);
 
-	desc = strchr (p, ',');
-	if (!desc)
+	name_end = strchr (p, ',');
+	if (!name_end)
 		error (FATAL, "no field description specified in \"--%s\" option", option);
-	else if (desc == p)
+	else if (name_end == p)
 		error (FATAL, "the field name in \"--%s\" option is empty", option);
 
-	for (; p < desc; p++)
+	for (; p < name_end; p++)
 	{
 		if (!isalpha (*p))
 			error (FATAL, "unacceptable char as part of field name in \"--%s\" option",
 				   option);
 	}
 
-	if (strlen (desc + 1) == 0)
+	p++;
+	if (p [0] == '\0' || p [0] == LONG_FLAGS_OPEN)
 		error (FATAL, "field description in \"--%s\" option is empty", option);
+
+	desc = extractDescriptionAndFlags (p, &flags);
 
 	fdef = xCalloc (1, fieldDefinition);
 	fdef->enabled = false;
 	fdef->letter = NUL_FIELD_LETTER;
-	fdef->name = eStrndup(parameter, desc - parameter);
-	fdef->description = eStrdup (desc + 1);
+	fdef->name = eStrndup(parameter, name_end - parameter);
+	fdef->description = desc;
 	fdef->isValueAvailable = NULL;
 	fdef->dataType = FIELDTYPE_STRING; /* TODO */
 	fdef->ftype = FIELD_UNKNOWN;
 	DEFAULT_TRASH_BOX(fdef, fieldDefinitionDestroy);
+
+	if (flags)
+		flagsEval (flags, NULL, 0, fdef);
 
 	defineField (fdef, language);
 
