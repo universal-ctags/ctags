@@ -1158,19 +1158,22 @@ static bool isTagWritable(const tagEntryInfo *const tag)
 
 	if (tag->extensionFields.roleBits)
 	{
+		size_t available_roles;
+
 		if (!isXtagEnabled (XTAG_REFERENCE_TAGS))
 			return false;
 
+		available_roles = countLanguageRoles(tag->langType,
+											 tag->kindIndex);
 		if (tag->extensionFields.roleBits >=
-			(makeRoleBit(countLanguageRoles(tag->langType,
-											tag->kindIndex))))
+			(makeRoleBit(available_roles)))
 			return false;
 
 		/* TODO: optimization
 		   A Bitmasks represeting all enabled roles can be calculated at the
 		   end of initializing the parser. Calculating each time when checking
 		   a tag entry is not needed. */
-		for (unsigned int roleIndex = 0; roleIndex < ROLE_MAX_COUNT; roleIndex++)
+		for (unsigned int roleIndex = 0; roleIndex < available_roles; roleIndex++)
 		{
 			if (isRoleAssigned(tag, roleIndex))
 			{
