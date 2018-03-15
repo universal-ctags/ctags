@@ -23,9 +23,11 @@ ctags: No files specified. Try "ctags --help".
 #LETTER NAME  ENABLED LANGUAGE  FIXED DESCRIPTION
 -       extra no      IMAGINARY no    desc
 # inject a broken flag separator(1)
+ctags: Warning: long flags specifier opened with `{' is not closed `}': "{foo"
 #LETTER NAME  ENABLED LANGUAGE  FIXED DESCRIPTION
 -       extra no      IMAGINARY no    desc
 # inject a broken flag separator(2)
+ctags: Warning: long flags specifier opened with `{' is not closed `}': "{"
 #LETTER NAME  ENABLED LANGUAGE  FIXED DESCRIPTION
 -       extra no      IMAGINARY no    desc
 # use a { in description (1)

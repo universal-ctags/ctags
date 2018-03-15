@@ -41,11 +41,11 @@ ctags: the kind name file in "--kinddef-MYTEST" option is reserved
 #LETTER NAME ENABLED REFONLY NROLES MASTER DESCRIPTION
 x       kind yes     no      0      NONE   desc
 # inject a broken flag separator(1)
-ctags: Warning: long flags specifier opened with `{' is not closed `}'
+ctags: Warning: long flags specifier opened with `{' is not closed `}': "{foo"
 #LETTER NAME ENABLED REFONLY NROLES MASTER DESCRIPTION
 x       kind yes     no      0      NONE   desc
 # inject a broken flag separator(2)
-ctags: Warning: long flags specifier opened with `{' is not closed `}'
+ctags: Warning: long flags specifier opened with `{' is not closed `}': "{"
 #LETTER NAME ENABLED REFONLY NROLES MASTER DESCRIPTION
 x       kind yes     no      0      NONE   desc
 # use a { in description (1)

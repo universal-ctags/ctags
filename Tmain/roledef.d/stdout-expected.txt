@@ -53,10 +53,12 @@ v       variable yes     no      2      NONE   variables
 v/variable  role on      roles
 
 # inject a broken flag separator(1)
+ctags: Warning: long flags specifier opened with `{' is not closed `}': "{foo"
 #KIND(L/N)  NAME ENABLED DESCRIPTION
 v/variable  role on      roles
 
 # inject a broken flag separator(2)
+ctags: Warning: long flags specifier opened with `{' is not closed `}': "{"
 #KIND(L/N)  NAME ENABLED DESCRIPTION
 v/variable  role on      roles
 
