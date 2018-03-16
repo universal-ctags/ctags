@@ -146,8 +146,9 @@ extern bool doesLanguageAllowNullTag (const langType language);
 extern bool doesLanguageRequestAutomaticFQTag (const langType language);
 extern const char *getLanguageName (const langType language);
 extern const char *getLanguageKindName (const langType language, const int kindIndex);
-extern kindDefinition* getLanguageKindForLetter (const langType language, char kindLetter);
 extern kindDefinition* getLanguageKind(const langType language, int kindIndex);
+extern kindDefinition* getLanguageKindForLetter (const langType language, char kindLetter);
+extern kindDefinition* getLanguageKindForName (const langType language, const char *kindName);
 extern int defineLanguageKind (const langType language, kindDefinition *def,
 							   freeKindDefFunc freeKindDef);
 extern unsigned int countLanguageKinds (const langType language);
@@ -159,6 +160,7 @@ extern langType getLanguageForFilename (const char *const filename, langType sta
 extern bool isLanguageEnabled (const langType language);
 extern bool isLanguageKindEnabled (const langType language, int kindIndex);
 extern bool isLanguageRoleEnabled (const langType language, int kindIndex, int roleIndex);
+extern bool isLanguageKindRefOnly (const langType language, int kindIndex);
 
 extern bool isLanguageVisible (const langType language);
 
@@ -185,6 +187,7 @@ extern void initializeParsing (void);
 extern void initializeParser (langType language);
 extern unsigned int countParsers (void);
 extern void freeParserResources (void);
+extern void enableDefaultFileKind (bool state);
 extern void printLanguageKinds (const langType language, bool allKindFields,
 								bool withListHeader, bool machinable, FILE *fp);
 extern void printLanguageRoles (const langType language, const char* letters,

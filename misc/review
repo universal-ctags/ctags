@@ -282,6 +282,11 @@ do_tmain_inspect()
     done
 }
 
+count ()
+{
+    echo $#
+}
+
 do_inspect ()
 {
     local a
@@ -305,9 +310,12 @@ do_inspect ()
 	esac
     done
 
-    for t0 in $(do_list ${including_known_bugs}); do
-	PS3="[[ $t0 ]]? "
-
+    local T=$(do_list ${including_known_bugs});
+    local total=$(count $T)
+    local i=1
+    for t0 in $T; do
+	PS3="[$i/$total [ $t0 ]]? "
+	i=$(( i + 1 ))
 	t=${t0#Units/}
 	t=${t#Tmain/}
 

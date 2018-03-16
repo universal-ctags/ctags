@@ -749,7 +749,7 @@ disabled.
 .. code-block:: console
 
 	$ ./ctags --languages=-Make --fields=+lKr --extras=+r -o - Makefile.am
-	bin	Makefile.am	/^bin_PROGRAMS = ctags$/;"	directory	language:Automake	role:program
+	bin	Makefile.am	/^bin_PROGRAMS = ctags$/;"	directory	language:Automake	roles:program
 	ctags	Makefile.am	/^bin_PROGRAMS = ctags$/;"	program	language:Automake	directory:bin
 
 Autoconf/M4 parser combination

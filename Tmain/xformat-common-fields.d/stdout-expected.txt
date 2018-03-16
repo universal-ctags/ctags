@@ -92,8 +92,8 @@ output: doIt class
 status: 0
 
 field: r
-output: Foo 
-output: doIt 
+output: Foo def
+output: doIt def
 status: 0
 
 field: s

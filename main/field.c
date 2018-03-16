@@ -59,7 +59,7 @@ static const char *renderFieldImplementation (const tagEntryInfo *const tag, con
 static const char *renderFieldFile (const tagEntryInfo *const tag, const char *value, vString* b, bool *rejected);
 static const char *renderFieldPatternCommon (const tagEntryInfo *const tag, const char *value, vString* b, bool *rejected);
 static const char *renderFieldPatternCtags (const tagEntryInfo *const tag, const char *value, vString* b, bool *rejected);
-static const char *renderFieldRole (const tagEntryInfo *const tag, const char *value, vString* b, bool *rejected);
+static const char *renderFieldRoles (const tagEntryInfo *const tag, const char *value, vString* b, bool *rejected);
 static const char *renderFieldRefMarker (const tagEntryInfo *const tag, const char *value, vString* b, bool *rejected);
 static const char *renderFieldExtras (const tagEntryInfo *const tag, const char *value, vString* b, bool *rejected);
 static const char *renderFieldXpath (const tagEntryInfo *const tag, const char *value, vString* b, bool *rejected);
@@ -73,7 +73,6 @@ static bool     isInheritsFieldAvailable  (const tagEntryInfo *const tag);
 static bool     isAccessFieldAvailable    (const tagEntryInfo *const tag);
 static bool     isImplementationFieldAvailable (const tagEntryInfo *const tag);
 static bool     isSignatureFieldAvailable (const tagEntryInfo *const tag);
-static bool     isRoleFieldAvailable      (const tagEntryInfo *const tag);
 static bool     isExtrasFieldAvailable    (const tagEntryInfo *const tag);
 static bool     isXpathFieldAvailable     (const tagEntryInfo *const tag);
 static bool     isEndFieldAvailable       (const tagEntryInfo *const tag);
@@ -188,11 +187,10 @@ static fieldDefinition fieldDefinitionsExuberant [] = {
 };
 
 static fieldDefinition fieldDefinitionsUniversal [] = {
-	DEFINE_FIELD_FULL ('r', "role",    false,
-			   "Role",
-			   isRoleFieldAvailable,
+	DEFINE_FIELD ('r', "roles",    false,
+			   "Roles",
 			   FIELDTYPE_STRING,
-			   [WRITER_U_CTAGS] = renderFieldRole),
+			   [WRITER_U_CTAGS] = renderFieldRoles),
 	DEFINE_FIELD ('R',  NULL,     false,
 			   "Marker (R or D) representing whether tag is definition or reference",
 			   FIELDTYPE_STRING,
@@ -627,24 +625,35 @@ static const char *renderFieldLineNumber (const tagEntryInfo *const tag,
 	return vStringValue (b);
 }
 
-static const char *renderFieldRole (const tagEntryInfo *const tag,
+static const char *renderFieldRoles (const tagEntryInfo *const tag,
 				    const char *value CTAGS_ATTR_UNUSED,
 				    vString* b,
 					bool *rejected CTAGS_ATTR_UNUSED)
 {
-	int rindex = tag->extensionFields.roleIndex;
+	roleBitsType rbits = tag->extensionFields.roleBits;
 	const roleDesc * role;
-
-	if (rindex == ROLE_INDEX_DEFINITION)
-		vStringClear (b);
-	else
+	if (rbits)
 	{
 		const kindDefinition *kdef = getTagKind(tag);
-		Assert (rindex < kdef->nRoles);
-		role  = & (kdef->roles [rindex]);
-		return renderRole (role, b);
-	}
+		int roleCount = countLanguageRoles (tag->langType, tag->kindIndex);
+		int nRoleWritten = 0;
 
+		for (int roleIndex = 0; roleIndex < roleCount; roleIndex++)
+		{
+			if (((rbits >> roleIndex) & (roleBitsType)1)
+				&& isLanguageRoleEnabled (tag->langType, tag->kindIndex, roleIndex))
+			{
+				if (nRoleWritten > 0)
+					vStringPut(b, ',');
+
+				role  = & (kdef->roles [roleIndex]);
+				renderRole (role, b);
+				nRoleWritten++;
+			}
+		}
+	}
+	else
+		vStringCatS (b, ROLE_NAME_DEFINITION);
 	return vStringValue (b);
 }
 
@@ -742,7 +751,7 @@ static const char *renderFieldRefMarker (const tagEntryInfo *const tag,
 {
 	static char c[2] = { [1] = '\0' };
 
-	c [0] = tag->extensionFields.roleIndex == ROLE_INDEX_DEFINITION? 'D': 'R';
+	c [0] = (tag->extensionFields.roleBits)? 'R': 'D';
 
 	return renderAsIs (b, c);
 }
@@ -853,11 +862,6 @@ static bool     isImplementationFieldAvailable (const tagEntryInfo *const tag)
 static bool     isSignatureFieldAvailable (const tagEntryInfo *const tag)
 {
 	return (tag->extensionFields.signature != NULL)? true: false;
-}
-
-static bool     isRoleFieldAvailable      (const tagEntryInfo *const tag)
-{
-	return (tag->extensionFields.roleIndex != ROLE_INDEX_DEFINITION)? true: false;
 }
 
 static bool     isExtrasFieldAvailable     (const tagEntryInfo *const tag)

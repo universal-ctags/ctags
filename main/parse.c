@@ -296,6 +296,19 @@ extern kindDefinition* getLanguageKindForLetter (const langType language, char k
 		return getKindForLetter (LanguageTable [language].kindControlBlock, kindLetter);
 }
 
+extern kindDefinition* getLanguageKindForName (const langType language, const char *kindName)
+{
+	Assert (0 <= language  &&  language < (int) LanguageCount);
+	Assert (kindName);
+
+	if (strcmp(kindName, LanguageTable [language].fileKind->name) == 0)
+		return LanguageTable [language].fileKind;
+	else if (strcmp(kindName, KIND_GHOST_LONG) == 0)
+		return &kindGhost;
+	else
+		return getKindForName (LanguageTable [language].kindControlBlock, kindName);
+}
+
 extern langType getNamedLanguage (const char *const name, size_t len)
 {
 	langType result = LANG_IGNORE;
@@ -1770,6 +1783,11 @@ static void lazyInitialize (langType language)
 	}
 }
 
+extern void enableDefaultFileKind (bool state)
+{
+	defaultFileKind.enabled = state;
+}
+
 /*
 *   Option parsing
 */
@@ -1925,28 +1943,22 @@ extern void processLanguageDefineOption (
 	}
 }
 
-static kindDefinition *langKindDefinition (const langType language, const int flag)
-{
-	Assert (0 <= language  &&  language < (int) LanguageCount);
-	return getKindForLetter (LanguageTable [language].kindControlBlock, flag);
-}
-
-static kindDefinition *langKindLongOption (const langType language, const char *kindLong)
-{
-	Assert (0 <= language  &&  language < (int) LanguageCount);
-	return getKindForName (LanguageTable [language].kindControlBlock, kindLong);
-}
-
 extern bool isLanguageKindEnabled (const langType language, int kindIndex)
 {
-	return isKindEnabled(LanguageTable [language].kindControlBlock,
-						 kindIndex);
+	kindDefinition * kdef = getLanguageKind (language, kindIndex);
+	return kdef->enabled;
 }
 
 extern bool isLanguageRoleEnabled (const langType language, int kindIndex, int roleIndex)
 {
 	return isRoleEnabled(LanguageTable [language].kindControlBlock,
 						 kindIndex, roleIndex);
+}
+
+extern bool isLanguageKindRefOnly (const langType language, int kindIndex)
+{
+	kindDefinition * def =  getLanguageKind(language, kindIndex);
+	return def->referenceOnly;
 }
 
 static void resetLanguageKinds (const langType language, const bool mode)
@@ -1968,11 +1980,11 @@ static void resetLanguageKinds (const langType language, const bool mode)
 	}
 }
 
-static bool enableLanguageKind (
+static bool enableLanguageKindForLetter (
 		const langType language, const int kind, const bool mode)
 {
 	bool result = false;
-	kindDefinition* const def = langKindDefinition (language, kind);
+	kindDefinition* const def = getLanguageKindForLetter (language, kind);
 	if (def != NULL)
 	{
 		enableKind (def, mode);
@@ -1981,11 +1993,11 @@ static bool enableLanguageKind (
 	return result;
 }
 
-static bool enableLanguageKindLong (
-	const langType language, const char * const kindLong, const bool mode)
+static bool enableLanguageKindForName (
+	const langType language, const char * const name, const bool mode)
 {
 	bool result = false;
-	kindDefinition* const def = langKindLongOption (language, kindLong);
+	kindDefinition* const def = getLanguageKindForName (language, name);
 	if (def != NULL)
 	{
 		enableKind (def, mode);
@@ -2048,7 +2060,7 @@ static void processLangKindDefinition (
 				      "unexpected character in kind specification: \'%c\'",
 				      c);
 			k = vStringValue (longName);
-			r = enableLanguageKindLong (language, k, mode);
+			r = enableLanguageKindForName (language, k, mode);
 			if (! r)
 				error (WARNING, "Unsupported kind: '%s' for --%s option",
 				       k, option);
@@ -2061,7 +2073,7 @@ static void processLangKindDefinition (
 				vStringPut (longName, c);
 			else
 			{
-				r = enableLanguageKind (language, c, mode);
+				r = enableLanguageKindForLetter (language, c, mode);
 				if (! r)
 					error (WARNING, "Unsupported kind: '%c' for --%s option",
 					       c, option);
@@ -3898,6 +3910,8 @@ typedef enum {
 #endif
 	K_DISABLED,
 	K_ENABLED,
+	K_ROLES,
+	K_ROLES_DISABLED,
 	KIND_COUNT
 } CTST_Kind;
 
@@ -3929,6 +3943,31 @@ static roleDesc CTST_EnabledKindRoles [] = {
 	{ true,  "enabled",  "enabled role attached to enabled kind"  },
 };
 
+typedef enum {
+	R_ROLES_KIND_A_ROLE,
+	R_ROLES_KIND_B_ROLE,
+	R_ROLES_KIND_C_ROLE,
+	R_ROLES_KIND_D_ROLE,
+} CTST_RolesKindRole;
+
+static roleDesc CTST_RolesKindRoles [] = {
+	{ true,  "a", "A role" },
+	{ true,  "b", "B role" },
+	{ false, "c", "C role" },
+	{ true,  "d", "D role"  },
+};
+
+typedef enum {
+	R_ROLES_DISABLED_KIND_A_ROLE,
+	R_ROLES_DISABLED_KIND_B_ROLE,
+} CTST_RolesDisableKindRole;
+
+
+static roleDesc CTST_RolesDisabledKindRoles [] = {
+	{ true,  "A", "A role" },
+	{ true,  "B", "B role" },
+};
+
 static kindDefinition CTST_Kinds[KIND_COUNT] = {
 	/* `a' is reserved for kinddef testing */
 	{true, 'b', "broken tag", "name with unwanted characters",
@@ -3947,6 +3986,10 @@ static kindDefinition CTST_Kinds[KIND_COUNT] = {
 	 .referenceOnly = false, ATTACH_ROLES (CTST_DisabledKindRoles)},
 	{true, 'e', "enabled", "a kind enabled by default",
 	 .referenceOnly = false, ATTACH_ROLES (CTST_EnabledKindRoles)},
+	{true, 'r', "roles", "emit a tag with multi roles",
+	 .referenceOnly = true, ATTACH_ROLES (CTST_RolesKindRoles)},
+	{false, 'R', "rolesDisabled", "emit a tag with multi roles(disabled by default)",
+	 .referenceOnly = true, ATTACH_ROLES (CTST_RolesDisabledKindRoles)},
 };
 
 static void createCTSTTags (void)
@@ -4037,6 +4080,31 @@ static void createCTSTTags (void)
 							makeTagEntry (&e);
 							break;
 						}
+					case K_ROLES:
+					{
+						char *name = "multiRolesTarget";
+						int qindex;
+						tagEntryInfo *qe;
+
+						initTagEntry (&e, name, i);
+						assignRole(&e, R_ROLES_KIND_A_ROLE);
+						assignRole(&e, R_ROLES_KIND_C_ROLE);
+						assignRole(&e, R_ROLES_KIND_D_ROLE);
+						qindex = makeTagEntry (&e);
+						qe = getEntryInCorkQueue (qindex);
+						assignRole(qe, R_ROLES_KIND_B_ROLE);
+						break;
+					}
+					case K_ROLES_DISABLED:
+					{
+						char *name = "multiRolesDisabledTarget";
+
+						initRefTagEntry (&e, name, i, R_ROLES_DISABLED_KIND_A_ROLE);
+						makeTagEntry (&e);
+						initRefTagEntry (&e, name, i, R_ROLES_DISABLED_KIND_B_ROLE);
+						makeTagEntry (&e);
+						break;
+					}
 				}
 			}
 	}
@@ -4052,5 +4120,6 @@ static parserDefinition *CTagsSelfTestParser (void)
 	def->parser = createCTSTTags;
 	def->invisible = true;
 	def->useMemoryStreamInput = true;
+	def->useCork = true;
 	return def;
 }

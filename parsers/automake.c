@@ -200,9 +200,14 @@ static void valueCallback (makeSubparser *make, char *name)
 
 	parent = getEntryInCorkQueue (p);
 	if ((parent->kindIndex == K_AM_DIR)
-	    && (parent->extensionFields.roleIndex != ROLE_INDEX_DEFINITION))
+	    && (parent->extensionFields.roleBits))
 	{
-		k = K_AM_PROGRAM + parent->extensionFields.roleIndex;
+		int roleIndex;
+		for (roleIndex = 0; roleIndex < ARRAY_SIZE(AutomakeDirectoryRoles); roleIndex++)
+			if (parent->extensionFields.roleBits & ((roleBitsType)1) << roleIndex)
+				break;
+
+		k = K_AM_PROGRAM + roleIndex;
 		initTagEntry (&elt, name, k);
 		elt.extensionFields.scopeIndex = p;
 		makeTagEntry (&elt);

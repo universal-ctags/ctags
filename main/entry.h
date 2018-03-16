@@ -41,6 +41,8 @@ typedef struct sTagField {
 	bool valueOwner;			/* used only in parserFieldsDynamic */
 } tagField;
 
+typedef uint64_t roleBitsType;
+
 /*  Information about the current tag candidate.
  */
 struct sTagEntryInfo {
@@ -87,7 +89,9 @@ struct sTagEntryInfo {
 		const char* typeRef [2];  /* e.g., "struct" and struct name */
 
 #define ROLE_INDEX_DEFINITION -1
-		int roleIndex; /* for role of reference tag */
+#define ROLE_NAME_DEFINITION "def"
+#define ROLE_MAX_COUNT (sizeof(roleBitsType) * 8)
+		roleBitsType roleBits; /* for role of reference tag */
 
 #ifdef HAVE_LIBXML
 		const char* xpath;
@@ -139,10 +143,13 @@ extern void initTagEntryFull (tagEntryInfo *const e, const char *const name,
 			      MIOPos      filePosition,
 			      const char *inputFileName,
 			      int kindIndex,
-			      int roleIndex,
+			      roleBitsType roleBits,
 			      const char *sourceFileName,
 			      langType sourceLangType,
 			      long sourceLineNumberDifference);
+extern void assignRole(tagEntryInfo *const e, int roleIndex);
+extern bool isRoleAssigned(const tagEntryInfo *const e, int roleIndex);
+
 extern int makeQualifiedTagEntry (const tagEntryInfo *const e);
 
 extern unsigned long numTagsAdded(void);
@@ -185,5 +192,13 @@ extern bool isTagExtraBitMarked (const tagEntryInfo *const tag, xtagType extra);
 extern void attachParserField (tagEntryInfo *const tag, fieldType ftype, const char* value);
 extern void attachParserFieldToCorkEntry (int index, fieldType ftype, const char* value);
 extern const tagField* getParserField (const tagEntryInfo * tag, int index);
+
+CTAGS_INLINE roleBitsType makeRoleBit(int roleIndex)
+{
+	if (roleIndex == ROLE_INDEX_DEFINITION)
+		return 0;
+	else
+		return ((roleBitsType)1) << roleIndex;
+}
 
 #endif  /* CTAGS_MAIN_ENTRY_H */
