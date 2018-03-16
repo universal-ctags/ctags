@@ -477,7 +477,7 @@ Next example is based on an issue #219 posted by @andreicristianpetcu::
 	   abc	input-0.bar	/^def def abc$/;"	a
 
 	``_advanceTo=1start`` is specified in *bar.ctags*.
-	That causes ctags allow to capture "abc".
+	This allows ctags to capture "abc".
 
 	At the first iteration, the patterns of both
 	*foo.ctags* and *bar.ctags* match as follows
@@ -489,10 +489,10 @@ Next example is based on an issue #219 posted by @andreicristianpetcu::
 			   ^
 			   0,1  (end)
 
-	"def" at the group 1 is captured as a tag in the
+	"def" at the group 1 is captured as a tag in
 	both languages. At the next iteration, the positions
 	where the pattern matching is applied to are not the
-	same in the language.
+	same in the languages.
 
 	*foo.ctags*
 	::
