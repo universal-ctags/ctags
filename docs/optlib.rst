@@ -383,6 +383,7 @@ Override the letter for file kind
 Overriding the letter for file kind is not allowed in Universal-ctags.
 
 .. IN MAN PAGE
+
 Don't use `F` as a kind letter in your parser.
 
 
@@ -479,10 +480,11 @@ Next example is based on an issue #219 posted by @andreicristianpetcu::
 	 That causes ctags allow to capture "abc".
 
 	 At the first iteration, the patterns of both
-	 *foo.ctags* and *bar.ctags" match as follows
+	 *foo.ctags* and *bar.ctags* match as follows
 	 ::
+
 		0   1       (start)
-        v   v
+		v   v
 		def def abc
 		       ^
 			   0,1  (end)
@@ -494,6 +496,7 @@ Next example is based on an issue #219 posted by @andreicristianpetcu::
 
 	 *foo.ctags*
 	 ::
+
                0end (default)
                v
 		def def abc
@@ -501,6 +504,7 @@ Next example is based on an issue #219 posted by @andreicristianpetcu::
 
 	 *bar.ctags*
 	 ::
+
             1start (as specified in _advanceTo long flag)
             v
 		def def abc
@@ -528,9 +532,9 @@ generator, which is a popular tool on Unix environment for writing a
 parser, and `RegexLexer` of Pygments. The knowledge about them
 help you understand the options.
 
-As usable, let me explain the feature with an example.  Consider a
+As usable, let me explain the feature with an example. Consider a
 imaginary language "X" has similar syntax with JavaScript; "var" is
-used as defining variable(s), , and "/* ... */" makes block comment.
+used as defining variable(s), , and "/\* ... \*/" makes block comment.
 
 *input.x*
 ::
