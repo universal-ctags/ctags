@@ -3,6 +3,8 @@
 
 CTAGS="$1 --quiet --options=NONE --langdef=IMAGINARY --kinddef-IMAGINARY=v,variable,variables"
 
+export MSYS2_ARG_CONV_EXCL=--_roledef-IMAGINARY
+
 title()
 {
 	echo
