@@ -3,58 +3,72 @@
 
 CTAGS="$1 --quiet --options=NONE"
 
+title()
 {
+	echo
+	echo "$@"
+
+	{
+		echo
+		echo "$@"
+	} 1>&2
+}
+
 {
-echo '# echo unknown lang'
+title '# echo unknown lang'
 ${CTAGS} --_fielddef-NOSUCHLANG
 ${CTAGS} --_fielddef-NOSUCHLANG=field,desc
 
-echo '# no option value'
+title '# no option value'
 ${CTAGS} --langdef=IMAGINARY --_fielddef-IMAGINARY
 ${CTAGS} --langdef=IMAGINARY --_fielddef-IMAGINARY=
 
-echo '# wrong char in a field name'
+title '# wrong char in a field name'
 ${CTAGS} --langdef=IMAGINARY --_fielddef-IMAGINARY=:
 ${CTAGS} --langdef=IMAGINARY --_fielddef-IMAGINARY=:abc
 ${CTAGS} --langdef=IMAGINARY --_fielddef-IMAGINARY=:abc,
 ${CTAGS} --langdef=IMAGINARY --_fielddef-IMAGINARY=:abc,description
 
-echo '# empty field name'
+title '# empty field name'
 ${CTAGS} --langdef=IMAGINARY --_fielddef-IMAGINARY=,
 ${CTAGS} --langdef=IMAGINARY --_fielddef-IMAGINARY=,abc
 ${CTAGS} --langdef=IMAGINARY --_fielddef-IMAGINARY=,abc,
 ${CTAGS} --langdef=IMAGINARY --_fielddef-IMAGINARY=,abc,description
 
-echo '# empty description'
+title '# empty description'
 ${CTAGS} --langdef=IMAGINARY --_fielddef-IMAGINARY=abc
 ${CTAGS} --langdef=IMAGINARY --_fielddef-IMAGINARY=abc,
 
-echo '# no input file'
+title '# no input file'
 ${CTAGS} --langdef=IMAGINARY --_fielddef-IMAGINARY=abc,desc
 
-echo '# inject a flag separator'
+title '# inject a flag separator'
 ${CTAGS} --langdef=IMAGINARY --_fielddef-IMAGINARY='field,desc{foo}' --list-fields=IMAGINARY
 
-echo '# inject a broken flag separator(1)'
+title '# inject a broken flag separator(1)'
 ${CTAGS} --langdef=IMAGINARY --_fielddef-IMAGINARY='field,desc{foo' --list-fields=IMAGINARY
 
-echo '# inject a broken flag separator(2)'
+title '# inject a broken flag separator(2)'
 ${CTAGS} --langdef=IMAGINARY --_fielddef-IMAGINARY='field,desc{' --list-fields=IMAGINARY
 
-echo '# use a { in description (1)'
+title '# use a { in description (1)'
 ${CTAGS} --langdef=IMAGINARY --_fielddef-IMAGINARY='field,desc\{' --list-fields=IMAGINARY
 
-echo '# use a { in description (2)'
+title '# use a { in description (2)'
 ${CTAGS} --langdef=IMAGINARY --_fielddef-IMAGINARY='field,desc\{}' --list-fields=IMAGINARY
 
-echo '# use a \ in description'
+title '# use a \ in description'
 ${CTAGS} --langdef=IMAGINARY --_fielddef-IMAGINARY='field,desc\\backslash' --list-fields=IMAGINARY
 
-echo '# description started from {'
+title '# description started from {'
 ${CTAGS} --langdef=IMAGINARY --_fielddef-IMAGINARY='field,{' --list-fields=IMAGINARY
 
-echo '# description started from \{'
+title '# description started from \{'
 ${CTAGS} --langdef=IMAGINARY --_fielddef-IMAGINARY='field,\{' --list-fields=IMAGINARY
+}  > /tmp/ctags-tmain-$$.stdout 2>/tmp/ctags-tmain-$$.stderr
 
-} 2>&1
-} | sed -e 's/\.exe//g'
+sed -e 's/\.exe//g' < /tmp/ctags-tmain-$$.stdout
+rm /tmp/ctags-tmain-$$.stdout
+
+sed -e 's/\.exe//g' < /tmp/ctags-tmain-$$.stderr 1>&2
+rm /tmp/ctags-tmain-$$.stderr

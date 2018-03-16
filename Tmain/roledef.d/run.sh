@@ -9,9 +9,13 @@ title()
 {
 	echo
 	echo "$@"
+
+	{
+		echo
+		echo "$@"
+	} 1>&2
 }
 
-{
 {
 title '# echo unknown lang'
 ${CTAGS} --_roledef-NOSUCHLANG
@@ -92,5 +96,10 @@ for i in $(seq 0 64); do
 done
 ${CTAGS} $opts
 
-} 2>&1
-} | sed -e 's/\.exe//g'
+} > /tmp/ctags-tmain-$$.stdout 2>/tmp/ctags-tmain-$$.stderr
+
+sed -e 's/\.exe//g' < /tmp/ctags-tmain-$$.stdout
+rm /tmp/ctags-tmain-$$.stdout
+
+sed -e 's/\.exe//g' < /tmp/ctags-tmain-$$.stderr 1>&2
+rm /tmp/ctags-tmain-$$.stderr

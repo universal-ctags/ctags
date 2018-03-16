@@ -1,46 +1,42 @@
+
 # echo unknown lang
-ctags: Unknown language "NOSUCHLANG" in "extradef-NOSUCHLANG" option
-ctags: Unknown language "NOSUCHLANG" in "extradef-NOSUCHLANG" option
+
 # no option value
-ctags: no extra definition specified in "--extradef-IMAGINARY" option
-ctags: no extra definition specified in "--extradef-IMAGINARY" option
+
 # wrong char in a field name
-ctags: no extra description specified in "--extradef-IMAGINARY" option
-ctags: no extra description specified in "--extradef-IMAGINARY" option
-ctags: unacceptable char as part of extra name in "--extradef-IMAGINARY" option
-ctags: unacceptable char as part of extra name in "--extradef-IMAGINARY" option
+
 # empty extra name
-ctags: the extra name in "--extradef-IMAGINARY" option is empty
-ctags: the extra name in "--extradef-IMAGINARY" option is empty
-ctags: the extra name in "--extradef-IMAGINARY" option is empty
-ctags: the extra name in "--extradef-IMAGINARY" option is empty
+
 # empty description
-ctags: no extra description specified in "--extradef-IMAGINARY" option
-ctags: extra description in "--extradef-IMAGINARY" option is empty
+
 # no input file
-ctags: No files specified. Try "ctags --help".
+
 # inject a flag separator
 #LETTER NAME  ENABLED LANGUAGE  FIXED DESCRIPTION
 -       extra no      IMAGINARY no    desc
+
 # inject a broken flag separator(1)
-ctags: Warning: long flags specifier opened with `{' is not closed `}': "{foo"
 #LETTER NAME  ENABLED LANGUAGE  FIXED DESCRIPTION
 -       extra no      IMAGINARY no    desc
+
 # inject a broken flag separator(2)
-ctags: Warning: long flags specifier opened with `{' is not closed `}': "{"
 #LETTER NAME  ENABLED LANGUAGE  FIXED DESCRIPTION
 -       extra no      IMAGINARY no    desc
+
 # use a { in description (1)
 #LETTER NAME  ENABLED LANGUAGE  FIXED DESCRIPTION
 -       extra no      IMAGINARY no    desc{
+
 # use a { in description (2)
 #LETTER NAME  ENABLED LANGUAGE  FIXED DESCRIPTION
 -       extra no      IMAGINARY no    desc{}
+
 # use a \ in description
 #LETTER NAME  ENABLED LANGUAGE  FIXED DESCRIPTION
 -       extra no      IMAGINARY no    desc\backslash
+
 # description started from {
-ctags: extra description in "--extradef-IMAGINARY" option is empty
+
 # description started from \{
 #LETTER NAME  ENABLED LANGUAGE  FIXED DESCRIPTION
 -       extra no      IMAGINARY no    {

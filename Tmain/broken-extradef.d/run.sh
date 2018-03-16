@@ -3,58 +3,73 @@
 
 CTAGS="$1 --quiet --options=NONE"
 
+title()
 {
+	echo
+	echo "$@"
+
+	{
+		echo
+		echo "$@"
+	} 1>&2
+}
+
 {
-echo '# echo unknown lang'
+title '# echo unknown lang'
 ${CTAGS} --extradef-NOSUCHLANG
 ${CTAGS} --extradef-NOSUCHLANG=extra,desc
 
-echo '# no option value'
+title '# no option value'
 ${CTAGS} --langdef=IMAGINARY --extradef-IMAGINARY
 ${CTAGS} --langdef=IMAGINARY --extradef-IMAGINARY=
 
-echo '# wrong char in a field name'
+title '# wrong char in a field name'
 ${CTAGS} --langdef=IMAGINARY --extradef-IMAGINARY=:
 ${CTAGS} --langdef=IMAGINARY --extradef-IMAGINARY=:abc
 ${CTAGS} --langdef=IMAGINARY --extradef-IMAGINARY=:abc,
 ${CTAGS} --langdef=IMAGINARY --extradef-IMAGINARY=:abc,description
 
-echo '# empty extra name'
+title '# empty extra name'
 ${CTAGS} --langdef=IMAGINARY --extradef-IMAGINARY=,
 ${CTAGS} --langdef=IMAGINARY --extradef-IMAGINARY=,abc
 ${CTAGS} --langdef=IMAGINARY --extradef-IMAGINARY=,abc,
 ${CTAGS} --langdef=IMAGINARY --extradef-IMAGINARY=,abc,description
 
-echo '# empty description'
+title '# empty description'
 ${CTAGS} --langdef=IMAGINARY --extradef-IMAGINARY=abc
 ${CTAGS} --langdef=IMAGINARY --extradef-IMAGINARY=abc,
 
-echo '# no input file'
+title '# no input file'
 ${CTAGS} --langdef=IMAGINARY --extradef-IMAGINARY=abc,desc
 
-echo '# inject a flag separator'
-${CTAGS} --langdef=IMAGINARY --extradef-IMAGINARY='extra,desc{foo}' --list-extras=IMAGINARY 2>&1
+title '# inject a flag separator'
+${CTAGS} --langdef=IMAGINARY --extradef-IMAGINARY='extra,desc{foo}' --list-extras=IMAGINARY
 
-echo '# inject a broken flag separator(1)'
-${CTAGS} --langdef=IMAGINARY --extradef-IMAGINARY='extra,desc{foo' --list-extras=IMAGINARY 2>&1
+title '# inject a broken flag separator(1)'
+${CTAGS} --langdef=IMAGINARY --extradef-IMAGINARY='extra,desc{foo' --list-extras=IMAGINARY
 
-echo '# inject a broken flag separator(2)'
-${CTAGS} --langdef=IMAGINARY --extradef-IMAGINARY='extra,desc{' --list-extras=IMAGINARY 2>&1
+title '# inject a broken flag separator(2)'
+${CTAGS} --langdef=IMAGINARY --extradef-IMAGINARY='extra,desc{' --list-extras=IMAGINARY
 
-echo '# use a { in description (1)'
-${CTAGS} --langdef=IMAGINARY --extradef-IMAGINARY='extra,desc\{' --list-extras=IMAGINARY 2>&1
+title '# use a { in description (1)'
+${CTAGS} --langdef=IMAGINARY --extradef-IMAGINARY='extra,desc\{' --list-extras=IMAGINARY
 
-echo '# use a { in description (2)'
-${CTAGS} --langdef=IMAGINARY --extradef-IMAGINARY='extra,desc\{}' --list-extras=IMAGINARY 2>&1
+title '# use a { in description (2)'
+${CTAGS} --langdef=IMAGINARY --extradef-IMAGINARY='extra,desc\{}' --list-extras=IMAGINARY
 
-echo '# use a \ in description'
-${CTAGS} --langdef=IMAGINARY --extradef-IMAGINARY='extra,desc\\backslash' --list-extras=IMAGINARY 2>&1
+title '# use a \ in description'
+${CTAGS} --langdef=IMAGINARY --extradef-IMAGINARY='extra,desc\\backslash' --list-extras=IMAGINARY
 
-echo '# description started from {'
-${CTAGS} --langdef=IMAGINARY --extradef-IMAGINARY='extra,{' --list-extras=IMAGINARY 2>&1
+title '# description started from {'
+${CTAGS} --langdef=IMAGINARY --extradef-IMAGINARY='extra,{' --list-extras=IMAGINARY
 
-echo '# description started from \{'
-${CTAGS} --langdef=IMAGINARY --extradef-IMAGINARY='extra,\{' --list-extras=IMAGINARY 2>&1
+title '# description started from \{'
+${CTAGS} --langdef=IMAGINARY --extradef-IMAGINARY='extra,\{' --list-extras=IMAGINARY
 
-} 2>&1
-} | sed -e 's/\.exe//g'
+} > /tmp/ctags-tmain-$$.stdout 2>/tmp/ctags-tmain-$$.stderr
+
+sed -e 's/\.exe//g' < /tmp/ctags-tmain-$$.stdout
+rm /tmp/ctags-tmain-$$.stdout
+
+sed -e 's/\.exe//g' < /tmp/ctags-tmain-$$.stderr 1>&2
+rm /tmp/ctags-tmain-$$.stderr
