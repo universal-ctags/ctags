@@ -22,6 +22,9 @@ $unicode_version = File.basename(ARGV[0])[/\A[.\d]+\z/]
 
 POSIX_NAMES = %w[NEWLINE Alpha Blank Cntrl Digit Graph Lower Print XPosixPunct Space Upper XDigit Word Alnum ASCII Punct]
 
+GPERF_VERSION = `gperf -v`.split("\n").first # /^GNU gperf (.+)$/
+  .split.last
+
 def pair_codepoints(codepoints)
 
   # We have a sorted Array of codepoints that we wish to partition into
@@ -440,7 +443,7 @@ output.ifdef :USE_UNICODE_PROPERTIES do
   blocks.each{|name|puts"  CR_#{name},"}
 end
 
-puts(<<'__HEREDOC')
+puts(<<"__HEREDOC")
 };
 struct uniname2ctype_struct {
   short name;
@@ -448,7 +451,7 @@ struct uniname2ctype_struct {
 };
 #define uniname2ctype_offset(str) offsetof(struct uniname2ctype_pool_t, uniname2ctype_pool_##str)
 
-static const struct uniname2ctype_struct *uniname2ctype_p(const char *, unsigned int);
+static const struct uniname2ctype_struct *uniname2ctype_p(const char *, #{ GPERF_VERSION >= '3.1' ? 'size_t' : 'unsigned int' });
 %}
 struct uniname2ctype_struct;
 %%
