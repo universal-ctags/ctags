@@ -713,14 +713,19 @@ EOF
 #
 ########################################################################
 
-sub rearrange {
-    my ($opts) = @_;
-    my $langdef = $opts -> {'langdef'};
-    my $c = substr ($langdef, 0, 1);
+sub capitalize {
+    my ($str) = $_[0];
+    my $c = substr ($str, 0, 1);
 
     $c =~ tr/a-z/A-Z/;
 
-    $opts -> {'Clangdef'} = $c . substr ($langdef, 1);
+    return $c . substr($str, 1);
+}
+
+sub rearrange {
+    my ($opts) = @_;
+    my $langdef = $opts -> {'langdef'};
+    $opts -> {'Clangdef'} = capitalize ($langdef);
 }
 
 
