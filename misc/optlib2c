@@ -55,7 +55,8 @@ my $options =
 	     if (! defined $_[0]->{'langdef'});
 	 die "Adding a kind is allowed only to the language specified with --langdef: $1"
 	   unless ($_[0]->{'langdef'} eq $1);
-	 push @{$_[0]->{'kinddefs'}}, { letter => $2, name => $3, desc => $4 };
+	 push @{$_[0]->{'kinddefs'}}, { letter => $2, name => $3, desc => $4,
+					refonly => 0, roles => [] };
        } ],
      [ qr/^--extradef-(.*)=([^,]+),(.+)/, sub {
 	 die "Don't use --extradef-<LANG>=+ option before defining the language"
@@ -70,6 +71,23 @@ my $options =
 	 die "Adding a field is allowed only to the language specified with --langdef: $1"
 	     unless ($_[0]->{'langdef'} eq $1);
 	 push @{$_[0]->{'fielddefs'}}, { name => $2, desc => $3 };
+       } ],
+     [ qr/^--_roledef-(.*)=([a-zA-Z])\.([a-zA-Z][a-zA-Z0-9]*),(.+)/, sub {
+	   die "Don't use --_roledef-<LANG>=+ option before defining the language"
+	     if (! defined $_[0]->{'langdef'});
+	   die "Adding a field is allowed only to the language specified with --langdef: $1"
+	     unless ($_[0]->{'langdef'} eq $1);
+
+	   my $kind_found = 0;
+	   for (@{$_[0]->{'kinddefs'}}) {
+	       if ($_->{'letter'} eq $2) {
+		   my $role = { name => $3, desc => $4, owner => $_ };
+		   push @{$_->{'roles'}}, $role;
+		   $kind_found = 1;
+		   last;
+	       }
+	   }
+	   die "no such kind, \"$2\" where role \"$3\" is attached to" if (! $kind_found);
        } ],
      [ qr/^--languages=-(.*)/, sub {
 	   die "Don't use --languages=- option before defining the language"
@@ -490,6 +508,30 @@ sub emit_patterns {
     emit_list $_[0], "patterns";
 }
 
+sub emit_roledefs {
+    my $opts = shift;
+
+
+    for (@{$opts->{'kinddefs'}}) {
+	next unless @{$_->{'roles'}};
+	my $Kind = capitalize($_->{'name'});
+	print <<EOF;
+	static roleDefinition $opts->{'Clangdef'}${Kind}RoleTable [] = {
+EOF
+	for (@{$_->{'roles'}}) {
+	    print <<EOF;
+		{ true, "$_->{'name'}", "$_->{'desc'}" },
+EOF
+	}
+
+	print <<EOF;
+	};
+EOF
+    }
+    print <<EOF;
+EOF
+}
+
 sub emit_kinddefs {
     my $opts = shift;
 
@@ -500,7 +542,24 @@ sub emit_kinddefs {
 EOF
     for (@{$opts->{'kinddefs'}}) {
       print <<EOF;
-		{ true, \'$_->{'letter'}\', "$_->{'name'}", "$_->{'desc'}" },
+		{
+EOF
+      print <<EOF;
+		  true, \'$_->{'letter'}\', "$_->{'name'}", "$_->{'desc'}",
+EOF
+      if ($_->{'refonly'}) {
+	  print <<EOF;
+		  .referenceOnly = true,
+EOF
+      }
+      my $Kind = capitalize($_->{'name'});
+      if (@{$_->{'roles'}}) {
+	  print <<EOF;
+		  ATTACH_ROLES($opts->{'Clangdef'}${Kind}RoleTable),
+EOF
+      }
+      print <<EOF;
+		},
 EOF
     }
     print <<EOF;
@@ -686,6 +745,7 @@ EOF
     emit_extensions      $opts;
     emit_aliases         $opts;
     emit_patterns        $opts;
+    emit_roledefs        $opts;
     emit_kinddefs        $opts;
     emit_fields          $opts;
     emit_xtags           $opts;
