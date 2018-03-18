@@ -50,13 +50,15 @@ my $options =
 	   $_[0]->{'base'} = $5 if defined $5;
 	   $_[0]->{'direction'} = $7 if defined $7;
        } ],
-     [ qr/^--kinddef-(.*)=([^,]),([^,]+),(.*)/, sub {
+     [ qr/^--kinddef-(.*)=([^,]),([^,]+),([^\{]+)({_refonly})?/, sub {
 	 die "Don't use --kinddef-<LANG>=+ option before defining the language"
 	     if (! defined $_[0]->{'langdef'});
 	 die "Adding a kind is allowed only to the language specified with --langdef: $1"
 	   unless ($_[0]->{'langdef'} eq $1);
+	 my $refonly = 0;
+	 $refonly = 1 if defined $5;
 	 push @{$_[0]->{'kinddefs'}}, { letter => $2, name => $3, desc => $4,
-					refonly => 0, roles => [] };
+					refonly => $refonly, roles => [] };
        } ],
      [ qr/^--extradef-(.*)=([^,]+),(.+)/, sub {
 	 die "Don't use --extradef-<LANG>=+ option before defining the language"
