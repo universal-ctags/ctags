@@ -55,6 +55,7 @@ SystemdUnit    u/unit            Wants               on      referred in Wants k
 Vera           d/macro           undef               on      undefined
 Vera           h/header          local               on      local header
 Vera           h/header          system              on      system header
+elm            m/module          imported            on      imported module
 
 #
 # all.*
@@ -112,6 +113,7 @@ SystemdUnit    u/unit            Wants               on      referred in Wants k
 Vera           d/macro           undef               on      undefined
 Vera           h/header          local               on      local header
 Vera           h/header          system              on      system header
+elm            m/module          imported            on      imported module
 
 #
 # C.*
