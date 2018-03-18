@@ -27,6 +27,7 @@
 --kinddef-elm=c,constructor,Type Constructor
 --kinddef-elm=a,alias,Type Alias
 --kinddef-elm=f,function,Functions
+--_roledef-elm=m.imported,imported module
 
 --regex-elm=/^(port[[:blank:]]+)?module[[:blank:]]+([[:upper:]][[:alnum:]_.]*)/\2/m/{scope=push}{exclusive}
 --regex-elm=/^import[[:blank:]]+[[:alnum:]_.]+[[:blank:]]+as[[:blank:]]+([[:alnum:]]+)/\1/n/{scope=clear}{exclusive}
@@ -34,8 +35,8 @@
 # Following two patterns are just for clearing scope stack.
 # X in "import X" should be captured as a reference tag in the future.
 #
---regex-elm=/^import[[:blank:]]+([[:alnum:]_.]+)[[:blank:]]exposing///{scope=clear}{exclusive}
---regex-elm=/^import[[:blank:]]+([[:alnum:]_.]+)///{scope=clear}{exclusive}
+--regex-elm=/^import[[:blank:]]+([[:alnum:]_.]+)[[:blank:]]exposing/\1/m/{scope=clear}{exclusive}{_role=imported}
+--regex-elm=/^import[[:blank:]]+([[:alnum:]_.]+)/\1/m/{scope=clear}{exclusive}{_role=imported}
 --regex-elm=/^port[[:blank:]]+([[:lower:]][[:alnum:]_]*).*/\1/p/{scope=clear}{exclusive}
 --regex-elm=/^type +([[:upper:]][[:alnum:]_]*.*)/\1/t/{scope=set}{exclusive}
 --regex-elm=/^[[:blank:]]+[|=][[:blank:]]+([[:upper:]][[:alnum:]_]*.*)$/\1/c/{scope=ref}{exclusive}

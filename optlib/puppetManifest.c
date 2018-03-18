@@ -593,11 +593,21 @@ extern parserDefinition* PuppetManifestParser (void)
 	};
 
 	static kindDefinition PuppetManifestKindTable [] = {
-		{ true, 'c', "class", "classes" },
-		{ true, 'd', "definition", "definitions" },
-		{ true, 'n', "node", "nodes" },
-		{ true, 'r', "resource", "resources" },
-		{ true, 'v', "variable", "variables" },
+		{
+		  true, 'c', "class", "classes",
+		},
+		{
+		  true, 'd', "definition", "definitions",
+		},
+		{
+		  true, 'n', "node", "nodes",
+		},
+		{
+		  true, 'r', "resource", "resources",
+		},
+		{
+		  true, 'v', "variable", "variables",
+		},
 	};
 
 	parserDefinition* const def = parserNew ("puppetManifest");

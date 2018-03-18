@@ -26,8 +26,12 @@ extern parserDefinition* QemuHXParser (void)
 	};
 
 	static kindDefinition QemuHXKindTable [] = {
-		{ true, 'q', "qmp", "QEMU Management Protocol dispatch table entries" },
-		{ true, 'i', "infoitem", "item in texinfo doc" },
+		{
+		  true, 'q', "qmp", "QEMU Management Protocol dispatch table entries",
+		},
+		{
+		  true, 'i', "infoitem", "item in texinfo doc",
+		},
 	};
 	static xtagDefinition QemuHXXtagTable [] = {
 		{
