@@ -52,6 +52,11 @@ that of Exuberant-ctags; the newly introduced kind should be declared
 explicitly, (long) names are approved than single letter flags
 specifying kinds, and naming rules are stricter.
 
+This man page explains only stable options and flags.  Universal-ctags
+is in development, and it introduces experimental options and flags.
+They have names started with ``_``. If you are interested in them, visit
+Universal-ctags web site (https://ctags.io/).
+
 
 Storing a parser definition to a file
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
