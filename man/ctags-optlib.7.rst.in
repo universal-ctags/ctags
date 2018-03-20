@@ -342,6 +342,55 @@ representation. ``--list-regex-flags`` lists all the flags.
 	attached to the ``end:`` field of the cleared tags.
 
 
+MORE EXAMPLES
+-------------
+
+Four things, an input source file,
+an optlib file, a command line invoking ctags, and
+output makes an example.
+
+
+Using scope regex flags
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Let's think writing a parser for a very small subset of Ruby language.
+
+input source file ("input.srb")::
+
+	class Example
+	  def methodA
+		puts "in class_method"
+	  end
+	  def methodB
+		puts "in class_method"
+	  end
+	end
+
+The parser for the input should capture "Example" with ``class`` kind,
+"methodA", and "methodB" with ``method`` kind. "methodA" and "methodB"
+should have "Example" as its scope. ``end:`` fields of each tag should
+have proper values.
+
+optlib file ("sub-ruby.ctags")::
+
+	--langdef=subRuby
+	--map-subRuby=.srb
+	--kinddef-subRuby=c,class,classes
+	--kinddef-subRuby=m,method,methods
+	--regex-subRuby=/^class[ \t]+([a-zA-Z][a-zA-Z0-9]+)/\1/c/{scope=push}
+	--regex-subRuby=/^end///{scope=pop}{placeholder}
+	--regex-subRuby=/^[ \t]+def[ \t]+([a-zA-Z][a-zA-Z0-9_]+)/\1/m/{scope=push}
+	--regex-subRuby=/^[ \t]+end///{scope=pop}{placeholder}
+
+command line and output::
+
+	$ ctags  --quiet --options=NONE --fields=+eK \
+	--options=./sub-ruby.ctags -o - input.srb
+	Example	input.srb	/^class Example$/;"	class	end:8
+	methodA	input.srb	/^  def methodA$/;"	method	class:Example	end:4
+	methodB	input.srb	/^  def methodB$/;"	method	class:Example	end:7
+
+
 SEE ALSO
 --------
 
