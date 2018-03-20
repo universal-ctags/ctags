@@ -289,6 +289,8 @@ Conceptual example::
 Scope tracking in a regex parser
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+.. IN MAN PAGE
+
 With scope long flag, you can record/track scope context.
 A stack is used for tracking the scope context.
 

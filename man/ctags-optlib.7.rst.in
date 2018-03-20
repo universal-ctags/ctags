@@ -216,10 +216,10 @@ OPTION ITEMS
 	Unless modified by flags, regexp is interpreted as a Posix
 	extended regular expression. The replacement should expand for all
 	matching lines to a non-empty string of characters, or a warning
-	message will be reported. An optional kind specifier for tags
-	matching regexp may follow replacement, which will determine what
-	kind of tag is reported in the "kind" extension field (see
-	ctags-tags(5)).
+	message will be reported unless ``{placeholder}`` regex flag is
+	specified. An optional kind specifier for tags matching regexp may
+	follow *replacement*, which will determine what kind of tag is
+	reported in the "kind" extension field (see ctags-tags(5)).
 
 	kind-spec has two forms: letter only form and full form.  The
 	letter form assumes using ``--regex-<LANG>`` option with
@@ -282,10 +282,61 @@ representation. ``--list-regex-flags`` lists all the flags.
 	manner.
 
 ``placeholder``
-	TBW
+	Don't emit a tag captured with a regex pattern.  The replacement
+	can be an empty string.  See the following description of
+	``scope=...`` flag about how this is useful.
 
-``scope``
-	TBW
+``scope=ref|push|pop|clear|set``
+
+	Specify what to do with the internal scope stack.
+
+	A parser programmed with ``--regex-<LANG>`` has a stack (scope
+	stack) internally. You can use it for tracking scope
+	information. The ``scope=...`` flag is for manipulating and
+	utilizing the scope stack.
+
+	If ``{scope=push}`` is specified, a tag captured with
+	``--regex-<LANG>`` is pushed to the stack. ``{scope=push}``
+	implies ``{scope=ref}``.
+
+	You can fill the scope field of captured tag with
+	``{scope=ref}``. If ``{scope=ref}`` flag is given,
+	@CTAGS_NAME_EXECUTABLE@ attaches the tag at the top to the tag
+	captured with ``--regex-<LANG>`` as the value for the ``scope:``
+	field.
+
+	@CTAGS_NAME_EXECUTABLE@ pops the tag at the top of the stack when
+	``--regex-<LANG>`` with ``{scope=pop}`` is matched to the input
+	line.
+
+	Specifying ``{scope=clear}`` removes all the tags in the scope.
+	Specifying ``{scope=set}`` removes all the tags in the scope, and
+	then pushes the captured tag as ``{scope=push}`` does.
+
+	In some case, you may want to use ``--regex-<LANG>`` only for side
+	effect: using only for manipulating the stack but not for
+	capturing a tag. In such case, make *replacement* component of
+	``--regex-<LANG>`` option empty with specifying ``{placeholder}``
+	as a regex flag. For an example, you can put a non-named tag to
+	the stack by giving a regex flag ``{scope=push}{placeholder}``.
+
+	You may wonder what happens if a regex patter having
+	``{scope=ref}`` flag matches an input line but the stack is empty,
+	or a non-named tag is at the top. If the stack is empty,
+	``{scope=ref}`` is just ignored; nothing is attached to ``scope:``
+	field. If the name of tag at the top is empty,
+	@CTAGS_NAME_EXECUTABLE@ goes into the stack deeper to the bottom
+	to find a named tag.
+
+	When a named tag on the stack is popped or cleared as the side
+	effect of a pattern matching, @CTAGS_NAME_EXECUTABLE@ attaches the
+	line number of the matching to the ``end:`` field of
+	the named tag.
+
+	@CTAGS_NAME_EXECUTABLE@ clears the all tags on the stack when at
+	the end of the input source file. The line number of the end is
+	attached to the ``end:`` field of the cleared tags.
+
 
 For more information on the regular expressions used by
 @CTAGS_NAME_EXECUTABLE@, see either the regex(5,7) man page, or the
