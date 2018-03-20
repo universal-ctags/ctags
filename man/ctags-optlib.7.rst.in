@@ -274,7 +274,7 @@ representation. ``--list-regex-flags`` lists all the flags.
 	The pattern is interpreted as a Posix basic regular expression.
 
 ``exclusive`` (letter form ``x``)
-	skip testing the other patterns if a line is matched to this
+	Skip testing the other patterns if a line is matched to this
 	pattern. This is useful to avoid using CPU to parse line comments.
 
 ``extend`` (letter form ``e``)
