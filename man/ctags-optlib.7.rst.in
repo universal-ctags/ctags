@@ -243,6 +243,10 @@ OPTION ITEMS
 
 	About *flag*, see "Flags for ``--regex-<LANG>`` option".
 
+	For more information on the regular expressions used by
+	@CTAGS_NAME_EXECUTABLE@, see either the regex(5,7) man page, or
+	the GNU info documentation for regex (e.g. "info regex").
+
 ``--_echo=msg``
 	Print *msg* to the standard error stream.  This is helpful to
 	understand (and debug) optlib loading feature of Universal-ctags.
@@ -338,9 +342,6 @@ representation. ``--list-regex-flags`` lists all the flags.
 	attached to the ``end:`` field of the cleared tags.
 
 
-For more information on the regular expressions used by
-@CTAGS_NAME_EXECUTABLE@, see either the regex(5,7) man page, or the
-GNU info documentation for regex (e.g. "info regex").
 
 SEE ALSO
 --------
