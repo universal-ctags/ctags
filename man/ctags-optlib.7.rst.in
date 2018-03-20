@@ -153,7 +153,7 @@ OPTION ITEMS
 	Lists the flags that can be used in ``--regex-<LANG>`` option.
 
 ``--kinddef-<LANG>=letter,name,description``
-    Define a kind for *<LANG>*.
+	Define a kind for *<LANG>*.
 	Be not confused this with ``--kinds-<LANG>``.
 
 	*letter* must be an alphabetical character ('[0-9a-zA-EG-Z]')
@@ -252,7 +252,7 @@ OPTION ITEMS
 	understand (and debug) optlib loading feature of Universal-ctags.
 
 ``--_force-quit=[num]``
-    Exits immediately when this option is processed.  If *num* is used
+	Exits immediately when this option is processed.  If *num* is used
 	as exit status. The default is 0.  This is helpful to debug optlib
 	loading feature of Universal-ctags.
 
@@ -340,7 +340,6 @@ representation. ``--list-regex-flags`` lists all the flags.
 	@CTAGS_NAME_EXECUTABLE@ clears the all tags on the stack when at
 	the end of the input source file. The line number of the end is
 	attached to the ``end:`` field of the cleared tags.
-
 
 
 SEE ALSO
