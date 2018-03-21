@@ -26,10 +26,18 @@ extern parserDefinition* PodParser (void)
 	};
 
 	static kindDefinition PodKindTable [] = {
-		{ true, 'c', "chapter", "chapters" },
-		{ true, 's', "section", "sections" },
-		{ true, 'S', "subsection", "subsections" },
-		{ true, 't', "subsubsection", "subsubsections" },
+		{
+		  true, 'c', "chapter", "chapters",
+		},
+		{
+		  true, 's', "section", "sections",
+		},
+		{
+		  true, 'S', "subsection", "subsections",
+		},
+		{
+		  true, 't', "subsubsection", "subsubsections",
+		},
 	};
 	static tagRegexTable PodTagRegexTable [] = {
 		{"^=head1[ \t]+(.+)", "\\1",

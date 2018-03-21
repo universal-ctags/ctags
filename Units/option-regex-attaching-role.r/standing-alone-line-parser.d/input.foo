@@ -1,0 +1,9 @@
+use A
+load B
+load "C.foo"
+load-and-use D
+
+use E as e
+load-and-use F as f
+
+defmod MYMODULE

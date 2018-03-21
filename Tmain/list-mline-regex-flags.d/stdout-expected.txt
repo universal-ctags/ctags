@@ -5,4 +5,5 @@ i       icase                   applied in a case-insensitive manner
 -       mgroup=N                a group in pattern determining the line number of tag
 -       _advanceTo=N[start|end] a group in pattern from where the next scan starts [0end]
 -       _extra=EXTRA            record the tag only when the extra is enabled
--       _field=FIELD:VALUE      record the matched string(VALUE) to FIELD of the tag
+-       _field=FIELD:VALUE      record the matched string(VALUE) to parser own FIELD of the tag
+-       _role=ROLE              Set given ROLE to roles field

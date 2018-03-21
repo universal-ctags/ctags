@@ -1,0 +1,61 @@
+
+# echo unknown lang
+
+# no option value
+
+# echo unknown kind
+
+# wrong char in a kind letter
+
+# empty role name
+
+# wrong char in role name
+
+# empty description
+
+# role is acceptable but no input file
+
+# listing with --list-roles
+#KIND(L/N)  NAME ENABLED DESCRIPTION
+v/variable  role on      roles
+#KIND(L/N)  NAME ENABLED DESCRIPTION
+v/variable  foos on      foods
+v/variable  role on      roles
+
+# listing with --list-kinds-full
+#LETTER NAME     ENABLED REFONLY NROLES MASTER DESCRIPTION
+v       variable yes     no      1      NONE   variables
+#LETTER NAME     ENABLED REFONLY NROLES MASTER DESCRIPTION
+v       variable yes     no      2      NONE   variables
+
+# inject a flag separator
+#KIND(L/N)  NAME ENABLED DESCRIPTION
+v/variable  role on      roles
+
+# inject a broken flag separator(1)
+#KIND(L/N)  NAME ENABLED DESCRIPTION
+v/variable  role on      roles
+
+# inject a broken flag separator(2)
+#KIND(L/N)  NAME ENABLED DESCRIPTION
+v/variable  role on      roles
+
+# use a { in description (1)
+#KIND(L/N)  NAME ENABLED DESCRIPTION
+v/variable  role on      roles{
+
+# use a { in description (2)
+#KIND(L/N)  NAME ENABLED DESCRIPTION
+v/variable  role on      roles{}
+
+# use a \ in description
+#KIND(L/N)  NAME ENABLED DESCRIPTION
+v/variable  role on      roles\backslash
+
+# description started from {
+
+# description started from \{
+#KIND(L/N)  NAME ENABLED DESCRIPTION
+v/variable  role on      {
+
+# too many roles

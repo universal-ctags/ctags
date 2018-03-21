@@ -1,0 +1,10 @@
+é_1	input.js	/^function é_1() {}$/;"	f
+é_2	input.js	/^function \\u00E9_2() {}$/;"	f
+é_3	input.js	/^function \\u00e9_3() {}$/;"	f
+é_4	input.js	/^function \\u{e9}_4() {}$/;"	f
+é_5	input.js	/^function \\u{0000000000000000000e9}_5() {}$/;"	f
+é_6	input.js	/^function \\u{65}\\u0301_6() {}$/;"	f
+𐌀_1	input.js	/^  '𐌀_1': function(){},$/;"	m	class:object
+𐌀_2	input.js	/^  '\\uD800\\uDF00_2': function(){},$/;"	m	class:object
+𐌀_3	input.js	/^  '\\u{10300}_3': function(){},$/;"	m	class:object
+object	input.js	/^var object = {$/;"	c

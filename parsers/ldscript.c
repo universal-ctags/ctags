@@ -28,7 +28,7 @@ typedef enum {
 	LD_SCRIPT_SYMBOL_ENTRYPOINT,
 } ldScriptSymbolRole;
 
-static roleDesc LdScriptSymbolRoles [] = {
+static roleDefinition LdScriptSymbolRoles [] = {
 	{ true, "entrypoint", "entry points" },
 };
 
@@ -37,7 +37,7 @@ typedef enum {
 	LD_SCRIPT_INPUT_SECTION_DISCARDED,
 } ldScriptInputSectionRole;
 
-static roleDesc LdScriptInputSectionRoles [] = {
+static roleDefinition LdScriptInputSectionRoles [] = {
 	{ true, "mapped",  "mapped to output section" },
 	{ true, "discarded", "discarded when linking" },
 };

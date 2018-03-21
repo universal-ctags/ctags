@@ -101,7 +101,7 @@ typedef enum {
 	R_GOTAG_UNKNOWN_RECEIVER,
 } GoUnknownRole;
 
-static roleDesc GoUnknownRoles [] = {
+static roleDefinition GoUnknownRoles [] = {
 	{ true, "receiverType", "receiver type" },
 };
 

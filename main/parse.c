@@ -296,6 +296,30 @@ extern kindDefinition* getLanguageKindForLetter (const langType language, char k
 		return getKindForLetter (LanguageTable [language].kindControlBlock, kindLetter);
 }
 
+extern kindDefinition* getLanguageKindForName (const langType language, const char *kindName)
+{
+	Assert (0 <= language  &&  language < (int) LanguageCount);
+	Assert (kindName);
+
+	if (strcmp(kindName, LanguageTable [language].fileKind->name) == 0)
+		return LanguageTable [language].fileKind;
+	else if (strcmp(kindName, KIND_GHOST_LONG) == 0)
+		return &kindGhost;
+	else
+		return getKindForName (LanguageTable [language].kindControlBlock, kindName);
+}
+
+extern roleDefinition* getLanguageRole(const langType language, int kindIndex, int roleIndex)
+{
+	return getRole (LanguageTable [language].kindControlBlock, kindIndex, roleIndex);
+}
+
+extern roleDefinition* getLanguageRoleForName (const langType language, int kindIndex,
+											   const char *roleName)
+{
+	return getRoleForName (LanguageTable [language].kindControlBlock, kindIndex, roleName);
+}
+
 extern langType getNamedLanguage (const char *const name, size_t len)
 {
 	langType result = LANG_IGNORE;
@@ -1770,6 +1794,11 @@ static void lazyInitialize (langType language)
 	}
 }
 
+extern void enableDefaultFileKind (bool state)
+{
+	defaultFileKind.enabled = state;
+}
+
 /*
 *   Option parsing
 */
@@ -1925,28 +1954,22 @@ extern void processLanguageDefineOption (
 	}
 }
 
-static kindDefinition *langKindDefinition (const langType language, const int flag)
-{
-	Assert (0 <= language  &&  language < (int) LanguageCount);
-	return getKindForLetter (LanguageTable [language].kindControlBlock, flag);
-}
-
-static kindDefinition *langKindLongOption (const langType language, const char *kindLong)
-{
-	Assert (0 <= language  &&  language < (int) LanguageCount);
-	return getKindForName (LanguageTable [language].kindControlBlock, kindLong);
-}
-
 extern bool isLanguageKindEnabled (const langType language, int kindIndex)
 {
-	return isKindEnabled(LanguageTable [language].kindControlBlock,
-						 kindIndex);
+	kindDefinition * kdef = getLanguageKind (language, kindIndex);
+	return kdef->enabled;
 }
 
 extern bool isLanguageRoleEnabled (const langType language, int kindIndex, int roleIndex)
 {
 	return isRoleEnabled(LanguageTable [language].kindControlBlock,
 						 kindIndex, roleIndex);
+}
+
+extern bool isLanguageKindRefOnly (const langType language, int kindIndex)
+{
+	kindDefinition * def =  getLanguageKind(language, kindIndex);
+	return def->referenceOnly;
 }
 
 static void resetLanguageKinds (const langType language, const bool mode)
@@ -1968,11 +1991,11 @@ static void resetLanguageKinds (const langType language, const bool mode)
 	}
 }
 
-static bool enableLanguageKind (
+static bool enableLanguageKindForLetter (
 		const langType language, const int kind, const bool mode)
 {
 	bool result = false;
-	kindDefinition* const def = langKindDefinition (language, kind);
+	kindDefinition* const def = getLanguageKindForLetter (language, kind);
 	if (def != NULL)
 	{
 		enableKind (def, mode);
@@ -1981,11 +2004,11 @@ static bool enableLanguageKind (
 	return result;
 }
 
-static bool enableLanguageKindLong (
-	const langType language, const char * const kindLong, const bool mode)
+static bool enableLanguageKindForName (
+	const langType language, const char * const name, const bool mode)
 {
 	bool result = false;
-	kindDefinition* const def = langKindLongOption (language, kindLong);
+	kindDefinition* const def = getLanguageKindForName (language, name);
 	if (def != NULL)
 	{
 		enableKind (def, mode);
@@ -2048,7 +2071,7 @@ static void processLangKindDefinition (
 				      "unexpected character in kind specification: \'%c\'",
 				      c);
 			k = vStringValue (longName);
-			r = enableLanguageKindLong (language, k, mode);
+			r = enableLanguageKindForName (language, k, mode);
 			if (! r)
 				error (WARNING, "Unsupported kind: '%s' for --%s option",
 				       k, option);
@@ -2061,7 +2084,7 @@ static void processLangKindDefinition (
 				vStringPut (longName, c);
 			else
 			{
-				r = enableLanguageKind (language, c, mode);
+				r = enableLanguageKindForLetter (language, c, mode);
 				if (! r)
 					error (WARNING, "Unsupported kind: '%c' for --%s option",
 					       c, option);
@@ -2078,6 +2101,49 @@ static void freeKdef (kindDefinition *kdef)
 	eFree (kdef);
 }
 
+static char *extractDescriptionAndFlags(const char *input, const char **flags)
+{
+	vString *vdesc = vStringNew();
+	bool escaped = false;
+
+	if (flags)
+		*flags = NULL;
+
+	while (*input != '\0')
+	{
+		if (escaped)
+		{
+			vStringPut (vdesc, *input);
+			escaped = false;
+
+		}
+		else if (*input == '\\')
+			escaped = true;
+		else if (*input == LONG_FLAGS_OPEN)
+		{
+			if (flags)
+				*flags = input;
+			break;
+		}
+		else
+			vStringPut (vdesc, *input);
+		input++;
+	}
+	return vStringDeleteUnwrap(vdesc);
+}
+
+static void pre_kind_def_flag_refonly_long (const char* const optflag,
+											const char* const param, void* data)
+{
+	kindDefinition *kdef = data;
+	kdef->referenceOnly = true;
+}
+
+static flagDefinition PreKindDefFlagDef [] = {
+	{ '\0', "_refonly", NULL, pre_kind_def_flag_refonly_long,
+	  NULL, "use this kind reference tags only"},
+};
+
 static bool processLangDefineKind(const langType language,
 								  const char *const option,
 								  const char *const parameterx)
@@ -2092,6 +2158,7 @@ static bool processLangDefineKind(const langType language,
 	const char *tmp_start;
 	const char *tmp_end;
 	size_t tmp_len;
+	const char *flags;
 
 
 	Assert (0 <= language  &&  language < (int) LanguageCount);
@@ -2153,17 +2220,118 @@ static bool processLangDefineKind(const langType language,
 	}
 
 	p++;
-	if (p [0] == '\0')
+	if (p [0] == '\0' || p [0] == LONG_FLAGS_OPEN)
 		error (FATAL, "found an empty kind description in \"--%s\" option", option);
-	description = eStrdup (p);
+
+	description = extractDescriptionAndFlags (p, &flags);
 
 	kdef = xCalloc (1, kindDefinition);
 	kdef->enabled = true;
 	kdef->letter = letter;
 	kdef->name = name;
 	kdef->description = description;
+	if (flags)
+		flagsEval (flags, PreKindDefFlagDef, ARRAY_SIZE (PreKindDefFlagDef), kdef);
 
 	defineKind (parser->kindControlBlock, kdef, freeKdef);
+	return true;
+}
+
+static void freeRdef (roleDefinition *rdef)
+{
+	eFree (rdef->name);
+	eFree (rdef->description);
+	eFree (rdef);
+}
+
+static bool processLangDefineRole(const langType language,
+								  const char *const option,
+								  const char *const parameterx)
+{
+	parserObject *parser;
+
+	kindDefinition *kdef;
+	roleDefinition *rdef;
+	int kletter;
+	const char * p = parameterx;
+	char *name;
+	char *description;
+	const char *tmp_start;
+	const char *tmp_end;
+	const char *flags;
+
+	Assert (0 <= language  &&  language < (int) LanguageCount);
+	parser = LanguageTable + language;
+
+	Assert (p);
+
+	if (p[0] == '\0')
+		error (FATAL, "no role definition specified in \"--%s\" option", option);
+
+	kletter = p[0];
+	if (kletter == '.')
+		error (FATAL, "no kind letter specified in \"--%s\" option", option);
+	if (!isalnum (kletter))
+		error (FATAL, "the kind letter give in \"--%s\" option is not an alphabet or a number", option);
+	else if (kletter == KIND_FILE_DEFAULT)
+		error (FATAL, "the kind letter `F' in \"--%s\" option is reserved for \"file\" kind and no role can be attached to", option);
+
+	kdef = getKindForLetter (parser->kindControlBlock, kletter);
+
+	if (kdef == NULL)
+	{
+		error (WARNING, "the kind for letter `%c' specified in \"--%s\" option is not defined.",
+			   kletter, option);
+		return true;
+	}
+
+	if (p[1] != '.')
+		error (FATAL, "wrong role definition in \"--%s\" option: no period after kind letter `%c'",
+			   option, kletter);
+
+	p += 2;
+	if (p[0] == '\0')
+		error (FATAL, "no role name specified in \"--%s\" option", option);
+	tmp_end = strchr (p, ',');
+	if (!tmp_end)
+		error (FATAL, "no role description specified in \"--%s\" option", option);
+
+	tmp_start = p;
+	while (p != tmp_end)
+	{
+		if (!isalnum (*p))
+			error (FATAL, "unacceptable char as part of role name in \"--%s\" option", option);
+		p++;
+	}
+
+	if (tmp_end == tmp_start)
+		error (FATAL, "the role name in \"--%s\" option is empty", option);
+
+	name = eStrndup (tmp_start, tmp_end - tmp_start);
+	if (getRoleForName (parser->kindControlBlock, kdef->id, name))
+	{
+		error (WARNING, "the role for name `%s' specified in \"--%s\" option is already defined.",
+			   name, option);
+		eFree (name);
+		return true;
+	}
+
+	p++;
+	if (p [0] == '\0' || p [0] == LONG_FLAGS_OPEN)
+		error (FATAL, "found an empty role description in \"--%s\" option", option);
+
+	description = extractDescriptionAndFlags (p, &flags);
+
+	rdef = xCalloc (1, roleDefinition);
+	rdef->enabled = true;
+	rdef->name = name;
+	rdef->description = description;
+
+	if (flags)
+		flagsEval (flags, NULL, 0, rdef);
+
+	defineRole (parser->kindControlBlock, kdef->id, rdef, freeRdef);
+
 	return true;
 }
 
@@ -2176,6 +2344,17 @@ extern bool processKinddefOption (const char *const option, const char * const p
 		return false;
 
 	return processLangDefineKind (language, option, parameter);
+}
+
+extern bool processRoledefOption (const char *const option, const char * const parameter)
+{
+	langType language;
+
+	language = getLanguageComponentInOption (option, "_roledef-");
+	if (language == LANG_IGNORE)
+		return false;
+
+	return processLangDefineRole (language, option, parameter);
 }
 
 struct langKindDefinitionStruct {
@@ -2680,7 +2859,9 @@ static bool processLangDefineExtra (const langType language,
 {
 	xtagDefinition *xdef;
 	const char * p = parameterx;
+	const char *name_end;
 	const char *desc;
+	const char *flags;
 
 	Assert (0 <= language  &&  language < (int) LanguageCount);
 	Assert (p);
@@ -2688,26 +2869,35 @@ static bool processLangDefineExtra (const langType language,
 	if (p[0] == '\0')
 		error (FATAL, "no extra definition specified in \"--%s\" option", option);
 
-	desc = strchr (p, ',');
-	if (!desc)
+	name_end = strchr (p, ',');
+	if (!name_end)
 		error (FATAL, "no extra description specified in \"--%s\" option", option);
-	else if (desc == p)
+	else if (name_end == p)
 		error (FATAL, "the extra name in \"--%s\" option is empty", option);
 
-	for (; p < desc; p++)
+	for (; p < name_end; p++)
 	{
 		if (!isalnum (*p))
 			error (FATAL, "unacceptable char as part of extra name in \"--%s\" option",
 				   option);
 	}
 
+	p++;
+	if (p [0] == '\0' || p [0] == LONG_FLAGS_OPEN)
+		error (FATAL, "extra description in \"--%s\" option is empty", option);
+
+	desc = extractDescriptionAndFlags (p, &flags);
+
 	xdef = xCalloc (1, xtagDefinition);
 	xdef->enabled = false;
 	xdef->letter = NUL_XTAG_LETTER;
-	xdef->name = eStrndup (parameterx, desc - parameterx);
-	xdef->description = eStrdup (desc + 1);
+	xdef->name = eStrndup (parameterx, name_end - parameterx);
+	xdef->description = desc;
 	xdef->isEnabled = NULL;
 	DEFAULT_TRASH_BOX(xdef, xtagDefinitionDestroy);
+
+	if (flags)
+		flagsEval (flags, NULL, 0, xdef);
 
 	defineXtag (xdef, language);
 
@@ -2738,7 +2928,9 @@ static bool processLangDefineField (const langType language,
 {
 	fieldDefinition *fdef;
 	const char * p = parameter;
+	const char *name_end;
 	const char *desc;
+	const char *flags;
 
 	Assert (0 <= language  &&  language < (int) LanguageCount);
 	Assert (p);
@@ -2746,31 +2938,37 @@ static bool processLangDefineField (const langType language,
 	if (p[0] == '\0')
 		error (FATAL, "no field definition specified in \"--%s\" option", option);
 
-	desc = strchr (p, ',');
-	if (!desc)
+	name_end = strchr (p, ',');
+	if (!name_end)
 		error (FATAL, "no field description specified in \"--%s\" option", option);
-	else if (desc == p)
+	else if (name_end == p)
 		error (FATAL, "the field name in \"--%s\" option is empty", option);
 
-	for (; p < desc; p++)
+	for (; p < name_end; p++)
 	{
 		if (!isalpha (*p))
 			error (FATAL, "unacceptable char as part of field name in \"--%s\" option",
 				   option);
 	}
 
-	if (strlen (desc + 1) == 0)
+	p++;
+	if (p [0] == '\0' || p [0] == LONG_FLAGS_OPEN)
 		error (FATAL, "field description in \"--%s\" option is empty", option);
+
+	desc = extractDescriptionAndFlags (p, &flags);
 
 	fdef = xCalloc (1, fieldDefinition);
 	fdef->enabled = false;
 	fdef->letter = NUL_FIELD_LETTER;
-	fdef->name = eStrndup(parameter, desc - parameter);
-	fdef->description = eStrdup (desc + 1);
+	fdef->name = eStrndup(parameter, name_end - parameter);
+	fdef->description = desc;
 	fdef->isValueAvailable = NULL;
 	fdef->dataType = FIELDTYPE_STRING; /* TODO */
 	fdef->ftype = FIELD_UNKNOWN;
 	DEFAULT_TRASH_BOX(fdef, fieldDefinitionDestroy);
+
+	if (flags)
+		flagsEval (flags, NULL, 0, fdef);
 
 	defineField (fdef, language);
 
@@ -3069,6 +3267,14 @@ extern void freeEncodingResources (void)
 	if (Option.outputEncoding)
 		eFree (Option.outputEncoding);
 }
+
+extern const char *getLanguageEncoding (const langType language)
+{
+	if (EncodingMap && language <= EncodingMapMax && EncodingMap [language])
+		return EncodingMap[language];
+	else
+		return Option.inputEncoding;
+}
 #endif
 
 static void addParserPseudoTags (langType language)
@@ -3155,9 +3361,7 @@ extern bool parseFileWithMio (const char *const fileName, MIO *mio)
 
 #ifdef HAVE_ICONV
 		/* TODO: checkUTF8BOM can be used to update the encodings. */
-		openConverter (EncodingMap && language <= EncodingMapMax &&
-				EncodingMap [language] ?
-					EncodingMap[language] : Option.inputEncoding, Option.outputEncoding);
+		openConverter (getLanguageEncoding (language), Option.outputEncoding);
 #endif
 
 		setupWriter ();
@@ -3822,6 +4026,18 @@ extern void printLangdefFlags (bool withListHeader, bool machinable, FILE *fp)
 	colprintTableDelete(table);
 }
 
+extern void printKinddefFlags (bool withListHeader, bool machinable, FILE *fp)
+{
+	struct colprintTable * table;
+
+	table = flagsColprintTableNew ();
+
+	flagsColprintAddDefinitions (table, PreKindDefFlagDef, ARRAY_SIZE (PreKindDefFlagDef));
+
+	flagsColprintTablePrint (table, withListHeader, machinable, fp);
+	colprintTableDelete(table);
+}
+
 extern void printLanguageMultitableStatistics (langType language, FILE *vfp)
 {
 	parserObject* const parser = LanguageTable + language;
@@ -3866,6 +4082,8 @@ typedef enum {
 #endif
 	K_DISABLED,
 	K_ENABLED,
+	K_ROLES,
+	K_ROLES_DISABLED,
 	KIND_COUNT
 } CTST_Kind;
 
@@ -3873,7 +4091,7 @@ typedef enum {
 	R_BROKEN_REF,
 } CTST_BrokenRole;
 
-static roleDesc CTST_BrokenRoles [] = {
+static roleDefinition CTST_BrokenRoles [] = {
 	{true, "broken", "broken" },
 };
 
@@ -3882,7 +4100,7 @@ typedef enum {
 	R_DISABLED_KIND_ENABLED_ROLE,
 } CTST_DisabledKindRole;
 
-static roleDesc CTST_DisabledKindRoles [] = {
+static roleDefinition CTST_DisabledKindRoles [] = {
 	{ false, "disabled", "disbaled role attached to disabled kind" },
 	{ true,  "enabled",  "enabled role attached to disabled kind"  },
 };
@@ -3892,9 +4110,34 @@ typedef enum {
 	R_ENABLED_KIND_ENABLED_ROLE,
 } CTST_EnabledKindRole;
 
-static roleDesc CTST_EnabledKindRoles [] = {
+static roleDefinition CTST_EnabledKindRoles [] = {
 	{ false, "disabled", "disbaled role attached to enabled kind" },
 	{ true,  "enabled",  "enabled role attached to enabled kind"  },
+};
+
+typedef enum {
+	R_ROLES_KIND_A_ROLE,
+	R_ROLES_KIND_B_ROLE,
+	R_ROLES_KIND_C_ROLE,
+	R_ROLES_KIND_D_ROLE,
+} CTST_RolesKindRole;
+
+static roleDefinition CTST_RolesKindRoles [] = {
+	{ true,  "a", "A role" },
+	{ true,  "b", "B role" },
+	{ false, "c", "C role" },
+	{ true,  "d", "D role"  },
+};
+
+typedef enum {
+	R_ROLES_DISABLED_KIND_A_ROLE,
+	R_ROLES_DISABLED_KIND_B_ROLE,
+} CTST_RolesDisableKindRole;
+
+
+static roleDefinition CTST_RolesDisabledKindRoles [] = {
+	{ true,  "A", "A role" },
+	{ true,  "B", "B role" },
 };
 
 static kindDefinition CTST_Kinds[KIND_COUNT] = {
@@ -3915,6 +4158,10 @@ static kindDefinition CTST_Kinds[KIND_COUNT] = {
 	 .referenceOnly = false, ATTACH_ROLES (CTST_DisabledKindRoles)},
 	{true, 'e', "enabled", "a kind enabled by default",
 	 .referenceOnly = false, ATTACH_ROLES (CTST_EnabledKindRoles)},
+	{true, 'r', "roles", "emit a tag with multi roles",
+	 .referenceOnly = true, ATTACH_ROLES (CTST_RolesKindRoles)},
+	{false, 'R', "rolesDisabled", "emit a tag with multi roles(disabled by default)",
+	 .referenceOnly = true, ATTACH_ROLES (CTST_RolesDisabledKindRoles)},
 };
 
 static void createCTSTTags (void)
@@ -4005,6 +4252,31 @@ static void createCTSTTags (void)
 							makeTagEntry (&e);
 							break;
 						}
+					case K_ROLES:
+					{
+						char *name = "multiRolesTarget";
+						int qindex;
+						tagEntryInfo *qe;
+
+						initTagEntry (&e, name, i);
+						assignRole(&e, R_ROLES_KIND_A_ROLE);
+						assignRole(&e, R_ROLES_KIND_C_ROLE);
+						assignRole(&e, R_ROLES_KIND_D_ROLE);
+						qindex = makeTagEntry (&e);
+						qe = getEntryInCorkQueue (qindex);
+						assignRole(qe, R_ROLES_KIND_B_ROLE);
+						break;
+					}
+					case K_ROLES_DISABLED:
+					{
+						char *name = "multiRolesDisabledTarget";
+
+						initRefTagEntry (&e, name, i, R_ROLES_DISABLED_KIND_A_ROLE);
+						makeTagEntry (&e);
+						initRefTagEntry (&e, name, i, R_ROLES_DISABLED_KIND_B_ROLE);
+						makeTagEntry (&e);
+						break;
+					}
 				}
 			}
 	}
@@ -4020,5 +4292,6 @@ static parserDefinition *CTagsSelfTestParser (void)
 	def->parser = createCTSTTags;
 	def->invisible = true;
 	def->useMemoryStreamInput = true;
+	def->useCork = true;
 	return def;
 }

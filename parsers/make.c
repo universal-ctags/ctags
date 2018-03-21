@@ -38,7 +38,7 @@ typedef enum {
 	R_INCLUDE_OPTIONAL,
 } makeMakefileRole;
 
-static roleDesc MakeMakefileRoles [] = {
+static roleDefinition MakeMakefileRoles [] = {
 	{ true, "included", "included" },
 	{ true, "optional", "optionally included"},
 };

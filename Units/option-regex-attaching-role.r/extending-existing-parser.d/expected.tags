@@ -1,0 +1,7 @@
+foo	input.scm	/^(define-module foo$/;"	function	language:Scheme	roles:def
+foobar	input.scm	/^(define (foobar)$/;"	function	language:Scheme	roles:def
+foo	input.scm	/^(define-module foo$/;"	module	language:myGauche	roles:def
+bar	input.scm	/^  (use bar)$/;"	module	language:myGauche	scope:module:foo	roles:used
+baz0	input.scm	/^  (export baz0 baz1))$/;"	module	language:myGauche	scope:module:foo	roles:exported
+baz1	input.scm	/^  (export baz0 baz1))$/;"	module	language:myGauche	scope:module:foo	roles:exported
+foo	input.scm	/^(select-module foo)$/;"	module	language:myGauche	roles:selected

@@ -28,8 +28,6 @@ void flagsEval (const char* flags_original, flagDefinition* defs, unsigned int n
 
 	if (!flags_original)
 		return;
-	if (!defs)
-		return;
 
 	flags = eStrdup (flags_original);
 	for (i = 0 ; flags [i] != '\0' ; ++i)
@@ -43,8 +41,8 @@ void flagsEval (const char* flags_original, flagDefinition* defs, unsigned int n
 
 			if (needle_close_paren == NULL)
 			{
-				error (WARNING, "long flags specifier opened with `%c' is not closed `%c'",
-				       LONG_FLAGS_OPEN, LONG_FLAGS_CLOSE);
+				error (WARNING, "long flags specifier opened with `%c' is not closed `%c': \"%s\"",
+				       LONG_FLAGS_OPEN, LONG_FLAGS_CLOSE, flags_original);
 				break;
 			}
 

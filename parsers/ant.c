@@ -56,7 +56,7 @@ typedef enum {
 	R_IMPORT_GENERIC,
 } antAntfileRole;
 
-static roleDesc AntAntfileRoles [] = {
+static roleDefinition AntAntfileRoles [] = {
         { true, "imported", "imported" },
 };
 

@@ -1,0 +1,77 @@
+
+# NOSUCHLANG
+ctags: Unknown language "NOSUCHLANG" in "kinddef-NOSUCHLANG" option
+
+# define "a"
+
+# no description 1
+ctags: found an empty kind description in "--kinddef-MYTEST" option
+
+# no description 2
+ctags: no kind description specified in "--kinddef-MYTEST" option
+
+# no name 1
+ctags: no kind name specified in "--kinddef-MYTEST" option
+
+# no name 2
+ctags: wrong kind definition in "--kinddef-MYTEST" option: no comma after letter
+
+# an empty name 1
+ctags: the kind name in "--kinddef-MYTEST" option is empty
+
+# an empty name 2
+ctags: the kind name in "--kinddef-MYTEST" option is empty
+
+# wrong letter in name 1
+ctags: unacceptable char as part of kind name in "--kinddef-MYTEST" option
+
+# wrong letter in name 2
+ctags: unacceptable char as part of kind name in "--kinddef-MYTEST" option
+
+# wrong letter in name 3
+ctags: no kind description specified in "--kinddef-MYTEST" option
+
+# no letter 1
+ctags: no kind letter specified in "--kinddef-MYTEST" option
+
+# no letter 2
+ctags: no kind letter specified in "--kinddef-MYTEST" option
+
+# no letter 3
+ctags: no kind letter specified in "--kinddef-MYTEST" option
+
+# no letter 4
+ctags: no kind letter specified in "--kinddef-MYTEST" option
+
+# no letter 5
+ctags: no kind definition specified in "--kinddef-MYTEST" option
+
+# wrong letter
+ctags: the kind letter give in "--kinddef-MYTEST" option is not an alphabet or a number
+
+# reusing the letter for file kind
+ctags: the kind letter `F' in "--kinddef-MYTEST" option is reserved for "file" kind
+
+# reusing the name for file kind
+ctags: the kind name file in "--kinddef-MYTEST" option is reserved
+
+# inject a flag separator
+
+# inject a broken flag separator(1)
+ctags: Warning: long flags specifier opened with `{' is not closed `}': "{foo"
+
+# inject a broken flag separator(2)
+ctags: Warning: long flags specifier opened with `{' is not closed `}': "{"
+
+# use a { in description (1)
+
+# use a { in description (2)
+
+# use a \ in description
+
+# description started from {
+ctags: found an empty kind description in "--kinddef-MYTEST" option
+
+# description started from \{
+
+# _refonly flag

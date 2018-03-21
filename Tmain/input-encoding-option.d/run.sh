@@ -8,7 +8,7 @@ BUILDDIR=$2
 
 . ../utils.sh
 
-if ${CTAGS} --quiet --options=NONE --list-features | grep -q multibyte ; then
+if ${CTAGS} --quiet --options=NONE --list-features | grep -q iconv; then
   if ${CTAGS} --quiet --options=NONE \
 	      --input-encoding=utf-8 --input-encoding-java=cp932 --input-encoding-javascript=euc-jp \
 	      -o ${BUILDDIR}/tags \
@@ -17,5 +17,5 @@ if ${CTAGS} --quiet --options=NONE --list-features | grep -q multibyte ; then
   fi
   exit $?
 else
-  skip "multibyte feature is not available"
+  skip "iconv feature is not available"
 fi

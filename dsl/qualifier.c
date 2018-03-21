@@ -68,7 +68,7 @@ static EsObject* value_language (EsObject *args, tagEntry *entry);
 static EsObject* value_implementation (EsObject *args, tagEntry *entry);
 static EsObject* value_line (EsObject *args, tagEntry *entry);
 static EsObject* value_kind (EsObject *args, tagEntry *entry);
-static EsObject* value_role (EsObject *args, tagEntry *entry);
+static EsObject* value_roles (EsObject *args, tagEntry *entry);
 static EsObject* value_pattern (EsObject *args, tagEntry *entry);
 static EsObject* value_inherits (EsObject *args, tagEntry *entry);
 static EsObject* value_scope_kind (EsObject *args, tagEntry *entry);
@@ -114,7 +114,8 @@ struct sCode {
 	{ "$implementation", value_implementation, NULL, MEMORABLE, 0UL },
 	{ "$line",           value_line,           NULL, MEMORABLE, 0UL },
 	{ "$kind",           value_kind,           NULL, MEMORABLE, 0UL },
-	{ "$role",           value_role,           NULL, MEMORABLE, 0UL },
+	{ "$roles",          value_roles,          NULL, MEMORABLE, 0UL,
+	  .helpstr = "<list>" },
 	{ "$pattern",        value_pattern,        NULL, MEMORABLE, 0UL },
 	{ "$inherits",       value_inherits,       NULL, MEMORABLE, 0UL,
 	  .helpstr = "<list>" },
@@ -465,6 +466,46 @@ static EsObject* entry_xget_string (tagEntry *entry, const char* name)
 		return es_false;
 }
 
+static EsObject* value_xget_csvlist (tagEntry *entry, const char* field)
+{
+	const char* inherits = entry_xget (entry, field);
+
+	if (inherits == NULL)
+		return es_nil;
+	else
+	{
+		EsObject *s = es_nil;
+		char *d = strdup (inherits);
+		char *h = d;
+		char *t;
+
+		if (h == NULL)
+		{
+			fprintf(stderr, "MEMORY EXHAUSTED\n");
+			exit (1);
+		}
+
+		while ((t = strchr (h, ',')))
+		{
+			*t = '\0';
+			s = es_cons (es_object_autounref (es_string_new (h)),
+				     s);
+			s = es_object_autounref (s);
+			h = t + 1;
+		}
+		if (*h != '\0')
+		{
+			s = es_cons (es_object_autounref (es_string_new (h)),
+				     s);
+			s = es_object_autounref (s);
+		}
+
+		free (d);
+		s = reverse (s);
+		return s;
+	}
+}
+
 static EsObject* builtin_entry_ref (EsObject *args, tagEntry *entry)
 {
 	EsObject *key = es_car(args);
@@ -547,9 +588,9 @@ static EsObject* value_kind (EsObject *args, tagEntry *entry)
 		return es_false;
 }
 
-static EsObject* value_role (EsObject *args, tagEntry *entry)
+static EsObject* value_roles (EsObject *args, tagEntry *entry)
 {
-	return entry_xget_string (entry, "role");
+	return value_xget_csvlist(entry, "roles");
 }
 
 static EsObject* value_pattern (EsObject *args, tagEntry *entry)
@@ -564,43 +605,7 @@ static EsObject* value_pattern (EsObject *args, tagEntry *entry)
 
 static EsObject* value_inherits (EsObject *args, tagEntry *entry)
 {
-	const char* inherits = entry_xget (entry, "inherits");
-
-	if (inherits == NULL)
-		return es_nil;
-	else
-	{
-		EsObject *s = es_nil;
-		char *d = strdup (inherits);
-		char *h = d;
-		char *t;
-
-		if (h == NULL)
-		{
-			fprintf(stderr, "MEMORY EXHAUSTED\n");
-			exit (1);
-		}
-
-		while ((t = strchr (h, ',')))
-		{
-			*t = '\0';
-			s = es_cons (es_object_autounref (es_string_new (h)),
-				     s);
-			s = es_object_autounref (s);
-			h = t + 1;
-		}
-		if (*h != '\0')
-		{
-			s = es_cons (es_object_autounref (es_string_new (h)),
-				     s);
-			s = es_object_autounref (s);
-		}
-
-		free (d);
-		s = reverse (s);
-		return s;
-	}
-
+	return value_xget_csvlist (entry, "inherits");
 }
 
 static EsObject* value_scope_kind (EsObject *args, tagEntry *entry)
