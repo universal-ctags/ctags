@@ -45,7 +45,7 @@ typedef enum {
 	R_AM_DIR_DATA,
 } makeAMDirectoryRole;
 
-static roleDesc AutomakeDirectoryRoles [] = {
+static roleDefinition AutomakeDirectoryRoles [] = {
 	{ true, "program",   "directory for PROGRAMS primary" },
 	{ true, "man",       "directory for MANS primary" },
 	{ true, "ltlibrary", "directory for LTLIBRARIES primary"},
@@ -58,7 +58,7 @@ typedef enum {
 	R_AM_CONDITION_BRANCHED,
 } makeAMConditionRole;
 
-static roleDesc AutomakeConditionRoles [] = {
+static roleDefinition AutomakeConditionRoles [] = {
 	{ true, "branched",  "used for branching" },
 };
 

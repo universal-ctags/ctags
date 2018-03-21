@@ -28,7 +28,7 @@ typedef enum {
 	COBOL_SOURCEFILE_COPIED,
 } cobolSourcefileRole;
 
-static roleDesc CobolSourcefileRoles [] = {
+static roleDefinition CobolSourcefileRoles [] = {
 	{ true, "copied", "copied in source file" },
 };
 

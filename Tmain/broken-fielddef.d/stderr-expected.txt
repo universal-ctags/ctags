@@ -1,0 +1,46 @@
+
+# echo unknown lang
+ctags: Unknown language "NOSUCHLANG" in "_fielddef-NOSUCHLANG" option
+ctags: Unknown language "NOSUCHLANG" in "_fielddef-NOSUCHLANG" option
+
+# no option value
+ctags: no field definition specified in "--_fielddef-IMAGINARY" option
+ctags: no field definition specified in "--_fielddef-IMAGINARY" option
+
+# wrong char in a field name
+ctags: no field description specified in "--_fielddef-IMAGINARY" option
+ctags: no field description specified in "--_fielddef-IMAGINARY" option
+ctags: unacceptable char as part of field name in "--_fielddef-IMAGINARY" option
+ctags: unacceptable char as part of field name in "--_fielddef-IMAGINARY" option
+
+# empty field name
+ctags: the field name in "--_fielddef-IMAGINARY" option is empty
+ctags: the field name in "--_fielddef-IMAGINARY" option is empty
+ctags: the field name in "--_fielddef-IMAGINARY" option is empty
+ctags: the field name in "--_fielddef-IMAGINARY" option is empty
+
+# empty description
+ctags: no field description specified in "--_fielddef-IMAGINARY" option
+ctags: field description in "--_fielddef-IMAGINARY" option is empty
+
+# no input file
+ctags: No files specified. Try "ctags --help".
+
+# inject a flag separator
+
+# inject a broken flag separator(1)
+ctags: Warning: long flags specifier opened with `{' is not closed `}': "{foo"
+
+# inject a broken flag separator(2)
+ctags: Warning: long flags specifier opened with `{' is not closed `}': "{"
+
+# use a { in description (1)
+
+# use a { in description (2)
+
+# use a \ in description
+
+# description started from {
+ctags: field description in "--_fielddef-IMAGINARY" option is empty
+
+# description started from \{

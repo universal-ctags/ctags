@@ -1,0 +1,42 @@
+
+# echo unknown lang
+
+# no option value
+
+# wrong char in a field name
+
+# empty extra name
+
+# empty description
+
+# no input file
+
+# inject a flag separator
+#LETTER NAME  ENABLED LANGUAGE  FIXED DESCRIPTION
+-       extra no      IMAGINARY no    desc
+
+# inject a broken flag separator(1)
+#LETTER NAME  ENABLED LANGUAGE  FIXED DESCRIPTION
+-       extra no      IMAGINARY no    desc
+
+# inject a broken flag separator(2)
+#LETTER NAME  ENABLED LANGUAGE  FIXED DESCRIPTION
+-       extra no      IMAGINARY no    desc
+
+# use a { in description (1)
+#LETTER NAME  ENABLED LANGUAGE  FIXED DESCRIPTION
+-       extra no      IMAGINARY no    desc{
+
+# use a { in description (2)
+#LETTER NAME  ENABLED LANGUAGE  FIXED DESCRIPTION
+-       extra no      IMAGINARY no    desc{}
+
+# use a \ in description
+#LETTER NAME  ENABLED LANGUAGE  FIXED DESCRIPTION
+-       extra no      IMAGINARY no    desc\backslash
+
+# description started from {
+
+# description started from \{
+#LETTER NAME  ENABLED LANGUAGE  FIXED DESCRIPTION
+-       extra no      IMAGINARY no    {

@@ -46,7 +46,7 @@ typedef enum {
 
 } systemdUnitRole;
 
-static roleDesc SystemdUnitUnitRoles [] = {
+static roleDefinition SystemdUnitUnitRoles [] = {
 	{ true, "Requires", "referred in Requires key" },
 	{ true, "Wants", "referred in Wants key" },
 	{ true, "After", "referred in After key" },

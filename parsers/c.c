@@ -311,7 +311,7 @@ typedef enum {
 	CR_MACRO_UNDEF,
 } cMacroRole;
 
-static roleDesc CMacroRoles [] = {
+static roleDefinition CMacroRoles [] = {
 	RoleTemplateUndef,
 };
 
@@ -320,7 +320,7 @@ typedef enum {
 	CR_HEADER_LOCAL,
 } cHeaderRole;
 
-static roleDesc CHeaderRoles [] = {
+static roleDefinition CHeaderRoles [] = {
 	RoleTemplateSystem,
 	RoleTemplateLocal,
 };
@@ -412,7 +412,7 @@ typedef enum {
 	JAVAR_PACKAGE_IMPORTED,
 } javaPackageRole;
 
-static roleDesc JavaPackageRoles [] = {
+static roleDefinition JavaPackageRoles [] = {
 	{ true, "imported", "imported package"},
 };
 
@@ -440,7 +440,7 @@ typedef enum {
 	VR_MACRO_UNDEF,
 } veraMacroRole;
 
-static roleDesc VeraMacroRoles [] = {
+static roleDefinition VeraMacroRoles [] = {
 	RoleTemplateUndef,
 };
 
@@ -450,7 +450,7 @@ typedef enum {
 	VR_HEADER_LOCAL,
 } veraHeaderRole;
 
-static roleDesc VeraHeaderRoles [] = {
+static roleDefinition VeraHeaderRoles [] = {
 	RoleTemplateSystem,
 	RoleTemplateLocal,
 };

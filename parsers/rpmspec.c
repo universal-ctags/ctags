@@ -42,7 +42,7 @@ enum rpmSpecMacroRole {
 };
 typedef int rpmSpecMacroRole; /* to allow ROLE_INDEX_* */
 
-static roleDesc RpmSpecMacroRoles [] = {
+static roleDefinition RpmSpecMacroRoles [] = {
 	{ true, "undef", "undefined" },
 };
 

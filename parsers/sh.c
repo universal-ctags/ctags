@@ -39,7 +39,7 @@ typedef enum {
 	R_SCRIPT_LOADED,
 } shScriptRole;
 
-static roleDesc ShScriptRoles [] = {
+static roleDefinition ShScriptRoles [] = {
 	{ true, "loaded", "loaded" },
 };
 
@@ -47,7 +47,7 @@ typedef enum {
 	R_HEREDOC_ENDMARKER,
 } shHeredocRole;
 
-static roleDesc ShHeredocRoles [] = {
+static roleDefinition ShHeredocRoles [] = {
 	{ true, "endmarker", "end marker" },
 };
 

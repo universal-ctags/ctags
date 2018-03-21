@@ -18,4 +18,6 @@ extern const kindDefinition* getTagKind(const tagEntryInfo *const tag);
 extern char getTagKindLetter(const tagEntryInfo *const tag);
 extern const char* getTagKindName(const tagEntryInfo *const tag);
 
+extern const roleDefinition* getTagRole(const tagEntryInfo *const tag, int roleIndex);
+
 #endif	/* CTAGS_PRIVATE_ENTRY_H */

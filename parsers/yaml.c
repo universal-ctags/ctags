@@ -88,7 +88,7 @@ enum YamlAnchorRole {
 	R_ANCHOR_ALIAS,
 };
 
-static roleDesc YamlAnchorRoles [] = {
+static roleDefinition YamlAnchorRoles [] = {
 	{ true, "alias", "alias" },
 };
 

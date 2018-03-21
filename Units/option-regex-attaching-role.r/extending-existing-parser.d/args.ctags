@@ -1,0 +1,62 @@
+#
+# This is an example of capturing reference tags by extending
+# already existing parser.
+# 
+# Gauche is an implementation Scheme language.
+# It has a module system.
+#
+# Copyright: 2018 Masatake YAMATO
+# License: GPL-2
+#
+--langdef=myGauche{base=Scheme}
+
+--kinddef-myGauche=m,module,modules
+--_roledef-myGauche=m.used,specified as argument for use
+--_roledef-myGauche=m.exported,specified as argument for export
+--_roledef-myGauche=m.selected,specified as argument for select
+
+--_tabledef-myGauche=main
+--_tabledef-myGauche=export
+
+
+#
+# MAIN TABLE
+#
+
+# Cut the corners.
+# In serious parser, You should define tables for select-module, define-module and use.
+--_mtable-regex-myGauche=main/\(define-module[ \t\n]+([-a-zA-Z0-9]+)/\1/m/{tenter=main}{scope=push}
+
+--_mtable-regex-myGauche=main/\(//{tenter=main}{scope=push}{placeholder}
+--_mtable-regex-myGauche=main/\)//{tleave}{scope=pop}
+--_mtable-regex-myGauche=main/[ \t\n]+//
+
+# Cut the corners.
+--_mtable-regex-myGauche=main/select-module[ \t\n]+([-a-zA-Z0-9]+)/\1/m/{_role=selected}{scope=set}
+--_mtable-regex-myGauche=main/use[ \t\n]+([-a-zA-Z0-9]+)/\1/m/{_role=used}{scope=ref}
+
+--_mtable-regex-myGauche=main/export[ \t\n]+//{tenter=export}
+
+# TODO: This fall-back pattern should be implementated in ctags main side as default behaviour.
+--_mtable-regex-myGauche=main/.//
+
+#
+# EXPORT TABLE
+#
+
+--_mtable-regex-myGauche=export/[ \t\n]+//
+
+# TODO: Why \0 is not allowed?
+--_mtable-regex-myGauche=export/([-a-zA-Z0-9]+)/\1/m/{_role=exported}{scope=ref}
+
+# Return to parent table with ungetc
+--_mtable-regex-myGauche=export/\)//{_advanceTo=0start}{tleave}
+--_mtable-regex-myGauche=export/.//
+
+
+--extras=+r
+--fields=+r
+
+--fields=+K{scope}{language}
+
+--sort=no

@@ -1,0 +1,9 @@
+A	input.foo	/^use A$/;"	m	roles:used
+B	input.foo	/^load B$/;"	m	roles:loaded
+C.foo	input.foo	/^load "C.foo"$/;"	f	roles:loaded
+D	input.foo	/^load-and-use D$/;"	m	roles:used,loaded
+E	input.foo	/^use E as e$/;"	m	roles:used
+e	input.foo	/^use E as e$/;"	n	roles:def	assocMod:E
+F	input.foo	/^load-and-use F as f$/;"	m	roles:used,loaded
+f	input.foo	/^load-and-use F as f$/;"	n	roles:def	assocMod:F
+MYMODULE	input.foo	/^defmod MYMODULE$/;"	m	roles:def

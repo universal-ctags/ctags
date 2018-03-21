@@ -1,0 +1,26 @@
+--langdef=FOO
+--map-FOO=.foo
+
+--kinddef-FOO=m,module,modules
+--kinddef-FOO=f,foofile,files written in FOO{_refonly}
+--kinddef-FOO=n,namespace,namespace
+
+--_fielddef-FOO=assocMod,module associated with the namespace
+
+--_roledef-FOO=m.used,refereed as an external module
+--_roledef-FOO=m.loaded,loaded into the current name space
+--_roledef-FOO=f.loaded,loaded into the current name space
+
+--regex-FOO=/^defmod +([A-Z]+)/\1/m/
+--regex-FOO=/^use +([A-Z]+)/\1/m/{_role=used}
+--regex-FOO=/^load +([A-Z]+)/\1/m/{_role=loaded}
+--regex-FOO=/^load +"([^"]+)"/\1/f/{_role=loaded}
+--regex-FOO=/^load-and-use +([A-Z]+)/\1/m/{_role=loaded}{_role=used}
+
+--regex-FOO=/^use +([A-Z]+) +as +([a-z]+)/\2/n/{_field=assocMod:\1}
+--regex-FOO=/^load-and-use +([A-Z]+) +as +([a-z]+)/\2/n/{_field=assocMod:\1}
+
+--fields=+r
+--fields-FOO=+{assocMod}
+--extras=+r
+--sort=no

@@ -149,6 +149,9 @@ extern const char *getLanguageKindName (const langType language, const int kindI
 extern kindDefinition* getLanguageKind(const langType language, int kindIndex);
 extern kindDefinition* getLanguageKindForLetter (const langType language, char kindLetter);
 extern kindDefinition* getLanguageKindForName (const langType language, const char *kindName);
+extern roleDefinition* getLanguageRole(const langType language, int kindIndex, int roleIndex);
+extern roleDefinition* getLanguageRoleForName (const langType language, int kindIndex,
+											   const char *roleName);
 extern int defineLanguageKind (const langType language, kindDefinition *def,
 							   freeKindDefFunc freeKindDef);
 extern unsigned int countLanguageKinds (const langType language);
@@ -200,6 +203,7 @@ extern void printLanguageParameters (const langType language,
 extern void printLanguageSubparsers (const langType language,
 									 bool withListHeader, bool machinable, FILE *fp);
 extern void printLangdefFlags (bool withListHeader, bool machinable, FILE *fp);
+extern void printKinddefFlags (bool withListHeader, bool machinable, FILE *fp);
 extern bool doesParserRequireMemoryStream (const langType language);
 extern bool parseFile (const char *const fileName);
 extern bool parseFileWithMio (const char *const fileName, MIO *mio);

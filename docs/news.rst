@@ -1053,6 +1053,10 @@ The third column shows the name of the role.
 The fourth column shows whether the role is enabled or not.
 The fifth column shows the description of the role.
 
+You can define a role in an optlib parser for capturing reference
+tags. See `Capturing reference tags <capturing_reftag>` for more
+details.
+
 Currently ctags doesn't provide the way for disabling a
 specified role.
 

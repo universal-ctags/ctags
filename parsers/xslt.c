@@ -35,7 +35,7 @@ typedef enum {
 	R_STYLESHEET_IMPORTED,
 	R_STYLESHEET_INCLUDED,
 } xsltStylesheetRole;
-static roleDesc XsltStylesheetRoles [] = {
+static roleDefinition XsltStylesheetRoles [] = {
 	{ true, "imported", "imported" },
 	{ true, "included", "included" },
 };
@@ -43,21 +43,21 @@ static roleDesc XsltStylesheetRoles [] = {
 typedef enum {
 	R_PARAMETER_BOUND,
 } xsltParameterRole;
-static roleDesc XsltParameterRoles [] = {
+static roleDefinition XsltParameterRoles [] = {
 	{ true, "bound", "bound to value" },
 };
 
 typedef enum {
 	R_MATCHED_TEMPLATE_APPLIED,
 } xsltMatchedTemplateRole;
-static roleDesc XsltMatchedTemplateRoles [] = {
+static roleDefinition XsltMatchedTemplateRoles [] = {
 	{ true, "applied", "applied" },
 };
 
 typedef enum {
 	R_NAMED_TEMPLATE_CALLED,
 } xsltNamedTemplateRole;
-static roleDesc XsltNamedTemplateRoles [] = {
+static roleDefinition XsltNamedTemplateRoles [] = {
 	{ true, "called", "called" },
 };
 

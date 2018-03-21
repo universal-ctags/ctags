@@ -38,11 +38,11 @@ enum M4MacrofileRole {
 };
 
 
-static roleDesc M4MacroRoles [] = {
+static roleDefinition M4MacroRoles [] = {
 	{ true, "undef", "undefined" },
 };
 
-static roleDesc M4MacrofileRoles [] = {
+static roleDefinition M4MacrofileRoles [] = {
 	{ true, "included", "included macro" },
 	{ true, "sincluded", "silently included macro" },
 };
