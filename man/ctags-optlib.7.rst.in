@@ -31,8 +31,6 @@ options are for defining (or customizing) a parser:
 
 * ``--langdef=``
 * ``--kindedef-<LANG>=``
-* ``--fielddef-<LANG>=``
-* ``--extradef-<LANG>=``
 * ``--map-<LANG>=``
 * ``--regex-<LANG>=``
 
@@ -140,12 +138,6 @@ This is the definition (pod.ctags) used in ctags for parsing pod
 
 OPTION ITEMS
 ------------
-
-``--extradef-<LANG>=...``
-	TBW
-
-``--fielddef-<LANG>=...``
-	TBW
 
 ``--langdef=name``
 	Defines a new user-defined language, *name*, to be parsed with regular

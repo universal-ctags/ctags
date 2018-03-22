@@ -784,7 +784,7 @@ Conditional tagging with extras
 
 If a pattern matching should be done only when an extra is enabled,
 mark a pattern with ``{_extra=XNAME}``. Here ``XNAME`` is the name of
-extra. You must define ``XNAME`` with ``--extradef-<LANG>=XNAME,DESCRIPTION`` option
+extra. You must define ``XNAME`` with ``--_extradef-<LANG>=XNAME,DESCRIPTION`` option
 before defining a pattern marked ``{_extra=XNAME}``.
 
 .. code-block:: python
@@ -796,7 +796,7 @@ To capture above lines in a python program(*input.py*), an extra can be used.
 
 .. code-block:: ctags
 
-	--extradef-Python=main,__main__ entry points
+	--_extradef-Python=main,__main__ entry points
 	--regex-Python=/^if __name__ == '__main__':/__main__/f/{_extra=main}
 
 The above optlib(*python-main.ctags*) introduces ``main`` extra to Python parser.

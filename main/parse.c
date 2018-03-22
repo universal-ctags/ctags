@@ -2908,7 +2908,7 @@ extern bool processExtradefOption (const char *const option, const char *const p
 {
 	langType language;
 
-	language = getLanguageComponentInOption (option, "extradef-");
+	language = getLanguageComponentInOption (option, "_" "extradef-");
 	if (language == LANG_IGNORE)
 		return false;
 

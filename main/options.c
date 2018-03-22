@@ -243,8 +243,6 @@ static optionDescription LongOptionDescription [] = {
 #else
  {0,"       Uses the specified type of EX command to locate tags [mix]."},
 #endif
- {1,"  --extradef-<LANG>=name,desc"},
- {1,"       Define new extra for <LANG>. \"--extra-<LANG>=+{name}\" enables it."},
  {1,"  --extras=[+|-]flags"},
  {1,"      Include extra tag entries for selected information (flags: \"Ffq.\") [F]."},
  {1,"  --extras-<LANG|*>=[+|-]flags"},
@@ -430,6 +428,8 @@ static optionDescription LongOptionDescription [] = {
  {1,"  --_echo=msg"},
  {1,"       Echo MSG to standard error. Useful to debug the chain"},
  {1,"       of loading option files."},
+ {1,"  --_extradef-<LANG>=name,desc"},
+ {1,"       Define new extra for <LANG>. \"--extra-<LANG>=+{name}\" enables it."},
  {1,"  --_fatal-warnings"},
  {1,"       Make all warnings fatal."},
  {1,"  --_fielddef-<LANG>=name,description"},
