@@ -53,9 +53,9 @@ explicitly, (long) names are approved than single letter flags
 specifying kinds, and naming rules are stricter.
 
 This man page explains only stable options and flags.  Universal-ctags
-is in development, and it introduces experimental options and flags.
-They have names started with ``_``. If you are interested in them, visit
-Universal-ctags web site (https://ctags.io/).
+also introduces experimental options and flags which have names starting
+with ``_``. For documentation on these options and flags, visit
+Universal-ctags web site at https://ctags.io/.
 
 
 Storing a parser definition to a file
@@ -317,29 +317,33 @@ representation. ``--list-regex-flags`` lists all the flags.
 	Specifying ``{scope=set}`` removes all the tags in the scope, and
 	then pushes the captured tag as ``{scope=push}`` does.
 
-	In some case, you may want to use ``--regex-<LANG>`` only for side
-	effect: using only for manipulating the stack but not for
-	capturing a tag. In such case, make *replacement* component of
-	``--regex-<LANG>`` option empty with specifying ``{placeholder}``
-	as a regex flag. For an example, you can put a non-named tag to
+	In some cases, you may want to use ``--regex-<LANG>`` only for its
+	side effects: using it only to manipulate the stack but not for
+	capturing a tag. In such a case, make *replacement* component of
+	``--regex-<LANG>`` option empty while specifying ``{placeholder}``
+	as a regex flag. For example, a non-named tag can be put on
 	the stack by giving a regex flag ``{scope=push}{placeholder}``.
 
-	You may wonder what happens if a regex patter having
+	You may wonder what happens if a regex pattern with
 	``{scope=ref}`` flag matches an input line but the stack is empty,
-	or a non-named tag is at the top. If the stack is empty,
-	``{scope=ref}`` is just ignored; nothing is attached to ``scope:``
-	field. If the name of tag at the top is empty,
-	@CTAGS_NAME_EXECUTABLE@ goes into the stack deeper to the bottom
-	to find a named tag.
+	or a non-named tag is at the top. If the regex pattern contains a
+	``{scope=ref}`` flag and the stack is empty, the ``{scope=ref}``
+	flag is ignored and nothing is attached to the ``scope:`` field.
+
+	If the top of the stack contains an unnamed tag,
+	@CTAGS_NAME_EXECUTABLE@ searches deeper into the stack to find the
+	top-most named tag. If it reaches the bottom of the stack without
+	finding a named tag, the ``{scope=ref}`` flag is ignored and
+	nothing is attached to the ``scope:`` field.
 
 	When a named tag on the stack is popped or cleared as the side
 	effect of a pattern matching, @CTAGS_NAME_EXECUTABLE@ attaches the
-	line number of the matching to the ``end:`` field of
+	line number of the match to the ``end:`` field of
 	the named tag.
 
-	@CTAGS_NAME_EXECUTABLE@ clears the all tags on the stack when at
-	the end of the input source file. The line number of the end is
-	attached to the ``end:`` field of the cleared tags.
+	@CTAGS_NAME_EXECUTABLE@ clears all of the tags on the stack when it
+	reaches the end of the input source file. The line number of the
+	end is attached to the ``end:`` field of the cleared tags.
 
 
 MORE EXAMPLES
@@ -353,7 +357,8 @@ output makes an example.
 Using scope regex flags
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Let's think writing a parser for a very small subset of Ruby language.
+Let's think about writing a parser for a very small subset of the Ruby
+language.
 
 input source file ("input.srb")::
 
@@ -368,8 +373,8 @@ input source file ("input.srb")::
 
 The parser for the input should capture "Example" with ``class`` kind,
 "methodA", and "methodB" with ``method`` kind. "methodA" and "methodB"
-should have "Example" as its scope. ``end:`` fields of each tag should
-have proper values.
+should have "Example" as their scope. ``end:`` fields of each tag
+should have proper values.
 
 optlib file ("sub-ruby.ctags")::
 
