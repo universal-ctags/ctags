@@ -17,7 +17,7 @@ l	language	no	NONE	s--	no	Language of input file containing tag
 m	implementation	no	NONE	s--	no	Implementation information
 n	line	no	NONE	-i-	no	Line number of tag definition
 p	scopeKind	no	NONE	s--	no	Kind of scope as full name
-r	role	no	NONE	s--	no	Role
+r	roles	no	NONE	s--	no	Roles
 s	NONE	yes	NONE	s--	no	Scope of tag definition (`p' can be used for printing its kind)
 t	typeref	yes	NONE	s--	no	Type and name of a variable or typedef
 x	xpath	no	NONE	s--	no	xpath for the tag
@@ -91,8 +91,8 @@ j	input.c	/^  int j;$/;"	typeref:typename:int
 main	input.c	/^int main(void)$/;"	typeref:typename:int
 x	input.c	/^  struct X x;$/;"	typeref:struct:X
 #r
-x	input.sh	/^source x$/;"	role:loaded
-y	input.sh	/^function y()$/
+x	input.sh	/^source x$/;"	roles:loaded
+y	input.sh	/^function y()$/;"	roles:def
 #r
-D/
+D/def
 R/loaded

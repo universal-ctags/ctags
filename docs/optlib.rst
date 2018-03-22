@@ -48,7 +48,7 @@ ctags visits the directories in the order as listed for loading files.
 ctags loads files having *.ctags* as file extension in alphabetical
 order(strcmp(3) is used for comparing).
 
-Quoted from man page of Exuberant-ctags:
+Quoted from man page of Exuberant-ctags::
 
 	FILES
 		   /ctags.cnf (on MSDOS, MSWindows only)
@@ -330,44 +330,44 @@ A stack is used for tracking the scope context.
 
 Example 1::
 
-    $ cat /tmp/input.foo
-    class foo:
+	$ cat /tmp/input.foo
+	class foo:
 	def bar(baz):
-	    print(baz)
-    class goo:
+		print(baz)
+	class goo:
 	def gar(gaz):
-	    print(gaz)
+		print(gaz)
 
-    $ cat /tmp/foo.ctags
-    --langdef=foo
-	    --map-foo=+.foo
-	    --regex-foo=/^class[[:blank:]]+([[:alpha:]]+):/\1/c,class/{scope=set}
-	    --regex-foo=/^[[:blank:]]+def[[:blank:]]+([[:alpha:]]+).*:/\1/d,definition/{scope=ref}
+	$ cat /tmp/foo.ctags
+	--langdef=foo
+		--map-foo=+.foo
+		--regex-foo=/^class[[:blank:]]+([[:alpha:]]+):/\1/c,class/{scope=set}
+		--regex-foo=/^[[:blank:]]+def[[:blank:]]+([[:alpha:]]+).*:/\1/d,definition/{scope=ref}
 
-    $ ~/var/ctags/ctags --options=/tmp/foo.ctags -o - /tmp/input.foo
-    bar	/tmp/input.foo	/^    def bar(baz):$/;"	d	class:foo
-    foo	/tmp/input.foo	/^class foo:$/;"	c
-    gar	/tmp/input.foo	/^    def gar(gaz):$/;"	d	class:goo
-    goo	/tmp/input.foo	/^class goo:$/;"	c
+	$ ~/var/ctags/ctags --options=/tmp/foo.ctags -o - /tmp/input.foo
+	bar	/tmp/input.foo	/^    def bar(baz):$/;"	d	class:foo
+	foo	/tmp/input.foo	/^class foo:$/;"	c
+	gar	/tmp/input.foo	/^    def gar(gaz):$/;"	d	class:goo
+	goo	/tmp/input.foo	/^class goo:$/;"	c
 
 
 Example 2::
 
-    $ cat /tmp/input.pp
-    class foo {
+	$ cat /tmp/input.pp
+	class foo {
 	include bar
-    }
+	}
 
-    $ cat /tmp/pp.ctags
-    --langdef=pp
-	    --map-pp=+.pp
-	    --regex-pp=/^class[[:blank:]]*([[:alnum:]]+)[[[:blank:]]]*\{/\1/c,class,classes/{scope=push}
-	    --regex-pp=/^[[:blank:]]*include[[:blank:]]*([[:alnum:]]+).*/\1/i,include,includes/{scope=ref}
-	    --regex-pp=/^[[:blank:]]*\}.*//{scope=pop}{exclusive}
+	$ cat /tmp/pp.ctags
+	--langdef=pp
+		--map-pp=+.pp
+		--regex-pp=/^class[[:blank:]]*([[:alnum:]]+)[[[:blank:]]]*\{/\1/c,class,classes/{scope=push}
+		--regex-pp=/^[[:blank:]]*include[[:blank:]]*([[:alnum:]]+).*/\1/i,include,includes/{scope=ref}
+		--regex-pp=/^[[:blank:]]*\}.*//{scope=pop}{exclusive}
 
-    $ ~/var/ctags/ctags --options=/tmp/pp.ctags -o - /tmp/input.pp
-    bar	/tmp/input.pp	/^    include bar$/;"	i	class:foo
-    foo	/tmp/input.pp	/^class foo {$/;"	c
+	$ ~/var/ctags/ctags --options=/tmp/pp.ctags -o - /tmp/input.pp
+	bar	/tmp/input.pp	/^    include bar$/;"	i	class:foo
+	foo	/tmp/input.pp	/^class foo {$/;"	c
 
 
 NOTE: Giving a scope long flag implies setting `useCork` of the parser
@@ -383,6 +383,7 @@ Override the letter for file kind
 Overriding the letter for file kind is not allowed in Universal-ctags.
 
 .. IN MAN PAGE
+
 Don't use `F` as a kind letter in your parser.
 
 
@@ -396,31 +397,31 @@ but the pattern is applied to whole file contents, not line by line.
 
 Next example is based on an issue #219 posted by @andreicristianpetcu::
 
-    $ cat input.java
-    @Subscribe
-    public void catchEvent(SomeEvent e)
-    {
+	$ cat input.java
+	@Subscribe
+	public void catchEvent(SomeEvent e)
+	{
 	return;
-    }
+	}
 
 
-    @Subscribe
-    public void
+	@Subscribe
+	public void
 	recover(Exception e)
-    {
+	{
 	return;
-    }
+	}
 
-    $ cat spring.ctags
-    --langdef=javaspring
-    --langmap=javaspring:.java
-    --mline-regex-javaspring=/@Subscribe([[:space:]])*([a-z ]+)[[:space:]]*([a-zA-Z]*)\(([a-zA-Z]*)/\3-\4/s,subscription/{mgroup=3}
-    --excmd=mixed
-    --fields=+ln
+	$ cat spring.ctags
+	--langdef=javaspring
+	--langmap=javaspring:.java
+	--mline-regex-javaspring=/@Subscribe([[:space:]])*([a-z ]+)[[:space:]]*([a-zA-Z]*)\(([a-zA-Z]*)/\3-\4/s,subscription/{mgroup=3}
+	--excmd=mixed
+	--fields=+ln
 
-    $ ./ctags -o - --options=./spring.ctags input.java
-    Event-SomeEvent	input.java	/^public void catchEvent(SomeEvent e)$/;"	s	line:2	language:javaspring
-    recover-Exception	input.java	/^    recover(Exception e)$/;"	s	line:10	language:javaspring
+	$ ./ctags -o - --options=./spring.ctags input.java
+	Event-SomeEvent	input.java	/^public void catchEvent(SomeEvent e)$/;"	s	line:2	language:javaspring
+	recover-Exception	input.java	/^    recover(Exception e)$/;"	s	line:10	language:javaspring
 
 ``{mgroup=N}``
 
@@ -458,51 +459,54 @@ Next example is based on an issue #219 posted by @andreicristianpetcu::
 	   --mline-regex-foo=/def *([a-z]+)/\1/a/{mgroup=1}
 
 
-	 *bar.ctags*
-	 ::
+	*bar.ctags*
+	::
 
-		--langdef=bar
-		--langmap=bar:.bar
-		--kinddef-bar=a,something,something
-		--mline-regex-bar=/def *([a-z]+)/\1/a/{mgroup=1}{_advanceTo=1start}
+	   --langdef=bar
+	   --langmap=bar:.bar
+	   --kinddef-bar=a,something,something
+	   --mline-regex-bar=/def *([a-z]+)/\1/a/{mgroup=1}{_advanceTo=1start}
 
-	 *foo.ctags* emits following tags output::
+	*foo.ctags* emits following tags output::
 
 	   def	input.foo	/^def def abc$/;"	a
 
-	 *bar.ctgs* emits following tags output::
+	*bar.ctgs* emits following tags output::
 
 	   def	input-0.bar	/^def def abc$/;"	a
 	   abc	input-0.bar	/^def def abc$/;"	a
 
-	 ``_advanceTo=1start`` is specified in *bar.ctags*.
-	 That causes ctags allow to capture "abc".
+	``_advanceTo=1start`` is specified in *bar.ctags*.
+	This allows ctags to capture "abc".
 
-	 At the first iteration, the patterns of both
-	 *foo.ctags* and *bar.ctags" match as follows
-	 ::
+	At the first iteration, the patterns of both
+	*foo.ctags* and *bar.ctags* match as follows
+	::
+
 		0   1       (start)
-        v   v
+		v   v
 		def def abc
-		       ^
+			   ^
 			   0,1  (end)
 
-	 "def" at the group 1 is captured as a tag in the
-	 both languages. At the next iteration, the positions
-	 where the pattern matching is applied to are not the
-	 same in the language.
+	"def" at the group 1 is captured as a tag in
+	both languages. At the next iteration, the positions
+	where the pattern matching is applied to are not the
+	same in the languages.
 
-	 *foo.ctags*
-	 ::
-               0end (default)
-               v
+	*foo.ctags*
+	::
+
+			   0end (default)
+			   v
 		def def abc
 
 
-	 *bar.ctags*
-	 ::
-            1start (as specified in _advanceTo long flag)
-            v
+	*bar.ctags*
+	::
+
+			1start (as specified in _advanceTo long flag)
+			v
 		def def abc
 
 	This difference of positions makes the difference of tags output.
@@ -528,9 +532,9 @@ generator, which is a popular tool on Unix environment for writing a
 parser, and `RegexLexer` of Pygments. The knowledge about them
 help you understand the options.
 
-As usable, let me explain the feature with an example.  Consider a
+As usable, let me explain the feature with an example. Consider a
 imaginary language "X" has similar syntax with JavaScript; "var" is
-used as defining variable(s), , and "/* ... */" makes block comment.
+used as defining variable(s), , and "/\* ... \*/" makes block comment.
 
 *input.x*
 ::
@@ -818,9 +822,9 @@ value of the fields of a tagEntry.
 Let's think about *Unknown*, an imaginary language.
 Here is a source file(``input.unknown``) written in *Unknown*:
 
-    public func foo(n, m);
-    protected func bar(n);
-    private func baz(n,...);
+	public func foo(n, m);
+	protected func bar(n);
+	private func baz(n,...);
 
 With `--regex-Unknown=...` Exuberant-ctags can capture `foo`, `bar`, and `baz`
 as names. Universal-ctags can attach extra context information to the
@@ -834,16 +838,16 @@ With following optlib file(``unknown.ctags``)), ctags can attach
 
 .. code-block:: ctags
 
-    --langdef=unknown
-    --kinddef-unknown=f,func,functions
-    --map-unknown=+.unknown
+	--langdef=unknown
+	--kinddef-unknown=f,func,functions
+	--map-unknown=+.unknown
 
-    --_fielddef-unknown=protection,access scope
-    --_fielddef-unknown=signature,signatures
+	--_fielddef-unknown=protection,access scope
+	--_fielddef-unknown=signature,signatures
 
-    --regex-unknown=/^((public|protected|private) +)?func ([^\(]+)\((.*)\)/\3/f/{_field=protection:\1}{_field=signature:(\4)}
+	--regex-unknown=/^((public|protected|private) +)?func ([^\(]+)\((.*)\)/\3/f/{_field=protection:\1}{_field=signature:(\4)}
 
-    --fields-unknown=+'{protection}{signature}'
+	--fields-unknown=+'{protection}{signature}'
 
 For the line `    protected func bar(n);` you will get following tags output::
 
@@ -853,7 +857,7 @@ Let's see the detail of ``unknown.ctags``.
 
 .. code-block:: ctags
 
-    --_fielddef-unknown=protection,access scope
+	--_fielddef-unknown=protection,access scope
 
 `--_fielddef-<LANG>=name,description` defines a new field for a parser
 specified by `<LANG>`.  Before defining a new field for the parser,
@@ -863,13 +867,13 @@ used in the output of ``--list-fields`` and ``--list-fields=Unknown``.
 
 .. code-block:: ctags
 
-    --_fielddef-unknown=signature,signatures
+	--_fielddef-unknown=signature,signatures
 
 This defines a field named `signature`.
 
 .. code-block:: ctags
 
-    --regex-unknown=/^((public|protected|private) +)?func ([^\(]+)\((.*)\)/\3/f/{_field=protection:\1}{_field=signature:(\4)}
+	--regex-unknown=/^((public|protected|private) +)?func ([^\(]+)\((.*)\)/\3/f/{_field=protection:\1}{_field=signature:(\4)}
 
 This option requests making a tag for the name that is specified with the group 3 of the
 pattern, attaching the group 1 as a value for `protection` field to the tag, and attaching
@@ -886,6 +890,69 @@ field explicitly to use the field. See :ref:`Parser own fields <parser-own-field
 about `--fields-<LANG>` option.
 
 `passwd` parser is a simple example that uses `--fields-<LANG>` option.
+
+
+.. _capturing_reftag:
+
+Capturing reference tags
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. NOT REVIEWED YET
+
+To capture a reference tag with an optlib parser, specify a role with
+`_role` long regex flag. Let's see an example:
+
+.. code-block:: ctags
+
+	--langdef=FOO
+	--kinddef-FOO=m,module,modules
+	--_roledef-FOO=m.imported,imported module
+	--regex-FOO=/import[ \t]+([a-z]+)/\1/m/{_role=imported}
+	--extras=+r
+	--fields=+r
+
+See the line, `--regex-FOO=...`.  In this parser `FOO`, a name of
+imported module is captured as a reference tag with role `imported`.
+A role must be defined before specifying it as value for `_role` flag.
+`--_roledef-<LANG>` option is for defining a role.
+
+The parameter of the option comes from three components: a kind
+letter, the name of role, and the description of role. The kind letter
+comes first.  Following a period, give the role name. The period
+represents that the role is defined under the kind specified with the
+kind letter.  In the example, `imported` role is defined under
+`module` kind specified with `m`.
+
+Of course, the kind specified with the kind letter must be defined
+before using `--_roledef-<FOO>` option. `--kinddef-<LANG>` option
+is for defining a kind.
+
+The roles are listed with `--list-roles=<LANG>`. The name and
+description passed to `--_roledef-<LANG>` option are used in
+the output like::
+
+	$ ./ctags --langdef=FOO --kinddef-FOO=m,module,modules \
+				--_roledef-FOO='m.imported,imported module' --list-roles=FOO
+	#KIND(L/N) NAME     ENABLED DESCRIPTION
+	m/module   imported on      imported module
+
+
+With specifying `_role` regex flag multiple times with different
+roles, you can assign multiple roles to a reference tag.
+See following input of C language
+
+.. code-block:: C
+
+   i += 1;
+
+An ultra fine grained C parser may capture a variable `i` with
+`lvalue` and `incremented`. You can do it with:
+
+.. code-block:: ctags
+
+	--_roledef-C=v.lvalue,locator values
+	--_roledef-C=v.incremented,incremeted with ++ operator
+	--regex-C=/([a-zA-Z_][a-zA-Z_0-9])+ *+=/\1/v/{_role=lvalue}{_role=incremeted}
 
 
 Submitting an optlib to universal-ctags project
@@ -917,30 +984,30 @@ Put these information at the header of *swine.ctags*.
 
 An example taken from *data/optlib/ctags.ctags* ::
 
-    #
-    #
-    #  Copyright (c) 2014, Red Hat, Inc.
-    #  Copyright (c) 2014, Masatake YAMATO
-    #
-    #  Author: Masatake YAMATO <yamato@redhat.com>
-    #
-    # This program is free software; you can redistribute it and/or
-    # modify it under the terms of the GNU General Public License
-    # as published by the Free Software Foundation; either version 2
-    # of the License, or (at your option) any later version.
-    #
-    # This program is distributed in the hope that it will be useful,
-    # but WITHOUT ANY WARRANTY; without even the implied warranty of
-    # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    # GNU General Public License for more details.
-    #
-    # You should have received a copy of the GNU General Public License
-    # along with this program; if not, write to the Free Software
-    # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,
-    # USA.
-    #
-    #
-    ...
+	#
+	#
+	#  Copyright (c) 2014, Red Hat, Inc.
+	#  Copyright (c) 2014, Masatake YAMATO
+	#
+	#  Author: Masatake YAMATO <yamato@redhat.com>
+	#
+	# This program is free software; you can redistribute it and/or
+	# modify it under the terms of the GNU General Public License
+	# as published by the Free Software Foundation; either version 2
+	# of the License, or (at your option) any later version.
+	#
+	# This program is distributed in the hope that it will be useful,
+	# but WITHOUT ANY WARRANTY; without even the implied warranty of
+	# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	# GNU General Public License for more details.
+	#
+	# You should have received a copy of the GNU General Public License
+	# along with this program; if not, write to the Free Software
+	# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,
+	# USA.
+	#
+	#
+	...
 
 "GPL version 2 or later version" is needed here.  Option file is not
 linked to ctags command. However, I have a plan to write a translator

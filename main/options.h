@@ -176,6 +176,7 @@ extern bool processTabledefOption (const char *const option, const char *const p
 #ifdef HAVE_ICONV
 extern bool processLanguageEncodingOption (const char *const option, const char *const parameter);
 #endif
+extern bool processRoledefOption (const char *const option, const char *const parameter);
 
 typedef void (* mainLoopFunc) (cookedArgs *args, void *data);
 extern void setMainLoop (mainLoopFunc func, void *data);

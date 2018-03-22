@@ -24,6 +24,16 @@
 #include <stdio.h>
 #endif
 
+#ifdef HAVE_ICONV
+#include <iconv.h>
+#include <errno.h>
+#	ifdef WORDS_BIGENDIAN
+#		define INTERNAL_ENCODING "UTF-32BE"
+#	else
+#		define INTERNAL_ENCODING "UTF-32LE"
+#	endif /* WORDS_BIGENDIAN */
+#endif
+
 #include <string.h>
 #include "debug.h"
 #include "entry.h"
@@ -33,6 +43,8 @@
 #include "routines.h"
 #include "vstring.h"
 #include "objpool.h"
+#include "options.h"
+#include "mbcs.h"
 #include "trace.h"
 
 /*
@@ -42,7 +54,8 @@
 #define isKeyword(token,k)	(bool) ((token)->keyword == (k))
 #define isIdentChar(c) \
 	(isalpha (c) || isdigit (c) || (c) == '$' || \
-		(c) == '@' || (c) == '_' || (c) == '#')
+		(c) == '@' || (c) == '_' || (c) == '#' || \
+		(c) >= 0x80)
 #define newToken() (objPoolGet (TokenPool))
 #define deleteToken(t) (objPoolPut (TokenPool, (t)))
 
@@ -180,6 +193,10 @@ static tokenInfo *NextToken;
 static langType Lang_js;
 
 static objPool *TokenPool = NULL;
+
+#ifdef HAVE_ICONV
+static iconv_t JSUnicodeConverter = (iconv_t) -2;
+#endif
 
 typedef enum {
 	JSTAG_FUNCTION,
@@ -417,6 +434,229 @@ static void makeFunctionTag (tokenInfo *const token, vString *const signature, b
  *	 Parsing functions
  */
 
+/* given @p point, returns the first byte of the encoded output sequence, and
+ * make sure the next ones will be returned by calls to getcFromInputFile()
+ * as if the code point was simply written in the input file. */
+static int handleUnicodeCodePoint (uint32_t point)
+{
+	int c = (int) point;
+
+	Assert (point < 0x110000);
+
+#ifdef HAVE_ICONV
+	/* if we do have iconv and the encodings are specified, use this */
+	if (isConverting () && JSUnicodeConverter == (iconv_t) -2)
+	{
+		/* if we didn't try creating the converter yet, try and do so */
+		JSUnicodeConverter = iconv_open (getLanguageEncoding (Lang_js), INTERNAL_ENCODING);
+	}
+	if (isConverting () && JSUnicodeConverter != (iconv_t) -1)
+	{
+		char *input_ptr = (char *) &point;
+		size_t input_left = sizeof point;
+		/* 4 bytes should be enough for any encoding (it's how much UTF-32
+		 * would need). */
+		/* FIXME: actually iconv has a tendency to output a BOM for Unicode
+		 * encodings where it matters when the endianess is not specified in
+		 * the target encoding name.  E.g., if the target encoding is "UTF-32"
+		 * or "UTF-16" it will output 2 code points, the BOM (U+FEFF) and the
+		 * one we expect. This does not happen if the endianess is specified
+		 * explicitly, e.g. with "UTF-32LE", or "UTF-16BE".
+		 * However, it's not very relevant for the moment as nothing in CTags
+		 * cope well (if at all) with non-ASCII-compatible encodings like
+		 * UTF-32 or UTF-16 anyway. */
+		char output[4] = { 0 };
+		char *output_ptr = output;
+		size_t output_left = ARRAY_SIZE (output);
+
+		if (iconv (JSUnicodeConverter, &input_ptr, &input_left, &output_ptr, &output_left) == (size_t) -1)
+		{
+			/* something went wrong, which probably means the output encoding
+			 * cannot represent the character.  Use a placeholder likely to be
+			 * supported instead, that's also valid in an identifier */
+			verbose ("JavaScript: Encoding: %s\n", strerror (errno));
+			c = '_';
+		}
+		else
+		{
+			const size_t output_len = ARRAY_SIZE (output) - output_left;
+
+			/* put all but the first byte back so that getcFromInputFile() will
+			 * return them in the right order */
+			for (unsigned int i = 1; i < output_len; i++)
+				ungetcToInputFile ((unsigned char) output[output_len - i]);
+			c = (unsigned char) output[0];
+		}
+
+		iconv (JSUnicodeConverter, NULL, NULL, NULL, NULL);
+	}
+	else
+#endif
+	{
+		/* when no encoding is specified (or no iconv), assume UTF-8 is good.
+		 * Why UTF-8?  Because it's an ASCII-compatible common Unicode encoding. */
+		if (point < 0x80)
+			c = (unsigned char) point;
+		else if (point < 0x800)
+		{
+			c = (unsigned char) (0xc0 | ((point >> 6) & 0x1f));
+			ungetcToInputFile ((unsigned char) (0x80 | (point & 0x3f)));
+		}
+		else if (point < 0x10000)
+		{
+			c = (unsigned char) (0xe0 | ((point >> 12) & 0x0f));
+			ungetcToInputFile ((unsigned char) (0x80 | ((point >>  0) & 0x3f)));
+			ungetcToInputFile ((unsigned char) (0x80 | ((point >>  6) & 0x3f)));
+		}
+		else if (point < 0x110000)
+		{
+			c = (unsigned char) (0xf0 | ((point >> 18) & 0x07));
+			ungetcToInputFile ((unsigned char) (0x80 | ((point >>  0) & 0x3f)));
+			ungetcToInputFile ((unsigned char) (0x80 | ((point >>  6) & 0x3f)));
+			ungetcToInputFile ((unsigned char) (0x80 | ((point >> 12) & 0x3f)));
+		}
+	}
+
+	return c;
+}
+
+/* reads a Unicode escape sequence after the "\" prefix.
+ * @param value Location to store the escape sequence value.
+ * @param isUTF16 Location to store whether @param value is an UTF-16 word.
+ * @returns Whether a valid sequence was read. */
+static bool readUnicodeEscapeSequenceValue (uint32_t *const value,
+                                            bool *const isUTF16)
+{
+	bool valid = false;
+	int d = getcFromInputFile ();
+
+	if (d != 'u')
+		ungetcToInputFile (d);
+	else
+	{
+		int e = getcFromInputFile ();
+		char cp[6 + 1]; /* up to 6 hex + possible closing '}' or invalid char */
+		unsigned int cp_len = 0;
+
+		*isUTF16 = (e != '{');
+		if (e == '{')
+		{	/* Handles Unicode code point escapes: \u{ HexDigits }
+			 * We skip the leading 0s because there can be any number of them
+			 * and they don't change any meaning. */
+			bool has_leading_zero = false;
+
+			while ((cp[cp_len] = (char) getcFromInputFile ()) == '0')
+				has_leading_zero = true;
+
+			while (isxdigit (cp[cp_len]) && ++cp_len < ARRAY_SIZE (cp))
+				cp[cp_len] = (char) getcFromInputFile ();
+			valid = ((cp_len > 0 || has_leading_zero) &&
+					 cp_len < ARRAY_SIZE (cp) && cp[cp_len] == '}' &&
+					 /* also check if it's a valid Unicode code point */
+					 (cp_len < 6 ||
+					  (cp_len == 6 && strncmp (cp, "110000", 6) < 0)));
+			if (! valid) /* put back the last (likely invalid) character */
+				ungetcToInputFile (cp[cp_len]);
+		}
+		else
+		{	/* Handles Unicode escape sequences: \u Hex4Digits */
+			do
+				cp[cp_len] = (char) ((cp_len == 0) ? e : getcFromInputFile ());
+			while (isxdigit (cp[cp_len]) && ++cp_len < 4);
+			valid = (cp_len == 4);
+		}
+
+		if (! valid)
+		{
+			/* we don't get every character back, but it would require to
+			 * be able to put up to 9 characters back (in the worst case
+			 * for handling invalid \u{10FFFFx}), and here we're recovering
+			 * from invalid syntax anyway. */
+			ungetcToInputFile (e);
+			ungetcToInputFile (d);
+		}
+		else
+		{
+			*value = 0;
+			for (unsigned int i = 0; i < cp_len; i++)
+			{
+				*value *= 16;
+
+				/* we know it's a hex digit, no need to double check */
+				if (cp[i] < 'A')
+					*value += (unsigned int) cp[i] - '0';
+				else if (cp[i] < 'a')
+					*value += 10 + (unsigned int) cp[i] - 'A';
+				else
+					*value += 10 + (unsigned int) cp[i] - 'a';
+			}
+		}
+	}
+
+	return valid;
+}
+
+static int valueToXDigit (unsigned char v)
+{
+	Assert (v <= 0xF);
+
+	if (v >= 0xA)
+		return 'A' + (v - 0xA);
+	else
+		return '0' + v;
+}
+
+/* Reads and expands a Unicode escape sequence after the "\" prefix.  If the
+ * escape sequence is a UTF16 high surrogate, also try and read the low
+ * surrogate to emit the proper code point.
+ * @param fallback The character to return if the sequence is invalid. Usually
+ *                 this would be the '\' character starting the sequence.
+ * @returns The first byte of the sequence, or @param fallback if the sequence
+ *          is invalid. On success, next calls to getcFromInputFile() will
+ *          return subsequent bytes (if any). */
+static int readUnicodeEscapeSequence (const int fallback)
+{
+	int c;
+	uint32_t value;
+	bool isUTF16;
+
+	if (! readUnicodeEscapeSequenceValue (&value, &isUTF16))
+		c = fallback;
+	else
+	{
+		if (isUTF16 && (value & 0xfc00) == 0xd800)
+		{	/* this is a high surrogate, try and read its low surrogate and
+			 * emit the resulting code point */
+			uint32_t low;
+			int d = getcFromInputFile ();
+
+			if (d != '\\' || ! readUnicodeEscapeSequenceValue (&low, &isUTF16))
+				ungetcToInputFile (d);
+			else if (! isUTF16)
+			{	/* not UTF-16 low surrogate but a plain code point */
+				d = handleUnicodeCodePoint (low);
+				ungetcToInputFile (d);
+			}
+			else if ((low & 0xfc00) != 0xdc00)
+			{	/* not a low surrogate, so put back the escaped representation
+				 * in case it was another high surrogate we should read as part
+				 * of another pair. */
+				ungetcToInputFile (valueToXDigit ((unsigned char) ((low & 0x000f) >>  0)));
+				ungetcToInputFile (valueToXDigit ((unsigned char) ((low & 0x00f0) >>  4)));
+				ungetcToInputFile (valueToXDigit ((unsigned char) ((low & 0x0f00) >>  8)));
+				ungetcToInputFile (valueToXDigit ((unsigned char) ((low & 0xf000) >> 12)));
+				ungetcToInputFile ('u');
+				ungetcToInputFile ('\\');
+			}
+			else
+				value = 0x010000 + ((value & 0x03ff) << 10) + (low & 0x03ff);
+		}
+		c = handleUnicodeCodePoint (value);
+	}
+
+	return c;
+}
+
 static void parseString (vString *const string, const int delimiter)
 {
 	bool end = false;
@@ -434,7 +674,13 @@ static void parseString (vString *const string, const int delimiter)
 			 * sequence.
 			 * See ECMA-262 7.8.4 */
 			c = getcFromInputFile ();
-			if (c != '\r' && c != '\n')
+			if (c == 'u')
+			{
+				ungetcToInputFile (c);
+				c = readUnicodeEscapeSequence ('\\');
+				vStringPut (string, c);
+			}
+			else if (c != '\r' && c != '\n')
 				vStringPut(string, c);
 			else if (c == '\r')
 			{
@@ -501,7 +747,13 @@ static void parseIdentifier (vString *const string, const int firstChar)
 	{
 		vStringPut (string, c);
 		c = getcFromInputFile ();
+		if (c == '\\')
+			c = readUnicodeEscapeSequence (c);
 	} while (isIdentChar (c));
+	/* if readUnicodeEscapeSequence() read an escape sequence this is incorrect,
+	 * as we should actually put back the whole escape sequence and not the
+	 * decoded character.  However, it's not really worth the hassle as it can
+	 * only happen if the input has an invalid escape sequence. */
 	ungetcToInputFile (c);		/* unget non-identifier character */
 }
 
@@ -658,15 +910,6 @@ getNextChar:
 				  }
 				  break;
 
-		case '\\':
-				  c = getcFromInputFile ();
-				  if (c != '\\'  && c != '"'  &&  !isspace (c))
-					  ungetcToInputFile (c);
-				  token->type = TOKEN_CHARACTER;
-				  token->lineNumber = getInputLineNumber ();
-				  token->filePosition = getInputFilePosition ();
-				  break;
-
 		case '/':
 				  {
 					  int d = getcFromInputFile ();
@@ -739,6 +982,9 @@ getNextChar:
 				  }
 				  break;
 
+		case '\\':
+				  c = readUnicodeEscapeSequence (c);
+				  /* fallthrough */
 		default:
 				  if (! isIdentChar (c))
 					  token->type = TOKEN_UNDEFINED;
@@ -2246,6 +2492,15 @@ static void findJsTags (void)
 	ClassNames = NULL;
 	FunctionNames = NULL;
 	deleteToken (token);
+
+#ifdef HAVE_ICONV
+	if (JSUnicodeConverter != (iconv_t) -2 && /* not created */
+	    JSUnicodeConverter != (iconv_t) -1 /* creation failed */)
+	{
+		iconv_close (JSUnicodeConverter);
+		JSUnicodeConverter = (iconv_t) -2;
+	}
+#endif
 
 	Assert (NextToken == NULL);
 }

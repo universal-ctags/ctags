@@ -26,8 +26,12 @@ extern parserDefinition* RSpecParser (void)
 	};
 
 	static kindDefinition RSpecKindTable [] = {
-		{ true, 'd', "describe", "describes" },
-		{ true, 'c', "context", "contexts" },
+		{
+		  true, 'd', "describe", "describes",
+		},
+		{
+		  true, 'c', "context", "contexts",
+		},
 	};
 	static tagRegexTable RSpecTagRegexTable [] = {
 		{"^[ \t]*RSpec\\.describe[ \t]+([^\"']+)[ \t]+do", "\\1",

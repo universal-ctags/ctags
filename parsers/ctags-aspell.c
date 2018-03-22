@@ -47,7 +47,7 @@ typedef enum {
 	R_WORD_TRACED
 } AspellWordRole;
 
-static roleDesc AspellWordRoles [] = {
+static roleDefinition AspellWordRoles [] = {
 	{ true,       "misspelled", "misspelled" },
 	{ DEBUG_WORD, "traced", "traced by this parser (enabling/disabling in build-time)" },
 };

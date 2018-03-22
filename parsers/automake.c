@@ -45,7 +45,7 @@ typedef enum {
 	R_AM_DIR_DATA,
 } makeAMDirectoryRole;
 
-static roleDesc AutomakeDirectoryRoles [] = {
+static roleDefinition AutomakeDirectoryRoles [] = {
 	{ true, "program",   "directory for PROGRAMS primary" },
 	{ true, "man",       "directory for MANS primary" },
 	{ true, "ltlibrary", "directory for LTLIBRARIES primary"},
@@ -58,7 +58,7 @@ typedef enum {
 	R_AM_CONDITION_BRANCHED,
 } makeAMConditionRole;
 
-static roleDesc AutomakeConditionRoles [] = {
+static roleDefinition AutomakeConditionRoles [] = {
 	{ true, "branched",  "used for branching" },
 };
 
@@ -200,9 +200,14 @@ static void valueCallback (makeSubparser *make, char *name)
 
 	parent = getEntryInCorkQueue (p);
 	if ((parent->kindIndex == K_AM_DIR)
-	    && (parent->extensionFields.roleIndex != ROLE_INDEX_DEFINITION))
+	    && (parent->extensionFields.roleBits))
 	{
-		k = K_AM_PROGRAM + parent->extensionFields.roleIndex;
+		int roleIndex;
+		for (roleIndex = 0; roleIndex < ARRAY_SIZE(AutomakeDirectoryRoles); roleIndex++)
+			if (parent->extensionFields.roleBits & ((roleBitsType)1) << roleIndex)
+				break;
+
+		k = K_AM_PROGRAM + roleIndex;
 		initTagEntry (&elt, name, k);
 		elt.extensionFields.scopeIndex = p;
 		makeTagEntry (&elt);

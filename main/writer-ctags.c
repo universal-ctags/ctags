@@ -215,7 +215,7 @@ static int addExtensionFields (tagWriter *writer, MIO *mio, const tagEntryInfo *
 	length += renderExtensionFieldMaybe (writer, FIELD_ACCESS, tag, sep, mio);
 	length += renderExtensionFieldMaybe (writer, FIELD_IMPLEMENTATION, tag, sep, mio);
 	length += renderExtensionFieldMaybe (writer, FIELD_SIGNATURE, tag, sep, mio);
-	length += renderExtensionFieldMaybe (writer, FIELD_ROLE, tag, sep, mio);
+	length += renderExtensionFieldMaybe (writer, FIELD_ROLES, tag, sep, mio);
 	length += renderExtensionFieldMaybe (writer, FIELD_EXTRAS, tag, sep, mio);
 	length += renderExtensionFieldMaybe (writer, FIELD_XPATH, tag, sep, mio);
 	length += renderExtensionFieldMaybe (writer, FIELD_END_LINE, tag, sep, mio);

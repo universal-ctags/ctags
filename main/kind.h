@@ -13,13 +13,16 @@
 #include "routines.h"
 #include "vstring.h"
 
-typedef struct sRoleDesc {
+struct sRoleDefinition {
 	bool enabled;
-	const char* name;		  /* role name */
-	const char* description;	  /* displayed in --help output */
-} roleDesc;
+	char* name;		  /* role name */
+	char* description;	  /* displayed in --help output */
 
-extern const char *renderRole (const roleDesc* const role, vString* b);
+	int id;
+};
+
+typedef void (* freeRoleDefFunc) (roleDefinition *);
+extern const char *renderRole (const roleDefinition* const def, vString* b);
 
 /*
  * Predefined kinds
@@ -54,7 +57,7 @@ struct sKindDefinition {
 	char* description;	  /* displayed in --help output */
 	bool referenceOnly;
 	int nRoles;		/* The number of role elements. */
-	roleDesc *roles;
+	roleDefinition *roles;
 	scopeSeparator *separators;
 	unsigned int separatorCount;
 
@@ -91,13 +94,17 @@ extern struct kindControlBlock* allocKindControlBlock (parserDefinition *parser)
 extern void freeKindControlBlock (struct kindControlBlock* kcb);
 extern int  defineKind (struct kindControlBlock* kcb, kindDefinition *def,
 						freeKindDefFunc freeKindDef);
-extern bool isKindEnabled (struct kindControlBlock* kcb, int kindIndex);
+extern int defineRole (struct kindControlBlock* kcb, int kindIndex,
+					   roleDefinition *def, freeRoleDefFunc freeRoleDef);
 extern bool isRoleEnabled (struct kindControlBlock* kcb, int kindIndex, int roleIndex);
+
 extern unsigned int countKinds (struct kindControlBlock* kcb);
 extern unsigned int countRoles (struct kindControlBlock* kcb, int kindIndex);
 extern kindDefinition *getKind (struct kindControlBlock* kcb, int kindIndex);
 extern kindDefinition *getKindForLetter (struct kindControlBlock* kcb, int letter);
 extern kindDefinition *getKindForName (struct kindControlBlock* kcb, const char* name);
+extern roleDefinition* getRole(struct kindControlBlock* kcb, int kindIndex, int roleIndex);
+extern roleDefinition* getRoleForName(struct kindControlBlock* kcb, int kindIndex, const char* name);
 extern void linkKindDependency (struct kindControlBlock *masterKCB,
 								struct kindControlBlock *slaveKCB);
 

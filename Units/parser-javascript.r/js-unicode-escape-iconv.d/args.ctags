@@ -1,0 +1,4 @@
+--sort=no
+# just so iconv kicks in
+--input-encoding=UTF-8
+--output-encoding=UTF-8

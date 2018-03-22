@@ -1,2 +1,2 @@
-mark	input.yml	/^- &mark foo$/;"	a
-mark	input.yml	/^- *mark$/;"	a	role:alias
+mark	input.yml	/^- &mark foo$/;"	a	roles:def
+mark	input.yml	/^- *mark$/;"	a	roles:alias

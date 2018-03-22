@@ -22,9 +22,21 @@
 #include "options.h"
 #include "vstring.h"
 
+typedef struct sRoleObject {
+	roleDefinition *def;
+	freeRoleDefFunc free;
+} roleObject;
+
+struct roleControlBlock {
+	roleObject *role;
+	unsigned int count;
+	int owner;
+};
+
 typedef struct sKindObject {
 	kindDefinition *def;
 	freeKindDefFunc free;
+	struct roleControlBlock *rcb;
 } kindObject;
 
 struct kindControlBlock {
@@ -33,7 +45,7 @@ struct kindControlBlock {
 	langType owner;
 };
 
-extern const char *renderRole (const roleDesc* const role, vString* b)
+extern const char *renderRole (const roleDefinition* const role, vString* b)
 {
 	vStringCatS (b, role->name);
 	return vStringValue (b);
@@ -94,6 +106,26 @@ extern void enableKind (kindDefinition *kind, bool enable)
 	}
 }
 
+static struct roleControlBlock* allocRoleControlBlock (kindObject *kind)
+{
+	unsigned int j;
+	struct roleControlBlock* rcb;
+
+	rcb = xMalloc(1, struct roleControlBlock);
+	rcb->count = kind->def->nRoles;
+	rcb->owner = kind->def->id;
+	rcb->role = xMalloc(rcb->count, roleObject);
+	for (j = 0; j < rcb->count; j++)
+	{
+		roleObject *role = rcb->role + j;
+		role->def = kind->def->roles + j;
+		role->free = NULL;
+		role->def->id = j;
+	}
+
+	return rcb;
+}
+
 extern struct kindControlBlock* allocKindControlBlock (parserDefinition *parser)
 {
 	unsigned int i;
@@ -106,12 +138,26 @@ extern struct kindControlBlock* allocKindControlBlock (parserDefinition *parser)
 
 	for (i = 0; i < parser->kindCount; ++i)
 	{
-		kcb->kind [i].def = parser->kindTable + i;
-		kcb->kind [i].free = NULL;
-		kcb->kind [i].def->id = i;
+		kindObject *kind = kcb->kind + i;
+		kind->def = parser->kindTable + i;
+		kind->free = NULL;
+		kind->def->id = i;
+		kind->rcb = allocRoleControlBlock (kind);
 	}
 
 	return kcb;
+}
+
+static void freeRoleControlBlock (struct roleControlBlock *rcb)
+{
+	unsigned int i;
+	for (i = 0; i < rcb->count; ++i)
+	{
+		if (rcb->role[i].free)
+			rcb->role [i].free (rcb->role [i].def);
+	}
+	eFree (rcb->role);
+	eFree (rcb);
 }
 
 extern void freeKindControlBlock (struct kindControlBlock* kcb)
@@ -122,6 +168,7 @@ extern void freeKindControlBlock (struct kindControlBlock* kcb)
 	{
 		if (kcb->kind [i].free)
 			kcb->kind [i].free (kcb->kind [i].def);
+		freeRoleControlBlock (kcb->kind [i].rcb);
 	}
 	eFree (kcb->kind);
 	eFree (kcb);
@@ -134,6 +181,7 @@ extern int  defineKind (struct kindControlBlock* kcb, kindDefinition *def,
 	kcb->kind = xRealloc (kcb->kind, kcb->count, kindObject);
 	kcb->kind [def->id].def = def;
 	kcb->kind [def->id].free = freeKindDef;
+	kcb->kind [def->id].rcb = allocRoleControlBlock(kcb->kind + def->id);
 
 	verbose ("Add kind[%d] \"%c,%s,%s\" to %s\n", def->id,
 			 def->letter, def->name, def->description,
@@ -142,14 +190,34 @@ extern int  defineKind (struct kindControlBlock* kcb, kindDefinition *def,
 	return def->id;
 }
 
-extern bool isKindEnabled (struct kindControlBlock* kcb, int kindIndex)
+extern int defineRole (struct kindControlBlock* kcb, int kindIndex,
+					   roleDefinition *def, freeRoleDefFunc freeRoleDef)
 {
-	return kcb->kind [kindIndex].def->enabled;
+	struct roleControlBlock *rcb = kcb->kind[kindIndex].rcb;
+	int roleIndex = rcb->count++;
+	roleObject *role;
+
+	if (roleIndex == ROLE_MAX_COUNT)
+	{
+		rcb->count--;
+		error (FATAL, "Too many role definition for kind \"%s\" of language \"%s\" (> %d)",
+			   kcb->kind[kindIndex].def->name,
+			   getLanguageName (kcb->owner),
+			   (int)(ROLE_MAX_COUNT - 1));
+	}
+
+	rcb->role = xRealloc (rcb->role, rcb->count, roleObject);
+	role = rcb->role + roleIndex;
+	role->def = def;
+	role->free = freeRoleDef;
+	role->def->id = roleIndex;
+	return roleIndex;
 }
 
 extern bool isRoleEnabled (struct kindControlBlock* kcb, int kindIndex, int roleIndex)
 {
-	return kcb->kind [kindIndex].def->roles[roleIndex].enabled;
+	roleDefinition *rdef = getRole (kcb, kindIndex, roleIndex);
+	return rdef->enabled;
 }
 
 extern unsigned int countKinds (struct kindControlBlock* kcb)
@@ -159,7 +227,7 @@ extern unsigned int countKinds (struct kindControlBlock* kcb)
 
 extern unsigned int countRoles (struct kindControlBlock* kcb, int kindIndex)
 {
-	return kcb->kind [kindIndex].def->nRoles;
+	return kcb->kind [kindIndex].rcb->count;
 }
 
 extern kindDefinition *getKind (struct kindControlBlock* kcb, int kindIndex)
@@ -192,6 +260,28 @@ extern kindDefinition *getKindForName (struct kindControlBlock* kcb, const char*
 		Assert(kdef);
 		if (kdef->name && (strcmp(kdef->name, name) == 0))
 			return kdef;
+	}
+	return NULL;
+}
+
+extern roleDefinition* getRole(struct kindControlBlock* kcb, int kindIndex, int roleIndex)
+{
+	struct roleControlBlock *rcb = kcb->kind[kindIndex].rcb;
+	return rcb->role [roleIndex].def;
+}
+
+extern roleDefinition* getRoleForName(struct kindControlBlock* kcb,
+									  int kindIndex, const char* name)
+{
+	unsigned int i;
+	roleDefinition *rdef;
+
+	for (i = 0; i < countRoles (kcb, kindIndex); ++i)
+	{
+		rdef = getRole(kcb, kindIndex, i);
+		Assert(rdef);
+		if (rdef->name && (strcmp(rdef->name, name) == 0))
+			return rdef;
 	}
 	return NULL;
 }
@@ -266,17 +356,19 @@ extern struct colprintTable * kindColprintTableNew (void)
 }
 
 static void kindColprintFillLine (struct colprintLine *line,
-								  const char *lang,
+								  const char *langName,
 								  kindDefinition *kdef)
 {
-	colprintLineAppendColumnCString (line, lang);
+	langType lang = getNamedLanguage (langName, 0);
+	unsigned int count = countLanguageRoles(lang, kdef->id);
+	colprintLineAppendColumnCString (line, langName);
 	colprintLineAppendColumnChar (line, kdef->letter);
 	colprintLineAppendColumnCString (line, kdef->name
 									 ? kdef->name
 									 : "ThisShouldNotBePrintedKindNameMustBeGiven");
 	colprintLineAppendColumnBool (line, kdef->enabled);
 	colprintLineAppendColumnBool (line, kdef->referenceOnly);
-	colprintLineAppendColumnInt (line, kdef->nRoles);
+	colprintLineAppendColumnInt (line, count);
 	colprintLineAppendColumnCString (line, (kdef->master
 											|| kdef->slave ) ?
 									 getLanguageName (kdef->syncWith): RSV_NONE);
@@ -369,9 +461,10 @@ extern void roleColprintAddRoles (struct colprintTable *table, struct kindContro
 				|| (!kname && *c == k->letter)
 				|| (!kname && *c == KIND_WILDCARD))
 			{
-				for (int j = 0; j < k->nRoles; j++)
+				unsigned int nRoles = countRoles(kcb, i);
+				for (int j = 0; j < nRoles; j++)
 				{
-					const roleDesc *r = k->roles + j;
+					const roleDefinition *r = getRole (kcb, i, j);
 					struct colprintLine *line = colprintTableGetNewLine(table);
 
 					colprintLineAppendColumnCString (line, lang);

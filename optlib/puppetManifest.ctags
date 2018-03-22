@@ -257,8 +257,8 @@
 # var
 #
 --_tabledef-puppetManifest=varexpr
---_mtable-regex-puppetManifest=var/(::[a-zA-Z0-9:]+)[ \t\n]*=/\1/v/{tenter=varexpr,end}
---_mtable-regex-puppetManifest=var/([a-zA-Z][a-zA-Z0-9:]*)[ \t\n]*=/\1/v/{tenter=varexpr,end}
+--_mtable-regex-puppetManifest=var/(::[a-zA-Z0-9_:]+)[ \t\n]*=/\1/v/{tenter=varexpr,end}
+--_mtable-regex-puppetManifest=var/([a-zA-Z_][a-zA-Z0-9_:]*)[ \t\n]*=/\1/v/{tenter=varexpr,end}
 
 --_mtable-extend-puppetManifest=varexpr+comment
 --_mtable-regex-puppetManifest=varexpr/'//{tenter=ssliteral,end}

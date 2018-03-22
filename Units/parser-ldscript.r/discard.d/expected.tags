@@ -1,13 +1,13 @@
-.eh_frame	input.lds	/^	.eh_frame	: { KEEP (*(.eh_frame)) }	:text$/;"	S
-.eh_frame	input.lds	/^	.eh_frame	: { KEEP (*(.eh_frame)) }	:text$/;"	i	section:.eh_frame	role:mapped
-.dynamic	input.lds	/^	.dynamic	: { *(.dynamic) }		:text	:dynamic$/;"	S
-.dynamic	input.lds	/^	.dynamic	: { *(.dynamic) }		:text	:dynamic$/;"	i	section:.dynamic	role:mapped
-.note.GNU-stack	input.lds	/^		*(.note.GNU-stack)$/;"	i	role:discarded
-.data	input.lds	/^		*(.data .data.* .gnu.linkonce.d.* .sdata*)$/;"	i	role:discarded
-.data.	input.lds	/^		*(.data .data.* .gnu.linkonce.d.* .sdata*)$/;"	i	role:discarded
-.gnu.linkonce.d.	input.lds	/^		*(.data .data.* .gnu.linkonce.d.* .sdata*)$/;"	i	role:discarded
-.sdata	input.lds	/^		*(.data .data.* .gnu.linkonce.d.* .sdata*)$/;"	i	role:discarded
-.bss	input.lds	/^		*(.bss .sbss .dynbss .dynsbss)$/;"	i	role:discarded
-.sbss	input.lds	/^		*(.bss .sbss .dynbss .dynsbss)$/;"	i	role:discarded
-.dynbss	input.lds	/^		*(.bss .sbss .dynbss .dynsbss)$/;"	i	role:discarded
-.dynsbss	input.lds	/^		*(.bss .sbss .dynbss .dynsbss)$/;"	i	role:discarded
+.eh_frame	input.lds	/^	.eh_frame	: { KEEP (*(.eh_frame)) }	:text$/;"	S	roles:def
+.eh_frame	input.lds	/^	.eh_frame	: { KEEP (*(.eh_frame)) }	:text$/;"	i	section:.eh_frame	roles:mapped
+.dynamic	input.lds	/^	.dynamic	: { *(.dynamic) }		:text	:dynamic$/;"	S	roles:def
+.dynamic	input.lds	/^	.dynamic	: { *(.dynamic) }		:text	:dynamic$/;"	i	section:.dynamic	roles:mapped
+.note.GNU-stack	input.lds	/^		*(.note.GNU-stack)$/;"	i	roles:discarded
+.data	input.lds	/^		*(.data .data.* .gnu.linkonce.d.* .sdata*)$/;"	i	roles:discarded
+.data.	input.lds	/^		*(.data .data.* .gnu.linkonce.d.* .sdata*)$/;"	i	roles:discarded
+.gnu.linkonce.d.	input.lds	/^		*(.data .data.* .gnu.linkonce.d.* .sdata*)$/;"	i	roles:discarded
+.sdata	input.lds	/^		*(.data .data.* .gnu.linkonce.d.* .sdata*)$/;"	i	roles:discarded
+.bss	input.lds	/^		*(.bss .sbss .dynbss .dynsbss)$/;"	i	roles:discarded
+.sbss	input.lds	/^		*(.bss .sbss .dynbss .dynsbss)$/;"	i	roles:discarded
+.dynbss	input.lds	/^		*(.bss .sbss .dynbss .dynsbss)$/;"	i	roles:discarded
+.dynsbss	input.lds	/^		*(.bss .sbss .dynbss .dynsbss)$/;"	i	roles:discarded

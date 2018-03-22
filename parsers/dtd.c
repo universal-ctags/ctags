@@ -34,7 +34,7 @@ typedef enum {
 	DTD_PARAMETER_ENTITY_PART_OF_ATT_DEF,
 } dtdEntityRole;
 
-static roleDesc DtdEntityRoles [] = {
+static roleDefinition DtdEntityRoles [] = {
 	{ true, "elementName", "element names" },
 	{ true, "condition",    "conditions" },
 	{ true, "partOfAttDef", "part of attribute definition" },
@@ -44,7 +44,7 @@ typedef enum {
 	DTD_ELEMENT_ATT_OWNER,
 } dtdElementRole;
 
-static roleDesc DtdElementRoles [] = {
+static roleDefinition DtdElementRoles [] = {
 	{ true, "attOwner", "attributes owner" },
 };
 

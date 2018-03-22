@@ -1,0 +1,62 @@
+
+# echo unknown lang
+ctags: Unknown language "NOSUCHLANG" in "_roledef-NOSUCHLANG" option
+ctags: Unknown language "NOSUCHLANG" in "_roledef-NOSUCHLANG" option
+
+# no option value
+ctags: no role definition specified in "--_roledef-IMAGINARY" option
+ctags: no role definition specified in "--_roledef-IMAGINARY" option
+
+# echo unknown kind
+ctags: Warning: the kind for letter `x' specified in "--_roledef-IMAGINARY" option is not defined.
+ctags: Warning: the kind for letter `x' specified in "--_roledef-IMAGINARY" option is not defined.
+ctags: Warning: the kind for letter `x' specified in "--_roledef-IMAGINARY" option is not defined.
+ctags: Warning: the kind for letter `x' specified in "--_roledef-IMAGINARY" option is not defined.
+ctags: Warning: the kind for letter `x' specified in "--_roledef-IMAGINARY" option is not defined.
+
+# wrong char in a kind letter
+ctags: the kind letter give in "--_roledef-IMAGINARY" option is not an alphabet or a number
+ctags: the kind letter give in "--_roledef-IMAGINARY" option is not an alphabet or a number
+ctags: the kind letter give in "--_roledef-IMAGINARY" option is not an alphabet or a number
+ctags: the kind letter give in "--_roledef-IMAGINARY" option is not an alphabet or a number
+
+# empty role name
+ctags: wrong role definition in "--_roledef-IMAGINARY" option: no period after kind letter `v'
+ctags: no role name specified in "--_roledef-IMAGINARY" option
+ctags: the role name in "--_roledef-IMAGINARY" option is empty
+
+# wrong char in role name
+ctags: unacceptable char as part of role name in "--_roledef-IMAGINARY" option
+
+# empty description
+ctags: no role description specified in "--_roledef-IMAGINARY" option
+ctags: found an empty role description in "--_roledef-IMAGINARY" option
+
+# role is acceptable but no input file
+ctags: No files specified. Try "ctags --help".
+
+# listing with --list-roles
+
+# listing with --list-kinds-full
+
+# inject a flag separator
+
+# inject a broken flag separator(1)
+ctags: Warning: long flags specifier opened with `{' is not closed `}': "{foo"
+
+# inject a broken flag separator(2)
+ctags: Warning: long flags specifier opened with `{' is not closed `}': "{"
+
+# use a { in description (1)
+
+# use a { in description (2)
+
+# use a \ in description
+
+# description started from {
+ctags: found an empty role description in "--_roledef-IMAGINARY" option
+
+# description started from \{
+
+# too many roles
+ctags: Too many role definition for kind "variable" of language "IMAGINARY" (> 63)

@@ -35,7 +35,6 @@
 #include "parse.h"
 #include "read.h"
 #include "routines.h"
-#include "ptrarray.h"
 #include "trashbox.h"
 
 static bool regexAvailable = false;
@@ -99,6 +98,7 @@ typedef struct {
 	union {
 		struct {
 			int kindIndex;
+			roleBitsType roleBits;
 			char *name_pattern;
 		} tag;
 		struct {
@@ -232,13 +232,13 @@ extern void freeLregexControlBlock (struct lregexControlBlock* lcb)
 */
 
 static bool initRegexTag (tagEntryInfo *e,
-		const vString* const name, int kindIndex, int scopeIndex, int placeholder,
+		const vString* const name, int kindIndex, int roleIndex, int scopeIndex, int placeholder,
 		unsigned long line, MIOPos *pos, int xtag_type)
 {
 	if (isInputLanguageKindEnabled (kindIndex))
 	{
 		Assert (name != NULL  &&  ((vStringLength (name) > 0) || placeholder));
-		initTagEntry (e, vStringValue (name), kindIndex);
+		initRefTagEntry (e, vStringValue (name), kindIndex, roleIndex);
 		e->extensionFields.scopeIndex = scopeIndex;
 		e->placeholder = !!placeholder;
 		if (line)
@@ -447,7 +447,7 @@ static regexPattern * refPattern (regexPattern * ptrn)
 static regexPattern * newPattern (regex_t* const pattern,
 								  enum regexParserType regptype)
 {
-	regexPattern*ptrn = xCalloc(1, regexPattern);
+	regexPattern *ptrn = xCalloc(1, regexPattern);
 
 	ptrn->pattern = pattern;
 	ptrn->exclusive = false;
@@ -459,6 +459,7 @@ static regexPattern * newPattern (regex_t* const pattern,
 	if (regptype == REG_PARSER_MULTI_TABLE)
 		initTaction(&ptrn->taction);
 
+	ptrn->u.tag.roleBits = 0;
 	ptrn->refcount = 1;
 	return ptrn;
 }
@@ -668,7 +669,7 @@ static void pre_ptrn_flag_field_long (const char* const s CTAGS_ATTR_UNUSED, con
 static flagDefinition fieldSpecFlagDef[] = {
 #define EXPERIMENTAL "_"
 	{ '\0',  EXPERIMENTAL "field", NULL, pre_ptrn_flag_field_long ,
-	  "FIELD:VALUE", "record the matched string(VALUE) to FIELD of the tag"},
+	  "FIELD:VALUE", "record the matched string(VALUE) to parser own FIELD of the tag"},
 };
 
 
@@ -753,6 +754,38 @@ static flagDefinition multitablePtrnFlagDef[] = {
 	  NULL, "stop the parsing with this parser"},
 };
 
+struct roleFlagData {
+	langType owner;
+	int kindIndex;
+	roleBitsType roleBits;
+};
+
+static void pre_ptrn_flag_role_long (const char* const s CTAGS_ATTR_UNUSED, const char* const v, void* data)
+{
+	struct roleFlagData *rdata = data;
+	roleDefinition * role;
+
+	if (!v)
+	{
+		error (WARNING, "no value is given for: %s", s);
+		return;
+	}
+
+	role = getLanguageRoleForName(rdata->owner,
+								  rdata->kindIndex, v);
+	if (!role)
+	{
+		error (WARNING, "no such role: %s", v);
+		return;
+	}
+
+	rdata->roleBits |= makeRoleBit(role->id);
+}
+
+static flagDefinition roleSpecFlagDef[] = {
+	{ '\0',  EXPERIMENTAL "role", NULL, pre_ptrn_flag_role_long,
+	  "ROLE", "Set given ROLE to roles field"},
+};
 
 static regexPattern *addCompiledTagPattern (struct lregexControlBlock *lcb,
 											int table_index,
@@ -775,6 +808,10 @@ static regexPattern *addCompiledTagPattern (struct lregexControlBlock *lcb,
 
 	struct mtableFlagData mtableFlagData = {
 		.lcb = lcb,
+	};
+
+	struct roleFlagData roleFlagData = {
+		.owner = lcb->owner,
 	};
 
 	if (regptype == REG_PARSER_SINGLE_LINE)
@@ -827,6 +864,13 @@ static regexPattern *addCompiledTagPattern (struct lregexControlBlock *lcb,
 
 		ptrn->u.tag.kindIndex = kdef->id;
 	}
+
+	roleFlagData.kindIndex = ptrn->u.tag.kindIndex;
+	roleFlagData.roleBits = 0;
+
+	flagsEval (flags, roleSpecFlagDef, ARRAY_SIZE(roleSpecFlagDef), &roleFlagData);
+	ptrn->u.tag.roleBits = roleFlagData.roleBits;
+
 	return ptrn;
 }
 
@@ -1067,6 +1111,7 @@ static void matchTagPattern (struct lregexControlBlock *lcb,
 		MIOPos pos;
 		tagEntryInfo e;
 		int kind;
+		roleBitsType roleBits;
 
 		if ((patbuf->regptype == REG_PARSER_MULTI_LINE)
 			|| (patbuf->regptype == REG_PARSER_MULTI_TABLE))
@@ -1077,8 +1122,9 @@ static void matchTagPattern (struct lregexControlBlock *lcb,
 
 		n = CORK_NIL;
 		kind = patbuf->u.tag.kindIndex;
+		roleBits = patbuf->u.tag.roleBits;
 
-		if (initRegexTag (&e, name, kind, scope, placeholder,
+		if (initRegexTag (&e, name, kind, ROLE_INDEX_DEFINITION, scope, placeholder,
 						  ln, ln == 0? NULL: &pos, patbuf->xtagType))
 		{
 			static TrashBox* field_trashbox;
@@ -1101,6 +1147,19 @@ static void matchTagPattern (struct lregexControlBlock *lcb,
 						trashBoxPut (field_trashbox, value,
 									 (TrashBoxDestroyItemProc)vStringDelete);
 					}
+				}
+			}
+
+			if (roleBits)
+			{
+				int roleIndex;
+
+				for (roleIndex = 0;
+					 roleIndex < countLanguageRoles(e.langType, kind);
+					 roleIndex++)
+				{
+					if (roleBits & makeRoleBit(roleIndex))
+						assignRole (&e, roleIndex);
 				}
 			}
 			n = makeTagEntry (&e);
@@ -1547,6 +1606,7 @@ extern void printRegexFlags (bool withListHeader, bool machinable, FILE *fp)
 	flagsColprintAddDefinitions (table, scopePtrnFlagDef, ARRAY_SIZE (scopePtrnFlagDef));
 	flagsColprintAddDefinitions (table, extraSpecFlagDef, ARRAY_SIZE (extraSpecFlagDef));
 	flagsColprintAddDefinitions (table, fieldSpecFlagDef, ARRAY_SIZE (fieldSpecFlagDef));
+	flagsColprintAddDefinitions (table, roleSpecFlagDef, ARRAY_SIZE (roleSpecFlagDef));
 
 	flagsColprintTablePrint (table, withListHeader, machinable, fp);
 	colprintTableDelete(table);
@@ -1562,6 +1622,7 @@ extern void printMultilineRegexFlags (bool withListHeader, bool machinable, FILE
 	flagsColprintAddDefinitions (table, multilinePtrnFlagDef, ARRAY_SIZE (multilinePtrnFlagDef));
 	flagsColprintAddDefinitions (table, extraSpecFlagDef, ARRAY_SIZE (extraSpecFlagDef));
 	flagsColprintAddDefinitions (table, fieldSpecFlagDef, ARRAY_SIZE (fieldSpecFlagDef));
+	flagsColprintAddDefinitions (table, roleSpecFlagDef, ARRAY_SIZE (roleSpecFlagDef));
 
 	flagsColprintTablePrint (table, withListHeader, machinable, fp);
 	colprintTableDelete(table);
@@ -1579,6 +1640,7 @@ extern void printMultitableRegexFlags (bool withListHeader, bool machinable, FIL
 	flagsColprintAddDefinitions (table, scopePtrnFlagDef, ARRAY_SIZE (scopePtrnFlagDef));
 	flagsColprintAddDefinitions (table, extraSpecFlagDef, ARRAY_SIZE (extraSpecFlagDef));
 	flagsColprintAddDefinitions (table, fieldSpecFlagDef, ARRAY_SIZE (fieldSpecFlagDef));
+	flagsColprintAddDefinitions (table, roleSpecFlagDef, ARRAY_SIZE (roleSpecFlagDef));
 
 	flagsColprintTablePrint (table, withListHeader, machinable, fp);
 	colprintTableDelete(table);

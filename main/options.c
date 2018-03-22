@@ -446,12 +446,16 @@ static optionDescription LongOptionDescription [] = {
  {0,"       Enter file I/O limited interactive mode if sandbox is specified. [default]"},
 #endif
 #endif
+ {1,"  --_list-kinddef-flags"},
+ {1,"       Output list of flags which can be used with --kinddef option."},
  {1,"  --_list-mtable-regex-flags"},
  {1,"       Output list of flags which can be used in a multitable regex parser definition."},
  {1,"  --_mtable-extend-<LANG>=disttable+srctable."},
  {1,"       Copy patterns of a regex table to another regex table."},
  {1,"  --_mtable-regex-<LANG>=table/line_pattern/name_pattern/[flags]"},
  {1,"       Define multitable regular expression for locating tags in specific language."},
+ {1,"  --_roledef-<LANG>=kind_letter.role_name,role_desc"},
+ {1,"       Define new role for kind specified with <kind_letter> in <LANG>."},
  {1,"  --_tabledef-<LANG>=name"},
  {1,"       Define new regex table for <LANG>."},
  {1,"  --_xformat=field_format"},
@@ -501,7 +505,7 @@ static struct Feature {
 	{"unix-path-separator", "can use '/' as file name separator"},
 #endif
 #ifdef HAVE_ICONV
-	{"multibyte", "TO BE WRITTEN"},
+	{"iconv", "can convert input/output encodings"},
 #endif
 #ifdef DEBUG
 	{"debug", "TO BE WRITTEN"},
@@ -2066,6 +2070,13 @@ static void processListLangdefFlagsOptions (
 	exit (0);
 }
 
+static void processListKinddefFlagsOptions (
+		const char *const option CTAGS_ATTR_UNUSED,
+		const char *const parameter CTAGS_ATTR_UNUSED)
+{
+	printKinddefFlags (localOption.withListHeader, localOption.machinable, stdout);
+	exit (0);
+}
 
 static void processListRolesOptions (const char *const option CTAGS_ATTR_UNUSED,
 				     const char *const parameter)
@@ -2609,6 +2620,7 @@ static parametricOption ParametricOptions [] = {
 #ifdef HAVE_JANSSON
 	{ "_interactive",           processInteractiveOption,       true,   STAGE_ANY },
 #endif
+	{ "_list-kinddef-flags",     processListKinddefFlagsOptions, true,   STAGE_ANY },
 	{ "_list-mtable-regex-flags", processListMultitableRegexFlagsOptions, true, STAGE_ANY },
 	{ "_xformat",               processXformatOption,           false,  STAGE_ANY },
 };
@@ -3051,6 +3063,8 @@ static void processLongOption (
 	else if (strcmp (option, "recurse") == 0)
 		error (WARNING, "%s option not supported on this host", option);
 #endif
+	else if (processRoledefOption (option, parameter))
+		;
 	else
 		error (FATAL, "Unknown option: --%s", option);
 }
