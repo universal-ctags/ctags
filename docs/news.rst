@@ -704,7 +704,7 @@ We can say now "kind" is a first class object in Universal-ctags.
 Defining an extra
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-A new ``--extradef-<LANG>=name,description`` option allows you to
+A new ``--_extradef-<LANG>=name,description`` option allows you to
 defining a parser own extra which turning on and off can be
 referred from a regex based parser for ``<LANG>``.
 
