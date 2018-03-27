@@ -1,0 +1,19 @@
+ctags: Notice: No options will be read from files or environment
+ctags: Warning: Forcefully advance the input pos because
+ctags: Warning: following conditions for entering infinite loop are satisfied:
+ctags: Warning: + matching the pattern succeeds,
+ctags: Warning: + the next table is not given, and
+ctags: Warning: + the input file pos doesn't advance.
+ctags: Warning: Language: FOO, input file: ./input.foo, pos: 0
+ctags: Warning: Forcefully advance the input pos because
+ctags: Warning: following conditions for entering infinite loop are satisfied:
+ctags: Warning: + matching the pattern succeeds,
+ctags: Warning: + the next table is not given, and
+ctags: Warning: + the input file pos doesn't advance.
+ctags: Warning: Language: FOO, input file: ./input2.foo, pos: 0
+ctags: Warning: Forcefully advance the input pos because
+ctags: Warning: following conditions for entering infinite loop are satisfied:
+ctags: Warning: + matching the pattern succeeds,
+ctags: Warning: + the next table is not given, and
+ctags: Warning: + the input file pos doesn't advance.
+ctags: Warning: Language: FOO, input file: ./input2.foo, pos: 1
