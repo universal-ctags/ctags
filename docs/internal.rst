@@ -238,8 +238,9 @@ in the promise. The sub input stream is made from the original input
 stream by narrowing as requested in the promise. The main part
 iterates the above process till there is no promise.
 
-Theoretically a guest parser can make more promises. It is just
-scheduled.  However, I have never tested such case.
+Theoretically a guest parser can be nested; it can make a promise.
+The level 2 guest is also just scheduled. (However, I have never
+tested such a nested guest parser).
 
 Why not running the guest parser directly from the context of the host
 parser? Remember many parsers have their own file static variables. If

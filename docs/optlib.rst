@@ -289,6 +289,8 @@ Conceptual example::
 Scope tracking in a regex parser
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+.. IN MAN PAGE
+
 With scope long flag, you can record/track scope context.
 A stack is used for tracking the scope context.
 
@@ -1012,7 +1014,7 @@ An example taken from *data/optlib/ctags.ctags* ::
 "GPL version 2 or later version" is needed here.  Option file is not
 linked to ctags command. However, I have a plan to write a translator
 which generates *.c* file from a given option file. As the result the
-*.c* file is built into *ctags* command. In such case "GPL version 2
+*.c* file is built into *ctags* command. In such a case "GPL version 2
 or later version" may be required.
 
 *Units* test cases
