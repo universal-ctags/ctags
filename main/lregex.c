@@ -1754,16 +1754,19 @@ static struct regexTable * matchMultitableRegexTable (struct lregexControlBlock 
 	const char *current;
 	regmatch_t pmatch [BACK_REFERENCE_COUNT];
 	const char *cstart = vStringValue(start);
+	unsigned int delta;
 
 
  restart:
 	current = cstart + *offset;
 
-#if 0
-	/* An empty regex // still matches empty input. */
-	if (*offset >= vStringLength(start))
+	/* Accept the case *offset == vStringLength(start)
+	   because we want an empty regex // still matches empty input. */
+	if (*offset > vStringLength(start))
+	{
+		*offset = vStringLength(start);
 		goto out;
-#endif
+	}
 
 	for (unsigned int i = 0; i < ptrArrayCount(table->patterns); i++)
 	{
@@ -1831,9 +1834,10 @@ static struct regexTable * matchMultitableRegexTable (struct lregexControlBlock 
 				}
 				END_VERBOSE();
 
-				*offset += (ptrn->mgroup.nextFromStart
-							? pmatch [ptrn->mgroup.forNextScanning].rm_so
-							: pmatch [ptrn->mgroup.forNextScanning].rm_eo);
+				delta = (ptrn->mgroup.nextFromStart
+						 ? pmatch [ptrn->mgroup.forNextScanning].rm_so
+						 : pmatch [ptrn->mgroup.forNextScanning].rm_eo);
+				*offset += delta;
 
 				switch (taction->action)
 				{
@@ -1911,6 +1915,18 @@ static struct regexTable * matchMultitableRegexTable (struct lregexControlBlock 
 
 				if (next)
 					break;
+
+				if (delta == 0)
+				{
+					error (WARNING, "Forcefully advance the input pos because");
+					error (WARNING, "following conditions for entering infinite loop are satisfied:");
+					error (WARNING, "+ matching the pattern succeeds,");
+					error (WARNING, "+ the next table is not given, and");
+					error (WARNING, "+ the input file pos doesn't advance.");
+					error (WARNING, "Language: %s, input file: %s, pos: %u",
+						   getLanguageName (lcb->owner), getInputFileName(), *offset);
+					++*offset;
+				}
 			}
 			else if (ptrn->type == PTRN_CALLBACK)
 				;	/* Not implemented yet */
@@ -1924,9 +1940,7 @@ static struct regexTable * matchMultitableRegexTable (struct lregexControlBlock 
 		else
 			ptrn->statistics.unmatch++;
 	}
-#if 0
  out:
-#endif
 	if (next == NULL && ptrArrayCount (lcb->tstack) > 0)
 	{
 		static int apop_count = 0;
