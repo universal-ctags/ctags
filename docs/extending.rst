@@ -12,11 +12,10 @@ the options. See :ref:`optlib <optlib>` to know how you can share your
 parser definition with other.
 
 Above new feature is very experimental, especially the directory layout
-for `optlib <optlib>` will be changed in the future.
+for :ref:`optlib <optlib>` will be changed in the future.
 
 .. toctree::
 	:maxdepth: 2
 
 	optlib.rst
 	internal.rst
-
