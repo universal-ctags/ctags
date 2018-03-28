@@ -46,6 +46,10 @@ static bool regexAvailable = false;
 /* Back-references \0 through \9 */
 #define BACK_REFERENCE_COUNT 10
 
+/* The max depth of taction=enter/leave stack */
+#define MTABLE_STACK_MAX_DEPTH 64
+
+
 /*
 *   DATA DECLARATIONS
 */
@@ -2029,6 +2033,24 @@ extern bool matchMultitableRegex (struct lregexControlBlock *lcb, const vString*
 		}
 		END_VERBOSE();
 		table = matchMultitableRegexTable(lcb, table, allLines, &offset);
+		if (table && (ptrArrayCount (lcb->tstack) > MTABLE_STACK_MAX_DEPTH))
+		{
+			unsigned int i;
+			struct regexTable *t;
+
+			error (WARNING, "mtable<%s/%s>: the tenter/tleave stack overflows at %u in %s",
+				   getLanguageName (lcb->owner),
+				   table->name, offset, getInputFileName ());
+			error (WARNING, "DUMP FROM THE TOP:");
+			/* TODO: ues dumpTstack */
+			for (i = ptrArrayCount(lcb->tstack); 0 < i; --i)
+			{
+				t = ptrArrayItem (lcb->tstack, i - 1);
+				error (WARNING, "%3u %s", i - 1, t->name);
+			}
+
+			break;
+		}
 	}
 
 	return true;
