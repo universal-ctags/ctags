@@ -49,6 +49,14 @@ static bool regexAvailable = false;
 /* The max depth of taction=enter/leave stack */
 #define MTABLE_STACK_MAX_DEPTH 64
 
+/* How many times ctags allows a mtable parser
+   stays at the same input position across table switching.
+
+   The value is derived from MTABLE_STACK_MAX_DEPTH.
+   No deep meaning is in that. It just for simplifying
+   Tmain cases. */
+#define MTABLE_MOTIONLESS_MAX (MTABLE_STACK_MAX_DEPTH + 1)
+
 
 /*
 *   DATA DECLARATIONS
@@ -2017,6 +2025,10 @@ extern bool matchMultitableRegex (struct lregexControlBlock *lcb, const vString*
 	struct regexTable *table = ptrArrayItem (lcb->tables, 0);
 	unsigned int offset = 0;
 
+	int motionless_counter = 0;
+	unsigned int last_offset;
+
+
 	while (table)
 	{
 
@@ -2032,7 +2044,23 @@ extern bool matchMultitableRegex (struct lregexControlBlock *lcb, const vString*
 			vStringDelete(v);
 		}
 		END_VERBOSE();
+
+		last_offset = offset;
 		table = matchMultitableRegexTable(lcb, table, allLines, &offset);
+
+		if (last_offset == offset)
+			motionless_counter++;
+		else
+			motionless_counter = 0;
+
+		if (motionless_counter > MTABLE_MOTIONLESS_MAX)
+		{
+			error (WARNING, "mtable<%s/%s>: the input cursor stays at %u in %s so long though the tables are switched",
+				   getLanguageName (lcb->owner),
+				   table->name, offset, getInputFileName ());
+			break;
+		}
+
 		if (table && (ptrArrayCount (lcb->tstack) > MTABLE_STACK_MAX_DEPTH))
 		{
 			unsigned int i;
