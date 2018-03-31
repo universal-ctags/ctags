@@ -1,0 +1,1 @@
+--mline-regex-FOO=/(.)/\1/{_advanceTo=1start}

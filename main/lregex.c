@@ -1251,42 +1251,57 @@ static bool matchMultilineRegexPattern (struct lregexControlBlock *lcb,
 	bool result = false;
 	regmatch_t pmatch [BACK_REFERENCE_COUNT];
 	int match = 0;
+	unsigned int delta = 1;
 
 	if (patbuf->disabled && *(patbuf->disabled))
 		return false;
 
-	start = vStringValue (allLines);
-	for (current = start;
-	     match == 0 && current < start + vStringLength (allLines);
-	     current += (patbuf->mgroup.nextFromStart
-					 ? pmatch [patbuf->mgroup.forNextScanning].rm_so
-					 : pmatch [patbuf->mgroup.forNextScanning].rm_eo))
+	current = start = vStringValue (allLines);
+	do
 	{
 		match = regexec (patbuf->pattern, current,
-				 BACK_REFERENCE_COUNT, pmatch, 0);
-		if (match == 0)
+						 BACK_REFERENCE_COUNT, pmatch, 0);
+		if (match != 0)
 		{
-			patbuf->statistics.match++;
-			if (patbuf->type == PTRN_TAG)
-			{
-				matchTagPattern (lcb, current, patbuf, pmatch,
-								 (current
-								  + pmatch [patbuf->mgroup.forLineNumberDetermination].rm_so)
-								 - start);
-				result = true;
-			}
-			else if (patbuf->type == PTRN_CALLBACK)
-				;	/* Not implemented yet */
-			else
-			{
-				Assert ("invalid pattern type" == NULL);
-				result = false;
-				break;
-			}
-		}
-		else
 			patbuf->statistics.unmatch++;
-	}
+			break;
+		}
+
+		patbuf->statistics.match++;
+		if (patbuf->type == PTRN_TAG)
+		{
+			matchTagPattern (lcb, current, patbuf, pmatch,
+							 (current
+							  + pmatch [patbuf->mgroup.forLineNumberDetermination].rm_so)
+							 - start);
+			result = true;
+		}
+		else if (patbuf->type == PTRN_CALLBACK)
+			;	/* Not implemented yet */
+		else
+		{
+			Assert ("invalid pattern type" == NULL);
+			result = false;
+			break;
+		}
+
+		delta = (patbuf->mgroup.nextFromStart
+				 ? pmatch [patbuf->mgroup.forNextScanning].rm_so
+				 : pmatch [patbuf->mgroup.forNextScanning].rm_eo);
+		if (delta == 0)
+		{
+			unsigned int offset = current - start;
+			error (WARNING,
+				   "a multi line regex pattern doesn't advance the input cursor: %s",
+				   patbuf->pattern_string);
+			error (WARNING, "Language: %s, input file: %s, pos: %u",
+				   getLanguageName (lcb->owner), getInputFileName(), offset);
+			break;
+		}
+		current += delta;
+
+	} while (current < start + vStringLength (allLines));
+
 	return result;
 }
 
