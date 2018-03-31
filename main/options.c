@@ -276,6 +276,8 @@ static optionDescription LongOptionDescription [] = {
  {1,"       o vim syntax specification at the end of input file."},
  {1,"  --help"},
  {1,"       Print this option summary."},
+ {1,"  --help-full"},
+ {1,"       Print this option summary including experimental features."},
  {1,"  --if0=[yes|no]"},
  {1,"       Should code within #if 0 conditional branches be parsed [no]?"},
 #ifdef HAVE_ICONV
@@ -419,6 +421,10 @@ static optionDescription LongOptionDescription [] = {
  {1,"       --list-{aliases,extras,features,fields,kind-full,langdef-flags,params," },
  {1,"       pseudo-tags,regex-flags,roles,subparsers} support this option."},
  {1,"       Specify before --list-* option."},
+ {1, NULL}
+};
+
+static optionDescription ExperimentalLongOptionDescription [] = {
  {1,"  --_anonhash=fname"},
  {1,"       Used in u-ctags test harness"},
  {1,"  --_dump-keywords"},
@@ -1487,15 +1493,33 @@ static void printProgramIdentification (void)
 	printFeatureList ();
 }
 
-static void processHelpOption (
+static void processHelpOptionCommon (
 		const char *const option CTAGS_ATTR_UNUSED,
-		const char *const parameter CTAGS_ATTR_UNUSED)
+		const char *const parameter CTAGS_ATTR_UNUSED,
+		bool includingExperimentalOptions)
 {
 	printProgramIdentification ();
 	putchar ('\n');
 	printInvocationDescription ();
 	putchar ('\n');
 	printOptionDescriptions (LongOptionDescription);
+	if (includingExperimentalOptions)
+		printOptionDescriptions (ExperimentalLongOptionDescription);
+}
+
+static void processHelpOption (
+		const char *const option,
+		const char *const parameter)
+{
+	processHelpOptionCommon (option, parameter, false);
+	exit (0);
+}
+
+static void processHelpFullOption (
+		const char *const option,
+		const char *const parameter)
+{
+	processHelpOptionCommon (option, parameter, true);
 	exit (0);
 }
 
@@ -2579,6 +2603,7 @@ static parametricOption ParametricOptions [] = {
 	{ "filter-terminator",      processFilterTerminatorOption,  true,   STAGE_ANY },
 	{ "format",                 processFormatOption,            true,   STAGE_ANY },
 	{ "help",                   processHelpOption,              true,   STAGE_ANY },
+	{ "help-full",              processHelpFullOption,          true,   STAGE_ANY },
 	{ "if0",                    processIf0Option,               false,  STAGE_ANY },
 #ifdef HAVE_ICONV
 	{ "input-encoding",         processInputEncodingOption,     false,  STAGE_ANY },
