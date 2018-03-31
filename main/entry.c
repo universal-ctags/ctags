@@ -1193,6 +1193,10 @@ static bool isTagWritable(const tagEntryInfo *const tag)
 		/* This one is not so critical. */
 	}
 
+	if (!isXtagEnabled(XTAG_ANONYMOUS)
+		&& isTagExtraBitMarked(tag, XTAG_ANONYMOUS))
+		return false;
+
 	return true;
 }
 
