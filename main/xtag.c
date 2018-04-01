@@ -204,19 +204,22 @@ static int xtagColprintCompareLines (struct colprintLine *a , struct colprintLin
 		r = strcmp (a_parser, b_parser);
 		if (r != 0)
 			return r;
-
-		const char *a_name = colprintLineGetColumn (a, 1);
-		const char *b_name = colprintLineGetColumn (b, 1);
-
-		return strcmp(a_name, b_name);
 	}
 	else
 	{
+		int r;
+
 		const char *a_letter = colprintLineGetColumn (a, 0);
 		const char *b_letter = colprintLineGetColumn (b, 0);
-
-		return strcmp(a_letter, b_letter);
+		r = strcmp(a_letter, b_letter);
+		if (r != 0)
+			return r;
 	}
+
+	const char *a_name = colprintLineGetColumn (a, 1);
+	const char *b_name = colprintLineGetColumn (b, 1);
+
+	return strcmp(a_name, b_name);
 }
 
 extern void xtagColprintTablePrint (struct colprintTable *table,
