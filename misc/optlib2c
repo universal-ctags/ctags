@@ -43,12 +43,16 @@ my $options =
      [ qr/^--options=(.*)/, sub {
 	   parse_optlib ($1, $_[0]);
        } ],
-     [ qr/^--langdef=([^\{]+)(((\{base=([^\{]+)\})(\{(dedicated|shared|bidirectional)\})?)?)/, sub {
+     #
+     # TODO: We should not assumed the order of flags.
+     #
+     [ qr/^--langdef=([^\{]+)(((\{base=([^\{]+)\})(\{(dedicated|shared|bidirectional)\})?)?)(\{_autoFQTag\})?/, sub {
 	   die "LANG is already defined as $_[0]->{'langdef'}: $1"
 	       if (defined $_[0]->{'langdef'});
 	   $_[0]->{'langdef'} = $1;
 	   $_[0]->{'base'} = $5 if defined $5;
 	   $_[0]->{'direction'} = $7 if defined $7;
+	   $_[0]->{'autoFQTag'} = (defined $8)? 1: 0;
        } ],
      [ qr/^--kinddef-(.*)=([^,]),([^,]+),([^\{]+)(\{_refonly\})?/, sub {
 	 die "Don't use --kinddef-<LANG>=+ option before defining the language"
@@ -729,6 +733,11 @@ EOF
 EOF
     }
 
+    if ($opts->{'autoFQTag'}) {
+	print <<EOF;
+	def->requestAutomaticFQTag = true;
+EOF
+    }
     print <<EOF;
 	def->initialize    = initialize$opts->{'Clangdef'}Parser;
 
