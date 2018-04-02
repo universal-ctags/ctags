@@ -5,7 +5,18 @@ set -xe
 type autoreconf || exit 1
 type pkg-config || exit 1
 
-ctags_files=`make -s -f makefiles/list-translator-input.mak`
+if [ -z "${MAKE}" ]; then
+	if type make > /dev/null; then
+		MAKE=make
+	elif type bmake > /dev/null; then
+		MAKE=bmake
+	else
+		echo "make command is not found" 1>&1
+		exit 1
+	fi
+fi
+
+ctags_files=`${MAKE} -s -f makefiles/list-translator-input.mak`
 misc/dist-test-cases > makefiles/test-cases.mak && \
     if autoreconf -vfi; then
 	if type perl > /dev/null; then
