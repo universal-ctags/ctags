@@ -1806,6 +1806,7 @@ struct preLangDefFlagData
 {
 	char *base;
 	subparserRunDirection direction;
+	bool autoFQTag;
 };
 
 static void pre_lang_def_flag_base_long (const char* const optflag, const char* const param, void* data)
@@ -1848,6 +1849,14 @@ static void pre_lang_def_flag_direction_long (const char* const optflag, const c
 		AssertNotReached ();
 }
 
+static void pre_lang_def_flag_autoFQTag_long (const char* const optflag,
+											  const char* const param CTAGS_ATTR_UNUSED,
+											  void* data)
+{
+	struct preLangDefFlagData * flag_data = data;
+	flag_data->autoFQTag = true;
+}
+
 static flagDefinition PreLangDefFlagDef [] = {
 	{ '\0',  "base", NULL, pre_lang_def_flag_base_long,
 	  "BASEPARSER", "utilize as a base parser"},
@@ -1862,6 +1871,8 @@ static flagDefinition PreLangDefFlagDef [] = {
 	  pre_lang_def_flag_direction_long,
 	  NULL, "utilize the base parser both 'dedicated' and 'shared' way"
 	},
+	{ '\0',  "_autoFQTag", NULL, pre_lang_def_flag_autoFQTag_long,
+	  NULL, "make full qualified tags automatically based on scope information"},
 };
 
 static void optlibFreeDep (langType lang, bool initialized CTAGS_ATTR_UNUSED)
@@ -1931,6 +1942,7 @@ extern void processLanguageDefineOption (
 		struct preLangDefFlagData data = {
 			.base = NULL,
 			.direction = SUBPARSER_UNKNOWN_DIRECTION,
+			.autoFQTag = false,
 		};
 		flagsEval (flags, PreLangDefFlagDef, ARRAY_SIZE (PreLangDefFlagDef), &data);
 
@@ -1943,6 +1955,8 @@ extern void processLanguageDefineOption (
 		def = OptlibParser (name, data.base, data.direction);
 		if (data.base)
 			eFree (data.base);
+
+		def->requestAutomaticFQTag = data.autoFQTag;
 
 		initializeParsingCommon (def, false);
 		linkDependenciesAtInitializeParsing (def);
