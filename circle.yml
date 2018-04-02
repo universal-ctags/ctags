@@ -18,9 +18,9 @@ jobs:
            name: Build
            command: |
              bash ./autogen.sh
-             ./configure --enable-debugging
+             MAKE=bmake ./configure --enable-debugging
              bmake -j 2
        - run:
            name: Test
            command: |
-             bmake check roundtrip CIRCLECI=1
+             MAKE=bmake bmake check roundtrip CIRCLECI=1
