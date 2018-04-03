@@ -1,0 +1,2 @@
+bin	input.passwd	/^bin:x:1:1:bin:\/bin:\/sbin\/nologin$/;"	u	home:/bin	shell:/sbin/nologin
+root	input.passwd	/^root:x:0:0:root:\/root:\/bin\/bash$/;"	u	home:/root	shell:/bin/bash
