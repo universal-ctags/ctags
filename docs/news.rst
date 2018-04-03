@@ -59,6 +59,7 @@ The following parsers have been added:
 * JSON
 * GNU linker script(LdScript)
 * Man page *optlib*
+* Markdown *optlib*
 * Maven2 *libxml*
 * M4
 * ObjectiveC

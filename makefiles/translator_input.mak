@@ -5,6 +5,7 @@ TRANSLATOR_INPUT = \
 	optlib/elm.ctags		\
 	optlib/gdbinit.ctags			\
 	optlib/man.ctags			\
+	optlib/markdown.ctags			\
 	optlib/passwd.ctags			\
 	optlib/pod.ctags			\
 	optlib/qemuhx.ctags			\
