@@ -1,0 +1,9 @@
+--langdef=FOO
+--map-FOO=+.foo
+--_tabledef-FOO=A
+--_tabledef-FOO=B
+
+--_mtable-regex-FOO=A/x//{tjump=B}{_advanceTo=0start}
+--_mtable-regex-FOO=B/x//{tjump=A}{_advanceTo=0start}
+
+--_mtable-regex-FOO=A/y//{tjump=A}{_advanceTo=0start}

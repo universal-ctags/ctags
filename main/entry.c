@@ -856,13 +856,18 @@ static int   makePatternStringCommon (const tagEntryInfo *const tag,
 
 	line = readLineFromBypass (TagFile.vLine, tag->filePosition, NULL);
 	if (line == NULL)
-		error (FATAL, "could not read tag line from %s at line %lu", getInputFileName (),tag->lineNumber);
+	{
+		/* This can be occurs if the size of input file is zero, and
+		   an empty regex pattern (//) matches to the input. */
+		line = "";
+	}
+
 	if (tag->truncateLineAfterTag)
 		truncateTagLineAfterTag (line, tag->name, false);
 
 	line_len = strlen (line);
 	searchChar = Option.backward ? '?' : '/';
-	terminator = (bool) (line [line_len - 1] == '\n') ? "$": "";
+	terminator = (line_len > 0 && (line [line_len - 1] == '\n')) ? "$": "";
 
 	if (!tag->truncateLineAfterTag)
 	{

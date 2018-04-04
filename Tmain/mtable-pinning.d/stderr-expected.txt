@@ -1,0 +1,3 @@
+ctags: Notice: No options will be read from files or environment
+ctags: Warning: mtable<FOO/A>: the input cursor stays at 0 in ./input0.foo so long though the tables are switched
+ctags: Warning: mtable<FOO/A>: the input cursor stays at 0 in ./input1.foo so long though the tables are switched

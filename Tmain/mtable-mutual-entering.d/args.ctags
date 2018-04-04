@@ -1,0 +1,24 @@
+--langdef=FOO
+--map-FOO=+.foo
+--_tabledef-FOO=A
+--_tabledef-FOO=B
+
+--_mtable-regex-FOO=A/define (.)/\1/
+
+--_mtable-regex-FOO=A/([a-z]*)///{tenter=B}
+--_mtable-regex-FOO=B/([a-z]*)///{tenter=A}
+
+
+--langdef=BAR
+--map-BAR=+.bar
+--_tabledef-BAR=C
+--_tabledef-BAR=D
+--_mtable-regex-BAR=C/([a-z]*)///{tenter=D}
+--_mtable-regex-BAR=D/([a-z]*)///{tenter=C}
+
+--langdef=BAZ
+--map-BAZ=+.baz
+--_tabledef-BAZ=E
+--_tabledef-BAZ=F
+--_mtable-regex-BAZ=E/([0-9])///{tenter=F}
+--_mtable-regex-BAZ=F/([0-9])///{tenter=E}

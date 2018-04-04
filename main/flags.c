@@ -37,7 +37,7 @@ void flagsEval (const char* flags_original, flagDefinition* defs, unsigned int n
 			const char* aflag = flags + i + 1;
 			char* needle_close_paren = strchr(aflag, LONG_FLAGS_CLOSE);
 			const char* param;
-			char* needle_eqaul;
+			char* needle_equal;
 
 			if (needle_close_paren == NULL)
 			{
@@ -47,24 +47,24 @@ void flagsEval (const char* flags_original, flagDefinition* defs, unsigned int n
 			}
 
 			*needle_close_paren = '\0';
-			needle_eqaul = strchr(aflag, '=');
-			if ((needle_eqaul == NULL || (needle_eqaul >= needle_close_paren)))
+			needle_equal = strchr(aflag, '=');
+			if ((needle_equal == NULL || (needle_equal >= needle_close_paren)))
 			{
-				needle_eqaul = NULL;
+				needle_equal = NULL;
 				param = NULL;
 			}
 			else
 			{
-				param = needle_eqaul + 1;
-				*needle_eqaul = '\0';
+				param = needle_equal + 1;
+				*needle_equal = '\0';
 			}
 
 			for ( j = 0 ; j < ndefs ; ++j )
 				if (defs[j].longStr && (strcmp(aflag, defs[j].longStr) == 0))
 					defs[j].longProc(aflag, param, data);
 
-			if (needle_eqaul)
-				*needle_eqaul = '=';
+			if (needle_equal)
+				*needle_equal = '=';
 			*needle_close_paren = LONG_FLAGS_CLOSE;
 
 			i = needle_close_paren - flags;
