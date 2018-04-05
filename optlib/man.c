@@ -53,7 +53,7 @@ extern parserDefinition* ManParser (void)
 	};
 
 
-	parserDefinition* const def = parserNew ("man");
+	parserDefinition* const def = parserNew ("Man");
 
 	def->enabled       = true;
 	def->extensions    = extensions;
