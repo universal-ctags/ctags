@@ -95,14 +95,14 @@ Overview for defining a parser
    concepts (definition, reference, kind, role, field, extra). About
    the concepts, ctags(1) of Universal-ctags may help you.
 
-2. Give a file pattern or file extension for activating the parser
-
-   Use ``--map-<LANG>=[+|-]extension|pattern``.
-
-3. Give a name to the parser
+2. Give a name to the parser
 
    Use ``--langdef=name`` option. *NAME* is referred as *<LANG>* in
    the later steps.
+
+3. Give a file pattern or file extension for activating the parser
+
+   Use ``--map-<LANG>=[+|-]extension|pattern``.
 
 4. Define kinds
 
