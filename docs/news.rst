@@ -73,7 +73,7 @@ The following parsers have been added:
 * QtMoc
 * R
 * RelaxNG *libxml*
-* reStructuredText
+* ReStructuredText
 * Robot
 * RpmSpec
 * Rust

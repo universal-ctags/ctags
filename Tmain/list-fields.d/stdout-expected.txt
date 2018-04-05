@@ -32,7 +32,7 @@ z	kind	no	NONE	s--	no	Include the "kind:" key in kind field (use k or K) in tags
 -	home	yes	Passwd	s--	no	home directory
 -	shell	yes	Passwd	s--	no	login shell
 -	decorators	no	Python	s--	no	decorators on functions and classes
--	sectionMarker	no	reStructuredText	s--	no	character used for declaring section
+-	sectionMarker	no	ReStructuredText	s--	no	character used for declaring section
 #
 Foo	input.java	/^abstract public class Foo extends Bar$/
 x	input.java	/^    public int x;$/
