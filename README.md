@@ -25,6 +25,10 @@ Go to the [releases](https://github.com/universal-ctags/ctags-win32/releases) pa
 ### Mac
 See [Homebrew Tap for Universal Ctags](https://github.com/universal-ctags/homebrew-universal-ctags)
 
+### GNU/Linux Distributions
+
+- Debian (since buster): `sudo apt install universal-ctags` 
+
 ## How to build and install ##
 
 To build with Autotools, see `docs/autotools.rst` for more information.
