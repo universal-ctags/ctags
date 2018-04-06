@@ -68,6 +68,9 @@ ${CTAGS} --kinddef-MYTEST= --list-kinds-full=MYTEST
 title '# wrong letter'
 ${CTAGS} --kinddef-MYTEST=^ --list-kinds-full=MYTEST
 
+title '# wrong letter (using number)'
+${CTAGS} --kinddef-MYTEST=7 --list-kinds-full=MYTEST
+
 title '# reusing the letter for file kind'
 ${CTAGS} --kinddef-MYTEST=F --list-kinds-full=MYTEST
 

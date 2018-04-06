@@ -91,6 +91,13 @@ Disallowing to define a kind with "file" as name
 The kind name "file" is reserved.  Using it as part of kind spec in
 ``--regex-<LANG>`` option is now disallowed.
 
+Disallowing to use other than alphabetical character as kind letter
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Exuberant-ctags accepts a character other than alphabetical character
+as kind letter in ``--regex-<LANG>=...`` option.  Universal-ctags
+accepts only an alphabetical character.
+
 Incompatibilities in tags file format
 -------------------------------------------------------------
 

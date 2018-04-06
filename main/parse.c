@@ -2402,11 +2402,12 @@ static bool processLangDefineKind(const langType language,
 	if (p[0] == '\0')
 		error (FATAL, "no kind definition specified in \"--%s\" option", option);
 
-	letter = p[0];
+	/* See #1697. isalnum expects 0~255 as the range of characters. */
+	letter = (unsigned char)p[0];
 	if (letter == ',')
 		error (FATAL, "no kind letter specified in \"--%s\" option", option);
-	if (!isalnum (letter))
-		error (FATAL, "the kind letter given in \"--%s\" option is not an alphabet or a number", option);
+	if (!isalpha (letter))
+		error (FATAL, "the kind letter given in \"--%s\" option is not an alphabet", option);
 	else if (letter == KIND_FILE_DEFAULT_LETTER)
 		error (FATAL, "the kind letter `F' in \"--%s\" option is reserved for \"file\" kind", option);
 	else if (getKindForLetter (parser->kindControlBlock, letter))

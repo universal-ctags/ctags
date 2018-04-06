@@ -35,6 +35,8 @@ a       aa   yes     no      0      NONE   aaa
 
 # wrong letter
 
+# wrong letter (using number)
+
 # reusing the letter for file kind
 
 # reusing the name for file kind

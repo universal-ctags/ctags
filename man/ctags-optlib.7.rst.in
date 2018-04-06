@@ -169,7 +169,7 @@ OPTION ITEMS
 	Define a kind for *<LANG>*.
 	Be not confused this with ``--kinds-<LANG>``.
 
-	*letter* must be an alphabetical character ('[0-9a-zA-EG-Z]')
+	*letter* must be an alphabetical character ('[a-zA-EG-Z]')
 	other than "F". "F" has been reserved for representing a file
 	since Exuberant-ctags.
 

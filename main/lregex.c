@@ -1934,6 +1934,10 @@ static regexPattern *addTagRegexInternal (struct lregexControlBlock *lcb,
 				   kindName,
 				   regex,
 				   getLanguageName (lcb->owner));
+		else if (!isalpha ((unsigned char)kindLetter))
+			error (FATAL,
+				   "Kind letter must be an alphabetical character: \"%c\"",
+				   kindLetter);
 
 		rptr = addCompiledTagPattern (lcb, table_index,
 									  regptype, cp, name,
