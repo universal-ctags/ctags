@@ -2146,13 +2146,13 @@ static flagDefinition PreKindDefFlagDef [] = {
 
 static bool processLangDefineKind(const langType language,
 								  const char *const option,
-								  const char *const parameterx)
+								  const char *const parameter)
 {
 	parserObject *parser;
 
 	kindDefinition *kdef;
 	int letter;
-	const char * p = parameterx;
+	const char * p = parameter;
 	char *name;
 	char *description;
 	const char *tmp_start;
@@ -2246,14 +2246,14 @@ static void freeRdef (roleDefinition *rdef)
 
 static bool processLangDefineRole(const langType language,
 								  const char *const option,
-								  const char *const parameterx)
+								  const char *const parameter)
 {
 	parserObject *parser;
 
 	kindDefinition *kdef;
 	roleDefinition *rdef;
 	int kletter;
-	const char * p = parameterx;
+	const char * p = parameter;
 	char *name;
 	char *description;
 	const char *tmp_start;
@@ -2855,10 +2855,10 @@ static void xtagDefinitionDestroy (xtagDefinition *xdef)
 
 static bool processLangDefineExtra (const langType language,
 									const char *const option,
-									const char *const parameterx)
+									const char *const parameter)
 {
 	xtagDefinition *xdef;
-	const char * p = parameterx;
+	const char * p = parameter;
 	const char *name_end;
 	const char *desc;
 	const char *flags;
@@ -2891,7 +2891,7 @@ static bool processLangDefineExtra (const langType language,
 	xdef = xCalloc (1, xtagDefinition);
 	xdef->enabled = false;
 	xdef->letter = NUL_XTAG_LETTER;
-	xdef->name = eStrndup (parameterx, name_end - parameterx);
+	xdef->name = eStrndup (parameter, name_end - parameter);
 	xdef->description = desc;
 	xdef->isEnabled = NULL;
 	DEFAULT_TRASH_BOX(xdef, xtagDefinitionDestroy);
