@@ -26,11 +26,6 @@
 #include "vstring.h"
 
 /*
- *	 MACROS
- */
-#define isIdentChar(c) (isalnum (c) || (c) == '_')
-
-/*
 *   DATA DECLARATIONS
 */
 typedef enum {
@@ -117,6 +112,11 @@ static bool canMatch (const unsigned char** s, const char* literal,
 	return true;
 }
 
+static bool isIdentChar (int c)
+{
+	return (isalnum (c) || c == '_');
+}
+
 static bool notIdentChar (int c)
 {
 	return ! isIdentChar (c);
@@ -137,9 +137,72 @@ static bool isWhitespace (int c)
 	return c == 0 || isspace (c);
 }
 
+/*
+ * Advance 's' while the passed predicate is true. Returns true if
+ * advanced by at least one position.
+ */
+static bool advanceBy (const unsigned char** s, bool (*predicate) (int))
+{
+	const int s_length = strlen ((const char *)*s);
+	unsigned char this_char;
+	int i = 0;
+
+	for (i = 0; i < s_length; ++i)
+	{
+		this_char = **s;
+
+		if (! predicate (this_char))
+		{
+			return i > 0;
+		}
+
+		(*s)++;
+	}
+
+	return i > 0;
+}
+
 static bool canMatchKeyword (const unsigned char** s, const char* literal)
 {
 	return canMatch (s, literal, notIdentChar);
+}
+
+/*
+ * Extends canMatch. Works similarly, but allows assignment to precede
+ * the keyword, as block assignment is a common Ruby idiom.
+ */
+static bool canMatchKeywordWithAssign (const unsigned char** s, const char* literal)
+{
+	const unsigned char* original_pos = *s;
+
+	if (canMatchKeyword (s, literal))
+	{
+		return true;
+	}
+
+	if (! advanceBy (s, isIdentChar))
+	{
+		*s = original_pos;
+		return false;
+	}
+
+	advanceBy (s, isWhitespace);
+
+	if (**s != '=') {
+		*s = original_pos;
+		return false;
+	}
+
+	(*s)++;
+	advanceBy (s, isWhitespace);
+
+	if (canMatchKeyword (s, literal))
+	{
+		return true;
+	}
+
+	*s = original_pos;
+	return false;
 }
 
 /*
@@ -428,29 +491,22 @@ static void findRubyTags (void)
 		*
 		*   return if <exp>
 		*
-		* FIXME: this is fooled by code such as
-		*
-		*   result = if <exp>
-		*               <a>
-		*            else
-		*               <b>
-		*            end
-		*
-		* FIXME: we're also fooled if someone does something heinous such as
+		* FIXME: we're fooled if someone does something heinous such as
 		*
 		*   puts("hello") \
 		*       unless <exp>
 		*/
-		if (canMatchKeyword (&cp, "for") ||
-		    canMatchKeyword (&cp, "until") ||
-		    canMatchKeyword (&cp, "while"))
+
+		if (canMatchKeywordWithAssign (&cp, "for") ||
+		    canMatchKeywordWithAssign (&cp, "until") ||
+		    canMatchKeywordWithAssign (&cp, "while"))
 		{
 			expect_separator = true;
 			enterUnnamedScope ();
 		}
-		else if (canMatchKeyword (&cp, "case") ||
-		         canMatchKeyword (&cp, "if") ||
-		         canMatchKeyword (&cp, "unless"))
+		else if (canMatchKeywordWithAssign (&cp, "case") ||
+		         canMatchKeywordWithAssign (&cp, "if") ||
+		         canMatchKeywordWithAssign (&cp, "unless"))
 		{
 			enterUnnamedScope ();
 		}
@@ -459,15 +515,15 @@ static void findRubyTags (void)
 		* "module M", "class C" and "def m" should only be at the beginning
 		* of a line.
 		*/
-		if (canMatchKeyword (&cp, "module"))
+		if (canMatchKeywordWithAssign (&cp, "module"))
 		{
 			readAndEmitTag (&cp, K_MODULE);
 		}
-		else if (canMatchKeyword (&cp, "class"))
+		else if (canMatchKeywordWithAssign (&cp, "class"))
 		{
 			readAndEmitTag (&cp, K_CLASS);
 		}
-		else if (canMatchKeyword (&cp, "def"))
+		else if (canMatchKeywordWithAssign (&cp, "def"))
 		{
 			rubyKind kind = K_METHOD;
 			NestingLevel *nl = nestingLevelsGetCurrent (nesting);
@@ -508,11 +564,11 @@ static void findRubyTags (void)
 				*/
 				break;
 			}
-			else if (canMatchKeyword (&cp, "begin"))
+			else if (canMatchKeywordWithAssign (&cp, "begin"))
 			{
 				enterUnnamedScope ();
 			}
-			else if (canMatchKeyword (&cp, "do"))
+			else if (canMatchKeywordWithAssign (&cp, "do"))
 			{
 				if (! expect_separator)
 					enterUnnamedScope ();
