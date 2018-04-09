@@ -564,11 +564,11 @@ static void findRubyTags (void)
 				*/
 				break;
 			}
-			else if (canMatchKeywordWithAssign (&cp, "begin"))
+			else if (canMatchKeyword (&cp, "begin"))
 			{
 				enterUnnamedScope ();
 			}
-			else if (canMatchKeywordWithAssign (&cp, "do"))
+			else if (canMatchKeyword (&cp, "do"))
 			{
 				if (! expect_separator)
 					enterUnnamedScope ();
