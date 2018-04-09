@@ -277,6 +277,8 @@ bool cxxParserParseNamespace(void)
 		{
 			tag->isFileScope = !isInputHeaderFile();
 
+			markTagExtraBit (tag, XTAG_ANONYMOUS);
+
 			vString * pszProperties = uProperties ? cxxTagSetProperties(uProperties) : NULL;
 
 			aCorkQueueIndices[0] = cxxTagCommit();

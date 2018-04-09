@@ -13,7 +13,7 @@ OptString	input.y	/^OptString	:	String	{ $$= $1; }$/;"	l	language:YACC
 String	input.y	/^String		:	STRING	{ $$= scanStr; scanStr= NULL; }$/;"	l	language:YACC
 YYDEBUG	input.y	/^#define	YYDEBUG /;"	d	language:C	file:	extras:fileScope,guest
 DEBUG_VAR	input.y	/^#define	DEBUG_VAR /;"	d	language:C	file:	extras:fileScope,guest
-__anon5f5ae8c8010a	input.y	/union	{$/;"	u	language:C	file:	extras:fileScope,guest
+__anon5f5ae8c8010a	input.y	/union	{$/;"	u	language:C	file:	extras:fileScope,guest,anonymous
 str	input.y	/^	char *		str;$/;"	m	language:C	union:__anon5f5ae8c8010a	typeref:typename:char *	file:	extras:fileScope,guest
 ival	input.y	/^	int		ival;$/;"	m	language:C	union:__anon5f5ae8c8010a	typeref:typename:int	file:	extras:fileScope,guest
 entry	input.y	/^	CfgEntryPtr	entry;$/;"	m	language:C	union:__anon5f5ae8c8010a	typeref:typename:CfgEntryPtr	file:	extras:fileScope,guest

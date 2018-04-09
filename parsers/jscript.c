@@ -311,8 +311,9 @@ static void copyToken (tokenInfo *const dest, const tokenInfo *const src,
  *	 Tag generation functions
  */
 
-static void makeJsTag (const tokenInfo *const token, const jsKind kind,
-                       vString *const signature, vString *const inheritance)
+static void makeJsTagCommon (const tokenInfo *const token, const jsKind kind,
+							 vString *const signature, vString *const inheritance,
+							 bool anonymous)
 {
 	if (JsKinds [kind].enabled && ! token->ignoreTag )
 	{
@@ -372,13 +373,22 @@ static void makeJsTag (const tokenInfo *const token, const jsKind kind,
 		if (inheritance)
 			e.extensionFields.inheritance = vStringValue(inheritance);
 
+		if (anonymous)
+			markTagExtraBit (&e, XTAG_ANONYMOUS);
+
 		makeTagEntry (&e);
 		vStringDelete (fullscope);
 	}
 }
 
-static void makeClassTag (tokenInfo *const token, vString *const signature,
-                          vString *const inheritance)
+static void makeJsTag (const tokenInfo *const token, const jsKind kind,
+					   vString *const signature, vString *const inheritance)
+{
+	makeJsTagCommon (token, kind, signature, inheritance, false);
+}
+
+static void makeClassTagCommon (tokenInfo *const token, vString *const signature,
+                          vString *const inheritance, bool anonymous)
 {
 	vString *	fulltag;
 
@@ -398,13 +408,21 @@ static void makeClassTag (tokenInfo *const token, vString *const signature,
 		if ( ! stringListHas(ClassNames, vStringValue (fulltag)) )
 		{
 			stringListAdd (ClassNames, vStringNewCopy (fulltag));
-			makeJsTag (token, JSTAG_CLASS, signature, inheritance);
+			makeJsTagCommon (token, JSTAG_CLASS, signature, inheritance,
+							 anonymous);
 		}
 		vStringDelete (fulltag);
 	}
 }
 
-static void makeFunctionTag (tokenInfo *const token, vString *const signature, bool generator)
+static void makeClassTag (tokenInfo *const token, vString *const signature,
+						  vString *const inheritance)
+{
+	makeClassTagCommon (token, signature, inheritance, false);
+}
+
+static void makeFunctionTagCommon (tokenInfo *const token, vString *const signature, bool generator,
+								   bool anonymous)
 {
 	vString *	fulltag;
 
@@ -424,10 +442,16 @@ static void makeFunctionTag (tokenInfo *const token, vString *const signature, b
 		if ( ! stringListHas(FunctionNames, vStringValue (fulltag)) )
 		{
 			stringListAdd (FunctionNames, vStringNewCopy (fulltag));
-			makeJsTag (token, generator ? JSTAG_GENERATOR : JSTAG_FUNCTION, signature, NULL);
+			makeJsTagCommon (token, generator ? JSTAG_GENERATOR : JSTAG_FUNCTION, signature, NULL,
+							 anonymous);
 		}
 		vStringDelete (fulltag);
 	}
+}
+
+static void makeFunctionTag (tokenInfo *const token, vString *const signature, bool generator)
+{
+	makeFunctionTagCommon (token, signature, generator, false);
 }
 
 /*
@@ -1367,7 +1391,7 @@ static void parseFunction (tokenInfo *const token)
 	vString *const signature = vStringNew ();
 	bool is_class = false;
 	bool is_generator = false;
-
+	bool is_anonymous = false;
 	/*
 	 * This deals with these formats
 	 *	   function validFunctionTwo(a,b) {}
@@ -1386,6 +1410,7 @@ static void parseFunction (tokenInfo *const token)
 		/* anonymous function */
 		copyToken (token, name, false);
 		anonGenerate (name->string, "AnonymousFunction", JSTAG_FUNCTION);
+		is_anonymous = true;
 	}
 	else if (!isType (name, TOKEN_IDENTIFIER))
 		goto cleanUp;
@@ -1409,9 +1434,9 @@ static void parseFunction (tokenInfo *const token)
 	{
 		is_class = parseBlock (token, name->string);
 		if ( is_class )
-			makeClassTag (name, signature, NULL);
+			makeClassTagCommon (name, signature, NULL, is_anonymous);
 		else
-			makeFunctionTag (name, signature, is_generator);
+			makeFunctionTagCommon (name, signature, is_generator, is_anonymous);
 	}
 
 	findCmdTerm (token, false, false);
@@ -1721,7 +1746,8 @@ static bool parseES6Class (tokenInfo *const token, const tokenInfo *targetName)
 
 	JSCRIPT_DEBUG_PRINT("Emitting tag for class '%s'", vStringValue(targetName->string));
 
-	makeJsTag (targetName, JSTAG_CLASS, NULL, inheritance);
+	makeJsTagCommon (targetName, JSTAG_CLASS, NULL, inheritance,
+					 (is_anonymous && (targetName == className)));
 
 	if (! is_anonymous && targetName != className)
 	{
