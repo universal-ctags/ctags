@@ -122,14 +122,19 @@ static bool notIdentChar (int c)
 	return ! isIdentChar (c);
 }
 
+static bool operatorChar (int c)
+{
+	return (c == '[' || c == ']' ||
+	        c == '=' || c == '!' || c == '~' ||
+	        c == '+' || c == '-' ||
+	        c == '@' || c == '*' || c == '/' || c == '%' ||
+	        c == '<' || c == '>' ||
+	        c == '&' || c == '^' || c == '|');
+}
+
 static bool notOperatorChar (int c)
 {
-	return ! (c == '[' || c == ']' ||
-	          c == '=' || c == '!' || c == '~' ||
-	          c == '+' || c == '-' ||
-	          c == '@' || c == '*' || c == '/' || c == '%' ||
-	          c == '<' || c == '>' ||
-	          c == '&' || c == '^' || c == '|');
+	return ! operatorChar (c);
 }
 
 static bool isWhitespace (int c)
@@ -141,7 +146,7 @@ static bool isWhitespace (int c)
  * Advance 's' while the passed predicate is true. Returns true if
  * advanced by at least one position.
  */
-static bool advanceBy (const unsigned char** s, bool (*predicate) (int))
+static bool advanceWhile (const unsigned char** s, bool (*predicate) (int))
 {
 	const int s_length = strlen ((const char *)*s);
 	unsigned char this_char;
@@ -180,21 +185,21 @@ static bool canMatchKeywordWithAssign (const unsigned char** s, const char* lite
 		return true;
 	}
 
-	if (! advanceBy (s, isIdentChar))
+	if (! advanceWhile (s, isIdentChar))
 	{
 		*s = original_pos;
 		return false;
 	}
 
-	advanceBy (s, isWhitespace);
+	advanceWhile (s, isWhitespace);
 
-	if (**s != '=') {
+	if (! (advanceWhile (s, operatorChar) && *(*s - 1) == '='))
+	{
 		*s = original_pos;
 		return false;
 	}
 
-	(*s)++;
-	advanceBy (s, isWhitespace);
+	advanceWhile (s, isWhitespace);
 
 	if (canMatchKeyword (s, literal))
 	{
@@ -230,7 +235,7 @@ static bool parseRubyOperator (vString* name, const unsigned char** cp)
 	{
 	    if (canMatch (cp, RUBY_OPERATORS[i], notOperatorChar))
 	    {
-	        vStringCatS (name, RUBY_OPERATORS[i]);
+			vStringCatS (name, RUBY_OPERATORS[i]);
 	        return true;
 	    }
 	}
