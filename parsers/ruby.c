@@ -148,23 +148,19 @@ static bool isWhitespace (int c)
  */
 static bool advanceWhile (const unsigned char** s, bool (*predicate) (int))
 {
-	const int s_length = strlen ((const char *)*s);
-	unsigned char this_char;
-	int i = 0;
+	const unsigned char* original_pos = *s;
 
-	for (i = 0; i < s_length; ++i)
+	while (**s != '\0')
 	{
-		this_char = **s;
-
-		if (! predicate (this_char))
+		if (! predicate (**s))
 		{
-			return i > 0;
+			return *s != original_pos;
 		}
 
 		(*s)++;
 	}
 
-	return i > 0;
+	return *s != original_pos;
 }
 
 static bool canMatchKeyword (const unsigned char** s, const char* literal)
@@ -235,7 +231,7 @@ static bool parseRubyOperator (vString* name, const unsigned char** cp)
 	{
 	    if (canMatch (cp, RUBY_OPERATORS[i], notOperatorChar))
 	    {
-			vStringCatS (name, RUBY_OPERATORS[i]);
+	        vStringCatS (name, RUBY_OPERATORS[i]);
 	        return true;
 	    }
 	}
