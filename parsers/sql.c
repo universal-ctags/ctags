@@ -1795,6 +1795,8 @@ static void parseTable (tokenInfo *const token)
      *     create table master..HasDbNoOwner (
      *     create table [master].dbo.[HasDbAndOwnerSquare] (
      *     create table [master]..[HasDbNoOwnerSquare] (
+     * Oracle and PostgreSQL use this format:
+     *     create table FOO as select...
 	 */
 
 	/* This could be a database, owner or table name */
@@ -1837,6 +1839,14 @@ static void parseTable (tokenInfo *const token)
 	}
 	else if (isKeyword (token, KEYWORD_at))
 	{
+		if (isType (name, TOKEN_IDENTIFIER))
+		{
+			makeSqlTag (name, SQLTAG_TABLE);
+		}
+	}
+	else if (isKeyword (token, KEYWORD_is))
+	{
+		/* KEYWORD_is is for recognizing "as" */
 		if (isType (name, TOKEN_IDENTIFIER))
 		{
 			makeSqlTag (name, SQLTAG_TABLE);

@@ -1,0 +1,3 @@
+foo	input.sql	/^CREATE TABLE foo($/;"	t
+col1	input.sql	/^    col1 text$/;"	E	table:foo
+bar	input.sql	/^CREATE TABLE bar AS$/;"	t
