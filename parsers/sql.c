@@ -140,6 +140,8 @@ enum eKeywordId {
 	KEYWORD_go,
 	KEYWORD_with,
 	KEYWORD_without,
+	KEYWORD_select,
+	KEYWORD_from,
 };
 typedef int keywordId; /* to allow KEYWORD_NONE */
 
@@ -316,6 +318,8 @@ static const keywordTable SqlKeywordTable [] = {
 	{ "go",								KEYWORD_go				      },
 	{ "with",							KEYWORD_with			      },
 	{ "without",						KEYWORD_without			      },
+	{ "select",							KEYWORD_select			      },
+	{ "from",							KEYWORD_from			      },
 };
 
 /*
@@ -1772,6 +1776,92 @@ static void parsePackage (tokenInfo *const token)
 	deleteToken (name);
 }
 
+static void parseColumnsAndAliases (tokenInfo *const token)
+{
+	bool columnAcceptable = true;
+	tokenInfo *const lastId = newToken ();
+
+	/*
+	 * -- A
+	 * create table foo as select A;
+	 *
+	 * -- B
+	 * create table foo as select B from ...;
+	 *
+	 * -- D
+	 * create table foo as select C as D from ...;
+	 *
+	 * -- E, F
+	 * create table foo as select E, a.F;
+	 *
+	 * -- G, H
+	 * create table foo as select G, a.H from ...;
+	 *
+	 * -- J, K
+	 * create table foo as select I as J, a.K from ...;
+	 *
+	 * lastID is used for capturing A, B, E, F, G, H, and K.
+	 */
+	readToken (token);
+	do
+	{
+		if (isType (token, TOKEN_KEYWORD)
+			&& isKeyword (token, KEYWORD_is))
+		{
+			readToken (token);
+			if (isType (token, TOKEN_IDENTIFIER))
+			{
+				/* Emit the alias */
+				makeSqlTag (token, SQLTAG_FIELD);
+				columnAcceptable = true;
+			}
+			lastId->type = TOKEN_UNDEFINED;
+		}
+		else if ((isType (token, TOKEN_KEYWORD)
+				  && isKeyword (token, KEYWORD_from))
+				 || isType (token, TOKEN_SEMICOLON)
+				 || isType(token, TOKEN_COMMA))
+		{
+			if (lastId->type == TOKEN_IDENTIFIER)
+			{
+				/* Emit the column */
+				makeSqlTag(lastId, SQLTAG_FIELD);
+				columnAcceptable = true;
+			}
+
+			if (isType(token, TOKEN_COMMA))
+				lastId->type = TOKEN_UNDEFINED;
+			else
+				break;
+		}
+		else if (isType (token, TOKEN_OPEN_PAREN))
+		{
+			columnAcceptable = false;
+			skipToMatched (token);
+			lastId->type = TOKEN_UNDEFINED;
+			continue;
+		}
+		else if (isType (token, TOKEN_PERIOD))
+		{
+			lastId->type = TOKEN_UNDEFINED;
+		}
+		else if (isType (token, TOKEN_IDENTIFIER))
+		{
+			if (columnAcceptable)
+				copyToken (lastId, token);
+		}
+		else
+		{
+			columnAcceptable = false;
+			lastId->type = TOKEN_UNDEFINED;
+		}
+
+		readToken (token);
+	} while (! isType (token, TOKEN_EOF));
+
+	deleteToken (lastId);
+}
+
 static void parseTable (tokenInfo *const token)
 {
 	tokenInfo *const name = newToken ();
@@ -1795,8 +1885,8 @@ static void parseTable (tokenInfo *const token)
      *     create table master..HasDbNoOwner (
      *     create table [master].dbo.[HasDbAndOwnerSquare] (
      *     create table [master]..[HasDbNoOwnerSquare] (
-     * Oracle and PostgreSQL use this format:
-     *     create table FOO as select...
+	 * Oracle and PostgreSQL use this format:
+	 *     create table FOO as select...
 	 */
 
 	/* This could be a database, owner or table name */
@@ -1850,9 +1940,16 @@ static void parseTable (tokenInfo *const token)
 		if (isType (name, TOKEN_IDENTIFIER))
 		{
 			makeSqlTag (name, SQLTAG_TABLE);
+			readToken (token);
+			if (isKeyword (token, KEYWORD_select))
+			{
+				addToScope (token, name->string, SQLTAG_TABLE);
+				parseColumnsAndAliases (token);
+				vStringClear (token->scope);
+			}
 		}
 	}
-	findCmdTerm (token, false);
+	findCmdTerm (token, true);
 	deleteToken (name);
 }
 
