@@ -4,7 +4,6 @@ TAG_FILE_FORMAT       on      the version of tags file format
 TAG_FILE_SORTED       on      how tags are sorted
 TAG_KIND_DESCRIPTION  off     the letters, names and descriptions of kinds in a parser
 TAG_KIND_SEPARATOR    off     the separators used in kinds
-TAG_OUTPUT_MODE       on      the output mode: u-ctags or e-ctags
 TAG_PROGRAM_AUTHOR    on      the author of this ctags implementation
 TAG_PROGRAM_NAME      on      the name of this ctags implementation
 TAG_PROGRAM_URL       on      the official site URL of this ctags implementation

@@ -11,15 +11,14 @@
 #include "entry.h"
 #include "writer.h"
 
-extern tagWriter uCtagsWriter;
+extern tagWriter ctagsWriter;
 extern tagWriter eCtagsWriter;
 extern tagWriter etagsWriter;
 extern tagWriter xrefWriter;
 extern tagWriter jsonWriter;
 
 static tagWriter *writerTable [WRITER_COUNT] = {
-	[WRITER_U_CTAGS] = &uCtagsWriter,
-	[WRITER_E_CTAGS] = &eCtagsWriter,
+	[WRITER_CTAGS] = &ctagsWriter,
 	[WRITER_ETAGS] = &etagsWriter,
 	[WRITER_XREF]  = &xrefWriter,
 	[WRITER_JSON]  = &jsonWriter,
@@ -76,22 +75,6 @@ extern void writerBuildFqTagCache (tagEntryInfo *const tag)
 {
 	if (writer->buildFqTagCache)
 		writer->buildFqTagCache (writer, tag);
-}
-
-
-extern bool ptagMakeCtagsOutputMode (ptagDesc *desc, void *data CTAGS_ATTR_UNUSED)
-{
-	const char *mode ="";
-
-	if (&uCtagsWriter == writer)
-		mode = "u-ctags";
-	else if (&eCtagsWriter == writer)
-		mode = "e-ctags";
-
-	return writePseudoTag (desc,
-						   mode,
-						   "u-ctags or e-ctags",
-						   NULL);
 }
 
 extern const char *outputDefaultFileName (void)

@@ -54,8 +54,9 @@ AH_VERBATIM([DEFAULT_FILE_FORMAT], [
 /* Define this as desired.
  * 1:  Original ctags format
  * 2:  Extended ctags format with extension flags in EX-style comment.
+ * 3:  Use backslash for escaping meta characters like tab
  */
-#define DEFAULT_FILE_FORMAT	2
+#define DEFAULT_FILE_FORMAT	3
 ])
 AH_TEMPLATE([CASE_INSENSITIVE_FILENAMES],
 	[Define this label if your system uses case-insensitive file names])
@@ -169,7 +170,7 @@ AC_ARG_ENABLE(etags,
 AC_ARG_ENABLE(extended-format,
 	[AS_HELP_STRING([--disable-extended-format],
 		[disable extension flags; use original ctags file format only])],
-	AC_DEFINE(DEFAULT_FILE_FORMAT, 1), AC_DEFINE(DEFAULT_FILE_FORMAT, 2))
+	AC_DEFINE(DEFAULT_FILE_FORMAT, 1), AC_DEFINE(DEFAULT_FILE_FORMAT, 3))
 
 AC_ARG_ENABLE(external-sort,
 	[AS_HELP_STRING([--disable-external-sort],

@@ -20,8 +20,7 @@
 
 typedef enum eWriterType {
 	WRITER_DEFAULT,
-	WRITER_U_CTAGS = WRITER_DEFAULT,
-	WRITER_E_CTAGS,
+	WRITER_CTAGS = WRITER_DEFAULT,
 	WRITER_ETAGS,
 	WRITER_XREF,
 	WRITER_JSON,
@@ -71,7 +70,6 @@ extern void truncateTagLineAfterTag (char *const line, const char *const token,
 extern void abort_if_ferror(MIO *const fp);
 
 extern bool ptagMakeJsonOutputVersion (ptagDesc *desc, void *data CTAGS_ATTR_UNUSED);
-extern bool ptagMakeCtagsOutputMode (ptagDesc *desc, void *data CTAGS_ATTR_UNUSED);
 
 extern bool writerCanPrintPtag (void);
 
