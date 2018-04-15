@@ -1,0 +1,10 @@
+Bar	input.rb	/^c = class Bar$/;"	c
+Foo	input.rb	/^m = module Foo$/;"	m
+Quux	input.rb	/^m += module Quux$/;"	m
+Zook	input.rb	/^c ||= class Zook$/;"	c
+method_a	input.rb	/^  x = def method_a$/;"	f	class:Bar
+method_b	input.rb	/^  def method_b$/;"	f	class:Bar
+method_c	input.rb	/^  def method_c$/;"	f	class:Bar
+method_d	input.rb	/^  def method_d$/;"	f	class:Bar
+method_e	input.rb	/^  def method_e$/;"	f	class:Bar
+method_f	input.rb	/^  def method_f$/;"	f	class:Bar
