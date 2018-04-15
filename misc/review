@@ -153,6 +153,8 @@ units_inspect_cmd_show_diff ()
 
     if which colordiff > /dev/null 2>&1; then
 	cmd=colordiff
+    elif which pygmentize > /dev/null 2>&1; then
+	cmd="pygmentize -l diff"
     fi
 
     inspect_cmd_show_generic $1 DIFF.tmp cat | ${cmd}
