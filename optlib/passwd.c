@@ -43,7 +43,7 @@ extern parserDefinition* PasswdParser (void)
 	};
 
 
-	parserDefinition* const def = parserNew ("passwd");
+	parserDefinition* const def = parserNew ("Passwd");
 
 	def->enabled       = true;
 	def->extensions    = extensions;

@@ -43,6 +43,7 @@ The following parsers have been added:
 * AutoIt
 * Clojure
 * CSS
+* Ctags option library *optlib*
 * CUDA
 * D
 * DBusIntrospect *libxml*
@@ -51,17 +52,18 @@ The following parsers have been added:
 * DTS
 * Elm *optlib*
 * Falcon
+* Gdbinit script *optlib*
 * Glade *libxml*
 * Go
 * JavaProperties
 * JSON
 * GNU linker script(LdScript)
-* man page *optlib*
+* Man page *optlib*
 * Maven2 *libxml*
 * M4
 * ObjectiveC
-* passwd
-* puppetManifest *optlib*
+* Passwd *optlib*
+* PuppetManifest *optlib*
 * Perl6
 * Pod *optlib*
 * PropertyList(plist) *libxml*
@@ -71,7 +73,7 @@ The following parsers have been added:
 * QtMoc
 * R
 * RelaxNG *libxml*
-* reStructuredText
+* ReStructuredText
 * Robot
 * RpmSpec
 * Rust
@@ -86,7 +88,6 @@ The following parsers have been added:
 * Yaml *libyaml*
 * YumRepo
 * Zephir
-* ctags option library *optlib*
 * Myrddin
 * RSpec *optlib*
 
@@ -704,7 +705,7 @@ We can say now "kind" is a first class object in Universal-ctags.
 Defining an extra
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-A new ``--extradef-<LANG>=name,description`` option allows you to
+A new ``--_extradef-<LANG>=name,description`` option allows you to
 defining a parser own extra which turning on and off can be
 referred from a regex based parser for ``<LANG>``.
 
@@ -1071,7 +1072,7 @@ The fourth column shows whether the role is enabled or not.
 The fifth column shows the description of the role.
 
 You can define a role in an optlib parser for capturing reference
-tags. See `Capturing reference tags <capturing_reftag>` for more
+tags. See :ref:`Capturing reference tags <capturing_reftag>` for more
 details.
 
 Currently ctags doesn't provide the way for disabling a

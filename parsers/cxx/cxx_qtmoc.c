@@ -303,18 +303,21 @@ extern parserDefinition* QtMocParser (void)
 {
 	parserDefinition* const def = parserNew("QtMoc");
 
-	static struct sCxxSubparser qtMocSubparser = {
-		.subparser = {
-			.direction = SUBPARSER_BI_DIRECTION,
-			.inputStart = inputStart,
-			.makeTagEntryNotify = makeTagEntryNotify,
-		},
-		.enterBlockNotify = enterBlockNotify,
-		.leaveBlockNotify = leaveBlockNotify,
-		.newIdentifierAsHeadOfMemberNotify = newIdentifierAsHeadOfMemberNotify,
-		.unknownIdentifierInClassNotify = unknownIdentifierInClassNotify,
-		.parseAccessSpecifierNotify = parseAccessSpecifierNotify,
-		.foundExtraIdentifierAsAccessSpecifier = foundExtraIdentifierAsAccessSpecifier,
+	static struct sQtMocSubparser qtMocSubparser = {
+		.cxx = {
+			.subparser = {
+				.direction = SUBPARSER_BI_DIRECTION,
+				.inputStart = inputStart,
+				.makeTagEntryNotify = makeTagEntryNotify,
+			},
+			.enterBlockNotify = enterBlockNotify,
+			.leaveBlockNotify = leaveBlockNotify,
+			.newIdentifierAsHeadOfMemberNotify = newIdentifierAsHeadOfMemberNotify,
+			.unknownIdentifierInClassNotify = unknownIdentifierInClassNotify,
+			.parseAccessSpecifierNotify = parseAccessSpecifierNotify,
+			.foundExtraIdentifierAsAccessSpecifier = foundExtraIdentifierAsAccessSpecifier,
+		}
+		/* The rest fields are initialized in inputStart(). */
 	};
 	static parserDependency dependencies [] = {
 		[0] = { DEPTYPE_SUBPARSER, "C++", &qtMocSubparser },

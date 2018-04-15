@@ -23,10 +23,10 @@
 # This optlib is a testbed for --_fielddef option and _field regex flag.
 #
 
---langdef=passwd
---map-passwd=+(passwd)
---_fielddef-passwd=home,home directory
---_fielddef-passwd=shell,login shell
---fields-passwd=+{home}
---fields-passwd=+{shell}
---regex-passwd=/^([^:]+):([^:]+):([^:]+):([^:]+):([^:]*):([^:]+):([^:]+)/\1/u,username,user names/{_field=home:\6}{_field=shell:\7}
+--langdef=Passwd
+--map-Passwd=+(passwd)
+--_fielddef-Passwd=home,home directory
+--_fielddef-Passwd=shell,login shell
+--fields-Passwd=+{home}
+--fields-Passwd=+{shell}
+--regex-Passwd=/^([^:]+):([^:]+):([^:]+):([^:]+):([^:]*):([^:]+):([^:]+)/\1/u,username,user names/{_field=home:\6}{_field=shell:\7}

@@ -1,0 +1,19 @@
+__anonf6b77c200108	input.c	/^struct {$/;"	s	file:	extras:fileScope,anonymous
+x	input.c	/^  int x;$/;"	m	struct:__anonf6b77c200108	typeref:typename:int	file:	extras:fileScope
+__anonf6b77c20020a	input.c	/^union {$/;"	u	file:	extras:fileScope,anonymous
+x	input.c	/^  int x;$/;"	m	union:__anonf6b77c20020a	typeref:typename:int	file:	extras:fileScope
+__anonf6b77c200303	input.c	/^enum {$/;"	g	file:	extras:fileScope,anonymous
+X	input.c	/^  X;$/;"	e	enum:__anonf6b77c200303	file:	extras:fileScope
+c2m1	input-0.js	/^  this.c2m1 = function() {$/;"	m	class:class2
+AnonymousFunctiond33a4a170100	input-0.js	/^    c2m3(function() {$/;"	f	function:class2.c2m1	extras:anonymous
+class2	input-0.js	/^var class2 = function() {$/;"	c
+c3m1	input-0.js	/^  this.c3m1 = function() {$/;"	m	class:class3
+AnonymousFunctiond33a4a170200	input-0.js	/^    return function(n) {$/;"	f	function:class3.c3m1	extras:anonymous
+class3	input-0.js	/^var class3 = function() {$/;"	c
+AnonymousFunctiond33a4a170300	input-0.js	/^  return function(x) {$/;"	f	function:f1	extras:anonymous
+f1	input-0.js	/^function f1(y) {$/;"	f
+AnonymousClassd33a4a170401	input-0.js	/^  return class extends superclass {$/;"	c	class:Mixin	extras:anonymous
+hello	input-0.js	/^    hello() {$/;"	m	class:Mixin.AnonymousClassd33a4a170401
+Mixin	input-0.js	/^function Mixin(superclass) {$/;"	f
+AnonymousClassd33a4a170501	input-0.js	/^class {$/;"	c	extras:anonymous
+method8	input-0.js	/^	method8(n) { return n * n; }$/;"	m	class:AnonymousClassd33a4a170501

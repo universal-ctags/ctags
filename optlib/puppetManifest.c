@@ -610,7 +610,7 @@ extern parserDefinition* PuppetManifestParser (void)
 		},
 	};
 
-	parserDefinition* const def = parserNew ("puppetManifest");
+	parserDefinition* const def = parserNew ("PuppetManifest");
 
 	def->enabled       = true;
 	def->extensions    = extensions;

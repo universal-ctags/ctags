@@ -26,11 +26,6 @@
 #include "vstring.h"
 
 /*
- *	 MACROS
- */
-#define isIdentChar(c) (isalnum (c) || (c) == '_')
-
-/*
 *   DATA DECLARATIONS
 */
 typedef enum {
@@ -117,19 +112,29 @@ static bool canMatch (const unsigned char** s, const char* literal,
 	return true;
 }
 
+static bool isIdentChar (int c)
+{
+	return (isalnum (c) || c == '_');
+}
+
 static bool notIdentChar (int c)
 {
 	return ! isIdentChar (c);
 }
 
+static bool operatorChar (int c)
+{
+	return (c == '[' || c == ']' ||
+	        c == '=' || c == '!' || c == '~' ||
+	        c == '+' || c == '-' ||
+	        c == '@' || c == '*' || c == '/' || c == '%' ||
+	        c == '<' || c == '>' ||
+	        c == '&' || c == '^' || c == '|');
+}
+
 static bool notOperatorChar (int c)
 {
-	return ! (c == '[' || c == ']' ||
-	          c == '=' || c == '!' || c == '~' ||
-	          c == '+' || c == '-' ||
-	          c == '@' || c == '*' || c == '/' || c == '%' ||
-	          c == '<' || c == '>' ||
-	          c == '&' || c == '^' || c == '|');
+	return ! operatorChar (c);
 }
 
 static bool isWhitespace (int c)
@@ -137,9 +142,68 @@ static bool isWhitespace (int c)
 	return c == 0 || isspace (c);
 }
 
+/*
+ * Advance 's' while the passed predicate is true. Returns true if
+ * advanced by at least one position.
+ */
+static bool advanceWhile (const unsigned char** s, bool (*predicate) (int))
+{
+	const unsigned char* original_pos = *s;
+
+	while (**s != '\0')
+	{
+		if (! predicate (**s))
+		{
+			return *s != original_pos;
+		}
+
+		(*s)++;
+	}
+
+	return *s != original_pos;
+}
+
 static bool canMatchKeyword (const unsigned char** s, const char* literal)
 {
 	return canMatch (s, literal, notIdentChar);
+}
+
+/*
+ * Extends canMatch. Works similarly, but allows assignment to precede
+ * the keyword, as block assignment is a common Ruby idiom.
+ */
+static bool canMatchKeywordWithAssign (const unsigned char** s, const char* literal)
+{
+	const unsigned char* original_pos = *s;
+
+	if (canMatchKeyword (s, literal))
+	{
+		return true;
+	}
+
+	if (! advanceWhile (s, isIdentChar))
+	{
+		*s = original_pos;
+		return false;
+	}
+
+	advanceWhile (s, isWhitespace);
+
+	if (! (advanceWhile (s, operatorChar) && *(*s - 1) == '='))
+	{
+		*s = original_pos;
+		return false;
+	}
+
+	advanceWhile (s, isWhitespace);
+
+	if (canMatchKeyword (s, literal))
+	{
+		return true;
+	}
+
+	*s = original_pos;
+	return false;
 }
 
 /*
@@ -428,29 +492,22 @@ static void findRubyTags (void)
 		*
 		*   return if <exp>
 		*
-		* FIXME: this is fooled by code such as
-		*
-		*   result = if <exp>
-		*               <a>
-		*            else
-		*               <b>
-		*            end
-		*
-		* FIXME: we're also fooled if someone does something heinous such as
+		* FIXME: we're fooled if someone does something heinous such as
 		*
 		*   puts("hello") \
 		*       unless <exp>
 		*/
-		if (canMatchKeyword (&cp, "for") ||
-		    canMatchKeyword (&cp, "until") ||
-		    canMatchKeyword (&cp, "while"))
+
+		if (canMatchKeywordWithAssign (&cp, "for") ||
+		    canMatchKeywordWithAssign (&cp, "until") ||
+		    canMatchKeywordWithAssign (&cp, "while"))
 		{
 			expect_separator = true;
 			enterUnnamedScope ();
 		}
-		else if (canMatchKeyword (&cp, "case") ||
-		         canMatchKeyword (&cp, "if") ||
-		         canMatchKeyword (&cp, "unless"))
+		else if (canMatchKeywordWithAssign (&cp, "case") ||
+		         canMatchKeywordWithAssign (&cp, "if") ||
+		         canMatchKeywordWithAssign (&cp, "unless"))
 		{
 			enterUnnamedScope ();
 		}
@@ -459,15 +516,15 @@ static void findRubyTags (void)
 		* "module M", "class C" and "def m" should only be at the beginning
 		* of a line.
 		*/
-		if (canMatchKeyword (&cp, "module"))
+		if (canMatchKeywordWithAssign (&cp, "module"))
 		{
 			readAndEmitTag (&cp, K_MODULE);
 		}
-		else if (canMatchKeyword (&cp, "class"))
+		else if (canMatchKeywordWithAssign (&cp, "class"))
 		{
 			readAndEmitTag (&cp, K_CLASS);
 		}
-		else if (canMatchKeyword (&cp, "def"))
+		else if (canMatchKeywordWithAssign (&cp, "def"))
 		{
 			rubyKind kind = K_METHOD;
 			NestingLevel *nl = nestingLevelsGetCurrent (nesting);

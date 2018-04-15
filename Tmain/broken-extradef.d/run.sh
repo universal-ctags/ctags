@@ -16,55 +16,55 @@ title()
 
 {
 title '# echo unknown lang'
-${CTAGS} --extradef-NOSUCHLANG
-${CTAGS} --extradef-NOSUCHLANG=extra,desc
+${CTAGS} --_extradef-NOSUCHLANG
+${CTAGS} --_extradef-NOSUCHLANG=extra,desc
 
 title '# no option value'
-${CTAGS} --langdef=IMAGINARY --extradef-IMAGINARY
-${CTAGS} --langdef=IMAGINARY --extradef-IMAGINARY=
+${CTAGS} --langdef=IMAGINARY --_extradef-IMAGINARY
+${CTAGS} --langdef=IMAGINARY --_extradef-IMAGINARY=
 
 title '# wrong char in a field name'
-${CTAGS} --langdef=IMAGINARY --extradef-IMAGINARY=:
-${CTAGS} --langdef=IMAGINARY --extradef-IMAGINARY=:abc
-${CTAGS} --langdef=IMAGINARY --extradef-IMAGINARY=:abc,
-${CTAGS} --langdef=IMAGINARY --extradef-IMAGINARY=:abc,description
+${CTAGS} --langdef=IMAGINARY --_extradef-IMAGINARY=:
+${CTAGS} --langdef=IMAGINARY --_extradef-IMAGINARY=:abc
+${CTAGS} --langdef=IMAGINARY --_extradef-IMAGINARY=:abc,
+${CTAGS} --langdef=IMAGINARY --_extradef-IMAGINARY=:abc,description
 
 title '# empty extra name'
-${CTAGS} --langdef=IMAGINARY --extradef-IMAGINARY=,
-${CTAGS} --langdef=IMAGINARY --extradef-IMAGINARY=,abc
-${CTAGS} --langdef=IMAGINARY --extradef-IMAGINARY=,abc,
-${CTAGS} --langdef=IMAGINARY --extradef-IMAGINARY=,abc,description
+${CTAGS} --langdef=IMAGINARY --_extradef-IMAGINARY=,
+${CTAGS} --langdef=IMAGINARY --_extradef-IMAGINARY=,abc
+${CTAGS} --langdef=IMAGINARY --_extradef-IMAGINARY=,abc,
+${CTAGS} --langdef=IMAGINARY --_extradef-IMAGINARY=,abc,description
 
 title '# empty description'
-${CTAGS} --langdef=IMAGINARY --extradef-IMAGINARY=abc
-${CTAGS} --langdef=IMAGINARY --extradef-IMAGINARY=abc,
+${CTAGS} --langdef=IMAGINARY --_extradef-IMAGINARY=abc
+${CTAGS} --langdef=IMAGINARY --_extradef-IMAGINARY=abc,
 
 title '# no input file'
-${CTAGS} --langdef=IMAGINARY --extradef-IMAGINARY=abc,desc
+${CTAGS} --langdef=IMAGINARY --_extradef-IMAGINARY=abc,desc
 
 title '# inject a flag separator'
-${CTAGS} --langdef=IMAGINARY --extradef-IMAGINARY='extra,desc{foo}' --list-extras=IMAGINARY
+${CTAGS} --langdef=IMAGINARY --_extradef-IMAGINARY='extra,desc{foo}' --list-extras=IMAGINARY
 
 title '# inject a broken flag separator(1)'
-${CTAGS} --langdef=IMAGINARY --extradef-IMAGINARY='extra,desc{foo' --list-extras=IMAGINARY
+${CTAGS} --langdef=IMAGINARY --_extradef-IMAGINARY='extra,desc{foo' --list-extras=IMAGINARY
 
 title '# inject a broken flag separator(2)'
-${CTAGS} --langdef=IMAGINARY --extradef-IMAGINARY='extra,desc{' --list-extras=IMAGINARY
+${CTAGS} --langdef=IMAGINARY --_extradef-IMAGINARY='extra,desc{' --list-extras=IMAGINARY
 
 title '# use a { in description (1)'
-${CTAGS} --langdef=IMAGINARY --extradef-IMAGINARY='extra,desc\{' --list-extras=IMAGINARY
+${CTAGS} --langdef=IMAGINARY --_extradef-IMAGINARY='extra,desc\{' --list-extras=IMAGINARY
 
 title '# use a { in description (2)'
-${CTAGS} --langdef=IMAGINARY --extradef-IMAGINARY='extra,desc\{}' --list-extras=IMAGINARY
+${CTAGS} --langdef=IMAGINARY --_extradef-IMAGINARY='extra,desc\{}' --list-extras=IMAGINARY
 
 title '# use a \ in description'
-${CTAGS} --langdef=IMAGINARY --extradef-IMAGINARY='extra,desc\\backslash' --list-extras=IMAGINARY
+${CTAGS} --langdef=IMAGINARY --_extradef-IMAGINARY='extra,desc\\backslash' --list-extras=IMAGINARY
 
 title '# description started from {'
-${CTAGS} --langdef=IMAGINARY --extradef-IMAGINARY='extra,{' --list-extras=IMAGINARY
+${CTAGS} --langdef=IMAGINARY --_extradef-IMAGINARY='extra,{' --list-extras=IMAGINARY
 
 title '# description started from \{'
-${CTAGS} --langdef=IMAGINARY --extradef-IMAGINARY='extra,\{' --list-extras=IMAGINARY
+${CTAGS} --langdef=IMAGINARY --_extradef-IMAGINARY='extra,\{' --list-extras=IMAGINARY
 
 } > /tmp/ctags-tmain-$$.stdout 2>/tmp/ctags-tmain-$$.stderr
 

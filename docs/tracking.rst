@@ -37,7 +37,7 @@ subversion
      You may know how to do it :)
 
      ::
-    
+
 	$ git clone https://github.com/universal-ctags/ctags.git
 
   2. prepare exuberant-ctags SVN repo: a local git repo clone from exuberant-ctags svn tree.
@@ -72,9 +72,9 @@ subversion
      <git: local universal-ctags repo>::
 
 	 	$ git log
-	 
+
      or ::
-	 
+
 	 	$ git log --oneline
 
      If conflicts are occurred in cherry-picking, you can
@@ -191,12 +191,12 @@ Patches are always there. So it is easy to evaluate the value:)
 
 	  + MORE STATUS
 
-   <TICKET#> 
+   <TICKET#>
 
    	means the ticket is closed from the view of exuberant tree
    	developers.  We don't have to take time for this ticket.
 
-   (TICKET#) 
+   (TICKET#)
 
    	means the ticket is still opened from the view of exuberant
 	tree developers.  We don't have to take time for this ticket.
@@ -276,7 +276,7 @@ Patches are always there. So it is easy to evaluate the value:)
 	* we have better objc parser.
 
    \(1\) bibtex parser
-	
+
 	* Reject because...
 
 	  + the owner of the ticket is anonymous.
@@ -318,7 +318,7 @@ devel mailing list (ctags-devel@sourceforge)
 	http://en.wikipedia.org/wiki/Resource_%28Windows%29
 
 	::
-	
+
 	 	95b4806ba6c006e4b7e72a006700e33c720ab9e7
 
 
@@ -351,13 +351,13 @@ http://pkgs.fedoraproject.org/cgit/ctags.git/tree/ctags.spec
 
 	Not in universal-ctags tree.
 
-	The reproducer is attached to following page:
+	The reproducer is attached to the following page:
 	https://bugzilla.redhat.com/show_bug.cgi?id=852101
 
 	However, universal-ctags doesn't reproduce with it.
 
 	I, Masatake YAMATO, read the patch.  However, I don't
-	understand the patch.  
+	understand the patch.
 
 <ctags-5.8-css.patch>
 
@@ -399,16 +399,16 @@ http://anonscm.debian.org/cgit/users/cjwatson/exuberant-ctags.git/tree/debian/pa
 	as definition tags. They are turned on by default.
 	The others are tagged as reference tags. reference tags are recorded only
 	when "r" extra tags are enabled. e.g. `--extras=+r`.
-	
+
 <vim-command-loop.patch>
 
-	This patch was merged as an alternative for 
+	This patch was merged as an alternative for
 	7fb36a2f4690374526e9e7ef4f1e24800b6914ec
-	
+
 	Discussed on https://github.com/fishman/ctags/issues/74
 
 	::
-	
+
 	   	e59325a576e38bc63b91abb05a5a22d2cef25ab7
 
 

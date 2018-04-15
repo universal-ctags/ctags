@@ -37,7 +37,7 @@ CXXToken * cxxParserOpeningBracketIsLambda(void)
 	// [ capture-list ] ( params ) -> ret { body }	(2)
 	// [ capture-list ] ( params ) { body }	(3)
 	// [ capture-list ] { body }	(4)
-	
+
 	// Exclude the case of array bracket initialization
 	//  type var[] { ... } (5 - not lambda)
 
@@ -173,6 +173,8 @@ bool cxxParserHandleLambda(CXXToken * pParenthesis)
 		tag->isFileScope = true;
 
 		CXXToken * pTypeName;
+
+		markTagExtraBit (tag, XTAG_ANONYMOUS);
 
 		if(pTypeStart)
 			pTypeName = cxxTagCheckAndSetTypeField(pTypeStart,pTypeEnd);

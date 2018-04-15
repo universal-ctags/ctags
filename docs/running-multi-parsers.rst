@@ -193,8 +193,8 @@ A subparser can be a base parser for another sub parsers.
 
 At a glance the relationship between two parsers are similar to the
 relationship guest parser and host parser description in
-:ref:`Applying a parser to specified areas of input file
-<host-guest-parsers>`.  However, they are different. Though a guest
+:ref:`Applying a parser to specified areas of input file <host-guest-parsers>`.
+However, they are different. Though a guest
 parser can run stand-alone, a subparser cannot; a subparser needs help
 from base parser to work.
 
@@ -204,7 +204,7 @@ Top down parser choice and bottom up parser choice
 There are two ways to run a subparser: top down or bottom up parser
 choices.
 
-Universal-ctags can chose a subparser `automatically <guessing>`_.
+Universal-ctags can chose a subparser :ref:`automatically <guessing>`.
 Matching file name patterns and extensions are the typical ways for
 choosing. A user can choose a subparser with `--language-force=` option.
 Choosing a parser in these deterministic way is called *top down*.

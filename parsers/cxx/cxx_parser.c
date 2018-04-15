@@ -157,7 +157,7 @@ bool cxxParserParseAndCondenseCurrentSubchain(
 		}
 		pFakeLast->eType = eTermType;
 		pFakeLast->pChain = NULL;
-		
+
 		cxxTokenChainAppend(g_cxx.pTokenChain,pFakeLast);
 	}
 
@@ -761,6 +761,7 @@ bool cxxParserParseEnum(void)
 
 
 	int iPushedScopes = 0;
+	bool bAnonymous = false;
 
 	if(pEnumName)
 	{
@@ -803,6 +804,7 @@ bool cxxParserParseEnum(void)
 		cxxTokenChainTake(g_cxx.pTokenChain,pEnumName);
 	} else {
 		pEnumName = cxxTokenCreateAnonymousIdentifier(CXXTagKindENUM);
+		bAnonymous = true;
 		CXX_DEBUG_PRINT(
 				"Enum name is %s (anonymous)",
 				vStringValue(pEnumName->pszWord)
@@ -818,6 +820,9 @@ bool cxxParserParseEnum(void)
 	{
 		// FIXME: this is debatable
 		tag->isFileScope = !isInputHeaderFile();
+
+		if (bAnonymous)
+			markTagExtraBit (tag, XTAG_ANONYMOUS);
 
 		CXXToken * pTypeName = NULL;
 		vString * pszProperties = NULL;
@@ -918,6 +923,7 @@ static bool cxxParserParseClassStructOrUnionInternal(
 	unsigned int uInitialKeywordState = g_cxx.uKeywordState;
 	int iInitialTokenCount = g_cxx.pTokenChain->iCount;
 	CXXToken * pLastToken = cxxTokenChainLast(g_cxx.pTokenChain);
+	bool bAnonymous = false;
 
 	/*
 		Spec is:
@@ -993,7 +999,7 @@ static bool cxxParserParseClassStructOrUnionInternal(
 
 		// FIXME: Should we add the specialisation arguments somewhere?
 		//        Maybe as a separate field?
-		
+
 		bRet = cxxParserParseTemplateAngleBracketsToSeparateChain();
 
 		if(!bRet)
@@ -1181,6 +1187,7 @@ static bool cxxParserParseClassStructOrUnionInternal(
 		cxxTokenChainTake(g_cxx.pTokenChain,pClassName);
 	} else {
 		pClassName = cxxTokenCreateAnonymousIdentifier(uTagKind);
+		bAnonymous = true;
 		CXX_DEBUG_PRINT(
 				"Class/struct/union name is %s (anonymous)",
 				vStringValue(pClassName->pszWord)
@@ -1232,6 +1239,9 @@ static bool cxxParserParseClassStructOrUnionInternal(
 
 	if(tag)
 	{
+		if (bAnonymous)
+			markTagExtraBit (tag, XTAG_ANONYMOUS);
+
 		if(g_cxx.pTokenChain->iCount > 0)
 		{
 			// Strip inheritance type information
