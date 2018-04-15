@@ -2287,10 +2287,9 @@ static void parseView (tokenInfo *const token)
 
 	/*
 	 * This deals with these formats
-	 *	   create variable varname1 integer;
-	 *	   create variable @varname2 integer;
-	 *	   create variable "varname3" integer;
-	 *	   drop   variable @varname3;
+	 *     create view VIEW;
+	 *     create view VIEW as ...;
+	 *     create view VIEW (...) as ...;
 	 */
 
 	readIdentifier (name);
