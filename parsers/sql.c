@@ -1865,6 +1865,7 @@ static void parseColumnsAndAliases (tokenInfo *const token)
 static void parseTable (tokenInfo *const token)
 {
 	tokenInfo *const name = newToken ();
+	bool emitted = false;
 
 	/*
 	 * This deals with these formats:
@@ -1887,6 +1888,9 @@ static void parseTable (tokenInfo *const token)
      *     create table [master]..[HasDbNoOwnerSquare] (
 	 * Oracle and PostgreSQL use this format:
 	 *     create table FOO as select...
+	 * MySQL allows omitting "as" like:
+	 *     create table FOO select...
+	 *     create table FOO (...) select...
 	 */
 
 	/* This could be a database, owner or table name */
@@ -1920,12 +1924,21 @@ static void parseTable (tokenInfo *const token)
 			isType (name, TOKEN_STRING))
 		{
 			makeSqlTag (name, SQLTAG_TABLE);
+			emitted = true;
+
 			vStringCopy(token->scope, name->string);
 			token->scopeKind = SQLTAG_TABLE;
 			parseRecord (token);
 			vStringClear (token->scope);
 			token->scopeKind = SQLTAG_COUNT;
+			readToken (token);
+			fprintf(stderr, "=> %s, t: %d, k: %d\n", vStringValue(token->string),
+					token->type,
+					token->keyword
+				);
 		}
+		else
+			skipToMatched(token);
 	}
 	else if (isKeyword (token, KEYWORD_at))
 	{
@@ -1934,13 +1947,19 @@ static void parseTable (tokenInfo *const token)
 			makeSqlTag (name, SQLTAG_TABLE);
 		}
 	}
-	else if (isKeyword (token, KEYWORD_is))
+
+	if (isKeyword (token, KEYWORD_select)
+			 /* KEYWORD_is is for recognizing "as" */
+			 || isKeyword (token, KEYWORD_is))
 	{
-		/* KEYWORD_is is for recognizing "as" */
 		if (isType (name, TOKEN_IDENTIFIER))
 		{
-			makeSqlTag (name, SQLTAG_TABLE);
-			readToken (token);
+			if (!emitted)
+				makeSqlTag (name, SQLTAG_TABLE);
+
+			if (isKeyword (token, KEYWORD_is))
+				readToken (token);
+
 			if (isKeyword (token, KEYWORD_select))
 			{
 				addToScope (token, name->string, SQLTAG_TABLE);
