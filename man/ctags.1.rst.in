@@ -1541,7 +1541,7 @@ file
 kind
 	Indicates the type, or kind, of tag. Its value is either one of the
 	corresponding one-letter flags described under the various
-	``--<LANG>-kinds`` options above, or a full name. It is permitted
+	``--kinds-<LANG>`` options above, or a full name. It is permitted
 	(and is, in fact, the default) for the key portion of this field to be
 	omitted. The optional behaviors are controlled with the ``--fields`` option.
 
