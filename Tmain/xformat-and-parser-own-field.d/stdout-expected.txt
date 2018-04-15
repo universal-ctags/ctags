@@ -20,8 +20,8 @@ subsection          -
 #
 # ENABLING COMMON FIELD BY SPECIFYING WILDCARD
 #
- Top level reStructuredText
-subsection reStructuredText
+ Top level ReStructuredText
+subsection ReStructuredText
 #
 # LIST: ENABLING COMMON FIELD BY SPECIFYING WILDCARD
 #

@@ -21,16 +21,16 @@
 # USA.
 #
 #
---langdef=pod
---map-pod=+.pod
+--langdef=Pod
+--map-Pod=+.pod
 
---kinddef-pod=c,chapter,chapters
---kinddef-pod=s,section,sections
---kinddef-pod=S,subsection,subsections
---kinddef-pod=t,subsubsection,subsubsections
+--kinddef-Pod=c,chapter,chapters
+--kinddef-Pod=s,section,sections
+--kinddef-Pod=S,subsection,subsections
+--kinddef-Pod=t,subsubsection,subsubsections
 
---regex-pod=/^=head1[ \t]+(.+)/\1/c/
---regex-pod=/^=head2[ \t]+(.+)/\1/s/
---regex-pod=/^=head3[ \t]+(.+)/\1/S/
---regex-pod=/^=head4[ \t]+(.+)/\1/t/
+--regex-Pod=/^=head1[ \t]+(.+)/\1/c/
+--regex-Pod=/^=head2[ \t]+(.+)/\1/s/
+--regex-Pod=/^=head3[ \t]+(.+)/\1/S/
+--regex-Pod=/^=head4[ \t]+(.+)/\1/t/
 

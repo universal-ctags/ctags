@@ -21,10 +21,10 @@
 # USA.
 #
 #
---langdef=ctags
---map-ctags=+.ctags
---kinddef-ctags=l,langdef,language definitions
---kinddef-ctags=k,kind,kind definitions
---regex-ctags=/^--langdef=([^ \t]+)$/\1/l/{scope=set}
---regex-ctags=/^--regex-[^=]+=.*\/.,(.+)\/.*/\1/k/{scope=ref}
---regex-ctags=/^--kinddef-[^=]+=.,([^,]+),.*/\1/k/{scope=ref}
+--langdef=Ctags
+--map-Ctags=+.ctags
+--kinddef-Ctags=l,langdef,language definitions
+--kinddef-Ctags=k,kind,kind definitions
+--regex-Ctags=/^--langdef=([^ \t]+)$/\1/l/{scope=set}
+--regex-Ctags=/^--regex-[^=]+=.*\/.,(.+)\/.*/\1/k/{scope=ref}
+--regex-Ctags=/^--kinddef-[^=]+=.,([^,]+),.*/\1/k/{scope=ref}

@@ -17,29 +17,29 @@
 # USA.
 #
 #
---langdef=elm
---map-elm=+.elm
+--langdef=Elm
+--map-Elm=+.elm
 
---kinddef-elm=m,module,Module
---kinddef-elm=n,namespace,Renamed Imported Module
---kinddef-elm=p,port,Port
---kinddef-elm=t,type,Type Definition
---kinddef-elm=c,constructor,Type Constructor
---kinddef-elm=a,alias,Type Alias
---kinddef-elm=f,function,Functions
---_roledef-elm=m.imported,imported module
+--kinddef-Elm=m,module,Module
+--kinddef-Elm=n,namespace,Renamed Imported Module
+--kinddef-Elm=p,port,Port
+--kinddef-Elm=t,type,Type Definition
+--kinddef-Elm=c,constructor,Type Constructor
+--kinddef-Elm=a,alias,Type Alias
+--kinddef-Elm=f,function,Functions
+--_roledef-Elm=m.imported,imported module
 
---regex-elm=/^(port[[:blank:]]+)?module[[:blank:]]+([[:upper:]][[:alnum:]_.]*)/\2/m/{scope=push}{exclusive}
---regex-elm=/^import[[:blank:]]+[[:alnum:]_.]+[[:blank:]]+as[[:blank:]]+([[:alnum:]]+)/\1/n/{scope=clear}{exclusive}
+--regex-Elm=/^(port[[:blank:]]+)?module[[:blank:]]+([[:upper:]][[:alnum:]_.]*)/\2/m/{scope=push}{exclusive}
+--regex-Elm=/^import[[:blank:]]+[[:alnum:]_.]+[[:blank:]]+as[[:blank:]]+([[:alnum:]]+)/\1/n/{scope=clear}{exclusive}
 #
 # Following two patterns are just for clearing scope stack.
 # X in "import X" should be captured as a reference tag in the future.
 #
---regex-elm=/^import[[:blank:]]+([[:alnum:]_.]+)[[:blank:]]exposing/\1/m/{scope=clear}{exclusive}{_role=imported}
---regex-elm=/^import[[:blank:]]+([[:alnum:]_.]+)/\1/m/{scope=clear}{exclusive}{_role=imported}
---regex-elm=/^port[[:blank:]]+([[:lower:]][[:alnum:]_]*).*/\1/p/{scope=clear}{exclusive}
---regex-elm=/^type +([[:upper:]][[:alnum:]_]*.*)/\1/t/{scope=set}{exclusive}
---regex-elm=/^[[:blank:]]+[|=][[:blank:]]+([[:upper:]][[:alnum:]_]*.*)$/\1/c/{scope=ref}{exclusive}
---regex-elm=/^type[[:blank:]]+alias[[:blank:]]+([[:upper:]][[:alnum:]_]*[[:blank:][:alnum:]_]*)/\1/a/{scope=set}{exclusive}
---regex-elm=/^([[:lower:]_][[:alnum:]_]*)[^=]*=$/\1/f/{scope=set}
---regex-elm=/^[[:blank:]]+([[:lower:]_][[:alnum:]_]*)[^=]*=$/\1/f/{scope=ref}
+--regex-Elm=/^import[[:blank:]]+([[:alnum:]_.]+)[[:blank:]]exposing/\1/m/{scope=clear}{exclusive}{_role=imported}
+--regex-Elm=/^import[[:blank:]]+([[:alnum:]_.]+)/\1/m/{scope=clear}{exclusive}{_role=imported}
+--regex-Elm=/^port[[:blank:]]+([[:lower:]][[:alnum:]_]*).*/\1/p/{scope=clear}{exclusive}
+--regex-Elm=/^type +([[:upper:]][[:alnum:]_]*.*)/\1/t/{scope=set}{exclusive}
+--regex-Elm=/^[[:blank:]]+[|=][[:blank:]]+([[:upper:]][[:alnum:]_]*.*)$/\1/c/{scope=ref}{exclusive}
+--regex-Elm=/^type[[:blank:]]+alias[[:blank:]]+([[:upper:]][[:alnum:]_]*[[:blank:][:alnum:]_]*)/\1/a/{scope=set}{exclusive}
+--regex-Elm=/^([[:lower:]_][[:alnum:]_]*)[^=]*=$/\1/f/{scope=set}
+--regex-Elm=/^[[:blank:]]+([[:lower:]_][[:alnum:]_]*)[^=]*=$/\1/f/{scope=ref}

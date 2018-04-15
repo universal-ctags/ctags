@@ -43,6 +43,7 @@ The following parsers have been added:
 * AutoIt
 * Clojure
 * CSS
+* Ctags option library *optlib*
 * CUDA
 * D
 * DBusIntrospect *libxml*
@@ -51,17 +52,18 @@ The following parsers have been added:
 * DTS
 * Elm *optlib*
 * Falcon
+* Gdbinit script *optlib*
 * Glade *libxml*
 * Go
 * JavaProperties
 * JSON
 * GNU linker script(LdScript)
-* man page *optlib*
+* Man page *optlib*
 * Maven2 *libxml*
 * M4
 * ObjectiveC
-* passwd
-* puppetManifest *optlib*
+* Passwd *optlib*
+* PuppetManifest *optlib*
 * Perl6
 * Pod *optlib*
 * PropertyList(plist) *libxml*
@@ -71,7 +73,7 @@ The following parsers have been added:
 * QtMoc
 * R
 * RelaxNG *libxml*
-* reStructuredText
+* ReStructuredText
 * Robot
 * RpmSpec
 * Rust
@@ -86,7 +88,6 @@ The following parsers have been added:
 * Yaml *libyaml*
 * YumRepo
 * Zephir
-* ctags option library *optlib*
 * Myrddin
 * RSpec *optlib*
 
