@@ -77,7 +77,7 @@ static kindDefinition JsonKinds [] = {
 	{ true,  'a', "array",		"arrays"	},
 	{ true,  'n', "number",		"numbers"	},
 	{ true,  's', "string",		"strings"	},
-	{ true,  'b', "bool",	"booleans"	},
+	{ true,  'b', "boolean",	"booleans"	},
 	{ true,  'z', "null",		"nulls"		}
 };
 
