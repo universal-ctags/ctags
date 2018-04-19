@@ -1,0 +1,19 @@
+foo	input.sql	/^CREATE TABLE foo($/;"	t
+col1	input.sql	/^    col1 text$/;"	E	table:foo
+bar	input.sql	/^CREATE TABLE bar AS$/;"	t
+col2	input.sql	/^SELECT 1 AS col2;$/;"	E	table:bar
+table_with_subselect	input.sql	/^CREATE TABLE table_with_subselect AS$/;"	t
+foo	input.sql	/^SELECT foo,$/;"	E	table:table_with_subselect
+bar	input.sql	/^    2 AS bar$/;"	E	table:table_with_subselect
+table_with_join	input.sql	/^CREATE TABLE table_with_join AS$/;"	t
+foo	input.sql	/^SELECT foo,$/;"	E	table:table_with_join
+bar	input.sql	/^    a.bar,$/;"	E	table:table_with_join
+b_bar	input.sql	/^    b.bar AS b_bar$/;"	E	table:table_with_join
+table_with_weird_expressions	input.sql	/^CREATE TABLE table_with_weird_expressions AS$/;"	t
+col1	input.sql	/^SELECT 'string AS not_a_colname' AS col1,$/;"	E	table:table_with_weird_expressions
+col3	input.sql	/^    'two lines' AS col3,$/;"	E	table:table_with_weird_expressions
+col4	input.sql	/^    1 + (SELECT 1 AS inner_colname) AS col4$/;"	E	table:table_with_weird_expressions
+table_with_subselect2	input.sql	/^CREATE TABLE table_with_subselect2 AS$/;"	t
+foo	input.sql	/^SELECT foo,$/;"	E	table:table_with_subselect2
+bar	input.sql	/^    2 AS bar$/;"	E	table:table_with_subselect2
+tmp_table0	input.sql	/^CREATE TABLE tmp_table0 AS$/;"	t

@@ -140,6 +140,8 @@ enum eKeywordId {
 	KEYWORD_go,
 	KEYWORD_with,
 	KEYWORD_without,
+	KEYWORD_select,
+	KEYWORD_from,
 };
 typedef int keywordId; /* to allow KEYWORD_NONE */
 
@@ -316,6 +318,8 @@ static const keywordTable SqlKeywordTable [] = {
 	{ "go",								KEYWORD_go				      },
 	{ "with",							KEYWORD_with			      },
 	{ "without",						KEYWORD_without			      },
+	{ "select",							KEYWORD_select			      },
+	{ "from",							KEYWORD_from			      },
 };
 
 /*
@@ -1772,9 +1776,96 @@ static void parsePackage (tokenInfo *const token)
 	deleteToken (name);
 }
 
+static void parseColumnsAndAliases (tokenInfo *const token)
+{
+	bool columnAcceptable = true;
+	tokenInfo *const lastId = newToken ();
+
+	/*
+	 * -- A
+	 * create table foo as select A;
+	 *
+	 * -- B
+	 * create table foo as select B from ...;
+	 *
+	 * -- D
+	 * create table foo as select C as D from ...;
+	 *
+	 * -- E, F
+	 * create table foo as select E, a.F;
+	 *
+	 * -- G, H
+	 * create table foo as select G, a.H from ...;
+	 *
+	 * -- J, K
+	 * create table foo as select I as J, a.K from ...;
+	 *
+	 * lastID is used for capturing A, B, E, F, G, H, and K.
+	 */
+	readToken (token);
+	do
+	{
+		if (isType (token, TOKEN_KEYWORD)
+			&& isKeyword (token, KEYWORD_is))
+		{
+			readToken (token);
+			if (isType (token, TOKEN_IDENTIFIER))
+			{
+				/* Emit the alias */
+				makeSqlTag (token, SQLTAG_FIELD);
+				columnAcceptable = true;
+			}
+			lastId->type = TOKEN_UNDEFINED;
+		}
+		else if ((isType (token, TOKEN_KEYWORD)
+				  && isKeyword (token, KEYWORD_from))
+				 || isType (token, TOKEN_SEMICOLON)
+				 || isType(token, TOKEN_COMMA))
+		{
+			if (lastId->type == TOKEN_IDENTIFIER)
+			{
+				/* Emit the column */
+				makeSqlTag(lastId, SQLTAG_FIELD);
+				columnAcceptable = true;
+			}
+
+			if (isType(token, TOKEN_COMMA))
+				lastId->type = TOKEN_UNDEFINED;
+			else
+				break;
+		}
+		else if (isType (token, TOKEN_OPEN_PAREN))
+		{
+			columnAcceptable = false;
+			skipToMatched (token);
+			lastId->type = TOKEN_UNDEFINED;
+			continue;
+		}
+		else if (isType (token, TOKEN_PERIOD))
+		{
+			lastId->type = TOKEN_UNDEFINED;
+		}
+		else if (isType (token, TOKEN_IDENTIFIER))
+		{
+			if (columnAcceptable)
+				copyToken (lastId, token);
+		}
+		else
+		{
+			columnAcceptable = false;
+			lastId->type = TOKEN_UNDEFINED;
+		}
+
+		readToken (token);
+	} while (! isType (token, TOKEN_EOF));
+
+	deleteToken (lastId);
+}
+
 static void parseTable (tokenInfo *const token)
 {
 	tokenInfo *const name = newToken ();
+	bool emitted = false;
 
 	/*
 	 * This deals with these formats:
@@ -1795,6 +1886,11 @@ static void parseTable (tokenInfo *const token)
      *     create table master..HasDbNoOwner (
      *     create table [master].dbo.[HasDbAndOwnerSquare] (
      *     create table [master]..[HasDbNoOwnerSquare] (
+	 * Oracle and PostgreSQL use this format:
+	 *     create table FOO as select...
+	 * MySQL allows omitting "as" like:
+	 *     create table FOO select...
+	 *     create table FOO (...) select...
 	 */
 
 	/* This could be a database, owner or table name */
@@ -1828,12 +1924,21 @@ static void parseTable (tokenInfo *const token)
 			isType (name, TOKEN_STRING))
 		{
 			makeSqlTag (name, SQLTAG_TABLE);
+			emitted = true;
+
 			vStringCopy(token->scope, name->string);
 			token->scopeKind = SQLTAG_TABLE;
 			parseRecord (token);
 			vStringClear (token->scope);
 			token->scopeKind = SQLTAG_COUNT;
+			readToken (token);
+			fprintf(stderr, "=> %s, t: %d, k: %d\n", vStringValue(token->string),
+					token->type,
+					token->keyword
+				);
 		}
+		else
+			skipToMatched(token);
 	}
 	else if (isKeyword (token, KEYWORD_at))
 	{
@@ -1842,7 +1947,28 @@ static void parseTable (tokenInfo *const token)
 			makeSqlTag (name, SQLTAG_TABLE);
 		}
 	}
-	findCmdTerm (token, false);
+
+	if (isKeyword (token, KEYWORD_select)
+			 /* KEYWORD_is is for recognizing "as" */
+			 || isKeyword (token, KEYWORD_is))
+	{
+		if (isType (name, TOKEN_IDENTIFIER))
+		{
+			if (!emitted)
+				makeSqlTag (name, SQLTAG_TABLE);
+
+			if (isKeyword (token, KEYWORD_is))
+				readToken (token);
+
+			if (isKeyword (token, KEYWORD_select))
+			{
+				addToScope (token, name->string, SQLTAG_TABLE);
+				parseColumnsAndAliases (token);
+				vStringClear (token->scope);
+			}
+		}
+	}
+	findCmdTerm (token, true);
 	deleteToken (name);
 }
 
@@ -2161,10 +2287,9 @@ static void parseView (tokenInfo *const token)
 
 	/*
 	 * This deals with these formats
-	 *	   create variable varname1 integer;
-	 *	   create variable @varname2 integer;
-	 *	   create variable "varname3" integer;
-	 *	   drop   variable @varname3;
+	 *     create view VIEW;
+	 *     create view VIEW as ...;
+	 *     create view VIEW (...) as ...;
 	 */
 
 	readIdentifier (name);

@@ -1,0 +1,11 @@
+bar	input.sql	/^CREATE TABLE bar (m INT) SELECT n FROM foo;$/;"	t
+m	input.sql	/^CREATE TABLE bar (m INT) SELECT n FROM foo;$/;"	E	table:bar
+n	input.sql	/^CREATE TABLE bar (m INT) SELECT n FROM foo;$/;"	E	table:bar
+bar	input.sql	/^CREATE TABLE bar (UNIQUE (n)) SELECT n FROM foo;$/;"	t
+n	input.sql	/^CREATE TABLE bar (UNIQUE (n)) SELECT n FROM foo;$/;"	E	table:bar
+artists_and_works	input.sql	/^CREATE TABLE artists_and_works$/;"	t
+name	input.sql	/^  SELECT artist.name, COUNT(work.artist_id) AS number_of_works$/;"	E	table:artists_and_works
+number_of_works	input.sql	/^  SELECT artist.name, COUNT(work.artist_id) AS number_of_works$/;"	E	table:artists_and_works
+foo	input.sql	/^CREATE TABLE foo (a TINYINT NOT NULL) SELECT b+1 AS a FROM bar;$/;"	t
+a	input.sql	/^CREATE TABLE foo (a TINYINT NOT NULL) SELECT b+1 AS a FROM bar;$/;"	E	table:foo
+a	input.sql	/^CREATE TABLE foo (a TINYINT NOT NULL) SELECT b+1 AS a FROM bar;$/;"	E	table:foo

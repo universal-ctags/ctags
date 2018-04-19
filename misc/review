@@ -151,8 +151,10 @@ units_inspect_cmd_show_diff ()
 {
     local cmd=cat
 
-    if which colordiff > /dev/null; then
+    if which colordiff > /dev/null 2>&1; then
 	cmd=colordiff
+    elif which pygmentize > /dev/null 2>&1; then
+	cmd="pygmentize -l diff"
     fi
 
     inspect_cmd_show_generic $1 DIFF.tmp cat | ${cmd}
@@ -165,7 +167,7 @@ units_inspect_show_args_ctags ()
 
 pygmentize_or_cat ()
 {
-    if which pygmentize > /dev/null; then
+    if which pygmentize > /dev/null 2>&1; then
 	pygmentize -O "style=colorful,linenos=1" $1 2>/dev/null || cat -n $1
     else
 	cat -n $1
