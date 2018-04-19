@@ -30,7 +30,7 @@ reader should read ctags(1) of Universal-ctags first. Following
 options are for defining (or customizing) a parser:
 
 * ``--langdef=``
-* ``--kindedef-<LANG>=``
+* ``--kinddef-<LANG>=``
 * ``--map-<LANG>=``
 * ``--regex-<LANG>=``
 
