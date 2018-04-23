@@ -28,6 +28,7 @@
 
 --langdef=Markdown
 --map-Markdown=+.md
+--map-Markdown=+.markdown
 
 --kinddef-Markdown=c,chapter,chapsters
 --kinddef-Markdown=s,section,sections

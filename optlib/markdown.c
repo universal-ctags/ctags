@@ -81,6 +81,7 @@ extern parserDefinition* MarkdownParser (void)
 {
 	static const char *const extensions [] = {
 		"md",
+		"markdown",
 		NULL
 	};
 
