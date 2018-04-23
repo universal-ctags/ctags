@@ -1,0 +1,24 @@
+ns0	input.clj	/^(ns ^{:doc "Utility functions."} ns0)$/;"	n
+debug0?	input.clj	/^(defn debug0? ^boolean$/;"	f	namespace:ns0
+ns1	input-0.clj	/^(ns ^:dynamic ns1)$/;"	n
+debug1?	input-0.clj	/^(defn debug1? ^boolean$/;"	f	namespace:ns1
+ns2	input-0.clj	/^(ns ^String ns2)$/;"	n
+debug2?	input-0.clj	/^(defn debug2? ^boolean$/;"	f	namespace:ns2
+ns00	input-0.clj	/^(ns ^{:doc "Utility functions."} ^{:doc1 "something"} ns00)$/;"	n
+debug00?	input-0.clj	/^(defn debug00? ^boolean$/;"	f	namespace:ns00
+ns01	input-0.clj	/^(ns ^{:doc "Utility functions."} ^:dynamic ns01)$/;"	n
+debug01?	input-0.clj	/^(defn debug01? ^boolean$/;"	f	namespace:ns01
+ns02	input-0.clj	/^(ns ^{:doc "Utility functions."} ^String ns02)$/;"	n
+debug02?	input-0.clj	/^(defn debug02? ^boolean$/;"	f	namespace:ns02
+ns10	input-0.clj	/^(ns ^:dynamic ^{:doc "Utility functions."} ns10)$/;"	n
+debug10?	input-0.clj	/^(defn debug10? ^boolean$/;"	f	namespace:ns10
+ns11	input-0.clj	/^(ns ^:dynamic ^:dynamic-something ns11)$/;"	n
+debug11?	input-0.clj	/^(defn debug11? ^boolean$/;"	f	namespace:ns11
+ns12	input-0.clj	/^(ns ^:dynamic ^String ns12)$/;"	n
+debug12?	input-0.clj	/^(defn debug12? ^boolean$/;"	f	namespace:ns12
+ns20	input-0.clj	/^(ns ^String ^{:doc "Utility functions."} ns20)$/;"	n
+debug20?	input-0.clj	/^(defn debug20? ^boolean$/;"	f	namespace:ns20
+ns21	input-0.clj	/^(ns ^String ^:dynamic ns21)$/;"	n
+debug21?	input-0.clj	/^(defn debug21? ^boolean$/;"	f	namespace:ns21
+ns22	input-0.clj	/^(ns ^String ^String-something ns22)$/;"	n
+debug22?	input-0.clj	/^(defn debug22? ^boolean$/;"	f	namespace:ns22
