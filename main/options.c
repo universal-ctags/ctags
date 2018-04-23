@@ -60,7 +60,7 @@
 #define IGNORE_SEPARATORS   ", \t\n"
 
 #ifndef DEFAULT_FILE_FORMAT
-# define DEFAULT_FILE_FORMAT  3
+# define DEFAULT_FILE_FORMAT  2
 #endif
 
 #if defined (HAVE_OPENDIR) || defined (HAVE__FINDFIRST)
@@ -85,7 +85,7 @@
 
 enum eOptionLimits {
 	MaxHeaderExtensions	= 100,  /* maximum number of extensions in -h option */
-	MaxSupportedTagFormat = 3
+	MaxSupportedTagFormat = 2
 };
 
 typedef struct sOptionDescription {
@@ -263,7 +263,11 @@ static optionDescription LongOptionDescription [] = {
  {1,"       Specify string to print to stdout following the tags for each file"},
  {1,"       parsed when --filter is enabled."},
  {0,"  --format=level"},
- {0,"       Force output of specified tag file format [" STRINGIFY(DEFAULT_FILE_FORMAT) "]."},
+#if DEFAULT_FILE_FORMAT == 1
+ {0,"       Force output of specified tag file format [1]."},
+#else
+ {0,"       Force output of specified tag file format [2]."},
+#endif
  {1,"  --guess-language-eagerly"},
  {1,"       Guess the language of input file more eagerly"},
  {1,"       (but taking longer time for guessing):"},
@@ -370,12 +374,12 @@ static optionDescription LongOptionDescription [] = {
  {1,"      The encoding to write the tag file in. Defaults to UTF-8 if --input-encoding"},
  {1,"      is specified, otherwise no conversion is performed."},
 #endif
- {0,"  --output-format=ctags|etags|xref"
+ {0,"  --output-format=u-ctags|e-ctags|etags|xref"
 #ifdef HAVE_JANSSON
   "|json"
 #endif
  },
- {0,"      Specify the output format. [ctags]"},
+ {0,"      Specify the output format. [u-ctags]"},
  {1,"  --param-<LANG>:name=argument"},
  {1,"       Set <LANG> specific parameter. Available parameters can be listed with --list-params."},
  {0,"  --pattern-length-limit=N"},
@@ -797,6 +801,7 @@ static void setXrefMode (void)
 static void setJsonMode (void)
 {
 	enablePtag (PTAG_JSON_OUTPUT_VERSION, true);
+	enablePtag (PTAG_OUTPUT_MODE, false);
 	enablePtag (PTAG_FILE_FORMAT, false);
 	setTagWriter (WRITER_JSON);
 }
@@ -2266,8 +2271,10 @@ static void processOutputFormat (const char *const option CTAGS_ATTR_UNUSED,
 	if (parameter [0] == '\0')
 		error (FATAL, "no output format name supplied for \"%s\"", option);
 
-	if (strcmp (parameter, "ctags") == 0)
-		setTagWriter (WRITER_CTAGS);
+	if (strcmp (parameter, "u-ctags") == 0)
+		;
+	else if (strcmp (parameter, "e-ctags") == 0)
+		setTagWriter (WRITER_E_CTAGS);
 	else if (strcmp (parameter, "etags") == 0)
 		setEtagsMode ();
 	else if (strcmp (parameter, "xref") == 0)

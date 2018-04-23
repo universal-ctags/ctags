@@ -34,9 +34,6 @@ static bool ptagMakeFormat (ptagDesc *desc, void *data CTAGS_ATTR_UNUSED)
 	else if (Option.tagFileFormat == 2)
 		formatComment =
 			"extended format; --format=1 will not append ;\" to lines";
-	else if (Option.tagFileFormat == 3)
-		formatComment =
-			"extended format with meta character escaping";
 	return writePseudoTag (desc, format, formatComment, NULL);
 }
 
@@ -142,6 +139,10 @@ static ptagDesc ptagDescs [] = {
 	  "the letters, names and descriptions of kinds in a parser",
 	  ptagMakeKindDescriptions,
 	  false },
+	{ true, "TAG_OUTPUT_MODE",
+	  "the output mode: u-ctags or e-ctags",
+	  ptagMakeCtagsOutputMode,
+	  true },
 };
 
 extern bool makePtagIfEnabled (ptagType type, void *data)

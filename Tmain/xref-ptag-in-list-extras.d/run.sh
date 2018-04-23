@@ -6,13 +6,13 @@ CTAGS=$1
 O=/tmp/ctags-tmain-$$
 
 echo '#' tags regular file
-"${CTAGS}" --options=NONE --output-format=ctags -o $O --list-extras | grep pseudo
+"${CTAGS}" --options=NONE --output-format=u-ctags -o $O --list-extras | grep pseudo
 
 echo '#' tags -
-"${CTAGS}" --options=NONE --output-format=ctags -o - --list-extras | grep pseudo
+"${CTAGS}" --options=NONE --output-format=u-ctags -o - --list-extras | grep pseudo
 
 echo '#' tags NOTHING
-"${CTAGS}" --options=NONE --output-format=ctags --list-extras | grep pseudo
+"${CTAGS}" --options=NONE --output-format=u-ctags --list-extras | grep pseudo
 
 echo '#' xref regular file
 "${CTAGS}" --options=NONE --output-format=xref -o $O --list-extras | grep pseudo
