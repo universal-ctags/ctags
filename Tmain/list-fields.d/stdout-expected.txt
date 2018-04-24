@@ -29,6 +29,7 @@ z	kind	no	NONE	s--	no	Include the "kind:" key in kind field (use k or K) in tags
 -	template	no	C++	s--	no	template parameters
 -	properties	no	CUDA	s--	no	properties (static, inline, mutable,...)
 -	assignment	yes	LdScript	s--	no	how a value is assigned to the symbol
+-	sectionMarker	no	Markdown	s--	no	character used for declaring section(#, ##, =, or -)
 -	home	yes	Passwd	s--	no	home directory
 -	shell	yes	Passwd	s--	no	login shell
 -	decorators	no	Python	s--	no	decorators on functions and classes

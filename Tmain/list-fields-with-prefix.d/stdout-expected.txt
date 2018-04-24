@@ -11,6 +11,7 @@ x       UCTAGSxpath         no      NONE             s--    no    xpath for the 
 -       UCTAGStemplate      no      C++              s--    no    template parameters
 -       UCTAGSproperties    no      CUDA             s--    no    properties (static, inline, mutable,...)
 -       UCTAGSassignment    yes     LdScript         s--    no    how a value is assigned to the symbol
+-       UCTAGSsectionMarker no      Markdown         s--    no    character used for declaring section(#, ##, =, or -)
 -       UCTAGShome          yes     Passwd           s--    no    home directory
 -       UCTAGSshell         yes     Passwd           s--    no    login shell
 -       UCTAGSdecorators    no      Python           s--    no    decorators on functions and classes
