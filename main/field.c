@@ -98,19 +98,21 @@ static fieldDefinition fieldDefinitionsFixed [] = {
 	DEFINE_FIELD ('N', "name",     true,
 			  "tag name",
 			  FIELDTYPE_STRING,
-			  [WRITER_CTAGS] = renderFieldName,
-			  [WRITER_JSON]  = renderFieldNameNoEscape,
+			  [WRITER_U_CTAGS] = renderFieldName,
+			  [WRITER_E_CTAGS] = renderFieldNameNoEscape,
+			  [WRITER_JSON]    = renderFieldNameNoEscape,
 			  ),
 	DEFINE_FIELD ('F', "input",    true,
 			   "input file",
 			   FIELDTYPE_STRING,
-			   [WRITER_CTAGS] = renderFieldInput,
-			   [WRITER_JSON]  = renderFieldInputNoEscape,
+			   [WRITER_U_CTAGS] = renderFieldInput,
+			   [WRITER_E_CTAGS] = renderFieldInputNoEscape,
+			   [WRITER_JSON]    = renderFieldInputNoEscape,
 		),
 	DEFINE_FIELD ('P', "pattern",  true,
 			   "pattern",
 			   FIELDTYPE_STRING|FIELDTYPE_BOOL,
-			   [WRITER_CTAGS] = renderFieldPatternCtags,
+			   [WRITER_U_CTAGS] = renderFieldPatternCtags,
 			   [WRITER_XREF]    = renderFieldPatternCommon,
 			   [WRITER_JSON]    = renderFieldPatternCommon,
 		),
@@ -120,104 +122,106 @@ static fieldDefinition fieldDefinitionsExuberant [] = {
 	DEFINE_FIELD ('C', "compact",        false,
 			   "compact input line (used only in xref output)",
 			   FIELDTYPE_STRING,
-			   [WRITER_CTAGS] = renderFieldCompactInputLine),
+			   [WRITER_U_CTAGS] = renderFieldCompactInputLine),
 
 	/* EXTENSION FIELDS */
 	DEFINE_FIELD_FULL ('a', "access",         false,
 		      "Access (or export) of class members",
 			  isAccessFieldAvailable,
 			  FIELDTYPE_STRING,
-		      [WRITER_CTAGS] = renderFieldAccess),
+		      [WRITER_U_CTAGS] = renderFieldAccess),
 	DEFINE_FIELD_FULL ('f', "file",           true,
 		      "File-restricted scoping",
 			  isFileFieldAvailable,
 			  FIELDTYPE_BOOL,
-		      [WRITER_CTAGS] = renderFieldFile),
+		      [WRITER_U_CTAGS] = renderFieldFile),
 	DEFINE_FIELD_FULL ('i', "inherits",       false,
 		      "Inheritance information",
 			  isInheritsFieldAvailable,
 			  FIELDTYPE_STRING|FIELDTYPE_BOOL,
-		      [WRITER_CTAGS] = renderFieldInherits),
+		      [WRITER_U_CTAGS] = renderFieldInherits),
 	DEFINE_FIELD ('K', NULL,             false,
 		      "Kind of tag as full name",
 		      FIELDTYPE_STRING,
-		      [WRITER_CTAGS] = renderFieldKindName),
+		      [WRITER_U_CTAGS] = renderFieldKindName),
 	DEFINE_FIELD ('k', NULL,             true,
 			   "Kind of tag as a single letter",
 			   FIELDTYPE_STRING,
-			   [WRITER_CTAGS] = renderFieldKindLetter),
+			   [WRITER_U_CTAGS] = renderFieldKindLetter),
 	DEFINE_FIELD_FULL ('l', "language",       false,
 			   "Language of input file containing tag",
 			   isLanguageFieldAvailable,
 			   FIELDTYPE_STRING,
-			   [WRITER_CTAGS] = renderFieldLanguage),
+			   [WRITER_U_CTAGS] = renderFieldLanguage),
 	DEFINE_FIELD_FULL ('m', "implementation", false,
 			   "Implementation information",
 			   isImplementationFieldAvailable,
 			   FIELDTYPE_STRING,
-			   [WRITER_CTAGS] = renderFieldImplementation),
+			   [WRITER_U_CTAGS] = renderFieldImplementation),
 	DEFINE_FIELD ('n', "line",           false,
 			   "Line number of tag definition",
 			   FIELDTYPE_INTEGER,
-			   [WRITER_CTAGS] = renderFieldLineNumber),
+			   [WRITER_U_CTAGS] = renderFieldLineNumber),
 	DEFINE_FIELD_FULL ('S', "signature",	     false,
 			   "Signature of routine (e.g. prototype or parameter list)",
 			   isSignatureFieldAvailable,
 			   FIELDTYPE_STRING,
-			   [WRITER_CTAGS] = renderFieldSignature),
+			   [WRITER_U_CTAGS] = renderFieldSignature),
 	DEFINE_FIELD ('s', NULL,             true,
 			   "Scope of tag definition (`p' can be used for printing its kind)",
 			   FIELDTYPE_STRING,
-			   [WRITER_CTAGS] = renderFieldScope,
+			   [WRITER_U_CTAGS] = renderFieldScope,
+			   [WRITER_E_CTAGS] = renderFieldScopeNoEscape,
 			   [WRITER_JSON]    = renderFieldScopeNoEscape),
 	DEFINE_FIELD_FULL ('t', "typeref",        true,
 			   "Type and name of a variable or typedef",
 			   isTyperefFieldAvailable,
 			   FIELDTYPE_STRING,
-			   [WRITER_CTAGS] = renderFieldTyperef),
+			   [WRITER_U_CTAGS] = renderFieldTyperef),
 	DEFINE_FIELD ('z', "kind",           false,
 			   "Include the \"kind:\" key in kind field (use k or K) in tags output, kind full name in xref output",
 			   FIELDTYPE_STRING,
 			   /* Following renderer is for handling --_xformat=%{kind};
 			      and is not for tags output. */
-			   [WRITER_CTAGS] = renderFieldKindName),
+			   [WRITER_U_CTAGS] = renderFieldKindName),
 };
 
 static fieldDefinition fieldDefinitionsUniversal [] = {
 	DEFINE_FIELD ('r', "roles",    false,
 			   "Roles",
 			   FIELDTYPE_STRING,
-			   [WRITER_CTAGS] = renderFieldRoles),
+			   [WRITER_U_CTAGS] = renderFieldRoles),
 	DEFINE_FIELD ('R',  NULL,     false,
 			   "Marker (R or D) representing whether tag is definition or reference",
 			   FIELDTYPE_STRING,
-			   [WRITER_CTAGS] = renderFieldRefMarker),
+			   [WRITER_U_CTAGS] = renderFieldRefMarker),
 	DEFINE_FIELD ('Z', "scope",   false,
 			  "Include the \"scope:\" key in scope field (use s) in tags output, scope name in xref output",
 			   FIELDTYPE_STRING,
 			   /* Following renderer is for handling --_xformat=%{scope};
 			      and is not for tags output. */
-			   [WRITER_CTAGS] = renderFieldScope,
-			   [WRITER_JSON]  = renderFieldScopeNoEscape),
+			   [WRITER_U_CTAGS] = renderFieldScope,
+			   [WRITER_E_CTAGS] = renderFieldScopeNoEscape,
+			   [WRITER_JSON]    = renderFieldScopeNoEscape),
 	DEFINE_FIELD_FULL ('E', "extras",   false,
 			   "Extra tag type information",
 			   isExtrasFieldAvailable,
 			   FIELDTYPE_STRING,
-			   [WRITER_CTAGS] = renderFieldExtras),
+			   [WRITER_U_CTAGS] = renderFieldExtras),
 	DEFINE_FIELD_FULL ('x', "xpath",   false,
 			   "xpath for the tag",
 			   isXpathFieldAvailable,
 			   FIELDTYPE_STRING,
-			   [WRITER_CTAGS] = renderFieldXpath),
+			   [WRITER_U_CTAGS] = renderFieldXpath),
 	DEFINE_FIELD ('p', "scopeKind", false,
 			   "Kind of scope as full name",
 			   FIELDTYPE_STRING,
-			   [WRITER_CTAGS] = renderFieldScopeKindName),
+			   [WRITER_U_CTAGS] = renderFieldScopeKindName),
 	DEFINE_FIELD_FULL ('e', "end", false,
 			   "end lines of various items",
 			   isEndFieldAvailable,
 			   FIELDTYPE_INTEGER,
-			   [WRITER_CTAGS] = renderFieldEnd),
+			   [WRITER_U_CTAGS] = renderFieldEnd),
 };
 
 
@@ -421,10 +425,7 @@ static const char *renderEscapedName (const bool isTagName,
 static const char *renderFieldName (const tagEntryInfo *const tag, const char *value CTAGS_ATTR_UNUSED, vString* b,
 									bool *rejected CTAGS_ATTR_UNUSED)
 {
-	if (escapeMetacharacters())
-		return renderEscapedName (true, tag->name, tag, b);
-	else
-		return renderFieldNameNoEscape(tag, value, b, rejected);
+	return renderEscapedName (true, tag->name, tag, b);
 }
 
 static const char *renderFieldNameNoEscape (const tagEntryInfo *const tag, const char *value CTAGS_ATTR_UNUSED, vString* b,
@@ -441,17 +442,11 @@ static const char *renderFieldNameNoEscape (const tagEntryInfo *const tag, const
 static const char *renderFieldInput (const tagEntryInfo *const tag, const char *value CTAGS_ATTR_UNUSED, vString* b,
 									 bool *rejected CTAGS_ATTR_UNUSED)
 {
+	const char *f = tag->inputFileName;
 
-	if (escapeMetacharacters())
-	{
-		const char *f = tag->inputFileName;
-
-		if (Option.lineDirectives && tag->sourceFileName)
-			f = tag->sourceFileName;
-		return renderEscapedString (f, tag, b);
-	}
-	else
-		return renderFieldInputNoEscape(tag, value, b, rejected);
+	if (Option.lineDirectives && tag->sourceFileName)
+		f = tag->sourceFileName;
+	return renderEscapedString (f, tag, b);
 }
 
 static const char *renderFieldInputNoEscape (const tagEntryInfo *const tag, const char *value CTAGS_ATTR_UNUSED, vString* b,
@@ -481,15 +476,10 @@ static const char *renderFieldSignature (const tagEntryInfo *const tag, const ch
 static const char *renderFieldScope (const tagEntryInfo *const tag, const char *value CTAGS_ATTR_UNUSED, vString* b,
 									 bool *rejected CTAGS_ATTR_UNUSED)
 {
-	if (escapeMetacharacters())
-	{
-		const char* scope;
+	const char* scope;
 
-		getTagScopeInformation ((tagEntryInfo *const)tag, NULL, &scope);
-		return scope? renderEscapedName (false, scope, tag, b): NULL;
-	}
-	else
-		return renderFieldScopeNoEscape(tag, value, b, rejected);
+	getTagScopeInformation ((tagEntryInfo *const)tag, NULL, &scope);
+	return scope? renderEscapedName (false, scope, tag, b): NULL;
 }
 
 static const char *renderFieldScopeNoEscape (const tagEntryInfo *const tag, const char *value CTAGS_ATTR_UNUSED, vString* b,

@@ -921,23 +921,6 @@ Changes to the tags file format
 ---------------------------------------------------------------------
 
 
-
-version 3 format for handling meta characters in tag entry
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. REVIEWED
-
-To allow recording names including tab characters and other control
-characters in a tag file, version 3 of the file format extends version
-2 with extra escape sequences.
-
-You can use ``--format=2`` to keep compatibility with the output of
-Exuberant-ctags; however, this version of the format cannot record
-names which include tab characters.
-
-See also :ref:`Compatible output and weakness <compat-output>`.
-
-
 Truncating the pattern for long input lines
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 To prevent generating overly large tags files, a pattern field is
@@ -1226,6 +1209,15 @@ The third line means `\\` is used when for combining a namespace item
 
 Of course, ctags uses the more specific line when choosing a
 separator; the third line has higher priority than the first.
+
+``TAG_OUTPUT_MODE``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. NOT REVIEWED YET
+
+This pseudo tag represents output mode: u-ctags or e-ctags.
+
+See also :ref:`Compatible output and weakness <compat-output>`.
 
 .. _parser-own-fields:
 

@@ -1,5 +1,5 @@
 !_TAG_PROGRAM_NAME	Universal Ctags	/Derived from Exuberant Ctags/
-!_TAG_FILE_FORMAT	3	/extended format with meta character escaping/
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
 !_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
 !_TAG_KIND_SEPARATOR!PHP	::	/*a/
 !_TAG_KIND_SEPARATOR!PHP	::	/*c/
@@ -19,6 +19,7 @@
 !_TAG_KIND_SEPARATOR!PHP	\\	/nn/
 !_TAG_KIND_SEPARATOR!PHP	\\	/nt/
 !_TAG_KIND_SEPARATOR!PHP	\\	/nv/
+!_TAG_OUTPUT_MODE	u-ctags	/u-ctags or e-ctags/
 !_TAG_PROGRAM_AUTHOR	Universal Ctags Team	//
 !_TAG_PROGRAM_NAME	Universal Ctags	/Derived from Exuberant Ctags/
 !_TAG_PROGRAM_URL	https://ctags.io/	/official site/

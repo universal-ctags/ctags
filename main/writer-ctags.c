@@ -34,31 +34,31 @@ struct rejection {
 	bool rejectedInThisInput;
 };
 
+tagWriter uCtagsWriter = {
+	.writeEntry = writeCtagsEntry,
+	.writePtagEntry = writeCtagsPtagEntry,
+	.preWriteEntry = NULL,
+	.postWriteEntry = NULL,
+	.buildFqTagCache = buildCtagsFqTagCache,
+	.defaultFileName = CTAGS_FILE,
+};
+
 static void *beginECtagsFile (tagWriter *writer CTAGS_ATTR_UNUSED, MIO * mio CTAGS_ATTR_UNUSED)
 {
 	static struct rejection rej;
 
-	if (escapeMetacharacters())
-		return NULL;
-	else
-	{
-		rej.rejectedInThisInput = false;
-		return &rej;
-	}
+	rej.rejectedInThisInput = false;
+
+	return &rej;
 }
 
 static bool endECTagsFile (tagWriter *writer, MIO * mio CTAGS_ATTR_UNUSED, const char* filename CTAGS_ATTR_UNUSED)
 {
-	if (escapeMetacharacters())
-		return false;
-	else
-	{
-		struct rejection *rej = writer->private;
-		return rej->rejectedInThisInput;
-	}
+	struct rejection *rej = writer->private;
+	return rej->rejectedInThisInput;
 }
 
-tagWriter ctagsWriter = {
+tagWriter eCtagsWriter = {
 	.writeEntry = writeCtagsEntry,
 	.writePtagEntry = writeCtagsPtagEntry,
 	.preWriteEntry = beginECtagsFile,
