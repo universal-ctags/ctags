@@ -355,6 +355,15 @@ process_token:
 						cppBeginStatement();
 					break;
 					case CXXKeywordTRY:
+						if (g_cxx.pToken->pPrev
+							&& cxxTokenTypeIs(g_cxx.pToken->pPrev, CXXTokenTypeParenthesisChain))
+						{
+							/* Maybe we are at "try" of "Function-try-block" like
+							   int f(int n = 2) try { ...
+							   Let's ignore this "try". */
+							continue;
+						}
+						/* Fall through */
 					case CXXKeywordELSE:
 					case CXXKeywordDO:
 						// parse as normal statement/block
