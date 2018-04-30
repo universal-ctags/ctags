@@ -1,0 +1,4 @@
+S	input.cxx	/^struct S {$/;"	s	file:
+m	input.cxx	/^    std::string m;$/;"	m	struct:S	typeref:typename:std::string	file:
+S	input.cxx	/^    S(const std::string& arg) try : m(arg, 100) {$/;"	f	struct:S	file:
+f	input.cxx	/^int f(int n = 2) try {$/;"	f	typeref:typename:int
