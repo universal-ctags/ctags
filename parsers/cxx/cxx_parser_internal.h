@@ -34,6 +34,7 @@ typedef enum _CXXLanguage
 
 // cxx_parser_tokenizer.c
 bool cxxParserParseNextToken(void);
+void cxxParserUngetCurrentToken(void);
 
 // cxx_parser_lambda.c
 CXXToken * cxxParserOpeningBracketIsLambda(void);
@@ -83,6 +84,8 @@ typedef enum _CXXFunctionSignatureInfoFlag
 	// Is scope template specialization a<x>::b()
 	// (implies that this is a template specialization too)
 	CXXFunctionSignatureInfoScopeTemplateSpecialization = (1 << 7),
+	// function-try-block: int f() try { ... } catch { ... }
+	CXXFunctionSignatureInfoFunctionTryBlock = (1 << 8),
 } CXXFunctionSignatureInfoFlag;
 
 //
@@ -142,7 +145,10 @@ typedef struct _CXXFunctionSignatureInfo
 } CXXFunctionSignatureInfo;
 
 int cxxParserMaybeParseKnRStyleFunctionDefinition(void);
-int cxxParserExtractFunctionSignatureBeforeOpeningBracket(int * piCorkQueueIndex);
+int cxxParserExtractFunctionSignatureBeforeOpeningBracket(
+		CXXFunctionSignatureInfo * pInfo,
+		int * piCorkQueueIndex
+	);
 
 #define CXX_MAX_EXTRACTED_PARAMETERS 24
 
@@ -213,7 +219,7 @@ bool cxxParserParseAndCondenseCurrentSubchain(
 	);
 bool cxxParserParseUpToOneOf(unsigned int uTokenTypes,
 							 bool bCanReduceInnerElements);
-bool cxxParserParseIfForWhileSwitch(void);
+bool cxxParserParseIfForWhileSwitchCatchParenthesis(void);
 bool cxxParserParseTemplatePrefix(void);
 bool cxxParserParseTemplateAngleBracketsToSeparateChain(void);
 bool cxxParserParseUsingClause(void);
@@ -225,6 +231,7 @@ bool cxxParserParseAndCondenseSubchainsUpToOneOf(
 		bool bCanReduceInnerElements
 	);
 void cxxParserMarkEndLineForTagInCorkQueue(int iCorkQueueIndex);
+void cxxParserSetEndLineForTagInCorkQueue(int iCorkQueueIndex,unsigned long lEndLine);
 
 typedef enum _CXXParserKeywordState
 {
@@ -295,6 +302,11 @@ typedef struct _CXXParserState
 	// The last token we have extracted. This is always pushed to
 	// the token chain tail (which will take care of deletion)
 	CXXToken * pToken; // the token chain tail
+	
+	// The parser internally supports a look-ahead of one token.
+	// It is rarely needed though.
+	// This is the token that has been "unget" from the token chain tail.
+	CXXToken * pUngetToken;
 
 	// The last char we have extracted from input
 	int iChar;

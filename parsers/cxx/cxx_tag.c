@@ -286,6 +286,9 @@ vString * cxxTagSetProperties(unsigned int uProperties)
 		vStringCatS(pszProperties,_szProperty); \
 	} while(0)
 
+	// FIXME: The property names might be too verbose. Maybe it could be a good idea
+	//        to a switch to shorten them to 1-2 letter codes?
+
 	if(uProperties & CXXTagPropertyConst)
 		ADD_PROPERTY("const");
 	if(uProperties & CXXTagPropertyDefault)
@@ -320,6 +323,8 @@ vString * cxxTagSetProperties(unsigned int uProperties)
 		ADD_PROPERTY("deprecated");
 	if(uProperties & CXXTagPropertyScopedEnum)
 		ADD_PROPERTY("scopedenum");
+	if(uProperties & CXXTagPropertyFunctionTryBlock)
+		ADD_PROPERTY("fntryblock");
 
 	cxxTagSetField(CXXTagFieldProperties,vStringValue(pszProperties));
 
