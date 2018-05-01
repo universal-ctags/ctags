@@ -31,8 +31,8 @@ int f3()
 {
 	// This is NOT a function-try-block
 	try {
-		int f2v1 = 10;
-	} catch(std::exception & f2v2)
+		int f3v1 = 10;
+	} catch(std::exception & f3v2)
 	{
 	}
 }
