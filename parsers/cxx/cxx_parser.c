@@ -1706,10 +1706,10 @@ bool cxxParserParseIfForWhileSwitchCatchParenthesis(void)
 			{
 				bOkToExtractVariables = true;
 			} else {
-				bOkToExtractVariables = cxxTokenChainNextTokenOfType(
+				bOkToExtractVariables = (cxxTokenChainNextTokenOfType(
 						pAndOrStar,
 						CXXTokenTypeAssignment | CXXTokenTypeSemicolon
-					);
+					) ? true : false); // ternary ?: needed because of MSVC
 			}
 		}
 	}

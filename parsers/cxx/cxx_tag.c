@@ -286,9 +286,6 @@ vString * cxxTagSetProperties(unsigned int uProperties)
 		vStringCatS(pszProperties,_szProperty); \
 	} while(0)
 
-	// FIXME: The property names might be too verbose. Maybe it could be a good idea
-	//        to a switch to shorten them to 1-2 letter codes?
-
 	if(uProperties & CXXTagPropertyConst)
 		ADD_PROPERTY("const");
 	if(uProperties & CXXTagPropertyDefault)
