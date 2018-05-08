@@ -1097,14 +1097,35 @@ static void cxxParserParseNextTokenApplyReplacement(
 	CXX_DEBUG_LEAVE();
 }
 
+void cxxParserUngetCurrentToken(void)
+{
+	CXX_DEBUG_ASSERT(
+			g_cxx.pToken &&
+			g_cxx.pTokenChain &&
+			(g_cxx.pTokenChain->iCount > 0),
+			"There should be at least one token to unget"
+		);
+
+	CXX_DEBUG_ASSERT(!g_cxx.pUngetToken,"The parser supports only one unget token at a time.");
+
+	if(g_cxx.pUngetToken)
+		cxxTokenDestroy(g_cxx.pUngetToken);
+	
+	
+	g_cxx.pUngetToken = cxxTokenChainTakeLast(g_cxx.pTokenChain);
+	
+	CXX_DEBUG_ASSERT(g_cxx.pUngetToken == g_cxx.pToken,"Oops.. ungot a token that was not the chain tail");
+
+	g_cxx.pToken = cxxTokenChainLast(g_cxx.pTokenChain);
+}
+
+
 // Returns false if it finds an EOF. Returns true otherwise.
 //
 // In some special cases this function may parse more than one token,
 // however only a single token will always be returned.
 bool cxxParserParseNextToken(void)
 {
-	CXXToken * t = cxxTokenCreate();
-
 	// The token chain should not be allowed to grow arbitrarily large.
 	// The token structures are quite big and it's easy to grow up to
 	// 5-6GB or memory usage. However this limit should be large enough
@@ -1114,6 +1135,20 @@ bool cxxParserParseNextToken(void)
 	// does NOT include large data tables.
 	if(g_cxx.pTokenChain->iCount > 16384)
 		cxxTokenChainDestroyLast(g_cxx.pTokenChain);
+
+	if(g_cxx.pUngetToken)
+	{
+		// got some tokens in the unget chain.
+		cxxTokenChainAppend(g_cxx.pTokenChain,g_cxx.pUngetToken);
+
+		g_cxx.pToken = g_cxx.pUngetToken;
+
+		g_cxx.pUngetToken = NULL;
+
+		return !cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeEOF);
+	}
+
+	CXXToken * t = cxxTokenCreate();
 
 	cxxTokenChainAppend(g_cxx.pTokenChain,t);
 

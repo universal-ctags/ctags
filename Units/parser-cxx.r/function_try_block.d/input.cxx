@@ -18,3 +18,26 @@ int f(int n = 2) try {
    assert(n == 4);
    return n;
 }
+
+int f2() try {
+} catch(SomeKindOfException &f2v1)
+{
+} catch(SomeOtherKindOfException &f2v2)
+{
+} catch(...) {
+}
+
+int f3()
+{
+	// This is NOT a function-try-block
+	try {
+		int f3v1 = 10;
+	} catch(std::exception & f3v2)
+	{
+	}
+}
+
+auto f4() -> void try {
+} catch(...)
+{
+}

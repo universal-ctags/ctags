@@ -404,12 +404,7 @@ bool cxxParserParseToEndOfQualifedName(void)
 	return true;
 }
 
-
-//
-// Attach the current position of input file as "end" field of
-// the specified tag in the cork queue
-//
-void cxxParserMarkEndLineForTagInCorkQueue(int iCorkQueueIndex)
+void cxxParserSetEndLineForTagInCorkQueue(int iCorkQueueIndex,unsigned long lEndLine)
 {
 	CXX_DEBUG_ASSERT(iCorkQueueIndex > CORK_NIL,"The cork queue index is not valid");
 
@@ -417,8 +412,18 @@ void cxxParserMarkEndLineForTagInCorkQueue(int iCorkQueueIndex)
 
 	CXX_DEBUG_ASSERT(tag,"No tag entry in the cork queue");
 
-	tag->extensionFields.endLine = getInputLineNumber();
+	tag->extensionFields.endLine = lEndLine;
 }
+
+//
+// Attach the current position of input file as "end" field of
+// the specified tag in the cork queue
+//
+void cxxParserMarkEndLineForTagInCorkQueue(int iCorkQueueIndex)
+{
+	cxxParserSetEndLineForTagInCorkQueue(iCorkQueueIndex,getInputLineNumber());
+}
+
 
 // Make sure that the token chain contains only the specified keyword and eventually
 // the "const" or "volatile" type modifiers.
@@ -1617,76 +1622,114 @@ bool cxxParserParseAccessSpecifier(void)
 	return true;
 }
 
-bool cxxParserParseIfForWhileSwitch(void)
+bool cxxParserParseIfForWhileSwitchCatchParenthesis(void)
 {
 	CXX_DEBUG_ENTER();
-
+	
+	CXX_DEBUG_ASSERT(
+			cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeKeyword),
+			"This function should be called only after encountering one of the keywords"
+		);
+	
+	CXXKeyword eKeyword = g_cxx.pToken->eKeyword;
+	
 	if(!cxxParserParseUpToOneOf(
 			CXXTokenTypeParenthesisChain | CXXTokenTypeSemicolon |
 				CXXTokenTypeOpeningBracket | CXXTokenTypeEOF,
 			false
 		))
 	{
-		CXX_DEBUG_LEAVE_TEXT("Failed to parse if/for/while/switch up to parenthesis");
+		CXX_DEBUG_LEAVE_TEXT("Failed to parse if/for/while/switch/catch up to parenthesis");
 		return false;
 	}
 
-	if(cxxTokenTypeIsOneOf(g_cxx.pToken,CXXTokenTypeEOF | CXXTokenTypeSemicolon))
+	if(cxxTokenTypeIsOneOf(
+			g_cxx.pToken,
+			CXXTokenTypeEOF | CXXTokenTypeSemicolon | CXXTokenTypeOpeningBracket
+		))
 	{
-		CXX_DEBUG_LEAVE_TEXT("Found EOF/semicolon while parsing if/for/while/switch");
+		CXX_DEBUG_LEAVE_TEXT(
+				"Found EOF/semicolon/opening bracket while parsing if/for/while/switch/catch"
+			);
 		return true;
 	}
 
-	if(cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeParenthesisChain))
+	CXX_DEBUG_ASSERT(
+			cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeParenthesisChain),
+			"Expected a parenthesis chain here"
+		);
+	
+	CXX_DEBUG_PRINT("Found if/for/while/switch/catch parenthesis chain");
+
+	// Extract variables from the parenthesis chain
+
+	CXXTokenChain * pChain = g_cxx.pToken->pChain;
+
+	CXX_DEBUG_ASSERT(
+			pChain->iCount >= 2,
+			"The parenthesis chain must have initial and final parenthesis"
+		);
+
+	// There are several constructs that can fool the parser here.
+	// The most notable ones are:
+	//     if(a & b)
+	//     if(a * b)
+	//     if(a && b)
+	// Too bad that these constructs are also used to declare variables.
+
+	// catch() always contains variable declarations
+	bool bOkToExtractVariables = eKeyword == CXXKeywordCATCH;
+
+	if(!bOkToExtractVariables)
 	{
-		// Extract variables from the parenthesis chain
-		// We handle only simple cases.
-		CXXTokenChain * pChain = g_cxx.pToken->pChain;
-
-		CXX_DEBUG_ASSERT(
-				pChain->iCount >= 2,
-				"The parenthesis chain must have initial and final parenthesis"
+		// Parenthesis contents start with a keyword. Things like:
+		//   if(const std::exception & e)
+		//   if(int i ...
+		bOkToExtractVariables = cxxTokenTypeIs(
+				cxxTokenChainAt(pChain,1),
+				CXXTokenTypeKeyword
 			);
-
-		// Simple check for cases like if(a & b), if(a * b).
-		// If there is &, && or * then we expect there to be also a = or a ;.
-		if(
-				// & && * not present
-				!cxxTokenChainFirstTokenOfType(
+		
+		if(!bOkToExtractVariables)
+		{
+			// If there is &, && or * then we expect there to be also a = or
+			// a semicolon that comes after it.
+			// This is not 100% foolproof but works most of the times.
+	
+			CXXToken * pAndOrStar = cxxTokenChainFirstTokenOfType(
 						pChain,
 						CXXTokenTypeAnd | CXXTokenTypeMultipleAnds |
 						CXXTokenTypeStar
-					) ||
-				// or [=;] present
-				cxxTokenChainFirstTokenOfType(
-						pChain,
+					);
+			
+			if(!pAndOrStar)
+			{
+				bOkToExtractVariables = true;
+			} else {
+				bOkToExtractVariables = (cxxTokenChainNextTokenOfType(
+						pAndOrStar,
 						CXXTokenTypeAssignment | CXXTokenTypeSemicolon
-					)
-			)
-		{
-			// Kill the initial parenthesis
-			cxxTokenChainDestroyFirst(pChain);
-			// Fake the final semicolon
-			CXXToken * t = cxxTokenChainLast(pChain);
-			t->eType = CXXTokenTypeSemicolon;
-			vStringClear(t->pszWord);
-			vStringPut(t->pszWord,';');
-
-			// and extract variable declarations if possible
-			cxxParserExtractVariableDeclarations(pChain,0);
+					) ? true : false); // ternary ?: needed because of MSVC
+			}
 		}
+	}
+	
+	if(bOkToExtractVariables)
+	{
+		// Kill the initial parenthesis
+		cxxTokenChainDestroyFirst(pChain);
+		// Fake the final semicolon
+		CXXToken * t = cxxTokenChainLast(pChain);
+		t->eType = CXXTokenTypeSemicolon;
+		vStringClear(t->pszWord);
+		vStringPut(t->pszWord,';');
 
-		CXX_DEBUG_LEAVE_TEXT("Found if/for/while/switch parenthesis chain");
-		return true;
+		// and extract variable declarations if possible
+		cxxParserExtractVariableDeclarations(pChain,0);
 	}
 
-	// must be opening bracket: parse it here.
-
-	bool bRet = cxxParserParseBlock(true);
-
 	CXX_DEBUG_LEAVE();
-
-	return bRet;
+	return true;
 }
 
 static rescanReason cxxParserMain(const unsigned int passCount)
@@ -1836,6 +1879,8 @@ void cxxParserCleanup(langType language CTAGS_ATTR_UNUSED,bool initialized CTAGS
 	// The next line forces this function to be called only once
 	g_bFirstRun = true;
 
+	if(g_cxx.pUngetToken)
+		cxxTokenDestroy(g_cxx.pUngetToken);
 	if(g_cxx.pTokenChain)
 		cxxTokenChainDestroy(g_cxx.pTokenChain);
 	if(g_cxx.pTemplateTokenChain)

@@ -320,6 +320,8 @@ vString * cxxTagSetProperties(unsigned int uProperties)
 		ADD_PROPERTY("deprecated");
 	if(uProperties & CXXTagPropertyScopedEnum)
 		ADD_PROPERTY("scopedenum");
+	if(uProperties & CXXTagPropertyFunctionTryBlock)
+		ADD_PROPERTY("fntryblock");
 
 	cxxTagSetField(CXXTagFieldProperties,vStringValue(pszProperties));
 
