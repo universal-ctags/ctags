@@ -149,7 +149,7 @@ evaluate_current_token:
 					CXX_DEBUG_LEAVE_TEXT("Found end of template");
 					return true;
 				}
-				// Nested > : is is a shift operator?
+				// Nested > : is it a shift operator?
 
 				if(!cxxParserParseNextToken())
 				{
