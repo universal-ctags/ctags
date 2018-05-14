@@ -131,7 +131,7 @@ bool cxxParserParseAndCondenseCurrentSubchain(
 			);
 
 		while(g_cxx.pTokenChain->iCount > 1)
-			cxxTokenDestroy(cxxTokenChainTakeLast(g_cxx.pTokenChain));
+			cxxTokenChainDestroyLast(g_cxx.pTokenChain);
 
 		// Fake the terminator
 		CXXToken * pFakeLast = cxxTokenCreate();
