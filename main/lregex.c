@@ -349,6 +349,12 @@ static bool parseTagRegex (
 			error (WARNING, "%s: regexp missing final separator", regexp);
 		else
 		{
+			/*
+			 * first----------V third------------V
+			 * --regex-<LANG>=/regexp/replacement/[kind-spec/][flags]
+			 * second----------------^ fourth---------------^
+			 */
+
 			char* const fourth = scanSeparators (third, false);
 			if (*fourth == separator)
 			{
