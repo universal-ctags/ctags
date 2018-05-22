@@ -403,10 +403,7 @@ static void parseTagLine (tagFile *file, tagEntry *const entry)
 	size_t p_len = strlen (p);
 	char *tab = strchr (p, TAB);
 
-	entry->fields.list = NULL;
-	entry->fields.count = 0;
-	entry->kind = NULL;
-	entry->fileScope = 0;
+	memset(entry, 0, sizeof(*entry));
 
 	entry->name = p;
 	if (tab != NULL)
