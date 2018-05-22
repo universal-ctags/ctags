@@ -53,7 +53,7 @@ struct sTagFile {
 		/* defines tag search state */
 	struct {
 				/* file position of last match for tag */
-			off_t pos; 
+			off_t pos;
 				/* name of tag last searched for */
 			char *name;
 				/* length of name for partial matches */
