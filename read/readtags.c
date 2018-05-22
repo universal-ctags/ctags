@@ -471,10 +471,14 @@ static void parseTagLine (tagFile *file, tagEntry *const entry)
 			{
 				/* invalid pattern */
 			}
-			fieldsPresent = (strncmp (p, ";\"", 2) == 0);
-			*p = '\0';
-			if (fieldsPresent)
-				parseExtensionFields (file, entry, p + 2);
+
+			if (p)
+			{
+				fieldsPresent = (strncmp (p, ";\"", 2) == 0);
+				*p = '\0';
+				if (fieldsPresent)
+					parseExtensionFields (file, entry, p + 2);
+			}
 		}
 	}
 	if (entry->fields.count > 0)
