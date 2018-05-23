@@ -1,2 +1,0 @@
-Foo	input.java	/^	      public interface Foo<T> {$/;"	i
-bar	input.java	/^		      public T bar();$/;"	m	interface:Foo
