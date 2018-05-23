@@ -1,0 +1,2 @@
+greetA	input.java	/^		public void greet (String word) {$/
+greetB	input.java	?^		public void greet (String word) {$?
