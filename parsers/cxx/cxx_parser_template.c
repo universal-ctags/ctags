@@ -24,12 +24,25 @@
 
 #include <string.h>
 
+typedef enum _CXXParserParseTemplateAngleBracketsResult
+{
+	// Succeeded parsing the template angle bracket, everything looks fine
+	CXXParserParseTemplateAngleBracketsSucceeded,
+	// Succeeded, but the parsing was unbalanced and was terminated by an 'unexpected' condition
+	// that detected the end of the template. If this is function has been called
+	// from an upper template parsing level, the caller should exit too.
+	CXXParserParseTemplateAngleBracketsFinishedPrematurely,
+	// Failed miserably, continuing parsing is not possible
+	CXXParserParseTemplateAngleBracketsFailed,
+	// Failed miserably, but it may be possible to continue parsing
+	CXXParserParseTemplateAngleBracketsFailedRecoverable
+} CXXParserParseTemplateAngleBracketsResult;
 
 //
 // Parses the <parameters> part of a template specification.
 // Here we are pointing at the initial <.
 //
-static bool cxxParserParseTemplateAngleBrackets(void)
+static CXXParserParseTemplateAngleBracketsResult cxxParserParseTemplateAngleBracketsInternal(void)
 {
 	CXX_DEBUG_ENTER();
 
@@ -65,14 +78,14 @@ static bool cxxParserParseTemplateAngleBrackets(void)
 		if(!cxxParserParseAndCondenseSubchainsUpToOneOf(
 				CXXTokenTypeGreaterThanSign | CXXTokenTypeSmallerThanSign |
 					CXXTokenTypeOpeningBracket | CXXTokenTypeSemicolon |
-					CXXTokenTypeEOF | CXXTokenTypeAssignment,
+					CXXTokenTypeEOF | CXXTokenTypeKeyword,
 				CXXTokenTypeOpeningParenthesis |
 					CXXTokenTypeOpeningSquareParenthesis,
 				false
 			))
 		{
 			CXX_DEBUG_LEAVE_TEXT("Failed to parse up to '<>{EOF'");
-			return false;
+			return CXXParserParseTemplateAngleBracketsFailed;
 		}
 
 evaluate_current_token:
@@ -90,7 +103,7 @@ evaluate_current_token:
 					if(!cxxParserParseNextToken())
 					{
 						CXX_DEBUG_LEAVE_TEXT("Syntax error, but tolerate it at this level");
-						return true;
+						return CXXParserParseTemplateAngleBracketsFailedRecoverable;
 					}
 
 					CXX_DEBUG_PRINT(
@@ -123,14 +136,15 @@ evaluate_current_token:
 								))
 							{
 								CXX_DEBUG_LEAVE_TEXT("Failed to condense current subchain");
-								return true;
+								return CXXParserParseTemplateAngleBracketsFailed;
 							}
+
 							if(cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeEOF))
 							{
 								CXX_DEBUG_LEAVE_TEXT(
 										"Found EOF, syntax error but we tolerate it"
 									);
-								return true;
+								return CXXParserParseTemplateAngleBracketsFailedRecoverable;
 							}
 						} else {
 							// it's ok
@@ -143,18 +157,22 @@ evaluate_current_token:
 				}
 			break;
 			case CXXTokenTypeGreaterThanSign:
+			{
 				if(iTemplateLevel == 0)
 				{
 					// Non-nested > : always a terminator
 					CXX_DEBUG_LEAVE_TEXT("Found end of template");
-					return true;
+					return CXXParserParseTemplateAngleBracketsSucceeded;
 				}
-				// Nested > : is it a shift operator?
+
+				// Nested > : is is a shift operator?
+
+				bool bFollowedBySpace = g_cxx.pToken->bFollowedBySpace;
 
 				if(!cxxParserParseNextToken())
 				{
 					CXX_DEBUG_LEAVE_TEXT("Syntax error, but tolerate it at this level");
-					return true;
+					return CXXParserParseTemplateAngleBracketsFailedRecoverable;
 				}
 
 				CXX_DEBUG_PRINT(
@@ -163,13 +181,41 @@ evaluate_current_token:
 						g_cxx.pToken->eType
 					);
 
-				if(cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeGreaterThanSign))
+				bool bIsGreaterThan = cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeGreaterThanSign);
+
+				if((!bFollowedBySpace) && bIsGreaterThan)
 				{
 					// assume it's an operator
 					CXX_DEBUG_PRINT("Treating > as shift-right operator");
 				} else {
 					CXX_DEBUG_PRINT("Decreasing template level");
 					iTemplateLevel--;
+
+					if(bIsGreaterThan)
+						goto evaluate_current_token;
+
+					// Handle gracefully some cases
+					if(
+							cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeKeyword) &&
+							(!cxxKeywordIsConstant(g_cxx.pToken->eKeyword))
+						)
+					{
+						// We found something like
+						//   ... > void ...
+						//   ... > static ...
+						// The part on the right of > does not seem to be a constant
+						// so this is not a comparison. Most likely explaination:
+						// We screwed up the parsing of the template.
+						// However we can still attempt to emit a symbol here.
+						CXX_DEBUG_PRINT(
+								"Found '> %s': assuming end of template",
+								vStringValue(g_cxx.pToken->pszWord)
+							);
+
+						cxxParserUngetCurrentToken();
+						CXX_DEBUG_LEAVE_TEXT("Found (broken) end of template");
+						return CXXParserParseTemplateAngleBracketsFinishedPrematurely;
+					}
 
 					if(cxxTokenTypeIsOneOf(
 							g_cxx.pToken,
@@ -187,45 +233,79 @@ evaluate_current_token:
 							))
 						{
 							CXX_DEBUG_LEAVE_TEXT("Failed to condense current subchain");
-							return true;
+							return CXXParserParseTemplateAngleBracketsFailed;
 						}
+
 						if(cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeEOF))
 						{
 							CXX_DEBUG_LEAVE_TEXT("Found EOF, syntax error but we tolerate it");
-							return true;
+							return CXXParserParseTemplateAngleBracketsFailedRecoverable;
 						}
 					} else {
 						// it's ok
 						CXX_DEBUG_PRINT("No need to condense subchain");
 					}
 				}
+			}
 			break;
-			case CXXTokenTypeComma:
-			case CXXTokenTypeAssignment:
-				CXX_DEBUG_PRINT("Found assignment, trying to skip up to a 'notable' point");
-				// try to skip to the next > or , without stopping at < characters.
-				if(!cxxParserParseUpToOneOf(
-						CXXTokenTypeGreaterThanSign | CXXTokenTypeComma |
-							CXXTokenTypeOpeningBracket | CXXTokenTypeSemicolon |
-							CXXTokenTypeEOF,
-						false
-					))
+			case CXXTokenTypeKeyword:
+				if(cxxTokenIsKeyword(g_cxx.pToken,CXXKeywordTEMPLATE))
 				{
-					CXX_DEBUG_LEAVE_TEXT("Failed to parse up to '}EOF'");
-					return false;
+					CXX_DEBUG_PRINT("Found nested template keyword");
+
+					// nested nastiness.
+					if(!cxxParserParseNextToken())
+					{
+						CXX_DEBUG_LEAVE_TEXT("Syntax error, but tolerate it at this level");
+						return CXXParserParseTemplateAngleBracketsFailedRecoverable;
+					}
+
+					if(!cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeSmallerThanSign))
+					{
+						// aaargh...
+						CXX_DEBUG_PRINT(
+								"Found unexpected token '%s' of type 0x%02x",
+								vStringValue(g_cxx.pToken->pszWord),
+								g_cxx.pToken->eType
+							);
+
+						CXX_DEBUG_LEAVE_TEXT("No smaller than sign after template keyword");
+						return CXXParserParseTemplateAngleBracketsFailed;
+					}
+
+					switch(cxxParserParseTemplateAngleBracketsInternal())
+					{
+						case CXXParserParseTemplateAngleBracketsFailed:
+							CXX_DEBUG_LEAVE_TEXT("Nested template parsing failed");
+							return CXXParserParseTemplateAngleBracketsFailed;
+						break;
+						case CXXParserParseTemplateAngleBracketsFailedRecoverable:
+							CXX_DEBUG_LEAVE_TEXT("Nested template parsing recovered");
+							return CXXParserParseTemplateAngleBracketsFailedRecoverable;
+						break;
+						case CXXParserParseTemplateAngleBracketsFinishedPrematurely:
+							CXX_DEBUG_LEAVE_TEXT("Nested template finished prematurely");
+							return CXXParserParseTemplateAngleBracketsFinishedPrematurely;
+						break;
+						case CXXParserParseTemplateAngleBracketsSucceeded:
+							// ok
+							CXX_DEBUG_PRINT("Nested template parsing succeeded");
+						break;
+						default:
+							CXX_DEBUG_ASSERT(false,"Should never end up here");
+							return CXXParserParseTemplateAngleBracketsFailed;
+						break;
+					}
 				}
-				if(!cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeComma))
-					goto evaluate_current_token; // backward jump to re-evaluate token
-				// else continue parsing at this level.
 			break;
 			case CXXTokenTypeEOF:
 				CXX_DEBUG_LEAVE_TEXT("Syntax error, but tolerate it at this level");
-				return true;
+				return CXXParserParseTemplateAngleBracketsFailedRecoverable;
 			break;
 			case CXXTokenTypeSemicolon:
 				cxxParserNewStatement();
 				CXX_DEBUG_LEAVE_TEXT("Broken template arguments, attempting to continue");
-				return true;
+				return CXXParserParseTemplateAngleBracketsFailedRecoverable;
 			break;
 			case CXXTokenTypeOpeningBracket:
 				CXX_DEBUG_PRINT(
@@ -237,23 +317,49 @@ evaluate_current_token:
 				if(!cxxParserParseUpToOneOf(CXXTokenTypeClosingBracket | CXXTokenTypeEOF, false))
 				{
 					CXX_DEBUG_LEAVE_TEXT("Failed to parse up to '}EOF'");
-					return false;
+					return CXXParserParseTemplateAngleBracketsFailed;
 				}
 				cxxParserNewStatement();
 				CXX_DEBUG_LEAVE_TEXT("Broken template arguments recovery complete");
-				return true;
+				return CXXParserParseTemplateAngleBracketsFailedRecoverable;
 			break;
 			default:
 				CXX_DEBUG_ASSERT(false,"Found unexpected token type 0x%02x",g_cxx.pToken->eType);
 				CXX_DEBUG_LEAVE_TEXT("Found unexpected token type 0x%02x",g_cxx.pToken->eType);
-				return false;
+				return CXXParserParseTemplateAngleBracketsFailed;
 			break;
 		}
 	}
 
 	// never reached
-	CXX_DEBUG_LEAVE();
-	return true;
+	CXX_DEBUG_LEAVE_TEXT("This should be never reached!");
+	return CXXParserParseTemplateAngleBracketsFailed;
+}
+
+//
+// Parses the <parameters> part of a template specification.
+// Here we are pointing at the initial <.
+//
+static bool cxxParserParseTemplateAngleBrackets(void)
+{
+	CXX_DEBUG_ENTER();
+	switch(cxxParserParseTemplateAngleBracketsInternal())
+	{
+		case CXXParserParseTemplateAngleBracketsFailed:
+			CXX_DEBUG_LEAVE();
+			return false;
+		break;
+		// TODO: We could signal failure+recovery to upper levels
+		//       so the caller could take recovery actions too.
+		//case CXXParserParseTemplateAngleBracketsFailedRecoverable:
+		//case CXXParserParseTemplateAngleBracketsFinishedPrematurely:
+		//case CXXParserParseTemplateAngleBracketsSucceeded:
+		default:
+			CXX_DEBUG_LEAVE();
+			return true;
+		break;
+	}
+	CXX_DEBUG_ASSERT(false,"Never here");
 }
 
 //
@@ -286,7 +392,7 @@ bool cxxParserParseTemplateAngleBracketsToSeparateChain(void)
 
 	g_cxx.pTemplateTokenChain = g_cxx.pTokenChain;
 	g_cxx.pTokenChain = pSave;
-	
+
 	CXX_DEBUG_LEAVE();
 	return true;
 }

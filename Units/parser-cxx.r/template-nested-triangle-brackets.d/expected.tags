@@ -1,0 +1,2 @@
+Test	input.hpp	/^class Test : public set<int> {$/;"	c	template:<int,class _Comp0=less<int>,class _Comp1=less<pair<int,int>>>
+xxx	input.hpp	/^  typedef int xxx;$/;"	t	class:Test	typeref:typename:int
