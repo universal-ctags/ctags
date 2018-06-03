@@ -889,7 +889,7 @@ static bool cxxParserParseNextTokenCondenseAttribute(void)
 		);
 
 	// Kill it
-	cxxTokenDestroy(cxxTokenChainTakeLast(g_cxx.pTokenChain));
+	cxxTokenChainDestroyLast(g_cxx.pTokenChain);
 
 	// And go ahead.
 
@@ -925,7 +925,7 @@ static bool cxxParserParseNextTokenCondenseAttribute(void)
 		// will report it.
 
 		// Kill the token chain
-		cxxTokenDestroy(cxxTokenChainTakeLast(g_cxx.pTokenChain));
+		cxxTokenChainDestroyLast(g_cxx.pTokenChain);
 
 		return cxxParserParseNextToken();
 	}
@@ -977,7 +977,7 @@ static bool cxxParserParseNextTokenCondenseAttribute(void)
 	}
 
 	// Now just kill the chain.
-	cxxTokenDestroy(cxxTokenChainTakeLast(g_cxx.pTokenChain));
+	cxxTokenChainDestroyLast(g_cxx.pTokenChain);
 
 	// And finally extract yet another token.
 	CXX_DEBUG_LEAVE();
