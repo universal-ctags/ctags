@@ -1,0 +1,2 @@
+INT	input.cpp	/^#define INT /;"	d	file:
+x	input.cpp	/^template<char i, bool B = i < 10> INT x(void) { }$/;"	f	typeref:typename:INT	template:<char i,bool B=i<10>
