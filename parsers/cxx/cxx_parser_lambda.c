@@ -26,77 +26,126 @@
 #include <string.h>
 
 //
-// This has to be called when pointing at an opening bracket in function scope.
+// This has to be called when pointing at an opening bracket.
 // Returns NULL if it does not look to be a lambda invocation.
-// Returns the lambda parameter parenthesis chain token if it DOES look like a
-// lambda invocation.
+// Otherwise it returns the parameter parenthesis token or the
+// capture list square parenthesis token if the lambda is
+// parameterless.
 //
 CXXToken * cxxParserOpeningBracketIsLambda(void)
 {
-	// [ capture-list ] ( params ) mutable(opt) exception attr -> ret {} (1)
-	// [ capture-list ] ( params ) -> ret { body }	(2)
-	// [ capture-list ] ( params ) { body }	(3)
-	// [ capture-list ] { body }	(4)
+	CXX_DEBUG_ENTER();
 
-	// Exclude the case of array bracket initialization
-	//  type var[] { ... } (5 - not lambda)
+	// Lambda syntax variants:
+	//
+	// 1) [ capture-list ] ( params ) mutable(opt) exception attr -> ret { body }
+	// 2) [ capture-list ] ( params ) -> ret { body }
+	// 3) [ capture-list ] ( params ) { body }
+	// 4) [ capture-list ] { body }
+
+	// Similar, but not lambda:
+	//
+	// 5) type var[] { ... }
+	// 6) operator [] ( params ) { ... }
 
 	CXX_DEBUG_ASSERT(cxxParserCurrentLanguageIsCPP(),"C++ only");
 
 	CXXToken * t = g_cxx.pToken->pPrev;
 
 	if(!t)
+	{
+		CXX_DEBUG_LEAVE_TEXT("Not a lambda: no token before bracket");
 		return NULL; // not a lambda
+	}
 
 	// Check simple cases first
 
 	// case 4?
 	if(cxxTokenTypeIs(t,CXXTokenTypeSquareParenthesisChain))
 	{
-		if(t->pPrev && cxxTokenTypeIs(t->pPrev,CXXTokenTypeIdentifier))
+		if(
+			t->pPrev &&
+			cxxTokenTypeIs(t->pPrev,CXXTokenTypeIdentifier)
+		)
 		{
 			// case 5
+			CXX_DEBUG_LEAVE_TEXT("Not a lambda: looks like type var[] { ... }");
 			return NULL;
 		}
+
 		// very likely parameterless lambda
+		CXX_DEBUG_LEAVE_TEXT("Likely a parameterless lambda");
 		return t;
 	}
 
-	// case 3
+	// case 3?
 	if(cxxTokenTypeIs(t,CXXTokenTypeParenthesisChain))
 	{
 		t = t->pPrev;
 		if(!t)
+		{
+			CXX_DEBUG_LEAVE_TEXT("Not a lambda: nothing before ()");
 			return NULL; // can't be
+		}
 
-		if(cxxTokenTypeIs(t,CXXTokenTypeSquareParenthesisChain))
-			return t->pNext;
+		if(!cxxTokenTypeIs(t,CXXTokenTypeSquareParenthesisChain))
+		{
+			CXX_DEBUG_LEAVE_TEXT("Not a lambda: no [] before ()");
+			return NULL; // can't be
+		}
 
-		return NULL;
+		if(
+			t->pPrev &&
+			// namely: operator [], operator new[], operator delete[]
+			cxxTokenTypeIs(t->pPrev,CXXTokenTypeKeyword)
+		)
+		{
+			// case 6
+			CXX_DEBUG_LEAVE_TEXT("Not a lambda: keyword before []");
+			return NULL;
+		}
+
+		CXX_DEBUG_LEAVE_TEXT("Looks like a lambda with parameters");
+		return t->pNext;
 	}
 
-	// Stop also at commas, so in very large structures we will not be searching far
+	// Handle the harder cases.
+	// Look backwards for the square parenthesis chain, but stop at
+	// tokens that shouldn't be present between the bracket and the
+	// parenthesis.
 	t = cxxTokenChainPreviousTokenOfType(
 			t,
 			CXXTokenTypeSquareParenthesisChain |
-			CXXTokenTypeComma
+			CXXTokenTypeAssignment |
+			CXXTokenTypeOperator
 		);
 
 	if(!t)
+	{
+		CXX_DEBUG_LEAVE_TEXT("Not a lambda: no []");
 		return NULL;
+	}
 
 	if(!cxxTokenTypeIs(t,CXXTokenTypeSquareParenthesisChain))
+	{
+		CXX_DEBUG_LEAVE_TEXT("Not a lambda: no [] before assignment or operator");
 		return NULL;
+	}
 
 	t = t->pNext;
 
 	if(cxxTokenTypeIs(t,CXXTokenTypeParenthesisChain))
+	{
+		CXX_DEBUG_LEAVE_TEXT("Looks like a lambda (got () after [])");
 		return t;
+	}
 
+	CXX_DEBUG_LEAVE_TEXT("Not a lambda: no () after []");
 	return NULL;
 }
 
-// In case of a lambda without parentheses this is the capture list token.
+// In case of a parameterless lambda (that has no parenthesis) the parameter
+// is the capture list token.
 bool cxxParserHandleLambda(CXXToken * pParenthesis)
 {
 	CXX_DEBUG_ENTER();
