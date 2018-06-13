@@ -91,6 +91,12 @@ Disallowing to define a kind with "file" as name
 The kind name "file" is reserved.  Using it as part of kind spec in
 ``--regex-<LANG>`` option is now disallowed.
 
+Disallowing to define a kind with "F" as letter
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The kind letter "F" is reserved.  Using it as part of a kind spec in
+``--regex-<LANG>`` option is now disallowed.
+
 Disallowing to use other than alphabetical character as kind letter
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
