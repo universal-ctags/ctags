@@ -173,9 +173,15 @@ OPTION ITEMS
 	other than "F". "F" has been reserved for representing a file
 	since Exuberant-ctags.
 
-	*name* also must come from alphabetical characters ('[0-9a-zA-Z]+').
-	Do not use "file" as *name*. It has been reserved for representing
-	a file since Exuberant-ctags.
+	*name* must start with an alphabetic character, and the rest
+	must  be alphanumeric ('[a-zA-Z][a-zA-Z0-9]*'). Do not use
+	"file" as *name*. It has been reserved for representing a file
+	since Exuberant-ctags.
+
+	Note that using a number character in a *name* violates the
+	version 2 of tags file format. The version 3 revised by
+	Universal-ctags project allows using the number character as an
+	initial in a kind name.
 
 	*description* comes from any printable ASCII characters. The
 	exception is "{" and "\". "{" is reserved for adding flags

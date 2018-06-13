@@ -23,10 +23,10 @@ ctags: the kind name in "--kinddef-MYTEST" option is empty
 ctags: the kind name in "--kinddef-MYTEST" option is empty
 
 # wrong letter in name 1
-ctags: unacceptable char as part of kind name in "--kinddef-MYTEST" option
+ctags: non-alphanumeric char is used as part of kind name: 'a	x' in "--kinddef-MYTEST" option
 
 # wrong letter in name 2
-ctags: unacceptable char as part of kind name in "--kinddef-MYTEST" option
+ctags: non-alphanumeric char is used as part of kind name: 'a	x' in "--kinddef-MYTEST" option
 
 # wrong letter in name 3
 ctags: no kind description specified in "--kinddef-MYTEST" option
@@ -69,6 +69,11 @@ ctags: Warning: long flags specifier opened with `{' is not closed `}': "{"
 # use a { in description (1)
 
 # use a { in description (2)
+
+# use a number char as the initial letter
+ctags: a kind name doesn't start with an alphabetical character: '0kind' in "--kinddef-MYTEST" option
+
+# use a number char within the body
 
 # use a \ in description
 

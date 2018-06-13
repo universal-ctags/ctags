@@ -107,6 +107,19 @@ accepts only an alphabetical character.
 Incompatibilities in tags file format
 -------------------------------------------------------------
 
+Using numerical character in the name part of tag tagfield
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The version 2 tags file format, the default output format of
+Exuberant-ctags, accepts only alphabetical characters in the name part
+of tag tagfield.
+
+Universal-ctags introduces an exception to this specification; it may
+use numerical characters in addition to alphabetical characters as the
+letters other than initial letter of the name part.
+
+The kinds "heading1", "heading2", and "heading3" in the HTML parser
+are the examples.
 
 Option files loading at starting up time (preload files)
 -------------------------------------------------------------

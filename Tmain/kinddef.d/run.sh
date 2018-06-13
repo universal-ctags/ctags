@@ -92,6 +92,12 @@ ${CTAGS} --kinddef-MYTEST='x,kind,desc\{' --list-kinds-full=MYTEST
 title '# use a { in description (2)'
 ${CTAGS} --kinddef-MYTEST='x,kind,desc\{}' --list-kinds-full=MYTEST
 
+title '# use a number char as the initial letter'
+${CTAGS} --kinddef-MYTEST='x,0kind,desc' --list-kinds-full=MYTEST
+
+title '# use a number char within the body'
+${CTAGS} --kinddef-MYTEST='x,k0ind,desc' --list-kinds-full=MYTEST
+
 # title '# use a { and \t in description'
 # ${CTAGS} --kinddef-MYTEST='x,kind,desc\{}\t' --list-kinds-full=MYTEST
 
