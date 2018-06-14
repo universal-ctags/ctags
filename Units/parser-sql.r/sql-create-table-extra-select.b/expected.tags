@@ -1,0 +1,5 @@
+test	input.sql	/^CREATE TABLE test (a INT NOT NULL AUTO_INCREMENT,$/;"	t
+a	input.sql	/^CREATE TABLE test (a INT NOT NULL AUTO_INCREMENT,$/;"	E	table:test
+b	input.sql	/^CREATE TABLE test (a INT NOT NULL AUTO_INCREMENT,$/;"	E	table:test
+b	input.sql	/^       		      ENGINE=MyISAM SELECT b,c FROM test2;$/;"	E	table:test
+c	input.sql	/^       		      ENGINE=MyISAM SELECT b,c FROM test2;$/;"	E	table:test

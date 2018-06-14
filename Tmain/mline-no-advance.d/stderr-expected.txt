@@ -1,0 +1,3 @@
+ctags: Notice: No options will be read from files or environment
+ctags: Warning: a multi line regex pattern doesn't advance the input cursor: (.)
+ctags: Warning: Language: FOO, input file: ./input.foo, pos: 0

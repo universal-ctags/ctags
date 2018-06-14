@@ -26,14 +26,14 @@
 #
 # `.hx' is the suffix for the tool.
 #
-# This optlib is a testbed for --extradef option and `extra' regex long flag.
+# This optlib is a testbed for --_extradef option and `extra' regex long flag.
 #
 
 --langdef=QemuHX
 	--kinddef-QemuHX=q,qmp,QEMU Management Protocol dispatch table entries
 	--kinddef-QemuHX=i,infoitem,item in texinfo doc
 	--map-QemuHX=+.hx
-	--extradef-QemuHX=funcmap,Include mapping SQMP to C function name
+	--_extradef-QemuHX=funcmap,Include mapping SQMP to C function name
 	--extras-QemuHX=+{funcmap}
 	--mline-regex-QemuHX=/^SQMP[[:space:]]([-a-z_0-9A-Z]+)[[:space:]]---/\1/q/{mgroup=1}
 	--mline-regex-QemuHX=/^SQMP[[:space:]]([-a-z_0-9A-Z]+)[[:space:]]---/qmp_\1/q/{mgroup=1}{_extra=funcmap}

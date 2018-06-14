@@ -289,6 +289,8 @@ Conceptual example::
 Scope tracking in a regex parser
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+.. IN MAN PAGE
+
 With scope long flag, you can record/track scope context.
 A stack is used for tracking the scope context.
 
@@ -784,7 +786,7 @@ Conditional tagging with extras
 
 If a pattern matching should be done only when an extra is enabled,
 mark a pattern with ``{_extra=XNAME}``. Here ``XNAME`` is the name of
-extra. You must define ``XNAME`` with ``--extradef-<LANG>=XNAME,DESCRIPTION`` option
+extra. You must define ``XNAME`` with ``--_extradef-<LANG>=XNAME,DESCRIPTION`` option
 before defining a pattern marked ``{_extra=XNAME}``.
 
 .. code-block:: python
@@ -796,7 +798,7 @@ To capture above lines in a python program(*input.py*), an extra can be used.
 
 .. code-block:: ctags
 
-	--extradef-Python=main,__main__ entry points
+	--_extradef-Python=main,__main__ entry points
 	--regex-Python=/^if __name__ == '__main__':/__main__/f/{_extra=main}
 
 The above optlib(*python-main.ctags*) introduces ``main`` extra to Python parser.
@@ -1012,7 +1014,7 @@ An example taken from *data/optlib/ctags.ctags* ::
 "GPL version 2 or later version" is needed here.  Option file is not
 linked to ctags command. However, I have a plan to write a translator
 which generates *.c* file from a given option file. As the result the
-*.c* file is built into *ctags* command. In such case "GPL version 2
+*.c* file is built into *ctags* command. In such a case "GPL version 2
 or later version" may be required.
 
 *Units* test cases

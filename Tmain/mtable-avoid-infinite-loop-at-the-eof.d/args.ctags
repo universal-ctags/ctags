@@ -1,0 +1,5 @@
+--langdef=FOO
+--map-FOO=+.foo
+--_tabledef-FOO=main
+--kinddef-FOO=e,eof,the end of file
+--_mtable-regex-FOO=main//eof/e/

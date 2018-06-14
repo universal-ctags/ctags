@@ -51,7 +51,7 @@ extern parserDefinition* PodParser (void)
 	};
 
 
-	parserDefinition* const def = parserNew ("pod");
+	parserDefinition* const def = parserNew ("Pod");
 
 	def->enabled       = true;
 	def->extensions    = extensions;

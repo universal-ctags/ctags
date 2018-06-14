@@ -60,8 +60,43 @@ static void functionName (vString * const name, const char *dbp)
 		vStringPut (name, *p);
 }
 
+const char* skipMetadata (const char *dbp)
+{
+	while (1)
+	{
+		if (*dbp == '^')
+		{
+			dbp++;
+			if (*dbp == '{')
+			{
+				/* skipping an arraymap */
+				for (; *dbp != '\0' && *dbp != '}'; dbp++)
+					;
+			}
+			else
+			{
+				/* skip a keyword or a symbol */
+				for (; *dbp != '\0' && !isspace((unsigned char)*dbp); dbp++)
+					;
+			}
+
+			if (*dbp == '\0')
+				break;
+
+			dbp++;
+			while (isspace ((unsigned char)*dbp))
+				dbp++;
+		}
+		else
+			break;
+	}
+
+	return dbp;
+}
+
 static int makeNamespaceTag (vString * const name, const char *dbp)
 {
+	dbp = skipMetadata (dbp);
 	functionName (name, dbp);
 	if (vStringLength (name) > 0 && ClojureKinds[K_NAMESPACE].enabled)
 	{

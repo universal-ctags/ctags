@@ -43,6 +43,7 @@ The following parsers have been added:
 * AutoIt
 * Clojure
 * CSS
+* Ctags option library *optlib*
 * CUDA
 * D
 * DBusIntrospect *libxml*
@@ -51,17 +52,19 @@ The following parsers have been added:
 * DTS
 * Elm *optlib*
 * Falcon
+* Gdbinit script *optlib*
 * Glade *libxml*
 * Go
 * JavaProperties
 * JSON
 * GNU linker script(LdScript)
-* man page *optlib*
+* Man page *optlib*
+* Markdown *optlib*
 * Maven2 *libxml*
 * M4
 * ObjectiveC
-* passwd
-* puppetManifest *optlib*
+* Passwd *optlib*
+* PuppetManifest *optlib*
 * Perl6
 * Pod *optlib*
 * PropertyList(plist) *libxml*
@@ -71,7 +74,7 @@ The following parsers have been added:
 * QtMoc
 * R
 * RelaxNG *libxml*
-* reStructuredText
+* ReStructuredText
 * Robot
 * RpmSpec
 * Rust
@@ -86,7 +89,6 @@ The following parsers have been added:
 * Yaml *libyaml*
 * YumRepo
 * Zephir
-* ctags option library *optlib*
 * Myrddin
 * RSpec *optlib*
 
@@ -704,7 +706,7 @@ We can say now "kind" is a first class object in Universal-ctags.
 Defining an extra
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-A new ``--extradef-<LANG>=name,description`` option allows you to
+A new ``--_extradef-<LANG>=name,description`` option allows you to
 defining a parser own extra which turning on and off can be
 referred from a regex based parser for ``<LANG>``.
 
@@ -920,23 +922,6 @@ Changes to the tags file format
 ---------------------------------------------------------------------
 
 
-
-version 3 format for handling meta characters in tag entry
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. REVIEWED
-
-To allow recording names including tab characters and other control
-characters in a tag file, version 3 of the file format extends version
-2 with extra escape sequences.
-
-You can use ``--format=2`` to keep compatibility with the output of
-Exuberant-ctags; however, this version of the format cannot record
-names which include tab characters.
-
-See also :ref:`Compatible output and weakness <compat-output>`.
-
-
 Truncating the pattern for long input lines
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 To prevent generating overly large tags files, a pattern field is
@@ -1071,7 +1056,7 @@ The fourth column shows whether the role is enabled or not.
 The fifth column shows the description of the role.
 
 You can define a role in an optlib parser for capturing reference
-tags. See `Capturing reference tags <capturing_reftag>` for more
+tags. See :ref:`Capturing reference tags <capturing_reftag>` for more
 details.
 
 Currently ctags doesn't provide the way for disabling a
@@ -1225,6 +1210,15 @@ The third line means `\\` is used when for combining a namespace item
 
 Of course, ctags uses the more specific line when choosing a
 separator; the third line has higher priority than the first.
+
+``TAG_OUTPUT_MODE``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. NOT REVIEWED YET
+
+This pseudo tag represents output mode: u-ctags or e-ctags.
+
+See also :ref:`Compatible output and weakness <compat-output>`.
 
 .. _parser-own-fields:
 

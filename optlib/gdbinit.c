@@ -62,7 +62,7 @@ extern parserDefinition* GdbinitParser (void)
 	};
 
 
-	parserDefinition* const def = parserNew ("gdbinit");
+	parserDefinition* const def = parserNew ("Gdbinit");
 
 	def->enabled       = true;
 	def->extensions    = extensions;

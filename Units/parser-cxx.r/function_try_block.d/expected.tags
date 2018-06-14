@@ -1,0 +1,14 @@
+S	input.cxx	/^struct S {$/;"	struct	file:	end:11
+m	input.cxx	/^    std::string m;$/;"	member	struct:S	typeref:typename:std::string	file:
+S	input.cxx	/^    S(const std::string& arg) try : m(arg, 100) {$/;"	function	struct:S	file:	signature:(const std::string & arg)	end:10	properties:fntryblock
+arg	input.cxx	/^    S(const std::string& arg) try : m(arg, 100) {$/;"	parameter	function:S::S	typeref:typename:const std::string &	file:
+e	input.cxx	/^    } catch(const std::exception& e) {$/;"	local	function:S::S	typeref:typename:const std::exception &	file:
+f	input.cxx	/^int f(int n = 2) try {$/;"	function	typeref:typename:int	signature:(int n=2)	end:20	properties:fntryblock
+n	input.cxx	/^int f(int n = 2) try {$/;"	parameter	function:f	typeref:typename:int	file:
+f2	input.cxx	/^int f2() try {$/;"	function	typeref:typename:int	signature:()	end:28	properties:fntryblock
+f2v1	input.cxx	/^} catch(SomeKindOfException &f2v1)$/;"	local	function:f2	typeref:typename:SomeKindOfException &	file:
+f2v2	input.cxx	/^} catch(SomeOtherKindOfException &f2v2)$/;"	local	function:f2	typeref:typename:SomeOtherKindOfException &	file:
+f3	input.cxx	/^int f3()$/;"	function	typeref:typename:int	signature:()	end:38
+f3v1	input.cxx	/^		int f3v1 = 10;$/;"	local	function:f3	typeref:typename:int	file:
+f3v2	input.cxx	/^	} catch(std::exception & f3v2)$/;"	local	function:f3	typeref:typename:std::exception &	file:
+f4	input.cxx	/^auto f4() -> void try {$/;"	function	typeref:typename:void try	signature:()	end:43	properties:fntryblock

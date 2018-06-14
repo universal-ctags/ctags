@@ -21,4 +21,4 @@ ${CTAGS} --quiet --options=NONE --with-list-header=no \
 
 echo '# combination with letters'
 ${CTAGS} --quiet --options=NONE --with-list-header=no \
-	 --extras=-'{fileScope}+p{inputFile}q{reference}.-f' --list-extras
+	 --extras=-'{fileScope}+p{inputFile}q{reference}-f' --list-extras

@@ -43,7 +43,7 @@ extern parserDefinition* CtagsParser (void)
 	};
 
 
-	parserDefinition* const def = parserNew ("ctags");
+	parserDefinition* const def = parserNew ("Ctags");
 
 	def->enabled       = true;
 	def->extensions    = extensions;

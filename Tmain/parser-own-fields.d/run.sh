@@ -4,7 +4,10 @@
 . ../utils.sh
 
 CTAGS=$1
+
+V=
 # V=valgrind
+
 echo '#' disabling fields
 ${V} ${CTAGS} --options=NONE --options=./unknown.ctags -o - input.unknown
 

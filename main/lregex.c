@@ -46,6 +46,18 @@ static bool regexAvailable = false;
 /* Back-references \0 through \9 */
 #define BACK_REFERENCE_COUNT 10
 
+/* The max depth of taction=enter/leave stack */
+#define MTABLE_STACK_MAX_DEPTH 64
+
+/* How many times ctags allows a mtable parser
+   stays at the same input position across table switching.
+
+   The value is derived from MTABLE_STACK_MAX_DEPTH.
+   No deep meaning is in that. It just for simplifying
+   Tmain cases. */
+#define MTABLE_MOTIONLESS_MAX (MTABLE_STACK_MAX_DEPTH + 1)
+
+
 /*
 *   DATA DECLARATIONS
 */
@@ -337,6 +349,12 @@ static bool parseTagRegex (
 			error (WARNING, "%s: regexp missing final separator", regexp);
 		else
 		{
+			/*
+			 * first----------V third------------V
+			 * --regex-<LANG>=/regexp/replacement/[kind-spec/][flags]
+			 * second----------------^ fourth---------------^
+			 */
+
 			char* const fourth = scanSeparators (third, false);
 			if (*fourth == separator)
 			{
@@ -1239,42 +1257,57 @@ static bool matchMultilineRegexPattern (struct lregexControlBlock *lcb,
 	bool result = false;
 	regmatch_t pmatch [BACK_REFERENCE_COUNT];
 	int match = 0;
+	unsigned int delta = 1;
 
 	if (patbuf->disabled && *(patbuf->disabled))
 		return false;
 
-	start = vStringValue (allLines);
-	for (current = start;
-	     match == 0 && current < start + vStringLength (allLines);
-	     current += (patbuf->mgroup.nextFromStart
-					 ? pmatch [patbuf->mgroup.forNextScanning].rm_so
-					 : pmatch [patbuf->mgroup.forNextScanning].rm_eo))
+	current = start = vStringValue (allLines);
+	do
 	{
 		match = regexec (patbuf->pattern, current,
-				 BACK_REFERENCE_COUNT, pmatch, 0);
-		if (match == 0)
+						 BACK_REFERENCE_COUNT, pmatch, 0);
+		if (match != 0)
 		{
-			patbuf->statistics.match++;
-			if (patbuf->type == PTRN_TAG)
-			{
-				matchTagPattern (lcb, current, patbuf, pmatch,
-								 (current
-								  + pmatch [patbuf->mgroup.forLineNumberDetermination].rm_so)
-								 - start);
-				result = true;
-			}
-			else if (patbuf->type == PTRN_CALLBACK)
-				;	/* Not implemented yet */
-			else
-			{
-				Assert ("invalid pattern type" == NULL);
-				result = false;
-				break;
-			}
-		}
-		else
 			patbuf->statistics.unmatch++;
-	}
+			break;
+		}
+
+		patbuf->statistics.match++;
+		if (patbuf->type == PTRN_TAG)
+		{
+			matchTagPattern (lcb, current, patbuf, pmatch,
+							 (current
+							  + pmatch [patbuf->mgroup.forLineNumberDetermination].rm_so)
+							 - start);
+			result = true;
+		}
+		else if (patbuf->type == PTRN_CALLBACK)
+			;	/* Not implemented yet */
+		else
+		{
+			Assert ("invalid pattern type" == NULL);
+			result = false;
+			break;
+		}
+
+		delta = (patbuf->mgroup.nextFromStart
+				 ? pmatch [patbuf->mgroup.forNextScanning].rm_so
+				 : pmatch [patbuf->mgroup.forNextScanning].rm_eo);
+		if (delta == 0)
+		{
+			unsigned int offset = current - start;
+			error (WARNING,
+				   "a multi line regex pattern doesn't advance the input cursor: %s",
+				   patbuf->pattern_string);
+			error (WARNING, "Language: %s, input file: %s, pos: %u",
+				   getLanguageName (lcb->owner), getInputFileName(), offset);
+			break;
+		}
+		current += delta;
+
+	} while (current < start + vStringLength (allLines));
+
 	return result;
 }
 
@@ -1754,16 +1787,19 @@ static struct regexTable * matchMultitableRegexTable (struct lregexControlBlock 
 	const char *current;
 	regmatch_t pmatch [BACK_REFERENCE_COUNT];
 	const char *cstart = vStringValue(start);
+	unsigned int delta;
 
 
  restart:
 	current = cstart + *offset;
 
-#if 0
-	/* An empty regex // still matches empty input. */
-	if (*offset >= vStringLength(start))
+	/* Accept the case *offset == vStringLength(start)
+	   because we want an empty regex // still matches empty input. */
+	if (*offset > vStringLength(start))
+	{
+		*offset = vStringLength(start);
 		goto out;
-#endif
+	}
 
 	for (unsigned int i = 0; i < ptrArrayCount(table->patterns); i++)
 	{
@@ -1831,9 +1867,10 @@ static struct regexTable * matchMultitableRegexTable (struct lregexControlBlock 
 				}
 				END_VERBOSE();
 
-				*offset += (ptrn->mgroup.nextFromStart
-							? pmatch [ptrn->mgroup.forNextScanning].rm_so
-							: pmatch [ptrn->mgroup.forNextScanning].rm_eo);
+				delta = (ptrn->mgroup.nextFromStart
+						 ? pmatch [ptrn->mgroup.forNextScanning].rm_so
+						 : pmatch [ptrn->mgroup.forNextScanning].rm_eo);
+				*offset += delta;
 
 				switch (taction->action)
 				{
@@ -1911,6 +1948,18 @@ static struct regexTable * matchMultitableRegexTable (struct lregexControlBlock 
 
 				if (next)
 					break;
+
+				if (delta == 0)
+				{
+					error (WARNING, "Forcefully advance the input pos because");
+					error (WARNING, "following conditions for entering infinite loop are satisfied:");
+					error (WARNING, "+ matching the pattern succeeds,");
+					error (WARNING, "+ the next table is not given, and");
+					error (WARNING, "+ the input file pos doesn't advance.");
+					error (WARNING, "Language: %s, input file: %s, pos: %u",
+						   getLanguageName (lcb->owner), getInputFileName(), *offset);
+					++*offset;
+				}
 			}
 			else if (ptrn->type == PTRN_CALLBACK)
 				;	/* Not implemented yet */
@@ -1924,9 +1973,7 @@ static struct regexTable * matchMultitableRegexTable (struct lregexControlBlock 
 		else
 			ptrn->statistics.unmatch++;
 	}
-#if 0
  out:
-#endif
 	if (next == NULL && ptrArrayCount (lcb->tstack) > 0)
 	{
 		static int apop_count = 0;
@@ -1999,6 +2046,10 @@ extern bool matchMultitableRegex (struct lregexControlBlock *lcb, const vString*
 	struct regexTable *table = ptrArrayItem (lcb->tables, 0);
 	unsigned int offset = 0;
 
+	int motionless_counter = 0;
+	unsigned int last_offset;
+
+
 	while (table)
 	{
 
@@ -2014,7 +2065,41 @@ extern bool matchMultitableRegex (struct lregexControlBlock *lcb, const vString*
 			vStringDelete(v);
 		}
 		END_VERBOSE();
+
+		last_offset = offset;
 		table = matchMultitableRegexTable(lcb, table, allLines, &offset);
+
+		if (last_offset == offset)
+			motionless_counter++;
+		else
+			motionless_counter = 0;
+
+		if (motionless_counter > MTABLE_MOTIONLESS_MAX)
+		{
+			error (WARNING, "mtable<%s/%s>: the input cursor stays at %u in %s so long though the tables are switched",
+				   getLanguageName (lcb->owner),
+				   table->name, offset, getInputFileName ());
+			break;
+		}
+
+		if (table && (ptrArrayCount (lcb->tstack) > MTABLE_STACK_MAX_DEPTH))
+		{
+			unsigned int i;
+			struct regexTable *t;
+
+			error (WARNING, "mtable<%s/%s>: the tenter/tleave stack overflows at %u in %s",
+				   getLanguageName (lcb->owner),
+				   table->name, offset, getInputFileName ());
+			error (WARNING, "DUMP FROM THE TOP:");
+			/* TODO: ues dumpTstack */
+			for (i = ptrArrayCount(lcb->tstack); 0 < i; --i)
+			{
+				t = ptrArrayItem (lcb->tstack, i - 1);
+				error (WARNING, "%3u %s", i - 1, t->name);
+			}
+
+			break;
+		}
 	}
 
 	return true;

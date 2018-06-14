@@ -1,0 +1,1 @@
+x	./input1.foo	/^define x$/;"	r

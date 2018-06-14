@@ -76,7 +76,7 @@ extern parserDefinition* ElmParser (void)
 	};
 
 
-	parserDefinition* const def = parserNew ("elm");
+	parserDefinition* const def = parserNew ("Elm");
 
 	def->enabled       = true;
 	def->extensions    = extensions;

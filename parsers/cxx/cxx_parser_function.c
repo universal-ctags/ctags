@@ -1153,10 +1153,16 @@ next_token:
 
 		CXX_DEBUG_PRINT("Scope prefix search finished");
 
-		// Look for trailing const.
+		// Look for trailing const and other interesting things that may come after the parenthesis.
 
 		if(pTopLevelParenthesis->pNext)
 		{
+			CXX_DEBUG_PRINT(
+					"Top level parenthesis is followed by '%s' (%s)",
+					vStringValue(pTopLevelParenthesis->pNext->pszWord),
+					cxxDebugTypeDecode(pTopLevelParenthesis->pNext->eType)
+				);
+
 			if(cxxTokenIsKeyword(pTopLevelParenthesis->pNext,CXXKeywordCONST))
 				pInfo->pSignatureConst = pTopLevelParenthesis->pNext;
 			else
@@ -1196,6 +1202,8 @@ next_token:
 				{
 					if(pIdentOrKeyword->eKeyword == CXXKeywordVOLATILE)
 						pInfo->uFlags |= CXXFunctionSignatureInfoVolatile;
+					else if(pIdentOrKeyword->eKeyword == CXXKeywordTRY)
+						pInfo->uFlags |= CXXFunctionSignatureInfoFunctionTryBlock;
 				} else {
 					// The "final" keyword is actually disabled in most contexts so we handle
 					// it as identifier. "override is always handled as identifier.
@@ -1577,6 +1585,8 @@ int cxxParserEmitFunctionTags(
 				uProperties |= CXXTagPropertyDelete;
 			if(pInfo->uFlags & CXXFunctionSignatureInfoVolatile)
 				uProperties |= CXXTagPropertyVolatile;
+			if(pInfo->uFlags & CXXFunctionSignatureInfoFunctionTryBlock)
+				uProperties |= CXXTagPropertyFunctionTryBlock;
 			if(pInfo->uFlags & CXXFunctionSignatureInfoScopeTemplateSpecialization)
 				uProperties |= CXXTagPropertyScopeTemplateSpecialization |
 								CXXTagPropertyTemplateSpecialization;
@@ -1630,7 +1640,10 @@ int cxxParserEmitFunctionTags(
 // and push all the necessary scopes for the next block. It returns the number
 // of scopes pushed.
 //
-int cxxParserExtractFunctionSignatureBeforeOpeningBracket(int * piCorkQueueIndex)
+int cxxParserExtractFunctionSignatureBeforeOpeningBracket(
+		CXXFunctionSignatureInfo * pInfo,
+		int * piCorkQueueIndex
+	)
 {
 	CXX_DEBUG_ENTER();
 
@@ -1653,11 +1666,9 @@ int cxxParserExtractFunctionSignatureBeforeOpeningBracket(int * piCorkQueueIndex
 
 	cxxTokenChainDestroyLast(g_cxx.pTokenChain);
 
-	CXXFunctionSignatureInfo oInfo;
-
 	CXXFunctionParameterInfo oParamInfo;
 
-	if(!cxxParserLookForFunctionSignature(g_cxx.pTokenChain,&oInfo,&oParamInfo))
+	if(!cxxParserLookForFunctionSignature(g_cxx.pTokenChain,pInfo,&oParamInfo))
 	{
 		CXX_DEBUG_LEAVE_TEXT("No parenthesis found: no function");
 		return 0;
@@ -1667,7 +1678,7 @@ int cxxParserExtractFunctionSignatureBeforeOpeningBracket(int * piCorkQueueIndex
 	// but the scope will be adjusted inside cxxParserEmitFunctionTags()
 
 	int iScopesPushed = cxxParserEmitFunctionTags(
-			&oInfo,
+			pInfo,
 			CXXTagKindFUNCTION,
 			CXXEmitFunctionTagsPushScopes,
 			piCorkQueueIndex

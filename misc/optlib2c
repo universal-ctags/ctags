@@ -60,8 +60,8 @@ my $options =
 	 push @{$_[0]->{'kinddefs'}}, { letter => $2, name => $3, desc => $4,
 					refonly => $refonly, roles => [] };
        } ],
-     [ qr/^--extradef-(.*)=([^,]+),(.+)/, sub {
-	 die "Don't use --extradef-<LANG>=+ option before defining the language"
+     [ qr/^--_extradef-(.*)=([^,]+),(.+)/, sub {
+	 die "Don't use --_extradef-<LANG>=+ option before defining the language"
 	     if (! defined $_[0]->{'langdef'});
 	 die "Adding an extra is allowed only to the language specified with --langdef: $1"
 	     unless ($_[0]->{'langdef'} eq $1);

@@ -53,7 +53,7 @@ struct sTagFile {
 		/* defines tag search state */
 	struct {
 				/* file position of last match for tag */
-			off_t pos; 
+			off_t pos;
 				/* name of tag last searched for */
 			char *name;
 				/* length of name for partial matches */
@@ -403,10 +403,7 @@ static void parseTagLine (tagFile *file, tagEntry *const entry)
 	size_t p_len = strlen (p);
 	char *tab = strchr (p, TAB);
 
-	entry->fields.list = NULL;
-	entry->fields.count = 0;
-	entry->kind = NULL;
-	entry->fileScope = 0;
+	memset(entry, 0, sizeof(*entry));
 
 	entry->name = p;
 	if (tab != NULL)
@@ -471,10 +468,14 @@ static void parseTagLine (tagFile *file, tagEntry *const entry)
 			{
 				/* invalid pattern */
 			}
-			fieldsPresent = (strncmp (p, ";\"", 2) == 0);
-			*p = '\0';
-			if (fieldsPresent)
-				parseExtensionFields (file, entry, p + 2);
+
+			if (p)
+			{
+				fieldsPresent = (strncmp (p, ";\"", 2) == 0);
+				*p = '\0';
+				if (fieldsPresent)
+					parseExtensionFields (file, entry, p + 2);
+			}
 		}
 	}
 	if (entry->fields.count > 0)

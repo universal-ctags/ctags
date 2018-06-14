@@ -121,10 +121,12 @@ bool cxxParserParseBlockHandleOpeningBracket(void)
 	// FIXME: Why the invalid cork queue entry index is CORK_NIL?
 	int iCorkQueueIndex = CORK_NIL;
 
+	CXXFunctionSignatureInfo oInfo;
+
 	if(eScopeType != CXXScopeTypeFunction)
 	{
 		// very likely a function definition
-		iScopes = cxxParserExtractFunctionSignatureBeforeOpeningBracket(&iCorkQueueIndex);
+		iScopes = cxxParserExtractFunctionSignatureBeforeOpeningBracket(&oInfo,&iCorkQueueIndex);
 
 		// FIXME: Handle syntax (5) of list initialization:
 		//        Class::Class() : member { arg1, arg2, ... } {...
@@ -147,6 +149,8 @@ bool cxxParserParseBlockHandleOpeningBracket(void)
 		}
 
 		iScopes = 0;
+
+		oInfo.uFlags = 0;
 	}
 
 	cxxParserNewStatement();
@@ -157,8 +161,69 @@ bool cxxParserParseBlockHandleOpeningBracket(void)
 		return false;
 	}
 
+	unsigned long uEndPosition = getInputLineNumber();
+	
+	// If the function contained a "try" keyword before the opening bracket
+	// then it's likely to be a function-try-block and should be followed by a catch
+	// block that is in the same scope.
+
+	if(oInfo.uFlags & CXXFunctionSignatureInfoFunctionTryBlock)
+	{	
+		// look for the catch blocks.
+		CXX_DEBUG_PRINT("The function is a function-try-block: looking for catch blocks");
+
+		for(;;)
+		{
+			CXX_DEBUG_PRINT("Looking ahead for a catch block...");
+
+			if(!cxxParserParseNextToken())
+				break; // EOF
+
+			if(!cxxTokenIsKeyword(g_cxx.pToken,CXXKeywordCATCH))
+			{
+				// No more catches. Unget and exit.
+				CXX_DEBUG_PRINT("No more catch blocks");
+				cxxParserUngetCurrentToken();
+				break;
+			}
+
+			// assume it's a catch block.
+
+			CXX_DEBUG_PRINT("Found catch block");
+
+			if(!cxxParserParseIfForWhileSwitchCatchParenthesis())
+			{
+				CXX_DEBUG_LEAVE_TEXT("Failed to parse the catch parenthesis");
+				return false;
+			}
+			
+			// the standard requires a bracket here (catch block is always a compound statement).
+			
+			cxxParserNewStatement();
+			
+			if(!cxxParserParseNextToken())
+			{
+				CXX_DEBUG_LEAVE_TEXT("Found EOF while looking for catch() block: playing nice");
+				break; // EOF (would be a syntax error!)
+			}
+			
+			if(!cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeOpeningBracket))
+			{
+				// Aargh...
+				CXX_DEBUG_LEAVE_TEXT("Found something unexpected while looking for catch() block: playing nice");
+				cxxParserUngetCurrentToken();
+				break; // (would be a syntax error!)
+			}
+			
+			if(!cxxParserParseBlock(true))
+				return false;
+
+ 			uEndPosition = getInputLineNumber();
+ 		}
+ 	}
+
 	if(iCorkQueueIndex > CORK_NIL)
-		cxxParserMarkEndLineForTagInCorkQueue(iCorkQueueIndex);
+		cxxParserSetEndLineForTagInCorkQueue(iCorkQueueIndex,uEndPosition);
 
 	while(iScopes > 0)
 	{
@@ -169,7 +234,6 @@ bool cxxParserParseBlockHandleOpeningBracket(void)
 	CXX_DEBUG_LEAVE();
 	return true;
 }
-
 
 static bool cxxParserParseBlockInternal(bool bExpectClosingBracket)
 {
@@ -345,16 +409,34 @@ process_token:
 					case CXXKeywordFOR:
 					case CXXKeywordWHILE:
 					case CXXKeywordSWITCH:
-						if(!cxxParserParseIfForWhileSwitch())
+					case CXXKeywordCATCH:
+						if(!cxxParserParseIfForWhileSwitchCatchParenthesis())
 						{
-							CXX_DEBUG_LEAVE_TEXT("Failed to parse if/for/while/switch");
+							CXX_DEBUG_LEAVE_TEXT("Failed to parse if/for/while/switch/catch parenthesis");
 							return false;
 						}
+						// Now we're just before the block that follows the parenthesis.
 						cxxParserNewStatement();
 						// Force the cpp preprocessor to think that we're in the middle of a statement.
 						cppBeginStatement();
 					break;
 					case CXXKeywordTRY:
+						// We parse try in different ways depending on the context.
+						// Inside a function, and without preceeding tokens it's assumed to be
+						// a plain try {} catch {} block. This is easy.
+						// Out of a function it's likely to be a function try block:
+						//    int f(int n = 2) try { ... } catch { ... }
+						// Inside a function but with some preceeding tokens it's likely to be a
+						// lambda expressed as function-try-block.
+						//    auto f() -> void try { ... } catch { ... }
+						if((cxxScopeGetType() != CXXScopeTypeFunction) || g_cxx.pToken->pPrev)
+						{
+							CXX_DEBUG_PRINT("Found try that looks like a function-try-block");
+							// Maybe function-try-block.
+							// Keep in the chain and continue parsing.
+							continue;
+						}
+						// Fall through.
 					case CXXKeywordELSE:
 					case CXXKeywordDO:
 						// parse as normal statement/block

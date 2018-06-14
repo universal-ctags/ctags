@@ -1,0 +1,8 @@
+greet1	input.java	/^		public void greet (String word) {$;"	m	line:9	method:input.hello.anonXXX
+greetA	input.java	/^		public void greet (String word) {$/;"	m	line:9	method:input.hello.anonXXX
+greet2	input.java	k:v
+greet3	input.java	
+greet4	input.java
+greet5
+greetB	input.java	?^		public void greet (String word) {$?;"	m	line:9	method:input.hello.anonXXX
+greet6	input.java	?^		public void greet (String word) {$;"	m	line:9	method:input.hello.anonXXX

@@ -21,21 +21,21 @@
 # USA.
 #
 #
---langdef=man
---map-man=+.1
---map-man=+.2
---map-man=+.3
---map-man=+.4
---map-man=+.5
---map-man=+.6
---map-man=+.7
---map-man=+.8
---map-man=+.9
+--langdef=Man
+--map-Man=+.1
+--map-Man=+.2
+--map-Man=+.3
+--map-Man=+.4
+--map-Man=+.5
+--map-Man=+.6
+--map-Man=+.7
+--map-Man=+.8
+--map-Man=+.9
 
---kinddef-man=t,title,titles
---kinddef-man=s,section,sections
+--kinddef-Man=t,title,titles
+--kinddef-Man=s,section,sections
 
---regex-man=/^\.TH[[:space:]]{1,}"([^"]{1,})".*/\1/t/{exclusive}{icase}{scope=push}
---regex-man=/^\.TH[[:space:]]{1,}([^[:space:]]{1,}).*/\1/t/{exclusive}{icase}{scope=push}
---regex-man=/^\.SH[[:space:]]{1,}"([^"]{1,})".*/\1/s/{exclusive}{icase}{scope=ref}
---regex-man=/^\.SH[[:space:]]{1,}([^[:space:]]{1,}).*/\1/s/{exclusive}{icase}{scope=ref}
+--regex-Man=/^\.TH[[:space:]]{1,}"([^"]{1,})".*/\1/t/{exclusive}{icase}{scope=push}
+--regex-Man=/^\.TH[[:space:]]{1,}([^[:space:]]{1,}).*/\1/t/{exclusive}{icase}{scope=push}
+--regex-Man=/^\.SH[[:space:]]{1,}"([^"]{1,})".*/\1/s/{exclusive}{icase}{scope=ref}
+--regex-Man=/^\.SH[[:space:]]{1,}([^[:space:]]{1,}).*/\1/s/{exclusive}{icase}{scope=ref}

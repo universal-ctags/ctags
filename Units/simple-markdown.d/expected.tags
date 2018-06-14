@@ -1,0 +1,27 @@
+a	input.md	/^# a$/;"	c	sectionMarker:#
+b	input.md	/^## b$/;"	s	sectionMarker:#
+c	input.md	/^### c$/;"	S	sectionMarker:#
+d	input.md	/^#### d$/;"	t	sectionMarker:#
+e	input.md	/^##### e$/;"	T	sectionMarker:#
+f	input.md	/^###### f$/;"	u	sectionMarker:#
+g	input.md	/^# g #$/;"	c	sectionMarker:##
+h	input.md	/^# h ##$/;"	c	sectionMarker:##
+i	input.md	/^## i #$/;"	s	sectionMarker:##
+j	input.md	/^## j ##$/;"	s	sectionMarker:##
+k	input.md	/^## k ###$/;"	s	sectionMarker:##
+l	input.md	/^### l #$/;"	S	sectionMarker:##
+m	input.md	/^### m ##$/;"	S	sectionMarker:##
+n	input.md	/^### n ###$/;"	S	sectionMarker:##
+o	input.md	/^### o ###$/;"	S	sectionMarker:##
+p	input.md	/^#### p #$/;"	t	sectionMarker:##
+q	input.md	/^#### q #####$/;"	t	sectionMarker:##
+r	input.md	/^##### r #$/;"	T	sectionMarker:##
+s	input.md	/^##### s ######$/;"	T	sectionMarker:##
+t	input.md	/^###### t #$/;"	u	sectionMarker:##
+u	input.md	/^###### u #######$/;"	u	sectionMarker:##
+A	input.md	/^A$/;"	c	sectionMarker:=
+B	input.md	/^B$/;"	c	sectionMarker:=
+C	input.md	/^C$/;"	c	sectionMarker:=
+D	input.md	/^D$/;"	s	sectionMarker:-
+E	input.md	/^E$/;"	s	sectionMarker:-
+F	input.md	/^F$/;"	s	sectionMarker:-

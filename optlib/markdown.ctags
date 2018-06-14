@@ -1,0 +1,68 @@
+#
+#
+#  Copyright (c) 2018, Red Hat, Inc.
+#  Copyright (c) 2018, Masatake YAMATO
+#
+#  Author: Masatake YAMATO <yamato@redhat.com>
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,
+# USA.
+#
+#
+
+#
+# TODO: Tracking the scope
+#
+
+--langdef=Markdown
+--map-Markdown=+.md
+--map-Markdown=+.markdown
+
+--kinddef-Markdown=c,chapter,chapsters
+--kinddef-Markdown=s,section,sections
+--kinddef-Markdown=S,subsection,subsections
+--kinddef-Markdown=t,subsubsection,subsubsections
+--kinddef-Markdown=T,l4subsection,level 4 subsections
+--kinddef-Markdown=u,l5subsection,level 5 subsections
+
+--_fielddef-Markdown=sectionMarker,character used for declaring section(#, ##, =, or -)
+
+--_tabledef-Markdown=main
+--_tabledef-Markdown=sharp
+
+
+--_mtable-regex-Markdown=main/^#///{tjump=sharp}{_advanceTo=0start}
+--_mtable-regex-Markdown=main/^([^\n]+)[\n]=+[\n]/\1/c/{_field=sectionMarker:=}
+--_mtable-regex-Markdown=main/^([^\n]+)[\n]-+[\n]/\1/s/{_field=sectionMarker:-}
+--_mtable-regex-Markdown=main/^[^\n]+[\n]//
+--_mtable-regex-Markdown=main/[\n]+//
+--_mtable-regex-Markdown=main/^[^\n]+//
+
+
+--_mtable-regex-Markdown=sharp/^#[ \t]+([^\n]+)([ \t]+#+)[\n]/\1/c/{_field=sectionMarker:##}{tjump=main}
+--_mtable-regex-Markdown=sharp/^##[ \t]+([^\n]+)([ \t]+#+)[\n]/\1/s/{_field=sectionMarker:##}{tjump=main}
+--_mtable-regex-Markdown=sharp/^###[ \t]+([^\n]+)([ \t]+#+)[\n]/\1/S/{_field=sectionMarker:##}{tjump=main}
+--_mtable-regex-Markdown=sharp/^####[ \t]+([^\n]+)([ \t]+#+)[\n]/\1/t/{_field=sectionMarker:##}{tjump=main}
+--_mtable-regex-Markdown=sharp/^#####[ \t]+([^\n]+)([ \t]+#+)[\n]/\1/T/{_field=sectionMarker:##}{tjump=main}
+--_mtable-regex-Markdown=sharp/^######[ \t]+([^\n]+)([ \t]+#+)[\n]/\1/u/{_field=sectionMarker:##}{tjump=main}
+--_mtable-regex-Markdown=sharp/^#[ \t]+([^\n]+)[\n]/\1/c/{_field=sectionMarker:#}{tjump=main}
+--_mtable-regex-Markdown=sharp/^##[ \t]+([^\n]+)[\n]/\1/s/{_field=sectionMarker:#}{tjump=main}
+--_mtable-regex-Markdown=sharp/^###[ \t]+([^\n]+)[\n]/\1/S/{_field=sectionMarker:#}{tjump=main}
+--_mtable-regex-Markdown=sharp/^####[ \t]+([^\n]+)[\n]/\1/t/{_field=sectionMarker:#}{tjump=main}
+--_mtable-regex-Markdown=sharp/^#####[ \t]+([^\n]+)[\n]/\1/T/{_field=sectionMarker:#}{tjump=main}
+--_mtable-regex-Markdown=sharp/^######[ \t]+([^\n]+)[\n]/\1/u/{_field=sectionMarker:#}{tjump=main}
+--_mtable-regex-Markdown=sharp/^[^\n]+[\n]//{tjump=main}
+--_mtable-regex-Markdown=sharp/[\n]+//{tjump=main}
+--_mtable-regex-Markdown=sharp/^[^\n]+//{tjump=main}

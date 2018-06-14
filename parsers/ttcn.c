@@ -122,7 +122,7 @@ static struct s_ttcnKeyword {
 	{T_ANY,         "any",          K_NONE},
 	{T_ANYTYPE,     "anytype",      K_NONE},
 	{T_BITSTRING,   "bitstring",    K_NONE},
-	{T_BOOLEAN,     "bool",      K_NONE},
+	{T_BOOLEAN,     "boolean",      K_NONE},
 	{T_CASE,        "case",         K_NONE},
 	{T_CALL,        "call",         K_NONE},
 	{T_CATCH,       "catch",        K_NONE},

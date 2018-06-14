@@ -503,7 +503,7 @@ static const keywordDesc KeywordTable [] = {
      { "bit",             KEYWORD_BIT,             { 0, 0, 0, 0, 0, 1 } },
      { "body",            KEYWORD_BODY,            { 0, 0, 0, 1, 0, 0 } },
      { "bool",            KEYWORD_BOOL,            { 0, 0, 0, 1, 0, 0 } },
-     { "bool",         KEYWORD_BOOLEAN,         { 0, 0, 0, 0, 1, 0 } },
+     { "boolean",         KEYWORD_BOOLEAN,         { 0, 0, 0, 0, 1, 0 } },
      { "break",           KEYWORD_BREAK,           { 0, 0, 0, 1, 0, 0 } },
      { "byte",            KEYWORD_BYTE,            { 0, 0, 0, 1, 1, 0 } },
      { "case",            KEYWORD_CASE,            { 1, 1, 1, 1, 1, 0 } },

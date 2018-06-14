@@ -21,37 +21,37 @@
 # USA.
 #
 #
---langdef=gdbinit
---map-gdbinit=+(.gdbinit)
---map-gdbinit=+.gdb
---kinddef-gdbinit=d,definition,definitions
---kinddef-gdbinit=D,document,documents
---kinddef-gdbinit=t,toplevelVariable,toplevel variables
---kinddef-gdbinit=l,localVariable,local variables
+--langdef=Gdbinit
+--map-Gdbinit=+(.gdbinit)
+--map-Gdbinit=+.gdb
+--kinddef-Gdbinit=d,definition,definitions
+--kinddef-Gdbinit=D,document,documents
+--kinddef-Gdbinit=t,toplevelVariable,toplevel variables
+--kinddef-Gdbinit=l,localVariable,local variables
 
 ##
 ## Ignore comments
 ##
---regex-gdbinit=/^#.*//{exclusive}
+--regex-Gdbinit=/^#.*//{exclusive}
 
 ##
 ## define
 ##
---regex-gdbinit=/^define[[:space:]]+([^[:space:]]+)$/\1/d/
+--regex-Gdbinit=/^define[[:space:]]+([^[:space:]]+)$/\1/d/
 
 ##
 ## document
 ##
---regex-gdbinit=/^document[[:space:]]+([^[:space:]]+)$/\1/D/
---kinds-gdbinit=-D
+--regex-Gdbinit=/^document[[:space:]]+([^[:space:]]+)$/\1/D/
+--kinds-Gdbinit=-D
 
 ##
 ## set $...
 ##
---regex-gdbinit=/^set[[:space:]]+\$([a-zA-Z0-9_]+)[[:space:]]*=/\1/t/
+--regex-Gdbinit=/^set[[:space:]]+\$([a-zA-Z0-9_]+)[[:space:]]*=/\1/t/
 
 ##
 ## __...set $...
 ##
---regex-gdbinit=/^[[:space:]]+set[[:space:]]+\$([a-zA-Z0-9_]+)[[:space:]]*=/\1/l/
---kinds-gdbinit=-l
+--regex-Gdbinit=/^[[:space:]]+set[[:space:]]+\$([a-zA-Z0-9_]+)[[:space:]]*=/\1/l/
+--kinds-Gdbinit=-l

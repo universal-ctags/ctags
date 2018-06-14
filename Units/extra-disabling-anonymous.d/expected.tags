@@ -1,0 +1,11 @@
+x	input.c	/^  int x;$/;"	m	struct:__anon335cadda0108	typeref:typename:int	file:	extras:fileScope
+x	input.c	/^  int x;$/;"	m	union:__anon335cadda020a	typeref:typename:int	file:	extras:fileScope
+X	input.c	/^  X;$/;"	e	enum:__anon335cadda0303	file:	extras:fileScope
+c2m1	input-0.js	/^  this.c2m1 = function() {$/;"	m	class:class2
+class2	input-0.js	/^var class2 = function() {$/;"	c
+c3m1	input-0.js	/^  this.c3m1 = function() {$/;"	m	class:class3
+class3	input-0.js	/^var class3 = function() {$/;"	c
+f1	input-0.js	/^function f1(y) {$/;"	f
+hello	input-0.js	/^    hello() {$/;"	m	class:Mixin.AnonymousClass2503d9910401
+Mixin	input-0.js	/^function Mixin(superclass) {$/;"	f
+method8	input-0.js	/^	method8(n) { return n * n; }$/;"	m	class:AnonymousClass2503d9910501

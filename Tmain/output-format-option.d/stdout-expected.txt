@@ -1,4 +1,4 @@
-# ctags
+# u-ctags
 main	input.c	/^main(void)$/;"	f	typeref:typename:int
 # etags
 

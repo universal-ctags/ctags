@@ -1,0 +1,11 @@
+input	input.java	/^public class input {$/;"	c	line:2
+greeting	input.java	/^    interface greeting {$/;"	i	line:3	class:input
+greet	input.java	/^	public void greet(String word);$/;"	m	line:4	interface:input.greeting
+hello	input.java	/^    public void hello () {$/;"	m	line:7	class:input
+g	input.java	/^	greeting g = new greeting() {$/;"	l	line:8	method:input.hello
+anonXXX	input.java	/^	greeting g = new greeting() {$/;"	c	line:8	method:input.hello
+greet	input.java	/^		public void greet (String word) {$/;"	m	line:9	method:input.hello.anonXXX
+bye	input.java	/^    public void bye () {$/;"	m	line:14	class:input
+h	input.java	/^	greeting h = new greeting() {$/;"	l	line:15
+anonYYY	input.java	/^	greeting g = new greeting() {$/;"	c	line:15	method:input.bye
+greet	input.java	/^		public void greet (String word) {$/;"	m	line:16	method:input.hello.anonYYY
