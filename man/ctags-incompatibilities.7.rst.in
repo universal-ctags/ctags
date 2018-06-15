@@ -104,6 +104,27 @@ Exuberant-ctags accepts a character other than alphabetical character
 as kind letter in ``--regex-<LANG>=...`` option.  Universal-ctags
 accepts only an alphabetical character.
 
+Acceptable characters as parts of a kind name
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Exuberant-ctags accepts any character as a part of a kind name
+defined with ``--regex-<LANG>=/regex/replacement/kind-spec/``.
+
+Universal-ctags accepts only an alphabetical character as
+the initial letter of a kind name.
+Universal-ctags accepts only an alphabetical character or
+numerical character as the rest letters.
+
+An example::
+
+  --regex-Foo=/abstract +class +([a-z]+)/\1/a,abstract class/i
+
+Universal-ctags rejects this because the kind name, "abstract class",
+includes a whitespace character.
+
+This requirement is for making the output of Universal-ctags follow
+the tags file format.
+
 Incompatibilities in tags file format
 -------------------------------------------------------------
 

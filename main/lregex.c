@@ -1928,16 +1928,59 @@ static regexPattern *addTagRegexInternal (struct lregexControlBlock *lcb,
 				   kindLetter,
 				   regex,
 				   getLanguageName (lcb->owner));
-		else if (kindName && (strcmp (kindName, fileKind->name) == 0))
-			error (FATAL,
-				   "Kind name \"%s\" used in regex definition \"%s\" of %s language is reserved in ctags main",
-				   kindName,
-				   regex,
-				   getLanguageName (lcb->owner));
 		else if (!isalpha ((unsigned char)kindLetter))
 			error (FATAL,
 				   "Kind letter must be an alphabetical character: \"%c\"",
 				   kindLetter);
+
+		if (kindName)
+		{
+			if (strcmp (kindName, fileKind->name) == 0)
+				error (FATAL,
+					   "Kind name \"%s\" used in regex definition \"%s\" of %s language is reserved in ctags main",
+					   kindName,
+					   regex,
+					   getLanguageName (lcb->owner));
+
+
+			const char *option_bsae = (regptype == REG_PARSER_SINGLE_LINE? "regex"        :
+									   regptype == REG_PARSER_MULTI_LINE ? "mline-regex"  :
+									   regptype == REG_PARSER_MULTI_TABLE? "_mtable-regex":
+									   NULL);
+			Assert (option_bsae);
+
+			for (const char * p = kindName; *p; p++)
+			{
+				if (p == kindName)
+				{
+					if (!isalpha(*p))
+						error (FATAL,
+							   "A kind name doesn't start with an alphabetical character: "
+							   "'%s' in \"--%s-%s\" option",
+							   kindName,
+							   option_bsae,
+							   getLanguageName (lcb->owner));
+				}
+				else
+				{
+					/*
+					 * People may object to this error.
+					 * Searching github repositories, I found not a few .ctags files
+					 * in which Exuberant-ctags users define kind names with whitespaces.
+					 * "FATAL" error breaks the compatibility.
+					 */
+					if (!isalnum(*p))
+						error (/* regptype == REG_PARSER_SINGLE_LINE? WARNING: */ FATAL,
+							   "Non-alphanumeric char is used in kind name: "
+							   "'%s' in \"--%s-%s\" option",
+							   kindName,
+							   option_bsae,
+							   getLanguageName (lcb->owner));
+
+				}
+
+			}
+		}
 
 		rptr = addCompiledTagPattern (lcb, table_index,
 									  regptype, cp, name,

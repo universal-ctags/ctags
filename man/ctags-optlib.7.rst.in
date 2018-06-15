@@ -247,8 +247,7 @@ OPTION ITEMS
 	``--kinddef-<LANG>``. This form is recommended in Universal-ctags.
 
 	The full form of *kind-spec* is in the form of a single *letter*, a
-	comma, a *name* (only out of alphabetical characters), a comma, a
-	*description*. See the description of
+	comma, a *name*, a comma, a *description*. See the description of
 	``--kinddef-<LANG>=letter,name,description`` option about how the
 	elements are used.
 
