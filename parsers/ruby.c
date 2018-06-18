@@ -122,7 +122,7 @@ static bool notIdentChar (int c)
 	return ! isIdentChar (c);
 }
 
-static bool operatorChar (int c)
+static bool isOperatorChar (int c)
 {
 	return (c == '[' || c == ']' ||
 	        c == '=' || c == '!' || c == '~' ||
@@ -134,7 +134,12 @@ static bool operatorChar (int c)
 
 static bool notOperatorChar (int c)
 {
-	return ! operatorChar (c);
+	return ! isOperatorChar (c);
+}
+
+static bool isSigilChar (int c)
+{
+	return (c == '@' || c == '$');
 }
 
 static bool isWhitespace (int c)
@@ -181,6 +186,8 @@ static bool canMatchKeywordWithAssign (const unsigned char** s, const char* lite
 		return true;
 	}
 
+	advanceWhile (s, isSigilChar);
+
 	if (! advanceWhile (s, isIdentChar))
 	{
 		*s = original_pos;
@@ -189,7 +196,7 @@ static bool canMatchKeywordWithAssign (const unsigned char** s, const char* lite
 
 	advanceWhile (s, isWhitespace);
 
-	if (! (advanceWhile (s, operatorChar) && *(*s - 1) == '='))
+	if (! (advanceWhile (s, isOperatorChar) && *(*s - 1) == '='))
 	{
 		*s = original_pos;
 		return false;

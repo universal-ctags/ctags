@@ -36,6 +36,24 @@ c = class Bar
   end
 
   def method_f
+    @x = if 1
+    else
+    end
+  end
+  
+  def method_g
+    @@x = if 1
+    else
+    end
+  end
+  
+  def method_h
+    $x = if 1
+    else
+    end
+  end
+  
+  def method_j
   end
 end
 
