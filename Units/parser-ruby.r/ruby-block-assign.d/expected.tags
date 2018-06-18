@@ -8,3 +8,6 @@ method_c	input.rb	/^  def method_c$/;"	f	class:Bar
 method_d	input.rb	/^  def method_d$/;"	f	class:Bar
 method_e	input.rb	/^  def method_e$/;"	f	class:Bar
 method_f	input.rb	/^  def method_f$/;"	f	class:Bar
+method_g	input.rb	/^  def method_g$/;"	f	class:Bar
+method_h	input.rb	/^  def method_h$/;"	f	class:Bar
+method_j	input.rb	/^  def method_j$/;"	f	class:Bar
