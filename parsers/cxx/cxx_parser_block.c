@@ -121,6 +121,25 @@ bool cxxParserParseBlockHandleOpeningBracket(void)
 	// FIXME: Why the invalid cork queue entry index is CORK_NIL?
 	int iCorkQueueIndex = CORK_NIL;
 
+	// In C++ mode check for lambdas
+	CXXToken * pParenthesis;
+
+	if(
+		bIsCPP &&
+		(pParenthesis = cxxParserOpeningBracketIsLambda())
+	)
+	{
+		if(!cxxParserHandleLambda(pParenthesis))
+		{
+			CXX_DEBUG_LEAVE_TEXT("Lambda handling failed");
+			return false;
+		}
+
+		// Note that here we're leaving the token chain "alive" so further parsing can be performed.
+		CXX_DEBUG_LEAVE_TEXT("Lambda handling succeeded");
+		return true;
+	}
+
 	CXXFunctionSignatureInfo oInfo;
 
 	if(eScopeType != CXXScopeTypeFunction)
@@ -134,19 +153,7 @@ bool cxxParserParseBlockHandleOpeningBracket(void)
 		// some kind of other block:
 		// - anonymous block
 		// - block after for(),while(),foreach(),if() and other similar stuff
-		// - lambda
-
-		// check for lambdas
-		CXXToken * pParenthesis;
-
-		if(
-			bIsCPP &&
-			(pParenthesis = cxxParserOpeningBracketIsLambda())
-		)
-		{
-			CXX_DEBUG_LEAVE_TEXT("Will handle lambda");
-			return cxxParserHandleLambda(pParenthesis);
-		}
+		// (note that {}-style initializers have been handled above and thus are excluded)
 
 		iScopes = 0;
 
@@ -162,13 +169,13 @@ bool cxxParserParseBlockHandleOpeningBracket(void)
 	}
 
 	unsigned long uEndPosition = getInputLineNumber();
-	
+
 	// If the function contained a "try" keyword before the opening bracket
 	// then it's likely to be a function-try-block and should be followed by a catch
 	// block that is in the same scope.
 
 	if(oInfo.uFlags & CXXFunctionSignatureInfoFunctionTryBlock)
-	{	
+	{
 		// look for the catch blocks.
 		CXX_DEBUG_PRINT("The function is a function-try-block: looking for catch blocks");
 
@@ -196,17 +203,17 @@ bool cxxParserParseBlockHandleOpeningBracket(void)
 				CXX_DEBUG_LEAVE_TEXT("Failed to parse the catch parenthesis");
 				return false;
 			}
-			
+
 			// the standard requires a bracket here (catch block is always a compound statement).
-			
+
 			cxxParserNewStatement();
-			
+
 			if(!cxxParserParseNextToken())
 			{
 				CXX_DEBUG_LEAVE_TEXT("Found EOF while looking for catch() block: playing nice");
 				break; // EOF (would be a syntax error!)
 			}
-			
+
 			if(!cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeOpeningBracket))
 			{
 				// Aargh...
@@ -214,7 +221,7 @@ bool cxxParserParseBlockHandleOpeningBracket(void)
 				cxxParserUngetCurrentToken();
 				break; // (would be a syntax error!)
 			}
-			
+
 			if(!cxxParserParseBlock(true))
 				return false;
 
