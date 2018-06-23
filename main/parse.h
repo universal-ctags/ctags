@@ -23,6 +23,7 @@
 #include "param.h"
 #include "parsers.h"  /* contains list of parsers */
 #include "strlist.h"
+#include "trace.h"
 #include "xtag.h"
 
 /*
@@ -109,6 +110,7 @@ struct sParserDefinition {
 	/* used internally */
 	langType id;		    /* id assigned to language */
 	unsigned int enabled:1;	       /* currently enabled? */
+	unsigned int traced:1;
 };
 
 typedef parserDefinition* (parserDefinitionFunc) (void);
@@ -260,4 +262,9 @@ extern void anonGenerate (vString *buffer, const char *prefix, int kind);
 extern void anonHashString (const char *filename, char buf[9]);
 
 extern void printLanguageMultitableStatistics (langType language, FILE *vfp);
+
+#ifdef DO_TRACING
+extern void traceLanguage (langType language);
+extern bool isLanguageTraced (langType language);
+#endif	/* DO_TRACING */
 #endif  /* CTAGS_MAIN_PARSE_H */

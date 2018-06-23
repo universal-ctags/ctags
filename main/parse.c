@@ -1531,6 +1531,19 @@ extern void enableLanguage (const langType language, const bool state)
 	LanguageTable [language].def->enabled = state;
 }
 
+#ifdef DO_TRACING
+extern void traceLanguage (langType language)
+{
+	Assert (0 <= language  &&  language < (int) LanguageCount);
+	LanguageTable [language].def->traced = true;
+}
+extern bool isLanguageTraced (langType language)
+{
+	Assert (0 <= language  &&  language < (int) LanguageCount);
+	return LanguageTable [language].def->traced;
+}
+#endif /* DO_TRACING */
+
 extern void enableLanguages (const bool state)
 {
 	unsigned int i;

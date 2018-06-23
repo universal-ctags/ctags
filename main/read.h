@@ -17,6 +17,7 @@
 #include <stdio.h>
 #include <ctype.h>
 
+#include "debug.h"
 #include "parse.h"
 #include "vstring.h"
 #include "mio.h"
@@ -129,5 +130,9 @@ extern unsigned long getInputLineNumberForFileOffset(long offset);
 extern bool isThinStreamSpec(unsigned long startLine, long startCharOffset,
 							 unsigned long endLine, long endCharOffset,
 							 unsigned long sourceLineOffset);
+
+#ifdef DO_TRACING
+extern bool isTraced (void);
+#endif	/* DO_TRACING */
 
 #endif  /* CTAGS_MAIN_READ_H */

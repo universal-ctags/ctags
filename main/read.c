@@ -1264,3 +1264,17 @@ extern bool isThinStreamSpec(unsigned long startLine, long startCharOffset,
 			endCharOffset == 0 &&
 			sourceLineOffset == 0);
 }
+
+#ifdef DO_TRACING
+extern bool isTraced (void)
+{
+	if (File.mio == NULL)
+		/* A parser is not given. In that case, just check whether --_trace option
+		   is given or not. */
+		return isMainTraced ();
+	else
+		/* Ap arser is given. In that case, check whether the current parser is
+		   specified in --_trace=<LANG>,... option */
+		return isLanguageTraced (getInputLanguage ());
+}
+#endif	/* DO_TRACING */
