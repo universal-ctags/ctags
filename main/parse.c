@@ -4188,6 +4188,8 @@ static void createCTSTTags (void)
 
 	int found_enabled_disabled[2] = {0, 0};
 
+	TRACE_ENTER_TEXT("Parsing starts");
+
 	while ((line = readLineFromInputFile ()) != NULL)
 	{
 		int c = line[0];
@@ -4293,6 +4295,8 @@ static void createCTSTTags (void)
 				}
 			}
 	}
+
+	TRACE_LEAVE();
 }
 
 static parserDefinition *CTagsSelfTestParser (void)
