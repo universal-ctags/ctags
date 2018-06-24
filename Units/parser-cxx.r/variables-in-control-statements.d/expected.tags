@@ -9,4 +9,6 @@ f09	input.cpp	/^	for(std::unique_ptr<int> f09 = 0;;)$/;"	l	function:test	typeref
 f10	input.cpp	/^	for(std::unique_ptr<int> f10(getPointer());;)$/;"	l	function:test	typeref:typename:std::unique_ptr<int>	file:
 f11	input.cpp	/^	for(std::pair<int,int> f11;;)$/;"	l	function:test	typeref:typename:std::pair<int,int>	file:
 i01	input.cpp	/^	if(int i01 = 10 + 20)$/;"	l	function:test	typeref:typename:int	file:
+i02	input.cpp	/^	if(INT * i02 = 0)$/;"	l	function:test	typeref:typename:INT *	file:
+i03	input.cpp	/^	if(INT & i03 = n01)$/;"	l	function:test	typeref:typename:INT &	file:
 w01	input.cpp	/^	while(unsigned short int w01 = getUShort())$/;"	l	function:test	typeref:typename:unsigned short int	file:
