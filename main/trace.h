@@ -21,23 +21,8 @@
 // "./configure --enable-debugging" defines DEBUG.
 //
 #ifdef DEBUG
-//#define TRACING_ENABLED 1
+//#define DO_TRACING
 #endif
-
-//
-// Currently this kind of debugging is supported only on gcc (because of
-// variadic macros and __PRETTY_FUNC__).
-//
-#if defined (__GNUC__) && (__GNUC__ > 2 || (__GNUC__ == 2 && __GNUC_MINOR__ >= 4))
-	#ifdef TRACING_ENABLED
-		#define DO_TRACING
-	#endif
-#else
-	#ifdef TRACING_ENABLED
-		#error "Tracing is not supported on this compiler (yet)"
-	#endif
-#endif
-
 
 #ifdef DO_TRACING
 
@@ -45,23 +30,23 @@
 	void traceLeave(const char * szFunction,const char * szFormat,...);
 	void tracePrint(const char * szFunction,const char * szFormat,...);
 
-	#define TRACE_ENTER() traceEnter(__PRETTY_FUNCTION__,"")
-	#define TRACE_LEAVE() traceLeave(__PRETTY_FUNCTION__,"")
+	#define TRACE_ENTER() traceEnter(__func__,"")
+	#define TRACE_LEAVE() traceLeave(__func__,"")
 
 	#define TRACE_ENTER_TEXT(_szFormat,...) \
-		traceEnter(__PRETTY_FUNCTION__,_szFormat,## __VA_ARGS__)
+		traceEnter(__func__,_szFormat,## __VA_ARGS__)
 
 	#define TRACE_LEAVE_TEXT(_szFormat,...) \
-		traceLeave(__PRETTY_FUNCTION__,_szFormat,## __VA_ARGS__)
+		traceLeave(__func__,_szFormat,## __VA_ARGS__)
 
 	#define TRACE_PRINT(_szFormat,...) \
-		tracePrint(__PRETTY_FUNCTION__,_szFormat,## __VA_ARGS__)
+		tracePrint(__func__,_szFormat,## __VA_ARGS__)
 
 	#define TRACE_ASSERT(_condition,_szFormat,...) \
 		do { \
 			if(!(_condition)) \
 			{ \
-				tracePrint(__PRETTY_FUNCTION__,_szFormat,## __VA_ARGS__); \
+				tracePrint(__func__,_szFormat,## __VA_ARGS__); \
 				Assert(false); \
 			} \
 		} while(0)
