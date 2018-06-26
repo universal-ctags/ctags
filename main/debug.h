@@ -31,10 +31,8 @@
 #  define Assert(c) do {} while(0)
 #  define AssertNotReached() do {} while(0)
 # else
-   /* based on glibc's assert.h __ASSERT_FUNCTION */
-#  if defined (__GNUC__) && (__GNUC__ > 2 || (__GNUC__ == 2 && __GNUC_MINOR__ >= 4))
-#   define ASSERT_FUNCTION __PRETTY_FUNCTION__
-#  elif defined __STDC_VERSION__ && __STDC_VERSION__ >= 199901L
+   /* We expect cc supports c99 standard. */
+#  if defined __STDC_VERSION__ && __STDC_VERSION__ >= 199901L
 #   define ASSERT_FUNCTION __func__
 #  else
 #   define ASSERT_FUNCTION ((const char*)0)
