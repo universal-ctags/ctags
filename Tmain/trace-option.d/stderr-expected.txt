@@ -1,0 +1,4 @@
+[>> parseFile][at 0] Parsing file ./input.unknown
+    [>> createCTSTTags][at 0] Parsing starts
+    [<< createCTSTTags][at 0] 
+[<< parseFile][at 0] 

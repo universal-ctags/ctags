@@ -19,9 +19,10 @@
 // Use only for development as tracing reduces performance.
 //
 // "./configure --enable-debugging" defines DEBUG.
+// When running ctags, pass --_trace=<LANG>[,<LANG>]* option.
 //
 #ifdef DEBUG
-//#define DO_TRACING
+#define DO_TRACING
 #endif
 
 #ifdef DO_TRACING
@@ -50,6 +51,9 @@
 				Assert(false); \
 			} \
 		} while(0)
+
+	void traceMain(void);
+	bool isMainTraced(void);
 
 #else //!DO_TRACING
 

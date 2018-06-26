@@ -11,6 +11,7 @@
 
 #ifdef DO_TRACING
 
+#include "options.h"
 #include "read.h"
 
 #include <stdio.h>
@@ -18,6 +19,9 @@
 
 void traceEnter(const char * szFunction,const char * szFormat,...)
 {
+	if (!isTraced())
+		return;
+
 	debugIndent ();
 
 	fprintf(stderr,"[>> %s][at %lu] ",szFunction,getInputLineNumber());
@@ -34,6 +38,9 @@ void traceEnter(const char * szFunction,const char * szFormat,...)
 
 void traceLeave(const char * szFunction,const char * szFormat,...)
 {
+	if (!isTraced())
+		return;
+
 	debugDec();
 	debugIndent ();
 
@@ -49,6 +56,9 @@ void traceLeave(const char * szFunction,const char * szFormat,...)
 
 void tracePrint(const char * szFunction,const char * szFormat,...)
 {
+	if (!isTraced())
+		return;
+
 	debugIndent();
 
 	fprintf(stderr,"[%s][at %lu] ",szFunction,getInputLineNumber());
@@ -59,6 +69,20 @@ void tracePrint(const char * szFunction,const char * szFormat,...)
 	va_end(va);
 
 	fprintf(stderr,"\n");
+}
+
+
+static bool tracingMain;
+
+void traceMain(void)
+{
+	verbose("Tracing main part\n");
+	tracingMain = true;
+}
+
+bool isMainTraced(void)
+{
+	return tracingMain;
 }
 
 #endif // DO_TRACING

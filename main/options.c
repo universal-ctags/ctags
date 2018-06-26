@@ -35,6 +35,7 @@
 #include "error.h"
 #include "interactive.h"
 #include "writer.h"
+#include "trace.h"
 
 #ifdef HAVE_JANSSON
 #include <jansson.h>
@@ -468,6 +469,10 @@ static optionDescription ExperimentalLongOptionDescription [] = {
  {1,"       Define new role for kind specified with <kind_letter> in <LANG>."},
  {1,"  --_tabledef-<LANG>=name"},
  {1,"       Define new regex table for <LANG>."},
+#ifdef DO_TRACING
+ {1,"  --_trace=list"},
+ {1,"       Trace parsers for the languages."},
+#endif
  {1,"  --_xformat=field_format"},
  {1,"       Specify custom format for tabular cross reference (-x)."},
  {1,"       Fields can be specified with letter listed in --list-fields."},
@@ -2503,6 +2508,45 @@ static void processVersionOption (
 	exit (0);
 }
 
+#ifdef DO_TRACING
+static void processTraceOption(const char *const option CTAGS_ATTR_UNUSED,
+							   const char *const parameter)
+{
+	const char *langs = eStrdup (parameter);
+	const char *lang = langs;
+
+	traceMain();
+
+	while (lang != NULL)
+	{
+		if (*lang == '\0')
+			break;
+		if (*lang == ',')
+		{
+			lang++;
+			continue;
+		}
+
+		char *const end = strchr (lang, ',');
+
+		if (end != NULL)
+			*end = '\0';
+
+		const langType language = getNamedLanguage (lang, 0);
+		if (language == LANG_IGNORE)
+			error (WARNING, "Unknown language \"%s\" in \"%s\" option", lang, option);
+		else
+		{
+			traceLanguage (language);
+			verbose ("Enable tracing language: %s\n", lang);
+
+		}
+		lang = (end != NULL ? end + 1 : NULL);
+	}
+	eFree ((char *)langs);
+}
+#endif
+
 static void processXformatOption (const char *const option CTAGS_ATTR_UNUSED,
 				  const char *const parameter)
 {
@@ -2654,6 +2698,9 @@ static parametricOption ParametricOptions [] = {
 #endif
 	{ "_list-kinddef-flags",     processListKinddefFlagsOptions, true,   STAGE_ANY },
 	{ "_list-mtable-regex-flags", processListMultitableRegexFlagsOptions, true, STAGE_ANY },
+#ifdef DO_TRACING
+	{ "_trace",                 processTraceOption,             false,  STAGE_ANY },
+#endif
 	{ "_xformat",               processXformatOption,           false,  STAGE_ANY },
 };
 
