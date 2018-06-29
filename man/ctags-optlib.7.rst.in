@@ -253,7 +253,7 @@ OPTION ITEMS
 
 	Either the kind *name* and/or the *description* can be omitted.
 	However, unless the *letter* is not defined with
-	``--kinddef-<LANG>`` option, omitting is not recommended in in
+	``--kinddef-<LANG>`` option, omitting is not recommended in
 	Universal-ctags. The omitting form is supported only for keeping
 	the compatibility with Exuberant-ctags. Supporting the omitting
 	form will be removed from Universal-ctags in the future.  If
