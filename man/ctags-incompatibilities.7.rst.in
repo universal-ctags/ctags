@@ -70,8 +70,11 @@ q/qualified". Unexpectedly the command line becomes as if
 
 In this case, the user should set "--extras=+q" instead of "--extras=q".
 
-Obsoleting ``--<LANG>-kinds`` option
+Kind definitions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Obsoleting ``--<LANG>-kinds`` option
+....................................................................................
 
 Some options have *<LANG>* as parameterized parts in their name like
 ``--foo-<LANG>=...`` or ``--<LANG>-foo=...``. The most of all such
@@ -86,26 +89,26 @@ removed in the future.
 The former form may be friendly to shell completion engines.
 
 Disallowing to define a kind with "file" as name
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+....................................................................................
 
 The kind name "file" is reserved.  Using it as part of kind spec in
 ``--regex-<LANG>`` option is now disallowed.
 
 Disallowing to define a kind with "F" as letter
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+....................................................................................
 
 The kind letter "F" is reserved.  Using it as part of a kind spec in
 ``--regex-<LANG>`` option is now disallowed.
 
 Disallowing to use other than alphabetical character as kind letter
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+....................................................................................
 
 Exuberant-ctags accepts a character other than alphabetical character
 as kind letter in ``--regex-<LANG>=...`` option.  Universal-ctags
 accepts only an alphabetical character.
 
 Acceptable characters as parts of a kind name
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+....................................................................................
 
 Exuberant-ctags accepts any character as a part of a kind name
 defined with ``--regex-<LANG>=/regex/replacement/kind-spec/``.
