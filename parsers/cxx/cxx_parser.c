@@ -1625,14 +1625,14 @@ bool cxxParserParseAccessSpecifier(void)
 bool cxxParserParseIfForWhileSwitchCatchParenthesis(void)
 {
 	CXX_DEBUG_ENTER();
-	
+
 	CXX_DEBUG_ASSERT(
 			cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeKeyword),
 			"This function should be called only after encountering one of the keywords"
 		);
-	
+
 	CXXKeyword eKeyword = g_cxx.pToken->eKeyword;
-	
+
 	if(!cxxParserParseUpToOneOf(
 			CXXTokenTypeParenthesisChain | CXXTokenTypeSemicolon |
 				CXXTokenTypeOpeningBracket | CXXTokenTypeEOF,
@@ -1658,7 +1658,7 @@ bool cxxParserParseIfForWhileSwitchCatchParenthesis(void)
 			cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeParenthesisChain),
 			"Expected a parenthesis chain here"
 		);
-	
+
 	CXX_DEBUG_PRINT("Found if/for/while/switch/catch parenthesis chain");
 
 	// Extract variables from the parenthesis chain
@@ -1671,49 +1671,84 @@ bool cxxParserParseIfForWhileSwitchCatchParenthesis(void)
 		);
 
 	// There are several constructs that can fool the parser here.
-	// The most notable ones are:
-	//     if(a & b)
-	//     if(a * b)
-	//     if(a && b)
-	// Too bad that these constructs are also used to declare variables.
+	//
+	// The most frequent problems arise with
+	//
+	//     if(a & b ...)
+	//     if(a * b ...)
+	//     if(a && b ...)
+	//
+	// which may or may not be variable declarations, depending on the
+	// meaning of identifier a.
+	// Other problems involve balanced operator that resemble templates:
+	//
+	//     if(a < b || c > d ...)
+	//
+	// Here we attempt to rule out these special cases.
+
+	// First try the easy "inclusive" cases.
 
 	// catch() always contains variable declarations
+
 	bool bOkToExtractVariables = eKeyword == CXXKeywordCATCH;
 
 	if(!bOkToExtractVariables)
 	{
-		// Parenthesis contents start with a keyword. Things like:
+		// Another easy one: try parenthesis contents that start with a keyword.
+		//
 		//   if(const std::exception & e)
 		//   if(int i ...
+		//
 		bOkToExtractVariables = cxxTokenTypeIs(
 				cxxTokenChainAt(pChain,1),
 				CXXTokenTypeKeyword
 			);
-		
+
 		if(!bOkToExtractVariables)
 		{
 			// If there is &, && or * then we expect there to be also a = or
 			// a semicolon that comes after it.
 			// This is not 100% foolproof but works most of the times.
-	
-			CXXToken * pAndOrStar = cxxTokenChainFirstTokenOfType(
-						pChain,
-						CXXTokenTypeAnd | CXXTokenTypeMultipleAnds |
-						CXXTokenTypeStar
-					);
-			
-			if(!pAndOrStar)
+
+			CXXToken * pToken = cxxTokenChainFirstTokenOfType(
+					pChain,
+					CXXTokenTypeAnd | CXXTokenTypeMultipleAnds | CXXTokenTypeStar |
+					CXXTokenTypeSmallerThanSign |
+					CXXTokenTypeAssignment | CXXTokenTypeSemicolon
+				);
+
+			if(pToken)
 			{
-				bOkToExtractVariables = true;
+				switch(pToken->eType)
+				{
+					case CXXTokenTypeAnd:
+					case CXXTokenTypeMultipleAnds:
+					case CXXTokenTypeStar:
+					case CXXTokenTypeSmallerThanSign:
+						// troublesome cases.
+						// Require an assignment or a semicolon to follow
+						bOkToExtractVariables = (cxxTokenChainFirstTokenOfType(
+								pChain,
+								CXXTokenTypeAssignment | CXXTokenTypeSemicolon
+							) ? true : false); // ternary ?: needed because of MSVC
+					break;
+					case CXXTokenTypeAssignment:
+					case CXXTokenTypeSemicolon:
+						// looks ok
+						bOkToExtractVariables = true;
+					break;
+					default:
+						// should NOT happen!
+						CXX_DEBUG_ASSERT(false,"Unexpecte token type");
+					break;
+				}
 			} else {
-				bOkToExtractVariables = (cxxTokenChainNextTokenOfType(
-						pAndOrStar,
-						CXXTokenTypeAssignment | CXXTokenTypeSemicolon
-					) ? true : false); // ternary ?: needed because of MSVC
+				// looks ok
+				bOkToExtractVariables = true;
 			}
 		}
 	}
-	
+
 	if(bOkToExtractVariables)
 	{
 		// Kill the initial parenthesis

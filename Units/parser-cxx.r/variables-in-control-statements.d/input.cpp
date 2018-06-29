@@ -18,12 +18,14 @@ int n01;
 unsigned short n02;
 int * n03;
 
+typedef int INT;
+
 int n04()
 {
 	return 0;
 }
 
-int n05,n06,n07,n08,n09,n10;
+int n05,n06,n07,n08,n09,n10,n11,n12,n13,n14;
 
 // The real test
 
@@ -86,7 +88,14 @@ void test()
 	// Valid variable declaration inside an if
 	if(int i01 = 10 + 20)
 	{
-		
+	}
+	
+	if(INT * i02 = 0)
+	{
+	}
+
+	if(INT & i03 = n01)
+	{
 	}
 
 	// non valid declarations inside if
@@ -99,6 +108,10 @@ void test()
 	}
 	
 	if(n09 && n10)
+	{
+	}
+
+	if(n11 < n12 || n13 > n14)
 	{
 	}
 
