@@ -3,13 +3,7 @@
 
 CTAGS="$1 --quiet --options=NONE"
 
-echo2()
-{
-	# use a external echo command here.
-	# built-in echo suppresses \1.
-	/bin/echo "$@"
-	/bin/echo "$@" 1>&2
-}
+. ../utils.sh
 
 echo2 param: '|(.)|\1|x,name| => acceptable'
 ${CTAGS} --langdef=x --regex-x='|(.)|\1|x,name|' --list-kinds-full=x

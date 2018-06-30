@@ -126,3 +126,11 @@ filter_by_column_index()
 		done
 	done
 }
+
+echo2()
+{
+	# use a external echo command here.
+	# built-in echo suppresses \1.
+	/bin/echo "$@"
+	/bin/echo "$@" 1>&2
+}
