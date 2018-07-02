@@ -84,6 +84,11 @@ function autoloadFunc#subdirname#Funcname()
    echo "Done!"
 endfunction
 
+" Dict function with g:prefix.
+let g:plugin#foo = {}
+function! g:plugin#foo() abort dict
+endfunction
+
 function! forms#form.addTextField(fname, flabel, fvalue, hotkey)
   let field = s:field.new(self, g:forms#FT_TEXTFIELD, a:fname, a:flabel,
         \ a:fvalue, a:hotkey)
