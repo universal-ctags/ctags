@@ -33,6 +33,7 @@ typedef enum {
 	K_SECTION,
 	K_SUBSECTION,
 	K_SUBSUBSECTION,
+	K_TARGET,
 	SECTION_COUNT
 } rstKind;
 
@@ -40,7 +41,8 @@ static kindDefinition RstKinds[] = {
 	{ true, 'c', "chapter",       "chapters"},
 	{ true, 's', "section",       "sections" },
 	{ true, 'S', "subsection",    "subsections" },
-	{ true, 't', "subsubsection", "subsubsections" }
+	{ true, 't', "subsubsection", "subsubsections" },
+	{ true, 'T', "target",        "targets" },
 };
 
 typedef enum {
@@ -94,7 +96,27 @@ static NestingLevel *getNestingLevel(const int kind)
 	return nl;
 }
 
-static void makeRstTag(const vString* const name, const int kind, const MIOPos filepos,
+static int makeTargetRstTag(const vString* const name)
+{
+	tagEntryInfo e;
+
+	initTagEntry (&e, vStringValue (name), K_TARGET);
+
+	const NestingLevel *nl = nestingLevelsGetCurrent(nestingLevels);
+	tagEntryInfo *parent = NULL;
+	if (nl)
+		parent = getEntryOfNestingLevel (nl);
+
+	if (parent)
+	{
+		e.extensionFields.scopeKindIndex = parent->kindIndex;
+		e.extensionFields.scopeName = parent->name;
+	}
+
+	return makeTagEntry (&e);
+}
+
+static void makeSectionRstTag(const vString* const name, const int kind, const MIOPos filepos,
 		       char marker)
 {
 	const NestingLevel *const nl = getNestingLevel(kind);
@@ -209,12 +231,79 @@ static int utf8_strlen(const char *buf, int buf_len)
 }
 
 
+static const unsigned char *is_target_line (const unsigned char *line)
+{
+	if ((line [0] == '.') && (line [1] == '.') && (line [2] == ' ')
+		&& (line [3] == '_'))
+		return line + 4;
+	return NULL;
+}
+
+static int capture_target (const unsigned char *target_line)
+{
+	vString *name = vStringNew ();
+	unsigned char terminator;
+	int r = CORK_NIL;
+
+	if (*target_line == '`')
+		terminator = '`';
+	else if (!isspace (*target_line) && *target_line != '\0')
+	{
+		/* "Simple reference names are single words consisting of
+		 * alphanumerics plus isolated (no two adjacent) internal
+		 * hyphens, underscores, periods, colons and plus signs; no
+		 * whitespace or other characters are allowed."
+		 * -- http://docutils.sourceforge.net/docs/ref/rst/restructuredtext.html#reference-names
+		 */
+		vStringPut (name, *target_line);
+		terminator = ':';
+	}
+	else
+		goto out;
+
+	target_line++;
+
+
+	bool escaped = false;
+	while (*target_line != '\0')
+	{
+		if (escaped)
+		{
+			vStringPut (name, *target_line);
+			escaped = false;
+		}
+		else
+		{
+			if (*target_line == '\\')
+			{
+				vStringPut (name, *target_line);
+				escaped = true;
+			}
+			else if (*target_line == terminator)
+				break;
+			else
+				vStringPut (name, *target_line);
+		}
+		target_line++;
+	}
+
+	if (vStringLength (name) == 0)
+		goto out;
+
+	r = makeTargetRstTag (name);
+
+ out:
+	vStringDelete (name);
+	return r;
+}
+
 /* TODO: parse overlining & underlining as distinct sections. */
 static void findRstTags (void)
 {
 	vString *name = vStringNew ();
 	MIOPos filepos;
 	const unsigned char *line;
+	const unsigned char *target_line;
 
 	memset(&filepos, 0, sizeof(filepos));
 	memset(kindchars, 0, sizeof kindchars);
@@ -222,6 +311,18 @@ static void findRstTags (void)
 
 	while ((line = readLineFromInputFile ()) != NULL)
 	{
+		/* Handle .. _target:
+		 * http://docutils.sourceforge.net/docs/ref/rst/restructuredtext.html#hyperlink-targets
+		 */
+		if ((target_line = is_target_line (line)) != NULL)
+		{
+			if (capture_target (target_line) != CORK_NIL)
+			{
+				vStringClear (name);
+				continue;
+			}
+		}
+
 		int line_len = strlen((const char*) line);
 		int name_len_bytes = vStringLength(name);
 		/* FIXME: this isn't right, actually we need the real display width,
@@ -242,7 +343,7 @@ static void findRstTags (void)
 
 			if (kind >= 0)
 			{
-				makeRstTag(name, kind, filepos, c);
+				makeSectionRstTag(name, kind, filepos, c);
 				continue;
 			}
 		}
