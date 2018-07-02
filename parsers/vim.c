@@ -245,6 +245,7 @@ static void parseFunction (const unsigned char *line)
 			if (isupper ((int) *cp)  ||
 					scope == 's'  ||  /* script scope */
 					scope == '<'  ||  /* script scope */
+					scope == 'g'  ||  /* global scope */
 					scope == 'd'  ||  /* dictionary */
 					scope == 'a')     /* autoload */
 			{
