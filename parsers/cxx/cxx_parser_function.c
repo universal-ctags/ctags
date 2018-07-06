@@ -1818,14 +1818,15 @@ bool cxxParserTokenChainLooksLikeFunctionParameterList(
 
 		CXXToken * pStart = t;
 
-		// First token must be identifier/keyword or ...
+		// First token must be identifier/keyword, :: or ...
 		if(!cxxTokenTypeIsOneOf(
 				t,
-				CXXTokenTypeIdentifier | CXXTokenTypeKeyword | CXXTokenTypeMultipleDots
+				CXXTokenTypeIdentifier | CXXTokenTypeKeyword |
+					CXXTokenTypeMultipleDots | CXXTokenTypeMultipleColons
 			))
 		{
 			CXX_DEBUG_LEAVE_TEXT(
-					"Token '%s' is something that is not a identifier, keyword or ...",
+					"Token '%s' is something that is not a identifier, keyword, :: or ...",
 					vStringValue(t->pszWord)
 				);
 			return false;
