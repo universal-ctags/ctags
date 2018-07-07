@@ -1040,7 +1040,7 @@ static bool parseImport (tokenInfo *const token)
 						   Y = (kind:unknown, role:imported) */
 						/* Y */
 						makeSimplePythonRefTag (name, NULL, K_UNKNOWN,
-						                        PYTHON_MODULE_IMPORTED,
+						                        PYTHON_UNKNOWN_IMPORTED,
 						                        XTAG_UNKNOWN);
 						/* x.Y */
 						if (isXtagEnabled (XTAG_QUALIFIED_TAGS))
@@ -1049,7 +1049,7 @@ static bool parseImport (tokenInfo *const token)
 							vStringPut (fq, '.');
 							vStringCat (fq, name->string);
 							makeSimplePythonRefTag (name, fq, K_UNKNOWN,
-							                        PYTHON_MODULE_IMPORTED,
+							                        PYTHON_UNKNOWN_IMPORTED,
 							                        XTAG_QUALIFIED_TAGS);
 							vStringDelete (fq);
 						}
