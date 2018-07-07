@@ -21,6 +21,7 @@ C              h/header          system             on      system header
 C++            d/macro           undef              on      undefined
 C++            h/header          local              on      local header
 C++            h/header          system             on      system header
+C++            n/namespace       used               on      specified with "using namespace"
 CPreProcessor  d/macro           undef              on      undefined
 CPreProcessor  h/header          local              on      local header
 CPreProcessor  h/header          system             on      system header
@@ -112,6 +113,7 @@ C              h/header          system             on      system header
 C++            d/macro           undef              on      undefined
 C++            h/header          local              on      local header
 C++            h/header          system             on      system header
+C++            n/namespace       used               on      specified with "using namespace"
 CPreProcessor  d/macro           undef              on      undefined
 CPreProcessor  h/header          local              on      local header
 CPreProcessor  h/header          system             on      system header

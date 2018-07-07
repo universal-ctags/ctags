@@ -68,14 +68,17 @@ static kindDefinition g_aCXXCKinds [] = {
 	CXX_COMMON_KINDS(C,"struct, and union members", LANG_IGNORE)
 };
 
+static roleDefinition g_aCXXCPPNamespaceRoles [] = {
+	{ true, "used", "specified with \"using namespace\"" },
+};
+
 static kindDefinition g_aCXXCPPKinds [] = {
 	CXX_COMMON_KINDS(CXX,"class, struct, and union members", LANG_AUTO),
 	{ true,  'c', "class",      "classes" },
-	{ true,  'n', "namespace",  "namespaces" },
+	{ true,  'n', "namespace",  "namespaces",
+	  .referenceOnly = false, ATTACH_ROLES(g_aCXXCPPNamespaceRoles) },
 	{ false, 'A', "alias",      "namespace aliases" },
 	{ false, 'N', "name",       "names imported via using scope::symbol" },
-	{ false, 'U', "using",      "using namespace statements",
-			.referenceOnly = true },
 	{ false, 'Z', "tparam",     "template parameters" },
 };
 
@@ -245,7 +248,7 @@ bool cxxTagFieldEnabled(unsigned int uField)
 static tagEntryInfo g_oCXXTag;
 
 
-tagEntryInfo * cxxTagBegin(unsigned int uKind,CXXToken * pToken)
+static tagEntryInfo * cxxTagBeginCommon(unsigned int uKind,unsigned int uRole,CXXToken * pToken)
 {
 	kindDefinition * pKindDefinitions = g_cxx.pKindDefinitions;
 
@@ -255,10 +258,11 @@ tagEntryInfo * cxxTagBegin(unsigned int uKind,CXXToken * pToken)
 		return NULL;
 	}
 
-	initTagEntry(
+	initRefTagEntry(
 			&g_oCXXTag,
 			vStringValue(pToken->pszWord),
-			uKind
+			uKind,
+			uRole
 		);
 
 	g_oCXXTag.lineNumber = pToken->iLineNumber;
@@ -275,6 +279,16 @@ tagEntryInfo * cxxTagBegin(unsigned int uKind,CXXToken * pToken)
 	g_oCXXTag.extensionFields.access = g_aCXXAccessStrings[cxxScopeGetAccess()];
 
 	return &g_oCXXTag;
+}
+
+tagEntryInfo * cxxRefTagBegin(unsigned int uKind, unsigned int uRole, CXXToken * pToken)
+{
+	return cxxTagBeginCommon(uKind, uRole, pToken);
+}
+
+tagEntryInfo * cxxTagBegin(unsigned int uKind,CXXToken * pToken)
+{
+	return cxxTagBeginCommon(uKind, ROLE_DEFINITION_INDEX, pToken);
 }
 
 vString * cxxTagSetProperties(unsigned int uProperties)
