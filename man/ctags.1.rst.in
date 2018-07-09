@@ -1398,11 +1398,6 @@ are not listed here. They are experimental or debugging purpose.
 	during the current invocation of @CTAGS_NAME_EXECUTABLE@. This option
 	is off by default. This option must appear before the first file name.
 
-``--undef[=yes|no]``
-	Specifies whether a macro tag should be generated from an #undef CPP
-	directive (in a C/C++ file), as if it were a #define directive. This
-	option is enabled by default.
-
 ``--verbose[=yes|no]``
 	Enable verbose mode. This prints out information on option processing
 	and a brief message describing what action is being taken for each file
