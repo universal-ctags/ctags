@@ -838,7 +838,8 @@ are not listed here. They are experimental or debugging purpose.
 		Signature of routine (e.g. prototype or parameter list)
 
 	t/typeref
-		Type and name of a variable or typedef as "typeref:" field.
+		Type and name of a variable, typedef or return type of
+		callable like function as "typeref:" field.
 		Enabled by default.
 
 	z/kind
