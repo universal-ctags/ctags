@@ -408,6 +408,7 @@ are not listed here. They are experimental or debugging purpose.
 	Use backward searching patterns (e.g. ?pattern?). [Ignored in etags mode]
 
 ``-e``
+	Same as ``--output-format=etags``.
 	Enable etags mode, which will create a tag file for use with the Emacs
 	editor. Alternatively, if @CTAGS_NAME_EXECUTABLE@ is invoked by a
 	name containing the string "@ETAGS_NAME_EXECUTABLE@" (either by renaming,
