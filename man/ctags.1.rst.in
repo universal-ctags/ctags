@@ -905,6 +905,11 @@ are not listed here. They are experimental or debugging purpose.
 ``--help``
 	Prints to standard output a detailed usage description, and then exits.
 
+``--help-full``
+	Prints to standard output a detailed usage description about experimental
+	features, and then exits. Visit http://docs.ctags.io/en/latest about the
+	experimental features.
+
 ``--if0[=yes|no]``
 	Indicates a preference as to whether code within an "#if 0" branch of a
 	preprocessor conditional should be examined for non-macro tags (macro
