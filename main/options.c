@@ -322,8 +322,6 @@ static optionDescription LongOptionDescription [] = {
  {1,"       List the details of all tag kinds for specified language or all"},
  {1,"       For each line, associated language name is printed when \"all\" is"},
  {1,"       specified as language."},
- {1,"  --list-langdef-flags"},
- {1,"       Output list of flags which can be used with --langdef option."},
  {1,"  --list-languages"},
  {1,"       Output list of supported languages."},
  {1,"  --list-map-extensions=[language|all]"},
@@ -459,6 +457,8 @@ static optionDescription ExperimentalLongOptionDescription [] = {
 #endif
  {1,"  --_list-kinddef-flags"},
  {1,"       Output list of flags which can be used with --kinddef option."},
+ {1,"  --_list-langdef-flags"},
+ {1,"       Output list of flags which can be used with --langdef option."},
  {1,"  --_list-mtable-regex-flags"},
  {1,"       Output list of flags which can be used in a multitable regex parser definition."},
  {1,"  --_mtable-extend-<LANG>=disttable+srctable."},
@@ -2666,7 +2666,6 @@ static parametricOption ParametricOptions [] = {
 	{ "list-fields",            processListFieldsOption,        true,   STAGE_ANY },
 	{ "list-kinds",             processListKindsOption,         true,   STAGE_ANY },
 	{ "list-kinds-full",        processListKindsOption,         true,   STAGE_ANY },
-	{ "list-langdef-flags",     processListLangdefFlagsOptions, true,   STAGE_ANY },
 	{ "list-languages",         processListLanguagesOption,     true,   STAGE_ANY },
 	{ "list-maps",              processListMapsOption,          true,   STAGE_ANY },
 	{ "list-map-extensions",    processListMapExtensionsOption, true,   STAGE_ANY },
@@ -2697,6 +2696,7 @@ static parametricOption ParametricOptions [] = {
 	{ "_interactive",           processInteractiveOption,       true,   STAGE_ANY },
 #endif
 	{ "_list-kinddef-flags",     processListKinddefFlagsOptions, true,   STAGE_ANY },
+	{ "_list-langdef-flags",     processListLangdefFlagsOptions, true,   STAGE_ANY },
 	{ "_list-mtable-regex-flags", processListMultitableRegexFlagsOptions, true, STAGE_ANY },
 #ifdef DO_TRACING
 	{ "_trace",                 processTraceOption,             false,  STAGE_ANY },
