@@ -507,6 +507,13 @@ static const char *renderFieldInherits (const tagEntryInfo *const tag, const cha
 static const char *renderFieldTyperef (const tagEntryInfo *const tag, const char *value CTAGS_ATTR_UNUSED, vString* b,
 									   bool *rejected CTAGS_ATTR_UNUSED)
 {
+	/* Return "-" instead of "-:-". */
+	if (tag->extensionFields.typeRef [0] == NULL
+		&& tag->extensionFields.typeRef [1] == NULL)
+		return renderAsIs (b, "-");
+
+	vStringCatS (b, WITH_DEFUALT_VALUE (tag->extensionFields.typeRef [0]));
+	vStringPut  (b, ':');
 	return renderEscapedName (false, WITH_DEFUALT_VALUE (tag->extensionFields.typeRef [1]), tag, b);
 }
 
