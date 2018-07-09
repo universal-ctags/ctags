@@ -1336,10 +1336,6 @@ are not listed here. They are experimental or debugging purpose.
 	Limits the depth of directory recursion enabled with the ``--recurse``
 	(``-R``) option.
 
-``--optlib-dir=[+]directory``
-	Add an optlib *directory* to or reset **optlib** path list.
-	By default, the optlib path list is empty.
-
 ``--options=pathname``
 	Read additional options from file or directory.
 
@@ -1360,6 +1356,10 @@ are not listed here. They are experimental or debugging purpose.
 ``--options-maybe=pathname``
 	Same as ``--options`` but doesn't cause an error if file
 	(or directory) specified with *pathname* doesn't exist.
+
+``--optlib-dir=[+]directory``
+	Add an optlib *directory* to or reset **optlib** path list.
+	By default, the optlib path list is empty.
 
 ``--print-language``
 	Just prints the parsers for specified source files, and then exits.
@@ -1414,15 +1414,14 @@ are not listed here. They are experimental or debugging purpose.
 	the command line, it will take effect before any options are read from
 	these sources. The default is no.
 
-``--with-list-header[=yes|no]``
-	Print headers describing columns in ``--list-`` option output.
-	See also "List options".
-
 ``--version``
 	Prints a version identifier for @CTAGS_NAME_EXECUTABLE@ to standard
 	output, and then exits. This is guaranteed to always contain the string
 	"Universal Ctags".
 
+``--with-list-header[=yes|no]``
+	Print headers describing columns in ``--list-`` option output.
+	See also "List options".
 
 OPERATIONAL DETAILS
 -------------------
