@@ -68,7 +68,7 @@ extras including F/fileScope, then enabling only
 q/qualified". Unexpectedly the command line becomes as if
 "--file-scope=no" is set.
 
-In this case the user should set "--extras=+q" instead of "--extras=q".
+In this case, the user should set "--extras=+q" instead of "--extras=q".
 
 Obsoleting ``--<LANG>-kinds`` option
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
