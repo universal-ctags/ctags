@@ -408,6 +408,7 @@ are not listed here. They are experimental or debugging purpose.
 	Use backward searching patterns (e.g. ?pattern?). [Ignored in etags mode]
 
 ``-e``
+	Same as ``--output-format=etags``.
 	Enable etags mode, which will create a tag file for use with the Emacs
 	editor. Alternatively, if @CTAGS_NAME_EXECUTABLE@ is invoked by a
 	name containing the string "@ETAGS_NAME_EXECUTABLE@" (either by renaming,
@@ -837,7 +838,8 @@ are not listed here. They are experimental or debugging purpose.
 		Signature of routine (e.g. prototype or parameter list)
 
 	t/typeref
-		Type and name of a variable or typedef as "typeref:" field.
+		Type and name of a variable, typedef or return type of
+		callable like function as "typeref:" field.
 		Enabled by default.
 
 	z/kind
@@ -904,6 +906,11 @@ are not listed here. They are experimental or debugging purpose.
 
 ``--help``
 	Prints to standard output a detailed usage description, and then exits.
+
+``--help-full``
+	Prints to standard output a detailed usage description about experimental
+	features, and then exits. Visit http://docs.ctags.io/en/latest about the
+	experimental features.
 
 ``--if0[=yes|no]``
 	Indicates a preference as to whether code within an "#if 0" branch of a
@@ -1330,10 +1337,6 @@ are not listed here. They are experimental or debugging purpose.
 	Limits the depth of directory recursion enabled with the ``--recurse``
 	(``-R``) option.
 
-``--optlib-dir=[+]directory``
-	Add an optlib *directory* to or reset **optlib** path list.
-	By default, the optlib path list is empty.
-
 ``--options=pathname``
 	Read additional options from file or directory.
 
@@ -1354,6 +1357,10 @@ are not listed here. They are experimental or debugging purpose.
 ``--options-maybe=pathname``
 	Same as ``--options`` but doesn't cause an error if file
 	(or directory) specified with *pathname* doesn't exist.
+
+``--optlib-dir=[+]directory``
+	Add an optlib *directory* to or reset **optlib** path list.
+	By default, the optlib path list is empty.
 
 ``--print-language``
 	Just prints the parsers for specified source files, and then exits.
@@ -1398,11 +1405,6 @@ are not listed here. They are experimental or debugging purpose.
 	during the current invocation of @CTAGS_NAME_EXECUTABLE@. This option
 	is off by default. This option must appear before the first file name.
 
-``--undef[=yes|no]``
-	Specifies whether a macro tag should be generated from an #undef CPP
-	directive (in a C/C++ file), as if it were a #define directive. This
-	option is enabled by default.
-
 ``--verbose[=yes|no]``
 	Enable verbose mode. This prints out information on option processing
 	and a brief message describing what action is being taken for each file
@@ -1413,15 +1415,14 @@ are not listed here. They are experimental or debugging purpose.
 	the command line, it will take effect before any options are read from
 	these sources. The default is no.
 
-``--with-list-header[=yes|no]``
-	Print headers describing columns in ``--list-`` option output.
-	See also "List options".
-
 ``--version``
 	Prints a version identifier for @CTAGS_NAME_EXECUTABLE@ to standard
 	output, and then exits. This is guaranteed to always contain the string
 	"Universal Ctags".
 
+``--with-list-header[=yes|no]``
+	Print headers describing columns in ``--list-`` option output.
+	See also "List options".
 
 OPERATIONAL DETAILS
 -------------------
