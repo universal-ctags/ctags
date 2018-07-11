@@ -1,0 +1,14 @@
+A	input.m	/^    A = magic(4);$/;"	v
+R	input.m	/^    R = randn(3,4,5);$/;"	v
+classfunc1	input.m	/^        function [x,y,z] = classfunc1$/;"	f
+classfunc2	input.m	/^        function x = classfunc2()$/;"	f
+classfunc3	input.m	/^        function classfunc3;$/;"	f
+func1	input.m	/^function [x,y,z] = func1() % Silly function with multiple outputs$/;"	f
+func2	input.m	/^function x = func2(arg) $/;"	f
+func3	input.m	/^function func3() $/;"	f
+input	input.m	/^classdef input < handle$/;"	c
+x	input.m	/^            x = func2(1);$/;"	v
+x	input.m	/^    x = 1;$/;"	v
+x	input.m	/^    x = arg;$/;"	v
+y	input.m	/^    y = 2;$/;"	v
+z	input.m	/^    z = 3;$/;"	v
