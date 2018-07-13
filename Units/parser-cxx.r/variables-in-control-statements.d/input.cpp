@@ -1,4 +1,3 @@
-
 #include <string>
 #include <memory>
 
@@ -25,9 +24,11 @@ int n04()
 	return 0;
 }
 
-int n05,n06,n07,n08,n09,n10,n11,n12,n13,n14;
+int n05,n06,n07,n08,n09,n10,n11,n12,n13,n14,n15,n16;
 
-// The real test
+template<typename T> func(int no){ return no; };
+
+// The real test starts here
 
 void test()
 {
@@ -47,7 +48,7 @@ void test()
 	for(std::string f07 = "test";;)
 	{
 	}
-	
+
 	for(int f08 : { 1,2,3,4,5 })
 	{
 	}
@@ -72,15 +73,15 @@ void test()
 	for(;;)
 	{
 	}
-	
+
 	for(n01 = 0;n01 < 10;n01++)
 	{
 	}
-	
+
 	for(n02 = getUShort(), n03 = getPointer();;)
 	{
 	}
-	
+
 	for(n04();n04();)
 	{
 	}
@@ -89,7 +90,7 @@ void test()
 	if(int i01 = 10 + 20)
 	{
 	}
-	
+
 	if(INT * i02 = 0)
 	{
 	}
@@ -102,16 +103,24 @@ void test()
 	if(n05 & n06)
 	{
 	}
-	
+
 	if(n07 * n08)
 	{
 	}
-	
+
 	if(n09 && n10)
 	{
 	}
 
 	if(n11 < n12 || n13 > n14)
+	{
+	}
+
+	if(static_cast<short>(n15) < n14)
+	{
+	}
+
+	if(func<int>(n16))
 	{
 	}
 

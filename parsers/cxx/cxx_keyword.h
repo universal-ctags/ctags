@@ -129,6 +129,7 @@ bool cxxKeywordIsConstant(CXXKeyword eKeywordId);
 bool cxxKeywordMayBePartOfTypeName(CXXKeyword eKeywordId);
 bool cxxKeywordIsTypeRefMarker(CXXKeyword eKeywordId);
 bool cxxKeywordExcludeFromTypeNames(CXXKeyword eKeywordId);
+bool cxxKeywordMayAppearInVariableDeclaration(CXXKeyword eKeywordId);
 bool cxxKeywordIsCPPSpecific(CXXKeyword eKeywordId);
 
 

@@ -100,16 +100,13 @@ bool cxxParserExtractVariableDeclarations(CXXTokenChain * pChain,unsigned int uF
 		return false;
 	}
 
-	// Handle the special case of delete/new keywords at the beginning
+	// Only keywords that can be parts of a type name.
 	if(
 			cxxTokenTypeIs(t,CXXTokenTypeKeyword) &&
-			(
-				(t->eKeyword == CXXKeywordDELETE) ||
-				(t->eKeyword == CXXKeywordNEW)
-			)
+			(!cxxKeywordMayAppearInVariableDeclaration(t->eKeyword))
 		)
 	{
-		CXX_DEBUG_LEAVE_TEXT("Statement looks like a delete or new call");
+		CXX_DEBUG_LEAVE_TEXT("Initial keyword can't appear in a variable declaration");
 		return false;
 	}
 
@@ -270,28 +267,18 @@ bool cxxParserExtractVariableDeclarations(CXXTokenChain * pChain,unsigned int uF
 					pIdentifier = t->pPrev;
 					pTokenBefore = pIdentifier->pPrev;
 				} else if (
-					    (
-							// type *(var);
+						// Variable declaration in parenthesis.
+						// We handle only cases that are clearly variable declarations.
+						// We leave alone the stuff that may also be a function call.
+						//   type *(var)
+						//   type &(var)
+						//   type const (var)
+						//   type (var[])
+						(
+							cxxTokenTypeIsOneOf(t->pPrev,CXXTokenTypeStar | CXXTokenTypeAnd) ||
 							(
-								(t->pChain->iCount == 3) &&
-								// * is expected here but the others are also acceptable.
-								// e.g. type const (x);
-								(
-									// type foo_an_identifier (x)
-									// This looks like function call or declaration.
-									!cxxTokenTypeIs(t->pPrev,CXXTokenTypeIdentifier) &&
-									(
-										// type * (x): acceptable
-										// type const (x): acceptable
-										// type __declspec(dllexport): unacceptable
-										(!cxxTokenTypeIs(t->pPrev,CXXTokenTypeKeyword)) ||
-										cxxKeywordMayBePartOfTypeName (t->pPrev->eKeyword)
-									)
-								)
-							) ||
-							// type (var []);
-							(
-								t->pChain->iCount > 3
+								cxxTokenTypeIs(t->pPrev,CXXTokenTypeKeyword) &&
+								cxxKeywordMayBePartOfTypeName(t->pPrev->eKeyword)
 							)
 						) &&
 						(
@@ -300,7 +287,7 @@ bool cxxParserExtractVariableDeclarations(CXXTokenChain * pChain,unsigned int uF
 						)
 					)
 				{
-					CXX_DEBUG_LEAVE_TEXT("Parenthesis seems to surrounds a variable definition");
+					CXX_DEBUG_LEAVE_TEXT("Parenthesis seems to surround a variable definition");
 					pTokenBefore = t->pPrev;
 					t = t->pNext;
 				} else {

@@ -15,17 +15,26 @@
 
 enum CXXKeywordFlag
 {
-	// int, void, const, float, stuff like that
+	// Keywords that in most cases are parts of the name of a type.
+	// Examples: int, void, const, float, stuff like that
 	CXXKeywordFlagMayBePartOfTypeName = 1,
 	// struct, class, union, enum, typename
 	CXXKeywordIsTypeRefMarker = (1 << 1),
-	// virtual, inline, friend, static
+	// Stuff that often appears together with a type name
+	// (for example a function return type or a variable type)
+	// but is not part of the type itself.
+	// Examples: virtual, inline, friend, static
 	CXXKeywordExcludeFromTypeNames = (1 << 2),
 	// true, false, nullptr
 	CXXKeywordIsConstant = (1 << 3),
 	// certain keywords are disabled "on-the-fly" to better
 	// handle C / C++ guessing errors (public, protected, private, namespace etc..)
-	CXXKeywordIsDisabled = (1 << 4)
+	CXXKeywordIsDisabled = (1 << 4),
+	// Similar to MayBePartOfTypeName but includes more keywords that are NOT part
+	// of the type itself. Keywords that do NOT have this flag simply cannot appear
+	// in a variable declaration.
+	// Examples: __global__, __host__, restrict, register...
+	CXXKeywordMayAppearInVariableDeclaration = (1 << 5)
 };
 
 typedef struct _CXXKeywordDescriptor
@@ -41,22 +50,22 @@ static CXXKeywordDescriptor g_aCXXKeywordTable[] = {
 	{
 		"__attribute__",
 		CXXLanguageC | CXXLanguageCPP | CXXLanguageCUDA,
-		0
+		CXXKeywordMayAppearInVariableDeclaration
 	},
 	{
 		"__constant__",
 		CXXLanguageCUDA,
-		CXXKeywordExcludeFromTypeNames
+		CXXKeywordMayAppearInVariableDeclaration | CXXKeywordExcludeFromTypeNames
 	},
 	{
 		"__declspec",
 		CXXLanguageC | CXXLanguageCPP | CXXLanguageCUDA,
-		CXXKeywordExcludeFromTypeNames
+		CXXKeywordMayAppearInVariableDeclaration | CXXKeywordExcludeFromTypeNames
 	},
 	{
 		"__device__",
 		CXXLanguageCUDA,
-		CXXKeywordExcludeFromTypeNames
+		CXXKeywordMayAppearInVariableDeclaration | CXXKeywordExcludeFromTypeNames
 	},
 	{
 		"__fastcall",
@@ -75,12 +84,12 @@ static CXXKeywordDescriptor g_aCXXKeywordTable[] = {
 	{
 		"__global__",
 		CXXLanguageCUDA,
-		CXXKeywordExcludeFromTypeNames
+		CXXKeywordMayAppearInVariableDeclaration | CXXKeywordExcludeFromTypeNames
 	},
 	{
 		"__host__",
 		CXXLanguageCUDA,
-		CXXKeywordExcludeFromTypeNames
+		CXXKeywordMayAppearInVariableDeclaration | CXXKeywordExcludeFromTypeNames
 	},
 	{
 		"__inline",
@@ -95,7 +104,7 @@ static CXXKeywordDescriptor g_aCXXKeywordTable[] = {
 	{
 		"__managed__",
 		CXXLanguageCUDA,
-		CXXKeywordExcludeFromTypeNames
+		CXXKeywordMayAppearInVariableDeclaration | CXXKeywordExcludeFromTypeNames
 	},
 	{
 		"__noinline__",
@@ -105,17 +114,17 @@ static CXXKeywordDescriptor g_aCXXKeywordTable[] = {
 	{
 		"__restrict",
 		CXXLanguageC | CXXLanguageCPP | CXXLanguageCUDA,
-		CXXKeywordExcludeFromTypeNames
+		CXXKeywordMayAppearInVariableDeclaration | CXXKeywordExcludeFromTypeNames
 	},
 	{
 		"__restrict__",
 		CXXLanguageC | CXXLanguageCPP | CXXLanguageCUDA,
-		CXXKeywordExcludeFromTypeNames
+		CXXKeywordMayAppearInVariableDeclaration | CXXKeywordExcludeFromTypeNames
 	},
 	{
 		"__shared__",
 		CXXLanguageCUDA,
-		CXXKeywordExcludeFromTypeNames
+		CXXKeywordMayAppearInVariableDeclaration | CXXKeywordExcludeFromTypeNames
 	},
 	{
 		"__stdcall",
@@ -130,7 +139,7 @@ static CXXKeywordDescriptor g_aCXXKeywordTable[] = {
 	{
 		"alignas",
 		CXXLanguageCPP,
-		0
+		CXXKeywordMayAppearInVariableDeclaration
 	},
 	{
 		"alignof",
@@ -147,14 +156,14 @@ static CXXKeywordDescriptor g_aCXXKeywordTable[] = {
 	{
 		"auto",
 		CXXLanguageCPP,
-		CXXKeywordFlagMayBePartOfTypeName
+		CXXKeywordMayAppearInVariableDeclaration | CXXKeywordFlagMayBePartOfTypeName
 	},
 	//{ 1, "bitand", 0 },
 	//{ 1, "bitor", 0 },
 	{
 		"bool",
 		CXXLanguageC | CXXLanguageCPP | CXXLanguageCUDA,
-		CXXKeywordFlagMayBePartOfTypeName
+		CXXKeywordMayAppearInVariableDeclaration | CXXKeywordFlagMayBePartOfTypeName
 	},
 	{
 		"break",
@@ -174,22 +183,23 @@ static CXXKeywordDescriptor g_aCXXKeywordTable[] = {
 	{
 		"char",
 		CXXLanguageC | CXXLanguageCPP | CXXLanguageCUDA,
-		CXXKeywordFlagMayBePartOfTypeName
+		CXXKeywordMayAppearInVariableDeclaration | CXXKeywordFlagMayBePartOfTypeName
 	},
 	{
 		"char16_t",
 		CXXLanguageCPP,
-		CXXKeywordFlagMayBePartOfTypeName
+		CXXKeywordMayAppearInVariableDeclaration | CXXKeywordFlagMayBePartOfTypeName
 	},
 	{
 		"char32_t",
 		CXXLanguageCPP,
-		CXXKeywordFlagMayBePartOfTypeName
+		CXXKeywordMayAppearInVariableDeclaration | CXXKeywordFlagMayBePartOfTypeName
 	},
 	{
 		"class",
 		CXXLanguageCPP,
-		CXXKeywordFlagMayBePartOfTypeName | CXXKeywordIsTypeRefMarker
+		CXXKeywordMayAppearInVariableDeclaration | CXXKeywordFlagMayBePartOfTypeName |
+			CXXKeywordIsTypeRefMarker
 	},
 	//{ 0, "compl", 0 },
 	{
@@ -200,7 +210,7 @@ static CXXKeywordDescriptor g_aCXXKeywordTable[] = {
 	{
 		"const",
 		CXXLanguageC | CXXLanguageCPP | CXXLanguageCUDA,
-		CXXKeywordFlagMayBePartOfTypeName
+		CXXKeywordMayAppearInVariableDeclaration | CXXKeywordFlagMayBePartOfTypeName
 	},
 	{
 		"constexpr",
@@ -240,7 +250,7 @@ static CXXKeywordDescriptor g_aCXXKeywordTable[] = {
 	{
 		"double",
 		CXXLanguageC | CXXLanguageCPP | CXXLanguageCUDA,
-		CXXKeywordFlagMayBePartOfTypeName
+		CXXKeywordMayAppearInVariableDeclaration | CXXKeywordFlagMayBePartOfTypeName
 	},
 	{
 		"dynamic_cast",
@@ -255,7 +265,8 @@ static CXXKeywordDescriptor g_aCXXKeywordTable[] = {
 	{
 		"enum",
 		CXXLanguageC | CXXLanguageCPP | CXXLanguageCUDA,
-		CXXKeywordFlagMayBePartOfTypeName | CXXKeywordIsTypeRefMarker
+		CXXKeywordMayAppearInVariableDeclaration | CXXKeywordFlagMayBePartOfTypeName |
+			CXXKeywordIsTypeRefMarker
 	},
 	{
 		"explicit",
@@ -286,7 +297,7 @@ static CXXKeywordDescriptor g_aCXXKeywordTable[] = {
 	{
 		"float",
 		CXXLanguageC | CXXLanguageCPP | CXXLanguageCUDA,
-		CXXKeywordFlagMayBePartOfTypeName
+		CXXKeywordMayAppearInVariableDeclaration | CXXKeywordFlagMayBePartOfTypeName
 	},
 	{
 		"for",
@@ -316,17 +327,17 @@ static CXXKeywordDescriptor g_aCXXKeywordTable[] = {
 	{
 		"int",
 		CXXLanguageC | CXXLanguageCPP | CXXLanguageCUDA,
-		CXXKeywordFlagMayBePartOfTypeName
+		CXXKeywordMayAppearInVariableDeclaration | CXXKeywordFlagMayBePartOfTypeName
 	},
 	{
 		"long",
 		CXXLanguageC | CXXLanguageCPP | CXXLanguageCUDA,
-		CXXKeywordFlagMayBePartOfTypeName
+		CXXKeywordMayAppearInVariableDeclaration | CXXKeywordFlagMayBePartOfTypeName
 	},
 	{
 		"mutable",
 		CXXLanguageCPP,
-		0
+		CXXKeywordMayAppearInVariableDeclaration
 	},
 	{
 		"namespace",
@@ -378,7 +389,7 @@ static CXXKeywordDescriptor g_aCXXKeywordTable[] = {
 	{
 		"register",
 		CXXLanguageC | CXXLanguageCPP | CXXLanguageCUDA,
-		0
+		CXXKeywordMayAppearInVariableDeclaration
 	},
 	{
 		"reinterpret_cast",
@@ -393,7 +404,7 @@ static CXXKeywordDescriptor g_aCXXKeywordTable[] = {
 	{
 		"restrict",
 		CXXLanguageC | CXXLanguageCPP | CXXLanguageCUDA,
-		CXXKeywordExcludeFromTypeNames
+		CXXKeywordMayAppearInVariableDeclaration | CXXKeywordExcludeFromTypeNames
 	},
 	{
 		"return",
@@ -403,12 +414,12 @@ static CXXKeywordDescriptor g_aCXXKeywordTable[] = {
 	{
 		"short",
 		CXXLanguageC | CXXLanguageCPP | CXXLanguageCUDA,
-		CXXKeywordFlagMayBePartOfTypeName
+		CXXKeywordMayAppearInVariableDeclaration | CXXKeywordFlagMayBePartOfTypeName
 	},
 	{
 		"signed",
 		CXXLanguageC | CXXLanguageCPP | CXXLanguageCUDA,
-		CXXKeywordFlagMayBePartOfTypeName
+		CXXKeywordMayAppearInVariableDeclaration | CXXKeywordFlagMayBePartOfTypeName
 	},
 	{
 		"sizeof",
@@ -418,7 +429,7 @@ static CXXKeywordDescriptor g_aCXXKeywordTable[] = {
 	{
 		"static",
 		CXXLanguageC | CXXLanguageCPP | CXXLanguageCUDA,
-		CXXKeywordExcludeFromTypeNames
+		CXXKeywordMayAppearInVariableDeclaration | CXXKeywordExcludeFromTypeNames
 	},
 	{
 		"static_assert",
@@ -433,7 +444,8 @@ static CXXKeywordDescriptor g_aCXXKeywordTable[] = {
 	{
 		"struct",
 		CXXLanguageC | CXXLanguageCPP | CXXLanguageCUDA,
-		CXXKeywordFlagMayBePartOfTypeName | CXXKeywordIsTypeRefMarker
+		CXXKeywordMayAppearInVariableDeclaration | CXXKeywordFlagMayBePartOfTypeName |
+			CXXKeywordIsTypeRefMarker
 	},
 	{
 		"switch",
@@ -453,7 +465,7 @@ static CXXKeywordDescriptor g_aCXXKeywordTable[] = {
 	{
 		"thread_local",
 		CXXLanguageCPP,
-		0
+		CXXKeywordMayAppearInVariableDeclaration
 	},
 	{
 		"throw",
@@ -483,17 +495,19 @@ static CXXKeywordDescriptor g_aCXXKeywordTable[] = {
 	{
 		"typename",
 		CXXLanguageCPP,
-		CXXKeywordFlagMayBePartOfTypeName | CXXKeywordIsTypeRefMarker
+		CXXKeywordMayAppearInVariableDeclaration | CXXKeywordFlagMayBePartOfTypeName |
+			CXXKeywordIsTypeRefMarker
 	},
 	{
 		"union",
 		CXXLanguageC | CXXLanguageCPP | CXXLanguageCUDA,
-		CXXKeywordFlagMayBePartOfTypeName | CXXKeywordIsTypeRefMarker
+		CXXKeywordMayAppearInVariableDeclaration | CXXKeywordFlagMayBePartOfTypeName |
+			CXXKeywordIsTypeRefMarker
 	},
 	{
 		"unsigned",
 		CXXLanguageC | CXXLanguageCPP | CXXLanguageCUDA,
-		CXXKeywordFlagMayBePartOfTypeName
+		CXXKeywordMayAppearInVariableDeclaration | CXXKeywordFlagMayBePartOfTypeName
 	},
 	{
 		"using",
@@ -508,17 +522,17 @@ static CXXKeywordDescriptor g_aCXXKeywordTable[] = {
 	{
 		"void",
 		CXXLanguageC | CXXLanguageCPP | CXXLanguageCUDA,
-		CXXKeywordFlagMayBePartOfTypeName
+		CXXKeywordMayAppearInVariableDeclaration | CXXKeywordFlagMayBePartOfTypeName
 	},
 	{
 		"volatile",
 		CXXLanguageC | CXXLanguageCPP | CXXLanguageCUDA,
-		0
+		CXXKeywordMayAppearInVariableDeclaration
 	},
 	{
 		"wchar_t",
 		CXXLanguageCPP,
-		CXXKeywordFlagMayBePartOfTypeName
+		CXXKeywordMayAppearInVariableDeclaration | CXXKeywordFlagMayBePartOfTypeName
 	},
 	{
 		"while",
@@ -538,6 +552,12 @@ bool cxxKeywordMayBePartOfTypeName(CXXKeyword eKeywordId)
 {
 	return g_aCXXKeywordTable[eKeywordId].uFlags &
 			CXXKeywordFlagMayBePartOfTypeName;
+}
+
+bool cxxKeywordMayAppearInVariableDeclaration(CXXKeyword eKeywordId)
+{
+	return g_aCXXKeywordTable[eKeywordId].uFlags &
+			CXXKeywordMayAppearInVariableDeclaration;
 }
 
 bool cxxKeywordIsTypeRefMarker(CXXKeyword eKeywordId)
@@ -576,7 +596,7 @@ bool cxxKeywordEnablePublicProtectedPrivate(bool bEnableIt)
 
 	if(bEnabledNow == bEnableIt)
 		return bEnabledNow;
-	
+
 	if(bEnableIt)
 	{
 		CXX_DEBUG_PRINT("Enabling public/protected/private keywords");
