@@ -56,6 +56,11 @@ bool cxxParserExtractVariableDeclarations(
 		unsigned int uFlags
 	);
 
+CXXToken * cxxParserFindFirstPossiblyNestedAndQualifiedIdentifier(
+		CXXTokenChain * pChain,
+		CXXTokenChain ** pParentChain
+	);
+
 // cxx_parser_function.c
 
 bool cxxParserTokenChainLooksLikeFunctionCallParameterSet(

@@ -21,6 +21,51 @@
 
 static CXXToken * cxxParserVardefInParenthesis (CXXToken *pToken, int depth);
 
+//
+// This is used to find the first identifier in stuff like
+//
+//    ret type (*variable)(params)
+//    ret type (* const (variable[4]))(params)
+//    ret type (*baz)(params) <-- function pointer (variable)
+//    ret type (*(baz))(params) <-- function pointer (variable)
+//    ret type (* const (baz))(params) <-- function pointer (variable)
+//    ret type (*baz())() <-- function returning function pointer
+//    ret type (*baz(params))(params) <-- function returning function pointer
+//    ret type (*baz(params)) <-- function returning a pointer
+//    ret type (*baz(params))[2] <-- function returning a pointer to array
+//
+CXXToken * cxxParserFindFirstPossiblyNestedAndQualifiedIdentifier(
+		CXXTokenChain * pChain,
+		CXXTokenChain ** pParentChain
+	)
+{
+	CXXToken * pId = cxxTokenChainFirstPossiblyNestedTokenOfType(
+			pChain,
+			CXXTokenTypeIdentifier,
+			pParentChain
+		);
+
+	if(!pId)
+		return NULL;
+
+	if(!cxxParserCurrentLanguageIsCPP())
+		return pId;
+
+	// In the case of CPP we also handle qualifications.
+
+	if(!pId->pNext)
+		return pId;
+
+	if(!cxxTokenTypeIs(pId->pNext,CXXTokenTypeMultipleColons))
+		return pId;
+
+	// identifier:: ...
+
+	// Look for the LAST identifier in the same chain.
+	// baz::foo::something <--
+
+	return cxxTokenChainNextTokenOfType(pId,CXXTokenTypeIdentifier);
+}
 
 //
 // Attempt to extract variable declarations from the chain.
@@ -221,9 +266,8 @@ bool cxxParserExtractVariableDeclarations(CXXTokenChain * pChain,unsigned int uF
 							) ||
 							cxxTokenTypeIs(t->pNext,CXXTokenTypeSquareParenthesisChain)
 						) &&
-						(pIdentifier = cxxTokenChainFirstPossiblyNestedTokenOfType(
+						(pIdentifier = cxxParserFindFirstPossiblyNestedAndQualifiedIdentifier(
 								t->pChain,
-								CXXTokenTypeIdentifier,
 								NULL
 							)) &&
 						// Discard function declarations with function return types

@@ -94,4 +94,8 @@ template<typename X> X func(X p1)
 int anotherFunc(int n06)
 {
 	func<int>(n06);
+
+	void (Struct1::*l33)() = NULL;
+	void (Struct1::*l34)(int) = NULL;
+	int (Struct1::*l35)(int) = NULL;
 }
