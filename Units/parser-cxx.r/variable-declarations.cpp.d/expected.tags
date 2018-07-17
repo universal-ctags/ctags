@@ -30,6 +30,9 @@ l29	input.cpp	/^	bool l29 { false };$/;"	l	function:main	typeref:typename:bool	f
 l30	input.cpp	/^	std::string * l30{ new std::string("test") };$/;"	l	function:main	typeref:typename:std::string *	file:
 l31	input.cpp	/^	std::string * l31(new std::string("test"));$/;"	l	function:main	typeref:typename:std::string *	file:
 l32	input.cpp	/^	auto l32 = new std::basic_string<wchar_t, std::char_traits<wchar_t>, std::allocator<wchar_t> >;$/;"	l	function:main	typeref:typename:auto	file:
+l33	input.cpp	/^	void (Struct1::*l33)() = NULL;$/;"	l	function:anotherFunc	typeref:typename:void (Struct1::*)()	file:
+l34	input.cpp	/^	void (Struct1::*l34)(int) = NULL;$/;"	l	function:anotherFunc	typeref:typename:void (Struct1::*)(int)	file:
+l35	input.cpp	/^	int (Struct1::*l35)(int) = NULL;$/;"	l	function:anotherFunc	typeref:typename:int (Struct1::*)(int)	file:
 m01	input.cpp	/^	unsigned int m01;$/;"	m	struct:Struct1	typeref:typename:unsigned int	file:
 m02	input.cpp	/^	std::string m02;$/;"	m	struct:Struct1	typeref:typename:std::string	file:
 m03	input.cpp	/^	std::string ** m03, m04;$/;"	m	struct:Struct1	typeref:typename:std::string **	file:

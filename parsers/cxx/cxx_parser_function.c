@@ -973,9 +973,8 @@ bool cxxParserLookForFunctionSignature(
 			//    ret type (*baz(params))(params) <-- function returning function pointer
 			//    ret type (*baz(params)) <-- function returning a pointer
 			//    ret type (*baz(params))[2] <-- function returning a pointer to array
-			(pIdentifierStart = cxxTokenChainFirstPossiblyNestedTokenOfType(
+			(pIdentifierStart = cxxParserFindFirstPossiblyNestedAndQualifiedIdentifier(
 					pToken->pChain,
-					CXXTokenTypeIdentifier,
 					&pIdentifierChain
 				))
 			)

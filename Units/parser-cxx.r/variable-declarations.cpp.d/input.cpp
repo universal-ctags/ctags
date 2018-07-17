@@ -1,7 +1,7 @@
 #include <string>
 #include <array>
 
-// All of these are valid variable declarations
+// All the m*, l* and v* are valid variable declarations. The n* are NOT valid declarations.
 
 struct Struct1
 {
@@ -83,3 +83,19 @@ typedef enum Enum1 n03;
 #ifdef _MSVC
 	class __declspec(dllexport) n05;
 #endif
+
+// Note that function parameters are NOT extracted in this test.
+
+template<typename X> X func(X p1)
+{
+	return p1+1;
+}
+
+int anotherFunc(int n06)
+{
+	func<int>(n06);
+
+	void (Struct1::*l33)() = NULL;
+	void (Struct1::*l34)(int) = NULL;
+	int (Struct1::*l35)(int) = NULL;
+}
