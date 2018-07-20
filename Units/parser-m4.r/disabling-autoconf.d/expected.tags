@@ -3,3 +3,4 @@ x	input.m4	/^define(`x', 1)$/;"	d	line:1	language:M4	roles:def	end:1
 [y]	input.m4	/^m4_define([y], 2)$/;"	d	line:7	language:M4	roles:def	end:7
 z	input.m4	/^define(`z', 3)$/;"	d	line:9	language:M4	roles:def	end:9
 input.m4	input.m4	1;"	F	line:1	language:M4	roles:def	end:10
+./Units/parser-m4.r/disabling-autoconf.d/input.m4	input.m4	1;"	F	line:1	language:M4	roles:def	end:10

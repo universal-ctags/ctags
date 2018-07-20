@@ -10,3 +10,4 @@ A.h	input.py	/^    def h(self):$/;"	m	line:12	class:A	end:14
 i	input.py	/^    def i(self):$/;"	m	line:16	class:A	end:18
 A.i	input.py	/^    def i(self):$/;"	m	line:16	class:A	end:18
 input.py	input.py	1;"	F	line:1	end:18
+./Units/parser-python.r/python-end-field.d/input.py	input.py	1;"	F	line:1	end:18

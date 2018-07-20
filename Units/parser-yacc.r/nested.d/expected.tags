@@ -22,3 +22,4 @@ yyerror	input.y	/^yyerror(char *s)$/;"	f	language:C	typeref:typename:int	extras:
 yywrap	input.y	/^yywrap(void)$/;"	f	language:C	typeref:typename:int	extras:guest
 CFGParseFile	input.y	/^CFGParseFile(FILE *file)$/;"	f	language:C	typeref:typename:int	extras:guest
 input.y	input.y	1;"	F	language:YACC	extras:inputFile
+./Units/parser-yacc.r/nested.d/input.y	input.y	1;"	F	language:YACC	extras:inputFile

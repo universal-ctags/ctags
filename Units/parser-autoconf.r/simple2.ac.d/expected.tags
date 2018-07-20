@@ -3,3 +3,4 @@ PKG_PREREQ	input.ac	/^AC_DEFUN([PKG_PREREQ],$/;"	m	line:4	language:Autoconf	role
 y	input.ac	/^m4_define([y], 2)$/;"	d	line:9	language:M4	roles:def	end:9
 z	input.ac	/^define(`z', 3)$/;"	d	line:11	language:M4	roles:def	end:11
 input.ac	input.ac	1;"	F	line:1	language:Autoconf	roles:def	end:12
+./Units/parser-autoconf.r/simple2.ac.d/input.ac	input.ac	1;"	F	line:1	language:Autoconf	roles:def	end:12

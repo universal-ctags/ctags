@@ -715,10 +715,10 @@ are not listed here. They are experimental or debugging purpose.
 		Equivalent to ``--file-scope``.
 
 	f/inputFile
-		Include an entry for the base file name of every source file
-		(e.g. "example.c"), which addresses the first line of the file.
-		If ``end:`` field is enabled, the end line number of the file
-		can be attached to the tag.
+		Include entries for the base and full file names of every source
+                file (e.g. "example.c" and "src/example.c"), which addresses the
+                first line of the file.  If ``end:`` field is enabled, the end
+                line number of the file can be attached to the tag.
 
 	p/pseudo
 		Include pseudo tags. Enabled by default unless the tag file is
