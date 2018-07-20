@@ -70,7 +70,9 @@ struct macro_cb_data {
 static bool is_line_continued(const char *line)
 {
 	size_t len = strlen (line);
-	Assert (len > 0);
+
+	if (len == 0)
+		return false;
 
 	return ((line[len - 1] == '\\')
 		|| ((len >= 2) && (line[len - 1] == '\n') && (line[len - 2] == '\\')))? true: false;

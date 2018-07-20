@@ -1,0 +1,2 @@
+m0	input.spec	/^%define m0 \\$/;"	m	line:1	end:2
+m1	input.spec	/^%define m1 1$/;"	m	line:3	end:3
