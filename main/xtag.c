@@ -56,7 +56,7 @@ static xtagDefinition xtagDefinitions [] = {
 	{ true, 'F',  "fileScope",
 	  "Include tags of file scope" },
 	{ false, 'f', "inputFile",
-	  "Include an entry for the base file name of every input file",
+	  "Include an entry for the base and full file names of every input file",
 	  NULL,
 	  NULL,
 	  enableFileKind},
