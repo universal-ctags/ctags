@@ -43,3 +43,4 @@ two.only	input.py	/^    def only(arg):$/;"	kind:member	line:48	language:Python	s
 three	input.py	/^three\\$/;"	kind:class	line:52	language:Python	inherits:A, B, C	access:public	roles:def	end:54
 foo	input.py	/^foo($/;"	kind:function	line:57	language:Python	access:public	signature:( x , y, z)	roles:def	end:60
 input.py	input.py	1;"	kind:file	line:1	language:Python	roles:def	extras:inputFile	end:60
+./Units/parser-python.r/simple.py.d/input.py	input.py	1;"	kind:file	line:1	language:Python	roles:def	extras:inputFile	end:60
