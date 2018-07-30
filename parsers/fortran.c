@@ -118,6 +118,7 @@ enum eKeywordId {
 	KEYWORD_private,
 	KEYWORD_procedure,
 	KEYWORD_program,
+	KEYWORD_protected,
 	KEYWORD_public,
 	KEYWORD_pure,
 	KEYWORD_real,
@@ -317,6 +318,7 @@ static const keywordTable FortranKeywordTable [] = {
 	{ "private",        KEYWORD_private      },
 	{ "procedure",      KEYWORD_procedure    },
 	{ "program",        KEYWORD_program      },
+	{ "protected",      KEYWORD_protected    },
 	{ "public",         KEYWORD_public       },
 	{ "pure",           KEYWORD_pure         },
 	{ "real",           KEYWORD_real         },
@@ -1428,6 +1430,7 @@ static tokenInfo *parseQualifierSpecList (tokenInfo *const token)
 			case KEYWORD_optional:
 			case KEYWORD_private:
 			case KEYWORD_pointer:
+			case KEYWORD_protected:
 			case KEYWORD_public:
 			case KEYWORD_save:
 			case KEYWORD_target:
@@ -1823,6 +1826,7 @@ static bool parseSpecificationStmt (tokenInfo *const token)
 		case KEYWORD_optional:
 		case KEYWORD_pointer:
 		case KEYWORD_private:
+		case KEYWORD_protected:
 		case KEYWORD_public:
 		case KEYWORD_save:
 		case KEYWORD_target:
