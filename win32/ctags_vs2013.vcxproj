@@ -140,6 +140,7 @@
     <ClCompile Include="..\main\xtag.c" />
     <ClCompile Include="..\optlib\RSpec.c" />
     <ClCompile Include="..\optlib\ctags-optlib.c" />
+    <ClCompile Include="..\optlib\elixir.c" />
     <ClCompile Include="..\optlib\elm.c" />
     <ClCompile Include="..\optlib\gdbinit.c" />
     <ClCompile Include="..\optlib\man.c" />
