@@ -569,6 +569,23 @@ sub emit_patterns {
     emit_list $_[0], "patterns";
 }
 
+sub escape_dquotes {
+    my $input = shift;
+    my $output = "";
+
+    my $c;
+
+    foreach $c (split //, $input) {
+	if ($c eq '"') {
+	    $output = $output . '\\' . '"';
+	} else {
+	    $output = $output . $c;
+	}
+    }
+
+    return $output;
+}
+
 sub emit_roledefs {
     my $opts = shift;
 
@@ -580,8 +597,9 @@ sub emit_roledefs {
 	static roleDefinition $opts->{'Clangdef'}${Kind}RoleTable [] = {
 EOF
 	for (@{$_->{'roles'}}) {
+	    my $desc = escape_dquotes $_->{'desc'};
 	    print <<EOF;
-		{ true, "$_->{'name'}", "$_->{'desc'}" },
+		{ true, "$_->{'name'}", "$desc" },
 EOF
 	}
 
@@ -652,8 +670,9 @@ EOF
       print <<EOF;
 		{
 EOF
+      my $desc = escape_dquotes $_->{'desc'};
       print <<EOF;
-		  $enabled, \'$_->{'letter'}\', "$_->{'name'}", "$_->{'desc'}",
+		  $enabled, \'$_->{'letter'}\', "$_->{'name'}", "$desc",
 EOF
       if ($_->{'refonly'}) {
 	  print <<EOF;
@@ -744,11 +763,12 @@ sub emit_xtags {
 EOF
     for (@{$opts->{'extradefs'}}) {
       my $enabled = $_->{"enabled"}? "true": "false";
+      my $desc = escape_dquotes $_->{'desc'};
       print <<EOF;
 		{
 		  .enabled     = $enabled,
 		  .name        = "$_->{'name'}",
-		  .description = "$_->{'desc'}",
+		  .description = "$desc",
 		},
 EOF
     }
@@ -767,11 +787,12 @@ sub emit_fields {
 EOF
     for (@{$opts->{'fielddefs'}}) {
       my $enabled = $_->{"enabled"}? "true": "false";
+      my $desc = escape_dquotes $_->{'desc'};
       print <<EOF;
 		{
 		  .enabled     = $enabled,
 		  .name        = "$_->{'name'}",
-		  .description = "$_->{'desc'}",
+		  .description = "$desc",
 		},
 EOF
     }
