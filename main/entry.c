@@ -654,6 +654,7 @@ static size_t appendInputLine (int putc_func (char , void *), const char *const 
 {
 	size_t length = 0;
 	const char *p;
+	int extraLength = 0;
 
 	/*  Write everything up to, but not including, a line end character.
 	 */
@@ -666,7 +667,11 @@ static size_t appendInputLine (int putc_func (char , void *), const char *const 
 		if (c == CRETURN  ||  c == NEWLINE)
 			break;
 
-		if (Option.patternLengthLimit != 0 && length >= Option.patternLengthLimit)
+		if (Option.patternLengthLimit != 0 && length >= Option.patternLengthLimit &&
+			/* Do not cut inside a multi-byte UTF-8 character, but safe-guard it not to
+			 * allow more than one extra valid UTF-8 character in case it's not actually
+			 * UTF-8.  To do that, limit to an extra 3 UTF-8 sub-bytes (0b10xxxxxx). */
+			((((unsigned char) c) & 0xc0) != 0x80 || ++extraLength > 3))
 		{
 			*omitted = true;
 			break;
