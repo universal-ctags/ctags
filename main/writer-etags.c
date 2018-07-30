@@ -108,7 +108,7 @@ static int writeEtagsEntry (tagWriter *writer,
 		else
 			line [len - 1] = '\0';
 
-		if (Option.patternLengthLimit < len)
+		if (Option.patternLengthLimit > 0 && Option.patternLengthLimit < len)
 			line [Option.patternLengthLimit - 1] = '\0';
 
 		length = mio_printf (mio, "%s\177%s\001%lu,%ld\n", line,
