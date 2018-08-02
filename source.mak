@@ -176,6 +176,7 @@ PARSER_SRCS =				\
 	parsers/falcon.c		\
 	parsers/flex.c			\
 	parsers/fortran.c		\
+	parsers/fypp.c			\
 	parsers/go.c			\
 	parsers/html.c			\
 	parsers/iniconf.c		\

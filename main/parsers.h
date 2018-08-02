@@ -66,6 +66,7 @@
 	FalconParser, \
 	FlexParser, \
 	FortranParser, \
+	FyppParser, \
 	GdbinitParser, \
 	GoParser, \
 	HtmlParser, \
