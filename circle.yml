@@ -6,9 +6,9 @@ jobs:
        - image: docker.io/fedora:latest
      steps:
        - run:
-           name: Install Git
+           name: Install Git and Gdb
            command: |
-             dnf -y install git || :
+             dnf -y install git gdb || :
        - checkout
        - run:
            name: Install build tools
