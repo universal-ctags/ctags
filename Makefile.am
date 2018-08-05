@@ -2,7 +2,7 @@ include $(top_srcdir)/source.mak
 
 # Test cases are added to EXTRA_DIST in makefiles/test-cases.mak
 EXTRA_DIST   = README.md autogen.sh \
-	       .ctags .dir-locals.el .editorconfig .gdbinit .gitignore \
+	       .ctags.d/exclusion.ctags .dir-locals.el .editorconfig .gdbinit .gitignore \
 	       .indent.pro .uncrustify.cfg \
 	       gnu_regex/README.txt gnu_regex/regcomp.c gnu_regex/regexec.c \
 	       gnu_regex/regex_internal.c gnu_regex/regex_internal.h \

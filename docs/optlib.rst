@@ -16,6 +16,7 @@ by line. ctags loads it and runs as if the options in the file are
 passed in command line.
 
 Following file is an example of option file.
+
 .. code-block::
 
 	# Exclude directories that don't contain real code

@@ -1840,6 +1840,9 @@ tmain_compare_result()
 	    echo
 	fi
     done
+    if [ -f ${build_topdir}/*/gdb-backtrace.txt ]; then
+	cat ${build_topdir}/*/gdb-backtrace.txt
+    fi
 }
 
 tmain_compare()
@@ -1875,6 +1878,28 @@ failed_git_marker ()
 	    echo '<G>'
 	fi
     fi
+}
+
+is_crashed ()
+{
+    local f=$1
+
+    grep -q -i "core dump" "$f"
+}
+
+print_backtraces()
+{
+    local ctags_exe=$1
+    shift 1
+
+    local coref
+    for coref in "$@"; do
+	if [ -f "${coref}" ]; then
+	    gdb "${ctags_exe}" -c "${coref}" -ex where -batch
+	else
+	    echo "no such file: ${coref}"
+	fi
+    done
 }
 
 CODE_FOR_IGNORING_THIS_TMAIN_TEST=77
@@ -1954,7 +1979,6 @@ tmain_run ()
 	if [ -f ${build_subdir}/tags ]; then
 	    mv ${build_subdir}/tags ${build_subdir}/tags-actual.txt
 	fi
-
 	for aspect in stdout stderr exit tags; do
 	    if [ -f ${subdir}/${aspect}-expected.txt ]; then
 		engine=compare
@@ -1964,6 +1988,13 @@ tmain_run ()
 		    failed="${failed} ${test_name}/${aspect}-${engine}"
 		    failed="${failed}$(failed_git_marker ${subdir}/${aspect}-expected.txt)"
 		    status_=1
+		    if [ ${aspect} = stderr ] &&
+			   is_crashed ${build_subdir}/${aspect}-actual.txt &&
+			   type "gdb" > /dev/null 2>&1; then
+			print_backtraces "${basedir}/${CTAGS}" \
+					 ${build_subdir}/core* \
+					 > ${build_subdir}/gdb-backtrace.txt
+		    fi
 		fi
 	    elif [ -f ${build_subdir}/${aspect}-actual.txt ]; then
 		     rm ${build_subdir}/${aspect}-actual.txt
@@ -2132,6 +2163,7 @@ action_clean_tmain()
     for object in stdout stderr exit tags; do
 	for type in actual diff; do
 	    rm -f $(find "$tmain_dir" -name ${object}-${type}.txt)
+	    rm -f $(find "$tmain_dir" -name gdb-backtrace.txt)
 	done
     done
     return 0
