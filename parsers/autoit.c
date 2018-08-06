@@ -49,10 +49,33 @@ static bool match (const unsigned char *line, const char *word)
 	        (isspace (line[len]) || line[len] == ';' || line[len] == 0));
 }
 
+static int makeSimpleAutoItTag (const NestingLevels *const nls,
+                                const vString* const name,
+                                const int kindIndex)
+{
+	int r = CORK_NIL;
+
+	if (isInputLanguageKindEnabled(kindIndex) && name != NULL && vStringLength (name) > 0)
+	{
+		NestingLevel *nl = nestingLevelsGetCurrent (nls);
+		tagEntryInfo e;
+
+		initTagEntry (&e, vStringValue (name), kindIndex);
+
+		if (nl)
+			e.extensionFields.scopeIndex = nl->corkIndex;
+
+		r = makeTagEntry (&e);
+	}
+
+	return r;
+}
+
 static void findAutoItTags (void)
 {
 	vString *name = vStringNew ();
 	const unsigned char *line;
+	NestingLevels *nls = nestingLevelsNew (0);
 
 	while ((line = readLineFromInputFile ()) != NULL)
 	{
@@ -73,10 +96,13 @@ static void findAutoItTags (void)
 
 				if (vStringLength(name) > 0)
 				{
-					makeSimpleTag (name, K_REGION);
+					int k = makeSimpleAutoItTag (nls, name, K_REGION);
+					nestingLevelsPush (nls, k);
 					vStringClear (name);
 				}
 			}
+			else if (match (p, "endregion"))
+				nestingLevelsPop (nls);
 		}
 		else
 		{
@@ -97,13 +123,17 @@ static void findAutoItTags (void)
 					++p;
 				if (*p == '(' && (vStringLength(name) > 0))
 				{
-					makeSimpleTag (name, K_FUNCTION);
+					int k = makeSimpleAutoItTag (nls, name, K_FUNCTION);
+					nestingLevelsPush (nls, k);
 					vStringClear (name);
 				}
 			}
+			else if (match (p, "endfunc"))
+				nestingLevelsPop (nls);
 		}
 	}
 	vStringDelete (name);
+	nestingLevelsFree (nls);
 }
 
 parserDefinition *AutoItParser (void)
@@ -114,5 +144,6 @@ parserDefinition *AutoItParser (void)
 	def->kindCount  = ARRAY_SIZE (AutoItKinds);
 	def->extensions = extensions;
 	def->parser     = findAutoItTags;
+	def->useCork    = true;
 	return def;
 }
