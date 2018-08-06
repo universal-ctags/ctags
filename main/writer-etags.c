@@ -98,18 +98,30 @@ static int writeEtagsEntry (tagWriter *writer,
 		long seekValue;
 		char *const line =
 				readLineFromBypassAnyway (etags->vLine, tag, &seekValue);
-		if (line == NULL)
+		if (line == NULL || line [0] == '\0')
 			return 0;
 
 		len = strlen (line);
 
 		if (tag->truncateLineAfterTag)
 			truncateTagLineAfterTag (line, tag->name, true);
-		else
-			line [len - 1] = '\0';
+		else if (line [len - 1] == '\n')
+			line [--len] = '\0';
 
-		if (Option.patternLengthLimit < len)
-			line [Option.patternLengthLimit - 1] = '\0';
+		if (Option.patternLengthLimit > 0 && Option.patternLengthLimit < len)
+		{
+			unsigned int truncationLength = Option.patternLengthLimit;
+
+			/* don't cut in the middle of a UTF-8 character, but don't allow
+			 * for more than one extra character in case it actually wasn't
+			 * UTF-8.  See also entry.c:appendInputLine() */
+			while (truncationLength < len &&
+			       truncationLength < Option.patternLengthLimit + 3 &&
+			       (((unsigned char) line[truncationLength]) & 0xc0) == 0x80)
+				truncationLength++;
+
+			line [truncationLength] = '\0';
+		}
 
 		length = mio_printf (mio, "%s\177%s\001%lu,%ld\n", line,
 				tag->name, tag->lineNumber, seekValue);
