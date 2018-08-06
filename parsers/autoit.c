@@ -72,9 +72,10 @@ static bool match (const unsigned char *line, const char *word)
 	        ! isIdentChar (line[len]));
 }
 
-static int makeSimpleAutoItTag (const NestingLevels *const nls,
-                                const vString* const name,
-                                const int kindIndex)
+static int makeAutoItTag (const NestingLevels *const nls,
+                          const vString* const name,
+                          const int kindIndex,
+                          const vString *const signature)
 {
 	int r = CORK_NIL;
 
@@ -87,11 +88,20 @@ static int makeSimpleAutoItTag (const NestingLevels *const nls,
 
 		if (nl)
 			e.extensionFields.scopeIndex = nl->corkIndex;
+		if (signature)
+			e.extensionFields.signature = vStringValue (signature);
 
 		r = makeTagEntry (&e);
 	}
 
 	return r;
+}
+
+static int makeSimpleAutoItTag (const NestingLevels *const nls,
+                                const vString* const name,
+                                const int kindIndex)
+{
+	return makeAutoItTag (nls, name, kindIndex, NULL);
 }
 
 static void findAutoItTags (void)
@@ -172,9 +182,17 @@ static void findAutoItTags (void)
 					++p;
 				if (*p == '(' && (vStringLength(name) > 0))
 				{
-					int k = makeSimpleAutoItTag (nls, name, K_FUNCTION);
+					vString *signature = vStringNew ();
+					int k;
+
+					do
+						vStringPut (signature, (int) *p);
+					while (*p != ')' && *p++);
+
+					k = makeAutoItTag (nls, name, K_FUNCTION, signature);
 					nestingLevelsPush (nls, k);
 					vStringClear (name);
+					vStringDelete (signature);
 				}
 			}
 			else if (match (p, "endfunc"))
