@@ -168,7 +168,9 @@ static void findAutoItTags (void)
 			/* skip white space */
 			while (isspace ((int) *p))
 				++p;
-			if (match (p, "func"))
+			if (*p == ';')
+				/* ignore single-line comments */;
+			else if (match (p, "func"))
 			{
 				p += 4;
 				while (isspace ((int) *p))
