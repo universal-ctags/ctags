@@ -57,13 +57,19 @@ static kindDefinition AutoItKinds [] = {
 /*
 *   FUNCTION DEFINITIONS
 */
+
+/* it's unclear what *is* an identifier character, so maybe we're too strict */
+static bool isIdentChar (int c)
+{
+	return isalnum (c) || c == '_';
+}
+
 static bool match (const unsigned char *line, const char *word)
 {
 	size_t len = strlen (word);
 
 	return (strncasecmp ((const char*) line, word, len) == 0 &&
-	        /* check that the word is followed by a space or similar */
-	        (isspace (line[len]) || line[len] == ';' || line[len] == 0));
+	        ! isIdentChar (line[len]));
 }
 
 static int makeSimpleAutoItTag (const NestingLevels *const nls,
@@ -157,7 +163,7 @@ static void findAutoItTags (void)
 				p += 4;
 				while (isspace ((int) *p))
 					++p;
-				while (isalnum ((int) *p) || *p == '_')
+				while (isIdentChar ((int) *p))
 				{
 					vStringPut (name, (int) *p);
 					++p;
@@ -187,7 +193,7 @@ static void findAutoItTags (void)
 				if (*p == '$')
 				{
 					vStringPut (name, (int) *p++);
-					while (isalnum ((int) *p) || *p == '_')
+					while (isIdentChar ((int) *p))
 					{
 						vStringPut (name, (int) *p);
 						++p;
