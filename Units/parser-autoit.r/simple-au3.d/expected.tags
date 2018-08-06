@@ -1,3 +1,6 @@
+$iDoubled	input.au3	/^Local $iDoubled = 0$/;"	l
+$iNumber	input.au3	/^Local $iNumber = 10$/;"	l
+$iSomething	input.au3	/^    Local $iSomething = 42$/;"	l	func:All functions.MyDouble0
 All functions	input.au3	/^#Region All functions$/;"	r
 MyDouble	input.au3	/^Func MyDouble($iValue)$/;"	f	region:All functions
 MyDouble0	input.au3	/^func MyDouble0($iValue)$/;"	f	region:All functions

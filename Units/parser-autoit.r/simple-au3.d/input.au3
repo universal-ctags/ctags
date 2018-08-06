@@ -21,6 +21,7 @@ Func MyDouble($iValue)
 EndFunc   ;==>MyDouble
 
 func MyDouble0($iValue)
+    Local $iSomething = 42
     $iValue = $iValue * 2
     Return $iValue
 EndFunc   ;==>MyDouble

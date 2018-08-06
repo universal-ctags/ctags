@@ -29,12 +29,16 @@
 */
 typedef enum {
 	K_FUNCTION,
-	K_REGION
+	K_REGION,
+	K_GLOBALVAR,
+	K_LOCALVAR,
 } AutoItKind;
 
 static kindDefinition AutoItKinds [] = {
 	{ true, 'f', "func", "functions" },
-	{ true, 'r', "region", "regions" }
+	{ true, 'r', "region", "regions" },
+	{ true, 'g', "global", "global variables" },
+	{ true, 'l', "local", "local variables" },
 };
 
 /*
@@ -106,6 +110,8 @@ static void findAutoItTags (void)
 		}
 		else
 		{
+			bool isGlobal = false;
+
 			/* skip white space */
 			while (isspace ((int) *p))
 				++p;
@@ -130,6 +136,30 @@ static void findAutoItTags (void)
 			}
 			else if (match (p, "endfunc"))
 				nestingLevelsPop (nls);
+			else if ((isGlobal = match (p, "global")) || match (p, "local"))
+			{
+				p += isGlobal ? 6 : 5;
+				while (isspace ((int) *p))
+					++p;
+				if (match (p, "const"))
+				{
+					p += 5;
+					while (isspace ((int) *p))
+						++p;
+				}
+				if (*p == '$')
+				{
+					vStringPut (name, (int) *p++);
+					while (isalnum ((int) *p) || *p == '_')
+					{
+						vStringPut (name, (int) *p);
+						++p;
+					}
+					if (vStringLength(name) > 0)
+						makeSimpleAutoItTag (nls, name, isGlobal ? K_GLOBALVAR : K_LOCALVAR);
+					vStringClear (name);
+				}
+			}
 		}
 	}
 	vStringDelete (name);
