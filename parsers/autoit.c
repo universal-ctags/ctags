@@ -32,13 +32,26 @@ typedef enum {
 	K_REGION,
 	K_GLOBALVAR,
 	K_LOCALVAR,
+	K_SCRIPT,
 } AutoItKind;
+
+typedef enum {
+	R_INCLUDE_SYSTEM,
+	R_INCLUDE_LOCAL,
+} AutoItIncludeRole;
+
+static roleDefinition AutoItIncludeRoles [] = {
+	{ true, "system", "system include" },
+	{ true, "local", "local include" },
+};
 
 static kindDefinition AutoItKinds [] = {
 	{ true, 'f', "func", "functions" },
 	{ true, 'r', "region", "regions" },
 	{ true, 'g', "global", "global variables" },
 	{ true, 'l', "local", "local variables" },
+	{ true, 'S', "script", "included scripts",
+	  .referenceOnly = true, ATTACH_ROLES (AutoItIncludeRoles) },
 };
 
 /*
@@ -107,6 +120,30 @@ static void findAutoItTags (void)
 			}
 			else if (match (p, "endregion"))
 				nestingLevelsPop (nls);
+			else if (match (p, "include"))
+			{
+				p += 7; /* strlen("include") = 7 */
+				while (isspace ((int) *p))
+					++p;
+				if (*p == '<' || *p == '"')
+				{
+					const AutoItIncludeRole role = (*p == '<')
+						? R_INCLUDE_SYSTEM
+						: R_INCLUDE_LOCAL;
+
+					++p;
+					while (*p != '\0' && *p != '>' && *p != '"')
+					{
+						vStringPut (name, (int) *p);
+						++p;
+					}
+					if (vStringLength(name) > 0)
+					{
+						makeSimpleRefTag (name, K_SCRIPT, role);
+						vStringClear (name);
+					}
+				}
+			}
 		}
 		else
 		{
