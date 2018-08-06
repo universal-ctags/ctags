@@ -50,9 +50,7 @@ static void findAutoItTags (void)
 		const unsigned char* p = line;
 		if (p [0] == '#')
 		{
-			/* min. string "#region" > 7 */
 			if ((p [1] == 'R' || p [1] == 'r') &&
-				strlen ((const char *) p) > 8 &&
 				(p [2] == 'E' || p [2] == 'e') &&
 				(p [3] == 'G' || p [3] == 'g') &&
 				(p [4] == 'I' || p [4] == 'i') &&
@@ -80,9 +78,7 @@ static void findAutoItTags (void)
 			/* skip white space */
 			while (isspace ((int) *p))
 				++p;
-			/* min. string "func a()" == 8 */
 			if ((p [0] == 'F' || p [0] == 'f') &&
-				strlen ((const char *) p) >= 8 &&
 				(p [1] == 'U' || p [1] == 'u') &&
 				(p [2] == 'N' || p [2] == 'n') &&
 				(p [3] == 'C' || p [3] == 'c') &&
