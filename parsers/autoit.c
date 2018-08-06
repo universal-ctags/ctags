@@ -40,6 +40,15 @@ static kindDefinition AutoItKinds [] = {
 /*
 *   FUNCTION DEFINITIONS
 */
+static bool match (const unsigned char *line, const char *word)
+{
+	size_t len = strlen (word);
+
+	return (strncasecmp ((const char*) line, word, len) == 0 &&
+	        /* check that the word is followed by a space or similar */
+	        (isspace (line[len]) || line[len] == ';' || line[len] == 0));
+}
+
 static void findAutoItTags (void)
 {
 	vString *name = vStringNew ();
@@ -50,14 +59,10 @@ static void findAutoItTags (void)
 		const unsigned char* p = line;
 		if (p [0] == '#')
 		{
-			if ((p [1] == 'R' || p [1] == 'r') &&
-				(p [2] == 'E' || p [2] == 'e') &&
-				(p [3] == 'G' || p [3] == 'g') &&
-				(p [4] == 'I' || p [4] == 'i') &&
-				(p [5] == 'O' || p [5] == 'o') &&
-				(p [6] == 'N' || p [6] == 'n'))
+			p++;
+			if (match (p, "region"))
 			{
-				p += 7;
+				p += 6; /* strlen("region") = 6 */
 				while (isspace ((int) *p))
 					++p;
 				while (*p != '\0')
@@ -78,13 +83,9 @@ static void findAutoItTags (void)
 			/* skip white space */
 			while (isspace ((int) *p))
 				++p;
-			if ((p [0] == 'F' || p [0] == 'f') &&
-				(p [1] == 'U' || p [1] == 'u') &&
-				(p [2] == 'N' || p [2] == 'n') &&
-				(p [3] == 'C' || p [3] == 'c') &&
-				isspace ((int) p [4]))
+			if (match (p, "func"))
 			{
-				p += 5;
+				p += 4;
 				while (isspace ((int) *p))
 					++p;
 				while (isalnum ((int) *p) || *p == '_')
