@@ -109,6 +109,7 @@ static void findAutoItTags (void)
 	vString *name = vStringNew ();
 	const unsigned char *line;
 	NestingLevels *nls = nestingLevelsNew (0);
+	unsigned int commentDepth = 0;
 
 	while ((line = readLineFromInputFile ()) != NULL)
 	{
@@ -116,7 +117,14 @@ static void findAutoItTags (void)
 		if (p [0] == '#')
 		{
 			p++;
-			if (match (p, "region"))
+			if (match (p, "cs") || match (p, "comments-start"))
+				commentDepth++;
+			else if (commentDepth > 0)
+			{
+				if (match (p, "ce") || match (p, "comments-end"))
+					commentDepth--;
+			}
+			else if (match (p, "region"))
 			{
 				p += 6; /* strlen("region") = 6 */
 				while (isspace ((int) *p))
@@ -161,7 +169,7 @@ static void findAutoItTags (void)
 				}
 			}
 		}
-		else
+		else if (commentDepth == 0)
 		{
 			bool isGlobal = false;
 

@@ -14,6 +14,17 @@ For $i = 1 To 10
 Next
 Exit
 
+#cs
+Func Ignored()
+EndFunc
+#comments-start
+Func Ignored0()
+EndFunc
+#comments-end
+Func Ignored1()
+EndFunc
+#ce
+
 #Region All functions
 Func MyDouble($iValue)
     $iValue = $iValue * 2
