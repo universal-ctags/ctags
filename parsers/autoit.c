@@ -65,12 +65,17 @@ static bool isIdentChar (int c)
 	return isalnum (c) || c == '_';
 }
 
-static bool match (const unsigned char *line, const char *word)
+static bool match (const unsigned char *line, const char *word,
+                   const unsigned char **positionAfter)
 {
 	size_t len = strlen (word);
+	bool matched = (strncasecmp ((const char*) line, word, len) == 0 &&
+	                ! isIdentChar (line[len]));
 
-	return (strncasecmp ((const char*) line, word, len) == 0 &&
-	        ! isIdentChar (line[len]));
+	if (matched && positionAfter)
+		*positionAfter = line + len;
+
+	return matched;
 }
 
 static int makeAutoItTag (const NestingLevels *const nls,
@@ -127,16 +132,15 @@ static void findAutoItTags (void)
 		if (p [0] == '#')
 		{
 			p++;
-			if (match (p, "cs") || match (p, "comments-start"))
+			if (match (p, "cs", NULL) || match (p, "comments-start", NULL))
 				commentDepth++;
 			else if (commentDepth > 0)
 			{
-				if (match (p, "ce") || match (p, "comments-end"))
+				if (match (p, "ce", NULL) || match (p, "comments-end", NULL))
 					commentDepth--;
 			}
-			else if (match (p, "region"))
+			else if (match (p, "region", &p))
 			{
-				p += 6; /* strlen("region") = 6 */
 				while (isspace ((int) *p))
 					++p;
 				while (*p != '\0')
@@ -152,14 +156,13 @@ static void findAutoItTags (void)
 					vStringClear (name);
 				}
 			}
-			else if (nls->n > 0 && match (p, "endregion"))
+			else if (nls->n > 0 && match (p, "endregion", NULL))
 			{
 				setEndLine (nls);
 				nestingLevelsPop (nls);
 			}
-			else if (match (p, "include"))
+			else if (match (p, "include", &p))
 			{
-				p += 7; /* strlen("include") = 7 */
 				while (isspace ((int) *p))
 					++p;
 				if (*p == '<' || *p == '"')
@@ -191,9 +194,8 @@ static void findAutoItTags (void)
 				++p;
 			if (*p == ';')
 				/* ignore single-line comments */;
-			else if (match (p, "func"))
+			else if (match (p, "func", &p))
 			{
-				p += 4;
 				while (isspace ((int) *p))
 					++p;
 				while (isIdentChar ((int) *p))
@@ -218,19 +220,18 @@ static void findAutoItTags (void)
 					vStringDelete (signature);
 				}
 			}
-			else if (nls->n > 0 && match (p, "endfunc"))
+			else if (nls->n > 0 && match (p, "endfunc", NULL))
 			{
 				setEndLine (nls);
 				nestingLevelsPop (nls);
 			}
-			else if ((isGlobal = match (p, "global")) || match (p, "local"))
+			else if ((isGlobal = match (p, "global", &p)) ||
+			         match (p, "local", &p))
 			{
-				p += isGlobal ? 6 : 5;
 				while (isspace ((int) *p))
 					++p;
-				if (match (p, "const"))
+				if (match (p, "const", &p))
 				{
-					p += 5;
 					while (isspace ((int) *p))
 						++p;
 				}
