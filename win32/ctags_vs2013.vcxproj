@@ -115,6 +115,7 @@
     <ClCompile Include="..\main\main.c" />
     <ClCompile Include="..\main\mio.c" />
     <ClCompile Include="..\main\nestlevel.c" />
+    <ClCompile Include="..\main\numarray.c" />
     <ClCompile Include="..\main\objpool.c" />
     <ClCompile Include="..\main\options.c" />
     <ClCompile Include="..\main\param.c" />
@@ -267,6 +268,7 @@
     <ClInclude Include="..\main\main.h" />
     <ClInclude Include="..\main\mio.h" />
     <ClInclude Include="..\main\nestlevel.h" />
+    <ClInclude Include="..\main\numarray.h" />
     <ClInclude Include="..\main\objpool.h" />
     <ClInclude Include="..\main\options.h" />
     <ClInclude Include="..\main\param.h" />
