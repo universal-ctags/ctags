@@ -125,6 +125,35 @@ static void skipSpaces (const unsigned char **p)
 		++(*p);
 }
 
+/* parses after a "func" keyword */
+static void parseFunc (const unsigned char *p, NestingLevels *nls)
+{
+	vString *name = vStringNew ();
+
+	skipSpaces (&p);
+	while (isIdentChar ((int) *p))
+	{
+		vStringPut (name, (int) *p);
+		++p;
+	}
+	skipSpaces (&p);
+	if (*p == '(' && (vStringLength (name) > 0))
+	{
+		vString *signature = vStringNew ();
+		int k;
+
+		do
+			vStringPut (signature, (int) *p);
+		while (*p != ')' && *p++);
+
+		k = makeAutoItTag (nls, name, K_FUNCTION, signature);
+		nestingLevelsPush (nls, k);
+		vStringDelete (signature);
+	}
+
+	vStringDelete (name);
+}
+
 static void findAutoItTags (void)
 {
 	vString *name = vStringNew ();
@@ -197,30 +226,14 @@ static void findAutoItTags (void)
 			skipSpaces (&p);
 			if (*p == ';')
 				/* ignore single-line comments */;
-			else if (match (p, "func", &p))
+			else if (match (p, "volatile", &p))
 			{
 				skipSpaces (&p);
-				while (isIdentChar ((int) *p))
-				{
-					vStringPut (name, (int) *p);
-					++p;
-				}
-				skipSpaces (&p);
-				if (*p == '(' && (vStringLength(name) > 0))
-				{
-					vString *signature = vStringNew ();
-					int k;
-
-					do
-						vStringPut (signature, (int) *p);
-					while (*p != ')' && *p++);
-
-					k = makeAutoItTag (nls, name, K_FUNCTION, signature);
-					nestingLevelsPush (nls, k);
-					vStringClear (name);
-					vStringDelete (signature);
-				}
+				if (match (p, "func", &p))
+					parseFunc (p, nls);
 			}
+			else if (match (p, "func", &p))
+				parseFunc (p, nls);
 			else if (nls->n > 0 && match (p, "endfunc", NULL))
 			{
 				setEndLine (nls);

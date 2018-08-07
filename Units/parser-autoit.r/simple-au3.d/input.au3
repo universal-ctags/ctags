@@ -41,4 +41,8 @@ EndFunc   ;==>MyDouble
     $iValue = $iValue * 2
     Return $iValue
 EndFunc
+
+Volatile Func MyVolatileDouble ($iValue)
+    Return $iValue * 2;
+EndFunc
 #EndRegion All functions
