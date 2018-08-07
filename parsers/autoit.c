@@ -119,6 +119,12 @@ static void setEndLine (const NestingLevels *const nls)
 		entry->extensionFields.endLine = getInputLineNumber ();
 }
 
+static void skipSpaces (const unsigned char **p)
+{
+	while (isspace ((int) **p))
+		++(*p);
+}
+
 static void findAutoItTags (void)
 {
 	vString *name = vStringNew ();
@@ -141,8 +147,7 @@ static void findAutoItTags (void)
 			}
 			else if (match (p, "region", &p))
 			{
-				while (isspace ((int) *p))
-					++p;
+				skipSpaces (&p);
 				while (*p != '\0')
 				{
 					vStringPut (name, (int) *p);
@@ -163,8 +168,7 @@ static void findAutoItTags (void)
 			}
 			else if (match (p, "include", &p))
 			{
-				while (isspace ((int) *p))
-					++p;
+				skipSpaces (&p);
 				if (*p == '<' || *p == '"')
 				{
 					const AutoItIncludeRole role = (*p == '<')
@@ -190,21 +194,18 @@ static void findAutoItTags (void)
 			bool isGlobal = false;
 
 			/* skip white space */
-			while (isspace ((int) *p))
-				++p;
+			skipSpaces (&p);
 			if (*p == ';')
 				/* ignore single-line comments */;
 			else if (match (p, "func", &p))
 			{
-				while (isspace ((int) *p))
-					++p;
+				skipSpaces (&p);
 				while (isIdentChar ((int) *p))
 				{
 					vStringPut (name, (int) *p);
 					++p;
 				}
-				while (isspace ((int) *p))
-					++p;
+				skipSpaces (&p);
 				if (*p == '(' && (vStringLength(name) > 0))
 				{
 					vString *signature = vStringNew ();
@@ -228,13 +229,9 @@ static void findAutoItTags (void)
 			else if ((isGlobal = match (p, "global", &p)) ||
 			         match (p, "local", &p))
 			{
-				while (isspace ((int) *p))
-					++p;
+				skipSpaces (&p);
 				if (match (p, "const", &p))
-				{
-					while (isspace ((int) *p))
-						++p;
-				}
+					skipSpaces (&p);
 				if (*p == '$')
 				{
 					vStringPut (name, (int) *p++);
