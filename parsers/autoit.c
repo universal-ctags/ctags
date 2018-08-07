@@ -142,7 +142,7 @@ static void findAutoItTags (void)
 					vStringClear (name);
 				}
 			}
-			else if (match (p, "endregion"))
+			else if (nls->n > 0 && match (p, "endregion"))
 				nestingLevelsPop (nls);
 			else if (match (p, "include"))
 			{
@@ -205,7 +205,7 @@ static void findAutoItTags (void)
 					vStringDelete (signature);
 				}
 			}
-			else if (match (p, "endfunc"))
+			else if (nls->n > 0 && match (p, "endfunc"))
 				nestingLevelsPop (nls);
 			else if ((isGlobal = match (p, "global")) || match (p, "local"))
 			{
