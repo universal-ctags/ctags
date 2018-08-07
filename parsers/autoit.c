@@ -1,5 +1,6 @@
 /*
 *   Copyright (c) 2017, Alexey Olenich
+*   Copyright (c) 2018, Colomban Wendling <colomban@geany.org>
 *
 *   This source code is released for free distribution under the terms of the
 *   GNU General Public License version 2 or (at your option) any later version.
