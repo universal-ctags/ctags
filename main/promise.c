@@ -17,7 +17,9 @@
 #include "read.h"
 #include "trashbox.h"
 #include "xtag.h"
+#include "numarray.h"
 
+#include <string.h>
 
 struct promise {
 	langType lang;
@@ -181,6 +183,89 @@ int getLastPromise (void)
 {
 	return promise_count - 1;
 }
+
+static unsigned char* fill_or_skip (unsigned char *input, unsigned char *input_end, bool filling)
+{
+	if ( !(input < input_end))
+		return NULL;
+
+	unsigned char *next = memchr(input, '\n', input_end - input);
+	if (next)
+	{
+		if (filling)
+			memset(input, ' ', next - input);
+		input = next + 1;
+		if (input == input_end)
+			return NULL;
+		else
+			return input;
+	}
+	else
+	{
+		if (filling)
+			memset(input, ' ', input_end - input);
+		return NULL;
+	}
+}
+
+static void line_filler (unsigned char *input, size_t size,
+						 unsigned long startLine, long startCharOffset,
+						 unsigned long endLine, long endCharOffset,
+						 void *data)
+{
+	ulongArray *lines = data;
+	unsigned int start_index, end_index;
+	int i;
+
+	for (i = 0; i < ulongArrayCount (lines); i++)
+	{
+		unsigned long line = ulongArrayItem (lines, i);
+		if (line >= startLine)
+			break;
+	}
+	if (i == ulongArrayCount (lines))
+		return;
+	if (i > endLine)
+		return;
+	start_index = i;
+
+	for (; i < ulongArrayCount (lines); i++)
+	{
+		unsigned long line = ulongArrayItem (lines, i);
+		if (line > endLine)
+			break;
+	}
+	end_index = i;
+
+	unsigned long input_line = startLine;
+	for (i = start_index; i < end_index; i++)
+	{
+		unsigned long line = ulongArrayItem (lines, i);
+
+		while (1)
+		{
+			if (input_line == line)
+			{
+				input = fill_or_skip (input, input + size, true);
+				input_line++;
+				break;
+			}
+			else
+			{
+				input = fill_or_skip (input, input + size, false);
+				input_line++;
+			}
+		}
+	}
+}
+
+void promiseAttachLineFiller (int promise, ulongArray *lines)
+{
+	attachPromiseModifier (promise, line_filler,
+						   (promiseDestroyAttachedData)ulongArrayDelete,
+						   lines);
+}
+
 
 static void collectModifiers(int promise, ptrArray *modifiers)
 {
