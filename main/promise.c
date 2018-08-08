@@ -25,11 +25,15 @@ struct promise {
 	unsigned long endLine;
 	long endCharOffset;
 	unsigned long sourceLineOffset;
+	int parent_promise;
 };
 
 static struct promise *promises;
 static int promise_count;
 static int promise_allocated;
+
+#define NO_PROMISE -1
+static int current_promise = NO_PROMISE;
 
 int  makePromise   (const char *parser,
 		    unsigned long startLine, long startCharOffset,
@@ -63,7 +67,7 @@ int  makePromise   (const char *parser,
 	}
 
 	p = promises + promise_count;
-
+	p->parent_promise = current_promise;
 	p->lang = lang;
 	p->startLine = startLine;
 	p->startCharOffset = startCharOffset;
@@ -90,6 +94,7 @@ bool forcePromises (void)
 
 	for (i = 0; i < promise_count; ++i)
 	{
+		current_promise = i;
 		struct promise *p = promises + i;
 		tagFileResized = runParserInNarrowedInputStream (p->lang,
 								 p->startLine,
@@ -101,6 +106,7 @@ bool forcePromises (void)
 			: tagFileResized;
 	}
 
+	current_promise  = NO_PROMISE;
 	promise_count = 0;
 	return tagFileResized;
 }
