@@ -221,6 +221,7 @@ static void findAutoItTags (void)
 		else if (commentDepth == 0)
 		{
 			bool isGlobal = false;
+			bool isStatic = false;
 
 			/* skip white space */
 			skipSpaces (&p);
@@ -239,11 +240,29 @@ static void findAutoItTags (void)
 				setEndLine (nls);
 				nestingLevelsPop (nls);
 			}
-			else if ((isGlobal = match (p, "global", &p)) ||
+			else if ((isStatic = match (p, "static", &p)) ||
+			         (isGlobal = match (p, "global", &p)) ||
 			         match (p, "local", &p))
 			{
+				/*
+				 * variable-identifier ::= "$[a-zA-Z_0-9]+"
+				 * scope-modifier ::= "Local" | "Global"
+				 * variable-declaration ::= "Static" [scope-modifier] variable-identifier
+				 *                          scope-modifier ["Static" | "Const"] variable-identifier
+				 */
 				skipSpaces (&p);
-				if (match (p, "const", &p))
+				if (isStatic)
+				{
+					/* skip optional modifiers */
+					if ((isGlobal = match (p, "global", &p)) ||
+					    match (p, "local", &p))
+					{
+						skipSpaces (&p);
+					}
+				}
+				else if ((isStatic = match (p, "static", &p)))
+					skipSpaces (&p);
+				else if (match (p, "const", &p))
 					skipSpaces (&p);
 				if (*p == '$')
 				{

@@ -45,4 +45,10 @@ EndFunc
 Volatile Func MyVolatileDouble ($iValue)
     Return $iValue * 2;
 EndFunc
+
+FUNC MyDummy($iValue)
+    LOCAL STATIC $iFirst = 0
+    STATIC LOCAL $iSecond = 1
+    RETURN $iValue * $iSecond + $iFirst
+ENDFUNC
 #EndRegion All functions
