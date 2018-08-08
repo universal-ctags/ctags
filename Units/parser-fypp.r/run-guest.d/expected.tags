@@ -1,0 +1,12 @@
++	input.fy	/^  interface operator(+)/;"	i	line:31	module:test_interface
+add	input.fy	/^    type(atype) function add(/;"	P	line:33	module:test_interface
+atype	input.fy	/^  type atype$/;"	t	line:28	module:test_interface
+debug_code	input.fy	/^#:def debug_code(code)$/;"	m	line:4	end:8
+get	input.fy	/^  interface get$/;"	i	line:47	module:test_interface
+get_1d	input.fy	/^  subroutine get_1d(/;"	s	line:55	module:test_interface
+get_2d	input.fy	/^  subroutine get_2d(/;"	s	line:62	module:test_interface
+helloworld	input.fy	/^program helloworld$/;"	p	line:17
+repeat_code	input.fy	/^#:def repeat_code(code, repeat)$/;"	m	line:23	end:27
+suba	input.fy	/^    subroutine suba(/;"	P	line:40	module:test_interface
+subb	input.fy	/^    subroutine subb(/;"	P	line:42	module:test_interface
+test_interface	input.fy	/^module test_interface$/;"	m	line:21
