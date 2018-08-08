@@ -12,6 +12,7 @@
 
 #include "general.h"
 #include "promise.h"
+#include "ptrarray.h"
 #include "debug.h"
 #include "read.h"
 #include "trashbox.h"
@@ -26,6 +27,20 @@ struct promise {
 	long endCharOffset;
 	unsigned long sourceLineOffset;
 	int parent_promise;
+	ptrArray *modifiers;
+};
+
+typedef void ( *promiseInputModifier) (unsigned char * input,
+									   size_t size,
+									   unsigned long startLine, long startCharOffset,
+									   unsigned long endLine, long endCharOffset,
+									   void *data);
+typedef void ( *promiseDestroyAttachedData) (void *data);
+
+struct modifier {
+	promiseInputModifier modifier;
+	promiseDestroyAttachedData destroyData;
+	void *data;
 };
 
 static struct promise *promises;
@@ -34,6 +49,12 @@ static int promise_allocated;
 
 #define NO_PROMISE -1
 static int current_promise = NO_PROMISE;
+
+static void attachPromiseModifier (int promise,
+								   promiseInputModifier modifier,
+								   promiseDestroyAttachedData destroyData,
+								   void *data);
+
 
 int  makePromise   (const char *parser,
 		    unsigned long startLine, long startCharOffset,
@@ -74,16 +95,58 @@ int  makePromise   (const char *parser,
 	p->endLine = endLine;
 	p->endCharOffset = endCharOffset;
 	p->sourceLineOffset = sourceLineOffset;
+	p->modifiers = NULL;
 
 	r = promise_count;
 	promise_count++;
 	return r;
 }
 
+static void freeModifier (void *data)
+{
+	struct modifier *m = data;
+	m->destroyData(m->data);
+	eFree (m);
+}
+
+static void attachPromiseModifier (int promise,
+								   promiseInputModifier modifier,
+								   promiseDestroyAttachedData destroyData,
+								   void *data)
+{
+	struct modifier *m = xMalloc (1, struct modifier);
+
+	m->modifier = modifier;
+	m->destroyData = destroyData;
+	m->data = data;
+
+	struct promise *p = promises + promise;
+	if (!p->modifiers)
+		p->modifiers = ptrArrayNew(freeModifier);
+
+	ptrArrayAdd (p->modifiers, m);
+}
+
+static void freeModifiers(int promise)
+{
+	for (int i = promise; i < promise_count; i++)
+	{
+		struct promise *p = promises + promise;
+		if (p->modifiers)
+		{
+			ptrArrayDelete (p->modifiers);
+			p->modifiers = NULL;
+		}
+	}
+}
+
 void breakPromisesAfter (int promise)
 {
 	Assert (promise_count >= promise);
+	if (promise == NO_PROMISE)
+		promise = 0;
 
+	freeModifiers(promise);
 	promise_count = promise;
 }
 
@@ -101,11 +164,13 @@ bool forcePromises (void)
 								 p->startCharOffset,
 								 p->endLine,
 								 p->endCharOffset,
-								 p->sourceLineOffset)
+								 p->sourceLineOffset,
+								 i)
 			? true
 			: tagFileResized;
 	}
 
+	freeModifiers (0);
 	current_promise  = NO_PROMISE;
 	promise_count = 0;
 	return tagFileResized;
@@ -115,4 +180,41 @@ bool forcePromises (void)
 int getLastPromise (void)
 {
 	return promise_count - 1;
+}
+
+static void collectModifiers(int promise, ptrArray *modifiers)
+{
+	while (promise != NO_PROMISE)
+	{
+		struct promise *p = promises + promise;
+		if (p->modifiers)
+		{
+			for (int i = ptrArrayCount(p->modifiers); i > 0; i--)
+			{
+				struct modifier *m = ptrArrayItem(p->modifiers, i - 1);
+				ptrArrayAdd (modifiers, m);
+			}
+		}
+		promise = p->parent_promise;
+	}
+}
+
+void runModifiers (int promise,
+				   unsigned long startLine, long startCharOffset,
+				   unsigned long endLine, long endCharOffset,
+				   unsigned char *input,
+				   size_t size)
+{
+	ptrArray *modifiers = ptrArrayNew (NULL);
+
+	collectModifiers (promise, modifiers);
+	for (int i = ptrArrayCount (modifiers); i > 0 ; i--)
+	{
+		struct modifier *m = ptrArrayItem (modifiers, i - 1);
+		m->modifier (input, size,
+					 startLine, startCharOffset,
+					 endLine, endCharOffset,
+					 m->data);
+	}
+	ptrArrayDelete (modifiers);
 }

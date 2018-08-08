@@ -3164,7 +3164,8 @@ static bool createTagsWithFallback1 (const langType language,
 extern bool runParserInNarrowedInputStream (const langType language,
 					       unsigned long startLine, long startCharOffset,
 					       unsigned long endLine, long endCharOffset,
-					       unsigned long sourceLineOffset)
+					       unsigned long sourceLineOffset,
+					       int promise)
 {
 	bool tagFileResized;
 
@@ -3181,7 +3182,8 @@ extern bool runParserInNarrowedInputStream (const langType language,
 	pushNarrowedInputStream (
 				 startLine, startCharOffset,
 				 endLine, endCharOffset,
-				 sourceLineOffset);
+				 sourceLineOffset,
+				 promise);
 	tagFileResized = createTagsWithFallback1 (language, NULL);
 	popNarrowedInputStream  ();
 	return tagFileResized;
