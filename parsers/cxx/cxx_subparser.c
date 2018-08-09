@@ -16,7 +16,7 @@
 
 bool cxxSubparserNotifyParseAccessSpecifier (ptrArray *pSubparsers)
 {
-	bool bR;
+	bool bR = false;
 	subparser *pSubparser;
 
 	foreachSubparser (pSubparser, false)
