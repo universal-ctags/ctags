@@ -1,0 +1,6 @@
+--fields=+e
+# The next redundant options are for improve the test coverage.
+--param-Fypp:guest=Lisp
+--param-Fypp:guest=NONE
+--param-Fypp:guest=Java
+--extras=+g
