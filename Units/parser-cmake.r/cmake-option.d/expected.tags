@@ -1,0 +1,5 @@
+1_tag_this	input.cmake	/^option(1_tag_this foo)$/;"	D
+B-option-tag_this_2	input.cmake	/^option(B-option-tag_this_2 ${BAR})$/;"	D
+c_TAG_THIS	input.cmake	/^    option ( c_TAG_THIS but_not_this)$/;"	D
+d-ALSO-Tag.this	input.cmake	/^        d-ALSO-Tag.this$/;"	D
+e.LastlyTagThis	input.cmake	/^e.LastlyTagThis "hello")$/;"	D

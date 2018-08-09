@@ -1,0 +1,5 @@
+Bfunctiontag_this_2	input.cmake	/^	function(	Bfunctiontag_this_2 ${BAR})$/;"	f
+cxx_shared_library	input.cmake	/^function(cxx_shared_library name cxx_flags)$/;"	f
+d_ALSO_Tag_this	input.cmake	/^        d_ALSO_Tag_this$/;"	f
+eLastlyTagThis_	input.cmake	/^eLastlyTagThis_ "hello")$/;"	f
+tag_this1	input.cmake	/^function(tag_this1)$/;"	f
