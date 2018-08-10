@@ -117,10 +117,6 @@ bool cxxParserParseBlockHandleOpeningBracket(void)
 		return bRet;
 	}
 
-	int iScopes;
-	// FIXME: Why the invalid cork queue entry index is CORK_NIL?
-	int iCorkQueueIndex = CORK_NIL;
-
 	// In C++ mode check for lambdas
 	CXXToken * pParenthesis;
 
@@ -140,11 +136,15 @@ bool cxxParserParseBlockHandleOpeningBracket(void)
 		return true;
 	}
 
+	int iScopes;
+	int iCorkQueueIndex = CORK_NIL;
+
 	CXXFunctionSignatureInfo oInfo;
 
 	if(eScopeType != CXXScopeTypeFunction)
 	{
 		// very likely a function definition
+		// (but may be also a toplevel block, like "extern "C" { ... }")
 		iScopes = cxxParserExtractFunctionSignatureBeforeOpeningBracket(&oInfo,&iCorkQueueIndex);
 
 		// FIXME: Handle syntax (5) of list initialization:
@@ -156,8 +156,6 @@ bool cxxParserParseBlockHandleOpeningBracket(void)
 		// (note that {}-style initializers have been handled above and thus are excluded)
 
 		iScopes = 0;
-
-		oInfo.uFlags = 0;
 	}
 
 	cxxParserNewStatement();
@@ -166,6 +164,12 @@ bool cxxParserParseBlockHandleOpeningBracket(void)
 	{
 		CXX_DEBUG_LEAVE_TEXT("Failed to parse nested block");
 		return false;
+	}
+
+	if(iScopes < 1)
+	{
+		CXX_DEBUG_LEAVE_TEXT("The block was not a function");
+		return true;
 	}
 
 	unsigned long uEndPosition = getInputLineNumber();
