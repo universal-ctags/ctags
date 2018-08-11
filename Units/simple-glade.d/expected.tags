@@ -5,3 +5,4 @@ GtkWindow	input.glade	/^<widget class="GtkWindow" id="window1">$/;"	class	line:6
 GtkButton	input.glade	/^    <widget class="GtkButton" id="button1">$/;"	class	line:23	roles:widget
 on_button1_clicked	input.glade	/^      <signal name="clicked" handler="on_button1_clicked" last_modification_time="Sat, 26 Dec 20/;"	handler	line:30	roles:handler
 input.glade	input.glade	1;"	file	line:1	roles:def
+./Units/simple-glade.d/input.glade	input.glade	1;"	file	line:1	roles:def

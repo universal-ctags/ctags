@@ -177,11 +177,14 @@ static void addCommonPseudoTags (void)
 extern void makeFileTag (const char *const fileName)
 {
 	tagEntryInfo tag;
+	const char *base;
+	unsigned long endLine = 0;
 
 	if (!isXtagEnabled(XTAG_FILE_NAMES))
 		return;
 
-	initTagEntry (&tag, baseFilename (fileName), KIND_FILE_INDEX);
+	base = baseFilename (fileName);
+	initTagEntry (&tag, base, KIND_FILE_INDEX);
 
 	tag.isFileEntry     = true;
 	tag.lineNumberEntry = true;
@@ -195,10 +198,23 @@ extern void makeFileTag (const char *const fileName)
 		   unnecessary read line loop. */
 		while (readLineFromInputFile () != NULL)
 			; /* Do nothing */
-		tag.extensionFields.endLine = getInputLineNumber ();
+		endLine = getInputLineNumber ();
 	}
 
+	tag.extensionFields.endLine = endLine;
 	makeTagEntry (&tag);
+
+	/* add the full filename too */
+	if (base != fileName) {
+		initTagEntry (&tag, fileName, KIND_FILE_INDEX);
+		tag.isFileEntry     = true;
+		tag.lineNumberEntry = true;
+		markTagExtraBit (&tag, XTAG_FILE_NAMES);
+		tag.lineNumber = 1;
+		if (isFieldEnabled (FIELD_END_LINE))
+			tag.extensionFields.endLine = endLine;
+		makeTagEntry (&tag);
+	}
 }
 
 static void updateSortedFlag (
