@@ -1422,7 +1422,7 @@ int cxxParserEmitFunctionTags(
 	CXX_DEBUG_PRINT("Identifier is '%s'",vStringValue(pIdentifier->pszWord));
 
 	tagEntryInfo * tag;
-	
+
 	if(
 			(uTagKind == CXXTagKindFUNCTION) &&
 			(g_cxx.uKeywordState & CXXParserKeywordStateSeenFriend) &&
@@ -1437,7 +1437,7 @@ int cxxParserEmitFunctionTags(
 		//  {
 		//   inline friend void y(){ ... }
 		//  }
-		// 
+		//
 		// Here y() is implicitly defined as a function in the namespace contaning X
 		// (so it is NOT X::y()).
 
@@ -1638,6 +1638,8 @@ int cxxParserEmitFunctionTags(
 // This function attempts to extract the function name, emit it as a tag
 // and push all the necessary scopes for the next block. It returns the number
 // of scopes pushed.
+//
+// When the returned number of scopes is 0 then no function has been found.
 //
 int cxxParserExtractFunctionSignatureBeforeOpeningBracket(
 		CXXFunctionSignatureInfo * pInfo,
