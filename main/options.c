@@ -3623,6 +3623,7 @@ extern void initOptions (void)
 	processExcludeOption (NULL, ".cvsignore");
 	processExcludeOption (NULL, "_darcs");
 	processExcludeOption (NULL, ".deps");
+	processExcludeOption (NULL, ".DS_Store");
 	processExcludeOption (NULL, "EIFGEN");
 	processExcludeOption (NULL, ".git");
 	processExcludeOption (NULL, ".gitignore");
