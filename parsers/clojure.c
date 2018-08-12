@@ -34,7 +34,12 @@ static int isNamespace (const char *strp)
 
 static int isFunction (const char *strp)
 {
-	return strncmp (++strp, "defn", 4) == 0 && isspace (strp[4]);
+	return (strncmp (++strp, "defn", 4) == 0 && isspace (strp[4])); // || (strncmp (++strp, "clojure.core/defn", 17) == 0 && isspace (strp[17]));
+}
+
+static int isCoreFunction (const char *strp)
+{
+	return (strncmp (++strp, "clojure.core/defn", 17) == 0 && isspace (strp[17]));
 }
 
 static int isQuote (const char *strp)
@@ -154,7 +159,7 @@ static void findClojureTags (void)
 				skipToSymbol (&p);
 				scope_index = makeNamespaceTag (name, p);
 			}
-			else if (isFunction (p))
+			else if (isFunction (p) || isCoreFunction (p))
 			{
 				skipToSymbol (&p);
 				makeFunctionTag (name, p, scope_index);
