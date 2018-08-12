@@ -41,6 +41,10 @@ typedef enum {
 	R_INCLUDE_LOCAL,
 } AutoItIncludeRole;
 
+typedef enum {
+	F_PROPERTIES,
+} AutoItField;
+
 static roleDefinition AutoItIncludeRoles [] = {
 	{ true, "system", "system include" },
 	{ true, "local", "local include" },
@@ -53,6 +57,14 @@ static kindDefinition AutoItKinds [] = {
 	{ true, 'l', "local", "local variables" },
 	{ true, 'S', "script", "included scripts",
 	  .referenceOnly = true, ATTACH_ROLES (AutoItIncludeRoles) },
+};
+
+static fieldDefinition AutoItFields [] = {
+	{
+		.name = "properties",
+		.description = "properties (static, volatile, ...)",
+		.enabled = false,
+	},
 };
 
 /*
@@ -126,8 +138,9 @@ static void skipSpaces (const unsigned char **p)
 }
 
 /* parses after a "func" keyword */
-static void parseFunc (const unsigned char *p, NestingLevels *nls)
+static int parseFunc (const unsigned char *p, NestingLevels *nls)
 {
+	int k = CORK_NIL;
 	vString *name = vStringNew ();
 
 	skipSpaces (&p);
@@ -140,7 +153,6 @@ static void parseFunc (const unsigned char *p, NestingLevels *nls)
 	if (*p == '(' && (vStringLength (name) > 0))
 	{
 		vString *signature = vStringNew ();
-		int k;
 
 		do
 			vStringPut (signature, (int) *p);
@@ -152,6 +164,8 @@ static void parseFunc (const unsigned char *p, NestingLevels *nls)
 	}
 
 	vStringDelete (name);
+
+	return k;
 }
 
 static void findAutoItTags (void)
@@ -231,7 +245,11 @@ static void findAutoItTags (void)
 			{
 				skipSpaces (&p);
 				if (match (p, "func", &p))
-					parseFunc (p, nls);
+				{
+					int k = parseFunc (p, nls);
+					if (k != CORK_NIL)
+						attachParserFieldToCorkEntry (k, AutoItFields[F_PROPERTIES].ftype, "volatile");
+				}
 			}
 			else if (match (p, "func", &p))
 				parseFunc (p, nls);
@@ -273,7 +291,11 @@ static void findAutoItTags (void)
 						++p;
 					}
 					if (vStringLength(name) > 0)
-						makeSimpleAutoItTag (nls, name, isGlobal ? K_GLOBALVAR : K_LOCALVAR);
+					{
+						int k = makeSimpleAutoItTag (nls, name, isGlobal ? K_GLOBALVAR : K_LOCALVAR);
+						if (k != CORK_NIL && isStatic)
+							attachParserFieldToCorkEntry (k, AutoItFields[F_PROPERTIES].ftype, "static");
+					}
 					vStringClear (name);
 				}
 			}
@@ -289,6 +311,8 @@ parserDefinition *AutoItParser (void)
 	parserDefinition* def = parserNew ("AutoIt");
 	def->kindTable      = AutoItKinds;
 	def->kindCount  = ARRAY_SIZE (AutoItKinds);
+	def->fieldTable = AutoItFields;
+	def->fieldCount = ARRAY_SIZE (AutoItFields);
 	def->extensions = extensions;
 	def->parser     = findAutoItTags;
 	def->useCork    = true;
