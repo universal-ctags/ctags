@@ -245,8 +245,10 @@ sub gather_chars {
 		$output = $output . '\\' . 't';
 	    } elsif ($c eq 'n') {
 		$output = $output . '\\' . 'n';
+	    } elsif ($c eq '\\') {
+		$output = $output . '\\\\' . '\\\\';
 	    } else {
-		$output = $output . '\\' . '\\' . $c;
+		$output = $output . '\\\\' . $c;
 	    }
 	    $escape = 0;
 	} elsif ($c eq '"') {
