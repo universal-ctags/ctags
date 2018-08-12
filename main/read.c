@@ -115,7 +115,8 @@ typedef struct sInputFile {
 	int thinDepth;
 } inputFile;
 
-static inputLangInfo inputLang, sourceLang;
+static inputLangInfo inputLang;
+static langType sourceLang;
 
 /*
 *   FUNCTION DECLARATIONS
@@ -231,7 +232,7 @@ extern const char *getSourceFileTagPath (void)
 
 extern langType getSourceLanguage (void)
 {
-	return sourceLang.type;
+	return sourceLang;
 }
 
 extern unsigned long getSourceLineNumber (void)
@@ -422,11 +423,6 @@ static void clearLangOnStack (inputLangInfo *langInfo)
 	langStackClear (& langInfo->stack);
 }
 
-static void setLangToType  (inputLangInfo *langInfo, langType lang)
-{
-	langInfo->type = lang;
-}
-
 static void setInputFileParameters (vString *const fileName, const langType language)
 {
 	setInputFileParametersCommon (&File.input, fileName,
@@ -438,7 +434,7 @@ static void setSourceFileParameters (vString *const fileName, const langType lan
 {
 	setInputFileParametersCommon (&File.source, fileName,
 				      language, File.sourceTagPathHolder);
-	setLangToType(&sourceLang, language);
+	sourceLang = language;
 }
 
 static bool setSourceFileName (vString *const fileName)
@@ -739,7 +735,7 @@ extern void resetInputFile (const langType language)
 
 	resetLangOnStack (& inputLang, language);
 	File.input.lineNumber = File.input.lineNumberOrigin;
-	setLangToType (& sourceLang, language);
+	sourceLang = language;
 	File.source.lineNumber = File.source.lineNumberOrigin;
 }
 
