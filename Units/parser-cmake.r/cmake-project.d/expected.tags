@@ -1,0 +1,5 @@
+1_tag_this	input.cmake	/^project(1_tag_this)$/;"	p
+B-project-tag_this_2	input.cmake	/^project(B-project-tag_this_2 ${BAR})$/;"	p
+c_TAG_THIS	input.cmake	/^    project ( c_TAG_THIS but_not_this)$/;"	p
+d-ALSO-Tag.this	input.cmake	/^        d-ALSO-Tag.this$/;"	p
+e.LastlyTagThis	input.cmake	/^e.LastlyTagThis "hello")$/;"	p

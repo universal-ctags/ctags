@@ -1,0 +1,5 @@
+Bmacrotag_this_2	input.cmake	/^	macro(	Bmacrotag_this_2 ${BAR})$/;"	m
+cxx_shared_library	input.cmake	/^macro(cxx_shared_library name cxx_flags)$/;"	m
+d_ALSO_Tag_this	input.cmake	/^        d_ALSO_Tag_this$/;"	m
+eLastlyTagThis_	input.cmake	/^eLastlyTagThis_ "hello")$/;"	m
+tag_this1	input.cmake	/^macro(tag_this1)$/;"	m

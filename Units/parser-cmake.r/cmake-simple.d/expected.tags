@@ -1,0 +1,6 @@
+BUILD_GMOCK	input.cmake	/^option(BUILD_GMOCK "Builds the googlemock subproject" ON)$/;"	D
+BUILD_GTEST	input.cmake	/^option(BUILD_GTEST "Builds the googletest subproject" OFF)$/;"	D
+CMAKE_INSTALL_BINDIR	input.cmake	/^  set(CMAKE_INSTALL_BINDIR "bin" CACHE STRING "User executables (bin)")$/;"	v
+CMAKE_INSTALL_INCLUDEDIR	input.cmake	/^  set(CMAKE_INSTALL_INCLUDEDIR "include" CACHE STRING "C header files (include)")$/;"	v
+CMAKE_INSTALL_LIBDIR	input.cmake	/^  set(CMAKE_INSTALL_LIBDIR "lib${LIB_SUFFIX}" CACHE STRING "Object code libraries (lib)")$/;"	v
+googletest-distribution	input.cmake	/^project( googletest-distribution )$/;"	p

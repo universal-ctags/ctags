@@ -1,0 +1,3 @@
+another_good_target	input.cmake	/^add_library(another_good_target# <-- target$/;"	t
+good_target	input.cmake	/^    good_target# this is legal comment placement set(NO_TAG foo)$/;"	t
+tag_this	input.cmake	/^]]set(tag_this)$/;"	v

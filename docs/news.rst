@@ -42,6 +42,7 @@ The following parsers have been added:
 * Automake
 * AutoIt
 * Clojure
+* CMake *optlib*
 * CSS
 * Ctags option library *optlib*
 * CUDA
