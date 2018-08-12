@@ -50,6 +50,7 @@ The following parsers have been added:
 * Diff
 * DTD
 * DTS
+* Elixir *optlib*
 * Elm *optlib*
 * Falcon
 * Gdbinit script *optlib*
