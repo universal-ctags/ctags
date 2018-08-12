@@ -17,6 +17,7 @@
 *~
 .deps
 .dirstamp
+.DS_Store
 a.out
 aclocal.m4
 autom4te.cache
