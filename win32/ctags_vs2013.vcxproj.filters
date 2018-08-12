@@ -99,6 +99,9 @@
     <ClCompile Include="..\main\nestlevel.c">
       <Filter>Source Files\Main</Filter>
     </ClCompile>
+    <ClCompile Include="..\main\numarray.c">
+      <Filter>Source Files\Main</Filter>
+    </ClCompile>
     <ClCompile Include="..\main\objpool.c">
       <Filter>Source Files\Main</Filter>
     </ClCompile>
@@ -549,6 +552,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\main\nestlevel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\main\numarray.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\main\objpool.h">

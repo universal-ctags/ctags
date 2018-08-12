@@ -34,6 +34,7 @@ MAIN_HEADS =			\
 	main/main.h		\
 	main/mbcs.h		\
 	main/nestlevel.h	\
+	main/numarray.h		\
 	main/objpool.h		\
 	main/options.h		\
 	main/param.h		\
@@ -77,6 +78,7 @@ MAIN_SRCS =				\
 	main/main.c			\
 	main/mbcs.c			\
 	main/nestlevel.c		\
+	main/numarray.c			\
 	main/objpool.c			\
 	main/options.c			\
 	main/param.c			\
