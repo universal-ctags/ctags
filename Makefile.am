@@ -12,7 +12,27 @@ EXTRA_DIST   = README.md autogen.sh \
 	       win32/ctags_vs2013.vcxproj win32/ctags_vs2013.vcxproj.filters \
 	       win32/gen-repoinfo.bat
 
+noinst_PROGRAMS = packcc
 bin_PROGRAMS = ctags
+
+packcc_CPPFLAGS =
+packcc_CFLAGS =
+dist_packcc_SOURCES = $(PACKCC_SRCS)
+
+if HAVE_STRNLEN
+packcc_CPPFLAGS += -DUSE_SYSTEM_STRNLEN
+endif
+
+if USE_NO_FORMATTER_FOR_SIZE_T
+packcc_CPPFLAGS += -DSIZE_T_FMT_CHAR='""'
+endif
+if USE_ULONG_FORMATTER_FOR_SIZE_T
+packcc_CPPFLAGS += -DSIZE_T_FMT_CHAR='"l"'
+endif
+if USE_ULONGLONG_FORMATTER_FOR_SIZE_T
+packcc_CPPFLAGS += -DSIZE_T_FMT_CHAR='"ll"'
+endif
+
 
 if USE_READCMD
 bin_PROGRAMS+= readtags
@@ -48,9 +68,15 @@ PARSER_SRCS += $(YAML_SRCS)
 PARSER_HEADS += $(YAML_HEADS)
 endif
 
-ctags_CPPFLAGS = -I. -I$(srcdir) -I$(srcdir)/main
+PARSER_SRCS += $(PEG_SRCS)
+PARSER_HEADS += $(PEG_HEADS) $(PEG_EXTRA_HEADS)
+
+ctags_CPPFLAGS = -I. -I$(srcdir) -I$(srcdir)/main -DHAVE_PACKCC
 if ENABLE_DEBUGGING
 ctags_CPPFLAGS+= $(DEBUG_CPPFLAGS)
+endif
+if HAVE_STRNLEN
+ctags_CPPFLAGS += -DUSE_SYSTEM_STRNLEN
 endif
 ctags_CPPFLAGS+= $(FNMATCH_CPPFLAGS)
 ctags_CPPFLAGS+= $(REGCOMP_CPPFLAGS)
@@ -104,6 +130,19 @@ SUFFIXES += .ctags
 	$(optlib2c_verbose)$(OPTLIB2C) $< > $@
 $(OPTLIB2C_INPUT): $(OPTLIB2C) Makefile
 endif
+
+packcc_verbose = $(packcc_verbose_@AM_V@)
+packcc_verbose_ = $(packcc_verbose_@AM_DEFAULT_V@)
+packcc_verbose_0 = @echo PACKCC "    $@";
+PACKCC = $(srcdir)/packcc$(EXEEXT)
+SUFFIXES += .peg
+.peg.c:
+	$(packcc_verbose)$(PACKCC) $<
+.peg.h:
+	$(packcc_verbose)$(PACKCC) $<
+# You cannot use $(PACKCC) as a target name here.
+$(PEG_INPUT): packcc$(EXEEXT) Makefile
+$(PEG_HEADS): packcc$(EXEEXT) Makefile
 dist_ctags_SOURCES = $(ALL_HEADS) $(ALL_SRCS)
 
 if INSTALL_ETAGS

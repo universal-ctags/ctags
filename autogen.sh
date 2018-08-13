@@ -5,6 +5,11 @@ set -xe
 type autoreconf || exit 1
 type pkg-config || exit 1
 
+if ! [ -f misc/packcc/packcc.c ]; then
+	git submodule init
+	git submodule update
+fi
+
 if [ -z "${MAKE}" ]; then
 	if type make > /dev/null; then
 		MAKE=make

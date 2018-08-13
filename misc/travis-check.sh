@@ -52,7 +52,7 @@ if [ "$TARGET" = "Unix" ]; then
         make -j2 check roundtrip TRAVIS=1
     fi
 elif [ "$TARGET" = "Mingw32" ]; then
-    make -j2 CC=i686-w64-mingw32-gcc -f mk_mingw.mak
+    make -j2 CC=i686-w64-mingw32-gcc CC_FOR_PACKCC=gcc -f mk_mingw.mak
     # Don't run test units in Mingw32 target
 else
     echo 'Invalid $TARGET value' 1>&2

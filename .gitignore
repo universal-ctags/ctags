@@ -16,6 +16,7 @@
 *.TMP
 *.tmp
 *~
+/packcc
 .deps
 .dirstamp
 .DS_Store
