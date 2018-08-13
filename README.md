@@ -14,6 +14,27 @@ The goal of the project is preparing and maintaining common/unified working
 space where people interested in making ctags better can work
 together.
 
+## Getting PACKCC compiler-compiler ##
+
+Packcc is a compiler-compiler; it translates .peg grammar file to .c
+file.  packcc was originally written by Arihiro Yoshida. Its source
+repository is at sourceforge. It seems that packcc at sourceforge is
+not actively maintained. Some derived repositories are at
+github. Currently, our choice is
+https://github.com/enechaev/packcc. It is the most active one in the
+derived repositories.
+
+The source tree of packcc is grafted at misc/packcc directory.
+Building packcc and ctags are integrated in the build-scripts of
+Universal-ctags.
+
+If misc/packcc directory is empty, run following command to get
+source code before building ctags:
+```
+$ git submodule init misc/packcc
+$ git submodule update misc/packcc
+```
+
 ## The latest build and package ##
 
 If you want to try the latest universal-ctags without building it yourself...

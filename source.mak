@@ -140,6 +140,12 @@ MAIN_SRCS =				\
 include makefiles/optlib2c_input.mak
 OPTLIB2C_SRCS = $(OPTLIB2C_INPUT:.ctags=.c)
 
+include makefiles/peg_input.mak
+PEG_SRCS = $(PEG_INPUT:.peg=.c)
+PEG_HEADS = $(PEG_INPUT:.peg=.h)
+PEG_EXTRA_HEADS = $(PEG_INPUT:.peg=_pre.h) $(PEG_INPUT:.peg=_post.h)
+PEG_OBJS = $(PEG_SRCS:.c=.$(OBJEXT))
+
 PARSER_HEADS = \
 	parsers/cxx/cxx_debug.h \
 	parsers/cxx/cxx_keyword.h \
@@ -329,4 +335,10 @@ READTAGS_SRCS  = \
 READTAGS_HEADS = read/readtags.h
 READTAGS_OBJS  = $(READTAGS_SRCS:.c=.$(OBJEXT))
 
+PACKCC_SRCS = \
+	    misc/packcc/packcc.c \
+	    \
+	    $(NULL)
+
+PACKCC_OBJS = $(PACKCC_SRCS:.c=.$(OBJEXT))
 # vim: ts=8

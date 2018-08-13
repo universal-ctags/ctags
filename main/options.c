@@ -563,6 +563,10 @@ static struct Feature {
 #ifdef HAVE_ASPELL
 	{"aspell", "linked with code for spell checking (internal use)"},
 #endif
+#ifdef HAVE_PACKCC
+	/* The test harnesses use this as hints for skipping test cases */
+	{"packcc", "has peg based parser(s)"},
+#endif
 	{NULL,}
 };
 

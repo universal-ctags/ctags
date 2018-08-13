@@ -1,0 +1,4 @@
+[submodule "misc/packcc"]
+	path = misc/packcc
+	url = https://github.com/universal-ctags/packcc.git
+	branch = master
