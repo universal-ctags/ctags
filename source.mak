@@ -137,8 +137,8 @@ MAIN_SRCS =				\
 	\
 	$(NULL)
 
-include makefiles/translator_input.mak
-TRANSLATED_SRCS = $(TRANSLATOR_INPUT:.ctags=.c)
+include makefiles/optlib2c_input.mak
+OPTLIB2C_SRCS = $(OPTLIB2C_INPUT:.ctags=.c)
 
 PARSER_HEADS = \
 	parsers/cxx/cxx_debug.h \
@@ -255,7 +255,7 @@ PARSER_SRCS =				\
 	parsers/yacc.c			\
 	parsers/yumrepo.c		\
 	\
-	$(TRANSLATED_SRCS)		\
+	$(OPTLIB2C_SRCS)		\
 	\
 	$(NULL)
 
