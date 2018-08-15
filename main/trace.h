@@ -31,6 +31,10 @@
 	void traceLeave(const char * szFunction,const char * szFormat,...);
 	void tracePrint(const char * szFunction,const char * szFormat,...);
 
+	void tracePrintPrefix(const char * szFunction);
+	void tracePrintFmt(const char * szFormat,...);
+	void tracePrintNewline(void);
+
 	#define TRACE_ENTER() traceEnter(__func__,"")
 	#define TRACE_LEAVE() traceLeave(__func__,"")
 
@@ -42,6 +46,21 @@
 
 	#define TRACE_PRINT(_szFormat,...) \
 		tracePrint(__func__,_szFormat,## __VA_ARGS__)
+
+	/* TRACE_PRINT prints line at once.
+	 * If you want to print a trace line incrementally,
+	 * use following macros.
+	 *
+	 * TRACE_PRINT_PREFIX: just print a trace prefix. No newline.
+	 * TRACE_PRINT_FMT: print as a format. No prefix, no newline.
+	 * TRACE_PRINT_NEWLINE: just print a newline.
+	 */
+	#define TRACE_PRINT_PREFIX() \
+		tracePrintPrefix(__func__)
+	#define TRACE_PRINT_FMT(_szFormat,...) \
+		tracePrintFmt(_szFormat,## __VA_ARGS__)
+	#define TRACE_PRINT_NEWLINE() \
+		tracePrintNewline()
 
 	#define TRACE_ASSERT(_condition,_szFormat,...) \
 		do { \
@@ -64,6 +83,10 @@
 	#define TRACE_LEAVE_TEXT(_szFormat,...) do { } while(0)
 
 	#define TRACE_PRINT(_szFormat,...) do { } while(0)
+
+	#define TRACE_PRINT_PREFIX() do { } while(0)
+	#define TRACE_PRINT_FMT(_szFormat,...) do { } while(0)
+	#define TRACE_PRINT_NEWLINE() do { } while(0)
 
 	#define TRACE_ASSERT(_condition,_szFormat,...) do { } while(0)
 
