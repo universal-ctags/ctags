@@ -427,11 +427,6 @@ static void clearLangOnStack (inputLangInfo *langInfo)
 	langStackClear (& langInfo->stack);
 }
 
-static void setLangToType  (inputLangInfo *langInfo, langType lang)
-{
-	langInfo->type = lang;
-}
-
 static void setInputFileParameters (vString *const fileName, const langType language)
 {
 	setInputFileParametersCommon (&File.input, fileName,
