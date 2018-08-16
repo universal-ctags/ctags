@@ -1,0 +1,13 @@
+a_int	input.cpp	/^constexpr int a_int = 1;$/;"	v	typeref:typename:int
+b_int	input.cpp	/^constexpr const int b_int = 2;$/;"	v	typeref:typename:const int
+c_int	input.cpp	/^static constexpr const int c_int = 3;$/;"	v	typeref:typename:const int	file:
+d_int	input.cpp	/^static constexpr int d_int = 4;$/;"	v	typeref:typename:int	file:
+e_int	input.cpp	/^constexpr static const int e_int = 5;$/;"	v	typeref:typename:const int	file:
+f_int	input.cpp	/^constexpr static int f_int = 6;$/;"	v	typeref:typename:int	file:
+g_auto	input.cpp	/^constexpr auto g_auto = 7;$/;"	v	typeref:typename:auto
+h_char_ptr	input.cpp	/^constexpr static const char* const h_char_ptr = "this is valid";$/;"	v	typeref:typename:const char * const	file:
+i_char_array	input.cpp	/^static constexpr const char i_char_array[] = "this is also valid";$/;"	v	typeref:typename:const char[]	file:
+j_ref	input.cpp	/^static constexpr int const& j_ref = 42;$/;"	v	typeref:typename:int const &	file:
+k_int_ptr	input.cpp	/^constexpr const int *k_int_ptr = &a_int;$/;"	v	typeref:typename:const int *
+l_raw	input.cpp	/^static constexpr const char* const l_raw = R"(setfacl {} -m g:{}:{} {})";$/;"	v	typeref:typename:const char * const	file:
+m_int64	input.cpp	/^static constexpr const int64_t m_int64 = 120'000;$/;"	v	typeref:typename:const int64_t	file:

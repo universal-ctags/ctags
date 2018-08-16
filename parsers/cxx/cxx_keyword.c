@@ -215,7 +215,7 @@ static CXXKeywordDescriptor g_aCXXKeywordTable[] = {
 	{
 		"constexpr",
 		CXXLanguageCPP,
-		CXXKeywordExcludeFromTypeNames
+		CXXKeywordMayAppearInVariableDeclaration | CXXKeywordExcludeFromTypeNames
 	},
 	{
 		"const_cast",
