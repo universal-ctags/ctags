@@ -1,5 +1,7 @@
-Bmacrotag_this_2	input.cmake	/^	macro(	Bmacrotag_this_2 ${BAR})$/;"	m
-cxx_shared_library	input.cmake	/^macro(cxx_shared_library name cxx_flags)$/;"	m
-d_ALSO_Tag_this	input.cmake	/^        d_ALSO_Tag_this$/;"	m
-eLastlyTagThis_	input.cmake	/^eLastlyTagThis_ "hello")$/;"	m
-tag_this1	input.cmake	/^macro(tag_this1)$/;"	m
+Bmacrotag_this_2	input.cmake	/^	macro(	Bmacrotag_this_2 ${BAR})$/;"	m	line:3
+a	input.cmake	/^macro(a)$/;"	m	line:19
+cxx_shared_library	input.cmake	/^macro(cxx_shared_library name cxx_flags)$/;"	m	line:6
+d_ALSO_Tag_this	input.cmake	/^        d_ALSO_Tag_this$/;"	m	line:11
+eLastlyTagThis_	input.cmake	/^eLastlyTagThis_ "hello")$/;"	m	line:16
+tag_this1	input.cmake	/^macro(tag_this1)$/;"	m	line:1
+var1_unscoped	input.cmake	/^  set(var1_unscoped TRUE)$/;"	v	line:20

@@ -58,6 +58,7 @@
 #
 --_tabledef-CMake=main
 --_tabledef-CMake=variable
+--_tabledef-CMake=variableScoped
 --_tabledef-CMake=function
 --_tabledef-CMake=macro
 --_tabledef-CMake=target
@@ -111,6 +112,22 @@
 --_mtable-extend-CMake=main+nextToken
 --_mtable-extend-CMake=main+skipWhiteSpace
 
+#
+# For performance reasons, this is a separate table from 'main', mostly to avoid
+# matching tokens starting with 'e' in the main table - such tokens are very
+# common in CMake, due to 'endif()' and such
+#
+--_tabledef-CMake=inFunction
+--_mtable-regex-CMake=inFunction/([^eEsSfFmMaAoO# \t\n]|[eE][^nN]|[eE][nN][^dD]|[eE][nN][dD][^fF#])[^ #\t\n]*[ \t\n]+//
+--_mtable-extend-CMake=inFunction+skipComment
+--_mtable-regex-CMake=inFunction/set[ \t]*\(//{icase}{tenter=variableScoped}
+--_mtable-regex-CMake=inFunction/function[ \t]*\(//{icase}{tenter=function}
+--_mtable-regex-CMake=inFunction/macro[ \t]*\(//{icase}{tenter=macro}
+--_mtable-regex-CMake=inFunction/endfunction[ \t]*\([^)]*\)//{icase}{tleave}{scope=pop}
+--_mtable-regex-CMake=inFunction/add_(custom_target|executable|library)[ \t]*\(//{icase}{tenter=target}
+--_mtable-regex-CMake=inFunction/option[ \t]*\(//{icase}{tenter=option}
+--_mtable-extend-CMake=inFunction+nextToken
+--_mtable-extend-CMake=inFunction+skipWhiteSpace
 
 #
 # Each of the following basically work the same way, and only differ in the
@@ -132,15 +149,29 @@
 --_mtable-extend-CMake=variable+skipToName
 --_mtable-regex-CMake=variable/([A-Za-z0-9_.-]+)(#)/\1/v/{tleave}{_advanceTo=2start}
 
+# when a variable is defined inside a function, we reference its scope unless it
+# has a PARENT_SCOPE argument; unfortunately the regex for this can backtrack a
+# lot and the current ctags regex engine doesn't do lazy or atomic/possessive
+# captures to avoid it, but in practice this should be ok
+--_tabledef-CMake=inVariable
+--_mtable-regex-CMake=inVariable/[^")]+(("(\\"|[^"])*")([^")]+("(\\"|[^"])*"))*)[ \t\n]PARENT_SCOPE[# \t\n)]//{tjump=variable}{_advanceTo=0start}
+--_mtable-regex-CMake=inVariable/([A-Za-z0-9_.-]+)[ \t\n\)]+/\1/v/{tleave}{scope=ref}
+--_mtable-regex-CMake=inVariable/([A-Za-z0-9_.-]+)(#)/\1/v/{tleave}{scope=ref}{_advanceTo=2start}
+
+--_mtable-regex-CMake=variableScoped/[A-Za-z0-9_.-]+[# \t\n\)]//{tjump=inVariable}{_advanceTo=0start}
+--_mtable-extend-CMake=variableScoped+skipToName
+
+
 #
 # function
 #
---_mtable-regex-CMake=function/([A-Za-z_][A-Za-z0-9_]*)[ \t\n\)]+/\1/f/{tleave}
+--_mtable-regex-CMake=function/([A-Za-z_][A-Za-z0-9_]*)([# \t\n\)])/\1/f/{_advanceTo=2start}{tjump=inFunction}{scope=push}
 --_mtable-extend-CMake=function+skipToName
---_mtable-regex-CMake=function/([A-Za-z_][A-Za-z0-9_]*)(#)/\1/f/{tleave}{_advanceTo=2start}
 
 #
-# macro
+# macro: unlike functions, technically macros don't create scopes for any
+# variables set in them - the scope is whatever it is when the macro is invoked.
+# So we're not going to push a scope nor go into the 'inFunction' table.
 #
 --_mtable-regex-CMake=macro/([A-Za-z_][A-Za-z0-9_]*)[ \t\n\)]+/\1/m/{tleave}
 --_mtable-extend-CMake=macro+skipToName

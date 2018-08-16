@@ -1,0 +1,25 @@
+_var10	input.cmake	/^  set (_var10 "\/FI\\"${_prefixFileNative}\\"" "\/FI\\"${_prefixFileNative}\\"")$/;"	v	line:24	function:cxx_shared_library
+_var11_unscoped	input.cmake	/^  set (_var11_unscoped "\/FI\\"${_prefixFileNative}\\"" "\/FI\\"${_prefixFileNative}\\"" PARENT_/;"	v	line:25
+_var6	input.cmake	/^  set (_var6 "-x ${_xLanguage_${_language}} -c \\"${_prefixFile}\\" -o \\"${_pchFile}\\"")$/;"	v	line:16	function:cxx_shared_library
+_var7_unscoped	input.cmake	/^  set (_var7_unscoped "-x ${_xLanguage_${_language}} -c \\"${_prefixFile}\\" -o \\"${_pchFile}\\/;"	v	line:17
+_var8_unscoped	input.cmake	/^  	_var8_unscoped$/;"	v	line:19	function:cxx_shared_library
+_var9	input.cmake	/^  set (_var9 "\/FI\\"${_prefixFileNative}\\"")$/;"	v	line:23	function:cxx_shared_library
+a	input.cmake	/^function(a)$/;"	f	line:39	end:50
+b	input.cmake	/^	function(b)$/;"	f	line:40	function:a	end:49
+c	input.cmake	/^		function(c ...)$/;"	f	line:45	function:a.b	end:48
+cxx_shared_library	input.cmake	/^function(cxx_shared_library name cxx_flags)$/;"	f	line:12	end:26
+func1	input.cmake	/^function(func1)$/;"	f	line:1	end:4
+func2	input.cmake	/^	function(	func2 ${BAR})$/;"	f	line:6	end:10
+func4	input.cmake	/^        func4$/;"	f	line:29	end:33
+macro1	input.cmake	/^macro(macro1)$/;"	m	line:35
+macro2	input.cmake	/^		macro(macro2)$/;"	m	line:41
+var1	input.cmake	/^	set(var1 TRUE)$/;"	v	line:2	function:func1
+var13_unscoped	input.cmake	/^	set(var13_unscoped TRUE)$/;"	v	line:36
+var14_a_b	input.cmake	/^			set(var14_a_b TRUE)$/;"	v	line:42	function:a.b
+var15_a_b_c	input.cmake	/^			set(var15_a_b_c TRUE)$/;"	v	line:46	function:a.b.c
+var2	input.cmake	/^	set(var2 "hello")$/;"	v	line:3	function:func1
+var_12	input.cmake	/^		SET ( var_12 "hello" foo ${bar})$/;"	v	line:31	function:func4
+var_16_unscoped	input.cmake	/^			set(var_16_unscoped "hello \\"" ${ARGN} "\\" world" PARENT_SCOPE)$/;"	v	line:47
+var_3_unscoped	input.cmake	/^		set ( var_3_unscoped "hello" PARENT_SCOPE)$/;"	v	line:7
+var_4_unscoped	input.cmake	/^		set ( var_4_unscoped "hello" "world" PARENT_SCOPE)$/;"	v	line:8
+var_5_unscoped	input.cmake	/^		set ( var_5_unscoped "hello \\"" ${ARGN} "\\" world" PARENT_SCOPE)$/;"	v	line:9

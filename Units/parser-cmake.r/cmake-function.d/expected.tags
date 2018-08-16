@@ -1,5 +1,12 @@
-Bfunctiontag_this_2	input.cmake	/^	function(	Bfunctiontag_this_2 ${BAR})$/;"	f
-cxx_shared_library	input.cmake	/^function(cxx_shared_library name cxx_flags)$/;"	f
-d_ALSO_Tag_this	input.cmake	/^        d_ALSO_Tag_this$/;"	f
-eLastlyTagThis_	input.cmake	/^eLastlyTagThis_ "hello")$/;"	f
-tag_this1	input.cmake	/^function(tag_this1)$/;"	f
+Bfunctiontag_this_2	input.cmake	/^	function(	Bfunctiontag_this_2 ${BAR})$/;"	f	line:3	end:4
+a	input.cmake	/^function(a)$/;"	f	line:19	end:27
+b	input.cmake	/^  function(b)$/;"	f	line:21	function:a	end:26
+c	input.cmake	/^    function(c)$/;"	f	line:23	function:a.b	end:25
+cxx_shared_library	input.cmake	/^function(cxx_shared_library name cxx_flags)$/;"	f	line:6	end:8
+d_ALSO_Tag_this	input.cmake	/^        d_ALSO_Tag_this$/;"	f	line:11	end:13
+eLastlyTagThis_	input.cmake	/^eLastlyTagThis_ "hello")$/;"	f	line:16	end:17
+tag_this1	input.cmake	/^function(tag_this1)$/;"	f	line:1	end:2
+var1_in_func_a	input.cmake	/^  set(var1_in_func_a TRUE)$/;"	v	line:20	function:a
+var2_in_func_a_b	input.cmake	/^	set(var2_in_func_a_b TRUE)$/;"	v	line:22	function:a.b
+var3_in_func_a_b_c	input.cmake	/^    	set(var3_in_func_a_b_c TRUE)$/;"	v	line:24	function:a.b.c
+var4_in_no_func	input.cmake	/^set(var4_in_no_func TRUE)$/;"	v	line:29
