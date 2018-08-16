@@ -97,7 +97,7 @@ static void initializeCMakeParser (const langType language CTAGS_ATTR_UNUSED)
 	                               "", "", "{tenter=commentBegin}", NULL);
 	addLanguageTagMultiTableRegex (language, "macro",
 	                               "^([A-Za-z_][A-Za-z0-9_]*)(#)",
-	                               "\\1", "t", "{tleave}{_advanceTo=2start}", NULL);
+	                               "\\1", "m", "{tleave}{_advanceTo=2start}", NULL);
 	addLanguageTagMultiTableRegex (language, "target",
 	                               "^([A-Za-z0-9_.-]+)[ \t\n\\)]+",
 	                               "\\1", "t", "{tleave}", NULL);

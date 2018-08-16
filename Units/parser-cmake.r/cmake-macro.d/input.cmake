@@ -3,12 +3,13 @@ endmacro(tag_this1)
 	macro(	Bmacrotag_this_2 ${BAR})
 	endmacro()
 
-macro(cxx_shared_library name cxx_flags)
+macro(cxx_shared_library#
+      name cxx_flags)
   cxx_library_with_type(${name} SHARED "${cxx_flags}" ${ARGN})
 endmacro()
 
     MACRO		(
-        d_ALSO_Tag_this
+        d_ALSO_Tag_this#[[ set(foo) ]]
     true)
     ENDMACRO()
 
