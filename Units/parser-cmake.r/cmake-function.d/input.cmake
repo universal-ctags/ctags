@@ -3,12 +3,13 @@ endfunction(tag_this1)
 	function(	Bfunctiontag_this_2 ${BAR})
 	endfunction()
 
-function(cxx_shared_library name cxx_flags)
+function(cxx_shared_library#
+         name cxx_flags)
   cxx_library_with_type(${name} SHARED "${cxx_flags}" ${ARGN})
 endfunction()
 
     FUNCTION		(
-        d_ALSO_Tag_this
+        d_ALSO_Tag_this#[[ set(foo) ]]
     true)
     ENDFUNCTION()
 
