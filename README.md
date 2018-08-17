@@ -85,3 +85,45 @@ site and man pages
 source tree).
 
 Pull-requests are welcome!
+
+## peg-based-java-parser branch ##
+
+This is an experimental branch for testing "packcc" parser generator
+and peg based "NewJava" parser.  Only building with Autotools is
+supported. Volunteers for the other build-system are welcome.
+
+packcc is registred as a git submodule. It is taken from https://github.com/enechaev/packcc.
+The peg definition for Java 1.7 is taken from https://github.com/pointlander/peg/blob/master/grammars/java/java_1_7.peg.
+
+git submodule handling is done in ./autogen.sh.
+
+How to switch the branch:
+
+```
+[yamato@master]/tmp% git clone https://github.com/masatake/ctags.git
+Cloning into 'ctags'...
+remote: Counting objects: 38867, done.
+remote: Compressing objects: 100% (48/48), done.
+remote: Total 38867 (delta 18), reused 43 (delta 16), pack-reused 38802
+Receiving objects: 100% (38867/38867), 11.80 MiB | 4.41 MiB/s, done.
+Resolving deltas: 100% (24486/24486), done.
+[yamato@master]/tmp% cd ctags
+[yamato@master]/tmp/ctags% git checkout peg-based-java-parser
+Branch 'peg-based-java-parser' set up to track remote branch 'peg-based-java-parser' from 'origin'.
+Switched to a new branch 'peg-based-java-parser'
+```
+
+How to try the new java parser:
+```
+[yamato@master]~/var/ctags-peg% ./ctags --fields=+l -o - --languages=+NewJava --language-force=NewJava foo.java
+A	foo.java	/^    A;$/;"	e	language:NewJava	enum:e
+e	foo.java	/^public enum e {$/;"	g	language:NewJava
+getString	foo.java	/^    public String getString() {$/;"	m	language:NewJava	enum:e
+```
+
+TODO:
+
+* Improve or modify packcc to make ctags pass the test case parser-java.r/accented-latin1-identifiers.java.d,
+* Build a ctags executable on non-Autotools platform,
+* Support Java-1.9 (See http://www.romanredz.se/Mouse/index.htm#parsing), and
+* Add a parser for peg itself.

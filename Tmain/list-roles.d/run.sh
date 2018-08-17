@@ -22,20 +22,26 @@ ignore_yaml()
 }
 
 # When introducing newly rewritten parser, we would like to provide
-# the both new parser and old parser for debugging and providing
+# both new parser and old parser for debugging and providing
 # migration period to users. In such case the prefix "Old" will be
-# used to the name of old parser. The old parser should be ignored
+# used to the name of old parser, or "New" will be used to the same name of
+# new experimental parser. The old and new parsers should be ignored
 # in this test case.
 ignore_old()
 {
     grep -v '^Old'
 }
 
+ignore_new()
+{
+    grep -v '^New'
+}
+
 title ''
-${CTAGS} --quiet --options=NONE --list-roles= | ignore_xml | ignore_old | ignore_yaml
+${CTAGS} --quiet --options=NONE --list-roles= | ignore_xml | ignore_old | ignore_yaml | ignore_new
 
 title 'all.*'
-${CTAGS} --quiet --options=NONE --list-roles='all.*' | ignore_xml | ignore_old | ignore_yaml
+${CTAGS} --quiet --options=NONE --list-roles='all.*' | ignore_xml | ignore_old | ignore_yaml | ignore_new
 
 title 'C.*'
 ${CTAGS} --quiet --options=NONE --list-roles='C.*'

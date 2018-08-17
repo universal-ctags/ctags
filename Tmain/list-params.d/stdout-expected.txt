@@ -1,9 +1,10 @@
 # ALL
-#LANGUAGE      NAME   DESCRIPTION
-CPreProcessor  define define replacement for an identifier
-CPreProcessor  if0    examine code within "#if 0" branch (true or [false])
-CPreProcessor  ignore a token to be specially handled
-Fypp           guest  parser run after Fypp parser parses the original input ("NONE" or a parser name [Fortran])
+#LANGUAGE      NAME                DESCRIPTION
+CPreProcessor  define              define replacement for an identifier
+CPreProcessor  if0                 examine code within "#if 0" branch (true or [false])
+CPreProcessor  ignore              a token to be specially handled
+Fypp           guest               parser run after Fypp parser parses the original input ("NONE" or a parser name [Fortran])
+NewJava        includeTypeArgument include type arguments to inheritance field: true or [false]
 
 # ALL MACHINABLE
 #LANGUAGE	NAME	DESCRIPTION
@@ -11,12 +12,14 @@ CPreProcessor	define	define replacement for an identifier
 CPreProcessor	if0	examine code within "#if 0" branch (true or [false])
 CPreProcessor	ignore	a token to be specially handled
 Fypp	guest	parser run after Fypp parser parses the original input ("NONE" or a parser name [Fortran])
+NewJava	includeTypeArgument	include type arguments to inheritance field: true or [false]
 
 # ALL MACHINABLE NOHEADER
 CPreProcessor	define	define replacement for an identifier
 CPreProcessor	if0	examine code within "#if 0" branch (true or [false])
 CPreProcessor	ignore	a token to be specially handled
 Fypp	guest	parser run after Fypp parser parses the original input ("NONE" or a parser name [Fortran])
+NewJava	includeTypeArgument	include type arguments to inheritance field: true or [false]
 
 # CPP
 #NAME   DESCRIPTION

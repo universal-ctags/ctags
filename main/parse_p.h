@@ -48,6 +48,9 @@ extern parserDefinitionFunc XML_PARSER_LIST;
 #ifdef HAVE_LIBYAML
 extern parserDefinitionFunc YAML_PARSER_LIST;
 #endif
+#ifdef HAVE_PACKCC
+extern parserDefinitionFunc PEG_PARSER_LIST;
+#endif
 
 extern bool doesLanguageAllowNullTag (const langType language);
 extern bool doesLanguageRequestAutomaticFQTag (const langType language);

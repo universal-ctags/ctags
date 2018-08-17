@@ -1,0 +1,1013 @@
+%prefix "pjava"
+
+%auxil	"struct parserCtx *"
+
+%header {
+	struct parserCtx;
+}
+
+%source {
+#include "java_pre.h"
+}
+
+#
+# The original code is taken from
+# https://github.com/pointlander/peg/blob/master/grammars/java/java_1_7.peg
+# https://raw.githubusercontent.com/pointlander/peg/master/grammars/java/java_1_7.peg
+#
+#===========================================================================
+#
+#  Parsing Expression Grammar for Java 1.7 for Mouse 1.1 - 1.5.
+#  Based on Chapters 3 and 18 of Java Language Specification, Third Edition,
+#  at http://java.sun.com/docs/books/jls/third_edition/html/j3TOC.html,
+#  and description of Java SE 7 enhancements in
+#  http://download.java.net/jdk7/docs/technotes/guides/language/enhancements.html.
+#
+#---------------------------------------------------------------------------
+#
+#  Copyright (C) 2006, 2009, 2010, 2011
+#  by Roman R Redziejowski(www.romanredz.se).
+#
+#  The author gives unlimited permission to copy and distribute
+#  this file, with or without modifications, as long as this notice
+#  is preserved, and any changes are properly documented.
+#
+#  This file is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+#
+#---------------------------------------------------------------------------
+#
+#  Latest update 2011-07-21
+#
+#---------------------------------------------------------------------------
+#
+#  Change log
+#    2006-12-06 Posted on Internet.
+#    2009-04-04 Modified to conform to Mouse syntax:
+#		Underscore removed from names
+#		\f in Space replaced by Unicode for FormFeed.
+#    2009-07-10 Unused rule THREADSAFE removed.
+#    2009-07-10 Copying and distribution conditions relaxed by the author.
+#    2010-07-01 Updated Mouse version in the comment.
+#    2010-09-15 Updated comment on Java release.
+#    2010-09-18 Updated list of reserved words ("keywords") according to
+#		JLS 3.9: added "const" and "goto", removed "threadsafe".
+#    2010-09-18 Removed superfluous "?" everywhere after "Spacing".
+#    2010-10-05 Removed erroneous "TypeArguments?" from "EnumConstant".
+#		See JLS 8.9, JLS 18.1.
+#		NB. "Annotations" are optional, but not shown as such in JLS.
+#    2010-10-20 Corrected "FormalParameterList" according to JLS 8.4.1.
+#		NB. "VariableModifiers" in "FormalParameter" and "LastFormalParameter"
+#		are optional, but not shown as such in JLS.
+#    2010-10-20 Corrected "Annotation" according to JLS 9.7.
+#		Is incorrect in JLS 18.1 (does not allow list of value pairs).
+#    2010-10-20 Corrected "LocalVariableDeclarationStatement".
+#		Is incorrect in JLS 18.1: only FINAL allowed as "VariableModifier".
+#		Is incorrect in JLS 14.4: "VariableModifiers" not shown as optional.
+#    2010-10-20 Corrected "AnnotationTypeElementRest": added SEMI as last alternative.
+#		See JLS 9.6. NB. Missing in JLS 18.1.
+#    2010-10-20 Moved "Identifier" from "AnnotationTypeElementRest" to
+#		"AnnotationMethodRest". Was incorrect in JLS 18.1.
+#    2010-10-21 Inverted order of alternatives in "HexSignificand".
+#    2010-10-24 Corrected previous correction: moved SEMI from
+#		"AnnotationTypeElementRest" to "AnnotationTypeElementDeclaration".
+#    2010-10-25 Repeated "u" allowed in UnicodeEscape (JLS 3.3).
+#		Line terminators not allowed in StringLiteral (JLS 3.10.5).
+#		(Found thanks to Java PEG for Parboiled, which in turn credits
+#		Reinier Zwitserloot for finding it.)
+#    2011-07-19 Added SEMI after "VariableDeclarators" in "MemberDecl" (JLS 8.3).
+#    2011-07-21 Corrected "ArrayInitializer" to allow for "{,}" (JLS 10.6).
+#
+#---------------------------------------------------------------------------
+#
+#  Changes for Java 1.7
+#    2011-07-18 Implemented Binary Literals: added "BinaryNumeral".
+#    2011-07-19 Implemented Underscores in Numerical Literals:
+#		Added "Digits" and "HexDigits". Removed "Digit".
+#		Modified "DecimalNumeral", "HexNumeral", "BinaryNumeral",
+#		"OctalNumeral", "DecimalFloat", "Exponent",
+#		"HexSignificand", and "BinaryExponent".
+#    2011-07-20 Implemented Type Inference for Generic Instance Creation:
+#		Added "Diamond".
+#		Modified "ClassCreatorRest" by adding "Diamond?".
+#    2011-07-20 Implemented try-with-resources Statement:
+#		Added try-with-resources as an alternative of "Statement".
+#		Added "Resource". (Based on comments to JavacParser).
+#    2011-07-20 Implemented catching of multiple exceptions:
+#		Modified "Catch" to allow multiple exception types.
+#		Based on a pure guess.
+#
+#---------------------------------------------------------------------------
+#
+#    2013-02-16 Modified to work with github.com/pointlander/peg
+#
+#---------------------------------------------------------------------------
+#
+#    2018-08-17 s/SEM/SEMI/ in rule "InterfaceMethodDeclaratorRest"
+#
+#---------------------------------------------------------------------------
+#
+#    2018-08-17 Embed C code for Universal-ctags
+#
+#===========================================================================
+
+#-------------------------------------------------------------------------
+#  Compilation Unit
+#-------------------------------------------------------------------------
+
+# package main
+# type Java Peg {
+# }
+
+CompilationUnit <- Spacing PackageDeclaration? ImportDeclaration* TypeDeclaration* < EOT > {
+	leavePackageMaybe (auxil, $1e);
+    }
+PackageDeclaration <- Annotation* PACKAGE { activateSink(auxil, S_NAME); } QualifiedIdentifier {
+	enterPackage (auxil);
+    } SEMI
+ImportDeclaration <- IMPORT {
+	resetModifier (auxil);
+	activateSink(auxil, S_NAME);
+    } STATIC? QualifiedIdentifier (DOT STAR { eatString (auxil, ".*", 2); })? {
+	captureImportedPackage(auxil);
+    } SEMI
+TypeDeclaration <- { resetModifier (auxil); } Modifier* (ClassDeclaration
+			     / EnumDeclaration
+			     / InterfaceDeclaration
+			     / AnnotationTypeDeclaration)
+		 / SEMI
+
+#-------------------------------------------------------------------------
+#  Class Declaration
+#-------------------------------------------------------------------------
+
+ClassDeclaration <- CLASS { activateSink(auxil, S_NAME); } Identifier {
+	enterClass (auxil);
+} TypeParameters? (EXTENDS { activateSink(auxil, S_SUPER); } ClassType)? (IMPLEMENTS {
+	    eatChar (auxil, ',');
+	} ClassTypeList)? { attachInheritsMaybe (auxil); } ClassBody {
+	leaveClass (auxil);
+}
+
+ClassBody <- LWING { markAnonClassMaybe (auxil); } ClassBodyDeclaration* RWING
+
+ClassBodyDeclaration
+   <- SEMI
+    / { resetModifier (auxil); } STATIC? Block	       # Static or Instance Initializer
+    / { resetModifier (auxil); } Modifier* MemberDecl  # ClassMemberDeclaration
+
+MemberDecl
+   <- TypeParameters GenericMethodOrConstructorRest    # Generic Method or Constructor
+    / Type { activateSink(auxil, S_NAME); } Identifier {
+	enterMethod (auxil);
+    } MethodDeclaratorRest {
+	leaveMethod (auxil);
+    }						       # Method
+    / Type { pushModifier (auxil); pushVarKind(auxil, K_FIELD); } VariableDeclarators SEMI {
+	popVarKind(auxil);
+	popModifier (auxil);
+      }						       # Field
+    / VOID { activateSink(auxil, S_NAME); } Identifier {
+	enterMethod (auxil);
+    }  VoidMethodDeclaratorRest {
+	leaveMethod (auxil);
+    }						       # Void method
+    / { activateSink(auxil, S_NAME); } Identifier {
+	enterMethod (auxil);
+    } ConstructorDeclaratorRest {
+	leaveMethod (auxil);
+    }						       # Constructor
+    / InterfaceDeclaration			       # Interface
+    / ClassDeclaration				       # Class
+    / EnumDeclaration				       # Enum
+    / AnnotationTypeDeclaration			       # Annotation
+
+GenericMethodOrConstructorRest
+    <- (Type / VOID) { activateSink(auxil, S_NAME); } Identifier {
+	enterMethod (auxil);
+    } MethodDeclaratorRest {
+	leaveMethod (auxil);
+    }
+    / { activateSink(auxil, S_NAME); } Identifier {
+	enterMethod (auxil);
+    } ConstructorDeclaratorRest {
+	leaveMethod (auxil);
+    }
+
+MethodDeclaratorRest
+    <- FormalParameters Dim* (THROWS ClassTypeList)? (MethodBody / SEMI)
+
+VoidMethodDeclaratorRest
+    <- FormalParameters (THROWS ClassTypeList)? (MethodBody / SEMI)
+
+ConstructorDeclaratorRest
+    <- FormalParameters (THROWS ClassTypeList)? MethodBody
+
+MethodBody
+    <- Block
+
+#-------------------------------------------------------------------------
+#  Interface Declaration
+#-------------------------------------------------------------------------
+
+InterfaceDeclaration
+    <- INTERFACE { activateSink(auxil, S_NAME); } Identifier {
+	enterInterface (auxil);
+    } TypeParameters? (EXTENDS {
+				   activateSink(auxil, S_SUPER);
+			       } ClassTypeList {
+				   attachInheritsMaybe (auxil);
+			       })? InterfaceBody {
+	leaveInterface (auxil);
+    }
+
+InterfaceBody
+    <- LWING InterfaceBodyDeclaration* RWING
+
+InterfaceBodyDeclaration
+    <- { resetModifier (auxil); } Modifier* InterfaceMemberDecl
+    / SEMI
+
+InterfaceMemberDecl
+    <- InterfaceMethodOrFieldDecl
+    / InterfaceGenericMethodDecl
+    / VOID { activateSink(auxil, S_NAME); } Identifier {
+       enterMethod (auxil);
+    } VoidInterfaceMethodDeclaratorRest {
+       leaveMethod (auxil);
+    }
+    / InterfaceDeclaration
+    / AnnotationTypeDeclaration
+    / ClassDeclaration
+    / EnumDeclaration
+
+InterfaceMethodOrFieldDecl
+    <- Type { activateSink(auxil, S_NAME); } Identifier InterfaceMethodOrFieldRest
+
+InterfaceMethodOrFieldRest
+    <- { pushModifier (auxil); captureField(auxil); } ConstantDeclaratorsRest SEMI {
+	 popModifier (auxil);
+       }
+    /  { enterMethod (auxil); } InterfaceMethodDeclaratorRest {
+	 leaveMethod (auxil);
+    }
+
+InterfaceMethodDeclaratorRest
+    <- FormalParameters Dim* (THROWS ClassTypeList)? SEMI
+
+InterfaceGenericMethodDecl
+    <- TypeParameters (Type / VOID) { activateSink(auxil, S_NAME); } Identifier {
+	  enterMethod (auxil);
+    } InterfaceMethodDeclaratorRest {
+	  leaveMethod (auxil);
+    }
+
+VoidInterfaceMethodDeclaratorRest
+    <- FormalParameters (THROWS ClassTypeList)? SEMI
+
+ConstantDeclaratorsRest
+    <- ConstantDeclaratorRest (COMMA ConstantDeclarator)*
+
+ConstantDeclarator
+    <- { activateSink(auxil, S_NAME); } Identifier { captureField(auxil); } ConstantDeclaratorRest
+
+ConstantDeclaratorRest
+    <- Dim* EQU VariableInitializer
+
+#-------------------------------------------------------------------------
+#  Enum Declaration
+#-------------------------------------------------------------------------
+
+EnumDeclaration
+    <- ENUM { activateSink(auxil, S_NAME); } Identifier {
+	enterEnum (auxil);
+    } (IMPLEMENTS { activateSink(auxil, S_SUPER); } ClassTypeList {
+	attachInheritsMaybe (auxil);
+    })? EnumBody {
+	leaveEnum (auxil);
+    }
+
+EnumBody
+    <- LWING EnumConstants? COMMA? EnumBodyDeclarations? RWING
+
+EnumConstants
+    <- EnumConstant (COMMA { patchEndline (auxil); } EnumConstant)*
+
+EnumConstant
+    <- Annotation* { activateSink(auxil, S_NAME); } Identifier {
+	enterEnumConstant (auxil);
+    } Arguments? ClassBody? {
+	leaveEnumConstant (auxil);
+    }
+
+EnumBodyDeclarations
+    <- SEMI ClassBodyDeclaration*
+
+#-------------------------------------------------------------------------
+#  Variable Declarations
+#-------------------------------------------------------------------------
+
+LocalVariableDeclarationStatement
+    <- (FINAL / Annotation)* Type {
+	pushVarKind(auxil, K_LOCAL);
+    } VariableDeclarators SEMI {
+	popVarKind(auxil);
+    }
+
+VariableDeclarators
+    <- VariableDeclarator (COMMA VariableDeclarator)*
+
+VariableDeclarator
+    <- { activateSink(auxil, S_NAME); } Identifier {
+	captureVariable(auxil);
+    } Dim* (EQU VariableInitializer)?
+
+#-------------------------------------------------------------------------
+#  Formal Parameters
+#-------------------------------------------------------------------------
+
+FormalParameters
+    <- LPAR FormalParameterList? RPAR
+
+FormalParameter
+    <- (FINAL / Annotation)* Type VariableDeclaratorId
+
+LastFormalParameter
+    <- (FINAL / Annotation)* Type ELLIPSIS VariableDeclaratorId
+
+FormalParameterList
+    <- FormalParameter (COMMA FormalParameter)* (COMMA LastFormalParameter)?
+    / LastFormalParameter
+
+VariableDeclaratorId
+    <- Identifier Dim*
+
+#-------------------------------------------------------------------------
+#  Statements
+#-------------------------------------------------------------------------
+
+Block
+    <- LWING BlockStatements RWING
+
+BlockStatements
+    <- BlockStatement*
+
+BlockStatement
+    <- LocalVariableDeclarationStatement
+    / { resetModifier (auxil); } Modifier*
+      ( ClassDeclaration
+      / EnumDeclaration
+      )
+    / Statement
+
+Statement
+    <- Block
+    / ASSERT Expression (COLON Expression)? SEMI
+    / IF ParExpression Statement (ELSE Statement)?
+    / FOR LPAR ForInit? SEMI Expression? SEMI ForUpdate? RPAR Statement
+    / FOR LPAR FormalParameter COLON Expression RPAR Statement
+    / WHILE ParExpression Statement
+    / DO Statement WHILE ParExpression	 SEMI
+    / TRY LPAR Resource (SEMI Resource)* SEMI? RPAR Block Catch* Finally?
+    / TRY Block (Catch+ Finally? / Finally)
+    / SWITCH ParExpression LWING SwitchBlockStatementGroups RWING
+    / SYNCHRONIZED ParExpression Block
+    / RETURN Expression? SEMI
+    / THROW Expression	 SEMI
+    / BREAK Identifier? SEMI
+    / CONTINUE Identifier? SEMI
+    / SEMI
+    / StatementExpression SEMI
+    / Identifier COLON Statement
+
+Resource
+    <- Modifier* Type VariableDeclaratorId EQU Expression
+
+Catch
+    <- CATCH LPAR (FINAL / Annotation)* Type (OR Type)* VariableDeclaratorId RPAR Block
+
+Finally
+    <- FINALLY Block
+
+SwitchBlockStatementGroups
+    <- SwitchBlockStatementGroup*
+
+SwitchBlockStatementGroup
+    <- SwitchLabel BlockStatements
+
+SwitchLabel
+    <- CASE ConstantExpression COLON
+    / CASE EnumConstantName COLON
+    / DEFAULT COLON
+
+ForInit
+    <- (FINAL / Annotation)* Type VariableDeclarators
+    / StatementExpression (COMMA StatementExpression)*
+
+ForUpdate
+    <- StatementExpression (COMMA StatementExpression)*
+
+EnumConstantName
+    <- Identifier
+
+#-------------------------------------------------------------------------
+#  Expressions
+#-------------------------------------------------------------------------
+
+StatementExpression
+    <- Expression
+
+    # This is more generous than definition in section 14.8, which allows only
+    # specific forms of Expression.
+
+
+ConstantExpression
+    <- Expression
+
+Expression
+    <- ConditionalExpression (AssignmentOperator ConditionalExpression)*
+
+    # This definition is part of the modification in JLS Chapter 18
+    # to minimize look ahead. In JLS Chapter 15.27, Expression is defined
+    # as AssignmentExpression, which is effectively defined as
+    # (LeftHandSide AssignmentOperator)* ConditionalExpression.
+    # The above is obtained by allowing ANY ConditionalExpression
+    # as LeftHandSide, which results in accepting statements like 5 = a.
+
+
+AssignmentOperator
+    <- EQU
+    / PLUSEQU
+    / MINUSEQU
+    / STAREQU
+    / DIVEQU
+    / ANDEQU
+    / OREQU
+    / HATEQU
+    / MODEQU
+    / SLEQU
+    / SREQU
+    / BSREQU
+
+ConditionalExpression
+    <- ConditionalOrExpression (QUERY Expression COLON ConditionalOrExpression)*
+
+ConditionalOrExpression
+    <- ConditionalAndExpression (OROR ConditionalAndExpression)*
+
+ConditionalAndExpression
+    <- InclusiveOrExpression (ANDAND InclusiveOrExpression)*
+
+InclusiveOrExpression
+    <- ExclusiveOrExpression (OR ExclusiveOrExpression)*
+
+ExclusiveOrExpression
+    <- AndExpression (HAT AndExpression)*
+
+AndExpression
+    <- EqualityExpression (AND EqualityExpression)*
+
+EqualityExpression
+    <- RelationalExpression ((EQUAL /  NOTEQUAL) RelationalExpression)*
+
+RelationalExpression
+    <- ShiftExpression ((LE / GE / LT / GT) ShiftExpression / INSTANCEOF ReferenceType)*
+
+ShiftExpression
+    <- AdditiveExpression ((SL / SR / BSR) AdditiveExpression)*
+
+AdditiveExpression
+    <- MultiplicativeExpression ((PLUS / MINUS) MultiplicativeExpression)*
+
+MultiplicativeExpression
+    <- UnaryExpression ((STAR / DIV / MOD) UnaryExpression)*
+
+UnaryExpression
+    <- PrefixOp UnaryExpression
+    / LPAR Type RPAR UnaryExpression
+    / Primary (Selector)* (PostfixOp)*
+
+Primary
+    <- ParExpression
+    / NonWildcardTypeArguments (ExplicitGenericInvocationSuffix / THIS Arguments)
+    / THIS Arguments?
+    / SUPER SuperSuffix
+    / Literal
+    / NEW Creator
+    / QualifiedIdentifier IdentifierSuffix?
+    / BasicType Dim* DOT CLASS
+    / VOID DOT CLASS
+
+IdentifierSuffix
+    <- LBRK ( RBRK Dim* DOT CLASS / Expression RBRK)
+    / Arguments
+    / DOT
+      ( CLASS
+      / ExplicitGenericInvocation
+      / THIS
+      / SUPER Arguments
+      / NEW NonWildcardTypeArguments? InnerCreator
+      )
+
+ExplicitGenericInvocation
+    <- NonWildcardTypeArguments ExplicitGenericInvocationSuffix
+
+NonWildcardTypeArguments
+    <- LPOINT ReferenceType (COMMA ReferenceType)* RPOINT
+
+ExplicitGenericInvocationSuffix
+    <- SUPER SuperSuffix
+    / Identifier Arguments
+
+PrefixOp
+    <- INC
+    / DEC
+    / BANG
+    / TILDA
+    / PLUS
+    / MINUS
+
+PostfixOp
+    <- INC
+    / DEC
+
+Selector
+    <- DOT Identifier Arguments?
+    / DOT ExplicitGenericInvocation
+    / DOT THIS
+    / DOT SUPER SuperSuffix
+    / DOT NEW NonWildcardTypeArguments? InnerCreator
+    / DimExpr
+
+SuperSuffix
+    <- Arguments
+    / DOT Identifier Arguments?
+
+BasicType
+    <- < ( 'byte'
+      / 'short'
+      / 'char'
+      / 'int'
+      / 'long'
+      / 'float'
+      / 'double'
+      / 'boolean'
+      ) > { eatIdentifier (auxil, $1, $1s, $1e); } !LetterOrDigit Spacing
+
+Arguments
+    <- LPAR (Expression (COMMA Expression)*)? RPAR
+
+Creator
+    <- NonWildcardTypeArguments? { activateSink(auxil, S_NAME); } CreatedName {
+	enterAnonClassMaybe(auxil);
+    } ClassCreatorRest {
+	leaveAnonClass(auxil);
+    }
+    / NonWildcardTypeArguments? (ClassType / BasicType) ArrayCreatorRest
+
+CreatedName
+    <- Identifier NonWildcardTypeArguments? (DOT Identifier NonWildcardTypeArguments?)*
+
+InnerCreator
+    <- Identifier ClassCreatorRest
+
+ArrayCreatorRest
+    <- LBRK ( RBRK Dim* ArrayInitializer / Expression RBRK DimExpr* Dim* )
+
+    # This is more generous than JLS 15.10. According to that definition,
+    # BasicType must be followed by at least one DimExpr or by ArrayInitializer.
+
+
+ClassCreatorRest
+    <- Diamond? Arguments ClassBody?
+
+Diamond
+    <- LPOINT RPOINT
+
+ArrayInitializer
+    <- LWING (VariableInitializer (COMMA VariableInitializer)*)? COMMA?	 RWING
+
+VariableInitializer
+    <- ArrayInitializer
+    / Expression
+
+ParExpression
+    <- LPAR Expression RPAR
+
+QualifiedIdentifier
+    <- Identifier (DOT Identifier)*
+
+Dim
+    <- LBRK RBRK { eatString (auxil, "[]", 2); }
+
+DimExpr
+    <- LBRK Expression RBRK
+
+#-------------------------------------------------------------------------
+#  Types and Modifiers
+#-------------------------------------------------------------------------
+
+Type
+    <- (BasicType / ClassType) Dim*
+
+ReferenceType
+    <- BasicType Dim+
+    / ClassType Dim*
+
+ClassType
+    <- Identifier TypeArguments? (DOT {
+	   eatChar (auxil, '.');
+       } Identifier TypeArguments?)*
+
+ClassTypeList
+    <- ClassType (COMMA { eatChar (auxil, ','); } ClassType)*
+
+TypeArguments
+    <- LPOINT {
+	  enterTypeArguments (auxil);
+	  eatChar(auxil, '<');
+       } TypeArgument (COMMA {
+	  eatChar(auxil, ',');
+       } TypeArgument)* RPOINT {
+	  eatChar(auxil, '>');
+	  leaveTypeArguments (auxil);
+       }
+
+TypeArgument
+    <- ReferenceType
+    / QUERY { eatChar(auxil, '?'); } ((EXTENDS {
+	eatString (auxil, " extends ", 9);
+    } / SUPER {
+	eatString (auxil, " super ", 7);
+    } ) ReferenceType)?
+
+TypeParameters
+    <- LPOINT TypeParameter (COMMA TypeParameter)* RPOINT
+
+TypeParameter
+    <- Identifier (EXTENDS Bound)?
+
+Bound
+    <- ClassType (AND ClassType)*
+
+Modifier
+    <- Annotation
+    / ( 'public'       { markModifier (auxil, JMOD_PUBLIC); }
+      / 'protected'    { markModifier (auxil, JMOD_PROTECTED); }
+      / 'private'      { markModifier (auxil, JMOD_PRIVATE); }
+      / 'static'       { markModifier (auxil, JMOD_STATIC); }
+      / 'abstract'     { markModifier (auxil, JMOD_ABSTRACT); }
+      / 'final'	       { markModifier (auxil, JMOD_FINAL); }
+      / 'native'       { markModifier (auxil, JMOD_NATIVE); }
+      / 'synchronized' { markModifier (auxil, JMOD_SYNCHRONIZED); }
+      / 'transient'    { markModifier (auxil, JMOD_TRANSIENT); }
+      / 'volatile'     { markModifier (auxil, JMOD_VOLATILE); }
+      / 'strictfp'     { markModifier (auxil, JMOD_STRICTFP); }
+      ) !LetterOrDigit Spacing
+
+    # This common definition of Modifier is part of the modification
+    # in JLS Chapter 18 to minimize look ahead. The main body of JLS has
+    # different lists of modifiers for different language elements.
+
+#-------------------------------------------------------------------------
+#  Annotations
+#-------------------------------------------------------------------------
+
+AnnotationTypeDeclaration
+    <- AT INTERFACE { activateSink(auxil, S_NAME); } Identifier {
+	enterAnnotationDecl (auxil);
+    } AnnotationTypeBody {
+	leaveAnnotationDecl (auxil);
+    }
+
+AnnotationTypeBody
+    <- LWING AnnotationTypeElementDeclaration* RWING
+
+AnnotationTypeElementDeclaration
+    <- { resetModifier (auxil); } Modifier* AnnotationTypeElementRest
+    / SEMI
+
+AnnotationTypeElementRest
+    <- Type AnnotationMethodOrConstantRest SEMI
+    / ClassDeclaration
+    / EnumDeclaration
+    / InterfaceDeclaration
+    / AnnotationTypeDeclaration
+
+AnnotationMethodOrConstantRest
+    <- AnnotationMethodRest
+    / AnnotationConstantRest
+
+AnnotationMethodRest
+    <- {
+	activateSink(auxil, S_NAME);
+    } Identifier {
+	enterMethod (auxil);
+    } LPAR RPAR DefaultValue? {
+	leaveMethod (auxil);
+    }
+
+AnnotationConstantRest
+    <- {
+	pushModifier (auxil);
+	pushVarKind(auxil, K_FIELD);
+    } VariableDeclarators {
+	popVarKind(auxil);
+	popModifier (auxil);
+    }
+
+DefaultValue
+    <- DEFAULT ElementValue
+
+Annotation
+    <- NormalAnnotation
+    / SingleElementAnnotation
+    / MarkerAnnotation
+
+NormalAnnotation
+    <- AT QualifiedIdentifier LPAR ElementValuePairs? RPAR
+
+SingleElementAnnotation
+    <- AT QualifiedIdentifier LPAR ElementValue RPAR
+
+MarkerAnnotation
+    <- AT QualifiedIdentifier
+
+ElementValuePairs
+    <- ElementValuePair (COMMA ElementValuePair)*
+
+ElementValuePair
+    <- Identifier EQU ElementValue
+
+ElementValue
+    <- ConditionalExpression
+    / Annotation
+    / ElementValueArrayInitializer
+
+ElementValueArrayInitializer
+    <- LWING ElementValues? COMMA? RWING
+
+ElementValues
+    <- ElementValue (COMMA ElementValue)*
+
+
+#=========================================================================
+#  Lexical Structure
+#=========================================================================
+#-------------------------------------------------------------------------
+#  JLS 3.6-7  Spacing
+#-------------------------------------------------------------------------
+
+Spacing
+     <- ( [ \t\r\n]+		  # WhiteSpace [ \t\r\n\u000C]+
+      / '/*' (!'*/' .)* '*/'	  # TraditionalComment
+      / '//' (![\r\n] .)* [\r\n]  # EndOfLineComment
+      )*
+
+#-------------------------------------------------------------------------
+#  JLS 3.8  Identifiers
+#-------------------------------------------------------------------------
+
+Identifier <- < !Keyword Letter LetterOrDigit* > Spacing {
+	       eatIdentifier(auxil, $1, $1s, $1e);
+	   }
+
+Letter <- [a-z] / [A-Z] / [_$]
+
+LetterOrDigit <- [a-z] / [A-Z] / [0-9] / [_$]
+
+    # These are traditional definitions of letters and digits.
+    # JLS defines letters and digits as Unicode characters recognized
+    # as such by special Java procedures, which is difficult
+    # to express in terms of Parsing Expressions.
+
+#-------------------------------------------------------------------------
+#  JLS 3.9  Keywords
+#  More precisely: reserved words. According to JLS, "true", "false",
+#  and "null" are technically not keywords - but still must not appear
+#  as identifiers. Keywords "const" and "goto" are not used; JLS explains
+#  the reason.
+#-------------------------------------------------------------------------
+
+Keyword
+   <- ( 'abstract'
+      / 'assert'
+      / 'boolean'
+      / 'break'
+      / 'byte'
+      / 'case'
+      / 'catch'
+      / 'char'
+      / 'class'
+      / 'const'
+      / 'continue'
+      / 'default'
+      / 'double'
+      / 'do'
+      / 'else'
+      / 'enum'
+      / 'extends'
+      / 'false'
+      / 'finally'
+      / 'final'
+      / 'float'
+      / 'for'
+      / 'goto'
+      / 'if'
+      / 'implements'
+      / 'import'
+      / 'interface'
+      / 'int'
+      / 'instanceof'
+      / 'long'
+      / 'native'
+      / 'new'
+      / 'null'
+      / 'package'
+      / 'private'
+      / 'protected'
+      / 'public'
+      / 'return'
+      / 'short'
+      / 'static'
+      / 'strictfp'
+      / 'super'
+      / 'switch'
+      / 'synchronized'
+      / 'this'
+      / 'throws'
+      / 'throw'
+      / 'transient'
+      / 'true'
+      / 'try'
+      / 'void'
+      / 'volatile'
+      / 'while'
+      ) !LetterOrDigit
+
+ASSERT	     <- 'assert'       !LetterOrDigit Spacing
+BREAK	     <- 'break'	       !LetterOrDigit Spacing
+CASE	     <- 'case'	       !LetterOrDigit Spacing
+CATCH	     <- 'catch'	       !LetterOrDigit Spacing
+CLASS	     <- 'class'	       !LetterOrDigit Spacing
+CONTINUE     <- 'continue'     !LetterOrDigit Spacing
+DEFAULT	     <- 'default'      !LetterOrDigit Spacing
+DO	     <- 'do'	       !LetterOrDigit Spacing
+ELSE	     <- 'else'	       !LetterOrDigit Spacing
+ENUM	     <- 'enum'	       !LetterOrDigit Spacing
+EXTENDS	     <- 'extends'      !LetterOrDigit Spacing
+FINALLY	     <- 'finally'      !LetterOrDigit Spacing
+FINAL	     <- 'final'	       !LetterOrDigit Spacing
+FOR	     <- 'for'	       !LetterOrDigit Spacing
+IF	     <- 'if'	       !LetterOrDigit Spacing
+IMPLEMENTS   <- 'implements'   !LetterOrDigit Spacing
+IMPORT	     <- 'import'       !LetterOrDigit Spacing
+INTERFACE    <- 'interface'    !LetterOrDigit Spacing
+INSTANCEOF   <- 'instanceof'   !LetterOrDigit Spacing
+NEW	     <- 'new'	       !LetterOrDigit Spacing
+PACKAGE	     <- 'package'      !LetterOrDigit Spacing
+RETURN	     <- 'return'       !LetterOrDigit Spacing
+STATIC	     <- 'static' {
+		 markModifier (auxil, JMOD_STATIC);
+	     } !LetterOrDigit Spacing
+SUPER	     <- 'super'	       !LetterOrDigit Spacing
+SWITCH	     <- 'switch'       !LetterOrDigit Spacing
+SYNCHRONIZED <- 'synchronized' !LetterOrDigit Spacing
+THIS	     <- 'this'	       !LetterOrDigit Spacing
+THROWS	     <- 'throws'       !LetterOrDigit Spacing
+THROW	     <- 'throw'	       !LetterOrDigit Spacing
+TRY	     <- 'try'	       !LetterOrDigit Spacing
+VOID	     <- 'void'	       !LetterOrDigit Spacing
+WHILE	     <- 'while'	       !LetterOrDigit Spacing
+
+#-------------------------------------------------------------------------
+#  JLS 3.10  Literals
+#-------------------------------------------------------------------------
+
+Literal
+   <- ( FloatLiteral
+      / IntegerLiteral		# May be a prefix of FloatLiteral
+      / CharLiteral
+      / StringLiteral
+      / 'true'	!LetterOrDigit
+      / 'false' !LetterOrDigit
+      / 'null'	!LetterOrDigit
+      ) Spacing
+
+IntegerLiteral
+   <- ( HexNumeral
+      / BinaryNumeral
+      / OctalNumeral		# May be a prefix of HexNumeral or BinaryNumeral
+      / DecimalNumeral		# May be a prefix of OctalNumeral
+      ) [lL]?
+
+DecimalNumeral <- '0' / [1-9] ([_]* [0-9])*
+
+HexNumeral     <- ('0x' / '0X') HexDigits
+
+BinaryNumeral  <- ('0b' / '0B') [01] ([_]* [01])*
+
+OctalNumeral   <- '0' ([_]* [0-7])+
+
+FloatLiteral   <- HexFloat / DecimalFloat
+
+DecimalFloat
+   <- Digits '.' Digits?  Exponent? [fFdD]?
+    / '.' Digits Exponent? [fFdD]?
+    / Digits Exponent [fFdD]?
+    / Digits Exponent? [fFdD]
+
+Exponent <- [eE] [+\-]? Digits
+
+HexFloat <- HexSignificand BinaryExponent [fFdD]?
+
+HexSignificand
+   <- ('0x' / '0X') HexDigits? '.' HexDigits
+    / HexNumeral '.'?				# May be a prefix of above
+
+BinaryExponent <- [pP] [+\-]? Digits
+
+Digits <- [0-9]([_]*[0-9])*
+
+HexDigits <- HexDigit ([_]*HexDigit)*
+
+HexDigit <- [a-f] / [A-F] / [0-9]
+
+CharLiteral <- ['] (Escape / !['\\] .) [']
+
+StringLiteral <- '\"' (Escape / !["\\\n\r] .)* '\"'
+
+Escape <- '\\' ([btnfr"'\\] / OctalEscape / UnicodeEscape)
+
+OctalEscape
+   <- [0-3][0-7][0-7]
+    / [0-7][0-7]
+    / [0-7]
+
+UnicodeEscape
+   <- 'u'+ HexDigit HexDigit HexDigit HexDigit
+
+#-------------------------------------------------------------------------
+#  JLS 3.11-12	Separators, Operators
+#-------------------------------------------------------------------------
+
+AT		<-   '@'       Spacing
+AND		<-   '&'![=&]  Spacing
+ANDAND		<-   '&&'      Spacing
+ANDEQU		<-   '&='      Spacing
+BANG		<-   '!' !'='  Spacing
+BSR		<-   '>>>' !'=' Spacing
+BSREQU		<-   '>>>='    Spacing
+COLON		<-   ':'       Spacing
+COMMA		<-   ',' {
+		    eatComma(auxil, $0s);
+		}	       Spacing
+DEC		<-   '--'      Spacing
+DIV		<-   '/' !'='  Spacing
+DIVEQU		<-   '/='      Spacing
+DOT		<-   '.'       Spacing
+ELLIPSIS	<-   '...'     Spacing
+EQU		<-   '=' !'='  Spacing
+EQUAL		<-   '=='      Spacing
+GE		<-   '>='      Spacing
+GT		<-   '>'![=>]  Spacing
+HAT		<-   '^' !'='	Spacing
+HATEQU		<-   '^='      Spacing
+INC		<-   '++'      Spacing
+LBRK		<-   '['       Spacing
+LE		<-   '<='      Spacing
+LPAR		<-   '('       Spacing
+LPOINT		<-   '<'       Spacing
+LT		<-   '<' ![=<]	Spacing
+LWING		<-   '{'       Spacing
+MINUS		<-   '-' ![=\-] Spacing
+MINUSEQU	<-   '-='      Spacing
+MOD		<-   '%' !'='	Spacing
+MODEQU		<-   '%='      Spacing
+NOTEQUAL	<-   '!='      Spacing
+OR		<-   '|' ![=|]	Spacing
+OREQU		<-   '|='      Spacing
+OROR		<-   '||'      Spacing
+PLUS		<-   '+' ![=+]	Spacing
+PLUSEQU		<-   '+='      Spacing
+QUERY		<-   '?'       Spacing
+RBRK		<-   ']'       Spacing
+RPAR		<-   ')'       Spacing
+RPOINT		<-   '>'       Spacing
+RWING		<-   '}' {
+		    eatRightwing(auxil, $0s);
+		}	       Spacing
+SEMI		<-   ';'       Spacing
+SL		<-   '<<' !'='	Spacing
+SLEQU		<-   '<<='     Spacing
+SR		<-   '>>' ![=>] Spacing
+SREQU		<-   '>>='     Spacing
+STAR		<-   '*' !'='	Spacing
+STAREQU		<-   '*='      Spacing
+TILDA		<-   '~'       Spacing
+
+EOT <- !.
+
+%%
+#include "java_post.h"
