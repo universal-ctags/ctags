@@ -259,6 +259,11 @@ extern void eFree (void *const ptr)
 	free (ptr);
 }
 
+extern void eFreeNoNullCheck (void *const ptr)
+{
+	free (ptr);
+}
+
 extern void eFreeIndirect(void **ptr)
 {
 	if (ptr && *ptr)
