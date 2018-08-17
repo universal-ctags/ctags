@@ -1,0 +1,8 @@
+STRU	input.fy	/^STRUC/;"	t
+X	input.fy	/^	INTEGER*4 X$/;"	k	type:STRU
+A0	input.fy	/^	INTEGER*4 A0$/;"	k	type:STRU
+B0	input.fy	/^	INTEGER*4 B0$/;"	k	type:STRU
+C	input.fy	/^	INTEGER*4 C$/;"	k	type:STRU
+B1	input.fy	/^	INTEGER*4 B1$/;"	k	type:STRU
+A1	input.fy	/^	INTEGER*4 A1$/;"	k	type:STRU
+Y	input.fy	/^	INTEGER*4 Y$/;"	k	type:STRU
