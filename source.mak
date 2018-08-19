@@ -135,6 +135,7 @@ PARSER_HEADS = \
 PARSER_SRCS =				\
 	parsers/ada.c			\
 	parsers/ant.c			\
+	parsers/asciidoc.c		\
 	parsers/asm.c			\
 	parsers/asp.c			\
 	parsers/autoconf.c		\

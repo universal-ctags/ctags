@@ -152,6 +152,7 @@
     <ClCompile Include="..\optlib\qemuhx.c" />
     <ClCompile Include="..\parsers\ada.c" />
     <ClCompile Include="..\parsers\ant.c" />
+    <ClCompile Include="..\parsers\asciidoc.c" />
     <ClCompile Include="..\parsers\asm.c" />
     <ClCompile Include="..\parsers\asp.c" />
     <ClCompile Include="..\parsers\autoconf.c" />

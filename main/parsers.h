@@ -38,6 +38,7 @@
 #define PARSER_LIST \
 	AdaParser, \
 	AntParser, \
+	AsciidocParser, \
 	AsmParser, \
 	AspParser, \
 	AutoconfParser, \

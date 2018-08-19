@@ -38,6 +38,7 @@ The following parsers have been added:
 
 * Ada
 * AnsiblePlaybook *libyaml*
+* Asciidoc
 * Autoconf
 * Automake
 * AutoIt
