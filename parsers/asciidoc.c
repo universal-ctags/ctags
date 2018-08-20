@@ -13,7 +13,7 @@
  * with the changes in geany's PR #1263, with some changes to work in uctags.
  *
  * TODO:
- *   - tag anchors (both long and short form)
+ *   - tag anchors inside one-line titles
  */
 
 /*
@@ -42,7 +42,8 @@ typedef enum {
 	K_SUBSUBSECTION,
 	K_LEVEL4SECTION,
 	/* level-5 section not in here because it only works for one-line */
-	SECTION_COUNT
+	SECTION_COUNT, /* this is the same as level-5 kind number */
+	K_ANCHOR
 } asciidocKind;
 
 /*
@@ -55,7 +56,8 @@ static kindDefinition AsciidocKinds[] = {
 	{ true, 'S', "subsection",    "level 2 sections" },
 	{ true, 't', "subsubsection", "level 3 sections" },
 	{ true, 'T', "l4subsection",  "level 4 sections" },
-	{ true, 'u', "l5subsection",  "level 5 sections" }
+	{ true, 'u', "l5subsection",  "level 5 sections" },
+	{ true, 'a', "anchor",        "anchors" }
 };
 
 static char kindchars[SECTION_COUNT]={ '=', '-', '~', '^', '+' };
@@ -121,6 +123,12 @@ static int makeAsciidocTag (const vString* const name, const int kind, const boo
 
 		r = makeTagEntry (&e);
 	}
+	return r;
+}
+
+static int makeSectionAsciidocTag (const vString* const name, const int kind, const bool two_line)
+{
+	int r = makeAsciidocTag(name, kind, two_line);
 	nestingLevelsPush(nestingLevels, r);
 	return r;
 }
@@ -136,6 +144,47 @@ static int get_kind(char c)
 			return i;
 	}
 	return -1;
+}
+
+
+static bool is_anchor(const unsigned char *line)
+{
+	/* must be at least "[#a]" */
+	return line[0] == '[' && (line[1] == '#' || line[1] == '[');
+}
+
+static int capture_anchor(const unsigned char *line)
+{
+	vString *name = vStringNew ();
+	int r = CORK_NIL;
+	const bool shorthand = line[1] == '#' ? true : false;
+
+	Assert (line[0] == '[');
+	Assert (line[1] == '#' || line[1] == '[');
+
+	line += 2;
+
+	while (*line != '\0')
+	{
+		if (*line == ']')
+		{
+			if (shorthand)
+				break;
+			else if (line[1] == ']')
+				break;
+			/* otherwise it's not the end, keep going */			
+		}
+		vStringPut (name, *line);
+		line++;
+	}
+
+	if (vStringLength (name) != 0)
+	{
+		r = makeAsciidocTag (name, K_ANCHOR, false);
+	}
+
+	vStringDelete (name);
+	return r;
 }
 
 
@@ -179,6 +228,15 @@ static void findAsciidocTags(void)
 
 	while ((line = readLineFromInputFile()) != NULL)
 	{
+		if (is_anchor (line))
+		{
+			if (capture_anchor (line) != CORK_NIL)
+			{
+				vStringClear (name);
+				continue;
+			}
+		}
+
 		int line_len = strlen((const char*) line);
 		int name_len_bytes = vStringLength(name);
 		int name_len = utf8_strlen(vStringValue(name), name_len_bytes);
@@ -213,7 +271,7 @@ static void findAsciidocTags(void)
 					int kind = get_kind((char)(line[0]));
 					if (kind >= 0)
 					{
-						makeAsciidocTag(name, kind, true);
+						makeSectionAsciidocTag(name, kind, true);
 						continue;
 					}
 				}
@@ -240,7 +298,7 @@ static void findAsciidocTags(void)
 				while (isspace(line[end]))--end;
 				vStringClear(name);
 				vStringNCatS(name, (const char*)(&(line[start])), end - start + 1);
-				makeAsciidocTag(name, kind, false);
+				makeSectionAsciidocTag(name, kind, false);
 				continue;
 			}
 		}
