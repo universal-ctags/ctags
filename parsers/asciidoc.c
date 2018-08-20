@@ -14,7 +14,6 @@
  *
  * TODO:
  *   - tag anchors (both long and short form)
- *   - add support for 5th level single-line title
  *   - for two-line titles, tag the first not second line pattern (i.e., fix filePosition)
  */
 
@@ -42,6 +41,7 @@ typedef enum {
 	K_SUBSECTION,
 	K_SUBSUBSECTION,
 	K_LEVEL4SECTION,
+	/* level-5 section not in here because it only works for one-line */
 	SECTION_COUNT
 } asciidocKind;
 
@@ -54,7 +54,8 @@ static kindDefinition AsciidocKinds[] = {
 	{ true, 's', "section",       "sections" },
 	{ true, 'S', "subsection",    "level 2 sections" },
 	{ true, 't', "subsubsection", "level 3 sections" },
-	{ true, 'T', "l4subsection",  "level 4 sections" }
+	{ true, 'T', "l4subsection",  "level 4 sections" },
+	{ true, 'u', "l5subsection",  "level 5 sections" }
 };
 
 static char kindchars[SECTION_COUNT]={ '=', '-', '~', '^', '+' };
@@ -218,7 +219,7 @@ static void findAsciidocTags(void)
 			}
 
 			/* otherwise is it a one line title */
-			else if (line[0] == '=' && n_same <= 5 && isspace(line[n_same]) &&
+			else if (line[0] == '=' && n_same <= 6 && isspace(line[n_same]) &&
 					!in_block)
 			{
 				int kind = n_same - 1;
