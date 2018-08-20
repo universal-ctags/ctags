@@ -624,6 +624,8 @@ are not listed here. They are experimental or debugging purpose.
 	which it is generally not desirable to descend while processing the
 	``--recurse`` option.
 
+	To see the built-in exclude patterns, use ``--list-excludes``.
+
 ``--excmd=type``
 	Determines the type of EX command used to locate tags in the source
 	file. [Ignored in etags mode]
@@ -1073,6 +1075,9 @@ are not listed here. They are experimental or debugging purpose.
 	Lists the aliases for either the specified language or all
 	languages, and then exits. The aliases are used in when guessing
 	a parser for a source file.
+
+``--list-excludes``
+	Lists the current exclusion patterns used to exclude files.
 
 ``--list-extras[=languages|all]``
 	Lists the extras recognized for either the specified language or
