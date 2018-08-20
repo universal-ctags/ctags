@@ -1,12 +1,14 @@
 /*
  *
+ *  Copyright (c) 2007-2011, Nick Treleaven
  * 	Copyright (c) 2012, Lex Trotman
- *   Based on Rest code by Nick Treleaven, see rest.c
  *
  *   This source code is released for free distribution under the terms of the
- *   GNU General Public License.
+ *   GNU General Public License version 2 or (at your option) any later version.
  *
- *   This module contains functions for generating tags for asciidoc files.
+ * This module contains functions for generating tags for asciidoc files.
+ *
+ * Based on Rest code by Nick Treleaven, see rest.c
  *
  * This code was ported from geany git commit 40396a3 at:
  *   https://github.com/geany/geany/blob/master/ctags/parsers/asciidoc.c
