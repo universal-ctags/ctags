@@ -13,6 +13,7 @@ This section deals with individual parser topics.
 	:maxdepth: 2
 
 	parser-asm.rst
+	parser-cmake.rst
 	parser-cxx.rst
 	parser-html.rst
 	parser-puppetManifest.rst
