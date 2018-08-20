@@ -14,7 +14,6 @@
  *
  * TODO:
  *   - tag anchors (both long and short form)
- *   - for two-line titles, tag the first not second line pattern (i.e., fix filePosition)
  */
 
 /*
@@ -25,6 +24,7 @@
 #include <ctype.h>
 #include <string.h>
 
+#include "debug.h"
 #include "entry.h"
 #include "parse.h"
 #include "read.h"
@@ -83,7 +83,7 @@ static NestingLevel *getNestingLevel(const int kind)
 	return nl;
 }
 
-static int makeAsciidocTag (const vString* const name, const int kind)
+static int makeAsciidocTag (const vString* const name, const int kind, const bool two_line)
 {
 	const NestingLevel *const nl = getNestingLevel(kind);
 	int r = CORK_NIL;
@@ -95,7 +95,17 @@ static int makeAsciidocTag (const vString* const name, const int kind)
 
 		initTagEntry (&e, vStringValue (name), kind);
 
-		e.lineNumber--;	/* we want the line before the '---' underline chars */
+		if (two_line)
+		{
+			/* we want the line before the '---' underline chars */
+			const unsigned long line = getInputLineNumber();
+			Assert (line > 0);
+			if (line > 0)
+			{
+				e.lineNumber--;	
+				e.filePosition = getInputFilePositionForLine(line - 1);
+			}
+		}
 
 		if (parent && (parent->kindIndex < kind))
 		{
@@ -203,7 +213,7 @@ static void findAsciidocTags(void)
 					int kind = get_kind((char)(line[0]));
 					if (kind >= 0)
 					{
-						makeAsciidocTag(name, kind);
+						makeAsciidocTag(name, kind, true);
 						continue;
 					}
 				}
@@ -230,7 +240,7 @@ static void findAsciidocTags(void)
 				while (isspace(line[end]))--end;
 				vStringClear(name);
 				vStringNCatS(name, (const char*)(&(line[start])), end - start + 1);
-				makeAsciidocTag(name, kind);
+				makeAsciidocTag(name, kind, false);
 				continue;
 			}
 		}
