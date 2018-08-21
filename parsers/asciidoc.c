@@ -160,6 +160,7 @@ static int capture_anchor(const unsigned char *line)
 	vString *name = vStringNew ();
 	int r = CORK_NIL;
 	const bool shorthand = line[1] == '#' ? true : false;
+	bool is_valid = false;
 	bool seen_comma = false;
 
 	Assert (line[0] == '[');
@@ -171,10 +172,11 @@ static int capture_anchor(const unsigned char *line)
 	{
 		if (*line == ']')
 		{
-			if (shorthand)
+			if (shorthand || line[1] == ']')
+			{
+				is_valid = true;
 				break;
-			else if (line[1] == ']')
-				break;
+			}
 			/* otherwise it's not the end, keep going */			
 		}
 
@@ -187,7 +189,7 @@ static int capture_anchor(const unsigned char *line)
 		line++;
 	}
 
-	if (vStringLength (name) != 0)
+	if (is_valid && vStringLength (name) != 0)
 	{
 		r = makeAsciidocTag (name, K_ANCHOR, false);
 	}

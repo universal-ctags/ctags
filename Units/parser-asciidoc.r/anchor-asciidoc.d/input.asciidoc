@@ -20,7 +20,7 @@ Text of subsection 1.1.1.1
 [#section_1_2_anchor, The section 1.2 anchor]
 == Section 1.2
 
-Text of section 1.2
+[#invalid anchor for Text of section 1.2
 
 // and now two-line titles:
 
@@ -40,3 +40,9 @@ Text of section 2.1
 Subsection 2.1.1
 ~~~~~~~~~~~~~~~
 
+other invalid anchors:
+[[]]
+[#]
+[#,]
+[[]
+[#
