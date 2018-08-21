@@ -226,6 +226,29 @@ static int process_leading_anchors(const unsigned char *const begin)
 	return current - begin;
 }
 
+static int process_trailing_anchor(const unsigned char *const begin,
+								   const unsigned char *const end)
+{
+	int captured_len = 0;
+	const unsigned char *found = NULL;
+
+	/* minimum is "[#a]" */
+	if (*end == ']' && (end - begin) >= 4)
+	{
+		found = (const unsigned char*) strrchr((const char*) begin , '[');
+		if (found && ((end - found) >= 4))
+		{
+			/* see if it's not shorthand [#a] but instead [[a]] */
+			if (end[-1] == ']' && found > begin && found[-1] == '[')
+				--found;
+
+			capture_anchor(found, &captured_len);
+		}
+	}
+
+	return captured_len;
+}
+
 static void process_name(vString *const name, const int kind,
 						 const unsigned char *line, const int line_len)
 {
@@ -243,8 +266,11 @@ static void process_name(vString *const name, const int kind,
 
 	if (start < end)
 	{
+		end -= process_trailing_anchor(line + start, line + end);
 		start += process_leading_anchors(line + start);
 	}
+
+	while (isspace(line[end])) --end;
 
 	if (start < end)
 		vStringNCatS(name, (const char*)(&(line[start])), end - start + 1);

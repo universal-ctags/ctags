@@ -17,16 +17,20 @@ Text of subsection 1.1.1
 
 Text of subsection 1.1.1.1
 
+===== Level 4 Section 1.1.1.1.1 Title [#inline-anchor-1]
+
+Text of subsection 1.1.1.1
+
 [#section_1_2_anchor, The section 1.2 anchor]
 == Section 1.2
 
 [#invalid anchor for Text of section 1.2
 
-=== [#inline-anchor-1]Subsection 1.2.1 Title
+=== [#inline-anchor-2a]Subsection 1.2.1 Title [[inline-anchor-2b, Subsection 1.2.1]]
 
 Text of subsection 1.2.1
 
-=== [[inline-anchor-2a]][#inline-anchor-2b]Subsection 1.2.2 Title ===
+=== [[inline-anchor-3a]][#inline-anchor-3b]Subsection 1.2.2 Title [#inline-anchor-3c] ===
 
 Text of subsection 1.2.2
 
