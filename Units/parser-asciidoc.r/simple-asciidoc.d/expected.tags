@@ -1,0 +1,13 @@
+Chapter 1 (Level 0)	input.asciidoc	/^= Chapter 1 (Level 0)$/;"	c
+Chapter 2	input.asciidoc	/^Chapter 2$/;"	c
+Level 3 Section 1.1.1.1 Title	input.asciidoc	/^==== Level 3 Section 1.1.1.1 Title$/;"	t	subsection:Subsection 1.1.1
+Level 3 Section 2.1.1.1 Title	input.asciidoc	/^Level 3 Section 2.1.1.1 Title$/;"	t	subsection:Subsection 2.1.1
+Level 4 Section 1.1.1.1.1 Title	input.asciidoc	/^===== Level 4 Section 1.1.1.1.1 Title$/;"	T	subsubsection:Level 3 Section 1.1.1.1 Title
+Level 4 Section 2.1.1.1.1 Title	input.asciidoc	/^Level 4 Section 2.1.1.1.1 Title$/;"	T	subsubsection:Level 3 Section 2.1.1.1 Title
+Level 5 Section 1.1.1.1.1.1 Title	input.asciidoc	/^====== Level 5 Section 1.1.1.1.1.1 Title$/;"	u	l4subsection:Level 4 Section 1.1.1.1.1 Title
+Section 1.1	input.asciidoc	/^== Section 1.1$/;"	s	chapter:Chapter 1 (Level 0)
+Section 1.2	input.asciidoc	/^== Section 1.2$/;"	s	chapter:Chapter 1 (Level 0)
+Section 2.1	input.asciidoc	/^Section 2.1$/;"	s	chapter:Chapter 2
+Section 2.2	input.asciidoc	/^Section 2.2$/;"	s	chapter:Chapter 2
+Subsection 1.1.1	input.asciidoc	/^=== Subsection 1.1.1$/;"	S	section:Section 1.1
+Subsection 2.1.1	input.asciidoc	/^Subsection 2.1.1$/;"	S	section:Section 2.1

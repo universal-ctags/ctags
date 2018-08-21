@@ -1,0 +1,4 @@
+@Ѐ–𐀀	input.asc	/^=== @Ѐ–𐀀$/;"	S	section:Šéçtiön 1.1
+Chàptěr 1	input.asc	/^Chàptěr 1$/;"	c
+Subsubsection 1.1.1.1	input.asc	/^==== Subsubsection 1.1.1.1$/;"	t	subsection:@Ѐ–𐀀
+Šéçtiön 1.1	input.asc	/^Šéçtiön 1.1$/;"	s	chapter:Chàptěr 1
