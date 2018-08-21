@@ -12,6 +12,13 @@
 #	later version.
 #
 
+# rst2man and rst2html are part of python-docutils, and if not found
+# 	can be installed using pip ("pip install docutils"). On some
+#	systems, rst2man and rst2html are actually installed as rst2man.py
+#	and rst2html.py - create a symlink of that's the case.
+#
+# rst2pdf is a separate tool and can also be installed via pip (e.g.,
+# 	"pip install rst2pdf")
 RST2MAN  = rst2man
 RST2HTML = rst2html
 RST2PDF  = rst2pdf
