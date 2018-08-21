@@ -13,9 +13,6 @@
  * This code was ported from geany git commit 40396a3 at:
  *   https://github.com/geany/geany/blob/master/ctags/parsers/asciidoc.c
  * with the changes in geany's PR #1263, with some changes to work in uctags.
- *
- * TODO:
- *   - tag anchors inside one-line titles
  */
 
 /*
@@ -266,6 +263,8 @@ static void process_name(vString *const name, const int kind,
 
 	if (start < end)
 	{
+		/* pop nesting levels, so that anchors get the parent's scope */
+		getNestingLevel(kind);
 		end -= process_trailing_anchor(line + start, line + end);
 		start += process_leading_anchors(line + start);
 	}

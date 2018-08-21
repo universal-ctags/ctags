@@ -13,9 +13,9 @@ chapter_2_anchor	input.asciidoc	/^[[chapter_2_anchor]]$/;"	a	subsection:Subsecti
 inline-anchor-1	input.asciidoc	/^===== Level 4 Section 1.1.1.1.1 Title [#inline-anchor-1]$/;"	a	subsubsection:Level 3 Section 1.1.1.1 Title
 inline-anchor-2a	input.asciidoc	/^=== [#inline-anchor-2a]Subsection 1.2.1 Title [[inline-anchor-2b, Subsection 1.2.1]]$/;"	a	section:Section 1.2
 inline-anchor-2b	input.asciidoc	/^=== [#inline-anchor-2a]Subsection 1.2.1 Title [[inline-anchor-2b, Subsection 1.2.1]]$/;"	a	section:Section 1.2
-inline-anchor-3a	input.asciidoc	/^=== [[inline-anchor-3a]][#inline-anchor-3b]Subsection 1.2.2 Title [#inline-anchor-3c] ===$/;"	a	subsection:Subsection 1.2.1 Title
-inline-anchor-3b	input.asciidoc	/^=== [[inline-anchor-3a]][#inline-anchor-3b]Subsection 1.2.2 Title [#inline-anchor-3c] ===$/;"	a	subsection:Subsection 1.2.1 Title
-inline-anchor-3c	input.asciidoc	/^=== [[inline-anchor-3a]][#inline-anchor-3b]Subsection 1.2.2 Title [#inline-anchor-3c] ===$/;"	a	subsection:Subsection 1.2.1 Title
+inline-anchor-3a	input.asciidoc	/^=== [[inline-anchor-3a]][#inline-anchor-3b]Subsection 1.2.2 Title [#inline-anchor-3c] ===$/;"	a	section:Section 1.2
+inline-anchor-3b	input.asciidoc	/^=== [[inline-anchor-3a]][#inline-anchor-3b]Subsection 1.2.2 Title [#inline-anchor-3c] ===$/;"	a	section:Section 1.2
+inline-anchor-3c	input.asciidoc	/^=== [[inline-anchor-3a]][#inline-anchor-3b]Subsection 1.2.2 Title [#inline-anchor-3c] ===$/;"	a	section:Section 1.2
 section_1_1_1_1_anchor	input.asciidoc	/^[#section_1_1_1_1_anchor]$/;"	a	subsection:Subsection 1.1.1
 section_1_1_1_anchor	input.asciidoc	/^[[section_1_1_1_anchor, The section 1.1.1 anchor]]$/;"	a	section:Section 1.1
 section_1_1_anchor	input.asciidoc	/^[[section_1_1_anchor]]$/;"	a	chapter:Chapter 1 (Level 0)
