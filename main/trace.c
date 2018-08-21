@@ -56,6 +56,9 @@ void traceLeave(const char * szFunction,const char * szFormat,...)
 
 static void tracePrintFmtVa(const char * szFormat, va_list va)
 {
+	if (!isTraced())
+		return;
+
 	vfprintf(stderr,szFormat,va);
 }
 
