@@ -7,7 +7,7 @@ Intro text of chapter 1
 
 Text of section 1.1
 
-[[section_1_1_1_anchor]]
+[[section_1_1_1_anchor, The section 1.1.1 anchor]]
 === Subsection 1.1.1
 
 Text of subsection 1.1.1
@@ -17,7 +17,7 @@ Text of subsection 1.1.1
 
 Text of subsection 1.1.1.1
 
-[#section_1_2_anchor]
+[#section_1_2_anchor, The section 1.2 anchor]
 == Section 1.2
 
 Text of section 1.2

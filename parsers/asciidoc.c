@@ -160,6 +160,7 @@ static int capture_anchor(const unsigned char *line)
 	vString *name = vStringNew ();
 	int r = CORK_NIL;
 	const bool shorthand = line[1] == '#' ? true : false;
+	bool seen_comma = false;
 
 	Assert (line[0] == '[');
 	Assert (line[1] == '#' || line[1] == '[');
@@ -176,7 +177,13 @@ static int capture_anchor(const unsigned char *line)
 				break;
 			/* otherwise it's not the end, keep going */			
 		}
-		vStringPut (name, *line);
+
+		if (*line == ',')
+			seen_comma = true;
+
+		if (!seen_comma)
+			vStringPut (name, *line);
+
 		line++;
 	}
 

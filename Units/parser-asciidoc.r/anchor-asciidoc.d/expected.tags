@@ -8,8 +8,8 @@ Subsection 1.1.1	input.asciidoc	/^=== Subsection 1.1.1$/;"	S	section:Section 1.1
 Subsection 2.1.1	input.asciidoc	/^Subsection 2.1.1$/;"	S	section:Section 2.1
 chapter_2_anchor	input.asciidoc	/^[[chapter_2_anchor]]$/;"	a	section:Section 1.2
 section_1_1_1_1_anchor	input.asciidoc	/^[#section_1_1_1_1_anchor]$/;"	a	subsection:Subsection 1.1.1
-section_1_1_1_anchor	input.asciidoc	/^[[section_1_1_1_anchor]]$/;"	a	section:Section 1.1
+section_1_1_1_anchor	input.asciidoc	/^[[section_1_1_1_anchor, The section 1.1.1 anchor]]$/;"	a	section:Section 1.1
 section_1_1_anchor	input.asciidoc	/^[[section_1_1_anchor]]$/;"	a	chapter:Chapter 1 (Level 0)
-section_1_2_anchor	input.asciidoc	/^[#section_1_2_anchor]$/;"	a	subsubsection:Level 3 Section 1.1.1.1 Title
+section_1_2_anchor	input.asciidoc	/^[#section_1_2_anchor, The section 1.2 anchor]$/;"	a	subsubsection:Level 3 Section 1.1.1.1 Title
 section_2_1_1_anchor	input.asciidoc	/^[#section_2_1_1_anchor]$/;"	a	section:Section 2.1
 section_2_1_anchor	input.asciidoc	/^[[section_2_1_anchor]]$/;"	a	chapter:Chapter 2
