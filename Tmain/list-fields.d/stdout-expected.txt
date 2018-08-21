@@ -22,6 +22,7 @@ s	NONE	yes	NONE	s--	no	Scope of tag definition (`p' can be used for printing its
 t	typeref	yes	NONE	s--	no	Type and name of a variable or typedef
 x	xpath	no	NONE	s--	no	xpath for the tag
 z	kind	no	NONE	s--	no	Include the "kind:" key in kind field (use k or K) in tags output, kind full name in xref output
+-	properties	no	AutoIt	s--	no	properties (static, volatile, ...)
 -	properties	no	C	s--	no	properties (static, inline, mutable,...)
 -	captures	no	C++	s--	no	lambda capture list
 -	name	yes	C++	s--	no	aliased names

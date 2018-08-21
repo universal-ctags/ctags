@@ -14,6 +14,17 @@ For $i = 1 To 10
 Next
 Exit
 
+#cs
+Func Ignored()
+EndFunc
+#comments-start
+Func Ignored0()
+EndFunc
+#comments-end
+Func Ignored1()
+EndFunc
+#ce
+
 #Region All functions
 Func MyDouble($iValue)
     $iValue = $iValue * 2
@@ -21,6 +32,7 @@ Func MyDouble($iValue)
 EndFunc   ;==>MyDouble
 
 func MyDouble0($iValue)
+    Local $iSomething = 42
     $iValue = $iValue * 2
     Return $iValue
 EndFunc   ;==>MyDouble
@@ -29,4 +41,14 @@ EndFunc   ;==>MyDouble
     $iValue = $iValue * 2
     Return $iValue
 EndFunc
+
+Volatile Func MyVolatileDouble ($iValue)
+    Return $iValue * 2;
+EndFunc
+
+FUNC MyDummy($iValue)
+    LOCAL STATIC $iFirst = 0
+    STATIC LOCAL $iSecond = 1
+    RETURN $iValue * $iSecond + $iFirst
+ENDFUNC
 #EndRegion All functions

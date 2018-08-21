@@ -4,6 +4,7 @@ e       UCTAGSend           no      NONE             -i-    no    end lines of v
 p       UCTAGSscopeKind     no      NONE             s--    no    Kind of scope as full name
 r       UCTAGSroles         no      NONE             s--    no    Roles
 x       UCTAGSxpath         no      NONE             s--    no    xpath for the tag
+-       UCTAGSproperties    no      AutoIt           s--    no    properties (static, volatile, ...)
 -       UCTAGSproperties    no      C                s--    no    properties (static, inline, mutable,...)
 -       UCTAGScaptures      no      C++              s--    no    lambda capture list
 -       UCTAGSname          yes     C++              s--    no    aliased names
