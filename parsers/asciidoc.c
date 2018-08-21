@@ -155,16 +155,19 @@ static bool is_anchor(const unsigned char *line)
 	return line[0] == '[' && (line[1] == '#' || line[1] == '[');
 }
 
-static int capture_anchor(const unsigned char *line)
+static int capture_anchor(const unsigned char *const orig, int* captured_len)
 {
 	vString *name = vStringNew ();
 	int r = CORK_NIL;
-	const bool shorthand = line[1] == '#' ? true : false;
+	const bool shorthand = orig[1] == '#' ? true : false;
 	bool is_valid = false;
 	bool seen_comma = false;
+	const unsigned char *line = orig;
 
 	Assert (line[0] == '[');
 	Assert (line[1] == '#' || line[1] == '[');
+
+	if (captured_len) *captured_len = 0;
 
 	line += 2;
 
@@ -175,6 +178,8 @@ static int capture_anchor(const unsigned char *line)
 			if (shorthand || line[1] == ']')
 			{
 				is_valid = true;
+				if (shorthand) line++;
+				else line += 2;
 				break;
 			}
 			/* otherwise it's not the end, keep going */			
@@ -192,12 +197,34 @@ static int capture_anchor(const unsigned char *line)
 	if (is_valid && vStringLength (name) != 0)
 	{
 		r = makeAsciidocTag (name, K_ANCHOR, false);
+
+		if (captured_len)
+		{
+			*captured_len = line - orig;
+		}
 	}
 
 	vStringDelete (name);
 	return r;
 }
 
+
+/* skips any leading anchor(s) in a one-line title, generating tags for them */
+static int process_leading_anchors(const unsigned char *const begin)
+{
+	int captured_len = 0;
+	const unsigned char *current = begin;
+
+	while (is_anchor(current) && capture_anchor(current, &captured_len) != CORK_NIL)
+	{
+		/* minimum is "[#a]" */
+		Assert (captured_len >= 4);
+		current += captured_len;
+		while (isspace(*current)) ++current;
+	}
+
+	return current - begin;
+}
 
 static void process_name(vString *const name, const int kind,
 						 const unsigned char *line, const int line_len)
@@ -208,12 +235,19 @@ static void process_name(vString *const name, const int kind,
 	Assert (kind >= 0 && kind < K_ANCHOR);
 	Assert (line_len > start);
 
+	vStringClear(name);
+
 	while (line[end] == line[0]) --end;
 	while (isspace(line[start])) ++start;
 	while (isspace(line[end])) --end;
 
-	vStringClear(name);
-	vStringNCatS(name, (const char*)(&(line[start])), end - start + 1);
+	if (start < end)
+	{
+		start += process_leading_anchors(line + start);
+	}
+
+	if (start < end)
+		vStringNCatS(name, (const char*)(&(line[start])), end - start + 1);
 }
 
 
@@ -259,7 +293,7 @@ static void findAsciidocTags(void)
 	{
 		if (is_anchor (line))
 		{
-			if (capture_anchor (line) != CORK_NIL)
+			if (capture_anchor (line, NULL) != CORK_NIL)
 			{
 				vStringClear (name);
 				continue;

@@ -22,6 +22,14 @@ Text of subsection 1.1.1.1
 
 [#invalid anchor for Text of section 1.2
 
+=== [#inline-anchor-1]Subsection 1.2.1 Title
+
+Text of subsection 1.2.1
+
+=== [[inline-anchor-2a]][#inline-anchor-2b]Subsection 1.2.2 Title ===
+
+Text of subsection 1.2.2
+
 // and now two-line titles:
 
 [[chapter_2_anchor]]
