@@ -199,6 +199,24 @@ static int capture_anchor(const unsigned char *line)
 }
 
 
+static void process_name(vString *const name, const int kind,
+						 const unsigned char *line, const int line_len)
+{
+	int start = kind + 1;
+	int end = line_len - 1;
+
+	Assert (kind >= 0 && kind < K_ANCHOR);
+	Assert (line_len > start);
+
+	while (line[end] == line[0]) --end;
+	while (isspace(line[start])) ++start;
+	while (isspace(line[end])) --end;
+
+	vStringClear(name);
+	vStringNCatS(name, (const char*)(&(line[start])), end - start + 1);
+}
+
+
 /* computes the length of an UTF-8 string
  * if the string doesn't look like UTF-8, return -1
  * FIXME consider East_Asian_Width Unicode property */
@@ -302,13 +320,7 @@ static void findAsciidocTags(void)
 					!in_block)
 			{
 				int kind = n_same - 1;
-				int start = n_same;
-				int end = line_len - 1;
-				while (line[end] == line[0])--end;
-				while (isspace(line[start]))++start;
-				while (isspace(line[end]))--end;
-				vStringClear(name);
-				vStringNCatS(name, (const char*)(&(line[start])), end - start + 1);
+				process_name(name, kind, line, line_len);
 				makeSectionAsciidocTag(name, kind, false);
 				continue;
 			}
