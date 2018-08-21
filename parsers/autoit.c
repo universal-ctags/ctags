@@ -8,9 +8,6 @@
 *   This module contains functions for generating tags for AutoIt functions.
 *   Homepage             https://www.autoitscript.com/site/autoit/
 *   Online Documentation https://www.autoitscript.com/autoit3/docs/
-*
-*   Functions: (?i)^func[ \t]{1,}([a-z0-9_]{1,}) >> \1
-*   Regions:   (?i)^#region[ \t]*(.*?)           >> \1
 */
 
 /*
