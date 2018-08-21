@@ -1,7 +1,7 @@
 A Rule with PCRE causes a failure to load snort.conf. Why 	input.tex	/^\\subsection{A Rule with PCRE causes a failure to load snort.conf.  Why?}$/;"	u	section:Problems
 After I add new rules or comment out rules how do I make Snort reload 	input.tex	/^\\subsection{After I add new rules or comment out rules how do I make Snort reload?}$/;"	u	section:Rules and Alerts
 Are rule keywords ORed or ANDed together 	input.tex	/^\\subsection{Are rule keywords ORed or ANDed together?}$/;"	u	section:Rules and Alerts
-Are there other output systems for Snort besides   Barnyard    label  spoolers	input.tex	/^\\subsection{Are there other output systems for Snort besides ``Barnyard''?\\label{spoolers}}$/;"	u	section:Getting Fancy
+Are there other output systems for Snort besides   Barnyard    label  spoolers 	input.tex	/^\\subsection{Are there other output systems for Snort besides ``Barnyard''?\\label{spoolers}}$/;"	u	section:Getting Fancy
 BASE appears to be broken in Lynx	input.tex	/^\\subsection{BASE appears to be broken in Lynx }$/;"	u	section:Problems
 Background	input.tex	/^\\section{Background}$/;"	s
 Can Snort be evaded by the use of polymorphic mutators on shellcode 	input.tex	/^\\subsection{Can Snort be evaded by the use of polymorphic mutators on shellcode?}$/;"	u	section:Background
@@ -58,7 +58,7 @@ I am getting too many   IIS Unicode attack detected   and  or   CGI Null Byte at
 I am still getting bombarded with spp  _portscan messages even though the IP that I am getting the portscan from is in my  $DNS  _SERVERs var	input.tex	/^\\subsection{I am still getting bombarded with spp\\_portscan messages even though the IP that I/;"	u	section:Problems
 I am using Snort on Windows and receive an   OpenPcap   error upon startup: ERROR: OpenPcap   device open: Error opening adapter   message. What  s wrong 	input.tex	/^\\subsection{I am using Snort on Windows and receive an ``OpenPcap() error upon startup: ERROR: /;"	u	section:Problems
 I have one network card and two aliases  how can I force Snort to   listen   on both addresses 	input.tex	/^\\subsection{I have one network card and two aliases, how can I force Snort to ``listen'' on bot/;"	u	section:Configuring Snort
-I hear people talking about   Barnyard   . What  s that  label  barnyard	input.tex	/^\\subsection{I hear people talking about ``Barnyard''. What's that?\\label{barnyard}}$/;"	u	section:Getting Fancy
+I hear people talking about   Barnyard   . What  s that  label  barnyard 	input.tex	/^\\subsection{I hear people talking about ``Barnyard''. What's that?\\label{barnyard}}$/;"	u	section:Getting Fancy
 I just downloaded a new ruleset and now Snort fails  complaining about the rules.	input.tex	/^\\subsection{I just downloaded a new ruleset and now Snort fails, complaining about the$/;"	u	section:Problems
 I think I found a bug in Snort. Now what 	input.tex	/^\\subsection{ I think I found a bug in Snort. Now what?}$/;"	u	section:Problems
 I try to start Snort and it gives an error like   ERROR: Unable to open rules file:  root  .snortrc or  root   root  .snortrc.   What can I do to fix this 	input.tex	/^\\subsection{I try to start Snort and it gives an error like ``ERROR: Unable to open$/;"	u	section:Problems
@@ -110,10 +110,10 @@ What is the use of the   -r   switch to read tcpdump files 	input.tex	/^\\subsec
 What the heck is a   Stealth scan   	input.tex	/^\\subsection{What the heck is a ``Stealth scan''?}$/;"	u	section:Configuring Snort
 What the heck is a SYNFIN scan 	input.tex	/^\\subsection{What the heck is a SYNFIN scan? }$/;"	u	section:Rules and Alerts
 What the heck is a SYNFIN scan 	input.tex	/^\\subsection{What the heck is a SYNFIN scan?}$/;"	u	section:Configuring Snort
-What version of Winpcap do I need  label  winpcap	input.tex	/^\\subsection{What version of Winpcap do I need?\\label{winpcap}}$/;"	u	section:Getting Started
+What version of Winpcap do I need  label  winpcap 	input.tex	/^\\subsection{What version of Winpcap do I need?\\label{winpcap}}$/;"	u	section:Getting Started
 Where  s a good place to physically put a Snort sensor 	input.tex	/^\\subsection{Where's a good place to physically put a Snort sensor?}$/;"	u	section:Getting Started
 Where are my log files located  What are they named 	input.tex	/^\\subsection{Where are my log files located?  What are they named?}$/;"	u	section:Getting Started
-Where can I get more reading and courses about IDS  label  courses	input.tex	/^\\subsection{Where can I get more reading and courses about IDS?\\label{courses}}$/;"	u	section:Background
+Where can I get more reading and courses about IDS  label  courses 	input.tex	/^\\subsection{Where can I get more reading and courses about IDS?\\label{courses}}$/;"	u	section:Background
 Where do I find binary packages for BlueHat BSD-Linux-RT 	input.tex	/^\\subsection{Where do I find binary packages for BlueHat BSD-Linux-RT?}$/;"	u	section:Getting Started
 Where do I get more help on Snort 	input.tex	/^\\subsection{Where do I get more help on Snort?}$/;"	u	section:Background
 Where do I get the latest version of Winpcap 	input.tex	/^\\subsection{Where do I get the latest version of Winpcap?}$/;"	u	section:Getting Started
@@ -130,7 +130,7 @@ Why do many Snort rules have the flags P  TCP PuSH  and A  TCP ACK  set 	input.t
 Why does Snort complain about  var  log  snort 	input.tex	/^\\subsection{Why does Snort complain about \/var\/log\/snort?}$/;"	u	section:Getting Started
 Why does building Snort complain about missing references 	input.tex	/^\\subsection{Why does building Snort complain about missing references? }$/;"	u	section:Getting Started
 Why does building snort fail with errors about yylex and lex  _init 	input.tex	/^\\subsection{Why does building snort fail with errors about yylex and lex\\_init? }$/;"	u	section:Getting Started
-Why does chrooted Snort die when I send it a SIGHUP  label  chroot	input.tex	/^\\subsection{Why does chrooted Snort die when I send it a SIGHUP? \\label{chroot}}$/;"	u	section:Problems
+Why does chrooted Snort die when I send it a SIGHUP  label  chroot 	input.tex	/^\\subsection{Why does chrooted Snort die when I send it a SIGHUP? \\label{chroot}}$/;"	u	section:Problems
 Why does snort report   Packet loss statistics are unavailable under Linux   	input.tex	/^\\subsection{Why does snort report ``Packet loss statistics are unavailable under Linux?''}$/;"	u	section:Problems
 Why does the  error deleting alert  message occur when attempting to delete an alert with BASE 	input.tex	/^\\subsection{Why does the `error deleting alert' message occur when attempting to delete an aler/;"	u	section:Problems
 Why does the portscan plugin log   stealth   packets even though the host is in the portscan-ignorehosts list 	input.tex	/^\\subsection{Why does the portscan plugin log ``stealth'' packets even though the host is in the/;"	u	section:Configuring Snort

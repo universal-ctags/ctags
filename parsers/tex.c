@@ -436,12 +436,14 @@ static bool parseTag (tokenInfo *const token, texKind kind)
 
 	if (isType (token, TOKEN_OPEN_CURLY))
 	{
+		int depth = 1;
+
 		if (!readToken (token))
 		{
 			eof = true;
 			goto out;
 		}
-		while (! isType (token, TOKEN_CLOSE_CURLY) )
+		while (depth > 0)
 		{
 			/* if (isType (token, TOKEN_IDENTIFIER) && useLongName) */
 			if (useLongName)
@@ -455,6 +457,10 @@ static bool parseTag (tokenInfo *const token, texKind kind)
 				eof = true;
 				goto out;
 			}
+			else if (isType (token, TOKEN_OPEN_CURLY))
+				depth++;
+			else if (isType (token, TOKEN_CLOSE_CURLY))
+				depth--;
 		}
 		if (useLongName)
 		{
