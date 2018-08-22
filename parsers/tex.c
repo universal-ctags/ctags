@@ -408,7 +408,7 @@ static bool parseTag (tokenInfo *const token, texKind kind)
 			{
 				if (vStringLength (fullname) > 0)
 					vStringPut (fullname, ' ');
-				vStringCatS (fullname, vStringValue (token->string));
+				vStringCat (fullname, token->string);
 			}
 			if (!readToken (token))
 			{
@@ -452,7 +452,7 @@ static bool parseTag (tokenInfo *const token, texKind kind)
 			if (useLongName)
 			{
 				if (isType (token, TOKEN_IDENTIFIER) || isType (token, TOKEN_KEYWORD))
-					vStringCatS (fullname, vStringValue (token->string));
+					vStringCat (fullname, token->string);
 				else
 					vStringPut (fullname, token->type);
 			}
