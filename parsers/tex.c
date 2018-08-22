@@ -284,11 +284,12 @@ getNextChar:
 	do
 	{
 		c = getcFromInputFile ();
-		token->lineNumber   = getInputLineNumber ();
-		token->filePosition = getInputFilePosition ();
 		whitespaces++;
 	}
 	while (c == '\t'  ||  c == ' ' ||  c == '\n');
+
+	token->lineNumber   = getInputLineNumber ();
+	token->filePosition = getInputFilePosition ();
 
 	if (includeWhitespaces && whitespaces > 0 && c != '%' && c != EOF)
 	{
@@ -314,8 +315,6 @@ getNextChar:
 				  {
 					  vStringPut (token->string, '\\');
 					  parseIdentifier (token->string, c);
-					  token->lineNumber = getInputLineNumber ();
-					  token->filePosition = getInputFilePosition ();
 					  token->keyword = lookupKeyword (vStringValue (token->string) + 1, Lang_tex);
 					  if (isKeyword (token, KEYWORD_NONE))
 						  token->type = TOKEN_IDENTIFIER;
@@ -333,8 +332,6 @@ getNextChar:
 				  if (isIdentChar (c))
 				  {
 					  parseIdentifier (token->string, c);
-					  token->lineNumber = getInputLineNumber ();
-					  token->filePosition = getInputFilePosition ();
 					  token->type = TOKEN_IDENTIFIER;
 				  }
 				  break;
