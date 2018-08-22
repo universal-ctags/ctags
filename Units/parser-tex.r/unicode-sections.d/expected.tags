@@ -1,0 +1,3 @@
+ABC	input.tex	/^\\section{ABC}$/;"	s
+DEF	input.tex	/^\\section{DEF}$/;"	s
+ZÖZÜZÄZßZ	input.tex	/^\\section{ZÖZÜZÄZßZ}$/;"	s
