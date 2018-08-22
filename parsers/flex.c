@@ -268,7 +268,7 @@ static void makeFlexTag (tokenInfo *const token, flexKind kind)
 			fulltag = vStringNew ();
 			vStringCopy(fulltag, token->scope);
 			vStringPut (fulltag, '.');
-			vStringCatS (fulltag, vStringValue(token->string));
+			vStringCat (fulltag, token->string);
 			vStringCopy(token->string, fulltag);
 			vStringDelete (fulltag);
 		}
@@ -287,7 +287,7 @@ static void makeClassTag (tokenInfo *const token)
 		{
 			vStringCopy(fulltag, token->scope);
 			vStringPut (fulltag, '.');
-			vStringCatS (fulltag, vStringValue(token->string));
+			vStringCat (fulltag, token->string);
 		}
 		else
 		{
@@ -313,7 +313,7 @@ static void makeMXTag (tokenInfo *const token)
 		{
 			vStringCopy(fulltag, token->scope);
 			vStringPut (fulltag, '.');
-			vStringCatS (fulltag, vStringValue(token->string));
+			vStringCat (fulltag, token->string);
 		}
 		else
 		{
@@ -335,7 +335,7 @@ static void makeFunctionTag (tokenInfo *const token)
 		{
 			vStringCopy(fulltag, token->scope);
 			vStringPut (fulltag, '.');
-			vStringCatS (fulltag, vStringValue(token->string));
+			vStringCat (fulltag, token->string);
 		}
 		else
 		{
@@ -800,7 +800,7 @@ static void addContext (tokenInfo* const parent, const tokenInfo* const child)
 	{
 		vStringPut (parent->string, '.');
 	}
-	vStringCatS (parent->string, vStringValue(child->string));
+	vStringCat (parent->string, child->string);
 }
 
 static void addToScope (tokenInfo* const token, vString* const extra)
@@ -809,7 +809,7 @@ static void addToScope (tokenInfo* const token, vString* const extra)
 	{
 		vStringPut (token->scope, '.');
 	}
-	vStringCatS (token->scope, vStringValue(extra));
+	vStringCat (token->scope, extra);
 }
 
 /*
@@ -1857,7 +1857,7 @@ static bool parseStatement (tokenInfo *const token)
 				{
 					vStringCopy(fulltag, token->scope);
 					vStringPut (fulltag, '.');
-					vStringCatS (fulltag, vStringValue(token->string));
+					vStringCat (fulltag, token->string);
 				}
 				else
 				{
