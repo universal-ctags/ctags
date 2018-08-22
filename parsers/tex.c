@@ -35,7 +35,7 @@
 #define isType(token,t)		(bool) ((token)->type == (t))
 #define isKeyword(token,k)	(bool) ((token)->keyword == (k))
 #define isIdentChar(c) \
-	(isalpha (c) || isdigit (c) || (c) == '$' || \
+	(isalpha (c) || isdigit (c) || (((unsigned char) c) >= 0x80) || (c) == '$' || \
 		(c) == '_' || (c) == '#' || (c) == '-' || (c) == '.' || (c) == ':')
 
 /*
