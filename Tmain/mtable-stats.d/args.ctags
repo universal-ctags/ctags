@@ -1,0 +1,24 @@
+--langdef=FOO
+--map-FOO=+.foo
+
+--kinddef-FOO=n,namespace,namespaces
+--kinddef-FOO=c,class,classes
+--kinddef-FOO=v,variable,variables
+
+--_tabledef-FOO=main
+--_tabledef-FOO=block
+--_tabledef-FOO=blockEnd
+--_tabledef-FOO=skipWhitespace
+
+--_mtable-regex-FOO=skipWhitespace/[ \t\n]+//
+
+--_mtable-regex-FOO=main/namespace ([a-zA-Z]+) \{/\1/n/{tenter=block,blockEnd}{scope=push}
+--_mtable-extend-FOO=main+skipWhitespace
+--_mtable-regex-FOO=main///
+
+--_mtable-regex-FOO=blockEnd/\};?//{scope=pop}
+--_mtable-extend-FOO=blockEnd+skipWhitespace
+
+--_mtable-regex-FOO=block/class ([a-zA-Z]+) \{/\1/c/{tenter=block,blockEnd}{scope=ref}{scope=push}
+--_mtable-regex-FOO=block/var ([a-zA-Z]+) ([a-zA-Z]+);/\2/v/{scope=ref}
+--_mtable-extend-FOO=block+skipWhitespace
