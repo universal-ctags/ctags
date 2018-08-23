@@ -129,6 +129,7 @@ typedef struct {
 	ptrArray *fieldPatterns;
 
 	char *pattern_string;
+	char *unescaped_pattern_string;
 	struct {
 		unsigned int match;
 		unsigned int unmatch;
@@ -198,6 +199,10 @@ static void deletePattern (void *ptrn)
 	}
 
 	eFree (p->pattern_string);
+
+	if (p->unescaped_pattern_string)
+		eFree (p->unescaped_pattern_string);
+
 	eFree (ptrn);
 }
 
@@ -462,6 +467,41 @@ static regexPattern * refPattern (regexPattern * ptrn)
 	return ptrn;
 }
 
+static regex_t* compileRegex (enum regexParserType regptype,
+							  const char* const regexp, const char* const flags);
+
+static ptrArray *copyFieldPatternArray(const ptrArray *const fieldPatterns);
+
+
+static regexPattern * copyPattern (const regexPattern *const orig)
+{
+	regexPattern *ptrn = xMalloc(1, regexPattern);
+
+	memcpy (ptrn, orig, sizeof(regexPattern));
+
+	ptrn->refcount = 1;
+
+	ptrn->pattern = NULL;
+	ptrn->unescaped_pattern_string = NULL;
+
+	if (orig->pattern && orig->unescaped_pattern_string)
+	{
+		ptrn->pattern = compileRegex (orig->regptype, orig->unescaped_pattern_string, NULL);
+		ptrn->unescaped_pattern_string = eStrdup (orig->unescaped_pattern_string);
+	}
+
+	if (ptrn->type == PTRN_TAG)
+	{
+		ptrn->u.tag.name_pattern = eStrdup(orig->u.tag.name_pattern);
+	}
+
+	ptrn->fieldPatterns = copyFieldPatternArray(orig->fieldPatterns);
+
+	ptrn->pattern_string = eStrdup (orig->pattern_string);
+
+	return ptrn;
+}
+
 static regexPattern * newPattern (regex_t* const pattern,
 								  enum regexParserType regptype)
 {
@@ -628,6 +668,26 @@ static void fieldPatternDelete (struct fieldPattern *fp)
 	eFree ((void *)fp->template);
 	eFree (fp);
 }
+
+static ptrArray *copyFieldPatternArray(const ptrArray *const fieldPatterns) 
+{
+	ptrArray *spec = NULL;
+
+	if (fieldPatterns)
+	{
+		spec = ptrArrayNew((ptrArrayDeleteFunc)fieldPatternDelete);
+
+		for (unsigned int i = 0; i < ptrArrayCount(fieldPatterns); i++)
+		{
+			const struct fieldPattern *const orig = ptrArrayItem(fieldPatterns, i);
+			struct fieldPattern *fp = fieldPatternNew(orig->ftype, orig->template);
+			ptrArrayAdd(spec, fp);
+		}
+	}
+
+	return spec;
+}
+
 
 static void pre_ptrn_flag_field_long (const char* const s CTAGS_ATTR_UNUSED, const char* const v, void* data)
 {
@@ -1464,6 +1524,7 @@ static regexPattern *addTagRegexInternal (struct lregexControlBlock *lcb,
 									  kindLetter, kindName, description, flags,
 									  disabled);
 		rptr->pattern_string = escapeRegexPattern(regex);
+		rptr->unescaped_pattern_string = eStrdup (regex);
 		if (kindName)
 			eFree (kindName);
 		if (description)
@@ -1535,6 +1596,7 @@ extern void addCallbackRegex (struct lregexControlBlock *lcb,
 		regexPattern *rptr = addCompiledCallbackPattern (lcb, cp, callback, flags,
 														 disabled, userData);
 		rptr->pattern_string = escapeRegexPattern(regex);
+		rptr->unescaped_pattern_string = eStrdup (regex);
 	}
 }
 
@@ -2007,7 +2069,11 @@ extern void extendRegexTable (struct lregexControlBlock *lcb, const char *src, c
 	for (i = 0; i < ptrArrayCount(src_table->patterns); i++)
 	{
 		regexPattern *ptrn = ptrArrayItem (src_table->patterns, i);
-		ptrArrayAdd(dist_table->patterns, refPattern(ptrn));
+
+		if (Option.mtableCopyExtended)
+			ptrArrayAdd(dist_table->patterns, copyPattern(ptrn));
+		else
+			ptrArrayAdd(dist_table->patterns, refPattern(ptrn));
 	}
 }
 
