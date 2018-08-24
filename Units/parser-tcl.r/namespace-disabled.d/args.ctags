@@ -1,0 +1,4 @@
+--sort=no
+--extras=+q
+--fields=+eE
+--kinds-Tcl=-n

@@ -146,7 +146,8 @@ extern int makeSimpleTag (
 {
 	int r = CORK_NIL;
 
-	if (isInputLanguageKindEnabled(kindIndex) &&  name != NULL  &&  vStringLength (name) > 0)
+	/* do not check for kind being disabled - that happens later in makeTagEntry() */
+	if (name != NULL  &&  vStringLength (name) > 0)
 	{
 		tagEntryInfo e;
 		initTagEntry (&e, vStringValue (name), kindIndex);
