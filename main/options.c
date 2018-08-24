@@ -169,6 +169,8 @@ optionValues Option = {
 	.putFieldPrefix = false,
 	.maxRecursionDepth = 0xffffffff,
 	.interactive = false,
+	.mtablePrintTotals = false,
+	.mtableCopyExtended = false,
 #ifdef DEBUG
 	.debugLevel = 0,
 	.breakLine = 0,
@@ -463,10 +465,14 @@ static optionDescription ExperimentalLongOptionDescription [] = {
  {1,"       Output list of flags which can be used with --langdef option."},
  {1,"  --_list-mtable-regex-flags"},
  {1,"       Output list of flags which can be used in a multitable regex parser definition."},
+ {1,"  --_mtable-copy-extended=[yes|no]"},
+ {1,"       Perform deep copying instead of just referencing, when extending tables using --_mtable-extend [no]."},
  {1,"  --_mtable-extend-<LANG>=disttable+srctable."},
  {1,"       Copy patterns of a regex table to another regex table."},
  {1,"  --_mtable-regex-<LANG>=table/line_pattern/name_pattern/[flags]"},
  {1,"       Define multitable regular expression for locating tags in specific language."},
+ {1,"  --_mtable-totals=[yes|no]"},
+ {1,"       Print statistics about mtable usage [no]."},
  {1,"  --_roledef-<LANG>=kind_letter.role_name,role_desc"},
  {1,"       Define new role for kind specified with <kind_letter> in <LANG>."},
  {1,"  --_tabledef-<LANG>=name"},
@@ -2757,6 +2763,8 @@ static booleanOption BooleanOptions [] = {
 	{ "verbose",        &Option.verbose,                false, STAGE_ANY },
 	{ "with-list-header", &localOption.withListHeader,       true,  STAGE_ANY },
 	{ "_fatal-warnings",&Option.fatalWarnings,          false, STAGE_ANY },
+	{ "_mtable-totals", &Option.mtablePrintTotals,      false, STAGE_ANY },
+	{ "_mtable-copy-extended",&Option.mtableCopyExtended,false, STAGE_ANY },
 };
 
 /*
