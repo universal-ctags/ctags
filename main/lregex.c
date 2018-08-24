@@ -243,28 +243,22 @@ extern void freeLregexControlBlock (struct lregexControlBlock* lcb)
 *   Regex pseudo-parser
 */
 
-static bool initRegexTag (tagEntryInfo *e,
+static void initRegexTag (tagEntryInfo *e,
 		const vString* const name, int kindIndex, int roleIndex, int scopeIndex, int placeholder,
 		unsigned long line, MIOPos *pos, int xtag_type)
 {
-	if (isInputLanguageKindEnabled (kindIndex))
+	Assert (name != NULL  &&  ((vStringLength (name) > 0) || placeholder));
+	initRefTagEntry (e, vStringValue (name), kindIndex, roleIndex);
+	e->extensionFields.scopeIndex = scopeIndex;
+	e->placeholder = !!placeholder;
+	if (line)
 	{
-		Assert (name != NULL  &&  ((vStringLength (name) > 0) || placeholder));
-		initRefTagEntry (e, vStringValue (name), kindIndex, roleIndex);
-		e->extensionFields.scopeIndex = scopeIndex;
-		e->placeholder = !!placeholder;
-		if (line)
-		{
-			e->lineNumber = line;
-			e->filePosition = *pos;
-		}
-
-		if (xtag_type != XTAG_UNKNOWN)
-			markTagExtraBit (e, xtag_type);
-
-		return true;
+		e->lineNumber = line;
+		e->filePosition = *pos;
 	}
-	return false;
+
+	if (xtag_type != XTAG_UNKNOWN)
+		markTagExtraBit (e, xtag_type);
 }
 
 /*
@@ -1125,6 +1119,7 @@ static void matchTagPattern (struct lregexControlBlock *lcb,
 	}
 	else
 	{
+		static TrashBox* field_trashbox;
 		unsigned long ln = 0;
 		MIOPos pos;
 		tagEntryInfo e;
@@ -1142,48 +1137,46 @@ static void matchTagPattern (struct lregexControlBlock *lcb,
 		kind = patbuf->u.tag.kindIndex;
 		roleBits = patbuf->u.tag.roleBits;
 
-		if (initRegexTag (&e, name, kind, ROLE_INDEX_DEFINITION, scope, placeholder,
-						  ln, ln == 0? NULL: &pos, patbuf->xtagType))
+		initRegexTag (&e, name, kind, ROLE_INDEX_DEFINITION, scope, placeholder,
+					  ln, ln == 0? NULL: &pos, patbuf->xtagType);
+
+		if (field_trashbox == NULL)
 		{
-			static TrashBox* field_trashbox;
-			if (field_trashbox == NULL)
-			{
-				field_trashbox = trashBoxNew();
-				DEFAULT_TRASH_BOX (field_trashbox, trashBoxDelete);
-			}
-
-			if (patbuf->fieldPatterns)
-			{
-				for (unsigned int i = 0; i < ptrArrayCount(patbuf->fieldPatterns); i++)
-				{
-					struct fieldPattern *fp = ptrArrayItem(patbuf->fieldPatterns, i);
-					if (isFieldEnabled (fp->ftype))
-					{
-						vString * const value = substitute (line, fp->template,
-															BACK_REFERENCE_COUNT, pmatch);
-						attachParserField (&e, fp->ftype, vStringValue (value));
-						trashBoxPut (field_trashbox, value,
-									 (TrashBoxDestroyItemProc)vStringDelete);
-					}
-				}
-			}
-
-			if (roleBits)
-			{
-				int roleIndex;
-
-				for (roleIndex = 0;
-					 roleIndex < countLanguageRoles(e.langType, kind);
-					 roleIndex++)
-				{
-					if (roleBits & makeRoleBit(roleIndex))
-						assignRole (&e, roleIndex);
-				}
-			}
-			n = makeTagEntry (&e);
-
-			trashBoxMakeEmpty(field_trashbox);
+			field_trashbox = trashBoxNew();
+			DEFAULT_TRASH_BOX (field_trashbox, trashBoxDelete);
 		}
+
+		if (patbuf->fieldPatterns)
+		{
+			for (unsigned int i = 0; i < ptrArrayCount(patbuf->fieldPatterns); i++)
+			{
+				struct fieldPattern *fp = ptrArrayItem(patbuf->fieldPatterns, i);
+				if (isFieldEnabled (fp->ftype))
+				{
+					vString * const value = substitute (line, fp->template,
+														BACK_REFERENCE_COUNT, pmatch);
+					attachParserField (&e, fp->ftype, vStringValue (value));
+					trashBoxPut (field_trashbox, value,
+								 (TrashBoxDestroyItemProc)vStringDelete);
+				}
+			}
+		}
+
+		if (roleBits)
+		{
+			int roleIndex;
+
+			for (roleIndex = 0;
+				 roleIndex < countLanguageRoles(e.langType, kind);
+				 roleIndex++)
+			{
+				if (roleBits & makeRoleBit(roleIndex))
+					assignRole (&e, roleIndex);
+			}
+		}
+		n = makeTagEntry (&e);
+
+		trashBoxMakeEmpty(field_trashbox);
 	}
 
 	if (patbuf->scopeActions & SCOPE_PUSH)
