@@ -6,6 +6,8 @@
 --kinddef-X=v,var,variables
 --kinddef-X=f,fun,functions
 
+--kinds-X=+{var}
+
 --_tabledef-X=main
 --_tabledef-X=comment_sharp_sa
 --_tabledef-X=comment_sharp_sharp
