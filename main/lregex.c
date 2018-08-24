@@ -130,6 +130,12 @@ typedef struct {
 
 	char *pattern_string;
 	char *unescaped_pattern_string;
+
+	struct {
+		errorSelection selection;
+		char *message_string;
+	} message;
+
 	struct {
 		unsigned int match;
 		unsigned int unmatch;
@@ -202,6 +208,9 @@ static void deletePattern (void *ptrn)
 
 	if (p->unescaped_pattern_string)
 		eFree (p->unescaped_pattern_string);
+
+	if (p->message.message_string)
+		eFree (p->message.message_string);
 
 	eFree (ptrn);
 }
@@ -499,6 +508,11 @@ static regexPattern * copyPattern (const regexPattern *const orig)
 
 	ptrn->pattern_string = eStrdup (orig->pattern_string);
 
+	if (orig->message.message_string)
+	{
+		ptrn->message.message_string = eStrdup(orig->message.message_string);
+	}
+
 	return ptrn;
 }
 
@@ -753,13 +767,50 @@ static flagDefinition fieldSpecFlagDef[] = {
 
 struct mtableFlagData {
 	struct lregexControlBlock *lcb;
-	struct mTableActionSpec *taction;
+	regexPattern *ptrn;
 };
+
+static void pre_ptrn_flag_msg_long (const char* const s, const char* const v, void* data)
+{
+	struct mtableFlagData *mdata = data;
+	regexPattern *ptrn = mdata->ptrn;
+
+	if (strcmp (s, "fatal") == 0)
+	{
+		ptrn->message.selection = FATAL;
+	}
+	else if (strcmp (s, "warning") == 0)
+	{
+		ptrn->message.selection = WARNING;
+	}
+
+	Assert (ptrn->message.selection != 0);
+
+	if (v && *v)
+	{
+		const char* begin = v;
+		const char* end = v + strlen (v);
+
+		if (*begin == '"' || *begin == '\'')
+		{
+			begin++;
+		}
+
+		if (end[-1] == '"' || end[-1] == '\'')
+		{
+			--end;
+		}
+
+		if (begin < end)
+			ptrn->message.message_string = eStrndup (begin, end - begin);
+	}
+}
+
 
 static void pre_ptrn_flag_mtable_long (const char* const s, const char* const v, void* data)
 {
 	struct mtableFlagData *mdata = data;
-	struct mTableActionSpec *taction = mdata->taction;
+	struct mTableActionSpec *taction = &mdata->ptrn->taction;
 	bool taking_table = true;
 
 	if (strcmp (s, "tenter") == 0)
@@ -820,6 +871,10 @@ static void pre_ptrn_flag_mtable_long (const char* const s, const char* const v,
 }
 
 static flagDefinition multitablePtrnFlagDef[] = {
+	{ '\0',  "fatal", NULL, pre_ptrn_flag_msg_long ,
+	  NULL, "print the given message at FATAL level"},
+	{ '\0',  "warning", NULL, pre_ptrn_flag_msg_long ,
+	  NULL, "print the given message at WARNING level"},
 	{ '\0',  "tenter", NULL, pre_ptrn_flag_mtable_long ,
 	  "TABLE[,CONT]", "enter to given regext table (with specifying continuation)"},
 	{ '\0',  "tleave", NULL, pre_ptrn_flag_mtable_long ,
@@ -904,7 +959,7 @@ static regexPattern *addCompiledTagPattern (struct lregexControlBlock *lcb,
 	if (regptype == REG_PARSER_MULTI_LINE || regptype == REG_PARSER_MULTI_TABLE)
 		flagsEval (flags, multilinePtrnFlagDef, ARRAY_SIZE(multilinePtrnFlagDef), &ptrn->mgroup);
 
-	mtableFlagData.taction = &ptrn->taction;
+	mtableFlagData.ptrn = ptrn;
 	if (regptype == REG_PARSER_MULTI_TABLE)
 		flagsEval (flags, multitablePtrnFlagDef, ARRAY_SIZE(multitablePtrnFlagDef), &mtableFlagData);
 
@@ -1915,6 +1970,7 @@ static struct regexTable * matchMultitableRegexTable (struct lregexControlBlock 
 		if (match == 0)
 		{
 			ptrn->statistics.match++;
+
 			if (ptrn->type == PTRN_TAG)
 			{
 				struct mTableActionSpec *taction = &(ptrn->taction);
@@ -1933,6 +1989,24 @@ static struct regexTable * matchMultitableRegexTable (struct lregexControlBlock 
 						 ? pmatch [ptrn->mgroup.forNextScanning].rm_so
 						 : pmatch [ptrn->mgroup.forNextScanning].rm_eo);
 				*offset += delta;
+
+				if (ptrn->message.selection > 0)
+				{
+					const char *const msgpat = (ptrn->message.message_string ?
+												ptrn->message.message_string :
+												"matched");
+					vString *msg = substitute (current, msgpat, BACK_REFERENCE_COUNT, pmatch);
+
+					error (ptrn->message.selection, "%sMessage from mtable<%s/%s[%2u]>: %s (%s:%lu)",
+						   (ptrn->message.selection == FATAL ? "Fatal: " : ""),
+						   getLanguageName (lcb->owner),
+						   table->name, i,
+						   vStringValue (msg),
+						   getInputFileName (),
+						   getInputLineNumberForFileOffset (*offset));
+
+					vStringDelete (msg);
+				}
 
 				switch (taction->action)
 				{
