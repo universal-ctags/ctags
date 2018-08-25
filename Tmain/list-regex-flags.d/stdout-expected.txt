@@ -9,4 +9,4 @@ x       exclusive          skip testing the other patterns if a line is matched 
 -       warning="MESSAGE"  print the given MESSAGE at WARNING level
 -       _extra=EXTRA       record the tag only when the extra is enabled
 -       _field=FIELD:VALUE record the matched string(VALUE) to parser own FIELD of the tag
--       _role=ROLE         Set given ROLE to roles field
+-       _role=ROLE         set the given ROLE to the roles field

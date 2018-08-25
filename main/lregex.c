@@ -679,7 +679,7 @@ static void common_flag_msg_long (const char* const s, const char* const v, void
 		ptrn->message.message_string = eStrndup (begin, end - begin);
 }
 
-static void common_flag_extra_long (const char* const s CTAGS_ATTR_UNUSED, const char* const v, void* data)
+static void common_flag_extra_long (const char* const s, const char* const v, void* data)
 {
 	struct commonFlagData * cdata = data;
 
@@ -714,7 +714,7 @@ static void fieldPatternDelete (struct fieldPattern *fp)
 	eFree (fp);
 }
 
-static void common_flag_field_long (const char* const s CTAGS_ATTR_UNUSED, const char* const v, void* data)
+static void common_flag_field_long (const char* const s, const char* const v, void* data)
 {
 	struct commonFlagData * cdata = data;
 	regexPattern *ptrn = cdata->ptrn;
@@ -772,6 +772,30 @@ static void common_flag_field_long (const char* const s CTAGS_ATTR_UNUSED, const
 	ptrArrayAdd(ptrn->fieldPatterns, fp);
 }
 
+static void common_flag_role_long (const char* const s, const char* const v, void* data)
+{
+	struct commonFlagData * cdata = data;
+	regexPattern *ptrn = cdata->ptrn;
+	roleDefinition * role;
+
+	Assert (ptrn);
+
+	if (!v)
+	{
+		error (WARNING, "no value is given for: %s", s);
+		return;
+	}
+
+	role = getLanguageRoleForName(cdata->owner,
+								  ptrn->u.tag.kindIndex, v);
+	if (!role)
+	{
+		error (WARNING, "no such role: %s", v);
+		return;
+	}
+
+	ptrn->u.tag.roleBits |= makeRoleBit(role->id);
+}
 
 static flagDefinition commonSpecFlagDef[] = {
 	{ '\0',  "fatal", NULL, common_flag_msg_long ,
@@ -783,6 +807,8 @@ static flagDefinition commonSpecFlagDef[] = {
 	  "EXTRA", "record the tag only when the extra is enabled"},
 	{ '\0',  EXPERIMENTAL "field", NULL, common_flag_field_long ,
 	  "FIELD:VALUE", "record the matched string(VALUE) to parser own FIELD of the tag"},
+	{ '\0',  EXPERIMENTAL "role", NULL, common_flag_role_long,
+	  "ROLE", "set the given ROLE to the roles field"},
 };
 
 
@@ -867,38 +893,6 @@ static flagDefinition multitablePtrnFlagDef[] = {
 	  NULL, "stop the parsing with this parser"},
 };
 
-struct roleFlagData {
-	langType owner;
-	int kindIndex;
-	roleBitsType roleBits;
-};
-
-static void pre_ptrn_flag_role_long (const char* const s CTAGS_ATTR_UNUSED, const char* const v, void* data)
-{
-	struct roleFlagData *rdata = data;
-	roleDefinition * role;
-
-	if (!v)
-	{
-		error (WARNING, "no value is given for: %s", s);
-		return;
-	}
-
-	role = getLanguageRoleForName(rdata->owner,
-								  rdata->kindIndex, v);
-	if (!role)
-	{
-		error (WARNING, "no such role: %s", v);
-		return;
-	}
-
-	rdata->roleBits |= makeRoleBit(role->id);
-}
-
-static flagDefinition roleSpecFlagDef[] = {
-	{ '\0',  EXPERIMENTAL "role", NULL, pre_ptrn_flag_role_long,
-	  "ROLE", "Set given ROLE to roles field"},
-};
 
 static void setKind(regexPattern * ptrn, const langType owner,
 					const char kindLetter, const char* kindName,
@@ -957,10 +951,6 @@ static regexPattern *addCompiledTagPattern (struct lregexControlBlock *lcb,
 		.lcb = lcb,
 	};
 
-	struct roleFlagData roleFlagData = {
-		.owner = lcb->owner,
-	};
-
 	if (regptype == REG_PARSER_SINGLE_LINE)
 		flagsEval (flags, prePtrnFlagDef, ARRAY_SIZE(prePtrnFlagDef), &exclusive);
 
@@ -968,6 +958,14 @@ static regexPattern *addCompiledTagPattern (struct lregexControlBlock *lcb,
 		flagsEval (flags, scopePtrnFlagDef, ARRAY_SIZE(scopePtrnFlagDef), &scopeActions);
 
 	ptrn = addCompiledTagCommon(lcb, table_index, pattern, regptype);
+
+	ptrn->type = PTRN_TAG;
+	ptrn->u.tag.name_pattern = eStrdup (name);
+	ptrn->exclusive = exclusive;
+	ptrn->scopeActions = scopeActions;
+	ptrn->disabled = disabled;
+
+	setKind(ptrn, lcb->owner, kindLetter, kindName, description);
 
 	commonFlagData.ptrn = ptrn;
 	flagsEval (flags, commonSpecFlagDef, ARRAY_SIZE(commonSpecFlagDef), &commonFlagData);
@@ -978,20 +976,6 @@ static regexPattern *addCompiledTagPattern (struct lregexControlBlock *lcb,
 	mtableFlagData.taction = &ptrn->taction;
 	if (regptype == REG_PARSER_MULTI_TABLE)
 		flagsEval (flags, multitablePtrnFlagDef, ARRAY_SIZE(multitablePtrnFlagDef), &mtableFlagData);
-
-	ptrn->type    = PTRN_TAG;
-	ptrn->u.tag.name_pattern = eStrdup (name);
-	ptrn->exclusive = exclusive;
-	ptrn->scopeActions = scopeActions;
-	ptrn->disabled = disabled;
-
-	setKind(ptrn, lcb->owner, kindLetter, kindName, description);
-
-	roleFlagData.kindIndex = ptrn->u.tag.kindIndex;
-	roleFlagData.roleBits = 0;
-
-	flagsEval (flags, roleSpecFlagDef, ARRAY_SIZE(roleSpecFlagDef), &roleFlagData);
-	ptrn->u.tag.roleBits = roleFlagData.roleBits;
 
 	return ptrn;
 }
@@ -1783,7 +1767,6 @@ extern void printRegexFlags (bool withListHeader, bool machinable, FILE *fp)
 	flagsColprintAddDefinitions (table, prePtrnFlagDef, ARRAY_SIZE (prePtrnFlagDef));
 	flagsColprintAddDefinitions (table, scopePtrnFlagDef, ARRAY_SIZE (scopePtrnFlagDef));
 	flagsColprintAddDefinitions (table, commonSpecFlagDef, ARRAY_SIZE (commonSpecFlagDef));
-	flagsColprintAddDefinitions (table, roleSpecFlagDef, ARRAY_SIZE (roleSpecFlagDef));
 
 	flagsColprintTablePrint (table, withListHeader, machinable, fp);
 	colprintTableDelete(table);
@@ -1798,7 +1781,6 @@ extern void printMultilineRegexFlags (bool withListHeader, bool machinable, FILE
 	flagsColprintAddDefinitions (table, regexFlagDefs,  ARRAY_SIZE (regexFlagDefs));
 	flagsColprintAddDefinitions (table, multilinePtrnFlagDef, ARRAY_SIZE (multilinePtrnFlagDef));
 	flagsColprintAddDefinitions (table, commonSpecFlagDef, ARRAY_SIZE (commonSpecFlagDef));
-	flagsColprintAddDefinitions (table, roleSpecFlagDef, ARRAY_SIZE (roleSpecFlagDef));
 
 	flagsColprintTablePrint (table, withListHeader, machinable, fp);
 	colprintTableDelete(table);
@@ -1815,7 +1797,6 @@ extern void printMultitableRegexFlags (bool withListHeader, bool machinable, FIL
 	flagsColprintAddDefinitions (table, multitablePtrnFlagDef, ARRAY_SIZE (multitablePtrnFlagDef));
 	flagsColprintAddDefinitions (table, scopePtrnFlagDef, ARRAY_SIZE (scopePtrnFlagDef));
 	flagsColprintAddDefinitions (table, commonSpecFlagDef, ARRAY_SIZE (commonSpecFlagDef));
-	flagsColprintAddDefinitions (table, roleSpecFlagDef, ARRAY_SIZE (roleSpecFlagDef));
 
 	flagsColprintTablePrint (table, withListHeader, machinable, fp);
 	colprintTableDelete(table);
