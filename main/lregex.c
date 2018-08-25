@@ -900,6 +900,44 @@ static flagDefinition roleSpecFlagDef[] = {
 	  "ROLE", "Set given ROLE to roles field"},
 };
 
+static void setKind(regexPattern * ptrn, const langType owner,
+					const char kindLetter, const char* kindName,
+					const char *const description)
+{
+	Assert (ptrn);
+	Assert (ptrn->u.tag.name_pattern);
+
+	if (*ptrn->u.tag.name_pattern == '\0' &&
+		ptrn->exclusive &&
+		kindLetter == KIND_REGEX_DEFAULT)
+	{
+		ptrn->u.tag.kindIndex = KIND_GHOST_INDEX;
+	}
+	else
+	{
+		kindDefinition *kdef;
+
+		kdef = getLanguageKindForLetter (owner, kindLetter);
+		if (kdef)
+		{
+			if (kindName && strcmp (kdef->name, kindName) && (strcmp(kindName, KIND_REGEX_DEFAULT_LONG)))
+				/* When using a same kind letter for multiple regex patterns, the name of kind
+				   should be the same. */
+				error  (WARNING, "Don't reuse the kind letter `%c' in a language %s (old: \"%s\", new: \"%s\")",
+						kdef->letter, getLanguageName (owner),
+						kdef->name, kindName);
+		}
+		else
+		{
+			kdef = kindNew (kindLetter, kindName, description);
+			defineLanguageKind (owner, kdef, kindFree);
+		}
+
+		ptrn->u.tag.kindIndex = kdef->id;
+	}
+}
+
+
 static regexPattern *addCompiledTagPattern (struct lregexControlBlock *lcb,
 											int table_index,
 											enum regexParserType regptype, regex_t* const pattern,
@@ -947,30 +985,7 @@ static regexPattern *addCompiledTagPattern (struct lregexControlBlock *lcb,
 	ptrn->scopeActions = scopeActions;
 	ptrn->disabled = disabled;
 
-	if (*name == '\0' && exclusive && kindLetter == KIND_REGEX_DEFAULT)
-		ptrn->u.tag.kindIndex = KIND_GHOST_INDEX;
-	else
-	{
-		kindDefinition *kdef;
-
-		kdef = getLanguageKindForLetter (lcb->owner, kindLetter);
-		if (kdef)
-		{
-			if (kindName && strcmp (kdef->name, kindName) && (strcmp(kindName, KIND_REGEX_DEFAULT_LONG)))
-				/* When using a same kind letter for multiple regex patterns, the name of kind
-				   should be the same. */
-				error  (WARNING, "Don't reuse the kind letter `%c' in a language %s (old: \"%s\", new: \"%s\")",
-						kdef->letter, getLanguageName (lcb->owner),
-						kdef->name, kindName);
-		}
-		else
-		{
-			kdef = kindNew (kindLetter, kindName, description);
-			defineLanguageKind (lcb->owner, kdef, kindFree);
-		}
-
-		ptrn->u.tag.kindIndex = kdef->id;
-	}
+	setKind(ptrn, lcb->owner, kindLetter, kindName, description);
 
 	roleFlagData.kindIndex = ptrn->u.tag.kindIndex;
 	roleFlagData.roleBits = 0;
