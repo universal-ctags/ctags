@@ -174,7 +174,7 @@ struct lregexControlBlock {
 /*
 *   FUNCTION DEFINITIONS
 */
-static int getTableIndexForName (struct lregexControlBlock *lcb, const char *name);
+static int getTableIndexForName (const struct lregexControlBlock *const lcb, const char *name);
 static void deletePattern (regexPattern *p);
 
 static void deleteTable (void *ptrn)
@@ -628,7 +628,8 @@ static bool hasMessage(const regexPattern *const ptrn)
 }
 
 struct commonFlagData {
-	langType owner;
+	const langType owner;
+	const struct lregexControlBlock *const lcb;
 	regexPattern *ptrn;
 };
 
@@ -812,16 +813,17 @@ static flagDefinition commonSpecFlagDef[] = {
 };
 
 
-struct mtableFlagData {
-	struct lregexControlBlock *lcb;
-	struct mTableActionSpec *taction;
-};
-
 static void pre_ptrn_flag_mtable_long (const char* const s, const char* const v, void* data)
 {
-	struct mtableFlagData *mdata = data;
-	struct mTableActionSpec *taction = mdata->taction;
+	struct commonFlagData * cdata = data;
+	regexPattern *ptrn = cdata->ptrn;
+	struct mTableActionSpec *taction;
 	bool taking_table = true;
+
+	Assert (ptrn);
+	Assert (cdata->lcb);
+
+	taction = &ptrn->taction;
 
 	if (strcmp (s, "tenter") == 0)
 		taction->action = TACTION_ENTER;
@@ -855,26 +857,26 @@ static void pre_ptrn_flag_mtable_long (const char* const s, const char* const v,
 			char *tableEnterTo;
 
 			tableEnterTo = eStrndup (v, continuation - v);
-			t = getTableIndexForName (mdata->lcb, tableEnterTo);
+			t = getTableIndexForName (cdata->lcb, tableEnterTo);
 			if (t < 0)
 				error (FATAL, "table is not defined: %s", tableEnterTo);
-			taction->table = ptrArrayItem (mdata->lcb->tables, t);
+			taction->table = ptrArrayItem (cdata->lcb->tables, t);
 			eFree (tableEnterTo);
 
 			if (!*(continuation + 1))
 				error (FATAL, "no continuation table is given for: %s", v);
 
-			int t_cont = getTableIndexForName (mdata->lcb, continuation + 1);
+			int t_cont = getTableIndexForName (cdata->lcb, continuation + 1);
 			if (t_cont < 0)
 				error (FATAL, "table for continuation is not defined: %s", continuation + 1);
-			taction->continuation_table = ptrArrayItem (mdata->lcb->tables, t_cont);
+			taction->continuation_table = ptrArrayItem (cdata->lcb->tables, t_cont);
 		}
 		else
 		{
-			t = getTableIndexForName (mdata->lcb, v);
+			t = getTableIndexForName (cdata->lcb, v);
 			if (t < 0)
 				error (FATAL, "table is not defined: %s", v);
-			taction->table = ptrArrayItem (mdata->lcb->tables, t);
+			taction->table = ptrArrayItem (cdata->lcb->tables, t);
 			taction->continuation_table = NULL;
 		}
 	}
@@ -939,43 +941,34 @@ static regexPattern *addCompiledTagPattern (struct lregexControlBlock *lcb,
 					    char *const description, const char* flags,
 					    bool *disabled)
 {
-	regexPattern * ptrn;
-	bool exclusive = false;
-	unsigned long scopeActions = 0UL;
+	regexPattern * ptrn = addCompiledTagCommon(lcb, table_index, pattern, regptype);
 
 	struct commonFlagData commonFlagData = {
 		.owner = lcb->owner,
-	};
-
-	struct mtableFlagData mtableFlagData = {
 		.lcb = lcb,
+		.ptrn = ptrn
 	};
-
-	if (regptype == REG_PARSER_SINGLE_LINE)
-		flagsEval (flags, prePtrnFlagDef, ARRAY_SIZE(prePtrnFlagDef), &exclusive);
-
-	if (regptype == REG_PARSER_SINGLE_LINE || regptype == REG_PARSER_MULTI_TABLE)
-		flagsEval (flags, scopePtrnFlagDef, ARRAY_SIZE(scopePtrnFlagDef), &scopeActions);
-
-	ptrn = addCompiledTagCommon(lcb, table_index, pattern, regptype);
 
 	ptrn->type = PTRN_TAG;
 	ptrn->u.tag.name_pattern = eStrdup (name);
-	ptrn->exclusive = exclusive;
-	ptrn->scopeActions = scopeActions;
 	ptrn->disabled = disabled;
+
+	/* need to check for exclusive before setting the kind */
+	if (regptype == REG_PARSER_SINGLE_LINE)
+		flagsEval (flags, prePtrnFlagDef, ARRAY_SIZE(prePtrnFlagDef), &ptrn->exclusive);
 
 	setKind(ptrn, lcb->owner, kindLetter, kindName, description);
 
-	commonFlagData.ptrn = ptrn;
 	flagsEval (flags, commonSpecFlagDef, ARRAY_SIZE(commonSpecFlagDef), &commonFlagData);
+
+	if (regptype == REG_PARSER_SINGLE_LINE || regptype == REG_PARSER_MULTI_TABLE)
+		flagsEval (flags, scopePtrnFlagDef, ARRAY_SIZE(scopePtrnFlagDef), &ptrn->scopeActions);
 
 	if (regptype == REG_PARSER_MULTI_LINE || regptype == REG_PARSER_MULTI_TABLE)
 		flagsEval (flags, multilinePtrnFlagDef, ARRAY_SIZE(multilinePtrnFlagDef), &ptrn->mgroup);
 
-	mtableFlagData.taction = &ptrn->taction;
 	if (regptype == REG_PARSER_MULTI_TABLE)
-		flagsEval (flags, multitablePtrnFlagDef, ARRAY_SIZE(multitablePtrnFlagDef), &mtableFlagData);
+		flagsEval (flags, multitablePtrnFlagDef, ARRAY_SIZE(multitablePtrnFlagDef), &commonFlagData);
 
 	return ptrn;
 }
@@ -1837,7 +1830,7 @@ extern bool matchMultilineRegex (struct lregexControlBlock *lcb, const vString* 
 	return result;
 }
 
-static int getTableIndexForName (struct lregexControlBlock *lcb, const char *name)
+static int getTableIndexForName (const struct lregexControlBlock *const lcb, const char *name)
 {
 	unsigned int i;
 
