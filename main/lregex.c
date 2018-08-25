@@ -130,6 +130,11 @@ typedef struct {
 
 	char *pattern_string;
 
+	struct {
+		errorSelection selection;
+		char *message_string;
+	} message;
+
 	int refcount;
 } regexPattern;
 
@@ -212,6 +217,10 @@ static void deletePattern (regexPattern *p)
 	}
 
 	eFree (p->pattern_string);
+
+	if (p->message.message_string)
+		eFree (p->message.message_string);
+
 	eFree (p);
 }
 
@@ -613,10 +622,62 @@ static flagDefinition multilinePtrnFlagDef[] = {
 	  "N[start|end]", "a group in pattern from where the next scan starts [0end]"},
 };
 
+static bool hasMessage(const regexPattern *const ptrn)
+{
+	return (ptrn->message.selection > 0 && ptrn->message.message_string);
+}
+
 struct commonFlagData {
 	langType owner;
 	regexPattern *ptrn;
 };
+
+static void common_flag_msg_long (const char* const s, const char* const v, void* data)
+{
+	struct commonFlagData *cdata = data;
+	regexPattern *ptrn = cdata->ptrn;
+
+	Assert (ptrn);
+
+	if (hasMessage(ptrn))
+	{
+		error (WARNING, "only one message flag may be given per regex (already set to '%s')",
+			   ptrn->message.message_string);
+		return;
+	}
+
+	if (strcmp (s, "fatal") == 0)
+	{
+		ptrn->message.selection = FATAL;
+	}
+	else if (strcmp (s, "warning") == 0)
+	{
+		ptrn->message.selection = WARNING;
+	}
+
+	Assert (ptrn->message.selection != 0);
+
+	if (!v || !*v)
+	{
+		error (WARNING, "no message value is given for {%s}", s);
+		return;
+	}
+
+	const char* begin = v;
+	const char* end = v + strlen (v);
+	--end;
+
+	if (*begin != '"' || *end != '"' || begin == end)
+	{
+		error (WARNING, "argument for {%s} must be in double-quotes", s);
+		return;
+	}
+
+	++begin;
+
+	if (begin < end)
+		ptrn->message.message_string = eStrndup (begin, end - begin);
+}
 
 static void common_flag_extra_long (const char* const s CTAGS_ATTR_UNUSED, const char* const v, void* data)
 {
@@ -636,6 +697,10 @@ static void common_flag_extra_long (const char* const s CTAGS_ATTR_UNUSED, const
 }
 
 static flagDefinition commonSpecFlagDef[] = {
+	{ '\0',  "fatal", NULL, common_flag_msg_long ,
+	  "\"MESSAGE\"", "print the given MESSAGE and exit"},
+	{ '\0',  "warning", NULL, common_flag_msg_long ,
+	  "\"MESSAGE\"", "print the given MESSAGE at WARNING level"},
 #define EXPERIMENTAL "_"
 	{ '\0',  EXPERIMENTAL "extra", NULL, common_flag_extra_long ,
 	  "EXTRA", "record the tag only when the extra is enabled"},
@@ -1250,6 +1315,32 @@ static bool matchCallbackPattern (
 				     patbuf->u.callback.userData);
 }
 
+
+static void printMessage(const langType language,
+						 const regexPattern *const ptrn,
+						 const off_t offset,
+						 const char *const line,
+						 const regmatch_t* const pmatch)
+{
+	vString *msg;
+
+	Assert (ptrn);
+	Assert (ptrn->message.selection > 0);
+	Assert (ptrn->message.message_string);
+
+	msg = substitute (line, ptrn->message.message_string, BACK_REFERENCE_COUNT, pmatch);
+
+	error (ptrn->message.selection, "%sMessage from regex<%s>: %s (%s:%lu)",
+		   (ptrn->message.selection == FATAL ? "Fatal: " : ""),
+		   getLanguageName (language),
+		   vStringValue (msg),
+		   getInputFileName (),
+		   getInputLineNumberInRegPType (ptrn->regptype, offset));
+
+	vStringDelete (msg);
+}
+
+
 static bool matchRegexPattern (struct lregexControlBlock *lcb,
 							   const vString* const line,
 							   regexTableEntry *entry)
@@ -1268,6 +1359,9 @@ static bool matchRegexPattern (struct lregexControlBlock *lcb,
 	{
 		result = true;
 		entry->statistics.match++;
+
+		if (hasMessage(patbuf))
+			printMessage(lcb->owner, patbuf, 0, vStringValue (line), pmatch);
 
 		if (patbuf->type == PTRN_TAG)
 			matchTagPattern (lcb, vStringValue (line), patbuf, pmatch, 0);
@@ -1290,6 +1384,7 @@ static bool matchMultilineRegexPattern (struct lregexControlBlock *lcb,
 {
 	const char *start;
 	const char *current;
+	off_t offset = 0;
 	regexPattern* patbuf = entry->pattern;
 
 	bool result = false;
@@ -1313,13 +1408,16 @@ static bool matchMultilineRegexPattern (struct lregexControlBlock *lcb,
 			break;
 		}
 
+		if (hasMessage(patbuf))
+			printMessage(lcb->owner, patbuf, (current + pmatch[0].rm_so) - start, current, pmatch);
+
+		offset = (current + pmatch [patbuf->mgroup.forLineNumberDetermination].rm_so)
+				 - start;
+
 		entry->statistics.match++;
 		if (patbuf->type == PTRN_TAG)
 		{
-			matchTagPattern (lcb, current, patbuf, pmatch,
-							 (current
-							  + pmatch [patbuf->mgroup.forLineNumberDetermination].rm_so)
-							 - start);
+			matchTagPattern (lcb, current, patbuf, pmatch, offset);
 			result = true;
 		}
 		else if (patbuf->type == PTRN_CALLBACK)
@@ -1825,6 +1923,34 @@ static void dumpTstack(FILE* fp, ptrArray *tstack)
 	fprintf(fp, "\n");
 }
 
+static void printMultitableMessage(const langType language,
+								   const char *const tableName,
+								   const unsigned int index,
+								   const regexPattern *const ptrn,
+								   const off_t offset,
+								   const char *const current,
+								   const regmatch_t* const pmatch)
+{
+	vString *msg;
+
+	Assert (ptrn);
+	Assert (ptrn->message.selection > 0);
+	Assert (ptrn->message.message_string);
+
+	msg = substitute (current, ptrn->message.message_string, BACK_REFERENCE_COUNT, pmatch);
+
+	error (ptrn->message.selection, "%sMessage from mtable<%s/%s[%2u]>: %s (%s:%lu)",
+		   (ptrn->message.selection == FATAL ? "Fatal: " : ""),
+		   getLanguageName (language),
+		   tableName,
+		   index,
+		   vStringValue (msg),
+		   getInputFileName (),
+		   getInputLineNumberForFileOffset (offset));
+
+	vStringDelete (msg);
+}
+
 static struct regexTable * matchMultitableRegexTable (struct lregexControlBlock *lcb,
 													  struct regexTable *table, const vString *const start, unsigned int *offset)
 {
@@ -1901,6 +2027,7 @@ static struct regexTable * matchMultitableRegexTable (struct lregexControlBlock 
 		if (match == 0)
 		{
 			entry->statistics.match++;
+
 			if (ptrn->type == PTRN_TAG)
 			{
 				struct mTableActionSpec *taction = &(ptrn->taction);
@@ -1914,6 +2041,10 @@ static struct regexTable * matchMultitableRegexTable (struct lregexControlBlock 
 					dumpSstack (vfp, lcb->currentScope);
 				}
 				END_VERBOSE();
+
+				if (hasMessage(ptrn))
+					printMultitableMessage (lcb->owner, table->name, i, ptrn,
+											*offset, current, pmatch);
 
 				delta = (ptrn->mgroup.nextFromStart
 						 ? pmatch [ptrn->mgroup.forNextScanning].rm_so

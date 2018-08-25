@@ -1,0 +1,5 @@
+namespace A {
+	class B {
+		var bool C;
+	};
+}
