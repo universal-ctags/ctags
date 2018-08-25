@@ -696,20 +696,6 @@ static void common_flag_extra_long (const char* const s CTAGS_ATTR_UNUSED, const
 		error (WARNING, "no such extra \"%s\" in %s", v, getLanguageName(cdata->owner));
 }
 
-static flagDefinition commonSpecFlagDef[] = {
-	{ '\0',  "fatal", NULL, common_flag_msg_long ,
-	  "\"MESSAGE\"", "print the given MESSAGE and exit"},
-	{ '\0',  "warning", NULL, common_flag_msg_long ,
-	  "\"MESSAGE\"", "print the given MESSAGE at WARNING level"},
-#define EXPERIMENTAL "_"
-	{ '\0',  EXPERIMENTAL "extra", NULL, common_flag_extra_long ,
-	  "EXTRA", "record the tag only when the extra is enabled"},
-};
-
-struct fieldFlagData {
-	ptrArray *spec;
-	langType owner;
-};
 
 static struct fieldPattern * fieldPatternNew (fieldType ftype, const char *template)
 {
@@ -728,9 +714,12 @@ static void fieldPatternDelete (struct fieldPattern *fp)
 	eFree (fp);
 }
 
-static void pre_ptrn_flag_field_long (const char* const s CTAGS_ATTR_UNUSED, const char* const v, void* data)
+static void common_flag_field_long (const char* const s CTAGS_ATTR_UNUSED, const char* const v, void* data)
 {
-	struct fieldFlagData *fdata = data;
+	struct commonFlagData * cdata = data;
+	regexPattern *ptrn = cdata->ptrn;
+
+	Assert (ptrn);
 
 	struct fieldPattern *fp;
 	fieldType ftype;
@@ -752,22 +741,22 @@ static void pre_ptrn_flag_field_long (const char* const s CTAGS_ATTR_UNUSED, con
 	}
 
 	fname = eStrndup (v, tmp - v);
-	ftype = getFieldTypeForNameAndLanguage (fname, fdata->owner);
+	ftype = getFieldTypeForNameAndLanguage (fname, cdata->owner);
 	if (ftype == FIELD_UNKNOWN)
 	{
-		error (WARNING, "no such field \"%s\" in %s", fname, getLanguageName(fdata->owner));
+		error (WARNING, "no such field \"%s\" in %s", fname, getLanguageName(cdata->owner));
 		eFree (fname);
 		return;
 	}
 
-	if (fdata->spec)
+	if (ptrn->fieldPatterns)
 	{
-		for (unsigned int i = 0; i < ptrArrayCount(fdata->spec); i++)
+		for (unsigned int i = 0; i < ptrArrayCount(ptrn->fieldPatterns); i++)
 		{
-			fp = ptrArrayItem(fdata->spec, i);
+			fp = ptrArrayItem(ptrn->fieldPatterns, i);
 			if (fp->ftype == ftype)
 			{
-				error (WARNING, "duplicated field specification \"%s\" in %s", fname, getLanguageName(fdata->owner));
+				error (WARNING, "duplicated field specification \"%s\" in %s", fname, getLanguageName(cdata->owner));
 				eFree (fname);
 				return;
 			}
@@ -778,14 +767,21 @@ static void pre_ptrn_flag_field_long (const char* const s CTAGS_ATTR_UNUSED, con
 	template = tmp + 1;
 	fp = fieldPatternNew (ftype, template);
 
-	if (fdata->spec == NULL)
-		fdata->spec = ptrArrayNew((ptrArrayDeleteFunc)fieldPatternDelete);
-	ptrArrayAdd(fdata->spec, fp);
+	if (ptrn->fieldPatterns == NULL)
+		ptrn->fieldPatterns = ptrArrayNew((ptrArrayDeleteFunc)fieldPatternDelete);
+	ptrArrayAdd(ptrn->fieldPatterns, fp);
 }
 
-static flagDefinition fieldSpecFlagDef[] = {
+
+static flagDefinition commonSpecFlagDef[] = {
+	{ '\0',  "fatal", NULL, common_flag_msg_long ,
+	  "\"MESSAGE\"", "print the given MESSAGE and exit"},
+	{ '\0',  "warning", NULL, common_flag_msg_long ,
+	  "\"MESSAGE\"", "print the given MESSAGE at WARNING level"},
 #define EXPERIMENTAL "_"
-	{ '\0',  EXPERIMENTAL "field", NULL, pre_ptrn_flag_field_long ,
+	{ '\0',  EXPERIMENTAL "extra", NULL, common_flag_extra_long ,
+	  "EXTRA", "record the tag only when the extra is enabled"},
+	{ '\0',  EXPERIMENTAL "field", NULL, common_flag_field_long ,
 	  "FIELD:VALUE", "record the matched string(VALUE) to parser own FIELD of the tag"},
 };
 
@@ -919,11 +915,6 @@ static regexPattern *addCompiledTagPattern (struct lregexControlBlock *lcb,
 		.owner = lcb->owner,
 	};
 
-	struct fieldFlagData fieldFlagData = {
-		.spec  = NULL,
-		.owner = lcb->owner,
-	};
-
 	struct mtableFlagData mtableFlagData = {
 		.lcb = lcb,
 	};
@@ -939,8 +930,8 @@ static regexPattern *addCompiledTagPattern (struct lregexControlBlock *lcb,
 		flagsEval (flags, scopePtrnFlagDef, ARRAY_SIZE(scopePtrnFlagDef), &scopeActions);
 
 	ptrn = addCompiledTagCommon(lcb, table_index, pattern, regptype);
-	commonFlagData.ptrn = ptrn;
 
+	commonFlagData.ptrn = ptrn;
 	flagsEval (flags, commonSpecFlagDef, ARRAY_SIZE(commonSpecFlagDef), &commonFlagData);
 
 	if (regptype == REG_PARSER_MULTI_LINE || regptype == REG_PARSER_MULTI_TABLE)
@@ -955,9 +946,6 @@ static regexPattern *addCompiledTagPattern (struct lregexControlBlock *lcb,
 	ptrn->exclusive = exclusive;
 	ptrn->scopeActions = scopeActions;
 	ptrn->disabled = disabled;
-
-	flagsEval (flags, fieldSpecFlagDef, ARRAY_SIZE(fieldSpecFlagDef), &fieldFlagData);
-	ptrn->fieldPatterns = fieldFlagData.spec;
 
 	if (*name == '\0' && exclusive && kindLetter == KIND_REGEX_DEFAULT)
 		ptrn->u.tag.kindIndex = KIND_GHOST_INDEX;
@@ -1780,7 +1768,6 @@ extern void printRegexFlags (bool withListHeader, bool machinable, FILE *fp)
 	flagsColprintAddDefinitions (table, prePtrnFlagDef, ARRAY_SIZE (prePtrnFlagDef));
 	flagsColprintAddDefinitions (table, scopePtrnFlagDef, ARRAY_SIZE (scopePtrnFlagDef));
 	flagsColprintAddDefinitions (table, commonSpecFlagDef, ARRAY_SIZE (commonSpecFlagDef));
-	flagsColprintAddDefinitions (table, fieldSpecFlagDef, ARRAY_SIZE (fieldSpecFlagDef));
 	flagsColprintAddDefinitions (table, roleSpecFlagDef, ARRAY_SIZE (roleSpecFlagDef));
 
 	flagsColprintTablePrint (table, withListHeader, machinable, fp);
@@ -1796,7 +1783,6 @@ extern void printMultilineRegexFlags (bool withListHeader, bool machinable, FILE
 	flagsColprintAddDefinitions (table, regexFlagDefs,  ARRAY_SIZE (regexFlagDefs));
 	flagsColprintAddDefinitions (table, multilinePtrnFlagDef, ARRAY_SIZE (multilinePtrnFlagDef));
 	flagsColprintAddDefinitions (table, commonSpecFlagDef, ARRAY_SIZE (commonSpecFlagDef));
-	flagsColprintAddDefinitions (table, fieldSpecFlagDef, ARRAY_SIZE (fieldSpecFlagDef));
 	flagsColprintAddDefinitions (table, roleSpecFlagDef, ARRAY_SIZE (roleSpecFlagDef));
 
 	flagsColprintTablePrint (table, withListHeader, machinable, fp);
@@ -1814,7 +1800,6 @@ extern void printMultitableRegexFlags (bool withListHeader, bool machinable, FIL
 	flagsColprintAddDefinitions (table, multitablePtrnFlagDef, ARRAY_SIZE (multitablePtrnFlagDef));
 	flagsColprintAddDefinitions (table, scopePtrnFlagDef, ARRAY_SIZE (scopePtrnFlagDef));
 	flagsColprintAddDefinitions (table, commonSpecFlagDef, ARRAY_SIZE (commonSpecFlagDef));
-	flagsColprintAddDefinitions (table, fieldSpecFlagDef, ARRAY_SIZE (fieldSpecFlagDef));
 	flagsColprintAddDefinitions (table, roleSpecFlagDef, ARRAY_SIZE (roleSpecFlagDef));
 
 	flagsColprintTablePrint (table, withListHeader, machinable, fp);
