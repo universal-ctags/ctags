@@ -485,6 +485,7 @@ static regexPattern * newPattern (regex_t* const pattern,
 	ptrn->exclusive = false;
 	ptrn->accept_empty_name = false;
 	ptrn->regptype = regptype;
+	ptrn->xtagType = XTAG_UNKNOWN;
 
 	if (regptype == REG_PARSER_MULTI_LINE)
 		initMgroup(&ptrn->mgroup);
@@ -612,14 +613,16 @@ static flagDefinition multilinePtrnFlagDef[] = {
 	  "N[start|end]", "a group in pattern from where the next scan starts [0end]"},
 };
 
-struct extraFlagData {
-	int xtype;
+struct commonFlagData {
 	langType owner;
+	regexPattern *ptrn;
 };
 
-static void pre_ptrn_flag_extra_long (const char* const s CTAGS_ATTR_UNUSED, const char* const v, void* data)
+static void common_flag_extra_long (const char* const s CTAGS_ATTR_UNUSED, const char* const v, void* data)
 {
-	struct extraFlagData * xdata = data;
+	struct commonFlagData * cdata = data;
+
+	Assert (cdata->ptrn);
 
 	if (!v)
 	{
@@ -627,14 +630,14 @@ static void pre_ptrn_flag_extra_long (const char* const s CTAGS_ATTR_UNUSED, con
 		return;
 	}
 
-	xdata->xtype = getXtagTypeForNameAndLanguage (v, xdata->owner);
-	if (xdata->xtype == XTAG_UNKNOWN)
-		error (WARNING, "no such extra \"%s\" in %s", v, getLanguageName(xdata->owner));
+	cdata->ptrn->xtagType = getXtagTypeForNameAndLanguage (v, cdata->owner);
+	if (cdata->ptrn->xtagType == XTAG_UNKNOWN)
+		error (WARNING, "no such extra \"%s\" in %s", v, getLanguageName(cdata->owner));
 }
 
-static flagDefinition extraSpecFlagDef[] = {
+static flagDefinition commonSpecFlagDef[] = {
 #define EXPERIMENTAL "_"
-	{ '\0',  EXPERIMENTAL "extra", NULL, pre_ptrn_flag_extra_long ,
+	{ '\0',  EXPERIMENTAL "extra", NULL, common_flag_extra_long ,
 	  "EXTRA", "record the tag only when the extra is enabled"},
 };
 
@@ -846,10 +849,11 @@ static regexPattern *addCompiledTagPattern (struct lregexControlBlock *lcb,
 	regexPattern * ptrn;
 	bool exclusive = false;
 	unsigned long scopeActions = 0UL;
-	struct extraFlagData extraFlagData = {
-		.xtype = XTAG_UNKNOWN,
+
+	struct commonFlagData commonFlagData = {
 		.owner = lcb->owner,
 	};
+
 	struct fieldFlagData fieldFlagData = {
 		.spec  = NULL,
 		.owner = lcb->owner,
@@ -869,9 +873,11 @@ static regexPattern *addCompiledTagPattern (struct lregexControlBlock *lcb,
 	if (regptype == REG_PARSER_SINGLE_LINE || regptype == REG_PARSER_MULTI_TABLE)
 		flagsEval (flags, scopePtrnFlagDef, ARRAY_SIZE(scopePtrnFlagDef), &scopeActions);
 
-	flagsEval (flags, extraSpecFlagDef, ARRAY_SIZE(extraSpecFlagDef), &extraFlagData);
+	ptrn = addCompiledTagCommon(lcb, table_index, pattern, regptype);
+	commonFlagData.ptrn = ptrn;
 
-	ptrn  = addCompiledTagCommon(lcb, table_index, pattern, regptype);
+	flagsEval (flags, commonSpecFlagDef, ARRAY_SIZE(commonSpecFlagDef), &commonFlagData);
+
 	if (regptype == REG_PARSER_MULTI_LINE || regptype == REG_PARSER_MULTI_TABLE)
 		flagsEval (flags, multilinePtrnFlagDef, ARRAY_SIZE(multilinePtrnFlagDef), &ptrn->mgroup);
 
@@ -884,7 +890,6 @@ static regexPattern *addCompiledTagPattern (struct lregexControlBlock *lcb,
 	ptrn->exclusive = exclusive;
 	ptrn->scopeActions = scopeActions;
 	ptrn->disabled = disabled;
-	ptrn->xtagType = extraFlagData.xtype;
 
 	flagsEval (flags, fieldSpecFlagDef, ARRAY_SIZE(fieldSpecFlagDef), &fieldFlagData);
 	ptrn->fieldPatterns = fieldFlagData.spec;
@@ -1676,7 +1681,7 @@ extern void printRegexFlags (bool withListHeader, bool machinable, FILE *fp)
 	flagsColprintAddDefinitions (table, regexFlagDefs,  ARRAY_SIZE (regexFlagDefs));
 	flagsColprintAddDefinitions (table, prePtrnFlagDef, ARRAY_SIZE (prePtrnFlagDef));
 	flagsColprintAddDefinitions (table, scopePtrnFlagDef, ARRAY_SIZE (scopePtrnFlagDef));
-	flagsColprintAddDefinitions (table, extraSpecFlagDef, ARRAY_SIZE (extraSpecFlagDef));
+	flagsColprintAddDefinitions (table, commonSpecFlagDef, ARRAY_SIZE (commonSpecFlagDef));
 	flagsColprintAddDefinitions (table, fieldSpecFlagDef, ARRAY_SIZE (fieldSpecFlagDef));
 	flagsColprintAddDefinitions (table, roleSpecFlagDef, ARRAY_SIZE (roleSpecFlagDef));
 
@@ -1692,7 +1697,7 @@ extern void printMultilineRegexFlags (bool withListHeader, bool machinable, FILE
 
 	flagsColprintAddDefinitions (table, regexFlagDefs,  ARRAY_SIZE (regexFlagDefs));
 	flagsColprintAddDefinitions (table, multilinePtrnFlagDef, ARRAY_SIZE (multilinePtrnFlagDef));
-	flagsColprintAddDefinitions (table, extraSpecFlagDef, ARRAY_SIZE (extraSpecFlagDef));
+	flagsColprintAddDefinitions (table, commonSpecFlagDef, ARRAY_SIZE (commonSpecFlagDef));
 	flagsColprintAddDefinitions (table, fieldSpecFlagDef, ARRAY_SIZE (fieldSpecFlagDef));
 	flagsColprintAddDefinitions (table, roleSpecFlagDef, ARRAY_SIZE (roleSpecFlagDef));
 
@@ -1710,7 +1715,7 @@ extern void printMultitableRegexFlags (bool withListHeader, bool machinable, FIL
 	flagsColprintAddDefinitions (table, multilinePtrnFlagDef, ARRAY_SIZE (multilinePtrnFlagDef));
 	flagsColprintAddDefinitions (table, multitablePtrnFlagDef, ARRAY_SIZE (multitablePtrnFlagDef));
 	flagsColprintAddDefinitions (table, scopePtrnFlagDef, ARRAY_SIZE (scopePtrnFlagDef));
-	flagsColprintAddDefinitions (table, extraSpecFlagDef, ARRAY_SIZE (extraSpecFlagDef));
+	flagsColprintAddDefinitions (table, commonSpecFlagDef, ARRAY_SIZE (commonSpecFlagDef));
 	flagsColprintAddDefinitions (table, fieldSpecFlagDef, ARRAY_SIZE (fieldSpecFlagDef));
 	flagsColprintAddDefinitions (table, roleSpecFlagDef, ARRAY_SIZE (roleSpecFlagDef));
 
