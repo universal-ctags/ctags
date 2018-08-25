@@ -129,24 +129,32 @@ typedef struct {
 	ptrArray *fieldPatterns;
 
 	char *pattern_string;
-	struct {
-		unsigned int match;
-		unsigned int unmatch;
-	} statistics;
 
 	int refcount;
 } regexPattern;
 
 
+typedef struct {
+	/* the pattern can be shared among entries using a refcount */
+	regexPattern *pattern;
+
+	/* but the statistics are per-table-entry */
+	struct {
+		unsigned int match;
+		unsigned int unmatch;
+	} statistics;
+} regexTableEntry;
+
+
 #define TABLE_INDEX_UNUSED -1
 struct regexTable {
 	char *name;
-	ptrArray *patterns;
+	ptrArray *entries;
 };
 
 struct lregexControlBlock {
 	unsigned long currentScope;
-	ptrArray *patterns [2];
+	ptrArray *entries [2];
 
 	ptrArray *tables;
 	ptrArray *tstack;
@@ -162,20 +170,26 @@ struct lregexControlBlock {
 *   FUNCTION DEFINITIONS
 */
 static int getTableIndexForName (struct lregexControlBlock *lcb, const char *name);
+static void deletePattern (regexPattern *p);
 
 static void deleteTable (void *ptrn)
 {
 	struct regexTable *t = ptrn;
 
-	ptrArrayDelete (t->patterns);
-	eFree (t->name);
+	ptrArrayDelete (t->entries);
 	eFree (t);
 }
 
-static void deletePattern (void *ptrn)
+static void deleteTableEntry (void *ptrn)
 {
-	regexPattern *p = ptrn;
+	regexTableEntry *e = ptrn;
+	Assert (e && e->pattern);
+	deletePattern (e->pattern);
+	eFree (e);
+}
 
+static void deletePattern (regexPattern *p)
+{
 	p->refcount--;
 
 	if (p->refcount > 0)
@@ -198,13 +212,13 @@ static void deletePattern (void *ptrn)
 	}
 
 	eFree (p->pattern_string);
-	eFree (ptrn);
+	eFree (p);
 }
 
 static void clearPatternSet (struct lregexControlBlock *lcb)
 {
-	ptrArrayClear (lcb->patterns [REG_PARSER_SINGLE_LINE]);
-	ptrArrayClear (lcb->patterns [REG_PARSER_MULTI_LINE]);
+	ptrArrayClear (lcb->entries [REG_PARSER_SINGLE_LINE]);
+	ptrArrayClear (lcb->entries [REG_PARSER_MULTI_LINE]);
 	ptrArrayClear (lcb->tables);
 }
 
@@ -212,8 +226,8 @@ extern struct lregexControlBlock* allocLregexControlBlock (parserDefinition *par
 {
 	struct lregexControlBlock *lcb = xCalloc (1, struct lregexControlBlock);
 
-	lcb->patterns[REG_PARSER_SINGLE_LINE] = ptrArrayNew(deletePattern);
-	lcb->patterns[REG_PARSER_MULTI_LINE] = ptrArrayNew(deletePattern);
+	lcb->entries[REG_PARSER_SINGLE_LINE] = ptrArrayNew(deleteTableEntry);
+	lcb->entries[REG_PARSER_MULTI_LINE] = ptrArrayNew(deleteTableEntry);
 	lcb->tables = ptrArrayNew(deleteTable);
 	lcb->tstack = ptrArrayNew(NULL);
 	lcb->owner = parser->id;
@@ -225,10 +239,10 @@ extern void freeLregexControlBlock (struct lregexControlBlock* lcb)
 {
 	clearPatternSet (lcb);
 
-	ptrArrayDelete (lcb->patterns [REG_PARSER_SINGLE_LINE]);
-	lcb->patterns [REG_PARSER_SINGLE_LINE] = NULL;
-	ptrArrayDelete (lcb->patterns [REG_PARSER_MULTI_LINE]);
-	lcb->patterns [REG_PARSER_MULTI_LINE] = NULL;
+	ptrArrayDelete (lcb->entries [REG_PARSER_SINGLE_LINE]);
+	lcb->entries [REG_PARSER_SINGLE_LINE] = NULL;
+	ptrArrayDelete (lcb->entries [REG_PARSER_MULTI_LINE]);
+	lcb->entries [REG_PARSER_MULTI_LINE] = NULL;
 
 	ptrArrayDelete (lcb->tables);
 	lcb->tables = NULL;
@@ -482,27 +496,44 @@ static regexPattern * newPattern (regex_t* const pattern,
 	return ptrn;
 }
 
+static regexTableEntry * newRefPatternEntry (regexTableEntry * other)
+{
+	regexTableEntry *entry = xCalloc (1, regexTableEntry);
+
+	Assert (other && other->pattern);
+
+	entry->pattern = refPattern(other->pattern);
+	return entry;
+}
+
+static regexTableEntry * newEntry (regex_t* const pattern,
+								   enum regexParserType regptype)
+{
+	regexTableEntry *entry = xCalloc (1, regexTableEntry);
+	entry->pattern = newPattern (pattern, regptype);
+	return entry;
+}
+
 static regexPattern* addCompiledTagCommon (struct lregexControlBlock *lcb,
 										   int table_index,
 										   regex_t* const pattern,
 										   enum regexParserType regptype)
 {
-	regexPattern *ptrn;
+	regexTableEntry *entry = newEntry (pattern, regptype);
 
-	ptrn = newPattern(pattern, regptype);
 	if (regptype == REG_PARSER_MULTI_TABLE)
 	{
-		struct regexTable *table = ptrArrayItem(lcb->tables, table_index);
+		struct regexTable *table = ptrArrayItem (lcb->tables, table_index);
 		Assert(table);
 
-		ptrArrayAdd (table->patterns, ptrn);
+		ptrArrayAdd (table->entries, entry);
 	}
 	else
-		ptrArrayAdd (lcb->patterns[regptype], ptrn);
+		ptrArrayAdd (lcb->entries[regptype], entry);
 
 	useRegexMethod(lcb->owner);
 
-	return ptrn;
+	return entry->pattern;
 }
 
 static void pre_ptrn_flag_mgroup_long (const char* const s, const char* const v, void* data)
@@ -1215,12 +1246,13 @@ static bool matchCallbackPattern (
 }
 
 static bool matchRegexPattern (struct lregexControlBlock *lcb,
-				  const vString* const line,
-				  regexPattern* patbuf)
+							   const vString* const line,
+							   regexTableEntry *entry)
 {
 	bool result = false;
 	regmatch_t pmatch [BACK_REFERENCE_COUNT];
 	int match;
+	regexPattern* patbuf = entry->pattern;
 
 	if (patbuf->disabled && *(patbuf->disabled))
 		return false;
@@ -1230,7 +1262,7 @@ static bool matchRegexPattern (struct lregexControlBlock *lcb,
 	if (match == 0)
 	{
 		result = true;
-		patbuf->statistics.match++;
+		entry->statistics.match++;
 
 		if (patbuf->type == PTRN_TAG)
 			matchTagPattern (lcb, vStringValue (line), patbuf, pmatch, 0);
@@ -1243,21 +1275,24 @@ static bool matchRegexPattern (struct lregexControlBlock *lcb,
 		}
 	}
 	else
-		patbuf->statistics.unmatch++;
+		entry->statistics.unmatch++;
 	return result;
 }
 
 static bool matchMultilineRegexPattern (struct lregexControlBlock *lcb,
-					const vString* const allLines,
-					regexPattern* patbuf)
+										const vString* const allLines,
+										regexTableEntry *entry)
 {
 	const char *start;
 	const char *current;
+	regexPattern* patbuf = entry->pattern;
 
 	bool result = false;
 	regmatch_t pmatch [BACK_REFERENCE_COUNT];
 	int match = 0;
 	unsigned int delta = 1;
+
+	Assert (patbuf);
 
 	if (patbuf->disabled && *(patbuf->disabled))
 		return false;
@@ -1269,11 +1304,11 @@ static bool matchMultilineRegexPattern (struct lregexControlBlock *lcb,
 						 BACK_REFERENCE_COUNT, pmatch, 0);
 		if (match != 0)
 		{
-			patbuf->statistics.unmatch++;
+			entry->statistics.unmatch++;
 			break;
 		}
 
-		patbuf->statistics.match++;
+		entry->statistics.match++;
 		if (patbuf->type == PTRN_TAG)
 		{
 			matchTagPattern (lcb, current, patbuf, pmatch,
@@ -1320,15 +1355,18 @@ extern bool matchRegex (struct lregexControlBlock *lcb, const vString* const lin
 {
 	bool result = false;
 	unsigned int i;
-	for (i = 0  ;  i < ptrArrayCount(lcb->patterns[REG_PARSER_SINGLE_LINE])  ;  ++i)
+	for (i = 0  ;  i < ptrArrayCount(lcb->entries[REG_PARSER_SINGLE_LINE])  ;  ++i)
 	{
-		regexPattern* ptrn = ptrArrayItem(lcb->patterns[REG_PARSER_SINGLE_LINE], i);
+		regexTableEntry *entry = ptrArrayItem(lcb->entries[REG_PARSER_SINGLE_LINE], i);
+		regexPattern *ptrn = entry->pattern;
+
+		Assert (ptrn);
 
 		if ((ptrn->xtagType != XTAG_UNKNOWN)
 			&& (!isXtagEnabled (ptrn->xtagType)))
 				continue;
 
-		if (matchRegexPattern (lcb, line, ptrn))
+		if (matchRegexPattern (lcb, line, entry))
 		{
 			result = true;
 			if (ptrn->exclusive)
@@ -1368,12 +1406,13 @@ extern void findRegexTags (void)
 	findRegexTagsMainloop (fileReadLineDriver);
 }
 
-static bool hasScopeActionInRegex0(ptrArray *patterns)
+static bool hasScopeActionInRegex0(ptrArray *entries)
 {
-	for (unsigned int i = 0; i < ptrArrayCount(patterns); i++)
+	for (unsigned int i = 0; i < ptrArrayCount(entries); i++)
 	{
-		regexPattern* ptrn = ptrArrayItem(patterns, i);
-		if (ptrn->scopeActions)
+		regexTableEntry *entry = ptrArrayItem(entries, i);
+		Assert (entry && entry->pattern);
+		if (entry->pattern->scopeActions)
 			return true;
 	}
 	return false;
@@ -1381,16 +1420,16 @@ static bool hasScopeActionInRegex0(ptrArray *patterns)
 
 extern bool hasScopeActionInRegex (struct lregexControlBlock *lcb)
 {
-	ptrArray *patterns;
+	ptrArray *entries;
 
-	patterns = lcb->patterns[REG_PARSER_SINGLE_LINE];
-	if (hasScopeActionInRegex0 (patterns))
+	entries = lcb->entries[REG_PARSER_SINGLE_LINE];
+	if (hasScopeActionInRegex0 (entries))
 		return true;
 
 	for (unsigned int i = 0; i < ptrArrayCount(lcb->tables); i++)
 	{
 		struct regexTable *table = ptrArrayItem(lcb->tables, i);
-		if (hasScopeActionInRegex0 (table->patterns))
+		if (hasScopeActionInRegex0 (table->entries))
 			return true;
 	}
 
@@ -1686,7 +1725,7 @@ extern void freeRegexResources (void)
 
 extern bool regexNeedsMultilineBuffer (struct lregexControlBlock *lcb)
 {
-	if  (ptrArrayCount(lcb->patterns [REG_PARSER_MULTI_LINE]) > 0)
+	if  (ptrArrayCount(lcb->entries [REG_PARSER_MULTI_LINE]) > 0)
 		return true;
 	else if (ptrArrayCount(lcb->tables) > 0)
 		return true;
@@ -1700,15 +1739,16 @@ extern bool matchMultilineRegex (struct lregexControlBlock *lcb, const vString* 
 
 	unsigned int i;
 
-	for (i = 0; i < ptrArrayCount(lcb->patterns [REG_PARSER_MULTI_LINE]); ++i)
+	for (i = 0; i < ptrArrayCount(lcb->entries [REG_PARSER_MULTI_LINE]); ++i)
 	{
-		regexPattern* ptrn = ptrArrayItem(lcb->patterns [REG_PARSER_MULTI_LINE], i);
+		regexTableEntry *entry = ptrArrayItem(lcb->entries [REG_PARSER_MULTI_LINE], i);
+		Assert (entry && entry->pattern);
 
-		if ((ptrn->xtagType != XTAG_UNKNOWN)
-			&& (!isXtagEnabled (ptrn->xtagType)))
+		if ((entry->pattern->xtagType != XTAG_UNKNOWN)
+			&& (!isXtagEnabled (entry->pattern->xtagType)))
 			continue;
 
-		result = matchMultilineRegexPattern (lcb, allLines, ptrn) || result;
+		result = matchMultilineRegexPattern (lcb, allLines, entry) || result;
 	}
 	return result;
 }
@@ -1742,7 +1782,7 @@ extern void addRegexTable (struct lregexControlBlock *lcb, const char *name)
 
 	struct regexTable *table = xCalloc(1, struct regexTable);
 	table->name = eStrdup (name);
-	table->patterns = ptrArrayNew(deletePattern);
+	table->entries = ptrArrayNew(deleteTableEntry);
 
 	ptrArrayAdd (lcb->tables, table);
 }
@@ -1801,9 +1841,12 @@ static struct regexTable * matchMultitableRegexTable (struct lregexControlBlock 
 		goto out;
 	}
 
-	for (unsigned int i = 0; i < ptrArrayCount(table->patterns); i++)
+	for (unsigned int i = 0; i < ptrArrayCount(table->entries); i++)
 	{
-		regexPattern* ptrn = ptrArrayItem(table->patterns, i);
+		regexTableEntry *entry = ptrArrayItem(table->entries, i);
+		regexPattern *ptrn = entry->pattern;
+
+		Assert (ptrn);
 
 		BEGIN_VERBOSE(vfp);
 		{
@@ -1852,7 +1895,7 @@ static struct regexTable * matchMultitableRegexTable (struct lregexControlBlock 
 
 		if (match == 0)
 		{
-			ptrn->statistics.match++;
+			entry->statistics.match++;
 			if (ptrn->type == PTRN_TAG)
 			{
 				struct mTableActionSpec *taction = &(ptrn->taction);
@@ -1971,7 +2014,7 @@ static struct regexTable * matchMultitableRegexTable (struct lregexControlBlock 
 			goto restart;
 		}
 		else
-			ptrn->statistics.unmatch++;
+			entry->statistics.unmatch++;
 	}
  out:
 	if (next == NULL && ptrArrayCount (lcb->tstack) > 0)
@@ -2004,10 +2047,10 @@ extern void extendRegexTable (struct lregexControlBlock *lcb, const char *src, c
 		error (FATAL, "no such regex table in %s: %s", getLanguageName(lcb->owner), dist);
 	dist_table = ptrArrayItem(lcb->tables, i);
 
-	for (i = 0; i < ptrArrayCount(src_table->patterns); i++)
+	for (i = 0; i < ptrArrayCount(src_table->entries); i++)
 	{
-		regexPattern *ptrn = ptrArrayItem (src_table->patterns, i);
-		ptrArrayAdd(dist_table->patterns, refPattern(ptrn));
+		regexTableEntry *entry = ptrArrayItem (src_table->entries, i);
+		ptrArrayAdd(dist_table->entries, newRefPatternEntry(entry));
 	}
 }
 
@@ -2025,14 +2068,15 @@ extern void printMultitableStatistics (struct lregexControlBlock *lcb, FILE *vfp
 		table = ptrArrayItem (lcb->tables, i);
 		fprintf(vfp, "%s\n", table->name);
 		fputs("-----------------------\n", vfp);
-		for (unsigned int j = 0; j < ptrArrayCount(table->patterns); j++)
+		for (unsigned int j = 0; j < ptrArrayCount(table->entries); j++)
 		{
-			regexPattern* ptrn = ptrArrayItem (table->patterns, j);
+			regexTableEntry *entry = ptrArrayItem (table->entries, j);
+			Assert (entry && entry->pattern);
 			fprintf(vfp, "%10u/%-10u%-40s ref: %d\n",
-					ptrn->statistics.match,
-					ptrn->statistics.unmatch + ptrn->statistics.match,
-					ptrn->pattern_string,
-					ptrn->refcount);
+					entry->statistics.match,
+					entry->statistics.unmatch + entry->statistics.match,
+					entry->pattern->pattern_string,
+					entry->pattern->refcount);
 		}
 		fputc('\n', vfp);
 	}
