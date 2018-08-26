@@ -1866,7 +1866,7 @@ extern void addRegexTable (struct lregexControlBlock *lcb, const char *name)
 
 static void dumpSstack(FILE* fp, unsigned long scope)
 {
-	fprintf (fp, "scope: ");
+	fprintf (fp, "scope : ");
 	while (scope != CORK_NIL)
 	{
 		tagEntryInfo *entry = getEntryInCorkQueue (scope);
@@ -1895,6 +1895,22 @@ static void dumpTstack(FILE* fp, ptrArray *tstack)
 		fprintf(fp, "%s%s", t->name, tmp);
 	}
 	fprintf(fp, "\n");
+}
+
+static void printInputLine(FILE* vfp, const char *c, const off_t offset)
+{
+	vString *v = vStringNew ();
+
+	for (; *c && (*c != '\n'); c++)
+		vStringPut(v, *c);
+
+	if (vStringLength (v) == 0 && *c == '\n')
+		vStringCatS (v, "\\n");
+
+	fprintf (vfp, "\ninput : \"%s\" L%lu\n",
+			 vStringValue (v),
+			 getInputLineNumberForFileOffset(offset));
+	vStringDelete(v);
 }
 
 static void printMultitableMessage(const langType language,
@@ -1945,6 +1961,12 @@ static struct regexTable * matchMultitableRegexTable (struct lregexControlBlock 
 		*offset = vStringLength(start);
 		goto out;
 	}
+
+	BEGIN_VERBOSE(vfp);
+	{
+		printInputLine(vfp, current, *offset);
+	}
+	END_VERBOSE();
 
 	for (unsigned int i = 0; i < ptrArrayCount(table->entries); i++)
 	{
@@ -2012,6 +2034,7 @@ static struct regexTable * matchMultitableRegexTable (struct lregexControlBlock 
 								 - cstart);
 				BEGIN_VERBOSE(vfp);
 				{
+					fprintf(vfp, "result: matched %d bytes\n", (int)(pmatch[0].rm_eo));
 					dumpSstack (vfp, lcb->currentScope);
 				}
 				END_VERBOSE();
@@ -2131,7 +2154,7 @@ static struct regexTable * matchMultitableRegexTable (struct lregexControlBlock 
 	{
 		static int apop_count = 0;
 		next = ptrArrayLast(lcb->tstack);
-		verbose("stack: autopop<%d> from %s to %s @ %lu\n", apop_count++, table->name, next->name,
+		verbose("result: no match - autopop<%d> from {%s} to {%s} @ %lu\n", apop_count++, table->name, next->name,
 				getInputLineNumberForFileOffset(*offset));
 		ptrArrayRemoveLast (lcb->tstack);
 	}
@@ -2206,20 +2229,6 @@ extern bool matchMultitableRegex (struct lregexControlBlock *lcb, const vString*
 
 	while (table)
 	{
-
-		BEGIN_VERBOSE(vfp);
-		{
-			vString *v = vStringNew ();
-			for (const char *c = vStringValue(allLines) + offset; *c && (*c != '\n'); c++)
-				vStringPut(v, *c);
-
-			fprintf (vfp, "input : \"%s\" L%lu\n",
-					 vStringValue (v),
-					 getInputLineNumberForFileOffset(offset));
-			vStringDelete(v);
-		}
-		END_VERBOSE();
-
 		last_offset = offset;
 		table = matchMultitableRegexTable(lcb, table, allLines, &offset);
 
