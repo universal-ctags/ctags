@@ -1,0 +1,11 @@
+--langdef=X
+--map-X=+.x
+--kinddef-X=f,func,functions
+--kinddef-X=v,var,variables
+
+# This triggers the parser initialization.
+--kinds-X=+{var}
+
+--regex-X=/^func +([A-Z])$/\1/f/{scope=push}
+--regex-X=/^end$///{scope=pop}{placeholder}
+--regex-X=/^[ \t]*var ([A-Z])$/\1/v/{scope=ref}
