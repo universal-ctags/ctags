@@ -1,0 +1,9 @@
+namespace X {
+	class Y {
+		var bool Z;
+	};
+}
+
+bad regex found-it
+bad multi-line found-mline
+bad multi-table found-mtable

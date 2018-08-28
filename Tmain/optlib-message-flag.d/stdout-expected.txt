@@ -1,0 +1,6 @@
+A	./input0.foo	/^namespace A {$/;"	N
+A	./input0.foo	/^namespace A {$/;"	m
+A	./input0.foo	/^namespace A {$/;"	n
+B	./input0.foo	/^	class B {$/;"	c	namespace:A
+C	./input0.foo	/^		var bool C;$/;"	V
+C	./input0.foo	/^		var bool C;$/;"	v	class:A.B

@@ -169,6 +169,7 @@ optionValues Option = {
 	.putFieldPrefix = false,
 	.maxRecursionDepth = 0xffffffff,
 	.interactive = false,
+	.mtablePrintTotals = false,
 #ifdef DEBUG
 	.debugLevel = 0,
 	.breakLine = 0,
@@ -467,6 +468,8 @@ static optionDescription ExperimentalLongOptionDescription [] = {
  {1,"       Copy patterns of a regex table to another regex table."},
  {1,"  --_mtable-regex-<LANG>=table/line_pattern/name_pattern/[flags]"},
  {1,"       Define multitable regular expression for locating tags in specific language."},
+ {1,"  --_mtable-totals=[yes|no]"},
+ {1,"       Print statistics about mtable usage [no]."},
  {1,"  --_roledef-<LANG>=kind_letter.role_name,role_desc"},
  {1,"       Define new role for kind specified with <kind_letter> in <LANG>."},
  {1,"  --_tabledef-<LANG>=name"},
@@ -2757,6 +2760,7 @@ static booleanOption BooleanOptions [] = {
 	{ "verbose",        &Option.verbose,                false, STAGE_ANY },
 	{ "with-list-header", &localOption.withListHeader,       true,  STAGE_ANY },
 	{ "_fatal-warnings",&Option.fatalWarnings,          false, STAGE_ANY },
+	{ "_mtable-totals", &Option.mtablePrintTotals,      false, STAGE_ANY },
 };
 
 /*

@@ -1,0 +1,31 @@
+# warning messages
+ctags: Notice: No options will be read from files or environment
+ctags: Warning: Message from regex<FOO>: found namespace 'A' (./input0.foo:1)
+ctags: Warning: Message from regex<FOO>: got namespace (./input0.foo:1)
+ctags: Warning: Message from regex<FOO>: got variable 'C' of type bool (./input0.foo:3)
+ctags: Warning: Message from mtable<FOO/main[ 0]>: found namespace (./input0.foo:1)
+ctags: Warning: Message from mtable<FOO/block[ 0]>: got class (./input0.foo:2)
+ctags: Warning: Message from mtable<FOO/block[ 1]>: got variable 'C' of type bool (./input0.foo:3)
+ctags: Warning: Message from mtable<FOO/blockEnd[ 0]>: end of block (./input0.foo:4)
+ctags: Warning: Message from mtable<FOO/blockEnd[ 0]>: end of block (./input0.foo:5)
+# fatal regex message
+ctags: Notice: No options will be read from files or environment
+ctags: Warning: Message from regex<FOO>: found namespace 'X' (./input1.foo:1)
+ctags: Fatal: Message from regex<FOO>: bad='found-it' (./input1.foo:7)
+# fatal mline-regex message
+ctags: Notice: No options will be read from files or environment
+ctags: Warning: Message from regex<FOO>: found namespace 'XX' (./input2.foo:1)
+ctags: Warning: Message from regex<FOO>: got namespace (./input2.foo:1)
+ctags: Warning: Message from regex<FOO>: got variable 'ZZ' of type bool (./input2.foo:3)
+ctags: Fatal: Message from regex<FOO>: bad='found-mline' (./input2.foo:7)
+# fatal mtable-regex message
+ctags: Notice: No options will be read from files or environment
+ctags: Warning: Message from regex<FOO>: found namespace 'XXX' (./input3.foo:1)
+ctags: Warning: Message from regex<FOO>: got namespace (./input3.foo:1)
+ctags: Warning: Message from regex<FOO>: got variable 'ZZZ' of type bool (./input3.foo:3)
+ctags: Warning: Message from mtable<FOO/main[ 0]>: found namespace (./input3.foo:1)
+ctags: Warning: Message from mtable<FOO/block[ 0]>: got class (./input3.foo:2)
+ctags: Warning: Message from mtable<FOO/block[ 1]>: got variable 'ZZZ' of type bool (./input3.foo:3)
+ctags: Warning: Message from mtable<FOO/blockEnd[ 0]>: end of block (./input3.foo:4)
+ctags: Warning: Message from mtable<FOO/blockEnd[ 0]>: end of block (./input3.foo:5)
+ctags: Fatal: Message from mtable<FOO/blockEnd[ 2]>: bad='found-mtable' (./input3.foo:7)

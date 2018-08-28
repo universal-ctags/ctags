@@ -1,0 +1,8 @@
+namespace XX {
+	class YY {
+		var bool ZZ;
+	};
+}
+
+bad multi-line found-mline
+bad multi-table found-mtable

@@ -104,6 +104,7 @@ typedef struct sOptionValues {
 	enum interactiveMode { INTERACTIVE_NONE = 0,
 						   INTERACTIVE_DEFAULT,
 						   INTERACTIVE_SANDBOX, } interactive; /* --interactive */
+	bool mtablePrintTotals;  /* display mtable statistics */
 #ifdef DEBUG
 	long debugLevel;        /* -d  debugging output */
 	unsigned long breakLine;/* -b  input line at which to call lineBreak() */
@@ -133,9 +134,14 @@ extern CONST_OPTION optionValues		Option;
 */
 extern void notice (const char *const format, ...) CTAGS_ATTR_PRINTF (1, 2);
 extern void verbose (const char *const format, ...) CTAGS_ATTR_PRINTF (1, 2);
+
 #define BEGIN_VERBOSE(VFP) do { if (Option.verbose) { \
                                 FILE* VFP = stderr
 #define END_VERBOSE()      } } while (0)
+
+#define BEGIN_VERBOSE_IF(COND,VFP) do { if (Option.verbose || (COND)) { \
+                                FILE* VFP = stderr
+
 
 extern void freeList (stringList** const pString);
 extern void setDefaultTagFileName (void);
