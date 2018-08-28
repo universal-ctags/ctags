@@ -1,0 +1,9 @@
+L1	input.adoc	/^== L1$/;"	s	chapter:[A B]
+L1_b	input.adoc	/^== L1_b$/;"	s	chapter:[A B]
+L2	input.adoc	/^=== L2$/;"	S	section:L1
+L3 Title	input.adoc	/^==== L3 Title$/;"	t	subsection:L2
+L4 Title [ ]	input.adoc	/^===== L4 Title [ ]$/;"	T	subsubsection:L3 Title
+[ #bad] L2_b Title [,]	input.adoc	/^=== [ #bad] L2_b Title [,]$/;"	S	section:L1_b
+[A B]	input.adoc	/^= [A B]$/;"	c
+[foo][bar] L2_c Title [[]	input.adoc	/^=== [foo][bar] L2_c Title [[] ===$/;"	S	section:L1_b
+good_anchor	input.adoc	/^[[good_anchor, ]]$/;"	a	section:L1

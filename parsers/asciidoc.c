@@ -239,7 +239,8 @@ static int process_trailing_anchor(const unsigned char *const begin,
 			if (end[-1] == ']' && found > begin && found[-1] == '[')
 				--found;
 
-			capture_anchor(found, &captured_len);
+			if (is_anchor (found))
+				capture_anchor(found, &captured_len);
 		}
 	}
 
