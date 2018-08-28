@@ -673,11 +673,12 @@ extern int main (int argc CTAGS_ATTR_UNUSED, char **argv)
 	runMainLoop (args);
 
 
-	if (Option.verbose || Option.mtablePrintTotals)
+	BEGIN_VERBOSE_IF(Option.mtablePrintTotals, vfp);
 	{
 		for (unsigned int i = 0; i < countParsers(); i++)
-			printLanguageMultitableStatistics (i, stderr);
+			printLanguageMultitableStatistics (i, vfp);
 	}
+	END_VERBOSE();
 
 	/*  Clean up.
 	 */
