@@ -13,9 +13,6 @@
  * This code was ported from geany git commit 40396a3 at:
  *   https://github.com/geany/geany/blob/master/ctags/parsers/asciidoc.c
  * with the changes in geany's PR #1263, with some changes to work in uctags.
- *
- * TODO:
- *   - tag anchors inside one-line titles
  */
 
 /*
@@ -155,14 +152,19 @@ static bool is_anchor(const unsigned char *line)
 	return line[0] == '[' && (line[1] == '#' || line[1] == '[');
 }
 
-static int capture_anchor(const unsigned char *line)
+static int capture_anchor(const unsigned char *const orig, int* captured_len)
 {
 	vString *name = vStringNew ();
 	int r = CORK_NIL;
-	const bool shorthand = line[1] == '#' ? true : false;
+	const bool shorthand = orig[1] == '#' ? true : false;
+	bool is_valid = false;
+	bool seen_comma = false;
+	const unsigned char *line = orig;
 
 	Assert (line[0] == '[');
 	Assert (line[1] == '#' || line[1] == '[');
+
+	if (captured_len) *captured_len = 0;
 
 	line += 2;
 
@@ -170,23 +172,107 @@ static int capture_anchor(const unsigned char *line)
 	{
 		if (*line == ']')
 		{
-			if (shorthand)
+			if (shorthand || line[1] == ']')
+			{
+				is_valid = true;
+				if (shorthand) line++;
+				else line += 2;
 				break;
-			else if (line[1] == ']')
-				break;
+			}
 			/* otherwise it's not the end, keep going */			
 		}
-		vStringPut (name, *line);
+
+		if (*line == ',')
+			seen_comma = true;
+
+		if (!seen_comma)
+			vStringPut (name, *line);
+
 		line++;
 	}
 
-	if (vStringLength (name) != 0)
+	if (is_valid && vStringLength (name) != 0)
 	{
 		r = makeAsciidocTag (name, K_ANCHOR, false);
+
+		if (captured_len)
+		{
+			*captured_len = line - orig;
+		}
 	}
 
 	vStringDelete (name);
 	return r;
+}
+
+
+/* skips any leading anchor(s) in a one-line title, generating tags for them */
+static int process_leading_anchors(const unsigned char *const begin)
+{
+	int captured_len = 0;
+	const unsigned char *current = begin;
+
+	while (is_anchor(current) && capture_anchor(current, &captured_len) != CORK_NIL)
+	{
+		/* minimum is "[#a]" */
+		Assert (captured_len >= 4);
+		current += captured_len;
+		while (isspace(*current)) ++current;
+	}
+
+	return current - begin;
+}
+
+static int process_trailing_anchor(const unsigned char *const begin,
+								   const unsigned char *const end)
+{
+	int captured_len = 0;
+	const unsigned char *found = NULL;
+
+	/* minimum is "[#a]" */
+	if (*end == ']' && (end - begin) >= 4)
+	{
+		found = (const unsigned char*) strrchr((const char*) begin , '[');
+		if (found && ((end - found) >= 4))
+		{
+			/* see if it's not shorthand [#a] but instead [[a]] */
+			if (end[-1] == ']' && found > begin && found[-1] == '[')
+				--found;
+
+			capture_anchor(found, &captured_len);
+		}
+	}
+
+	return captured_len;
+}
+
+static void process_name(vString *const name, const int kind,
+						 const unsigned char *line, const int line_len)
+{
+	int start = kind + 1;
+	int end = line_len - 1;
+
+	Assert (kind >= 0 && kind < K_ANCHOR);
+	Assert (line_len > start);
+
+	vStringClear(name);
+
+	while (line[end] == line[0]) --end;
+	while (isspace(line[start])) ++start;
+	while (isspace(line[end])) --end;
+
+	if (start < end)
+	{
+		/* pop nesting levels, so that anchors get the parent's scope */
+		getNestingLevel(kind);
+		end -= process_trailing_anchor(line + start, line + end);
+		start += process_leading_anchors(line + start);
+	}
+
+	while (isspace(line[end])) --end;
+
+	if (start < end)
+		vStringNCatS(name, (const char*)(&(line[start])), end - start + 1);
 }
 
 
@@ -232,7 +318,7 @@ static void findAsciidocTags(void)
 	{
 		if (is_anchor (line))
 		{
-			if (capture_anchor (line) != CORK_NIL)
+			if (capture_anchor (line, NULL) != CORK_NIL)
 			{
 				vStringClear (name);
 				continue;
@@ -293,13 +379,7 @@ static void findAsciidocTags(void)
 					!in_block)
 			{
 				int kind = n_same - 1;
-				int start = n_same;
-				int end = line_len - 1;
-				while (line[end] == line[0])--end;
-				while (isspace(line[start]))++start;
-				while (isspace(line[end]))--end;
-				vStringClear(name);
-				vStringNCatS(name, (const char*)(&(line[start])), end - start + 1);
+				process_name(name, kind, line, line_len);
 				makeSectionAsciidocTag(name, kind, false);
 				continue;
 			}
