@@ -1800,6 +1800,11 @@ static void lazyInitialize (langType language)
 			def->parser = optlibRunBaseParser;
 		else
 			def->parser = findRegexTags;
+
+		if (!def->useCork &&
+			(hasLanguageScopeActionInRegex (language)
+			 || def->requestAutomaticFQTag))
+			def->useCork = true;
 	}
 }
 
