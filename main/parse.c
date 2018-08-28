@@ -1601,10 +1601,6 @@ static void initializeParserOne (langType lang)
 	   xtag definitions. */
 	installTagRegexTable (lang);
 
-	if (hasLanguageScopeActionInRegex (lang)
-	    || parser->def->requestAutomaticFQTag)
-		parser->def->useCork = true;
-
 	if (parser->def->initialize != NULL)
 		parser->def->initialize (lang);
 
@@ -3044,6 +3040,13 @@ static bool doesParserUseCork (parserDefinition *parser)
 
 	if (parser->useCork)
 		return true;
+
+	if (hasLanguageScopeActionInRegex (parser->id)
+	    || parser->requestAutomaticFQTag)
+	{
+		parser->useCork = true;
+		return true;
+	}
 
 	pushLanguage (parser->id);
 	foreachSubparser(tmp, true)
