@@ -91,6 +91,14 @@ typedef struct sParserObject {
 	struct slaveControlBlock *slaveControlBlock;
 	struct kindControlBlock  *kindControlBlock;
 	struct lregexControlBlock *lregexControlBlock;
+
+	langType pretendingAsLanguage; /* OLDLANG in --_pretend-<NEWLANG>=<OLDLANG>
+									  is set here if this parser is NEWLANG.
+									  LANG_IGNORE is set if no pretending. */
+	langType pretendedAsLanguage;  /* NEWLANG in --_pretend-<NEWLANG>=<OLDLANG>
+									  is set here if this parser is OLDLANG.
+									  LANG_IGNORE is set if no being pretended. */
+
 } parserObject;
 
 /*
@@ -224,17 +232,35 @@ extern bool doesLanguageRequestAutomaticFQTag (const langType language)
 	return LanguageTable [language].def->requestAutomaticFQTag;
 }
 
-extern const char *getLanguageName (const langType language)
+static const char *getLanguageNameFull (const langType language, bool noPretending)
 {
 	const char* result;
+
 	if (language == LANG_IGNORE)
 		result = "unknown";
 	else
 	{
 		Assert (0 <= language  &&  language < (int) LanguageCount);
-		result = LanguageTable [language].def->name;
+		if (noPretending)
+			result = LanguageTable [language].def->name;
+		else
+		{
+			langType real_language = LanguageTable [language].pretendingAsLanguage;
+			if (real_language == LANG_IGNORE)
+				result = LanguageTable [language].def->name;
+			else
+			{
+				Assert (0 <= real_language  &&  real_language < (int) LanguageCount);
+				result = LanguageTable [real_language].def->name;
+			}
+		}
 	}
 	return result;
+}
+
+extern const char *getLanguageName (const langType language)
+{
+	return getLanguageNameFull (language, false);
 }
 
 extern const char *getLanguageKindName (const langType language, const int kindIndex)
@@ -321,7 +347,7 @@ extern roleDefinition* getLanguageRoleForName (const langType language, int kind
 	return getRoleForName (LanguageTable [language].kindControlBlock, kindIndex, roleName);
 }
 
-extern langType getNamedLanguage (const char *const name, size_t len)
+extern langType getNamedLanguageFull (const char *const name, size_t len, bool noPretending)
 {
 	langType result = LANG_IGNORE;
 	unsigned int i;
@@ -345,7 +371,18 @@ extern langType getNamedLanguage (const char *const name, size_t len)
 				result = i;
 			vStringDelete (vstr);
 		}
+
+	if (result != LANG_IGNORE
+		&& (!noPretending)
+		&& LanguageTable [result].pretendedAsLanguage != LANG_IGNORE)
+		result = LanguageTable [result].pretendedAsLanguage;
+
 	return result;
+}
+
+extern langType getNamedLanguage (const char *const name, size_t len)
+{
+	return getNamedLanguageFull (name, len, false);
 }
 
 static langType getNameOrAliasesLanguageAndSpec (const char *const key, langType start_index,
@@ -1844,6 +1881,11 @@ extern void initializeParsing (void)
 	builtInCount = ARRAY_SIZE (BuiltInParsers);
 	LanguageTable = xMalloc (builtInCount, parserObject);
 	memset(LanguageTable, 0, builtInCount * sizeof (parserObject));
+	for (i = 0; i < builtInCount; ++i)
+	{
+		LanguageTable [i].pretendingAsLanguage = LANG_IGNORE;
+		LanguageTable [i].pretendedAsLanguage = LANG_IGNORE;
+	}
 
 	LanguageHTable = hashTableNew (127,
 								   hashCstrcasehash,
@@ -2118,6 +2160,8 @@ extern void processLanguageDefineOption (
 
 		LanguageTable [def->id].currentPatterns = stringListNew ();
 		LanguageTable [def->id].currentExtensions = stringListNew ();
+		LanguageTable [def->id].pretendingAsLanguage = LANG_IGNORE;
+		LanguageTable [def->id].pretendedAsLanguage = LANG_IGNORE;
 
 		eFree (name);
 	}
@@ -3386,7 +3430,9 @@ static void printGuessedParser (const char* const fileName, langType language)
 		parserName = RSV_NONE;
 	}
 	else
-		parserName = LanguageTable [language].def->name;
+	{
+		parserName = getLanguageName (language);
+	}
 
 	printf("%s: %s\n", fileName, parserName);
 }
@@ -4238,6 +4284,54 @@ extern void addLanguageTagMultiTableRegex(const langType language,
 	parserObject* const parser = LanguageTable + language;
 	addTagMultiTableRegex (parser->lregexControlBlock, table_name, regex,
 						   name, kinds, flags, disabled);
+}
+
+extern bool processPretendOption (const char *const option, const char *const parameter)
+{
+	langType new_language, old_language;
+
+#define pretendOptionPrefix "_pretend-"
+	new_language = getLanguageComponentInOptionFull (option, pretendOptionPrefix, true);
+	if (new_language == LANG_IGNORE)
+		return false;
+
+	if (parameter == NULL || parameter[0] == '\0')
+		error (FATAL, "A parameter is needed after \"%s\" option", option);
+
+	old_language = getNamedLanguageFull (parameter, 0, true);
+	if (old_language == LANG_IGNORE)
+		error (FATAL, "Unknown language \"%s\" in option \"--%s=%s\"",
+			   parameter, option, parameter);
+
+	if (LanguageTable [new_language].pretendingAsLanguage != LANG_IGNORE)
+	{
+		error (FATAL, "%s parser pretends as %s already\n",
+			   getLanguageNameFull (new_language, true),
+			   getLanguageNameFull (LanguageTable [new_language].pretendingAsLanguage, true));
+	}
+	if (LanguageTable [old_language].pretendedAsLanguage != LANG_IGNORE)
+	{
+		error (FATAL, "%s parser is pretended as %s already\n",
+			   getLanguageNameFull (old_language, true),
+			   getLanguageNameFull (LanguageTable [old_language].pretendedAsLanguage, true));
+	}
+
+	verbose ("%s pretends %s\n",
+			 getLanguageNameFull (new_language, true),
+			 getLanguageNameFull (old_language, true));
+
+	LanguageTable [new_language].pretendingAsLanguage = old_language;
+	LanguageTable [old_language].pretendedAsLanguage  = new_language;
+
+	verbose ("force enabling %s\n",
+			 getLanguageNameFull (new_language, true));
+	enableLanguage (new_language, true);
+
+	verbose ("force disbling %s\n",
+			 getLanguageNameFull (old_language, true));
+	enableLanguage (old_language, false);
+
+	return true;
 }
 
 /*
