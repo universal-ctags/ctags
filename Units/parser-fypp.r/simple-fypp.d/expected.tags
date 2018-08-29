@@ -1,0 +1,1 @@
+assertTrue	input.fy	/^#:def assertTrue(cond)$/;"	m	line:2	signature:(cond)	end:7

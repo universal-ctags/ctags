@@ -24,6 +24,7 @@
 #include "main.h"
 #include "routines.h"
 #include "options.h"
+#include "promise.h"
 #include "trashbox.h"
 #ifdef HAVE_ICONV
 # include "mbcs.h"
@@ -1111,7 +1112,8 @@ out:
 extern void   pushNarrowedInputStream (
 				       unsigned long startLine, long startCharOffset,
 				       unsigned long endLine, long endCharOffset,
-				       unsigned long sourceLineOffset)
+				       unsigned long sourceLineOffset,
+				       int promise)
 {
 	long p, q;
 	MIOPos original;
@@ -1144,9 +1146,16 @@ extern void   pushNarrowedInputStream (
 
 	invalidatePatternCache();
 
-	subio = mio_new_mio (File.mio, p, q - p);
+	size_t size = q - p;
+	subio = mio_new_mio (File.mio, p, size);
 	if (subio == NULL)
 		error (FATAL, "memory for mio may be exhausted");
+
+	runModifiers (promise,
+				  startLine, startCharOffset,
+				  endLine, endCharOffset,
+				  mio_memory_get_data (subio, NULL),
+				  size);
 
 	BackupFile = File;
 

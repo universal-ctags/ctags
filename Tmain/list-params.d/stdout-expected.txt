@@ -3,17 +3,20 @@
 CPreProcessor  define define replacement for an identifier
 CPreProcessor  if0    examine code within "#if 0" branch (true or [false])
 CPreProcessor  ignore a token to be specially handled
+Fypp           guest  parser run after Fypp parser parses the original input ("NONE" or a parser name [Fortran])
 
 # ALL MACHINABLE
 #LANGUAGE	NAME	DESCRIPTION
 CPreProcessor	define	define replacement for an identifier
 CPreProcessor	if0	examine code within "#if 0" branch (true or [false])
 CPreProcessor	ignore	a token to be specially handled
+Fypp	guest	parser run after Fypp parser parses the original input ("NONE" or a parser name [Fortran])
 
 # ALL MACHINABLE NOHEADER
 CPreProcessor	define	define replacement for an identifier
 CPreProcessor	if0	examine code within "#if 0" branch (true or [false])
 CPreProcessor	ignore	a token to be specially handled
+Fypp	guest	parser run after Fypp parser parses the original input ("NONE" or a parser name [Fortran])
 
 # CPP
 #NAME   DESCRIPTION

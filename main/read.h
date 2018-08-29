@@ -118,7 +118,8 @@ extern char *readLineFromBypassSlow (vString *const vLine, unsigned long lineNum
 extern void   pushNarrowedInputStream (
 				       unsigned long startLine, long startCharOffset,
 				       unsigned long endLine, long endCharOffset,
-				       unsigned long sourceLineOffset);
+				       unsigned long sourceLineOffset,
+				       int promise);
 extern void   popNarrowedInputStream  (void);
 
 extern void     pushLanguage(const langType language);

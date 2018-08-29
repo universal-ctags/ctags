@@ -1,0 +1,16 @@
+A	input.fy	/^	A,    \/\/ should be 'e', not 'f'$/;"	e	enum:e	file:	end:10
+B	input.fy	/^	B(),  \/\/ should be 'e', not 'm'$/;"	e	enum:e	file:	end:11
+C	input.fy	/^	C(1), \/\/ should be 'e', not missing$/;"	e	enum:e	file:	end:12
+D	input.fy	/^	D,    \/\/ should be 'e', not 'f'$/;"	e	enum:e	file:	end:20
+E	input.fy	/^	E(),  \/\/ should be 'e', not 'm'$/;"	e	enum:e	file:	end:21
+F	input.fy	/^	F(1), \/\/ should be 'e', not missing$/;"	e	enum:e	file:	end:22
+debug_code	input.fy	/^#:def debug_code(code)$/;"	m	end:8
+e	input.fy	/^        e() {}$/;"	m	class:e	end:32
+e	input.fy	/^        e(int x) {}$/;"	m	class:e	end:31
+e	input.fy	/^public enum e {$/;"	g
+getShape	input.fy	/^	public final Shape getShape() {$/;"	m	class:e	end:46
+getString	input.fy	/^	public String getString() {$/;"	m	class:e	end:41
+repeat_code	input.fy	/^#:def repeat_code(code, repeat)$/;"	m	end:29
+shape	input.fy	/^	public final Shape shape;$/;"	f	class:e	end:35
+string	input.fy	/^	public String string;$/;"	f	class:e	end:34
+twoKeywordsInARow	input.fy	/^	public final boolean twoKeywordsInARow;$/;"	f	class:e	end:36

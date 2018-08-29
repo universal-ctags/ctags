@@ -1,0 +1,1 @@
+foo	input.fy	/^#:def foo(cond) cond + 1$/;"	m
