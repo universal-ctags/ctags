@@ -30,13 +30,6 @@
 # include "mbcs.h"
 #endif
 
-#include <ctype.h>
-#include <stddef.h>
-#ifdef HAVE_SYS_TYPES_H
-# include <sys/types.h>  /* declare off_t (not known to regex.h on FreeBSD) */
-#endif
-#include <regex.h>
-
 /*
 *   DATA DECLARATIONS
 */
@@ -1006,106 +999,6 @@ extern char *readLineFromBypass (
 	/* If the file is empty, we can't get the line
 	   for location 0. readLineFromBypass doesn't know
 	   what itself should do; just report it to the caller. */
-	return result;
-}
-
-/* If a xcmd parser is used, ctags cannot know the location for a tag.
- * In the other hand, etags output and cross reference output require the
- * line after the location.
- *
- * readLineFromBypassSlow retrieves the line for (lineNumber and pattern of a tag).
- */
-
-extern char *readLineFromBypassSlow (vString *const vLine,
-				 unsigned long lineNumber,
-				 const char *pattern,
-				 long *const pSeekValue)
-{
-	char *result = NULL;
-
-
-	MIOPos originalPosition;
-	char *line;
-	size_t len;
-	long pos;
-
-	regex_t patbuf;
-	char lastc;
-
-
-	/*
-	 * Compile the pattern
-	 */
-	{
-		char *pat;
-		int errcode;
-		char errmsg[256];
-
-		pat = eStrdup (pattern);
-		pat[strlen(pat) - 1] = '\0';
-		errcode = regcomp (&patbuf, pat + 1, 0);
-		eFree (pat);
-
-		if (errcode != 0)
-		{
-			regerror (errcode, &patbuf, errmsg, 256);
-			error (WARNING, "regcomp %s in readLineFromBypassSlow: %s", pattern, errmsg);
-			regfree (&patbuf);
-			return NULL;
-		}
-	}
-
-	/*
-	 * Get the line for lineNumber
-	 */
-	{
-		unsigned long n;
-
-		mio_getpos (File.mio, &originalPosition);
-		rewindInputFile (&File);
-		line = NULL;
-		pos = 0;
-		for (n = 0; n < lineNumber; n++)
-		{
-			pos = mio_tell (File.mio);
-			line = readLineRaw (vLine, File.mio);
-			if (line == NULL)
-				break;
-		}
-		if (line == NULL)
-			goto out;
-		else
-			len = strlen(line);
-
-		if (len == 0)
-			goto out;
-
-		lastc = line[len - 1];
-		if (lastc == '\n')
-			line[len - 1] = '\0';
-	}
-
-	/*
-	 * Match
-	 */
-	{
-		regmatch_t pmatch;
-		int after_newline = 0;
-		if (regexec (&patbuf, line, 1, &pmatch, 0) == 0)
-		{
-			line[len - 1] = lastc;
-			result = line + pmatch.rm_so;
-			if (pSeekValue)
-			{
-				after_newline = ((lineNumber == 1)? 0: 1);
-				*pSeekValue = pos + after_newline + pmatch.rm_so;
-			}
-		}
-	}
-
-out:
-	regfree (&patbuf);
-	mio_setpos (File.mio, &originalPosition);
 	return result;
 }
 

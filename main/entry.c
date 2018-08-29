@@ -720,14 +720,8 @@ static bool isPosSet(MIOPos pos)
 extern char *readLineFromBypassAnyway (vString *const vLine, const tagEntryInfo *const tag,
 				   long *const pSeekValue)
 {
-	char * line;
-
-	if (isPosSet (tag->filePosition) || (tag->pattern == NULL))
-		line = 	readLineFromBypass (vLine, tag->filePosition, pSeekValue);
-	else
-		line = readLineFromBypassSlow (vLine, tag->lineNumber, tag->pattern, pSeekValue);
-
-	return line;
+	Assert (isPosSet (tag->filePosition) || (tag->pattern == NULL));
+	return readLineFromBypass (vLine, tag->filePosition, pSeekValue);
 }
 
 /*  Truncates the text line containing the tag at the character following the
