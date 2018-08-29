@@ -1,0 +1,35 @@
+= [A B]
+
+Intro text of chapter 1
+
+[c]
+== L1
+
+Text of section 1.1
+
+[[good_anchor, ]]
+=== L2
+
+Text of subsection 1.1.1
+
+[#]
+==== L3 Title
+
+Text of subsection 1.1.1.1
+
+===== L4 Title [ ]
+
+Text of subsection 1.1.1.1
+
+[, bad]
+== L1_b
+
+[#invalid anchor for Text of section 1.2
+
+=== [ #bad] L2_b Title [,]
+
+Text of subsection 1.2.1
+
+=== [foo][bar] L2_c Title [[] ===
+
+Text of subsection 1.2.2
