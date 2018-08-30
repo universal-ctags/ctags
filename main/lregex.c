@@ -182,6 +182,7 @@ static void deleteTable (void *ptrn)
 	struct regexTable *t = ptrn;
 
 	ptrArrayDelete (t->entries);
+	eFree (t->name);
 	eFree (t);
 }
 
