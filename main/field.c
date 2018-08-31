@@ -602,7 +602,7 @@ static const char *renderFieldCompactInputLine (const tagEntryInfo *const tag,
 
 	tmp = vStringNewOrClearWithAutoRelease (tmp);
 
-	line = readLineFromBypassAnyway (tmp, tag, NULL);
+	line = readLineFromBypassForTag (tmp, tag, NULL);
 	if (line)
 		renderCompactInputLine (b, line);
 	else

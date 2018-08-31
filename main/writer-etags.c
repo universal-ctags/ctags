@@ -97,7 +97,7 @@ static int writeEtagsEntry (tagWriter *writer,
 		size_t len;
 		long seekValue;
 		char *const line =
-				readLineFromBypassAnyway (etags->vLine, tag, &seekValue);
+				readLineFromBypassForTag (etags->vLine, tag, &seekValue);
 		if (line == NULL || line [0] == '\0')
 			return 0;
 

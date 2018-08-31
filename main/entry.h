@@ -164,7 +164,7 @@ extern void getTagScopeInformation (tagEntryInfo *const tag,
 				    const char **kind, const char **name);
 
 /* Getting line associated with tag */
-extern char *readLineFromBypassAnyway (vString *const vLine, const tagEntryInfo *const tag,
+extern char *readLineFromBypassForTag (vString *const vLine, const tagEntryInfo *const tag,
 				   long *const pSeekValue);
 
 /* Generating pattern associated tag, caller must do eFree for the returned value. */
