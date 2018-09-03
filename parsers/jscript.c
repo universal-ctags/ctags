@@ -399,7 +399,7 @@ static void makeClassTagCommon (tokenInfo *const token, vString *const signature
 		{
 			vStringCopy(fulltag, token->scope);
 			vStringPut (fulltag, '.');
-			vStringCatS (fulltag, vStringValue(token->string));
+			vStringCat (fulltag, token->string);
 		}
 		else
 		{
@@ -433,7 +433,7 @@ static void makeFunctionTagCommon (tokenInfo *const token, vString *const signat
 		{
 			vStringCopy(fulltag, token->scope);
 			vStringPut (fulltag, '.');
-			vStringCatS (fulltag, vStringValue(token->string));
+			vStringCat (fulltag, token->string);
 		}
 		else
 		{
@@ -1155,7 +1155,7 @@ static void addContext (tokenInfo* const parent, const tokenInfo* const child)
 	{
 		vStringPut (parent->string, '.');
 	}
-	vStringCatS (parent->string, vStringValue(child->string));
+	vStringCat (parent->string, child->string);
 }
 
 static void addToScope (tokenInfo* const token, const vString* const extra)
@@ -1164,7 +1164,7 @@ static void addToScope (tokenInfo* const token, const vString* const extra)
 	{
 		vStringPut (token->scope, '.');
 	}
-	vStringCatS (token->scope, vStringValue(extra));
+	vStringCat (token->scope, extra);
 }
 
 /*
@@ -2193,7 +2193,7 @@ nextVar:
 					{
 						vStringCopy(fulltag, token->scope);
 						vStringPut (fulltag, '.');
-						vStringCatS (fulltag, vStringValue(token->string));
+						vStringCat (fulltag, token->string);
 					}
 					else
 					{
@@ -2283,7 +2283,7 @@ nextVar:
 				{
 					vStringCopy(fulltag, token->scope);
 					vStringPut (fulltag, '.');
-					vStringCatS (fulltag, vStringValue(token->string));
+					vStringCat (fulltag, token->string);
 				}
 				else
 				{

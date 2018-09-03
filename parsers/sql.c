@@ -740,7 +740,7 @@ static void readIdentifier (tokenInfo *const token)
  *	   {
  *		   vStringPut (parent->string, '.');
  *	   }
- *	   vStringCatS (parent->string, vStringValue(child->string));
+ *	   vStringCat (parent->string, child->string);
  * }
  */
 
@@ -750,7 +750,7 @@ static void addToScope (tokenInfo* const token, vString* const extra, sqlKind ki
 	{
 		vStringPut (token->scope, '.');
 	}
-	vStringCatS (token->scope, vStringValue(extra));
+	vStringCat (token->scope, extra);
 	token->scopeKind = kind;
 }
 

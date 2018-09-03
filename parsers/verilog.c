@@ -622,7 +622,7 @@ static void createTag (tokenInfo *const token)
 
 		vStringCopy (scopedName, currentContext->name);
 		vStringPut (scopedName, '.');
-		vStringCatS (scopedName, vStringValue (token->name));
+		vStringCat (scopedName, token->name);
 		tag.name = vStringValue (scopedName);
 
 		markTagExtraBit (&tag, XTAG_QUALIFIED_TAGS);
