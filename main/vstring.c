@@ -107,7 +107,7 @@ static void stringCat (
 	if (string->length + length + 1 > string->size)
 		vStringResize (string, string->length + length + 1);
 
-	strncpy (string->buffer + string->length, s, length);
+	memcpy (string->buffer + string->length, s, length);
 	string->length += length;
 	vStringPut (string, '\0');
 }
