@@ -73,6 +73,7 @@ typedef struct sTokenInfo {
 	vString *string;		/* the name of the token */
 	unsigned long lineNumber;	/* line number of tag */
 	MIOPos filePosition;		/* file position of line containing name */
+	int c;						/* Used in AppendTokenToVString */
 } tokenInfo;
 
 /*
@@ -221,6 +222,24 @@ static void parseIdentifier (vString *const string, const int firstChar)
 	ungetcToInputFile (c);		/* always unget, LF might add a semicolon */
 }
 
+static void appendTokenToVString (const tokenInfo *const token, vString *collector)
+{
+	if (token->type == TOKEN_LEFT_ARROW)
+		vStringCatS(collector, "<-");
+	else if (token->type == TOKEN_STRING)
+	{
+		// only struct member annotations can appear in function prototypes
+		// so only `` type strings are possible
+		vStringPut(collector, '`');
+		vStringCat(collector, token->string);
+		vStringPut(collector, '`');
+	}
+	else if (token->type == TOKEN_IDENTIFIER || token->type == TOKEN_KEYWORD)
+		vStringCat(collector, token->string);
+	else if (token->c != EOF)
+		vStringPut(collector, token->c);
+}
+
 static void readTokenFull (tokenInfo *const token, vString *collector)
 {
 	int c;
@@ -228,6 +247,7 @@ static void readTokenFull (tokenInfo *const token, vString *collector)
 	bool firstWhitespace = true;
 	bool whitespace;
 
+	token->c = EOF;
 	token->type = TOKEN_NONE;
 	token->keyword = KEYWORD_NONE;
 	vStringClear (token->string);
@@ -385,23 +405,10 @@ getNextChar:
 			break;
 	}
 
+	token->c = c;
+
 	if (collector && vStringLength (collector) < MAX_COLLECTOR_LENGTH)
-	{
-		if (token->type == TOKEN_LEFT_ARROW)
-			vStringCatS(collector, "<-");
-		else if (token->type == TOKEN_STRING)
-		{
-			// only struct member annotations can appear in function prototypes
-			// so only `` type strings are possible
-			vStringPut(collector, '`');
-			vStringCat(collector, token->string);
-			vStringPut(collector, '`');
-		}
-		else if (token->type == TOKEN_IDENTIFIER || token->type == TOKEN_KEYWORD)
-			vStringCat(collector, token->string);
-		else if (c != EOF)
-			vStringPut(collector, c);
-	}
+		appendTokenToVString (token, collector);
 
 	lastTokenType = token->type;
 }
