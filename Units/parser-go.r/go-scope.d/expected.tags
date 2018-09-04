@@ -1,10 +1,10 @@
 main	input.go	/^package main$/;"	p
 Point	input.go	/^type Point struct { X, Y int }$/;"	s	package:main
 main.Point	input.go	/^type Point struct { X, Y int }$/;"	s	package:main
-X	input.go	/^type Point struct { X, Y int }$/;"	m	struct:main.Point
-main.Point.X	input.go	/^type Point struct { X, Y int }$/;"	m	struct:main.Point
-Y	input.go	/^type Point struct { X, Y int }$/;"	m	struct:main.Point
-main.Point.Y	input.go	/^type Point struct { X, Y int }$/;"	m	struct:main.Point
+X	input.go	/^type Point struct { X, Y int }$/;"	m	struct:main.Point	typeref:typename:int
+main.Point.X	input.go	/^type Point struct { X, Y int }$/;"	m	struct:main.Point	typeref:typename:int
+Y	input.go	/^type Point struct { X, Y int }$/;"	m	struct:main.Point	typeref:typename:int
+main.Point.Y	input.go	/^type Point struct { X, Y int }$/;"	m	struct:main.Point	typeref:typename:int
 Render	input.go	/^func (p *Point) Render() {$/;"	f	unknown:main.Point
 main.Point.Render	input.go	/^func (p *Point) Render() {$/;"	f	unknown:main.Point
 main	input.go	/^func main() {$/;"	f	package:main
