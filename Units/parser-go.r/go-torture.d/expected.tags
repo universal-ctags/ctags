@@ -18,11 +18,11 @@ T6	input.go	/^type T6 struct {$/;"	s	package:main
 T7	input.go	/^type (T7 func (a struct{_ int; _ float32}, b int) (int, map[string]int);T8 float32)$/;"	t	package:main
 T8	input.go	/^type (T7 func (a struct{_ int; _ float32}, b int) (int, map[string]int);T8 float32)$/;"	t	package:main
 T9	input.go	/^func f1() {};func f2() {};type\/*no newline here*\/T9 int\/*var ignored int$/;"	t	package:main
-_a	input.go	/^	_a, _b, _c, _d int$/;"	m	struct:main.T6
-_b	input.go	/^	_a, _b, _c, _d int$/;"	m	struct:main.T6
-_c	input.go	/^	_a, _b, _c, _d int$/;"	m	struct:main.T6
-_d	input.go	/^	_a, _b, _c, _d int$/;"	m	struct:main.T6
-_e	input.go	/^	_e float32$/;"	m	struct:main.T6
+_a	input.go	/^	_a, _b, _c, _d int$/;"	m	struct:main.T6	typeref:typename:int
+_b	input.go	/^	_a, _b, _c, _d int$/;"	m	struct:main.T6	typeref:typename:int
+_c	input.go	/^	_a, _b, _c, _d int$/;"	m	struct:main.T6	typeref:typename:int
+_d	input.go	/^	_a, _b, _c, _d int$/;"	m	struct:main.T6	typeref:typename:int
+_e	input.go	/^	_e float32$/;"	m	struct:main.T6	typeref:typename:float32
 a	input.go	/^var (a, b, c int$/;"	v	package:main
 b	input.go	/^var (a, b, c int$/;"	v	package:main
 c	input.go	/^var (a, b, c int$/;"	v	package:main

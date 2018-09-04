@@ -11,6 +11,7 @@
 #include "keyword.h"
 #include "read.h"
 #include "main.h"
+#include "numarray.h"
 #include "objpool.h"
 #include "routines.h"
 #include "vstring.h"
@@ -706,6 +707,17 @@ static void parseFunctionOrMethod (tokenInfo *const token, const int scope)
 		deleteToken(receiver_type_token);
 }
 
+static void attachTypeRefField (intArray *corks, const char *const type)
+{
+	for (int i = 0; i < intArrayCount (corks); i++)
+	{
+		int cork = intArrayItem (corks, i);
+		tagEntryInfo *e = getEntryInCorkQueue (cork);
+		e->extensionFields.typeRef [0] = eStrdup ("typename");
+		e->extensionFields.typeRef [1] = eStrdup (type);
+	}
+}
+
 static void parseStructMembers (tokenInfo *const token, const int scope)
 {
 	// StructType     = "struct" "{" { FieldDecl ";" } "}" .
@@ -718,6 +730,7 @@ static void parseStructMembers (tokenInfo *const token, const int scope)
 		return;
 
 	vString *typeForAnonMember = vStringNew ();
+	intArray *corkForFields = intArrayNew ();
 
 	readToken (token);
 	while (!isType (token, TOKEN_EOF) && !isType (token, TOKEN_CLOSE_CURLY))
@@ -738,14 +751,17 @@ static void parseStructMembers (tokenInfo *const token, const int scope)
 				}
 				else
 				{
+					int cork;
 					if (memberCandidate)
 					{
 						// if we are here, there was a comma and memberCandidate isn't an anonymous field
-						makeTag (memberCandidate, GOTAG_MEMBER, scope, NULL, NULL);
+						cork = makeTag (memberCandidate, GOTAG_MEMBER, scope, NULL, NULL);
 						deleteToken (memberCandidate);
 						memberCandidate = NULL;
+						intArrayAdd (corkForFields, cork);
 					}
-					makeTag (token, GOTAG_MEMBER, scope, NULL, NULL);
+					cork = makeTag (token, GOTAG_MEMBER, scope, NULL, NULL);
+					intArrayAdd (corkForFields, cork);
 				}
 				readToken (token);
 			}
@@ -807,11 +823,22 @@ static void parseStructMembers (tokenInfo *const token, const int scope)
 				deleteToken (anonMember);
 			}
 		}
-		else if (memberCandidate)
+		else
 		{
-			// memberCandidate is a non-anonymous member
-			makeTag (memberCandidate, GOTAG_MEMBER, scope, NULL, NULL);
-			skipType (token);
+			vString *typeForMember = vStringNew ();
+			collector collector = { .str = typeForMember, .last_len = 0, };
+
+			appendTokenToVString (token, &collector);
+			skipType (token, &collector);
+			collectorTruncate (&collector, true);
+
+			if (memberCandidate)
+				makeTag (memberCandidate, GOTAG_MEMBER, scope, NULL,
+						 vStringValue (typeForMember));
+
+			attachTypeRefField (corkForFields, vStringValue (typeForMember));
+			intArrayClear (corkForFields);
+			vStringDelete (typeForMember);
 		}
 
 		if (memberCandidate)
@@ -833,6 +860,7 @@ static void parseStructMembers (tokenInfo *const token, const int scope)
 		}
 	}
 
+	intArrayDelete (corkForFields);
 	vStringDelete (typeForAnonMember);
 }
 
