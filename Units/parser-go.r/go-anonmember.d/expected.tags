@@ -13,10 +13,10 @@ person	input.go	/^	person P.T9$/;"	m	struct:X
 parent	input.go	/^	parent *P.T10$/;"	m	struct:X
 lang1	input.go	/^	lang1, lang2 P.LANG$/;"	m	struct:X
 lang2	input.go	/^	lang1, lang2 P.LANG$/;"	m	struct:X
-lang3	input.go	/^	lang3, lang4 *P.Q.LANG$/;"	m	struct:X
-lang4	input.go	/^	lang3, lang4 *P.Q.LANG$/;"	m	struct:X
-T11	input.go	/^	P.Q.T11$/;"	M	struct:X	typeref:typename:P.Q.T11
-T12	input.go	/^	*P.Q.T12$/;"	M	struct:X	typeref:typename:*P.Q.T12
+lang3	input.go	/^	lang3, lang4 *P.LANG$/;"	m	struct:X
+lang4	input.go	/^	lang3, lang4 *P.LANG$/;"	m	struct:X
+Q	input.go	/^	P.Q$/;"	M	struct:X	typeref:typename:P.Q
+Q	input.go	/^	*P.Q$/;"	M	struct:X	typeref:typename:*P.Q
 Y	input.go	/^type Y struct {$/;"	s
 byte	input.go	/^	byte$/;"	M	struct:Y	typeref:typename:byte
 b	input.go	/^	b byte$/;"	m	struct:Y
