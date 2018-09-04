@@ -76,6 +76,11 @@ typedef struct sTokenInfo {
 	int c;						/* Used in AppendTokenToVString */
 } tokenInfo;
 
+typedef struct sCollector {
+	vString *str;
+	size_t last_len;
+} collector;
+
 /*
 *   DATA DEFINITIONS
 */
@@ -222,25 +227,53 @@ static void parseIdentifier (vString *const string, const int firstChar)
 	ungetcToInputFile (c);		/* always unget, LF might add a semicolon */
 }
 
-static void appendTokenToVString (const tokenInfo *const token, vString *collector)
+static void collectorPut (collector *collector, char c)
+{
+	collector->last_len = vStringLength (collector->str);
+	vStringPut (collector->str, c);
+}
+
+static void collectorCatS (collector *collector, char *cstr)
+{
+	collector->last_len = vStringLength (collector->str);
+	vStringCatS (collector->str, cstr);
+}
+
+static void collectorCat (collector *collector, vString *str)
+{
+	collector->last_len = vStringLength (collector->str);
+	vStringCat (collector->str, str);
+}
+
+static void appendTokenToVString (const tokenInfo *const token, collector *collector)
 {
 	if (token->type == TOKEN_LEFT_ARROW)
-		vStringCatS(collector, "<-");
+		collectorCatS (collector, "<-");
 	else if (token->type == TOKEN_STRING)
 	{
 		// only struct member annotations can appear in function prototypes
 		// so only `` type strings are possible
-		vStringPut(collector, '`');
-		vStringCat(collector, token->string);
-		vStringPut(collector, '`');
+		collector->last_len = vStringLength (collector->str);
+		vStringPut(collector->str, '`');
+		vStringCat(collector->str, token->string);
+		vStringPut(collector->str, '`');
 	}
 	else if (token->type == TOKEN_IDENTIFIER || token->type == TOKEN_KEYWORD)
-		vStringCat(collector, token->string);
+		collectorCat (collector, token->string);
 	else if (token->c != EOF)
-		vStringPut(collector, token->c);
+		collectorPut (collector, token->c);
 }
 
-static void readTokenFull (tokenInfo *const token, vString *collector)
+static void collectorTruncate (collector *collector, bool dropLast)
+{
+	if (dropLast)
+		vStringTruncate (collector->str, collector->last_len);
+
+	vStringStripLeading (collector->str);
+	vStringStripTrailing (collector->str);
+}
+
+static void readTokenFull (tokenInfo *const token, collector *collector)
 {
 	int c;
 	static tokenType lastTokenType = TOKEN_NONE;
@@ -268,10 +301,10 @@ getNextChar:
 			c = ';';  // semicolon injection
 		}
 		whitespace = c == '\t'  ||  c == ' ' ||  c == '\r' || c == '\n';
-		if (collector && whitespace && firstWhitespace && vStringLength (collector) < MAX_COLLECTOR_LENGTH)
+		if (collector && whitespace && firstWhitespace && vStringLength (collector->str) < MAX_COLLECTOR_LENGTH)
 		{
 			firstWhitespace = false;
-			vStringPut(collector, ' ');
+			collectorPut (collector, ' ');
 		}
 	}
 	while (whitespace);
@@ -407,7 +440,7 @@ getNextChar:
 
 	token->c = c;
 
-	if (collector && vStringLength (collector) < MAX_COLLECTOR_LENGTH)
+	if (collector && vStringLength (collector->str) < MAX_COLLECTOR_LENGTH)
 		appendTokenToVString (token, collector);
 
 	lastTokenType = token->type;
@@ -418,7 +451,7 @@ static void readToken (tokenInfo *const token)
 	readTokenFull (token, NULL);
 }
 
-static bool skipToMatchedNoRead (tokenInfo *const token, vString *collector)
+static bool skipToMatchedNoRead (tokenInfo *const token, collector *collector)
 {
 	int nest_level = 0;
 	tokenType open_token = token->type;
@@ -642,13 +675,13 @@ static void parseFunctionOrMethod (tokenInfo *const token, const int scope)
 
 		// Start recording signature
 		vString *signature = vStringNew ();
+		collector collector = { .str = signature, .last_len = 0, };
 
 		// Skip over parameters.
-		readTokenFull (token, signature);
-		skipToMatchedNoRead (token, signature);
+		readTokenFull (token, &collector);
+		skipToMatchedNoRead (token, &collector);
 
-		vStringStripLeading (signature);
-		vStringStripTrailing (signature);
+		collectorTruncate (&collector, false);
 		if (receiver_type_token)
 			func_scope = makeTag(receiver_type_token, GOTAG_UNKNOWN,
 								 scope, NULL, NULL);
