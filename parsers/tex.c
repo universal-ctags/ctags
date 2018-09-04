@@ -35,7 +35,7 @@
 #define isType(token,t)		(bool) ((token)->type == (t))
 #define isKeyword(token,k)	(bool) ((token)->keyword == (k))
 #define isIdentChar(c) \
-	(isalpha (c) || isdigit (c) || (c) == '$' || \
+	(isalpha (c) || isdigit (c) || (((unsigned char) c) >= 0x80) || (c) == '$' || \
 		(c) == '_' || (c) == '#' || (c) == '-' || (c) == '.' || (c) == ':')
 
 /*
@@ -58,22 +58,22 @@ enum eKeywordId {
 };
 typedef int keywordId; /* to allow KEYWORD_NONE */
 
-typedef enum eTokenType {
-	TOKEN_UNDEFINED,
-	TOKEN_CHARACTER,
-	TOKEN_CLOSE_PAREN,
-	TOKEN_COMMA,
+enum eTokenType {
+	/* 0..255 are the byte's value.  Some are named for convenience */
+	TOKEN_OPEN_PAREN = '(',
+	TOKEN_CLOSE_PAREN = ')',
+	TOKEN_OPEN_CURLY = '{',
+	TOKEN_CLOSE_CURLY = '}',
+	TOKEN_OPEN_SQUARE = '[',
+	TOKEN_CLOSE_SQUARE = ']',
+	TOKEN_STAR = '*',
+	/* above is special types */
+	TOKEN_UNDEFINED = 256,
 	TOKEN_KEYWORD,
-	TOKEN_OPEN_PAREN,
 	TOKEN_IDENTIFIER,
 	TOKEN_STRING,
-	TOKEN_OPEN_CURLY,
-	TOKEN_CLOSE_CURLY,
-	TOKEN_OPEN_SQUARE,
-	TOKEN_CLOSE_SQUARE,
-	TOKEN_QUESTION_MARK,
-	TOKEN_STAR
-} tokenType;
+};
+typedef int tokenType;
 
 typedef struct sTokenInfo {
 	tokenType		type;
@@ -266,38 +266,41 @@ static void parseIdentifier (vString *const string, const int firstChar)
 		c = getcFromInputFile ();
 	} while (isIdentChar (c));
 
-	if (!isspace (c))
+	if (c != EOF)
 		ungetcToInputFile (c);		/* unget non-identifier character */
 }
 
-static bool readToken (tokenInfo *const token)
+static bool readTokenFull (tokenInfo *const token, const bool includeWhitespaces)
 {
 	int c;
+	int whitespaces = -1;
 
 	token->type			= TOKEN_UNDEFINED;
 	token->keyword		= KEYWORD_NONE;
 	vStringClear (token->string);
 
 getNextChar:
+
 	do
 	{
 		c = getcFromInputFile ();
-		token->lineNumber   = getInputLineNumber ();
-		token->filePosition = getInputFilePosition ();
+		whitespaces++;
 	}
 	while (c == '\t'  ||  c == ' ' ||  c == '\n');
 
+	token->lineNumber   = getInputLineNumber ();
+	token->filePosition = getInputFilePosition ();
+
+	if (includeWhitespaces && whitespaces > 0 && c != '%' && c != EOF)
+	{
+		ungetcToInputFile (c);
+		c = ' ';
+	}
+
+	token->type = (unsigned char) c;
 	switch (c)
 	{
 		case EOF: return false;
-		case '(': token->type = TOKEN_OPEN_PAREN;			break;
-		case ')': token->type = TOKEN_CLOSE_PAREN;			break;
-		case ',': token->type = TOKEN_COMMA;				break;
-		case '{': token->type = TOKEN_OPEN_CURLY;			break;
-		case '}': token->type = TOKEN_CLOSE_CURLY;			break;
-		case '[': token->type = TOKEN_OPEN_SQUARE;			break;
-		case ']': token->type = TOKEN_CLOSE_SQUARE;			break;
-		case '*': token->type = TOKEN_STAR;					break;
 
 		case '\\':
 				  /*
@@ -310,10 +313,9 @@ getNextChar:
 					  ungetcToInputFile (c);
 				  else
 				  {
+					  vStringPut (token->string, '\\');
 					  parseIdentifier (token->string, c);
-					  token->lineNumber = getInputLineNumber ();
-					  token->filePosition = getInputFilePosition ();
-					  token->keyword = lookupKeyword (vStringValue (token->string), Lang_tex);
+					  token->keyword = lookupKeyword (vStringValue (token->string) + 1, Lang_tex);
 					  if (isKeyword (token, KEYWORD_NONE))
 						  token->type = TOKEN_IDENTIFIER;
 					  else
@@ -327,18 +329,19 @@ getNextChar:
 				  break;
 
 		default:
-				  if (! isIdentChar (c))
-					  token->type = TOKEN_UNDEFINED;
-				  else
+				  if (isIdentChar (c))
 				  {
 					  parseIdentifier (token->string, c);
-					  token->lineNumber = getInputLineNumber ();
-					  token->filePosition = getInputFilePosition ();
 					  token->type = TOKEN_IDENTIFIER;
 				  }
 				  break;
 	}
 	return true;
+}
+
+static bool readToken (tokenInfo *const token)
+{
+	return readTokenFull (token, false);
 }
 
 static void copyToken (tokenInfo *const dest, tokenInfo *const src)
@@ -405,7 +408,7 @@ static bool parseTag (tokenInfo *const token, texKind kind)
 			{
 				if (vStringLength (fullname) > 0)
 					vStringPut (fullname, ' ');
-				vStringCatS (fullname, vStringValue (token->string));
+				vStringCat (fullname, token->string);
 			}
 			if (!readToken (token))
 			{
@@ -436,28 +439,36 @@ static bool parseTag (tokenInfo *const token, texKind kind)
 
 	if (isType (token, TOKEN_OPEN_CURLY))
 	{
+		int depth = 1;
+
 		if (!readToken (token))
 		{
 			eof = true;
 			goto out;
 		}
-		while (! isType (token, TOKEN_CLOSE_CURLY) )
+		while (depth > 0)
 		{
 			/* if (isType (token, TOKEN_IDENTIFIER) && useLongName) */
 			if (useLongName)
 			{
-				if (vStringLength (fullname) > 0)
-					vStringPut (fullname, ' ');
-				vStringCatS (fullname, vStringValue (token->string));
+				if (isType (token, TOKEN_IDENTIFIER) || isType (token, TOKEN_KEYWORD))
+					vStringCat (fullname, token->string);
+				else
+					vStringPut (fullname, token->type);
 			}
-			if (!readToken (token))
+			if (!readTokenFull (token, useLongName))
 			{
 				eof = true;
 				goto out;
 			}
+			else if (isType (token, TOKEN_OPEN_CURLY))
+				depth++;
+			else if (isType (token, TOKEN_CLOSE_CURLY))
+				depth--;
 		}
 		if (useLongName)
 		{
+			vStringStripTrailing (fullname);
 			if (vStringLength (fullname) > 0)
 			{
 				vStringCopy (name->string, fullname);
