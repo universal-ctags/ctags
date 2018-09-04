@@ -489,19 +489,19 @@ static bool skipToMatchedNoRead (tokenInfo *const token, collector *collector)
 	return true;
 }
 
-static void skipToMatched (tokenInfo *const token)
+static void skipToMatched (tokenInfo *const token, collector *collector)
 {
-	if (skipToMatchedNoRead (token, NULL))
-		readToken (token);
+	if (skipToMatchedNoRead (token, collector))
+		readTokenFull (token, collector);
 }
 
-static bool skipType (tokenInfo *const token)
+static bool skipType (tokenInfo *const token, collector *collector)
 {
 	// Type      = TypeName | TypeLit | "(" Type ")" .
 	// Skips also function multiple return values "(" Type {"," Type} ")"
 	if (isType (token, TOKEN_OPEN_PAREN))
 	{
-		skipToMatched (token);
+		skipToMatched (token, collector);
 		return true;
 	}
 
@@ -510,12 +510,12 @@ static bool skipType (tokenInfo *const token)
 	// PackageName    = identifier .
 	if (isType (token, TOKEN_IDENTIFIER))
 	{
-		readToken (token);
+		readTokenFull (token, collector);
 		if (isType (token, TOKEN_DOT))
 		{
-			readToken (token);
+			readTokenFull (token, collector);
 			if (isType (token, TOKEN_IDENTIFIER))
-				readToken (token);
+				readTokenFull (token, collector);
 		}
 		return true;
 	}
@@ -524,9 +524,9 @@ static bool skipType (tokenInfo *const token)
 	// InterfaceType      = "interface" "{" { MethodSpec ";" } "}" .
 	if (isKeyword (token, KEYWORD_struct) || isKeyword (token, KEYWORD_interface))
 	{
-		readToken (token);
+		readTokenFull (token, collector);
 		// skip over "{}"
-		skipToMatched (token);
+		skipToMatched (token, collector);
 		return true;
 	}
 
@@ -535,8 +535,8 @@ static bool skipType (tokenInfo *const token)
 	// ElementType = Type .
 	if (isType (token, TOKEN_OPEN_SQUARE))
 	{
-		skipToMatched (token);
-		return skipType (token);
+		skipToMatched (token, collector);
+		return skipType (token, collector);
 	}
 
 	// PointerType = "*" BaseType .
@@ -544,18 +544,18 @@ static bool skipType (tokenInfo *const token)
 	// ChannelType = ( "chan" [ "<-" ] | "<-" "chan" ) ElementType .
 	if (isType (token, TOKEN_STAR) || isKeyword (token, KEYWORD_chan) || isType (token, TOKEN_LEFT_ARROW))
 	{
-		readToken (token);
-		return skipType (token);
+		readTokenFull (token, collector);
+		return skipType (token, collector);
 	}
 
 	// MapType     = "map" "[" KeyType "]" ElementType .
 	// KeyType     = Type .
 	if (isKeyword (token, KEYWORD_map))
 	{
-		readToken (token);
+		readTokenFull (token, collector);
 		// skip over "[]"
-		skipToMatched (token);
-		return skipType (token);
+		skipToMatched (token, collector);
+		return skipType (token, collector);
 	}
 
 	// FunctionType   = "func" Signature .
@@ -564,13 +564,13 @@ static bool skipType (tokenInfo *const token)
 	// Parameters     = "(" [ ParameterList [ "," ] ] ")" .
 	if (isKeyword (token, KEYWORD_func))
 	{
-		readToken (token);
+		readTokenFull (token, collector);
 		// Parameters, skip over "()"
-		skipToMatched (token);
+		skipToMatched (token, collector);
 		// Result is parameters or type or nothing.  skipType treats anything
 		// surrounded by parentheses as a type, and does nothing if what
 		// follows is not a type.
-		return skipType (token);
+		return skipType (token, collector);
 	}
 
 	return false;
@@ -695,11 +695,11 @@ static void parseFunctionOrMethod (tokenInfo *const token, const int scope)
 		readToken (token);
 
 		// Skip over result.
-		skipType (token);
+		skipType (token, NULL);
 
 		// Skip over function body.
 		if (isType (token, TOKEN_OPEN_CURLY))
-			skipToMatched (token);
+			skipToMatched (token, NULL);
 	}
 
 	if (receiver_type_token)
@@ -823,7 +823,7 @@ static void parseStructMembers (tokenInfo *const token, const int scope)
 				&& !isType (token, TOKEN_EOF))
 		{
 			readToken (token);
-			skipToMatched (token);
+			skipToMatched (token, NULL);
 		}
 
 		if (!isType (token, TOKEN_CLOSE_CURLY))
@@ -895,17 +895,17 @@ static void parseConstTypeVar (tokenInfo *const token, goKind kind, const int sc
 			if (isKeyword (token, KEYWORD_struct))
 				parseStructMembers (token, member_scope);
 			else
-				skipType (token);
+				skipType (token, NULL);
 			deleteToken (typeToken);
 		}
 		else
-			skipType (token);
+			skipType (token, NULL);
 
 		while (!isType (token, TOKEN_SEMICOLON) && !isType (token, TOKEN_CLOSE_PAREN)
 				&& !isType (token, TOKEN_EOF))
 		{
 			readToken (token);
-			skipToMatched (token);
+			skipToMatched (token, NULL);
 		}
 
 		if (usesParens && !isType (token, TOKEN_CLOSE_PAREN))
@@ -951,7 +951,7 @@ static void parseGoFile (tokenInfo *const token)
 		else if (isType (token, TOKEN_OPEN_PAREN) || isType (token, TOKEN_OPEN_CURLY) ||
 			isType (token, TOKEN_OPEN_SQUARE))
 		{
-			skipToMatched (token);
+			skipToMatched (token, NULL);
 		}
 	} while (token->type != TOKEN_EOF);
 }
