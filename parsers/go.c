@@ -20,7 +20,7 @@
 /*
  *	 MACROS
  */
-#define MAX_SIGNATURE_LENGTH 512
+#define MAX_COLLECTOR_LENGTH 512
 #define isType(token,t) (bool) ((token)->type == (t))
 #define isKeyword(token,k) (bool) ((token)->keyword == (k))
 #define isStartIdentChar(c) (isalpha (c) ||  (c) == '_' || (c) > 128) /* XXX UTF-8 */
@@ -81,7 +81,6 @@ typedef struct sTokenInfo {
 
 static int Lang_go;
 static objPool *TokenPool = NULL;
-static vString *signature = NULL;
 
 typedef enum {
 	GOTAG_UNDEFINED = -1,
@@ -222,7 +221,7 @@ static void parseIdentifier (vString *const string, const int firstChar)
 	ungetcToInputFile (c);		/* always unget, LF might add a semicolon */
 }
 
-static void readToken (tokenInfo *const token)
+static void readTokenFull (tokenInfo *const token, vString *collector)
 {
 	int c;
 	static tokenType lastTokenType = TOKEN_NONE;
@@ -249,10 +248,10 @@ getNextChar:
 			c = ';';  // semicolon injection
 		}
 		whitespace = c == '\t'  ||  c == ' ' ||  c == '\r' || c == '\n';
-		if (signature && whitespace && firstWhitespace && vStringLength (signature) < MAX_SIGNATURE_LENGTH)
+		if (collector && whitespace && firstWhitespace && vStringLength (collector) < MAX_COLLECTOR_LENGTH)
 		{
 			firstWhitespace = false;
-			vStringPut(signature, ' ');
+			vStringPut(collector, ' ');
 		}
 	}
 	while (whitespace);
@@ -386,28 +385,33 @@ getNextChar:
 			break;
 	}
 
-	if (signature && vStringLength (signature) < MAX_SIGNATURE_LENGTH)
+	if (collector && vStringLength (collector) < MAX_COLLECTOR_LENGTH)
 	{
 		if (token->type == TOKEN_LEFT_ARROW)
-			vStringCatS(signature, "<-");
+			vStringCatS(collector, "<-");
 		else if (token->type == TOKEN_STRING)
 		{
 			// only struct member annotations can appear in function prototypes
 			// so only `` type strings are possible
-			vStringPut(signature, '`');
-			vStringCat(signature, token->string);
-			vStringPut(signature, '`');
+			vStringPut(collector, '`');
+			vStringCat(collector, token->string);
+			vStringPut(collector, '`');
 		}
 		else if (token->type == TOKEN_IDENTIFIER || token->type == TOKEN_KEYWORD)
-			vStringCat(signature, token->string);
+			vStringCat(collector, token->string);
 		else if (c != EOF)
-			vStringPut(signature, c);
+			vStringPut(collector, c);
 	}
 
 	lastTokenType = token->type;
 }
 
-static bool skipToMatchedNoRead (tokenInfo *const token)
+static void readToken (tokenInfo *const token)
+{
+	readTokenFull (token, NULL);
+}
+
+static bool skipToMatchedNoRead (tokenInfo *const token, vString *collector)
 {
 	int nest_level = 0;
 	tokenType open_token = token->type;
@@ -435,7 +439,7 @@ static bool skipToMatchedNoRead (tokenInfo *const token)
 	nest_level++;
 	while (nest_level > 0 && !isType (token, TOKEN_EOF))
 	{
-		readToken (token);
+		readTokenFull (token, collector);
 		if (isType (token, open_token))
 			nest_level++;
 		else if (isType (token, close_token))
@@ -447,7 +451,7 @@ static bool skipToMatchedNoRead (tokenInfo *const token)
 
 static void skipToMatched (tokenInfo *const token)
 {
-	if (skipToMatchedNoRead (token))
+	if (skipToMatchedNoRead (token, NULL))
 		readToken (token);
 }
 
@@ -630,11 +634,11 @@ static void parseFunctionOrMethod (tokenInfo *const token, const int scope)
 		copyToken (functionToken, token);
 
 		// Start recording signature
-		signature = vStringNew ();
+		vString *signature = vStringNew ();
 
 		// Skip over parameters.
-		readToken (token);
-		skipToMatchedNoRead (token);
+		readTokenFull (token, signature);
+		skipToMatchedNoRead (token, signature);
 
 		vStringStripLeading (signature);
 		vStringStripTrailing (signature);
@@ -647,9 +651,6 @@ static void parseFunctionOrMethod (tokenInfo *const token, const int scope)
 				 func_scope, signature->buffer, NULL);
 		deleteToken (functionToken);
 		vStringDelete(signature);
-
-		// Stop recording signature
-		signature = NULL;
 
 		readToken (token);
 
