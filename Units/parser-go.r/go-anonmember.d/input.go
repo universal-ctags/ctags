@@ -10,9 +10,9 @@ type X struct {
 	person P.T9
 	parent *P.T10
 	lang1, lang2 P.LANG
-	lang3, lang4 *P.Q.LANG
-	P.Q.T11
-	*P.Q.T12
+	lang3, lang4 *P.LANG
+	P.Q
+	*P.Q
 }
 
 type Y struct {
