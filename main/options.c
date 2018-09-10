@@ -108,7 +108,7 @@ typedef const struct sBooleanOption {
 	bool* pValue;    /* pointer to option value */
 	bool initOnly;   /* option must be specified before any files */
 	unsigned long acceptableStages;
-	void (* redirect) (const struct sBooleanOption *const option, bool value);
+	void (* set) (const struct sBooleanOption *const option, bool value);
 } booleanOption;
 
 /*
@@ -2656,7 +2656,7 @@ static void processPatternLengthLimit(const char *const option, const char *cons
 		error (FATAL, "-%s: Invalid pattern length limit", option);
 }
 
-static void redirectToXtag(booleanOption *const option, bool value)
+static void setBooleanToXtag(booleanOption *const option, bool value)
 {
 	/* WARNING/TODO: This function breaks capsulization. */
 	xtagType t = (xtagType)option->pValue;
@@ -2739,8 +2739,8 @@ static parametricOption ParametricOptions [] = {
 
 static booleanOption BooleanOptions [] = {
 	{ "append",         &Option.append,                 true,  STAGE_ANY },
-	{ "file-scope",     ((bool *)XTAG_FILE_SCOPE),   false, STAGE_ANY, redirectToXtag },
-	{ "file-tags",      ((bool *)XTAG_FILE_NAMES),   false, STAGE_ANY, redirectToXtag },
+	{ "file-scope",     ((bool *)XTAG_FILE_SCOPE),   false, STAGE_ANY, setBooleanToXtag },
+	{ "file-tags",      ((bool *)XTAG_FILE_NAMES),   false, STAGE_ANY, setBooleanToXtag },
 	{ "filter",         &Option.filter,                 true,  STAGE_ANY },
 	{ "guess-language-eagerly", &Option.guessLanguageEagerly, false, STAGE_ANY },
 	{ "line-directives",&Option.lineDirectives,         false, STAGE_ANY },
@@ -2825,8 +2825,8 @@ static bool processBooleanOption (
 				checkOptionOrder (option, true);
 
 			bool value = getBooleanOption (option, parameter);
-			if (entry->redirect)
-				entry->redirect (entry, value);
+			if (entry->set)
+				entry->set (entry, value);
 			else
 				*entry->pValue = value;
 		}
