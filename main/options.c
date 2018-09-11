@@ -108,7 +108,7 @@ typedef const struct sBooleanOption {
 	bool* pValue;    /* pointer to option value */
 	bool initOnly;   /* option must be specified before any files */
 	unsigned long acceptableStages;
-	bool* (* redirect) (const struct sBooleanOption *const option);
+	void (* set) (const struct sBooleanOption *const option, bool value);
 } booleanOption;
 
 /*
@@ -2656,15 +2656,11 @@ static void processPatternLengthLimit(const char *const option, const char *cons
 		error (FATAL, "-%s: Invalid pattern length limit", option);
 }
 
-static bool* redirectToXtag(booleanOption *const option)
+static void setBooleanToXtag(booleanOption *const option, bool value)
 {
 	/* WARNING/TODO: This function breaks capsulization. */
 	xtagType t = (xtagType)option->pValue;
-	bool default_value = isXtagEnabled (t);
-
-	enableXtag (t, default_value);
-
-	return &(getXtagDefinition (t)->enabled);
+	enableXtag (t, value);
 }
 
 /*
@@ -2743,8 +2739,8 @@ static parametricOption ParametricOptions [] = {
 
 static booleanOption BooleanOptions [] = {
 	{ "append",         &Option.append,                 true,  STAGE_ANY },
-	{ "file-scope",     ((bool *)XTAG_FILE_SCOPE),   false, STAGE_ANY, redirectToXtag },
-	{ "file-tags",      ((bool *)XTAG_FILE_NAMES),   false, STAGE_ANY, redirectToXtag },
+	{ "file-scope",     ((bool *)XTAG_FILE_SCOPE),   false, STAGE_ANY, setBooleanToXtag },
+	{ "file-tags",      ((bool *)XTAG_FILE_NAMES),   false, STAGE_ANY, setBooleanToXtag },
 	{ "filter",         &Option.filter,                 true,  STAGE_ANY },
 	{ "guess-language-eagerly", &Option.guessLanguageEagerly, false, STAGE_ANY },
 	{ "line-directives",&Option.lineDirectives,         false, STAGE_ANY },
@@ -2816,7 +2812,6 @@ static bool processBooleanOption (
 	for (i = 0  ;  i < count  &&  ! found  ;  ++i)
 	{
 		booleanOption* const entry = &BooleanOptions [i];
-		bool *slot;
 		if (strcmp (option, entry->name) == 0)
 		{
 			found = true;
@@ -2828,11 +2823,12 @@ static bool processBooleanOption (
 			}
 			if (entry->initOnly)
 				checkOptionOrder (option, true);
-			if (entry->redirect)
-				slot = entry->redirect (entry);
+
+			bool value = getBooleanOption (option, parameter);
+			if (entry->set)
+				entry->set (entry, value);
 			else
-				slot = entry->pValue;
-			*slot = getBooleanOption (option, parameter);
+				*entry->pValue = value;
 		}
 	}
 	return found;
