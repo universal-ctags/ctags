@@ -144,17 +144,7 @@ extern unsigned int countParsers (void)
 extern int makeSimpleTag (
 		const vString* const name, const int kindIndex)
 {
-	int r = CORK_NIL;
-
-	/* do not check for kind being disabled - that happens later in makeTagEntry() */
-	if (name != NULL  &&  vStringLength (name) > 0)
-	{
-		tagEntryInfo e;
-		initTagEntry (&e, vStringValue (name), kindIndex);
-
-		r = makeTagEntry (&e);
-	}
-	return r;
+	return makeSimpleRefTag (name, kindIndex, ROLE_INDEX_DEFINITION);
 }
 
 extern int makeSimpleRefTag (const vString* const name, const int kindIndex,
