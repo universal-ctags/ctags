@@ -162,9 +162,6 @@ extern int makeSimpleRefTag (const vString* const name, const int kindIndex,
 {
 	int r = CORK_NIL;
 
-	if (! isXtagEnabled (XTAG_REFERENCE_TAGS))
-		return r;
-
 	Assert (roleIndex < (int)countInputLanguageRoles(kindIndex));
 
 	/* do not check for kind being disabled - that happens later in makeTagEntry() */
