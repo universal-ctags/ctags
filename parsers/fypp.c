@@ -286,7 +286,7 @@ static bool is_in_first_if_block (struct fyppParseCtx *ctx)
 {
 	int r = 1;
 
-	for (int i = 0; i < intArrayCount (ctx->if_tracker); i++)
+	for (unsigned int i = 0; i < intArrayCount (ctx->if_tracker); i++)
 		r *= intArrayItem(ctx->if_tracker, i);
 
 	return r;

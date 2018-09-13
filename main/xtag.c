@@ -179,7 +179,7 @@ extern void xtagColprintAddCommonLines (struct colprintTable *table)
 
 extern void xtagColprintAddLanguageLines (struct colprintTable *table, langType language)
 {
-	for (int i = XTAG_COUNT; i < xtagObjectUsed; i++)
+	for (unsigned int i = XTAG_COUNT; i < xtagObjectUsed; i++)
 	{
 		xtagObject* xobj = getXtagObject (i);
 

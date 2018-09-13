@@ -76,7 +76,7 @@ const char *scopeSeparatorFor (langType lang, int kindIndex, int parentKindIndex
 			return ".";
 	}
 
-	while (table - kind->separators < kind->separatorCount)
+	while (table - kind->separators < (int)kind->separatorCount)
 	{
 		/* KIND_WILDCARD cannot be used as a key for finding
 		   a root separator.*/
@@ -462,7 +462,7 @@ extern void roleColprintAddRoles (struct colprintTable *table, struct kindContro
 				|| (!kname && *c == KIND_WILDCARD))
 			{
 				unsigned int nRoles = countRoles(kcb, i);
-				for (int j = 0; j < nRoles; j++)
+				for (unsigned int j = 0; j < nRoles; j++)
 				{
 					const roleDefinition *r = getRole (kcb, i, j);
 					struct colprintLine *line = colprintTableGetNewLine(table);

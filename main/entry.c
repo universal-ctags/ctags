@@ -1491,7 +1491,7 @@ extern void initTagEntryFull (tagEntryInfo *const e, const char *const name,
 	e->extensionFields.scopeKindIndex = KIND_GHOST_INDEX;
 	e->extensionFields.scopeIndex     = CORK_NIL;
 
-	Assert (kindIndex < 0 || kindIndex < countLanguageKinds(langType_));
+	Assert (kindIndex < 0 || kindIndex < (int)countLanguageKinds(langType_));
 	e->kindIndex = kindIndex;
 
 	Assert (roleBits == 0
@@ -1602,7 +1602,7 @@ static void assignRoleFull(tagEntryInfo *const e, int roleIndex, bool assign)
 	}
 	else if (roleIndex > ROLE_INDEX_DEFINITION)
 	{
-		Assert (roleIndex < countLanguageRoles(e->langType, e->kindIndex));
+		Assert (roleIndex < (int)countLanguageRoles(e->langType, e->kindIndex));
 
 		if (assign)
 			e->extensionFields.roleBits |= (makeRoleBit(roleIndex));

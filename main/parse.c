@@ -165,7 +165,7 @@ extern int makeSimpleRefTag (const vString* const name, const int kindIndex,
 	if (! isXtagEnabled (XTAG_REFERENCE_TAGS))
 		return r;
 
-	Assert (roleIndex < countInputLanguageRoles(kindIndex));
+	Assert (roleIndex < (int)countInputLanguageRoles(kindIndex));
 
 	if (isInputLanguageRoleEnabled(kindIndex, roleIndex))
 	{

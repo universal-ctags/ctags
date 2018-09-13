@@ -709,7 +709,7 @@ static void parseFunctionOrMethod (tokenInfo *const token, const int scope)
 
 static void attachTypeRefField (intArray *corks, const char *const type)
 {
-	for (int i = 0; i < intArrayCount (corks); i++)
+	for (unsigned int i = 0; i < intArrayCount (corks); i++)
 	{
 		int cork = intArrayItem (corks, i);
 		tagEntryInfo *e = getEntryInCorkQueue (cork);
