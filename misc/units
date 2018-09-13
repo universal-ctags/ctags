@@ -752,8 +752,8 @@ run_dir ()
 	    continue
 	fi
 
-	extra_inputs=$(for extra_tmp in $(dirname $input)/input-[0-9].* \
-					$(dirname $input)/input-[0-9]-*.* ; do
+	extra_inputs=$(for extra_tmp in $(dirname $input)/input[-_][0-9].* \
+					$(dirname $input)/input[-_][0-9][-_]*.* ; do
 	    if unwanted_file "$extra_tmp"; then
 		continue
 	    fi
