@@ -669,6 +669,8 @@ static void parseFunctionOrMethod (tokenInfo *const token, const int scope)
 
 	if (isType (token, TOKEN_IDENTIFIER))
 	{
+		int cork;
+		tagEntryInfo *e = NULL;
 		tokenInfo *functionToken = newToken ();
 		int func_scope;
 
@@ -688,8 +690,12 @@ static void parseFunctionOrMethod (tokenInfo *const token, const int scope)
 								 scope, NULL, NULL);
 		else
 			func_scope = scope;
-		makeTag (functionToken, GOTAG_FUNCTION,
-				 func_scope, vStringValue (signature), NULL);
+
+		cork = makeTag (functionToken, GOTAG_FUNCTION,
+						func_scope, vStringValue (signature), NULL);
+		if (cork != CORK_NIL)
+			e = getEntryInCorkQueue (cork);
+
 		deleteToken (functionToken);
 		vStringDelete(signature);
 
@@ -700,7 +706,11 @@ static void parseFunctionOrMethod (tokenInfo *const token, const int scope)
 
 		// Skip over function body.
 		if (isType (token, TOKEN_OPEN_CURLY))
+		{
 			skipToMatched (token, NULL);
+			if (e)
+				e->extensionFields.endLine = getInputLineNumber ();
+		}
 	}
 
 	if (receiver_type_token)
