@@ -677,8 +677,8 @@ static void parseFunctionOrMethod (tokenInfo *const token, const int scope)
 		copyToken (functionToken, token);
 
 		// Start recording signature
-		vString *signature = vStringNew ();
-		collector collector = { .str = signature, .last_len = 0, };
+		vString *buffer = vStringNew ();
+		collector collector = { .str = buffer, .last_len = 0, };
 
 		// Skip over parameters.
 		readTokenFull (token, &collector);
@@ -692,17 +692,34 @@ static void parseFunctionOrMethod (tokenInfo *const token, const int scope)
 			func_scope = scope;
 
 		cork = makeTag (functionToken, GOTAG_FUNCTION,
-						func_scope, vStringValue (signature), NULL);
+						func_scope, vStringValue (buffer), NULL);
 		if (cork != CORK_NIL)
 			e = getEntryInCorkQueue (cork);
 
 		deleteToken (functionToken);
-		vStringDelete(signature);
 
-		readToken (token);
+		vStringClear (collector.str);
+		collector.last_len = 0;
+
+		readTokenFull (token, &collector);
 
 		// Skip over result.
-		skipType (token, NULL);
+		skipType (token, &collector);
+
+		// Neither "{" nor " {".
+		if (!(isType (token, TOKEN_OPEN_CURLY) && collector.last_len < 2))
+		{
+			collectorTruncate(&collector, isType (token, TOKEN_OPEN_CURLY));
+			if (e)
+			{
+				e->extensionFields.typeRef [0] = eStrdup ("typename");
+				e->extensionFields.typeRef [1] = vStringDeleteUnwrap (buffer);
+				buffer = NULL;
+			}
+		}
+
+		if (buffer)
+			vStringDelete (buffer);
 
 		// Skip over function body.
 		if (isType (token, TOKEN_OPEN_CURLY))
