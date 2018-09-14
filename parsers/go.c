@@ -689,7 +689,7 @@ static void parseFunctionOrMethod (tokenInfo *const token, const int scope)
 		else
 			func_scope = scope;
 		makeTag (functionToken, GOTAG_FUNCTION,
-				 func_scope, signature->buffer, NULL);
+				 func_scope, vStringValue (signature), NULL);
 		deleteToken (functionToken);
 		vStringDelete(signature);
 
