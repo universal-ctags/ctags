@@ -230,6 +230,14 @@ static void parseIdentifier (vString *const string, const int firstChar)
 
 static void collectorPut (collector *collector, char c)
 {
+	if (vStringLength(collector->str) > 0)
+	{
+		if (vStringLast(collector->str) == '(' && c == ' ')
+			return;
+		else if (vStringLast(collector->str) == ' ' && c == ')')
+			vStringChop(collector->str);
+	}
+
 	collector->last_len = vStringLength (collector->str);
 	vStringPut (collector->str, c);
 }
