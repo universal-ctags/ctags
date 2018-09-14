@@ -706,6 +706,7 @@ static int vstring_puts (const char* s, void *data)
 	return vStringLength (str) - len;
 }
 
+#if DEBUG
 static bool isPosSet(MIOPos pos)
 {
 	char * p = (char *)&pos;
@@ -716,6 +717,7 @@ static bool isPosSet(MIOPos pos)
 		r |= p[i];
 	return r;
 }
+#endif
 
 extern char *readLineFromBypassForTag (vString *const vLine, const tagEntryInfo *const tag,
 				   long *const pSeekValue)
