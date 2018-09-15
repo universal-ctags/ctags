@@ -292,7 +292,7 @@ static void collectorCat (collector *collector, vString *str)
 	vStringCat (collector->str, str);
 }
 
-static void appendTokenToVString (const tokenInfo *const token, collector *collector)
+static void collectorAppendToken (collector *collector, const tokenInfo *const token)
 {
 	if (token->type == TOKEN_LEFT_ARROW)
 		collectorCatS (collector, "<-");
@@ -488,7 +488,7 @@ getNextChar:
 	token->c = c;
 
 	if (collector && vStringLength (collector->str) < MAX_COLLECTOR_LENGTH)
-		appendTokenToVString (token, collector);
+		collectorAppendToken (collector, token);
 
 	lastTokenType = token->type;
 }
@@ -912,7 +912,7 @@ static void parseStructMembers (tokenInfo *const token, const int scope)
 			vString *typeForMember = vStringNew ();
 			collector collector = { .str = typeForMember, .last_len = 0, };
 
-			appendTokenToVString (token, &collector);
+			collectorAppendToken (&collector, token);
 			skipType (token, &collector);
 			collectorTruncate (&collector, true);
 
