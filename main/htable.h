@@ -12,6 +12,7 @@
 #define CTAGS_MAIN_HTABLE_H
 
 #include "general.h"
+#include <stdint.h>
 
 typedef struct sHashTable hashTable;
 typedef unsigned int (* hashTableHashFunc)  (const void * const key);
@@ -36,6 +37,7 @@ extern hashTable* hashTableNew         (unsigned int size,
 					hashTableEqualFunc equalfn,
 					hashTableFreeFunc keyfreefn,
 					hashTableFreeFunc valfreefn);
+
 extern void       hashTableDelete      (hashTable *htable);
 extern void       hashTableClear       (hashTable *htable);
 extern void       hashTablePutItem     (hashTable *htable, void *key, void *value);
@@ -44,5 +46,12 @@ extern bool    hashTableHasItem     (hashTable * htable, const void * key);
 extern bool    hashTableDeleteItem  (hashTable *htable, void *key);
 extern void       hashTableForeachItem (hashTable *htable, hashTableForeachFunc proc, void *user_data);
 extern int        hashTableCountItem   (hashTable *htable);
+
+extern hashTable* hashTableIntNew (unsigned int size,
+								   hashTableHashFunc hashfn,
+								   hashTableEqualFunc equalfn,
+								   hashTableFreeFunc keyfreefn);
+#define HT_PTR_TO_INT(P) ((int)(intptr_t)(P))
+#define HT_INT_TO_PTR(P) ((void*)(intptr_t)(P))
 
 #endif	/* CTAGS_MAIN_HTABLE_H */
