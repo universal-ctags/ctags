@@ -1,0 +1,38 @@
+main	input.go	/^package main$/;"	package	roles:def
+fmt	input.go	/^import "fmt"$/;"	package	roles:imported
+main	input.go	/^func main() {$/;"	func	package:main	roles:def
+main	input-0.go	/^package main$/;"	package	roles:def
+f	input-0.go	/^import f "fmt"$/;"	packageName	roles:def	package:fmt
+fmt	input-0.go	/^import f "fmt"$/;"	package	roles:imported	packageName:f
+main	input-0.go	/^func main() {$/;"	func	package:main	roles:def
+main	input-1.go	/^package main$/;"	package	roles:def
+fmt	input-1.go	/^	"fmt"$/;"	package	roles:imported
+main	input-1.go	/^func main() {$/;"	func	package:main	roles:def
+main	input-2.go	/^package main$/;"	package	roles:def
+f	input-2.go	/^	f "fmt"$/;"	packageName	roles:def	package:fmt
+fmt	input-2.go	/^	f "fmt"$/;"	package	roles:imported	packageName:f
+main	input-2.go	/^func main() {$/;"	func	package:main	roles:def
+main	input-3.go	/^package main$/;"	package	roles:def
+time	input-3.go	/^	"time"$/;"	package	roles:imported
+fmt	input-3.go	/^	"fmt"$/;"	package	roles:imported
+main	input-3.go	/^func main() {$/;"	func	package:main	roles:def
+main	input-4.go	/^package main$/;"	package	roles:def
+t	input-4.go	/^	t "time"$/;"	packageName	roles:def	package:time
+time	input-4.go	/^	t "time"$/;"	package	roles:imported	packageName:t
+fmt	input-4.go	/^	"fmt"$/;"	package	roles:imported
+main	input-4.go	/^func main() {$/;"	func	package:main	roles:def
+main	input-5.go	/^package main$/;"	package	roles:def
+time	input-5.go	/^	"time"$/;"	package	roles:imported
+f	input-5.go	/^	f "fmt"$/;"	packageName	roles:def	package:fmt
+fmt	input-5.go	/^	f "fmt"$/;"	package	roles:imported	packageName:f
+main	input-5.go	/^func main() {$/;"	func	package:main	roles:def
+main	input-6.go	/^package main$/;"	package	roles:def
+t	input-6.go	/^	t "time"$/;"	packageName	roles:def	package:time
+time	input-6.go	/^	t "time"$/;"	package	roles:imported	packageName:t
+f	input-6.go	/^	f "fmt"$/;"	packageName	roles:def	package:fmt
+fmt	input-6.go	/^	f "fmt"$/;"	package	roles:imported	packageName:f
+main	input-6.go	/^func main() {$/;"	func	package:main	roles:def
+main	input-7.go	/^package main$/;"	package	roles:def
+fmt	input-7.go	/^	. "fmt"$/;"	package	roles:imported	howImported:inline
+time	input-7.go	/^	_ "time"$/;"	package	roles:imported	howImported:init
+main	input-7.go	/^func main() {$/;"	func	package:main	roles:def

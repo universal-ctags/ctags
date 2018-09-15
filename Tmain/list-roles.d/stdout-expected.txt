@@ -31,6 +31,7 @@ DTD            p/parameterEntity condition           on      conditions
 DTD            p/parameterEntity elementName         on      element names
 DTD            p/parameterEntity partOfAttDef        on      part of attribute definition
 Elm            m/module          imported            on      imported module
+Go             p/package         imported            on      imported package
 Go             u/unknown         receiverType        on      receiver type
 Java           p/package         imported            on      imported package
 LdScript       i/inputSection    discarded           on      discarded when linking
@@ -91,6 +92,7 @@ DTD            p/parameterEntity condition           on      conditions
 DTD            p/parameterEntity elementName         on      element names
 DTD            p/parameterEntity partOfAttDef        on      part of attribute definition
 Elm            m/module          imported            on      imported module
+Go             p/package         imported            on      imported package
 Go             u/unknown         receiverType        on      receiver type
 Java           p/package         imported            on      imported package
 LdScript       i/inputSection    discarded           on      discarded when linking
