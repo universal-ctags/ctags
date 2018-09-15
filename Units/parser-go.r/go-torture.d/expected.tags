@@ -23,19 +23,19 @@ _b	input.go	/^	_a, _b, _c, _d int$/;"	m	struct:T6	typeref:typename:int
 _c	input.go	/^	_a, _b, _c, _d int$/;"	m	struct:T6	typeref:typename:int
 _d	input.go	/^	_a, _b, _c, _d int$/;"	m	struct:T6	typeref:typename:int
 _e	input.go	/^	_e float32$/;"	m	struct:T6	typeref:typename:float32
-a	input.go	/^var (a, b, c int$/;"	v	package:main
-b	input.go	/^var (a, b, c int$/;"	v	package:main
-c	input.go	/^var (a, b, c int$/;"	v	package:main
-d	input.go	/^d T5$/;"	v	package:main
-e	input.go	/^e T4$/;"	v	package:main
-f	input.go	/^f interface{})$/;"	v	package:main
+a	input.go	/^var (a, b, c int$/;"	v	package:main	typeref:typename:int
+b	input.go	/^var (a, b, c int$/;"	v	package:main	typeref:typename:int
+c	input.go	/^var (a, b, c int$/;"	v	package:main	typeref:typename:int
+d	input.go	/^d T5$/;"	v	package:main	typeref:typename:T5
+e	input.go	/^e T4$/;"	v	package:main	typeref:typename:T4
+f	input.go	/^f interface{})$/;"	v	package:main	typeref:typename:interface{}
 f1	input.go	/^func f1() {};func f2() {};type\/*no newline here*\/T9 int\/*var ignored int$/;"	f	package:main	signature:()
 f2	input.go	/^func f1() {};func f2() {};type\/*no newline here*\/T9 int\/*var ignored int$/;"	f	package:main	signature:()
 f3	input.go	/^func (t *T1) f3() (a, b int){$/;"	f	type:T1	typeref:typename:(a, b int)	signature:()
 f4	input.go	/^func (tt * T7) f4(a func () func ()) (func (), int) {return func (){}, 1};func f5(){};const H=1$/;"	f	type:T7	typeref:typename:(func (), int)	signature:(a func () func ())
 f5	input.go	/^func (tt * T7) f4(a func () func ()) (func (), int) {return func (){}, 1};func f5(){};const H=1$/;"	f	package:main	signature:()
-g	input.go	/^const ignored int*\/const (G=6); var g int$/;"	v	package:main
-h	input.go	/^}; var h int$/;"	v	package:main
+g	input.go	/^const ignored int*\/const (G=6); var g int$/;"	v	package:main	typeref:typename:int
+h	input.go	/^}; var h int$/;"	v	package:main	typeref:typename:int
 int	input.go	/^	int$/;"	M	struct:T6	typeref:typename:int
 main	input.go	/^func main() {$/;"	f	package:main	signature:()
 main	input.go	/^package main$/;"	p

@@ -969,6 +969,8 @@ static void parseConstTypeVar (tokenInfo *const token, goKind kind, const int sc
 	// VarSpec     = IdentifierList ( Type [ "=" ExpressionList ] | "=" ExpressionList ) .
 	bool usesParens = false;
 	int member_scope = scope;
+	intArray *corks
+		= (kind == GOTAG_VAR || kind == GOTAG_CONST)? intArrayNew (): NULL;
 
 	readToken (token);
 
@@ -1011,7 +1013,11 @@ static void parseConstTypeVar (tokenInfo *const token, goKind kind, const int sc
 					break;
 				}
 				else
-					makeTag (token, kind, scope, NULL, NULL);
+				{
+					int c = makeTag (token, kind, scope, NULL, NULL);
+					if (corks)
+						intArrayAdd (corks, c);
+				}
 				readToken (token);
 			}
 			if (!isType (token, TOKEN_COMMA))
@@ -1026,6 +1032,20 @@ static void parseConstTypeVar (tokenInfo *const token, goKind kind, const int sc
 			else
 				skipType (token, NULL);
 			deleteToken (typeToken);
+		}
+		else if (corks)
+		{
+			vString *buffer = vStringNew ();
+			collector collector = { .str = buffer, .last_len = 0, };
+
+			collectorAppendToken (&collector, token);
+			skipType (token, &collector);
+			collectorTruncate (&collector, true);
+
+			if (!vStringIsEmpty (buffer))
+				attachTypeRefField (corks, vStringValue (buffer));
+			vStringDelete (buffer);
+			intArrayClear (corks);
 		}
 		else
 			skipType (token, NULL);
@@ -1045,6 +1065,8 @@ static void parseConstTypeVar (tokenInfo *const token, goKind kind, const int sc
 	}
 	while (!isType (token, TOKEN_EOF) &&
 			usesParens && !isType (token, TOKEN_CLOSE_PAREN));
+
+	intArrayDelete (corks);
 }
 
 static void parseImportSpec (tokenInfo *const token)
