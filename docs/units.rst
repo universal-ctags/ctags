@@ -46,7 +46,7 @@ have its own directory under Units directory.
 	Input file name must have a *input* as basename. *TEST*
 	part should explain the test case well.
 
-*Units/TEST/input-[0-9].\** *Units/TEST/input-[0-9]-\*.\** **optional**
+*Units/TEST/input[-_][0-9].\** *Units/TEST/input[-_][0-9][-_]\*.\** **optional**
 
 	Optional input file names. They are put next to *input.\** in
 	testing command line.
