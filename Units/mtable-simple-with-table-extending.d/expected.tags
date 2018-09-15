@@ -6,4 +6,4 @@ e	input.mtable	/^c, e = "x";$/;"	var	line:16	scope:fun:foo
 bar	input.mtable	/^function bar$/;"	fun	line:19	end:27
 y	input.mtable	/^	var y;$/;"	var	line:21	scope:fun:bar
 baz	input.mtable	/^	function baz$/;"	fun	line:22	scope:fun:bar	end:25
-z	input.mtable	/^		var z;$/;"	var	line:24	scope:fun:bar.baz
+z	input.mtable	/^		var z;$/;"	var	line:24	scope:fun:baz

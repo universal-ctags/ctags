@@ -22,16 +22,16 @@ superclass-element	input.rng	156;"	n
 gjdoc:superclass	input.rng	157;"	e	namedPattern:superclass-element
 tag-element	input.rng	166;"	n
 gjdoc:tag	input.rng	167;"	e	namedPattern:tag-element
-kind	input.rng	169;"	a	element:tag-element.gjdoc:tag
+kind	input.rng	169;"	a	element:gjdoc:tag
 exception-element	input.rng	178;"	n
 gjdoc:exception	input.rng	179;"	e	namedPattern:exception-element
 TagContent	input.rng	184;"	n
 containingPackage-element	input.rng	212;"	n
 gjdoc:containingPackage	input.rng	213;"	e	namedPattern:containingPackage-element
-name	input.rng	217;"	a	element:containingPackage-element.gjdoc:containingPackage
+name	input.rng	217;"	a	element:gjdoc:containingPackage
 tagletText-element	input.rng	223;"	n
 gjdoc:tagletText	input.rng	224;"	e	namedPattern:tagletText-element
-tagName	input.rng	228;"	a	element:tagletText-element.gjdoc:tagletText
+tagName	input.rng	228;"	a	element:gjdoc:tagletText
 isError-element	input.rng	237;"	n
 gjdoc:isError	input.rng	238;"	e	namedPattern:isError-element
 isException-element	input.rng	246;"	n

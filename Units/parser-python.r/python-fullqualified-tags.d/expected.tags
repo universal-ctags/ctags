@@ -3,5 +3,5 @@ Foo	input.py	/^class Foo():$/;"	c
 Foo.Bar	input.py	/^    class Bar():$/;"	c	class:Foo
 Foo.Bar.f	input.py	/^        def f(self):$/;"	m	class:Foo.Bar
 Foo.g	input.py	/^    def g(self):$/;"	m	class:Foo
-f	input.py	/^        def f(self):$/;"	m	class:Foo.Bar
+f	input.py	/^        def f(self):$/;"	m	class:Bar
 g	input.py	/^    def g(self):$/;"	m	class:Foo

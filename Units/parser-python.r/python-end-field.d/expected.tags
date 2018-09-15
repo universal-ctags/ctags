@@ -1,7 +1,7 @@
 A	input.py	/^class A(object):$/;"	c	line:1	end:18
 f	input.py	/^    def f(self):$/;"	m	line:3	class:A	end:7
 A.f	input.py	/^    def f(self):$/;"	m	line:3	class:A	end:7
-g	input.py	/^        def g(x):$/;"	f	line:4	member:A.f	file:	end:5
+g	input.py	/^        def g(x):$/;"	f	line:4	member:f	file:	end:5
 A.f.g	input.py	/^        def g(x):$/;"	f	line:4	member:A.f	file:	end:5
 y	input.py	/^    y = 1$/;"	v	line:10	class:A
 A.y	input.py	/^    y = 1$/;"	v	line:10	class:A

@@ -7,9 +7,9 @@ F	input.go	/^	F=3.14*(1+2*3)\/34e7;I=1)$/;"	c	package:main
 G	input.go	/^const ignored int*\/const (G=6); var g int$/;"	c	package:main
 H	input.go	/^func (tt * T7) f4(a func () func ()) (func (), int) {return func (){}, 1};func f5(){};const H=1$/;"	c	package:main
 I	input.go	/^	F=3.14*(1+2*3)\/34e7;I=1)$/;"	c	package:main
-T1	input.go	/^	T1 `annotation`$/;"	M	struct:main.T6	typeref:typename:T1
+T1	input.go	/^	T1 `annotation`$/;"	M	struct:T6	typeref:typename:T1
 T1	input.go	/^	T1 map[string]int$/;"	t	package:main
-T2	input.go	/^	*T2$/;"	M	struct:main.T6	typeref:typename:*T2
+T2	input.go	/^	*T2$/;"	M	struct:T6	typeref:typename:*T2
 T2	input.go	/^	T2 <-chan float32$/;"	t	package:main
 T3	input.go	/^	T3 chan []string$/;"	t	package:main
 T4	input.go	/^	T4 chan<- *[12]string$/;"	t	package:main
@@ -18,11 +18,11 @@ T6	input.go	/^type T6 struct {$/;"	s	package:main
 T7	input.go	/^type (T7 func (a struct{_ int; _ float32}, b int) (int, map[string]int);T8 float32)$/;"	t	package:main
 T8	input.go	/^type (T7 func (a struct{_ int; _ float32}, b int) (int, map[string]int);T8 float32)$/;"	t	package:main
 T9	input.go	/^func f1() {};func f2() {};type\/*no newline here*\/T9 int\/*var ignored int$/;"	t	package:main
-_a	input.go	/^	_a, _b, _c, _d int$/;"	m	struct:main.T6	typeref:typename:int
-_b	input.go	/^	_a, _b, _c, _d int$/;"	m	struct:main.T6	typeref:typename:int
-_c	input.go	/^	_a, _b, _c, _d int$/;"	m	struct:main.T6	typeref:typename:int
-_d	input.go	/^	_a, _b, _c, _d int$/;"	m	struct:main.T6	typeref:typename:int
-_e	input.go	/^	_e float32$/;"	m	struct:main.T6	typeref:typename:float32
+_a	input.go	/^	_a, _b, _c, _d int$/;"	m	struct:T6	typeref:typename:int
+_b	input.go	/^	_a, _b, _c, _d int$/;"	m	struct:T6	typeref:typename:int
+_c	input.go	/^	_a, _b, _c, _d int$/;"	m	struct:T6	typeref:typename:int
+_d	input.go	/^	_a, _b, _c, _d int$/;"	m	struct:T6	typeref:typename:int
+_e	input.go	/^	_e float32$/;"	m	struct:T6	typeref:typename:float32
 a	input.go	/^var (a, b, c int$/;"	v	package:main
 b	input.go	/^var (a, b, c int$/;"	v	package:main
 c	input.go	/^var (a, b, c int$/;"	v	package:main
@@ -31,11 +31,11 @@ e	input.go	/^e T4$/;"	v	package:main
 f	input.go	/^f interface{})$/;"	v	package:main
 f1	input.go	/^func f1() {};func f2() {};type\/*no newline here*\/T9 int\/*var ignored int$/;"	f	package:main	signature:()
 f2	input.go	/^func f1() {};func f2() {};type\/*no newline here*\/T9 int\/*var ignored int$/;"	f	package:main	signature:()
-f3	input.go	/^func (t *T1) f3() (a, b int){$/;"	f	unknown:main.T1	typeref:typename:(a, b int)	signature:()
-f4	input.go	/^func (tt * T7) f4(a func () func ()) (func (), int) {return func (){}, 1};func f5(){};const H=1$/;"	f	unknown:main.T7	typeref:typename:(func (), int)	signature:(a func () func ())
+f3	input.go	/^func (t *T1) f3() (a, b int){$/;"	f	unknown:T1	typeref:typename:(a, b int)	signature:()
+f4	input.go	/^func (tt * T7) f4(a func () func ()) (func (), int) {return func (){}, 1};func f5(){};const H=1$/;"	f	unknown:T7	typeref:typename:(func (), int)	signature:(a func () func ())
 f5	input.go	/^func (tt * T7) f4(a func () func ()) (func (), int) {return func (){}, 1};func f5(){};const H=1$/;"	f	package:main	signature:()
 g	input.go	/^const ignored int*\/const (G=6); var g int$/;"	v	package:main
 h	input.go	/^}; var h int$/;"	v	package:main
-int	input.go	/^	int$/;"	M	struct:main.T6	typeref:typename:int
+int	input.go	/^	int$/;"	M	struct:T6	typeref:typename:int
 main	input.go	/^func main() {$/;"	f	package:main	signature:()
 main	input.go	/^package main$/;"	p

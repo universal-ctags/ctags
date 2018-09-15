@@ -743,6 +743,20 @@ extern void truncateTagLineAfterTag (
 	}
 }
 
+static const char *getScopeNameFromCorkQueue (const tagEntryInfo * inner_scope)
+{
+	const tagEntryInfo *scope = inner_scope;
+
+	while (scope)
+	{
+		if (!scope->placeholder)
+			return scope->name;
+		else
+			scope = getEntryInCorkQueue (scope->extensionFields.scopeIndex);
+	}
+	return "";
+}
+
 static char* getFullQualifiedScopeNameFromCorkQueue (const tagEntryInfo * inner_scope)
 {
 
@@ -788,7 +802,7 @@ static char* getFullQualifiedScopeNameFromCorkQueue (const tagEntryInfo * inner_
 }
 
 extern void getTagScopeInformation (tagEntryInfo *const tag,
-				    const char **kind, const char **name)
+				    const char ** kind, const char ** name)
 {
 	if (kind)
 		*kind = NULL;
@@ -826,7 +840,22 @@ extern void getTagScopeInformation (tagEntryInfo *const tag,
 			*kind = kdef->name;
 		}
 		if (name)
-			*name = tag->extensionFields.scopeName;
+		{
+			if (tag->extensionFields.scopeIndex != CORK_NIL &&
+				(!isTagExtraBitMarked(tag, XTAG_QUALIFIED_TAGS)))
+			{
+				/* Though the tag has filled scopeName field ,
+				   it is a cache for building FQ tag.
+				   In the case, the filed filled with full qualified
+				   scope information. We will provide just one upper level
+				   scope information for this  no-qualified tag. */
+				const tagEntryInfo * scope;
+				scope = getEntryInCorkQueue (tag->extensionFields.scopeIndex);
+				*name = getScopeNameFromCorkQueue (scope);
+			}
+			else
+				*name = tag->extensionFields.scopeName;
+		}
 	}
 }
 

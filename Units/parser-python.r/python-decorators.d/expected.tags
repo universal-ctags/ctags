@@ -11,4 +11,4 @@ hi	input.py	/^    def hi(cls):$/;"	m	class:class01	decorators:classmethod
 noop	input.py	/^def noop(f):$/;"	f
 noopwrapper	input.py	/^def noopwrapper(*args):$/;"	f
 tracer	input.py	/^    def tracer(f):$/;"	m	class:class01	decorators:staticmethod
-wrapper	input.py	/^        def wrapper():$/;"	f	member:class01.tracer	file:
+wrapper	input.py	/^        def wrapper():$/;"	f	member:tracer	file:
