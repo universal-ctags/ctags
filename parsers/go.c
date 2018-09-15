@@ -17,6 +17,7 @@
 #include "vstring.h"
 #include "xtag.h"
 #include "field.h"
+#include "htable.h"
 
 #include <string.h>
 
@@ -174,6 +175,8 @@ static fieldDefinition GoFields [] = {
 		.enabled = false,
 	},
 };
+
+static hashTable *typeTable;
 
 /*
 *   FUNCTION DEFINITIONS
@@ -741,9 +744,15 @@ static void parseFunctionOrMethod (tokenInfo *const token, const int scope)
 
 		collectorTruncate (&collector, false);
 		if (receiver_type_token)
-			func_scope = makeTagFull(receiver_type_token, GOTAG_UNKNOWN,
-									 scope, NULL, NULL,
-									 R_GOTAG_UNKNOWN_RECEIVER);
+		{
+			void *p = hashTableGetItem (typeTable, vStringValue (receiver_type_token->string));
+			if (p)
+				func_scope = HT_PTR_TO_INT(p);
+			else
+				func_scope = makeTagFull(receiver_type_token, GOTAG_UNKNOWN,
+										 scope, NULL, NULL,
+										 R_GOTAG_UNKNOWN_RECEIVER);
+		}
 		else
 			func_scope = scope;
 
@@ -990,6 +999,14 @@ static void parseConstTypeVar (tokenInfo *const token, goKind kind, const int sc
 					else
 						member_scope = makeTag (typeToken, kind,
 												scope, NULL, NULL);
+
+					if (member_scope != CORK_NIL)
+					{
+						tagEntryInfo *e = getEntryInCorkQueue (member_scope);
+						hashTablePutItem (typeTable,
+										  (char *)e->name,
+										  HT_INT_TO_PTR(member_scope));
+					}
 					break;
 				}
 				else
@@ -1147,8 +1164,13 @@ static void parseGoFile (tokenInfo *const token)
 static void findGoTags (void)
 {
 	tokenInfo *const token = newToken ();
+	typeTable = hashTableIntNew (43, hashCstrhash, hashCstreq,
+								 NULL);
 
 	parseGoFile (token);
+
+	hashTableDelete (typeTable);
+	typeTable = NULL;
 
 	deleteToken (token);
 }
