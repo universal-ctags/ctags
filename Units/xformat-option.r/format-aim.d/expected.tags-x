@@ -1,4 +1,4 @@
 getTarget  <access =    private, parent =          -, impl =          ->
 input      <access =          -, parent =     Object, impl =          ->
-life       <access =    default, parent =          -, impl =   abstract>
+life       <access =  protected, parent =          -, impl =   abstract>
 main       <access =     public, parent =          -, impl =          ->
