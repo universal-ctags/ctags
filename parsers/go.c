@@ -230,6 +230,14 @@ static void parseIdentifier (vString *const string, const int firstChar)
 
 static void collectorPut (collector *collector, char c)
 {
+	if (vStringLength(collector->str) > 0)
+	{
+		if (vStringLast(collector->str) == '(' && c == ' ')
+			return;
+		else if (vStringLast(collector->str) == ' ' && c == ')')
+			vStringChop(collector->str);
+	}
+
 	collector->last_len = vStringLength (collector->str);
 	vStringPut (collector->str, c);
 }
@@ -669,14 +677,16 @@ static void parseFunctionOrMethod (tokenInfo *const token, const int scope)
 
 	if (isType (token, TOKEN_IDENTIFIER))
 	{
+		int cork;
+		tagEntryInfo *e = NULL;
 		tokenInfo *functionToken = newToken ();
 		int func_scope;
 
 		copyToken (functionToken, token);
 
 		// Start recording signature
-		vString *signature = vStringNew ();
-		collector collector = { .str = signature, .last_len = 0, };
+		vString *buffer = vStringNew ();
+		collector collector = { .str = buffer, .last_len = 0, };
 
 		// Skip over parameters.
 		readTokenFull (token, &collector);
@@ -688,19 +698,44 @@ static void parseFunctionOrMethod (tokenInfo *const token, const int scope)
 								 scope, NULL, NULL);
 		else
 			func_scope = scope;
-		makeTag (functionToken, GOTAG_FUNCTION,
-				 func_scope, signature->buffer, NULL);
-		deleteToken (functionToken);
-		vStringDelete(signature);
 
-		readToken (token);
+		cork = makeTag (functionToken, GOTAG_FUNCTION,
+						func_scope, vStringValue (buffer), NULL);
+		if (cork != CORK_NIL)
+			e = getEntryInCorkQueue (cork);
+
+		deleteToken (functionToken);
+
+		vStringClear (collector.str);
+		collector.last_len = 0;
+
+		readTokenFull (token, &collector);
 
 		// Skip over result.
-		skipType (token, NULL);
+		skipType (token, &collector);
+
+		// Neither "{" nor " {".
+		if (!(isType (token, TOKEN_OPEN_CURLY) && collector.last_len < 2))
+		{
+			collectorTruncate(&collector, isType (token, TOKEN_OPEN_CURLY));
+			if (e)
+			{
+				e->extensionFields.typeRef [0] = eStrdup ("typename");
+				e->extensionFields.typeRef [1] = vStringDeleteUnwrap (buffer);
+				buffer = NULL;
+			}
+		}
+
+		if (buffer)
+			vStringDelete (buffer);
 
 		// Skip over function body.
 		if (isType (token, TOKEN_OPEN_CURLY))
+		{
 			skipToMatched (token, NULL);
+			if (e)
+				e->extensionFields.endLine = getInputLineNumber ();
+		}
 	}
 
 	if (receiver_type_token)
