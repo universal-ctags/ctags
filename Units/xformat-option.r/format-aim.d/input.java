@@ -5,7 +5,7 @@ public class input extends Object
 	return "world";
     }
 
-    abstract package static int life ();
+    abstract protected static int life ();
 
     public static void main(String[] args)
     {
