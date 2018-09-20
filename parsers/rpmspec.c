@@ -59,13 +59,19 @@ static kindDefinition RpmSpecKinds[] = {
 	{ true, 'g', "global", "global macros" },
 };
 
-
-static bool rejecting;
-
 struct macro_cb_data {
 	rpmSpecKind kindex;
 	rpmSpecMacroRole rindex;
 };
+
+struct rpmSpecCtx {
+	bool rejecting;
+	struct macro_cb_data macro;
+	struct macro_cb_data global;
+	struct macro_cb_data undef;
+	int package_index;
+} rpmSpecCtx;
+
 
 static bool is_line_continued(const char *line)
 {
@@ -78,12 +84,22 @@ static bool is_line_continued(const char *line)
 		|| ((len >= 2) && (line[len - 1] == '\n') && (line[len - 2] == '\\')))? true: false;
 }
 
-static bool found_macro_cb (const char *line,
-			    const regexMatch *matches,
-			    unsigned int count,
-			    void *uesrData)
+static bool found_macro_cb_full (const char *line,
+								 const regexMatch *matches,
+								 unsigned int count,
+								 bool global,
+								 bool undef,
+								 void *userData)
 {
-	struct macro_cb_data *data = uesrData;
+	struct rpmSpecCtx *ctx = (struct rpmSpecCtx *)userData;
+	struct macro_cb_data *data;
+
+	if (undef)
+		data = &ctx->undef;
+	else if (global)
+		data = &ctx->global;
+	else
+		data = &ctx->macro;
 
 	if (count > 0)
 	{
@@ -106,10 +122,10 @@ static bool found_macro_cb (const char *line,
 		/* Skip the definition */
 		while (line && is_line_continued (line))
 		{
-			rejecting = true;
+			((struct rpmSpecCtx *)userData)->rejecting = true;
 			line = (const char *)readLineFromInputFile ();
 		}
-		rejecting = false;
+		((struct rpmSpecCtx *)userData)->rejecting = false;
 
 		tag.extensionFields.endLine = getInputLineNumber();
 
@@ -121,6 +137,31 @@ static bool found_macro_cb (const char *line,
 	}
 	return true;
 }
+
+static bool found_macro_cb (const char *line,
+							const regexMatch *matches,
+							unsigned int count,
+							void *userData)
+{
+	return found_macro_cb_full(line, matches, count, false, false, userData);
+}
+
+static bool found_global_cb (const char *line,
+			    const regexMatch *matches,
+			    unsigned int count,
+			    void *userData)
+{
+	return found_macro_cb_full(line, matches, count, true, false, userData);
+}
+
+static bool found_undef_cb (const char *line,
+			    const regexMatch *matches,
+			    unsigned int count,
+			    void *userData)
+{
+	return found_macro_cb_full(line, matches, count, false, true, userData);
+}
+
 
 static bool found_tag_cb (const char *line,
 			  const regexMatch *matches,
@@ -139,7 +180,8 @@ static bool found_tag_cb (const char *line,
 			{
 				vString *package = vStringNew ();
 				vStringNCopyS (package, line + matches[2].start, matches[2].length);
-				*((int *)userData) = makeSimpleTag (package, K_PACKAGE);
+				((struct rpmSpecCtx *)userData)->package_index
+					= makeSimpleTag (package, K_PACKAGE);
 				vStringDelete (package);
 			}
 		}
@@ -160,32 +202,36 @@ static bool found_package_cb (const char *line,
 
 		vStringNCopyS (name, line + matches[2].start, matches[2].length);
 		initTagEntry (&tag, vStringValue (name), K_PACKAGE);
-		tag.extensionFields.scopeIndex = *(int *)userData;
+		tag.extensionFields.scopeIndex = ((struct rpmSpecCtx *)userData)->package_index;
 		makeTagEntry (&tag);
 		vStringDelete (name);
 	}
 	return true;
 }
 
+static void findRpmSpecTags (void)
+{
+	rpmSpecCtx.rejecting = false;
+	rpmSpecCtx.macro = (struct macro_cb_data){.kindex = K_MACOR, .rindex = ROLE_INDEX_DEFINITION};
+	rpmSpecCtx.global = (struct macro_cb_data){K_GLOBAL, ROLE_INDEX_DEFINITION};
+	rpmSpecCtx.undef = (struct macro_cb_data){K_MACOR,  R_MACRO_UNDEF};
+	rpmSpecCtx.package_index = CORK_NIL;
+
+	findRegexTags ();
+}
+
 static void initializeRpmSpecParser (langType language)
 {
-	static int package_index = CORK_NIL;
-	rejecting = false;
-
-	static struct macro_cb_data macro  = {K_MACOR,  ROLE_INDEX_DEFINITION};
-	static struct macro_cb_data global = {K_GLOBAL, ROLE_INDEX_DEFINITION};
-	static struct macro_cb_data undef  = {K_MACOR,  R_MACRO_UNDEF};
-
 	addLanguageCallbackRegex (language,  "^([A-Za-z_][A-Za-z_0-9()]+)[ \t]*:[ \t]*([^ \t]*)",
-			  "{exclusive}", found_tag_cb, &rejecting, &package_index);
+			  "{exclusive}", found_tag_cb, &rpmSpecCtx.rejecting, &rpmSpecCtx);
 	addLanguageCallbackRegex (language, "^%define[ \t]+([A-Za-z_][A-Za-z_0-9]+)(\\([^)]+\\))?",
-			  "{exclusive}", found_macro_cb, &rejecting, &macro);
+			  "{exclusive}", found_macro_cb, &rpmSpecCtx.rejecting, &rpmSpecCtx);
 	addLanguageCallbackRegex (language, "^%undef[ \t]+([A-Za-z_][A-Za-z_0-9]+)",
-			  "{exclusive}", found_macro_cb, &rejecting, &undef);
+			  "{exclusive}", found_undef_cb, &rpmSpecCtx.rejecting, &rpmSpecCtx);
 	addLanguageCallbackRegex (language, "^%global[ \t]+([A-Za-z_][A-Za-z_0-9]+)(\\([^)]+\\))?",
-			  "{exclusive}", found_macro_cb, &rejecting, &global);
+			  "{exclusive}", found_global_cb, &rpmSpecCtx.rejecting, &rpmSpecCtx);
 	addLanguageCallbackRegex (language, "^%package[ \t]+(-n[ \t]+)?([A-Za-z_][A-Za-z_0-9-]+)",
-			  "{exclusive}", found_package_cb, &rejecting, &package_index);
+			  "{exclusive}", found_package_cb, &rpmSpecCtx.rejecting, &rpmSpecCtx);
 }
 
 extern parserDefinition* RpmSpecParser (void)
@@ -196,7 +242,8 @@ extern parserDefinition* RpmSpecParser (void)
 	def->kindCount = ARRAY_SIZE (RpmSpecKinds);
 	def->extensions = extensions;
 	def->initialize = initializeRpmSpecParser;
-	def->method     = METHOD_NOT_CRAFTED|METHOD_REGEX;
+	def->parser = findRpmSpecTags;
+	def->method     = METHOD_REGEX;
 	def->useCork = true;
 	def->requestAutomaticFQTag = true;
 	return def;
