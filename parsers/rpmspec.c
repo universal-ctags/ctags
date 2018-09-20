@@ -70,6 +70,7 @@ struct rpmSpecCtx {
 	struct macro_cb_data global;
 	struct macro_cb_data undef;
 	int package_index;
+	int macro_index;
 } rpmSpecCtx;
 
 
@@ -93,6 +94,11 @@ static bool found_macro_cb_full (const char *line,
 {
 	struct rpmSpecCtx *ctx = (struct rpmSpecCtx *)userData;
 	struct macro_cb_data *data;
+
+	ctx->rejecting = (line && is_line_continued (line));
+
+	TRACE_PRINT("Line %04d continuation: %d",
+				getInputLineNumber(), ctx->rejecting);
 
 	if (undef)
 		data = &ctx->undef;
@@ -119,17 +125,19 @@ static bool found_macro_cb_full (const char *line,
 		if (signature)
 			tag.extensionFields.signature = vStringValue (signature);
 
-		/* Skip the definition */
-		while (line && is_line_continued (line))
+		if (!ctx->rejecting)
 		{
-			((struct rpmSpecCtx *)userData)->rejecting = true;
-			line = (const char *)readLineFromInputFile ();
+			/* The line is not continued. Let's record the endLine now. */
+			tag.extensionFields.endLine = getInputLineNumber();
 		}
-		((struct rpmSpecCtx *)userData)->rejecting = false;
 
-		tag.extensionFields.endLine = getInputLineNumber();
-
-		makeTagEntry (&tag);
+		int cork_index = makeTagEntry (&tag);
+		if (data->rindex == ROLE_INDEX_DEFINITION && ctx->rejecting)
+		{
+			/* The line is continued. Let's record the cork index
+			   for attachend endLine field later. */
+			ctx->macro_index = cork_index;
+		}
 
 		vStringDelete (name);
 		if (signature)
@@ -209,6 +217,28 @@ static bool found_package_cb (const char *line,
 	return true;
 }
 
+static bool check_line_continuation (const char *line,
+			      const regexMatch *matches,
+			      unsigned int count,
+			      void *userData)
+{
+	struct rpmSpecCtx *ctx = (struct rpmSpecCtx *)userData;
+	bool rejecting = ctx->rejecting;
+	ctx->rejecting = (line && is_line_continued (line));
+
+	TRACE_PRINT("Line %04d continuation: %d -> %d",
+				getInputLineNumber(), rejecting, ctx->rejecting);
+
+	if (rejecting && (!ctx->rejecting) && (ctx->macro_index != CORK_NIL))
+	{
+		tagEntryInfo *e = getEntryInCorkQueue (ctx->macro_index);
+		e->extensionFields.endLine = getInputLineNumber();
+		ctx->macro_index = CORK_NIL;
+	}
+
+	return true;
+}
+
 static void findRpmSpecTags (void)
 {
 	rpmSpecCtx.rejecting = false;
@@ -216,6 +246,7 @@ static void findRpmSpecTags (void)
 	rpmSpecCtx.global = (struct macro_cb_data){K_GLOBAL, ROLE_INDEX_DEFINITION};
 	rpmSpecCtx.undef = (struct macro_cb_data){K_MACOR,  R_MACRO_UNDEF};
 	rpmSpecCtx.package_index = CORK_NIL;
+	rpmSpecCtx.macro_index = CORK_NIL;
 
 	findRegexTags ();
 }
@@ -232,6 +263,8 @@ static void initializeRpmSpecParser (langType language)
 			  "{exclusive}", found_global_cb, &rpmSpecCtx.rejecting, &rpmSpecCtx);
 	addLanguageCallbackRegex (language, "^%package[ \t]+(-n[ \t]+)?([A-Za-z_][A-Za-z_0-9-]+)",
 			  "{exclusive}", found_package_cb, &rpmSpecCtx.rejecting, &rpmSpecCtx);
+	addLanguageCallbackRegex (language, "^.*$",
+			  "{exclusive}", check_line_continuation, NULL, &rpmSpecCtx);
 }
 
 extern parserDefinition* RpmSpecParser (void)
