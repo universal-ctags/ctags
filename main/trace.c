@@ -67,7 +67,7 @@ void tracePrint(const char * szFunction, const char * szFormat,...)
 	if (!isTraced())
 		return;
 
-	tracePrintPrefix(szFormat);
+	tracePrintPrefix(szFunction);
 
 	va_list va;
 	va_start(va,szFormat);
