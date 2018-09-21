@@ -1107,7 +1107,7 @@ extern void fieldColprintAddCommonLines (struct colprintTable *table)
 
 extern void fieldColprintAddLanguageLines (struct colprintTable *table, langType language)
 {
-	for (int i = FIELD_BUILTIN_LAST + 1; i < fieldObjectUsed; i++)
+	for (unsigned int i = FIELD_BUILTIN_LAST + 1; i < fieldObjectUsed; i++)
 	{
 		fieldObject *fobj = getFieldObject(i);
 		if (fobj->language == language)

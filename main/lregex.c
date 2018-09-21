@@ -1246,7 +1246,7 @@ static void matchTagPattern (struct lregexControlBlock *lcb,
 
 		if (roleBits)
 		{
-			int roleIndex;
+			unsigned int roleIndex;
 
 			for (roleIndex = 0;
 				 roleIndex < countLanguageRoles(e.langType, kind);
@@ -2174,7 +2174,7 @@ extern void extendRegexTable (struct lregexControlBlock *lcb, const char *src, c
 		error (FATAL, "no such regex table in %s: %s", getLanguageName(lcb->owner), dist);
 	dist_table = ptrArrayItem(lcb->tables, i);
 
-	for (i = 0; i < ptrArrayCount(src_table->entries); i++)
+	for (i = 0; i < (int)ptrArrayCount(src_table->entries); i++)
 	{
 		regexTableEntry *entry = ptrArrayItem (src_table->entries, i);
 		ptrArrayAdd(dist_table->entries, newRefPatternEntry(entry));

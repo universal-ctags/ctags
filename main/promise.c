@@ -215,7 +215,7 @@ static void line_filler (unsigned char *input, size_t size,
 {
 	ulongArray *lines = data;
 	unsigned int start_index, end_index;
-	int i;
+	unsigned int i;
 
 	for (i = 0; i < ulongArrayCount (lines); i++)
 	{
