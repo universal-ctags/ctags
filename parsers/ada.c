@@ -2124,9 +2124,9 @@ static void storeAdaTags(adaTokenInfo *token, const char *parentScope)
         size_t parentScope_len = strlen(parentScope);
         size_t name_len = strlen(token->name);
         currentScope = xMalloc(parentScope_len + name_len + 2, char);
-        strncpy(currentScope, parentScope, parentScope_len);
+        memcpy(currentScope, parentScope, parentScope_len);
         currentScope[parentScope_len] = '.';
-        strncpy(&currentScope[parentScope_len + 1], token->name, name_len);
+        memcpy(&currentScope[parentScope_len + 1], token->name, name_len);
         currentScope[parentScope_len + 1 + name_len] = '\0';
 
         token->tag.name = currentScope;
