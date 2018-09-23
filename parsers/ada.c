@@ -2130,7 +2130,7 @@ static void storeAdaTags(adaTokenInfo *token, const char *parentScope)
         currentScope[strlen(parentScope) + 1 + strlen(token->name)] = '\0';
 
         token->tag.name = currentScope;
-	markTagExtraBit (&token->tag, XTAG_QUALIFIED_TAGS);
+        markTagExtraBit (&token->tag, XTAG_QUALIFIED_TAGS);
         makeTagEntry(&token->tag);
       } /* if(parentScope != NULL) */
       else
