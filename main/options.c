@@ -115,6 +115,7 @@ typedef const struct sBooleanOption {
 *   DATA DEFINITIONS
 */
 
+/* Set true to this to stop option proessing.*/
 static bool NonOptionEncountered = false;
 static stringList *OptionFiles;
 
@@ -871,7 +872,9 @@ static void cArgRead (cookedArgs *const current)
 		item = argItem (current->args);
 		current->shortOptions = NULL;
 		Assert (item != NULL);
-		if (strncmp (item, "--", (size_t) 2) == 0)
+
+		if ((!NonOptionEncountered)
+			&& (strncmp (item, "--", (size_t) 2) == 0))
 		{
 			current->isOption = true;
 			current->longOption = true;
@@ -879,7 +882,8 @@ static void cArgRead (cookedArgs *const current)
 			Assert (current->item != NULL);
 			Assert (current->parameter != NULL);
 		}
-		else if (*item == '-')
+		else if ((!NonOptionEncountered)
+				 && (*item == '-'))
 		{
 			current->isOption = true;
 			current->longOption = false;
@@ -3301,7 +3305,13 @@ static void parseOption (cookedArgs* const args)
 	if (args->isOption)
 	{
 		if (args->longOption)
-			processLongOption (args->item, args->parameter);
+		{
+			if (*args->item == '\0')
+				/* "--" is passed. */
+				NonOptionEncountered = true;
+			else
+				processLongOption (args->item, args->parameter);
+		}
 		else
 		{
 			const char *parameter = args->parameter;

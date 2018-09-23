@@ -1,2 +1,2 @@
-ctags: Notice: No options will be read from files or environment
-ctags: Unknown option: --
+Notice: No options will be read from files or environment
+No files specified. Try "ctags --help".

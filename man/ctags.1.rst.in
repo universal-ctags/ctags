@@ -12,8 +12,8 @@ Generate tag files for source code
 
 SYNOPSIS
 --------
-|	**@CTAGS_NAME_EXECUTABLE@** [options] [source_file(s)]
-|	**@ETAGS_NAME_EXECUTABLE@** [options] [source_file(s)]
+|	**@CTAGS_NAME_EXECUTABLE@** [options] [--] [source_file(s)]
+|	**@ETAGS_NAME_EXECUTABLE@** [options] [--] [source_file(s)]
 
 
 DESCRIPTION
