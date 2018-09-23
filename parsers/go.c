@@ -17,6 +17,9 @@
 #include "vstring.h"
 #include "options.h"
 #include "xtag.h"
+#include "field.h"
+
+#include <string.h>
 
 /*
  *	 MACROS
@@ -101,7 +104,16 @@ typedef enum {
 	GOTAG_MEMBER,
 	GOTAG_ANONMEMBER,
 	GOTAG_UNKNOWN,
+	GOTAG_PACKAGE_NAME,
 } goKind;
+
+typedef enum {
+	R_GOTAG_PACKAGE_IMPORTED,
+} GoPackageRole;
+
+static roleDefinition GoPackageRoles [] = {
+	{ true, "imported", "imported package" },
+};
 
 typedef enum {
 	R_GOTAG_UNKNOWN_RECEIVER,
@@ -112,7 +124,8 @@ static roleDefinition GoUnknownRoles [] = {
 };
 
 static kindDefinition GoKinds[] = {
-	{true, 'p', "package", "packages"},
+	{true, 'p', "package", "packages",
+	  .referenceOnly = false, ATTACH_ROLES (GoPackageRoles)},
 	{true, 'f', "func", "functions"},
 	{true, 'c', "const", "constants"},
 	{true, 't', "type", "types"},
@@ -123,6 +136,7 @@ static kindDefinition GoKinds[] = {
 	{true, 'M', "anonMember", "struct anonymous members"},
 	{true, 'u', "unknown", "unknown",
 	 .referenceOnly = true, ATTACH_ROLES (GoUnknownRoles)},
+	{true, 'P', "packageName", "name for specifying imported package"},
 };
 
 static const keywordTable GoKeywordTable[] = {
@@ -136,6 +150,30 @@ static const keywordTable GoKeywordTable[] = {
 	{"interface", KEYWORD_interface},
 	{"map", KEYWORD_map},
 	{"chan", KEYWORD_chan}
+};
+
+typedef enum {
+	F_PACKAGE,
+	F_PACKAGE_NAME,
+	F_HOW_IMPORTED,
+} goField;
+
+static fieldDefinition GoFields [] = {
+	{
+		.name = "package",
+		.description = "the real package specified by the package name",
+		.enabled = true,
+	},
+	{
+		.name = "packageName",
+		.description = "the name for referring the package",
+		.enabled = true,
+	},
+	{
+		.name = "howImported",
+		.description = "how the package is imported (\"inline\" for `.' or \"init\" for `_')",
+		.enabled = false,
+	},
 };
 
 /*
@@ -585,18 +623,15 @@ static bool skipType (tokenInfo *const token, collector *collector)
 	return false;
 }
 
-static int makeTag (tokenInfo *const token, const goKind kind,
-	const int scope, const char *argList, const char *typeref)
+static int makeTagFull (tokenInfo *const token, const goKind kind,
+						const int scope, const char *argList, const char *typeref,
+						const int role)
 {
 	const char *const name = vStringValue (token->string);
 
 	tagEntryInfo e;
 
-	if (kind == GOTAG_UNKNOWN)
-		initRefTagEntry (&e, name, kind,
-						 R_GOTAG_UNKNOWN_RECEIVER);
-	else
-		initTagEntry (&e, name, kind);
+	initRefTagEntry (&e, name, kind, role);
 
 	if (!GoKinds [kind].enabled)
 		return CORK_NIL;
@@ -614,6 +649,19 @@ static int makeTag (tokenInfo *const token, const goKind kind,
 
 	e.extensionFields.scopeIndex = scope;
 	return makeTagEntry (&e);
+}
+
+static int makeTag (tokenInfo *const token, const goKind kind,
+					const int scope, const char *argList, const char *typeref)
+{
+	return makeTagFull (token, kind, scope, argList, typeref,
+						ROLE_INDEX_DEFINITION);
+}
+
+static int makeRefTag (tokenInfo *const token, const goKind kind,
+					   const int role)
+{
+	return makeTagFull (token, kind, CORK_NIL, NULL, NULL, role);
 }
 
 static int parsePackage (tokenInfo *const token)
@@ -694,8 +742,9 @@ static void parseFunctionOrMethod (tokenInfo *const token, const int scope)
 
 		collectorTruncate (&collector, false);
 		if (receiver_type_token)
-			func_scope = makeTag(receiver_type_token, GOTAG_UNKNOWN,
-								 scope, NULL, NULL);
+			func_scope = makeTagFull(receiver_type_token, GOTAG_UNKNOWN,
+									 scope, NULL, NULL,
+									 R_GOTAG_UNKNOWN_RECEIVER);
 		else
 			func_scope = scope;
 
@@ -981,6 +1030,80 @@ static void parseConstTypeVar (tokenInfo *const token, goKind kind, const int sc
 			usesParens && !isType (token, TOKEN_CLOSE_PAREN));
 }
 
+static void parseImportSpec (tokenInfo *const token)
+{
+	// ImportSpec       = [ "." | PackageName ] ImportPath .
+	// ImportPath       = string_lit .
+
+	int packageName_cork = CORK_NIL;
+	char *how_imported = NULL;
+	if (isType (token, TOKEN_IDENTIFIER))
+	{
+		if (strcmp(vStringValue (token->string), "_") == 0)
+			how_imported = "init";
+		else
+		{
+			packageName_cork = makeTag (token, GOTAG_PACKAGE_NAME,
+										CORK_NIL, NULL, NULL);
+		}
+		readToken (token);
+	}
+	else if (isType (token, TOKEN_DOT))
+	{
+		how_imported = "inline";
+		readToken (token);
+	}
+
+	if (isType (token, TOKEN_STRING))
+	{
+		int package_cork =
+			makeRefTag (token, GOTAG_PACKAGE, R_GOTAG_PACKAGE_IMPORTED);
+
+		if (package_cork != CORK_NIL && how_imported)
+			attachParserFieldToCorkEntry (package_cork,
+										  GoFields [F_HOW_IMPORTED].ftype,
+										  how_imported);
+
+		if (packageName_cork != CORK_NIL)
+		{
+			attachParserFieldToCorkEntry (packageName_cork,
+										  GoFields [F_PACKAGE].ftype,
+										  vStringValue (token->string));
+			if (package_cork != CORK_NIL)
+			{
+				tagEntryInfo *e = getEntryInCorkQueue (packageName_cork);
+				attachParserFieldToCorkEntry (package_cork,
+											  GoFields [F_PACKAGE_NAME].ftype,
+											  e->name);
+			}
+		}
+	}
+}
+
+static void parseImport (tokenInfo *const token)
+{
+	// ImportDecl       = "import" ( ImportSpec | "(" { ImportSpec ";" } ")" ) .
+
+	readToken (token);
+	if (isType (token, TOKEN_EOF))
+		return;
+
+	if (isType (token, TOKEN_OPEN_PAREN))
+	{
+		do
+		{
+			parseImportSpec (token);
+			readToken (token);
+		} while (!isType (token, TOKEN_EOF) &&
+				 !isType (token, TOKEN_CLOSE_PAREN));
+	}
+	else
+	{
+		parseImportSpec (token);
+		return;
+	}
+}
+
 static void parseGoFile (tokenInfo *const token)
 {
 	int scope = CORK_NIL;
@@ -1006,6 +1129,9 @@ static void parseGoFile (tokenInfo *const token)
 					break;
 				case KEYWORD_var:
 					parseConstTypeVar (token, GOTAG_VAR, scope);
+					break;
+				case KEYWORD_import:
+					parseImport (token);
 					break;
 				default:
 					break;
@@ -1040,6 +1166,8 @@ extern parserDefinition *GoParser (void)
 	def->finalize = finalize;
 	def->keywordTable = GoKeywordTable;
 	def->keywordCount = ARRAY_SIZE (GoKeywordTable);
+	def->fieldTable = GoFields;
+	def->fieldCount = ARRAY_SIZE (GoFields);
 	def->useCork = true;
 	def->requestAutomaticFQTag = true;
 	return def;
