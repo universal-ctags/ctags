@@ -43,14 +43,14 @@ my $options =
      [ qr/^--options=(.*)/, sub {
 	   parse_optlib ($1, $_[0]);
        } ],
-     [ qr/^--langdef=([^\{]+)((({base=([^\{]+)})({(dedicated|shared|bidirectional)})?)?)/, sub {
+     [ qr/^--langdef=([^\{]+)(((\{base=([^\{]+)\})(\{(dedicated|shared|bidirectional)\})?)?)/, sub {
 	   die "LANG is already defined as $_[0]->{'langdef'}: $1"
 	       if (defined $_[0]->{'langdef'});
 	   $_[0]->{'langdef'} = $1;
 	   $_[0]->{'base'} = $5 if defined $5;
 	   $_[0]->{'direction'} = $7 if defined $7;
        } ],
-     [ qr/^--kinddef-(.*)=([^,]),([^,]+),([^\{]+)({_refonly})?/, sub {
+     [ qr/^--kinddef-(.*)=([^,]),([^,]+),([^\{]+)(\{_refonly\})?/, sub {
 	 die "Don't use --kinddef-<LANG>=+ option before defining the language"
 	     if (! defined $_[0]->{'langdef'});
 	 die "Adding a kind is allowed only to the language specified with --langdef: $1"
