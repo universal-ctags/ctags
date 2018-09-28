@@ -1932,10 +1932,6 @@ static void parseTable (tokenInfo *const token)
 			vStringClear (token->scope);
 			token->scopeKind = SQLTAG_COUNT;
 			readToken (token);
-			fprintf(stderr, "=> %s, t: %d, k: %d\n", vStringValue(token->string),
-					token->type,
-					token->keyword
-				);
 		}
 		else
 			skipToMatched(token);
