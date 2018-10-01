@@ -48,7 +48,8 @@
  *  C++ allows '~' in destructors.
  *  VMS allows '$' in identifiers.
  */
-#define cppIsident1(c)  ((cppIsascii(c) && isalpha(c))	\
+#define cppIsalpha(c)   (cppIsascii(c) && isalpha(c))
+#define cppIsident1(c)  (cppIsalpha(c)					\
 						  || (c) == '_' || (c) == '~' || (c) == '$')
 
 #define cppIsspace(c)   (cppIsascii(c) && isspace(c))
