@@ -1258,7 +1258,7 @@ bool cxxParserParseNextToken(void)
 						/* Specifying the scope of struct/union/class member */
 						goto assign_keyword;
 					}
-					else if (isalpha (c1))
+					else if (cppIsalpha(c1))
 					{
 						/* Specifying the scope of class inheritance */
 						goto assign_keyword;
