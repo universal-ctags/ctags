@@ -1110,10 +1110,10 @@ void cxxParserUngetCurrentToken(void)
 
 	if(g_cxx.pUngetToken)
 		cxxTokenDestroy(g_cxx.pUngetToken);
-	
-	
+
+
 	g_cxx.pUngetToken = cxxTokenChainTakeLast(g_cxx.pTokenChain);
-	
+
 	CXX_DEBUG_ASSERT(g_cxx.pUngetToken == g_cxx.pToken,"Oops.. ungot a token that was not the chain tail");
 
 	g_cxx.pToken = cxxTokenChainLast(g_cxx.pTokenChain);
