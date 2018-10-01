@@ -1672,12 +1672,12 @@ static int skipToNonWhite (void)
 #if 0
 	do
 		c = cppGetc ();
-	while (isspace (c));
+	while (cppIsspace (c));
 #else
 	while (1)
 	{
 		c = cppGetc ();
-		if (isspace (c))
+		if (cppIsspace (c))
 			found = true;
 		else
 			break;
@@ -2040,7 +2040,7 @@ static void readOperator (statementInfo *const st)
 		bool whiteSpace = true;  /* default causes insertion of space */
 		do
 		{
-			if (isspace (c))
+			if (cppIsspace (c))
 				whiteSpace = true;
 			else
 			{
