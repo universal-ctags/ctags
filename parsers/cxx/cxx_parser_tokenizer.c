@@ -1260,7 +1260,6 @@ bool cxxParserParseNextToken(void)
 					}
 					else if (isalpha (c1))
 					{
-
 						/* Specifying the scope of class inheritance */
 						goto assign_keyword;
 					}
