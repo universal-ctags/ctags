@@ -1,0 +1,4 @@
+extern "C"{
+};
+
+int main() {}

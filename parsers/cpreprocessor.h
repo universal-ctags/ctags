@@ -51,6 +51,9 @@
 #define cppIsident1(c)  ((cppIsascii(c) && isalpha(c))	\
 						  || (c) == '_' || (c) == '~' || (c) == '$')
 
+#define cppIsspace(c)   (cppIsascii(c) && isspace(c))
+
+
 #define RoleTemplateUndef { true, "undef", "undefined" }
 
 #define RoleTemplateSystem { true, "system", "system header" }
