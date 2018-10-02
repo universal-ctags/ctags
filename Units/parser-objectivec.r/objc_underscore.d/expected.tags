@@ -1,0 +1,4 @@
+Grumble	input.mm	/^int Foo::Grumble(void)$/;"	f
+MyOtherFunction	input.mm	/^void MyOtherFunction(void)$/;"	f
+_Mumble	input.mm	/^int	Foo::_Mumble(void)$/;"	f
+_MyFunction	input.mm	/^void _MyFunction(void)$/;"	f
