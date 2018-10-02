@@ -135,11 +135,11 @@ repeat:
 		token.type = TOKEN_EOF;
 	else if (c == '{' || c == '}' || c == ';' || c == '.' || c == '=')
 		token.type = c;
-	else if (isalnum (c) || c == '_')
+	else if (cppIsalnum (c) || c == '_')
 	{
 		token.type = TOKEN_ID;
 		vStringClear (token.value);
-		while (c > 0 && (isalnum (c) || c == '_')) {
+		while (c > 0 && (cppIsalnum (c) || c == '_')) {
 			vStringPut (token.value, c);
 			c = cppGetc ();
 		}
