@@ -19,20 +19,8 @@
 /*
 *   MACROS
 */
-/*  Is the character valid as a character of a C identifier?
- *  VMS allows '$' in identifiers.
- */
-#define cppIsident(c)  (isalnum(c) || (c) == '_' || (c) == '$')
-
-/*  Is the character valid as the first character of a C identifier?
- *  C++ allows '~' in destructors.
- *  VMS allows '$' in identifiers.
- */
-#define cppIsident1(c)  ( ((c >= 0) && (c < 0x80) && isalpha(c)) \
-		       || (c) == '_' || (c) == '~' || (c) == '$')
-/* NOTE about isident1 profitability
-
-   Doing the same as isascii before passing value to isalpha
+#define cppIsascii(c) ((c >= 0) && (c < 0x80))
+/* Doing the same as isascii before passing value to isXXXXX
    ----------------------------------------------------------
    cppGetc() can return the value out of range of char.
    cppGetc calls skipToEndOfString and skipToEndOfString can
@@ -49,6 +37,18 @@
 
    isascii is for suitable to verify the range of input. However, it
    is not portable enough. */
+
+/*  Is the character valid as a character of a C identifier?
+ *  VMS allows '$' in identifiers.
+ */
+#define cppIsident(c)  (isalnum(c) || (c) == '_' || (c) == '$')
+
+/*  Is the character valid as the first character of a C identifier?
+ *  C++ allows '~' in destructors.
+ *  VMS allows '$' in identifiers.
+ */
+#define cppIsident1(c)  ((cppIsascii(c) && isalpha(c))	\
+						  || (c) == '_' || (c) == '~' || (c) == '$')
 
 #define RoleTemplateUndef { true, "undef", "undefined" }
 
