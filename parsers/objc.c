@@ -283,7 +283,7 @@ static objcKeyword lex (lexingState * st)
 		return Tok_EOL;
 	}
 
-	if (isAlpha (*st->cp))
+	if (isAlpha (*st->cp) || (*st->cp == '_'))
 	{
 		readIdentifier (st);
 		retType = lookupKeyword (vStringValue (st->name), Lang_ObjectiveC);
