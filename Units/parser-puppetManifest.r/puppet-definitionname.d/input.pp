@@ -20,8 +20,8 @@ define o_ne::two_ {
     file { "/tmp/multipledefineo_netwo_": content => "two" }
 }
 
-include t
-include one_
-include on_e
-include o_ne::tw_o
-include o_ne::two_
+t { 't': }
+one_ { 'one_': }
+on_e { 'on_e': }
+o_ne::tw_o { 'o_ne::tw_o': }
+o_ne::two_ { 'o_ne::two_': }
