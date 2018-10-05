@@ -1,4 +1,0 @@
-/tmp/12	input.pp	/^    file { "\/tmp\/12": ensure => $ensure }$/;"	r	definition:one_one::two
-/tmp/34	input.pp	/^    file { "\/tmp\/34": ensure => $ensure }$/;"	r	definition:three::four_four
-one_one::two	input.pp	/^define one_one::two($ensure) {$/;"	d
-three::four_four	input.pp	/^define three::four_four($ensure) {$/;"	d

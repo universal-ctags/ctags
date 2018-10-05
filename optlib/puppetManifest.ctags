@@ -209,8 +209,8 @@
 # TODO: inherits:
 #
 --_mtable-extend-PuppetManifest=classStart+comment
---_mtable-regex-PuppetManifest=classStart/(::[a-zA-Z0-9:]+)/\1/c/{tenter=blockHead,endWithPop}{scope=push}
---_mtable-regex-PuppetManifest=classStart/([a-zA-Z][a-zA-Z0-9:]*)/\1/c/{tenter=blockHead,endWithPop}{scope=push}
+--_mtable-regex-PuppetManifest=classStart/(::[a-z][_a-zA-Z0-9:]*)/\1/c/{tenter=blockHead,endWithPop}{scope=push}
+--_mtable-regex-PuppetManifest=classStart/([a-z][_a-zA-Z0-9:]*)/\1/c/{tenter=blockHead,endWithPop}{scope=push}
 
 #
 # resource
@@ -277,8 +277,8 @@
 # define
 #
 --_mtable-extend-PuppetManifest=defineStart+comment
---_mtable-regex-PuppetManifest=defineStart/([a-z:][-_a-zA-Z0-9:]*)[ \n\t]*\(/\1/d/{tenter=skipArgs,blockHeadPopAtLast}{scope=push}
---_mtable-regex-PuppetManifest=defineStart/([a-z:][-_a-zA-Z0-9:]*)[ \n\t]*\{/\1/d/{tenter=block,endWithPop}{scope=push}
+--_mtable-regex-PuppetManifest=defineStart/([a-z][_a-zA-Z0-9:]*)[ \n\t]*\(/\1/d/{tenter=skipArgs,blockHeadPopAtLast}{scope=push}
+--_mtable-regex-PuppetManifest=defineStart/([a-z][_a-zA-Z0-9:]*)[ \n\t]*\{/\1/d/{tenter=block,endWithPop}{scope=push}
 
 #
 # case
