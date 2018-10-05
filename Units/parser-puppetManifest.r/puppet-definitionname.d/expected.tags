@@ -8,3 +8,4 @@ o_ne::tw_o	input.pp	/^define o_ne::tw_o {$/;"	definition	line:15	language:Puppet
 /tmp/multipledefineo_netw_o	input.pp	/^    file { "\/tmp\/multipledefineo_netw_o": content => "two" }$/;"	resource	line:16	language:PuppetManifest	scope:definition:o_ne::tw_o	end:16
 o_ne::two_	input.pp	/^define o_ne::two_ {$/;"	definition	line:19	language:PuppetManifest	end:21
 /tmp/multipledefineo_netwo_	input.pp	/^    file { "\/tmp\/multipledefineo_netwo_": content => "two" }$/;"	resource	line:20	language:PuppetManifest	scope:definition:o_ne::two_	end:20
+t	input.pp	/^t { 't': }$/;"	resource	line:23	language:PuppetManifest	end:23
