@@ -287,7 +287,15 @@ static const unsigned char *asmReadLineFromInputFile (void)
 	{
 		if (c == '\n')
 			break;
-		vStringPut (line, c);
+		else if (c == STRING_SYMBOL || c == CHAR_SYMBOL)
+		{
+			/* We cannot store these values to vString
+			 * Store a whitespace as a dummy value for them.
+			 */
+			vStringPut (line, ' ');
+		}
+		else
+			vStringPut (line, c);
 	}
 
 	if ((vStringLength (line) == 0)&& (c == EOF))
