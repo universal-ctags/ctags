@@ -60,6 +60,7 @@
 						  || (c) == '_' || (c) == '~' || (c) == '$')
 
 #define cppIsspace(c)   (cppIsascii(c) && isspace(c))
+#define cppIsdigit(c)   (cppIsascii(c) && isdigit(c))
 
 
 #define RoleTemplateUndef { true, "undef", "undefined" }
