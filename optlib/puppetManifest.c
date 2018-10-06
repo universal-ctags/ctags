@@ -66,10 +66,10 @@ static void initializePuppetManifestParser (const langType language CTAGS_ATTR_U
 	                               "^\\$",
 	                               "", "", "{tenter=var}", NULL);
 	addLanguageTagMultiTableRegex (language, "main",
-	                               "^@?::[a-zA-Z0-9:]+[ \t\n]*\\{",
+	                               "^@?::[a-zA-Z0-9:_]+[ \t\n]*\\{",
 	                               "", "", "{tenter=resourceBlock}", NULL);
 	addLanguageTagMultiTableRegex (language, "main",
-	                               "^@?[a-zA-Z][a-zA-Z0-9:]*[ \t\n]*\\{",
+	                               "^@?[a-zA-Z][a-zA-Z0-9:_]*[ \t\n]*\\{",
 	                               "", "", "{tenter=resourceBlock}", NULL);
 	addLanguageTagMultiTableRegex (language, "main",
 	                               "^class[ \t\n]+",
@@ -132,10 +132,10 @@ static void initializePuppetManifestParser (const langType language CTAGS_ATTR_U
 	                               "^\\#",
 	                               "", "", "{tenter=comment_oneline}", NULL);
 	addLanguageTagMultiTableRegex (language, "blockStart",
-	                               "^@?::[a-zA-Z0-9:]+[ \t\n]*\\{",
+	                               "^@?::[a-zA-Z0-9:_]+[ \t\n]*\\{",
 	                               "", "", "{tenter=resourceBlock}", NULL);
 	addLanguageTagMultiTableRegex (language, "blockStart",
-	                               "^@?[a-zA-Z][a-zA-Z0-9:]*[ \t\n]*\\{",
+	                               "^@?[a-zA-Z][a-zA-Z0-9:_]*[ \t\n]*\\{",
 	                               "", "", "{tenter=resourceBlock}", NULL);
 	addLanguageTagMultiTableRegex (language, "blockStart",
 	                               "^class[ \t\n]+",
@@ -195,10 +195,10 @@ static void initializePuppetManifestParser (const langType language CTAGS_ATTR_U
 	                               "^<<?\\|",
 	                               "", "", "{tenter=skipCollector}", NULL);
 	addLanguageTagMultiTableRegex (language, "block",
-	                               "^@?::[a-zA-Z0-9:]+[ \t\n]*\\{",
+	                               "^@?::[a-zA-Z0-9:_]+[ \t\n]*\\{",
 	                               "", "", "{tenter=resourceBlock}", NULL);
 	addLanguageTagMultiTableRegex (language, "block",
-	                               "^@?[a-zA-Z][a-zA-Z0-9:]*[ \t\n]*\\{",
+	                               "^@?[a-zA-Z][a-zA-Z0-9:_]*[ \t\n]*\\{",
 	                               "", "", "{tenter=resourceBlock}", NULL);
 	addLanguageTagMultiTableRegex (language, "block",
 	                               "^class[ \t\n]+",

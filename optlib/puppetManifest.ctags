@@ -152,8 +152,8 @@
 #
 # block
 #
---_mtable-regex-PuppetManifest=blockStart/@?::[a-zA-Z0-9:]+[ \t\n]*\{//{tenter=resourceBlock}
---_mtable-regex-PuppetManifest=blockStart/@?[a-zA-Z][a-zA-Z0-9:]*[ \t\n]*\{//{tenter=resourceBlock}
+--_mtable-regex-PuppetManifest=blockStart/@?::[a-zA-Z0-9:_]+[ \t\n]*\{//{tenter=resourceBlock}
+--_mtable-regex-PuppetManifest=blockStart/@?[a-zA-Z][a-zA-Z0-9:_]*[ \t\n]*\{//{tenter=resourceBlock}
 --_mtable-regex-PuppetManifest=blockStart/class[ \t\n]+//{tenter=classStart}
 --_mtable-regex-PuppetManifest=blockStart/define[ \t\n]+//{tenter=defineStart}
 --_mtable-regex-PuppetManifest=blockStart/case[ \t\n]+//{tenter=caseStart}

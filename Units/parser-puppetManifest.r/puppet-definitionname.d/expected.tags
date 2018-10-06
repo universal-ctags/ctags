@@ -9,3 +9,7 @@ o_ne::tw_o	input.pp	/^define o_ne::tw_o {$/;"	definition	line:15	language:Puppet
 o_ne::two_	input.pp	/^define o_ne::two_ {$/;"	definition	line:19	language:PuppetManifest	end:21
 /tmp/multipledefineo_netwo_	input.pp	/^    file { "\/tmp\/multipledefineo_netwo_": content => "two" }$/;"	resource	line:20	language:PuppetManifest	scope:definition:o_ne::two_	end:20
 t	input.pp	/^t { 't': }$/;"	resource	line:23	language:PuppetManifest	end:23
+one_	input.pp	/^one_ { 'one_': }$/;"	resource	line:24	language:PuppetManifest	end:24
+on_e	input.pp	/^on_e { 'on_e': }$/;"	resource	line:25	language:PuppetManifest	end:25
+o_ne::tw_o	input.pp	/^o_ne::tw_o { 'o_ne::tw_o': }$/;"	resource	line:26	language:PuppetManifest	end:26
+o_ne::two_	input.pp	/^o_ne::two_ { 'o_ne::two_': }$/;"	resource	line:27	language:PuppetManifest	end:27
