@@ -411,8 +411,16 @@ static void readToken (tokenInfo *const token, void *data CTAGS_ATTR_UNUSED)
 			token->type = c;
 		break;
 	default:
-		if (isdigit (c))
+		if (cppIsdigit (c))
 		{
+			/* Using cppIsdigit here is redundant.
+			 *
+			 * `c' never takes STRING_SYMBOL or CHAR_SYMBOL as
+			 * its value here.
+			 * However, the practice using cppIs... macros for the value
+			 * returned from cppGetc() may avoid unexpected programming
+			 * mistakes I took repeatedly.
+			 */
 			token->type = TOKEN_NUMBER;
 			tokenPutc(token, c);
 			while ((c = cppGetc()))
