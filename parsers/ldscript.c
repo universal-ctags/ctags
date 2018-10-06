@@ -259,7 +259,8 @@ static void readToken (tokenInfo *const token, void *data CTAGS_ATTR_UNUSED)
 
 	do {
 		c = cppGetc();
-	} while (c == ' ' || c== '\t' || c == '\f' || c == '\r' || c == '\n');
+	} while (c == ' ' || c== '\t' || c == '\f' || c == '\r' || c == '\n'
+			 || c == STRING_SYMBOL || c == CHAR_SYMBOL);
 
 	token->lineNumber   = getInputLineNumber ();
 	token->filePosition = getInputFilePosition ();
