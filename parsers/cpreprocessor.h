@@ -76,7 +76,6 @@ extern void cppEndStatement (void);
 extern void cppUngetc (const int c);
 extern void cppUngetString(const char * string,int len);
 extern int cppGetc (void);
-extern int cppSkipOverCComment (void);
 
 /* notify the external parser state for the purpose of conditional
    branch choice. The CXX parser stores the block level here. */

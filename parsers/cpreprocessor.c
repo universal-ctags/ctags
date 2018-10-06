@@ -914,7 +914,7 @@ static Comment isComment (void)
 /*  Skips over a C style comment. According to ANSI specification a comment
  *  is treated as white space, so we perform this substitution.
  */
-int cppSkipOverCComment (void)
+static int cppSkipOverCComment (void)
 {
 	int c = cppGetcFromUngetBufferOrFile ();
 

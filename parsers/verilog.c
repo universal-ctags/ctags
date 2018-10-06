@@ -22,7 +22,6 @@
 #include <string.h>
 
 #include "debug.h"
-#include "cpreprocessor.h"
 #include "keyword.h"
 #include "options.h"
 #include "parse.h"
@@ -379,6 +378,37 @@ static void vUngetc (int c)
 	Ungetc = c;
 }
 
+/* Mostly copyed from cppSkipOverCComment() in cpreprocessor.c.
+ *
+ * cppSkipOverCComment() uses the internal ungetc buffer of
+ * CPreProcessor.  On the other hand, the Verilog parser uses
+ * getcFromInputFile() directly. getcFromInputFile() uses just
+ * another internal ungetc buffer. Using them mixed way will
+ * cause a trouble. */
+static int verilogSkipOverCComment (void)
+{
+	int c =  getcFromInputFile();
+
+	while (c != EOF)
+	{
+		if (c != '*')
+			c = getcFromInputFile ();
+		else
+		{
+			const int next = getcFromInputFile ();
+
+			if (next != '/')
+				c = next;
+			else
+			{
+				c = SPACE;  /* replace comment with space */
+				break;
+			}
+		}
+	}
+	return c;
+}
+
 static int vGetc (void)
 {
 	int c;
@@ -402,7 +432,7 @@ static int vGetc (void)
 		}
 		else if (c2 == '*')  /* strip block comment */
 		{
-			c = cppSkipOverCComment();
+			c = verilogSkipOverCComment();
 		}
 		else
 		{
