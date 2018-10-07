@@ -1,5 +1,5 @@
 # -*- makefile -*-
-.PHONY: check units fuzz noise tmain tinst clean-units clean-tmain clean-gcov run-gcov codecheck cppcheck dicts cspell
+.PHONY: check units fuzz noise tmain tinst clean-units clean-tmain clean-gcov run-gcov codecheck cppcheck dicts cspell $(VERIFY_PUPPET_TEST_DIRS_TARGETS) verify-units-inputs
 
 check: tmain units
 
@@ -88,10 +88,26 @@ slap: $(CTAGS_TEST)
 		--with-timeout=$(TIMEOUT)"; \
 	$(SHELL) $${c} $(srcdir)/Units
 
+
+PUPPET_TEST_DIRS = $(shell find $(srcdir)/Units/parser-puppetManifest.r -maxdepth 1 -mindepth 1 -type d)
+VERIFY_PUPPET_TEST_DIRS_TARGETS := $(PUPPET_TEST_DIRS:%=TARGET_FOR_VERIFY_%)
+
+define VERIFY_ONE_PUPPET_TEST_DIR
+TARGET_FOR_VERIFY_$(1): $(1)/input.pp
+	puppet apply --noop $$<
+endef
+
+$(foreach puppet_test_dir,$(PUPPET_TEST_DIRS),$(eval $(call VERIFY_ONE_PUPPET_TEST_DIR,$(puppet_test_dir))))
+
+#
+# verify-units-inputs Target
+#
+verify-units-inputs: $(VERIFY_PUPPET_TEST_DIRS_TARGETS)
+
 #
 # UNITS Target
 #
-units: $(CTAGS_TEST)
+units: $(CTAGS_TEST) verify-units-inputs
 	$(V_RUN) \
 	if test -n "$${ZSH_VERSION+set}"; then set -o SH_WORD_SPLIT; fi; \
 	if test x$(VG) = x1; then		\
