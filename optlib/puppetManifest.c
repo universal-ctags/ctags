@@ -87,6 +87,9 @@ static void initializePuppetManifestParser (const langType language CTAGS_ATTR_U
 	                               "^node[ \t\n]+",
 	                               "", "", "{tenter=nodeStart}", NULL);
 	addLanguageTagMultiTableRegex (language, "main",
+	                               "^\\$",
+	                               "", "", "{tenter=var}", NULL);
+	addLanguageTagMultiTableRegex (language, "main",
 	                               "^\\(",
 	                               "", "", "{tenter=skipArgs}", NULL);
 	addLanguageTagMultiTableRegex (language, "main",
@@ -152,6 +155,9 @@ static void initializePuppetManifestParser (const langType language CTAGS_ATTR_U
 	addLanguageTagMultiTableRegex (language, "blockStart",
 	                               "^node[ \t\n]+",
 	                               "", "", "{tenter=nodeStart}", NULL);
+	addLanguageTagMultiTableRegex (language, "blockStart",
+	                               "^\\$",
+	                               "", "", "{tenter=var}", NULL);
 	addLanguageTagMultiTableRegex (language, "blockHead",
 	                               "^/\\*",
 	                               "", "", "{tenter=comment_multiline}", NULL);
@@ -215,6 +221,9 @@ static void initializePuppetManifestParser (const langType language CTAGS_ATTR_U
 	addLanguageTagMultiTableRegex (language, "block",
 	                               "^node[ \t\n]+",
 	                               "", "", "{tenter=nodeStart}", NULL);
+	addLanguageTagMultiTableRegex (language, "block",
+	                               "^\\$",
+	                               "", "", "{tenter=var}", NULL);
 	addLanguageTagMultiTableRegex (language, "block",
 	                               "^;?[ \t\n]*\\}",
 	                               "", "", "{tleave}", NULL);
@@ -358,7 +367,7 @@ static void initializePuppetManifestParser (const langType language CTAGS_ATTR_U
 	                               "\\1", "v", "{tenter=varexpr,end}", NULL);
 	addLanguageTagMultiTableRegex (language, "var",
 	                               "^([a-zA-Z_][a-zA-Z0-9_:]*)[ \t\n]*=",
-	                               "\\1", "v", "{tenter=varexpr,end}", NULL);
+	                               "\\1", "v", "{tenter=varexpr,end}{scope=ref}", NULL);
 	addLanguageTagMultiTableRegex (language, "defineStart",
 	                               "^/\\*",
 	                               "", "", "{tenter=comment_multiline}", NULL);

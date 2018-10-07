@@ -159,6 +159,7 @@
 --_mtable-regex-PuppetManifest=blockStart/case[ \t\n]+//{tenter=caseStart}
 --_mtable-regex-PuppetManifest=blockStart/(if|elsif|else|unless)[ \t\n]+//{tenter=ifStart}
 --_mtable-regex-PuppetManifest=blockStart/node[ \t\n]+//{tenter=nodeStart}
+--_mtable-regex-PuppetManifest=blockStart/\$//{tenter=var}
 
 
 --_mtable-extend-PuppetManifest=blockHead+comment
@@ -258,7 +259,7 @@
 #
 --_tabledef-PuppetManifest=varexpr
 --_mtable-regex-PuppetManifest=var/(::[a-zA-Z0-9_:]+)[ \t\n]*=/\1/v/{tenter=varexpr,end}
---_mtable-regex-PuppetManifest=var/([a-zA-Z_][a-zA-Z0-9_:]*)[ \t\n]*=/\1/v/{tenter=varexpr,end}
+--_mtable-regex-PuppetManifest=var/([a-zA-Z_][a-zA-Z0-9_:]*)[ \t\n]*=/\1/v/{tenter=varexpr,end}{scope=ref}
 
 --_mtable-extend-PuppetManifest=varexpr+comment
 --_mtable-regex-PuppetManifest=varexpr/'//{tenter=ssliteral,end}
