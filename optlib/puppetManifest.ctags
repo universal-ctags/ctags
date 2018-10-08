@@ -84,13 +84,13 @@
 --_mtable-regex-PuppetManifest=separator///{tleave}
 
 --_mtable-regex-PuppetManifest=any/.//
---_mtable-regex-PuppetManifest=ignoreWhiteSpace/[ \t\n]//
+--_mtable-regex-PuppetManifest=ignoreWhiteSpace/[ \t\n]+//
 --_mtable-regex-PuppetManifest=end///{tleave}
 --_mtable-regex-PuppetManifest=endWithPop///{tleave}{scope=pop}
 
---_mtable-regex-PuppetManifest=ssliteral/[^']//
+--_mtable-regex-PuppetManifest=ssliteral/[^']+//
 --_mtable-regex-PuppetManifest=ssliteral/'//{tleave}
---_mtable-regex-PuppetManifest=dsliteral/[^"]//
+--_mtable-regex-PuppetManifest=dsliteral/[^"]+//
 --_mtable-regex-PuppetManifest=dsliteral/"//{tleave}
 
 #
@@ -241,7 +241,7 @@
 #
 # Next pattern is just for optimization.
 #
---_mtable-regex-PuppetManifest=resourceBody/([^\/#{'";}<])//
+--_mtable-regex-PuppetManifest=resourceBody/[^\/#{'";}<]+//
 --_mtable-regex-PuppetManifest=resourceBody/'//{tenter=ssliteral}
 --_mtable-regex-PuppetManifest=resourceBody/"//{tenter=dsliteral}
 --_mtable-regex-PuppetManifest=resourceBody/\}//{tleave}{_advanceTo=0start}{scope=pop}
