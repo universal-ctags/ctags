@@ -88,10 +88,10 @@
 --_mtable-regex-PuppetManifest=end///{tleave}
 --_mtable-regex-PuppetManifest=endWithPop///{tleave}{scope=pop}
 
+--_mtable-regex-PuppetManifest=ssliteral/[^']//
 --_mtable-regex-PuppetManifest=ssliteral/'//{tleave}
---_mtable-extend-PuppetManifest=ssliteral+any
+--_mtable-regex-PuppetManifest=dsliteral/[^"]//
 --_mtable-regex-PuppetManifest=dsliteral/"//{tleave}
---_mtable-extend-PuppetManifest=dsliteral+any
 
 #
 # comment
@@ -170,11 +170,9 @@
 --_mtable-regex-PuppetManifest=blockHeadPopAtLast/\{//{tenter=block,endWithPop}
 --_mtable-extend-PuppetManifest=blockHeadPopAtLast+any
 
---_mtable-extend-PuppetManifest=block+comment
 --_mtable-extend-PuppetManifest=block+ignoreWhiteSpace
---_mtable-extend-PuppetManifest=block+skipLiteral
---_mtable-regex-PuppetManifest=block/<<?\|//{tenter=skipCollector}
 --_mtable-extend-PuppetManifest=block+blockStart
+--_mtable-regex-PuppetManifest=block/<<?\|//{tenter=skipCollector}
 
 # Following stack manipulation for handling following input.
 # A {
@@ -189,6 +187,8 @@
 --_mtable-regex-PuppetManifest=block/;//{tjump=resourceBlock}{scope=pop}
 #--_mtable-regex-PuppetManifest=block/;//{tleave}{scope=pop}
 --_mtable-regex-PuppetManifest=block/://
+--_mtable-extend-PuppetManifest=block+comment
+--_mtable-extend-PuppetManifest=block+skipLiteral
 --_mtable-regex-PuppetManifest=block/.//{tenter=separator}
 
 #
