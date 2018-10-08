@@ -237,14 +237,18 @@
 --_mtable-regex-PuppetManifest=resourceNameInArray/"([^"]+)"/\1/r/{tleave}
 --_mtable-regex-PuppetManifest=resourceNameInArray////{tquit}
 
---_mtable-extend-PuppetManifest=resourceBody+comment
---_mtable-extend-PuppetManifest=resourceBody+ignoreWhiteSpace
---_mtable-regex-PuppetManifest=resourceBody/\{//{tenter=skipBlock}
+# --_mtable-extend-PuppetManifest=resourceBody+ignoreWhiteSpace
+#
+# Next pattern is just for optimization.
+#
+--_mtable-regex-PuppetManifest=resourceBody/([^\/#{'";}<])//
 --_mtable-regex-PuppetManifest=resourceBody/'//{tenter=ssliteral}
 --_mtable-regex-PuppetManifest=resourceBody/"//{tenter=dsliteral}
---_mtable-regex-PuppetManifest=resourceBody/;//{tleave}{scope=pop}
 --_mtable-regex-PuppetManifest=resourceBody/\}//{tleave}{_advanceTo=0start}{scope=pop}
+--_mtable-regex-PuppetManifest=resourceBody/\{//{tenter=skipBlock}
+--_mtable-regex-PuppetManifest=resourceBody/;//{tleave}{scope=pop}
 --_mtable-regex-PuppetManifest=resourceBody/<<?\|//{tenter=skipCollector}
+--_mtable-extend-PuppetManifest=resourceBody+comment
 --_mtable-extend-PuppetManifest=resourceBody+any
 
 --_mtable-extend-PuppetManifest=resourceArray+comment

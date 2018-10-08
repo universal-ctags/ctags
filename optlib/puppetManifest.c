@@ -471,17 +471,8 @@ static void initializePuppetManifestParser (const langType language CTAGS_ATTR_U
 	                               "^",
 	                               "", "", "{tquit}", NULL);
 	addLanguageTagMultiTableRegex (language, "resourceBody",
-	                               "^/\\*",
-	                               "", "", "{tenter=comment_multiline}", NULL);
-	addLanguageTagMultiTableRegex (language, "resourceBody",
-	                               "^\\#",
-	                               "", "", "{tenter=comment_oneline}", NULL);
-	addLanguageTagMultiTableRegex (language, "resourceBody",
-	                               "^[ \t\n]",
+	                               "^([^/#{'\";}<])",
 	                               "", "", "", NULL);
-	addLanguageTagMultiTableRegex (language, "resourceBody",
-	                               "^\\{",
-	                               "", "", "{tenter=skipBlock}", NULL);
 	addLanguageTagMultiTableRegex (language, "resourceBody",
 	                               "^'",
 	                               "", "", "{tenter=ssliteral}", NULL);
@@ -489,14 +480,23 @@ static void initializePuppetManifestParser (const langType language CTAGS_ATTR_U
 	                               "^\"",
 	                               "", "", "{tenter=dsliteral}", NULL);
 	addLanguageTagMultiTableRegex (language, "resourceBody",
-	                               "^;",
-	                               "", "", "{tleave}{scope=pop}", NULL);
-	addLanguageTagMultiTableRegex (language, "resourceBody",
 	                               "^\\}",
 	                               "", "", "{tleave}{_advanceTo=0start}{scope=pop}", NULL);
 	addLanguageTagMultiTableRegex (language, "resourceBody",
+	                               "^\\{",
+	                               "", "", "{tenter=skipBlock}", NULL);
+	addLanguageTagMultiTableRegex (language, "resourceBody",
+	                               "^;",
+	                               "", "", "{tleave}{scope=pop}", NULL);
+	addLanguageTagMultiTableRegex (language, "resourceBody",
 	                               "^<<?\\|",
 	                               "", "", "{tenter=skipCollector}", NULL);
+	addLanguageTagMultiTableRegex (language, "resourceBody",
+	                               "^/\\*",
+	                               "", "", "{tenter=comment_multiline}", NULL);
+	addLanguageTagMultiTableRegex (language, "resourceBody",
+	                               "^\\#",
+	                               "", "", "{tenter=comment_oneline}", NULL);
 	addLanguageTagMultiTableRegex (language, "resourceBody",
 	                               "^.",
 	                               "", "", "", NULL);
