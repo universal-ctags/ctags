@@ -206,6 +206,18 @@ extern const char *getExecutablePath (void)
 }
 
 /*
+ *  compare file/dirname characters with platform-correct case sensitivity
+ */
+static bool fnmChEq (int c1, int c2)
+{
+#ifdef WIN32
+	return tolower( c1 ) == tolower( c2 );  /* case-insensitive */
+#else
+	return          c1   ==          c2  ;  /* case-  sensitive */
+#endif
+}
+
+/*
  *  Memory allocation functions
  */
 
@@ -846,7 +858,7 @@ extern char* relativeFilename (const char *file, const char *dir)
 	absdir = absoluteFilename (file);
 	fp = absdir;
 	dp = dir;
-	while (*fp++ == *dp++)
+	while (fnmChEq (*fp++, *dp++))
 		continue;
 	fp--;
 	dp--;  /* back to the first differing char */
