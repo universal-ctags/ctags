@@ -89,7 +89,11 @@ slap: $(CTAGS_TEST)
 	$(SHELL) $${c} $(srcdir)/Units
 
 
-PUPPET_TEST_DIRS = $(shell find $(srcdir)/Units/parser-puppetManifest.r -maxdepth 1 -mindepth 1 -type d)
+# Find the test directories where ctags is expected to succeed. Only tests with
+# an expected.tags file present are required to have valid input.
+PUPPET_TEST_DIRS = $(foreach path, \
+    $(shell find $(srcdir)/Units/parser-puppetManifest.r -name expected.tags), \
+    $(shell dirname $(path)))
 VERIFY_PUPPET_TEST_DIRS_TARGETS := $(PUPPET_TEST_DIRS:%=TARGET_FOR_VERIFY_%)
 
 define VERIFY_ONE_PUPPET_TEST_DIR
