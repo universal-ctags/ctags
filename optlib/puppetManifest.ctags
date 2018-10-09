@@ -84,14 +84,14 @@
 --_mtable-regex-PuppetManifest=separator///{tleave}
 
 --_mtable-regex-PuppetManifest=any/.//
---_mtable-regex-PuppetManifest=ignoreWhiteSpace/[ \t\n]//
+--_mtable-regex-PuppetManifest=ignoreWhiteSpace/[ \t\n]+//
 --_mtable-regex-PuppetManifest=end///{tleave}
 --_mtable-regex-PuppetManifest=endWithPop///{tleave}{scope=pop}
 
---_mtable-regex-PuppetManifest=ssliteral/'//{tleave}
---_mtable-extend-PuppetManifest=ssliteral+any
---_mtable-regex-PuppetManifest=dsliteral/"//{tleave}
---_mtable-extend-PuppetManifest=dsliteral+any
+--_mtable-regex-PuppetManifest=ssliteral/[^']*'//{tleave}
+--_mtable-regex-PuppetManifest=ssliteral/[^']+//
+--_mtable-regex-PuppetManifest=dsliteral/[^"]*"//{tleave}
+--_mtable-regex-PuppetManifest=dsliteral/[^"]+//
 
 #
 # comment
@@ -170,11 +170,9 @@
 --_mtable-regex-PuppetManifest=blockHeadPopAtLast/\{//{tenter=block,endWithPop}
 --_mtable-extend-PuppetManifest=blockHeadPopAtLast+any
 
---_mtable-extend-PuppetManifest=block+comment
 --_mtable-extend-PuppetManifest=block+ignoreWhiteSpace
---_mtable-extend-PuppetManifest=block+skipLiteral
---_mtable-regex-PuppetManifest=block/<<?\|//{tenter=skipCollector}
 --_mtable-extend-PuppetManifest=block+blockStart
+--_mtable-regex-PuppetManifest=block/<<?\|//{tenter=skipCollector}
 
 # Following stack manipulation for handling following input.
 # A {
@@ -189,6 +187,8 @@
 --_mtable-regex-PuppetManifest=block/;//{tjump=resourceBlock}{scope=pop}
 #--_mtable-regex-PuppetManifest=block/;//{tleave}{scope=pop}
 --_mtable-regex-PuppetManifest=block/://
+--_mtable-extend-PuppetManifest=block+comment
+--_mtable-extend-PuppetManifest=block+skipLiteral
 --_mtable-regex-PuppetManifest=block/.//{tenter=separator}
 
 #
@@ -222,12 +222,12 @@
 --_tabledef-PuppetManifest=resourceArray
 --_tabledef-PuppetManifest=resourceCollector
 
---_mtable-extend-PuppetManifest=resourceBlock+comment
 --_mtable-extend-PuppetManifest=resourceBlock+ignoreWhiteSpace
+--_mtable-regex-PuppetManifest=resourceBlock/\}//{tleave}
 --_mtable-regex-PuppetManifest=resourceBlock/'//{tenter=resourceName}{_advanceTo=0start}
 --_mtable-regex-PuppetManifest=resourceBlock/"//{tenter=resourceName}{_advanceTo=0start}
 --_mtable-regex-PuppetManifest=resourceBlock/\[//{tenter=resourceArray}
---_mtable-regex-PuppetManifest=resourceBlock/\}//{tleave}
+--_mtable-extend-PuppetManifest=resourceBlock+comment
 --_mtable-regex-PuppetManifest=resourceBlock/.//{tenter=resourceBody}{scope=push}{placeholder}
 
 --_mtable-regex-PuppetManifest=resourceName/'([^']+)'/\1/r/{tenter=resourceBody,end}{scope=push}
@@ -237,14 +237,18 @@
 --_mtable-regex-PuppetManifest=resourceNameInArray/"([^"]+)"/\1/r/{tleave}
 --_mtable-regex-PuppetManifest=resourceNameInArray////{tquit}
 
---_mtable-extend-PuppetManifest=resourceBody+comment
---_mtable-extend-PuppetManifest=resourceBody+ignoreWhiteSpace
---_mtable-regex-PuppetManifest=resourceBody/\{//{tenter=skipBlock}
+# --_mtable-extend-PuppetManifest=resourceBody+ignoreWhiteSpace
+#
+# Next pattern is just for optimization.
+#
+--_mtable-regex-PuppetManifest=resourceBody/[^\/#{'";}<]+//
 --_mtable-regex-PuppetManifest=resourceBody/'//{tenter=ssliteral}
 --_mtable-regex-PuppetManifest=resourceBody/"//{tenter=dsliteral}
---_mtable-regex-PuppetManifest=resourceBody/;//{tleave}{scope=pop}
 --_mtable-regex-PuppetManifest=resourceBody/\}//{tleave}{_advanceTo=0start}{scope=pop}
+--_mtable-regex-PuppetManifest=resourceBody/\{//{tenter=skipBlock}
+--_mtable-regex-PuppetManifest=resourceBody/;//{tleave}{scope=pop}
 --_mtable-regex-PuppetManifest=resourceBody/<<?\|//{tenter=skipCollector}
+--_mtable-extend-PuppetManifest=resourceBody+comment
 --_mtable-extend-PuppetManifest=resourceBody+any
 
 --_mtable-extend-PuppetManifest=resourceArray+comment

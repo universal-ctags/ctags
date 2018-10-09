@@ -51,7 +51,7 @@ static void initializePuppetManifestParser (const langType language CTAGS_ATTR_U
 	                               "^\\#",
 	                               "", "", "{tenter=comment_oneline}", NULL);
 	addLanguageTagMultiTableRegex (language, "main",
-	                               "^[ \t\n]",
+	                               "^[ \t\n]+",
 	                               "", "", "", NULL);
 	addLanguageTagMultiTableRegex (language, "main",
 	                               "^'",
@@ -108,7 +108,7 @@ static void initializePuppetManifestParser (const langType language CTAGS_ATTR_U
 	                               "^.",
 	                               "", "", "", NULL);
 	addLanguageTagMultiTableRegex (language, "ignoreWhiteSpace",
-	                               "^[ \t\n]",
+	                               "^[ \t\n]+",
 	                               "", "", "", NULL);
 	addLanguageTagMultiTableRegex (language, "end",
 	                               "^",
@@ -117,16 +117,16 @@ static void initializePuppetManifestParser (const langType language CTAGS_ATTR_U
 	                               "^",
 	                               "", "", "{tleave}{scope=pop}", NULL);
 	addLanguageTagMultiTableRegex (language, "ssliteral",
-	                               "^'",
+	                               "^[^']*'",
 	                               "", "", "{tleave}", NULL);
 	addLanguageTagMultiTableRegex (language, "ssliteral",
-	                               "^.",
+	                               "^[^']+",
 	                               "", "", "", NULL);
 	addLanguageTagMultiTableRegex (language, "dsliteral",
-	                               "^\"",
+	                               "^[^\"]*\"",
 	                               "", "", "{tleave}", NULL);
 	addLanguageTagMultiTableRegex (language, "dsliteral",
-	                               "^.",
+	                               "^[^\"]+",
 	                               "", "", "", NULL);
 	addLanguageTagMultiTableRegex (language, "comment",
 	                               "^/\\*",
@@ -183,23 +183,8 @@ static void initializePuppetManifestParser (const langType language CTAGS_ATTR_U
 	                               "^.",
 	                               "", "", "", NULL);
 	addLanguageTagMultiTableRegex (language, "block",
-	                               "^/\\*",
-	                               "", "", "{tenter=comment_multiline}", NULL);
-	addLanguageTagMultiTableRegex (language, "block",
-	                               "^\\#",
-	                               "", "", "{tenter=comment_oneline}", NULL);
-	addLanguageTagMultiTableRegex (language, "block",
-	                               "^[ \t\n]",
+	                               "^[ \t\n]+",
 	                               "", "", "", NULL);
-	addLanguageTagMultiTableRegex (language, "block",
-	                               "^'",
-	                               "", "", "{tenter=ssliteral}", NULL);
-	addLanguageTagMultiTableRegex (language, "block",
-	                               "^\"",
-	                               "", "", "{tenter=dsliteral}", NULL);
-	addLanguageTagMultiTableRegex (language, "block",
-	                               "^<<?\\|",
-	                               "", "", "{tenter=skipCollector}", NULL);
 	addLanguageTagMultiTableRegex (language, "block",
 	                               "^@?::[a-zA-Z0-9:_]+[ \t\n]*\\{",
 	                               "", "", "{tenter=resourceBlock}", NULL);
@@ -225,6 +210,9 @@ static void initializePuppetManifestParser (const langType language CTAGS_ATTR_U
 	                               "^\\$",
 	                               "", "", "{tenter=var}", NULL);
 	addLanguageTagMultiTableRegex (language, "block",
+	                               "^<<?\\|",
+	                               "", "", "{tenter=skipCollector}", NULL);
+	addLanguageTagMultiTableRegex (language, "block",
 	                               "^;?[ \t\n]*\\}",
 	                               "", "", "{tleave}", NULL);
 	addLanguageTagMultiTableRegex (language, "block",
@@ -233,6 +221,18 @@ static void initializePuppetManifestParser (const langType language CTAGS_ATTR_U
 	addLanguageTagMultiTableRegex (language, "block",
 	                               "^:",
 	                               "", "", "", NULL);
+	addLanguageTagMultiTableRegex (language, "block",
+	                               "^/\\*",
+	                               "", "", "{tenter=comment_multiline}", NULL);
+	addLanguageTagMultiTableRegex (language, "block",
+	                               "^\\#",
+	                               "", "", "{tenter=comment_oneline}", NULL);
+	addLanguageTagMultiTableRegex (language, "block",
+	                               "^'",
+	                               "", "", "{tenter=ssliteral}", NULL);
+	addLanguageTagMultiTableRegex (language, "block",
+	                               "^\"",
+	                               "", "", "{tenter=dsliteral}", NULL);
 	addLanguageTagMultiTableRegex (language, "block",
 	                               "^.",
 	                               "", "", "{tenter=separator}", NULL);
@@ -249,14 +249,11 @@ static void initializePuppetManifestParser (const langType language CTAGS_ATTR_U
 	                               "^([a-z][_a-zA-Z0-9:]*)",
 	                               "\\1", "c", "{tenter=blockHead,endWithPop}{scope=push}", NULL);
 	addLanguageTagMultiTableRegex (language, "resourceBlock",
-	                               "^/\\*",
-	                               "", "", "{tenter=comment_multiline}", NULL);
-	addLanguageTagMultiTableRegex (language, "resourceBlock",
-	                               "^\\#",
-	                               "", "", "{tenter=comment_oneline}", NULL);
-	addLanguageTagMultiTableRegex (language, "resourceBlock",
-	                               "^[ \t\n]",
+	                               "^[ \t\n]+",
 	                               "", "", "", NULL);
+	addLanguageTagMultiTableRegex (language, "resourceBlock",
+	                               "^\\}",
+	                               "", "", "{tleave}", NULL);
 	addLanguageTagMultiTableRegex (language, "resourceBlock",
 	                               "^'",
 	                               "", "", "{tenter=resourceName}{_advanceTo=0start}", NULL);
@@ -267,8 +264,11 @@ static void initializePuppetManifestParser (const langType language CTAGS_ATTR_U
 	                               "^\\[",
 	                               "", "", "{tenter=resourceArray}", NULL);
 	addLanguageTagMultiTableRegex (language, "resourceBlock",
-	                               "^\\}",
-	                               "", "", "{tleave}", NULL);
+	                               "^/\\*",
+	                               "", "", "{tenter=comment_multiline}", NULL);
+	addLanguageTagMultiTableRegex (language, "resourceBlock",
+	                               "^\\#",
+	                               "", "", "{tenter=comment_oneline}", NULL);
 	addLanguageTagMultiTableRegex (language, "resourceBlock",
 	                               "^.",
 	                               "", "", "{tenter=resourceBody}{scope=push}{placeholder}", NULL);
@@ -387,7 +387,7 @@ static void initializePuppetManifestParser (const langType language CTAGS_ATTR_U
 	                               "^\\#",
 	                               "", "", "{tenter=comment_oneline}", NULL);
 	addLanguageTagMultiTableRegex (language, "caseStart",
-	                               "^[ \t\n]",
+	                               "^[ \t\n]+",
 	                               "", "", "", NULL);
 	addLanguageTagMultiTableRegex (language, "caseStart",
 	                               "^\\{",
@@ -405,7 +405,7 @@ static void initializePuppetManifestParser (const langType language CTAGS_ATTR_U
 	                               "^\\#",
 	                               "", "", "{tenter=comment_oneline}", NULL);
 	addLanguageTagMultiTableRegex (language, "ifStart",
-	                               "^[ \t\n]",
+	                               "^[ \t\n]+",
 	                               "", "", "", NULL);
 	addLanguageTagMultiTableRegex (language, "ifStart",
 	                               "^'",
@@ -426,7 +426,7 @@ static void initializePuppetManifestParser (const langType language CTAGS_ATTR_U
 	                               "^\\#",
 	                               "", "", "{tenter=comment_oneline}", NULL);
 	addLanguageTagMultiTableRegex (language, "nodeStart",
-	                               "^[ \t\n]",
+	                               "^[ \t\n]+",
 	                               "", "", "", NULL);
 	addLanguageTagMultiTableRegex (language, "nodeStart",
 	                               "^'([^']+)'",
@@ -471,17 +471,8 @@ static void initializePuppetManifestParser (const langType language CTAGS_ATTR_U
 	                               "^",
 	                               "", "", "{tquit}", NULL);
 	addLanguageTagMultiTableRegex (language, "resourceBody",
-	                               "^/\\*",
-	                               "", "", "{tenter=comment_multiline}", NULL);
-	addLanguageTagMultiTableRegex (language, "resourceBody",
-	                               "^\\#",
-	                               "", "", "{tenter=comment_oneline}", NULL);
-	addLanguageTagMultiTableRegex (language, "resourceBody",
-	                               "^[ \t\n]",
+	                               "^[^/#{'\";}<]+",
 	                               "", "", "", NULL);
-	addLanguageTagMultiTableRegex (language, "resourceBody",
-	                               "^\\{",
-	                               "", "", "{tenter=skipBlock}", NULL);
 	addLanguageTagMultiTableRegex (language, "resourceBody",
 	                               "^'",
 	                               "", "", "{tenter=ssliteral}", NULL);
@@ -489,14 +480,23 @@ static void initializePuppetManifestParser (const langType language CTAGS_ATTR_U
 	                               "^\"",
 	                               "", "", "{tenter=dsliteral}", NULL);
 	addLanguageTagMultiTableRegex (language, "resourceBody",
-	                               "^;",
-	                               "", "", "{tleave}{scope=pop}", NULL);
-	addLanguageTagMultiTableRegex (language, "resourceBody",
 	                               "^\\}",
 	                               "", "", "{tleave}{_advanceTo=0start}{scope=pop}", NULL);
 	addLanguageTagMultiTableRegex (language, "resourceBody",
+	                               "^\\{",
+	                               "", "", "{tenter=skipBlock}", NULL);
+	addLanguageTagMultiTableRegex (language, "resourceBody",
+	                               "^;",
+	                               "", "", "{tleave}{scope=pop}", NULL);
+	addLanguageTagMultiTableRegex (language, "resourceBody",
 	                               "^<<?\\|",
 	                               "", "", "{tenter=skipCollector}", NULL);
+	addLanguageTagMultiTableRegex (language, "resourceBody",
+	                               "^/\\*",
+	                               "", "", "{tenter=comment_multiline}", NULL);
+	addLanguageTagMultiTableRegex (language, "resourceBody",
+	                               "^\\#",
+	                               "", "", "{tenter=comment_oneline}", NULL);
 	addLanguageTagMultiTableRegex (language, "resourceBody",
 	                               "^.",
 	                               "", "", "", NULL);
@@ -507,7 +507,7 @@ static void initializePuppetManifestParser (const langType language CTAGS_ATTR_U
 	                               "^\\#",
 	                               "", "", "{tenter=comment_oneline}", NULL);
 	addLanguageTagMultiTableRegex (language, "resourceArray",
-	                               "^[ \t\n]",
+	                               "^[ \t\n]+",
 	                               "", "", "", NULL);
 	addLanguageTagMultiTableRegex (language, "resourceArray",
 	                               "^'",
@@ -567,7 +567,7 @@ static void initializePuppetManifestParser (const langType language CTAGS_ATTR_U
 	                               "^\\#",
 	                               "", "", "{tenter=comment_oneline}", NULL);
 	addLanguageTagMultiTableRegex (language, "caseBlock",
-	                               "^[ \t\n]",
+	                               "^[ \t\n]+",
 	                               "", "", "", NULL);
 	addLanguageTagMultiTableRegex (language, "caseBlock",
 	                               "^'",
