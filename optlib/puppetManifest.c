@@ -117,17 +117,17 @@ static void initializePuppetManifestParser (const langType language CTAGS_ATTR_U
 	                               "^",
 	                               "", "", "{tleave}{scope=pop}", NULL);
 	addLanguageTagMultiTableRegex (language, "ssliteral",
+	                               "^[^']*'",
+	                               "", "", "{tleave}", NULL);
+	addLanguageTagMultiTableRegex (language, "ssliteral",
 	                               "^[^']+",
 	                               "", "", "", NULL);
-	addLanguageTagMultiTableRegex (language, "ssliteral",
-	                               "^'",
+	addLanguageTagMultiTableRegex (language, "dsliteral",
+	                               "^[^\"]*\"",
 	                               "", "", "{tleave}", NULL);
 	addLanguageTagMultiTableRegex (language, "dsliteral",
 	                               "^[^\"]+",
 	                               "", "", "", NULL);
-	addLanguageTagMultiTableRegex (language, "dsliteral",
-	                               "^\"",
-	                               "", "", "{tleave}", NULL);
 	addLanguageTagMultiTableRegex (language, "comment",
 	                               "^/\\*",
 	                               "", "", "{tenter=comment_multiline}", NULL);

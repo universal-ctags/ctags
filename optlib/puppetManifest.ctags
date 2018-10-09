@@ -88,10 +88,10 @@
 --_mtable-regex-PuppetManifest=end///{tleave}
 --_mtable-regex-PuppetManifest=endWithPop///{tleave}{scope=pop}
 
+--_mtable-regex-PuppetManifest=ssliteral/[^']*'//{tleave}
 --_mtable-regex-PuppetManifest=ssliteral/[^']+//
---_mtable-regex-PuppetManifest=ssliteral/'//{tleave}
+--_mtable-regex-PuppetManifest=dsliteral/[^"]*"//{tleave}
 --_mtable-regex-PuppetManifest=dsliteral/[^"]+//
---_mtable-regex-PuppetManifest=dsliteral/"//{tleave}
 
 #
 # comment
