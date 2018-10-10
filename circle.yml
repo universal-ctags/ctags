@@ -35,12 +35,13 @@ jobs:
              yum -y install git || :
        - checkout
        - run:
-           name: Install build tools
+           name: Install build and test tools
            # TODO: enable spell checker
            command: |
               rpm -Uvh https://yum.puppet.com/puppet5/puppet5-release-el-7.noarch.rpm \
               && yum -y install gcc automake autoconf pkgconfig make libxml2-devel \
-                  jansson-devel libyaml-devel findutils puppet-agent-5.5.6-1.el7 || :
+                  jansson-devel libyaml-devel findutils puppet-agent-5.5.6-1.el7 \
+              && export PATH=/opt/puppetlabs/bin:$PATH || :
        - run:
            name: Build
            command: |
@@ -50,7 +51,7 @@ jobs:
        - run:
            name: Test
            command: |
-             make check roundtrip CIRCLECI=1
+             make verify-units-inputs check roundtrip CIRCLECI=1
 
 workflows:
   version: 2
