@@ -3740,3 +3740,8 @@ extern bool inSandbox (void)
 {
 	return (Option.interactive == INTERACTIVE_SANDBOX);
 }
+
+extern bool canUseLineNumberAsLocator (void)
+{
+	return (Option.locate != EX_PATTERN);
+}

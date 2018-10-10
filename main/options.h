@@ -189,4 +189,7 @@ extern void setMainLoop (mainLoopFunc func, void *data);
 
 extern bool inSandbox (void);
 
+/* This is for emitting a tag for a commnn block of Fortran parser*/
+extern bool canUseLineNumberAsLocator (void);
+
 #endif  /* CTAGS_MAIN_OPTIONS_H */

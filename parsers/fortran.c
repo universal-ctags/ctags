@@ -528,7 +528,7 @@ static void makeFortranTag (tokenInfo *const token, tagType tag)
 		initTagEntry (&e, name, token->tag);
 
 		if (token->tag == TAG_COMMON_BLOCK)
-			e.lineNumberEntry = (bool) (Option.locate != EX_PATTERN);
+			e.lineNumberEntry = canUseLineNumberAsLocator();
 
 		e.lineNumber	= token->lineNumber;
 		e.filePosition	= token->filePosition;
