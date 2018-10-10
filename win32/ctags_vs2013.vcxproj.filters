@@ -575,6 +575,9 @@
     <ClInclude Include="..\main\options.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\main\options_p.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="..\main\param.h">
       <Filter>Header Files</Filter>
     </ClInclude>

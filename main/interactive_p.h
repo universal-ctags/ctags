@@ -10,7 +10,7 @@
 #define CTAGS_MAIN_INTERACTIVE_H
 
 #include "general.h"
-#include "options.h"
+#include "options_p.h"
 
 
 struct interactiveModeArgs

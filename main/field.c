@@ -22,7 +22,7 @@
 #include "entry_private.h"
 #include "field.h"
 #include "kind.h"
-#include "options.h"
+#include "options_p.h"
 #include "read.h"
 #include "routines.h"
 #include "trashbox.h"

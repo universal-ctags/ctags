@@ -12,7 +12,7 @@
 
 #include "general.h"
 #include "param.h"
-#include "options.h"
+#include "parse.h"
 
 #include <string.h>
 

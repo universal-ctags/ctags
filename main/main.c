@@ -68,7 +68,7 @@
 #include "field.h"
 #include "keyword.h"
 #include "main.h"
-#include "options.h"
+#include "options_p.h"
 #include "read.h"
 #include "routines.h"
 #include "trace.h"
@@ -76,7 +76,7 @@
 #include "writer.h"
 
 #ifdef HAVE_JANSSON
-#include "interactive.h"
+#include "interactive_p.h"
 #include <jansson.h>
 #include <errno.h>
 #endif

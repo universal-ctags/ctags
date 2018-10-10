@@ -13,6 +13,7 @@ MIO_SRCS  = main/mio.c
 
 MAIN_PUBLIC_HEADS =		\
 		main/gvars.h	\
+		main/options.h	\
 		\
 		$(NULL)
 
@@ -31,7 +32,7 @@ MAIN_HEADS =			\
 	main/general.h		\
 	main/htable.h		\
 	main/inline.h		\
-	main/interactive.h	\
+	main/interactive_p.h	\
 	main/keyword.h		\
 	main/kind.h		\
 	main/lregex.h		\
@@ -41,7 +42,7 @@ MAIN_HEADS =			\
 	main/nestlevel.h	\
 	main/numarray.h		\
 	main/objpool.h		\
-	main/options.h		\
+	main/options_p.h	\
 	main/param.h		\
 	main/parse.h		\
 	main/parsers.h		\

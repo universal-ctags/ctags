@@ -12,7 +12,7 @@
 #include <errno.h>
 
 #include "error.h"
-#include "options.h"
+#include "options_p.h"
 
 #ifdef HAVE_JANSSON
 #include <jansson.h>

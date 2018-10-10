@@ -12,7 +12,7 @@
 #include "entry.h"
 #include "fmt.h"
 #include "mio.h"
-#include "options.h"
+#include "options_p.h"
 #include "writer.h"
 
 

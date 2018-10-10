@@ -17,7 +17,7 @@
 
 #include "debug.h"
 #include "keyword.h"
-#include "options.h"
+#include "parse.h"
 #include "routines.h"
 
 /*

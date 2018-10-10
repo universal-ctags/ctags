@@ -44,7 +44,7 @@
 #include "fmt.h"
 #include "kind.h"
 #include "main.h"
-#include "options.h"
+#include "options_p.h"
 #include "ptag.h"
 #include "read.h"
 #include "routines.h"

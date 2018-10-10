@@ -14,7 +14,6 @@
 #include "debug.h"
 #include "fmt.h"
 #include "field.h"
-#include "options.h"
 #include "parse.h"
 #include "routines.h"
 #include <string.h>

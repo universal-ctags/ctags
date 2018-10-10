@@ -23,7 +23,7 @@
 #include "entry.h"
 #include "main.h"
 #include "routines.h"
-#include "options.h"
+#include "options_p.h"
 #include "promise.h"
 #include "trashbox.h"
 #ifdef HAVE_ICONV

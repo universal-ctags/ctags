@@ -16,7 +16,7 @@
 #include "colprint.h"
 #include "ctags.h"
 #include "debug.h"
-#include "options.h"
+#include "options_p.h"
 #include "parse.h"
 #include "ptag.h"
 #include "writer.h"
