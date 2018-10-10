@@ -18,6 +18,7 @@
 #include "parse.h"
 #include "promise.h"
 #include "read.h"
+#include "trace.h"
 
 #include <string.h>
 
