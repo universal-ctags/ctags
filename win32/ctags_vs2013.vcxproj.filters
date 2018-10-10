@@ -515,7 +515,7 @@
     <ClInclude Include="..\main\entry.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\main\entry_private.h">
+    <ClInclude Include="..\main\entry_p.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\main\error.h">

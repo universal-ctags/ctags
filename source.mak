@@ -23,7 +23,7 @@ MAIN_HEADS =			\
 	main/ctags.h		\
 	main/dependency.h	\
 	main/entry.h		\
-	main/entry_private.h	\
+	main/entry_p.h		\
 	main/error.h		\
 	main/field.h		\
 	main/flags.h		\
