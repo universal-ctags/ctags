@@ -19,7 +19,7 @@
 #include "ctags.h"
 #include "debug.h"
 #include "entry.h"
-#include "entry_private.h"
+#include "entry_p.h"
 #include "field.h"
 #include "kind.h"
 #include "options_p.h"

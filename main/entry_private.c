@@ -8,7 +8,7 @@
 *   main part private interface to entry.c
 */
 
-#include "entry_private.h"
+#include "entry_p.h"
 #include "parse.h"
 
 extern const kindDefinition* getTagKind(const tagEntryInfo *const tag)
