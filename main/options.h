@@ -25,6 +25,7 @@
 #include "args.h"
 #include "field.h"
 #include "fmt.h"
+#include "gvars.h"
 #include "parse.h"
 #include "strlist.h"
 #include "vstring.h"
@@ -75,7 +76,6 @@ typedef struct sOptionValues {
 	exCmd locate;           /* --excmd  EX command used to locate tag */
 	bool recurse;        /* -R  recurse into directories */
 	sortType sorted;        /* -u,--sort  sort tags */
-	bool verbose;        /* -V  verbose */
 	bool xref;           /* -x  generate xref output instead */
 	fmtElement *customXfmt;	/* compiled code for --xformat=XFMT */
 	char *fileList;         /* -L  name of file containing names of files */
@@ -106,9 +106,9 @@ typedef struct sOptionValues {
 						   INTERACTIVE_SANDBOX, } interactive; /* --interactive */
 	bool mtablePrintTotals;  /* display mtable statistics */
 #ifdef DEBUG
-	long debugLevel;        /* -d  debugging output */
 	unsigned long breakLine;/* -b  input line at which to call lineBreak() */
 #endif
+
 } optionValues;
 
 typedef enum eOptionLoadingStage {
@@ -135,11 +135,11 @@ extern CONST_OPTION optionValues		Option;
 extern void notice (const char *const format, ...) CTAGS_ATTR_PRINTF (1, 2);
 extern void verbose (const char *const format, ...) CTAGS_ATTR_PRINTF (1, 2);
 
-#define BEGIN_VERBOSE(VFP) do { if (Option.verbose) { \
+#define BEGIN_VERBOSE(VFP) do { if (ctags_verbose) { \
                                 FILE* VFP = stderr
 #define END_VERBOSE()      } } while (0)
 
-#define BEGIN_VERBOSE_IF(COND,VFP) do { if (Option.verbose || (COND)) { \
+#define BEGIN_VERBOSE_IF(COND,VFP) do { if (ctags_verbose || (COND)) { \
                                 FILE* VFP = stderr
 
 
