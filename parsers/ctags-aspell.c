@@ -206,7 +206,7 @@ static void aspell_dictfile_handler (const langType language CTAGS_ATTR_UNUSED,
 {
 	int count = 0;
 
-	if (Option.interactive == INTERACTIVE_SANDBOX)
+	if (inSandbox ())
 	{
 		verbose ("UCtagsAspell: loading a user dictionary is disallowed in sandbox: %s\n", arg);
 		return;
@@ -272,7 +272,7 @@ static AspellConfig * spell_config;
 
 static void initialize (const langType language CTAGS_ATTR_UNUSED)
 {
-	if (Option.interactive == INTERACTIVE_SANDBOX)
+	if (inSandbox ())
 	{
 		verbose ("UCtagsAspell: initializing aspell is disallowed in sandbox\n");
 		return;
@@ -342,7 +342,7 @@ static void findMisspelling (void)
 	AspellSpeller * spell_checker = NULL;
 
 #ifdef HAVE_ASPELL
-	if (Option.interactive != INTERACTIVE_SANDBOX)
+	if (!inSandbox ())
 	{
 		AspellCanHaveError * possible_err = new_aspell_speller(spell_config);
 		if (aspell_error_number(possible_err) != 0)

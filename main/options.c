@@ -3735,3 +3735,8 @@ static void processDumpOptionsOption (const char *const option CTAGS_ATTR_UNUSED
 	for (unsigned int i = 0; i < ARRAY_SIZE(BooleanOptions); i++)
 		fprintf(stdout, "%s\n", BooleanOptions[i].name);
 }
+
+extern bool inSandbox (void)
+{
+	return (Option.interactive == INTERACTIVE_SANDBOX);
+}
