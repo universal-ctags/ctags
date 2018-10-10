@@ -3,5 +3,5 @@ var	input.pp	/^$var = "value"$/;"	variable	line:3	language:PuppetManifest
 /tmp/snippetselectbtest	input.pp	/^file { "\/tmp\/snippetselectbtest":$/;"	resource	line:13	language:PuppetManifest	end:19
 othervar	input.pp	/^$othervar = "complex value"$/;"	variable	line:21	language:PuppetManifest
 /tmp/snippetselectctest	input.pp	/^file { "\/tmp\/snippetselectctest":$/;"	resource	line:23	language:PuppetManifest	end:29
-anothervar	input.pp	/^$anothervar = Yayness$/;"	variable	line:30	language:PuppetManifest
+anothervar	input.pp	/^$anothervar = "Yayness"$/;"	variable	line:30	language:PuppetManifest
 /tmp/snippetselectdtest	input.pp	/^file { "\/tmp\/snippetselectdtest":$/;"	resource	line:32	language:PuppetManifest	end:38

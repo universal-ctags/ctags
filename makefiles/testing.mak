@@ -112,7 +112,7 @@ verify-units-inputs: $(VERIFY_PUPPET_TEST_DIRS_TARGETS)
 #
 # UNITS Target
 #
-units: $(CTAGS_TEST) verify-units-inputs
+units: $(CTAGS_TEST)
 	$(V_RUN) \
 	if test -n "$${ZSH_VERSION+set}"; then set -o SH_WORD_SPLIT; fi; \
 	if test x$(VG) = x1; then		\

@@ -1,2 +1,3 @@
 var	input.pp	/^$var=['\/tmp\/file1','\/tmp\/file2']$/;"	variable	line:1	language:PuppetManifest
 arraytest	input.pp	/^class arraytest {$/;"	class	line:3	language:PuppetManifest	end:9
+var	input.pp	/^    $var = $var + ['\/tmp\/file3', '\/tmp\/file4']$/;"	variable	line:4	language:PuppetManifest	scope:class:arraytest
