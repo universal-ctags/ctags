@@ -88,7 +88,8 @@ slap: $(CTAGS_TEST)
 		--with-timeout=$(TIMEOUT)"; \
 	$(SHELL) $${c} $(srcdir)/Units
 
-
+# TODO: Possibly the bmake does not support the metaprogramming similar to gnu make.
+ifneq ($(MAKE),bmake)
 # Find the test directories where ctags is expected to succeed. Only tests with
 # an expected.tags file present are required to have valid input.
 PUPPET_TEST_DIRS = $(foreach path, \
@@ -109,6 +110,7 @@ $(foreach puppet_test_dir,$(PUPPET_TEST_DIRS),$(eval $(call VERIFY_ONE_PUPPET_TE
 # verify-units-inputs Target
 #
 verify-units-inputs: $(VERIFY_PUPPET_TEST_DIRS_TARGETS)
+endif  # ifneq ($(MAKE),bmake)
 
 #
 # UNITS Target
