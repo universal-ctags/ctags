@@ -27,7 +27,7 @@ file { "/tmp/snippetselectctest":
         default => "644"
     }
 }
-$anothervar = Yayness
+$anothervar = "Yayness"
 
 file { "/tmp/snippetselectdtest":
     ensure => file,
