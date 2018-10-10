@@ -13,6 +13,10 @@
 */
 #include "general.h"  /* must always come first */
 
+/* TODO: This definition should be removed. */
+#define OPTION_WRITE
+#include "options_p.h"
+
 #include <string.h>
 
 #include "ctags.h"
@@ -22,8 +26,6 @@
 #include "htable.h"
 #include "keyword.h"
 #include "main.h"
-#define OPTION_WRITE
-#include "options.h"
 #include "parsers.h"
 #include "promise.h"
 #include "ptag.h"

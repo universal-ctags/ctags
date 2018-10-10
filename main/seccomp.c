@@ -10,7 +10,7 @@
 
 #include "general.h"
 #include "debug.h"
-#include "interactive.h"
+#include "interactive_p.h"
 
 #ifdef HAVE_SECCOMP
 #include <seccomp.h>

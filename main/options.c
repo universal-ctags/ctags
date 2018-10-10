@@ -12,6 +12,9 @@
 */
 #include "general.h"  /* must always come first */
 
+#define OPTION_WRITE
+#include "options_p.h"
+
 #ifndef _GNU_SOURCE
 # define _GNU_SOURCE   /* for asprintf */
 #endif
@@ -26,15 +29,13 @@
 #include "gvars.h"
 #include "keyword.h"
 #include "main.h"
-#define OPTION_WRITE
-#include "options.h"
 #include "parse.h"
 #include "ptag.h"
 #include "routines.h"
 #include "xtag.h"
 #include "routines.h"
 #include "error.h"
-#include "interactive.h"
+#include "interactive_p.h"
 #include "writer.h"
 #include "trace.h"
 

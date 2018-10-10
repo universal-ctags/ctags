@@ -65,8 +65,6 @@
 # include <errno.h>
 #endif
 
-#include "options.h"
-
 /*
 *   MACROS
 */

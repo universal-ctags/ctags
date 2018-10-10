@@ -12,7 +12,7 @@
 #include "debug.h"
 #include "entry.h"
 #include "mio.h"
-#include "options.h"
+#include "options_p.h"
 #include "read.h"
 #include "ptag.h"
 #include "writer.h"
