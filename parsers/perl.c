@@ -12,12 +12,10 @@
 *   INCLUDE FILES
 */
 #include "general.h"  /* must always come first */
-#include "debug.h"
 
 #include <string.h>
 
 #include "entry.h"
-#include "options.h"
 #include "promise.h"
 #include "read.h"
 #include "routines.h"

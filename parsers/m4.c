@@ -17,7 +17,6 @@
 #include "htable.h"
 #include "keyword.h"
 #include "m4.h"
-#include "options.h"
 #include "parse.h"
 #include "read.h"
 #include "vstring.h"

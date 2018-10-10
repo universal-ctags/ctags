@@ -13,6 +13,7 @@
 #include <inttypes.h>
 
 #include "debug.h"
+#include "entry.h"
 #include "htable.h"
 #include "options.h"
 #include "parse.h"

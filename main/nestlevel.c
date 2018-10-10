@@ -15,6 +15,7 @@
 
 #include "main.h"
 #include "debug.h"
+#include "entry.h"
 #include "routines.h"
 #include "nestlevel.h"
 

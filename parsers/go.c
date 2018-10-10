@@ -15,7 +15,6 @@
 #include "objpool.h"
 #include "routines.h"
 #include "vstring.h"
-#include "options.h"
 #include "xtag.h"
 #include "field.h"
 

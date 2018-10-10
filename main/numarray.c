@@ -14,6 +14,7 @@
 
 #include "debug.h"
 #include "numarray.h"
+#include "routines.h"
 
 #include <stdlib.h>
 #include <string.h>
