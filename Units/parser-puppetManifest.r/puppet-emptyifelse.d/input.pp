@@ -4,6 +4,3 @@ if false {
   # nothing here
 }
 
-if true {
-  # still nothing
-}
