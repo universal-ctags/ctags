@@ -10,9 +10,11 @@
 #include "tcl.h"
 #include "entry.h"
 #include "parse.h"
-#include "string.h"
 #include "read.h"
 #include "keyword.h"
+
+#include <string.h>
+
 
 struct itclSubparser {
 	tclSubparser tcl;
