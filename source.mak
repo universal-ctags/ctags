@@ -11,6 +11,11 @@ REPOINFO_OBJS  = $(REPOINFO_SRCS:.c=.$(OBJEXT))
 MIO_HEADS = main/mio.h
 MIO_SRCS  = main/mio.c
 
+MAIN_PUBLIC_HEADS =		\
+		main/gvars.h	\
+		\
+		$(NULL)
+
 MAIN_HEADS =			\
 	main/args.h		\
 	main/colprint.h		\
@@ -57,6 +62,8 @@ MAIN_HEADS =			\
 	main/vstring.h		\
 	main/writer.h		\
 	main/xtag.h		\
+	\
+	$(MAIN_PUBLIC_HEADS)    \
 	\
 	$(MIO_HEADS)
 

@@ -23,6 +23,7 @@
 #include "ctags.h"
 #include "debug.h"
 #include "field.h"
+#include "gvars.h"
 #include "keyword.h"
 #include "main.h"
 #define OPTION_WRITE
@@ -129,6 +130,9 @@ static const char *const HeaderExtensions [] = {
 	"h", "H", "hh", "hpp", "hxx", "h++", "inc", "def", NULL
 };
 
+long ctags_debugLevel = 0L;
+bool ctags_verbose = false;
+
 optionValues Option = {
 	.append = false,
 	.backward = false,
@@ -142,7 +146,6 @@ optionValues Option = {
 	,
 	.recurse = false,
 	.sorted = SO_SORTED,
-	.verbose = false,
 	.xref = false,
 	.customXfmt = NULL,
 	.fileList = NULL,
@@ -171,7 +174,6 @@ optionValues Option = {
 	.interactive = false,
 	.mtablePrintTotals = false,
 #ifdef DEBUG
-	.debugLevel = 0,
 	.breakLine = 0,
 #endif
 };
@@ -637,7 +639,7 @@ int asprintf(char **strp, const char *fmt, ...)
 
 extern void verbose (const char *const format, ...)
 {
-	if (Option.verbose)
+	if (ctags_verbose)
 	{
 		va_list ap;
 		va_start (ap, format);
@@ -2753,7 +2755,7 @@ static booleanOption BooleanOptions [] = {
 	{ "recurse",        &Option.recurse,                false, STAGE_ANY },
 #endif
 	{ "totals",         &Option.printTotals,            true,  STAGE_ANY },
-	{ "verbose",        &Option.verbose,                false, STAGE_ANY },
+	{ "verbose",        &ctags_verbose,                false, STAGE_ANY },
 	{ "with-list-header", &localOption.withListHeader,       true,  STAGE_ANY },
 	{ "_fatal-warnings",&Option.fatalWarnings,          false, STAGE_ANY },
 	{ "_mtable-totals", &Option.mtablePrintTotals,      false, STAGE_ANY },
@@ -3209,11 +3211,11 @@ static void processShortOption (
 			Option.breakLine = atol (parameter);
 			break;
 		case 'd':
-			if (!strToLong(parameter, 0, &Option.debugLevel))
+			if (!strToLong(parameter, 0, &ctags_debugLevel))
 				error (FATAL, "-%s: Invalid debug level", option);
 
 			if (debug (DEBUG_STATUS))
-				Option.verbose = true;
+				ctags_verbose = true;
 			break;
 #endif
 		case 'B':
@@ -3280,7 +3282,7 @@ static void processShortOption (
 			Option.sorted = SO_UNSORTED;
 			break;
 		case 'V':
-			Option.verbose = true;
+			ctags_verbose = true;
 			break;
 		case 'w':
 			/* silently ignored */
