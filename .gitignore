@@ -14,6 +14,8 @@
 *.ssexwsp.user
 *.TMP
 *.tmp
+# Makefile empty target files of verify-units-inputs target
+Units/**/.input.*.verified
 *~
 .deps
 .dirstamp

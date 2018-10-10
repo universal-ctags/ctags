@@ -1,5 +1,5 @@
 # -*- makefile -*-
-.PHONY: check units fuzz noise tmain tinst clean-units clean-tmain clean-gcov run-gcov codecheck cppcheck dicts cspell $(VERIFY_PUPPET_TEST_DIRS_TARGETS) verify-units-inputs
+.PHONY: check units fuzz noise tmain tinst clean-units clean-tmain clean-gcov run-gcov codecheck cppcheck dicts cspell verify-units-inputs
 
 check: tmain units
 
@@ -94,12 +94,13 @@ slap: $(CTAGS_TEST)
 PUPPET_TEST_DIRS = $(foreach path, \
     $(shell find $(srcdir)/Units/parser-puppetManifest.r -name expected.tags), \
     $(shell dirname $(path)))
-VERIFY_PUPPET_TEST_DIRS_TARGETS := $(PUPPET_TEST_DIRS:%=TARGET_FOR_VERIFY_%)
+VERIFY_PUPPET_TEST_DIRS_TARGETS := $(PUPPET_TEST_DIRS:%=%/.input.pp.verified)
 
 #TODO: We shuold make this an empty target rather than a phony target
 define VERIFY_ONE_PUPPET_TEST_DIR
-TARGET_FOR_VERIFY_$(1): $(1)/input.pp
-	puppet apply --noop $$<
+$(1)/.input.pp.verified: $(1)/input.pp
+	puppet apply --noop $$< && \
+	touch $$@
 endef
 
 $(foreach puppet_test_dir,$(PUPPET_TEST_DIRS),$(eval $(call VERIFY_ONE_PUPPET_TEST_DIR,$(puppet_test_dir))))
