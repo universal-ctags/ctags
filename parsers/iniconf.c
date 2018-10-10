@@ -24,7 +24,7 @@
 
 #include "general.h"  /* must always come first */
 
-#include "debug.h"
+#include "entry.h"
 #include "htable.h"
 #include "iniconf.h"
 #include "parse.h"

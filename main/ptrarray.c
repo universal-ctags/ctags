@@ -17,6 +17,7 @@
 
 #include "debug.h"
 #include "ptrarray.h"
+#include "routines.h"
 
 /*
 *   DATA DECLARATIONS

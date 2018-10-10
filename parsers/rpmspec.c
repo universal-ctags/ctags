@@ -25,7 +25,7 @@
 #include <regex.h>
 
 #include <string.h>
-#include "debug.h"
+#include "entry.h"
 #include "parse.h"
 #include "read.h"
 #include "routines.h"

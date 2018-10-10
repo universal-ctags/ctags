@@ -17,7 +17,6 @@
 #include <stdio.h>
 #include <ctype.h>
 
-#include "debug.h"
 #include "parse.h"
 #include "vstring.h"
 #include "mio.h"

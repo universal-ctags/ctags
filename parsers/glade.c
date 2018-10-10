@@ -10,8 +10,8 @@
 */
 
 #include "general.h"	/* must always come first */
+#include "entry.h"
 #include "debug.h"
-#include "options.h"
 #include "parse.h"
 #include "read.h"
 #include "routines.h"

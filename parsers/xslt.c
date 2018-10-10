@@ -15,7 +15,7 @@
 
 #include <string.h>
 
-#include "debug.h"
+#include "entry.h"
 #include "options.h"
 #include "parse.h"
 #include "read.h"

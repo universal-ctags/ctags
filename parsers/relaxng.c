@@ -13,7 +13,7 @@
 */
 
 #include "general.h"	/* must always come first */
-#include "options.h"
+#include "entry.h"
 #include "parse.h"
 #include "read.h"
 

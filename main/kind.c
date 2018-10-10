@@ -17,6 +17,7 @@
 
 #include "ctags.h"
 #include "debug.h"
+#include "entry.h"
 #include "kind.h"
 #include "parse.h"
 #include "options.h"

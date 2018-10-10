@@ -22,6 +22,7 @@
 #include <string.h>
 
 #include "debug.h"
+#include "entry.h"
 #include "keyword.h"
 #include "options.h"
 #include "parse.h"

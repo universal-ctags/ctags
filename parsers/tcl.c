@@ -20,7 +20,6 @@
 #include "keyword.h"
 #include "entry.h"
 #include "routines.h"
-#include "debug.h"
 #include "ptrarray.h"
 #include "tcl.h"
 
