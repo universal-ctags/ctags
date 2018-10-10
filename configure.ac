@@ -204,6 +204,7 @@ AC_ARG_PROGRAM
 AM_CONDITIONAL(INSTALL_LIB, [test "x$enable_readlib" = "xyes"])
 AM_CONDITIONAL(INSTALL_ETAGS, [test "x$enable_etags" = "xyes"])
 AM_CONDITIONAL(USE_READCMD, [test "x$enable_readcmd" = "xyes"])
+AM_CONDITIONAL(USING_BMAKE, [test "x$MAKE" = "xbmake"])
 
 dnl AC_MSG_NOTICE(Change with $program_transform_name)
 CTAGS_NAME_EXECUTABLE=`echo ctags | sed "$program_transform_name"`
