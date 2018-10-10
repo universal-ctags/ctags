@@ -1,6 +1,6 @@
-define test($name) {
-    file {"/tmp/collection_within_virtual_definitions1_$name.txt":
-        content => "File name $name\n"
+define test($my_name) {
+    file {"/tmp/collection_within_virtual_definitions1_$my_name.txt":
+        content => "File name $my_name\n"
     }
     Test2 <||>
 }
@@ -13,7 +13,7 @@ define test2() {
 
 node default {
     @test {"foo":
-        name => "foo"
+        my_name => "foo"
     }
     @test2 {"foo2": }
     Test <||>
