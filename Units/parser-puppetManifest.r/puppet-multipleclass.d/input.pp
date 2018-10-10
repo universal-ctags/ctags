@@ -2,7 +2,7 @@ class one {
     file { "/tmp/multipleclassone": content => "one" }
 }
 
-class one {
+class two {
     file { "/tmp/multipleclasstwo": content => "two" }
 }
 

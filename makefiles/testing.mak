@@ -96,6 +96,7 @@ PUPPET_TEST_DIRS = $(foreach path, \
     $(shell dirname $(path)))
 VERIFY_PUPPET_TEST_DIRS_TARGETS := $(PUPPET_TEST_DIRS:%=TARGET_FOR_VERIFY_%)
 
+#TODO: We shuold make this an empty target rather than a phony target
 define VERIFY_ONE_PUPPET_TEST_DIR
 TARGET_FOR_VERIFY_$(1): $(1)/input.pp
 	puppet apply --noop $$<

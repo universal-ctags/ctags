@@ -1,12 +1,12 @@
 
-$mode = 640
+$mode = "640"
 
 define thing {
     file { "/tmp/$name": ensure => file, mode => $mode }
 }
 
 class testing {
-    $mode = 755
+    $mode = "755"
     thing {scopetest: }
 }
 
