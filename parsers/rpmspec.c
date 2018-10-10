@@ -29,6 +29,7 @@
 #include "parse.h"
 #include "read.h"
 #include "routines.h"
+#include "trace.h"
 
 typedef enum {
 	K_TAG,

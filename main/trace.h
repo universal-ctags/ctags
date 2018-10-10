@@ -27,6 +27,10 @@
 
 #ifdef DO_TRACING
 
+	bool isTraced (void);
+	void traceLanguage (langType language);
+	bool isLanguageTraced (langType language);
+
 	void traceEnter(const char * szFunction,const char * szFormat,...);
 	void traceLeave(const char * szFunction,const char * szFormat,...);
 	void tracePrint(const char * szFunction,const char * szFormat,...);

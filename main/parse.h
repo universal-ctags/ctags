@@ -23,7 +23,6 @@
 #include "param.h"
 #include "parsers.h"  /* contains list of parsers */
 #include "strlist.h"
-#include "trace.h"
 #include "xtag.h"
 
 /*
@@ -264,8 +263,4 @@ extern void anonHashString (const char *filename, char buf[9]);
 
 extern void printLanguageMultitableStatistics (langType language, FILE *vfp);
 
-#ifdef DO_TRACING
-extern void traceLanguage (langType language);
-extern bool isLanguageTraced (langType language);
-#endif	/* DO_TRACING */
 #endif  /* CTAGS_MAIN_PARSE_H */

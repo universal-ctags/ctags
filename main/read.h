@@ -130,8 +130,4 @@ extern bool isThinStreamSpec(unsigned long startLine, long startCharOffset,
 							 unsigned long endLine, long endCharOffset,
 							 unsigned long sourceLineOffset);
 
-#ifdef DO_TRACING
-extern bool isTraced (void);
-#endif	/* DO_TRACING */
-
 #endif  /* CTAGS_MAIN_READ_H */
