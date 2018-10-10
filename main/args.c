@@ -19,6 +19,7 @@
 #include "args.h"
 #include "debug.h"
 #include "routines.h"
+#include "vstring.h"
 
 /*
 *   FUNCTION DEFINITIONS
