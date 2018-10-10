@@ -187,4 +187,6 @@ extern bool processRoledefOption (const char *const option, const char *const pa
 typedef void (* mainLoopFunc) (cookedArgs *args, void *data);
 extern void setMainLoop (mainLoopFunc func, void *data);
 
+extern bool inSandbox (void);
+
 #endif  /* CTAGS_MAIN_OPTIONS_H */
