@@ -101,7 +101,6 @@
 #include "read.h"       /* to define file readLineFromInputFile() */
 #include "entry.h"      /* for the tag entry manipulation */
 #include "routines.h"   /* for generic malloc/realloc/free routines */
-#include "options.h"    /* for the Option structure */
 #include "debug.h"      /* for Assert */
 #include "xtag.h"
 
