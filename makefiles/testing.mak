@@ -88,28 +88,41 @@ slap: $(CTAGS_TEST)
 		--with-timeout=$(TIMEOUT)"; \
 	$(SHELL) $${c} $(srcdir)/Units
 
+TEST_DIRS =
+
 # TODO: Possibly the bmake does not support the metaprogramming similar to gnu make.
 if !USING_BMAKE
+
+# TODO: A disgusting hack
+# TODO: Explain more why this is necessary
+set = $(eval $(1) = $(2))
+
+# $(1): Language Name. For example: PUPPET
+# $(2): Extension. For example: pp
+# $(3): Directory Name. For example: parser-puppetManifest.r
+define VERIFY_GIVEN_UNITS_TEST_DIR
+
 # Find the test directories where ctags is expected to succeed. Only tests with
 # an expected.tags file present are required to have valid input.
-PUPPET_TEST_DIRS = $(foreach path, \
-    $(shell find $(srcdir)/Units/parser-puppetManifest.r -name expected.tags), \
-    $(shell dirname $(path)))
-VERIFY_PUPPET_TEST_DIRS_TARGETS := $(PUPPET_TEST_DIRS:%=%/.input.pp.verified)
+$$(call set,$(1)_TEST_DIRS,$$(foreach path, \
+    $$(shell find $$(srcdir)/Units/$(3) -name expected.tags), \
+    $$(shell dirname $$(path))) )
+$$(call set,VERIFY_$(1)_TEST_DIRS_TARGETS,$$($(1)_TEST_DIRS:%=%/.input.$(2).verified))
 
-#TODO: We shuold make this an empty target rather than a phony target
-define VERIFY_ONE_PUPPET_TEST_DIR
-$(1)/.input.pp.verified: $(1)/input.pp
-	puppet apply --noop $$< && \
-	touch $$@
+verify-units-inputs: $$(VERIFY_$(1)_TEST_DIRS_TARGETS)
+
+define VERIFY_ONE_$(1)_TEST_DIR
+$$(1)/.input.pp.verified: $$(1)/input.pp
+	puppet apply --noop $$$$< && \
+	touch $$$$@
 endef
 
-$(foreach puppet_test_dir,$(PUPPET_TEST_DIRS),$(eval $(call VERIFY_ONE_PUPPET_TEST_DIR,$(puppet_test_dir))))
+$$(foreach $(1)_test_dir,$$($(1)_TEST_DIRS),$$(eval $$(call VERIFY_ONE_$(1)_TEST_DIR,$$($(1)_test_dir))))
 
-#
-# verify-units-inputs Target
-#
-verify-units-inputs: $(VERIFY_PUPPET_TEST_DIRS_TARGETS)
+endef # define VERIFY_GIVEN_UNITS_TEST_DIR
+
+$(eval $(call VERIFY_GIVEN_UNITS_TEST_DIR,PUPPET,pp,parser-puppetManifest.r))
+
 
 endif  # if !USING_BMAKE
 
