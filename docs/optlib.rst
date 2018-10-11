@@ -984,7 +984,7 @@ table:
 This pattern matches any any one character including newline; the current
 position moves one character forward. Now the character at the current position is
 ``B``. The first pattern of the table ``*/`` still does not match with the input. So
-``ctags`` uses next pattern again. When the current position moves to the ``/*``
+``ctags`` uses next pattern again. When the current position moves to the ``*/``
 of the 3rd line of :file:`input.x`, it will finally match this:
 
 .. code-block:: perl
