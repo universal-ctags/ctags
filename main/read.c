@@ -24,6 +24,7 @@
 #include "main.h"
 #include "routines.h"
 #include "options_p.h"
+#include "parse_p.h"
 #include "promise.h"
 #include "trace.h"
 #include "trashbox.h"

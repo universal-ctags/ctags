@@ -14,7 +14,7 @@
 #include <string.h>
 
 #include "debug.h"
-#include "parse.h"
+#include "parse_p.h"
 #include "options.h"
 #include "selectors.h"
 #include "vstring.h"

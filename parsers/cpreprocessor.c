@@ -23,6 +23,7 @@
 #include "options.h"
 #include "read.h"
 #include "vstring.h"
+#include "param.h"
 #include "parse.h"
 #include "trashbox.h"
 #include "xtag.h"

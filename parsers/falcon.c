@@ -18,6 +18,8 @@
 #include <ctype.h>
 
 #include "read.h"
+#include "kind.h"
+#include "parse.h"
 #include "routines.h"
 
 /*

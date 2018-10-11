@@ -16,6 +16,7 @@
 #include "debug.h"
 #include "entry.h"
 #include "numarray.h"
+#include "param.h"
 #include "parse.h"
 #include "promise.h"
 #include "read.h"

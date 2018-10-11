@@ -21,6 +21,7 @@
 #include "parse.h"
 #include "read.h"
 #include "routines.h"
+#include "strlist.h"
 #include "vstring.h"
 #include "xtag.h"
 

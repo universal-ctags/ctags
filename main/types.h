@@ -36,4 +36,16 @@ typedef struct sSlaveParser slaveParser;
 struct sSubparser;
 typedef struct sSubparser subparser;
 
+struct sParserDependency;
+typedef struct sParserDependency parserDependency;
+
+struct sFieldDefinition;
+typedef struct sFieldDefinition fieldDefinition;
+
+struct sXtagDefinition;
+typedef struct sXtagDefinition xtagDefinition;
+
+struct sParameterHandlerTable;
+typedef struct sParameterHandlerTable parameterHandlerTable;
+
 #endif	/* CTAGS_MAIN_TYPES_H */
