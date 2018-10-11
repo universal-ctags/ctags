@@ -39,7 +39,8 @@ jobs:
            # TODO: enable spell checker
            command: |
               rpm -Uvh https://yum.puppet.com/puppet5/puppet5-release-el-7.noarch.rpm \
-              && yum -y install epel-release gcc automake autoconf pkgconfig make \
+              && yum -y install epel-release \
+              && yum -y install gcc automake autoconf pkgconfig make \
                  libxml2-devel jansson-devel libyaml-devel findutils \
                  puppet-agent-5.5.6-1.el7 jq || :
        - run:
