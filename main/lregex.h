@@ -17,7 +17,7 @@
 #define CTAGS_MAIN_LREGEX_H
 #include "general.h"
 
-typedef struct {
+typedef struct sTagRegexTable {
 	const char *const regex;
 	const char* const name;
 	const char* const kinds;
