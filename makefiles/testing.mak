@@ -100,6 +100,7 @@ set = $(eval $(1) = $(2))
 # $(1): Language Name. For example: PUPPET
 # $(2): Extension. For example: pp
 # $(3): Directory Name. For example: parser-puppetManifest.r
+# $(4): Command: For example: puppet apply --noop $<
 define VERIFY_GIVEN_UNITS_TEST_DIR
 
 # Find the test directories where ctags is expected to succeed. Only tests with
@@ -113,7 +114,7 @@ verify-units-inputs: $$(VERIFY_$(1)_TEST_DIRS_TARGETS)
 
 define VERIFY_ONE_$(1)_TEST_DIR
 $$(1)/.input.pp.verified: $$(1)/input.pp
-	puppet apply --noop $$$$< && \
+	puppet apply --noop $$$$<  1>/dev/null && \
 	touch $$$$@
 endef
 
@@ -122,6 +123,13 @@ $$(foreach $(1)_test_dir,$$($(1)_TEST_DIRS),$$(eval $$(call VERIFY_ONE_$(1)_TEST
 endef # define VERIFY_GIVEN_UNITS_TEST_DIR
 
 $(eval $(call VERIFY_GIVEN_UNITS_TEST_DIR,PUPPET,pp,parser-puppetManifest.r))
+
+
+#
+#  Removes the empty target files of the verify-units-inputs target
+#
+clean-verify-units-inputs:
+	find Units -path "*/.input.*.verified" | xargs rm
 
 
 endif  # if !USING_BMAKE
