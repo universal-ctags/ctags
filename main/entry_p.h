@@ -10,10 +10,16 @@
 #ifndef CTAGS_PRIVATE_ENTRY_H
 #define CTAGS_PRIVATE_ENTRY_H
 
-#include "general.h"
+/*
+*   INCLUDE FILES
+*/
+#include "general.h"  /* must always come first */
 #include "entry.h"
 #include "types.h"
 
+/*
+*   FUNCTION PROTOTYPES
+*/
 extern const kindDefinition* getTagKind(const tagEntryInfo *const tag);
 extern char getTagKindLetter(const tagEntryInfo *const tag);
 extern const char* getTagKindName(const tagEntryInfo *const tag);
