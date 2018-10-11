@@ -495,6 +495,7 @@ static void copyFile (const char *const from, const char *const to, const long s
  */
 static int replacementTruncate (const char *const name, const long size)
 {
+#define WHOLE_FILE  -1L
 	char *tempName = NULL;
 	MIO *mio = tempFile ("w", &tempName);
 	mio_free (mio);
