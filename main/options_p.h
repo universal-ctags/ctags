@@ -29,6 +29,11 @@
 #include "vstring.h"
 
 /*
+*   MACROS
+*/
+#define includeExtensionFlags()         (Option.tagFileFormat > 1)
+
+/*
 *   DATA DECLARATIONS
 */
 typedef enum { OPTION_NONE, OPTION_SHORT, OPTION_LONG } optionType;

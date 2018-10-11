@@ -29,7 +29,6 @@
 /*
 *   MACROS
 */
-#define includeExtensionFlags()         (Option.tagFileFormat > 1)
 
 /*
 *   DATA DECLARATIONS
