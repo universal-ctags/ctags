@@ -468,7 +468,7 @@ Example 1:
 	# in /tmp/foo.ctags:
 	--langdef=Foo
 	--map-Foo=+.foo
-	
+
 	--regex-Foo=/^class[[:blank:]]+([[:alpha:]]+):/\1/c,class/{scope=set}
 	--regex-Foo=/^[[:blank:]]+def[[:blank:]]+([[:alpha:]]+).*:/\1/d,definition/{scope=ref}
 
@@ -509,7 +509,6 @@ Example 2:
 
 NOTE: This flag doesn't work well with ``--mline-regex-<LANG>=``.
 
-
 Overriding the letter for file kind
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -541,7 +540,7 @@ except the pattern is applied to the whole file's contents, not line by line.
 This example is based on an issue #219 posted by @andreicristianpetcu:
 
 .. code-block:: java
-	
+
 	// in input.java:
 
 	@Subscribe
