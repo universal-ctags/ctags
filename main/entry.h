@@ -29,7 +29,6 @@
 /*
 *   MACROS
 */
-#define WHOLE_FILE  -1L
 #define includeExtensionFlags()         (Option.tagFileFormat > 1)
 
 /*
