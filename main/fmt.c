@@ -12,6 +12,7 @@
 
 #include "general.h"
 #include "debug.h"
+#include "entry_p.h"
 #include "fmt.h"
 #include "field.h"
 #include "parse.h"

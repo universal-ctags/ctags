@@ -8,7 +8,7 @@
 */
 
 #include "general.h"
-#include "entry.h"
+#include "entry_p.h"
 #include "writer.h"
 
 extern tagWriter uCtagsWriter;

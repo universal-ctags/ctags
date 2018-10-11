@@ -63,7 +63,7 @@
 
 #include "ctags.h"
 #include "debug.h"
-#include "entry.h"
+#include "entry_p.h"
 #include "error.h"
 #include "field.h"
 #include "keyword.h"

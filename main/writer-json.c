@@ -10,7 +10,7 @@
 #include "general.h"  /* must always come first */
 
 #include "debug.h"
-#include "entry.h"
+#include "entry_p.h"
 #include "mio.h"
 #include "options_p.h"
 #include "read.h"
