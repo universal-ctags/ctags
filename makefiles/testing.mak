@@ -135,7 +135,7 @@ $(eval $(call VERIFY_GIVEN_UNITS_TEST_DIR,JSON,.json,simple-json.d,jq '.' $$$$< 
 #  Removes the empty target files of the verify-units-inputs target
 #
 clean-verify-units-inputs:
-	find Units -path "*/.input.*.verified" | xargs rm
+	find Units -path "*/.input.*.verified" | xargs rm -f
 
 
 endif  # if !USING_BMAKE
