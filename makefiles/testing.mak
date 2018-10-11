@@ -114,7 +114,7 @@ verify-units-inputs: $$(VERIFY_$(1)_TEST_DIRS_TARGETS)
 
 define VERIFY_ONE_$(1)_TEST_DIR
 $$(1)/.input.pp.verified: $$(1)/input.pp
-	puppet apply --noop $$$$<  1>/dev/null && \
+	$(4) && \
 	touch $$$$@
 endef
 
@@ -122,7 +122,7 @@ $$(foreach $(1)_test_dir,$$($(1)_TEST_DIRS),$$(eval $$(call VERIFY_ONE_$(1)_TEST
 
 endef # define VERIFY_GIVEN_UNITS_TEST_DIR
 
-$(eval $(call VERIFY_GIVEN_UNITS_TEST_DIR,PUPPET,pp,parser-puppetManifest.r))
+$(eval $(call VERIFY_GIVEN_UNITS_TEST_DIR,PUPPET,pp,parser-puppetManifest.r,puppet apply --noop $$$$< 1>/dev/null))
 
 
 #
