@@ -23,6 +23,7 @@
 #include "field.h"
 #include "kind.h"
 #include "options_p.h"
+#include "parse_p.h"
 #include "read.h"
 #include "routines.h"
 #include "trashbox.h"

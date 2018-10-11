@@ -15,6 +15,7 @@
 
 #include "entry.h"
 #include "keyword.h"
+#include "parse.h"
 #include "read.h"
 #include "xtag.h"
 

@@ -26,6 +26,8 @@
 #include "htable.h"
 #include "keyword.h"
 #include "main.h"
+#include "param.h"
+#include "parse_p.h"
 #include "parsers.h"
 #include "promise.h"
 #include "ptag.h"

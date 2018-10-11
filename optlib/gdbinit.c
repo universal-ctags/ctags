@@ -4,6 +4,8 @@
 #include "general.h"
 #include "parse.h"
 #include "routines.h"
+#include "field.h"
+#include "xtag.h"
 
 
 static void initializeGdbinitParser (const langType language)

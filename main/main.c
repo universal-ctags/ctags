@@ -69,6 +69,7 @@
 #include "keyword.h"
 #include "main.h"
 #include "options_p.h"
+#include "parse_p.h"
 #include "read.h"
 #include "routines.h"
 #include "trace.h"

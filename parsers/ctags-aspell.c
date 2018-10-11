@@ -23,6 +23,7 @@
 #include "keyword.h"
 #include "kind.h"
 #include "mio.h"
+#include "param.h"
 #include "parse.h"
 #include "read.h"
 #include "strlist.h"

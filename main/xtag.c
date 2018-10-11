@@ -15,7 +15,7 @@
 #include "debug.h"
 #include "main.h"
 #include "options.h"
-#include "parse.h"
+#include "parse_p.h"
 #include "routines.h"
 #include "trashbox.h"
 #include "writer.h"

@@ -19,7 +19,7 @@
 #include "debug.h"
 #include "entry.h"
 #include "kind.h"
-#include "parse.h"
+#include "parse_p.h"
 #include "options.h"
 #include "vstring.h"
 

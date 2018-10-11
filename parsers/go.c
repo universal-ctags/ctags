@@ -13,6 +13,7 @@
 #include "main.h"
 #include "numarray.h"
 #include "objpool.h"
+#include "parse.h"
 #include "routines.h"
 #include "vstring.h"
 #include "xtag.h"

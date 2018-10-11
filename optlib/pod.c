@@ -4,6 +4,8 @@
 #include "general.h"
 #include "parse.h"
 #include "routines.h"
+#include "field.h"
+#include "xtag.h"
 
 
 static void initializePodParser (const langType language CTAGS_ATTR_UNUSED)
