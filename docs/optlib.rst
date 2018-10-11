@@ -523,6 +523,52 @@ Overriding the letter for file kind is not allowed in Universal-ctags.
 	Don't use ``F`` as a kind letter in your parser. (See issue #317 on github)
 
 
+Generating fully qualified tags automatically from scope information
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. NOT REVIEWED YET
+
+If scope fields are filled properly with `{scope=...}` regex flags,
+you can use the field values for generating fully qualified tags.
+
+Specify `{_autoFQTag}` to the end of ``--langdef=<LANG>`` option like
+``-langdef=Foo{_autoFQTag}`` to make ctags generate fully qualified
+tags automatically.
+
+`.` is the default separator combining names into a fully qualified
+tag. It is not customizable yet.
+
+input.foo::
+
+  class X
+     var y
+  end
+
+foo.ctags::
+
+  --langdef=foo{_autoFQTag}
+  --map-foo=+.foo
+  --kinddef-foo=c,class,classes
+  --kinddef-foo=v,var,variables
+  --regex-foo=/class ([A-Z]*)/\1/c/{scope=push}
+  --regex-foo=/end///{placeholder}{scope=pop}
+  --regex-foo=/[ \t]*var ([a-z]*)/\1/v/{scope=ref}
+
+Output::
+
+	$ u-ctags --quiet --options=NONE --options=./foo.ctags -o - input.foo
+	X	input.foo	/^class X$/;"	c
+	y	input.foo	/^	var y$/;"	v	class:X
+
+	$ u-ctags --quiet --options=NONE --options=./foo.ctags --extras=+q -o - input.foo
+	X	input.foo	/^class X$/;"	c
+	X.y	input.foo	/^	var y$/;"	v	class:X
+	y	input.foo	/^	var y$/;"	v	class:X
+
+
+"X.y" is printed as a fully qualified tag when ``--extras=+q`` is given.
+
+
 Multi-line pattern match
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
