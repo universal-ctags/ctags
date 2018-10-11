@@ -20,7 +20,7 @@
 #define FILE_WRITE
 #include "read.h"
 #include "debug.h"
-#include "entry.h"
+#include "entry_p.h"
 #include "main.h"
 #include "routines.h"
 #include "options_p.h"

@@ -21,7 +21,7 @@
 
 #include "ctags.h"
 #include "debug.h"
-#include "entry.h"
+#include "entry_p.h"
 #include "flags.h"
 #include "htable.h"
 #include "keyword.h"

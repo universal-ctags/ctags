@@ -9,7 +9,7 @@
 
 #include "general.h"  /* must always come first */
 
-#include "entry.h"
+#include "entry_p.h"
 #include "mio.h"
 #include "options_p.h"
 #include "parse_p.h"
