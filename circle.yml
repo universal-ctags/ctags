@@ -24,7 +24,7 @@ jobs:
        - run:
            name: Test
            command: |
-             MAKE=bmake bmake validate-input check roundtrip CIRCLECI=1
+             MAKE=bmake bmake validate-input check roundtrip CIRCLECI=1 PMAP=NewJava/Java
    centos_make:
      working_directory: ~/universal-ctags
      docker:
@@ -49,7 +49,7 @@ jobs:
        - run:
            name: Test
            command: |
-             make check roundtrip CIRCLECI=1
+             make check roundtrip CIRCLECI=1 PMAP=NewJava/Java
 
 workflows:
   version: 2
