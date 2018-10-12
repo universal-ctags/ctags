@@ -79,14 +79,17 @@ nodist_ctags_SOURCES = $(REPOINFO_HEADS)
 BUILT_SOURCES = $(REPOINFO_HEADS)
 CLEANFILES = $(REPOINFO_HEADS)
 $(REPOINFO_OBJS): $(REPOINFO_SRCS) $(REPOINFO_HEADS)
+repoinfo_verbose = $(repoinfo_verbose_@AM_V@)
+repoinfo_verbose_ = $(repoinfo_verbose_@AM_DEFAULT_V@)
+repoinfo_verbose_0 = @echo REPOINFO "  $@";
 if BUILD_IN_GIT_REPO
 GEN_REPOINFO = $(srcdir)/misc/gen-repoinfo
 $(REPOINFO_HEADS): FORCE
-	$(GEN_REPOINFO) $@
+	$(repoinfo_verbose)$(GEN_REPOINFO) $@
 FORCE:
 else
 $(REPOINFO_HEADS):
-	echo > $@
+	$(repoinfo_verbose)echo > $@
 endif
 
 if RUN_OPTLIB2C
