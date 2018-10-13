@@ -53,7 +53,7 @@ V_OPTLIB2C_1 =
 .c.o:
 	$(V_CC) $(CC) -c $(OPT) $(CFLAGS) $(DEFINES) $(INCLUDES) -o $@ $<
 
-.ctags.c: $(OPTLIB2C)
+%.c: %.ctags $(OPTLIB2C)
 	$(V_OPTLIB2C) $(OPTLIB2C) $< > $@
 
 all: ctags.exe readtags.exe
