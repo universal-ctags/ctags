@@ -170,7 +170,7 @@ const char* cxxDebugScopeDecode(enum CXXScopeType scope)
 		[CXXScopeTypeUnion] = "union",
 		[CXXScopeTypeStruct] = "structg",
 	};
-	if (sizeof(table) > scope)
+	if (CXXScopeTypeLAST > scope)
 		return table[scope];
 	else
 		return NULL;

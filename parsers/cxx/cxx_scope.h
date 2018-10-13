@@ -28,7 +28,8 @@ enum CXXScopeType
 	CXXScopeTypeClass,
 	CXXScopeTypeEnum,
 	CXXScopeTypeUnion,
-	CXXScopeTypeStruct
+	CXXScopeTypeStruct,
+	CXXScopeTypeLAST
 };
 
 void cxxScopeInit(void);
