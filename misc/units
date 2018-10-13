@@ -38,6 +38,7 @@ LANGUAGES=
 RUN_SHRINK=
 QUIET=
 SHOW_DIFF_OUTPUT=
+VERIFIERS=
 
 #
 # Internal variables and constants
@@ -54,6 +55,12 @@ readonly _LINE_SPLITTER=$(if type dos2unix > /dev/null 2>&1; then echo "dos2unix
 readonly _STDERR_OUTPUT_NAME="STDERR.tmp"
 readonly _DIFF_OUTPUT_NAME="DIFF.tmp"
 readonly _NOISE_REPORT_MAX_COLUMN=50
+readonly _VALIDATION_EXIT_INVALID=2
+readonly _NOOP_VERIFIER="NONE"
+readonly _KNOWN_INVALIDATION_VERIFIER="KNOWN-INVALIDATION"
+
+_RUNNABLE_VERIFIERS=
+_UNAVAILABLE_VERIFIERS=
 
 #
 # Results
@@ -68,6 +75,11 @@ L_SKIPPED_BY_ILOOP=
 L_KNOWN_BUGS=
 L_FAILED_BY_TIMEED_OUT=
 L_BROKEN_ARGS_CTAGS=
+
+V_VALID=0
+V_INVALID=0
+V_SKIP_VERIFIER_UNAVAILABLE=0
+V_SKIP_KNOWN_INVALIDATION=0
 
 #
 # TODO
@@ -94,6 +106,8 @@ Usage:
 	$(help_tmain)
 
 	$(help_chop)
+
+	$(help_verify_input)
 
 	$(help_clean_tmain)
 EOF
@@ -2178,7 +2192,7 @@ action_clean_tmain()
 
 help_clean_tmain ()
 {
-cat <<EOF
+    cat <<EOF
 $0 clean_tmain TMAIN-DIR
 
 	   Clean all files created during tmain testing
@@ -2188,7 +2202,7 @@ EOF
 
 help_chop ()
 {
-cat <<EOF
+    cat <<EOF
 $0 chop|slap [OPTIONS] UNITS-DIR
 
 	   OPTIONS:
@@ -2371,6 +2385,491 @@ chop_lang_file_chopspec()
     return $r
 }
 
+help_verify_input ()
+{
+    cat <<EOF
+$0 verify-input [OPTIONS] UNITS-DIR VERIFIERS-DIR
+
+	Verify the input files (only for the test cases specifying verifiers.)
+
+	OPTIONS:
+		--verifiers=verifier[,...]: Verify test cases specifying
+					    given verifiers.
+		--colorized-output: yes|no: print the result in color.
+EOF
+}
+
+has_verifier_acceptable_name ()
+{
+    local verifier=$1
+    if [ -z "${verifier}" ]; then
+	return 1
+    fi
+
+    echo "${verifier}" | grep -q "^[-a-zA-Z+#0-9]\+$"
+}
+
+is_verifier_runnable ()
+{
+    local v=$1
+    local d=$2
+    shift 2
+
+    "$d/"verifier-"$v" is_runnable
+}
+
+update_verifier_list ()
+{
+    local type=$1
+    local v=$2
+
+    case $type in
+	runnable)
+	    if ! member_p "$v" ${_RUNNABLE_VERIFIERS}; then
+		_RUNNABLE_VERIFIERS="${_RUNNABLE_VERIFIERS} $v"
+	    fi
+	    ;;
+	unavailable)
+	    if ! member_p "$v" ${_UNAVAILABLE_VERIFIERS}; then
+		_UNAVAILABLE_VERIFIERS="${_UNAVAILABLE_VERIFIERS} $v"
+	    fi
+	    ;;
+	*)
+	    ERROR 1 "INTERNAL ERROR: wrong verifier list type: ${type}"
+	    ;;
+    esac
+}
+
+#
+# Whether a verifier can be run or not.
+#
+# This runs "is_runnable" subcommand of the verifier.
+#
+verify_verifier ()
+{
+    local v=$1
+    local verifiers_dir=$2
+    local make_error=$3
+
+    if member_p "$v" ${_RUNNABLE_VERIFIERS}; then
+	return 0
+    elif member_p "$v" ${_UNAVAILABLE_VERIFIERS}; then
+	return 1
+    fi
+
+    if ! has_verifier_acceptable_name "$v"; then
+	if [ "${make_error}" = "error" ]; then
+	    ERROR 1 "Unacceptable verifier name: $v"
+	else
+	    update_verifier_list unavailable "$v"
+	    return 1
+	fi
+    elif ! [ -f "${verifiers_dir}/verifier-$v" ]; then
+	if [ "${make_error}" = "error" ]; then
+	    ERROR 1 "No such verifier: $v (${verifiers_dir}/verifier-$v)"
+	else
+	    update_verifier_list unavailable "$v"
+	    return 1
+	fi
+    elif ! [ -x "${verifiers_dir}/verifier-$v" ]; then
+	if [ "$make_error" = "error" ]; then
+	    ERROR 1 "Not exectuable: $v (${verifiers_dir}/verifier-$v)"
+	else
+	    update_verifier_list unavailable "$v"
+	    return 1
+	fi
+    elif ! is_verifier_runnable "$v" "${verifiers_dir}"; then
+	if [ "${make_error}" = "error" ]; then
+	    ERROR 1 "$v (${verifiers_dir}/verifier-$v) is not ready to run"
+	else
+	    update_verifier_list unavailable "$v"
+	    return 1
+	fi
+    fi
+
+    update_verifier_list runnable "$v"
+    return 0
+}
+
+#
+# Choose a verifier suitable for the current context.
+#
+# Return value
+# 0: The caller should run echo'ed verifier.
+#
+# 1: The caller should skip the input. It means
+#    - the suitable verifier is not listed in VERIFIERS, or
+#    - no expected.tags and no verifier file exist.
+#    The caller doesn't have to update any verification counters.
+# 2: The caller should skip the input and update the unavailable
+#    counter.
+#
+resolve_verifier ()
+{
+    local verifier_file=$1
+    local default_verifier=$2
+    local has_expected_tags=$3
+    local verifiers_dir=$4
+
+    shift 4
+
+    local candidate_verifier
+    local local_verifier
+
+    if [ -r "$verifier_file" ]; then
+	local_verifier=$(cat "${verifier_file}" | grep -v '#')
+	if [ -z "${local_verifier}" ]; then
+	    ERROR 1 "Empty verifier specfile: ${local_verifier}"
+	else
+	    candidate_verifier=${local_verifier}
+	fi
+    elif [ "$has_expected_tags" = no ]; then
+	return 1
+    else
+	candidate_verifier=${default_verifier}
+    fi
+
+    if [ -z "${candidate_verifier}" ]; then
+	return 2
+    elif [ -z "${VERIFIERS}" ] || member_p "${candidate_verifier}" ${VERIFIERS}; then
+	echo "${candidate_verifier}"
+	if verify_verifier "${candidate_verifier}" "${verifiers_dir}" noerror; then
+	    return 0
+	else
+	    return 2
+	fi
+    else
+	return 1
+    fi
+}
+
+#
+# Report the result of verification for INPUT with decoration
+# The verification result counters are updated here.
+#
+verify_report_one ()
+{
+    local input=$1
+    local verifier=$2
+    local status=$3
+    shift 3
+
+    if [ "${verifier}" = "${_NOOP_VERIFIER}" ]; then
+	return
+    fi
+
+    local i=$(basename $input)
+    local d=$(basename $(dirname $input))
+
+    printf '%-65s' "$d/$i with ${verifier}"
+    case "${status}" in
+	valid)
+	    if [ "${verifier}" = "${_KNOWN_INVALIDATION_VERIFIER}" ]; then
+		printf '%b\n' $(decorate yellow "known-invalidation")
+		V_SKIP_KNOWN_INVALIDATION=$(( V_SKIP_KNOWN_INVALIDATION + 1 ))
+	    else
+		printf '%b\n' $(decorate green "valid")
+		V_VALID=$(( V_VALID + 1))
+	    fi
+	    ;;
+	invalid)
+	    printf '%b\n' $(decorate red "invalid")
+	    V_INVALID=$(( V_INVALID + 1))
+	    ;;
+	unavailable)
+	    printf '%b\n' $(decorate yellow "unavailable")
+	    V_SKIP_VERIFIER_UNAVAILABLE=$(( V_SKIP_VERIFIER_UNAVAILABLE + 1))
+	    ;;
+	*)
+	    ERROR 1 "INTERNAL ERROR: wrong verification status: ${status}"
+	    ;;
+    esac
+}
+
+#
+# Run a verifier for the given input
+#
+# This runs "verify" subcommand of the verifier.
+#
+verify_file ()
+{
+    local input=$1
+    local verifier=$2
+    local verifiers_dir=$3
+    shift 3
+
+    ${verifiers_dir}/verifier-${verifier} verify $input
+    return $?
+}
+
+#
+# Verify input files under *.[dbtiv].
+#
+verify_dir ()
+{
+    local base_dir=$1
+    local default_verifier=$2
+    local verifiers_dir=$3
+    shift 3
+
+    local f
+    local t
+
+    local v0 s0 inputs0
+    local v s inputs
+
+    #
+    # No expected.tags* implies the input is invalid.
+    # We don't have to run any verifier as far as no
+    # ./verifier explicitly is given.
+    #
+    local has_expected_tags=no
+    for f in "${base_dir}"/expected.tags*; do
+	[ -r "$f" ] || continue
+	unwanted_file "$f" && continue
+	has_expected_tags=yes
+	break
+    done
+
+    # A verifier specified in ./verifier is used for verifying ./input.foo.
+    # It will be used for verifying ./input[-_]*.foo, too if ./verifier[-_]*.
+    # doesn't exit.
+    inputs0=$(for f in "${base_dir}"/input.*; do
+		  [ -r "$f" ] || continue
+		  unwanted_file "$f" && continue
+		  echo $f
+	      done | sort)
+    v0=$(resolve_verifier "${base_dir}"/verifier \
+			  "${default_verifier}" \
+			  "${has_expected_tags}" \
+			  "${verifiers_dir}")
+    s0=$?
+
+    case "$s0" in
+	0)
+	    update_verifier_list runnable "$v0"
+	    for f in $inputs0; do
+		if verify_file "$f" "$v0" "${verifiers_dir}"; then
+		    verify_report_one "$f" "$v0" valid
+		else
+		    verify_report_one "$f" "$v0" invalid
+		fi
+	    done
+	    default_verifier=$v0
+	    ;;
+	1)
+	    # no action neeeded
+	    ;;
+	2)
+	    update_verifier_list unavailable "$v0"
+	    for f in $inputs0; do
+		verify_report_one "$f" "$v0" unavailable
+	    done
+	    default_verifier=
+	    ;;
+    esac
+
+    inputs=$(for f in "${base_dir}"/input[-_][0-9].* \
+		      "${base_dir}"/input[-_][0-9][-_]*.*; do
+		 [ -r "$f" ] || continue
+		 unwanted_file "$f" && continue
+		 echo $f
+	     done | sort)
+
+    for f in $inputs; do
+	t=${f#input}; t=${t%.*}
+	v=$(resolve_verifier "${base_dir}"/verifier"$t" \
+			     "$default_verifier" \
+			     "$has_expected_tags" \
+			     "$verifiers_dir")
+	s=$?
+	case "$s" in
+	    0)
+		update_verifier_list runnable "$v0"
+		if verify_file "$f" "$v" "${verifiers_dir}"; then
+		    verify_report_one "$f" "$v" valid
+		else
+		    verify_report_one "$f" "$v" invalid
+		fi
+		;;
+	    1)
+		# no action neeeded
+		;;
+	    2)
+		update_verifier_list unavailable "$v0"
+		verify_report_one "$f" "$v" unavailable
+		;;
+	esac
+    done
+}
+
+#
+# Verify input files under *.r.
+#
+verify_category ()
+{
+    local category=$1
+    local base_dir=$2
+    local verifiers_dir=$3
+    shift 3
+
+    local d
+    local default_verifier=${_NOOP_VERIFIER}
+
+    if [ -r "${base_dir}/verifier" ]; then
+	default_verifier=$(cat "${base_dir}/verifier" | grep -v '#')
+	if [ -z "${default_verifier}" ]; then
+	    ERROR 1 "Empty verifier specfile (in ${base_dir}/verifier)"
+	fi
+
+	verify_verifier "${default_verifier}" "${verifiers_dir}" noerror
+    fi
+
+    for d in "${base_dir}"/*.[dbtiv]; do
+	[ -d "$d" ] || continue
+	verify_dir "$d" "${default_verifier}" "${verifiers_dir}"
+    done
+}
+
+#
+# Report the summary of verifications
+#
+verify_summary ()
+{
+    echo
+    echo "Summary"
+    line
+
+    printf '  %-40s' "#valid:"
+    printf '%b\n' $(decorate green "${V_VALID}")
+
+    printf '  %-40s' "#invalid:"
+    if [ "${V_INVALID}" = 0 ]; then
+	echo "${V_INVALID}"
+    else
+	printf '%b\n' $(decorate red "${V_INVALID}")
+    fi
+
+    printf '  %-40s' "#skipped (known invalidation)"
+    if [ "${V_SKIP_KNOWN_INVALIDATION}" = 0 ]; then
+	echo 0
+    else
+	printf '%b\n' $(decorate yellow "${V_SKIP_KNOWN_INVALIDATION}")
+    fi
+
+    printf '  %-40s' "#skipped (verifier unavailable)"
+    if [ "${V_SKIP_VERIFIER_UNAVAILABLE}" = 0 ]; then
+	echo 0
+    else
+	local u
+	printf '%b\n' $(decorate yellow "${V_SKIP_VERIFIER_UNAVAILABLE}")
+
+	echo
+	echo "Unavailable verifiers"
+	line
+	for u in ${_UNAVAILABLE_VERIFIERS}; do
+	    echo "	$u"
+	done
+    fi
+
+    if [ "${V_INVALID}" = 0 ]; then
+	return 0
+    else
+	return "${_VALIDATION_EXIT_INVALID}"
+    fi
+}
+
+action_verify_input ()
+{
+    local action=$1
+    shift
+
+    local units_dir
+    local verifiers_dir
+    local verifiers
+
+    local v
+    local d
+
+    while [ $# -gt 0 ]; do
+	case $1 in
+	    --verifiers)
+		shift
+		verifiers=$1
+		shift
+		;;
+	    --verifiers=*)
+		verifiers=${1#--verifiers=}
+		shift
+		;;
+	    --colorized-output)
+		shift
+		COLORIZED_OUTPUT=$1
+		shift
+		;;
+	    --colorized-output=*)
+		COLORIZED_OUTPUT=${1#--colorized-output=}
+		shift
+		;;
+	    -*)
+		ERROR 1 "unknown option \"${1}\" for ${action} action"
+		;;
+	    *)
+		units_dir=$1
+		shift
+		verifiers_dir=$1
+		shift
+		break;
+		;;
+	esac
+    done
+
+    if [ $# -gt 0 ]; then
+	ERROR 1 "too many arguments for ${action} action: $*"
+    elif [ -z "${units_dir}" ]; then
+	ERROR 1 "UNITS_DIR parameter is not given in ${action} action"
+    elif [ -z "${verifiers_dir}" ]; then
+	ERROR 1 "VERIFIERS_DIR parameter is not given in ${action} action"
+    fi
+
+    if ! [ -d "${units_dir}" ]; then
+	ERROR 1 "No such directory: ${units_dir}"
+    elif ! [ -d "${verifiers_dir}" ]; then
+	ERROR 1 "No such directory: ${units_dir}"
+    fi
+
+    if ! ( [ "${COLORIZED_OUTPUT}" = 'yes' ] || [ "${COLORIZED_OUTPUT}" = 'no' ] ); then
+	ERROR 1 "unexpected option argument for --colorized-output: ${COLORIZED_OUTPUT}"
+    fi
+
+    if [ -n "${verifiers}" ]; then
+	VERIFIERS=$(echo "${verifiers}" | tr ',' ' ')
+	for v in ${VERIFIERS}; do
+	    verify_verifier "$v" "${verifiers_dir}" error
+	done
+    fi
+
+    for d in ${units_dir}/*.r; do
+	[ -d "$d" ] || continue
+	category=${d##*/}
+	echo
+	echo "Category: ${category}"
+	line
+	verify_category "${category}" "$d" "${verifiers_dir}"
+    done
+
+    echo
+    echo "Category: ${_DEFAULT_CATEGORY}"
+    line
+    for d in ${units_dir}/*.[dbtiv]; do
+	[ -d "$d" ] || continue
+	verify_dir "$d" "${_NOOP_VERIFIER}" "$verifiers_dir"
+    done
+
+    verify_summary
+    return $?
+}
+
 # * Avoid issues between sed and the locale settings by overriding it using
 #   LC_ALL, which takes precedence over all other locale configurations:
 #   https://www.gnu.org/software/gettext/manual/html_node/Locale-Environment-Variables.html
@@ -2433,6 +2932,10 @@ main ()
 	    ;;
 	slap)
 	    action_chop "$@"
+	    return $?
+	    ;;
+	verify-input)
+	    action_verify_input "$@"
 	    return $?
 	    ;;
 	*)
