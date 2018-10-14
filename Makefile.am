@@ -99,8 +99,10 @@ optlib2c_verbose = $(optlib2c_verbose_@AM_V@)
 optlib2c_verbose_ = $(optlib2c_verbose_@AM_DEFAULT_V@)
 optlib2c_verbose_0 = @echo OPTLIB2C "  $@";
 OPTLIB2C = $(srcdir)/misc/optlib2c
-%.c: %.ctags $(OPTLIB2C) Makefile
+SUFFIXES += .ctags
+.ctags.c:
 	$(optlib2c_verbose)$(OPTLIB2C) $< > $@
+$(OPTLIB2C_INPUT): $(OPTLIB2C) Makefile
 endif
 dist_ctags_SOURCES = $(ALL_HEADS) $(ALL_SRCS)
 
