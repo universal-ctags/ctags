@@ -92,6 +92,8 @@ $(REPOINFO_HEADS):
 	$(repoinfo_verbose)echo > $@
 endif
 
+SUFFIXES=
+
 if RUN_OPTLIB2C
 optlib2c_verbose = $(optlib2c_verbose_@AM_V@)
 optlib2c_verbose_ = $(optlib2c_verbose_@AM_DEFAULT_V@)
@@ -120,7 +122,7 @@ man_MANS = man/ctags.1 man/ctags-incompatibilities.7 man/ctags-optlib.7
 rst2man_verbose = $(rst2man_verbose_@AM_V@)
 rst2man_verbose_ = $(rst2man_verbose_@AM_DEFAULT_V@)
 rst2man_verbose_0 = @echo RST2MAN "  $@";
-SUFFIXES = .1.rst .1 .7.rst .7
+SUFFIXES += .1.rst .1 .7.rst .7
 # See man/Makefile
 RST2MAN_OPTIONS=--syntax-highlight=none
 .1.rst.1:
