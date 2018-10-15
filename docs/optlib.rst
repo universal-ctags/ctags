@@ -526,8 +526,6 @@ Overriding the letter for file kind is not allowed in Universal-ctags.
 Generating fully qualified tags automatically from scope information
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. NOT REVIEWED YET
-
 If scope fields are filled properly with `{scope=...}` regex flags,
 you can use the field values for generating fully qualified tags.
 About the `{scope=..}` flag itself, see "FLAGS FOR --regex-<LANG>
