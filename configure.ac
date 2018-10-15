@@ -385,8 +385,8 @@ AC_EGREP_HEADER(clock_t, time.h, AC_MSG_RESULT(yes),
 
 AC_CHECK_HEADERS([stdbool.h],
 [
-	AH_TEMPLATE([USE_STDBOOL_H], [whether or not to use <stdbool.h>.])
-	AC_DEFINE([USE_STDBOOL_H])
+	AH_TEMPLATE([HAVE_STDBOOL_H], [whether or not to use <stdbool.h>.])
+	AC_DEFINE([HAVE_STDBOOL_H])
 ],
 [
 	AH_TEMPLATE([bool],  [type for 'bool' if <stdbool.h> is missing or broken.])
