@@ -530,6 +530,9 @@ Generating fully qualified tags automatically from scope information
 
 If scope fields are filled properly with `{scope=...}` regex flags,
 you can use the field values for generating fully qualified tags.
+About the `{scope=..}` flag itself, see "FLAGS FOR --regex-<LANG>
+OPTION" section of `ctags-optlib(7)` man page or
+`Universal-ctags parser definition language <https://github.com/universal-ctags/ctags/blob/master/man/ctags-optlib.7.rst.in>`_.
 
 Specify `{_autoFQTag}` to the end of ``--langdef=<LANG>`` option like
 ``-langdef=Foo{_autoFQTag}`` to make ctags generate fully qualified
