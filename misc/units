@@ -265,6 +265,13 @@ decorate ()
     local decorator="$1"
     local msg="$2"
 
+    case "$decorator" in
+	red)    decorator=31 ;;
+	green)  decorator=32 ;;
+	yellow) decorator=33 ;;
+	*) ERROR 1 "INTERNAL ERROR: wrong run_result function: $f"
+    esac
+
     if [ "${COLORIZED_OUTPUT}" = 'yes' ]; then
 	printf '%b\n' "\033[${decorator}m${msg}\033[39m"
     else
@@ -294,33 +301,33 @@ run_result ()
 run_result_skip ()
 {
     if [ -n "$1" ]; then
-	printf '%b\n' $(decorate 33 "skipped")" ($1)"
+	printf '%b\n' $(decorate yellow "skipped")" ($1)"
     else
-	printf '%b\n' $(decorate 33 "skipped")
+	printf '%b\n' $(decorate yellow "skipped")
     fi
 }
 
 run_result_error ()
 {
     if [ ! -n "$1" ]; then
-	printf '%b\n' $(decorate 31 "failed")
+	printf '%b\n' $(decorate red "failed")
     else
-	printf '%b\n' $(decorate 31 "failed")" ($1)"
+	printf '%b\n' $(decorate red "failed")" ($1)"
     fi
 }
 
 run_result_ok ()
 {
     if [ ! -n "$1" ]; then
-	printf '%b\n' $(decorate 32 "passed")
+	printf '%b\n' $(decorate green "passed")
     else
-	printf '%b\n' $(decorate 32 "passed")" ($1)"
+	printf '%b\n' $(decorate green "passed")" ($1)"
     fi
 }
 
 run_result_known_error ()
 {
-    printf '%b\n' $(decorate 33 "failed")" (KNOWN bug)"
+    printf '%b\n' $(decorate yellow "failed")" (KNOWN bug)"
 }
 
 run_shrink ()
