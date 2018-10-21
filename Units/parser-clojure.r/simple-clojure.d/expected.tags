@@ -1,4 +1,4 @@
-another.name	input.clj	/^(ns another.name)$/;"	n
+another.name	input.clj	/^(clojure.core\/ns another.name)$/;"	n
 app.controller	input.clj	/^(ns app.controller)$/;"	n
 core-function-with-body	input.clj	/^(clojure.core\/defn core-function-with-body []$/;"	f	namespace:app.controller
 empty-fn	input.clj	/^ (defn empty-fn [])$/;"	f	namespace:app.controller
