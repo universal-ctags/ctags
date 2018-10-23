@@ -24,3 +24,10 @@ help:
 	@echo "CATEGORIES=<category>             - Only run tests available under folder Units/<category>.r"
 	@echo "UNITS=<case>[,<case>]             - Only run tests named Units/[category.r/]/<case>.d in units target"
 	@echo "                                                         Tmain/<case>.d in tmain target"
+	@echo ""
+	@echo "Input verification target:"
+	@echo ""
+	@echo "make verify-input                 - Verify the input files themselves, not ctags"
+	@echo
+	@echo "Arguments that can be used in input verification target:"
+	@echo "VERIFIERS=<verifier>,[<verifier>] - Verify only input files expecting verified by VERIFIERs"
