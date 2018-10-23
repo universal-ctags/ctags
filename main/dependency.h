@@ -23,11 +23,11 @@ typedef enum eDepType {
 	COUNT_DEPTYPES,
 } depType;
 
-typedef struct sParserDependency {
+struct sParserDependency {
 	depType type;
 	const char *upperParser;
 	void *data;
-} parserDependency;
+};
 
 struct sSlaveParser {
 	depType type;

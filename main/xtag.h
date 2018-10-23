@@ -32,7 +32,7 @@ typedef enum eXtagType { /* extra tag content control */
 	XTAG_COUNT
 } xtagType;
 
-typedef struct sXtagDefinition {
+struct sXtagDefinition {
 	bool enabled;
 	/* letter, and ftype are initialized in the main part,
 	   not in a parser. */
@@ -54,7 +54,7 @@ typedef struct sXtagDefinition {
 	void (* enable)    (struct sXtagDefinition *def, bool state);
 
 	unsigned int xtype;	/* Given from the main part */
-} xtagDefinition;
+};
 
 extern xtagDefinition* getXtagDefinition (xtagType type);
 extern xtagType  getXtagTypeForLetter (char letter);

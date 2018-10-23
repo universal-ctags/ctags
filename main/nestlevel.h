@@ -20,7 +20,6 @@
 /*
 *   DATA DECLARATIONS
 */
-typedef struct NestingLevel NestingLevel;
 typedef struct NestingLevels NestingLevels;
 
 struct NestingLevel

@@ -17,11 +17,11 @@
 #include "colprint.h"
 #include "types.h"
 
-typedef struct sParameterHandlerTable {
+struct sParameterHandlerTable {
 	const char *name;
 	const char *desc;
 	void  (* handleParameter) (langType lang, const char *name, const char *arg);
-} parameterHandlerTable;
+};
 
 extern void applyParameter (const langType language, const char *name, const char *args);
 
