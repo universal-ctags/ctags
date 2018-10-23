@@ -65,6 +65,8 @@
 # include <errno.h>
 #endif
 
+#include "vstring.h"
+
 /*
 *   MACROS
 */
