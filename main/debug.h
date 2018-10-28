@@ -15,10 +15,10 @@
 #include "general.h"  /* must always come first */
 
 #include "gvars.h"
+#include "types.h"
 #ifdef DEBUG
 # include <assert.h>
 #endif
-#include "entry.h"
 
 /*
 *   Macros

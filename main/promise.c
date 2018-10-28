@@ -11,6 +11,7 @@
  */
 
 #include "general.h"
+#include "parse_p.h"
 #include "promise.h"
 #include "ptrarray.h"
 #include "debug.h"

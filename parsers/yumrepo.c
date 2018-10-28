@@ -19,6 +19,7 @@
 #include "entry.h"
 #include "iniconf.h"
 #include "kind.h"
+#include "parse.h"
 #include "read.h"
 #include "routines.h"
 #include <string.h>

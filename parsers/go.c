@@ -13,9 +13,9 @@
 #include "main.h"
 #include "numarray.h"
 #include "objpool.h"
+#include "parse.h"
 #include "routines.h"
 #include "vstring.h"
-#include "options.h"
 #include "xtag.h"
 #include "field.h"
 

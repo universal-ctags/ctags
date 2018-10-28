@@ -15,22 +15,15 @@
 #include "general.h"  /* must always come first */
 #include "types.h"
 
-#include <stdio.h>
 #include <stdint.h>
 
 #include "field.h"
-#include "kind.h"
-#include "vstring.h"
 #include "xtag.h"
 #include "mio.h"
-#include "nestlevel.h"
-#include "ptrarray.h"
 
 /*
 *   MACROS
 */
-#define WHOLE_FILE  -1L
-#define includeExtensionFlags()         (Option.tagFileFormat > 1)
 
 /*
 *   DATA DECLARATIONS
@@ -126,72 +119,28 @@ struct sTagEntryInfo {
 /*
 *   FUNCTION PROTOTYPES
 */
-extern void freeTagFileResources (void);
-extern const char *tagFileName (void);
-extern void openTagFile (void);
-extern void closeTagFile (const bool resize);
-extern void  setupWriter (void);
-extern bool  teardownWriter (const char *inputFilename);
 extern int makeTagEntry (const tagEntryInfo *const tag);
 extern void initTagEntry (tagEntryInfo *const e, const char *const name,
 			  int kindIndex);
 extern void initRefTagEntry (tagEntryInfo *const e, const char *const name,
 			     int kindIndex, int roleIndex);
-extern void initTagEntryFull (tagEntryInfo *const e, const char *const name,
-			      unsigned long lineNumber,
-			      langType langType_,
-			      MIOPos      filePosition,
-			      const char *inputFileName,
-			      int kindIndex,
-			      roleBitsType roleBits,
-			      const char *sourceFileName,
-			      langType sourceLangType,
-			      long sourceLineNumberDifference);
+
 extern void assignRole(tagEntryInfo *const e, int roleIndex);
 extern bool isRoleAssigned(const tagEntryInfo *const e, int roleIndex);
 
 extern int makeQualifiedTagEntry (const tagEntryInfo *const e);
 
-extern unsigned long numTagsAdded(void);
-extern void setNumTagsAdded (unsigned long nadded);
-extern unsigned long numTagsTotal(void);
-extern unsigned long maxTagsLine(void);
-extern void invalidatePatternCache(void);
-extern void tagFilePosition (MIOPos *p);
-extern void setTagFilePosition (MIOPos *p);
-extern const char* getTagFileDirectory (void);
-extern void getTagScopeInformation (tagEntryInfo *const tag,
-				    const char **kind, const char **name);
-
-/* Getting line associated with tag */
-extern char *readLineFromBypassForTag (vString *const vLine, const tagEntryInfo *const tag,
-				   long *const pSeekValue);
-
-/* Generating pattern associated tag, caller must do eFree for the returned value. */
-extern char* makePatternString (const tagEntryInfo *const tag);
-
-
-/* language is optional: can be NULL. */
-extern bool writePseudoTag (const ptagDesc *pdesc,
-			       const char *const fileName,
-			       const char *const pattern,
-			       const char *const parserName);
 
 #define CORK_NIL 0
-void          corkTagFile(void);
-void          uncorkTagFile(void);
 tagEntryInfo *getEntryInCorkQueue   (unsigned int n);
 tagEntryInfo *getEntryOfNestingLevel (const NestingLevel *nl);
 size_t        countEntryInCorkQueue (void);
-
-extern void makeFileTag (const char *const fileName);
 
 extern void    markTagExtraBit     (tagEntryInfo *const tag, xtagType extra);
 extern bool isTagExtraBitMarked (const tagEntryInfo *const tag, xtagType extra);
 
 extern void attachParserField (tagEntryInfo *const tag, fieldType ftype, const char* value);
 extern void attachParserFieldToCorkEntry (int index, fieldType ftype, const char* value);
-extern const tagField* getParserField (const tagEntryInfo * tag, int index);
 
 CTAGS_INLINE roleBitsType makeRoleBit(int roleIndex)
 {

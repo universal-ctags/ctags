@@ -13,10 +13,10 @@
 #include "general.h"  /* must always come first */
 
 #include <string.h>
+#include "entry.h"
 #include "parse.h"
 #include "routines.h"
 #ifdef HAVE_LIBXML
-#include "options.h"
 #include "read.h"
 #include "selectors.h"
 #endif

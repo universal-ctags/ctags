@@ -12,8 +12,10 @@ MIO_HEADS = main/mio.h
 MIO_SRCS  = main/mio.c
 
 MAIN_PUBLIC_HEADS =		\
+		main/entry.h	\
 		main/gvars.h	\
 		main/options.h	\
+		main/parse.h	\
 		\
 		$(NULL)
 
@@ -22,7 +24,6 @@ MAIN_HEADS =			\
 	main/colprint.h		\
 	main/ctags.h		\
 	main/dependency.h	\
-	main/entry.h		\
 	main/entry_p.h		\
 	main/error.h		\
 	main/field.h		\
@@ -44,7 +45,7 @@ MAIN_HEADS =			\
 	main/objpool.h		\
 	main/options_p.h	\
 	main/param.h		\
-	main/parse.h		\
+	main/parse_p.h		\
 	main/parsers.h		\
 	main/portable-dirent.h	\
 	main/promise.h		\

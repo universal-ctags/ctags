@@ -9,7 +9,7 @@
 */
 
 #include "entry_p.h"
-#include "parse.h"
+#include "parse_p.h"
 
 extern const kindDefinition* getTagKind(const tagEntryInfo *const tag)
 {

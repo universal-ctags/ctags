@@ -71,7 +71,7 @@ typedef enum eFieldDataType {
 } fieldDataType;
 
 #define FIELD_LETTER_NO_USE '\0'
-typedef struct sFieldDefinition {
+struct sFieldDefinition {
 	/* letter, and ftype are initialized in the main part,
 	   not in a parser. */
 #define NUL_FIELD_LETTER '\0'
@@ -84,7 +84,7 @@ typedef struct sFieldDefinition {
 	fieldDataType dataType; /* used in json output */
 
 	unsigned int ftype;	/* Given from the main part */
-} fieldDefinition;
+};
 
 
 extern fieldType getFieldTypeForOption (char letter);

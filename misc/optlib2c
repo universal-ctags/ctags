@@ -419,6 +419,8 @@ sub emit_header {
 #include "general.h"
 #include "parse.h"
 #include "routines.h"
+#include "field.h"
+#include "xtag.h"
 EOF
 
     if (defined $opts->{'base'}) {

@@ -18,6 +18,8 @@
 #include <string.h>
 
 #include "parse.h"
+#include "entry.h"
+#include "nestlevel.h"
 #include "read.h"
 #include "routines.h"
 #include "vstring.h"

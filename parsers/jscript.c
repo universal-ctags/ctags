@@ -46,6 +46,7 @@
 #include "options.h"
 #include "mbcs.h"
 #include "trace.h"
+#include "strlist.h"
 
 /*
  *	 MACROS

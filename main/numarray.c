@@ -14,8 +14,10 @@
 
 #include "debug.h"
 #include "numarray.h"
-#include <string.h>
+#include "routines.h"
 
+#include <stdlib.h>
+#include <string.h>
 
 #define impNumArray(prefix,Prefix,type)									\
 																		\

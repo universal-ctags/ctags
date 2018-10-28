@@ -20,11 +20,13 @@
 #define FILE_WRITE
 #include "read.h"
 #include "debug.h"
-#include "entry.h"
+#include "entry_p.h"
 #include "main.h"
 #include "routines.h"
 #include "options_p.h"
+#include "parse_p.h"
 #include "promise.h"
+#include "trace.h"
 #include "trashbox.h"
 #ifdef HAVE_ICONV
 # include "mbcs.h"

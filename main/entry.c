@@ -39,15 +39,17 @@
 #include <stdint.h>
 
 #include "debug.h"
-#include "entry.h"
+#include "entry_p.h"
 #include "field.h"
 #include "fmt.h"
 #include "kind.h"
 #include "main.h"
+#include "nestlevel.h"
 #include "options_p.h"
 #include "ptag.h"
 #include "read.h"
 #include "routines.h"
+#include "parse_p.h"
 #include "ptrarray.h"
 #include "sort.h"
 #include "strlist.h"
@@ -494,6 +496,7 @@ static void copyFile (const char *const from, const char *const to, const long s
  */
 static int replacementTruncate (const char *const name, const long size)
 {
+#define WHOLE_FILE  -1L
 	char *tempName = NULL;
 	MIO *mio = tempFile ("w", &tempName);
 	mio_free (mio);
@@ -1436,37 +1439,7 @@ extern int makeQualifiedTagEntry (const tagEntryInfo *const e)
 	return r;
 }
 
-extern void initTagEntry (tagEntryInfo *const e, const char *const name,
-						  int kindIndex)
-{
-	initTagEntryFull(e, name,
-			 getInputLineNumber (),
-			 getInputLanguage (),
-			 getInputFilePosition (),
-			 getInputFileTagPath (),
-			 kindIndex,
-			 0,
-			 getSourceFileTagPath(),
-			 getSourceLanguage(),
-			 getSourceLineNumber() - getInputLineNumber ());
-}
-
-extern void initRefTagEntry (tagEntryInfo *const e, const char *const name,
-			     int kindIndex, int roleIndex)
-{
-	initTagEntryFull(e, name,
-			 getInputLineNumber (),
-			 getInputLanguage (),
-			 getInputFilePosition (),
-			 getInputFileTagPath (),
-			 kindIndex,
-			 makeRoleBit(roleIndex),
-			 getSourceFileTagPath(),
-			 getSourceLanguage(),
-			 getSourceLineNumber() - getInputLineNumber ());
-}
-
-extern void initTagEntryFull (tagEntryInfo *const e, const char *const name,
+static void initTagEntryFull (tagEntryInfo *const e, const char *const name,
 			      unsigned long lineNumber,
 			      langType langType_,
 			      MIOPos      filePosition,
@@ -1518,6 +1491,36 @@ extern void initTagEntryFull (tagEntryInfo *const e, const char *const name,
 
 	if (isParserMarkedNoEmission ())
 		e->placeholder = 1;
+}
+
+extern void initTagEntry (tagEntryInfo *const e, const char *const name,
+						  int kindIndex)
+{
+	initTagEntryFull(e, name,
+			 getInputLineNumber (),
+			 getInputLanguage (),
+			 getInputFilePosition (),
+			 getInputFileTagPath (),
+			 kindIndex,
+			 0,
+			 getSourceFileTagPath(),
+			 getSourceLanguage(),
+			 getSourceLineNumber() - getInputLineNumber ());
+}
+
+extern void initRefTagEntry (tagEntryInfo *const e, const char *const name,
+			     int kindIndex, int roleIndex)
+{
+	initTagEntryFull(e, name,
+			 getInputLineNumber (),
+			 getInputLanguage (),
+			 getInputFilePosition (),
+			 getInputFileTagPath (),
+			 kindIndex,
+			 makeRoleBit(roleIndex),
+			 getSourceFileTagPath(),
+			 getSourceLanguage(),
+			 getSourceLineNumber() - getInputLineNumber ());
 }
 
 static void    markTagExtraBitFull     (tagEntryInfo *const tag, xtagType extra, bool mark)

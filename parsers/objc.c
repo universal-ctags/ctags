@@ -17,7 +17,7 @@
 
 #include "keyword.h"
 #include "entry.h"
-#include "options.h"
+#include "parse.h"
 #include "read.h"
 #include "routines.h"
 #include "selectors.h"

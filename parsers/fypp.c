@@ -13,11 +13,14 @@
 #include "general.h"  /* must always come first */
 
 #include "ctags.h"
+#include "debug.h"
 #include "entry.h"
 #include "numarray.h"
+#include "param.h"
 #include "parse.h"
 #include "promise.h"
 #include "read.h"
+#include "trace.h"
 
 #include <string.h>
 
