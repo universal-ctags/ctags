@@ -38,7 +38,7 @@ LANGUAGES=
 RUN_SHRINK=
 QUIET=
 SHOW_DIFF_OUTPUT=
-VERIFIERS=
+VALIDATORS=
 
 #
 # Internal variables and constants
@@ -56,11 +56,11 @@ readonly _STDERR_OUTPUT_NAME="STDERR.tmp"
 readonly _DIFF_OUTPUT_NAME="DIFF.tmp"
 readonly _NOISE_REPORT_MAX_COLUMN=50
 readonly _VALIDATION_EXIT_INVALID=2
-readonly _NOOP_VERIFIER="NONE"
-readonly _KNOWN_INVALIDATION_VERIFIER="KNOWN-INVALIDATION"
+readonly _NOOP_VALIDATOR="NONE"
+readonly _KNOWN_INVALIDATION_VALIDATOR="KNOWN-INVALIDATION"
 
-_RUNNABLE_VERIFIERS=
-_UNAVAILABLE_VERIFIERS=
+_RUNNABLE_VALIDATORS=
+_UNAVAILABLE_VALIDATORS=
 
 #
 # Results
@@ -78,7 +78,7 @@ L_BROKEN_ARGS_CTAGS=
 
 V_VALID=0
 V_INVALID=0
-V_SKIP_VERIFIER_UNAVAILABLE=0
+V_SKIP_VALIDATOR_UNAVAILABLE=0
 V_SKIP_KNOWN_INVALIDATION=0
 
 #
@@ -107,7 +107,7 @@ Usage:
 
 	$(help_chop)
 
-	$(help_verify_input)
+	$(help_validate_input)
 
 	$(help_clean_tmain)
 EOF
@@ -2385,155 +2385,155 @@ chop_lang_file_chopspec()
     return $r
 }
 
-help_verify_input ()
+help_validate_input ()
 {
     cat <<EOF
-$0 verify-input [OPTIONS] UNITS-DIR VERIFIERS-DIR
+$0 validate-input [OPTIONS] UNITS-DIR VALIDATORS-DIR
 
-	Verify the input files (only for the test cases specifying verifiers.)
+	Validate the input files (only for the test cases specifying validators.)
 
 	OPTIONS:
-		--verifiers=verifier[,...]: Verify test cases specifying
-					    given verifiers.
+		--validators=validator[,...]: Validate test cases specifying
+					    given validators.
 		--colorized-output: yes|no: print the result in color.
 EOF
 }
 
-has_verifier_acceptable_name ()
+has_validator_acceptable_name ()
 {
-    local verifier=$1
-    if [ -z "${verifier}" ]; then
+    local validator=$1
+    if [ -z "${validator}" ]; then
 	return 1
     fi
 
-    echo "${verifier}" | grep -q "^[-a-zA-Z+#0-9]\+$"
+    echo "${validator}" | grep -q "^[-a-zA-Z+#0-9]\+$"
 }
 
-is_verifier_runnable ()
+is_validator_runnable ()
 {
     local v=$1
     local d=$2
     shift 2
 
-    "$d/"verifier-"$v" is_runnable
+    "$d/"validator-"$v" is_runnable
 }
 
-update_verifier_list ()
+update_validator_list ()
 {
     local type=$1
     local v=$2
 
     case $type in
 	runnable)
-	    if ! member_p "$v" ${_RUNNABLE_VERIFIERS}; then
-		_RUNNABLE_VERIFIERS="${_RUNNABLE_VERIFIERS} $v"
+	    if ! member_p "$v" ${_RUNNABLE_VALIDATORS}; then
+		_RUNNABLE_VALIDATORS="${_RUNNABLE_VALIDATORS} $v"
 	    fi
 	    ;;
 	unavailable)
-	    if ! member_p "$v" ${_UNAVAILABLE_VERIFIERS}; then
-		_UNAVAILABLE_VERIFIERS="${_UNAVAILABLE_VERIFIERS} $v"
+	    if ! member_p "$v" ${_UNAVAILABLE_VALIDATORS}; then
+		_UNAVAILABLE_VALIDATORS="${_UNAVAILABLE_VALIDATORS} $v"
 	    fi
 	    ;;
 	*)
-	    ERROR 1 "INTERNAL ERROR: wrong verifier list type: ${type}"
+	    ERROR 1 "INTERNAL ERROR: wrong validator list type: ${type}"
 	    ;;
     esac
 }
 
 #
-# Whether a verifier can be run or not.
+# Whether a validator can be run or not.
 #
-# This runs "is_runnable" subcommand of the verifier.
+# This runs "is_runnable" subcommand of the validator.
 #
-verify_verifier ()
+validate_validator ()
 {
     local v=$1
-    local verifiers_dir=$2
+    local validators_dir=$2
     local make_error=$3
 
-    if member_p "$v" ${_RUNNABLE_VERIFIERS}; then
+    if member_p "$v" ${_RUNNABLE_VALIDATORS}; then
 	return 0
-    elif member_p "$v" ${_UNAVAILABLE_VERIFIERS}; then
+    elif member_p "$v" ${_UNAVAILABLE_VALIDATORS}; then
 	return 1
     fi
 
-    if ! has_verifier_acceptable_name "$v"; then
+    if ! has_validator_acceptable_name "$v"; then
 	if [ "${make_error}" = "error" ]; then
-	    ERROR 1 "Unacceptable verifier name: $v"
+	    ERROR 1 "Unacceptable validator name: $v"
 	else
-	    update_verifier_list unavailable "$v"
+	    update_validator_list unavailable "$v"
 	    return 1
 	fi
-    elif ! [ -f "${verifiers_dir}/verifier-$v" ]; then
+    elif ! [ -f "${validators_dir}/validator-$v" ]; then
 	if [ "${make_error}" = "error" ]; then
-	    ERROR 1 "No such verifier: $v (${verifiers_dir}/verifier-$v)"
+	    ERROR 1 "No such validator: $v (${validators_dir}/validator-$v)"
 	else
-	    update_verifier_list unavailable "$v"
+	    update_validator_list unavailable "$v"
 	    return 1
 	fi
-    elif ! [ -x "${verifiers_dir}/verifier-$v" ]; then
+    elif ! [ -x "${validators_dir}/validator-$v" ]; then
 	if [ "$make_error" = "error" ]; then
-	    ERROR 1 "Not exectuable: $v (${verifiers_dir}/verifier-$v)"
+	    ERROR 1 "Not exectuable: $v (${validators_dir}/validator-$v)"
 	else
-	    update_verifier_list unavailable "$v"
+	    update_validator_list unavailable "$v"
 	    return 1
 	fi
-    elif ! is_verifier_runnable "$v" "${verifiers_dir}"; then
+    elif ! is_validator_runnable "$v" "${validators_dir}"; then
 	if [ "${make_error}" = "error" ]; then
-	    ERROR 1 "$v (${verifiers_dir}/verifier-$v) is not ready to run"
+	    ERROR 1 "$v (${validators_dir}/validator-$v) is not ready to run"
 	else
-	    update_verifier_list unavailable "$v"
+	    update_validator_list unavailable "$v"
 	    return 1
 	fi
     fi
 
-    update_verifier_list runnable "$v"
+    update_validator_list runnable "$v"
     return 0
 }
 
 #
-# Choose a verifier suitable for the current context.
+# Choose a validator suitable for the current context.
 #
 # Return value
-# 0: The caller should run echo'ed verifier.
+# 0: The caller should run echo'ed validator.
 #
 # 1: The caller should skip the input. It means
-#    - the suitable verifier is not listed in VERIFIERS, or
-#    - no expected.tags and no verifier file exist.
-#    The caller doesn't have to update any verification counters.
+#    - the suitable validator is not listed in VALIDATORS, or
+#    - no expected.tags and no validator file exist.
+#    The caller doesn't have to update any validation counters.
 # 2: The caller should skip the input and update the unavailable
 #    counter.
 #
-resolve_verifier ()
+resolve_validator ()
 {
-    local verifier_file=$1
-    local default_verifier=$2
+    local validator_file=$1
+    local default_validator=$2
     local has_expected_tags=$3
-    local verifiers_dir=$4
+    local validators_dir=$4
 
     shift 4
 
-    local candidate_verifier
-    local local_verifier
+    local candidate_validator
+    local local_validator
 
-    if [ -r "$verifier_file" ]; then
-	local_verifier=$(cat "${verifier_file}" | grep -v '#')
-	if [ -z "${local_verifier}" ]; then
-	    ERROR 1 "Empty verifier specfile: ${local_verifier}"
+    if [ -r "$validator_file" ]; then
+	local_validator=$(cat "${validator_file}" | grep -v '#')
+	if [ -z "${local_validator}" ]; then
+	    ERROR 1 "Empty validator specfile: ${local_validator}"
 	else
-	    candidate_verifier=${local_verifier}
+	    candidate_validator=${local_validator}
 	fi
     elif [ "$has_expected_tags" = no ]; then
 	return 1
     else
-	candidate_verifier=${default_verifier}
+	candidate_validator=${default_validator}
     fi
 
-    if [ -z "${candidate_verifier}" ]; then
+    if [ -z "${candidate_validator}" ]; then
 	return 2
-    elif [ -z "${VERIFIERS}" ] || member_p "${candidate_verifier}" ${VERIFIERS}; then
-	echo "${candidate_verifier}"
-	if verify_verifier "${candidate_verifier}" "${verifiers_dir}" noerror; then
+    elif [ -z "${VALIDATORS}" ] || member_p "${candidate_validator}" ${VALIDATORS}; then
+	echo "${candidate_validator}"
+	if validate_validator "${candidate_validator}" "${validators_dir}" noerror; then
 	    return 0
 	else
 	    return 2
@@ -2544,27 +2544,27 @@ resolve_verifier ()
 }
 
 #
-# Report the result of verification for INPUT with decoration
-# The verification result counters are updated here.
+# Report the result of validation for INPUT with decoration
+# The validation result counters are updated here.
 #
-verify_report_one ()
+validate_report_one ()
 {
     local input=$1
-    local verifier=$2
+    local validator=$2
     local status=$3
     shift 3
 
-    if [ "${verifier}" = "${_NOOP_VERIFIER}" ]; then
+    if [ "${validator}" = "${_NOOP_VALIDATOR}" ]; then
 	return
     fi
 
     local i=$(basename $input)
     local d=$(basename $(dirname $input))
 
-    printf '%-65s' "$d/$i with ${verifier}"
+    printf '%-65s' "$d/$i with ${validator}"
     case "${status}" in
 	valid)
-	    if [ "${verifier}" = "${_KNOWN_INVALIDATION_VERIFIER}" ]; then
+	    if [ "${validator}" = "${_KNOWN_INVALIDATION_VALIDATOR}" ]; then
 		printf '%b\n' $(decorate yellow "known-invalidation")
 		V_SKIP_KNOWN_INVALIDATION=$(( V_SKIP_KNOWN_INVALIDATION + 1 ))
 	    else
@@ -2578,38 +2578,38 @@ verify_report_one ()
 	    ;;
 	unavailable)
 	    printf '%b\n' $(decorate yellow "unavailable")
-	    V_SKIP_VERIFIER_UNAVAILABLE=$(( V_SKIP_VERIFIER_UNAVAILABLE + 1))
+	    V_SKIP_VALIDATOR_UNAVAILABLE=$(( V_SKIP_VALIDATOR_UNAVAILABLE + 1))
 	    ;;
 	*)
-	    ERROR 1 "INTERNAL ERROR: wrong verification status: ${status}"
+	    ERROR 1 "INTERNAL ERROR: wrong validation status: ${status}"
 	    ;;
     esac
 }
 
 #
-# Run a verifier for the given input
+# Run a validator for the given input
 #
-# This runs "verify" subcommand of the verifier.
+# This runs "validate" subcommand of the validator.
 #
-verify_file ()
+validate_file ()
 {
     local input=$1
-    local verifier=$2
-    local verifiers_dir=$3
+    local validator=$2
+    local validators_dir=$3
     shift 3
 
-    ${verifiers_dir}/verifier-${verifier} verify $input
+    ${validators_dir}/validator-${validator} validate $input
     return $?
 }
 
 #
-# Verify input files under *.[dbtiv].
+# Validate input files under *.[dbtiv].
 #
-verify_dir ()
+validate_dir ()
 {
     local base_dir=$1
-    local default_verifier=$2
-    local verifiers_dir=$3
+    local default_validator=$2
+    local validators_dir=$3
     shift 3
 
     local f
@@ -2620,8 +2620,8 @@ verify_dir ()
 
     #
     # No expected.tags* implies the input is invalid.
-    # We don't have to run any verifier as far as no
-    # ./verifier explicitly is given.
+    # We don't have to run any validator as far as no
+    # ./validator explicitly is given.
     #
     local has_expected_tags=no
     for f in "${base_dir}"/expected.tags*; do
@@ -2631,41 +2631,41 @@ verify_dir ()
 	break
     done
 
-    # A verifier specified in ./verifier is used for verifying ./input.foo.
-    # It will be used for verifying ./input[-_]*.foo, too if ./verifier[-_]*.
+    # A validator specified in ./validator is used for validating ./input.foo.
+    # It will be used for validating ./input[-_]*.foo, too if ./validator[-_]*.
     # doesn't exit.
     inputs0=$(for f in "${base_dir}"/input.*; do
 		  [ -r "$f" ] || continue
 		  unwanted_file "$f" && continue
 		  echo $f
 	      done | sort)
-    v0=$(resolve_verifier "${base_dir}"/verifier \
-			  "${default_verifier}" \
+    v0=$(resolve_validator "${base_dir}"/validator \
+			  "${default_validator}" \
 			  "${has_expected_tags}" \
-			  "${verifiers_dir}")
+			  "${validators_dir}")
     s0=$?
 
     case "$s0" in
 	0)
-	    update_verifier_list runnable "$v0"
+	    update_validator_list runnable "$v0"
 	    for f in $inputs0; do
-		if verify_file "$f" "$v0" "${verifiers_dir}"; then
-		    verify_report_one "$f" "$v0" valid
+		if validate_file "$f" "$v0" "${validators_dir}"; then
+		    validate_report_one "$f" "$v0" valid
 		else
-		    verify_report_one "$f" "$v0" invalid
+		    validate_report_one "$f" "$v0" invalid
 		fi
 	    done
-	    default_verifier=$v0
+	    default_validator=$v0
 	    ;;
 	1)
 	    # no action neeeded
 	    ;;
 	2)
-	    update_verifier_list unavailable "$v0"
+	    update_validator_list unavailable "$v0"
 	    for f in $inputs0; do
-		verify_report_one "$f" "$v0" unavailable
+		validate_report_one "$f" "$v0" unavailable
 	    done
-	    default_verifier=
+	    default_validator=
 	    ;;
     esac
 
@@ -2678,63 +2678,63 @@ verify_dir ()
 
     for f in $inputs; do
 	t=${f#input}; t=${t%.*}
-	v=$(resolve_verifier "${base_dir}"/verifier"$t" \
-			     "$default_verifier" \
+	v=$(resolve_validator "${base_dir}"/validator"$t" \
+			     "$default_validator" \
 			     "$has_expected_tags" \
-			     "$verifiers_dir")
+			     "$validators_dir")
 	s=$?
 	case "$s" in
 	    0)
-		update_verifier_list runnable "$v0"
-		if verify_file "$f" "$v" "${verifiers_dir}"; then
-		    verify_report_one "$f" "$v" valid
+		update_validator_list runnable "$v0"
+		if validate_file "$f" "$v" "${validators_dir}"; then
+		    validate_report_one "$f" "$v" valid
 		else
-		    verify_report_one "$f" "$v" invalid
+		    validate_report_one "$f" "$v" invalid
 		fi
 		;;
 	    1)
 		# no action neeeded
 		;;
 	    2)
-		update_verifier_list unavailable "$v0"
-		verify_report_one "$f" "$v" unavailable
+		update_validator_list unavailable "$v0"
+		validate_report_one "$f" "$v" unavailable
 		;;
 	esac
     done
 }
 
 #
-# Verify input files under *.r.
+# Validate input files under *.r.
 #
-verify_category ()
+validate_category ()
 {
     local category=$1
     local base_dir=$2
-    local verifiers_dir=$3
+    local validators_dir=$3
     shift 3
 
     local d
-    local default_verifier=${_NOOP_VERIFIER}
+    local default_validator=${_NOOP_VALIDATOR}
 
-    if [ -r "${base_dir}/verifier" ]; then
-	default_verifier=$(cat "${base_dir}/verifier" | grep -v '#')
-	if [ -z "${default_verifier}" ]; then
-	    ERROR 1 "Empty verifier specfile (in ${base_dir}/verifier)"
+    if [ -r "${base_dir}/validator" ]; then
+	default_validator=$(cat "${base_dir}/validator" | grep -v '#')
+	if [ -z "${default_validator}" ]; then
+	    ERROR 1 "Empty validator specfile (in ${base_dir}/validator)"
 	fi
 
-	verify_verifier "${default_verifier}" "${verifiers_dir}" noerror
+	validate_validator "${default_validator}" "${validators_dir}" noerror
     fi
 
     for d in "${base_dir}"/*.[dbtiv]; do
 	[ -d "$d" ] || continue
-	verify_dir "$d" "${default_verifier}" "${verifiers_dir}"
+	validate_dir "$d" "${default_validator}" "${validators_dir}"
     done
 }
 
 #
-# Report the summary of verifications
+# Report the summary of validations
 #
-verify_summary ()
+validate_summary ()
 {
     echo
     echo "Summary"
@@ -2757,17 +2757,17 @@ verify_summary ()
 	printf '%b\n' $(decorate yellow "${V_SKIP_KNOWN_INVALIDATION}")
     fi
 
-    printf '  %-40s' "#skipped (verifier unavailable)"
-    if [ "${V_SKIP_VERIFIER_UNAVAILABLE}" = 0 ]; then
+    printf '  %-40s' "#skipped (validator unavailable)"
+    if [ "${V_SKIP_VALIDATOR_UNAVAILABLE}" = 0 ]; then
 	echo 0
     else
 	local u
-	printf '%b\n' $(decorate yellow "${V_SKIP_VERIFIER_UNAVAILABLE}")
+	printf '%b\n' $(decorate yellow "${V_SKIP_VALIDATOR_UNAVAILABLE}")
 
 	echo
-	echo "Unavailable verifiers"
+	echo "Unavailable validators"
 	line
-	for u in ${_UNAVAILABLE_VERIFIERS}; do
+	for u in ${_UNAVAILABLE_VALIDATORS}; do
 	    echo "	$u"
 	done
     fi
@@ -2779,27 +2779,27 @@ verify_summary ()
     fi
 }
 
-action_verify_input ()
+action_validate_input ()
 {
     local action=$1
     shift
 
     local units_dir
-    local verifiers_dir
-    local verifiers
+    local validators_dir
+    local validators
 
     local v
     local d
 
     while [ $# -gt 0 ]; do
 	case $1 in
-	    --verifiers)
+	    --validators)
 		shift
-		verifiers=$1
+		validators=$1
 		shift
 		;;
-	    --verifiers=*)
-		verifiers=${1#--verifiers=}
+	    --validators=*)
+		validators=${1#--validators=}
 		shift
 		;;
 	    --colorized-output)
@@ -2817,7 +2817,7 @@ action_verify_input ()
 	    *)
 		units_dir=$1
 		shift
-		verifiers_dir=$1
+		validators_dir=$1
 		shift
 		break;
 		;;
@@ -2828,13 +2828,13 @@ action_verify_input ()
 	ERROR 1 "too many arguments for ${action} action: $*"
     elif [ -z "${units_dir}" ]; then
 	ERROR 1 "UNITS_DIR parameter is not given in ${action} action"
-    elif [ -z "${verifiers_dir}" ]; then
-	ERROR 1 "VERIFIERS_DIR parameter is not given in ${action} action"
+    elif [ -z "${validators_dir}" ]; then
+	ERROR 1 "VALIDATORS_DIR parameter is not given in ${action} action"
     fi
 
     if ! [ -d "${units_dir}" ]; then
 	ERROR 1 "No such directory: ${units_dir}"
-    elif ! [ -d "${verifiers_dir}" ]; then
+    elif ! [ -d "${validators_dir}" ]; then
 	ERROR 1 "No such directory: ${units_dir}"
     fi
 
@@ -2842,10 +2842,10 @@ action_verify_input ()
 	ERROR 1 "unexpected option argument for --colorized-output: ${COLORIZED_OUTPUT}"
     fi
 
-    if [ -n "${verifiers}" ]; then
-	VERIFIERS=$(echo "${verifiers}" | tr ',' ' ')
-	for v in ${VERIFIERS}; do
-	    verify_verifier "$v" "${verifiers_dir}" error
+    if [ -n "${validators}" ]; then
+	VALIDATORS=$(echo "${validators}" | tr ',' ' ')
+	for v in ${VALIDATORS}; do
+	    validate_validator "$v" "${validators_dir}" error
 	done
     fi
 
@@ -2855,7 +2855,7 @@ action_verify_input ()
 	echo
 	echo "Category: ${category}"
 	line
-	verify_category "${category}" "$d" "${verifiers_dir}"
+	validate_category "${category}" "$d" "${validators_dir}"
     done
 
     echo
@@ -2863,10 +2863,10 @@ action_verify_input ()
     line
     for d in ${units_dir}/*.[dbtiv]; do
 	[ -d "$d" ] || continue
-	verify_dir "$d" "${_NOOP_VERIFIER}" "$verifiers_dir"
+	validate_dir "$d" "${_NOOP_VALIDATOR}" "$validators_dir"
     done
 
-    verify_summary
+    validate_summary
     return $?
 }
 
@@ -2934,8 +2934,8 @@ main ()
 	    action_chop "$@"
 	    return $?
 	    ;;
-	verify-input)
-	    action_verify_input "$@"
+	validate-input)
+	    action_validate_input "$@"
 	    return $?
 	    ;;
 	*)

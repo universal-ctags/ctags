@@ -1,5 +1,5 @@
 # -*- sh -*-
-# verifier-jq - verifying json input files
+# validator-jq - validating json input files
 #
 #  Copyright (c) 2018, Red Hat, Inc.
 #  Copyright (c) 2018, Masatake YAMATO
@@ -35,7 +35,7 @@ case "$action" in
 	type jq > /dev/null 2>&1
 	exit $?
 	;;
-    verify)
+    validate)
 	jq . "$input" > /dev/null
 	exit $?
 	;;
