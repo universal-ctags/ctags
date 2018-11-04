@@ -25,9 +25,9 @@ help:
 	@echo "UNITS=<case>[,<case>]             - Only run tests named Units/[category.r/]/<case>.d in units target"
 	@echo "                                                         Tmain/<case>.d in tmain target"
 	@echo ""
-	@echo "Input verification target:"
+	@echo "Input validation target:"
 	@echo ""
-	@echo "make verify-input                 - Verify the input files themselves, not ctags"
+	@echo "make validate-input                 - Validate the input files themselves, not ctags"
 	@echo
-	@echo "Arguments that can be used in input verification target:"
-	@echo "VERIFIERS=<verifier>,[<verifier>] - Verify only input files expecting verified by VERIFIERs"
+	@echo "Arguments that can be used in input validation target:"
+	@echo "VALIDATORS=<validator>,[<validator>] - Validate only input files expecting validated by VALIDATORs"
