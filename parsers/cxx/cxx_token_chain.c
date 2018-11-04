@@ -27,7 +27,7 @@ void cxxTokenChainInit(CXXTokenChain * tc)
 
 CXXTokenChain * cxxTokenChainCreate(void)
 {
-	CXXTokenChain * tc = xMalloc(sizeof(CXXTokenChain),CXXTokenChain);
+	CXXTokenChain * tc = xMalloc(1, CXXTokenChain);
 	cxxTokenChainInit(tc);
 	return tc;
 }
