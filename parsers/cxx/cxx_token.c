@@ -27,7 +27,7 @@ void cxxTokenForceDestroy(CXXToken * t);
 
 static CXXToken *createToken(void *createArg CTAGS_ATTR_UNUSED)
 {
-	CXXToken *t = xMalloc(sizeof(CXXToken),CXXToken);
+	CXXToken *t = xMalloc(1, CXXToken);
 	// we almost always want a string, and since this token
 	// is being reused..well.. we always want it
 	t->pszWord = vStringNew();
