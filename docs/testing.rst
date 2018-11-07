@@ -21,3 +21,4 @@ ctags in limited resources.
 	tmain.rst
 	tinst.rst
 	cspell.rst
+	input-validation.rst

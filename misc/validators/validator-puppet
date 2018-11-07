@@ -1,0 +1,60 @@
+# -*- sh -*-
+# validator-puppet - validating puppetManifest input files
+#
+#  Copyright (c) 2018, Hakan Baba
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,
+# USA.
+#
+#
+# NOTE about puppet version
+# ------------------------------------------------------------------------
+# This driver script does not specify the used puppet
+# version. Instead, puppet version will depend on the platform
+# runtime. As a result, you may see some warnings on some platforms
+# even tough the validation has passed.
+#
+# As of writing this comment, puppet5 is becoming popular. In #1909,
+# @ahakanbaba has fixed much of test cases to be valid puppet5
+# files. Even tough that PR exists, we are still sticking with puppet4
+# in our automated tests. One of our test platforms is Fedora28 and
+# its distribution has puppet4 at this time. As the note about
+# warnings above mentions, in validation runs using puppet4 you may
+# see the following Errors prompts that do not fail the validation.
+#
+#     puppet-simpleselector.d/input.pp with puppet                     valid
+#     Error: Could not write report for e22e2d5d26ca.ec2.internal at \
+#     /var/lib/puppet/reports/e22e2d5d26ca.ec2.internal/201810241144.yaml: \
+#     undefined method `split' for :ensure:Symbol
+#     Error: Could not send report: undefined method `split' for :ensure:Symbol
+#     ...
+#
+# So ideally, we should specify the version of puppet used
+# in this script. @ahakanbaba shows the way to do so in #1926.
+# However, because I (@masatake) don't want to take much time to write
+# portable puppet validator, I keep this script as is.
+#
+action=$1
+input=$2
+case "$action" in
+    is_runnable)
+	type puppet > /dev/null 2>&1
+	exit $?
+	;;
+    validate)
+	puppet apply --noop "$input" > /dev/null
+	exit $?
+	;;
+esac

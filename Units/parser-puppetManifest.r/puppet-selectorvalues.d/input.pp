@@ -6,37 +6,37 @@ $value4 = yay
 $test = "yay"
 
 $mode1 = $value1 ? {
-    "" => 755,
-    default => 644
+    "" => "755",
+    default => "644"
 }
 
 $mode2 = $value2 ? {
-    true => 755,
-    default => 644
+    true => "755",
+    default => "644"
 }
 
 $mode3 = $value3 ? {
-    false => 755,
-    default => 644
+    false => "755",
+    default => "644"
 }
 
 $mode4 = $value4 ? {
-    $test => 755,
-    default => 644
+    $test => "755",
+    default => "644"
 }
 
 $mode5 = yay ? {
-    $test => 755,
-    default => 644
+    $test => "755",
+    default => "644"
 }
 
 $mode6 = $mode5 ? {
-    755 => 755
+    "755" => "755"
 }
 
 $mode7 = "test regex" ? {
-    /regex$/ => 755,
-    default => 644
+    /regex$/ => "755",
+    default => "644"
 }
 
 

@@ -1,0 +1,12 @@
+#
+# The puppet validator reports this input as "invalid" because
+# += operator is obsoleted in puppet5.
+# @ahakanbaba in #1909 reported and proposed a fix for this already.
+#
+# However, @masatake kept this as is for following reasons:
+#
+# - valid in puppet4,
+# - testing KNOWN-INVALIDATION special validator, and
+# - testing '#' comment in a validator file.
+#
+KNOWN-INVALIDATION

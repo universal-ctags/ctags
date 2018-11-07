@@ -6,15 +6,15 @@ $value4 = yay
 $test = "yay"
 
 $mode1 = $value1 ? {
-    "" => 755
+    "" => "755"
 }
 
 $mode2 = $value2 ? {
-    true => 755
+    true => "755"
 }
 
 $mode3 = $value3 ? {
-    default => 755
+    default => "755"
 }
 
 file { "/tmp/singleselector1": ensure => file, mode => $mode1 }
