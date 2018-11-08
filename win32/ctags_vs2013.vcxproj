@@ -248,7 +248,7 @@
   <ItemGroup>
     <ClInclude Include="..\fnmatch\fnmatch.h" />
     <ClInclude Include="..\gnu_regex\regex.h" />
-    <ClInclude Include="..\main\args.h" />
+    <ClInclude Include="..\main\args_p.h" />
     <ClInclude Include="..\main\colprint.h" />
     <ClInclude Include="..\main\ctags.h" />
     <ClInclude Include="..\main\debug.h" />

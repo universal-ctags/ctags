@@ -20,7 +20,7 @@ MAIN_PUBLIC_HEADS =		\
 		$(NULL)
 
 MAIN_HEADS =			\
-	main/args.h		\
+	main/args_p.h		\
 	main/colprint.h		\
 	main/ctags.h		\
 	main/dependency.h	\

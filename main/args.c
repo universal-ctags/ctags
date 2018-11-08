@@ -16,7 +16,7 @@
 #include <string.h>
 #include <ctype.h>
 
-#include "args.h"
+#include "args_p.h"
 #include "debug.h"
 #include "routines.h"
 #include "vstring.h"

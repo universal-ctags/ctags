@@ -20,7 +20,7 @@
 */
 #include "general.h"  /* must always come first */
 
-#include "args.h"
+#include "args_p.h"
 #include "field.h"
 #include "fmt.h"
 #include "options.h"

@@ -494,7 +494,7 @@
     <ClInclude Include="..\gnu_regex\regex.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\main\args.h">
+    <ClInclude Include="..\main\args_p.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\main\colprint.h">
