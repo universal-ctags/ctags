@@ -22,7 +22,7 @@ MAIN_PUBLIC_HEADS =		\
 
 MAIN_HEADS =			\
 	main/args_p.h		\
-	main/colprint.h		\
+	main/colprint_p.h	\
 	main/ctags.h		\
 	main/dependency.h	\
 	main/entry_p.h		\

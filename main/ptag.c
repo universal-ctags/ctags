@@ -13,7 +13,7 @@
 
 #include "general.h"  /* must always come first */
 
-#include "colprint.h"
+#include "colprint_p.h"
 #include "ctags.h"
 #include "debug.h"
 #include "entry_p.h"

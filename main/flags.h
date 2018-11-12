@@ -12,7 +12,7 @@
 #define CTAGS_MAIN_FLAGS_H
 
 #include "general.h"
-#include "colprint.h"
+#include "colprint_p.h"
 
 
 #define LONG_FLAGS_OPEN  '{'

@@ -13,7 +13,7 @@
 #define CTAGS_MAIN_FIELD_H
 
 #include "general.h"
-#include "colprint.h"
+#include "colprint_p.h"
 #include "writer_p.h"
 #include "types.h"
 

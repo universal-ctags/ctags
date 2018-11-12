@@ -14,7 +14,7 @@
 
 #include "general.h"
 
-#include "colprint.h"
+#include "colprint_p.h"
 #include "types.h"
 
 struct sParameterHandlerTable {

@@ -26,7 +26,7 @@
 #include <regex.h>
 
 #include "debug.h"
-#include "colprint.h"
+#include "colprint_p.h"
 #include "entry.h"
 #include "flags.h"
 #include "htable.h"

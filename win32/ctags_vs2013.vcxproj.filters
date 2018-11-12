@@ -497,7 +497,7 @@
     <ClInclude Include="..\main\args_p.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\main\colprint.h">
+    <ClInclude Include="..\main\colprint_p.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\main\ctags.h">
