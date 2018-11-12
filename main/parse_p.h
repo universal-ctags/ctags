@@ -14,7 +14,7 @@
 */
 #include "general.h"  /* must always come first */
 #include "kind.h"
-#include "lregex.h"
+#include "lregex_p.h"
 #include "parse.h"
 #include "parsers.h"  /* contains list of parsers */
 #include "strlist.h"
