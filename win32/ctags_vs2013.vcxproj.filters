@@ -635,7 +635,7 @@
     <ClInclude Include="..\main\vstring.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\main\writer.h">
+    <ClInclude Include="..\main\writer_p.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\main\xtag.h">

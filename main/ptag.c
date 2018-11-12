@@ -20,7 +20,7 @@
 #include "options_p.h"
 #include "parse_p.h"
 #include "ptag.h"
-#include "writer.h"
+#include "writer_p.h"
 #include <string.h>
 
 

@@ -295,7 +295,7 @@
     <ClInclude Include="..\main\trashbox.h" />
     <ClInclude Include="..\main\types.h" />
     <ClInclude Include="..\main\vstring.h" />
-    <ClInclude Include="..\main\writer.h" />
+    <ClInclude Include="..\main\writer_p.h" />
     <ClInclude Include="..\main\xtag.h" />
     <ClInclude Include="..\parsers\cpreprocessor.h" />
     <ClInclude Include="..\parsers\cxx\cxx_debug.h" />

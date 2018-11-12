@@ -55,7 +55,7 @@
 #include "strlist.h"
 #include "subparser.h"
 #include "trashbox.h"
-#include "writer.h"
+#include "writer_p.h"
 #include "xtag.h"
 
 /*

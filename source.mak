@@ -63,7 +63,7 @@ MAIN_HEADS =			\
 	main/trashbox.h		\
 	main/types.h		\
 	main/vstring.h		\
-	main/writer.h		\
+	main/writer_p.h		\
 	main/xtag.h		\
 	\
 	$(MAIN_PUBLIC_HEADS)    \

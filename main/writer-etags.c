@@ -17,7 +17,7 @@
 #include "options_p.h"
 #include "read.h"
 #include "vstring.h"
-#include "writer.h"
+#include "writer_p.h"
 
 
 #define ETAGS_FILE  "TAGS"

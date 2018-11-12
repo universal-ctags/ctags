@@ -15,7 +15,7 @@
 #include "options_p.h"
 #include "read.h"
 #include "ptag.h"
-#include "writer.h"
+#include "writer_p.h"
 
 
 #include <string.h>

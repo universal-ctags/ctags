@@ -9,7 +9,7 @@
 
 #include "general.h"
 #include "entry_p.h"
-#include "writer.h"
+#include "writer_p.h"
 
 extern tagWriter uCtagsWriter;
 extern tagWriter eCtagsWriter;

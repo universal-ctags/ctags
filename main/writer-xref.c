@@ -13,7 +13,7 @@
 #include "fmt.h"
 #include "mio.h"
 #include "options_p.h"
-#include "writer.h"
+#include "writer_p.h"
 
 
 static int writeXrefEntry  (tagWriter *writer CTAGS_ATTR_UNUSED,

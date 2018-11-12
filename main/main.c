@@ -74,7 +74,7 @@
 #include "routines.h"
 #include "trace.h"
 #include "trashbox.h"
-#include "writer.h"
+#include "writer_p.h"
 
 #ifdef HAVE_JANSSON
 #include "interactive_p.h"

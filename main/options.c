@@ -37,7 +37,7 @@
 #include "routines.h"
 #include "error.h"
 #include "interactive_p.h"
-#include "writer.h"
+#include "writer_p.h"
 #include "trace.h"
 
 #ifdef HAVE_JANSSON

@@ -14,7 +14,7 @@
 
 #include "general.h"
 #include "colprint.h"
-#include "writer.h"
+#include "writer_p.h"
 #include "types.h"
 
 #include "vstring.h"
