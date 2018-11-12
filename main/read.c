@@ -25,7 +25,7 @@
 #include "routines.h"
 #include "options_p.h"
 #include "parse_p.h"
-#include "promise.h"
+#include "promise_p.h"
 #include "trace.h"
 #include "trashbox.h"
 #ifdef HAVE_ICONV

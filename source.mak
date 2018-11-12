@@ -17,6 +17,7 @@ MAIN_PUBLIC_HEADS =		\
 		main/keyword.h	\
 		main/options.h	\
 		main/parse.h	\
+		main/promise.h	\
 		\
 		$(NULL)
 
@@ -49,7 +50,7 @@ MAIN_HEADS =			\
 	main/parse_p.h		\
 	main/parsers.h		\
 	main/portable-dirent.h	\
-	main/promise.h		\
+	main/promise_p.h	\
 	main/ptag.h		\
 	main/ptrarray.h		\
 	main/read.h		\

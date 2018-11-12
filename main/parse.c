@@ -30,6 +30,7 @@
 #include "parse_p.h"
 #include "parsers.h"
 #include "promise.h"
+#include "promise_p.h"
 #include "ptag.h"
 #include "ptrarray.h"
 #include "read.h"
