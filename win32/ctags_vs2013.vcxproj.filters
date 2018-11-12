@@ -530,6 +530,9 @@
     <ClInclude Include="..\main\fmt.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\main\fmt_p.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="..\main\gcc-attr.h">
       <Filter>Header Files</Filter>
     </ClInclude>

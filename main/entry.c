@@ -41,7 +41,7 @@
 #include "debug.h"
 #include "entry_p.h"
 #include "field.h"
-#include "fmt.h"
+#include "fmt_p.h"
 #include "kind.h"
 #include "main.h"
 #include "nestlevel.h"

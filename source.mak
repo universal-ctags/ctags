@@ -30,7 +30,7 @@ MAIN_HEADS =			\
 	main/error.h		\
 	main/field.h		\
 	main/flags_p.h		\
-	main/fmt.h		\
+	main/fmt_p.h		\
 	main/gcc-attr.h		\
 	main/general.h		\
 	main/htable.h		\

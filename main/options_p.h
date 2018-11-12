@@ -22,7 +22,7 @@
 
 #include "args_p.h"
 #include "field.h"
-#include "fmt.h"
+#include "fmt_p.h"
 #include "options.h"
 #include "parse.h"
 #include "strlist.h"

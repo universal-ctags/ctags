@@ -13,7 +13,7 @@
 #include "general.h"
 #include "debug.h"
 #include "entry_p.h"
-#include "fmt.h"
+#include "fmt_p.h"
 #include "field.h"
 #include "parse.h"
 #include "routines.h"
