@@ -17,7 +17,7 @@
 #include <stdio.h>
 
 #include "ctags.h"
-#include "flags.h"
+#include "flags_p.h"
 #include "vstring.h"
 #include "routines.h"
 

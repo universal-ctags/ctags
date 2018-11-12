@@ -22,7 +22,7 @@
 #include "ctags.h"
 #include "debug.h"
 #include "entry_p.h"
-#include "flags.h"
+#include "flags_p.h"
 #include "htable.h"
 #include "keyword.h"
 #include "main.h"

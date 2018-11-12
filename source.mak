@@ -29,7 +29,7 @@ MAIN_HEADS =			\
 	main/entry_p.h		\
 	main/error.h		\
 	main/field.h		\
-	main/flags.h		\
+	main/flags_p.h		\
 	main/fmt.h		\
 	main/gcc-attr.h		\
 	main/general.h		\

@@ -28,7 +28,7 @@
 #include "debug.h"
 #include "colprint_p.h"
 #include "entry.h"
-#include "flags.h"
+#include "flags_p.h"
 #include "htable.h"
 #include "kind.h"
 #include "options.h"
