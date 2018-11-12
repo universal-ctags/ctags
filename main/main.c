@@ -66,7 +66,7 @@
 #include "entry_p.h"
 #include "error.h"
 #include "field.h"
-#include "keyword.h"
+#include "keyword_p.h"
 #include "main.h"
 #include "options_p.h"
 #include "parse_p.h"

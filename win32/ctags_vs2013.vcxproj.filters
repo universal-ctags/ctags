@@ -548,6 +548,9 @@
     <ClInclude Include="..\main\keyword.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\main\keyword_p.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="..\main\kind.h">
       <Filter>Header Files</Filter>
     </ClInclude>

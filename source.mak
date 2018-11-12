@@ -14,6 +14,7 @@ MIO_SRCS  = main/mio.c
 MAIN_PUBLIC_HEADS =		\
 		main/entry.h	\
 		main/gvars.h	\
+		main/keyword.h	\
 		main/options.h	\
 		main/parse.h	\
 		\
@@ -34,7 +35,7 @@ MAIN_HEADS =			\
 	main/htable.h		\
 	main/inline.h		\
 	main/interactive_p.h	\
-	main/keyword.h		\
+	main/keyword_p.h	\
 	main/kind.h		\
 	main/lregex.h		\
 	main/lxpath.h		\
