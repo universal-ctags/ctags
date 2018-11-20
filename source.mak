@@ -50,7 +50,7 @@ MAIN_HEADS =			\
 	main/param.h		\
 	main/parse_p.h		\
 	main/parsers.h		\
-	main/portable-dirent.h	\
+	main/portable-dirent_p.h\
 	main/promise_p.h	\
 	main/ptag_p.h		\
 	main/ptrarray.h		\
