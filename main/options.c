@@ -30,7 +30,7 @@
 #include "keyword.h"
 #include "main.h"
 #include "parse_p.h"
-#include "ptag.h"
+#include "ptag_p.h"
 #include "routines.h"
 #include "xtag.h"
 #include "param.h"

@@ -46,7 +46,7 @@
 #include "main.h"
 #include "nestlevel.h"
 #include "options_p.h"
-#include "ptag.h"
+#include "ptag_p.h"
 #include "read.h"
 #include "routines.h"
 #include "parse_p.h"

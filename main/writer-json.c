@@ -14,7 +14,7 @@
 #include "mio.h"
 #include "options_p.h"
 #include "read.h"
-#include "ptag.h"
+#include "ptag_p.h"
 #include "writer_p.h"
 
 

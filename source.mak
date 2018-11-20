@@ -51,7 +51,7 @@ MAIN_HEADS =			\
 	main/parsers.h		\
 	main/portable-dirent.h	\
 	main/promise_p.h	\
-	main/ptag.h		\
+	main/ptag_p.h		\
 	main/ptrarray.h		\
 	main/read.h		\
 	main/routines.h		\

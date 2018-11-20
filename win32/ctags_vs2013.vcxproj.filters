@@ -608,7 +608,7 @@
     <ClInclude Include="..\main\promise_p.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\main\ptag.h">
+    <ClInclude Include="..\main\ptag_p.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\main\ptrarray.h">
