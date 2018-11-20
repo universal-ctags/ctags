@@ -109,6 +109,7 @@
  */
 
 #include "routines.h"
+#include "routines_p.h"
 
 #if HAVE_SCANDIR
 #include <dirent.h>

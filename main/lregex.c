@@ -35,6 +35,7 @@
 #include "parse_p.h"
 #include "read.h"
 #include "routines.h"
+#include "routines_p.h"
 #include "trashbox.h"
 
 static bool regexAvailable = false;

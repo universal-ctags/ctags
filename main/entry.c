@@ -49,6 +49,7 @@
 #include "ptag_p.h"
 #include "read.h"
 #include "routines.h"
+#include "routines_p.h"
 #include "parse_p.h"
 #include "ptrarray.h"
 #include "sort.h"

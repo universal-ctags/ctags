@@ -16,6 +16,7 @@
 #include "mio.h"
 #include "options_p.h"
 #include "read.h"
+#include "routines_p.h"
 #include "vstring.h"
 #include "writer_p.h"
 

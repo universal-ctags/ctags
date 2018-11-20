@@ -620,6 +620,9 @@
     <ClInclude Include="..\main\routines.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\main\routines_p.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="..\main\selectors.h">
       <Filter>Header Files</Filter>
     </ClInclude>

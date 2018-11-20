@@ -35,6 +35,7 @@
 #include "ptrarray.h"
 #include "read.h"
 #include "routines.h"
+#include "routines_p.h"
 #include "subparser.h"
 #include "trace.h"
 #include "trashbox.h"

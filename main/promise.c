@@ -19,6 +19,7 @@
 #include "trashbox.h"
 #include "xtag.h"
 #include "numarray.h"
+#include "routines.h"
 
 #include <string.h>
 

@@ -71,7 +71,7 @@
 #include "options_p.h"
 #include "parse_p.h"
 #include "read.h"
-#include "routines.h"
+#include "routines_p.h"
 #include "trace.h"
 #include "trashbox.h"
 #include "writer_p.h"

@@ -18,6 +18,7 @@ MAIN_PUBLIC_HEADS =		\
 		main/options.h	\
 		main/parse.h	\
 		main/promise.h	\
+		main/routines.h	\
 		\
 		$(NULL)
 
@@ -54,7 +55,7 @@ MAIN_HEADS =			\
 	main/ptag_p.h		\
 	main/ptrarray.h		\
 	main/read.h		\
-	main/routines.h		\
+	main/routines_p.h	\
 	main/selectors.h	\
 	main/sort.h		\
 	main/strlist.h		\

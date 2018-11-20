@@ -11,6 +11,7 @@
 
 #include "general.h"
 #include "options_p.h"
+#include "routines.h"
 
 
 struct interactiveModeArgs
