@@ -551,6 +551,9 @@ static bool isIgnoreBranch (void)
 	{
 		CXX_DEBUG_PRINT("Choosing single branch");
 		ifdef->singleBranch = true;
+	} else {
+		CXX_DEBUG_PRINT("Choosing all branch");
+		ifdef->singleBranch = false;
 	}
 
 	/*  We will ignore this branch in the following cases:
