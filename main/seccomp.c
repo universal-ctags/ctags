@@ -41,10 +41,12 @@ int installSyscallFilter (void)
 
 	// The bowels of stdio want to know the size of a file, even for stdout.
 	seccomp_rule_add (ctx, SCMP_ACT_ALLOW, SCMP_SYS (fstat), 0);
+	seccomp_rule_add (ctx, SCMP_ACT_ALLOW, SCMP_SYS (fstat64), 0);
 
 	// seems unnecessary, but this comes from
 	// main/parse.c:2764 : tagFilePosition (&tagfpos);
 	seccomp_rule_add (ctx, SCMP_ACT_ALLOW, SCMP_SYS (lseek), 0);
+	seccomp_rule_add (ctx, SCMP_ACT_ALLOW, SCMP_SYS (_llseek), 0);
 
 	// libxml2 uses pthread_once, which in turn uses a futex
 	seccomp_rule_add (ctx, SCMP_ACT_ALLOW, SCMP_SYS (futex), 0);
