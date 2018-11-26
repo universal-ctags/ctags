@@ -10,10 +10,10 @@
 #include "general.h"  /* must always come first */
 
 #include "entry.h"
-#include "fmt.h"
+#include "fmt_p.h"
 #include "mio.h"
 #include "options_p.h"
-#include "writer.h"
+#include "writer_p.h"
 
 
 static int writeXrefEntry  (tagWriter *writer CTAGS_ATTR_UNUSED,

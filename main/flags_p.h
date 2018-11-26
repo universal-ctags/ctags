@@ -8,11 +8,11 @@
 *
 *   Defines external interface to option processing.
 */
-#ifndef CTAGS_MAIN_FLAGS_H
-#define CTAGS_MAIN_FLAGS_H
+#ifndef CTAGS_MAIN_FLAGS_PRIVATE_H
+#define CTAGS_MAIN_FLAGS_PRIVATE_H
 
 #include "general.h"
-#include "colprint.h"
+#include "colprint_p.h"
 
 
 #define LONG_FLAGS_OPEN  '{'
@@ -32,4 +32,4 @@ extern struct colprintTable * flagsColprintTableNew (void);
 extern void flagsColprintAddDefinitions (struct colprintTable *table, flagDefinition* def, unsigned int ndefs);
 extern void flagsColprintTablePrint (struct colprintTable *table,
 									 bool withListHeader, bool machinable, FILE *fp);
-#endif	/* CTAGS_MAIN_FLAGS_H */
+#endif	/* CTAGS_MAIN_FLAGS_PRIVATE_H */

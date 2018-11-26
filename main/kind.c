@@ -21,6 +21,7 @@
 #include "kind.h"
 #include "parse_p.h"
 #include "options.h"
+#include "routines.h"
 #include "vstring.h"
 
 typedef struct sRoleObject {

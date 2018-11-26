@@ -5,8 +5,8 @@
 *   GNU General Public License version 2 or (at your option) any later version.
 *
 */
-#ifndef CTAGS_MAIN_COLPRINT_H
-#define CTAGS_MAIN_COLPRINT_H
+#ifndef CTAGS_MAIN_COLPRINT_PRIVATE_H
+#define CTAGS_MAIN_COLPRINT_PRIVATE_H
 
 #include "general.h"
 
@@ -34,4 +34,4 @@ void colprintLineAppendColumnBool (struct colprintLine *line, bool column);
 
 const char *colprintLineGetColumn (struct colprintLine *line, unsigned int column);
 
-#endif /* CTAGS_MAIN_COLPRINT_H */
+#endif /* CTAGS_MAIN_COLPRINT_PRIVATE_H */

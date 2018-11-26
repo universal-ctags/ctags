@@ -13,9 +13,9 @@
 #include "mio.h"
 #include "options_p.h"
 #include "parse_p.h"
-#include "ptag.h"
+#include "ptag_p.h"
 #include "read.h"
-#include "writer.h"
+#include "writer_p.h"
 
 
 #define CTAGS_FILE  "tags"

@@ -13,7 +13,7 @@
 #define CTAGS_MAIN_XTAG_H
 
 #include "general.h"
-#include "colprint.h"
+#include "colprint_p.h"
 
 
 typedef enum eXtagType { /* extra tag content control */

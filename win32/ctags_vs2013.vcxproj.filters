@@ -494,10 +494,10 @@
     <ClInclude Include="..\gnu_regex\regex.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\main\args.h">
+    <ClInclude Include="..\main\args_p.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\main\colprint.h">
+    <ClInclude Include="..\main\colprint_p.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\main\ctags.h">
@@ -524,10 +524,13 @@
     <ClInclude Include="..\main\field.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\main\flags.h">
+    <ClInclude Include="..\main\flags_p.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\main\fmt.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\main\fmt_p.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\main\gcc-attr.h">
@@ -548,10 +551,16 @@
     <ClInclude Include="..\main\keyword.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\main\keyword_p.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="..\main\kind.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\main\lregex.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\main\lregex_p.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\main\lxpath.h">
@@ -590,13 +599,16 @@
     <ClInclude Include="..\main\parsers.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\main\portable-dirent.h">
+    <ClInclude Include="..\main\portable-dirent_p.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\main\promise.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\main\ptag.h">
+    <ClInclude Include="..\main\promise_p.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\main\ptag_p.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\main\ptrarray.h">
@@ -606,6 +618,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\main\routines.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\main\routines_p.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\main\selectors.h">
@@ -632,7 +647,7 @@
     <ClInclude Include="..\main\vstring.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\main\writer.h">
+    <ClInclude Include="..\main\writer_p.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\main\xtag.h">

@@ -14,6 +14,7 @@
 */
 #include "general.h"  /* must always come first */
 #include "gvars.h"
+#include "keyword_p.h"
 
 #include <stdarg.h>
 

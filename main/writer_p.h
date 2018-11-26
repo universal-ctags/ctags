@@ -6,8 +6,8 @@
 *   GNU General Public License version 2 or (at your option) any later version.
 *
 */
-#ifndef CTAGS_MAIN_WRITER_H
-#define CTAGS_MAIN_WRITER_H
+#ifndef CTAGS_MAIN_WRITER_PRIVATE_H
+#define CTAGS_MAIN_WRITER_PRIVATE_H
 
 #include "general.h"  /* must always come first */
 #include "mio.h"
@@ -75,4 +75,4 @@ extern bool ptagMakeCtagsOutputMode (ptagDesc *desc, void *data CTAGS_ATTR_UNUSE
 
 extern bool writerCanPrintPtag (void);
 
-#endif
+#endif	/* CTAGS_MAIN_WRITER_PRIVATE_H */

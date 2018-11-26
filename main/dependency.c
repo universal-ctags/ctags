@@ -17,6 +17,7 @@
 #include "options.h"
 #include "parse_p.h"
 #include "read.h"
+#include "routines.h"
 #include "subparser.h"
 #include "xtag.h"
 

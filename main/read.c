@@ -23,9 +23,10 @@
 #include "entry_p.h"
 #include "main.h"
 #include "routines.h"
+#include "routines_p.h"
 #include "options_p.h"
 #include "parse_p.h"
-#include "promise.h"
+#include "promise_p.h"
 #include "trace.h"
 #include "trashbox.h"
 #ifdef HAVE_ICONV

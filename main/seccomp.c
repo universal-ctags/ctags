@@ -11,6 +11,7 @@
 #include "general.h"
 #include "debug.h"
 #include "interactive_p.h"
+#include "routines.h"
 
 #ifdef HAVE_SECCOMP
 #include <seccomp.h>

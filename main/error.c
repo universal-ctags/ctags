@@ -13,6 +13,7 @@
 
 #include "error.h"
 #include "options_p.h"
+#include "routines_p.h"
 
 #ifdef HAVE_JANSSON
 #include <jansson.h>

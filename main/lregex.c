@@ -26,15 +26,16 @@
 #include <regex.h>
 
 #include "debug.h"
-#include "colprint.h"
+#include "colprint_p.h"
 #include "entry.h"
-#include "flags.h"
+#include "flags_p.h"
 #include "htable.h"
 #include "kind.h"
 #include "options.h"
 #include "parse_p.h"
 #include "read.h"
 #include "routines.h"
+#include "routines_p.h"
 #include "trashbox.h"
 
 static bool regexAvailable = false;

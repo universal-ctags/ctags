@@ -14,27 +14,41 @@ MIO_SRCS  = main/mio.c
 MAIN_PUBLIC_HEADS =		\
 		main/entry.h	\
 		main/gvars.h	\
+		main/keyword.h	\
 		main/options.h	\
 		main/parse.h	\
+		main/promise.h	\
+		main/routines.h	\
+		\
+		$(NULL)
+
+MAIN_PRIVATE_HEADS =		\
+	main/args_p.h		\
+	main/colprint_p.h	\
+	main/entry_p.h		\
+	main/flags_p.h		\
+	main/fmt_p.h		\
+	main/interactive_p.h	\
+	main/keyword_p.h	\
+	main/options_p.h	\
+	main/parse_p.h		\
+	main/portable-dirent_p.h\
+	main/promise_p.h	\
+	main/ptag_p.h		\
+	main/routines_p.h	\
+	main/writer_p.h		\
 		\
 		$(NULL)
 
 MAIN_HEADS =			\
-	main/args.h		\
-	main/colprint.h		\
 	main/ctags.h		\
 	main/dependency.h	\
-	main/entry_p.h		\
 	main/error.h		\
 	main/field.h		\
-	main/flags.h		\
-	main/fmt.h		\
 	main/gcc-attr.h		\
 	main/general.h		\
 	main/htable.h		\
 	main/inline.h		\
-	main/interactive_p.h	\
-	main/keyword.h		\
 	main/kind.h		\
 	main/lregex.h		\
 	main/lxpath.h		\
@@ -43,16 +57,10 @@ MAIN_HEADS =			\
 	main/nestlevel.h	\
 	main/numarray.h		\
 	main/objpool.h		\
-	main/options_p.h	\
 	main/param.h		\
-	main/parse_p.h		\
 	main/parsers.h		\
-	main/portable-dirent.h	\
-	main/promise.h		\
-	main/ptag.h		\
 	main/ptrarray.h		\
 	main/read.h		\
-	main/routines.h		\
 	main/selectors.h	\
 	main/sort.h		\
 	main/strlist.h		\
@@ -62,10 +70,10 @@ MAIN_HEADS =			\
 	main/trashbox.h		\
 	main/types.h		\
 	main/vstring.h		\
-	main/writer.h		\
 	main/xtag.h		\
 	\
 	$(MAIN_PUBLIC_HEADS)    \
+	$(MAIN_PRIVATE_HEADS)   \
 	\
 	$(MIO_HEADS)
 

@@ -17,6 +17,7 @@
 
 #include "debug.h"
 #include "keyword.h"
+#include "keyword_p.h"
 #include "parse.h"
 #include "routines.h"
 

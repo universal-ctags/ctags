@@ -58,6 +58,7 @@
 #endif
 #include "debug.h"
 #include "routines.h"
+#include "routines_p.h"
 #ifdef HAVE_ICONV
 # include "mbcs.h"
 #endif

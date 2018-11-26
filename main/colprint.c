@@ -7,7 +7,7 @@
 */
 #include "general.h"  /* must always come first */
 
-#include "colprint.h"
+#include "colprint_p.h"
 #include "ptrarray.h"
 #include "routines.h"
 #include "strlist.h"

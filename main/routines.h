@@ -16,7 +16,6 @@
 
 #include <stdio.h>
 
-#include "mio.h"
 
 /*
 *   MACROS
@@ -32,68 +31,14 @@
 #define STRINGIFY_(X) #X
 
 /*
- *  Portability macros
- */
-#ifndef PATH_SEPARATOR
-# if defined (MSDOS_STYLE_PATH)
-#  define PATH_SEPARATOR '\\'
-# else
-#  define PATH_SEPARATOR '/'
-# endif
-#endif
-
-#if defined (MSDOS_STYLE_PATH) && defined (UNIX_PATH_SEPARATOR)
-# define OUTPUT_PATH_SEPARATOR	'/'
-#else
-# define OUTPUT_PATH_SEPARATOR	PATH_SEPARATOR
-#endif
-
-/*
 *   DATA DECLARATIONS
 */
-#if defined (MSDOS_STYLE_PATH)
-extern const char *const PathDelimiters;
-#endif
-extern char *CurrentDirectory;
 typedef int errorSelection;
 enum eErrorTypes { FATAL = 1, WARNING = 2, PERROR = 4 };
-
-typedef struct {
-		/* Name of file for which status is valid */
-	char* name;
-
-		/* Does file exist? If not, members below do not contain valid data. */
-	bool exists;
-
-		/* is file path a symbolic link to another file? */
-	bool isSymbolicLink;
-
-		/* Is file (pointed to) a directory? */
-	bool isDirectory;
-
-		/* Is file (pointed to) a normal file? */
-	bool isNormalFile;
-
-		/* Is file (pointed to) executable? */
-	bool isExecutable;
-
-		/* Is file (pointed to) setuid? */
-	bool isSetuid;
-
-		/* Is file (pointed to) setgid? */
-	bool isSetgid;
-
-		/* Size of file (pointed to) */
-	unsigned long size;
-} fileStatus;
 
 /*
 *   FUNCTION PROTOTYPES
 */
-extern void freeRoutineResources (void);
-extern void setExecutableName (const char *const path);
-extern const char *getExecutableName (void);
-extern const char *getExecutablePath (void);
 extern void error (const errorSelection selection, const char *const format, ...) CTAGS_ATTR_PRINTF (2, 3);
 
 /* Memory allocation functions */
@@ -126,28 +71,7 @@ extern bool strToInt(const char *const str, int base, int *value);
 extern bool strToLong(const char *const string, int base, long *value);
 
 /* File system functions */
-extern void setCurrentDirectory (void);
-extern fileStatus *eStat (const char *const fileName);
-extern void eStatFree (fileStatus *status);
-extern bool doesFileExist (const char *const fileName);
-extern bool doesExecutableExist (const char *const fileName);
-extern bool isRecursiveLink (const char* const dirName);
-extern bool isSameFile (const char *const name1, const char *const name2);
 extern const char *baseFilename (const char *const filePath);
 extern const char *fileExtension (const char *const fileName);
-extern bool isAbsolutePath (const char *const path);
-extern char *combinePathAndFile (const char *const path, const char *const file);
-extern char* absoluteFilename (const char *file);
-extern char* absoluteDirname (char *file);
-extern char* relativeFilename (const char *file, const char *dir);
-extern MIO *tempFile (const char *const mode, char **const pName);
-
-extern char* baseFilenameSansExtensionNew (const char *const fileName, const char *const templateExt);
-
-#include "portable-dirent.h"
-
-extern int scanDirectory (const char *directory_name,
-						  struct dirent ***array_pointer, int (*select_function) (const struct dirent *),
-						  int (*compare_function) (const struct dirent **, const struct dirent **));
 
 #endif  /* CTAGS_MAIN_ROUTINES_H */

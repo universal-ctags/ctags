@@ -18,7 +18,7 @@
 #include "parse_p.h"
 #include "routines.h"
 #include "trashbox.h"
-#include "writer.h"
+#include "writer_p.h"
 #include "xtag.h"
 
 #include <string.h>

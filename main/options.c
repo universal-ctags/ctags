@@ -30,14 +30,13 @@
 #include "keyword.h"
 #include "main.h"
 #include "parse_p.h"
-#include "ptag.h"
-#include "routines.h"
+#include "ptag_p.h"
+#include "routines_p.h"
 #include "xtag.h"
 #include "param.h"
-#include "routines.h"
 #include "error.h"
 #include "interactive_p.h"
-#include "writer.h"
+#include "writer_p.h"
 #include "trace.h"
 
 #ifdef HAVE_JANSSON
