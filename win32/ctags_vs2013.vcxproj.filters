@@ -518,7 +518,7 @@
     <ClInclude Include="..\main\entry_p.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\main\error.h">
+    <ClInclude Include="..\main\error_p.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\main\field.h">

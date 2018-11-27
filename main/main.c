@@ -64,7 +64,7 @@
 #include "ctags.h"
 #include "debug.h"
 #include "entry_p.h"
-#include "error.h"
+#include "error_p.h"
 #include "field.h"
 #include "keyword_p.h"
 #include "main.h"

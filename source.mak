@@ -27,6 +27,7 @@ MAIN_PRIVATE_HEADS =		\
 	main/args_p.h		\
 	main/colprint_p.h	\
 	main/entry_p.h		\
+	main/error_p.h		\
 	main/flags_p.h		\
 	main/fmt_p.h		\
 	main/interactive_p.h	\
@@ -45,7 +46,6 @@ MAIN_PRIVATE_HEADS =		\
 MAIN_HEADS =			\
 	main/ctags.h		\
 	main/dependency.h	\
-	main/error.h		\
 	main/field.h		\
 	main/gcc-attr.h		\
 	main/general.h		\
