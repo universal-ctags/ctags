@@ -52,7 +52,7 @@
 #include "routines_p.h"
 #include "parse_p.h"
 #include "ptrarray.h"
-#include "sort.h"
+#include "sort_p.h"
 #include "strlist.h"
 #include "subparser.h"
 #include "trashbox.h"

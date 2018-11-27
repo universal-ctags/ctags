@@ -39,6 +39,7 @@ MAIN_PRIVATE_HEADS =		\
 	main/promise_p.h	\
 	main/ptag_p.h		\
 	main/routines_p.h	\
+	main/sort_p.h		\
 	main/writer_p.h		\
 		\
 		$(NULL)
@@ -63,7 +64,6 @@ MAIN_HEADS =			\
 	main/ptrarray.h		\
 	main/read.h		\
 	main/selectors.h	\
-	main/sort.h		\
 	main/strlist.h		\
 	main/subparser.h	\
 	main/trace.h		\
