@@ -13,13 +13,25 @@ MIO_SRCS  = main/mio.c
 
 MAIN_PUBLIC_HEADS =		\
 		main/entry.h	\
+		main/gcc-attr.h	\
 		main/gvars.h	\
+		main/htable.h	\
+		main/inline.h	\
 		main/keyword.h	\
 		main/lregex.h	\
+		main/nestlevel.h\
+		main/numarray.h	\
+		main/objpool.h	\
 		main/options.h	\
 		main/parse.h	\
 		main/promise.h	\
+		main/ptrarray.h	\
 		main/routines.h	\
+		main/strlist.h	\
+		main/tokeninfo.h\
+		main/trace.h	\
+		main/types.h	\
+		main/vstring.h	\
 		\
 		$(NULL)
 
@@ -48,29 +60,17 @@ MAIN_HEADS =			\
 	main/ctags.h		\
 	main/dependency.h	\
 	main/field.h		\
-	main/gcc-attr.h		\
 	main/general.h		\
-	main/htable.h		\
-	main/inline.h		\
 	main/kind.h		\
 	main/lxpath.h		\
 	main/main.h		\
 	main/mbcs.h		\
-	main/nestlevel.h	\
-	main/numarray.h		\
-	main/objpool.h		\
 	main/param.h		\
 	main/parsers.h		\
-	main/ptrarray.h		\
 	main/read.h		\
 	main/selectors.h	\
-	main/strlist.h		\
 	main/subparser.h	\
-	main/trace.h		\
-	main/tokeninfo.h	\
 	main/trashbox.h		\
-	main/types.h		\
-	main/vstring.h		\
 	main/xtag.h		\
 	\
 	$(MAIN_PUBLIC_HEADS)    \
