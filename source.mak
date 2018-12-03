@@ -23,6 +23,7 @@ MAIN_PUBLIC_HEADS =		\
 		main/numarray.h	\
 		main/objpool.h	\
 		main/options.h	\
+		main/param.h	\
 		main/parse.h	\
 		main/promise.h	\
 		main/ptrarray.h	\
@@ -46,7 +47,9 @@ MAIN_PRIVATE_HEADS =		\
 	main/keyword_p.h	\
 	main/lregex_p.h		\
 	main/options_p.h	\
+	main/param_p.h		\
 	main/parse_p.h		\
+	main/parsers_p.h	\
 	main/portable-dirent_p.h\
 	main/promise_p.h	\
 	main/ptag_p.h		\
@@ -65,8 +68,6 @@ MAIN_HEADS =			\
 	main/lxpath.h		\
 	main/main.h		\
 	main/mbcs.h		\
-	main/param.h		\
-	main/parsers.h		\
 	main/read.h		\
 	main/selectors.h	\
 	main/subparser.h	\

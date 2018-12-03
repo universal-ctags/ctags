@@ -12,26 +12,26 @@
 #ifndef CTAGS_MAIN_PARAM_H
 #define CTAGS_MAIN_PARAM_H
 
+/*
+*   INCLUDE FILES
+*/
 #include "general.h"
 
-#include "colprint_p.h"
 #include "types.h"
 
+
+/*
+*   DATA DECLARATIONS
+*/
 struct sParameterHandlerTable {
 	const char *name;
 	const char *desc;
 	void  (* handleParameter) (langType lang, const char *name, const char *arg);
 };
 
-extern void applyParameter (const langType language, const char *name, const char *args);
-
-extern struct colprintTable * paramColprintTableNew (void);
-extern void paramColprintAddParameter (struct colprintTable *table,
-									   langType language,
-									   const parameterHandlerTable *const paramHandler);
-extern void paramColprintTablePrint (struct colprintTable *table, bool noparser,
-									bool withListHeader, bool machinable, FILE *fp);
-
+/*
+*   FUNCTION PROTOTYPES
+*/
 extern bool paramParserBool (const char *value, bool fallback,
 							 const char *errWhat, const char *errCategory);
 

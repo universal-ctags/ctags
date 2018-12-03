@@ -279,6 +279,7 @@
     <ClInclude Include="..\main\options.h" />
     <ClInclude Include="..\main\options_p.h" />
     <ClInclude Include="..\main\param.h" />
+    <ClInclude Include="..\main\param_p.h" />
     <ClInclude Include="..\main\parse.h" />
     <ClInclude Include="..\main\parse_p.h" />
     <ClInclude Include="..\main\parsers_p.h" />
