@@ -16,7 +16,7 @@
 #include "kind.h"
 #include "lregex_p.h"
 #include "parse.h"
-#include "parsers.h"  /* contains list of parsers */
+#include "parsers_p.h"  /* contains list of parsers */
 #include "strlist.h"
 
 /*

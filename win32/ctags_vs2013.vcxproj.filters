@@ -596,7 +596,7 @@
     <ClInclude Include="..\main\parse_.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\main\parsers.h">
+    <ClInclude Include="..\main\parsers_p.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\main\portable-dirent_p.h">
