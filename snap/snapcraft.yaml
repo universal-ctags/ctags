@@ -1,0 +1,22 @@
+name: universal-ctags # you probably want to 'snapcraft register <name>'
+version: '0.1.1' # just for humans, typically '1.2+git' or '1.3.2'
+summary: Symbol tags for tracing code # 79 char long summary
+description: |
+  The goal of the project is preparing and maintaining common/unified working
+  space where people interested in making ctags better can work together.
+
+grade: stable # must be 'stable' to release into candidate/stable channels
+confinement: strict # use 'strict' once you have the right plugs and slots
+
+apps:
+  ctags:
+    command: ctags
+    plugs:
+      - home
+
+parts:
+  universal-ctags:
+    source-type: git
+    source: https://github.com/universal-ctags/ctags.git
+    # See 'snapcraft plugins'
+    plugin: autotools
