@@ -1,0 +1,4 @@
+gv1	input.cpp	/^static inline int gv1;$/;"	v	typeref:typename:int	file:	properties:inline,static
+gv2	input.cpp	/^inline int gv2;$/;"	v	typeref:typename:int	properties:inline
+var1	input.cpp	/^	static inline int var1;$/;"	m	class:C1	typeref:typename:int	file:	properties:inline,static
+var2	input.cpp	/^	inline int var2;$/;"	m	class:C1	typeref:typename:int	file:	properties:inline
