@@ -94,12 +94,12 @@ static CXXKeywordDescriptor g_aCXXKeywordTable[] = {
 	{
 		"__inline",
 		CXXLanguageC | CXXLanguageCPP | CXXLanguageCUDA,
-		CXXKeywordExcludeFromTypeNames
+		CXXKeywordMayAppearInVariableDeclaration | CXXKeywordExcludeFromTypeNames
 	},
 	{
 		"__inline__",
 		CXXLanguageC | CXXLanguageCPP | CXXLanguageCUDA,
-		CXXKeywordExcludeFromTypeNames
+		CXXKeywordMayAppearInVariableDeclaration | CXXKeywordExcludeFromTypeNames
 	},
 	{
 		"__managed__",
@@ -322,7 +322,7 @@ static CXXKeywordDescriptor g_aCXXKeywordTable[] = {
 	{
 		"inline",
 		CXXLanguageC | CXXLanguageCPP | CXXLanguageCUDA,
-		CXXKeywordExcludeFromTypeNames
+		CXXKeywordMayAppearInVariableDeclaration | CXXKeywordExcludeFromTypeNames
 	},
 	{
 		"int",

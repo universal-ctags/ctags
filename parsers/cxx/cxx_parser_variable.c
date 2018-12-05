@@ -145,7 +145,11 @@ bool cxxParserExtractVariableDeclarations(CXXTokenChain * pChain,unsigned int uF
 		return false;
 	}
 
-	// Only keywords that can be parts of a type name.
+	// Only keywords that can appear in a variable declaration.
+	//
+	// TODO?: We might add this check also on the other tokens here
+	//        However it's unclear if it would provide some advantages
+	//        It would certainly be a small overhead.
 	if(
 			cxxTokenTypeIs(t,CXXTokenTypeKeyword) &&
 			(!cxxKeywordMayAppearInVariableDeclaration(t->eKeyword))
@@ -706,6 +710,8 @@ bool cxxParserExtractVariableDeclarations(CXXTokenChain * pChain,unsigned int uF
 					uProperties |= CXXTagPropertyExtern;
 				if(g_cxx.uKeywordState & CXXParserKeywordStateSeenMutable)
 					uProperties |= CXXTagPropertyMutable;
+				if(g_cxx.uKeywordState & CXXParserKeywordStateSeenInline)
+					uProperties |= CXXTagPropertyInline;
 				if(g_cxx.uKeywordState & CXXParserKeywordStateSeenAttributeDeprecated)
 					uProperties |= CXXTagPropertyDeprecated;
 				// Volatile is part of the type, so we don't mark it as a property

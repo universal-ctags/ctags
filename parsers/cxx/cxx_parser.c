@@ -1519,7 +1519,9 @@ check_function_signature:
 	if(
 		g_cxx.uKeywordState &
 		(
-			CXXParserKeywordStateSeenInline | CXXParserKeywordStateSeenExplicit |
+			// Note that since C++-17 inline can be used as a modifier for variables
+			// so don't be tempted to put it here.
+			CXXParserKeywordStateSeenExplicit |
 			CXXParserKeywordStateSeenOperator | CXXParserKeywordStateSeenVirtual
 		)
 	)
