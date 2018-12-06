@@ -2218,7 +2218,7 @@ static void findAdaTags(void)
 /* parser definition function */
 extern parserDefinition* AdaParser(void)
 {
-  static const char *const extensions[] = { "adb", "ads", "Ada", NULL };
+  static const char *const extensions[] = { "adb", "ads", "Ada", "ada", NULL };
   parserDefinition* def = parserNew("Ada");
   def->kindTable = AdaKinds;
   def->kindCount = ADA_KIND_COUNT;

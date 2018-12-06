@@ -9,13 +9,13 @@ MatLab   *.m
 
 [--map-<LANG>] adding *.m to Ada
 =======================================
-Ada      *.adb *.ads *.Ada *.m
+Ada      *.adb *.ads *.Ada *.ada *.m
 MatLab   *.m
 ObjectiveC *.mm *.m *.h
 
 [--map-<LANG>] removing from *.m from ObjectiveC, and adding *.m to Ada
 =======================================
-Ada      *.adb *.ads *.Ada *.m
+Ada      *.adb *.ads *.Ada *.ada *.m
 MatLab   *.m
 
 [--map-<LANG>] guessing parser with adding *.m to Ada
