@@ -45,25 +45,11 @@
 
 #ifdef QUALIFIER
 #define xMalloc(n,Type)    (Type *)eMalloc((size_t)(n) * sizeof (Type))
-#define xCalloc(n,Type)    (Type *)eCalloc((size_t)(n), sizeof (Type))
 #define xRealloc(p,n,Type) (Type *)eRealloc((p), (n) * sizeof (Type))
 
 static void *eMalloc (const size_t size)
 {
 	void *buffer = malloc (size);
-
-	if (buffer == NULL)
-	{
-		fprintf(stderr, "out of memory");
-		abort ();
-	}
-
-	return buffer;
-}
-
-static void *eCalloc (const size_t count, const size_t size)
-{
-	void *buffer = calloc (count, size);
 
 	if (buffer == NULL)
 	{
