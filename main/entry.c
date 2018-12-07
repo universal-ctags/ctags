@@ -710,7 +710,7 @@ static int vstring_puts (const char* s, void *data)
 	return vStringLength (str) - len;
 }
 
-#if DEBUG
+#ifdef DEBUG
 static bool isPosSet(MIOPos pos)
 {
 	char * p = (char *)&pos;
