@@ -167,9 +167,9 @@
 	}
 
 /* We expect the linker we use is enough clever to delete dead code. */
-impNumArray(char, Char, char);
-impNumArray(uchar, Uchar, unsigned char);
-impNumArray(int, Int, int);
-impNumArray(uint, Uint, unsigned int);
-impNumArray(long, Long, long);
-impNumArray(ulong, Ulong, unsigned long);
+impNumArray(char, Char, char)
+impNumArray(uchar, Uchar, unsigned char)
+impNumArray(int, Int, int)
+impNumArray(uint, Uint, unsigned int)
+impNumArray(long, Long, long)
+impNumArray(ulong, Ulong, unsigned long)
