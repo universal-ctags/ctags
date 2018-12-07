@@ -705,9 +705,9 @@ static int vstring_putc (char c, void *data)
 static int vstring_puts (const char* s, void *data)
 {
 	vString *str = data;
-	int len = vStringLength (str);
+	size_t len = vStringLength (str);
 	vStringCatS (str, s);
-	return vStringLength (str) - len;
+	return (int) (vStringLength (str) - len);
 }
 
 #ifdef DEBUG
