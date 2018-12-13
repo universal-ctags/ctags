@@ -38,11 +38,11 @@
 	\
 	extern void prefix##ArraySort (prefix##Array *const current, bool descendingOrder);
 
-declNumArray(char, Char, char);
-declNumArray(uchar, Uchar, unsigned char);
-declNumArray(int, Int, int);
-declNumArray(uint, Uint, unsigned int);
-declNumArray(long, Long, long);
-declNumArray(ulong, Ulong, unsigned long);
+declNumArray(char, Char, char)
+declNumArray(uchar, Uchar, unsigned char)
+declNumArray(int, Int, int)
+declNumArray(uint, Uint, unsigned int)
+declNumArray(long, Long, long)
+declNumArray(ulong, Ulong, unsigned long)
 
 #endif  /* CTAGS_MAIN_NUMARRAY_H */

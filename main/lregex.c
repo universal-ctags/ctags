@@ -1409,12 +1409,12 @@ static bool matchMultilineRegexPattern (struct lregexControlBlock *lcb,
 				 : pmatch [patbuf->mgroup.forNextScanning].rm_eo);
 		if (delta == 0)
 		{
-			unsigned int offset = current - start;
+			unsigned int pos = current - start;
 			error (WARNING,
 				   "a multi line regex pattern doesn't advance the input cursor: %s",
 				   patbuf->pattern_string);
 			error (WARNING, "Language: %s, input file: %s, pos: %u",
-				   getLanguageName (lcb->owner), getInputFileName(), offset);
+				   getLanguageName (lcb->owner), getInputFileName(), pos);
 			break;
 		}
 		current += delta;

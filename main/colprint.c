@@ -160,7 +160,7 @@ static void colprintHeaderColumnPrint (struct colprintHeaderColumn *headerCol, b
 	colprintColumnPrintGeneric (headerCol->value, headerCol, machinable, fp);
 }
 
-static void colprintHeaderPrint (ptrArray *header, int startFrom, bool withHeader, bool machinable, FILE *fp)
+static void colprintHeaderPrint (ptrArray *header, unsigned int startFrom, bool withHeader, bool machinable, FILE *fp)
 {
 	unsigned int i;
 
@@ -175,7 +175,7 @@ static void colprintHeaderPrint (ptrArray *header, int startFrom, bool withHeade
 	fputc('\n', fp);
 }
 
-static void colprintLinePrint  (stringList *line, int startFrom, ptrArray *header, bool machinable, FILE *fp)
+static void colprintLinePrint  (stringList *line, unsigned int startFrom, ptrArray *header, bool machinable, FILE *fp)
 {
 	unsigned int i;
 
@@ -186,7 +186,7 @@ static void colprintLinePrint  (stringList *line, int startFrom, ptrArray *heade
 		colprintColumnPrintGeneric(value, spec, machinable, fp);
 	}
 }
-static void colprintLinesPrint (ptrArray *lines, int startFrom, ptrArray *header, bool machinable, FILE *fp)
+static void colprintLinesPrint (ptrArray *lines, unsigned int startFrom, ptrArray *header, bool machinable, FILE *fp)
 {
 	unsigned int i;
 
