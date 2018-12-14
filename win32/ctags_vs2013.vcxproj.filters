@@ -509,6 +509,9 @@
     <ClInclude Include="..\main\dependency.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\main\dependency_p.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="..\main\e_msoft.h">
       <Filter>Header Files</Filter>
     </ClInclude>

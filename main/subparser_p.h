@@ -18,7 +18,7 @@
 #include "general.h"  /* must always come first */
 
 #include "colprint_p.h"
-#include "dependency.h"
+#include "dependency_p.h"
 #include "types.h"
 
 /*
