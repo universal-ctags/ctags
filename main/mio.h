@@ -123,7 +123,7 @@ MIO *mio_new_memory (unsigned char *data,
 					 MIOReallocFunc realloc_func,
 					 MIODestroyNotify free_func);
 
-MIO *mio_new_mio    (MIO *base, long start, size_t size);
+MIO *mio_new_mio    (MIO *base, long start, long size);
 MIO *mio_ref        (MIO *mio);
 
 int mio_free (MIO *mio);

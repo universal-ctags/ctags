@@ -854,7 +854,7 @@ struct getLangCtx {
 		    (mio_memory_get_data((_glc_)->input, NULL) == NULL)) \
 		{							\
 			MIO *tmp_ = (_glc_)->input;			\
-			(_glc_)->input = mio_new_mio (tmp_, 0, 0);	\
+			(_glc_)->input = mio_new_mio (tmp_, 0, -1);	\
 			mio_free (tmp_);				\
 			if (!(_glc_)->input) {				\
 				(_glc_)->err = true;			\

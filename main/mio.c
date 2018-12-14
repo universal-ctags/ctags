@@ -361,12 +361,12 @@ MIO *mio_new_memory (unsigned char *data,
  * @size: the length of the data copied from @base to new mio
  *
  * Creates a new #MIO object by copying data from existing #MIO (@base).
- * The range for copying are given with @start and @size.
+ * The range for copying is given with @start and @size.
  * Copying data at the range from @start to the end of @base is
- * done if 0 is given as @size.
+ * done if -1 is given as @size.
  *
- * If @size(!= 0) is larger than the length from @start to the end of
- * @base, %NULL is return.
+ * If @size is larger than the length from @start to the end of
+ * @base, %NULL is returned.
  *
  * The function doesn't move the file position of @base.
  *
@@ -374,7 +374,7 @@ MIO *mio_new_memory (unsigned char *data,
  *
  */
 
-MIO *mio_new_mio (MIO *base, long start, size_t size)
+MIO *mio_new_mio (MIO *base, long start, long size)
 {
 	unsigned char *data;
 	long original_pos;
@@ -383,7 +383,7 @@ MIO *mio_new_mio (MIO *base, long start, size_t size)
 
 	original_pos = mio_tell (base);
 
-	if (size == 0)
+	if (size == -1)
 	{
 		long end;
 
