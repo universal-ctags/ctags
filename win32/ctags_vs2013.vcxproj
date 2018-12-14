@@ -295,6 +295,7 @@
     <ClInclude Include="..\main\sort_p.h" />
     <ClInclude Include="..\main\strlist.h" />
     <ClInclude Include="..\main\subparser.h" />
+    <ClInclude Include="..\main\subparser_p.h" />
     <ClInclude Include="..\main\tokeninfo.h" />
     <ClInclude Include="..\main\trashbox.h" />
     <ClInclude Include="..\main\types.h" />

@@ -38,6 +38,7 @@
 #include "routines.h"
 #include "routines_p.h"
 #include "subparser.h"
+#include "subparser_p.h"
 #include "trace.h"
 #include "trashbox.h"
 #include "vstring.h"

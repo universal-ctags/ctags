@@ -54,7 +54,7 @@
 #include "ptrarray.h"
 #include "sort_p.h"
 #include "strlist.h"
-#include "subparser.h"
+#include "subparser_p.h"
 #include "trashbox.h"
 #include "writer_p.h"
 #include "xtag.h"

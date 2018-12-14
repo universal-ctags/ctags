@@ -29,6 +29,7 @@ MAIN_PUBLIC_HEADS =		\
 		main/ptrarray.h	\
 		main/routines.h	\
 		main/strlist.h	\
+		main/subparser.h\
 		main/tokeninfo.h\
 		main/trace.h	\
 		main/types.h	\
@@ -55,6 +56,7 @@ MAIN_PRIVATE_HEADS =		\
 	main/ptag_p.h		\
 	main/routines_p.h	\
 	main/sort_p.h		\
+	main/subparser_p.h	\
 	main/writer_p.h		\
 		\
 		$(NULL)
@@ -70,7 +72,6 @@ MAIN_HEADS =			\
 	main/mbcs.h		\
 	main/read.h		\
 	main/selectors.h	\
-	main/subparser.h	\
 	main/trashbox.h		\
 	main/xtag.h		\
 	\
