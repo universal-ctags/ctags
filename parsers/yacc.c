@@ -102,22 +102,25 @@ static bool leave_union (const char *line CTAGS_ATTR_UNUSED,
 
 static void make_promise_for_epilogue (void)
 {
-	const unsigned char *tmp, *last;
+	const unsigned char *tmp;
 	long endCharOffset;
 	unsigned long c_start;
 	unsigned long c_source_start;
 	unsigned long c_end;
 
-	c_start = getInputLineNumber ();
-	c_source_start = getSourceLineNumber();
+	/* We are at line with %% so the next line is the start of epilogue */
+	c_start = getInputLineNumber () + 1;
+	c_source_start = getSourceLineNumber() + 1;
 
 	/* Skip the lines for finding the EOF. */
 	endCharOffset = 0;
-	last = NULL;
 	while ((tmp = readLineFromInputFile ()))
-		last = tmp;
-	if (last)
-		endCharOffset = strlen ((const char *)last);
+	{
+		/* We want to get strlen() of the last line only but because
+		 * readLineFromInputFile() invalidates the previous value, get
+		 * endCharOffset here while the tmp variable is valid. */
+		endCharOffset = strlen ((const char *)tmp);
+	}
 	/* If `last' is too long, strlen returns a too large value
 	   for the positive area of `endCharOffset'. */
 	if (endCharOffset < 0)
@@ -199,8 +202,7 @@ static void runYaccParser (void)
 		}
 		else if (parserState.area == YACC_C_EPILOGUE)
 		{
-			if (readLineFromInputFile ())
-				make_promise_for_epilogue ();
+			make_promise_for_epilogue ();
 		}
 		last_area = parserState.area;
 	}
