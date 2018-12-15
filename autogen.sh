@@ -17,7 +17,7 @@ if [ -z "${MAKE}" ]; then
 fi
 
 ctags_files=`${MAKE} -s -f makefiles/list-translator-input.mak`
-misc/dist-test-cases > makefiles/test-cases.mak && \
+misc/dist-test-cases && \
     if autoreconf -vfi; then
 	if type perl > /dev/null; then
 	    for i in ${ctags_files}; do

@@ -1,6 +1,9 @@
 # -*- makefile -*-
 .PHONY: check units fuzz noise tmain tinst clean-units clean-tmain clean-gcov run-gcov codecheck cppcheck dicts cspell validate-input
 
+EXTRA_DIST += misc/units
+DIST_SUBDIRS = Tmain Units
+
 check: tmain units
 
 clean-local: clean-units clean-tmain

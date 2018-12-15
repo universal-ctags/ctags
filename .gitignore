@@ -12,6 +12,7 @@
 *.pdf
 *.ssexwsp
 *.ssexwsp.user
+*.tar.gz
 *.TMP
 *.tmp
 *~
@@ -57,7 +58,6 @@ syntax.vim
 tags
 tags.ref
 tags.test
-test-cases.mak
 test.*.diff
 tg
 tinst-root
@@ -77,3 +77,11 @@ man/ctags-incompatibilities.7.rst
 man/ctags-optlib.7
 man/ctags-optlib.7.html
 man/ctags-optlib.7.rst
+Tmain/**/Makefile
+Tmain/**/Makefile.am
+Tmain/**/Makefile.in
+Units/**/Makefile
+Units/**/Makefile.am
+Units/**/Makefile.in
+Tmain/dist.m4
+Units/dist.m4

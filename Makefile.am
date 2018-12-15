@@ -109,7 +109,6 @@ uninstall-hook:
 endif
 
 include $(top_srcdir)/makefiles/testing.mak
-include $(top_srcdir)/makefiles/test-cases.mak
 
 include $(top_srcdir)/makefiles/help.mak
 
