@@ -51,6 +51,11 @@ public:
 		return 0;
 	}
 	
+	int operator[](const X &a) const
+	{
+		return 0;
+	}
+	
 	// This should appear as member of the global namespace
 	inline friend X operator*(const X &a, const X &b)
 	{
