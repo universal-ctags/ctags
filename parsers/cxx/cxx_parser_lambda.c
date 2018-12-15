@@ -132,6 +132,17 @@ CXXToken * cxxParserOpeningBracketIsLambda(void)
 		return NULL;
 	}
 
+	if(
+		t->pPrev &&
+		// namely: operator [], operator new[], operator delete[]
+		cxxTokenTypeIs(t->pPrev,CXXTokenTypeKeyword)
+	)
+	{
+		// case 6
+		CXX_DEBUG_LEAVE_TEXT("Not a lambda: keyword before []");
+		return NULL;
+	}
+
 	t = t->pNext;
 
 	if(cxxTokenTypeIs(t,CXXTokenTypeParenthesisChain))
