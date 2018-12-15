@@ -15,6 +15,7 @@ MAIN_PUBLIC_HEADS =		\
 		main/entry.h	\
 		main/gvars.h	\
 		main/keyword.h	\
+		main/lregex.h	\
 		main/options.h	\
 		main/parse.h	\
 		main/promise.h	\
@@ -30,6 +31,7 @@ MAIN_PRIVATE_HEADS =		\
 	main/fmt_p.h		\
 	main/interactive_p.h	\
 	main/keyword_p.h	\
+	main/lregex_p.h		\
 	main/options_p.h	\
 	main/parse_p.h		\
 	main/portable-dirent_p.h\
@@ -50,7 +52,6 @@ MAIN_HEADS =			\
 	main/htable.h		\
 	main/inline.h		\
 	main/kind.h		\
-	main/lregex.h		\
 	main/lxpath.h		\
 	main/main.h		\
 	main/mbcs.h		\
