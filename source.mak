@@ -20,6 +20,7 @@ MAIN_PUBLIC_HEADS =		\
 		main/inline.h	\
 		main/keyword.h	\
 		main/lregex.h	\
+		main/mbcs.h	\
 		main/nestlevel.h\
 		main/numarray.h	\
 		main/objpool.h	\
@@ -49,6 +50,7 @@ MAIN_PRIVATE_HEADS =		\
 	main/interactive_p.h	\
 	main/keyword_p.h	\
 	main/lregex_p.h		\
+	main/mbcs_p.h		\
 	main/options_p.h	\
 	main/param_p.h		\
 	main/parse_p.h		\
@@ -70,7 +72,6 @@ MAIN_HEADS =			\
 	main/kind.h		\
 	main/lxpath.h		\
 	main/main.h		\
-	main/mbcs.h		\
 	main/read.h		\
 	main/selectors.h	\
 	main/trashbox.h		\

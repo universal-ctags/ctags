@@ -43,7 +43,7 @@
 #include "trashbox.h"
 #include "vstring.h"
 #ifdef HAVE_ICONV
-# include "mbcs.h"
+# include "mbcs_p.h"
 #endif
 #include "xtag.h"
 

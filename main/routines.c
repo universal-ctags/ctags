@@ -60,7 +60,7 @@
 #include "routines.h"
 #include "routines_p.h"
 #ifdef HAVE_ICONV
-# include "mbcs.h"
+# include "mbcs_p.h"
 #endif
 #ifdef HAVE_ERRNO_H
 # include <errno.h>

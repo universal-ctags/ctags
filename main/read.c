@@ -31,6 +31,7 @@
 #include "trashbox.h"
 #ifdef HAVE_ICONV
 # include "mbcs.h"
+# include "mbcs_p.h"
 #endif
 
 /*
