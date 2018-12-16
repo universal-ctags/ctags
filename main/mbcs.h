@@ -8,15 +8,26 @@
 *
 *   This module contains functions for checking multibyte character set.
 */
+#ifndef CTAGS_MAIN_MBCS_H
+#define CTAGS_MAIN_MBCS_H
 
+/*
+*   INCLUDE FILES
+*/
 #include "general.h"  /* must always come first */
+
 #include "vstring.h"
 
 #ifdef HAVE_ICONV
 
+/*
+*   FUNCTION PROTOTYPES
+*/
 extern bool isConverting (void);
 extern bool openConverter (const char*, const char*);
 extern bool convertString (vString *const);
 extern void closeConverter (void);
 
 #endif /* HAVE_ICONV */
+
+#endif /* CTAGS_MAIN_MBCS_H */
