@@ -38,12 +38,17 @@ if [ "$TARGET" = "Unix" ]; then
 
 		${CONFIGURE_CMDLINE} --enable-coverage-gcov
         make -j2 COVERAGE=1
+        echo 'List features'
+        ./ctags --list-features
         echo 'Run "make check" with gcov'
         make -j2 check roundtrip TRAVIS=1
 
     else
 		${CONFIGURE_CMDLINE}
         make -j2
+        echo 'List features'
+        ./ctags --list-features
+        echo 'Run "make check" (without gcov)'
         make -j2 check roundtrip TRAVIS=1
     fi
 elif [ "$TARGET" = "Mingw32" ]; then
