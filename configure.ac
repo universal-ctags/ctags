@@ -733,6 +733,8 @@ AC_CONFIG_FILES([Makefile
 		 man/ctags-incompatibilities.7.rst
 		 man/ctags-optlib.7.rst
 		 ])
+m4_include([Tmain/dist.m4])
+m4_include([Units/dist.m4])
 
 AC_OUTPUT
 
