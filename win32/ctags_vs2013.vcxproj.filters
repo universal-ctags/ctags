@@ -509,6 +509,9 @@
     <ClInclude Include="..\main\dependency.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\main\dependency_p.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="..\main\e_msoft.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -518,7 +521,7 @@
     <ClInclude Include="..\main\entry_p.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\main\error.h">
+    <ClInclude Include="..\main\error_p.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\main\field.h">
@@ -590,13 +593,16 @@
     <ClInclude Include="..\main\param.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\main\param_p.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="..\main\parse.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\main\parse_.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\main\parsers.h">
+    <ClInclude Include="..\main\parsers_p.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\main\portable-dirent_p.h">
@@ -626,13 +632,16 @@
     <ClInclude Include="..\main\selectors.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\main\sort.h">
+    <ClInclude Include="..\main\sort_p.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\main\strlist.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\main\subparser.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\main\subparser_p.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\main\tokeninfo.h">

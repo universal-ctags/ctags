@@ -19,6 +19,7 @@
 #include "read.h"
 #include "routines.h"
 #include "subparser.h"
+#include "subparser_p.h"
 #include "xtag.h"
 
 #include <string.h>

@@ -29,7 +29,7 @@
 #include "options_p.h"
 #include "read.h"
 #include "routines.h"
-#include "sort.h"
+#include "sort_p.h"
 
 /*
 *   FUNCTION DEFINITIONS

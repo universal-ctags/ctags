@@ -11,7 +11,7 @@
 #include <string.h>
 #include <errno.h>
 
-#include "error.h"
+#include "error_p.h"
 #include "options_p.h"
 #include "routines_p.h"
 

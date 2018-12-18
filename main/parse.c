@@ -27,8 +27,9 @@
 #include "keyword.h"
 #include "main.h"
 #include "param.h"
+#include "param_p.h"
 #include "parse_p.h"
-#include "parsers.h"
+#include "parsers_p.h"
 #include "promise.h"
 #include "promise_p.h"
 #include "ptag_p.h"
@@ -37,11 +38,12 @@
 #include "routines.h"
 #include "routines_p.h"
 #include "subparser.h"
+#include "subparser_p.h"
 #include "trace.h"
 #include "trashbox.h"
 #include "vstring.h"
 #ifdef HAVE_ICONV
-# include "mbcs.h"
+# include "mbcs_p.h"
 #endif
 #include "xtag.h"
 

@@ -14,11 +14,19 @@
 
 #include "general.h"
 
-#include "colprint_p.h"
 #include "dependency.h"
 #include "types.h"
 
+/*
+*   MACROS
+*/
+#define foreachSubparser(VAR, INCLUDING_NONE_CRAFTED_PARSER)\
+	VAR = NULL;								\
+	while ((VAR = getNextSubparser (VAR, INCLUDING_NONE_CRAFTED_PARSER)) != NULL)
 
+/*
+*   DATA DECLARATIONS
+*/
 typedef enum eSubparserRunDirection {
 	SUBPARSER_UNKNOWN_DIRECTION =  0,
 	SUBPARSER_BASE_RUNS_SUB = 1 << 0,
@@ -42,40 +50,19 @@ struct sSubparser {
 	void (* makeTagEntryNotify) (subparser *s, const tagEntryInfo *tag, int corkIndex);
 };
 
-/* A base parser doesn't have to call the following three functions.
-   The main part calls them internally. */
-extern void notifyInputStart (void);
-extern void notifyInputEnd   (void);
-extern void notifyMakeTagEntry (const tagEntryInfo *info, int corkIndex);
-
-extern langType getSubparserLanguage (subparser *s);
+/*
+*   FUNCTION PROTOTYPES
+*/
 
 /* Interface for Baseparser */
 extern subparser *getNextSubparser(subparser *last, bool includingNoneCraftedParser);
-#define foreachSubparser(VAR, INCLUDING_NONE_CRAFTED_PARSER)\
-	VAR = NULL;								\
-	while ((VAR = getNextSubparser (VAR, INCLUDING_NONE_CRAFTED_PARSER)) != NULL)
-
 extern void enterSubparser(subparser *subparser);
 extern void leaveSubparser(void);
-
 extern subparser* getSubparserRunningBaseparser (void);
 extern void chooseExclusiveSubparser (subparser *s, void *data);
 
 /* Interface for Subparsers   */
 #define RUN_DEFAULT_SUBPARSERS -1
 extern void scheduleRunningBaseparser (int dependencyIndex);
-
-extern subparser *getFirstSubparser(struct slaveControlBlock *controlBlock);
-extern void useDefaultSubparsers (struct slaveControlBlock *controlBlock);
-extern void useSpecifiedSubparser (struct slaveControlBlock *controlBlock, subparser *s);
-extern void setupSubparsersInUse (struct slaveControlBlock *controlBlock);
-extern subparser* teardownSubparsersInUse (struct slaveControlBlock *controlBlock);
-
-extern struct colprintTable * subparserColprintTableNew (void);
-extern void subparserColprintAddSubparsers (struct colprintTable *table,
-											struct slaveControlBlock *scb);
-extern void subparserColprintTablePrint (struct colprintTable *table,
-										 bool withListHeader, bool machinable, FILE *fp);
 
 #endif	/* CTAGS_MAIN_SUBPARSER_H */

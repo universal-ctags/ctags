@@ -25,6 +25,7 @@
 #include <errno.h>
 #include "options.h"
 #include "mbcs.h"
+#include "mbcs_p.h"
 #include "routines.h"
 
 static iconv_t iconv_fd = (iconv_t) -1;
