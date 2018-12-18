@@ -29,6 +29,7 @@ MAIN_PUBLIC_HEADS =		\
 		main/parse.h	\
 		main/promise.h	\
 		main/ptrarray.h	\
+		main/read_p.h	\
 		main/routines.h	\
 		main/strlist.h	\
 		main/subparser.h\
@@ -58,6 +59,7 @@ MAIN_PRIVATE_HEADS =		\
 	main/portable-dirent_p.h\
 	main/promise_p.h	\
 	main/ptag_p.h		\
+	main/read_p.h		\
 	main/routines_p.h	\
 	main/sort_p.h		\
 	main/subparser_p.h	\
@@ -72,7 +74,6 @@ MAIN_HEADS =			\
 	main/kind.h		\
 	main/lxpath.h		\
 	main/main.h		\
-	main/read.h		\
 	main/selectors.h	\
 	main/trashbox.h		\
 	main/xtag.h		\

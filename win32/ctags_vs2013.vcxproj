@@ -290,6 +290,7 @@
     <ClInclude Include="..\main\ptag_p.h" />
     <ClInclude Include="..\main\ptrarray.h" />
     <ClInclude Include="..\main\read.h" />
+    <ClInclude Include="..\main\read_p.h" />
     <ClInclude Include="..\main\routines.h" />
     <ClInclude Include="..\main\routines_p.h" />
     <ClInclude Include="..\main\selectors.h" />

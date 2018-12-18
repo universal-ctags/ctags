@@ -35,6 +35,7 @@
 #include "ptag_p.h"
 #include "ptrarray.h"
 #include "read.h"
+#include "read_p.h"
 #include "routines.h"
 #include "routines_p.h"
 #include "subparser.h"

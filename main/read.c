@@ -19,6 +19,7 @@
 
 #define FILE_WRITE
 #include "read.h"
+#include "read_p.h"
 #include "debug.h"
 #include "entry_p.h"
 #include "main.h"

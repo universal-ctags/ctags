@@ -34,6 +34,7 @@
 #include "options.h"
 #include "parse_p.h"
 #include "read.h"
+#include "read_p.h"
 #include "routines.h"
 #include "routines_p.h"
 #include "trashbox.h"
