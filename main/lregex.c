@@ -38,6 +38,7 @@
 #include "routines.h"
 #include "routines_p.h"
 #include "trashbox.h"
+#include "xtag_p.h"
 
 static bool regexAvailable = false;
 

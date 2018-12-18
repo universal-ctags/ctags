@@ -32,7 +32,7 @@
 #include "parse_p.h"
 #include "ptag_p.h"
 #include "routines_p.h"
-#include "xtag.h"
+#include "xtag_p.h"
 #include "param_p.h"
 #include "error_p.h"
 #include "interactive_p.h"

@@ -46,7 +46,7 @@
 #ifdef HAVE_ICONV
 # include "mbcs_p.h"
 #endif
-#include "xtag.h"
+#include "xtag_p.h"
 
 /*
  * DATA TYPES

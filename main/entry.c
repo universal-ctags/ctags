@@ -58,7 +58,7 @@
 #include "subparser_p.h"
 #include "trashbox.h"
 #include "writer_p.h"
-#include "xtag.h"
+#include "xtag_p.h"
 
 /*
 *   MACROS

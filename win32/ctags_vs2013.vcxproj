@@ -304,6 +304,7 @@
     <ClInclude Include="..\main\vstring.h" />
     <ClInclude Include="..\main\writer_p.h" />
     <ClInclude Include="..\main\xtag.h" />
+    <ClInclude Include="..\main\xtag_p.h" />
     <ClInclude Include="..\parsers\cpreprocessor.h" />
     <ClInclude Include="..\parsers\cxx\cxx_debug.h" />
     <ClInclude Include="..\parsers\cxx\cxx_keyword.h" />

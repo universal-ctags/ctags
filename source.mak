@@ -38,6 +38,7 @@ MAIN_PUBLIC_HEADS =		\
 		main/trace.h	\
 		main/types.h	\
 		main/vstring.h	\
+		main/xtag.h	\
 		\
 		$(NULL)
 
@@ -65,6 +66,7 @@ MAIN_PRIVATE_HEADS =		\
 	main/sort_p.h		\
 	main/subparser_p.h	\
 	main/writer_p.h		\
+	main/xtag_p.h		\
 		\
 		$(NULL)
 
@@ -76,7 +78,6 @@ MAIN_HEADS =			\
 	main/lxpath.h		\
 	main/main.h		\
 	main/trashbox.h		\
-	main/xtag.h		\
 	\
 	$(MAIN_PUBLIC_HEADS)    \
 	$(MAIN_PRIVATE_HEADS)   \

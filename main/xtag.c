@@ -20,6 +20,7 @@
 #include "trashbox.h"
 #include "writer_p.h"
 #include "xtag.h"
+#include "xtag_p.h"
 
 #include <string.h>
 #include <ctype.h>
