@@ -31,6 +31,7 @@ MAIN_PUBLIC_HEADS =		\
 		main/ptrarray.h	\
 		main/read_p.h	\
 		main/routines.h	\
+		main/selectors.h\
 		main/strlist.h	\
 		main/subparser.h\
 		main/tokeninfo.h\
@@ -74,7 +75,6 @@ MAIN_HEADS =			\
 	main/kind.h		\
 	main/lxpath.h		\
 	main/main.h		\
-	main/selectors.h	\
 	main/trashbox.h		\
 	main/xtag.h		\
 	\
