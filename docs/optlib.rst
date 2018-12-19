@@ -62,7 +62,7 @@ At start-up time, Universal-ctags loads files having :file:`.ctags` as a
 file extension under the following statically defined directories:
 
 #. :file:`$HOME/.ctags.d`
-#. :file:`$HOMEDRIVE$HOMEPATH/.ctags.d` (in ``Windows``)
+#. :file:`$HOMEDRIVE$HOMEPATH/ctags.d` (in ``Windows``)
 #. :file:`.ctags.d`
 #. :file:`ctags.d`
 
