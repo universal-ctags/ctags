@@ -20,6 +20,7 @@
 #include "field.h"
 #include "xtag.h"
 #include "mio.h"
+#include "ptrarray.h"
 
 /*
 *   MACROS

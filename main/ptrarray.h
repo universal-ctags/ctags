@@ -18,10 +18,11 @@
 /*
 *   DATA DECLARATIONS
 */
+struct sPtrArray;
+typedef struct sPtrArray ptrArray;
 
 typedef void (*ptrArrayDeleteFunc) (void *data);
 
-struct sPtrArray;
 
 /*
 *   FUNCTION PROTOTYPES

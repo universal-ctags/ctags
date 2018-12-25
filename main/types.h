@@ -51,7 +51,4 @@ typedef struct sParameterHandlerTable parameterHandlerTable;
 struct NestingLevel;
 typedef struct NestingLevel NestingLevel;
 
-struct sPtrArray;
-typedef struct sPtrArray ptrArray;
-
 #endif	/* CTAGS_MAIN_TYPES_H */
