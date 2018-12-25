@@ -311,6 +311,23 @@ static void clearToken (tokenInfo *token)
 	vStringClear (token->string);
 }
 
+#define CBL_NL(nl) (*((int *) (nestingLevelGetUserData (nl))))
+
+static NestingLevel *popNestingLevelsToLevelNumber (NestingLevels *levels, const int levelNumber)
+{
+	NestingLevel *nl;
+
+	while (true)
+	{
+		nl = nestingLevelsGetCurrent (levels);
+		if (! nl || CBL_NL (nl) < levelNumber)
+			break;
+		nestingLevelsPop (levels);
+	}
+
+	return nl;
+}
+
 static void findCOBOLTags (void)
 {
 	tokenInfo tokens[2];
@@ -318,12 +335,15 @@ static void findCOBOLTags (void)
 	tokenInfo *token = NULL;
 	const tokenInfo *prevToken = NULL;
 	tokenInfo *sentenceStart = NULL;
+	NestingLevels *levels;
 
 	for (curToken = 0; curToken < ARRAY_SIZE (tokens); curToken++)
 	{
 		tokens[curToken].string = vStringNew ();
 		clearToken (&tokens[curToken]);
 	}
+
+	levels = nestingLevelsNew (sizeof (int));
 
 #define readToken() \
 	do {																	\
@@ -395,12 +415,16 @@ static void findCOBOLTags (void)
 		}
 		else if (token == sentenceStart && token->type == TOKEN_NUMBER)
 		{
+			int thisLevelNumber = strtol (vStringValue (token->string), NULL, 10);
+
 			readToken ();
 			if (token->type == TOKEN_WORD)
 			{
+				int kind = KIND_GHOST_INDEX;
+
 				readToken ();
 				if (token->type == '.')
-					makeCOBOLTag (prevToken, K_GROUP);
+					kind = K_GROUP;
 				else if (token->type == TOKEN_KEYWORD)
 				{
 					switch (token->keyword)
@@ -416,14 +440,35 @@ static void findCOBOLTags (void)
 						case KEYWORD_SYNC:
 						case KEYWORD_USAGE:
 						case KEYWORD_VALUE:
-							makeCOBOLTag (prevToken, K_DATA);
+							kind = K_DATA;
 							break;
 					}
+				}
+
+				if (kind != KIND_GHOST_INDEX)
+				{
+					NestingLevel *nl;
+					tagEntryInfo entry;
+					int r;
+
+					/* FIXME: handle level 77 (standalone) specifically */
+					nl = popNestingLevelsToLevelNumber (levels, thisLevelNumber);
+					initTagEntry (&entry, vStringValue (prevToken->string), kind);
+					if (nl && CBL_NL (nl) < thisLevelNumber)
+						entry.extensionFields.scopeIndex = nl->corkIndex;
+					r = makeTagEntry (&entry);
+					nl = nestingLevelsPush (levels, r);
+					CBL_NL (nl) = thisLevelNumber;
+
+					while (token->type != TOKEN_EOF && token->type != '.')
+						readToken ();
 				}
 			}
 		}
 	}
 	while (token->type != TOKEN_EOF);
+
+	nestingLevelsFree (levels);
 
 	for (curToken = 0; curToken < ARRAY_SIZE (tokens); curToken++)
 		vStringDelete (tokens[curToken].string);
@@ -446,5 +491,6 @@ extern parserDefinition* CobolParser (void)
 	def->kindCount = ARRAY_SIZE(CobolKinds);
 	def->keywordTable = cobolKeywordTable;
 	def->keywordCount = ARRAY_SIZE(cobolKeywordTable);
+	def->useCork = CORK_QUEUE;
 	return def;
 }
