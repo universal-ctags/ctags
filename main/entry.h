@@ -21,6 +21,7 @@
 #include "xtag.h"
 #include "mio.h"
 #include "ptrarray.h"
+#include "nestlevel.h"
 
 /*
 *   MACROS
