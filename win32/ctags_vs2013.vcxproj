@@ -269,6 +269,7 @@
     <ClInclude Include="..\main\keyword.h" />
     <ClInclude Include="..\main\keyword_p.h" />
     <ClInclude Include="..\main\kind.h" />
+    <ClInclude Include="..\main\kind_p.h" />
     <ClInclude Include="..\main\lregex.h" />
     <ClInclude Include="..\main\lregex_p.h" />
     <ClInclude Include="..\main\lxpath.h" />

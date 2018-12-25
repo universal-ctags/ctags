@@ -19,6 +19,7 @@
 *   INCLUDE FILES
 */
 #include "general.h"
+#include "kind_p.h"
 #include "lregex.h"
 
 /*

@@ -19,6 +19,7 @@ MAIN_PUBLIC_HEADS =		\
 		main/htable.h	\
 		main/inline.h	\
 		main/keyword.h	\
+		main/kind.h	\
 		main/lregex.h	\
 		main/mbcs.h	\
 		main/nestlevel.h\
@@ -52,6 +53,7 @@ MAIN_PRIVATE_HEADS =		\
 	main/fmt_p.h		\
 	main/interactive_p.h	\
 	main/keyword_p.h	\
+	main/kind_p.h		\
 	main/lregex_p.h		\
 	main/mbcs_p.h		\
 	main/options_p.h	\
@@ -74,7 +76,6 @@ MAIN_HEADS =			\
 	main/ctags.h		\
 	main/field.h		\
 	main/general.h		\
-	main/kind.h		\
 	main/lxpath.h		\
 	main/main.h		\
 	main/trashbox.h		\

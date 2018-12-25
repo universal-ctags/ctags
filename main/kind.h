@@ -8,10 +8,17 @@
 #ifndef CTAGS_MAIN_KIND_H
 #define CTAGS_MAIN_KIND_H
 
+/*
+*   INCLUDE FILES
+*/
+
 #include "general.h"
 #include "types.h"
 #include "routines.h"
-#include "vstring.h"
+
+/*
+*   DATA DECLARATIONS
+*/
 
 struct sRoleDefinition {
 	bool enabled;
@@ -20,9 +27,6 @@ struct sRoleDefinition {
 
 	int id;
 };
-
-typedef void (* freeRoleDefFunc) (roleDefinition *);
-extern const char *renderRole (const roleDefinition* const def, vString* b);
 
 /*
  * Predefined kinds
@@ -81,49 +85,10 @@ struct sKindDefinition {
 #define ATTACH_ROLES(RS) .nRoles = ARRAY_SIZE(RS), .roles = RS
 #define ATTACH_SEPARATORS(S) .separators = S, .separatorCount = ARRAY_SIZE(S)
 
-/* for the obsolete --list-kinds option */
-extern void printKind (const kindDefinition* const kind, bool indent);
+/*
+*   FUNCTION PROTOTYPES
+*/
 
 extern const char *scopeSeparatorFor (langType lang, int kindIndex, int parentKindIndex);
-
-extern void enableKind (kindDefinition *kind, bool enable);
-
-struct kindControlBlock;
-typedef void (* freeKindDefFunc) (kindDefinition *);
-extern struct kindControlBlock* allocKindControlBlock (parserDefinition *parser);
-extern void freeKindControlBlock (struct kindControlBlock* kcb);
-extern int  defineKind (struct kindControlBlock* kcb, kindDefinition *def,
-						freeKindDefFunc freeKindDef);
-extern int defineRole (struct kindControlBlock* kcb, int kindIndex,
-					   roleDefinition *def, freeRoleDefFunc freeRoleDef);
-extern bool isRoleEnabled (struct kindControlBlock* kcb, int kindIndex, int roleIndex);
-
-extern unsigned int countKinds (struct kindControlBlock* kcb);
-extern unsigned int countRoles (struct kindControlBlock* kcb, int kindIndex);
-extern kindDefinition *getKind (struct kindControlBlock* kcb, int kindIndex);
-extern kindDefinition *getKindForLetter (struct kindControlBlock* kcb, int letter);
-extern kindDefinition *getKindForName (struct kindControlBlock* kcb, const char* name);
-extern roleDefinition* getRole(struct kindControlBlock* kcb, int kindIndex, int roleIndex);
-extern roleDefinition* getRoleForName(struct kindControlBlock* kcb, int kindIndex, const char* name);
-extern void linkKindDependency (struct kindControlBlock *masterKCB,
-								struct kindControlBlock *slaveKCB);
-
-/* for --list-kinds-full option. LANGUAGE must be initialized. */
-extern struct colprintTable * kindColprintTableNew (void);
-extern void kindColprintAddLanguageLines (struct colprintTable *table,
-										  struct kindControlBlock* kcb);
-extern void kindColprintTablePrint (struct colprintTable *table, bool noparser,
-									bool withListHeader, bool machinable, FILE *fp);
-
-extern struct colprintTable * roleColprintTableNew (void);
-extern void roleColprintAddRoles (struct colprintTable *table,
-								  struct kindControlBlock* kcb,
-								  const char *kindspecs);
-extern void roleColprintTablePrint (struct colprintTable *table, bool noparser,
-									bool withListHeader, bool machinable, FILE *fp);
-
-#ifdef DEBUG
-extern bool doesParserUseKind (struct kindControlBlock* kcb, char letter);
-#endif
 
 #endif	/* CTAGS_MAIN_KIND_H */
