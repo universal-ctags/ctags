@@ -144,12 +144,4 @@ extern bool isTagExtraBitMarked (const tagEntryInfo *const tag, xtagType extra);
 extern void attachParserField (tagEntryInfo *const tag, fieldType ftype, const char* value);
 extern void attachParserFieldToCorkEntry (int index, fieldType ftype, const char* value);
 
-CTAGS_INLINE roleBitsType makeRoleBit(int roleIndex)
-{
-	if (roleIndex == ROLE_INDEX_DEFINITION)
-		return 0;
-	else
-		return ((roleBitsType)1) << roleIndex;
-}
-
 #endif  /* CTAGS_MAIN_ENTRY_H */

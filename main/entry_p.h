@@ -65,4 +65,13 @@ extern void makeFileTag (const char *const fileName);
 
 extern const tagField* getParserField (const tagEntryInfo * tag, int index);
 
+
+CTAGS_INLINE roleBitsType makeRoleBit(int roleIndex)
+{
+	if (roleIndex == ROLE_INDEX_DEFINITION)
+		return 0;
+	else
+		return ((roleBitsType)1) << roleIndex;
+}
+
 #endif	/* CTAGS_PRIVATE_ENTRY_H */
