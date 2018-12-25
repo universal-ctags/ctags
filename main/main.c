@@ -67,7 +67,7 @@
 #include "error_p.h"
 #include "field.h"
 #include "keyword_p.h"
-#include "main.h"
+#include "main_p.h"
 #include "options_p.h"
 #include "parse_p.h"
 #include "read_p.h"

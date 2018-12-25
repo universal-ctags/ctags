@@ -13,7 +13,7 @@
 #include "general.h"  /* must always come first */
 #include "ctags.h"
 #include "debug.h"
-#include "main.h"
+#include "main_p.h"
 #include "options.h"
 #include "parse_p.h"
 #include "routines.h"

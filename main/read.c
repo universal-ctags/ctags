@@ -22,7 +22,7 @@
 #include "read_p.h"
 #include "debug.h"
 #include "entry_p.h"
-#include "main.h"
+#include "main_p.h"
 #include "routines.h"
 #include "routines_p.h"
 #include "options_p.h"

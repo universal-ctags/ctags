@@ -56,6 +56,7 @@ MAIN_PRIVATE_HEADS =		\
 	main/keyword_p.h	\
 	main/kind_p.h		\
 	main/lregex_p.h		\
+	main/main_p.h		\
 	main/mbcs_p.h		\
 	main/options_p.h	\
 	main/param_p.h		\
@@ -79,7 +80,6 @@ MAIN_HEADS =			\
 	main/field.h		\
 	main/general.h		\
 	main/lxpath.h		\
-	main/main.h		\
 	\
 	$(MAIN_PUBLIC_HEADS)    \
 	$(MAIN_PRIVATE_HEADS)   \

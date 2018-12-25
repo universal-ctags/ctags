@@ -43,7 +43,7 @@
 #include "field.h"
 #include "fmt_p.h"
 #include "kind.h"
-#include "main.h"
+#include "main_p.h"
 #include "nestlevel.h"
 #include "options_p.h"
 #include "ptag_p.h"

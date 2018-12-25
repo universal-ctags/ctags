@@ -4,10 +4,10 @@
 *   This source code is released for free distribution under the terms of the
 *   GNU General Public License version 2 or (at your option) any later version.
 *
-*   External interface to main.c
+*   Main part private interface to main.c
 */
-#ifndef CTAGS_MAIN_MAIN_H
-#define CTAGS_MAIN_MAIN_H
+#ifndef CTAGS_MAIN_MAIN_PRIVATE_H
+#define CTAGS_MAIN_MAIN_PRIVATE_H
 
 /*
 *   INCLUDE FILES
@@ -21,4 +21,4 @@ extern void addTotals (const unsigned int files, const long unsigned int lines, 
 extern bool isDestinationStdout (void);
 extern int main (int argc, char **argv);
 
-#endif  /* CTAGS_MAIN_MAIN_H */
+#endif  /* CTAGS_MAIN_MAIN_PRIVATE_H */

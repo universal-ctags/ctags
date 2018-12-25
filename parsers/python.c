@@ -16,7 +16,6 @@
 #include "entry.h"
 #include "nestlevel.h"
 #include "read.h"
-#include "main.h"
 #include "parse.h"
 #include "vstring.h"
 #include "keyword.h"

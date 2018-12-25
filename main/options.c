@@ -28,7 +28,7 @@
 #include "field.h"
 #include "gvars.h"
 #include "keyword_p.h"
-#include "main.h"
+#include "main_p.h"
 #include "parse_p.h"
 #include "ptag_p.h"
 #include "routines_p.h"
