@@ -572,6 +572,9 @@
     <ClInclude Include="..\main\lxpath.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\main\lxpath_p.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="..\main\main_p.h">
       <Filter>Header Files</Filter>
     </ClInclude>

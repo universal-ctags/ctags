@@ -25,6 +25,7 @@
 #include "flags_p.h"
 #include "htable.h"
 #include "keyword.h"
+#include "lxpath_p.h"
 #include "main_p.h"
 #include "param.h"
 #include "param_p.h"
