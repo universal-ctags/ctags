@@ -656,6 +656,9 @@
     <ClInclude Include="..\main\trashbox.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\main\trashbox_p.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="..\main\types.h">
       <Filter>Header Files</Filter>
     </ClInclude>

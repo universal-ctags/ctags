@@ -73,7 +73,7 @@
 #include "read_p.h"
 #include "routines_p.h"
 #include "trace.h"
-#include "trashbox.h"
+#include "trashbox_p.h"
 #include "writer_p.h"
 #include "xtag_p.h"
 

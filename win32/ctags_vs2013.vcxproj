@@ -301,6 +301,7 @@
     <ClInclude Include="..\main\subparser_p.h" />
     <ClInclude Include="..\main\tokeninfo.h" />
     <ClInclude Include="..\main\trashbox.h" />
+    <ClInclude Include="..\main\trashbox_p.h" />
     <ClInclude Include="..\main\types.h" />
     <ClInclude Include="..\main\vstring.h" />
     <ClInclude Include="..\main\writer_p.h" />

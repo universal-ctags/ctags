@@ -42,6 +42,7 @@
 #include "subparser_p.h"
 #include "trace.h"
 #include "trashbox.h"
+#include "trashbox_p.h"
 #include "vstring.h"
 #ifdef HAVE_ICONV
 # include "mbcs_p.h"

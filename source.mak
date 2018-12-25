@@ -37,6 +37,7 @@ MAIN_PUBLIC_HEADS =		\
 		main/subparser.h\
 		main/tokeninfo.h\
 		main/trace.h	\
+		main/trashbox_p.h\
 		main/types.h	\
 		main/vstring.h	\
 		main/xtag.h	\
@@ -67,6 +68,7 @@ MAIN_PRIVATE_HEADS =		\
 	main/routines_p.h	\
 	main/sort_p.h		\
 	main/subparser_p.h	\
+	main/trashbox_p.h	\
 	main/writer_p.h		\
 	main/xtag_p.h		\
 		\
@@ -78,7 +80,6 @@ MAIN_HEADS =			\
 	main/general.h		\
 	main/lxpath.h		\
 	main/main.h		\
-	main/trashbox.h		\
 	\
 	$(MAIN_PUBLIC_HEADS)    \
 	$(MAIN_PRIVATE_HEADS)   \
