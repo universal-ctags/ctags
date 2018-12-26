@@ -59,8 +59,7 @@ static const char *renderFieldAccess (const tagEntryInfo *const tag, const char 
 static const char *renderFieldKindLetter (const tagEntryInfo *const tag, const char *value, vString* b, bool *rejected);
 static const char *renderFieldImplementation (const tagEntryInfo *const tag, const char *value, vString* b, bool *rejected);
 static const char *renderFieldFile (const tagEntryInfo *const tag, const char *value, vString* b, bool *rejected);
-static const char *renderFieldPatternCommon (const tagEntryInfo *const tag, const char *value, vString* b, bool *rejected);
-static const char *renderFieldPatternCtags (const tagEntryInfo *const tag, const char *value, vString* b, bool *rejected);
+static const char *renderFieldPattern (const tagEntryInfo *const tag, const char *value, vString* b, bool *rejected);
 static const char *renderFieldRoles (const tagEntryInfo *const tag, const char *value, vString* b, bool *rejected);
 static const char *renderFieldRefMarker (const tagEntryInfo *const tag, const char *value, vString* b, bool *rejected);
 static const char *renderFieldExtras (const tagEntryInfo *const tag, const char *value, vString* b, bool *rejected);
@@ -114,9 +113,7 @@ static fieldDefinition fieldDefinitionsFixed [] = {
 	DEFINE_FIELD ('P', "pattern",  true,
 			   "pattern",
 			   FIELDTYPE_STRING|FIELDTYPE_BOOL,
-			   [WRITER_U_CTAGS] = renderFieldPatternCtags,
-			   [WRITER_XREF]    = renderFieldPatternCommon,
-			   [WRITER_JSON]    = renderFieldPatternCommon,
+			   [WRITER_U_CTAGS] = renderFieldPattern,
 		),
 };
 
@@ -716,7 +713,7 @@ static const char *renderFieldFile (const tagEntryInfo *const tag,
 	return renderAsIs (b, tag->isFileScope? "file": "-");
 }
 
-static const char *renderFieldPatternCommon (const tagEntryInfo *const tag,
+static const char *renderFieldPattern (const tagEntryInfo *const tag,
 				       const char *value CTAGS_ATTR_UNUSED,
 				       vString* b,
 					   bool *rejected CTAGS_ATTR_UNUSED)
@@ -734,22 +731,6 @@ static const char *renderFieldPatternCommon (const tagEntryInfo *const tag,
 		eFree (tmp);
 	}
 	return vStringValue (b);
-}
-
-static const char *renderFieldPatternCtags (const tagEntryInfo *const tag,
-				       const char *value,
-				       vString* b,
-					   bool *rejected)
-{
-	/* This is for handling 'common' of 'fortran'.  See the
-	   description of --excmd=mixed in ctags.1.  In tags output, what
-	   we call "pattern" is instructions for vi.
-
-	   However, in the other formats, pattern should be pattern as its name. */
-	if (tag->lineNumberEntry)
-		return NULL;
-
-	return renderFieldPatternCommon(tag, value, b, rejected);
 }
 
 static const char *renderFieldRefMarker (const tagEntryInfo *const tag,

@@ -241,6 +241,11 @@ static int writeCtagsEntry (tagWriter *writer,
 			      escapeFieldValue (writer, tag, FIELD_NAME),
 			      escapeFieldValue (writer, tag, FIELD_INPUT_FILE));
 
+	/* This is for handling 'common' of 'fortran'.  See the
+	   description of --excmd=mixed in ctags.1.  In tags output, what
+	   we call "pattern" is instructions for vi.
+
+	   However, in the other formats, pattern should be pattern as its name. */
 	if (tag->lineNumberEntry)
 		length += writeLineNumberEntry (writer, mio, tag);
 	else
