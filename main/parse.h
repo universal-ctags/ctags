@@ -18,6 +18,7 @@
 #include "kind.h"
 #include "lregex.h"
 #include "lxpath.h"
+#include "vstring.h"
 
 /*
 *   MACROS

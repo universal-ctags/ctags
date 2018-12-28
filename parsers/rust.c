@@ -10,7 +10,6 @@
 *   INCLUDE FILES
 */
 #include "general.h"	/* must always come first */
-#include "main.h"
 
 #include <string.h>
 

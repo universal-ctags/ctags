@@ -25,7 +25,8 @@
 #include "flags_p.h"
 #include "htable.h"
 #include "keyword.h"
-#include "main.h"
+#include "lxpath_p.h"
+#include "main_p.h"
 #include "param.h"
 #include "param_p.h"
 #include "parse_p.h"
@@ -35,17 +36,19 @@
 #include "ptag_p.h"
 #include "ptrarray.h"
 #include "read.h"
+#include "read_p.h"
 #include "routines.h"
 #include "routines_p.h"
 #include "subparser.h"
 #include "subparser_p.h"
 #include "trace.h"
 #include "trashbox.h"
+#include "trashbox_p.h"
 #include "vstring.h"
 #ifdef HAVE_ICONV
 # include "mbcs_p.h"
 #endif
-#include "xtag.h"
+#include "xtag_p.h"
 
 /*
  * DATA TYPES

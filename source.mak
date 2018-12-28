@@ -19,7 +19,9 @@ MAIN_PUBLIC_HEADS =		\
 		main/htable.h	\
 		main/inline.h	\
 		main/keyword.h	\
+		main/kind.h	\
 		main/lregex.h	\
+		main/lxpath.h	\
 		main/mbcs.h	\
 		main/nestlevel.h\
 		main/numarray.h	\
@@ -29,13 +31,17 @@ MAIN_PUBLIC_HEADS =		\
 		main/parse.h	\
 		main/promise.h	\
 		main/ptrarray.h	\
+		main/read_p.h	\
 		main/routines.h	\
+		main/selectors.h\
 		main/strlist.h	\
 		main/subparser.h\
 		main/tokeninfo.h\
 		main/trace.h	\
+		main/trashbox_p.h\
 		main/types.h	\
 		main/vstring.h	\
+		main/xtag.h	\
 		\
 		$(NULL)
 
@@ -49,7 +55,10 @@ MAIN_PRIVATE_HEADS =		\
 	main/fmt_p.h		\
 	main/interactive_p.h	\
 	main/keyword_p.h	\
+	main/kind_p.h		\
 	main/lregex_p.h		\
+	main/lxpath_p.h		\
+	main/main_p.h		\
 	main/mbcs_p.h		\
 	main/options_p.h	\
 	main/param_p.h		\
@@ -58,10 +67,13 @@ MAIN_PRIVATE_HEADS =		\
 	main/portable-dirent_p.h\
 	main/promise_p.h	\
 	main/ptag_p.h		\
+	main/read_p.h		\
 	main/routines_p.h	\
 	main/sort_p.h		\
 	main/subparser_p.h	\
+	main/trashbox_p.h	\
 	main/writer_p.h		\
+	main/xtag_p.h		\
 		\
 		$(NULL)
 
@@ -69,13 +81,6 @@ MAIN_HEADS =			\
 	main/ctags.h		\
 	main/field.h		\
 	main/general.h		\
-	main/kind.h		\
-	main/lxpath.h		\
-	main/main.h		\
-	main/read.h		\
-	main/selectors.h	\
-	main/trashbox.h		\
-	main/xtag.h		\
 	\
 	$(MAIN_PUBLIC_HEADS)    \
 	$(MAIN_PRIVATE_HEADS)   \

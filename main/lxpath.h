@@ -10,6 +10,10 @@
 #ifndef CTAGS_LXPATH_PARSE_H
 #define CTAGS_LXPATH_PARSE_H
 
+/*
+*   INCLUDE FILES
+*/
+
 #include "general.h"  /* must always come first */
 #include "types.h"
 
@@ -21,6 +25,11 @@
 #define xmlXPathCompExpr void
 #define xmlXPathContext void
 #endif
+
+
+/*
+*   DATA DECLARATIONS
+*/
 
 typedef struct sTagXpathMakeTagSpec {
 	int   kind;
@@ -72,10 +81,14 @@ typedef struct sXpathFileSpec {
 	const char *rootNSHref;
 } xpathFileSpec;
 
+
+/*
+*   FUNCTION PROTOTYPES
+*/
+
 /* Xpath interface */
 extern void findXMLTags (xmlXPathContext *ctx, xmlNode *root,
 			 const tagXpathTableTable *xpathTableTable,
 			 const kindDefinition* const kinds, void *userData);
-extern void addTagXpath (const langType language, tagXpathTable *xpathTable);
 
 #endif  /* CTAGS_LXPATH_PARSE_H */

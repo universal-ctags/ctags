@@ -27,6 +27,7 @@
 #include "read.h"
 #include "routines.h"
 #include "trashbox.h"
+#include "xtag_p.h"
 
 
 typedef struct sFieldObject {

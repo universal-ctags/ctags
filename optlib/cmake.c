@@ -8,7 +8,7 @@
 #include "xtag.h"
 
 
-static void initializeCMakeParser (const langType language CTAGS_ATTR_UNUSED)
+static void initializeCMakeParser (const langType language)
 {
 
 	addLanguageRegexTable (language, "main");

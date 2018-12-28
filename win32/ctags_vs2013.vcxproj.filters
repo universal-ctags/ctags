@@ -560,6 +560,9 @@
     <ClInclude Include="..\main\kind.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\main\kind_p.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="..\main\lregex.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -569,7 +572,10 @@
     <ClInclude Include="..\main\lxpath.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\main\main.h">
+    <ClInclude Include="..\main\lxpath_p.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\main\main_p.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\main\mio.h">
@@ -623,6 +629,9 @@
     <ClInclude Include="..\main\read.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\main\read_p.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="..\main\routines.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -650,6 +659,9 @@
     <ClInclude Include="..\main\trashbox.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\main\trashbox_p.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="..\main\types.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -660,6 +672,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\main\xtag.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\main\xtag_p.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\parsers\cpreprocessor.h">

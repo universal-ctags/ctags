@@ -61,7 +61,7 @@ my $options =
 	   unless ($_[0]->{'langdef'} eq $1);
 	 my $refonly = 0;
 	 $refonly = 1 if defined $5;
-	 push @{$_[0]->{'kinddefs'}}, { letter => $2, name => $3, desc => $4,
+	 push @{$_[0]->{'kinddefs'}}, { enabled => 1, letter => $2, name => $3, desc => $4,
 					refonly => $refonly, roles => [] };
        } ],
      [ qr/^--_extradef-(.*)=([^,]+),(.+)/, sub {
@@ -356,7 +356,12 @@ sub extend_table {
 sub parse_kinds {
     my ($kinds, $opts) = @_;
     for (split //, $kinds) {
-	push @{$opts->{'disabledKinds'}}, $_;
+	my $letter = $_;
+	for (@{$opts->{'kinddefs'}}) {
+	    if ($_->{'letter'} eq $letter) {
+		$_->{'enabled'} = 0;
+	    }
+	}
     }
 }
 
@@ -443,21 +448,12 @@ EOF
 
 sub emit_initializer {
     my $opts = shift;
-    my $may_unused = (@{$opts->{'disabledKinds'}}) ? "": " CTAGS_ATTR_UNUSED";
+    my $may_unused = $opts->{'tablenames'} ? "": " CTAGS_ATTR_UNUSED";
 
     print <<EOF;
 static void initialize$opts->{'Clangdef'}Parser (const langType language$may_unused)
 {
 EOF
-    for (@{$opts->{'disabledKinds'}}) {
-	print <<EOF;
-	{
-		kindDefinition *kdef = getLanguageKindForLetter (language, '$_');
-		enableKind (kdef, false);
-	}
-EOF
-      }
-
     if ($opts->{'tablenames'}) {
       print "\n";
 
@@ -551,11 +547,12 @@ sub emit_kinddefs {
 	static kindDefinition $opts->{'Clangdef'}KindTable [] = {
 EOF
     for (@{$opts->{'kinddefs'}}) {
+      my $enabled = $_->{"enabled"}? "true": "false";
       print <<EOF;
 		{
 EOF
       print <<EOF;
-		  true, \'$_->{'letter'}\', "$_->{'name'}", "$_->{'desc'}",
+		  $enabled, \'$_->{'letter'}\', "$_->{'name'}", "$_->{'desc'}",
 EOF
       if ($_->{'refonly'}) {
 	  print <<EOF;
@@ -818,7 +815,6 @@ sub main {
 		patterns => [],
 		extensions => [],
 		aliases => [],
-		disabledKinds => [],
 		regexs => [# { regex => "", name => "", kind => "", flags => "", mline => 1|0 },
 			  ],
 		kinddefs => [# { letter => '', name => "", desc => "" },

@@ -10,7 +10,6 @@
 #include "entry.h"
 #include "keyword.h"
 #include "read.h"
-#include "main.h"
 #include "numarray.h"
 #include "objpool.h"
 #include "parse.h"

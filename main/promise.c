@@ -16,7 +16,7 @@
 #include "promise_p.h"
 #include "ptrarray.h"
 #include "debug.h"
-#include "read.h"
+#include "read_p.h"
 #include "trashbox.h"
 #include "xtag.h"
 #include "numarray.h"

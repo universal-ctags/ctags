@@ -13,13 +13,14 @@
 #include "general.h"  /* must always come first */
 #include "ctags.h"
 #include "debug.h"
-#include "main.h"
+#include "main_p.h"
 #include "options.h"
 #include "parse_p.h"
 #include "routines.h"
 #include "trashbox.h"
 #include "writer_p.h"
 #include "xtag.h"
+#include "xtag_p.h"
 
 #include <string.h>
 #include <ctype.h>

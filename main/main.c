@@ -67,14 +67,15 @@
 #include "error_p.h"
 #include "field.h"
 #include "keyword_p.h"
-#include "main.h"
+#include "main_p.h"
 #include "options_p.h"
 #include "parse_p.h"
-#include "read.h"
+#include "read_p.h"
 #include "routines_p.h"
 #include "trace.h"
-#include "trashbox.h"
+#include "trashbox_p.h"
 #include "writer_p.h"
+#include "xtag_p.h"
 
 #ifdef HAVE_JANSSON
 #include "interactive_p.h"

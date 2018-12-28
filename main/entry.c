@@ -43,11 +43,12 @@
 #include "field.h"
 #include "fmt_p.h"
 #include "kind.h"
-#include "main.h"
+#include "main_p.h"
 #include "nestlevel.h"
 #include "options_p.h"
 #include "ptag_p.h"
 #include "read.h"
+#include "read_p.h"
 #include "routines.h"
 #include "routines_p.h"
 #include "parse_p.h"
@@ -57,7 +58,7 @@
 #include "subparser_p.h"
 #include "trashbox.h"
 #include "writer_p.h"
-#include "xtag.h"
+#include "xtag_p.h"
 
 /*
 *   MACROS
