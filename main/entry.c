@@ -1347,6 +1347,7 @@ extern int makeTagEntry (const tagEntryInfo *const tag)
 {
 	int r = CORK_NIL;
 	Assert (tag->name != NULL);
+	Assert(tag->lineNumber > 0);
 
 	if (!TagFile.cork)
 		if (!isTagWritable (tag))
