@@ -90,7 +90,7 @@ static void renderExtensionFieldMaybe (int xftype, const tagEntryInfo *const tag
 {
 	const char *fname = getFieldName (xftype);
 
-	if (fname && isFieldRenderable (xftype) && isFieldEnabled (xftype) && doesFieldHaveValue (xftype, tag))
+	if (fname && doesFieldHaveRenderer (xftype) && isFieldEnabled (xftype) && doesFieldHaveValue (xftype, tag))
 	{
 		switch (xftype)
 		{

@@ -192,7 +192,7 @@ static fmtElement** queueTagField (fmtElement **last, long width, bool truncatio
 			error (FATAL, "No such field letter: %c", field_letter);
 	}
 
-	if (!isFieldRenderable (ftype))
+	if (!doesFieldHaveRenderer (ftype))
 	{
 		Assert (field_letter != NUL_FIELD_LETTER);
 		error (FATAL, "The field cannot be printed in format output: %c", field_letter);

@@ -944,7 +944,7 @@ extern unsigned int getFieldDataType (fieldType type)
 	return getFieldObject(type)->def->dataType;
 }
 
-extern bool isFieldRenderable (fieldType type)
+extern bool doesFieldHaveRenderer (fieldType type)
 {
 	return getFieldObject(type)->def->renderEscaped [WRITER_DEFAULT]? true: false;
 }

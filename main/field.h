@@ -112,7 +112,7 @@ extern void printFields (int language);
 
 /* Whether the field specified with TYPE has a
    method for rendering in the current format. */
-extern bool isFieldRenderable (fieldType type);
+extern bool doesFieldHaveRenderer (fieldType type);
 
 extern bool doesFieldHaveValue (fieldType type, const tagEntryInfo *tag);
 extern const char* renderFieldEscaped (writerType writer, fieldType type, const tagEntryInfo *tag, int index,
