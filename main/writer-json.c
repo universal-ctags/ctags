@@ -11,6 +11,7 @@
 
 #include "debug.h"
 #include "entry_p.h"
+#include "field_p.h"
 #include "mio.h"
 #include "options_p.h"
 #include "read.h"

@@ -15,6 +15,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "colprint_p.h"
 #include "ctags.h"
 #include "debug.h"
 #include "entry.h"

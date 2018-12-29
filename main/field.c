@@ -21,6 +21,7 @@
 #include "entry.h"
 #include "entry_p.h"
 #include "field.h"
+#include "field_p.h"
 #include "kind.h"
 #include "options_p.h"
 #include "parse_p.h"

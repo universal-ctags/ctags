@@ -15,6 +15,7 @@
 #include "entry_p.h"
 #include "fmt_p.h"
 #include "field.h"
+#include "field_p.h"
 #include "parse.h"
 #include "routines.h"
 #include <string.h>

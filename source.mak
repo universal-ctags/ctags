@@ -14,6 +14,7 @@ MIO_SRCS  = main/mio.c
 MAIN_PUBLIC_HEADS =		\
 		main/dependency.h\
 		main/entry.h	\
+		main/field.h	\
 		main/gcc-attr.h	\
 		main/gvars.h	\
 		main/htable.h	\
@@ -51,6 +52,7 @@ MAIN_PRIVATE_HEADS =		\
 	main/dependency_p.h	\
 	main/entry_p.h		\
 	main/error_p.h		\
+	main/field_p.h		\
 	main/flags_p.h		\
 	main/fmt_p.h		\
 	main/interactive_p.h	\
@@ -79,7 +81,6 @@ MAIN_PRIVATE_HEADS =		\
 
 MAIN_HEADS =			\
 	main/ctags.h		\
-	main/field.h		\
 	main/general.h		\
 	\
 	$(MAIN_PUBLIC_HEADS)    \

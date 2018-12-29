@@ -10,6 +10,7 @@
 #include "general.h"  /* must always come first */
 
 #include "entry.h"
+#include "field_p.h"
 #include "fmt_p.h"
 #include "mio.h"
 #include "options_p.h"

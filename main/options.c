@@ -25,7 +25,7 @@
 
 #include "ctags.h"
 #include "debug.h"
-#include "field.h"
+#include "field_p.h"
 #include "gvars.h"
 #include "keyword_p.h"
 #include "main_p.h"
