@@ -58,7 +58,6 @@ typedef const char* (* renderEscaped) (const tagEntryInfo *const tag,
 				       const char *value,
 				       vString * buffer,
 					   bool *rejected);
-typedef bool (* isValueAvailable) (const struct sTagEntryInfo *const tag);
 
 #define fieldDataTypeFalgs "sib" /* used in --list-fields */
 typedef enum eFieldDataType {
@@ -80,7 +79,7 @@ struct sFieldDefinition {
 	const char* description;
 	bool enabled;
 	renderEscaped renderEscaped [WRITER_COUNT];
-	isValueAvailable isValueAvailable;
+	bool (* isValueAvailable) (const tagEntryInfo *const);
 	fieldDataType dataType; /* used in json output */
 
 	unsigned int ftype;	/* Given from the main part */
