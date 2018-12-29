@@ -51,7 +51,13 @@ tagWriter jsonWriter = {
 
 static json_t* escapeFieldValue (const tagEntryInfo * tag, fieldType ftype, bool returnEmptyStringAsNoValue)
 {
-	const char *str = renderFieldEscaped (jsonWriter.type, ftype, tag, NO_PARSER_FIELD, NULL);
+	const char *str;
+
+	if (doesFieldHaveRenderer (ftype, true))
+		str = renderFieldNoEscaping (ftype, tag, NO_PARSER_FIELD);
+	else
+		str = renderField (ftype, tag, NO_PARSER_FIELD);
+
 	if (str)
 	{
 		unsigned int dt = getFieldDataType(ftype);
@@ -90,7 +96,7 @@ static void renderExtensionFieldMaybe (int xftype, const tagEntryInfo *const tag
 {
 	const char *fname = getFieldName (xftype);
 
-	if (fname && doesFieldHaveRenderer (xftype) && isFieldEnabled (xftype) && doesFieldHaveValue (xftype, tag))
+	if (fname && doesFieldHaveRenderer (xftype, false) && isFieldEnabled (xftype) && doesFieldHaveValue (xftype, tag))
 	{
 		switch (xftype)
 		{
@@ -181,10 +187,8 @@ static int writeJsonEntry (tagWriter *writer CTAGS_ATTR_UNUSED,
 
 static void buildJsonFqTagCache (tagWriter *writer, tagEntryInfo *const tag)
 {
-	renderFieldEscaped (writer->type, FIELD_SCOPE_KIND_LONG, tag,
-			    NO_PARSER_FIELD, NULL);
-	renderFieldEscaped (writer->type, FIELD_SCOPE, tag,
-			    NO_PARSER_FIELD, NULL);
+	renderField (FIELD_SCOPE_KIND_LONG, tag, NO_PARSER_FIELD);
+	renderField (FIELD_SCOPE, tag, NO_PARSER_FIELD);
 }
 
 static int writeJsonPtagEntry (tagWriter *writer CTAGS_ATTR_UNUSED,

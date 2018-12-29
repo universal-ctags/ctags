@@ -65,8 +65,6 @@ static int writeXrefEntry (tagWriter *writer CTAGS_ATTR_UNUSED,
 
 static void buildXrefFqTagCache (tagWriter *writer, tagEntryInfo *const tag)
 {
-	renderFieldEscaped (writer->type, FIELD_SCOPE_KIND_LONG, tag,
-			    NO_PARSER_FIELD, NULL);
-	renderFieldEscaped (writer->type, FIELD_SCOPE, tag,
-			    NO_PARSER_FIELD, NULL);
+	renderField (FIELD_SCOPE_KIND_LONG, tag, NO_PARSER_FIELD);
+	renderField (FIELD_SCOPE, tag, NO_PARSER_FIELD);
 }

@@ -14,7 +14,6 @@
 
 #include "general.h"
 #include "colprint_p.h"
-#include "writer_p.h"
 #include "types.h"
 
 #include "vstring.h"
@@ -54,11 +53,6 @@ typedef enum eFieldType { /* extension field content control */
 	FIELD_BUILTIN_LAST = FIELD_END_LINE,
 } fieldType ;
 
-typedef const char* (* renderEscaped) (const tagEntryInfo *const tag,
-				       const char *value,
-				       vString * buffer,
-					   bool *rejected);
-
 #define fieldDataTypeFalgs "sib" /* used in --list-fields */
 typedef enum eFieldDataType {
 	FIELDTYPE_STRING  = 1 << 0,
@@ -69,6 +63,10 @@ typedef enum eFieldDataType {
 	FIELDTYPE_END_MARKER = 1 << 3,
 } fieldDataType;
 
+typedef const char* (*fieldRenderer)(const tagEntryInfo *const,
+									 const char *,
+									 vString *);
+
 #define FIELD_LETTER_NO_USE '\0'
 struct sFieldDefinition {
 	/* letter, and ftype are initialized in the main part,
@@ -78,8 +76,13 @@ struct sFieldDefinition {
 	const char* name;
 	const char* description;
 	bool enabled;
-	renderEscaped renderEscaped [WRITER_COUNT];
+
+	fieldRenderer render;
+	fieldRenderer renderNoEscaping;
+	bool (*hasWhitespaceChar) (const tagEntryInfo *const, const char*);
+
 	bool (* isValueAvailable) (const tagEntryInfo *const);
+
 	fieldDataType dataType; /* used in json output */
 
 	unsigned int ftype;	/* Given from the main part */
@@ -111,11 +114,13 @@ extern void printFields (int language);
 
 /* Whether the field specified with TYPE has a
    method for rendering in the current format. */
-extern bool doesFieldHaveRenderer (fieldType type);
+extern bool doesFieldHaveRenderer (fieldType type, bool noEscaping);
 
 extern bool doesFieldHaveValue (fieldType type, const tagEntryInfo *tag);
-extern const char* renderFieldEscaped (writerType writer, fieldType type, const tagEntryInfo *tag, int index,
-									   bool *rejected);
+
+extern const char* renderField (fieldType type, const tagEntryInfo *tag, int index);
+extern const char* renderFieldNoEscaping (fieldType type, const tagEntryInfo *tag, int index);
+extern bool  doesFieldHaveWhitespaceChar (fieldType type, const tagEntryInfo *tag, int index);
 
 extern void initFieldObjects (void);
 extern int countFields (void);
