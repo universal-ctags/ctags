@@ -244,7 +244,11 @@ static int writeCtagsEntry (tagWriter *writer,
 	if (tag->lineNumberEntry)
 		length += writeLineNumberEntry (writer, mio, tag);
 	else
+	{
+		if (Option.locate == EX_COMBINE)
+			length += mio_printf(mio, "%lu;", tag->lineNumber + (Option.backward? 1: -1));
 		length += mio_puts(mio, escapeFieldValue(writer, tag, FIELD_PATTERN));
+	}
 
 	if (includeExtensionFlags ())
 	{

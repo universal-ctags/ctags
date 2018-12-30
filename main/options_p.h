@@ -53,7 +53,8 @@ typedef struct sCookedArgs {
 typedef enum eLocate {
 	EX_MIX,      /* line numbers for defines, patterns otherwise */
 	EX_LINENUM,  /* -n  only line numbers in tag file */
-	EX_PATTERN   /* -N  only patterns in tag file */
+	EX_PATTERN,  /* -N  only patterns in tag file */
+	EX_COMBINE,  /* Combine linenum and pattern with `;'*/
 } exCmd;
 
 typedef enum sortType {

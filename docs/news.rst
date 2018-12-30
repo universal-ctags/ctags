@@ -920,6 +920,39 @@ Subparsers can be listed with ``--list-subparser``:
     #NAME                          BASEPARSER           DIRECTION
     linux                          C                    base => sub {shared}
 
+Including line number to pattern field
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``--excmd=type`` specifies how ctags prints pattern field in a tags file.
+Universal-ctags inroduces ``combine`` as a new ``type``.
+
+.. IN MAN PAGE
+
+If ``combine`` is given, Universal-ctags combines adjusted line number
+and pattern with a semicolon as pattern. ctags adjusts the line number
+by decrementing or incrementing (if ``-B`` option is given) one.  This
+adjustment helps a client tool like vim to search the pattern from the
+line before (or after) the pattern starts.
+
+Let's see an example.
+
+.. code-block:: console
+
+	$ cat -n /tmp/foo.cc
+		 1	int foo(int i)
+		 2	{
+		 3	  return i;
+		 4	}
+		 5
+		 6	int foo(int i, int j)
+		 7	{
+		 8	  return i + j;
+		 9	}
+	$ ./ctags --excmd=combine -o - /tmp/foo.cc
+	foo	/tmp/foo.cc	0;/^int foo(int i)$/;"	f	typeref:typename:int
+	foo	/tmp/foo.cc	5;/^int foo(int i, int j)$/;"	f	typeref:typename:int
+
+
 Changes to the tags file format
 ---------------------------------------------------------------------
 

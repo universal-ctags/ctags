@@ -242,7 +242,7 @@ static optionDescription LongOptionDescription [] = {
  {1,"      Include reference to 'file' in Emacs-style tag file (requires -e)."},
  {1,"  --exclude=pattern"},
  {1,"      Exclude files and directories matching 'pattern'."},
- {0,"  --excmd=number|pattern|mix"},
+ {0,"  --excmd=number|pattern|mix|combine"},
 #ifdef MACROS_USE_PATTERNS
  {0,"       Uses the specified type of EX command to locate tags [pattern]."},
 #else
@@ -1164,7 +1164,10 @@ static void processExcmdOption (
 		case 'n': Option.locate = EX_LINENUM; break;
 		case 'p': Option.locate = EX_PATTERN; break;
 		default:
-			error (FATAL, "Invalid value for \"%s\" option", option);
+			if (strcmp(parameter, "combine") == 0)
+				Option.locate = EX_COMBINE;
+			else
+				error (FATAL, "Invalid value for \"%s\" option", option);
 			break;
 	}
 }
