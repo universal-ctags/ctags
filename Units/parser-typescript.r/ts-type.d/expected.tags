@@ -1,0 +1,11 @@
+MyString	input.ts	/^type MyString = "mystring";$/;"	a
+MyUnion	input.ts	/^type MyUnion = MyString | "other" | 99;$/;"	a
+MyExportedUnion	input.ts	/^export type MyExportedUnion = MyUnion | "default" \/\/;$/;"	a
+StringOrNumber	input.ts	/^type StringOrNumber = string | number;$/;"	a
+Text	input.ts	/^type Text = string | { text: string };$/;"	a
+NameLookup	input.ts	/^type NameLookup = Dictionary<string, Person>;$/;"	a
+ObjectStatics	input.ts	/^type ObjectStatics = typeof Object;$/;"	a
+Callback	input.ts	/^type Callback<T> = (data: T) => void;$/;"	a
+Pair	input.ts	/^type Pair<T> = [T, T];$/;"	a
+Coordinates	input.ts	/^type Coordinates = Pair<number>;$/;"	a
+Tree	input.ts	/^type Tree<T> = T | { left: Tree<T>, right: Tree<T> };$/;"	a

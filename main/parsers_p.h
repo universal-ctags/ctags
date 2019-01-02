@@ -130,6 +130,7 @@
 	TclOOParser, \
 	TexParser, \
 	TTCNParser, \
+	TypeScriptParser, \
 	VeraParser, \
 	VerilogParser, \
 	SystemVerilogParser, \
