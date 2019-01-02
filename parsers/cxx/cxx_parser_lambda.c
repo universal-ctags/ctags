@@ -116,6 +116,7 @@ CXXToken * cxxParserOpeningBracketIsLambda(void)
 	t = cxxTokenChainPreviousTokenOfType(
 			t,
 			CXXTokenTypeSquareParenthesisChain |
+			CXXTokenTypeBracketChain |
 			CXXTokenTypeAssignment |
 			CXXTokenTypeOperator
 		);
