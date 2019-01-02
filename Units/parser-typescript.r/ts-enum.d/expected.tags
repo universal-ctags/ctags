@@ -1,0 +1,21 @@
+A	input.ts	/^  A,$/;"	p	enum:Test
+B	input.ts	/^  B,$/;"	p	enum:Test
+Blue	input.ts	/^enum Color { Red, Green, Blue }$/;"	p	enum:Color
+Bold	input.ts	/^  Bold = 1,$/;"	p	enum:Style
+C	input.ts	/^  C = Math.floor(Math.random() * 1000),$/;"	p	enum:Test
+Color	input.ts	/^enum Color { Red, Green, Blue }$/;"	e
+Comparison	input.ts	/^const enum Comparison {$/;"	e
+D	input.ts	/^  D = 10,$/;"	p	enum:Test
+E	input.ts	/^  E$/;"	p	enum:Test
+Emphasis	input.ts	/^  Emphasis = Bold | Italic,$/;"	p	enum:Style
+EqualTo	input.ts	/^  EqualTo = 0,$/;"	p	enum:Comparison
+GreaterThan	input.ts	/^  GreaterThan = 1$/;"	p	enum:Comparison
+Green	input.ts	/^enum Color { Red, Green, Blue }$/;"	p	enum:Color
+Hyperlink	input.ts	/^  Hyperlink = Bold | Underline$/;"	p	enum:Style
+Italic	input.ts	/^  Italic = 2,$/;"	p	enum:Style
+LessThan	input.ts	/^  LessThan = -1,$/;"	p	enum:Comparison
+None	input.ts	/^  None = 0,$/;"	p	enum:Style
+Red	input.ts	/^enum Color { Red, Green, Blue }$/;"	p	enum:Color
+Style	input.ts	/^export enum Style {$/;"	e
+Test	input.ts	/^enum Test {$/;"	e
+Underline	input.ts	/^  Underline = 4,$/;"	p	enum:Style

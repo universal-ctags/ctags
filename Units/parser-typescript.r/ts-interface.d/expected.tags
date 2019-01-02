@@ -1,0 +1,35 @@
+Array	input.ts	/^interface Array<T> {$/;"	i
+CompilerOptions	input.ts	/^interface CompilerOptions {$/;"	i
+Document	input.ts	/^interface Document {$/;"	i
+JQuery	input.ts	/^interface JQuery {$/;"	i
+JQueryStatic	input.ts	/^interface JQueryStatic {$/;"	i
+List	input.ts	/^interface List<T> {$/;"	i
+Mover	input.ts	/^interface Mover {$/;"	i
+MoverShaker	input.ts	/^interface MoverShaker extends Mover, Shaker {$/;"	i
+Shaker	input.ts	/^interface Shaker {$/;"	i
+SimpleRecord	input.ts	/^interface SimpleRecord {$/;"	i
+createElement	input.ts	/^  createElement(tagName: "canvas"): HTMLCanvasElement;$/;"	m	interface:Document
+createElement	input.ts	/^  createElement(tagName: "div"): HTMLDivElement;$/;"	m	interface:Document
+createElement	input.ts	/^  createElement(tagName: "span"): HTMLSpanElement;$/;"	m	interface:Document
+createElement	input.ts	/^  createElement(tagName: string): HTMLElement;$/;"	m	interface:Document
+data	input.ts	/^  data: T;$/;"	p	interface:List
+get	input.ts	/^  get(url: string, callback: (data: string) => any);$/;"	m	interface:JQueryStatic
+getSomething	input.ts	/^  getSomething(): \/* } *\/ void;$/;"	m	interface:MoverShaker
+getSomethingSophisticated	input.ts	/^  getSomethingSophisticated()\/*$/;"	m	interface:MoverShaker
+getStatus	input.ts	/^  getStatus(): { frequency: number; };$/;"	m	interface:Shaker
+getStatus	input.ts	/^  getStatus(): { speed: number; };$/;"	m	interface:Mover
+getStatus	input.ts	/^  getStatus(\/*)*\/): { speed: number; frequency: number; };$/;"	m	interface:MoverShaker
+getTpl	input.ts	/^  getTpl<T>(): Promise<T>;$/;"	m	interface:MoverShaker
+length	input.ts	/^  length: number;$/;"	p	interface:Array
+move	input.ts	/^  move(): void;$/;"	m	interface:Mover
+next	input.ts	/^  next: List<T>;$/;"	p	interface:List
+owner	input.ts	/^  owner: List<List<T>>;$/;"	p	interface:List
+propertyA	input.ts	/^  propertyA: number;$/;"	p	interface:SimpleRecord
+propertyB	input.ts	/^  propertyB: string;$/;"	p	interface:SimpleRecord
+propertyC	input.ts	/^  readonly propertyC: [];$/;"	p	interface:SimpleRecord
+shake	input.ts	/^  shake(): void;$/;"	m	interface:Shaker
+sourcePath	input.ts	/^  sourcePath?: string;$/;"	p	interface:CompilerOptions
+strict	input.ts	/^  strict?: boolean;$/;"	p	interface:CompilerOptions
+targetPath	input.ts	/^  targetPath?: string;$/;"	p	interface:CompilerOptions
+text	input.ts	/^  text(content: string);$/;"	m	interface:JQuery
+withoutType	input.ts	/^  withoutType?;$/;"	p	interface:SimpleRecord

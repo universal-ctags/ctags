@@ -1,0 +1,37 @@
+a	input.ts	/^    const a = 100;$/;"	v	function:f3
+a	input.ts	/^    let a = 100;$/;"	v	function:f2
+a	input.ts	/^function map<T, U>(a: T[], f: (x: T) => U): U[] {$/;"	v	function:map
+a	input.ts	/^function mul(a: number, b: number) {$/;"	v	function:mul
+a	input.ts	/^function numberToString(a: number[]) {$/;"	v	function:numberToString
+b	input.ts	/^        let b = a + 1;$/;"	v	function:f2
+b	input.ts	/^        let b = a + 1;$/;"	v	function:f3
+b	input.ts	/^function mul(a: number, b: number) {$/;"	v	function:mul
+combine	input.ts	/^function zip<S, T, U>(x: S[], y: T[], combine: (x: S) => (y: T) => U): U[] {$/;"	v	function:zip
+f	input.ts	/^function map<T, U>(a: T[], f: (x: T) => U): U[] {$/;"	v	function:map
+f1	input.ts	/^function f1(x: string | number | boolean) {$/;"	f
+f2	input.ts	/^function f2(input: boolean) {$/;"	f
+f3	input.ts	/^function f3(input: boolean) {$/;"	f
+f4	input.ts	/^function f4(input = [1, 2]) {$/;"	f
+f5	input.ts	/^function f5([first, second]: [number, number]) {$/;"	f
+first	input.ts	/^  let [first, second] = input;$/;"	v	function:f4
+first	input.ts	/^function f5([first, second]: [number, number]) {$/;"	v	function:f5
+i	input.ts	/^  for (var i = 0; i < a.length; i++) result.push(f(a[i]));$/;"	v	function:map
+i	input.ts	/^  for (var i = 0; i < len; i++) result.push(combine(x[i])(y[i]));$/;"	v	function:zip
+input	input.ts	/^function f2(input: boolean) {$/;"	v	function:f2
+input	input.ts	/^function f3(input: boolean) {$/;"	v	function:f3
+input	input.ts	/^function f4(input = [1, 2]) {$/;"	v	function:f4
+len	input.ts	/^  var len = Math.max(x.length, y.length);$/;"	v	function:zip
+map	input.ts	/^function map<T, U>(a: T[], f: (x: T) => U): U[] {$/;"	f
+mul	input.ts	/^function mul(a: number, b: number) {$/;"	f
+numberToString	input.ts	/^function numberToString(a: number[]) {$/;"	f
+result	input.ts	/^  var result: U[] = [];$/;"	v	function:map
+result	input.ts	/^  var result: U[] = [];$/;"	v	function:zip
+second	input.ts	/^  let [first, second] = input;$/;"	v	function:f4
+second	input.ts	/^function f5([first, second]: [number, number]) {$/;"	v	function:f5
+stringArray	input.ts	/^  var stringArray = a.map(v => v.toString());$/;"	v	function:numberToString
+x	input.ts	/^function f1(x: string | number | boolean) {$/;"	v	function:f1
+x	input.ts	/^function zip<S, T, U>(x: S[], y: T[], combine: (x: S) => (y: T) => U): U[] {$/;"	v	function:zip
+y	input.ts	/^    var y = x; \/\/ Type of y is string | number$/;"	v	function:f1
+y	input.ts	/^function zip<S, T, U>(x: S[], y: T[], combine: (x: S) => (y: T) => U): U[] {$/;"	v	function:zip
+z	input.ts	/^    var z = x; \/\/ Type of z is boolean$/;"	v	function:f1
+zip	input.ts	/^function zip<S, T, U>(x: S[], y: T[], combine: (x: S) => (y: T) => U): U[] {$/;"	f
