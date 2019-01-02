@@ -247,6 +247,7 @@ PARSER_SRCS =				\
 	parsers/tcloo.c			\
 	parsers/tex.c			\
 	parsers/ttcn.c			\
+	parsers/typescript.c		\
 	parsers/verilog.c		\
 	parsers/vhdl.c			\
 	parsers/vim.c			\
