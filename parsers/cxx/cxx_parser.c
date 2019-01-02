@@ -1636,15 +1636,6 @@ bool cxxParserParseAccessSpecifier(void)
 			CXX_DEBUG_PRINT("The access specifier was the first token and I have found a colon: this is C++");
 			g_cxx.bConfirmedCPPLanguage = true;
 		}
-	} else {
-		if(!g_cxx.bConfirmedCPPLanguage)
-		{
-			pInitialToken->eType = CXXTokenTypeIdentifier;
-			// trace back one token so the caller can handle it
-			cxxParserUngetCurrentToken();
-			CXX_DEBUG_LEAVE_TEXT("C++ is not confirmed and there is no colon at the end: not access specifier?");
-			return true;
-		}
 	}
 
 	switch(pInitialToken->eKeyword)
