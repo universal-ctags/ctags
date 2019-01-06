@@ -46,6 +46,7 @@ static const char *renderFieldInput (const tagEntryInfo *const tag, const char *
 static const char *renderFieldInputNoEscape (const tagEntryInfo *const tag, const char *value, vString* b);
 static const char *renderFieldCompactInputLine (const tagEntryInfo *const tag, const char *value, vString* b);
 static const char *renderFieldSignature (const tagEntryInfo *const tag, const char *value, vString* b);
+static const char *renderFieldSignatureNoEscape (const tagEntryInfo *const tag, const char *value, vString* b);
 static const char *renderFieldScope (const tagEntryInfo *const tag, const char *value, vString* b);
 static const char *renderFieldScopeNoEscape (const tagEntryInfo *const tag, const char *value, vString* b);
 static const char *renderFieldTyperef (const tagEntryInfo *const tag, const char *value, vString* b);
@@ -68,6 +69,7 @@ static const char *renderFieldEnd (const tagEntryInfo *const tag, const char *va
 static bool hasWhitespaceInName (const tagEntryInfo *const tag, const char *value);
 static bool hasWhitespaceInInput (const tagEntryInfo *const tag, const char*value);
 static bool hasWhitespaceInFieldScope (const tagEntryInfo *const tag, const char *value);
+static bool hasWhitespaceInSignature (const tagEntryInfo *const tag, const char *value);
 
 static bool     isLanguageFieldAvailable  (const tagEntryInfo *const tag);
 static bool     isTyperefFieldAvailable   (const tagEntryInfo *const tag);
@@ -162,11 +164,12 @@ static fieldDefinition fieldDefinitionsExuberant [] = {
 			   "Line number of tag definition",
 			   FIELDTYPE_INTEGER,
 			   renderFieldLineNumber),
-	DEFINE_FIELD_FULL ('S', "signature",	     false,
+	DEFINE_FIELD_FULL ('S', "signature",     false,
 			   "Signature of routine (e.g. prototype or parameter list)",
 			   isSignatureFieldAvailable,
 			   FIELDTYPE_STRING,
-			   renderFieldSignature, NULL, NULL),
+			   renderFieldSignature, renderFieldSignatureNoEscape,
+			   hasWhitespaceInSignature),
 	DEFINE_FIELD_FULL ('s', NULL,             true,
 			   "Scope of tag definition (`p' can be used for printing its kind)",
 			   NULL,
@@ -470,6 +473,18 @@ static const char *renderFieldSignature (const tagEntryInfo *const tag, const ch
 {
 	return renderEscapedString (WITH_DEFUALT_VALUE (tag->extensionFields.signature),
 				    tag, b);
+}
+
+static const char *renderFieldSignatureNoEscape (const tagEntryInfo *const tag, const char *value CTAGS_ATTR_UNUSED, vString* b)
+{
+	return renderAsIs (b, WITH_DEFUALT_VALUE (tag->extensionFields.signature));
+}
+
+static bool hasWhitespaceInSignature (const tagEntryInfo *const tag, const char *value CTAGS_ATTR_UNUSED)
+{
+	return (tag->extensionFields.signature && strpbrk(tag->extensionFields.signature, " \t"))
+		? true
+		: false;
 }
 
 static const char *renderFieldScope (const tagEntryInfo *const tag, const char *value CTAGS_ATTR_UNUSED, vString* b)
