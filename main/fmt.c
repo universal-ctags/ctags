@@ -15,6 +15,7 @@
 #include "entry_p.h"
 #include "fmt_p.h"
 #include "field.h"
+#include "field_p.h"
 #include "parse.h"
 #include "routines.h"
 #include <string.h>
@@ -60,8 +61,7 @@ static int printTagField (fmtSpec* fspec, MIO* fp, const tagEntryInfo * tag)
 	ftype = fspec->field.ftype;
 
 	if (isCommonField (ftype))
-		/* TODO: Don't use WRITER_XREF directly */
-		str = renderFieldEscaped (WRITER_XREF, ftype, tag, NO_PARSER_FIELD, NULL);
+		str = renderField (ftype, tag, NO_PARSER_FIELD);
 	else
 	{
 		unsigned int findex;
@@ -77,9 +77,7 @@ static int printTagField (fmtSpec* fspec, MIO* fp, const tagEntryInfo * tag)
 		if (findex == tag->usedParserFields)
 			str = "";
 		else if (isFieldEnabled (f->ftype))
-			/* TODO: Don't use WRITER_XREF directly */
-			str = renderFieldEscaped (WRITER_XREF, f->ftype,
-						  tag, findex, NULL);
+			str = renderField (f->ftype, tag, findex);
 	}
 
 	if (str == NULL)
@@ -192,7 +190,7 @@ static fmtElement** queueTagField (fmtElement **last, long width, bool truncatio
 			error (FATAL, "No such field letter: %c", field_letter);
 	}
 
-	if (!isFieldRenderable (ftype))
+	if (!doesFieldHaveRenderer (ftype, false))
 	{
 		Assert (field_letter != NUL_FIELD_LETTER);
 		error (FATAL, "The field cannot be printed in format output: %c", field_letter);

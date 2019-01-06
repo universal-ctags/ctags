@@ -28,6 +28,7 @@
 #include "debug.h"
 #include "colprint_p.h"
 #include "entry_p.h"
+#include "field_p.h"
 #include "flags_p.h"
 #include "htable.h"
 #include "kind.h"

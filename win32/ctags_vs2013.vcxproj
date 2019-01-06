@@ -259,6 +259,7 @@
     <ClInclude Include="..\main\entry_p.h" />
     <ClInclude Include="..\main\error_p.h" />
     <ClInclude Include="..\main\field.h" />
+    <ClInclude Include="..\main\field_p.h" />
     <ClInclude Include="..\main\flags_p.h" />
     <ClInclude Include="..\main\fmt_p.h" />
     <ClInclude Include="..\main\gcc-attr.h" />

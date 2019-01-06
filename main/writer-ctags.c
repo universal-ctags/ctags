@@ -10,6 +10,7 @@
 #include "general.h"  /* must always come first */
 
 #include "entry_p.h"
+#include "field_p.h"
 #include "mio.h"
 #include "options_p.h"
 #include "parse_p.h"
@@ -70,14 +71,17 @@ tagWriter eCtagsWriter = {
 
 static const char* escapeFieldValue (tagWriter *writer, const tagEntryInfo * tag, fieldType ftype)
 {
-	bool *reject = NULL;
-
 	if (writer->private)
 	{
 		struct rejection * rej = writer->private;
-		reject = &rej->rejectedInThisRendering;
+		if (!rej->rejectedInThisRendering)
+			rej->rejectedInThisRendering = doesFieldHaveWhitespaceChar (ftype, tag, NO_PARSER_FIELD);
 	}
-	return renderFieldEscaped (writer->type, ftype, tag, NO_PARSER_FIELD, reject);
+
+	if (writer->type == WRITER_E_CTAGS && doesFieldHaveRenderer(ftype, true))
+		return renderFieldNoEscaping (ftype, tag, NO_PARSER_FIELD);
+	else
+		return renderField (ftype, tag, NO_PARSER_FIELD);
 }
 
 static int renderExtensionFieldMaybe (tagWriter *writer, int xftype, const tagEntryInfo *const tag, char sep[2], MIO *mio)
@@ -99,13 +103,7 @@ static int addParserFields (tagWriter *writer, MIO * mio, const tagEntryInfo *co
 {
 	unsigned int i;
 	int length = 0;
-	bool *reject = NULL;
-
-	if (writer->private)
-	{
-		struct rejection *rej = writer->private;
-		reject = &rej->rejectedInThisRendering;
-	}
+	struct rejection * rej = writer->private;
 
 	for (i = 0; i < tag->usedParserFields; i++)
 	{
@@ -113,10 +111,18 @@ static int addParserFields (tagWriter *writer, MIO * mio, const tagEntryInfo *co
 		if (! isFieldEnabled (f->ftype))
 			continue;
 
+		if (rej && (!rej->rejectedInThisRendering))
+			rej->rejectedInThisRendering = doesFieldHaveWhitespaceChar (f->ftype, tag, NO_PARSER_FIELD);
+
+		const char *v;
+		if (writer->type == WRITER_E_CTAGS && doesFieldHaveRenderer(f->ftype, true))
+			v = renderFieldNoEscaping (f->ftype, tag, i);
+		else
+			v = renderField (f->ftype, tag, i);
+
 		length += mio_printf(mio, "\t%s:%s",
 							 getFieldName (f->ftype),
-							 renderFieldEscaped (writer->type,
-												 f->ftype, tag, i, reject));
+							 v);
 	}
 	return length;
 }
@@ -241,6 +247,11 @@ static int writeCtagsEntry (tagWriter *writer,
 			      escapeFieldValue (writer, tag, FIELD_NAME),
 			      escapeFieldValue (writer, tag, FIELD_INPUT_FILE));
 
+	/* This is for handling 'common' of 'fortran'.  See the
+	   description of --excmd=mixed in ctags.1.  In tags output, what
+	   we call "pattern" is instructions for vi.
+
+	   However, in the other formats, pattern should be pattern as its name. */
 	if (tag->lineNumberEntry)
 		length += writeLineNumberEntry (writer, mio, tag);
 	else

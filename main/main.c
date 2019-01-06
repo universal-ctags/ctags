@@ -65,7 +65,7 @@
 #include "debug.h"
 #include "entry_p.h"
 #include "error_p.h"
-#include "field.h"
+#include "field_p.h"
 #include "keyword_p.h"
 #include "main_p.h"
 #include "options_p.h"

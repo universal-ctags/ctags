@@ -527,6 +527,9 @@
     <ClInclude Include="..\main\field.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\main\field_p.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="..\main\flags_p.h">
       <Filter>Header Files</Filter>
     </ClInclude>
