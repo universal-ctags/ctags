@@ -985,16 +985,24 @@ static int skipOverDComment (void)
 /*  Skips to the end of a string, returning a special character to
  *  symbolically represent a generic string.
  */
-static int skipToEndOfString (bool ignoreBackslash)
+static int skipToEndOfString (bool ignoreBackslash, vString *rawdata, unsigned int maxlen)
 {
 	int c;
 
 	while ((c = cppGetcFromUngetBufferOrFile ()) != EOF)
 	{
 		if (c == BACKSLASH && ! ignoreBackslash)
-			cppGetcFromUngetBufferOrFile ();  /* throw away next character, too */
+		{
+			if (rawdata)
+				vStringPutWithLimit (rawdata, c, maxlen);
+			c = cppGetcFromUngetBufferOrFile ();  /* throw away next character, too */
+			if ((c != EOF) && rawdata)
+				vStringPutWithLimit (rawdata, c, maxlen);
+		}
 		else if (c == DOUBLE_QUOTE)
 			break;
+		else if (rawdata)
+			vStringPutWithLimit (rawdata, c, maxlen);
 	}
 	return STRING_SYMBOL;  /* symbolic representation of string */
 }
@@ -1012,7 +1020,7 @@ static int skipToEndOfCxxRawLiteralString (void)
 	if (c != '(' && ! isCxxRawLiteralDelimiterChar (c))
 	{
 		cppUngetc (c);
-		c = skipToEndOfString (false);
+		c = skipToEndOfString (false, NULL, 0);
 	}
 	else
 	{
@@ -1052,7 +1060,7 @@ static int skipToEndOfCxxRawLiteralString (void)
  *  special character to symbolically represent a generic character.
  *  Also detects Vera numbers that include a base specifier (ie. 'b1010).
  */
-static int skipToEndOfChar (void)
+static int skipToEndOfChar (vString *rawdata, unsigned int maxlen)
 {
 	int c;
 	int count = 0, veraBase = '\0';
@@ -1061,7 +1069,13 @@ static int skipToEndOfChar (void)
 	{
 	    ++count;
 		if (c == BACKSLASH)
-			cppGetcFromUngetBufferOrFile ();  /* throw away next character, too */
+		{
+			if (rawdata)
+				vStringPutWithLimit (rawdata, c, maxlen);
+			c = cppGetcFromUngetBufferOrFile ();  /* throw away next character, too */
+			if ((c != EOF) && rawdata)
+				vStringPutWithLimit (rawdata, c, maxlen);
+		}
 		else if (c == SINGLE_QUOTE)
 			break;
 		else if (c == NEWLINE)
@@ -1072,13 +1086,20 @@ static int skipToEndOfChar (void)
 		else if (Cpp.hasSingleQuoteLiteralNumbers)
 		{
 			if (count == 1  &&  strchr ("DHOB", toupper (c)) != NULL)
+			{
 				veraBase = c;
+				vStringPutWithLimit (rawdata, c, maxlen);
+			}
 			else if (veraBase != '\0'  &&  ! isalnum (c))
 			{
 				cppUngetc (c);
 				break;
 			}
+			else if (rawdata)
+				vStringPutWithLimit (rawdata, c, maxlen);
 		}
+		else if (rawdata)
+			vStringPutWithLimit (rawdata, c, maxlen);
 	}
 	return CHAR_SYMBOL;  /* symbolic representation of character */
 }
@@ -1101,6 +1122,11 @@ static void attachEndFieldMaybe (int macroCorkIndex)
  *  the tokenizer.
  */
 extern int cppGetc (void)
+{
+	return cppGetcFull (NULL, 0);
+}
+
+extern int cppGetcFull (vString *rawData, int maxlen)
 {
 	bool directive = false;
 	bool ignore = false;
@@ -1141,7 +1167,7 @@ process:
 				else
 				{
 					Cpp.directive.accept = false;
-					c = skipToEndOfString (false);
+					c = skipToEndOfString (false, rawData, maxlen);
 				}
 
 				break;
@@ -1157,7 +1183,7 @@ process:
 
 			case SINGLE_QUOTE:
 				Cpp.directive.accept = false;
-				c = skipToEndOfChar ();
+				c = skipToEndOfChar (rawData, maxlen);
 				break;
 
 			case '/':
@@ -1292,7 +1318,7 @@ process:
 					if (next == DOUBLE_QUOTE)
 					{
 						Cpp.directive.accept = false;
-						c = skipToEndOfString (true);
+						c = skipToEndOfString (true, NULL, 0);
 						break;
 					}
 					else
