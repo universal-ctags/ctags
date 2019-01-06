@@ -102,4 +102,11 @@ CTAGS_INLINE void vStringPut (vString *const string, const int c)
 		string->buffer [++string->length] = '\0';
 }
 
+CTAGS_INLINE void vStringPutWithLimit (vString *const string, const int c,
+									   unsigned int maxlen)
+{
+	if (vStringLength (string) < maxlen || maxlen == 0)
+		vStringPut (string, c);
+}
+
 #endif  /* CTAGS_MAIN_VSTRING_H */
