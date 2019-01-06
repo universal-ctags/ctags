@@ -77,6 +77,9 @@ typedef struct sCppState {
 	int * ungetPointer;      /* the current unget char: points in the middle of the buffer */
 	int ungetDataSize;        /* the number of valid unget characters in the buffer */
 
+	/* the contents of the last SYMBOL_CHAR or SYMBOL_STRING */
+	vString * charOrStringContents;
+
 	bool resolveRequired;     /* must resolve if/else/elif/endif branch */
 	bool hasAtLiteralStrings; /* supports @"c:\" strings */
 	bool hasCxxRawLiteralStrings; /* supports R"xxx(...)xxx" strings */
@@ -169,6 +172,7 @@ static cppState Cpp = {
 	.ungetBufferSize = 0,
 	.ungetPointer = NULL,
 	.ungetDataSize = 0,
+	.charOrStringContents = NULL,
 	.resolveRequired = false,
 	.hasAtLiteralStrings = false,
 	.hasCxxRawLiteralStrings = false,
@@ -236,6 +240,9 @@ static void cppInitCommon(langType clientLang,
 	Cpp.clientLang = clientLang;
 	Cpp.ungetBuffer = NULL;
 	Cpp.ungetPointer = NULL;
+
+	CXX_DEBUG_ASSERT(!Cpp.charOrStringContents,"This string should be null when CPP is not initialized");
+	Cpp.charOrStringContents = vStringNew();
 
 	Cpp.resolveRequired = false;
 	Cpp.hasAtLiteralStrings = hasAtLiteralStrings;
@@ -314,6 +321,12 @@ extern void cppTerminate (void)
 	{
 		eFree(Cpp.ungetBuffer);
 		Cpp.ungetBuffer = NULL;
+	}
+
+	if(Cpp.charOrStringContents)
+	{
+		vStringDelete(Cpp.charOrStringContents);
+		Cpp.charOrStringContents = NULL;
 	}
 
 	Cpp.clientLang = LANG_IGNORE;
@@ -982,27 +995,34 @@ static int skipOverDComment (void)
 	return c;
 }
 
+const vString * cppGetLastCharOrStringContents (void)
+{
+	CXX_DEBUG_ASSERT(Cpp.charOrStringContents,"Shouldn't be called when CPP is not initialized");
+	return Cpp.charOrStringContents;
+}
+
 /*  Skips to the end of a string, returning a special character to
  *  symbolically represent a generic string.
  */
-static int skipToEndOfString (bool ignoreBackslash, vString *rawdata, unsigned int maxlen)
+static int skipToEndOfString (bool ignoreBackslash)
 {
 	int c;
+
+	vStringClear(Cpp.charOrStringContents);
 
 	while ((c = cppGetcFromUngetBufferOrFile ()) != EOF)
 	{
 		if (c == BACKSLASH && ! ignoreBackslash)
 		{
-			if (rawdata)
-				vStringPutWithLimit (rawdata, c, maxlen);
+			vStringPutWithLimit (Cpp.charOrStringContents, c, 1024);
 			c = cppGetcFromUngetBufferOrFile ();  /* throw away next character, too */
-			if ((c != EOF) && rawdata)
-				vStringPutWithLimit (rawdata, c, maxlen);
+			if (c != EOF)
+				vStringPutWithLimit (Cpp.charOrStringContents, c, 1024);
 		}
 		else if (c == DOUBLE_QUOTE)
 			break;
-		else if (rawdata)
-			vStringPutWithLimit (rawdata, c, maxlen);
+		else
+			vStringPutWithLimit (Cpp.charOrStringContents, c, 1024);
 	}
 	return STRING_SYMBOL;  /* symbolic representation of string */
 }
@@ -1020,7 +1040,7 @@ static int skipToEndOfCxxRawLiteralString (void)
 	if (c != '(' && ! isCxxRawLiteralDelimiterChar (c))
 	{
 		cppUngetc (c);
-		c = skipToEndOfString (false, NULL, 0);
+		c = skipToEndOfString (false);
 	}
 	else
 	{
@@ -1060,21 +1080,22 @@ static int skipToEndOfCxxRawLiteralString (void)
  *  special character to symbolically represent a generic character.
  *  Also detects Vera numbers that include a base specifier (ie. 'b1010).
  */
-static int skipToEndOfChar (vString *rawdata, unsigned int maxlen)
+static int skipToEndOfChar ()
 {
 	int c;
 	int count = 0, veraBase = '\0';
+
+	vStringClear(Cpp.charOrStringContents);
 
 	while ((c = cppGetcFromUngetBufferOrFile ()) != EOF)
 	{
 	    ++count;
 		if (c == BACKSLASH)
 		{
-			if (rawdata)
-				vStringPutWithLimit (rawdata, c, maxlen);
+			vStringPutWithLimit (Cpp.charOrStringContents, c, 10);
 			c = cppGetcFromUngetBufferOrFile ();  /* throw away next character, too */
-			if ((c != EOF) && rawdata)
-				vStringPutWithLimit (rawdata, c, maxlen);
+			if (c != EOF)
+				vStringPutWithLimit (Cpp.charOrStringContents, c, 10);
 		}
 		else if (c == SINGLE_QUOTE)
 			break;
@@ -1088,18 +1109,18 @@ static int skipToEndOfChar (vString *rawdata, unsigned int maxlen)
 			if (count == 1  &&  strchr ("DHOB", toupper (c)) != NULL)
 			{
 				veraBase = c;
-				vStringPutWithLimit (rawdata, c, maxlen);
+				vStringPutWithLimit (Cpp.charOrStringContents, c, 10);
 			}
 			else if (veraBase != '\0'  &&  ! isalnum (c))
 			{
 				cppUngetc (c);
 				break;
 			}
-			else if (rawdata)
-				vStringPutWithLimit (rawdata, c, maxlen);
+			else
+				vStringPutWithLimit (Cpp.charOrStringContents, c, 10);
 		}
-		else if (rawdata)
-			vStringPutWithLimit (rawdata, c, maxlen);
+		else
+			vStringPutWithLimit (Cpp.charOrStringContents, c, 10);
 	}
 	return CHAR_SYMBOL;  /* symbolic representation of character */
 }
@@ -1122,11 +1143,6 @@ static void attachEndFieldMaybe (int macroCorkIndex)
  *  the tokenizer.
  */
 extern int cppGetc (void)
-{
-	return cppGetcFull (NULL, 0);
-}
-
-extern int cppGetcFull (vString *rawData, int maxlen)
 {
 	bool directive = false;
 	bool ignore = false;
@@ -1167,7 +1183,7 @@ process:
 				else
 				{
 					Cpp.directive.accept = false;
-					c = skipToEndOfString (false, rawData, maxlen);
+					c = skipToEndOfString (false);
 				}
 
 				break;
@@ -1183,7 +1199,7 @@ process:
 
 			case SINGLE_QUOTE:
 				Cpp.directive.accept = false;
-				c = skipToEndOfChar (rawData, maxlen);
+				c = skipToEndOfChar ();
 				break;
 
 			case '/':
@@ -1318,7 +1334,7 @@ process:
 					if (next == DOUBLE_QUOTE)
 					{
 						Cpp.directive.accept = false;
-						c = skipToEndOfString (true, NULL, 0);
+						c = skipToEndOfString (true);
 						break;
 					}
 					else

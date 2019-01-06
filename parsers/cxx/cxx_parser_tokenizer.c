@@ -26,18 +26,10 @@
 
 #define UINFO(c) (((c) < 0x80 && (c) >= 0) ? g_aCharTable[c].uType : 0)
 
-static void cxxParserSkipToNonWhiteSpaceFull(vString *pRawdata, unsigned int uMaxlen)
-{
-	if(!cppIsspace(g_cxx.iChar))
-		return;
-	do
-		g_cxx.iChar = cppGetcFull(pRawdata, uMaxlen);
-	while(cppIsspace(g_cxx.iChar));
-}
-
 static void cxxParserSkipToNonWhiteSpace(void)
 {
-	cxxParserSkipToNonWhiteSpaceFull (NULL, 0);
+	while(cppIsspace(g_cxx.iChar))
+		g_cxx.iChar = cppGetc();
 }
 
 enum CXXCharType
@@ -1154,14 +1146,12 @@ bool cxxParserParseNextToken(void)
 	}
 
 	CXXToken * t = cxxTokenCreate();
-	static vString *pRawdata;
-	pRawdata = vStringNewOrClear (pRawdata);
 
 	cxxTokenChainAppend(g_cxx.pTokenChain,t);
 
 	g_cxx.pToken = t;
 
-	cxxParserSkipToNonWhiteSpaceFull(pRawdata, 0);
+	cxxParserSkipToNonWhiteSpace();
 
 	// FIXME: this cpp handling is kind of broken:
 	// it works only because the moon is in the correct phase.
@@ -1373,7 +1363,7 @@ bool cxxParserParseNextToken(void)
 	{
 		t->eType = CXXTokenTypeStringConstant;
 		vStringPut(t->pszWord,'"');
-		vStringCat(t->pszWord, pRawdata);
+		vStringCat(t->pszWord,cppGetLastCharOrStringContents());
 		vStringPut(t->pszWord,'"');
 		g_cxx.iChar = cppGetc();
 		t->bFollowedBySpace = cppIsspace(g_cxx.iChar);
@@ -1421,7 +1411,7 @@ bool cxxParserParseNextToken(void)
 	{
 		t->eType = CXXTokenTypeCharacterConstant;
 		vStringPut(t->pszWord,'\'');
-		vStringCat(t->pszWord, pRawdata);
+		vStringCat(t->pszWord,cppGetLastCharOrStringContents());
 		vStringPut(t->pszWord,'\'');
 		g_cxx.iChar = cppGetc();
 		t->bFollowedBySpace = cppIsspace(g_cxx.iChar);
