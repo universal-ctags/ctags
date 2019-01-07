@@ -28,11 +28,8 @@
 
 static void cxxParserSkipToNonWhiteSpace(void)
 {
-	if(!cppIsspace(g_cxx.iChar))
-		return;
-	do
+	while(cppIsspace(g_cxx.iChar))
 		g_cxx.iChar = cppGetc();
-	while(cppIsspace(g_cxx.iChar));
 }
 
 enum CXXCharType
@@ -1366,6 +1363,7 @@ bool cxxParserParseNextToken(void)
 	{
 		t->eType = CXXTokenTypeStringConstant;
 		vStringPut(t->pszWord,'"');
+		vStringCat(t->pszWord,cppGetLastCharOrStringContents());
 		vStringPut(t->pszWord,'"');
 		g_cxx.iChar = cppGetc();
 		t->bFollowedBySpace = cppIsspace(g_cxx.iChar);
@@ -1413,6 +1411,7 @@ bool cxxParserParseNextToken(void)
 	{
 		t->eType = CXXTokenTypeCharacterConstant;
 		vStringPut(t->pszWord,'\'');
+		vStringCat(t->pszWord,cppGetLastCharOrStringContents());
 		vStringPut(t->pszWord,'\'');
 		g_cxx.iChar = cppGetc();
 		t->bFollowedBySpace = cppIsspace(g_cxx.iChar);
