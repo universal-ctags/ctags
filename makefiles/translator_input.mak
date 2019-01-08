@@ -11,5 +11,6 @@ TRANSLATOR_INPUT = \
 	optlib/pod.ctags			\
 	optlib/qemuhx.ctags			\
 	optlib/puppetManifest.ctags		\
+	optlib/systemtap.ctags			\
 	\
 	$(NULL)

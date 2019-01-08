@@ -1,0 +1,4 @@
+matched_str	input.stp	/^function matched_str:string() { return matched(0) }$/;"	f	line:24	end:24
+matched	input.stp	/^function matched:string(n:long)$/;"	f	line:39	end:82
+ngroups	input.stp	/^function ngroups:long()$/;"	f	line:96	end:105
+__asmlinkage_int_arg	input.stp	/^function __asmlinkage_int_arg:long(n:long)$/;"	f	line:116	end:120

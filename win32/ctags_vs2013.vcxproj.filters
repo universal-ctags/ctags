@@ -204,6 +204,9 @@
     <ClCompile Include="..\optlib\qemuhx.c">
       <Filter>Source Files\optlib</Filter>
     </ClCompile>
+    <ClCompile Include="..\optlib\systemtap.c">
+      <Filter>Source Files\optlib</Filter>
+    </ClCompile>
     <ClCompile Include="..\parsers\ada.c">
       <Filter>Source Files\Parsers</Filter>
     </ClCompile>

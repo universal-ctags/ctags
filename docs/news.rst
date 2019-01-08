@@ -81,6 +81,7 @@ The following parsers have been added:
 * RpmSpec
 * Rust
 * SystemdUnit
+* SystemTap *optlib*
 * SystemVerilog
 * SVG *libxml*
 * TclOO (see :ref:`The new Tcl parser <tcl>`)

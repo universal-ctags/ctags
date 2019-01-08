@@ -1,0 +1,3 @@
+m0	input.stpm	/^@define m0$/;"	m	line:4	end:7
+m1	input.stpm	/^@define m1(a0) %($/;"	m	line:12	end:14
+m2	input.stpm	/^@define m2(a1,$/;"	m	line:19	end:22

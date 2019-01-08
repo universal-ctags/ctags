@@ -1,0 +1,730 @@
+#
+# Taken from /usr/share/systemtap/tapset/linux/tcp.stp
+#
+// TCP tapset
+// Copyright (C) 2006 IBM Corp.
+// Copyright (C) 2006 Intel Corporation.
+// Copyright (C) 2007, 2010, 2012-2018 Red Hat, Inc.
+//
+// This file is part of systemtap, and is free software.  You can
+// redistribute it and/or modify it under the terms of the GNU General
+// Public License (GPL); either version 2, or (at your option) any
+// later version.
+// <tapsetdescription>
+// This family of probe points is used to probe events that occur in the TCP layer, 
+// </tapsetdescription>
+
+// See the BZ1546179 block comment in tapset/linux/networking.stp for
+// an explanation of the try/catch statements around sk_buff structure
+// accesses.
+
+%{
+#include <linux/version.h>
+#include <net/sock.h>
+#include <net/tcp.h>
+#include <net/ip.h>
+#include <linux/skbuff.h>
+%}
+
+// Get retransmission timeout in usecs. RTO is initialized from default
+// retransmission time, but can be adjusted (increased) each time we 
+// retransmit. It should always be less than the max value of TCP retransmission 
+// timeout (TCP_RTO_MAX)
+function tcp_get_info_rto:long(sock:long)
+%{ /* pure */
+	struct sock *sk = (struct sock *)(uintptr_t) STAP_ARG_sock;
+#if LINUX_VERSION_CODE < KERNEL_VERSION(2,6,10)
+	struct tcp_opt *tp = tcp_sk(sk);
+	STAP_RETVALUE = (int64_t) jiffies_to_usecs(kread(&(tp->rto)));
+#else
+	const struct inet_connection_sock *icsk = inet_csk(sk);
+	STAP_RETVALUE = (int64_t) jiffies_to_usecs(kread(&(icsk->icsk_rto)));
+#endif
+	CATCH_DEREF_FAULT();
+%}
+
+//Get congestion window segment size. Initial value of congestion window size 
+//typically set to one segment (i.e., slow start algorithm, each segment can be 512 bytes).
+//This congestion window size can be dynamically increased based on whether TCP
+//is performing slow start or congestion avoidance. 
+function tcp_get_info_snd_cwnd:long(sock:long)
+%{ /* pure */
+	struct sock *sk = (struct sock *)(uintptr_t) STAP_ARG_sock;
+#if LINUX_VERSION_CODE < KERNEL_VERSION(2,6,10)
+	struct tcp_opt *tp = tcp_sk(sk);
+#else
+	struct tcp_sock *tp = tcp_sk(sk);
+#endif
+	STAP_RETVALUE = (int64_t) kread(&(tp->snd_cwnd));
+	CATCH_DEREF_FAULT();
+%}
+
+//
+//Definitions of the TCP protocol sk_state field listed below.
+//
+//     TCP_ESTABLISHED = 1,   Normal data transfer
+//     TCP_SYN_SENT   = 2,   App. has started to open a connection
+//     TCP_SYN_RECV   = 3,   A connection request has arrived; wait for ACK
+//     TCP_FIN_WAIT1  = 4,   App. has said it is finished
+//     TCP_FIN_WAIT2  = 5,   The other side has agreed to close
+//     TCP_TIME_WAIT  = 6,   Wait for all packets to die off
+//     TCP_CLOSE      = 7,   No connection is active or pending 
+//     TCP_CLOSE_WAIT = 8,   The other side has initiated a release
+//     TCP_LAST_ACK   = 9,   Last ACK, wait for all packets to die off
+//     TCP_LISTEN     = 10,  Waiting for incoming call
+//     TCP_CLOSING    = 11,  Both sides have tried to close simultaneously
+//     TCP_MAX_STATES = 12   Max states number
+// 
+function tcp_ts_get_info_state:long(sock:long)
+%{ /* pure */
+	struct sock *sk = (struct sock *)(uintptr_t) STAP_ARG_sock;
+	STAP_RETVALUE = (int64_t) kread(&(sk->sk_state));
+	CATCH_DEREF_FAULT();
+%}
+
+/* return the TCP destination port for a given sock */
+function __tcp_sock_dport:long (sock:long)
+{
+  port = @choose_defined(@inet_sock_cast(sock)->sk->__sk_common->skc_dport, # kernel >= 3.8
+          @choose_defined(@inet_sock_cast(sock)->inet_dport, # kernel >= 2.6.33
+           @choose_defined(@inet_sock_cast(sock)->dport, # kernel >= 2.6.11
+                           @inet_sock_cast(sock)->inet->dport)))
+  return ntohs(port)
+}
+
+/* returns the TCP header for recent (<2.6.21) kernel */
+@__private30 function __get_skb_tcphdr_new:long(skb:long)
+%{ /* pure */
+	struct sk_buff *skb;
+	skb = (struct sk_buff *)(uintptr_t)STAP_ARG_skb;
+	/* as done by skb_transport_header() */
+	#ifdef NET_SKBUFF_DATA_USES_OFFSET
+		STAP_RETVALUE = (long)(kread(&(skb->head)) + kread(&(skb->transport_header)));
+	#else
+		STAP_RETVALUE = (long)kread(&(skb->transport_header));
+	#endif
+	CATCH_DEREF_FAULT();
+%}
+
+/* returns the TCP header for a given sk_buff structure */
+function __get_skb_tcphdr:long(skb:long)
+{
+%( kernel_v < "2.6.21" %?
+	tcphdr = @cast(skb, "sk_buff")->h->raw
+	return tcphdr
+%:
+	return __get_skb_tcphdr_new(skb)
+%)
+}
+
+/* returns TCP URG flag for a given sk_buff structure */
+function __tcp_skb_urg:long (tcphdr:long)
+{
+	return @cast(tcphdr, "tcphdr", "kernel<linux/tcp.h>")->urg
+}
+
+/* returns TCP ACK flag for a given sk_buff structure */
+function __tcp_skb_ack:long (tcphdr:long)
+{
+	return @cast(tcphdr, "tcphdr", "kernel<linux/tcp.h>")->ack
+}
+
+/* returns TCP PSH flag for a given sk_buff structure */
+function __tcp_skb_psh:long (tcphdr:long)
+{
+	return @cast(tcphdr, "tcphdr", "kernel<linux/tcp.h>")->psh
+}
+
+/* returns TCP RST flag for a given sk_buff structure */
+function __tcp_skb_rst:long (tcphdr:long)
+{
+	return @cast(tcphdr, "tcphdr", "kernel<linux/tcp.h>")->rst
+}
+
+/* returns TCP SYN flag for a given sk_buff structure */
+function __tcp_skb_syn:long (tcphdr:long)
+{
+	return @cast(tcphdr, "tcphdr", "kernel<linux/tcp.h>")->syn
+}
+
+/* returns TCP FIN flag for a given sk_buff structure */
+function __tcp_skb_fin:long (tcphdr:long)
+{
+	return @cast(tcphdr, "tcphdr", "kernel<linux/tcp.h>")->fin
+}
+
+/* returns TCP source port for a given sk_buff structure */
+function __tcp_skb_sport:long (tcphdr:long)
+{
+	return ntohs(@cast(tcphdr, "tcphdr", "kernel<linux/tcp.h>")->source)
+}
+
+/* returns TCP destination port for a given sk_buff structure */
+function __tcp_skb_dport:long (tcphdr:long){
+	return ntohs(@cast(tcphdr, "tcphdr", "kernel<linux/tcp.h>")->dest)
+}
+
+/* return the TCP source port for a given sock */
+function __tcp_sock_sport:long (sock:long)
+{
+    port = @choose_defined(@inet_sock_cast(sock)->inet_sport, # kernel >= 2.6.33
+	    @choose_defined(@inet_sock_cast(sock)->sport, # kernel >= 2.6.11
+		@inet_sock_cast(sock)->inet->sport))
+    return ntohs(port)
+}
+
+@__private30 global sockstate[12]
+probe init {
+	sockstate[1] = "TCP_ESTABLISHED"
+	sockstate[2] = "TCP_SYN_SENT"
+	sockstate[3] = "TCP_SYN_RECV"
+	sockstate[4] = "TCP_FIN_WAIT1"
+	sockstate[5] = "TCP_FIN_WAIT2"
+	sockstate[6] = "TCP_TIME_WAIT"
+	sockstate[7] = "TCP_CLOSE"
+	sockstate[8] = "TCP_CLOSE_WAIT"
+	sockstate[9] = "TCP_LAST_ACK"
+	sockstate[10] = "TCP_LISTEN"
+	sockstate[11] = "TCP_CLOSING"
+	sockstate[12] = "TCP_MAX_STATES"
+}
+
+function tcp_sockstate_str:string (state:long) {
+	return (state in sockstate ? sockstate[state] : "UNDEF")
+}
+
+// Get slow start threshold size.  If cwnd size is less than or equal to
+// threshold size, then TCP is in slow start; otherwise TCP is in congestion
+// avoidance.
+function tcp_ts_get_info_snd_ssthresh:long(sock:long)
+%{ /* pure */
+	struct sock *sk = (struct sock *)(uintptr_t) STAP_ARG_sock;
+#if LINUX_VERSION_CODE < KERNEL_VERSION(2,6,10)
+	struct tcp_opt *tp = tcp_sk(sk);
+#else
+	struct tcp_sock *tp = tcp_sk(sk);
+#endif
+	STAP_RETVALUE = (int64_t) kread(&(tp->snd_ssthresh));
+	CATCH_DEREF_FAULT();
+%}
+
+// Get receiver's advertised segment size.  TCP typically never sends more
+// than what receiver can accept.
+function tcp_ts_get_info_rcv_mss:long(sock:long)
+%{ /* pure */
+	struct sock *sk = (struct sock *)(uintptr_t) STAP_ARG_sock;
+#if LINUX_VERSION_CODE < KERNEL_VERSION(2,6,10)
+	struct tcp_opt *tp = tcp_sk(sk);
+	STAP_RETVALUE = (int64_t) kread(&(tp->ack.rcv_mss));
+#else
+	const struct inet_connection_sock *icsk = inet_csk(sk);
+	STAP_RETVALUE = (int64_t) kread(&(icsk->icsk_ack.rcv_mss));
+#endif
+	CATCH_DEREF_FAULT();
+%}
+
+%{
+// Define newer IPv4 sockopt constants for older kernels.
+#ifndef TCP_CONGESTION
+#define TCP_CONGESTION 0
+#endif
+#ifndef TCP_MD5SIG
+#define TCP_MD5SIG 0
+#endif
+#ifndef TCP_COOKIE_TRANSACTIONS
+#define TCP_COOKIE_TRANSACTIONS 0
+#endif
+#ifndef TCP_THIN_LINEAR_TIMEOUTS
+#define TCP_THIN_LINEAR_TIMEOUTS 0
+#endif
+#ifndef TCP_THIN_DUPACK
+#define TCP_THIN_DUPACK 0
+#endif
+#ifndef TCP_USER_TIMEOUT
+#define TCP_USER_TIMEOUT 0
+#endif
+%}
+
+@__private30 global __sockopt[18]
+probe init {
+	__sockopt[@const("TCP_NODELAY")] = "TCP_NODELAY"
+	__sockopt[@const("TCP_MAXSEG")] = "TCP_MAXSEG"
+	__sockopt[@const("TCP_CORK")] = "TCP_CORK"
+	__sockopt[@const("TCP_KEEPIDLE")] = "TCP_KEEPIDLE"
+	__sockopt[@const("TCP_KEEPINTVL")] = "TCP_KEEPINTVL"
+	__sockopt[@const("TCP_KEEPCNT")] = "TCP_KEEPCNT"
+	__sockopt[@const("TCP_SYNCNT")] = "TCP_SYNCNT"
+	__sockopt[@const("TCP_LINGER2")] = "TCP_LINGER2"
+	__sockopt[@const("TCP_DEFER_ACCEPT")] = "TCP_DEFER_ACCEPT"
+	__sockopt[@const("TCP_WINDOW_CLAMP")] = "TCP_WINDOW_CLAMP"
+	__sockopt[@const("TCP_INFO")] = "TCP_INFO"
+	__sockopt[@const("TCP_QUICKACK")] = "TCP_QUICKACK"
+	if (@const("TCP_CONGESTION") > 0)
+		__sockopt[@const("TCP_CONGESTION")]
+			= "TCP_CONGESTION"
+	if (@const("TCP_MD5SIG") > 0)
+		__sockopt[@const("TCP_MD5SIG")] = "TCP_MD5SIG"
+	if (@const("TCP_COOKIE_TRANSACTIONS") > 0)
+		__sockopt[@const("TCP_COOKIE_TRANSACTIONS")]
+			= "TCP_COOKIE_TRANSACTIONS"
+	if (@const("TCP_THIN_LINEAR_TIMEOUTS") > 0)
+		__sockopt[@const("TCP_THIN_LINEAR_TIMEOUTS")]
+			= "TCP_THIN_LINEAR_TIMEOUTS"
+	if (@const("TCP_THIN_DUPACK") > 0)
+		__sockopt[@const("TCP_THIN_DUPACK")]
+			= "TCP_THIN_DUPACK"
+	if (@const("TCP_USER_TIMEOUT") > 0)
+		__sockopt[@const("TCP_USER_TIMEOUT")]
+			= "TCP_USER_TIMEOUT"
+}
+
+function tcp_sockopt_str:string (optname:long)
+{
+	return (optname in __sockopt ? __sockopt[optname]
+		: sprintf("UNDEF_SOCKOPT(%d)", optname))
+}
+
+%{
+// Define newer IPv6 sockopt constants for older kernels.
+#include <linux/in6.h>
+#ifndef IPV6_2292PKTINFO
+#define IPV6_2292PKTINFO 0
+#endif
+#ifndef IPV6_2292HOPOPTS
+#define IPV6_2292HOPOPTS 0
+#endif
+#ifndef IPV6_2292DSTOPTS
+#define IPV6_2292DSTOPTS 0
+#endif
+#ifndef IPV6_2292RTHDR
+#define IPV6_2292RTHDR 0
+#endif
+#ifndef IPV6_2292PKTOPTIONS
+#define IPV6_2292PKTOPTIONS 0
+#endif
+#ifndef IPV6_2292HOPLIMIT
+#define IPV6_2292HOPLIMIT 0
+#endif
+#ifndef IPV6_RECVPKTINFO
+#define IPV6_RECVPKTINFO 0
+#endif
+#ifndef IPV6_RECVHOPLIMIT
+#define IPV6_RECVHOPLIMIT 0
+#endif
+#ifndef IPV6_RECVHOPOPTS
+#define IPV6_RECVHOPOPTS 0
+#endif
+#ifndef IPV6_RTHDRDSTOPTS
+#define IPV6_RTHDRDSTOPTS 0
+#endif
+#ifndef IPV6_RECVRTHDR
+#define IPV6_RECVRTHDR 0
+#endif
+#ifndef IPV6_RECVDSTOPTS
+#define IPV6_RECVDSTOPTS 0
+#endif
+#ifndef IPV6_RECVPATHMTU
+#define IPV6_RECVPATHMTU 0
+#endif
+#ifndef IPV6_PATHMTU
+#define IPV6_PATHMTU 0
+#endif
+#ifndef IPV6_DONTFRAG
+#define IPV6_DONTFRAG 0
+#endif
+#ifndef IPV6_ADDR_PREFERENCES
+#define IPV6_ADDR_PREFERENCES 0
+#endif
+#ifndef IPV6_MINHOPCOUNT
+#define IPV6_MINHOPCOUNT 0
+#endif
+#ifndef IPV6_RECVORIGDSTADDR
+#define IPV6_RECVORIGDSTADDR 0
+#endif
+#ifndef IPV6_TRANSPARENT
+#define IPV6_TRANSPARENT 0
+#endif
+%}
+
+@__private30 global __ipv6_sockopt[55]
+probe init {
+	__ipv6_sockopt[@const("IPV6_ADDRFORM")] = "IPV6_ADDRFORM"
+	if (@const("IPV6_2292PKTINFO") > 0)
+		__ipv6_sockopt[@const("IPV6_2292PKTINFO")]
+			= "IPV6_2292PKTINFO"
+	if (@const("IPV6_2292HOPOPTS") > 0)
+		__ipv6_sockopt[@const("IPV6_2292HOPOPTS")]
+			= "IPV6_2292HOPOPTS"
+	if (@const("IPV6_2292DSTOPTS") > 0)
+		__ipv6_sockopt[@const("IPV6_2292DSTOPTS")]
+			= "IPV6_2292DSTOPTS"
+	if (@const("IPV6_2292RTHDR") > 0)
+		__ipv6_sockopt[@const("IPV6_2292RTHDR")]
+			= "IPV6_2292RTHDR"
+	if (@const("IPV6_2292PKTOPTIONS") > 0)
+		__ipv6_sockopt[@const("IPV6_2292PKTOPTIONS")]
+			= "IPV6_2292PKTOPTIONS"
+	__ipv6_sockopt[@const("IPV6_CHECKSUM")] = "IPV6_CHECKSUM"
+	if (@const("IPV6_2292HOPLIMIT") > 0)
+		__ipv6_sockopt[@const("IPV6_2292HOPLIMIT")]
+			= "IPV6_2292HOPLIMIT"
+	__ipv6_sockopt[@const("IPV6_NEXTHOP")] = "IPV6_NEXTHOP"
+	__ipv6_sockopt[@const("IPV6_AUTHHDR")] = "IPV6_AUTHHDR"
+	__ipv6_sockopt[@const("IPV6_FLOWINFO")] = "IPV6_FLOWINFO"
+	__ipv6_sockopt[@const("IPV6_UNICAST_HOPS")]
+		= "IPV6_UNICAST_HOPS"
+	__ipv6_sockopt[@const("IPV6_MULTICAST_IF")]
+		= "IPV6_MULTICAST_IF"
+	__ipv6_sockopt[@const("IPV6_MULTICAST_HOPS")]
+		= "IPV6_MULTICAST_HOPS"
+	__ipv6_sockopt[@const("IPV6_MULTICAST_LOOP")]
+		= "IPV6_MULTICAST_LOOP"
+	__ipv6_sockopt[@const("IPV6_ADD_MEMBERSHIP")]
+		= "IPV6_ADD_MEMBERSHIP"
+	__ipv6_sockopt[@const("IPV6_DROP_MEMBERSHIP")]
+		= "IPV6_DROP_MEMBERSHIP"
+	__ipv6_sockopt[@const("IPV6_ROUTER_ALERT")]
+		= "IPV6_ROUTER_ALERT"
+	__ipv6_sockopt[@const("IPV6_MTU_DISCOVER")]
+		= "IPV6_MTU_DISCOVER"
+	__ipv6_sockopt[@const("IPV6_MTU")] = "IPV6_MTU"
+	__ipv6_sockopt[@const("IPV6_RECVERR")] = "IPV6_RECVERR"
+	__ipv6_sockopt[@const("IPV6_V6ONLY")] = "IPV6_V6ONLY"
+	__ipv6_sockopt[@const("IPV6_JOIN_ANYCAST")]
+		= "IPV6_JOIN_ANYCAST"
+	__ipv6_sockopt[@const("IPV6_LEAVE_ANYCAST")]
+		= "IPV6_LEAVE_ANYCAST"
+	__ipv6_sockopt[@const("IPV6_FLOWLABEL_MGR")]
+		= "IPV6_FLOWLABEL_MGR"
+	__ipv6_sockopt[@const("IPV6_FLOWINFO_SEND")]
+		= "IPV6_FLOWINFO_SEND"
+	__ipv6_sockopt[@const("IPV6_IPSEC_POLICY")]
+		= "IPV6_IPSEC_POLICY"
+	__ipv6_sockopt[@const("IPV6_XFRM_POLICY")]
+		= "IPV6_XFRM_POLICY"
+	__ipv6_sockopt[@const("MCAST_JOIN_GROUP")]
+		= "MCAST_JOIN_GROUP"
+	__ipv6_sockopt[@const("MCAST_BLOCK_SOURCE")]
+		= "MCAST_BLOCK_SOURCE"
+	__ipv6_sockopt[@const("MCAST_UNBLOCK_SOURCE")]
+		= "MCAST_UNBLOCK_SOURCE"
+	__ipv6_sockopt[@const("MCAST_LEAVE_GROUP")]
+		= "MCAST_LEAVE_GROUP"
+	__ipv6_sockopt[@const("MCAST_JOIN_SOURCE_GROUP")]
+		= "MCAST_JOIN_SOURCE_GROUP"
+	__ipv6_sockopt[@const("MCAST_LEAVE_SOURCE_GROUP")]
+		= "MCAST_LEAVE_SOURCE_GROUP"
+	__ipv6_sockopt[@const("MCAST_MSFILTER")] = "MCAST_MSFILTER"
+	if (@const("IPV6_RECVPKTINFO") > 0)
+		__ipv6_sockopt[@const("IPV6_RECVPKTINFO")]
+			= "IPV6_RECVPKTINFO"
+	__ipv6_sockopt[@const("IPV6_PKTINFO")] = "IPV6_PKTINFO"
+	if (@const("IPV6_RECVHOPLIMIT") > 0)
+		__ipv6_sockopt[@const("IPV6_RECVHOPLIMIT")]
+			= "IPV6_RECVHOPLIMIT"
+	__ipv6_sockopt[@const("IPV6_HOPLIMIT")] = "IPV6_HOPLIMIT"
+	if (@const("IPV6_RECVHOPOPTS") > 0)
+		__ipv6_sockopt[@const("IPV6_RECVHOPOPTS")]
+			= "IPV6_RECVHOPOPTS"
+	__ipv6_sockopt[@const("IPV6_HOPOPTS")] = "IPV6_HOPOPTS"
+	if (@const("IPV6_RTHDRDSTOPTS") > 0)
+		__ipv6_sockopt[@const("IPV6_RTHDRDSTOPTS")]
+			= "IPV6_RTHDRDSTOPTS"
+	if (@const("IPV6_RECVRTHDR") > 0)
+		__ipv6_sockopt[@const("IPV6_RECVRTHDR")]
+			= "IPV6_RECVRTHDR"
+	__ipv6_sockopt[@const("IPV6_RTHDR")] = "IPV6_RTHDR"
+	if (@const("IPV6_RECVDSTOPTS") > 0)
+		__ipv6_sockopt[@const("IPV6_RECVDSTOPTS")]
+			= "IPV6_RECVDSTOPTS"
+	__ipv6_sockopt[@const("IPV6_DSTOPTS")] = "IPV6_DSTOPTS"
+	if (@const("IPV6_RECVPATHMTU") > 0)
+		__ipv6_sockopt[@const("IPV6_RECVPATHMTU")]
+			= "IPV6_RECVPATHMTU"
+	if (@const("IPV6_PATHMTU") > 0)
+		__ipv6_sockopt[@const("IPV6_PATHMTU")]
+			= "IPV6_PATHMTU"
+	if (@const("IPV6_DONTFRAG") > 0)
+		__ipv6_sockopt[@const("IPV6_DONTFRAG")]
+			= "IPV6_DONTFRAG"
+	__ipv6_sockopt[@const("IPV6_RECVTCLASS")]
+		= "IPV6_RECVTCLASS"
+	__ipv6_sockopt[@const("IPV6_TCLASS")] = "IPV6_TCLASS"
+	if (@const("IPV6_ADDR_PREFERENCES") > 0)
+		__ipv6_sockopt[@const("IPV6_ADDR_PREFERENCES")]
+			= "IPV6_ADDR_PREFERENCES"
+	if (@const("IPV6_MINHOPCOUNT") > 0)
+		__ipv6_sockopt[@const("IPV6_MINHOPCOUNT")]
+			= "IPV6_MINHOPCOUNT"
+	if (@const("IPV6_RECVORIGDSTADDR") > 0)
+		__ipv6_sockopt[@const("IPV6_RECVORIGDSTADDR")]
+			= "IPV6_RECVORIGDSTADDR"
+	if (@const("IPV6_TRANSPARENT") > 0)
+		__ipv6_sockopt[@const("IPV6_TRANSPARENT")]
+			= "IPV6_TRANSPARENT"
+}
+
+function tcp_ipv6_sockopt_str:string (optname:long)
+{
+	return (optname in __ipv6_sockopt ? __ipv6_sockopt[optname]
+		: sprintf("UNDEF_SOCKOPT(%d)", optname))
+}
+
+/**
+  * probe tcp.sendmsg - Sending a tcp message
+  * @name: Name of this probe
+  * @sock: Network socket 
+  * @family: IP address family
+  * @size: Number of bytes to send  
+  *
+  * Context:
+  *  The process which sends a tcp message 
+  */
+probe tcp.sendmsg = kernel.function("tcp_sendmsg") {
+	name = "tcp.sendmsg"
+	sock = (@defined($sock) ? $sock->sk : $sk)
+	family  = __ip_sock_family(@defined($sock) ? $sock->sk : $sk)
+	size = $size
+}
+
+/**
+ * probe tcp.sendmsg.return -  Sending TCP message is done
+ * @name: Name of this probe
+ * @size: Number of bytes sent or error code if an error occurred. 
+ *
+ * Context:
+ *  The process which sends a tcp message
+ */
+probe tcp.sendmsg.return = kernel.function("tcp_sendmsg").return {
+	name = "tcp.sendmsg"
+	size = $return 
+}
+
+/**
+ * probe tcp.recvmsg - Receiving TCP message
+ * @name: Name of this probe
+ * @sock: Network socket
+ * @size: Number of bytes to be received  
+ * @family: IP address family
+ * @saddr: A string representing the source IP address
+ * @daddr: A string representing the destination IP address
+ * @sport: TCP source port 
+ * @dport: TCP destination port
+ * Context:
+ *  The process which receives a tcp message
+ */
+probe tcp.recvmsg = kernel.function("tcp_recvmsg") {
+	name = "tcp.recvmsg"
+	sock    = $sk
+	size    = $len
+	family  = __ip_sock_family($sk)
+	saddr   = format_ipaddr(__ip_sock_saddr($sk), __ip_sock_family($sk))
+	daddr   = format_ipaddr(__ip_sock_daddr($sk), __ip_sock_family($sk))
+	sport   = __tcp_sock_sport($sk)
+	dport   = __tcp_sock_dport($sk)
+}
+
+/**
+ * probe tcp.recvmsg.return - Receiving TCP message complete
+ * @name: Name of this probe
+ * @size: Number of bytes received or error code if an error occurred.
+ * @family: IP address family
+ * @saddr: A string representing the source IP address
+ * @daddr: A string representing the destination IP address
+ * @sport: TCP source port 
+ * @dport: TCP destination port
+ *
+ * Context:
+ *  The process which receives a tcp message
+ */
+probe tcp.recvmsg.return = kernel.function("tcp_recvmsg").return {
+	name = "tcp.recvmsg"
+	size = $return
+	family  = __ip_sock_family(@entry($sk))
+	saddr   = format_ipaddr(__ip_sock_saddr(@entry($sk)), __ip_sock_family(@entry($sk)))
+	daddr   = format_ipaddr(__ip_sock_daddr(@entry($sk)), __ip_sock_family(@entry($sk)))
+	sport = __tcp_sock_sport(@entry($sk))
+	dport = __tcp_sock_dport(@entry($sk))
+}
+
+/**
+ * probe tcp.disconnect - TCP socket disconnection
+ * @name: Name of this probe
+ * @sock: Network socket 
+ * @family: IP address family
+ * @flags: TCP flags (e.g. FIN, etc)  
+ * @saddr: A string representing the source IP address
+ * @daddr: A string representing the destination IP address
+ * @sport: TCP source port 
+ * @dport: TCP destination port
+ *
+ * Context:
+ *  The process which disconnects tcp 
+ */
+probe tcp.disconnect = kernel.function("tcp_disconnect") {
+	name = "tcp.disconnect"
+	sock  = $sk
+	family = __ip_sock_family($sk)
+	flags = $flags
+	saddr   = format_ipaddr(__ip_sock_saddr($sk), __ip_sock_family($sk))
+	daddr   = format_ipaddr(__ip_sock_daddr($sk), __ip_sock_family($sk))
+	sport = __tcp_sock_sport($sk)
+	dport = __tcp_sock_dport($sk)
+}
+
+/**
+ * probe tcp.disconnect.return - TCP socket disconnection complete
+ * @name: Name of this probe
+ * @ret: Error code (0: no error) 
+ *
+ * Context:
+ *  The process which disconnects tcp
+ */
+probe tcp.disconnect.return = kernel.function("tcp_disconnect").return {
+	name = "tcp.disconnect"
+	ret = $return 
+}
+
+/**
+ * probe tcp.setsockopt - Call to setsockopt()
+ * @name: Name of this probe
+ * @sock: Network socket
+ * @family: IP address family
+ * @level: The level at which the socket options will be manipulated
+ * @optname: TCP socket options (e.g. TCP_NODELAY, TCP_MAXSEG, etc)
+ * @optstr: Resolves optname to a human-readable format
+ * @optlen: Used to access values for setsockopt()
+ *
+ * Context:
+ *  The process which calls setsockopt
+ */
+probe tcp.setsockopt = tcp.ipv4.setsockopt, tcp.ipv6.setsockopt
+{
+}
+probe tcp.ipv4.setsockopt = kernel.function("tcp_setsockopt")
+{
+	name = "tcp.ipv4.setsockopt"
+	sock = $sk
+	family  = __ip_sock_family($sk)
+	level = $level
+	optname = $optname
+	optstr = tcp_sockopt_str($optname)
+	optlen = $optlen
+}
+probe tcp.ipv6.setsockopt = kernel.function("ipv6_setsockopt")!,
+	module("ipv6").function("ipv6_setsockopt")
+{
+	name = "tcp.ipv6.setsockopt"
+	sock = $sk
+	family  = __ip_sock_family($sk)
+	level = $level
+	optname = $optname
+	optstr = tcp_ipv6_sockopt_str($optname)
+	optlen = $optlen
+}
+
+/**
+ * probe tcp.setsockopt.return -  Return from setsockopt()
+ * @name: Name of this probe
+ * @ret: Error code (0: no error)
+ *
+ * Context:
+ *  The process which calls setsockopt
+ */
+probe tcp.setsockopt.return = tcp.ipv4.setsockopt.return,
+	tcp.ipv6.setsockopt.return
+{
+}
+probe tcp.ipv4.setsockopt.return = kernel.function("tcp_setsockopt").return
+{
+	name = "tcp.ipv4.setsockopt"
+	ret = $return
+}
+probe tcp.ipv6.setsockopt.return = kernel.function("ipv6_setsockopt").return!,
+	module("ipv6").function("ipv6_setsockopt").return
+{
+	name = "tcp.ipv6.setsockopt"
+	ret = $return
+}
+
+/**
+ * probe tcp.receive - Called when a TCP packet is received
+ * @name: Name of the probe point
+ * @iphdr: IP header address
+ * @protocol: Packet protocol from driver
+ * @family: IP address family
+ * @saddr: A string representing the source IP address
+ * @daddr: A string representing the destination IP address
+ * @sport: TCP source port
+ * @dport: TCP destination port
+ * @urg: TCP URG flag
+ * @ack: TCP ACK flag
+ * @psh: TCP PSH flag
+ * @rst: TCP RST flag
+ * @syn: TCP SYN flag
+ * @fin: TCP FIN flag
+ */
+probe tcp.receive = tcp.ipv4.receive, tcp.ipv6.receive
+{
+}
+
+probe tcp.ipv4.receive = kernel.function("tcp_v4_rcv")
+{
+	name = "tcp.ipv4.receive"
+	# If we're here, by definition we're doing AF_INET, not AF_INET6.
+	family = @const("AF_INET")
+	try {
+	  iphdr = __get_skb_iphdr($skb)
+	  saddr = format_ipaddr(__ip_skb_saddr(iphdr), @const("AF_INET"))
+	  daddr = format_ipaddr(__ip_skb_daddr(iphdr), @const("AF_INET"))
+	  protocol = __ip_skb_proto(iphdr)
+	} catch { }
+
+	try {
+	  tcphdr = __get_skb_tcphdr($skb)
+	  dport = __tcp_skb_dport(tcphdr)
+	  sport = __tcp_skb_sport(tcphdr)
+	  urg = __tcp_skb_urg(tcphdr)
+	  ack = __tcp_skb_ack(tcphdr)
+	  psh = __tcp_skb_psh(tcphdr)
+	  rst = __tcp_skb_rst(tcphdr)
+	  syn = __tcp_skb_syn(tcphdr)
+	  fin = __tcp_skb_fin(tcphdr)
+	} catch { }
+}
+
+probe tcp.ipv6.receive = kernel.function("tcp_v6_rcv")!,
+	module("ipv6").function("tcp_v6_rcv")
+{
+	name = "tcp.ipv6.receive"
+	# If we're here, by definition we're doing AF_INET6, not AF_INET.
+	family = @const("AF_INET6")
+	try {
+	  iphdr = __get_skb_iphdr(@choose_defined($skb, kernel_pointer($pskb)))
+	  saddr = format_ipaddr(&@cast(iphdr, "ipv6hdr",
+				       "kernel<linux/ipv6.h>")->saddr,
+				@const("AF_INET6"))
+	  daddr = format_ipaddr(&@cast(iphdr, "ipv6hdr",
+				       "kernel<linux/ipv6.h>")->daddr,
+				@const("AF_INET6"))
+	} catch { }
+
+	# If we're here, by definition we're doing IPPROTO_TCP.  There
+	# isn't a protocol field in 'struct ipv6hdr'.  There is one in
+	# 'struct sk_buff', but that protocol field is an Ethernet
+	# Procol ID (ETH_P_*), not an IP protocol ID (IPPROTO_*).
+	protocol = @const("IPPROTO_TCP")
+
+	try {
+	  tcphdr = __get_skb_tcphdr(@choose_defined($skb,
+				    kernel_pointer($pskb)))
+	  dport = __tcp_skb_dport(tcphdr)
+	  sport = __tcp_skb_sport(tcphdr)
+	  urg = __tcp_skb_urg(tcphdr)
+	  ack = __tcp_skb_ack(tcphdr)
+	  psh = __tcp_skb_psh(tcphdr)
+	  rst = __tcp_skb_rst(tcphdr)
+	  syn = __tcp_skb_syn(tcphdr)
+	  fin = __tcp_skb_fin(tcphdr)
+	} catch { }
+}
