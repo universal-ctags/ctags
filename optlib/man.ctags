@@ -32,6 +32,13 @@
 --map-Man=+.8
 --map-Man=+.9
 
+# For perl modules
+--map-Man=+.3pm
+
+# For systemtap
+--map-Man=+.3stap
+--map-Man=+.7stap
+
 --kinddef-Man=t,title,titles
 --kinddef-Man=s,section,sections
 
