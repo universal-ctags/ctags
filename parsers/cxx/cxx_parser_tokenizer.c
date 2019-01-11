@@ -286,7 +286,7 @@ static CXXCharTypeData g_aCharTable[128] =
 	},
 	// 036 (0x24) '$'
 	{
-		0,
+		CXXCharTypeStartOfIdentifier | CXXCharTypePartOfIdentifier,
 		0,
 		0
 	},

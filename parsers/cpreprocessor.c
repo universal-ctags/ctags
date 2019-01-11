@@ -1565,7 +1565,7 @@ static void saveMacro(const char * macro)
 		return;
 	}
 
-	if(!(isalpha(*c) || (*c == '_')))
+	if(!(isalpha(*c) || (*c == '_' || (*c == '$') )))
 	{
 		CXX_DEBUG_LEAVE_TEXT("Macro does not start with an alphanumeric character");
 		return; // must be a sequence of letters and digits
@@ -1573,7 +1573,7 @@ static void saveMacro(const char * macro)
 
 	const char * identifierBegin = c;
 
-	while(*c && (isalnum(*c) || (*c == '_')))
+	while(*c && (isalnum(*c) || (*c == '_') || (*c == '$') ))
 		c++;
 
 	const char * identifierEnd = c;
