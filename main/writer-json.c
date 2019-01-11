@@ -38,14 +38,12 @@ static int writeJsonPtagEntry (tagWriter *writer CTAGS_ATTR_UNUSED,
 				const char *const fileName,
 				const char *const pattern,
 				const char *const parserName);
-static void buildJsonFqTagCache (tagWriter *writer, tagEntryInfo *const tag);
 
 tagWriter jsonWriter = {
 	.writeEntry = writeJsonEntry,
 	.writePtagEntry = writeJsonPtagEntry,
 	.preWriteEntry = NULL,
 	.postWriteEntry = NULL,
-	.buildFqTagCache = buildJsonFqTagCache,
 	.defaultFileName = NULL,
 };
 
@@ -184,12 +182,6 @@ static int writeJsonEntry (tagWriter *writer CTAGS_ATTR_UNUSED,
 	json_decref (response);
 
 	return length;
-}
-
-static void buildJsonFqTagCache (tagWriter *writer, tagEntryInfo *const tag)
-{
-	renderField (FIELD_SCOPE_KIND_LONG, tag, NO_PARSER_FIELD);
-	renderField (FIELD_SCOPE, tag, NO_PARSER_FIELD);
 }
 
 static int writeJsonPtagEntry (tagWriter *writer CTAGS_ATTR_UNUSED,
