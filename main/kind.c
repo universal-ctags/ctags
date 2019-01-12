@@ -48,6 +48,8 @@ struct kindControlBlock {
 	kindObject *kind;
 	unsigned int count;
 	langType owner;
+	scopeSeparator defaultScopeSeparator;
+	scopeSeparator defaultRootScopeSeparator;
 };
 
 extern const char *renderRole (const roleDefinition* const role, vString* b)
@@ -108,6 +110,16 @@ extern struct kindControlBlock* allocKindControlBlock (parserDefinition *parser)
 	kcb->count = parser->kindCount;
 	kcb->owner = parser->id;
 
+	kcb->defaultScopeSeparator.parentKindIndex = KIND_WILDCARD_INDEX;
+	kcb->defaultScopeSeparator.separator = NULL;
+	if (parser->defaultScopeSeparator)
+		kcb->defaultScopeSeparator.separator = eStrdup (parser->defaultScopeSeparator);
+
+	kcb->defaultRootScopeSeparator.parentKindIndex = KIND_GHOST_INDEX;
+	kcb->defaultRootScopeSeparator.separator = NULL;
+	if (parser->defaultRootScopeSeparator)
+		kcb->defaultRootScopeSeparator.separator = eStrdup (parser->defaultRootScopeSeparator);
+
 	for (i = 0; i < parser->kindCount; ++i)
 	{
 		kindObject *kind = kcb->kind + i;
@@ -145,6 +157,12 @@ extern void freeKindControlBlock (struct kindControlBlock* kcb)
 		if (kcb->kind [i].dynamicSeparators)
 			ptrArrayDelete(kcb->kind [i].dynamicSeparators);
 	}
+
+	if (kcb->defaultRootScopeSeparator.separator)
+		eFree((char *)kcb->defaultRootScopeSeparator.separator);
+	if (kcb->defaultScopeSeparator.separator)
+		eFree((char *)kcb->defaultScopeSeparator.separator);
+
 	eFree (kcb->kind);
 	eFree (kcb);
 }
@@ -391,14 +409,20 @@ extern const scopeSeparator *getScopeSeparator(struct kindControlBlock* kcb,
 	/* Cannot find a sitable sep definition.
 	 * Use default one. */
 	if (parentKindIndex == KIND_GHOST_INDEX)
+	{
+		if (kcb->defaultRootScopeSeparator.separator)
+			return &kcb->defaultRootScopeSeparator;
 		return NULL;
+	}
 	else
 	{
+		if (kcb->defaultScopeSeparator.separator)
+			return &kcb->defaultScopeSeparator;
+
 		static scopeSeparator defaultSeparator = {
 			.separator = ".",
 			.parentKindIndex = KIND_WILDCARD_INDEX,
 		};
-
 		return &defaultSeparator;
 	}
 }

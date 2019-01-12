@@ -30,20 +30,13 @@
 /*
 *   DATA DEFINITIONS
 */
-
-static scopeSeparator TclGenericSeparators [] = {
-	{ KIND_WILDCARD_INDEX, "::" },
-};
-
 typedef enum {
 	K_PROCEDURE, K_NAMESPACE
 } tclKind;
 
 static kindDefinition TclKinds [] = {
-	{ true, 'p', "procedure", "procedures",
-	  ATTACH_SEPARATORS(TclGenericSeparators)},
-	{ true, 'n', "namespace", "namespaces",
-	  ATTACH_SEPARATORS(TclGenericSeparators)},
+	{ true, 'p', "procedure", "procedures", },
+	{ true, 'n', "namespace", "namespaces", },
 };
 
 enum {
@@ -642,5 +635,7 @@ extern parserDefinition* TclParser (void)
 	def->parser     = findTclTags;
 	def->useCork    = true;
 	def->requestAutomaticFQTag = true;
+	def->defaultScopeSeparator = "::";
+
 	return def;
 }
