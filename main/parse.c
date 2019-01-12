@@ -2208,7 +2208,7 @@ static bool processLangDefineKind(const langType language,
 	if (letter == ',')
 		error (FATAL, "no kind letter specified in \"--%s\" option", option);
 	if (!isalnum (letter))
-		error (FATAL, "the kind letter give in \"--%s\" option is not an alphabet or a number", option);
+		error (FATAL, "the kind letter given in \"--%s\" option is not an alphabet or a number", option);
 	else if (letter == KIND_FILE_DEFAULT)
 		error (FATAL, "the kind letter `F' in \"--%s\" option is reserved for \"file\" kind", option);
 	else if (getKindForLetter (parser->kindControlBlock, letter))
@@ -2307,7 +2307,7 @@ static bool processLangDefineRole(const langType language,
 	if (kletter == '.')
 		error (FATAL, "no kind letter specified in \"--%s\" option", option);
 	if (!isalnum (kletter))
-		error (FATAL, "the kind letter give in \"--%s\" option is not an alphabet or a number", option);
+		error (FATAL, "the kind letter given in \"--%s\" option is not an alphabet or a number", option);
 	else if (kletter == KIND_FILE_DEFAULT)
 		error (FATAL, "the kind letter `F' in \"--%s\" option is reserved for \"file\" kind and no role can be attached to", option);
 

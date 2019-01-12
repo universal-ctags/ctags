@@ -15,10 +15,10 @@ ctags: Warning: the kind for letter `x' specified in "--_roledef-IMAGINARY" opti
 ctags: Warning: the kind for letter `x' specified in "--_roledef-IMAGINARY" option is not defined.
 
 # wrong char in a kind letter
-ctags: the kind letter give in "--_roledef-IMAGINARY" option is not an alphabet or a number
-ctags: the kind letter give in "--_roledef-IMAGINARY" option is not an alphabet or a number
-ctags: the kind letter give in "--_roledef-IMAGINARY" option is not an alphabet or a number
-ctags: the kind letter give in "--_roledef-IMAGINARY" option is not an alphabet or a number
+ctags: the kind letter given in "--_roledef-IMAGINARY" option is not an alphabet or a number
+ctags: the kind letter given in "--_roledef-IMAGINARY" option is not an alphabet or a number
+ctags: the kind letter given in "--_roledef-IMAGINARY" option is not an alphabet or a number
+ctags: the kind letter given in "--_roledef-IMAGINARY" option is not an alphabet or a number
 
 # empty role name
 ctags: wrong role definition in "--_roledef-IMAGINARY" option: no period after kind letter `v'
