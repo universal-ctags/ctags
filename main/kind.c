@@ -337,6 +337,31 @@ extern int defineScopeSeparator(struct kindControlBlock* kcb,
 								int kindIndex,
 								int parentKindIndex, const char *separator)
 {
+	if (kindIndex == KIND_WILDCARD_INDEX)
+	{
+		if (parentKindIndex == KIND_WILDCARD_INDEX)
+		{
+			if (kcb->defaultScopeSeparator.separator)
+				eFree ((char *)kcb->defaultScopeSeparator.separator);
+			verbose ("Installing default separator for %s: %s\n",
+					 getLanguageName (kcb->owner), separator);
+			kcb->defaultScopeSeparator.separator = eStrdup (separator);
+		}
+		else if (parentKindIndex == KIND_GHOST_INDEX)
+		{
+			if (kcb->defaultRootScopeSeparator.separator)
+				eFree ((char *)kcb->defaultRootScopeSeparator.separator);
+			verbose ("Installing default root separator for %s: %s\n",
+					 getLanguageName (kcb->owner),
+					 separator);
+			kcb->defaultRootScopeSeparator.separator = eStrdup (separator);
+		}
+		else
+			error (FATAL,
+				   "Don't specify a real kind as parent when defining a default scope separator: %d",
+				   parentKindIndex);
+		return 0;
+	}
 	Assert (kcb->count > kindIndex);
 	kindObject *kind = kcb->kind + kindIndex;
 
