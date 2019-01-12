@@ -394,6 +394,15 @@ static const scopeSeparator *getScopeSeparatorStatic(kindDefinition *kdef, int p
 extern const scopeSeparator *getScopeSeparator(struct kindControlBlock* kcb,
 											   int kindIndex, int parentKindIndex)
 {
+	Assert (kindIndex != KIND_GHOST_INDEX);
+	Assert (kindIndex != KIND_FILE_INDEX);
+	Assert (kindIndex != KIND_WILDCARD_INDEX);
+
+	Assert (parentKindIndex != KIND_WILDCARD_INDEX);
+	Assert (parentKindIndex != KIND_FILE_INDEX);
+	/* A caller specifies KIND_GHOST_INDEX for parentKindIndex when it
+	 * wants root separator. */
+
 	Assert (kcb->count > kindIndex);
 	kindObject *kobj = kcb->kind + kindIndex;
 	const scopeSeparator *sep;
