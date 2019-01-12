@@ -468,6 +468,17 @@ extern langType getLanguageForFilename (const char *const filename, langType sta
 									  &tmp_specType);
 }
 
+const char *scopeSeparatorFor (langType language, int kindIndex, int parentKindIndex)
+{
+	Assert (0 <= language  &&  language < (int) LanguageCount);
+
+	parserObject *parser = LanguageTable + language;
+	struct kindControlBlock *kcb = parser->kindControlBlock;
+
+	const scopeSeparator *sep = getScopeSeparator (kcb, kindIndex, parentKindIndex);
+	return sep? sep->separator: NULL;
+}
+
 static parserCandidate* parserCandidateNew(unsigned int count CTAGS_ATTR_UNUSED)
 {
 	parserCandidate* candidates;
