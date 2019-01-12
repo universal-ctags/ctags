@@ -365,12 +365,15 @@ static const scopeSeparator *getScopeSeparatorStatic(kindDefinition *kdef, int p
 
 	while (table - kdef->separators < (int)kdef->separatorCount)
 	{
-		/* KIND_WILDCARD cannot be used as a key for finding
-		   a root separator.*/
-		if ( (table->parentKindIndex == KIND_WILDCARD_INDEX
-			  && parentKindIndex != KIND_GHOST_INDEX)
-			 || table->parentKindIndex == parentKindIndex)
+		if (table->parentKindIndex == parentKindIndex)
 			return table;
+
+		/* If a caller wants a root separator for kdef,
+		   we should not return a wildcard table. */
+		if (parentKindIndex != KIND_GHOST_INDEX
+			&& table->parentKindIndex == KIND_WILDCARD_INDEX)
+			return table;
+
 		table++;
 	}
  use_default:
