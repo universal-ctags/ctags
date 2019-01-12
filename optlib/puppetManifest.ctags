@@ -27,7 +27,7 @@
 # - https://github.com/puppetlabs/puppet-specifications/blob/master/language/intro.md
 # - https://docs.puppet.com/puppet/5.1/lang_visual_index.html
 #
---langdef=PuppetManifest
+--langdef=PuppetManifest{_autoFQTag}
 --map-PuppetManifest=+.pp
 
 #
@@ -38,6 +38,12 @@
 --kinddef-PuppetManifest=n,node,nodes
 --kinddef-PuppetManifest=r,resource,resources
 --kinddef-PuppetManifest=v,variable,variables
+
+#
+# Separators
+#
+--_scopesep-PuppetManifest=/c:::
+--_scopesep-PuppetManifest=*/*:::
 
 #
 # Tables

@@ -8,6 +8,15 @@
 #include "xtag.h"
 
 
+typedef enum {
+	K_CLASS,
+	K_DEFINITION,
+	K_NODE,
+	K_RESOURCE,
+	K_VARIABLE,
+} PuppetManifestKind;
+
+
 static void initializePuppetManifestParser (const langType language)
 {
 
@@ -603,9 +612,14 @@ extern parserDefinition* PuppetManifestParser (void)
 		NULL
 	};
 
+	static scopeSeparator PuppetManifestClassSeparators [] = {
+		{ KIND_GHOST_INDEX, "::" },
+	};
+
 	static kindDefinition PuppetManifestKindTable [] = {
 		{
 		  true, 'c', "class", "classes",
+		  ATTACH_SEPARATORS(PuppetManifestClassSeparators),
 		},
 		{
 		  true, 'd', "definition", "definitions",
@@ -631,6 +645,8 @@ extern parserDefinition* PuppetManifestParser (void)
 	def->useCork       = 1;
 	def->kindTable = PuppetManifestKindTable;
 	def->kindCount = ARRAY_SIZE(PuppetManifestKindTable);
+	def->requestAutomaticFQTag = true;
+	def->defaultScopeSeparator = "::";
 	def->initialize    = initializePuppetManifestParser;
 
 	return def;
