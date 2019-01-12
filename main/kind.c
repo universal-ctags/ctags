@@ -352,16 +352,9 @@ static scopeSeparator *getScopeSeparatorDynamic(kindObject *kobj, int parentKind
 static const scopeSeparator *getScopeSeparatorStatic(kindDefinition *kdef, int parentKindIndex)
 {
 	scopeSeparator *table = kdef->separators;
-	static scopeSeparator defaultSeparator = {
-		.separator = ".",
-	};
-
-	/* If no table is given, use the default generic separator ".".
-	   The exception is if a root separator is looked up. In this case,
-	   return NULL to notify there is no root separator to the caller. */
 
 	if (table == NULL)
-		goto use_default;
+		return NULL;
 
 	while (table - kdef->separators < (int)kdef->separatorCount)
 	{
@@ -376,14 +369,8 @@ static const scopeSeparator *getScopeSeparatorStatic(kindDefinition *kdef, int p
 
 		table++;
 	}
- use_default:
-	if (parentKindIndex == KIND_GHOST_INDEX)
-		return NULL;
-	else
-	{
-		defaultSeparator.parentKindIndex = parentKindIndex;
-		return &defaultSeparator;
-	}
+
+	return NULL;
 }
 
 extern const scopeSeparator *getScopeSeparator(struct kindControlBlock* kcb,
@@ -391,12 +378,29 @@ extern const scopeSeparator *getScopeSeparator(struct kindControlBlock* kcb,
 {
 	Assert (kcb->count > kindIndex);
 	kindObject *kobj = kcb->kind + kindIndex;
-	scopeSeparator *sep = getScopeSeparatorDynamic (kobj, parentKindIndex);
+	const scopeSeparator *sep;
 
+	sep = getScopeSeparatorDynamic (kobj, parentKindIndex);
 	if (sep)
 		return sep;
 
-	return getScopeSeparatorStatic (kobj->def, parentKindIndex);
+	sep = getScopeSeparatorStatic (kobj->def, parentKindIndex);
+	if (sep)
+		return sep;
+
+	/* Cannot find a sitable sep definition.
+	 * Use default one. */
+	if (parentKindIndex == KIND_GHOST_INDEX)
+		return NULL;
+	else
+	{
+		static scopeSeparator defaultSeparator = {
+			.separator = ".",
+			.parentKindIndex = KIND_WILDCARD_INDEX,
+		};
+
+		return &defaultSeparator;
+	}
 }
 
 #ifdef DEBUG
