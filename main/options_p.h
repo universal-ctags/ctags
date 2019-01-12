@@ -178,6 +178,7 @@ extern bool processTabledefOption (const char *const option, const char *const p
 extern bool processLanguageEncodingOption (const char *const option, const char *const parameter);
 #endif
 extern bool processRoledefOption (const char *const option, const char *const parameter);
+extern bool processScopesepOption (const char *const option, const char *const parameter);
 
 extern void setMainLoop (mainLoopFunc func, void *data);
 

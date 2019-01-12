@@ -475,6 +475,9 @@ static optionDescription ExperimentalLongOptionDescription [] = {
  {1,"       Print statistics about mtable usage [no]."},
  {1,"  --_roledef-<LANG>=kind_letter.role_name,role_desc"},
  {1,"       Define new role for kind specified with <kind_letter> in <LANG>."},
+ {1,"  --_scopesep-<LANG>=[parent_kind_letter]/child_kind_letter:separator"},
+ {1,"       Specify scope separator between <PARENT_KIND> and <KIND>."},
+ {1,"       * as a kind letter matches any kind."},
  {1,"  --_tabledef-<LANG>=name"},
  {1,"       Define new regex table for <LANG>."},
 #ifdef DO_TRACING
@@ -3183,6 +3186,8 @@ static void processLongOption (
 		error (WARNING, "%s option not supported on this host", option);
 #endif
 	else if (processRoledefOption (option, parameter))
+		;
+	else if (processScopesepOption (option, parameter))
 		;
 	else
 		error (FATAL, "Unknown option: --%s", option);

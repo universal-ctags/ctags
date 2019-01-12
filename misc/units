@@ -2880,7 +2880,7 @@ prepare_environment ()
 {
     _PREPERE_ENV=$(cat <<'EOF'
 LC_ALL="C"; export LC_ALL
-MSYS2_ARG_CONV_EXCL=--regex-; export MSYS2_ARG_CONV_EXCL
+MSYS2_ARG_CONV_EXCL='--regex-;--_scopesep' export MSYS2_ARG_CONV_EXCL
 EOF
 )
     eval ${_PREPERE_ENV}
