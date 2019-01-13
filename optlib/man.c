@@ -24,6 +24,9 @@ extern parserDefinition* ManParser (void)
 		"7",
 		"8",
 		"9",
+		"3pm",
+		"3stap",
+		"7stap",
 		NULL
 	};
 
