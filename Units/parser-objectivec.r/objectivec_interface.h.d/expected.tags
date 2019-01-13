@@ -1,7 +1,7 @@
 ANOTHER_MACRO	input.h	/^ # define ANOTHER_MACRO( WITH, MOAR ) \\$/;"	kind:macro	line:21	language:ObjectiveC	roles:def
 A_MACRO_TEST	input.h	/^#define       A_MACRO_TEST$/;"	kind:macro	line:15	language:ObjectiveC	roles:def
-FileTree	input.h	/^@interface FileTree : NSObject {$/;"	kind:interface	line:33	language:ObjectiveC	struct:aStruct	roles:def
-FolderTree	input.h	/^@interface FolderTree : FileTree {$/;"	kind:interface	line:52	language:ObjectiveC	roles:def
+FileTree	input.h	/^@interface FileTree : NSObject {$/;"	kind:interface	line:33	language:ObjectiveC	struct:aStruct	inherits:NSObject	roles:def
+FolderTree	input.h	/^@interface FolderTree : FileTree {$/;"	kind:interface	line:52	language:ObjectiveC	inherits:FileTree	roles:def
 SampleTypedefObjC	input.h	/^typedef something SampleTypedefObjC;$/;"	kind:typedef	line:17	language:ObjectiveC	roles:def
 aStruct	input.h	/^struct aStruct$/;"	kind:struct	line:25	language:ObjectiveC	roles:def
 aStructMember	input.h	/^    int aStructMember;$/;"	kind:field	line:27	language:ObjectiveC	struct:aStruct	roles:def

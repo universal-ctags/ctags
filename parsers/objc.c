@@ -16,6 +16,7 @@
 #include <string.h>
 
 #include "keyword.h"
+#include "debug.h"
 #include "entry.h"
 #include "parse.h"
 #include "read.h"
@@ -423,6 +424,7 @@ static void parseImplemMethods (vString * const ident, objcToken what);
 static vString *tempName = NULL;
 static vString *parentName = NULL;
 static objcKind parentType = K_INTERFACE;
+static unsigned int parentCorkIndex = CORK_NIL;
 
 /* used to prepare tag for OCaml, just in case their is a need to
  * add additional information to the tag. */
@@ -441,6 +443,12 @@ static void pushEnclosingContext (const vString * parent, objcKind type)
 {
 	vStringCopy (parentName, parent);
 	parentType = type;
+}
+
+static void pushEnclosingContextFull (const vString * parent, objcKind type, unsigned int corkIndex)
+{
+	pushEnclosingContext (parent, type);
+	parentCorkIndex = corkIndex;
 }
 
 static void popEnclosingContext (void)
@@ -721,6 +729,21 @@ static void parseProperty (vString * const ident, objcToken what)
 	}
 }
 
+static void parseInterfaceSuperclass (vString * const ident, objcToken what)
+{
+	if (what == ObjcIDENTIFIER)
+	{
+		tagEntryInfo *e = getEntryInCorkQueue (parentCorkIndex);
+		if (e)
+		{
+			Assert (!e->extensionFields.inheritance);
+			e->extensionFields.inheritance = vStringStrdup (ident);
+		}
+	}
+
+	toDoNext = &parseMethods;
+}
+
 static void parseMethods (vString * const ident CTAGS_ATTR_UNUSED, objcToken what)
 {
 	switch (what)
@@ -746,6 +769,10 @@ static void parseMethods (vString * const ident CTAGS_ATTR_UNUSED, objcToken wha
 
 	case Tok_CurlL:	/* { */
 		toDoNext = &parseFields;
+		break;
+
+	case Tok_dpoint: /* : */
+		toDoNext = &parseInterfaceSuperclass;
 		break;
 
 	default:
@@ -778,8 +805,8 @@ static void parseInterface (vString * const ident, objcToken what)
 {
 	if (what == ObjcIDENTIFIER)
 	{
-		addTag (ident, K_INTERFACE);
-		pushEnclosingContext (ident, K_INTERFACE);
+		unsigned int index = addTag (ident, K_INTERFACE);
+		pushEnclosingContextFull (ident, K_INTERFACE, index);
 	}
 
 	toDoNext = &parseMethods;
