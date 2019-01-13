@@ -24,11 +24,16 @@
 #include "read.h"
 #include "numarray.h"
 #include "routines.h"
+#include "entry.h"
 
 #define isType(token,t)		(bool) ((token)->type == (t))
 #define isKeyword(token,k)	(bool) ((token)->keyword == (k))
 #define newToken() (objPoolGet (TokenPool))
 #define deleteToken(t) (objPoolPut (TokenPool, (t)))
+#define isIdentChar(c) \
+	(isalpha (c) || isdigit (c) || (c) == '$' || \
+		(c) == '@' || (c) == '_' || (c) == '#' || \
+		(c) >= 0x80)
 
 /*
  *	DATA DEFINITIONS
@@ -178,6 +183,19 @@ static const keywordTable TsKeywordTable [] = {
 	{ "yield"      , KEYWORD_yield      }
 };
 
+typedef enum {
+	TSTAG_FUNCTION,
+	TSTAG_CLASS,
+	TSTAG_INTERFACE,
+	TSTAG_ENUM,
+	TSTAG_METHOD,
+	TSTAG_PROPERTY,
+	TSTAG_CONSTANT,
+	TSTAG_VARIABLE,
+	TSTAG_GENERATOR,
+	TSTAG_ALIAS
+} tsKind;
+
 static kindDefinition TsKinds [] = {
 	{ true,  'f', "function",	  "functions"		   },
 	{ true,  'c', "class",		  "classes"			   },
@@ -190,6 +208,20 @@ static kindDefinition TsKinds [] = {
 	{ true,  'g', "generator",	  "generators"		   },
 	{ true,	 'a', "alias",		  "aliases",		   }
 };
+
+static void emitTag(const tokenInfo *const token, const tsKind kind)
+{
+	if (!TsKinds [kind].enabled)
+		return;
+
+	const char *name = vStringValue (token->string);
+	tagEntryInfo e;
+
+	initTagEntry (&e, name, kind);
+	e.lineNumber   = token->lineNumber;
+	e.filePosition = token->filePosition;
+	makeTagEntry (&e);
+}
 
 static void *newPoolToken (void *createArg CTAGS_ATTR_UNUSED)
 {
@@ -221,9 +253,14 @@ typedef enum eParserResult {
 	PARSER_FINISHED,
 	PARSER_NEEDS_MORE_INPUT,
 	PARSER_FAILED
+} parserResultStatus;
+
+typedef struct sParserResult {
+	parserResultStatus status;
+	unsigned int       unusedChars;
 } parserResult;
 
-typedef parserResult (*Parser)(const char c, tokenInfo *const, void *state);
+typedef void (*Parser)(const char c, tokenInfo *const, void *state, parserResult *const);
 typedef void* (*ParserStateInit)();
 typedef void (*ParserStateFree)(void *);
 
@@ -232,24 +269,30 @@ inline static bool whiteChar(const char c)
 	return c == ' ' || c == '\n' || c == '\r' || c == '\t';
 }
 
-inline static parserResult parseOneChar(const char c, tokenInfo *const token, const char expected, const tokenType type)
+inline static void parseOneChar(const char c, tokenInfo *const token, const char expected, const tokenType type, parserResult *const result)
 {
-	if (whiteChar(c))
-		return PARSER_NEEDS_MORE_INPUT;
+	if (whiteChar(c)) {
+		result->status = PARSER_NEEDS_MORE_INPUT;
+		return;
+	}
 
-	if (c != expected)
-		return PARSER_FAILED;
+	if (c != expected) {
+		result->status = PARSER_FAILED;
+		return;
+	}
 
 	token->type = type;
 	token->lineNumber   = getInputLineNumber ();
 	token->filePosition = getInputFilePosition ();
-
-	return PARSER_FINISHED;
+	result->status = PARSER_FINISHED;
 }
 
 inline static void* initParseWordState()
 {
-	return xMalloc (1, int);
+	int *num = xMalloc (1, int);
+	*num = 0;
+
+	return num;
 }
 
 inline static void freeParseWordState(void *state)
@@ -257,10 +300,12 @@ inline static void freeParseWordState(void *state)
 	eFree ((int *) state);
 }
 
-inline static parserResult parseWord(const char c, tokenInfo *const token, const char* word, int* parsed)
+inline static void parseWord(const char c, tokenInfo *const token, const char* word, int* parsed, parserResult *const result)
 {
-	if (whiteChar(c))
-		return PARSER_NEEDS_MORE_INPUT;
+	if (*parsed == 0 && whiteChar(c)) {
+		result->status = PARSER_NEEDS_MORE_INPUT;
+		return;
+	}
 
 	if (c == word[*parsed]) {
 		*parsed = *parsed + 1;
@@ -272,349 +317,382 @@ inline static parserResult parseWord(const char c, tokenInfo *const token, const
 			token->lineNumber   = getInputLineNumber ();
 			token->filePosition = getInputFilePosition ();
 
-			return PARSER_FINISHED;
+			result->status = PARSER_FINISHED;
+			return;
 		}
 
-		return PARSER_NEEDS_MORE_INPUT;
+		result->status = PARSER_NEEDS_MORE_INPUT;
+		return;
 	}
 
-	return PARSER_FAILED;
+	result->status = PARSER_FAILED;
 }
 
-inline static parserResult parseBreakKeyword(const char c, tokenInfo *const token, void *state)
+inline static void parseIdentifier(const char c, tokenInfo *const token, int *parsed, parserResult *const result)
 {
-	return parseWord(c, token, "break", (int*) state);
+	if (*parsed == 0 && whiteChar(c)) {
+		result->status = PARSER_NEEDS_MORE_INPUT;
+		return;
+	}
+
+	if (isIdentChar(c)) {
+		vStringPut (token->string, c);
+		*parsed = *parsed + 1;
+		result->status = PARSER_NEEDS_MORE_INPUT;
+		return;
+	}
+
+	if (*parsed > 0) {
+		result->status = PARSER_FINISHED;
+		result->unusedChars = 1;
+		return;
+	}
+
+	result->status = PARSER_FAILED;
 }
 
-inline static parserResult parseCaseKeyword(const char c, tokenInfo *const token, void *state)
+inline static void parseBreakKeyword(const char c, tokenInfo *const token, void *state, parserResult *const result)
 {
-	return parseWord(c, token, "case", (int*) state);
+	parseWord(c, token, "break", (int*) state, result);
 }
 
-inline static parserResult parseCatchKeyword(const char c, tokenInfo *const token, void *state)
+inline static void parseCaseKeyword(const char c, tokenInfo *const token, void *state, parserResult *const result)
 {
-	return parseWord(c, token, "catch", (int*) state);
+	parseWord(c, token, "case", (int*) state, result);
 }
 
-inline static parserResult parseClassKeyword(const char c, tokenInfo *const token, void *state)
+inline static void parseCatchKeyword(const char c, tokenInfo *const token, void *state, parserResult *const result)
 {
-	return parseWord(c, token, "class", (int*) state);
+	parseWord(c, token, "catch", (int*) state, result);
 }
 
-inline static parserResult parseConstKeyword(const char c, tokenInfo *const token, void *state)
+inline static void parseClassKeyword(const char c, tokenInfo *const token, void *state, parserResult *const result)
 {
-	return parseWord(c, token, "const", (int*) state);
+	parseWord(c, token, "class", (int*) state, result);
 }
 
-inline static parserResult parseContinueKeyword(const char c, tokenInfo *const token, void *state)
+inline static void parseConstKeyword(const char c, tokenInfo *const token, void *state, parserResult *const result)
 {
-	return parseWord(c, token, "continue", (int*) state);
+	parseWord(c, token, "const", (int*) state, result);
 }
 
-inline static parserResult parseDebuggerKeyword(const char c, tokenInfo *const token, void *state)
+inline static void parseContinueKeyword(const char c, tokenInfo *const token, void *state, parserResult *const result)
 {
-	return parseWord(c, token, "debugger", (int*) state);
+	parseWord(c, token, "continue", (int*) state, result);
 }
 
-inline static parserResult parseDefaultKeyword(const char c, tokenInfo *const token, void *state)
+inline static void parseDebuggerKeyword(const char c, tokenInfo *const token, void *state, parserResult *const result)
 {
-	return parseWord(c, token, "default", (int*) state);
+	parseWord(c, token, "debugger", (int*) state, result);
 }
 
-inline static parserResult parseDeleteKeyword(const char c, tokenInfo *const token, void *state)
+inline static void parseDefaultKeyword(const char c, tokenInfo *const token, void *state, parserResult *const result)
 {
-	return parseWord(c, token, "delete", (int*) state);
+	parseWord(c, token, "default", (int*) state, result);
 }
 
-inline static parserResult parseDoKeyword(const char c, tokenInfo *const token, void *state)
+inline static void parseDeleteKeyword(const char c, tokenInfo *const token, void *state, parserResult *const result)
 {
-	return parseWord(c, token, "do", (int*) state);
+	parseWord(c, token, "delete", (int*) state, result);
 }
 
-inline static parserResult parseElseKeyword(const char c, tokenInfo *const token, void *state)
+inline static void parseDoKeyword(const char c, tokenInfo *const token, void *state, parserResult *const result)
 {
-	return parseWord(c, token, "else", (int*) state);
+	parseWord(c, token, "do", (int*) state, result);
 }
 
-inline static parserResult parseEnumKeyword(const char c, tokenInfo *const token, void *state)
+inline static void parseElseKeyword(const char c, tokenInfo *const token, void *state, parserResult *const result)
 {
-	return parseWord(c, token, "enum", (int*) state);
+	parseWord(c, token, "else", (int*) state, result);
 }
 
-inline static parserResult parseExportKeyword(const char c, tokenInfo *const token, void *state)
+inline static void parseEnumKeyword(const char c, tokenInfo *const token, void *state, parserResult *const result)
 {
-	return parseWord(c, token, "export", (int*) state);
+	parseWord(c, token, "enum", (int*) state, result);
 }
 
-inline static parserResult parseExtendsKeyword(const char c, tokenInfo *const token, void *state)
+inline static void parseExportKeyword(const char c, tokenInfo *const token, void *state, parserResult *const result)
 {
-	return parseWord(c, token, "extends", (int*) state);
+	parseWord(c, token, "export", (int*) state, result);
 }
 
-inline static parserResult parseFalseKeyword(const char c, tokenInfo *const token, void *state)
+inline static void parseExtendsKeyword(const char c, tokenInfo *const token, void *state, parserResult *const result)
 {
-	return parseWord(c, token, "false", (int*) state);
+	parseWord(c, token, "extends", (int*) state, result);
 }
 
-inline static parserResult parseFinallyKeyword(const char c, tokenInfo *const token, void *state)
+inline static void parseFalseKeyword(const char c, tokenInfo *const token, void *state, parserResult *const result)
 {
-	return parseWord(c, token, "finally", (int*) state);
+	parseWord(c, token, "false", (int*) state, result);
 }
 
-inline static parserResult parseForKeyword(const char c, tokenInfo *const token, void *state)
+inline static void parseFinallyKeyword(const char c, tokenInfo *const token, void *state, parserResult *const result)
 {
-	return parseWord(c, token, "for", (int*) state);
+	parseWord(c, token, "finally", (int*) state, result);
 }
 
-inline static parserResult parseFunctionKeyword(const char c, tokenInfo *const token, void *state)
+inline static void parseForKeyword(const char c, tokenInfo *const token, void *state, parserResult *const result)
 {
-	return parseWord(c, token, "function", (int*) state);
+	parseWord(c, token, "for", (int*) state, result);
 }
 
-inline static parserResult parseIfKeyword(const char c, tokenInfo *const token, void *state)
+inline static void parseFunctionKeyword(const char c, tokenInfo *const token, void *state, parserResult *const result)
 {
-	return parseWord(c, token, "if", (int*) state);
+	parseWord(c, token, "function", (int*) state, result);
 }
 
-inline static parserResult parseImplementsKeyword(const char c, tokenInfo *const token, void *state)
+inline static void parseIfKeyword(const char c, tokenInfo *const token, void *state, parserResult *const result)
 {
-	return parseWord(c, token, "implements", (int*) state);
+	parseWord(c, token, "if", (int*) state, result);
 }
 
-inline static parserResult parseImportKeyword(const char c, tokenInfo *const token, void *state)
+inline static void parseImplementsKeyword(const char c, tokenInfo *const token, void *state, parserResult *const result)
 {
-	return parseWord(c, token, "import", (int*) state);
+	parseWord(c, token, "implements", (int*) state, result);
 }
 
-inline static parserResult parseInKeyword(const char c, tokenInfo *const token, void *state)
+inline static void parseImportKeyword(const char c, tokenInfo *const token, void *state, parserResult *const result)
 {
-	return parseWord(c, token, "in", (int*) state);
+	parseWord(c, token, "import", (int*) state, result);
 }
 
-inline static parserResult parseInstanceofKeyword(const char c, tokenInfo *const token, void *state)
+inline static void parseInKeyword(const char c, tokenInfo *const token, void *state, parserResult *const result)
 {
-	return parseWord(c, token, "instanceof", (int*) state);
+	parseWord(c, token, "in", (int*) state, result);
 }
 
-inline static parserResult parseInterfaceKeyword(const char c, tokenInfo *const token, void *state)
+inline static void parseInstanceofKeyword(const char c, tokenInfo *const token, void *state, parserResult *const result)
 {
-	return parseWord(c, token, "interface", (int*) state);
+	parseWord(c, token, "instanceof", (int*) state, result);
 }
 
-inline static parserResult parseLetKeyword(const char c, tokenInfo *const token, void *state)
+inline static void parseInterfaceKeyword(const char c, tokenInfo *const token, void *state, parserResult *const result)
 {
-	return parseWord(c, token, "let", (int*) state);
+	parseWord(c, token, "interface", (int*) state, result);
 }
 
-inline static parserResult parseModuleKeyword(const char c, tokenInfo *const token, void *state)
+inline static void parseLetKeyword(const char c, tokenInfo *const token, void *state, parserResult *const result)
 {
-	return parseWord(c, token, "module", (int*) state);
+	parseWord(c, token, "let", (int*) state, result);
 }
 
-inline static parserResult parseNamespaceKeyword(const char c, tokenInfo *const token, void *state)
+inline static void parseModuleKeyword(const char c, tokenInfo *const token, void *state, parserResult *const result)
 {
-	return parseWord(c, token, "namespace", (int*) state);
+	parseWord(c, token, "module", (int*) state, result);
 }
 
-inline static parserResult parseNewKeyword(const char c, tokenInfo *const token, void *state)
+inline static void parseNamespaceKeyword(const char c, tokenInfo *const token, void *state, parserResult *const result)
 {
-	return parseWord(c, token, "new", (int*) state);
+	parseWord(c, token, "namespace", (int*) state, result);
 }
 
-inline static parserResult parseNullKeyword(const char c, tokenInfo *const token, void *state)
+inline static void parseNewKeyword(const char c, tokenInfo *const token, void *state, parserResult *const result)
 {
-	return parseWord(c, token, "null", (int*) state);
+	parseWord(c, token, "new", (int*) state, result);
 }
 
-inline static parserResult parsePackageKeyword(const char c, tokenInfo *const token, void *state)
+inline static void parseNullKeyword(const char c, tokenInfo *const token, void *state, parserResult *const result)
 {
-	return parseWord(c, token, "package", (int*) state);
+	parseWord(c, token, "null", (int*) state, result);
 }
 
-inline static parserResult parsePrivateKeyword(const char c, tokenInfo *const token, void *state)
+inline static void parsePackageKeyword(const char c, tokenInfo *const token, void *state, parserResult *const result)
 {
-	return parseWord(c, token, "private", (int*) state);
+	parseWord(c, token, "package", (int*) state, result);
 }
 
-inline static parserResult parseProtectedKeyword(const char c, tokenInfo *const token, void *state)
+inline static void parsePrivateKeyword(const char c, tokenInfo *const token, void *state, parserResult *const result)
 {
-	return parseWord(c, token, "protected", (int*) state);
+	parseWord(c, token, "private", (int*) state, result);
 }
 
-inline static parserResult parsePublicKeyword(const char c, tokenInfo *const token, void *state)
+inline static void parseProtectedKeyword(const char c, tokenInfo *const token, void *state, parserResult *const result)
 {
-	return parseWord(c, token, "public", (int*) state);
+	parseWord(c, token, "protected", (int*) state, result);
 }
 
-inline static parserResult parseReturnKeyword(const char c, tokenInfo *const token, void *state)
+inline static void parsePublicKeyword(const char c, tokenInfo *const token, void *state, parserResult *const result)
 {
-	return parseWord(c, token, "return", (int*) state);
+	parseWord(c, token, "public", (int*) state, result);
 }
 
-inline static parserResult parseStaticKeyword(const char c, tokenInfo *const token, void *state)
+inline static void parseReturnKeyword(const char c, tokenInfo *const token, void *state, parserResult *const result)
 {
-	return parseWord(c, token, "static", (int*) state);
+	parseWord(c, token, "return", (int*) state, result);
 }
 
-inline static parserResult parseSuperKeyword(const char c, tokenInfo *const token, void *state)
+inline static void parseStaticKeyword(const char c, tokenInfo *const token, void *state, parserResult *const result)
 {
-	return parseWord(c, token, "super", (int*) state);
+	parseWord(c, token, "static", (int*) state, result);
 }
 
-inline static parserResult parseSwitchKeyword(const char c, tokenInfo *const token, void *state)
+inline static void parseSuperKeyword(const char c, tokenInfo *const token, void *state, parserResult *const result)
 {
-	return parseWord(c, token, "switch", (int*) state);
+	parseWord(c, token, "super", (int*) state, result);
 }
 
-inline static parserResult parseThisKeyword(const char c, tokenInfo *const token, void *state)
+inline static void parseSwitchKeyword(const char c, tokenInfo *const token, void *state, parserResult *const result)
 {
-	return parseWord(c, token, "this", (int*) state);
+	parseWord(c, token, "switch", (int*) state, result);
 }
 
-inline static parserResult parseThrowKeyword(const char c, tokenInfo *const token, void *state)
+inline static void parseThisKeyword(const char c, tokenInfo *const token, void *state, parserResult *const result)
 {
-	return parseWord(c, token, "throw", (int*) state);
+	parseWord(c, token, "this", (int*) state, result);
 }
 
-inline static parserResult parseTrueKeyword(const char c, tokenInfo *const token, void *state)
+inline static void parseThrowKeyword(const char c, tokenInfo *const token, void *state, parserResult *const result)
 {
-	return parseWord(c, token, "true", (int*) state);
+	parseWord(c, token, "throw", (int*) state, result);
 }
 
-inline static parserResult parseTryKeyword(const char c, tokenInfo *const token, void *state)
+inline static void parseTrueKeyword(const char c, tokenInfo *const token, void *state, parserResult *const result)
 {
-	return parseWord(c, token, "try", (int*) state);
+	parseWord(c, token, "true", (int*) state, result);
 }
 
-inline static parserResult parseTypeKeyword(const char c, tokenInfo *const token, void *state)
+inline static void parseTryKeyword(const char c, tokenInfo *const token, void *state, parserResult *const result)
 {
-	return parseWord(c, token, "type", (int*) state);
+	parseWord(c, token, "try", (int*) state, result);
 }
 
-inline static parserResult parseTypeofKeyword(const char c, tokenInfo *const token, void *state)
+inline static void parseTypeKeyword(const char c, tokenInfo *const token, void *state, parserResult *const result)
 {
-	return parseWord(c, token, "typeof", (int*) state);
+	parseWord(c, token, "type", (int*) state, result);
 }
 
-inline static parserResult parseVarKeyword(const char c, tokenInfo *const token, void *state)
+inline static void parseTypeofKeyword(const char c, tokenInfo *const token, void *state, parserResult *const result)
 {
-	return parseWord(c, token, "var", (int*) state);
+	parseWord(c, token, "typeof", (int*) state, result);
 }
 
-inline static parserResult parseVoidKeyword(const char c, tokenInfo *const token, void *state)
+inline static void parseVarKeyword(const char c, tokenInfo *const token, void *state, parserResult *const result)
 {
-	return parseWord(c, token, "void", (int*) state);
+	parseWord(c, token, "var", (int*) state, result);
 }
 
-inline static parserResult parseWhileKeyword(const char c, tokenInfo *const token, void *state)
+inline static void parseVoidKeyword(const char c, tokenInfo *const token, void *state, parserResult *const result)
 {
-	return parseWord(c, token, "while", (int*) state);
+	parseWord(c, token, "void", (int*) state, result);
 }
 
-inline static parserResult parseWithKeyword(const char c, tokenInfo *const token, void *state)
+inline static void parseWhileKeyword(const char c, tokenInfo *const token, void *state, parserResult *const result)
 {
-	return parseWord(c, token, "with", (int*) state);
+	parseWord(c, token, "while", (int*) state, result);
 }
 
-inline static parserResult parseYieldKeyword(const char c, tokenInfo *const token, void *state)
+inline static void parseWithKeyword(const char c, tokenInfo *const token, void *state, parserResult *const result)
 {
-	return parseWord(c, token, "yield", (int*) state);
+	parseWord(c, token, "with", (int*) state, result);
 }
 
-inline static parserResult parseCloseParen(const char c, tokenInfo *const token, void *state)
+inline static void parseYieldKeyword(const char c, tokenInfo *const token, void *state, parserResult *const result)
 {
-	return parseOneChar(c, token, ')', TOKEN_CLOSE_PAREN);
+	parseWord(c, token, "yield", (int*) state, result);
 }
 
-inline static parserResult parseSemicolon(const char c, tokenInfo *const token, void *state)
+inline static void parseCloseParen(const char c, tokenInfo *const token, void *state, parserResult *const result)
 {
-	return parseOneChar(c, token, ';', TOKEN_SEMICOLON);
+	parseOneChar(c, token, ')', TOKEN_CLOSE_PAREN, result);
 }
 
-inline static parserResult parseComma(const char c, tokenInfo *const token, void *state)
+inline static void parseSemicolon(const char c, tokenInfo *const token, void *state, parserResult *const result)
 {
-	return parseOneChar(c, token, ',', TOKEN_COMMA);
+	parseOneChar(c, token, ';', TOKEN_SEMICOLON, result);
 }
 
-inline static parserResult parseColon(const char c, tokenInfo *const token, void *state)
+inline static void parseComma(const char c, tokenInfo *const token, void *state, parserResult *const result)
 {
-	return parseOneChar(c, token, ':', TOKEN_COLON);
+	parseOneChar(c, token, ',', TOKEN_COMMA, result);
 }
 
-inline static parserResult parseOpenParen(const char c, tokenInfo *const token, void *state)
+inline static void parseColon(const char c, tokenInfo *const token, void *state, parserResult *const result)
 {
-	return parseOneChar(c, token, '(', TOKEN_OPEN_PAREN);
+	parseOneChar(c, token, ':', TOKEN_COLON, result);
 }
 
-inline static parserResult parsePeriod(const char c, tokenInfo *const token, void *state)
+inline static void parseOpenParen(const char c, tokenInfo *const token, void *state, parserResult *const result)
 {
-	return parseOneChar(c, token, '.', TOKEN_PERIOD);
+	parseOneChar(c, token, '(', TOKEN_OPEN_PAREN, result);
 }
 
-inline static parserResult parseOpenCurly(const char c, tokenInfo *const token, void *state)
+inline static void parsePeriod(const char c, tokenInfo *const token, void *state, parserResult *const result)
 {
-	return parseOneChar(c, token, '{', TOKEN_OPEN_CURLY);
+	parseOneChar(c, token, '.', TOKEN_PERIOD, result);
 }
 
-inline static parserResult parseCloseCurly(const char c, tokenInfo *const token, void *state)
+inline static void parseOpenCurly(const char c, tokenInfo *const token, void *state, parserResult *const result)
 {
-	return parseOneChar(c, token, '}', TOKEN_CLOSE_CURLY);
+	parseOneChar(c, token, '{', TOKEN_OPEN_CURLY, result);
 }
 
-inline static parserResult parseEqualSign(const char c, tokenInfo *const token, void *state)
+inline static void parseCloseCurly(const char c, tokenInfo *const token, void *state, parserResult *const result)
 {
-	return parseOneChar(c, token, '=', TOKEN_EQUAL_SIGN);
+	parseOneChar(c, token, '}', TOKEN_CLOSE_CURLY, result);
 }
 
-inline static parserResult parseOpenSquare(const char c, tokenInfo *const token, void *state)
+inline static void parseEqualSign(const char c, tokenInfo *const token, void *state, parserResult *const result)
 {
-	return parseOneChar(c, token, '[', TOKEN_OPEN_SQUARE);
+	parseOneChar(c, token, '=', TOKEN_EQUAL_SIGN, result);
 }
 
-inline static parserResult parseCloseSquare(const char c, tokenInfo *const token, void *state)
+inline static void parseOpenSquare(const char c, tokenInfo *const token, void *state, parserResult *const result)
 {
-	return parseOneChar(c, token, ']', TOKEN_CLOSE_SQUARE);
+	parseOneChar(c, token, '[', TOKEN_OPEN_SQUARE, result);
 }
 
-inline static parserResult parseStar(const char c, tokenInfo *const token, void *state)
+inline static void parseCloseSquare(const char c, tokenInfo *const token, void *state, parserResult *const result)
 {
-	return parseOneChar(c, token, '*', TOKEN_STAR);
+	parseOneChar(c, token, ']', TOKEN_CLOSE_SQUARE, result);
 }
 
-inline static parserResult parseEOF(const char c, tokenInfo *const token, void *state)
+inline static void parseStar(const char c, tokenInfo *const token, void *state, parserResult *const result)
 {
-	return parseOneChar(c, token, EOF, TOKEN_EOF);
+	parseOneChar(c, token, '*', TOKEN_STAR, result);
+}
+
+inline static void parseEOF(const char c, tokenInfo *const token, void *state, parserResult *const result)
+{
+	parseOneChar(c, token, EOF, TOKEN_EOF, result);
 }
 
 static bool tryParser(Parser parser, ParserStateInit stInit, ParserStateFree stFree, tokenInfo *const token)
 {
 	void *currentState = NULL;
-	parserResult result = PARSER_NEEDS_MORE_INPUT;
+	parserResult result;
+	result.status = PARSER_NEEDS_MORE_INPUT;
+	result.unusedChars = 0;
 	charArray *usedC = charArrayNew();
 	char c;
 
 	if (stInit)
 		currentState = stInit();
 
-	while (result == PARSER_NEEDS_MORE_INPUT) {
+	while (result.status == PARSER_NEEDS_MORE_INPUT) {
 		c = getcFromInputFile();
-		result = parser(c, token, currentState);
+		parser(c, token, currentState, &result);
 		charArrayAdd(usedC, c);
 	}
 
 	if (stFree)
 		stFree(currentState);
 
-	if (result == PARSER_FAILED) {
+	if (result.status == PARSER_FAILED) {
 		while (charArrayCount(usedC) > 0) {
 			ungetcToInputFile(charArrayLast(usedC));
 			charArrayRemoveLast(usedC);
+		}
+	} else {
+		while (result.unusedChars > 0) {
+			ungetcToInputFile(charArrayLast(usedC));
+			charArrayRemoveLast(usedC);
+			result.unusedChars--;
 		}
 	}
 
 	charArrayDelete(usedC);
 
-	return result == PARSER_FINISHED;
+	return result.status == PARSER_FINISHED;
 }
 
 static bool tryParse(tokenInfo *const token, ...)
@@ -680,9 +758,9 @@ static void readToken (tokenInfo *const token)
 			parseIfKeyword, initParseWordState, freeParseWordState,
 			parseImplementsKeyword, initParseWordState, freeParseWordState,
 			parseImportKeyword, initParseWordState, freeParseWordState,
-			parseInKeyword, initParseWordState, freeParseWordState,
 			parseInstanceofKeyword, initParseWordState, freeParseWordState,
 			parseInterfaceKeyword, initParseWordState, freeParseWordState,
+			parseInKeyword, initParseWordState, freeParseWordState,
 			parseLetKeyword, initParseWordState, freeParseWordState,
 			parseModuleKeyword, initParseWordState, freeParseWordState,
 			parseNamespaceKeyword, initParseWordState, freeParseWordState,
@@ -707,6 +785,8 @@ static void readToken (tokenInfo *const token)
 			parseWhileKeyword, initParseWordState, freeParseWordState,
 			parseWithKeyword, initParseWordState, freeParseWordState,
 			parseYieldKeyword, initParseWordState, freeParseWordState,
+
+			parseIdentifier, initParseWordState, freeParseWordState,
 			NULL);
 
 	if (parsed)
@@ -717,6 +797,12 @@ static void parseTsFile (tokenInfo *const token)
 {
 	do {
 		readToken (token);
+
+		switch (token->keyword) {
+			case KEYWORD_interface:
+				emitTag(token, TSTAG_INTERFACE);
+				break;
+		}
 	} while (! isType (token, TOKEN_EOF));
 }
 
