@@ -754,6 +754,7 @@ static char* getFullQualifiedScopeNameFromCorkQueue (const tagEntryInfo * inner_
 	int kindIndex = KIND_GHOST_INDEX;
 	langType lang;
 	const tagEntryInfo *scope = inner_scope;
+	const tagEntryInfo *root_scope = NULL;
 	stringList *queue = stringListNew ();
 	vString *v;
 	vString *n;
@@ -776,10 +777,15 @@ static char* getFullQualifiedScopeNameFromCorkQueue (const tagEntryInfo * inner_
 			kindIndex = scope->kindIndex;
 			lang = scope->langType;
 		}
+		root_scope = scope;
 		scope =  getEntryInCorkQueue (scope->extensionFields.scopeIndex);
 	}
 
 	n = vStringNew ();
+	sep = scopeSeparatorFor (root_scope->langType, root_scope->kindIndex, KIND_GHOST_INDEX);
+	if (sep)
+		vStringCatS(n, sep);
+
 	while ((c = stringListCount (queue)) > 0)
 	{
 		v = stringListLast (queue);
@@ -1289,11 +1295,15 @@ extern void uncorkTagFile(void)
 	{
 		tagEntryInfo *tag = TagFile.corkQueue.queue + i;
 		writeTagEntry (tag, true);
+
 		if (doesInputLanguageRequestAutomaticFQTag ()
 		    && isXtagEnabled (XTAG_QUALIFIED_TAGS)
-		    && (tag->extensionFields.scopeKindIndex != KIND_GHOST_INDEX)
-		    && tag->extensionFields.scopeName
-		    && tag->extensionFields.scopeIndex)
+			&& ((tag->extensionFields.scopeKindIndex != KIND_GHOST_INDEX
+				 && tag->extensionFields.scopeName != NULL
+				 && tag->extensionFields.scopeIndex != CORK_NIL)
+				|| (tag->extensionFields.scopeKindIndex == KIND_GHOST_INDEX
+					&& tag->extensionFields.scopeName == NULL
+					&& tag->extensionFields.scopeIndex == CORK_NIL)))
 			makeQualifiedTagEntry (tag);
 	}
 	for (i = 1; i < TagFile.corkQueue.count; i++)
