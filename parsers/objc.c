@@ -642,7 +642,7 @@ static void parseMethodsNameCommon (vString * const ident, objcToken what,
 				vStringCatS (signature, "id");
 			vStringPut (signature, ')');
 
-			e->extensionFields.signature = eStrdup (vStringValue (signature));
+			e->extensionFields.signature = vStringStrdup (signature);
 
 			vStringClear (signature);
 			vStringPut (signature, '(');

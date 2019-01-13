@@ -84,6 +84,7 @@ extern vString *vStringNewOrClearWithAutoRelease (vString *const string);
 
 extern vString *vStringNewOwn (char *s);
 extern char    *vStringDeleteUnwrap (vString *const string);
+extern char    *vStringStrdup (const vString *const string);
 
 extern void vStringCatSWithEscaping (vString* b, const char *s);
 extern void vStringCatSWithEscapingAsPattern (vString *output, const char* input);
