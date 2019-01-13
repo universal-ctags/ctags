@@ -29,7 +29,6 @@ static int writeCtagsPtagEntry (tagWriter *writer CTAGS_ATTR_UNUSED,
 								const char *const fileName,
 								const char *const pattern,
 								const char *const parserName);
-static void buildCtagsFqTagCache (tagWriter *writer CTAGS_ATTR_UNUSED, tagEntryInfo *const tag);
 
 struct rejection {
 	bool rejectedInThisRendering;
@@ -41,7 +40,6 @@ tagWriter uCtagsWriter = {
 	.writePtagEntry = writeCtagsPtagEntry,
 	.preWriteEntry = NULL,
 	.postWriteEntry = NULL,
-	.buildFqTagCache = buildCtagsFqTagCache,
 	.defaultFileName = CTAGS_FILE,
 };
 
@@ -65,7 +63,6 @@ tagWriter eCtagsWriter = {
 	.writePtagEntry = writeCtagsPtagEntry,
 	.preWriteEntry = beginECtagsFile,
 	.postWriteEntry = endECTagsFile,
-	.buildFqTagCache = buildCtagsFqTagCache,
 	.defaultFileName = CTAGS_FILE,
 };
 
@@ -298,10 +295,4 @@ static int writeCtagsPtagEntry (tagWriter *writer CTAGS_ATTR_UNUSED,
 			      PSEUDO_TAG_PREFIX, desc->name,
 			      OPT(fileName), OPT(pattern));
 #undef OPT
-}
-
-static void buildCtagsFqTagCache (tagWriter *writer CTAGS_ATTR_UNUSED, tagEntryInfo *const tag)
-{
-	escapeFieldValue (writer, tag, FIELD_SCOPE_KIND_LONG);
-	escapeFieldValue (writer, tag, FIELD_SCOPE);
 }

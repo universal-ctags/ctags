@@ -1211,6 +1211,11 @@ static bool isTagWritable(const tagEntryInfo *const tag)
 	return true;
 }
 
+static void buildFqTagCache (tagEntryInfo *const tag)
+{
+	getTagScopeInformation (tag, NULL, NULL);
+}
+
 static void writeTagEntry (const tagEntryInfo *const tag, bool checkingNeeded)
 {
 	int length = 0;
@@ -1227,7 +1232,7 @@ static void writeTagEntry (const tagEntryInfo *const tag, bool checkingNeeded)
 	    && doesInputLanguageRequestAutomaticFQTag ())
 	{
 		/* const is discarded to update the cache field of TAG. */
-		writerBuildFqTagCache ( (tagEntryInfo *const)tag);
+		buildFqTagCache ( (tagEntryInfo *const)tag);
 	}
 
 	length = writerWriteTag (TagFile.mio, tag);

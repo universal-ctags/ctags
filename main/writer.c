@@ -72,13 +72,6 @@ extern int writerWritePtag (MIO * mio,
 
 }
 
-extern void writerBuildFqTagCache (tagEntryInfo *const tag)
-{
-	if (writer->buildFqTagCache)
-		writer->buildFqTagCache (writer, tag);
-}
-
-
 extern bool ptagMakeCtagsOutputMode (ptagDesc *desc, void *data CTAGS_ATTR_UNUSED)
 {
 	const char *mode ="";
