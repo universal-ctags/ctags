@@ -8,7 +8,7 @@ createLayoutTree	input.m	/^{$/;"	m	implementation:FileTree
 createLayoutTree	input.m	/^{$/;"	m	implementation:FolderTree
 dealloc	input.m	/^{$/;"	m	implementation:FileTree
 dealloc	input.m	/^{$/;"	m	implementation:FolderTree
-doSomething	input.m	/^{$/;"	m	implementation:NSString
+doSomething	input.m	/^{$/;"	m	implementation:NSString	category:Extension
 getDiskSize	input.m	/^{$/;"	m	implementation:FileTree
 initWithName:andSize:atPlace:	input.m	/^{$/;"	m	implementation:FileTree
 initWithName:atPlace:	input.m	/^{$/;"	m	implementation:FileTree

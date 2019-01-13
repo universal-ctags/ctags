@@ -679,6 +679,14 @@ static void parseMethodsNameCommon (vString * const ident, objcToken what,
 
 			vStringClear (signature);
 			vStringPut (signature, '(');
+
+			if (categoryCorkIndex != CORK_NIL)
+			{
+				tagEntryInfo *e = getEntryInCorkQueue (categoryCorkIndex);
+				attachParserFieldToCorkEntry (index,
+											  ObjcFields [F_CATEGORY].ftype,
+											  e->name);
+			}
 		}
 		break;
 

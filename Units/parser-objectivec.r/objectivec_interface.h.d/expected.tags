@@ -15,7 +15,7 @@ createLayoutTree	input.h	/^- (LayoutTree*)createLayoutTree;$/;"	kind:method	line
 dealloc	input.h	/^- (void)dealloc;$/;"	kind:method	line:46	language:ObjectiveC	interface:FileTree	signature:()	roles:def
 dealloc	input.h	/^- (void)dealloc;$/;"	kind:method	line:58	language:ObjectiveC	interface:FolderTree	signature:()	roles:def
 diskSize	input.h	/^    FileSize    diskSize;$/;"	kind:field	line:37	language:ObjectiveC	interface:FileTree	roles:def
-doSomething	input.h	/^- (void)doSomething;$/;"	kind:method	line:66	language:ObjectiveC	interface:NSString	signature:()	roles:def
+doSomething	input.h	/^- (void)doSomething;$/;"	kind:method	line:66	language:ObjectiveC	interface:NSString	signature:()	roles:def	category:Extension
 getDiskSize	input.h	/^- (FileSize)getDiskSize;$/;"	kind:method	line:48	language:ObjectiveC	interface:FileTree	signature:()	roles:def
 initWithName:andSize:atPlace:	input.h	/^           atPlace:(FolderTree*)parentFolder;$/;"	kind:method	line:41	language:ObjectiveC	interface:FileTree	signature:(NSString*,uint64_t,FolderTree*)	roles:def
 initWithName:atPlace:	input.h	/^           atPlace:(FolderTree*)parentFolder;$/;"	kind:method	line:44	language:ObjectiveC	interface:FileTree	signature:(NSString*,FolderTree*)	roles:def
