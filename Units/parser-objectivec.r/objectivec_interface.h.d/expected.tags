@@ -1,7 +1,9 @@
 ANOTHER_MACRO	input.h	/^ # define ANOTHER_MACRO( WITH, MOAR ) \\$/;"	kind:macro	line:21	language:ObjectiveC	roles:def
 A_MACRO_TEST	input.h	/^#define       A_MACRO_TEST$/;"	kind:macro	line:15	language:ObjectiveC	roles:def
+Extension	input.h	/^@interface NSString (Extension)$/;"	kind:category	line:65	language:ObjectiveC	interface:NSString	roles:def
 FileTree	input.h	/^@interface FileTree : NSObject {$/;"	kind:interface	line:33	language:ObjectiveC	struct:aStruct	inherits:NSObject	roles:def
 FolderTree	input.h	/^@interface FolderTree : FileTree {$/;"	kind:interface	line:52	language:ObjectiveC	inherits:FileTree	roles:def
+NSString	input.h	/^@interface NSString (Extension)$/;"	kind:interface	line:65	language:ObjectiveC	roles:def	category:Extension
 SampleTypedefObjC	input.h	/^typedef something SampleTypedefObjC;$/;"	kind:typedef	line:17	language:ObjectiveC	roles:def
 aStruct	input.h	/^struct aStruct$/;"	kind:struct	line:25	language:ObjectiveC	roles:def
 aStructMember	input.h	/^    int aStructMember;$/;"	kind:field	line:27	language:ObjectiveC	struct:aStruct	roles:def
@@ -13,6 +15,7 @@ createLayoutTree	input.h	/^- (LayoutTree*)createLayoutTree;$/;"	kind:method	line
 dealloc	input.h	/^- (void)dealloc;$/;"	kind:method	line:46	language:ObjectiveC	interface:FileTree	signature:()	roles:def
 dealloc	input.h	/^- (void)dealloc;$/;"	kind:method	line:58	language:ObjectiveC	interface:FolderTree	signature:()	roles:def
 diskSize	input.h	/^    FileSize    diskSize;$/;"	kind:field	line:37	language:ObjectiveC	interface:FileTree	roles:def
+doSomething	input.h	/^- (void)doSomething;$/;"	kind:method	line:66	language:ObjectiveC	interface:NSString	signature:()	roles:def
 getDiskSize	input.h	/^- (FileSize)getDiskSize;$/;"	kind:method	line:48	language:ObjectiveC	interface:FileTree	signature:()	roles:def
 initWithName:andSize:atPlace:	input.h	/^           atPlace:(FolderTree*)parentFolder;$/;"	kind:method	line:41	language:ObjectiveC	interface:FileTree	signature:(NSString*,uint64_t,FolderTree*)	roles:def
 initWithName:atPlace:	input.h	/^           atPlace:(FolderTree*)parentFolder;$/;"	kind:method	line:44	language:ObjectiveC	interface:FileTree	signature:(NSString*,FolderTree*)	roles:def

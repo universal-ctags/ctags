@@ -62,3 +62,6 @@ struct aStruct
 - (LayoutTree*)createLayoutTree;
 @end
 
+@interface NSString (Extension)
+- (void)doSomething;
+@end

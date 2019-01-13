@@ -37,7 +37,8 @@ typedef enum {
 	K_TYPEDEF,
 	K_STRUCT,
 	K_ENUM,
-	K_MACRO
+	K_MACRO,
+	K_CATEGORY,
 } objcKind;
 
 static kindDefinition ObjcKinds[] = {
@@ -54,6 +55,7 @@ static kindDefinition ObjcKinds[] = {
 	{true, 's', "struct", "A type structure"},
 	{true, 'e', "enum", "An enumeration"},
 	{true, 'M', "macro", "A preprocessor macro"},
+	{true, 'C', "category", "categories"},
 };
 
 typedef enum {
@@ -125,6 +127,18 @@ static const keywordTable objcKeywordTable[] = {
 	{"@dynamic", ObjcDYNAMIC},
 	{"@optional", ObjcOPTIONAL},
 	{"@required", ObjcREQUIRED},
+};
+
+typedef enum {
+	F_CATEGORY,
+} objcField;
+
+static fieldDefinition ObjcFields [] = {
+	{
+		.name = "category",
+		.description = "category attached to the class",
+		.enabled = true,
+	},
 };
 
 static langType Lang_ObjectiveC;
@@ -425,6 +439,7 @@ static vString *tempName = NULL;
 static vString *parentName = NULL;
 static objcKind parentType = K_INTERFACE;
 static unsigned int parentCorkIndex = CORK_NIL;
+static unsigned int categoryCorkIndex = CORK_NIL;
 
 /* used to prepare tag for OCaml, just in case their is a need to
  * add additional information to the tag. */
@@ -454,6 +469,16 @@ static void pushEnclosingContextFull (const vString * parent, objcKind type, uns
 static void popEnclosingContext (void)
 {
 	vStringClear (parentName);
+}
+
+static void pushCategoryContext (unsigned int category_index)
+{
+	categoryCorkIndex = category_index;
+}
+
+static void popCategoryContext (void)
+{
+	categoryCorkIndex = CORK_NIL;
 }
 
 /* Used to centralise tag creation, and be able to add
@@ -672,6 +697,29 @@ static void parseMethodsImplemName (vString * const ident, objcToken what)
 	parseMethodsNameCommon (ident, what, parseMethodsImplemName, parseImplemMethods);
 }
 
+static void parseCategory (vString * const ident, objcToken what)
+{
+	if (what == ObjcIDENTIFIER)
+	{
+		if (parentCorkIndex != CORK_NIL)
+		{
+			tagEntryInfo *e = getEntryInCorkQueue (parentCorkIndex);
+			if (e)
+				attachParserFieldToCorkEntry (parentCorkIndex,
+											  ObjcFields [F_CATEGORY].ftype,
+											  vStringValue (ident));
+
+			if (e->kindIndex == K_INTERFACE)
+				toDoNext = &parseMethods;
+			else
+				toDoNext = &parseImplemMethods;
+
+			unsigned int index = addTag (ident, K_CATEGORY);
+			pushCategoryContext (index);
+		}
+	}
+}
+
 static void parseImplemMethods (vString * const ident, objcToken what)
 {
 	switch (what)
@@ -688,6 +736,7 @@ static void parseImplemMethods (vString * const ident, objcToken what)
 
 	case ObjcEND:	/* @end */
 		popEnclosingContext ();
+		popCategoryContext ();
 		toDoNext = &globalScope;
 		break;
 
@@ -695,6 +744,10 @@ static void parseImplemMethods (vString * const ident, objcToken what)
 		toDoNext = &ignoreBalanced;
 		ignoreBalanced (ident, what);
 		comeAfter = &parseImplemMethods;
+		break;
+
+	case Tok_PARL: /* ( */
+		toDoNext = &parseCategory;
 		break;
 
 	default:
@@ -731,7 +784,7 @@ static void parseProperty (vString * const ident, objcToken what)
 
 static void parseInterfaceSuperclass (vString * const ident, objcToken what)
 {
-	if (what == ObjcIDENTIFIER)
+	if (what == ObjcIDENTIFIER && parentCorkIndex != CORK_NIL)
 	{
 		tagEntryInfo *e = getEntryInCorkQueue (parentCorkIndex);
 		if (e)
@@ -764,6 +817,7 @@ static void parseMethods (vString * const ident CTAGS_ATTR_UNUSED, objcToken wha
 
 	case ObjcEND:	/* @end */
 		popEnclosingContext ();
+		popCategoryContext ();
 		toDoNext = &globalScope;
 		break;
 
@@ -773,6 +827,10 @@ static void parseMethods (vString * const ident CTAGS_ATTR_UNUSED, objcToken wha
 
 	case Tok_dpoint: /* : */
 		toDoNext = &parseInterfaceSuperclass;
+		break;
+
+	case Tok_PARL: /* ( */
+		toDoNext = &parseCategory;
 		break;
 
 	default:
@@ -795,8 +853,8 @@ static void parseImplementation (vString * const ident, objcToken what)
 {
 	if (what == ObjcIDENTIFIER)
 	{
-		addTag (ident, K_IMPLEMENTATION);
-		pushEnclosingContext (ident, K_IMPLEMENTATION);
+		unsigned int index = addTag (ident, K_IMPLEMENTATION);
+		pushEnclosingContextFull (ident, K_IMPLEMENTATION, index);
 	}
 	toDoNext = &parseImplemMethods;
 }
@@ -1170,6 +1228,7 @@ static void findObjcTags (void)
 	tempName = NULL;
 	prevIdent = NULL;
 	fullMethodName = NULL;
+	categoryCorkIndex = CORK_NIL;
 }
 
 static void objcInitialize (const langType language)
@@ -1190,6 +1249,8 @@ extern parserDefinition *ObjcParser (void)
 	def->kindTable = ObjcKinds;
 	def->kindCount = ARRAY_SIZE (ObjcKinds);
 	def->extensions = extensions;
+	def->fieldTable = ObjcFields;
+	def->fieldCount = ARRAY_SIZE (ObjcFields);
 	def->aliases = aliases;
 	def->parser = findObjcTags;
 	def->initialize = objcInitialize;
