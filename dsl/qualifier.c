@@ -306,7 +306,7 @@ static EsObject* builtin_or  (EsObject *args, tagEntry *entry)
 		o = es_car (args);
 		o = eval (o, entry);
 		if (! es_object_equal (o, es_false))
-			return es_true;
+			return o;
 		else if (es_error_p (o))
 			return o;
 		args = es_cdr (args);
