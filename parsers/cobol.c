@@ -12,6 +12,7 @@
 *   INCLUDE FILES
 */
 #include "general.h"	/* must always come first */
+#include "debug.h"
 #include "entry.h"
 #include "keyword.h"
 #include "nestlevel.h"
@@ -51,7 +52,6 @@ static kindDefinition CobolKinds[] = {
 };
 
 static langType Lang_cobol;
-static bool AtLineStart = true;
 
 typedef enum {
 	TOKEN_UNDEFINED = 256,
@@ -127,10 +127,110 @@ typedef struct {
 
 #define isIdentifierChar(c) (isalnum(c) || (c) == '-')
 
+typedef enum {
+	/* Fixed: program starts at column 8, ends at column 72 */
+	FORMAT_FIXED	= 0x1,
+	/* Free: program starts at column 1, no specific end */
+	FORMAT_FREE		= 0x2,
+	/* Variable: program starts at column 8, no specific end */
+	FORMAT_VARIABLE	= FORMAT_FIXED | FORMAT_FREE
+} CobolFormat;
+
+static struct {
+	struct {
+		int c;
+		unsigned int column;
+	} ungetchBuf[3];
+	unsigned int ungetchIdx;
+	int column;
+	CobolFormat format;
+} CblInputState;
+
+static void cblppInit (const CobolFormat format)
+{
+	CblInputState.ungetchIdx = 0;
+	CblInputState.column = 0;
+	CblInputState.format = format;
+}
+
+static int cblppSkipLine (void)
+{
+	int c;
+
+	do
+		c = getcFromInputFile ();
+	while (c != EOF && c != '\r' && c != '\n');
+	if (c == '\r')
+	{
+		int d;
+		d = getcFromInputFile ();
+		if (d != '\n')
+			ungetcToInputFile (c);
+		else
+			c = d;
+	}
+	CblInputState.column = 0;
+
+	return c;
+}
+
+/* FIXME: handle continuation lines */
+static int cblppGetc (void)
+{
+	int prevColumn = CblInputState.column;
+	int c;
+
+	if (CblInputState.ungetchIdx > 0)
+	{
+		CblInputState.ungetchIdx--;
+		CblInputState.column = CblInputState.ungetchBuf[CblInputState.ungetchIdx].column;
+		return CblInputState.ungetchBuf[CblInputState.ungetchIdx].c;
+	}
+
+	c = getcFromInputFile ();
+	if (c == EOF)
+		return c;
+
+	/* compute column information */
+	if (c == '\t')
+		CblInputState.column += 8 - CblInputState.column % 8;
+	else if (c == '\r' || c == '\n')
+		CblInputState.column = 0;
+	else
+		CblInputState.column += 1;
+
+	/* check for format-specific areas */
+	if (CblInputState.format & FORMAT_FIXED && prevColumn < 6)
+		return cblppGetc ();
+	else if ((CblInputState.format == FORMAT_FIXED && prevColumn >= 72) ||
+			 ((c == '*' || c == '/') &&
+			  prevColumn == ((CblInputState.format & FORMAT_FIXED) ? 6 : 0)))
+	{
+		cblppSkipLine ();
+		return cblppGetc ();
+	}
+	else if (CblInputState.format & FORMAT_FIXED && prevColumn == 6)
+		return cblppGetc ();
+
+	return c;
+}
+
+static void cblppUngetc (int c)
+{
+	const size_t len = ARRAY_SIZE (CblInputState.ungetchBuf);
+
+	Assert (CblInputState.ungetchIdx < len);
+	if (CblInputState.ungetchIdx < len)
+	{
+		CblInputState.ungetchBuf[CblInputState.ungetchIdx].c = c;
+		CblInputState.ungetchBuf[CblInputState.ungetchIdx].column = CblInputState.column;
+		CblInputState.ungetchIdx++;
+	}
+}
+
 static void readToken (tokenInfo *const token)
 {
 	int c;
-	int i;
 
 	token->type		= TOKEN_UNDEFINED;
 	token->keyword	= KEYWORD_NONE;
@@ -138,26 +238,11 @@ static void readToken (tokenInfo *const token)
 
 getNextChar:
 
-	i = AtLineStart ? 0 : 80;
 	do
 	{
-		c = getcFromInputFile ();
-		if (i == 6 && (c == '*' || c == '/'))
-		{
-			do
-				c = getcFromInputFile ();
-			while (c != EOF && c != '\r' && c != '\n');
-		}
-		if (c == '\r' || c == '\n')
-		{
-			AtLineStart = true;
-			i = 0;
-		}
-		else
-			i++;
+		c = cblppGetc ();
 	}
-	while ((AtLineStart && i < 7 && c != EOF) || isspace(c));
-	AtLineStart = false;
+	while (isspace(c));
 
 	token->lineNumber   = getInputLineNumber ();
 	token->filePosition = getInputFilePosition ();
@@ -172,14 +257,14 @@ getNextChar:
 		case '"':
 		{
 			const int q = c;
-			int d = getcFromInputFile ();
+			int d = cblppGetc ();
 			token->type = TOKEN_LITERAL;
 			vStringPut (token->string, c);
 			while (d != EOF && (d != q || c == q))
 			{
 				vStringPut (token->string, d);
 				c = d;
-				d = getcFromInputFile ();
+				d = cblppGetc ();
 			}
 			vStringPut (token->string, d);
 			token->lineNumber = getInputLineNumber ();
@@ -189,23 +274,22 @@ getNextChar:
 
 		case '*': /* maybe comment start */
 		{
-			int d = getcFromInputFile ();
+			int d = cblppGetc ();
 			if (d != '>')
 			{
-				ungetcToInputFile (d);
+				cblppUngetc (d);
 				vStringPut (token->string, c);
 				token->type = c;
 			}
 			else
 			{
-				d = getcFromInputFile ();
 				do
 				{
-					d = getcFromInputFile ();
+					d = cblppGetc ();
 				}
 				while (d != EOF && d != '\r' && d != '\n');
 				if (d != EOF) /* let the newline magic happen */
-					ungetcToInputFile (d);
+					cblppUngetc (d);
 				goto getNextChar;
 			}
 			break;
@@ -214,7 +298,7 @@ getNextChar:
 		case '-':
 		case '+':
 		{
-			int d = getcFromInputFile ();
+			int d = cblppGetc ();
 			vStringPut (token->string, c);
 			if (isdigit (d))
 			{
@@ -223,7 +307,7 @@ getNextChar:
 			}
 			else
 			{
-				ungetcToInputFile (d);
+				cblppUngetc (d);
 				token->type = c;
 			}
 			break;
@@ -236,8 +320,8 @@ getNextChar:
 			readNumber:
 				if (c == '.')
 				{
-					int d = getcFromInputFile ();
-					ungetcToInputFile (d);
+					int d = cblppGetc ();
+					cblppUngetc (d);
 					if (! isdigit (d))
 					{
 						vStringPut (token->string, c);
@@ -249,15 +333,15 @@ getNextChar:
 				do
 				{
 					vStringPut (token->string, c);
-					c = getcFromInputFile ();
+					c = cblppGetc ();
 					if (c == '.')
 					{
 						if (seenPeriod)
 							break;
 						else
 						{
-							int d = getcFromInputFile ();
-							ungetcToInputFile (d);
+							int d = cblppGetc ();
+							cblppUngetc (d);
 							if (! isdigit (d))
 								break;
 							seenPeriod = true;
@@ -266,7 +350,7 @@ getNextChar:
 				}
 				while (isdigit(c) || c == '.');
 				if (c != EOF)
-					ungetcToInputFile (c);
+					cblppUngetc (c);
 				token->type = TOKEN_NUMBER;
 			}
 			else if (! isIdentifierChar (c))
@@ -279,11 +363,11 @@ getNextChar:
 				do
 				{
 					vStringPut (token->string, c);
-					c = getcFromInputFile ();
+					c = cblppGetc ();
 				}
 				while (isIdentifierChar (c));
 				if (c != EOF)
-					ungetcToInputFile (c);
+					cblppUngetc (c);
 				token->keyword = lookupCaseKeyword (vStringValue (token->string), Lang_cobol);
 				if (token->keyword == KEYWORD_NONE)
 					token->type = TOKEN_WORD;
@@ -337,6 +421,8 @@ static void findCOBOLTags (void)
 	tokenInfo *sentenceStart = NULL;
 	NestingLevels *levels;
 
+	cblppInit (FORMAT_FIXED);
+
 	for (curToken = 0; curToken < ARRAY_SIZE (tokens); curToken++)
 	{
 		tokens[curToken].string = vStringNew ();
@@ -357,8 +443,6 @@ static void findCOBOLTags (void)
 		else if (sentenceStart != prevToken)								\
 			sentenceStart = NULL;											\
 	} while (0)
-
-	AtLineStart = true;
 
 	do
 	{
