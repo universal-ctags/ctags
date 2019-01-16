@@ -100,10 +100,9 @@ struct sCode {
 	{ "substr?", builtin_substr, NULL, CHECK_ARITY, 2,
 	  .helpstr = "(substr? TARGET<string> SUBSTR<string>) -> <boolean>" },
 	{ "member",  builtin_member, NULL, CHECK_ARITY, 2,
-	  .helpstr = "(member ELEMENT LIST) -> #f|<list>'" },
+	  .helpstr = "(member ELEMENT LIST) -> #f|<list>" },
 	{ "$",       builtin_entry_ref, NULL, CHECK_ARITY, 1,
-	  .helpstr = "($ NAME) -> #f|<string>'" },
-
+	  .helpstr = "($ NAME) -> #f|<string>" },
 	{ "$name",           value_name,           NULL, MEMORABLE, 0UL,},
 	{ "$input",          value_input,          NULL, MEMORABLE, 0UL,
 	  .helpstr = "input file name" },
@@ -684,7 +683,7 @@ enum QRESULT q_is_acceptable  (QCode *code, tagEntry *entry)
 		i = Q_REJECT;
 	else if (es_error_p (r))
 	{
-		MIO  *mioerr = mio_new_fp (stderr, NULL);;
+		MIO  *mioerr = mio_new_fp (stderr, NULL);
 
 		fprintf(stderr, "GOT ERROR in QUALIFYING: %s: ",
 			 es_error_name (r));
