@@ -58,6 +58,7 @@ static EsObject* builtin_suffix (EsObject *args, tagEntry *entry);
 static EsObject* builtin_substr (EsObject *args, tagEntry *entry);
 static EsObject* builtin_member (EsObject *args, tagEntry *entry);
 static EsObject* builtin_entry_ref (EsObject *args, tagEntry *entry);
+static EsObject* bulitin_debug_print (EsObject *args, tagEntry *entry);
 
 
 static EsObject* value_name (EsObject *args, tagEntry *entry);
@@ -103,6 +104,9 @@ struct sCode {
 	  .helpstr = "(member ELEMENT LIST) -> #f|<list>" },
 	{ "$",       builtin_entry_ref, NULL, CHECK_ARITY, 1,
 	  .helpstr = "($ NAME) -> #f|<string>" },
+	{ "print",   bulitin_debug_print, NULL, CHECK_ARITY, 1,
+	  .helpstr = "(print OBJ) -> OBJ" },
+
 	{ "$name",           value_name,           NULL, MEMORABLE, 0UL,},
 	{ "$input",          value_input,          NULL, MEMORABLE, 0UL,
 	  .helpstr = "input file name" },
@@ -518,6 +522,18 @@ static EsObject* builtin_entry_ref (EsObject *args, tagEntry *entry)
 		return entry_xget_string (entry, es_string_get (key));
 }
 
+static MIO  *miodebug;
+static EsObject* bulitin_debug_print (EsObject *args, tagEntry *entry)
+{
+	if (miodebug == NULL)
+		miodebug = mio_new_fp (stderr, NULL);
+
+	EsObject *o = es_car(args);
+	es_print(o, miodebug);
+	putc('\n', stderr);
+
+	return o;
+}
 
 static EsObject* value_name (EsObject *args, tagEntry *entry)
 {
