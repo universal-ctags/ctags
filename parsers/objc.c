@@ -22,6 +22,7 @@
 #include "read.h"
 #include "routines.h"
 #include "selectors.h"
+#include "trashbox.h"
 #include "vstring.h"
 
 typedef enum {
@@ -97,6 +98,8 @@ typedef enum {
 	Tok_Sharp,	/* '#' */
 	Tok_Backslash,	/* '\\' */
 	Tok_Asterisk,	/* '*' */
+	Tok_ANGLEL,		/* '<' */
+	Tok_ANGLER,		/* '>' */
 	Tok_EOL,	/* '\r''\n' */
 	Tok_any,
 
@@ -131,12 +134,18 @@ static const keywordTable objcKeywordTable[] = {
 
 typedef enum {
 	F_CATEGORY,
+	F_PROTOCOLS,
 } objcField;
 
 static fieldDefinition ObjcFields [] = {
 	{
 		.name = "category",
 		.description = "category attached to the class",
+		.enabled = true,
+	},
+	{
+		.name = "protocols",
+		.description = "protocols that the class (or category) confirms to",
 		.enabled = true,
 	},
 };
@@ -400,6 +409,12 @@ static objcKeyword lex (lexingState * st)
 		case '*':
 			st->cp++;
 			return Tok_Asterisk;
+		case '<':
+			st->cp++;
+			return Tok_ANGLEL;
+		case '>':
+			st->cp++;
+			return Tok_ANGLER;
 
 		default:
 			st->cp++;
@@ -805,6 +820,40 @@ static void parseInterfaceSuperclass (vString * const ident, objcToken what)
 	toDoNext = &parseMethods;
 }
 
+static void parseInterfaceProtocolList (vString * const ident, objcToken what)
+{
+	static vString *protocol_list;
+
+	if (parentCorkIndex == CORK_NIL)
+	{
+		toDoNext = &parseMethods;
+		return;
+	}
+
+	if (protocol_list == NULL)
+	{
+		protocol_list = vStringNew ();
+		DEFAULT_TRASH_BOX(protocol_list, vStringDelete);
+	}
+
+	if (what == ObjcIDENTIFIER)
+		vStringCat(protocol_list, ident);
+	else if (what == Tok_COMA)
+		vStringPut (protocol_list, ',');
+	else if (what == Tok_ANGLER)
+	{
+		attachParserFieldToCorkEntry (parentCorkIndex,
+									  ObjcFields [F_PROTOCOLS].ftype,
+									  vStringValue (protocol_list));
+		if (categoryCorkIndex != CORK_NIL)
+			attachParserFieldToCorkEntry (categoryCorkIndex,
+										  ObjcFields [F_PROTOCOLS].ftype,
+										  vStringValue (protocol_list));
+		vStringClear (protocol_list);
+		toDoNext = &parseMethods;
+	}
+}
+
 static void parseMethods (vString * const ident CTAGS_ATTR_UNUSED, objcToken what)
 {
 	switch (what)
@@ -839,6 +888,10 @@ static void parseMethods (vString * const ident CTAGS_ATTR_UNUSED, objcToken wha
 
 	case Tok_PARL: /* ( */
 		toDoNext = &parseCategory;
+		break;
+
+	case Tok_ANGLEL: /* < */
+		toDoNext = &parseInterfaceProtocolList;
 		break;
 
 	default:
