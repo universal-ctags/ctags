@@ -284,7 +284,7 @@ static EsObject* builtin_null  (EsObject *args, tagEntry *entry)
 
 static EsObject* builtin_and  (EsObject *args, tagEntry *entry)
 {
-	EsObject *o;
+	EsObject *o = es_true;
 
 	while (! es_null (args))
 	{
@@ -297,7 +297,7 @@ static EsObject* builtin_and  (EsObject *args, tagEntry *entry)
 		args = es_cdr (args);
 	}
 
-	return es_true;
+	return o;
 }
 
 static EsObject* builtin_or  (EsObject *args, tagEntry *entry)
