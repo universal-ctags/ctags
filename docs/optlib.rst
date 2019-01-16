@@ -536,8 +536,9 @@ Specify `{_autoFQTag}` to the end of ``--langdef=<LANG>`` option like
 ``-langdef=Foo{_autoFQTag}`` to make ctags generate fully qualified
 tags automatically.
 
-`.` is the default separator combining names into a fully qualified
-tag. It is not customizable yet.
+`.` is the (ctags global) default separator combining names into a
+fully qualified tag. You can customize separators with
+``--_scopesep-<LANG>=...` option.
 
 input.foo::
 
@@ -568,6 +569,151 @@ Output::
 
 
 "X.y" is printed as a fully qualified tag when ``--extras=+q`` is given.
+
+.. NOT REVIEWED YET (--_scopesep)
+
+Customizing scope separators
+......................................................................
+Use ``--_scopesep-<LANG>=[<parent-kindLetter>]/<child-kindLetter>:<sep>``
+option for customizing if the langauge uses `{_autoFQTag}`.
+
+``parent-kindLetter``
+
+	The kind letter for a tag of outer-scope.
+
+	You can use `*` for specifying as wildcards that means
+	"any kinds" for a tag of outer-scope.
+
+	If you omit ``parent-kindLetter``, the separator is used as
+	a prefix for tags having the kind specified with ``child-kindLetter``.
+	This prefix can be used to refer to global namespace or similar concepts if the
+	language has one.
+
+``child-kindLetter``
+
+	The kind letter for a tag of inner-scope.
+
+	You can use `*` for specifying as wildcards that means
+	"any kinds" for a tag of inner-scope.
+
+``sep``
+
+	In a qualified tag, if the outer-scope has kind and ``parent-kindLetter``
+	the inner-scope has ``child-kindLetter``, then ``sep`` is instead in
+	between the scope names in the generated tags file.
+
+specifying `*` as both  ``parent-kindLetter`` and ``child-kindLetter``
+sets ``sep`` as the language default separator. It is used as fallback.
+
+Specifying `*` as ``child-kindLetter`` and omitting ``parent-kindLetter``
+sets ``sep`` as the language default prefix. It is used as fallback.
+
+
+NOTE: There is no ctags global default prefix.
+NOTE: ``_scopesep-<LANG>=...`` option affects only a parser that
+enables ``_autoFQTag``. A parser building full qualified tags
+manually ignores the option.
+
+Let's see an example.
+The input file is written in Tcl.  Tcl parser is not an optlib
+parser. However, it uses the ``_autoFQTag`` feature internally.
+Therefore, ``_scopesep-Tcl=`` option works well. Tcl parser
+defines two kinds `n (namespace)` and `p (procedure)`.
+
+By default, Tcl parser uses `::` as scope separator. The parser also
+uses `::` as root prefix.
+
+.. code-block:: tcl
+
+	namespace eval N {
+		namespace eval M {
+			proc pr0 {s} {
+				puts $s
+			}
+		}
+	}
+
+	proc pr1 {s} {
+		puts $s
+	}
+
+`M` is defined under the scope of `N`. `pr0` is defined	under the scope
+of `M`. `N` and `pr1` are at top level (so they are candidates to be added
+prefixes). `M` and `N` are language objects with `n (namespace)` kind.
+`pr0` and `pr1` are language objects with `p (procedure)` kind.
+
+.. code-block:: console
+
+	$ ctags -o - --extras=+q input.tcl
+	::N	input.tcl	/^namespace eval N {$/;"	n
+	::N::M	input.tcl	/^	namespace eval M {$/;"	n	namespace:::N
+	::N::M::pr0	input.tcl	/^		proc pr0 {s} {$/;"	p	namespace:::N::M
+	::pr1	input.tcl	/^proc pr1 {s} {$/;"	p
+	M	input.tcl	/^	namespace eval M {$/;"	n	namespace:::N
+	N	input.tcl	/^namespace eval N {$/;"	n
+	pr0	input.tcl	/^		proc pr0 {s} {$/;"	p	namespace:::N::M
+	pr1	input.tcl	/^proc pr1 {s} {$/;"	p
+
+Let's change the default separator to `->`:
+
+.. code-block:: console
+
+	$ ctags -o - --extras=+q --_scopesep-Tcl='*/*:->' input.tcl
+	::N	input.tcl	/^namespace eval N {$/;"	n
+	::N->M	input.tcl	/^	namespace eval M {$/;"	n	namespace:::N
+	::N->M->pr0	input.tcl	/^		proc pr0 {s} {$/;"	p	namespace:::N->M
+	::pr1	input.tcl	/^proc pr1 {s} {$/;"	p
+	M	input.tcl	/^	namespace eval M {$/;"	n	namespace:::N
+	N	input.tcl	/^namespace eval N {$/;"	n
+	pr0	input.tcl	/^		proc pr0 {s} {$/;"	p	namespace:::N->M
+	pr1	input.tcl	/^proc pr1 {s} {$/;"	p
+
+Let's define '^' as default prefix:
+
+.. code-block:: console
+
+	$ ctags -o - --extras=+q --_scopesep-Tcl='*/*:->' --_scopesep-Tcl='/*:^' input.tcl
+	M	input.tcl	/^	namespace eval M {$/;"	n	namespace:^N
+	N	input.tcl	/^namespace eval N {$/;"	n
+	^N	input.tcl	/^namespace eval N {$/;"	n
+	^N->M	input.tcl	/^	namespace eval M {$/;"	n	namespace:^N
+	^N->M->pr0	input.tcl	/^		proc pr0 {s} {$/;"	p	namespace:^N->M
+	^pr1	input.tcl	/^proc pr1 {s} {$/;"	p
+	pr0	input.tcl	/^		proc pr0 {s} {$/;"	p	namespace:^N->M
+	pr1	input.tcl	/^proc pr1 {s} {$/;"	p
+
+Let's override the specification of separator for combining a
+namespace and a procedure with '+': (About the separator for
+combining a namespace and another namespace, ctags uses the default separator.)
+
+.. code-block:: console
+
+	$ ctags -o - --extras=+q --_scopesep-Tcl='*/*:->' --_scopesep-Tcl='/*:^' \
+				--_scopesep-Tcl='n/p:+' input.tcl
+	M	input.tcl	/^	namespace eval M {$/;"	n	namespace:^N
+	N	input.tcl	/^namespace eval N {$/;"	n
+	^N	input.tcl	/^namespace eval N {$/;"	n
+	^N->M	input.tcl	/^	namespace eval M {$/;"	n	namespace:^N
+	^N->M+pr0	input.tcl	/^		proc pr0 {s} {$/;"	p	namespace:^N->M
+	^pr1	input.tcl	/^proc pr1 {s} {$/;"	p
+	pr0	input.tcl	/^		proc pr0 {s} {$/;"	p	namespace:^N->M
+	pr1	input.tcl	/^proc pr1 {s} {$/;"	p
+
+Let's override the definition of prefix for a namespace with '@':
+(About the prefix for procedures, ctags uses the default prefix.)
+
+.. code-block:: console
+
+	$ ctags -o - --extras=+q --_scopesep-Tcl='*/*:->' --_scopesep-Tcl='/*:^' \
+				 --_scopesep-Tcl='n/p:+' --_scopesep-Tcl='/n:@' input.tcl
+	@N	input.tcl	/^namespace eval N {$/;"	n
+	@N->M	input.tcl	/^	namespace eval M {$/;"	n	namespace:@N
+	@N->M+pr0	input.tcl	/^		proc pr0 {s} {$/;"	p	namespace:@N->M
+	M	input.tcl	/^	namespace eval M {$/;"	n	namespace:@N
+	N	input.tcl	/^namespace eval N {$/;"	n
+	^pr1	input.tcl	/^proc pr1 {s} {$/;"	p
+	pr0	input.tcl	/^		proc pr0 {s} {$/;"	p	namespace:@N->M
+	pr1	input.tcl	/^proc pr1 {s} {$/;"	p
 
 
 Multi-line pattern match
