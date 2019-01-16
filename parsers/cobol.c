@@ -259,14 +259,12 @@ getNextChar:
 			const int q = c;
 			int d = cblppGetc ();
 			token->type = TOKEN_LITERAL;
-			vStringPut (token->string, c);
 			while (d != EOF && (d != q || c == q))
 			{
 				vStringPut (token->string, d);
 				c = d;
 				d = cblppGetc ();
 			}
-			vStringPut (token->string, d);
 			token->lineNumber = getInputLineNumber ();
 			token->filePosition = getInputFilePosition ();
 			break;
