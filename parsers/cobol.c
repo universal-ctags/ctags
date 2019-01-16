@@ -469,7 +469,7 @@ static void findCOBOLTags (void)
 
 				readToken ();
 			}
-			if (token->type == TOKEN_WORD)
+			if (token->type == TOKEN_WORD || token->type == TOKEN_LITERAL)
 				makeCOBOLTag (token, K_PROGRAM);
 		}
 		else if (token->keyword == KEYWORD_FD ||
