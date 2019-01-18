@@ -116,22 +116,25 @@ static void listTags (void)
 	}
 	else
 	{
-		while (tagsNext (file, &entry) == TagSuccess)
+		if (tagsFirst (file, &entry) == TagSuccess)
 		{
-#ifdef QUALIFIER
-			if (Qualifier)
+			do
 			{
-				int i = q_is_acceptable (Qualifier, &entry);
-				switch (i)
+#ifdef QUALIFIER
+				if (Qualifier)
 				{
-				case Q_REJECT:
-					continue;
-				case Q_ERROR:
-					exit (1);
+					int i = q_is_acceptable (Qualifier, &entry);
+					switch (i)
+					{
+					case Q_REJECT:
+						continue;
+					case Q_ERROR:
+						exit (1);
+					}
 				}
-			}
 #endif
-			printTag (&entry);
+				printTag (&entry);
+			} while (tagsNext (file, &entry) == TagSuccess);
 		}
 		tagsClose (file);
 	}
