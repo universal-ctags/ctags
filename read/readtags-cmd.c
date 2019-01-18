@@ -61,6 +61,29 @@ static void printTag (const tagEntry *entry)
 #undef sep
 }
 
+static void walkTags (tagFile *const file, tagEntry *first_entry,
+					  tagResult (* nextfn) (tagFile *const, tagEntry *),
+					  void (* actionfn) (const tagEntry *))
+{
+	do
+	{
+#ifdef QUALIFIER
+		if (Qualifier)
+		{
+			int i = q_is_acceptable (Qualifier, first_entry);
+			switch (i)
+			{
+			case Q_REJECT:
+				continue;
+			case Q_ERROR:
+				exit (1);
+			}
+		}
+#endif
+		(* actionfn) (first_entry);
+	} while ( (*nextfn) (file, first_entry) == TagSuccess);
+}
+
 static void findTag (const char *const name, const int options)
 {
 	tagFileInfo info;
@@ -80,25 +103,7 @@ static void findTag (const char *const name, const int options)
 			fprintf (stderr, "%s: searching for \"%s\" in \"%s\"\n",
 					 ProgramName, name, TagFileName);
 		if (tagsFind (file, &entry, name, options) == TagSuccess)
-		{
-			do
-			{
-#ifdef QUALIFIER
-				if (Qualifier)
-				{
-					int i = q_is_acceptable (Qualifier, &entry);
-					switch (i)
-					{
-					case Q_REJECT:
-						continue;
-					case Q_ERROR:
-						exit (1);
-					}
-				}
-#endif
-				printTag (&entry);
-			} while (tagsFindNext (file, &entry) == TagSuccess);
-		}
+			walkTags (file, &entry, tagsFindNext, printTag);
 		tagsClose (file);
 	}
 }
@@ -117,25 +122,7 @@ static void listTags (void)
 	else
 	{
 		if (tagsFirst (file, &entry) == TagSuccess)
-		{
-			do
-			{
-#ifdef QUALIFIER
-				if (Qualifier)
-				{
-					int i = q_is_acceptable (Qualifier, &entry);
-					switch (i)
-					{
-					case Q_REJECT:
-						continue;
-					case Q_ERROR:
-						exit (1);
-					}
-				}
-#endif
-				printTag (&entry);
-			} while (tagsNext (file, &entry) == TagSuccess);
-		}
+			walkTags (file, &entry, tagsNext, printTag);
 		tagsClose (file);
 	}
 }
