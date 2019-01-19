@@ -18,7 +18,7 @@ static int SortOverride;
 static sortType SortMethod;
 static int allowPrintLineNumber;
 static int debugMode;
-#ifdef QUALIFIER
+#ifdef READTAGS_DSL
 #include "dsl/qualifier.h"
 static QCode *Qualifier;
 #endif
@@ -67,7 +67,7 @@ static void walkTags (tagFile *const file, tagEntry *first_entry,
 {
 	do
 	{
-#ifdef QUALIFIER
+#ifdef READTAGS_DSL
 		if (Qualifier)
 		{
 			int i = q_is_acceptable (Qualifier, first_entry);
@@ -132,7 +132,7 @@ static const char *const Usage =
 	"Usage: \n"
 	"    %s -h\n"
 	"    %s [-ilp] [-n] "
-#ifdef QUALIFIER
+#ifdef READTAGS_DSL
 	"[-Q EXP] "
 #endif
 	"[-s[0|1]] [-t file] [-] [name(s)]\n\n"
@@ -144,7 +144,7 @@ static const char *const Usage =
 	"    -l           List all tags.\n"
 	"    -n           Allow print line numbers if -e option is given.\n"
 	"    -p           Perform partial matching.\n"
-#ifdef QUALIFIER
+#ifdef READTAGS_DSL
 	"    -Q EXP       Filter the result with EXP.\n"
 #endif
 	"    -s[0|1|2]    Override sort detection of tag file.\n"
@@ -155,14 +155,14 @@ static const char *const Usage =
 static void printUsage(FILE* stream, int exitCode)
 {
 	fprintf (stream, Usage, ProgramName, ProgramName);
-#ifdef QUALIFIER
+#ifdef READTAGS_DSL
 	fprintf (stream, "\nFilter expression: \n");
 	q_help (stream);
 #endif
 	exit (exitCode);
 }
 
-#ifdef QUALIFIER
+#ifdef READTAGS_DSL
 static QCode *convertToQualifier(const char* exp)
 {
 	EsObject *sexp = es_read_from_string (exp, NULL);
@@ -243,7 +243,7 @@ extern int main (int argc, char **argv)
 						else
 							printUsage(stderr, 1);
 						break;
-#ifdef QUALIFIER
+#ifdef READTAGS_DSL
 					case 'Q':
 						if (i + 1 == argc)
 							printUsage(stderr, 1);
