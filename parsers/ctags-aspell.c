@@ -184,7 +184,7 @@ static int add_word_to_dict (const char *word, hashTable * dict, bool split)
 		vString *item = stringListItem (list, j);
 		if (!hashTableHasItem (dict, vStringValue(item)))
 		{
-			char* subword = eStrdup (vStringValue(item));
+			char* subword = vStringStrdup (item);
 			downcase_word (subword);
 			hashTablePutItem (dict, subword, subword);
 			count++;

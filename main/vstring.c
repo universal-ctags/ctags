@@ -277,6 +277,14 @@ extern char    *vStringDeleteUnwrap       (vString *const string)
 	return buffer;
 }
 
+extern char    *vStringStrdup (const vString *const string)
+{
+	char *str = xMalloc (vStringLength(string) + 1, char);
+	str[vStringLength(string)] = '\0';
+	memcpy (str, string->buffer, vStringLength(string));
+	return str;
+}
+
 static char valueToXDigit (int v)
 {
 	Assert (v >= 0 && v <= 0xF);

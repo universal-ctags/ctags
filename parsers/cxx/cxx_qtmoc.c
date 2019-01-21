@@ -139,7 +139,7 @@ static bool qtMocParseProperty(void)
 		return false;
 	}
 
-	pszPropType = eStrdup (vStringValue (g_cxx.pToken->pszWord));
+	pszPropType = vStringStrdup (g_cxx.pToken->pszWord);
 	if(!cxxParserParseNextToken())
 	{
 		CXX_DEBUG_LEAVE_TEXT("EOF in cxxParserParseNextToken");
