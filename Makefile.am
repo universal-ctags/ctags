@@ -81,18 +81,22 @@ mktable: $(encdir)/mktable.c $(srcdir)/regenc.h
 # TEST
 TESTS = testc testp testcu
 
-check_PROGRAMS = testc testp testcu
+check_PROGRAMS = testc testp testcu \
+	test_enc_utf8
 
 test: atest pytest
 	$(MAKE) -C sample test
 
-atest: testc$(EXEEXT) testp$(EXEEXT) testcu$(EXEEXT)
+atest: testc$(EXEEXT) testp$(EXEEXT) testcu$(EXEEXT) \
+    test_enc_utf8$(EXEEXT)
 	@echo "[Onigmo API, ASCII/EUC-JP check]"
 	@$(top_builddir)/testc  | grep RESULT
 	@echo "[POSIX API, ASCII/EUC-JP check]"
 	@$(top_builddir)/testp  | grep RESULT
 	@echo "[Onigmo API, UTF-16 check]"
 	@$(top_builddir)/testcu | grep RESULT
+	@echo "[UTF-8 codec check]"
+	@$(top_builddir)/test_enc_utf8 | grep RESULT
 
 testc_SOURCES = testc.c
 testc_LDADD = libonigmo.la
@@ -104,6 +108,8 @@ testp_CFLAGS = -DPOSIX_TEST
 testcu_SOURCES = testu.c
 testcu_LDADD = libonigmo.la
 
+test_enc_utf8_SOURCES = test_enc_utf8.c
+test_enc_utf8_LDADD = libonigmo.la
 
 #$(srcdir)/testc.c: $(srcdir)/test.rb $(srcdir)/testconv.rb
 $(srcdir)/testc.c:
