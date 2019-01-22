@@ -592,7 +592,7 @@ static vString* determineEmacsModeAtFirstLine (const char* const line)
 	for ( ;  isspace ((int) *p)  ;  ++p)
 		;  /* no-op */
 
-	if (strncmp(p, "mode:", strlen("mode:")) == 0)
+	if (strncasecmp(p, "mode:", strlen("mode:")) == 0)
 	{
 		/* -*- mode: MODE; -*- */
 		p += strlen("mode:");
