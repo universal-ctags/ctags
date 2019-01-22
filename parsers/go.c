@@ -801,11 +801,22 @@ static void parseFunctionOrMethod (tokenInfo *const token, const int scope)
 
 static void attachTypeRefField (intArray *corks, const char *const type)
 {
+	tagEntryInfo *type_e = NULL;
+	void *p = hashTableGetItem (typeTable, type);
+	if (p)
+	{
+		int type_cork = HT_PTR_TO_INT(p);
+		type_e = getEntryInCorkQueue (type_cork);
+	}
+
 	for (unsigned int i = 0; i < intArrayCount (corks); i++)
 	{
 		int cork = intArrayItem (corks, i);
 		tagEntryInfo *e = getEntryInCorkQueue (cork);
-		e->extensionFields.typeRef [0] = eStrdup ("typename");
+		if (type_e)
+			e->extensionFields.typeRef [0] = eStrdup (GoKinds[type_e->kindIndex].name);
+		else
+			e->extensionFields.typeRef [0] = eStrdup ("typename");
 		e->extensionFields.typeRef [1] = eStrdup (type);
 	}
 }

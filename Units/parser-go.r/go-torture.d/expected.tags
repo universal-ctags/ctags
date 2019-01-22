@@ -26,8 +26,8 @@ _e	input.go	/^	_e float32$/;"	m	struct:main.T6	typeref:typename:float32
 a	input.go	/^var (a, b, c int$/;"	v	package:main	typeref:typename:int
 b	input.go	/^var (a, b, c int$/;"	v	package:main	typeref:typename:int
 c	input.go	/^var (a, b, c int$/;"	v	package:main	typeref:typename:int
-d	input.go	/^d T5$/;"	v	package:main	typeref:typename:T5
-e	input.go	/^e T4$/;"	v	package:main	typeref:typename:T4
+d	input.go	/^d T5$/;"	v	package:main	typeref:interface:T5
+e	input.go	/^e T4$/;"	v	package:main	typeref:type:T4
 f	input.go	/^f interface{})$/;"	v	package:main	typeref:typename:interface{}
 f1	input.go	/^func f1() {};func f2() {};type\/*no newline here*\/T9 int\/*var ignored int$/;"	f	package:main	signature:()
 f2	input.go	/^func f1() {};func f2() {};type\/*no newline here*\/T9 int\/*var ignored int$/;"	f	package:main	signature:()
