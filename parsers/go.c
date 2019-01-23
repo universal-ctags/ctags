@@ -1039,8 +1039,27 @@ static void parseConstTypeVar (tokenInfo *const token, goKind kind, const int sc
 		{
 			if (isKeyword (token, KEYWORD_struct))
 				parseStructMembers (token, member_scope);
-			else
+			else if (isKeyword (token, KEYWORD_interface))
 				skipType (token, NULL);
+			else
+			{
+				/* Filling "typeref:" field of typeToken. */
+				vString *buffer = vStringNew ();
+				collector collector = { .str = buffer, .last_len = 0, };
+
+				collectorAppendToken (&collector, token);
+				skipType (token, &collector);
+				collectorTruncate (&collector, true);
+
+				if (!vStringIsEmpty (buffer))
+				{
+					tagEntryInfo *e = getEntryInCorkQueue (member_scope);
+					e->extensionFields.typeRef [0] = eStrdup ("typename");
+					e->extensionFields.typeRef [1] = vStringDeleteUnwrap (buffer);
+				}
+				else
+					vStringDelete (buffer);
+			}
 			deleteToken (typeToken);
 		}
 		else if (corks)

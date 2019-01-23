@@ -8,16 +8,16 @@ G	input.go	/^const ignored int*\/const (G=6); var g int$/;"	c	package:main
 H	input.go	/^func (tt * T7) f4(a func () func ()) (func (), int) {return func (){}, 1};func f5(){};const H=1$/;"	c	package:main
 I	input.go	/^	F=3.14*(1+2*3)\/34e7;I=1)$/;"	c	package:main
 T1	input.go	/^	T1 `annotation`$/;"	M	struct:main.T6	typeref:typename:T1
-T1	input.go	/^	T1 map[string]int$/;"	t	package:main
+T1	input.go	/^	T1 map[string]int$/;"	t	package:main	typeref:typename:map[string]int
 T2	input.go	/^	*T2$/;"	M	struct:main.T6	typeref:typename:*T2
-T2	input.go	/^	T2 <-chan float32$/;"	t	package:main
-T3	input.go	/^	T3 chan []string$/;"	t	package:main
-T4	input.go	/^	T4 chan<- *[12]string$/;"	t	package:main
+T2	input.go	/^	T2 <-chan float32$/;"	t	package:main	typeref:typename:<-chan float32
+T3	input.go	/^	T3 chan []string$/;"	t	package:main	typeref:typename:chan []string
+T4	input.go	/^	T4 chan<- *[12]string$/;"	t	package:main	typeref:typename:chan<- *[12]string
 T5	input.go	/^	T5 interface {$/;"	i	package:main
 T6	input.go	/^type T6 struct {$/;"	s	package:main
-T7	input.go	/^type (T7 func (a struct{_ int; _ float32}, b int) (int, map[string]int);T8 float32)$/;"	t	package:main
-T8	input.go	/^type (T7 func (a struct{_ int; _ float32}, b int) (int, map[string]int);T8 float32)$/;"	t	package:main
-T9	input.go	/^func f1() {};func f2() {};type\/*no newline here*\/T9 int\/*var ignored int$/;"	t	package:main
+T7	input.go	/^type (T7 func (a struct{_ int; _ float32}, b int) (int, map[string]int);T8 float32)$/;"	t	package:main	typeref:typename:func (a struct{_ int; _ float32}, b int) (int, map[string]int)
+T8	input.go	/^type (T7 func (a struct{_ int; _ float32}, b int) (int, map[string]int);T8 float32)$/;"	t	package:main	typeref:typename:float32
+T9	input.go	/^func f1() {};func f2() {};type\/*no newline here*\/T9 int\/*var ignored int$/;"	t	package:main	typeref:typename:int
 _a	input.go	/^	_a, _b, _c, _d int$/;"	m	struct:main.T6	typeref:typename:int
 _b	input.go	/^	_a, _b, _c, _d int$/;"	m	struct:main.T6	typeref:typename:int
 _c	input.go	/^	_a, _b, _c, _d int$/;"	m	struct:main.T6	typeref:typename:int

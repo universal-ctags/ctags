@@ -1,4 +1,4 @@
-T	input.go	/^type T int$/;"	t	package:main
+T	input.go	/^type T int$/;"	t	package:main	typeref:typename:int
 f1	input.go	/^func f1() {$/;"	f	package:main	signature:()	end:6
 f2	input.go	/^func f2(a int) {$/;"	f	package:main	signature:(a int)	end:9
 f3	input.go	/^func f3(a int) string {$/;"	f	package:main	typeref:typename:string	signature:(a int)	end:13
