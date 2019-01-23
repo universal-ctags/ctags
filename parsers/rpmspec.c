@@ -271,10 +271,14 @@ static void initializeRpmSpecParser (langType language)
 extern parserDefinition* RpmSpecParser (void)
 {
 	static const char *const extensions [] = { "spec", NULL };
+	static const char *const aliases [] = {
+		"rpm-spec",				/* the mode name in Emacs */
+		NULL };
 	parserDefinition* const def = parserNew ("RpmSpec");
 	def->kindTable = RpmSpecKinds;
 	def->kindCount = ARRAY_SIZE (RpmSpecKinds);
 	def->extensions = extensions;
+	def->aliases = aliases;
 	def->initialize = initializeRpmSpecParser;
 	def->parser = findRpmSpecTags;
 	def->method     = METHOD_REGEX;
