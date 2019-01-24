@@ -1,4 +1,4 @@
-Onigmo (Oniguruma-mod) Unicode Properties  Version 6.2.0    2018/03/17
+Onigmo (Oniguruma-mod) Unicode Properties  Version 6.2.0    2019/01/24
 
 * POSIX brackets
     Alpha
@@ -92,6 +92,7 @@ Onigmo (Oniguruma-mod) Unicode Properties  Version 6.2.0    2018/03/17
     Cyrillic
     Deseret
     Devanagari
+    Dogra
     Duployan
     Egyptian_Hieroglyphs
     Elbasan
@@ -102,9 +103,11 @@ Onigmo (Oniguruma-mod) Unicode Properties  Version 6.2.0    2018/03/17
     Grantha
     Greek
     Gujarati
+    Gunjala_Gondi
     Gurmukhi
     Han
     Hangul
+    Hanifi_Rohingya
     Hanunoo
     Hatran
     Hebrew
@@ -132,11 +135,13 @@ Onigmo (Oniguruma-mod) Unicode Properties  Version 6.2.0    2018/03/17
     Lycian
     Lydian
     Mahajani
+    Makasar
     Malayalam
     Mandaic
     Manichaean
     Marchen
     Masaram_Gondi
+    Medefaidrin
     Meetei_Mayek
     Mende_Kikakui
     Meroitic_Cursive
@@ -159,6 +164,7 @@ Onigmo (Oniguruma-mod) Unicode Properties  Version 6.2.0    2018/03/17
     Old_North_Arabian
     Old_Permic
     Old_Persian
+    Old_Sogdian
     Old_South_Arabian
     Old_Turkic
     Oriya
@@ -179,6 +185,7 @@ Onigmo (Oniguruma-mod) Unicode Properties  Version 6.2.0    2018/03/17
     Siddham
     SignWriting
     Sinhala
+    Sogdian
     Sora_Sompeng
     Soyombo
     Sundanese
@@ -384,6 +391,7 @@ Onigmo (Oniguruma-mod) Unicode Properties  Version 6.2.0    2018/03/17
     Cprt
     Cyrl
     Deva
+    Dogr
     Dsrt
     Dupl
     Egyp
@@ -391,6 +399,7 @@ Onigmo (Oniguruma-mod) Unicode Properties  Version 6.2.0    2018/03/17
     Ethi
     Geor
     Glag
+    Gong
     Gonm
     Goth
     Gran
@@ -425,9 +434,11 @@ Onigmo (Oniguruma-mod) Unicode Properties  Version 6.2.0    2018/03/17
     Lyci
     Lydi
     Mahj
+    Maka
     Mand
     Mani
     Marc
+    Medf
     Mend
     Merc
     Mero
@@ -457,6 +468,7 @@ Onigmo (Oniguruma-mod) Unicode Properties  Version 6.2.0    2018/03/17
     Plrd
     Prti
     Rjng
+    Rohg
     Runr
     Samr
     Sarb
@@ -467,6 +479,8 @@ Onigmo (Oniguruma-mod) Unicode Properties  Version 6.2.0    2018/03/17
     Sidd
     Sind
     Sinh
+    Sogd
+    Sogo
     Sora
     Soyo
     Sund
@@ -500,6 +514,7 @@ Onigmo (Oniguruma-mod) Unicode Properties  Version 6.2.0    2018/03/17
 * DerivedAges
     Age=1.1
     Age=10.0
+    Age=11.0
     Age=2.0
     Age=2.1
     Age=3.0
@@ -582,6 +597,7 @@ Onigmo (Oniguruma-mod) Unicode Properties  Version 6.2.0    2018/03/17
     In_Lepcha
     In_Ol_Chiki
     In_Cyrillic_Extended_C
+    In_Georgian_Extended
     In_Sundanese_Supplement
     In_Vedic_Extensions
     In_Phonetic_Extensions
@@ -721,7 +737,10 @@ Onigmo (Oniguruma-mod) Unicode Properties  Version 6.2.0    2018/03/17
     In_Psalter_Pahlavi
     In_Old_Turkic
     In_Old_Hungarian
+    In_Hanifi_Rohingya
     In_Rumi_Numeral_Symbols
+    In_Old_Sogdian
+    In_Sogdian
     In_Brahmi
     In_Kaithi
     In_Sora_Sompeng
@@ -740,6 +759,7 @@ Onigmo (Oniguruma-mod) Unicode Properties  Version 6.2.0    2018/03/17
     In_Mongolian_Supplement
     In_Takri
     In_Ahom
+    In_Dogra
     In_Warang_Citi
     In_Zanabazar_Square
     In_Soyombo
@@ -747,6 +767,8 @@ Onigmo (Oniguruma-mod) Unicode Properties  Version 6.2.0    2018/03/17
     In_Bhaiksuki
     In_Marchen
     In_Masaram_Gondi
+    In_Gunjala_Gondi
+    In_Makasar
     In_Cuneiform
     In_Cuneiform_Numbers_and_Punctuation
     In_Early_Dynastic_Cuneiform
@@ -756,6 +778,7 @@ Onigmo (Oniguruma-mod) Unicode Properties  Version 6.2.0    2018/03/17
     In_Mro
     In_Bassa_Vah
     In_Pahawh_Hmong
+    In_Medefaidrin
     In_Miao
     In_Ideographic_Symbols_and_Punctuation
     In_Tangut
@@ -768,6 +791,7 @@ Onigmo (Oniguruma-mod) Unicode Properties  Version 6.2.0    2018/03/17
     In_Byzantine_Musical_Symbols
     In_Musical_Symbols
     In_Ancient_Greek_Musical_Notation
+    In_Mayan_Numerals
     In_Tai_Xuan_Jing_Symbols
     In_Counting_Rod_Numerals
     In_Mathematical_Alphanumeric_Symbols
@@ -775,6 +799,7 @@ Onigmo (Oniguruma-mod) Unicode Properties  Version 6.2.0    2018/03/17
     In_Glagolitic_Supplement
     In_Mende_Kikakui
     In_Adlam
+    In_Indic_Siyaq_Numbers
     In_Arabic_Mathematical_Alphabetic_Symbols
     In_Mahjong_Tiles
     In_Domino_Tiles
@@ -789,6 +814,7 @@ Onigmo (Oniguruma-mod) Unicode Properties  Version 6.2.0    2018/03/17
     In_Geometric_Shapes_Extended
     In_Supplemental_Arrows_C
     In_Supplemental_Symbols_and_Pictographs
+    In_Chess_Symbols
     In_CJK_Unified_Ideographs_Extension_B
     In_CJK_Unified_Ideographs_Extension_C
     In_CJK_Unified_Ideographs_Extension_D
