@@ -193,6 +193,14 @@
 /* */
 # define onig_st_is_member              st_is_member
 
+# ifdef __GNUC__
+#  define RB_GNUC_EXTENSION __extension__
+#  define RB_GNUC_EXTENSION_BLOCK(x) __extension__ ({ x; })
+# else
+#  define RB_GNUC_EXTENSION
+#  define RB_GNUC_EXTENSION_BLOCK(x) (x)
+# endif
+
 #endif /* RUBY */
 
 #define STATE_CHECK_STRING_THRESHOLD_LEN             7
