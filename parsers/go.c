@@ -2,8 +2,14 @@
 *   This source code is released for free distribution under the terms of the
 *   GNU General Public License version 2 or (at your option) any later version.
 *
-*   INCLUDE FILES
+*   Reference:
+*     https://golang.org/ref/spec
 */
+
+
+/*
+ *   INCLUDE FILES
+ */
 #include "general.h"        /* must always come first */
 
 #include "debug.h"
