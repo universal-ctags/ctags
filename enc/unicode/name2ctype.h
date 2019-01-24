@@ -1,4 +1,4 @@
-/* C code produced by gperf version 3.0.4 */
+/* ANSI-C code produced by gperf version 3.1 */
 /* Command-line: gperf -7 -c -j1 -i1 -t -C -P -T -H uniname2ctype_hash -Q uniname2ctype_pool -N uniname2ctype_p  */
 #ifndef USE_UNICODE_PROPERTIES
 /* Computed positions: -k'1,3' */
@@ -30,7 +30,7 @@
       && ('w' == 119) && ('x' == 120) && ('y' == 121) && ('z' == 122) \
       && ('{' == 123) && ('|' == 124) && ('}' == 125) && ('~' == 126))
 /* The character set is not based on ISO-646.  */
-error "gperf generated tables don't work with this execution character set. Please report a bug to <bug-gnu-gperf@gnu.org>."
+#error "gperf generated tables don't work with this execution character set. Please report a bug to <bug-gperf@gnu.org>."
 #endif
 
 
@@ -34756,7 +34756,7 @@ struct uniname2ctype_struct {
 };
 #define uniname2ctype_offset(str) offsetof(struct uniname2ctype_pool_t, uniname2ctype_pool_##str)
 
-static const struct uniname2ctype_struct *uniname2ctype_p(const char *, unsigned int);
+static const struct uniname2ctype_struct *uniname2ctype_p(const char *, size_t);
 
 #ifndef USE_UNICODE_PROPERTIES
 #define TOTAL_KEYWORDS 15
@@ -34786,9 +34786,7 @@ inline
 #endif
 #endif
 static unsigned int
-uniname2ctype_hash (str, len)
-     register const char *str;
-     register unsigned int len;
+uniname2ctype_hash (register const char *str, register size_t len)
 {
 #ifndef USE_UNICODE_PROPERTIES
   static const unsigned char asso_values[] =
@@ -34834,7 +34832,7 @@ uniname2ctype_hash (str, len)
 #ifndef USE_UNICODE_PROPERTIES
   return len + asso_values[(unsigned char)str[2]] + asso_values[(unsigned char)str[0]];
 #else /* USE_UNICODE_PROPERTIES */
-  register int hval = len;
+  register unsigned int hval = len;
 
   switch (hval)
     {
@@ -36536,16 +36534,8 @@ static const struct uniname2ctype_pool_t uniname2ctype_pool_contents =
 #endif /* USE_UNICODE_PROPERTIES */
   };
 #define uniname2ctype_pool ((const char *) &uniname2ctype_pool_contents)
-#ifdef __GNUC__
-__inline
-#if defined __GNUC_STDC_INLINE__ || defined __GNUC_GNU_INLINE__
-__attribute__ ((__gnu_inline__))
-#endif
-#endif
 const struct uniname2ctype_struct *
-uniname2ctype_p (str, len)
-     register const char *str;
-     register unsigned int len;
+uniname2ctype_p (register const char *str, register size_t len)
 {
   static const struct uniname2ctype_struct wordlist[] =
     {
@@ -38352,9 +38342,9 @@ uniname2ctype_p (str, len)
 
   if (len <= MAX_WORD_LENGTH && len >= MIN_WORD_LENGTH)
     {
-      register int key = uniname2ctype_hash (str, len);
+      register unsigned int key = uniname2ctype_hash (str, len);
 
-      if (key <= MAX_HASH_VALUE && key >= 0)
+      if (key <= MAX_HASH_VALUE)
         {
           register int o = wordlist[key].name;
           if (o >= 0)
