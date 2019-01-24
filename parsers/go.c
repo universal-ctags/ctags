@@ -17,6 +17,7 @@
 #include "vstring.h"
 #include "xtag.h"
 #include "field.h"
+#include "htable.h"
 
 #include <string.h>
 
@@ -175,6 +176,8 @@ static fieldDefinition GoFields [] = {
 	},
 };
 
+static hashTable *typeTable;
+
 /*
 *   FUNCTION DEFINITIONS
 */
@@ -291,7 +294,7 @@ static void collectorCat (collector *collector, vString *str)
 	vStringCat (collector->str, str);
 }
 
-static void appendTokenToVString (const tokenInfo *const token, collector *collector)
+static void collectorAppendToken (collector *collector, const tokenInfo *const token)
 {
 	if (token->type == TOKEN_LEFT_ARROW)
 		collectorCatS (collector, "<-");
@@ -487,7 +490,7 @@ getNextChar:
 	token->c = c;
 
 	if (collector && vStringLength (collector->str) < MAX_COLLECTOR_LENGTH)
-		appendTokenToVString (token, collector);
+		collectorAppendToken (collector, token);
 
 	lastTokenType = token->type;
 }
@@ -741,9 +744,15 @@ static void parseFunctionOrMethod (tokenInfo *const token, const int scope)
 
 		collectorTruncate (&collector, false);
 		if (receiver_type_token)
-			func_scope = makeTagFull(receiver_type_token, GOTAG_UNKNOWN,
-									 scope, NULL, NULL,
-									 R_GOTAG_UNKNOWN_RECEIVER);
+		{
+			void *p = hashTableGetItem (typeTable, vStringValue (receiver_type_token->string));
+			if (p)
+				func_scope = HT_PTR_TO_INT(p);
+			else
+				func_scope = makeTagFull(receiver_type_token, GOTAG_UNKNOWN,
+										 scope, NULL, NULL,
+										 R_GOTAG_UNKNOWN_RECEIVER);
+		}
 		else
 			func_scope = scope;
 
@@ -792,11 +801,22 @@ static void parseFunctionOrMethod (tokenInfo *const token, const int scope)
 
 static void attachTypeRefField (intArray *corks, const char *const type)
 {
+	tagEntryInfo *type_e = NULL;
+	void *p = hashTableGetItem (typeTable, type);
+	if (p)
+	{
+		int type_cork = HT_PTR_TO_INT(p);
+		type_e = getEntryInCorkQueue (type_cork);
+	}
+
 	for (unsigned int i = 0; i < intArrayCount (corks); i++)
 	{
 		int cork = intArrayItem (corks, i);
 		tagEntryInfo *e = getEntryInCorkQueue (cork);
-		e->extensionFields.typeRef [0] = eStrdup ("typename");
+		if (type_e)
+			e->extensionFields.typeRef [0] = eStrdup (GoKinds[type_e->kindIndex].name);
+		else
+			e->extensionFields.typeRef [0] = eStrdup ("typename");
 		e->extensionFields.typeRef [1] = eStrdup (type);
 	}
 }
@@ -911,7 +931,7 @@ static void parseStructMembers (tokenInfo *const token, const int scope)
 			vString *typeForMember = vStringNew ();
 			collector collector = { .str = typeForMember, .last_len = 0, };
 
-			appendTokenToVString (token, &collector);
+			collectorAppendToken (&collector, token);
 			skipType (token, &collector);
 			collectorTruncate (&collector, true);
 
@@ -959,6 +979,8 @@ static void parseConstTypeVar (tokenInfo *const token, goKind kind, const int sc
 	// VarSpec     = IdentifierList ( Type [ "=" ExpressionList ] | "=" ExpressionList ) .
 	bool usesParens = false;
 	int member_scope = scope;
+	intArray *corks
+		= (kind == GOTAG_VAR || kind == GOTAG_CONST)? intArrayNew (): NULL;
 
 	readToken (token);
 
@@ -990,10 +1012,22 @@ static void parseConstTypeVar (tokenInfo *const token, goKind kind, const int sc
 					else
 						member_scope = makeTag (typeToken, kind,
 												scope, NULL, NULL);
+
+					if (member_scope != CORK_NIL)
+					{
+						tagEntryInfo *e = getEntryInCorkQueue (member_scope);
+						hashTablePutItem (typeTable,
+										  (char *)e->name,
+										  HT_INT_TO_PTR(member_scope));
+					}
 					break;
 				}
 				else
-					makeTag (token, kind, scope, NULL, NULL);
+				{
+					int c = makeTag (token, kind, scope, NULL, NULL);
+					if (corks)
+						intArrayAdd (corks, c);
+				}
 				readToken (token);
 			}
 			if (!isType (token, TOKEN_COMMA))
@@ -1005,9 +1039,42 @@ static void parseConstTypeVar (tokenInfo *const token, goKind kind, const int sc
 		{
 			if (isKeyword (token, KEYWORD_struct))
 				parseStructMembers (token, member_scope);
-			else
+			else if (isKeyword (token, KEYWORD_interface))
 				skipType (token, NULL);
+			else
+			{
+				/* Filling "typeref:" field of typeToken. */
+				vString *buffer = vStringNew ();
+				collector collector = { .str = buffer, .last_len = 0, };
+
+				collectorAppendToken (&collector, token);
+				skipType (token, &collector);
+				collectorTruncate (&collector, true);
+
+				if (!vStringIsEmpty (buffer))
+				{
+					tagEntryInfo *e = getEntryInCorkQueue (member_scope);
+					e->extensionFields.typeRef [0] = eStrdup ("typename");
+					e->extensionFields.typeRef [1] = vStringDeleteUnwrap (buffer);
+				}
+				else
+					vStringDelete (buffer);
+			}
 			deleteToken (typeToken);
+		}
+		else if (corks)
+		{
+			vString *buffer = vStringNew ();
+			collector collector = { .str = buffer, .last_len = 0, };
+
+			collectorAppendToken (&collector, token);
+			skipType (token, &collector);
+			collectorTruncate (&collector, true);
+
+			if (!vStringIsEmpty (buffer))
+				attachTypeRefField (corks, vStringValue (buffer));
+			vStringDelete (buffer);
+			intArrayClear (corks);
 		}
 		else
 			skipType (token, NULL);
@@ -1027,6 +1094,8 @@ static void parseConstTypeVar (tokenInfo *const token, goKind kind, const int sc
 	}
 	while (!isType (token, TOKEN_EOF) &&
 			usesParens && !isType (token, TOKEN_CLOSE_PAREN));
+
+	intArrayDelete (corks);
 }
 
 static void parseImportSpec (tokenInfo *const token)
@@ -1147,8 +1216,13 @@ static void parseGoFile (tokenInfo *const token)
 static void findGoTags (void)
 {
 	tokenInfo *const token = newToken ();
+	typeTable = hashTableIntNew (43, hashCstrhash, hashCstreq,
+								 NULL);
 
 	parseGoFile (token);
+
+	hashTableDelete (typeTable);
+	typeTable = NULL;
 
 	deleteToken (token);
 }

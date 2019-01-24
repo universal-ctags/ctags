@@ -140,6 +140,14 @@ extern hashTable *hashTableNew    (unsigned int size,
 	return htable;
 }
 
+extern hashTable* hashTableIntNew (unsigned int size,
+								   hashTableHashFunc hashfn,
+								   hashTableEqualFunc equalfn,
+								   hashTableFreeFunc keyfreefn)
+{
+	return hashTableNew (size, hashfn, equalfn, keyfreefn, NULL);
+}
+
 extern void       hashTableDelete (hashTable *htable)
 {
 	if (!htable)
