@@ -109,6 +109,7 @@ typedef enum {
 	GOTAG_INTERFACE,
 	GOTAG_MEMBER,
 	GOTAG_ANONMEMBER,
+	GOTAG_METHODSPEC,
 	GOTAG_UNKNOWN,
 	GOTAG_PACKAGE_NAME,
 } goKind;
@@ -140,6 +141,7 @@ static kindDefinition GoKinds[] = {
 	{true, 'i', "interface", "interfaces"},
 	{true, 'm', "member", "struct members"},
 	{true, 'M', "anonMember", "struct anonymous members"},
+	{true, 'n', "methodSpec", "interface method specification"},
 	{true, 'u', "unknown", "unknown",
 	 .referenceOnly = true, ATTACH_ROLES (GoUnknownRoles)},
 	{true, 'P', "packageName", "name for specifying imported package"},
@@ -272,6 +274,11 @@ static void parseIdentifier (vString *const string, const int firstChar)
 		c = getcFromInputFile ();
 	} while (isIdentChar (c));
 	ungetcToInputFile (c);		/* always unget, LF might add a semicolon */
+}
+
+static bool collectorIsEmpty(collector *collector)
+{
+	return !vStringLength(collector->str);
 }
 
 static void collectorPut (collector *collector, char c)
@@ -827,6 +834,98 @@ static void attachTypeRefField (intArray *corks, const char *const type)
 	}
 }
 
+static void parseInterfaceMethods (tokenInfo *const token, const int scope)
+{
+	// InterfaceType      = "interface" "{" { MethodSpec ";" } "}" .
+	// MethodSpec         = MethodName Signature | InterfaceTypeName .
+	// MethodName         = identifier .
+	// InterfaceTypeName  = TypeName .
+
+	vString *inheritsBuf = vStringNew ();
+	collector inherits = { .str = inheritsBuf, .last_len = 0, };
+
+	readToken (token);
+	if (!isType (token, TOKEN_OPEN_CURLY))
+		return;
+
+	readToken (token);
+	while (!isType (token, TOKEN_EOF) && !isType (token, TOKEN_CLOSE_CURLY))
+	{
+		if (isType (token, TOKEN_IDENTIFIER))
+		{
+			tokenInfo * headToken = newToken();
+			copyToken (headToken, token);
+
+			readToken (token);
+			if(isType (token, TOKEN_DOT))
+			{
+				if (!collectorIsEmpty(&inherits))
+					collectorPut (&inherits, ',');
+				collectorAppendToken (&inherits, headToken);
+				readTokenFull (token, NULL);
+				if (isType (token, TOKEN_IDENTIFIER))
+				{
+					collectorPut (&inherits, '.');
+					collectorAppendToken (&inherits, token);
+					readToken (token);
+				}
+				/* If the token is not an identifier, the input
+				   may be wrong. */
+			}
+			else if (isType (token, TOKEN_SEMICOLON))
+			{
+				if (!collectorIsEmpty(&inherits))
+					collectorPut (&inherits, ',');
+				collectorAppendToken (&inherits, headToken);
+				readToken (token);
+			}
+			else if (isType (token, TOKEN_OPEN_PAREN))
+			{
+				// => Signature
+				// Signature      = Parameters [ Result ] .
+				vString *pbuf = vStringNew ();
+				collector pcol = { .str = pbuf, .last_len = 0, };
+				vString *rbuf = NULL;
+				collector rcol = { .str = NULL, .last_len = 0, };
+
+				// Parameters
+				collectorPut (&pcol, '(');
+				skipToMatched (token, &pcol);
+				collectorTruncate(&pcol, true);
+
+				if (!isType (token, TOKEN_SEMICOLON))
+				{
+					rbuf = vStringNew ();
+					rcol.str = rbuf;
+
+					collectorAppendToken (&rcol, token);
+					skipType (token, &rcol);
+					collectorTruncate(&rcol, true);
+				}
+
+				makeTag (headToken, GOTAG_METHODSPEC, scope,
+						 vStringValue (pbuf),
+						 rbuf? vStringValue(rbuf): NULL);
+
+				if (rbuf)
+					vStringDelete (rbuf);
+				vStringDelete (pbuf);
+			}
+			deleteToken (headToken);
+		}
+		else
+			readToken (token);
+	}
+
+	if (!collectorIsEmpty(&inherits))
+	{
+		tagEntryInfo *e = getEntryInCorkQueue (scope);
+		e->extensionFields.inheritance = vStringDeleteUnwrap (inheritsBuf);
+	}
+	else
+		vStringDelete (inheritsBuf);
+}
+
 static void parseStructMembers (tokenInfo *const token, const int scope)
 {
 	// StructType     = "struct" "{" { FieldDecl ";" } "}" .
@@ -1046,7 +1145,7 @@ static void parseConstTypeVar (tokenInfo *const token, goKind kind, const int sc
 			if (isKeyword (token, KEYWORD_struct))
 				parseStructMembers (token, member_scope);
 			else if (isKeyword (token, KEYWORD_interface))
-				skipType (token, NULL);
+				parseInterfaceMethods (token, member_scope);
 			else
 			{
 				/* Filling "typeref:" field of typeToken. */

@@ -1,0 +1,12 @@
+main	input.go	/^package main$/;"	kind:package
+Buffer	input.go	/^type Buffer interface {$/;"	kind:interface	scope:package:main
+Locker	input.go	/^type Locker interface {$/;"	kind:interface	scope:package:main
+Lock	input.go	/^	Lock()$/;"	kind:methodSpec	scope:interface:main.Locker	signature:()
+Unlock	input.go	/^	Unlock()$/;"	kind:methodSpec	scope:interface:main.Locker	signature:()
+ReadWriter	input.go	/^type ReadWriter interface {$/;"	kind:interface	scope:package:main
+Read	input.go	/^	Read(b Buffer) bool$/;"	kind:methodSpec	scope:interface:main.ReadWriter	typeref:typename:bool	signature:(b Buffer)
+Write	input.go	/^	Write(b Buffer) bool$/;"	kind:methodSpec	scope:interface:main.ReadWriter	typeref:typename:bool	signature:(b Buffer)
+File	input.go	/^type File interface {$/;"	kind:interface	scope:package:main	inherits:ReadWriter,Locker,ext.Processor
+Close	input.go	/^	Close()$/;"	kind:methodSpec	scope:interface:main.File	signature:()
+ListAttr	input.go	/^	ListAttr() ([][]byte, error)$/;"	kind:methodSpec	scope:interface:main.File	typeref:typename:([][]byte, error)	signature:()
+main	input.go	/^func main () {$/;"	kind:func	scope:package:main	signature:()

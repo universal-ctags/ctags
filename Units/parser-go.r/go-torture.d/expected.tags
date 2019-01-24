@@ -7,6 +7,7 @@ F	input.go	/^	F=3.14*(1+2*3)\/34e7;I=1)$/;"	c	package:main
 G	input.go	/^const ignored int*\/const (G=6); var g int$/;"	c	package:main
 H	input.go	/^func (tt * T7) f4(a func () func ()) (func (), int) {return func (){}, 1};func f5(){};const H=1$/;"	c	package:main
 I	input.go	/^	F=3.14*(1+2*3)\/34e7;I=1)$/;"	c	package:main
+Reader	input.go	/^		Reader()$/;"	n	interface:main.T5	signature:()
 T1	input.go	/^	T1 `annotation`$/;"	M	struct:main.T6	typeref:typename:T1
 T1	input.go	/^	T1 map[string]int$/;"	t	package:main	typeref:typename:map[string]int
 T2	input.go	/^	*T2$/;"	M	struct:main.T6	typeref:typename:*T2
@@ -18,6 +19,7 @@ T6	input.go	/^type T6 struct {$/;"	s	package:main
 T7	input.go	/^type (T7 func (a struct{_ int; _ float32}, b int) (int, map[string]int);T8 float32)$/;"	t	package:main	typeref:typename:func (a struct{_ int; _ float32}, b int) (int, map[string]int)
 T8	input.go	/^type (T7 func (a struct{_ int; _ float32}, b int) (int, map[string]int);T8 float32)$/;"	t	package:main	typeref:typename:float32
 T9	input.go	/^func f1() {};func f2() {};type\/*no newline here*\/T9 int\/*var ignored int$/;"	t	package:main	typeref:typename:int
+Writer	input.go	/^		Writer()$/;"	n	interface:main.T5	signature:()
 _a	input.go	/^	_a, _b, _c, _d int$/;"	m	struct:main.T6	typeref:typename:int
 _b	input.go	/^	_a, _b, _c, _d int$/;"	m	struct:main.T6	typeref:typename:int
 _c	input.go	/^	_a, _b, _c, _d int$/;"	m	struct:main.T6	typeref:typename:int
@@ -34,6 +36,7 @@ f2	input.go	/^func f1() {};func f2() {};type\/*no newline here*\/T9 int\/*var ig
 f3	input.go	/^func (t *T1) f3() (a, b int){$/;"	f	type:main.T1	typeref:typename:(a, b int)	signature:()
 f4	input.go	/^func (tt * T7) f4(a func () func ()) (func (), int) {return func (){}, 1};func f5(){};const H=1$/;"	f	type:main.T7	typeref:typename:(func (), int)	signature:(a func () func ())
 f5	input.go	/^func (tt * T7) f4(a func () func ()) (func (), int) {return func (){}, 1};func f5(){};const H=1$/;"	f	package:main	signature:()
+foo	input.go	/^		foo()$/;"	n	interface:main.T5	signature:()
 g	input.go	/^const ignored int*\/const (G=6); var g int$/;"	v	package:main	typeref:typename:int
 h	input.go	/^}; var h int$/;"	v	package:main	typeref:typename:int
 int	input.go	/^	int$/;"	M	struct:main.T6	typeref:typename:int
