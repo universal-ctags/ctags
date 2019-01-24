@@ -1461,9 +1461,9 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
 # define CASE(x) L_##x: sbegin = s; OPCODE_EXEC_HOOK;
 # define DEFAULT L_DEFAULT:
 # define NEXT sprev = sbegin; JUMP
-# define JUMP goto *oplabels[*p++]
+# define JUMP RB_GNUC_EXTENSION_BLOCK(goto *oplabels[*p++])
 
-  static const void *oplabels[] = {
+  RB_GNUC_EXTENSION static const void *oplabels[] = {
     &&L_OP_FINISH,               /* matching process terminator (no more alternative) */
     &&L_OP_END,                  /* pattern code terminator (success end) */
 
@@ -2501,6 +2501,7 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
     CASE(OP_MEMORY_START)  MOP_IN(OP_MEMORY_START);
       GET_MEMNUM_INC(mem, p);
       mem_start_stk[mem] = (OnigStackIndex )((void* )s);
+      mem_end_stk[mem] = INVALID_STACK_INDEX;
       MOP_OUT;
       JUMP;
 
@@ -4616,4 +4617,3 @@ onig_copy_encoding(OnigEncodingType *to, OnigEncoding from)
 {
   *to = *from;
 }
-
