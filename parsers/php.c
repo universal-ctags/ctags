@@ -245,6 +245,8 @@ static langType Lang_php;
 static langType Lang_zephir;
 
 static bool InPhp = false; /* whether we are between <? ?> */
+/* whether the next token may be a keyword, e.g. not after "::" or "->" */
+static bool MayBeKeyword = true;
 
 /* current statement details */
 static struct {
@@ -808,6 +810,7 @@ static int skipSingleComment (void)
 static void readToken (tokenInfo *const token)
 {
 	int c;
+	bool nextMayBeKeyword = true;
 
 	token->type		= TOKEN_UNDEFINED;
 	token->keyword	= KEYWORD_NONE;
@@ -837,13 +840,28 @@ getNextChar:
 		case ';': token->type = TOKEN_SEMICOLON;			break;
 		case ',': token->type = TOKEN_COMMA;				break;
 		case '.': token->type = TOKEN_PERIOD;				break;
-		case ':': token->type = TOKEN_COLON;				break;
 		case '{': token->type = TOKEN_OPEN_CURLY;			break;
 		case '}': token->type = TOKEN_CLOSE_CURLY;			break;
 		case '[': token->type = TOKEN_OPEN_SQUARE;			break;
 		case ']': token->type = TOKEN_CLOSE_SQUARE;			break;
 		case '&': token->type = TOKEN_AMPERSAND;			break;
 		case '\\': token->type = TOKEN_BACKSLASH;			break;
+
+		case ':':
+		{
+			int d = getcFromInputFile ();
+			if (d == c) /* :: */
+			{
+				nextMayBeKeyword = false;
+				token->type = TOKEN_OPERATOR;
+			}
+			else
+			{
+				ungetcToInputFile (d);
+				token->type = TOKEN_COLON;
+			}
+			break;
+		}
 
 		case '=':
 		{
@@ -913,7 +931,9 @@ getNextChar:
 		case '%':
 		{
 			int d = getcFromInputFile ();
-			if (d != '=' && ! (c == '-' && d == '>'))
+			if (c == '-' && d == '>')
+				nextMayBeKeyword = false;
+			else if (d != '=')
 				ungetcToInputFile (d);
 			token->type = TOKEN_OPERATOR;
 			break;
@@ -990,7 +1010,11 @@ getNextChar:
 			else
 			{
 				parseIdentifier (token->string, c);
-				token->keyword = lookupCaseKeyword (vStringValue (token->string), getInputLanguage ());
+				if (MayBeKeyword)
+					token->keyword = lookupCaseKeyword (vStringValue (token->string), getInputLanguage ());
+				else
+					token->keyword = KEYWORD_NONE;
+
 				if (token->keyword == KEYWORD_NONE)
 					token->type = TOKEN_IDENTIFIER;
 				else
@@ -1010,6 +1034,8 @@ getNextChar:
 		CurrentStatement.access = ACCESS_UNDEFINED;
 		CurrentStatement.impl = IMPL_UNDEFINED;
 	}
+
+	MayBeKeyword = nextMayBeKeyword;
 }
 
 static void enterScope (tokenInfo *const parentToken,
@@ -1632,6 +1658,7 @@ static void findTags (bool startsInPhpMode)
 	tokenInfo *const token = newToken ();
 
 	InPhp = startsInPhpMode;
+	MayBeKeyword = true;
 	CurrentStatement.access = ACCESS_UNDEFINED;
 	CurrentStatement.impl = IMPL_UNDEFINED;
 	CurrentNamesapce = vStringNew ();
