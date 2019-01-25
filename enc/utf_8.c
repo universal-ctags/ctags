@@ -37,7 +37,7 @@
 #endif
 
 #define USE_INVALID_CODE_SCHEME
-#define USE_UTF8_31BITS
+/* #define USE_UTF8_31BITS */
 
 #ifdef USE_INVALID_CODE_SCHEME
 /* virtual codepoint values for invalid encoding byte 0xfe and 0xff */

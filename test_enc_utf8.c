@@ -9,7 +9,7 @@
 
 #include "onigmo.h"
 
-#define USE_UTF8_31BITS
+/* #define USE_UTF8_31BITS */
 
 #define SLEN(s)  strlen(s)
 
