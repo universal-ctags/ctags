@@ -262,6 +262,9 @@ static unsigned int AnonymousID;
 
 static objPool *TokenPool = NULL;
 
+/* Used in readToken() */
+static bool nextToArrow = false;
+
 static const char *phpScopeSeparatorFor (int kind, int upperScopeKind)
 {
 	return scopeSeparatorFor (getInputLanguage(), kind, upperScopeKind);
@@ -808,6 +811,7 @@ static int skipSingleComment (void)
 static void readToken (tokenInfo *const token)
 {
 	int c;
+	bool foundArrow = false;
 
 	token->type		= TOKEN_UNDEFINED;
 	token->keyword	= KEYWORD_NONE;
@@ -913,7 +917,8 @@ getNextChar:
 		case '%':
 		{
 			int d = getcFromInputFile ();
-			if (d != '=' && ! (c == '-' && d == '>'))
+			foundArrow = (c == '-' && d == '>');
+			if (d != '=' && ! foundArrow)
 				ungetcToInputFile (d);
 			token->type = TOKEN_OPERATOR;
 			break;
@@ -993,6 +998,16 @@ getNextChar:
 				token->keyword = lookupCaseKeyword (vStringValue (token->string), getInputLanguage ());
 				if (token->keyword == KEYWORD_NONE)
 					token->type = TOKEN_IDENTIFIER;
+				else if (token->keyword == KEYWORD_namespace)
+				{
+					/* "namespace" can be used as a method name.
+					 * e.g. https://github.com/nikic/PHP-Parser/blob/master/lib/PhpParser/BuilderFactory.php
+					 * If we find a sequence ["->", "namespace"], return the "namespace" as an identifier. */
+					if (nextToArrow)
+						token->type = TOKEN_IDENTIFIER;
+					else
+						token->type = TOKEN_KEYWORD;
+				}
 				else
 					token->type = TOKEN_KEYWORD;
 			}
@@ -1010,6 +1025,7 @@ getNextChar:
 		CurrentStatement.access = ACCESS_UNDEFINED;
 		CurrentStatement.impl = IMPL_UNDEFINED;
 	}
+	nextToArrow = foundArrow;
 }
 
 static void enterScope (tokenInfo *const parentToken,
@@ -1637,6 +1653,7 @@ static void findTags (bool startsInPhpMode)
 	CurrentNamesapce = vStringNew ();
 	FullScope = vStringNew ();
 	AnonymousID = 0;
+	nextToArrow = false;
 
 	do
 	{

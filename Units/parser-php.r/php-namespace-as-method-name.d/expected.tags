@@ -1,0 +1,2 @@
+A	input.php	/^class A$/;"	c
+f	input.php	/^        public function f() {$/;"	f	class:A
