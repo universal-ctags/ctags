@@ -2770,10 +2770,8 @@ get_head_value_node(Node* node, int exact, regex_t* reg)
       if (sn->end <= sn->s)
 	break;
 
-      if (exact != 0 &&
-	  !NSTRING_IS_RAW(node) && IS_IGNORECASE(reg->options)) {
-      }
-      else {
+      if (exact == 0 ||
+	  NSTRING_IS_RAW(node) || !IS_IGNORECASE(reg->options)) {
 	n = node;
       }
     }
@@ -5036,7 +5034,7 @@ optimize_node_left(Node* node, NodeOptInfo* opt, OptEnv* env)
 
 	if (NSTRING_IS_DONT_GET_OPT_INFO(node)) {
 	  int n = onigenc_strlen(env->enc, sn->s, sn->end);
-	  max = ONIGENC_MBC_MAXLEN_DIST(env->enc) * n;
+	  max = (OnigDistance )ONIGENC_MBC_MAXLEN_DIST(env->enc) * n;
 	}
 	else {
 	  concat_opt_exact_info_str(&opt->exb, sn->s, sn->end,
