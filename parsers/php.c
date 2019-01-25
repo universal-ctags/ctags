@@ -394,6 +394,7 @@ static void makeClassOrIfaceTag (const phpKind kind, const tokenInfo *const toke
 
 static void makeFunctionTag (const tokenInfo *const token,
 							 const vString *const arglist,
+							 const vString *const rtype,
 							 const accessType access, const implType impl)
 {
 	if (PhpKinds[K_FUNCTION].enabled)
@@ -406,6 +407,11 @@ static void makeFunctionTag (const tokenInfo *const token,
 			e.extensionFields.implementation = implToString (impl);
 		if (arglist)
 			e.extensionFields.signature = vStringValue (arglist);
+		if (rtype)
+		{
+			e.extensionFields.typeRef [0] = "unknown";
+			e.extensionFields.typeRef [1] = vStringValue (rtype);
+		}
 
 		makePhpTagEntry (&e);
 	}
@@ -1043,6 +1049,24 @@ getNextChar:
 	MayBeKeyword = nextMayBeKeyword;
 }
 
+static void readQualifiedName (tokenInfo *const token, vString *name,
+                               tokenInfo *const lastToken)
+{
+	while (token->type == TOKEN_IDENTIFIER || token->type == TOKEN_BACKSLASH)
+	{
+		if (name)
+		{
+			if (token->type == TOKEN_BACKSLASH)
+				vStringPut (name, '\\');
+			else
+				vStringCat (name, token->string);
+		}
+		if (lastToken)
+			copyToken (lastToken, token, true);
+		readToken (token);
+	}
+}
+
 static void enterScope (tokenInfo *const parentToken,
 						const vString *const extraScope,
 						const int parentKind);
@@ -1182,6 +1206,8 @@ static bool parseFunction (tokenInfo *const token, const tokenInfo *name)
 	accessType access = CurrentStatement.access;
 	implType impl = CurrentStatement.impl;
 	tokenInfo *nameFree = NULL;
+	vString *rtype = NULL;
+	vString *arglist = NULL;
 
 	readToken (token);
 	/* skip a possible leading ampersand (return by reference) */
@@ -1200,9 +1226,9 @@ static bool parseFunction (tokenInfo *const token, const tokenInfo *name)
 
 	if (token->type == TOKEN_OPEN_PAREN)
 	{
-		vString *arglist = vStringNew ();
 		int depth = 1;
 
+		arglist = vStringNew ();
 		vStringPut (arglist, '(');
 		do
 		{
@@ -1269,9 +1295,6 @@ static bool parseFunction (tokenInfo *const token, const tokenInfo *name)
 		}
 		while (token->type != TOKEN_EOF && depth > 0);
 
-		makeFunctionTag (name, arglist, access, impl);
-		vStringDelete (arglist);
-
 		readToken (token); /* normally it's an open brace or "use" keyword */
 	}
 
@@ -1282,22 +1305,34 @@ static bool parseFunction (tokenInfo *const token, const tokenInfo *name)
 		skipOverParens (token);
 	}
 
-	/* PHP7 return type declaration or if parsing Zephir, skip function return
-	 * type hint */
+	/* PHP7 return type declaration or if parsing Zephir, gather function return
+	 * type hint to fill typeRef. */
 	if ((getInputLanguage () == Lang_php && token->type == TOKEN_COLON) ||
 	    (getInputLanguage () == Lang_zephir && token->type == TOKEN_OPERATOR))
 	{
-		do
-			readToken (token);
-		while (token->type == TOKEN_IDENTIFIER ||
-		       token->type == TOKEN_BACKSLASH);
+		if (arglist)
+			rtype = vStringNew ();
+
+		readToken (token);
+		readQualifiedName (token, rtype, NULL);
+
+		if (rtype && vStringIsEmpty (rtype))
+		{
+			vStringDelete (rtype);
+			rtype = NULL;
+		}
 	}
+
+	if (arglist)
+		makeFunctionTag (name, arglist, rtype, access, impl);
 
 	if (token->type == TOKEN_OPEN_CURLY)
 		enterScope (token, name->string, K_FUNCTION);
 	else
 		readNext = false;
 
+	vStringDelete (rtype);
+	vStringDelete (arglist);
 	if (nameFree)
 		deleteToken (nameFree);
 
@@ -1363,20 +1398,6 @@ static bool parseDefine (tokenInfo *const token)
 	}
 
 	return false;
-}
-
-static void readQualifiedName (tokenInfo *const token, vString *name,
-                               tokenInfo *const lastToken)
-{
-	while (token->type == TOKEN_IDENTIFIER || token->type == TOKEN_BACKSLASH)
-	{
-		if (token->type == TOKEN_BACKSLASH)
-			vStringPut (name, '\\');
-		else
-			vStringCat (name, token->string);
-		copyToken (lastToken, token, true);
-		readToken (token);
-	}
 }
 
 /* parses declarations of the form
