@@ -1172,6 +1172,28 @@ def main():
         x2("(?i)(?<=\u0149)a", "\u02bcna", 2, 3)    # with look-behind
         # Other Unicode tests
         x2("\\x{25771}", "\U00025771", 0, 1)
+    x2("(?i:ss)", "ss", 0, 2)
+    x2("(?i:ss)", "Ss", 0, 2)
+    x2("(?i:ss)", "SS", 0, 2)
+    if is_unicode_encoding(onig_encoding):
+        x2("(?i:ss)", "\u017fS", 0, 2)  # LATIN SMALL LETTER LONG S
+        x2("(?i:ss)", "s\u017f", 0, 2)
+        x2("(?i:ss)", "\u00df", 0, 1)   # LATIN SMALL LETTER SHARP S
+        x2("(?i:ss)", "\u1e9e", 0, 1)   # LATIN CAPITAL LETTER SHARP S
+    x2("(?i:xssy)", "xssy", 0, 4)
+    x2("(?i:xssy)", "xSsy", 0, 4)
+    x2("(?i:xssy)", "xSSy", 0, 4)
+    if is_unicode_encoding(onig_encoding):
+        x2("(?i:xssy)", "x\u017fSy", 0, 4)
+        x2("(?i:xssy)", "xs\u017fy", 0, 4)
+        x2("(?i:xssy)", "x\u00dfy", 0, 3)
+        x2("(?i:xssy)", "x\u1e9ey", 0, 3)
+        x2("(?i:\u00df)", "ss", 0, 2)
+        x2("(?i:\u00df)", "SS", 0, 2)
+        x2("(?i:[\u00df])", "ss", 0, 2)
+        x2("(?i:[\u00df])", "SS", 0, 2)
+    x2("(?i)(?<!ss)z", "qqz", 2, 3)     # Issue #92
+    x2("(?i)(?<!xss)z", "qqz", 2, 3)
     x2("[0-9-a]+", " 0123456789-a ", 1, 13)     # same as [0-9\-a]
     x2("[0-9-\\s]+", " 0123456789-a ", 0, 12)   # same as [0-9\-\s]
     n("[0-9-a]", "", syn=onigmo.ONIG_SYNTAX_GREP, err=onigmo.ONIGERR_UNMATCHED_RANGE_SPECIFIER_IN_CHAR_CLASS)
