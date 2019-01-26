@@ -12,6 +12,9 @@
 *   INCLUDE FILES
 */
 #include "general.h"  /* must always come first */
+
+#include <string.h>
+
 #include "parse.h"
 #include "read.h"
 #include "vstring.h"
@@ -409,8 +412,21 @@ static void makeFunctionTag (const tokenInfo *const token,
 			e.extensionFields.signature = vStringValue (arglist);
 		if (rtype)
 		{
-			e.extensionFields.typeRef [0] = "unknown";
-			e.extensionFields.typeRef [1] = vStringValue (rtype);
+			if ((vStringLength (rtype) == 4)
+				&& (strcmp (vStringValue (rtype), "self") == 0)
+				&& vStringLength (token->scope) > 0)
+			{
+				if (token->parentKind == -1)
+					e.extensionFields.typeRef [0] = "unknown";
+				else
+					e.extensionFields.typeRef [0] = PhpKinds [token->parentKind].name;
+				e.extensionFields.typeRef [1] = vStringValue (token->scope);
+			}
+			else
+			{
+				e.extensionFields.typeRef [0] = "unknown";
+				e.extensionFields.typeRef [1] = vStringValue (rtype);
+			}
 		}
 
 		makePhpTagEntry (&e);
