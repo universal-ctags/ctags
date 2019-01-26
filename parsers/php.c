@@ -266,6 +266,9 @@ static vString *CurrentNamesapce;
 /* Cache variable to build the tag's scope.  It has no real meaning outside
  * of initPhpEntry()'s scope. */
 static vString *FullScope;
+/* The class name specified at "extends" keyword in the current class
+ * definition. Used to resolve "parent" in return type. */
+static vString *ParentClass;
 
 static objPool *TokenPool = NULL;
 
@@ -423,6 +426,13 @@ static void makeFunctionTag (const tokenInfo *const token,
 				else
 					e.extensionFields.typeRef [0] = PhpKinds [token->parentKind].name;
 				e.extensionFields.typeRef [1] = vStringValue (token->scope);
+			}
+			else if ((vStringLength (rtype) == 6)
+				&& (strcmp (vStringValue (rtype), "parent") == 0)
+				&& (ParentClass && vStringLength (ParentClass) > 0))
+			{
+				e.extensionFields.typeRef [0] = "class";
+				e.extensionFields.typeRef [1] = vStringValue (ParentClass);
 			}
 			else
 			{
@@ -1129,6 +1139,7 @@ static bool parseClassOrIface (tokenInfo *const token, const phpKind kind,
 	implType impl = CurrentStatement.impl;
 	tokenInfo *nameFree = NULL;
 	vString *inheritance = NULL;
+	vString *parent = NULL;
 
 	readToken (token);
 	if (name) /* anonymous class */
@@ -1151,6 +1162,11 @@ static bool parseClassOrIface (tokenInfo *const token, const phpKind kind,
 	/* read every identifiers, keywords and commas, and assume each
 	 *  identifier (not keyword) is an inheritance
 	 * (like in "class Foo extends Bar implements iA, iB") */
+	enum { inheritance_initial,
+		   inheritance_extends,
+		   inheritance_implements
+	} istat = inheritance_initial;
+	parent = vStringNew ();
 	while (token->type == TOKEN_IDENTIFIER ||
 	       token->type == TOKEN_KEYWORD ||
 	       token->type == TOKEN_COMMA)
@@ -1160,6 +1176,15 @@ static bool parseClassOrIface (tokenInfo *const token, const phpKind kind,
 			if (vStringLength (inheritance) > 0)
 				vStringPut (inheritance, ',');
 			vStringCat (inheritance, token->string);
+			if (istat == inheritance_extends)
+				vStringCopy (parent, token->string);
+		}
+		else if (token->type == TOKEN_KEYWORD)
+		{
+			if (token->keyword == KEYWORD_extends)
+				istat = inheritance_extends;
+			else if (token->keyword == KEYWORD_implements)
+				istat = inheritance_implements;
 		}
 
 		readToken (token);
@@ -1168,12 +1193,18 @@ static bool parseClassOrIface (tokenInfo *const token, const phpKind kind,
 	makeClassOrIfaceTag (kind, name, inheritance, impl);
 
 	if (token->type == TOKEN_OPEN_CURLY)
+	{
+		vString *backup = ParentClass;
+		ParentClass = parent;
 		enterScope (token, name->string, kind);
+		ParentClass = backup;
+	}
 	else
 		readNext = false;
 
 	if (nameFree)
 		deleteToken (nameFree);
+	vStringDelete (parent);
 	vStringDelete (inheritance);
 
 	return readNext;
@@ -1706,6 +1737,7 @@ static void findTags (bool startsInPhpMode)
 	CurrentStatement.impl = IMPL_UNDEFINED;
 	CurrentNamesapce = vStringNew ();
 	FullScope = vStringNew ();
+	Assert (ParentClass == NULL);
 
 	do
 	{

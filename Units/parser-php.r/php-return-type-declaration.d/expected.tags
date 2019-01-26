@@ -10,5 +10,5 @@ s	input.php	/^    $s = new SubTest;$/;"	v
 second	input.php	/^        public function second() : self$/;"	f	class:Test	typeref:class:Test	access:public	signature:()
 sixth	input.php	/^        public function &sixth(\\A\\T &$t) : \\A\\T$/;"	f	class:SubTest	typeref:unknown:\\A\\T	access:public	signature:(\\A\\T& $t)
 t	input.php	/^    $t = $s->third();$/;"	v
-third	input.php	/^        public function third() : parent$/;"	f	class:SubTest	typeref:unknown:parent	access:public	signature:()
+third	input.php	/^        public function third() : parent$/;"	f	class:SubTest	typeref:class:Test	access:public	signature:()
 tmp	input.php	/^            $tmp = function() use ($str) : int {$/;"	f	function:Test::first	typeref:unknown:int	signature:()
