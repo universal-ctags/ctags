@@ -95,7 +95,7 @@ atest: testc$(EXEEXT) testp$(EXEEXT) testcu$(EXEEXT) \
 	@$(top_builddir)/testp  | grep RESULT
 	@echo "[Onigmo API, UTF-16 check]"
 	@$(top_builddir)/testcu | grep RESULT
-	@echo "[UTF-8 codec check]"
+	@echo "[UTF-8 encoding check]"
 	@$(top_builddir)/test_enc_utf8 | grep RESULT
 
 testc_SOURCES = testc.c
