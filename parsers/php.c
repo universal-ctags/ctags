@@ -6,6 +6,8 @@
 *
 *   This module contains code for generating tags for the PHP scripting
 *   language.
+*
+*   The language reference: http://php.net/manual/en/langref.php
 */
 
 /*
