@@ -1,0 +1,6 @@
+current	input.js	/^  set current (str) {$/;"	setter	class:o
+latest	input.js	/^  get latest() {$/;"	getter	class:obj
+log	input.js	/^  log: ['a', 'b', 'c'],$/;"	property	class:obj
+log	input.js	/^  log: []$/;"	property	class:o
+o	input.js	/^var o = {$/;"	class
+obj	input.js	/^var obj = {$/;"	class

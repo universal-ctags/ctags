@@ -145,6 +145,8 @@ enum eKeywordId {
 	KEYWORD_default,
 	KEYWORD_export,
 	KEYWORD_async,
+	KEYWORD_get,
+	KEYWORD_set,
 };
 typedef int keywordId; /* to allow KEYWORD_NONE */
 
@@ -207,6 +209,8 @@ typedef enum {
 	JSTAG_CONSTANT,
 	JSTAG_VARIABLE,
 	JSTAG_GENERATOR,
+	JSTAG_GETTER,
+	JSTAG_SETTER,
 	JSTAG_COUNT
 } jsKind;
 
@@ -217,7 +221,9 @@ static kindDefinition JsKinds [] = {
 	{ true,  'p', "property",	  "properties"		   },
 	{ true,  'C', "constant",	  "constants"		   },
 	{ true,  'v', "variable",	  "global variables"   },
-	{ true,  'g', "generator",	  "generators"		   }
+	{ true,  'g', "generator",	  "generators"		   },
+	{ true,  'G', "getter",		  "getters"			   },
+	{ true,  'S', "setter",		  "setters"			   },
 };
 
 static const keywordTable JsKeywordTable [] = {
@@ -248,6 +254,8 @@ static const keywordTable JsKeywordTable [] = {
 	{ "default",	KEYWORD_default				},
 	{ "export",		KEYWORD_export				},
 	{ "async",		KEYWORD_async				},
+	{ "get",		KEYWORD_get					},
+	{ "set",		KEYWORD_set					},
 };
 
 /*
@@ -1574,6 +1582,9 @@ static bool parseMethods (tokenInfo *const token, const tokenInfo *const class,
 
 	do
 	{
+		bool is_setter = false;
+		bool is_getter = false;
+
 		readToken (token);
 		if (isType (token, TOKEN_CLOSE_CURLY))
 		{
@@ -1582,6 +1593,16 @@ static bool parseMethods (tokenInfo *const token, const tokenInfo *const class,
 
 		if (isKeyword (token, KEYWORD_async))
 			readToken (token);
+		else if (isType(token, TOKEN_KEYWORD) && isKeyword (token, KEYWORD_get))
+		{
+			is_getter = true;
+			readToken (token);
+		}
+		else if (isType(token, TOKEN_KEYWORD) && isKeyword (token, KEYWORD_set))
+		{
+			is_setter = true;
+			readToken (token);
+		}
 
 		if (! isType (token, TOKEN_KEYWORD) &&
 		    ! isType (token, TOKEN_SEMICOLON))
@@ -1630,7 +1651,16 @@ static bool parseMethods (tokenInfo *const token, const tokenInfo *const class,
 					if (isType (token, TOKEN_OPEN_CURLY))
 					{
 						has_methods = true;
-						makeJsTag (name, is_generator ? JSTAG_GENERATOR : JSTAG_METHOD, signature, NULL);
+
+						int kind = JSTAG_METHOD;
+						if (is_generator)
+							kind = JSTAG_GENERATOR;
+						else if (is_getter)
+							kind = JSTAG_GETTER;
+						else if (is_setter)
+							kind = JSTAG_SETTER;
+
+						makeJsTag (name, kind, signature, NULL);
 						parseBlock (token, name->string);
 
 						/*
