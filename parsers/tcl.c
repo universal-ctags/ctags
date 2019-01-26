@@ -532,7 +532,7 @@ static void parseNamespace (tokenInfo *const token,
 	}
 
 	int index = makeSimpleTag (token->string, K_NAMESPACE);
-	if (parent != CORK_NIL && strncmp(vStringValue (token->string), "::", 2))
+	if (parent != CORK_NIL && !isAbsoluteIdentifier(token))
 	{
 		tagEntryInfo *e = getEntryInCorkQueue (index);
 		e->extensionFields.scopeIndex = parent;
