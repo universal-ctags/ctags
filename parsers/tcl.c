@@ -454,7 +454,9 @@ static void parseProc (tokenInfo *const token,
 			{
 				const char * sep = scopeSeparatorFor (getInputLanguage(),
 													  K_PROCEDURE,
-													  K_NAMESPACE);
+													  vStringIsEmpty (ns)
+													  ? KIND_GHOST_INDEX
+													  : K_NAMESPACE);
 
 				vStringCatS (ns, sep);
 				vStringCatS (ns, last);
