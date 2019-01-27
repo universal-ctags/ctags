@@ -2875,7 +2875,7 @@ action_validate_input ()
 #   https://www.gnu.org/software/gettext/manual/html_node/Locale-Environment-Variables.html
 #
 # * Avoid unexpected pathname conversion on MSYS2.
-#   http://sourceforge.net/p/msys2/wiki/Porting/#filesystem-namespaces
+#   https://github.com/msys2/msys2/wiki/Porting#filesystem-namespaces
 prepare_environment ()
 {
     _PREPERE_ENV=$(cat <<'EOF'
