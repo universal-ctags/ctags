@@ -637,6 +637,7 @@ extern parserDefinition* TclParser (void)
 	def->useCork    = true;
 	def->requestAutomaticFQTag = true;
 	def->defaultScopeSeparator = "::";
+	def->defaultRootScopeSeparator = "::";
 
 	return def;
 }
