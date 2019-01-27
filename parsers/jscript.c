@@ -1571,6 +1571,8 @@ static bool parseMethods (tokenInfo *const token, const tokenInfo *const class,
 	 *	   validMethod    : function(a,b) {}
 	 *	   'validMethod2' : function(a,b) {}
      *     container.dirtyTab = {'url': false, 'title':false, 'snapshot':false, '*': false}
+	 *     get prop() {}
+	 *     set prop(val) {}
      *
      * ES6 methods:
      *     property(...) {}
