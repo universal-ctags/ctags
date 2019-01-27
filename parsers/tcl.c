@@ -441,7 +441,6 @@ static void parseProc (tokenInfo *const token,
 				vStringNCopy(ns, token->string, len - 2);
 			}
 
-
 			if (vStringLength(ns) > 0)
 			{
 				e.extensionFields.scopeKindIndex = K_NAMESPACE;
