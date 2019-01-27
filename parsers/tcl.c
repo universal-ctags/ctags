@@ -448,6 +448,7 @@ static void parseProc (tokenInfo *const token,
 				e.extensionFields.scopeName = vStringValue (ns);
 			}
 
+			e.skipAutoFQEmission = 1;
 			index = makeTagEntry (&e);
 
 			if (isXtagEnabled(XTAG_QUALIFIED_TAGS))

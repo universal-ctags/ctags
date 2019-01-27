@@ -1235,7 +1235,8 @@ static void writeTagEntry (const tagEntryInfo *const tag, bool checkingNeeded)
 
 	if (includeExtensionFlags ()
 	    && isXtagEnabled (XTAG_QUALIFIED_TAGS)
-	    && doesInputLanguageRequestAutomaticFQTag ())
+	    && doesInputLanguageRequestAutomaticFQTag ()
+		&& !tag->skipAutoFQEmission)
 	{
 		/* const is discarded to update the cache field of TAG. */
 		buildFqTagCache ( (tagEntryInfo *const)tag);
@@ -1298,6 +1299,7 @@ extern void uncorkTagFile(void)
 
 		if (doesInputLanguageRequestAutomaticFQTag ()
 		    && isXtagEnabled (XTAG_QUALIFIED_TAGS)
+			&& !tag->skipAutoFQEmission
 			&& ((tag->extensionFields.scopeKindIndex != KIND_GHOST_INDEX
 				 && tag->extensionFields.scopeName != NULL
 				 && tag->extensionFields.scopeIndex != CORK_NIL)
