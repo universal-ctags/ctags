@@ -440,8 +440,11 @@ static void parseProc (tokenInfo *const token,
 			else
 			{
 				tagEntryInfo *e_parent = getEntryInCorkQueue (parent);
+				const char * sep = scopeSeparatorFor (getInputLanguage(),
+													  K_PROCEDURE,
+													  e_parent->kindIndex);
 				vStringCatS(ns, e_parent->name);
-				vStringCatS(ns, "::");
+				vStringCatS(ns, sep);
 				vStringNCopy(ns, token->string, len - 2);
 			}
 
@@ -456,7 +459,11 @@ static void parseProc (tokenInfo *const token,
 
 			if (isXtagEnabled(XTAG_QUALIFIED_TAGS))
 			{
-				vStringCatS (ns, "::");
+				const char * sep = scopeSeparatorFor (getInputLanguage(),
+													  K_PROCEDURE,
+													  K_NAMESPACE);
+
+				vStringCatS (ns, sep);
 				vStringCatS (ns, last);
 
 				index_fq = makeSimpleTag (ns, K_PROCEDURE);
