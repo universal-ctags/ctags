@@ -1577,9 +1577,14 @@ static bool parseMethods (tokenInfo *const token, const tokenInfo *const class,
      * ES6 methods:
      *     property(...) {}
      *     *generator() {}
-     * FIXME: what to do with computed names?
+     *
+     * ES6 computed name:
      *     [property]() {}
+     *     get [property]() {}
+     *     set [property]() {}
      *     *[generator]() {}
+	 * => Capture them only if they are string literals.
+	 *
 	 */
 
 	do
@@ -1611,6 +1616,10 @@ static bool parseMethods (tokenInfo *const token, const tokenInfo *const class,
 		{
 			bool is_generator = false;
 			bool is_shorthand = false; /* ES6 shorthand syntax */
+			bool is_computed_name = false; /* ES6 computed property name */
+			bool is_dynamic_prop = false;  /* is_computed_name is true but
+											  the name is not represnted in
+											  a string literal. */
 
 			if (isType (token, TOKEN_STAR)) /* shorthand generator */
 			{
@@ -1618,9 +1627,35 @@ static bool parseMethods (tokenInfo *const token, const tokenInfo *const class,
 				readToken (token);
 			}
 
+			if (isType (token, TOKEN_OPEN_SQUARE))
+			{
+				is_computed_name = true;
+				readToken (token);
+			}
+
 			copyToken(name, token, true);
+			if (is_computed_name && ! isType (token, TOKEN_STRING))
+				is_dynamic_prop = true;
 
 			readToken (token);
+
+			if (is_computed_name)
+			{
+				int depth = 1;
+				do
+				{
+					if (isType (token, TOKEN_CLOSE_SQUARE))
+						depth--;
+					else
+					{
+						is_dynamic_prop = true;
+						if (isType (token, TOKEN_OPEN_SQUARE))
+							depth++;
+					}
+					readToken (token);
+				} while (! isType (token, TOKEN_EOF) && depth > 0);
+			}
+
 			is_shorthand = isType (token, TOKEN_OPEN_PAREN);
 			if ( isType (token, TOKEN_COLON) || is_shorthand )
 			{
@@ -1662,7 +1697,8 @@ static bool parseMethods (tokenInfo *const token, const tokenInfo *const class,
 						else if (is_setter)
 							kind = JSTAG_SETTER;
 
-						makeJsTag (name, kind, signature, NULL);
+						if (!is_dynamic_prop)
+							makeJsTag (name, kind, signature, NULL);
 						parseBlock (token, name->string);
 
 						/*
@@ -1709,7 +1745,7 @@ static bool parseMethods (tokenInfo *const token, const tokenInfo *const class,
 						has_methods = true;
 						if (has_child_methods)
 							makeJsTag (name, JSTAG_CLASS, NULL, NULL);
-						else
+						else if (!is_dynamic_prop)
 							makeJsTag (name, JSTAG_PROPERTY, NULL, NULL);
 				}
 			}
