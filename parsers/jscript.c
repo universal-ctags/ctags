@@ -145,6 +145,8 @@ enum eKeywordId {
 	KEYWORD_default,
 	KEYWORD_export,
 	KEYWORD_async,
+	KEYWORD_get,
+	KEYWORD_set,
 };
 typedef int keywordId; /* to allow KEYWORD_NONE */
 
@@ -207,6 +209,8 @@ typedef enum {
 	JSTAG_CONSTANT,
 	JSTAG_VARIABLE,
 	JSTAG_GENERATOR,
+	JSTAG_GETTER,
+	JSTAG_SETTER,
 	JSTAG_COUNT
 } jsKind;
 
@@ -217,7 +221,9 @@ static kindDefinition JsKinds [] = {
 	{ true,  'p', "property",	  "properties"		   },
 	{ true,  'C', "constant",	  "constants"		   },
 	{ true,  'v', "variable",	  "global variables"   },
-	{ true,  'g', "generator",	  "generators"		   }
+	{ true,  'g', "generator",	  "generators"		   },
+	{ true,  'G', "getter",		  "getters"			   },
+	{ true,  'S', "setter",		  "setters"			   },
 };
 
 static const keywordTable JsKeywordTable [] = {
@@ -248,6 +254,8 @@ static const keywordTable JsKeywordTable [] = {
 	{ "default",	KEYWORD_default				},
 	{ "export",		KEYWORD_export				},
 	{ "async",		KEYWORD_async				},
+	{ "get",		KEYWORD_get					},
+	{ "set",		KEYWORD_set					},
 };
 
 /*
@@ -1563,17 +1571,27 @@ static bool parseMethods (tokenInfo *const token, const tokenInfo *const class,
 	 *	   validMethod    : function(a,b) {}
 	 *	   'validMethod2' : function(a,b) {}
      *     container.dirtyTab = {'url': false, 'title':false, 'snapshot':false, '*': false}
+	 *     get prop() {}
+	 *     set prop(val) {}
      *
      * ES6 methods:
      *     property(...) {}
      *     *generator() {}
-     * FIXME: what to do with computed names?
+     *
+     * ES6 computed name:
      *     [property]() {}
+     *     get [property]() {}
+     *     set [property]() {}
      *     *[generator]() {}
+	 * => Capture them only if they are string literals.
+	 *
 	 */
 
 	do
 	{
+		bool is_setter = false;
+		bool is_getter = false;
+
 		readToken (token);
 		if (isType (token, TOKEN_CLOSE_CURLY))
 		{
@@ -1582,12 +1600,26 @@ static bool parseMethods (tokenInfo *const token, const tokenInfo *const class,
 
 		if (isKeyword (token, KEYWORD_async))
 			readToken (token);
+		else if (isType(token, TOKEN_KEYWORD) && isKeyword (token, KEYWORD_get))
+		{
+			is_getter = true;
+			readToken (token);
+		}
+		else if (isType(token, TOKEN_KEYWORD) && isKeyword (token, KEYWORD_set))
+		{
+			is_setter = true;
+			readToken (token);
+		}
 
 		if (! isType (token, TOKEN_KEYWORD) &&
 		    ! isType (token, TOKEN_SEMICOLON))
 		{
 			bool is_generator = false;
 			bool is_shorthand = false; /* ES6 shorthand syntax */
+			bool is_computed_name = false; /* ES6 computed property name */
+			bool is_dynamic_prop = false;  /* is_computed_name is true but
+											  the name is not represnted in
+											  a string literal. */
 
 			if (isType (token, TOKEN_STAR)) /* shorthand generator */
 			{
@@ -1595,9 +1627,35 @@ static bool parseMethods (tokenInfo *const token, const tokenInfo *const class,
 				readToken (token);
 			}
 
+			if (isType (token, TOKEN_OPEN_SQUARE))
+			{
+				is_computed_name = true;
+				readToken (token);
+			}
+
 			copyToken(name, token, true);
+			if (is_computed_name && ! isType (token, TOKEN_STRING))
+				is_dynamic_prop = true;
 
 			readToken (token);
+
+			if (is_computed_name)
+			{
+				int depth = 1;
+				do
+				{
+					if (isType (token, TOKEN_CLOSE_SQUARE))
+						depth--;
+					else
+					{
+						is_dynamic_prop = true;
+						if (isType (token, TOKEN_OPEN_SQUARE))
+							depth++;
+					}
+					readToken (token);
+				} while (! isType (token, TOKEN_EOF) && depth > 0);
+			}
+
 			is_shorthand = isType (token, TOKEN_OPEN_PAREN);
 			if ( isType (token, TOKEN_COLON) || is_shorthand )
 			{
@@ -1630,7 +1688,17 @@ static bool parseMethods (tokenInfo *const token, const tokenInfo *const class,
 					if (isType (token, TOKEN_OPEN_CURLY))
 					{
 						has_methods = true;
-						makeJsTag (name, is_generator ? JSTAG_GENERATOR : JSTAG_METHOD, signature, NULL);
+
+						int kind = JSTAG_METHOD;
+						if (is_generator)
+							kind = JSTAG_GENERATOR;
+						else if (is_getter)
+							kind = JSTAG_GETTER;
+						else if (is_setter)
+							kind = JSTAG_SETTER;
+
+						if (!is_dynamic_prop)
+							makeJsTag (name, kind, signature, NULL);
 						parseBlock (token, name->string);
 
 						/*
@@ -1677,7 +1745,7 @@ static bool parseMethods (tokenInfo *const token, const tokenInfo *const class,
 						has_methods = true;
 						if (has_child_methods)
 							makeJsTag (name, JSTAG_CLASS, NULL, NULL);
-						else
+						else if (!is_dynamic_prop)
 							makeJsTag (name, JSTAG_PROPERTY, NULL, NULL);
 				}
 			}
