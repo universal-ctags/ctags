@@ -1310,6 +1310,7 @@ def main():
     x2("c.*\\b", "abc", 2, 3)           # Issue #96
     x2("abc.*\\b", "abc", 0, 3)         # Issue #96
     x2("\\b.*abc.*\\b", "abc", 0, 3)    # Issue #96
+    x2('(?i) *TOOKY', 'Mozilla/5.0 (Linux; Android 4.0.3; TOOKY', 34, 40)   # Issue #120
 
     # ONIG_OPTION_FIND_LONGEST option
     x2("foo|foobar", "foobar", 0, 3)
