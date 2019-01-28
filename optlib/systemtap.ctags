@@ -1,0 +1,211 @@
+#
+# systemtap.ctags --- multitable regex parser for SystemTap script file
+#
+#  Copyright (c) 2018, Red Hat, Inc.
+#  Copyright (c) 2018, Masatake YAMATO
+#
+#  Author: Masatake YAMATO <yamato@redhat.com>
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,
+# USA.
+#
+#
+# References:
+#
+# - https://sourceware.org/systemtap/langref/
+#
+--langdef=SystemTap
+--map-SystemTap=+.stp
+--map-SystemTap=+.stpm
+--alias-SystemTap=+.stap
+
+--kinddef-SystemTap=p,probe,probe aliases
+--kinddef-SystemTap=f,function,functions
+--kinddef-SystemTap=v,variable,variables
+--kinddef-SystemTap=m,macro,macros
+
+--_tabledef-SystemTap=main
+--_tabledef-SystemTap=comment
+--_tabledef-SystemTap=any
+--_tabledef-SystemTap=skipWhiteSpace
+--_tabledef-SystemTap=skipLiteral
+--_tabledef-SystemTap=ssliteral
+--_tabledef-SystemTap=dsliteral
+--_tabledef-SystemTap=arraysize
+
+--_tabledef-SystemTap=stmtend
+
+--_tabledef-SystemTap=probe
+--_tabledef-SystemTap=probeBody
+--_tabledef-SystemTap=probeStmt
+
+--_tabledef-SystemTap=func
+--_tabledef-SystemTap=funcSig
+--_tabledef-SystemTap=funcBody
+--_tabledef-SystemTap=funcStmt
+--_tabledef-SystemTap=cfuncStmt
+
+--_tabledef-SystemTap=vars
+
+--_tabledef-SystemTap=macro
+--_tabledef-SystemTap=macroSig
+--_tabledef-SystemTap=macroBody
+--_tabledef-SystemTap=macroStmt
+
+#
+# Utilities
+#
+--_mtable-regex-SystemTap=any/.//
+--_mtable-regex-SystemTap=skipWhiteSpace/[ \t\n]+//
+--_mtable-regex-SystemTap=skipLiteral/"//{tenter=dsliteral}
+--_mtable-regex-SystemTap=skipLiteral/'//{tenter=ssliteral}
+--_mtable-regex-SystemTap=ssliteral/[^']*'//{tleave}
+--_mtable-regex-SystemTap=ssliteral/[^']+//
+--_mtable-regex-SystemTap=dsliteral/[^"\\]+//
+--_mtable-regex-SystemTap=dsliteral/"//{tleave}
+--_mtable-regex-SystemTap=dsliteral/\\.//
+--_mtable-regex-SystemTap=stmtend///{tleave}{scope=pop}
+--_mtable-regex-SystemTap=arraysize/[^]\/#]+//
+--_mtable-regex-SystemTap=arraysize/]//{tleave}
+--_mtable-extend-SystemTap=arraysize+comment
+--_mtable-extend-SystemTap=arraysize+any
+
+#
+# comment
+#
+--_tabledef-SystemTap=comment_multiline
+--_tabledef-SystemTap=comment_oneline
+--_mtable-regex-SystemTap=comment/\#//{tenter=comment_oneline}
+--_mtable-regex-SystemTap=comment/\/\*//{tenter=comment_multiline}
+--_mtable-regex-SystemTap=comment/\/\///{tenter=comment_oneline}
+
+--_mtable-regex-SystemTap=comment_multiline/[^*]+//
+--_mtable-regex-SystemTap=comment_multiline/\*\///{tleave}
+--_mtable-extend-SystemTap=comment_multiline+any
+
+--_mtable-regex-SystemTap=comment_oneline/[^\n]*\n//{tleave}
+--_mtable-extend-SystemTap=comment_oneline+any
+
+#
+# main
+#
+--_mtable-regex-SystemTap=main/[^#\/'"pfg@%]+//
+--_mtable-regex-SystemTap=main/probe[[:space:]]+//{tenter=probe}
+--_mtable-extend-SystemTap=main+comment
+--_mtable-regex-SystemTap=main/@define[[:space:]]+//{tenter=macro}
+--_mtable-regex-SystemTap=main/function[[:space:]]+//{tenter=func}
+--_mtable-regex-SystemTap=main/global[[:space:]]+//{tenter=vars}
+--_mtable-regex-SystemTap=main/%[\{(]//{tenter=cfuncStmt}
+--_mtable-extend-SystemTap=main+any
+
+#
+# probe
+#
+--_mtable-regex-SystemTap=probe/([[:alpha:]_][[:alnum:]_.]*)[[:space:]]*\+?=[[:space:]]*/\1/p/{tenter=probeBody}{scope=push}
+
+# This "push" is dummy.
+--_mtable-regex-SystemTap=probe/([[:alpha:]_][[:alnum:]_.]*)[[:space:]]*///{tenter=probeBody}{scope=push}
+
+#
+# probeBody
+#
+--_mtable-regex-SystemTap=probeBody/[^\{\/#'"]+//
+--_mtable-regex-SystemTap=probeBody/\{//{tenter=probeStmt,stmtend}
+--_mtable-extend-SystemTap=probeBody+skipLiteral
+--_mtable-extend-SystemTap=probeBody+comment
+--_mtable-extend-SystemTap=probeBody+any
+
+#
+# probeStmt
+#
+--_mtable-regex-SystemTap=probeStmt/[^\{\}\/#'"]+//
+--_mtable-regex-SystemTap=probeStmt/\}//{tleave}
+--_mtable-extend-SystemTap=probeStmt+skipLiteral
+--_mtable-regex-SystemTap=probeStmt/\{//{tenter=probeStmt}
+--_mtable-extend-SystemTap=probeStmt+comment
+--_mtable-extend-SystemTap=probeStmt+any
+
+#
+# func
+#
+
+# TODO: return type should be recorded to typeref field
+--_mtable-regex-SystemTap=func/([[:alpha:]_][[:alnum:]_]*)(:[[:alpha:]_][[:alnum:]_]*)?[[:space:]]*\(/\1/f/{tenter=funcSig,funcBody}{scope=push}
+
+# TODO: capture parameters
+--_mtable-regex-SystemTap=funcSig/[^)\/]+//
+--_mtable-regex-SystemTap=funcSig/\)(:[0-9]+)?//{tleave}
+--_mtable-extend-SystemTap=funcSig+comment
+--_mtable-extend-SystemTap=funcSig+any
+
+--_mtable-regex-SystemTap=funcBody/[^\{%'"#]+//
+--_mtable-regex-SystemTap=funcBody/\{//{tenter=funcStmt,stmtend}
+--_mtable-regex-SystemTap=funcBody/%[\{(]//{tenter=cfuncStmt,stmtend}
+--_mtable-extend-SystemTap=funcBody+comment
+--_mtable-extend-SystemTap=funcBody+any
+
+#
+# funcStmt and cfuncStmt
+#
+--_mtable-regex-SystemTap=funcStmt/[^%\/#'"\{\}]+//
+--_mtable-regex-SystemTap=funcStmt/\}//{tleave}
+--_mtable-extend-SystemTap=funcStmt+skipLiteral
+--_mtable-extend-SystemTap=funcStmt+comment
+--_mtable-regex-SystemTap=funcStmt/%[\{(]//{tenter=cfuncStmt}
+--_mtable-regex-SystemTap=funcStmt/\{//{tenter=funcStmt}
+--_mtable-extend-SystemTap=funcStmt+any
+
+--_mtable-regex-SystemTap=cfuncStmt/[^%\/#'"]+//
+--_mtable-extend-SystemTap=cfuncStmt+comment
+--_mtable-extend-SystemTap=cfuncStmt+skipLiteral
+--_mtable-regex-SystemTap=cfuncStmt/%[\})]//{tleave}
+--_mtable-regex-SystemTap=cfuncStmt/%[\{(]//{tenter=cfuncStmt}
+--_mtable-extend-SystemTap=cfuncStmt+any
+
+#
+# vars
+#
+--_mtable-regex-SystemTap=vars/([[:alpha:]_][[:alnum:]_]*)%?/\1/v/
+--_mtable-regex-SystemTap=vars/[\n]//{tleave}
+--_mtable-regex-SystemTap=vars/,[[:space:]]*//{tjump=vars}
+--_mtable-extend-SystemTap=vars+comment
+--_mtable-extend-SystemTap=vars+skipLiteral
+--_mtable-regex-SystemTap=vars/\[//{tenter=arraysize}
+--_mtable-extend-SystemTap=vars+any
+
+#
+# macro
+#
+--_mtable-regex-SystemTap=macro/([[:alpha:]_][[:alnum:]_]*)[[:space:]]*\(/\1/m/{tenter=macroSig,macroBody}{scope=push}
+--_mtable-regex-SystemTap=macro/([[:alpha:]_][[:alnum:]_]*)[[:space:]]*/\1/m/{tenter=macroBody,stmtend}{scope=push}
+
+# TODO: capture parameters
+--_mtable-regex-SystemTap=macroSig/[^#\/)]+//
+--_mtable-regex-SystemTap=macroSig/\)//{tleave}
+--_mtable-extend-SystemTap=macroSig+comment
+--_mtable-extend-SystemTap=macroSig+any
+
+
+--_mtable-regex-SystemTap=macroBody/[^%#\/)]+//
+--_mtable-regex-SystemTap=macroBody/%\(//{tenter=macroStmt,stmtend}
+--_mtable-extend-SystemTap=macroBody+comment
+--_mtable-extend-SystemTap=macroBody+any
+
+--_mtable-regex-SystemTap=macroStmt/[^#\/%'"]+//
+--_mtable-regex-SystemTap=macroStmt/%\)//{tleave}
+--_mtable-extend-SystemTap=macroStmt+skipLiteral
+--_mtable-extend-SystemTap=macroStmt+comment
+--_mtable-regex-SystemTap=macroStmt/%\(//{tenter=macroStmt}
+--_mtable-extend-SystemTap=macroStmt+any

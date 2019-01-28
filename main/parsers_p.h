@@ -117,6 +117,7 @@
 	SmlParser, \
 	SqlParser, \
 	SystemdUnitParser, \
+	SystemTapParser, \
 	TclParser, \
 	TclOOParser, \
 	TexParser, \

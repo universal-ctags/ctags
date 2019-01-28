@@ -1,0 +1,38 @@
+tcp_get_info_rto	input.stp	/^function tcp_get_info_rto:long(sock:long)$/;"	f	line:33	end:44
+tcp_get_info_snd_cwnd	input.stp	/^function tcp_get_info_snd_cwnd:long(sock:long)$/;"	f	line:50	end:60
+tcp_ts_get_info_state	input.stp	/^function tcp_ts_get_info_state:long(sock:long)$/;"	f	line:78	end:83
+__tcp_sock_dport	input.stp	/^function __tcp_sock_dport:long (sock:long)$/;"	f	line:86	end:93
+__get_skb_tcphdr_new	input.stp	/^@__private30 function __get_skb_tcphdr_new:long(skb:long)$/;"	f	line:96	end:107
+__get_skb_tcphdr	input.stp	/^function __get_skb_tcphdr:long(skb:long)$/;"	f	line:110	end:118
+__tcp_skb_urg	input.stp	/^function __tcp_skb_urg:long (tcphdr:long)$/;"	f	line:121	end:124
+__tcp_skb_ack	input.stp	/^function __tcp_skb_ack:long (tcphdr:long)$/;"	f	line:127	end:130
+__tcp_skb_psh	input.stp	/^function __tcp_skb_psh:long (tcphdr:long)$/;"	f	line:133	end:136
+__tcp_skb_rst	input.stp	/^function __tcp_skb_rst:long (tcphdr:long)$/;"	f	line:139	end:142
+__tcp_skb_syn	input.stp	/^function __tcp_skb_syn:long (tcphdr:long)$/;"	f	line:145	end:148
+__tcp_skb_fin	input.stp	/^function __tcp_skb_fin:long (tcphdr:long)$/;"	f	line:151	end:154
+__tcp_skb_sport	input.stp	/^function __tcp_skb_sport:long (tcphdr:long)$/;"	f	line:157	end:160
+__tcp_skb_dport	input.stp	/^function __tcp_skb_dport:long (tcphdr:long){$/;"	f	line:163	end:165
+__tcp_sock_sport	input.stp	/^function __tcp_sock_sport:long (sock:long)$/;"	f	line:168	end:174
+sockstate	input.stp	/^@__private30 global sockstate[12]$/;"	v	line:176
+tcp_sockstate_str	input.stp	/^function tcp_sockstate_str:string (state:long) {$/;"	f	line:192	end:194
+tcp_ts_get_info_snd_ssthresh	input.stp	/^function tcp_ts_get_info_snd_ssthresh:long(sock:long)$/;"	f	line:199	end:209
+tcp_ts_get_info_rcv_mss	input.stp	/^function tcp_ts_get_info_rcv_mss:long(sock:long)$/;"	f	line:213	end:224
+__sockopt	input.stp	/^@__private30 global __sockopt[18]$/;"	v	line:248
+tcp_sockopt_str	input.stp	/^function tcp_sockopt_str:string (optname:long)$/;"	f	line:281	end:285
+__ipv6_sockopt	input.stp	/^@__private30 global __ipv6_sockopt[55]$/;"	v	line:349
+tcp_ipv6_sockopt_str	input.stp	/^function tcp_ipv6_sockopt_str:string (optname:long)$/;"	f	line:467	end:471
+tcp.sendmsg	input.stp	/^probe tcp.sendmsg = kernel.function("tcp_sendmsg") {$/;"	p	line:483	end:488
+tcp.sendmsg.return	input.stp	/^probe tcp.sendmsg.return = kernel.function("tcp_sendmsg").return {$/;"	p	line:498	end:501
+tcp.recvmsg	input.stp	/^probe tcp.recvmsg = kernel.function("tcp_recvmsg") {$/;"	p	line:516	end:525
+tcp.recvmsg.return	input.stp	/^probe tcp.recvmsg.return = kernel.function("tcp_recvmsg").return {$/;"	p	line:540	end:548
+tcp.disconnect	input.stp	/^probe tcp.disconnect = kernel.function("tcp_disconnect") {$/;"	p	line:564	end:573
+tcp.disconnect.return	input.stp	/^probe tcp.disconnect.return = kernel.function("tcp_disconnect").return {$/;"	p	line:583	end:586
+tcp.setsockopt	input.stp	/^probe tcp.setsockopt = tcp.ipv4.setsockopt, tcp.ipv6.setsockopt$/;"	p	line:601	end:603
+tcp.ipv4.setsockopt	input.stp	/^probe tcp.ipv4.setsockopt = kernel.function("tcp_setsockopt")$/;"	p	line:604	end:613
+tcp.ipv6.setsockopt	input.stp	/^probe tcp.ipv6.setsockopt = kernel.function("ipv6_setsockopt")!,$/;"	p	line:614	end:624
+tcp.setsockopt.return	input.stp	/^probe tcp.setsockopt.return = tcp.ipv4.setsockopt.return,$/;"	p	line:634	end:637
+tcp.ipv4.setsockopt.return	input.stp	/^probe tcp.ipv4.setsockopt.return = kernel.function("tcp_setsockopt").return$/;"	p	line:638	end:642
+tcp.ipv6.setsockopt.return	input.stp	/^probe tcp.ipv6.setsockopt.return = kernel.function("ipv6_setsockopt").return!,$/;"	p	line:643	end:648
+tcp.receive	input.stp	/^probe tcp.receive = tcp.ipv4.receive, tcp.ipv6.receive$/;"	p	line:667	end:669
+tcp.ipv4.receive	input.stp	/^probe tcp.ipv4.receive = kernel.function("tcp_v4_rcv")$/;"	p	line:671	end:694
+tcp.ipv6.receive	input.stp	/^probe tcp.ipv6.receive = kernel.function("tcp_v6_rcv")!,$/;"	p	line:696	end:730

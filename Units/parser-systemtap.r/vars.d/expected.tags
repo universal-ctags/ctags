@@ -1,0 +1,8 @@
+A	input.stp	/^private global A$/;"	v
+a	input.stp	/^global a%[10], b[10], c%[10], d = "[", e = 3, f = "]"$/;"	v
+b	input.stp	/^global a%[10], b[10], c%[10], d = "[", e = 3, f = "]"$/;"	v
+c	input.stp	/^global a%[10], b[10], c%[10], d = "[", e = 3, f = "]"$/;"	v
+d	input.stp	/^global a%[10], b[10], c%[10], d = "[", e = 3, f = "]"$/;"	v
+e	input.stp	/^global a%[10], b[10], c%[10], d = "[", e = 3, f = "]"$/;"	v
+f	input.stp	/^global a%[10], b[10], c%[10], d = "[", e = 3, f = "]"$/;"	v
+B	input.stp	/^@__private30 global B$/;"	v
