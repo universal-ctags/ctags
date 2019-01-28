@@ -1166,28 +1166,35 @@ static bool parseClassOrIface (tokenInfo *const token, const phpKind kind,
 		   inheritance_extends,
 		   inheritance_implements
 	} istat = inheritance_initial;
-	parent = vStringNew ();
 	while (token->type == TOKEN_IDENTIFIER ||
+	       token->type == TOKEN_BACKSLASH ||
 	       token->type == TOKEN_KEYWORD ||
 	       token->type == TOKEN_COMMA)
 	{
-		if (token->type == TOKEN_IDENTIFIER)
+		if (token->type == TOKEN_IDENTIFIER || token->type == TOKEN_BACKSLASH)
 		{
+			vString *qualifiedName = vStringNew ();
+
+			readQualifiedName (token, qualifiedName, NULL);
 			if (vStringLength (inheritance) > 0)
 				vStringPut (inheritance, ',');
-			vStringCat (inheritance, token->string);
-			if (istat == inheritance_extends)
-				vStringCopy (parent, token->string);
+			vStringCat (inheritance, qualifiedName);
+			if (istat == inheritance_extends && !parent)
+				parent = qualifiedName;
+			else
+				vStringDelete (qualifiedName);
 		}
-		else if (token->type == TOKEN_KEYWORD)
+		else
 		{
-			if (token->keyword == KEYWORD_extends)
-				istat = inheritance_extends;
-			else if (token->keyword == KEYWORD_implements)
-				istat = inheritance_implements;
+			if (token->type == TOKEN_KEYWORD)
+			{
+				if (token->keyword == KEYWORD_extends)
+					istat = inheritance_extends;
+				else if (token->keyword == KEYWORD_implements)
+					istat = inheritance_implements;
+			}
+			readToken (token);
 		}
-
-		readToken (token);
 	}
 
 	makeClassOrIfaceTag (kind, name, inheritance, impl);
