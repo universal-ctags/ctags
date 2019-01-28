@@ -1,0 +1,4 @@
+myClass	input.pp	/^class myClass {$/;"	c
+::myClass	input.pp	/^class myClass {$/;"	c
+my_variable	input.pp	/^  $my_variable= 1209600$/;"	v	class:::myClass
+::myClass::my_variable	input.pp	/^  $my_variable= 1209600$/;"	v	class:::myClass

@@ -176,6 +176,9 @@ static void initializePuppetManifestParser (const langType language)
 	                               "^\\#",
 	                               "", "", "{tenter=comment_oneline}", NULL);
 	addLanguageTagMultiTableRegex (language, "blockHead",
+	                               "^[ \t\n]+",
+	                               "", "", "", NULL);
+	addLanguageTagMultiTableRegex (language, "blockHead",
 	                               "^\\{",
 	                               "", "", "{tenter=block,end}", NULL);
 	addLanguageTagMultiTableRegex (language, "blockHead",
@@ -245,6 +248,9 @@ static void initializePuppetManifestParser (const langType language)
 	                               "^\"",
 	                               "", "", "{tenter=dsliteral}", NULL);
 	addLanguageTagMultiTableRegex (language, "block",
+	                               "^\\{",
+	                               "", "", "{tenter=block}", NULL);
+	addLanguageTagMultiTableRegex (language, "block",
 	                               "^.",
 	                               "", "", "{tenter=separator}", NULL);
 	addLanguageTagMultiTableRegex (language, "classStart",
@@ -274,6 +280,9 @@ static void initializePuppetManifestParser (const langType language)
 	addLanguageTagMultiTableRegex (language, "resourceBlock",
 	                               "^\\[",
 	                               "", "", "{tenter=resourceArray}", NULL);
+	addLanguageTagMultiTableRegex (language, "resourceBlock",
+	                               "^\\{",
+	                               "", "", "{tenter=block}", NULL);
 	addLanguageTagMultiTableRegex (language, "resourceBlock",
 	                               "^/\\*",
 	                               "", "", "{tenter=comment_multiline}", NULL);
@@ -588,7 +597,7 @@ static void initializePuppetManifestParser (const langType language)
 	                               "", "", "{tenter=dsliteral}", NULL);
 	addLanguageTagMultiTableRegex (language, "caseBlock",
 	                               "^:",
-	                               "", "", "{tenter=block}", NULL);
+	                               "", "", "{tenter=blockHead}", NULL);
 	addLanguageTagMultiTableRegex (language, "caseBlock",
 	                               "^}",
 	                               "", "", "{tleave}{_advanceTo=0start}", NULL);
