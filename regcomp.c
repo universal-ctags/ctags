@@ -5540,7 +5540,6 @@ onig_free_body(regex_t* reg)
   if (IS_NOT_NULL(reg)) {
     if (IS_NOT_NULL(reg->p))                xfree(reg->p);
     if (IS_NOT_NULL(reg->exact))            xfree(reg->exact);
-    if (IS_NOT_NULL(reg->int_map_backward)) xfree(reg->int_map_backward);
     if (IS_NOT_NULL(reg->repeat_range))     xfree(reg->repeat_range);
     if (IS_NOT_NULL(reg->chain))            onig_free(reg->chain);
 
@@ -5567,7 +5566,6 @@ onig_memsize(const regex_t *reg)
     if (IS_NULL(reg)) return 0;
     if (IS_NOT_NULL(reg->p))                size += reg->alloc;
     if (IS_NOT_NULL(reg->exact))            size += reg->exact_end - reg->exact;
-    if (IS_NOT_NULL(reg->int_map_backward)) size += sizeof(int) * ONIG_CHAR_TABLE_SIZE;
     if (IS_NOT_NULL(reg->repeat_range))     size += reg->repeat_range_alloc * sizeof(OnigRepeatRange);
     if (IS_NOT_NULL(reg->chain))            size += onig_memsize(reg->chain);
 
@@ -5851,7 +5849,6 @@ onig_reg_init(regex_t* reg, OnigOptionType option,
   (reg)->syntax           = syntax;
   (reg)->optimize         = 0;
   (reg)->exact            = (UChar* )NULL;
-  (reg)->int_map_backward = (int* )NULL;
   (reg)->chain            = (regex_t* )NULL;
 
   (reg)->p                = (UChar* )NULL;
