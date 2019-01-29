@@ -184,6 +184,7 @@ typedef struct sTokenInfo {
 	MIOPos 			filePosition;
 	int				nestLevel;
 	bool			ignoreTag;
+	bool			dynamicProp;
 } tokenInfo;
 
 /*
@@ -287,6 +288,7 @@ static void clearPoolToken (void *data)
 	token->keyword		= KEYWORD_NONE;
 	token->nestLevel	= 0;
 	token->ignoreTag	= false;
+	token->dynamicProp  = false;
 	token->lineNumber   = getInputLineNumber ();
 	token->filePosition = getInputFilePosition ();
 	vStringClear (token->string);
@@ -308,12 +310,20 @@ static void copyToken (tokenInfo *const dest, const tokenInfo *const src,
 	dest->filePosition = src->filePosition;
 	dest->type = src->type;
 	dest->keyword = src->keyword;
+	dest->dynamicProp = src->dynamicProp;
 	vStringCopy(dest->string, src->string);
 	if (include_non_read_info)
 	{
 		dest->nestLevel = src->nestLevel;
 		vStringCopy(dest->scope, src->scope);
 	}
+}
+
+static void injectDynamicName (tokenInfo *const token, vString *newName)
+{
+	token->dynamicProp = true;
+	vStringDelete (token->string);
+	token->string = newName;
 }
 
 /*
@@ -331,7 +341,7 @@ static void makeJsTagCommon (const tokenInfo *const token, const jsKind kind,
 		const char *p;
 		tagEntryInfo e;
 
-		if (kind != JSTAG_PROPERTY &&  (p = strrchr (name, '.')) != NULL )
+		if (!token->dynamicProp && kind != JSTAG_PROPERTY &&  (p = strrchr (name, '.')) != NULL )
 		{
 			if (vStringLength (fullscope) > 0)
 				vStringPut (fullscope, '.');
@@ -1583,8 +1593,6 @@ static bool parseMethods (tokenInfo *const token, const tokenInfo *const class,
      *     get [property]() {}
      *     set [property]() {}
      *     *[generator]() {}
-	 * => Capture them only if they are string literals.
-	 *
 	 */
 
 	do
@@ -1617,9 +1625,11 @@ static bool parseMethods (tokenInfo *const token, const tokenInfo *const class,
 			bool is_generator = false;
 			bool is_shorthand = false; /* ES6 shorthand syntax */
 			bool is_computed_name = false; /* ES6 computed property name */
-			bool is_dynamic_prop = false;  /* is_computed_name is true but
-											  the name is not represnted in
-											  a string literal. */
+			bool is_dynamic_prop = false;
+			vString *dprop = NULL; /* is_computed_name is true but
+									* the name is not represnted in
+									* a string literal. The expressions
+									* go this string. */
 
 			if (isType (token, TOKEN_STAR)) /* shorthand generator */
 			{
@@ -1630,14 +1640,15 @@ static bool parseMethods (tokenInfo *const token, const tokenInfo *const class,
 			if (isType (token, TOKEN_OPEN_SQUARE))
 			{
 				is_computed_name = true;
-				readToken (token);
+				dprop = vStringNewInit ("[");
+				readTokenFull (token, false, dprop);
 			}
 
 			copyToken(name, token, true);
 			if (is_computed_name && ! isType (token, TOKEN_STRING))
 				is_dynamic_prop = true;
 
-			readToken (token);
+			readTokenFull (token, false, dprop);
 
 			if (is_computed_name)
 			{
@@ -1652,7 +1663,7 @@ static bool parseMethods (tokenInfo *const token, const tokenInfo *const class,
 						if (isType (token, TOKEN_OPEN_SQUARE))
 							depth++;
 					}
-					readToken (token);
+					readTokenFull (token, false, (is_dynamic_prop && depth != 0)? dprop: NULL);
 				} while (! isType (token, TOKEN_EOF) && depth > 0);
 			}
 
@@ -1697,8 +1708,12 @@ static bool parseMethods (tokenInfo *const token, const tokenInfo *const class,
 						else if (is_setter)
 							kind = JSTAG_SETTER;
 
-						if (!is_dynamic_prop)
-							makeJsTag (name, kind, signature, NULL);
+						if (is_dynamic_prop)
+						{
+							injectDynamicName (name, dprop);
+							dprop = NULL;
+						}
+						makeJsTag (name, kind, signature, NULL);
 						parseBlock (token, name->string);
 
 						/*
@@ -1716,6 +1731,12 @@ static bool parseMethods (tokenInfo *const token, const tokenInfo *const class,
 				else if (! is_es6_class)
 				{
 						bool has_child_methods = false;
+
+						if (is_dynamic_prop)
+						{
+							injectDynamicName (name, dprop);
+							dprop = NULL;
+						}
 
 						/* skip whatever is the value */
 						while (! isType (token, TOKEN_COMMA) &&
@@ -1745,10 +1766,11 @@ static bool parseMethods (tokenInfo *const token, const tokenInfo *const class,
 						has_methods = true;
 						if (has_child_methods)
 							makeJsTag (name, JSTAG_CLASS, NULL, NULL);
-						else if (!is_dynamic_prop)
+						else
 							makeJsTag (name, JSTAG_PROPERTY, NULL, NULL);
 				}
 			}
+			vStringDelete (dprop);
 		}
 	} while ( isType(token, TOKEN_COMMA) ||
 	          ( is_es6_class && ! isType(token, TOKEN_EOF) ) );

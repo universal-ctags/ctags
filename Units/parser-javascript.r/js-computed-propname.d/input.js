@@ -9,9 +9,9 @@ var y = ['d', 'e'];
 var o = {
     ['a' + y [0]]: {},
     ['a']: {},			// Tagging
-    ['a' + 'b']: {},		// Not tagging
-    [x]: {},			// Not tagging
-    ['a' + x]: {},        	// Not tagging
+    ['a' + 'b']: {},		// Tagging whole    \
+    [x]: {},			// expressions with \
+    ['a' + x]: {},        	// `[' and `]'
     
 };
 
@@ -36,3 +36,9 @@ class User extends Model {
     }
   }
 }
+
+var p = {
+	[(1+2)*3]: {
+		subnum: function (){}
+	},
+};
