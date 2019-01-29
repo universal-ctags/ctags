@@ -139,8 +139,8 @@ pytest:
 # Collect coverage data and write to coverage.info, then create HTML output
 # in the coverage directory.
 lcov:
-	if [ ! -f $(builddir)/enc/jis/props.kwd ]; then mkdir -p $(builddir)/enc/jis; cp $(srcdir)/enc/jis/props.kwd $(builddir)/enc/jis/props.kwd; fi
-	lcov -c -d .libs -o coverage.info
+	if [ ! -f $(builddir)/enc/jis/props.kwd ]; then mkdir -p $(builddir)/enc/jis; cp -p $(srcdir)/enc/jis/props.kwd $(builddir)/enc/jis/props.kwd; fi
+	lcov -c -d .libs -d enc/.libs -o coverage.info
 	genhtml -o coverage coverage.info
 
 # Clear coverage data.
