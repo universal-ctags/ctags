@@ -81,13 +81,12 @@
 /* #define USE_OP_PUSH_OR_JUMP_EXACT */
 #define USE_QTFR_PEEK_NEXT
 #define USE_ST_LIBRARY
-#define USE_SUNDAY_QUICK_SEARCH
 
 #define INIT_MATCH_STACK_SIZE                     160
 #define DEFAULT_MATCH_STACK_LIMIT_SIZE              0 /* unlimited */
 #define DEFAULT_PARSE_DEPTH_LIMIT                4096
 
-#define OPT_EXACT_MAXLEN   24
+#define OPT_EXACT_MAXLEN   24	/* This must be smaller than ONIG_CHAR_TABLE_SIZE. */
 
 /* check config */
 #if defined(USE_PERL_SUBEXP_CALL) || defined(USE_CAPITAL_P_NAMED_GROUP)
