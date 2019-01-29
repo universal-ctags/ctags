@@ -239,6 +239,8 @@ typedef struct {
 	unsigned long 	lineNumber;
 	MIOPos			filePosition;
 	int 			parentKind; /* -1 if none */
+	bool			anonymous;	/* true if token specifies
+								 * an anonymous class */
 } tokenInfo;
 
 static langType Lang_php;
@@ -259,8 +261,6 @@ static vString *CurrentNamesapce;
 /* Cache variable to build the tag's scope.  It has no real meaning outside
  * of initPhpEntry()'s scope. */
 static vString *FullScope;
-/* Anonymous symbol count to generate file-unique names */
-static unsigned int AnonymousID;
 
 static objPool *TokenPool = NULL;
 
@@ -337,6 +337,9 @@ static void initPhpEntry (tagEntryInfo *const e, const tokenInfo *const token,
 		e->extensionFields.scopeKindIndex = parentKind;
 		e->extensionFields.scopeName = vStringValue (FullScope);
 	}
+
+	if (token->anonymous)
+		markTagExtraBit (e, XTAG_ANONYMOUS);
 }
 
 static void  makePhpTagEntry  (tagEntryInfo *const e)
@@ -426,6 +429,7 @@ static void clearPoolToken (void *data)
 	token->lineNumber   = getInputLineNumber ();
 	token->filePosition = getInputFilePosition ();
 	token->parentKind	= -1;
+	token->anonymous	= false;
 	vStringClear (token->string);
 	vStringClear (token->scope);
 }
@@ -449,6 +453,7 @@ static void copyToken (tokenInfo *const dest, const tokenInfo *const src,
 	dest->parentKind = src->parentKind;
 	if (scope)
 		vStringCopy(dest->scope, src->scope);
+	dest->anonymous = src->anonymous;
 }
 
 #if 0
@@ -1599,12 +1604,11 @@ static void enterScope (tokenInfo *const parentToken,
 							readNext = false;
 						else
 						{
-							char buf[32];
 							tokenInfo *name = newToken ();
 
 							copyToken (name, token, true);
-							snprintf (buf, sizeof buf, "AnonymousClass%u", ++AnonymousID);
-							vStringCopyS (name->string, buf);
+							anonGenerate (name->string, "AnonymousClass", K_CLASS);
+							name->anonymous = true;
 							readNext = parseClassOrIface (token, K_CLASS, name);
 							deleteToken (name);
 						}
@@ -1663,7 +1667,6 @@ static void findTags (bool startsInPhpMode)
 	CurrentStatement.impl = IMPL_UNDEFINED;
 	CurrentNamesapce = vStringNew ();
 	FullScope = vStringNew ();
-	AnonymousID = 0;
 
 	do
 	{
