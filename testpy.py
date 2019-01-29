@@ -1152,6 +1152,7 @@ def main():
     n("(?i)(?<!b|aa)c", "Aac")
     x2("(?<=\\babc)d", " abcd", 4, 5)
     x2("(?<=\\Babc)d", "aabcd", 4, 5)
+    n("(?<!a(?:bb|c))", "", err=onigmo.ONIGERR_INVALID_LOOK_BEHIND_PATTERN)
     x2("a\\b?a", "aa", 0, 2)
     x2("[^x]*x", "aaax", 0, 4)
     x2("(?i)[\\x{0}-B]+", "\x00\x01\x02\x1f\x20@AaBbC", 0, 10)
@@ -1311,6 +1312,13 @@ def main():
     x2("abc.*\\b", "abc", 0, 3)         # Issue #96
     x2("\\b.*abc.*\\b", "abc", 0, 3)    # Issue #96
     x2('(?i) *TOOKY', 'Mozilla/5.0 (Linux; Android 4.0.3; TOOKY', 34, 40)   # Issue #120
+    n("(?", "", err=onigmo.ONIGERR_END_PATTERN_IN_GROUP)
+    n("(?#", "", err=onigmo.ONIGERR_END_PATTERN_IN_GROUP)
+    n("\\", "", err=onigmo.ONIGERR_END_PATTERN_AT_ESCAPE)
+    n("\\M", "", err=onigmo.ONIGERR_END_PATTERN_AT_META)
+    n("\\M#", "", err=onigmo.ONIGERR_META_CODE_SYNTAX)
+    n("\\C", "", err=onigmo.ONIGERR_END_PATTERN_AT_CONTROL)
+    n("\\C#", "", err=onigmo.ONIGERR_CONTROL_CODE_SYNTAX)
 
     # ONIG_OPTION_FIND_LONGEST option
     x2("foo|foobar", "foobar", 0, 3)
@@ -1427,6 +1435,8 @@ def main():
     n("\\k<1/>", "", err=onigmo.ONIGERR_INVALID_GROUP_NAME)
     n("\\k<1-1/>", "", err=onigmo.ONIGERR_INVALID_GROUP_NAME)
     n("\\k<a/>", "", err=onigmo.ONIGERR_INVALID_CHAR_IN_GROUP_NAME)
+    n("\\k<a>", "", err=onigmo.ONIGERR_UNDEFINED_NAME_REFERENCE)
+    n("\\g<1>", "", err=onigmo.ONIGERR_UNDEFINED_GROUP_REFERENCE)
 
     # character set modifiers
     x2("(?u)\\w+", "あa#", 0, 2);
