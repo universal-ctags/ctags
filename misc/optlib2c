@@ -62,7 +62,7 @@ my $options =
 	 my $refonly = 0;
 	 $refonly = 1 if defined $5;
 	 push @{$_[0]->{'kinddefs'}}, { enabled => 1, letter => $2, name => $3, desc => $4,
-					refonly => $refonly, roles => [] };
+					refonly => $refonly, roles => [], seps => [] };
        } ],
      [ qr/^--_extradef-(.*)=([^,]+),(.+)/, sub {
 	 die "Don't use --_extradef-<LANG>=+ option before defining the language"
@@ -209,6 +209,13 @@ my $options =
 	 die "Extending a multitable regex is allowed only to the language specified with --langdef: $1"
 	   unless ($_[0]->{'langdef'} eq $1);
 	 extend_table($_[0], $2, $3);
+       } ],
+     [ qr/^--_scopesep-([^=]*)=([^,]?)\/([^:]+):(.+)/, sub {
+	 die "Don't use --_scopesep-<LANG>= option before defining the language"
+	   if (! defined $_[0]->{'langdef'});
+	 die "Specifying a scope separator is allowed only to the language specified with --langdef: $1"
+	   unless ($_[0]->{'langdef'} eq $1);
+	 scopesep($_[0], $2, $3, $4);
        } ],
      [ qr/^-.*/, sub {
 	 die "Unhandled option: \"$&\"";
@@ -414,6 +421,61 @@ sub parse_fields {
     }
 }
 
+sub scopesep {
+    my ($opts, $parent_kletter, $kletter, $sep) = @_;
+
+    if ($kletter eq '*') {
+	if ($parent_kletter eq '*') {
+	    $opts->{'defaultScopeSeparator'} = $sep;
+	} elsif (!$parent_kletter) {
+	    $opts->{'defaultRootScopeSeparator'} = $sep;
+	} else {
+	    die "Unhandled kind letter during parsing --_scopsesep option: $parent_kletter";
+	}
+    } elsif ($kletter =~ /[a-zA-Z]/) {
+	my $kind;
+	for (@{$opts->{'kinddefs'}}) {
+	    if ($_->{'letter'} eq $kletter) {
+		$kind = $_;
+		last;
+	    }
+	}
+	die "Unknown kind letter in --_scopsesep option: $kletter"
+	  unless defined $kind;
+
+	if ($parent_kletter eq '*') {
+	    push @{$kind->{'seps'}}, { parentKindIndex => 'KIND_WILDCARD_INDEX',
+				       sep => $sep };
+	} elsif (!$parent_kletter) {
+	    push @{$kind->{'seps'}}, { parentKindIndex => 'KIND_GHOST_INDEX',
+				       sep => $sep };
+	} elsif ($parent_kletter =~ /[a-zA-Z]/) {
+	    my $parent_kind;
+	    for (@{$opts->{'kinddefs'}}) {
+		if ($_->{'letter'} == $parent_kletter) {
+		    $parent_kind = $_;
+		    last;
+		}
+	    }
+	    die "Unknown kind letter in --_scopsesep option: $parent_kletter"
+	      unless defined $parent_kind;
+	    push @{$kind->{'seps'}}, { parentKindIndex => 'K_' . (uc $parent_kind->{'name'}),
+				       sep => $sep };
+	}
+    } else {
+	die "Unhandled kind letter during parsing --_scopsesep option: $kletter";
+    }
+
+    $opts->{'hasSepSpeicifer'} = 1;
+}
+
+
+########################################################################
+#
+# EMIT
+#
+########################################################################
+
 sub emit_header {
     my ($optlib, $opts) = @_;
 
@@ -438,13 +500,6 @@ EOF
 
 EOF
 }
-
-
-########################################################################
-#
-# EMIT
-#
-########################################################################
 
 sub emit_initializer {
     my $opts = shift;
@@ -538,6 +593,52 @@ EOF
 EOF
 }
 
+sub emit_kinddef_enums {
+    my $opts = shift;
+
+    return if (! @{$opts->{'kinddefs'}});
+
+    print <<EOF;
+typedef enum {
+EOF
+    for (@{$opts->{'kinddefs'}}) {
+	my $e = uc($_->{'name'});
+	print <<EOF;
+	K_$e,
+EOF
+    }
+    print <<EOF;
+} $opts->{'Clangdef'}Kind;
+
+
+EOF
+}
+
+sub emit_scopeseps {
+    my $opts = shift;
+
+    return if (! @{$opts->{'kinddefs'}});
+
+    for (@{$opts->{'kinddefs'}}) {
+	my $seps = $_->{'seps'};
+	if (@{$seps}) {
+	    my $Kind = capitalize ($_->{'name'});
+	    print <<EOF;
+	static scopeSeparator $opts->{'Clangdef'}${Kind}Separators [] = {
+EOF
+	    for (@{$seps}) {
+	    print <<EOF;
+		{ $_->{'parentKindIndex'}, "$_->{'sep'}" },
+EOF
+	    }
+	    print <<EOF;
+	};
+
+EOF
+	}
+    }
+}
+
 sub emit_kinddefs {
     my $opts = shift;
 
@@ -563,6 +664,11 @@ EOF
       if (@{$_->{'roles'}}) {
 	  print <<EOF;
 		  ATTACH_ROLES($opts->{'Clangdef'}${Kind}RoleTable),
+EOF
+      }
+      if (@{$_->{'seps'}}) {
+	  print <<EOF;
+		  ATTACH_SEPARATORS($opts->{'Clangdef'}${Kind}Separators),
 EOF
       }
       print <<EOF;
@@ -737,6 +843,17 @@ EOF
 	def->requestAutomaticFQTag = true;
 EOF
     }
+
+    if ($opts->{'defaultScopeSeparator'}) {
+	print <<EOF;
+	def->defaultScopeSeparator = "$opts->{'defaultScopeSeparator'}";
+EOF
+    }
+    if ($opts->{'defaultRootScopeSeparator'}) {
+	print <<EOF;
+	def->defaultRootScopeSeparator = "$opts->{'defaultRootScopeSeparator'}";
+EOF
+    }
     print <<EOF;
 	def->initialize    = initialize$opts->{'Clangdef'}Parser;
 
@@ -747,6 +864,10 @@ sub emit {
     my ($optlib, $opts) = @_;
 
     emit_header ($optlib, $opts);
+
+    if ($opts->{'hasSepSpeicifer'}) {
+	emit_kinddef_enums   $opts;
+    };
     emit_initializer $opts;
 
     print <<EOF;
@@ -758,6 +879,7 @@ EOF
     emit_aliases         $opts;
     emit_patterns        $opts;
     emit_roledefs        $opts;
+    emit_scopeseps       $opts;
     emit_kinddefs        $opts;
     emit_fields          $opts;
     emit_xtags           $opts;
@@ -817,7 +939,9 @@ sub main {
 		aliases => [],
 		regexs => [# { regex => "", name => "", kind => "", flags => "", mline => 1|0 },
 			  ],
-		kinddefs => [# { letter => '', name => "", desc => "" },
+		kinddefs => [# { letter => '', name => "", desc => "",
+			     #   seps => [ {parentKindIndex => "", sep => "" } ]
+			     # },
 			    ],
 		extradefs => [ # { name => "", desc => "", enabled => 1|0 },
 			     ],
@@ -829,6 +953,9 @@ sub main {
 		tabledefs => { # "" => [{ regex => "", name => "", kind => "", flags => "" }...],
 			     },
 		useCork   => 0,
+		defaultScopeSeparator => undef,
+		defaultRootScopeSeparator => undef,
+		hasSepSpeicifer => 0,
 	       );
 
     for (@_) {

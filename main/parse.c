@@ -468,6 +468,151 @@ extern langType getLanguageForFilename (const char *const filename, langType sta
 									  &tmp_specType);
 }
 
+const char *scopeSeparatorFor (langType language, int kindIndex, int parentKindIndex)
+{
+	Assert (0 <= language  &&  language < (int) LanguageCount);
+
+	parserObject *parser = LanguageTable + language;
+	struct kindControlBlock *kcb = parser->kindControlBlock;
+
+	const scopeSeparator *sep = getScopeSeparator (kcb, kindIndex, parentKindIndex);
+	return sep? sep->separator: NULL;
+}
+
+static bool processLangDefineScopesep(const langType language,
+								  const char *const option,
+								  const char *const parameter)
+{
+	parserObject *parser;
+	const char * p = parameter;
+
+
+	char parentKletter;
+	int parentKindex = KIND_FILE_INDEX;
+	char kletter;
+	int kindex = KIND_FILE_INDEX;
+	const char *separator;
+
+	Assert (0 <= language  &&  language < (int) LanguageCount);
+	parser = LanguageTable + language;
+
+
+	/*
+	 * Parent
+	 */
+	parentKletter = p[0];
+
+	if (parentKletter == '\0')
+		error (FATAL, "no scope separator specified in \"--%s\" option", option);
+	else if (parentKletter == '/')
+		parentKindex = KIND_GHOST_INDEX;
+	else if (parentKletter == KIND_WILDCARD)
+		parentKindex = KIND_WILDCARD_INDEX;
+	else if (parentKletter == KIND_FILE_DEFAULT)
+		error (FATAL,
+			   "the kind letter `F' in \"--%s\" option is reserved for \"file\" kind and no separator can be assigned to",
+			   option);
+	else if (isalpha (parentKletter))
+	{
+		kindDefinition *kdef = getKindForLetter (parser->kindControlBlock, parentKletter);
+		if (kdef == NULL)
+			error (FATAL,
+				   "the kind for letter `%c' specified in \"--%s\" option is not defined.",
+				   parentKletter, option);
+		parentKindex = kdef->id;
+	}
+	else
+		error (FATAL,
+			   "the kind letter `%c` given in \"--%s\" option is not an alphabet",
+			   parentKletter, option);
+
+
+	/*
+	 * Child
+	 */
+	if (parentKindex == KIND_GHOST_INDEX)
+		kletter = p[1];
+	else
+	{
+		if (p[1] != '/')
+			error (FATAL,
+				   "wrong separator specification in \"--%s\" option: no slash after parent kind letter `%c'",
+				   option, parentKletter);
+		kletter = p[2];
+	}
+
+	if (kletter == '\0')
+		error (FATAL, "no child kind letter in \"--%s\" option", option);
+	else if (kletter == '/')
+		error (FATAL,
+			   "wrong separator specification in \"--%s\" option: don't specify slash char twice: %s",
+			   option, parameter);
+	else if (kletter == ':')
+		error (FATAL,
+			   "no child kind letter in \"--%s\" option", option);
+	else if (kletter == KIND_WILDCARD)
+	{
+		if (parentKindex != KIND_WILDCARD_INDEX
+			&& parentKindex != KIND_GHOST_INDEX)
+			error (FATAL,
+				   "cannot use wild card for child kind unless parent kind is also wild card or empty");
+		kindex = KIND_WILDCARD_INDEX;
+	}
+	else if (kletter == KIND_FILE_DEFAULT)
+		error (FATAL,
+			   "the kind letter `F' in \"--%s\" option is reserved for \"file\" kind and no separator can be assigned to",
+			   option);
+	else if (isalpha (kletter))
+	{
+		kindDefinition *kdef = getKindForLetter (parser->kindControlBlock, kletter);
+		if (kdef == NULL)
+			error (FATAL,
+				   "the kind for letter `%c' specified in \"--%s\" option is not defined.",
+				   kletter, option);
+		kindex = kdef->id;
+	}
+	else
+		error (FATAL,
+			   "the kind letter `%c` given in \"--%s\" option is not an alphabet",
+			   kletter, option);
+
+	/*
+	 * Separator
+	 */
+	if (parentKindex == KIND_GHOST_INDEX)
+	{
+		if (p[2] != ':')
+			error (FATAL,
+				   "wrong separator specification in \"--%s\" option: cannot find a colon after child kind: %s",
+				   option, parameter);
+		separator = p + 3;
+	}
+	else
+	{
+		if (p[3] != ':')
+			error (FATAL,
+				   "wrong separator specification in \"--%s\" option: cannot find a colon after child kind: %s",
+				   option, parameter);
+		separator = p + 4;
+	}
+
+	Assert (parentKindex != KIND_FILE_INDEX);
+	Assert (kindex != KIND_FILE_INDEX);
+	defineScopeSeparator (parser->kindControlBlock, kindex, parentKindex, separator);
+	return true;
+}
+
+extern bool processScopesepOption (const char *const option, const char * const parameter)
+{
+	langType language;
+
+	language = getLanguageComponentInOption (option, "_scopesep-");
+	if (language == LANG_IGNORE)
+		return false;
+
+	return processLangDefineScopesep (language, option, parameter);
+}
+
 static parserCandidate* parserCandidateNew(unsigned int count CTAGS_ATTR_UNUSED)
 {
 	parserCandidate* candidates;
@@ -2197,7 +2342,7 @@ static bool processLangDefineKind(const langType language,
 	if (letter == ',')
 		error (FATAL, "no kind letter specified in \"--%s\" option", option);
 	if (!isalnum (letter))
-		error (FATAL, "the kind letter give in \"--%s\" option is not an alphabet or a number", option);
+		error (FATAL, "the kind letter given in \"--%s\" option is not an alphabet or a number", option);
 	else if (letter == KIND_FILE_DEFAULT)
 		error (FATAL, "the kind letter `F' in \"--%s\" option is reserved for \"file\" kind", option);
 	else if (getKindForLetter (parser->kindControlBlock, letter))
@@ -2296,7 +2441,7 @@ static bool processLangDefineRole(const langType language,
 	if (kletter == '.')
 		error (FATAL, "no kind letter specified in \"--%s\" option", option);
 	if (!isalnum (kletter))
-		error (FATAL, "the kind letter give in \"--%s\" option is not an alphabet or a number", option);
+		error (FATAL, "the kind letter given in \"--%s\" option is not an alphabet or a number", option);
 	else if (kletter == KIND_FILE_DEFAULT)
 		error (FATAL, "the kind letter `F' in \"--%s\" option is reserved for \"file\" kind and no role can be attached to", option);
 

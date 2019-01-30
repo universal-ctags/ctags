@@ -1,0 +1,6 @@
+pr0	input.tcl	/^proc ::pr0 {s} {$/;"	p
+@pr0	input.tcl	/^proc ::pr0 {s} {$/;"	p	extras:qualified
+N	input.tcl	/^namespace eval N {$/;"	n
+#N	input.tcl	/^namespace eval N {$/;"	n	extras:qualified
+pr1	input.tcl	/^    proc pr1 {s} {$/;"	p	namespace:#N
+#N+pr1	input.tcl	/^    proc pr1 {s} {$/;"	p	namespace:#N	extras:qualified

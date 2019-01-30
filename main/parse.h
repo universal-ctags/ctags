@@ -101,6 +101,10 @@ struct sParserDefinition {
 	xpathFileSpec *xpathFileSpecs;
 	unsigned int xpathFileSpecCount;
 
+	/* Following two fields are used in a parser using cork. */
+	const char *defaultScopeSeparator;
+	const char *defaultRootScopeSeparator;
+
 	/* used internally */
 	langType id;		    /* id assigned to language */
 	unsigned int enabled:1;	       /* currently enabled? */

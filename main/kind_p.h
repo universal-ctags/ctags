@@ -50,6 +50,11 @@ extern roleDefinition* getRoleForName(struct kindControlBlock* kcb, int kindInde
 extern void linkKindDependency (struct kindControlBlock *masterKCB,
 								struct kindControlBlock *slaveKCB);
 
+extern int defineScopeSeparator(struct kindControlBlock* kcb,
+								int kindIndex,
+								int parentKindIndex, const char *separator);
+extern const  scopeSeparator *getScopeSeparator(struct kindControlBlock* kcb, int kindIndex, int parentKindIndex);
+
 /* for the obsolete --list-kinds option */
 extern void printKind (const kindDefinition* const kind, bool indent);
 
