@@ -1198,6 +1198,7 @@ def main():
     x2("[0-9-a]+", " 0123456789-a ", 1, 13)     # same as [0-9\-a]
     x2("[0-9-\\s]+", " 0123456789-a ", 0, 12)   # same as [0-9\-\s]
     n("[0-9-a]", "", syn=onigmo.ONIG_SYNTAX_GREP, err=onigmo.ONIGERR_UNMATCHED_RANGE_SPECIFIER_IN_CHAR_CLASS)
+    n("[a-\\d]", "", err=onigmo.ONIGERR_CHAR_CLASS_VALUE_AT_END_OF_RANGE)
     x2("[0-9-あ\\\\/\u0001]+", " 0123456789-あ\\/\u0001 ", 1, 16)
     x2("[a-b-]+", "ab-", 0, 3)
     x2("[a-b-&&-]+", "ab-", 2, 3)
@@ -1332,6 +1333,7 @@ def main():
     # ONIG_OPTION_DONT_CAPTURE_GROUP option
     x2("(ab|cd)*", "cdab", 0, 4, opt=onigmo.ONIG_OPTION_DONT_CAPTURE_GROUP)
     n("(ab|cd)*\\1", "", opt=onigmo.ONIG_OPTION_DONT_CAPTURE_GROUP, err=onigmo.ONIGERR_INVALID_BACKREF)
+    #n("", "", opt=(onigmo.ONIG_OPTION_DONT_CAPTURE_GROUP | onigmo.ONIG_OPTION_CAPTURE_GROUP), err=onigmo.ONIGERR_INVALID_COMBINATION_OF_OPTIONS)  # FIXME: Python crashes on Windows
 
     # character classes (tests for character class optimization)
     x2("[@][a]", "@a", 0, 2);
@@ -1435,7 +1437,7 @@ def main():
     n("\\k<1/>", "", err=onigmo.ONIGERR_INVALID_GROUP_NAME)
     n("\\k<1-1/>", "", err=onigmo.ONIGERR_INVALID_GROUP_NAME)
     n("\\k<a/>", "", err=onigmo.ONIGERR_INVALID_CHAR_IN_GROUP_NAME)
-    n("\\k<a>", "", err=onigmo.ONIGERR_UNDEFINED_NAME_REFERENCE)
+    n("\\k<aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa>", "", err=onigmo.ONIGERR_UNDEFINED_NAME_REFERENCE)
     n("\\g<1>", "", err=onigmo.ONIGERR_UNDEFINED_GROUP_REFERENCE)
 
     # character set modifiers
