@@ -2,6 +2,7 @@ History of Onigmo (Oniguruma-mod)
 
 2019/01/30: Version 6.2.0
 
+2019/01/30: [dist] Update LTVERSION to "6:5:0".
 2019/01/30: [dist] Delete all autotools generated files from the repository.
                    (PR #115)
 2019/01/30: [test] Update tests. (PR #127)
