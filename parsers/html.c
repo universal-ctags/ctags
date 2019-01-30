@@ -30,15 +30,26 @@ typedef enum {
 	K_ANCHOR,
 	K_HEADING1,
 	K_HEADING2,
-	K_HEADING3
+	K_HEADING3,
+	K_SCRIPT,
 } htmlKind;
 
+
+typedef enum {
+	SCRIPT_KIND_EXTERNAL_FILE_ROLE,
+} ScriptRole;
+
+static roleDefinition ScriptRoles [] = {
+	{ true, "extFile", "referenced as external files" },
+};
 
 static kindDefinition HtmlKinds [] = {
 	{ true, 'a', "anchor",		"named anchors" },
 	{ true, 'h', "heading1",	"H1 headings" },
 	{ true, 'i', "heading2",	"H2 headings" },
-	{ true, 'j', "heading3",	"H3 headings" }
+	{ true, 'j', "heading3",	"H3 headings" },
+	{ true, 'J', "script",		"scripts",
+	  .referenceOnly = true, ATTACH_ROLES (ScriptRoles)},
 };
 
 typedef enum {
@@ -65,6 +76,7 @@ typedef enum {
 	KEYWORD_meta,
 	KEYWORD_param,
 	KEYWORD_source,
+	KEYWORD_src,
 	KEYWORD_track,
 	KEYWORD_wbr
 } keywordId;
@@ -93,6 +105,7 @@ static const keywordTable HtmlKeywordTable[] = {
 	{"meta", KEYWORD_meta},
 	{"param", KEYWORD_param},
 	{"source", KEYWORD_source},
+	{"src", KEYWORD_src},
 	{"track", KEYWORD_track},
 	{"wbr", KEYWORD_wbr},
 };
@@ -415,6 +428,22 @@ static void readTag (tokenInfo *token, vString *text, int depth)
 						readToken (token, true);
 						if (token->type == TOKEN_STRING || token->type == TOKEN_NAME)
 							makeSimpleTag (token->string, K_ANCHOR);
+					}
+				}
+			}
+			else if (startTag == KEYWORD_script && token->type == TOKEN_NAME)
+			{
+				keywordId attribute = lookupKeyword (vStringValue (token->string), Lang_html);
+
+				if (attribute == KEYWORD_src)
+				{
+					readToken (token, true);
+					if (token->type == TOKEN_EQUAL)
+					{
+						readToken (token, true);
+						if (token->type == TOKEN_STRING)
+							makeSimpleRefTag (token->string, K_SCRIPT,
+											  SCRIPT_KIND_EXTERNAL_FILE_ROLE);
 					}
 				}
 			}
