@@ -18,7 +18,11 @@ typedef struct sHashTable hashTable;
 typedef unsigned int (* hashTableHashFunc)  (const void * const key);
 typedef bool      (* hashTableEqualFunc) (const void* a, const void* b);
 typedef void         (* hashTableFreeFunc)  (void * ptr);
-typedef void         (* hashTableForeachFunc) (void *key, void *value, void* user_data);
+
+/* To continue the interation, return false.
+ * To break the interation, return true.
+ */
+typedef bool         (* hashTableForeachFunc) (void *key, void *value, void *user_data);
 
 unsigned int hashPtrhash (const void * x);
 bool hashPtreq (const void * a, const void * constb);
@@ -44,7 +48,14 @@ extern void       hashTablePutItem     (hashTable *htable, void *key, void *valu
 extern void*      hashTableGetItem     (hashTable *htable, const void * key);
 extern bool    hashTableHasItem     (hashTable * htable, const void * key);
 extern bool    hashTableDeleteItem  (hashTable *htable, void *key);
-extern void       hashTableForeachItem (hashTable *htable, hashTableForeachFunc proc, void *user_data);
+
+/* hashTableForeachItem returns false if PROC returns false for all values.
+ * True returned by hashTableForeachItem means PROC requests to stop the iteration.
+ * If PROC never retruns true, or if PROC is not called because HTABLE is empty,
+ * hashTableForeachItem returns false.
+ */
+extern bool       hashTableForeachItem (hashTable *htable, hashTableForeachFunc proc, void *user_data);
+
 extern int        hashTableCountItem   (hashTable *htable);
 
 extern hashTable* hashTableIntNew (unsigned int size,
