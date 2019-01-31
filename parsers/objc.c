@@ -484,6 +484,7 @@ static void pushEnclosingContextFull (const vString * parent, objcKind type, uns
 static void popEnclosingContext (void)
 {
 	vStringClear (parentName);
+	parentCorkIndex = CORK_NIL;
 }
 
 static void pushCategoryContext (unsigned int category_index)
@@ -1290,6 +1291,7 @@ static void findObjcTags (void)
 	prevIdent = NULL;
 	fullMethodName = NULL;
 	categoryCorkIndex = CORK_NIL;
+	parentCorkIndex = CORK_NIL;
 }
 
 static void objcInitialize (const langType language)
