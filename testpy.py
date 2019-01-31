@@ -1333,7 +1333,7 @@ def main():
     # ONIG_OPTION_DONT_CAPTURE_GROUP option
     x2("(ab|cd)*", "cdab", 0, 4, opt=onigmo.ONIG_OPTION_DONT_CAPTURE_GROUP)
     n("(ab|cd)*\\1", "", opt=onigmo.ONIG_OPTION_DONT_CAPTURE_GROUP, err=onigmo.ONIGERR_INVALID_BACKREF)
-    #n("", "", opt=(onigmo.ONIG_OPTION_DONT_CAPTURE_GROUP | onigmo.ONIG_OPTION_CAPTURE_GROUP), err=onigmo.ONIGERR_INVALID_COMBINATION_OF_OPTIONS)  # FIXME: Python crashes on Windows
+    n("", "", opt=(onigmo.ONIG_OPTION_DONT_CAPTURE_GROUP | onigmo.ONIG_OPTION_CAPTURE_GROUP), err=onigmo.ONIGERR_INVALID_COMBINATION_OF_OPTIONS)
 
     # character classes (tests for character class optimization)
     x2("[@][a]", "@a", 0, 2);
