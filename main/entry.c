@@ -977,7 +977,11 @@ extern void attachParserFieldToCorkEntry (int index,
 	Assert (tag != NULL);
 
 	v = eStrdup (value);
+
+	bool dynfields_allocated = tag->parserFieldsDynamic? true: false;
 	attachParserFieldGeneric (tag, ftype, v, true);
+	if (!dynfields_allocated && tag->parserFieldsDynamic)
+		PARSER_TRASH_BOX_TAKE_BACK(tag->parserFieldsDynamic);
 }
 
 extern const tagField* getParserField (const tagEntryInfo * tag, int index)
