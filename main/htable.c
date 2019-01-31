@@ -96,7 +96,7 @@ static void *entry_find (hentry* entry, const void* const key, hashTableEqualFun
 	return NULL;
 }
 
-static bool		entry_delete (hentry **entry, void *key, hashTableEqualFunc equalfn,
+static bool		entry_delete (hentry **entry, const void *key, hashTableEqualFunc equalfn,
 			      hashTableFreeFunc keyfreefn, hashTableFreeFunc valfreefn)
 {
 	while (*entry)
@@ -193,7 +193,7 @@ extern void*      hashTableGetItem   (hashTable *htable, const void * key)
 	return entry_find(htable->table[i], key, htable->equalfn);
 }
 
-extern bool     hashTableDeleteItem (hashTable *htable, void *key)
+extern bool     hashTableDeleteItem (hashTable *htable, const void *key)
 {
 	unsigned int i;
 
@@ -217,7 +217,7 @@ extern bool       hashTableForeachItem (hashTable *htable, hashTableForeachFunc 
 	return true;
 }
 
-static bool count (void *key CTAGS_ATTR_UNUSED, void *value CTAGS_ATTR_UNUSED, void *data)
+static bool count (const void *const key CTAGS_ATTR_UNUSED, void *value CTAGS_ATTR_UNUSED, void *data)
 {
 	int *c = data;
 	++*c;

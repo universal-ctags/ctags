@@ -21,7 +21,7 @@ typedef void         (* hashTableFreeFunc)  (void * ptr);
 
 /* To continue interation, return true.
  * To break interation, return false. */
-typedef bool         (* hashTableForeachFunc) (void *key, void *value, void *user_data);
+typedef bool         (* hashTableForeachFunc) (const void *key, void *value, void *user_data);
 
 unsigned int hashPtrhash (const void * x);
 bool hashPtreq (const void * a, const void * constb);
@@ -46,7 +46,7 @@ extern void       hashTableClear       (hashTable *htable);
 extern void       hashTablePutItem     (hashTable *htable, void *key, void *value);
 extern void*      hashTableGetItem     (hashTable *htable, const void * key);
 extern bool    hashTableHasItem     (hashTable * htable, const void * key);
-extern bool    hashTableDeleteItem  (hashTable *htable, void *key);
+extern bool    hashTableDeleteItem  (hashTable *htable, const void *key);
 
 /* Return true if proc never returns false; proc returns true for all
  * the items, or htable holds no item.
