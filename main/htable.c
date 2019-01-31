@@ -47,6 +47,12 @@ struct sHashTable {
 	hashTableFreeFunc valfreefn;
 };
 
+struct chainTracker {
+	const void *const target_key;
+	hashTableForeachFunc user_proc;
+	void *user_data;
+	hashTableEqualFunc equalfn;
+};
 
 static hentry* entry_new (void *key, void *value, hentry* next)
 {
@@ -214,6 +220,34 @@ extern bool       hashTableForeachItem (hashTable *htable, hashTableForeachFunc 
 	for (i = 0; i < htable->size; i++)
 		if (!entry_foreach(htable->table[i], proc, user_data))
 			return false;
+	return true;
+}
+
+static bool track_chain (const void *const key, void *value, void *chain_data)
+{
+	struct chainTracker *chain_tracker = chain_data;
+
+	if (chain_tracker->equalfn (chain_tracker->target_key, key))
+	{
+		if (! chain_tracker->user_proc (key, value, chain_tracker->user_data))
+			return false;
+	}
+	return true;
+}
+
+extern bool       hashTableForeachItemOnChain (hashTable *htable, const void *key, hashTableForeachFunc proc, void *user_data)
+{
+	unsigned int i;
+	struct chainTracker chain_tracker = {
+		.target_key = key,
+		.user_proc = proc,
+		.user_data = user_data,
+		.equalfn   = htable->equalfn,
+	};
+
+	i = htable->hashfn (key) % htable->size;
+	if (!entry_foreach(htable->table[i], track_chain, &chain_tracker))
+		return false;
 	return true;
 }
 

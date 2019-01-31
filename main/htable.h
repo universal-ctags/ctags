@@ -14,6 +14,19 @@
 #include "general.h"
 #include <stdint.h>
 
+/* This hashtable allows adding multiple items for a same key.
+ *
+ * hashTablePutItem() adds a key/item pair to the htable even if the
+ * htable has an item for the key already.
+ *
+ * hashTableGetItem() returns the first occurrence item for a given
+ * key.
+ *
+ * hashTableDeleteItem() deletes the first occurrence item for a given
+ * key.
+ *
+ * Use hashTableForeachItemOnChain () to process all items for a same key.
+ */
 typedef struct sHashTable hashTable;
 typedef unsigned int (* hashTableHashFunc)  (const void * const key);
 typedef bool      (* hashTableEqualFunc) (const void* a, const void* b);
@@ -54,6 +67,12 @@ extern bool    hashTableDeleteItem  (hashTable *htable, const void *key);
  * Return false if htable holds at least one item and proc returns false
  * for one of the items. */
 extern bool       hashTableForeachItem (hashTable *htable, hashTableForeachFunc proc, void *user_data);
+
+/* This function is useful for htable having multiple items for a key.
+ * By giving a key, you can traverse all the items associated with the
+ * key via proc.  * "Chain" means group of items associated with a
+ * key. */
+extern bool       hashTableForeachItemOnChain (hashTable *htable, const void *key, hashTableForeachFunc proc, void *user_data);
 
 extern int        hashTableCountItem   (hashTable *htable);
 
