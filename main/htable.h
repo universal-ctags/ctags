@@ -22,7 +22,7 @@ typedef void         (* hashTableFreeFunc)  (void * ptr);
 /* To continue the interation, return false.
  * To break the interation, return true.
  */
-typedef bool         (* hashTableForeachFunc) (void *key, void *value, void *user_data);
+typedef bool         (* hashTableForeachFunc) (const void *key, void *value, void *user_data);
 
 unsigned int hashPtrhash (const void * x);
 bool hashPtreq (const void * a, const void * constb);
@@ -47,7 +47,7 @@ extern void       hashTableClear       (hashTable *htable);
 extern void       hashTablePutItem     (hashTable *htable, void *key, void *value);
 extern void*      hashTableGetItem     (hashTable *htable, const void * key);
 extern bool    hashTableHasItem     (hashTable * htable, const void * key);
-extern bool    hashTableDeleteItem  (hashTable *htable, void *key);
+extern bool    hashTableDeleteItem  (hashTable *htable, const void *key);
 
 /* hashTableForeachItem returns false if PROC returns false for all values.
  * True returned by hashTableForeachItem means PROC requests to stop the iteration.
