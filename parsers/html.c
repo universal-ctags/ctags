@@ -32,6 +32,7 @@ typedef enum {
 	K_HEADING2,
 	K_HEADING3,
 	K_STYELSHEET,
+	K_ID,
 	K_SCRIPT,
 } htmlKind;
 
@@ -59,6 +60,7 @@ static kindDefinition HtmlKinds [] = {
 	{ true, 'j', "heading3",	"H3 headings" },
 	{ true, 'C', "stylesheet",	"stylesheets",
 	  .referenceOnly = true, ATTACH_ROLES (StylesheetRoles)},
+	{ true, 'I', "id",			"identifiers" },
 	{ true, 'J', "script",		"scripts",
 	  .referenceOnly = true, ATTACH_ROLES (ScriptRoles)},
 };
@@ -81,6 +83,7 @@ typedef enum {
 	KEYWORD_embed,
 	KEYWORD_hr,
 	KEYWORD_href,
+	KEYWORD_id,
 	KEYWORD_img,
 	KEYWORD_input,
 	KEYWORD_keygen,
@@ -112,6 +115,7 @@ static const keywordTable HtmlKeywordTable[] = {
 	{"embed", KEYWORD_embed},
 	{"hr", KEYWORD_hr},
 	{"href", KEYWORD_href},
+	{"id", KEYWORD_id},
 	{"img", KEYWORD_img},
 	{"input", KEYWORD_input},
 	{"keygen", KEYWORD_keygen},
@@ -433,7 +437,18 @@ static void readTag (tokenInfo *token, vString *text, int depth)
 		do
 		{
 			readToken (token, true);
-			if (startTag == KEYWORD_a && token->type == TOKEN_NAME)
+			if (token->type == TOKEN_NAME &&
+				KEYWORD_id == lookupKeyword (vStringValue (token->string), Lang_html))
+			{
+				readToken (token, true);
+				if (token->type == TOKEN_EQUAL)
+				{
+					readToken (token, true);
+					if (token->type == TOKEN_STRING)
+						makeSimpleTag (token->string, K_ID);
+				}
+			}
+			else if (startTag == KEYWORD_a && token->type == TOKEN_NAME)
 			{
 				keywordId attribute = lookupKeyword (vStringValue (token->string), Lang_html);
 
