@@ -436,9 +436,13 @@ static void readTag (tokenInfo *token, vString *text, int depth)
 
 		do
 		{
+			keywordId attribute = KEYWORD_NONE;
+
 			readToken (token, true);
-			if (token->type == TOKEN_NAME &&
-				KEYWORD_id == lookupKeyword (vStringValue (token->string), Lang_html))
+			if (token->type == TOKEN_NAME)
+				attribute = lookupKeyword (vStringValue (token->string), Lang_html);
+
+			if (attribute == KEYWORD_id)
 			{
 				readToken (token, true);
 				if (token->type == TOKEN_EQUAL)
@@ -448,41 +452,29 @@ static void readTag (tokenInfo *token, vString *text, int depth)
 						makeSimpleTag (token->string, K_ID);
 				}
 			}
-			else if (startTag == KEYWORD_a && token->type == TOKEN_NAME)
+			else if (startTag == KEYWORD_a && attribute == KEYWORD_name)
 			{
-				keywordId attribute = lookupKeyword (vStringValue (token->string), Lang_html);
-
-				if (attribute == KEYWORD_name)
+				readToken (token, true);
+				if (token->type == TOKEN_EQUAL)
 				{
 					readToken (token, true);
-					if (token->type == TOKEN_EQUAL)
-					{
-						readToken (token, true);
-						if (token->type == TOKEN_STRING || token->type == TOKEN_NAME)
-							makeSimpleTag (token->string, K_ANCHOR);
-					}
+					if (token->type == TOKEN_STRING || token->type == TOKEN_NAME)
+						makeSimpleTag (token->string, K_ANCHOR);
 				}
 			}
-			else if (startTag == KEYWORD_script && token->type == TOKEN_NAME)
+			else if (startTag == KEYWORD_script && attribute == KEYWORD_src)
 			{
-				keywordId attribute = lookupKeyword (vStringValue (token->string), Lang_html);
-
-				if (attribute == KEYWORD_src)
+				readToken (token, true);
+				if (token->type == TOKEN_EQUAL)
 				{
 					readToken (token, true);
-					if (token->type == TOKEN_EQUAL)
-					{
-						readToken (token, true);
-						if (token->type == TOKEN_STRING)
-							makeSimpleRefTag (token->string, K_SCRIPT,
-											  SCRIPT_KIND_EXTERNAL_FILE_ROLE);
-					}
+					if (token->type == TOKEN_STRING)
+						makeSimpleRefTag (token->string, K_SCRIPT,
+										  SCRIPT_KIND_EXTERNAL_FILE_ROLE);
 				}
 			}
-			else if (startTag == KEYWORD_link && token->type == TOKEN_NAME)
+			else if (startTag == KEYWORD_link)
 			{
-				keywordId attribute = lookupKeyword (vStringValue (token->string), Lang_html);
-
 				if (attribute == KEYWORD_rel)
 				{
 					readToken (token, true);
