@@ -484,6 +484,7 @@ static void pushEnclosingContextFull (const vString * parent, objcKind type, uns
 static void popEnclosingContext (void)
 {
 	vStringClear (parentName);
+	parentCorkIndex = CORK_NIL;
 }
 
 static void pushCategoryContext (unsigned int category_index)
@@ -904,8 +905,8 @@ static void parseProtocol (vString * const ident, objcToken what)
 {
 	if (what == ObjcIDENTIFIER)
 	{
-		addTag (ident, K_PROTOCOL);
-		pushEnclosingContext (ident, K_PROTOCOL);
+		unsigned int index = addTag (ident, K_PROTOCOL);
+		pushEnclosingContextFull (ident, K_PROTOCOL, index);
 	}
 	toDoNext = &parseMethods;
 }
@@ -1290,6 +1291,7 @@ static void findObjcTags (void)
 	prevIdent = NULL;
 	fullMethodName = NULL;
 	categoryCorkIndex = CORK_NIL;
+	parentCorkIndex = CORK_NIL;
 }
 
 static void objcInitialize (const langType language)

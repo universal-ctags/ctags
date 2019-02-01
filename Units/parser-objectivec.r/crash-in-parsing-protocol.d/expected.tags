@@ -1,0 +1,5 @@
+NSFileAccessIntent	input.h	/^@interface NSFileAccessIntent : NSObject$/;"	i	inherits:NSObject
+NSFileCoordinator	input.h	/^@interface NSFileCoordinator : NSObject$/;"	i	inherits:NSObject
+NSFilePresenter	input-0.h	/^@protocol NSFilePresenter <NSObject>$/;"	P	protocols:NSObject
+__NSFileCoordinator_h_GNUSTEP_BASE_INCLUDE	input-0.h	/^#define __NSFileCoordinator_h_GNUSTEP_BASE_INCLUDE$/;"	M
+__NSFileCoordinator_h_GNUSTEP_BASE_INCLUDE	input.h	/^#define __NSFileCoordinator_h_GNUSTEP_BASE_INCLUDE$/;"	M
