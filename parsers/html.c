@@ -28,6 +28,7 @@
 
 typedef enum {
 	K_ANCHOR,
+	K_CLASS,
 	K_HEADING1,
 	K_HEADING2,
 	K_HEADING3,
@@ -38,12 +39,20 @@ typedef enum {
 
 
 typedef enum {
+	CLASS_KIND_ATTRIBUTE_ROLE,
+} ClassRole;
+
+typedef enum {
 	SCRIPT_KIND_EXTERNAL_FILE_ROLE,
 } ScriptRole;
 
 typedef enum {
 	STYLESHEET_KIND_EXTERNAL_FILE_ROLE,
 } StylesheetRole;
+
+static roleDefinition ClassRoles [] = {
+	{ true, "attribute", "assigned as attributes" },
+};
 
 static roleDefinition ScriptRoles [] = {
 	{ true, "extFile", "referenced as external files" },
@@ -55,6 +64,8 @@ static roleDefinition StylesheetRoles [] = {
 
 static kindDefinition HtmlKinds [] = {
 	{ true, 'a', "anchor",		"named anchors" },
+	{ true, 'c', "class",		"classes",
+	  .referenceOnly = true, ATTACH_ROLES (ClassRoles)},
 	{ true, 'h', "heading1",	"H1 headings" },
 	{ true, 'i', "heading2",	"H2 headings" },
 	{ true, 'j', "heading3",	"H3 headings" },
@@ -78,6 +89,7 @@ typedef enum {
 	KEYWORD_area,
 	KEYWORD_base,
 	KEYWORD_br,
+	KEYWORD_class,
 	KEYWORD_col,
 	KEYWORD_command,
 	KEYWORD_embed,
@@ -110,6 +122,7 @@ static const keywordTable HtmlKeywordTable[] = {
 	{"area", KEYWORD_area},
 	{"base", KEYWORD_base},
 	{"br", KEYWORD_br},
+	{"class", KEYWORD_class},
 	{"col", KEYWORD_col},
 	{"command", KEYWORD_command},
 	{"embed", KEYWORD_embed},
@@ -412,6 +425,30 @@ static bool skipScriptContent (tokenInfo *token, long *line, long *lineOffset)
 	return found_script;
 }
 
+static void makeClassRefTags (const char *classes)
+{
+	vString *klass = vStringNew ();
+
+	do
+	{
+		if (*classes && !isspace (*classes))
+			vStringPut (klass, *classes);
+		else if (!vStringIsEmpty (klass))
+		{
+			makeSimpleRefTag (klass, K_CLASS,
+							  CLASS_KIND_ATTRIBUTE_ROLE);
+			vStringClear (klass);
+		}
+
+		if (!*classes)
+			break;
+
+		classes++;
+	} while (1);
+
+	vStringDelete (klass);
+}
+
 static void readTag (tokenInfo *token, vString *text, int depth)
 {
 	bool textCreated = false;
@@ -442,7 +479,17 @@ static void readTag (tokenInfo *token, vString *text, int depth)
 			if (token->type == TOKEN_NAME)
 				attribute = lookupKeyword (vStringValue (token->string), Lang_html);
 
-			if (attribute == KEYWORD_id)
+			if (attribute == KEYWORD_class)
+			{
+				readToken (token, true);
+				if (token->type == TOKEN_EQUAL)
+				{
+					readToken (token, true);
+					if (token->type == TOKEN_STRING)
+						makeClassRefTags (vStringValue (token->string));
+				}
+			}
+			else if (attribute == KEYWORD_id)
 			{
 				readToken (token, true);
 				if (token->type == TOKEN_EQUAL)
