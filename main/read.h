@@ -55,6 +55,7 @@ enum eCharacters {
 
 /* InputFile: reading from fp in inputFile with updating fields in input fields */
 extern unsigned long getInputLineNumber (void);
+extern unsigned long getInputLineNumberForFileOffset(long offset);
 extern int getInputLineOffset (void);
 extern const char *getInputFileName (void);
 extern MIOPos getInputFilePosition (void);
