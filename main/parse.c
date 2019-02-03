@@ -129,6 +129,10 @@ static parserDefinitionFunc* BuiltInParsers[] = {
 #ifdef HAVE_LIBYAML
 	,
 #endif
+       PEG_PARSER_LIST
+#ifdef HAVE_PACKCC
+       ,
+#endif
 };
 static parserObject* LanguageTable = NULL;
 static unsigned int LanguageCount = 0;

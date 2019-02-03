@@ -1,0 +1,61 @@
+org.example.complex	input.varlink	/^interface org.example.complex$/;"	i
+Enum	input.varlink	/^type Enum (enum, b, c)$/;"	g	interface:org.example.complex
+enum	input.varlink	/^type Enum (enum, b, c)$/;"	e	enum:org.example.complex.Enum
+b	input.varlink	/^type Enum (enum, b, c)$/;"	e	enum:org.example.complex.Enum
+c	input.varlink	/^type Enum (enum, b, c)$/;"	e	enum:org.example.complex.Enum
+Type	input.varlink	/^type Type (type, b, c)$/;"	g	interface:org.example.complex
+type	input.varlink	/^type Type (type, b, c)$/;"	e	enum:org.example.complex.Type
+b	input.varlink	/^type Type (type, b, c)$/;"	e	enum:org.example.complex.Type
+c	input.varlink	/^type Type (type, b, c)$/;"	e	enum:org.example.complex.Type
+TypeEnum	input.varlink	/^type TypeEnum (type, b, c)$/;"	g	interface:org.example.complex
+type	input.varlink	/^type TypeEnum (type, b, c)$/;"	e	enum:org.example.complex.TypeEnum
+b	input.varlink	/^type TypeEnum (type, b, c)$/;"	e	enum:org.example.complex.TypeEnum
+c	input.varlink	/^type TypeEnum (type, b, c)$/;"	e	enum:org.example.complex.TypeEnum
+Interface	input.varlink	/^type Interface (interface, b, c)$/;"	g	interface:org.example.complex
+interface	input.varlink	/^type Interface (interface, b, c)$/;"	e	enum:org.example.complex.Interface
+b	input.varlink	/^type Interface (interface, b, c)$/;"	e	enum:org.example.complex.Interface
+c	input.varlink	/^type Interface (interface, b, c)$/;"	e	enum:org.example.complex.Interface
+TypeFoo	input.varlink	/^type TypeFoo ($/;"	s	interface:org.example.complex
+bool	input.varlink	/^  bool: bool,$/;"	f	struct:org.example.complex.TypeFoo
+int	input.varlink	/^  int: int,$/;"	f	struct:org.example.complex.TypeFoo
+float	input.varlink	/^  float: float,$/;"	f	struct:org.example.complex.TypeFoo
+string	input.varlink	/^  string: string,$/;"	f	struct:org.example.complex.TypeFoo
+enum	input.varlink	/^  enum: ?[]?(foo, bar, baz),$/;"	f	struct:org.example.complex.TypeFoo
+foo	input.varlink	/^  enum: ?[]?(foo, bar, baz),$/;"	e	struct:org.example.complex.TypeFoo
+bar	input.varlink	/^  enum: ?[]?(foo, bar, baz),$/;"	e	struct:org.example.complex.TypeFoo
+baz	input.varlink	/^  enum: ?[]?(foo, bar, baz),$/;"	e	struct:org.example.complex.TypeFoo
+type	input.varlink	/^  type: ?TypeEnum,$/;"	f	struct:org.example.complex.TypeFoo
+anon	input.varlink	/^  anon: (foo: bool, bar: int, baz: [](a: int, b: int))$/;"	f	struct:org.example.complex.TypeFoo
+foo	input.varlink	/^  anon: (foo: bool, bar: int, baz: [](a: int, b: int))$/;"	f	struct:org.example.complex.TypeFoo
+bar	input.varlink	/^  anon: (foo: bool, bar: int, baz: [](a: int, b: int))$/;"	f	struct:org.example.complex.TypeFoo
+baz	input.varlink	/^  anon: (foo: bool, bar: int, baz: [](a: int, b: int))$/;"	f	struct:org.example.complex.TypeFoo
+a	input.varlink	/^  anon: (foo: bool, bar: int, baz: [](a: int, b: int))$/;"	f	struct:org.example.complex.TypeFoo
+b	input.varlink	/^  anon: (foo: bool, bar: int, baz: [](a: int, b: int))$/;"	f	struct:org.example.complex.TypeFoo
+Foo	input.varlink	/^method Foo(enum: (b: bool, c: int), foo: TypeFoo, interface: Interface) -> ($/;"	m	interface:org.example.complex
+enum	input.varlink	/^method Foo(enum: (b: bool, c: int), foo: TypeFoo, interface: Interface) -> ($/;"	I	method:org.example.complex.Foo
+b	input.varlink	/^method Foo(enum: (b: bool, c: int), foo: TypeFoo, interface: Interface) -> ($/;"	I	method:org.example.complex.Foo
+c	input.varlink	/^method Foo(enum: (b: bool, c: int), foo: TypeFoo, interface: Interface) -> ($/;"	I	method:org.example.complex.Foo
+foo	input.varlink	/^method Foo(enum: (b: bool, c: int), foo: TypeFoo, interface: Interface) -> ($/;"	I	method:org.example.complex.Foo
+interface	input.varlink	/^method Foo(enum: (b: bool, c: int), foo: TypeFoo, interface: Interface) -> ($/;"	I	method:org.example.complex.Foo
+a	input.varlink	/^  a: [](b: bool, c: int),$/;"	O	method:org.example.complex.Foo
+b	input.varlink	/^  a: [](b: bool, c: int),$/;"	O	method:org.example.complex.Foo
+c	input.varlink	/^  a: [](b: bool, c: int),$/;"	O	method:org.example.complex.Foo
+foo	input.varlink	/^  foo: TypeFoo,$/;"	O	method:org.example.complex.Foo
+interface	input.varlink	/^  interface: Interface$/;"	O	method:org.example.complex.Foo
+Bar	input.varlink	/^method Bar() -> ()$/;"	m	interface:org.example.complex
+ErrorFoo	input.varlink	/^error ErrorFoo ($/;"	E	interface:org.example.complex
+enum	input.varlink	/^  enum: (b: bool, c: int, interface: Interface),$/;"	d	error:org.example.complex.ErrorFoo
+b	input.varlink	/^  enum: (b: bool, c: int, interface: Interface),$/;"	d	error:org.example.complex.ErrorFoo
+c	input.varlink	/^  enum: (b: bool, c: int, interface: Interface),$/;"	d	error:org.example.complex.ErrorFoo
+interface	input.varlink	/^  enum: (b: bool, c: int, interface: Interface),$/;"	d	error:org.example.complex.ErrorFoo
+foo	input.varlink	/^  foo: TypeFoo,$/;"	d	error:org.example.complex.ErrorFoo
+bar	input.varlink	/^  bar: (type, enum, int, bool, string, if, let),$/;"	d	error:org.example.complex.ErrorFoo
+type	input.varlink	/^  bar: (type, enum, int, bool, string, if, let),$/;"	e	error:org.example.complex.ErrorFoo
+enum	input.varlink	/^  bar: (type, enum, int, bool, string, if, let),$/;"	e	error:org.example.complex.ErrorFoo
+int	input.varlink	/^  bar: (type, enum, int, bool, string, if, let),$/;"	e	error:org.example.complex.ErrorFoo
+bool	input.varlink	/^  bar: (type, enum, int, bool, string, if, let),$/;"	e	error:org.example.complex.ErrorFoo
+string	input.varlink	/^  bar: (type, enum, int, bool, string, if, let),$/;"	e	error:org.example.complex.ErrorFoo
+if	input.varlink	/^  bar: (type, enum, int, bool, string, if, let),$/;"	e	error:org.example.complex.ErrorFoo
+let	input.varlink	/^  bar: (type, enum, int, bool, string, if, let),$/;"	e	error:org.example.complex.ErrorFoo
+interface	input.varlink	/^  interface: Interface$/;"	d	error:org.example.complex.ErrorFoo
+ErrorBar	input.varlink	/^error ErrorBar ()$/;"	E	interface:org.example.complex

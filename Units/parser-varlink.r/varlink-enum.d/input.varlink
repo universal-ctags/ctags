@@ -1,0 +1,38 @@
+# Taken from https://github.com/varlink/varlink.github.io/pull/12
+
+interface org.example.complex
+
+type Enum (enum, b, c)
+
+type Type (type, b, c)
+
+type TypeEnum (type, b, c)
+
+type Interface (interface, b, c)
+
+type TypeFoo (
+  bool: bool,
+  int: int,
+  float: float,
+  string: string,
+  enum: ?[]?(foo, bar, baz),
+  type: ?TypeEnum,
+  anon: (foo: bool, bar: int, baz: [](a: int, b: int))
+)
+
+method Foo(enum: (b: bool, c: int), foo: TypeFoo, interface: Interface) -> (
+  a: [](b: bool, c: int),
+  foo: TypeFoo,
+  interface: Interface
+)
+
+method Bar() -> ()
+
+error ErrorFoo (
+  enum: (b: bool, c: int, interface: Interface),
+  foo: TypeFoo,
+  bar: (type, enum, int, bool, string, if, let),
+  interface: Interface
+)
+
+error ErrorBar ()

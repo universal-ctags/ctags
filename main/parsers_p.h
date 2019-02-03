@@ -33,6 +33,12 @@
 #define YAML_PARSER_LIST
 #endif
 
+#ifdef HAVE_PACKCC
+#define PEG_PARSER_LIST						\
+	VarlinkParser
+#else
+#define PEG_PARSER_LIST
+#endif
 
 /* Add the name of any new parser definition function here */
 #define PARSER_LIST \

@@ -1,0 +1,81 @@
+/*
+ *   Copyright (c) 2019 Masatake YAMATO
+ *   Copyright (c) 2019 Red Hat, Inc.
+ *
+ *   This source code is released for free distribution under the terms of the
+ *   GNU General Public License version 2 or (at your option) any later version.
+ *
+ *   This module contains macros, data decls and prototypes to generate tags for Varlink.
+ */
+
+/*
+*   INCLUDE FILES
+*/
+#include "general.h"  /* must always come first */
+
+#include "entry.h"
+#include "numarray.h"
+#include "kind.h"
+#include "read.h"
+
+
+/*
+*   MACROS
+*/
+#define PCC_GETCHAR(auxil) getcFromInputFile()
+#define PCC_MALLCO(auxil,size) eMalloc(size)
+#define PCC_REALLOC(auxil,ptr,size) eRealloc(ptr,size)
+#define PCC_FREE(auxil,ptr) eFreeNoNullCheck(ptr)
+#define PCC_ERROR(auxil) reportError(auxil)
+
+/*
+*   DATA DECLARATIONS
+*/
+typedef enum {
+	K_INTERFACE,
+	K_METHOD,
+	K_IPARAM,
+	K_OPARAM,
+	K_STRUCT,
+	K_FIELD,
+	K_ENUM,
+	K_ENUMERATION,
+	K_ERROR,
+	K_EDESC,
+} varlinkKind;
+
+static kindDefinition VarlinkKinds [] = {
+	{ true,  'i', "interface",   "interfaces" },
+	{ true,  'm', "method",      "methods" },
+	{ true,  'I', "iparam",      "input parameters" },
+	{ true,  'O', "oparam",      "output parameters" },
+	{ true,  's', "struct",      "structs" },
+	{ true,  'f', "field",       "fields" },
+	{ true,  'g', "enum",        "enumeration names" },
+	{ true,  'e', "enumerator",  "enumerators (values inside an enumeration)" },
+	{ true,  'E', "error",       "errors" },
+	{ true,  'd', "edesc",       "error descriptors" },
+};
+
+typedef enum  {
+	METHOD_PARAM_INPUT,
+	METHOD_PARAM_OUTPUT,
+} methodParamState;
+
+struct parserCtx {
+	int scope_cork_index;
+	intArray *kind_stack;
+	methodParamState mparam_state;
+	bool found_syntax_error;
+};
+
+/*
+*   FUNCTION PROTOTYPES
+*/
+static void pushKind (struct parserCtx *auxil, int kind);
+static void popKind (struct parserCtx *auxil, bool popScopeToo);
+static void pushKindContextual (struct parserCtx *auxil);
+static int peekKind (struct parserCtx *auxil);
+static void setMethodParamState (struct parserCtx *auxil, methodParamState s);
+static void reportError (struct parserCtx *auxil);
+static int makeVarlikTag (struct parserCtx *auxil, const char *name, long offset);
