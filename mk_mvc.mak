@@ -10,8 +10,8 @@
 include source.mak
 
 OBJEXT = obj
-REGEX_DEFINES = -DHAVE_REGCOMP -D__USE_GNU -Dbool=int -Dfalse=0 -Dtrue=1 -Dstrcasecmp=stricmp -DHAVE_REPOINFO_H
-DEFINES = -DWIN32 $(REGEX_DEFINES)
+DEFINES = -DWIN32 -DHAVE_REGCOMP -D__USE_GNU -Dstrcasecmp=stricmp -DHAVE_REPOINFO_H
+REGEX_DEFINES = -Dbool=int -Dfalse=0 -Dtrue=1 $(DEFINES)
 INCLUDES = -I. -Imain -Ignu_regex -Ifnmatch -Iparsers
 OPT = /O2 /WX
 REGEX_OBJS = $(REGEX_SRCS:.c=.obj)
@@ -66,7 +66,7 @@ readtags.exe: $(READTAGS_OBJS) $(READTAGS_HEADS)
 	$(CC) $(OPT) /Fe$@ $(READTAGS_OBJS) /link setargv.obj $(PDBFLAG)
 
 $(REGEX_OBJS): $(REGEX_SRCS)
-	$(CC) /c $(OPT) /Fo$@ $(INCLUDES) $(DEFINES) $(REGEX_SRCS)
+	$(CC) /c $(OPT) /Fo$@ $(INCLUDES) $(REGEX_DEFINES) $(REGEX_SRCS)
 
 $(FNMATCH_OBJS): $(FNMATCH_SRCS)
 	$(CC) /c $(OPT) /Fo$@ $(INCLUDES) $(DEFINES) $(FNMATCH_SRCS)

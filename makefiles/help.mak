@@ -24,6 +24,7 @@ help:
 	@echo "CATEGORIES=<category>             - Only run tests available under folder Units/<category>.r"
 	@echo "UNITS=<case>[,<case>]             - Only run tests named Units/[category.r/]/<case>.d in units target"
 	@echo "                                                         Tmain/<case>.d in tmain target"
+	@echo "PMAP=<newlang>/<oldlang>[,...]    - Make <newlang> parser pretend <oldlang> (units target only)"
 	@echo ""
 	@echo "Input validation target:"
 	@echo ""

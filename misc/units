@@ -35,6 +35,7 @@ COLORIZED_OUTPUT=yes
 CATEGORIES=
 UNITS=
 LANGUAGES=
+PRETENSE_OPTS=
 RUN_SHRINK=
 QUIET=
 SHOW_DIFF_OUTPUT=
@@ -559,7 +560,7 @@ run_tcase ()
     #
     # Build _CMDLINE
     #
-    _CMDLINE="${CTAGS} --verbose --options=NONE --optlib-dir=+$t/optlib -o -"
+    _CMDLINE="${CTAGS} --verbose --options=NONE $PRETENSE_OPTS --optlib-dir=+$t/optlib -o -"
     [ -f "${fargs}" ] && _CMDLINE="${_CMDLINE} --options=${fargs}"
 
     if [ -f "${fargs}" ] && ! ${_CMDLINE} --_force-quit=0 > /dev/null 2>&1; then
@@ -900,6 +901,30 @@ run_summary ()
     fi
 }
 
+make_pretense_map ()
+{
+    local ifs=$IFS
+    local p
+    local r
+
+    IFS=,
+    for p in $1; do
+	newlang=${p%/*}
+	oldlang=${p#*/}
+
+	if [ -z "$newlang" ]; then
+	    ERROR 1 "newlang part of --pretend option arg is empty"
+	fi
+	if [ -z "$oldlang" ]; then
+	    ERROR 1 "oldlang part of --pretend option arg is empty"
+	fi
+
+	r="$r --_pretend-$newlang=$oldlang"
+    done
+    IFS=$ifs
+    echo $r
+}
+
 action_run ()
 {
     local action="$1"
@@ -983,6 +1008,15 @@ action_run ()
 		;;
 	    --show-diff-output)
 		SHOW_DIFF_OUTPUT=yes
+		shift
+		;;
+	    --with-pretense-map)
+		shift
+		PRETENSE_OPTS=$(make_pretense_map "$1")
+		shift
+		;;
+	    --with-pretense-map=*)
+		PRETENSE_OPTS=$(make_pretense_map "${1#--with-pretense-map=}")
 		shift
 		;;
 	    -*)
@@ -1088,6 +1122,8 @@ $0 run [OPTIONS] UNITS-DIR
 			       If this option given, DURATION is changed to
 			       DURATION := DURATION * ${_VG_TIMEOUT_FACTOR}
 		--show-diff-output: show diff output for failed test cases in the summary.
+		--with-pretense-map=NEWLANG0/OLDLANG0[,...]: make NEWLANG parser pretend
+							     OLDLANG.
 EOF
 }
 

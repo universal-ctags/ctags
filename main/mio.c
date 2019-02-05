@@ -29,7 +29,7 @@
 #include <config.h>
 #endif
 
-#ifdef USE_STDBOOL_H
+#ifdef HAVE_STDBOOL_H
 #include <stdbool.h>
 #endif
 #endif

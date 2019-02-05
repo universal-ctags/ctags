@@ -79,23 +79,30 @@ nodist_ctags_SOURCES = $(REPOINFO_HEADS)
 BUILT_SOURCES = $(REPOINFO_HEADS)
 CLEANFILES = $(REPOINFO_HEADS)
 $(REPOINFO_OBJS): $(REPOINFO_SRCS) $(REPOINFO_HEADS)
+repoinfo_verbose = $(repoinfo_verbose_@AM_V@)
+repoinfo_verbose_ = $(repoinfo_verbose_@AM_DEFAULT_V@)
+repoinfo_verbose_0 = @echo REPOINFO "  $@";
 if BUILD_IN_GIT_REPO
 GEN_REPOINFO = $(srcdir)/misc/gen-repoinfo
 $(REPOINFO_HEADS): FORCE
-	$(GEN_REPOINFO) $@
+	$(repoinfo_verbose)$(GEN_REPOINFO) $@
 FORCE:
 else
 $(REPOINFO_HEADS):
-	echo > $@
+	$(repoinfo_verbose)echo > $@
 endif
+
+SUFFIXES=
 
 if RUN_OPTLIB2C
 optlib2c_verbose = $(optlib2c_verbose_@AM_V@)
 optlib2c_verbose_ = $(optlib2c_verbose_@AM_DEFAULT_V@)
 optlib2c_verbose_0 = @echo OPTLIB2C "  $@";
 OPTLIB2C = $(srcdir)/misc/optlib2c
-%.c: %.ctags $(OPTLIB2C) Makefile
+SUFFIXES += .ctags
+.ctags.c:
 	$(optlib2c_verbose)$(OPTLIB2C) $< > $@
+$(OPTLIB2C_INPUT): $(OPTLIB2C) Makefile
 endif
 dist_ctags_SOURCES = $(ALL_HEADS) $(ALL_SRCS)
 
@@ -117,7 +124,7 @@ man_MANS = man/ctags.1 man/ctags-incompatibilities.7 man/ctags-optlib.7
 rst2man_verbose = $(rst2man_verbose_@AM_V@)
 rst2man_verbose_ = $(rst2man_verbose_@AM_DEFAULT_V@)
 rst2man_verbose_0 = @echo RST2MAN "  $@";
-SUFFIXES = .1.rst .1 .7.rst .7
+SUFFIXES += .1.rst .1 .7.rst .7
 # See man/Makefile
 RST2MAN_OPTIONS=--syntax-highlight=none
 .1.rst.1:

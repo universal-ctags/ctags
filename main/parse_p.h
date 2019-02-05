@@ -52,6 +52,8 @@ extern parserDefinitionFunc YAML_PARSER_LIST;
 extern bool doesLanguageAllowNullTag (const langType language);
 extern bool doesLanguageRequestAutomaticFQTag (const langType language);
 
+extern langType getNamedLanguageFull (const char *const name, size_t len, bool noPretending);
+
 extern kindDefinition* getLanguageKind(const langType language, int kindIndex);
 extern kindDefinition* getLanguageKindForName (const langType language, const char *kindName);
 extern roleDefinition* getLanguageRole(const langType language, int kindIndex, int roleIndex);

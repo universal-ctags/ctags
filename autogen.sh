@@ -16,7 +16,7 @@ if [ -z "${MAKE}" ]; then
 	fi
 fi
 
-ctags_files=`${MAKE} -s -f makefiles/list-translator-input.mak`
+ctags_files=`${MAKE} -s -f makefiles/list-optlib2c-input.mak`
 misc/dist-test-cases && \
     if autoreconf -vfi; then
 	if type perl > /dev/null; then

@@ -130,6 +130,12 @@ extern void vStringNCatS (
 	stringCat (string, s, len);
 }
 
+extern void vStringNCatSUnsafe (
+		vString *const string, const char *const s, const size_t length)
+{
+	stringCat (string, s, length);
+}
+
 extern void vStringCat (vString *const string, const vString *const s)
 {
 	size_t len = vStringLength (s);
