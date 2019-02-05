@@ -532,10 +532,12 @@ CXXToken * cxxTokenChainSkipToEndOfTemplateAngleBracket(CXXToken * t)
 {
 	if(!t)
 		return NULL;
+
 	CXX_DEBUG_ASSERT(
-			t->eType == CXXTokenTypeSmallerThanSign,
+			cxxTokenTypeIs(t,CXXTokenTypeSmallerThanSign),
 			"This function must be called when pointing to a <"
 		);
+
 	int iLevel = 1;
 	t = t->pNext;
 	while(t)

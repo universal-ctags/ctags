@@ -1,6 +1,8 @@
 #include <string>
 #include <memory>
 
+class Type {};
+
 class X
 {
 public:
@@ -26,7 +28,8 @@ public:
 	
 	X & operator *= (int x);
 	X & operator *= (const X & x);
-	
+	X operator && (const X &a);
+
 	inline void operator /= (int)
 	{
 	}
@@ -40,6 +43,7 @@ public:
 	{
 		return *this;
 	}
+
 
 	X & operator--()
 	{
@@ -59,7 +63,7 @@ public:
 	// This should appear as member of the global namespace
 	inline friend X operator*(const X &a, const X &b)
 	{
-		return *this;
+		return X();
 	}
 	
 	// This should NOT appear at all
@@ -69,6 +73,8 @@ public:
 	void operator delete(void *);
 	void * operator new[](size_t);
 	void operator delete[](void *);
+
+	operator Type() const;
 };
 
 X & X::operator *= (int x)
@@ -81,7 +87,7 @@ X & X::operator *= (const X & x)
 	return *this;
 }
 
-X X::operator && (const X &a,const X & b)
+X X::operator && (const X &a)
 {
 	return *this;
 }
@@ -110,3 +116,20 @@ int main(int argc,char ** argv)
 	return x[0];
 }
 
+X::operator Type() const
+{
+	return Type();
+}
+
+#ifdef DONT_CARE_ABOUT_COMPILATION
+// This doesn't compile because it lacks the necessary definitions. But it's still extracted.
+
+template<typename T> inline cv::Affine3<T>::operator Eigen::Transform<T, 3, Eigen::Affine, (Eigen::RowMajor)>() const
+{
+	Eigen::Transform<T, 3, Eigen::Affine, (Eigen::RowMajor)> r;
+	cv::Mat hdr(4, 4, cv::traits::Type<T>::value, r.matrix().data());
+	cv::Mat(matrix, false).copyTo(hdr);
+	return r;
+}
+
+#endif
