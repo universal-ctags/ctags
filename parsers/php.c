@@ -233,7 +233,8 @@ typedef enum eTokenType {
 	TOKEN_CLOSE_SQUARE,
 	TOKEN_VARIABLE,
 	TOKEN_AMPERSAND,
-	TOKEN_BACKSLASH
+	TOKEN_BACKSLASH,
+	TOKEN_QMARK,
 } tokenType;
 
 typedef struct {
@@ -1038,7 +1039,7 @@ getNextChar:
 			else
 			{
 				ungetcToInputFile (d);
-				token->type = TOKEN_UNDEFINED;
+				token->type = TOKEN_QMARK;
 			}
 			break;
 		}
@@ -1370,6 +1371,12 @@ static bool parseFunction (tokenInfo *const token, const tokenInfo *name)
 			rtype = vStringNew ();
 
 		readToken (token);
+		if (token->type == TOKEN_QMARK)
+		{
+			if (rtype)
+				vStringPut (rtype, '?');
+			readToken (token);
+		}
 		readQualifiedName (token, rtype, NULL);
 
 		if (rtype && vStringIsEmpty (rtype))
