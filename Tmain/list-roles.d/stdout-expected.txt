@@ -33,6 +33,8 @@ DTD            p/parameterEntity partOfAttDef        on      part of attribute d
 Elm            m/module          imported            on      imported module
 Go             p/package         imported            on      imported package
 Go             u/unknown         receiverType        on      receiver type
+HTML           C/stylesheet      extFile             on      referenced as external files
+HTML           J/script          extFile             on      referenced as external files
 Java           p/package         imported            on      imported package
 LdScript       i/inputSection    discarded           on      discarded when linking
 LdScript       i/inputSection    mapped              on      mapped to output section
@@ -94,6 +96,8 @@ DTD            p/parameterEntity partOfAttDef        on      part of attribute d
 Elm            m/module          imported            on      imported module
 Go             p/package         imported            on      imported package
 Go             u/unknown         receiverType        on      receiver type
+HTML           C/stylesheet      extFile             on      referenced as external files
+HTML           J/script          extFile             on      referenced as external files
 Java           p/package         imported            on      imported package
 LdScript       i/inputSection    discarded           on      discarded when linking
 LdScript       i/inputSection    mapped              on      mapped to output section

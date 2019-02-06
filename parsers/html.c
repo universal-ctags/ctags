@@ -30,15 +30,37 @@ typedef enum {
 	K_ANCHOR,
 	K_HEADING1,
 	K_HEADING2,
-	K_HEADING3
+	K_HEADING3,
+	K_STYELSHEET,
+	K_SCRIPT,
 } htmlKind;
 
+
+typedef enum {
+	SCRIPT_KIND_EXTERNAL_FILE_ROLE,
+} ScriptRole;
+
+typedef enum {
+	STYLESHEET_KIND_EXTERNAL_FILE_ROLE,
+} StylesheetRole;
+
+static roleDefinition ScriptRoles [] = {
+	{ true, "extFile", "referenced as external files" },
+};
+
+static roleDefinition StylesheetRoles [] = {
+	{ true, "extFile", "referenced as external files" },
+};
 
 static kindDefinition HtmlKinds [] = {
 	{ true, 'a', "anchor",		"named anchors" },
 	{ true, 'h', "heading1",	"H1 headings" },
 	{ true, 'i', "heading2",	"H2 headings" },
-	{ true, 'j', "heading3",	"H3 headings" }
+	{ true, 'j', "heading3",	"H3 headings" },
+	{ true, 'C', "stylesheet",	"stylesheets",
+	  .referenceOnly = true, ATTACH_ROLES (StylesheetRoles)},
+	{ true, 'J', "script",		"scripts",
+	  .referenceOnly = true, ATTACH_ROLES (ScriptRoles)},
 };
 
 typedef enum {
@@ -58,13 +80,16 @@ typedef enum {
 	KEYWORD_command,
 	KEYWORD_embed,
 	KEYWORD_hr,
+	KEYWORD_href,
 	KEYWORD_img,
 	KEYWORD_input,
 	KEYWORD_keygen,
 	KEYWORD_link,
 	KEYWORD_meta,
 	KEYWORD_param,
+	KEYWORD_rel,
 	KEYWORD_source,
+	KEYWORD_src,
 	KEYWORD_track,
 	KEYWORD_wbr
 } keywordId;
@@ -86,13 +111,16 @@ static const keywordTable HtmlKeywordTable[] = {
 	{"command", KEYWORD_command},
 	{"embed", KEYWORD_embed},
 	{"hr", KEYWORD_hr},
+	{"href", KEYWORD_href},
 	{"img", KEYWORD_img},
 	{"input", KEYWORD_input},
 	{"keygen", KEYWORD_keygen},
 	{"link", KEYWORD_link},
 	{"meta", KEYWORD_meta},
 	{"param", KEYWORD_param},
+	{"rel", KEYWORD_rel},
 	{"source", KEYWORD_source},
+	{"src", KEYWORD_src},
 	{"track", KEYWORD_track},
 	{"wbr", KEYWORD_wbr},
 };
@@ -390,6 +418,8 @@ static void readTag (tokenInfo *token, vString *text, int depth)
 		keywordId startTag;
 		bool isHeading;
 		bool isVoid;
+		vString *stylesheet = NULL;
+		bool stylesheet_expectation = false;
 
 		startTag = lookupKeyword (vStringValue (token->string), Lang_html);
 		isHeading = (startTag == KEYWORD_h1 || startTag == KEYWORD_h2 || startTag == KEYWORD_h3);
@@ -418,9 +448,71 @@ static void readTag (tokenInfo *token, vString *text, int depth)
 					}
 				}
 			}
+			else if (startTag == KEYWORD_script && token->type == TOKEN_NAME)
+			{
+				keywordId attribute = lookupKeyword (vStringValue (token->string), Lang_html);
+
+				if (attribute == KEYWORD_src)
+				{
+					readToken (token, true);
+					if (token->type == TOKEN_EQUAL)
+					{
+						readToken (token, true);
+						if (token->type == TOKEN_STRING)
+							makeSimpleRefTag (token->string, K_SCRIPT,
+											  SCRIPT_KIND_EXTERNAL_FILE_ROLE);
+					}
+				}
+			}
+			else if (startTag == KEYWORD_link && token->type == TOKEN_NAME)
+			{
+				keywordId attribute = lookupKeyword (vStringValue (token->string), Lang_html);
+
+				if (attribute == KEYWORD_rel)
+				{
+					readToken (token, true);
+					if (token->type == TOKEN_EQUAL)
+					{
+						readToken (token, true);
+						if (token->type == TOKEN_STRING &&
+							/* strcmp is not enough:
+							 * e.g. <link href="fancy.css"
+							 *            rel="alternate stylesheet" title="Fancy"> */
+							vStringLength(token->string) >= 10 &&
+							strstr (vStringValue (token->string), "stylesheet"))
+							stylesheet_expectation = true;
+					}
+				}
+				else if (attribute == KEYWORD_href)
+				{
+					readToken (token, true);
+					if (token->type == TOKEN_EQUAL)
+					{
+						readToken (token, true);
+						if (token->type == TOKEN_STRING)
+						{
+							if (stylesheet == NULL)
+								stylesheet = vStringNewCopy (token->string);
+							else
+								vStringCopy (stylesheet, token->string);
+						}
+					}
+				}
+				if (stylesheet_expectation && stylesheet && !vStringIsEmpty (stylesheet))
+				{
+					makeSimpleRefTag (stylesheet, K_STYELSHEET,
+									  STYLESHEET_KIND_EXTERNAL_FILE_ROLE);
+					stylesheet_expectation = false;
+					if (stylesheet)
+						vStringClear (stylesheet);
+				}
+			}
 		}
 		while (token->type != TOKEN_TAG_END && token->type != TOKEN_TAG_END2 &&
 			   token->type != TOKEN_EOF);
+
+		vStringDelete (stylesheet);
+		stylesheet = NULL;
 
 		if (!isVoid && token->type == TOKEN_TAG_END && depth < MAX_DEPTH)
 		{

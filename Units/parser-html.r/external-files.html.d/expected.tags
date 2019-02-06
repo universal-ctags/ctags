@@ -1,0 +1,10 @@
+A.css	input.html	/^    <link href="A.css" rel="stylesheet" media="print">$/;"	C	roles:extFile
+B.css	input.html	/^    <link rel="stylesheet" media="print" href="B.css">$/;"	C	roles:extFile
+C.css	input.html	/^    <link media="print" href="C.css" rel="stylesheet">$/;"	C	roles:extFile
+https://cdn.jsdelivr.net/npm/vue	input.html	/^    <script src="https:\/\/cdn.jsdelivr.net\/npm\/vue"><\/script>$/;"	J	roles:extFile
+D.css	input.html	/^    <link rel="stylesheet" href="D.css" media="print">$/;"	C	roles:extFile
+E.css	input.html	/^    <link href="E.css" media="print" rel="stylesheet">$/;"	C	roles:extFile
+F.css	input.html	/^    <link media="print" rel="stylesheet" href="F.css">$/;"	C	roles:extFile
+js/three.min.js	input.html	/^    <script type="text\/javascript" src="js\/three.min.js"><\/script>$/;"	J	roles:extFile
+i	input.html	/^      var i;$/;"	v	roles:def
+j	input.html	/var j;/;"	v	roles:def
