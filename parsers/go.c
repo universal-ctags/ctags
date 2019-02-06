@@ -646,6 +646,10 @@ static int makeTagFull (tokenInfo *const token, const goKind kind,
 
 	tagEntryInfo e;
 
+	/* Don't record `_' placeholder variable  */
+	if (kind == GOTAG_VAR && name[0] == '_' && name[1] == '\0')
+		return CORK_NIL;
+
 	initRefTagEntry (&e, name, kind, role);
 
 	if (!GoKinds [kind].enabled)
