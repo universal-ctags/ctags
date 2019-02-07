@@ -795,8 +795,14 @@ bool cxxParserLookForFunctionSignature(
 
 		if(cxxTokenIsKeyword(pToken,CXXKeywordOPERATOR))
 		{
-			// Special case for operator <something> (), which has an identifier
-			// that is actually composed of multiple tokens.
+			// Special case for operator <something> (...), where <something> can be
+			// either a simple thing like &, +, =, a keyword or a full fledged type
+			// with scoping and template parts.
+
+			// void operator = ()
+			// int operator + (...)
+			// void * operator new[] ()
+			// template<typename T> cv::Affine3<T>::operator Eigen::Transform<T, 3, Eigen::Affine, (Eigen::RowMajor)>() const
 
 			CXX_DEBUG_PRINT("operator token found: looking for proper identifier");
 
@@ -805,6 +811,13 @@ bool cxxParserLookForFunctionSignature(
 
 			while(pToken)
 			{
+				CXX_DEBUG_PRINT(
+						"Candidate token '%s' of type 0x%02x (%s)",
+						vStringValue(pToken->pszWord),
+						pToken->eType,
+						cxxDebugTypeDecode(pToken->eType)
+					);
+
 				if(cxxTokenTypeIs(pToken,CXXTokenTypeParenthesisChain))
 				{
 					// check for operator ()()
@@ -825,6 +838,32 @@ bool cxxParserLookForFunctionSignature(
 						CXX_DEBUG_LEAVE_TEXT("Unexpected token after the operator keyword");
 						return false;
 					}
+				} else if(cxxTokenTypeIs(pToken,CXXTokenTypeSmallerThanSign))
+				{
+					if(pToken->pPrev == pIdentifierStart)
+					{
+						// operator <
+					} else if(cxxTokenTypeIs(pToken->pPrev,CXXTokenTypeIdentifier))
+					{
+						// assume template, which is generally uncondensed at this level
+						CXX_DEBUG_LEAVE_TEXT("Trying to handle uncondensed template");
+
+						pToken = cxxTokenChainSkipToEndOfTemplateAngleBracket(pToken);
+						if(!pToken)
+						{
+							CXX_DEBUG_LEAVE_TEXT("Failed to skip to end of template");
+							return false;
+						}
+
+						CXX_DEBUG_ASSERT(
+								cxxTokenTypeIs(pToken,CXXTokenTypeGreaterThanSign),
+								"Should have found a >"
+							);
+
+					} else {
+						CXX_DEBUG_LEAVE_TEXT("Unexpected token after the operator keyword");
+						return false;
+					}
 				} else if(!cxxTokenTypeIsOneOf(
 						pToken,
 						CXXTokenTypeAnd | CXXTokenTypeAssignment |
@@ -832,8 +871,9 @@ bool cxxParserLookForFunctionSignature(
 							CXXTokenTypeAngleBracketChain |
 							CXXTokenTypeGreaterThanSign | CXXTokenTypeOperator |
 							CXXTokenTypePointerOperator | CXXTokenTypeSingleColon |
-							CXXTokenTypeSmallerThanSign | CXXTokenTypeSquareParenthesisChain |
-							CXXTokenTypeStar | CXXTokenTypeMultipleAnds
+							CXXTokenTypeSquareParenthesisChain |
+							CXXTokenTypeAngleBracketChain | CXXTokenTypeMultipleColons |
+							CXXTokenTypeStar | CXXTokenTypeMultipleAnds | CXXTokenTypeIdentifier
 					)
 				)
 				{
