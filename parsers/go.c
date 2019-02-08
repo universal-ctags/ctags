@@ -74,6 +74,7 @@ typedef enum eTokenType {
 	TOKEN_LEFT_ARROW,
 	TOKEN_DOT,
 	TOKEN_COMMA,
+	TOKEN_EQUAL,
 	TOKEN_EOF
 } tokenType;
 
@@ -112,6 +113,7 @@ typedef enum {
 	GOTAG_METHODSPEC,
 	GOTAG_UNKNOWN,
 	GOTAG_PACKAGE_NAME,
+	GOTAG_ALIAS,
 } goKind;
 
 typedef enum {
@@ -145,6 +147,7 @@ static kindDefinition GoKinds[] = {
 	{true, 'u', "unknown", "unknown",
 	 .referenceOnly = true, ATTACH_ROLES (GoUnknownRoles)},
 	{true, 'P', "packageName", "name for specifying imported package"},
+	{true, 'a', "talias", "type aliases"},
 };
 
 static const keywordTable GoKeywordTable[] = {
@@ -481,6 +484,10 @@ getNextChar:
 
 		case ',':
 			token->type = TOKEN_COMMA;
+			break;
+
+		case '=':
+			token->type = TOKEN_EQUAL;
 			break;
 
 		default:
@@ -1083,7 +1090,7 @@ static void parseConstTypeVar (tokenInfo *const token, goKind kind, const int sc
 	// IdentifierList = identifier { "," identifier } .
 	// ExpressionList = Expression { "," Expression } .
 	// TypeDecl     = "type" ( TypeSpec | "(" { TypeSpec ";" } ")" ) .
-	// TypeSpec     = identifier Type .
+	// TypeSpec     = identifier [ "=" ] Type .
 	// VarDecl     = "var" ( VarSpec | "(" { VarSpec ";" } ")" ) .
 	// VarSpec     = IdentifierList ( Type [ "=" ExpressionList ] | "=" ExpressionList ) .
 	bool usesParens = false;
@@ -1112,6 +1119,12 @@ static void parseConstTypeVar (tokenInfo *const token, goKind kind, const int sc
 					typeToken = newToken ();
 					copyToken (typeToken, token);
 					readToken (token);
+					if (isType (token, TOKEN_EQUAL))
+					{
+						kind = GOTAG_ALIAS;
+						readToken (token);
+					}
+
 					if (isKeyword (token, KEYWORD_struct))
 						member_scope = makeTag (typeToken, GOTAG_STRUCT,
 												scope, NULL, NULL);
