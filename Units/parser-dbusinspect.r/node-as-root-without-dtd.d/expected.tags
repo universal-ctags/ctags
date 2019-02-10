@@ -1,0 +1,3 @@
+/	input.xml	/^<node name="\/">$/;"	n
+org.freedesktop.NetworkManager.Device.Ppp	input.xml	/^  <interface name="org.freedesktop.NetworkManager.Device.Ppp">$/;"	i	node:/
+PropertiesChanged	input.xml	/^    <signal name="PropertiesChanged">$/;"	s	interface:/.org.freedesktop.NetworkManager.Device.Ppp

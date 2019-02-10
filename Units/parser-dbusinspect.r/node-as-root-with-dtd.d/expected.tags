@@ -1,0 +1,5 @@
+org.gnome.Terminal.Factory0	input.xml	/^  <interface name="org.gnome.Terminal.Factory0">$/;"	i
+CreateInstance	input.xml	/^    <method name="CreateInstance">$/;"	m	interface:org.gnome.Terminal.Factory0
+org.gnome.Terminal.Terminal0	input.xml	/^  <interface name="org.gnome.Terminal.Terminal0">$/;"	i
+Exec	input.xml	/^    <method name="Exec">$/;"	m	interface:org.gnome.Terminal.Terminal0
+ChildExited	input.xml	/^    <signal name="ChildExited">$/;"	s	interface:org.gnome.Terminal.Terminal0
