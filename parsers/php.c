@@ -6,12 +6,17 @@
 *
 *   This module contains code for generating tags for the PHP scripting
 *   language.
+*
+*   The language reference: http://php.net/manual/en/langref.php
 */
 
 /*
 *   INCLUDE FILES
 */
 #include "general.h"  /* must always come first */
+
+#include <string.h>
+
 #include "parse.h"
 #include "read.h"
 #include "vstring.h"
@@ -228,7 +233,8 @@ typedef enum eTokenType {
 	TOKEN_CLOSE_SQUARE,
 	TOKEN_VARIABLE,
 	TOKEN_AMPERSAND,
-	TOKEN_BACKSLASH
+	TOKEN_BACKSLASH,
+	TOKEN_QMARK,
 } tokenType;
 
 typedef struct {
@@ -261,6 +267,9 @@ static vString *CurrentNamesapce;
 /* Cache variable to build the tag's scope.  It has no real meaning outside
  * of initPhpEntry()'s scope. */
 static vString *FullScope;
+/* The class name specified at "extends" keyword in the current class
+ * definition. Used to resolve "parent" in return type. */
+static vString *ParentClass;
 
 static objPool *TokenPool = NULL;
 
@@ -394,6 +403,7 @@ static void makeClassOrIfaceTag (const phpKind kind, const tokenInfo *const toke
 
 static void makeFunctionTag (const tokenInfo *const token,
 							 const vString *const arglist,
+							 const vString *const rtype,
 							 const accessType access, const implType impl)
 {
 	if (PhpKinds[K_FUNCTION].enabled)
@@ -406,6 +416,31 @@ static void makeFunctionTag (const tokenInfo *const token,
 			e.extensionFields.implementation = implToString (impl);
 		if (arglist)
 			e.extensionFields.signature = vStringValue (arglist);
+		if (rtype)
+		{
+			if ((vStringLength (rtype) == 4)
+				&& (strcmp (vStringValue (rtype), "self") == 0)
+				&& vStringLength (token->scope) > 0)
+			{
+				if (token->parentKind == -1)
+					e.extensionFields.typeRef [0] = "unknown";
+				else
+					e.extensionFields.typeRef [0] = PhpKinds [token->parentKind].name;
+				e.extensionFields.typeRef [1] = vStringValue (token->scope);
+			}
+			else if ((vStringLength (rtype) == 6)
+				&& (strcmp (vStringValue (rtype), "parent") == 0)
+				&& (ParentClass && vStringLength (ParentClass) > 0))
+			{
+				e.extensionFields.typeRef [0] = "class";
+				e.extensionFields.typeRef [1] = vStringValue (ParentClass);
+			}
+			else
+			{
+				e.extensionFields.typeRef [0] = "unknown";
+				e.extensionFields.typeRef [1] = vStringValue (rtype);
+			}
+		}
 
 		makePhpTagEntry (&e);
 	}
@@ -1004,7 +1039,7 @@ getNextChar:
 			else
 			{
 				ungetcToInputFile (d);
-				token->type = TOKEN_UNDEFINED;
+				token->type = TOKEN_QMARK;
 			}
 			break;
 		}
@@ -1041,6 +1076,24 @@ getNextChar:
 	}
 
 	MayBeKeyword = nextMayBeKeyword;
+}
+
+static void readQualifiedName (tokenInfo *const token, vString *name,
+                               tokenInfo *const lastToken)
+{
+	while (token->type == TOKEN_IDENTIFIER || token->type == TOKEN_BACKSLASH)
+	{
+		if (name)
+		{
+			if (token->type == TOKEN_BACKSLASH)
+				vStringPut (name, '\\');
+			else
+				vStringCat (name, token->string);
+		}
+		if (lastToken)
+			copyToken (lastToken, token, true);
+		readToken (token);
+	}
 }
 
 static void enterScope (tokenInfo *const parentToken,
@@ -1087,6 +1140,7 @@ static bool parseClassOrIface (tokenInfo *const token, const phpKind kind,
 	implType impl = CurrentStatement.impl;
 	tokenInfo *nameFree = NULL;
 	vString *inheritance = NULL;
+	vString *parent = NULL;
 
 	readToken (token);
 	if (name) /* anonymous class */
@@ -1109,29 +1163,56 @@ static bool parseClassOrIface (tokenInfo *const token, const phpKind kind,
 	/* read every identifiers, keywords and commas, and assume each
 	 *  identifier (not keyword) is an inheritance
 	 * (like in "class Foo extends Bar implements iA, iB") */
+	enum { inheritance_initial,
+		   inheritance_extends,
+		   inheritance_implements
+	} istat = inheritance_initial;
 	while (token->type == TOKEN_IDENTIFIER ||
+	       token->type == TOKEN_BACKSLASH ||
 	       token->type == TOKEN_KEYWORD ||
 	       token->type == TOKEN_COMMA)
 	{
-		if (token->type == TOKEN_IDENTIFIER)
+		if (token->type == TOKEN_IDENTIFIER || token->type == TOKEN_BACKSLASH)
 		{
+			vString *qualifiedName = vStringNew ();
+
+			readQualifiedName (token, qualifiedName, NULL);
 			if (vStringLength (inheritance) > 0)
 				vStringPut (inheritance, ',');
-			vStringCat (inheritance, token->string);
+			vStringCat (inheritance, qualifiedName);
+			if (istat == inheritance_extends && !parent)
+				parent = qualifiedName;
+			else
+				vStringDelete (qualifiedName);
 		}
-
-		readToken (token);
+		else
+		{
+			if (token->type == TOKEN_KEYWORD)
+			{
+				if (token->keyword == KEYWORD_extends)
+					istat = inheritance_extends;
+				else if (token->keyword == KEYWORD_implements)
+					istat = inheritance_implements;
+			}
+			readToken (token);
+		}
 	}
 
 	makeClassOrIfaceTag (kind, name, inheritance, impl);
 
 	if (token->type == TOKEN_OPEN_CURLY)
+	{
+		vString *backup = ParentClass;
+		ParentClass = parent;
 		enterScope (token, name->string, kind);
+		ParentClass = backup;
+	}
 	else
 		readNext = false;
 
 	if (nameFree)
 		deleteToken (nameFree);
+	vStringDelete (parent);
 	vStringDelete (inheritance);
 
 	return readNext;
@@ -1182,6 +1263,8 @@ static bool parseFunction (tokenInfo *const token, const tokenInfo *name)
 	accessType access = CurrentStatement.access;
 	implType impl = CurrentStatement.impl;
 	tokenInfo *nameFree = NULL;
+	vString *rtype = NULL;
+	vString *arglist = NULL;
 
 	readToken (token);
 	/* skip a possible leading ampersand (return by reference) */
@@ -1200,9 +1283,9 @@ static bool parseFunction (tokenInfo *const token, const tokenInfo *name)
 
 	if (token->type == TOKEN_OPEN_PAREN)
 	{
-		vString *arglist = vStringNew ();
 		int depth = 1;
 
+		arglist = vStringNew ();
 		vStringPut (arglist, '(');
 		do
 		{
@@ -1269,9 +1352,6 @@ static bool parseFunction (tokenInfo *const token, const tokenInfo *name)
 		}
 		while (token->type != TOKEN_EOF && depth > 0);
 
-		makeFunctionTag (name, arglist, access, impl);
-		vStringDelete (arglist);
-
 		readToken (token); /* normally it's an open brace or "use" keyword */
 	}
 
@@ -1282,22 +1362,40 @@ static bool parseFunction (tokenInfo *const token, const tokenInfo *name)
 		skipOverParens (token);
 	}
 
-	/* PHP7 return type declaration or if parsing Zephir, skip function return
-	 * type hint */
+	/* PHP7 return type declaration or if parsing Zephir, gather function return
+	 * type hint to fill typeRef. */
 	if ((getInputLanguage () == Lang_php && token->type == TOKEN_COLON) ||
 	    (getInputLanguage () == Lang_zephir && token->type == TOKEN_OPERATOR))
 	{
-		do
+		if (arglist)
+			rtype = vStringNew ();
+
+		readToken (token);
+		if (token->type == TOKEN_QMARK)
+		{
+			if (rtype)
+				vStringPut (rtype, '?');
 			readToken (token);
-		while (token->type == TOKEN_IDENTIFIER ||
-		       token->type == TOKEN_BACKSLASH);
+		}
+		readQualifiedName (token, rtype, NULL);
+
+		if (rtype && vStringIsEmpty (rtype))
+		{
+			vStringDelete (rtype);
+			rtype = NULL;
+		}
 	}
+
+	if (arglist)
+		makeFunctionTag (name, arglist, rtype, access, impl);
 
 	if (token->type == TOKEN_OPEN_CURLY)
 		enterScope (token, name->string, K_FUNCTION);
 	else
 		readNext = false;
 
+	vStringDelete (rtype);
+	vStringDelete (arglist);
 	if (nameFree)
 		deleteToken (nameFree);
 
@@ -1363,20 +1461,6 @@ static bool parseDefine (tokenInfo *const token)
 	}
 
 	return false;
-}
-
-static void readQualifiedName (tokenInfo *const token, vString *name,
-                               tokenInfo *const lastToken)
-{
-	while (token->type == TOKEN_IDENTIFIER || token->type == TOKEN_BACKSLASH)
-	{
-		if (token->type == TOKEN_BACKSLASH)
-			vStringPut (name, '\\');
-		else
-			vStringCat (name, token->string);
-		copyToken (lastToken, token, true);
-		readToken (token);
-	}
 }
 
 /* parses declarations of the form
@@ -1667,6 +1751,7 @@ static void findTags (bool startsInPhpMode)
 	CurrentStatement.impl = IMPL_UNDEFINED;
 	CurrentNamesapce = vStringNew ();
 	FullScope = vStringNew ();
+	Assert (ParentClass == NULL);
 
 	do
 	{
