@@ -1251,12 +1251,14 @@ static bool parseTrait (tokenInfo *const token)
  * 	function myfunc($foo, $bar) {}
  * 	function &myfunc($foo, $bar) {}
  * 	function myfunc($foo, $bar) : type {}
+ * 	function myfunc($foo, $bar) : ?type {}
  *
  * if @name is not NULL, parses an anonymous function with name @name
  * 	$foo = function($foo, $bar) {}
  * 	$foo = function&($foo, $bar) {}
  * 	$foo = function($foo, $bar) use ($x, &$y) {}
- * 	$foo = function($foo, $bar) use ($x, &$y) : type {} */
+ * 	$foo = function($foo, $bar) use ($x, &$y) : type {}
+ * 	$foo = function($foo, $bar) use ($x, &$y) : ?type {} */
 static bool parseFunction (tokenInfo *const token, const tokenInfo *name)
 {
 	bool readNext = true;
