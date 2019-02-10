@@ -32,6 +32,10 @@
 */
 
 typedef struct sTagXpathMakeTagSpec {
+	/* Kind used in making a tag.
+	   If kind is KIND_GHOST_INDEX, a function
+	   specified with decideKind is called to decide
+	   the kind for the tag. */
 	int   kind;
 	int   role;
 	/* If make is NULL, just makeTagEntry is used instead. */
@@ -39,6 +43,10 @@ typedef struct sTagXpathMakeTagSpec {
 		      const struct sTagXpathMakeTagSpec *spec,
 		      tagEntryInfo *tag,
 		      void *userData);
+	int (*decideKind) (xmlNode *node,
+		      const struct sTagXpathMakeTagSpec *spec,
+		      void *userData);
+	/* TODO: decideRole */
 } tagXpathMakeTagSpec;
 
 typedef struct sTagXpathRecurSpec {

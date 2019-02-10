@@ -30,16 +30,23 @@ static void simpleXpathMakeTag (xmlNode *node,
 	tagEntryInfo tag;
 	xmlChar* str;
 	char *path;
+	int kind;
 
 	str = xmlNodeGetContent(node);
 	if (str == NULL)
 		return;
 
+	if (spec->kind == KIND_GHOST_INDEX && spec->decideKind)
+		kind = spec->decideKind (node, spec, userData);
+	else
+		kind = spec->kind;
+	Assert (kind != KIND_GHOST_INDEX);
+
 	if (spec->role == ROLE_INDEX_DEFINITION)
-		initTagEntry (&tag, (char *)str, spec->kind);
+		initTagEntry (&tag, (char *)str, kind);
 	else if (isXtagEnabled(XTAG_REFERENCE_TAGS))
 		initRefTagEntry (&tag, (char *)str,
-				 spec->kind,
+				 kind,
 				 spec->role);
 	else
 		goto out;
