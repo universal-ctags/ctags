@@ -734,8 +734,8 @@ extern parserDefinition* LdScriptParser (void)
 {
 	parserDefinition* def = parserNew ("LdScript");
 
-	/* File name patters are picked from Linux kernel. */
-	static const char *const extensions [] = { "lds", "scr", "ld", NULL };
+	/* File name patters are picked from Linux kernel and ecos. */
+	static const char *const extensions [] = { "lds", "scr", "ld", "ldi", NULL };
 
 	/* lds.S must be here because Asm parser registers .S as an extension. */
 	static const char *const patterns [] = { "*.lds.S", "ld.*", NULL };
