@@ -341,6 +341,9 @@ matchXpathFileSpec (xmlDocPtr doc, xpathFileSpec *spec)
 					&& doc->children->name
 					&& (strcmp (spec->rootElementName, (char *)doc->children->name) == 0)))
 			return false;
+		else
+			verbose ("		Xml[rootElementName]== %s\n",
+					 spec->rootElementName);
 	}
 
 	if (spec->nameInDTD)
@@ -354,6 +357,9 @@ matchXpathFileSpec (xmlDocPtr doc, xpathFileSpec *spec)
 					&& doc->intSubset->name
 					&& (strcmp (spec->nameInDTD, (char *)doc->intSubset->name) == 0)))
 			return false;
+		else
+			verbose ("		Xml[nameInDTD]== %s\n",
+					 spec->nameInDTD);
 	}
 
 	if (spec->externalID)
@@ -367,6 +373,10 @@ matchXpathFileSpec (xmlDocPtr doc, xpathFileSpec *spec)
 					&& doc->intSubset->ExternalID
 					&& (strcmp (spec->externalID, (char *)doc->intSubset->ExternalID) == 0)))
 			return false;
+		else
+			verbose ("		Xml[externalID]== %s\n",
+					 spec->externalID);
+
 	}
 
 	if (spec->systemID)
@@ -380,6 +390,9 @@ matchXpathFileSpec (xmlDocPtr doc, xpathFileSpec *spec)
 					&& doc->intSubset->SystemID
 					&& (strcmp (spec->systemID, (char *)doc->intSubset->SystemID) == 0)))
 			return false;
+		else
+			verbose ("		Xml[systemID]== %s\n",
+					 spec->systemID);
 	}
 
 	if (spec->rootNSPrefix)
@@ -394,6 +407,9 @@ matchXpathFileSpec (xmlDocPtr doc, xpathFileSpec *spec)
 					&& doc->children->ns->prefix
 					&& (strcmp (spec->rootNSPrefix, (char *)doc->children->ns->prefix))))
 			return false;
+		else
+			verbose ("		Xml[rootNSPrefix]== %s\n",
+					 spec->rootNSPrefix);
 	}
 
 	if (spec->rootNSHref)
@@ -408,6 +424,9 @@ matchXpathFileSpec (xmlDocPtr doc, xpathFileSpec *spec)
 					&& doc->children->ns->href
 					&& (strcmp (spec->rootNSHref, (char *)doc->children->ns->href) == 0)))
 			return false;
+		else
+			verbose ("		Xml[rootNSHref]== %s\n",
+					 spec->rootNSHref);
 	}
 	return true;
 }
