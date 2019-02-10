@@ -348,7 +348,7 @@ matchXpathFileSpec (xmlDocPtr doc, xpathFileSpec *spec)
 
 	if (spec->nameInDTD)
 	{
-		if (*spec->rootElementName == '\0')
+		if (*spec->nameInDTD == '\0')
 		{
 			if (doc->intSubset && doc->intSubset->name)
 				return false;
