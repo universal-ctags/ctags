@@ -75,6 +75,7 @@ typedef enum eTokenType {
 	TOKEN_DOT,
 	TOKEN_COMMA,
 	TOKEN_EQUAL,
+	TOKEN_3DOTS,
 	TOKEN_EOF
 } tokenType;
 
@@ -286,7 +287,12 @@ static bool collectorIsEmpty(collector *collector)
 
 static void collectorPut (collector *collector, char c)
 {
-	if (vStringLength(collector->str) > 0)
+	if ((vStringLength(collector->str) > 2)
+		&& strcmp (vStringValue (collector->str) + (vStringLength(collector->str) - 3),
+				  "...") == 0
+		&& c == ' ')
+		return;
+	else if (vStringLength(collector->str) > 0)
 	{
 		if (vStringLast(collector->str) == '(' && c == ' ')
 			return;
@@ -325,6 +331,13 @@ static void collectorAppendToken (collector *collector, const tokenInfo *const t
 	}
 	else if (token->type == TOKEN_IDENTIFIER || token->type == TOKEN_KEYWORD)
 		collectorCat (collector, token->string);
+	else if (token->type == TOKEN_3DOTS)
+	{
+		if ((vStringLength (collector->str) > 0)
+			&& vStringLast(collector->str) != ' ')
+			collectorPut (collector, ' ');
+		collectorCatS (collector, "...");
+	}
 	else if (token->c != EOF)
 		collectorPut (collector, token->c);
 }
@@ -479,6 +492,26 @@ getNextChar:
 			break;
 
 		case '.':
+			{
+				int d, e;
+				d = getcFromInputFile ();
+				if (d == '.')
+				{
+					e = getcFromInputFile ();
+					if (e == '.')
+					{
+						token->type = TOKEN_3DOTS;
+						break;
+					}
+					else
+					{
+						ungetcToInputFile (e);
+						ungetcToInputFile (d);
+					}
+				}
+				else
+					ungetcToInputFile (d);
+			}
 			token->type = TOKEN_DOT;
 			break;
 
