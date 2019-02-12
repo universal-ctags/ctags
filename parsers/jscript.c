@@ -2309,17 +2309,16 @@ nextVar:
 						{
 							makeJsTag (name, is_const ? JSTAG_CONSTANT : JSTAG_VARIABLE, NULL, NULL);
 						}
+						else if ( is_class )
+						{
+							makeClassTag (name, NULL, NULL);
+						}
 						else
 						{
-							if ( is_class )
-							{
-								makeClassTag (name, NULL, NULL);
-							} else {
-								/* FIXME: we cannot really get a meaningful
-								 * signature from a `new Function()` call,
-								 * so for now just don't set any */
-								makeFunctionTag (name, NULL, false);
-							}
+							/* FIXME: we cannot really get a meaningful
+							 * signature from a `new Function()` call,
+							 * so for now just don't set any */
+							makeFunctionTag (name, NULL, false);
 						}
 					}
 				}
