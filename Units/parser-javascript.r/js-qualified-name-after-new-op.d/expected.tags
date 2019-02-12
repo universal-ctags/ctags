@@ -1,0 +1,3 @@
+Car	input.js	/^function Car(make, model, year) {$/;"	c
+container	input.js	/^var container = {}$/;"	v
+car1	input.js	/^var car1 = new container.car('Eagle', 'Talon TSi', 1993);$/;"	v
