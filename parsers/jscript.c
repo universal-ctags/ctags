@@ -1672,7 +1672,8 @@ static bool parseMethods (tokenInfo *const token, const tokenInfo *const class,
 				injectDynamicName (name, dprop);
 				dprop = NULL;
 			}
-			vStringDelete (dprop);
+			else
+				vStringDelete (dprop);
 
 			is_shorthand = isType (token, TOKEN_OPEN_PAREN);
 			if ( isType (token, TOKEN_COLON) || is_shorthand )
