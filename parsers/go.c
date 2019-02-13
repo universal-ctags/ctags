@@ -1134,7 +1134,7 @@ static void parseConstTypeVar (tokenInfo *const token, goKind kind, const int sc
 				else
 				{
 					int c = makeTag (token, kind, scope, NULL, NULL);
-					if (corks)
+					if (c != CORK_NIL && corks)
 						intArrayAdd (corks, c);
 				}
 				readToken (token);
