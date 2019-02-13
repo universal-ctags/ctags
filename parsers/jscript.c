@@ -1667,6 +1667,13 @@ static bool parseMethods (tokenInfo *const token, const tokenInfo *const class,
 				} while (! isType (token, TOKEN_EOF) && depth > 0);
 			}
 
+			if (is_dynamic_prop)
+			{
+				injectDynamicName (name, dprop);
+				dprop = NULL;
+			}
+			vStringDelete (dprop);
+
 			is_shorthand = isType (token, TOKEN_OPEN_PAREN);
 			if ( isType (token, TOKEN_COLON) || is_shorthand )
 			{
@@ -1708,11 +1715,6 @@ static bool parseMethods (tokenInfo *const token, const tokenInfo *const class,
 						else if (is_setter)
 							kind = JSTAG_SETTER;
 
-						if (is_dynamic_prop)
-						{
-							injectDynamicName (name, dprop);
-							dprop = NULL;
-						}
 						makeJsTag (name, kind, signature, NULL);
 						parseBlock (token, name->string);
 
@@ -1731,12 +1733,6 @@ static bool parseMethods (tokenInfo *const token, const tokenInfo *const class,
 				else if (! is_es6_class)
 				{
 						bool has_child_methods = false;
-
-						if (is_dynamic_prop)
-						{
-							injectDynamicName (name, dprop);
-							dprop = NULL;
-						}
 
 						/* skip whatever is the value */
 						while (! isType (token, TOKEN_COMMA) &&
@@ -1770,7 +1766,6 @@ static bool parseMethods (tokenInfo *const token, const tokenInfo *const class,
 							makeJsTag (name, JSTAG_PROPERTY, NULL, NULL);
 				}
 			}
-			vStringDelete (dprop);
 		}
 	} while ( isType(token, TOKEN_COMMA) ||
 	          ( is_es6_class && ! isType(token, TOKEN_EOF) ) );
