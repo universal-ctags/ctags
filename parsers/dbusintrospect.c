@@ -122,7 +122,7 @@ static tagXpathTableTable dbusIntrospectXpathTableTable[] = {
 };
 
 static void dbusIntrospectFindTagsUnderMain (xmlNode *node,
-						  const char *xpath CTAGS_ATTR_UNUSED,
+						  const char *xpath,
 						  const struct sTagXpathRecurSpec *spec CTAGS_ATTR_UNUSED,
 						  xmlXPathContext *ctx,
 						  void *userData)
@@ -131,7 +131,7 @@ static void dbusIntrospectFindTagsUnderMain (xmlNode *node,
 	int scopeIndex = data->scopeIndex;
 	int tableForParsingChildren;
 
-	if (strcmp ((const char *)node->name, "interface") == 0)
+	if (!strcmp(xpath, "interface"))
 	{
 		data->kindForName = K_INTERFACE;
 		tableForParsingChildren = TABLE_INTERFACE;
