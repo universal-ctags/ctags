@@ -80,6 +80,15 @@ extern void addTagXpath (const langType language CTAGS_ATTR_UNUSED, tagXpathTabl
 		error (WARNING, "Failed to compile the Xpath expression: %s", xpathTable->xpath);
 }
 
+extern void removeTagXpath (const langType language CTAGS_ATTR_UNUSED, tagXpathTable *xpathTable)
+{
+	if (xpathTable->xpathCompiled)
+	{
+		xmlXPathFreeCompExpr (xpathTable->xpathCompiled);
+		xpathTable->xpathCompiled = NULL;
+	}
+}
+
 static void findXMLTagsCore (xmlXPathContext *ctx, xmlNode *root,
 			     const tagXpathTableTable *xpathTableTable,
 			     const kindDefinition* const kinds,void *userData)
@@ -211,6 +220,10 @@ out:
 extern void addTagXpath (const langType language, tagXpathTable *xpathTable)
 {
 	xpathTable->xpathCompiled = NULL;
+}
+
+extern void removeTagXpath (const langType language CTAGS_ATTR_UNUSED, tagXpathTable *xpathTable CTAGS_ATTR_UNUSED)
+{
 }
 
 extern void findXMLTags (xmlXPathContext *ctx, xmlNode *root,

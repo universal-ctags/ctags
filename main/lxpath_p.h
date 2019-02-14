@@ -23,5 +23,6 @@
 */
 
 extern void addTagXpath (const langType language, tagXpathTable *xpathTable);
+extern void removeTagXpath (const langType language, tagXpathTable *xpathTable);
 
 #endif  /* CTAGS_LXPATH_PARSE_PRIVATE_H */
