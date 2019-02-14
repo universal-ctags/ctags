@@ -75,15 +75,18 @@ static kindDefinition XsltKinds [] = {
 };
 
 static void makeTagRecursivelyWithVersionVerification (xmlNode *node,
+						       const char *xpath,
 						       const tagXpathRecurSpec *spec,
 						       xmlXPathContext *ctx,
 						       void *userData);
 static void makeTagRecursively (xmlNode *node,
+				const char *xpath,
 				const tagXpathRecurSpec *spec,
 				xmlXPathContext *ctx,
 				void *userData);
 
 static void makeTagWithProvidingScope (xmlNode *node,
+				       const char *xpath,
 				       const tagXpathMakeTagSpec *spec,
 				       struct sTagEntryInfo *tag,
 				       void *userData);
@@ -217,6 +220,7 @@ static tagXpathTable xsltXpathTemplateInternalTable [] = {
 };
 
 static void verifyVersion (xmlNode *node,
+			   const char *xpath CTAGS_ATTR_UNUSED,
 			   const tagXpathRecurSpec *spec CTAGS_ATTR_UNUSED,
 			   xmlXPathContext *ctx CTAGS_ATTR_UNUSED,
 			   void *userData)
@@ -262,6 +266,7 @@ static tagXpathTableTable xsltXpathTableTable[] = {
 
 
 static void makeTagRecursivelyWithVersionVerification (xmlNode *node,
+						       const char *xpath CTAGS_ATTR_UNUSED,
 						       const tagXpathRecurSpec *spec CTAGS_ATTR_UNUSED,
 						       xmlXPathContext *ctx,
 						       void *userData)
@@ -286,6 +291,7 @@ static void makeTagRecursivelyWithVersionVerification (xmlNode *node,
 }
 
 static void makeTagRecursively (xmlNode *node,
+				const char *xpath CTAGS_ATTR_UNUSED,
 				const tagXpathRecurSpec *spec,
 				xmlXPathContext *ctx,
 				void *userData)
@@ -301,6 +307,7 @@ static void makeTagRecursively (xmlNode *node,
 }
 
 static void makeTagWithProvidingScope (xmlNode *node CTAGS_ATTR_UNUSED,
+				       const char *xpath CTAGS_ATTR_UNUSED,
 				       const tagXpathMakeTagSpec *spec CTAGS_ATTR_UNUSED,
 				       struct sTagEntryInfo *tag,
 				       void *userData)

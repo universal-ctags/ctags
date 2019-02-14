@@ -30,11 +30,13 @@ static kindDefinition PlistKinds [] = {
 };
 
 static void plistFindTagsUnderKey (xmlNode *node,
+				   const char *xpath,
 				   const struct sTagXpathRecurSpec *spec,
 				   xmlXPathContext *ctx,
 				   void *userData);
 
 static void makeTagWithScope (xmlNode *node,
+			      const char *xpath,
 			      const struct sTagXpathMakeTagSpec *spec,
 			      struct sTagEntryInfo *tag,
 			      void *userData);
@@ -91,6 +93,7 @@ static xmlNode *getPrevKeyElement (xmlNode *node)
 }
 
 static void plistFindTagsUnderKey (xmlNode *node,
+				   const char *xpath CTAGS_ATTR_UNUSED,
 				   const struct sTagXpathRecurSpec *spec CTAGS_ATTR_UNUSED,
 				   xmlXPathContext *ctx,
 				   void *userData CTAGS_ATTR_UNUSED)
@@ -140,6 +143,7 @@ static void plistFindTagsUnderKey (xmlNode *node,
 }
 
 static void makeTagWithScope (xmlNode *node CTAGS_ATTR_UNUSED,
+			      const char *xpath CTAGS_ATTR_UNUSED,
 			      const struct sTagXpathMakeTagSpec *spec CTAGS_ATTR_UNUSED,
 			      struct sTagEntryInfo *tag,
 			      void *userData)

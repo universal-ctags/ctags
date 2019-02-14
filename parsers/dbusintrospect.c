@@ -41,18 +41,22 @@ static kindDefinition DbusIntrospectKinds [] = {
 };
 
 static void dbusIntrospectFindTagsUnderMain (xmlNode *node,
+						  const char *xpath,
 						  const struct sTagXpathRecurSpec *spec,
 						  xmlXPathContext *ctx,
 						  void *userData);
 static void makeTagForMainName (xmlNode *node,
+				     const char *xpath,
 				     const struct sTagXpathMakeTagSpec *spec,
 				     struct sTagEntryInfo *tag,
 				     void *userData);
 static void makeTagWithScope (xmlNode *node,
+			      const char *xpath,
 			      const struct sTagXpathMakeTagSpec *spec,
 			      struct sTagEntryInfo *tag,
 			      void *userData);
 static int decideKindForMainName (xmlNode *node,
+				  const char *xpath,
 			      const struct sTagXpathMakeTagSpec *spec,
 			      void *userData);
 
@@ -118,6 +122,7 @@ static tagXpathTableTable dbusIntrospectXpathTableTable[] = {
 };
 
 static void dbusIntrospectFindTagsUnderMain (xmlNode *node,
+						  const char *xpath CTAGS_ATTR_UNUSED,
 						  const struct sTagXpathRecurSpec *spec CTAGS_ATTR_UNUSED,
 						  xmlXPathContext *ctx,
 						  void *userData)
@@ -150,6 +155,7 @@ static void dbusIntrospectFindTagsUnderMain (xmlNode *node,
 
 
 static void makeTagWithScope (xmlNode *node CTAGS_ATTR_UNUSED,
+			      const char *xpath CTAGS_ATTR_UNUSED,
 			      const struct sTagXpathMakeTagSpec *spec CTAGS_ATTR_UNUSED,
 			      struct sTagEntryInfo *tag,
 			      void *userData)
@@ -164,6 +170,7 @@ static void makeTagWithScope (xmlNode *node CTAGS_ATTR_UNUSED,
 }
 
 static void makeTagForMainName (xmlNode *node CTAGS_ATTR_UNUSED,
+				     const char *xpath CTAGS_ATTR_UNUSED,
 				     const struct sTagXpathMakeTagSpec *spec CTAGS_ATTR_UNUSED,
 				     struct sTagEntryInfo *tag,
 				     void *userData)
@@ -178,6 +185,7 @@ static void makeTagForMainName (xmlNode *node CTAGS_ATTR_UNUSED,
 }
 
 static int decideKindForMainName (xmlNode *node CTAGS_ATTR_UNUSED,
+			      const char *xpath CTAGS_ATTR_UNUSED,
 			      const struct sTagXpathMakeTagSpec *spec CTAGS_ATTR_UNUSED,
 			      void *userData)
 {

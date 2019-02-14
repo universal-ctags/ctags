@@ -40,10 +40,12 @@ typedef struct sTagXpathMakeTagSpec {
 	int   role;
 	/* If make is NULL, just makeTagEntry is used instead. */
 	void (*make) (xmlNode *node,
+		      const char *xpath,
 		      const struct sTagXpathMakeTagSpec *spec,
 		      tagEntryInfo *tag,
 		      void *userData);
 	int (*decideKind) (xmlNode *node,
+		      const char *xpath,
 		      const struct sTagXpathMakeTagSpec *spec,
 		      void *userData);
 	/* TODO: decideRole */
@@ -51,6 +53,7 @@ typedef struct sTagXpathMakeTagSpec {
 
 typedef struct sTagXpathRecurSpec {
 	void (*enter) (xmlNode *node,
+		       const char *xpath,
 		       const struct sTagXpathRecurSpec *spec,
 		       xmlXPathContext *ctx,
 		       void *userData);

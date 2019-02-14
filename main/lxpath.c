@@ -23,6 +23,7 @@
 #include <libxml/tree.h>
 
 static void simpleXpathMakeTag (xmlNode *node,
+				const char *xpath,
 				const tagXpathMakeTagSpec *spec,
 				const kindDefinition* const kinds,
 				void *userData)
@@ -37,7 +38,7 @@ static void simpleXpathMakeTag (xmlNode *node,
 		return;
 
 	if (spec->kind == KIND_GHOST_INDEX && spec->decideKind)
-		kind = spec->decideKind (node, spec, userData);
+		kind = spec->decideKind (node, xpath, spec, userData);
 	else
 		kind = spec->kind;
 	Assert (kind != KIND_GHOST_INDEX);
@@ -59,7 +60,7 @@ static void simpleXpathMakeTag (xmlNode *node,
 	tag.extensionFields.xpath = path;
 
 	if (spec->make)
-		spec->make (node, spec, &tag, userData);
+		spec->make (node, xpath, spec, &tag, userData);
 	else
 		makeTagEntry (&tag);
 
@@ -132,9 +133,9 @@ static void findXMLTagsCore (xmlXPathContext *ctx, xmlNode *root,
 			{
 				node = xmlXPathNodeSetItem(set, j);
 				if (elt->specType == LXPATH_TABLE_DO_MAKE)
-					simpleXpathMakeTag (node, &(elt->spec.makeTagSpec), kinds, userData);
+					simpleXpathMakeTag (node, elt->xpath, &(elt->spec.makeTagSpec), kinds, userData);
 				else
-					elt->spec.recurSpec.enter (node, &(elt->spec.recurSpec), ctx, userData);
+					elt->spec.recurSpec.enter (node, elt->xpath, &(elt->spec.recurSpec), ctx, userData);
 			}
 		}
 		xmlXPathFreeObject (object);
