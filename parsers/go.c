@@ -74,6 +74,8 @@ typedef enum eTokenType {
 	TOKEN_LEFT_ARROW,
 	TOKEN_DOT,
 	TOKEN_COMMA,
+	TOKEN_EQUAL,
+	TOKEN_3DOTS,
 	TOKEN_EOF
 } tokenType;
 
@@ -112,6 +114,7 @@ typedef enum {
 	GOTAG_METHODSPEC,
 	GOTAG_UNKNOWN,
 	GOTAG_PACKAGE_NAME,
+	GOTAG_ALIAS,
 } goKind;
 
 typedef enum {
@@ -145,6 +148,7 @@ static kindDefinition GoKinds[] = {
 	{true, 'u', "unknown", "unknown",
 	 .referenceOnly = true, ATTACH_ROLES (GoUnknownRoles)},
 	{true, 'P', "packageName", "name for specifying imported package"},
+	{true, 'a', "talias", "type aliases"},
 };
 
 static const keywordTable GoKeywordTable[] = {
@@ -283,7 +287,12 @@ static bool collectorIsEmpty(collector *collector)
 
 static void collectorPut (collector *collector, char c)
 {
-	if (vStringLength(collector->str) > 0)
+	if ((vStringLength(collector->str) > 2)
+		&& strcmp (vStringValue (collector->str) + (vStringLength(collector->str) - 3),
+				  "...") == 0
+		&& c == ' ')
+		return;
+	else if (vStringLength(collector->str) > 0)
 	{
 		if (vStringLast(collector->str) == '(' && c == ' ')
 			return;
@@ -322,6 +331,13 @@ static void collectorAppendToken (collector *collector, const tokenInfo *const t
 	}
 	else if (token->type == TOKEN_IDENTIFIER || token->type == TOKEN_KEYWORD)
 		collectorCat (collector, token->string);
+	else if (token->type == TOKEN_3DOTS)
+	{
+		if ((vStringLength (collector->str) > 0)
+			&& vStringLast(collector->str) != ' ')
+			collectorPut (collector, ' ');
+		collectorCatS (collector, "...");
+	}
 	else if (token->c != EOF)
 		collectorPut (collector, token->c);
 }
@@ -476,11 +492,35 @@ getNextChar:
 			break;
 
 		case '.':
+			{
+				int d, e;
+				d = getcFromInputFile ();
+				if (d == '.')
+				{
+					e = getcFromInputFile ();
+					if (e == '.')
+					{
+						token->type = TOKEN_3DOTS;
+						break;
+					}
+					else
+					{
+						ungetcToInputFile (e);
+						ungetcToInputFile (d);
+					}
+				}
+				else
+					ungetcToInputFile (d);
+			}
 			token->type = TOKEN_DOT;
 			break;
 
 		case ',':
 			token->type = TOKEN_COMMA;
+			break;
+
+		case '=':
+			token->type = TOKEN_EQUAL;
 			break;
 
 		default:
@@ -1083,7 +1123,7 @@ static void parseConstTypeVar (tokenInfo *const token, goKind kind, const int sc
 	// IdentifierList = identifier { "," identifier } .
 	// ExpressionList = Expression { "," Expression } .
 	// TypeDecl     = "type" ( TypeSpec | "(" { TypeSpec ";" } ")" ) .
-	// TypeSpec     = identifier Type .
+	// TypeSpec     = identifier [ "=" ] Type .
 	// VarDecl     = "var" ( VarSpec | "(" { VarSpec ";" } ")" ) .
 	// VarSpec     = IdentifierList ( Type [ "=" ExpressionList ] | "=" ExpressionList ) .
 	bool usesParens = false;
@@ -1112,6 +1152,12 @@ static void parseConstTypeVar (tokenInfo *const token, goKind kind, const int sc
 					typeToken = newToken ();
 					copyToken (typeToken, token);
 					readToken (token);
+					if (isType (token, TOKEN_EQUAL))
+					{
+						kind = GOTAG_ALIAS;
+						readToken (token);
+					}
+
 					if (isKeyword (token, KEYWORD_struct))
 						member_scope = makeTag (typeToken, GOTAG_STRUCT,
 												scope, NULL, NULL);

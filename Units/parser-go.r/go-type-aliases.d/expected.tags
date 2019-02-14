@@ -1,0 +1,9 @@
+main	input.go	/^package main$/;"	p
+y	input.go	/^type y int$/;"	t	package:main	typeref:typename:int
+T2	input.go	/^type T2 int$/;"	t	package:main	typeref:typename:int
+t	input.go	/^type t y$/;"	t	package:main	typeref:typename:y
+T1	input.go	/^type T1 = T2$/;"	a	package:main	typeref:typename:T2
+Name1	input.go	/^type Name1 map[string]string$/;"	t	package:main	typeref:typename:map[string]string
+Name2	input.go	/^type Name2 map[string]string$/;"	t	package:main	typeref:typename:map[string]string
+Alias	input.go	/^type Alias = map[string]string$/;"	a	package:main	typeref:typename:map[string]string
+main	input.go	/^func main() {$/;"	f	package:main
