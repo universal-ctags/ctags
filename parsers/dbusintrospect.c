@@ -155,12 +155,12 @@ static void dbusIntrospectFindTagsUnderMain (xmlNode *node,
 		data->kindForName = K_NODE;
 
 	findXMLTags (ctx, node,
-		     dbusIntrospectXpathTableTable + TABLE_MAIN_NAME,
+		     TABLE_MAIN_NAME,
 		     DbusIntrospectKinds,
 		     data);
 	if (spec->nextTable >= 0)
 		findXMLTags (ctx, node,
-					 dbusIntrospectXpathTableTable + spec->nextTable,
+					 spec->nextTable,
 					 DbusIntrospectKinds,
 					 data);
 	data->scopeIndex = scopeIndex;
@@ -213,7 +213,7 @@ findDbusIntrospectTags (void)
 	};
 
 	findXMLTags (NULL, NULL,
-		     dbusIntrospectXpathTableTable + TABLE_ROOT,
+		     TABLE_ROOT,
 		     DbusIntrospectKinds,
 		     &data);
 }

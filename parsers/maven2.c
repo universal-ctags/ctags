@@ -221,7 +221,7 @@ findMaven2TagsForTable (enum maven2XpathTable tindex,
 	};
 
 	findXMLTags (ctx, node,
-		     maven2XpathTableTable + tindex,
+		     tindex,
 		     Maven2Kinds,
 		     &corkIndexes);
 

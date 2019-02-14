@@ -170,11 +170,15 @@ static xmlDocPtr makeXMLDoc (void)
 }
 
 extern void findXMLTags (xmlXPathContext *ctx, xmlNode *root,
-			 const tagXpathTableTable *xpathTableTable,
+			 int tableTableIndex,
 			 const kindDefinition* const kinds,void *userData)
 {
 	bool usedAsEntryPoint = false;
 	xmlDocPtr doc = NULL;
+
+	const langType lang = getInputLanguage();
+	const tagXpathTableTable *xpathTableTable
+		= getXpathTableTable (lang, tableTableIndex);
 
 	if (ctx == NULL)
 	{

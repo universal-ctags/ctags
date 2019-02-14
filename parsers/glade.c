@@ -73,7 +73,7 @@ static tagXpathTableTable gladeXpathTableTable[] = {
 static void
 findGladeTags (void)
 {
-	findXMLTags (NULL, NULL, gladeXpathTableTable + TABLE_MAIN, GladeKinds, NULL);
+	findXMLTags (NULL, NULL, TABLE_MAIN, GladeKinds, NULL);
 }
 
 extern parserDefinition*

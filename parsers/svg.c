@@ -45,7 +45,7 @@ static void
 findSvgTags (void)
 {
 	findXMLTags (NULL, NULL,
-		     svgXpathTableTable + TABLE_MAIN,
+		     TABLE_MAIN,
 		     SvgKinds,
 		     NULL);
 }

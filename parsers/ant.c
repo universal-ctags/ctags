@@ -150,11 +150,11 @@ antFindTagsUnderProject (xmlNode *node,
 	int corkIndex = CORK_NIL;
 
 	findXMLTags (ctx, node,
-		     antXpathTableTable + TABLE_MAIN_NAME,
+		     TABLE_MAIN_NAME,
 		     AntKinds,
 		     &corkIndex);
 	findXMLTags (ctx, node,
-		     antXpathTableTable + TABLE_PROJECT,
+		     TABLE_PROJECT,
 		     AntKinds,
 		     &corkIndex);
 }
@@ -168,7 +168,7 @@ static void antFindTagsUnderTask (xmlNode *node,
 	int corkIndex = *(int *)userData;
 
 	findXMLTags (ctx, node,
-		     antXpathTableTable + spec->nextTable,
+		     spec->nextTable,
 		     AntKinds,
 		     &corkIndex);
 }
@@ -216,7 +216,7 @@ static void makeTagWithScope (xmlNode *node CTAGS_ATTR_UNUSED,
 static void
 findAntTags (void)
 {
-	findXMLTags (NULL, NULL, antXpathTableTable + TABLE_MAIN,
+	findXMLTags (NULL, NULL, TABLE_MAIN,
 		     AntKinds,
 		     NULL);
 }

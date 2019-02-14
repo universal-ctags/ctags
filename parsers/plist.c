@@ -135,7 +135,7 @@ static void plistFindTagsUnderKey (xmlNode *node,
 	stringListDelete (queue);
 
 	findXMLTags (ctx, node,
-		     plistXpathTableTable + TABLE_TEXT,
+		     TABLE_TEXT,
 		     PlistKinds,
 		     (vStringLength (path) > 0)? vStringValue (path): NULL);
 
@@ -156,7 +156,7 @@ static void makeTagWithScope (xmlNode *node CTAGS_ATTR_UNUSED,
 static void
 findPlistTags (void)
 {
-	findXMLTags (NULL, NULL, plistXpathTableTable + TABLE_MAIN, PlistKinds, NULL);
+	findXMLTags (NULL, NULL, TABLE_MAIN, PlistKinds, NULL);
 }
 
 extern parserDefinition*

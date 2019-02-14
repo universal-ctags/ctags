@@ -275,7 +275,7 @@ static void makeTagRecursivelyWithVersionVerification (xmlNode *node,
 	int backup;
 
 	findXMLTags (ctx, node,
-		     xsltXpathTableTable + TABLE_VERSION_VERIFY,
+		     TABLE_VERSION_VERIFY,
 		     NULL,
 		     &acceptable);
 	if (!acceptable)
@@ -283,7 +283,7 @@ static void makeTagRecursivelyWithVersionVerification (xmlNode *node,
 
 	backup = *(int *)userData;
 	findXMLTags (ctx, node,
-		     xsltXpathTableTable + TABLE_STYLESHEET,
+		     TABLE_STYLESHEET,
 		     XsltKinds,
 		     userData);
 
@@ -299,7 +299,7 @@ static void makeTagRecursively (xmlNode *node,
 	int backup = *(int *)userData;
 
 	findXMLTags (ctx, node,
-		     xsltXpathTableTable + spec->nextTable,
+		     spec->nextTable,
 		     XsltKinds,
 		     userData);
 
@@ -324,7 +324,7 @@ findXsltTags (void)
 	int scopeIndex = CORK_NIL;
 
 	findXMLTags (NULL, NULL,
-		     xsltXpathTableTable + TABLE_MAIN,
+		     TABLE_MAIN,
 		     XsltKinds,
 		     &scopeIndex);
 }

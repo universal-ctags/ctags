@@ -3860,6 +3860,17 @@ static void uninstallTagXpathTable (const langType language)
 	}
 }
 
+const tagXpathTableTable *getXpathTableTable (const langType language, unsigned int nth)
+{
+	parserDefinition* lang;
+
+	Assert (0 <= language  &&  language < (int) LanguageCount);
+	lang = LanguageTable [language].def;
+
+	Assert (nth < lang->tagXpathTableCount);
+	return lang->tagXpathTableTable + nth;
+}
+
 extern unsigned int getXpathFileSpecCount (const langType language)
 {
 	parserDefinition* lang;
