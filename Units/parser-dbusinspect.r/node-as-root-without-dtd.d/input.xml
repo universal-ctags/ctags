@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<node name="/">
+  <!-- Taken from NetworkManager-1.12.0/introspection/org.freedesktop.NetworkManager.Device.Ppp.xml -->
+  <!--
+      org.freedesktop.NetworkManager.Device.Ppp:
+      @short_description: PPP Device
+
+  -->
+  <interface name="org.freedesktop.NetworkManager.Device.Ppp">
+
+    <!--
+        PropertiesChanged:
+        @properties: A dictionary mapping property names to variant boxed values
+
+        DEPRECATED. Use the standard "PropertiesChanged" signal from "org.freedesktop.DBus.Properties" instead which exists since version NetworkManager 1.2.0.
+    -->
+    <signal name="PropertiesChanged">
+      <arg name="properties" type="a{sv}"/>
+    </signal>
+  </interface>
+</node>

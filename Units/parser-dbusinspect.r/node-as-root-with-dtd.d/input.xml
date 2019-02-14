@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE node PUBLIC "-//freedesktop//DTD D-BUS Introspection 0.1//EN"
+                      "http://www.freedesktop.org/software/dbus/introspection.dtd">
+<!-- TAKEN FROM gnome-terminal-3.28.2 -->
+<!--
+  Copyright © 2011 Christian Persch
+
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; either version 3, or (at your option)
+  any later version.
+
+  This program is distributed in the hope conf it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+<node>
+  <interface name="org.gnome.Terminal.Factory0">
+    <annotation name="org.gtk.GDBus.C.Name" value="Factory" />
+    <method name="CreateInstance">
+      <arg type="a{sv}" name="options" direction="in" />
+      <arg type="o" name="receiver" direction="out" />
+    </method>
+  </interface>
+
+  <interface name="org.gnome.Terminal.Terminal0">
+    <annotation name="org.gtk.GDBus.C.Name" value="Receiver" />
+    <method name="Exec">
+      <annotation name="org.gtk.GDBus.C.UnixFD" value="true" />
+      <arg type="a{sv}" name="options" direction="in" />
+      <arg type="aay" name="arguments" direction="in">
+        <annotation name="org.gtk.GDBus.C.ForceGVariant" value="true" />
+      </arg>
+    </method>
+    
+    <signal name="ChildExited">
+      <arg type="i" name="exit_code" direction="in" />
+    </signal>
+  </interface>
+</node>

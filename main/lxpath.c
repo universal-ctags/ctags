@@ -30,16 +30,23 @@ static void simpleXpathMakeTag (xmlNode *node,
 	tagEntryInfo tag;
 	xmlChar* str;
 	char *path;
+	int kind;
 
 	str = xmlNodeGetContent(node);
 	if (str == NULL)
 		return;
 
+	if (spec->kind == KIND_GHOST_INDEX && spec->decideKind)
+		kind = spec->decideKind (node, spec, userData);
+	else
+		kind = spec->kind;
+	Assert (kind != KIND_GHOST_INDEX);
+
 	if (spec->role == ROLE_INDEX_DEFINITION)
-		initTagEntry (&tag, (char *)str, spec->kind);
+		initTagEntry (&tag, (char *)str, kind);
 	else if (isXtagEnabled(XTAG_REFERENCE_TAGS))
 		initRefTagEntry (&tag, (char *)str,
-				 spec->kind,
+				 kind,
 				 spec->role);
 	else
 		goto out;
@@ -112,9 +119,9 @@ static void findXMLTagsCore (xmlXPathContext *ctx, xmlNode *root,
 
 		if (set)
 		{
-			for (j = 0; j < set->nodeNr; ++j)
+			for (j = 0; j < xmlXPathNodeSetGetLength (set); ++j)
 			{
-				node = set->nodeTab[j];
+				node = xmlXPathNodeSetItem(set, j);
 				if (elt->specType == LXPATH_TABLE_DO_MAKE)
 					simpleXpathMakeTag (node, &(elt->spec.makeTagSpec), kinds, userData);
 				else
