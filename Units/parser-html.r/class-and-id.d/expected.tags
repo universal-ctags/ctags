@@ -1,0 +1,23 @@
+/public/css/poole.css	input.html	/^<link rel="stylesheet" href="\/public\/css\/poole.css">$/;"	C	roles:extFile
+/public/css/syntax.css	input.html	/^<link rel="stylesheet" href="\/public\/css\/syntax.css">$/;"	C	roles:extFile
+/public/css/hyde.css	input.html	/^<link rel="stylesheet" href="\/public\/css\/hyde.css">$/;"	C	roles:extFile
+http://fonts.googleapis.com/css?family=PT+Sans:400,400italic,700|Abril+Fatface	input.html	/^<link rel="stylesheet" href="http:\/\/fonts.googleapis.com\/css?family=PT+Sans:400,400italic,700/;"	C	roles:extFile
+theme-base-0d	input.html	/^<body class="theme-base-0d">$/;"	c	roles:attribute
+sidebar	input.html	/^<div class="sidebar">$/;"	c	roles:attribute
+container	input.html	/^<div class="container sidebar-sticky">$/;"	c	roles:attribute
+sidebar-sticky	input.html	/^<div class="container sidebar-sticky">$/;"	c	roles:attribute
+sidebar-about	input.html	/^<div class="sidebar-about">$/;"	c	roles:attribute
+Universal Ctags	input.html	/^<h1>Universal Ctags<\/h1>$/;"	h	roles:def
+lead	input.html	/^<p class="lead">A maintained ctags implementation<\/p>$/;"	c	roles:attribute
+sidebar-nav	input.html	/^<ul class="sidebar-nav">$/;"	c	roles:attribute
+sidebar-nav-item	input.html	/^<li class="sidebar-nav-item active">$/;"	c	roles:attribute
+active	input.html	/^<li class="sidebar-nav-item active">$/;"	c	roles:attribute
+sidebar-nav-item	input.html	/^<li class="sidebar-nav-item"><a href="http:\/\/docs.ctags.io\/en\/latest\/">Docs<\/a><\/li>$/;"	c	roles:attribute
+sidebar-nav-item	input.html	/^<li class="sidebar-nav-item"><a href="\/blog\/">Blog<\/a><\/li>$/;"	c	roles:attribute
+sidebar-nav-item	input.html	/^<li class="sidebar-nav-item"><a href="https:\/\/github.com\/universal-ctags\/ctags">GitHub proje/;"	c	roles:attribute
+content	input.html	/^<div class="content container">$/;"	c	roles:attribute
+container	input.html	/^<div class="content container">$/;"	c	roles:attribute
+universal-ctags	input.html	/^<h1 id="universal-ctags">Universal Ctags<\/h1>$/;"	I	roles:def
+Universal Ctags	input.html	/^<h1 id="universal-ctags">Universal Ctags<\/h1>$/;"	h	roles:def
+get-involved	input.html	/^<h2 id="get-involved">Get Involved<\/h2>$/;"	I	roles:def
+Get Involved	input.html	/^<h2 id="get-involved">Get Involved<\/h2>$/;"	i	roles:def
