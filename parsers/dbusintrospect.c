@@ -29,10 +29,11 @@
 
 
 typedef enum {
-	K_INTERFACE, K_METHOD, K_SIGNAL, K_PROPERTY, K_NODE,
+	K_ARG, K_INTERFACE, K_METHOD, K_SIGNAL, K_PROPERTY, K_NODE,
 } dbusIntrospectKind;
 
 static kindDefinition DbusIntrospectKinds [] = {
+	{ true,  'a', "arg",       "arguments"  },
 	{ true,  'i', "interface", "interfaces" },
 	{ true,  'm', "method",    "methods"    },
 	{ true,  's', "signal",    "signals"    },
@@ -65,32 +66,46 @@ struct dbusIntrospectData {
 	int kindForName;
 };
 
-static tagXpathTable dbusIntrospectXpathInterfaceTable [] = {
-	{ "method/@name",
-	  LXPATH_TABLE_DO_MAKE,
-	  { .makeTagSpec = {K_METHOD, ROLE_INDEX_DEFINITION,
-			    makeTagWithScope } }
+static tagXpathTable dbusIntrospectXpathArgTable [] = {
+	{ "arg",
+	  LXPATH_TABLE_DO_RECUR,
+	  { .recurSpec = { dbusIntrospectFindTagsUnderMain,
+					   -1 } },
 	},
-	{ "signal/@name",
-	  LXPATH_TABLE_DO_MAKE,
-	  { .makeTagSpec = { K_SIGNAL, ROLE_INDEX_DEFINITION,
-			     makeTagWithScope } }
+};
+
+enum dbusIntrospectXpathTable {
+	TABLE_ROOT, TABLE_MAIN, TABLE_INTERFACE, TABLE_MAIN_NAME, TABLE_ARG,
+};
+
+static tagXpathTable dbusIntrospectXpathInterfaceTable [] = {
+	{ "method",
+	  LXPATH_TABLE_DO_RECUR,
+	  { .recurSpec = { dbusIntrospectFindTagsUnderMain,
+					   TABLE_ARG, } }
+	},
+	{ "signal",
+	  LXPATH_TABLE_DO_RECUR,
+	  { .recurSpec = { dbusIntrospectFindTagsUnderMain,
+					   TABLE_ARG, } }
 	},
 	{ "property/@name",
 	  LXPATH_TABLE_DO_MAKE,
 	  { .makeTagSpec = { K_PROPERTY, ROLE_INDEX_DEFINITION,
-			     makeTagWithScope } }
+						 makeTagWithScope, } }
 	},
 };
 
 static tagXpathTable dbusIntrospectXpathMainTable [] = {
 	{ "interface",
 	  LXPATH_TABLE_DO_RECUR,
-	  { .recurSpec = { dbusIntrospectFindTagsUnderMain } }
+	  { .recurSpec = { dbusIntrospectFindTagsUnderMain,
+					   TABLE_INTERFACE, } }
 	},
 	{ "node",
 	  LXPATH_TABLE_DO_RECUR,
-	  { .recurSpec = { dbusIntrospectFindTagsUnderMain } }
+	  { .recurSpec = { dbusIntrospectFindTagsUnderMain,
+					   TABLE_MAIN, } }
 	},
 };
 
@@ -106,12 +121,9 @@ static tagXpathTable dbusIntrospectXpathMainNameTable [] = {
 static tagXpathTable dbusIntrospectXpathRootTable [] = {
 	{ "/node",
 	  LXPATH_TABLE_DO_RECUR,
-	  { .recurSpec = { dbusIntrospectFindTagsUnderMain } }
+	  { .recurSpec = { dbusIntrospectFindTagsUnderMain,
+					   TABLE_MAIN, } }
 	},
-};
-
-enum dbusIntrospectXpathTable {
-	TABLE_ROOT, TABLE_MAIN, TABLE_INTERFACE, TABLE_MAIN_NAME,
 };
 
 static tagXpathTableTable dbusIntrospectXpathTableTable[] = {
@@ -119,40 +131,40 @@ static tagXpathTableTable dbusIntrospectXpathTableTable[] = {
 	[TABLE_MAIN]      = { ARRAY_AND_SIZE (dbusIntrospectXpathMainTable)     },
 	[TABLE_INTERFACE] = { ARRAY_AND_SIZE (dbusIntrospectXpathInterfaceTable)},
 	[TABLE_MAIN_NAME] = { ARRAY_AND_SIZE (dbusIntrospectXpathMainNameTable) },
+	[TABLE_ARG]       = { ARRAY_AND_SIZE (dbusIntrospectXpathArgTable)      },
 };
 
 static void dbusIntrospectFindTagsUnderMain (xmlNode *node,
 						  const char *xpath,
-						  const struct sTagXpathRecurSpec *spec CTAGS_ATTR_UNUSED,
+						  const struct sTagXpathRecurSpec *spec,
 						  xmlXPathContext *ctx,
 						  void *userData)
 {
 	struct dbusIntrospectData *data = userData;
 	int scopeIndex = data->scopeIndex;
-	int tableForParsingChildren;
 
 	if (!strcmp(xpath, "interface"))
-	{
 		data->kindForName = K_INTERFACE;
-		tableForParsingChildren = TABLE_INTERFACE;
-	}
+	else if (!strcmp (xpath, "method"))
+		data->kindForName = K_METHOD;
+	else if (!strcmp (xpath, "signal"))
+		data->kindForName = K_SIGNAL;
+	else if (!strcmp (xpath, "arg"))
+		data->kindForName = K_ARG;
 	else
-	{
 		data->kindForName = K_NODE;
-		tableForParsingChildren = TABLE_MAIN;
-	}
 
 	findXMLTags (ctx, node,
 		     dbusIntrospectXpathTableTable + TABLE_MAIN_NAME,
 		     DbusIntrospectKinds,
 		     data);
-	findXMLTags (ctx, node,
-		     dbusIntrospectXpathTableTable + tableForParsingChildren,
-		     DbusIntrospectKinds,
-		     data);
+	if (spec->nextTable >= 0)
+		findXMLTags (ctx, node,
+					 dbusIntrospectXpathTableTable + spec->nextTable,
+					 DbusIntrospectKinds,
+					 data);
 	data->scopeIndex = scopeIndex;
 }
-
 
 static void makeTagWithScope (xmlNode *node CTAGS_ATTR_UNUSED,
 			      const char *xpath CTAGS_ATTR_UNUSED,
