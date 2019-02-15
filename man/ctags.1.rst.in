@@ -788,7 +788,7 @@ are not listed here. They are experimental or for debugging purpose.
 	Specify "all" as <LANG> to apply the parameter flags to all
 	fields; all fields are enabled with specifying '*' as the
 	parameter flags. If specifying nothing as the parameter flags
-	("--fields-all="), all extras are disabled. These two combinations
+	("--fields-all="), all fields are disabled. These two combinations
 	are useful for testing.
 
 
