@@ -100,6 +100,6 @@ typedef struct sXpathFileSpec {
 /* Xpath interface */
 extern void findXMLTags (xmlXPathContext *ctx, xmlNode *root,
 			 int tableTableIndex,
-			 const kindDefinition* const kinds, void *userData);
+			 void *userData);
 
 #endif  /* CTAGS_LXPATH_PARSE_H */

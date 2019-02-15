@@ -274,18 +274,12 @@ static void makeTagRecursivelyWithVersionVerification (xmlNode *node,
 	bool acceptable = false;
 	int backup;
 
-	findXMLTags (ctx, node,
-		     TABLE_VERSION_VERIFY,
-		     NULL,
-		     &acceptable);
+	findXMLTags (ctx, node, TABLE_VERSION_VERIFY, &acceptable);
 	if (!acceptable)
 		return;
 
 	backup = *(int *)userData;
-	findXMLTags (ctx, node,
-		     TABLE_STYLESHEET,
-		     XsltKinds,
-		     userData);
+	findXMLTags (ctx, node, TABLE_STYLESHEET, userData);
 
 	*(int *)userData = backup;
 }
@@ -298,10 +292,7 @@ static void makeTagRecursively (xmlNode *node,
 {
 	int backup = *(int *)userData;
 
-	findXMLTags (ctx, node,
-		     spec->nextTable,
-		     XsltKinds,
-		     userData);
+	findXMLTags (ctx, node, spec->nextTable, userData);
 
 	*(int *)userData = backup;
 }
@@ -323,10 +314,7 @@ findXsltTags (void)
 {
 	int scopeIndex = CORK_NIL;
 
-	findXMLTags (NULL, NULL,
-		     TABLE_MAIN,
-		     XsltKinds,
-		     &scopeIndex);
+	findXMLTags (NULL, NULL, TABLE_MAIN, &scopeIndex);
 }
 
 extern parserDefinition*

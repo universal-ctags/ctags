@@ -137,10 +137,7 @@ relaxngMakeAndFindTags(xmlNode *node,
 {
 	int corkIndex = *(int *)userData;
 
-	findXMLTags (ctx, node,
-		     nextTable,
-		     RelaxNGKinds,
-		     &corkIndex);
+	findXMLTags (ctx, node, nextTable, &corkIndex);
 
 	relaxngFindTags (node, xpath, spec, ctx, &corkIndex);
 }
@@ -174,10 +171,7 @@ relaxngFindTags (xmlNode *node,
 {
 	int corkIndex = *(int *)userData;
 
-	findXMLTags (ctx, node,
-		     spec->nextTable,
-		     RelaxNGKinds,
-		     &corkIndex);
+	findXMLTags (ctx, node, spec->nextTable, &corkIndex);
 }
 
 static void
@@ -216,10 +210,7 @@ findRelaxNGTags (void)
 {
 	int corkIndex = CORK_NIL;
 
-	findXMLTags (NULL, NULL,
-		     TABLE_MAIN,
-		     RelaxNGKinds,
-		     &corkIndex);
+	findXMLTags (NULL, NULL, TABLE_MAIN, &corkIndex);
 }
 
 static void

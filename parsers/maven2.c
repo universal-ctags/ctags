@@ -220,10 +220,7 @@ findMaven2TagsForTable (enum maven2XpathTable tindex,
 		[K_ARTIFACT_ID] = CORK_NIL,
 	};
 
-	findXMLTags (ctx, node,
-		     tindex,
-		     Maven2Kinds,
-		     &corkIndexes);
+	findXMLTags (ctx, node, tindex, &corkIndexes);
 
 	if ( corkIndexes [K_ARTIFACT_ID] != CORK_NIL
 	     && corkIndexes [K_GROUP_ID] != CORK_NIL)

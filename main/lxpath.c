@@ -25,7 +25,6 @@
 static void simpleXpathMakeTag (xmlNode *node,
 				const char *xpath,
 				const tagXpathMakeTagSpec *spec,
-				const kindDefinition* const kinds,
 				void *userData)
 {
 	tagEntryInfo tag;
@@ -92,7 +91,7 @@ extern void removeTagXpath (const langType language CTAGS_ATTR_UNUSED, tagXpathT
 
 static void findXMLTagsCore (xmlXPathContext *ctx, xmlNode *root,
 			     const tagXpathTableTable *xpathTableTable,
-			     const kindDefinition* const kinds,void *userData)
+			     void *userData)
 {
 	unsigned int i;
 	int j;
@@ -133,7 +132,7 @@ static void findXMLTagsCore (xmlXPathContext *ctx, xmlNode *root,
 			{
 				node = xmlXPathNodeSetItem(set, j);
 				if (elt->specType == LXPATH_TABLE_DO_MAKE)
-					simpleXpathMakeTag (node, elt->xpath, &(elt->spec.makeTagSpec), kinds, userData);
+					simpleXpathMakeTag (node, elt->xpath, &(elt->spec.makeTagSpec), userData);
 				else
 					elt->spec.recurSpec.enter (node, elt->xpath, &(elt->spec.recurSpec), ctx, userData);
 			}
@@ -171,7 +170,7 @@ static xmlDocPtr makeXMLDoc (void)
 
 extern void findXMLTags (xmlXPathContext *ctx, xmlNode *root,
 			 int tableTableIndex,
-			 const kindDefinition* const kinds,void *userData)
+			 void *userData)
 {
 	bool usedAsEntryPoint = false;
 	xmlDocPtr doc = NULL;
@@ -208,7 +207,7 @@ extern void findXMLTags (xmlXPathContext *ctx, xmlNode *root,
 		}
 	}
 
-	findXMLTagsCore (ctx, root, xpathTableTable, kinds, userData);
+	findXMLTagsCore (ctx, root, xpathTableTable, userData);
 
 out:
 	if (usedAsEntryPoint)
@@ -232,8 +231,8 @@ extern void removeTagXpath (const langType language CTAGS_ATTR_UNUSED, tagXpathT
 }
 
 extern void findXMLTags (xmlXPathContext *ctx, xmlNode *root,
-			 const tagXpathTableTable *xpathTableTable,
-			 const kindDefinition* const kinds, void *userData)
+			 int tableTableIndex,
+			 void *userData)
 {
 }
 

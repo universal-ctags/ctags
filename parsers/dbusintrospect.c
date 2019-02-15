@@ -154,15 +154,9 @@ static void dbusIntrospectFindTagsUnderMain (xmlNode *node,
 	else
 		data->kindForName = K_NODE;
 
-	findXMLTags (ctx, node,
-		     TABLE_MAIN_NAME,
-		     DbusIntrospectKinds,
-		     data);
+	findXMLTags (ctx, node, TABLE_MAIN_NAME, data);
 	if (spec->nextTable >= 0)
-		findXMLTags (ctx, node,
-					 spec->nextTable,
-					 DbusIntrospectKinds,
-					 data);
+		findXMLTags (ctx, node, spec->nextTable, data);
 	data->scopeIndex = scopeIndex;
 }
 
@@ -212,10 +206,7 @@ findDbusIntrospectTags (void)
 		.kindForName = KIND_GHOST_INDEX,
 	};
 
-	findXMLTags (NULL, NULL,
-		     TABLE_ROOT,
-		     DbusIntrospectKinds,
-		     &data);
+	findXMLTags (NULL, NULL, TABLE_ROOT, &data);
 }
 
 extern parserDefinition*

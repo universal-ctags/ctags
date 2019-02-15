@@ -44,10 +44,7 @@ static tagXpathTableTable svgXpathTableTable[] = {
 static void
 findSvgTags (void)
 {
-	findXMLTags (NULL, NULL,
-		     TABLE_MAIN,
-		     SvgKinds,
-		     NULL);
+	findXMLTags (NULL, NULL, TABLE_MAIN, NULL);
 }
 
 extern parserDefinition*
