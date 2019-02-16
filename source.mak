@@ -267,6 +267,7 @@ XML_SRCS = \
 	 parsers/svg.c			\
 	 parsers/plist.c		\
 	 parsers/relaxng.c		\
+	 parsers/xml.c			\
 	 parsers/xslt.c			\
 	 \
 	 $(NULL)

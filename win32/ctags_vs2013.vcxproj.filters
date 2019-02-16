@@ -486,6 +486,9 @@
     <ClCompile Include="..\parsers\yumrepo.c">
       <Filter>Source Files\Parsers</Filter>
     </ClCompile>
+    <ClCompile Include="..\parsers\xml.c">
+      <Filter>Source Files\Parsers</Filter>
+    </ClCompile>
     <ClCompile Include="mkstemp\mkstemp.c">
       <Filter>Source Files\win32\mkstemp</Filter>
     </ClCompile>
