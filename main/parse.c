@@ -113,6 +113,7 @@ static void installTagXpathTable (const langType language);
 static void anonResetMaybe (parserObject *parser);
 static void setupAnon (void);
 static void teardownAnon (void);
+static void uninstallTagXpathTable (const langType language);
 
 /*
 *   DATA DEFINITIONS
@@ -1933,6 +1934,8 @@ extern void freeParserResources (void)
 
 		if (parser->def->finalize)
 			(parser->def->finalize)((langType)i, (bool)parser->initialized);
+
+		uninstallTagXpathTable (i);
 
 		freeLregexControlBlock (parser->lregexControlBlock);
 		freeKindControlBlock (parser->kindControlBlock);
@@ -3839,6 +3842,33 @@ static void installTagXpathTable (const langType language)
 				addTagXpath (language, lang->tagXpathTableTable[i].table + j);
 		useXpathMethod (language);
 	}
+}
+
+static void uninstallTagXpathTable (const langType language)
+{
+	parserDefinition* lang;
+	unsigned int i, j;
+
+	Assert (0 <= language  &&  language < (int) LanguageCount);
+	lang = LanguageTable [language].def;
+
+	if (lang->tagXpathTableTable != NULL)
+	{
+		for (i = 0; i < lang->tagXpathTableCount; ++i)
+			for (j = 0; j < lang->tagXpathTableTable[i].count; ++j)
+				removeTagXpath (language, lang->tagXpathTableTable[i].table + j);
+	}
+}
+
+const tagXpathTableTable *getXpathTableTable (const langType language, unsigned int nth)
+{
+	parserDefinition* lang;
+
+	Assert (0 <= language  &&  language < (int) LanguageCount);
+	lang = LanguageTable [language].def;
+
+	Assert (nth < lang->tagXpathTableCount);
+	return lang->tagXpathTableTable + nth;
 }
 
 extern unsigned int getXpathFileSpecCount (const langType language)

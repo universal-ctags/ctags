@@ -146,6 +146,8 @@ extern void processLanguageMultitableExtendingOption (langType language, const c
 extern unsigned int   getXpathFileSpecCount (const langType language);
 extern xpathFileSpec* getXpathFileSpec (const langType language, unsigned int nth);
 
+const tagXpathTableTable *getXpathTableTable (const langType language, unsigned int nth);
+
 extern bool makeKindSeparatorsPseudoTags (const langType language,
 					     const ptagDesc *pdesc);
 extern bool makeKindDescriptionsPseudoTags (const langType language,

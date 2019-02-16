@@ -26,22 +26,27 @@
 *   FUNCTION PROTOTYPES
 */
 static void antFindTagsUnderProject (xmlNode *node,
+				     const char *xpath,
 				     const struct sTagXpathRecurSpec *spec,
 				     xmlXPathContext *ctx,
 				     void *userData);
 static void antFindTagsUnderTask (xmlNode *node,
+				  const char *xpath,
 				  const struct sTagXpathRecurSpec *spec,
 				  xmlXPathContext *ctx,
 				  void *userData);
 static void makeTagForProjectName (xmlNode *node,
+				   const char *xpath,
 				   const struct sTagXpathMakeTagSpec *spec,
 				   struct sTagEntryInfo *tag,
 				   void *userData);
 static void makeTagForTargetName (xmlNode *node,
+				  const char *xpath,
 				  const struct sTagXpathMakeTagSpec *spec,
 				  struct sTagEntryInfo *tag,
 				  void *userData);
 static void makeTagWithScope (xmlNode *node,
+				  const char *xpath,
 			      const struct sTagXpathMakeTagSpec *spec,
 			      struct sTagEntryInfo *tag,
 			      void *userData);
@@ -137,36 +142,30 @@ static tagRegexTable antTagRegexTable [] = {
 
 static void
 antFindTagsUnderProject (xmlNode *node,
+			 const char *xpath CTAGS_ATTR_UNUSED,
 			 const struct sTagXpathRecurSpec *spec CTAGS_ATTR_UNUSED,
 			 xmlXPathContext *ctx,
 			 void *userData CTAGS_ATTR_UNUSED)
 {
 	int corkIndex = CORK_NIL;
 
-	findXMLTags (ctx, node,
-		     antXpathTableTable + TABLE_MAIN_NAME,
-		     AntKinds,
-		     &corkIndex);
-	findXMLTags (ctx, node,
-		     antXpathTableTable + TABLE_PROJECT,
-		     AntKinds,
-		     &corkIndex);
+	findXMLTags (ctx, node, TABLE_MAIN_NAME, &corkIndex);
+	findXMLTags (ctx, node, TABLE_PROJECT, &corkIndex);
 }
 
 static void antFindTagsUnderTask (xmlNode *node,
+				  const char *xpath CTAGS_ATTR_UNUSED,
 				  const struct sTagXpathRecurSpec *spec,
 				  xmlXPathContext *ctx,
 				  void *userData)
 {
 	int corkIndex = *(int *)userData;
 
-	findXMLTags (ctx, node,
-		     antXpathTableTable + spec->nextTable,
-		     AntKinds,
-		     &corkIndex);
+	findXMLTags (ctx, node, spec->nextTable, &corkIndex);
 }
 
 static void makeTagForProjectName (xmlNode *node CTAGS_ATTR_UNUSED,
+				   const char *xpath CTAGS_ATTR_UNUSED,
 				   const struct sTagXpathMakeTagSpec *spec CTAGS_ATTR_UNUSED,
 				   struct sTagEntryInfo *tag,
 				   void *userData)
@@ -177,6 +176,7 @@ static void makeTagForProjectName (xmlNode *node CTAGS_ATTR_UNUSED,
 }
 
 static void makeTagForTargetName (xmlNode *node CTAGS_ATTR_UNUSED,
+				  const char *xpath CTAGS_ATTR_UNUSED,
 				  const struct sTagXpathMakeTagSpec *spec CTAGS_ATTR_UNUSED,
 				  struct sTagEntryInfo *tag,
 				  void *userData)
@@ -192,6 +192,7 @@ static void makeTagForTargetName (xmlNode *node CTAGS_ATTR_UNUSED,
 }
 
 static void makeTagWithScope (xmlNode *node CTAGS_ATTR_UNUSED,
+			      const char *xpath CTAGS_ATTR_UNUSED,
 			      const struct sTagXpathMakeTagSpec *spec CTAGS_ATTR_UNUSED,
 			      struct sTagEntryInfo *tag,
 			      void *userData)
@@ -206,9 +207,7 @@ static void makeTagWithScope (xmlNode *node CTAGS_ATTR_UNUSED,
 static void
 findAntTags (void)
 {
-	findXMLTags (NULL, NULL, antXpathTableTable + TABLE_MAIN,
-		     AntKinds,
-		     NULL);
+	findXMLTags (NULL, NULL, TABLE_MAIN, NULL);
 }
 #endif
 
