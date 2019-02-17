@@ -35,6 +35,7 @@ Go             p/package         imported            on      imported package
 Go             u/unknown         receiverType        on      receiver type
 HTML           C/stylesheet      extFile             on      referenced as external files
 HTML           J/script          extFile             on      referenced as external files
+HTML           c/class           attribute           on      assigned as attributes
 Java           p/package         imported            on      imported package
 LdScript       i/inputSection    discarded           on      discarded when linking
 LdScript       i/inputSection    mapped              on      mapped to output section
@@ -98,6 +99,7 @@ Go             p/package         imported            on      imported package
 Go             u/unknown         receiverType        on      receiver type
 HTML           C/stylesheet      extFile             on      referenced as external files
 HTML           J/script          extFile             on      referenced as external files
+HTML           c/class           attribute           on      assigned as attributes
 Java           p/package         imported            on      imported package
 LdScript       i/inputSection    discarded           on      discarded when linking
 LdScript       i/inputSection    mapped              on      mapped to output section

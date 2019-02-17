@@ -28,13 +28,19 @@
 
 typedef enum {
 	K_ANCHOR,
+	K_CLASS,
 	K_HEADING1,
 	K_HEADING2,
 	K_HEADING3,
 	K_STYELSHEET,
+	K_ID,
 	K_SCRIPT,
 } htmlKind;
 
+
+typedef enum {
+	CLASS_KIND_ATTRIBUTE_ROLE,
+} ClassRole;
 
 typedef enum {
 	SCRIPT_KIND_EXTERNAL_FILE_ROLE,
@@ -43,6 +49,10 @@ typedef enum {
 typedef enum {
 	STYLESHEET_KIND_EXTERNAL_FILE_ROLE,
 } StylesheetRole;
+
+static roleDefinition ClassRoles [] = {
+	{ true, "attribute", "assigned as attributes" },
+};
 
 static roleDefinition ScriptRoles [] = {
 	{ true, "extFile", "referenced as external files" },
@@ -54,11 +64,14 @@ static roleDefinition StylesheetRoles [] = {
 
 static kindDefinition HtmlKinds [] = {
 	{ true, 'a', "anchor",		"named anchors" },
+	{ true, 'c', "class",		"classes",
+	  .referenceOnly = true, ATTACH_ROLES (ClassRoles)},
 	{ true, 'h', "heading1",	"H1 headings" },
 	{ true, 'i', "heading2",	"H2 headings" },
 	{ true, 'j', "heading3",	"H3 headings" },
 	{ true, 'C', "stylesheet",	"stylesheets",
 	  .referenceOnly = true, ATTACH_ROLES (StylesheetRoles)},
+	{ true, 'I', "id",			"identifiers" },
 	{ true, 'J', "script",		"scripts",
 	  .referenceOnly = true, ATTACH_ROLES (ScriptRoles)},
 };
@@ -76,11 +89,13 @@ typedef enum {
 	KEYWORD_area,
 	KEYWORD_base,
 	KEYWORD_br,
+	KEYWORD_class,
 	KEYWORD_col,
 	KEYWORD_command,
 	KEYWORD_embed,
 	KEYWORD_hr,
 	KEYWORD_href,
+	KEYWORD_id,
 	KEYWORD_img,
 	KEYWORD_input,
 	KEYWORD_keygen,
@@ -107,11 +122,13 @@ static const keywordTable HtmlKeywordTable[] = {
 	{"area", KEYWORD_area},
 	{"base", KEYWORD_base},
 	{"br", KEYWORD_br},
+	{"class", KEYWORD_class},
 	{"col", KEYWORD_col},
 	{"command", KEYWORD_command},
 	{"embed", KEYWORD_embed},
 	{"hr", KEYWORD_hr},
 	{"href", KEYWORD_href},
+	{"id", KEYWORD_id},
 	{"img", KEYWORD_img},
 	{"input", KEYWORD_input},
 	{"keygen", KEYWORD_keygen},
@@ -408,6 +425,30 @@ static bool skipScriptContent (tokenInfo *token, long *line, long *lineOffset)
 	return found_script;
 }
 
+static void makeClassRefTags (const char *classes)
+{
+	vString *klass = vStringNew ();
+
+	do
+	{
+		if (*classes && !isspace (*classes))
+			vStringPut (klass, *classes);
+		else if (!vStringIsEmpty (klass))
+		{
+			makeSimpleRefTag (klass, K_CLASS,
+							  CLASS_KIND_ATTRIBUTE_ROLE);
+			vStringClear (klass);
+		}
+
+		if (!*classes)
+			break;
+
+		classes++;
+	} while (1);
+
+	vStringDelete (klass);
+}
+
 static void readTag (tokenInfo *token, vString *text, int depth)
 {
 	bool textCreated = false;
@@ -432,42 +473,55 @@ static void readTag (tokenInfo *token, vString *text, int depth)
 
 		do
 		{
+			keywordId attribute = KEYWORD_NONE;
+
 			readToken (token, true);
-			if (startTag == KEYWORD_a && token->type == TOKEN_NAME)
-			{
-				keywordId attribute = lookupKeyword (vStringValue (token->string), Lang_html);
+			if (token->type == TOKEN_NAME)
+				attribute = lookupKeyword (vStringValue (token->string), Lang_html);
 
-				if (attribute == KEYWORD_name)
+			if (attribute == KEYWORD_class)
+			{
+				readToken (token, true);
+				if (token->type == TOKEN_EQUAL)
 				{
 					readToken (token, true);
-					if (token->type == TOKEN_EQUAL)
-					{
-						readToken (token, true);
-						if (token->type == TOKEN_STRING || token->type == TOKEN_NAME)
-							makeSimpleTag (token->string, K_ANCHOR);
-					}
+					if (token->type == TOKEN_STRING)
+						makeClassRefTags (vStringValue (token->string));
 				}
 			}
-			else if (startTag == KEYWORD_script && token->type == TOKEN_NAME)
+			else if (attribute == KEYWORD_id)
 			{
-				keywordId attribute = lookupKeyword (vStringValue (token->string), Lang_html);
-
-				if (attribute == KEYWORD_src)
+				readToken (token, true);
+				if (token->type == TOKEN_EQUAL)
 				{
 					readToken (token, true);
-					if (token->type == TOKEN_EQUAL)
-					{
-						readToken (token, true);
-						if (token->type == TOKEN_STRING)
-							makeSimpleRefTag (token->string, K_SCRIPT,
-											  SCRIPT_KIND_EXTERNAL_FILE_ROLE);
-					}
+					if (token->type == TOKEN_STRING)
+						makeSimpleTag (token->string, K_ID);
 				}
 			}
-			else if (startTag == KEYWORD_link && token->type == TOKEN_NAME)
+			else if (startTag == KEYWORD_a && attribute == KEYWORD_name)
 			{
-				keywordId attribute = lookupKeyword (vStringValue (token->string), Lang_html);
-
+				readToken (token, true);
+				if (token->type == TOKEN_EQUAL)
+				{
+					readToken (token, true);
+					if (token->type == TOKEN_STRING || token->type == TOKEN_NAME)
+						makeSimpleTag (token->string, K_ANCHOR);
+				}
+			}
+			else if (startTag == KEYWORD_script && attribute == KEYWORD_src)
+			{
+				readToken (token, true);
+				if (token->type == TOKEN_EQUAL)
+				{
+					readToken (token, true);
+					if (token->type == TOKEN_STRING)
+						makeSimpleRefTag (token->string, K_SCRIPT,
+										  SCRIPT_KIND_EXTERNAL_FILE_ROLE);
+				}
+			}
+			else if (startTag == KEYWORD_link)
+			{
 				if (attribute == KEYWORD_rel)
 				{
 					readToken (token, true);
