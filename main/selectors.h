@@ -27,9 +27,7 @@ selectByArrowOfR (MIO *, langType *, unsigned int);
 const char *
 selectByRexxCommentAndDosbatchLabelPrefix (MIO *, langType *, unsigned int);
 
-#ifdef HAVE_LIBXML
 const char *
 selectByXpathFileSpec (MIO *input, langType *candidates, unsigned int nCandidates);
-#endif
 
 #endif

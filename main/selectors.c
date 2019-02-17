@@ -500,4 +500,15 @@ selectByXpathFileSpec (MIO *input,
 
 	return r;
 }
+
+#else
+
+const char *
+selectByXpathFileSpec (MIO *input,
+					   langType *candidates,
+					   unsigned int nCandidates)
+{
+	return NULL;
+}
+
 #endif
