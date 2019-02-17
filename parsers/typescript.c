@@ -129,13 +129,15 @@ typedef enum eTokenType {
 	TOKEN_REGEXP,
 	TOKEN_POSTFIX_OPERATOR,
 	TOKEN_STAR,
-	TOKEN_BINARY_OPERATOR
+	TOKEN_BINARY_OPERATOR,
+	TOKEN_NL
 } tokenType;
 
 typedef struct sTokenInfo {
 	tokenType		type;
 	keywordId		keyword;
 	vString *		string;
+	vString *		scope;
 	unsigned long 	lineNumber;
 	MIOPos 			filePosition;
 } tokenInfo;
@@ -232,6 +234,9 @@ static void emitTag(const tokenInfo *const token, const tsKind kind)
 	initTagEntry (&e, name, kind);
 	e.lineNumber   = token->lineNumber;
 	e.filePosition = token->filePosition;
+	if (token->scope && vStringLength(token->scope) > 0) {
+		e.extensionFields.scopeName = vStringValue (token->scope);
+	}
 	makeTagEntry (&e);
 }
 
@@ -251,14 +256,29 @@ static void clearPoolToken (void *data)
 	token->keyword		= KEYWORD_NONE;
 	token->lineNumber   = getInputLineNumber ();
 	token->filePosition = getInputFilePosition ();
+	token->scope        = vStringNew ();
 	vStringClear (token->string);
+	vStringClear (token->scope);
 }
 
 static void deletePoolToken (void *data)
 {
 	tokenInfo *token = data;
-	vStringDelete (token->string);
+	if (token->string) vStringDelete (token->string);
+	if (token->scope) vStringDelete (token->scope);
 	eFree (token);
+}
+
+static void copyToken (tokenInfo *const dest, const tokenInfo *const src,
+					   bool scope)
+{
+	dest->lineNumber = src->lineNumber;
+	dest->filePosition = src->filePosition;
+	dest->type = src->type;
+	dest->keyword = src->keyword;
+	vStringCopy(dest->string, src->string);
+	if (scope)
+		vStringCopy(dest->scope, src->scope);
 }
 
 typedef enum eParserResult {
@@ -278,7 +298,7 @@ typedef void (*ParserStateFree)(void *);
 
 inline static bool whiteChar(const char c)
 {
-	return c == ' ' || c == '\n' || c == '\r' || c == '\t';
+	return c == ' ' || c == '\r' || c == '\t';
 }
 
 inline static void parseOneChar(const char c, tokenInfo *const token, const char expected, const tokenType type, parserResult *const result)
@@ -351,10 +371,14 @@ inline static void parseIdentifier(const char c, tokenInfo *const token, int *pa
 		vStringPut (token->string, c);
 		*parsed = *parsed + 1;
 		result->status = PARSER_NEEDS_MORE_INPUT;
+
 		return;
 	}
 
 	if (*parsed > 0) {
+		token->type = TOKEN_IDENTIFIER;
+		token->lineNumber   = getInputLineNumber ();
+		token->filePosition = getInputFilePosition ();
 		result->status = PARSER_FINISHED;
 		result->unusedChars = 1;
 		return;
@@ -412,19 +436,20 @@ PARSER_DEF(WhileKeyword      , parseWord , "while"      , (int*))
 PARSER_DEF(WithKeyword       , parseWord , "with"       , (int*))
 PARSER_DEF(YieldKeyword      , parseWord , "yield"      , (int*))
 
-TOKEN_PARSER_DEF(CloseParen  , ')' , TOKEN_CLOSE_PAREN)
-TOKEN_PARSER_DEF(Semicolon   , ';' , TOKEN_SEMICOLON)
-TOKEN_PARSER_DEF(Comma       , ',' , TOKEN_COMMA)
-TOKEN_PARSER_DEF(Colon       , ':' , TOKEN_COLON)
-TOKEN_PARSER_DEF(OpenParen   , '(' , TOKEN_OPEN_PAREN)
-TOKEN_PARSER_DEF(Period      , '.' , TOKEN_PERIOD)
-TOKEN_PARSER_DEF(OpenCurly   , '{' , TOKEN_OPEN_CURLY)
-TOKEN_PARSER_DEF(CloseCurly  , '}' , TOKEN_CLOSE_CURLY)
-TOKEN_PARSER_DEF(EqualSign   , '=' , TOKEN_EQUAL_SIGN)
-TOKEN_PARSER_DEF(OpenSquare  , '[' , TOKEN_OPEN_SQUARE)
-TOKEN_PARSER_DEF(CloseSquare , ']' , TOKEN_CLOSE_SQUARE)
-TOKEN_PARSER_DEF(Star        , '*' , TOKEN_STAR)
-TOKEN_PARSER_DEF(EOF         , EOF , TOKEN_EOF)
+TOKEN_PARSER_DEF(CloseParen  , ')'  , TOKEN_CLOSE_PAREN)
+TOKEN_PARSER_DEF(Semicolon   , ';'  , TOKEN_SEMICOLON)
+TOKEN_PARSER_DEF(Comma       , ','  , TOKEN_COMMA)
+TOKEN_PARSER_DEF(Colon       , ':'  , TOKEN_COLON)
+TOKEN_PARSER_DEF(OpenParen   , '('  , TOKEN_OPEN_PAREN)
+TOKEN_PARSER_DEF(Period      , '.'  , TOKEN_PERIOD)
+TOKEN_PARSER_DEF(OpenCurly   , '{'  , TOKEN_OPEN_CURLY)
+TOKEN_PARSER_DEF(CloseCurly  , '}'  , TOKEN_CLOSE_CURLY)
+TOKEN_PARSER_DEF(EqualSign   , '='  , TOKEN_EQUAL_SIGN)
+TOKEN_PARSER_DEF(OpenSquare  , '['  , TOKEN_OPEN_SQUARE)
+TOKEN_PARSER_DEF(CloseSquare , ']'  , TOKEN_CLOSE_SQUARE)
+TOKEN_PARSER_DEF(Star        , '*'  , TOKEN_STAR)
+TOKEN_PARSER_DEF(NewLine     , '\n' , TOKEN_NL)
+TOKEN_PARSER_DEF(EOF         , EOF  , TOKEN_EOF)
 
 static bool tryParser(Parser parser, ParserStateInit stInit, ParserStateFree stFree, tokenInfo *const token)
 {
@@ -505,6 +530,7 @@ static void readToken (tokenInfo *const token)
 			parseOpenSquare, NULL, NULL,
 			parseCloseSquare, NULL, NULL,
 			parseStar, NULL, NULL,
+			parseNewLine, NULL, NULL,
 			parseEOF, NULL, NULL,
 
 			parseBreakKeyword, initParseWordState, freeParseWordState,
@@ -563,6 +589,79 @@ static void readToken (tokenInfo *const token)
 		LastTokenType = token->type;
 }
 
+static void skipBlocksTillType (tokenType type, tokenInfo *const token)
+{
+	int nestLevel = 0;
+	do {
+		readToken (token);
+
+		if (isType (token, TOKEN_OPEN_CURLY))
+		{
+			nestLevel++;
+		}
+		else if (nestLevel > 0 && isType (token, TOKEN_CLOSE_CURLY))
+		{
+			nestLevel--;
+		}
+		else if (nestLevel <= 0 && isType (token, type)) return;
+	} while (! isType (token, TOKEN_EOF));
+}
+
+static void parseInterfaceBody (vString *const scope, tokenInfo *const token)
+{
+	do {
+		readToken (token);
+		if (isType (token, TOKEN_EOF)) return;
+	} while (! isType (token, TOKEN_OPEN_CURLY));
+
+	tokenInfo *member = NULL;
+	do {
+		readToken (token);
+		if (isType (token, TOKEN_EOF)) break;
+		else if (!member && isType (token, TOKEN_IDENTIFIER))
+		{
+			member = newToken ();
+			copyToken(member, token, false);
+			vStringCopy (member->scope, scope);
+		}
+		else if (member && isType (token, TOKEN_OPEN_PAREN))
+		{
+			emitTag (member, TSTAG_METHOD);
+			deleteToken (member);
+			member = NULL;
+			skipBlocksTillType (TOKEN_SEMICOLON, token);
+		}
+		else if (member)
+		{
+			emitTag (member, TSTAG_PROPERTY);
+			deleteToken (member);
+			member = NULL;
+			skipBlocksTillType (TOKEN_SEMICOLON, token);
+		}
+	} while (! isType (token, TOKEN_CLOSE_CURLY));
+
+	if (member) {
+		emitTag (member, TSTAG_PROPERTY);
+		deleteToken (member);
+	}
+}
+
+static void parseInterface (tokenInfo *const token)
+{
+	readToken (token);
+
+	if (token->type != TOKEN_IDENTIFIER) return;
+
+	emitTag(token, TSTAG_INTERFACE);
+
+	vString *scope = vStringNew ();
+	vStringCopy (scope, token->string);
+
+	parseInterfaceBody (scope, token);
+
+	vStringDelete(scope);
+}
+
 static void parseTsFile (tokenInfo *const token)
 {
 	do {
@@ -570,7 +669,7 @@ static void parseTsFile (tokenInfo *const token)
 
 		switch (token->keyword) {
 			case KEYWORD_interface:
-				emitTag(token, TSTAG_INTERFACE);
+				parseInterface (token);
 				break;
 		}
 	} while (! isType (token, TOKEN_EOF));
