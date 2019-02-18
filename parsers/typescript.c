@@ -41,7 +41,7 @@ inline static void parse##fname(const char c, tokenInfo *const token, void *stat
 	pfun(c, token, word, stype state, result); \
 }
 
-#define TOKEN_PARSER_DEF(fname, ch, ttype) \
+#define SINGLE_CHAR_PARSER_DEF(fname, ch, ttype) \
 inline static void parse##fname(const char c, tokenInfo *const token, void *state, parserResult *const result) \
 { \
 	parseOneChar(c, token, ch, ttype, result); \
@@ -130,7 +130,8 @@ typedef enum eTokenType {
 	TOKEN_POSTFIX_OPERATOR,
 	TOKEN_STAR,
 	TOKEN_BINARY_OPERATOR,
-	TOKEN_NL
+	TOKEN_NL,
+	TOKEN_COMMENT_BLOCK
 } tokenType;
 
 typedef struct sTokenInfo {
@@ -141,6 +142,12 @@ typedef struct sTokenInfo {
 	unsigned long 	lineNumber;
 	MIOPos 			filePosition;
 } tokenInfo;
+
+typedef struct sCommentState {
+	int  parsed;
+	int  blockParsed;
+	bool isBlock;
+} commentState;
 
 static tokenType LastTokenType;
 static tokenInfo *NextToken;
@@ -360,6 +367,114 @@ inline static void parseWord(const char c, tokenInfo *const token, const char* w
 	result->status = PARSER_FAILED;
 }
 
+inline static void* initParseCommentState()
+{
+	commentState *st = xMalloc (1, commentState);
+	st->parsed = 0;
+	st->blockParsed = 0;
+	st->isBlock = false;
+
+	return st;
+}
+
+inline static void freeParseCommentState(void *state)
+{
+	eFree ((commentState *) state);
+}
+
+inline static void parseComment(const char c, tokenInfo *const token, commentState* state, parserResult *const result)
+{
+	if (state->parsed < 2) {
+		parseWord (c, token, "//", &state->parsed, result);
+
+		if (result->status == PARSER_FAILED) {
+			parseWord (c, token, "/*", &state->parsed, result);
+			if (result->status == PARSER_FINISHED) {
+				result->status = PARSER_NEEDS_MORE_INPUT;
+				state->isBlock = true;
+			}
+		} else if (result->status == PARSER_FINISHED) {
+			result->status = PARSER_NEEDS_MORE_INPUT;
+			state->isBlock = false;
+		}
+
+		return;
+	}
+
+	state->parsed += 1;
+
+	if (state->isBlock) {
+		parseWord (c, token, "*/", &state->blockParsed, result);
+
+		if (result->status == PARSER_FAILED) {
+			state->blockParsed = c == '*' ? 1 : 0;
+			result->status = PARSER_NEEDS_MORE_INPUT;
+		}
+	} else if (c == '\n') {
+		result->status = PARSER_FINISHED;
+	}
+
+	if (result->status == PARSER_FINISHED) {
+		token->type = TOKEN_COMMENT_BLOCK;
+		token->keyword = KEYWORD_NONE;
+		token->lineNumber   = getInputLineNumber ();
+		token->filePosition = getInputFilePosition ();
+
+		return;
+	}
+
+	result->status = PARSER_NEEDS_MORE_INPUT;
+}
+
+inline static void* initParseStringState()
+{
+	char *st = xMalloc (1, char);
+	*st = '\0';
+
+	return st;
+}
+
+inline static void freeParseStringState(void *state)
+{
+	eFree ((char *) state);
+}
+
+inline static void parseString(const char c, tokenInfo *const token, const char quote, char* prev, parserResult *const result)
+{
+	if (*prev == '\0') {
+		if (whiteChar (c)) {
+			result->status = PARSER_NEEDS_MORE_INPUT;
+			return;
+		} else if (c == quote) {
+			*prev = c;
+			result->status = PARSER_NEEDS_MORE_INPUT;
+		} else {
+			result->status = PARSER_FAILED;
+
+			return;
+		}
+	}
+
+	if (c == quote) {
+		if (*prev == '\\') {
+			*prev = c;
+			result->status = PARSER_NEEDS_MORE_INPUT;
+		} else {
+			result->status = PARSER_FINISHED;
+
+			token->type = TOKEN_STRING;
+			token->keyword = KEYWORD_NONE;
+			token->lineNumber   = getInputLineNumber ();
+			token->filePosition = getInputFilePosition ();
+
+			return;
+		}
+	}
+
+	*prev = c;
+	result->status = PARSER_NEEDS_MORE_INPUT;
+}
+
 inline static void parseIdentifier(const char c, tokenInfo *const token, int *parsed, parserResult *const result)
 {
 	if (*parsed == 0 && whiteChar(c)) {
@@ -436,20 +551,24 @@ PARSER_DEF(WhileKeyword      , parseWord , "while"      , (int*))
 PARSER_DEF(WithKeyword       , parseWord , "with"       , (int*))
 PARSER_DEF(YieldKeyword      , parseWord , "yield"      , (int*))
 
-TOKEN_PARSER_DEF(CloseParen  , ')'  , TOKEN_CLOSE_PAREN)
-TOKEN_PARSER_DEF(Semicolon   , ';'  , TOKEN_SEMICOLON)
-TOKEN_PARSER_DEF(Comma       , ','  , TOKEN_COMMA)
-TOKEN_PARSER_DEF(Colon       , ':'  , TOKEN_COLON)
-TOKEN_PARSER_DEF(OpenParen   , '('  , TOKEN_OPEN_PAREN)
-TOKEN_PARSER_DEF(Period      , '.'  , TOKEN_PERIOD)
-TOKEN_PARSER_DEF(OpenCurly   , '{'  , TOKEN_OPEN_CURLY)
-TOKEN_PARSER_DEF(CloseCurly  , '}'  , TOKEN_CLOSE_CURLY)
-TOKEN_PARSER_DEF(EqualSign   , '='  , TOKEN_EQUAL_SIGN)
-TOKEN_PARSER_DEF(OpenSquare  , '['  , TOKEN_OPEN_SQUARE)
-TOKEN_PARSER_DEF(CloseSquare , ']'  , TOKEN_CLOSE_SQUARE)
-TOKEN_PARSER_DEF(Star        , '*'  , TOKEN_STAR)
-TOKEN_PARSER_DEF(NewLine     , '\n' , TOKEN_NL)
-TOKEN_PARSER_DEF(EOF         , EOF  , TOKEN_EOF)
+SINGLE_CHAR_PARSER_DEF(CloseParen  , ')'  , TOKEN_CLOSE_PAREN)
+SINGLE_CHAR_PARSER_DEF(Semicolon   , ';'  , TOKEN_SEMICOLON)
+SINGLE_CHAR_PARSER_DEF(Comma       , ','  , TOKEN_COMMA)
+SINGLE_CHAR_PARSER_DEF(Colon       , ':'  , TOKEN_COLON)
+SINGLE_CHAR_PARSER_DEF(OpenParen   , '('  , TOKEN_OPEN_PAREN)
+SINGLE_CHAR_PARSER_DEF(Period      , '.'  , TOKEN_PERIOD)
+SINGLE_CHAR_PARSER_DEF(OpenCurly   , '{'  , TOKEN_OPEN_CURLY)
+SINGLE_CHAR_PARSER_DEF(CloseCurly  , '}'  , TOKEN_CLOSE_CURLY)
+SINGLE_CHAR_PARSER_DEF(EqualSign   , '='  , TOKEN_EQUAL_SIGN)
+SINGLE_CHAR_PARSER_DEF(OpenSquare  , '['  , TOKEN_OPEN_SQUARE)
+SINGLE_CHAR_PARSER_DEF(CloseSquare , ']'  , TOKEN_CLOSE_SQUARE)
+SINGLE_CHAR_PARSER_DEF(Star        , '*'  , TOKEN_STAR)
+SINGLE_CHAR_PARSER_DEF(NewLine     , '\n' , TOKEN_NL)
+SINGLE_CHAR_PARSER_DEF(EOF         , EOF  , TOKEN_EOF)
+
+PARSER_DEF(StringSQuote   , parseString , '\'' , (char*))
+PARSER_DEF(StringDQuote   , parseString , '"'  , (char*))
+PARSER_DEF(StringTemplate , parseString , '`'  , (char*))
 
 static bool tryParser(Parser parser, ParserStateInit stInit, ParserStateFree stFree, tokenInfo *const token)
 {
@@ -532,6 +651,10 @@ static void readToken (tokenInfo *const token)
 			parseStar, NULL, NULL,
 			parseNewLine, NULL, NULL,
 			parseEOF, NULL, NULL,
+			parseComment, initParseCommentState, freeParseCommentState,
+			parseStringSQuote, initParseStringState, freeParseStringState,
+			parseStringDQuote, initParseStringState, freeParseStringState,
+			parseStringTemplate, initParseStringState, freeParseStringState,
 
 			parseBreakKeyword, initParseWordState, freeParseWordState,
 			parseCaseKeyword, initParseWordState, freeParseWordState,
