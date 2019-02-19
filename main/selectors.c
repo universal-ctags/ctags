@@ -438,6 +438,7 @@ selectParserForXmlDoc (xmlDocPtr doc,
 {
 
 	unsigned int lang_index;
+	bool xml_parser_is_in_candidate = false;;
 
 	verbose ("		Xml[rootElementName]: %s\n",
 			 (doc->children && doc->children->name)
@@ -473,6 +474,15 @@ selectParserForXmlDoc (xmlDocPtr doc,
 			if (matchXpathFileSpec (doc, spec))
 				return getLanguageName (candidates[lang_index]);
 		}
+
+		if (strcmp (getLanguageName (candidates[lang_index]), "XML") == 0)
+			xml_parser_is_in_candidate = true;
+	}
+
+	if (xml_parser_is_in_candidate)
+	{
+		verbose ("		Use generic XML parser as fallback\n");
+		return "XML";
 	}
 
 	return NULL;
@@ -500,4 +510,15 @@ selectByXpathFileSpec (MIO *input,
 
 	return r;
 }
+
+#else
+
+const char *
+selectByXpathFileSpec (MIO *input,
+					   langType *candidates,
+					   unsigned int nCandidates)
+{
+	return NULL;
+}
+
 #endif

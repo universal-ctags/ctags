@@ -1,0 +1,2 @@
+a	input.xml	/^<UnKnownTag id="a">$/;"	i	language:XML	xpath:/UnKnownTag/@id
+b	input.xml	/^  <UnKnownTag2 id="b"\/>$/;"	i	language:XML	xpath:/UnKnownTag/UnKnownTag2/@id

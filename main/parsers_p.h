@@ -20,6 +20,7 @@
 	PlistXMLParser, \
 	RelaxNGParser, \
 	SvgParser, \
+	XmlParser, \
 	XsltParser
 #else
 #define XML_PARSER_LIST
