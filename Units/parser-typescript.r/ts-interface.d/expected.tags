@@ -1,0 +1,34 @@
+Array	input.ts	/^interface Array<T> {$/;"	i
+CompilerOptions	input.ts	/^interface CompilerOptions {$/;"	i
+Document	input.ts	/^interface Document {$/;"	i
+JQuery	input.ts	/^interface JQuery {$/;"	i
+JQueryStatic	input.ts	/^interface JQueryStatic {$/;"	i
+List	input.ts	/^interface List<T> {$/;"	i
+Mover	input.ts	/^interface Mover {$/;"	i
+MoverShaker	input.ts	/^interface MoverShaker extends Mover, Shaker {$/;"	i
+Shaker	input.ts	/^interface Shaker {$/;"	i
+SimpleRecord	input.ts	/^interface SimpleRecord {$/;"	i
+createElement	input.ts	/^  createElement(tagName: "canvas"): HTMLCanvasElement;$/;"	m
+createElement	input.ts	/^  createElement(tagName: "div"): HTMLDivElement;$/;"	m
+createElement	input.ts	/^  createElement(tagName: "span"): HTMLSpanElement;$/;"	m
+createElement	input.ts	/^  createElement(tagName: string): HTMLElement;$/;"	m
+data	input.ts	/^  data: T;$/;"	p
+get	input.ts	/^  get(url: string, callback: (data: string) => any);$/;"	m
+getSomething	input.ts	/^  getSomething(): \/* } *\/ void;$/;"	m
+getSomethingSophisticated	input.ts	/^  getSomethingSophisticated()\/*$/;"	m
+getStatus	input.ts	/^  getStatus(): { frequency: number; };$/;"	m
+getStatus	input.ts	/^  getStatus(): { speed: number; frequency: number; };$/;"	m
+getStatus	input.ts	/^  getStatus(): { speed: number; };$/;"	m
+length	input.ts	/^  length: number;$/;"	p
+move	input.ts	/^  move(): void;$/;"	m
+next	input.ts	/^  next: List<T>;$/;"	p
+owner	input.ts	/^  owner: List<List<T>>;$/;"	p
+propertyA	input.ts	/^  propertyA: number;$/;"	p
+propertyB	input.ts	/^  propertyB: string;$/;"	p
+propertyC	input.ts	/^  readonly propertyC: [];$/;"	p
+shake	input.ts	/^  shake(): void;$/;"	m
+sourcePath	input.ts	/^  sourcePath?: string;$/;"	p
+strict	input.ts	/^  strict?: boolean;$/;"	p
+targetPath	input.ts	/^  targetPath?: string;$/;"	p
+text	input.ts	/^  text(content: string);$/;"	m
+withoutType	input.ts	/^  withoutType?;$/;"	p

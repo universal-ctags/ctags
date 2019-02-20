@@ -90,6 +90,7 @@ enum eKeywordId {
 	KEYWORD_protected,
 	KEYWORD_public,
 	KEYWORD_return,
+	KEYWORD_readonly,
 	KEYWORD_static,
 	KEYWORD_super,
 	KEYWORD_switch,
@@ -111,27 +112,26 @@ typedef enum eTokenType {
 	TOKEN_UNDEFINED,
 	TOKEN_EOF,
 	TOKEN_CHARACTER,
-	TOKEN_CLOSE_PAREN,
 	TOKEN_SEMICOLON,
 	TOKEN_COLON,
+	TOKEN_QUESTION_MARK,
 	TOKEN_COMMA,
 	TOKEN_KEYWORD,
-	TOKEN_OPEN_PAREN,
 	TOKEN_IDENTIFIER,
 	TOKEN_STRING,
-	TOKEN_TEMPLATE_STRING,
+	TOKEN_TEMPLATE,
 	TOKEN_PERIOD,
 	TOKEN_OPEN_CURLY,
 	TOKEN_CLOSE_CURLY,
 	TOKEN_EQUAL_SIGN,
-	TOKEN_OPEN_SQUARE,
-	TOKEN_CLOSE_SQUARE,
 	TOKEN_REGEXP,
 	TOKEN_POSTFIX_OPERATOR,
 	TOKEN_STAR,
 	TOKEN_BINARY_OPERATOR,
 	TOKEN_NL,
-	TOKEN_COMMENT_BLOCK
+	TOKEN_COMMENT_BLOCK,
+	TOKEN_PARENS,
+	TOKEN_SQUARES
 } tokenType;
 
 typedef struct sTokenInfo {
@@ -148,6 +148,21 @@ typedef struct sCommentState {
 	int  blockParsed;
 	bool isBlock;
 } commentState;
+
+typedef struct sTemplateState {
+	int  parsed;
+	int  nestLevel;
+} templateState;
+
+typedef struct sParensState {
+	int  parsed;
+	int  nestLevel;
+} parensState;
+
+typedef struct sSquaresState {
+	int  parsed;
+	int  nestLevel;
+} squaresState;
 
 static tokenType LastTokenType;
 static tokenInfo *NextToken;
@@ -341,6 +356,42 @@ inline static void freeParseWordState(void *state)
 
 inline static void parseWord(const char c, tokenInfo *const token, const char* word, int* parsed, parserResult *const result)
 {
+	if (*parsed == 0 && whiteChar (c)) {
+		result->status = PARSER_NEEDS_MORE_INPUT;
+		return;
+	}
+
+	if (word[*parsed] == '\0') {
+		if (!whiteChar (c) && c != '\n')
+		{
+			result->status = PARSER_FAILED;
+			return;
+		}
+
+		vStringCatS (token->string, word);
+		token->type = TOKEN_KEYWORD;
+		token->keyword = lookupKeyword (vStringValue (token->string), Lang_ts);
+		token->lineNumber   = getInputLineNumber ();
+		token->filePosition = getInputFilePosition ();
+
+		result->unusedChars = 1;
+		result->status = PARSER_FINISHED;
+		return;
+	}
+
+	if (c == word[*parsed])
+	{
+		*parsed = *parsed + 1;
+
+		result->status = PARSER_NEEDS_MORE_INPUT;
+		return;
+	}
+
+	result->status = PARSER_FAILED;
+}
+
+inline static void parseWordToken(const char c, tokenInfo *const token, const char* word, const tokenType type, int* parsed, parserResult *const result)
+{
 	if (*parsed == 0 && whiteChar(c)) {
 		result->status = PARSER_NEEDS_MORE_INPUT;
 		return;
@@ -350,12 +401,9 @@ inline static void parseWord(const char c, tokenInfo *const token, const char* w
 		*parsed = *parsed + 1;
 
 		if (word[*parsed] == '\0') {
-			vStringCatS (token->string, word);
-			token->type = TOKEN_KEYWORD;
-			token->keyword = lookupKeyword (vStringValue (token->string), Lang_ts);
+			token->type = type;
 			token->lineNumber   = getInputLineNumber ();
 			token->filePosition = getInputFilePosition ();
-
 			result->status = PARSER_FINISHED;
 			return;
 		}
@@ -384,11 +432,16 @@ inline static void freeParseCommentState(void *state)
 
 inline static void parseComment(const char c, tokenInfo *const token, commentState* state, parserResult *const result)
 {
+	if (state->parsed == 0 && whiteChar(c)) {
+		result->status = PARSER_NEEDS_MORE_INPUT;
+		return;
+	}
+
 	if (state->parsed < 2) {
-		parseWord (c, token, "//", &state->parsed, result);
+		parseWordToken (c, token, "//", TOKEN_COMMENT_BLOCK, &state->parsed, result);
 
 		if (result->status == PARSER_FAILED) {
-			parseWord (c, token, "/*", &state->parsed, result);
+			parseWordToken (c, token, "/*", TOKEN_COMMENT_BLOCK, &state->parsed, result);
 			if (result->status == PARSER_FINISHED) {
 				result->status = PARSER_NEEDS_MORE_INPUT;
 				state->isBlock = true;
@@ -404,7 +457,7 @@ inline static void parseComment(const char c, tokenInfo *const token, commentSta
 	state->parsed += 1;
 
 	if (state->isBlock) {
-		parseWord (c, token, "*/", &state->blockParsed, result);
+		parseWordToken (c, token, "*/", TOKEN_COMMENT_BLOCK, &state->blockParsed, result);
 
 		if (result->status == PARSER_FAILED) {
 			state->blockParsed = c == '*' ? 1 : 0;
@@ -475,6 +528,180 @@ inline static void parseString(const char c, tokenInfo *const token, const char 
 	result->status = PARSER_NEEDS_MORE_INPUT;
 }
 
+inline static void* initParseTemplateState()
+{
+	templateState *st = xMalloc (1, templateState);
+	st->parsed = 0;
+	st->nestLevel = 0;
+
+	return st;
+}
+
+inline static void freeParseTemplateState(void *state)
+{
+	eFree ((templateState *) state);
+}
+
+inline static void parseTemplate(const char c, tokenInfo *const token, templateState* state, parserResult *const result)
+{
+	if (state->parsed == 0)
+	{
+		if (whiteChar(c))
+		{
+			result->status = PARSER_NEEDS_MORE_INPUT;
+			return;
+		}
+
+		if (c != '<') {
+			result->status = PARSER_FAILED;
+			return;
+		}
+	}
+
+	switch (c) {
+		case '<':
+			state->nestLevel += 1;
+			break;
+		case '>':
+			state->nestLevel -= 1;
+			break;
+		case ';':
+			result->status = PARSER_FAILED;
+			return;
+	}
+
+	state->parsed += 1;
+
+	if (state->nestLevel <= 0)
+	{
+		token->type = TOKEN_TEMPLATE;
+		token->keyword = KEYWORD_NONE;
+		token->lineNumber   = getInputLineNumber ();
+		token->filePosition = getInputFilePosition ();
+	    result->status = PARSER_FINISHED;
+
+		return;
+	}
+
+	result->status = PARSER_NEEDS_MORE_INPUT;
+}
+
+inline static void* initParseParensState()
+{
+	parensState *st = xMalloc (1, parensState);
+	st->parsed = 0;
+	st->nestLevel = 0;
+
+	return st;
+}
+
+inline static void freeParseParensState(void *state)
+{
+	eFree ((parensState *) state);
+}
+
+inline static void parseParens(const char c, tokenInfo *const token, parensState* state, parserResult *const result)
+{
+	if (state->parsed == 0)
+	{
+		if (whiteChar(c))
+		{
+			result->status = PARSER_NEEDS_MORE_INPUT;
+			return;
+		}
+
+		if (c != '(') {
+			result->status = PARSER_FAILED;
+			return;
+		}
+	}
+
+	switch (c) {
+		case '(':
+			state->nestLevel += 1;
+			break;
+		case ')':
+			state->nestLevel -= 1;
+			break;
+		case ';':
+			result->status = PARSER_FAILED;
+			return;
+	}
+
+	state->parsed += 1;
+
+	if (state->nestLevel <= 0)
+	{
+		token->type = TOKEN_PARENS;
+		token->keyword = KEYWORD_NONE;
+		token->lineNumber   = getInputLineNumber ();
+		token->filePosition = getInputFilePosition ();
+		result->status = PARSER_FINISHED;
+
+		return;
+	}
+
+	result->status = PARSER_NEEDS_MORE_INPUT;
+}
+
+inline static void* initParseSquaresState()
+{
+	squaresState *st = xMalloc (1, squaresState);
+	st->parsed = 0;
+	st->nestLevel = 0;
+
+	return st;
+}
+
+inline static void freeParseSquaresState(void *state)
+{
+	eFree ((squaresState *) state);
+}
+
+inline static void parseSquares(const char c, tokenInfo *const token, squaresState* state, parserResult *const result)
+{
+	if (state->parsed == 0)
+	{
+		if (whiteChar(c))
+		{
+			result->status = PARSER_NEEDS_MORE_INPUT;
+			return;
+		}
+
+		if (c != '[') {
+			result->status = PARSER_FAILED;
+			return;
+		}
+	}
+
+	switch (c) {
+		case '[':
+			state->nestLevel += 1;
+			break;
+		case ']':
+			state->nestLevel -= 1;
+			break;
+		case ';':
+			result->status = PARSER_FAILED;
+			return;
+	}
+
+	state->parsed += 1;
+
+	if (state->nestLevel <= 0)
+	{
+		token->type = TOKEN_SQUARES;
+		token->keyword = KEYWORD_NONE;
+		token->lineNumber   = getInputLineNumber ();
+		token->filePosition = getInputFilePosition ();
+		result->status = PARSER_FINISHED;
+
+		return;
+	}
+
+	result->status = PARSER_NEEDS_MORE_INPUT;
+}
+
 inline static void parseIdentifier(const char c, tokenInfo *const token, int *parsed, parserResult *const result)
 {
 	if (*parsed == 0 && whiteChar(c)) {
@@ -535,6 +762,7 @@ PARSER_DEF(PackageKeyword    , parseWord , "package"    , (int*))
 PARSER_DEF(PrivateKeyword    , parseWord , "private"    , (int*))
 PARSER_DEF(ProtectedKeyword  , parseWord , "protected"  , (int*))
 PARSER_DEF(PublicKeyword     , parseWord , "public"     , (int*))
+PARSER_DEF(ReadonlyKeyword   , parseWord , "readonly"   , (int*))
 PARSER_DEF(ReturnKeyword     , parseWord , "return"     , (int*))
 PARSER_DEF(StaticKeyword     , parseWord , "static"     , (int*))
 PARSER_DEF(SuperKeyword      , parseWord , "super"      , (int*))
@@ -551,20 +779,18 @@ PARSER_DEF(WhileKeyword      , parseWord , "while"      , (int*))
 PARSER_DEF(WithKeyword       , parseWord , "with"       , (int*))
 PARSER_DEF(YieldKeyword      , parseWord , "yield"      , (int*))
 
-SINGLE_CHAR_PARSER_DEF(CloseParen  , ')'  , TOKEN_CLOSE_PAREN)
-SINGLE_CHAR_PARSER_DEF(Semicolon   , ';'  , TOKEN_SEMICOLON)
-SINGLE_CHAR_PARSER_DEF(Comma       , ','  , TOKEN_COMMA)
-SINGLE_CHAR_PARSER_DEF(Colon       , ':'  , TOKEN_COLON)
-SINGLE_CHAR_PARSER_DEF(OpenParen   , '('  , TOKEN_OPEN_PAREN)
-SINGLE_CHAR_PARSER_DEF(Period      , '.'  , TOKEN_PERIOD)
-SINGLE_CHAR_PARSER_DEF(OpenCurly   , '{'  , TOKEN_OPEN_CURLY)
-SINGLE_CHAR_PARSER_DEF(CloseCurly  , '}'  , TOKEN_CLOSE_CURLY)
-SINGLE_CHAR_PARSER_DEF(EqualSign   , '='  , TOKEN_EQUAL_SIGN)
-SINGLE_CHAR_PARSER_DEF(OpenSquare  , '['  , TOKEN_OPEN_SQUARE)
-SINGLE_CHAR_PARSER_DEF(CloseSquare , ']'  , TOKEN_CLOSE_SQUARE)
-SINGLE_CHAR_PARSER_DEF(Star        , '*'  , TOKEN_STAR)
-SINGLE_CHAR_PARSER_DEF(NewLine     , '\n' , TOKEN_NL)
-SINGLE_CHAR_PARSER_DEF(EOF         , EOF  , TOKEN_EOF)
+
+SINGLE_CHAR_PARSER_DEF(Semicolon    , ';'  , TOKEN_SEMICOLON)
+SINGLE_CHAR_PARSER_DEF(Comma        , ','  , TOKEN_COMMA)
+SINGLE_CHAR_PARSER_DEF(Colon        , ':'  , TOKEN_COLON)
+SINGLE_CHAR_PARSER_DEF(Period       , '.'  , TOKEN_PERIOD)
+SINGLE_CHAR_PARSER_DEF(OpenCurly    , '{'  , TOKEN_OPEN_CURLY)
+SINGLE_CHAR_PARSER_DEF(CloseCurly   , '}'  , TOKEN_CLOSE_CURLY)
+SINGLE_CHAR_PARSER_DEF(EqualSign    , '='  , TOKEN_EQUAL_SIGN)
+SINGLE_CHAR_PARSER_DEF(Star         , '*'  , TOKEN_STAR)
+SINGLE_CHAR_PARSER_DEF(NewLine      , '\n' , TOKEN_NL)
+SINGLE_CHAR_PARSER_DEF(QuestionMark , '?'  , TOKEN_QUESTION_MARK)
+SINGLE_CHAR_PARSER_DEF(EOF          , EOF  , TOKEN_EOF)
 
 PARSER_DEF(StringSQuote   , parseString , '\'' , (char*))
 PARSER_DEF(StringDQuote   , parseString , '"'  , (char*))
@@ -637,21 +863,21 @@ static void readToken (tokenInfo *const token)
 	clearPoolToken (token);
 
 	bool parsed = tryParse(token,
-			parseCloseParen, NULL, NULL,
 			parseSemicolon, NULL, NULL,
 			parseComma, NULL, NULL,
+			parseQuestionMark, NULL, NULL,
 			parseColon, NULL, NULL,
-			parseOpenParen, NULL, NULL,
 			parsePeriod, NULL, NULL,
 			parseOpenCurly, NULL, NULL,
 			parseCloseCurly, NULL, NULL,
 			parseEqualSign, NULL, NULL,
-			parseOpenSquare, NULL, NULL,
-			parseCloseSquare, NULL, NULL,
 			parseStar, NULL, NULL,
 			parseNewLine, NULL, NULL,
 			parseEOF, NULL, NULL,
+			parseSquares, initParseSquaresState, freeParseSquaresState,
+			parseParens, initParseParensState, freeParseParensState,
 			parseComment, initParseCommentState, freeParseCommentState,
+			parseTemplate, initParseTemplateState, freeParseTemplateState,
 			parseStringSQuote, initParseStringState, freeParseStringState,
 			parseStringDQuote, initParseStringState, freeParseStringState,
 			parseStringTemplate, initParseStringState, freeParseStringState,
@@ -689,6 +915,7 @@ static void readToken (tokenInfo *const token)
 			parsePrivateKeyword, initParseWordState, freeParseWordState,
 			parseProtectedKeyword, initParseWordState, freeParseWordState,
 			parsePublicKeyword, initParseWordState, freeParseWordState,
+			parseReadonlyKeyword, initParseWordState, freeParseWordState,
 			parseReturnKeyword, initParseWordState, freeParseWordState,
 			parseStaticKeyword, initParseWordState, freeParseWordState,
 			parseSuperKeyword, initParseWordState, freeParseWordState,
@@ -747,7 +974,15 @@ static void parseInterfaceBody (vString *const scope, tokenInfo *const token)
 			copyToken(member, token, false);
 			vStringCopy (member->scope, scope);
 		}
-		else if (member && isType (token, TOKEN_OPEN_PAREN))
+		else if (!member && isType (token, TOKEN_PARENS))
+		{
+			skipBlocksTillType (TOKEN_SEMICOLON, token);
+		}
+		else if (!member && isType (token, TOKEN_SQUARES))
+		{
+			skipBlocksTillType (TOKEN_SEMICOLON, token);
+		}
+		else if (member && isType (token, TOKEN_PARENS))
 		{
 			emitTag (member, TSTAG_METHOD);
 			deleteToken (member);
