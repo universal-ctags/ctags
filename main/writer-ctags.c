@@ -31,8 +31,8 @@ static int writeCtagsPtagEntry (tagWriter *writer CTAGS_ATTR_UNUSED,
 								const char *const parserName);
 
 struct rejection {
-	bool rejectedInThisRendering;
-	bool rejectedInThisInput;
+	bool rejectionInThisRendering;
+	bool rejectionInThisInput;
 };
 
 tagWriter uCtagsWriter = {
@@ -47,7 +47,7 @@ static void *beginECtagsFile (tagWriter *writer CTAGS_ATTR_UNUSED, MIO * mio CTA
 {
 	static struct rejection rej;
 
-	rej.rejectedInThisInput = false;
+	rej.rejectionInThisInput = false;
 
 	return &rej;
 }
@@ -55,7 +55,7 @@ static void *beginECtagsFile (tagWriter *writer CTAGS_ATTR_UNUSED, MIO * mio CTA
 static bool endECTagsFile (tagWriter *writer, MIO * mio CTAGS_ATTR_UNUSED, const char* filename CTAGS_ATTR_UNUSED)
 {
 	struct rejection *rej = writer->private;
-	return rej->rejectedInThisInput;
+	return rej->rejectionInThisInput;
 }
 
 tagWriter eCtagsWriter = {
@@ -71,8 +71,8 @@ static const char* escapeFieldValue (tagWriter *writer, const tagEntryInfo * tag
 	if (writer->private)
 	{
 		struct rejection * rej = writer->private;
-		if (!rej->rejectedInThisRendering)
-			rej->rejectedInThisRendering = doesFieldHaveTabChar (ftype, tag, NO_PARSER_FIELD);
+		if (!rej->rejectionInThisRendering)
+			rej->rejectionInThisRendering = doesFieldHaveTabChar (ftype, tag, NO_PARSER_FIELD);
 	}
 
 	if (writer->type == WRITER_E_CTAGS && doesFieldHaveRenderer(ftype, true))
@@ -108,8 +108,8 @@ static int addParserFields (tagWriter *writer, MIO * mio, const tagEntryInfo *co
 		if (! isFieldEnabled (f->ftype))
 			continue;
 
-		if (rej && (!rej->rejectedInThisRendering))
-			rej->rejectedInThisRendering = doesFieldHaveTabChar (f->ftype, tag, i);
+		if (rej && (!rej->rejectionInThisRendering))
+			rej->rejectionInThisRendering = doesFieldHaveTabChar (f->ftype, tag, i);
 
 		const char *v;
 		if (writer->type == WRITER_E_CTAGS && doesFieldHaveRenderer(f->ftype, true))
@@ -236,7 +236,7 @@ static int writeCtagsEntry (tagWriter *writer,
 		struct rejection *rej = writer->private;
 
 		origin = mio_tell (mio);
-		rej->rejectedInThisRendering = false;
+		rej->rejectionInThisRendering = false;
 
 	}
 
@@ -267,12 +267,12 @@ static int writeCtagsEntry (tagWriter *writer,
 	length += mio_printf (mio, "\n");
 
 	if (writer->private
-		&& ((struct rejection *)(writer->private))->rejectedInThisRendering)
+		&& ((struct rejection *)(writer->private))->rejectionInThisRendering)
 	{
 		mio_seek (mio, origin, SEEK_SET);
 
 		/* Truncation is needed. */
-		((struct rejection *)(writer->private))->rejectedInThisInput = true;
+		((struct rejection *)(writer->private))->rejectionInThisInput = true;
 
 		length = 0;
 	}
