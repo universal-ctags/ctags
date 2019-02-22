@@ -109,7 +109,7 @@ static int addParserFields (tagWriter *writer, MIO * mio, const tagEntryInfo *co
 			continue;
 
 		if (rej && (!rej->rejectedInThisRendering))
-			rej->rejectedInThisRendering = doesFieldHaveTabChar (f->ftype, tag, NO_PARSER_FIELD);
+			rej->rejectedInThisRendering = doesFieldHaveTabChar (f->ftype, tag, i);
 
 		const char *v;
 		if (writer->type == WRITER_E_CTAGS && doesFieldHaveRenderer(f->ftype, true))
