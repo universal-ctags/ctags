@@ -1025,7 +1025,7 @@ static const char* defaultRenderer (const tagEntryInfo *const tag CTAGS_ATTR_UNU
 				    const char *value,
 				    vString * buffer CTAGS_ATTR_UNUSED)
 {
-	return value;
+	return renderEscapedString (value, tag, buffer);
 }
 
 extern int defineField (fieldDefinition *def, langType language)
