@@ -72,7 +72,7 @@ static const char* escapeFieldValue (tagWriter *writer, const tagEntryInfo * tag
 	{
 		struct rejection * rej = writer->private;
 		if (!rej->rejectedInThisRendering)
-			rej->rejectedInThisRendering = doesFieldHaveWhitespaceChar (ftype, tag, NO_PARSER_FIELD);
+			rej->rejectedInThisRendering = doesFieldHaveTabChar (ftype, tag, NO_PARSER_FIELD);
 	}
 
 	if (writer->type == WRITER_E_CTAGS && doesFieldHaveRenderer(ftype, true))
@@ -109,7 +109,7 @@ static int addParserFields (tagWriter *writer, MIO * mio, const tagEntryInfo *co
 			continue;
 
 		if (rej && (!rej->rejectedInThisRendering))
-			rej->rejectedInThisRendering = doesFieldHaveWhitespaceChar (f->ftype, tag, NO_PARSER_FIELD);
+			rej->rejectedInThisRendering = doesFieldHaveTabChar (f->ftype, tag, NO_PARSER_FIELD);
 
 		const char *v;
 		if (writer->type == WRITER_E_CTAGS && doesFieldHaveRenderer(f->ftype, true))

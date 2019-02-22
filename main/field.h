@@ -86,7 +86,7 @@ struct sFieldDefinition {
 
 	fieldRenderer render;
 	fieldRenderer renderNoEscaping;
-	bool (*hasWhitespaceChar) (const tagEntryInfo *const, const char*);
+	bool (*hasTabChar) (const tagEntryInfo *const, const char*);
 
 	bool (* isValueAvailable) (const tagEntryInfo *const);
 
