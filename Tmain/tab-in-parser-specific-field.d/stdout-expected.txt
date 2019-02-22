@@ -1,0 +1,6 @@
+# Universal-ctags output format
+fun0	input.foo	/^def fun0@prop(arg0, arg1):$/;"	f	fprop:(arg0, arg1)
+fun1	input.foo	/^def fun1@prop(arg0,	arg1):$/;"	f	fprop:(arg0,\targ1)
+# Exuberant-ctags output format
+# fun1 has a tab char in fprop fields. So ctags drops it silent.
+fun0	input.foo	/^def fun0@prop(arg0, arg1):$/;"	f	fprop:(arg0, arg1)

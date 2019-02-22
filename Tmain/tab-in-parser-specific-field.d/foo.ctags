@@ -1,0 +1,6 @@
+--langdef=foo
+--map-foo=.foo
+--_fielddef-foo=fprop,property attached to a function
+--kinddef-foo=f,func,functions
+--fields-foo=+{fprop}
+--regex-foo=/^def +([^@]+)@prop(\([^\)]*\)):/\1/f/{_field=fprop:\2}
