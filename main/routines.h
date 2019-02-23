@@ -50,6 +50,7 @@ extern void *eMalloc (const size_t size);
 extern void *eCalloc (const size_t count, const size_t size);
 extern void *eRealloc (void *const ptr, const size_t size);
 extern void eFree (void *const ptr);
+extern void eFreeNoNullCheck (void *const ptr);
 extern void eFreeIndirect(void **ptr);
 
 /* String manipulation functions */

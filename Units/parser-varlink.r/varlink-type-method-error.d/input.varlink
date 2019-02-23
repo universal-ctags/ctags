@@ -1,0 +1,25 @@
+# Taken from https://github.com/varlink/rust/blob/master/examples/more/src/org.example.more.varlink
+
+# Example Varlink service
+interface org.example.more
+
+# Enum, returning either start, progress or end
+# progress: [0-100]
+type State (
+  start: ?bool,
+  progress: ?int,
+  end: ?bool
+)
+
+# Returns the same string
+method Ping(ping: string) -> (pong: string)
+
+# Dummy progress method
+# n: number of progress steps
+method TestMore(n: int) -> (state: State)
+
+# Stop serving
+method StopServing() -> ()
+
+# Something failed in TestMore
+error TestMoreError (reason: string)

@@ -1,0 +1,14 @@
+org.example.more	input.varlink	/^interface org.example.more$/;"	i
+State	input.varlink	/^type State ($/;"	s	interface:org.example.more
+start	input.varlink	/^  start: ?bool,$/;"	f	struct:org.example.more.State
+progress	input.varlink	/^  progress: ?int,$/;"	f	struct:org.example.more.State
+end	input.varlink	/^  end: ?bool$/;"	f	struct:org.example.more.State
+Ping	input.varlink	/^method Ping(ping: string) -> (pong: string)$/;"	m	interface:org.example.more
+ping	input.varlink	/^method Ping(ping: string) -> (pong: string)$/;"	I	method:org.example.more.Ping
+pong	input.varlink	/^method Ping(ping: string) -> (pong: string)$/;"	O	method:org.example.more.Ping
+TestMore	input.varlink	/^method TestMore(n: int) -> (state: State)$/;"	m	interface:org.example.more
+n	input.varlink	/^method TestMore(n: int) -> (state: State)$/;"	I	method:org.example.more.TestMore
+state	input.varlink	/^method TestMore(n: int) -> (state: State)$/;"	O	method:org.example.more.TestMore
+StopServing	input.varlink	/^method StopServing() -> ()$/;"	m	interface:org.example.more
+TestMoreError	input.varlink	/^error TestMoreError (reason: string)$/;"	E	interface:org.example.more
+reason	input.varlink	/^error TestMoreError (reason: string)$/;"	d	error:org.example.more.TestMoreError
