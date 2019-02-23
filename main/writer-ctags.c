@@ -65,23 +65,27 @@ tagWriter eCtagsWriter = {
 	.postWriteEntry = endECTagsFile,
 	.defaultFileName = CTAGS_FILE,
 };
-
-static const char* escapeFieldValue (tagWriter *writer, const tagEntryInfo * tag, fieldType ftype)
+static const char* escapeFieldValueFull (tagWriter *writer, const tagEntryInfo * tag, fieldType ftype, int fieldIndex)
 {
 	if (writer->private)
 	{
 		struct rejection * rej = writer->private;
 		if (!rej->rejectionInThisRendering)
-			rej->rejectionInThisRendering = doesFieldHaveTabChar (ftype, tag, NO_PARSER_FIELD);
+			rej->rejectionInThisRendering = doesFieldHaveTabChar (ftype, tag, fieldIndex);
 	}
 
 	const char *v;
 	if (writer->type == WRITER_E_CTAGS && doesFieldHaveRenderer(ftype, true))
-		v = renderFieldNoEscaping (ftype, tag, NO_PARSER_FIELD);
+		v = renderFieldNoEscaping (ftype, tag, fieldIndex);
 	else
-		v = renderField (ftype, tag, NO_PARSER_FIELD);
+		v = renderField (ftype, tag, fieldIndex);
 
 	return v;
+}
+
+static const char* escapeFieldValue (tagWriter *writer, const tagEntryInfo * tag, fieldType ftype)
+{
+	return escapeFieldValueFull (writer, tag, ftype, NO_PARSER_FIELD);
 }
 
 static int renderExtensionFieldMaybe (tagWriter *writer, int xftype, const tagEntryInfo *const tag, char sep[2], MIO *mio)
@@ -111,22 +115,9 @@ static int addParserFields (tagWriter *writer, MIO * mio, const tagEntryInfo *co
 		if (! isFieldEnabled (ftype))
 			continue;
 
-		if (writer->private)
-		{
-			struct rejection * rej = writer->private;
-			if (!rej->rejectionInThisRendering)
-				rej->rejectionInThisRendering = doesFieldHaveTabChar (ftype, tag, i);
-		}
-
-		const char *v;
-		if (writer->type == WRITER_E_CTAGS && doesFieldHaveRenderer(ftype, true))
-			v = renderFieldNoEscaping (ftype, tag, i);
-		else
-			v = renderField (ftype, tag, i);
-
 		length += mio_printf(mio, "\t%s:%s",
 							 getFieldName (ftype),
-							 v);
+							 escapeFieldValueFull (writer, tag, ftype, i));
 	}
 	return length;
 }
