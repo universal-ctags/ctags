@@ -31,7 +31,6 @@ static int writeCtagsPtagEntry (tagWriter *writer CTAGS_ATTR_UNUSED,
 								const char *const parserName);
 
 struct rejection {
-	bool rejectionInThisRendering;
 	bool rejectionInThisInput;
 };
 
@@ -65,15 +64,76 @@ tagWriter eCtagsWriter = {
 	.postWriteEntry = endECTagsFile,
 	.defaultFileName = CTAGS_FILE,
 };
-static const char* escapeFieldValueFull (tagWriter *writer, const tagEntryInfo * tag, fieldType ftype, int fieldIndex)
+
+static bool hasTagEntryTabChar (const tagEntryInfo * const tag)
 {
-	if (writer->private)
+
+	if (doesFieldHaveTabChar (FIELD_NAME, tag, NO_PARSER_FIELD)
+		|| doesFieldHaveTabChar (FIELD_INPUT_FILE, tag, NO_PARSER_FIELD))
+		return true;
+
+	if (tag->lineNumberEntry)
 	{
-		struct rejection * rej = writer->private;
-		if (!rej->rejectionInThisRendering)
-			rej->rejectionInThisRendering = doesFieldHaveTabChar (ftype, tag, fieldIndex);
+		if (Option.lineDirectives)
+		{
+			if (doesFieldHaveTabChar (FIELD_LINE_NUMBER, tag, NO_PARSER_FIELD))
+				return true;
+		}
+	}
+	else if (doesFieldHaveTabChar (FIELD_PATTERN, tag, NO_PARSER_FIELD))
+	{
+		/* Pattern may have a tab char. However, doesFieldHaveTabChar returns
+		 * false because NO_PARSER_FIELD may not have hasTabChar handler.
+		 */
+		return true;
 	}
 
+	if (includeExtensionFlags ())
+	{
+		if (isFieldEnabled (FIELD_SCOPE) && doesFieldHaveValue (FIELD_SCOPE, tag)
+			&& (doesFieldHaveTabChar (FIELD_SCOPE_KIND_LONG, tag, NO_PARSER_FIELD)
+				|| doesFieldHaveTabChar (FIELD_SCOPE, tag, NO_PARSER_FIELD)))
+			return true;
+		if (isFieldEnabled (FIELD_TYPE_REF) && doesFieldHaveValue (FIELD_TYPE_REF, tag)
+			&& doesFieldHaveTabChar (FIELD_TYPE_REF, tag, NO_PARSER_FIELD))
+			return true;
+		if (isFieldEnabled (FIELD_FILE_SCOPE) && doesFieldHaveValue (FIELD_FILE_SCOPE, tag)
+			&& doesFieldHaveTabChar (FIELD_FILE_SCOPE, tag, NO_PARSER_FIELD))
+			return true;
+
+		int f[] = { FIELD_INHERITANCE,
+					FIELD_ACCESS,
+					FIELD_IMPLEMENTATION,
+					FIELD_SIGNATURE,
+					FIELD_ROLES,
+					FIELD_EXTRAS,
+					FIELD_XPATH,
+					FIELD_END_LINE,
+					-1};
+		for (unsigned int i = 0; f[i] >= 0; i++)
+		{
+			if (isFieldEnabled (f[i]) && doesFieldHaveValue (f[i], tag)
+				&& doesFieldHaveTabChar (f[i], tag, NO_PARSER_FIELD))
+				return true;
+		}
+	}
+
+	for (unsigned int i = 0; i < tag->usedParserFields; i++)
+	{
+		const tagField *f = getParserField(tag, i);
+		fieldType ftype = f->ftype;
+		if (isFieldEnabled (ftype))
+		{
+			if (doesFieldHaveTabChar (ftype, tag, i))
+				return true;
+		}
+	}
+	return false;
+}
+
+
+static const char* escapeFieldValueFull (tagWriter *writer, const tagEntryInfo * tag, fieldType ftype, int fieldIndex)
+{
 	const char *v;
 	if (writer->type == WRITER_E_CTAGS && doesFieldHaveRenderer(ftype, true))
 		v = renderFieldNoEscaping (ftype, tag, fieldIndex);
@@ -227,15 +287,14 @@ static int addExtensionFields (tagWriter *writer, MIO *mio, const tagEntryInfo *
 static int writeCtagsEntry (tagWriter *writer,
 							MIO * mio, const tagEntryInfo *const tag)
 {
-	long origin = 0;
-
 	if (writer->private)
 	{
 		struct rejection *rej = writer->private;
-
-		origin = mio_tell (mio);
-		rej->rejectionInThisRendering = false;
-
+		if (hasTagEntryTabChar (tag))
+		{
+			rej->rejectionInThisInput = true;
+			return 0;
+		}
 	}
 
 	int length = mio_printf (mio, "%s\t%s\t",
@@ -264,16 +323,6 @@ static int writeCtagsEntry (tagWriter *writer,
 
 	length += mio_printf (mio, "\n");
 
-	if (writer->private
-		&& ((struct rejection *)(writer->private))->rejectionInThisRendering)
-	{
-		mio_seek (mio, origin, SEEK_SET);
-
-		/* Truncation is needed. */
-		((struct rejection *)(writer->private))->rejectionInThisInput = true;
-
-		length = 0;
-	}
 	return length;
 }
 
