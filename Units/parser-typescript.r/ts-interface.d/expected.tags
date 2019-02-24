@@ -17,8 +17,8 @@ get	input.ts	/^  get(url: string, callback: (data: string) => any);$/;"	m
 getSomething	input.ts	/^  getSomething(): \/* } *\/ void;$/;"	m
 getSomethingSophisticated	input.ts	/^  getSomethingSophisticated()\/*$/;"	m
 getStatus	input.ts	/^  getStatus(): { frequency: number; };$/;"	m
-getStatus	input.ts	/^  getStatus(): { speed: number; frequency: number; };$/;"	m
 getStatus	input.ts	/^  getStatus(): { speed: number; };$/;"	m
+getStatus	input.ts	/^  getStatus(\/*)*\/): { speed: number; frequency: number; };$/;"	m
 length	input.ts	/^  length: number;$/;"	p
 move	input.ts	/^  move(): void;$/;"	m
 next	input.ts	/^  next: List<T>;$/;"	p

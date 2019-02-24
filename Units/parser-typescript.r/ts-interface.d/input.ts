@@ -9,7 +9,7 @@ interface Shaker {
 }
 
 interface MoverShaker extends Mover, Shaker {
-  getStatus(): { speed: number; frequency: number; };
+  getStatus(/*)*/): { speed: number; frequency: number; };
   //somethingCommentedOut(): string;
   getSomething(): /* } */ void;
   getSomethingSophisticated()/*

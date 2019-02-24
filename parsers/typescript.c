@@ -47,6 +47,12 @@ inline static void parse##fname(const char c, tokenInfo *const token, void *stat
 	parseOneChar(c, token, ch, ttype, result); \
 }
 
+#define BLOCK_PARSER_DEF(fname, start, end, ttype) \
+inline static void parse##fname(const char c, tokenInfo *const token, void *state, parserResult *const result) \
+{ \
+	parseBlock(c, token, ttype, start, end, (blockState*) state, result); \
+}
+
 /*
  *	DATA DEFINITIONS
  */
@@ -149,20 +155,10 @@ typedef struct sCommentState {
 	bool isBlock;
 } commentState;
 
-typedef struct sTemplateState {
+typedef struct sBlockState {
 	int  parsed;
 	int  nestLevel;
-} templateState;
-
-typedef struct sParensState {
-	int  parsed;
-	int  nestLevel;
-} parensState;
-
-typedef struct sSquaresState {
-	int  parsed;
-	int  nestLevel;
-} squaresState;
+} blockState;
 
 static tokenType LastTokenType;
 static tokenInfo *NextToken;
@@ -245,6 +241,23 @@ static kindDefinition TsKinds [] = {
 	{ true,	 'a', "alias",		  "aliases",		   }
 };
 
+typedef enum eParserResult {
+	PARSER_FINISHED,
+	PARSER_NEEDS_MORE_INPUT,
+	PARSER_FAILED
+} parserResultStatus;
+
+typedef struct sParserResult {
+	parserResultStatus status;
+	unsigned int       unusedChars;
+} parserResult;
+
+typedef void (*Parser)(const char c, tokenInfo *const, void *state, parserResult *const);
+typedef void* (*ParserStateInit)();
+typedef void (*ParserStateFree)(void *);
+
+static bool tryParser(Parser parser, ParserStateInit stInit, ParserStateFree stFree, tokenInfo *const token);
+
 static void emitTag(const tokenInfo *const token, const tsKind kind)
 {
 	if (!TsKinds [kind].enabled)
@@ -302,21 +315,6 @@ static void copyToken (tokenInfo *const dest, const tokenInfo *const src,
 	if (scope)
 		vStringCopy(dest->scope, src->scope);
 }
-
-typedef enum eParserResult {
-	PARSER_FINISHED,
-	PARSER_NEEDS_MORE_INPUT,
-	PARSER_FAILED
-} parserResultStatus;
-
-typedef struct sParserResult {
-	parserResultStatus status;
-	unsigned int       unusedChars;
-} parserResult;
-
-typedef void (*Parser)(const char c, tokenInfo *const, void *state, parserResult *const);
-typedef void* (*ParserStateInit)();
-typedef void (*ParserStateFree)(void *);
 
 inline static bool whiteChar(const char c)
 {
@@ -456,16 +454,17 @@ inline static void parseComment(const char c, tokenInfo *const token, commentSta
 
 	state->parsed += 1;
 
-	if (state->isBlock) {
+	if (c == EOF) result->status = PARSER_FINISHED;
+	else if (state->isBlock)
+	{
 		parseWordToken (c, token, "*/", TOKEN_COMMENT_BLOCK, &state->blockParsed, result);
 
 		if (result->status == PARSER_FAILED) {
 			state->blockParsed = c == '*' ? 1 : 0;
 			result->status = PARSER_NEEDS_MORE_INPUT;
 		}
-	} else if (c == '\n') {
-		result->status = PARSER_FINISHED;
 	}
+	else if (c == '\n') result->status = PARSER_FINISHED;
 
 	if (result->status == PARSER_FINISHED) {
 		token->type = TOKEN_COMMENT_BLOCK;
@@ -528,169 +527,49 @@ inline static void parseString(const char c, tokenInfo *const token, const char 
 	result->status = PARSER_NEEDS_MORE_INPUT;
 }
 
-inline static void* initParseTemplateState()
+inline static void* initBlockState()
 {
-	templateState *st = xMalloc (1, templateState);
+	blockState *st = xMalloc (1, blockState);
 	st->parsed = 0;
 	st->nestLevel = 0;
 
 	return st;
 }
 
-inline static void freeParseTemplateState(void *state)
+inline static void freeBlockState(void *state)
 {
-	eFree ((templateState *) state);
+	eFree ((blockState *) state);
 }
 
-inline static void parseTemplate(const char c, tokenInfo *const token, templateState* state, parserResult *const result)
+inline static void parseBlock(const char c, tokenInfo *const token, tokenType const ttype, const char start, const char end, blockState* state, parserResult *const result)
 {
 	if (state->parsed == 0)
 	{
-		if (whiteChar(c))
+		if (whiteChar (c))
 		{
 			result->status = PARSER_NEEDS_MORE_INPUT;
 			return;
 		}
 
-		if (c != '<') {
-			result->status = PARSER_FAILED;
-			return;
-		}
-	}
-
-	switch (c) {
-		case '<':
-			state->nestLevel += 1;
-			break;
-		case '>':
-			state->nestLevel -= 1;
-			break;
-		case ';':
-			result->status = PARSER_FAILED;
-			return;
-	}
-
-	state->parsed += 1;
-
-	if (state->nestLevel <= 0)
-	{
-		token->type = TOKEN_TEMPLATE;
-		token->keyword = KEYWORD_NONE;
-		token->lineNumber   = getInputLineNumber ();
-		token->filePosition = getInputFilePosition ();
-	    result->status = PARSER_FINISHED;
-
-		return;
-	}
-
-	result->status = PARSER_NEEDS_MORE_INPUT;
-}
-
-inline static void* initParseParensState()
-{
-	parensState *st = xMalloc (1, parensState);
-	st->parsed = 0;
-	st->nestLevel = 0;
-
-	return st;
-}
-
-inline static void freeParseParensState(void *state)
-{
-	eFree ((parensState *) state);
-}
-
-inline static void parseParens(const char c, tokenInfo *const token, parensState* state, parserResult *const result)
-{
-	if (state->parsed == 0)
-	{
-		if (whiteChar(c))
+		if (c != start)
 		{
-			result->status = PARSER_NEEDS_MORE_INPUT;
-			return;
-		}
-
-		if (c != '(') {
 			result->status = PARSER_FAILED;
 			return;
 		}
 	}
 
-	switch (c) {
-		case '(':
-			state->nestLevel += 1;
-			break;
-		case ')':
-			state->nestLevel -= 1;
-			break;
-		case ';':
-			result->status = PARSER_FAILED;
-			return;
-	}
+	if (c == start) state->nestLevel += 1;
+	else if (c == end) state->nestLevel -= 1;
+	else if (c == ';') result->status = PARSER_FAILED;
+
+	//skip comments:
+	tryParser ((Parser) parseComment, initParseCommentState, freeParseCommentState, token);
 
 	state->parsed += 1;
 
 	if (state->nestLevel <= 0)
 	{
-		token->type = TOKEN_PARENS;
-		token->keyword = KEYWORD_NONE;
-		token->lineNumber   = getInputLineNumber ();
-		token->filePosition = getInputFilePosition ();
-		result->status = PARSER_FINISHED;
-
-		return;
-	}
-
-	result->status = PARSER_NEEDS_MORE_INPUT;
-}
-
-inline static void* initParseSquaresState()
-{
-	squaresState *st = xMalloc (1, squaresState);
-	st->parsed = 0;
-	st->nestLevel = 0;
-
-	return st;
-}
-
-inline static void freeParseSquaresState(void *state)
-{
-	eFree ((squaresState *) state);
-}
-
-inline static void parseSquares(const char c, tokenInfo *const token, squaresState* state, parserResult *const result)
-{
-	if (state->parsed == 0)
-	{
-		if (whiteChar(c))
-		{
-			result->status = PARSER_NEEDS_MORE_INPUT;
-			return;
-		}
-
-		if (c != '[') {
-			result->status = PARSER_FAILED;
-			return;
-		}
-	}
-
-	switch (c) {
-		case '[':
-			state->nestLevel += 1;
-			break;
-		case ']':
-			state->nestLevel -= 1;
-			break;
-		case ';':
-			result->status = PARSER_FAILED;
-			return;
-	}
-
-	state->parsed += 1;
-
-	if (state->nestLevel <= 0)
-	{
-		token->type = TOKEN_SQUARES;
+		token->type = ttype;
 		token->keyword = KEYWORD_NONE;
 		token->lineNumber   = getInputLineNumber ();
 		token->filePosition = getInputFilePosition ();
@@ -779,7 +658,6 @@ PARSER_DEF(WhileKeyword      , parseWord , "while"      , (int*))
 PARSER_DEF(WithKeyword       , parseWord , "with"       , (int*))
 PARSER_DEF(YieldKeyword      , parseWord , "yield"      , (int*))
 
-
 SINGLE_CHAR_PARSER_DEF(Semicolon    , ';'  , TOKEN_SEMICOLON)
 SINGLE_CHAR_PARSER_DEF(Comma        , ','  , TOKEN_COMMA)
 SINGLE_CHAR_PARSER_DEF(Colon        , ':'  , TOKEN_COLON)
@@ -795,6 +673,10 @@ SINGLE_CHAR_PARSER_DEF(EOF          , EOF  , TOKEN_EOF)
 PARSER_DEF(StringSQuote   , parseString , '\'' , (char*))
 PARSER_DEF(StringDQuote   , parseString , '"'  , (char*))
 PARSER_DEF(StringTemplate , parseString , '`'  , (char*))
+
+BLOCK_PARSER_DEF(Parens, '(', ')', TOKEN_PARENS)
+BLOCK_PARSER_DEF(Squares, '[', ']', TOKEN_SQUARES)
+BLOCK_PARSER_DEF(Template, '<', '>', TOKEN_TEMPLATE)
 
 static bool tryParser(Parser parser, ParserStateInit stInit, ParserStateFree stFree, tokenInfo *const token)
 {
@@ -874,10 +756,10 @@ static void readToken (tokenInfo *const token)
 			parseStar, NULL, NULL,
 			parseNewLine, NULL, NULL,
 			parseEOF, NULL, NULL,
-			parseSquares, initParseSquaresState, freeParseSquaresState,
-			parseParens, initParseParensState, freeParseParensState,
+			parseSquares, initBlockState, freeBlockState,
+			parseParens, initBlockState, freeBlockState,
 			parseComment, initParseCommentState, freeParseCommentState,
-			parseTemplate, initParseTemplateState, freeParseTemplateState,
+			parseTemplate, initBlockState, freeBlockState,
 			parseStringSQuote, initParseStringState, freeParseStringState,
 			parseStringDQuote, initParseStringState, freeParseStringState,
 			parseStringTemplate, initParseStringState, freeParseStringState,
