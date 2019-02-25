@@ -1168,6 +1168,19 @@ static void skipArrayList (tokenInfo *const token, bool include_newlines)
 	}
 }
 
+static void skipQualifiedIdentifier (tokenInfo *const token)
+{
+	/* Skip foo.bar.baz */
+	while (isType (token, TOKEN_IDENTIFIER))
+	{
+		readToken (token);
+		if (isType (token, TOKEN_PERIOD))
+			readToken (token);
+		else
+			break;
+	}
+}
+
 static void addContext (tokenInfo* const parent, const tokenInfo* const child)
 {
 	if (vStringLength (parent->string) > 0)
@@ -2315,7 +2328,11 @@ nextVar:
 				if ( isKeyword (token, KEYWORD_capital_object) )
 					is_class = true;
 
-				readToken (token);
+				if (is_var)
+					skipQualifiedIdentifier (token);
+				else
+					readToken (token);
+
 				if ( isType (token, TOKEN_OPEN_PAREN) )
 					skipArgumentList(token, true, NULL);
 
@@ -2327,17 +2344,16 @@ nextVar:
 						{
 							makeJsTag (name, is_const ? JSTAG_CONSTANT : JSTAG_VARIABLE, NULL, NULL);
 						}
+						else if ( is_class )
+						{
+							makeClassTag (name, NULL, NULL);
+						}
 						else
 						{
-							if ( is_class )
-							{
-								makeClassTag (name, NULL, NULL);
-							} else {
-								/* FIXME: we cannot really get a meaningful
-								 * signature from a `new Function()` call,
-								 * so for now just don't set any */
-								makeFunctionTag (name, NULL, false);
-							}
+							/* FIXME: we cannot really get a meaningful
+							 * signature from a `new Function()` call,
+							 * so for now just don't set any */
+							makeFunctionTag (name, NULL, false);
 						}
 					}
 				}
