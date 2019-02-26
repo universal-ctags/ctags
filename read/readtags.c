@@ -334,6 +334,8 @@ static tagResult growFields (tagFile *const file)
 	return result;
 }
 
+#define CMP4(a, b) ((a)[0] == (b)[0] && (a)[1] == (b)[1] && (a)[2] == (b)[2] && (a)[3] == (b)[3])
+
 static void parseExtensionFields (tagFile *const file, tagEntry *const entry,
 								  char *const string)
 {
@@ -360,11 +362,11 @@ static void parseExtensionFields (tagFile *const file, tagEntry *const entry,
 				*colon = '\0';
 				if (key_len == 4)
 				{
-					if (strcmp (key, "kind") == 0)
+					if (CMP4 (key, "kind"))
 						entry->kind = value;
-					else if (strcmp (key, "file") == 0)
+					else if (CMP4 (key, "file"))
 						entry->fileScope = 1;
-					else if (strcmp (key, "line") == 0)
+					else if (CMP4 (key, "line"))
 						entry->address.lineNumber = atol (value);
 					else
 						goto normalField;
