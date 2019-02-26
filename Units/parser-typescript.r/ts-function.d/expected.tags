@@ -1,0 +1,9 @@
+equals	input.ts	/^export function equals(p1: Point, p2: Point) {$/;"	f
+fn	input.ts	/^async function fn(): Promise<number> {  $/;"	f
+g	input.ts	/^function *g(): Iterable<string> {$/;"	g
+h	input.ts	/^function *h(limit) {$/;"	g
+isCat	input.ts	/^function isCat(a: Animal): a is Cat {$/;"	f
+message	input.ts	/^export function message(s: string) {$/;"	f
+numberToString	input.ts	/^function numberToString(a: number[]) {$/;"	f
+point	input.ts	/^export default function point(x: number, y: number) {$/;"	f
+point	input.ts	/^function point(x: number, y: number): Point {$/;"	f

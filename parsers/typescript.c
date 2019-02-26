@@ -137,9 +137,7 @@ typedef enum eTokenType {
 	TOKEN_CLOSE_CURLY,
 	TOKEN_EQUAL_SIGN,
 	TOKEN_REGEXP,
-	TOKEN_POSTFIX_OPERATOR,
 	TOKEN_STAR,
-	TOKEN_BINARY_OPERATOR,
 	TOKEN_NL,
 	TOKEN_COMMENT_BLOCK,
 	TOKEN_PARENS,
@@ -343,6 +341,19 @@ inline static void parseOneChar(const char c, tokenInfo *const token, const char
 	}
 
 	token->type = type;
+	token->lineNumber   = getInputLineNumber ();
+	token->filePosition = getInputFilePosition ();
+	result->status = PARSER_FINISHED;
+}
+
+inline static void parseChar(const char c, tokenInfo *const token, void *state, parserResult *const result)
+{
+	if (whiteChar(c)) {
+		result->status = PARSER_NEEDS_MORE_INPUT;
+		return;
+	}
+
+	token->type = TOKEN_CHARACTER;
 	token->lineNumber   = getInputLineNumber ();
 	token->filePosition = getInputFilePosition ();
 	result->status = PARSER_FINISHED;
@@ -870,6 +881,7 @@ static void readToken (tokenInfo *const token)
 			parseYieldKeyword, initParseWordState, freeParseWordState,
 
 			parseIdentifier, initParseWordState, freeParseWordState,
+			parseChar, NULL, NULL,
 			NULL);
 
 	if (parsed)
@@ -1015,6 +1027,36 @@ static void parseEnum (tokenInfo *const token)
 	vStringDelete(scope);
 }
 
+static void parseFunctionBody (vString *const scope, tokenInfo *const token)
+{
+	do {
+		readToken (token);
+		if (isType (token, TOKEN_EOF)) return;
+	} while (! isType (token, TOKEN_OPEN_CURLY));
+
+	do {
+		readToken (token);
+	} while (! isType (token, TOKEN_CLOSE_CURLY));
+}
+
+static void parseFunction (tokenInfo *const token)
+{
+	bool isGenerator = tryParser ((Parser) parseStar, NULL, NULL, token);
+
+	readToken (token);
+	if (token->type != TOKEN_IDENTIFIER) return;
+
+	if (isGenerator) emitTag(token, TSTAG_GENERATOR);
+	else emitTag(token, TSTAG_FUNCTION);
+
+	vString *scope = vStringNew ();
+	vStringCopy (scope, token->string);
+
+	parseFunctionBody (scope, token);
+
+	vStringDelete(scope);
+}
+
 static void parseTsFile (tokenInfo *const token)
 {
 	do {
@@ -1029,6 +1071,9 @@ static void parseTsFile (tokenInfo *const token)
 				break;
 			case KEYWORD_enum:
 				parseEnum (token);
+				break;
+			case KEYWORD_function:
+				parseFunction (token);
 				break;
 		}
 	} while (! isType (token, TOKEN_EOF));
