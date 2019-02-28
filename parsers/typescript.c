@@ -135,6 +135,10 @@ typedef enum eTokenType {
 	TOKEN_PERIOD,
 	TOKEN_OPEN_CURLY,
 	TOKEN_CLOSE_CURLY,
+	TOKEN_OPEN_PAREN,
+	TOKEN_CLOSE_PAREN,
+	TOKEN_OPEN_SQUARE,
+	TOKEN_CLOSE_SQUARE,
 	TOKEN_EQUAL_SIGN,
 	TOKEN_REGEXP,
 	TOKEN_STAR,
@@ -620,7 +624,11 @@ inline static void parseBlock(const char c, tokenInfo *const token, tokenType co
 
 	if (c == start) state->nestLevel += 1;
 	else if (c == end) state->nestLevel -= 1;
-	else if (c == ';') result->status = PARSER_FAILED;
+	else if (c == ';')
+	{
+		result->status = PARSER_FAILED;
+		return;
+	}
 
 	//skip comments:
 	tryParser ((Parser) parseComment, initParseCommentState, freeParseCommentState, token);
@@ -724,6 +732,10 @@ SINGLE_CHAR_PARSER_DEF(Colon        , ':'  , TOKEN_COLON)
 SINGLE_CHAR_PARSER_DEF(Period       , '.'  , TOKEN_PERIOD)
 SINGLE_CHAR_PARSER_DEF(OpenCurly    , '{'  , TOKEN_OPEN_CURLY)
 SINGLE_CHAR_PARSER_DEF(CloseCurly   , '}'  , TOKEN_CLOSE_CURLY)
+SINGLE_CHAR_PARSER_DEF(OpenParen    , '('  , TOKEN_OPEN_PAREN)
+SINGLE_CHAR_PARSER_DEF(CloseParen   , ')'  , TOKEN_CLOSE_PAREN)
+SINGLE_CHAR_PARSER_DEF(OpenSquare   , '['  , TOKEN_OPEN_SQUARE)
+SINGLE_CHAR_PARSER_DEF(CloseSquare  , ']'  , TOKEN_CLOSE_SQUARE)
 SINGLE_CHAR_PARSER_DEF(EqualSign    , '='  , TOKEN_EQUAL_SIGN)
 SINGLE_CHAR_PARSER_DEF(Star         , '*'  , TOKEN_STAR)
 SINGLE_CHAR_PARSER_DEF(NewLine      , '\n' , TOKEN_NL)
@@ -1027,16 +1039,204 @@ static void parseEnum (tokenInfo *const token)
 	vStringDelete(scope);
 }
 
+static void parseVariable (vString *const scope, tokenInfo *const token)
+{
+	tokenInfo *member = NULL;
+	bool parsed = false;
+	bool parsingType = false;
+	int nestLevel = 0;
+
+	do {
+		clearPoolToken (token);
+		parsed = tryParse(token,
+			parseTemplate, initBlockState, freeBlockState,
+			parseComment, initParseCommentState, freeParseCommentState,
+			parseStringSQuote, initParseStringState, freeParseStringState,
+			parseStringDQuote, initParseStringState, freeParseStringState,
+			parseStringTemplate, initParseStringState, freeParseStringState,
+			parseParens, initBlockState, freeBlockState,
+			parseNumber, initParseWordState, freeParseWordState,
+			parsePipe, NULL, NULL,
+			parseEqualSign, NULL, NULL,
+			parseQuestionMark, NULL, NULL,
+			parseOpenSquare, NULL, NULL,
+			parseCloseSquare, NULL, NULL,
+			parseOpenCurly, NULL, NULL,
+			parseCloseCurly, NULL, NULL,
+			parseNewLine, NULL, NULL,
+			parseColon, NULL, NULL,
+			parseSemicolon, NULL, NULL,
+			parseComma, NULL, NULL,
+			parseArrow, initParseWordState, freeParseWordState,
+			parseIdentifier, initParseWordState, freeParseWordState,
+			NULL);
+
+		if (parsed) {
+			switch (token->type) {
+				case TOKEN_OPEN_SQUARE:
+				case TOKEN_OPEN_CURLY:
+					if (parsingType) nestLevel += 1;
+					break;
+				case TOKEN_CLOSE_SQUARE:
+				case TOKEN_CLOSE_CURLY:
+					if (parsingType) nestLevel -= 1;
+					break;
+				case TOKEN_COMMA:
+				case TOKEN_SEMICOLON:
+					if (nestLevel <= 0)
+					{
+						parsingType = false;
+						nestLevel = 0;
+					}
+					break;
+				case TOKEN_COLON:
+				case TOKEN_EQUAL_SIGN:
+					parsingType = true;
+					break;
+				case TOKEN_IDENTIFIER:
+					if (!parsingType) {
+						member = newToken ();
+						copyToken(member, token, false);
+						vStringCopy (member->scope, scope);
+						emitTag (member, TSTAG_VARIABLE);
+						deleteToken (member);
+					}
+					break;
+				default:
+					break;
+			}
+		}
+	} while (parsed && ! (token->type == TOKEN_SEMICOLON && !parsingType));
+}
+
+static void parseFunctionArgs (vString *const scope, tokenInfo *const token)
+{
+	bool parsed = false;
+	bool parsingType = false;
+	int nestLevel = 0;
+	tokenInfo *member = NULL;
+
+	do {
+		clearPoolToken (token);
+		parsed = tryParse(token,
+			parseNewLine, NULL, NULL,
+			parseTemplate, initBlockState, freeBlockState,
+			parseComment, initParseCommentState, freeParseCommentState,
+			parseOpenParen, NULL, NULL,
+			NULL);
+	} while (parsed);
+
+	do {
+		clearPoolToken (token);
+		parsed = tryParse(token,
+			parseTemplate, initBlockState, freeBlockState,
+			parseStringSQuote, initParseStringState, freeParseStringState,
+			parseStringDQuote, initParseStringState, freeParseStringState,
+			parseStringTemplate, initParseStringState, freeParseStringState,
+			parseComment, initParseCommentState, freeParseCommentState,
+			parseParens, initBlockState, freeBlockState,
+			parseNumber, initParseWordState, freeParseWordState,
+			parsePipe, NULL, NULL,
+			parseEqualSign, NULL, NULL,
+			parseQuestionMark, NULL, NULL,
+			parseOpenSquare, NULL, NULL,
+			parseCloseSquare, NULL, NULL,
+			parseOpenCurly, NULL, NULL,
+			parseCloseCurly, NULL, NULL,
+			parseNewLine, NULL, NULL,
+			parseColon, NULL, NULL,
+			parseComma, NULL, NULL,
+			parseArrow, initParseWordState, freeParseWordState,
+			parseCloseParen, NULL, NULL,
+			parseIdentifier, initParseWordState, freeParseWordState,
+			NULL);
+
+		if (parsed) {
+			switch (token->type) {
+				case TOKEN_OPEN_SQUARE:
+				case TOKEN_OPEN_CURLY:
+					if (parsingType) nestLevel += 1;
+					break;
+				case TOKEN_CLOSE_SQUARE:
+				case TOKEN_CLOSE_CURLY:
+					if (parsingType) nestLevel -= 1;
+					break;
+				case TOKEN_COMMA:
+					if (nestLevel <= 0)
+					{
+						parsingType = false;
+						nestLevel = 0;
+					}
+					break;
+				case TOKEN_COLON:
+				case TOKEN_EQUAL_SIGN:
+					parsingType = true;
+					break;
+				case TOKEN_IDENTIFIER:
+					if (!parsingType) {
+						member = newToken ();
+						copyToken(member, token, false);
+						vStringCopy (member->scope, scope);
+						emitTag (member, TSTAG_VARIABLE);
+						deleteToken (member);
+					}
+					break;
+				default:
+					break;
+			}
+		}
+	} while (parsed && token->type != TOKEN_CLOSE_PAREN);
+}
+
 static void parseFunctionBody (vString *const scope, tokenInfo *const token)
 {
+	bool parsed = false;
+	int nestLevel = 1;
+
 	do {
 		readToken (token);
 		if (isType (token, TOKEN_EOF)) return;
 	} while (! isType (token, TOKEN_OPEN_CURLY));
 
 	do {
-		readToken (token);
-	} while (! isType (token, TOKEN_CLOSE_CURLY));
+		clearPoolToken (token);
+
+		parsed = tryParse(token,
+			parseStringSQuote, initParseStringState, freeParseStringState,
+			parseStringDQuote, initParseStringState, freeParseStringState,
+			parseStringTemplate, initParseStringState, freeParseStringState,
+			parseComment, initParseCommentState, freeParseCommentState,
+			parseTemplate, initBlockState, freeBlockState,
+			parseOpenCurly, NULL, NULL,
+			parseCloseCurly, NULL, NULL,
+			parseVarKeyword, initParseWordState, freeParseWordState,
+			parseLetKeyword, initParseWordState, freeParseWordState,
+			parseConstKeyword, initParseWordState, freeParseWordState,
+			parseChar, NULL, NULL,
+			NULL);
+
+		if (parsed) {
+			switch (token->type) {
+				case TOKEN_OPEN_CURLY:
+					nestLevel += 1;
+					break;
+				case TOKEN_CLOSE_CURLY:
+					nestLevel -= 1;
+					break;
+				case TOKEN_KEYWORD:
+					switch (token->keyword) {
+						case KEYWORD_var:
+						case KEYWORD_let:
+						case KEYWORD_const:
+							parseVariable (scope, token);
+							break;
+					}
+					break;
+				default:
+					break;
+			}
+		}
+	} while (parsed && ! (isType (token, TOKEN_CLOSE_CURLY) && nestLevel <= 0));
 }
 
 static void parseFunction (tokenInfo *const token)
@@ -1052,6 +1252,7 @@ static void parseFunction (tokenInfo *const token)
 	vString *scope = vStringNew ();
 	vStringCopy (scope, token->string);
 
+	parseFunctionArgs (scope, token);
 	parseFunctionBody (scope, token);
 
 	vStringDelete(scope);
