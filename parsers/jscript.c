@@ -61,52 +61,6 @@
 #define deleteToken(t) (objPoolPut (TokenPool, (t)))
 
 /*
- * Debugging
- *
- * Uncomment this to enable extensive debugging to stderr in jscript code.
- * Please note that TRACING_ENABLED should be #defined in main/trace.h
- * for this to work.
- *
- */
-//#define JSCRIPT_DEBUGGING_ENABLED 1
-
-#if defined(DO_TRACING) && defined(JSCRIPT_DEBUGGING_ENABLED)
-	#define JSCRIPT_DO_DEBUGGING
-#endif
-
-#ifdef JSCRIPT_DO_DEBUGGING
-
-#define JSCRIPT_DEBUG_ENTER() TRACE_ENTER()
-#define JSCRIPT_DEBUG_LEAVE() TRACE_LEAVE()
-
-#define JSCRIPT_DEBUG_ENTER_TEXT(_szFormat,...) \
-	TRACE_ENTER_TEXT(_szFormat,## __VA_ARGS__)
-
-#define JSCRIPT_DEBUG_LEAVE_TEXT(_szFormat,...) \
-	TRACE_LEAVE_TEXT(_szFormat,## __VA_ARGS__)
-
-#define JSCRIPT_DEBUG_PRINT(_szFormat,...) \
-	TRACE_PRINT(_szFormat,## __VA_ARGS__)
-
-#define JSCRIPT_DEBUG_ASSERT(_condition,_szFormat,...) \
-	TRACE_ASSERT(_condition,_szFormat,## __VA_ARGS__)
-
-#else //!JSCRIPT_DO_DEBUGGING
-
-#define JSCRIPT_DEBUG_ENTER() do { } while(0)
-#define JSCRIPT_DEBUG_LEAVE() do { } while(0)
-
-#define JSCRIPT_DEBUG_ENTER_TEXT(_szFormat,...) do { } while(0)
-#define JSCRIPT_DEBUG_LEAVE_TEXT(_szFormat,...) do { } while(0)
-
-#define JSCRIPT_DEBUG_PRINT(_szFormat,...) do { } while(0)
-
-#define JSCRIPT_DEBUG_ASSERT(_condition,_szFormat,...) do { } while(0)
-
-#endif //!JSCRIPT_DO_DEBUGGING
-
-
-/*
  *	 DATA DECLARATIONS
  */
 
@@ -270,6 +224,12 @@ static bool parseBlock (tokenInfo *const token, const vString *const parentScope
 static bool parseLine (tokenInfo *const token, bool is_inside_class);
 static void parseUI5 (tokenInfo *const token);
 
+#ifdef DO_TRACING
+static void dumpToken (const tokenInfo *const token);
+static const char *tokenTypeName(enum eTokenType e);
+static const char *keywordName(enum eKeywordId e);
+#endif
+
 static void *newPoolToken (void *createArg CTAGS_ATTR_UNUSED)
 {
 	tokenInfo *token = xMalloc (1, tokenInfo);
@@ -351,7 +311,7 @@ static void makeJsTagCommon (const tokenInfo *const token, const jsKind kind,
 
 		initTagEntry (&e, name, kind);
 
-		JSCRIPT_DEBUG_PRINT("Emitting tag for symbol '%s' of kind %02x with scope '%s'",name,kind,vStringValue(fullscope));
+		TRACE_PRINT("Emitting tag for symbol '%s' of kind %02x with scope '%s'",name,kind,vStringValue(fullscope));
 
 		e.lineNumber   = token->lineNumber;
 		e.filePosition = token->filePosition;
@@ -1106,7 +1066,7 @@ getNextChar:
 static void readTokenFullDebug (tokenInfo *const token, bool include_newlines, vString *const repr)
 {
 	readTokenFull (token, include_newlines, repr);
-	JSCRIPT_DEBUG_PRINT("token '%s' of type %02x with scope '%s'",vStringValue(token->string),token->type, vStringValue(token->scope));
+	TRACE_PRINT("token '%s' of type %02x with scope '%s'",vStringValue(token->string),token->type, vStringValue(token->scope));
 }
 # define readTokenFull readTokenFullDebug
 #endif
@@ -1419,6 +1379,8 @@ static bool parseIf (tokenInfo *const token)
 
 static void parseFunction (tokenInfo *const token)
 {
+	TRACE_ENTER();
+
 	tokenInfo *const name = newToken ();
 	vString *const signature = vStringNew ();
 	bool is_class = false;
@@ -1476,13 +1438,15 @@ static void parseFunction (tokenInfo *const token)
  cleanUp:
 	vStringDelete (signature);
 	deleteToken (name);
+
+	TRACE_LEAVE();
 }
 
 /* Parses a block surrounded by curly braces.
  * @p parentScope is the scope name for this block, or NULL for unnamed scopes */
 static bool parseBlock (tokenInfo *const token, const vString *const parentScope)
 {
-	JSCRIPT_DEBUG_ENTER();
+	TRACE_ENTER();
 
 	bool is_class = false;
 	bool read_next_token = true;
@@ -1571,7 +1535,7 @@ static bool parseBlock (tokenInfo *const token, const vString *const parentScope
 	if (parentScope)
 		token->nestLevel--;
 
-	JSCRIPT_DEBUG_LEAVE();
+	TRACE_LEAVE();
 
 	return is_class;
 }
@@ -1579,7 +1543,7 @@ static bool parseBlock (tokenInfo *const token, const vString *const parentScope
 static bool parseMethods (tokenInfo *const token, const tokenInfo *const class,
                           const bool is_es6_class)
 {
-	JSCRIPT_DEBUG_ENTER();
+	TRACE_ENTER();
 
 	tokenInfo *const name = newToken ();
 	bool has_methods = false;
@@ -1699,7 +1663,7 @@ static bool parseMethods (tokenInfo *const token, const tokenInfo *const class,
 				}
 				if ( is_shorthand || isKeyword (token, KEYWORD_function) )
 				{
-					JSCRIPT_DEBUG_PRINT("Seems to be a function or shorthand");
+					TRACE_PRINT("Seems to be a function or shorthand");
 					vString *const signature = vStringNew ();
 
 					if (! is_shorthand)
@@ -1784,7 +1748,7 @@ static bool parseMethods (tokenInfo *const token, const tokenInfo *const class,
 	} while ( isType(token, TOKEN_COMMA) ||
 	          ( is_es6_class && ! isType(token, TOKEN_EOF) ) );
 
-	JSCRIPT_DEBUG_PRINT("Finished parsing methods");
+	TRACE_PRINT("Finished parsing methods");
 
 	findCmdTerm (token, false, false);
 
@@ -1793,14 +1757,14 @@ cleanUp:
 	vStringDelete (saveScope);
 	deleteToken (name);
 
-	JSCRIPT_DEBUG_LEAVE();
+	TRACE_LEAVE();
 
 	return has_methods;
 }
 
 static bool parseES6Class (tokenInfo *const token, const tokenInfo *targetName)
 {
-	JSCRIPT_DEBUG_ENTER();
+	TRACE_ENTER();
 
 	tokenInfo * className = newToken ();
 	vString *inheritance = NULL;
@@ -1844,7 +1808,7 @@ static bool parseES6Class (tokenInfo *const token, const tokenInfo *targetName)
 		vStringStripLeading (inheritance);
 	}
 
-	JSCRIPT_DEBUG_PRINT("Emitting tag for class '%s'", vStringValue(targetName->string));
+	TRACE_PRINT("Emitting tag for class '%s'", vStringValue(targetName->string));
 
 	makeJsTagCommon (targetName, JSTAG_CLASS, NULL, inheritance,
 					 (is_anonymous && (targetName == className)));
@@ -1868,13 +1832,13 @@ static bool parseES6Class (tokenInfo *const token, const tokenInfo *targetName)
 
 	deleteToken (className);
 
-	JSCRIPT_DEBUG_LEAVE();
+	TRACE_LEAVE();
 	return true;
 }
 
 static bool parseStatement (tokenInfo *const token, bool is_inside_class)
 {
-	JSCRIPT_DEBUG_ENTER();
+	TRACE_ENTER();
 
 	tokenInfo *const name = newToken ();
 	tokenInfo *const secondary_name = newToken ();
@@ -1926,7 +1890,7 @@ static bool parseStatement (tokenInfo *const token, bool is_inside_class)
 		 isKeyword(token, KEYWORD_let) ||
 		 isKeyword(token, KEYWORD_const) )
 	{
-		JSCRIPT_DEBUG_PRINT("var/let/const case");
+		TRACE_PRINT("var/let/const case");
 		is_const = isKeyword(token, KEYWORD_const);
 		/*
 		 * Only create variables for global scope
@@ -1941,7 +1905,7 @@ static bool parseStatement (tokenInfo *const token, bool is_inside_class)
 nextVar:
 	if ( isKeyword(token, KEYWORD_this) )
 	{
-		JSCRIPT_DEBUG_PRINT("found 'this' keyword");
+		TRACE_PRINT("found 'this' keyword");
 
 		readToken(token);
 		if (isType (token, TOKEN_PERIOD))
@@ -1951,7 +1915,8 @@ nextVar:
 	}
 
 	copyToken(name, token, true);
-	JSCRIPT_DEBUG_PRINT("name becomes '%s'",vStringValue(name->string));
+	TRACE_PRINT("name becomes '%s' of type %s",
+				vStringValue(token->string), tokenTypeName (token->type));
 
 	while (! isType (token, TOKEN_CLOSE_CURLY) &&
 	       ! isType (token, TOKEN_SEMICOLON)   &&
@@ -2232,7 +2197,7 @@ nextVar:
 					     || isType (name, TOKEN_KEYWORD) ) )
 					{
 						/* Unexpected input. Try to reset the parsing. */
-						JSCRIPT_DEBUG_PRINT("Unexpected input, trying to reset");
+						TRACE_PRINT("Unexpected input, trying to reset");
 						vStringDelete (signature);
 						goto cleanUp;
 					}
@@ -2448,7 +2413,7 @@ cleanUp:
 	deleteToken (method_body_token);
 	vStringDelete(saveScope);
 
-	JSCRIPT_DEBUG_LEAVE();
+	TRACE_LEAVE();
 
 	return is_terminated;
 }
@@ -2505,7 +2470,8 @@ static void parseUI5 (tokenInfo *const token)
 
 static bool parseLine (tokenInfo *const token, bool is_inside_class)
 {
-	JSCRIPT_DEBUG_ENTER_TEXT("token is '%s' of type %02x",vStringValue(token->string),token->type);
+	TRACE_ENTER_TEXT("token is '%s' of type %s",
+					 vStringValue(token->string), tokenTypeName (token->type));
 
 	bool is_terminated = true;
 	/*
@@ -2564,14 +2530,14 @@ static bool parseLine (tokenInfo *const token, bool is_inside_class)
 		is_terminated = parseStatement (token, is_inside_class);
 	}
 
-	JSCRIPT_DEBUG_LEAVE();
+	TRACE_LEAVE();
 
 	return is_terminated;
 }
 
 static void parseJsFile (tokenInfo *const token)
 {
-	JSCRIPT_DEBUG_ENTER();
+	TRACE_ENTER();
 
 	do
 	{
@@ -2586,8 +2552,86 @@ static void parseJsFile (tokenInfo *const token)
 			parseLine (token, false);
 	} while (! isType (token, TOKEN_EOF));
 
-	JSCRIPT_DEBUG_LEAVE();
+	TRACE_LEAVE();
 }
+
+#ifdef DO_TRACING
+static void dumpToken (const tokenInfo *const token)
+{
+	fprintf(stderr, "Token <%p>: %s: %s\n",
+			token,
+			tokenTypeName (token->type),
+			(token->type == TOKEN_KEYWORD   ? keywordName (token->keyword):
+			 token->type == TOKEN_IDENTIFIER? vStringValue (token->string):
+			 ""));
+}
+
+static const char *tokenTypeName(enum eTokenType e)
+{ /* Generated by misc/enumstr.sh with cmdline "parsers/jscript.c" "eTokenType" "tokenTypeName" */
+	switch (e)
+	{
+		case    TOKEN_BINARY_OPERATOR: return "TOKEN_BINARY_OPERATOR";
+		case          TOKEN_CHARACTER: return "TOKEN_CHARACTER";
+		case        TOKEN_CLOSE_CURLY: return "TOKEN_CLOSE_CURLY";
+		case        TOKEN_CLOSE_PAREN: return "TOKEN_CLOSE_PAREN";
+		case       TOKEN_CLOSE_SQUARE: return "TOKEN_CLOSE_SQUARE";
+		case              TOKEN_COLON: return "TOKEN_COLON";
+		case              TOKEN_COMMA: return "TOKEN_COMMA";
+		case                TOKEN_EOF: return "TOKEN_EOF";
+		case         TOKEN_EQUAL_SIGN: return "TOKEN_EQUAL_SIGN";
+		case         TOKEN_IDENTIFIER: return "TOKEN_IDENTIFIER";
+		case            TOKEN_KEYWORD: return "TOKEN_KEYWORD";
+		case         TOKEN_OPEN_CURLY: return "TOKEN_OPEN_CURLY";
+		case         TOKEN_OPEN_PAREN: return "TOKEN_OPEN_PAREN";
+		case        TOKEN_OPEN_SQUARE: return "TOKEN_OPEN_SQUARE";
+		case             TOKEN_PERIOD: return "TOKEN_PERIOD";
+		case   TOKEN_POSTFIX_OPERATOR: return "TOKEN_POSTFIX_OPERATOR";
+		case             TOKEN_REGEXP: return "TOKEN_REGEXP";
+		case          TOKEN_SEMICOLON: return "TOKEN_SEMICOLON";
+		case               TOKEN_STAR: return "TOKEN_STAR";
+		case             TOKEN_STRING: return "TOKEN_STRING";
+		case    TOKEN_TEMPLATE_STRING: return "TOKEN_TEMPLATE_STRING";
+		case          TOKEN_UNDEFINED: return "TOKEN_UNDEFINED";
+		default: return "UNKNOWN";
+	}
+}
+
+static const char *keywordName(enum eKeywordId e)
+{ /* Generated by misc/enumstr.sh with cmdline "parsers/jscript.c" "eKeywordId" "keywordName" */
+	switch (e)
+	{
+		case            KEYWORD_async: return "KEYWORD_async";
+		case KEYWORD_capital_function: return "KEYWORD_capital_function";
+		case   KEYWORD_capital_object: return "KEYWORD_capital_object";
+		case            KEYWORD_catch: return "KEYWORD_catch";
+		case            KEYWORD_class: return "KEYWORD_class";
+		case            KEYWORD_const: return "KEYWORD_const";
+		case          KEYWORD_default: return "KEYWORD_default";
+		case               KEYWORD_do: return "KEYWORD_do";
+		case             KEYWORD_else: return "KEYWORD_else";
+		case           KEYWORD_export: return "KEYWORD_export";
+		case          KEYWORD_extends: return "KEYWORD_extends";
+		case          KEYWORD_finally: return "KEYWORD_finally";
+		case              KEYWORD_for: return "KEYWORD_for";
+		case         KEYWORD_function: return "KEYWORD_function";
+		case              KEYWORD_get: return "KEYWORD_get";
+		case               KEYWORD_if: return "KEYWORD_if";
+		case              KEYWORD_let: return "KEYWORD_let";
+		case              KEYWORD_new: return "KEYWORD_new";
+		case        KEYWORD_prototype: return "KEYWORD_prototype";
+		case           KEYWORD_return: return "KEYWORD_return";
+		case              KEYWORD_sap: return "KEYWORD_sap";
+		case              KEYWORD_set: return "KEYWORD_set";
+		case           KEYWORD_static: return "KEYWORD_static";
+		case           KEYWORD_switch: return "KEYWORD_switch";
+		case             KEYWORD_this: return "KEYWORD_this";
+		case              KEYWORD_try: return "KEYWORD_try";
+		case              KEYWORD_var: return "KEYWORD_var";
+		case            KEYWORD_while: return "KEYWORD_while";
+		default: return "UNKNOWN";
+	}
+}
+#endif
 
 static void initialize (const langType language)
 {
