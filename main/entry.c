@@ -1249,8 +1249,11 @@ static void writeTagEntry (const tagEntryInfo *const tag, bool checkingNeeded)
 
 	length = writerWriteTag (TagFile.mio, tag);
 
-	++TagFile.numTags.added;
-	rememberMaxLengths (strlen (tag->name), (size_t) length);
+	if (length > 0)
+	{
+		++TagFile.numTags.added;
+		rememberMaxLengths (strlen (tag->name), (size_t) length);
+	}
 	DebugStatement ( mio_flush (TagFile.mio); )
 
 	abort_if_ferror (TagFile.mio);
