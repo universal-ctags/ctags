@@ -1,0 +1,6 @@
+def b@prop(arg0, arg1):
+    pass
+
+# TAB char betwen arg0 and arg1
+def a@prop(arg0,	arg1):
+    pass

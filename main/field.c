@@ -572,16 +572,27 @@ extern const char* renderFieldNoEscaping (fieldType type, const tagEntryInfo *ta
 	return renderFieldCommon (type, tag, index, true);
 }
 
+static bool defaultHasTabChar (const tagEntryInfo *const tag CTAGS_ATTR_UNUSED, const char* value)
+{
+	return strchr (value, '\t')? true: false;
+}
+
 extern bool  doesFieldHaveTabChar (fieldType type, const tagEntryInfo *tag, int index)
 {
 	fieldObject *fobj = fieldObjects + type;
 	const char *value;
-
-	if (!fobj->def->hasTabChar)
-		return false;
+	bool (* hasTabChar) (const tagEntryInfo *const, const char*) = fobj->def->hasTabChar;
 
 	Assert (tag);
-	Assert (index < 0 || ((unsigned int)index) < tag->usedParserFields);
+	Assert (index == NO_PARSER_FIELD || ((unsigned int)index) < tag->usedParserFields);
+
+	if (hasTabChar == NULL)
+	{
+		if (index == NO_PARSER_FIELD)
+			return false;
+		else
+			hasTabChar = defaultHasTabChar;
+	}
 
 	if (index >= 0)
 	{
@@ -592,7 +603,7 @@ extern bool  doesFieldHaveTabChar (fieldType type, const tagEntryInfo *tag, int 
 	else
 		value = NULL;
 
-	return fobj->def->hasTabChar (tag, value);
+	return (* hasTabChar) (tag, value);
 }
 
 /*  Writes "line", stripping leading and duplicate white space.
@@ -1014,7 +1025,7 @@ static const char* defaultRenderer (const tagEntryInfo *const tag CTAGS_ATTR_UNU
 				    const char *value,
 				    vString * buffer CTAGS_ATTR_UNUSED)
 {
-	return value;
+	return renderEscapedString (value, tag, buffer);
 }
 
 extern int defineField (fieldDefinition *def, langType language)

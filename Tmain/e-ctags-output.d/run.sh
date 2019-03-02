@@ -5,22 +5,33 @@
 CTAGS=$1
 
 tmp="input file.cc"
-cp input_file.cc "${tmp}"
-"${CTAGS}" --quiet --options=NONE --output-format=e-ctags \
-		   --kinds-c++=+p --fields=+iaSs \
-		   -o - \
-		   "${tmp}" \
-		   input_tab.rst input_space.rst
-rm "${tmp}"
 
-echo "# WITH SCOPE"
-"${CTAGS}" --quiet --options=NONE --output-format=e-ctags \
-		   --fields=+s \
-		   -o - \
-		   input_scope.rst
+run()
+{
+	echo '#'
+	echo '#' with $1
+	echo '#'
 
-echo "# WITHOUT SCOPE"
-"${CTAGS}" --quiet --options=NONE --output-format=e-ctags \
-		   --fields=-s \
-		   -o - \
-		   input_scope.rst
+	cp input_file.cc "${tmp}"
+	"${CTAGS}" --quiet --options=NONE ${1} --output-format=e-ctags \
+			   --kinds-c++=+p --fields=+iaSs \
+			   -o - \
+			   "${tmp}" \
+			   input_tab.rst input_space.rst
+	rm "${tmp}"
+
+	echo "# WITH SCOPE"
+	"${CTAGS}" --quiet --options=NONE ${1} --output-format=e-ctags \
+			   --fields=+s \
+			   -o - \
+			   input_scope.rst
+
+	echo "# WITHOUT SCOPE"
+	"${CTAGS}" --quiet --options=NONE ${1} --output-format=e-ctags \
+			   --fields=-s \
+			   -o - \
+			   input_scope.rst
+}
+
+run "--sort=yes"
+run "--sort=no"

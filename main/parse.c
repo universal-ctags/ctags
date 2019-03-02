@@ -3616,9 +3616,6 @@ extern bool parseFileWithMio (const char *const fileName, MIO *mio)
 #ifdef HAVE_ICONV
 		closeConverter ();
 #endif
-		if (req.type == GLR_OPEN && req.mio)
-			mio_free (req.mio);
-		return tagFileResized;
 	}
 
 	if (req.type == GLR_OPEN && req.mio)
