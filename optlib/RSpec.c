@@ -66,11 +66,11 @@ extern parserDefinition* RSpecParser (void)
 	def->patterns      = patterns;
 	def->aliases       = aliases;
 	def->method        = METHOD_NOT_CRAFTED|METHOD_REGEX;
-	def->kindTable = RSpecKindTable;
-	def->kindCount = ARRAY_SIZE(RSpecKindTable);
+	def->kindTable     = RSpecKindTable;
+	def->kindCount     = ARRAY_SIZE(RSpecKindTable);
 	def->tagRegexTable = RSpecTagRegexTable;
 	def->tagRegexCount = ARRAY_SIZE(RSpecTagRegexTable);
-	def->dependencies = RSpecDependencies;
+	def->dependencies    = RSpecDependencies;
 	def->dependencyCount = ARRAY_SIZE(RSpecDependencies);
 	def->initialize    = initializeRSpecParser;
 

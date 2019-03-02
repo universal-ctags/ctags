@@ -826,22 +826,22 @@ EOF
     }
     if (@{$opts->{'kinddefs'}}) {
 	print <<EOF;
-	def->kindTable = $opts->{'Clangdef'}KindTable;
-	def->kindCount = ARRAY_SIZE($opts->{'Clangdef'}KindTable);
+	def->kindTable     = $opts->{'Clangdef'}KindTable;
+	def->kindCount     = ARRAY_SIZE($opts->{'Clangdef'}KindTable);
 EOF
     }
 
     if (@{$opts->{'fielddefs'}}) {
 	print <<EOF;
-	def->fieldTable = $opts->{'Clangdef'}FieldTable;
-	def->fieldCount = ARRAY_SIZE($opts->{'Clangdef'}FieldTable);
+	def->fieldTable    = $opts->{'Clangdef'}FieldTable;
+	def->fieldCount    = ARRAY_SIZE($opts->{'Clangdef'}FieldTable);
 EOF
     }
 
     if (@{$opts->{'extradefs'}}) {
 	print <<EOF;
-	def->xtagTable = $opts->{'Clangdef'}XtagTable;
-	def->xtagCount = ARRAY_SIZE($opts->{'Clangdef'}XtagTable);
+	def->xtagTable     = $opts->{'Clangdef'}XtagTable;
+	def->xtagCount     = ARRAY_SIZE($opts->{'Clangdef'}XtagTable);
 EOF
     }
 
@@ -854,7 +854,7 @@ EOF
 
     if (defined $opts->{'base'}) {
 	print <<EOF;
-	def->dependencies = $opts->{'Clangdef'}Dependencies;
+	def->dependencies    = $opts->{'Clangdef'}Dependencies;
 	def->dependencyCount = ARRAY_SIZE($opts->{'Clangdef'}Dependencies);
 EOF
     }

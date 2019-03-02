@@ -59,10 +59,10 @@ extern parserDefinition* QemuHXParser (void)
 	def->patterns      = patterns;
 	def->aliases       = aliases;
 	def->method        = METHOD_NOT_CRAFTED|METHOD_REGEX;
-	def->kindTable = QemuHXKindTable;
-	def->kindCount = ARRAY_SIZE(QemuHXKindTable);
-	def->xtagTable = QemuHXXtagTable;
-	def->xtagCount = ARRAY_SIZE(QemuHXXtagTable);
+	def->kindTable     = QemuHXKindTable;
+	def->kindCount     = ARRAY_SIZE(QemuHXKindTable);
+	def->xtagTable     = QemuHXXtagTable;
+	def->xtagCount     = ARRAY_SIZE(QemuHXXtagTable);
 	def->tagRegexTable = QemuHXTagRegexTable;
 	def->tagRegexCount = ARRAY_SIZE(QemuHXTagRegexTable);
 	def->initialize    = initializeQemuHXParser;

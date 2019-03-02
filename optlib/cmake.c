@@ -246,8 +246,8 @@ extern parserDefinition* CMakeParser (void)
 	def->aliases       = aliases;
 	def->method        = METHOD_NOT_CRAFTED|METHOD_REGEX;
 	def->useCork       = 1;
-	def->kindTable = CMakeKindTable;
-	def->kindCount = ARRAY_SIZE(CMakeKindTable);
+	def->kindTable     = CMakeKindTable;
+	def->kindCount     = ARRAY_SIZE(CMakeKindTable);
 	def->initialize    = initializeCMakeParser;
 
 	return def;

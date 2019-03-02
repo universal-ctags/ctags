@@ -53,8 +53,8 @@ extern parserDefinition* CtagsParser (void)
 	def->aliases       = aliases;
 	def->method        = METHOD_NOT_CRAFTED|METHOD_REGEX;
 	def->useCork       = 1;
-	def->kindTable = CtagsKindTable;
-	def->kindCount = ARRAY_SIZE(CtagsKindTable);
+	def->kindTable     = CtagsKindTable;
+	def->kindCount     = ARRAY_SIZE(CtagsKindTable);
 	def->tagRegexTable = CtagsTagRegexTable;
 	def->tagRegexCount = ARRAY_SIZE(CtagsTagRegexTable);
 	def->initialize    = initializeCtagsParser;
