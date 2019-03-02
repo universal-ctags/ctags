@@ -7,9 +7,9 @@ Testing ctags
 	:depth: 3
 	:local:
 
-It it difficult for us to know syntax of all languages supported in
-ctags. Test facility and test cases are quite import for maintaining
-ctags in limited resources.
+It is difficult for us to know syntax of all languages supported in ctags. Test
+facility and test cases are quite important for maintaining ctags with limited
+resources.
 
 .. toctree::
 	:maxdepth: 2
