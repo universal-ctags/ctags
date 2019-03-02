@@ -145,7 +145,8 @@ not.
 Example of files
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-See *Units/c-sample/input.c* and *Units/c-sample/expected*.
+See *Units/parser-c.r/c-sample/input.c* and
+*Units/parser-c.r/c-sample/expected.tags*.
 
 How to run unit tests
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
