@@ -4,6 +4,8 @@
 #include "general.h"
 #include "parse.h"
 #include "routines.h"
+#include "field.h"
+#include "xtag.h"
 
 
 static void initializeElixirParser (const langType language CTAGS_ATTR_UNUSED)
@@ -94,8 +96,8 @@ extern parserDefinition* ElixirParser (void)
 	def->patterns      = patterns;
 	def->aliases       = aliases;
 	def->method        = METHOD_NOT_CRAFTED|METHOD_REGEX;
-	def->kindTable = ElixirKindTable;
-	def->kindCount = ARRAY_SIZE(ElixirKindTable);
+	def->kindTable     = ElixirKindTable;
+	def->kindCount     = ARRAY_SIZE(ElixirKindTable);
 	def->tagRegexTable = ElixirTagRegexTable;
 	def->tagRegexCount = ARRAY_SIZE(ElixirTagRegexTable);
 	def->initialize    = initializeElixirParser;
