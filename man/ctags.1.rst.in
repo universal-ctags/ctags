@@ -577,9 +577,9 @@ are not listed here. They are experimental or for debugging purpose.
 	file which defines the tag. No tag file is written and all options
 	affecting tag file output will be ignored. Example applications for this
 	feature are generating a listing of all functions located in a source
-	file (e.g. "@CTAGS_NAME_EXECUTABLE@ -x --c-kinds=f file"), or generating
+	file (e.g. "@CTAGS_NAME_EXECUTABLE@ -x --kinds-c=f file"), or generating
 	a list of all externally visible global variables located in a source
-	file (e.g. "@CTAGS_NAME_EXECUTABLE@ -x --c-kinds=v --file-scope=no file").
+	file (e.g. "@CTAGS_NAME_EXECUTABLE@ -x --kinds-c=v --file-scope=no file").
 	This option must appear before the first file name.
 
 ``--alias-<LANG>=[+|-]aliasPattern``
