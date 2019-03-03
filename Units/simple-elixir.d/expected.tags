@@ -1,3 +1,55 @@
-drive	input.ex	/^def drive(%User{age: age}) when age >= 16 do$/;"	function
-MathTest	input.ex	/^defmodule MathTest do$/;"	module
-can add two numbers	input.ex	/^  test "can add two numbers" do$/;"	test
+MyString	input.ex	/^defmodule MyString do$/;"	module
+one_liner_func	input.ex	/^  def one_liner_func, do: :baz$/;"	function
+func_no_params	input.ex	/^  def func_no_params do$/;"	function
+join	input.ex	/^  def join(string1, string2 \\\\ nil, separator \\\\ " ")$/;"	function
+join	input.ex	/^  def join(string1, nil, _separator) do$/;"	function
+join	input.ex	/^  def join(string1, string2, separator) do$/;"	function
+private_func	input.ex	/^  defp private_func(a), do: a <> " alone"$/;"	function
+private_func_no_params	input.ex	/^  defp private_func_no_params do$/;"	function
+MyParser	input.ex	/^defmodule URI.MyParser do$/;"	module
+default_port	input.ex	/^  @callback default_port() :: integer$/;"	callback
+parse	input.ex	/^  defcallback parse(uri_info :: URI.t()) :: URI.t()$/;"	callback
+MyList	input.ex	/^defmodule MyList do$/;"	module
+reverse	input.ex	/^  defdelegate reverse(list), to: Enum$/;"	delegate
+other_reverse	input.ex	/^  defdelegate other_reverse(list), to: Enum, as: :reverse$/;"	delegate
+Size	input.ex	/^defprotocol Size do$/;"	protocol
+size	input.ex	/^  def size(data)$/;"	function
+MyGuards	input.ex	/^defmodule Integer.MyGuards do$/;"	module
+is_even	input.ex	/^  defguard is_even(value) when is_integer(value) and rem(value, 2) == 0$/;"	macro
+is_odd	input.ex	/^  defguardp is_odd(value) when is_integer(value) and rem(value, 2) != 0$/;"	macro
+Size	input.ex	/^defimpl Size, for: BitString do$/;"	implementation
+size	input.ex	/^  def size(binary), do: byte_size(binary)$/;"	function
+MyLogic	input.ex	/^defmodule MyLogic do$/;"	module
+macro	input.ex	/^  defmacro macro(expr, opts) do$/;"	macro
+macro_no_params	input.ex	/^  defmacro macro_no_params do$/;"	macro
+private_macro	input.ex	/^  defmacrop private_macro(expr, opts) do$/;"	macro
+private_macro_no_params	input.ex	/^  defmacrop private_macro_no_params do$/;"	macro
+MyOperators	input.ex	/^defmodule MyOperators do$/;"	module
++	input.ex	/^  def a + b, do: max(a, b)$/;"	operator
+-	input.ex	/^  def a - b, do: max(a, b)$/;"	operator
+*	input.ex	/^  def a * b, do: max(a, b)$/;"	operator
+/	input.ex	/^  def a \/ b, do: max(a, b)$/;"	operator
+=	input.ex	/^  def a = b, do: max(a, b)$/;"	operator
+.	input.ex	/^  def a . b, do: max(a, b)$/;"	operator
+|	input.ex	/^  def a | b, do: max(a, b)$/;"	operator
+|||	input.ex	/^  def _ ||| b, do: max(a, b)$/;"	operator
+&&&	input.ex	/^  def a &&& _, do: max(a, b)$/;"	operator
+<<<	input.ex	/^  def a <<< b, do: max(a, b)$/;"	operator
+>>>	input.ex	/^  defp a >>> b, do: max(a, b)$/;"	operator
+<<~	input.ex	/^  defp _ <<~ _, do: max(a, b)$/;"	operator
+~>>	input.ex	/^  defp a ~>> b, do: max(a, b)$/;"	operator
+<~	input.ex	/^  defmacro a <~ b, do: max(a, b)$/;"	operator
+~>	input.ex	/^  defmacro _ ~> b, do: max(a, b)$/;"	operator
+<~>	input.ex	/^  defmacro a <~> _, do: max(a, b)$/;"	operator
+<|>	input.ex	/^  defmacrop a <|> b, do: max(a, b)$/;"	operator
+^^^	input.ex	/^  defmacrop _ ^^^ _, do: max(a, b)$/;"	operator
+~~~	input.ex	/^  defmacrop a ~~~ b, do: max(a, b)$/;"	operator
+Nest	input.ex	/^defmodule Nest do$/;"	module
+Of	input.ex	/^  defmodule Of do$/;"	module
+Modules	input.ex	/^    defmodule Modules do$/;"	module
+MyRecords	input.ex	/^defmodule MyRecords do$/;"	module
+user1	input.ex	/^  Record.defrecord(:user1, name: "megan", age: "25")$/;"	record
+user2	input.ex	/^  Record.defrecordp :user2, name: "ivan", age: "23"$/;"	record
+CallbackModule	input.ex	/^defmodule CallbackModule do$/;"	module
+with spaces	input.ex	/^  test "with spaces" do$/;"	test
+with parens	input.ex	/^  test("with parens") do$/;"	test
