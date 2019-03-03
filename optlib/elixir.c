@@ -42,6 +42,9 @@ extern parserDefinition* ElixirParser (void)
 		  true, 'e', "exception", "exceptions (defexception ...)",
 		},
 		{
+		  true, 'g', "guard", "guards (defguard ...)",
+		},
+		{
 		  true, 'i', "implementation", "implementations (defimpl ...)",
 		},
 		{
@@ -64,27 +67,31 @@ extern parserDefinition* ElixirParser (void)
 		},
 	};
 	static tagRegexTable ElixirTagRegexTable [] = {
-		{"^[ \t]*def(p?)[ \t]+([a-z_][a-zA-Z0-9_?!]*)", "\\2",
+		{"^[ \t]*def(p?)[ \t]+([a-z_][a-zA-Z0-9_?!]*)(.[^\\|\\^/&<>~.=!*+-]+)", "\\2",
 		"f", NULL, NULL, false},
-		{"^[ \t]*defcallback[ \t]+([a-z_][a-zA-Z0-9_?!]*)", "\\1",
+		{"^[ \t]*(@|def)callback[ \t]+([a-z_][a-zA-Z0-9_?!]*)", "\\2",
 		"c", NULL, NULL, false},
 		{"^[ \t]*defdelegate[ \t]+([a-z_][a-zA-Z0-9_?!]*)", "\\1",
 		"d", NULL, NULL, false},
 		{"^[ \t]*defexception[ \t]+([A-Z][a-zA-Z0-9_]*\\.)*([A-Z][a-zA-Z0-9_?!]*)", "\\2",
 		"e", NULL, NULL, false},
+		{"^[ \t]*defguard(p?)[ \t]+(is_[a-zA-Z0-9_?!]+)", "\\2",
+		"a", NULL, NULL, false},
 		{"^[ \t]*defimpl[ \t]+([A-Z][a-zA-Z0-9_]*\\.)*([A-Z][a-zA-Z0-9_?!]*)", "\\2",
 		"i", NULL, NULL, false},
-		{"^[ \t]*defmacro(p?)[ \t]+([a-z_][a-zA-Z0-9_?!]*)\\(", "\\2",
+		{"^[ \t]*defmacro(p?)[ \t]+([a-z_][a-zA-Z0-9_?!]*)(.[^\\|\\^/&<>~.=!*+-]+)", "\\2",
 		"a", NULL, NULL, false},
-		{"^[ \t]*defmacro(p?)[ \t]+([a-zA-Z0-9_?!]+)?[ \t]+([^ \tA-Za-z0-9_]+)[ \t]*[a-zA-Z0-9_!?!]", "\\3",
+		{"^[ \t]*def(p?)[ \t]+([a-zA-Z0-9_?!]+)[ \t]+([\\|\\^/&<>~.=!*+-]{1,3})[ \t]+[a-zA-Z0-9_!?!]", "\\3",
+		"o", NULL, NULL, false},
+		{"^[ \t]*defmacro(p?)[ \t]+([a-zA-Z0-9_?!]+)[ \t]+([\\|\\^/&<>~.=!*+-]{1,3})[ \t]+[a-zA-Z0-9_!?!]", "\\3",
 		"o", NULL, NULL, false},
 		{"^[ \t]*defmodule[ \t]+([A-Z][a-zA-Z0-9_]*\\.)*([A-Z][a-zA-Z0-9_?!]*)", "\\2",
 		"m", NULL, NULL, false},
 		{"^[ \t]*defprotocol[ \t]+([A-Z][a-zA-Z0-9_]*\\.)*([A-Z][a-zA-Z0-9_?!]*)", "\\2",
 		"p", NULL, NULL, false},
-		{"^[ \t]*Record\\.defrecord[ \t]+:([a-zA-Z0-9_]+)", "\\1",
+		{"^[ \t]*Record\\.defrecord(p?)[ \t(]+:([a-zA-Z0-9_]+)(\\)?)", "\\2",
 		"r", NULL, NULL, false},
-		{"^[ \t]*test[ \t]+\"([a-z_][a-zA-Z0-9_?! ]*)\"*", "\\1",
+		{"^[ \t]*test[ \t(]+\"([a-z_][a-zA-Z0-9_?! ]*)\"*(\\)?)", "\\1",
 		"t", NULL, NULL, false},
 	};
 
