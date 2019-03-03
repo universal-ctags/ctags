@@ -412,6 +412,9 @@ OPTION ITEMS
 Options starting with an underscore character, such as ``--_echo=msg``,
 are not listed here. They are experimental or for debugging purpose.
 
+``-?``
+	Equivalent to ``--help``.
+
 ``-a``
 	Equivalent to ``--append``.
 

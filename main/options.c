@@ -195,6 +195,7 @@ static OptionLoadingStage Stage = OptionLoadingStageNone;
 */
 
 static optionDescription LongOptionDescription [] = {
+ {1,"  -?   Print this option summary."},
  {1,"  -a   Append the tags to an existing tag file."},
 #ifdef DEBUG
  {1,"  -b <line>"},
