@@ -60,8 +60,8 @@ extern parserDefinition* PodParser (void)
 	def->patterns      = patterns;
 	def->aliases       = aliases;
 	def->method        = METHOD_NOT_CRAFTED|METHOD_REGEX;
-	def->kindTable = PodKindTable;
-	def->kindCount = ARRAY_SIZE(PodKindTable);
+	def->kindTable     = PodKindTable;
+	def->kindCount     = ARRAY_SIZE(PodKindTable);
 	def->tagRegexTable = PodTagRegexTable;
 	def->tagRegexCount = ARRAY_SIZE(PodTagRegexTable);
 	def->initialize    = initializePodParser;

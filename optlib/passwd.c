@@ -52,8 +52,8 @@ extern parserDefinition* PasswdParser (void)
 	def->patterns      = patterns;
 	def->aliases       = aliases;
 	def->method        = METHOD_NOT_CRAFTED|METHOD_REGEX;
-	def->fieldTable = PasswdFieldTable;
-	def->fieldCount = ARRAY_SIZE(PasswdFieldTable);
+	def->fieldTable    = PasswdFieldTable;
+	def->fieldCount    = ARRAY_SIZE(PasswdFieldTable);
 	def->tagRegexTable = PasswdTagRegexTable;
 	def->tagRegexCount = ARRAY_SIZE(PasswdTagRegexTable);
 	def->initialize    = initializePasswdParser;

@@ -652,8 +652,8 @@ extern parserDefinition* PuppetManifestParser (void)
 	def->aliases       = aliases;
 	def->method        = METHOD_NOT_CRAFTED|METHOD_REGEX;
 	def->useCork       = 1;
-	def->kindTable = PuppetManifestKindTable;
-	def->kindCount = ARRAY_SIZE(PuppetManifestKindTable);
+	def->kindTable     = PuppetManifestKindTable;
+	def->kindCount     = ARRAY_SIZE(PuppetManifestKindTable);
 	def->requestAutomaticFQTag = true;
 	def->defaultScopeSeparator = "::";
 	def->initialize    = initializePuppetManifestParser;

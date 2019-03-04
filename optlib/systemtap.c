@@ -426,8 +426,8 @@ extern parserDefinition* SystemTapParser (void)
 	def->aliases       = aliases;
 	def->method        = METHOD_NOT_CRAFTED|METHOD_REGEX;
 	def->useCork       = 1;
-	def->kindTable = SystemTapKindTable;
-	def->kindCount = ARRAY_SIZE(SystemTapKindTable);
+	def->kindTable     = SystemTapKindTable;
+	def->kindCount     = ARRAY_SIZE(SystemTapKindTable);
 	def->initialize    = initializeSystemTapParser;
 
 	return def;
