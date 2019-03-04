@@ -128,7 +128,7 @@ OPTLIB2C = $(srcdir)/misc/optlib2c
 SUFFIXES += .ctags
 .ctags.c:
 	$(optlib2c_verbose)$(OPTLIB2C) $< > $@
-$(OPTLIB2C_INPUT): $(OPTLIB2C) Makefile
+$(OPTLIB2C_SRCS): $(OPTLIB2C) Makefile
 endif
 
 packcc_verbose = $(packcc_verbose_@AM_V@)
