@@ -572,7 +572,7 @@ tags automatically.
 
 `.` is the (ctags global) default separator combining names into a
 fully qualified tag. You can customize separators with
-``--_scopesep-<LANG>=...` option.
+``--_scopesep-<LANG>=...`` option.
 
 input.foo::
 
