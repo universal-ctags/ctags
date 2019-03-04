@@ -68,11 +68,13 @@ static objPool *TokenPool = NULL;
 /*	Used to specify type of keyword.
 */
 enum eKeywordId {
+	KEYWORD_async,
 	KEYWORD_break,
 	KEYWORD_case,
 	KEYWORD_catch,
 	KEYWORD_class,
 	KEYWORD_const,
+	KEYWORD_constructor,
 	KEYWORD_continue,
 	KEYWORD_debugger,
 	KEYWORD_default,
@@ -158,6 +160,7 @@ typedef struct sTokenInfo {
 	vString *		scope;
 	unsigned long 	lineNumber;
 	MIOPos 			filePosition;
+	keywordId		accessKeyword;
 } tokenInfo;
 
 typedef struct sCommentState {
@@ -176,54 +179,57 @@ static tokenInfo *NextToken;
 
 static const keywordTable TsKeywordTable [] = {
 	/* keyword		keyword ID */
-	{ "break"      , KEYWORD_break      },
-	{ "case"       , KEYWORD_case       },
-	{ "catch"      , KEYWORD_catch      },
-	{ "class"      , KEYWORD_class      },
-	{ "const"      , KEYWORD_const      },
-	{ "continue"   , KEYWORD_continue   },
-	{ "debugger"   , KEYWORD_debugger   },
-	{ "default"    , KEYWORD_default    },
-	{ "delete"     , KEYWORD_delete     },
-	{ "do"         , KEYWORD_do         },
-	{ "else"       , KEYWORD_else       },
-	{ "enum"       , KEYWORD_enum       },
-	{ "export"     , KEYWORD_export     },
-	{ "extends"    , KEYWORD_extends    },
-	{ "false"      , KEYWORD_false      },
-	{ "finally"    , KEYWORD_finally    },
-	{ "for"        , KEYWORD_for        },
-	{ "function"   , KEYWORD_function   },
-	{ "if"         , KEYWORD_if         },
-	{ "implements" , KEYWORD_implements },
-	{ "import"     , KEYWORD_import     },
-	{ "in"         , KEYWORD_in         },
-	{ "instanceof" , KEYWORD_instanceof },
-	{ "interface"  , KEYWORD_interface  },
-	{ "let"        , KEYWORD_let        },
-	{ "module"     , KEYWORD_module     },
-	{ "namespace"  , KEYWORD_namespace  },
-	{ "new"        , KEYWORD_new        },
-	{ "null"       , KEYWORD_null       },
-	{ "package"    , KEYWORD_package    },
-	{ "private"    , KEYWORD_private    },
-	{ "protected"  , KEYWORD_protected  },
-	{ "public"     , KEYWORD_public     },
-	{ "return"     , KEYWORD_return     },
-	{ "static"     , KEYWORD_static     },
-	{ "super"      , KEYWORD_super      },
-	{ "switch"     , KEYWORD_switch     },
-	{ "this"       , KEYWORD_this       },
-	{ "throw"      , KEYWORD_throw      },
-	{ "true"       , KEYWORD_true       },
-	{ "try"        , KEYWORD_try        },
-	{ "type"       , KEYWORD_type       },
-	{ "typeof"     , KEYWORD_typeof     },
-	{ "var"        , KEYWORD_var        },
-	{ "void"       , KEYWORD_void       },
-	{ "while"      , KEYWORD_while      },
-	{ "with"       , KEYWORD_with       },
-	{ "yield"      , KEYWORD_yield      }
+	{ "async"      , KEYWORD_async       },
+	{ "break"      , KEYWORD_break       },
+	{ "case"       , KEYWORD_case        },
+	{ "catch"      , KEYWORD_catch       },
+	{ "class"      , KEYWORD_class       },
+	{ "const"      , KEYWORD_const       },
+	{ "constructor", KEYWORD_constructor },
+
+	{ "continue"   , KEYWORD_continue    },
+	{ "debugger"   , KEYWORD_debugger    },
+	{ "default"    , KEYWORD_default     },
+	{ "delete"     , KEYWORD_delete      },
+	{ "do"         , KEYWORD_do          },
+	{ "else"       , KEYWORD_else        },
+	{ "enum"       , KEYWORD_enum        },
+	{ "export"     , KEYWORD_export      },
+	{ "extends"    , KEYWORD_extends     },
+	{ "false"      , KEYWORD_false       },
+	{ "finally"    , KEYWORD_finally     },
+	{ "for"        , KEYWORD_for         },
+	{ "function"   , KEYWORD_function    },
+	{ "if"         , KEYWORD_if          },
+	{ "implements" , KEYWORD_implements  },
+	{ "import"     , KEYWORD_import      },
+	{ "in"         , KEYWORD_in          },
+	{ "instanceof" , KEYWORD_instanceof  },
+	{ "interface"  , KEYWORD_interface   },
+	{ "let"        , KEYWORD_let         },
+	{ "module"     , KEYWORD_module      },
+	{ "namespace"  , KEYWORD_namespace   },
+	{ "new"        , KEYWORD_new         },
+	{ "null"       , KEYWORD_null        },
+	{ "package"    , KEYWORD_package     },
+	{ "private"    , KEYWORD_private     },
+	{ "protected"  , KEYWORD_protected   },
+	{ "public"     , KEYWORD_public      },
+	{ "return"     , KEYWORD_return      },
+	{ "static"     , KEYWORD_static      },
+	{ "super"      , KEYWORD_super       },
+	{ "switch"     , KEYWORD_switch      },
+	{ "this"       , KEYWORD_this        },
+	{ "throw"      , KEYWORD_throw       },
+	{ "true"       , KEYWORD_true        },
+	{ "try"        , KEYWORD_try         },
+	{ "type"       , KEYWORD_type        },
+	{ "typeof"     , KEYWORD_typeof      },
+	{ "var"        , KEYWORD_var         },
+	{ "void"       , KEYWORD_void        },
+	{ "while"      , KEYWORD_while       },
+	{ "with"       , KEYWORD_with        },
+	{ "yield"      , KEYWORD_yield       }
 };
 
 typedef enum {
@@ -246,7 +252,6 @@ static kindDefinition TsKinds [] = {
 	{ true,  'e', "enum",		  "enums"			   },
 	{ true,  'm', "method",		  "methods"			   },
 	{ true,  'p', "property",	  "properties"		   },
-	{ true,  'C', "constant",	  "constants"		   },
 	{ true,  'v', "variable",	  "global variables"   },
 	{ true,  'g', "generator",	  "generators"		   },
 	{ true,	 'a', "alias",		  "aliases",		   }
@@ -274,15 +279,35 @@ static void emitTag(const tokenInfo *const token, const tsKind kind)
 	if (!TsKinds [kind].enabled)
 		return;
 
+	static const char *const access[3] = {
+		"private",
+		"protected",
+		"public"
+	};
+
 	const char *name = vStringValue (token->string);
 	tagEntryInfo e;
 
 	initTagEntry (&e, name, kind);
 	e.lineNumber   = token->lineNumber;
 	e.filePosition = token->filePosition;
+
 	if (token->scope && vStringLength(token->scope) > 0) {
 		e.extensionFields.scopeName = vStringValue (token->scope);
 	}
+
+	switch (token->accessKeyword) {
+		case KEYWORD_public:
+			e->extensionFields.access = access[2];
+			break;
+		case KEYWORD_protected:
+			e->extensionFields.access = access[1];
+			break;
+		case KEYWORD_private:
+			e->extensionFields.access = access[0];
+			break;
+	}
+
 	makeTagEntry (&e);
 }
 
@@ -298,11 +323,12 @@ static void clearPoolToken (void *data)
 {
 	tokenInfo *token = data;
 
-	token->type			= TOKEN_UNDEFINED;
-	token->keyword		= KEYWORD_NONE;
-	token->lineNumber   = getInputLineNumber ();
-	token->filePosition = getInputFilePosition ();
-	token->scope        = vStringNew ();
+	token->type			 = TOKEN_UNDEFINED;
+	token->keyword		 = T= KEYWORD_NONE;
+	token->lineNumber    = T= getInputLineNumber ();
+	token->filePosition  = T= getInputFilePosition ();
+	token->scope         = T= vStringNew ();
+	token->accessKeyword = KEYWORD_NONE;
 	vStringClear (token->string);
 	vStringClear (token->scope);
 }
@@ -624,7 +650,7 @@ inline static void parseBlock(const char c, tokenInfo *const token, tokenType co
 
 	if (c == start) state->nestLevel += 1;
 	else if (c == end) state->nestLevel -= 1;
-	else if (c == ';')
+	else if (c == ';' || c == EOF)
 	{
 		result->status = PARSER_FAILED;
 		return;
@@ -676,11 +702,13 @@ inline static void parseIdentifier(const char c, tokenInfo *const token, int *pa
 	result->status = PARSER_FAILED;
 }
 
+PARSER_DEF(AsyncKeyword      , parseWord , "async"      , (int*))
 PARSER_DEF(BreakKeyword      , parseWord , "break"      , (int*))
 PARSER_DEF(CaseKeyword       , parseWord , "case"       , (int*))
 PARSER_DEF(CatchKeyword      , parseWord , "catch"      , (int*))
 PARSER_DEF(ClassKeyword      , parseWord , "class"      , (int*))
 PARSER_DEF(ConstKeyword      , parseWord , "const"      , (int*))
+PARSER_DEF(ConstructorKeyword, parseWord , "constructor", (int*))
 PARSER_DEF(ContinueKeyword   , parseWord , "continue"   , (int*))
 PARSER_DEF(DebuggerKeyword   , parseWord , "debugger"   , (int*))
 PARSER_DEF(DefaultKeyword    , parseWord , "default"    , (int*))
@@ -1124,7 +1152,9 @@ static void parseFunctionArgs (vString *const scope, tokenInfo *const token)
 			parseComment, initParseCommentState, freeParseCommentState,
 			parseOpenParen, NULL, NULL,
 			NULL);
-	} while (parsed);
+	} while (parsed && token->type != TOKEN_OPEN_PAREN);
+
+	if (!parsed) return;
 
 	do {
 		clearPoolToken (token);
@@ -1258,6 +1288,136 @@ static void parseFunction (tokenInfo *const token)
 	vStringDelete(scope);
 }
 
+static void parseClassBody (vString *const scope, tokenInfo *const token)
+{
+	bool parsed = false;
+
+	//parse until {
+	do {
+		clearPoolToken (token);
+
+		parsed = tryParse(token,
+			parseNewLine, NULL, NULL,
+			parseOpenCurly, NULL, NULL,
+			parseTemplate, initBlockState, freeBlockState,
+			parseComment, initParseCommentState, freeParseCommentState,
+			NULL);
+	} while (parsed && token->type != TOKEN_OPEN_CURLY);
+
+	if (!parsed) return;
+
+	tokenInfo *member = NULL;
+	bool isGenerator = false;
+	int visibility = 0;
+
+	do {
+		clearPoolToken (token);
+
+		parsed = tryParse(token,
+			parseNewLine, NULL, NULL,
+			parseCloseCurly, NULL, NULL,
+			parseStar, NULL, NULL,
+			parseOpenParen, NULL, NULL,
+			parseColon, NULL, NULL,
+			parseSemicolon, NULL, NULL,
+			parseComment, initParseCommentState, freeParseCommentState,
+			parseAsyncKeyword, initParseWordState, freeParseWordState,
+			parseConstructorKeyword, initParseWordState, freeParseWordState,
+			parsePrivateKeyword, initParseWordState, freeParseWordState,
+			parseProtectedKeyword, initParseWordState, freeParseWordState,
+			parsePublicKeyword, initParseWordState, freeParseWordState,
+			parseReadonlyKeyword, initParseWordState, freeParseWordState,
+			parseStaticKeyword, initParseWordState, freeParseWordState,
+			parseIdentifier, initParseWordState, freeParseWordState,
+			NULL);
+
+		if (parsed) {
+			switch (token->type) {
+				case TOKEN_KEYWORD:
+					switch (token->keyword) {
+						case KEYWORD_constructor:
+							parsePropertyList (scope, token);
+							break;
+						case KEYWORD_private:
+						case KEYWORD_public:
+						case KEYWORD_protected:
+							visibility = token->keyword;
+							break;
+					}
+					isGenerator = false;
+					break;
+				case TOKEN_COLON:
+					ungetcToInputFile(':');
+					parsePropertyType (token);
+				case TOKEN_SEMICOLON:
+					emitTag(member, TSTAG_PROPERTY);
+					deleteToken (member);
+					member = NULL;
+					isGenerator = false;
+					visibility = 0;
+					break;
+				case TOKEN_STAR:
+					isGenerator = true;
+					break;
+				case TOKEN_OPEN_PAREN:
+					ungetcToInputFile('(');
+
+					if (isGenerator) emitTag(token, TSTAG_GENERATOR);
+					else emitTag(member, TSTAG_METHOD);
+
+					parseFunctionArgs (scope, token);
+					parseFunctionBody (scope, token);
+					isGenerator = false;
+					visibility = 0;
+					break;
+				case TOKEN_IDENTIFIER:
+					if (member) deleteToken (member);
+					member = newToken ();
+					copyToken(member, token, false);
+					vStringCopy (member->scope, scope);
+					if (visibility) member->accessKeyword = visibility;
+					break;
+				default:
+					isGenerator = false;
+					visibility = 0;
+					break;
+			}
+		}
+	} while (parsed && token->type != TOKEN_CLOSE_CURLY);
+
+	if (parsed && member)
+	{
+		emitTag(member, TSTAG_PROPERTY);
+		deleteToken (member);
+	}
+}
+
+static void parseClass (tokenInfo *const token)
+{
+	bool parsed = false;
+
+	do {
+		clearPoolToken (token);
+
+		parsed = tryParse(token,
+			parseNewLine, NULL, NULL,
+			parseComment, initParseCommentState, freeParseCommentState,
+			parseIdentifier, initParseWordState, freeParseWordState,
+			NULL);
+	} while (parsed && token->type != TOKEN_IDENTIFIER);
+
+	if (!parsed) return;
+
+	emitTag(token, TSTAG_CLASS);
+
+	vString *scope = vStringNew ();
+	vStringCopy (scope, token->string);
+
+	parseClassBody (scope, token);
+
+	vStringDelete(scope);
+}
+
 static void parseTsFile (tokenInfo *const token)
 {
 	do {
@@ -1275,6 +1435,9 @@ static void parseTsFile (tokenInfo *const token)
 				break;
 			case KEYWORD_function:
 				parseFunction (token);
+				break;
+			case KEYWORD_class:
+				parseClass (token);
 				break;
 		}
 	} while (! isType (token, TOKEN_EOF));
