@@ -158,6 +158,7 @@ extern void addLanguageTagMultiTableRegex(const langType language,
 										  bool *disabled);
 
 extern void anonGenerate (vString *buffer, const char *prefix, int kind);
+extern vString *anonGenerateNew (const char *prefix, int kind);
 extern void anonHashString (const char *filename, char buf[9]);
 
 #endif  /* CTAGS_MAIN_PARSE_H */
