@@ -1,2 +1,6 @@
-a	input.xml	/^<UnKnownTag id="a">$/;"	i	language:XML	xpath:/UnKnownTag/@id
-b	input.xml	/^  <UnKnownTag2 id="b"\/>$/;"	i	language:XML	xpath:/UnKnownTag/UnKnownTag2/@id
+ns56cd8d1c0101	input.xml	/^       >$/;"	n	line:4	language:XML	uri:https://ctags.io/root
+abc	input.xml	/^       >$/;"	n	line:4	language:XML	uri:https://ctags.io/nosuchthing
+unused	input.xml	/^       >$/;"	n	line:4	language:XML	uri:https://ctags.io/unused
+efg	input.xml	/^<abc:UnKnownTag id="a" xmlns:efg="https:\/\/ctags.io\/nosuchthing2">$/;"	n	line:5	language:XML	uri:https://ctags.io/nosuchthing2
+a	input.xml	/^<abc:UnKnownTag id="a" xmlns:efg="https:\/\/ctags.io\/nosuchthing2">$/;"	i	line:5	language:XML	xpath:/*/abc:UnKnownTag/@id
+b	input.xml	/^  <efg:UnKnownTag2 id="b"\/>$/;"	i	line:6	language:XML	xpath:/*/abc:UnKnownTag/efg:UnKnownTag2/@id
