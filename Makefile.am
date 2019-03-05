@@ -134,7 +134,7 @@ endif
 packcc_verbose = $(packcc_verbose_@AM_V@)
 packcc_verbose_ = $(packcc_verbose_@AM_DEFAULT_V@)
 packcc_verbose_0 = @echo PACKCC "    $@";
-PACKCC = $(srcdir)/packcc$(EXEEXT)
+PACKCC = $(top_builddir)/packcc$(EXEEXT)
 SUFFIXES += .peg
 .peg.c:
 	$(packcc_verbose)$(PACKCC) $<
