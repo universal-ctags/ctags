@@ -6,6 +6,7 @@ class CPoint {
     this.y = y;
   }
 }
+
 class BankAccount {
   balance = 0;
   deposit(credit: number) {

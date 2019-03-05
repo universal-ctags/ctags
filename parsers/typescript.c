@@ -149,6 +149,7 @@ typedef enum eTokenType {
 	TOKEN_PARENS,
 	TOKEN_SQUARES,
 	TOKEN_PIPE,
+	TOKEN_AMPERSAND,
 	TOKEN_ARROW,
 	TOKEN_NUMBER
 } tokenType;
@@ -239,7 +240,6 @@ typedef enum {
 	TSTAG_ENUM,
 	TSTAG_METHOD,
 	TSTAG_PROPERTY,
-	TSTAG_CONSTANT,
 	TSTAG_VARIABLE,
 	TSTAG_GENERATOR,
 	TSTAG_ALIAS
@@ -298,13 +298,13 @@ static void emitTag(const tokenInfo *const token, const tsKind kind)
 
 	switch (token->accessKeyword) {
 		case KEYWORD_public:
-			e->extensionFields.access = access[2];
+			e.extensionFields.access = access[2];
 			break;
 		case KEYWORD_protected:
-			e->extensionFields.access = access[1];
+			e.extensionFields.access = access[1];
 			break;
 		case KEYWORD_private:
-			e->extensionFields.access = access[0];
+			e.extensionFields.access = access[0];
 			break;
 	}
 
@@ -324,10 +324,10 @@ static void clearPoolToken (void *data)
 	tokenInfo *token = data;
 
 	token->type			 = TOKEN_UNDEFINED;
-	token->keyword		 = T= KEYWORD_NONE;
-	token->lineNumber    = T= getInputLineNumber ();
-	token->filePosition  = T= getInputFilePosition ();
-	token->scope         = T= vStringNew ();
+	token->keyword		 = KEYWORD_NONE;
+	token->lineNumber    = getInputLineNumber ();
+	token->filePosition  = getInputFilePosition ();
+	token->scope         = vStringNew ();
 	token->accessKeyword = KEYWORD_NONE;
 	vStringClear (token->string);
 	vStringClear (token->scope);
@@ -412,7 +412,7 @@ inline static void parseWord(const char c, tokenInfo *const token, const char* w
 
 	if (word[*parsed] == '\0')
 	{
-		if (!whiteChar (c) && c != '\n')
+		if (isIdentChar (c))
 		{
 			result->status = PARSER_FAILED;
 			return;
@@ -770,6 +770,7 @@ SINGLE_CHAR_PARSER_DEF(NewLine      , '\n' , TOKEN_NL)
 SINGLE_CHAR_PARSER_DEF(QuestionMark , '?'  , TOKEN_QUESTION_MARK)
 SINGLE_CHAR_PARSER_DEF(EOF          , EOF  , TOKEN_EOF)
 SINGLE_CHAR_PARSER_DEF(Pipe         , '|'  , TOKEN_PIPE)
+SINGLE_CHAR_PARSER_DEF(Ampersand    , '&'  , TOKEN_AMPERSAND)
 
 WORD_TOKEN_PARSER_DEF(Arrow         , "=>" , TOKEN_ARROW)
 
@@ -862,6 +863,7 @@ static void readToken (tokenInfo *const token)
 			parseNewLine, NULL, NULL,
 			parseEOF, NULL, NULL,
 			parsePipe, NULL, NULL,
+			parseAmpersand, NULL, NULL,
 			parseSquares, initBlockState, freeBlockState,
 			parseParens, initBlockState, freeBlockState,
 			parseComment, initParseCommentState, freeParseCommentState,
@@ -1085,6 +1087,7 @@ static void parseVariable (vString *const scope, tokenInfo *const token)
 			parseParens, initBlockState, freeBlockState,
 			parseNumber, initParseWordState, freeParseWordState,
 			parsePipe, NULL, NULL,
+			parseAmpersand, NULL, NULL,
 			parseEqualSign, NULL, NULL,
 			parseQuestionMark, NULL, NULL,
 			parseOpenSquare, NULL, NULL,
@@ -1167,6 +1170,7 @@ static void parseFunctionArgs (vString *const scope, tokenInfo *const token)
 			parseParens, initBlockState, freeBlockState,
 			parseNumber, initParseWordState, freeParseWordState,
 			parsePipe, NULL, NULL,
+			parseAmpersand, NULL, NULL,
 			parseEqualSign, NULL, NULL,
 			parseQuestionMark, NULL, NULL,
 			parseOpenSquare, NULL, NULL,
@@ -1224,21 +1228,29 @@ static void parseFunctionBody (vString *const scope, tokenInfo *const token)
 	int nestLevel = 1;
 
 	do {
-		readToken (token);
-		if (isType (token, TOKEN_EOF)) return;
-	} while (! isType (token, TOKEN_OPEN_CURLY));
+		clearPoolToken (token);
+
+		parsed = tryParse(token,
+			parseOpenCurly, NULL, NULL,
+			parseComment, initParseCommentState, freeParseCommentState,
+			parseChar, NULL, NULL,
+			NULL);
+
+	} while (parsed && ! isType (token, TOKEN_OPEN_CURLY));
+
+	if (!parsed) return;
 
 	do {
 		clearPoolToken (token);
 
 		parsed = tryParse(token,
+			parseOpenCurly, NULL, NULL,
+			parseCloseCurly, NULL, NULL,
 			parseStringSQuote, initParseStringState, freeParseStringState,
 			parseStringDQuote, initParseStringState, freeParseStringState,
 			parseStringTemplate, initParseStringState, freeParseStringState,
 			parseComment, initParseCommentState, freeParseCommentState,
 			parseTemplate, initBlockState, freeBlockState,
-			parseOpenCurly, NULL, NULL,
-			parseCloseCurly, NULL, NULL,
 			parseVarKeyword, initParseWordState, freeParseWordState,
 			parseLetKeyword, initParseWordState, freeParseWordState,
 			parseConstKeyword, initParseWordState, freeParseWordState,
@@ -1267,6 +1279,8 @@ static void parseFunctionBody (vString *const scope, tokenInfo *const token)
 			}
 		}
 	} while (parsed && ! (isType (token, TOKEN_CLOSE_CURLY) && nestLevel <= 0));
+
+	clearPoolToken (token);
 }
 
 static void parseFunction (tokenInfo *const token)
@@ -1288,6 +1302,114 @@ static void parseFunction (tokenInfo *const token)
 	vStringDelete(scope);
 }
 
+static void parsePropertyType (tokenInfo *const token)
+{
+	bool parsed = tryParser ((Parser) parseColon, NULL, NULL, token);
+
+	if (!parsed) return;
+
+	do {
+		clearPoolToken (token);
+
+		parsed = tryParse(token,
+			parseNewLine, NULL, NULL,
+			parseSemicolon, NULL, NULL,
+			parsePipe, NULL, NULL,
+			parseAmpersand, NULL, NULL,
+			parseEqualSign, NULL, NULL,
+			parseComma, NULL, NULL,
+			parseCloseParen, NULL, NULL,
+			parseTemplate, initBlockState, freeBlockState,
+			parseComment, initParseCommentState, freeParseCommentState,
+			parseSquares, initBlockState, freeBlockState,
+			parseIdentifier, initParseWordState, freeParseWordState,
+			NULL);
+	} while (parsed && !isType (token, TOKEN_CLOSE_PAREN) && ! isType (token, TOKEN_SEMICOLON) && ! isType (token, TOKEN_COMMA));
+
+	if (!parsed) return;
+
+	if (isType (token, TOKEN_CLOSE_PAREN)) ungetcToInputFile (')');
+	clearPoolToken (token);
+}
+
+static void parsePropertyList (vString *const scope, tokenInfo *const token)
+{
+	bool parsed = false;
+
+	do {
+		clearPoolToken (token);
+
+		parsed = tryParse(token,
+			parseNewLine, NULL, NULL,
+			parseOpenParen, NULL, NULL,
+			parseComment, initParseCommentState, freeParseCommentState,
+			NULL);
+	} while (parsed && !isType (token, TOKEN_OPEN_PAREN));
+
+	if (!parsed) return;
+
+	tokenInfo *member = NULL;
+	int visibility = 0;
+
+	do {
+		clearPoolToken (token);
+
+		parsed = tryParse(token,
+			parseNewLine, NULL, NULL,
+			parseCloseParen, NULL, NULL,
+			parseComma, NULL, NULL,
+			parseColon, NULL, NULL,
+			parseComment, initParseCommentState, freeParseCommentState,
+			parsePrivateKeyword, initParseWordState, freeParseWordState,
+			parseProtectedKeyword, initParseWordState, freeParseWordState,
+			parsePublicKeyword, initParseWordState, freeParseWordState,
+			parseReadonlyKeyword, initParseWordState, freeParseWordState,
+			parseStaticKeyword, initParseWordState, freeParseWordState,
+			parseIdentifier, initParseWordState, freeParseWordState,
+			NULL);
+
+		if (parsed)
+		{
+			switch (token->type) {
+				case TOKEN_KEYWORD:
+					switch (token->keyword) {
+						case KEYWORD_private:
+						case KEYWORD_public:
+						case KEYWORD_protected:
+							visibility = token->keyword;
+							break;
+					}
+					break;
+				case TOKEN_COLON:
+					ungetcToInputFile(':');
+					parsePropertyType (token);
+					break;
+				case TOKEN_IDENTIFIER:
+					member = newToken ();
+					copyToken(member, token, false);
+					vStringCopy (member->scope, scope);
+					if (visibility)
+					{
+						member->accessKeyword = visibility;
+						emitTag(member, TSTAG_PROPERTY);
+					}
+					else
+					{
+						vStringCatS (member->scope, ".constructor");
+						emitTag(member, TSTAG_VARIABLE);
+					}
+					deleteToken (member);
+					member = NULL;
+					visibility = 0;
+					break;
+				default:
+					break;
+			}
+		}
+	} while (parsed && !isType (token, TOKEN_CLOSE_PAREN));
+
+}
+
 static void parseClassBody (vString *const scope, tokenInfo *const token)
 {
 	bool parsed = false;
@@ -1301,6 +1423,7 @@ static void parseClassBody (vString *const scope, tokenInfo *const token)
 			parseOpenCurly, NULL, NULL,
 			parseTemplate, initBlockState, freeBlockState,
 			parseComment, initParseCommentState, freeParseCommentState,
+			parseIdentifier, initParseWordState, freeParseWordState,
 			NULL);
 	} while (parsed && token->type != TOKEN_OPEN_CURLY);
 
@@ -1320,6 +1443,7 @@ static void parseClassBody (vString *const scope, tokenInfo *const token)
 			parseOpenParen, NULL, NULL,
 			parseColon, NULL, NULL,
 			parseSemicolon, NULL, NULL,
+			parseEqualSign, NULL, NULL,
 			parseComment, initParseCommentState, freeParseCommentState,
 			parseAsyncKeyword, initParseWordState, freeParseWordState,
 			parseConstructorKeyword, initParseWordState, freeParseWordState,
@@ -1328,15 +1452,36 @@ static void parseClassBody (vString *const scope, tokenInfo *const token)
 			parsePublicKeyword, initParseWordState, freeParseWordState,
 			parseReadonlyKeyword, initParseWordState, freeParseWordState,
 			parseStaticKeyword, initParseWordState, freeParseWordState,
+			parseNumber, initParseWordState, freeParseWordState,
 			parseIdentifier, initParseWordState, freeParseWordState,
 			NULL);
 
-		if (parsed) {
+		if (parsed)
+		{
 			switch (token->type) {
 				case TOKEN_KEYWORD:
 					switch (token->keyword) {
 						case KEYWORD_constructor:
+							if (member) deleteToken (member);
+							member = newToken ();
+							copyToken(member, token, false);
+							vStringCopy (member->scope, scope);
+
+							if (visibility) member->accessKeyword = visibility;
+							else member->accessKeyword = KEYWORD_public;
+
+							emitTag(member, TSTAG_METHOD);
+							deleteToken (member);
+							member = NULL;
+							visibility = 0;
+
 							parsePropertyList (scope, token);
+
+							vString *methodScope = vStringNew ();
+							vStringCopy (methodScope, scope);
+							vStringCatS (methodScope, ".constructor");
+							parseFunctionBody (methodScope, token);
+							vStringDelete(methodScope);
 							break;
 						case KEYWORD_private:
 						case KEYWORD_public:
@@ -1346,15 +1491,21 @@ static void parseClassBody (vString *const scope, tokenInfo *const token)
 					}
 					isGenerator = false;
 					break;
+				case TOKEN_EQUAL_SIGN:
+					skipBlocksTillType (TOKEN_SEMICOLON, token);
+					ungetcToInputFile(';');
+					break;
 				case TOKEN_COLON:
 					ungetcToInputFile(':');
 					parsePropertyType (token);
 				case TOKEN_SEMICOLON:
-					emitTag(member, TSTAG_PROPERTY);
-					deleteToken (member);
-					member = NULL;
-					isGenerator = false;
-					visibility = 0;
+					if (member) {
+						emitTag(member, TSTAG_PROPERTY);
+						deleteToken (member);
+						member = NULL;
+						isGenerator = false;
+						visibility = 0;
+					}
 					break;
 				case TOKEN_STAR:
 					isGenerator = true;
@@ -1362,11 +1513,21 @@ static void parseClassBody (vString *const scope, tokenInfo *const token)
 				case TOKEN_OPEN_PAREN:
 					ungetcToInputFile('(');
 
-					if (isGenerator) emitTag(token, TSTAG_GENERATOR);
+					if (isGenerator) emitTag(member, TSTAG_GENERATOR);
 					else emitTag(member, TSTAG_METHOD);
 
-					parseFunctionArgs (scope, token);
-					parseFunctionBody (scope, token);
+					vString *methodScope = vStringNew ();
+					vStringCopy (methodScope, scope);
+					vStringCatS (methodScope, ".");
+					vStringCat (methodScope, member->string);
+
+					deleteToken (member);
+					member = NULL;
+
+					parseFunctionArgs (methodScope, token);
+					parseFunctionBody (methodScope, token);
+
+					vStringDelete(methodScope);
 					isGenerator = false;
 					visibility = 0;
 					break;
@@ -1376,6 +1537,7 @@ static void parseClassBody (vString *const scope, tokenInfo *const token)
 					copyToken(member, token, false);
 					vStringCopy (member->scope, scope);
 					if (visibility) member->accessKeyword = visibility;
+					else member->accessKeyword = KEYWORD_public;
 					break;
 				default:
 					isGenerator = false;
@@ -1385,11 +1547,13 @@ static void parseClassBody (vString *const scope, tokenInfo *const token)
 		}
 	} while (parsed && token->type != TOKEN_CLOSE_CURLY);
 
+
 	if (parsed && member)
 	{
 		emitTag(member, TSTAG_PROPERTY);
 		deleteToken (member);
 	}
+	else if (member) deleteToken (member);
 }
 
 static void parseClass (tokenInfo *const token)

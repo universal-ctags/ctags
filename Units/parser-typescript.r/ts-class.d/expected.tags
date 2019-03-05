@@ -1,0 +1,45 @@
+A	input.ts	/^class A {$/;"	c
+BankAccount	input.ts	/^class BankAccount {$/;"	c
+C	input.ts	/^class C {$/;"	c
+CPoint	input.ts	/^class CPoint {$/;"	c
+CheckingAccount	input.ts	/^class CheckingAccount extends BankAccount {$/;"	c
+D	input.ts	/^class D {$/;"	c
+List	input.ts	/^class List<T extends NamedItem> {$/;"	c
+Messenger	input.ts	/^class Messenger {$/;"	c
+Point	input.ts	/^class Point {$/;"	c
+_this	input.ts	/^    var _this = this;$/;"	v
+a	input.ts	/^  static f(a: A, b: B) {$/;"	v
+b	input.ts	/^  static f(a: A, b: B) {$/;"	v
+balance	input.ts	/^  balance = 0;$/;"	p
+balance	input.ts	/^  constructor(balance: number) {$/;"	v
+constructor	input.ts	/^  constructor(balance: number) {$/;"	m
+constructor	input.ts	/^  constructor(public item: T) {$/;"	m
+constructor	input.ts	/^  constructor(public x: number, public y: number) { }$/;"	m
+constructor	input.ts	/^  constructor(x: number, y: number) {$/;"	m
+credit	input.ts	/^  deposit(credit: number) {$/;"	v
+data	input.ts	/^    var data = this.data;$/;"	v
+data	input.ts	/^  data: string | string[];$/;"	p
+debit	input.ts	/^  writeCheck(debit: number) {$/;"	v
+deposit	input.ts	/^  deposit(credit: number) {$/;"	m
+f	input.ts	/^  static f(a: A, b: B) {$/;"	m
+getData	input.ts	/^  getData() {$/;"	m
+insertAfter	input.ts	/^  insertAfter(item: T) {$/;"	m
+item	input.ts	/^  constructor(public item: T) {$/;"	p
+item	input.ts	/^  insertAfter(item: T) {$/;"	v
+length	input.ts	/^  public length() { return Math.sqrt(this.x * this.x + this.y * this.y); }$/;"	m
+log	input.ts	/^  log() {$/;"	m
+message	input.ts	/^  message = "Hello World";$/;"	p
+next	input.ts	/^  next: List<T> = null;$/;"	p
+origin	input.ts	/^  static origin = new Point(0, 0);$/;"	p
+start	input.ts	/^  start() {$/;"	m
+temp	input.ts	/^    var temp = this.next;$/;"	v
+writeCheck	input.ts	/^  writeCheck(debit: number) {$/;"	m
+x	input.ts	/^  constructor(public x: number, public y: number) { }$/;"	p
+x	input.ts	/^  constructor(x: number, y: number) {$/;"	v
+x	input.ts	/^  private x: number;$/;"	p
+x	input.ts	/^  static x: string;$/;"	p
+x	input.ts	/^  x: number;$/;"	p
+y	input.ts	/^  constructor(public x: number, public y: number) { }$/;"	p
+y	input.ts	/^  constructor(x: number, y: number) {$/;"	v
+y	input.ts	/^  protected y: number;$/;"	p
+y	input.ts	/^  y: number;$/;"	p
