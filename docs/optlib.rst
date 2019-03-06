@@ -1573,16 +1573,18 @@ Read "Option library" about the concept and usage first.
 Here I will explain how to merge your .ctags into Universal-ctags as
 part of the option library. Here I assume you consider contributing
 an option library in which a regex-based language parser is defined.
-See `How to Add Support for a New Language to Exuberant Ctags (EXTENDING)`_
-about the way to how to write a regex based language parser. In this
-section I explains the next step.
+
+First you need your option library (which you have seen in this part of the
+guide).  See `How to Add Support for a New Language to Exuberant Ctags
+(EXTENDING)`_ to learn how to write a regex-based language parser in C.
+
+In this section I explain what to do after you have your parser.
+
+Like in the link, I use Swine as the name of programming language that
+the parser deals with. Assume source files written in Swine language have a
+suffix *.swn*. The file name of the option library is *swine.ctags*.
 
 .. _`How to Add Support for a New Language to Exuberant Ctags (EXTENDING)`: http://ctags.sourceforge.net/EXTENDING.html
-
-I use Swine as the name of programming language which your parser
-deals with. Assume source files written in Swine language have a suffix
-*.swn*. The file name of option library is *swine.ctags*.
-
 
 Copyright notice, contact mail address and license term
 ......................................................................
@@ -1616,11 +1618,12 @@ An example taken from *data/optlib/ctags.ctags* ::
 	#
 	...
 
-"GPL version 2 or later version" is needed here.  Option file is not
-linked to ``ctags`` command. However, I have a plan to write a translator
-which generates *.c* file from a given option file. As the result the
-*.c* file is built into ``ctags`` command. In such a case "GPL version 2
-or later version" may be required.
+"GPL version 2 or later version" is needed here. The Option library is not
+linked to ``ctags`` command. However, I have written a translator which
+generates *.c* file from a given option file. Said translator is called
+``optlib2c`` and can be found in ``misc/optlib2c`` from the source tree. As
+result the *.c* file is built into ``ctags`` command. In such a case "GPL
+version 2 or later version" is be required.
 
 *Units* test cases
 ......................................................................
