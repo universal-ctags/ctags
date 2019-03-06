@@ -1,0 +1,23 @@
+Greeter	input.ts	/^class Greeter {$/;"	c
+Line	input.ts	/^class Line {$/;"	c
+Point	input.ts	/^class Point {$/;"	c
+_p0	input.ts	/^    private _p0: Point;$/;"	p
+_p1	input.ts	/^    private _p1: Point;$/;"	p
+_x	input.ts	/^    private _x: number;$/;"	p
+_y	input.ts	/^    private _y: number;$/;"	p
+constructor	input.ts	/^    constructor(@inject x: number, @inject('yNumber') y: number) {$/;"	m
+constructor	input.ts	/^    constructor(message: string) {$/;"	m
+greet	input.ts	/^    greet(@required name: string) {$/;"	m
+greeting	input.ts	/^    greeting: string;$/;"	p
+message	input.ts	/^    constructor(message: string) {$/;"	v
+name	input.ts	/^    greet(@required name: string) {$/;"	v
+p0	input.ts	/^    get p0() { return this._p0; }$/;"	m
+p0	input.ts	/^    set p0(value: Point) { this._p0 = value; }$/;"	m
+p1	input.ts	/^    get p1() { return this._p1; }$/;"	m
+p1	input.ts	/^    set p1(value: Point) { this._p1 = value; }$/;"	m
+value	input.ts	/^    set p0(value: Point) { this._p0 = value; }$/;"	v
+value	input.ts	/^    set p1(value: Point) { this._p1 = value; }$/;"	v
+x	input.ts	/^    constructor(@inject x: number, @inject('yNumber') y: number) {$/;"	v
+x	input.ts	/^    get x() { return this._x; }$/;"	m
+y	input.ts	/^    constructor(@inject x: number, @inject('yNumber') y: number) {$/;"	v
+y	input.ts	/^    get y() { return this._y; }$/;"	m

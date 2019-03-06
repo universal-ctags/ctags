@@ -151,7 +151,8 @@ typedef enum eTokenType {
 	TOKEN_PIPE,
 	TOKEN_AMPERSAND,
 	TOKEN_ARROW,
-	TOKEN_NUMBER
+	TOKEN_NUMBER,
+	TOKEN_AT
 } tokenType;
 
 typedef struct sTokenInfo {
@@ -766,6 +767,7 @@ SINGLE_CHAR_PARSER_DEF(OpenSquare   , '['  , TOKEN_OPEN_SQUARE)
 SINGLE_CHAR_PARSER_DEF(CloseSquare  , ']'  , TOKEN_CLOSE_SQUARE)
 SINGLE_CHAR_PARSER_DEF(EqualSign    , '='  , TOKEN_EQUAL_SIGN)
 SINGLE_CHAR_PARSER_DEF(Star         , '*'  , TOKEN_STAR)
+SINGLE_CHAR_PARSER_DEF(At           , '@'  , TOKEN_AT)
 SINGLE_CHAR_PARSER_DEF(NewLine      , '\n' , TOKEN_NL)
 SINGLE_CHAR_PARSER_DEF(QuestionMark , '?'  , TOKEN_QUESTION_MARK)
 SINGLE_CHAR_PARSER_DEF(EOF          , EOF  , TOKEN_EOF)
@@ -860,6 +862,7 @@ static void readToken (tokenInfo *const token)
 			parseArrow, initParseWordState, freeParseWordState,
 			parseEqualSign, NULL, NULL,
 			parseStar, NULL, NULL,
+			parseAt, NULL, NULL,
 			parseNewLine, NULL, NULL,
 			parseEOF, NULL, NULL,
 			parsePipe, NULL, NULL,
@@ -928,6 +931,33 @@ static void readToken (tokenInfo *const token)
 
 	if (parsed)
 		LastTokenType = token->type;
+}
+
+static void parseDecorator (tokenInfo *const token)
+{
+	bool parsed = false;
+
+	do {
+		clearPoolToken (token);
+		parsed = tryParse(token,
+			parseAt, NULL, NULL,
+			parseNewLine, NULL, NULL,
+			parseComment, initParseCommentState, freeParseCommentState,
+			NULL);
+	} while (parsed && token->type != TOKEN_PARENS);
+
+	do {
+		clearPoolToken (token);
+
+		parsed = tryParse(token,
+			parseNewLine, NULL, NULL,
+			parseComment, initParseCommentState, freeParseCommentState,
+			parseIdentifier, initParseWordState, freeParseWordState,
+			NULL);
+	} while (parsed && (token->type != TOKEN_IDENTIFIER || tryParser ((Parser) parsePeriod, NULL, NULL, token)));
+
+	//parse optional parens block
+	tryParser ((Parser) parseParens, initBlockState, freeBlockState, token);
 }
 
 static void skipBlocksTillType (tokenType type, tokenInfo *const token)
@@ -1180,6 +1210,7 @@ static void parseFunctionArgs (vString *const scope, tokenInfo *const token)
 			parseNewLine, NULL, NULL,
 			parseColon, NULL, NULL,
 			parseComma, NULL, NULL,
+			parseAt, NULL, NULL,
 			parseArrow, initParseWordState, freeParseWordState,
 			parseCloseParen, NULL, NULL,
 			parseIdentifier, initParseWordState, freeParseWordState,
@@ -1187,6 +1218,10 @@ static void parseFunctionArgs (vString *const scope, tokenInfo *const token)
 
 		if (parsed) {
 			switch (token->type) {
+				case TOKEN_AT:
+					ungetcToInputFile ('@');
+					parseDecorator (token);
+					break;
 				case TOKEN_OPEN_SQUARE:
 				case TOKEN_OPEN_CURLY:
 					if (parsingType) nestLevel += 1;
@@ -1221,6 +1256,7 @@ static void parseFunctionArgs (vString *const scope, tokenInfo *const token)
 		}
 	} while (parsed && token->type != TOKEN_CLOSE_PAREN);
 }
+
 
 static void parseFunctionBody (vString *const scope, tokenInfo *const token)
 {
@@ -1359,6 +1395,7 @@ static void parsePropertyList (vString *const scope, tokenInfo *const token)
 			parseCloseParen, NULL, NULL,
 			parseComma, NULL, NULL,
 			parseColon, NULL, NULL,
+			parseAt, NULL, NULL,
 			parseComment, initParseCommentState, freeParseCommentState,
 			parsePrivateKeyword, initParseWordState, freeParseWordState,
 			parseProtectedKeyword, initParseWordState, freeParseWordState,
@@ -1371,6 +1408,10 @@ static void parsePropertyList (vString *const scope, tokenInfo *const token)
 		if (parsed)
 		{
 			switch (token->type) {
+				case TOKEN_AT:
+					ungetcToInputFile ('@');
+					parseDecorator (token);
+					break;
 				case TOKEN_KEYWORD:
 					switch (token->keyword) {
 						case KEYWORD_private:
@@ -1440,6 +1481,7 @@ static void parseClassBody (vString *const scope, tokenInfo *const token)
 			parseNewLine, NULL, NULL,
 			parseCloseCurly, NULL, NULL,
 			parseStar, NULL, NULL,
+			parseAt, NULL, NULL,
 			parseOpenParen, NULL, NULL,
 			parseColon, NULL, NULL,
 			parseSemicolon, NULL, NULL,
@@ -1459,6 +1501,10 @@ static void parseClassBody (vString *const scope, tokenInfo *const token)
 		if (parsed)
 		{
 			switch (token->type) {
+				case TOKEN_AT:
+					ungetcToInputFile ('@');
+					parseDecorator (token);
+					break;
 				case TOKEN_KEYWORD:
 					switch (token->keyword) {
 						case KEYWORD_constructor:
@@ -1587,21 +1633,31 @@ static void parseTsFile (tokenInfo *const token)
 	do {
 		readToken (token);
 
-		switch (token->keyword) {
-			case KEYWORD_interface:
-				parseInterface (token);
+		switch (token->type) {
+			case TOKEN_KEYWORD:
+				switch (token->keyword) {
+					case KEYWORD_interface:
+						parseInterface (token);
+						break;
+					case KEYWORD_type:
+						parseType (token);
+						break;
+					case KEYWORD_enum:
+						parseEnum (token);
+						break;
+					case KEYWORD_function:
+						parseFunction (token);
+						break;
+					case KEYWORD_class:
+						parseClass (token);
+						break;
+				}
 				break;
-			case KEYWORD_type:
-				parseType (token);
+			case TOKEN_AT:
+				ungetcToInputFile ('@');
+				parseDecorator (token);
 				break;
-			case KEYWORD_enum:
-				parseEnum (token);
-				break;
-			case KEYWORD_function:
-				parseFunction (token);
-				break;
-			case KEYWORD_class:
-				parseClass (token);
+			default:
 				break;
 		}
 	} while (! isType (token, TOKEN_EOF));
