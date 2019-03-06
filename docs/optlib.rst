@@ -27,9 +27,9 @@ Option files
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 An "option" file is a file in which command line options are written line
 by line. ``ctags`` loads it and runs as if the options in the file were
-passed in command line.
+passed through command line.
 
-Following file is an example of option file.
+The following file is an example of an option file:
 
 .. code-block:: python
 
@@ -39,8 +39,14 @@ Following file is an example of option file.
 		--exclude=tinst-root
 	--exclude=Tmain
 
-`#` can be used as a start marker of a line comment.
+The character `#` can be used as a start marker of a line comment.
 Whitespaces at the start of lines are ignored during loading.
+
+And it works exactly as if we had called:
+
+```sh
+ctags --exclude=Units --exclude=tinst-root --exclude=Tmain
+```
 
 There are two categories of option files, though they both contain command
 line options: **preload** and **optlib** option files.
@@ -118,11 +124,11 @@ defining a parser, and have extended existing options. Defining
 a new parser with the options is more than "customizing" in
 Universal-ctags.
 
-To make it easier to maintain a parser defined using the options, you can put
-each parser language in a different options file. Universal-ctags doesn't
-preload a single file. Instead, Universal-ctags loads all files having the
-:file:`.ctags` extension under the previously specified directories. If you have
-multiple parser definitions, put them in different files.
+To make easier the maintenance a parser defined using the options, you can put
+each language parser in a different options file. Universal-ctags doesn't
+preload a single file. Instead, Universal-ctags loads all the files having the
+:file:`.ctags` extension under the previously specified directories. If you
+have multiple parser definitions, put them in different files.
 
 Avoiding option incompatibility issues
 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
@@ -140,7 +146,7 @@ To make the preload path list short and because it was rarely ever used,
 Universal-ctags does not load any option files for system wide configuration.
 (i.e., no :file:`/etc/ctags.d`)
 
-Use :file:`.ctags` for the file extension
+Using :file:`.ctags` for the file extension
 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 
 Extensions :file:`.cnf` and :file:`.conf` are obsolete.
@@ -160,9 +166,10 @@ explicitly. The pathname can be just the filename if it's in the
 current directory.
 
 Exuberant-ctags has the ``--options`` option, but you can only specify a
-single file to load. Universal-ctags extends the option two aspects: you
-can specify a directory to load all files in that directory, and you can
-specify a path search list to look in. See next section for details.
+single file to load. Universal-ctags extends the option in two aspects:
+
+- You can specify a directory, to load all the files in that directory.
+- You can specify a PATH list to look in. See next section for details.
 
 
 Specifying a directory
@@ -170,7 +177,7 @@ Specifying a directory
 
 If you specify a directory instead of a file as the argument for the
 ``--options=PATHNAME``, Universal-ctags will load all files having a
-:file:`.ctags` extension under the directory in alphabetical order.
+:file:`.ctags` extension under said directory in alphabetical order.
 
 Specifying an optlib path search list
 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
@@ -220,7 +227,7 @@ Tips for writing an option file
 Regular expression (regex) engine
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Universal-ctags currently uses the same regex engine as Exuberant-ctags does:
+Universal-ctags currently uses the same regex engine as Exuberant-ctags:
 the POSIX.2 regex engine in GNU glibc-2.10.1. By default it uses the Extended
 Regular Expressions (ERE) syntax, as used by most engines today; however it does
 *not* support many of the "modern" extensions such as lazy captures,
@@ -345,9 +352,9 @@ use, but long flags are mostly intended for option files.
 Exclusive flag in regex
 ......................................................................
 
-By default, lines read from the input files will be matched with **all** regular
-expressions defined with ``--regex-<LANG>``. Each matched regular expression
-will successfully emit a tag.
+By default, lines read from the input files will be matched against **all** the
+regular expressions defined with ``--regex-<LANG>``. Each successfully matched
+regular expression will emit a tag.
 
 In some cases another policy, exclusive-matching, is preferable to the
 all-matching policy. Exclusive-matching means the rest of regular
@@ -437,7 +444,7 @@ A stack is used for tracking the scope context.
 
 ``{scope=clear}``
 
-	Make the stack empty.
+	Empty the stack.
 
 ``{scope=set}``
 
@@ -1029,7 +1036,7 @@ A regex pattern added to a parser with ``--_mtable-regex-<LANG>`` is matched
 against the input at the current byte position, not line. Even if you do not
 specify the ``^`` anchor at the start of the pattern, ``ctags`` adds ``^`` to
 the pattern automatically. Unlike the ``--regex-<LANG>`` and
-``--mline-regex-<LANG>`` options, a ``^`` anchor does not mean "begging of
+``--mline-regex-<LANG>`` options, a ``^`` anchor does not mean "beginning of
 line" in ``--_mtable-regex-<LANG>``; instead it means the beginning of the
 input string (i.e., the current byte position).
 
@@ -1093,7 +1100,7 @@ discuss them one by one.
 For each new file it scans, ``ctags`` always chooses the first pattern of the
 first table of the parser. Even if it's an empty table, ``ctags`` will only try
 the first declared table. (in such a case it would immedietaly fail to match
-anything, and thus stop proessing the input file and effectively do nothing)
+anything, and thus stop processing the input file and effectively do nothing)
 
 The first declared table (``toplevel``) has the following regex added to
 it first:
@@ -1546,15 +1553,15 @@ An ultra fine grained C parser may capture a variable `i` with
 Submitting an optlib file to the Universal-ctags project
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-You are encouraged to submit your :file:`.ctags` file to our github through
-a pull request.
+You are encouraged to submit your :file:`.ctags` file to our repository on
+github through a pull request.
 
 Universal-ctags provides a facility for "Option library".
 Read "Option library" about the concept and usage first.
 
-Here I will explain how to merge your .ctags into universal-ctags as
-part of option library. Here I assume you consider contributing
-an option library in which a regex based language parser is defined.
+Here I will explain how to merge your .ctags into Universal-ctags as
+part of the option library. Here I assume you consider contributing
+an option library in which a regex-based language parser is defined.
 See `How to Add Support for a New Language to Exuberant Ctags (EXTENDING)`_
 about the way to how to write a regex based language parser. In this
 section I explains the next step.
@@ -1613,9 +1620,9 @@ code. Only test cases help us to know whether a contributed option
 library works well or not. We may reject any contribution without
 a test case.
 
-Read "Using *Units*" about how to write *Units* test
-cases.  Don't write one big test case. Some smaller cases are helpful
-to know about the intent of the contributor.
+Read "Using *Units*" about how to write *Units* test cases.  Do not write one
+big test case: smaller cases are helpful to know about the intent of the
+contributor. For example:
 
 * *Units/sh-alias.d*
 * *Units/sh-comments.d*
@@ -1623,7 +1630,7 @@ to know about the intent of the contributor.
 * *Units/sh-statements.d*
 
 are good example of small test cases.
-Big test cases are good if smaller test cases exist.
+Big test cases are acceptable if smaller test cases exist.
 
 See also *parser-m4.r/m4-simple.d* especially *parser-m4.r/m4-simple.d/args.ctags*.
 Your test cases need ``ctags`` having already loaded your option
