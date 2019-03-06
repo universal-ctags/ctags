@@ -240,6 +240,7 @@ typedef enum {
 	TSTAG_INTERFACE,
 	TSTAG_ENUM,
 	TSTAG_METHOD,
+	TSTAG_NAMESPACE,
 	TSTAG_PROPERTY,
 	TSTAG_VARIABLE,
 	TSTAG_GENERATOR,
@@ -252,6 +253,7 @@ static kindDefinition TsKinds [] = {
 	{ true,  'i', "interface",	  "interfaces"		   },
 	{ true,  'e', "enum",		  "enums"			   },
 	{ true,  'm', "method",		  "methods"			   },
+	{ true,  'n', "namespace",	  "namespaces"		   },
 	{ true,  'p', "property",	  "properties"		   },
 	{ true,  'v', "variable",	  "global variables"   },
 	{ true,  'g', "generator",	  "generators"		   },
@@ -1026,28 +1028,36 @@ static void parseInterfaceBody (vString *const scope, tokenInfo *const token)
 	}
 }
 
-static void parseInterface (tokenInfo *const token)
+static void parseInterface (vString *const scope, tokenInfo *const token)
 {
 	readToken (token);
 
 	if (token->type != TOKEN_IDENTIFIER) return;
+
+	if (scope) vStringCopy (token->scope, scope);
 
 	emitTag(token, TSTAG_INTERFACE);
 
-	vString *scope = vStringNew ();
-	vStringCopy (scope, token->string);
+	vString *nscope = vStringNew ();
+	if (scope)
+	{
+		vStringCopy (nscope, scope);
+		vStringCatS (nscope, ".");
+	}
+	vStringCat (nscope, token->string);
 
-	parseInterfaceBody (scope, token);
+	parseInterfaceBody (nscope, token);
 
-	vStringDelete(scope);
+	vStringDelete(nscope);
 }
 
-static void parseType (tokenInfo *const token)
+static void parseType (vString *const scope, tokenInfo *const token)
 {
 	readToken (token);
 
 	if (token->type != TOKEN_IDENTIFIER) return;
 
+	if (scope) vStringCopy(token->scope, scope);
 	emitTag(token, TSTAG_ALIAS);
 	skipBlocksTillType (TOKEN_SEMICOLON, token);
 }
@@ -1083,20 +1093,26 @@ static void parseEnumBody (vString *const scope, tokenInfo *const token)
 	}
 }
 
-static void parseEnum (tokenInfo *const token)
+static void parseEnum (vString *const scope, tokenInfo *const token)
 {
 	readToken (token);
 
 	if (token->type != TOKEN_IDENTIFIER) return;
 
+	if (scope) vStringCopy (token->scope, scope);
 	emitTag(token, TSTAG_ENUM);
 
-	vString *scope = vStringNew ();
-	vStringCopy (scope, token->string);
+	vString *nscope = vStringNew ();
+	if (scope)
+	{
+		vStringCopy (nscope, scope);
+		vStringCatS (nscope, ".");
+	}
+	vStringCat (nscope, token->string);
 
-	parseEnumBody (scope, token);
+	parseEnumBody (nscope, token);
 
-	vStringDelete(scope);
+	vStringDelete(nscope);
 }
 
 static void parseVariable (vString *const scope, tokenInfo *const token)
@@ -1129,6 +1145,7 @@ static void parseVariable (vString *const scope, tokenInfo *const token)
 			parseSemicolon, NULL, NULL,
 			parseComma, NULL, NULL,
 			parseArrow, initParseWordState, freeParseWordState,
+			parseEnumKeyword, initParseWordState, freeParseWordState,
 			parseIdentifier, initParseWordState, freeParseWordState,
 			NULL);
 
@@ -1158,10 +1175,13 @@ static void parseVariable (vString *const scope, tokenInfo *const token)
 					if (!parsingType) {
 						member = newToken ();
 						copyToken(member, token, false);
-						vStringCopy (member->scope, scope);
+						if (scope) vStringCopy (member->scope, scope);
 						emitTag (member, TSTAG_VARIABLE);
 						deleteToken (member);
 					}
+					break;
+				case TOKEN_KEYWORD:
+					if (token->keyword == KEYWORD_enum) parseEnum (scope, token);
 					break;
 				default:
 					break;
@@ -1319,23 +1339,30 @@ static void parseFunctionBody (vString *const scope, tokenInfo *const token)
 	clearPoolToken (token);
 }
 
-static void parseFunction (tokenInfo *const token)
+static void parseFunction (vString *const scope, tokenInfo *const token)
 {
 	bool isGenerator = tryParser ((Parser) parseStar, NULL, NULL, token);
 
 	readToken (token);
 	if (token->type != TOKEN_IDENTIFIER) return;
 
+	if (scope) vStringCopy (token->scope, scope);
+
 	if (isGenerator) emitTag(token, TSTAG_GENERATOR);
 	else emitTag(token, TSTAG_FUNCTION);
 
-	vString *scope = vStringNew ();
-	vStringCopy (scope, token->string);
+	vString *nscope = vStringNew ();
+	if (scope)
+	{
+		vStringCopy (nscope, scope);
+		vStringCatS (nscope, ".");
+	}
+	vStringCat (nscope, token->string);
 
-	parseFunctionArgs (scope, token);
-	parseFunctionBody (scope, token);
+	parseFunctionArgs (nscope, token);
+	parseFunctionBody (nscope, token);
 
-	vStringDelete(scope);
+	vStringDelete(nscope);
 }
 
 static void parsePropertyType (tokenInfo *const token)
@@ -1602,7 +1629,7 @@ static void parseClassBody (vString *const scope, tokenInfo *const token)
 	else if (member) deleteToken (member);
 }
 
-static void parseClass (tokenInfo *const token)
+static void parseClass (vString *const scope, tokenInfo *const token)
 {
 	bool parsed = false;
 
@@ -1618,12 +1645,99 @@ static void parseClass (tokenInfo *const token)
 
 	if (!parsed) return;
 
+	if (scope) vStringCopy (token->scope, scope);
 	emitTag(token, TSTAG_CLASS);
+
+	vString *nscope = vStringNew ();
+	if (scope)
+	{
+		vStringCopy (nscope, scope);
+		vStringCatS (nscope, ".");
+	}
+	vStringCat (nscope, token->string);
+
+	parseClassBody (nscope, token);
+
+	vStringDelete(nscope);
+}
+
+static void parseNamespaceBody (vString *const scope, tokenInfo *const token)
+{
+	bool parsed = false;
+
+	//parse until {
+	do {
+		clearPoolToken (token);
+
+		parsed = tryParse(token,
+			parseNewLine, NULL, NULL,
+			parseOpenCurly, NULL, NULL,
+			parseComment, initParseCommentState, freeParseCommentState,
+			NULL);
+	} while (parsed && token->type != TOKEN_OPEN_CURLY);
+
+	if (!parsed) return;
+
+	do {
+		readToken (token);
+
+		switch (token->type) {
+			case TOKEN_KEYWORD:
+				switch (token->keyword) {
+					case KEYWORD_interface:
+						parseInterface (scope, token);
+						break;
+					case KEYWORD_type:
+						parseType (scope, token);
+						break;
+					case KEYWORD_enum:
+						parseEnum (scope, token);
+						break;
+					case KEYWORD_function:
+						parseFunction (scope, token);
+						break;
+					case KEYWORD_class:
+						parseClass (scope, token);
+						break;
+					case KEYWORD_var:
+					case KEYWORD_let:
+					case KEYWORD_const:
+						parseVariable (scope, token);
+						break;
+				}
+				break;
+			case TOKEN_AT:
+				ungetcToInputFile ('@');
+				parseDecorator (token);
+				break;
+			default:
+				break;
+		}
+	} while (!isType (token, TOKEN_CLOSE_CURLY) && !isType (token, TOKEN_EOF));
+}
+
+static void parseNamespace (tokenInfo *const token)
+{
+	bool parsed = false;
+
+	do {
+		clearPoolToken (token);
+
+		parsed = tryParse(token,
+			parseNewLine, NULL, NULL,
+			parseComment, initParseCommentState, freeParseCommentState,
+			parseIdentifier, initParseWordState, freeParseWordState,
+			NULL);
+	} while (parsed && token->type != TOKEN_IDENTIFIER);
+
+	if (!parsed) return;
+
+	emitTag(token, TSTAG_NAMESPACE);
 
 	vString *scope = vStringNew ();
 	vStringCopy (scope, token->string);
 
-	parseClassBody (scope, token);
+	parseNamespaceBody (scope, token);
 
 	vStringDelete(scope);
 }
@@ -1637,19 +1751,27 @@ static void parseTsFile (tokenInfo *const token)
 			case TOKEN_KEYWORD:
 				switch (token->keyword) {
 					case KEYWORD_interface:
-						parseInterface (token);
+						parseInterface (NULL, token);
 						break;
 					case KEYWORD_type:
-						parseType (token);
+						parseType (NULL, token);
 						break;
 					case KEYWORD_enum:
-						parseEnum (token);
+						parseEnum (NULL, token);
 						break;
 					case KEYWORD_function:
-						parseFunction (token);
+						parseFunction (NULL, token);
 						break;
 					case KEYWORD_class:
-						parseClass (token);
+						parseClass (NULL, token);
+						break;
+					case KEYWORD_namespace:
+						parseNamespace (token);
+						break;
+					case KEYWORD_var:
+					case KEYWORD_let:
+					case KEYWORD_const:
+						parseVariable (NULL, token);
 						break;
 				}
 				break;
