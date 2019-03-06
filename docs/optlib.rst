@@ -1372,26 +1372,28 @@ used in the actual ``ctags`` program for parsing puppet manifest files.
 Conditional tagging with extras
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. NOT REVIEWED YET
+.. NEEDS MORE REVIEWS
 
-If a matched pattern should only be tagged when an ``extra`` is enabled, mark
-the pattern with ``{_extra=XNAME}``. ``XNAME`` is the name of extra. You must
-define an ``XNAME`` with the ``--_extradef-<LANG>=XNAME,DESCRIPTION`` option
-before defining a regex option marked ``{_extra=XNAME}``.
+If a matched pattern should only be tagged when an ``extra`` flag is enabled,
+mark the pattern with ``{_extra=XNAME}`` where ``XNAME`` is the name of the
+extra. You must define a ``XNAME`` with the
+``--_extradef-<LANG>=XNAME,DESCRIPTION`` option before defining a regex flag
+marked ``{_extra=XNAME}``.
 
 .. code-block:: python
 
 	if __name__ == '__main__':
 		do_something()
 
-To capture above lines in a python program(*input.py*), an extra can be used.
+To capture the lines above in a python program(*input.py*), an `extra` flag can
+be used.
 
 .. code-block:: perl
 
 	--_extradef-Python=main,__main__ entry points
 	--regex-Python=/^if __name__ == '__main__':/__main__/f/{_extra=main}
 
-The above optlib(*python-main.ctags*) introduces ``main`` extra to Python parser.
+The above optlib(*python-main.ctags*) introduces ``main`` extra to the Python parser.
 The pattern matching is done only when the ``main`` is enabled.
 
 .. code-block:: console
