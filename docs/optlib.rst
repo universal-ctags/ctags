@@ -179,16 +179,22 @@ If you specify a directory instead of a file as the argument for the
 ``--options=PATHNAME``, Universal-ctags will load all files having a
 :file:`.ctags` extension under said directory in alphabetical order.
 
-Specifying an optlib path search list
+Specifying an optlib PATH list
 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 
-For loading a file (or directory) specified in ``--options=PATHNAME``,
-``ctags`` searches "optlib path list" first if the option argument
-(PATHNAME) doesn't start with '``/``' or '``.``'. If ``ctags`` finds a
-file, ``ctags`` loads it.
+Much like a command line shell, ``ctags`` has an "optlib PATH list" in which it
+can look for a file (or directory) to load.
 
-If ``ctags`` doesn't find a file in the path list, ``ctags`` loads
-a file (or directory) at the specified pathname.
+When loading a file (or directory) specified with ``--options=PATHNAME``,
+ctags first checks if ``PATHNAME`` is an absolute path or a relative path.
+An absolute path starts with '``/``' or '``.``'.
+If ``PATHNAME`` is an absolute path, ctags tries to load it inmediately.
+
+If, on the contrary, is a relative path, ``ctags`` does two things: First,
+looks for the file (or directory) in "optlib PATH list" and tries to load it.
+
+If the file doesn't exist in the PATH list, ``ctags``  treats ``PATHNAME`` as a
+path relative to the working directory and loads the file.
 
 By default, optlib path list is empty. To set or add a directory
 path to the list, use ``--optlib-dir=PATH``.
