@@ -1,0 +1,2 @@
+ModuleError	input.ex	/^defmodule ModuleError do$/;"	module
+ModuleError	input.ex	/^  defexception [:message]$/;"	delegate
