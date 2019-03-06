@@ -1517,25 +1517,26 @@ To capture a reference tag with an optlib parser, specify a role with
 	--extras=+r
 	--fields=+r
 
-See the line, `--regex-FOO=...`.  In this parser `FOO`, a name of
+A role must be defined before specifying it as value for ``_role`` flag.
+``--_roledef-<LANG>`` option is for defining a role.
+See the line, ``--regex-FOO=...``.  In this parser `FOO`, the name of an
 imported module is captured as a reference tag with role `imported`.
-A role must be defined before specifying it as value for `_role` flag.
-`--_roledef-<LANG>` option is for defining a role.
 
-The parameter of the option comes from three components: a kind
-letter, the name of role, and the description of role. The kind letter
-comes first.  Following a period, give the role name. The period
-represents that the role is defined under the kind specified with the
-kind letter.  In the example, `imported` role is defined under
-`module` kind specified with `m`.
+The option definition has two parameters separated by a comma:
 
-Of course, the kind specified with the kind letter must be defined
-before using `--_roledef-<FOO>` option. `--kinddef-<LANG>` option
-is for defining a kind.
+- A kind letter, followed by a period (``.``), followed by the role name.
+- The description of role.
 
-The roles are listed with `--list-roles=<LANG>`. The name and
-description passed to `--_roledef-<LANG>` option are used in
-the output like::
+The first parameter is the name of the role. The period indicates that the role
+is defined under the kind specified with the kind letter.  In the example,
+`imported` role is defined under the `module` kind, which is specified with
+`m`.
+
+Of course, the kind specified with the kind letter must be defined *before*
+using ``--_roledef-<FOO>`` option. See the option ``--kinddef-<LANG>``.
+
+The roles are listed with ``--list-roles=<LANG>``. The name and description
+passed to ``--_roledef-<LANG>`` option are used in the output like::
 
 	$ ./ctags --langdef=FOO --kinddef-FOO=m,module,modules \
 				--_roledef-FOO='m.imported,imported module' --list-roles=FOO
@@ -1543,16 +1544,15 @@ the output like::
 	m/module   imported on      imported module
 
 
-With specifying `_role` regex flag multiple times with different
-roles, you can assign multiple roles to a reference tag.
-See following input of C language
+When specifying ``_role`` regex flag multiple times with different roles, you can
+assign multiple roles to a reference tag.  See following input of C language
 
 .. code-block:: C
 
    i += 1;
 
-An ultra fine grained C parser may capture a variable `i` with
-`lvalue` and `incremented`. You can do it with:
+An ultra fine grained C parser may capture a variable `i` with `lvalue` and
+`incremented`. You can do it with:
 
 .. code-block:: perl
 
