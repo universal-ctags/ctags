@@ -67,6 +67,8 @@ extern parserDefinition* ElixirParser (void)
 		},
 	};
 	static tagRegexTable ElixirTagRegexTable [] = {
+		{"^[ \t]*def((p?)|macro(p?))[ \t]+([a-zA-Z0-9_?!]+)[ \t]+([\\|\\^/&<>~.=!*+-]{1,3}|and|or|in|not|when|not in)[ \t]+[a-zA-Z0-9_?!]", "\\5",
+		"o", "{exclusive}", NULL, false},
 		{"^[ \t]*def(p?)[ \t]+([a-z_][a-zA-Z0-9_?!]*)(.[^\\|\\^/&<>~.=!*+-]+)", "\\2",
 		"f", NULL, NULL, false},
 		{"^[ \t]*(@|def)callback[ \t]+([a-z_][a-zA-Z0-9_?!]*)", "\\2",
@@ -81,8 +83,6 @@ extern parserDefinition* ElixirParser (void)
 		"i", NULL, NULL, false},
 		{"^[ \t]*defmacro(p?)[ \t]+([a-z_][a-zA-Z0-9_?!]*)(.[^\\|\\^/&<>~.=!*+-]+)", "\\2",
 		"a", NULL, NULL, false},
-		{"^[ \t]*def((p?)|macro(p?))[ \t]+([a-zA-Z0-9_?!]+)[ \t]+([\\|\\^/&<>~.=!*+-]{1,3})[ \t]+[a-zA-Z0-9_!?!]", "\\5",
-		"o", NULL, NULL, false},
 		{"^[ \t]*defmodule[ \t]+([A-Z][a-zA-Z0-9_]*\\.)*([A-Z][a-zA-Z0-9_?!]*)", "\\2",
 		"m", NULL, NULL, false},
 		{"^[ \t]*defprotocol[ \t]+([A-Z][a-zA-Z0-9_]*\\.)*([A-Z][a-zA-Z0-9_?!]*)", "\\2",
