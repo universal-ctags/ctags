@@ -1410,17 +1410,20 @@ The pattern matching is done only when the ``main`` is enabled.
 Adding custom fields to the tag output
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. NOT REVIEWED YET
+.. NEEDS MORE REVIEWS
 
-Exuberant-ctags allows one of the specified group in a regex pattern can be
-used as a part of the name of a tagEntry. Universal-ctags offers using
-the other groups in the regex pattern.
+Exuberant-ctags allows just one of the specified groups in a regex pattern to
+be used as a part of the name of a tagEntry.
+
+Universal-ctags allows using the other groups in the regex pattern.
 
 An optlib parser can have its own fields. The groups can be used as a
 value of the fields of a tagEntry.
 
 Let's think about *Unknown*, an imaginary language.
-Here is a source file(``input.unknown``) written in *Unknown*:
+Here is a source file(*input.unknown*) written in *Unknown*:
+
+.. code-block:: java
 
 	public func foo(n, m);
 	protected func bar(n);
@@ -1433,8 +1436,8 @@ keyword to control how widely the identifier `bar` can be accessed.
 `(n)` is the parameter list of `bar`. `protected` and `(n)` are
 extra context information of `bar`.
 
-With following optlib file(``unknown.ctags``)), ``ctags`` can attach
-`protected` to protection field and `(n)` to signature field.
+With the following optlib file(*unknown.ctags*), ``ctags`` can attach
+`protected` to the field protection and `(n)` to the field signature.
 
 .. code-block:: perl
 
@@ -1453,7 +1456,7 @@ For the line `protected func bar(n);` you will get following tags output::
 
 	bar	input.unknown	/^protected func bar(n);$/;"	f	protection:protected	signature:(n)
 
-Let's see the detail of ``unknown.ctags``.
+Let's see the detail of *unknown.ctags*.
 
 .. code-block:: perl
 
@@ -1478,7 +1481,7 @@ This defines a field named `signature`.
 This option requests making a tag for the name that is specified with the group 3 of the
 pattern, attaching the group 1 as a value for `protection` field to the tag, and attaching
 the group 4 as a value for `signature` field to the tag. You can use the long regex flag
-`_field` for attaching fields to a tag with following notation rule::
+`_field` for attaching fields to a tag with the following notation rule::
 
   {_field=FIELDNAME:GROUP}
 
