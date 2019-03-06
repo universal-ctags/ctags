@@ -89,7 +89,7 @@ extern parserDefinition* ElixirParser (void)
 		"p", NULL, NULL, false},
 		{"^[ \t]*Record\\.defrecord(p?)[ \t(]+:([a-zA-Z0-9_]+)(\\)?)", "\\2",
 		"r", NULL, NULL, false},
-		{"^[ \t]*test[ \t(]+\"([a-z_][a-zA-Z0-9_?! ]*)\"*(\\)?)", "\\1",
+		{"^[ \t]*test[ \t(]+\"([a-z_][a-zA-Z0-9_?! ]*)\"*(\\)?)[ \t]*do", "\\1",
 		"t", NULL, NULL, false},
 	};
 
