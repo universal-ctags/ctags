@@ -1,6 +1,0 @@
-OperatorModule	input.ex	/^defmodule OperatorModule do$/;"	module
-and	input.ex	/^  def a and b, do: max(a, b)$/;"	operator
-or	input.ex	/^  def a or b, do: max(a, b)$/;"	operator
-not	input.ex	/^  def a not b, do: max(a, b)$/;"	operator
-in	input.ex	/^  def a in b, do: max(a, b)$/;"	operator
-when	input.ex	/^  def a when b, do: max(a, b)$/;"	operator
