@@ -75,4 +75,27 @@ class A {
     a.y = 1; // Ok
     b.y = 1; // Ok
   }
+
+  getXAsT<T = any>(): T {
+    return this.x as T;
+  }
+
+  register(...args) {
+    return this.f(...args);
+  }
+
+  longArgsFun(options: {
+    root: string;
+    prefix?: string;
+    setHeaders?: Function;
+    send?: any;
+  }) {
+    return this.f(options);
+  }
+
+  closure(
+    x: number,
+  ): (path: string, callback: Function) => any {
+    const normalizedPath = path === '/*' ? '' : path;
+  }
 }

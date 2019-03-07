@@ -1,11 +1,13 @@
 LettersOnlyValidator	input.ts	/^    export class LettersOnlyValidator implements StringValidator {$/;"	c
-StringValidator	input.ts	/^    export interface StringValidator {$/;"	i
+StringValidator	input.ts	/^    export interface StringValidator {$/;"	i	namespace:Validation
 Validation	input.ts	/^namespace Validation {$/;"	n
 ZipCodeValidator	input.ts	/^    export class ZipCodeValidator implements StringValidator {$/;"	c
-isAcceptable	input.ts	/^        isAcceptable(s: string) {$/;"	m
-isAcceptable	input.ts	/^        isAcceptable(s: string): boolean;$/;"	m
+isAcceptable	input.ts	/^        isAcceptable(s: string) {$/;"	m	class:LettersOnlyValidator
+isAcceptable	input.ts	/^        isAcceptable(s: string) {$/;"	m	class:ZipCodeValidator
+isAcceptable	input.ts	/^        isAcceptable(s: string): boolean;$/;"	m	interface:Validation.StringValidator
 lettersRegexp	input.ts	/^    const lettersRegexp = \/^[A-Za-z]+$\/;$/;"	v
 numberRegexp	input.ts	/^    const numberRegexp = \/^[0-9]+$\/;$/;"	v
-s	input.ts	/^        isAcceptable(s: string) {$/;"	v
+s	input.ts	/^        isAcceptable(s: string) {$/;"	v	method:LettersOnlyValidator.isAcceptable
+s	input.ts	/^        isAcceptable(s: string) {$/;"	v	method:ZipCodeValidator.isAcceptable
 strings	input.ts	/^let strings = ["Hello", "98052", "101"];$/;"	v
 validators	input.ts	/^let validators: { [s: string]: Validation.StringValidator; } = {};$/;"	v

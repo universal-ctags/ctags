@@ -16,6 +16,8 @@ interface MoverShaker extends Mover, Shaker {
     comment
     block
     */: void;
+
+  getTpl<T>(): Promise<T>;
 }
 
 interface SimpleRecord {

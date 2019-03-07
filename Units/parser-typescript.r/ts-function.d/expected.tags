@@ -1,23 +1,23 @@
-a	input.ts	/^function isCat(a: Animal): a is Cat {$/;"	v
-a	input.ts	/^function numberToString(a: number[]) {$/;"	v
+a	input.ts	/^function isCat(a: Animal): a is Cat {$/;"	v	function:isCat
+a	input.ts	/^function numberToString(a: number[]) {$/;"	v	function:numberToString
 equals	input.ts	/^export function equals(p1: Point, p2: Point) {$/;"	f
 fn	input.ts	/^async function fn(): Promise<number> {  $/;"	f
 g	input.ts	/^function *g(): Iterable<string> {$/;"	g
 h	input.ts	/^function *h(limit) {$/;"	g
-i	input.ts	/^  for (var i = 0; i < 100; i++) {$/;"	v
-i	input.ts	/^  for (var i = 0; i < limit; i++) {$/;"	v
-i	input.ts	/^  var i = await p; \/\/ suspend execution until 'p' is settled. 'i' has type "number"  $/;"	v
+i	input.ts	/^  for (var i = 0; i < 100; i++) {$/;"	v	generator:g
+i	input.ts	/^  for (var i = 0; i < limit; i++) {$/;"	v	generator:h
+i	input.ts	/^  var i = await p; \/\/ suspend execution until 'p' is settled. 'i' has type "number"  $/;"	v	function:fn
 isCat	input.ts	/^function isCat(a: Animal): a is Cat {$/;"	f
-limit	input.ts	/^function *h(limit) {$/;"	v
+limit	input.ts	/^function *h(limit) {$/;"	v	generator:h
 message	input.ts	/^export function message(s: string) {$/;"	f
 numberToString	input.ts	/^function numberToString(a: number[]) {$/;"	f
-p1	input.ts	/^export function equals(p1: Point, p2: Point) {$/;"	v
-p2	input.ts	/^export function equals(p1: Point, p2: Point) {$/;"	v
+p1	input.ts	/^export function equals(p1: Point, p2: Point) {$/;"	v	function:equals
+p2	input.ts	/^export function equals(p1: Point, p2: Point) {$/;"	v	function:equals
 point	input.ts	/^export default function point(x: number, y: number) {$/;"	f
 point	input.ts	/^function point(x: number, y: number): Point {$/;"	f
-s	input.ts	/^export function message(s: string) {$/;"	v
-stringArray	input.ts	/^  var stringArray = a.map(v => v.toString());$/;"	v
-x	input.ts	/^export default function point(x: number, y: number) {$/;"	v
-x	input.ts	/^function point(x: number, y: number): Point {$/;"	v
-y	input.ts	/^export default function point(x: number, y: number) {$/;"	v
-y	input.ts	/^function point(x: number, y: number): Point {$/;"	v
+s	input.ts	/^export function message(s: string) {$/;"	v	function:message
+stringArray	input.ts	/^  var stringArray = a.map(v => v.toString());$/;"	v	function:numberToString
+x	input.ts	/^export default function point(x: number, y: number) {$/;"	v	function:point
+x	input.ts	/^function point(x: number, y: number): Point {$/;"	v	function:point
+y	input.ts	/^export default function point(x: number, y: number) {$/;"	v	function:point
+y	input.ts	/^function point(x: number, y: number): Point {$/;"	v	function:point

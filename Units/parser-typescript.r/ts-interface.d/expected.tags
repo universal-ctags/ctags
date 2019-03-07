@@ -8,27 +8,28 @@ Mover	input.ts	/^interface Mover {$/;"	i
 MoverShaker	input.ts	/^interface MoverShaker extends Mover, Shaker {$/;"	i
 Shaker	input.ts	/^interface Shaker {$/;"	i
 SimpleRecord	input.ts	/^interface SimpleRecord {$/;"	i
-createElement	input.ts	/^  createElement(tagName: "canvas"): HTMLCanvasElement;$/;"	m
-createElement	input.ts	/^  createElement(tagName: "div"): HTMLDivElement;$/;"	m
-createElement	input.ts	/^  createElement(tagName: "span"): HTMLSpanElement;$/;"	m
-createElement	input.ts	/^  createElement(tagName: string): HTMLElement;$/;"	m
-data	input.ts	/^  data: T;$/;"	p
-get	input.ts	/^  get(url: string, callback: (data: string) => any);$/;"	m
-getSomething	input.ts	/^  getSomething(): \/* } *\/ void;$/;"	m
-getSomethingSophisticated	input.ts	/^  getSomethingSophisticated()\/*$/;"	m
-getStatus	input.ts	/^  getStatus(): { frequency: number; };$/;"	m
-getStatus	input.ts	/^  getStatus(): { speed: number; };$/;"	m
-getStatus	input.ts	/^  getStatus(\/*)*\/): { speed: number; frequency: number; };$/;"	m
-length	input.ts	/^  length: number;$/;"	p
-move	input.ts	/^  move(): void;$/;"	m
-next	input.ts	/^  next: List<T>;$/;"	p
-owner	input.ts	/^  owner: List<List<T>>;$/;"	p
-propertyA	input.ts	/^  propertyA: number;$/;"	p
-propertyB	input.ts	/^  propertyB: string;$/;"	p
-propertyC	input.ts	/^  readonly propertyC: [];$/;"	p
-shake	input.ts	/^  shake(): void;$/;"	m
-sourcePath	input.ts	/^  sourcePath?: string;$/;"	p
-strict	input.ts	/^  strict?: boolean;$/;"	p
-targetPath	input.ts	/^  targetPath?: string;$/;"	p
-text	input.ts	/^  text(content: string);$/;"	m
-withoutType	input.ts	/^  withoutType?;$/;"	p
+createElement	input.ts	/^  createElement(tagName: "canvas"): HTMLCanvasElement;$/;"	m	interface:Document
+createElement	input.ts	/^  createElement(tagName: "div"): HTMLDivElement;$/;"	m	interface:Document
+createElement	input.ts	/^  createElement(tagName: "span"): HTMLSpanElement;$/;"	m	interface:Document
+createElement	input.ts	/^  createElement(tagName: string): HTMLElement;$/;"	m	interface:Document
+data	input.ts	/^  data: T;$/;"	p	interface:List
+get	input.ts	/^  get(url: string, callback: (data: string) => any);$/;"	m	interface:JQueryStatic
+getSomething	input.ts	/^  getSomething(): \/* } *\/ void;$/;"	m	interface:MoverShaker
+getSomethingSophisticated	input.ts	/^  getSomethingSophisticated()\/*$/;"	m	interface:MoverShaker
+getStatus	input.ts	/^  getStatus(): { frequency: number; };$/;"	m	interface:Shaker
+getStatus	input.ts	/^  getStatus(): { speed: number; };$/;"	m	interface:Mover
+getStatus	input.ts	/^  getStatus(\/*)*\/): { speed: number; frequency: number; };$/;"	m	interface:MoverShaker
+getTpl	input.ts	/^  getTpl<T>(): Promise<T>;$/;"	m	interface:MoverShaker
+length	input.ts	/^  length: number;$/;"	p	interface:Array
+move	input.ts	/^  move(): void;$/;"	m	interface:Mover
+next	input.ts	/^  next: List<T>;$/;"	p	interface:List
+owner	input.ts	/^  owner: List<List<T>>;$/;"	p	interface:List
+propertyA	input.ts	/^  propertyA: number;$/;"	p	interface:SimpleRecord
+propertyB	input.ts	/^  propertyB: string;$/;"	p	interface:SimpleRecord
+propertyC	input.ts	/^  readonly propertyC: [];$/;"	p	interface:SimpleRecord
+shake	input.ts	/^  shake(): void;$/;"	m	interface:Shaker
+sourcePath	input.ts	/^  sourcePath?: string;$/;"	p	interface:CompilerOptions
+strict	input.ts	/^  strict?: boolean;$/;"	p	interface:CompilerOptions
+targetPath	input.ts	/^  targetPath?: string;$/;"	p	interface:CompilerOptions
+text	input.ts	/^  text(content: string);$/;"	m	interface:JQuery
+withoutType	input.ts	/^  withoutType?;$/;"	p	interface:SimpleRecord

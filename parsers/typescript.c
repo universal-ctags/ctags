@@ -155,11 +155,25 @@ typedef enum eTokenType {
 	TOKEN_AT
 } tokenType;
 
+typedef enum {
+	TSTAG_FUNCTION,
+	TSTAG_CLASS,
+	TSTAG_INTERFACE,
+	TSTAG_ENUM,
+	TSTAG_METHOD,
+	TSTAG_NAMESPACE,
+	TSTAG_PROPERTY,
+	TSTAG_VARIABLE,
+	TSTAG_GENERATOR,
+	TSTAG_ALIAS
+} tsKind;
+
 typedef struct sTokenInfo {
 	tokenType		type;
 	keywordId		keyword;
 	vString *		string;
 	vString *		scope;
+	tsKind			scopeParentKind;
 	unsigned long 	lineNumber;
 	MIOPos 			filePosition;
 	keywordId		accessKeyword;
@@ -234,19 +248,6 @@ static const keywordTable TsKeywordTable [] = {
 	{ "yield"      , KEYWORD_yield       }
 };
 
-typedef enum {
-	TSTAG_FUNCTION,
-	TSTAG_CLASS,
-	TSTAG_INTERFACE,
-	TSTAG_ENUM,
-	TSTAG_METHOD,
-	TSTAG_NAMESPACE,
-	TSTAG_PROPERTY,
-	TSTAG_VARIABLE,
-	TSTAG_GENERATOR,
-	TSTAG_ALIAS
-} tsKind;
-
 static kindDefinition TsKinds [] = {
 	{ true,  'f', "function",	  "functions"		   },
 	{ true,  'c', "class",		  "classes"			   },
@@ -296,6 +297,7 @@ static void emitTag(const tokenInfo *const token, const tsKind kind)
 	e.filePosition = token->filePosition;
 
 	if (token->scope && vStringLength(token->scope) > 0) {
+		e.extensionFields.scopeKindIndex = token->scopeParentKind;
 		e.extensionFields.scopeName = vStringValue (token->scope);
 	}
 
@@ -326,12 +328,13 @@ static void clearPoolToken (void *data)
 {
 	tokenInfo *token = data;
 
-	token->type			 = TOKEN_UNDEFINED;
-	token->keyword		 = KEYWORD_NONE;
-	token->lineNumber    = getInputLineNumber ();
-	token->filePosition  = getInputFilePosition ();
-	token->scope         = vStringNew ();
-	token->accessKeyword = KEYWORD_NONE;
+	token->type			   = TOKEN_UNDEFINED;
+	token->keyword		   = KEYWORD_NONE;
+	token->lineNumber      = getInputLineNumber ();
+	token->filePosition    = getInputFilePosition ();
+	token->scope           = vStringNew ();
+	token->scopeParentKind = TSTAG_CLASS;
+	token->accessKeyword   = KEYWORD_NONE;
 	vStringClear (token->string);
 	vStringClear (token->scope);
 }
@@ -383,6 +386,11 @@ inline static void parseChar(const char c, tokenInfo *const token, void *state, 
 {
 	if (whiteChar(c)) {
 		result->status = PARSER_NEEDS_MORE_INPUT;
+		return;
+	}
+
+	if (c == EOF) {
+		result->status = PARSER_FAILED;
 		return;
 	}
 
@@ -997,6 +1005,7 @@ static void parseInterfaceBody (vString *const scope, tokenInfo *const token)
 			member = newToken ();
 			copyToken(member, token, false);
 			vStringCopy (member->scope, scope);
+			member->scopeParentKind = TSTAG_INTERFACE;
 		}
 		else if (!member && isType (token, TOKEN_PARENS))
 		{
@@ -1015,10 +1024,12 @@ static void parseInterfaceBody (vString *const scope, tokenInfo *const token)
 		}
 		else if (member)
 		{
-			emitTag (member, TSTAG_PROPERTY);
-			deleteToken (member);
-			member = NULL;
-			skipBlocksTillType (TOKEN_SEMICOLON, token);
+			if (!isType (token, TOKEN_TEMPLATE)) {
+				emitTag (member, TSTAG_PROPERTY);
+				deleteToken (member);
+				member = NULL;
+				skipBlocksTillType (TOKEN_SEMICOLON, token);
+			}
 		}
 	} while (! isType (token, TOKEN_CLOSE_CURLY));
 
@@ -1028,13 +1039,17 @@ static void parseInterfaceBody (vString *const scope, tokenInfo *const token)
 	}
 }
 
-static void parseInterface (vString *const scope, tokenInfo *const token)
+static void parseInterface (vString *const scope, tsKind scopeParentKind, tokenInfo *const token)
 {
 	readToken (token);
 
 	if (token->type != TOKEN_IDENTIFIER) return;
 
-	if (scope) vStringCopy (token->scope, scope);
+	if (scope)
+	{
+		vStringCopy (token->scope, scope);
+		token->scopeParentKind = scopeParentKind;
+	}
 
 	emitTag(token, TSTAG_INTERFACE);
 
@@ -1051,13 +1066,17 @@ static void parseInterface (vString *const scope, tokenInfo *const token)
 	vStringDelete(nscope);
 }
 
-static void parseType (vString *const scope, tokenInfo *const token)
+static void parseType (vString *const scope, tsKind scopeParentKind, tokenInfo *const token)
 {
 	readToken (token);
 
 	if (token->type != TOKEN_IDENTIFIER) return;
 
-	if (scope) vStringCopy(token->scope, scope);
+	if (scope)
+	{
+		vStringCopy(token->scope, scope);
+		token->scopeParentKind = scopeParentKind;
+	}
 	emitTag(token, TSTAG_ALIAS);
 	skipBlocksTillType (TOKEN_SEMICOLON, token);
 }
@@ -1078,6 +1097,7 @@ static void parseEnumBody (vString *const scope, tokenInfo *const token)
 			member = newToken ();
 			copyToken(member, token, false);
 			vStringCopy (member->scope, scope);
+			member->scopeParentKind = TSTAG_ENUM;
 			emitTag (member, TSTAG_PROPERTY);
 		}
 		else if (isType (token, TOKEN_COMMA))
@@ -1093,13 +1113,17 @@ static void parseEnumBody (vString *const scope, tokenInfo *const token)
 	}
 }
 
-static void parseEnum (vString *const scope, tokenInfo *const token)
+static void parseEnum (vString *const scope, tsKind scopeParentKind, tokenInfo *const token)
 {
 	readToken (token);
 
 	if (token->type != TOKEN_IDENTIFIER) return;
 
-	if (scope) vStringCopy (token->scope, scope);
+	if (scope)
+	{
+		vStringCopy (token->scope, scope);
+		token->scopeParentKind = scopeParentKind;
+	}
 	emitTag(token, TSTAG_ENUM);
 
 	vString *nscope = vStringNew ();
@@ -1115,7 +1139,7 @@ static void parseEnum (vString *const scope, tokenInfo *const token)
 	vStringDelete(nscope);
 }
 
-static void parseVariable (vString *const scope, tokenInfo *const token)
+static void parseVariable (vString *const scope, tsKind scopeParentKind, tokenInfo *const token)
 {
 	tokenInfo *member = NULL;
 	bool parsed = false;
@@ -1126,10 +1150,10 @@ static void parseVariable (vString *const scope, tokenInfo *const token)
 		clearPoolToken (token);
 		parsed = tryParse(token,
 			parseTemplate, initBlockState, freeBlockState,
-			parseComment, initParseCommentState, freeParseCommentState,
 			parseStringSQuote, initParseStringState, freeParseStringState,
 			parseStringDQuote, initParseStringState, freeParseStringState,
 			parseStringTemplate, initParseStringState, freeParseStringState,
+			parseComment, initParseCommentState, freeParseCommentState,
 			parseParens, initBlockState, freeBlockState,
 			parseNumber, initParseWordState, freeParseWordState,
 			parsePipe, NULL, NULL,
@@ -1144,6 +1168,7 @@ static void parseVariable (vString *const scope, tokenInfo *const token)
 			parseColon, NULL, NULL,
 			parseSemicolon, NULL, NULL,
 			parseComma, NULL, NULL,
+			parsePeriod, NULL, NULL,
 			parseArrow, initParseWordState, freeParseWordState,
 			parseEnumKeyword, initParseWordState, freeParseWordState,
 			parseIdentifier, initParseWordState, freeParseWordState,
@@ -1175,22 +1200,28 @@ static void parseVariable (vString *const scope, tokenInfo *const token)
 					if (!parsingType) {
 						member = newToken ();
 						copyToken(member, token, false);
-						if (scope) vStringCopy (member->scope, scope);
+						if (scope)
+						{
+							vStringCopy (member->scope, scope);
+							member->scopeParentKind = scopeParentKind;
+						}
 						emitTag (member, TSTAG_VARIABLE);
 						deleteToken (member);
 					}
 					break;
 				case TOKEN_KEYWORD:
-					if (token->keyword == KEYWORD_enum) parseEnum (scope, token);
+					if (token->keyword == KEYWORD_enum) parseEnum (scope, scopeParentKind, token);
 					break;
 				default:
 					break;
 			}
 		}
 	} while (parsed && ! (token->type == TOKEN_SEMICOLON && !parsingType));
+
+	clearPoolToken (token);
 }
 
-static void parseFunctionArgs (vString *const scope, tokenInfo *const token)
+static void parseFunctionArgs (vString *const scope, tsKind scopeParentKind, tokenInfo *const token)
 {
 	bool parsed = false;
 	bool parsingType = false;
@@ -1230,6 +1261,7 @@ static void parseFunctionArgs (vString *const scope, tokenInfo *const token)
 			parseNewLine, NULL, NULL,
 			parseColon, NULL, NULL,
 			parseComma, NULL, NULL,
+			parsePeriod, NULL, NULL,
 			parseAt, NULL, NULL,
 			parseArrow, initParseWordState, freeParseWordState,
 			parseCloseParen, NULL, NULL,
@@ -1266,6 +1298,7 @@ static void parseFunctionArgs (vString *const scope, tokenInfo *const token)
 						member = newToken ();
 						copyToken(member, token, false);
 						vStringCopy (member->scope, scope);
+						member->scopeParentKind = scopeParentKind;
 						emitTag (member, TSTAG_VARIABLE);
 						deleteToken (member);
 					}
@@ -1278,7 +1311,7 @@ static void parseFunctionArgs (vString *const scope, tokenInfo *const token)
 }
 
 
-static void parseFunctionBody (vString *const scope, tokenInfo *const token)
+static void parseFunctionBody (vString *const scope, tsKind scopeParentKind, tokenInfo *const token)
 {
 	bool parsed = false;
 	int nestLevel = 1;
@@ -1326,7 +1359,7 @@ static void parseFunctionBody (vString *const scope, tokenInfo *const token)
 						case KEYWORD_var:
 						case KEYWORD_let:
 						case KEYWORD_const:
-							parseVariable (scope, token);
+							parseVariable (scope, scopeParentKind, token);
 							break;
 					}
 					break;
@@ -1339,14 +1372,18 @@ static void parseFunctionBody (vString *const scope, tokenInfo *const token)
 	clearPoolToken (token);
 }
 
-static void parseFunction (vString *const scope, tokenInfo *const token)
+static void parseFunction (vString *const scope, tsKind scopeParentKind, tokenInfo *const token)
 {
 	bool isGenerator = tryParser ((Parser) parseStar, NULL, NULL, token);
 
 	readToken (token);
 	if (token->type != TOKEN_IDENTIFIER) return;
 
-	if (scope) vStringCopy (token->scope, scope);
+	if (scope)
+	{
+		vStringCopy (token->scope, scope);
+		token->scopeParentKind = scopeParentKind;
+	}
 
 	if (isGenerator) emitTag(token, TSTAG_GENERATOR);
 	else emitTag(token, TSTAG_FUNCTION);
@@ -1359,8 +1396,8 @@ static void parseFunction (vString *const scope, tokenInfo *const token)
 	}
 	vStringCat (nscope, token->string);
 
-	parseFunctionArgs (nscope, token);
-	parseFunctionBody (nscope, token);
+	parseFunctionArgs (nscope, isGenerator ? TSTAG_GENERATOR : TSTAG_FUNCTION, token);
+	parseFunctionBody (nscope, isGenerator ? TSTAG_GENERATOR : TSTAG_FUNCTION, token);
 
 	vStringDelete(nscope);
 }
@@ -1459,11 +1496,13 @@ static void parsePropertyList (vString *const scope, tokenInfo *const token)
 					if (visibility)
 					{
 						member->accessKeyword = visibility;
+						member->scopeParentKind = TSTAG_CLASS;
 						emitTag(member, TSTAG_PROPERTY);
 					}
 					else
 					{
 						vStringCatS (member->scope, ".constructor");
+						member->scopeParentKind = TSTAG_METHOD;
 						emitTag(member, TSTAG_VARIABLE);
 					}
 					deleteToken (member);
@@ -1522,6 +1561,7 @@ static void parseClassBody (vString *const scope, tokenInfo *const token)
 			parseReadonlyKeyword, initParseWordState, freeParseWordState,
 			parseStaticKeyword, initParseWordState, freeParseWordState,
 			parseNumber, initParseWordState, freeParseWordState,
+			parseTemplate, initBlockState, freeBlockState,
 			parseIdentifier, initParseWordState, freeParseWordState,
 			NULL);
 
@@ -1539,6 +1579,7 @@ static void parseClassBody (vString *const scope, tokenInfo *const token)
 							member = newToken ();
 							copyToken(member, token, false);
 							vStringCopy (member->scope, scope);
+							member->scopeParentKind = TSTAG_CLASS;
 
 							if (visibility) member->accessKeyword = visibility;
 							else member->accessKeyword = KEYWORD_public;
@@ -1553,7 +1594,7 @@ static void parseClassBody (vString *const scope, tokenInfo *const token)
 							vString *methodScope = vStringNew ();
 							vStringCopy (methodScope, scope);
 							vStringCatS (methodScope, ".constructor");
-							parseFunctionBody (methodScope, token);
+							parseFunctionBody (methodScope, TSTAG_METHOD, token);
 							vStringDelete(methodScope);
 							break;
 						case KEYWORD_private:
@@ -1597,8 +1638,8 @@ static void parseClassBody (vString *const scope, tokenInfo *const token)
 					deleteToken (member);
 					member = NULL;
 
-					parseFunctionArgs (methodScope, token);
-					parseFunctionBody (methodScope, token);
+					parseFunctionArgs (methodScope, TSTAG_METHOD, token);
+					parseFunctionBody (methodScope, TSTAG_METHOD, token);
 
 					vStringDelete(methodScope);
 					isGenerator = false;
@@ -1609,6 +1650,7 @@ static void parseClassBody (vString *const scope, tokenInfo *const token)
 					member = newToken ();
 					copyToken(member, token, false);
 					vStringCopy (member->scope, scope);
+					member->scopeParentKind = TSTAG_CLASS;
 					if (visibility) member->accessKeyword = visibility;
 					else member->accessKeyword = KEYWORD_public;
 					break;
@@ -1629,7 +1671,7 @@ static void parseClassBody (vString *const scope, tokenInfo *const token)
 	else if (member) deleteToken (member);
 }
 
-static void parseClass (vString *const scope, tokenInfo *const token)
+static void parseClass (vString *const scope, tsKind scopeParentKind, tokenInfo *const token)
 {
 	bool parsed = false;
 
@@ -1645,7 +1687,11 @@ static void parseClass (vString *const scope, tokenInfo *const token)
 
 	if (!parsed) return;
 
-	if (scope) vStringCopy (token->scope, scope);
+	if (scope)
+	{
+		vStringCopy (token->scope, scope);
+		token->scopeParentKind = scopeParentKind;
+	}
 	emitTag(token, TSTAG_CLASS);
 
 	vString *nscope = vStringNew ();
@@ -1685,24 +1731,24 @@ static void parseNamespaceBody (vString *const scope, tokenInfo *const token)
 			case TOKEN_KEYWORD:
 				switch (token->keyword) {
 					case KEYWORD_interface:
-						parseInterface (scope, token);
+						parseInterface (scope, TSTAG_NAMESPACE, token);
 						break;
 					case KEYWORD_type:
-						parseType (scope, token);
+						parseType (scope, TSTAG_NAMESPACE, token);
 						break;
 					case KEYWORD_enum:
-						parseEnum (scope, token);
+						parseEnum (scope, TSTAG_NAMESPACE, token);
 						break;
 					case KEYWORD_function:
-						parseFunction (scope, token);
+						parseFunction (scope, TSTAG_NAMESPACE, token);
 						break;
 					case KEYWORD_class:
-						parseClass (scope, token);
+						parseClass (scope, TSTAG_NAMESPACE, token);
 						break;
 					case KEYWORD_var:
 					case KEYWORD_let:
 					case KEYWORD_const:
-						parseVariable (scope, token);
+						parseVariable (scope, TSTAG_NAMESPACE, token);
 						break;
 				}
 				break;
@@ -1751,19 +1797,19 @@ static void parseTsFile (tokenInfo *const token)
 			case TOKEN_KEYWORD:
 				switch (token->keyword) {
 					case KEYWORD_interface:
-						parseInterface (NULL, token);
+						parseInterface (NULL, TSTAG_CLASS, token);
 						break;
 					case KEYWORD_type:
-						parseType (NULL, token);
+						parseType (NULL, TSTAG_CLASS, token);
 						break;
 					case KEYWORD_enum:
-						parseEnum (NULL, token);
+						parseEnum (NULL, TSTAG_CLASS, token);
 						break;
 					case KEYWORD_function:
-						parseFunction (NULL, token);
+						parseFunction (NULL, TSTAG_CLASS, token);
 						break;
 					case KEYWORD_class:
-						parseClass (NULL, token);
+						parseClass (NULL, TSTAG_CLASS, token);
 						break;
 					case KEYWORD_namespace:
 						parseNamespace (token);
@@ -1771,7 +1817,7 @@ static void parseTsFile (tokenInfo *const token)
 					case KEYWORD_var:
 					case KEYWORD_let:
 					case KEYWORD_const:
-						parseVariable (NULL, token);
+						parseVariable (NULL, TSTAG_CLASS, token);
 						break;
 				}
 				break;
