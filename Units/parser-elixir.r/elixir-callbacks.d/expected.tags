@@ -1,0 +1,3 @@
+CallbackModule	input.ex	/^defmodule CallbackModule do$/;"	module
+new_callback	input.ex	/^  @callback new_callback() :: integer$/;"	callback
+old_callback	input.ex	/^  defcallback old_callback(info :: integer) :: integer$/;"	callback

@@ -1,0 +1,10 @@
+MyList	input.ex	/^defmodule MyList do$/;"	module
+reverse	input.ex	/^  defdelegate reverse(list), to: Enum$/;"	delegate
+other_reverse	input.ex	/^  defdelegate other_reverse(list), to: Enum, as: :reverse$/;"	delegate
+Size	input.ex	/^defprotocol Size do$/;"	protocol
+size	input.ex	/^  def size(data)$/;"	function
+MyGuards	input.ex	/^defmodule Integer.MyGuards do$/;"	module
+is_even	input.ex	/^  defguard is_even(value) when is_integer(value) and rem(value, 2) == 0$/;"	guard
+is_odd	input.ex	/^  defguardp is_odd(value) when is_integer(value) and rem(value, 2) != 0$/;"	guard
+Size	input.ex	/^defimpl Size, for: BitString do$/;"	implementation
+size	input.ex	/^  def size(binary), do: byte_size(binary)$/;"	function
