@@ -1321,6 +1321,10 @@ static void parseFunctionBody (vString *const scope, tsKind scopeParentKind, tok
 
 		parsed = tryParse(token,
 			parseOpenCurly, NULL, NULL,
+			parseStringSQuote, initParseStringState, freeParseStringState,
+			parseStringDQuote, initParseStringState, freeParseStringState,
+			parseStringTemplate, initParseStringState, freeParseStringState,
+			parseTemplate, initBlockState, freeBlockState,
 			parseComment, initParseCommentState, freeParseCommentState,
 			parseChar, NULL, NULL,
 			NULL);
@@ -1419,10 +1423,16 @@ static void parsePropertyType (tokenInfo *const token)
 			parseEqualSign, NULL, NULL,
 			parseComma, NULL, NULL,
 			parseCloseParen, NULL, NULL,
+			parseArrow, initParseWordState, freeParseWordState,
 			parseTemplate, initBlockState, freeBlockState,
+			parseParens, initBlockState, freeBlockState,
+			parseStringSQuote, initParseStringState, freeParseStringState,
+			parseStringDQuote, initParseStringState, freeParseStringState,
+			parseStringTemplate, initParseStringState, freeParseStringState,
 			parseComment, initParseCommentState, freeParseCommentState,
 			parseSquares, initBlockState, freeBlockState,
 			parseIdentifier, initParseWordState, freeParseWordState,
+			parseChar, NULL, NULL,
 			NULL);
 	} while (parsed && !isType (token, TOKEN_CLOSE_PAREN) && ! isType (token, TOKEN_SEMICOLON) && ! isType (token, TOKEN_COMMA));
 
