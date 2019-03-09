@@ -99,6 +99,7 @@ enum eKeywordId {
 	KEYWORD_namespace,
 	KEYWORD_new,
 	KEYWORD_null,
+	KEYWORD_of,
 	KEYWORD_package,
 	KEYWORD_private,
 	KEYWORD_protected,
@@ -188,6 +189,7 @@ typedef struct sCommentState {
 typedef struct sBlockState {
 	int  parsed;
 	int  nestLevel;
+	int  curlyLevel;
 } blockState;
 
 static tokenType LastTokenType;
@@ -227,6 +229,7 @@ static const keywordTable TsKeywordTable [] = {
 	{ "namespace"  , KEYWORD_namespace   },
 	{ "new"        , KEYWORD_new         },
 	{ "null"       , KEYWORD_null        },
+	{ "of"         , KEYWORD_of          },
 	{ "package"    , KEYWORD_package     },
 	{ "private"    , KEYWORD_private     },
 	{ "protected"  , KEYWORD_protected   },
@@ -633,6 +636,7 @@ inline static void* initBlockState()
 	blockState *st = xMalloc (1, blockState);
 	st->parsed = 0;
 	st->nestLevel = 0;
+	st->curlyLevel = 0;
 
 	return st;
 }
@@ -661,7 +665,9 @@ inline static void parseBlock(const char c, tokenInfo *const token, tokenType co
 
 	if (c == start) state->nestLevel += 1;
 	else if (c == end) state->nestLevel -= 1;
-	else if (c == ';' || c == EOF)
+	else if (c == '{') state->curlyLevel += 1;
+	else if (c == '}') state->curlyLevel -= 1;
+	else if ((state->curlyLevel < 1 && c == ';') || c == EOF)
 	{
 		result->status = PARSER_FAILED;
 		return;
@@ -744,6 +750,7 @@ PARSER_DEF(ModuleKeyword     , parseWord , "module"     , (int*))
 PARSER_DEF(NamespaceKeyword  , parseWord , "namespace"  , (int*))
 PARSER_DEF(NewKeyword        , parseWord , "new"        , (int*))
 PARSER_DEF(NullKeyword       , parseWord , "null"       , (int*))
+PARSER_DEF(OfKeyword         , parseWord , "of"         , (int*))
 PARSER_DEF(PackageKeyword    , parseWord , "package"    , (int*))
 PARSER_DEF(PrivateKeyword    , parseWord , "private"    , (int*))
 PARSER_DEF(ProtectedKeyword  , parseWord , "protected"  , (int*))
@@ -1164,14 +1171,20 @@ static void parseVariable (vString *const scope, tsKind scopeParentKind, tokenIn
 			parseCloseSquare, NULL, NULL,
 			parseOpenCurly, NULL, NULL,
 			parseCloseCurly, NULL, NULL,
+			parseCloseParen, NULL, NULL,
 			parseNewLine, NULL, NULL,
 			parseColon, NULL, NULL,
 			parseSemicolon, NULL, NULL,
 			parseComma, NULL, NULL,
 			parsePeriod, NULL, NULL,
 			parseArrow, initParseWordState, freeParseWordState,
+			parseForKeyword, initParseWordState, freeParseWordState,
+			parseWhileKeyword, initParseWordState, freeParseWordState,
+			parseThisKeyword, initParseWordState, freeParseWordState,
 			parseEnumKeyword, initParseWordState, freeParseWordState,
+			parseOfKeyword, initParseWordState, freeParseWordState,
 			parseIdentifier, initParseWordState, freeParseWordState,
+			parseChar, NULL, NULL,
 			NULL);
 
 		if (parsed) {
@@ -1186,6 +1199,7 @@ static void parseVariable (vString *const scope, tsKind scopeParentKind, tokenIn
 					break;
 				case TOKEN_COMMA:
 				case TOKEN_SEMICOLON:
+				case TOKEN_CLOSE_PAREN:
 					if (nestLevel <= 0)
 					{
 						parsingType = false;
@@ -1210,13 +1224,21 @@ static void parseVariable (vString *const scope, tsKind scopeParentKind, tokenIn
 					}
 					break;
 				case TOKEN_KEYWORD:
-					if (token->keyword == KEYWORD_enum) parseEnum (scope, scopeParentKind, token);
+					switch (token->keyword)
+					{
+						case KEYWORD_enum:
+							parseEnum (scope, scopeParentKind, token);
+							break;
+						case KEYWORD_of:
+							parsingType = true;
+							break;
+					}
 					break;
 				default:
 					break;
 			}
 		}
-	} while (parsed && ! (token->type == TOKEN_SEMICOLON && !parsingType));
+	} while (parsed && ! ((token->type == TOKEN_SEMICOLON || token->type == TOKEN_CLOSE_PAREN) && !parsingType));
 
 	clearPoolToken (token);
 }
