@@ -24,6 +24,8 @@ data	input.ts	/^  data: string | string[];$/;"	p	class:D
 debit	input.ts	/^  writeCheck(debit: number) {$/;"	v	method:CheckingAccount.writeCheck
 deposit	input.ts	/^  deposit(credit: number) {$/;"	m	class:BankAccount
 f	input.ts	/^  static f(a: A, b: B) {$/;"	m	class:A
+fakePointBuilder	input.ts	/^  protected fakePointBuilder: () => { x: number, y: number };$/;"	p	class:Point
+fun	input.ts	/^  public fun: (a: 22 | 30, b: CPoint) => number | string;$/;"	p	class:A
 getData	input.ts	/^  getData() {$/;"	m	class:D
 getXAsT	input.ts	/^  getXAsT<T = any>(): T {$/;"	m	class:A
 insertAfter	input.ts	/^  insertAfter(item: T) {$/;"	m	class:List

@@ -149,6 +149,7 @@ typedef enum eTokenType {
 	TOKEN_COMMENT_BLOCK,
 	TOKEN_PARENS,
 	TOKEN_SQUARES,
+	TOKEN_CURLIES,
 	TOKEN_PIPE,
 	TOKEN_AMPERSAND,
 	TOKEN_ARROW,
@@ -800,6 +801,7 @@ PARSER_DEF(StringTemplate , parseString , '`'  , (char*))
 BLOCK_PARSER_DEF(Parens, '(', ')', TOKEN_PARENS)
 BLOCK_PARSER_DEF(Squares, '[', ']', TOKEN_SQUARES)
 BLOCK_PARSER_DEF(Template, '<', '>', TOKEN_TEMPLATE)
+BLOCK_PARSER_DEF(Curlies, '{', '}', TOKEN_CURLIES)
 
 static bool tryParser(Parser parser, ParserStateInit stInit, ParserStateFree stFree, tokenInfo *const token)
 {
@@ -1453,6 +1455,7 @@ static void parsePropertyType (tokenInfo *const token)
 			parseStringTemplate, initParseStringState, freeParseStringState,
 			parseComment, initParseCommentState, freeParseCommentState,
 			parseSquares, initBlockState, freeBlockState,
+			parseCurlies, initBlockState, freeBlockState,
 			parseIdentifier, initParseWordState, freeParseWordState,
 			parseChar, NULL, NULL,
 			NULL);

@@ -61,6 +61,7 @@ class D {
 }
 
 class Point {
+  protected fakePointBuilder: () => { x: number, y: number };
   constructor(public x: number, public y: number) { }
   public length() { return Math.sqrt(this.x * this.x + this.y * this.y); }
   static origin = new Point(0, 0);
@@ -69,6 +70,8 @@ class Point {
 class A {
   private x: number;
   protected y: number;
+  public fun: (a: 22 | 30, b: CPoint) => number | string;
+
   static f(a: A, b: B) {
     a.x = 1; // Ok
     b.x = 1; // Ok
