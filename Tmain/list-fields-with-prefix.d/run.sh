@@ -4,7 +4,7 @@ CTAGS=$1
 
 ignore_xpath ()
 {
-    grep -v Maven2
+    grep -v Maven2 | grep -v XML
 }
 
 $CTAGS --quiet --options=NONE --put-field-prefix --list-fields \

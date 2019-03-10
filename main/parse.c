@@ -4091,6 +4091,14 @@ extern void anonGenerate (vString *buffer, const char *prefix, int kind)
 	vStringCatS(buffer,szNum);
 }
 
+extern vString *anonGenerateNew (const char *prefix, int kind)
+{
+	vString *buffer = vStringNew ();
+
+	anonGenerate (buffer, prefix, kind);
+	return buffer;
+}
+
 
 extern void applyParameter (const langType language, const char *name, const char *args)
 {

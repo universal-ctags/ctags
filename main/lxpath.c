@@ -52,7 +52,7 @@ static void simpleXpathMakeTag (xmlNode *node,
 		goto out;
 
 
-	tag.lineNumber = xmlGetLineNo (node);
+	tag.lineNumber = XML_GET_LINE (node);
 	tag.filePosition = getInputFilePositionForLine (tag.lineNumber);
 
 	path = (char *)xmlGetNodePath (node);
