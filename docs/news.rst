@@ -85,6 +85,7 @@ The following parsers have been added:
 * SVG *libxml*
 * TclOO (see :ref:`The new Tcl parser <tcl>`)
 * TTCN
+* TypeScript
 * WindRes
 * XSLT v1.0 *libxml*
 * Yacc

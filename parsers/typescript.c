@@ -69,57 +69,27 @@ static objPool *TokenPool = NULL;
 */
 enum eKeywordId {
 	KEYWORD_async,
-	KEYWORD_break,
-	KEYWORD_case,
-	KEYWORD_catch,
 	KEYWORD_class,
-	KEYWORD_const,
 	KEYWORD_constructor,
-	KEYWORD_continue,
-	KEYWORD_debugger,
-	KEYWORD_default,
-	KEYWORD_delete,
-	KEYWORD_do,
-	KEYWORD_else,
+	KEYWORD_const,
 	KEYWORD_enum,
-	KEYWORD_export,
-	KEYWORD_extends,
-	KEYWORD_false,
-	KEYWORD_finally,
 	KEYWORD_for,
 	KEYWORD_function,
-	KEYWORD_if,
-	KEYWORD_implements,
-	KEYWORD_import,
-	KEYWORD_in,
 	KEYWORD_instanceof,
 	KEYWORD_interface,
 	KEYWORD_let,
-	KEYWORD_module,
 	KEYWORD_namespace,
-	KEYWORD_new,
-	KEYWORD_null,
 	KEYWORD_of,
-	KEYWORD_package,
 	KEYWORD_private,
 	KEYWORD_protected,
 	KEYWORD_public,
 	KEYWORD_return,
 	KEYWORD_readonly,
 	KEYWORD_static,
-	KEYWORD_super,
-	KEYWORD_switch,
 	KEYWORD_this,
-	KEYWORD_throw,
-	KEYWORD_true,
-	KEYWORD_try,
 	KEYWORD_type,
-	KEYWORD_typeof,
 	KEYWORD_var,
-	KEYWORD_void,
-	KEYWORD_while,
-	KEYWORD_with,
-	KEYWORD_yield
+	KEYWORD_while
 };
 typedef int keywordId; /* to allow KEYWORD_NONE */
 
@@ -143,7 +113,6 @@ typedef enum eTokenType {
 	TOKEN_OPEN_SQUARE,
 	TOKEN_CLOSE_SQUARE,
 	TOKEN_EQUAL_SIGN,
-	TOKEN_REGEXP,
 	TOKEN_STAR,
 	TOKEN_NL,
 	TOKEN_COMMENT_BLOCK,
@@ -196,57 +165,24 @@ typedef struct sBlockState {
 static const keywordTable TsKeywordTable [] = {
 	/* keyword		keyword ID */
 	{ "async"      , KEYWORD_async       },
-	{ "break"      , KEYWORD_break       },
-	{ "case"       , KEYWORD_case        },
-	{ "catch"      , KEYWORD_catch       },
 	{ "class"      , KEYWORD_class       },
 	{ "const"      , KEYWORD_const       },
 	{ "constructor", KEYWORD_constructor },
-
-	{ "continue"   , KEYWORD_continue    },
-	{ "debugger"   , KEYWORD_debugger    },
-	{ "default"    , KEYWORD_default     },
-	{ "delete"     , KEYWORD_delete      },
-	{ "do"         , KEYWORD_do          },
-	{ "else"       , KEYWORD_else        },
 	{ "enum"       , KEYWORD_enum        },
-	{ "export"     , KEYWORD_export      },
-	{ "extends"    , KEYWORD_extends     },
-	{ "false"      , KEYWORD_false       },
-	{ "finally"    , KEYWORD_finally     },
 	{ "for"        , KEYWORD_for         },
 	{ "function"   , KEYWORD_function    },
-	{ "if"         , KEYWORD_if          },
-	{ "implements" , KEYWORD_implements  },
-	{ "import"     , KEYWORD_import      },
-	{ "in"         , KEYWORD_in          },
-	{ "instanceof" , KEYWORD_instanceof  },
 	{ "interface"  , KEYWORD_interface   },
 	{ "let"        , KEYWORD_let         },
-	{ "module"     , KEYWORD_module      },
 	{ "namespace"  , KEYWORD_namespace   },
-	{ "new"        , KEYWORD_new         },
-	{ "null"       , KEYWORD_null        },
 	{ "of"         , KEYWORD_of          },
-	{ "package"    , KEYWORD_package     },
 	{ "private"    , KEYWORD_private     },
 	{ "protected"  , KEYWORD_protected   },
 	{ "public"     , KEYWORD_public      },
-	{ "return"     , KEYWORD_return      },
 	{ "static"     , KEYWORD_static      },
-	{ "super"      , KEYWORD_super       },
-	{ "switch"     , KEYWORD_switch      },
 	{ "this"       , KEYWORD_this        },
-	{ "throw"      , KEYWORD_throw       },
-	{ "true"       , KEYWORD_true        },
-	{ "try"        , KEYWORD_try         },
 	{ "type"       , KEYWORD_type        },
-	{ "typeof"     , KEYWORD_typeof      },
 	{ "var"        , KEYWORD_var         },
-	{ "void"       , KEYWORD_void        },
-	{ "while"      , KEYWORD_while       },
-	{ "with"       , KEYWORD_with        },
-	{ "yield"      , KEYWORD_yield       }
+	{ "while"      , KEYWORD_while       }
 };
 
 static kindDefinition TsKinds [] = {
@@ -719,57 +655,25 @@ inline static void parseIdentifier(const char c, tokenInfo *const token, int *pa
 }
 
 PARSER_DEF(AsyncKeyword      , parseWord , "async"      , (int*))
-PARSER_DEF(BreakKeyword      , parseWord , "break"      , (int*))
-PARSER_DEF(CaseKeyword       , parseWord , "case"       , (int*))
-PARSER_DEF(CatchKeyword      , parseWord , "catch"      , (int*))
 PARSER_DEF(ClassKeyword      , parseWord , "class"      , (int*))
 PARSER_DEF(ConstKeyword      , parseWord , "const"      , (int*))
 PARSER_DEF(ConstructorKeyword, parseWord , "constructor", (int*))
-PARSER_DEF(ContinueKeyword   , parseWord , "continue"   , (int*))
-PARSER_DEF(DebuggerKeyword   , parseWord , "debugger"   , (int*))
-PARSER_DEF(DefaultKeyword    , parseWord , "default"    , (int*))
-PARSER_DEF(DeleteKeyword     , parseWord , "delete"     , (int*))
-PARSER_DEF(DoKeyword         , parseWord , "do"         , (int*))
-PARSER_DEF(ElseKeyword       , parseWord , "else"       , (int*))
 PARSER_DEF(EnumKeyword       , parseWord , "enum"       , (int*))
-PARSER_DEF(ExportKeyword     , parseWord , "export"     , (int*))
-PARSER_DEF(ExtendsKeyword    , parseWord , "extends"    , (int*))
-PARSER_DEF(FalseKeyword      , parseWord , "false"      , (int*))
-PARSER_DEF(FinallyKeyword    , parseWord , "finally"    , (int*))
 PARSER_DEF(ForKeyword        , parseWord , "for"        , (int*))
 PARSER_DEF(FunctionKeyword   , parseWord , "function"   , (int*))
-PARSER_DEF(IfKeyword         , parseWord , "if"         , (int*))
-PARSER_DEF(ImplementsKeyword , parseWord , "implements" , (int*))
-PARSER_DEF(ImportKeyword     , parseWord , "import"     , (int*))
-PARSER_DEF(InKeyword         , parseWord , "in"         , (int*))
-PARSER_DEF(InstanceofKeyword , parseWord , "instanceof" , (int*))
 PARSER_DEF(InterfaceKeyword  , parseWord , "interface"  , (int*))
 PARSER_DEF(LetKeyword        , parseWord , "let"        , (int*))
-PARSER_DEF(ModuleKeyword     , parseWord , "module"     , (int*))
 PARSER_DEF(NamespaceKeyword  , parseWord , "namespace"  , (int*))
-PARSER_DEF(NewKeyword        , parseWord , "new"        , (int*))
-PARSER_DEF(NullKeyword       , parseWord , "null"       , (int*))
 PARSER_DEF(OfKeyword         , parseWord , "of"         , (int*))
-PARSER_DEF(PackageKeyword    , parseWord , "package"    , (int*))
 PARSER_DEF(PrivateKeyword    , parseWord , "private"    , (int*))
 PARSER_DEF(ProtectedKeyword  , parseWord , "protected"  , (int*))
 PARSER_DEF(PublicKeyword     , parseWord , "public"     , (int*))
 PARSER_DEF(ReadonlyKeyword   , parseWord , "readonly"   , (int*))
-PARSER_DEF(ReturnKeyword     , parseWord , "return"     , (int*))
 PARSER_DEF(StaticKeyword     , parseWord , "static"     , (int*))
-PARSER_DEF(SuperKeyword      , parseWord , "super"      , (int*))
-PARSER_DEF(SwitchKeyword     , parseWord , "switch"     , (int*))
 PARSER_DEF(ThisKeyword       , parseWord , "this"       , (int*))
-PARSER_DEF(ThrowKeyword      , parseWord , "throw"      , (int*))
-PARSER_DEF(TrueKeyword       , parseWord , "true"       , (int*))
-PARSER_DEF(TryKeyword        , parseWord , "try"        , (int*))
 PARSER_DEF(TypeKeyword       , parseWord , "type"       , (int*))
-PARSER_DEF(TypeofKeyword     , parseWord , "typeof"     , (int*))
 PARSER_DEF(VarKeyword        , parseWord , "var"        , (int*))
-PARSER_DEF(VoidKeyword       , parseWord , "void"       , (int*))
 PARSER_DEF(WhileKeyword      , parseWord , "while"      , (int*))
-PARSER_DEF(WithKeyword       , parseWord , "with"       , (int*))
-PARSER_DEF(YieldKeyword      , parseWord , "yield"      , (int*))
 
 SINGLE_CHAR_PARSER_DEF(Semicolon    , ';'  , TOKEN_SEMICOLON)
 SINGLE_CHAR_PARSER_DEF(Comma        , ','  , TOKEN_COMMA)
@@ -987,7 +891,7 @@ static void parseInterfaceBody (vString *const scope, tokenInfo *const token)
 				}
 			}
 		}
-	} while (! isType (token, TOKEN_CLOSE_CURLY));
+	} while (parsed && ! isType (token, TOKEN_CLOSE_CURLY));
 
 	if (member) {
 		emitTag (member, TSTAG_PROPERTY);
@@ -1002,6 +906,7 @@ static void parseInterface (vString *const scope, tsKind scopeParentKind, tokenI
 	do {
 		clearPoolToken(token);
 		parsed = tryInSequence(token,
+			parseNewLine, NULL, NULL,
 			parseComment, initParseCommentState, freeParseCommentState,
 			parseIdentifier, initParseWordState, freeParseWordState,
 			NULL);
@@ -1478,7 +1383,7 @@ static void parsePropertyType (tokenInfo *const token)
 	clearPoolToken (token);
 }
 
-static void parsePropertyList (vString *const scope, tokenInfo *const token)
+static void parseConstructorParams (vString *const scope, tokenInfo *const token)
 {
 	bool parsed = false;
 
@@ -1635,7 +1540,7 @@ static void parseClassBody (vString *const scope, tokenInfo *const token)
 							member = NULL;
 							visibility = 0;
 
-							parsePropertyList (scope, token);
+							parseConstructorParams (scope, token);
 
 							vString *methodScope = vStringNew ();
 							vStringCopy (methodScope, scope);
@@ -1671,6 +1576,7 @@ static void parseClassBody (vString *const scope, tokenInfo *const token)
 					isGenerator = true;
 					break;
 				case TOKEN_OPEN_PAREN:
+					if (!member) break;
 					ungetcToInputFile('(');
 
 					if (isGenerator) emitTag(member, TSTAG_GENERATOR);
@@ -1707,7 +1613,6 @@ static void parseClassBody (vString *const scope, tokenInfo *const token)
 			}
 		}
 	} while (parsed && token->type != TOKEN_CLOSE_CURLY);
-
 
 	if (parsed && member)
 	{
