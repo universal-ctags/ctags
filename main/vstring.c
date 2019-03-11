@@ -130,6 +130,12 @@ extern void vStringNCatS (
 	stringCat (string, s, len);
 }
 
+extern void vStringNCatSUnsafe (
+		vString *const string, const char *const s, const size_t length)
+{
+	stringCat (string, s, length);
+}
+
 extern void vStringCat (vString *const string, const vString *const s)
 {
 	size_t len = vStringLength (s);
@@ -275,6 +281,14 @@ extern char    *vStringDeleteUnwrap       (vString *const string)
 	}
 
 	return buffer;
+}
+
+extern char    *vStringStrdup (const vString *const string)
+{
+	char *str = xMalloc (vStringLength(string) + 1, char);
+	str[vStringLength(string)] = '\0';
+	memcpy (str, string->buffer, vStringLength(string));
+	return str;
 }
 
 static char valueToXDigit (int v)

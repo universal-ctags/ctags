@@ -52,6 +52,7 @@ The following parsers have been added:
 * Diff
 * DTD
 * DTS
+* Elixir *optlib*
 * Elm *optlib*
 * Falcon
 * Gdbinit script *optlib*
@@ -81,11 +82,13 @@ The following parsers have been added:
 * RpmSpec
 * Rust
 * SystemdUnit
+* SystemTap *optlib*
 * SystemVerilog
 * SVG *libxml*
 * TclOO (see :ref:`The new Tcl parser <tcl>`)
 * TTCN
 * TypeScript
+* Varlink *peg/packcc*
 * WindRes
 * XSLT v1.0 *libxml*
 * Yacc

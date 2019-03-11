@@ -1,0 +1,6 @@
+main	input.go	/^package main$/;"	p
+F	input.go	/^func F() (int, int) {$/;"	f	package:main	typeref:typename:(int, int)
+x0	input.go	/^var x0, y0 = F()$/;"	v	package:main
+y0	input.go	/^var x0, y0 = F()$/;"	v	package:main
+x	input.go	/^var x, _ = F()$/;"	v	package:main
+main	input.go	/^func main() {$/;"	f	package:main

@@ -8,6 +8,15 @@
 #include "xtag.h"
 
 
+typedef enum {
+	K_CLASS,
+	K_DEFINITION,
+	K_NODE,
+	K_RESOURCE,
+	K_VARIABLE,
+} PuppetManifestKind;
+
+
 static void initializePuppetManifestParser (const langType language)
 {
 
@@ -167,6 +176,9 @@ static void initializePuppetManifestParser (const langType language)
 	                               "^\\#",
 	                               "", "", "{tenter=comment_oneline}", NULL);
 	addLanguageTagMultiTableRegex (language, "blockHead",
+	                               "^[ \t\n]+",
+	                               "", "", "", NULL);
+	addLanguageTagMultiTableRegex (language, "blockHead",
 	                               "^\\{",
 	                               "", "", "{tenter=block,end}", NULL);
 	addLanguageTagMultiTableRegex (language, "blockHead",
@@ -236,6 +248,9 @@ static void initializePuppetManifestParser (const langType language)
 	                               "^\"",
 	                               "", "", "{tenter=dsliteral}", NULL);
 	addLanguageTagMultiTableRegex (language, "block",
+	                               "^\\{",
+	                               "", "", "{tenter=block}", NULL);
+	addLanguageTagMultiTableRegex (language, "block",
 	                               "^.",
 	                               "", "", "{tenter=separator}", NULL);
 	addLanguageTagMultiTableRegex (language, "classStart",
@@ -265,6 +280,9 @@ static void initializePuppetManifestParser (const langType language)
 	addLanguageTagMultiTableRegex (language, "resourceBlock",
 	                               "^\\[",
 	                               "", "", "{tenter=resourceArray}", NULL);
+	addLanguageTagMultiTableRegex (language, "resourceBlock",
+	                               "^\\{",
+	                               "", "", "{tenter=block}", NULL);
 	addLanguageTagMultiTableRegex (language, "resourceBlock",
 	                               "^/\\*",
 	                               "", "", "{tenter=comment_multiline}", NULL);
@@ -579,7 +597,7 @@ static void initializePuppetManifestParser (const langType language)
 	                               "", "", "{tenter=dsliteral}", NULL);
 	addLanguageTagMultiTableRegex (language, "caseBlock",
 	                               "^:",
-	                               "", "", "{tenter=block}", NULL);
+	                               "", "", "{tenter=blockHead}", NULL);
 	addLanguageTagMultiTableRegex (language, "caseBlock",
 	                               "^}",
 	                               "", "", "{tleave}{_advanceTo=0start}", NULL);
@@ -603,9 +621,14 @@ extern parserDefinition* PuppetManifestParser (void)
 		NULL
 	};
 
+	static scopeSeparator PuppetManifestClassSeparators [] = {
+		{ KIND_GHOST_INDEX, "::" },
+	};
+
 	static kindDefinition PuppetManifestKindTable [] = {
 		{
 		  true, 'c', "class", "classes",
+		  ATTACH_SEPARATORS(PuppetManifestClassSeparators),
 		},
 		{
 		  true, 'd', "definition", "definitions",
@@ -629,8 +652,10 @@ extern parserDefinition* PuppetManifestParser (void)
 	def->aliases       = aliases;
 	def->method        = METHOD_NOT_CRAFTED|METHOD_REGEX;
 	def->useCork       = 1;
-	def->kindTable = PuppetManifestKindTable;
-	def->kindCount = ARRAY_SIZE(PuppetManifestKindTable);
+	def->kindTable     = PuppetManifestKindTable;
+	def->kindCount     = ARRAY_SIZE(PuppetManifestKindTable);
+	def->requestAutomaticFQTag = true;
+	def->defaultScopeSeparator = "::";
 	def->initialize    = initializePuppetManifestParser;
 
 	return def;

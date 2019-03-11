@@ -14,7 +14,7 @@ with_field()
 
 ignore_xpath ()
 {
-    grep -v Maven2
+    grep -v Maven2 | grep -v XML
 }
 
 : &&

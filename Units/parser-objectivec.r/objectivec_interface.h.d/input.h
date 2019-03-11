@@ -62,3 +62,22 @@ struct aStruct
 - (LayoutTree*)createLayoutTree;
 @end
 
+@interface NSString (Extension)
+- (void)doSomething;
+@end
+
+@interface NSString (Extension2) <Proto2>
+- (void)doSomething2;
+@end
+
+@interface NSString (Extension34) <Proto3, Proto4>
+- (void)doSomething34;
+@end
+
+@interface MyString <Proto5>
+- (void)doSomething5;
+@end
+
+@interface YourString <Proto6, Proto7>
+- (void)doSomething67;
+@end

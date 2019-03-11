@@ -63,8 +63,8 @@ extern parserDefinition* GdbinitParser (void)
 	def->patterns      = patterns;
 	def->aliases       = aliases;
 	def->method        = METHOD_NOT_CRAFTED|METHOD_REGEX;
-	def->kindTable = GdbinitKindTable;
-	def->kindCount = ARRAY_SIZE(GdbinitKindTable);
+	def->kindTable     = GdbinitKindTable;
+	def->kindCount     = ARRAY_SIZE(GdbinitKindTable);
 	def->tagRegexTable = GdbinitTagRegexTable;
 	def->tagRegexCount = ARRAY_SIZE(GdbinitTagRegexTable);
 	def->initialize    = initializeGdbinitParser;

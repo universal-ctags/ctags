@@ -61,52 +61,6 @@
 #define deleteToken(t) (objPoolPut (TokenPool, (t)))
 
 /*
- * Debugging
- *
- * Uncomment this to enable extensive debugging to stderr in jscript code.
- * Please note that TRACING_ENABLED should be #defined in main/trace.h
- * for this to work.
- *
- */
-//#define JSCRIPT_DEBUGGING_ENABLED 1
-
-#if defined(DO_TRACING) && defined(JSCRIPT_DEBUGGING_ENABLED)
-	#define JSCRIPT_DO_DEBUGGING
-#endif
-
-#ifdef JSCRIPT_DO_DEBUGGING
-
-#define JSCRIPT_DEBUG_ENTER() TRACE_ENTER()
-#define JSCRIPT_DEBUG_LEAVE() TRACE_LEAVE()
-
-#define JSCRIPT_DEBUG_ENTER_TEXT(_szFormat,...) \
-	TRACE_ENTER_TEXT(_szFormat,## __VA_ARGS__)
-
-#define JSCRIPT_DEBUG_LEAVE_TEXT(_szFormat,...) \
-	TRACE_LEAVE_TEXT(_szFormat,## __VA_ARGS__)
-
-#define JSCRIPT_DEBUG_PRINT(_szFormat,...) \
-	TRACE_PRINT(_szFormat,## __VA_ARGS__)
-
-#define JSCRIPT_DEBUG_ASSERT(_condition,_szFormat,...) \
-	TRACE_ASSERT(_condition,_szFormat,## __VA_ARGS__)
-
-#else //!JSCRIPT_DO_DEBUGGING
-
-#define JSCRIPT_DEBUG_ENTER() do { } while(0)
-#define JSCRIPT_DEBUG_LEAVE() do { } while(0)
-
-#define JSCRIPT_DEBUG_ENTER_TEXT(_szFormat,...) do { } while(0)
-#define JSCRIPT_DEBUG_LEAVE_TEXT(_szFormat,...) do { } while(0)
-
-#define JSCRIPT_DEBUG_PRINT(_szFormat,...) do { } while(0)
-
-#define JSCRIPT_DEBUG_ASSERT(_condition,_szFormat,...) do { } while(0)
-
-#endif //!JSCRIPT_DO_DEBUGGING
-
-
-/*
  *	 DATA DECLARATIONS
  */
 
@@ -145,6 +99,8 @@ enum eKeywordId {
 	KEYWORD_default,
 	KEYWORD_export,
 	KEYWORD_async,
+	KEYWORD_get,
+	KEYWORD_set,
 };
 typedef int keywordId; /* to allow KEYWORD_NONE */
 
@@ -182,6 +138,7 @@ typedef struct sTokenInfo {
 	MIOPos 			filePosition;
 	int				nestLevel;
 	bool			ignoreTag;
+	bool			dynamicProp;
 } tokenInfo;
 
 /*
@@ -207,6 +164,8 @@ typedef enum {
 	JSTAG_CONSTANT,
 	JSTAG_VARIABLE,
 	JSTAG_GENERATOR,
+	JSTAG_GETTER,
+	JSTAG_SETTER,
 	JSTAG_COUNT
 } jsKind;
 
@@ -217,7 +176,9 @@ static kindDefinition JsKinds [] = {
 	{ true,  'p', "property",	  "properties"		   },
 	{ true,  'C', "constant",	  "constants"		   },
 	{ true,  'v', "variable",	  "global variables"   },
-	{ true,  'g', "generator",	  "generators"		   }
+	{ true,  'g', "generator",	  "generators"		   },
+	{ true,  'G', "getter",		  "getters"			   },
+	{ true,  'S', "setter",		  "setters"			   },
 };
 
 static const keywordTable JsKeywordTable [] = {
@@ -248,6 +209,8 @@ static const keywordTable JsKeywordTable [] = {
 	{ "default",	KEYWORD_default				},
 	{ "export",		KEYWORD_export				},
 	{ "async",		KEYWORD_async				},
+	{ "get",		KEYWORD_get					},
+	{ "set",		KEYWORD_set					},
 };
 
 /*
@@ -260,6 +223,12 @@ static void parseFunction (tokenInfo *const token);
 static bool parseBlock (tokenInfo *const token, const vString *const parentScope);
 static bool parseLine (tokenInfo *const token, bool is_inside_class);
 static void parseUI5 (tokenInfo *const token);
+
+#ifdef DO_TRACING
+static void dumpToken (const tokenInfo *const token);
+static const char *tokenTypeName(enum eTokenType e);
+static const char *keywordName(enum eKeywordId e);
+#endif
 
 static void *newPoolToken (void *createArg CTAGS_ATTR_UNUSED)
 {
@@ -279,6 +248,7 @@ static void clearPoolToken (void *data)
 	token->keyword		= KEYWORD_NONE;
 	token->nestLevel	= 0;
 	token->ignoreTag	= false;
+	token->dynamicProp  = false;
 	token->lineNumber   = getInputLineNumber ();
 	token->filePosition = getInputFilePosition ();
 	vStringClear (token->string);
@@ -300,12 +270,20 @@ static void copyToken (tokenInfo *const dest, const tokenInfo *const src,
 	dest->filePosition = src->filePosition;
 	dest->type = src->type;
 	dest->keyword = src->keyword;
+	dest->dynamicProp = src->dynamicProp;
 	vStringCopy(dest->string, src->string);
 	if (include_non_read_info)
 	{
 		dest->nestLevel = src->nestLevel;
 		vStringCopy(dest->scope, src->scope);
 	}
+}
+
+static void injectDynamicName (tokenInfo *const token, vString *newName)
+{
+	token->dynamicProp = true;
+	vStringDelete (token->string);
+	token->string = newName;
 }
 
 /*
@@ -323,7 +301,7 @@ static void makeJsTagCommon (const tokenInfo *const token, const jsKind kind,
 		const char *p;
 		tagEntryInfo e;
 
-		if (kind != JSTAG_PROPERTY &&  (p = strrchr (name, '.')) != NULL )
+		if (!token->dynamicProp && kind != JSTAG_PROPERTY &&  (p = strrchr (name, '.')) != NULL )
 		{
 			if (vStringLength (fullscope) > 0)
 				vStringPut (fullscope, '.');
@@ -333,7 +311,7 @@ static void makeJsTagCommon (const tokenInfo *const token, const jsKind kind,
 
 		initTagEntry (&e, name, kind);
 
-		JSCRIPT_DEBUG_PRINT("Emitting tag for symbol '%s' of kind %02x with scope '%s'",name,kind,vStringValue(fullscope));
+		TRACE_PRINT("Emitting tag for symbol '%s' of kind %02x with scope '%s'",name,kind,vStringValue(fullscope));
 
 		e.lineNumber   = token->lineNumber;
 		e.filePosition = token->filePosition;
@@ -1088,7 +1066,7 @@ getNextChar:
 static void readTokenFullDebug (tokenInfo *const token, bool include_newlines, vString *const repr)
 {
 	readTokenFull (token, include_newlines, repr);
-	JSCRIPT_DEBUG_PRINT("token '%s' of type %02x with scope '%s'",vStringValue(token->string),token->type, vStringValue(token->scope));
+	TRACE_PRINT("token '%s' of type %02x with scope '%s'",vStringValue(token->string),token->type, vStringValue(token->scope));
 }
 # define readTokenFull readTokenFullDebug
 #endif
@@ -1147,6 +1125,19 @@ static void skipArrayList (tokenInfo *const token, bool include_newlines)
 				nest_level--;
 		}
 		readTokenFull (token, include_newlines, NULL);
+	}
+}
+
+static void skipQualifiedIdentifier (tokenInfo *const token)
+{
+	/* Skip foo.bar.baz */
+	while (isType (token, TOKEN_IDENTIFIER))
+	{
+		readToken (token);
+		if (isType (token, TOKEN_PERIOD))
+			readToken (token);
+		else
+			break;
 	}
 }
 
@@ -1388,6 +1379,8 @@ static bool parseIf (tokenInfo *const token)
 
 static void parseFunction (tokenInfo *const token)
 {
+	TRACE_ENTER();
+
 	tokenInfo *const name = newToken ();
 	vString *const signature = vStringNew ();
 	bool is_class = false;
@@ -1445,13 +1438,15 @@ static void parseFunction (tokenInfo *const token)
  cleanUp:
 	vStringDelete (signature);
 	deleteToken (name);
+
+	TRACE_LEAVE();
 }
 
 /* Parses a block surrounded by curly braces.
  * @p parentScope is the scope name for this block, or NULL for unnamed scopes */
 static bool parseBlock (tokenInfo *const token, const vString *const parentScope)
 {
-	JSCRIPT_DEBUG_ENTER();
+	TRACE_ENTER();
 
 	bool is_class = false;
 	bool read_next_token = true;
@@ -1540,7 +1535,7 @@ static bool parseBlock (tokenInfo *const token, const vString *const parentScope
 	if (parentScope)
 		token->nestLevel--;
 
-	JSCRIPT_DEBUG_LEAVE();
+	TRACE_LEAVE();
 
 	return is_class;
 }
@@ -1548,7 +1543,7 @@ static bool parseBlock (tokenInfo *const token, const vString *const parentScope
 static bool parseMethods (tokenInfo *const token, const tokenInfo *const class,
                           const bool is_es6_class)
 {
-	JSCRIPT_DEBUG_ENTER();
+	TRACE_ENTER();
 
 	tokenInfo *const name = newToken ();
 	bool has_methods = false;
@@ -1563,17 +1558,25 @@ static bool parseMethods (tokenInfo *const token, const tokenInfo *const class,
 	 *	   validMethod    : function(a,b) {}
 	 *	   'validMethod2' : function(a,b) {}
      *     container.dirtyTab = {'url': false, 'title':false, 'snapshot':false, '*': false}
+	 *     get prop() {}
+	 *     set prop(val) {}
      *
      * ES6 methods:
      *     property(...) {}
      *     *generator() {}
-     * FIXME: what to do with computed names?
+     *
+     * ES6 computed name:
      *     [property]() {}
+     *     get [property]() {}
+     *     set [property]() {}
      *     *[generator]() {}
 	 */
 
 	do
 	{
+		bool is_setter = false;
+		bool is_getter = false;
+
 		readToken (token);
 		if (isType (token, TOKEN_CLOSE_CURLY))
 		{
@@ -1582,12 +1585,28 @@ static bool parseMethods (tokenInfo *const token, const tokenInfo *const class,
 
 		if (isKeyword (token, KEYWORD_async))
 			readToken (token);
+		else if (isType(token, TOKEN_KEYWORD) && isKeyword (token, KEYWORD_get))
+		{
+			is_getter = true;
+			readToken (token);
+		}
+		else if (isType(token, TOKEN_KEYWORD) && isKeyword (token, KEYWORD_set))
+		{
+			is_setter = true;
+			readToken (token);
+		}
 
 		if (! isType (token, TOKEN_KEYWORD) &&
 		    ! isType (token, TOKEN_SEMICOLON))
 		{
 			bool is_generator = false;
 			bool is_shorthand = false; /* ES6 shorthand syntax */
+			bool is_computed_name = false; /* ES6 computed property name */
+			bool is_dynamic_prop = false;
+			vString *dprop = NULL; /* is_computed_name is true but
+									* the name is not represnted in
+									* a string literal. The expressions
+									* go this string. */
 
 			if (isType (token, TOKEN_STAR)) /* shorthand generator */
 			{
@@ -1595,9 +1614,44 @@ static bool parseMethods (tokenInfo *const token, const tokenInfo *const class,
 				readToken (token);
 			}
 
-			copyToken(name, token, true);
+			if (isType (token, TOKEN_OPEN_SQUARE))
+			{
+				is_computed_name = true;
+				dprop = vStringNewInit ("[");
+				readTokenFull (token, false, dprop);
+			}
 
-			readToken (token);
+			copyToken(name, token, true);
+			if (is_computed_name && ! isType (token, TOKEN_STRING))
+				is_dynamic_prop = true;
+
+			readTokenFull (token, false, dprop);
+
+			if (is_computed_name)
+			{
+				int depth = 1;
+				do
+				{
+					if (isType (token, TOKEN_CLOSE_SQUARE))
+						depth--;
+					else
+					{
+						is_dynamic_prop = true;
+						if (isType (token, TOKEN_OPEN_SQUARE))
+							depth++;
+					}
+					readTokenFull (token, false, (is_dynamic_prop && depth != 0)? dprop: NULL);
+				} while (! isType (token, TOKEN_EOF) && depth > 0);
+			}
+
+			if (is_dynamic_prop)
+			{
+				injectDynamicName (name, dprop);
+				dprop = NULL;
+			}
+			else
+				vStringDelete (dprop);
+
 			is_shorthand = isType (token, TOKEN_OPEN_PAREN);
 			if ( isType (token, TOKEN_COLON) || is_shorthand )
 			{
@@ -1609,7 +1663,7 @@ static bool parseMethods (tokenInfo *const token, const tokenInfo *const class,
 				}
 				if ( is_shorthand || isKeyword (token, KEYWORD_function) )
 				{
-					JSCRIPT_DEBUG_PRINT("Seems to be a function or shorthand");
+					TRACE_PRINT("Seems to be a function or shorthand");
 					vString *const signature = vStringNew ();
 
 					if (! is_shorthand)
@@ -1630,7 +1684,16 @@ static bool parseMethods (tokenInfo *const token, const tokenInfo *const class,
 					if (isType (token, TOKEN_OPEN_CURLY))
 					{
 						has_methods = true;
-						makeJsTag (name, is_generator ? JSTAG_GENERATOR : JSTAG_METHOD, signature, NULL);
+
+						int kind = JSTAG_METHOD;
+						if (is_generator)
+							kind = JSTAG_GENERATOR;
+						else if (is_getter)
+							kind = JSTAG_GETTER;
+						else if (is_setter)
+							kind = JSTAG_SETTER;
+
+						makeJsTag (name, kind, signature, NULL);
 						parseBlock (token, name->string);
 
 						/*
@@ -1685,7 +1748,7 @@ static bool parseMethods (tokenInfo *const token, const tokenInfo *const class,
 	} while ( isType(token, TOKEN_COMMA) ||
 	          ( is_es6_class && ! isType(token, TOKEN_EOF) ) );
 
-	JSCRIPT_DEBUG_PRINT("Finished parsing methods");
+	TRACE_PRINT("Finished parsing methods");
 
 	findCmdTerm (token, false, false);
 
@@ -1694,14 +1757,14 @@ cleanUp:
 	vStringDelete (saveScope);
 	deleteToken (name);
 
-	JSCRIPT_DEBUG_LEAVE();
+	TRACE_LEAVE();
 
 	return has_methods;
 }
 
 static bool parseES6Class (tokenInfo *const token, const tokenInfo *targetName)
 {
-	JSCRIPT_DEBUG_ENTER();
+	TRACE_ENTER();
 
 	tokenInfo * className = newToken ();
 	vString *inheritance = NULL;
@@ -1745,7 +1808,7 @@ static bool parseES6Class (tokenInfo *const token, const tokenInfo *targetName)
 		vStringStripLeading (inheritance);
 	}
 
-	JSCRIPT_DEBUG_PRINT("Emitting tag for class '%s'", vStringValue(targetName->string));
+	TRACE_PRINT("Emitting tag for class '%s'", vStringValue(targetName->string));
 
 	makeJsTagCommon (targetName, JSTAG_CLASS, NULL, inheritance,
 					 (is_anonymous && (targetName == className)));
@@ -1769,13 +1832,13 @@ static bool parseES6Class (tokenInfo *const token, const tokenInfo *targetName)
 
 	deleteToken (className);
 
-	JSCRIPT_DEBUG_LEAVE();
+	TRACE_LEAVE();
 	return true;
 }
 
 static bool parseStatement (tokenInfo *const token, bool is_inside_class)
 {
-	JSCRIPT_DEBUG_ENTER();
+	TRACE_ENTER();
 
 	tokenInfo *const name = newToken ();
 	tokenInfo *const secondary_name = newToken ();
@@ -1827,7 +1890,7 @@ static bool parseStatement (tokenInfo *const token, bool is_inside_class)
 		 isKeyword(token, KEYWORD_let) ||
 		 isKeyword(token, KEYWORD_const) )
 	{
-		JSCRIPT_DEBUG_PRINT("var/let/const case");
+		TRACE_PRINT("var/let/const case");
 		is_const = isKeyword(token, KEYWORD_const);
 		/*
 		 * Only create variables for global scope
@@ -1842,7 +1905,7 @@ static bool parseStatement (tokenInfo *const token, bool is_inside_class)
 nextVar:
 	if ( isKeyword(token, KEYWORD_this) )
 	{
-		JSCRIPT_DEBUG_PRINT("found 'this' keyword");
+		TRACE_PRINT("found 'this' keyword");
 
 		readToken(token);
 		if (isType (token, TOKEN_PERIOD))
@@ -1852,7 +1915,8 @@ nextVar:
 	}
 
 	copyToken(name, token, true);
-	JSCRIPT_DEBUG_PRINT("name becomes '%s'",vStringValue(name->string));
+	TRACE_PRINT("name becomes '%s' of type %s",
+				vStringValue(token->string), tokenTypeName (token->type));
 
 	while (! isType (token, TOKEN_CLOSE_CURLY) &&
 	       ! isType (token, TOKEN_SEMICOLON)   &&
@@ -2133,7 +2197,7 @@ nextVar:
 					     || isType (name, TOKEN_KEYWORD) ) )
 					{
 						/* Unexpected input. Try to reset the parsing. */
-						JSCRIPT_DEBUG_PRINT("Unexpected input, trying to reset");
+						TRACE_PRINT("Unexpected input, trying to reset");
 						vStringDelete (signature);
 						goto cleanUp;
 					}
@@ -2229,7 +2293,11 @@ nextVar:
 				if ( isKeyword (token, KEYWORD_capital_object) )
 					is_class = true;
 
-				readToken (token);
+				if (is_var)
+					skipQualifiedIdentifier (token);
+				else
+					readToken (token);
+
 				if ( isType (token, TOKEN_OPEN_PAREN) )
 					skipArgumentList(token, true, NULL);
 
@@ -2241,17 +2309,16 @@ nextVar:
 						{
 							makeJsTag (name, is_const ? JSTAG_CONSTANT : JSTAG_VARIABLE, NULL, NULL);
 						}
+						else if ( is_class )
+						{
+							makeClassTag (name, NULL, NULL);
+						}
 						else
 						{
-							if ( is_class )
-							{
-								makeClassTag (name, NULL, NULL);
-							} else {
-								/* FIXME: we cannot really get a meaningful
-								 * signature from a `new Function()` call,
-								 * so for now just don't set any */
-								makeFunctionTag (name, NULL, false);
-							}
+							/* FIXME: we cannot really get a meaningful
+							 * signature from a `new Function()` call,
+							 * so for now just don't set any */
+							makeFunctionTag (name, NULL, false);
 						}
 					}
 				}
@@ -2346,7 +2413,7 @@ cleanUp:
 	deleteToken (method_body_token);
 	vStringDelete(saveScope);
 
-	JSCRIPT_DEBUG_LEAVE();
+	TRACE_LEAVE();
 
 	return is_terminated;
 }
@@ -2403,7 +2470,8 @@ static void parseUI5 (tokenInfo *const token)
 
 static bool parseLine (tokenInfo *const token, bool is_inside_class)
 {
-	JSCRIPT_DEBUG_ENTER_TEXT("token is '%s' of type %02x",vStringValue(token->string),token->type);
+	TRACE_ENTER_TEXT("token is '%s' of type %s",
+					 vStringValue(token->string), tokenTypeName (token->type));
 
 	bool is_terminated = true;
 	/*
@@ -2462,14 +2530,14 @@ static bool parseLine (tokenInfo *const token, bool is_inside_class)
 		is_terminated = parseStatement (token, is_inside_class);
 	}
 
-	JSCRIPT_DEBUG_LEAVE();
+	TRACE_LEAVE();
 
 	return is_terminated;
 }
 
 static void parseJsFile (tokenInfo *const token)
 {
-	JSCRIPT_DEBUG_ENTER();
+	TRACE_ENTER();
 
 	do
 	{
@@ -2484,8 +2552,86 @@ static void parseJsFile (tokenInfo *const token)
 			parseLine (token, false);
 	} while (! isType (token, TOKEN_EOF));
 
-	JSCRIPT_DEBUG_LEAVE();
+	TRACE_LEAVE();
 }
+
+#ifdef DO_TRACING
+static void dumpToken (const tokenInfo *const token)
+{
+	fprintf(stderr, "Token <%p>: %s: %s\n",
+			token,
+			tokenTypeName (token->type),
+			(token->type == TOKEN_KEYWORD   ? keywordName (token->keyword):
+			 token->type == TOKEN_IDENTIFIER? vStringValue (token->string):
+			 ""));
+}
+
+static const char *tokenTypeName(enum eTokenType e)
+{ /* Generated by misc/enumstr.sh with cmdline "parsers/jscript.c" "eTokenType" "tokenTypeName" */
+	switch (e)
+	{
+		case    TOKEN_BINARY_OPERATOR: return "TOKEN_BINARY_OPERATOR";
+		case          TOKEN_CHARACTER: return "TOKEN_CHARACTER";
+		case        TOKEN_CLOSE_CURLY: return "TOKEN_CLOSE_CURLY";
+		case        TOKEN_CLOSE_PAREN: return "TOKEN_CLOSE_PAREN";
+		case       TOKEN_CLOSE_SQUARE: return "TOKEN_CLOSE_SQUARE";
+		case              TOKEN_COLON: return "TOKEN_COLON";
+		case              TOKEN_COMMA: return "TOKEN_COMMA";
+		case                TOKEN_EOF: return "TOKEN_EOF";
+		case         TOKEN_EQUAL_SIGN: return "TOKEN_EQUAL_SIGN";
+		case         TOKEN_IDENTIFIER: return "TOKEN_IDENTIFIER";
+		case            TOKEN_KEYWORD: return "TOKEN_KEYWORD";
+		case         TOKEN_OPEN_CURLY: return "TOKEN_OPEN_CURLY";
+		case         TOKEN_OPEN_PAREN: return "TOKEN_OPEN_PAREN";
+		case        TOKEN_OPEN_SQUARE: return "TOKEN_OPEN_SQUARE";
+		case             TOKEN_PERIOD: return "TOKEN_PERIOD";
+		case   TOKEN_POSTFIX_OPERATOR: return "TOKEN_POSTFIX_OPERATOR";
+		case             TOKEN_REGEXP: return "TOKEN_REGEXP";
+		case          TOKEN_SEMICOLON: return "TOKEN_SEMICOLON";
+		case               TOKEN_STAR: return "TOKEN_STAR";
+		case             TOKEN_STRING: return "TOKEN_STRING";
+		case    TOKEN_TEMPLATE_STRING: return "TOKEN_TEMPLATE_STRING";
+		case          TOKEN_UNDEFINED: return "TOKEN_UNDEFINED";
+		default: return "UNKNOWN";
+	}
+}
+
+static const char *keywordName(enum eKeywordId e)
+{ /* Generated by misc/enumstr.sh with cmdline "parsers/jscript.c" "eKeywordId" "keywordName" */
+	switch (e)
+	{
+		case            KEYWORD_async: return "KEYWORD_async";
+		case KEYWORD_capital_function: return "KEYWORD_capital_function";
+		case   KEYWORD_capital_object: return "KEYWORD_capital_object";
+		case            KEYWORD_catch: return "KEYWORD_catch";
+		case            KEYWORD_class: return "KEYWORD_class";
+		case            KEYWORD_const: return "KEYWORD_const";
+		case          KEYWORD_default: return "KEYWORD_default";
+		case               KEYWORD_do: return "KEYWORD_do";
+		case             KEYWORD_else: return "KEYWORD_else";
+		case           KEYWORD_export: return "KEYWORD_export";
+		case          KEYWORD_extends: return "KEYWORD_extends";
+		case          KEYWORD_finally: return "KEYWORD_finally";
+		case              KEYWORD_for: return "KEYWORD_for";
+		case         KEYWORD_function: return "KEYWORD_function";
+		case              KEYWORD_get: return "KEYWORD_get";
+		case               KEYWORD_if: return "KEYWORD_if";
+		case              KEYWORD_let: return "KEYWORD_let";
+		case              KEYWORD_new: return "KEYWORD_new";
+		case        KEYWORD_prototype: return "KEYWORD_prototype";
+		case           KEYWORD_return: return "KEYWORD_return";
+		case              KEYWORD_sap: return "KEYWORD_sap";
+		case              KEYWORD_set: return "KEYWORD_set";
+		case           KEYWORD_static: return "KEYWORD_static";
+		case           KEYWORD_switch: return "KEYWORD_switch";
+		case             KEYWORD_this: return "KEYWORD_this";
+		case              KEYWORD_try: return "KEYWORD_try";
+		case              KEYWORD_var: return "KEYWORD_var";
+		case            KEYWORD_while: return "KEYWORD_while";
+		default: return "UNKNOWN";
+	}
+}
+#endif
 
 static void initialize (const langType language)
 {

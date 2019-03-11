@@ -754,6 +754,7 @@ static char* getFullQualifiedScopeNameFromCorkQueue (const tagEntryInfo * inner_
 	int kindIndex = KIND_GHOST_INDEX;
 	langType lang;
 	const tagEntryInfo *scope = inner_scope;
+	const tagEntryInfo *root_scope = NULL;
 	stringList *queue = stringListNew ();
 	vString *v;
 	vString *n;
@@ -776,10 +777,15 @@ static char* getFullQualifiedScopeNameFromCorkQueue (const tagEntryInfo * inner_
 			kindIndex = scope->kindIndex;
 			lang = scope->langType;
 		}
+		root_scope = scope;
 		scope =  getEntryInCorkQueue (scope->extensionFields.scopeIndex);
 	}
 
 	n = vStringNew ();
+	sep = scopeSeparatorFor (root_scope->langType, root_scope->kindIndex, KIND_GHOST_INDEX);
+	if (sep)
+		vStringCatS(n, sep);
+
 	while ((c = stringListCount (queue)) > 0)
 	{
 		v = stringListLast (queue);
@@ -971,7 +977,11 @@ extern void attachParserFieldToCorkEntry (int index,
 	Assert (tag != NULL);
 
 	v = eStrdup (value);
+
+	bool dynfields_allocated = tag->parserFieldsDynamic? true: false;
 	attachParserFieldGeneric (tag, ftype, v, true);
+	if (!dynfields_allocated && tag->parserFieldsDynamic)
+		PARSER_TRASH_BOX_TAKE_BACK(tag->parserFieldsDynamic);
 }
 
 extern const tagField* getParserField (const tagEntryInfo * tag, int index)
@@ -1211,6 +1221,11 @@ static bool isTagWritable(const tagEntryInfo *const tag)
 	return true;
 }
 
+static void buildFqTagCache (tagEntryInfo *const tag)
+{
+	getTagScopeInformation (tag, NULL, NULL);
+}
+
 static void writeTagEntry (const tagEntryInfo *const tag, bool checkingNeeded)
 {
 	int length = 0;
@@ -1224,16 +1239,21 @@ static void writeTagEntry (const tagEntryInfo *const tag, bool checkingNeeded)
 
 	if (includeExtensionFlags ()
 	    && isXtagEnabled (XTAG_QUALIFIED_TAGS)
-	    && doesInputLanguageRequestAutomaticFQTag ())
+	    && doesInputLanguageRequestAutomaticFQTag ()
+		&& !isTagExtraBitMarked (tag, XTAG_QUALIFIED_TAGS)
+		&& !tag->skipAutoFQEmission)
 	{
 		/* const is discarded to update the cache field of TAG. */
-		writerBuildFqTagCache ( (tagEntryInfo *const)tag);
+		buildFqTagCache ( (tagEntryInfo *const)tag);
 	}
 
 	length = writerWriteTag (TagFile.mio, tag);
 
-	++TagFile.numTags.added;
-	rememberMaxLengths (strlen (tag->name), (size_t) length);
+	if (length > 0)
+	{
+		++TagFile.numTags.added;
+		rememberMaxLengths (strlen (tag->name), (size_t) length);
+	}
 	DebugStatement ( mio_flush (TagFile.mio); )
 
 	abort_if_ferror (TagFile.mio);
@@ -1284,11 +1304,17 @@ extern void uncorkTagFile(void)
 	{
 		tagEntryInfo *tag = TagFile.corkQueue.queue + i;
 		writeTagEntry (tag, true);
+
 		if (doesInputLanguageRequestAutomaticFQTag ()
 		    && isXtagEnabled (XTAG_QUALIFIED_TAGS)
-		    && (tag->extensionFields.scopeKindIndex != KIND_GHOST_INDEX)
-		    && tag->extensionFields.scopeName
-		    && tag->extensionFields.scopeIndex)
+			&& !isTagExtraBitMarked (tag, XTAG_QUALIFIED_TAGS)
+			&& !tag->skipAutoFQEmission
+			&& ((tag->extensionFields.scopeKindIndex != KIND_GHOST_INDEX
+				 && tag->extensionFields.scopeName != NULL
+				 && tag->extensionFields.scopeIndex != CORK_NIL)
+				|| (tag->extensionFields.scopeKindIndex == KIND_GHOST_INDEX
+					&& tag->extensionFields.scopeName == NULL
+					&& tag->extensionFields.scopeIndex == CORK_NIL)))
 			makeQualifiedTagEntry (tag);
 	}
 	for (i = 1; i < TagFile.corkQueue.count; i++)

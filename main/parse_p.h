@@ -48,9 +48,14 @@ extern parserDefinitionFunc XML_PARSER_LIST;
 #ifdef HAVE_LIBYAML
 extern parserDefinitionFunc YAML_PARSER_LIST;
 #endif
+#ifdef HAVE_PACKCC
+extern parserDefinitionFunc PEG_PARSER_LIST;
+#endif
 
 extern bool doesLanguageAllowNullTag (const langType language);
 extern bool doesLanguageRequestAutomaticFQTag (const langType language);
+
+extern langType getNamedLanguageFull (const char *const name, size_t len, bool noPretending);
 
 extern kindDefinition* getLanguageKind(const langType language, int kindIndex);
 extern kindDefinition* getLanguageKindForName (const langType language, const char *kindName);
@@ -143,6 +148,8 @@ extern void processLanguageMultitableExtendingOption (langType language, const c
 
 extern unsigned int   getXpathFileSpecCount (const langType language);
 extern xpathFileSpec* getXpathFileSpec (const langType language, unsigned int nth);
+
+const tagXpathTableTable *getXpathTableTable (const langType language, unsigned int nth);
 
 extern bool makeKindSeparatorsPseudoTags (const langType language,
 					     const ptagDesc *pdesc);

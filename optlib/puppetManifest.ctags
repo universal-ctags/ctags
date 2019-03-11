@@ -27,7 +27,7 @@
 # - https://github.com/puppetlabs/puppet-specifications/blob/master/language/intro.md
 # - https://docs.puppet.com/puppet/5.1/lang_visual_index.html
 #
---langdef=PuppetManifest
+--langdef=PuppetManifest{_autoFQTag}
 --map-PuppetManifest=+.pp
 
 #
@@ -38,6 +38,12 @@
 --kinddef-PuppetManifest=n,node,nodes
 --kinddef-PuppetManifest=r,resource,resources
 --kinddef-PuppetManifest=v,variable,variables
+
+#
+# Separators
+#
+--_scopesep-PuppetManifest=/c:::
+--_scopesep-PuppetManifest=*/*:::
 
 #
 # Tables
@@ -163,6 +169,7 @@
 
 
 --_mtable-extend-PuppetManifest=blockHead+comment
+--_mtable-extend-PuppetManifest=blockHead+ignoreWhiteSpace
 --_mtable-regex-PuppetManifest=blockHead/\{//{tenter=block,end}
 --_mtable-extend-PuppetManifest=blockHead+any
 
@@ -189,6 +196,7 @@
 --_mtable-regex-PuppetManifest=block/://
 --_mtable-extend-PuppetManifest=block+comment
 --_mtable-extend-PuppetManifest=block+skipLiteral
+--_mtable-regex-PuppetManifest=block/\{//{tenter=block}
 --_mtable-regex-PuppetManifest=block/.//{tenter=separator}
 
 #
@@ -227,6 +235,7 @@
 --_mtable-regex-PuppetManifest=resourceBlock/'//{tenter=resourceName}{_advanceTo=0start}
 --_mtable-regex-PuppetManifest=resourceBlock/"//{tenter=resourceName}{_advanceTo=0start}
 --_mtable-regex-PuppetManifest=resourceBlock/\[//{tenter=resourceArray}
+--_mtable-regex-PuppetManifest=resourceBlock/\{//{tenter=block}
 --_mtable-extend-PuppetManifest=resourceBlock+comment
 --_mtable-regex-PuppetManifest=resourceBlock/.//{tenter=resourceBody}{scope=push}{placeholder}
 
@@ -299,7 +308,7 @@
 --_mtable-extend-PuppetManifest=caseBlock+comment
 --_mtable-extend-PuppetManifest=caseBlock+ignoreWhiteSpace
 --_mtable-extend-PuppetManifest=caseBlock+skipLiteral
---_mtable-regex-PuppetManifest=caseBlock/://{tenter=block}
+--_mtable-regex-PuppetManifest=caseBlock/://{tenter=blockHead}
 --_mtable-regex-PuppetManifest=caseBlock/}//{tleave}{_advanceTo=0start}
 --_mtable-extend-PuppetManifest=caseBlock+any
 

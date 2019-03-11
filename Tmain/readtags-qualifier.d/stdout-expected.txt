@@ -54,3 +54,6 @@ bw	base.py	/^    def bw ():$/;"	kind:member	language:Python	scope:class:Baz	acce
 ;; (member "superClass" $roles)
 Foo	base.py	/^class Bar (Foo):$/;"	kind:class	line:13	language:Python	roles:superClass
 Foo	base.py	/^class Baz (Foo): $/;"	kind:class	line:21	language:Python	roles:superClass
+;; (substr? (or ($ "roles") "") "super")
+Foo	base.py	/^class Bar (Foo):$/;"	kind:class	language:Python	roles:superClass
+Foo	base.py	/^class Baz (Foo): $/;"	kind:class	language:Python	roles:superClass

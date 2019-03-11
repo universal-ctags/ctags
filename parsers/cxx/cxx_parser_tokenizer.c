@@ -28,11 +28,8 @@
 
 static void cxxParserSkipToNonWhiteSpace(void)
 {
-	if(!cppIsspace(g_cxx.iChar))
-		return;
-	do
+	while(cppIsspace(g_cxx.iChar))
 		g_cxx.iChar = cppGetc();
-	while(cppIsspace(g_cxx.iChar));
 }
 
 enum CXXCharType
@@ -289,7 +286,7 @@ static CXXCharTypeData g_aCharTable[128] =
 	},
 	// 036 (0x24) '$'
 	{
-		0,
+		CXXCharTypeStartOfIdentifier | CXXCharTypePartOfIdentifier,
 		0,
 		0
 	},
@@ -1231,45 +1228,8 @@ bool cxxParserParseNextToken(void)
 			if(cxxKeywordIsDisabled((CXXKeyword)iCXXKeyword))
 			{
 				t->eType = CXXTokenTypeIdentifier;
-			} else if (isInputHeaderFile ()
-					   && (iCXXKeyword == CXXKeywordPUBLIC
-						   || iCXXKeyword == CXXKeywordPROTECTED
-						   || iCXXKeyword == CXXKeywordPRIVATE))
-			{
-				int c0 = g_cxx.iChar;
-
-				if (c0 == ':')
-				{
-					/* Specifying the scope of struct/union/class member */
-					goto assign_keyword;
-				}
-
-				if (cppIsspace (c0))
-				{
-					int c1;
-
-					cxxParserSkipToNonWhiteSpace ();
-					c1 = g_cxx.iChar;
-					cppUngetc (c1);
-					g_cxx.iChar = c0;
-
-					if (c1 == ':')
-					{
-						/* Specifying the scope of struct/union/class member */
-						goto assign_keyword;
-					}
-					else if (cppIsalpha(c1))
-					{
-						/* Specifying the scope of class inheritance */
-						goto assign_keyword;
-					}
-				}
-
-				t->eType = CXXTokenTypeIdentifier;
-				g_cxx.bConfirmedCPPLanguage = false;
-				cxxKeywordEnablePublicProtectedPrivate(false);
 			} else {
-			assign_keyword:
+
 				t->eType = CXXTokenTypeKeyword;
 				t->eKeyword = (CXXKeyword)iCXXKeyword;
 
@@ -1403,6 +1363,7 @@ bool cxxParserParseNextToken(void)
 	{
 		t->eType = CXXTokenTypeStringConstant;
 		vStringPut(t->pszWord,'"');
+		vStringCat(t->pszWord,cppGetLastCharOrStringContents());
 		vStringPut(t->pszWord,'"');
 		g_cxx.iChar = cppGetc();
 		t->bFollowedBySpace = cppIsspace(g_cxx.iChar);
@@ -1450,6 +1411,7 @@ bool cxxParserParseNextToken(void)
 	{
 		t->eType = CXXTokenTypeCharacterConstant;
 		vStringPut(t->pszWord,'\'');
+		vStringCat(t->pszWord,cppGetLastCharOrStringContents());
 		vStringPut(t->pszWord,'\'');
 		g_cxx.iChar = cppGetc();
 		t->bFollowedBySpace = cppIsspace(g_cxx.iChar);

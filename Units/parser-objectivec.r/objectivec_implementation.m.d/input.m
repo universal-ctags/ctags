@@ -123,3 +123,8 @@
 }
 @end
 
+@implementation NSString (Extension)
+- (void)doSomething
+{
+}
+@end

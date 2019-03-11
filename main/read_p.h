@@ -70,8 +70,6 @@ extern void   pushNarrowedInputStream (
 				       int promise);
 extern void   popNarrowedInputStream  (void);
 
-extern unsigned long getInputLineNumberForFileOffset(long offset);
-
 #define THIN_STREAM_SPEC 0, 0, 0, 0, 0
 extern bool isThinStreamSpec(unsigned long startLine, long startCharOffset,
 							 unsigned long endLine, long endCharOffset,

@@ -1,0 +1,10 @@
+org.gnome.Terminal.Factory0	input.xml	/^  <interface name="org.gnome.Terminal.Factory0">$/;"	i
+CreateInstance	input.xml	/^    <method name="CreateInstance">$/;"	m	interface:org.gnome.Terminal.Factory0
+options	input.xml	/^      <arg type="a{sv}" name="options" direction="in" \/>$/;"	a	method:org.gnome.Terminal.Factory0.CreateInstance
+receiver	input.xml	/^      <arg type="o" name="receiver" direction="out" \/>$/;"	a	method:org.gnome.Terminal.Factory0.CreateInstance
+org.gnome.Terminal.Terminal0	input.xml	/^  <interface name="org.gnome.Terminal.Terminal0">$/;"	i
+Exec	input.xml	/^    <method name="Exec">$/;"	m	interface:org.gnome.Terminal.Terminal0
+options	input.xml	/^      <arg type="a{sv}" name="options" direction="in" \/>$/;"	a	method:org.gnome.Terminal.Terminal0.Exec
+arguments	input.xml	/^      <arg type="aay" name="arguments" direction="in">$/;"	a	method:org.gnome.Terminal.Terminal0.Exec
+ChildExited	input.xml	/^    <signal name="ChildExited">$/;"	s	interface:org.gnome.Terminal.Terminal0
+exit_code	input.xml	/^      <arg type="i" name="exit_code" direction="in" \/>$/;"	a	signal:org.gnome.Terminal.Terminal0.ChildExited

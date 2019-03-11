@@ -142,6 +142,7 @@
     <ClCompile Include="..\optlib\RSpec.c" />
     <ClCompile Include="..\optlib\cmake.c" />
     <ClCompile Include="..\optlib\ctags-optlib.c" />
+    <ClCompile Include="..\optlib\elixir.c" />
     <ClCompile Include="..\optlib\elm.c" />
     <ClCompile Include="..\optlib\gdbinit.c" />
     <ClCompile Include="..\optlib\man.c" />
@@ -150,6 +151,7 @@
     <ClCompile Include="..\optlib\pod.c" />
     <ClCompile Include="..\optlib\puppetManifest.c" />
     <ClCompile Include="..\optlib\qemuhx.c" />
+    <ClCompile Include="..\optlib\systemtap.c" />
     <ClCompile Include="..\parsers\ada.c" />
     <ClCompile Include="..\parsers\ant.c" />
     <ClCompile Include="..\parsers\asciidoc.c" />
@@ -243,6 +245,7 @@
     <ClCompile Include="..\parsers\windres.c" />
     <ClCompile Include="..\parsers\yacc.c" />
     <ClCompile Include="..\parsers\yumrepo.c" />
+    <ClCompile Include="..\parsers\xml.c" />
     <ClCompile Include="mkstemp\mkstemp.c" />
   </ItemGroup>
   <ItemGroup>
@@ -259,6 +262,7 @@
     <ClInclude Include="..\main\entry_p.h" />
     <ClInclude Include="..\main\error_p.h" />
     <ClInclude Include="..\main\field.h" />
+    <ClInclude Include="..\main\field_p.h" />
     <ClInclude Include="..\main\flags_p.h" />
     <ClInclude Include="..\main\fmt_p.h" />
     <ClInclude Include="..\main\gcc-attr.h" />

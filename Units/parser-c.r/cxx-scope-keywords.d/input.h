@@ -35,3 +35,5 @@ void baz(void) {
  private/* coment */:
   return;
 }
+
+int private;

@@ -16,3 +16,4 @@ bar	input.h	/^void bar(void) {$/;"	function	typeref:typename:void
 private	input.h	/^private :$/;"	label	function:bar	file:
 baz	input.h	/^void baz(void) {$/;"	function	typeref:typename:void
 private	input.h	/^ private\/* coment *\/:$/;"	label	function:baz	file:
+private	input.h	/^int private;$/;"	variable	typeref:typename:int

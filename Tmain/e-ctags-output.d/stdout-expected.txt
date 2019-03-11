@@ -1,0 +1,34 @@
+#
+# with --sort=yes
+#
+A spaces B	input_space.rst	/^A spaces B$/;"	c
+test	input file.cc	/^int32 test(int32 a)$/;"	f	typeref:typename:int32	signature:(int32 a)
+test2	input file.cc	/^int32 test2(void)$/;"	f	typeref:typename:int32	signature:(void)
+test3	input file.cc	/^int32 test3(int32	a)$/;"	f	typeref:typename:int32	signature:(int32 a)
+test4	input file.cc	/^int32 test4(int32$/;"	f	typeref:typename:int32	signature:(int32 a)
+# WITH SCOPE
+X space Y	input_scope.rst	/^X space Y$/;"	c
+title	input_scope.rst	/^title$/;"	c
+topic in space	input_scope.rst	/^topic in space$/;"	s	chapter:X space Y
+# WITHOUT SCOPE
+X space Y	input_scope.rst	/^X space Y$/;"	c
+title	input_scope.rst	/^title$/;"	c
+topic in space	input_scope.rst	/^topic in space$/;"	s
+topic in tab	input_scope.rst	/^topic in tab$/;"	s
+#
+# with --sort=no
+#
+test	input file.cc	/^int32 test(int32 a)$/;"	f	typeref:typename:int32	signature:(int32 a)
+test2	input file.cc	/^int32 test2(void)$/;"	f	typeref:typename:int32	signature:(void)
+test3	input file.cc	/^int32 test3(int32	a)$/;"	f	typeref:typename:int32	signature:(int32 a)
+test4	input file.cc	/^int32 test4(int32$/;"	f	typeref:typename:int32	signature:(int32 a)
+A spaces B	input_space.rst	/^A spaces B$/;"	c
+# WITH SCOPE
+title	input_scope.rst	/^title$/;"	c
+X space Y	input_scope.rst	/^X space Y$/;"	c
+topic in space	input_scope.rst	/^topic in space$/;"	s	chapter:X space Y
+# WITHOUT SCOPE
+title	input_scope.rst	/^title$/;"	c
+topic in tab	input_scope.rst	/^topic in tab$/;"	s
+X space Y	input_scope.rst	/^X space Y$/;"	c
+topic in space	input_scope.rst	/^topic in space$/;"	s

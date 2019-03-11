@@ -25,7 +25,7 @@
 
 #include "ctags.h"
 #include "debug.h"
-#include "field.h"
+#include "field_p.h"
 #include "gvars.h"
 #include "keyword_p.h"
 #include "main_p.h"
@@ -250,12 +250,12 @@ static optionDescription LongOptionDescription [] = {
 #endif
  {1,"  --extras=[+|-]flags"},
  {1,"      Include extra tag entries for selected information (flags: \"fFgpqrs\") [F]."},
- {1,"  --extras-<LANG|*>=[+|-]flags"},
+ {1,"  --extras-<LANG|all>=[+|-]flags"},
  {1,"      Include <LANG> own extra tag entries for selected information"},
  {1,"      (flags: see the output of --list-extras=<LANG> option)."},
  {1,"  --fields=[+|-]flags"},
  {1,"      Include selected extension fields (flags: \"aCeEfFikKlmnNpPrRsStxzZ\") [fks]."},
- {1,"  --fields-<LANG|*>=[+|-]flags"},
+ {1,"  --fields-<LANG|all>=[+|-]flags"},
  {1,"      Include selected <LANG> own extension fields"},
  {1,"      (flags: see the output of --list-fields=<LANG> option)."},
  {1,"  --file-scope=[yes|no]"},
@@ -473,8 +473,13 @@ static optionDescription ExperimentalLongOptionDescription [] = {
  {1,"       Define multitable regular expression for locating tags in specific language."},
  {1,"  --_mtable-totals=[yes|no]"},
  {1,"       Print statistics about mtable usage [no]."},
+ {1,"  --_pretend-<NEWLANG>=<OLDLANG>"},
+ {1,"       Make NEWLANG parser pretend OLDLANG parser in lang: field."},
  {1,"  --_roledef-<LANG>=kind_letter.role_name,role_desc"},
  {1,"       Define new role for kind specified with <kind_letter> in <LANG>."},
+ {1,"  --_scopesep-<LANG>=[parent_kind_letter]/child_kind_letter:separator"},
+ {1,"       Specify scope separator between <PARENT_KIND> and <KIND>."},
+ {1,"       * as a kind letter matches any kind."},
  {1,"  --_tabledef-<LANG>=name"},
  {1,"       Define new regex table for <LANG>."},
 #ifdef DO_TRACING
@@ -557,6 +562,10 @@ static struct Feature {
 #endif
 #ifdef HAVE_ASPELL
 	{"aspell", "linked with code for spell checking (internal use)"},
+#endif
+#ifdef HAVE_PACKCC
+	/* The test harnesses use this as hints for skipping test cases */
+	{"packcc", "has peg based parser(s)"},
 #endif
 	{NULL,}
 };
@@ -745,8 +754,9 @@ extern void checkOptions (void)
 	}
 }
 
-extern langType getLanguageComponentInOption (const char *const option,
-											  const char *const prefix)
+extern langType getLanguageComponentInOptionFull (const char *const option,
+												  const char *const prefix,
+												  bool noPretending)
 {
 	size_t prefix_len;
 	langType language;
@@ -771,11 +781,17 @@ extern langType getLanguageComponentInOption (const char *const option,
 	colon = strchr (lang, ':');
 	if (colon)
 		lang_len = colon - lang;
-	language = getNamedLanguage (lang, lang_len);
+	language = getNamedLanguageFull (lang, lang_len, noPretending);
 	if (language == LANG_IGNORE)
 		error (FATAL, "Unknown language \"%s\" in \"%s\" option", lang, option);
 
 	return language;
+}
+
+extern langType getLanguageComponentInOption (const char *const option,
+											  const char *const prefix)
+{
+	return getLanguageComponentInOptionFull (option, prefix, false);
 }
 
 static void setEtagsMode (void)
@@ -3183,6 +3199,10 @@ static void processLongOption (
 		error (WARNING, "%s option not supported on this host", option);
 #endif
 	else if (processRoledefOption (option, parameter))
+		;
+	else if (processScopesepOption (option, parameter))
+		;
+	else if (processPretendOption (option, parameter))
 		;
 	else
 		error (FATAL, "Unknown option: --%s", option);

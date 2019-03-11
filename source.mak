@@ -14,6 +14,7 @@ MIO_SRCS  = main/mio.c
 MAIN_PUBLIC_HEADS =		\
 		main/dependency.h\
 		main/entry.h	\
+		main/field.h	\
 		main/gcc-attr.h	\
 		main/gvars.h	\
 		main/htable.h	\
@@ -51,6 +52,7 @@ MAIN_PRIVATE_HEADS =		\
 	main/dependency_p.h	\
 	main/entry_p.h		\
 	main/error_p.h		\
+	main/field_p.h		\
 	main/flags_p.h		\
 	main/fmt_p.h		\
 	main/interactive_p.h	\
@@ -79,7 +81,6 @@ MAIN_PRIVATE_HEADS =		\
 
 MAIN_HEADS =			\
 	main/ctags.h		\
-	main/field.h		\
 	main/general.h		\
 	\
 	$(MAIN_PUBLIC_HEADS)    \
@@ -136,8 +137,14 @@ MAIN_SRCS =				\
 	\
 	$(NULL)
 
-include makefiles/translator_input.mak
-TRANSLATED_SRCS = $(TRANSLATOR_INPUT:.ctags=.c)
+include makefiles/optlib2c_input.mak
+OPTLIB2C_SRCS = $(OPTLIB2C_INPUT:.ctags=.c)
+
+include makefiles/peg_input.mak
+PEG_SRCS = $(PEG_INPUT:.peg=.c)
+PEG_HEADS = $(PEG_INPUT:.peg=.h)
+PEG_EXTRA_HEADS = $(PEG_INPUT:.peg=_pre.h) $(PEG_INPUT:.peg=_post.h)
+PEG_OBJS = $(PEG_SRCS:.c=.$(OBJEXT))
 
 PARSER_HEADS = \
 	parsers/cxx/cxx_debug.h \
@@ -255,7 +262,7 @@ PARSER_SRCS =				\
 	parsers/yacc.c			\
 	parsers/yumrepo.c		\
 	\
-	$(TRANSLATED_SRCS)		\
+	$(OPTLIB2C_SRCS)		\
 	\
 	$(NULL)
 
@@ -267,6 +274,7 @@ XML_SRCS = \
 	 parsers/svg.c			\
 	 parsers/plist.c		\
 	 parsers/relaxng.c		\
+	 parsers/xml.c			\
 	 parsers/xslt.c			\
 	 \
 	 $(NULL)
@@ -329,4 +337,10 @@ READTAGS_SRCS  = \
 READTAGS_HEADS = read/readtags.h
 READTAGS_OBJS  = $(READTAGS_SRCS:.c=.$(OBJEXT))
 
+PACKCC_SRCS = \
+	    misc/packcc/packcc.c \
+	    \
+	    $(NULL)
+
+PACKCC_OBJS = $(PACKCC_SRCS:.c=.$(OBJEXT))
 # vim: ts=8

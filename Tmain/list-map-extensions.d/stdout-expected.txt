@@ -3,8 +3,10 @@
 LdScript          lds
 LdScript          scr
 LdScript          ld
+LdScript          ldi
 ## LdScript
 #EXTENSION
 lds
 scr
 ld
+ldi

@@ -24,6 +24,9 @@ extern parserDefinition* ManParser (void)
 		"7",
 		"8",
 		"9",
+		"3pm",
+		"3stap",
+		"7stap",
 		NULL
 	};
 
@@ -63,8 +66,8 @@ extern parserDefinition* ManParser (void)
 	def->aliases       = aliases;
 	def->method        = METHOD_NOT_CRAFTED|METHOD_REGEX;
 	def->useCork       = 1;
-	def->kindTable = ManKindTable;
-	def->kindCount = ARRAY_SIZE(ManKindTable);
+	def->kindTable     = ManKindTable;
+	def->kindCount     = ARRAY_SIZE(ManKindTable);
 	def->tagRegexTable = ManTagRegexTable;
 	def->tagRegexCount = ARRAY_SIZE(ManTagRegexTable);
 	def->initialize    = initializeManParser;

@@ -1,0 +1,18 @@
+#
+# with --sort=yes
+#
+# Universal-ctags output format
+a	input.foo	/^def a@prop(arg0,	arg1):$/;"	f	fprop:(arg0,\targ1)
+b	input.foo	/^def b@prop(arg0, arg1):$/;"	f	fprop:(arg0, arg1)
+# Exuberant-ctags output format
+# 'a' has a tab char in fprop fields. So ctags drops it silent.
+b	input.foo	/^def b@prop(arg0, arg1):$/;"	f	fprop:(arg0, arg1)
+#
+# with --sort=no
+#
+# Universal-ctags output format
+b	input.foo	/^def b@prop(arg0, arg1):$/;"	f	fprop:(arg0, arg1)
+a	input.foo	/^def a@prop(arg0,	arg1):$/;"	f	fprop:(arg0,\targ1)
+# Exuberant-ctags output format
+# 'a' has a tab char in fprop fields. So ctags drops it silent.
+b	input.foo	/^def b@prop(arg0, arg1):$/;"	f	fprop:(arg0, arg1)

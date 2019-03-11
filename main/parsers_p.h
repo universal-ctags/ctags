@@ -20,6 +20,7 @@
 	PlistXMLParser, \
 	RelaxNGParser, \
 	SvgParser, \
+	XmlParser, \
 	XsltParser
 #else
 #define XML_PARSER_LIST
@@ -33,6 +34,12 @@
 #define YAML_PARSER_LIST
 #endif
 
+#ifdef HAVE_PACKCC
+#define PEG_PARSER_LIST						\
+	VarlinkParser
+#else
+#define PEG_PARSER_LIST
+#endif
 
 /* Add the name of any new parser definition function here */
 #define PARSER_LIST \
@@ -63,6 +70,7 @@
 	DTSParser, \
 	DosBatchParser, \
 	EiffelParser, \
+	ElixirParser, \
 	ElmParser, \
 	ErlangParser, \
 	FalconParser, \
@@ -117,6 +125,7 @@
 	SmlParser, \
 	SqlParser, \
 	SystemdUnitParser, \
+	SystemTapParser, \
 	TclParser, \
 	TclOOParser, \
 	TexParser, \

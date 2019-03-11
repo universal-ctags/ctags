@@ -10,7 +10,12 @@
 *   <!DOCTYPE node PUBLIC
 *             "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN"
 *             "http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
+*   and
 *
+*	<!DOCTYPE node PUBLIC
+*             "-//freedesktop//DTD D-BUS Introspection 0.1//EN"
+*             "http://www.freedesktop.org/software/dbus/introspection.dtd">
+**
 */
 
 #include "general.h"	/* must always come first */
@@ -20,121 +25,188 @@
 #include "routines.h"
 #include "selectors.h"
 
+#include <string.h>
+
 
 typedef enum {
-	K_INTERFACE, K_METHOD, K_SIGNAL, K_PROPERTY
+	K_ARG, K_INTERFACE, K_METHOD, K_SIGNAL, K_PROPERTY, K_NODE,
 } dbusIntrospectKind;
 
 static kindDefinition DbusIntrospectKinds [] = {
+	{ true,  'a', "arg",       "arguments"  },
 	{ true,  'i', "interface", "interfaces" },
 	{ true,  'm', "method",    "methods"    },
 	{ true,  's', "signal",    "signals"    },
 	{ true,  'p', "property",  "properties" },
+	{ true,  'n', "node",      "nodes"      },
 };
 
-static void dbusIntrospectFindTagsUnderInterface (xmlNode *node,
+static void dbusIntrospectFindTagsUnderMain (xmlNode *node,
+						  const char *xpath,
 						  const struct sTagXpathRecurSpec *spec,
 						  xmlXPathContext *ctx,
 						  void *userData);
-static void makeTagForInterfaceName (xmlNode *node,
+static void makeTagForMainName (xmlNode *node,
+				     const char *xpath,
 				     const struct sTagXpathMakeTagSpec *spec,
 				     struct sTagEntryInfo *tag,
 				     void *userData);
 static void makeTagWithScope (xmlNode *node,
+			      const char *xpath,
 			      const struct sTagXpathMakeTagSpec *spec,
 			      struct sTagEntryInfo *tag,
 			      void *userData);
+static int decideKindForMainName (xmlNode *node,
+				  const char *xpath,
+			      const struct sTagXpathMakeTagSpec *spec,
+			      void *userData);
 
+struct dbusIntrospectData {
+	int scopeIndex;
+	int kindForName;
+};
+
+static tagXpathTable dbusIntrospectXpathArgTable [] = {
+	{ "arg",
+	  LXPATH_TABLE_DO_RECUR,
+	  { .recurSpec = { dbusIntrospectFindTagsUnderMain,
+					   -1 } },
+	},
+};
+
+enum dbusIntrospectXpathTable {
+	TABLE_ROOT, TABLE_MAIN, TABLE_INTERFACE, TABLE_MAIN_NAME, TABLE_ARG,
+};
 
 static tagXpathTable dbusIntrospectXpathInterfaceTable [] = {
-	{ "//method/@name",
-	  LXPATH_TABLE_DO_MAKE,
-	  { .makeTagSpec = {K_METHOD, ROLE_INDEX_DEFINITION,
-			    makeTagWithScope } }
+	{ "method",
+	  LXPATH_TABLE_DO_RECUR,
+	  { .recurSpec = { dbusIntrospectFindTagsUnderMain,
+					   TABLE_ARG, } }
 	},
-	{ "//signal/@name",
-	  LXPATH_TABLE_DO_MAKE,
-	  { .makeTagSpec = { K_SIGNAL, ROLE_INDEX_DEFINITION,
-			     makeTagWithScope } }
+	{ "signal",
+	  LXPATH_TABLE_DO_RECUR,
+	  { .recurSpec = { dbusIntrospectFindTagsUnderMain,
+					   TABLE_ARG, } }
 	},
-	{ "//property/@name",
+	{ "property/@name",
 	  LXPATH_TABLE_DO_MAKE,
 	  { .makeTagSpec = { K_PROPERTY, ROLE_INDEX_DEFINITION,
-			     makeTagWithScope } }
+						 makeTagWithScope, } }
 	},
 };
 
 static tagXpathTable dbusIntrospectXpathMainTable [] = {
-	{ "///interface",
+	{ "interface",
 	  LXPATH_TABLE_DO_RECUR,
-	  { .recurSpec = { dbusIntrospectFindTagsUnderInterface } }
+	  { .recurSpec = { dbusIntrospectFindTagsUnderMain,
+					   TABLE_INTERFACE, } }
+	},
+	{ "node",
+	  LXPATH_TABLE_DO_RECUR,
+	  { .recurSpec = { dbusIntrospectFindTagsUnderMain,
+					   TABLE_MAIN, } }
 	},
 };
 
 static tagXpathTable dbusIntrospectXpathMainNameTable [] = {
 	{ "@name",
 	  LXPATH_TABLE_DO_MAKE,
-	  { .makeTagSpec = { K_INTERFACE, ROLE_INDEX_DEFINITION,
-			     makeTagForInterfaceName } }
+	  { .makeTagSpec = { KIND_GHOST_INDEX, ROLE_INDEX_DEFINITION,
+			     makeTagForMainName,
+			     decideKindForMainName } }
 	},
 };
 
-enum dbusIntrospectXpathTable {
-	TABLE_MAIN, TABLE_INTERFACE, TABLE_MAIN_NAME,
+static tagXpathTable dbusIntrospectXpathRootTable [] = {
+	{ "/node",
+	  LXPATH_TABLE_DO_RECUR,
+	  { .recurSpec = { dbusIntrospectFindTagsUnderMain,
+					   TABLE_MAIN, } }
+	},
 };
 
 static tagXpathTableTable dbusIntrospectXpathTableTable[] = {
+	[TABLE_ROOT]      = { ARRAY_AND_SIZE (dbusIntrospectXpathRootTable)     },
 	[TABLE_MAIN]      = { ARRAY_AND_SIZE (dbusIntrospectXpathMainTable)     },
 	[TABLE_INTERFACE] = { ARRAY_AND_SIZE (dbusIntrospectXpathInterfaceTable)},
 	[TABLE_MAIN_NAME] = { ARRAY_AND_SIZE (dbusIntrospectXpathMainNameTable) },
+	[TABLE_ARG]       = { ARRAY_AND_SIZE (dbusIntrospectXpathArgTable)      },
 };
 
-static void dbusIntrospectFindTagsUnderInterface (xmlNode *node,
-						  const struct sTagXpathRecurSpec *spec CTAGS_ATTR_UNUSED,
+static void dbusIntrospectFindTagsUnderMain (xmlNode *node,
+						  const char *xpath,
+						  const struct sTagXpathRecurSpec *spec,
 						  xmlXPathContext *ctx,
-						  void *userData CTAGS_ATTR_UNUSED)
+						  void *userData)
 {
-	int corkIndex = CORK_NIL;
+	struct dbusIntrospectData *data = userData;
+	int scopeIndex = data->scopeIndex;
 
-	findXMLTags (ctx, node,
-		     dbusIntrospectXpathTableTable + TABLE_MAIN_NAME,
-		     DbusIntrospectKinds,
-		     &corkIndex);
-	findXMLTags (ctx, node,
-		     dbusIntrospectXpathTableTable + TABLE_INTERFACE,
-		     DbusIntrospectKinds,
-		     &corkIndex);
+	if (!strcmp(xpath, "interface"))
+		data->kindForName = K_INTERFACE;
+	else if (!strcmp (xpath, "method"))
+		data->kindForName = K_METHOD;
+	else if (!strcmp (xpath, "signal"))
+		data->kindForName = K_SIGNAL;
+	else if (!strcmp (xpath, "arg"))
+		data->kindForName = K_ARG;
+	else
+		data->kindForName = K_NODE;
+
+	findXMLTags (ctx, node, TABLE_MAIN_NAME, data);
+	if (spec->nextTable >= 0)
+		findXMLTags (ctx, node, spec->nextTable, data);
+	data->scopeIndex = scopeIndex;
 }
 
 static void makeTagWithScope (xmlNode *node CTAGS_ATTR_UNUSED,
+			      const char *xpath CTAGS_ATTR_UNUSED,
 			      const struct sTagXpathMakeTagSpec *spec CTAGS_ATTR_UNUSED,
 			      struct sTagEntryInfo *tag,
 			      void *userData)
 {
+	struct dbusIntrospectData *data = userData;
+
 	tag->extensionFields.scopeKindIndex = KIND_GHOST_INDEX;
 	tag->extensionFields.scopeName  = NULL;
-	tag->extensionFields.scopeIndex = *(int *)userData;
+	tag->extensionFields.scopeIndex = data->scopeIndex;
 
 	makeTagEntry (tag);
 }
 
-static void makeTagForInterfaceName (xmlNode *node CTAGS_ATTR_UNUSED,
+static void makeTagForMainName (xmlNode *node CTAGS_ATTR_UNUSED,
+				     const char *xpath CTAGS_ATTR_UNUSED,
 				     const struct sTagXpathMakeTagSpec *spec CTAGS_ATTR_UNUSED,
 				     struct sTagEntryInfo *tag,
 				     void *userData)
 {
-	int *corkIndex = userData;
+	struct dbusIntrospectData *data = userData;
 
-	*corkIndex = makeTagEntry (tag);
+	tag->extensionFields.scopeKindIndex = KIND_GHOST_INDEX;
+	tag->extensionFields.scopeName  = NULL;
+	tag->extensionFields.scopeIndex = data->scopeIndex;
+
+	data->scopeIndex = makeTagEntry (tag);
+}
+
+static int decideKindForMainName (xmlNode *node CTAGS_ATTR_UNUSED,
+			      const char *xpath CTAGS_ATTR_UNUSED,
+			      const struct sTagXpathMakeTagSpec *spec CTAGS_ATTR_UNUSED,
+			      void *userData)
+{
+	return ((struct dbusIntrospectData *)userData)->kindForName;
 }
 
 static void
 findDbusIntrospectTags (void)
 {
-	findXMLTags (NULL, NULL,
-		     dbusIntrospectXpathTableTable + TABLE_MAIN,
-		     DbusIntrospectKinds,
-		     NULL);
+	struct dbusIntrospectData data = {
+		.scopeIndex = CORK_NIL,
+		.kindForName = KIND_GHOST_INDEX,
+	};
+
+	findXMLTags (NULL, NULL, TABLE_ROOT, &data);
 }
 
 extern parserDefinition*
@@ -151,6 +223,20 @@ DbusIntrospectParser (void)
 			   <node ... */
 			.externalID = "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN",
 			.systemID   = "http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd",
+		},
+		{
+			.externalID = "-//freedesktop//DTD D-BUS Introspection 0.1//EN",
+			.systemID = "http://www.freedesktop.org/software/dbus/introspection.dtd",
+		},
+		/* TODO: the following rule is too strong; parsers may conflicts each other
+		 * when we implement more xpath based parsers. */
+		{
+			.rootElementName = "node",
+			.nameInDTD       = "",
+			.externalID      = "",
+			.systemID        = "",
+			.rootNSPrefix    = "",
+			.rootNSHref      = "",
 		},
 	};
 	def->kindTable         = DbusIntrospectKinds;

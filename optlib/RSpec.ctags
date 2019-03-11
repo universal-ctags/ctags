@@ -25,16 +25,16 @@
 # commit 76dbed4de88875d8c8409dfd65da4f94f901c94a
 # Author: Ram Singla <ram.singla@gmail.com>
 # Date:   Tue Jan 18 13:24:46 2011 +0800
-# 
+#
 #    RSpec Code added. Courtesy: mortice
 #
 --langdef=RSpec{base=Ruby}{shared}
-	--kinddef-RSpec=d,describe,describes
-	--kinddef-RSpec=c,context,contexts
-	--regex-RSpec=/^[ \t]*RSpec\.describe[ \t]+([^"']+)[ \t]+do/\1/d/
-	--regex-RSpec=/^[ \t]*describe[ \t]+"([^"]+)"[ \t]+do/\1/d/
-	--regex-RSpec=/^[ \t]*describe[ \t]+'([^']+)'[ \t]+do/\1/d/	
-	--regex-RSpec=/^[ \t]*describe[ \t]+([^"']+)[ \t]+do/\1/d/
-	--regex-RSpec=/^[ \t]*context[ \t]+"([^"]+)"[ \t]+do/\1/c/
-	--regex-RSpec=/^[ \t]*context[ \t]+'([^']+)'[ \t]+do/\1/c/	
-	--regex-RSpec=/^[ \t]*context[ \t]+([^"']+)[ \t]+do/\1/c/
+--kinddef-RSpec=d,describe,describes
+--kinddef-RSpec=c,context,contexts
+--regex-RSpec=/^[ \t]*RSpec\.describe[ \t]+([^"']+)[ \t]+do/\1/d/
+--regex-RSpec=/^[ \t]*describe[ \t]+"([^"]+)"[ \t]+do/\1/d/
+--regex-RSpec=/^[ \t]*describe[ \t]+'([^']+)'[ \t]+do/\1/d/
+--regex-RSpec=/^[ \t]*describe[ \t]+([^"']+)[ \t]+do/\1/d/
+--regex-RSpec=/^[ \t]*context[ \t]+"([^"]+)"[ \t]+do/\1/c/
+--regex-RSpec=/^[ \t]*context[ \t]+'([^']+)'[ \t]+do/\1/c/
+--regex-RSpec=/^[ \t]*context[ \t]+([^"']+)[ \t]+do/\1/c/

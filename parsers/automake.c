@@ -125,7 +125,7 @@ static int lookupAutomakeDirectory (hashTable* directories,  vString *const name
 
 static void addAutomakeDirectory (hashTable* directories, vString *const name, int corkIndex)
 {
-	char * k = eStrdup (vStringValue (name));
+	char * k = vStringStrdup (name);
 	int  * i = xMalloc (1, int);
 
 	*i = corkIndex;

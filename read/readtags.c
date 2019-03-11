@@ -356,15 +356,22 @@ static void parseExtensionFields (tagFile *const file, tagEntry *const entry,
 			{
 				const char *key = field;
 				const char *value = colon + 1;
+				const int key_len = colon - key;
 				*colon = '\0';
-				if (strcmp (key, "kind") == 0)
-					entry->kind = value;
-				else if (strcmp (key, "file") == 0)
-					entry->fileScope = 1;
-				else if (strcmp (key, "line") == 0)
-					entry->address.lineNumber = atol (value);
+				if (key_len == 4)
+				{
+					if (memcmp (key, "kind", 4) == 0)
+						entry->kind = value;
+					else if (memcmp (key, "file", 4) == 0)
+						entry->fileScope = 1;
+					else if (memcmp (key, "line", 4) == 0)
+						entry->address.lineNumber = atol (value);
+					else
+						goto normalField;
+				}
 				else
 				{
+				normalField:
 					if (entry->fields.count == file->fields.max)
 						growFields (file);
 					file->fields.list [entry->fields.count].key = key;

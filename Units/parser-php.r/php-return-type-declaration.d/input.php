@@ -48,6 +48,14 @@ namespace
         }
     }
 
+    class SubAT extends \A \ T
+    {
+        public function seventh() : parent
+        {
+            return $this;
+        }
+    }
+
     /* runtime test */
     $s = new SubTest;
     $t = $s->third();
@@ -56,4 +64,6 @@ namespace
     var_dump($s->fifth());
     $at = $s->fourth();
     var_dump($s->sixth($at));
+
+    var_dump((new SubAT)->seventh());
 }

@@ -1,0 +1,16 @@
+prop	input.js	/^var prop = 'foo';$/;"	v
+x	input.js	/^var x = 'c';$/;"	v
+y	input.js	/^var y = ['d', 'e'];$/;"	v
+['a' + y [0]]	input.js	/^    ['a' + y [0]]: {},$/;"	p	class:o
+a	input.js	/^    ['a']: {},			\/\/ Tagging$/;"	p	class:o
+['a' + 'b']	input.js	/^    ['a' + 'b']: {},		\/\/ Tagging whole    \\$/;"	p	class:o
+[x]	input.js	/^    [x]: {},			\/\/ expressions with \\$/;"	p	class:o
+['a' + x]	input.js	/^    ['a' + x]: {},        	\/\/ `[' and `]'$/;"	p	class:o
+o	input.js	/^var o = {$/;"	c
+Model	input.js	/^class Model {$/;"	c
+User	input.js	/^class User extends Model {$/;"	c
+tableName	input.js	/^  static get tableName() {$/;"	G	class:User
+json-schema	input.js	/^  static get ["json-schema"]() {$/;"	G	class:User
+subnum	input.js	/^		subnum: function (){}$/;"	m	class:p.[(1+2)*3]
+[(1+2)*3]	input.js	/^	[(1+2)*3]: {$/;"	c	class:p
+p	input.js	/^var p = {$/;"	c

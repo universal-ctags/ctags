@@ -180,6 +180,9 @@
     <ClCompile Include="..\optlib\ctags-optlib.c">
       <Filter>Source Files\optlib</Filter>
     </ClCompile>
+    <ClCompile Include="..\optlib\elixir.c">
+      <Filter>Source Files\optlib</Filter>
+    </ClCompile>
     <ClCompile Include="..\optlib\elm.c">
       <Filter>Source Files\optlib</Filter>
     </ClCompile>
@@ -202,6 +205,9 @@
       <Filter>Source Files\optlib</Filter>
     </ClCompile>
     <ClCompile Include="..\optlib\qemuhx.c">
+      <Filter>Source Files\optlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\optlib\systemtap.c">
       <Filter>Source Files\optlib</Filter>
     </ClCompile>
     <ClCompile Include="..\parsers\ada.c">
@@ -483,6 +489,9 @@
     <ClCompile Include="..\parsers\yumrepo.c">
       <Filter>Source Files\Parsers</Filter>
     </ClCompile>
+    <ClCompile Include="..\parsers\xml.c">
+      <Filter>Source Files\Parsers</Filter>
+    </ClCompile>
     <ClCompile Include="mkstemp\mkstemp.c">
       <Filter>Source Files\win32\mkstemp</Filter>
     </ClCompile>
@@ -525,6 +534,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\main\field.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\main\field_p.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\main\flags_p.h">

@@ -139,7 +139,7 @@ static bool qtMocParseProperty(void)
 		return false;
 	}
 
-	pszPropType = eStrdup (vStringValue (g_cxx.pToken->pszWord));
+	pszPropType = vStringStrdup (g_cxx.pToken->pszWord);
 	if(!cxxParserParseNextToken())
 	{
 		CXX_DEBUG_LEAVE_TEXT("EOF in cxxParserParseNextToken");
@@ -242,12 +242,14 @@ static bool unknownIdentifierInClassNotify (struct sCxxSubparser *pSubparser,
 	{
 	case KEYWORD_SIGNALS:
 		CXX_DEBUG_PRINT("Found \"signals\" QtMoc Keyword");
+		pToken->eType = CXXTokenTypeKeyword;
 		pToken->eKeyword = CXXKeywordPUBLIC;
 		cxxParserParseAccessSpecifier();
 		pQtMoc->eMemberMarker = QtMocMemberMarkerSignal;
 		return true;
 	case KEYWORD_SLOTS:
 		CXX_DEBUG_PRINT("Found \"slots\" QtMoc Keyword");
+		pToken->eType = CXXTokenTypeKeyword;
 		g_cxx.pToken->eKeyword = CXXKeywordPUBLIC; /* ??? */
 		cxxParserParseAccessSpecifier();
 		pQtMoc->eMemberMarker = QtMocMemberMarkerSlot;

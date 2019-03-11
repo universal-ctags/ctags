@@ -23,36 +23,43 @@
 #include <libxml/tree.h>
 
 static void simpleXpathMakeTag (xmlNode *node,
+				const char *xpath,
 				const tagXpathMakeTagSpec *spec,
-				const kindDefinition* const kinds,
 				void *userData)
 {
 	tagEntryInfo tag;
 	xmlChar* str;
 	char *path;
+	int kind;
 
 	str = xmlNodeGetContent(node);
 	if (str == NULL)
 		return;
 
+	if (spec->kind == KIND_GHOST_INDEX && spec->decideKind)
+		kind = spec->decideKind (node, xpath, spec, userData);
+	else
+		kind = spec->kind;
+	Assert (kind != KIND_GHOST_INDEX);
+
 	if (spec->role == ROLE_INDEX_DEFINITION)
-		initTagEntry (&tag, (char *)str, spec->kind);
+		initTagEntry (&tag, (char *)str, kind);
 	else if (isXtagEnabled(XTAG_REFERENCE_TAGS))
 		initRefTagEntry (&tag, (char *)str,
-				 spec->kind,
+				 kind,
 				 spec->role);
 	else
 		goto out;
 
 
-	tag.lineNumber = xmlGetLineNo (node);
+	tag.lineNumber = XML_GET_LINE (node);
 	tag.filePosition = getInputFilePositionForLine (tag.lineNumber);
 
 	path = (char *)xmlGetNodePath (node);
 	tag.extensionFields.xpath = path;
 
 	if (spec->make)
-		spec->make (node, spec, &tag, userData);
+		spec->make (node, xpath, spec, &tag, userData);
 	else
 		makeTagEntry (&tag);
 
@@ -73,9 +80,18 @@ extern void addTagXpath (const langType language CTAGS_ATTR_UNUSED, tagXpathTabl
 		error (WARNING, "Failed to compile the Xpath expression: %s", xpathTable->xpath);
 }
 
+extern void removeTagXpath (const langType language CTAGS_ATTR_UNUSED, tagXpathTable *xpathTable)
+{
+	if (xpathTable->xpathCompiled)
+	{
+		xmlXPathFreeCompExpr (xpathTable->xpathCompiled);
+		xpathTable->xpathCompiled = NULL;
+	}
+}
+
 static void findXMLTagsCore (xmlXPathContext *ctx, xmlNode *root,
 			     const tagXpathTableTable *xpathTableTable,
-			     const kindDefinition* const kinds,void *userData)
+			     void *userData)
 {
 	unsigned int i;
 	int j;
@@ -112,13 +128,13 @@ static void findXMLTagsCore (xmlXPathContext *ctx, xmlNode *root,
 
 		if (set)
 		{
-			for (j = 0; j < set->nodeNr; ++j)
+			for (j = 0; j < xmlXPathNodeSetGetLength (set); ++j)
 			{
-				node = set->nodeTab[j];
+				node = xmlXPathNodeSetItem(set, j);
 				if (elt->specType == LXPATH_TABLE_DO_MAKE)
-					simpleXpathMakeTag (node, &(elt->spec.makeTagSpec), kinds, userData);
+					simpleXpathMakeTag (node, elt->xpath, &(elt->spec.makeTagSpec), userData);
 				else
-					elt->spec.recurSpec.enter (node, &(elt->spec.recurSpec), ctx, userData);
+					elt->spec.recurSpec.enter (node, elt->xpath, &(elt->spec.recurSpec), ctx, userData);
 			}
 		}
 		xmlXPathFreeObject (object);
@@ -153,11 +169,15 @@ static xmlDocPtr makeXMLDoc (void)
 }
 
 extern void findXMLTags (xmlXPathContext *ctx, xmlNode *root,
-			 const tagXpathTableTable *xpathTableTable,
-			 const kindDefinition* const kinds,void *userData)
+			 int tableTableIndex,
+			 void *userData)
 {
 	bool usedAsEntryPoint = false;
 	xmlDocPtr doc = NULL;
+
+	const langType lang = getInputLanguage();
+	const tagXpathTableTable *xpathTableTable
+		= getXpathTableTable (lang, tableTableIndex);
 
 	if (ctx == NULL)
 	{
@@ -187,7 +207,7 @@ extern void findXMLTags (xmlXPathContext *ctx, xmlNode *root,
 		}
 	}
 
-	findXMLTagsCore (ctx, root, xpathTableTable, kinds, userData);
+	findXMLTagsCore (ctx, root, xpathTableTable, userData);
 
 out:
 	if (usedAsEntryPoint)
@@ -206,9 +226,13 @@ extern void addTagXpath (const langType language, tagXpathTable *xpathTable)
 	xpathTable->xpathCompiled = NULL;
 }
 
+extern void removeTagXpath (const langType language CTAGS_ATTR_UNUSED, tagXpathTable *xpathTable CTAGS_ATTR_UNUSED)
+{
+}
+
 extern void findXMLTags (xmlXPathContext *ctx, xmlNode *root,
-			 const tagXpathTableTable *xpathTableTable,
-			 const kindDefinition* const kinds, void *userData)
+			 int tableTableIndex,
+			 void *userData)
 {
 }
 

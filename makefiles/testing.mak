@@ -20,6 +20,7 @@ endif
 LANGUAGES=
 CATEGORIES=
 UNITS=
+PMAP=
 
 SILENT = $(SILENT_@AM_V@)
 SILENT_ = $(SILENT_@AM_DEFAULT_V@)
@@ -111,6 +112,7 @@ units: $(CTAGS_TEST)
 		--languages=$(LANGUAGES) \
 		--categories=$(CATEGORIES) \
 		--units=$(UNITS) \
+		--with-pretense-map=$(PMAP) \
 		$${VALGRIND} --run-shrink \
 		--with-timeout=`expr $(TIMEOUT) '*' 10`\
 		$${SHOW_DIFF_OUTPUT}"; \

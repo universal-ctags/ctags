@@ -41,13 +41,13 @@ extern parserDefinition* RSpecParser (void)
 		{"^[ \t]*describe[ \t]+\"([^\"]+)\"[ \t]+do", "\\1",
 		"d", NULL, NULL, false},
 		{"^[ \t]*describe[ \t]+'([^']+)'[ \t]+do", "\\1",
-		"d", "	", NULL, false},
+		"d", NULL, NULL, false},
 		{"^[ \t]*describe[ \t]+([^\"']+)[ \t]+do", "\\1",
 		"d", NULL, NULL, false},
 		{"^[ \t]*context[ \t]+\"([^\"]+)\"[ \t]+do", "\\1",
 		"c", NULL, NULL, false},
 		{"^[ \t]*context[ \t]+'([^']+)'[ \t]+do", "\\1",
-		"c", "	", NULL, false},
+		"c", NULL, NULL, false},
 		{"^[ \t]*context[ \t]+([^\"']+)[ \t]+do", "\\1",
 		"c", NULL, NULL, false},
 	};
@@ -66,11 +66,11 @@ extern parserDefinition* RSpecParser (void)
 	def->patterns      = patterns;
 	def->aliases       = aliases;
 	def->method        = METHOD_NOT_CRAFTED|METHOD_REGEX;
-	def->kindTable = RSpecKindTable;
-	def->kindCount = ARRAY_SIZE(RSpecKindTable);
+	def->kindTable     = RSpecKindTable;
+	def->kindCount     = ARRAY_SIZE(RSpecKindTable);
 	def->tagRegexTable = RSpecTagRegexTable;
 	def->tagRegexCount = ARRAY_SIZE(RSpecTagRegexTable);
-	def->dependencies = RSpecDependencies;
+	def->dependencies    = RSpecDependencies;
 	def->dependencyCount = ARRAY_SIZE(RSpecDependencies);
 	def->initialize    = initializeRSpecParser;
 

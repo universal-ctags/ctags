@@ -1,0 +1,9 @@
+x	input.go	/^var x, y, z int$/;"	v	typeref:typename:int
+y	input.go	/^var x, y, z int$/;"	v	typeref:typename:int
+z	input.go	/^var x, y, z int$/;"	v	typeref:typename:int
+a	input.go	/^	a, b int$/;"	v	typeref:typename:int
+b	input.go	/^	a, b int$/;"	v	typeref:typename:int
+n	input.go	/^	n = 0$/;"	v
+s	input.go	/^	s string$/;"	v	typeref:typename:string
+i	input.go	/^	i interface{}$/;"	v	typeref:typename:interface{}
+c	input.go	/^const c int$/;"	c	typeref:typename:int

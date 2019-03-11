@@ -1,0 +1,36 @@
+# root sep and wildcard
+M	input.tcl	/^namespace eval M {$/;"	n
+/M	input.tcl	/^namespace eval M {$/;"	n
+N	input.tcl	/^    namespace eval N {$/;"	n	namespace:/M
+/M+N	input.tcl	/^    namespace eval N {$/;"	n	namespace:/M
+p0	input.tcl	/^	proc p0 {s} {$/;"	p	namespace:/M+N
+/M+N+p0	input.tcl	/^	proc p0 {s} {$/;"	p	namespace:/M+N
+p1	input.tcl	/^proc p1 {s} {$/;"	p
+/p1	input.tcl	/^proc p1 {s} {$/;"	p
+# override wildcard
+M	input.tcl	/^namespace eval M {$/;"	n
+/M	input.tcl	/^namespace eval M {$/;"	n
+N	input.tcl	/^    namespace eval N {$/;"	n	namespace:/M
+/M->N	input.tcl	/^    namespace eval N {$/;"	n	namespace:/M
+p0	input.tcl	/^	proc p0 {s} {$/;"	p	namespace:/M->N
+/M->N^p0	input.tcl	/^	proc p0 {s} {$/;"	p	namespace:/M->N
+p1	input.tcl	/^proc p1 {s} {$/;"	p
+/p1	input.tcl	/^proc p1 {s} {$/;"	p
+# override rootsep
+M	input.tcl	/^namespace eval M {$/;"	n
+@M	input.tcl	/^namespace eval M {$/;"	n
+N	input.tcl	/^    namespace eval N {$/;"	n	namespace:@M
+@M+N	input.tcl	/^    namespace eval N {$/;"	n	namespace:@M
+p0	input.tcl	/^	proc p0 {s} {$/;"	p	namespace:@M+N
+@M+N+p0	input.tcl	/^	proc p0 {s} {$/;"	p	namespace:@M+N
+p1	input.tcl	/^proc p1 {s} {$/;"	p
+%p1	input.tcl	/^proc p1 {s} {$/;"	p
+# no default
+M	input.tcl	/^namespace eval M {$/;"	n
+@M	input.tcl	/^namespace eval M {$/;"	n
+N	input.tcl	/^    namespace eval N {$/;"	n	namespace:@M
+@M->N	input.tcl	/^    namespace eval N {$/;"	n	namespace:@M
+p0	input.tcl	/^	proc p0 {s} {$/;"	p	namespace:@M->N
+@M->N^p0	input.tcl	/^	proc p0 {s} {$/;"	p	namespace:@M->N
+p1	input.tcl	/^proc p1 {s} {$/;"	p
+%p1	input.tcl	/^proc p1 {s} {$/;"	p

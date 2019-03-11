@@ -1,0 +1,9 @@
+main	input.go	/^package main$/;"	p
+f0	input.go	/^func f0(nums...int) {$/;"	f	package:main	signature:(nums ...int)
+f1	input.go	/^func f1(nums  ...	interface{}) {$/;"	f	package:main	signature:(nums ...interface{})
+f10	input.go	/^func f10(nums...	interface{}) {$/;"	f	package:main	signature:(nums ...interface{})
+f11	input.go	/^func f11(nums  ...interface{}) {$/;"	f	package:main	signature:(nums ...interface{})
+f2	input.go	/^func f2(o int, nums ...int) {$/;"	f	package:main	signature:(o int, nums ...int)
+f3	input.go	/^func f3(o int, nums...  \/* ... *\/		int) {$/;"	f	package:main	signature:(o int, nums ...int)
+f4	input.go	/^func f4(o              int,          p   int) {$/;"	f	package:main	signature:(o int, p int)
+main	input.go	/^func main() {$/;"	f	package:main	signature:()

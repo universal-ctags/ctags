@@ -1,0 +1,22 @@
+#
+# sharp Comment
+#
+@define m0
+%(
+  0
+%)
+
+/* 
+ * C comment 
+ */
+@define m1(a0) %(
+    @a0
+%)
+
+//
+// C++  comment
+//
+@define m2(a1,
+	   a2) %(
+ %( @a1 + @a2 %)
+%)

@@ -15,12 +15,14 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "colprint_p.h"
 #include "ctags.h"
 #include "debug.h"
 #include "entry.h"
 #include "kind.h"
 #include "parse_p.h"
 #include "options.h"
+#include "ptrarray.h"
 #include "routines.h"
 #include "vstring.h"
 
@@ -39,12 +41,15 @@ typedef struct sKindObject {
 	kindDefinition *def;
 	freeKindDefFunc free;
 	struct roleControlBlock *rcb;
+	ptrArray * dynamicSeparators;
 } kindObject;
 
 struct kindControlBlock {
 	kindObject *kind;
 	unsigned int count;
 	langType owner;
+	scopeSeparator defaultScopeSeparator;
+	scopeSeparator defaultRootScopeSeparator;
 };
 
 extern const char *renderRole (const roleDefinition* const role, vString* b)
@@ -59,39 +64,6 @@ extern void printKind (const kindDefinition* const kind, bool indent)
 			kind->description != NULL ? kind->description :
 			(kind->name != NULL ? kind->name : ""),
 			kind->enabled ? "" : " [off]");
-}
-
-const char *scopeSeparatorFor (langType lang, int kindIndex, int parentKindIndex)
-{
-	kindDefinition *kind = getLanguageKind (lang, kindIndex);
-	scopeSeparator *table = kind->separators;
-
-	/* If no table is given, use the default generic separator ".".
-	   The exception is if a root separator is looked up. In this case,
-	   return NULL to notify there is no root separator to the caller. */
-
-	if (table == NULL)
-	{
-		if (parentKindIndex == KIND_GHOST_INDEX)
-			return NULL;
-		else
-			return ".";
-	}
-
-	while (table - kind->separators < (int)kind->separatorCount)
-	{
-		/* KIND_WILDCARD cannot be used as a key for finding
-		   a root separator.*/
-		if ( (table->parentKindIndex == KIND_WILDCARD_INDEX
-		       && parentKindIndex != KIND_GHOST_INDEX)
-		    || table->parentKindIndex == parentKindIndex)
-			return table->separator;
-		table++;
-	}
-	if (parentKindIndex == KIND_GHOST_INDEX)
-		return NULL;
-	else
-		return ".";
 }
 
 extern void enableKind (kindDefinition *kind, bool enable)
@@ -138,6 +110,16 @@ extern struct kindControlBlock* allocKindControlBlock (parserDefinition *parser)
 	kcb->count = parser->kindCount;
 	kcb->owner = parser->id;
 
+	kcb->defaultScopeSeparator.parentKindIndex = KIND_WILDCARD_INDEX;
+	kcb->defaultScopeSeparator.separator = NULL;
+	if (parser->defaultScopeSeparator)
+		kcb->defaultScopeSeparator.separator = eStrdup (parser->defaultScopeSeparator);
+
+	kcb->defaultRootScopeSeparator.parentKindIndex = KIND_GHOST_INDEX;
+	kcb->defaultRootScopeSeparator.separator = NULL;
+	if (parser->defaultRootScopeSeparator)
+		kcb->defaultRootScopeSeparator.separator = eStrdup (parser->defaultRootScopeSeparator);
+
 	for (i = 0; i < parser->kindCount; ++i)
 	{
 		kindObject *kind = kcb->kind + i;
@@ -145,6 +127,7 @@ extern struct kindControlBlock* allocKindControlBlock (parserDefinition *parser)
 		kind->free = NULL;
 		kind->def->id = i;
 		kind->rcb = allocRoleControlBlock (kind);
+		kind->dynamicSeparators = NULL;
 	}
 
 	return kcb;
@@ -171,7 +154,15 @@ extern void freeKindControlBlock (struct kindControlBlock* kcb)
 		if (kcb->kind [i].free)
 			kcb->kind [i].free (kcb->kind [i].def);
 		freeRoleControlBlock (kcb->kind [i].rcb);
+		if (kcb->kind [i].dynamicSeparators)
+			ptrArrayDelete(kcb->kind [i].dynamicSeparators);
 	}
+
+	if (kcb->defaultRootScopeSeparator.separator)
+		eFree((char *)kcb->defaultRootScopeSeparator.separator);
+	if (kcb->defaultScopeSeparator.separator)
+		eFree((char *)kcb->defaultScopeSeparator.separator);
+
 	eFree (kcb->kind);
 	eFree (kcb);
 }
@@ -184,6 +175,7 @@ extern int  defineKind (struct kindControlBlock* kcb, kindDefinition *def,
 	kcb->kind [def->id].def = def;
 	kcb->kind [def->id].free = freeKindDef;
 	kcb->kind [def->id].rcb = allocRoleControlBlock(kcb->kind + def->id);
+	kcb->kind [def->id].dynamicSeparators = NULL;
 
 	verbose ("Add kind[%d] \"%c,%s,%s\" to %s\n", def->id,
 			 def->letter, def->name, def->description,
@@ -330,6 +322,142 @@ extern void linkKindDependency (struct kindControlBlock *masterKCB,
 				}
 			}
 		}
+	}
+}
+
+static void scopeSeparatorDelete (void *data)
+{
+	scopeSeparator *sep = data;
+	eFree ((void *)sep->separator);
+	sep->separator = NULL;
+	eFree (sep);
+}
+
+extern int defineScopeSeparator(struct kindControlBlock* kcb,
+								int kindIndex,
+								int parentKindIndex, const char *separator)
+{
+	if (kindIndex == KIND_WILDCARD_INDEX)
+	{
+		if (parentKindIndex == KIND_WILDCARD_INDEX)
+		{
+			if (kcb->defaultScopeSeparator.separator)
+				eFree ((char *)kcb->defaultScopeSeparator.separator);
+			verbose ("Installing default separator for %s: %s\n",
+					 getLanguageName (kcb->owner), separator);
+			kcb->defaultScopeSeparator.separator = eStrdup (separator);
+		}
+		else if (parentKindIndex == KIND_GHOST_INDEX)
+		{
+			if (kcb->defaultRootScopeSeparator.separator)
+				eFree ((char *)kcb->defaultRootScopeSeparator.separator);
+			verbose ("Installing default root separator for %s: %s\n",
+					 getLanguageName (kcb->owner),
+					 separator);
+			kcb->defaultRootScopeSeparator.separator = eStrdup (separator);
+		}
+		else
+			error (FATAL,
+				   "Don't specify a real kind as parent when defining a default scope separator: %d",
+				   parentKindIndex);
+		return 0;
+	}
+	Assert (kcb->count > kindIndex);
+	kindObject *kind = kcb->kind + kindIndex;
+
+	if (!kind->dynamicSeparators)
+		kind->dynamicSeparators = ptrArrayNew (scopeSeparatorDelete);
+
+	scopeSeparator *sep = xMalloc (1, scopeSeparator);
+	sep->parentKindIndex = parentKindIndex;
+	sep->separator = eStrdup(separator);
+	ptrArrayAdd (kind->dynamicSeparators, sep);
+
+	return 0;
+}
+
+static scopeSeparator *getScopeSeparatorDynamic(kindObject *kobj, int parentKindIndex)
+{
+	scopeSeparator *sep;
+
+	if (kobj->dynamicSeparators)
+	{
+		for (unsigned int i = ptrArrayCount (kobj->dynamicSeparators); 0 < i ; i--)
+		{
+			sep = ptrArrayItem (kobj->dynamicSeparators, i - 1);
+			if (sep->parentKindIndex == parentKindIndex)
+				return sep;
+		}
+	}
+	return NULL;
+}
+
+static const scopeSeparator *getScopeSeparatorStatic(kindDefinition *kdef, int parentKindIndex)
+{
+	scopeSeparator *table = kdef->separators;
+
+	if (table == NULL)
+		return NULL;
+
+	while (table - kdef->separators < (int)kdef->separatorCount)
+	{
+		if (table->parentKindIndex == parentKindIndex)
+			return table;
+
+		/* If a caller wants a root separator for kdef,
+		   we should not return a wildcard table. */
+		if (parentKindIndex != KIND_GHOST_INDEX
+			&& table->parentKindIndex == KIND_WILDCARD_INDEX)
+			return table;
+
+		table++;
+	}
+
+	return NULL;
+}
+
+extern const scopeSeparator *getScopeSeparator(struct kindControlBlock* kcb,
+											   int kindIndex, int parentKindIndex)
+{
+	Assert (kindIndex != KIND_GHOST_INDEX);
+	Assert (kindIndex != KIND_FILE_INDEX);
+	Assert (kindIndex != KIND_WILDCARD_INDEX);
+
+	Assert (parentKindIndex != KIND_WILDCARD_INDEX);
+	Assert (parentKindIndex != KIND_FILE_INDEX);
+	/* A caller specifies KIND_GHOST_INDEX for parentKindIndex when it
+	 * wants root separator. */
+
+	Assert (kcb->count > kindIndex);
+	kindObject *kobj = kcb->kind + kindIndex;
+	const scopeSeparator *sep;
+
+	sep = getScopeSeparatorDynamic (kobj, parentKindIndex);
+	if (sep)
+		return sep;
+
+	sep = getScopeSeparatorStatic (kobj->def, parentKindIndex);
+	if (sep)
+		return sep;
+
+	/* Cannot find a sitable sep definition.
+	 * Use default one. */
+	if (parentKindIndex == KIND_GHOST_INDEX)
+	{
+		if (kcb->defaultRootScopeSeparator.separator)
+			return &kcb->defaultRootScopeSeparator;
+		return NULL;
+	}
+	else
+	{
+		if (kcb->defaultScopeSeparator.separator)
+			return &kcb->defaultScopeSeparator;
+
+		static scopeSeparator defaultSeparator = {
+			.separator = ".",
+			.parentKindIndex = KIND_WILDCARD_INDEX,
+		};
+		return &defaultSeparator;
 	}
 }
 

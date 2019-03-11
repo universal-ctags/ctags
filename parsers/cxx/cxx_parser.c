@@ -1545,6 +1545,16 @@ bool cxxParserParseAccessSpecifier(void)
 {
 	CXX_DEBUG_ENTER();
 
+	CXX_DEBUG_ASSERT(
+			cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeKeyword) &&
+			(
+				(g_cxx.pToken->eKeyword == CXXKeywordPUBLIC) ||
+				(g_cxx.pToken->eKeyword == CXXKeywordPROTECTED) ||
+				(g_cxx.pToken->eKeyword == CXXKeywordPRIVATE)
+			),
+			"This must be called just after parinsg public/protected/private"
+		);
+
 	unsigned int uExtraType = 0;
 
 	enum CXXScopeType eScopeType = cxxScopeGetType();
@@ -1569,33 +1579,34 @@ bool cxxParserParseAccessSpecifier(void)
 
 		if(!g_cxx.bConfirmedCPPLanguage)
 		{
-			CXX_DEBUG_LEAVE_TEXT("C++ language is not confirmed: we try to be flexible and not bail out");
+			CXX_DEBUG_LEAVE_TEXT("C++ is not confirmed and the scope is not right: likely not access specifier");
+			g_cxx.pToken->eType = CXXTokenTypeIdentifier;
 			return true;
 		}
+
 		// this is a syntax error: we're in the wrong scope.
 		CXX_DEBUG_LEAVE_TEXT("C++ language is confirmed: bailing out to avoid reporting broken structure");
 		return false;
 	}
 
+	if(!g_cxx.bConfirmedCPPLanguage)
+	{
+		if(g_cxx.pToken->pPrev)
+		{
+			// ugly, there is something before the public/private/protected keyword.
+			// This is likely a type or something else.
+			CXX_DEBUG_LEAVE_TEXT(
+					"C++ is not confirmed and there is something before: likely not access specifier"
+				);
+			g_cxx.pToken->eType = CXXTokenTypeIdentifier;
+			return true;
+		}
+	}
 
 	if (cxxSubparserNotifyParseAccessSpecifier (pSubparsers))
 		uExtraType = CXXTokenTypeIdentifier;
 
-	switch(g_cxx.pToken->eKeyword)
-	{
-		case CXXKeywordPUBLIC:
-			cxxScopeSetAccess(CXXScopeAccessPublic);
-		break;
-		case CXXKeywordPRIVATE:
-			cxxScopeSetAccess(CXXScopeAccessPrivate);
-		break;
-		case CXXKeywordPROTECTED:
-			cxxScopeSetAccess(CXXScopeAccessProtected);
-		break;
-		default:
-			CXX_DEBUG_ASSERT(false,"Bad keyword in cxxParserParseAccessSpecifier!");
-		break;
-	}
+	CXXToken * pInitialToken = g_cxx.pToken;
 
 	// skip to the next :, without leaving scope.
  findColon:
@@ -1616,6 +1627,31 @@ bool cxxParserParseAccessSpecifier(void)
 		cxxSubparserNotifyfoundExtraIdentifierAsAccessSpecifier (pSubparsers,
 																 g_cxx.pToken);
 		goto findColon;
+	}
+
+	if(cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeSingleColon))
+	{
+		if(!pInitialToken->pPrev)
+		{
+			CXX_DEBUG_PRINT("The access specifier was the first token and I have found a colon: this is C++");
+			g_cxx.bConfirmedCPPLanguage = true;
+		}
+	}
+
+	switch(pInitialToken->eKeyword)
+	{
+		case CXXKeywordPUBLIC:
+			cxxScopeSetAccess(CXXScopeAccessPublic);
+		break;
+		case CXXKeywordPRIVATE:
+			cxxScopeSetAccess(CXXScopeAccessPrivate);
+		break;
+		case CXXKeywordPROTECTED:
+			cxxScopeSetAccess(CXXScopeAccessProtected);
+		break;
+		default:
+			CXX_DEBUG_ASSERT(false,"Bad keyword in cxxParserParseAccessSpecifier!");
+		break;
 	}
 
 	cxxTokenChainClear(g_cxx.pTokenChain);

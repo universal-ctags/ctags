@@ -1,0 +1,120 @@
+#
+# Taken from /usr/share/systemtap/tapset/regex.stp and registers.stp
+#
+// Regular expression subexpression tapset
+// Copyright (C) 2017 Serhei Makarov
+// Copyright (C) 2013 Red Hat, Inc.
+//
+// This file is part of systemtap, and is free software.  You can
+// redistribute it and/or modify it under the terms of the GNU General
+// Public License (GPL); either version 2, or (at your option) any
+// later version.
+
+%{
+#define STAP_NEED_CONTEXT_SUBEXPRESSION 1
+%}
+
+/**
+ * sfunction matched_str - Return the last matched string.
+ *
+ * Description: returns the string matched by the last successful
+ * use of the =~ regexp matching operator. Returns an error if the
+ * last use of =~ led to a failed match.
+ */
+function matched_str:string() { return matched(0) }
+
+/**
+ * sfunction matched - Return a given matched subexpression.
+ *
+ * @n: index to the subexpression to return. 0 corresponds to the
+ * entire regular expression.
+ *
+ * Description: returns the content of the n'th subexpression of the
+ * last successful use of the =~ regex matching operator. Returns an
+ * empty string if the n'th subexpression was not matched (e.g. due to
+ * alternation). Throws an error if the last use of =~ was a failed
+ * match, or if fewer than n subexpressions are present in the
+ * original regexp.
+ */
+function matched:string(n:long)
+%{ /* pure */ /* unprivileged */ /* pragma:tagged_dfa */
+  int start_ix, end_ix; // indices into tag buffer
+  int start, end, length; // actual coordinate values
+
+  if (!CONTEXT->last_match.result) {
+    snprintf(CONTEXT->error_buffer, sizeof(CONTEXT->error_buffer),
+             "Attempted to get subexpression %lld from failed match", (long long) STAP_ARG_n);
+    CONTEXT->last_error = CONTEXT->error_buffer;
+  }
+
+  start_ix = 2 * STAP_ARG_n, end_ix = start_ix + 1;
+
+  if (end_ix >= CONTEXT->last_match.num_final_tags) {
+    snprintf(CONTEXT->error_buffer, sizeof(CONTEXT->error_buffer),
+             "Attempted to get nonexistent subexpression %lld", (long long) STAP_ARG_n);
+    CONTEXT->last_error = CONTEXT->error_buffer;
+  }
+
+  start = CONTEXT->last_match.tag_vals[start_ix];
+  end = CONTEXT->last_match.tag_vals[end_ix];
+  // _stp_printf ("**DEBUG** Extracted subexpression #%lld:(%d,%d) from %d to %d\n", STAP_ARG_n, start_ix, end_ix, start, end);
+
+  if (start < 0 || end < 0) {
+    // If indices are negative, the group was not matched. Return empty string:
+    start = end = 0;
+    // snprintf(CONTEXT->error_buffer, sizeof(CONTEXT->error_buffer),
+    //          "Unknown coordinates for subexpression %lld", STAP_ARG_n);
+    // CONTEXT->last_error = CONTEXT->error_buffer;
+  }
+
+  if (start > end) {
+    // This should not happen.
+    snprintf(CONTEXT->error_buffer, sizeof(CONTEXT->error_buffer),
+             "BUG: inverted coordinates for subexpression %lld", (long long) STAP_ARG_n);
+    CONTEXT->last_error = CONTEXT->error_buffer;
+  }
+
+  length = end - start;
+
+  // TODOXXX assert (start <= strlen(matched_str)) ??
+  // XXX: Must add 1 to length to account for NUL byte in strlcpy().
+  strlcpy(STAP_RETVALUE, CONTEXT->last_match.matched_str + start, length + 1);
+%}
+
+/**
+ * sfunction ngroups - Number of subexpressions in the last match.
+ *
+ * Description: returns the number of subexpressions from the
+ * last successful use of the =~ regex matching operator.
+ *
+ * Note that this number includes subexpressions which are present in
+ * the regex but did not match any string; for example, given the
+ * regex "a|(b)", the subexpressions will count the group for (b)
+ * regardless of whether it matched a string or not. Throws an error
+ * if the last use of =~ was a failed match.
+ */
+function ngroups:long()
+%{ /* pure */ /* unprivileged */ /* pragma:tagged_dfa */
+  if (!CONTEXT->last_match.result) {
+    snprintf(CONTEXT->error_buffer, sizeof(CONTEXT->error_buffer),
+             "Attempted to get subexpression count from failed match");
+    CONTEXT->last_error = CONTEXT->error_buffer;
+  }
+
+  STAP_RETVALUE = CONTEXT->last_match.num_final_tags / 2;
+%}
+
+// XXX: perhaps implement matched_start, matched_end to get indices?
+// XXX: some kind of find-replace functionality?
+// XXX: some kind of splitting / multiple-match functionality?
+
+/*
+ * In nd_syscall.return probes, we sometimes need @entry() values. To
+ * ensure we get the argument in the correct mode, we need a function
+ * that calls asmlinkage() first.
+ */
+function __asmlinkage_int_arg:long(n:long)
+{
+	asmlinkage()
+	return int_arg(n)
+}

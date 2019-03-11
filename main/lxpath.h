@@ -32,17 +32,28 @@
 */
 
 typedef struct sTagXpathMakeTagSpec {
+	/* Kind used in making a tag.
+	   If kind is KIND_GHOST_INDEX, a function
+	   specified with decideKind is called to decide
+	   the kind for the tag. */
 	int   kind;
 	int   role;
 	/* If make is NULL, just makeTagEntry is used instead. */
 	void (*make) (xmlNode *node,
+		      const char *xpath,
 		      const struct sTagXpathMakeTagSpec *spec,
 		      tagEntryInfo *tag,
 		      void *userData);
+	int (*decideKind) (xmlNode *node,
+		      const char *xpath,
+		      const struct sTagXpathMakeTagSpec *spec,
+		      void *userData);
+	/* TODO: decideRole */
 } tagXpathMakeTagSpec;
 
 typedef struct sTagXpathRecurSpec {
 	void (*enter) (xmlNode *node,
+		       const char *xpath,
 		       const struct sTagXpathRecurSpec *spec,
 		       xmlXPathContext *ctx,
 		       void *userData);
@@ -88,7 +99,7 @@ typedef struct sXpathFileSpec {
 
 /* Xpath interface */
 extern void findXMLTags (xmlXPathContext *ctx, xmlNode *root,
-			 const tagXpathTableTable *xpathTableTable,
-			 const kindDefinition* const kinds, void *userData);
+			 int tableTableIndex,
+			 void *userData);
 
 #endif  /* CTAGS_LXPATH_PARSE_H */

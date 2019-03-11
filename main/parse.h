@@ -101,6 +101,10 @@ struct sParserDefinition {
 	xpathFileSpec *xpathFileSpecs;
 	unsigned int xpathFileSpecCount;
 
+	/* Following two fields are used in a parser using cork. */
+	const char *defaultScopeSeparator;
+	const char *defaultRootScopeSeparator;
+
 	/* used internally */
 	langType id;		    /* id assigned to language */
 	unsigned int enabled:1;	       /* currently enabled? */
@@ -154,6 +158,7 @@ extern void addLanguageTagMultiTableRegex(const langType language,
 										  bool *disabled);
 
 extern void anonGenerate (vString *buffer, const char *prefix, int kind);
+extern vString *anonGenerateNew (const char *prefix, int kind);
 extern void anonHashString (const char *filename, char buf[9]);
 
 #endif  /* CTAGS_MAIN_PARSE_H */

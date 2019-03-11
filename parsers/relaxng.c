@@ -34,15 +34,18 @@ enum relaxngXpathTable {
 };
 
 static void relaxngMakeAndFindTagsUnderElement (xmlNode *node,
+						const char *xpath,
 						const struct sTagXpathRecurSpec *spec,
 						xmlXPathContext *ctx,
 						void *userData);
 static void relaxngMakeAndFindTagsUnderDefine (xmlNode *node,
+					       const char *xpath,
 					       const struct sTagXpathRecurSpec *spec,
 					       xmlXPathContext *ctx,
 					       void *userData);
 
 static void relaxngFindTags (xmlNode *node,
+			     const char *xpath,
 			     const struct sTagXpathRecurSpec *spec,
 			     xmlXPathContext *ctx,
 			     void *userData);
@@ -60,6 +63,7 @@ static tagXpathTable relaxngXpathMainTable [] = {
 };
 
 static void makeTagWithScope (xmlNode *node,
+			      const char *xpath,
 			      const struct sTagXpathMakeTagSpec *spec,
 			      struct sTagEntryInfo *tag,
 			      void *userData);
@@ -82,6 +86,7 @@ static tagXpathTable relaxngXpathPatternTable [] = {
 
 
 static void makeTagWithUpdatingScope (xmlNode *node,
+				      const char *xpath,
 				      const struct sTagXpathMakeTagSpec *spec,
 				      struct sTagEntryInfo *tag,
 				      void *userData);
@@ -124,6 +129,7 @@ static tagXpathTableTable relaxngXpathTableTable[] = {
 
 static void
 relaxngMakeAndFindTags(xmlNode *node,
+		       const char *xpath,
 		       const struct sTagXpathRecurSpec *spec,
 		       xmlXPathContext *ctx,
 		       int nextTable,
@@ -131,44 +137,41 @@ relaxngMakeAndFindTags(xmlNode *node,
 {
 	int corkIndex = *(int *)userData;
 
-	findXMLTags (ctx, node,
-		     relaxngXpathTableTable + nextTable,
-		     RelaxNGKinds,
-		     &corkIndex);
+	findXMLTags (ctx, node, nextTable, &corkIndex);
 
-	relaxngFindTags (node, spec, ctx, &corkIndex);
+	relaxngFindTags (node, xpath, spec, ctx, &corkIndex);
 }
 
 static void
 relaxngMakeAndFindTagsUnderElement (xmlNode *node,
+				    const char *xpath,
 				    const struct sTagXpathRecurSpec *spec,
 				    xmlXPathContext *ctx,
 				    void *userData)
 {
-	relaxngMakeAndFindTags (node, spec, ctx, TABLE_ELEMENT_NAME, userData);
+	relaxngMakeAndFindTags (node, xpath, spec, ctx, TABLE_ELEMENT_NAME, userData);
 }
 
 static void
 relaxngMakeAndFindTagsUnderDefine (xmlNode *node,
+				   const char *xpath,
 				   const struct sTagXpathRecurSpec *spec,
 				   xmlXPathContext *ctx,
 				   void *userData)
 {
-	relaxngMakeAndFindTags (node, spec, ctx, TABLE_DEFINE_NAME, userData);
+	relaxngMakeAndFindTags (node, xpath, spec, ctx, TABLE_DEFINE_NAME, userData);
 }
 
 static void
 relaxngFindTags (xmlNode *node,
+		 const char *xpath CTAGS_ATTR_UNUSED,
 		 const struct sTagXpathRecurSpec *spec,
 		 xmlXPathContext *ctx,
 		 void *userData)
 {
 	int corkIndex = *(int *)userData;
 
-	findXMLTags (ctx, node,
-		     relaxngXpathTableTable + spec->nextTable,
-		     RelaxNGKinds,
-		     &corkIndex);
+	findXMLTags (ctx, node, spec->nextTable, &corkIndex);
 }
 
 static void
@@ -182,6 +185,7 @@ setScope (struct sTagEntryInfo *tag, int index)
 
 static void
 makeTagWithUpdatingScope (xmlNode *node CTAGS_ATTR_UNUSED,
+			  const char *xpath CTAGS_ATTR_UNUSED,
 			  const struct sTagXpathMakeTagSpec *spec CTAGS_ATTR_UNUSED,
 			  struct sTagEntryInfo *tag,
 			  void *userData)
@@ -206,14 +210,12 @@ findRelaxNGTags (void)
 {
 	int corkIndex = CORK_NIL;
 
-	findXMLTags (NULL, NULL,
-		     relaxngXpathTableTable + TABLE_MAIN,
-		     RelaxNGKinds,
-		     &corkIndex);
+	findXMLTags (NULL, NULL, TABLE_MAIN, &corkIndex);
 }
 
 static void
 makeTagWithScope (xmlNode *node CTAGS_ATTR_UNUSED,
+		  const char *xpath CTAGS_ATTR_UNUSED,
 		  const struct sTagXpathMakeTagSpec *spec CTAGS_ATTR_UNUSED,
 		  struct sTagEntryInfo *tag,
 		  void *userData)
