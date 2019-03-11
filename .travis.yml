@@ -64,7 +64,7 @@ after_success:
                     sed -i -e 's/severity.capitalize!/severity = severity.capitalize/' $f
             done
         ) || :
-        (cd linux-gcc-gcov; lcov -c -b . -d . -o coverage.info && lcoveralls --root . --retry-count 5 coverage.info)
+        lcov -c -b . -d . -o coverage.info && lcoveralls --root . --retry-count 5 coverage.info
     fi
 
 # Build Matrix configuration

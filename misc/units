@@ -430,7 +430,7 @@ prepare_bundles ()
 		;;
 	    *)
 		dist="${to}/$(basename ${src})"
-		if ! cp -a "${src}" "${to}"; then
+		if ! cp -ar "${src}" "${to}"; then
 		    ERROR 1 "failure in copying bundle file \"${src}\" to \"${to}\""
 		else
 		    echo ${dist} >> ${obundles}
