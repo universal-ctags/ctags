@@ -66,3 +66,39 @@ class Point {
   public length() { return Math.sqrt(this.x * this.x + this.y * this.y); }
   static origin = new Point(0, 0);
 }
+
+class A {
+  private x: number;
+  protected y: number;
+  public fun: (a: 22 | 30, b: CPoint) => number | string;
+
+  static f(a: A, b: B) {
+    a.x = 1; // Ok
+    b.x = 1; // Ok
+    a.y = 1; // Ok
+    b.y = 1; // Ok
+  }
+
+  getXAsT<T = any>(): T {
+    return this.x as T;
+  }
+
+  register(...args) {
+    return this.f(...args);
+  }
+
+  longArgsFun(options: {
+    root: string;
+    prefix?: string;
+    setHeaders?: Function;
+    send?: any;
+  }) {
+    return this.f(options);
+  }
+
+  closure(
+    x: number,
+  ): (path: string, callback: Function) => any {
+    const normalizedPath = path === '/*' ? '' : path;
+  }
+}
