@@ -362,8 +362,7 @@ sub extend_table {
 
 sub parse_kinds {
     my ($kinds, $opts) = @_;
-    for (split //, $kinds) {
-	my $letter = $_;
+    for my $letter (split //, $kinds) {
 	for (@{$opts->{'kinddefs'}}) {
 	    if ($_->{'letter'} eq $letter) {
 		$_->{'enabled'} = 0;
@@ -520,8 +519,7 @@ EOF
 
       print "\n";
 
-      for (@{$opts->{'tablenames'}}) {
-	my $table = $_;
+      for my $table (@{$opts->{'tablenames'}}) {
 	for (@{$opts->{'tabledefs'}->{"$table"}}) {
 	  print <<EOF;
 	addLanguageTagMultiTableRegex (language, "$table",
@@ -573,9 +571,7 @@ sub escape_dquotes {
     my $input = shift;
     my $output = "";
 
-    my $c;
-
-    foreach $c (split //, $input) {
+    for my $c (split //, $input) {
 	if ($c eq '"') {
 	    $output = $output . '\\' . '"';
 	} else {
