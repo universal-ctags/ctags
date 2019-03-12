@@ -36,25 +36,25 @@
 	 (c) >= 0x80)
 
 #define PARSER_DEF(fname, pfun, word, stype) \
-	inline static void parse ## fname (const int c, tokenInfo * const token, void *state, parserResult * const result) \
+	__inline static void parse ## fname (const int c, tokenInfo * const token, void *state, parserResult * const result) \
 	{ \
 		pfun (c, token, word, stype state, result); \
 	}
 
 #define SINGLE_CHAR_PARSER_DEF(fname, ch, ttype) \
-	inline static void parse ## fname (const int c, tokenInfo * const token, void *state, parserResult * const result) \
+	__inline static void parse ## fname (const int c, tokenInfo * const token, void *state, parserResult * const result) \
 	{ \
 		parseOneChar (c, token, ch, ttype, result); \
 	}
 
 #define WORD_TOKEN_PARSER_DEF(fname, w, ttype) \
-	inline static void parse ## fname (const int c, tokenInfo * const token, void *state, parserResult * const result) \
+	__inline static void parse ## fname (const int c, tokenInfo * const token, void *state, parserResult * const result) \
 	{ \
 		parseWordToken (c, token, w, ttype, (int *) state, result); \
 	}
 
 #define BLOCK_PARSER_DEF(fname, start, end, ttype) \
-	inline static void parse ## fname (const int c, tokenInfo * const token, void *state, parserResult * const result) \
+	__inline static void parse ## fname (const int c, tokenInfo * const token, void *state, parserResult * const result) \
 	{ \
 		parseBlock (c, token, ttype, start, end, (blockState *) state, result); \
 	}
@@ -309,12 +309,12 @@ static void copyToken (tokenInfo *const dest, const tokenInfo *const src,
 		vStringCopy (dest->scope, src->scope);
 }
 
-inline static bool whiteChar(const int c)
+__inline static bool whiteChar(const int c)
 {
 	return c == ' ' || c == '\r' || c == '\t';
 }
 
-inline static void parseOneChar(const int c, tokenInfo *const token, const char expected, const tokenType type, parserResult *const result)
+__inline static void parseOneChar(const int c, tokenInfo *const token, const char expected, const tokenType type, parserResult *const result)
 {
 	if (whiteChar (c))
 	{
@@ -334,7 +334,7 @@ inline static void parseOneChar(const int c, tokenInfo *const token, const char 
 	result->status = PARSER_FINISHED;
 }
 
-inline static void parseChar(const int c, tokenInfo *const token, void *state, parserResult *const result)
+__inline static void parseChar(const int c, tokenInfo *const token, void *state, parserResult *const result)
 {
 	if (whiteChar (c))
 	{
@@ -354,7 +354,7 @@ inline static void parseChar(const int c, tokenInfo *const token, void *state, p
 	result->status = PARSER_FINISHED;
 }
 
-inline static void *initParseWordState()
+__inline static void *initParseWordState()
 {
 	int *num = xMalloc (1, int);
 	*num = 0;
@@ -362,12 +362,12 @@ inline static void *initParseWordState()
 	return num;
 }
 
-inline static void freeParseWordState(void *state)
+__inline static void freeParseWordState(void *state)
 {
 	eFree ((int *) state);
 }
 
-inline static void parseWord(const int c, tokenInfo *const token, const char *word, int *parsed, parserResult *const result)
+__inline static void parseWord(const int c, tokenInfo *const token, const char *word, int *parsed, parserResult *const result)
 {
 	if (*parsed == 0 && whiteChar (c))
 	{
@@ -405,7 +405,7 @@ inline static void parseWord(const int c, tokenInfo *const token, const char *wo
 	result->status = PARSER_FAILED;
 }
 
-inline static void parseNumber(const int c, tokenInfo *const token, int *parsed, parserResult *const result)
+__inline static void parseNumber(const int c, tokenInfo *const token, int *parsed, parserResult *const result)
 {
 	if (*parsed == 0)
 	{
@@ -441,7 +441,7 @@ inline static void parseNumber(const int c, tokenInfo *const token, int *parsed,
 	result->status = PARSER_FINISHED;
 }
 
-inline static void parseWordToken(const int c, tokenInfo *const token, const char *word, const tokenType type, int *parsed, parserResult *const result)
+__inline static void parseWordToken(const int c, tokenInfo *const token, const char *word, const tokenType type, int *parsed, parserResult *const result)
 {
 	if (*parsed == 0 && whiteChar (c))
 	{
@@ -470,7 +470,7 @@ inline static void parseWordToken(const int c, tokenInfo *const token, const cha
 	result->status = PARSER_FAILED;
 }
 
-inline static void *initParseCommentState()
+__inline static void *initParseCommentState()
 {
 	commentState *st = xMalloc (1, commentState);
 	st->parsed = 0;
@@ -480,12 +480,12 @@ inline static void *initParseCommentState()
 	return st;
 }
 
-inline static void freeParseCommentState(void *state)
+__inline static void freeParseCommentState(void *state)
 {
 	eFree ((commentState *) state);
 }
 
-inline static void parseComment(const int c, tokenInfo *const token, commentState *state, parserResult *const result)
+__inline static void parseComment(const int c, tokenInfo *const token, commentState *state, parserResult *const result)
 {
 	if (state->parsed == 0 && whiteChar (c))
 	{
@@ -545,7 +545,7 @@ inline static void parseComment(const int c, tokenInfo *const token, commentStat
 	result->status = PARSER_NEEDS_MORE_INPUT;
 }
 
-inline static void *initParseStringState()
+__inline static void *initParseStringState()
 {
 	char *st = xMalloc (1, char);
 	*st = '\0';
@@ -553,12 +553,12 @@ inline static void *initParseStringState()
 	return st;
 }
 
-inline static void freeParseStringState(void *state)
+__inline static void freeParseStringState(void *state)
 {
 	eFree ((char *) state);
 }
 
-inline static void parseString(const int c, tokenInfo *const token, const char quote, char *prev, parserResult *const result)
+__inline static void parseString(const int c, tokenInfo *const token, const char quote, char *prev, parserResult *const result)
 {
 	if (*prev == '\0')
 	{
@@ -604,7 +604,7 @@ inline static void parseString(const int c, tokenInfo *const token, const char q
 	result->status = PARSER_NEEDS_MORE_INPUT;
 }
 
-inline static void *initBlockState()
+__inline static void *initBlockState()
 {
 	blockState *st = xMalloc (1, blockState);
 	st->parsed = 0;
@@ -614,12 +614,12 @@ inline static void *initBlockState()
 	return st;
 }
 
-inline static void freeBlockState(void *state)
+__inline static void freeBlockState(void *state)
 {
 	eFree ((blockState *) state);
 }
 
-inline static void parseBlock(const int c, tokenInfo *const token, tokenType const ttype, const char start, const char end, blockState *state, parserResult *const result)
+__inline static void parseBlock(const int c, tokenInfo *const token, tokenType const ttype, const char start, const char end, blockState *state, parserResult *const result)
 {
 	if (state->parsed == 0)
 	{
@@ -670,7 +670,7 @@ inline static void parseBlock(const int c, tokenInfo *const token, tokenType con
 	result->status = PARSER_NEEDS_MORE_INPUT;
 }
 
-inline static void parseIdentifier(const int c, tokenInfo *const token, int *parsed, parserResult *const result)
+__inline static void parseIdentifier(const int c, tokenInfo *const token, int *parsed, parserResult *const result)
 {
 	if (*parsed == 0 && whiteChar (c))
 	{
