@@ -442,7 +442,7 @@ void cppUngetString(const char * string,int len)
 	Cpp.ungetDataSize += len;
 }
 
-static int cppGetcFromUngetBufferOrFile(void)
+extern int cppGetcFromUngetBufferOrFile(void)
 {
 	if(Cpp.ungetPointer)
 	{

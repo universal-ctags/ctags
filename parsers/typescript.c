@@ -59,6 +59,9 @@
 		parseBlock (c, token, ttype, start, end, (blockState *) state, result); \
 	}
 
+extern int cppGetcFromUngetBufferOrFile (void);
+extern void cppUngetc (const int c);
+
 /*
  *	DATA DEFINITIONS
  */
@@ -762,7 +765,7 @@ static bool tryParser(Parser parser, ParserStateInit stInit, ParserStateFree stF
 
 	while (result.status == PARSER_NEEDS_MORE_INPUT)
 	{
-		c = getcFromInputFile ();
+		c = cppGetcFromUngetBufferOrFile ();
 		parser (c, token, currentState, &result);
 		charArrayAdd (usedC, c);
 	}
@@ -774,7 +777,7 @@ static bool tryParser(Parser parser, ParserStateInit stInit, ParserStateFree stF
 	{
 		while (charArrayCount (usedC) > 0)
 		{
-			ungetcToInputFile (charArrayLast (usedC));
+			cppUngetc (charArrayLast (usedC));
 			charArrayRemoveLast (usedC);
 		}
 	}
@@ -782,7 +785,7 @@ static bool tryParser(Parser parser, ParserStateInit stInit, ParserStateFree stF
 	{
 		while (result.unusedChars > 0)
 		{
-			ungetcToInputFile (charArrayLast (usedC));
+			cppUngetc (charArrayLast (usedC));
 			charArrayRemoveLast (usedC);
 			result.unusedChars--;
 		}
@@ -1279,7 +1282,7 @@ static void parseFunctionArgs (vString *const scope, tsKind scopeParentKind, tok
 			switch (token->type)
 			{
 				case TOKEN_AT:
-					ungetcToInputFile ('@');
+					cppUngetc ('@');
 					parseDecorator (token);
 					break;
 				case TOKEN_OPEN_SQUARE:
@@ -1475,7 +1478,7 @@ static void parsePropertyType (tokenInfo *const token)
 		return;
 
 	if (isType (token, TOKEN_CLOSE_PAREN))
-		ungetcToInputFile (')');
+		cppUngetc (')');
 	clearPoolToken (token);
 }
 
@@ -1524,7 +1527,7 @@ static void parseConstructorParams (vString *const scope, tokenInfo *const token
 			switch (token->type)
 			{
 				case TOKEN_AT:
-					ungetcToInputFile ('@');
+					cppUngetc ('@');
 					parseDecorator (token);
 					break;
 				case TOKEN_KEYWORD:
@@ -1538,7 +1541,7 @@ static void parseConstructorParams (vString *const scope, tokenInfo *const token
 					}
 					break;
 				case TOKEN_COLON:
-					ungetcToInputFile (':');
+					cppUngetc (':');
 					parsePropertyType (token);
 					break;
 				case TOKEN_IDENTIFIER:
@@ -1625,7 +1628,7 @@ static void parseClassBody (vString *const scope, tokenInfo *const token)
 			switch (token->type)
 			{
 				case TOKEN_AT:
-					ungetcToInputFile ('@');
+					cppUngetc ('@');
 					parseDecorator (token);
 					break;
 				case TOKEN_KEYWORD:
@@ -1667,10 +1670,10 @@ static void parseClassBody (vString *const scope, tokenInfo *const token)
 					break;
 				case TOKEN_EQUAL_SIGN:
 					skipBlocksTillType (TOKEN_SEMICOLON, token);
-					ungetcToInputFile (';');
+					cppUngetc (';');
 					break;
 				case TOKEN_COLON:
-					ungetcToInputFile (':');
+					cppUngetc (':');
 					parsePropertyType (token);
 				case TOKEN_SEMICOLON:
 					if (member)
@@ -1688,7 +1691,7 @@ static void parseClassBody (vString *const scope, tokenInfo *const token)
 				case TOKEN_OPEN_PAREN:
 					if (! member)
 						break;
-					ungetcToInputFile ('(');
+					cppUngetc ('(');
 
 					if (isGenerator)
 						emitTag (member, TSTAG_GENERATOR);
@@ -1848,7 +1851,7 @@ static void parseNamespaceBody (vString *const scope, tokenInfo *const token)
 				}
 				break;
 			case TOKEN_AT:
-				ungetcToInputFile ('@');
+				cppUngetc ('@');
 				parseDecorator (token);
 				break;
 			default:
@@ -1947,7 +1950,7 @@ static void parseTsFile (tokenInfo *const token)
 				}
 				break;
 			case TOKEN_AT:
-				ungetcToInputFile ('@');
+				cppUngetc ('@');
 				parseDecorator (token);
 				break;
 			default:
