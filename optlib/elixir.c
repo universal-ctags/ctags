@@ -30,6 +30,9 @@ extern parserDefinition* ElixirParser (void)
 
 	static kindDefinition ElixirKindTable [] = {
 		{
+		  true, 'm', "module", "modules (defmodule ...)",
+		},
+		{
 		  true, 'f', "function", "functions (def ...)",
 		},
 		{
@@ -54,9 +57,6 @@ extern parserDefinition* ElixirParser (void)
 		  true, 'o', "operator", "operators (e.g. \"defmacro a <<< b\")",
 		},
 		{
-		  true, 'm', "module", "modules (defmodule ...)",
-		},
-		{
 		  true, 'p', "protocol", "protocols (defprotocol...)",
 		},
 		{
@@ -67,30 +67,30 @@ extern parserDefinition* ElixirParser (void)
 		},
 	};
 	static tagRegexTable ElixirTagRegexTable [] = {
-		{"^[ \t]*def((p?)|macro(p?))[ \t]+([a-zA-Z0-9_?!]+)[ \t]+([\\|\\^/&<>~.=!*+-]{1,3}|and|or|in|not|when|not in)[ \t]+[a-zA-Z0-9_?!]", "\\5",
-		"o", "{exclusive}", NULL, false},
-		{"^[ \t]*def(p?)[ \t]+([a-z_][a-zA-Z0-9_?!]*)(.[^\\|\\^/&<>~.=!*+-]+)", "\\2",
-		"f", NULL, NULL, false},
-		{"^[ \t]*(@|def)callback[ \t]+([a-z_][a-zA-Z0-9_?!]*)", "\\2",
-		"c", NULL, NULL, false},
-		{"^[ \t]*defdelegate[ \t]+([a-z_][a-zA-Z0-9_?!]*)", "\\1",
-		"d", NULL, NULL, false},
-		{"^[ \t]*defexception[ \t]+([A-Z][a-zA-Z0-9_]*\\.)*([A-Z][a-zA-Z0-9_?!]*)", "\\2",
-		"e", NULL, NULL, false},
-		{"^[ \t]*defguard(p?)[ \t]+(is_[a-zA-Z0-9_?!]+)", "\\2",
-		"g", NULL, NULL, false},
-		{"^[ \t]*defimpl[ \t]+([A-Z][a-zA-Z0-9_]*\\.)*([A-Z][a-zA-Z0-9_?!]*)", "\\2",
-		"i", NULL, NULL, false},
-		{"^[ \t]*defmacro(p?)[ \t]+([a-z_][a-zA-Z0-9_?!]*)(.[^\\|\\^/&<>~.=!*+-]+)", "\\2",
-		"a", NULL, NULL, false},
 		{"^[ \t]*defmodule[ \t]+([A-Z][a-zA-Z0-9_]*\\.)*([A-Z][a-zA-Z0-9_?!]*)", "\\2",
-		"m", NULL, NULL, false},
+		"m", "{scope=set}", NULL, false},
+		{"^[ \t]*def((p?)|macro(p?))[ \t]+([a-zA-Z0-9_?!]+)[ \t]+([\\|\\^/&<>~.=!*+-]{1,3}|and|or|in|not|when|not in)[ \t]+[a-zA-Z0-9_?!]", "\\5",
+		"o", "{scope=ref}{exclusive}", NULL, false},
+		{"^[ \t]*def(p?)[ \t]+([a-z_][a-zA-Z0-9_?!]*)(.[^\\|\\^/&<>~.=!*+-]+)", "\\2",
+		"f", "{scope=ref}", NULL, false},
+		{"^[ \t]*(@|def)callback[ \t]+([a-z_][a-zA-Z0-9_?!]*)", "\\2",
+		"c", "{scope=ref}", NULL, false},
+		{"^[ \t]*defdelegate[ \t]+([a-z_][a-zA-Z0-9_?!]*)", "\\1",
+		"d", "{scope=ref}", NULL, false},
+		{"^[ \t]*defexception[ \t]+([A-Z][a-zA-Z0-9_]*\\.)*([A-Z][a-zA-Z0-9_?!]*)", "\\2",
+		"e", "{scope=ref}", NULL, false},
+		{"^[ \t]*defguard(p?)[ \t]+(is_[a-zA-Z0-9_?!]+)", "\\2",
+		"g", "{scope=ref}", NULL, false},
+		{"^[ \t]*defimpl[ \t]+([A-Z][a-zA-Z0-9_]*\\.)*([A-Z][a-zA-Z0-9_?!]*)", "\\2",
+		"i", "{scope=ref}", NULL, false},
+		{"^[ \t]*defmacro(p?)[ \t]+([a-z_][a-zA-Z0-9_?!]*)(.[^\\|\\^/&<>~.=!*+-]+)", "\\2",
+		"a", "{scope=ref}", NULL, false},
 		{"^[ \t]*defprotocol[ \t]+([A-Z][a-zA-Z0-9_]*\\.)*([A-Z][a-zA-Z0-9_?!]*)", "\\2",
-		"p", NULL, NULL, false},
+		"p", "{scope=ref}", NULL, false},
 		{"^[ \t]*Record\\.defrecord(p?)[ \t(]+:([a-zA-Z0-9_]+)(\\)?)", "\\2",
-		"r", NULL, NULL, false},
+		"r", "{scope=ref}", NULL, false},
 		{"^[ \t]*test[ \t(]+\"([a-z_][a-zA-Z0-9_?! ]*)\"*(\\)?)[ \t]*do", "\\1",
-		"t", NULL, NULL, false},
+		"t", "{scope=ref}", NULL, false},
 	};
 
 
@@ -101,6 +101,7 @@ extern parserDefinition* ElixirParser (void)
 	def->patterns      = patterns;
 	def->aliases       = aliases;
 	def->method        = METHOD_NOT_CRAFTED|METHOD_REGEX;
+	def->useCork       = 1;
 	def->kindTable     = ElixirKindTable;
 	def->kindCount     = ARRAY_SIZE(ElixirKindTable);
 	def->tagRegexTable = ElixirTagRegexTable;
