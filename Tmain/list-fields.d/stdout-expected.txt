@@ -29,6 +29,7 @@ z	kind	no	NONE	s--	no	Include the "kind:" key in kind field (use k or K) in tags
 -	properties	no	C++	s--	no	properties (static, inline, mutable,...)
 -	template	no	C++	s--	no	template parameters
 -	properties	no	CUDA	s--	no	properties (static, inline, mutable,...)
+-	access	yes	Elixir	s--	no	access
 -	howImported	no	Go	s--	no	how the package is imported ("inline" for `.' or "init" for `_')
 -	package	yes	Go	s--	no	the real package specified by the package name
 -	packageName	yes	Go	s--	no	the name for referring the package
