@@ -65,6 +65,9 @@ extern parserDefinition* ElixirParser (void)
 		{
 		  true, 't', "test", "tests (test ...)",
 		},
+		{
+		  true, 'y', "type", "types (@type ...)",
+		},
 	};
 	static fieldDefinition ElixirFieldTable [] = {
 		{
@@ -106,6 +109,10 @@ extern parserDefinition* ElixirParser (void)
 		"r", "{scope=ref}{_field=access:private}", NULL, false},
 		{"^[ \t]*test[ \t(]+\"([a-z_][a-zA-Z0-9_?! ]*)\"*(\\)?)[ \t]*do", "\\1",
 		"t", "{scope=ref}", NULL, false},
+		{"^[ \t]*@(type|opaque)[ \t]+([a-z_][a-zA-Z0-9_?!]*)", "\\2",
+		"y", "{scope=ref}{_field=access:public}", NULL, false},
+		{"^[ \t]*@typep[ \t]+([a-z_][a-zA-Z0-9_?!]*)", "\\1",
+		"y", "{scope=ref}{_field=access:private}", NULL, false},
 	};
 
 

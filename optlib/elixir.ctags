@@ -64,6 +64,7 @@
 --kinddef-Elixir=p,protocol,protocols (defprotocol...)
 --kinddef-Elixir=r,record,records (defrecord...)
 --kinddef-Elixir=t,test,tests (test ...)
+--kinddef-Elixir=y,type,types (@type ...)
 
 --_fielddef-Elixir=access,access
 
@@ -85,3 +86,5 @@
 --regex-Elixir=/^[ \t]*Record\.defrecord[ \t(]+:([a-zA-Z0-9_]+)(\)?)/\1/r/{scope=ref}{_field=access:public}
 --regex-Elixir=/^[ \t]*Record\.defrecordp[ \t(]+:([a-zA-Z0-9_]+)(\)?)/\1/r/{scope=ref}{_field=access:private}
 --regex-Elixir=/^[ \t]*test[ \t(]+"([a-z_][a-zA-Z0-9_?! ]*)"*(\)?)[ \t]*do/\1/t/{scope=ref}
+--regex-Elixir=/^[ \t]*@(type|opaque)[ \t]+([a-z_][a-zA-Z0-9_?!]*)/\2/y/{scope=ref}{_field=access:public}
+--regex-Elixir=/^[ \t]*@typep[ \t]+([a-z_][a-zA-Z0-9_?!]*)/\1/y/{scope=ref}{_field=access:private}
