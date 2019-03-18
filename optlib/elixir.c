@@ -30,6 +30,9 @@ extern parserDefinition* ElixirParser (void)
 
 	static kindDefinition ElixirKindTable [] = {
 		{
+		  true, 'p', "protocol", "protocols (defprotocol...)",
+		},
+		{
 		  true, 'm', "module", "modules (defmodule ...)",
 		},
 		{
@@ -57,9 +60,6 @@ extern parserDefinition* ElixirParser (void)
 		  true, 'o', "operator", "operators (e.g. \"defmacro a <<< b\")",
 		},
 		{
-		  true, 'p', "protocol", "protocols (defprotocol...)",
-		},
-		{
 		  true, 'r', "record", "records (defrecord...)",
 		},
 		{
@@ -77,6 +77,8 @@ extern parserDefinition* ElixirParser (void)
 		},
 	};
 	static tagRegexTable ElixirTagRegexTable [] = {
+		{"^[ \t]*defprotocol[ \t]+([A-Z][a-zA-Z0-9_]*\\.)*([A-Z][a-zA-Z0-9_?!]*)", "\\2",
+		"p", "{scope=set}", NULL, false},
 		{"^[ \t]*defmodule[ \t]+([A-Z][a-zA-Z0-9_]*\\.)*([A-Z][a-zA-Z0-9_?!]*)", "\\2",
 		"m", "{scope=set}", NULL, false},
 		{"^[ \t]*def((p?)|macro(p?))[ \t]+([a-zA-Z0-9_?!]+)[ \t]+([\\|\\^/&<>~.=!*+-]{1,3}|and|or|in|not|when|not in)[ \t]+[a-zA-Z0-9_?!]", "\\5",
@@ -101,8 +103,6 @@ extern parserDefinition* ElixirParser (void)
 		"a", "{scope=ref}{_field=access:public}", NULL, false},
 		{"^[ \t]*defmacrop[ \t]+([a-z_][a-zA-Z0-9_?!]*)(.[^\\|\\^/&<>~.=!*+-]+)", "\\1",
 		"a", "{scope=ref}{_field=access:private}", NULL, false},
-		{"^[ \t]*defprotocol[ \t]+([A-Z][a-zA-Z0-9_]*\\.)*([A-Z][a-zA-Z0-9_?!]*)", "\\2",
-		"p", "{scope=ref}", NULL, false},
 		{"^[ \t]*Record\\.defrecord[ \t(]+:([a-zA-Z0-9_]+)(\\)?)", "\\1",
 		"r", "{scope=ref}{_field=access:public}", NULL, false},
 		{"^[ \t]*Record\\.defrecordp[ \t(]+:([a-zA-Z0-9_]+)(\\)?)", "\\1",
