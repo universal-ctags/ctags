@@ -307,21 +307,23 @@ WIN32_HEADS = main/e_msoft.h
 WIN32_SRCS = win32/mkstemp/mkstemp.c
 WIN32_OBJS = $(WIN32_SRCS:.c=.$(OBJEXT))
 
-QUALIFIER_HEADS = dsl/es-lang-c-stdc99.h \
-		 dsl/qualifier.h \
-		 \
-		 $(MIO_HEADS) \
-		 \
-		 $(NULL)
+READTAGS_DSL_HEADS = \
+	dsl/es-lang-c-stdc99.h \
+	dsl/qualifier.h \
+	\
+	$(MIO_HEADS) \
+	\
+	$(NULL)
 
-QUALIFIER_SRCS = dsl/es-lang-c-stdc99.c \
-		 dsl/qualifier.c \
-		 \
-		 $(MIO_SRCS) \
-		 \
-		 $(NULL)
+READTAGS_DSL_SRCS = \
+	dsl/es-lang-c-stdc99.c \
+	dsl/qualifier.c \
+	\
+	 $(MIO_SRCS) \
+	\
+	$(NULL)
 
-QUALIFIER_OBJS = $(QUALIFIER_SRCS:.c=.$(OBJEXT))
+READTAGS_DSL_OBJS = $(QUALIFIER_SRCS:.c=.$(OBJEXT))
 
 ALL_OBJS = \
 	$(ALL_SRCS:.c=.$(OBJEXT)) \

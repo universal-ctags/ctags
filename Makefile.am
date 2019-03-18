@@ -39,8 +39,8 @@ bin_PROGRAMS+= readtags
 readtags_CPPFLAGS = -I. -I$(srcdir) -I$(srcdir)/main -I$(srcdir)/read
 readtags_CFLAGS = $(COVERAGE_CFLAGS)
 dist_readtags_SOURCES = $(READTAGS_SRCS) $(READTAGS_HEADS)
-readtags_CPPFLAGS += -DQUALIFIER -I$(srcdir)/dsl
-dist_readtags_SOURCES += $(QUALIFIER_SRCS) $(QUALIFIER_HEADS)
+readtags_CPPFLAGS += -DREADTAGS_DSL -I$(srcdir)/dsl
+dist_readtags_SOURCES += $(READTAGS_DSL_SRCS) $(READTAGS_DSL_HEADS)
 endif
 
 if !HAVE_FNMATCH

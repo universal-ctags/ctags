@@ -218,7 +218,8 @@ static int growString (vstring *s)
 	{
 		newLength = 128;
 		newLine = (char*) malloc (newLength);
-		*newLine = '\0';
+		if (newLine)
+			*newLine = '\0';
 	}
 	else
 	{
