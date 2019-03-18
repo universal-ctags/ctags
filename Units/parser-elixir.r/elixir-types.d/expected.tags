@@ -1,0 +1,4 @@
+TypeModule	input.ex	/^defmodule TypeModule do$/;"	module
+t	input.ex	/^  @opaque t :: pid$/;"	type	module:TypeModule	access:public
+credentials	input.ex	/^  @type credentials :: {atom, password}$/;"	type	module:TypeModule	access:public
+password	input.ex	/^  @typep password :: binary$/;"	type	module:TypeModule	access:private
