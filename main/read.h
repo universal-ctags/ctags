@@ -71,6 +71,7 @@ extern const unsigned char *getInputFileData (size_t *size);
 extern int getcFromInputFile (void);
 extern int getNthPrevCFromInputFile (unsigned int nth, int def);
 extern int skipToCharacterInInputFile (int c);
+extern int skipToCharacterInInputFile2 (int c0, int c1);
 extern void ungetcToInputFile (int c);
 extern const unsigned char *readLineFromInputFile (void);
 
