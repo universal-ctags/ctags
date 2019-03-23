@@ -28,13 +28,6 @@ The source tree of packcc is grafted at misc/packcc directory.
 Building packcc and ctags are integrated in the build-scripts of
 Universal-ctags.
 
-If misc/packcc directory is empty, run following command to get
-source code before building ctags:
-```
-$ git submodule init misc/packcc
-$ git submodule update misc/packcc
-```
-
 ## The latest build and package ##
 
 If you want to try the latest universal-ctags without building it yourself...
