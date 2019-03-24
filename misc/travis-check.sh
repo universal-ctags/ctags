@@ -15,62 +15,61 @@
 
 make --version
 
-#
 # Our sandbox doesn't work with gcov.
-# Follwoing cases target ctags without gcov.
-#
+# Following cases target ctags without gcov.
 SANDBOX_CASES=sandbox,sandbox-crash,sandbox-default-req,sandbox-unknown-submode
 
 
 if [ "$TARGET" = "Unix" ]; then
+    ./autogen.sh
+    CONFIGURE_CMDLINE="../configure --enable-debugging --enable-iconv "
 
-	./autogen.sh
-	CONFIGURE_CMDLINE="../configure --enable-debugging --enable-iconv "
-
-	BUILDDIR0="$TRAVIS_OS_NAME"-"$CC"
+    BUILDDIR0="$TRAVIS_OS_NAME"-"$CC"
     if [ "$TRAVIS_OS_NAME" = "linux" ] && [ "$CC" = "gcc" ]; then
 
-		BUILDDIR=${BUILDDIR0}
-		mkdir -p ${BUILDDIR}
-		(
-		cd ${BUILDDIR}
-        ${CONFIGURE_CMDLINE}
-        make -j2
-        echo 'Run "make tmain (sandbox only)" without gcov'
-        make -j2 tmain TRAVIS=1 UNITS=${SANDBOX_CASES}
+        BUILDDIR=${BUILDDIR0}
+        mkdir -p "${BUILDDIR}"
+        (
+            cd "${BUILDDIR}"
+            ${CONFIGURE_CMDLINE}
+            make -j2
+            echo 'Run "make tmain (sandbox only)" without gcov'
+            make -j2 tmain TRAVIS=1 UNITS=${SANDBOX_CASES}
 
-        make clean
-		)
+            make clean
+        )
 
-		BUILDDIR=${BUILDDIR0}-gcov
-		mkdir -p ${BUILDDIR}
-		(
-		cd ${BUILDDIR}
-		${CONFIGURE_CMDLINE} --enable-coverage-gcov
-        make -j2 COVERAGE=1
-        echo 'List features'
-        ./ctags --list-features
-        echo 'Run "make check" with gcov'
-        make -j2 check roundtrip TRAVIS=1
-		)
+        BUILDDIR=${BUILDDIR0}-gcov
+        mkdir -p "${BUILDDIR}"
+        (
+            cd "${BUILDDIR}"
+            ${CONFIGURE_CMDLINE} --enable-coverage-gcov
+            make -j2 COVERAGE=1
+            echo 'List features'
+            ./ctags --list-features
+            echo 'Run "make check" with gcov'
+            make -j2 check roundtrip TRAVIS=1
+        )
 
     else
-		BUILDDIR=${BUILDDIR0}
-		mkdir -p ${BUILDDIR}
-		(
-		cd ${BUILDDIR}
-		${CONFIGURE_CMDLINE}
-        make -j2
-        echo 'List features'
-        ./ctags --list-features
-        echo 'Run "make check" (without gcov)'
-        make -j2 check roundtrip TRAVIS=1
-		)
+        BUILDDIR=${BUILDDIR0}
+        mkdir -p "${BUILDDIR}"
+        (
+            cd "${BUILDDIR}"
+            ${CONFIGURE_CMDLINE}
+            make -j2
+            echo 'List features'
+            ./ctags --list-features
+            echo 'Run "make check" (without gcov)'
+            make -j2 check roundtrip TRAVIS=1
+        )
     fi
+
 elif [ "$TARGET" = "Mingw32" ]; then
+    # Don't run test units in Mingw32 target.
     make -j2 CC=i686-w64-mingw32-gcc CC_FOR_PACKCC=gcc -f mk_mingw.mak
-    # Don't run test units in Mingw32 target
+
 else
-    echo 'Invalid $TARGET value' 1>&2
+    echo "Invalid TARGET value: $TARGET" 1>&2
     exit 1
 fi
