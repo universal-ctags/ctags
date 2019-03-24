@@ -3,6 +3,8 @@
 # https://github.com/steveno/ctags/blob/master/.travis.yml
 #
 
+dist: xenial
+
 language: c
 
 os:
@@ -29,8 +31,6 @@ env:
     build_command:   "make -j 4 CFLAGS=-O0"
     branch_pattern: master
 
-sudo: false
-
 addons:
   apt:
     packages:
@@ -56,6 +56,7 @@ before_install:
 # Build and run tests. Only with gcc cross compile
 script:
   - ./misc/travis-check.sh
+
 after_success:
   - |
     if [ $CC = 'gcc' ] && [ $TRAVIS_OS_NAME = 'linux' ]; then
