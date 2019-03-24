@@ -8,13 +8,13 @@ jobs:
        - run:
            name: Install Git and Gdb
            command: |
-             dnf -y install git gdb || :
+             dnf -y install git gdb
        - checkout
        - run:
            name: Install build tools
            command: |
-             dnf -y install gcc automake autoconf pkgconfig bmake aspell-devel aspell-en libxml2-devel jansson-devel libyaml-devel findutils || :
-             dnf -y install jq puppet || :
+             dnf -y install gcc automake autoconf pkgconfig bmake aspell-devel aspell-en libxml2-devel jansson-devel libyaml-devel findutils
+             dnf -y install jq puppet
        - run:
            name: Build
            command: |
@@ -25,6 +25,7 @@ jobs:
            name: Test
            command: |
              MAKE=bmake bmake validate-input check roundtrip CIRCLECI=1
+
    centos_make:
      working_directory: ~/universal-ctags
      docker:
@@ -33,13 +34,13 @@ jobs:
        - run:
            name: Install Git
            command: |
-             yum -y install git || :
+             yum -y install git
        - checkout
        - run:
            name: Install build tools
            # TODO: enable spell checker
            command: |
-              yum -y install gcc automake autoconf pkgconfig make libxml2-devel jansson-devel libyaml-devel findutils || :
+              yum -y install gcc automake autoconf pkgconfig make libxml2-devel jansson-devel libyaml-devel findutils
        - run:
            name: Build
            command: |
