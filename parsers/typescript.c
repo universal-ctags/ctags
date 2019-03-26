@@ -16,6 +16,7 @@
  */
 #include <stdio.h>
 #include <stdarg.h>
+#include <string.h>
 
 #include "general.h"    /* must always come first */
 #include "parse.h"
@@ -25,6 +26,8 @@
 #include "numarray.h"
 #include "routines.h"
 #include "entry.h"
+#include "inline.h"
+#include "debug.h"
 
 #define isType(token,t)     (bool) ((token)->type == (t))
 #define isKeyword(token,k)  (bool) ((token)->keyword == (k))
@@ -36,25 +39,25 @@
 	 (c) >= 0x80)
 
 #define PARSER_DEF(fname, pfun, word, stype) \
-	__inline static void parse ## fname (const int c, tokenInfo * const token, void *state, parserResult * const result) \
+	CTAGS_INLINE void parse ## fname (const int c, tokenInfo * const token, void *state, parserResult * const result) \
 	{ \
 		pfun (c, token, word, stype state, result); \
 	}
 
 #define SINGLE_CHAR_PARSER_DEF(fname, ch, ttype) \
-	__inline static void parse ## fname (const int c, tokenInfo * const token, void *state, parserResult * const result) \
+	CTAGS_INLINE void parse ## fname (const int c, tokenInfo * const token, void *state, parserResult * const result) \
 	{ \
 		parseOneChar (c, token, ch, ttype, result); \
 	}
 
 #define WORD_TOKEN_PARSER_DEF(fname, w, ttype) \
-	__inline static void parse ## fname (const int c, tokenInfo * const token, void *state, parserResult * const result) \
+	CTAGS_INLINE void parse ## fname (const int c, tokenInfo * const token, void *state, parserResult * const result) \
 	{ \
 		parseWordToken (c, token, w, ttype, (int *) state, result); \
 	}
 
 #define BLOCK_PARSER_DEF(fname, start, end, ttype) \
-	__inline static void parse ## fname (const int c, tokenInfo * const token, void *state, parserResult * const result) \
+	CTAGS_INLINE void parse ## fname (const int c, tokenInfo * const token, void *state, parserResult * const result) \
 	{ \
 		parseBlock (c, token, ttype, start, end, (blockState *) state, result); \
 	}
@@ -213,9 +216,117 @@ typedef void (*Parser)(const int c, tokenInfo *const, void *state, parserResult 
 typedef void * (*ParserStateInit)();
 typedef void (*ParserStateFree)(void *);
 
-static bool tryParser(Parser parser, ParserStateInit stInit, ParserStateFree stFree, tokenInfo *const token);
+static bool tryParser (Parser parser, ParserStateInit stInit, ParserStateFree stFree, tokenInfo *const token);
 
-static void emitTag(const tokenInfo *const token, const tsKind kind)
+typedef struct sTsIOChar {
+	int c;
+	unsigned long frontLineNumber;
+	MIOPos frontFilePosition;
+	unsigned long rearLineNumber;
+	MIOPos rearFilePosition;
+} tsIOChar;
+
+static ptrArray *tsInputFile;
+static tsIOChar *tsCurrentIOChar;
+
+static void tsDeleteIOChar (tsIOChar *c)
+{
+	if (c == tsCurrentIOChar)
+		tsCurrentIOChar = NULL;
+	eFree (c);
+}
+
+static tsIOChar *tsNewC (int chr,
+						 unsigned fLineNumber, MIOPos fPos,
+						 unsigned rLineNumber, MIOPos rPos)
+{
+	tsIOChar *c = xMalloc (1, tsIOChar);
+	c->c = chr;
+	c->frontLineNumber = fLineNumber;
+	c->frontFilePosition = fPos;
+	c->rearLineNumber = rLineNumber;
+	c->rearFilePosition = rPos;
+	return c;
+}
+
+static tsIOChar *tsGetC ()
+{
+	tsIOChar *c;
+
+	if (ptrArrayCount (tsInputFile) > 0)
+	{
+		c = ptrArrayLast (tsInputFile);
+		ptrArrayRemoveLast (tsInputFile);
+	}
+	else
+	{
+		unsigned long lineNumber = getInputLineNumber ();
+		MIOPos pos = getInputFilePosition ();
+		int chr = getcFromInputFile();
+		c = tsNewC (chr,
+					lineNumber, pos,
+					getInputLineNumber(), getInputFilePosition ());
+	}
+
+	tsCurrentIOChar = c;
+	return c;
+}
+
+static void tsUngetC (tsIOChar *c)
+{
+	tsCurrentIOChar = NULL;
+
+	if (c->c == EOF)
+	{
+		ptrArrayClear (tsInputFile);
+		tsDeleteIOChar (c);
+		return;
+	}
+
+	ptrArrayAdd (tsInputFile, c);
+}
+
+static void tsInjectC (int chr)
+{
+	tsIOChar *lastc = NULL;
+	if (ptrArrayCount (tsInputFile) > 0)
+		lastc = ptrArrayLast (tsInputFile);
+
+	tsIOChar *c = tsNewC(chr,
+						 lastc? lastc->rearLineNumber: getInputLineNumber (),
+						 lastc? lastc->rearFilePosition: getInputFilePosition(),
+						 getInputLineNumber (),
+						 getInputFilePosition());
+	tsUngetC (c);
+}
+
+static unsigned long tsGetLineNumber ()
+{
+	if (tsCurrentIOChar)
+		return tsCurrentIOChar->rearLineNumber;
+	else if (ptrArrayCount (tsInputFile) > 0)
+	{
+		tsIOChar *c = ptrArrayLast (tsInputFile);
+		return c->frontLineNumber;
+	}
+	else
+		return getInputLineNumber ();
+}
+
+static MIOPos tsGetFilePosition ()
+{
+	if (tsCurrentIOChar)
+		return tsCurrentIOChar->rearFilePosition;
+	else if (ptrArrayCount (tsInputFile) > 0)
+	{
+		tsIOChar *c = ptrArrayLast (tsInputFile);
+		return c->frontFilePosition;
+	}
+	else
+		return getInputFilePosition ();
+}
+
+static void emitTag (const tokenInfo *const token, const tsKind kind)
 {
 	if (! TsKinds [kind].enabled)
 		return;
@@ -270,8 +381,8 @@ static void clearPoolToken (void *data)
 
 	token->type            = TOKEN_UNDEFINED;
 	token->keyword         = KEYWORD_NONE;
-	token->lineNumber      = getInputLineNumber ();
-	token->filePosition    = getInputFilePosition ();
+	token->lineNumber      = tsGetLineNumber ();
+	token->filePosition    = tsGetFilePosition ();
 
 	if (!token->scope)
 		token->scope = vStringNew ();
@@ -295,7 +406,7 @@ static void deletePoolToken (void *data)
 }
 
 static void copyToken (tokenInfo *const dest, const tokenInfo *const src,
-                       bool scope)
+					   bool scope)
 {
 	dest->lineNumber = src->lineNumber;
 	dest->filePosition = src->filePosition;
@@ -306,12 +417,12 @@ static void copyToken (tokenInfo *const dest, const tokenInfo *const src,
 		vStringCopy (dest->scope, src->scope);
 }
 
-__inline static bool whiteChar(const int c)
+CTAGS_INLINE bool whiteChar (const int c)
 {
 	return c == ' ' || c == '\r' || c == '\t';
 }
 
-__inline static void parseOneChar(const int c, tokenInfo *const token, const char expected, const tokenType type, parserResult *const result)
+CTAGS_INLINE void parseOneChar (const int c, tokenInfo *const token, const char expected, const tokenType type, parserResult *const result)
 {
 	if (whiteChar (c))
 	{
@@ -326,12 +437,12 @@ __inline static void parseOneChar(const int c, tokenInfo *const token, const cha
 	}
 
 	token->type = type;
-	token->lineNumber   = getInputLineNumber ();
-	token->filePosition = getInputFilePosition ();
+	token->lineNumber   = tsGetLineNumber ();
+	token->filePosition = tsGetFilePosition ();
 	result->status = PARSER_FINISHED;
 }
 
-__inline static void parseChar(const int c, tokenInfo *const token, void *state, parserResult *const result)
+CTAGS_INLINE void parseChar (const int c, tokenInfo *const token, void *state, parserResult *const result)
 {
 	if (whiteChar (c))
 	{
@@ -346,12 +457,12 @@ __inline static void parseChar(const int c, tokenInfo *const token, void *state,
 	}
 
 	token->type = TOKEN_CHARACTER;
-	token->lineNumber   = getInputLineNumber ();
-	token->filePosition = getInputFilePosition ();
+	token->lineNumber   = tsGetLineNumber ();
+	token->filePosition = tsGetFilePosition ();
 	result->status = PARSER_FINISHED;
 }
 
-__inline static void *initParseWordState()
+CTAGS_INLINE void *initParseWordState ()
 {
 	int *num = xMalloc (1, int);
 	*num = 0;
@@ -359,12 +470,12 @@ __inline static void *initParseWordState()
 	return num;
 }
 
-__inline static void freeParseWordState(void *state)
+CTAGS_INLINE void freeParseWordState (void *state)
 {
 	eFree ((int *) state);
 }
 
-__inline static void parseWord(const int c, tokenInfo *const token, const char *word, int *parsed, parserResult *const result)
+CTAGS_INLINE void parseWord (const int c, tokenInfo *const token, const char *word, int *parsed, parserResult *const result)
 {
 	if (*parsed == 0 && whiteChar (c))
 	{
@@ -383,8 +494,8 @@ __inline static void parseWord(const int c, tokenInfo *const token, const char *
 		vStringCatS (token->string, word);
 		token->type = TOKEN_KEYWORD;
 		token->keyword = lookupKeyword (vStringValue (token->string), Lang_ts);
-		token->lineNumber   = getInputLineNumber ();
-		token->filePosition = getInputFilePosition ();
+		token->lineNumber   = tsGetLineNumber ();
+		token->filePosition = tsGetFilePosition ();
 
 		result->unusedChars = 1;
 		result->status = PARSER_FINISHED;
@@ -402,7 +513,7 @@ __inline static void parseWord(const int c, tokenInfo *const token, const char *
 	result->status = PARSER_FAILED;
 }
 
-__inline static void parseNumber(const int c, tokenInfo *const token, int *parsed, parserResult *const result)
+CTAGS_INLINE void parseNumber (const int c, tokenInfo *const token, int *parsed, parserResult *const result)
 {
 	if (*parsed == 0)
 	{
@@ -431,14 +542,14 @@ __inline static void parseNumber(const int c, tokenInfo *const token, int *parse
 
 	token->type = TOKEN_NUMBER;
 	token->keyword = KEYWORD_NONE;
-	token->lineNumber   = getInputLineNumber ();
-	token->filePosition = getInputFilePosition ();
+	token->lineNumber   = tsGetLineNumber ();
+	token->filePosition = tsGetFilePosition ();
 
 	result->unusedChars = 1;
 	result->status = PARSER_FINISHED;
 }
 
-__inline static void parseWordToken(const int c, tokenInfo *const token, const char *word, const tokenType type, int *parsed, parserResult *const result)
+CTAGS_INLINE void parseWordToken (const int c, tokenInfo *const token, const char *word, const tokenType type, int *parsed, parserResult *const result)
 {
 	if (*parsed == 0 && whiteChar (c))
 	{
@@ -454,8 +565,8 @@ __inline static void parseWordToken(const int c, tokenInfo *const token, const c
 		{
 			token->type = type;
 			token->keyword = KEYWORD_NONE;
-			token->lineNumber   = getInputLineNumber ();
-			token->filePosition = getInputFilePosition ();
+			token->lineNumber   = tsGetLineNumber ();
+			token->filePosition = tsGetFilePosition ();
 			result->status = PARSER_FINISHED;
 			return;
 		}
@@ -467,7 +578,7 @@ __inline static void parseWordToken(const int c, tokenInfo *const token, const c
 	result->status = PARSER_FAILED;
 }
 
-__inline static void *initParseCommentState()
+CTAGS_INLINE void *initParseCommentState ()
 {
 	commentState *st = xMalloc (1, commentState);
 	st->parsed = 0;
@@ -477,12 +588,12 @@ __inline static void *initParseCommentState()
 	return st;
 }
 
-__inline static void freeParseCommentState(void *state)
+CTAGS_INLINE void freeParseCommentState (void *state)
 {
 	eFree ((commentState *) state);
 }
 
-__inline static void parseComment(const int c, tokenInfo *const token, commentState *state, parserResult *const result)
+CTAGS_INLINE void parseComment (const int c, tokenInfo *const token, commentState *state, parserResult *const result)
 {
 	if (state->parsed == 0 && whiteChar (c))
 	{
@@ -533,8 +644,8 @@ __inline static void parseComment(const int c, tokenInfo *const token, commentSt
 	{
 		token->type = TOKEN_COMMENT_BLOCK;
 		token->keyword = KEYWORD_NONE;
-		token->lineNumber   = getInputLineNumber ();
-		token->filePosition = getInputFilePosition ();
+		token->lineNumber   = tsGetLineNumber ();
+		token->filePosition = tsGetFilePosition ();
 
 		return;
 	}
@@ -542,7 +653,7 @@ __inline static void parseComment(const int c, tokenInfo *const token, commentSt
 	result->status = PARSER_NEEDS_MORE_INPUT;
 }
 
-__inline static void *initParseStringState()
+CTAGS_INLINE void *initParseStringState ()
 {
 	char *st = xMalloc (1, char);
 	*st = '\0';
@@ -550,12 +661,12 @@ __inline static void *initParseStringState()
 	return st;
 }
 
-__inline static void freeParseStringState(void *state)
+CTAGS_INLINE void freeParseStringState (void *state)
 {
 	eFree ((char *) state);
 }
 
-__inline static void parseString(const int c, tokenInfo *const token, const char quote, char *prev, parserResult *const result)
+CTAGS_INLINE void parseString (const int c, tokenInfo *const token, const char quote, char *prev, parserResult *const result)
 {
 	if (*prev == '\0')
 	{
@@ -590,8 +701,8 @@ __inline static void parseString(const int c, tokenInfo *const token, const char
 
 			token->type = TOKEN_STRING;
 			token->keyword = KEYWORD_NONE;
-			token->lineNumber   = getInputLineNumber ();
-			token->filePosition = getInputFilePosition ();
+			token->lineNumber   = tsGetLineNumber ();
+			token->filePosition = tsGetFilePosition ();
 
 			return;
 		}
@@ -601,7 +712,7 @@ __inline static void parseString(const int c, tokenInfo *const token, const char
 	result->status = PARSER_NEEDS_MORE_INPUT;
 }
 
-__inline static void *initBlockState()
+CTAGS_INLINE void *initBlockState ()
 {
 	blockState *st = xMalloc (1, blockState);
 	st->parsed = 0;
@@ -611,12 +722,12 @@ __inline static void *initBlockState()
 	return st;
 }
 
-__inline static void freeBlockState(void *state)
+CTAGS_INLINE void freeBlockState (void *state)
 {
 	eFree ((blockState *) state);
 }
 
-__inline static void parseBlock(const int c, tokenInfo *const token, tokenType const ttype, const char start, const char end, blockState *state, parserResult *const result)
+CTAGS_INLINE void parseBlock (const int c, tokenInfo *const token, tokenType const ttype, const char start, const char end, blockState *state, parserResult *const result)
 {
 	if (state->parsed == 0)
 	{
@@ -657,8 +768,8 @@ __inline static void parseBlock(const int c, tokenInfo *const token, tokenType c
 	{
 		token->type = ttype;
 		token->keyword = KEYWORD_NONE;
-		token->lineNumber   = getInputLineNumber ();
-		token->filePosition = getInputFilePosition ();
+		token->lineNumber   = tsGetLineNumber ();
+		token->filePosition = tsGetFilePosition ();
 		result->status = PARSER_FINISHED;
 
 		return;
@@ -667,7 +778,7 @@ __inline static void parseBlock(const int c, tokenInfo *const token, tokenType c
 	result->status = PARSER_NEEDS_MORE_INPUT;
 }
 
-__inline static void parseIdentifier(const int c, tokenInfo *const token, int *parsed, parserResult *const result)
+CTAGS_INLINE void parseIdentifier (const int c, tokenInfo *const token, int *parsed, parserResult *const result)
 {
 	if (*parsed == 0 && whiteChar (c))
 	{
@@ -687,8 +798,8 @@ __inline static void parseIdentifier(const int c, tokenInfo *const token, int *p
 	if (*parsed > 0)
 	{
 		token->type = TOKEN_IDENTIFIER;
-		token->lineNumber   = getInputLineNumber ();
-		token->filePosition = getInputFilePosition ();
+		token->lineNumber   = tsGetLineNumber ();
+		token->filePosition = tsGetFilePosition ();
 		result->status = PARSER_FINISHED;
 		result->unusedChars = 1;
 		return;
@@ -748,23 +859,23 @@ BLOCK_PARSER_DEF (Squares, '[', ']', TOKEN_SQUARES)
 BLOCK_PARSER_DEF (Template, '<', '>', TOKEN_TEMPLATE)
 BLOCK_PARSER_DEF (Curlies, '{', '}', TOKEN_CURLIES)
 
-static bool tryParser(Parser parser, ParserStateInit stInit, ParserStateFree stFree, tokenInfo *const token)
+static bool tryParser (Parser parser, ParserStateInit stInit, ParserStateFree stFree, tokenInfo *const token)
 {
 	void *currentState = NULL;
 	parserResult result;
 	result.status = PARSER_NEEDS_MORE_INPUT;
 	result.unusedChars = 0;
-	charArray *usedC = charArrayNew ();
-	int c;
+	ptrArray *usedC = ptrArrayNew ((ptrArrayDeleteFunc)tsDeleteIOChar);
+	tsIOChar *c;
 
 	if (stInit)
 		currentState = stInit ();
 
 	while (result.status == PARSER_NEEDS_MORE_INPUT)
 	{
-		c = getcFromInputFile ();
-		parser (c, token, currentState, &result);
-		charArrayAdd (usedC, c);
+		c = tsGetC ();
+		parser (c->c, token, currentState, &result);
+		ptrArrayAdd (usedC, c);
 	}
 
 	if (stFree)
@@ -772,28 +883,28 @@ static bool tryParser(Parser parser, ParserStateInit stInit, ParserStateFree stF
 
 	if (result.status == PARSER_FAILED)
 	{
-		while (charArrayCount (usedC) > 0)
+		while (ptrArrayCount (usedC) > 0)
 		{
-			ungetcToInputFile (charArrayLast (usedC));
-			charArrayRemoveLast (usedC);
+			tsUngetC (ptrArrayLast (usedC));
+			ptrArrayRemoveLast (usedC);
 		}
 	}
 	else
 	{
 		while (result.unusedChars > 0)
 		{
-			ungetcToInputFile (charArrayLast (usedC));
-			charArrayRemoveLast (usedC);
+			tsUngetC (ptrArrayLast (usedC));
+			ptrArrayRemoveLast (usedC);
 			result.unusedChars--;
 		}
 	}
 
-	charArrayDelete (usedC);
+	ptrArrayDelete (usedC);
 
 	return result.status == PARSER_FINISHED;
 }
 
-static bool tryInSequence(tokenInfo *const token, ...)
+static bool tryInSequence (tokenInfo *const token, ...)
 {
 	Parser currentParser = NULL;
 	ParserStateInit stInit;
@@ -825,10 +936,10 @@ static void parseDecorator (tokenInfo *const token)
 	{
 		clearPoolToken (token);
 		parsed = tryInSequence (token,
-		                        parseAt, NULL, NULL,
-		                        parseNewLine, NULL, NULL,
-		                        parseComment, initParseCommentState, freeParseCommentState,
-		                        NULL);
+								parseAt, NULL, NULL,
+								parseNewLine, NULL, NULL,
+								parseComment, initParseCommentState, freeParseCommentState,
+								NULL);
 	} while (parsed && token->type != TOKEN_PARENS);
 
 	do
@@ -836,10 +947,10 @@ static void parseDecorator (tokenInfo *const token)
 		clearPoolToken (token);
 
 		parsed = tryInSequence (token,
-		                        parseNewLine, NULL, NULL,
-		                        parseComment, initParseCommentState, freeParseCommentState,
-		                        parseIdentifier, initParseWordState, freeParseWordState,
-		                        NULL);
+								parseNewLine, NULL, NULL,
+								parseComment, initParseCommentState, freeParseCommentState,
+								parseIdentifier, initParseWordState, freeParseWordState,
+								NULL);
 	} while (parsed && (token->type != TOKEN_IDENTIFIER || tryParser ((Parser) parsePeriod, NULL, NULL, token)));
 
 	//parse optional parens block
@@ -853,18 +964,18 @@ static void skipBlocksTillType (tokenType type, tokenInfo *const token)
 	do
 	{
 		parsed = tryInSequence (token,
-		                        parseSquares, initBlockState, freeBlockState,
-		                        parseParens, initBlockState, freeBlockState,
-		                        parseComment, initParseCommentState, freeParseCommentState,
-		                        parseTemplate, initBlockState, freeBlockState,
-		                        parseCurlies, initBlockState, freeBlockState,
-		                        parseStringSQuote, initParseStringState, freeParseStringState,
-		                        parseStringDQuote, initParseStringState, freeParseStringState,
-		                        parseStringTemplate, initParseStringState, freeParseStringState,
-		                        parseSemicolon, NULL, NULL,
-		                        parseComma, NULL, NULL,
-		                        parseChar, NULL, NULL,
-		                        NULL);
+								parseSquares, initBlockState, freeBlockState,
+								parseParens, initBlockState, freeBlockState,
+								parseComment, initParseCommentState, freeParseCommentState,
+								parseTemplate, initBlockState, freeBlockState,
+								parseCurlies, initBlockState, freeBlockState,
+								parseStringSQuote, initParseStringState, freeParseStringState,
+								parseStringDQuote, initParseStringState, freeParseStringState,
+								parseStringTemplate, initParseStringState, freeParseStringState,
+								parseSemicolon, NULL, NULL,
+								parseComma, NULL, NULL,
+								parseChar, NULL, NULL,
+								NULL);
 	} while (parsed && ! isType (token, type));
 }
 
@@ -875,16 +986,16 @@ static void parseInterfaceBody (vString *const scope, tokenInfo *const token)
 	do
 	{
 		parsed = tryInSequence (token,
-		                        parseTemplate, initBlockState, freeBlockState,
-		                        parseStringSQuote, initParseStringState, freeParseStringState,
-		                        parseStringDQuote, initParseStringState, freeParseStringState,
-		                        parseStringTemplate, initParseStringState, freeParseStringState,
-		                        parseParens, initBlockState, freeBlockState,
-		                        parseComment, initParseCommentState, freeParseCommentState,
-		                        parseSquares, initBlockState, freeBlockState,
-		                        parseOpenCurly, NULL, NULL,
-		                        parseChar, NULL, NULL,
-		                        NULL);
+								parseTemplate, initBlockState, freeBlockState,
+								parseStringSQuote, initParseStringState, freeParseStringState,
+								parseStringDQuote, initParseStringState, freeParseStringState,
+								parseStringTemplate, initParseStringState, freeParseStringState,
+								parseParens, initBlockState, freeBlockState,
+								parseComment, initParseCommentState, freeParseCommentState,
+								parseSquares, initBlockState, freeBlockState,
+								parseOpenCurly, NULL, NULL,
+								parseChar, NULL, NULL,
+								NULL);
 	} while (parsed && ! isType (token, TOKEN_OPEN_CURLY));
 
 	if (! parsed)
@@ -896,22 +1007,22 @@ static void parseInterfaceBody (vString *const scope, tokenInfo *const token)
 		clearPoolToken (token);
 
 		parsed = tryInSequence (token,
-		                        parseTemplate, initBlockState, freeBlockState,
-		                        parseStringSQuote, initParseStringState, freeParseStringState,
-		                        parseStringDQuote, initParseStringState, freeParseStringState,
-		                        parseStringTemplate, initParseStringState, freeParseStringState,
-		                        parseParens, initBlockState, freeBlockState,
-		                        parseComment, initParseCommentState, freeParseCommentState,
-		                        parseSquares, initBlockState, freeBlockState,
-		                        parsePrivateKeyword, initParseWordState, freeParseWordState,
-		                        parseProtectedKeyword, initParseWordState, freeParseWordState,
-		                        parsePublicKeyword, initParseWordState, freeParseWordState,
-		                        parseReadonlyKeyword, initParseWordState, freeParseWordState,
-		                        parseStaticKeyword, initParseWordState, freeParseWordState,
-		                        parseCloseCurly, NULL, NULL,
-		                        parseIdentifier, initParseWordState, freeParseWordState,
-		                        parseChar, NULL, NULL,
-		                        NULL);
+								parseTemplate, initBlockState, freeBlockState,
+								parseStringSQuote, initParseStringState, freeParseStringState,
+								parseStringDQuote, initParseStringState, freeParseStringState,
+								parseStringTemplate, initParseStringState, freeParseStringState,
+								parseParens, initBlockState, freeBlockState,
+								parseComment, initParseCommentState, freeParseCommentState,
+								parseSquares, initBlockState, freeBlockState,
+								parsePrivateKeyword, initParseWordState, freeParseWordState,
+								parseProtectedKeyword, initParseWordState, freeParseWordState,
+								parsePublicKeyword, initParseWordState, freeParseWordState,
+								parseReadonlyKeyword, initParseWordState, freeParseWordState,
+								parseStaticKeyword, initParseWordState, freeParseWordState,
+								parseCloseCurly, NULL, NULL,
+								parseIdentifier, initParseWordState, freeParseWordState,
+								parseChar, NULL, NULL,
+								NULL);
 
 		if (parsed)
 		{
@@ -965,10 +1076,10 @@ static void parseInterface (vString *const scope, tsKind scopeParentKind, tokenI
 	{
 		clearPoolToken (token);
 		parsed = tryInSequence (token,
-		                        parseNewLine, NULL, NULL,
-		                        parseComment, initParseCommentState, freeParseCommentState,
-		                        parseIdentifier, initParseWordState, freeParseWordState,
-		                        NULL);
+								parseNewLine, NULL, NULL,
+								parseComment, initParseCommentState, freeParseCommentState,
+								parseIdentifier, initParseWordState, freeParseWordState,
+								NULL);
 	} while (parsed && token->type != TOKEN_IDENTIFIER);
 
 	if (! parsed)
@@ -1003,9 +1114,9 @@ static void parseType (vString *const scope, tsKind scopeParentKind, tokenInfo *
 	{
 		clearPoolToken (token);
 		parsed = tryInSequence (token,
-		                        parseComment, initParseCommentState, freeParseCommentState,
-		                        parseIdentifier, initParseWordState, freeParseWordState,
-		                        NULL);
+								parseComment, initParseCommentState, freeParseCommentState,
+								parseIdentifier, initParseWordState, freeParseWordState,
+								NULL);
 	} while (parsed && token->type != TOKEN_IDENTIFIER);
 
 	if (! parsed)
@@ -1027,16 +1138,16 @@ static void parseEnumBody (vString *const scope, tokenInfo *const token)
 	do
 	{
 		parsed = tryInSequence (token,
-		                        parseTemplate, initBlockState, freeBlockState,
-		                        parseStringSQuote, initParseStringState, freeParseStringState,
-		                        parseStringDQuote, initParseStringState, freeParseStringState,
-		                        parseStringTemplate, initParseStringState, freeParseStringState,
-		                        parseParens, initBlockState, freeBlockState,
-		                        parseComment, initParseCommentState, freeParseCommentState,
-		                        parseSquares, initBlockState, freeBlockState,
-		                        parseOpenCurly, NULL, NULL,
-		                        parseChar, NULL, NULL,
-		                        NULL);
+								parseTemplate, initBlockState, freeBlockState,
+								parseStringSQuote, initParseStringState, freeParseStringState,
+								parseStringDQuote, initParseStringState, freeParseStringState,
+								parseStringTemplate, initParseStringState, freeParseStringState,
+								parseParens, initBlockState, freeBlockState,
+								parseComment, initParseCommentState, freeParseCommentState,
+								parseSquares, initBlockState, freeBlockState,
+								parseOpenCurly, NULL, NULL,
+								parseChar, NULL, NULL,
+								NULL);
 	} while (parsed && token->type != TOKEN_OPEN_CURLY);
 
 	if (! parsed)
@@ -1047,18 +1158,18 @@ static void parseEnumBody (vString *const scope, tokenInfo *const token)
 	{
 		clearPoolToken (token);
 		parsed = tryInSequence (token,
-		                        parseTemplate, initBlockState, freeBlockState,
-		                        parseStringSQuote, initParseStringState, freeParseStringState,
-		                        parseStringDQuote, initParseStringState, freeParseStringState,
-		                        parseStringTemplate, initParseStringState, freeParseStringState,
-		                        parseParens, initBlockState, freeBlockState,
-		                        parseComment, initParseCommentState, freeParseCommentState,
-		                        parseSquares, initBlockState, freeBlockState,
-		                        parseCloseCurly, NULL, NULL,
-		                        parseComma, NULL, NULL,
-		                        parseIdentifier, initParseWordState, freeParseWordState,
-		                        parseChar, NULL, NULL,
-		                        NULL);
+								parseTemplate, initBlockState, freeBlockState,
+								parseStringSQuote, initParseStringState, freeParseStringState,
+								parseStringDQuote, initParseStringState, freeParseStringState,
+								parseStringTemplate, initParseStringState, freeParseStringState,
+								parseParens, initBlockState, freeBlockState,
+								parseComment, initParseCommentState, freeParseCommentState,
+								parseSquares, initBlockState, freeBlockState,
+								parseCloseCurly, NULL, NULL,
+								parseComma, NULL, NULL,
+								parseIdentifier, initParseWordState, freeParseWordState,
+								parseChar, NULL, NULL,
+								NULL);
 
 		if (parsed)
 		{
@@ -1093,9 +1204,9 @@ static void parseEnum (vString *const scope, tsKind scopeParentKind, tokenInfo *
 	{
 		clearPoolToken (token);
 		parsed = tryInSequence (token,
-		                        parseComment, initParseCommentState, freeParseCommentState,
-		                        parseIdentifier, initParseWordState, freeParseWordState,
-		                        NULL);
+								parseComment, initParseCommentState, freeParseCommentState,
+								parseIdentifier, initParseWordState, freeParseWordState,
+								NULL);
 	} while (parsed && token->type != TOKEN_IDENTIFIER);
 
 	if (! parsed)
@@ -1132,36 +1243,36 @@ static void parseVariable (vString *const scope, tsKind scopeParentKind, tokenIn
 	{
 		clearPoolToken (token);
 		parsed = tryInSequence (token,
-		                        parseTemplate, initBlockState, freeBlockState,
-		                        parseStringSQuote, initParseStringState, freeParseStringState,
-		                        parseStringDQuote, initParseStringState, freeParseStringState,
-		                        parseStringTemplate, initParseStringState, freeParseStringState,
-		                        parseComment, initParseCommentState, freeParseCommentState,
-		                        parseParens, initBlockState, freeBlockState,
-		                        parseNumber, initParseWordState, freeParseWordState,
-		                        parsePipe, NULL, NULL,
-		                        parseAmpersand, NULL, NULL,
-		                        parseEqualSign, NULL, NULL,
-		                        parseQuestionMark, NULL, NULL,
-		                        parseOpenSquare, NULL, NULL,
-		                        parseCloseSquare, NULL, NULL,
-		                        parseOpenCurly, NULL, NULL,
-		                        parseCloseCurly, NULL, NULL,
-		                        parseCloseParen, NULL, NULL,
-		                        parseNewLine, NULL, NULL,
-		                        parseColon, NULL, NULL,
-		                        parseSemicolon, NULL, NULL,
-		                        parseComma, NULL, NULL,
-		                        parsePeriod, NULL, NULL,
-		                        parseArrow, initParseWordState, freeParseWordState,
-		                        parseForKeyword, initParseWordState, freeParseWordState,
-		                        parseWhileKeyword, initParseWordState, freeParseWordState,
-		                        parseThisKeyword, initParseWordState, freeParseWordState,
-		                        parseEnumKeyword, initParseWordState, freeParseWordState,
-		                        parseOfKeyword, initParseWordState, freeParseWordState,
-		                        parseIdentifier, initParseWordState, freeParseWordState,
-		                        parseChar, NULL, NULL,
-		                        NULL);
+								parseTemplate, initBlockState, freeBlockState,
+								parseStringSQuote, initParseStringState, freeParseStringState,
+								parseStringDQuote, initParseStringState, freeParseStringState,
+								parseStringTemplate, initParseStringState, freeParseStringState,
+								parseComment, initParseCommentState, freeParseCommentState,
+								parseParens, initBlockState, freeBlockState,
+								parseNumber, initParseWordState, freeParseWordState,
+								parsePipe, NULL, NULL,
+								parseAmpersand, NULL, NULL,
+								parseEqualSign, NULL, NULL,
+								parseQuestionMark, NULL, NULL,
+								parseOpenSquare, NULL, NULL,
+								parseCloseSquare, NULL, NULL,
+								parseOpenCurly, NULL, NULL,
+								parseCloseCurly, NULL, NULL,
+								parseCloseParen, NULL, NULL,
+								parseNewLine, NULL, NULL,
+								parseColon, NULL, NULL,
+								parseSemicolon, NULL, NULL,
+								parseComma, NULL, NULL,
+								parsePeriod, NULL, NULL,
+								parseArrow, initParseWordState, freeParseWordState,
+								parseForKeyword, initParseWordState, freeParseWordState,
+								parseWhileKeyword, initParseWordState, freeParseWordState,
+								parseThisKeyword, initParseWordState, freeParseWordState,
+								parseEnumKeyword, initParseWordState, freeParseWordState,
+								parseOfKeyword, initParseWordState, freeParseWordState,
+								parseIdentifier, initParseWordState, freeParseWordState,
+								parseChar, NULL, NULL,
+								NULL);
 
 		if (parsed)
 		{
@@ -1235,11 +1346,11 @@ static void parseFunctionArgs (vString *const scope, tsKind scopeParentKind, tok
 	{
 		clearPoolToken (token);
 		parsed = tryInSequence (token,
-		                        parseNewLine, NULL, NULL,
-		                        parseTemplate, initBlockState, freeBlockState,
-		                        parseComment, initParseCommentState, freeParseCommentState,
-		                        parseOpenParen, NULL, NULL,
-		                        NULL);
+								parseNewLine, NULL, NULL,
+								parseTemplate, initBlockState, freeBlockState,
+								parseComment, initParseCommentState, freeParseCommentState,
+								parseOpenParen, NULL, NULL,
+								NULL);
 	} while (parsed && token->type != TOKEN_OPEN_PAREN);
 
 	if (! parsed)
@@ -1249,37 +1360,37 @@ static void parseFunctionArgs (vString *const scope, tsKind scopeParentKind, tok
 	{
 		clearPoolToken (token);
 		parsed = tryInSequence (token,
-		                        parseTemplate, initBlockState, freeBlockState,
-		                        parseStringSQuote, initParseStringState, freeParseStringState,
-		                        parseStringDQuote, initParseStringState, freeParseStringState,
-		                        parseStringTemplate, initParseStringState, freeParseStringState,
-		                        parseComment, initParseCommentState, freeParseCommentState,
-		                        parseParens, initBlockState, freeBlockState,
-		                        parseNumber, initParseWordState, freeParseWordState,
-		                        parsePipe, NULL, NULL,
-		                        parseAmpersand, NULL, NULL,
-		                        parseEqualSign, NULL, NULL,
-		                        parseQuestionMark, NULL, NULL,
-		                        parseOpenSquare, NULL, NULL,
-		                        parseCloseSquare, NULL, NULL,
-		                        parseOpenCurly, NULL, NULL,
-		                        parseCloseCurly, NULL, NULL,
-		                        parseNewLine, NULL, NULL,
-		                        parseColon, NULL, NULL,
-		                        parseComma, NULL, NULL,
-		                        parsePeriod, NULL, NULL,
-		                        parseAt, NULL, NULL,
-		                        parseArrow, initParseWordState, freeParseWordState,
-		                        parseCloseParen, NULL, NULL,
-		                        parseIdentifier, initParseWordState, freeParseWordState,
-		                        NULL);
+								parseTemplate, initBlockState, freeBlockState,
+								parseStringSQuote, initParseStringState, freeParseStringState,
+								parseStringDQuote, initParseStringState, freeParseStringState,
+								parseStringTemplate, initParseStringState, freeParseStringState,
+								parseComment, initParseCommentState, freeParseCommentState,
+								parseParens, initBlockState, freeBlockState,
+								parseNumber, initParseWordState, freeParseWordState,
+								parsePipe, NULL, NULL,
+								parseAmpersand, NULL, NULL,
+								parseEqualSign, NULL, NULL,
+								parseQuestionMark, NULL, NULL,
+								parseOpenSquare, NULL, NULL,
+								parseCloseSquare, NULL, NULL,
+								parseOpenCurly, NULL, NULL,
+								parseCloseCurly, NULL, NULL,
+								parseNewLine, NULL, NULL,
+								parseColon, NULL, NULL,
+								parseComma, NULL, NULL,
+								parsePeriod, NULL, NULL,
+								parseAt, NULL, NULL,
+								parseArrow, initParseWordState, freeParseWordState,
+								parseCloseParen, NULL, NULL,
+								parseIdentifier, initParseWordState, freeParseWordState,
+								NULL);
 
 		if (parsed)
 		{
 			switch (token->type)
 			{
 				case TOKEN_AT:
-					ungetcToInputFile ('@');
+					tsInjectC ('@');
 					parseDecorator (token);
 					break;
 				case TOKEN_OPEN_SQUARE:
@@ -1331,14 +1442,14 @@ static void parseFunctionBody (vString *const scope, tsKind scopeParentKind, tok
 		clearPoolToken (token);
 
 		parsed = tryInSequence (token,
-		                        parseOpenCurly, NULL, NULL,
-		                        parseStringSQuote, initParseStringState, freeParseStringState,
-		                        parseStringDQuote, initParseStringState, freeParseStringState,
-		                        parseStringTemplate, initParseStringState, freeParseStringState,
-		                        parseTemplate, initBlockState, freeBlockState,
-		                        parseComment, initParseCommentState, freeParseCommentState,
-		                        parseChar, NULL, NULL,
-		                        NULL);
+								parseOpenCurly, NULL, NULL,
+								parseStringSQuote, initParseStringState, freeParseStringState,
+								parseStringDQuote, initParseStringState, freeParseStringState,
+								parseStringTemplate, initParseStringState, freeParseStringState,
+								parseTemplate, initBlockState, freeBlockState,
+								parseComment, initParseCommentState, freeParseCommentState,
+								parseChar, NULL, NULL,
+								NULL);
 
 	} while (parsed && ! isType (token, TOKEN_OPEN_CURLY));
 
@@ -1350,18 +1461,18 @@ static void parseFunctionBody (vString *const scope, tsKind scopeParentKind, tok
 		clearPoolToken (token);
 
 		parsed = tryInSequence (token,
-		                        parseOpenCurly, NULL, NULL,
-		                        parseCloseCurly, NULL, NULL,
-		                        parseStringSQuote, initParseStringState, freeParseStringState,
-		                        parseStringDQuote, initParseStringState, freeParseStringState,
-		                        parseStringTemplate, initParseStringState, freeParseStringState,
-		                        parseComment, initParseCommentState, freeParseCommentState,
-		                        parseTemplate, initBlockState, freeBlockState,
-		                        parseVarKeyword, initParseWordState, freeParseWordState,
-		                        parseLetKeyword, initParseWordState, freeParseWordState,
-		                        parseConstKeyword, initParseWordState, freeParseWordState,
-		                        parseChar, NULL, NULL,
-		                        NULL);
+								parseOpenCurly, NULL, NULL,
+								parseCloseCurly, NULL, NULL,
+								parseStringSQuote, initParseStringState, freeParseStringState,
+								parseStringDQuote, initParseStringState, freeParseStringState,
+								parseStringTemplate, initParseStringState, freeParseStringState,
+								parseComment, initParseCommentState, freeParseCommentState,
+								parseTemplate, initBlockState, freeBlockState,
+								parseVarKeyword, initParseWordState, freeParseWordState,
+								parseLetKeyword, initParseWordState, freeParseWordState,
+								parseConstKeyword, initParseWordState, freeParseWordState,
+								parseChar, NULL, NULL,
+								NULL);
 
 		if (parsed)
 		{
@@ -1401,10 +1512,10 @@ static void parseFunction (vString *const scope, tsKind scopeParentKind, tokenIn
 	{
 		clearPoolToken (token);
 		parsed = tryInSequence (token,
-		                        parseComment, initParseCommentState, freeParseCommentState,
-		                        parseStar, NULL, NULL,
-		                        parseIdentifier, initParseWordState, freeParseWordState,
-		                        NULL);
+								parseComment, initParseCommentState, freeParseCommentState,
+								parseStar, NULL, NULL,
+								parseIdentifier, initParseWordState, freeParseWordState,
+								NULL);
 
 		if (parsed && isType (token, TOKEN_STAR))
 			isGenerator = true;
@@ -1450,32 +1561,32 @@ static void parsePropertyType (tokenInfo *const token)
 		clearPoolToken (token);
 
 		parsed = tryInSequence (token,
-		                        parseNewLine, NULL, NULL,
-		                        parseSemicolon, NULL, NULL,
-		                        parsePipe, NULL, NULL,
-		                        parseAmpersand, NULL, NULL,
-		                        parseEqualSign, NULL, NULL,
-		                        parseComma, NULL, NULL,
-		                        parseCloseParen, NULL, NULL,
-		                        parseArrow, initParseWordState, freeParseWordState,
-		                        parseTemplate, initBlockState, freeBlockState,
-		                        parseParens, initBlockState, freeBlockState,
-		                        parseStringSQuote, initParseStringState, freeParseStringState,
-		                        parseStringDQuote, initParseStringState, freeParseStringState,
-		                        parseStringTemplate, initParseStringState, freeParseStringState,
-		                        parseComment, initParseCommentState, freeParseCommentState,
-		                        parseSquares, initBlockState, freeBlockState,
-		                        parseCurlies, initBlockState, freeBlockState,
-		                        parseIdentifier, initParseWordState, freeParseWordState,
-		                        parseChar, NULL, NULL,
-		                        NULL);
+								parseNewLine, NULL, NULL,
+								parseSemicolon, NULL, NULL,
+								parsePipe, NULL, NULL,
+								parseAmpersand, NULL, NULL,
+								parseEqualSign, NULL, NULL,
+								parseComma, NULL, NULL,
+								parseCloseParen, NULL, NULL,
+								parseArrow, initParseWordState, freeParseWordState,
+								parseTemplate, initBlockState, freeBlockState,
+								parseParens, initBlockState, freeBlockState,
+								parseStringSQuote, initParseStringState, freeParseStringState,
+								parseStringDQuote, initParseStringState, freeParseStringState,
+								parseStringTemplate, initParseStringState, freeParseStringState,
+								parseComment, initParseCommentState, freeParseCommentState,
+								parseSquares, initBlockState, freeBlockState,
+								parseCurlies, initBlockState, freeBlockState,
+								parseIdentifier, initParseWordState, freeParseWordState,
+								parseChar, NULL, NULL,
+								NULL);
 	} while (parsed && ! isType (token, TOKEN_CLOSE_PAREN) && ! isType (token, TOKEN_SEMICOLON) && ! isType (token, TOKEN_COMMA));
 
 	if (! parsed)
 		return;
 
 	if (isType (token, TOKEN_CLOSE_PAREN))
-		ungetcToInputFile (')');
+		tsInjectC (')');
 	clearPoolToken (token);
 }
 
@@ -1488,10 +1599,10 @@ static void parseConstructorParams (vString *const scope, tokenInfo *const token
 		clearPoolToken (token);
 
 		parsed = tryInSequence (token,
-		                        parseNewLine, NULL, NULL,
-		                        parseOpenParen, NULL, NULL,
-		                        parseComment, initParseCommentState, freeParseCommentState,
-		                        NULL);
+								parseNewLine, NULL, NULL,
+								parseOpenParen, NULL, NULL,
+								parseComment, initParseCommentState, freeParseCommentState,
+								NULL);
 	} while (parsed && ! isType (token, TOKEN_OPEN_PAREN));
 
 	if (! parsed)
@@ -1505,26 +1616,26 @@ static void parseConstructorParams (vString *const scope, tokenInfo *const token
 		clearPoolToken (token);
 
 		parsed = tryInSequence (token,
-		                        parseNewLine, NULL, NULL,
-		                        parseCloseParen, NULL, NULL,
-		                        parseComma, NULL, NULL,
-		                        parseColon, NULL, NULL,
-		                        parseAt, NULL, NULL,
-		                        parseComment, initParseCommentState, freeParseCommentState,
-		                        parsePrivateKeyword, initParseWordState, freeParseWordState,
-		                        parseProtectedKeyword, initParseWordState, freeParseWordState,
-		                        parsePublicKeyword, initParseWordState, freeParseWordState,
-		                        parseReadonlyKeyword, initParseWordState, freeParseWordState,
-		                        parseStaticKeyword, initParseWordState, freeParseWordState,
-		                        parseIdentifier, initParseWordState, freeParseWordState,
-		                        NULL);
+								parseNewLine, NULL, NULL,
+								parseCloseParen, NULL, NULL,
+								parseComma, NULL, NULL,
+								parseColon, NULL, NULL,
+								parseAt, NULL, NULL,
+								parseComment, initParseCommentState, freeParseCommentState,
+								parsePrivateKeyword, initParseWordState, freeParseWordState,
+								parseProtectedKeyword, initParseWordState, freeParseWordState,
+								parsePublicKeyword, initParseWordState, freeParseWordState,
+								parseReadonlyKeyword, initParseWordState, freeParseWordState,
+								parseStaticKeyword, initParseWordState, freeParseWordState,
+								parseIdentifier, initParseWordState, freeParseWordState,
+								NULL);
 
 		if (parsed)
 		{
 			switch (token->type)
 			{
 				case TOKEN_AT:
-					ungetcToInputFile ('@');
+					tsInjectC ('@');
 					parseDecorator (token);
 					break;
 				case TOKEN_KEYWORD:
@@ -1538,7 +1649,7 @@ static void parseConstructorParams (vString *const scope, tokenInfo *const token
 					}
 					break;
 				case TOKEN_COLON:
-					ungetcToInputFile (':');
+					tsInjectC (':');
 					parsePropertyType (token);
 					break;
 				case TOKEN_IDENTIFIER:
@@ -1579,12 +1690,12 @@ static void parseClassBody (vString *const scope, tokenInfo *const token)
 		clearPoolToken (token);
 
 		parsed = tryInSequence (token,
-		                        parseNewLine, NULL, NULL,
-		                        parseOpenCurly, NULL, NULL,
-		                        parseTemplate, initBlockState, freeBlockState,
-		                        parseComment, initParseCommentState, freeParseCommentState,
-		                        parseIdentifier, initParseWordState, freeParseWordState,
-		                        NULL);
+								parseNewLine, NULL, NULL,
+								parseOpenCurly, NULL, NULL,
+								parseTemplate, initBlockState, freeBlockState,
+								parseComment, initParseCommentState, freeParseCommentState,
+								parseIdentifier, initParseWordState, freeParseWordState,
+								NULL);
 	} while (parsed && token->type != TOKEN_OPEN_CURLY);
 
 	if (! parsed)
@@ -1599,33 +1710,33 @@ static void parseClassBody (vString *const scope, tokenInfo *const token)
 		clearPoolToken (token);
 
 		parsed = tryInSequence (token,
-		                        parseNewLine, NULL, NULL,
-		                        parseCloseCurly, NULL, NULL,
-		                        parseStar, NULL, NULL,
-		                        parseAt, NULL, NULL,
-		                        parseOpenParen, NULL, NULL,
-		                        parseColon, NULL, NULL,
-		                        parseSemicolon, NULL, NULL,
-		                        parseEqualSign, NULL, NULL,
-		                        parseComment, initParseCommentState, freeParseCommentState,
-		                        parseAsyncKeyword, initParseWordState, freeParseWordState,
-		                        parseConstructorKeyword, initParseWordState, freeParseWordState,
-		                        parsePrivateKeyword, initParseWordState, freeParseWordState,
-		                        parseProtectedKeyword, initParseWordState, freeParseWordState,
-		                        parsePublicKeyword, initParseWordState, freeParseWordState,
-		                        parseReadonlyKeyword, initParseWordState, freeParseWordState,
-		                        parseStaticKeyword, initParseWordState, freeParseWordState,
-		                        parseNumber, initParseWordState, freeParseWordState,
-		                        parseTemplate, initBlockState, freeBlockState,
-		                        parseIdentifier, initParseWordState, freeParseWordState,
-		                        NULL);
+								parseNewLine, NULL, NULL,
+								parseCloseCurly, NULL, NULL,
+								parseStar, NULL, NULL,
+								parseAt, NULL, NULL,
+								parseOpenParen, NULL, NULL,
+								parseColon, NULL, NULL,
+								parseSemicolon, NULL, NULL,
+								parseEqualSign, NULL, NULL,
+								parseComment, initParseCommentState, freeParseCommentState,
+								parseAsyncKeyword, initParseWordState, freeParseWordState,
+								parseConstructorKeyword, initParseWordState, freeParseWordState,
+								parsePrivateKeyword, initParseWordState, freeParseWordState,
+								parseProtectedKeyword, initParseWordState, freeParseWordState,
+								parsePublicKeyword, initParseWordState, freeParseWordState,
+								parseReadonlyKeyword, initParseWordState, freeParseWordState,
+								parseStaticKeyword, initParseWordState, freeParseWordState,
+								parseNumber, initParseWordState, freeParseWordState,
+								parseTemplate, initBlockState, freeBlockState,
+								parseIdentifier, initParseWordState, freeParseWordState,
+								NULL);
 
 		if (parsed)
 		{
 			switch (token->type)
 			{
 				case TOKEN_AT:
-					ungetcToInputFile ('@');
+					tsInjectC ('@');
 					parseDecorator (token);
 					break;
 				case TOKEN_KEYWORD:
@@ -1667,10 +1778,10 @@ static void parseClassBody (vString *const scope, tokenInfo *const token)
 					break;
 				case TOKEN_EQUAL_SIGN:
 					skipBlocksTillType (TOKEN_SEMICOLON, token);
-					ungetcToInputFile (';');
+					tsInjectC (';');
 					break;
 				case TOKEN_COLON:
-					ungetcToInputFile (':');
+					tsInjectC (':');
 					parsePropertyType (token);
 				case TOKEN_SEMICOLON:
 					if (member)
@@ -1688,7 +1799,7 @@ static void parseClassBody (vString *const scope, tokenInfo *const token)
 				case TOKEN_OPEN_PAREN:
 					if (! member)
 						break;
-					ungetcToInputFile ('(');
+					tsInjectC ('(');
 
 					if (isGenerator)
 						emitTag (member, TSTAG_GENERATOR);
@@ -1748,10 +1859,10 @@ static void parseClass (vString *const scope, tsKind scopeParentKind, tokenInfo 
 		clearPoolToken (token);
 
 		parsed = tryInSequence (token,
-		                        parseNewLine, NULL, NULL,
-		                        parseComment, initParseCommentState, freeParseCommentState,
-		                        parseIdentifier, initParseWordState, freeParseWordState,
-		                        NULL);
+								parseNewLine, NULL, NULL,
+								parseComment, initParseCommentState, freeParseCommentState,
+								parseIdentifier, initParseWordState, freeParseWordState,
+								NULL);
 	} while (parsed && token->type != TOKEN_IDENTIFIER);
 
 	if (! parsed)
@@ -1785,10 +1896,10 @@ static void parseNamespaceBody (vString *const scope, tokenInfo *const token)
 	do
 	{
 		parsed = tryInSequence (token,
-		                        parseNewLine, NULL, NULL,
-		                        parseOpenCurly, NULL, NULL,
-		                        parseComment, initParseCommentState, freeParseCommentState,
-		                        NULL);
+								parseNewLine, NULL, NULL,
+								parseOpenCurly, NULL, NULL,
+								parseComment, initParseCommentState, freeParseCommentState,
+								NULL);
 	} while (parsed && token->type != TOKEN_OPEN_CURLY);
 
 	if (! parsed)
@@ -1799,26 +1910,26 @@ static void parseNamespaceBody (vString *const scope, tokenInfo *const token)
 		clearPoolToken (token);
 
 		parsed = tryInSequence (token,
-		                        parseComment, initParseCommentState, freeParseCommentState,
-		                        parseTemplate, initBlockState, freeBlockState,
-		                        parseCurlies, initBlockState, freeBlockState,
-		                        parseSquares, initBlockState, freeBlockState,
-		                        parseStringSQuote, initParseStringState, freeParseStringState,
-		                        parseStringDQuote, initParseStringState, freeParseStringState,
-		                        parseStringTemplate, initParseStringState, freeParseStringState,
-		                        parseParens, initBlockState, freeBlockState,
-		                        parseInterfaceKeyword, initParseWordState, freeParseWordState,
-		                        parseTypeKeyword, initParseWordState, freeParseWordState,
-		                        parseEnumKeyword, initParseWordState, freeParseWordState,
-		                        parseFunctionKeyword, initParseWordState, freeParseWordState,
-		                        parseClassKeyword, initParseWordState, freeParseWordState,
-		                        parseVarKeyword, initParseWordState, freeParseWordState,
-		                        parseLetKeyword, initParseWordState, freeParseWordState,
-		                        parseConstKeyword, initParseWordState, freeParseWordState,
-		                        parseAt, NULL, NULL,
-		                        parseCloseCurly, NULL, NULL,
-		                        parseChar, NULL, NULL,
-		                        NULL);
+								parseComment, initParseCommentState, freeParseCommentState,
+								parseTemplate, initBlockState, freeBlockState,
+								parseCurlies, initBlockState, freeBlockState,
+								parseSquares, initBlockState, freeBlockState,
+								parseStringSQuote, initParseStringState, freeParseStringState,
+								parseStringDQuote, initParseStringState, freeParseStringState,
+								parseStringTemplate, initParseStringState, freeParseStringState,
+								parseParens, initBlockState, freeBlockState,
+								parseInterfaceKeyword, initParseWordState, freeParseWordState,
+								parseTypeKeyword, initParseWordState, freeParseWordState,
+								parseEnumKeyword, initParseWordState, freeParseWordState,
+								parseFunctionKeyword, initParseWordState, freeParseWordState,
+								parseClassKeyword, initParseWordState, freeParseWordState,
+								parseVarKeyword, initParseWordState, freeParseWordState,
+								parseLetKeyword, initParseWordState, freeParseWordState,
+								parseConstKeyword, initParseWordState, freeParseWordState,
+								parseAt, NULL, NULL,
+								parseCloseCurly, NULL, NULL,
+								parseChar, NULL, NULL,
+								NULL);
 
 		switch (token->type)
 		{
@@ -1848,7 +1959,7 @@ static void parseNamespaceBody (vString *const scope, tokenInfo *const token)
 				}
 				break;
 			case TOKEN_AT:
-				ungetcToInputFile ('@');
+				tsInjectC ('@');
 				parseDecorator (token);
 				break;
 			default:
@@ -1866,10 +1977,10 @@ static void parseNamespace (tokenInfo *const token)
 		clearPoolToken (token);
 
 		parsed = tryInSequence (token,
-		                        parseNewLine, NULL, NULL,
-		                        parseComment, initParseCommentState, freeParseCommentState,
-		                        parseIdentifier, initParseWordState, freeParseWordState,
-		                        NULL);
+								parseNewLine, NULL, NULL,
+								parseComment, initParseCommentState, freeParseCommentState,
+								parseIdentifier, initParseWordState, freeParseWordState,
+								NULL);
 	} while (parsed && token->type != TOKEN_IDENTIFIER);
 
 	if (! parsed)
@@ -1894,27 +2005,27 @@ static void parseTsFile (tokenInfo *const token)
 		clearPoolToken (token);
 
 		parsed = tryInSequence (token,
-		                        parseComment, initParseCommentState, freeParseCommentState,
-		                        parseTemplate, initBlockState, freeBlockState,
-		                        parseCurlies, initBlockState, freeBlockState,
-		                        parseSquares, initBlockState, freeBlockState,
-		                        parseStringSQuote, initParseStringState, freeParseStringState,
-		                        parseStringDQuote, initParseStringState, freeParseStringState,
-		                        parseStringTemplate, initParseStringState, freeParseStringState,
-		                        parseParens, initBlockState, freeBlockState,
-		                        parseInterfaceKeyword, initParseWordState, freeParseWordState,
-		                        parseTypeKeyword, initParseWordState, freeParseWordState,
-		                        parseEnumKeyword, initParseWordState, freeParseWordState,
-		                        parseFunctionKeyword, initParseWordState, freeParseWordState,
-		                        parseClassKeyword, initParseWordState, freeParseWordState,
-		                        parseNamespaceKeyword, initParseWordState, freeParseWordState,
-		                        parseVarKeyword, initParseWordState, freeParseWordState,
-		                        parseLetKeyword, initParseWordState, freeParseWordState,
-		                        parseConstKeyword, initParseWordState, freeParseWordState,
-		                        parseAt, NULL, NULL,
-		                        parseCloseCurly, NULL, NULL,
-		                        parseChar, NULL, NULL,
-		                        NULL);
+								parseComment, initParseCommentState, freeParseCommentState,
+								parseTemplate, initBlockState, freeBlockState,
+								parseCurlies, initBlockState, freeBlockState,
+								parseSquares, initBlockState, freeBlockState,
+								parseStringSQuote, initParseStringState, freeParseStringState,
+								parseStringDQuote, initParseStringState, freeParseStringState,
+								parseStringTemplate, initParseStringState, freeParseStringState,
+								parseParens, initBlockState, freeBlockState,
+								parseInterfaceKeyword, initParseWordState, freeParseWordState,
+								parseTypeKeyword, initParseWordState, freeParseWordState,
+								parseEnumKeyword, initParseWordState, freeParseWordState,
+								parseFunctionKeyword, initParseWordState, freeParseWordState,
+								parseClassKeyword, initParseWordState, freeParseWordState,
+								parseNamespaceKeyword, initParseWordState, freeParseWordState,
+								parseVarKeyword, initParseWordState, freeParseWordState,
+								parseLetKeyword, initParseWordState, freeParseWordState,
+								parseConstKeyword, initParseWordState, freeParseWordState,
+								parseAt, NULL, NULL,
+								parseCloseCurly, NULL, NULL,
+								parseChar, NULL, NULL,
+								NULL);
 
 		switch (token->type)
 		{
@@ -1947,7 +2058,7 @@ static void parseTsFile (tokenInfo *const token)
 				}
 				break;
 			case TOKEN_AT:
-				ungetcToInputFile ('@');
+				tsInjectC ('@');
 				parseDecorator (token);
 				break;
 			default:
@@ -1960,6 +2071,8 @@ static void findTsTags (void)
 {
 	tokenInfo *const token = newToken ();
 
+	tsCurrentIOChar = NULL;
+
 	parseTsFile (token);
 
 	deleteToken (token);
@@ -1970,6 +2083,8 @@ static void initialize (const langType language)
 	Lang_ts = language;
 
 	TokenPool = objPoolNew (16, newPoolToken, deletePoolToken, clearPoolToken, NULL);
+
+	tsInputFile = ptrArrayNew ((ptrArrayDeleteFunc)tsDeleteIOChar);
 }
 
 static void finalize (langType language CTAGS_ATTR_UNUSED, bool initialized)
@@ -1978,6 +2093,7 @@ static void finalize (langType language CTAGS_ATTR_UNUSED, bool initialized)
 		return;
 
 	objPoolDelete (TokenPool);
+	ptrArrayDelete (tsInputFile);
 }
 
 /* Create parser definition structure */
