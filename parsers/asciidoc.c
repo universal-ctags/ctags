@@ -272,7 +272,7 @@ static void process_name(vString *const name, const int kind,
 
 	while (isspace(line[end])) --end;
 
-	if (start < end)
+	if (start <= end)
 		vStringNCatS(name, (const char*)(&(line[start])), end - start + 1);
 }
 
