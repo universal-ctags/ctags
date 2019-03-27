@@ -1,0 +1,3 @@
+a	input.adoc	/^= a$/;"	c
+b	input.adoc	/^== b$/;"	s	chapter:a
+c	input.adoc	/^=== c$/;"	S	section:b

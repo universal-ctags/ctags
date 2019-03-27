@@ -103,7 +103,7 @@ static int makeAsciidocTag (const vString* const name, const int kind, const boo
 			Assert (line > 0);
 			if (line > 0)
 			{
-				e.lineNumber--;	
+				e.lineNumber--;
 				e.filePosition = getInputFilePositionForLine(line - 1);
 			}
 		}
@@ -179,7 +179,7 @@ static int capture_anchor(const unsigned char *const orig, int* captured_len)
 				else line += 2;
 				break;
 			}
-			/* otherwise it's not the end, keep going */			
+			/* otherwise it's not the end, keep going */
 		}
 
 		if (*line == ',')
@@ -272,7 +272,7 @@ static void process_name(vString *const name, const int kind,
 
 	while (isspace(line[end])) --end;
 
-	if (start < end)
+	if (start <= end)
 		vStringNCatS(name, (const char*)(&(line[start])), end - start + 1);
 }
 
