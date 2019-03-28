@@ -106,7 +106,8 @@ typedef struct {
 		/* name of tag */
 	const char *name;
 
-		/* path of source file containing definition of tag */
+		/* path of source file containing definition of tag.
+		   For a broken tags file, this can be NULL. */
 	const char *file;
 
 		/* address for locating tag in source file */

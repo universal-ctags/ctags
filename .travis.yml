@@ -3,6 +3,8 @@
 # https://github.com/steveno/ctags/blob/master/.travis.yml
 #
 
+dist: xenial
+
 language: c
 
 os:
@@ -29,8 +31,6 @@ env:
     build_command:   "make -j 4 CFLAGS=-O0"
     branch_pattern: master
 
-sudo: false
-
 addons:
   apt:
     packages:
@@ -56,6 +56,7 @@ before_install:
 # Build and run tests. Only with gcc cross compile
 script:
   - ./misc/travis-check.sh
+
 after_success:
   - |
     if [ $CC = 'gcc' ] && [ $TRAVIS_OS_NAME = 'linux' ]; then
@@ -63,8 +64,15 @@ after_success:
             for f in /home/travis/.rvm/gems/ruby-2*/gems/lcoveralls-*/lib/lcoveralls/color_formatter.rb; do
                     sed -i -e 's/severity.capitalize!/severity = severity.capitalize/' $f
             done
-        ) || :
-        (cd linux-gcc-gcov; lcov -c -b . -d . -o coverage.info && lcoveralls --root . --retry-count 5 coverage.info)
+        )
+
+        (cd linux-gcc-gcov; lcov -c -b .. -d . -o coverage.info)
+
+        # Upload to coveralls.
+        lcoveralls --root . --retry-count 5 linux-gcc-gcov/coverage.info
+
+        # Upload to codecov.
+        bash <(curl -s https://codecov.io/bash) -f linux-gcc-gcov/coverage.info -Z -X gcov -X coveragepy -X search -X xcode -X gcovout -n travis-$TRAVIS_OS_NAME
     fi
 
 # Build Matrix configuration

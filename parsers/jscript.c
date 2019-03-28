@@ -946,15 +946,7 @@ getNextChar:
 							  repr->buffer[--repr->length] = 0;
 						  if (d == '*')
 						  {
-							  do
-							  {
-								  skipToCharacterInInputFile ('*');
-								  c = getcFromInputFile ();
-								  if (c == '/')
-									  break;
-								  else
-									  ungetcToInputFile (c);
-							  } while (c != EOF && c != '\0');
+							  skipToCharacterInInputFile2('*', '/');
 							  goto getNextChar;
 						  }
 						  else if (d == '/')	/* is this the start of a comment?  */

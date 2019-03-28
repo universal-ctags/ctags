@@ -948,6 +948,19 @@ extern int skipToCharacterInInputFile (int c)
 	return d;
 }
 
+extern int skipToCharacterInInputFile2 (int c0, int c1)
+{
+	int d;
+	do
+	{
+		skipToCharacterInInputFile(c0);
+		do
+			d = getcFromInputFile ();
+		while (d == c0 && d != c1);
+	} while (d != EOF && d != c1);
+	return d;
+}
+
 /*  An alternative interface to getcFromInputFile (). Do not mix use of readLineFromInputFile()
  *  and getcFromInputFile() for the same file. The returned string does not contain
  *  the terminating newline. A NULL return value means that all lines in the

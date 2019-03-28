@@ -24,4 +24,7 @@ defmodule FunctionModule do
   defp private_func_no_params do
     #
   end
+
+  def function_with_comma,
+    do: :some_constant
 end

@@ -47,15 +47,20 @@ tagWriter jsonWriter = {
 	.defaultFileName = NULL,
 };
 
+static const char* escapeFieldValueRaw (const tagEntryInfo * tag, fieldType ftype, int fieldIndex)
+{
+	const char *v;
+	if (doesFieldHaveRenderer(ftype, true))
+		v = renderFieldNoEscaping (ftype, tag, fieldIndex);
+	else
+		v = renderField (ftype, tag, fieldIndex);
+
+	return v;
+}
 
 static json_t* escapeFieldValue (const tagEntryInfo * tag, fieldType ftype, bool returnEmptyStringAsNoValue)
 {
-	const char *str;
-
-	if (doesFieldHaveRenderer (ftype, true))
-		str = renderFieldNoEscaping (ftype, tag, NO_PARSER_FIELD);
-	else
-		str = renderField (ftype, tag, NO_PARSER_FIELD);
+	const char *str = escapeFieldValueRaw (tag, ftype, NO_PARSER_FIELD);
 
 	if (str)
 	{
@@ -117,15 +122,16 @@ static void renderExtensionFieldMaybe (int xftype, const tagEntryInfo *const tag
 static void addParserFields (json_t *response, const tagEntryInfo *const tag)
 {
 	unsigned int i;
-	unsigned int ftype;
 
 	for (i = 0; i < tag->usedParserFields; i++)
 	{
-		ftype = tag->parserFields [i].ftype;
+		const tagField *f = getParserField(tag, i);
+		fieldType ftype = f->ftype;
 		if (! isFieldEnabled (ftype))
 			continue;
 
-		json_object_set_new (response, getFieldName (ftype), json_string (tag->parserFields [i].value));
+		const char *str = escapeFieldValueRaw (tag, ftype, i);
+		json_object_set_new (response, getFieldName (ftype), json_string (str));
 	}
 }
 
