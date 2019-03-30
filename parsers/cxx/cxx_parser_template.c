@@ -183,7 +183,11 @@ evaluate_current_token:
 
 				bool bIsGreaterThan = cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeGreaterThanSign);
 
-				if((!bFollowedBySpace) && bIsGreaterThan)
+				if(
+					(!bFollowedBySpace) && bIsGreaterThan &&
+					! (g_cxx.pToken->pPrev->pPrev
+					   && cxxTokenIsNonConstantKeyword(g_cxx.pToken->pPrev->pPrev))
+					)
 				{
 					// assume it's an operator
 					CXX_DEBUG_PRINT("Treating > as shift-right operator");
@@ -195,10 +199,7 @@ evaluate_current_token:
 						goto evaluate_current_token;
 
 					// Handle gracefully some cases
-					if(
-							cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeKeyword) &&
-							(!cxxKeywordIsConstant(g_cxx.pToken->eKeyword))
-						)
+					if(cxxTokenIsNonConstantKeyword(g_cxx.pToken))
 					{
 						// We found something like
 						//   ... > void ...
