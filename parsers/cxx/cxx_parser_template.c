@@ -21,6 +21,7 @@
 #include "debug.h"
 #include "keyword.h"
 #include "read.h"
+#include "strlist.h"
 
 #include <string.h>
 
@@ -42,7 +43,8 @@ typedef enum _CXXParserParseTemplateAngleBracketsResult
 // Parses the <parameters> part of a template specification.
 // Here we are pointing at the initial <.
 //
-static CXXParserParseTemplateAngleBracketsResult cxxParserParseTemplateAngleBracketsInternal(void)
+static CXXParserParseTemplateAngleBracketsResult
+cxxParserParseTemplateAngleBracketsInternal(stringList *pslTypeParams)
 {
 	CXX_DEBUG_ENTER();
 
@@ -64,6 +66,16 @@ static CXXParserParseTemplateAngleBracketsResult cxxParserParseTemplateAngleBrac
 	// around but without proper state (include headers, macro expansion, full type
 	// database etc) we simply can't do the same. However, we try to recover if we
 	// figure out we (or the programmer?) screwed up.
+	//
+	//
+	// Like gcc, if this function knows identifiers in a template prefix more,
+	// the quality of parsing becomes better.
+	// Introducing `pslTypeParams` is the first step to know identifiers.
+	// pslTypeParams list keeps all type parameters introduced in templated prefixes.
+	// When deciding whether ">>" is an end marker of template prefixes or a shift
+	// operator, this function looks up pslTypeParams list.
+	// If this function can find A of "A >>" in the list, we can say ">>" is not an
+	// operator.
 
 	CXX_DEBUG_ASSERT(
 			cxxTokenTypeIs(cxxTokenChainLast(g_cxx.pTokenChain),CXXTokenTypeSmallerThanSign),
@@ -186,7 +198,16 @@ evaluate_current_token:
 				if(
 					(!bFollowedBySpace) && bIsGreaterThan &&
 					! (g_cxx.pToken->pPrev->pPrev
-					   && cxxTokenIsNonConstantKeyword(g_cxx.pToken->pPrev->pPrev))
+					   && (
+						   /* int >>: in this case ">>" cannot be an operator. */
+						   cxxTokenIsNonConstantKeyword(g_cxx.pToken->pPrev->pPrev)
+						   || (
+							   /* <tyename T, ... T >>: in this case ">>" cannot be an operator. */
+							   cxxTokenTypeIs(g_cxx.pToken->pPrev->pPrev, CXXTokenTypeIdentifier)
+							   && stringListHas(pslTypeParams, vStringValue(g_cxx.pToken->pPrev->pPrev->pszWord))
+							   )
+						   )
+						)
 					)
 				{
 					// assume it's an operator
@@ -274,7 +295,7 @@ evaluate_current_token:
 						return CXXParserParseTemplateAngleBracketsFailed;
 					}
 
-					switch(cxxParserParseTemplateAngleBracketsInternal())
+					switch(cxxParserParseTemplateAngleBracketsInternal(pslTypeParams))
 					{
 						case CXXParserParseTemplateAngleBracketsFailed:
 							CXX_DEBUG_LEAVE_TEXT("Nested template parsing failed");
@@ -297,6 +318,25 @@ evaluate_current_token:
 							return CXXParserParseTemplateAngleBracketsFailed;
 						break;
 					}
+				}
+				else if (cxxTokenTypeIsOneOf(g_cxx.pToken,
+											 CXXKeywordTYPENAME|CXXKeywordCLASS)
+						 &&
+						 g_cxx.pToken->pPrev &&
+						 cxxTokenTypeIsOneOf(g_cxx.pToken->pPrev,
+											 CXXTokenTypeSmallerThanSign|CXXTokenTypeComma))
+				{
+					/* < typename X , class Y> */
+					if (!cxxParserParseNextToken())
+					{
+						CXX_DEBUG_LEAVE_TEXT("Failed to parse up to '<>{EOF'");
+						return CXXParserParseTemplateAngleBracketsFailed;
+					}
+
+					if (cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeIdentifier))
+						stringListAdd(pslTypeParams, vStringNewCopy (g_cxx.pToken->pszWord));
+					else
+						cxxParserUngetCurrentToken();
 				}
 			break;
 			case CXXTokenTypeEOF:
@@ -344,7 +384,14 @@ evaluate_current_token:
 static bool cxxParserParseTemplateAngleBrackets(void)
 {
 	CXX_DEBUG_ENTER();
-	switch(cxxParserParseTemplateAngleBracketsInternal())
+
+	CXXParserParseTemplateAngleBracketsResult r;
+	stringList *typeParams = stringListNew ();
+
+	r = cxxParserParseTemplateAngleBracketsInternal(typeParams);
+	stringListDelete (typeParams);
+
+	switch(r)
 	{
 		case CXXParserParseTemplateAngleBracketsFailed:
 			CXX_DEBUG_LEAVE();
