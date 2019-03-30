@@ -721,6 +721,19 @@ bool cxxParserExtractVariableDeclarations(CXXTokenChain * pChain,unsigned int uF
 				pszProperties = cxxTagSetProperties(uProperties);
 			}
 
+			if(
+				g_cxx.pTemplateTokenChain && (g_cxx.pTemplateTokenChain->iCount > 0) &&
+				cxxTagFieldEnabled(CXXTagCPPFieldTemplate)
+				)
+			{
+				cxxTokenChainNormalizeTypeNameSpacing(g_cxx.pTemplateTokenChain);
+				cxxTokenChainCondense(g_cxx.pTemplateTokenChain,0);
+				cxxTagSetField(
+					CXXTagCPPFieldTemplate,
+					vStringValue(cxxTokenChainFirst(g_cxx.pTemplateTokenChain)->pszWord)
+					);
+			}
+
 			cxxTagCommit();
 
 			if(pTypeToken)
