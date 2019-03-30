@@ -1,2 +1,6 @@
 Test	input.hpp	/^class Test : public set<int> {$/;"	c	template:<int,class _Comp0=less<int>,class _Comp1=less<pair<int,int>>>
 xxx	input.hpp	/^  typedef int xxx;$/;"	t	class:Test	typeref:typename:int
+Foo	input-0.hpp	/^class Foo {};$/;"	c	template:<typename X>
+bar	input-0.hpp	/^constexpr Foo<Y> bar {};$/;"	v	typeref:typename:Foo<Y>	template:<typename Y=Foo<int>>
+i	input-0.hpp	/^const int i = 3;$/;"	v	typeref:typename:const int
+failure	input-1.hpp	/^class failure {};$/;"	c	template:<class T,class Hash=std::hash<T>>
