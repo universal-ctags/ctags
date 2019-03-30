@@ -669,7 +669,9 @@ CTAGS_INLINE void parseBlock(const int c, tokenInfo *const token, tokenType cons
 	result->status = PARSER_NEEDS_MORE_INPUT;
 }
 
-CTAGS_INLINE void parseIdentifier(const int c, tokenInfo *const token, int *parsed, parserResult *const result)
+
+CTAGS_INLINE void parseIdentifierCommon(const int c, tokenInfo *const token, int *parsed, parserResult *const result,
+										   bool acceptFqName)
 {
 	if (*parsed == 0 && whiteChar (c))
 	{
@@ -677,7 +679,7 @@ CTAGS_INLINE void parseIdentifier(const int c, tokenInfo *const token, int *pars
 		return;
 	}
 
-	if (isIdentChar (c))
+	if (isIdentChar (c) || (acceptFqName && c == '.'))
 	{
 		vStringPut (token->string, c);
 		*parsed = *parsed + 1;
@@ -697,6 +699,16 @@ CTAGS_INLINE void parseIdentifier(const int c, tokenInfo *const token, int *pars
 	}
 
 	result->status = PARSER_FAILED;
+}
+
+CTAGS_INLINE void parseIdentifier(const int c, tokenInfo *const token, int *parsed, parserResult *const result)
+{
+	parseIdentifierCommon (c, token, parsed, result, false);
+}
+
+CTAGS_INLINE void parseFQIdentifier(const int c, tokenInfo *const token, int *parsed, parserResult *const result)
+{
+	parseIdentifierCommon (c, token, parsed, result, true);
 }
 
 PARSER_DEF (AsyncKeyword, parseWord, "async", (int *))
@@ -1855,7 +1867,7 @@ static void parseNamespace (tokenInfo *const token)
 		parsed = tryInSequence (token,
 		                        parseNewLine, NULL, NULL,
 		                        parseComment, initParseCommentState, freeParseCommentState,
-		                        parseIdentifier, initParseWordState, freeParseWordState,
+		                        parseFQIdentifier, initParseWordState, freeParseWordState,
 		                        NULL);
 	} while (parsed && token->type != TOKEN_IDENTIFIER);
 
