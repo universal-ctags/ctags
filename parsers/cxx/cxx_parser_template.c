@@ -165,7 +165,7 @@ evaluate_current_token:
 					return CXXParserParseTemplateAngleBracketsSucceeded;
 				}
 
-				// Nested > : is is a shift operator?
+				// Nested > : is it a shift operator?
 
 				bool bFollowedBySpace = g_cxx.pToken->bFollowedBySpace;
 
