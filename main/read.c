@@ -164,8 +164,18 @@ extern MIOPos getInputFilePosition (void)
 
 extern MIOPos getInputFilePositionForLine (unsigned int line)
 {
-	return File.lineFposMap.pos[(((File.lineFposMap.count > (line - 1)) \
-				      && (line > 0))? (line - 1): 0)].pos;
+	int index;
+	if (line > 0)
+	{
+		if (File.lineFposMap.count > (line - 1))
+			index = line - 1;
+		else
+			index = File.lineFposMap.count - 1;
+	}
+	else
+		index = 0;
+
+	return File.lineFposMap.pos[index].pos;
 }
 
 extern langType getInputLanguage (void)
