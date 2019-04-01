@@ -137,6 +137,7 @@ typedef enum {
 	TSTAG_NAMESPACE,
 	TSTAG_PROPERTY,
 	TSTAG_VARIABLE,
+	TSTAG_CONSTANT,
 	TSTAG_GENERATOR,
 	TSTAG_ALIAS
 } tsKind;
@@ -188,16 +189,17 @@ static const keywordTable TsKeywordTable [] = {
 };
 
 static kindDefinition TsKinds [] = {
-	{ true,  'f', "function",     "functions"          },
-	{ true,  'c', "class",        "classes"            },
-	{ true,  'i', "interface",    "interfaces"         },
-	{ true,  'e', "enum",         "enums"              },
-	{ true,  'm', "method",       "methods"            },
-	{ true,  'n', "namespace",    "namespaces"         },
-	{ true,  'p', "property",     "properties"         },
-	{ true,  'v', "variable",     "global variables"   },
-	{ true,  'g', "generator",    "generators"         },
-	{ true,  'a', "alias",        "aliases",           }
+	{ true,  'f', "function",     "functions"   },
+	{ true,  'c', "class",        "classes"     },
+	{ true,  'i', "interface",    "interfaces"  },
+	{ true,  'e', "enum",         "enums"       },
+	{ true,  'm', "method",       "methods"     },
+	{ true,  'n', "namespace",    "namespaces"  },
+	{ true,  'p', "property",     "properties"  },
+	{ true,  'v', "variable",     "variables"   },
+	{ true,  'C', "constant",     "constants"   },
+	{ true,  'g', "generator",    "generators"  },
+	{ true,  'a', "alias",        "aliases",    }
 };
 
 typedef enum eParserResult {
@@ -1120,12 +1122,13 @@ static void parseEnum (vString *const scope, tsKind scopeParentKind, tokenInfo *
 	vStringDelete (nscope);
 }
 
-static void parseVariable (vString *const scope, tsKind scopeParentKind, tokenInfo *const token)
+static void parseVariable (bool constVar, vString *const scope, tsKind scopeParentKind, tokenInfo *const token)
 {
 	tokenInfo *member = NULL;
 	bool parsed = false;
 	bool parsingType = false;
 	int nestLevel = 0;
+	tsKind varKind = constVar ? TSTAG_CONSTANT : TSTAG_VARIABLE;
 
 	do
 	{
@@ -1199,7 +1202,7 @@ static void parseVariable (vString *const scope, tsKind scopeParentKind, tokenIn
 							vStringCopy (member->scope, scope);
 							member->scopeParentKind = scopeParentKind;
 						}
-						emitTag (member, TSTAG_VARIABLE);
+						emitTag (member, varKind);
 						deleteToken (member);
 					}
 					break;
@@ -1377,8 +1380,10 @@ static void parseFunctionBody (vString *const scope, tsKind scopeParentKind, tok
 					{
 						case KEYWORD_var:
 						case KEYWORD_let:
+							parseVariable (false, scope, scopeParentKind, token);
+							break;
 						case KEYWORD_const:
-							parseVariable (scope, scopeParentKind, token);
+							parseVariable (true, scope, scopeParentKind, token);
 							break;
 					}
 					break;
@@ -1841,8 +1846,10 @@ static void parseNamespaceBody (vString *const scope, tokenInfo *const token)
 						break;
 					case KEYWORD_var:
 					case KEYWORD_let:
+						parseVariable (false, scope, TSTAG_NAMESPACE, token);
+						break;
 					case KEYWORD_const:
-						parseVariable (scope, TSTAG_NAMESPACE, token);
+						parseVariable (true, scope, TSTAG_NAMESPACE, token);
 						break;
 				}
 				break;
@@ -1940,8 +1947,10 @@ static void parseTsFile (tokenInfo *const token)
 						break;
 					case KEYWORD_var:
 					case KEYWORD_let:
+						parseVariable (false, NULL, TSTAG_CLASS, token);
+						break;
 					case KEYWORD_const:
-						parseVariable (NULL, TSTAG_CLASS, token);
+						parseVariable (true, NULL, TSTAG_CLASS, token);
 						break;
 				}
 				break;

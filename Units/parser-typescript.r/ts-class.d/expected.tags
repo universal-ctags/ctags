@@ -53,4 +53,4 @@ longArgsFun	input.ts	/^  longArgsFun(options: {$/;"	m	class:A
 options	input.ts	/^  longArgsFun(options: {$/;"	v	method:A.longArgsFun
 closure	input.ts	/^  closure($/;"	m	class:A
 x	input.ts	/^    x: number,$/;"	v	method:A.closure
-normalizedPath	input.ts	/^    const normalizedPath = path === '\/*' ? '' : path;$/;"	v	method:A.closure
+normalizedPath	input.ts	/^    const normalizedPath = path === '\/*' ? '' : path;$/;"	C	method:A.closure
