@@ -94,6 +94,7 @@
 	MakefileParser, \
 	MarkdownParser, \
 	MatLabParser, \
+	MooseParser, \
 	MyrddinParser, \
 	ObjcParser, \
 	OldCppParser, \

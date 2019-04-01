@@ -228,6 +228,7 @@ PARSER_SRCS =				\
 	parsers/m4.c			\
 	parsers/make.c			\
 	parsers/matlab.c		\
+	parsers/moose.c			\
 	parsers/myrddin.c		\
 	parsers/objc.c			\
 	parsers/ocaml.c			\

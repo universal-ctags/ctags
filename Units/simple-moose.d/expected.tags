@@ -1,0 +1,32 @@
+Point	input.pl	/^package Point;$/;"	package	line:2	language:Perl
+Point	input.pl	/^package Point;$/;"	class	line:2	language:Moose
+x	input.pl	/^has 'x' => (is => 'rw', isa => 'Int');$/;"	attribute	line:5	language:Moose	class:Point
+y	input.pl	/^has 'y' => (is => 'rw', isa => 'Int');$/;"	attribute	line:6	language:Moose	class:Point
+z0	input.pl	/^has z0 => (is => 'rw');$/;"	attribute	line:8	language:Moose	class:Point
+z1	input.pl	/^has 'z1' => (is => 'rw');$/;"	attribute	line:9	language:Moose	class:Point
+z2	input.pl	/^has "z2" => (is => 'rw');$/;"	attribute	line:10	language:Moose	class:Point
+z0p	input.pl	/^has (z0p => (is => 'rw'));$/;"	attribute	line:12	language:Moose	class:Point
+z1p	input.pl	/^has ('z1p' => (is => 'rw'));$/;"	attribute	line:13	language:Moose	class:Point
+z2p	input.pl	/^has ("z2p" => (is => 'rw'));$/;"	attribute	line:14	language:Moose	class:Point
+z0ps	input.pl	/^has (	z0ps => (is => 'rw'));$/;"	attribute	line:16	language:Moose	class:Point
+z1ps	input.pl	/^has (	'z1ps' => (is => 'rw'));$/;"	attribute	line:17	language:Moose	class:Point
+z2ps	input.pl	/^has (	"z2ps" => (is => 'rw'));$/;"	attribute	line:18	language:Moose	class:Point
+z3	input.pl	/^has [qw#z3	z4 z5#] => ((is => 'rw'),(is => 'rw'),(is => 'rw'));$/;"	attribute	line:20	language:Moose	class:Point
+z4	input.pl	/^has [qw#z3	z4 z5#] => ((is => 'rw'),(is => 'rw'),(is => 'rw'));$/;"	attribute	line:20	language:Moose	class:Point
+z5	input.pl	/^has [qw#z3	z4 z5#] => ((is => 'rw'),(is => 'rw'),(is => 'rw'));$/;"	attribute	line:20	language:Moose	class:Point
+z6	input.pl	/^has ([qw|z6	z7|] => (is => 'rw'), (is => 'rw'));$/;"	attribute	line:21	language:Moose	class:Point
+z7	input.pl	/^has ([qw|z6	z7|] => (is => 'rw'), (is => 'rw'));$/;"	attribute	line:21	language:Moose	class:Point
+clear	input.pl	/^sub clear {$/;"	subroutine	line:23	language:Perl
+clear	input.pl	/^sub clear {$/;"	method	line:23	language:Moose	class:Point
+Point3D	input.pl	/^package Point3D;$/;"	package	line:29	language:Perl
+Point3D	input.pl	/^package Point3D;$/;"	class	line:29	language:Moose	inherits:Point
+z	input.pl	/^has 'z' => (is => 'rw', isa => 'Int');$/;"	attribute	line:34	language:Moose	class:Point3D
+clear	input.pl	/^before 'clear' => sub {$/;"	wrapper	line:36	language:Moose	class:Point3D	wrapping:before
+clear	input.pl	/^after 'clear' => sub {$/;"	wrapper	line:39	language:Moose	class:Point3D	wrapping:after
+clear	input.pl	/^around 'clear' => sub {$/;"	wrapper	line:42	language:Moose	class:Point3D	wrapping:around
+TimeAxis	input.pl	/^package TimeAxis;$/;"	package	line:45	language:Perl
+TimeAxis	input.pl	/^package TimeAxis;$/;"	class	line:45	language:Moose
+Point4D	input.pl	/^package Point4D;$/;"	package	line:48	language:Perl
+Point4D	input.pl	/^package Point4D;$/;"	class	line:48	language:Moose	inherits:Point3D,TimeAxis	end:57
+clear	input.pl	/^override "clear" => sub {$/;"	method	line:54	language:Moose	class:Point4D
+Line	input.pl	/^package Line;$/;"	package	line:58	language:Perl

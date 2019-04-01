@@ -390,6 +390,9 @@
     <ClCompile Include="..\parsers\matlab.c">
       <Filter>Source Files\Parsers</Filter>
     </ClCompile>
+    <ClCompile Include="..\parsers\moose.c">
+      <Filter>Source Files\Parsers</Filter>
+    </ClCompile>
     <ClCompile Include="..\parsers\myrddin.c">
       <Filter>Source Files\Parsers</Filter>
     </ClCompile>

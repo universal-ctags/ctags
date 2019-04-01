@@ -212,6 +212,7 @@
     <ClCompile Include="..\parsers\m4.c" />
     <ClCompile Include="..\parsers\make.c" />
     <ClCompile Include="..\parsers\matlab.c" />
+    <ClCompile Include="..\parsers\moose.c" />
     <ClCompile Include="..\parsers\myrddin.c" />
     <ClCompile Include="..\parsers\objc.c" />
     <ClCompile Include="..\parsers\ocaml.c" />
