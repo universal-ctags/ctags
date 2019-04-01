@@ -162,6 +162,7 @@ PARSER_HEADS = \
 	parsers/iniconf.h \
 	parsers/m4.h \
 	parsers/make.h \
+	parsers/perl.h \
 	parsers/tcl.h \
 	\
 	$(NULL)

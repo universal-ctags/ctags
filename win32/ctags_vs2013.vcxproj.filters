@@ -731,6 +731,9 @@
     <ClInclude Include="..\parsers\make.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\parsers\perl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="..\parsers\tcl.h">
       <Filter>Header Files</Filter>
     </ClInclude>
