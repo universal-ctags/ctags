@@ -1,4 +1,4 @@
-a	input.ts	/^    const a = 100;$/;"	v	function:f3
+a	input.ts	/^    const a = 100;$/;"	C	function:f3
 a	input.ts	/^    let a = 100;$/;"	v	function:f2
 a	input.ts	/^function map<T, U>(a: T[], f: (x: T) => U): U[] {$/;"	v	function:map
 a	input.ts	/^function mul(a: number, b: number) {$/;"	v	function:mul

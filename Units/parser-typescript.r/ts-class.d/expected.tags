@@ -36,7 +36,7 @@ log	input.ts	/^  log() {$/;"	m	class:List
 longArgsFun	input.ts	/^  longArgsFun(options: {$/;"	m	class:A
 message	input.ts	/^  message = "Hello World";$/;"	p	class:Messenger
 next	input.ts	/^  next: List<T> = null;$/;"	p	class:List
-normalizedPath	input.ts	/^    const normalizedPath = path === '\/*' ? '' : path;$/;"	v	method:A.closure
+normalizedPath	input.ts	/^    const normalizedPath = path === '\/*' ? '' : path;$/;"	C	method:A.closure
 options	input.ts	/^  longArgsFun(options: {$/;"	v	method:A.longArgsFun
 origin	input.ts	/^  static origin = new Point(0, 0);$/;"	p	class:Point
 register	input.ts	/^  register(...args) {$/;"	m	class:A

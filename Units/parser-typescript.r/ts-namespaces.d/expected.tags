@@ -5,8 +5,8 @@ ZipCodeValidator	input.ts	/^    export class ZipCodeValidator implements StringV
 isAcceptable	input.ts	/^        isAcceptable(s: string) {$/;"	m	class:LettersOnlyValidator
 isAcceptable	input.ts	/^        isAcceptable(s: string) {$/;"	m	class:ZipCodeValidator
 isAcceptable	input.ts	/^        isAcceptable(s: string): boolean;$/;"	m	interface:Validation.StringValidator
-lettersRegexp	input.ts	/^    const lettersRegexp = \/^[A-Za-z]+$\/;$/;"	v
-numberRegexp	input.ts	/^    const numberRegexp = \/^[0-9]+$\/;$/;"	v
+lettersRegexp	input.ts	/^    const lettersRegexp = \/^[A-Za-z]+$\/;$/;"	C
+numberRegexp	input.ts	/^    const numberRegexp = \/^[0-9]+$\/;$/;"	C
 s	input.ts	/^        isAcceptable(s: string) {$/;"	v	method:LettersOnlyValidator.isAcceptable
 s	input.ts	/^        isAcceptable(s: string) {$/;"	v	method:ZipCodeValidator.isAcceptable
 strings	input.ts	/^let strings = ["Hello", "98052", "101"];$/;"	v
