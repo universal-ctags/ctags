@@ -169,8 +169,10 @@ extern MIOPos getInputFilePositionForLine (unsigned int line)
 	{
 		if (File.lineFposMap.count > (line - 1))
 			index = line - 1;
-		else
+		else if (File.lineFposMap.count != 0)
 			index = File.lineFposMap.count - 1;
+		else
+			index = 0;
 	}
 	else
 		index = 0;
