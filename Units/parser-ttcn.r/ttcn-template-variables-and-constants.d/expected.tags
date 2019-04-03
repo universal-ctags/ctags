@@ -1,0 +1,3 @@
+variable	input.ttcn	/^var TemplateType<Type> variable := { }$/;"	v
+constant	input.ttcn	/^const TemplateType<Type> constant := { }$/;"	c
+templateVariable	input.ttcn	/^var template TemplateType<Type> templateVariable := { }$/;"	v

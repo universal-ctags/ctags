@@ -581,6 +581,7 @@ static int matchBrackets (const char * br)
 static const char BR_CUR[] = "{}";
 static const char BR_PAR[] = "()";
 static const char BR_SQ[] = "[]";
+static const char BR_ANG[] = "<>";
 
 /* List of TTCN operators.
    A dot (.) is not a TTCN operator but it is included to simplify
@@ -769,6 +770,8 @@ static int parseType (void)
 			/* ModuleID.TypeID */
 			if (matchToken('.') && !(matchToken(T_ID)))
 				break;
+            /* FormalTypeParList */
+            matchBrackets(BR_ANG);
 			/* TypeActualParList */
 			matchBrackets(BR_PAR);
 			/* ExtendedFieldReference */
