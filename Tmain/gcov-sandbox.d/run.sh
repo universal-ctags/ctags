@@ -7,6 +7,7 @@ CTAGS=$1
 
 . ../utils.sh
 is_feature_available $CTAGS sandbox
+is_feature_available ${CTAGS} interactive
 is_feature_available ${CTAGS} gcov
 
 {
