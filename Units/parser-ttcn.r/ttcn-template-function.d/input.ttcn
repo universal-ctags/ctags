@@ -1,0 +1,8 @@
+function templateFunctionThatReturnTemplateType<type PARAM>(PARAM parameter)
+    return list<PARAM>
+{
+}
+
+function templateFunction<type PARAM>(PARAM parameter)
+{
+}

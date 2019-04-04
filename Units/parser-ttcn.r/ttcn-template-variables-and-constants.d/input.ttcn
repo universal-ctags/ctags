@@ -1,0 +1,3 @@
+var TemplateType<Type> variable := { }
+const TemplateType<Type> constant := { }
+var template TemplateType<Type> templateVariable := { }

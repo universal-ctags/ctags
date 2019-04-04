@@ -1,0 +1,2 @@
+list	input.ttcn	/^type record of T list<type T>$/;"	t
+RecordOfList	input.ttcn	/^type record of list<T> RecordOfList<type T>$/;"	t
