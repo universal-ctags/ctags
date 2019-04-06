@@ -103,6 +103,11 @@ CXXToken * cxxTokenCreateAnonymousIdentifier(unsigned int uTagKind);
 			(_pToken->eType == CXXTokenTypeKeyword) && \
 			(_pToken->eKeyword == _eKeyword) \
 		)
+#define cxxTokenIsNonConstantKeyword(_pToken) \
+		( \
+			cxxTokenTypeIs(_pToken,CXXTokenTypeKeyword) && \
+			(!cxxKeywordIsConstant(_pToken->eKeyword)) \
+		)
 
 // FIXME: Bad argument order
 void cxxTokenAppendToString(vString * s,CXXToken * t);

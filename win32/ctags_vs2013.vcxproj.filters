@@ -153,6 +153,9 @@
     <ClCompile Include="..\main\vstring.c">
       <Filter>Source Files\Main</Filter>
     </ClCompile>
+    <ClCompile Include="..\main\uwindi.c">
+      <Filter>Source Files\Main</Filter>
+    </ClCompile>
     <ClCompile Include="..\main\writer-ctags.c">
       <Filter>Source Files\Main</Filter>
     </ClCompile>
@@ -683,6 +686,9 @@
     <ClInclude Include="..\main\vstring.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\main\unwindi.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="..\main\writer_p.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -738,4 +744,4 @@
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
-</Project>
+</Project>
