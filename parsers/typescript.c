@@ -78,6 +78,7 @@ enum eKeywordId {
 	KEYWORD_for,
 	KEYWORD_function,
 	KEYWORD_instanceof,
+	KEYWORD_in,
 	KEYWORD_interface,
 	KEYWORD_let,
 	KEYWORD_namespace,
@@ -133,10 +134,13 @@ typedef enum {
 	TSTAG_CLASS,
 	TSTAG_INTERFACE,
 	TSTAG_ENUM,
+	TSTAG_ENUMERATOR,
 	TSTAG_METHOD,
 	TSTAG_NAMESPACE,
+	TSTAG_PARAMETER,
 	TSTAG_PROPERTY,
 	TSTAG_VARIABLE,
+	TSTAG_LOCAL,
 	TSTAG_CONSTANT,
 	TSTAG_GENERATOR,
 	TSTAG_ALIAS
@@ -174,6 +178,7 @@ static const keywordTable TsKeywordTable [] = {
 	{ "enum"        , KEYWORD_enum        },
 	{ "for"         , KEYWORD_for         },
 	{ "function"    , KEYWORD_function    },
+	{ "in"          , KEYWORD_in          },
 	{ "interface"   , KEYWORD_interface   },
 	{ "let"         , KEYWORD_let         },
 	{ "namespace"   , KEYWORD_namespace   },
@@ -189,17 +194,20 @@ static const keywordTable TsKeywordTable [] = {
 };
 
 static kindDefinition TsKinds [] = {
-	{ true,  'f', "function",     "functions"   },
-	{ true,  'c', "class",        "classes"     },
-	{ true,  'i', "interface",    "interfaces"  },
-	{ true,  'e', "enum",         "enums"       },
-	{ true,  'm', "method",       "methods"     },
-	{ true,  'n', "namespace",    "namespaces"  },
-	{ true,  'p', "property",     "properties"  },
-	{ true,  'v', "variable",     "variables"   },
-	{ true,  'C', "constant",     "constants"   },
-	{ true,  'g', "generator",    "generators"  },
-	{ true,  'a', "alias",        "aliases",    }
+	{ true,  'f', "function",     "functions"                                       },
+	{ true,  'c', "class",        "classes"                                         },
+	{ true,  'i', "interface",    "interfaces"                                      },
+	{ true,  'g', "enum",         "enums"                                           },
+	{ true,  'e', "enumerator",   "enumerators (values inside an enumeration)"      },
+	{ true,  'm', "method",       "methods"                                         },
+	{ true,  'n', "namespace",    "namespaces"                                      },
+	{ false, 'z', "parameter",    "function parameters inside function definitions" },
+	{ true,  'p', "property",     "properties"                                      },
+	{ true,  'v', "variable",     "variables"                                       },
+	{ false, 'l', "local",        "local variables"                                 },
+	{ true,  'C', "constant",     "constants"                                       },
+	{ true,  'G', "generator",    "generators"                                      },
+	{ true,  'a', "alias",        "aliases",                                        }
 };
 
 typedef enum eParserResult {
@@ -720,6 +728,7 @@ PARSER_DEF (ConstructorKeyword, parseWord, "constructor", (int *))
 PARSER_DEF (EnumKeyword, parseWord, "enum", (int *))
 PARSER_DEF (ForKeyword, parseWord, "for", (int *))
 PARSER_DEF (FunctionKeyword, parseWord, "function", (int *))
+PARSER_DEF (InKeyword, parseWord, "in", (int *))
 PARSER_DEF (InterfaceKeyword, parseWord, "interface", (int *))
 PARSER_DEF (LetKeyword, parseWord, "let", (int *))
 PARSER_DEF (NamespaceKeyword, parseWord, "namespace", (int *))
@@ -1069,7 +1078,7 @@ static void parseEnumBody (vString *const scope, tokenInfo *const token)
 				copyToken (member, token, false);
 				vStringCopy (member->scope, scope);
 				member->scopeParentKind = TSTAG_ENUM;
-				emitTag (member, TSTAG_PROPERTY);
+				emitTag (member, TSTAG_ENUMERATOR);
 			}
 			else if (isType (token, TOKEN_COMMA))
 			{
@@ -1081,7 +1090,6 @@ static void parseEnumBody (vString *const scope, tokenInfo *const token)
 
 	if (member)
 	{
-		emitTag (member, TSTAG_PROPERTY);
 		deleteToken (member);
 	}
 }
@@ -1122,13 +1130,13 @@ static void parseEnum (vString *const scope, tsKind scopeParentKind, tokenInfo *
 	vStringDelete (nscope);
 }
 
-static void parseVariable (bool constVar, vString *const scope, tsKind scopeParentKind, tokenInfo *const token)
+static void parseVariable (bool constVar, bool localVar, vString *const scope, tsKind scopeParentKind, tokenInfo *const token)
 {
 	tokenInfo *member = NULL;
 	bool parsed = false;
 	bool parsingType = false;
 	int nestLevel = 0;
-	tsKind varKind = constVar ? TSTAG_CONSTANT : TSTAG_VARIABLE;
+	tsKind varKind = constVar ? TSTAG_CONSTANT : (localVar ? TSTAG_LOCAL : TSTAG_VARIABLE);
 
 	do
 	{
@@ -1161,6 +1169,7 @@ static void parseVariable (bool constVar, vString *const scope, tsKind scopePare
 		                        parseThisKeyword, initParseWordState, freeParseWordState,
 		                        parseEnumKeyword, initParseWordState, freeParseWordState,
 		                        parseOfKeyword, initParseWordState, freeParseWordState,
+		                        parseInKeyword, initParseWordState, freeParseWordState,
 		                        parseIdentifier, initParseWordState, freeParseWordState,
 		                        parseChar, NULL, NULL,
 		                        NULL);
@@ -1213,6 +1222,7 @@ static void parseVariable (bool constVar, vString *const scope, tsKind scopePare
 							parseEnum (scope, scopeParentKind, token);
 							break;
 						case KEYWORD_of:
+						case KEYWORD_in:
 							parsingType = true;
 							break;
 					}
@@ -1312,7 +1322,7 @@ static void parseFunctionArgs (vString *const scope, tsKind scopeParentKind, tok
 						copyToken (member, token, false);
 						vStringCopy (member->scope, scope);
 						member->scopeParentKind = scopeParentKind;
-						emitTag (member, TSTAG_VARIABLE);
+						emitTag (member, TSTAG_PARAMETER);
 						deleteToken (member);
 					}
 					break;
@@ -1380,10 +1390,10 @@ static void parseFunctionBody (vString *const scope, tsKind scopeParentKind, tok
 					{
 						case KEYWORD_var:
 						case KEYWORD_let:
-							parseVariable (false, scope, scopeParentKind, token);
+							parseVariable (false, true, scope, scopeParentKind, token);
 							break;
 						case KEYWORD_const:
-							parseVariable (true, scope, scopeParentKind, token);
+							parseVariable (true, true, scope, scopeParentKind, token);
 							break;
 					}
 					break;
@@ -1559,7 +1569,7 @@ static void parseConstructorParams (vString *const scope, tokenInfo *const token
 					{
 						vStringCatS (member->scope, ".constructor");
 						member->scopeParentKind = TSTAG_METHOD;
-						emitTag (member, TSTAG_VARIABLE);
+						emitTag (member, TSTAG_PARAMETER);
 					}
 					deleteToken (member);
 					member = NULL;
@@ -1798,6 +1808,10 @@ static void parseNamespaceBody (vString *const scope, tokenInfo *const token)
 	if (! parsed)
 		return;
 
+	int parenLvl = 0;
+	int squareLvl = 0;
+	int curlyLvl = 1;
+
 	do
 	{
 		clearPoolToken (token);
@@ -1805,12 +1819,9 @@ static void parseNamespaceBody (vString *const scope, tokenInfo *const token)
 		parsed = tryInSequence (token,
 		                        parseComment, initParseCommentState, freeParseCommentState,
 		                        parseTemplate, initBlockState, freeBlockState,
-		                        parseCurlies, initBlockState, freeBlockState,
-		                        parseSquares, initBlockState, freeBlockState,
 		                        parseStringSQuote, initParseStringState, freeParseStringState,
 		                        parseStringDQuote, initParseStringState, freeParseStringState,
 		                        parseStringTemplate, initParseStringState, freeParseStringState,
-		                        parseParens, initBlockState, freeBlockState,
 		                        parseInterfaceKeyword, initParseWordState, freeParseWordState,
 		                        parseTypeKeyword, initParseWordState, freeParseWordState,
 		                        parseEnumKeyword, initParseWordState, freeParseWordState,
@@ -1820,7 +1831,12 @@ static void parseNamespaceBody (vString *const scope, tokenInfo *const token)
 		                        parseLetKeyword, initParseWordState, freeParseWordState,
 		                        parseConstKeyword, initParseWordState, freeParseWordState,
 		                        parseAt, NULL, NULL,
+		                        parseOpenCurly, NULL, NULL,
 		                        parseCloseCurly, NULL, NULL,
+		                        parseOpenParen, NULL, NULL,
+		                        parseCloseParen, NULL, NULL,
+		                        parseOpenSquare, NULL, NULL,
+		                        parseCloseSquare, NULL, NULL,
 		                        parseChar, NULL, NULL,
 		                        NULL);
 
@@ -1846,10 +1862,10 @@ static void parseNamespaceBody (vString *const scope, tokenInfo *const token)
 						break;
 					case KEYWORD_var:
 					case KEYWORD_let:
-						parseVariable (false, scope, TSTAG_NAMESPACE, token);
+						parseVariable (false, false, scope, TSTAG_NAMESPACE, token);
 						break;
 					case KEYWORD_const:
-						parseVariable (true, scope, TSTAG_NAMESPACE, token);
+						parseVariable (true, false, scope, TSTAG_NAMESPACE, token);
 						break;
 				}
 				break;
@@ -1857,10 +1873,28 @@ static void parseNamespaceBody (vString *const scope, tokenInfo *const token)
 				uwiUngetC ('@');
 				parseDecorator (token);
 				break;
+			case TOKEN_OPEN_CURLY:
+				curlyLvl += 1;
+				break;
+			case TOKEN_OPEN_SQUARE:
+				squareLvl += 1;
+				break;
+			case TOKEN_OPEN_PAREN:
+				parenLvl += 1;
+				break;
+			case TOKEN_CLOSE_CURLY:
+				curlyLvl -= 1;
+				break;
+			case TOKEN_CLOSE_SQUARE:
+				squareLvl -= 1;
+				break;
+			case TOKEN_CLOSE_PAREN:
+				parenLvl -= 1;
+				break;
 			default:
 				break;
 		}
-	} while (parsed && ! isType (token, TOKEN_CLOSE_CURLY));
+	} while (parsed && ! (isType (token, TOKEN_CLOSE_CURLY) && parenLvl <= 0 && squareLvl <= 0 && curlyLvl <= 0));
 }
 
 static void parseNamespace (tokenInfo *const token)
@@ -1902,12 +1936,9 @@ static void parseTsFile (tokenInfo *const token)
 		parsed = tryInSequence (token,
 		                        parseComment, initParseCommentState, freeParseCommentState,
 		                        parseTemplate, initBlockState, freeBlockState,
-		                        parseCurlies, initBlockState, freeBlockState,
-		                        parseSquares, initBlockState, freeBlockState,
 		                        parseStringSQuote, initParseStringState, freeParseStringState,
 		                        parseStringDQuote, initParseStringState, freeParseStringState,
 		                        parseStringTemplate, initParseStringState, freeParseStringState,
-		                        parseParens, initBlockState, freeBlockState,
 		                        parseInterfaceKeyword, initParseWordState, freeParseWordState,
 		                        parseTypeKeyword, initParseWordState, freeParseWordState,
 		                        parseEnumKeyword, initParseWordState, freeParseWordState,
@@ -1918,7 +1949,6 @@ static void parseTsFile (tokenInfo *const token)
 		                        parseLetKeyword, initParseWordState, freeParseWordState,
 		                        parseConstKeyword, initParseWordState, freeParseWordState,
 		                        parseAt, NULL, NULL,
-		                        parseCloseCurly, NULL, NULL,
 		                        parseChar, NULL, NULL,
 		                        NULL);
 
@@ -1947,10 +1977,10 @@ static void parseTsFile (tokenInfo *const token)
 						break;
 					case KEYWORD_var:
 					case KEYWORD_let:
-						parseVariable (false, NULL, TSTAG_CLASS, token);
+						parseVariable (false, false, NULL, TSTAG_CLASS, token);
 						break;
 					case KEYWORD_const:
-						parseVariable (true, NULL, TSTAG_CLASS, token);
+						parseVariable (true, false, NULL, TSTAG_CLASS, token);
 						break;
 				}
 				break;
