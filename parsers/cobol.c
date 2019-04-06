@@ -53,16 +53,6 @@ static kindDefinition CobolKinds[] = {
 
 static langType Lang_cobol;
 
-typedef enum {
-	TOKEN_UNDEFINED = 256,
-	TOKEN_EOF,
-	TOKEN_WORD,
-	TOKEN_NUMBER,
-	TOKEN_KEYWORD,
-	TOKEN_LITERAL,
-	TOKEN_PICTURE
-} tokenType;
-
 enum {
 	KEYWORD_FD,
 	KEYWORD_SD,
@@ -87,7 +77,6 @@ enum {
 	KEYWORD_EXIT,
 	KEYWORD_COPY,
 };
-typedef int keywordId; /* to allow KEYWORD_NONE */
 
 static const keywordTable cobolKeywordTable[] = {
 #define DEFINE_KEYWORD(n) { #n, KEYWORD_##n }
@@ -106,9 +95,7 @@ static const keywordTable cobolKeywordTable[] = {
 	DEFINE_KEYWORD (JUST),
 	DEFINE_KEYWORD (PIC),
 	DEFINE_KEYWORD (REDEFINES),
-	//~ { "REDEFINE", KEYWORD_REDEFINES },
 	DEFINE_KEYWORD (RENAMES),
-	//~ { "RENAME", KEYWORD_RENAMES },
 	DEFINE_KEYWORD (SIGN),
 	DEFINE_KEYWORD (SYNC),
 	DEFINE_KEYWORD (USAGE),
@@ -117,13 +104,8 @@ static const keywordTable cobolKeywordTable[] = {
 	DEFINE_KEYWORD (COPY),
 };
 
-typedef struct {
-	int				type;
-	keywordId		keyword;
-	vString *		string;
-	unsigned long 	lineNumber;
-	MIOPos			filePosition;
-} tokenInfo;
+#define INDICATOR_COLUMN 7
+#define PROGRAM_NAME_AREA_COLUMN 73
 
 #define isIdentifierChar(c) (isalnum(c) || (c) == '-')
 
@@ -137,265 +119,146 @@ typedef enum {
 } CobolFormat;
 
 static struct {
-	struct {
-		int c;
-		unsigned int column;
-	} ungetchBuf[3];
-	unsigned int ungetchIdx;
-	int column;
+	vString *line;
+	unsigned long int lineNumber;
+	MIOPos filePosition;
+	const char *nextLine;
 	CobolFormat format;
 } CblInputState;
 
 static void cblppInit (const CobolFormat format)
 {
-	CblInputState.ungetchIdx = 0;
-	CblInputState.column = 0;
+	CblInputState.line = vStringNew ();
+	CblInputState.lineNumber = 0;
+	CblInputState.nextLine = NULL;
 	CblInputState.format = format;
 }
 
-static int cblppSkipLine (void)
+static void cblppDeinit (void)
 {
-	int c;
-
-	do
-		c = getcFromInputFile ();
-	while (c != EOF && c != '\r' && c != '\n');
-	if (c == '\r')
-	{
-		int d;
-		d = getcFromInputFile ();
-		if (d != '\n')
-			ungetcToInputFile (c);
-		else
-			c = d;
-	}
-	CblInputState.column = 0;
-
-	return c;
+	vStringDelete (CblInputState.line);
 }
 
-/* FIXME: handle continuation lines */
-static int cblppGetc (void)
+static const char *cblppGetColumn (const char *line,
+								   const unsigned int column)
 {
-	int prevColumn = CblInputState.column;
-	int c;
+	unsigned int col = 0;
 
-	if (CblInputState.ungetchIdx > 0)
+	for (; *line; line++)
 	{
-		CblInputState.ungetchIdx--;
-		CblInputState.column = CblInputState.ungetchBuf[CblInputState.ungetchIdx].column;
-		return CblInputState.ungetchBuf[CblInputState.ungetchIdx].c;
+		col += (*line == '\t') ? 8 : 1;
+		if (col >= column)
+			return line;
 	}
 
-	c = getcFromInputFile ();
-	if (c == EOF)
-		return c;
+	return NULL;
+}
 
-	/* compute column information */
-	if (c == '\t')
-		CblInputState.column += 8 - CblInputState.column % 8;
-	else if (c == '\r' || c == '\n')
-		CblInputState.column = 0;
+static void cblppAppendLine (vString *buffer,
+							 const char *line)
+{
+	if (CblInputState.format & FORMAT_FIXED)
+	{
+		const char *indicator = cblppGetColumn (line, INDICATOR_COLUMN);
+
+		if (indicator && *indicator && *indicator != '*' && *indicator != '/')
+		{
+			const char *lineStart = indicator + 1;
+			const char *lineEnd = cblppGetColumn (line, PROGRAM_NAME_AREA_COLUMN);
+
+			if (*indicator == '-')
+			{
+				vStringStripTrailing (buffer);
+				while (isspace (*lineStart))
+					lineStart++;
+			}
+
+			if (CblInputState.format == FORMAT_FIXED)
+				vStringNCatS (buffer, lineStart, lineEnd - lineStart);
+			else
+				vStringCatS (buffer, lineStart);
+		}
+	}
+	else if (line[0] != '*' && line[0] != '/')
+		vStringCatS (buffer, line);
+}
+
+/* TODO: skip *> comments */
+static const char *cblppGetLine (void)
+{
+	const char *line;
+
+	if (CblInputState.nextLine)
+	{
+		line = CblInputState.nextLine;
+		CblInputState.nextLine = NULL;
+	}
 	else
-		CblInputState.column += 1;
+		line = (const char *) readLineFromInputFile ();
 
-	/* check for format-specific areas */
-	if (CblInputState.format & FORMAT_FIXED && prevColumn < 6)
-		return cblppGetc ();
-	else if ((CblInputState.format == FORMAT_FIXED && prevColumn >= 72) ||
-			 ((c == '*' || c == '/') &&
-			  prevColumn == ((CblInputState.format & FORMAT_FIXED) ? 6 : 0)))
+	CblInputState.lineNumber = getInputLineNumber ();
+	CblInputState.filePosition = getInputFilePosition ();
+
+	if (!line)
+		return NULL;
+
+	vStringClear (CblInputState.line);
+	cblppAppendLine (CblInputState.line, line);
+
+	/* check for continuation lines */
+	while (CblInputState.format & FORMAT_FIXED)
 	{
-		cblppSkipLine ();
-		return cblppGetc ();
+		const char *indicator;
+		line = (const char *) readLineFromInputFile ();
+		if (! line)
+			break;
+		indicator = cblppGetColumn (line, INDICATOR_COLUMN);
+		if (indicator && *indicator == '-')
+			cblppAppendLine (CblInputState.line, line);
+		else
+			break;
 	}
-	else if (CblInputState.format & FORMAT_FIXED && prevColumn == 6)
-		return cblppGetc ();
 
-	return c;
+	CblInputState.nextLine = line;
+
+	return vStringValue (CblInputState.line);
 }
 
-static void cblppUngetc (int c)
+static void initCOBOLRefTagEntry (tagEntryInfo *e, const char *name,
+								  const cobolKind kind, const int role)
 {
-	const size_t len = ARRAY_SIZE (CblInputState.ungetchBuf);
-
-	Assert (CblInputState.ungetchIdx < len);
-	if (CblInputState.ungetchIdx < len)
-	{
-		CblInputState.ungetchBuf[CblInputState.ungetchIdx].c = c;
-		CblInputState.ungetchBuf[CblInputState.ungetchIdx].column = CblInputState.column;
-		CblInputState.ungetchIdx++;
-	}
+	initRefTagEntry (e, name, kind, role);
+	e->lineNumber = CblInputState.lineNumber;
+	e->filePosition = CblInputState.filePosition;
 }
 
-static void readToken (tokenInfo *const token)
+static void initCOBOLTagEntry (tagEntryInfo *e, const char *name, const cobolKind kind)
 {
-	int c;
-
-	token->type		= TOKEN_UNDEFINED;
-	token->keyword	= KEYWORD_NONE;
-	vStringClear (token->string);
-
-getNextChar:
-
-	do
-	{
-		c = cblppGetc ();
-	}
-	while (isspace(c));
-
-	token->lineNumber   = getInputLineNumber ();
-	token->filePosition = getInputFilePosition ();
-
-	switch (c)
-	{
-		case EOF:
-			token->type = TOKEN_EOF;
-			break;
-
-		case '\'':
-		case '"':
-		{
-			const int q = c;
-			int d = cblppGetc ();
-			token->type = TOKEN_LITERAL;
-			while (d != EOF && (d != q || c == q))
-			{
-				vStringPut (token->string, d);
-				c = d;
-				d = cblppGetc ();
-			}
-			token->lineNumber = getInputLineNumber ();
-			token->filePosition = getInputFilePosition ();
-			break;
-		}
-
-		case '*': /* maybe comment start */
-		{
-			int d = cblppGetc ();
-			if (d != '>')
-			{
-				cblppUngetc (d);
-				vStringPut (token->string, c);
-				token->type = c;
-			}
-			else
-			{
-				do
-				{
-					d = cblppGetc ();
-				}
-				while (d != EOF && d != '\r' && d != '\n');
-				if (d != EOF) /* let the newline magic happen */
-					cblppUngetc (d);
-				goto getNextChar;
-			}
-			break;
-		}
-
-		case '-':
-		case '+':
-		{
-			int d = cblppGetc ();
-			vStringPut (token->string, c);
-			if (isdigit (d))
-			{
-				c = d;
-				goto readNumber;
-			}
-			else
-			{
-				cblppUngetc (d);
-				token->type = c;
-			}
-			break;
-		}
-
-		default:
-			if (isdigit (c) || c == '.')
-			{
-				bool seenPeriod;
-			readNumber:
-				if (c == '.')
-				{
-					int d = cblppGetc ();
-					cblppUngetc (d);
-					if (! isdigit (d))
-					{
-						vStringPut (token->string, c);
-						token->type = c;
-						break;
-					}
-					seenPeriod = true;
-				}
-				do
-				{
-					vStringPut (token->string, c);
-					c = cblppGetc ();
-					if (c == '.')
-					{
-						if (seenPeriod)
-							break;
-						else
-						{
-							int d = cblppGetc ();
-							cblppUngetc (d);
-							if (! isdigit (d))
-								break;
-							seenPeriod = true;
-						}
-					}
-				}
-				while (isdigit(c) || c == '.');
-				if (c != EOF)
-					cblppUngetc (c);
-				token->type = TOKEN_NUMBER;
-			}
-			else if (! isIdentifierChar (c))
-			{
-				vStringPut (token->string, c);
-				token->type = c;
-			}
-			else
-			{
-				do
-				{
-					vStringPut (token->string, c);
-					c = cblppGetc ();
-				}
-				while (isIdentifierChar (c));
-				if (c != EOF)
-					cblppUngetc (c);
-				token->keyword = lookupCaseKeyword (vStringValue (token->string), Lang_cobol);
-				if (token->keyword == KEYWORD_NONE)
-					token->type = TOKEN_WORD;
-				else
-					token->type = TOKEN_KEYWORD;
-			}
-			break;
-	}
+	initCOBOLRefTagEntry (e, name, kind, ROLE_DEFINITION_INDEX);
 }
 
-static int makeCOBOLTag (const tokenInfo *const token, const cobolKind kind)
+static int makeCOBOLRefTag (const char *name, const cobolKind kind, const int role)
 {
 	if (CobolKinds[kind].enabled)
-		return makeSimpleTag (token->string, kind);
-	else
-		return CORK_NIL;
+	{
+		tagEntryInfo e;
+
+		initCOBOLRefTagEntry (&e, name, kind, role);
+
+		return makeTagEntry (&e);
+	}
+
+	return CORK_NIL;
 }
 
-static void clearToken (tokenInfo *token)
+static int makeCOBOLTag (const char *name, const cobolKind kind)
 {
-	token->type			= TOKEN_UNDEFINED;
-	token->keyword		= KEYWORD_NONE;
-	token->lineNumber   = getInputLineNumber ();
-	token->filePosition = getInputFilePosition ();
-	vStringClear (token->string);
+	return makeCOBOLRefTag (name, kind, ROLE_DEFINITION_INDEX);
 }
 
-#define CBL_NL(nl) (*((int *) (nestingLevelGetUserData (nl))))
+#define CBL_NL(nl) (*((unsigned int *) (nestingLevelGetUserData (nl))))
 
-static NestingLevel *popNestingLevelsToLevelNumber (NestingLevels *levels, const int levelNumber)
+static NestingLevel *popNestingLevelsToLevelNumber (NestingLevels *levels, const unsigned int levelNumber)
 {
 	NestingLevel *nl;
 
@@ -410,107 +273,109 @@ static NestingLevel *popNestingLevelsToLevelNumber (NestingLevels *levels, const
 	return nl;
 }
 
+static bool isNumeric (const char *nptr, unsigned long int *num)
+{
+	char *endptr;
+	unsigned long int v;
+
+	v = strtoul (nptr, &endptr, 10);
+	if (nptr != endptr && *endptr == 0)
+	{
+		if (num)
+			*num = v;
+		return true;
+	}
+	return false;
+}
+
 static void findCOBOLTags (void)
 {
-	tokenInfo tokens[2];
-	unsigned int curToken = 0;
-	tokenInfo *token = NULL;
-	const tokenInfo *prevToken = NULL;
-	tokenInfo *sentenceStart = NULL;
 	NestingLevels *levels;
+	const char *line;
 
 	cblppInit (FORMAT_FIXED);
 
-	for (curToken = 0; curToken < ARRAY_SIZE (tokens); curToken++)
+	levels = nestingLevelsNew (sizeof (unsigned int));
+
+	while ((line = cblppGetLine ()) != NULL)
 	{
-		tokens[curToken].string = vStringNew ();
-		clearToken (&tokens[curToken]);
-	}
+		char word[64];
+		int keyword;
+		unsigned long int levelNumber;
 
-	levels = nestingLevelsNew (sizeof (int));
-
-#define readToken() \
-	do {																	\
-		curToken ++;														\
-		if (curToken >= ARRAY_SIZE (tokens)) curToken = 0;					\
-		prevToken = token;													\
-		token = &tokens[curToken];											\
-		readToken (token);													\
-		if (! prevToken || prevToken->type == '.')							\
-			sentenceStart = token;											\
-		else if (sentenceStart != prevToken)								\
-			sentenceStart = NULL;											\
+#define READ_WORD(word, keyword) \
+	do { \
+		unsigned int i; \
+		for (i = 0; i < (ARRAY_SIZE (word) - 1) && isIdentifierChar (*line); line++) \
+			word[i++] = *line; \
+		word[i] = 0; \
+		keyword = lookupCaseKeyword (word, Lang_cobol); \
 	} while (0)
+#define READ_KEYWORD(keyword) \
+	do { \
+		char READ_KEYWORD__word[64]; \
+		READ_WORD (READ_KEYWORD__word, keyword); \
+	} while (0)
+#define SKIP_SPACES() do { while (isspace (*line)) line++; } while (0)
 
-	do
-	{
-		readToken ();
-		fprintf(stderr, "token(%d) = %s\n", token->type, vStringValue (token->string));
+		SKIP_SPACES ();
+		READ_WORD (word, keyword);
+		SKIP_SPACES ();
 
-		if (token->keyword == KEYWORD_DIVISION)
+		switch (keyword)
 		{
-			if (prevToken && prevToken->type == TOKEN_WORD)
-				makeCOBOLTag (prevToken, K_DIVISION);
-		}
-		else if (token->keyword == KEYWORD_SECTION)
-		{
-			if (prevToken && prevToken->type == TOKEN_WORD)
-				makeCOBOLTag (prevToken, K_SECTION);
-		}
-		else if (token->keyword == KEYWORD_PROGRAM_ID)
-		{
-			readToken ();
-			if (token->type == '.')
+		case KEYWORD_FD:
+		case KEYWORD_SD:
+		case KEYWORD_RD:
+			READ_WORD (word, keyword);
+			SKIP_SPACES ();
+			if (*word && *line == '.')
+				makeCOBOLTag (word, K_FILE);
+			break;
+
+		case KEYWORD_PROGRAM_ID:
+			if (*line == '.')
 			{
-				/* this is a hack to prevent the period in
-				 * "PROGRAM-ID. program-name" from being considered as a
-				 * sentence separator.  Yeah it's ugly. */
-				token->type = TOKEN_UNDEFINED;
-
-				readToken ();
+				line++;
+				SKIP_SPACES ();
 			}
-			if (token->type == TOKEN_WORD || token->type == TOKEN_LITERAL)
-				makeCOBOLTag (token, K_PROGRAM);
-		}
-		else if (token->keyword == KEYWORD_FD ||
-		         token->keyword == KEYWORD_SD ||
-		         token->keyword == KEYWORD_RD)
-		{
-			readToken ();
-			if (token->type == TOKEN_WORD)
-				makeCOBOLTag (token, K_FILE);
-		}
-		else if (token->keyword == KEYWORD_COPY)
-		{
-			readToken ();
-			if (token->type == TOKEN_WORD ||
-			    token->type == TOKEN_NUMBER ||
-			    token->type == TOKEN_LITERAL)
-			{
-				makeSimpleRefTag (token->string, K_SOURCEFILE, COBOL_SOURCEFILE_COPIED);
-			}
-		}
-		/* paragraph-name "." */
-		else if (token->type == '.' && prevToken == sentenceStart && prevToken->type == TOKEN_WORD)
-		{
-			makeCOBOLTag (prevToken, K_PARAGRAPH);
-		}
-		else if (token == sentenceStart && token->type == TOKEN_NUMBER)
-		{
-			int thisLevelNumber = strtol (vStringValue (token->string), NULL, 10);
+			READ_WORD (word, keyword);
+			if (*word)
+				makeCOBOLTag (word, K_PROGRAM);
+			break;
 
-			readToken ();
-			if (token->type == TOKEN_WORD)
-			{
-				int kind = KIND_GHOST_INDEX;
+		case KEYWORD_COPY:
+			READ_WORD (word, keyword); // FIXME: also allow LITERAL
+			if (*word)
+				makeCOBOLRefTag (word, K_SOURCEFILE, COBOL_SOURCEFILE_COPIED);
+			break;
 
-				readToken ();
-				if (token->type == '.')
-					kind = K_GROUP;
-				else if (token->type == TOKEN_KEYWORD)
+		case KEYWORD_CONTINUE:
+		case KEYWORD_END_EXEC:
+		case KEYWORD_EXIT:
+		case KEYWORD_FILLER:
+			/* nothing, just ignore those in following cases */;
+			break;
+
+		default:
+			if (isNumeric (word, &levelNumber))
+			{
+				READ_WORD (word, keyword);
+				SKIP_SPACES ();
+
+				if (*word && keyword != KEYWORD_FILLER)
 				{
-					switch (token->keyword)
+					int kind = KIND_GHOST_INDEX;
+
+					if (*line == '.')
+						kind = K_GROUP;
+					else
 					{
+						int keyword2;
+
+						READ_KEYWORD (keyword2);
+						switch (keyword2)
+						{
 						case KEYWORD_BLANK:
 						case KEYWORD_OCCURS:
 						case KEYWORD_IS:
@@ -523,37 +388,45 @@ static void findCOBOLTags (void)
 						case KEYWORD_USAGE:
 						case KEYWORD_VALUE:
 							kind = K_DATA;
-							break;
+						}
+					}
+
+					if (kind != KIND_GHOST_INDEX)
+					{
+						NestingLevel *nl;
+						tagEntryInfo entry;
+						int r;
+
+						/* FIXME: handle level 77 (standalone) specifically */
+						nl = popNestingLevelsToLevelNumber (levels, levelNumber);
+						initCOBOLTagEntry (&entry, word, kind);
+						if (nl && CBL_NL (nl) < levelNumber)
+							entry.extensionFields.scopeIndex = nl->corkIndex;
+						r = makeTagEntry (&entry);
+						nl = nestingLevelsPush (levels, r);
+						CBL_NL (nl) = levelNumber;
 					}
 				}
+			}
+			else if (*word && *line == '.')
+				makeCOBOLTag (word, K_PARAGRAPH);
+			else
+			{
+				int keyword2;
 
-				if (kind != KIND_GHOST_INDEX)
-				{
-					NestingLevel *nl;
-					tagEntryInfo entry;
-					int r;
+				READ_KEYWORD (keyword2);
+				SKIP_SPACES ();
 
-					/* FIXME: handle level 77 (standalone) specifically */
-					nl = popNestingLevelsToLevelNumber (levels, thisLevelNumber);
-					initTagEntry (&entry, vStringValue (prevToken->string), kind);
-					if (nl && CBL_NL (nl) < thisLevelNumber)
-						entry.extensionFields.scopeIndex = nl->corkIndex;
-					r = makeTagEntry (&entry);
-					nl = nestingLevelsPush (levels, r);
-					CBL_NL (nl) = thisLevelNumber;
-
-					while (token->type != TOKEN_EOF && token->type != '.')
-						readToken ();
-				}
+				if (keyword2 == KEYWORD_DIVISION && *line == '.')
+					makeCOBOLTag (word, K_DIVISION);
+				else if (keyword2 == KEYWORD_SECTION && *line == '.')
+					makeCOBOLTag (word, K_SECTION);
 			}
 		}
 	}
-	while (token->type != TOKEN_EOF);
 
 	nestingLevelsFree (levels);
-
-	for (curToken = 0; curToken < ARRAY_SIZE (tokens); curToken++)
-		vStringDelete (tokens[curToken].string);
+	cblppDeinit ();
 }
 
 static void initializeCobolParser (langType language)
