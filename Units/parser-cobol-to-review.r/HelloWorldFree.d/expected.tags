@@ -1,0 +1,9 @@
+CTION	input.cbl	/^FILE SECTION.$/;"	p
+ICATION	input.cbl	/^IDENTIFICATION DIVISION.$/;"	D
+MENT	input.cbl	/^ENVIRONMENT DIVISION.$/;"	D
+N	input.cbl	/^STOP RUN.$/;"	p
+OCEDURE	input.cbl	/^MAIN-PROCEDURE.$/;"	p
+RATION	input.cbl	/^CONFIGURATION SECTION.$/;"	s
+RE	input.cbl	/^PROCEDURE DIVISION.$/;"	D
+UTPUT	input.cbl	/^INPUT-OUTPUT SECTION.$/;"	s
+VISION	input.cbl	/^DATA DIVISION.$/;"	p
