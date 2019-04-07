@@ -1,3 +1,5 @@
+-ID	input.cbl	/^PROGRAM-ID. YOUR-PROGRAM-NAME.$/;"	p
+-STORAGE	input.cbl	/^WORKING-STORAGE SECTION.$/;"	s
 CTION	input.cbl	/^FILE SECTION.$/;"	p
 ICATION	input.cbl	/^IDENTIFICATION DIVISION.$/;"	D
 MENT	input.cbl	/^ENVIRONMENT DIVISION.$/;"	D

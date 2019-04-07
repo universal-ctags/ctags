@@ -7,5 +7,4 @@ IDENTIFICATION	input.cbl	/^       IDENTIFICATION DIVISION.$/;"	D
 INPUT-OUTPUT	input.cbl	/^       INPUT-OUTPUT SECTION.$/;"	s
 MAIN-PROCEDURE	input.cbl	/^       MAIN-PROCEDURE.$/;"	p
 PROCEDURE	input.cbl	/^       PROCEDURE DIVISION.$/;"	D
-PROGRAM-ID	input.cbl	/^       PROGRAM-ID. HelloWorld.$/;"	p
 WORKING-STORAGE	input.cbl	/^       WORKING-STORAGE SECTION.$/;"	s
