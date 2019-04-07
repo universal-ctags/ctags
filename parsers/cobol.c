@@ -396,15 +396,27 @@ static void findCOBOLTags (void)
 						NestingLevel *nl;
 						tagEntryInfo entry;
 						int r;
+						unsigned int nestingLevelNumber;
 
-						/* FIXME: handle level 77 (standalone) specifically */
-						nl = popNestingLevelsToLevelNumber (levels, levelNumber);
+						/* for nesting purposes, level 77 is identical to 1,
+						 * and 66 to 2 */
+						switch (levelNumber)
+						{
+						default: nestingLevelNumber = levelNumber; break;
+						case 77: nestingLevelNumber = 1; break;
+						case 66: nestingLevelNumber = 2; break;
+						}
+
+						nl = popNestingLevelsToLevelNumber (levels, nestingLevelNumber);
 						initCOBOLTagEntry (&entry, word, kind);
-						if (nl && CBL_NL (nl) < levelNumber)
+						if (nl && CBL_NL (nl) < nestingLevelNumber)
 							entry.extensionFields.scopeIndex = nl->corkIndex;
 						r = makeTagEntry (&entry);
-						nl = nestingLevelsPush (levels, r);
-						CBL_NL (nl) = levelNumber;
+						if (levelNumber < 50 /* exclude special levels */)
+						{
+							nl = nestingLevelsPush (levels, r);
+							CBL_NL (nl) = levelNumber;
+						}
 					}
 				}
 			}
