@@ -132,6 +132,7 @@
     <ClCompile Include="..\main\strlist.c" />
     <ClCompile Include="..\main\tokeninfo.c" />
     <ClCompile Include="..\main\trashbox.c" />
+    <ClCompile Include="..\main\unwindi.c" />
     <ClCompile Include="..\main\vstring.c" />
     <ClCompile Include="..\main\writer-ctags.c" />
     <ClCompile Include="..\main\writer-etags.c" />
@@ -239,6 +240,7 @@
     <ClCompile Include="..\parsers\tcloo.c" />
     <ClCompile Include="..\parsers\tex.c" />
     <ClCompile Include="..\parsers\ttcn.c" />
+    <ClCompile Include="..\parsers\typescript.c" />
     <ClCompile Include="..\parsers\verilog.c" />
     <ClCompile Include="..\parsers\vhdl.c" />
     <ClCompile Include="..\parsers\vim.c" />
@@ -308,6 +310,7 @@
     <ClInclude Include="..\main\trashbox.h" />
     <ClInclude Include="..\main\trashbox_p.h" />
     <ClInclude Include="..\main\types.h" />
+    <ClInclude Include="..\main\unwindi.h" />
     <ClInclude Include="..\main\vstring.h" />
     <ClInclude Include="..\main\writer_p.h" />
     <ClInclude Include="..\main\xtag.h" />

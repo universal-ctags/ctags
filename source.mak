@@ -41,6 +41,7 @@ MAIN_PUBLIC_HEADS =		\
 		main/trace.h	\
 		main/trashbox_p.h\
 		main/types.h	\
+		main/unwindi.h  \
 		main/vstring.h	\
 		main/xtag.h	\
 		\
@@ -124,6 +125,7 @@ MAIN_SRCS =				\
 	main/trace.c			\
 	main/trashbox.c			\
 	main/tokeninfo.c		\
+	main/unwindi.c			\
 	main/vstring.c			\
 	main/writer.c			\
 	main/writer-etags.c		\
@@ -254,6 +256,7 @@ PARSER_SRCS =				\
 	parsers/tcloo.c			\
 	parsers/tex.c			\
 	parsers/ttcn.c			\
+	parsers/typescript.c		\
 	parsers/verilog.c		\
 	parsers/vhdl.c			\
 	parsers/vim.c			\
