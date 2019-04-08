@@ -293,12 +293,12 @@ static bool isNumeric (const char *nptr, unsigned long int *num)
 	return false;
 }
 
-static void findCOBOLTags (void)
+static void findCOBOLTags (const CobolFormat format)
 {
 	NestingLevels *levels;
 	const char *line;
 
-	cblppInit (FORMAT_FIXED);
+	cblppInit (format);
 
 	levels = nestingLevelsNew (sizeof (unsigned int));
 
@@ -446,23 +446,56 @@ static void findCOBOLTags (void)
 	cblppDeinit ();
 }
 
+static void findCOBOLFixedTags (void)
+{
+	findCOBOLTags (FORMAT_FIXED);
+}
+
+static void findCOBOLFreeTags (void)
+{
+	findCOBOLTags (FORMAT_FREE);
+}
+
+static void findCOBOLVariableTags (void)
+{
+	findCOBOLTags (FORMAT_VARIABLE);
+}
+
 static void initializeCobolParser (langType language)
 {
 	Lang_cobol = language;
 }
 
-extern parserDefinition* CobolParser (void)
+static parserDefinition* commonCobolParserDefinition (const char *name,
+													  simpleParser parser)
 {
-	static const char *const extensions [] = {
-			"cbl", "cob", "CBL", "COB", NULL };
-	parserDefinition* def = parserNew ("Cobol");
-	def->extensions = extensions;
+	parserDefinition* def = parserNew (name);
 	def->initialize = initializeCobolParser;
-	def->parser = findCOBOLTags;
+	def->parser = parser;
 	def->kindTable = CobolKinds;
 	def->kindCount = ARRAY_SIZE(CobolKinds);
 	def->keywordTable = cobolKeywordTable;
 	def->keywordCount = ARRAY_SIZE(cobolKeywordTable);
 	def->useCork = CORK_QUEUE;
 	return def;
+}
+
+extern parserDefinition* CobolParser (void)
+{
+	static const char *const extensions [] = {
+			"cbl", "cob", "CBL", "COB", NULL };
+	parserDefinition* def = commonCobolParserDefinition ("Cobol",
+														 findCOBOLFixedTags);
+	def->extensions = extensions;
+	return def;
+}
+
+extern parserDefinition* CobolFreeParser (void)
+{
+	return commonCobolParserDefinition ("CobolFree", findCOBOLFreeTags);
+}
+
+extern parserDefinition* CobolVariableParser (void)
+{
+	return commonCobolParserDefinition ("CobolVariable", findCOBOLVariableTags);
 }
