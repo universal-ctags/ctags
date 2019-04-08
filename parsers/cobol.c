@@ -110,6 +110,7 @@ static const keywordTable cobolKeywordTable[] = {
 #define PROGRAM_NAME_AREA_COLUMN 73
 
 #define isIdentifierChar(c) (isalnum(c) || (c) == '-')
+#define isQuote(c) ((c) == '\'' || (c) == '"')
 
 typedef enum {
 	/* Fixed: program starts at column 8, ends at column 72 */
@@ -308,12 +309,25 @@ static void findCOBOLTags (const CobolFormat format)
 		int keyword;
 		unsigned long int levelNumber;
 
-#define READ_WORD(word, keyword) \
+#define READ_WHILE(word, cond) \
 	do { \
 		unsigned int i; \
-		for (i = 0; i < (ARRAY_SIZE (word) - 1) && isIdentifierChar (*line); line++) \
+		for (i = 0; i < (ARRAY_SIZE (word) - 1) && *line && (cond); line++) \
 			word[i++] = *line; \
 		word[i] = 0; \
+	} while (0)
+#define READ_LITERAL(word) \
+	do { \
+		const char READ_LITERAL__q = isQuote (*line) ? *line++ : 0; \
+		READ_WHILE (word, (READ_LITERAL__q && READ_LITERAL__q != *line) || \
+		                   isIdentifierChar (*line)); \
+		if (READ_LITERAL__q && READ_LITERAL__q == *line) \
+			line++; \
+		keyword = lookupCaseKeyword (word, Lang_cobol); \
+	} while (0)
+#define READ_WORD(word, keyword) \
+	do { \
+		READ_WHILE (word, isIdentifierChar (*line)); \
 		keyword = lookupCaseKeyword (word, Lang_cobol); \
 	} while (0)
 #define READ_KEYWORD(keyword) \
@@ -344,7 +358,7 @@ static void findCOBOLTags (const CobolFormat format)
 				line++;
 				SKIP_SPACES ();
 			}
-			READ_WORD (word, keyword);
+			READ_LITERAL (word);
 			if (*word)
 				makeCOBOLTag (word, K_PROGRAM);
 			break;
