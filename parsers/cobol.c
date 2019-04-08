@@ -208,20 +208,23 @@ static const char *cblppGetLine (void)
 	cblppAppendLine (CblInputState.line, line);
 
 	/* check for continuation lines */
-	while (CblInputState.format & FORMAT_FIXED)
+	if (CblInputState.format & FORMAT_FIXED)
 	{
-		const char *indicator;
-		line = (const char *) readLineFromInputFile ();
-		if (! line)
-			break;
-		indicator = cblppGetColumn (line, INDICATOR_COLUMN);
-		if (indicator && *indicator == '-')
-			cblppAppendLine (CblInputState.line, line);
-		else
-			break;
-	}
+		while (true)
+		{
+			const char *indicator;
+			line = (const char *) readLineFromInputFile ();
+			if (! line)
+				break;
+			indicator = cblppGetColumn (line, INDICATOR_COLUMN);
+			if (indicator && *indicator == '-')
+				cblppAppendLine (CblInputState.line, line);
+			else
+				break;
+		}
 
-	CblInputState.nextLine = line;
+		CblInputState.nextLine = line;
+	}
 
 	return vStringValue (CblInputState.line);
 }
