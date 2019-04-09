@@ -8,6 +8,14 @@
 *   files.
 */
 
+/* Some references:
+ * - https://www.cs.vu.nl/grammarware/browsable/cobol/
+ * - https://www.cs.vu.nl/grammarware/browsable/vs-cobol-ii/
+ * - https://open-cobol.sourceforge.io/guides/grammar.pdf
+ * - http://mapage.noos.fr/~bpinon/a_cobol_parser.htm
+ * - https://en.wikipedia.org/wiki/COBOL
+ */
+
 /*
 *   INCLUDE FILES
 */
