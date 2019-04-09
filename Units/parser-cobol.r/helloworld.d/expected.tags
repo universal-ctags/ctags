@@ -1,0 +1,10 @@
+00-MAIN	input.cbl	/^ 04100 00-MAIN.                                                         00160000$/;"	p
+CONFIGURATION	input.cbl	/^ 02100 CONFIGURATION SECTION.                                           00090000$/;"	s
+DATA	input.cbl	/^ 03000 DATA DIVISION.                                                   00140000$/;"	D
+ENVIRONMENT	input.cbl	/^ 02000 ENVIRONMENT DIVISION.                                            00080000$/;"	D
+HELLO	input.cbl	/^ 01100 PROGRAM-ID. 'HELLO'.                                             00070000$/;"	P
+IDENTIFICATION	input.cbl	/^ 01000 IDENTIFICATION DIVISION.                                         00060000$/;"	D
+OBJECT-COMPUTER	input.cbl	/^ 02120 OBJECT-COMPUTER.  HERCULES.                                      00110000$/;"	p
+PROCEDURE	input.cbl	/^ 04000 PROCEDURE DIVISION.                                              00150000$/;"	D
+SOURCE-COMPUTER	input.cbl	/^ 02110 SOURCE-COMPUTER.  GNULINUX.                                      00100000$/;"	p
+SPECIAL-NAMES	input.cbl	/^ 02200 SPECIAL-NAMES.                                                   00120000$/;"	p
