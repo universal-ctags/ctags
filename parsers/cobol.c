@@ -297,9 +297,9 @@ static bool isNumeric (const char *nptr, unsigned long int *num)
 	{
 		if (num)
 			*num = v;
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 static void findCOBOLTags (const CobolFormat format)
