@@ -1,0 +1,26 @@
+AUTHOR	input.cbl	/^       AUTHOR.                     TSH.$/;"	p
+DATA	input.cbl	/^       DATA                        DIVISION.$/;"	D
+DATE-WRITTEN	input.cbl	/^       DATE-WRITTEN.               2013-06-28.$/;"	p
+DBNAME	input.cbl	/^       01  DBNAME                  PIC  X(30) VALUE SPACE.$/;"	d
+EMP-NAME	input.cbl	/^         03  EMP-NAME              PIC  X(20) .$/;"	d	group:EMP-REC-VARS
+EMP-NO	input.cbl	/^         03  EMP-NO                PIC S9(04) VALUE ZERO.$/;"	d	group:EMP-REC-VARS
+EMP-REC-VARS	input.cbl	/^       01  EMP-REC-VARS.$/;"	g
+EMP-SALARY	input.cbl	/^         03  EMP-SALARY            PIC S9(04) VALUE ZERO.$/;"	d	group:EMP-REC-VARS
+END-EVALUATE	input.cbl	/^           END-EVALUATE.$/;"	p
+END-PERFORM	input.cbl	/^           END-PERFORM.$/;"	p
+ERROR-RTN	input.cbl	/^       ERROR-RTN.$/;"	p
+IDENTIFICATION	input.cbl	/^       IDENTIFICATION              DIVISION.$/;"	D
+IDX	input.cbl	/^       01  IDX                     PIC  9(02).$/;"	d
+INSERTTBL	input.cbl	/^       PROGRAM-ID.                 INSERTTBL.$/;"	P
+MAIN-RTN	input.cbl	/^       MAIN-RTN.$/;"	p
+PASSWD	input.cbl	/^       01  PASSWD                  PIC  X(10) VALUE SPACE.$/;"	d
+PROCEDURE	input.cbl	/^       PROCEDURE                   DIVISION.$/;"	D
+SYS-TIME	input.cbl	/^       01  SYS-TIME                PIC  9(08).$/;"	d
+TEST-DATA	input.cbl	/^       01  TEST-DATA.$/;"	g
+TEST-DATA-R	input.cbl	/^       01  TEST-DATA-R   REDEFINES TEST-DATA.$/;"	d
+TEST-NAME	input.cbl	/^           05  TEST-NAME           PIC  X(20) .$/;"	d	data:TEST-DATA-R.TEST-TBL
+TEST-NO	input.cbl	/^           05  TEST-NO             PIC S9(04).$/;"	d	data:TEST-DATA-R.TEST-TBL
+TEST-SALARY	input.cbl	/^           05  TEST-SALARY         PIC S9(04).$/;"	d	data:TEST-DATA-R.TEST-TBL
+TEST-TBL	input.cbl	/^         03  TEST-TBL    OCCURS  10.$/;"	d	data:TEST-DATA-R
+USERNAME	input.cbl	/^       01  USERNAME                PIC  X(30) VALUE SPACE.$/;"	d
+WORKING-STORAGE	input.cbl	/^       WORKING-STORAGE             SECTION.$/;"	s
