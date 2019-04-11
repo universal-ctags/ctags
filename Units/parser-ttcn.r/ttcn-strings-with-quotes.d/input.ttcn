@@ -1,0 +1,35 @@
+/* standard strings */
+var charstring begin := "first"
+var charstring emptyString := ""
+var charstring simpleString := "abcdef"
+/* single quotes */
+var charstring singleQuote := "'"
+var charstring twoSingleQuote := "''"
+var charstring stringWithSingleQuote := "a'bc"
+var charstring stringWithTwoSingleQuote := "a'b'c"
+/* escaped double quotes with backslash */
+var charstring escapedDoubleQuotes := "\""
+var charstring twoEscapedDoubleQuotes := "\"\""
+var charstring stringWithEscapedDoubleQuotes := "a\"bc"
+var charstring stringWithTwoEscapedDoubleQuotes := "a\"b\"c"
+/* two double quotes in string are treated as escaped double quotes */
+var charstring doubleQuotes := """"
+var charstring twoDoubleQuotes := """"""
+var charstring stringWithDoubleQuotes := "a""bc"
+var charstring stringWithTwoDoubleQuotes := "a""b""c"
+/* mixed quotes */
+var charstring mixedQuotes1 := "\""""
+var charstring mixedQuotes2 := """\""
+var charstring stringWithMixedQuotes1 := "a\"b""c"
+var charstring stringWithMixedQuotes2 := "a""b\"c"
+/* quotes and backslach interactions */
+var charstring backslash := "\\"
+var charstring stringWithBackslash := "a\\b"
+var charstring backslashAndEscapedDoubleQuotes := "\\\""
+var charstring escapedDoubleQuotesAndBackslash := "\"\\"
+var charstring stringWithBackslashAndEscapedDoubleQuotes := "a\\\"b"
+var charstring stringWithEscapedDoubleQuotesAndBackslash := "a\"\\b"
+var charstring stringWithBackslashAndDoubleQuotes := "a\\""b"
+var charstring stringWithDoubleQuotesAndBackslash := "a""\\b"
+
+var charstring end := "last"
