@@ -1,0 +1,18 @@
+SQLCABC	input.cbl	/^           05  SQLCABC               PIC S9(9) COMP-5.$/;"	d
+SQLCAID	input.cbl	/^           05  SQLCAID               PIC X(8).$/;"	d
+SQLCODE	input.cbl	/^           05  SQLCODE               PIC S9(9) COMP-5.$/;"	d
+SQLERRD	input.cbl	/^           05  SQLERRD OCCURS 6 TIMES                                   *> used only ERRD(3)$/;"	d
+SQLERRM	input.cbl	/^           05  SQLERRM.$/;"	g
+SQLERRMC	input.cbl	/^           49  SQLERRMC              PIC X(70).$/;"	d	group:SQLERRM
+SQLERRML	input.cbl	/^           49  SQLERRML              PIC S9(4) COMP-5.$/;"	d	group:SQLERRM
+SQLERRP	input.cbl	/^           05  SQLERRP               PIC X(8).                          *> not used$/;"	d
+SQLSTATE	input.cbl	/^           05  SQLSTATE              PIC X(5).$/;"	d
+SQLWARN	input.cbl	/^           05  SQLWARN.                                                 *> not used$/;"	g
+SQLWARN0	input.cbl	/^               10 SQLWARN0           PIC X(1).$/;"	d	group:SQLWARN
+SQLWARN1	input.cbl	/^               10 SQLWARN1           PIC X(1).$/;"	d	group:SQLWARN
+SQLWARN2	input.cbl	/^               10 SQLWARN2           PIC X(1).$/;"	d	group:SQLWARN
+SQLWARN3	input.cbl	/^               10 SQLWARN3           PIC X(1).$/;"	d	group:SQLWARN
+SQLWARN4	input.cbl	/^               10 SQLWARN4           PIC X(1).$/;"	d	group:SQLWARN
+SQLWARN5	input.cbl	/^               10 SQLWARN5           PIC X(1).$/;"	d	group:SQLWARN
+SQLWARN6	input.cbl	/^               10 SQLWARN6           PIC X(1).$/;"	d	group:SQLWARN
+SQLWARN7	input.cbl	/^               10 SQLWARN7           PIC X(1).$/;"	d	group:SQLWARN
