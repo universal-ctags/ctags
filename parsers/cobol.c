@@ -24,9 +24,12 @@
 #include "entry.h"
 #include "keyword.h"
 #include "nestlevel.h"
+#include "param.h"
 #include "parse.h"
 #include "read.h"
 #include "routines.h"
+
+#include <string.h>
 
 typedef enum {
 	K_FILE,
@@ -57,6 +60,17 @@ static kindDefinition CobolKinds[] = {
 	{ true, 'd', "data", "data items"      },
 	{ true, 'S', "sourcefile", "source code file",
 	  .referenceOnly = true, ATTACH_ROLES(CobolSourcefileRoles)},
+};
+
+static void cobol_set_format (const langType language CTAGS_ATTR_UNUSED,
+							  const char *optname,
+							  const char *arg);
+static parameterHandlerTable CobolParameterHandlerTable [] = {
+	{
+		.name = "format",
+		.desc = "source code format: [fixed], free, or variable",
+		.handleParameter = cobol_set_format,
+	},
 };
 
 static langType Lang_cobol;
@@ -302,7 +316,7 @@ static bool isNumeric (const char *nptr, unsigned long int *num)
 	return false;
 }
 
-static void findCOBOLTags (const CobolFormat format)
+static void findCOBOLTagsCommon (const CobolFormat format)
 {
 	NestingLevels *levels;
 	const char *line;
@@ -468,19 +482,44 @@ static void findCOBOLTags (const CobolFormat format)
 	cblppDeinit ();
 }
 
+static CobolFormat cobolFormat = FORMAT_FIXED;
+
+static void findCOBOLTags (void)
+{
+	findCOBOLTagsCommon (cobolFormat);
+}
+
+static void cobol_set_format (const langType language CTAGS_ATTR_UNUSED,
+							  const char *optname,
+							  const char *arg)
+{
+	if (strcmp (arg, "fixed") == 0)
+		cobolFormat = FORMAT_FIXED;
+	else if (strcmp (arg, "free") == 0)
+		cobolFormat = FORMAT_FREE;
+	else if (strcmp (arg, "variable") == 0)
+		cobolFormat = FORMAT_VARIABLE;
+	else
+	{
+		error(WARNING, "Cobol: an unexpcted value is given as an argument to \"format\" parameter: %s", arg);
+		error(WARNING, "Cobol: reset \"format\" to \"fixed\"");
+		cobolFormat = FORMAT_FIXED;
+	}
+}
+
 static void findCOBOLFixedTags (void)
 {
-	findCOBOLTags (FORMAT_FIXED);
+	findCOBOLTagsCommon (FORMAT_FIXED);
 }
 
 static void findCOBOLFreeTags (void)
 {
-	findCOBOLTags (FORMAT_FREE);
+	findCOBOLTagsCommon (FORMAT_FREE);
 }
 
 static void findCOBOLVariableTags (void)
 {
-	findCOBOLTags (FORMAT_VARIABLE);
+	findCOBOLTagsCommon (FORMAT_VARIABLE);
 }
 
 static void initializeCobolParser (langType language)
@@ -489,7 +528,8 @@ static void initializeCobolParser (langType language)
 }
 
 static parserDefinition* commonCobolParserDefinition (const char *name,
-													  simpleParser parser)
+													  simpleParser parser,
+													  bool invisible)
 {
 	parserDefinition* def = parserNew (name);
 	def->initialize = initializeCobolParser;
@@ -499,6 +539,7 @@ static parserDefinition* commonCobolParserDefinition (const char *name,
 	def->keywordTable = cobolKeywordTable;
 	def->keywordCount = ARRAY_SIZE(cobolKeywordTable);
 	def->useCork = true;
+	def->invisible = invisible;
 	return def;
 }
 
@@ -507,17 +548,27 @@ extern parserDefinition* CobolParser (void)
 	static const char *const extensions [] = {
 			"cbl", "cob", "CBL", "COB", NULL };
 	parserDefinition* def = commonCobolParserDefinition ("Cobol",
-														 findCOBOLFixedTags);
+														 findCOBOLTags,
+														 false);
 	def->extensions = extensions;
+
+	def->parameterHandlerTable = CobolParameterHandlerTable;
+	def->parameterHandlerCount = ARRAY_SIZE(CobolParameterHandlerTable);
+
 	return def;
+}
+
+extern parserDefinition* CobolFixedParser (void)
+{
+	return commonCobolParserDefinition ("CobolFixed", findCOBOLFixedTags, true);
 }
 
 extern parserDefinition* CobolFreeParser (void)
 {
-	return commonCobolParserDefinition ("CobolFree", findCOBOLFreeTags);
+	return commonCobolParserDefinition ("CobolFree", findCOBOLFreeTags, true);
 }
 
 extern parserDefinition* CobolVariableParser (void)
 {
-	return commonCobolParserDefinition ("CobolVariable", findCOBOLVariableTags);
+	return commonCobolParserDefinition ("CobolVariable", findCOBOLVariableTags, true);
 }

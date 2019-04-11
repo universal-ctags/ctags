@@ -63,6 +63,7 @@
 	CsharpParser, \
 	CtagsParser, \
 	CobolParser, \
+	CobolFixedParser, \
 	CobolFreeParser, \
 	CobolVariableParser, \
 	CUDAParser, \
