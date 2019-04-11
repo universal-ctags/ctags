@@ -1,0 +1,21 @@
+DATA	input.cbl	/^       DATA DIVISION.$/;"	D
+EVEN	input.cbl	/^                     88 EVEN VALUES 2, 4, 6, 8.$/;"	d	data:RECORD1.ITEM2
+G1	input.cbl	/^              02 G1.$/;"	g	group:REC2
+IDENTIFICATION	input.cbl	/^       IDENTIFICATION DIVISION.$/;"	D
+ITEM1	input.cbl	/^                     05 ITEM1 PICTURE X(10).$/;"	d	group:REC2.G1
+ITEM1	input.cbl	/^              05 ITEM1 PIC X(1).$/;"	d	group:RECORD1
+ITEM2	input.cbl	/^                     05 ITEM2 PIC X(10).$/;"	d	group:REC2.G1
+ITEM2	input.cbl	/^              05 ITEM2 PIC A(1).$/;"	d	group:RECORD1
+ITEM3	input.cbl	/^              05 ITEM3 PIC X(6).$/;"	d	group:RECORD1
+MAIN-PROCEDURE	input.cbl	/^       MAIN-PROCEDURE.$/;"	p
+ODD	input.cbl	/^                     88 ODD VALUES 1, 3, 5, 7, 9.$/;"	d	data:RECORD1.ITEM2
+OTHERNAME1	input.cbl	/^              66 OTHERNAME1 RENAMES ITEM1 IN REC2.$/;"	d	group:REC2
+OTHERNAME2	input.cbl	/^              66 OTHERNAME2 RENAMES G1.$/;"	d	group:REC2
+PROCEDURE	input.cbl	/^       PROCEDURE DIVISION.$/;"	D
+RDITEM4	input.cbl	/^              66 RDITEM4 RENAMES ITEM1 THRU ITEM2.$/;"	d	group:RECORD1
+RDITEM5	input.cbl	/^              66 RDITEM5 RENAMES ITEM1 THROUGH ITEM3.$/;"	d	group:RECORD1
+REC2	input.cbl	/^       01 REC2.$/;"	g
+RECORD1	input.cbl	/^       01 RECORD1.$/;"	g
+STDLN1	input.cbl	/^       77 STDLN1 PIC A(4).$/;"	d
+Test-Items	input.cbl	/^       PROGRAM-ID. Test-Items.$/;"	P
+WORKING-STORAGE	input.cbl	/^       WORKING-STORAGE SECTION.$/;"	s
