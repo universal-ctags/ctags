@@ -28,12 +28,12 @@
 #include "read.h"
 #include "routines.h"
 #include "trashbox.h"
+#include "writer_p.h"
 #include "xtag_p.h"
 
 
 typedef struct sFieldObject {
 	fieldDefinition *def;
-	unsigned int fixed:   1;   /* fields which cannot be disabled. */
 	vString     *buffer;
 	const char* nameWithPrefix;
 	langType language;
@@ -252,7 +252,6 @@ extern void initFieldObjects (void)
 	{
 		fobj = fieldObjects + i + fieldObjectUsed;
 		fobj->def = fieldDefinitionsFixed + i;
-		fobj->fixed  = 1;
 		fobj->buffer = NULL;
 		fobj->nameWithPrefix = fobj->def->name;
 		fobj->language = LANG_IGNORE;
@@ -264,7 +263,6 @@ extern void initFieldObjects (void)
 	{
 		fobj = fieldObjects + i + fieldObjectUsed;
 		fobj->def = fieldDefinitionsExuberant +i;
-		fobj->fixed = 0;
 		fobj->buffer = NULL;
 		fobj->nameWithPrefix = fobj->def->name;
 		fobj->language = LANG_IGNORE;
@@ -278,7 +276,6 @@ extern void initFieldObjects (void)
 
 		fobj = fieldObjects + i + fieldObjectUsed;
 		fobj->def = fieldDefinitionsUniversal + i;
-		fobj->fixed = 0;
 		fobj->buffer = NULL;
 
 		if (fobj->def->name)
@@ -925,16 +922,11 @@ extern bool isFieldEnabled (fieldType type)
 	return getFieldObject(type)->def->enabled;
 }
 
-static bool isFieldFixed (fieldType type)
-{
-	return getFieldObject(type)->fixed? true: false;
-}
-
 extern bool enableField (fieldType type, bool state, bool warnIfFixedField)
 {
 	fieldDefinition *def = getFieldObject(type)->def;
 	bool old = def->enabled;
-	if (isFieldFixed (type))
+	if (writerDoesTreatFieldAsFixed (type))
 	{
 		if ((!state) && warnIfFixedField)
 		{
@@ -1062,7 +1054,6 @@ extern int defineField (fieldDefinition *def, langType language)
 
 	fobj->def = def;
 
-	fobj->fixed =  0;
 	fobj->buffer = NULL;
 
 	nameWithPrefix = eMalloc (sizeof CTAGS_FIELD_PREFIX + strlen (def->name) + 1);
@@ -1123,7 +1114,7 @@ static void  fieldColprintAddLine (struct colprintTable *table, int i)
 				typefields[offset] = fieldDataTypeFalgs[offset];
 	}
 	colprintLineAppendColumnCString (line, typefields);
-	colprintLineAppendColumnBool (line, fobj->fixed);
+	colprintLineAppendColumnBool (line, writerDoesTreatFieldAsFixed (i));
 	colprintLineAppendColumnCString (line, fdef->description);
 }
 
