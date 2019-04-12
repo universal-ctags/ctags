@@ -438,20 +438,32 @@ static ttcnToken_t * getToken (void)
 		/* Charstring */
 		pTtcnToken->type = T_LITERAL;
 		pTtcnToken->value = vStringNew();
-		do
+        vStringPut(pTtcnToken->value, c);
+		while((c = getcFromInputFile()) != EOF)
 		{
 			vStringPut(pTtcnToken->value, c);
-			c = getcFromInputFile();
+            /* consume escaped chracters */
+            if(c == '\\' && ((c2 = getcFromInputFile()) != EOF))
+            {
+                vStringPut(pTtcnToken->value, c2);
+                continue;
+            }
+            /* Double '"' represents '"' within a Charstring literal */
 			if (c == '"')
 			{
-				vStringPut(pTtcnToken->value, c);
 				c2 = getcFromInputFile();
-				/* Double '"' represents '"' within a Charstring literal */
-				if (c2 == c)
-					continue;
-				ungetcToInputFile(c2);
+                /* consume "" */
+				if (c2 == '"')
+                {
+                    vStringPut(pTtcnToken->value, c2);
+                    continue;
+                }
+                /* c is " that close string, c2 is out of string */
+                if(c2 != EOF)
+                    ungetcToInputFile(c2);
+                break;
 			}
-		} while ((c != '"') && (c != EOF));
+		}
 		if (c != '"')
 			pTtcnToken->type = 0;
 	}
