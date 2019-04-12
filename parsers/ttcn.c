@@ -459,7 +459,8 @@ static ttcnToken_t * getToken (void)
                     continue;
                 }
                 /* c is " that close string, c2 is out of string */
-                ungetcToInputFile(c2);
+                if(c2 != EOF)
+                    ungetcToInputFile(c2);
                 break;
 			}
 		}
