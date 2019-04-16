@@ -397,6 +397,40 @@ Experimental flags
 	This flag allows a regex match to generate a reference tag entry and
 	specify the role of the reference, as explained in :ref:`roles`.
 
+.. NOT REVIEWED YET
+
+``_anonymous=PREFIX``
+
+	This flag allows a regex match to generate an anonymous tag entry.
+	ctags gives a name starting with ``PREFIX`` and emits it.
+	This flag is useful to record the position for a language object
+	having no name. A lambda function in a functional programming
+	language is a typical example of a language object having no name.
+
+	Consider following input (input.foo):
+
+	.. code-block:: lisp
+
+		(let ((f (lambda (x) (+ 1 x))))
+			...
+			)
+
+	Consider following optlib file (foo.ctags):
+
+	.. code-block:: perl
+
+		--langdef=Foo
+		--map-Foo=+.foo
+		--kinddef-Foo=l,lambda,lambda functions
+		--regex-Foo=/.*\(lambda .*//l/{_anonymous=L}
+
+	You can get following tags file:
+
+	.. code-block:: console
+
+		$ u-ctags  --options=foo.ctags -o - /tmp/input.foo
+		Le4679d360100	/tmp/input.foo	/^(let ((f (lambda (x) (+ 1 x))))$/;"	l
+
 
 Ghost kind in regex parser
 ......................................................................
@@ -538,7 +572,7 @@ tags automatically.
 
 `.` is the (ctags global) default separator combining names into a
 fully qualified tag. You can customize separators with
-``--_scopesep-<LANG>=...` option.
+``--_scopesep-<LANG>=...`` option.
 
 input.foo::
 

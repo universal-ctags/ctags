@@ -1,0 +1,4 @@
+MyAppError1	input.foo	/^defmodule MyAppError1 do$/;"	m
+exceptionf9e1959f0101	input.foo	/^  defexception [:message]$/;"	x	module:MyAppError1
+MyAppError2	input.foo	/^defmodule MyAppError2 do$/;"	m
+exceptionf9e1959f0201	input.foo	/^  defexception [:message]$/;"	x	module:MyAppError2
