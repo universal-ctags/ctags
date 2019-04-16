@@ -10,6 +10,7 @@
 #include "general.h"  /* must always come first */
 
 #include "entry_p.h"
+#include "field.h"
 #include "field_p.h"
 #include "mio.h"
 #include "options_p.h"
@@ -29,6 +30,7 @@ static int writeCtagsPtagEntry (tagWriter *writer CTAGS_ATTR_UNUSED,
 								const char *const fileName,
 								const char *const pattern,
 								const char *const parserName);
+static bool treatFieldAsFixed (int fieldType);
 
 struct rejection {
 	bool rejectionInThisInput;
@@ -39,6 +41,7 @@ tagWriter uCtagsWriter = {
 	.writePtagEntry = writeCtagsPtagEntry,
 	.preWriteEntry = NULL,
 	.postWriteEntry = NULL,
+	.treatFieldAsFixed = treatFieldAsFixed,
 	.defaultFileName = CTAGS_FILE,
 };
 
@@ -62,6 +65,7 @@ tagWriter eCtagsWriter = {
 	.writePtagEntry = writeCtagsPtagEntry,
 	.preWriteEntry = beginECtagsFile,
 	.postWriteEntry = endECTagsFile,
+	.treatFieldAsFixed = treatFieldAsFixed,
 	.defaultFileName = CTAGS_FILE,
 };
 
@@ -342,4 +346,17 @@ static int writeCtagsPtagEntry (tagWriter *writer CTAGS_ATTR_UNUSED,
 			      PSEUDO_TAG_PREFIX, desc->name,
 			      OPT(fileName), OPT(pattern));
 #undef OPT
+}
+
+static bool treatFieldAsFixed (int fieldType)
+{
+	switch (fieldType)
+	{
+	case FIELD_NAME:
+	case FIELD_INPUT_FILE:
+	case FIELD_PATTERN:
+		return true;
+	default:
+		return false;
+	}
 }

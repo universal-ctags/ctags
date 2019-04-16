@@ -41,6 +41,7 @@ struct sTagWriter {
 	/* Returning TRUE means the output file may be shrunk.
 	   In such case the callee may do truncate output file. */
 	bool (* postWriteEntry)  (tagWriter *writer, MIO * mio, const char* filename);
+	bool (* treatFieldAsFixed) (int fieldType);
 	const char *defaultFileName;
 
 	/* The value returned from preWriteEntry is stored `private' field.
@@ -71,5 +72,6 @@ extern bool ptagMakeJsonOutputVersion (ptagDesc *desc, void *data CTAGS_ATTR_UNU
 extern bool ptagMakeCtagsOutputMode (ptagDesc *desc, void *data CTAGS_ATTR_UNUSED);
 
 extern bool writerCanPrintPtag (void);
+extern bool writerDoesTreatFieldAsFixed (int fieldType);
 
 #endif	/* CTAGS_MAIN_WRITER_PRIVATE_H */

@@ -25,6 +25,7 @@ tagWriter xrefWriter = {
 	.writePtagEntry = NULL,
 	.preWriteEntry = NULL,
 	.postWriteEntry = NULL,
+	.treatFieldAsFixed = NULL,
 	.defaultFileName = NULL,
 };
 

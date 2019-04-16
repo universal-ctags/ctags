@@ -44,6 +44,7 @@ tagWriter jsonWriter = {
 	.writePtagEntry = writeJsonPtagEntry,
 	.preWriteEntry = NULL,
 	.postWriteEntry = NULL,
+	.treatFieldAsFixed = NULL,
 	.defaultFileName = NULL,
 };
 
@@ -162,13 +163,23 @@ static void addExtensionFields (json_t *response, const tagEntryInfo *const tag)
 static int writeJsonEntry (tagWriter *writer CTAGS_ATTR_UNUSED,
 			       MIO * mio, const tagEntryInfo *const tag)
 {
-	json_t *pat = escapeFieldValue(tag, FIELD_PATTERN, true);
-	json_t *response = json_pack ("{ss ss ss sO}",
-		"_type", "tag",
-		"name", tag->name,
-		"path", tag->sourceFileName,
-		"pattern", pat);
-	json_decref (pat);
+	int length = 0;
+	json_t *response = json_pack ("{ss}", "_type", "tag");
+
+	if (isFieldEnabled (FIELD_NAME))
+	{
+		json_t *name = json_string (tag->name);
+		if (name == NULL)
+			goto out;
+		json_object_set_new (response, "name", name);
+	}
+	if (isFieldEnabled (FIELD_INPUT_FILE))
+		json_object_set_new (response, "path", json_string (tag->sourceFileName));
+	if (isFieldEnabled (FIELD_PATTERN))
+	{
+		json_t *pat = escapeFieldValue(tag, FIELD_PATTERN, true);
+		json_object_set_new (response, "pattern", pat);
+	}
 
 	if (includeExtensionFlags ())
 	{
@@ -176,11 +187,11 @@ static int writeJsonEntry (tagWriter *writer CTAGS_ATTR_UNUSED,
 		addParserFields (response, tag);
 	}
 
-	int length = 0;
-	char *buf = json_dumps (response, JSON_PRESERVE_ORDER);
-	if (!buf)
+	/* Print nothing if RESPONSE has only "_type" field. */
+	if (json_object_size (response) == 1)
 		goto out;
 
+	char *buf = json_dumps (response, JSON_PRESERVE_ORDER);
 	length = mio_printf (mio, "%s\n", buf);
 
 	free (buf);

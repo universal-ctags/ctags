@@ -96,3 +96,10 @@ extern bool writerCanPrintPtag (void)
 {
 	return (writer->writePtagEntry)? true: false;
 }
+
+extern bool writerDoesTreatFieldAsFixed (int fieldType)
+{
+	if (writer->treatFieldAsFixed)
+		return writer->treatFieldAsFixed (fieldType);
+	return false;
+}
