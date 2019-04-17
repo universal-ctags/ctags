@@ -70,3 +70,9 @@ Szymon Tomasz Stefanek <s.stefanek@gmail.com>
 
 	I'm a multilanguage developer and I use ctags with my own text editor
 	which has some IDE capabilities. I'm the maintainer of the new C/C++ parser.
+
+Karol Samborski <edv.karol@gmail.com>
+
+	I like programming in multiple languages such as Haskell, C/C++,
+	TypeScript, PHP to name a few. Ctags are useful for me as I code mostly in
+	Vim. My goal here is to take care of the TypeScript parser.
