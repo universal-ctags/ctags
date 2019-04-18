@@ -1915,6 +1915,7 @@ extern parserDefinition *TypeScriptParser (void)
 	def->keywordTable = TsKeywordTable;
 	def->keywordCount = ARRAY_SIZE (TsKeywordTable);
 	def->useCork = true;
+	def->requestAutomaticFQTag = true;
 
 	return def;
 }
