@@ -196,7 +196,7 @@ static const keywordTable FlexKeywordTable [] = {
 static void parseFunction (tokenInfo *const token);
 static bool parseBlock (tokenInfo *const token, tokenInfo *const parent);
 static bool parseLine (tokenInfo *const token);
-static bool parseActionScript (tokenInfo *const token);
+static bool parseActionScript (tokenInfo *const token, bool readNext);
 static bool parseMXML (tokenInfo *const token);
 
 static tokenInfo *newToken (void)
@@ -1966,7 +1966,7 @@ static bool parseCDATA (tokenInfo *const token)
 					readToken (token);
 					if (isType (token, TOKEN_OPEN_SQUARE))
 					{
-						parseActionScript (token);
+						parseActionScript (token, true);
 						if (isType (token, TOKEN_CLOSE_SQUARE))
 						{
 							readToken (token);
@@ -1982,7 +1982,7 @@ static bool parseCDATA (tokenInfo *const token)
 	}
 	else
 	{
-		parseActionScript (token);
+		parseActionScript (token, false);
 	}
 	return true;
 }
@@ -2195,11 +2195,14 @@ cleanUp:
 	return true;
 }
 
-static bool parseActionScript (tokenInfo *const token)
+static bool parseActionScript (tokenInfo *const token, bool readNext)
 {
 	do
 	{
-		readToken (token);
+		if (! readNext)
+			readNext = true;
+		else
+			readToken (token);
 
 		if (isType (token, TOKEN_LESS_THAN))
 		{
@@ -2340,7 +2343,7 @@ static void parseFlexFile (tokenInfo *const token)
 		}
 		else
 		{
-			parseActionScript (token);
+			parseActionScript (token, false);
 		}
 	} while (!isEOF (token));
 }
