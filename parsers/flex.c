@@ -80,6 +80,10 @@ enum eKeywordId {
 	KEYWORD_return,
 	KEYWORD_public,
 	KEYWORD_private,
+	KEYWORD_protected,
+	KEYWORD_internal,
+	KEYWORD_final,
+	KEYWORD_native,
 	KEYWORD_class,
 	KEYWORD_static,
 	KEYWORD_get,
@@ -189,6 +193,10 @@ static const keywordTable FlexKeywordTable [] = {
 	{ "return",		KEYWORD_return				},
 	{ "public",		KEYWORD_public				},
 	{ "private",	KEYWORD_private				},
+	{ "protected",	KEYWORD_protected			},
+	{ "internal",	KEYWORD_internal			},
+	{ "final",		KEYWORD_final				},
+	{ "native",		KEYWORD_native				},
 	{ "class",		KEYWORD_class				},
 	{ "static",		KEYWORD_static				},
 	{ "get",		KEYWORD_get					},
@@ -1537,20 +1545,20 @@ static bool parseStatement (tokenInfo *const token)
 	 *	   Database.prototype.validMethodThree = Database_getTodaysDate;
 	 */
 
-	if ( isKeyword(token, KEYWORD_public) )
+	/* skip attributes */
+	while (isKeyword (token, KEYWORD_public) ||
+	       isKeyword (token, KEYWORD_protected) ||
+	       isKeyword (token, KEYWORD_private) ||
+	       isKeyword (token, KEYWORD_override) ||
+	       isKeyword (token, KEYWORD_static) ||
+	       isKeyword (token, KEYWORD_internal) ||
+	       isKeyword (token, KEYWORD_native) ||
+	       isKeyword (token, KEYWORD_final))
 	{
-		is_public = true;
-		readToken(token);
-	}
+		if (isKeyword(token, KEYWORD_public))
+			is_public = true;
 
-	if ( isKeyword(token, KEYWORD_private) )
-	{
-		readToken(token);
-	}
-
-	if ( isKeyword(token, KEYWORD_static) )
-	{
-		readToken(token);
+		readToken (token);
 	}
 
 	if (isType(token, TOKEN_KEYWORD))
@@ -2353,41 +2361,7 @@ static bool parseActionScript (tokenInfo *const token, bool readNext)
 		}
 		else
 		{
-			if (isType(token, TOKEN_KEYWORD))
-			{
-				if (isKeyword (token, KEYWORD_private)   ||
-				    isKeyword (token, KEYWORD_public)    ||
-				    isKeyword (token, KEYWORD_override)  )
-				{
-					/*
-					 * Methods can be defined as:
-					 *     private function f_name
-					 *     public override function f_name
-					 *     override private function f_name
-					 * Ignore these keywords if present.
-					 */
-					readToken (token);
-				}
-				if (isKeyword (token, KEYWORD_private)   ||
-				    isKeyword (token, KEYWORD_public)    ||
-				    isKeyword (token, KEYWORD_override)  )
-				{
-					/*
-					 * Methods can be defined as:
-					 *     private function f_name
-					 *     public override function f_name
-					 *     override private function f_name
-					 * Ignore these keywords if present.
-					 */
-					readToken (token);
-				}
-
-				parseLine (token);
-			}
-			else
-			{
-				parseLine (token);
-			}
+			parseLine (token);
 		}
 	} while (!isEOF (token));
 	return true;
