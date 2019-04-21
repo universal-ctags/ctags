@@ -82,6 +82,8 @@ enum eKeywordId {
 	KEYWORD_private,
 	KEYWORD_class,
 	KEYWORD_static,
+	KEYWORD_get,
+	KEYWORD_set,
 	KEYWORD_id,
 	KEYWORD_name,
 	KEYWORD_script,
@@ -189,6 +191,8 @@ static const keywordTable FlexKeywordTable [] = {
 	{ "private",	KEYWORD_private				},
 	{ "class",		KEYWORD_class				},
 	{ "static",		KEYWORD_static				},
+	{ "get",		KEYWORD_get					},
+	{ "set",		KEYWORD_set					},
 	{ "id",			KEYWORD_id					},
 	{ "name",		KEYWORD_name				},
 	{ "script",		KEYWORD_script				},
@@ -1120,9 +1124,18 @@ static void parseFunction (tokenInfo *const token)
 	/*
 	 * This deals with these formats
      *     private static function ioErrorHandler( event:IOErrorEvent ):void {
+     *     public function get prop():String {}
+     *     public function set prop(param:String):void {}
 	 */
 
 	if ( isKeyword(token, KEYWORD_function) )
+	{
+		readToken (token);
+	}
+
+	/* getter and setter */
+	if (isKeyword (token, KEYWORD_get) ||
+		isKeyword (token, KEYWORD_set))
 	{
 		readToken (token);
 	}
