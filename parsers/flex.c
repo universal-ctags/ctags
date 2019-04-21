@@ -84,6 +84,7 @@ enum eKeywordId {
 	KEYWORD_internal,
 	KEYWORD_final,
 	KEYWORD_native,
+	KEYWORD_dynamic,
 	KEYWORD_class,
 	KEYWORD_static,
 	KEYWORD_get,
@@ -197,6 +198,7 @@ static const keywordTable FlexKeywordTable [] = {
 	{ "internal",	KEYWORD_internal			},
 	{ "final",		KEYWORD_final				},
 	{ "native",		KEYWORD_native				},
+	{ "dynamic",	KEYWORD_dynamic				},
 	{ "class",		KEYWORD_class				},
 	{ "static",		KEYWORD_static				},
 	{ "get",		KEYWORD_get					},
@@ -1553,6 +1555,7 @@ static bool parseStatement (tokenInfo *const token)
 	       isKeyword (token, KEYWORD_static) ||
 	       isKeyword (token, KEYWORD_internal) ||
 	       isKeyword (token, KEYWORD_native) ||
+	       isKeyword (token, KEYWORD_dynamic) ||
 	       isKeyword (token, KEYWORD_final))
 	{
 		if (isKeyword(token, KEYWORD_public))
