@@ -1173,7 +1173,8 @@ static void parseFunction (tokenInfo *const token)
 		 *   function fname ():ReturnType
 		 */
 		readToken (token);
-		readToken (token);
+		if (isType (token, TOKEN_IDENTIFIER))
+			readToken (token);
 	}
 
 	if ( isType (token, TOKEN_OPEN_CURLY) )
@@ -1407,7 +1408,8 @@ static bool parseVar (tokenInfo *const token, bool is_public)
 		 *   var vname ():DataType;
 		 */
 		readToken (token);
-		readToken (token);
+		if (isType (token, TOKEN_IDENTIFIER))
+			readToken (token);
 	}
 
 	while (! (isType (token, TOKEN_SEMICOLON) ||
@@ -1728,7 +1730,8 @@ nextVar:
 			 *   function fname ():ReturnType {
 			 */
 			readToken (token);
-			readToken (token);
+			if (isType (token, TOKEN_IDENTIFIER))
+				readToken (token);
 		}
 
 		if ( isType (token, TOKEN_OPEN_SQUARE) )
