@@ -86,7 +86,9 @@ enum eKeywordId {
 	KEYWORD_native,
 	KEYWORD_dynamic,
 	KEYWORD_class,
+	KEYWORD_extends,
 	KEYWORD_static,
+	KEYWORD_implements,
 	KEYWORD_get,
 	KEYWORD_set,
 	KEYWORD_id,
@@ -200,7 +202,9 @@ static const keywordTable FlexKeywordTable [] = {
 	{ "native",		KEYWORD_native				},
 	{ "dynamic",	KEYWORD_dynamic				},
 	{ "class",		KEYWORD_class				},
+	{ "extends",	KEYWORD_extends				},
 	{ "static",		KEYWORD_static				},
+	{ "implements",	KEYWORD_implements			},
 	{ "get",		KEYWORD_get					},
 	{ "set",		KEYWORD_set					},
 	{ "id",			KEYWORD_id					},
@@ -1478,6 +1482,25 @@ static bool parseClass (tokenInfo *const token)
 				, vStringValue(token->string)
 				);
 			);
+
+	if (isKeyword (token, KEYWORD_extends))
+	{
+		readToken (token);
+		if (isType (token, TOKEN_IDENTIFIER))
+			readToken (token);
+	}
+
+	if (isKeyword (token, KEYWORD_implements))
+	{
+		do
+		{
+			readToken (token);
+			if (isType (token, TOKEN_IDENTIFIER))
+				readToken (token);
+		}
+		while (isType (token, TOKEN_COMMA));
+	}
+
 	if ( isType (token, TOKEN_OPEN_CURLY) )
 	{
 		makeClassTag (name);
