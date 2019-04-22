@@ -1423,11 +1423,7 @@ static bool parseVar (tokenInfo *const token, bool is_public)
 			readToken (token);
 	}
 
-	while (! (isType (token, TOKEN_SEMICOLON) ||
-		  isEOF (token)))
-	{
-		readToken (token);
-	}
+	is_terminated = findCmdTerm (token, true, false);
 
 	if ( isType (token, TOKEN_SEMICOLON) )
 	{
@@ -1610,7 +1606,7 @@ static bool parseStatement (tokenInfo *const token)
 				goto cleanUp;
 				break;
 			case KEYWORD_var:
-				parseVar (token, is_public);
+				is_terminated = parseVar (token, is_public);
 				goto cleanUp;
 				break;
 			default:
