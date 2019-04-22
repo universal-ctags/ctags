@@ -1395,11 +1395,8 @@ cleanUp:
 static bool parseVar (tokenInfo *const token, bool is_public)
 {
 	tokenInfo *const name = newToken ();
-	tokenInfo *const secondary_name = newToken ();
-	vString * saveScope = vStringNew ();
 	bool is_terminated = true;
 
-	vStringCopy (saveScope, token->scope);
 	/*
 	 * Variables are defined as:
 	 *     private static var lastFaultMessage:Date = new Date( 0 );
@@ -1445,10 +1442,7 @@ static bool parseVar (tokenInfo *const token, bool is_public)
 		}
 	}
 
-	vStringCopy(token->scope, saveScope);
 	deleteToken (name);
-	deleteToken (secondary_name);
-	vStringDelete(saveScope);
 
 	return is_terminated;
 }
