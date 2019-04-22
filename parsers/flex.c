@@ -87,6 +87,7 @@ enum eKeywordId {
 	KEYWORD_dynamic,
 	KEYWORD_class,
 	KEYWORD_interface,
+	KEYWORD_package,
 	KEYWORD_extends,
 	KEYWORD_static,
 	KEYWORD_implements,
@@ -159,6 +160,7 @@ typedef enum {
 	FLEXTAG_FUNCTION,
 	FLEXTAG_CLASS,
 	FLEXTAG_INTERFACE,
+	FLEXTAG_PACKAGE,
 	FLEXTAG_METHOD,
 	FLEXTAG_PROPERTY,
 	FLEXTAG_VARIABLE,
@@ -180,6 +182,7 @@ static kindDefinition FlexKinds [] = {
 	{ true,  'f', "function",	  "functions"		   },
 	{ true,  'c', "class",		  "classes"			   },
 	{ true,  'i', "interface",	  "interfaces"		   },
+	{ true,  'P', "package",	  "packages"		   },
 	{ true,  'm', "method",		  "methods"			   },
 	{ true,  'p', "property",	  "properties"		   },
 	{ true,  'v', "variable",	  "global variables"   },
@@ -221,6 +224,7 @@ static const keywordTable FlexKeywordTable [] = {
 	{ "dynamic",	KEYWORD_dynamic				},
 	{ "class",		KEYWORD_class				},
 	{ "interface",	KEYWORD_interface			},
+	{ "package",	KEYWORD_package				},
 	{ "extends",	KEYWORD_extends				},
 	{ "static",		KEYWORD_static				},
 	{ "implements",	KEYWORD_implements			},
@@ -1488,6 +1492,32 @@ static bool parseVar (tokenInfo *const token, bool is_public)
 	return is_terminated;
 }
 
+static void parsePackage (tokenInfo *const token)
+{
+	tokenInfo *name = NULL;
+
+	if (isKeyword (token, KEYWORD_package))
+		readToken(token);
+
+	/* name is optional (?) */
+	if (isType (token, TOKEN_IDENTIFIER))
+	{
+		name = newToken ();
+		copyToken (name, token, true);
+		readToken (token);
+	}
+
+	if (isType (token, TOKEN_OPEN_CURLY))
+	{
+		if (name)
+			makeFlexTag (name, FLEXTAG_PACKAGE);
+		parseBlock (token, name ? name->string : NULL);
+	}
+
+	if (name)
+		deleteToken (name);
+}
+
 static bool parseClass (tokenInfo *const token)
 {
 	tokenInfo *const name = newToken ();
@@ -1676,6 +1706,10 @@ static bool parseStatement (tokenInfo *const token)
 				break;
 			case KEYWORD_switch:
 				parseSwitch (token);
+				break;
+			case KEYWORD_package:
+				parsePackage (token);
+				goto cleanUp;
 				break;
 			case KEYWORD_class:
 				parseClass (token);
