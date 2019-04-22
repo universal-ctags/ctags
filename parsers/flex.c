@@ -282,14 +282,31 @@ static void makeConstTag (tokenInfo *const token, const flexKind kind)
 		e.lineNumber   = token->lineNumber;
 		e.filePosition = token->filePosition;
 
+		if ( vStringLength(token->scope) > 0 )
+		{
+			/* FIXME: proper parent type */
+			flexKind parent_kind = FLEXTAG_CLASS;
+
+			/*
+			 * If we're creating a function (and not a method),
+			 * guess we're inside another function
+			 */
+			if (kind == FLEXTAG_FUNCTION)
+				parent_kind = FLEXTAG_FUNCTION;
+			/* mxtags can only be nested inside other mxtags */
+			else if (kind == FLEXTAG_MXTAG)
+				parent_kind = kind;
+
+			e.extensionFields.scopeKindIndex = parent_kind;
+			e.extensionFields.scopeName = vStringValue (token->scope);
+		}
+
 		makeTagEntry (&e);
 	}
 }
 
 static void makeFlexTag (tokenInfo *const token, flexKind kind)
 {
-	vString *	fulltag;
-
 	if (FlexKinds [kind].enabled && ! token->ignoreTag )
 	{
 	DebugStatement (
@@ -303,19 +320,6 @@ static void makeFlexTag (tokenInfo *const token, flexKind kind)
 		if (kind == FLEXTAG_FUNCTION && token->isClass )
 		{
 			kind = FLEXTAG_METHOD;
-		}
-		/*
-		 * If a scope has been added to the token, change the token
-		 * string to include the scope when making the tag.
-		 */
-		if ( vStringLength(token->scope) > 0 )
-		{
-			fulltag = vStringNew ();
-			vStringCopy(fulltag, token->scope);
-			vStringPut (fulltag, '.');
-			vStringCat (fulltag, token->string);
-			vStringCopy(token->string, fulltag);
-			vStringDelete (fulltag);
 		}
 		makeConstTag (token, kind);
 	}
