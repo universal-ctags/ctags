@@ -91,6 +91,7 @@ enum eKeywordId {
 	KEYWORD_implements,
 	KEYWORD_get,
 	KEYWORD_set,
+	KEYWORD_import,
 	KEYWORD_id,
 	KEYWORD_name,
 	KEYWORD_script,
@@ -129,6 +130,7 @@ typedef enum eTokenType {
 	TOKEN_QUESTION_MARK,
 	TOKEN_OPEN_NAMESPACE,
 	TOKEN_POSTFIX_OPERATOR,
+	TOKEN_STAR,
 	TOKEN_BINARY_OPERATOR
 } tokenType;
 
@@ -159,9 +161,18 @@ typedef enum {
 	FLEXTAG_PROPERTY,
 	FLEXTAG_VARIABLE,
 	FLEXTAG_LOCALVAR,
+	FLEXTAG_IMPORT,
 	FLEXTAG_MXTAG,
 	FLEXTAG_COUNT
 } flexKind;
+
+typedef enum {
+	FLEX_IMPORT_ROLE_IMPORTED,
+} flexImportRole;
+
+static roleDefinition FlexImportRoles [] = {
+	{ true, "import", "imports" },
+};
 
 static kindDefinition FlexKinds [] = {
 	{ true,  'f', "function",	  "functions"		   },
@@ -170,6 +181,8 @@ static kindDefinition FlexKinds [] = {
 	{ true,  'p', "property",	  "properties"		   },
 	{ true,  'v', "variable",	  "global variables"   },
 	{ false, 'l', "localvar",	  "local variables"   },
+	{ true,  'I', "import",		  "imports",
+	  .referenceOnly = true, ATTACH_ROLES (FlexImportRoles) },
 	{ true,  'x', "mxtag",		  "mxtags" 			   }
 };
 
@@ -209,6 +222,7 @@ static const keywordTable FlexKeywordTable [] = {
 	{ "implements",	KEYWORD_implements			},
 	{ "get",		KEYWORD_get					},
 	{ "set",		KEYWORD_set					},
+	{ "import",		KEYWORD_import				},
 	{ "id",			KEYWORD_id					},
 	{ "name",		KEYWORD_name				},
 	{ "script",		KEYWORD_script				},
@@ -293,7 +307,12 @@ static void makeConstTag (tokenInfo *const token, const flexKind kind)
 	{
 		const char *const name = vStringValue (token->string);
 		tagEntryInfo e;
-		initTagEntry (&e, name, kind);
+		int role = ROLE_INDEX_DEFINITION;
+
+		if (kind == FLEXTAG_IMPORT)
+			role = FLEX_IMPORT_ROLE_IMPORTED;
+
+		initRefTagEntry (&e, name, kind, role);
 
 		e.lineNumber   = token->lineNumber;
 		e.filePosition = token->filePosition;
@@ -493,6 +512,8 @@ getNextChar:
 			}
 
 		case '*':
+			token->type = TOKEN_STAR;
+			break;
 		case '%':
 		case '^':
 		case '|':
@@ -805,6 +826,7 @@ getNextChar:
 		#define IS_BINARY_OPERATOR(t) ((t) == TOKEN_EQUAL_SIGN      || \
 		                               (t) == TOKEN_COLON           || \
 		                               (t) == TOKEN_PERIOD          || \
+		                               (t) == TOKEN_STAR            || \
 		                               (t) == TOKEN_FORWARD_SLASH   || \
 		                               (t) == TOKEN_QUESTION_MARK   || \
 		                               (t) == TOKEN_LESS_THAN       || \
@@ -1124,6 +1146,38 @@ static bool parseIf (tokenInfo *const token)
 		read_next_token = findCmdTerm (token, true, false);
 	}
 	return read_next_token;
+}
+
+static bool parseImport (tokenInfo *const token)
+{
+	if (! isKeyword (token, KEYWORD_import))
+		return false;
+
+	readToken (token);
+
+	if (isType (token, TOKEN_IDENTIFIER))
+	{
+		tokenInfo *const name = newToken ();
+
+		copyToken (name, token, true);
+		readToken (token);
+		while (isType (token, TOKEN_PERIOD))
+		{
+			vStringPut (name->string, '.');
+			readToken (token);
+			if (isType (token, TOKEN_IDENTIFIER))
+				vStringCat (name->string, token->string);
+			else if (isType (token, TOKEN_STAR))
+				vStringPut (name->string, '*');
+			if (isType (token, TOKEN_IDENTIFIER) || isType (token, TOKEN_STAR))
+				readToken (token);
+		}
+
+		makeFlexTag (name, FLEXTAG_IMPORT);
+		deleteToken (name);
+	}
+
+	return isType (token, TOKEN_SEMICOLON);
 }
 
 static void parseFunction (tokenInfo *const token)
@@ -2030,6 +2084,14 @@ static bool parseLine (tokenInfo *const token)
 				break;
 			case KEYWORD_function:
 				parseFunction (token);
+				break;
+			case KEYWORD_import:
+				is_terminated = parseImport (token);
+				/* to properly support unterminated imports at top level,
+				 * recurse here because parseActionScript() will *always*
+				 * advance to avoid ever getting stuck. */
+				if (! is_terminated)
+					return parseLine (token);
 				break;
 			default:
 				is_terminated = parseStatement (token);
