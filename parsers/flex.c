@@ -1191,6 +1191,7 @@ static bool parseImport (tokenInfo *const token)
 static void parseFunction (tokenInfo *const token)
 {
 	tokenInfo *const name = newToken ();
+	flexKind kind = FLEXTAG_FUNCTION;
 
 	/*
 	 * This deals with these formats
@@ -1208,6 +1209,7 @@ static void parseFunction (tokenInfo *const token)
 	if (isKeyword (token, KEYWORD_get) ||
 		isKeyword (token, KEYWORD_set))
 	{
+		kind = FLEXTAG_PROPERTY;
 		readToken (token);
 	}
 
@@ -1283,7 +1285,10 @@ static void parseFunction (tokenInfo *const token)
 					, vStringValue(name->string)
 					);
 				);
-		makeFunctionTag (name);
+		if (kind == FLEXTAG_FUNCTION)
+			makeFunctionTag (name);
+		else
+			makeFlexTag (name, kind);
 	}
 
 	findCmdTerm (token, false, false);
