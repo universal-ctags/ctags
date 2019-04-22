@@ -1,0 +1,9 @@
+C	input.as	/^class C {$/;"	c
+f1	input.as	/^  public function f1():void {}$/;"	m	class:C
+f2	input.as	/^  private function f2():void {}$/;"	m	class:C
+f3	input.as	/^  protected function f3():void {}$/;"	m	class:C
+f4	input.as	/^  internal function f4():void {}$/;"	m	class:C
+f5	input.as	/^  public function f5():void {}$/;"	m	class:C
+f6	input.as	/^  public override function f6():void {}$/;"	m	class:C
+f7	input.as	/^  final function f7():void {}$/;"	m	class:C
+f8	input.as	/^  native function f8():void {}$/;"	m	class:C
