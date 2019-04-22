@@ -271,6 +271,20 @@ static void copyToken (tokenInfo *const dest, tokenInfo *const src,
  *	 Tag generation functions
  */
 
+static vString *buildQualifiedName (const tokenInfo *const token)
+{
+	vString *qualified = vStringNew ();
+
+	if (vStringLength (token->scope) > 0)
+	{
+		vStringCopy (qualified, token->scope);
+		vStringPut (qualified, '.');
+	}
+	vStringCat (qualified, token->string);
+
+	return qualified;
+}
+
 static void makeConstTag (tokenInfo *const token, const flexKind kind)
 {
 	if (FlexKinds [kind].enabled && ! token->ignoreTag )
@@ -302,6 +316,17 @@ static void makeConstTag (tokenInfo *const token, const flexKind kind)
 		}
 
 		makeTagEntry (&e);
+
+		/* make qualified tags for compatibility if requested */
+		if (isXtagEnabled (XTAG_QUALIFIED_TAGS))
+		{
+			vString *qualified = buildQualifiedName (token);
+
+			markTagExtraBit (&e, XTAG_QUALIFIED_TAGS);
+			e.name = vStringValue (qualified);
+			makeTagEntry (&e);
+			vStringDelete (qualified);
+		}
 	}
 }
 
