@@ -158,6 +158,7 @@ typedef enum {
 	FLEXTAG_METHOD,
 	FLEXTAG_PROPERTY,
 	FLEXTAG_VARIABLE,
+	FLEXTAG_LOCALVAR,
 	FLEXTAG_MXTAG,
 	FLEXTAG_COUNT
 } flexKind;
@@ -168,6 +169,7 @@ static kindDefinition FlexKinds [] = {
 	{ true,  'm', "method",		  "methods"			   },
 	{ true,  'p', "property",	  "properties"		   },
 	{ true,  'v', "variable",	  "global variables"   },
+	{ false, 'l', "localvar",	  "local variables"   },
 	{ true,  'x', "mxtag",		  "mxtags" 			   }
 };
 
@@ -1420,15 +1422,7 @@ static bool parseVar (tokenInfo *const token, bool is_public)
 
 	if ( isType (token, TOKEN_SEMICOLON) )
 	{
-		/*
-		 * Only create variables for global scope
-		 */
-		/* if ( token->nestLevel == 0 && is_global ) */
-		if ( is_public )
-		{
-			if (isType (token, TOKEN_SEMICOLON))
-				makeFlexTag (name, FLEXTAG_VARIABLE);
-		}
+		makeFlexTag (name, is_public ? FLEXTAG_VARIABLE: FLEXTAG_LOCALVAR);
 	}
 
 	deleteToken (name);
