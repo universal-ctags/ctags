@@ -86,6 +86,7 @@ enum eKeywordId {
 	KEYWORD_native,
 	KEYWORD_dynamic,
 	KEYWORD_class,
+	KEYWORD_interface,
 	KEYWORD_extends,
 	KEYWORD_static,
 	KEYWORD_implements,
@@ -157,6 +158,7 @@ static langType Lang_flex;
 typedef enum {
 	FLEXTAG_FUNCTION,
 	FLEXTAG_CLASS,
+	FLEXTAG_INTERFACE,
 	FLEXTAG_METHOD,
 	FLEXTAG_PROPERTY,
 	FLEXTAG_VARIABLE,
@@ -177,6 +179,7 @@ static roleDefinition FlexImportRoles [] = {
 static kindDefinition FlexKinds [] = {
 	{ true,  'f', "function",	  "functions"		   },
 	{ true,  'c', "class",		  "classes"			   },
+	{ true,  'i', "interface",	  "interfaces"		   },
 	{ true,  'm', "method",		  "methods"			   },
 	{ true,  'p', "property",	  "properties"		   },
 	{ true,  'v', "variable",	  "global variables"   },
@@ -217,6 +220,7 @@ static const keywordTable FlexKeywordTable [] = {
 	{ "native",		KEYWORD_native				},
 	{ "dynamic",	KEYWORD_dynamic				},
 	{ "class",		KEYWORD_class				},
+	{ "interface",	KEYWORD_interface			},
 	{ "extends",	KEYWORD_extends				},
 	{ "static",		KEYWORD_static				},
 	{ "implements",	KEYWORD_implements			},
@@ -1552,6 +1556,41 @@ static bool parseClass (tokenInfo *const token)
 	return true;
 }
 
+static void parseInterface (tokenInfo *const token)
+{
+	tokenInfo *const name = newToken ();
+	bool saveIsClass = token->isClass;
+
+	if (isKeyword(token, KEYWORD_interface))
+		readToken(token);
+
+	token->isClass = true;
+	/* interface name */
+	copyToken (name, token, true);
+	readToken (token);
+
+	/* interfaces can extend multiple interfaces */
+	if (isKeyword (token, KEYWORD_extends))
+	{
+		do
+		{
+			readToken (token);
+			if (isType (token, TOKEN_IDENTIFIER))
+				readToken (token);
+		}
+		while (isType (token, TOKEN_COMMA));
+	}
+
+	if (isType (token, TOKEN_OPEN_CURLY))
+	{
+		makeFlexTag (name, FLEXTAG_INTERFACE);
+		parseBlock (token, name->string);
+	}
+
+	token->isClass = saveIsClass;
+	deleteToken (name);
+}
+
 static bool parseStatement (tokenInfo *const token)
 {
 	tokenInfo *const name = newToken ();
@@ -1640,6 +1679,10 @@ static bool parseStatement (tokenInfo *const token)
 				break;
 			case KEYWORD_class:
 				parseClass (token);
+				goto cleanUp;
+				break;
+			case KEYWORD_interface:
+				parseInterface (token);
 				goto cleanUp;
 				break;
 			case KEYWORD_function:
