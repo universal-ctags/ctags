@@ -352,21 +352,10 @@ static void makeFlexTag (tokenInfo *const token, flexKind kind)
 
 static void makeClassTag (tokenInfo *const token)
 {
-	vString *	fulltag;
-
 	if ( ! token->ignoreTag )
 	{
-		fulltag = vStringNew ();
-		if (vStringLength (token->scope) > 0)
-		{
-			vStringCopy(fulltag, token->scope);
-			vStringPut (fulltag, '.');
-			vStringCat (fulltag, token->string);
-		}
-		else
-		{
-			vStringCopy(fulltag, token->string);
-		}
+		vString *fulltag = buildQualifiedName (token);
+
 		if ( ! stringListHas(ClassNames, vStringValue (fulltag)) )
 		{
 			stringListAdd (ClassNames, vStringNewCopy (fulltag));
@@ -378,43 +367,18 @@ static void makeClassTag (tokenInfo *const token)
 
 static void makeMXTag (tokenInfo *const token)
 {
-	vString *	fulltag;
-
 	if ( ! token->ignoreTag )
 	{
-		fulltag = vStringNew ();
-		if (vStringLength (token->scope) > 0)
-		{
-			vStringCopy(fulltag, token->scope);
-			vStringPut (fulltag, '.');
-			vStringCat (fulltag, token->string);
-		}
-		else
-		{
-			vStringCopy(fulltag, token->string);
-		}
 		makeFlexTag (token, FLEXTAG_MXTAG);
-		vStringDelete (fulltag);
 	}
 }
 
 static void makeFunctionTag (tokenInfo *const token)
 {
-	vString *	fulltag;
-
 	if ( ! token->ignoreTag )
 	{
-		fulltag = vStringNew ();
-		if (vStringLength (token->scope) > 0)
-		{
-			vStringCopy(fulltag, token->scope);
-			vStringPut (fulltag, '.');
-			vStringCat (fulltag, token->string);
-		}
-		else
-		{
-			vStringCopy(fulltag, token->string);
-		}
+		vString *fulltag = buildQualifiedName (token);
+
 		if ( ! stringListHas(FunctionNames, vStringValue (fulltag)) )
 		{
 			stringListAdd (FunctionNames, vStringNewCopy (fulltag));
