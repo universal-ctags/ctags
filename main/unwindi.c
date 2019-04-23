@@ -217,6 +217,7 @@ extern void uwiDeactivate (void)
 {
 	Assert (uwiMarkerStack);
 	ptrArrayDelete (uwiMarkerStack);
+	uwiMarkerStack = NULL;
 	uugcDeactive();
 }
 
