@@ -27,6 +27,11 @@ static tagWriter *writerTable [WRITER_COUNT] = {
 
 static tagWriter *writer;
 
+extern void setCustomTagWriter(tagWriter *w)
+{
+	writer = w;
+}
+
 extern void setTagWriter (writerType wtype)
 {
 	writer = writerTable [wtype];
@@ -70,6 +75,12 @@ extern int writerWritePtag (MIO * mio,
 	return writer->writePtagEntry (writer, mio, desc, fileName,
 								   pattern, parserName);
 
+}
+
+extern void writerRescanFailed (unsigned long validTagNum)
+{
+	if (writer->rescanFailedEntry)
+		writer->rescanFailedEntry(writer, validTagNum);
 }
 
 extern bool ptagMakeCtagsOutputMode (ptagDesc *desc, void *data CTAGS_ATTR_UNUSED)

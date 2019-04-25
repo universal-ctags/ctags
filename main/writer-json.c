@@ -44,6 +44,7 @@ tagWriter jsonWriter = {
 	.writePtagEntry = writeJsonPtagEntry,
 	.preWriteEntry = NULL,
 	.postWriteEntry = NULL,
+	.rescanFailedEntry = NULL,
 	.treatFieldAsFixed = NULL,
 	.defaultFileName = NULL,
 };

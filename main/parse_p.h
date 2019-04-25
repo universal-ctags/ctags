@@ -158,4 +158,7 @@ extern bool makeKindDescriptionsPseudoTags (const langType language,
 
 extern void printLanguageMultitableStatistics (langType language, FILE *vfp);
 
+extern void createTags(unsigned char *buffer, size_t bufferSize,
+	const char *fileName, const langType language);
+
 #endif	/* CTAGS_MAIN_PARSE_PRIVATE_H */

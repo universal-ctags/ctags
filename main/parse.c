@@ -3344,6 +3344,7 @@ static bool createTagsWithFallback1 (const langType language,
 			*/
 			setTagFilePosition (&tagfpos);
 			setNumTagsAdded (numTags);
+			writerRescanFailed (numTags);
 			tagFileResized = true;
 			breakPromisesAfter(lastPromise);
 		}
@@ -3425,6 +3426,26 @@ static bool createTagsWithFallback (
 	closeInputFile ();
 
 	return tagFileResized;
+}
+
+extern void createTags(unsigned char *buffer, size_t bufferSize,
+	const char *fileName, const langType language)
+{
+	MIO *mio = NULL;
+
+	if (buffer)
+		mio = mio_new_memory (buffer, bufferSize, NULL, NULL);
+
+	/* keep in sync with parseFileWithMio() */
+	setupWriter ();
+	setupAnon ();
+	initParserTrashBox ();
+
+	createTagsWithFallback (fileName, language, mio);
+
+	finiParserTrashBox ();
+	teardownAnon ();
+	teardownWriter(fileName);
 }
 
 static void printGuessedParser (const char* const fileName, langType language)

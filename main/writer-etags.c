@@ -34,6 +34,7 @@ tagWriter etagsWriter = {
 	.writePtagEntry = NULL,
 	.preWriteEntry = beginEtagsFile,
 	.postWriteEntry = endEtagsFile,
+	.rescanFailedEntry = NULL,
 	.treatFieldAsFixed = NULL,
 	.defaultFileName = ETAGS_FILE,
 };

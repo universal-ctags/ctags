@@ -41,6 +41,7 @@ tagWriter uCtagsWriter = {
 	.writePtagEntry = writeCtagsPtagEntry,
 	.preWriteEntry = NULL,
 	.postWriteEntry = NULL,
+	.rescanFailedEntry = NULL,
 	.treatFieldAsFixed = treatFieldAsFixed,
 	.defaultFileName = CTAGS_FILE,
 };
@@ -65,6 +66,7 @@ tagWriter eCtagsWriter = {
 	.writePtagEntry = writeCtagsPtagEntry,
 	.preWriteEntry = beginECtagsFile,
 	.postWriteEntry = endECTagsFile,
+	.rescanFailedEntry = NULL,
 	.treatFieldAsFixed = treatFieldAsFixed,
 	.defaultFileName = CTAGS_FILE,
 };

@@ -41,6 +41,7 @@ struct sTagWriter {
 	/* Returning TRUE means the output file may be shrunk.
 	   In such case the callee may do truncate output file. */
 	bool (* postWriteEntry)  (tagWriter *writer, MIO * mio, const char* filename);
+	void (* rescanFailedEntry) (tagWriter *writer, unsigned long validTagNum);
 	bool (* treatFieldAsFixed) (int fieldType);
 	const char *defaultFileName;
 
@@ -61,6 +62,9 @@ int writerWritePtag (MIO * mio,
 					 const char *const fileName,
 					 const char *const pattern,
 					 const char *const parserName);
+
+extern void setCustomTagWriter(tagWriter *w);
+void writerRescanFailed (unsigned long validTagNum);
 
 extern const char *outputDefaultFileName (void);
 

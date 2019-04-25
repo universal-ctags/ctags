@@ -106,6 +106,7 @@ MAIN_SRCS =				\
 	main/lxpath.c			\
 	main/main.c			\
 	main/mbcs.c			\
+	main/mini-geany.c			\
 	main/nestlevel.c		\
 	main/numarray.c			\
 	main/objpool.c			\

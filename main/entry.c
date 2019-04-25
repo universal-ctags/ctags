@@ -156,7 +156,7 @@ extern const char *tagFileName (void)
 
 extern void abort_if_ferror(MIO *const mio)
 {
-	if (mio_error (mio))
+	if (mio != NULL && mio_error (mio))
 		error (FATAL | PERROR, "cannot write tag file");
 }
 
@@ -1688,12 +1688,14 @@ extern void invalidatePatternCache(void)
 
 extern void tagFilePosition (MIOPos *p)
 {
-	mio_getpos (TagFile.mio, p);
+	if (TagFile.mio)
+		mio_getpos (TagFile.mio, p);
 }
 
 extern void setTagFilePosition (MIOPos *p)
 {
-	mio_setpos (TagFile.mio, p);
+	if (TagFile.mio)
+		mio_setpos (TagFile.mio, p);
 }
 
 extern const char* getTagFileDirectory (void)
