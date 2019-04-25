@@ -44,8 +44,10 @@ dctags
 dctags.exe
 depcomp
 install-sh
+libctags.a
 Makefile
 Makefile.in
+mini-geany
 missing
 mkinstalldirs
 perf.data*

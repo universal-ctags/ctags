@@ -47,7 +47,7 @@ MAIN_PUBLIC_HEADS =		\
 		\
 		$(NULL)
 
-MAIN_PRIVATE_HEADS =		\
+LIB_PRIVATE_HEADS =		\
 	main/args_p.h		\
 	main/colprint_p.h	\
 	main/dependency_p.h	\
@@ -81,18 +81,17 @@ MAIN_PRIVATE_HEADS =		\
 		\
 		$(NULL)
 
-MAIN_HEADS =			\
+LIB_HEADS =			\
 	main/ctags.h		\
 	main/general.h		\
 	\
 	$(MAIN_PUBLIC_HEADS)    \
-	$(MAIN_PRIVATE_HEADS)   \
+	$(LIB_PRIVATE_HEADS)   \
 	\
 	$(MIO_HEADS)
 
-MAIN_SRCS =				\
+LIB_SRCS =			\
 	main/args.c			\
-	main/cmd.c			\
 	main/colprint.c			\
 	main/dependency.c		\
 	main/entry.c			\
@@ -139,6 +138,18 @@ MAIN_SRCS =				\
 	\
 	$(REPOINFO_SRCS) \
 	$(MIO_SRCS)      \
+	\
+	$(NULL)
+
+CMDLINE_HEADS =
+CMDLINE_SRCS = \
+	main/cmd.c \
+	\
+	$(NULL)
+
+MINI_GEANY_HEADS =
+MINI_GEANY_SRCS = \
+	main/mini-geany.c \
 	\
 	$(NULL)
 
@@ -295,8 +306,10 @@ YAML_SRCS = \
 DEBUG_HEADS = main/debug.h
 DEBUG_SRCS = main/debug.c
 
-ALL_HEADS = $(MAIN_HEADS) $(PARSER_HEADS) $(DEBUG_HEADS)
-ALL_SRCS = $(MAIN_SRCS) $(PARSER_SRCS) $(DEBUG_SRCS)
+ALL_LIB_HEADS = $(LIB_HEADS) $(PARSER_HEADS) $(DEBUG_HEADS)
+ALL_LIB_SRCS  = $(LIB_SRCS) $(PARSER_SRCS) $(DEBUG_SRCS)
+ALL_HEADS = $(ALL_LIB_HEADS) $(CMDLINE_HEADS)
+ALL_SRCS = $(ALL_LIB_SRCS) $(CMDLINE_SRCS)
 
 ENVIRONMENT_HEADS =
 ENVIRONMENT_SRCS =
