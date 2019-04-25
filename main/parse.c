@@ -49,6 +49,7 @@
 #ifdef HAVE_ICONV
 # include "mbcs_p.h"
 #endif
+#include "writer_p.h"
 #include "xtag_p.h"
 
 /*
@@ -3344,6 +3345,7 @@ static bool createTagsWithFallback1 (const langType language,
 			*/
 			setTagFilePosition (&tagfpos);
 			setNumTagsAdded (numTags);
+			writerRescanFailed (numTags);
 			tagFileResized = true;
 			breakPromisesAfter(lastPromise);
 		}

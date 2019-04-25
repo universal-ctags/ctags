@@ -46,6 +46,8 @@ struct sTagWriter {
 	   In such case the callee may do truncate output file. */
 	bool (* postWriteEntry)  (tagWriter *writer, MIO * mio, const char* filename,
 							  void *clientData);
+	void (* rescanFailedEntry) (tagWriter *writer, unsigned long validTagNum,
+								void *clientData);
 	bool (* treatFieldAsFixed) (int fieldType);
 	const char *defaultFileName;
 
@@ -69,6 +71,8 @@ int writerWritePtag (MIO * mio,
 					 const char *const fileName,
 					 const char *const pattern,
 					 const char *const parserName);
+
+void writerRescanFailed (unsigned long validTagNum);
 
 extern const char *outputDefaultFileName (void);
 
