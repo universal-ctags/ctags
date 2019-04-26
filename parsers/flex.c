@@ -16,6 +16,7 @@
  *	 Flex 3 language reference
  *		 http://livedocs.adobe.com/flex/3/langref/index.html
  * 		 https://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/language-elements.html
+ * 		 https://www.adobe.com/devnet/actionscript/learning/as3-fundamentals/packages.html
  */
 
 /*
@@ -1504,12 +1505,23 @@ static void parsePackage (tokenInfo *const token)
 	if (isKeyword (token, KEYWORD_package))
 		readToken(token);
 
-	/* name is optional (?) */
+	/* name is optional and can be qualified */
 	if (isType (token, TOKEN_IDENTIFIER))
 	{
 		name = newToken ();
 		copyToken (name, token, true);
 		readToken (token);
+
+		while (isType (token, TOKEN_PERIOD))
+		{
+			vStringPut (name->string, '.');
+			readToken (token);
+			if (isType (token, TOKEN_IDENTIFIER))
+			{
+				vStringCat (name->string, token->string);
+				readToken (token);
+			}
+		}
 	}
 
 	if (isType (token, TOKEN_OPEN_CURLY))

@@ -5,3 +5,5 @@ package P2 {
 package P3 {
   class C1 {}
 }
+package qualified.test . pkg {
+}
