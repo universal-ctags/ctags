@@ -3411,6 +3411,7 @@ extern void previewFirstOption (cookedArgs* const args)
 	}
 }
 
+#if defined(HAVE_SCANDIR) || defined (HAVE_DIRENT_H) || defined (_MSC_VER)
 static void parseConfigurationFileOptionsInDirectoryWithLeafname (const char* directory, const char* leafname)
 {
 	char* pathname = combinePathAndFile (directory, leafname);
@@ -3418,7 +3419,6 @@ static void parseConfigurationFileOptionsInDirectoryWithLeafname (const char* di
 	eFree (pathname);
 }
 
-#if defined(HAVE_SCANDIR) || defined (HAVE_DIRENT_H) || defined (_MSC_VER)
 static int ignore_dot_file(const struct dirent* dent)
 {
 	/* Ignore a file which name is started from dot. */
