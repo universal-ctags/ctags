@@ -1,0 +1,5 @@
+AlarmClock	input.as	/^public class AlarmClock {$/;"	c
+MODE_AUDIO	input.as	/^  public static const MODE_AUDIO  = 2;$/;"	C	class:AlarmClock
+MODE_BOTH	input.as	/^  public static const MODE_BOTH   = 3;$/;"	C	class:AlarmClock
+MODE_VISUAL	input.as	/^  public static const MODE_VISUAL = 1;$/;"	C	class:AlarmClock
+mode	input.as	/^  private var mode = AlarmClock.MODE_AUDIO;$/;"	l	class:AlarmClock

@@ -67,6 +67,7 @@ enum eKeywordId {
 	KEYWORD_capital_object,
 	KEYWORD_prototype,
 	KEYWORD_var,
+	KEYWORD_const,
 	KEYWORD_new,
 	KEYWORD_this,
 	KEYWORD_for,
@@ -166,6 +167,7 @@ typedef enum {
 	FLEXTAG_PROPERTY,
 	FLEXTAG_VARIABLE,
 	FLEXTAG_LOCALVAR,
+	FLEXTAG_CONST,
 	FLEXTAG_IMPORT,
 	FLEXTAG_MXTAG,
 	FLEXTAG_COUNT
@@ -188,6 +190,7 @@ static kindDefinition FlexKinds [] = {
 	{ true,  'p', "property",	  "properties"		   },
 	{ true,  'v', "variable",	  "global variables"   },
 	{ false, 'l', "localvar",	  "local variables"   },
+	{ true,  'C', "constant",	  "constants"		   },
 	{ true,  'I', "import",		  "imports",
 	  .referenceOnly = true, ATTACH_ROLES (FlexImportRoles) },
 	{ true,  'x', "mxtag",		  "mxtags" 			   }
@@ -204,6 +207,7 @@ static const keywordTable FlexKeywordTable [] = {
 	{ "Object",		KEYWORD_capital_object		},
 	{ "prototype",	KEYWORD_prototype			},
 	{ "var",		KEYWORD_var					},
+	{ "const",		KEYWORD_const				},
 	{ "new",		KEYWORD_new					},
 	{ "this",		KEYWORD_this				},
 	{ "for",		KEYWORD_for					},
@@ -1459,6 +1463,7 @@ static bool parseVar (tokenInfo *const token, bool is_public)
 {
 	tokenInfo *const name = newToken ();
 	bool is_terminated = true;
+	flexKind kind = is_public ? FLEXTAG_VARIABLE : FLEXTAG_LOCALVAR;
 
 	/*
 	 * Variables are defined as:
@@ -1468,6 +1473,11 @@ static bool parseVar (tokenInfo *const token, bool is_public)
 
 	if ( isKeyword(token, KEYWORD_var) )
 	{
+		readToken(token);
+	}
+	else if (isKeyword(token, KEYWORD_const))
+	{
+		kind = FLEXTAG_CONST;
 		readToken(token);
 	}
 
@@ -1490,7 +1500,7 @@ static bool parseVar (tokenInfo *const token, bool is_public)
 
 	if ( isType (token, TOKEN_SEMICOLON) )
 	{
-		makeFlexTag (name, is_public ? FLEXTAG_VARIABLE: FLEXTAG_LOCALVAR);
+		makeFlexTag (name, kind);
 	}
 
 	deleteToken (name);
@@ -1741,6 +1751,7 @@ static bool parseStatement (tokenInfo *const token)
 				goto cleanUp;
 				break;
 			case KEYWORD_var:
+			case KEYWORD_const:
 				is_terminated = parseVar (token, is_public);
 				goto cleanUp;
 				break;
