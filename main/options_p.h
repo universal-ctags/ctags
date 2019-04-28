@@ -183,6 +183,8 @@ extern bool processRoledefOption (const char *const option, const char *const pa
 extern bool processScopesepOption (const char *const option, const char *const parameter);
 extern bool processPretendOption (const char *const option, const char *const parameter);
 
+extern bool isDestinationStdout (void);
+
 extern void setMainLoop (mainLoopFunc func, void *data);
 
 #endif  /* CTAGS_MAIN_OPTIONS_PRIVATE_H */

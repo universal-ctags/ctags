@@ -28,7 +28,6 @@
 #include "field_p.h"
 #include "gvars.h"
 #include "keyword_p.h"
-#include "main_p.h"
 #include "parse_p.h"
 #include "ptag_p.h"
 #include "routines_p.h"
@@ -3769,4 +3768,19 @@ extern bool inSandbox (void)
 extern bool canUseLineNumberAsLocator (void)
 {
 	return (Option.locate != EX_PATTERN);
+}
+
+extern bool isDestinationStdout (void)
+{
+	bool toStdout = false;
+
+	if (Option.filter || Option.interactive ||
+		(Option.tagFileName != NULL  &&  (strcmp (Option.tagFileName, "-") == 0
+						  || strcmp (Option.tagFileName, "/dev/stdout") == 0
+		)))
+		toStdout = true;
+	else if (Option.tagFileName == NULL && NULL == outputDefaultFileName ())
+		toStdout = true;
+
+	return toStdout;
 }

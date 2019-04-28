@@ -17,7 +17,6 @@
 /*
 *   FUNCTION PROTOTYPES
 */
-extern bool isDestinationStdout (void);
 extern int main (int argc, char **argv);
 
 #endif  /* CTAGS_MAIN_MAIN_PRIVATE_H */

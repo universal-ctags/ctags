@@ -85,21 +85,6 @@ static bool createTagsForEntry (const char *const entryName);
 *   FUNCTION DEFINITIONS
 */
 
-extern bool isDestinationStdout (void)
-{
-	bool toStdout = false;
-
-	if (Option.filter || Option.interactive ||
-		(Option.tagFileName != NULL  &&  (strcmp (Option.tagFileName, "-") == 0
-						  || strcmp (Option.tagFileName, "/dev/stdout") == 0
-		)))
-		toStdout = true;
-	else if (Option.tagFileName == NULL && NULL == outputDefaultFileName ())
-		toStdout = true;
-
-	return toStdout;
-}
-
 #if defined (HAVE_OPENDIR)
 static bool recurseUsingOpendir (const char *const dirName)
 {
