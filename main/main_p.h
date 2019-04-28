@@ -17,7 +17,6 @@
 /*
 *   FUNCTION PROTOTYPES
 */
-extern void addTotals (const unsigned int files, const long unsigned int lines, const long unsigned int bytes);
 extern bool isDestinationStdout (void);
 extern int main (int argc, char **argv);
 

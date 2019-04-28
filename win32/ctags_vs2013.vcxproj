@@ -129,6 +129,7 @@
     <ClCompile Include="..\main\routines.c" />
     <ClCompile Include="..\main\selectors.c" />
     <ClCompile Include="..\main\sort.c" />
+    <ClCompile Include="..\main\stats.c" />
     <ClCompile Include="..\main\strlist.c" />
     <ClCompile Include="..\main\tokeninfo.c" />
     <ClCompile Include="..\main\trashbox.c" />
@@ -303,6 +304,7 @@
     <ClInclude Include="..\main\routines_p.h" />
     <ClInclude Include="..\main\selectors.h" />
     <ClInclude Include="..\main\sort_p.h" />
+    <ClInclude Include="..\main\stat_p.h" />
     <ClInclude Include="..\main\strlist.h" />
     <ClInclude Include="..\main\subparser.h" />
     <ClInclude Include="..\main\subparser_p.h" />

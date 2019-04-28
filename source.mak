@@ -73,6 +73,7 @@ MAIN_PRIVATE_HEADS =		\
 	main/read_p.h		\
 	main/routines_p.h	\
 	main/sort_p.h		\
+	main/stats_p.h		\
 	main/subparser_p.h	\
 	main/trashbox_p.h	\
 	main/writer_p.h		\
@@ -121,6 +122,7 @@ MAIN_SRCS =				\
 	main/seccomp.c			\
 	main/selectors.c		\
 	main/sort.c			\
+	main/stats.c			\
 	main/strlist.c			\
 	main/trace.c			\
 	main/trashbox.c			\
