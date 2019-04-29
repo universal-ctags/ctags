@@ -547,7 +547,7 @@ extern int ctags_cli_main (int argc CTAGS_ATTR_UNUSED, char **argv)
 
 	setErrorPrinter (stderrDefaultErrorPrinter, NULL);
 	setMainLoop (batchMakeTags, NULL);
-	setTagWriter (WRITER_U_CTAGS);
+	setTagWriter (WRITER_U_CTAGS, NULL);
 
 	setCurrentDirectory ();
 	setExecutableName (*argv++);

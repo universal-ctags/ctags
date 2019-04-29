@@ -23,13 +23,17 @@ static tagWriter *writerTable [WRITER_COUNT] = {
 	[WRITER_ETAGS] = &etagsWriter,
 	[WRITER_XREF]  = &xrefWriter,
 	[WRITER_JSON]  = &jsonWriter,
+	[WRITER_CUSTOM] = NULL,
 };
 
 static tagWriter *writer;
 
-extern void setTagWriter (writerType wtype)
+extern void setTagWriter (writerType wtype, tagWriter *customWriter)
 {
-	writer = writerTable [wtype];
+	if (wtype != WRITER_CUSTOM)
+		writer = writerTable [wtype];
+	else
+		writer = customWriter;
 	writer->type = wtype;
 }
 

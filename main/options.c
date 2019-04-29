@@ -800,7 +800,7 @@ static void setEtagsMode (void)
 	Option.sorted = SO_UNSORTED;
 	Option.lineDirectives = false;
 	Option.tagRelative = TREL_YES;
-	setTagWriter (WRITER_ETAGS);
+	setTagWriter (WRITER_ETAGS, NULL);
 }
 
 extern void testEtagsInvocation (void)
@@ -823,7 +823,7 @@ extern void testEtagsInvocation (void)
 static void setXrefMode (void)
 {
 	Option.xref = true;
-	setTagWriter (WRITER_XREF);
+	setTagWriter (WRITER_XREF, NULL);
 }
 
 #ifdef HAVE_JANSSON
@@ -832,7 +832,7 @@ static void setJsonMode (void)
 	enablePtag (PTAG_JSON_OUTPUT_VERSION, true);
 	enablePtag (PTAG_OUTPUT_MODE, false);
 	enablePtag (PTAG_FILE_FORMAT, false);
-	setTagWriter (WRITER_JSON);
+	setTagWriter (WRITER_JSON, NULL);
 }
 #endif
 
@@ -1626,7 +1626,7 @@ static void processInteractiveOption (
 	Option.sorted = SO_UNSORTED;
 	setMainLoop (interactiveLoop, &args);
 	setErrorPrinter (jsonErrorPrinter, NULL);
-	setTagWriter (WRITER_JSON);
+	setTagWriter (WRITER_JSON, NULL);
 	enablePtag (PTAG_JSON_OUTPUT_VERSION, true);
 
 	json_set_alloc_funcs (eMalloc, eFree);
@@ -2337,7 +2337,7 @@ static void processOutputFormat (const char *const option CTAGS_ATTR_UNUSED,
 	if (strcmp (parameter, "u-ctags") == 0)
 		;
 	else if (strcmp (parameter, "e-ctags") == 0)
-		setTagWriter (WRITER_E_CTAGS);
+		setTagWriter (WRITER_E_CTAGS, NULL);
 	else if (strcmp (parameter, "etags") == 0)
 		setEtagsMode ();
 	else if (strcmp (parameter, "xref") == 0)

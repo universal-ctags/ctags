@@ -25,6 +25,7 @@ typedef enum eWriterType {
 	WRITER_ETAGS,
 	WRITER_XREF,
 	WRITER_JSON,
+	WRITER_CUSTOM,
 	WRITER_COUNT,
 } writerType;
 
@@ -51,7 +52,8 @@ struct sTagWriter {
 
 };
 
-extern void setTagWriter (writerType otype);
+/* customWriter is used only if otype is WRITER_CUSTOM */
+extern void setTagWriter (writerType otype, tagWriter *customWriter);
 extern void writerSetup  (MIO *mio);
 extern bool writerTeardown (MIO *mio, const char *filename);
 
