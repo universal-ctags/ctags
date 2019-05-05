@@ -228,9 +228,9 @@ typedef union uParserState {
 	char ch;
 } parserState;
 
-typedef void (*Parser)(const int c, tokenInfo *const, void *state, parserResult *const);
+typedef void (*Parser)(const int c, tokenInfo *const, parserState *state, parserResult *const);
 
-static bool tryParser(Parser parser, tokenInfo *const token);
+static bool tryParser(Parser parser, tokenInfo *const token, bool skipWhite);
 
 static int emitTag(const tokenInfo *const token, const tsKind kind)
 {
@@ -324,14 +324,27 @@ CTAGS_INLINE bool whiteChar(const int c)
 	return c == ' ' || c == '\r' || c == '\t';
 }
 
-CTAGS_INLINE void parseOneChar(const int c, tokenInfo *const token, const char expected, const tokenType type, parserResult *const result)
+CTAGS_INLINE void parseWhiteChars(const int c, tokenInfo *const token, parserState *state, parserResult * const result)
 {
 	if (whiteChar (c))
 	{
 		result->status = PARSER_NEEDS_MORE_INPUT;
+		state->num += 1;
 		return;
 	}
 
+	if (state->num == 0)
+	{
+		result->status = PARSER_FAILED;
+		return;
+	}
+
+	result->status = PARSER_FINISHED;
+	result->unusedChars = 1;
+}
+
+CTAGS_INLINE void parseOneChar(const int c, tokenInfo *const token, const char expected, const tokenType type, parserResult *const result)
+{
 	if (c != expected)
 	{
 		result->status = PARSER_FAILED;
@@ -344,12 +357,6 @@ CTAGS_INLINE void parseOneChar(const int c, tokenInfo *const token, const char e
 
 CTAGS_INLINE void parseChar(const int c, tokenInfo *const token, void *state, parserResult *const result)
 {
-	if (whiteChar (c))
-	{
-		result->status = PARSER_NEEDS_MORE_INPUT;
-		return;
-	}
-
 	if (c == EOF)
 	{
 		result->status = PARSER_FAILED;
@@ -362,12 +369,6 @@ CTAGS_INLINE void parseChar(const int c, tokenInfo *const token, void *state, pa
 
 CTAGS_INLINE void parseWord(const int c, tokenInfo *const token, const char *word, int *parsed, parserResult *const result)
 {
-	if (*parsed == 0 && whiteChar (c))
-	{
-		result->status = PARSER_NEEDS_MORE_INPUT;
-		return;
-	}
-
 	if (word [*parsed] == '\0')
 	{
 		if (isIdentChar (c))
@@ -402,9 +403,7 @@ CTAGS_INLINE void parseNumber(const int c, tokenInfo *const token, int *parsed, 
 	{
 		result->status = PARSER_NEEDS_MORE_INPUT;
 
-		if (whiteChar (c))
-			return;
-		else if (c == '-')
+		if (c == '-')
 		{
 			*parsed += 1;
 			return;
@@ -431,12 +430,6 @@ CTAGS_INLINE void parseNumber(const int c, tokenInfo *const token, int *parsed, 
 
 CTAGS_INLINE void parseWordToken(const int c, tokenInfo *const token, const char *word, const tokenType type, int *parsed, parserResult *const result)
 {
-	if (*parsed == 0 && whiteChar (c))
-	{
-		result->status = PARSER_NEEDS_MORE_INPUT;
-		return;
-	}
-
 	if (c == word [*parsed])
 	{
 		*parsed += 1;
@@ -457,12 +450,6 @@ CTAGS_INLINE void parseWordToken(const int c, tokenInfo *const token, const char
 
 CTAGS_INLINE void parseComment(const int c, tokenInfo *const token, commentState *state, parserResult *const result)
 {
-	if (state->parsed == 0 && whiteChar (c))
-	{
-		result->status = PARSER_NEEDS_MORE_INPUT;
-		return;
-	}
-
 	if (state->parsed < 2)
 	{
 		parseWordToken (c, token, "//", TOKEN_COMMENT_BLOCK, &state->parsed, result);
@@ -515,12 +502,7 @@ CTAGS_INLINE void parseString(const int c, tokenInfo *const token, const char qu
 {
 	if (*prev == '\0')
 	{
-		if (whiteChar (c))
-		{
-			result->status = PARSER_NEEDS_MORE_INPUT;
-			return;
-		}
-		else if (c == quote)
+		if (c == quote)
 		{
 			*prev = c;
 			result->status = PARSER_NEEDS_MORE_INPUT;
@@ -558,17 +540,13 @@ CTAGS_INLINE void parseBlock(const int c, tokenInfo *const token, tokenType cons
 {
 	if (state->parsed == 0)
 	{
-		if (whiteChar (c))
-		{
-			result->status = PARSER_NEEDS_MORE_INPUT;
-			return;
-		}
-
 		if (c != start)
 		{
 			result->status = PARSER_FAILED;
 			return;
 		}
+
+		state->parsed = 1;
 	}
 
 	if (c == '{')
@@ -586,11 +564,6 @@ CTAGS_INLINE void parseBlock(const int c, tokenInfo *const token, tokenType cons
 		return;
 	}
 
-	//skip comments:
-	tryParser ((Parser) parseComment, token);
-
-	state->parsed += 1;
-
 	if (state->nestLevel <= 0)
 	{
 		initToken (token, ttype);
@@ -599,6 +572,9 @@ CTAGS_INLINE void parseBlock(const int c, tokenInfo *const token, tokenType cons
 		return;
 	}
 
+	//skip comments:
+	tryParser ((Parser) parseComment, token, false);
+
 	result->status = PARSER_NEEDS_MORE_INPUT;
 }
 
@@ -606,12 +582,6 @@ CTAGS_INLINE void parseBlock(const int c, tokenInfo *const token, tokenType cons
 CTAGS_INLINE void parseIdentifierCommon(const int c, tokenInfo *const token, int *parsed, parserResult *const result,
 										   bool acceptFqName)
 {
-	if (*parsed == 0 && whiteChar (c))
-	{
-		result->status = PARSER_NEEDS_MORE_INPUT;
-		return;
-	}
-
 	if (isIdentChar (c) || (acceptFqName && c == '.'))
 	{
 		vStringPut (token->string, c);
@@ -694,19 +664,29 @@ BLOCK_PARSER_DEF (Squares, '[', ']', TOKEN_SQUARES)
 BLOCK_PARSER_DEF (Template, '<', '>', TOKEN_TEMPLATE)
 BLOCK_PARSER_DEF (Curlies, '{', '}', TOKEN_CURLIES)
 
-static bool tryParser(Parser parser, tokenInfo *const token)
+CTAGS_INLINE bool tryParser(Parser parser, tokenInfo *const token, bool skipWhite)
 {
 	parserState currentState;
 	parserResult result;
+	int c;
+
 	result.status = PARSER_NEEDS_MORE_INPUT;
 	result.unusedChars = 0;
-
 	memset(&currentState, 0, sizeof (currentState));
 
 	uwiPushMarker();
+
 	while (result.status == PARSER_NEEDS_MORE_INPUT)
 	{
-		int c = uwiGetC ();
+		c = uwiGetC ();
+		if (skipWhite && whiteChar (c))
+		{
+			do {
+				c = uwiGetC ();
+			} while (whiteChar (c));
+			skipWhite = false;
+		}
+
 		parser (c, token, &currentState, &result);
 	}
 
@@ -725,13 +705,15 @@ static bool tryInSequence(tokenInfo *const token, ...)
 	Parser currentParser = NULL;
 	bool result = false;
 
+	tryParser (parseWhiteChars, token, false);
+
 	va_list args;
 	va_start (args, token);
 
 	currentParser = va_arg (args, Parser);
 	while (! result && currentParser)
 	{
-		result = tryParser (currentParser, token);
+		result = tryParser (currentParser, token, false);
 		currentParser = va_arg (args, Parser);
 	}
 
@@ -755,10 +737,10 @@ static void parseDecorator (tokenInfo *const token)
 		clearPoolToken (token);
 
 		parsed = tryInSequence (token, parseNewLine, parseComment, parseIdentifier, NULL);
-	} while (parsed && (token->type != TOKEN_IDENTIFIER || tryParser ((Parser) parsePeriod, token)));
+	} while (parsed && (token->type != TOKEN_IDENTIFIER || tryParser ((Parser) parsePeriod, token, true)));
 
 	//parse optional parens block
-	tryParser ((Parser) parseParens, token);
+	tryParser ((Parser) parseParens, token, true);
 }
 
 static void skipBlocksTillType (tokenType type, tokenInfo *const token)
@@ -1303,7 +1285,7 @@ static void parseFunction (const int scope, tokenInfo *const token)
 
 static void parsePropertyType (tokenInfo *const token)
 {
-	bool parsed = tryParser ((Parser) parseColon, token);
+	bool parsed = tryParser ((Parser) parseColon, token, true);
 
 	if (! parsed)
 		return;
