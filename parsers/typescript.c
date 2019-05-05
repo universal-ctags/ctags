@@ -50,6 +50,13 @@
 		parseOneChar (c, token, ch, ttype, result); \
 	}
 
+#define MULTI_CHAR_PARSER_DEF(fname, chs, ...) \
+	CTAGS_INLINE void parse ## fname (const int c, tokenInfo * const token, parserState *state, parserResult * const result) \
+	{ \
+		tokenType types[] = { __VA_ARGS__ }; \
+		parseChar (c, token, state, result, chs, types); \
+	}
+
 #define WORD_TOKEN_PARSER_DEF(fname, w, ttype) \
 	CTAGS_INLINE void parse ## fname (const int c, tokenInfo * const token, parserState *state, parserResult * const result) \
 	{ \
@@ -355,16 +362,18 @@ CTAGS_INLINE void parseOneChar(const int c, tokenInfo *const token, const char e
 	result->status = PARSER_FINISHED;
 }
 
-CTAGS_INLINE void parseChar(const int c, tokenInfo *const token, void *state, parserResult *const result)
+CTAGS_INLINE void parseChar(const int c, tokenInfo *const token, void *state, parserResult *const result, const char *chars, const tokenType *types)
 {
-	if (c == EOF)
+	const char *pos = strchr (chars, c);
+
+	if (pos)
 	{
-		result->status = PARSER_FAILED;
+		result->status = PARSER_FINISHED;
+		initToken (token, types[pos - chars]);
 		return;
 	}
 
-	initToken (token, TOKEN_CHARACTER);
-	result->status = PARSER_FINISHED;
+	result->status = PARSER_FAILED;
 }
 
 CTAGS_INLINE void parseWord(const int c, tokenInfo *const token, const char *word, int *parsed, parserResult *const result)
@@ -700,7 +709,7 @@ CTAGS_INLINE bool tryParser(Parser parser, tokenInfo *const token, bool skipWhit
 	return result.status == PARSER_FINISHED;
 }
 
-static bool tryInSequence(tokenInfo *const token, ...)
+static bool tryInSequence(tokenInfo *const token, bool skipUnparsed, ...)
 {
 	Parser currentParser = NULL;
 	bool result = false;
@@ -708,7 +717,7 @@ static bool tryInSequence(tokenInfo *const token, ...)
 	tryParser (parseWhiteChars, token, false);
 
 	va_list args;
-	va_start (args, token);
+	va_start (args, skipUnparsed);
 
 	currentParser = va_arg (args, Parser);
 	while (! result && currentParser)
@@ -719,9 +728,12 @@ static bool tryInSequence(tokenInfo *const token, ...)
 
 	va_end (args);
 
+	if (skipUnparsed && ! result) return uwiGetC () != EOF;
+
 	return result;
 }
 
+MULTI_CHAR_PARSER_DEF (DecoratorChars, "@\n", TOKEN_AT, TOKEN_NL)
 static void parseDecorator (tokenInfo *const token)
 {
 	bool parsed = false;
@@ -729,27 +741,28 @@ static void parseDecorator (tokenInfo *const token)
 	do
 	{
 		clearPoolToken (token);
-		parsed = tryInSequence (token, parseAt, parseNewLine, parseComment, NULL);
+		parsed = tryInSequence (token, false, parseDecoratorChars, parseComment, NULL);
 	} while (parsed && token->type != TOKEN_PARENS);
 
 	do
 	{
 		clearPoolToken (token);
 
-		parsed = tryInSequence (token, parseNewLine, parseComment, parseIdentifier, NULL);
+		parsed = tryInSequence (token, false, parseNewLine, parseComment, parseIdentifier, NULL);
 	} while (parsed && (token->type != TOKEN_IDENTIFIER || tryParser ((Parser) parsePeriod, token, true)));
 
 	//parse optional parens block
 	tryParser ((Parser) parseParens, token, true);
 }
 
+MULTI_CHAR_PARSER_DEF (SkipBlockChars, ";,", TOKEN_SEMICOLON, TOKEN_COMMA)
 static void skipBlocksTillType (tokenType type, tokenInfo *const token)
 {
 	bool parsed;
 
 	do
 	{
-		parsed = tryInSequence (token,
+		parsed = tryInSequence (token, true,
 								parseSquares,
 								parseParens,
 								parseComment,
@@ -758,9 +771,7 @@ static void skipBlocksTillType (tokenType type, tokenInfo *const token)
 								parseStringSQuote,
 								parseStringDQuote,
 								parseStringTemplate,
-								parseSemicolon,
-								parseComma,
-								parseChar,
+								parseSkipBlockChars,
 								NULL);
 	} while (parsed && ! isType (token, type));
 }
@@ -771,7 +782,7 @@ static void parseInterfaceBody (const int scope, tokenInfo *const token)
 
 	do
 	{
-		parsed = tryInSequence (token,
+		parsed = tryInSequence (token, true,
 								parseTemplate,
 								parseStringSQuote,
 								parseStringDQuote,
@@ -780,7 +791,6 @@ static void parseInterfaceBody (const int scope, tokenInfo *const token)
 								parseComment,
 								parseSquares,
 								parseOpenCurly,
-								parseChar,
 								NULL);
 	} while (parsed && ! isType (token, TOKEN_OPEN_CURLY));
 
@@ -792,7 +802,7 @@ static void parseInterfaceBody (const int scope, tokenInfo *const token)
 	{
 		clearPoolToken (token);
 
-		parsed = tryInSequence (token,
+		parsed = tryInSequence (token, true,
 								parseTemplate,
 								parseStringSQuote,
 								parseStringDQuote,
@@ -807,7 +817,6 @@ static void parseInterfaceBody (const int scope, tokenInfo *const token)
 								parseStaticKeyword,
 								parseCloseCurly,
 								parseIdentifier,
-								parseChar,
 								NULL);
 
 		if (parsed)
@@ -860,7 +869,7 @@ static void parseInterface (const int scope, tokenInfo *const token)
 	do
 	{
 		clearPoolToken (token);
-		parsed = tryInSequence (token,
+		parsed = tryInSequence (token, false,
 								parseNewLine,
 								parseComment,
 								parseIdentifier,
@@ -884,7 +893,7 @@ static void parseType (const int scope, tokenInfo *const token)
 	do
 	{
 		clearPoolToken (token);
-		parsed = tryInSequence (token,
+		parsed = tryInSequence (token, false,
 								parseComment,
 								parseIdentifier,
 								NULL);
@@ -898,13 +907,14 @@ static void parseType (const int scope, tokenInfo *const token)
 	skipBlocksTillType (TOKEN_SEMICOLON, token);
 }
 
+MULTI_CHAR_PARSER_DEF (EnumBodyChars, "},", TOKEN_CLOSE_CURLY, TOKEN_COMMA)
 static void parseEnumBody (const int scope, tokenInfo *const token)
 {
 	bool parsed;
 
 	do
 	{
-		parsed = tryInSequence (token,
+		parsed = tryInSequence (token, true,
 								parseTemplate,
 								parseStringSQuote,
 								parseStringDQuote,
@@ -913,7 +923,6 @@ static void parseEnumBody (const int scope, tokenInfo *const token)
 								parseComment,
 								parseSquares,
 								parseOpenCurly,
-								parseChar,
 								NULL);
 	} while (parsed && token->type != TOKEN_OPEN_CURLY);
 
@@ -924,7 +933,7 @@ static void parseEnumBody (const int scope, tokenInfo *const token)
 	do
 	{
 		clearPoolToken (token);
-		parsed = tryInSequence (token,
+		parsed = tryInSequence (token, true,
 								parseTemplate,
 								parseStringSQuote,
 								parseStringDQuote,
@@ -932,10 +941,8 @@ static void parseEnumBody (const int scope, tokenInfo *const token)
 								parseParens,
 								parseComment,
 								parseSquares,
-								parseCloseCurly,
-								parseComma,
+								parseEnumBodyChars,
 								parseIdentifier,
-								parseChar,
 								NULL);
 
 		if (parsed)
@@ -968,7 +975,7 @@ static void parseEnum (const int scope, tokenInfo *const token)
 	do
 	{
 		clearPoolToken (token);
-		parsed = tryInSequence (token,
+		parsed = tryInSequence (token, false,
 								parseComment,
 								parseIdentifier,
 								NULL);
@@ -983,6 +990,7 @@ static void parseEnum (const int scope, tokenInfo *const token)
 	parseEnumBody (nscope, token);
 }
 
+MULTI_CHAR_PARSER_DEF (VariableChars, "|&=?[]{})\n:;,.", TOKEN_PIPE, TOKEN_AMPERSAND, TOKEN_EQUAL_SIGN, TOKEN_QUESTION_MARK, TOKEN_OPEN_SQUARE, TOKEN_CLOSE_SQUARE, TOKEN_OPEN_CURLY, TOKEN_CLOSE_CURLY, TOKEN_CLOSE_PAREN, TOKEN_NL, TOKEN_COLON, TOKEN_SEMICOLON, TOKEN_COMMA, TOKEN_PERIOD)
 static void parseVariable (bool constVar, bool localVar, const int scope, tokenInfo *const token)
 {
 	tokenInfo *member = NULL;
@@ -994,7 +1002,7 @@ static void parseVariable (bool constVar, bool localVar, const int scope, tokenI
 	do
 	{
 		clearPoolToken (token);
-		parsed = tryInSequence (token,
+		parsed = tryInSequence (token, true,
 								parseTemplate,
 								parseStringSQuote,
 								parseStringDQuote,
@@ -1002,20 +1010,7 @@ static void parseVariable (bool constVar, bool localVar, const int scope, tokenI
 								parseComment,
 								parseParens,
 								parseNumber,
-								parsePipe,
-								parseAmpersand,
-								parseEqualSign,
-								parseQuestionMark,
-								parseOpenSquare,
-								parseCloseSquare,
-								parseOpenCurly,
-								parseCloseCurly,
-								parseCloseParen,
-								parseNewLine,
-								parseColon,
-								parseSemicolon,
-								parseComma,
-								parsePeriod,
+								parseVariableChars,
 								parseArrow,
 								parseForKeyword,
 								parseWhileKeyword,
@@ -1024,7 +1019,6 @@ static void parseVariable (bool constVar, bool localVar, const int scope, tokenI
 								parseOfKeyword,
 								parseInKeyword,
 								parseIdentifier,
-								parseChar,
 								NULL);
 
 		if (parsed)
@@ -1085,6 +1079,8 @@ static void parseVariable (bool constVar, bool localVar, const int scope, tokenI
 	clearPoolToken (token);
 }
 
+MULTI_CHAR_PARSER_DEF (FunctionArgsChars, "\n(", TOKEN_NL, TOKEN_OPEN_PAREN)
+MULTI_CHAR_PARSER_DEF (FunctionArgsAfterParenChars, "|&=?[]{})\n:,.@", TOKEN_PIPE, TOKEN_AMPERSAND, TOKEN_EQUAL_SIGN, TOKEN_QUESTION_MARK, TOKEN_OPEN_SQUARE, TOKEN_CLOSE_SQUARE, TOKEN_OPEN_CURLY, TOKEN_CLOSE_CURLY, TOKEN_CLOSE_PAREN, TOKEN_NL, TOKEN_COLON, TOKEN_COMMA, TOKEN_PERIOD, TOKEN_AT)
 static void parseFunctionArgs (const int scope, tokenInfo *const token)
 {
 	bool parsed = false;
@@ -1095,11 +1091,10 @@ static void parseFunctionArgs (const int scope, tokenInfo *const token)
 	do
 	{
 		clearPoolToken (token);
-		parsed = tryInSequence (token,
-								parseNewLine,
+		parsed = tryInSequence (token, false,
 								parseTemplate,
 								parseComment,
-								parseOpenParen,
+								parseFunctionArgsChars,
 								NULL);
 	} while (parsed && token->type != TOKEN_OPEN_PAREN);
 
@@ -1109,7 +1104,7 @@ static void parseFunctionArgs (const int scope, tokenInfo *const token)
 	do
 	{
 		clearPoolToken (token);
-		parsed = tryInSequence (token,
+		parsed = tryInSequence (token, false,
 								parseTemplate,
 								parseStringSQuote,
 								parseStringDQuote,
@@ -1117,21 +1112,8 @@ static void parseFunctionArgs (const int scope, tokenInfo *const token)
 								parseComment,
 								parseParens,
 								parseNumber,
-								parsePipe,
-								parseAmpersand,
-								parseEqualSign,
-								parseQuestionMark,
-								parseOpenSquare,
-								parseCloseSquare,
-								parseOpenCurly,
-								parseCloseCurly,
-								parseNewLine,
-								parseColon,
-								parseComma,
-								parsePeriod,
-								parseAt,
+								parseFunctionArgsAfterParenChars,
 								parseArrow,
-								parseCloseParen,
 								parseIdentifier,
 								NULL);
 
@@ -1181,6 +1163,7 @@ static void parseFunctionArgs (const int scope, tokenInfo *const token)
 	} while (parsed && token->type != TOKEN_CLOSE_PAREN);
 }
 
+MULTI_CHAR_PARSER_DEF (FunctionBodyChars, "{}", TOKEN_OPEN_CURLY, TOKEN_CLOSE_CURLY)
 static void parseFunctionBody (const int scope, tokenInfo *const token)
 {
 	bool parsed = false;
@@ -1190,14 +1173,13 @@ static void parseFunctionBody (const int scope, tokenInfo *const token)
 	{
 		clearPoolToken (token);
 
-		parsed = tryInSequence (token,
+		parsed = tryInSequence (token, true,
 								parseOpenCurly,
 								parseStringSQuote,
 								parseStringDQuote,
 								parseStringTemplate,
 								parseTemplate,
 								parseComment,
-								parseChar,
 								NULL);
 
 	} while (parsed && ! isType (token, TOKEN_OPEN_CURLY));
@@ -1209,9 +1191,8 @@ static void parseFunctionBody (const int scope, tokenInfo *const token)
 	{
 		clearPoolToken (token);
 
-		parsed = tryInSequence (token,
-								parseOpenCurly,
-								parseCloseCurly,
+		parsed = tryInSequence (token, true,
+								parseFunctionBodyChars,
 								parseStringSQuote,
 								parseStringDQuote,
 								parseStringTemplate,
@@ -1220,7 +1201,6 @@ static void parseFunctionBody (const int scope, tokenInfo *const token)
 								parseVarKeyword,
 								parseLetKeyword,
 								parseConstKeyword,
-								parseChar,
 								NULL);
 
 		if (parsed)
@@ -1262,7 +1242,7 @@ static void parseFunction (const int scope, tokenInfo *const token)
 	do
 	{
 		clearPoolToken (token);
-		parsed = tryInSequence (token,
+		parsed = tryInSequence (token, false,
 								parseComment,
 								parseStar,
 								parseIdentifier,
@@ -1283,6 +1263,7 @@ static void parseFunction (const int scope, tokenInfo *const token)
 	parseFunctionBody (nscope, token);
 }
 
+MULTI_CHAR_PARSER_DEF (PropertyTypeChars, "\n;|&=,)", TOKEN_NL, TOKEN_SEMICOLON, TOKEN_PIPE, TOKEN_AMPERSAND, TOKEN_EQUAL_SIGN, TOKEN_COMMA, TOKEN_CLOSE_PAREN)
 static void parsePropertyType (tokenInfo *const token)
 {
 	bool parsed = tryParser ((Parser) parseColon, token, true);
@@ -1294,14 +1275,8 @@ static void parsePropertyType (tokenInfo *const token)
 	{
 		clearPoolToken (token);
 
-		parsed = tryInSequence (token,
-								parseNewLine,
-								parseSemicolon,
-								parsePipe,
-								parseAmpersand,
-								parseEqualSign,
-								parseComma,
-								parseCloseParen,
+		parsed = tryInSequence (token, true,
+								parsePropertyTypeChars,
 								parseArrow,
 								parseTemplate,
 								parseParens,
@@ -1312,7 +1287,6 @@ static void parsePropertyType (tokenInfo *const token)
 								parseSquares,
 								parseCurlies,
 								parseIdentifier,
-								parseChar,
 								NULL);
 	} while (parsed && ! isType (token, TOKEN_CLOSE_PAREN) && ! isType (token, TOKEN_SEMICOLON) && ! isType (token, TOKEN_COMMA));
 
@@ -1324,6 +1298,8 @@ static void parsePropertyType (tokenInfo *const token)
 	clearPoolToken (token);
 }
 
+MULTI_CHAR_PARSER_DEF (ConstructorParamsChars, "\n(", TOKEN_NL, TOKEN_OPEN_PAREN)
+MULTI_CHAR_PARSER_DEF (ConstructorParamsAfterParenChars, "\n:,)@", TOKEN_NL, TOKEN_COLON, TOKEN_COMMA, TOKEN_CLOSE_PAREN, TOKEN_AT)
 static void parseConstructorParams (const int classScope, const int constrScope, tokenInfo *const token)
 {
 	bool parsed = false;
@@ -1332,9 +1308,8 @@ static void parseConstructorParams (const int classScope, const int constrScope,
 	{
 		clearPoolToken (token);
 
-		parsed = tryInSequence (token,
-								parseNewLine,
-								parseOpenParen,
+		parsed = tryInSequence (token, false,
+								parseConstructorParamsChars,
 								parseComment,
 								NULL);
 	} while (parsed && ! isType (token, TOKEN_OPEN_PAREN));
@@ -1349,12 +1324,8 @@ static void parseConstructorParams (const int classScope, const int constrScope,
 	{
 		clearPoolToken (token);
 
-		parsed = tryInSequence (token,
-								parseNewLine,
-								parseCloseParen,
-								parseComma,
-								parseColon,
-								parseAt,
+		parsed = tryInSequence (token, false,
+								parseConstructorParamsAfterParenChars,
 								parseComment,
 								parsePrivateKeyword,
 								parseProtectedKeyword,
@@ -1412,6 +1383,8 @@ static void parseConstructorParams (const int classScope, const int constrScope,
 
 }
 
+MULTI_CHAR_PARSER_DEF (ClassBodyChars, "\n{", TOKEN_NL, TOKEN_OPEN_CURLY)
+MULTI_CHAR_PARSER_DEF (ClassBodyAfterCurlyChars, "\n}*@(:;=", TOKEN_NL, TOKEN_CLOSE_CURLY, TOKEN_STAR, TOKEN_AT, TOKEN_OPEN_PAREN, TOKEN_COLON, TOKEN_SEMICOLON, TOKEN_EQUAL_SIGN)
 static void parseClassBody (const int scope, tokenInfo *const token)
 {
 	bool parsed = false;
@@ -1421,9 +1394,8 @@ static void parseClassBody (const int scope, tokenInfo *const token)
 	{
 		clearPoolToken (token);
 
-		parsed = tryInSequence (token,
-								parseNewLine,
-								parseOpenCurly,
+		parsed = tryInSequence (token, false,
+								parseClassBodyChars,
 								parseTemplate,
 								parseComment,
 								parseIdentifier,
@@ -1441,15 +1413,8 @@ static void parseClassBody (const int scope, tokenInfo *const token)
 	{
 		clearPoolToken (token);
 
-		parsed = tryInSequence (token,
-								parseNewLine,
-								parseCloseCurly,
-								parseStar,
-								parseAt,
-								parseOpenParen,
-								parseColon,
-								parseSemicolon,
-								parseEqualSign,
+		parsed = tryInSequence (token, false,
+								parseClassBodyAfterCurlyChars,
 								parseComment,
 								parseAsyncKeyword,
 								parseConstructorKeyword,
@@ -1575,7 +1540,7 @@ static void parseClass (const int scope, tokenInfo *const token)
 	{
 		clearPoolToken (token);
 
-		parsed = tryInSequence (token,
+		parsed = tryInSequence (token, false,
 								parseNewLine,
 								parseComment,
 								parseIdentifier,
@@ -1591,6 +1556,8 @@ static void parseClass (const int scope, tokenInfo *const token)
 	parseClassBody (nscope, token);
 }
 
+MULTI_CHAR_PARSER_DEF (NamespaceBodyChars, "\n{", TOKEN_NL, TOKEN_OPEN_CURLY)
+MULTI_CHAR_PARSER_DEF (NamespaceBodyAfterCurlyChars, "@{}()[]", TOKEN_AT, TOKEN_OPEN_CURLY, TOKEN_CLOSE_CURLY, TOKEN_OPEN_PAREN, TOKEN_CLOSE_PAREN, TOKEN_OPEN_SQUARE, TOKEN_CLOSE_SQUARE)
 static void parseNamespaceBody (const int scope, tokenInfo *const token)
 {
 	bool parsed = false;
@@ -1598,9 +1565,8 @@ static void parseNamespaceBody (const int scope, tokenInfo *const token)
 	//parse until {
 	do
 	{
-		parsed = tryInSequence (token,
-								parseNewLine,
-								parseOpenCurly,
+		parsed = tryInSequence (token, false,
+								parseNamespaceBodyChars,
 								parseComment,
 								NULL);
 	} while (parsed && token->type != TOKEN_OPEN_CURLY);
@@ -1616,7 +1582,7 @@ static void parseNamespaceBody (const int scope, tokenInfo *const token)
 	{
 		clearPoolToken (token);
 
-		parsed = tryInSequence (token,
+		parsed = tryInSequence (token, true,
 								parseComment,
 								parseTemplate,
 								parseStringSQuote,
@@ -1630,14 +1596,7 @@ static void parseNamespaceBody (const int scope, tokenInfo *const token)
 								parseVarKeyword,
 								parseLetKeyword,
 								parseConstKeyword,
-								parseAt,
-								parseOpenCurly,
-								parseCloseCurly,
-								parseOpenParen,
-								parseCloseParen,
-								parseOpenSquare,
-								parseCloseSquare,
-								parseChar,
+								parseNamespaceBodyAfterCurlyChars,
 								NULL);
 
 		switch (token->type)
@@ -1705,7 +1664,7 @@ static void parseNamespace (tokenInfo *const token)
 	{
 		clearPoolToken (token);
 
-		parsed = tryInSequence (token,
+		parsed = tryInSequence (token, false,
 								parseNewLine,
 								parseComment,
 								parseFQIdentifier,
@@ -1728,7 +1687,7 @@ static void parseTsFile (tokenInfo *const token)
 	{
 		clearPoolToken (token);
 
-		parsed = tryInSequence (token,
+		parsed = tryInSequence (token, true,
 								parseComment,
 								parseTemplate,
 								parseStringSQuote,
@@ -1744,7 +1703,6 @@ static void parseTsFile (tokenInfo *const token)
 								parseLetKeyword,
 								parseConstKeyword,
 								parseAt,
-								parseChar,
 								NULL);
 
 		switch (token->type)
