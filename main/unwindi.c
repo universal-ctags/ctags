@@ -241,7 +241,7 @@ extern int uwiGetC ()
 
 extern void uwiUngetC (int c)
 {
-	Assert (!uwiCurrentMarker);
+	//Assert (!uwiCurrentMarker);
 	uugcInjectC (c);
 }
 
@@ -265,17 +265,9 @@ extern void uwiPushMarker (void)
 	uwiCurrentMarker = ptrArrayNew ((ptrArrayDeleteFunc)uugcDeleteC);
 }
 
-extern void uwiPopMarker (int upto)
+extern void uwiPopMarker (const int upto, const bool revertChars)
 {
-	Assert (uwiCurrentMarker);
-
-	int count = (upto < 0)? ptrArrayCount (uwiCurrentMarker): upto;
-	while (count > 0)
-	{
-		uugcUngetC (ptrArrayLast (uwiCurrentMarker));
-		ptrArrayRemoveLast (uwiCurrentMarker);
-		count--;
-	}
+	uwiClearMarker (upto, revertChars);
 
 	ptrArrayDelete (uwiCurrentMarker);
 
@@ -287,7 +279,19 @@ extern void uwiPopMarker (int upto)
 	}
 }
 
-extern void	 uwiDropMaker ()
+extern void uwiClearMarker (const int upto, const bool revertChars)
 {
-	uwiPopMarker  (0);
+	Assert (uwiCurrentMarker);
+	int count = (upto <= 0)? ptrArrayCount (uwiCurrentMarker): upto;
+	while (count-- > 0)
+	{
+		if (revertChars) uugcUngetC (ptrArrayLast (uwiCurrentMarker));
+		else uugcDeleteC (ptrArrayLast (uwiCurrentMarker));
+		ptrArrayRemoveLast (uwiCurrentMarker);
+	}
+}
+
+extern void uwiDropMaker ()
+{
+	uwiPopMarker (0, false);
 }
