@@ -305,10 +305,11 @@ extern void uwiClearMarker (const int upto, const bool revertChars)
 {
 	Assert (uwiCurrentMarker);
 	int count = (upto <= 0)? *uwiCurrentMarker : upto;
+	void (*charHandler)(uugcChar *) = revertChars ? uugcUngetC : uugcDeleteC;
+
 	while (count-- > 0)
 	{
-		if (revertChars) uugcUngetC (ptrArrayLast (uwiBuffer));
-		else uugcDeleteC (ptrArrayLast (uwiBuffer));
+		charHandler (ptrArrayLast (uwiBuffer));
 		ptrArrayRemoveLast (uwiBuffer);
 		*uwiCurrentMarker -= 1;
 	}
