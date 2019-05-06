@@ -57,7 +57,7 @@
 /*
 *   FUNCTION PROTOTYPES
 */
-extern void uwiActivate   (void);
+extern void uwiActivate   (unsigned int);
 extern void uwiDeactivate (void);
 
 extern int uwiGetC (void);

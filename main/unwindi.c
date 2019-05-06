@@ -203,21 +203,32 @@ CTAGS_INLINE MIOPos uugcGetFilePosition (void)
 		return getInputFilePosition ();
 }
 
-static ptrArray *uwiMarkerStack;
-static ptrArray *uwiCurrentMarker;
-extern void uwiActivate   (void)
+static ptrArray *uwiBuffer;
+static unsigned int *uwiMarkerStack;
+static unsigned int uwiMarkerStackLength;
+static unsigned int *uwiCurrentMarker;
+
+extern void uwiActivate (unsigned int stackLength)
 {
-	Assert (!uwiMarkerStack);
+	Assert (stackLength > 0);
 
 	uugcActivate ();
-	uwiMarkerStack = ptrArrayNew ((ptrArrayDeleteFunc)ptrArrayDelete);
+	uwiBuffer = ptrArrayNew ((ptrArrayDeleteFunc)uugcDeleteC);
+	uwiMarkerStackLength = stackLength;
+	uwiMarkerStack = xMalloc (stackLength, unsigned int);
+	uwiCurrentMarker = NULL;
 }
 
 extern void uwiDeactivate (void)
 {
+	Assert (uwiBuffer);
 	Assert (uwiMarkerStack);
-	ptrArrayDelete (uwiMarkerStack);
+
+	ptrArrayDelete (uwiBuffer);
+	eFree (uwiMarkerStack);
+	uwiBuffer = NULL;
 	uwiMarkerStack = NULL;
+	uwiMarkerStackLength = 0;
 	uugcDeactive();
 }
 
@@ -229,7 +240,10 @@ extern int uwiGetC ()
 	c = chr->c;
 
 	if (uwiCurrentMarker)
-		ptrArrayAdd (uwiCurrentMarker, chr);
+	{
+		*uwiCurrentMarker += 1;
+		ptrArrayAdd (uwiBuffer, chr);
+	}
 	else
 	{
 		uugcCurrentChar = NULL;
@@ -241,7 +255,7 @@ extern int uwiGetC ()
 
 extern void uwiUngetC (int c)
 {
-	//Assert (!uwiCurrentMarker);
+	Assert (!uwiCurrentMarker);
 	uugcInjectC (c);
 }
 
@@ -257,37 +271,46 @@ extern MIOPos uwiGetFilePosition (void)
 
 extern void uwiPushMarker (void)
 {
-	Assert (uwiMarkerStack);
+	if (uwiCurrentMarker - uwiMarkerStack >= ( uwiMarkerStackLength - 1 )) {
+		error (WARNING,
+			"trying to add too many markers during parsing: %s "
+			"(this is a bug, please consider filing an issue)", getInputFileName());
+		uwiCurrentMarker = NULL;
+	}
 
-	if (uwiCurrentMarker)
-		ptrArrayAdd (uwiMarkerStack, uwiCurrentMarker);
+	if (uwiCurrentMarker) uwiCurrentMarker++;
+	else uwiCurrentMarker = uwiMarkerStack;
 
-	uwiCurrentMarker = ptrArrayNew ((ptrArrayDeleteFunc)uugcDeleteC);
+	*uwiCurrentMarker = 0;
 }
 
 extern void uwiPopMarker (const int upto, const bool revertChars)
 {
+	if (uwiCurrentMarker - uwiMarkerStack < 0) {
+		error (WARNING,
+				"trying to drop too many markers during parsing: %s "
+				"(this is a bug, please consider filing an issue)", getInputFileName());
+
+		uwiCurrentMarker = NULL;
+		return;
+	}
+
 	uwiClearMarker (upto, revertChars);
 
-	ptrArrayDelete (uwiCurrentMarker);
-
-	uwiCurrentMarker = NULL;
-	if (ptrArrayCount (uwiMarkerStack) > 0)
-	{
-		uwiCurrentMarker = ptrArrayLast (uwiMarkerStack);
-		ptrArrayRemoveLast (uwiMarkerStack);
-	}
+	if (uwiCurrentMarker == uwiMarkerStack) uwiCurrentMarker = NULL;
+	else uwiCurrentMarker--;
 }
 
 extern void uwiClearMarker (const int upto, const bool revertChars)
 {
 	Assert (uwiCurrentMarker);
-	int count = (upto <= 0)? ptrArrayCount (uwiCurrentMarker): upto;
+	int count = (upto <= 0)? *uwiCurrentMarker : upto;
 	while (count-- > 0)
 	{
-		if (revertChars) uugcUngetC (ptrArrayLast (uwiCurrentMarker));
-		else uugcDeleteC (ptrArrayLast (uwiCurrentMarker));
-		ptrArrayRemoveLast (uwiCurrentMarker);
+		if (revertChars) uugcUngetC (ptrArrayLast (uwiBuffer));
+		else uugcDeleteC (ptrArrayLast (uwiBuffer));
+		ptrArrayRemoveLast (uwiBuffer);
+		*uwiCurrentMarker -= 1;
 	}
 }
 

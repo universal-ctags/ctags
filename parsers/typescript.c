@@ -677,21 +677,21 @@ CTAGS_INLINE bool tryParser(Parser parser, tokenInfo *const token, bool skipWhit
 {
 	parserState currentState;
 	parserResult result;
-	int c, count = 0;
+	int c;
 
 	result.status = PARSER_NEEDS_MORE_INPUT;
 	result.unusedChars = 0;
 	memset(&currentState, 0, sizeof (currentState));
 
+	uwiPushMarker();
+
 	while (result.status == PARSER_NEEDS_MORE_INPUT)
 	{
 		c = uwiGetC ();
-		count += 1;
 		if (skipWhite && whiteChar (c))
 		{
 			do {
 				c = uwiGetC ();
-				count += 1;
 			} while (whiteChar (c));
 			skipWhite = false;
 		}
@@ -700,11 +700,11 @@ CTAGS_INLINE bool tryParser(Parser parser, tokenInfo *const token, bool skipWhit
 	}
 
 	if (result.status == PARSER_FAILED)
-		uwiClearMarker (count, true);
+		uwiPopMarker (-1, true);
 	else if (result.unusedChars > 0)
-		uwiClearMarker (result.unusedChars, true);
+		uwiPopMarker (result.unusedChars, true);
 	else
-		uwiClearMarker (count, false);
+		uwiDropMaker ();
 
 	return result.status == PARSER_FINISHED;
 }
@@ -1762,8 +1762,7 @@ static void parseTsFile (tokenInfo *const token)
 
 static void findTsTags (void)
 {
-	uwiActivate();
-	uwiPushMarker();
+	uwiActivate (256);
 
 	tokenInfo *const token = newToken ();
 
@@ -1771,8 +1770,7 @@ static void findTsTags (void)
 
 	deleteToken (token);
 
-	uwiDropMaker ();
-	uwiDeactivate();
+	uwiDeactivate ();
 }
 
 static void initialize (const langType language)
