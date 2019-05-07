@@ -990,7 +990,10 @@ static void parseEnum (const int scope, tokenInfo *const token)
 	parseEnumBody (nscope, token);
 }
 
-MULTI_CHAR_PARSER_DEF (VariableChars, "|&=?[]{})\n:;,.", TOKEN_PIPE, TOKEN_AMPERSAND, TOKEN_EQUAL_SIGN, TOKEN_QUESTION_MARK, TOKEN_OPEN_SQUARE, TOKEN_CLOSE_SQUARE, TOKEN_OPEN_CURLY, TOKEN_CLOSE_CURLY, TOKEN_CLOSE_PAREN, TOKEN_NL, TOKEN_COLON, TOKEN_SEMICOLON, TOKEN_COMMA, TOKEN_PERIOD)
+MULTI_CHAR_PARSER_DEF (VariableChars, "|&=?[]{})\n:;,.",
+		TOKEN_PIPE, TOKEN_AMPERSAND, TOKEN_EQUAL_SIGN, TOKEN_QUESTION_MARK,
+		TOKEN_OPEN_SQUARE, TOKEN_CLOSE_SQUARE, TOKEN_OPEN_CURLY, TOKEN_CLOSE_CURLY,
+		TOKEN_CLOSE_PAREN, TOKEN_NL, TOKEN_COLON, TOKEN_SEMICOLON, TOKEN_COMMA, TOKEN_PERIOD)
 static void parseVariable (bool constVar, bool localVar, const int scope, tokenInfo *const token)
 {
 	tokenInfo *member = NULL;
@@ -1080,7 +1083,10 @@ static void parseVariable (bool constVar, bool localVar, const int scope, tokenI
 }
 
 MULTI_CHAR_PARSER_DEF (FunctionArgsChars, "\n(", TOKEN_NL, TOKEN_OPEN_PAREN)
-MULTI_CHAR_PARSER_DEF (FunctionArgsAfterParenChars, "|&=?[]{})\n:,.@", TOKEN_PIPE, TOKEN_AMPERSAND, TOKEN_EQUAL_SIGN, TOKEN_QUESTION_MARK, TOKEN_OPEN_SQUARE, TOKEN_CLOSE_SQUARE, TOKEN_OPEN_CURLY, TOKEN_CLOSE_CURLY, TOKEN_CLOSE_PAREN, TOKEN_NL, TOKEN_COLON, TOKEN_COMMA, TOKEN_PERIOD, TOKEN_AT)
+MULTI_CHAR_PARSER_DEF (FunctionArgsAfterParenChars, "|&=?[]{})\n:,.@",
+		TOKEN_PIPE, TOKEN_AMPERSAND, TOKEN_EQUAL_SIGN, TOKEN_QUESTION_MARK,
+		TOKEN_OPEN_SQUARE, TOKEN_CLOSE_SQUARE, TOKEN_OPEN_CURLY, TOKEN_CLOSE_CURLY,
+		TOKEN_CLOSE_PAREN, TOKEN_NL, TOKEN_COLON, TOKEN_COMMA, TOKEN_PERIOD, TOKEN_AT)
 static void parseFunctionArgs (const int scope, tokenInfo *const token)
 {
 	bool parsed = false;
@@ -1263,7 +1269,9 @@ static void parseFunction (const int scope, tokenInfo *const token)
 	parseFunctionBody (nscope, token);
 }
 
-MULTI_CHAR_PARSER_DEF (PropertyTypeChars, "\n;|&=,)", TOKEN_NL, TOKEN_SEMICOLON, TOKEN_PIPE, TOKEN_AMPERSAND, TOKEN_EQUAL_SIGN, TOKEN_COMMA, TOKEN_CLOSE_PAREN)
+MULTI_CHAR_PARSER_DEF (PropertyTypeChars, "\n;|&=,)",
+		TOKEN_NL, TOKEN_SEMICOLON, TOKEN_PIPE, TOKEN_AMPERSAND,
+		TOKEN_EQUAL_SIGN, TOKEN_COMMA, TOKEN_CLOSE_PAREN)
 static void parsePropertyType (tokenInfo *const token)
 {
 	bool parsed = tryParser ((Parser) parseColon, token, true);
@@ -1299,7 +1307,8 @@ static void parsePropertyType (tokenInfo *const token)
 }
 
 MULTI_CHAR_PARSER_DEF (ConstructorParamsChars, "\n(", TOKEN_NL, TOKEN_OPEN_PAREN)
-MULTI_CHAR_PARSER_DEF (ConstructorParamsAfterParenChars, "\n:,)@", TOKEN_NL, TOKEN_COLON, TOKEN_COMMA, TOKEN_CLOSE_PAREN, TOKEN_AT)
+MULTI_CHAR_PARSER_DEF (ConstructorParamsAfterParenChars, "\n:,)@",
+		TOKEN_NL, TOKEN_COLON, TOKEN_COMMA, TOKEN_CLOSE_PAREN, TOKEN_AT)
 static void parseConstructorParams (const int classScope, const int constrScope, tokenInfo *const token)
 {
 	bool parsed = false;
@@ -1384,7 +1393,9 @@ static void parseConstructorParams (const int classScope, const int constrScope,
 }
 
 MULTI_CHAR_PARSER_DEF (ClassBodyChars, "\n{", TOKEN_NL, TOKEN_OPEN_CURLY)
-MULTI_CHAR_PARSER_DEF (ClassBodyAfterCurlyChars, "\n}*@(:;=", TOKEN_NL, TOKEN_CLOSE_CURLY, TOKEN_STAR, TOKEN_AT, TOKEN_OPEN_PAREN, TOKEN_COLON, TOKEN_SEMICOLON, TOKEN_EQUAL_SIGN)
+MULTI_CHAR_PARSER_DEF (ClassBodyAfterCurlyChars, "\n}*@(:;=",
+		TOKEN_NL, TOKEN_CLOSE_CURLY, TOKEN_STAR, TOKEN_AT, TOKEN_OPEN_PAREN,
+		TOKEN_COLON, TOKEN_SEMICOLON, TOKEN_EQUAL_SIGN)
 static void parseClassBody (const int scope, tokenInfo *const token)
 {
 	bool parsed = false;
@@ -1557,7 +1568,9 @@ static void parseClass (const int scope, tokenInfo *const token)
 }
 
 MULTI_CHAR_PARSER_DEF (NamespaceBodyChars, "\n{", TOKEN_NL, TOKEN_OPEN_CURLY)
-MULTI_CHAR_PARSER_DEF (NamespaceBodyAfterCurlyChars, "@{}()[]", TOKEN_AT, TOKEN_OPEN_CURLY, TOKEN_CLOSE_CURLY, TOKEN_OPEN_PAREN, TOKEN_CLOSE_PAREN, TOKEN_OPEN_SQUARE, TOKEN_CLOSE_SQUARE)
+MULTI_CHAR_PARSER_DEF (NamespaceBodyAfterCurlyChars, "@{}()[]",
+		TOKEN_AT, TOKEN_OPEN_CURLY, TOKEN_CLOSE_CURLY, TOKEN_OPEN_PAREN,
+		TOKEN_CLOSE_PAREN, TOKEN_OPEN_SQUARE, TOKEN_CLOSE_SQUARE)
 static void parseNamespaceBody (const int scope, tokenInfo *const token)
 {
 	bool parsed = false;
