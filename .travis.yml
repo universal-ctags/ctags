@@ -41,6 +41,7 @@ addons:
       - libyaml-dev
       - libseccomp-dev
       - gdb
+      - valgrind
 
 env:
   - TARGET=Unix
