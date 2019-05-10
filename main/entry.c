@@ -1158,9 +1158,9 @@ static unsigned int queueTagEntry(const tagEntryInfo *const tag)
 }
 
 
-extern void setupWriter (void)
+extern void setupWriter (void *writerClientData)
 {
-	writerSetup (TagFile.mio);
+	writerSetup (TagFile.mio, writerClientData);
 }
 
 extern bool teardownWriter (const char *filename)

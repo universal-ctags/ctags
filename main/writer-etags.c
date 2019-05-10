@@ -25,9 +25,12 @@
 #define ETAGS_FILE  "TAGS"
 
 
-static int writeEtagsEntry  (tagWriter *writer, MIO * mio, const tagEntryInfo *const tag);
-static void *beginEtagsFile (tagWriter *writer, MIO * mio);
-static bool  endEtagsFile   (tagWriter *writer, MIO * mio, const char* filename);
+static int writeEtagsEntry  (tagWriter *writer, MIO * mio, const tagEntryInfo *const tag,
+							 void *clientData CTAGS_ATTR_UNUSED);
+static void *beginEtagsFile (tagWriter *writer, MIO * mio,
+							 void *clientData CTAGS_ATTR_UNUSED);
+static bool  endEtagsFile   (tagWriter *writer, MIO * mio, const char* filename,
+							 void *clientData CTAGS_ATTR_UNUSED);
 
 tagWriter etagsWriter = {
 	.writeEntry = writeEtagsEntry,
@@ -47,7 +50,8 @@ struct sEtags {
 
 
 
-static void *beginEtagsFile (tagWriter *writer CTAGS_ATTR_UNUSED, MIO *mio CTAGS_ATTR_UNUSED)
+static void *beginEtagsFile (tagWriter *writer CTAGS_ATTR_UNUSED, MIO *mio CTAGS_ATTR_UNUSED,
+							 void *clientData CTAGS_ATTR_UNUSED)
 {
 	static struct sEtags etags = { NULL, NULL, 0, NULL };
 
@@ -58,7 +62,8 @@ static void *beginEtagsFile (tagWriter *writer CTAGS_ATTR_UNUSED, MIO *mio CTAGS
 }
 
 static bool endEtagsFile (tagWriter *writer,
-						  MIO *mainfp, const char *filename)
+						  MIO *mainfp, const char *filename,
+						  void *clientData CTAGS_ATTR_UNUSED)
 {
 	const char *line;
 	struct sEtags *etags = writer->private;
@@ -85,7 +90,8 @@ static bool endEtagsFile (tagWriter *writer,
 }
 
 static int writeEtagsEntry (tagWriter *writer,
-							MIO * mio, const tagEntryInfo *const tag)
+							MIO * mio, const tagEntryInfo *const tag,
+							void *clientData CTAGS_ATTR_UNUSED)
 {
 	int length;
 	struct sEtags *etags = writer->private;

@@ -18,7 +18,8 @@
 
 
 static int writeXrefEntry  (tagWriter *writer CTAGS_ATTR_UNUSED,
-							MIO * mio, const tagEntryInfo *const tag);
+							MIO * mio, const tagEntryInfo *const tag,
+							void *clientData CTAGS_ATTR_UNUSED);
 
 tagWriter xrefWriter = {
 	.writeEntry = writeXrefEntry,
@@ -30,7 +31,8 @@ tagWriter xrefWriter = {
 };
 
 static int writeXrefEntry (tagWriter *writer CTAGS_ATTR_UNUSED,
-						   MIO * mio, const tagEntryInfo *const tag)
+						   MIO * mio, const tagEntryInfo *const tag,
+						   void *clientData CTAGS_ATTR_UNUSED)
 {
 	int length;
 	static fmtElement *fmt1;

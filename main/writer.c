@@ -37,10 +37,13 @@ extern void setTagWriter (writerType wtype, tagWriter *customWriter)
 	writer->type = wtype;
 }
 
-extern void writerSetup (MIO *mio)
+extern void writerSetup (MIO *mio, void *clientData)
 {
+	writer->clientData = clientData;
+
 	if (writer->preWriteEntry)
-		writer->private = writer->preWriteEntry (writer, mio);
+		writer->private = writer->preWriteEntry (writer, mio,
+												 writer->clientData);
 	else
 		writer->private = NULL;
 }
@@ -50,7 +53,8 @@ extern bool writerTeardown (MIO *mio, const char *filename)
 	if (writer->postWriteEntry)
 	{
 		bool r;
-		r = writer->postWriteEntry (writer, mio, filename);
+		r = writer->postWriteEntry (writer, mio, filename,
+									writer->clientData);
 		writer->private = NULL;
 		return r;
 	}
@@ -59,7 +63,8 @@ extern bool writerTeardown (MIO *mio, const char *filename)
 
 extern int writerWriteTag (MIO * mio, const tagEntryInfo *const tag)
 {
-	return writer->writeEntry (writer, mio, tag);
+	return writer->writeEntry (writer, mio, tag,
+							   writer->clientData);
 }
 
 extern int writerWritePtag (MIO * mio,
@@ -72,7 +77,8 @@ extern int writerWritePtag (MIO * mio,
 		return -1;
 
 	return writer->writePtagEntry (writer, mio, desc, fileName,
-								   pattern, parserName);
+								   pattern, parserName,
+								   writer->clientData);
 
 }
 

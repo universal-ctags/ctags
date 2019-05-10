@@ -32,16 +32,20 @@ typedef enum eWriterType {
 struct sTagWriter;
 typedef struct sTagWriter tagWriter;
 struct sTagWriter {
-	int (* writeEntry) (tagWriter *writer, MIO * mio, const tagEntryInfo *const tag);
+	int (* writeEntry) (tagWriter *writer, MIO * mio, const tagEntryInfo *const tag,
+						void *clientData);
 	int (* writePtagEntry) (tagWriter *writer, MIO * mio, const ptagDesc *desc,
 							const char *const fileName,
 							const char *const pattern,
-							const char *const parserName);
-	void * (* preWriteEntry) (tagWriter *writer, MIO * mio);
+							const char *const parserName,
+							void *clientData);
+	void * (* preWriteEntry) (tagWriter *writer, MIO * mio,
+							  void *clientData);
 
 	/* Returning TRUE means the output file may be shrunk.
 	   In such case the callee may do truncate output file. */
-	bool (* postWriteEntry)  (tagWriter *writer, MIO * mio, const char* filename);
+	bool (* postWriteEntry)  (tagWriter *writer, MIO * mio, const char* filename,
+							  void *clientData);
 	bool (* treatFieldAsFixed) (int fieldType);
 	const char *defaultFileName;
 
@@ -49,12 +53,14 @@ struct sTagWriter {
 	   The value must be released in postWriteEntry. */
 	void *private;
 	writerType type;
-
+	/* The value passed as the second argument for writerSetup iss
+	 * stored here. Unlink `private' field, ctags does nothing more. */
+	void *clientData;
 };
 
 /* customWriter is used only if otype is WRITER_CUSTOM */
 extern void setTagWriter (writerType otype, tagWriter *customWriter);
-extern void writerSetup  (MIO *mio);
+extern void writerSetup  (MIO *mio, void *clientData);
 extern bool writerTeardown (MIO *mio, const char *filename);
 
 int writerWriteTag (MIO * mio, const tagEntryInfo *const tag);

@@ -3595,7 +3595,7 @@ extern bool parseFileWithMio (const char *const fileName, MIO *mio)
 		openConverter (getLanguageEncoding (language), Option.outputEncoding);
 #endif
 
-		setupWriter ();
+		setupWriter (NULL);
 
 		setupAnon ();
 

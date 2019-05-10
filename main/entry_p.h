@@ -30,7 +30,7 @@ extern void freeTagFileResources (void);
 extern const char *tagFileName (void);
 extern void openTagFile (void);
 extern void closeTagFile (const bool resize);
-extern void  setupWriter (void);
+extern void  setupWriter (void *writerClientData);
 extern bool  teardownWriter (const char *inputFilename);
 
 extern unsigned long numTagsAdded(void);
