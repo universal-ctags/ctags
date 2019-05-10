@@ -49,6 +49,13 @@ if [ "$TARGET" = "Unix" ]; then
             ./ctags --list-features
             echo 'Run "make check" with gcov'
             make -j2 check roundtrip TRAVIS=1
+			make dist
+			tar zxvf universal-ctags*tar.gz
+			(
+				cd universal-ctags*[0-9]
+				./configure
+				make
+			)
         )
 
     else
