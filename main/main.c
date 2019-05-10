@@ -537,7 +537,7 @@ static void sanitizeEnviron (void)
  *		Start up code
  */
 
-extern int main (int argc CTAGS_ATTR_UNUSED, char **argv)
+extern int ctags_cli_main (int argc CTAGS_ATTR_UNUSED, char **argv)
 {
 	cookedArgs *args;
 

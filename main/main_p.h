@@ -17,6 +17,6 @@
 /*
 *   FUNCTION PROTOTYPES
 */
-extern int main (int argc, char **argv);
+extern int ctags_cli_main (int argc, char **argv);
 
 #endif  /* CTAGS_MAIN_MAIN_PRIVATE_H */

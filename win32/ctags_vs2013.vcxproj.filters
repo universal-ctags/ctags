@@ -48,6 +48,9 @@
     <ClCompile Include="..\main\args.c">
       <Filter>Source Files\Main</Filter>
     </ClCompile>
+    <ClCompile Include="..\main\cmd.c">
+      <Filter>Source Files\Main</Filter>
+    </ClCompile>
     <ClCompile Include="..\main\colprint.c">
       <Filter>Source Files\Main</Filter>
     </ClCompile>

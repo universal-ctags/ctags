@@ -92,6 +92,7 @@ MAIN_HEADS =			\
 
 MAIN_SRCS =				\
 	main/args.c			\
+	main/cmd.c			\
 	main/colprint.c			\
 	main/dependency.c		\
 	main/entry.c			\
