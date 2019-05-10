@@ -114,7 +114,10 @@ extern void printLangdefFlags (bool withListHeader, bool machinable, FILE *fp);
 extern void printKinddefFlags (bool withListHeader, bool machinable, FILE *fp);
 extern bool doesParserRequireMemoryStream (const langType language);
 extern bool parseFile (const char *const fileName);
-extern bool parseFileWithMio (const char *const fileName, MIO *mio);
+extern bool parseFileWithMio (const char *const fileName, MIO *mio, void *clientData);
+extern bool parseRawBuffer(const char *fileName, unsigned char *buffer,
+			    size_t bufferSize, const langType language, void *clientData);
+
 extern bool runParserInNarrowedInputStream (const langType language,
 					       unsigned long startLine, long startCharOffset,
 					       unsigned long endLine, long endCharOffset,

@@ -456,7 +456,7 @@ void interactiveLoop (cookedArgs *args CTAGS_ATTR_UNUSED, void *user)
 				unsigned char *data = eMalloc (size);
 				size = fread (data, 1, size, stdin);
 				MIO *mio = mio_new_memory (data, size, eRealloc, eFree);
-				parseFileWithMio (filename, mio);
+				parseFileWithMio (filename, mio, NULL);
 				mio_unref (mio);
 			}
 

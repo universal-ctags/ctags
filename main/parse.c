@@ -3558,12 +3558,36 @@ extern bool doesParserRequireMemoryStream (const langType language)
 extern bool parseFile (const char *const fileName)
 {
 	TRACE_ENTER_TEXT("Parsing file %s",fileName);
-	bool bRet = parseFileWithMio (fileName, NULL);
+	bool bRet = parseFileWithMio (fileName, NULL, NULL);
 	TRACE_LEAVE();
 	return bRet;
 }
 
-extern bool parseFileWithMio (const char *const fileName, MIO *mio)
+static bool parseMio (const char *const fileName, langType language, MIO* mio, bool useSourceFileTagPath,
+					  void *clientData)
+{
+	bool tagFileResized = false;
+
+	setupWriter (clientData);
+
+	setupAnon ();
+
+	initParserTrashBox ();
+
+	tagFileResized = createTagsWithFallback (fileName, language, mio);
+
+	finiParserTrashBox ();
+
+	teardownAnon ();
+
+	if (useSourceFileTagPath)
+		return teardownWriter (getSourceFileTagPath())? true: tagFileResized;
+	else
+		return teardownWriter(fileName);
+}
+
+extern bool parseFileWithMio (const char *const fileName, MIO *mio,
+							  void *clientData)
 {
 	bool tagFileResized = false;
 	langType language;
@@ -3596,21 +3620,7 @@ extern bool parseFileWithMio (const char *const fileName, MIO *mio)
 		/* TODO: checkUTF8BOM can be used to update the encodings. */
 		openConverter (getLanguageEncoding (language), Option.outputEncoding);
 #endif
-
-		setupWriter (NULL);
-
-		setupAnon ();
-
-		initParserTrashBox ();
-
-		tagFileResized = createTagsWithFallback (fileName, language, req.mio);
-
-		finiParserTrashBox ();
-
-		teardownAnon ();
-
-		tagFileResized = teardownWriter (getSourceFileTagPath())? true: tagFileResized;
-
+		tagFileResized = parseMio (fileName, language, req.mio, true, clientData);
 		if (Option.filter && ! Option.interactive)
 			closeTagFile (tagFileResized);
 		addTotals (1, 0L, 0L);
@@ -3624,6 +3634,23 @@ extern bool parseFileWithMio (const char *const fileName, MIO *mio)
 		mio_unref (req.mio);
 
 	return tagFileResized;
+}
+
+extern bool parseRawBuffer(const char *fileName, unsigned char *buffer,
+			 size_t bufferSize, const langType language, void *clientData)
+{
+	MIO *mio = NULL;
+	bool r;
+
+	if (buffer)
+		mio = mio_new_memory (buffer, bufferSize, NULL, NULL);
+
+	r = parseMio (fileName, language, mio, false, clientData);
+
+	if (buffer)
+		mio_unref (mio);
+
+	return r;
 }
 
 static void matchLanguageMultilineRegexCommon (const langType language,
