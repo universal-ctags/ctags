@@ -169,7 +169,7 @@ extern void failedSort (MIO *const mio, const char* msg)
 {
 	const char* const cannotSort = "cannot sort tag file";
 	if (mio != NULL)
-		mio_free (mio);
+		mio_unref (mio);
 	if (msg == NULL)
 		error (FATAL | PERROR, "%s", cannotSort);
 	else
@@ -223,7 +223,7 @@ static void writeSortedTags (
 	}
 	if (toStdout)
 		mio_flush (mio);
-	mio_free (mio);
+	mio_unref (mio);
 }
 
 extern void internalSortTags (const bool toStdout, MIO* mio, size_t numTags)

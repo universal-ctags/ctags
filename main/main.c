@@ -563,7 +563,7 @@ void interactiveLoop (cookedArgs *args CTAGS_ATTR_UNUSED, void *user)
 				size = fread (data, 1, size, stdin);
 				MIO *mio = mio_new_memory (data, size, eRealloc, eFree);
 				parseFileWithMio (filename, mio);
-				mio_free (mio);
+				mio_unref (mio);
 			}
 
 			closeTagFile (false);

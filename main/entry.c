@@ -370,7 +370,7 @@ static bool isTagFile (const char *const filename)
 			ok = true;
 		else
 			ok = (bool) (isCtagsLine (line) || isEtagsLine (line));
-		mio_free (mio);
+		mio_unref (mio);
 	}
 	return ok;
 }
@@ -430,7 +430,7 @@ extern void openTagFile (void)
 				if (TagFile.mio != NULL)
 				{
 					TagFile.numTags.prev = updatePseudoTags (TagFile.mio);
-					mio_free (TagFile.mio);
+					mio_unref (TagFile.mio);
 					TagFile.mio = mio_new_file (TagFile.name, "a+");
 				}
 			}
@@ -488,9 +488,9 @@ static void copyFile (const char *const from, const char *const to, const long s
 		else
 		{
 			copyBytes (fromMio, toMio, size);
-			mio_free (toMio);
+			mio_unref (toMio);
 		}
-		mio_free (fromMio);
+		mio_unref (fromMio);
 	}
 }
 
@@ -501,7 +501,7 @@ static int replacementTruncate (const char *const name, const long size)
 #define WHOLE_FILE  -1L
 	char *tempName = NULL;
 	MIO *mio = tempFile ("w", &tempName);
-	mio_free (mio);
+	mio_unref (mio);
 	copyFile (name, tempName, size);
 	copyFile (tempName, name, WHOLE_FILE);
 	remove (tempName);
@@ -536,7 +536,7 @@ static void internalSortTagFile (void)
 			  TagFile.numTags.added + TagFile.numTags.prev);
 
 	if (! TagsToStdout)
-		mio_free (mio);
+		mio_unref (mio);
 }
 #endif
 
@@ -612,7 +612,7 @@ extern void closeTagFile (const bool resize)
 
 	if ((TagsToStdout && (Option.sorted == SO_UNSORTED)))
 	{
-		if (mio_free (TagFile.mio) != 0)
+		if (mio_unref (TagFile.mio) != 0)
 			error (FATAL | PERROR, "cannot close tag file");
 		goto out;
 	}
@@ -623,7 +623,7 @@ extern void closeTagFile (const bool resize)
 	size = mio_tell (TagFile.mio);
 	if (! TagsToStdout)
 		/* The tag file should be closed before resizing. */
-		if (mio_free (TagFile.mio) != 0)
+		if (mio_unref (TagFile.mio) != 0)
 			error (FATAL | PERROR, "cannot close tag file");
 
 	if (resize  &&  desiredSize < size)
@@ -636,7 +636,7 @@ extern void closeTagFile (const bool resize)
 	sortTagFile ();
 	if (TagsToStdout)
 	{
-		if (mio_free (TagFile.mio) != 0)
+		if (mio_unref (TagFile.mio) != 0)
 			error (FATAL | PERROR, "cannot close tag file");
 		remove (tagFileName ());  /* remove temporary file */
 	}

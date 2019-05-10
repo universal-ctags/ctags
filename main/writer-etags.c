@@ -74,7 +74,7 @@ static bool endEtagsFile (tagWriter *writer,
 			mio_puts (mainfp, line);
 
 		vStringDelete (etags->vLine);
-		mio_free (etags->mio);
+		mio_unref (etags->mio);
 		remove (etags->name);
 		eFree (etags->name);
 		etags->vLine = NULL;

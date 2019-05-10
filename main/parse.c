@@ -1048,7 +1048,7 @@ struct getLangCtx {
 		{							\
 			MIO *tmp_ = (_glc_)->input;			\
 			(_glc_)->input = mio_new_mio (tmp_, 0, -1);	\
-			mio_free (tmp_);				\
+			mio_unref (tmp_);				\
 			if (!(_glc_)->input) {				\
 				(_glc_)->err = true;			\
 				goto _label_;				\
@@ -1058,7 +1058,7 @@ struct getLangCtx {
 
 #define GLC_FCLOSE(_glc_) do {                              \
     if ((_glc_)->input) {                                   \
-        mio_free((_glc_)->input);                             \
+        mio_unref((_glc_)->input);                             \
         (_glc_)->input = NULL;                              \
     }                                                       \
 } while (0)
@@ -3619,7 +3619,7 @@ extern bool parseFileWithMio (const char *const fileName, MIO *mio)
 	}
 
 	if (req.type == GLR_OPEN && req.mio)
-		mio_free (req.mio);
+		mio_unref (req.mio);
 
 	return tagFileResized;
 }

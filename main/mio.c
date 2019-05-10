@@ -104,9 +104,9 @@ static void eFree (void *const ptr)
  * A #MIO object is created using mio_new_file(), mio_new_memory() or mio_new_mio(),
  * depending on whether you want file or in-memory operations.
  * Its life is managed by reference counting. Just after calling one of functions
- * for creating, the count is 1. mio_ref() increments the counter. mio_free()
+ * for creating, the count is 1. mio_ref() increments the counter. mio_unref()
  * decrements it. When the counter becomes 0, the #MIO object will be destroyed
- * in mio_free(). There is also some other convenient API to create file-based
+ * in mio_unref(). There is also some other convenient API to create file-based
  * #MIO objects for more complex cases, such as mio_new_file_full() and
  * mio_new_fp().
  *
@@ -175,10 +175,10 @@ struct _MIO {
  * as a close function. The former is useful e.g. if you need to wrap fopen()
  * for some reason (like filename encoding conversion for example), and the
  * latter allows you both to match your custom open function and to choose
- * whether the underlying #FILE object should or not be closed when mio_free()
+ * whether the underlying #FILE object should or not be closed when mio_unref()
  * is called on the returned object.
  *
- * Free-function: mio_free()
+ * Free-function: mio_unref()
  *
  * Returns: A new #MIO on success, or %NULL on failure.
  */
@@ -226,7 +226,7 @@ MIO *mio_new_file_full (const char *filename,
  * This function simply calls mio_new_file_full() with the libc's fopen() and
  * fclose() functions.
  *
- * Free-function: mio_free()
+ * Free-function: mio_unref()
  *
  * Returns: A new #MIO on success, or %NULL on failure.
  */
@@ -251,7 +251,7 @@ MIO *mio_new_file (const char *filename, const char *mode)
  * </programlisting>
  * </example>
  *
- * Free-function: mio_free()
+ * Free-function: mio_unref()
  *
  * Returns: A new #MIO on success or %NULL on failure.
  */
@@ -308,7 +308,7 @@ MIO *mio_new_fp (FILE *fp, MIOFCloseFunc close_func)
  * </programlisting>
  * </example>
  *
- * Free-function: mio_free()
+ * Free-function: mio_unref()
  *
  * Returns: A new #MIO on success, or %NULL on failure.
  */
@@ -356,7 +356,7 @@ MIO *mio_new_memory (unsigned char *data,
  *
  * The function doesn't move the file position of @base.
  *
- * Free-function: mio_free()
+ * Free-function: mio_unref()
  *
  */
 
@@ -422,7 +422,7 @@ MIO *mio_ref        (MIO *mio)
  * Gets the underlying #FILE object associated with a #MIO file stream.
  *
  * <warning><para>The returned object may become invalid after a call to
- * mio_free() if the stream was configured to close the file when
+ * mio_unref() if the stream was configured to close the file when
  * destroyed.</para></warning>
  *
  * Returns: The underlying #FILE object of the given stream, or %NULL if the
@@ -447,7 +447,7 @@ FILE *mio_file_get_fp (MIO *mio)
  * Gets the underlying memory buffer associated with a #MIO memory stream.
  *
  * <warning><para>The returned pointer and size may become invalid after a
- * successful write on the stream or after a call to mio_free() if the stream
+ * successful write on the stream or after a call to mio_unref() if the stream
  * was configured to free the memory when destroyed.</para></warning>
  *
  * Returns: The memory buffer of the given #MIO stream, or %NULL if the stream
@@ -468,7 +468,7 @@ unsigned char *mio_memory_get_data (MIO *mio, size_t *size)
 }
 
 /**
- * mio_free:
+ * mio_unref:
  * @mio: A #MIO object
  *
  * Decrements the reference counter of a #MIO and destroys the #MIO
@@ -476,7 +476,7 @@ unsigned char *mio_memory_get_data (MIO *mio, size_t *size)
  *
  * Returns: Error code obtained from the registered MIOFCloseFunc or 0 on success.
  */
-int mio_free (MIO *mio)
+int mio_unref (MIO *mio)
 {
 	int rv = 0;
 

@@ -249,7 +249,7 @@ static void aspell_dictfile_handler (const langType language CTAGS_ATTR_UNUSED,
 
 	vStringDelete (line);
 
-	mio_free (mio);
+	mio_unref (mio);
 }
 
 static void aspell_dictword_handler (const langType language CTAGS_ATTR_UNUSED,

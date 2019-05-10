@@ -1780,7 +1780,7 @@ extern void processTagRegexOption (struct lregexControlBlock *lcb,
 				if (vStringLength (regex) > 1 && vStringValue (regex)[0] != '\n')
 					addTagRegexOption (lcb, regptype, vStringValue (regex));
 			}
-			mio_free (mio);
+			mio_unref (mio);
 			vStringDelete (regex);
 		}
 	}
