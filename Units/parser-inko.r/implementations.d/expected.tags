@@ -1,0 +1,4 @@
+SomeObject	input.inko	/^impl SomeObject {$/;"	r
+foo	input.inko	/^  def foo {}$/;"	m	reopen:SomeObject
+SomeObject	input.inko	/^impl SomeTrait for SomeObject {$/;"	r	implements:SomeTrait
+bar	input.inko	/^  def bar {}$/;"	m	reopen:SomeObject

@@ -1,0 +1,43 @@
+{ 20 }
+
+object A
+{
+  def in_a {
+    { 20 }
+  }
+
+  def another {}
+}
+
+def foo {}
+
+object B {
+  def in_b {
+    { 10  }
+  }
+
+  object C {
+    def nested_method {}
+  }
+}
+
+def global {}
+
+trait SomeTrait {
+  # def this_should_be_ignored {}
+}
+
+object Socket impl Foo {
+  def quack {}
+}
+
+impl Bar for Socket {
+  def moo !! Integer {}
+}
+
+impl Chickens {
+  def bok_bok {}
+}
+
+let NUMBER = 10
+let @number = 20

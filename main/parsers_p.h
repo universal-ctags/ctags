@@ -81,6 +81,7 @@
 	GoParser, \
 	HtmlParser, \
 	IniconfParser, \
+	InkoParser, \
 	ITclParser, \
 	JavaParser, \
 	JavaPropertiesParser, \

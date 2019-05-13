@@ -33,6 +33,7 @@ z	kind	no	NONE	s--	no	Include the "kind:" key in kind field (use k or K) in tags
 -	howImported	no	Go	s--	no	how the package is imported ("inline" for `.' or "init" for `_')
 -	package	yes	Go	s--	no	the real package specified by the package name
 -	packageName	yes	Go	s--	no	the name for referring the package
+-	implements	yes	Inko	s--	no	Trait being implemented
 -	assignment	yes	LdScript	s--	no	how a value is assigned to the symbol
 -	sectionMarker	no	Markdown	s--	no	character used for declaring section(#, ##, =, or -)
 -	category	yes	ObjectiveC	s--	no	category attached to the class

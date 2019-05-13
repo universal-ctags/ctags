@@ -153,6 +153,7 @@
     <ClCompile Include="..\optlib\puppetManifest.c" />
     <ClCompile Include="..\optlib\qemuhx.c" />
     <ClCompile Include="..\optlib\systemtap.c" />
+    <ClCompile Include="..\optlib\inko.c" />
     <ClCompile Include="..\parsers\ada.c" />
     <ClCompile Include="..\parsers\ant.c" />
     <ClCompile Include="..\parsers\asciidoc.c" />
