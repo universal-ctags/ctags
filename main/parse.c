@@ -121,7 +121,6 @@ static void uninstallTagXpathTable (const langType language);
 */
 static parserDefinition *CTagsSelfTestParser (void);
 static parserDefinitionFunc* BuiltInParsers[] = {
-	CTagsSelfTestParser,
 	PARSER_LIST,
 	XML_PARSER_LIST
 #ifdef HAVE_LIBXML
@@ -131,10 +130,11 @@ static parserDefinitionFunc* BuiltInParsers[] = {
 #ifdef HAVE_LIBYAML
 	,
 #endif
-       PEG_PARSER_LIST
+	PEG_PARSER_LIST
 #ifdef HAVE_PACKCC
-       ,
+	,
 #endif
+	CTagsSelfTestParser
 };
 static parserObject* LanguageTable = NULL;
 static unsigned int LanguageCount = 0;
