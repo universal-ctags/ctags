@@ -44,8 +44,10 @@ dctags
 dctags.exe
 depcomp
 install-sh
+libctags.a
 Makefile
 Makefile.in
+mini-geany
 missing
 mkinstalldirs
 perf.data*
@@ -78,6 +80,7 @@ man/ctags-incompatibilities.7.rst
 man/ctags-optlib.7
 man/ctags-optlib.7.html
 man/ctags-optlib.7.rst
+misc/mini-geany.actual
 Tmain/**/Makefile
 Tmain/**/Makefile.am
 Tmain/**/Makefile.in

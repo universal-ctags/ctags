@@ -27,7 +27,6 @@
 #include "htable.h"
 #include "keyword.h"
 #include "lxpath_p.h"
-#include "main_p.h"
 #include "param.h"
 #include "param_p.h"
 #include "parse_p.h"
@@ -40,6 +39,7 @@
 #include "read_p.h"
 #include "routines.h"
 #include "routines_p.h"
+#include "stats_p.h"
 #include "subparser.h"
 #include "subparser_p.h"
 #include "trace.h"
@@ -49,6 +49,7 @@
 #ifdef HAVE_ICONV
 # include "mbcs_p.h"
 #endif
+#include "writer_p.h"
 #include "xtag_p.h"
 
 /*
@@ -1048,7 +1049,7 @@ struct getLangCtx {
 		{							\
 			MIO *tmp_ = (_glc_)->input;			\
 			(_glc_)->input = mio_new_mio (tmp_, 0, -1);	\
-			mio_free (tmp_);				\
+			mio_unref (tmp_);				\
 			if (!(_glc_)->input) {				\
 				(_glc_)->err = true;			\
 				goto _label_;				\
@@ -1058,7 +1059,7 @@ struct getLangCtx {
 
 #define GLC_FCLOSE(_glc_) do {                              \
     if ((_glc_)->input) {                                   \
-        mio_free((_glc_)->input);                             \
+        mio_unref((_glc_)->input);                             \
         (_glc_)->input = NULL;                              \
     }                                                       \
 } while (0)
@@ -3344,6 +3345,7 @@ static bool createTagsWithFallback1 (const langType language,
 			*/
 			setTagFilePosition (&tagfpos);
 			setNumTagsAdded (numTags);
+			writerRescanFailed (numTags);
 			tagFileResized = true;
 			breakPromisesAfter(lastPromise);
 		}
@@ -3556,12 +3558,36 @@ extern bool doesParserRequireMemoryStream (const langType language)
 extern bool parseFile (const char *const fileName)
 {
 	TRACE_ENTER_TEXT("Parsing file %s",fileName);
-	bool bRet = parseFileWithMio (fileName, NULL);
+	bool bRet = parseFileWithMio (fileName, NULL, NULL);
 	TRACE_LEAVE();
 	return bRet;
 }
 
-extern bool parseFileWithMio (const char *const fileName, MIO *mio)
+static bool parseMio (const char *const fileName, langType language, MIO* mio, bool useSourceFileTagPath,
+					  void *clientData)
+{
+	bool tagFileResized = false;
+
+	setupWriter (clientData);
+
+	setupAnon ();
+
+	initParserTrashBox ();
+
+	tagFileResized = createTagsWithFallback (fileName, language, mio);
+
+	finiParserTrashBox ();
+
+	teardownAnon ();
+
+	if (useSourceFileTagPath)
+		return teardownWriter (getSourceFileTagPath())? true: tagFileResized;
+	else
+		return teardownWriter(fileName);
+}
+
+extern bool parseFileWithMio (const char *const fileName, MIO *mio,
+							  void *clientData)
 {
 	bool tagFileResized = false;
 	langType language;
@@ -3594,21 +3620,7 @@ extern bool parseFileWithMio (const char *const fileName, MIO *mio)
 		/* TODO: checkUTF8BOM can be used to update the encodings. */
 		openConverter (getLanguageEncoding (language), Option.outputEncoding);
 #endif
-
-		setupWriter ();
-
-		setupAnon ();
-
-		initParserTrashBox ();
-
-		tagFileResized = createTagsWithFallback (fileName, language, req.mio);
-
-		finiParserTrashBox ();
-
-		teardownAnon ();
-
-		tagFileResized = teardownWriter (getSourceFileTagPath())? true: tagFileResized;
-
+		tagFileResized = parseMio (fileName, language, req.mio, true, clientData);
 		if (Option.filter && ! Option.interactive)
 			closeTagFile (tagFileResized);
 		addTotals (1, 0L, 0L);
@@ -3619,9 +3631,26 @@ extern bool parseFileWithMio (const char *const fileName, MIO *mio)
 	}
 
 	if (req.type == GLR_OPEN && req.mio)
-		mio_free (req.mio);
+		mio_unref (req.mio);
 
 	return tagFileResized;
+}
+
+extern bool parseRawBuffer(const char *fileName, unsigned char *buffer,
+			 size_t bufferSize, const langType language, void *clientData)
+{
+	MIO *mio = NULL;
+	bool r;
+
+	if (buffer)
+		mio = mio_new_memory (buffer, bufferSize, NULL, NULL);
+
+	r = parseMio (fileName, language, mio, false, clientData);
+
+	if (buffer)
+		mio_unref (mio);
+
+	return r;
 }
 
 static void matchLanguageMultilineRegexCommon (const langType language,

@@ -1289,7 +1289,7 @@ es_print_to_string (EsObject*        object)
 
   es_print(object, out);
   bp = (char *)mio_memory_get_data (out, &size);
-  mio_free(out);
+  mio_unref(out);
 
   return bp;
 }
@@ -1362,7 +1362,7 @@ es_comment_to_string (const char* comment)
 
   es_comment(comment, out);
   bp = (char *)mio_memory_get_data (out, &size);
-  mio_free(out);
+  mio_unref(out);
 
   return bp;
 }
@@ -2045,7 +2045,7 @@ es_read_from_string(const char* buf,
   o = es_read(in);
   if (saveptr)
     *saveptr = buf + mio_tell(in);
-  mio_free(in);
+  mio_unref(in);
 
   return o;
 }

@@ -14,8 +14,12 @@ EXTRA_DIST   = README.md autogen.sh \
 	       win32/gen-repoinfo.bat \
 		$(PEG_INPUT) $(OPTLIB2C_INPUT)
 
-noinst_PROGRAMS = packcc
 bin_PROGRAMS = ctags
+noinst_LIBRARIES = libctags.a
+
+noinst_PROGRAMS =
+noinst_PROGRAMS += packcc
+noinst_PROGRAMS += mini-geany
 
 packcc_CPPFLAGS =
 packcc_CFLAGS =
@@ -46,13 +50,13 @@ dist_readtags_SOURCES += $(READTAGS_DSL_SRCS) $(READTAGS_DSL_HEADS)
 endif
 
 if !HAVE_FNMATCH
-MAIN_SRCS += $(FNMATCH_SRCS)
-MAIN_HEADS += $(FNMATCH_HEADS)
+LIB_SRCS += $(FNMATCH_SRCS)
+LIB_HEADS += $(FNMATCH_HEADS)
 endif
 
 if !HAVE_REGCOMP
-MAIN_SRCS += $(REGEX_SRCS)
-MAIN_HEADS += $(REGEX_HEADS)
+LIB_SRCS += $(REGEX_SRCS)
+LIB_HEADS += $(REGEX_HEADS)
 endif
 
 if HAVE_LIBXML
@@ -61,8 +65,8 @@ PARSER_HEADS += $(XML_HEADS)
 endif
 
 if HAVE_JANSSON
-MAIN_SRCS += $(JANSSON_SRCS)
-MAIN_HEADS += $(JANSSON_HEADS)
+LIB_SRCS += $(JANSSON_SRCS)
+LIB_HEADS += $(JANSSON_HEADS)
 endif
 
 if HAVE_LIBYAML
@@ -73,37 +77,29 @@ endif
 PARSER_SRCS += $(PEG_SRCS)
 PARSER_HEADS += $(PEG_HEADS) $(PEG_EXTRA_HEADS)
 
-ctags_CPPFLAGS = -I. -I$(srcdir) -I$(srcdir)/main -DHAVE_PACKCC
+libctags_a_CPPFLAGS = -I. -I$(srcdir) -I$(srcdir)/main -DHAVE_PACKCC
 if ENABLE_DEBUGGING
-ctags_CPPFLAGS+= $(DEBUG_CPPFLAGS)
+libctags_a_CPPFLAGS+= $(DEBUG_CPPFLAGS)
 endif
 if HAVE_STRNLEN
-ctags_CPPFLAGS += -DUSE_SYSTEM_STRNLEN
+libctags_a_CPPFLAGS += -DUSE_SYSTEM_STRNLEN
 endif
-ctags_CPPFLAGS+= $(FNMATCH_CPPFLAGS)
-ctags_CPPFLAGS+= $(REGCOMP_CPPFLAGS)
-ctags_CPPFLAGS+= -DHAVE_REPOINFO_H
+libctags_a_CPPFLAGS+= $(FNMATCH_CPPFLAGS)
+libctags_a_CPPFLAGS+= $(REGCOMP_CPPFLAGS)
+libctags_a_CPPFLAGS+= -DHAVE_REPOINFO_H
 
-ctags_CFLAGS   =
-ctags_CFLAGS  += $(EXTRA_CFLAGS)
-ctags_CFLAGS  += $(WARNING_CFLAGS)
-ctags_CFLAGS  += $(COVERAGE_CFLAGS)
-ctags_CFLAGS  += $(CGCC_CFLAGS)
-ctags_CFLAGS  += $(LIBXML_CFLAGS)
-ctags_CFLAGS  += $(JANSSON_CFLAGS)
-ctags_CFLAGS  += $(LIBYAML_CFLAGS)
-ctags_CFLAGS  += $(ASPELL_CFLAGS)
-ctags_CFLAGS  += $(SECCOMP_CFLAGS)
+libctags_a_CFLAGS   =
+libctags_a_CFLAGS  += $(EXTRA_CFLAGS)
+libctags_a_CFLAGS  += $(WARNING_CFLAGS)
+libctags_a_CFLAGS  += $(COVERAGE_CFLAGS)
+libctags_a_CFLAGS  += $(CGCC_CFLAGS)
+libctags_a_CFLAGS  += $(LIBXML_CFLAGS)
+libctags_a_CFLAGS  += $(JANSSON_CFLAGS)
+libctags_a_CFLAGS  += $(LIBYAML_CFLAGS)
+libctags_a_CFLAGS  += $(ASPELL_CFLAGS)
+libctags_a_CFLAGS  += $(SECCOMP_CFLAGS)
 
-ctags_LDADD  =
-ctags_LDADD += $(LIBXML_LIBS)
-ctags_LDADD += $(JANSSON_LIBS)
-ctags_LDADD += $(LIBYAML_LIBS)
-ctags_LDADD += $(SECCOMP_LIBS)
-ctags_LDADD += $(ASPELL_LIBS)
-ctags_LDADD += $(ICONV_LIBS)
-
-nodist_ctags_SOURCES = $(REPOINFO_HEADS)
+nodist_libctags_a_SOURCES = $(REPOINFO_HEADS)
 BUILT_SOURCES = $(REPOINFO_HEADS)
 CLEANFILES = $(REPOINFO_HEADS)
 $(REPOINFO_OBJS): $(REPOINFO_SRCS) $(REPOINFO_HEADS)
@@ -145,7 +141,29 @@ SUFFIXES += .peg
 # You cannot use $(PACKCC) as a target name here.
 $(PEG_INPUT): packcc$(EXEEXT) Makefile
 $(PEG_HEADS): packcc$(EXEEXT) Makefile
-dist_ctags_SOURCES = $(ALL_HEADS) $(ALL_SRCS)
+dist_libctags_a_SOURCES = $(ALL_LIB_HEADS) $(ALL_LIB_SRCS)
+
+ctags_CPPFLAGS = $(libctags_a_CPPFLAGS)
+ctags_CFLAGS = $(libctags_a_CFLAGS)
+ctags_LDADD  =libctags.a
+ctags_LDADD += $(LIBXML_LIBS)
+ctags_LDADD += $(JANSSON_LIBS)
+ctags_LDADD += $(LIBYAML_LIBS)
+ctags_LDADD += $(SECCOMP_LIBS)
+ctags_LDADD += $(ASPELL_LIBS)
+ctags_LDADD += $(ICONV_LIBS)
+dist_ctags_SOURCES = $(CMDLINE_HEADS) $(CMDLINE_SRCS)
+
+mini_geany_CPPFLAGS = $(libctags_a_CPPFLAGS)
+mini_geany_CFLAGS = $(libctags_a_CFLAGS)
+mini_geany_LDADD  = libctags.a
+mini_geany_LDADD += $(LIBXML_LIBS)
+mini_geany_LDADD += $(JANSSON_LIBS)
+mini_geany_LDADD += $(LIBYAML_LIBS)
+mini_geany_LDADD += $(SECCOMP_LIBS)
+mini_geany_LDADD += $(ASPELL_LIBS)
+mini_geany_LDADD += $(ICONV_LIBS)
+mini_geany_SOURCES = $(MINI_GEANY_HEADS) $(MINI_GEANY_SRCS)
 
 if INSTALL_ETAGS
 install-exec-hook:

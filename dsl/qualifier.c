@@ -707,7 +707,7 @@ enum QRESULT q_is_acceptable  (QCode *code, tagEntry *entry)
 		putc('\n', stderr);
 		i = Q_ERROR;
 
-		mio_free(mioerr);
+		mio_unref(mioerr);
 	}
 	else
 		i = Q_ACCEPT;

@@ -24,12 +24,14 @@
 
 
 static int writeCtagsEntry (tagWriter *writer CTAGS_ATTR_UNUSED,
-							MIO * mio, const tagEntryInfo *const tag);
+							MIO * mio, const tagEntryInfo *const tag,
+							void *clientData);
 static int writeCtagsPtagEntry (tagWriter *writer CTAGS_ATTR_UNUSED,
 								MIO * mio, const ptagDesc *desc,
 								const char *const fileName,
 								const char *const pattern,
-								const char *const parserName);
+								const char *const parserName,
+								void *clientData);
 static bool treatFieldAsFixed (int fieldType);
 
 struct rejection {
@@ -41,11 +43,13 @@ tagWriter uCtagsWriter = {
 	.writePtagEntry = writeCtagsPtagEntry,
 	.preWriteEntry = NULL,
 	.postWriteEntry = NULL,
+	.rescanFailedEntry = NULL,
 	.treatFieldAsFixed = treatFieldAsFixed,
 	.defaultFileName = CTAGS_FILE,
 };
 
-static void *beginECtagsFile (tagWriter *writer CTAGS_ATTR_UNUSED, MIO * mio CTAGS_ATTR_UNUSED)
+static void *beginECtagsFile (tagWriter *writer CTAGS_ATTR_UNUSED, MIO * mio CTAGS_ATTR_UNUSED,
+							  void *clientData CTAGS_ATTR_UNUSED)
 {
 	static struct rejection rej;
 
@@ -54,7 +58,8 @@ static void *beginECtagsFile (tagWriter *writer CTAGS_ATTR_UNUSED, MIO * mio CTA
 	return &rej;
 }
 
-static bool endECTagsFile (tagWriter *writer, MIO * mio CTAGS_ATTR_UNUSED, const char* filename CTAGS_ATTR_UNUSED)
+static bool endECTagsFile (tagWriter *writer, MIO * mio CTAGS_ATTR_UNUSED, const char* filename CTAGS_ATTR_UNUSED,
+						   void *clientData CTAGS_ATTR_UNUSED)
 {
 	struct rejection *rej = writer->private;
 	return rej->rejectionInThisInput;
@@ -65,6 +70,7 @@ tagWriter eCtagsWriter = {
 	.writePtagEntry = writeCtagsPtagEntry,
 	.preWriteEntry = beginECtagsFile,
 	.postWriteEntry = endECTagsFile,
+	.rescanFailedEntry = NULL,
 	.treatFieldAsFixed = treatFieldAsFixed,
 	.defaultFileName = CTAGS_FILE,
 };
@@ -289,7 +295,8 @@ static int addExtensionFields (tagWriter *writer, MIO *mio, const tagEntryInfo *
 }
 
 static int writeCtagsEntry (tagWriter *writer,
-							MIO * mio, const tagEntryInfo *const tag)
+							MIO * mio, const tagEntryInfo *const tag,
+							void *clientData CTAGS_ATTR_UNUSED)
 {
 	if (writer->private)
 	{
@@ -334,7 +341,8 @@ static int writeCtagsPtagEntry (tagWriter *writer CTAGS_ATTR_UNUSED,
 				MIO * mio, const ptagDesc *desc,
 				const char *const fileName,
 				const char *const pattern,
-				const char *const parserName)
+				const char *const parserName,
+				void *clientData CTAGS_ATTR_UNUSED)
 {
 	return parserName
 

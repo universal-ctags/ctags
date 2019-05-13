@@ -43,7 +43,6 @@
 #include "field.h"
 #include "fmt_p.h"
 #include "kind.h"
-#include "main_p.h"
 #include "nestlevel.h"
 #include "options_p.h"
 #include "ptag_p.h"
@@ -156,7 +155,7 @@ extern const char *tagFileName (void)
 
 extern void abort_if_ferror(MIO *const mio)
 {
-	if (mio_error (mio))
+	if (mio != NULL && mio_error (mio))
 		error (FATAL | PERROR, "cannot write tag file");
 }
 
@@ -370,7 +369,7 @@ static bool isTagFile (const char *const filename)
 			ok = true;
 		else
 			ok = (bool) (isCtagsLine (line) || isEtagsLine (line));
-		mio_free (mio);
+		mio_unref (mio);
 	}
 	return ok;
 }
@@ -430,7 +429,7 @@ extern void openTagFile (void)
 				if (TagFile.mio != NULL)
 				{
 					TagFile.numTags.prev = updatePseudoTags (TagFile.mio);
-					mio_free (TagFile.mio);
+					mio_unref (TagFile.mio);
 					TagFile.mio = mio_new_file (TagFile.name, "a+");
 				}
 			}
@@ -488,9 +487,9 @@ static void copyFile (const char *const from, const char *const to, const long s
 		else
 		{
 			copyBytes (fromMio, toMio, size);
-			mio_free (toMio);
+			mio_unref (toMio);
 		}
-		mio_free (fromMio);
+		mio_unref (fromMio);
 	}
 }
 
@@ -501,7 +500,7 @@ static int replacementTruncate (const char *const name, const long size)
 #define WHOLE_FILE  -1L
 	char *tempName = NULL;
 	MIO *mio = tempFile ("w", &tempName);
-	mio_free (mio);
+	mio_unref (mio);
 	copyFile (name, tempName, size);
 	copyFile (tempName, name, WHOLE_FILE);
 	remove (tempName);
@@ -536,7 +535,7 @@ static void internalSortTagFile (void)
 			  TagFile.numTags.added + TagFile.numTags.prev);
 
 	if (! TagsToStdout)
-		mio_free (mio);
+		mio_unref (mio);
 }
 #endif
 
@@ -612,7 +611,7 @@ extern void closeTagFile (const bool resize)
 
 	if ((TagsToStdout && (Option.sorted == SO_UNSORTED)))
 	{
-		if (mio_free (TagFile.mio) != 0)
+		if (mio_unref (TagFile.mio) != 0)
 			error (FATAL | PERROR, "cannot close tag file");
 		goto out;
 	}
@@ -623,7 +622,7 @@ extern void closeTagFile (const bool resize)
 	size = mio_tell (TagFile.mio);
 	if (! TagsToStdout)
 		/* The tag file should be closed before resizing. */
-		if (mio_free (TagFile.mio) != 0)
+		if (mio_unref (TagFile.mio) != 0)
 			error (FATAL | PERROR, "cannot close tag file");
 
 	if (resize  &&  desiredSize < size)
@@ -636,7 +635,7 @@ extern void closeTagFile (const bool resize)
 	sortTagFile ();
 	if (TagsToStdout)
 	{
-		if (mio_free (TagFile.mio) != 0)
+		if (mio_unref (TagFile.mio) != 0)
 			error (FATAL | PERROR, "cannot close tag file");
 		remove (tagFileName ());  /* remove temporary file */
 	}
@@ -1159,9 +1158,9 @@ static unsigned int queueTagEntry(const tagEntryInfo *const tag)
 }
 
 
-extern void setupWriter (void)
+extern void setupWriter (void *writerClientData)
 {
-	writerSetup (TagFile.mio);
+	writerSetup (TagFile.mio, writerClientData);
 }
 
 extern bool teardownWriter (const char *filename)
@@ -1254,7 +1253,7 @@ static void writeTagEntry (const tagEntryInfo *const tag, bool checkingNeeded)
 		++TagFile.numTags.added;
 		rememberMaxLengths (strlen (tag->name), (size_t) length);
 	}
-	DebugStatement ( mio_flush (TagFile.mio); )
+	DebugStatement ( if (TagFile.mio) mio_flush (TagFile.mio); )
 
 	abort_if_ferror (TagFile.mio);
 }
@@ -1688,12 +1687,14 @@ extern void invalidatePatternCache(void)
 
 extern void tagFilePosition (MIOPos *p)
 {
-	mio_getpos (TagFile.mio, p);
+	if (TagFile.mio)
+		mio_getpos (TagFile.mio, p);
 }
 
 extern void setTagFilePosition (MIOPos *p)
 {
-	mio_setpos (TagFile.mio, p);
+	if (TagFile.mio)
+		mio_setpos (TagFile.mio, p);
 }
 
 extern const char* getTagFileDirectory (void)

@@ -1,15 +1,18 @@
 # -*- makefile -*-
-.PHONY: check units fuzz noise tmain tinst clean-units clean-tmain clean-gcov run-gcov codecheck cppcheck dicts cspell validate-input
+.PHONY: check units fuzz noise tmain tinst tlib clean-units clean-tlib clean-tmain clean-gcov run-gcov codecheck cppcheck dicts cspell validate-input
 
 EXTRA_DIST += misc/units
+EXTRA_DIST += misc/tlib misc/mini-geany.expected
+
 DIST_SUBDIRS = Tmain Units
 
-check: tmain units
+check: tmain units tlib
 
 clean-local: clean-units clean-tmain
 
 CTAGS_TEST = ./ctags$(EXEEXT)
 READ_TEST = ./readtags$(EXEEXT)
+MINI_GEANY_TEST = ./mini-geany$(EXEEXT)
 
 if HAVE_TIMEOUT
 TIMEOUT = 1
@@ -166,6 +169,24 @@ clean-tmain:
 	$(SILENT) echo Cleaning main part tests
 	$(SILENT) builddir=$$(pwd); \
 		$(SHELL) $(srcdir)/misc/units clean-tmain $${builddir}/Tmain
+
+tlib: $(MINI_GEANY_TEST)
+	$(V_RUN) \
+	builddir=$$(pwd); \
+	mkdir -p $${builddir}/misc; \
+	if test -s '$(MINI_GEANY_TEST)'; then \
+		$(SHELL) $(srcdir)/misc/tlib $(MINI_GEANY_TEST) \
+			$(srcdir)/misc/mini-geany.expected \
+			$${builddir}/misc/mini-geany.actual \
+			$(VG); \
+		echo 'mini-geany: OK'; \
+	else \
+		echo 'mini-geany: SKIP'; \
+	fi
+clean-tlib:
+	$(SILENT) echo Cleaning libctags part tests
+	$(SILENT) builddir=$$(pwd); \
+		rm -f $${builddir}/misc/mini-geany.actual
 
 #
 # Test installation

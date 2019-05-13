@@ -22,12 +22,12 @@
 #include "read_p.h"
 #include "debug.h"
 #include "entry_p.h"
-#include "main_p.h"
 #include "routines.h"
 #include "routines_p.h"
 #include "options_p.h"
 #include "parse_p.h"
 #include "promise_p.h"
+#include "stats_p.h"
 #include "trace.h"
 #include "trashbox.h"
 #ifdef HAVE_ICONV
@@ -662,7 +662,7 @@ extern bool openInputFile (const char *const fileName, const langType language,
 	 */
 	if (File.mio != NULL)
 	{
-		mio_free (File.mio);  /* close any open input file */
+		mio_unref (File.mio);  /* close any open input file */
 		File.mio = NULL;
 	}
 
@@ -764,7 +764,7 @@ extern void closeInputFile (void)
 			fileStatus *status = eStat (vStringValue (File.input.name));
 			addTotals (0, File.input.lineNumber - 1L, status->size);
 		}
-		mio_free (File.mio);
+		mio_unref (File.mio);
 		File.mio = NULL;
 		freeLineFposMap (&File.lineFposMap);
 	}
@@ -1127,7 +1127,7 @@ extern void   popNarrowedInputStream  (void)
 		verbose ("CLEARING thin flag(%d)\n", File.thinDepth);
 		return;
 	}
-	mio_free (File.mio);
+	mio_unref (File.mio);
 	File = BackupFile;
 	memset (&BackupFile, 0, sizeof (BackupFile));
 }

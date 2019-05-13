@@ -23,20 +23,27 @@ static tagWriter *writerTable [WRITER_COUNT] = {
 	[WRITER_ETAGS] = &etagsWriter,
 	[WRITER_XREF]  = &xrefWriter,
 	[WRITER_JSON]  = &jsonWriter,
+	[WRITER_CUSTOM] = NULL,
 };
 
 static tagWriter *writer;
 
-extern void setTagWriter (writerType wtype)
+extern void setTagWriter (writerType wtype, tagWriter *customWriter)
 {
-	writer = writerTable [wtype];
+	if (wtype != WRITER_CUSTOM)
+		writer = writerTable [wtype];
+	else
+		writer = customWriter;
 	writer->type = wtype;
 }
 
-extern void writerSetup (MIO *mio)
+extern void writerSetup (MIO *mio, void *clientData)
 {
+	writer->clientData = clientData;
+
 	if (writer->preWriteEntry)
-		writer->private = writer->preWriteEntry (writer, mio);
+		writer->private = writer->preWriteEntry (writer, mio,
+												 writer->clientData);
 	else
 		writer->private = NULL;
 }
@@ -46,7 +53,8 @@ extern bool writerTeardown (MIO *mio, const char *filename)
 	if (writer->postWriteEntry)
 	{
 		bool r;
-		r = writer->postWriteEntry (writer, mio, filename);
+		r = writer->postWriteEntry (writer, mio, filename,
+									writer->clientData);
 		writer->private = NULL;
 		return r;
 	}
@@ -55,7 +63,8 @@ extern bool writerTeardown (MIO *mio, const char *filename)
 
 extern int writerWriteTag (MIO * mio, const tagEntryInfo *const tag)
 {
-	return writer->writeEntry (writer, mio, tag);
+	return writer->writeEntry (writer, mio, tag,
+							   writer->clientData);
 }
 
 extern int writerWritePtag (MIO * mio,
@@ -68,8 +77,15 @@ extern int writerWritePtag (MIO * mio,
 		return -1;
 
 	return writer->writePtagEntry (writer, mio, desc, fileName,
-								   pattern, parserName);
+								   pattern, parserName,
+								   writer->clientData);
 
+}
+
+extern void writerRescanFailed (unsigned long validTagNum)
+{
+	if (writer->rescanFailedEntry)
+		writer->rescanFailedEntry(writer, validTagNum, writer->clientData);
 }
 
 extern bool ptagMakeCtagsOutputMode (ptagDesc *desc, void *data CTAGS_ATTR_UNUSED)

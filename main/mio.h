@@ -126,7 +126,7 @@ MIO *mio_new_memory (unsigned char *data,
 MIO *mio_new_mio    (MIO *base, long start, long size);
 MIO *mio_ref        (MIO *mio);
 
-int mio_free (MIO *mio);
+int mio_unref (MIO *mio);
 FILE *mio_file_get_fp (MIO *mio);
 unsigned char *mio_memory_get_data (MIO *mio, size_t *size);
 size_t mio_read (MIO *mio,

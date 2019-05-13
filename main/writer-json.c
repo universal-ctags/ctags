@@ -31,19 +31,22 @@
 
 
 static int writeJsonEntry  (tagWriter *writer CTAGS_ATTR_UNUSED,
-				MIO * mio, const tagEntryInfo *const tag);
+				MIO * mio, const tagEntryInfo *const tag,
+				void *clientData);
 
 static int writeJsonPtagEntry (tagWriter *writer CTAGS_ATTR_UNUSED,
 				MIO * mio, const ptagDesc *desc,
 				const char *const fileName,
 				const char *const pattern,
-				const char *const parserName);
+				const char *const parserName,
+				void *clientData);
 
 tagWriter jsonWriter = {
 	.writeEntry = writeJsonEntry,
 	.writePtagEntry = writeJsonPtagEntry,
 	.preWriteEntry = NULL,
 	.postWriteEntry = NULL,
+	.rescanFailedEntry = NULL,
 	.treatFieldAsFixed = NULL,
 	.defaultFileName = NULL,
 };
@@ -161,7 +164,8 @@ static void addExtensionFields (json_t *response, const tagEntryInfo *const tag)
 }
 
 static int writeJsonEntry (tagWriter *writer CTAGS_ATTR_UNUSED,
-			       MIO * mio, const tagEntryInfo *const tag)
+			       MIO * mio, const tagEntryInfo *const tag,
+				   void *clientData CTAGS_ATTR_UNUSED)
 {
 	int length = 0;
 	json_t *response = json_pack ("{ss}", "_type", "tag");
@@ -205,7 +209,8 @@ static int writeJsonPtagEntry (tagWriter *writer CTAGS_ATTR_UNUSED,
 			       MIO * mio, const ptagDesc *desc,
 			       const char *const fileName,
 			       const char *const pattern,
-			       const char *const parserName)
+			       const char *const parserName,
+				   void *clientData CTAGS_ATTR_UNUSED)
 {
 #define OPT(X) ((X)?(X):"")
 	json_t *response;
