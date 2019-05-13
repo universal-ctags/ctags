@@ -27,9 +27,9 @@ Option files
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 An "option" file is a file in which command line options are written line
 by line. ``ctags`` loads it and runs as if the options in the file were
-passed in command line.
+passed through command line.
 
-Following file is an example of option file.
+The following file is an example of an option file:
 
 .. code-block:: python
 
@@ -39,8 +39,14 @@ Following file is an example of option file.
 		--exclude=tinst-root
 	--exclude=Tmain
 
-`#` can be used as a start marker of a line comment.
+The character `#` can be used as a start marker of a line comment.
 Whitespaces at the start of lines are ignored during loading.
+
+And it works exactly as if we had called:
+
+```sh
+ctags --exclude=Units --exclude=tinst-root --exclude=Tmain
+```
 
 There are two categories of option files, though they both contain command
 line options: **preload** and **optlib** option files.
@@ -118,11 +124,11 @@ defining a parser, and have extended existing options. Defining
 a new parser with the options is more than "customizing" in
 Universal-ctags.
 
-To make it easier to maintain a parser defined using the options, you can put
-each parser language in a different options file. Universal-ctags doesn't
-preload a single file. Instead, Universal-ctags loads all files having the
-:file:`.ctags` extension under the previously specified directories. If you have
-multiple parser definitions, put them in different files.
+To make easier the maintenance a parser defined using the options, you can put
+each language parser in a different options file. Universal-ctags doesn't
+preload a single file. Instead, Universal-ctags loads all the files having the
+:file:`.ctags` extension under the previously specified directories. If you
+have multiple parser definitions, put them in different files.
 
 Avoiding option incompatibility issues
 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
@@ -140,7 +146,7 @@ To make the preload path list short and because it was rarely ever used,
 Universal-ctags does not load any option files for system wide configuration.
 (i.e., no :file:`/etc/ctags.d`)
 
-Use :file:`.ctags` for the file extension
+Using :file:`.ctags` for the file extension
 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 
 Extensions :file:`.cnf` and :file:`.conf` are obsolete.
@@ -160,9 +166,10 @@ explicitly. The pathname can be just the filename if it's in the
 current directory.
 
 Exuberant-ctags has the ``--options`` option, but you can only specify a
-single file to load. Universal-ctags extends the option two aspects: you
-can specify a directory to load all files in that directory, and you can
-specify a path search list to look in. See next section for details.
+single file to load. Universal-ctags extends the option in two aspects:
+
+- You can specify a directory, to load all the files in that directory.
+- You can specify a PATH list to look in. See next section for details.
 
 
 Specifying a directory
@@ -170,18 +177,24 @@ Specifying a directory
 
 If you specify a directory instead of a file as the argument for the
 ``--options=PATHNAME``, Universal-ctags will load all files having a
-:file:`.ctags` extension under the directory in alphabetical order.
+:file:`.ctags` extension under said directory in alphabetical order.
 
-Specifying an optlib path search list
+Specifying an optlib PATH list
 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 
-For loading a file (or directory) specified in ``--options=PATHNAME``,
-``ctags`` searches "optlib path list" first if the option argument
-(PATHNAME) doesn't start with '``/``' or '``.``'. If ``ctags`` finds a
-file, ``ctags`` loads it.
+Much like a command line shell, ``ctags`` has an "optlib PATH list" in which it
+can look for a file (or directory) to load.
 
-If ``ctags`` doesn't find a file in the path list, ``ctags`` loads
-a file (or directory) at the specified pathname.
+When loading a file (or directory) specified with ``--options=PATHNAME``,
+ctags first checks if ``PATHNAME`` is an absolute path or a relative path.
+An absolute path starts with '``/``' or '``.``'.
+If ``PATHNAME`` is an absolute path, ctags tries to load it inmediately.
+
+If, on the contrary, is a relative path, ``ctags`` does two things: First,
+looks for the file (or directory) in "optlib PATH list" and tries to load it.
+
+If the file doesn't exist in the PATH list, ``ctags``  treats ``PATHNAME`` as a
+path relative to the working directory and loads the file.
 
 By default, optlib path list is empty. To set or add a directory
 path to the list, use ``--optlib-dir=PATH``.
@@ -220,7 +233,7 @@ Tips for writing an option file
 Regular expression (regex) engine
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Universal-ctags currently uses the same regex engine as Exuberant-ctags does:
+Universal-ctags currently uses the same regex engine as Exuberant-ctags:
 the POSIX.2 regex engine in GNU glibc-2.10.1. By default it uses the Extended
 Regular Expressions (ERE) syntax, as used by most engines today; however it does
 *not* support many of the "modern" extensions such as lazy captures,
@@ -345,9 +358,9 @@ use, but long flags are mostly intended for option files.
 Exclusive flag in regex
 ......................................................................
 
-By default, lines read from the input files will be matched with **all** regular
-expressions defined with ``--regex-<LANG>``. Each matched regular expression
-will successfully emit a tag.
+By default, lines read from the input files will be matched against **all** the
+regular expressions defined with ``--regex-<LANG>``. Each successfully matched
+regular expression will emit a tag.
 
 In some cases another policy, exclusive-matching, is preferable to the
 all-matching policy. Exclusive-matching means the rest of regular
@@ -471,7 +484,7 @@ A stack is used for tracking the scope context.
 
 ``{scope=clear}``
 
-	Make the stack empty.
+	Empty the stack.
 
 ``{scope=set}``
 
@@ -1063,7 +1076,7 @@ A regex pattern added to a parser with ``--_mtable-regex-<LANG>`` is matched
 against the input at the current byte position, not line. Even if you do not
 specify the ``^`` anchor at the start of the pattern, ``ctags`` adds ``^`` to
 the pattern automatically. Unlike the ``--regex-<LANG>`` and
-``--mline-regex-<LANG>`` options, a ``^`` anchor does not mean "begging of
+``--mline-regex-<LANG>`` options, a ``^`` anchor does not mean "beginning of
 line" in ``--_mtable-regex-<LANG>``; instead it means the beginning of the
 input string (i.e., the current byte position).
 
@@ -1127,7 +1140,7 @@ discuss them one by one.
 For each new file it scans, ``ctags`` always chooses the first pattern of the
 first table of the parser. Even if it's an empty table, ``ctags`` will only try
 the first declared table. (in such a case it would immedietaly fail to match
-anything, and thus stop proessing the input file and effectively do nothing)
+anything, and thus stop processing the input file and effectively do nothing)
 
 The first declared table (``toplevel``) has the following regex added to
 it first:
@@ -1393,26 +1406,28 @@ used in the actual ``ctags`` program for parsing puppet manifest files.
 Conditional tagging with extras
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. NOT REVIEWED YET
+.. NEEDS MORE REVIEWS
 
-If a matched pattern should only be tagged when an ``extra`` is enabled, mark
-the pattern with ``{_extra=XNAME}``. ``XNAME`` is the name of extra. You must
-define an ``XNAME`` with the ``--_extradef-<LANG>=XNAME,DESCRIPTION`` option
-before defining a regex option marked ``{_extra=XNAME}``.
+If a matched pattern should only be tagged when an ``extra`` flag is enabled,
+mark the pattern with ``{_extra=XNAME}`` where ``XNAME`` is the name of the
+extra. You must define a ``XNAME`` with the
+``--_extradef-<LANG>=XNAME,DESCRIPTION`` option before defining a regex flag
+marked ``{_extra=XNAME}``.
 
 .. code-block:: python
 
 	if __name__ == '__main__':
 		do_something()
 
-To capture above lines in a python program(*input.py*), an extra can be used.
+To capture the lines above in a python program(*input.py*), an `extra` flag can
+be used.
 
 .. code-block:: perl
 
 	--_extradef-Python=main,__main__ entry points
 	--regex-Python=/^if __name__ == '__main__':/__main__/f/{_extra=main}
 
-The above optlib(*python-main.ctags*) introduces ``main`` extra to Python parser.
+The above optlib(*python-main.ctags*) introduces ``main`` extra to the Python parser.
 The pattern matching is done only when the ``main`` is enabled.
 
 .. code-block:: console
@@ -1429,17 +1444,20 @@ The pattern matching is done only when the ``main`` is enabled.
 Adding custom fields to the tag output
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. NOT REVIEWED YET
+.. NEEDS MORE REVIEWS
 
-Exuberant-ctags allows one of the specified group in a regex pattern can be
-used as a part of the name of a tagEntry. Universal-ctags offers using
-the other groups in the regex pattern.
+Exuberant-ctags allows just one of the specified groups in a regex pattern to
+be used as a part of the name of a tagEntry.
+
+Universal-ctags allows using the other groups in the regex pattern.
 
 An optlib parser can have its own fields. The groups can be used as a
 value of the fields of a tagEntry.
 
 Let's think about *Unknown*, an imaginary language.
-Here is a source file(``input.unknown``) written in *Unknown*:
+Here is a source file(*input.unknown*) written in *Unknown*:
+
+.. code-block:: java
 
 	public func foo(n, m);
 	protected func bar(n);
@@ -1452,8 +1470,8 @@ keyword to control how widely the identifier `bar` can be accessed.
 `(n)` is the parameter list of `bar`. `protected` and `(n)` are
 extra context information of `bar`.
 
-With following optlib file(``unknown.ctags``)), ``ctags`` can attach
-`protected` to protection field and `(n)` to signature field.
+With the following optlib file(*unknown.ctags*), ``ctags`` can attach
+`protected` to the field protection and `(n)` to the field signature.
 
 .. code-block:: perl
 
@@ -1472,7 +1490,7 @@ For the line `protected func bar(n);` you will get following tags output::
 
 	bar	input.unknown	/^protected func bar(n);$/;"	f	protection:protected	signature:(n)
 
-Let's see the detail of ``unknown.ctags``.
+Let's see the detail of *unknown.ctags*.
 
 .. code-block:: perl
 
@@ -1497,7 +1515,7 @@ This defines a field named `signature`.
 This option requests making a tag for the name that is specified with the group 3 of the
 pattern, attaching the group 1 as a value for `protection` field to the tag, and attaching
 the group 4 as a value for `signature` field to the tag. You can use the long regex flag
-`_field` for attaching fields to a tag with following notation rule::
+`_field` for attaching fields to a tag with the following notation rule::
 
   {_field=FIELDNAME:GROUP}
 
@@ -1533,25 +1551,26 @@ To capture a reference tag with an optlib parser, specify a role with
 	--extras=+r
 	--fields=+r
 
-See the line, `--regex-FOO=...`.  In this parser `FOO`, a name of
+A role must be defined before specifying it as value for ``_role`` flag.
+``--_roledef-<LANG>`` option is for defining a role.
+See the line, ``--regex-FOO=...``.  In this parser `FOO`, the name of an
 imported module is captured as a reference tag with role `imported`.
-A role must be defined before specifying it as value for `_role` flag.
-`--_roledef-<LANG>` option is for defining a role.
 
-The parameter of the option comes from three components: a kind
-letter, the name of role, and the description of role. The kind letter
-comes first.  Following a period, give the role name. The period
-represents that the role is defined under the kind specified with the
-kind letter.  In the example, `imported` role is defined under
-`module` kind specified with `m`.
+The option definition has two parameters separated by a comma:
 
-Of course, the kind specified with the kind letter must be defined
-before using `--_roledef-<FOO>` option. `--kinddef-<LANG>` option
-is for defining a kind.
+- A kind letter, followed by a period (``.``), followed by the role name.
+- The description of role.
 
-The roles are listed with `--list-roles=<LANG>`. The name and
-description passed to `--_roledef-<LANG>` option are used in
-the output like::
+The first parameter is the name of the role. The period indicates that the role
+is defined under the kind specified with the kind letter.  In the example,
+`imported` role is defined under the `module` kind, which is specified with
+`m`.
+
+Of course, the kind specified with the kind letter must be defined *before*
+using ``--_roledef-<FOO>`` option. See the option ``--kinddef-<LANG>``.
+
+The roles are listed with ``--list-roles=<LANG>``. The name and description
+passed to ``--_roledef-<LANG>`` option are used in the output like::
 
 	$ ./ctags --langdef=FOO --kinddef-FOO=m,module,modules \
 				--_roledef-FOO='m.imported,imported module' --list-roles=FOO
@@ -1559,16 +1578,15 @@ the output like::
 	m/module   imported on      imported module
 
 
-With specifying `_role` regex flag multiple times with different
-roles, you can assign multiple roles to a reference tag.
-See following input of C language
+When specifying ``_role`` regex flag multiple times with different roles, you can
+assign multiple roles to a reference tag.  See following input of C language
 
 .. code-block:: C
 
    i += 1;
 
-An ultra fine grained C parser may capture a variable `i` with
-`lvalue` and `incremented`. You can do it with:
+An ultra fine grained C parser may capture a variable `i` with `lvalue` and
+`incremented`. You can do it with:
 
 .. code-block:: perl
 
@@ -1580,25 +1598,27 @@ An ultra fine grained C parser may capture a variable `i` with
 Submitting an optlib file to the Universal-ctags project
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-You are encouraged to submit your :file:`.ctags` file to our github through
-a pull request.
+You are encouraged to submit your :file:`.ctags` file to our repository on
+github through a pull request.
 
 Universal-ctags provides a facility for "Option library".
 Read "Option library" about the concept and usage first.
 
-Here I will explain how to merge your .ctags into universal-ctags as
-part of option library. Here I assume you consider contributing
-an option library in which a regex based language parser is defined.
-See `How to Add Support for a New Language to Exuberant Ctags (EXTENDING)`_
-about the way to how to write a regex based language parser. In this
-section I explains the next step.
+Here I will explain how to merge your .ctags into Universal-ctags as
+part of the option library. Here I assume you consider contributing
+an option library in which a regex-based language parser is defined.
+
+First you need your option library (which you have seen in this part of the
+guide).  See `How to Add Support for a New Language to Exuberant Ctags
+(EXTENDING)`_ to learn how to write a regex-based language parser in C.
+
+In this section I explain what to do after you have your parser.
+
+Like in the link, I use Swine as the name of programming language that
+the parser deals with. Assume source files written in Swine language have a
+suffix *.swn*. The file name of the option library is *swine.ctags*.
 
 .. _`How to Add Support for a New Language to Exuberant Ctags (EXTENDING)`: http://ctags.sourceforge.net/EXTENDING.html
-
-I use Swine as the name of programming language which your parser
-deals with. Assume source files written in Swine language have a suffix
-*.swn*. The file name of option library is *swine.ctags*.
-
 
 Copyright notice, contact mail address and license term
 ......................................................................
@@ -1632,11 +1652,12 @@ An example taken from *data/optlib/ctags.ctags* ::
 	#
 	...
 
-"GPL version 2 or later version" is needed here.  Option file is not
-linked to ``ctags`` command. However, I have a plan to write a translator
-which generates *.c* file from a given option file. As the result the
-*.c* file is built into ``ctags`` command. In such a case "GPL version 2
-or later version" may be required.
+"GPL version 2 or later version" is needed here. The Option library is not
+linked to ``ctags`` command. However, I have written a translator which
+generates *.c* file from a given option file. Said translator is called
+``optlib2c`` and can be found in ``misc/optlib2c`` from the source tree. As
+result the *.c* file is built into ``ctags`` command. In such a case "GPL
+version 2 or later version" is be required.
 
 *Units* test cases
 ......................................................................
@@ -1647,9 +1668,9 @@ code. Only test cases help us to know whether a contributed option
 library works well or not. We may reject any contribution without
 a test case.
 
-Read "Using *Units*" about how to write *Units* test
-cases.  Don't write one big test case. Some smaller cases are helpful
-to know about the intent of the contributor.
+Read "Using *Units*" about how to write *Units* test cases.  Do not write one
+big test case: smaller cases are helpful to know about the intent of the
+contributor. For example:
 
 * *Units/sh-alias.d*
 * *Units/sh-comments.d*
@@ -1657,7 +1678,7 @@ to know about the intent of the contributor.
 * *Units/sh-statements.d*
 
 are good example of small test cases.
-Big test cases are good if smaller test cases exist.
+Big test cases are acceptable if smaller test cases exist.
 
 See also *parser-m4.r/m4-simple.d* especially *parser-m4.r/m4-simple.d/args.ctags*.
 Your test cases need ``ctags`` having already loaded your option
