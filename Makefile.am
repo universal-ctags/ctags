@@ -2,6 +2,7 @@ include $(top_srcdir)/source.mak
 
 # Test cases are added to EXTRA_DIST in makefiles/test-cases.mak
 EXTRA_DIST   = README.md autogen.sh \
+	       makefiles/list-optlib2c-input.mak misc/optlib2c \
 	       .ctags.d/exclusion.ctags .dir-locals.el .editorconfig .gdbinit .gitignore \
 	       .indent.pro .uncrustify.cfg \
 	       gnu_regex/README.txt gnu_regex/regcomp.c gnu_regex/regexec.c \
@@ -10,7 +11,8 @@ EXTRA_DIST   = README.md autogen.sh \
 	       win32/mkstemp/COPYING.MinGW-w64-runtime.txt \
 	       win32/ctags_vs2013.sln \
 	       win32/ctags_vs2013.vcxproj win32/ctags_vs2013.vcxproj.filters \
-	       win32/gen-repoinfo.bat
+	       win32/gen-repoinfo.bat \
+		$(PEG_INPUT) $(OPTLIB2C_INPUT)
 
 noinst_PROGRAMS = packcc
 bin_PROGRAMS = ctags

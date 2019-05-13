@@ -32,14 +32,14 @@ MAIN_PUBLIC_HEADS =		\
 		main/parse.h	\
 		main/promise.h	\
 		main/ptrarray.h	\
-		main/read_p.h	\
+		main/read.h	\
 		main/routines.h	\
 		main/selectors.h\
 		main/strlist.h	\
 		main/subparser.h\
 		main/tokeninfo.h\
 		main/trace.h	\
-		main/trashbox_p.h\
+		main/trashbox.h \
 		main/types.h	\
 		main/unwindi.h  \
 		main/vstring.h	\
