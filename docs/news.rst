@@ -58,6 +58,7 @@ The following parsers have been added:
 * Gdbinit script *optlib*
 * Glade *libxml*
 * Go
+* Inko *optlib*
 * JavaProperties
 * JSON
 * GNU linker script(LdScript)

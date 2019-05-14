@@ -1,0 +1,3 @@
+# def this_should_be_ignored {}
+
+def this_method_should_be_tagged {}

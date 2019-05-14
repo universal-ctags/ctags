@@ -1,0 +1,7 @@
+let CONSTANT = 10
+
+object Person {
+  def init(name: String) {
+    let @name = name
+  }
+}

@@ -1,0 +1,15 @@
+object A {
+  def method_a {}
+}
+
+object B {
+  def method_b {}
+}
+
+object C {
+  object D {
+    object E {
+      def method_e {}
+    }
+  }
+}
