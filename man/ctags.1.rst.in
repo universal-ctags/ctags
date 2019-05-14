@@ -1419,13 +1419,17 @@ are not listed here. They are experimental or for debugging purpose.
 	(using "set ignorecase"). This option must appear before the first file
 	name. [Ignored in etags mode]
 
-``--tag-relative[=yes|no]``
-	Indicates that the file paths recorded in the tag file should be
+``--tag-relative[=yes|no|always|never]``
+	The yes value indicates that the file paths recorded in the tag file should be
 	relative to the directory containing the tag file, rather than relative
 	to the current directory, unless the files supplied on the command line
 	are specified with absolute paths. This option must appear before the
 	first file name. The default is yes when running in etags mode (see
 	the ``-e`` option), no otherwise.
+	The always value indicates the recorded file paths should be relative
+	even if source file names are passed in with absolute paths.
+	The never value indicates the recorded file paths should be absolute
+	even if source file names are passed in with relative paths.
 
 ``--totals[=yes|no]``
 	Prints statistics about the source files read and the tag file written

@@ -558,6 +558,7 @@ See :ref:`JSON output <output-json>` for more details.
 
 ..
 	NOT REVIEWED YET
+	IN MAN PAGE
 
 Even if "yes" is specified as an option argument for --tag-relative,
 absolute paths are used in tags output if an input is given as
