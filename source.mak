@@ -178,6 +178,7 @@ PARSER_HEADS = \
 	parsers/iniconf.h \
 	parsers/m4.h \
 	parsers/make.h \
+	parsers/perl.h \
 	parsers/tcl.h \
 	\
 	$(NULL)
@@ -243,6 +244,7 @@ PARSER_SRCS =				\
 	parsers/m4.c			\
 	parsers/make.c			\
 	parsers/matlab.c		\
+	parsers/moose.c			\
 	parsers/myrddin.c		\
 	parsers/objc.c			\
 	parsers/ocaml.c			\

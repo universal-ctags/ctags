@@ -144,7 +144,7 @@ static void inputStart (subparser *s)
 	tcloo->foundTclOONamespaceImported = false;
 }
 
-struct tclooSubparser tclooSubparser = {
+static struct tclooSubparser tclooSubparser = {
 	.tcl = {
 		.subparser = {
 			.direction = SUBPARSER_BI_DIRECTION,

@@ -65,6 +65,7 @@ The following parsers have been added:
 * Man page *optlib*
 * Markdown *optlib*
 * Maven2 *libxml*
+* Moose *perl basesd subperser*
 * M4
 * ObjectiveC
 * Passwd *optlib*

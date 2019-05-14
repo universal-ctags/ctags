@@ -16,10 +16,12 @@
 #include <string.h>
 
 #include "entry.h"
+#include "perl.h"
 #include "promise.h"
 #include "read.h"
 #include "routines.h"
 #include "selectors.h"
+#include "subparser.h"
 #include "vstring.h"
 #include "xtag.h"
 
@@ -29,15 +31,7 @@
 /*
 *   DATA DEFINITIONS
 */
-typedef enum {
-	K_NONE = -1,
-	K_CONSTANT,
-	K_FORMAT,
-	K_LABEL,
-	K_PACKAGE,
-	K_SUBROUTINE,
-	K_SUBROUTINE_DECLARATION
-} perlKind;
+typedef enum PerlKindType perlKind;
 
 static kindDefinition PerlKinds [] = {
 	{ true,  'c', "constant",               "constants" },
@@ -51,6 +45,38 @@ static kindDefinition PerlKinds [] = {
 /*
 *   FUNCTION DEFINITIONS
 */
+
+static void notifyEntringPod ()
+{
+	subparser *sub;
+
+	foreachSubparser (sub, false)
+	{
+		perlSubparser *perlsub = (perlSubparser *)sub;
+		if (perlsub->enteringPodNotify)
+		{
+			enterSubparser (sub);
+			perlsub->enteringPodNotify (perlsub);
+			leaveSubparser ();
+		}
+	}
+}
+
+static void notifyLeavingPod ()
+{
+	subparser *sub;
+
+	foreachSubparser (sub, false)
+	{
+		perlSubparser *perlsub = (perlSubparser *)sub;
+		if (perlsub->leavingPodNotify)
+		{
+			enterSubparser (sub);
+			perlsub->leavingPodNotify (perlsub);
+			leaveSubparser ();
+		}
+	}
+}
 
 static bool isIdentifier1 (int c)
 {
@@ -178,7 +204,7 @@ static void makeTagFromLeftSide (const char *begin, const char *end,
 {
 	tagEntryInfo entry;
 	const char *b, *e;
-	if (! PerlKinds[K_CONSTANT].enabled)
+	if (! PerlKinds[KIND_PERL_CONSTANT].enabled)
 		return;
 	for (e = end - 1; e > begin && isspace(*e); --e)
 		;
@@ -197,13 +223,13 @@ static void makeTagFromLeftSide (const char *begin, const char *end,
 		return;			/* Left side of => has an invalid identifier. */
 	vStringClear(name);
 	vStringNCatS(name, b, e - b + 1);
-	initTagEntry(&entry, vStringValue(name), K_CONSTANT);
+	initTagEntry(&entry, vStringValue(name), KIND_PERL_CONSTANT);
 	makeTagEntry(&entry);
 	if (isXtagEnabled (XTAG_QUALIFIED_TAGS) && package && vStringLength(package)) {
 		vStringClear(name);
 		vStringCopy(name, package);
 		vStringNCatS(name, b, e - b + 1);
-		initTagEntry(&entry, vStringValue(name), K_CONSTANT);
+		initTagEntry(&entry, vStringValue(name), KIND_PERL_CONSTANT);
 		markTagExtraBit (&entry, XTAG_QUALIFIED_TAGS);
 		makeTagEntry(&entry);
 	}
@@ -291,7 +317,7 @@ static void findPerlTags (void)
 		bool spaceRequired = false;
 		bool qualified = false;
 		const unsigned char *cp = line;
-		perlKind kind = K_NONE;
+		perlKind kind = KIND_PERL_NONE;
 		tagEntryInfo e;
 
 		if (skipPodDoc)
@@ -301,6 +327,7 @@ static void findPerlTags (void)
 				skipPodDoc = false;
 				if (podStart != 0UL)
 				{
+					notifyLeavingPod ();
 					makePromise ("Pod",
 						     podStart, 0,
 						     getInputLineNumber(), 0,
@@ -314,7 +341,10 @@ static void findPerlTags (void)
 		{
 			skipPodDoc = isPodWord ((const char*)line + 1);
 			if (skipPodDoc)
+			{
 				podStart = getSourceLineNumber ();
+				notifyEntringPod ();
+			}
 			continue;
 		}
 		else if (strcmp ((const char*) line, "__DATA__") == 0)
@@ -341,7 +371,7 @@ static void findPerlTags (void)
 		{
 			TRACE("this looks like a sub\n");
 			cp += 3;
-			kind = K_SUBROUTINE;
+			kind = KIND_PERL_SUBROUTINE;
 			spaceRequired = true;
 			qualified = true;
 		}
@@ -383,7 +413,7 @@ static void findPerlTags (void)
 				} else
 					goto END_MAIN_WHILE;
 			}
-			kind = K_CONSTANT;
+			kind = KIND_PERL_CONSTANT;
 			spaceRequired = false;
 			qualified = true;
 		}
@@ -413,14 +443,14 @@ static void findPerlTags (void)
 			vStringCatS (package, "::");
 
 			cp = first;	 /* Rewind */
-			kind = K_PACKAGE;
+			kind = KIND_PERL_PACKAGE;
 			spaceRequired = false;
 			qualified = true;
 		}
 		else if (strncmp((const char*) cp, "format", (size_t) 6) == 0)
 		{
 			cp += 6;
-			kind = K_FORMAT;
+			kind = KIND_PERL_FORMAT;
 			spaceRequired = true;
 			qualified = true;
 		}
@@ -434,10 +464,10 @@ static void findPerlTags (void)
 				while (isspace (*p))
 					++p;
 				if ((int) *p == ':' && (int) *(p + 1) != ':')
-					kind = K_LABEL;
+					kind = KIND_PERL_LABEL;
 			}
 		}
-		if (kind != K_NONE)
+		if (kind != KIND_PERL_NONE)
 		{
 			TRACE("cp0: %s\n", (const char *) cp);
 			if (spaceRequired && *cp && !isspace (*cp))
@@ -456,13 +486,13 @@ static void findPerlTags (void)
 					cp++;
 			}
 
-			while (isIdentifier (*cp) || (K_PACKAGE == kind && ':' == *cp))
+			while (isIdentifier (*cp) || (KIND_PERL_PACKAGE == kind && ':' == *cp))
 			{
 				vStringPut (name, (int) *cp);
 				cp++;
 			}
 
-			if (K_FORMAT == kind &&
+			if (KIND_PERL_FORMAT == kind &&
 				vStringLength (name) == 0 && /* cp did not advance */
 				'=' == *cp)
 			{
@@ -478,7 +508,7 @@ static void findPerlTags (void)
 				continue;
 			}
 
-			if (K_SUBROUTINE == kind)
+			if (KIND_PERL_SUBROUTINE == kind)
 			{
 				/*
 				 * isSubroutineDeclaration() may consume several lines.  So
@@ -487,8 +517,8 @@ static void findPerlTags (void)
 				initTagEntry(&e, vStringValue(name), KIND_GHOST_INDEX);
 
 				if (true == isSubroutineDeclaration(cp)) {
-					if (true == PerlKinds[K_SUBROUTINE_DECLARATION].enabled) {
-						kind = K_SUBROUTINE_DECLARATION;
+					if (true == PerlKinds[KIND_PERL_SUBROUTINE_DECLARATION].enabled) {
+						kind = KIND_PERL_SUBROUTINE_DECLARATION;
 					} else {
 						vStringClear (name);
 						continue;
@@ -516,7 +546,7 @@ static void findPerlTags (void)
 			{
 				makeSimpleTag (name, kind);
 				if (isXtagEnabled(XTAG_QUALIFIED_TAGS) && qualified &&
-					K_PACKAGE != kind &&
+					KIND_PERL_PACKAGE != kind &&
 					package != NULL  && vStringLength (package) > 0)
 				{
 					tagEntryInfo fqe;
@@ -550,5 +580,9 @@ extern parserDefinition* PerlParser (void)
 	def->extensions = extensions;
 	def->parser     = findPerlTags;
 	def->selectLanguage = selectors;
+
+	/* Subparsers need this */
+	def->useCork = true;
+
 	return def;
 }
