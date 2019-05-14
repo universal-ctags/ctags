@@ -67,6 +67,7 @@ typedef enum {
 	ObjcINTERFACE,
 	ObjcPROTOCOL,
 	ObjcENCODE,
+	ObjcEXTERN,
 	ObjcSYNCHRONIZED,
 	ObjcSELECTOR,
 	ObjcPROPERTY,
@@ -101,6 +102,7 @@ typedef enum {
 	Tok_ANGLEL,		/* '<' */
 	Tok_ANGLER,		/* '>' */
 	Tok_EOL,	/* '\r''\n' */
+	Tok_CSTRING,	/* "..." */
 	Tok_any,
 
 	Tok_EOF	/* END of file */
@@ -112,6 +114,7 @@ static const keywordTable objcKeywordTable[] = {
 	{"typedef", ObjcTYPEDEF},
 	{"struct", ObjcSTRUCT},
 	{"enum", ObjcENUM},
+	{"extern", ObjcEXTERN},
 	{"@implementation", ObjcIMPLEMENTATION},
 	{"@interface", ObjcINTERFACE},
 	{"@protocol", ObjcPROTOCOL},
@@ -201,11 +204,13 @@ static void eatWhiteSpace (lexingState * st)
 	st->cp = cp;
 }
 
-static void eatString (lexingState * st)
+static void readCString (lexingState * st)
 {
 	bool lastIsBackSlash = false;
 	bool unfinished = true;
 	const unsigned char *c = st->cp + 1;
+
+	vStringClear (st->name);
 
 	while (unfinished)
 	{
@@ -216,7 +221,10 @@ static void eatString (lexingState * st)
 		else if (*c == '"' && !lastIsBackSlash)
 			unfinished = false;
 		else
+		{
 			lastIsBackSlash = *c == '\\';
+			vStringPut (st->name, (int) *c);
+		}
 
 		c++;
 	}
@@ -398,8 +406,8 @@ static objcKeyword lex (lexingState * st)
 			st->cp++;
 			return Tok_dpoint;
 		case '"':
-			eatString (st);
-			return Tok_any;
+			readCString (st);
+			return Tok_CSTRING;
 		case '+':
 			st->cp++;
 			return Tok_PLUS;
@@ -1177,6 +1185,24 @@ static void parsePreproc (vString * const ident, objcToken what)
 	}
 }
 
+static void skipCurlL (vString * const ident, objcToken what)
+{
+	if (what == Tok_CurlL)
+		toDoNext = comeAfter;
+}
+
+static void parseCPlusPlusCLinkage (vString * const ident, objcToken what)
+{
+	toDoNext = comeAfter;
+
+	/* Linkage specification like "C" */
+	if (what == Tok_CSTRING)
+		toDoNext = skipCurlL;
+	else
+		/* Force handle this ident in globalScope */
+		globalScope (ident, what);
+}
+
 /* Handle the "strong" top levels, all 'big' declarations
  * happen here */
 static void globalScope (vString * const ident, objcToken what)
@@ -1229,6 +1255,11 @@ static void globalScope (vString * const ident, objcToken what)
 		comeAfter = &globalScope;
 		toDoNext = &ignoreBalanced;
 		ignoreBalanced (ident, what);
+		break;
+
+	case ObjcEXTERN:
+		comeAfter = &globalScope;
+		toDoNext = &parseCPlusPlusCLinkage;
 		break;
 
 	case ObjcEND:

@@ -17,5 +17,6 @@
 @synchronized	ObjectiveC
 @synthesize	ObjectiveC
 enum	ObjectiveC
+extern	ObjectiveC
 struct	ObjectiveC
 typedef	ObjectiveC
