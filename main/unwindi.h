@@ -57,7 +57,7 @@
 /*
 *   FUNCTION PROTOTYPES
 */
-extern void uwiActivate   (void);
+extern void uwiActivate   (unsigned int);
 extern void uwiDeactivate (void);
 
 extern int uwiGetC (void);
@@ -66,6 +66,7 @@ extern unsigned long uwiGetLineNumber (void);
 extern MIOPos uwiGetFilePosition (void);
 
 extern void uwiPushMarker (void);
-extern void uwiPopMarker (int count);
+extern void uwiClearMarker (const int count, const bool revertChars);
+extern void uwiPopMarker (const int count, const bool revertChars);
 extern void	uwiDropMaker (void);
 #endif	/* CTAGS_MAIN_UNWINDI_H */
