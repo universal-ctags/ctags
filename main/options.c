@@ -161,7 +161,7 @@ optionValues Option = {
 	.followLinks = true,
 	.filter = false,
 	.filterTerminator = NULL,
-	.tagRelative = false,
+	.tagRelative = TREL_NO,
 	.printTotals = false,
 	.lineDirectives = false,
 	.printLanguage =false,
@@ -2413,7 +2413,7 @@ static void processTagRelative (
 {
 	if (isFalse (parameter))
 		Option.tagRelative = TREL_NO;
-	else if (isTrue (parameter))
+	else if (isTrue (parameter) || *parameter == '\0')
 		Option.tagRelative = TREL_YES;
 	else if (strcasecmp (parameter, "always") == 0)
 		Option.tagRelative = TREL_ALWAYS;
