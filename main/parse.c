@@ -3316,11 +3316,15 @@ extern void printParserStatisticsIfUsed (langType language)
 {
 	parserObject *parser = &(LanguageTable [language]);
 
-	if (parser->used && parser->def->printStats)
+	if (parser->used)
 	{
-		fprintf(stderr, "\nSTATISTICS of %s\n", getLanguageName (language));
-		fputs("==============================================\n", stderr);
-		parser->def->printStats (language);
+		if (parser->def->printStats)
+		{
+			fprintf(stderr, "\nSTATISTICS of %s\n", getLanguageName (language));
+			fputs("==============================================\n", stderr);
+			parser->def->printStats (language);
+		}
+		printLanguageMultitableStatistics (language);
 	}
 }
 
@@ -4353,11 +4357,10 @@ extern void printKinddefFlags (bool withListHeader, bool machinable, FILE *fp)
 	colprintTableDelete(table);
 }
 
-extern void printLanguageMultitableStatistics (langType language, FILE *vfp)
+extern void printLanguageMultitableStatistics (langType language)
 {
 	parserObject* const parser = LanguageTable + language;
-	printMultitableStatistics (parser->lregexControlBlock,
-							   vfp);
+	printMultitableStatistics (parser->lregexControlBlock);
 }
 
 extern void addLanguageRegexTable (const langType language, const char *name)

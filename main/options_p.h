@@ -120,7 +120,6 @@ typedef struct sOptionValues {
 	enum interactiveMode { INTERACTIVE_NONE = 0,
 						   INTERACTIVE_DEFAULT,
 						   INTERACTIVE_SANDBOX, } interactive; /* --interactive */
-	bool mtablePrintTotals;  /* display mtable statistics */
 #ifdef DEBUG
 	unsigned long breakLine;/* -b  input line at which to call lineBreak() */
 #endif

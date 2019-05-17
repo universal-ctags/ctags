@@ -159,7 +159,7 @@ extern bool makeKindSeparatorsPseudoTags (const langType language,
 extern bool makeKindDescriptionsPseudoTags (const langType language,
 					       const ptagDesc *pdesc);
 
-extern void printLanguageMultitableStatistics (langType language, FILE *vfp);
+extern void printLanguageMultitableStatistics (langType language);
 extern void printParserStatisticsIfUsed (langType lang);
 
 #endif	/* CTAGS_MAIN_PARSE_PRIVATE_H */

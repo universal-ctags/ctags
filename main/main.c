@@ -574,14 +574,6 @@ extern int ctags_cli_main (int argc CTAGS_ATTR_UNUSED, char **argv)
 
 	runMainLoop (args);
 
-
-	BEGIN_VERBOSE_IF(Option.mtablePrintTotals, vfp);
-	{
-		for (unsigned int i = 0; i < countParsers(); i++)
-			printLanguageMultitableStatistics (i, vfp);
-	}
-	END_VERBOSE();
-
 	/*  Clean up.
 	 */
 	cArgDelete (args);
