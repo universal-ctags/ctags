@@ -82,8 +82,10 @@ typedef struct sParserObject {
 	stringList* currentAliases;    /* current list of aliases */
 
 	unsigned int initialized:1;    /* initialize() is called or not */
-	unsigned int dontEmit:1;	   /* run but don't emit tags
-									  (a subparser requests run this parser.) */
+	unsigned int dontEmit:1;	   /* run but don't emit tags.
+									  This parser was disabled but a subparser on
+									  this parser makes this parser run (to drive
+									  the subparser). */
 	unsigned int pseudoTagPrinted:1;   /* pseudo tags about this parser
 										  is emitted or not. */
 	unsigned int used;			/* Used for printing language specific statistics. */
