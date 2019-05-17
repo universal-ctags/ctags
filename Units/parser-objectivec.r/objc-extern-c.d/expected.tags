@@ -1,0 +1,9 @@
+__NSCompoundPredicate_h_GNUSTEP_BASE_INCLUDE	input.h	/^#define __NSCompoundPredicate_h_GNUSTEP_BASE_INCLUDE$/;"	M
+NSCompoundPredicateType	input.h	/^typedef NSUInteger NSCompoundPredicateType;$/;"	t
+NSCompoundPredicate	input.h	/^@interface NSCompoundPredicate : NSPredicate$/;"	i
+_subs	input.h	/^  NSArray	*_subs;$/;"	E	interface:NSCompoundPredicate
+andPredicateWithSubpredicates:	input.h	/^+ (NSPredicate *) andPredicateWithSubpredicates: (NSArray *)list;$/;"	c	interface:NSCompoundPredicate
+notPredicateWithSubpredicate:	input.h	/^+ (NSPredicate *) notPredicateWithSubpredicate: (NSPredicate *)predicate;$/;"	c	interface:NSCompoundPredicate
+orPredicateWithSubpredicates:	input.h	/^+ (NSPredicate *) orPredicateWithSubpredicates: (NSArray *)list;$/;"	c	interface:NSCompoundPredicate
+subpredicates	input.h	/^- (NSArray *) subpredicates;$/;"	m	interface:NSCompoundPredicate
+foo	input-0.m	/^extern int foo (void)$/;"	f
