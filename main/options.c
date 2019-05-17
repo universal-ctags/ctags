@@ -162,7 +162,7 @@ optionValues Option = {
 	.filter = false,
 	.filterTerminator = NULL,
 	.tagRelative = TREL_NO,
-	.printTotals = false,
+	.printTotals = 0,
 	.lineDirectives = false,
 	.printLanguage =false,
 	.guessLanguageEagerly = false,
@@ -415,7 +415,7 @@ static optionDescription LongOptionDescription [] = {
  {0,"       Should paths be relative to location of tag file [no; yes when -e]?"},
  {0,"       always: be relative even if input files are passed in with absolute paths" },
  {0,"       never:  be absolute even if input files are passed in with relative paths" },
- {1,"  --totals=[yes|no]"},
+ {1,"  --totals=[yes|no|extra]"},
  {1,"       Print statistics about input and tag files [no]."},
  {1,"  --verbose=[yes|no]"},
  {1,"       Enable verbose messages describing actions on each input file."},
@@ -747,7 +747,7 @@ extern void checkOptions (void)
 		if (Option.printTotals)
 		{
 			error (WARNING, "%s disables totals", notice);
-			Option.printTotals = false;
+			Option.printTotals = 0;
 		}
 		if (Option.tagFileName != NULL)
 			error (WARNING, "%s ignores output tag file name", notice);
@@ -2423,6 +2423,19 @@ static void processTagRelative (
 		error (FATAL, "Invalid value for \"%s\" option", option);
 }
 
+static void processTotals (
+		const char *const option, const char *const parameter)
+{
+	if (isFalse (parameter))
+		Option.printTotals = 0;
+	else if (isTrue (parameter) || *parameter == '\0')
+		Option.printTotals = 1;
+	else if (strcasecmp (parameter, "extra") == 0)
+		Option.printTotals = 2;
+	else
+		error (FATAL, "Invalid value for \"%s\" option", option);
+}
+
 static void installHeaderListDefaults (void)
 {
 	Option.headerExt = stringListNewFromArgv (HeaderExtensions);
@@ -2740,6 +2753,7 @@ static parametricOption ParametricOptions [] = {
 	{ "pseudo-tags",            processPseudoTags,              false,  STAGE_ANY },
 	{ "sort",                   processSortOption,              true,   STAGE_ANY },
 	{ "tag-relative",           processTagRelative,             true,   STAGE_ANY },
+	{ "totals",                 processTotals,                  true,   STAGE_ANY },
 	{ "version",                processVersionOption,           true,   STAGE_ANY },
 	{ "_anonhash",              processAnonHashOption,          false,  STAGE_ANY },
 	{ "_dump-keywords",         processDumpKeywordsOption,      false,  STAGE_ANY },
@@ -2774,7 +2788,6 @@ static booleanOption BooleanOptions [] = {
 #ifdef RECURSE_SUPPORTED
 	{ "recurse",        &Option.recurse,                false, STAGE_ANY },
 #endif
-	{ "totals",         &Option.printTotals,            true,  STAGE_ANY },
 	{ "verbose",        &ctags_verbose,                false, STAGE_ANY },
 	{ "with-list-header", &localOption.withListHeader,       true,  STAGE_ANY },
 	{ "_fatal-warnings",&Option.fatalWarnings,          false, STAGE_ANY },

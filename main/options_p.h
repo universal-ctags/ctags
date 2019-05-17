@@ -108,7 +108,7 @@ typedef struct sOptionValues {
 	bool filter;         /* --filter  behave as filter: files in, tags out */
 	char* filterTerminator; /* --filter-terminator  string to output */
 	tagRelative tagRelative;    /* --tag-relative file paths relative to tag file */
-	bool printTotals;    /* --totals  print cumulative statistics */
+	int  printTotals;    /* --totals  print cumulative statistics */
 	bool lineDirectives; /* --linedirectives  process #line directives */
 	bool printLanguage;  /* --print-language */
 	bool guessLanguageEagerly; /* --guess-language-eagerly|-G */

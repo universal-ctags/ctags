@@ -1,0 +1,3 @@
+STATISTICS of CTagsSelfTest
+==============================================
+The number of handled chars: 10

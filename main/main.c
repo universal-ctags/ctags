@@ -376,7 +376,13 @@ static void batchMakeTags (cookedArgs *args, void *user CTAGS_ATTR_UNUSED)
 	timeStamp (2);
 
 	if (Option.printTotals)
+	{
 		printTotals (timeStamps, Option.append, Option.sorted);
+		if (Option.printTotals > 1)
+			for (unsigned int i = 0; i < countParsers(); i++)
+				printParserStatisticsIfUsed (i);
+	}
+
 #undef timeStamp
 }
 

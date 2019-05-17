@@ -39,6 +39,8 @@ typedef void (*createRegexTag) (const vString* const name);
 typedef void (*simpleParser) (void);
 typedef rescanReason (*rescanParser) (const unsigned int passCount);
 typedef void (*parserInitialize) (langType language);
+typedef void (*initStatistics) (langType language);
+typedef void (*printStatistics) (langType langType);
 
 /* Per language finalizer is called anytime when ctags exits.
    (Exceptions are a kind of options are given when invoked. Here
@@ -104,6 +106,9 @@ struct sParserDefinition {
 	/* Following two fields are used in a parser using cork. */
 	const char *defaultScopeSeparator;
 	const char *defaultRootScopeSeparator;
+
+	initStatistics initStats;
+	printStatistics printStats;
 
 	/* used internally */
 	langType id;		    /* id assigned to language */

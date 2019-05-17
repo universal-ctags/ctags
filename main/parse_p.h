@@ -160,5 +160,6 @@ extern bool makeKindDescriptionsPseudoTags (const langType language,
 					       const ptagDesc *pdesc);
 
 extern void printLanguageMultitableStatistics (langType language, FILE *vfp);
+extern void printParserStatisticsIfUsed (langType lang);
 
 #endif	/* CTAGS_MAIN_PARSE_PRIVATE_H */
