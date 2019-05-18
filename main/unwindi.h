@@ -55,10 +55,22 @@
 #include "general.h"
 
 /*
+*   DATA DECLARATIONS
+*/
+struct sUwiStats {
+	int maxLength;
+	bool overflow;
+	bool underflow;
+};
+
+/*
 *   FUNCTION PROTOTYPES
 */
 extern void uwiActivate   (unsigned int);
-extern void uwiDeactivate (void);
+extern void uwiDeactivate (struct sUwiStats *statsToBeUpdated);
+
+extern void uwiStatsInit  (struct sUwiStats *stats);
+extern void uwiStatsPrint (struct sUwiStats *stats);
 
 extern int uwiGetC (void);
 extern void uwiUngetC (int c);

@@ -235,6 +235,8 @@ typedef union uParserState {
 	char ch;
 } parserState;
 
+static struct sUwiStats tsUwiStats;
+
 typedef void (*Parser)(const int c, tokenInfo *const, parserState *state, parserResult *const);
 
 static bool tryParser(Parser parser, tokenInfo *const token, bool skipWhite);
@@ -1770,7 +1772,7 @@ static void findTsTags (void)
 
 	deleteToken (token);
 
-	uwiDeactivate ();
+	uwiDeactivate (&tsUwiStats);
 }
 
 static void initialize (const langType language)
@@ -1788,6 +1790,15 @@ static void finalize (langType language CTAGS_ATTR_UNUSED, bool initialized)
 	objPoolDelete (TokenPool);
 }
 
+static void initStats (langType language CTAGS_ATTR_UNUSED)
+{
+	uwiStatsInit (&tsUwiStats);
+}
+static void printStats (langType language CTAGS_ATTR_UNUSED)
+{
+	uwiStatsPrint (&tsUwiStats);
+}
+
 /* Create parser definition structure */
 extern parserDefinition *TypeScriptParser (void)
 {
@@ -1803,6 +1814,9 @@ extern parserDefinition *TypeScriptParser (void)
 	def->keywordCount = ARRAY_SIZE (TsKeywordTable);
 	def->useCork = true;
 	def->requestAutomaticFQTag = true;
+
+	def->initStats = initStats;
+	def->printStats = printStats;
 
 	return def;
 }
