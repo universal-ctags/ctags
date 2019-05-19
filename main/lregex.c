@@ -34,6 +34,7 @@
 #include "kind.h"
 #include "options.h"
 #include "parse_p.h"
+#include "promise.h"
 #include "read.h"
 #include "read_p.h"
 #include "routines.h"
@@ -182,6 +183,12 @@ struct lregexControlBlock {
 */
 static int getTableIndexForName (const struct lregexControlBlock *const lcb, const char *name);
 static void deletePattern (regexPattern *p);
+static int  makePromiseForAreaSpecifiedWithOffsets (const char *parser,
+													enum regexParserType regptype,
+													off_t startOffset,
+													off_t endOffset);
+
+
 
 static void deleteTable (void *ptrn)
 {
@@ -2306,6 +2313,22 @@ extern bool matchMultitableRegex (struct lregexControlBlock *lcb, const vString*
 	}
 
 	return true;
+}
+
+static int  makePromiseForAreaSpecifiedWithOffsets (const char *parser,
+													enum regexParserType regptype,
+													off_t startOffset,
+													off_t endOffset)
+{
+	unsigned long startLine = getInputLineNumberInRegPType(regptype, startOffset);
+	unsigned long endLine = getInputLineNumberInRegPType(regptype, endOffset);
+	unsigned long startLineOffset = getInputFileOffsetForLine (startLine);
+	unsigned long endLineOffset = getInputFileOffsetForLine (endLine);
+
+	return makePromise (parser,
+						startLine, startOffset - startLineOffset,
+						endLine, endOffset - endLineOffset,
+						startOffset - startLineOffset);
 }
 
 /* Return true if available. */
