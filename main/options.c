@@ -538,7 +538,7 @@ static struct Feature {
 #ifdef DEBUG
 	{"debug", "TO BE WRITTEN"},
 #endif
-#if defined(HAVE_SCANDIR) || defined (HAVE_DIRENT_H) || defined (_MSC_VER)
+#if defined (HAVE_DIRENT_H) || defined (_MSC_VER)
 	{"option-directory", "TO BE WRITTEN"},
 #endif
 #ifdef HAVE_LIBXML
@@ -3410,7 +3410,11 @@ extern void previewFirstOption (cookedArgs* const args)
 	}
 }
 
-#if defined(HAVE_SCANDIR) || defined (HAVE_DIRENT_H) || defined (_MSC_VER)
+#if defined (HAVE_DIRENT_H) || defined (_MSC_VER)
+extern int scanDirectory (const char *directory_name,
+						  struct dirent ***array_pointer, int (*select_function) (const struct dirent *),
+						  int (*compare_function) (const struct dirent **, const struct dirent **));
+
 static void parseConfigurationFileOptionsInDirectoryWithLeafname (const char* directory, const char* leafname)
 {
 	char* pathname = combinePathAndFile (directory, leafname);

@@ -85,7 +85,7 @@ static bool createTagsForEntry (const char *const entryName);
 *   FUNCTION DEFINITIONS
 */
 
-#if defined (HAVE_OPENDIR)
+#if defined (HAVE_OPENDIR) && (defined (HAVE_DIRENT_H) || defined (_MSC_VER))
 static bool recurseUsingOpendir (const char *const dirName)
 {
 	bool resize = false;
@@ -178,7 +178,7 @@ static bool recurseIntoDirectory (const char *const dirName)
 	else
 	{
 		verbose ("RECURSING into directory \"%s\"\n", dirName);
-#if defined (HAVE_OPENDIR)
+#if defined (HAVE_OPENDIR) && (defined (HAVE_DIRENT_H) || defined (_MSC_VER))
 		resize = recurseUsingOpendir (dirName);
 #elif defined (HAVE__FINDFIRST)
 		{

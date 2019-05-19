@@ -111,9 +111,12 @@
 #include "routines.h"
 #include "routines_p.h"
 
-#ifdef HAVE_SCANDIR
+#if defined (HAVE_SCANDIR) && defined (HAVE_DIRENT_H)
 #include <dirent.h>
-#else
+#elif defined (HAVE_DIRENT_H) || defined (_MSC_VER)
+# ifdef HAVE_DIRENT_H
+# include <dirent.h>
+# endif
 #define USE_SCANDIR_COMPARE_STRUCT_DIRENT
 
 #include <sys/types.h>
@@ -227,9 +230,11 @@ scandir(const char *directory_name,
 }
 #endif
 
+#if defined (HAVE_DIRENT_H) || defined (_MSC_VER)
 int scanDirectory (const char *directory_name,
 				   struct dirent ***array_pointer, int (*select_function) (const struct dirent *),
 				   int (*compare_function) (const struct dirent **, const struct dirent **))
 {
 	return scandir (directory_name, array_pointer, select_function, compare_function);
 }
+#endif
