@@ -39,6 +39,16 @@ if [ "$TARGET" = "Unix" ]; then
             make clean
         )
 
+        BUILDDIR=${BUILDDIR0}-external_parser_list
+        mkdir -p "${BUILDDIR}"
+        (
+            cd "${BUILDDIR}"
+            ${CONFIGURE_CMDLINE}
+            make -j2 EXTRA_CPPFLAGS=-DEXTERNAL_PARSER_LIST="\\\"Tlib/extra_parser_list.h\\\""
+			test $(./ctags --list-languages | wc -l) = 1
+            make clean
+        )
+
         BUILDDIR=${BUILDDIR0}-gcov
         mkdir -p "${BUILDDIR}"
         (

@@ -4,7 +4,7 @@
 EXTRA_DIST += misc/units
 EXTRA_DIST += misc/tlib misc/mini-geany.expected
 
-DIST_SUBDIRS = Tmain Units
+DIST_SUBDIRS = Tmain Units Tlib
 
 check: tmain units tlib
 

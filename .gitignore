@@ -81,6 +81,8 @@ man/ctags-optlib.7
 man/ctags-optlib.7.html
 man/ctags-optlib.7.rst
 misc/mini-geany.actual
+Tlib/Makefile
+Tlib/Makefile.in
 Tmain/**/Makefile
 Tmain/**/Makefile.am
 Tmain/**/Makefile.in

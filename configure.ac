@@ -772,6 +772,7 @@ AC_CONFIG_FILES([Makefile
 		 man/ctags.1.rst
 		 man/ctags-incompatibilities.7.rst
 		 man/ctags-optlib.7.rst
+		 Tlib/Makefile
 		 ])
 m4_include([Tmain/dist.m4])
 m4_include([Units/dist.m4])
