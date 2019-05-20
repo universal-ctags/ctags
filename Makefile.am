@@ -77,7 +77,9 @@ endif
 PARSER_SRCS += $(PEG_SRCS)
 PARSER_HEADS += $(PEG_HEADS) $(PEG_EXTRA_HEADS)
 
-libctags_a_CPPFLAGS = -I. -I$(srcdir) -I$(srcdir)/main -DHAVE_PACKCC
+libctags_a_CPPFLAGS =
+libctags_a_CPPFLAGS+= $(EXTRA_CPPFLAGS)
+libctags_a_CPPFLAGS+= -I. -I$(srcdir) -I$(srcdir)/main -DHAVE_PACKCC
 if ENABLE_DEBUGGING
 libctags_a_CPPFLAGS+= $(DEBUG_CPPFLAGS)
 endif
