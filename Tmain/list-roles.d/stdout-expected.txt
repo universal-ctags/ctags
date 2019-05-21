@@ -31,6 +31,7 @@ DTD            p/parameterEntity condition           on      conditions
 DTD            p/parameterEntity elementName         on      element names
 DTD            p/parameterEntity partOfAttDef        on      part of attribute definition
 Elm            m/module          imported            on      imported module
+Flex           I/import          import              on      imports
 Go             p/package         imported            on      imported package
 Go             u/unknown         receiverType        on      receiver type
 HTML           C/stylesheet      extFile             on      referenced as external files
@@ -95,6 +96,7 @@ DTD            p/parameterEntity condition           on      conditions
 DTD            p/parameterEntity elementName         on      element names
 DTD            p/parameterEntity partOfAttDef        on      part of attribute definition
 Elm            m/module          imported            on      imported module
+Flex           I/import          import              on      imports
 Go             p/package         imported            on      imported package
 Go             u/unknown         receiverType        on      receiver type
 HTML           C/stylesheet      extFile             on      referenced as external files

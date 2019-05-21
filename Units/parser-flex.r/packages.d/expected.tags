@@ -1,0 +1,6 @@
+C1	input.as	/^  class C1 {}$/;"	c	class:P3
+P1	input.as	/^package P1 {}$/;"	P
+P2	input.as	/^package P2 {$/;"	P
+P3	input.as	/^package P3 {$/;"	P
+f1	input.as	/^  function f1() {}$/;"	f	function:P2
+qualified.test.pkg	input.as	/^package qualified.test . pkg {$/;"	P

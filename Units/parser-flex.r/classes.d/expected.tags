@@ -1,0 +1,13 @@
+C1	input.as	/^  class C1 {$/;"	c
+C1.m1	input.as	/^    public function m1():Boolean { return 0; }$/;"	m	scope:class:C1
+C2	input.as	/^  class C2 extends C1 {}$/;"	c
+C3	input.as	/^  class C3 {}$/;"	c
+C4	input.as	/^  class C4 implements I1 {}$/;"	c
+C5	input.as	/^  class C5 extends C3 implements I1 {}$/;"	c
+C6	input.as	/^  class C6 extends C3 implements I1, I2 {}$/;"	c
+C7	input.as	/^  dynamic class C7{}$/;"	c
+I1	input.as	/^  interface I1 {}$/;"	i
+I2	input.as	/^  interface I2 {}$/;"	i
+I3	input.as	/^  interface I3 extends I1, I2 {}$/;"	i
+I4	input.as	/^  interface I4 extends I3 {}$/;"	i
+m1	input.as	/^    public function m1():Boolean { return 0; }$/;"	m	scope:class:C1

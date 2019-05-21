@@ -24,6 +24,7 @@ CPreProcessor  h/header    local     on      local header
 CPreProcessor  h/header    system    on      system header
 CUDA           h/header    local     on      local header
 CUDA           h/header    system    on      system header
+Flex           I/import    import    on      imports
 M4             I/macrofile included  on      included macro
 M4             I/macrofile sincluded on      silently included macro
 Make           I/makefile  included  on      included

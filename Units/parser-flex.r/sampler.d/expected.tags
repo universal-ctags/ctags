@@ -1,0 +1,15 @@
+assert	input.as	/^        private function assert(e:Boolean, mess:String=null):void {$/;"	m	scope:class:sampleTypes	roles:def
+b	input.as	/^      var b:Boolean = true$/;"	l	scope:class:sampleTypes	roles:def
+cpuSamples	input.as	/^            var cpuSamples:Array=[];$/;"	l	scope:class:sampleTypes.sampleTypes	roles:def
+delSamples	input.as	/^            var delSamples:Array=[];$/;"	l	scope:class:sampleTypes.sampleTypes	roles:def
+dos	input.as	/^                var dos = DeleteObjectSample(s);$/;"	l	scope:class:sampleTypes.sampleTypes	roles:def
+flash.display.Sprite	input.as	/^    import flash.display.Sprite$/;"	I	roles:import
+flash.sampler.*	input.as	/^    import flash.sampler.*$/;"	I	roles:import
+flash.system.*	input.as	/^    import flash.system.*$/;"	I	roles:import
+flash.utils.*	input.as	/^    import flash.utils.*$/;"	I	roles:import
+ids	input.as	/^            var ids:Array=[]$/;"	l	scope:class:sampleTypes.sampleTypes	roles:def
+lastTime	input.as	/^            var lastTime:Number=0;$/;"	l	scope:class:sampleTypes.sampleTypes	roles:def
+newSamples	input.as	/^            var newSamples:Array=[];$/;"	l	scope:class:sampleTypes.sampleTypes	roles:def
+nos	input.as	/^                var nos = NewObjectSample(s);$/;"	l	scope:class:sampleTypes.sampleTypes	roles:def
+sampleTypes	input.as	/^        public function sampleTypes() {$/;"	m	scope:class:sampleTypes	roles:def
+sampleTypes	input.as	/^    public class sampleTypes extends Sprite$/;"	c	roles:def

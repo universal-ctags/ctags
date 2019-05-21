@@ -1,0 +1,2 @@
+MIN_AGE	input.as	/^const MIN_AGE:int = 21;$/;"	C
+product_array	input.as	/^const product_array:Array = new Array("Studio", "Dreamweaver", "Flash", "ColdFusion", "Contribut/;"	C
