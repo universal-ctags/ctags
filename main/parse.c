@@ -121,6 +121,9 @@ static void uninstallTagXpathTable (const langType language);
 */
 static parserDefinition *CTagsSelfTestParser (void);
 static parserDefinitionFunc* BuiltInParsers[] = {
+#ifdef EXTERNAL_PARSER_LIST
+	EXTERNAL_PARSER_LIST
+#else  /* ! EXTERNAL_PARSER_LIST */
 	CTagsSelfTestParser,
 	PARSER_LIST,
 	XML_PARSER_LIST
@@ -135,6 +138,7 @@ static parserDefinitionFunc* BuiltInParsers[] = {
 #ifdef HAVE_PACKCC
        ,
 #endif
+#endif	/* EXTERNAL_PARSER_LIST */
 };
 static parserObject* LanguageTable = NULL;
 static unsigned int LanguageCount = 0;
