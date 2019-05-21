@@ -5,4 +5,7 @@ CTAGS=$1
 
 . ../utils.sh
 
-${CTAGS} --options=NONE --options=./args.ctags --_mtable-totals=yes -o - ./input.foo
+stats=/tmp/ctags-Tmain-$$
+${CTAGS} --quiet --options=NONE --options=./args.ctags --totals=extra -o - ./input.foo 2> ${stats}
+sed -n -e '/^MTABLE REGEX.*/,$p' ${stats} 1>&2
+rm ${stats}

@@ -376,7 +376,13 @@ static void batchMakeTags (cookedArgs *args, void *user CTAGS_ATTR_UNUSED)
 	timeStamp (2);
 
 	if (Option.printTotals)
+	{
 		printTotals (timeStamps, Option.append, Option.sorted);
+		if (Option.printTotals > 1)
+			for (unsigned int i = 0; i < countParsers(); i++)
+				printParserStatisticsIfUsed (i);
+	}
+
 #undef timeStamp
 }
 
@@ -567,14 +573,6 @@ extern int ctags_cli_main (int argc CTAGS_ATTR_UNUSED, char **argv)
 	checkOptions ();
 
 	runMainLoop (args);
-
-
-	BEGIN_VERBOSE_IF(Option.mtablePrintTotals, vfp);
-	{
-		for (unsigned int i = 0; i < countParsers(); i++)
-			printLanguageMultitableStatistics (i, vfp);
-	}
-	END_VERBOSE();
 
 	/*  Clean up.
 	 */

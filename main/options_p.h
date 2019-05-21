@@ -108,7 +108,7 @@ typedef struct sOptionValues {
 	bool filter;         /* --filter  behave as filter: files in, tags out */
 	char* filterTerminator; /* --filter-terminator  string to output */
 	tagRelative tagRelative;    /* --tag-relative file paths relative to tag file */
-	bool printTotals;    /* --totals  print cumulative statistics */
+	int  printTotals;    /* --totals  print cumulative statistics */
 	bool lineDirectives; /* --linedirectives  process #line directives */
 	bool printLanguage;  /* --print-language */
 	bool guessLanguageEagerly; /* --guess-language-eagerly|-G */
@@ -120,7 +120,6 @@ typedef struct sOptionValues {
 	enum interactiveMode { INTERACTIVE_NONE = 0,
 						   INTERACTIVE_DEFAULT,
 						   INTERACTIVE_SANDBOX, } interactive; /* --interactive */
-	bool mtablePrintTotals;  /* display mtable statistics */
 #ifdef DEBUG
 	unsigned long breakLine;/* -b  input line at which to call lineBreak() */
 #endif

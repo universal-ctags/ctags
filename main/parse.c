@@ -82,10 +82,13 @@ typedef struct sParserObject {
 	stringList* currentAliases;    /* current list of aliases */
 
 	unsigned int initialized:1;    /* initialize() is called or not */
-	unsigned int dontEmit:1;	   /* run but don't emit tags
-									  (a subparser requests run this parser.) */
+	unsigned int dontEmit:1;	   /* run but don't emit tags.
+									  This parser was disabled but a subparser on
+									  this parser makes this parser run (to drive
+									  the subparser). */
 	unsigned int pseudoTagPrinted:1;   /* pseudo tags about this parser
 										  is emitted or not. */
+	unsigned int used;			/* Used for printing language specific statistics. */
 
 	unsigned int anonymousIdentiferId; /* managed by anon* functions */
 
@@ -3302,6 +3305,29 @@ static subparser* teardownLanguageSubparsersInUse (const langType language)
 	return teardownSubparsersInUse ((LanguageTable + language)->slaveControlBlock);
 }
 
+static void	initializeParserStats (parserObject *parser)
+{
+	if (Option.printTotals > 1 && parser->used == 0 && parser->def->initStats)
+		parser->def->initStats (parser->def->id);
+	parser->used = 1;
+}
+
+extern void printParserStatisticsIfUsed (langType language)
+{
+	parserObject *parser = &(LanguageTable [language]);
+
+	if (parser->used)
+	{
+		if (parser->def->printStats)
+		{
+			fprintf(stderr, "\nSTATISTICS of %s\n", getLanguageName (language));
+			fputs("==============================================\n", stderr);
+			parser->def->printStats (language);
+		}
+		printLanguageMultitableStatistics (language);
+	}
+}
+
 static bool createTagsWithFallback1 (const langType language,
 									 langType *exclusive_subparser)
 {
@@ -3324,6 +3350,7 @@ static bool createTagsWithFallback1 (const langType language,
 		corkTagFile();
 
 	addParserPseudoTags (language);
+	initializeParserStats (parser);
 	tagFilePosition (&tagfpos);
 
 	anonResetMaybe (parser);
@@ -4330,11 +4357,10 @@ extern void printKinddefFlags (bool withListHeader, bool machinable, FILE *fp)
 	colprintTableDelete(table);
 }
 
-extern void printLanguageMultitableStatistics (langType language, FILE *vfp)
+extern void printLanguageMultitableStatistics (langType language)
 {
 	parserObject* const parser = LanguageTable + language;
-	printMultitableStatistics (parser->lregexControlBlock,
-							   vfp);
+	printMultitableStatistics (parser->lregexControlBlock);
 }
 
 extern void addLanguageRegexTable (const langType language, const char *name)
@@ -4409,6 +4435,9 @@ extern bool processPretendOption (const char *const option, const char *const pa
 #if defined(DEBUG) && defined(HAVE_SECCOMP)
 extern void getppid(void);
 #endif
+
+static bool CTST_GatherStats;
+static int CTST_num_handled_char;
 
 typedef enum {
 	K_BROKEN,
@@ -4525,6 +4554,9 @@ static void createCTSTTags (void)
 			if ((c == CTST_Kinds[i].letter && i != K_NO_LETTER)
 				|| (c == '@' && i == K_NO_LETTER))
 			{
+				if (CTST_GatherStats)
+					CTST_num_handled_char++;
+
 				switch (i)
 				{
 					case K_BROKEN:
@@ -4626,6 +4658,17 @@ static void createCTSTTags (void)
 	TRACE_LEAVE();
 }
 
+static void initStatsCTST (langType lang CTAGS_ATTR_UNUSED)
+{
+	CTST_GatherStats = true;
+}
+
+static void printStatsCTST (langType lang CTAGS_ATTR_UNUSED)
+{
+	fprintf (stderr, "The number of handled chars: %d\n",
+			 CTST_num_handled_char);
+}
+
 static parserDefinition *CTagsSelfTestParser (void)
 {
 	static const char *const extensions[] = { NULL };
@@ -4637,5 +4680,7 @@ static parserDefinition *CTagsSelfTestParser (void)
 	def->invisible = true;
 	def->useMemoryStreamInput = true;
 	def->useCork = true;
+	def->initStats = initStatsCTST;
+	def->printStats = printStatsCTST;
 	return def;
 }

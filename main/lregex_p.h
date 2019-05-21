@@ -72,6 +72,6 @@ extern void notifyRegexInputEnd (struct lregexControlBlock *lcb);
 extern void addRegexTable (struct lregexControlBlock *lcb, const char *name);
 extern void extendRegexTable (struct lregexControlBlock *lcb, const char *src, const char *dist);
 
-extern void printMultitableStatistics (struct lregexControlBlock *lcb, FILE *vfp);
+extern void printMultitableStatistics (struct lregexControlBlock *lcb);
 
 #endif	/* CTAGS_MAIN_LREGEX_PRIVATEH */
