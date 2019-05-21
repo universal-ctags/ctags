@@ -941,7 +941,4 @@ dirent_set_errno(
 }
 #endif
 #endif /*DIRENT_H*/
-
-#else
-#error "dirent.h is not available."
 #endif /* HAVE_DIRENT_H */
