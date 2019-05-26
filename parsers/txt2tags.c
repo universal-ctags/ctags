@@ -42,7 +42,7 @@ static scopeSeparator Txt2TagsSeparators [] = {
 };
 
 static kindDefinition Txt2tagsKinds[] = {
-	{ true, 'm', "member", "sections",
+	{ true, 's', "section", "sections",
 	  ATTACH_SEPARATORS(Txt2TagsSeparators) },
 };
 

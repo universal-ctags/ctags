@@ -28,8 +28,8 @@
 */
 
 static kindDefinition AbcKinds[] = {
-	{ true, 'm', "member", "sections" },
-	{ true, 's', "struct",  "header1"}
+	{ true, 's', "section", "sections" },
+/*	{ true, 'h', "header",  "header1"} */
 };
 
 /*

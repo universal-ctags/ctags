@@ -30,7 +30,7 @@ typedef enum {
 } NsisKind;
 
 static kindDefinition NsisKinds [] = {
-	{ true, 'n', "namespace", "sections"},
+	{ true, 's', "section", "sections"},
 	{ true, 'f', "function", "functions"},
 	{ true, 'v', "variable", "variables"}
 };

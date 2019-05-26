@@ -29,9 +29,9 @@ typedef enum {
 } AbaqusKind;
 
 static kindDefinition AbaqusKinds[] = {
-     { true, 'c', "class",      "Parts" },
-     { true, 'm', "member",      "Assembly" },
-     { true, 'n', "namespace",      "Steps" }
+     { true, 'p', "part",     "Parts" },
+     { true, 'a', "assembly", "Assembly" },
+     { true, 's', "step",     "Steps" }
 };
 
 /*

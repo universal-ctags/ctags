@@ -38,10 +38,10 @@ typedef enum {
 } haskellKind;
 
 static kindDefinition HaskellKinds [] = {
-	{ true, 't', "typedef", "types" },
-	{ true, 'c', "macro", "type constructors" },
+	{ true, 't', "type", "types" },
+	{ true, 'c', "constructor", "type constructors" },
 	{ true, 'f', "function", "functions" },
-	{ true, 'm', "namespace", "modules"}
+	{ true, 'm', "module", "modules"}
 };
 
 

@@ -35,12 +35,12 @@ typedef enum {
 } docbookKind;
 
 static kindDefinition DocBookKinds [] = {
-	{ true,  'f', "function",   "chapters"},
-	{ true,  'c', "class",      "sections"},
-	{ true,  'm', "member",     "sect1"},
-	{ true,  'd', "macro",      "sect2"},
-	{ true,  'v', "variable",   "sect3"},
-	{ true,  's', "struct",     "appendix"}
+	{ true,  'c', "chapter",  "chapters"},
+	{ true,  's', "section",  "sections"},
+	{ true,  'd', "sect1",    "sect1"},
+	{ true,  'e', "sect2",    "sect2"},
+	{ true,  'f', "sect3",    "sect3"},
+	{ true,  'a', "appendix", "appendix"}
 };
 
 /*
