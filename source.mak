@@ -184,6 +184,8 @@ PARSER_HEADS = \
 	$(NULL)
 
 PARSER_SRCS =				\
+	parsers/abaqus.c		\
+	parsers/abc.c			\
 	parsers/ada.c			\
 	parsers/ant.c			\
 	parsers/asciidoc.c		\
@@ -222,6 +224,7 @@ PARSER_SRCS =				\
 	parsers/cxx/cxx_token.c		\
 	parsers/cxx/cxx_token_chain.c		\
 	parsers/diff.c			\
+	parsers/docbook.c		\
 	parsers/dosbatch.c		\
 	parsers/dtd.c			\
 	parsers/dts.c			\
@@ -232,6 +235,8 @@ PARSER_SRCS =				\
 	parsers/fortran.c		\
 	parsers/fypp.c			\
 	parsers/go.c			\
+	parsers/haskell.c		\
+	parsers/haxe.c			\
 	parsers/html.c			\
 	parsers/iniconf.c		\
 	parsers/itcl.c			\
@@ -246,12 +251,14 @@ PARSER_SRCS =				\
 	parsers/matlab.c		\
 	parsers/moose.c			\
 	parsers/myrddin.c		\
+	parsers/nsis.c			\
 	parsers/objc.c			\
 	parsers/ocaml.c			\
 	parsers/pascal.c		\
 	parsers/perl.c			\
 	parsers/perl6.c			\
 	parsers/php.c			\
+	parsers/powershell.c	\
 	parsers/protobuf.c		\
 	parsers/python.c		\
 	parsers/pythonloggingconfig.c	\
@@ -272,6 +279,7 @@ PARSER_SRCS =				\
 	parsers/tcloo.c			\
 	parsers/tex.c			\
 	parsers/ttcn.c			\
+	parsers/txt2tags.c		\
 	parsers/typescript.c		\
 	parsers/verilog.c		\
 	parsers/vhdl.c			\

@@ -43,6 +43,8 @@
 
 /* Add the name of any new parser definition function here */
 #define PARSER_LIST \
+	AbaqusParser, \
+	AbcParser, \
 	AdaParser, \
 	AntParser, \
 	AsciidocParser, \
@@ -66,6 +68,7 @@
 	CUDAParser, \
 	DParser, \
 	DiffParser, \
+	DocBookParser, \
 	DtdParser, \
 	DTSParser, \
 	DosBatchParser, \
@@ -79,6 +82,8 @@
 	FyppParser,	   \
 	GdbinitParser, \
 	GoParser, \
+	HaskellParser, \
+	HaxeParser, \
 	HtmlParser, \
 	IniconfParser, \
 	InkoParser, \
@@ -97,6 +102,7 @@
 	MatLabParser, \
 	MooseParser, \
 	MyrddinParser, \
+	NsisParser, \
 	ObjcParser, \
 	OldCppParser, \
 	OldCParser, \
@@ -106,6 +112,7 @@
 	PerlParser, \
 	Perl6Parser, \
 	PhpParser, \
+	PowerShellParser, \
 	PodParser, \
 	ProtobufParser, \
 	PuppetManifestParser, \
@@ -132,6 +139,7 @@
 	TclOOParser, \
 	TexParser, \
 	TTCNParser, \
+	Txt2tagsParser, \
 	TypeScriptParser, \
 	VeraParser, \
 	VerilogParser, \

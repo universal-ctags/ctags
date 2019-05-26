@@ -156,6 +156,8 @@
     <ClCompile Include="..\optlib\qemuhx.c" />
     <ClCompile Include="..\optlib\systemtap.c" />
     <ClCompile Include="..\optlib\inko.c" />
+    <ClCompile Include="..\parsers\abaqus.c" />
+    <ClCompile Include="..\parsers\abc.c" />
     <ClCompile Include="..\parsers\ada.c" />
     <ClCompile Include="..\parsers\ant.c" />
     <ClCompile Include="..\parsers\asciidoc.c" />
@@ -194,6 +196,7 @@
     <ClCompile Include="..\parsers\cxx\cxx_token.c" />
     <ClCompile Include="..\parsers\cxx\cxx_token_chain.c" />
     <ClCompile Include="..\parsers\diff.c" />
+    <ClCompile Include="..\parsers\docbook.c" />
     <ClCompile Include="..\parsers\dosbatch.c" />
     <ClCompile Include="..\parsers\dtd.c" />
     <ClCompile Include="..\parsers\dts.c" />
@@ -204,6 +207,8 @@
     <ClCompile Include="..\parsers\fortran.c" />
     <ClCompile Include="..\parsers\fypp.c" />
     <ClCompile Include="..\parsers\go.c" />
+    <ClCompile Include="..\parsers\haskell.c" />
+    <ClCompile Include="..\parsers\haxe.c" />
     <ClCompile Include="..\parsers\html.c" />
     <ClCompile Include="..\parsers\iniconf.c" />
     <ClCompile Include="..\parsers\itcl.c" />
@@ -218,12 +223,14 @@
     <ClCompile Include="..\parsers\matlab.c" />
     <ClCompile Include="..\parsers\moose.c" />
     <ClCompile Include="..\parsers\myrddin.c" />
+    <ClCompile Include="..\parsers\nsis.c" />
     <ClCompile Include="..\parsers\objc.c" />
     <ClCompile Include="..\parsers\ocaml.c" />
     <ClCompile Include="..\parsers\pascal.c" />
     <ClCompile Include="..\parsers\perl.c" />
     <ClCompile Include="..\parsers\perl6.c" />
     <ClCompile Include="..\parsers\php.c" />
+    <ClCompile Include="..\parsers\powershell.c" />
     <ClCompile Include="..\parsers\protobuf.c" />
     <ClCompile Include="..\parsers\python.c" />
     <ClCompile Include="..\parsers\pythonloggingconfig.c" />
@@ -244,6 +251,7 @@
     <ClCompile Include="..\parsers\tcloo.c" />
     <ClCompile Include="..\parsers\tex.c" />
     <ClCompile Include="..\parsers\ttcn.c" />
+    <ClCompile Include="..\parsers\txt2tags.c" />
     <ClCompile Include="..\parsers\typescript.c" />
     <ClCompile Include="..\parsers\verilog.c" />
     <ClCompile Include="..\parsers\vhdl.c" />
