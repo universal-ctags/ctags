@@ -1,0 +1,6 @@
+chapter1	input.docbook	/^  <chapter id="chapter1"><title>Required Chapter<\/title>$/;"	c
+intro	input.docbook	/^ <section id="intro">$/;"	s
+sect1	input.docbook	/^ <sect1 id="sect1">$/;"	d
+sect2	input.docbook	/^ <sect2 id="sect2">$/;"	e
+sect3	input.docbook	/^ <sect3 id="sect3">$/;"	f
+conclusion	input.docbook	/^ <section id="conclusion">$/;"	s

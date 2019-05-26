@@ -1,0 +1,9 @@
+Color	input.hx	/^enum Color {$/;"	e
+Printable	input.hx	/^interface Printable {$/;"	i
+toString	input.hx	/^    public function toString():String;$/;"	m
+User	input.hx	/^typedef User = {$/;"	t
+age	input.hx	/^  var age : Int;$/;"	v
+name	input.hx	/^  var name : String;$/;"	v
+Main	input.hx	/^class Main {$/;"	c
+member	input.hx	/^  static var member:String = "bar";$/;"	v
+main	input.hx	/^  static public function main():Void {$/;"	m
