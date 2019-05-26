@@ -120,6 +120,9 @@
     <ClCompile Include="..\main\portable-scandir.c">
       <Filter>Source Files\Main</Filter>
     </ClCompile>
+    <ClCompile Include="..\main\powershell.c">
+      <Filter>Source Files\Main</Filter>
+    </ClCompile>
     <ClCompile Include="..\main\promise.c">
       <Filter>Source Files\Main</Filter>
     </ClCompile>

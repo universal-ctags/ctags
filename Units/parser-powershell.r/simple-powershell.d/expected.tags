@@ -1,0 +1,15 @@
+ErrorActionPreference	input.ps1	/^$ErrorActionPreference = "Stop"$/;"	v
+Settings	input.ps1	/^$Global:Settings = $null$/;"	v
+ALocalVar	input.ps1	/^$Local:ALocalVar = $null$/;"	v
+BasePath	input.ps1	/^$BasePath = split-path -parent $Global:MyInvocation.InvocationName$/;"	v
+Read-Configuration-File	input.ps1	/^FUNCTION Read-Configuration-File() {$/;"	f	signature:()
+LogMessageOK	input.ps1	/^Function LogMessageOK()$/;"	f	signature:()
+LogMessage	input.ps1	/^function LogMessage() {$/;"	f	signature:()
+A-Global-Scope-Function	input.ps1	/^function global:A-Global-Scope-Function() {$/;"	f	signature:()
+MyFilter	input.ps1	/^filter Script:MyFilter {$/;"	f
+MyPrivateFilter	input.ps1	/^Filter Private:MyPrivateFilter {$/;"	f
+LoadTemplate	input.ps1	/^function LoadTemplate($template) {$/;"	f	signature:($template)
+TopLevelFunction	input.ps1	/^function TopLevelFunction() {$/;"	f	signature:()
+SecondLevelNestedFunction	input.ps1	/^    function SecondLevelNestedFunction() {$/;"	f	function:TopLevelFunction	signature:()
+ThirdLevelNestedFunction	input.ps1	/^        function ThirdLevelNestedFunction() {$/;"	f	function:TopLevelFunction::SecondLevelNestedFunction	signature:()
+Main	input.ps1	/^function Main() {$/;"	f	signature:()
