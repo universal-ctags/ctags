@@ -39,7 +39,6 @@ They have these additional language parsers:
 * `GLSL (c.c) <http://en.wikipedia.org/wiki/OpenGL_Shading_Language>`_
 * `Haskell <http://en.wikipedia.org/wiki/Haskell_%28programming_language%29>`_
 * `Haxe <http://en.wikipedia.org/wiki/Haxe>`_
-* `NSIS <http://en.wikipedia.org/wiki/Nullsoft_Scriptable_Install_System>`_
 * `txt2tags <http://en.wikipedia.org/wiki/Txt2tags>`_
 * `Vala (c.c) <http://en.wikipedia.org/wiki/Vala_%28programming_language%29>`_
 

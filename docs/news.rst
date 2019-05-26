@@ -68,6 +68,7 @@ The following parsers have been added:
 * Maven2 *libxml*
 * Moose *perl basesd subperser*
 * M4
+* NSIS
 * ObjectiveC
 * Passwd *optlib*
 * PuppetManifest *optlib*
