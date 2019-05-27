@@ -36,6 +36,8 @@ New parsers
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 The following parsers have been added:
 
+* Abaqus
+* Abc
 * Ada
 * AnsiblePlaybook *libyaml*
 * Asciidoc
@@ -50,6 +52,7 @@ The following parsers have been added:
 * D
 * DBusIntrospect *libxml*
 * Diff
+* Docbook
 * DTD
 * DTS
 * Elixir *optlib*
@@ -58,6 +61,8 @@ The following parsers have been added:
 * Gdbinit script *optlib*
 * Glade *libxml*
 * Go
+* Haskell
+* Haxe
 * Inko *optlib*
 * JavaProperties
 * JSON
@@ -67,11 +72,13 @@ The following parsers have been added:
 * Maven2 *libxml*
 * Moose *perl basesd subperser*
 * M4
+* Nsis
 * ObjectiveC
 * Passwd *optlib*
 * PuppetManifest *optlib*
 * Perl6
 * Pod *optlib*
+* Powershell
 * PropertyList(plist) *libxml*
 * Protobuf
 * PythonLoggingConfig
@@ -89,6 +96,7 @@ The following parsers have been added:
 * SVG *libxml*
 * TclOO (see :ref:`The new Tcl parser <tcl>`)
 * TTCN
+* Txt2tags
 * TypeScript
 * Varlink *peg/packcc*
 * WindRes

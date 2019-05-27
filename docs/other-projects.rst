@@ -23,7 +23,6 @@ Geany has created a library out of ctags
 Their language parsers have many improvements to various parsers.
 Changes known by devs worth backporting:
 
-* HTML reads <h1><h2><h3> tags
 * Make has support for targets
 * Various fixes for D parser (c.c), but currently the code diverges
   from ours to some extent.
@@ -31,24 +30,9 @@ Changes known by devs worth backporting:
 
 They have these additional language parsers:
 
-* `Abaqus <http://en.wikipedia.org/wiki/Abaqus>`_
-* `ActionScript <http://en.wikipedia.org/wiki/ActionScript>`_
-* `AsciiDoc <http://en.wikipedia.org/wiki/AsciiDoc>`_
-* `DocBook <http://en.wikipedia.org/wiki/DocBook>`_
 * `Ferite (c.c) <http://en.wikipedia.org/wiki/Ferite>`_
 * `GLSL (c.c) <http://en.wikipedia.org/wiki/OpenGL_Shading_Language>`_
-* `Haskell <http://en.wikipedia.org/wiki/Haskell_%28programming_language%29>`_
-* `Haxe <http://en.wikipedia.org/wiki/Haxe>`_
-* `NSIS <http://en.wikipedia.org/wiki/Nullsoft_Scriptable_Install_System>`_
-* `txt2tags <http://en.wikipedia.org/wiki/Txt2tags>`_
 * `Vala (c.c) <http://en.wikipedia.org/wiki/Vala_%28programming_language%29>`_
-
-These changes have been merged:
-
-* Fix regex callback match count - https://github.com/universal-ctags/ctags/pull/104
-* SQL tags are stored with scopes instead of "tablename.field" - https://github.com/universal-ctags/ctags/pull/100
-* Some fixes for D parser
-* C++11's enum class/struct support
 
 .. include:: tracking.rst
 
