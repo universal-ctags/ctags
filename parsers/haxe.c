@@ -4,7 +4,10 @@
  *       This source code is released for free distribution under the terms of the
  *       GNU General Public License.
  *
- *              borrowed from PHP
+ *       This module contains functions for generating tags for Haxe files
+ *       (https://en.wikipedia.org/wiki/Haxe).
+ *
+ *       Borrowed from PHP.
  */
 
 /*

@@ -6,7 +6,9 @@
  *   GNU General Public License.
  *
  *   This module contains functions for generating tags for source files
- *   for docbook files(based on TeX parser from Jérôme Plût).
+ *   for docbook files (https://en.wikipedia.org/wiki/DocBook).
+ *
+ *   Based on TeX parser from Jérôme Plût.
  */
 
 /*

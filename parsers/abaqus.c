@@ -5,7 +5,7 @@
  *   GNU General Public License.
  *
  *   This module contains functions for generating tags for source files
- *   for inp files (Abaqus).
+ *   for Abaqus inp files (https://en.wikipedia.org/wiki/Abaqus).
  */
 
 /*

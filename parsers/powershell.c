@@ -7,7 +7,8 @@
 *   This source code is released for free distribution under the terms of the
 *   GNU General Public License.
 *
-*   This module contains code for generating tags for Windows PowerShell scripts.
+*   This module contains code for generating tags for Windows PowerShell scripts
+*   (https://en.wikipedia.org/wiki/PowerShell).
 */
 
 /*

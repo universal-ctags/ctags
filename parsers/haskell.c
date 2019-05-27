@@ -1,4 +1,3 @@
-
 /*
 * Copyright (c) 2003, Peter Strand <peter@zarquon.se>
 *
@@ -6,9 +5,7 @@
 * GNU General Public License.
 *
 * This module contains functions for generating tags for Haskell language
-* files.
-*
-*
+* files (https://en.wikipedia.org/wiki/Haskell_(programming_language)).
 *
 * Does not handle operators or infix definitions like:
 * a `f` b = ...

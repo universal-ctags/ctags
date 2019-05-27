@@ -5,7 +5,10 @@
 *   This source code is released for free distribution under the terms of the
 *   GNU General Public License.
 *
-*   This module contains functions for generating tags for NSIS scripts (based on sh.c).
+*   This module contains functions for generating tags for NSIS scripts
+*   (https://en.wikipedia.org/wiki/Nullsoft_Scriptable_Install_System).
+*
+*   Based on sh.c.
 */
 
 /*
