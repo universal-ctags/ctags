@@ -346,7 +346,7 @@ extern parserDefinition* HaskellParser (void)
 extern parserDefinition* LiterateHaskellParser (void)
 {
 	static const char *const extensions [] = { "lhs", NULL };
-	parserDefinition* def = parserNew ("Literate Haskell");
+	parserDefinition* def = parserNew ("LiterateHaskell");
 	def->kindTable  = HaskellKinds;
 	def->kindCount  = ARRAY_SIZE(HaskellKinds);
 	def->extensions = extensions;
