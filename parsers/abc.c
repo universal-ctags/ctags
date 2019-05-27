@@ -39,13 +39,10 @@ static kindDefinition AbcKinds[] = {
 *   FUNCTION DEFINITIONS
 */
 
-static void makeAbcTag (const vString* const name, bool name_before)
+static void makeAbcTag (const vString* const name)
 {
 	tagEntryInfo e;
 	initTagEntry (&e, vStringValue(name), K_SECTION);
-
-	if (name_before)
-		e.lineNumber--;	/* we want the line before the underline chars */
 
 	makeTagEntry(&e);
 }
@@ -60,7 +57,7 @@ static void findAbcTags (void)
 		if (line[0] == 'T') {
 			vStringCatS(name, " / ");
 			vStringCatS(name, (const char *) line);
-			makeAbcTag(name, false);
+			makeAbcTag(name);
 		}
 		else {
 			vStringClear (name);
