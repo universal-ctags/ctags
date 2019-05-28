@@ -52,7 +52,7 @@ The following parsers have been added:
 * D
 * DBusIntrospect *libxml*
 * Diff
-* Docbook
+* DocBook
 * DTD
 * DTS
 * Elixir *optlib*
@@ -72,13 +72,13 @@ The following parsers have been added:
 * Maven2 *libxml*
 * Moose *perl basesd subperser*
 * M4
-* Nsis
+* NSIS
 * ObjectiveC
 * Passwd *optlib*
 * PuppetManifest *optlib*
 * Perl6
 * Pod *optlib*
-* Powershell
+* PowerShell
 * PropertyList(plist) *libxml*
 * Protobuf
 * PythonLoggingConfig

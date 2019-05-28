@@ -143,7 +143,7 @@ static void findDocBookTags(void)
 extern parserDefinition* DocBookParser (void)
 {
 	static const char *const extensions [] = { "sgml", "docbook", NULL };
-	parserDefinition* def = parserNew ("Docbook");
+	parserDefinition* def = parserNew ("DocBook");
 	def->extensions = extensions;
 	def->kindTable  = DocBookKinds;
 	def->kindCount  = ARRAY_SIZE (DocBookKinds);
