@@ -1,0 +1,4 @@
+--sort=no
+--fields=+rEn
+--extras=+r
+--kinds-Perl=+M

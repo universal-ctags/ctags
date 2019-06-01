@@ -1,0 +1,12 @@
+constant	input.pl	/^use constant$/;"	M	line:2	roles:used	extras:reference
+ONE	input.pl	/^ONE => 1;$/;"	c	line:3	roles:def
+diagnostics	input.pl	/^use diagnostics;$/;"	M	line:4	roles:used	extras:reference
+integer	input.pl	/^use integer;$/;"	M	line:5	roles:used	extras:reference
+sigtrap	input.pl	/^use sigtrap  qw(SEGV BUS);$/;"	M	line:6	roles:used	extras:reference
+strict	input.pl	/^use strict   qw(subs vars refs);$/;"	M	line:7	roles:used	extras:reference
+subs	input.pl	/^use subs     qw(afunc blurfl);$/;"	M	line:8	roles:used	extras:reference
+warnings	input.pl	/^use warnings qw(all);$/;"	M	line:9	roles:used	extras:reference
+sort	input.pl	/^use sort     qw(stable _quicksort _mergesort);$/;"	M	line:10	roles:used	extras:reference
+integer	input.pl	/^no integer;$/;"	M	line:12	roles:unused	extras:reference
+strict	input.pl	/^no strict 'refs';$/;"	M	line:13	roles:unused	extras:reference
+warnings	input.pl	/^no warnings;$/;"	M	line:14	roles:unused	extras:reference
