@@ -36,6 +36,7 @@ typedef enum PerlModuleRoleType perlModuleRole;
 
 static roleDefinition PerlModuleRoles [] = {
 	{ true, "used",   "specified in `use' built-in function" },
+	{ true, "unused", "specified in `no' built-in function" },
 };
 
 static kindDefinition PerlKinds [] = {
@@ -414,13 +415,14 @@ static void findPerlTags (void)
 				vStringPut(module, *cp);
 				++cp;
 			}
-			if (module) {
-				bool isConstant = (strcmp(vStringValue(module), "constant") == 0);
-				makeTagForModule(vStringValue(module), ROLE_PERL_MODULE_USED);
-				vStringDelete(module);
-				if (!isConstant)
-					continue;
-			}
+			if (!module)
+				continue;
+
+			makeTagForModule(vStringValue(module), ROLE_PERL_MODULE_USED);
+			bool isConstant = (strcmp(vStringValue(module), "constant") == 0);
+			vStringDelete(module);
+			if (!isConstant)
+				continue;
 
 			/* Skip up to the first non-space character, skipping empty
 			 * and comment lines.
@@ -445,6 +447,24 @@ static void findPerlTags (void)
 			kind = KIND_PERL_CONSTANT;
 			spaceRequired = false;
 			qualified = true;
+		}
+		else if (strncmp((const char*) cp, "no", (size_t) 2) == 0 && isspace(cp[2]))
+		{
+			cp += 3;
+			while (isspace (*cp))
+				cp++;
+			vString *module = NULL;
+			while (isalnum(*cp) || *cp == ':' || *cp == '.') {
+				if (!module)
+					module = vStringNew();
+				vStringPut(module, *cp);
+				++cp;
+			}
+			if (module) {
+				makeTagForModule(vStringValue(module), ROLE_PERL_MODULE_UNUSED);
+				vStringDelete(module);
+			}
+			continue;
 		}
 		else if (strncmp((const char*) cp, "package", (size_t) 7) == 0 &&
 				 ('\0' == cp[7] || isspace(cp[7])))

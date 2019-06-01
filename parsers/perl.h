@@ -18,6 +18,7 @@ typedef struct sPerlSubparser perlSubparser;
 
 enum PerlModuleRoleType {
 	ROLE_PERL_MODULE_USED,
+	ROLE_PERL_MODULE_UNUSED,
 };
 
 enum PerlKindType {
