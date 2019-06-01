@@ -35,3 +35,13 @@ Point4D	input.pl	/^package Point4D;$/;"	class	line:48	language:Moose	inherits:Po
 clear	input.pl	/^override "clear" => sub {$/;"	method	line:54	language:Moose	class:Point4D
 Moose	input.pl	/^no Moose;$/;"	module	line:57	language:Perl
 Line	input.pl	/^package Line;$/;"	package	line:58	language:Perl
+Cat::Food	input-0.pl	/^package Cat::Food;$/;"	package	line:2	language:Perl
+Moo	input-0.pl	/^use Moo;$/;"	module	line:4	language:Perl
+Cat::Food	input-0.pl	/^package Cat::Food;$/;"	class	line:2	language:Moose	end:31
+strictures	input-0.pl	/^use strictures 2;$/;"	module	line:5	language:Perl
+namespace::clean	input-0.pl	/^use namespace::clean;$/;"	module	line:6	language:Perl
+feed_lion	input-0.pl	/^sub feed_lion {$/;"	subroutine	line:8	language:Perl
+feed_lion	input-0.pl	/^sub feed_lion {$/;"	method	line:8	language:Moose	class:Cat::Food
+taste	input-0.pl	/^has taste => ($/;"	attribute	line:15	language:Moose	class:Cat::Food
+brand	input-0.pl	/^has brand => ($/;"	attribute	line:19	language:Moose	class:Cat::Food
+pounds	input-0.pl	/^has pounds => ($/;"	attribute	line:26	language:Moose	class:Cat::Food

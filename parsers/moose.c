@@ -6,6 +6,18 @@
  *
  *   This module contains functions for generating tags for Moose perl extension.
  *   https://metacpan.org/pod/Moose
+ *
+ *   This module can gather tags for Moo perl extension, too.
+ *   https://metacpan.org/pod/Moo
+ *
+ *   From the output of this parser, a client cannot know which extension is used
+ *   in the input source file. However, perl parser can give you hints about the
+ *   extension; with "--extras=+r --kinds-Perl=+M" options, the perl parser tags
+ *   module names specified as arguments for `use' perl built-in function.
+ *   You don't need the options if you just want to run This parser.
+ *   This parser just needs --extras=+s option that run subparsers including this
+ *   parser.
+ *
  */
 
 /* NOTE about kind/role design:
@@ -171,12 +183,14 @@ static void makeTagEntryNotify (subparser *s, const tagEntryInfo *tag, int corkI
 	{
 		if (isRoleAssigned(tag, ROLE_PERL_MODULE_USED))
 		{
-			if (strcmp (tag->name, "Moose") == 0)
+			if (strcmp (tag->name, "Moose") == 0
+				|| strcmp (tag->name, "Moo") == 0)
 				enterMoose (moose);
 		}
 		else if (isRoleAssigned(tag, ROLE_PERL_MODULE_UNUSED))
 		{
-			if (strcmp (tag->name, "Moose") == 0)
+			if (strcmp (tag->name, "Moose") == 0
+				|| strcmp (tag->name, "Moo") == 0)
 				leaveMoose (moose);
 		}
 	}
