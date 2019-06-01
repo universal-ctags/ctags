@@ -1,4 +1,5 @@
 Point	input.pl	/^package Point;$/;"	package	line:2	language:Perl
+Moose	input.pl	/^use Moose; # automatically turns on strict and warnings$/;"	module	line:3	language:Perl
 Point	input.pl	/^package Point;$/;"	class	line:2	language:Moose
 x	input.pl	/^has 'x' => (is => 'rw', isa => 'Int');$/;"	attribute	line:5	language:Moose	class:Point
 y	input.pl	/^has 'y' => (is => 'rw', isa => 'Int');$/;"	attribute	line:6	language:Moose	class:Point
@@ -19,14 +20,18 @@ z7	input.pl	/^has ([qw|z6	z7|] => (is => 'rw'), (is => 'rw'));$/;"	attribute	lin
 clear	input.pl	/^sub clear {$/;"	subroutine	line:23	language:Perl
 clear	input.pl	/^sub clear {$/;"	method	line:23	language:Moose	class:Point
 Point3D	input.pl	/^package Point3D;$/;"	package	line:29	language:Perl
+Moose	input.pl	/^use Moose;$/;"	module	line:30	language:Perl
 Point3D	input.pl	/^package Point3D;$/;"	class	line:29	language:Moose	inherits:Point
 z	input.pl	/^has 'z' => (is => 'rw', isa => 'Int');$/;"	attribute	line:34	language:Moose	class:Point3D
 clear	input.pl	/^before 'clear' => sub {$/;"	wrapper	line:36	language:Moose	class:Point3D	wrapping:before
 clear	input.pl	/^after 'clear' => sub {$/;"	wrapper	line:39	language:Moose	class:Point3D	wrapping:after
 clear	input.pl	/^around 'clear' => sub {$/;"	wrapper	line:42	language:Moose	class:Point3D	wrapping:around
 TimeAxis	input.pl	/^package TimeAxis;$/;"	package	line:45	language:Perl
+Moose	input.pl	/^use Moose;$/;"	module	line:46	language:Perl
 TimeAxis	input.pl	/^package TimeAxis;$/;"	class	line:45	language:Moose
 Point4D	input.pl	/^package Point4D;$/;"	package	line:48	language:Perl
+Moose	input.pl	/^use Moose;$/;"	module	line:49	language:Perl
 Point4D	input.pl	/^package Point4D;$/;"	class	line:48	language:Moose	inherits:Point3D,TimeAxis	end:57
 clear	input.pl	/^override "clear" => sub {$/;"	method	line:54	language:Moose	class:Point4D
+Moose	input.pl	/^no Moose;$/;"	module	line:57	language:Perl
 Line	input.pl	/^package Line;$/;"	package	line:58	language:Perl

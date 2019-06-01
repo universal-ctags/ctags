@@ -34,6 +34,8 @@
 #include "routines.h"
 #include "trace.h"
 
+#include <string.h>
+
 /*
  *   DATA DECLARATIONS
  */
@@ -94,6 +96,8 @@ struct mooseSubparser {
 static void inputStart (subparser *s);
 static void inputEnd (subparser *s);
 static void makeTagEntryNotify (subparser *s, const tagEntryInfo *tag, int corkIndex);
+static void enterMoose (struct mooseSubparser *moose);
+static void leaveMoose (struct mooseSubparser *moose);
 static void enteringPodNotify (perlSubparser *perl);
 static void leavingPodNotify  (perlSubparser *perl);
 
@@ -163,6 +167,19 @@ static void makeTagEntryNotify (subparser *s, const tagEntryInfo *tag, int corkI
 		moose_e.extensionFields.scopeIndex = moose->classCork;
 		makeTagEntry (&moose_e);
 	}
+	else if (tag->kindIndex == KIND_PERL_MODULE)
+	{
+		if (isRoleAssigned(tag, ROLE_PERL_MODULE_USED))
+		{
+			if (strcmp (tag->name, "Moose") == 0)
+				enterMoose (moose);
+		}
+		else if (isRoleAssigned(tag, ROLE_PERL_MODULE_UNUSED))
+		{
+			if (strcmp (tag->name, "Moose") == 0)
+				leaveMoose (moose);
+		}
+	}
 }
 
 static void enteringPodNotify (perlSubparser *perl)
@@ -177,16 +194,8 @@ static void leavingPodNotify  (perlSubparser *perl)
 	moose->inPod = false;
 }
 
-static bool leaveMoose (const char *line CTAGS_ATTR_UNUSED,
-						const regexMatch *matches CTAGS_ATTR_UNUSED,
-						unsigned int count CTAGS_ATTR_UNUSED,
-						void *data)
+static void leaveMoose (struct mooseSubparser *moose)
 {
-	struct mooseSubparser *moose = data;
-
-	if (moose->inPod)
-		return true;
-
 	moose->notContinuousExtendsLines = true;
 
 	tagEntryInfo *e = getEntryInCorkQueue (moose->classCork);
@@ -196,23 +205,14 @@ static bool leaveMoose (const char *line CTAGS_ATTR_UNUSED,
 	moose->classCork = CORK_NIL;
 	moose->notInMoose = true;
 	moose->packageCork = CORK_NIL;
-	return true;
 }
 
-static bool enterMoose (const char *line CTAGS_ATTR_UNUSED,
-						const regexMatch *matches CTAGS_ATTR_UNUSED,
-						unsigned int count CTAGS_ATTR_UNUSED,
-						void *data)
+static void enterMoose (struct mooseSubparser *moose)
 {
-	struct mooseSubparser *moose = data;
-
-	if (moose->inPod)
-		return true;
-
 	moose->notContinuousExtendsLines = true;
 
 	if (moose->packageCork == CORK_NIL)
-		return true;
+		return;
 
 	moose->notInMoose = false;
 	tagEntryInfo *perl_e = getEntryInCorkQueue (moose->packageCork);
@@ -224,7 +224,7 @@ static bool enterMoose (const char *line CTAGS_ATTR_UNUSED,
 	moose_e.filePosition = perl_e->filePosition;
 	moose->classCork = makeTagEntry (&moose_e);
 
-	return true;
+	return;
 }
 
 static void parseExtendsClass (const char *input,
@@ -447,14 +447,6 @@ static void findMooseTags (void)
 
 static void initializeMooseParser (langType language)
 {
-	addLanguageCallbackRegex (language, "^[ \t]*use +Moose *;",
-							  "{exclusive}",
-							  enterMoose, NULL,
-							  &mooseSubparser);
-	addLanguageCallbackRegex (language, "^[ \t]*no +Moose *;",
-							  "{exclusive}",
-							  leaveMoose, &mooseSubparser.notInMoose,
-							  &mooseSubparser);
 	addLanguageCallbackRegex (language, "^[ \t]*extends *(.+)",
 							  "{exclusive}",
 							  findExtendsClass, &mooseSubparser.notInMoose,
