@@ -46,6 +46,7 @@ M4             I/macrofile       sincluded           on      silently included m
 M4             d/macro           undef               on      undefined
 Make           I/makefile        included            on      included
 Make           I/makefile        optional            on      optionally included
+Perl           M/module          used                on      specified in `use' built-in function
 Python         i/module          imported            on      imported modules
 Python         i/module          indirectly-imported on      module imported in alternative name
 Python         i/module          namespace           on      namespace from where classes/variables/functions are imported
@@ -111,6 +112,7 @@ M4             I/macrofile       sincluded           on      silently included m
 M4             d/macro           undef               on      undefined
 Make           I/makefile        included            on      included
 Make           I/makefile        optional            on      optionally included
+Perl           M/module          used                on      specified in `use' built-in function
 Python         i/module          imported            on      imported modules
 Python         i/module          indirectly-imported on      module imported in alternative name
 Python         i/module          namespace           on      namespace from where classes/variables/functions are imported
