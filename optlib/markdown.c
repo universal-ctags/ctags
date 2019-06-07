@@ -13,10 +13,19 @@ static void initializeMarkdownParser (const langType language)
 
 	addLanguageRegexTable (language, "main");
 	addLanguageRegexTable (language, "sharp");
+	addLanguageRegexTable (language, "rest");
+	addLanguageRegexTable (language, "codeblockBacktick");
+	addLanguageRegexTable (language, "codeblockTildes");
 
 	addLanguageTagMultiTableRegex (language, "main",
 	                               "^#",
 	                               "", "", "{tjump=sharp}{_advanceTo=0start}", NULL);
+	addLanguageTagMultiTableRegex (language, "main",
+	                               "^[ \t]*````*[^`\n]*[\n]",
+	                               "", "", "{tenter=codeblockBacktick}", NULL);
+	addLanguageTagMultiTableRegex (language, "main",
+	                               "^[ \t]*~~~~*[^~\n]*[\n]",
+	                               "", "", "{tenter=codeblockTildes}", NULL);
 	addLanguageTagMultiTableRegex (language, "main",
 	                               "^([^\n]+)[\n]=+[\n]",
 	                               "\\1", "c", "{_field=sectionMarker:=}", NULL);
@@ -77,6 +86,39 @@ static void initializeMarkdownParser (const langType language)
 	addLanguageTagMultiTableRegex (language, "sharp",
 	                               "^[^\n]+",
 	                               "", "", "{tjump=main}", NULL);
+	addLanguageTagMultiTableRegex (language, "rest",
+	                               "^[^\n]+[\n]",
+	                               "", "", "", NULL);
+	addLanguageTagMultiTableRegex (language, "rest",
+	                               "^[\n]+",
+	                               "", "", "", NULL);
+	addLanguageTagMultiTableRegex (language, "rest",
+	                               "^[^\n]+",
+	                               "", "", "", NULL);
+	addLanguageTagMultiTableRegex (language, "codeblockBacktick",
+	                               "^[ \t]*````*[ \t]*[\n]",
+	                               "", "", "{tleave}", NULL);
+	addLanguageTagMultiTableRegex (language, "codeblockBacktick",
+	                               "^[^\n]+[\n]",
+	                               "", "", "", NULL);
+	addLanguageTagMultiTableRegex (language, "codeblockBacktick",
+	                               "^[\n]+",
+	                               "", "", "", NULL);
+	addLanguageTagMultiTableRegex (language, "codeblockBacktick",
+	                               "^[^\n]+",
+	                               "", "", "", NULL);
+	addLanguageTagMultiTableRegex (language, "codeblockTildes",
+	                               "^[ \t]*~~~~*[ \t]*[\n]",
+	                               "", "", "{tleave}", NULL);
+	addLanguageTagMultiTableRegex (language, "codeblockTildes",
+	                               "^[^\n]+[\n]",
+	                               "", "", "", NULL);
+	addLanguageTagMultiTableRegex (language, "codeblockTildes",
+	                               "^[\n]+",
+	                               "", "", "", NULL);
+	addLanguageTagMultiTableRegex (language, "codeblockTildes",
+	                               "^[^\n]+",
+	                               "", "", "", NULL);
 }
 
 extern parserDefinition* MarkdownParser (void)
