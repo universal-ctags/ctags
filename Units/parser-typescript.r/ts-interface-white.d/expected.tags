@@ -1,0 +1,35 @@
+Mover	input.ts	/^interface Mover {$/;"	i
+move	input.ts	/^  move(): void$/;"	m	interface:Mover
+getStatus	input.ts	/^  getStatus(): { speed: number }$/;"	m	interface:Mover
+Shaker	input.ts	/^interface Shaker {$/;"	i
+shake	input.ts	/^  shake(): void$/;"	m	interface:Shaker
+getStatus	input.ts	/^  getStatus(): { frequency: number }$/;"	m	interface:Shaker
+MoverShaker	input.ts	/^interface MoverShaker extends Mover, Shaker {$/;"	i
+getStatus	input.ts	/^  getStatus(\/*)*\/): { speed: number; frequency: number }$/;"	m	interface:MoverShaker
+getSomething	input.ts	/^  getSomething(): \/* } *\/ void$/;"	m	interface:MoverShaker
+getSomethingSophisticated	input.ts	/^  getSomethingSophisticated()\/*$/;"	m	interface:MoverShaker
+getTpl	input.ts	/^  getTpl<T>(): Promise<T>$/;"	m	interface:MoverShaker
+SimpleRecord	input.ts	/^interface SimpleRecord {$/;"	i
+propertyA	input.ts	/^  propertyA: number$/;"	p	interface:SimpleRecord
+propertyB	input.ts	/^  propertyB: string$/;"	p	interface:SimpleRecord
+propertyC	input.ts	/^  readonly propertyC: []$/;"	p	interface:SimpleRecord
+withoutType	input.ts	/^  withoutType?$/;"	p	interface:SimpleRecord
+Document	input.ts	/^interface Document {$/;"	i
+createElement	input.ts	/^  createElement(tagName: "div"): HTMLDivElement$/;"	m	interface:Document
+createElement	input.ts	/^  createElement(tagName: "span"): HTMLSpanElement$/;"	m	interface:Document
+createElement	input.ts	/^  createElement(tagName: "canvas"): HTMLCanvasElement$/;"	m	interface:Document
+createElement	input.ts	/^  createElement(tagName: string): HTMLElement$/;"	m	interface:Document
+CompilerOptions	input.ts	/^interface CompilerOptions {$/;"	i
+strict	input.ts	/^  strict?: boolean$/;"	p	interface:CompilerOptions
+sourcePath	input.ts	/^  sourcePath?: string$/;"	p	interface:CompilerOptions
+targetPath	input.ts	/^  targetPath?: string$/;"	p	interface:CompilerOptions
+List	input.ts	/^interface List<T> {$/;"	i
+data	input.ts	/^  data: T$/;"	p	interface:List
+next	input.ts	/^  next: List<T>$/;"	p	interface:List
+owner	input.ts	/^  owner: List<List<T>>$/;"	p	interface:List
+JQuery	input.ts	/^interface JQuery {$/;"	i
+text	input.ts	/^  text(content: string)$/;"	m	interface:JQuery
+JQueryStatic	input.ts	/^interface JQueryStatic {$/;"	i
+get	input.ts	/^  get(url: string, callback: (data: string) => any)$/;"	m	interface:JQueryStatic
+Array	input.ts	/^interface Array<T> {$/;"	i
+length	input.ts	/^  length: number$/;"	p	interface:Array
