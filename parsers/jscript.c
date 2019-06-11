@@ -2225,9 +2225,12 @@ nextVar:
 			 * Or checks if this is a hash variable.
 			 *     var z = {};
 			 */
+			bool anonClass = vStringIsEmpty (name->string);
+			if (anonClass)
+				anonGenerate (name->string, "AnonymousClass", JSTAG_CLASS);
 			has_methods = parseMethods(token, name, false);
 			if (has_methods)
-				makeJsTag (name, JSTAG_CLASS, NULL, NULL);
+				makeJsTagCommon (name, JSTAG_CLASS, NULL, NULL, anonClass);
 			else
 			{
 				/*
