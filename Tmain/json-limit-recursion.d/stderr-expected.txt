@@ -1,0 +1,10 @@
+# depth: 512, items: 1
+# depth: 512, items: 2
+# depth: 513, items: 1
+# depth: 513, items: 2
+# depth: 513, items: 1, NO QUIET
+ctags: Notice: No options will be read from files or environment
+ctags: Notice: Terminate parsing: too deep brackets recursion in input513-one.json at 5
+# depth: 513, items: 2, NO QUIET
+ctags: Notice: No options will be read from files or environment
+ctags: Notice: Terminate parsing: too deep brackets recursion in input513-two.json at 6
