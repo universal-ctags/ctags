@@ -1535,7 +1535,10 @@ static bool parseBlock (tokenInfo *const token, const vString *const parentScope
 static bool parseMethods (tokenInfo *const token, const tokenInfo *const class,
                           const bool is_es6_class)
 {
-	TRACE_ENTER();
+	TRACE_ENTER_TEXT("token is '%s' of type %s in classToken '%s' of type %s (es6: %s)",
+					 vStringValue(token->string), tokenTypeName (token->type),
+					 vStringValue(class->string), tokenTypeName (class->type),
+					 is_es6_class? "yes": "no");
 
 	tokenInfo *const name = newToken ();
 	bool has_methods = false;
@@ -1749,7 +1752,7 @@ cleanUp:
 	vStringDelete (saveScope);
 	deleteToken (name);
 
-	TRACE_LEAVE();
+	TRACE_LEAVE_TEXT("found method(s): %s", has_methods? "yes": "no");
 
 	return has_methods;
 }
@@ -1830,7 +1833,7 @@ static bool parseES6Class (tokenInfo *const token, const tokenInfo *targetName)
 
 static bool parseStatement (tokenInfo *const token, bool is_inside_class)
 {
-	TRACE_ENTER();
+	TRACE_ENTER_TEXT("is_inside_class: %s", is_inside_class? "yes": "no");
 
 	tokenInfo *const name = newToken ();
 	tokenInfo *const secondary_name = newToken ();
