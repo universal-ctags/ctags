@@ -2675,7 +2675,7 @@ extern parserDefinition* JavaScriptParser (void)
 {
 	// .jsx files are JSX: https://facebook.github.io/jsx/
 	// which have JS function definitions, so we just use the JS parser
-	static const char *const extensions [] = { "js", "jsx", NULL };
+	static const char *const extensions [] = { "js", "jsx", "mjs", NULL };
 	static const char *const aliases [] = { "js", "node", "nodejs",
 	                                        "seed", "gjs", NULL };
 	parserDefinition *const def = parserNew ("JavaScript");
