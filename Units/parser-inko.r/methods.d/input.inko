@@ -13,3 +13,12 @@ object C {
     }
   }
 }
+
+def + {}
+def - {}
+def * {}
+def / {}
+def % {}
+def ^ {}
+def [] {}
+def []= {}
