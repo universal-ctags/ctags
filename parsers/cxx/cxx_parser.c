@@ -676,7 +676,7 @@ bool cxxParserParseEnum(void)
 			(!(uInitialKeywordState & CXXParserKeywordStateSeenTypedef))
 		)
 	{
-		CXX_DEBUG_PRINT("Maybe KnR funciton definition");
+		CXX_DEBUG_PRINT("Maybe KnR function definition");
 
 		switch(cxxParserMaybeParseKnRStyleFunctionDefinition())
 		{
@@ -1777,7 +1777,7 @@ bool cxxParserParseIfForWhileSwitchCatchParenthesis(void)
 					break;
 					default:
 						// should NOT happen!
-						CXX_DEBUG_ASSERT(false,"Unexpecte token type");
+						CXX_DEBUG_ASSERT(false,"Unexpected token type");
 					break;
 				}
 			} else {
