@@ -198,6 +198,11 @@ extern int makeSimpleRefTag (const vString* const name, const int kindIndex,
 	return r;
 }
 
+extern int makeSimplePlaceholder(const vString* const name)
+{
+	return makePlaceholder (vStringValue (name));
+}
+
 extern bool isLanguageEnabled (const langType language)
 {
 	const parserDefinition* const lang = LanguageTable [language].def;
