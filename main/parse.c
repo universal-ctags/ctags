@@ -148,9 +148,9 @@ static unsigned int LanguageCount = 0;
 static hashTable* LanguageHTable = NULL;
 static kindDefinition defaultFileKind = {
 	.enabled     = false,
-	.letter      = KIND_FILE_DEFAULT,
-	.name        = KIND_FILE_DEFAULT_LONG,
-	.description = KIND_FILE_DEFAULT_LONG,
+	.letter      = KIND_FILE_DEFAULT_LETTER,
+	.name        = KIND_FILE_DEFAULT_NAME,
+	.description = KIND_FILE_DEFAULT_NAME,
 };
 
 /*
@@ -283,9 +283,9 @@ extern const char *getLanguageKindName (const langType language, const int kindI
 }
 
 static kindDefinition kindGhost = {
-	.letter = KIND_GHOST,
-	.name = KIND_GHOST_LONG,
-	.description = KIND_GHOST_LONG,
+	.letter = KIND_GHOST_LETTER,
+	.name = KIND_GHOST_NAME,
+	.description = KIND_GHOST_NAME,
 };
 
 extern int defineLanguageKind (const langType language, kindDefinition *def,
@@ -330,7 +330,7 @@ extern kindDefinition* getLanguageKindForLetter (const langType language, char k
 	Assert (0 <= language  &&  language < (int) LanguageCount);
 	if (kindLetter == LanguageTable [language].fileKind->letter)
 		return LanguageTable [language].fileKind;
-	else if (kindLetter == KIND_GHOST)
+	else if (kindLetter == KIND_GHOST_LETTER)
 		return &kindGhost;
 	else
 		return getKindForLetter (LanguageTable [language].kindControlBlock, kindLetter);
@@ -343,7 +343,7 @@ extern kindDefinition* getLanguageKindForName (const langType language, const ch
 
 	if (strcmp(kindName, LanguageTable [language].fileKind->name) == 0)
 		return LanguageTable [language].fileKind;
-	else if (strcmp(kindName, KIND_GHOST_LONG) == 0)
+	else if (strcmp(kindName, KIND_GHOST_NAME) == 0)
 		return &kindGhost;
 	else
 		return getKindForName (LanguageTable [language].kindControlBlock, kindName);
@@ -556,9 +556,9 @@ static bool processLangDefineScopesep(const langType language,
 		error (FATAL, "no scope separator specified in \"--%s\" option", option);
 	else if (parentKletter == '/')
 		parentKindex = KIND_GHOST_INDEX;
-	else if (parentKletter == KIND_WILDCARD)
+	else if (parentKletter == KIND_WILDCARD_LETTER)
 		parentKindex = KIND_WILDCARD_INDEX;
-	else if (parentKletter == KIND_FILE_DEFAULT)
+	else if (parentKletter == KIND_FILE_DEFAULT_LETTER)
 		error (FATAL,
 			   "the kind letter `F' in \"--%s\" option is reserved for \"file\" kind and no separator can be assigned to",
 			   option);
@@ -600,7 +600,7 @@ static bool processLangDefineScopesep(const langType language,
 	else if (kletter == ':')
 		error (FATAL,
 			   "no child kind letter in \"--%s\" option", option);
-	else if (kletter == KIND_WILDCARD)
+	else if (kletter == KIND_WILDCARD_LETTER)
 	{
 		if (parentKindex != KIND_WILDCARD_INDEX
 			&& parentKindex != KIND_GHOST_INDEX)
@@ -608,7 +608,7 @@ static bool processLangDefineScopesep(const langType language,
 				   "cannot use wild card for child kind unless parent kind is also wild card or empty");
 		kindex = KIND_WILDCARD_INDEX;
 	}
-	else if (kletter == KIND_FILE_DEFAULT)
+	else if (kletter == KIND_FILE_DEFAULT_LETTER)
 		error (FATAL,
 			   "the kind letter `F' in \"--%s\" option is reserved for \"file\" kind and no separator can be assigned to",
 			   option);
@@ -2402,7 +2402,7 @@ static bool processLangDefineKind(const langType language,
 		error (FATAL, "no kind letter specified in \"--%s\" option", option);
 	if (!isalnum (letter))
 		error (FATAL, "the kind letter given in \"--%s\" option is not an alphabet or a number", option);
-	else if (letter == KIND_FILE_DEFAULT)
+	else if (letter == KIND_FILE_DEFAULT_LETTER)
 		error (FATAL, "the kind letter `F' in \"--%s\" option is reserved for \"file\" kind", option);
 	else if (getKindForLetter (parser->kindControlBlock, letter))
 	{
@@ -2433,9 +2433,9 @@ static bool processLangDefineKind(const langType language,
 		error (FATAL, "the kind name in \"--%s\" option is empty", option);
 
 	tmp_len = tmp_end - tmp_start;
-	if (strncmp (tmp_start, KIND_FILE_DEFAULT_LONG, tmp_len) == 0)
+	if (strncmp (tmp_start, KIND_FILE_DEFAULT_NAME, tmp_len) == 0)
 		error (FATAL,
-			   "the kind name " KIND_FILE_DEFAULT_LONG " in \"--%s\" option is reserved",
+			   "the kind name " KIND_FILE_DEFAULT_NAME " in \"--%s\" option is reserved",
 			   option);
 
 	name = eStrndup (tmp_start, tmp_len);
@@ -2501,7 +2501,7 @@ static bool processLangDefineRole(const langType language,
 		error (FATAL, "no kind letter specified in \"--%s\" option", option);
 	if (!isalnum (kletter))
 		error (FATAL, "the kind letter given in \"--%s\" option is not an alphabet or a number", option);
-	else if (kletter == KIND_FILE_DEFAULT)
+	else if (kletter == KIND_FILE_DEFAULT_LETTER)
 		error (FATAL, "the kind letter `F' in \"--%s\" option is reserved for \"file\" kind and no role can be attached to", option);
 
 	kdef = getKindForLetter (parser->kindControlBlock, kletter);
@@ -3992,7 +3992,7 @@ extern bool makeKindSeparatorsPseudoTags (const langType language,
 
 			if (sep->parentKindIndex == KIND_WILDCARD_INDEX)
 			{
-				name[1] = KIND_WILDCARD;
+				name[1] = KIND_WILDCARD_LETTER;
 				name[2] = kind->letter;
 			}
 			else if (sep->parentKindIndex == KIND_GHOST_INDEX)
@@ -4517,7 +4517,7 @@ static kindDefinition CTST_Kinds[KIND_COUNT] = {
 	/* `a' is reserved for kinddef testing */
 	{true, 'b', "broken tag", "name with unwanted characters",
 	 .referenceOnly = false, ATTACH_ROLES (CTST_BrokenRoles) },
-	{true, KIND_NULL, "no letter", "kind with no letter"
+	{true, KIND_NULL_LETTER, "no letter", "kind with no letter"
 	 /* use '@' when testing. */
 	},
 	{true, 'L', NULL, "kind with no long name" },

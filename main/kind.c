@@ -589,7 +589,7 @@ extern void roleColprintAddRoles (struct colprintTable *table, struct kindContro
 				 && strlen (k->name) == kname_len
 				 && strncmp (k->name, kname, kname_len) == 0)
 				|| (!kname && *c == k->letter)
-				|| (!kname && *c == KIND_WILDCARD))
+				|| (!kname && *c == KIND_WILDCARD_LETTER))
 			{
 				unsigned int nRoles = countRoles(kcb, i);
 				for (unsigned int j = 0; j < nRoles; j++)
@@ -610,7 +610,7 @@ extern void roleColprintAddRoles (struct colprintTable *table, struct kindContro
 													 r->enabled ? "on" : "off");
 					colprintLineAppendColumnCString (line, r->description);
 				}
-				if (! (!kname && *c == KIND_WILDCARD))
+				if (! (!kname && *c == KIND_WILDCARD_LETTER))
 					break;
 			}
 		}
