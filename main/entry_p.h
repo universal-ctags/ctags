@@ -68,7 +68,7 @@ extern const tagField* getParserField (const tagEntryInfo * tag, int index);
 
 CTAGS_INLINE roleBitsType makeRoleBit(int roleIndex)
 {
-	if (roleIndex == ROLE_INDEX_DEFINITION)
+	if (roleIndex == ROLE_DEFINITION_INDEX)
 		return 0;
 	else
 		return ((roleBitsType)1) << roleIndex;

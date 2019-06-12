@@ -50,7 +50,7 @@ static kindDefinition GladeKinds [] = {
 static tagXpathTable gladeXpathMainTable[] = {
 	{ "///glade-interface//widget//@id",
 	  LXPATH_TABLE_DO_MAKE,
-	  { .makeTagSpec = { K_ID, ROLE_INDEX_DEFINITION } }
+	  { .makeTagSpec = { K_ID, ROLE_DEFINITION_INDEX } }
 	},
 	{ "///glade-interface//widget//@class",
 	  LXPATH_TABLE_DO_MAKE,

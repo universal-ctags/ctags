@@ -679,7 +679,7 @@ static int makeDefineTag (const char *const name, const char* const signature, b
 	if (isFileScope && !isXtagEnabled(XTAG_FILE_SCOPE))
 		return CORK_NIL;
 
-	if (undef && (Cpp.macroUndefRoleIndex == ROLE_INDEX_DEFINITION))
+	if (undef && (Cpp.macroUndefRoleIndex == ROLE_DEFINITION_INDEX))
 		return CORK_NIL;
 
 	if (! isLanguageKindEnabled (lang,
@@ -734,7 +734,7 @@ static void makeIncludeTag (const  char *const name, bool systemHeader)
 	Assert (Cpp.headerKindIndex != KIND_GHOST_INDEX);
 
 	role_index = systemHeader? Cpp.headerSystemRoleIndex: Cpp.headerLocalRoleIndex;
-	if (role_index == ROLE_INDEX_DEFINITION)
+	if (role_index == ROLE_DEFINITION_INDEX)
 		return;
 
 	if (!isXtagEnabled (XTAG_REFERENCE_TAGS))

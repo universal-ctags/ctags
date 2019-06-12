@@ -1625,7 +1625,7 @@ extern bool isTagExtraBitMarked (const tagEntryInfo *const tag, xtagType extra)
 
 static void assignRoleFull(tagEntryInfo *const e, int roleIndex, bool assign)
 {
-	if (roleIndex == ROLE_INDEX_DEFINITION)
+	if (roleIndex == ROLE_DEFINITION_INDEX)
 	{
 		if (assign)
 		{
@@ -1633,7 +1633,7 @@ static void assignRoleFull(tagEntryInfo *const e, int roleIndex, bool assign)
 			markTagExtraBitFull (e, XTAG_REFERENCE_TAGS, false);
 		}
 	}
-	else if (roleIndex > ROLE_INDEX_DEFINITION)
+	else if (roleIndex > ROLE_DEFINITION_INDEX)
 	{
 		Assert (roleIndex < (int)countLanguageRoles(e->langType, e->kindIndex));
 
@@ -1654,7 +1654,7 @@ extern void assignRole(tagEntryInfo *const e, int roleIndex)
 
 extern bool isRoleAssigned(const tagEntryInfo *const e, int roleIndex)
 {
-	if (roleIndex == ROLE_INDEX_DEFINITION)
+	if (roleIndex == ROLE_DEFINITION_INDEX)
 		return (!e->extensionFields.roleBits);
 	else
 		return (e->extensionFields.roleBits & makeRoleBit(roleIndex));

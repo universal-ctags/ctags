@@ -177,7 +177,7 @@ extern unsigned int countParsers (void)
 extern int makeSimpleTag (
 		const vString* const name, const int kindIndex)
 {
-	return makeSimpleRefTag (name, kindIndex, ROLE_INDEX_DEFINITION);
+	return makeSimpleRefTag (name, kindIndex, ROLE_DEFINITION_INDEX);
 }
 
 extern int makeSimpleRefTag (const vString* const name, const int kindIndex,
@@ -4615,7 +4615,7 @@ static void createCTSTTags (void)
 							char *name;
 							if (found_enabled_disabled[i == K_DISABLED]++ == 0)
 							{
-								role = ROLE_INDEX_DEFINITION;
+								role = ROLE_DEFINITION_INDEX;
 								name = (i == K_DISABLED)
 									? "disable-kind-no-role"
 									: "enabled-kind-no-role";
