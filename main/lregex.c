@@ -1260,7 +1260,7 @@ static void matchTagPattern (struct lregexControlBlock *lcb,
 		kind = patbuf->u.tag.kindIndex;
 		roleBits = patbuf->u.tag.roleBits;
 
-		initRegexTag (&e, name, kind, ROLE_INDEX_DEFINITION, scope, placeholder,
+		initRegexTag (&e, name, kind, ROLE_DEFINITION_INDEX, scope, placeholder,
 					  ln, ln == 0? NULL: &pos, patbuf->xtagType);
 
 		if (field_trashbox == NULL)

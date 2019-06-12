@@ -54,7 +54,7 @@ static tagXpathTable plistXpathTextTable[] = {
 	{ "text()",
 	  LXPATH_TABLE_DO_MAKE,
 	  .spec.makeTagSpec = {
-			K_KEY,  ROLE_INDEX_DEFINITION,
+			K_KEY,  ROLE_DEFINITION_INDEX,
 			makeTagWithScope
 		}
 	},

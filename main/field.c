@@ -705,7 +705,7 @@ static const char *renderFieldRoles (const tagEntryInfo *const tag,
 		}
 	}
 	else
-		vStringCatS (b, ROLE_NAME_DEFINITION);
+		vStringCatS (b, ROLE_DEFINITION_NAME);
 	return vStringValue (b);
 }
 

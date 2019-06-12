@@ -167,7 +167,7 @@ static bool automakeMakeTag (struct sAutomakeSubparser* automake,
 	else
 		vStringNCopyS(subname, name, len - expected_len);
 
-	if (rindex == ROLE_INDEX_DEFINITION)
+	if (rindex == ROLE_DEFINITION_INDEX)
 	{
 		automake->index = makeSimpleTag (subname, kindex);
 		addAutomakeDirectory (automake->directories, subname, automake->index);
@@ -277,7 +277,7 @@ static void newMacroCallback (makeSubparser *make, char* name, bool with_define_
 	(void)(0
 	       || automakeMakeTag (automake,
 							   name, "dir", appending,
-							   K_AM_DIR, ROLE_INDEX_DEFINITION, am_blacklist)
+							   K_AM_DIR, ROLE_DEFINITION_INDEX, am_blacklist)
 	       || automakeMakeTag (automake,
 							   name, "_PROGRAMS", appending,
 							   K_AM_DIR, R_AM_DIR_PROGRAMS, am_blacklist)

@@ -91,7 +91,7 @@ static tagXpathTable dbusIntrospectXpathInterfaceTable [] = {
 	},
 	{ "property/@name",
 	  LXPATH_TABLE_DO_MAKE,
-	  { .makeTagSpec = { K_PROPERTY, ROLE_INDEX_DEFINITION,
+	  { .makeTagSpec = { K_PROPERTY, ROLE_DEFINITION_INDEX,
 						 makeTagWithScope, } }
 	},
 };
@@ -112,7 +112,7 @@ static tagXpathTable dbusIntrospectXpathMainTable [] = {
 static tagXpathTable dbusIntrospectXpathMainNameTable [] = {
 	{ "@name",
 	  LXPATH_TABLE_DO_MAKE,
-	  { .makeTagSpec = { KIND_GHOST_INDEX, ROLE_INDEX_DEFINITION,
+	  { .makeTagSpec = { KIND_GHOST_INDEX, ROLE_DEFINITION_INDEX,
 			     makeTagForMainName,
 			     decideKindForMainName } }
 	},

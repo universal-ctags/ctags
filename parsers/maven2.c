@@ -98,7 +98,7 @@ enum maven2XpathTable {
 static tagXpathTable maven2XpathMainTable[] = {
 	{ "/*[local-name()='project']/*[local-name()='groupId']",
 	  LXPATH_TABLE_DO_MAKE,
-	  { .makeTagSpec = { K_GROUP_ID, ROLE_INDEX_DEFINITION,
+	  { .makeTagSpec = { K_GROUP_ID, ROLE_DEFINITION_INDEX,
 			     makeTagWithScope } }
 	},
 	{ "/*[local-name()='project']/*[local-name()='parent']",
@@ -111,7 +111,7 @@ static tagXpathTable maven2XpathMainTable[] = {
 	},
 	{ "/*[local-name()='project']/*[local-name()='artifactId']",
 	  LXPATH_TABLE_DO_MAKE,
-	  { .makeTagSpec = { K_ARTIFACT_ID, ROLE_INDEX_DEFINITION,
+	  { .makeTagSpec = { K_ARTIFACT_ID, ROLE_DEFINITION_INDEX,
 			     makeTagWithScope } }
 	},
 	{ "/*[local-name()='project']/*[local-name()='properties']/*",
@@ -120,7 +120,7 @@ static tagXpathTable maven2XpathMainTable[] = {
 	},
 	{ "/*[local-name()='project']/*[local-name()='repositories']/*[local-name()='repository']/*[local-name()='id']",
 	  LXPATH_TABLE_DO_MAKE,
-	  { .makeTagSpec = { K_REPOSITORY_ID, ROLE_INDEX_DEFINITION, } }
+	  { .makeTagSpec = { K_REPOSITORY_ID, ROLE_DEFINITION_INDEX, } }
 	},
 };
 

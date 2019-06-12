@@ -355,7 +355,7 @@ static int makeM4Tag (int kind, int role)
 
 	if (kind == M4_MACRO_KIND)
 	{
-		if (role == ROLE_INDEX_DEFINITION)
+		if (role == ROLE_DEFINITION_INDEX)
 		{
 			name = vStringNew();
 			readM4MacroArgument(name);
@@ -408,7 +408,7 @@ static struct newMacroResult newMacroM4 (const char* token)
 	};
 
 	int keyword;
-	int role = ROLE_INDEX_DEFINITION;
+	int role = ROLE_DEFINITION_INDEX;
 	int kind = -1;
 
 	if (lang == LANG_IGNORE)
@@ -421,7 +421,7 @@ static struct newMacroResult newMacroM4 (const char* token)
 		break;
 	case KEYWORD_define:
 		kind = M4_MACRO_KIND;
-		role = ROLE_INDEX_DEFINITION;
+		role = ROLE_DEFINITION_INDEX;
 		result.consumed = true;
 		break;
 	case KEYWORD_undefine:
@@ -449,7 +449,7 @@ static struct newMacroResult newMacroM4 (const char* token)
 		return result;
 
 	if ((! isXtagEnabled (XTAG_REFERENCE_TAGS))
-	    && (role != ROLE_INDEX_DEFINITION))
+	    && (role != ROLE_DEFINITION_INDEX))
 		return result;
 
 	result.index = makeM4Tag (kind, role);
