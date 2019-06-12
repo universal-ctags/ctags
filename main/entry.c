@@ -1229,10 +1229,10 @@ static void writeTagEntry (const tagEntryInfo *const tag, bool checkingNeeded)
 {
 	int length = 0;
 
-	Assert (tag->kindIndex != KIND_GHOST_INDEX);
-
 	if (checkingNeeded && !isTagWritable(tag))
 		return;
+
+	Assert (tag->kindIndex != KIND_GHOST_INDEX);
 
 	DebugStatement ( debugEntry (tag); )
 
@@ -1345,6 +1345,26 @@ extern tagEntryInfo *getEntryOfNestingLevel (const NestingLevel *nl)
 extern size_t        countEntryInCorkQueue (void)
 {
 	return TagFile.corkQueue.count;
+}
+
+extern int makePlaceholder (const char *const name)
+{
+	tagEntryInfo e;
+
+	initTagEntry (&e, name, KIND_GHOST_INDEX);
+	e.placeholder = 1;
+
+	/*
+	 * makePlaceholder may be called even before reading any bytes
+	 * from the input stream. In such case, initTagEntry fills
+	 * the lineNumber field of the placeholder tag with 0.
+	 * This breaks an assertion in makeTagEntry. Following adjustment
+	 * is for avoding it.
+	 */
+	if (e.lineNumber == 0)
+		e.lineNumber = 1;
+
+	return makeTagEntry (&e);
 }
 
 static void makeTagEntriesForSubwords (tagEntryInfo *const subtag)

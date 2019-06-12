@@ -126,6 +126,7 @@ typedef parserDefinition* (parserDefinitionFunc) (void);
 extern int makeSimpleTag (const vString* const name, const int kindIndex);
 extern int makeSimpleRefTag (const vString* const name, const int kindIndex,
 			     int roleIndex);
+extern int makeSimplePlaceholder(const vString* const name);
 extern parserDefinition* parserNew (const char* name);
 
 extern const char *getLanguageName (const langType language);
