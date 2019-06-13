@@ -188,7 +188,7 @@ can look for a file (or directory) to load.
 When loading a file (or directory) specified with ``--options=PATHNAME``,
 ctags first checks if ``PATHNAME`` is an absolute path or a relative path.
 An absolute path starts with '``/``' or '``.``'.
-If ``PATHNAME`` is an absolute path, ctags tries to load it inmediately.
+If ``PATHNAME`` is an absolute path, ctags tries to load it immediately.
 
 If, on the contrary, is a relative path, ``ctags`` does two things: First,
 looks for the file (or directory) in "optlib PATH list" and tries to load it.
@@ -289,7 +289,7 @@ Will match this **entire** string, not just the first part::
 Regex option argument flags
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Many regex-based options described in this document support additonal arguments
+Many regex-based options described in this document support additional arguments
 in the form of long flags. Long flags are specified with surrounding ``{`` and
 ``}``.
 
@@ -622,7 +622,7 @@ Output::
 Customizing scope separators
 ......................................................................
 Use ``--_scopesep-<LANG>=[<parent-kindLetter>]/<child-kindLetter>:<sep>``
-option for customizing if the langauge uses `{_autoFQTag}`.
+option for customizing if the language uses `{_autoFQTag}`.
 
 ``parent-kindLetter``
 
@@ -998,7 +998,7 @@ that will ignore ``dont_capture_me`` in the comment with a classical regex
 parser defined with ``--regex-<LANG>`` or ``--mline-regex-<LANG>``, because of
 the block comments.
 
-The ``--regex-<LANG>`` option only works on one line at a time, so cannnot know
+The ``--regex-<LANG>`` option only works on one line at a time, so can not know
 ``dont_capture_me`` is within comments. The ``--mline-regex-<LANG>`` could
 do it in theory, but due to the greedy nature of the regex engine it is
 impractical and potentially inefficient to do so, given that there could be
@@ -1139,7 +1139,7 @@ discuss them one by one.
 
 For each new file it scans, ``ctags`` always chooses the first pattern of the
 first table of the parser. Even if it's an empty table, ``ctags`` will only try
-the first declared table. (in such a case it would immedietaly fail to match
+the first declared table. (in such a case it would immediately fail to match
 anything, and thus stop processing the input file and effectively do nothing)
 
 The first declared table (``toplevel``) has the following regex added to
