@@ -65,7 +65,7 @@ static void initializeInkoParser (const langType language)
 	                               "^.",
 	                               "", "", "", NULL);
 	addLanguageTagMultiTableRegex (language, "method",
-	                               "^([a-zA-Z0-9_?]+)[^{]*",
+	                               "^([a-zA-Z0-9_?]+|\\[\\]=?|\\^|&|\\||\\*|\\+|\\-|/|>>|<<|%)[^{]*",
 	                               "\\1", "m", "{scope=push}", NULL);
 	addLanguageTagMultiTableRegex (language, "method",
 	                               "^\\{",
