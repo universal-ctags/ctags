@@ -850,7 +850,7 @@ Multiline pattern flags
 	flag specifies from where the pattern should be applied in the next
 	iteration for regex matching. When a pattern matches, the next pattern
 	matching starts from the start or end of capture group ``N``. By default it
-	advances to the end of of the whole match (i.e., ``{_advanceTo=0end}`` is
+	advances to the end of the whole match (i.e., ``{_advanceTo=0end}`` is
 	the default).
 
 
