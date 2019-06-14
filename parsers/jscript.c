@@ -298,7 +298,6 @@ static void makeJsTagCommon (const tokenInfo *const token, const jsKind kind,
 							 vString *const signature, vString *const inheritance,
 							 bool anonymous)
 {
-	if (JsKinds [kind].enabled )
 	{
 		const char *name = vStringValue (token->string);
 		vString *fullscope = vStringNewCopy (token->scope);
