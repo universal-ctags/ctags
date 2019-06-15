@@ -118,6 +118,7 @@
 	OldCppParser, \
 	OldCParser, \
 	OcamlParser, \
+	OpenUI5Parser, \
 	PasswdParser, \
 	PascalParser, \
 	PerlParser, \
