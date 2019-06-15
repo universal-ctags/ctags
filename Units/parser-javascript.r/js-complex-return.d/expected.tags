@@ -1,5 +1,5 @@
-AnonymousFunctiona815156f0100	input.js	/^    c2m3(function() {$/;"	f	function:class2.c2m1
-AnonymousFunctiona815156f0200	input.js	/^    return function(n) {$/;"	f	function:class3.c3m1
+AnonymousFunctiona815156f0100	input.js	/^    c2m3(function() {$/;"	f	method:class2.c2m1
+AnonymousFunctiona815156f0200	input.js	/^    return function(n) {$/;"	f	method:class3.c3m1
 c2m1	input.js	/^  this.c2m1 = function() {$/;"	m	class:class2
 c2m2	input.js	/^  this.c2m2 = function(f) {$/;"	m	class:class2
 c2m3	input.js	/^  this.c2m3 = function(f) {$/;"	m	class:class2
