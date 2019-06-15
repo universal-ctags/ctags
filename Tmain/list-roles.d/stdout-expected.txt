@@ -54,6 +54,8 @@ HTML           C/stylesheet      extFile            on      referenced as extern
 HTML           J/script          extFile            on      referenced as external files
 HTML           c/class           attribute          on      assigned as attributes
 Java           p/package         imported           on      imported package
+JavaScript     c/class           chainElt           off     (EXPERIMENTAL)used as an element in a name chain like a.b.c
+JavaScript     f/function        chainElt           off     (EXPERIMENTAL)used as an element in a name chain like a.b.c
 Julia          n/module          imported           on      loaded by "import"
 Julia          n/module          namespace          on      only some symbols in it are imported
 Julia          n/module          used               on      loaded by "using"
@@ -162,6 +164,8 @@ HTML           C/stylesheet      extFile            on      referenced as extern
 HTML           J/script          extFile            on      referenced as external files
 HTML           c/class           attribute          on      assigned as attributes
 Java           p/package         imported           on      imported package
+JavaScript     c/class           chainElt           off     (EXPERIMENTAL)used as an element in a name chain like a.b.c
+JavaScript     f/function        chainElt           off     (EXPERIMENTAL)used as an element in a name chain like a.b.c
 Julia          n/module          imported           on      loaded by "import"
 Julia          n/module          namespace          on      only some symbols in it are imported
 Julia          n/module          used               on      loaded by "using"
