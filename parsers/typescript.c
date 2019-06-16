@@ -760,7 +760,16 @@ static bool tryInSequence(tokenInfo *const token, bool skipUnparsed, ...)
 
 	va_end (args);
 
-	if (skipUnparsed && ! result) return uwiGetC () != EOF;
+	if (skipUnparsed && ! result)
+	{
+		int c;
+
+		do {
+			c = uwiGetC ();
+		} while (c != EOF && isIdentChar(c));
+
+		return c != EOF;
+	}
 
 	return result;
 }
