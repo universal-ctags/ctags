@@ -12,6 +12,8 @@
 #ifndef CTAGS_MAIN_PROMISE_PRIVATE_H
 #define CTAGS_MAIN_PROMISE_PRIVATE_H
 
+#include "general.h"
+
 bool forcePromises (void);
 void breakPromisesAfter (int promise);
 int getLastPromise (void);
