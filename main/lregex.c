@@ -578,13 +578,6 @@ static void pre_ptrn_flag_mgroup_long (const char* const s, const char* const v,
 			   s, v);
 		mgroup->forLineNumberDetermination = NO_MULTILINE;
 	}
-
-	if (mgroup->forLineNumberDetermination != NO_MULTILINE
-		&& mgroup->forNextScanning == NO_MULTILINE)
-	{
-		mgroup->forNextScanning = 0;
-		mgroup->nextFromStart = false;
-	}
 }
 
 static void pre_ptrn_flag_advanceTo_long (const char* const s, const char* const v, void* data)
@@ -1003,7 +996,11 @@ static regexPattern *addCompiledTagPattern (struct lregexControlBlock *lcb,
 		flagsEval (flags, scopePtrnFlagDef, ARRAY_SIZE(scopePtrnFlagDef), &ptrn->scopeActions);
 
 	if (regptype == REG_PARSER_MULTI_LINE || regptype == REG_PARSER_MULTI_TABLE)
+	{
+		ptrn->mgroup.forNextScanning = 0;
+		/* ptrn->mgroup.nextFromStart is initialized in initMgroup() already. */
 		flagsEval (flags, multilinePtrnFlagDef, ARRAY_SIZE(multilinePtrnFlagDef), &ptrn->mgroup);
+	}
 
 	if (regptype == REG_PARSER_MULTI_TABLE)
 		flagsEval (flags, multitablePtrnFlagDef, ARRAY_SIZE(multitablePtrnFlagDef), &commonFlagData);
