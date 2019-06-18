@@ -34,6 +34,8 @@ enum nestedInputBoundaryFlag {
 extern const char *getInputLanguageName (void);
 extern const char *getInputFileTagPath (void);
 
+extern long getInputFileOffsetForLine (unsigned int line);
+
 extern unsigned int countInputLanguageKinds (void);
 extern unsigned int countInputLanguageRoles (int kindIndex);
 
