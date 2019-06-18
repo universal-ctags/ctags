@@ -4425,7 +4425,7 @@ extern bool processPretendOption (const char *const option, const char *const pa
 			 getLanguageNameFull (new_language, true));
 	enableLanguage (new_language, true);
 
-	verbose ("force disbling %s\n",
+	verbose ("force disabling %s\n",
 			 getLanguageNameFull (old_language, true));
 	enableLanguage (old_language, false);
 
@@ -4474,7 +4474,7 @@ typedef enum {
 } CTST_DisabledKindRole;
 
 static roleDefinition CTST_DisabledKindRoles [] = {
-	{ false, "disabled", "disbaled role attached to disabled kind" },
+	{ false, "disabled", "disabled role attached to disabled kind" },
 	{ true,  "enabled",  "enabled role attached to disabled kind"  },
 };
 
@@ -4484,7 +4484,7 @@ typedef enum {
 } CTST_EnabledKindRole;
 
 static roleDefinition CTST_EnabledKindRoles [] = {
-	{ false, "disabled", "disbaled role attached to enabled kind" },
+	{ false, "disabled", "disabled role attached to enabled kind" },
 	{ true,  "enabled",  "enabled role attached to enabled kind"  },
 };
 
