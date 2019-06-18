@@ -809,7 +809,7 @@ static void common_flag_role_long (const char* const s, const char* const v, voi
 	ptrn->u.tag.roleBits |= makeRoleBit(role->id);
 }
 
-static void common_flag_anonymous_long (const char* const s, const char* const v, void* data)
+static void common_flag_anonymous_long (const char* const s CTAGS_ATTR_UNUSED, const char* const v, void* data)
 {
 	struct commonFlagData * cdata = data;
 	regexPattern *ptrn = cdata->ptrn;
