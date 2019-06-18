@@ -162,7 +162,7 @@ extern MIOPos getInputFilePosition (void)
 	return File.filePosition.pos;
 }
 
-extern MIOPos getInputFilePositionForLine (unsigned int line)
+static compoundPos* getInputFileCompoundPosForLine (unsigned int line)
 {
 	int index;
 	if (line > 0)
@@ -177,7 +177,19 @@ extern MIOPos getInputFilePositionForLine (unsigned int line)
 	else
 		index = 0;
 
-	return File.lineFposMap.pos[index].pos;
+	return File.lineFposMap.pos + index;
+}
+
+extern MIOPos getInputFilePositionForLine (unsigned int line)
+{
+	compoundPos *cpos = getInputFileCompoundPosForLine (line);
+	return cpos->pos;
+}
+
+extern long getInputFileOffsetForLine (unsigned int line)
+{
+	compoundPos *cpos = getInputFileCompoundPosForLine (line);
+	return cpos->offset;
 }
 
 extern langType getInputLanguage (void)
