@@ -627,7 +627,7 @@ static void pre_ptrn_flag_advanceTo_long (const char* const s, const char* const
 }
 
 static flagDefinition multilinePtrnFlagDef[] = {
-	{ '\0',  "mgroup", NULL, pre_ptrn_flag_mgroup_long ,
+	{ '\0',  "mgroup", NULL, pre_ptrn_flag_mgroup_long,
 	  "N", "a group in pattern determining the line number of tag"},
 	{ '\0',  "_advanceTo", NULL, pre_ptrn_flag_advanceTo_long,
 	  "N[start|end]", "a group in pattern from where the next scan starts [0end]"},
