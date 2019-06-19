@@ -1,0 +1,103 @@
+CPoint	input.ts	/^class CPoint {$/;"	c
+x	input.ts	/^  x: number$/;"	p	class:CPoint
+CPoint.x	input.ts	/^  x: number$/;"	p	class:CPoint
+y	input.ts	/^  y: number$/;"	p	class:CPoint
+CPoint.y	input.ts	/^  y: number$/;"	p	class:CPoint
+constructor	input.ts	/^  constructor(x: number, y: number) {$/;"	m	class:CPoint
+CPoint.constructor	input.ts	/^  constructor(x: number, y: number) {$/;"	m	class:CPoint
+x	input.ts	/^  constructor(x: number, y: number) {$/;"	z	method:CPoint.constructor
+CPoint.constructor.x	input.ts	/^  constructor(x: number, y: number) {$/;"	z	method:CPoint.constructor
+y	input.ts	/^  constructor(x: number, y: number) {$/;"	z	method:CPoint.constructor
+CPoint.constructor.y	input.ts	/^  constructor(x: number, y: number) {$/;"	z	method:CPoint.constructor
+BankAccount	input.ts	/^class BankAccount {$/;"	c
+balance	input.ts	/^  balance = 0$/;"	p	class:BankAccount
+BankAccount.balance	input.ts	/^  balance = 0$/;"	p	class:BankAccount
+deposit	input.ts	/^  deposit(credit: number) {$/;"	m	class:BankAccount
+BankAccount.deposit	input.ts	/^  deposit(credit: number) {$/;"	m	class:BankAccount
+credit	input.ts	/^  deposit(credit: number) {$/;"	z	method:BankAccount.deposit
+BankAccount.deposit.credit	input.ts	/^  deposit(credit: number) {$/;"	z	method:BankAccount.deposit
+CheckingAccount	input.ts	/^class CheckingAccount extends BankAccount {$/;"	c
+constructor	input.ts	/^  constructor(balance: number) {$/;"	m	class:CheckingAccount
+CheckingAccount.constructor	input.ts	/^  constructor(balance: number) {$/;"	m	class:CheckingAccount
+balance	input.ts	/^  constructor(balance: number) {$/;"	z	method:CheckingAccount.constructor
+CheckingAccount.constructor.balance	input.ts	/^  constructor(balance: number) {$/;"	z	method:CheckingAccount.constructor
+writeCheck	input.ts	/^  writeCheck(debit: number) {$/;"	m	class:CheckingAccount
+CheckingAccount.writeCheck	input.ts	/^  writeCheck(debit: number) {$/;"	m	class:CheckingAccount
+debit	input.ts	/^  writeCheck(debit: number) {$/;"	z	method:CheckingAccount.writeCheck
+CheckingAccount.writeCheck.debit	input.ts	/^  writeCheck(debit: number) {$/;"	z	method:CheckingAccount.writeCheck
+List	input.ts	/^class List<T extends NamedItem> {$/;"	c
+next	input.ts	/^  next: List<T> = null$/;"	p	class:List
+List.next	input.ts	/^  next: List<T> = null$/;"	p	class:List
+constructor	input.ts	/^  constructor(public item: T) {$/;"	m	class:List
+List.constructor	input.ts	/^  constructor(public item: T) {$/;"	m	class:List
+item	input.ts	/^  constructor(public item: T) {$/;"	p	class:List
+List.item	input.ts	/^  constructor(public item: T) {$/;"	p	class:List
+insertAfter	input.ts	/^  insertAfter(item: T) {$/;"	m	class:List
+List.insertAfter	input.ts	/^  insertAfter(item: T) {$/;"	m	class:List
+item	input.ts	/^  insertAfter(item: T) {$/;"	z	method:List.insertAfter
+List.insertAfter.item	input.ts	/^  insertAfter(item: T) {$/;"	z	method:List.insertAfter
+temp	input.ts	/^    var temp = this.next$/;"	l	method:List.insertAfter
+List.insertAfter.temp	input.ts	/^    var temp = this.next$/;"	l	method:List.insertAfter
+log	input.ts	/^  log() {$/;"	m	class:List
+List.log	input.ts	/^  log() {$/;"	m	class:List
+C	input.ts	/^class C {$/;"	c
+x	input.ts	/^  x: number$/;"	p	class:C
+C.x	input.ts	/^  x: number$/;"	p	class:C
+x	input.ts	/^  static x: string$/;"	p	class:C
+C.x	input.ts	/^  static x: string$/;"	p	class:C
+Messenger	input.ts	/^class Messenger {$/;"	c
+message	input.ts	/^  message = "Hello World"$/;"	p	class:Messenger
+Messenger.message	input.ts	/^  message = "Hello World"$/;"	p	class:Messenger
+start	input.ts	/^  start() {$/;"	m	class:Messenger
+Messenger.start	input.ts	/^  start() {$/;"	m	class:Messenger
+_this	input.ts	/^    var _this = this$/;"	l	method:Messenger.start
+Messenger.start._this	input.ts	/^    var _this = this$/;"	l	method:Messenger.start
+D	input.ts	/^class D {$/;"	c
+data	input.ts	/^  data: string | string[]$/;"	p	class:D
+D.data	input.ts	/^  data: string | string[]$/;"	p	class:D
+getData	input.ts	/^  getData() {$/;"	m	class:D
+D.getData	input.ts	/^  getData() {$/;"	m	class:D
+data	input.ts	/^    var data = this.data$/;"	l	method:D.getData
+D.getData.data	input.ts	/^    var data = this.data$/;"	l	method:D.getData
+Point	input.ts	/^class Point {$/;"	c
+fakePointBuilder	input.ts	/^  protected fakePointBuilder: () => { x: number, y: number }$/;"	p	class:Point
+Point.fakePointBuilder	input.ts	/^  protected fakePointBuilder: () => { x: number, y: number }$/;"	p	class:Point
+constructor	input.ts	/^  constructor(public x: number, public y: number) { }$/;"	m	class:Point
+Point.constructor	input.ts	/^  constructor(public x: number, public y: number) { }$/;"	m	class:Point
+x	input.ts	/^  constructor(public x: number, public y: number) { }$/;"	p	class:Point
+Point.x	input.ts	/^  constructor(public x: number, public y: number) { }$/;"	p	class:Point
+y	input.ts	/^  constructor(public x: number, public y: number) { }$/;"	p	class:Point
+Point.y	input.ts	/^  constructor(public x: number, public y: number) { }$/;"	p	class:Point
+length	input.ts	/^  public length() { return Math.sqrt(this.x * this.x + this.y * this.y) }$/;"	m	class:Point
+Point.length	input.ts	/^  public length() { return Math.sqrt(this.x * this.x + this.y * this.y) }$/;"	m	class:Point
+origin	input.ts	/^  static origin = new Point(0, 0)$/;"	p	class:Point
+Point.origin	input.ts	/^  static origin = new Point(0, 0)$/;"	p	class:Point
+A	input.ts	/^class A {$/;"	c
+x	input.ts	/^  private x: number$/;"	p	class:A
+A.x	input.ts	/^  private x: number$/;"	p	class:A
+y	input.ts	/^  protected y: number$/;"	p	class:A
+A.y	input.ts	/^  protected y: number$/;"	p	class:A
+fun	input.ts	/^  public fun: (a: 22 | 30, b: CPoint) => number | string$/;"	p	class:A
+A.fun	input.ts	/^  public fun: (a: 22 | 30, b: CPoint) => number | string$/;"	p	class:A
+f	input.ts	/^  static f(a: A, b: B) {$/;"	m	class:A
+A.f	input.ts	/^  static f(a: A, b: B) {$/;"	m	class:A
+a	input.ts	/^  static f(a: A, b: B) {$/;"	z	method:A.f
+A.f.a	input.ts	/^  static f(a: A, b: B) {$/;"	z	method:A.f
+b	input.ts	/^  static f(a: A, b: B) {$/;"	z	method:A.f
+A.f.b	input.ts	/^  static f(a: A, b: B) {$/;"	z	method:A.f
+getXAsT	input.ts	/^  getXAsT<T = any>(): T {$/;"	m	class:A
+A.getXAsT	input.ts	/^  getXAsT<T = any>(): T {$/;"	m	class:A
+register	input.ts	/^  register(...args) {$/;"	m	class:A
+A.register	input.ts	/^  register(...args) {$/;"	m	class:A
+args	input.ts	/^  register(...args) {$/;"	z	method:A.register
+A.register.args	input.ts	/^  register(...args) {$/;"	z	method:A.register
+longArgsFun	input.ts	/^  longArgsFun(options: {$/;"	m	class:A
+A.longArgsFun	input.ts	/^  longArgsFun(options: {$/;"	m	class:A
+options	input.ts	/^  longArgsFun(options: {$/;"	z	method:A.longArgsFun
+A.longArgsFun.options	input.ts	/^  longArgsFun(options: {$/;"	z	method:A.longArgsFun
+closure	input.ts	/^  closure($/;"	m	class:A
+A.closure	input.ts	/^  closure($/;"	m	class:A
+x	input.ts	/^    x: number,$/;"	z	method:A.closure
+A.closure.x	input.ts	/^    x: number,$/;"	z	method:A.closure
+normalizedPath	input.ts	/^    const normalizedPath = path === '\/*' ? '' : path$/;"	C	method:A.closure
+A.closure.normalizedPath	input.ts	/^    const normalizedPath = path === '\/*' ? '' : path$/;"	C	method:A.closure

@@ -1,0 +1,15 @@
+Validation	input.ts	/^namespace Validation {$/;"	n
+StringValidator	input.ts	/^    export interface StringValidator {$/;"	i	namespace:Validation
+isAcceptable	input.ts	/^        isAcceptable(s: string): boolean$/;"	m	interface:Validation.StringValidator
+lettersRegexp	input.ts	/^    const lettersRegexp = \/^[A-Za-z]+$\/$/;"	C	namespace:Validation
+numberRegexp	input.ts	/^    const numberRegexp = \/^[0-9]+$\/$/;"	C	namespace:Validation
+LettersOnlyValidator	input.ts	/^    export class LettersOnlyValidator implements StringValidator {$/;"	c	namespace:Validation
+isAcceptable	input.ts	/^        isAcceptable(s: string) {$/;"	m	class:Validation.LettersOnlyValidator
+s	input.ts	/^        isAcceptable(s: string) {$/;"	z	method:Validation.LettersOnlyValidator.isAcceptable
+ZipCodeValidator	input.ts	/^    export class ZipCodeValidator implements StringValidator {$/;"	c	namespace:Validation
+isAcceptable	input.ts	/^        isAcceptable(s: string) {$/;"	m	class:Validation.ZipCodeValidator
+s	input.ts	/^        isAcceptable(s: string) {$/;"	z	method:Validation.ZipCodeValidator.isAcceptable
+strings	input.ts	/^let strings = ["Hello", "98052", "101"]$/;"	v
+validators	input.ts	/^let validators: { [s: string]: Validation.StringValidator; } = {}$/;"	v
+s	input.ts	/^for (let s of strings) {$/;"	v
+name	input.ts	/^    for (let name in validators) {$/;"	v

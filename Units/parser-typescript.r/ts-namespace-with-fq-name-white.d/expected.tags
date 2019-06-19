@@ -1,0 +1,2 @@
+ctags.config	input.ts	/^namespace ctags.config {$/;"	n
+version	input.ts	/^    export const version = "6.0"$/;"	C	namespace:ctags.config

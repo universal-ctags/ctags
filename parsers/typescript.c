@@ -79,6 +79,7 @@ static objPool *TokenPool = NULL;
  */
 enum eKeywordId {
 	KEYWORD_async,
+	KEYWORD_await,
 	KEYWORD_class,
 	KEYWORD_constructor,
 	KEYWORD_const,
@@ -90,6 +91,7 @@ enum eKeywordId {
 	KEYWORD_interface,
 	KEYWORD_let,
 	KEYWORD_namespace,
+	KEYWORD_new,
 	KEYWORD_of,
 	KEYWORD_private,
 	KEYWORD_protected,
@@ -99,6 +101,7 @@ enum eKeywordId {
 	KEYWORD_static,
 	KEYWORD_this,
 	KEYWORD_type,
+	KEYWORD_typeof,
 	KEYWORD_var,
 	KEYWORD_while
 };
@@ -134,7 +137,13 @@ typedef enum eTokenType {
 	TOKEN_AMPERSAND,
 	TOKEN_ARROW,
 	TOKEN_NUMBER,
-	TOKEN_AT
+	TOKEN_AT,
+	TOKEN_MINUS,
+	TOKEN_PLUS,
+	TOKEN_DIV,
+	TOKEN_POWER,
+	TOKEN_GREATER,
+	TOKEN_LOWER
 } tokenType;
 
 typedef enum {
@@ -179,6 +188,7 @@ typedef struct sBlockState {
 static const keywordTable TsKeywordTable [] = {
 	/* keyword		  keyword ID */
 	{ "async"       , KEYWORD_async       },
+	{ "await"       , KEYWORD_await       },
 	{ "class"       , KEYWORD_class       },
 	{ "const"       , KEYWORD_const       },
 	{ "constructor" , KEYWORD_constructor },
@@ -189,6 +199,7 @@ static const keywordTable TsKeywordTable [] = {
 	{ "interface"   , KEYWORD_interface   },
 	{ "let"         , KEYWORD_let         },
 	{ "namespace"   , KEYWORD_namespace   },
+	{ "new"			, KEYWORD_new		  },
 	{ "of"          , KEYWORD_of          },
 	{ "private"     , KEYWORD_private     },
 	{ "protected"   , KEYWORD_protected   },
@@ -196,6 +207,7 @@ static const keywordTable TsKeywordTable [] = {
 	{ "static"      , KEYWORD_static      },
 	{ "this"        , KEYWORD_this        },
 	{ "type"        , KEYWORD_type        },
+	{ "typeof"      , KEYWORD_typeof      },
 	{ "var"         , KEYWORD_var         },
 	{ "while"       , KEYWORD_while       }
 };
@@ -240,11 +252,14 @@ static struct sUwiStats tsUwiStats;
 typedef void (*Parser)(const int c, tokenInfo *const, parserState *state, parserResult *const);
 
 static bool tryParser(Parser parser, tokenInfo *const token, bool skipWhite);
+CTAGS_INLINE void parseStringRegex(const int c, tokenInfo * const token, parserState *state, parserResult * const result);
+CTAGS_INLINE void parseStringSQuote(const int c, tokenInfo * const token, parserState *state, parserResult * const result);
+CTAGS_INLINE void parseStringDQuote(const int c, tokenInfo * const token, parserState *state, parserResult * const result);
+CTAGS_INLINE void parseStringTemplate(const int c, tokenInfo * const token, parserState *state, parserResult * const result);
 
 static int emitTag(const tokenInfo *const token, const tsKind kind)
 {
-	if (! TsKinds [kind].enabled)
-		return CORK_NIL;
+	if (! TsKinds [kind].enabled) return CORK_NIL;
 
 	static const char *const access [3] = {
 		"private",
@@ -296,7 +311,7 @@ static void clearPoolToken (void *data)
 
 	token->scope = CORK_NIL;
 
-	token->accessKeyword   = KEYWORD_NONE;
+	token->accessKeyword = KEYWORD_NONE;
 
 	token->string = vStringNewOrClear (token->string);
 }
@@ -304,8 +319,7 @@ static void clearPoolToken (void *data)
 static void deletePoolToken (void *data)
 {
 	tokenInfo *token = data;
-	if (token->string)
-		vStringDelete (token->string);
+	if (token->string) vStringDelete (token->string);
 	eFree (token);
 }
 
@@ -412,10 +426,9 @@ CTAGS_INLINE void parseNumber(const int c, tokenInfo *const token, int *parsed, 
 {
 	if (*parsed == 0)
 	{
-		result->status = PARSER_NEEDS_MORE_INPUT;
-
 		if (c == '-')
 		{
+			result->status = PARSER_NEEDS_MORE_INPUT;
 			*parsed += 1;
 			return;
 		}
@@ -485,8 +498,7 @@ CTAGS_INLINE void parseComment(const int c, tokenInfo *const token, commentState
 
 	state->parsed += 1;
 
-	if (c == EOF)
-		result->status = PARSER_FINISHED;
+	if (c == EOF) result->status = PARSER_FINISHED;
 	else if (state->isBlock)
 	{
 		parseWordToken (c, token, "*/", TOKEN_COMMENT_BLOCK, &state->blockParsed, result);
@@ -498,7 +510,10 @@ CTAGS_INLINE void parseComment(const int c, tokenInfo *const token, commentState
 		}
 	}
 	else if (c == '\n')
+	{
 		result->status = PARSER_FINISHED;
+		result->unusedChars = 1;
+	}
 
 	if (result->status == PARSER_FINISHED)
 	{
@@ -518,34 +533,36 @@ CTAGS_INLINE void parseString(const int c, tokenInfo *const token, const char qu
 			*prev = c;
 			result->status = PARSER_NEEDS_MORE_INPUT;
 		}
-		else
-		{
-			result->status = PARSER_FAILED;
+		else result->status = PARSER_FAILED;
 
-			return;
-		}
+		return;
+	}
+	else if (c == EOF)
+	{
+		result->status = PARSER_FAILED;
+
+		return;
 	}
 
-	if (c == quote)
+	if (c == '\\' && *prev == '\\')
 	{
-		if (*prev == '\\')
-		{
-			*prev = c;
-			result->status = PARSER_NEEDS_MORE_INPUT;
-		}
-		else
-		{
-			result->status = PARSER_FINISHED;
+		*prev = '\1';
+		result->status = PARSER_NEEDS_MORE_INPUT;
 
-			initToken (token, TOKEN_STRING);
+		return;
+	}
+	else if (c == quote && *prev != '\\')
+	{
+		result->status = PARSER_FINISHED;
+		initToken (token, TOKEN_STRING);
 
-			return;
-		}
+		return;
 	}
 
 	*prev = c;
 	result->status = PARSER_NEEDS_MORE_INPUT;
 }
+
 
 CTAGS_INLINE void parseBlock(const int c, tokenInfo *const token, tokenType const ttype, const char start, const char end, blockState *state, parserResult *const result)
 {
@@ -560,15 +577,11 @@ CTAGS_INLINE void parseBlock(const int c, tokenInfo *const token, tokenType cons
 		state->parsed = 1;
 	}
 
-	if (c == '{')
-		state->curlyLevel += 1;
-	else if (c == '}')
-		state->curlyLevel -= 1;
+	if (c == '{') state->curlyLevel += 1;
+	else if (c == '}') state->curlyLevel -= 1;
 
-	if (c == start)
-		state->nestLevel += 1;
-	else if (c == end)
-		state->nestLevel -= 1;
+	if (c == start) state->nestLevel += 1;
+	else if (c == end) state->nestLevel -= 1;
 	else if ((state->curlyLevel < 1 && c == ';') || c == EOF)
 	{
 		result->status = PARSER_FAILED;
@@ -585,6 +598,11 @@ CTAGS_INLINE void parseBlock(const int c, tokenInfo *const token, tokenType cons
 
 	//skip comments:
 	tryParser ((Parser) parseComment, token, false);
+	//skip strings:
+	tryParser ((Parser) parseStringRegex, token, false);
+	tryParser ((Parser) parseStringSQuote, token, false);
+	tryParser ((Parser) parseStringDQuote, token, false);
+	tryParser ((Parser) parseStringTemplate, token, false);
 
 	result->status = PARSER_NEEDS_MORE_INPUT;
 }
@@ -624,6 +642,7 @@ CTAGS_INLINE void parseFQIdentifier(const int c, tokenInfo *const token, int *pa
 }
 
 PARSER_DEF (AsyncKeyword, parseWord, "async", num)
+PARSER_DEF (AwaitKeyword, parseWord, "await", num)
 PARSER_DEF (ClassKeyword, parseWord, "class", num)
 PARSER_DEF (ConstKeyword, parseWord, "const", num)
 PARSER_DEF (ConstructorKeyword, parseWord, "constructor", num)
@@ -634,6 +653,7 @@ PARSER_DEF (InKeyword, parseWord, "in", num)
 PARSER_DEF (InterfaceKeyword, parseWord, "interface", num)
 PARSER_DEF (LetKeyword, parseWord, "let", num)
 PARSER_DEF (NamespaceKeyword, parseWord, "namespace", num)
+PARSER_DEF (NewKeyword, parseWord, "new", num)
 PARSER_DEF (OfKeyword, parseWord, "of", num)
 PARSER_DEF (PrivateKeyword, parseWord, "private", num)
 PARSER_DEF (ProtectedKeyword, parseWord, "protected", num)
@@ -642,6 +662,7 @@ PARSER_DEF (ReadonlyKeyword, parseWord, "readonly", num)
 PARSER_DEF (StaticKeyword, parseWord, "static", num)
 PARSER_DEF (ThisKeyword, parseWord, "this", num)
 PARSER_DEF (TypeKeyword, parseWord, "type", num)
+PARSER_DEF (TypeofKeyword, parseWord, "typeof", num)
 PARSER_DEF (VarKeyword, parseWord, "var", num)
 PARSER_DEF (WhileKeyword, parseWord, "while", num)
 
@@ -669,6 +690,7 @@ WORD_TOKEN_PARSER_DEF (Arrow, "=>", TOKEN_ARROW)
 PARSER_DEF (StringSQuote, parseString, '\'', ch)
 PARSER_DEF (StringDQuote, parseString, '"', ch)
 PARSER_DEF (StringTemplate, parseString, '`', ch)
+PARSER_DEF (StringRegex, parseString, '/', ch)
 
 BLOCK_PARSER_DEF (Parens, '(', ')', TOKEN_PARENS)
 BLOCK_PARSER_DEF (Squares, '[', ']', TOKEN_SQUARES)
@@ -687,26 +709,24 @@ CTAGS_INLINE bool tryParser(Parser parser, tokenInfo *const token, bool skipWhit
 
 	uwiPushMarker();
 
+	c = uwiGetC ();
+	if (skipWhite && whiteChar (c))
+	{
+		do {
+			c = uwiGetC ();
+		} while (whiteChar (c));
+	}
+	parser (c, token, &currentState, &result);
+
 	while (result.status == PARSER_NEEDS_MORE_INPUT)
 	{
 		c = uwiGetC ();
-		if (skipWhite && whiteChar (c))
-		{
-			do {
-				c = uwiGetC ();
-			} while (whiteChar (c));
-			skipWhite = false;
-		}
-
 		parser (c, token, &currentState, &result);
 	}
 
-	if (result.status == PARSER_FAILED)
-		uwiPopMarker (-1, true);
-	else if (result.unusedChars > 0)
-		uwiPopMarker (result.unusedChars, true);
-	else
-		uwiDropMaker ();
+	if (result.status == PARSER_FAILED) uwiPopMarker (-1, true);
+	else if (result.unusedChars > 0) uwiPopMarker (result.unusedChars, true);
+	else uwiDropMaker ();
 
 	return result.status == PARSER_FINISHED;
 }
@@ -730,7 +750,16 @@ static bool tryInSequence(tokenInfo *const token, bool skipUnparsed, ...)
 
 	va_end (args);
 
-	if (skipUnparsed && ! result) return uwiGetC () != EOF;
+	if (skipUnparsed && ! result)
+	{
+		int c;
+
+		do {
+			c = uwiGetC ();
+		} while (c != EOF && isIdentChar(c));
+
+		return c != EOF;
+	}
 
 	return result;
 }
@@ -757,27 +786,10 @@ static void parseDecorator (tokenInfo *const token)
 	tryParser ((Parser) parseParens, token, true);
 }
 
-MULTI_CHAR_PARSER_DEF (SkipBlockChars, ";,", TOKEN_SEMICOLON, TOKEN_COMMA)
-static void skipBlocksTillType (tokenType type, tokenInfo *const token)
-{
-	bool parsed;
-
-	do
-	{
-		parsed = tryInSequence (token, true,
-								parseSquares,
-								parseParens,
-								parseComment,
-								parseTemplate,
-								parseCurlies,
-								parseStringSQuote,
-								parseStringDQuote,
-								parseStringTemplate,
-								parseSkipBlockChars,
-								NULL);
-	} while (parsed && ! isType (token, type));
-}
-
+MULTI_CHAR_PARSER_DEF (InterfaceBodyChars, "}:;.,|&",
+		TOKEN_CLOSE_CURLY, TOKEN_COLON,
+		TOKEN_SEMICOLON, TOKEN_PERIOD, TOKEN_COMMA,
+		TOKEN_PIPE, TOKEN_AMPERSAND)
 static void parseInterfaceBody (const int scope, tokenInfo *const token)
 {
 	bool parsed;
@@ -785,74 +797,119 @@ static void parseInterfaceBody (const int scope, tokenInfo *const token)
 	do
 	{
 		parsed = tryInSequence (token, true,
+								parseComment,
 								parseTemplate,
 								parseStringSQuote,
 								parseStringDQuote,
 								parseStringTemplate,
+								parseStringRegex,
 								parseParens,
-								parseComment,
 								parseSquares,
 								parseOpenCurly,
 								NULL);
 	} while (parsed && ! isType (token, TOKEN_OPEN_CURLY));
 
-	if (! parsed)
-		return;
+	if (! parsed) return;
 
 	tokenInfo *member = NULL;
+	bool parsingType = false;
+	int visibility = 0;
+
 	do
 	{
 		clearPoolToken (token);
 
 		parsed = tryInSequence (token, true,
 								parseTemplate,
+								parseComment,
 								parseStringSQuote,
 								parseStringDQuote,
 								parseStringTemplate,
+								parseStringRegex,
 								parseParens,
-								parseComment,
 								parseSquares,
+								parseCurlies,
+								parseNumber,
 								parsePrivateKeyword,
 								parseProtectedKeyword,
 								parsePublicKeyword,
 								parseReadonlyKeyword,
 								parseStaticKeyword,
-								parseCloseCurly,
+								parseArrow,
+								parseTypeofKeyword,
+								parseInterfaceBodyChars,
 								parseIdentifier,
 								NULL);
 
 		if (parsed)
 		{
-			if (! member && isType (token, TOKEN_IDENTIFIER))
+			switch (token->type)
 			{
-				member = newToken ();
-				copyToken (member, token, false);
-				member->scope = scope;
-			}
-			else if (! member && isType (token, TOKEN_PARENS))
-			{
-				skipBlocksTillType (TOKEN_SEMICOLON, token);
-			}
-			else if (! member && isType (token, TOKEN_SQUARES))
-			{
-				skipBlocksTillType (TOKEN_SEMICOLON, token);
-			}
-			else if (member && isType (token, TOKEN_PARENS))
-			{
-				emitTag (member, TSTAG_METHOD);
-				deleteToken (member);
-				member = NULL;
-				skipBlocksTillType (TOKEN_SEMICOLON, token);
-			}
-			else if (member)
-			{
-				if (! isType (token, TOKEN_TEMPLATE))
-				{
-					emitTag (member, TSTAG_PROPERTY);
-					deleteToken (member);
-					member = NULL;
-					skipBlocksTillType (TOKEN_SEMICOLON, token);
-				}
+				case TOKEN_KEYWORD:
+					switch (token->keyword)
+					{
+						case KEYWORD_private:
+						case KEYWORD_public:
+						case KEYWORD_protected:
+							if (member)
+							{
+								emitTag (member, TSTAG_PROPERTY);
+								deleteToken (member);
+								member = NULL;
+							}
+							visibility = token->keyword;
+							parsingType = false;
+							break;
+						case KEYWORD_typeof:
+							parsingType = true;
+							break;
+					}
+					break;
+				case TOKEN_COLON:
+				case TOKEN_PERIOD:
+				case TOKEN_PIPE:
+				case TOKEN_AMPERSAND:
+				case TOKEN_ARROW:
+					parsingType = true;
+					break;
+				case TOKEN_IDENTIFIER:
+					if (member)
+					{
+						emitTag (member, TSTAG_PROPERTY);
+						deleteToken (member);
+						member = NULL;
+						visibility = 0;
+					}
+
+					if (!parsingType)
+					{
+						member = newToken ();
+						copyToken (member, token, false);
+						member->scope = scope;
+						if (visibility) member->accessKeyword = visibility;
+						else member->accessKeyword = KEYWORD_public;
+					}
+					parsingType = false;
+					break;
+				case TOKEN_PARENS:
+					if (!parsingType && member)
+					{
+						emitTag (member, TSTAG_METHOD);
+						deleteToken (member);
+						member = NULL;
+						visibility = 0;
+					}
+				case TOKEN_SQUARES:
+				case TOKEN_CURLIES:
+				case TOKEN_TEMPLATE:
+				case TOKEN_SEMICOLON:
+				case TOKEN_COMMA:
+				case TOKEN_STRING:
+				case TOKEN_NUMBER:
+					parsingType = false;
+					break;
+				default:
+					break;
 			}
 		}
 	} while (parsed && ! isType (token, TOKEN_CLOSE_CURLY));
@@ -878,8 +935,7 @@ static void parseInterface (const int scope, tokenInfo *const token)
 								NULL);
 	} while (parsed && token->type != TOKEN_IDENTIFIER);
 
-	if (! parsed)
-		return;
+	if (! parsed) return;
 
 	token->scope = scope;
 
@@ -888,28 +944,92 @@ static void parseInterface (const int scope, tokenInfo *const token)
 	parseInterfaceBody (nscope, token);
 }
 
+MULTI_CHAR_PARSER_DEF (TypeChars, ":;,=|&",
+		TOKEN_COLON, TOKEN_SEMICOLON, TOKEN_COMMA,
+		TOKEN_EQUAL_SIGN, TOKEN_PIPE, TOKEN_AMPERSAND)
 static void parseType (const int scope, tokenInfo *const token)
 {
 	bool parsed;
+	bool parsingType = false;
+	bool shouldEnd = false;
 
 	do
 	{
 		clearPoolToken (token);
 		parsed = tryInSequence (token, false,
 								parseComment,
+								parseTemplate,
+								parseStringSQuote,
+								parseStringDQuote,
+								parseStringTemplate,
+								parseStringRegex,
+								parseParens,
+								parseSquares,
+								parseCurlies,
+								parseArrow,
+								parseNumber,
+								parseTypeofKeyword,
+								parseTypeChars,
 								parseIdentifier,
 								NULL);
-	} while (parsed && token->type != TOKEN_IDENTIFIER);
+		if (parsed)
+		{
+			switch (token->type)
+			{
+				case TOKEN_KEYWORD:
+					switch (token->keyword)
+					{
+						case KEYWORD_typeof:
+							shouldEnd = true;
+							parsingType = true;
+							break;
+						default:
+							break;
+					}
+					break;
+				case TOKEN_COLON:
+				case TOKEN_TEMPLATE:
+				case TOKEN_STRING:
+				case TOKEN_PARENS:
+				case TOKEN_SQUARES:
+				case TOKEN_CURLIES:
+				case TOKEN_NUMBER:
+					shouldEnd = true;
+					parsingType = false;
+					break;
+				case TOKEN_EQUAL_SIGN:
+				case TOKEN_PIPE:
+				case TOKEN_AMPERSAND:
+				case TOKEN_ARROW:
+					parsingType = true;
+					break;
+				case TOKEN_IDENTIFIER:
+					if (! parsingType && ! shouldEnd)
+					{
+						token->scope = scope;
+						emitTag (token, TSTAG_ALIAS);
+					}
+					else if (! parsingType && shouldEnd)
+					{
+						for (int i = vStringLength(token->string); i >= 0; i--)
+							uwiUngetC (vStringChar(token->string, i));
 
-	if (! parsed)
-		return;
+						parsed = false;
+					}
+					parsingType = false;
+					break;
+				default:
+					break;
+			}
+		}
+	} while (parsed && ! isType (token, TOKEN_COMMA) && ! isType (token, TOKEN_SEMICOLON));
 
-	token->scope = scope;
-	emitTag (token, TSTAG_ALIAS);
-	skipBlocksTillType (TOKEN_SEMICOLON, token);
+	clearPoolToken(token);
 }
 
-MULTI_CHAR_PARSER_DEF (EnumBodyChars, "},", TOKEN_CLOSE_CURLY, TOKEN_COMMA)
+MULTI_CHAR_PARSER_DEF (EnumBodyChars, "},=|&.",
+		TOKEN_CLOSE_CURLY, TOKEN_COMMA, TOKEN_EQUAL_SIGN,
+		TOKEN_PIPE, TOKEN_AMPERSAND, TOKEN_PERIOD)
 static void parseEnumBody (const int scope, tokenInfo *const token)
 {
 	bool parsed;
@@ -918,48 +1038,81 @@ static void parseEnumBody (const int scope, tokenInfo *const token)
 	{
 		parsed = tryInSequence (token, true,
 								parseTemplate,
+								parseComment,
 								parseStringSQuote,
 								parseStringDQuote,
 								parseStringTemplate,
+								parseStringRegex,
 								parseParens,
-								parseComment,
 								parseSquares,
 								parseOpenCurly,
 								NULL);
 	} while (parsed && token->type != TOKEN_OPEN_CURLY);
 
-	if (! parsed)
-		return;
+	if (! parsed) return;
 
 	tokenInfo *member = NULL;
+	bool parsingValue = false;
 	do
 	{
 		clearPoolToken (token);
 		parsed = tryInSequence (token, true,
 								parseTemplate,
+								parseComment,
 								parseStringSQuote,
 								parseStringDQuote,
 								parseStringTemplate,
+								parseStringRegex,
 								parseParens,
-								parseComment,
 								parseSquares,
+								parseCurlies,
+								parseNumber,
 								parseEnumBodyChars,
+								parseNewKeyword,
 								parseIdentifier,
 								NULL);
 
 		if (parsed)
 		{
-			if (! member && isType (token, TOKEN_IDENTIFIER))
+			switch (token->type)
 			{
-				member = newToken ();
-				copyToken (member, token, false);
-				member->scope = scope;
-				emitTag (member, TSTAG_ENUMERATOR);
-			}
-			else if (isType (token, TOKEN_COMMA))
-			{
-				deleteToken (member);
-				member = NULL;
+				case TOKEN_KEYWORD:
+					switch (token->keyword)
+					{
+						case KEYWORD_new:
+							parsingValue = true;
+							break;
+					}
+					break;
+				case TOKEN_EQUAL_SIGN:
+				case TOKEN_PIPE:
+				case TOKEN_AMPERSAND:
+				case TOKEN_PERIOD:
+					parsingValue = true;
+					break;
+				case TOKEN_COMMA:
+				case TOKEN_SEMICOLON:
+				case TOKEN_STRING:
+				case TOKEN_PARENS:
+				case TOKEN_SQUARES:
+				case TOKEN_CURLIES:
+				case TOKEN_NUMBER:
+					parsingValue = false;
+					break;
+				case TOKEN_IDENTIFIER:
+					if (!parsingValue)
+					{
+						member = newToken ();
+						copyToken (member, token, false);
+						member->scope = scope;
+						emitTag (member, TSTAG_ENUMERATOR);
+						deleteToken (member);
+						member = NULL;
+					}
+					parsingValue = false;
+					break;
+				default:
+					break;
 			}
 		}
 	} while (parsed && ! isType (token, TOKEN_CLOSE_CURLY));
@@ -983,8 +1136,7 @@ static void parseEnum (const int scope, tokenInfo *const token)
 								NULL);
 	} while (parsed && token->type != TOKEN_IDENTIFIER);
 
-	if (! parsed)
-		return;
+	if (! parsed) return;
 
 	token->scope = scope;
 	const int nscope = emitTag (token, TSTAG_ENUM);
@@ -992,10 +1144,12 @@ static void parseEnum (const int scope, tokenInfo *const token)
 	parseEnumBody (nscope, token);
 }
 
-MULTI_CHAR_PARSER_DEF (VariableChars, "|&=?[]{})\n:;,.",
+MULTI_CHAR_PARSER_DEF (VariableChars, "|&=?[]{})\n:;,.=-+/^<>*",
 		TOKEN_PIPE, TOKEN_AMPERSAND, TOKEN_EQUAL_SIGN, TOKEN_QUESTION_MARK,
 		TOKEN_OPEN_SQUARE, TOKEN_CLOSE_SQUARE, TOKEN_OPEN_CURLY, TOKEN_CLOSE_CURLY,
-		TOKEN_CLOSE_PAREN, TOKEN_NL, TOKEN_COLON, TOKEN_SEMICOLON, TOKEN_COMMA, TOKEN_PERIOD)
+		TOKEN_CLOSE_PAREN, TOKEN_NL, TOKEN_COLON, TOKEN_SEMICOLON, TOKEN_COMMA, TOKEN_PERIOD,
+		TOKEN_EQUAL_SIGN, TOKEN_MINUS, TOKEN_PLUS, TOKEN_DIV, TOKEN_POWER, TOKEN_GREATER,
+		TOKEN_STAR)
 static void parseVariable (bool constVar, bool localVar, const int scope, tokenInfo *const token)
 {
 	tokenInfo *member = NULL;
@@ -1007,22 +1161,26 @@ static void parseVariable (bool constVar, bool localVar, const int scope, tokenI
 	do
 	{
 		clearPoolToken (token);
-		parsed = tryInSequence (token, true,
+		parsed = tryInSequence (token, false,
 								parseTemplate,
+								parseComment,
+								parseStringRegex,
 								parseStringSQuote,
 								parseStringDQuote,
 								parseStringTemplate,
-								parseComment,
 								parseParens,
 								parseNumber,
-								parseVariableChars,
 								parseArrow,
+								parseAwaitKeyword,
 								parseForKeyword,
 								parseWhileKeyword,
 								parseThisKeyword,
 								parseEnumKeyword,
 								parseOfKeyword,
 								parseInKeyword,
+								parseNewKeyword,
+								parseTypeofKeyword,
+								parseVariableChars,
 								parseIdentifier,
 								NULL);
 
@@ -1032,23 +1190,34 @@ static void parseVariable (bool constVar, bool localVar, const int scope, tokenI
 			{
 				case TOKEN_OPEN_SQUARE:
 				case TOKEN_OPEN_CURLY:
-					if (parsingType)
-						nestLevel += 1;
+					nestLevel += 1;
 					break;
 				case TOKEN_CLOSE_SQUARE:
 				case TOKEN_CLOSE_CURLY:
-					if (parsingType)
-						nestLevel -= 1;
+					nestLevel -= 1;
 					break;
 				case TOKEN_COMMA:
 				case TOKEN_SEMICOLON:
 				case TOKEN_CLOSE_PAREN:
+				case TOKEN_NUMBER:
+				case TOKEN_STRING:
+				case TOKEN_PARENS:
 					if (nestLevel <= 0)
 					{
 						parsingType = false;
 						nestLevel = 0;
 					}
 					break;
+				case TOKEN_STAR:
+				case TOKEN_MINUS:
+				case TOKEN_PLUS:
+				case TOKEN_DIV:
+				case TOKEN_POWER:
+				case TOKEN_GREATER:
+				case TOKEN_LOWER:
+				case TOKEN_PERIOD:
+				case TOKEN_PIPE:
+				case TOKEN_AMPERSAND:
 				case TOKEN_COLON:
 				case TOKEN_EQUAL_SIGN:
 					parsingType = true;
@@ -1062,6 +1231,7 @@ static void parseVariable (bool constVar, bool localVar, const int scope, tokenI
 						emitTag (member, varKind);
 						deleteToken (member);
 					}
+					parsingType = false;
 					break;
 				case TOKEN_KEYWORD:
 					switch (token->keyword)
@@ -1071,6 +1241,9 @@ static void parseVariable (bool constVar, bool localVar, const int scope, tokenI
 							break;
 						case KEYWORD_of:
 						case KEYWORD_in:
+						case KEYWORD_await:
+						case KEYWORD_new:
+						case KEYWORD_typeof:
 							parsingType = true;
 							break;
 					}
@@ -1079,7 +1252,7 @@ static void parseVariable (bool constVar, bool localVar, const int scope, tokenI
 					break;
 			}
 		}
-	} while (parsed && ! ((token->type == TOKEN_SEMICOLON || token->type == TOKEN_CLOSE_PAREN) && ! parsingType));
+	} while (parsed && ! ((token->type == TOKEN_SEMICOLON || token->type == TOKEN_CLOSE_PAREN || token->type == TOKEN_NL) && ! parsingType && nestLevel <= 0));
 
 	clearPoolToken (token);
 }
@@ -1106,18 +1279,18 @@ static void parseFunctionArgs (const int scope, tokenInfo *const token)
 								NULL);
 	} while (parsed && token->type != TOKEN_OPEN_PAREN);
 
-	if (! parsed)
-		return;
+	if (! parsed) return;
 
 	do
 	{
 		clearPoolToken (token);
 		parsed = tryInSequence (token, false,
 								parseTemplate,
+								parseComment,
 								parseStringSQuote,
 								parseStringDQuote,
 								parseStringTemplate,
-								parseComment,
+								parseStringRegex,
 								parseParens,
 								parseNumber,
 								parseFunctionArgsAfterParenChars,
@@ -1135,13 +1308,11 @@ static void parseFunctionArgs (const int scope, tokenInfo *const token)
 					break;
 				case TOKEN_OPEN_SQUARE:
 				case TOKEN_OPEN_CURLY:
-					if (parsingType)
-						nestLevel += 1;
+					if (parsingType) nestLevel += 1;
 					break;
 				case TOKEN_CLOSE_SQUARE:
 				case TOKEN_CLOSE_CURLY:
-					if (parsingType)
-						nestLevel -= 1;
+					if (parsingType) nestLevel -= 1;
 					break;
 				case TOKEN_COMMA:
 					if (nestLevel <= 0)
@@ -1183,17 +1354,17 @@ static void parseFunctionBody (const int scope, tokenInfo *const token)
 
 		parsed = tryInSequence (token, true,
 								parseOpenCurly,
+								parseComment,
 								parseStringSQuote,
 								parseStringDQuote,
 								parseStringTemplate,
+								parseStringRegex,
 								parseTemplate,
-								parseComment,
 								NULL);
 
 	} while (parsed && ! isType (token, TOKEN_OPEN_CURLY));
 
-	if (! parsed)
-		return;
+	if (! parsed) return;
 
 	do
 	{
@@ -1201,10 +1372,11 @@ static void parseFunctionBody (const int scope, tokenInfo *const token)
 
 		parsed = tryInSequence (token, true,
 								parseFunctionBodyChars,
+								parseComment,
 								parseStringSQuote,
 								parseStringDQuote,
 								parseStringTemplate,
-								parseComment,
+								parseStringRegex,
 								parseTemplate,
 								parseVarKeyword,
 								parseLetKeyword,
@@ -1256,12 +1428,10 @@ static void parseFunction (const int scope, tokenInfo *const token)
 								parseIdentifier,
 								NULL);
 
-		if (parsed && isType (token, TOKEN_STAR))
-			isGenerator = true;
+		if (parsed && isType (token, TOKEN_STAR)) isGenerator = true;
 	} while (parsed && token->type != TOKEN_IDENTIFIER);
 
-	if (! parsed)
-		return;
+	if (! parsed) return;
 
 	token->scope = scope;
 
@@ -1271,40 +1441,74 @@ static void parseFunction (const int scope, tokenInfo *const token)
 	parseFunctionBody (nscope, token);
 }
 
-MULTI_CHAR_PARSER_DEF (PropertyTypeChars, "\n;|&=,)",
+MULTI_CHAR_PARSER_DEF (PropertyTypeChars, "\n;|&,)",
 		TOKEN_NL, TOKEN_SEMICOLON, TOKEN_PIPE, TOKEN_AMPERSAND,
-		TOKEN_EQUAL_SIGN, TOKEN_COMMA, TOKEN_CLOSE_PAREN)
+		TOKEN_COMMA, TOKEN_CLOSE_PAREN)
 static void parsePropertyType (tokenInfo *const token)
 {
 	bool parsed = tryParser ((Parser) parseColon, token, true);
+	bool parsedIdentifier = false;
+	bool parseReturnValue = false;
 
-	if (! parsed)
-		return;
+	if (! parsed) return;
 
 	do
 	{
 		clearPoolToken (token);
 
-		parsed = tryInSequence (token, true,
-								parsePropertyTypeChars,
-								parseArrow,
-								parseTemplate,
-								parseParens,
-								parseStringSQuote,
-								parseStringDQuote,
-								parseStringTemplate,
-								parseComment,
-								parseSquares,
-								parseCurlies,
-								parseIdentifier,
-								NULL);
-	} while (parsed && ! isType (token, TOKEN_CLOSE_PAREN) && ! isType (token, TOKEN_SEMICOLON) && ! isType (token, TOKEN_COMMA));
+		if (parsedIdentifier)
+		{
+			parsed = tryInSequence (token, false,
+									parsePropertyTypeChars,
+									parseArrow,
+									parseTemplate,
+									parseParens,
+									parseComment,
+									parseStringSQuote,
+									parseStringDQuote,
+									parseStringTemplate,
+									parseStringRegex,
+									parseSquares,
+									parseCurlies,
+									NULL);
 
-	if (! parsed)
-		return;
+			if (isType (token, TOKEN_PIPE) || isType (token, TOKEN_AMPERSAND)) parsedIdentifier = false;
+		}
+		else
+		{
+			parsed = tryInSequence (token, false,
+									parsePropertyTypeChars,
+									parseArrow,
+									parseTemplate,
+									parseParens,
+									parseComment,
+									parseStringSQuote,
+									parseStringDQuote,
+									parseStringTemplate,
+									parseStringRegex,
+									parseSquares,
+									parseCurlies,
+									parseIdentifier,
+									NULL);
 
-	if (isType (token, TOKEN_CLOSE_PAREN))
-		uwiUngetC (')');
+			if (isType (token, TOKEN_IDENTIFIER)) parsedIdentifier = true;
+		}
+
+
+		if (isType (token, TOKEN_ARROW)) parseReturnValue = true;
+	} while (parsed
+			&& ! isType (token, TOKEN_CLOSE_PAREN)
+			&& ! isType (token, TOKEN_SEMICOLON)
+			&& ! isType (token, TOKEN_COMMA)
+			&& ! (parseReturnValue && (
+					isType (token, TOKEN_PARENS)
+					|| isType (token, TOKEN_CURLIES)
+					|| isType (token, TOKEN_SQUARES))));
+
+	if (! parsed) return;
+
+	if (isType (token, TOKEN_CLOSE_PAREN)) uwiUngetC (')');
+
 	clearPoolToken (token);
 }
 
@@ -1325,8 +1529,7 @@ static void parseConstructorParams (const int classScope, const int constrScope,
 								NULL);
 	} while (parsed && ! isType (token, TOKEN_OPEN_PAREN));
 
-	if (! parsed)
-		return;
+	if (! parsed) return;
 
 	tokenInfo *member = NULL;
 	int visibility = 0;
@@ -1395,9 +1598,12 @@ static void parseConstructorParams (const int classScope, const int constrScope,
 }
 
 MULTI_CHAR_PARSER_DEF (ClassBodyChars, "\n{", TOKEN_NL, TOKEN_OPEN_CURLY)
-MULTI_CHAR_PARSER_DEF (ClassBodyAfterCurlyChars, "\n}*@(:;=",
+MULTI_CHAR_PARSER_DEF (ClassBodyAfterCurlyChars, "\n}*@(:;=-+/^<>.,|&",
 		TOKEN_NL, TOKEN_CLOSE_CURLY, TOKEN_STAR, TOKEN_AT, TOKEN_OPEN_PAREN,
-		TOKEN_COLON, TOKEN_SEMICOLON, TOKEN_EQUAL_SIGN)
+		TOKEN_COLON, TOKEN_SEMICOLON, TOKEN_EQUAL_SIGN,
+		TOKEN_MINUS, TOKEN_PLUS, TOKEN_DIV, TOKEN_POWER,
+		TOKEN_GREATER, TOKEN_LOWER, TOKEN_PERIOD, TOKEN_COMMA,
+		TOKEN_PIPE, TOKEN_AMPERSAND)
 static void parseClassBody (const int scope, tokenInfo *const token)
 {
 	bool parsed = false;
@@ -1415,11 +1621,11 @@ static void parseClassBody (const int scope, tokenInfo *const token)
 								NULL);
 	} while (parsed && token->type != TOKEN_OPEN_CURLY);
 
-	if (! parsed)
-		return;
+	if (! parsed) return;
 
 	tokenInfo *member = NULL;
 	bool isGenerator = false;
+	bool parsingValue = false;
 	int visibility = 0;
 
 	do
@@ -1427,10 +1633,14 @@ static void parseClassBody (const int scope, tokenInfo *const token)
 		clearPoolToken (token);
 
 		parsed = tryInSequence (token, false,
-								parseClassBodyAfterCurlyChars,
 								parseComment,
+								parseStringSQuote,
+								parseStringDQuote,
+								parseStringTemplate,
+								parseStringRegex,
 								parseAsyncKeyword,
 								parseConstructorKeyword,
+								parseNewKeyword,
 								parsePrivateKeyword,
 								parseProtectedKeyword,
 								parsePublicKeyword,
@@ -1438,6 +1648,8 @@ static void parseClassBody (const int scope, tokenInfo *const token)
 								parseStaticKeyword,
 								parseNumber,
 								parseTemplate,
+								parseTypeofKeyword,
+								parseClassBodyAfterCurlyChars,
 								parseIdentifier,
 								NULL);
 
@@ -1454,15 +1666,18 @@ static void parseClassBody (const int scope, tokenInfo *const token)
 					{
 						case KEYWORD_constructor:
 							if (member)
+							{
+								emitTag (member, TSTAG_PROPERTY);
 								deleteToken (member);
+								member = NULL;
+								isGenerator = false;
+							}
 							member = newToken ();
 							copyToken (member, token, false);
 							member->scope = scope;
 
-							if (visibility)
-								member->accessKeyword = visibility;
-							else
-								member->accessKeyword = KEYWORD_public;
+							if (visibility) member->accessKeyword = visibility;
+							else member->accessKeyword = KEYWORD_public;
 
 							const int nscope = emitTag (member, TSTAG_METHOD);
 							deleteToken (member);
@@ -1472,18 +1687,36 @@ static void parseClassBody (const int scope, tokenInfo *const token)
 							parseConstructorParams (scope, nscope, token);
 
 							parseFunctionBody (nscope, token);
+							parsingValue = false;
 							break;
 						case KEYWORD_private:
 						case KEYWORD_public:
 						case KEYWORD_protected:
+							if (member)
+							{
+								emitTag (member, TSTAG_PROPERTY);
+								deleteToken (member);
+								member = NULL;
+							}
 							visibility = token->keyword;
+							parsingValue = false;
+							break;
+						case KEYWORD_new:
+						case KEYWORD_typeof:
+							parsingValue = true;
 							break;
 					}
 					isGenerator = false;
 					break;
 				case TOKEN_EQUAL_SIGN:
-					skipBlocksTillType (TOKEN_SEMICOLON, token);
-					uwiUngetC (';');
+					if (member)
+					{
+						emitTag (member, TSTAG_PROPERTY);
+						deleteToken (member);
+						member = NULL;
+						isGenerator = false;
+					}
+					parsingValue = true;
 					break;
 				case TOKEN_COLON:
 					uwiUngetC (':');
@@ -1497,13 +1730,28 @@ static void parseClassBody (const int scope, tokenInfo *const token)
 						isGenerator = false;
 						visibility = 0;
 					}
+					parsingValue = false;
 					break;
 				case TOKEN_STAR:
 					isGenerator = true;
+				case TOKEN_MINUS:
+				case TOKEN_PLUS:
+				case TOKEN_DIV:
+				case TOKEN_POWER:
+				case TOKEN_GREATER:
+				case TOKEN_LOWER:
+				case TOKEN_PERIOD:
+				case TOKEN_PIPE:
+				case TOKEN_AMPERSAND:
+					parsingValue = true;
+					break;
+				case TOKEN_STRING:
+				case TOKEN_COMMA:
+				case TOKEN_NUMBER:
+					parsingValue = false;
 					break;
 				case TOKEN_OPEN_PAREN:
-					if (! member)
-						break;
+					if (! member) break;
 					uwiUngetC ('(');
 
 					const int nscope = emitTag (member, isGenerator ? TSTAG_GENERATOR : TSTAG_METHOD);
@@ -1516,17 +1764,20 @@ static void parseClassBody (const int scope, tokenInfo *const token)
 
 					isGenerator = false;
 					visibility = 0;
+					parsingValue = false;
 					break;
 				case TOKEN_IDENTIFIER:
-					if (member)
-						deleteToken (member);
-					member = newToken ();
-					copyToken (member, token, false);
-					member->scope = scope;
-					if (visibility)
-						member->accessKeyword = visibility;
-					else
-						member->accessKeyword = KEYWORD_public;
+					if (!parsingValue) {
+						if (member) deleteToken (member);
+						member = newToken ();
+						copyToken (member, token, false);
+						member->scope = scope;
+						if (visibility) member->accessKeyword = visibility;
+						else member->accessKeyword = KEYWORD_public;
+					}
+
+					parsingValue = false;
+					isGenerator = false;
 					break;
 				default:
 					isGenerator = false;
@@ -1541,8 +1792,7 @@ static void parseClassBody (const int scope, tokenInfo *const token)
 		emitTag (member, TSTAG_PROPERTY);
 		deleteToken (member);
 	}
-	else if (member)
-		deleteToken (member);
+	else if (member) deleteToken (member);
 }
 
 static void parseClass (const int scope, tokenInfo *const token)
@@ -1560,8 +1810,7 @@ static void parseClass (const int scope, tokenInfo *const token)
 								NULL);
 	} while (parsed && token->type != TOKEN_IDENTIFIER);
 
-	if (! parsed)
-		return;
+	if (! parsed) return;
 
 	token->scope = scope;
 	const int nscope = emitTag (token, TSTAG_CLASS);
@@ -1586,8 +1835,7 @@ static void parseNamespaceBody (const int scope, tokenInfo *const token)
 								NULL);
 	} while (parsed && token->type != TOKEN_OPEN_CURLY);
 
-	if (! parsed)
-		return;
+	if (! parsed) return;
 
 	int parenLvl = 0;
 	int squareLvl = 0;
@@ -1603,6 +1851,7 @@ static void parseNamespaceBody (const int scope, tokenInfo *const token)
 								parseStringSQuote,
 								parseStringDQuote,
 								parseStringTemplate,
+								parseStringRegex,
 								parseInterfaceKeyword,
 								parseTypeKeyword,
 								parseEnumKeyword,
@@ -1686,8 +1935,7 @@ static void parseNamespace (tokenInfo *const token)
 								NULL);
 	} while (parsed && token->type != TOKEN_IDENTIFIER);
 
-	if (! parsed)
-		return;
+	if (! parsed) return;
 
 	const int scope = emitTag (token, TSTAG_NAMESPACE);
 
@@ -1708,6 +1956,7 @@ static void parseTsFile (tokenInfo *const token)
 								parseStringSQuote,
 								parseStringDQuote,
 								parseStringTemplate,
+								parseStringRegex,
 								parseInterfaceKeyword,
 								parseTypeKeyword,
 								parseEnumKeyword,
@@ -1784,8 +2033,7 @@ static void initialize (const langType language)
 
 static void finalize (langType language CTAGS_ATTR_UNUSED, bool initialized)
 {
-	if (! initialized)
-		return;
+	if (! initialized) return;
 
 	objPoolDelete (TokenPool);
 }
