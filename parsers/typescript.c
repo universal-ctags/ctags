@@ -259,8 +259,7 @@ CTAGS_INLINE void parseStringTemplate(const int c, tokenInfo * const token, pars
 
 static int emitTag(const tokenInfo *const token, const tsKind kind)
 {
-	if (! TsKinds [kind].enabled)
-		return CORK_NIL;
+	if (! TsKinds [kind].enabled) return CORK_NIL;
 
 	static const char *const access [3] = {
 		"private",
@@ -320,8 +319,7 @@ static void clearPoolToken (void *data)
 static void deletePoolToken (void *data)
 {
 	tokenInfo *token = data;
-	if (token->string)
-		vStringDelete (token->string);
+	if (token->string) vStringDelete (token->string);
 	eFree (token);
 }
 
@@ -500,8 +498,7 @@ CTAGS_INLINE void parseComment(const int c, tokenInfo *const token, commentState
 
 	state->parsed += 1;
 
-	if (c == EOF)
-		result->status = PARSER_FINISHED;
+	if (c == EOF) result->status = PARSER_FINISHED;
 	else if (state->isBlock)
 	{
 		parseWordToken (c, token, "*/", TOKEN_COMMENT_BLOCK, &state->blockParsed, result);
@@ -580,15 +577,11 @@ CTAGS_INLINE void parseBlock(const int c, tokenInfo *const token, tokenType cons
 		state->parsed = 1;
 	}
 
-	if (c == '{')
-		state->curlyLevel += 1;
-	else if (c == '}')
-		state->curlyLevel -= 1;
+	if (c == '{') state->curlyLevel += 1;
+	else if (c == '}') state->curlyLevel -= 1;
 
-	if (c == start)
-		state->nestLevel += 1;
-	else if (c == end)
-		state->nestLevel -= 1;
+	if (c == start) state->nestLevel += 1;
+	else if (c == end) state->nestLevel -= 1;
 	else if ((state->curlyLevel < 1 && c == ';') || c == EOF)
 	{
 		result->status = PARSER_FAILED;
@@ -731,12 +724,9 @@ CTAGS_INLINE bool tryParser(Parser parser, tokenInfo *const token, bool skipWhit
 		parser (c, token, &currentState, &result);
 	}
 
-	if (result.status == PARSER_FAILED)
-		uwiPopMarker (-1, true);
-	else if (result.unusedChars > 0)
-		uwiPopMarker (result.unusedChars, true);
-	else
-		uwiDropMaker ();
+	if (result.status == PARSER_FAILED) uwiPopMarker (-1, true);
+	else if (result.unusedChars > 0) uwiPopMarker (result.unusedChars, true);
+	else uwiDropMaker ();
 
 	return result.status == PARSER_FINISHED;
 }
@@ -819,8 +809,7 @@ static void parseInterfaceBody (const int scope, tokenInfo *const token)
 								NULL);
 	} while (parsed && ! isType (token, TOKEN_OPEN_CURLY));
 
-	if (! parsed)
-		return;
+	if (! parsed) return;
 
 	tokenInfo *member = NULL;
 	bool parsingType = false;
@@ -897,10 +886,8 @@ static void parseInterfaceBody (const int scope, tokenInfo *const token)
 						member = newToken ();
 						copyToken (member, token, false);
 						member->scope = scope;
-						if (visibility)
-							member->accessKeyword = visibility;
-						else
-							member->accessKeyword = KEYWORD_public;
+						if (visibility) member->accessKeyword = visibility;
+						else member->accessKeyword = KEYWORD_public;
 					}
 					parsingType = false;
 					break;
@@ -948,8 +935,7 @@ static void parseInterface (const int scope, tokenInfo *const token)
 								NULL);
 	} while (parsed && token->type != TOKEN_IDENTIFIER);
 
-	if (! parsed)
-		return;
+	if (! parsed) return;
 
 	token->scope = scope;
 
@@ -1063,8 +1049,7 @@ static void parseEnumBody (const int scope, tokenInfo *const token)
 								NULL);
 	} while (parsed && token->type != TOKEN_OPEN_CURLY);
 
-	if (! parsed)
-		return;
+	if (! parsed) return;
 
 	tokenInfo *member = NULL;
 	bool parsingValue = false;
@@ -1151,8 +1136,7 @@ static void parseEnum (const int scope, tokenInfo *const token)
 								NULL);
 	} while (parsed && token->type != TOKEN_IDENTIFIER);
 
-	if (! parsed)
-		return;
+	if (! parsed) return;
 
 	token->scope = scope;
 	const int nscope = emitTag (token, TSTAG_ENUM);
@@ -1295,8 +1279,7 @@ static void parseFunctionArgs (const int scope, tokenInfo *const token)
 								NULL);
 	} while (parsed && token->type != TOKEN_OPEN_PAREN);
 
-	if (! parsed)
-		return;
+	if (! parsed) return;
 
 	do
 	{
@@ -1325,13 +1308,11 @@ static void parseFunctionArgs (const int scope, tokenInfo *const token)
 					break;
 				case TOKEN_OPEN_SQUARE:
 				case TOKEN_OPEN_CURLY:
-					if (parsingType)
-						nestLevel += 1;
+					if (parsingType) nestLevel += 1;
 					break;
 				case TOKEN_CLOSE_SQUARE:
 				case TOKEN_CLOSE_CURLY:
-					if (parsingType)
-						nestLevel -= 1;
+					if (parsingType) nestLevel -= 1;
 					break;
 				case TOKEN_COMMA:
 					if (nestLevel <= 0)
@@ -1383,8 +1364,7 @@ static void parseFunctionBody (const int scope, tokenInfo *const token)
 
 	} while (parsed && ! isType (token, TOKEN_OPEN_CURLY));
 
-	if (! parsed)
-		return;
+	if (! parsed) return;
 
 	do
 	{
@@ -1448,12 +1428,10 @@ static void parseFunction (const int scope, tokenInfo *const token)
 								parseIdentifier,
 								NULL);
 
-		if (parsed && isType (token, TOKEN_STAR))
-			isGenerator = true;
+		if (parsed && isType (token, TOKEN_STAR)) isGenerator = true;
 	} while (parsed && token->type != TOKEN_IDENTIFIER);
 
-	if (! parsed)
-		return;
+	if (! parsed) return;
 
 	token->scope = scope;
 
@@ -1472,8 +1450,7 @@ static void parsePropertyType (tokenInfo *const token)
 	bool parsedIdentifier = false;
 	bool parseReturnValue = false;
 
-	if (! parsed)
-		return;
+	if (! parsed) return;
 
 	do
 	{
@@ -1495,8 +1472,7 @@ static void parsePropertyType (tokenInfo *const token)
 									parseCurlies,
 									NULL);
 
-			if (isType (token, TOKEN_PIPE) || isType (token, TOKEN_AMPERSAND))
-				parsedIdentifier = false;
+			if (isType (token, TOKEN_PIPE) || isType (token, TOKEN_AMPERSAND)) parsedIdentifier = false;
 		}
 		else
 		{
@@ -1529,11 +1505,9 @@ static void parsePropertyType (tokenInfo *const token)
 					|| isType (token, TOKEN_CURLIES)
 					|| isType (token, TOKEN_SQUARES))));
 
-	if (! parsed)
-		return;
+	if (! parsed) return;
 
-	if (isType (token, TOKEN_CLOSE_PAREN))
-		uwiUngetC (')');
+	if (isType (token, TOKEN_CLOSE_PAREN)) uwiUngetC (')');
 
 	clearPoolToken (token);
 }
@@ -1555,8 +1529,7 @@ static void parseConstructorParams (const int classScope, const int constrScope,
 								NULL);
 	} while (parsed && ! isType (token, TOKEN_OPEN_PAREN));
 
-	if (! parsed)
-		return;
+	if (! parsed) return;
 
 	tokenInfo *member = NULL;
 	int visibility = 0;
@@ -1648,8 +1621,7 @@ static void parseClassBody (const int scope, tokenInfo *const token)
 								NULL);
 	} while (parsed && token->type != TOKEN_OPEN_CURLY);
 
-	if (! parsed)
-		return;
+	if (! parsed) return;
 
 	tokenInfo *member = NULL;
 	bool isGenerator = false;
@@ -1704,10 +1676,8 @@ static void parseClassBody (const int scope, tokenInfo *const token)
 							copyToken (member, token, false);
 							member->scope = scope;
 
-							if (visibility)
-								member->accessKeyword = visibility;
-							else
-								member->accessKeyword = KEYWORD_public;
+							if (visibility) member->accessKeyword = visibility;
+							else member->accessKeyword = KEYWORD_public;
 
 							const int nscope = emitTag (member, TSTAG_METHOD);
 							deleteToken (member);
@@ -1798,15 +1768,12 @@ static void parseClassBody (const int scope, tokenInfo *const token)
 					break;
 				case TOKEN_IDENTIFIER:
 					if (!parsingValue) {
-						if (member)
-							deleteToken (member);
+						if (member) deleteToken (member);
 						member = newToken ();
 						copyToken (member, token, false);
 						member->scope = scope;
-						if (visibility)
-							member->accessKeyword = visibility;
-						else
-							member->accessKeyword = KEYWORD_public;
+						if (visibility) member->accessKeyword = visibility;
+						else member->accessKeyword = KEYWORD_public;
 					}
 
 					parsingValue = false;
@@ -1825,8 +1792,7 @@ static void parseClassBody (const int scope, tokenInfo *const token)
 		emitTag (member, TSTAG_PROPERTY);
 		deleteToken (member);
 	}
-	else if (member)
-		deleteToken (member);
+	else if (member) deleteToken (member);
 }
 
 static void parseClass (const int scope, tokenInfo *const token)
@@ -1844,8 +1810,7 @@ static void parseClass (const int scope, tokenInfo *const token)
 								NULL);
 	} while (parsed && token->type != TOKEN_IDENTIFIER);
 
-	if (! parsed)
-		return;
+	if (! parsed) return;
 
 	token->scope = scope;
 	const int nscope = emitTag (token, TSTAG_CLASS);
@@ -1870,8 +1835,7 @@ static void parseNamespaceBody (const int scope, tokenInfo *const token)
 								NULL);
 	} while (parsed && token->type != TOKEN_OPEN_CURLY);
 
-	if (! parsed)
-		return;
+	if (! parsed) return;
 
 	int parenLvl = 0;
 	int squareLvl = 0;
@@ -1971,8 +1935,7 @@ static void parseNamespace (tokenInfo *const token)
 								NULL);
 	} while (parsed && token->type != TOKEN_IDENTIFIER);
 
-	if (! parsed)
-		return;
+	if (! parsed) return;
 
 	const int scope = emitTag (token, TSTAG_NAMESPACE);
 
@@ -2070,8 +2033,7 @@ static void initialize (const langType language)
 
 static void finalize (langType language CTAGS_ATTR_UNUSED, bool initialized)
 {
-	if (! initialized)
-		return;
+	if (! initialized) return;
 
 	objPoolDelete (TokenPool);
 }
