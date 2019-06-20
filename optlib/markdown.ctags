@@ -41,14 +41,24 @@
 
 --_tabledef-Markdown=main
 --_tabledef-Markdown=sharp
+--_tabledef-Markdown=rest
 
+# Handle GFM style codeblock in this table.
+# https://github.github.com/gfm/#fenced-code-blocks
+--_tabledef-Markdown=codeblockBacktick
+--_tabledef-Markdown=codeblockTildes
+
+
+--_mtable-regex-Markdown=rest/^[^\n]+[\n]//
+--_mtable-regex-Markdown=rest/[\n]+//
+--_mtable-regex-Markdown=rest/^[^\n]+//
 
 --_mtable-regex-Markdown=main/^#///{tjump=sharp}{_advanceTo=0start}
+--_mtable-regex-Markdown=main/^[ \t]*````*[^`\n]*[\n]//{tenter=codeblockBacktick}
+--_mtable-regex-Markdown=main/^[ \t]*~~~~*[^~\n]*[\n]//{tenter=codeblockTildes}
 --_mtable-regex-Markdown=main/^([^\n]+)[\n]=+[\n]/\1/c/{_field=sectionMarker:=}
 --_mtable-regex-Markdown=main/^([^\n]+)[\n]-+[\n]/\1/s/{_field=sectionMarker:-}
---_mtable-regex-Markdown=main/^[^\n]+[\n]//
---_mtable-regex-Markdown=main/[\n]+//
---_mtable-regex-Markdown=main/^[^\n]+//
+--_mtable-extend-Markdown=main+rest
 
 
 --_mtable-regex-Markdown=sharp/^#[ \t]+([^\n]+)([ \t]+#+)[\n]/\1/c/{_field=sectionMarker:##}{tjump=main}
@@ -66,3 +76,9 @@
 --_mtable-regex-Markdown=sharp/^[^\n]+[\n]//{tjump=main}
 --_mtable-regex-Markdown=sharp/[\n]+//{tjump=main}
 --_mtable-regex-Markdown=sharp/^[^\n]+//{tjump=main}
+
+--_mtable-regex-Markdown=codeblockBacktick/^[ \t]*````*[ \t]*[\n]//{tleave}
+--_mtable-extend-Markdown=codeblockBacktick+rest
+
+--_mtable-regex-Markdown=codeblockTildes/^[ \t]*~~~~*[ \t]*[\n]//{tleave}
+--_mtable-extend-Markdown=codeblockTildes+rest
