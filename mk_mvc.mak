@@ -55,9 +55,12 @@ PDBFLAG =
 {win32\mkstemp}.c{win32\mkstemp}.obj::
 	$(CC) $(OPT) $(DEFINES) $(INCLUDES) /Fowin32\mkstemp\ /c $<
 
-all: ctags.exe readtags.exe
+all: libctags_a.lib ctags.exe readtags.exe
 
-ctags: ctags.exe
+ctags: libctags_a.lib ctags.exe
+
+libctags_a.lib: $(ALL_OBJS)
+		lib -nologo -out:$@ $(ALL_OBJS)
 
 ctags.exe: $(ALL_OBJS) $(ALL_HEADS) $(REGEX_HEADS) $(FNMATCH_HEADS) $(WIN32_HEADS) $(REPOINFO_HEADS)
 	$(CC) $(OPT) /Fe$@ $(ALL_OBJS) /link setargv.obj $(LIBS) $(PDBFLAG)
