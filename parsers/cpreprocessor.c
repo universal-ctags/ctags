@@ -751,14 +751,17 @@ static int directiveDefine (const int c, bool undef)
 		readIdentifier (c, Cpp.directive.name);
 		if (! isIgnore ())
 		{
-			int p;
+			unsigned long 	lineNumber = getInputLineNumber ();
+			MIOPos filePosition = getInputFilePosition ();
+			int p = cppGetcFromUngetBufferOrFile ();
 
-			p = cppGetcFromUngetBufferOrFile ();
 			if (p == '(')
 			{
 				signature = vStringNewOrClearWithAutoRelease (signature);
 				do {
-					if (!isspacetab(p))
+					if (p == '\\')
+						cppGetcFromUngetBufferOrFile (); /* Throw away the next char */
+					else if (!isspacetab(p))
 						vStringPut (signature, p);
 					/* TODO: Macro parameters can be captured here. */
 					p = cppGetcFromUngetBufferOrFile ();
@@ -771,6 +774,13 @@ static int directiveDefine (const int c, bool undef)
 				}
 				else
 					r = makeDefineTag (vStringValue (Cpp.directive.name), NULL, undef);
+
+				if (r != CORK_NIL)
+				{
+					tagEntryInfo *e = getEntryInCorkQueue (r);
+					e->lineNumber = lineNumber;
+					e->filePosition = filePosition;
+				}
 			}
 			else
 			{
