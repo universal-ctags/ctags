@@ -25,3 +25,7 @@ C	input.md	/^C$/;"	c	sectionMarker:=
 D	input.md	/^D$/;"	s	sectionMarker:-
 E	input.md	/^E$/;"	s	sectionMarker:-
 F	input.md	/^F$/;"	s	sectionMarker:-
+x	input.md	/^function x$/;"	f
+y	input.md	/^function y$/;"	f
+f	input.md	/^sub f {$/;"	s
+g	input.md	/^sub g$/;"	s
