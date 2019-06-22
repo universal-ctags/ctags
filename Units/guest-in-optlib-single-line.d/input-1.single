@@ -1,0 +1,18 @@
+BEGIN:lisp
+(defun g0 () (list))
+END
+
+BEGIN:C
+int g1 (void) { return 0; }
+END
+
+BEGIN:Sh
+function g2
+{
+	cat > foo.rst <<EOF
+==================
+G2 on g2
+==================
+EOF
+}
+END
