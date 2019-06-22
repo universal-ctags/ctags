@@ -32,6 +32,12 @@
 *   DATA DEFINITIONS
 */
 typedef enum PerlKindType perlKind;
+typedef enum PerlModuleRoleType perlModuleRole;
+
+static roleDefinition PerlModuleRoles [] = {
+	{ true, "used",   "specified in `use' built-in function" },
+	{ true, "unused", "specified in `no' built-in function" },
+};
 
 static kindDefinition PerlKinds [] = {
 	{ true,  'c', "constant",               "constants" },
@@ -40,6 +46,8 @@ static kindDefinition PerlKinds [] = {
 	{ true,  'p', "package",                "packages" },
 	{ true,  's', "subroutine",             "subroutines" },
 	{ false, 'd', "subroutineDeclaration",  "subroutine declarations" },
+	{ false, 'M', "module",                 "modules",
+	  .referenceOnly = true,  ATTACH_ROLES(PerlModuleRoles)},
 };
 
 /*
@@ -235,6 +243,13 @@ static void makeTagFromLeftSide (const char *begin, const char *end,
 	}
 }
 
+static void makeTagForModule (const char *name, int role)
+{
+	tagEntryInfo entry;
+	initRefTagEntry(&entry, name, KIND_PERL_MODULE, role);
+	makeTagEntry(&entry);
+}
+
 enum const_state { CONST_STATE_NEXT_LINE, CONST_STATE_HIT_END };
 
 /* Parse a single line, find as many NAME => VALUE pairs as we can and try
@@ -384,15 +399,31 @@ static void findPerlTags (void)
 				++cp;
 			if (strncmp((const char*) cp, "AutoLoader", (size_t) 10) == 0) {
 				respect_token &= ~RESPECT_END;
+				makeTagForModule("AutoLoader", ROLE_PERL_MODULE_USED);
 				continue;
 			}
 			if (strncmp((const char*) cp, "SelfLoader", (size_t) 10) == 0) {
 				respect_token &= ~RESPECT_DATA;
+				makeTagForModule("SelfLoader", ROLE_PERL_MODULE_USED);
 				continue;
 			}
-			if (strncmp((const char*) cp, "constant", (size_t) 8) != 0)
+
+			vString *module = NULL;
+			while (isalnum(*cp) || *cp == ':' || *cp == '.') {
+				if (!module)
+					module = vStringNew();
+				vStringPut(module, *cp);
+				++cp;
+			}
+			if (!module)
 				continue;
-			cp += 8;
+
+			makeTagForModule(vStringValue(module), ROLE_PERL_MODULE_USED);
+			bool isConstant = (strcmp(vStringValue(module), "constant") == 0);
+			vStringDelete(module);
+			if (!isConstant)
+				continue;
+
 			/* Skip up to the first non-space character, skipping empty
 			 * and comment lines.
 			 */
@@ -416,6 +447,24 @@ static void findPerlTags (void)
 			kind = KIND_PERL_CONSTANT;
 			spaceRequired = false;
 			qualified = true;
+		}
+		else if (strncmp((const char*) cp, "no", (size_t) 2) == 0 && isspace(cp[2]))
+		{
+			cp += 3;
+			while (isspace (*cp))
+				cp++;
+			vString *module = NULL;
+			while (isalnum(*cp) || *cp == ':' || *cp == '.') {
+				if (!module)
+					module = vStringNew();
+				vStringPut(module, *cp);
+				++cp;
+			}
+			if (module) {
+				makeTagForModule(vStringValue(module), ROLE_PERL_MODULE_UNUSED);
+				vStringDelete(module);
+			}
+			continue;
 		}
 		else if (strncmp((const char*) cp, "package", (size_t) 7) == 0 &&
 				 ('\0' == cp[7] || isspace(cp[7])))

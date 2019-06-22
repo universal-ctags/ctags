@@ -16,6 +16,11 @@
 
 typedef struct sPerlSubparser perlSubparser;
 
+enum PerlModuleRoleType {
+	ROLE_PERL_MODULE_USED,
+	ROLE_PERL_MODULE_UNUSED,
+};
+
 enum PerlKindType {
 	KIND_PERL_NONE = -1,
 	KIND_PERL_CONSTANT,
@@ -23,7 +28,8 @@ enum PerlKindType {
 	KIND_PERL_LABEL,
 	KIND_PERL_PACKAGE,
 	KIND_PERL_SUBROUTINE,
-	KIND_PERL_SUBROUTINE_DECLARATION
+	KIND_PERL_SUBROUTINE_DECLARATION,
+	KIND_PERL_MODULE,
 };
 
 struct sPerlSubparser {
