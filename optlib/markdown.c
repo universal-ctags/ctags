@@ -21,11 +21,11 @@ static void initializeMarkdownParser (const langType language)
 	                               "^#",
 	                               "", "", "{tjump=sharp}{_advanceTo=0start}", NULL);
 	addLanguageTagMultiTableRegex (language, "main",
-	                               "^[ \t]*````*[^`\n]*[\n]",
-	                               "", "", "{tenter=codeblockBacktick}", NULL);
+	                               "^[ \t]*````*([a-zA-Z0-9][-#+a-zA-Z0-9]*)?[^`\n]*[\n]",
+	                               "", "", "{tenter=codeblockBacktick}{_guest=\\1,0end,}", NULL);
 	addLanguageTagMultiTableRegex (language, "main",
-	                               "^[ \t]*~~~~*[^~\n]*[\n]",
-	                               "", "", "{tenter=codeblockTildes}", NULL);
+	                               "^[ \t]*~~~~*([a-zA-Z0-9][-#+a-zA-Z0-9]*)?[^~\n]*[\n]",
+	                               "", "", "{tenter=codeblockTildes}{_guest=\\1,0end,}", NULL);
 	addLanguageTagMultiTableRegex (language, "main",
 	                               "^([^\n]+)[\n]=+[\n]",
 	                               "\\1", "c", "{_field=sectionMarker:=}", NULL);
@@ -97,7 +97,7 @@ static void initializeMarkdownParser (const langType language)
 	                               "", "", "", NULL);
 	addLanguageTagMultiTableRegex (language, "codeblockBacktick",
 	                               "^[ \t]*````*[ \t]*[\n]",
-	                               "", "", "{tleave}", NULL);
+	                               "", "", "{tleave}{_guest=,,0start}", NULL);
 	addLanguageTagMultiTableRegex (language, "codeblockBacktick",
 	                               "^[^\n]+[\n]",
 	                               "", "", "", NULL);
@@ -109,7 +109,7 @@ static void initializeMarkdownParser (const langType language)
 	                               "", "", "", NULL);
 	addLanguageTagMultiTableRegex (language, "codeblockTildes",
 	                               "^[ \t]*~~~~*[ \t]*[\n]",
-	                               "", "", "{tleave}", NULL);
+	                               "", "", "{tleave}{_guest=,,0start}", NULL);
 	addLanguageTagMultiTableRegex (language, "codeblockTildes",
 	                               "^[^\n]+[\n]",
 	                               "", "", "", NULL);
