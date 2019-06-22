@@ -1,0 +1,1 @@
+IX_GET_BIT_FIELD16	input.h	/^#define IX_GET_BIT_FIELD16(/;"	d	line:2	signature:(arg_PackedData16,arg_FieldLSBBit,arg_FieldMSBBit)
