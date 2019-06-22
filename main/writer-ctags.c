@@ -75,25 +75,25 @@ tagWriter eCtagsWriter = {
 	.defaultFileName = CTAGS_FILE,
 };
 
-static bool hasTagEntryTabChar (const tagEntryInfo * const tag)
+static bool hasTagEntryTabOrNewlineChar (const tagEntryInfo * const tag)
 {
 
-	if (doesFieldHaveTabChar (FIELD_NAME, tag, NO_PARSER_FIELD)
-		|| doesFieldHaveTabChar (FIELD_INPUT_FILE, tag, NO_PARSER_FIELD))
+	if (doesFieldHaveTabOrNewlineChar (FIELD_NAME, tag, NO_PARSER_FIELD)
+		|| doesFieldHaveTabOrNewlineChar (FIELD_INPUT_FILE, tag, NO_PARSER_FIELD))
 		return true;
 
 	if (tag->lineNumberEntry)
 	{
 		if (Option.lineDirectives)
 		{
-			if (doesFieldHaveTabChar (FIELD_LINE_NUMBER, tag, NO_PARSER_FIELD))
+			if (doesFieldHaveTabOrNewlineChar (FIELD_LINE_NUMBER, tag, NO_PARSER_FIELD))
 				return true;
 		}
 	}
-	else if (doesFieldHaveTabChar (FIELD_PATTERN, tag, NO_PARSER_FIELD))
+	else if (doesFieldHaveTabOrNewlineChar (FIELD_PATTERN, tag, NO_PARSER_FIELD))
 	{
-		/* Pattern may have a tab char. However, doesFieldHaveTabChar returns
-		 * false because NO_PARSER_FIELD may not have hasTabChar handler.
+		/* Pattern may have a tab char. However, doesFieldHaveTabOrNewlineChar returns
+		 * false because NO_PARSER_FIELD may not have hasTabOrNewlineChar handler.
 		 */
 		return true;
 	}
@@ -101,14 +101,14 @@ static bool hasTagEntryTabChar (const tagEntryInfo * const tag)
 	if (includeExtensionFlags ())
 	{
 		if (isFieldEnabled (FIELD_SCOPE) && doesFieldHaveValue (FIELD_SCOPE, tag)
-			&& (doesFieldHaveTabChar (FIELD_SCOPE_KIND_LONG, tag, NO_PARSER_FIELD)
-				|| doesFieldHaveTabChar (FIELD_SCOPE, tag, NO_PARSER_FIELD)))
+			&& (doesFieldHaveTabOrNewlineChar (FIELD_SCOPE_KIND_LONG, tag, NO_PARSER_FIELD)
+				|| doesFieldHaveTabOrNewlineChar (FIELD_SCOPE, tag, NO_PARSER_FIELD)))
 			return true;
 		if (isFieldEnabled (FIELD_TYPE_REF) && doesFieldHaveValue (FIELD_TYPE_REF, tag)
-			&& doesFieldHaveTabChar (FIELD_TYPE_REF, tag, NO_PARSER_FIELD))
+			&& doesFieldHaveTabOrNewlineChar (FIELD_TYPE_REF, tag, NO_PARSER_FIELD))
 			return true;
 		if (isFieldEnabled (FIELD_FILE_SCOPE) && doesFieldHaveValue (FIELD_FILE_SCOPE, tag)
-			&& doesFieldHaveTabChar (FIELD_FILE_SCOPE, tag, NO_PARSER_FIELD))
+			&& doesFieldHaveTabOrNewlineChar (FIELD_FILE_SCOPE, tag, NO_PARSER_FIELD))
 			return true;
 
 		int f[] = { FIELD_INHERITANCE,
@@ -123,7 +123,7 @@ static bool hasTagEntryTabChar (const tagEntryInfo * const tag)
 		for (unsigned int i = 0; f[i] >= 0; i++)
 		{
 			if (isFieldEnabled (f[i]) && doesFieldHaveValue (f[i], tag)
-				&& doesFieldHaveTabChar (f[i], tag, NO_PARSER_FIELD))
+				&& doesFieldHaveTabOrNewlineChar (f[i], tag, NO_PARSER_FIELD))
 				return true;
 		}
 	}
@@ -134,7 +134,7 @@ static bool hasTagEntryTabChar (const tagEntryInfo * const tag)
 		fieldType ftype = f->ftype;
 		if (isFieldEnabled (ftype))
 		{
-			if (doesFieldHaveTabChar (ftype, tag, i))
+			if (doesFieldHaveTabOrNewlineChar (ftype, tag, i))
 				return true;
 		}
 	}
@@ -301,7 +301,7 @@ static int writeCtagsEntry (tagWriter *writer,
 	if (writer->private)
 	{
 		struct rejection *rej = writer->private;
-		if (hasTagEntryTabChar (tag))
+		if (hasTagEntryTabOrNewlineChar (tag))
 		{
 			rej->rejectionInThisInput = true;
 			return 0;

@@ -4568,6 +4568,18 @@ static void createCTSTTags (void)
 						e.extensionFields.scopeKindIndex = K_BROKEN;
 						e.extensionFields.scopeName = "\\Broken\tContext";
 						makeTagEntry (&e);
+						initTagEntry (&e, "only\nnewline", i);
+						makeTagEntry (&e);
+						initTagEntry (&e, "only\ttab", i);
+						makeTagEntry (&e);
+						initTagEntry (&e, "newline-in-scope", i);
+						e.extensionFields.scopeKindIndex = K_BROKEN;
+						e.extensionFields.scopeName = "parent\nscope";
+						makeTagEntry (&e);
+						initTagEntry (&e, "tab-in-scope", i);
+						e.extensionFields.scopeKindIndex = K_BROKEN;
+						e.extensionFields.scopeName = "parent\tscope";
+						makeTagEntry (&e);
 						break;
 					case K_NO_LETTER:
 						initTagEntry (&e, "abnormal kindDefinition testing (no letter)", i);

@@ -58,7 +58,7 @@ extern bool doesFieldHaveValue (fieldType type, const tagEntryInfo *tag);
 
 extern const char* renderField (fieldType type, const tagEntryInfo *tag, int index);
 extern const char* renderFieldNoEscaping (fieldType type, const tagEntryInfo *tag, int index);
-extern bool  doesFieldHaveTabChar (fieldType type, const tagEntryInfo *tag, int index);
+extern bool  doesFieldHaveTabOrNewlineChar (fieldType type, const tagEntryInfo *tag, int index);
 
 extern void initFieldObjects (void);
 extern int countFields (void);

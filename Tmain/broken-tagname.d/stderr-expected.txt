@@ -10,4 +10,18 @@ Escape the character
 Unexpected character 0x09 included in a tagEntryInfo: \Broken	Context
 File: input.cst, Line: 1, Lang: CTagsSelfTest, Kind: b
 Escape the character
+Unexpected character 0x0a included in a tagEntryInfo: only
+newline
+File: input.cst, Line: 1, Lang: CTagsSelfTest, Kind: b
+Escape the character
+Unexpected character 0x09 included in a tagEntryInfo: only	tab
+File: input.cst, Line: 1, Lang: CTagsSelfTest, Kind: b
+Escape the character
+Unexpected character 0x0a included in a tagEntryInfo: parent
+scope
+File: input.cst, Line: 1, Lang: CTagsSelfTest, Kind: b
+Escape the character
+Unexpected character 0x09 included in a tagEntryInfo: parent	scope
+File: input.cst, Line: 1, Lang: CTagsSelfTest, Kind: b
+Escape the character
 sorting tag file
