@@ -330,7 +330,7 @@ typedef enum {
 	CK_CLASS, CK_DEFINE, CK_ENUMERATOR, CK_FUNCTION,
 	CK_ENUMERATION, CK_HEADER, CK_LOCAL, CK_MEMBER, CK_NAMESPACE, CK_PROTOTYPE,
 	CK_STRUCT, CK_TYPEDEF, CK_UNION, CK_VARIABLE,
-	CK_EXTERN_VARIABLE, CK_LABEL
+	CK_EXTERN_VARIABLE, CK_LABEL, CK_MACRO_PARAM,
 } cKind;
 
 static kindDefinition CKinds [] = {
@@ -352,6 +352,7 @@ static kindDefinition CKinds [] = {
 	{ true,  'v', "variable",   "variable definitions"},
 	{ false, 'x', "externvar",  "external and forward variable declarations"},
 	{ false, 'L', "label",      "goto label"},
+	{ false, 'D', "macroparam", "cpp macro parameters"},
 };
 
 typedef enum {
@@ -460,7 +461,7 @@ typedef enum {
 	VK_CLASS, VK_DEFINE, VK_ENUMERATOR, VK_FUNCTION,
 	VK_ENUMERATION, VK_INTERFACE, VK_LOCAL, VK_MEMBER, VK_PROGRAM, VK_PROTOTYPE,
 	VK_SIGNAL, VK_TASK, VK_TYPEDEF, VK_VARIABLE,
-	VK_EXTERN_VARIABLE, VK_HEADER
+	VK_EXTERN_VARIABLE, VK_HEADER, VK_MACRO_PARAM,
 } veraKind;
 
 static kindDefinition VeraKinds [] = {
@@ -482,6 +483,7 @@ static kindDefinition VeraKinds [] = {
 	{ false, 'x', "externvar",  "external variable declarations"},
 	{ true,  'h', "header",     "included header files",
 	  .referenceOnly = true, ATTACH_ROLES(VeraHeaderRoles)},
+	{ false, 'D', "macroParameter", "cpp macro parameters"},
 };
 
 static const keywordDesc KeywordTable [] = {
@@ -3468,6 +3470,7 @@ static rescanReason findCTags (const unsigned int passCount)
 	rescanReason rescan;
 	int kind_for_define = KIND_GHOST_INDEX;
 	int kind_for_header = KIND_GHOST_INDEX;
+	int kind_for_param  = KIND_GHOST_INDEX;
 	int role_for_macro_undef   = ROLE_INDEX_DEFINITION;
 	int role_for_header_system   = ROLE_INDEX_DEFINITION;
 	int role_for_header_local   = ROLE_INDEX_DEFINITION;
@@ -3480,6 +3483,7 @@ static rescanReason findCTags (const unsigned int passCount)
 	{
 		kind_for_define = CK_DEFINE;
 		kind_for_header = CK_HEADER;
+		kind_for_param = CK_MACRO_PARAM,
 		role_for_macro_undef = CR_MACRO_UNDEF;
 		role_for_header_system = CR_HEADER_SYSTEM;
 		role_for_header_local = CR_HEADER_LOCAL;
@@ -3488,6 +3492,7 @@ static rescanReason findCTags (const unsigned int passCount)
 	{
 		kind_for_define = VK_DEFINE;
 		kind_for_header = VK_HEADER;
+		kind_for_param  = VK_MACRO_PARAM,
 		role_for_macro_undef = VR_MACRO_UNDEF;
 		role_for_header_system = VR_HEADER_SYSTEM;
 		role_for_header_local = VR_HEADER_LOCAL;
@@ -3495,7 +3500,7 @@ static rescanReason findCTags (const unsigned int passCount)
 
 	cppInit ((bool) (passCount > 1), isInputLanguage (Lang_csharp), isInputLanguage(Lang_cpp),
 		 isInputLanguage(Lang_vera),
-		 kind_for_define, role_for_macro_undef,
+		 kind_for_define, role_for_macro_undef, kind_for_param,
 		 kind_for_header, role_for_header_system, role_for_header_local);
 
 	Signature = vStringNew ();

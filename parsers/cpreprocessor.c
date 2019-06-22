@@ -90,6 +90,9 @@ typedef struct sCppState {
 	int defineMacroKindIndex;
 	int macroUndefRoleIndex;
 
+	bool useClientLangMacroParamKindIndex;
+	int macroParamKindIndex;
+
 	bool useClientLangHeaderKindIndex;
 	int headerKindIndex;
 	int headerSystemRoleIndex;
@@ -126,7 +129,7 @@ static roleDefinition CPREPROHeaderRoles [] = {
 
 
 typedef enum {
-	CPREPRO_MACRO, CPREPRO_HEADER,
+	CPREPRO_MACRO, CPREPRO_HEADER, CPREPRO_PARAM,
 } cPreProkind;
 
 static kindDefinition CPreProKinds [] = {
@@ -134,6 +137,7 @@ static kindDefinition CPreProKinds [] = {
 	  .referenceOnly = false, ATTACH_ROLES(CPREPROMacroRoles)},
 	{ true, 'h', "header",     "included header files",
 	  .referenceOnly = true, ATTACH_ROLES(CPREPROHeaderRoles)},
+	{ false, 'D', "parameter", "macro parameters", },
 };
 
 /*
@@ -180,6 +184,8 @@ static cppState Cpp = {
 	.useClientLangDefineMacroKindIndex = false,
 	.defineMacroKindIndex = CPREPRO_MACRO,
 	.macroUndefRoleIndex = CPREPRO_MACRO_KIND_UNDEF_ROLE,
+	.useClientLangMacroParamKindIndex = false,
+	.macroParamKindIndex = CPREPRO_PARAM,
 	.useClientLangHeaderKindIndex = false,
 	.headerKindIndex = CPREPRO_HEADER,
 	.headerSystemRoleIndex = CPREPRO_HEADER_KIND_SYSTEM_ROLE,
@@ -220,6 +226,7 @@ static void cppInitCommon(langType clientLang,
 		     const bool hasSingleQuoteLiteralNumbers,
 		     int defineMacroKindIndex,
 		     int macroUndefRoleIndex,
+		     int macroParamKindIndex,
 		     int headerKindIndex,
 		     int headerSystemRoleIndex, int headerLocalRoleIndex)
 {
@@ -264,6 +271,17 @@ static void cppInitCommon(langType clientLang,
 		Cpp.macroUndefRoleIndex = CPREPRO_MACRO_KIND_UNDEF_ROLE;
 	}
 
+	if (macroParamKindIndex != KIND_GHOST_INDEX)
+	{
+		Cpp.macroParamKindIndex = macroParamKindIndex;
+		Cpp.useClientLangMacroParamKindIndex = true;
+	}
+	else
+	{
+		Cpp.macroParamKindIndex = CPREPRO_PARAM;
+		Cpp.useClientLangMacroParamKindIndex = false;
+	}
+
 	if (headerKindIndex != KIND_GHOST_INDEX)
 	{
 		Cpp.headerKindIndex = headerKindIndex;
@@ -298,6 +316,7 @@ extern void cppInit (const bool state, const bool hasAtLiteralStrings,
 		     const bool hasSingleQuoteLiteralNumbers,
 		     int defineMacroKindIndex,
 		     int macroUndefRoleIndex,
+		     int macroParamKindIndex,
 			 int headerKindIndex,
 		     int headerSystemRoleIndex, int headerLocalRoleIndex)
 {
@@ -305,8 +324,8 @@ extern void cppInit (const bool state, const bool hasAtLiteralStrings,
 
 	cppInitCommon (client, state, hasAtLiteralStrings,
 				   hasCxxRawLiteralStrings, hasSingleQuoteLiteralNumbers,
-				   defineMacroKindIndex, macroUndefRoleIndex, headerKindIndex,
-				   headerSystemRoleIndex, headerLocalRoleIndex);
+				   defineMacroKindIndex, macroUndefRoleIndex, macroParamKindIndex,
+				   headerKindIndex, headerSystemRoleIndex, headerLocalRoleIndex);
 }
 
 extern void cppTerminate (void)
@@ -637,6 +656,8 @@ static bool doesCPreProRunAsStandaloneParser (int kind)
 		return !Cpp.useClientLangDefineMacroKindIndex;
 	else if (kind == CPREPRO_MACRO)
 		return !Cpp.useClientLangHeaderKindIndex;
+	else if (kind == CPREPRO_PARAM)
+		return !Cpp.useClientLangMacroParamKindIndex;
 	else
 	{
 		AssertNotReached();
@@ -737,7 +758,49 @@ static void makeIncludeTag (const  char *const name, bool systemHeader)
 	}
 }
 
-static vString *signature;
+static void makeParamTag (vString *name, bool placeholder)
+{
+	bool standing_alone = doesCPreProRunAsStandaloneParser(CPREPRO_MACRO);
+	langType lang = standing_alone ? Cpp.lang: Cpp.clientLang;
+
+	Assert (Cpp.macroParamKindIndex != KIND_GHOST_INDEX);
+
+	int r;
+	pushLanguage (lang);
+	r = makeSimpleTag (name, Cpp.macroParamKindIndex);
+	popLanguage ();
+
+	if (placeholder)
+	{
+		tagEntryInfo *e = getEntryInCorkQueue (r);
+		e->placeholder = 1;
+	}
+}
+
+static void regenreateSignatureFromParameters (vString * buffer, int from, int to)
+{
+	vStringPut(buffer, '(');
+	for (int pindex = from; pindex < to; pindex++)
+	{
+		tagEntryInfo *e = getEntryInCorkQueue (pindex);
+		if (e)
+			vStringCatS (buffer, e->name);
+		if (pindex != (to - 1))
+			vStringPut (buffer, ',');
+	}
+	vStringPut (buffer, ')');
+}
+
+static void patchScopeFieldOfParameters(int from, int to, int parentIndex)
+{
+	for (int pindex = from; pindex < to; pindex++)
+	{
+		tagEntryInfo *e = getEntryInCorkQueue (pindex);
+		if (e)
+			e->extensionFields.scopeIndex = parentIndex;
+	}
+}
+
 static int directiveDefine (const int c, bool undef)
 {
 	// FIXME: We could possibly handle the macros here!
@@ -757,20 +820,35 @@ static int directiveDefine (const int c, bool undef)
 
 			if (p == '(')
 			{
-				signature = vStringNewOrClearWithAutoRelease (signature);
+				vString *param = vStringNew ();
+				int param_start = countEntryInCorkQueue();
 				do {
+					p = cppGetcFromUngetBufferOrFile ();
+					if (isalnum(p) || p == '_' || p == '$'
+						/* Handle variadic macros like (a,...) */
+						|| p == '.')
+					{
+						vStringPut (param, p);
+						continue;
+					}
+
+					if (vStringLength (param) > 0)
+					{
+						makeParamTag (param, vStringItem(param, 0) == '.');
+						vStringClear (param);
+					}
 					if (p == '\\')
 						cppGetcFromUngetBufferOrFile (); /* Throw away the next char */
-					else if (!isspacetab(p))
-						vStringPut (signature, p);
-					/* TODO: Macro parameters can be captured here. */
-					p = cppGetcFromUngetBufferOrFile ();
 				} while (p != ')' && p != EOF);
+				vStringDelete (param);
 
+				int param_end = countEntryInCorkQueue();
 				if (p == ')')
 				{
-					vStringPut (signature, p);
+					vString *signature = vStringNew ();
+					regenreateSignatureFromParameters (signature, param_start, param_end);
 					r = makeDefineTag (vStringValue (Cpp.directive.name), vStringValue (signature), undef);
+					vStringDelete (signature);
 				}
 				else
 					r = makeDefineTag (vStringValue (Cpp.directive.name), NULL, undef);
@@ -780,6 +858,7 @@ static int directiveDefine (const int c, bool undef)
 					tagEntryInfo *e = getEntryInCorkQueue (r);
 					e->lineNumber = lineNumber;
 					e->filePosition = filePosition;
+					patchScopeFieldOfParameters (param_start, param_end, r);
 				}
 			}
 			else
@@ -1413,7 +1492,8 @@ process:
 static void findCppTags (void)
 {
 	cppInitCommon (Cpp.lang, 0, false, false, false,
-				   KIND_GHOST_INDEX, 0, KIND_GHOST_INDEX, 0, 0);
+				   KIND_GHOST_INDEX, 0, KIND_GHOST_INDEX,
+				   KIND_GHOST_INDEX, 0, 0);
 
 	findRegexTagsMainloop (cppGetc);
 
@@ -1940,5 +2020,6 @@ extern parserDefinition* CPreProParser (void)
 	def->parameterHandlerTable = CpreProParameterHandlerTable;
 	def->parameterHandlerCount = ARRAY_SIZE(CpreProParameterHandlerTable);
 
+	def->useCork = true;
 	return def;
 }

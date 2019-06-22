@@ -1813,6 +1813,7 @@ static rescanReason cxxParserMain(const unsigned int passCount)
 
 	int kind_for_define = CXXTagKindMACRO;
 	int kind_for_header = CXXTagKindINCLUDE;
+	int kind_for_macro_param = CXXTagKindMACROPARAM;
 	int role_for_macro_undef = CR_MACRO_UNDEF;
 	int role_for_header_system = CR_HEADER_SYSTEM;
 	int role_for_header_local = CR_HEADER_LOCAL;
@@ -1826,6 +1827,7 @@ static rescanReason cxxParserMain(const unsigned int passCount)
 			false,
 			kind_for_define,
 			role_for_macro_undef,
+			kind_for_macro_param,
 			kind_for_header,
 			role_for_header_system,
 			role_for_header_local

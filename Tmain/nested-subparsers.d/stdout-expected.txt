@@ -16,6 +16,7 @@ v  variable definitions
 x  external and forward variable declarations [off]
 z  function parameters inside function definitions [off]
 L  goto labels [off]
+D  parameters inside macro definitions [off]
 #
 # list kinds Event
 #
@@ -33,6 +34,7 @@ n  name
 # list kinds-full C
 #
 #LETTER NAME       ENABLED REFONLY NROLES MASTER DESCRIPTION
+D       macroparam no      no      0      C      parameters inside macro definitions
 L       label      no      no      0      C      goto labels
 d       macro      yes     no      1      C      macro definitions
 e       enumerator yes     no      0      C      enumerators (values inside an enumeration)

@@ -1,0 +1,4 @@
+--sort=no
+--language-force=CPreProcessor
+--kinds-CPreProcessor=+D
+--fields=+Sn

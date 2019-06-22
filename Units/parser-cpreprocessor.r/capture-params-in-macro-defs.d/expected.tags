@@ -1,0 +1,18 @@
+arg_PackedData16	input.h	/^                            arg_PackedData16, \\$/;"	D	line:3	macro:IX_GET_BIT_FIELD16
+arg_FieldLSBBit	input.h	/^                            arg_FieldLSBBit, \\$/;"	D	line:4	macro:IX_GET_BIT_FIELD16
+arg_FieldMSBBit	input.h	/^                            arg_FieldMSBBit \\$/;"	D	line:5	macro:IX_GET_BIT_FIELD16
+IX_GET_BIT_FIELD16	input.h	/^#define IX_GET_BIT_FIELD16(/;"	d	line:2	signature:(arg_PackedData16,arg_FieldLSBBit,arg_FieldMSBBit)
+M0	input.h	/^#define M0(/;"	d	line:10	signature:()
+X	input.h	/^#define M1(X) 1 + X$/;"	D	line:11	macro:M1
+M1	input.h	/^#define M1(/;"	d	line:11	signature:(X)
+X	input.h	/^#define M2(X,Y) 1 + X + Y$/;"	D	line:12	macro:M2
+Y	input.h	/^#define M2(X,Y) 1 + X + Y$/;"	D	line:12	macro:M2
+M2	input.h	/^#define M2(/;"	d	line:12	signature:(X,Y)
+X	input.h	/^#define M3(X,Y,Z) 1 + X + Y + Z$/;"	D	line:13	macro:M3
+Y	input.h	/^#define M3(X,Y,Z) 1 + X + Y + Z$/;"	D	line:13	macro:M3
+Z	input.h	/^#define M3(X,Y,Z) 1 + X + Y + Z$/;"	D	line:13	macro:M3
+M3	input.h	/^#define M3(/;"	d	line:13	signature:(X,Y,Z)
+X	input.h	/^#define Mn(X,Y,Z,...) 1 + X + Y + Z$/;"	D	line:14	macro:Mn
+Y	input.h	/^#define Mn(X,Y,Z,...) 1 + X + Y + Z$/;"	D	line:14	macro:Mn
+Z	input.h	/^#define Mn(X,Y,Z,...) 1 + X + Y + Z$/;"	D	line:14	macro:Mn
+Mn	input.h	/^#define Mn(/;"	d	line:14	signature:(X,Y,Z,...)
