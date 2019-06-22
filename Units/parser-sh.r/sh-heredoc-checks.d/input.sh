@@ -28,12 +28,12 @@ End Of File
 f6(){ :; }
 cat<<EOF 
 this isn't terminated
-EOF 
+
 EOF#test
  EOF
 
 bug6(){ :; }
-EOF
+EOF 
 
 f7(){ :; }
 cat<<"End Of \"File\""
