@@ -91,6 +91,33 @@ struct fieldPattern {
 	const char *template;
 };
 
+struct boundarySpec {
+	int patternGroup;
+	bool fromStartOfGroup;
+	bool placeholder;
+};
+
+struct guestLangSpec {
+	enum guestLangSpecType {
+		GUEST_LANG_UNKNOWN,
+		GUEST_LANG_PLACEHOLDER,			   /* _ */
+		GUEST_LANG_STATIC_LANGNAME,		   /* C, Python,... */
+		GUEST_LANG_PTN_GROUP_FOR_LANGNAME, /* \1, \2, ..., \9 */
+		GUEST_LANG_PTN_GROUP_FOR_FILEMAP, /* *1, *2, ... *9 */
+	} type;
+	union {
+		langType lang;
+		int patternGroup;
+	} spec;
+};
+
+struct guestSpec {
+	struct guestLangSpec lang;
+#define BOUNDARY_START 0
+#define BOUNDARY_END  1
+	struct boundarySpec boundary[2];
+};
+
 struct mGroupSpec {
 #define NO_MULTILINE -1
 	int forLineNumberDetermination;
@@ -128,6 +155,7 @@ typedef struct {
 
 	enum regexParserType regptype;
 	struct mGroupSpec mgroup;
+	struct guestSpec guest;
 	struct mTableActionSpec taction;
 
 	int   xtagType;
@@ -164,12 +192,26 @@ struct regexTable {
 	ptrArray *entries;
 };
 
+struct boundaryInRequest {
+	bool offset_set;
+	off_t offset;
+};
+
+struct guestRequest {
+	bool lang_set;
+	langType lang;
+
+	struct boundaryInRequest boundary[2];
+};
+
 struct lregexControlBlock {
 	unsigned long currentScope;
 	ptrArray *entries [2];
 
 	ptrArray *tables;
 	ptrArray *tstack;
+
+	struct guestRequest *guest_req;
 
 	langType owner;
 };
@@ -184,11 +226,14 @@ struct lregexControlBlock {
 static int getTableIndexForName (const struct lregexControlBlock *const lcb, const char *name);
 static void deletePattern (regexPattern *p);
 static int  makePromiseForAreaSpecifiedWithOffsets (const char *parser,
-													enum regexParserType regptype,
 													off_t startOffset,
 													off_t endOffset);
 
-
+static struct guestRequest *guestRequestNew (void);
+static void   guestRequestDelete (struct guestRequest *);
+static bool   guestRequestIsFilled(struct guestRequest *);
+static void   guestRequestClear (struct guestRequest *);
+static void   guestRequestSubmit (struct guestRequest *);
 
 static void deleteTable (void *ptrn)
 {
@@ -256,6 +301,7 @@ extern struct lregexControlBlock* allocLregexControlBlock (parserDefinition *par
 	lcb->entries[REG_PARSER_MULTI_LINE] = ptrArrayNew(deleteTableEntry);
 	lcb->tables = ptrArrayNew(deleteTable);
 	lcb->tstack = ptrArrayNew(NULL);
+	lcb->guest_req = guestRequestNew ();
 	lcb->owner = parser->id;
 
 	return lcb;
@@ -275,6 +321,9 @@ extern void freeLregexControlBlock (struct lregexControlBlock* lcb)
 
 	ptrArrayDelete (lcb->tstack);
 	lcb->tstack = NULL;
+
+	guestRequestDelete (lcb->guest_req);
+	lcb->guest_req = NULL;
 
 	eFree (lcb);
 }
@@ -484,6 +533,11 @@ static void initMgroup(struct mGroupSpec *mgroup)
 	mgroup->nextFromStart = false;
 }
 
+static void initGuestSpec (struct guestSpec *guest)
+{
+	guest->lang.type = GUEST_LANG_UNKNOWN;
+}
+
 static void initTaction(struct mTableActionSpec *taction)
 {
 	taction->action = TACTION_NOP;
@@ -511,6 +565,7 @@ static regexPattern * newPattern (regex_t* const pattern,
 		initMgroup(&ptrn->mgroup);
 	if (regptype == REG_PARSER_MULTI_TABLE)
 		initTaction(&ptrn->taction);
+	initGuestSpec (&ptrn->guest);
 
 	ptrn->u.tag.roleBits = 0;
 	ptrn->refcount = 1;
@@ -619,11 +674,174 @@ static void pre_ptrn_flag_advanceTo_long (const char* const s, const char* const
 	eFree (vdup);
 }
 
+struct guestPtrnFlagData {
+	enum regexParserType type;
+	struct guestSpec *guest;
+};
+
+static void pre_ptrn_flag_guest_long (const char* const s, const char* const v, void* data)
+{
+	struct guestPtrnFlagData *flagData = data;
+	enum regexParserType type = flagData->type;
+	struct guestSpec *guest = flagData->guest;
+	struct boundarySpec *current;
+
+	if (!v)
+	{
+		error (WARNING, "no value is given for: %s", s);
+		return;
+	}
+
+	char *tmp = strchr (v, ',');
+	if (tmp == NULL)
+	{
+		error (WARNING, "no terminator found for parser name: %s", s);
+		return;
+	}
+
+	if ((tmp - v) == 0)
+	{
+		if (type == REG_PARSER_MULTI_LINE)
+		{
+			error (WARNING,
+				   "using placeholder for guest name field is not allowed in multiline regex spec: %s", v);
+			goto err;
+		}
+
+		guest->lang.type = GUEST_LANG_PLACEHOLDER;
+	}
+	else if (*v == '\\' || *v == '*')
+	{
+		const char *n_tmp = v + 1;
+		const char *n = n_tmp;
+		for (; isdigit (*n_tmp); n_tmp++);
+		char c = *n_tmp;
+		*(char *)n_tmp = '\0';
+		if (!strToInt (n, 10, &(guest->lang.spec.patternGroup)))
+		{
+			error (WARNING, "wrong guest name specification: %s", v);
+			goto err;
+		}
+		else if (guest->lang.spec.patternGroup >= BACK_REFERENCE_COUNT)
+		{
+			error (WARNING, "wrong guest name specification (back reference count is too large): %d",
+				   guest->lang.spec.patternGroup);
+			goto err;
+		}
+
+		*(char *)n_tmp = c;
+		if (*n_tmp != ',')
+		{
+			error (WARNING, "wrong guest specification (garbage at the end of end guest spec): %s", v);
+			goto err;
+		}
+
+		guest->lang.type = (*v == '\\')
+			? GUEST_LANG_PTN_GROUP_FOR_LANGNAME
+			: GUEST_LANG_PTN_GROUP_FOR_FILEMAP;
+	}
+	else
+	{
+		guest->lang.spec.lang = getNamedLanguage (v, (tmp - v));
+		if (guest->lang.spec.lang == LANG_IGNORE)
+		{
+			error (WARNING, "no parser found for the guest spec: %s", v);
+			goto err;
+		}
+		guest->lang.type = GUEST_LANG_STATIC_LANGNAME;
+	}
+
+	tmp++;
+	if (*tmp == '\0')
+	{
+		error (WARNING, "no area spec found in the guest spec: %s", v);
+		goto err;
+	}
+
+	for (int i = 0; i < 2; i++)
+	{
+		current = guest->boundary + i;
+		const char *current_field_str = (i == BOUNDARY_START? "start": "end");
+
+		if (tmp [0] == ((i == BOUNDARY_START)? ',': '\0'))
+		{
+			if (type == REG_PARSER_MULTI_LINE)
+				error (WARNING,
+					   "using placeholder for %s field is not allowed in multiline regex spec: %s",
+					   current_field_str, v);
+
+			current->placeholder = true;
+		}
+		else
+		{
+			char *n = tmp;
+
+			for (; isdigit (*tmp); tmp++);
+			char c = *tmp;
+			*tmp = '\0';
+			if (!strToInt (n, 10, &(current->patternGroup)))
+			{
+				error (WARNING, "wrong guest area specification (patternGroup of %s, number expected): %s:%s",
+					   current_field_str, v, n);
+				goto err;
+			}
+			*tmp = c;
+			if (*tmp == '\0')
+			{
+				error (WARNING, "wrong guest area specification (patternGroup of %s, nether start nor end given): %s",
+					   current_field_str, v);
+				goto err;
+			}
+			else if (strncmp (tmp, "start", 5) == 0)
+			{
+				current->fromStartOfGroup = true;
+				tmp += 5;
+			}
+			else if (strncmp (tmp, "end", 3) == 0)
+			{
+				current->fromStartOfGroup = false;
+				tmp += 3;
+			}
+			else
+			{
+				error (WARNING, "wrong guest area specification (%s): %s",
+					   current_field_str, v);
+				goto err;
+			}
+		}
+
+		if (i == 0)
+		{
+			if (*tmp != ',')
+			{
+				error (WARNING,
+					   "wrong guest area specification (separator between start and end boundaries): %s", v);
+				goto err;
+			}
+			tmp++;
+		}
+		else if (i == 1 && (*tmp != '\0'))
+		{
+			error (WARNING, "wrong guest area specification (garbage at the end of end boundary spec): %s", v);
+			goto err;
+		}
+	}
+	return;
+ err:
+	guest->lang.type = GUEST_LANG_UNKNOWN;
+}
+
 static flagDefinition multilinePtrnFlagDef[] = {
 	{ '\0',  "mgroup", NULL, pre_ptrn_flag_mgroup_long,
 	  "N", "a group in pattern determining the line number of tag"},
 	{ '\0',  "_advanceTo", NULL, pre_ptrn_flag_advanceTo_long,
 	  "N[start|end]", "a group in pattern from where the next scan starts [0end]"},
+};
+
+static flagDefinition guestPtrnFlagDef[] = {
+#define EXPERIMENTAL "_"
+	{ '\0',  EXPERIMENTAL "guest", NULL, pre_ptrn_flag_guest_long,
+	  "PARSERSPEC,N0[start|end],N1[start|end]", "run guest parser on the area"},
 };
 
 static bool hasMessage(const regexPattern *const ptrn)
@@ -1002,6 +1220,12 @@ static regexPattern *addCompiledTagPattern (struct lregexControlBlock *lcb,
 		flagsEval (flags, multilinePtrnFlagDef, ARRAY_SIZE(multilinePtrnFlagDef), &ptrn->mgroup);
 	}
 
+	struct guestPtrnFlagData guestPtrnFlagData = {
+		.type = regptype,
+		.guest = &ptrn->guest,
+	};
+	flagsEval (flags, guestPtrnFlagDef, ARRAY_SIZE(guestPtrnFlagDef), &guestPtrnFlagData);
+
 	if (regptype == REG_PARSER_MULTI_TABLE)
 		flagsEval (flags, multitablePtrnFlagDef, ARRAY_SIZE(multitablePtrnFlagDef), &commonFlagData);
 
@@ -1363,6 +1587,65 @@ static void printMessage(const langType language,
 	vStringDelete (msg);
 }
 
+static bool isGuestRequestConsistent (struct guestRequest *guest_req)
+{
+	return (guest_req->lang != LANG_IGNORE)
+		&& (guest_req->boundary[BOUNDARY_START].offset < guest_req->boundary[BOUNDARY_END].offset);
+}
+
+static bool fillGuestRequest (const char *start,
+							  const char *current,
+							  regmatch_t pmatch [BACK_REFERENCE_COUNT],
+							  struct guestSpec *guest_spec,
+							  struct guestRequest *guest_req)
+{
+	if (guest_spec->lang.type == GUEST_LANG_UNKNOWN)
+		return false;
+	else if (guest_spec->lang.type == GUEST_LANG_PLACEHOLDER)
+		;
+	else if (guest_spec->lang.type == GUEST_LANG_STATIC_LANGNAME)
+	{
+		guest_req->lang = guest_spec->lang.spec.lang;
+		guest_req->lang_set = true;
+	}
+	else if (guest_spec->lang.type == GUEST_LANG_PTN_GROUP_FOR_LANGNAME)
+	{
+		const char * name = current + pmatch [guest_spec->lang.spec.patternGroup].rm_so;
+		int size = pmatch [guest_spec->lang.spec.patternGroup].rm_eo
+			- pmatch [guest_spec->lang.spec.patternGroup].rm_so;
+		if (size > 0)
+			guest_req->lang = getNamedLanguage (name, size);
+		guest_req->lang_set = true;
+	}
+	else if (guest_spec->lang.type == GUEST_LANG_PTN_GROUP_FOR_FILEMAP)
+	{
+		const char * name = current + pmatch [guest_spec->lang.spec.patternGroup].rm_so;
+		int size = pmatch [guest_spec->lang.spec.patternGroup].rm_eo
+			- pmatch [guest_spec->lang.spec.patternGroup].rm_so;
+		char *fname = (size > 0)? eStrndup (name, size): NULL;
+
+		if (fname)
+		{
+			guest_req->lang = getLanguageForFilename (fname, LANG_AUTO);
+			eFree (fname);
+		}
+		guest_req->lang_set = true;
+	}
+
+	for (int i = 0; i < 2; i++)
+	{
+		struct boundarySpec *boundary_spec = guest_spec->boundary + i;
+		struct boundaryInRequest *boundary = guest_req->boundary + i;
+		if (!boundary_spec->placeholder)
+		{
+			boundary->offset =  current - start + (boundary_spec->fromStartOfGroup
+												   ? pmatch [boundary_spec->patternGroup].rm_so
+												   : pmatch [boundary_spec->patternGroup].rm_eo);
+			boundary->offset_set = true;
+		}
+	}
+	return guestRequestIsFilled (guest_req);
+}
 
 static bool matchRegexPattern (struct lregexControlBlock *lcb,
 							   const vString* const line,
@@ -1372,6 +1655,7 @@ static bool matchRegexPattern (struct lregexControlBlock *lcb,
 	regmatch_t pmatch [BACK_REFERENCE_COUNT];
 	int match;
 	regexPattern* patbuf = entry->pattern;
+	struct guestSpec  *guest = &patbuf->guest;
 
 	if (patbuf->disabled && *(patbuf->disabled))
 		return false;
@@ -1387,7 +1671,23 @@ static bool matchRegexPattern (struct lregexControlBlock *lcb,
 			printMessage(lcb->owner, patbuf, 0, vStringValue (line), pmatch);
 
 		if (patbuf->type == PTRN_TAG)
+		{
 			matchTagPattern (lcb, vStringValue (line), patbuf, pmatch, 0);
+
+			if (guest->lang.type != GUEST_LANG_UNKNOWN)
+			{
+				unsigned long ln = getInputLineNumber ();
+				long current = getInputFileOffsetForLine (ln);
+				if (fillGuestRequest (vStringValue (line) - current,
+									  vStringValue (line), pmatch, guest, lcb->guest_req))
+				{
+					Assert (lcb->guest_req->lang != LANG_AUTO);
+					if (isGuestRequestConsistent(lcb->guest_req))
+						guestRequestSubmit (lcb->guest_req);
+					guestRequestClear (lcb->guest_req);
+				}
+			}
+		}
 		else if (patbuf->type == PTRN_CALLBACK)
 			result = matchCallbackPattern (line, patbuf, pmatch);
 		else
@@ -1409,6 +1709,8 @@ static bool matchMultilineRegexPattern (struct lregexControlBlock *lcb,
 	const char *current;
 	off_t offset = 0;
 	regexPattern* patbuf = entry->pattern;
+	struct mGroupSpec *mgroup = &patbuf->mgroup;
+	struct guestSpec  *guest = &patbuf->guest;
 
 	bool result = false;
 	regmatch_t pmatch [BACK_REFERENCE_COUNT];
@@ -1434,7 +1736,7 @@ static bool matchMultilineRegexPattern (struct lregexControlBlock *lcb,
 		if (hasMessage(patbuf))
 			printMessage(lcb->owner, patbuf, (current + pmatch[0].rm_so) - start, current, pmatch);
 
-		offset = (current + pmatch [patbuf->mgroup.forLineNumberDetermination].rm_so)
+		offset = (current + pmatch [mgroup->forLineNumberDetermination].rm_so)
 				 - start;
 
 		entry->statistics.match++;
@@ -1452,9 +1754,17 @@ static bool matchMultilineRegexPattern (struct lregexControlBlock *lcb,
 			break;
 		}
 
-		delta = (patbuf->mgroup.nextFromStart
-				 ? pmatch [patbuf->mgroup.forNextScanning].rm_so
-				 : pmatch [patbuf->mgroup.forNextScanning].rm_eo);
+		if (fillGuestRequest (start, current, pmatch, guest, lcb->guest_req))
+		{
+			Assert (lcb->guest_req->lang != LANG_AUTO);
+			if (isGuestRequestConsistent(lcb->guest_req))
+				guestRequestSubmit (lcb->guest_req);
+			guestRequestClear (lcb->guest_req);
+		}
+
+		delta = (mgroup->nextFromStart
+				 ? pmatch [mgroup->forNextScanning].rm_so
+				 : pmatch [mgroup->forNextScanning].rm_eo);
 		if (delta == 0)
 		{
 			unsigned int pos = current - start;
@@ -1507,6 +1817,7 @@ extern void notifyRegexInputStart (struct lregexControlBlock *lcb)
 	lcb->currentScope = CORK_NIL;
 
 	ptrArrayClear (lcb->tstack);
+	guestRequestClear (lcb->guest_req);
 }
 
 extern void notifyRegexInputEnd (struct lregexControlBlock *lcb)
@@ -1638,7 +1949,9 @@ static regexPattern *addTagRegexInternal (struct lregexControlBlock *lcb,
 		{
 			if (rptr->exclusive || rptr->scopeActions & SCOPE_PLACEHOLDER
 				|| rptr->anonymous_tag_prefix
-				|| regptype == REG_PARSER_MULTI_TABLE)
+				|| regptype == REG_PARSER_MULTI_TABLE
+				|| rptr->guest.lang.type != GUEST_LANG_UNKNOWN
+				)
 				rptr->accept_empty_name = true;
 			else
 				error (WARNING, "%s: regexp missing name pattern", regex);
@@ -1802,6 +2115,7 @@ extern void printRegexFlags (bool withListHeader, bool machinable, FILE *fp)
 
 	flagsColprintAddDefinitions (table, regexFlagDefs,  ARRAY_SIZE (regexFlagDefs));
 	flagsColprintAddDefinitions (table, prePtrnFlagDef, ARRAY_SIZE (prePtrnFlagDef));
+	flagsColprintAddDefinitions (table, guestPtrnFlagDef, ARRAY_SIZE (guestPtrnFlagDef));
 	flagsColprintAddDefinitions (table, scopePtrnFlagDef, ARRAY_SIZE (scopePtrnFlagDef));
 	flagsColprintAddDefinitions (table, commonSpecFlagDef, ARRAY_SIZE (commonSpecFlagDef));
 
@@ -1817,6 +2131,7 @@ extern void printMultilineRegexFlags (bool withListHeader, bool machinable, FILE
 
 	flagsColprintAddDefinitions (table, regexFlagDefs,  ARRAY_SIZE (regexFlagDefs));
 	flagsColprintAddDefinitions (table, multilinePtrnFlagDef, ARRAY_SIZE (multilinePtrnFlagDef));
+	flagsColprintAddDefinitions (table, guestPtrnFlagDef, ARRAY_SIZE (guestPtrnFlagDef));
 	flagsColprintAddDefinitions (table, commonSpecFlagDef, ARRAY_SIZE (commonSpecFlagDef));
 
 	flagsColprintTablePrint (table, withListHeader, machinable, fp);
@@ -1832,6 +2147,7 @@ extern void printMultitableRegexFlags (bool withListHeader, bool machinable, FIL
 	flagsColprintAddDefinitions (table, regexFlagDefs,  ARRAY_SIZE (regexFlagDefs));
 	flagsColprintAddDefinitions (table, multilinePtrnFlagDef, ARRAY_SIZE (multilinePtrnFlagDef));
 	flagsColprintAddDefinitions (table, multitablePtrnFlagDef, ARRAY_SIZE (multitablePtrnFlagDef));
+	flagsColprintAddDefinitions (table, guestPtrnFlagDef, ARRAY_SIZE (guestPtrnFlagDef));
 	flagsColprintAddDefinitions (table, scopePtrnFlagDef, ARRAY_SIZE (scopePtrnFlagDef));
 	flagsColprintAddDefinitions (table, commonSpecFlagDef, ARRAY_SIZE (commonSpecFlagDef));
 
@@ -2016,6 +2332,7 @@ static struct regexTable * matchMultitableRegexTable (struct lregexControlBlock 
 	{
 		regexTableEntry *entry = ptrArrayItem(table->entries, i);
 		regexPattern *ptrn = entry->pattern;
+		struct guestSpec  *guest = &ptrn->guest;
 
 		Assert (ptrn);
 
@@ -2086,6 +2403,14 @@ static struct regexTable * matchMultitableRegexTable (struct lregexControlBlock 
 				if (hasMessage(ptrn))
 					printMultitableMessage (lcb->owner, table->name, i, ptrn,
 											*offset, current, pmatch);
+
+				if (fillGuestRequest (cstart, current, pmatch, guest, lcb->guest_req))
+				{
+					Assert (lcb->guest_req->lang != LANG_AUTO);
+					if (isGuestRequestConsistent(lcb->guest_req))
+						guestRequestSubmit (lcb->guest_req);
+					guestRequestClear (lcb->guest_req);
+				}
 
 				delta = (ptrn->mgroup.nextFromStart
 						 ? pmatch [ptrn->mgroup.forNextScanning].rm_so
@@ -2313,12 +2638,11 @@ extern bool matchMultitableRegex (struct lregexControlBlock *lcb, const vString*
 }
 
 static int  makePromiseForAreaSpecifiedWithOffsets (const char *parser,
-													enum regexParserType regptype,
 													off_t startOffset,
 													off_t endOffset)
 {
-	unsigned long startLine = getInputLineNumberInRegPType(regptype, startOffset);
-	unsigned long endLine = getInputLineNumberInRegPType(regptype, endOffset);
+	unsigned long startLine = getInputLineNumberForFileOffset(startOffset);
+	unsigned long endLine = getInputLineNumberForFileOffset(endOffset);
 	unsigned long startLineOffset = getInputFileOffsetForLine (startLine);
 	unsigned long endLineOffset = getInputFileOffsetForLine (endLine);
 
@@ -2326,6 +2650,45 @@ static int  makePromiseForAreaSpecifiedWithOffsets (const char *parser,
 						startLine, startOffset - startLineOffset,
 						endLine, endOffset - endLineOffset,
 						startOffset - startLineOffset);
+}
+
+static struct guestRequest *guestRequestNew (void)
+{
+	struct guestRequest *r = xMalloc (1, struct guestRequest);
+
+
+	guestRequestClear (r);
+	return r;
+}
+
+static void   guestRequestDelete (struct guestRequest *r)
+{
+	eFree (r);
+}
+
+static bool   guestRequestIsFilled(struct guestRequest *r)
+{
+	return (r->lang_set && (r->boundary + 0)->offset_set && (r->boundary + 1)->offset_set);
+}
+
+static void   guestRequestClear (struct guestRequest *r)
+{
+	r->lang_set = false;
+	r->boundary[BOUNDARY_START].offset_set = false;
+	r->boundary[BOUNDARY_END].offset_set = false;
+}
+
+static void   guestRequestSubmit (struct guestRequest *r)
+{
+	const char *langName = getLanguageName (r->lang);
+	verbose ("guestRequestSubmit: %s; "
+			 "range: %ld - %ld\n",
+			 langName,
+			 r->boundary[BOUNDARY_START].offset,
+			 r->boundary[BOUNDARY_END].offset);
+	makePromiseForAreaSpecifiedWithOffsets (langName,
+											r->boundary[BOUNDARY_START].offset,
+											r->boundary[BOUNDARY_END].offset);
 }
 
 /* Return true if available. */
