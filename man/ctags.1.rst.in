@@ -65,7 +65,7 @@ SOURCE FILES
 	man page, instead of having the "OPTION ITEMS" section be right after
 	the Description section, no? I mean the man page for most programs starts
 	with a very brief description of the program, then all the command-line
-	options, then later detailed backgound and descriptions like this section.
+	options, then later detailed background and descriptions like this section.
 
 Unless the ``--language-force`` option is specified, the language of each source
 file is automatically selected based upon a **mapping** of file names to
@@ -1465,7 +1465,7 @@ determine the language of the file by applying the following three tests
 in order: if the file extension has been mapped to a language, if the
 filename matches a shell pattern mapped to a language, and finally if the
 file is executable and its first line specifies an interpreter using the
-Unix-style "#!" specification (if supported on the platform). Additionallly,
+Unix-style "#!" specification (if supported on the platform). Additionally,
 if the ``--guess-language-eagerly`` option is given, heuristic testing is
 also performed to determine if a language parser applies. (See
 "Determining file language")
