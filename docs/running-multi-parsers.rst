@@ -84,6 +84,12 @@ be applied to the areas.
 
 .. _base-sub-parsers:
 
+Running guest parsers from an optlib based host parser
+......................................................................
+
+See :ref:`Running a guest parser with guest regex flag <guest-regex-flag>`.
+
+
 Tagging definitions of higher(upper) level language (sub/base)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
