@@ -979,7 +979,7 @@ The new options are:
 
 The above will be discussed in more detail shortly.
 
-First, let's explain the feature with an example. Consider a
+First, let's explain the feature with an example. Consider an
 imaginary language "`X`" has a similar syntax as JavaScript: "var" is
 used as defining variable(s), , and "/\* ... \*/" is used for block
 comments.
@@ -1593,6 +1593,151 @@ An ultra fine grained C parser may capture a variable `i` with `lvalue` and
 	--_roledef-C=v.lvalue,locator values
 	--_roledef-C=v.incremented,incremeted with ++ operator
 	--regex-C=/([a-zA-Z_][a-zA-Z_0-9])+ *+=/\1/v/{_role=lvalue}{_role=incremeted}
+
+.. _guest-regex-flag:
+
+Running a guest parser with `_guest` regex flag
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. NOT REVIEWED YET
+
+With `_guest` regex flag, you can run a parser (a guest parser) on an
+area of the current input file.
+See :ref:`Applying a parser to specified areas of input file (guest/host) <host-guest-parsers>`
+about the concept of the guest parser.
+
+The `_guest` regex flag specifies `guest spec`, and attaches it to
+the associated regex pattern.
+
+A guest spec has three fields: `PARSER`, `START of area`, and `END of area`.
+The `_guest` regex flag has following forms::
+
+  {_guest=PARSER,START,END}
+
+``ctags`` maintains a data called `guest request` during parsing.  The
+guest request also has three fields: `parser`, `start of area`, and
+`end of area`.
+
+You, a parser developer, have to fill the fields of guest specs.
+``ctags`` inquiries the guest spec when matching the regex pattern
+associated with it, tries to fill the fields of the guest request,
+and runs a guest parser when all the fields of the guest request are
+filled.
+
+If you don't use `Multi-line pattern match`_ to define a host parser,
+``ctags`` can fill fields of `guest request` incrementally; more than
+one guest specs are used to fill the fields. In other words, you can
+make some of the fields of a guest spec empty. On the other hand, you must
+specify all the fields of a guest spec for `Multi-line pattern match`_.
+
+The PARSER field of `_guest` regex flag
+......................................................................
+For PARSER, you can specify one of the following items:
+
+a name of a parser
+
+	If you know the guest parser you want to run before parsing
+	the input file, specify the name to the `PARSER`.
+
+	An example of running C parser as a guest parser::
+
+	  {_guest=C,...
+
+the group number of a regex pattern started from ``\`` (backslash)
+
+	If a parser name appears in an input file, write a regex pattern
+	to capture the name.  Specify the group number where the name is
+	stored to the `PARSER`.  In such case, use ``\`` as the prefix for
+	the number.
+
+	Let's see an example. Git Flavor Markdown (GFM) is a language for
+	documentation. It provides a notation for quoting a snippet of
+	program code; the language treats the area started from ``~~~`` to
+	``~~~`` as a snippet. You can specify a programming language of
+	the snippet with starting the area with
+	``~~~THE_NAME_OF_LANGUAGE`` like ``~~~C`` or ``~~~Java``.
+
+	To run a guest parser on the area, you have to capture the
+	``THE_NAME_OF_LANGUAGE`` with a regex pattern::
+
+		--_mtable-regex-Markdown=main/~~~([a-zA-Z0-9][-#+a-zA-Z0-9]*)[\n]//{_guest=\1,0end,}
+
+	The pattern captures the language name in the input file with the
+	regex group 1, and specify it to `PARSER`::
+
+
+	   {guest=\1,...
+
+
+the group number of a regex pattern started from ``*`` (asterisk)
+
+	If a file name implying a programming language appears in an input
+	file, capture the file name with the regex pattern where the guest
+	spec attaches to. ``ctags`` tries to find a proper parser for the
+	file name by inquiring the langmap.
+
+	Use ``*`` as the prefix to the number for specifying the group of
+	the regex pattern that captures the file name.
+
+	Let's see an example. Consider you have a shell script that emits
+	a program code instantiated from one of the templates. HERE DOCUMENTs
+	are used to represent the templates like:
+
+	.. code-block:: sh
+
+		i=...
+		cat > foo.c <<EOF
+			int main (void) { return $i; }
+		EOF
+
+		cat > foo.el <<EOF
+			(defun foo () (1+ $i))
+		EOF
+
+	To run guest parsers for the here document areas, the shell
+	script parser of ctags must choose the parsers from the file
+	names (foo.c and foo.el)::
+
+		--regex-sh=/cat > ([a-z.]+) <<EOF//{_guest=*1,0end,}
+
+	The pattern captures the file name in the input file with the
+	regex group 1, and specify it to `PARSER`::
+
+	   {_guest=*1,...
+
+The START and END fields of `_guest` regex flag
+......................................................................
+
+The START and END fields specify the area the PARSER parses.  START
+specifies the start of the area. END specifies the end of the area.
+
+The forms of the two fields are the same: a regex group number
+followed by "start" or "end". e.g. "3start", "0end".  The suffixes,
+"start" and "end", represents one of two boundaries of the group.
+
+Let's see an example:
+
+	{_guest=C,2end,3start}
+
+This guest regex flag means running C parser on the area between
+"2end" and "3start". "2end" means the area starts from the end of
+matching of the 2nd regex group associated with the flag. "3start"
+means the area ends at the beginning of matching of the 3rd regex
+group associated with the flag.
+
+Let's more realistic example.
+Here is an optlib file for an imaginary language "single".
+
+	--langdef=single
+	--map-single=.single
+	--regex-single=/^(BEGIN_C<).*(>END_C)$//{_guest=C,1end,2start}
+
+This parser can run C parser and extract "main" function from the
+following input file::
+
+	BEGIN_C<int main (int argc, char **argv) { return 0; }>END_C
+	        ^                                             ^
+			 `- "1end" points here.                       |
+			                       "2start" points here. -+
 
 
 Submitting an optlib file to the Universal-ctags project
