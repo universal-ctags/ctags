@@ -139,6 +139,7 @@
 	UCtagsAspellParser, \
 	VhdlParser, \
 	VimParser, \
+	VueParser, \
 	WindResParser, \
 	YaccParser, \
 	YumRepoParser, \

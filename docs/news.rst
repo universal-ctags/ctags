@@ -93,6 +93,7 @@ The following parsers have been added:
 * TTCN
 * TypeScript
 * Varlink *peg/packcc*
+* Vue *optlib*
 * WindRes
 * XSLT v1.0 *libxml*
 * Yacc
