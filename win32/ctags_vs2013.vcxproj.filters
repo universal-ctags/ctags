@@ -198,6 +198,9 @@
     <ClCompile Include="..\optlib\gdbinit.c">
       <Filter>Source Files\optlib</Filter>
     </ClCompile>
+    <ClCompile Include="..\optlib\inko.c">
+      <Filter>Source Files\optlib</Filter>
+    </ClCompile>
     <ClCompile Include="..\optlib\man.c">
       <Filter>Source Files\optlib</Filter>
     </ClCompile>
@@ -217,9 +220,6 @@
       <Filter>Source Files\optlib</Filter>
     </ClCompile>
     <ClCompile Include="..\optlib\systemtap.c">
-      <Filter>Source Files\optlib</Filter>
-    </ClCompile>
-    <ClCompile Include="..\optlib\inko.c">
       <Filter>Source Files\optlib</Filter>
     </ClCompile>
     <ClCompile Include="..\parsers\ada.c">
