@@ -775,13 +775,13 @@ static char* getFullQualifiedScopeNameFromCorkQueue (const tagEntryInfo * inner_
 			stringListAdd (queue, v);
 			kindIndex = scope->kindIndex;
 			lang = scope->langType;
+			root_scope = scope;
 		}
-		root_scope = scope;
 		scope =  getEntryInCorkQueue (scope->extensionFields.scopeIndex);
 	}
 
 	n = vStringNew ();
-	sep = scopeSeparatorFor (root_scope->langType, root_scope->kindIndex, KIND_GHOST_INDEX);
+	sep = root_scope? scopeSeparatorFor (root_scope->langType, root_scope->kindIndex, KIND_GHOST_INDEX): NULL;
 	if (sep)
 		vStringCatS(n, sep);
 
