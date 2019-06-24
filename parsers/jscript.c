@@ -1936,6 +1936,123 @@ static bool parseES6Class (tokenInfo *const token, const tokenInfo *targetName)
 	return true;
 }
 
+/* Forms the left side of desturctual assignments
+ *
+ * T = var|let|const
+ *
+ * ---------------------------------------------------------
+ * T [] = [];
+ * T [a] = [0];
+ * T [b,c] = [0];
+ * T [,d] = [0];
+ * T [e,...f] = [0];
+ * T [,...g] = [0];
+ * T [...h] = [0];
+ * T {i, j} = ...;
+ * T {k=DONT_TAG_ME0,l} = ...;
+ * T {DONT_TAG_ME1: m, DONT_TAG_ME2: n = DONT_TAG_ME3} = ...;
+ * let DONT_TAG_ME_KEY = 'z'; T {[DONT_TAG_ME_KEY]: o} = ...;
+ * T {'DONT_TAG_ME_KEYLIT': p } = ...;
+ * T [,{ q }] = ...;
+ * T {DONT_TAG_ME_KEYLIT: [r,s]} = ;
+ */
+#define MAX_DESTRUCTUAL_ASSIGNMENTS_DEPTH 32
+static void parseLeftSideOfDestructualAssignment (tokenInfo * const token, int kindIndex, int depth)
+{
+	if (depth > MAX_DESTRUCTUAL_ASSIGNMENTS_DEPTH)
+		return;
+
+	tokenInfo *const name = newToken ();
+	int terminator = isType (token, TOKEN_OPEN_CURLY)? TOKEN_CLOSE_CURLY: TOKEN_CLOSE_SQUARE;
+	int dont_read = 0;
+
+	while (!(isType(token, terminator) || isType(token, TOKEN_EOF)))
+	{
+		if (!dont_read)
+			readToken(token);
+		else
+			dont_read--;
+
+		bool started_from_id = isType(token, TOKEN_IDENTIFIER);
+		if (started_from_id
+			|| isType (token, TOKEN_STRING)
+			|| (terminator == TOKEN_CLOSE_CURLY && isType(token, TOKEN_OPEN_SQUARE)))
+		{
+			if (started_from_id)
+			{
+				copyToken(name, token, true);
+				readToken(token);
+			}
+			else
+			{
+				/*
+				 * let DONT_TAG_ME_KEY = 'z'; T {[DONT_TAG_ME_KEY]: o} = ...;
+				 */
+				skipArrayList (token, true);
+			}
+
+			if (isType (token, TOKEN_COLON))
+			{
+				readToken(token);
+				if (isType(token, TOKEN_IDENTIFIER))
+				{
+					/*
+					 * T {DONT_TAG_ME1: m, DONT_TAG_ME2: n = DONT_TAG_ME3} = ...;
+					 */
+					if ((kindIndex != KIND_GHOST_INDEX)
+						&& (!vStringIsEmpty (token->string)))
+						makeJsTag (token, kindIndex, NULL, NULL);
+				}
+				else if (isType(token, TOKEN_OPEN_CURLY) || isType(token, TOKEN_OPEN_SQUARE))
+				{
+					/*
+					 * T {DONT_TAG_ME_KEYLIT: [r,s]} = ;
+					 */
+					parseLeftSideOfDestructualAssignment (token, kindIndex, ++depth);
+				}
+				else
+				{
+					/* Unexpected input */
+					dont_read++;
+				}
+			}
+			else if (started_from_id)
+			{
+				/*
+				 * T [] = [];
+				 * T [a] = [0];
+				 * T [b,c] = [0];
+				 * T [,d] = [0];
+				 * T [e,...f] = [0];
+				 * T [,...g] = [0];
+				 * T [...h] = [0];
+				 * T {i, j} = ...;
+				 */
+
+				if ((kindIndex != KIND_GHOST_INDEX)
+					&& (!vStringIsEmpty (name->string)))
+					makeJsTag (name, kindIndex, NULL, NULL);
+				dont_read++;
+			}
+		}
+		else if (isType(token, TOKEN_EQUAL_SIGN))
+		{
+			/*
+			 * T {k=DONT_TAG_ME0,l} = ...;
+			 */
+			/* DONT_TAG_ME0 can be an expresion.
+			   Skip to the next `,' or `}'. */
+			readToken(token);
+			findCmdTerm (token, true, true, true);
+		}
+		else if (isType(token, TOKEN_OPEN_CURLY) || isType(token, TOKEN_OPEN_SQUARE))
+		{
+			parseLeftSideOfDestructualAssignment (token, kindIndex, ++depth);
+		}
+	}
+	deleteToken (name);
+}
+
 static bool parseStatement (tokenInfo *const token, bool is_inside_class)
 {
 	TRACE_ENTER_TEXT("is_inside_class: %s", is_inside_class? "yes": "no");
@@ -2001,6 +2118,18 @@ static bool parseStatement (tokenInfo *const token, bool is_inside_class)
 			is_global = true;
 		}
 		readToken(token);
+		if (isType (token, TOKEN_OPEN_CURLY) ||
+			isType (token, TOKEN_OPEN_SQUARE))
+		{
+			int kindIndex;
+			if (!is_global)
+				kindIndex = KIND_GHOST_INDEX;
+			else if (is_const)
+				kindIndex = JSTAG_CONSTANT;
+			else
+				kindIndex = JSTAG_VARIABLE;
+			parseLeftSideOfDestructualAssignment (token, kindIndex, 0);
+		}
 	}
 
 nextVar:
@@ -2462,7 +2591,7 @@ nextVar:
 					;
 				else if ((indexForName = symbolTableGet(ClassNames, vStringValue (fulltag))) != CORK_NIL)
 					;
-				else
+				else if (!vStringIsEmpty (name->string))
 					indexForName = makeJsTag (name, is_const ? JSTAG_CONSTANT : JSTAG_VARIABLE, NULL, NULL);
 				vStringDelete (fulltag);
 			}
