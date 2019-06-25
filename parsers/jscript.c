@@ -1245,7 +1245,7 @@ static void addToScope (tokenInfo* const token, int parent)
  */
 
 static bool findCmdTerm (tokenInfo *const token, bool include_newlines,
-                            bool include_commas)
+                            bool include_commas, bool include_close_square)
 {
 	/*
 	 * Read until we find either a semicolon or closing brace.
@@ -1254,6 +1254,7 @@ static bool findCmdTerm (tokenInfo *const token, bool include_newlines,
 	while (! isType (token, TOKEN_SEMICOLON) &&
 		   ! isType (token, TOKEN_CLOSE_CURLY) &&
 		   ! (include_commas && isType (token, TOKEN_COMMA)) &&
+		   ! (include_close_square && isType (token, TOKEN_CLOSE_SQUARE)) &&
 		   ! isType (token, TOKEN_EOF))
 	{
 		/* Handle nested blocks */
@@ -1453,7 +1454,7 @@ static bool parseIf (tokenInfo *const token)
 	{
 		/* The next token should only be read if this statement had its own
 		 * terminator */
-		read_next_token = findCmdTerm (token, true, false);
+		read_next_token = findCmdTerm (token, true, false, false);
 	}
 	return read_next_token;
 }
@@ -1516,7 +1517,7 @@ static void parseFunction (tokenInfo *const token)
 		patchScopeFieldOfEntriesBetween (p, countEntryInCorkQueue(), q);
 	}
 
-	findCmdTerm (token, false, false);
+	findCmdTerm (token, false, false, false);
 
  cleanUp:
 	vStringDelete (signature);
@@ -1850,7 +1851,7 @@ static bool parseMethods (tokenInfo *const token, int classIndex,
 
 	TRACE_PRINT("Finished parsing methods");
 
-	findCmdTerm (token, false, false);
+	findCmdTerm (token, false, false, false);
 
 cleanUp:
 	token->scope = saveScope;
@@ -2157,7 +2158,7 @@ nextVar:
 							/*
 							 * Find to the end of the statement
 							 */
-							findCmdTerm (token, false, false);
+							findCmdTerm (token, false, false, false);
 							is_terminated = true;
 							goto cleanUp;
 						}
@@ -2498,7 +2499,7 @@ nextVar:
 		 *	   return 1;
 		 * }
 		 */
-		is_terminated = findCmdTerm (token, true, true);
+		is_terminated = findCmdTerm (token, true, true, false);
 		/* if we're at a comma, try and read a second var */
 		if (isType (token, TOKEN_COMMA))
 		{
