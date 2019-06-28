@@ -56,8 +56,10 @@ extern hashTable* hashTableNew         (unsigned int size,
 					hashTableEqualFunc equalfn,
 					hashTableFreeFunc keyfreefn,
 					hashTableFreeFunc valfreefn);
-
 extern void       hashTableDelete      (hashTable *htable);
+extern hashTable* hashTableRef (hashTable* htable);
+#define 		  hashTableUnref hashTableDelete
+
 extern void       hashTableClear       (hashTable *htable);
 extern void       hashTablePutItem     (hashTable *htable, void *key, void *value);
 extern void*      hashTableGetItem     (hashTable *htable, const void * key);

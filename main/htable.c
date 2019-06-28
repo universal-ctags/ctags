@@ -41,6 +41,7 @@ struct sHashEntry {
 struct sHashTable {
 	hentry** table;
 	unsigned int size;
+	int refcnt;
 	hashTableHashFunc hashfn;
 	hashTableEqualFunc equalfn;
 	hashTableFreeFunc keyfreefn;
@@ -145,6 +146,7 @@ extern hashTable *hashTableNew    (unsigned int size,
 	htable->equalfn = equalfn;
 	htable->keyfreefn = keyfreefn;
 	htable->valfreefn = valfreefn;
+	htable->refcnt = 1;
 
 	return htable;
 }
@@ -157,9 +159,18 @@ extern hashTable* hashTableIntNew (unsigned int size,
 	return hashTableNew (size, hashfn, equalfn, keyfreefn, NULL);
 }
 
+extern hashTable* hashTableRef (hashTable *htable)
+{
+	htable->refcnt++;
+	return htable;
+}
+
 extern void       hashTableDelete (hashTable *htable)
 {
 	if (!htable)
+		return;
+
+	if (--htable->refcnt > 0)
 		return;
 
 	hashTableClear (htable);
