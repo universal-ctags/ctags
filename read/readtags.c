@@ -442,6 +442,7 @@ static void parseTagLine (tagFile *file, tagEntry *const entry)
 		if (tab != NULL)
 		{
 			int fieldsPresent;
+			int combinedPattern;
 			*tab = '\0';
 			p = tab + 1;
 			if (*p == '/'  ||  *p == '?')
@@ -471,6 +472,30 @@ static void parseTagLine (tagFile *file, tagEntry *const entry)
 				entry->address.lineNumber = atol (p);
 				while (isdigit ((int) *(unsigned char*) p))
 					++p;
+				if (p)
+				{
+					combinedPattern = (strncmp (p, ";/", 2) == 0) ||
+											(strncmp (p, ";?", 2) == 0);
+					if (combinedPattern)
+					{
+						++p;
+						/* parse pattern */
+						int delimiter = *(unsigned char*) p;
+						do
+						{
+							p = strchr (p + 1, delimiter);
+						} while (p != NULL
+							 &&  isOdd (countContinuousBackslashesBackward (p - 1,
+													entry->address.pattern)));
+
+						if (p == NULL)
+						{
+							/* invalid pattern */
+						}
+						else
+							++p;
+					}
+				}
 			}
 			else
 			{
