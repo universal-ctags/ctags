@@ -15,6 +15,8 @@
 #include "general.h"  /* must always come first */
 #include "types.h"
 
+#include <stdint.h>
+
 #include "kind.h"
 #include "lregex.h"
 #include "lxpath.h"
@@ -42,6 +44,30 @@ typedef void (*parserInitialize) (langType language);
 typedef void (*initStatistics) (langType language);
 typedef void (*printStatistics) (langType langType);
 
+/* Used only when CORK_TABLE_REVERSE_SCOPE_MAP is set.
+ * This helps you to make the reverse scope map smaller.
+ *
+ * Return true for accepting an entry as the child of the parent.  The
+ * entry is specified with childCandidateIndex and childCandidateTag.
+ * The parent is specified with parentIndex. As the result of the
+ * acceptance, the entry is linked to the reverse scope map of the
+ * parent.
+ *
+ * forEachChildForCorkEntry() and forEachNamedChildForCorkEntry() are
+ * for the function accessing the revese scope map of a given entry.
+ */
+typedef bool (*filterChildCandidate) (langType langType, int parentIndex, int childCandidateIndex,
+									  const tagEntryInfo *childCandidateTag);
+
+/* Used only when CORK_TABLE_REVERSE_SCOPE_MAP and
+   CORK_TABLE_REVERSE_NAME_MAP are set.
+
+   Return true if the newEntry and the preExistingEntry represent a same
+   language object. */
+typedef bool (* detectGroupFunc) (langType language,
+								  const tagEntryInfo *newEntry,
+								  const tagEntryInfo *preExistingEntry);
+
 /* Per language finalizer is called anytime when ctags exits.
    (Exceptions are a kind of options are given when invoked. Here
    options are: --version, --help, --list-*, and so on.)
@@ -64,6 +90,37 @@ typedef struct {
 	const int id;
 } keywordTable;
 
+typedef enum {
+	/* The fundamental queue.
+	 * All makeTagEntry'ed entries are stored to the cork queue, and
+	 * indexes are assigned to the entries.
+	 * The value returned from the makeTagEntry is the index.
+	 * You can access the entry after calling makeTagEntry by
+	 * calling getEntryInCorkQueue with the index.
+	 * This must be enabled to use the reverse map enabled with
+	 * CORK_TABLE_REVERSE_SCOPE_MAP.
+	 */
+	CORK_TABLE_QUEUE = 1 << 0,
+
+	/* All the names are stored this flat map.
+	 */
+	CORK_TABLE_REVERSE_NAME_MAP       = 1 << 1,
+	/* If the bit is not set, the accessing the flat map in
+	 * case sensitive way.
+	 */
+	CORK_TABLE_REVERSE_NAME_MAP_ICASE = 1 << 2,
+
+	/* To use forEachChildForCorkEntry and
+	 * forEachNamedChildForCorkEntry, use following flags.
+	 */
+	CORK_TABLE_REVERSE_SCOPE_MAP       = 1 << 3,
+
+	/* If the bit is not set, the accessing the map in
+	 * case sensitive way.
+	 */
+	CORK_TABLE_REVERSE_SCOPE_MAP_ICASE = 1 << 4,
+} corkTableSpec;
+
 struct sParserDefinition {
 	/* defined by parser */
 	char* name;                    /* name of language */
@@ -77,8 +134,13 @@ struct sParserDefinition {
 	simpleParser parser;           /* simple parser (common case) */
 	rescanParser parser2;          /* rescanning parser (unusual case) */
 	selectLanguage* selectLanguage; /* may be used to resolve conflicts */
+
 	unsigned int method;           /* See METHOD_ definitions above */
-	bool useCork;
+
+	unsigned int useCork;		   /* true means ues CORK_TABLE_QUEUE */
+	filterChildCandidate filterChild;
+	detectGroupFunc detectGroup;
+
 	bool useMemoryStreamInput;
 	bool allowNullTag;
 	bool requestAutomaticFQTag;

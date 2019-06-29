@@ -103,6 +103,7 @@ typedef struct sParserObject {
 									  is set here if this parser is OLDLANG.
 									  LANG_IGNORE is set if no being pretended. */
 
+	hashTable** name2indexes;	/* Used when CORK_TABLE_REVERSE_NAME_MAP is specified. */
 } parserObject;
 
 /*
@@ -3262,13 +3263,13 @@ static bool doesParserUseCork (parserDefinition *parser)
 	subparser *tmp;
 	bool r = false;
 
-	if (parser->useCork)
+	if (parser->useCork & CORK_TABLE_QUEUE)
 		return true;
 
 	if (hasLanguageScopeActionInRegex (parser->id)
 	    || parser->requestAutomaticFQTag)
 	{
-		parser->useCork = true;
+		parser->useCork |= CORK_TABLE_QUEUE;
 		return true;
 	}
 
@@ -3337,6 +3338,11 @@ extern void printParserStatisticsIfUsed (langType language)
 	}
 }
 
+extern unsigned int getCorkTableSpecOfParser (langType language)
+{
+	return LanguageTable [language].def->useCork;
+}
+
 static bool createTagsWithFallback1 (const langType language,
 									 langType *exclusive_subparser)
 {
@@ -3348,6 +3354,7 @@ static bool createTagsWithFallback1 (const langType language,
 	rescanReason whyRescan;
 	parserObject *parser;
 	bool useCork;
+	unsigned int corkSpec = getCorkTableSpecOfParser (language);
 
 	initializeParser (language);
 	parser = &(LanguageTable [language]);
@@ -3356,7 +3363,7 @@ static bool createTagsWithFallback1 (const langType language,
 
 	useCork = doesParserUseCork(parser->def);
 	if (useCork)
-		corkTagFile();
+		corkTagFile(language, corkSpec);
 
 	addParserPseudoTags (language);
 	initializeParserStats (parser);
@@ -3370,8 +3377,9 @@ static bool createTagsWithFallback1 (const langType language,
 	{
 		if (useCork)
 		{
+			/* TODO:subparserCorkReset (); */
 			uncorkTagFile();
-			corkTagFile();
+			corkTagFile(language, corkSpec);
 		}
 
 
@@ -4434,6 +4442,23 @@ extern bool processPretendOption (const char *const option, const char *const pa
 			 getLanguageNameFull (old_language, true));
 	enableLanguage (old_language, false);
 
+	return true;
+}
+
+extern bool filterChildLinkingToReverseScopeMap (langType language, int newParentCorkIndex,
+											   int tagCorkIndex, const tagEntryInfo *tag)
+{
+	if (LanguageTable [language].def->filterChild)
+		return LanguageTable [language].def->filterChild (language, newParentCorkIndex, tagCorkIndex, tag);
+	return true;
+}
+
+extern bool detectEntriesAreInTheSameGroup (langType language,
+											const tagEntryInfo *newEntry,
+											const tagEntryInfo *preExistingEntry)
+{
+	if (LanguageTable [language].def->detectGroup)
+		return LanguageTable [language].def->detectGroup (language, newEntry, preExistingEntry);
 	return true;
 }
 

@@ -58,7 +58,7 @@ extern bool writePseudoTag (const ptagDesc *pdesc,
 			       const char *const pattern,
 			       const char *const parserName);
 
-void          corkTagFile(void);
+void          corkTagFile(langType lang, unsigned int spec);
 void          uncorkTagFile(void);
 
 extern void makeFileTag (const char *const fileName);
