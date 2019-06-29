@@ -140,6 +140,7 @@
 	UCtagsAspellParser, \
 	VhdlParser, \
 	VimParser, \
+	VueJavaScriptParser, \
 	VueParser, \
 	WindResParser, \
 	YaccParser, \

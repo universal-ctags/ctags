@@ -31,7 +31,7 @@ extern parserDefinition* VueParser (void)
 		{"<template>\n((.|\n){1,}\n)</template>", "",
 		"", "{_guest=HTML,1start,1end}", NULL, true},
 		{"<script>\n((.|\n){1,}\n)</script>", "",
-		"", "{_guest=JavaScript,1start,1end}", NULL, true},
+		"", "{_guest=VueJavaScript,1start,1end}", NULL, true},
 		{"<style([ ]{1,}[a-z]{1,})*>\n((.|\n){1,}\n)</style>", "",
 		"", "{_guest=CSS,2start,2end}", NULL, true},
 	};

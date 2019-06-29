@@ -3088,3 +3088,89 @@ extern parserDefinition* JavaScriptParser (void)
 
 	return def;
 }
+
+
+#include "subparser.h"
+
+typedef enum {
+	VJS_K_L1,
+} VueJavaScriptKind;
+
+static kindDefinition VueJavaScriptKinds [] = {
+	{ true, 'V', "L1Entry" "Level 1 entries of exporting module" },
+};
+
+static 	void inputEnd (subparser *s)
+{
+	int exported = CORK_NIL;
+	langType js = getNamedLanguage ("JavaScript", 0);
+
+	for (int i = 0; i < countEntryInCorkQueue (); i++)
+	{
+		tagEntryInfo *e = getEntryInCorkQueue (i);
+		if (!e)
+			continue;
+
+		if (e->langType == js && e->kindIndex == JSTAG_CLASS)
+		{
+			const tagField *f = getParserFieldByType (e, JsFields [JSFLD_EXPORTED_AS].ftype);
+
+			if (f && f->value && (strcmp(f->value, "default") == 0))
+			{
+				exported = i;
+				break;
+			}
+		}
+	}
+
+	if (exported == CORK_NIL)
+		return;
+
+	for (int i = 0; i < countEntryInCorkQueue (); i++)
+	{
+		tagEntryInfo *e = getEntryInCorkQueue (i);
+		if (!e)
+			continue;
+		if (e->langType == js
+			&& (!e->placeholder)
+			&& (e->extensionFields.scopeIndex == exported))
+		{
+			tagEntryInfo ve;
+			initTagEntry (&ve, e->name, VJS_K_L1);
+			ve.lineNumber = e->lineNumber;
+			ve.filePosition = e->filePosition;
+			ve.extensionFields.scopeIndex = exported;
+			makeTagEntry (&ve);
+		}
+	}
+}
+
+static struct sSubparser vueJavaScriptSubparser = {
+	.direction = SUBPARSER_BI_DIRECTION,
+	.inputEnd = inputEnd,
+};
+
+static void findVueJavaScriptTags(void)
+{
+	scheduleRunningBaseparser (RUN_DEFAULT_SUBPARSERS);
+}
+
+extern parserDefinition* VueJavaScriptParser (void)
+{
+	parserDefinition *const def = parserNew ("VueJavaScript");
+
+	static parserDependency dependencies [] = {
+		[0] = { DEPTYPE_SUBPARSER, "JavaScript", &vueJavaScriptSubparser },
+	};
+
+	def->dependencies = dependencies;
+	def->dependencyCount = ARRAY_SIZE (dependencies);
+
+	def->kindTable	= VueJavaScriptKinds;
+	def->kindCount	= ARRAY_SIZE (VueJavaScriptKinds);
+
+	def->parser = findVueJavaScriptTags;
+	def->useCork = CORK_TABLE_REVERSE_NAME_MAP|CORK_TABLE_REVERSE_SCOPE_MAP|CORK_TABLE_QUEUE;
+
+	return def;
+}
