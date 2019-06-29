@@ -55,11 +55,13 @@ extern void ptrArrayAdd (ptrArray *const current, void *ptr)
 	current->array [current->count++] = ptr;
 }
 
-extern void ptrArrayRemoveLast (ptrArray *const current)
+extern void *ptrArrayRemoveLast (ptrArray *const current)
 {
 	Assert (current != NULL);
 	Assert (current->count > 0);
+	void *r = ptrArrayLast (current);
 	--current->count;
+	return r;
 }
 
 /* Combine array `from' into `current', deleting `from' */

@@ -42,7 +42,7 @@ static void simpleXpathMakeTag (xmlNode *node,
 		kind = spec->kind;
 	Assert (kind != KIND_GHOST_INDEX);
 
-	if (spec->role == ROLE_INDEX_DEFINITION)
+	if (spec->role == ROLE_DEFINITION_INDEX)
 		initTagEntry (&tag, (char *)str, kind);
 	else if (isXtagEnabled(XTAG_REFERENCE_TAGS))
 		initRefTagEntry (&tag, (char *)str,

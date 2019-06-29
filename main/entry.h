@@ -85,8 +85,8 @@ struct sTagEntryInfo {
 		/* type (union/struct/etc.) and name for a variable or typedef. */
 		const char* typeRef [2];  /* e.g., "struct" and struct name */
 
-#define ROLE_INDEX_DEFINITION -1
-#define ROLE_NAME_DEFINITION "def"
+#define ROLE_DEFINITION_INDEX -1
+#define ROLE_DEFINITION_NAME "def"
 #define ROLE_MAX_COUNT (sizeof(roleBitsType) * 8)
 		roleBitsType roleBits; /* for role of reference tag */
 
@@ -140,10 +140,39 @@ tagEntryInfo *getEntryInCorkQueue   (unsigned int n);
 tagEntryInfo *getEntryOfNestingLevel (const NestingLevel *nl);
 size_t        countEntryInCorkQueue (void);
 
+/* Only if the current parser requested CORK_TABLE_REVERSE_SCOPE_MAP table,
+ * the following functions work.
+ *
+ * forEachChildForCorkEntry makes PROC visit all children
+ * (in meaning of scope) below the entry specified with
+ * PARENTCORKINDEX.
+ *
+ * forEachNamedChildForCorkEntry makes PROC visit all children
+ * (in meaning of scope) having NAME as its name below the entry
+ * (in meaning of scope) below the entry specified with
+ * PARENTCORKINDEX.
+ *
+ * By returing true, PROC can stop the iteration.
+ * In the case, forEach*ChildForCorkEntry functions return true.
+ * In the other case, forEach*ChildForCorkEntry functions return false.
+ */
+typedef bool (* corkForeachFunc) (int childCorkIndex, void *user_data);
+extern bool forEachChildForCorkEntry (int parentCorkIndex,
+									  corkForeachFunc proc, void *user_data);
+extern bool forEachNamedChildForCorkEntry (int parentCorkIndex, const char *childExpectedName,
+										   corkForeachFunc proc, void *user_data);
+/* If the parser uses the reverse scope map, use patchScopeFieldForCorkEntry to
+ * modify the scope of a tag instead of directly updating scopeIndex field
+ * of the tag.
+ */
+extern void patchScopeFieldForCorkEntry (int targetIndex, int scopeIndex);
+
 extern void    markTagExtraBit     (tagEntryInfo *const tag, xtagType extra);
 extern bool isTagExtraBitMarked (const tagEntryInfo *const tag, xtagType extra);
 
 extern void attachParserField (tagEntryInfo *const tag, fieldType ftype, const char* value);
 extern void attachParserFieldToCorkEntry (int index, fieldType ftype, const char* value);
+
+extern int makePlaceholder (const char *const name);
 
 #endif  /* CTAGS_MAIN_ENTRY_H */

@@ -1,4 +1,4 @@
-AnonymousClasse9b77f6a0101	input.js	/^  return class extends superclass {$/;"	c	class:Mixin	inherits:superclass
+AnonymousClasse9b77f6a0101	input.js	/^  return class extends superclass {$/;"	c	function:Mixin	inherits:superclass
 Bar	input.js	/^class Bar extends Foo {$/;"	c	inherits:Foo
 Baz	input.js	/^class Baz extends Mixin(Bar) {$/;"	c	inherits:Mixin(Bar)
 Foo	input.js	/^class Foo {$/;"	c

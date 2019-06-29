@@ -58,7 +58,7 @@ extern bool writePseudoTag (const ptagDesc *pdesc,
 			       const char *const pattern,
 			       const char *const parserName);
 
-void          corkTagFile(void);
+void          corkTagFile(langType lang, unsigned int spec);
 void          uncorkTagFile(void);
 
 extern void makeFileTag (const char *const fileName);
@@ -68,7 +68,7 @@ extern const tagField* getParserField (const tagEntryInfo * tag, int index);
 
 CTAGS_INLINE roleBitsType makeRoleBit(int roleIndex)
 {
-	if (roleIndex == ROLE_INDEX_DEFINITION)
+	if (roleIndex == ROLE_DEFINITION_INDEX)
 		return 0;
 	else
 		return ((roleBitsType)1) << roleIndex;

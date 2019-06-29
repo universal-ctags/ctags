@@ -146,11 +146,11 @@ static tagXpathTable xsltXpathStylesheetTable[] = {
 static tagXpathTable xsltXpathTemplateTable[] = {
 	{ "./@match",
 	  LXPATH_TABLE_DO_MAKE,
-	  { .makeTagSpec = {K_MATCHED_TEMPLATE, ROLE_INDEX_DEFINITION,
+	  { .makeTagSpec = {K_MATCHED_TEMPLATE, ROLE_DEFINITION_INDEX,
 			    makeTagWithProvidingScope } }},
 	{ "./@name",
 	  LXPATH_TABLE_DO_MAKE,
-	  { .makeTagSpec = {K_NAMED_TEMPLATE, ROLE_INDEX_DEFINITION,
+	  { .makeTagSpec = {K_NAMED_TEMPLATE, ROLE_DEFINITION_INDEX,
 			    makeTagWithProvidingScope } }},
 	{ ".",
 	  LXPATH_TABLE_DO_RECUR,
@@ -176,7 +176,7 @@ static tagXpathTable xsltXpathCallTemplateTable [] = {
 static tagXpathTable xsltXpathParamTable [] = {
 	{ "./@name",
 	  LXPATH_TABLE_DO_MAKE,
-	  { .makeTagSpec = {K_PARAMETER, ROLE_INDEX_DEFINITION,
+	  { .makeTagSpec = {K_PARAMETER, ROLE_DEFINITION_INDEX,
 			    makeTagWithProvidingScope} }},
 	xsltXpathTemplateTableEntry ("."),
 };
@@ -184,7 +184,7 @@ static tagXpathTable xsltXpathParamTable [] = {
 static tagXpathTable xsltXpathVariableTable [] = {
 	{ "./@name",
 	  LXPATH_TABLE_DO_MAKE,
-	  { .makeTagSpec = {K_VARIABLE, ROLE_INDEX_DEFINITION,
+	  { .makeTagSpec = {K_VARIABLE, ROLE_DEFINITION_INDEX,
 			    makeTagWithProvidingScope} }},
 	xsltXpathTemplateTableEntry ("."),
 };

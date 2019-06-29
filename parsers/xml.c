@@ -64,7 +64,7 @@ static tagXpathTable XmlXpathMainTable [] = {
 static tagXpathTable XmlXpathIdTable [] = {
 	{ "./@id",
 	  LXPATH_TABLE_DO_MAKE,
-	  { .makeTagSpec = { K_ID, ROLE_INDEX_DEFINITION } }
+	  { .makeTagSpec = { K_ID, ROLE_DEFINITION_INDEX } }
 	},
 };
 

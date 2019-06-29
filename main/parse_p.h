@@ -169,4 +169,11 @@ extern bool makeKindDescriptionsPseudoTags (const langType language,
 extern void printLanguageMultitableStatistics (langType language);
 extern void printParserStatisticsIfUsed (langType lang);
 
+extern bool filterChildLinkingToReverseScopeMap (langType language, int newParentCorkIndex, int tagCorkIndex, const tagEntryInfo *tag);
+extern bool detectEntriesAreInTheSameGroup (langType language,
+											const tagEntryInfo *newEntry,
+											const tagEntryInfo *preExistingEntry);
+
+extern unsigned int getCorkTableSpecOfParser (langType language);
+
 #endif	/* CTAGS_MAIN_PARSE_PRIVATE_H */
