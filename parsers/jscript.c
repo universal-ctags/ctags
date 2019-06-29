@@ -64,12 +64,6 @@
  *	 DATA DECLARATIONS
  */
 
-/*
- * Tracks class and function names already created
- */
-static hashTable *ClassNames;
-static hashTable *FunctionNames;
-
 /*	Used to specify type of keyword.
 */
 enum eKeywordId {
@@ -249,12 +243,6 @@ static bool parseBlock (tokenInfo *const token, int parentScope);
 static bool parseLine (tokenInfo *const token, bool is_inside_class);
 static void parseUI5 (tokenInfo *const token);
 
-/* symbol table functions (fullscope'ed name to corkIndex) */
-static hashTable * symbolTableNew (void);
-static void symbolTableDelete (hashTable *t);
-static int symbolTableGet (hashTable *t, const char *name);
-static void symbolTablePut (hashTable *t, char *name, int corkIndex);
-
 #ifdef DO_TRACING
 static void dumpToken (const tokenInfo *const token);
 static const char *tokenTypeName(enum eTokenType e);
@@ -320,6 +308,8 @@ static void injectDynamicName (tokenInfo *const token, vString *newName)
 /*
  *	 Tag generation functions
  */
+static bool isAlreadyTaggedForTag (tagEntryInfo *e, int *exitingScopeIndex);
+static bool isAlreadyTaggedForToken (int kindIndex, tokenInfo *const token, int *existing);
 
 static int makeJsTagCommon (const tokenInfo *const token, const jsKind kind,
 							 vString *const signature, vString *const inheritance,
@@ -371,7 +361,7 @@ static int makeJsTagCommon (const tokenInfo *const token, const jsKind kind,
 				parent_role = JS_FUNCTION_NAMECHAIN;
 			}
 
-			TRACE_PRINT("Emitting refernce tag of %s role for symbol '%s' of kind %02x with scope '%s'",name,kind,
+			TRACE_PRINT("Emitting reference tag of %s role for symbol '%s' of kind %s with scope '%s'",
 						JsKinds [parent_kind].roles[parent_role].name,
 						vStringValue (middle_name),
 						JsKinds [parent_kind].name,
@@ -386,10 +376,13 @@ static int makeJsTagCommon (const tokenInfo *const token, const jsKind kind,
 			vStringDelete (middle_name);
 		}
 
-		TRACE_PRINT("Emitting tag for symbol '%s' of kind %02x with scope '%s'",name,kind,
-					fullscope == CORK_NIL? "":
-					getEntryInCorkQueue (fullscope)->placeholder? "<patchedLater>":
-					getEntryInCorkQueue (fullscope)->name);
+		TRACE_PRINT("Emitting tag for symbol '%s' of kind %s with scope '%s'",
+					name, JsKinds [kind].name,
+					(fullscope == CORK_NIL)
+					? ""
+					: (getEntryInCorkQueue (fullscope)->placeholder
+					   ? "<patchedLater>"
+					   : getEntryInCorkQueue (fullscope)->name));
 
 		e.lineNumber   = token->lineNumber;
 		e.filePosition = token->filePosition;
@@ -419,6 +412,9 @@ static int makeJsTagCommon (const tokenInfo *const token, const jsKind kind,
 		if (anonymous)
 			markTagExtraBit (&e, XTAG_ANONYMOUS);
 
+		if (isAlreadyTaggedForTag (&e, &r))
+			return r;
+
 		r = makeTagEntry (&e);
 	}
 	return r;
@@ -430,55 +426,14 @@ static int makeJsTag (const tokenInfo *const token, const jsKind kind,
 	return makeJsTagCommon (token, kind, signature, inheritance, false);
 }
 
-static vString* buildFullScopeString (int bottomCorkIndex,
-									  const char sep, vString *tail)
-{
-	vString *fulltag = vStringNew ();
-
-	if (bottomCorkIndex == CORK_NIL)
-	{
-		vStringCopy(fulltag, tail);
-		return fulltag;
-	}
-
-	ptrArray *a = ptrArrayNew (NULL);
-	do
-	{
-		tagEntryInfo *e0 = getEntryInCorkQueue (bottomCorkIndex);
-		ptrArrayAdd (a, e0);
-		bottomCorkIndex = e0->extensionFields.scopeIndex;
-	}
-	while (bottomCorkIndex != CORK_NIL);
-
-	while (ptrArrayCount (a) > 0)
-	{
-		tagEntryInfo * e = ptrArrayRemoveLast (a);
-		vStringCatS (fulltag, e->name);
-		vStringPut (fulltag, sep);
-	}
-	vStringCat(fulltag, tail);
-
-	if (a)
-		ptrArrayDelete (a);
-
-	return fulltag;
-}
-
 static int makeClassTagCommon (tokenInfo *const token, vString *const signature,
                           vString *const inheritance, bool anonymous)
 {
 	int r;
 	{
-		vString * fulltag = buildFullScopeString (token->scope, '.', token->string);
-		r = symbolTableGet (ClassNames, vStringValue (fulltag));
-		if (r == CORK_NIL)
-		{
+		if (!isAlreadyTaggedForToken (JSTAG_CLASS, token, &r))
 			r = makeJsTagCommon (token, JSTAG_CLASS, signature, inheritance,
-							 anonymous);
-			symbolTablePut (ClassNames, vStringDeleteUnwrap (fulltag), r);
-		}
-		else
-			vStringDelete (fulltag);
+								 anonymous);
 	}
 	return r;
 }
@@ -494,16 +449,9 @@ static int makeFunctionTagCommon (tokenInfo *const token, vString *const signatu
 {
 	int r;
 	{
-		vString * fulltag = buildFullScopeString (token->scope, '.', token->string);
-		r = symbolTableGet (FunctionNames, vStringValue (fulltag));
-		if (r == CORK_NIL)
-		{
-			r = makeJsTagCommon (token, generator ? JSTAG_GENERATOR : JSTAG_FUNCTION, signature, NULL,
-							 anonymous);
-			symbolTablePut (FunctionNames, vStringDeleteUnwrap (fulltag), r);
-		}
-		else
-			vStringDelete (fulltag);
+		int kindIndex = generator ? JSTAG_GENERATOR : JSTAG_FUNCTION;
+		if (!isAlreadyTaggedForToken (kindIndex, token, &r))
+			r = makeJsTagCommon (token, kindIndex, signature, NULL, anonymous);
 	}
 	return r;
 }
@@ -522,7 +470,7 @@ static void patchScopeFieldOfEntriesBetween (int start, int end, int scopeIndex)
 	{
 		tagEntryInfo *e = getEntryInCorkQueue (i);
 		if (e && e->extensionFields.scopeIndex == start)
-			e->extensionFields.scopeIndex = scopeIndex;
+			patchScopeFieldForCorkEntry (i, scopeIndex);
 	}
 }
 
@@ -2068,7 +2016,6 @@ static bool parseStatement (tokenInfo *const token, bool is_inside_class)
 	bool is_terminated = true;
 	bool is_global = false;
 	bool has_methods = false;
-	vString *	fulltag;
 
 	saveScope = token->scope;
 	/*
@@ -2500,15 +2447,12 @@ nextVar:
 					 * This is a global variable:
 					 *	   var g_var = different_var_name;
 					 */
-					fulltag = buildFullScopeString (token->scope, '.', token->string);
-
-					if ((indexForName = symbolTableGet(FunctionNames, vStringValue (fulltag))) != CORK_NIL)
+					if (isAlreadyTaggedForToken(JSTAG_FUNCTION, token, &indexForName))
 						;
-					else if ((indexForName = symbolTableGet(ClassNames, vStringValue (fulltag))) != CORK_NIL)
+					else if (isAlreadyTaggedForToken(JSTAG_CLASS, token, &indexForName))
 						;
 					else
 						indexForName = makeJsTag (name, is_const ? JSTAG_CONSTANT : JSTAG_VARIABLE, NULL, NULL);
-					vStringDelete (fulltag);
 				}
 			}
 			/* Here we should be at the end of the block, on the close curly.
@@ -2585,15 +2529,12 @@ nextVar:
 				 * This is a global variable:
 				 *	   var g_var = different_var_name;
 				 */
-				fulltag = buildFullScopeString (token->scope, '.', token->string);
-
-				if ((indexForName = symbolTableGet(FunctionNames, vStringValue (fulltag))) != CORK_NIL)
+				if (isAlreadyTaggedForToken(JSTAG_FUNCTION, token, &indexForName))
 					;
-				else if ((indexForName = symbolTableGet(ClassNames, vStringValue (fulltag))) != CORK_NIL)
+				else if (isAlreadyTaggedForToken(JSTAG_CLASS, token, &indexForName))
 					;
 				else if (!vStringIsEmpty (name->string))
 					indexForName = makeJsTag (name, is_const ? JSTAG_CONSTANT : JSTAG_VARIABLE, NULL, NULL);
-				vStringDelete (fulltag);
 			}
 		}
 
@@ -2710,8 +2651,9 @@ static void parseUI5 (tokenInfo *const token)
 
 static bool parseLine (tokenInfo *const token, bool is_inside_class)
 {
-	TRACE_ENTER_TEXT("token is '%s' of type %s",
-					 vStringValue(token->string), tokenTypeName (token->type));
+	TRACE_ENTER_TEXT("token is '%s' of type %s under %d",
+					 vStringValue(token->string), tokenTypeName (token->type),
+					 token->scope);
 
 	bool is_terminated = true;
 	/*
@@ -2881,27 +2823,6 @@ static const char *kindName (int k)
 }
 #endif
 
-static hashTable * symbolTableNew (void)
-{
-	return hashTableNew (47, hashCstrhash, hashCstreq, eFree, NULL);
-}
-
-static void symbolTableDelete (hashTable *t)
-{
-	hashTableDelete (t);
-}
-
-static int symbolTableGet (hashTable *t, const char *name)
-{
-	void *tmp = hashTableGetItem (t, name);
-	return HT_PTR_TO_INT (tmp);
-}
-
-static void symbolTablePut (hashTable *t, char *name, int corkIndex)
-{
-	hashTablePutItem (t, name, HT_INT_TO_PTR(corkIndex));
-}
-
 static void initialize (const langType language)
 {
 	Assert (ARRAY_SIZE (JsKinds) == JSTAG_COUNT);
@@ -2923,16 +2844,10 @@ static void findJsTags (void)
 	tokenInfo *const token = newToken ();
 
 	NextToken = NULL;
-	ClassNames = symbolTableNew ();
-	FunctionNames = symbolTableNew ();
 	LastTokenType = TOKEN_UNDEFINED;
 
 	parseJsFile (token);
 
-	symbolTableDelete (ClassNames);
-	symbolTableDelete (FunctionNames);
-	ClassNames = NULL;
-	FunctionNames = NULL;
 	deleteToken (token);
 
 #ifdef HAVE_ICONV
@@ -2947,6 +2862,108 @@ static void findJsTags (void)
 	Assert (NextToken == NULL);
 }
 
+struct findGroupData {
+	int corkIndex;				/* what found! */
+	int expectedKind;			/* JSTAG_FUNCTION implies JSTAG_GENERATOR, too. */
+};
+
+static bool findGroup (int childCorkIndex, void *user_data)
+{
+	struct findGroupData *data = user_data;
+	tagEntryInfo *child = getEntryInCorkQueue (childCorkIndex);
+
+	TRACE_PRINT ("%d (placeholder: %d)", childCorkIndex, child->placeholder);
+	if ((!child->placeholder)
+		&& (((data->expectedKind == JSTAG_CLASS)
+			 && (data->expectedKind == child->kindIndex))
+			|| ((data->expectedKind == JSTAG_FUNCTION
+				 || data->expectedKind == JSTAG_GENERATOR)
+				&& ((child->kindIndex == JSTAG_FUNCTION)
+					|| child->kindIndex == JSTAG_GENERATOR))))
+	{
+		data->corkIndex = childCorkIndex;
+		TRACE_PRINT ("FOUND");
+		return true;			/* Found -> stop iteration */
+	}
+	TRACE_PRINT ("NOT FOUND");
+	return false;
+}
+
+static bool isAlreadyTaggedRaw (int scopeIndex, const char *name, int kindIndex,
+								int *existing)
+{
+	struct findGroupData data = {
+		.corkIndex = CORK_NIL,
+		.expectedKind = kindIndex,
+	};
+	TRACE_PRINT("Searching '%s' below %d (expected kind: %d)...[",
+				name, scopeIndex, kindIndex);
+	if (forEachNamedChildForCorkEntry (scopeIndex, name, findGroup, &data))
+	{
+		if (existing)
+			*existing = data.corkIndex;
+		TRACE_PRINT("] %d", data.corkIndex);
+		return true;
+	}
+	else
+	{
+		TRACE_PRINT("] %s", "not found");
+		return false;
+	}
+}
+
+static bool isAlreadyTaggedForTag (tagEntryInfo *e, int *exitingScopeIndex)
+{
+	return isAlreadyTaggedRaw (e->extensionFields.scopeIndex,
+							   e->name,
+							   e->kindIndex,
+							   exitingScopeIndex);
+}
+
+static bool isAlreadyTaggedForToken (int kindIndex, tokenInfo *const token, int *existing)
+{
+	return isAlreadyTaggedRaw (token->scope, vStringValue(token->string), kindIndex,
+							   existing);
+}
+
+static bool filterChild (langType langType, int parentIndex, int childCandidateIndex,
+						 const tagEntryInfo *childCandidateTag)
+{
+	tagEntryInfo *parent = getEntryInCorkQueue (parentIndex);
+
+	if (parent == CORK_NIL)
+		return true;
+
+	if (isTagExtraBitMarked (childCandidateTag, XTAG_REFERENCE_TAGS))
+		return false;
+
+	if (isTagExtraBitMarked (childCandidateTag, XTAG_QUALIFIED_TAGS))
+		return false;
+
+	if (isTagExtraBitMarked (childCandidateTag, XTAG_SUBWORD))
+		return false;
+
+	return true;
+}
+
+static bool detectGroup (langType language,
+						 const tagEntryInfo *newEntry,
+						 const tagEntryInfo *preExistingEntry)
+{
+	if (newEntry->extensionFields.scopeIndex == CORK_NIL &&
+		preExistingEntry->extensionFields.scopeIndex == CORK_NIL)
+		return true;
+	else if (newEntry->extensionFields.scopeIndex == CORK_NIL
+			 || preExistingEntry->extensionFields.scopeIndex == CORK_NIL)
+		return false;
+	else
+	{
+		tagEntryInfo *a = getEntryInCorkQueue (newEntry->extensionFields.scopeIndex);
+		tagEntryInfo *b = getEntryInCorkQueue (preExistingEntry->extensionFields.scopeIndex);
+		return detectGroup (language, a, b);
+	}
+}
+
 extern parserDefinition* OpenUI5Parser (void)
 {
 	parserDefinition *const def = parserNew ("OpenUI5");
@@ -2955,6 +2972,8 @@ extern parserDefinition* OpenUI5Parser (void)
 
 	/* This must be implementated in a separated sub parser. */
 	def->invisible   = true;
+	/* TODO: these setting should be inherited from the base parser automatically. */
+	def->useCork	 = CORK_TABLE_REVERSE_NAME_MAP|CORK_TABLE_REVERSE_SCOPE_MAP|CORK_TABLE_QUEUE;
 	return def;
 }
 
@@ -2979,7 +2998,10 @@ extern parserDefinition* JavaScriptParser (void)
 	def->finalize   = finalize;
 	def->keywordTable = JsKeywordTable;
 	def->keywordCount = ARRAY_SIZE (JsKeywordTable);
-	def->useCork	= true;
+
+	def->useCork	= CORK_TABLE_REVERSE_NAME_MAP|CORK_TABLE_REVERSE_SCOPE_MAP|CORK_TABLE_QUEUE;
+	def->filterChild = filterChild;
+	def->detectGroup = detectGroup;
 
 	return def;
 }
