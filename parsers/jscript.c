@@ -159,7 +159,8 @@ typedef enum {
 	JSTAG_GENERATOR,
 	JSTAG_GETTER,
 	JSTAG_SETTER,
-	JSTAG_COUNT
+	JSTAG_NAME,
+	JSTAG_COUNT,
 } jsKind;
 
 typedef enum {
@@ -169,6 +170,11 @@ typedef enum {
 typedef enum {
 	JS_CLASS_NAMECHAIN,
 } jsClassRole;
+
+typedef enum {
+	JSFLD_EXPORTED_AS,
+	JSFLD_EXPORTS,
+} jsField;
 
 static roleDefinition JsFunctionRoles [] = {
 	{ false, "namechain", "(EXPERIMENTAL)used as a part of a name chain line a.b.c" },
@@ -190,6 +196,17 @@ static kindDefinition JsKinds [] = {
 	{ true,  'g', "generator",	  "generators"		   },
 	{ true,  'G', "getter",		  "getters"			   },
 	{ true,  'S', "setter",		  "setters"			   },
+	{ true,  'N', "name",		  "names used in module export or import" },
+};
+
+static fieldDefinition JsFields [] = {
+	{ .name = "exportedAs",
+	  .description = "the name using for exporting this tag",
+	  .enabled = true },
+	{ .name = "exports",
+	  .description = "what this tag exports",
+	  .enabled = true, },
+
 };
 
 static const keywordTable JsKeywordTable [] = {
@@ -2725,6 +2742,62 @@ static bool parseLine (tokenInfo *const token, bool is_inside_class)
 	return is_terminated;
 }
 
+static void parseExport (tokenInfo *const token)
+{
+	readToken (token);
+
+	if (isType (token, TOKEN_KEYWORD))
+	{
+		if ( isKeyword (token, KEYWORD_default) )
+		{
+			int scopeIndex = token->scope;
+			int defaultIndex = makeSimpleTag (token->string, JSTAG_NAME);
+			int c;
+			readToken (token);
+
+			if (isType (token, TOKEN_OPEN_CURLY))
+			{
+				anonGenerate (token->string, "AnonymousClass", JSTAG_CLASS);
+				c = makeJsTagCommon (token, JSTAG_CLASS, NULL, NULL, true);
+				parseMethods(token, c, false);
+			}
+			else
+			{
+				c = CORK_NIL;
+				parseLine (token, false);
+				int count = countEntryInCorkQueue();
+				if (defaultIndex + 1 < count)
+				{
+					for (int candidateIndex = defaultIndex + 1; candidateIndex < count; candidateIndex++)
+					{
+						tagEntryInfo *candidateTag = getEntryInCorkQueue (candidateIndex);
+						if (candidateTag->extensionFields.scopeIndex == scopeIndex)
+						{
+							c = candidateIndex;
+							break;
+						}
+					}
+				}
+			}
+
+			if (c != CORK_NIL)
+			{
+				tagEntryInfo *defaultTag = getEntryInCorkQueue (defaultIndex);
+				tagEntryInfo *classTag = getEntryInCorkQueue (c);
+
+				attachParserFieldToCorkEntry (defaultIndex, JsFields [JSFLD_EXPORTS].ftype,
+											  classTag->name);
+				attachParserFieldToCorkEntry (c, JsFields [JSFLD_EXPORTED_AS].ftype,
+											  defaultTag->name);
+			}
+			return;
+		}
+	}
+
+	/* fallback for the unexpected input */
+	parseLine (token, false);
+}
+
 static void parseJsFile (tokenInfo *const token)
 {
 	TRACE_ENTER();
@@ -2735,9 +2808,8 @@ static void parseJsFile (tokenInfo *const token)
 
 		if (isType (token, TOKEN_KEYWORD) && token->keyword == KEYWORD_sap)
 			parseUI5 (token);
-		else if (isType (token, TOKEN_KEYWORD) && (token->keyword == KEYWORD_export ||
-		                                           token->keyword == KEYWORD_default))
-			/* skip those at top-level */;
+		else if (isType (token, TOKEN_KEYWORD) && isKeyword (token, KEYWORD_export))
+			parseExport (token);
 		else
 			parseLine (token, false);
 	} while (! isType (token, TOKEN_EOF));
@@ -3010,6 +3082,9 @@ extern parserDefinition* JavaScriptParser (void)
 	def->useCork	= CORK_TABLE_REVERSE_NAME_MAP|CORK_TABLE_REVERSE_SCOPE_MAP|CORK_TABLE_QUEUE;
 	def->filterChild = filterChild;
 	def->detectGroup = detectGroup;
+
+	def->fieldTable = JsFields;
+	def->fieldCount = ARRAY_SIZE (JsFields);
 
 	return def;
 }
