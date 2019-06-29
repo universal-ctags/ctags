@@ -2114,9 +2114,17 @@ nextVar:
 			is_global = false;
 			/* Assume it's an assignment to a global name (e.g. a class) using
 			 * its fully qualified name, so strip the scope.
-			 * FIXME: resolve the scope so we can make more than an assumption. */
-			token->scope = CORK_NIL;
-			name->scope = CORK_NIL;
+			 * FIXME: resolve the scope so we can make more than an assumption.
+			 * -------------------------------------------------------------------
+			 * If NAME is defined in the scope, we don't have to clear the scope.
+			 */
+			if (!isAlreadyTaggedForToken(JSTAG_CLASS, name, NULL))
+			{
+				TRACE_PRINT("clear SCOPE");
+				token->scope = CORK_NIL;
+				name->scope = CORK_NIL;
+			}
+
 			do
 			{
 				readToken (token);
