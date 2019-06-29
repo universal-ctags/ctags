@@ -2093,8 +2093,8 @@ nextVar:
 
 	copyToken(name, token, true);
 	indexForName = CORK_NIL;
-	TRACE_PRINT("name becomes '%s' of type %s",
-				vStringValue(token->string), tokenTypeName (token->type));
+	TRACE_PRINT("name becomes '%s' of type %s below %d",
+				vStringValue(name->string), tokenTypeName (name->type), name->scope);
 
 	while (! isType (token, TOKEN_CLOSE_CURLY) &&
 	       ! isType (token, TOKEN_SEMICOLON)   &&
