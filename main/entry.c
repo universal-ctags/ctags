@@ -992,6 +992,17 @@ extern void attachParserFieldToCorkEntry (int index,
 		PARSER_TRASH_BOX_TAKE_BACK(tag->parserFieldsDynamic);
 }
 
+extern const tagField* getParserFieldByType (const tagEntryInfo * tag, int ftype)
+{
+	for (int i = 0; i < tag->usedParserFields; i++)
+	{
+		const tagField* f = getParserField (tag, i);
+		if (f && f->ftype == ftype)
+			return f;
+	}
+	return NULL;
+}
+
 extern const tagField* getParserField (const tagEntryInfo * tag, int index)
 {
 	if (index < 0

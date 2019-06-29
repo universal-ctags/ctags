@@ -172,6 +172,7 @@ extern bool isTagExtraBitMarked (const tagEntryInfo *const tag, xtagType extra);
 
 extern void attachParserField (tagEntryInfo *const tag, fieldType ftype, const char* value);
 extern void attachParserFieldToCorkEntry (int index, fieldType ftype, const char* value);
+extern const tagField* getParserFieldByType (const tagEntryInfo * tag, fieldType ftype);
 
 extern int makePlaceholder (const char *const name);
 
