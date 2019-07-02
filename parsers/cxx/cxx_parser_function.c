@@ -1994,23 +1994,29 @@ try_again:
 					pIdentifier = t->pPrev;
 				} else if(t->pPrev->pPrev)
 				{
-					bool bPrevIsSquareParenthesis = cxxTokenTypeIs(
-							t->pPrev,
+					CXXToken *pNonSquareParenthesis = cxxTokenChainPreviousTokenNotOfType(
+							t,
 							CXXTokenTypeSquareParenthesisChain
+						);
+
+					bool bPrevIsSquareParenthesis = (
+							pNonSquareParenthesis &&
+							(pNonSquareParenthesis != t->pPrev)
 						);
 
 					if(
 						bPrevIsSquareParenthesis &&
-						cxxTokenTypeIs(t->pPrev->pPrev,CXXTokenTypeIdentifier)
+						cxxTokenTypeIs(pNonSquareParenthesis,CXXTokenTypeIdentifier)
 					)
 					{
 						// type var[]
-						pIdentifier = t->pPrev->pPrev;
+						// type var[]...[]
+						pIdentifier = pNonSquareParenthesis;
 					} else if(
 						bPrevIsSquareParenthesis &&
-						cxxTokenTypeIs(t->pPrev->pPrev,CXXTokenTypeParenthesisChain) &&
+						cxxTokenTypeIs(pNonSquareParenthesis,CXXTokenTypeParenthesisChain) &&
 						(pIdentifier = cxxTokenChainFirstTokenOfType(
-								t->pPrev->pPrev->pChain,
+								pNonSquareParenthesis->pChain,
 								CXXTokenTypeIdentifier
 							))
 					)
