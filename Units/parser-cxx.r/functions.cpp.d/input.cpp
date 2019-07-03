@@ -73,6 +73,11 @@ int f09(char *((*f09a01)()))
 	return 0;
 }
 
+int f10(int f10a01,int f10a02[],int f10a03[2][3],int (f10a04)[],int (f10a05)[][5])
+{
+	return 0;
+}
+
 // Valid function templates
 template <typename T> std::unique_ptr<T> t01(T && t01a01)
 {
