@@ -1,0 +1,2 @@
+foo	input.c	0;/^int foo (void)$/;"	kind:f	typeref:typename:int
+foo	input.c	2;?^int foo (void)$?;"	kind:f	typeref:typename:int
