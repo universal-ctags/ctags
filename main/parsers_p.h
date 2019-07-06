@@ -101,6 +101,7 @@
 	OldCppParser, \
 	OldCParser, \
 	OcamlParser, \
+	OpenUI5Parser, \
 	PasswdParser, \
 	PascalParser, \
 	PerlParser, \
@@ -139,6 +140,8 @@
 	UCtagsAspellParser, \
 	VhdlParser, \
 	VimParser, \
+	VueJavaScriptParser, \
+	VueParser, \
 	WindResParser, \
 	YaccParser, \
 	YumRepoParser, \

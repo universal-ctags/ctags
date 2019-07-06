@@ -2,7 +2,7 @@
 The development guideline
 ======================================================================
 
-Supporting many parsers with few developers are impossible.  We invite
+Supporting many parsers with few developers is impossible.  We invite
 the person who contributes a parser to u-ctags team, especially if the
 target language is updated frequently. TypeScript is a typical
 frequently updated language.
@@ -150,7 +150,7 @@ Rules for modifying our repository
 
   These prefixes reduce the load of reviewers.
 
-* Use "git rebse -i" and "git push --force" to refine your change in
+* Use "git rebase -i" and "git push --force" to refine your change in
   the meaning of "semantically well separated."  "semantically well
   separated" is important than "recording the history of your try and
   error."

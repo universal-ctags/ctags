@@ -276,7 +276,7 @@ static void readToken (tokenInfo *const token, void *data CTAGS_ATTR_UNUSED)
 static int makeDtdTagMaybe (tagEntryInfo *const e, tokenInfo *const token,
 							int kind, int role)
 {
-	if (role == ROLE_INDEX_DEFINITION)
+	if (role == ROLE_DEFINITION_INDEX)
 	{
 		if (! DtdKinds[kind].enabled)
 			return CORK_NIL;
@@ -314,11 +314,11 @@ static void parseEntity (tokenInfo *const token)
 		tokenRead (token);
 		if (tokenIsType(token, IDENTIFIER))
 			index = makeDtdTagMaybe (&e, token,
-									 K_PARAMETER_ENTITY, ROLE_INDEX_DEFINITION);
+									 K_PARAMETER_ENTITY, ROLE_DEFINITION_INDEX);
 	}
 	else if (tokenIsType(token, IDENTIFIER))
 		index = makeDtdTagMaybe (&e, token,
-								 K_ENTITY, ROLE_INDEX_DEFINITION);
+								 K_ENTITY, ROLE_DEFINITION_INDEX);
 
 	if (tokenSkipToType (token, TOKEN_CLOSE) && (index != CORK_NIL))
 		backpatchEndField (index, token->lineNumber);
@@ -365,7 +365,7 @@ static void parseElement (tokenInfo *const token, bool skipToClose)
 		}
 	}
 	else if (tokenIsType(token, IDENTIFIER))
-		makeDtdTagMaybe (&e, token, K_ELEMENT, ROLE_INDEX_DEFINITION);
+		makeDtdTagMaybe (&e, token, K_ELEMENT, ROLE_DEFINITION_INDEX);
 	else if (token->type == '(')
 	{
 		do {
@@ -401,7 +401,7 @@ static void parseAttDefs (tokenInfo *const token)
 		{
 			tagEntryInfo e;
 			makeDtdTagMaybe (&e, token,
-							 K_ATTRIBUTE, ROLE_INDEX_DEFINITION);
+							 K_ATTRIBUTE, ROLE_DEFINITION_INDEX);
 		}
 		else if (tokenIsKeyword(token, ATTR_TYPES)
 				 || tokenIsKeyword(token, ENTITY))
@@ -503,7 +503,7 @@ static void parseNotation (tokenInfo *const token)
 	tokenRead (token);
 	if (tokenIsType(token, IDENTIFIER))
 		index = makeDtdTagMaybe (&e, token,
-								 K_NOTATION, ROLE_INDEX_DEFINITION);
+								 K_NOTATION, ROLE_DEFINITION_INDEX);
 
 	tokenSkipToType (token, TOKEN_CLOSE);
 	backpatchEndField (index, token->lineNumber);

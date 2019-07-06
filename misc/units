@@ -1409,6 +1409,8 @@ $0 shrink [OPTIONS] CMD_TEMPLATE INPUT OUTPUT
 		--timeout N: Run CMD under timeout command with duration N
 		--foreground: add --foreground option to timeout command.
 			      can be used with --timeout option.
+	   EXAMPLES:
+		misc/units shrink "u-ctags -o - %s" original-input.js  /tmp/anyname.js
 EOF
 }
 #action_shrink shrink --timeout=1 --foreground "./a.out  < %s" input.txt output.txt

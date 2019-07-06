@@ -320,7 +320,7 @@ static void makeConstTag (tokenInfo *const token, const flexKind kind)
 	{
 		const char *const name = vStringValue (token->string);
 		tagEntryInfo e;
-		int role = ROLE_INDEX_DEFINITION;
+		int role = ROLE_DEFINITION_INDEX;
 
 		if (kind == FLEXTAG_IMPORT)
 			role = FLEX_IMPORT_ROLE_IMPORTED;
@@ -1300,7 +1300,7 @@ static void parseFunction (tokenInfo *const token)
 
 	deleteToken (name);
 }
- 
+
 /* Parses a block surrounded by curly braces.
  * @p parentScope is the scope name for this block, or NULL for unnamed scopes */
 static bool parseBlock (tokenInfo *const token, const vString *const parentScope)

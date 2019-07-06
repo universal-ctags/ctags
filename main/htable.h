@@ -14,11 +14,30 @@
 #include "general.h"
 #include <stdint.h>
 
+/* This hashtable allows adding multiple items for a key.
+ * We call the imaginary group of items associated with a key
+ " "chain".
+ *
+ * hashTablePutItem() adds a key/item pair to the htable even if the
+ * htable has an item for the key already.
+ *
+ * hashTableGetItem() returns the first occurrence item for a given
+ * key.
+ *
+ * hashTableDeleteItem() deletes the first occurrence item for a given
+ * key.
+ *
+ * Use hashTableForeachItemOnChain () to process all items for a key.
+ */
 typedef struct sHashTable hashTable;
 typedef unsigned int (* hashTableHashFunc)  (const void * const key);
 typedef bool      (* hashTableEqualFunc) (const void* a, const void* b);
 typedef void         (* hashTableFreeFunc)  (void * ptr);
-typedef void         (* hashTableForeachFunc) (void *key, void *value, void* user_data);
+
+/* To continue the interation, return false.
+ * To break the interation, return true.
+ */
+typedef bool         (* hashTableForeachFunc) (const void *key, void *value, void *user_data);
 
 unsigned int hashPtrhash (const void * x);
 bool hashPtreq (const void * a, const void * constb);
@@ -37,14 +56,25 @@ extern hashTable* hashTableNew         (unsigned int size,
 					hashTableEqualFunc equalfn,
 					hashTableFreeFunc keyfreefn,
 					hashTableFreeFunc valfreefn);
-
 extern void       hashTableDelete      (hashTable *htable);
+extern hashTable* hashTableRef (hashTable* htable);
+#define 		  hashTableUnref hashTableDelete
+
 extern void       hashTableClear       (hashTable *htable);
 extern void       hashTablePutItem     (hashTable *htable, void *key, void *value);
 extern void*      hashTableGetItem     (hashTable *htable, const void * key);
 extern bool    hashTableHasItem     (hashTable * htable, const void * key);
-extern bool    hashTableDeleteItem  (hashTable *htable, void *key);
-extern void       hashTableForeachItem (hashTable *htable, hashTableForeachFunc proc, void *user_data);
+extern bool    hashTableDeleteItem  (hashTable *htable, const void *key);
+
+/* hashTableForeachItem* returns false if PROC returns false for all values.
+ * True returned by hashTableForeachItem* means PROC requests to stop the iteration.
+ * If PROC never retruns true, or if PROC is not called because HTABLE is empty,
+ * hashTableForeachItem* returns false.
+ */
+extern bool       hashTableForeachItem (hashTable *htable, hashTableForeachFunc proc, void *user_data);
+
+extern bool       hashTableForeachItemOnChain (hashTable *htable, const void *key, hashTableForeachFunc proc, void *user_data);
+
 extern int        hashTableCountItem   (hashTable *htable);
 
 extern hashTable* hashTableIntNew (unsigned int size,

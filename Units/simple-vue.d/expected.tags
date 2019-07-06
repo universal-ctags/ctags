@@ -1,0 +1,5 @@
+slot	input.vue	/^  <p id="slot">{{ greeting }} World!<\/p>$/;"	I	line:4	language:HTML
+makeWord	input.vue	/^function makeWord ()$/;"	f	line:8	language:JavaScript
+data	input.vue	/^  data: function () {$/;"	m	line:14	language:JavaScript	class:module.exports
+exports	input.vue	/^module.exports = {$/;"	c	line:13	language:JavaScript	class:module
+p	input.vue	/^p {$/;"	s	line:23	language:CSS

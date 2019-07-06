@@ -75,7 +75,7 @@ static tagXpathTable relaxngXpathPatternTable [] = {
 	},
 	{ "./*[local-name()='attribute']/@name",
 	  LXPATH_TABLE_DO_MAKE,
-	  { .makeTagSpec = { K_ATTRIBUTE, ROLE_INDEX_DEFINITION,
+	  { .makeTagSpec = { K_ATTRIBUTE, ROLE_DEFINITION_INDEX,
 			     makeTagWithScope } }
 	},
 	{ "./*[not(local-name()='element')][not(local-name()='attribute')]",
@@ -94,7 +94,7 @@ static void makeTagWithUpdatingScope (xmlNode *node,
 static tagXpathTable relaxngXpathElementNameTable [] = {
 	{ "@name",
 	  LXPATH_TABLE_DO_MAKE,
-	  { .makeTagSpec = { K_ELEMENT, ROLE_INDEX_DEFINITION,
+	  { .makeTagSpec = { K_ELEMENT, ROLE_DEFINITION_INDEX,
 			     makeTagWithUpdatingScope } }
 	},
 };
@@ -113,7 +113,7 @@ static tagXpathTable relaxngXpathGrammerTable [] = {
 static tagXpathTable relaxngXpathDefineNameTable [] = {
 	{ "@name",
 	  LXPATH_TABLE_DO_MAKE,
-	  { .makeTagSpec = { K_NAMED_PATTERN, ROLE_INDEX_DEFINITION,
+	  { .makeTagSpec = { K_NAMED_PATTERN, ROLE_DEFINITION_INDEX,
 			     makeTagWithUpdatingScope } }
 	},
 };

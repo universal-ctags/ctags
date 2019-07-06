@@ -30,7 +30,7 @@
 
 ```sh
 # A COMMENT LINE in SHELL SYNTAX
-funciton x
+function x
 {
 	echo 'Hello, World!'
 }
@@ -38,7 +38,7 @@ funciton x
 ###### t #
 ```sh
 # THE OTHER COMMENT LINE in SHELL SYNTAX
-funciton x
+function y
 {
 	cat <<<EOF
 	~~~

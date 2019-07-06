@@ -714,7 +714,7 @@ static int makeTag (tokenInfo *const token, const goKind kind,
 					const int scope, const char *argList, const char *typeref)
 {
 	return makeTagFull (token, kind, scope, argList, typeref,
-						ROLE_INDEX_DEFINITION);
+						ROLE_DEFINITION_INDEX);
 }
 
 static int makeRefTag (tokenInfo *const token, const goKind kind,

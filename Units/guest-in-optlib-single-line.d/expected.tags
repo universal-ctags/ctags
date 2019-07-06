@@ -1,0 +1,30 @@
+S0	input.single	/^DEF:S0$/;"	r	line:1	language:single
+E0	input.single	/^DEF:E0$/;"	r	line:7	language:single
+S1	input.single	/^DEF:S1$/;"	r	line:10	language:single
+E1	input.single	/^DEF:E1$/;"	r	line:16	language:single
+S2	input.single	/^DEF:S2$/;"	r	line:18	language:single
+E2	input.single	/^DEF:E2$/;"	r	line:24	language:single
+S3	input.single	/^DEF:S3$/;"	r	line:26	language:single
+E3	input.single	/^DEF:E3$/;"	r	line:32	language:single
+S4	input.single	/^DEF:S4$/;"	r	line:34	language:single
+E4	input.single	/^DEF:E4$/;"	r	line:43	language:single
+S5	input.single	/^DEF:S5$/;"	r	line:45	language:single
+E5	input.single	/^DEF:E5$/;"	r	line:47	language:single
+S6	input.single	/^DEF:S6$/;"	r	line:49	language:single
+E6	input.single	/^DEF:E6$/;"	r	line:51	language:single
+S7	input.single	/^DEF:S7$/;"	r	line:53	language:single
+E7	input.single	/^DEF:E7$/;"	r	line:55	language:single
+f0	input.single	/^(defun f0 () (list))$/;"	f	line:4	language:Lisp
+f1	input.single	/^(defun f1 () (list))$/;"	f	line:13	language:Lisp
+f2	input.single	/^(defun f2 () (list))$/;"	f	line:21	language:Lisp
+f3	input.single	/^(defun f3 () (list))$/;"	f	line:29	language:Lisp
+f4	input.single	/^int f4 (void)$/;"	f	line:37	language:C	typeref:typename:int
+f5	input.single	/(defun f5 () (list))/;"	f	line:46	language:Lisp
+f6	input.single	/(defun f6 () (list))/;"	f	line:50	language:Lisp
+f7	input.single	/int f7 (void) { return 0; }/;"	f	line:54	language:C	typeref:typename:int
+v0	input-0.single	/(defvar v0 0/;"	f	line:1	language:Lisp
+g0	input-1.single	/^(defun g0 () (list))$/;"	f	line:2	language:Lisp
+g1	input-1.single	/^int g1 (void) { return 0; }$/;"	f	line:6	language:C	typeref:typename:int
+g2	input-1.single	/^function g2$/;"	f	line:10	language:Sh
+EOF	input-1.single	/^	cat > foo.rst <<EOF$/;"	h	line:12	language:Sh
+G2 on g2	input-1.single	/^G2 on g2$/;"	c	line:14	language:ReStructuredText

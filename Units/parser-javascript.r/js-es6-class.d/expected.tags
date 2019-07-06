@@ -5,8 +5,8 @@ Class3	input.js	/^var Class3 = class {$/;"	c
 Class4	input.js	/^var Class4 = class Class4_2 {$/;"	c
 Class4_2	input.js	/^var Class4 = class Class4_2 {$/;"	c
 Class5	input.js	/^class Class5 {$/;"	c
-InnerClass1	input.js	/^	class InnerClass1 {$/;"	c	class:func1
-InnerClass2	input.js	/^	class InnerClass2 {$/;"	c	class:func1
+InnerClass1	input.js	/^	class InnerClass1 {$/;"	c	function:func1
+InnerClass2	input.js	/^	class InnerClass2 {$/;"	c	function:func1
 func1	input.js	/^function func1() {$/;"	f
 func2	input.js	/^function func2() {$/;"	f
 method1	input.js	/^	method1(arg1,arg2)$/;"	m	class:Class1

@@ -91,7 +91,7 @@ static tagXpathTable antXpathProjectTable [] = {
 	},
 	{ "property/@name",
 	  LXPATH_TABLE_DO_MAKE,
-	  { .makeTagSpec = { K_PROPERTY, ROLE_INDEX_DEFINITION,
+	  { .makeTagSpec = { K_PROPERTY, ROLE_DEFINITION_INDEX,
 			     makeTagWithScope } }
 	},
 	{ "import/@file",
@@ -104,7 +104,7 @@ static tagXpathTable antXpathProjectTable [] = {
 static tagXpathTable antXpathMainNameTable [] = {
 	{ "@name",
 	  LXPATH_TABLE_DO_MAKE,
-	  { .makeTagSpec = { K_PROJECT, ROLE_INDEX_DEFINITION,
+	  { .makeTagSpec = { K_PROJECT, ROLE_DEFINITION_INDEX,
 			     makeTagForProjectName } }
 	},
 };
@@ -112,7 +112,7 @@ static tagXpathTable antXpathMainNameTable [] = {
 static tagXpathTable antXpathTargetNameTable [] = {
 	{ "@name",
 	  LXPATH_TABLE_DO_MAKE,
-	  { .makeTagSpec = { K_TARGET, ROLE_INDEX_DEFINITION,
+	  { .makeTagSpec = { K_TARGET, ROLE_DEFINITION_INDEX,
 			     makeTagForTargetName} }
 	},
 };

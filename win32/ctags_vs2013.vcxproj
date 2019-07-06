@@ -148,6 +148,7 @@
     <ClCompile Include="..\optlib\elixir.c" />
     <ClCompile Include="..\optlib\elm.c" />
     <ClCompile Include="..\optlib\gdbinit.c" />
+    <ClCompile Include="..\optlib\inko.c" />
     <ClCompile Include="..\optlib\man.c" />
     <ClCompile Include="..\optlib\markdown.c" />
     <ClCompile Include="..\optlib\passwd.c" />
@@ -155,7 +156,7 @@
     <ClCompile Include="..\optlib\puppetManifest.c" />
     <ClCompile Include="..\optlib\qemuhx.c" />
     <ClCompile Include="..\optlib\systemtap.c" />
-    <ClCompile Include="..\optlib\inko.c" />
+    <ClCompile Include="..\optlib\vue.c" />
     <ClCompile Include="..\parsers\ada.c" />
     <ClCompile Include="..\parsers\ant.c" />
     <ClCompile Include="..\parsers\asciidoc.c" />

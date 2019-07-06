@@ -66,6 +66,7 @@ The following parsers have been added:
 * Markdown *optlib*
 * Maven2 *libxml*
 * Moose *perl basesd subperser*
+* Myrddin
 * M4
 * ObjectiveC
 * Passwd *optlib*
@@ -82,6 +83,7 @@ The following parsers have been added:
 * ReStructuredText
 * Robot
 * RpmSpec
+* RSpec *optlib*
 * Rust
 * SystemdUnit
 * SystemTap *optlib*
@@ -91,14 +93,13 @@ The following parsers have been added:
 * TTCN
 * TypeScript
 * Varlink *peg/packcc*
+* Vue *optlib*
 * WindRes
 * XSLT v1.0 *libxml*
 * Yacc
 * Yaml *libyaml*
 * YumRepo
 * Zephir
-* Myrddin
-* RSpec *optlib*
 
 See "Option library" for details on *optlib*.
 Libxml2 is required to use the parser(s) marked with *libxml*.

@@ -1,0 +1,47 @@
+x	input.js	/^var [x,y] = [0,0];$/;"	v
+y	input.js	/^var [x,y] = [0,0];$/;"	v
+z	input.js	/^var z = [0];$/;"	v
+a	input.js	/^var [,a] = [0, 0];$/;"	v
+b	input.js	/^var [b,...rest] = [0, 0];$/;"	v
+rest	input.js	/^var [b,...rest] = [0, 0];$/;"	v
+d0	input.js	/^var { d0, d1 } = { d0: 10, d1: 20 };$/;"	v
+d1	input.js	/^var { d0, d1 } = { d0: 10, d1: 20 };$/;"	v
+d0	input.js	/^var { d0, d1 } = { d0: 10, d1: 20 };$/;"	p	class:AnonymousClass1b7a94030101
+d1	input.js	/^var { d0, d1 } = { d0: 10, d1: 20 };$/;"	p	class:AnonymousClass1b7a94030101
+AnonymousClass1b7a94030101	input.js	/^var { d0, d1 } = { d0: 10, d1: 20 };$/;"	c
+d2	input.js	/^const { d2, d3 } = { d2: 10, d3: 20 };$/;"	C
+d3	input.js	/^const { d2, d3 } = { d2: 10, d3: 20 };$/;"	C
+d2	input.js	/^const { d2, d3 } = { d2: 10, d3: 20 };$/;"	p	class:AnonymousClass1b7a94030201
+d3	input.js	/^const { d2, d3 } = { d2: 10, d3: 20 };$/;"	p	class:AnonymousClass1b7a94030201
+AnonymousClass1b7a94030201	input.js	/^const { d2, d3 } = { d2: 10, d3: 20 };$/;"	c
+d4	input.js	/^let { d4, d5 } = { d4: 10, d5: 20 };$/;"	v
+d5	input.js	/^let { d4, d5 } = { d4: 10, d5: 20 };$/;"	v
+d4	input.js	/^let { d4, d5 } = { d4: 10, d5: 20 };$/;"	p	class:AnonymousClass1b7a94030301
+d5	input.js	/^let { d4, d5 } = { d4: 10, d5: 20 };$/;"	p	class:AnonymousClass1b7a94030301
+AnonymousClass1b7a94030301	input.js	/^let { d4, d5 } = { d4: 10, d5: 20 };$/;"	c
+v0	input.js	/^var [v0=5, v1=7] = [1, 2];$/;"	v
+v1	input.js	/^var [v0=5, v1=7] = [1, 2];$/;"	v
+v2	input.js	/^var {a: v2 = 10, b: v3 = 5} = {a: 3};$/;"	v
+v3	input.js	/^var {a: v2 = 10, b: v3 = 5} = {a: 3};$/;"	v
+a	input.js	/^var {a: v2 = 10, b: v3 = 5} = {a: 3};$/;"	p	class:AnonymousClass1b7a94030401
+AnonymousClass1b7a94030401	input.js	/^var {a: v2 = 10, b: v3 = 5} = {a: 3};$/;"	c
+key	input.js	/^let key = 'z';$/;"	v
+d6	input.js	/^let {[key]: d6} = {z: 'bar'};$/;"	v
+z	input.js	/^let {[key]: d6} = {z: 'bar'};$/;"	p	class:AnonymousClass1b7a94030501
+AnonymousClass1b7a94030501	input.js	/^let {[key]: d6} = {z: 'bar'};$/;"	c
+a0	input.js	/^var {x: [a0, a1]} = {x: [0, 1]}$/;"	v
+a1	input.js	/^var {x: [a0, a1]} = {x: [0, 1]}$/;"	v
+x	input.js	/^var {x: [a0, a1]} = {x: [0, 1]}$/;"	p	class:AnonymousClass1b7a94030601
+AnonymousClass1b7a94030601	input.js	/^var {x: [a0, a1]} = {x: [0, 1]}$/;"	c
+fizz-buzz	input.js	/^const foo = { 'fizz-buzz': true };$/;"	p	class:foo
+foo	input.js	/^const foo = { 'fizz-buzz': true };$/;"	c
+fizzBuzz	input.js	/^const { 'fizz-buzz': fizzBuzz } = foo;$/;"	C
+fuzzBizz	input.js	/^const { [((x, y)=>x+y)(1,1)]: fuzzBizz } = foo;$/;"	C
+props	input.js	/^const props = [$/;"	C
+name	input.js	/^const [,, { name }] = props;$/;"	C
+title	input.js	/^  title: 'Scratchpad',$/;"	p	class:metadata
+translations	input.js	/^  translations: [$/;"	p	class:metadata
+url	input.js	/^  url: '\/en-US\/docs\/Tools\/Scratchpad'$/;"	p	class:metadata
+metadata	input.js	/^const metadata = {$/;"	c
+englishTitle	input.js	/^  title: englishTitle, \/\/ rename$/;"	v
+localeTitle	input.js	/^       title: localeTitle, \/\/ rename$/;"	v

@@ -42,6 +42,8 @@
 #include "entry_p.h"
 #include "field.h"
 #include "fmt_p.h"
+#include "htable.h"
+#include "numarray.h"
 #include "kind.h"
 #include "nestlevel.h"
 #include "options_p.h"
@@ -55,6 +57,7 @@
 #include "sort_p.h"
 #include "strlist.h"
 #include "subparser_p.h"
+#include "trace.h"
 #include "trashbox.h"
 #include "writer_p.h"
 #include "xtag_p.h"
@@ -80,6 +83,11 @@
 #endif
 
 
+typedef struct sTagEntryInfoExtended {
+	tagEntryInfo tag;
+	hashTable *children;		/* Reverse scope map */
+} tagEntryInfoExtended;
+
 /*  Maintains the state of the tag file.
  */
 typedef struct eTagFile {
@@ -92,10 +100,11 @@ typedef struct eTagFile {
 
 	unsigned int cork;
 	struct sCorkQueue {
-		struct sTagEntryInfo* queue;
+		struct sTagEntryInfoExtended* queue;
 		unsigned int length;
 		unsigned int count;
 	} corkQueue;
+	hashTable *reverseNameMap;
 
 	bool patternCacheValid;
 } tagFile;
@@ -775,13 +784,13 @@ static char* getFullQualifiedScopeNameFromCorkQueue (const tagEntryInfo * inner_
 			stringListAdd (queue, v);
 			kindIndex = scope->kindIndex;
 			lang = scope->langType;
+			root_scope = scope;
 		}
-		root_scope = scope;
 		scope =  getEntryInCorkQueue (scope->extensionFields.scopeIndex);
 	}
 
 	n = vStringNew ();
-	sep = scopeSeparatorFor (root_scope->langType, root_scope->kindIndex, KIND_GHOST_INDEX);
+	sep = root_scope? scopeSeparatorFor (root_scope->langType, root_scope->kindIndex, KIND_GHOST_INDEX): NULL;
 	if (sep)
 		vStringCatS(n, sep);
 
@@ -983,6 +992,17 @@ extern void attachParserFieldToCorkEntry (int index,
 		PARSER_TRASH_BOX_TAKE_BACK(tag->parserFieldsDynamic);
 }
 
+extern const tagField* getParserFieldByType (const tagEntryInfo * tag, int ftype)
+{
+	for (int i = 0; i < tag->usedParserFields; i++)
+	{
+		const tagField* f = getParserField (tag, i);
+		if (f && f->ftype == ftype)
+			return f;
+	}
+	return NULL;
+}
+
 extern const tagField* getParserField (const tagEntryInfo * tag, int index)
 {
 	if (index < 0
@@ -1092,8 +1112,22 @@ static void clearParserFields (tagEntryInfo *const tag)
 	}
 }
 
-static void clearTagEntryInQueue (tagEntryInfo* slot)
+static void initTagEntryExtendedArea (tagEntryInfoExtended *slotx)
 {
+	slotx->children = NULL;
+}
+
+static void clearTagEntryExtendedInQueue (tagEntryInfoExtended *slotx, bool onlyExtendedArea)
+{
+	/* hashTableUnref can take NULL. */
+	hashTableUnref (slotx->children);
+	slotx->children = NULL;
+
+	if (onlyExtendedArea)
+		return;
+
+	tagEntryInfo *slot = (tagEntryInfo *)slotx;
+
 	if (slot->pattern)
 		eFree ((char *)slot->pattern);
 	eFree ((char *)slot->inputFileName);
@@ -1129,11 +1163,193 @@ static void clearTagEntryInQueue (tagEntryInfo* slot)
 	clearParserFields (slot);
 }
 
-static unsigned int queueTagEntry(const tagEntryInfo *const tag)
+static hashTable *childrenNew (size_t size, bool icase)
 {
+	return hashTableIntNew (size,
+							icase? hashCstrcasehash: hashCstrhash,
+							icase? hashCstrcaseeq  : hashCstreq,
+							NULL);
+}
+
+struct reverseNameMapPreparingData {
+	langType lang;
+	tagEntryInfoExtended *slotx;
+	intArray *workSpace;
+};
+
+static bool isRootSlot (tagEntryInfoExtended *slotx)
+{
+	return (slotx == TagFile.corkQueue.queue);
+}
+
+static bool findReverseScopeMap (const void *key, void *value, void *user_data)
+{
+	struct reverseNameMapPreparingData *data = user_data;
+	tagEntryInfoExtended *another_slotx = TagFile.corkQueue.queue + HT_PTR_TO_INT (value);
+
+	TRACE_PRINT_PREFIX ();
+	TRACE_PRINT_FMT ("%ld %d (%s)=>",
+					 data->slotx - TagFile.corkQueue.queue, HT_PTR_TO_INT (value),
+					 another_slotx->tag.name);
+
+	if (another_slotx == data->slotx)
+	{
+		TRACE_PRINT_FMT("self");
+		TRACE_PRINT_NEWLINE();
+		return false;
+	}
+
+	if (detectEntriesAreInTheSameGroup (data->lang, (tagEntryInfo *)data->slotx,
+										(tagEntryInfo *)another_slotx))
+	{
+		if (another_slotx->children)
+		{
+			TRACE_PRINT_FMT("in the SAME group (having A children htable)");
+			TRACE_PRINT_NEWLINE();
+			data->slotx = another_slotx;
+			return true;
+		}
+		else
+		{
+			TRACE_PRINT_FMT("in the SAME group (having NO children htable)");
+			TRACE_PRINT_NEWLINE();
+			if (data->workSpace == NULL)
+				data->workSpace = intArrayNew ();
+			intArrayAdd (data->workSpace, HT_PTR_TO_INT (value));
+			return false;
+		}
+	}
+	TRACE_PRINT_FMT("in DIFFERENT groups");
+	TRACE_PRINT_NEWLINE();
+	return false;
+}
+
+static hashTable *findOrNewReverseScopeMap (tagEntryInfoExtended *slotx,
+											bool updating)
+{
+	TRACE_ENTER();
+
+	tagEntryInfo *tag = (tagEntryInfo *)slotx;
+	unsigned int spec = getCorkTableSpecOfParser (tag->langType);
+	bool icase = spec & CORK_TABLE_REVERSE_SCOPE_MAP_ICASE;
+	hashTable *children;
+	size_t hsize = isRootSlot (slotx)? 37: 11;
+
+	if (!(spec & CORK_TABLE_REVERSE_NAME_MAP))
+	{
+		if (updating)
+		{
+			children = childrenNew (hsize, icase);
+			TRACE_LEAVE_TEXT("Install newly allocated reverse scope map: %p", children);
+			return children;
+
+		}
+		else
+		{
+			children = NULL;
+			TRACE_LEAVE_TEXT("Install NULL");
+			return children;
+		}
+	}
+
+	if (isRootSlot (slotx))
+	{
+		/* Slot for CORK_NIL. */
+		children = childrenNew (hsize, icase);
+		TRACE_LEAVE_TEXT("Install newly allocated reverse scope map: %p", children);
+		return children;
+	}
+	else
+	{
+		struct reverseNameMapPreparingData data = {
+			.lang  = tag->langType,
+			.slotx = slotx,		/* A slot having children field may be set. */
+			.workSpace = NULL,
+		};
+
+		hashTableForeachItemOnChain (TagFile.reverseNameMap,
+									 tag->name,
+									 findReverseScopeMap,
+									 &data);
+		if (data.slotx == slotx)
+		{
+			/* No slot having children field is found. */
+			children = childrenNew(hsize, icase);
+			TRACE_PRINT("Install a newly allocated reverse scope map: %p", children);
+		}
+		else
+		{
+			children = hashTableRef (data.slotx->children);
+			TRACE_PRINT("Install an existing reverse scope map: %p", children);
+		}
+
+		Assert (children);
+
+		if (data.workSpace)
+		{
+			for (int i = 0; i < intArrayCount(data.workSpace); i++)
+			{
+				int index = intArrayItem (data.workSpace, i);
+				(TagFile.corkQueue.queue + index)->children = hashTableRef (children);
+				TRACE_PRINT("Install the reverse scope map %p to %d (%d/%d)", children, index,
+							i, intArrayCount(data.workSpace));
+			}
+			intArrayDelete (data.workSpace);
+		}
+		TRACE_LEAVE();
+		return children;
+	}
+}
+
+static void updateReveseScopeMap (const tagEntryInfo *tag, int tagCorkIndex, int newParentCorkIndex,
+								  bool newEntry)
+{
+	unsigned int rmap = getCorkTableSpecOfParser (tag->langType);
+	if (! (rmap & CORK_TABLE_REVERSE_SCOPE_MAP))
+		return;
+
+	TRACE_PRINT ("%s the reverse scope map: \"%s\" (index: %d, kind: %d, placeholder:%s) [%d -> %d]...", newEntry? "Link to": "Update",
+				 tag->name, tagCorkIndex,
+				 tag->kindIndex,
+				 tag->placeholder? "yes": "no",
+				 tag->extensionFields.scopeIndex, newParentCorkIndex);
+	if (!filterChildLinkingToReverseScopeMap (tag->langType, newParentCorkIndex, tagCorkIndex, tag))
+	{
+		TRACE_PRINT ("linking to the map is rejected by \"%s\" parser's filter", getLanguageName (tag->langType));
+		return;
+	}
+	TRACE_PRINT ("linking to the map is accepted by \"%s\" parser's filter", getLanguageName (tag->langType));
+
+	int oldParentCorkIndex = tag->extensionFields.scopeIndex;
+	tagEntryInfoExtended *oldParentSlot = TagFile.corkQueue.queue + oldParentCorkIndex;
+	if (!newEntry)
+	{
+		if (!oldParentSlot->children)
+		{
+			// TODO: unlink self from the original parent.
+		}
+	}
+
+	tagEntryInfoExtended *newParentSlot = TagFile.corkQueue.queue + newParentCorkIndex;
+	if (!newParentSlot->children)
+		newParentSlot->children = findOrNewReverseScopeMap (newParentSlot, true);
+	hashTablePutItem (newParentSlot->children, (char *)((tagEntryInfo * )tag)->name,
+					  HT_INT_TO_PTR (tagCorkIndex));
+}
+
+static void putTagToReverseNameMap (const tagEntryInfo *tag, int index)
+{
+	if (TagFile.reverseNameMap)
+		hashTablePutItem (TagFile.reverseNameMap, (char *)((tagEntryInfo * )tag)->name,
+						  HT_INT_TO_PTR(index));
+}
+
+static unsigned int queueTagEntry (const tagEntryInfo *const tag)
+{
+	TRACE_ENTER_TEXT("%s", tag->name);
 	unsigned int i;
 	void *tmp;
-	tagEntryInfo * slot;
+	tagEntryInfoExtended * slot;
 
 	if (! (TagFile.corkQueue.count < TagFile.corkQueue.length))
 	{
@@ -1145,18 +1361,145 @@ static unsigned int queueTagEntry(const tagEntryInfo *const tag)
 
 		TagFile.corkQueue.length *= 2;
 		TagFile.corkQueue.queue = tmp;
+
+		for (unsigned int j = TagFile.corkQueue.count; j < TagFile.corkQueue.length; j++)
+			initTagEntryExtendedArea (TagFile.corkQueue.queue + j);
 	}
 
 	i = TagFile.corkQueue.count;
 	TagFile.corkQueue.count++;
 
-
 	slot = TagFile.corkQueue.queue + i;
-	recordTagEntryInQueue (tag, slot);
+	recordTagEntryInQueue (tag, (tagEntryInfo *)slot);
 
+	putTagToReverseNameMap ((const tagEntryInfo * )slot, i);
+	updateReveseScopeMap ((tagEntryInfo *)slot, i,
+						  ((tagEntryInfo *)slot)->extensionFields.scopeIndex, true);
+
+	TRACE_LEAVE_TEXT("%s -> %d", tag->name, i);
 	return i;
 }
 
+
+struct collectDirectChildrenData {
+	int parentIndex;
+	intArray *directChildren;
+};
+
+static bool collectDirectChildren (const void *key, void *value, void *user_data)
+{
+	int childIndex = HT_PTR_TO_INT (value);
+	tagEntryInfo *child = getEntryInCorkQueue (childIndex);
+	struct collectDirectChildrenData* data = user_data;
+	if (child->extensionFields.scopeIndex == data->parentIndex)
+	{
+		if (data->directChildren == NULL)
+			data->directChildren = intArrayNew ();
+		intArrayAdd (data->directChildren, childIndex);
+	}
+	return false;
+}
+
+extern void patchScopeFieldForCorkEntry (int targetIndex, int scopeIndex)
+{
+	tagEntryInfoExtended *slotx = TagFile.corkQueue.queue + targetIndex;
+	TRACE_ENTER_TEXT("set %d (%s) parent to %d (%s) (was: %d)",
+					 targetIndex, getEntryInCorkQueue (targetIndex)->name,
+					 scopeIndex,  slotx->tag.name,
+					 getEntryInCorkQueue (targetIndex)->extensionFields.scopeIndex);
+
+	updateReveseScopeMap ((tagEntryInfo *)slotx, targetIndex, scopeIndex, false);
+	((tagEntryInfo *)slotx)->extensionFields.scopeIndex = scopeIndex;
+
+	if (slotx->children)
+	{
+		struct collectDirectChildrenData data = {
+			.parentIndex = targetIndex,
+			.directChildren = NULL,
+		};
+
+		hashTableForeachItem (slotx->children, collectDirectChildren, &data);
+		/* TODO: The collected children should be removed from the original children map. */
+		hashTableUnref (slotx->children);
+		slotx->children = findOrNewReverseScopeMap (slotx,
+													(data.directChildren
+													 && intArrayCount (data.directChildren)));
+		if (data.directChildren)
+		{
+			for (int i = 0; i < intArrayCount (data.directChildren); i++)
+			{
+				/* relink the recorded children to the target tag's children fields */
+				int directChildIndex = intArrayItem (data.directChildren, i);
+				tagEntryInfo *directChildTag = getEntryInCorkQueue (directChildIndex);
+				if (!filterChildLinkingToReverseScopeMap (directChildTag->langType, scopeIndex, directChildIndex,
+														  directChildTag))
+					continue;
+				hashTablePutItem (slotx->children, (char *)directChildTag->name, HT_INT_TO_PTR (directChildIndex));
+			}
+			/* TODO: ??? Should this should be done recursively? */
+			if (data.directChildren)
+				intArrayDelete (data.directChildren);
+		}
+	}
+	TRACE_LEAVE();
+}
+
+struct forEachChildData {
+	corkForeachFunc proc;
+	void *user_data;
+};
+
+static bool ptr2index (const void *key, void *value, void *user_data)
+{
+	struct forEachChildData *data = user_data;
+	return (data)->proc (HT_PTR_TO_INT (value), (data)->user_data);
+}
+
+extern bool forEachChildForCorkEntry (int parentIndex, corkForeachFunc proc, void *user_data)
+{
+	if ((! (parentIndex < TagFile.corkQueue.count))
+		|| (parentIndex < 0))
+		return false;
+
+	tagEntryInfoExtended *parentSlot = TagFile.corkQueue.queue + parentIndex;
+
+	if (!parentSlot->children)
+		parentSlot->children = findOrNewReverseScopeMap (parentSlot, false);
+
+	return hashTableForeachItem (parentSlot->children, ptr2index,
+								 & (struct forEachChildData) {
+									 .proc = proc, .user_data = user_data,
+								 });
+}
+
+extern bool forEachNamedChildForCorkEntry (int parentIndex, const char *name, corkForeachFunc proc, void *user_data)
+{
+	TRACE_ENTER_TEXT ("%s under %d", name, parentIndex);
+
+	if (! (parentIndex < TagFile.corkQueue.count))
+	{
+		TRACE_LEAVE ();
+		return false;
+	}
+
+	if (parentIndex < 0)
+	{
+		TRACE_LEAVE ();
+		return false;
+	}
+
+	tagEntryInfoExtended *parentSlot = TagFile.corkQueue.queue + parentIndex;
+
+	if (!parentSlot->children)
+		parentSlot->children = findOrNewReverseScopeMap (parentSlot, false);
+
+	bool r = hashTableForeachItemOnChain (parentSlot->children, name, ptr2index,
+										  & (struct forEachChildData) {
+											  .proc = proc, .user_data = user_data,
+												  });
+	TRACE_LEAVE_TEXT ("%s", r? "found": "not found");
+	return r;
+}
 
 extern void setupWriter (void *writerClientData)
 {
@@ -1229,10 +1572,10 @@ static void writeTagEntry (const tagEntryInfo *const tag, bool checkingNeeded)
 {
 	int length = 0;
 
-	Assert (tag->kindIndex != KIND_GHOST_INDEX);
-
 	if (checkingNeeded && !isTagWritable(tag))
 		return;
+
+	Assert (tag->kindIndex != KIND_GHOST_INDEX);
 
 	DebugStatement ( debugEntry (tag); )
 
@@ -1278,7 +1621,7 @@ extern bool writePseudoTag (const ptagDesc *desc,
 	return true;
 }
 
-extern void corkTagFile(void)
+extern void corkTagFile(langType lang, unsigned int spec)
 {
 	TagFile.cork++;
 	if (TagFile.cork == 1)
@@ -1287,6 +1630,20 @@ extern void corkTagFile(void)
 		  TagFile.corkQueue.count = 1;
 		  TagFile.corkQueue.queue = eMalloc (sizeof (*TagFile.corkQueue.queue));
 		  memset (TagFile.corkQueue.queue, 0, sizeof (*TagFile.corkQueue.queue));
+
+		  /* Even if we are in a guest parser, the language of the parser is
+		   * not prepared via resetInputFile at the this point.
+		   * resetInputFile is called after corkTagFile. It means we cannot
+		   * use getInputLanguage() here. */
+		  TagFile.corkQueue.queue->tag.langType = lang;
+
+		  unsigned int icase = spec & CORK_TABLE_REVERSE_NAME_MAP_ICASE;
+		  TagFile.reverseNameMap = (spec & CORK_TABLE_REVERSE_NAME_MAP)
+			  ?hashTableIntNew  (123, /* TODO */
+								 icase? hashCstrcasehash: hashCstrhash,
+								 icase? hashCstrcaseeq  : hashCstreq,
+								 NULL)
+			  : NULL;
 	}
 }
 
@@ -1301,7 +1658,7 @@ extern void uncorkTagFile(void)
 
 	for (i = 1; i < TagFile.corkQueue.count; i++)
 	{
-		tagEntryInfo *tag = TagFile.corkQueue.queue + i;
+		tagEntryInfo *tag = (tagEntryInfo *)(TagFile.corkQueue.queue + i);
 		writeTagEntry (tag, true);
 
 		if (doesInputLanguageRequestAutomaticFQTag ()
@@ -1316,8 +1673,14 @@ extern void uncorkTagFile(void)
 					&& tag->extensionFields.scopeIndex == CORK_NIL)))
 			makeQualifiedTagEntry (tag);
 	}
-	for (i = 1; i < TagFile.corkQueue.count; i++)
-		clearTagEntryInQueue (TagFile.corkQueue.queue + i);
+
+	if (TagFile.reverseNameMap)
+	{
+		hashTableDelete (TagFile.reverseNameMap);
+		TagFile.reverseNameMap = NULL;
+	}
+	for (i = 0; i < TagFile.corkQueue.count; i++)
+		clearTagEntryExtendedInQueue (TagFile.corkQueue.queue + i, i == 0);
 
 	memset (TagFile.corkQueue.queue, 0,
 		sizeof (*TagFile.corkQueue.queue) * TagFile.corkQueue.count);
@@ -1330,7 +1693,7 @@ extern void uncorkTagFile(void)
 extern tagEntryInfo *getEntryInCorkQueue   (unsigned int n)
 {
 	if ((CORK_NIL < n) && (n < TagFile.corkQueue.count))
-		return TagFile.corkQueue.queue + n;
+		return (tagEntryInfo *)(TagFile.corkQueue.queue + n);
 	else
 		return NULL;
 }
@@ -1345,6 +1708,26 @@ extern tagEntryInfo *getEntryOfNestingLevel (const NestingLevel *nl)
 extern size_t        countEntryInCorkQueue (void)
 {
 	return TagFile.corkQueue.count;
+}
+
+extern int makePlaceholder (const char *const name)
+{
+	tagEntryInfo e;
+
+	initTagEntry (&e, name, KIND_GHOST_INDEX);
+	e.placeholder = 1;
+
+	/*
+	 * makePlaceholder may be called even before reading any bytes
+	 * from the input stream. In such case, initTagEntry fills
+	 * the lineNumber field of the placeholder tag with 0.
+	 * This breaks an assertion in makeTagEntry. Following adjustment
+	 * is for avoding it.
+	 */
+	if (e.lineNumber == 0)
+		e.lineNumber = 1;
+
+	return makeTagEntry (&e);
 }
 
 static void makeTagEntriesForSubwords (tagEntryInfo *const subtag)
@@ -1625,7 +2008,7 @@ extern bool isTagExtraBitMarked (const tagEntryInfo *const tag, xtagType extra)
 
 static void assignRoleFull(tagEntryInfo *const e, int roleIndex, bool assign)
 {
-	if (roleIndex == ROLE_INDEX_DEFINITION)
+	if (roleIndex == ROLE_DEFINITION_INDEX)
 	{
 		if (assign)
 		{
@@ -1633,7 +2016,7 @@ static void assignRoleFull(tagEntryInfo *const e, int roleIndex, bool assign)
 			markTagExtraBitFull (e, XTAG_REFERENCE_TAGS, false);
 		}
 	}
-	else if (roleIndex > ROLE_INDEX_DEFINITION)
+	else if (roleIndex > ROLE_DEFINITION_INDEX)
 	{
 		Assert (roleIndex < (int)countLanguageRoles(e->langType, e->kindIndex));
 
@@ -1654,7 +2037,7 @@ extern void assignRole(tagEntryInfo *const e, int roleIndex)
 
 extern bool isRoleAssigned(const tagEntryInfo *const e, int roleIndex)
 {
-	if (roleIndex == ROLE_INDEX_DEFINITION)
+	if (roleIndex == ROLE_DEFINITION_INDEX)
 		return (!e->extensionFields.roleBits);
 	else
 		return (e->extensionFields.roleBits & makeRoleBit(roleIndex));
