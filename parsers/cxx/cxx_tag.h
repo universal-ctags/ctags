@@ -34,6 +34,7 @@ enum CXXTagCommonKind
 	CXXTagKindEXTERNVAR,
 	CXXTagKindPARAMETER,
 	CXXTagKindLABEL,
+	CXXTagKindMACROPARAM,
 
 	CXXTagCommonKindCount
 };

@@ -1,4 +1,5 @@
 #LETTER	NAME	ENABLED	REFONLY	NROLES	MASTER	DESCRIPTION
+D	macroparam	no	no	0	C	parameters inside macro definitions
 L	label	no	no	0	C	goto labels
 d	macro	yes	no	1	C	macro definitions
 e	enumerator	yes	no	0	C	enumerators (values inside an enumeration)
@@ -16,6 +17,7 @@ x	externvar	no	no	0	C	external and forward variable declarations
 z	parameter	no	no	0	C	function parameters inside function definitions
 #LETTER	NAME	ENABLED	REFONLY	NROLES	MASTER	DESCRIPTION
 A	alias	no	no	0	NONE	namespace aliases
+D	macroparam	no	no	0	C	parameters inside macro definitions
 L	label	no	no	0	C	goto labels
 N	name	no	no	0	NONE	names imported via using scope::symbol
 U	using	no	yes	0	NONE	using namespace statements

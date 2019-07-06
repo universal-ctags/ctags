@@ -1,3 +1,5 @@
+a	input.cpp	/^#define SOME_MACRO(a,b) 1$/;"	D	macro:SOME_MACRO
+b	input.cpp	/^#define SOME_MACRO(a,b) 1$/;"	D	macro:SOME_MACRO
 SOME_MACRO	input.cpp	/^#define SOME_MACRO(/;"	d	file:	end:2
 whatever_t	input.cpp	/^typedef int whatever_t;$/;"	t	typeref:typename:int	file:
 uint8_t	input.cpp	/^typedef unsigned char uint8_t;$/;"	t	typeref:typename:unsigned char	file:

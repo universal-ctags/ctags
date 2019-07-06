@@ -57,7 +57,8 @@ CXX_COMMON_HEADER_ROLES(CUDA);
 	{ true,  'v', "variable",   "variable definitions", .syncWith = _syncWith },		\
 	{ false, 'x', "externvar",  "external and forward variable declarations", .syncWith = _syncWith }, \
 	{ false, 'z', "parameter",  "function parameters inside function definitions", .syncWith = _syncWith }, \
-	{ false, 'L', "label",      "goto labels", .syncWith = _syncWith }
+	{ false, 'L', "label",      "goto labels", .syncWith = _syncWith }, \
+	{ false, 'D', "macroparam", "parameters inside macro definitions", .syncWith = _syncWith }
 
 static kindDefinition g_aCXXCKinds [] = {
 	/* All other than LANG_AUTO are ignored.
