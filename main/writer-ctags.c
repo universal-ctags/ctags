@@ -93,7 +93,7 @@ static bool hasTagEntryTabOrNewlineChar (const tagEntryInfo * const tag)
 	else if (doesFieldHaveTabOrNewlineChar (FIELD_PATTERN, tag, NO_PARSER_FIELD))
 	{
 		/* Pattern may have a tab char. However, doesFieldHaveTabOrNewlineChar returns
-		 * false because NO_PARSER_FIELD may not have hasTabOrNewlineChar handler.
+		 * false because NO_PARSER_FIELD may not have doesContainAnyChar handler.
 		 */
 		return true;
 	}

@@ -66,10 +66,10 @@ static const char *renderFieldXpath (const tagEntryInfo *const tag, const char *
 static const char *renderFieldScopeKindName(const tagEntryInfo *const tag, const char *value, vString* b);
 static const char *renderFieldEnd (const tagEntryInfo *const tag, const char *value, vString* b);
 
-static bool hasTabOrNewlineCharInName (const tagEntryInfo *const tag, const char *value);
-static bool hasTabOrNewlineCharInInput (const tagEntryInfo *const tag, const char*value);
-static bool hasTabOrNewlineCharInFieldScope (const tagEntryInfo *const tag, const char *value);
-static bool hasTabOrNewlineCharInSignature (const tagEntryInfo *const tag, const char *value);
+static bool doesContainAnyCharInName (const tagEntryInfo *const tag, const char *value, const char *chars);
+static bool doesContainAnyCharInInput (const tagEntryInfo *const tag, const char*value, const char *chars);
+static bool doesContainAnyCharInFieldScope (const tagEntryInfo *const tag, const char *value, const char *chars);
+static bool doesContainAnyCharInSignature (const tagEntryInfo *const tag, const char *value, const char *chars);
 
 static bool     isLanguageFieldAvailable  (const tagEntryInfo *const tag);
 static bool     isTyperefFieldAvailable   (const tagEntryInfo *const tag);
@@ -85,7 +85,7 @@ static bool     isEndFieldAvailable       (const tagEntryInfo *const tag);
 
 #define DEFINE_FIELD(L, N, V, H, DT, RE)				\
 	DEFINE_FIELD_FULL (L, N, V, H, NULL, DT, RE, NULL, NULL)
-#define DEFINE_FIELD_FULL(L, N, V, H, A, DT, RE, RN, HSC)	\
+#define DEFINE_FIELD_FULL(L, N, V, H, A, DT, RE, RN, DCAC)	\
 	{					\
 		.letter        = L,		\
 		.name          = N,		\
@@ -93,7 +93,7 @@ static bool     isEndFieldAvailable       (const tagEntryInfo *const tag);
 		.enabled       = V,		\
 		.render        = RE,		\
 		.renderNoEscaping= RN,		\
-		.hasTabOrNewlineChar = HSC, \
+		.doesContainAnyChar = DCAC, \
 		.isValueAvailable = A,		\
 		.dataType = DT, \
 	}
@@ -107,13 +107,13 @@ static fieldDefinition fieldDefinitionsFixed [] = {
 			  NULL,
 			  FIELDTYPE_STRING,
 			  renderFieldName, renderFieldNameNoEscape,
-			  hasTabOrNewlineCharInName),
+			  doesContainAnyCharInName),
 	DEFINE_FIELD_FULL ('F', "input",    true,
 			   "input file",
 			   NULL,
 			   FIELDTYPE_STRING,
 			   renderFieldInput, renderFieldInputNoEscape,
-			   hasTabOrNewlineCharInInput),
+			   doesContainAnyCharInInput),
 	DEFINE_FIELD ('P', "pattern",  true,
 			   "pattern",
 			   FIELDTYPE_STRING|FIELDTYPE_BOOL,
@@ -169,13 +169,13 @@ static fieldDefinition fieldDefinitionsExuberant [] = {
 			   isSignatureFieldAvailable,
 			   FIELDTYPE_STRING,
 			   renderFieldSignature, renderFieldSignatureNoEscape,
-			   hasTabOrNewlineCharInSignature),
+			   doesContainAnyCharInSignature),
 	DEFINE_FIELD_FULL ('s', NULL,             true,
 			   "Scope of tag definition (`p' can be used for printing its kind)",
 			   NULL,
 			   FIELDTYPE_STRING,
 			   renderFieldScope, renderFieldScopeNoEscape,
-			   hasTabOrNewlineCharInFieldScope),
+			   doesContainAnyCharInFieldScope),
 	DEFINE_FIELD_FULL ('t', "typeref",        true,
 			   "Type and name of a variable or typedef",
 			   isTyperefFieldAvailable,
@@ -205,7 +205,7 @@ static fieldDefinition fieldDefinitionsUniversal [] = {
 			   /* Following renderer is for handling --_xformat=%{scope};
 			      and is not for tags output. */
 			   renderFieldScope, renderFieldScopeNoEscape,
-			   hasTabOrNewlineCharInFieldScope),
+			   doesContainAnyCharInFieldScope),
 	DEFINE_FIELD_FULL ('E', "extras",   false,
 			   "Extra tag type information",
 			   isExtrasFieldAvailable,
@@ -432,9 +432,9 @@ static const char *renderFieldNameNoEscape (const tagEntryInfo *const tag, const
 	return renderAsIs (b, tag->name);
 }
 
-static bool hasTabOrNewlineCharInName (const tagEntryInfo *const tag, const char *value CTAGS_ATTR_UNUSED)
+static bool doesContainAnyCharInName (const tagEntryInfo *const tag, const char *value CTAGS_ATTR_UNUSED, const char *chars)
 {
-	return strpbrk (tag->name, "\t\n")? true: false;
+	return strpbrk (tag->name, chars)? true: false;
 }
 
 static const char *renderFieldInput (const tagEntryInfo *const tag, const char *value CTAGS_ATTR_UNUSED, vString* b)
@@ -456,14 +456,14 @@ static const char *renderFieldInputNoEscape (const tagEntryInfo *const tag, cons
 	return renderAsIs (b, f);
 }
 
-static bool hasTabOrNewlineCharInInput (const tagEntryInfo *const tag, const char *value CTAGS_ATTR_UNUSED)
+static bool doesContainAnyCharInInput (const tagEntryInfo *const tag, const char *value CTAGS_ATTR_UNUSED, const char *chars)
 {
 	const char *f = tag->inputFileName;
 
 	if (Option.lineDirectives && tag->sourceFileName)
 		f = tag->sourceFileName;
 
-	return strpbrk (f, "\t\n")? true: false;
+	return strpbrk (f, chars)? true: false;
 }
 
 static const char *renderFieldSignature (const tagEntryInfo *const tag, const char *value CTAGS_ATTR_UNUSED, vString* b)
@@ -477,9 +477,9 @@ static const char *renderFieldSignatureNoEscape (const tagEntryInfo *const tag, 
 	return renderAsIs (b, WITH_DEFUALT_VALUE (tag->extensionFields.signature));
 }
 
-static bool hasTabOrNewlineCharInSignature (const tagEntryInfo *const tag, const char *value CTAGS_ATTR_UNUSED)
+static bool doesContainAnyCharInSignature (const tagEntryInfo *const tag, const char *value CTAGS_ATTR_UNUSED, const char *chars)
 {
-	return (tag->extensionFields.signature && strpbrk(tag->extensionFields.signature, "\t\n"))
+	return (tag->extensionFields.signature && strpbrk(tag->extensionFields.signature, chars))
 		? true
 		: false;
 }
@@ -500,12 +500,12 @@ static const char *renderFieldScopeNoEscape (const tagEntryInfo *const tag, cons
 	return scope? renderAsIs (b, scope): NULL;
 }
 
-static bool hasTabOrNewlineCharInFieldScope (const tagEntryInfo *const tag, const char *value CTAGS_ATTR_UNUSED)
+static bool doesContainAnyCharInFieldScope (const tagEntryInfo *const tag, const char *value CTAGS_ATTR_UNUSED, const char *chars)
 {
 	const char* scope;
 
 	getTagScopeInformation ((tagEntryInfo *const)tag, NULL, &scope);
-	return (scope && strpbrk (scope, "\t\n"));
+	return (scope && strpbrk (scope, chars));
 }
 
 
@@ -569,26 +569,26 @@ extern const char* renderFieldNoEscaping (fieldType type, const tagEntryInfo *ta
 	return renderFieldCommon (type, tag, index, true);
 }
 
-static bool defaultHasTabOrNewlineChar (const tagEntryInfo *const tag CTAGS_ATTR_UNUSED, const char* value)
+static bool defaultDoesContainAnyChar (const tagEntryInfo *const tag CTAGS_ATTR_UNUSED, const char* value, const char* chars)
 {
-	return strpbrk (value, "\t\n")? true: false;
+	return strpbrk (value, chars)? true: false;
 }
 
 extern bool  doesFieldHaveTabOrNewlineChar (fieldType type, const tagEntryInfo *tag, int index)
 {
 	fieldObject *fobj = fieldObjects + type;
 	const char *value;
-	bool (* hasTabOrNewlineChar) (const tagEntryInfo *const, const char*) = fobj->def->hasTabOrNewlineChar;
+	bool (* doesContainAnyChar) (const tagEntryInfo *const, const char*, const char*) = fobj->def->doesContainAnyChar;
 
 	Assert (tag);
 	Assert (index == NO_PARSER_FIELD || ((unsigned int)index) < tag->usedParserFields);
 
-	if (hasTabOrNewlineChar == NULL)
+	if (doesContainAnyChar == NULL)
 	{
 		if (index == NO_PARSER_FIELD)
 			return false;
 		else
-			hasTabOrNewlineChar = defaultHasTabOrNewlineChar;
+			doesContainAnyChar = defaultDoesContainAnyChar;
 	}
 
 	if (index >= 0)
@@ -600,7 +600,7 @@ extern bool  doesFieldHaveTabOrNewlineChar (fieldType type, const tagEntryInfo *
 	else
 		value = NULL;
 
-	return (* hasTabOrNewlineChar) (tag, value);
+	return (* doesContainAnyChar) (tag, value, "\t\n");
 }
 
 /*  Writes "line", stripping leading and duplicate white space.
@@ -1046,7 +1046,7 @@ extern int defineField (fieldDefinition *def, langType language)
 	{
 		def->render = defaultRenderer;
 		def->renderNoEscaping = NULL;
-		def->hasTabOrNewlineChar = NULL;
+		def->doesContainAnyChar = NULL;
 	}
 
 	if (! def->dataType)
