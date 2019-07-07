@@ -221,6 +221,27 @@ static void parseStatement (int kind)
 		parseEnumConstants ();
 }
 
+static void parsePackage (void)
+{
+	vString *pkg = vStringNew ();
+
+	while (true)
+	{
+		nextToken ();
+
+		if (token.type == TOKEN_ID)
+			vStringCat (pkg, token.value);
+		else if (token.type == '.')
+			vStringPut (pkg, '.');
+		else
+			break;
+	}
+
+	if (vStringLength (pkg) > 0)
+		createProtobufTag (pkg, PK_PACKAGE);
+	vStringDelete (pkg);
+}
+
 static void findProtobufTags (void)
 {
 	cppInit (false, false, false, false,
@@ -233,7 +254,7 @@ static void findProtobufTags (void)
 	while (token.type != TOKEN_EOF)
 	{
 		if (tokenIsKeyword (KEYWORD_PACKAGE))
-			parseStatement (PK_PACKAGE);
+			parsePackage ();
 		else if (tokenIsKeyword (KEYWORD_MESSAGE))
 			parseStatement (PK_MESSAGE);
 		else if (tokenIsKeyword (KEYWORD_ENUM))
