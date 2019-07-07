@@ -1,0 +1,6 @@
+ctags: Notice: No options will be read from files or environment
+  Option: --output-format=e-ctags
+Reading command line arguments
+CTagsSelfTest requires a memory stream for input
+OPENING input.cst as CTagsSelfTest language file [new,required]
+Initialize parser: CTagsSelfTest
