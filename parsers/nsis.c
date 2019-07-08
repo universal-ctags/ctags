@@ -29,13 +29,15 @@
 typedef enum {
 	K_SECTION,
 	K_FUNCTION,
-	K_VARIABLE
+	K_VARIABLE,
+	K_DEFINITION,
 } NsisKind;
 
 static kindDefinition NsisKinds [] = {
 	{ true, 's', "section", "sections"},
 	{ true, 'f', "function", "functions"},
-	{ true, 'v', "variable", "variables"}
+	{ true, 'v', "variable", "variables"},
+	{ true, 'd', "definition", "definitions"},
 };
 
 /*
@@ -125,7 +127,10 @@ static void findNsisTags (void)
 				if (*cp == '"')
 				{
 					if (in_quotes)
+					{
+						++cp;
 						break;
+					}
 					else
 					{
 						in_quotes = true;
@@ -137,6 +142,22 @@ static void findNsisTags (void)
 				++cp;
 			}
 			makeSimpleTag (name, K_SECTION);
+			if (vStringLength (name) > 0)
+			{
+				/*
+				 * Try to capture section_index_output.
+				 */
+				vStringClear (name);
+				/* skip all whitespace */
+				while (isspace ((int) *cp))
+					++cp;
+				while (isalnum ((int) *cp) || *cp == '_')
+				{
+					vStringPut (name, (int) *cp);
+					++cp;
+				}
+				makeSimpleTag (name, K_DEFINITION);
+			}
 			vStringClear (name);
 		}
 	}

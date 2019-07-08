@@ -3,14 +3,23 @@ UserName	input.nsi	/^Var UserName$/;"	v
 StartmenuFolder	input.nsi	/^Var StartmenuFolder$/;"	v
 UNINSTDIR	input.nsi	/^Var UNINSTDIR$/;"	v
 \x21Program Files	input.nsi	/^Section "!Program Files" SEC01$/;"	s
+SEC01	input.nsi	/^Section "!Program Files" SEC01$/;"	d
 Plugins	input.nsi	/^Section "Plugins" SEC02$/;"	s
+SEC02	input.nsi	/^Section "Plugins" SEC02$/;"	d
 Language Files	input.nsi	/^Section "Language Files" SEC03$/;"	s
+SEC03	input.nsi	/^Section "Language Files" SEC03$/;"	d
 Documentation	input.nsi	/^Section "Documentation" SEC04$/;"	s
+SEC04	input.nsi	/^Section "Documentation" SEC04$/;"	d
 Autocompletion Tags	input.nsi	/^Section "Autocompletion Tags" SEC05$/;"	s
+SEC05	input.nsi	/^Section "Autocompletion Tags" SEC05$/;"	d
 GTK ${GTK_VERSION} Runtime Environment	input.nsi	/^Section "GTK ${GTK_VERSION} Runtime Environment" SEC06$/;"	s
+SEC06	input.nsi	/^Section "GTK ${GTK_VERSION} Runtime Environment" SEC06$/;"	d
 Context Menus	input.nsi	/^Section "Context Menus" SEC07$/;"	s
+SEC07	input.nsi	/^Section "Context Menus" SEC07$/;"	d
 Desktop Shortcuts	input.nsi	/^Section "Desktop Shortcuts" SEC08$/;"	s
+SEC08	input.nsi	/^Section "Desktop Shortcuts" SEC08$/;"	d
 Development files	input.nsi	/^Section "Development files" SEC09$/;"	s
+SEC09	input.nsi	/^Section "Development files" SEC09$/;"	d
 -AdditionalIcons	input.nsi	/^Section -AdditionalIcons$/;"	s
 -Post	input.nsi	/^Section -Post$/;"	s
 Uninstall	input.nsi	/^Section Uninstall$/;"	s
