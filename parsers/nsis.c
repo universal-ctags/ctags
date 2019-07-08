@@ -158,6 +158,18 @@ static void findNsisTags (void)
 			}
 			vStringClear (name);
 		}
+		/* definitions */
+		else if (lineStartingWith (cp, "!define"))
+		{
+			cp += 7;
+			cp = skipWhitespace (cp);
+			cp = skipFlags (cp);
+
+			fillName (name, cp, (isalnum ((int) *cp) || *cp == '_'));
+
+			makeSimpleTag (name, K_DEFINITION);
+			vStringClear (name);
+		}
 	}
 	vStringDelete (name);
 }
