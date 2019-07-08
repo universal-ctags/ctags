@@ -1,0 +1,5 @@
+-hidden section	input.nsi	/^Section "-hidden section"$/;"	s
+\x21bold section	input.nsi	/^Section "!bold section"$/;"	s
+optional	input.nsi	/^Section \/o "optional"$/;"	s
+install something	input.nsi	/^Section "install something" SEC_IDX$/;"	s
+SEC_IDX	input.nsi	/^Section "install something" SEC_IDX$/;"	d
