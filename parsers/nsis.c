@@ -44,6 +44,26 @@ static kindDefinition NsisKinds [] = {
 *   FUNCTION DEFINITIONS
 */
 
+static const unsigned char* skipWhitespace (const unsigned char* cp)
+{
+	while (isspace ((int) *cp))
+		++cp;
+	return cp;
+}
+
+static const unsigned char* skipFlags (const unsigned char* cp)
+{
+	while (*cp == '/')
+	{
+		++cp;
+		while (! isspace ((int) *cp))
+			++cp;
+		while (isspace ((int) *cp))
+			++cp;
+	}
+	return cp;
+}
+
 static void findNsisTags (void)
 {
 	vString *name = vStringNew ();
@@ -64,9 +84,7 @@ static void findNsisTags (void)
 			isspace ((int) cp [8]))
 		{
 			cp += 8;
-			/* skip all whitespace */
-			while (isspace ((int) *cp))
-				++cp;
+			cp = skipWhitespace (cp);
 			while (isalnum ((int) *cp) || *cp == '_' || *cp == '-' || *cp == '.' || *cp == '!')
 			{
 				vStringPut (name, (int) *cp);
@@ -80,18 +98,9 @@ static void findNsisTags (void)
 			isspace ((int) cp [3]))
 		{
 			cp += 3;
-			/* skip all whitespace */
-			while (isspace ((int) *cp))
-				++cp;
-			/* skip any flags */
-			while (*cp == '/')
-			{
-				++cp;
-				while (! isspace ((int) *cp))
-					++cp;
-				while (isspace ((int) *cp))
-					++cp;
-			}
+			cp = skipWhitespace (cp);
+			cp = skipFlags (cp);
+
 			while (isalnum ((int) *cp) || *cp == '_')
 			{
 				vStringPut (name, (int) *cp);
@@ -106,20 +115,8 @@ static void findNsisTags (void)
 		{
 			bool in_quotes = false;
 			cp += 7;
-			/* skip all whitespace */
-			while (isspace ((int) *cp))
-				++cp;
-			/* skip /o switch */
-			if (cp[0] == '/')
-			{
-				if (cp[1] == 'o')
-				{
-					cp += 2;
-					/* skip all whitespace */
-					while (isspace ((int) *cp))
-						++cp;
-				}
-			}
+			cp = skipWhitespace (cp);
+			cp = skipFlags (cp);
 			while (isalnum ((int) *cp) || isspace ((int) *cp) ||
 				   *cp == '_' || *cp == '-' || *cp == '.' || *cp == '!' || *cp == '"'
 				   || (in_quotes && (*cp == '$' || *cp == '{' || *cp == '}' )))
@@ -148,9 +145,7 @@ static void findNsisTags (void)
 				 * Try to capture section_index_output.
 				 */
 				vStringClear (name);
-				/* skip all whitespace */
-				while (isspace ((int) *cp))
-					++cp;
+				cp = skipWhitespace (cp);
 				while (isalnum ((int) *cp) || *cp == '_')
 				{
 					vStringPut (name, (int) *cp);
