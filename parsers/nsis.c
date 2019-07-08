@@ -64,6 +64,10 @@ static const unsigned char* skipFlags (const unsigned char* cp)
 	return cp;
 }
 
+#define lineStartingWith(CP,EXPECTED)									\
+	(strncasecmp ((const char*) CP, EXPECTED, strlen(EXPECTED)) == 0	\
+	 && isspace ((int) CP [strlen(EXPECTED)]))
+
 #define fillName(NAME,CP,CONDITION)				\
 	while (CONDITION)							\
 	{											\
@@ -88,8 +92,7 @@ static void findNsisTags (void)
 			continue;
 
 		/* functions */
-		if (strncasecmp ((const char*) cp, "function", (size_t) 8) == 0 &&
-			isspace ((int) cp [8]))
+		if (lineStartingWith (cp, "function"))
 		{
 			cp += 8;
 			cp = skipWhitespace (cp);
@@ -101,8 +104,7 @@ static void findNsisTags (void)
 			vStringClear (name);
 		}
 		/* variables */
-		else if (strncasecmp ((const char*) cp, "var", (size_t) 3) == 0 &&
-			isspace ((int) cp [3]))
+		else if (lineStartingWith (cp, "var"))
 		{
 			cp += 3;
 			cp = skipWhitespace (cp);
@@ -114,8 +116,7 @@ static void findNsisTags (void)
 			vStringClear (name);
 		}
 		/* sections */
-		else if (strncasecmp ((const char*) cp, "section", (size_t) 7) == 0  &&
-				 isspace ((int) cp [7]))
+		else if (lineStartingWith (cp, "section"))
 		{
 			bool in_quotes = false;
 			cp += 7;
