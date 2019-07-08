@@ -7,7 +7,7 @@ Plugins	input.nsi	/^Section "Plugins" SEC02$/;"	s
 Language Files	input.nsi	/^Section "Language Files" SEC03$/;"	s
 Documentation	input.nsi	/^Section "Documentation" SEC04$/;"	s
 Autocompletion Tags	input.nsi	/^Section "Autocompletion Tags" SEC05$/;"	s
-GTK 	input.nsi	/^Section "GTK ${GTK_VERSION} Runtime Environment" SEC06$/;"	s
+GTK ${GTK_VERSION} Runtime Environment	input.nsi	/^Section "GTK ${GTK_VERSION} Runtime Environment" SEC06$/;"	s
 Context Menus	input.nsi	/^Section "Context Menus" SEC07$/;"	s
 Desktop Shortcuts	input.nsi	/^Section "Desktop Shortcuts" SEC08$/;"	s
 Development files	input.nsi	/^Section "Development files" SEC09$/;"	s

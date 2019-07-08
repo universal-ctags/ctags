@@ -119,7 +119,8 @@ static void findNsisTags (void)
 				}
 			}
 			while (isalnum ((int) *cp) || isspace ((int) *cp) ||
-				   *cp == '_' || *cp == '-' || *cp == '.' || *cp == '!' || *cp == '"')
+				   *cp == '_' || *cp == '-' || *cp == '.' || *cp == '!' || *cp == '"'
+				   || (in_quotes && (*cp == '$' || *cp == '{' || *cp == '}' )))
 			{
 				if (*cp == '"')
 				{
