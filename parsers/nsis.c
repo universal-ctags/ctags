@@ -64,6 +64,14 @@ static const unsigned char* skipFlags (const unsigned char* cp)
 	return cp;
 }
 
+#define fillName(NAME,CP,CONDITION)				\
+	while (CONDITION)							\
+	{											\
+		vStringPut ((NAME), (int) *(CP));		\
+		++(CP);									\
+	}											\
+	do {} while (0)
+
 static void findNsisTags (void)
 {
 	vString *name = vStringNew ();
@@ -85,11 +93,10 @@ static void findNsisTags (void)
 		{
 			cp += 8;
 			cp = skipWhitespace (cp);
-			while (isalnum ((int) *cp) || *cp == '_' || *cp == '-' || *cp == '.' || *cp == '!')
-			{
-				vStringPut (name, (int) *cp);
-				++cp;
-			}
+
+			fillName (name, cp,
+					  (isalnum ((int) *cp) || *cp == '_' || *cp == '-' || *cp == '.' || *cp == '!'));
+
 			makeSimpleTag (name, K_FUNCTION);
 			vStringClear (name);
 		}
@@ -101,11 +108,8 @@ static void findNsisTags (void)
 			cp = skipWhitespace (cp);
 			cp = skipFlags (cp);
 
-			while (isalnum ((int) *cp) || *cp == '_')
-			{
-				vStringPut (name, (int) *cp);
-				++cp;
-			}
+			fillName (name, cp, (isalnum ((int) *cp) || *cp == '_'));
+
 			makeSimpleTag (name, K_VARIABLE);
 			vStringClear (name);
 		}
@@ -146,11 +150,9 @@ static void findNsisTags (void)
 				 */
 				vStringClear (name);
 				cp = skipWhitespace (cp);
-				while (isalnum ((int) *cp) || *cp == '_')
-				{
-					vStringPut (name, (int) *cp);
-					++cp;
-				}
+
+				fillName (name, cp, (isalnum ((int) *cp) || *cp == '_'));
+
 				makeSimpleTag (name, K_DEFINITION);
 			}
 			vStringClear (name);
