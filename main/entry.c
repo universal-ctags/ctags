@@ -775,13 +775,13 @@ static char* getFullQualifiedScopeNameFromCorkQueue (const tagEntryInfo * inner_
 			stringListAdd (queue, v);
 			kindIndex = scope->kindIndex;
 			lang = scope->langType;
+			root_scope = scope;
 		}
-		root_scope = scope;
 		scope =  getEntryInCorkQueue (scope->extensionFields.scopeIndex);
 	}
 
 	n = vStringNew ();
-	sep = scopeSeparatorFor (root_scope->langType, root_scope->kindIndex, KIND_GHOST_INDEX);
+	sep = root_scope? scopeSeparatorFor (root_scope->langType, root_scope->kindIndex, KIND_GHOST_INDEX): NULL;
 	if (sep)
 		vStringCatS(n, sep);
 
@@ -1229,10 +1229,10 @@ static void writeTagEntry (const tagEntryInfo *const tag, bool checkingNeeded)
 {
 	int length = 0;
 
-	Assert (tag->kindIndex != KIND_GHOST_INDEX);
-
 	if (checkingNeeded && !isTagWritable(tag))
 		return;
+
+	Assert (tag->kindIndex != KIND_GHOST_INDEX);
 
 	DebugStatement ( debugEntry (tag); )
 
@@ -1345,6 +1345,26 @@ extern tagEntryInfo *getEntryOfNestingLevel (const NestingLevel *nl)
 extern size_t        countEntryInCorkQueue (void)
 {
 	return TagFile.corkQueue.count;
+}
+
+extern int makePlaceholder (const char *const name)
+{
+	tagEntryInfo e;
+
+	initTagEntry (&e, name, KIND_GHOST_INDEX);
+	e.placeholder = 1;
+
+	/*
+	 * makePlaceholder may be called even before reading any bytes
+	 * from the input stream. In such case, initTagEntry fills
+	 * the lineNumber field of the placeholder tag with 0.
+	 * This breaks an assertion in makeTagEntry. Following adjustment
+	 * is for avoding it.
+	 */
+	if (e.lineNumber == 0)
+		e.lineNumber = 1;
+
+	return makeTagEntry (&e);
 }
 
 static void makeTagEntriesForSubwords (tagEntryInfo *const subtag)
@@ -1625,7 +1645,7 @@ extern bool isTagExtraBitMarked (const tagEntryInfo *const tag, xtagType extra)
 
 static void assignRoleFull(tagEntryInfo *const e, int roleIndex, bool assign)
 {
-	if (roleIndex == ROLE_INDEX_DEFINITION)
+	if (roleIndex == ROLE_DEFINITION_INDEX)
 	{
 		if (assign)
 		{
@@ -1633,7 +1653,7 @@ static void assignRoleFull(tagEntryInfo *const e, int roleIndex, bool assign)
 			markTagExtraBitFull (e, XTAG_REFERENCE_TAGS, false);
 		}
 	}
-	else if (roleIndex > ROLE_INDEX_DEFINITION)
+	else if (roleIndex > ROLE_DEFINITION_INDEX)
 	{
 		Assert (roleIndex < (int)countLanguageRoles(e->langType, e->kindIndex));
 
@@ -1654,7 +1674,7 @@ extern void assignRole(tagEntryInfo *const e, int roleIndex)
 
 extern bool isRoleAssigned(const tagEntryInfo *const e, int roleIndex)
 {
-	if (roleIndex == ROLE_INDEX_DEFINITION)
+	if (roleIndex == ROLE_DEFINITION_INDEX)
 		return (!e->extensionFields.roleBits);
 	else
 		return (e->extensionFields.roleBits & makeRoleBit(roleIndex));

@@ -226,12 +226,12 @@ static int addExtensionFields (tagWriter *writer, MIO *mio, const tagEntryInfo *
 	const char kind_letter_str[2] = {kdef->letter, '\0'};
 
 	if (kdef->name != NULL && (isFieldEnabled (FIELD_KIND_LONG)  ||
-		 (isFieldEnabled (FIELD_KIND)  && kdef->letter == KIND_NULL)))
+		 (isFieldEnabled (FIELD_KIND)  && kdef->letter == KIND_NULL_LETTER)))
 	{
 		/* Use kind long name */
 		str = kdef->name;
 	}
-	else if (kdef->letter != KIND_NULL  && (isFieldEnabled (FIELD_KIND) ||
+	else if (kdef->letter != KIND_NULL_LETTER  && (isFieldEnabled (FIELD_KIND) ||
 			(isFieldEnabled (FIELD_KIND_LONG) &&  kdef->name == NULL)))
 	{
 		/* Use kind letter */

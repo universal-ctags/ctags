@@ -180,7 +180,7 @@ static void copyToken (tokenInfo *dest, tokenInfo *src, void *data CTAGS_ATTR_UN
 static int makeLdScriptTagMaybe (tagEntryInfo *const e, tokenInfo *const token,
 								 int kind, int role)
 {
-	if (role == ROLE_INDEX_DEFINITION)
+	if (role == ROLE_DEFINITION_INDEX)
 	{
 		if (! LdScriptKinds[kind].enabled)
 			return CORK_NIL;
@@ -493,7 +493,7 @@ static void parseProvide (tokenInfo * token)
 			TOKENX (token, struct tokenExtra)->assignment = p;
 
 			makeLdScriptTagMaybe (&e, token,
-								  K_SYMBOL, ROLE_INDEX_DEFINITION);
+								  K_SYMBOL, ROLE_DEFINITION_INDEX);
 			TOKENX (token, struct tokenExtra)->assignment = KEYWORD_NONE;
 		}
 		tokenSkipToType (token, ')');
@@ -563,7 +563,7 @@ static void parseOutputSectionCommands (tokenInfo *const token, int terminator)
 			{
 				if (! tokenIsKeyword (token, LOC))
 					makeLdScriptTagMaybe (&e, token,
-										  K_SYMBOL, ROLE_INDEX_DEFINITION);
+										  K_SYMBOL, ROLE_DEFINITION_INDEX);
 				tokenSkipToType (token, ';');
 			}
 			else if (tmp->type == '(')
@@ -606,7 +606,7 @@ static void parseSection (tokenInfo * name)
 	{
 		if (!tokenIsKeyword (name, LOC))
 			makeLdScriptTagMaybe (&e, name,
-								  K_SYMBOL, ROLE_INDEX_DEFINITION);
+								  K_SYMBOL, ROLE_DEFINITION_INDEX);
 		tokenSkipToType (token, ';');
 	}
 	else
@@ -631,7 +631,7 @@ static void parseSection (tokenInfo * name)
 				scope_index = CORK_NIL;
 			else
 				scope_index = makeLdScriptTagMaybe (&e, name,
-													K_SECTION, ROLE_INDEX_DEFINITION);
+													K_SECTION, ROLE_DEFINITION_INDEX);
 
 			if (tokenSkipToType (token, '{'))
 			{
@@ -668,7 +668,7 @@ static void parseVersion (tokenInfo *const token)
 {
 	tagEntryInfo e;
 	makeLdScriptTagMaybe (&e, token,
-						  K_VERSION, ROLE_INDEX_DEFINITION);
+						  K_VERSION, ROLE_DEFINITION_INDEX);
 
 	if (tokenSkipToType (token, '{'))
 		tokenSkipOverPair (token);
@@ -710,7 +710,7 @@ static void findLdScriptTags (void)
 			if (tokenIsType(tmp, ASSIGNMENT_OP))
 			{
 				makeLdScriptTagMaybe (&e, token,
-									  K_SYMBOL, ROLE_INDEX_DEFINITION);
+									  K_SYMBOL, ROLE_DEFINITION_INDEX);
 				tokenSkipToType (tmp, ';');
 			}
 		}

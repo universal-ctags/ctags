@@ -454,7 +454,7 @@ static kindDefinition *kindNew (char letter, const char *name, const char *descr
 {
 	kindDefinition *kdef = xCalloc (1, kindDefinition);
 	kdef->letter        = letter;
-	kdef->name = eStrdup (name? name: KIND_REGEX_DEFAULT_LONG);
+	kdef->name = eStrdup (name? name: KIND_REGEX_DEFAULT_NAME);
 	kdef->description = eStrdup(description? description: kdef->name);
 	kdef->enabled = true;
 	return kdef;
@@ -936,7 +936,7 @@ static void setKind(regexPattern * ptrn, const langType owner,
 
 	if (*ptrn->u.tag.name_pattern == '\0' &&
 		ptrn->exclusive &&
-		kindLetter == KIND_REGEX_DEFAULT)
+		kindLetter == KIND_REGEX_DEFAULT_LETTER)
 	{
 		ptrn->u.tag.kindIndex = KIND_GHOST_INDEX;
 	}
@@ -947,7 +947,7 @@ static void setKind(regexPattern * ptrn, const langType owner,
 		kdef = getLanguageKindForLetter (owner, kindLetter);
 		if (kdef)
 		{
-			if (kindName && strcmp (kdef->name, kindName) && (strcmp(kindName, KIND_REGEX_DEFAULT_LONG)))
+			if (kindName && strcmp (kdef->name, kindName) && (strcmp(kindName, KIND_REGEX_DEFAULT_NAME)))
 				/* When using a same kind letter for multiple regex patterns, the name of kind
 				   should be the same. */
 				error  (WARNING, "Don't reuse the kind letter `%c' in a language %s (old: \"%s\", new: \"%s\")",
@@ -1105,8 +1105,8 @@ static void parseKinds (
 	*description = NULL;
 	if (kinds == NULL  ||  kinds [0] == '\0')
 	{
-		*kind = KIND_REGEX_DEFAULT;
-		*kindName = eStrdup (KIND_REGEX_DEFAULT_LONG);
+		*kind = KIND_REGEX_DEFAULT_LETTER;
+		*kindName = eStrdup (KIND_REGEX_DEFAULT_NAME);
 	}
 	else if (kinds [0] != '\0')
 	{
@@ -1114,11 +1114,11 @@ static void parseKinds (
 		if (k [0] != ','  &&  (k [1] == ','  ||  k [1] == '\0'))
 			*kind = *k++;
 		else
-			*kind = KIND_REGEX_DEFAULT;
+			*kind = KIND_REGEX_DEFAULT_LETTER;
 		if (*k == ',')
 			++k;
 		if (k [0] == '\0')
-			*kindName = eStrdup (KIND_REGEX_DEFAULT_LONG);
+			*kindName = eStrdup (KIND_REGEX_DEFAULT_NAME);
 		else
 		{
 			const char *const comma = strchr (k, ',');
@@ -1260,7 +1260,7 @@ static void matchTagPattern (struct lregexControlBlock *lcb,
 		kind = patbuf->u.tag.kindIndex;
 		roleBits = patbuf->u.tag.roleBits;
 
-		initRegexTag (&e, name, kind, ROLE_INDEX_DEFINITION, scope, placeholder,
+		initRegexTag (&e, name, kind, ROLE_DEFINITION_INDEX, scope, placeholder,
 					  ln, ln == 0? NULL: &pos, patbuf->xtagType);
 
 		if (field_trashbox == NULL)

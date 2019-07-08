@@ -118,7 +118,7 @@ static bool found_macro_cb_full (const char *line,
 			vStringNCopyS (signature, line + matches[2].start, matches[2].length);
 		vStringNCopyS (name, line + matches[1].start, matches[1].length);
 
-		if (data->rindex == ROLE_INDEX_DEFINITION)
+		if (data->rindex == ROLE_DEFINITION_INDEX)
 			initTagEntry (&tag, vStringValue (name), data->kindex);
 		else
 			initRefTagEntry (&tag, vStringValue (name), data->kindex, data->rindex);
@@ -133,7 +133,7 @@ static bool found_macro_cb_full (const char *line,
 		}
 
 		int cork_index = makeTagEntry (&tag);
-		if (data->rindex == ROLE_INDEX_DEFINITION && ctx->rejecting)
+		if (data->rindex == ROLE_DEFINITION_INDEX && ctx->rejecting)
 		{
 			/* The line is continued. Let's record the cork index
 			   for attachend endLine field later. */
@@ -243,8 +243,8 @@ static bool check_line_continuation (const char *line,
 static void findRpmSpecTags (void)
 {
 	rpmSpecCtx.rejecting = false;
-	rpmSpecCtx.macro = (struct macro_cb_data){.kindex = K_MACOR, .rindex = ROLE_INDEX_DEFINITION};
-	rpmSpecCtx.global = (struct macro_cb_data){K_GLOBAL, ROLE_INDEX_DEFINITION};
+	rpmSpecCtx.macro = (struct macro_cb_data){.kindex = K_MACOR, .rindex = ROLE_DEFINITION_INDEX};
+	rpmSpecCtx.global = (struct macro_cb_data){K_GLOBAL, ROLE_DEFINITION_INDEX};
 	rpmSpecCtx.undef = (struct macro_cb_data){K_MACOR,  R_MACRO_UNDEF};
 	rpmSpecCtx.package_index = CORK_NIL;
 	rpmSpecCtx.macro_index = CORK_NIL;

@@ -29,7 +29,7 @@ static kindDefinition SvgKinds [] = {
 static tagXpathTable svgXpathMainTable [] = {
 	{ "//*[local-name()='svg']//*/@id",
 	  LXPATH_TABLE_DO_MAKE,
-	  { .makeTagSpec = {K_ID, ROLE_INDEX_DEFINITION } }
+	  { .makeTagSpec = {K_ID, ROLE_DEFINITION_INDEX } }
 	},
 };
 

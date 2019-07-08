@@ -31,7 +31,7 @@ extern const char* getTagKindName(const tagEntryInfo *const tag)
 extern const roleDefinition* getTagRole(const tagEntryInfo *const tag,
 										int roleIndex)
 {
-	if (roleIndex == ROLE_INDEX_DEFINITION)
+	if (roleIndex == ROLE_DEFINITION_INDEX)
 		return NULL;
 	return getLanguageRole(tag->langType, tag->kindIndex, roleIndex);
 }
