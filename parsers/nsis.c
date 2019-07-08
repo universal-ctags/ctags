@@ -106,7 +106,7 @@ static void findNsisTags (void)
 			cp += 7;
 			/* skip all whitespace */
 			while (isspace ((int) *cp))
-			++cp;
+				++cp;
 			while (isalnum ((int) *cp) || isspace ((int) *cp) ||
 				   *cp == '_' || *cp == '-' || *cp == '.' || *cp == '!' || *cp == '"')
 			{
