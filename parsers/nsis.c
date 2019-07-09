@@ -34,6 +34,7 @@ typedef enum {
 	K_DEFINITION,
 	K_MACRO,
 	K_SECTION_GROUP,
+	K_MACRO_PARAM,
 } NsisKind;
 
 static kindDefinition NsisKinds [] = {
@@ -43,6 +44,7 @@ static kindDefinition NsisKinds [] = {
 	{ true, 'd', "definition", "definitions"},
 	{ true, 'm', "macro", "macros"},
 	{ true, 'S', "sectionGroup", "section groups"},
+	{ false, 'p', "macroparam", "macro parameters"},
 };
 
 /*
@@ -209,7 +211,7 @@ static void findNsisTags (void)
 			vStringClear (name);
 		}
 		/* macro */
-		else if (lineStartingWith(cp, "!macro", false))
+		else if (lineStartingWith (cp, "!macro", false))
 		{
 			cp += 6;
 			cp = skipWhitespace (cp);
@@ -217,9 +219,19 @@ static void findNsisTags (void)
 
 			fillName (name, cp, (isalnum ((int) *cp) || *cp == '_'));
 
-			makeSimpleTag (name, K_MACRO);
-			/* TODO: tag parameters */
-			vStringClear (name);
+			int index = makeSimpleTag (name, K_MACRO);
+			if (vStringLength (name) > 0)
+			{
+				while (1)
+				{
+					vStringClear (name);
+					cp = skipWhitespace (cp);
+					fillName (name, cp, (isalnum ((int) *cp) || *cp == '_'));
+					if (vStringLength (name) == 0)
+						break;
+					makeSimpleTagWithScope (name, K_MACRO_PARAM, index);
+				}
+			}
 		}
 	}
 	vStringDelete (name);
