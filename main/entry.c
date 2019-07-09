@@ -1190,7 +1190,7 @@ static bool isTagWritable(const tagEntryInfo *const tag)
 			return false;
 
 		/* TODO: optimization
-		   A Bitmasks represeting all enabled roles can be calculated at the
+		   A Bitmasks represetting all enabled roles can be calculated at the
 		   end of initializing the parser. Calculating each time when checking
 		   a tag entry is not needed. */
 		for (unsigned int roleIndex = 0; roleIndex < available_roles; roleIndex++)
@@ -1359,7 +1359,7 @@ extern int makePlaceholder (const char *const name)
 	 * from the input stream. In such case, initTagEntry fills
 	 * the lineNumber field of the placeholder tag with 0.
 	 * This breaks an assertion in makeTagEntry. Following adjustment
-	 * is for avoding it.
+	 * is for avoiding it.
 	 */
 	if (e.lineNumber == 0)
 		e.lineNumber = 1;

@@ -170,7 +170,7 @@ About documentation
 * Update documents. man/\*.rst files are the source files of our man pages.
   The man pages are for users. docs/\*.rst files explain experimental
   new features. The files are for developers. The parts of contents
-  of docs/*.rst should be moved to man/\*.rst in the future.
+  of docs/\*.rst should be moved to man/\*.rst in the future.
 
 * Write docs/parser-<NAME-OF-YOUR-PARSER>.rst as you want.
   A FAQ and the design or your parser are common topics.

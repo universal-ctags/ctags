@@ -17,7 +17,7 @@
 #include "routines.h"
 
 /*
-* FUNCTOIN DEFINITIONS
+* FUNCTION DEFINITIONS
 */
 static void pushKind (struct parserCtx *auxil, int kind)
 {

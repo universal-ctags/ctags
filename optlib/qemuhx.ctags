@@ -21,7 +21,7 @@
 #
 #
 # `hxtool' is a tool used in QEMU build process.
-# It converts an input file to both a C haeder file code and Texinfo document.
+# It converts an input file to both a C header file code and Texinfo document.
 #
 # `.hx' is the suffix for the tool.
 #

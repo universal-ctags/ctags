@@ -1,5 +1,5 @@
 /*
-*   Copyright (c) 2017, Red Hat, INc.
+*   Copyright (c) 2017, Red Hat, Inc.
 *   Copyright (c) 2017, Masatake YAMATO
 *
 *   This source code is released for free distribution under the terms of the

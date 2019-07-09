@@ -440,7 +440,7 @@ extern const scopeSeparator *getScopeSeparator(struct kindControlBlock* kcb,
 	if (sep)
 		return sep;
 
-	/* Cannot find a sitable sep definition.
+	/* Cannot find a suitable sep definition.
 	 * Use default one. */
 	if (parentKindIndex == KIND_GHOST_INDEX)
 	{

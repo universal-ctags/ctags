@@ -7,7 +7,7 @@
 
 #
 # Originally this file generates just one file with much "EXTRA_DISTS += " lines.
-# However, now we have so many test releates files, EXTRA_DISTS becomes too long
+# However, now we have so many test related files, EXTRA_DISTS becomes too long
 # to pass it to execve.
 # See http://gnu-automake.7480.n7.nabble.com/argument-list-too-long-in-project-with-many-files-td21323.html
 #

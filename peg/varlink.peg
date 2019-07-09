@@ -67,7 +67,7 @@
 }
 
 #
-# Packcc tries to apply the first grammer rule in the input.
+# Packcc tries to apply the first grammar rule in the input.
 #
 interface
     <- _* "interface" _+ interface_name eol ( member_list ) _*

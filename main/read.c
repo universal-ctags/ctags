@@ -1196,7 +1196,7 @@ extern bool isTraced (void)
 		   is given or not. */
 		return isMainTraced ();
 	else
-		/* Ap arser is given. In that case, check whether the current parser is
+		/* A parser is given. In that case, check whether the current parser is
 		   specified in --_trace=<LANG>,... option */
 		return isLanguageTraced (getInputLanguage ());
 }

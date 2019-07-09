@@ -753,7 +753,7 @@ readdir(
         } else {
             /*
              * Cannot convert file name to multi-byte string so construct
-             * an errornous directory entry and return that.  Note that
+             * an erroneous directory entry and return that.  Note that
              * we cannot return NULL as that would stop the processing
              * of directory entries completely.
              */
@@ -845,7 +845,7 @@ dirent_mbstowcs_s(
             wcstr[n] = 0;
         }
 
-        /* Length of resuting multi-byte string WITH zero terminator */
+        /* Length of resulting multi-byte string WITH zero terminator */
         if (pReturnValue) {
             *pReturnValue = n + 1;
         }
