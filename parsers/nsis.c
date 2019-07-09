@@ -31,6 +31,7 @@ typedef enum {
 	K_FUNCTION,
 	K_VARIABLE,
 	K_DEFINITION,
+	K_MACRO,
 } NsisKind;
 
 static kindDefinition NsisKinds [] = {
@@ -38,6 +39,7 @@ static kindDefinition NsisKinds [] = {
 	{ true, 'f', "function", "functions"},
 	{ true, 'v', "variable", "variables"},
 	{ true, 'd', "definition", "definitions"},
+	{ true, 'm', "macro", "macros"},
 };
 
 /*
@@ -168,6 +170,19 @@ static void findNsisTags (void)
 			fillName (name, cp, (isalnum ((int) *cp) || *cp == '_'));
 
 			makeSimpleTag (name, K_DEFINITION);
+			vStringClear (name);
+		}
+		/* macro */
+		else if (lineStartingWith(cp, "!macro"))
+		{
+			cp += 6;
+			cp = skipWhitespace (cp);
+			cp = skipFlags (cp);
+
+			fillName (name, cp, (isalnum ((int) *cp) || *cp == '_'));
+
+			makeSimpleTag (name, K_MACRO);
+			/* TODO: tag parameters */
 			vStringClear (name);
 		}
 	}

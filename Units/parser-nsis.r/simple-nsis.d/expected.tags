@@ -48,6 +48,7 @@ SEC09	input.nsi	/^Section "Development files" SEC09$/;"	d
 -AdditionalIcons	input.nsi	/^Section -AdditionalIcons$/;"	s
 -Post	input.nsi	/^Section -Post$/;"	s
 Uninstall	input.nsi	/^Section Uninstall$/;"	s
+IsUserAdmin	input.nsi	/^!macro IsUserAdmin Result UName$/;"	m
 .onInit	input.nsi	/^Function .onInit$/;"	f
 un.onUninstSuccess	input.nsi	/^Function un.onUninstSuccess$/;"	f
 un.onInit	input.nsi	/^Function un.onInit$/;"	f
