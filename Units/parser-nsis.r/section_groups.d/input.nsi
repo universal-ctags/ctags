@@ -5,3 +5,10 @@ SectionEnd
 Section "another section"
 SectionEnd
 SectionGroupEnd
+
+SectionGroup "some item"
+Section "b section"
+SectionEnd
+Section "alt section"
+SectionEnd
+SectionGroupEnd

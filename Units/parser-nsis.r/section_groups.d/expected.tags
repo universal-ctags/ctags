@@ -1,3 +1,6 @@
 some stuff	input.nsi	/^SectionGroup "some stuff"$/;"	S
-a section	input.nsi	/^Section "a section"$/;"	s
-another section	input.nsi	/^Section "another section"$/;"	s
+a section	input.nsi	/^Section "a section"$/;"	s	sectionGroup:some stuff
+another section	input.nsi	/^Section "another section"$/;"	s	sectionGroup:some stuff
+some item	input.nsi	/^SectionGroup "some item"$/;"	S
+b section	input.nsi	/^Section "b section"$/;"	s	sectionGroup:some item
+alt section	input.nsi	/^Section "alt section"$/;"	s	sectionGroup:some item

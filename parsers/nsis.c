@@ -18,6 +18,7 @@
 
 #include <string.h>
 
+#include "entry.h"
 #include "parse.h"
 #include "read.h"
 #include "vstring.h"
@@ -68,9 +69,18 @@ static const unsigned char* skipFlags (const unsigned char* cp)
 	return cp;
 }
 
-#define lineStartingWith(CP,EXPECTED)									\
+static int makeSimpleTagWithScope(vString *name, int kindIndex, int parentCorkIndex)
+{
+	tagEntryInfo e;
+	initTagEntry (&e, vStringValue (name), kindIndex);
+	e.extensionFields.scopeIndex = parentCorkIndex;
+	return makeTagEntry (&e);
+}
+
+#define lineStartingWith(CP,EXPECTED,EOL)								\
 	(strncasecmp ((const char*) CP, EXPECTED, strlen(EXPECTED)) == 0	\
-	 && isspace ((int) CP [strlen(EXPECTED)]))
+		&& (EOL ? (isspace ((int) CP [strlen(EXPECTED)]) || CP [strlen(EXPECTED)] == '\0') \
+			: isspace ((int) CP [strlen(EXPECTED)])))
 
 #define fillName(NAME,CP,CONDITION)				\
 	while (CONDITION)							\
@@ -81,7 +91,7 @@ static const unsigned char* skipFlags (const unsigned char* cp)
 	do {} while (0)
 
 static const unsigned char* parseSection (const unsigned char* cp, vString *name,
-										  int kindIndex)
+										  int kindIndex, int scopeIndex, int *corkIndex)
 {
 	bool in_quotes = false;
 	cp = skipWhitespace (cp);
@@ -107,7 +117,9 @@ static const unsigned char* parseSection (const unsigned char* cp, vString *name
 		vStringPut (name, (int) *cp);
 		++cp;
 	}
-	makeSimpleTag (name, kindIndex);
+	int r = makeSimpleTagWithScope (name, kindIndex, scopeIndex);
+	if (corkIndex)
+		*corkIndex = r;
 	if (vStringLength (name) > 0)
 	{
 		/*
@@ -129,6 +141,7 @@ static const unsigned char* parseSection (const unsigned char* cp, vString *name
 
 static void findNsisTags (void)
 {
+	int sectionGroupIndex = CORK_NIL;
 	vString *name = vStringNew ();
 	const unsigned char *line;
 
@@ -143,7 +156,7 @@ static void findNsisTags (void)
 			continue;
 
 		/* functions */
-		if (lineStartingWith (cp, "function"))
+		if (lineStartingWith (cp, "function", false))
 		{
 			cp += 8;
 			cp = skipWhitespace (cp);
@@ -155,7 +168,7 @@ static void findNsisTags (void)
 			vStringClear (name);
 		}
 		/* variables */
-		else if (lineStartingWith (cp, "var"))
+		else if (lineStartingWith (cp, "var", false))
 		{
 			cp += 3;
 			cp = skipWhitespace (cp);
@@ -167,19 +180,24 @@ static void findNsisTags (void)
 			vStringClear (name);
 		}
 		/* section groups */
-		else if (lineStartingWith (cp, "sectiongroup"))
+		else if (lineStartingWith (cp, "sectiongroup", false))
 		{
 			cp += 12;
-			cp = parseSection (cp, name, K_SECTION_GROUP);
+			cp = parseSection (cp, name, K_SECTION_GROUP, CORK_NIL, &sectionGroupIndex);
+		}
+		else if (lineStartingWith (cp, "sectiongroupend", true))
+		{
+			cp += 15;
+			sectionGroupIndex = CORK_NIL;
 		}
 		/* sections */
-		else if (lineStartingWith (cp, "section"))
+		else if (lineStartingWith (cp, "section", false))
 		{
 			cp += 7;
-			cp = parseSection (cp, name, K_SECTION);
+			cp = parseSection (cp, name, K_SECTION, sectionGroupIndex, NULL);
 		}
 		/* definitions */
-		else if (lineStartingWith (cp, "!define"))
+		else if (lineStartingWith (cp, "!define", false))
 		{
 			cp += 7;
 			cp = skipWhitespace (cp);
@@ -191,7 +209,7 @@ static void findNsisTags (void)
 			vStringClear (name);
 		}
 		/* macro */
-		else if (lineStartingWith(cp, "!macro"))
+		else if (lineStartingWith(cp, "!macro", false))
 		{
 			cp += 6;
 			cp = skipWhitespace (cp);
@@ -217,5 +235,6 @@ extern parserDefinition* NsisParser (void)
 	def->kindCount  = ARRAY_SIZE (NsisKinds);
 	def->extensions = extensions;
 	def->parser     = findNsisTags;
+	def->useCork    = true;
 	return def;
 }
