@@ -78,6 +78,52 @@ static const unsigned char* skipFlags (const unsigned char* cp)
 	}											\
 	do {} while (0)
 
+static const unsigned char* parseSection (const unsigned char* cp, vString *name)
+{
+	bool in_quotes = false;
+	cp = skipWhitespace (cp);
+	cp = skipFlags (cp);
+	while (isalnum ((int) *cp) || isspace ((int) *cp) ||
+		   *cp == '_' || *cp == '-' || *cp == '.' || *cp == '!' || *cp == '"'
+		   || (in_quotes && (*cp == '$' || *cp == '{' || *cp == '}' )))
+	{
+		if (*cp == '"')
+		{
+			if (in_quotes)
+			{
+				++cp;
+				break;
+			}
+			else
+			{
+				in_quotes = true;
+				++cp;
+				continue;
+			}
+		}
+		vStringPut (name, (int) *cp);
+		++cp;
+	}
+	makeSimpleTag (name, K_SECTION);
+	if (vStringLength (name) > 0)
+	{
+		/*
+		 * Try to capture section_index_output.
+		 */
+		vStringClear (name);
+		cp = skipWhitespace (cp);
+
+		fillName (name, cp, (isalnum ((int) *cp) || *cp == '_'));
+
+		if (vStringLength (name) > 0)
+		{
+			makeSimpleTag (name, K_DEFINITION);
+			vStringClear (name);
+		}
+	}
+	return cp;
+}
+
 static void findNsisTags (void)
 {
 	vString *name = vStringNew ();
@@ -120,45 +166,8 @@ static void findNsisTags (void)
 		/* sections */
 		else if (lineStartingWith (cp, "section"))
 		{
-			bool in_quotes = false;
 			cp += 7;
-			cp = skipWhitespace (cp);
-			cp = skipFlags (cp);
-			while (isalnum ((int) *cp) || isspace ((int) *cp) ||
-				   *cp == '_' || *cp == '-' || *cp == '.' || *cp == '!' || *cp == '"'
-				   || (in_quotes && (*cp == '$' || *cp == '{' || *cp == '}' )))
-			{
-				if (*cp == '"')
-				{
-					if (in_quotes)
-					{
-						++cp;
-						break;
-					}
-					else
-					{
-						in_quotes = true;
-						++cp;
-						continue;
-					}
-				}
-				vStringPut (name, (int) *cp);
-				++cp;
-			}
-			makeSimpleTag (name, K_SECTION);
-			if (vStringLength (name) > 0)
-			{
-				/*
-				 * Try to capture section_index_output.
-				 */
-				vStringClear (name);
-				cp = skipWhitespace (cp);
-
-				fillName (name, cp, (isalnum ((int) *cp) || *cp == '_'));
-
-				makeSimpleTag (name, K_DEFINITION);
-			}
-			vStringClear (name);
+			cp = parseSection (cp, name);
 		}
 		/* definitions */
 		else if (lineStartingWith (cp, "!define"))
