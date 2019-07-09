@@ -1816,7 +1816,7 @@ bool cxxParserTokenChainLooksLikeFunctionParameterList(
 	CXX_DEBUG_ENTER();
 	CXX_DEBUG_ASSERT(
 			tc->iCount >= 2,
-			"At least linitial and final parenthesis should be there"
+			"At least initial and final parenthesis should be there"
 		);
 
 	CXX_DEBUG_ASSERT(

@@ -202,7 +202,7 @@ evaluate_current_token:
 						   /* int >>: in this case ">>" cannot be an operator. */
 						   cxxTokenIsNonConstantKeyword(g_cxx.pToken->pPrev->pPrev)
 						   || (
-							   /* <tyename T, ... T >>: in this case ">>" cannot be an operator. */
+							   /* <typename T, ... T >>: in this case ">>" cannot be an operator. */
 							   cxxTokenTypeIs(g_cxx.pToken->pPrev->pPrev, CXXTokenTypeIdentifier)
 							   && stringListHas(pslTypeParams, vStringValue(g_cxx.pToken->pPrev->pPrev->pszWord))
 							   )
@@ -226,7 +226,7 @@ evaluate_current_token:
 						//   ... > void ...
 						//   ... > static ...
 						// The part on the right of > does not seem to be a constant
-						// so this is not a comparison. Most likely explaination:
+						// so this is not a comparison. Most likely explanation:
 						// We screwed up the parsing of the template.
 						// However we can still attempt to emit a symbol here.
 						CXX_DEBUG_PRINT(

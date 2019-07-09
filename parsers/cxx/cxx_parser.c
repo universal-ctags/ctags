@@ -69,11 +69,11 @@ void cxxParserNewStatement(void)
 // cxxParserParseAndCondenseSubchainsUpToOneOf() so this is actually a recursive
 // subchain nesting algorithm.
 //
-// Returns true if it has succesfully extracted and "condensed" a subchain
+// Returns true if it has successfully extracted and "condensed" a subchain
 // replacing the current token with a subchain subtree. Returns false if
 // extraction fails for some reason.
 //
-// This function never leaves the token chain in an incoerent state.
+// This function never leaves the token chain in an incoherent state.
 // The current token is always replaced with a subchain tree. If the subchain
 // is broken, its contents are discarded, regardless of the return value.
 //
@@ -1480,7 +1480,7 @@ check_function_signature:
 			// };
 			// 'aFunction' is NOT X::aFunction() and in complex cases we can't figure
 			// out its proper scope. Better avoid emitting this one.
-			CXX_DEBUG_PRINT("But it has been preceeded by the 'friend' keyword: this is not a real prototype");
+			CXX_DEBUG_PRINT("But it has been preceded by the 'friend' keyword: this is not a real prototype");
 		} else {
 			int iScopesPushed = cxxParserEmitFunctionTags(&oInfo,CXXTagKindPROTOTYPE,CXXEmitFunctionTagsPushScopes,NULL);
 			while(iScopesPushed > 0)
@@ -1552,7 +1552,7 @@ bool cxxParserParseAccessSpecifier(void)
 				(g_cxx.pToken->eKeyword == CXXKeywordPROTECTED) ||
 				(g_cxx.pToken->eKeyword == CXXKeywordPRIVATE)
 			),
-			"This must be called just after parinsg public/protected/private"
+			"This must be called just after parsing public/protected/private"
 		);
 
 	unsigned int uExtraType = 0;

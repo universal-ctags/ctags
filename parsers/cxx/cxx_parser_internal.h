@@ -135,7 +135,7 @@ typedef struct _CXXFunctionSignatureInfo
 	// nasty things, like:
 	//     int (*foo(void))[2]
 	// It is granted that the scope and identifier are either
-	// completly included or completly excluded from the type range.
+	// completely included or completely excluded from the type range.
 	bool bTypeContainsIdentifierScopeAndSignature;
 
 	// Non-NULL if there is a trailing comma after the function.
@@ -307,7 +307,7 @@ typedef struct _CXXParserState
 	// The last token we have extracted. This is always pushed to
 	// the token chain tail (which will take care of deletion)
 	CXXToken * pToken; // the token chain tail
-	
+
 	// The parser internally supports a look-ahead of one token.
 	// It is rarely needed though.
 	// This is the token that has been "unget" from the token chain tail.
