@@ -32,6 +32,7 @@ typedef enum {
 	K_VARIABLE,
 	K_DEFINITION,
 	K_MACRO,
+	K_SECTION_GROUP,
 } NsisKind;
 
 static kindDefinition NsisKinds [] = {
@@ -40,6 +41,7 @@ static kindDefinition NsisKinds [] = {
 	{ true, 'v', "variable", "variables"},
 	{ true, 'd', "definition", "definitions"},
 	{ true, 'm', "macro", "macros"},
+	{ true, 'S', "sectionGroup", "section groups"},
 };
 
 /*
@@ -78,7 +80,8 @@ static const unsigned char* skipFlags (const unsigned char* cp)
 	}											\
 	do {} while (0)
 
-static const unsigned char* parseSection (const unsigned char* cp, vString *name)
+static const unsigned char* parseSection (const unsigned char* cp, vString *name,
+										  int kindIndex)
 {
 	bool in_quotes = false;
 	cp = skipWhitespace (cp);
@@ -104,7 +107,7 @@ static const unsigned char* parseSection (const unsigned char* cp, vString *name
 		vStringPut (name, (int) *cp);
 		++cp;
 	}
-	makeSimpleTag (name, K_SECTION);
+	makeSimpleTag (name, kindIndex);
 	if (vStringLength (name) > 0)
 	{
 		/*
@@ -163,11 +166,17 @@ static void findNsisTags (void)
 			makeSimpleTag (name, K_VARIABLE);
 			vStringClear (name);
 		}
+		/* section groups */
+		else if (lineStartingWith (cp, "sectiongroup"))
+		{
+			cp += 12;
+			cp = parseSection (cp, name, K_SECTION_GROUP);
+		}
 		/* sections */
 		else if (lineStartingWith (cp, "section"))
 		{
 			cp += 7;
-			cp = parseSection (cp, name);
+			cp = parseSection (cp, name, K_SECTION);
 		}
 		/* definitions */
 		else if (lineStartingWith (cp, "!define"))
