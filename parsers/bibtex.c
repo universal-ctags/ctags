@@ -151,7 +151,6 @@ static tokenInfo *newToken (void)
 	token->type			= TOKEN_UNDEFINED;
 	token->keyword		= KEYWORD_NONE;
 	token->string		= vStringNew ();
-	token->scope		= vStringNew ();
 	token->lineNumber   = getInputLineNumber ();
 	token->filePosition = getInputFilePosition ();
 
@@ -161,7 +160,6 @@ static tokenInfo *newToken (void)
 static void deleteToken (tokenInfo *const token)
 {
 	vStringDelete (token->string);
-	vStringDelete (token->scope);
 	eFree (token);
 }
 
@@ -283,7 +281,6 @@ static void copyToken (tokenInfo *const dest, tokenInfo *const src)
 	dest->type = src->type;
 	dest->keyword = src->keyword;
 	vStringCopy (dest->string, src->string);
-	vStringCopy (dest->scope, src->scope);
 }
 
 /*
@@ -294,7 +291,6 @@ static bool parseTag (tokenInfo *const token, bibKind kind)
 {
 	tokenInfo *	const name = newToken ();
 	vString		*	currentid;
-	bool				useLongName = true;
 	bool				eof = false;
 
 	currentid = vStringNew ();
@@ -319,8 +315,6 @@ static bool parseTag (tokenInfo *const token, bibKind kind)
 
 	if (isType (token, TOKEN_OPEN_CURLY))
 	{
-		int depth = 1;
-
 		if (!readToken (token))
 		{
 			eof = true;
