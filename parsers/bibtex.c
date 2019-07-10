@@ -35,7 +35,8 @@
  */
 #define isType(token,t)		(bool) ((token)->type == (t))
 #define isKeyword(token,k)	(bool) ((token)->keyword == (k))
-#define isIdentChar(c) (isalpha (c) || isdigit (c) || (c) == '_' || (c) == '-')
+#define isIdentChar(c) \
+	(isalpha (c) || isdigit (c) || (c) == '_' || (c) == '-')
 
 /*
  *	 DATA DECLARATIONS
@@ -46,19 +47,19 @@
  */
 enum eKeywordId {
 	KEYWORD_article,
-  KEYWORD_book,
-  KEYWORD_booklet,
-  KEYWORD_conference,
-  KEYWORD_inbook,
-  KEYWORD_incollection,
-  KEYWORD_inproceedings,
-  KEYWORD_manual,
-  KEYWORD_mastersthesis,
-  KEYWORD_misc,
-  KEYWORD_phdthesis,
-  KEYWORD_proceedings,
-  KEYWORD_techreport,
-  KEYWORD_unpublished
+	KEYWORD_book,
+	KEYWORD_booklet,
+	KEYWORD_conference,
+	KEYWORD_inbook,
+	KEYWORD_incollection,
+	KEYWORD_inproceedings,
+	KEYWORD_manual,
+	KEYWORD_mastersthesis,
+	KEYWORD_misc,
+	KEYWORD_phdthesis,
+	KEYWORD_proceedings,
+	KEYWORD_techreport,
+	KEYWORD_unpublished
 };
 typedef int keywordId; /* to allow KEYWORD_NONE */
 
@@ -76,7 +77,6 @@ typedef struct sTokenInfo {
 	tokenType		type;
 	keywordId		keyword;
 	vString *		string;
-	vString *		scope;
 	unsigned long 	lineNumber;
 	MIOPos 			filePosition;
 } tokenInfo;
@@ -89,37 +89,37 @@ static langType Lang_bib;
 
 typedef enum {
 	BIBTAG_ARTICLE,
-  BIBTAG_BOOK,
-  BIBTAG_BOOKLET,
-  BIBTAG_CONFERENCE,
-  BIBTAG_INBOOK,
-  BIBTAG_INCOLLECTION,
-  BIBTAG_INPROCEEDINGS,
-  BIBTAG_MANUAL,
-  BIBTAG_MASTERSTHESIS,
-  BIBTAG_MISC,
-  BIBTAG_PHDTHESIS,
-  BIBTAG_PROCEEDINGS,
-  BIBTAG_TECHREPORT,
-  BIBTAG_UNPUBLISHED,
+	BIBTAG_BOOK,
+	BIBTAG_BOOKLET,
+	BIBTAG_CONFERENCE,
+	BIBTAG_INBOOK,
+	BIBTAG_INCOLLECTION,
+	BIBTAG_INPROCEEDINGS,
+	BIBTAG_MANUAL,
+	BIBTAG_MASTERSTHESIS,
+	BIBTAG_MISC,
+	BIBTAG_PHDTHESIS,
+	BIBTAG_PROCEEDINGS,
+	BIBTAG_TECHREPORT,
+	BIBTAG_UNPUBLISHED,
 	BIBTAG_COUNT
 } bibKind;
 
 static kindDefinition BibKinds [] = {
-	{ true,  'a', "article",			  "article"		   },
-	{ true,  'b', "book",			      "book"		     },
-	{ true,  'B', "booklet",			  "booklet"		   },
-	{ true,  'c', "conference",		  "conference"	 },
-	{ true,  'i', "inbook",			    "inbook"		   },
-	{ true,  'I', "incollection",	  "incollection" },
-	{ true,  'j', "inproceedings",	"inproceedings"},
-	{ true,  'm', "manual",	  		  "manual"		   },
-	{ true,  'M', "mastersthesis",  "mastersthesis"},
-	{ true,  'n', "misc",   			  "misc"  		   },
-	{ true,  'p', "phdthesis",			"phdthesis"	   },
-	{ true,  'P', "proceedings",		"proceedings"  },
-	{ true,  't', "techreport",		  "techreport"   },
-	{ true,  'u', "unpublished",	  "unpublished"  }
+	{ true,  'a', "article",				"article"				},
+	{ true,  'b', "book",						"book"					},
+	{ true,  'B', "booklet",				"booklet"				},
+	{ true,  'c', "conference",			"conference"		},
+	{ true,  'i', "inbook",					"inbook"				},
+	{ true,  'I', "incollection",		"incollection"	},
+	{ true,  'j', "inproceedings",	"inproceedings"	},
+	{ true,  'm', "manual",					"manual"				},
+	{ true,  'M', "mastersthesis",	"mastersthesis"	},
+	{ true,  'n', "misc",						"misc"					},
+	{ true,  'p', "phdthesis",			"phdthesis"			},
+	{ true,  'P', "proceedings",		"proceedings"		},
+	{ true,  't', "techreport",			"techreport"		},
+	{ true,  'u', "unpublished",		"unpublished"		}
 };
 
 static const keywordTable BibKeywordTable [] = {
@@ -173,8 +173,6 @@ static void makeBibTag (tokenInfo *const token, bibKind kind)
 	if (BibKinds [kind].enabled)
 	{
 		const char *const name = vStringValue (token->string);
-		int parentKind = KIND_GHOST_INDEX;
-		vString *parentName = vStringNew();
 		tagEntryInfo e;
 		initTagEntry (&e, name, kind);
 
@@ -182,7 +180,6 @@ static void makeBibTag (tokenInfo *const token, bibKind kind)
 		e.filePosition = token->filePosition;
 
 		makeTagEntry (&e);
-		vStringDelete (parentName);
 	}
 }
 
@@ -240,38 +237,36 @@ getNextChar:
 		case EOF: return false;
 
 		case '@':
-				  /*
-				   * All Bib entries start with an at symbol.
-				   * Check if the next character is an alpha character
-				   * else it is not a potential tex tag.
-				   */
-				  c = getcFromInputFile ();
-				  if (! isalpha (c))
+					/*
+					 * All Bib entries start with an at symbol.
+					 * Check if the next character is an alpha character
+					 * else it is not a potential tex tag.
+					 */
+					c = getcFromInputFile ();
+					if (! isalpha (c))
 					  ungetcToInputFile (c);
-				  else
-				  {
-					  vStringPut (token->string, '@');
-					  parseIdentifier (token->string, c);
-					  token->keyword = lookupKeyword (vStringValue (token->string) + 1, Lang_bib);
-					  if (isKeyword (token, KEYWORD_NONE)){
-						  token->type = TOKEN_IDENTIFIER;
-					  }else{
-						  token->type = TOKEN_KEYWORD;
-            }
-				  }
-				  break;
+					else
+					{
+						vStringPut (token->string, '@');
+						parseIdentifier (token->string, c);
+						token->keyword = lookupKeyword (vStringValue (token->string) + 1, Lang_bib);
+						if (isKeyword (token, KEYWORD_NONE))
+							token->type = TOKEN_IDENTIFIER;
+						else
+							token->type = TOKEN_KEYWORD;
+					}
+					break;
 		case '%':
-				  skipToCharacterInInputFile ('\n'); /* % are single line comments */
-				  goto getNextChar;
-				  break;
-
+					skipToCharacterInInputFile ('\n'); /* % are single line comments */
+					goto getNextChar;
+					break;
 		default:
-				  if (isIdentChar (c))
-				  {
-					  parseIdentifier (token->string, c);
-            token->type = TOKEN_IDENTIFIER;
-				  }
-				  break;
+					if (isIdentChar (c))
+					{
+						parseIdentifier (token->string, c);
+						token->type = TOKEN_IDENTIFIER;
+					}
+					break;
 	}
 	return true;
 }
@@ -297,10 +292,10 @@ static void copyToken (tokenInfo *const dest, tokenInfo *const src)
 
 static bool parseTag (tokenInfo *const token, bibKind kind)
 {
-	tokenInfo *const name = newToken ();
-	vString *	currentid;
-	bool		useLongName = true;
-	bool        eof = false;
+	tokenInfo *	const name = newToken ();
+	vString		*	currentid;
+	bool				useLongName = true;
+	bool				eof = false;
 
 	currentid = vStringNew ();
 	/*
@@ -331,18 +326,20 @@ static bool parseTag (tokenInfo *const token, bibKind kind)
 			eof = true;
 			goto out;
 		}
-    if (isType (token, TOKEN_IDENTIFIER)){
-      vStringCat (currentid, token->string);
-      vStringStripTrailing (currentid);
+		if (isType (token, TOKEN_IDENTIFIER)){
+			vStringCat (currentid, token->string);
+			vStringStripTrailing (currentid);
 			if (vStringLength (currentid) > 0)
 			{
 				vStringCopy (name->string, currentid);
 				makeBibTag (name, kind);
 			}
-    }else{ // should find an identifier for bib item at first place
-      eof = true;
-      goto out;
-    }
+		}
+		else
+		{ // should find an identifier for bib item at first place
+			eof = true;
+			goto out;
+		}
 	}
   
 
@@ -445,12 +442,12 @@ extern parserDefinition* BibtexParser (void)
 	/*
 	 * New definitions for parsing instead of regex
 	 */
-	def->kindTable	= BibKinds;
-	def->kindCount	= ARRAY_SIZE (BibKinds);
-	def->parser		= findBibTags;
-	def->initialize = initialize;
-	def->finalize   = finalize;
-	def->keywordTable =  BibKeywordTable;
-	def->keywordCount = ARRAY_SIZE (BibKeywordTable);
+	def->kindTable		= BibKinds;
+	def->kindCount		= ARRAY_SIZE (BibKinds);
+	def->parser				= findBibTags;
+	def->initialize		= initialize;
+	def->finalize			= finalize;
+	def->keywordTable	= BibKeywordTable;
+	def->keywordCount	= ARRAY_SIZE (BibKeywordTable);
 	return def;
 }
