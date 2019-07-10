@@ -1,0 +1,3 @@
+1957-doe_loc_ident	input.bib	/^@article{1957-doe_loc_ident,$/;"	a
+1959-rocket_	input.bib	/^@INPROCEEDINGS{1959-rocket_,$/;"	j
+doe+rocket	input.bib	/^@Book{doe+rocket,$/;"	b

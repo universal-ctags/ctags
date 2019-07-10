@@ -42,6 +42,7 @@ The following parsers have been added:
 * Autoconf
 * Automake
 * AutoIt
+* BibTex
 * Clojure
 * CMake *optlib*
 * CSS

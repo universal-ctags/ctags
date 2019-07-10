@@ -36,7 +36,7 @@
 #define isType(token,t)		(bool) ((token)->type == (t))
 #define isKeyword(token,k)	(bool) ((token)->keyword == (k))
 #define isIdentChar(c) \
-	(isalpha (c) || isdigit (c) || (c) == '_' || (c) == '-')
+	(isalpha (c) || isdigit (c) || (c) == '_' || (c) == '-' || (c) == '+')
 
 /*
  *	 DATA DECLARATIONS
@@ -247,7 +247,7 @@ getNextChar:
 					{
 						vStringPut (token->string, '@');
 						parseIdentifier (token->string, c);
-						token->keyword = lookupKeyword (vStringValue (token->string) + 1, Lang_bib);
+						token->keyword = lookupCaseKeyword (vStringValue (token->string) + 1, Lang_bib);
 						if (isKeyword (token, KEYWORD_NONE))
 							token->type = TOKEN_IDENTIFIER;
 						else
@@ -290,14 +290,14 @@ static void copyToken (tokenInfo *const dest, tokenInfo *const src)
 static bool parseTag (tokenInfo *const token, bibKind kind)
 {
 	tokenInfo *	const name = newToken ();
-	vString		*	currentid;
+	vString *		currentid;
 	bool				eof = false;
 
 	currentid = vStringNew ();
 	/*
 	 * Bib entries are of these formats:
 	 *   @article{identifier,
-   *   author="John Doe"}
+	 *   author="John Doe"}
 	 *
 	 * When a keyword is found, loop through all words up to
 	 * a comma brace for the tag name.
