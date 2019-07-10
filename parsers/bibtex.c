@@ -6,10 +6,10 @@
  *	 This source code is released for free distribution under the terms of the
  *	 GNU General Public License version 2 or (at your option) any later version.
  *
- *	 This module contains functions for generating tags for TeX language files.
+ *	 This module contains functions for generating identifiers of entries of Bibtex language files.
  *
- *	 Tex language reference:
- *		 http://en.wikibooks.org/wiki/TeX#The_Structure_of_TeX
+ *	 BibTex language "reference":
+ *		 https://en.wikipedia.org/wiki/BibTeX
  */
 
 /*
