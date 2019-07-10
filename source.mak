@@ -195,6 +195,7 @@ PARSER_SRCS =				\
 	parsers/awk.c			\
 	parsers/basic.c			\
 	parsers/beta.c			\
+	parsers/bibtex.c			\
 	parsers/c.c			\
 	parsers/clojure.c		\
 	parsers/css.c			\
