@@ -64,14 +64,11 @@ typedef int keywordId; /* to allow KEYWORD_NONE */
 
 enum eTokenType {
 	/* 0..255 are the byte's value.  Some are named for convenience */
-  TOKEN_COMMA = ',',
 	TOKEN_OPEN_CURLY = '{',
-	TOKEN_CLOSE_CURLY = '}',
 	/* above is special types */
 	TOKEN_UNDEFINED = 256,
 	TOKEN_KEYWORD,
-	TOKEN_IDENTIFIER,
-	TOKEN_STRING,
+	TOKEN_IDENTIFIER
 };
 typedef int tokenType;
 
