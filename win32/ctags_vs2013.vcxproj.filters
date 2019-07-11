@@ -255,6 +255,9 @@
     <ClCompile Include="..\parsers\beta.c">
       <Filter>Source Files\Parsers</Filter>
     </ClCompile>
+    <ClCompile Include="..\parsers\bibtex.c">
+      <Filter>Source Files\Parsers</Filter>
+    </ClCompile>
     <ClCompile Include="..\parsers\c.c">
       <Filter>Source Files\Parsers</Filter>
     </ClCompile>

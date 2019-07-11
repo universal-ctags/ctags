@@ -54,6 +54,7 @@
 	AwkParser, \
 	BasicParser, \
 	BetaParser, \
+  	BibtexParser, \
 	ClojureParser, \
 	CMakeParser, \
 	CParser, \
