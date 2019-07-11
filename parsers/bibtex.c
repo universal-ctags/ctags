@@ -202,10 +202,9 @@ static void parseIdentifier (vString *const string, const int firstChar)
 		ungetcToInputFile (c);		/* unget non-identifier character */
 }
 
-static bool readTokenFull (tokenInfo *const token, const bool includeWhitespaces)
+static bool readToken (tokenInfo *const token)
 {
 	int c;
-	int whitespaces = -1;
 
 	token->type			= TOKEN_UNDEFINED;
 	token->keyword		= KEYWORD_NONE;
@@ -216,18 +215,11 @@ getNextChar:
 	do
 	{
 		c = getcFromInputFile ();
-		whitespaces++;
 	}
 	while (c == '\t'  ||  c == ' ' ||  c == '\n');
 
 	token->lineNumber   = getInputLineNumber ();
 	token->filePosition = getInputFilePosition ();
-
-	if (includeWhitespaces && whitespaces > 0 && c != '%' && c != EOF)
-	{
-		ungetcToInputFile (c);
-		c = ' ';
-	}
 
 	token->type = (unsigned char) c;
 	switch (c)
@@ -267,11 +259,6 @@ getNextChar:
 					break;
 	}
 	return true;
-}
-
-static bool readToken (tokenInfo *const token)
-{
-	return readTokenFull (token, false);
 }
 
 static void copyToken (tokenInfo *const dest, tokenInfo *const src)
