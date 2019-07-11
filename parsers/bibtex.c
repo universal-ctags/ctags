@@ -17,9 +17,6 @@
  */
 #include "general.h"	/* must always come first */
 #include <ctype.h>	/* to define isalpha () */
-#ifdef DEBUG
-#include <stdio.h>
-#endif
 #include <string.h>
 
 #include "debug.h"
@@ -216,7 +213,7 @@ getNextChar:
 	{
 		c = getcFromInputFile ();
 	}
-	while (c == '\t'  ||  c == ' ' ||  c == '\n');
+	while (c == '\t' || c == ' ' || c == '\n');
 
 	token->lineNumber   = getInputLineNumber ();
 	token->filePosition = getInputFilePosition ();
@@ -400,11 +397,6 @@ static void initialize (const langType language)
 	Lang_bib = language;
 }
 
-static void finalize (const langType language CTAGS_ATTR_UNUSED,
-		      bool initialized)
-{
-}
-
 static void findBibTags (void)
 {
 	tokenInfo *const token = newToken ();
@@ -427,7 +419,6 @@ extern parserDefinition* BibtexParser (void)
 	def->kindCount		= ARRAY_SIZE (BibKinds);
 	def->parser				= findBibTags;
 	def->initialize		= initialize;
-	def->finalize			= finalize;
 	def->keywordTable	= BibKeywordTable;
 	def->keywordCount	= ARRAY_SIZE (BibKeywordTable);
 	return def;
