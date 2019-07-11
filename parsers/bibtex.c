@@ -393,7 +393,6 @@ static void parseBibFile (tokenInfo *const token)
 
 static void initialize (const langType language)
 {
-	Assert (ARRAY_SIZE (BibKinds) == BIBTAG_COUNT);
 	Lang_bib = language;
 }
 
@@ -409,6 +408,7 @@ static void findBibTags (void)
 /* Create parser definition structure */
 extern parserDefinition* BibtexParser (void)
 {
+	Assert (ARRAY_SIZE (BibKinds) == BIBTAG_COUNT);
 	static const char *const extensions [] = { "bib", NULL };
 	parserDefinition *const def = parserNew ("BibTex");
 	def->extensions = extensions;
