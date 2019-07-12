@@ -55,6 +55,7 @@ enum eKeywordId {
 	KEYWORD_misc,
 	KEYWORD_phdthesis,
 	KEYWORD_proceedings,
+	KEYWORD_string,
 	KEYWORD_techreport,
 	KEYWORD_unpublished
 };
@@ -97,6 +98,7 @@ typedef enum {
 	BIBTAG_MISC,
 	BIBTAG_PHDTHESIS,
 	BIBTAG_PROCEEDINGS,
+	BIBTAG_STRING,
 	BIBTAG_TECHREPORT,
 	BIBTAG_UNPUBLISHED,
 	BIBTAG_COUNT
@@ -115,6 +117,7 @@ static kindDefinition BibKinds [] = {
 	{ true,  'n', "misc",						"misc"					},
 	{ true,  'p', "phdthesis",			"phdthesis"			},
 	{ true,  'P', "proceedings",		"proceedings"		},
+	{ true,  's', "string",					"string"				},
 	{ true,  't', "techreport",			"techreport"		},
 	{ true,  'u', "unpublished",		"unpublished"		}
 };
@@ -133,6 +136,7 @@ static const keywordTable BibKeywordTable [] = {
 	{ "misc",	        KEYWORD_misc				  },
 	{ "phdthesis",	  KEYWORD_phdthesis			},
 	{ "proceedings",	KEYWORD_proceedings		},
+	{ "string",				KEYWORD_string				},
 	{ "techreport",	  KEYWORD_techreport		},
 	{ "unpublished",	KEYWORD_unpublished		}
 };
@@ -376,6 +380,9 @@ static void parseBibFile (tokenInfo *const token)
 				case KEYWORD_proceedings:
 					eof = parseTag (token, BIBTAG_PROCEEDINGS);
 					break;
+				case KEYWORD_string:
+					eof = parseTag (token, BIBTAG_STRING);
+					break;
 				case KEYWORD_techreport:
 					eof = parseTag (token, BIBTAG_TECHREPORT);
 					break;
@@ -410,7 +417,7 @@ extern parserDefinition* BibtexParser (void)
 {
 	Assert (ARRAY_SIZE (BibKinds) == BIBTAG_COUNT);
 	static const char *const extensions [] = { "bib", NULL };
-	parserDefinition *const def = parserNew ("BibTex");
+	parserDefinition *const def = parserNew ("BibTeX");
 	def->extensions = extensions;
 	/*
 	 * New definitions for parsing instead of regex
