@@ -410,7 +410,7 @@ extern parserDefinition* BibtexParser (void)
 {
 	Assert (ARRAY_SIZE (BibKinds) == BIBTAG_COUNT);
 	static const char *const extensions [] = { "bib", NULL };
-	parserDefinition *const def = parserNew ("BibTex");
+	parserDefinition *const def = parserNew ("BibTeX");
 	def->extensions = extensions;
 	/*
 	 * New definitions for parsing instead of regex
