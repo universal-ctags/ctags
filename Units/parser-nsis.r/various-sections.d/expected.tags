@@ -17,3 +17,6 @@ b$\\"c	input.nsi	/^Section "b$\\"c" B_Q_C_IDX$/;"	s
 B_Q_C_IDX	input.nsi	/^Section "b$\\"c" B_Q_C_IDX$/;"	d
 d$\\ne	input.nsi	/^Section "d$\\ne" D_Q_E_IDX$/;"	s
 D_Q_E_IDX	input.nsi	/^Section "d$\\ne" D_Q_E_IDX$/;"	d
+Single Quote	input.nsi	/^Section 'Single Quote'$/;"	s
+Double Quote	input.nsi	/^Section "Double Quote"$/;"	s
+Back Quote	input.nsi	/^Section `Back Quote`$/;"	s

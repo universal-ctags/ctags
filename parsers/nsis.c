@@ -102,10 +102,12 @@ static const unsigned char* parseSection (const unsigned char* cp, vString *name
 	if (corkIndex)
 		*corkIndex = CORK_NIL;
 
-	if (*cp == '"')
+	if (strpbrk((const char *)cp, "'`\""))
 	{
+		const unsigned char terminator = *cp;
+
 		cp++;
-		if (*cp == '"')
+		if (*cp == terminator)
 		{
 			/* An empty section.
 			 * See https://nsis.sourceforge.io/Docs/Chapter4.html#sectionsettext
@@ -137,7 +139,7 @@ static const unsigned char* parseSection (const unsigned char* cp, vString *name
 					in_escape++;
 				else if (*cp == '\\' && in_escape == 1)
 					in_escape++;
-				else if (*cp == '"' && in_escape == 2)
+				else if (*cp == terminator && in_escape == 2)
 					/*
 					 * This `"' is not a terminator of quotation;
 					 * set in_escape to 3.
@@ -146,7 +148,7 @@ static const unsigned char* parseSection (const unsigned char* cp, vString *name
 				else
 					in_escape = 0;
 
-				if ((in_escape != 3) && *cp == '"')
+				if ((in_escape != 3) && *cp == terminator)
 				{
 					++cp;
 					break;

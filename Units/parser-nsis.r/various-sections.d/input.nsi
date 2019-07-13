@@ -34,3 +34,12 @@ SectionEnd
 
 Section "d$\ne" D_Q_E_IDX
 SectionEnd
+
+Section 'Single Quote'
+SectionEnd
+
+Section "Double Quote"
+SectionEnd
+
+Section `Back Quote`
+SectionEnd
