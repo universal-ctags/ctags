@@ -95,29 +95,58 @@ static int makeSimpleTagWithScope(vString *name, int kindIndex, int parentCorkIn
 static const unsigned char* parseSection (const unsigned char* cp, vString *name,
 										  int kindIndex, int scopeIndex, int *corkIndex)
 {
-	bool in_quotes = false;
 	cp = skipWhitespace (cp);
 	cp = skipFlags (cp);
-	while (isalnum ((int) *cp) || isspace ((int) *cp) ||
-		   *cp == '_' || *cp == '-' || *cp == '.' || *cp == '!' || *cp == '"'
-		   || (in_quotes && (*cp == '$' || *cp == '{' || *cp == '}' )))
+	cp = skipWhitespace (cp);
+
+	if (corkIndex)
+		*corkIndex = CORK_NIL;
+
+	if (*cp == '"')
 	{
+		cp++;
 		if (*cp == '"')
 		{
-			if (in_quotes)
-			{
-				++cp;
-				break;
-			}
-			else
-			{
-				in_quotes = true;
-				++cp;
-				continue;
-			}
+			/* An empty section.
+			 * See https://nsis.sourceforge.io/Docs/Chapter4.html#sectionsettext
+			 */
+			anonGenerate (name,
+						  (kindIndex == K_SECTION
+						   ? "AnonymousSection"
+						   : "AnonymousSectionGroup"),
+						  kindIndex);
+			cp++;
 		}
-		vStringPut (name, (int) *cp);
-		++cp;
+		else if (*cp == '\0')
+			return cp;
+		else
+		{
+			do
+			{
+				vStringPut (name, (int) *cp);
+				++cp;
+
+				if (*cp == '\0')
+					break;
+
+				if (*cp == '"')
+				{
+					++cp;
+					break;
+				}
+			}
+			while (1);
+		}
+	}
+	else
+	{
+		while (isalnum ((int) *cp)
+			   || *cp == '_' || *cp == '-' || *cp == '.' || *cp == '!'
+			   || *cp == '$' || *cp == '{' || *cp == '}' || *cp == '(' || *cp == ')')
+		{
+			vStringPut (name, (int) *cp);
+			++cp;
+		}
 	}
 	int r = makeSimpleTagWithScope (name, kindIndex, scopeIndex);
 	if (corkIndex)

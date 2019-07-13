@@ -12,3 +12,31 @@ SectionEnd
 Section "alt section"
 SectionEnd
 SectionGroupEnd
+
+SectionGroup "the rest (その他)"
+Section "c section"
+SectionEnd
+Section "d section"
+SectionEnd
+SectionGroupEnd
+
+SectionGroup "${SG0}" SG0
+Section "e section"
+SectionEnd
+Section "f section"
+SectionEnd
+SectionGroupEnd
+
+SectionGroup "$(SG1)" SG1
+Section "g section"
+SectionEnd
+Section "h section"
+SectionEnd
+SectionGroupEnd
+
+SectionGroup "" EMPTY0
+Section "i section"
+SectionEnd
+Section "j section"
+SectionEnd
+SectionGroupEnd
