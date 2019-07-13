@@ -25,3 +25,12 @@ SectionEnd
 
 Section "" EMPTY_IDX
 SectionEnd
+
+Section "a$\"" A_Q_IDX
+SectionEnd
+
+Section "b$\"c" B_Q_C_IDX
+SectionEnd
+
+Section "d$\ne" D_Q_E_IDX
+SectionEnd

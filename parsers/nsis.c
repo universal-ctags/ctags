@@ -121,6 +121,7 @@ static const unsigned char* parseSection (const unsigned char* cp, vString *name
 			return cp;
 		else
 		{
+			int in_escape = 0;
 			do
 			{
 				vStringPut (name, (int) *cp);
@@ -129,7 +130,23 @@ static const unsigned char* parseSection (const unsigned char* cp, vString *name
 				if (*cp == '\0')
 					break;
 
-				if (*cp == '"')
+				/*
+				 * Ignore `"' in `$\"' as the terminator of quotation.
+				 */
+				if (*cp == '$' && in_escape == 0)
+					in_escape++;
+				else if (*cp == '\\' && in_escape == 1)
+					in_escape++;
+				else if (*cp == '"' && in_escape == 2)
+					/*
+					 * This `"' is not a terminator of quotation;
+					 * set in_escape to 3.
+					 */
+					in_escape++;
+				else
+					in_escape = 0;
+
+				if ((in_escape != 3) && *cp == '"')
 				{
 					++cp;
 					break;

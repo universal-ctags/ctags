@@ -40,3 +40,10 @@ SectionEnd
 Section "j section"
 SectionEnd
 SectionGroupEnd
+
+SectionGroup "x$\"y" XQY
+Section "k section"
+SectionEnd
+Section "l section"
+SectionEnd
+SectionGroupEnd
