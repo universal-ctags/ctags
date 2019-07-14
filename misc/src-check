@@ -62,7 +62,7 @@ check_name_cpp_macro()
     local n
 
     header "Check whether '_' is not used as ctags own macro name"
-    for f in $(find $dir -name '*.[ch]'); do
+    for f in $(find $dir -name '*.[ch]' | grep -v portable-dirent_p.h); do
 	if ${CTAGS} --language-force=C -x --_xformat='%F:%N' --kinds-C=d -o - $f | grep -q '.*:_.*H'; then
 	    for n in $(${CTAGS} --language-force=C -x --_xformat='%N' --kinds-C=d -o - $f | grep  '^_.*H'); do
 		echo "#" $n
