@@ -35,6 +35,7 @@ typedef enum {
 	K_MACRO,
 	K_SECTION_GROUP,
 	K_MACRO_PARAM,
+	K_LANGSTR,
 } NsisKind;
 
 static kindDefinition NsisKinds [] = {
@@ -45,6 +46,17 @@ static kindDefinition NsisKinds [] = {
 	{ true, 'm', "macro", "macros"},
 	{ true, 'S', "sectionGroup", "section groups"},
 	{ false, 'p', "macroparam", "macro parameters"},
+	{ true, 'l', "langstr", "language strings"},
+};
+
+typedef enum {
+	F_LANGID,
+} nsisField;
+
+static fieldDefinition NsisFields[] = {
+	{ .name = "langid",
+	  .description = "language identifier specified in (License)LangString commands",
+	  .enabled = true },
 };
 
 /*
@@ -189,6 +201,37 @@ static const unsigned char* parseSection (const unsigned char* cp, vString *name
 	return cp;
 }
 
+static const unsigned char* parseLangString (const unsigned char* cp, vString *name)
+{
+	cp = skipWhitespace (cp);
+
+	/* `^' is not explaned the nsis reference manual. However, it is used
+	 * in gvim.
+	 * e.g.
+	 * https://github.com/vim/vim/blob/3dabd718f4b2d8e09de9e2ec73832620b91c2f79/nsis/lang/english.nsi
+	 */
+	fillName (name, cp, (isalnum ((int) *cp) || *cp == '_' || *cp == '^'));
+
+	if (vStringLength (name) > 0)
+	{
+		int r = makeSimpleTag (name, K_LANGSTR);
+		if (r == CORK_NIL)
+			goto out;
+		vStringClear (name);
+
+		cp = skipWhitespace (cp);
+		fillName (name, cp, ((*cp != '\0') && (!isspace ((int) *cp))));
+		if (vStringLength (name) > 0)
+		{
+			attachParserFieldToCorkEntry (r, NsisFields[F_LANGID].ftype,
+										  vStringValue (name));
+			vStringClear (name);
+		}
+	}
+ out:
+	return cp;
+}
+
 static void findNsisTags (void)
 {
 	int sectionGroupIndex = CORK_NIL;
@@ -246,6 +289,18 @@ static void findNsisTags (void)
 			cp += 7;
 			cp = parseSection (cp, name, K_SECTION, sectionGroupIndex, NULL);
 		}
+		/* LangString */
+		else if (lineStartingWith (cp, "langstring", false))
+		{
+			cp += 10;
+			cp = parseLangString (cp, name);
+		}
+		/* LicenseLangString */
+		else if (lineStartingWith (cp, "licenselangstring", false))
+		{
+			cp += 17;
+			cp = parseLangString (cp, name);
+		}
 		/* definitions */
 		else if (lineStartingWith (cp, "!define", false))
 		{
@@ -294,6 +349,8 @@ extern parserDefinition* NsisParser (void)
 	def->kindTable  = NsisKinds;
 	def->kindCount  = ARRAY_SIZE (NsisKinds);
 	def->extensions = extensions;
+	def->fieldTable = NsisFields;
+	def->fieldCount = ARRAY_SIZE (NsisFields);
 	def->parser     = findNsisTags;
 	def->useCork    = true;
 	return def;
