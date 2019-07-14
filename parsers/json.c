@@ -20,6 +20,7 @@
 #include "debug.h"
 #include "entry.h"
 #include "keyword.h"
+#include "options.h"
 #include "parse.h"
 #include "read.h"
 #include "routines.h"
@@ -141,10 +142,30 @@ static void makeJsonTag (tokenInfo *const token, const jsonKind kind)
 	makeTagEntry (&e);
 }
 
+#define DEPTH_LIMIT 512
+#define DEPTH_RESET() depth_counter = 0
+#define DEPTH_INC()   depth_counter++
+#define DEPTH_DEC()   depth_counter--
+static int depth_counter;
+
 static void readTokenFull (tokenInfo *const token,
 						   bool includeStringRepr)
 {
 	int c;
+
+	if (depth_counter > DEPTH_LIMIT)
+	{
+		token->type = TOKEN_EOF;
+
+		/* Not to repeat warnings. */
+		if (depth_counter == (DEPTH_LIMIT + 1))
+		{
+			notice ("Terminate parsing: too deep brackets recursion in %s at %ld",
+					getInputFileName(), getInputLineNumber());
+			depth_counter++;
+		}
+		return;
+	}
 
 	token->type = TOKEN_UNDEFINED;
 	vStringClear (token->string);
@@ -159,10 +180,18 @@ static void readTokenFull (tokenInfo *const token,
 	switch (c)
 	{
 		case EOF: token->type = TOKEN_EOF;			break;
-		case '[': token->type = TOKEN_OPEN_SQUARE;	break;
-		case ']': token->type = TOKEN_CLOSE_SQUARE;	break;
-		case '{': token->type = TOKEN_OPEN_CURLY;	break;
-		case '}': token->type = TOKEN_CLOSE_CURLY;	break;
+		case '[':
+			DEPTH_INC();
+			token->type = TOKEN_OPEN_SQUARE;		break;
+		case ']':
+			DEPTH_DEC();
+			token->type = TOKEN_CLOSE_SQUARE;		break;
+		case '{':
+			DEPTH_INC();
+			token->type = TOKEN_OPEN_CURLY;			break;
+		case '}':
+			DEPTH_DEC();
+			token->type = TOKEN_CLOSE_CURLY;		break;
 		case ':': token->type = TOKEN_COLON;		break;
 		case ',': token->type = TOKEN_COMMA;		break;
 
@@ -355,6 +384,8 @@ static void parseValue (tokenInfo *const token)
 static void findJsonTags (void)
 {
 	tokenInfo *const token = newToken ();
+
+	DEPTH_RESET();
 
 	/* We allow multiple top-level elements, although it's not actually valid
 	 * JSON.  An interesting side effect of this is that we allow a leading
