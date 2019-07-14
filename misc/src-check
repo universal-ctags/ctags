@@ -126,7 +126,7 @@ main()
 	i=$(expr $i + 1)
     fi
 
-    return 0
+    return $i
 }
 
 main "$@"
