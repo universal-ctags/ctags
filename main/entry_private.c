@@ -8,6 +8,7 @@
 *   main part private interface to entry.c
 */
 
+#include "general.h"
 #include "entry_p.h"
 #include "parse_p.h"
 

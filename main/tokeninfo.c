@@ -9,6 +9,7 @@
 *   files.
 */
 
+#include "general.h"
 #include "tokeninfo.h"
 
 #include "entry.h"
