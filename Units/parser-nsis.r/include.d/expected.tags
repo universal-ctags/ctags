@@ -1,0 +1,7 @@
+WinMessages.nsh	input.nsi	/^!include WinMessages.nsh$/;"	i	roles:included
+Library.nsh	input.nsi	/^!include Library.nsh$/;"	i	roles:included
+C:\\MyConfig.nsi	input.nsi	/^!include \/CHARSET=CP1252 C:\\MyConfig.nsi$/;"	i	roles:included
+..\\MyConfig.nsh	input.nsi	/^!include ..\\MyConfig.nsh$/;"	i	roles:included
+file_that_may_exist_or_not.nsh	input.nsi	/^!include \/NONFATAL file_that_may_exist_or_not.nsh$/;"	i	roles:included
+a.nsh	input.nsi	/^!include a.nsh                         # COMMENT$/;"	i	roles:included
+b.nsh	input.nsi	/^!include b.nsh                         ; COMMENT$/;"	i	roles:included

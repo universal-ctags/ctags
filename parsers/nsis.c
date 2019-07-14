@@ -36,7 +36,16 @@ typedef enum {
 	K_SECTION_GROUP,
 	K_MACRO_PARAM,
 	K_LANGSTR,
+	K_SCRIPT,
 } NsisKind;
+
+typedef enum {
+	NSIS_SCRIPT_INCLUDED,
+} nsisScriptRole;
+
+static roleDefinition NsisScriptRoles [] = {
+	{ true, "included",  "included with !include" },
+};
 
 static kindDefinition NsisKinds [] = {
 	{ true, 's', "section", "sections"},
@@ -47,6 +56,8 @@ static kindDefinition NsisKinds [] = {
 	{ true, 'S', "sectionGroup", "section groups"},
 	{ false, 'p', "macroparam", "macro parameters"},
 	{ true, 'l', "langstr", "language strings"},
+	{ true, 'i', "script", "NSIS scripts",
+	  .referenceOnly = true, ATTACH_ROLES(NsisScriptRoles)},
 };
 
 typedef enum {
@@ -335,6 +346,32 @@ static void findNsisTags (void)
 					makeSimpleTagWithScope (name, K_MACRO_PARAM, index);
 				}
 			}
+		}
+		/* include */
+		else if (lineStartingWith (cp, "!include", false))
+		{
+			cp += 8;
+
+			/* !include [/NONFATAL] [/CHARSET=ACP|OEM|CP#|UTF8|UTF16LE|UTF16BE] file */
+			cp = skipWhitespace (cp);
+
+			/* /NONFATAL */
+			cp = skipFlags (cp);
+			cp = skipWhitespace (cp);
+
+			/* /CHARSET */
+			cp = skipFlags (cp);
+			cp = skipWhitespace (cp);
+
+			fillName (name, cp, (*cp != '\0' && *cp != ';' && *cp != '#'));
+			vStringStripTrailing (name);
+
+			if (vStringLength (name) > 0)
+			{
+				makeSimpleRefTag (name, K_SCRIPT, NSIS_SCRIPT_INCLUDED);
+				vStringClear (name);
+			}
+			/* TODO: capture !addinclduedir */
 		}
 	}
 	vStringDelete (name);
