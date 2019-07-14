@@ -89,6 +89,25 @@ check_vStringCatS_usage()
 
     return $i
 }
+
+check_eof_chars_in_vcxproj()
+{
+    local r=2
+    local f
+
+    for f in win32/ctags_vs2013.vcxproj win32/ctags_vs2013.vcxproj.filters; do
+	header "Check the EOF characters of $f"
+	local s=$(od -t c  -j $(expr $(stat -c %s $f) - 3) $f)
+	if echo "$s" | grep -q '>  \\r  \\n'; then
+	    r=$(expr $r - 1)
+	else
+	    echo "unexpected chars: $s"
+	fi
+    done
+
+    return $r
+}
+
 main()
 {
     local i=0
@@ -124,6 +143,10 @@ main()
     fi
 
     if ! check_vStringCatS_usage parsers; then
+	i=$(expr $i + 1)
+    fi
+
+    if ! check_eof_chars_in_vcxproj; then
 	i=$(expr $i + 1)
     fi
 
