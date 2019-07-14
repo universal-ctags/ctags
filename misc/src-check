@@ -124,30 +124,51 @@ main()
 
     if ! check_include_general_h_first main; then
 	i=$(expr $i + 1)
+	echo "failed"
+    else
+	echo "ok"
     fi
 
     if ! check_include_general_h_first parsers; then
 	i=$(expr $i + 1)
+	echo "failed"
+    else
+	echo "ok"
     fi
 
     if ! check_name_cpp_macro main; then
 	i=$(expr $i + 1)
+	echo "failed"
+    else
+	echo "ok"
     fi
 
     if ! check_name_cpp_macro parsers; then
 	i=$(expr $i + 1)
+	echo "failed"
+    else
+	echo "ok"
     fi
 
     if ! check_vStringCatS_usage main; then
 	i=$(expr $i + 1)
+	echo "failed"
+    else
+	echo "ok"
     fi
 
     if ! check_vStringCatS_usage parsers; then
 	i=$(expr $i + 1)
+	echo "failed"
+    else
+	echo "ok"
     fi
 
     if ! check_eof_chars_in_vcxproj; then
 	i=$(expr $i + 1)
+	echo "failed"
+    else
+	echo "ok"
     fi
 
     return $i
