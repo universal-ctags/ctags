@@ -136,7 +136,7 @@ static bool found_macro_cb_full (const char *line,
 		if (data->rindex == ROLE_DEFINITION_INDEX && ctx->rejecting)
 		{
 			/* The line is continued. Let's record the cork index
-			   for attached endLine field later. */
+			   for attaching endLine field later. */
 			ctx->macro_index = cork_index;
 		}
 
