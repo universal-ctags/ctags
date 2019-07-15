@@ -1,0 +1,25 @@
+some stuff	input.nsi	/^SectionGroup "some stuff"$/;"	S
+a section	input.nsi	/^Section "a section"$/;"	s	sectionGroup:some stuff
+another section	input.nsi	/^Section "another section"$/;"	s	sectionGroup:some stuff
+some item	input.nsi	/^SectionGroup "some item"$/;"	S
+b section	input.nsi	/^Section "b section"$/;"	s	sectionGroup:some item
+alt section	input.nsi	/^Section "alt section"$/;"	s	sectionGroup:some item
+the rest (その他)	input.nsi	/^SectionGroup "the rest (その他)"$/;"	S
+c section	input.nsi	/^Section "c section"$/;"	s	sectionGroup:the rest (その他)
+d section	input.nsi	/^Section "d section"$/;"	s	sectionGroup:the rest (その他)
+${SG0}	input.nsi	/^SectionGroup "${SG0}" SG0$/;"	S
+SG0	input.nsi	/^SectionGroup "${SG0}" SG0$/;"	d
+e section	input.nsi	/^Section "e section"$/;"	s	sectionGroup:${SG0}
+f section	input.nsi	/^Section "f section"$/;"	s	sectionGroup:${SG0}
+$(SG1)	input.nsi	/^SectionGroup "$(SG1)" SG1$/;"	S
+SG1	input.nsi	/^SectionGroup "$(SG1)" SG1$/;"	d
+g section	input.nsi	/^Section "g section"$/;"	s	sectionGroup:$(SG1)
+h section	input.nsi	/^Section "h section"$/;"	s	sectionGroup:$(SG1)
+AnonymousSectionGroup91b7d5e70105	input.nsi	/^SectionGroup "" EMPTY0$/;"	S
+EMPTY0	input.nsi	/^SectionGroup "" EMPTY0$/;"	d
+i section	input.nsi	/^Section "i section"$/;"	s	sectionGroup:AnonymousSectionGroup91b7d5e70105
+j section	input.nsi	/^Section "j section"$/;"	s	sectionGroup:AnonymousSectionGroup91b7d5e70105
+x$\\"y	input.nsi	/^SectionGroup "x$\\"y" XQY$/;"	S
+XQY	input.nsi	/^SectionGroup "x$\\"y" XQY$/;"	d
+k section	input.nsi	/^Section "k section"$/;"	s	sectionGroup:x$\\"y
+l section	input.nsi	/^Section "l section"$/;"	s	sectionGroup:x$\\"y

@@ -1,0 +1,57 @@
+PRODUCT_NAME	input.nsi	/^!define PRODUCT_NAME "Geany"$/;"	d
+PRODUCT_VERSION	input.nsi	/^!define PRODUCT_VERSION "1.35"$/;"	d
+PRODUCT_VERSION_ID	input.nsi	/^!define PRODUCT_VERSION_ID "1.35.0.0"$/;"	d
+PRODUCT_PUBLISHER	input.nsi	/^!define PRODUCT_PUBLISHER "The Geany developer team"$/;"	d
+PRODUCT_WEB_SITE	input.nsi	/^!define PRODUCT_WEB_SITE "https:\/\/www.geany.org\/"$/;"	d
+PRODUCT_DIR_REGKEY	input.nsi	/^!define PRODUCT_DIR_REGKEY "Software\\Geany"$/;"	d
+PRODUCT_UNINST_KEY	input.nsi	/^!define PRODUCT_UNINST_KEY "Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\${PRODUCT_N/;"	d
+PRODUCT_EXE	input.nsi	/^!define PRODUCT_EXE "$INSTDIR\\bin\\Geany.exe"$/;"	d
+PRODUCT_REGNAME	input.nsi	/^!define PRODUCT_REGNAME "Geany.ProjectFile"$/;"	d
+PRODUCT_EXT	input.nsi	/^!define PRODUCT_EXT ".geany"$/;"	d
+RESOURCEDIR	input.nsi	/^!define RESOURCEDIR "geany-${PRODUCT_VERSION}"$/;"	d
+GTK_VERSION	input.nsi	/^!define GTK_VERSION 2.24.30$/;"	d
+Answer	input.nsi	/^Var Answer$/;"	v
+UserName	input.nsi	/^Var UserName$/;"	v
+StartmenuFolder	input.nsi	/^Var StartmenuFolder$/;"	v
+UNINSTDIR	input.nsi	/^Var UNINSTDIR$/;"	v
+MUI_ABORTWARNING	input.nsi	/^!define MUI_ABORTWARNING$/;"	d
+MUI_ICON	input.nsi	/^!define MUI_ICON "icons\\geany.ico"$/;"	d
+MUI_UNICON	input.nsi	/^!define MUI_UNICON "${NSISDIR}\\Contrib\\Graphics\\Icons\\modern-uninstall-full.ico"$/;"	d
+MUI_PAGE_CUSTOMFUNCTION_LEAVE	input.nsi	/^!define MUI_PAGE_CUSTOMFUNCTION_LEAVE OnDirLeave$/;"	d
+MUI_STARTMENUPAGE_DEFAULTFOLDER	input.nsi	/^!define MUI_STARTMENUPAGE_DEFAULTFOLDER "Geany"$/;"	d
+MUI_STARTMENUPAGE_REGISTRY_ROOT	input.nsi	/^!define MUI_STARTMENUPAGE_REGISTRY_ROOT HKLM$/;"	d
+MUI_STARTMENUPAGE_REGISTRY_KEY	input.nsi	/^!define MUI_STARTMENUPAGE_REGISTRY_KEY "${PRODUCT_UNINST_KEY}"$/;"	d
+MUI_STARTMENUPAGE_REGISTRY_VALUENAME	input.nsi	/^!define MUI_STARTMENUPAGE_REGISTRY_VALUENAME "Start Menu Folder"$/;"	d
+MUI_FINISHPAGE_SHOWREADME	input.nsi	/^!define MUI_FINISHPAGE_SHOWREADME "$INSTDIR\\News.txt"$/;"	d
+MUI_FINISHPAGE_SHOWREADME_TEXT	input.nsi	/^!define MUI_FINISHPAGE_SHOWREADME_TEXT "Show Release Notes"$/;"	d
+MUI_FINISHPAGE_SHOWREADME_NOTCHECKED	input.nsi	/^!define MUI_FINISHPAGE_SHOWREADME_NOTCHECKED$/;"	d
+MUI_FINISHPAGE_RUN	input.nsi	/^!define MUI_FINISHPAGE_RUN "$INSTDIR\\bin\\Geany.exe"$/;"	d
+MUI_FINISHPAGE_RUN_NOTCHECKED	input.nsi	/^!define MUI_FINISHPAGE_RUN_NOTCHECKED$/;"	d
+\x21Program Files	input.nsi	/^Section "!Program Files" SEC01$/;"	s
+SEC01	input.nsi	/^Section "!Program Files" SEC01$/;"	d
+Plugins	input.nsi	/^Section "Plugins" SEC02$/;"	s
+SEC02	input.nsi	/^Section "Plugins" SEC02$/;"	d
+Language Files	input.nsi	/^Section "Language Files" SEC03$/;"	s
+SEC03	input.nsi	/^Section "Language Files" SEC03$/;"	d
+Documentation	input.nsi	/^Section "Documentation" SEC04$/;"	s
+SEC04	input.nsi	/^Section "Documentation" SEC04$/;"	d
+Autocompletion Tags	input.nsi	/^Section "Autocompletion Tags" SEC05$/;"	s
+SEC05	input.nsi	/^Section "Autocompletion Tags" SEC05$/;"	d
+GTK ${GTK_VERSION} Runtime Environment	input.nsi	/^Section "GTK ${GTK_VERSION} Runtime Environment" SEC06$/;"	s
+SEC06	input.nsi	/^Section "GTK ${GTK_VERSION} Runtime Environment" SEC06$/;"	d
+Context Menus	input.nsi	/^Section "Context Menus" SEC07$/;"	s
+SEC07	input.nsi	/^Section "Context Menus" SEC07$/;"	d
+Desktop Shortcuts	input.nsi	/^Section "Desktop Shortcuts" SEC08$/;"	s
+SEC08	input.nsi	/^Section "Desktop Shortcuts" SEC08$/;"	d
+Development files	input.nsi	/^Section "Development files" SEC09$/;"	s
+SEC09	input.nsi	/^Section "Development files" SEC09$/;"	d
+-AdditionalIcons	input.nsi	/^Section -AdditionalIcons$/;"	s
+-Post	input.nsi	/^Section -Post$/;"	s
+Uninstall	input.nsi	/^Section Uninstall$/;"	s
+IsUserAdmin	input.nsi	/^!macro IsUserAdmin Result UName$/;"	m
+Result	input.nsi	/^!macro IsUserAdmin Result UName$/;"	p	macro:IsUserAdmin
+UName	input.nsi	/^!macro IsUserAdmin Result UName$/;"	p	macro:IsUserAdmin
+.onInit	input.nsi	/^Function .onInit$/;"	f
+un.onUninstSuccess	input.nsi	/^Function un.onUninstSuccess$/;"	f
+un.onInit	input.nsi	/^Function un.onInit$/;"	f
+OnDirLeave	input.nsi	/^Function OnDirLeave$/;"	f

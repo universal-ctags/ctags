@@ -1,0 +1,8 @@
+message	input.nsi	/^LangString message ${LANG_ENGLISH} "English message"$/;"	l	langid:${LANG_ENGLISH}
+message	input.nsi	/^LangString message ${LANG_FRENCH} "French message"$/;"	l	langid:${LANG_FRENCH}
+message	input.nsi	/^LangString message ${LANG_KOREAN} "Korean message"$/;"	l	langid:${LANG_KOREAN}
+license	input.nsi	/^LicenseLangString license ${LANG_ENGLISH} license-english.txt$/;"	l	langid:${LANG_ENGLISH}
+license	input.nsi	/^LicenseLangString license ${LANG_FRENCH} license-french.txt$/;"	l	langid:${LANG_FRENCH}
+license	input.nsi	/^LicenseLangString license ${LANG_GERMAN} license-german.txt$/;"	l	langid:${LANG_GERMAN}
+^SetupCaption	input.nsi	/^LangString ^SetupCaption     ${LANG_ENGLISH} \\$/;"	l	langid:${LANG_ENGLISH}
+^UninstallCaption	input.nsi	/^LangString ^UninstallCaption ${LANG_ENGLISH} \\$/;"	l	langid:${LANG_ENGLISH}

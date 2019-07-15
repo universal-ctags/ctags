@@ -37,6 +37,7 @@ z	kind	no	NONE	s--	no	Include the "kind:" key in kind field (use k or K) in tags
 -	assignment	yes	LdScript	s--	no	how a value is assigned to the symbol
 -	sectionMarker	no	Markdown	s--	no	character used for declaring section(#, ##, =, or -)
 -	wrapping	yes	Moose	s--	no	how a wrapper wrapping the method (around, after, or before)
+-	langid	yes	NSIS	s--	no	language identifier specified in (License)LangString commands
 -	category	yes	ObjectiveC	s--	no	category attached to the class
 -	protocols	yes	ObjectiveC	s--	no	protocols that the class (or category) confirms to
 -	home	yes	Passwd	s--	no	home directory

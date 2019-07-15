@@ -411,6 +411,9 @@
     <ClCompile Include="..\parsers\myrddin.c">
       <Filter>Source Files\Parsers</Filter>
     </ClCompile>
+    <ClCompile Include="..\parsers\nsis.c">
+      <Filter>Source Files\Parsers</Filter>
+    </ClCompile>
     <ClCompile Include="..\parsers\objc.c">
       <Filter>Source Files\Parsers</Filter>
     </ClCompile>

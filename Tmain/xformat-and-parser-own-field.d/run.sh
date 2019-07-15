@@ -57,7 +57,7 @@ echo "#"
 ${CTAGS} --quiet --options=NONE \
 	 -x \
 	 --_xformat="%10N %10{*.language}" \
-	 --list-fields | grep language
+	 --list-fields | grep -v NSIS | grep language
 
 
 exit $?

@@ -98,6 +98,7 @@
 	MatLabParser, \
 	MooseParser, \
 	MyrddinParser, \
+	NsisParser, \
 	ObjcParser, \
 	OldCppParser, \
 	OldCParser, \
