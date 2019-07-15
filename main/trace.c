@@ -7,6 +7,7 @@
 *   Tracing facility.
 */
 
+#include "general.h"
 #include "trace.h"
 
 #ifdef DO_TRACING

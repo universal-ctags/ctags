@@ -14,11 +14,12 @@
 /*
  *	 INCLUDE FILES
  */
+#include "general.h"    /* must always come first */
+
 #include <stdio.h>
 #include <stdarg.h>
 #include <string.h>
 
-#include "general.h"    /* must always come first */
 #include "parse.h"
 #include "objpool.h"
 #include "keyword.h"
