@@ -1190,7 +1190,7 @@ static bool isTagWritable(const tagEntryInfo *const tag)
 			return false;
 
 		/* TODO: optimization
-		   A Bitmasks represetting all enabled roles can be calculated at the
+		   A Bitmasks representing all enabled roles can be calculated at the
 		   end of initializing the parser. Calculating each time when checking
 		   a tag entry is not needed. */
 		for (unsigned int roleIndex = 0; roleIndex < available_roles; roleIndex++)
