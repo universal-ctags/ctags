@@ -143,9 +143,6 @@ static void makeJsonTag (tokenInfo *const token, const jsonKind kind)
 }
 
 #define DEPTH_LIMIT 512
-#define DEPTH_RESET() depth_counter = 0
-#define DEPTH_INC()   depth_counter++
-#define DEPTH_DEC()   depth_counter--
 static int depth_counter;
 
 static void readTokenFull (tokenInfo *const token,
@@ -181,16 +178,16 @@ static void readTokenFull (tokenInfo *const token,
 	{
 		case EOF: token->type = TOKEN_EOF;			break;
 		case '[':
-			DEPTH_INC();
+			depth_counter++;
 			token->type = TOKEN_OPEN_SQUARE;		break;
 		case ']':
-			DEPTH_DEC();
+			depth_counter--;
 			token->type = TOKEN_CLOSE_SQUARE;		break;
 		case '{':
-			DEPTH_INC();
+			depth_counter++;
 			token->type = TOKEN_OPEN_CURLY;			break;
 		case '}':
-			DEPTH_DEC();
+			depth_counter--;
 			token->type = TOKEN_CLOSE_CURLY;		break;
 		case ':': token->type = TOKEN_COLON;		break;
 		case ',': token->type = TOKEN_COMMA;		break;
@@ -385,7 +382,7 @@ static void findJsonTags (void)
 {
 	tokenInfo *const token = newToken ();
 
-	DEPTH_RESET();
+	depth_counter = 0;
 
 	/* We allow multiple top-level elements, although it's not actually valid
 	 * JSON.  An interesting side effect of this is that we allow a leading
