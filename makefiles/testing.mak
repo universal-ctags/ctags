@@ -212,8 +212,8 @@ endif
 #
 # Checking code in ctags own rules
 #
-	$(SHELL) misc/src-check
 codecheck: $(CTAGS_TEST)
+	$(V_RUN) $(SHELL) misc/src-check
 
 #
 # Report coverage (usable only if ctags is built with COVERAGE=1.)
