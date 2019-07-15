@@ -460,10 +460,10 @@ static int handleUnicodeCodePoint (uint32_t point)
 		/* 4 bytes should be enough for any encoding (it's how much UTF-32
 		 * would need). */
 		/* FIXME: actually iconv has a tendency to output a BOM for Unicode
-		 * encodings where it matters when the endianess is not specified in
+		 * encodings where it matters when the endianness is not specified in
 		 * the target encoding name.  E.g., if the target encoding is "UTF-32"
 		 * or "UTF-16" it will output 2 code points, the BOM (U+FEFF) and the
-		 * one we expect. This does not happen if the endianess is specified
+		 * one we expect. This does not happen if the endianness is specified
 		 * explicitly, e.g. with "UTF-32LE", or "UTF-16BE".
 		 * However, it's not very relevant for the moment as nothing in CTags
 		 * cope well (if at all) with non-ASCII-compatible encodings like
@@ -1596,7 +1596,7 @@ static bool parseMethods (tokenInfo *const token, const tokenInfo *const class,
 			bool is_computed_name = false; /* ES6 computed property name */
 			bool is_dynamic_prop = false;
 			vString *dprop = NULL; /* is_computed_name is true but
-									* the name is not represnted in
+									* the name is not represented in
 									* a string literal. The expressions
 									* go this string. */
 

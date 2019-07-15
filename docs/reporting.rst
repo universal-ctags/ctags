@@ -97,7 +97,7 @@ U-ctags developers know the programming language that you are talking.
     language object you asked tagging especially about kind.  A person
     extending a parser have to decide a kind of newly tagging language
     object: reusing an existing kind or introducing a new kind.
-    U-ctags developers expect a report know the concent kind, field,
+    U-ctags developers expect a report know the concept kind, field,
     and extra. ctags.1 man page of u-ctags explains them.
 
 English is the native language of the head maintainer.
@@ -144,7 +144,7 @@ An example of good report
 ---------------------------------------------------------------------
 
 For the following input file(input.f90), u-ctags reports incomplete pattern
-for fuction `f` at the line 23.
+for function `f` at the line 23.
 
 ::
 

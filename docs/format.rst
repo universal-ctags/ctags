@@ -431,7 +431,7 @@ command can be used::
 
 TAG FILE INFORMATION:
 
-Psuedo-tag lines can be used to encode information into the tag file regarding
+Pseudo-tag lines can be used to encode information into the tag file regarding
 details about its content (e.g. have the tags been sorted?, are the optional
 tagfields present?), and regarding the program used to generate the tag file.
 This information can be used both to optimize use of the tag file (e.g.

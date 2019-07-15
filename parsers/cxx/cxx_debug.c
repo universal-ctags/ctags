@@ -168,7 +168,7 @@ const char* cxxDebugScopeDecode(enum CXXScopeType scope)
 		[CXXScopeTypeClass] = "class",
 		[CXXScopeTypeEnum] = "enum",
 		[CXXScopeTypeUnion] = "union",
-		[CXXScopeTypeStruct] = "structg",
+		[CXXScopeTypeStruct] = "struct",
 	};
 	if (CXXScopeTypeLAST > scope)
 		return table[scope];

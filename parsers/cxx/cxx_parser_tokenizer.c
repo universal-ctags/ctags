@@ -911,7 +911,7 @@ static bool cxxParserParseNextTokenCondenseAttribute(void)
 			false
 		))
 	{
-		// Pasing and/or condensation of the subchain failed. This implies broken
+		// Parsing and/or condensation of the subchain failed. This implies broken
 		// input (mismatched parenthesis/bracket, early EOF).
 
 		CXX_DEBUG_LEAVE_TEXT("Failed to parse subchains. The input is broken...");

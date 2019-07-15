@@ -2294,7 +2294,7 @@ extern bool matchMultitableRegex (struct lregexControlBlock *lcb, const vString*
 				   getLanguageName (lcb->owner),
 				   table->name, offset, getInputFileName ());
 			error (WARNING, "DUMP FROM THE TOP:");
-			/* TODO: ues dumpTstack */
+			/* TODO: use dumpTstack */
 			for (i = ptrArrayCount(lcb->tstack); 0 < i; --i)
 			{
 				t = ptrArrayItem (lcb->tstack, i - 1);

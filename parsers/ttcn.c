@@ -442,7 +442,7 @@ static ttcnToken_t * getToken (void)
 		while((c = getcFromInputFile()) != EOF)
 		{
 			vStringPut(pTtcnToken->value, c);
-            /* consume escaped chracters */
+            /* consume escaped characters */
             if(c == '\\' && ((c2 = getcFromInputFile()) != EOF))
             {
                 vStringPut(pTtcnToken->value, c2);

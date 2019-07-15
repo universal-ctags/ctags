@@ -433,11 +433,11 @@ process_token:
 					break;
 					case CXXKeywordTRY:
 						// We parse try in different ways depending on the context.
-						// Inside a function, and without preceeding tokens it's assumed to be
+						// Inside a function, and without preceding tokens it's assumed to be
 						// a plain try {} catch {} block. This is easy.
 						// Out of a function it's likely to be a function try block:
 						//    int f(int n = 2) try { ... } catch { ... }
-						// Inside a function but with some preceeding tokens it's likely to be a
+						// Inside a function but with some preceding tokens it's likely to be a
 						// lambda expressed as function-try-block.
 						//    auto f() -> void try { ... } catch { ... }
 						if((cxxScopeGetType() != CXXScopeTypeFunction) || g_cxx.pToken->pPrev)

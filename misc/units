@@ -2511,7 +2511,7 @@ validate_validator ()
 	fi
     elif ! [ -x "${validators_dir}/validator-$v" ]; then
 	if [ "$make_error" = "error" ]; then
-	    ERROR 1 "Not exectuable: $v (${validators_dir}/validator-$v)"
+	    ERROR 1 "Not executable: $v (${validators_dir}/validator-$v)"
 	else
 	    update_validator_list unavailable "$v"
 	    return 1
@@ -2696,7 +2696,7 @@ validate_dir ()
 	    default_validator=$v0
 	    ;;
 	1)
-	    # no action neeeded
+	    # no action needed
 	    ;;
 	2)
 	    update_validator_list unavailable "$v0"
@@ -2731,7 +2731,7 @@ validate_dir ()
 		fi
 		;;
 	    1)
-		# no action neeeded
+		# no action needed
 		;;
 	    2)
 		update_validator_list unavailable "$v0"

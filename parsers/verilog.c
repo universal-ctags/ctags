@@ -379,7 +379,7 @@ static void vUngetc (int c)
 	Ungetc = c;
 }
 
-/* Mostly copyed from cppSkipOverCComment() in cpreprocessor.c.
+/* Mostly copied from cppSkipOverCComment() in cpreprocessor.c.
  *
  * cppSkipOverCComment() uses the internal ungetc buffer of
  * CPreProcessor.  On the other hand, the Verilog parser uses

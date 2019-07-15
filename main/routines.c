@@ -789,7 +789,7 @@ extern char* absoluteFilename (const char *file)
 					cp = slashp;/* the absolute name begins with "/.." */
 #ifdef MSDOS_STYLE_PATH
 				/* Under MSDOS and NT we get `d:/NAME' as absolute file name,
-				 * so the luser could say `d:/../NAME'. We silently treat this
+				 * so the user could say `d:/../NAME'. We silently treat this
 				 * as `d:/NAME'.
 				 */
 				else if (!isPathSeparator (cp [0]))

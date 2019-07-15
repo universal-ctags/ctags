@@ -38,7 +38,7 @@ extern void verbose (const char *const format, ...) CTAGS_ATTR_PRINTF (1, 2);
 
 extern bool inSandbox (void);
 
-/* This is for emitting a tag for a commnn block of Fortran parser*/
+/* This is for emitting a tag for a common block of Fortran parser*/
 extern bool canUseLineNumberAsLocator (void);
 
 #endif  /* CTAGS_MAIN_OPTIONS_H */
