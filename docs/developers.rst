@@ -9,13 +9,14 @@ dispatch a task and/or an issue to the right person!
 (Keep the list in alphabetical order.)
 
 
-Frank Fesevur <ffes@users.sourceforge.net>
+Cameron Eagans <me@cweagans.net>
 
-	My current use of ctags is for a Notepad++ plug-in I'm writing.
-	The plug-in is not yet released because of problems with the
-	Windows version of ctags. Those problems are fixed by now.
-	I am a Windows developer, but also an occasional Ubuntu and
-	Raspbian user at home. I wrote the windres parser.
+	I've been a PHP developer for almost 10 years, and have been using Vim
+	almost as long. My goal is to help guide the direction of the PHP
+	parser, as well as maintain the ctags website and help guide new
+	contributors to tasks that they may be able to help with. With time,
+	I may end up contributing directly to ctags development, but my C skills
+	are not so great at the moment.
 
 Colomban Wendling <colomban@geany.org>
 
@@ -28,6 +29,20 @@ Colomban Wendling <colomban@geany.org>
 	CTags library applications could use more readily. I am mostly a C
 	developer, but as the maintainer of the CTags parsers in Geany I work
 	on all parsers.
+
+Frank Fesevur <ffes@users.sourceforge.net>
+
+	My current use of ctags is for a Notepad++ plug-in I'm writing.
+	The plug-in is not yet released because of problems with the
+	Windows version of ctags. Those problems are fixed by now.
+	I am a Windows developer, but also an occasional Ubuntu and
+	Raspbian user at home. I wrote the windres parser.
+
+Karol Samborski <edv.karol@gmail.com>
+
+	I like programming in multiple languages such as Haskell, C/C++,
+	TypeScript, PHP to name a few. Ctags are useful for me as I code mostly in
+	Vim. My goal here is to take care of the TypeScript parser.
 
 Masatake YAMATO <yamato@redhat.com>
 
@@ -49,6 +64,11 @@ Qingming He <906459647@qq.com>
 	released in the near future. I'm also interested in improving the lisp
 	parsers (elisp and scheme).
 
+Szymon Tomasz Stefanek <s.stefanek@gmail.com>
+
+	I'm a multilanguage developer and I use ctags with my own text editor
+	which has some IDE capabilities. I'm the maintainer of the new C/C++ parser.
+
 Vitor Antunes <vitor.hda@gmail.com>
 
 	I've been working with Verilog for most of the last 10
@@ -56,23 +76,3 @@ Vitor Antunes <vitor.hda@gmail.com>
 	Verilog parser such that Vim can get the most out of it
 	in plugins like Tagbar and to support the Omni
 	completion plugin I am writing.
-
-Cameron Eagans <me@cweagans.net>
-
-        I've been a PHP developer for almost 10 years, and have been using Vim
-        almost as long. My goal is to help guide the direction of the PHP
-        parser, as well as maintain the ctags website and help guide new
-        contributors to tasks that they may be able to help with. With time,
-        I may end up contributing directly to ctags development, but my C skills
-        are not so great at the moment.
-
-Szymon Tomasz Stefanek <s.stefanek@gmail.com>
-
-	I'm a multilanguage developer and I use ctags with my own text editor
-	which has some IDE capabilities. I'm the maintainer of the new C/C++ parser.
-
-Karol Samborski <edv.karol@gmail.com>
-
-	I like programming in multiple languages such as Haskell, C/C++,
-	TypeScript, PHP to name a few. Ctags are useful for me as I code mostly in
-	Vim. My goal here is to take care of the TypeScript parser.
