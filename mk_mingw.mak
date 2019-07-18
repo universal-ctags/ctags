@@ -73,10 +73,6 @@ all: $(PACKCC) ctags.exe readtags.exe
 
 ctags: ctags.exe
 
-$(PACKCC_SRCS):
-	git submodule init
-	git submodule update
-
 $(PACKCC_OBJS): $(PACKCC_SRCS)
 	$(V_CC) $(CC_FOR_PACKCC) -c $(OPT) $(CFLAGS) $(COMMON_DEFINES) -DSIZE_T_FMT_CHAR=$(SIZE_T_FMT_CHAR) -o $@ $<
 
@@ -94,6 +90,6 @@ readtags.exe: $(READTAGS_OBJS) $(READTAGS_HEADS)
 
 clean:
 	$(SILENT) echo Cleaning
-	$(SILENT) rm -f ctags.exe readtags.exe
+	$(SILENT) rm -f ctags.exe readtags.exe $(PACKCC)
 	$(SILENT) rm -f tags
-	$(SILENT) rm -f main/*.o optlib/*.o parsers/*.o parsers/cxx/*.o gnu_regex/*.o fnmatch/*.o read/*.o win32/mkstemp/*.o
+	$(SILENT) rm -f main/*.o optlib/*.o parsers/*.o parsers/cxx/*.o gnu_regex/*.o fnmatch/*.o misc/packcc/*.o peg/*.o read/*.o win32/mkstemp/*.o
