@@ -44,6 +44,13 @@ Karol Samborski <edv.karol@gmail.com>
 	TypeScript, PHP to name a few. Ctags are useful for me as I code mostly in
 	Vim. My goal here is to take care of the TypeScript parser.
 
+Ken Takata <kentkt@csc.jp>
+
+	I use ctags with Vim mainly on Windows and Cygwin.
+	I'm the one of the heaviest contributors of Vim.
+	I set up the AppVeyor environment and I'm also maintaining the
+	`ctags-win32 <https://github.com/universal-ctags/ctags-win32>`_ project.
+
 Masatake YAMATO <yamato@redhat.com>
 
 	I'm using ctags in batch jobs running on my source code base
