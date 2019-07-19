@@ -9,9 +9,12 @@
 
 include source.mak
 
+REGEX_DEFINES = -DHAVE_REGCOMP -D__USE_GNU -DHAVE_STDBOOL_H -Dstrcasecmp=stricmp
+
 OBJEXT = obj
-DEFINES = -DWIN32 -DHAVE_REGCOMP -D__USE_GNU -Dstrcasecmp=stricmp -DHAVE_PACKCC -DHAVE_REPOINFO_H -DSIZE_T_FMT_CHAR=\"I\"
-REGEX_DEFINES = -Dbool=int -Dfalse=0 -Dtrue=1 $(DEFINES)
+SIZE_T_FMT_CHAR=\"I\"
+COMMON_DEFINES =
+DEFINES = -DWIN32 $(REGEX_DEFINES) -DHAVE_PACKCC $(COMMON_DEFINES) -DHAVE_REPOINFO_H
 INCLUDES = -I. -Imain -Ignu_regex -Ifnmatch -Iparsers
 OPT = /O2 /WX
 PACKCC = packcc.exe
@@ -75,15 +78,15 @@ readtags.exe: $(READTAGS_OBJS) $(READTAGS_HEADS)
 	$(CC) $(OPT) /Fe$@ $(READTAGS_OBJS) /link setargv.obj $(PDBFLAG)
 
 $(REGEX_OBJS): $(REGEX_SRCS)
-	$(CC) /c $(OPT) /Fo$@ $(INCLUDES) $(REGEX_DEFINES) $(REGEX_SRCS)
+	$(CC) /c $(OPT) /Fo$@ $(INCLUDES) $(DEFINES) $(REGEX_SRCS)
 
 $(FNMATCH_OBJS): $(FNMATCH_SRCS)
 	$(CC) /c $(OPT) /Fo$@ $(INCLUDES) $(DEFINES) $(FNMATCH_SRCS)
 
 $(PACKCC_OBJS): $(PACKCC_SRCS)
-	$(CC) /c $(OPT) /Fo$@ $(INCLUDES) $(DEFINES) $(PACKCC_SRCS)
+	$(CC) /c $(OPT) /Fo$@ $(INCLUDES) $(COMMON_DEFINES) -DSIZE_T_FMT_CHAR=$(SIZE_T_FMT_CHAR) $(PACKCC_SRCS)
 
-$(PACKCC): $(PACKCC_OBJS) $(PACKCC_HEADS)
+$(PACKCC): $(PACKCC_OBJS)
 	$(CC) $(OPT) /Fe$@ $(PACKCC_OBJS) /link setargv.obj $(PDBFLAG)
 
 main\repoinfo.obj: main\repoinfo.c main\repoinfo.h
