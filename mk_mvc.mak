@@ -10,7 +10,7 @@
 include source.mak
 
 OBJEXT = obj
-DEFINES = -DWIN32 -DHAVE_REGCOMP -D__USE_GNU -Dstrcasecmp=stricmp -DHAVE_PACKCC -DHAVE_REPOINFO_H
+DEFINES = -DWIN32 -DHAVE_REGCOMP -D__USE_GNU -Dstrcasecmp=stricmp -DHAVE_PACKCC -DHAVE_REPOINFO_H -DSIZE_T_FMT_CHAR=\"I\"
 REGEX_DEFINES = -Dbool=int -Dfalse=0 -Dtrue=1 $(DEFINES)
 INCLUDES = -I. -Imain -Ignu_regex -Ifnmatch -Iparsers
 OPT = /O2 /WX
