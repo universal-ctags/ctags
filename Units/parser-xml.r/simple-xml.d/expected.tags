@@ -1,4 +1,4 @@
-ns56cd8d1c0101	input.xml	/^       >$/;"	n	line:4	language:XML	uri:https://ctags.io/root
+nsa9858b760101	input.xml	/^       >$/;"	n	line:4	language:XML	uri:https://ctags.io/root
 abc	input.xml	/^       >$/;"	n	line:4	language:XML	uri:https://ctags.io/nosuchthing
 unused	input.xml	/^       >$/;"	n	line:4	language:XML	uri:https://ctags.io/unused
 efg	input.xml	/^<abc:UnKnownTag id="a" xmlns:efg="https:\/\/ctags.io\/nosuchthing2">$/;"	n	line:5	language:XML	uri:https://ctags.io/nosuchthing2

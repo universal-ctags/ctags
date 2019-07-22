@@ -79,8 +79,16 @@ static int makeNsPrefixTag (const char *name, xmlNode *node, xmlNsPtr ns)
 
 #ifdef HAVE_LIBXML
 	tagEntryInfo tag;
+	vString *anon = NULL;
 
-	initTagEntry (&tag, name, K_NSPREFIX);
+	if (name)
+		initTagEntry (&tag, name, K_NSPREFIX);
+	else
+	{
+		anon = anonGenerateNew ("ns", K_NSPREFIX);
+		initTagEntry (&tag, vStringValue (anon), K_NSPREFIX);
+		markTagExtraBit (&tag, XTAG_ANONYMOUS);
+	}
 	/* TODO
 	 * - move this code block to lxpath.c.
 	 * - adjust the line number for nsprefixes forward. */
@@ -93,6 +101,8 @@ static int makeNsPrefixTag (const char *name, xmlNode *node, xmlNsPtr ns)
 	n = makeTagEntry (&tag);
 	if (p)
 		xmlFree (p);
+	if (anon)
+		vStringDelete (anon);
 #endif
 
 	return n;
@@ -105,18 +115,8 @@ static void findNsPrefix (xmlNode *node,
 					   void *userData)
 {
 #ifdef HAVE_LIBXML
-	if (node->ns && node->ns->prefix == NULL)
-	{
-		vString *prefix = anonGenerateNew ("ns", K_NSPREFIX);
-		makeNsPrefixTag (vStringValue (prefix), node, node->ns);
-		vStringDelete (prefix);
-	}
-
 	for (xmlNsPtr ns = node->nsDef; ns; ns = ns->next)
-	{
-		if (ns->prefix)
-			makeNsPrefixTag ((char *)ns->prefix, node, ns);
-	}
+		makeNsPrefixTag ((char *)ns->prefix, node, ns);
 
 	findXMLTags (ctx, node, spec->nextTable, userData);
 #endif
