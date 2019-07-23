@@ -216,7 +216,7 @@ static const unsigned char* parseLangString (const unsigned char* cp, vString *n
 {
 	cp = skipWhitespace (cp);
 
-	/* `^' is not explained the nsis reference manual. However, it is used
+	/* `^' is not explained in the nsis reference manual. However, it is used
 	 * in gvim.
 	 * e.g.
 	 * https://github.com/vim/vim/blob/3dabd718f4b2d8e09de9e2ec73832620b91c2f79/nsis/lang/english.nsi
