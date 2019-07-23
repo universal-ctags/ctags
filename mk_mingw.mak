@@ -2,7 +2,7 @@
 
 include source.mak
 
-REGEX_DEFINES = -DHAVE_REGCOMP -D__USE_GNU -Dbool=int -Dfalse=0 -Dtrue=1 -Dstrcasecmp=stricmp
+REGEX_DEFINES = -DHAVE_REGCOMP -D__USE_GNU -DHAVE_STDBOOL_H -Dstrcasecmp=stricmp
 
 CFLAGS = -Wall -std=gnu99
 # sizeof (size_t) == sizeof(unsigned long) == 4 on i686-w64-mingw32-gcc.
