@@ -1,0 +1,5 @@
+Gradient01	input.svg	/^    <linearGradient id="Gradient01">$/;"	d	language:SVG
+Gradient01	input.svg	/^    <linearGradient id="Gradient01">$/;"	i	language:XML
+Gradient02	input.svg	/^    <linearGradient id="Gradient02">$/;"	d	language:SVG
+Gradient02	input.svg	/^    <linearGradient id="Gradient02">$/;"	i	language:XML
+ns6c64d62e0101	input.svg	/^     xmlns="http:\/\/www.w3.org\/2000\/svg">$/;"	n	language:XML	uri:http://www.w3.org/2000/svg
