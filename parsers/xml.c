@@ -16,6 +16,14 @@
 #include "read.h"
 #include "routines.h"
 #include "selectors.h"
+#include "subparser.h"
+#include "xml.h"
+
+static void makeTagWithNotification (xmlNode *node,
+									 const char *xpath,
+									 const tagXpathMakeTagSpec *spec,
+									 tagEntryInfo *tag,
+									 void *userData);
 
 typedef enum {
 	K_ID,
@@ -60,7 +68,8 @@ static tagXpathTable XmlXpathMainTable [] = {
 static tagXpathTable XmlXpathIdTable [] = {
 	{ "./@id",
 	  LXPATH_TABLE_DO_MAKE,
-	  { .makeTagSpec = { K_ID, ROLE_DEFINITION_INDEX } }
+	  { .makeTagSpec = { K_ID, ROLE_DEFINITION_INDEX,
+						 .make = makeTagWithNotification,} }
 	},
 };
 
@@ -68,6 +77,35 @@ static tagXpathTableTable xmlXpathTableTable[] = {
 	[TABLE_MAIN] = { ARRAY_AND_SIZE (XmlXpathMainTable) },
 	[TABLE_ID]   = { ARRAY_AND_SIZE (XmlXpathIdTable) },
 };
+
+static int makeTagWithNotificationCommon (tagEntryInfo *tag,
+										   xmlNode *node)
+{
+	int n = makeTagEntry (tag);
+
+	subparser *sub;
+	foreachSubparser (sub, false)
+	{
+		xmlSubparser *xmlsub = (xmlSubparser *)sub;
+
+		if (xmlsub->makeTagEntryWithNodeNotify)
+		{
+			enterSubparser(sub);
+			xmlsub->makeTagEntryWithNodeNotify (xmlsub, node, tag);
+			leaveSubparser();
+		}
+	}
+	return n;
+}
+
+static void makeTagWithNotification (xmlNode *node,
+									 const char *xpath CTAGS_ATTR_UNUSED,
+									 const tagXpathMakeTagSpec *spec CTAGS_ATTR_UNUSED,
+									 tagEntryInfo *tag,
+									 void *userData CTAGS_ATTR_UNUSED)
+{
+	makeTagWithNotificationCommon (tag, node);
+}
 
 static int makeNsPrefixTag (const char *name, xmlNode *node, xmlNsPtr ns)
 {
@@ -92,7 +130,7 @@ static int makeNsPrefixTag (const char *name, xmlNode *node, xmlNsPtr ns)
 	if (ns->href && *ns->href)
 		attachParserField (&tag, XmlFields [F_NS_URI].ftype, (char *)ns->href);
 
-	n = makeTagEntry (&tag);
+	n = makeTagWithNotificationCommon (&tag, node);
 	if (p)
 		xmlFree (p);
 	if (anon)

@@ -286,7 +286,7 @@ PARSER_SRCS =				\
 	\
 	$(NULL)
 
-XML_HEADS =
+XML_HEADS = parsers/xml.h
 XML_SRCS = \
 	 parsers/maven2.c		\
 	 parsers/dbusintrospect.c	\
