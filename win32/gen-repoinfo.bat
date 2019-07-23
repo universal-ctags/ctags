@@ -1,6 +1,6 @@
 @echo off
 :: Copyright (C) 2017 Ken Takata
-:: License: GPL-2
+:: License: GPL-2 or later
 
 setlocal
 
