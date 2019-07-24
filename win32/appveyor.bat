@@ -1,8 +1,8 @@
 @echo off
 :: Batch file for building/testing ctags on AppVeyor
 ::
-:: Copyright: 2015 K. Takata
-:: License: GPL-2
+:: Copyright (C) 2015 Ken Takata
+:: License: GPL-2 or later
 
 
 cd %APPVEYOR_BUILD_FOLDER%
