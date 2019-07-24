@@ -175,11 +175,14 @@ tlib: $(MINI_GEANY_TEST)
 	builddir=$$(pwd); \
 	mkdir -p $${builddir}/misc; \
 	if test -s '$(MINI_GEANY_TEST)'; then \
-		$(SHELL) $(srcdir)/misc/tlib $(MINI_GEANY_TEST) \
+		if $(SHELL) $(srcdir)/misc/tlib $(MINI_GEANY_TEST) \
 			$(srcdir)/misc/mini-geany.expected \
 			$${builddir}/misc/mini-geany.actual \
-			$(VG); \
-		echo 'mini-geany: OK'; \
+			$(VG); then \
+			echo 'mini-geany: OK'; \
+		else \
+			echo 'mini-geany: FAILED'; \
+		fi; \
 	else \
 		echo 'mini-geany: SKIP'; \
 	fi

@@ -16,6 +16,7 @@ v: variable
 x: externvar
 z: parameter
 L: label
+D: macroparam
 
 Parsing buffer:
 foo	line: 1	kind: function	 lang: C
