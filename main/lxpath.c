@@ -168,8 +168,9 @@ static xmlDocPtr makeXMLDoc (void)
 	return doc;
 }
 
-extern void findXMLTags (xmlXPathContext *ctx, xmlNode *root,
+extern void findXMLTagsFull (xmlXPathContext *ctx, xmlNode *root,
 			 int tableTableIndex,
+			 void (* runAfter) (xmlXPathContext *, xmlNode *, void *),
 			 void *userData)
 {
 	bool usedAsEntryPoint = false;
@@ -208,6 +209,8 @@ extern void findXMLTags (xmlXPathContext *ctx, xmlNode *root,
 	}
 
 	findXMLTagsCore (ctx, root, xpathTableTable, userData);
+	if (runAfter)
+		(* runAfter) (ctx, root, userData);
 
 out:
 	if (usedAsEntryPoint)
@@ -230,10 +233,18 @@ extern void removeTagXpath (const langType language CTAGS_ATTR_UNUSED, tagXpathT
 {
 }
 
-extern void findXMLTags (xmlXPathContext *ctx, xmlNode *root,
+extern void findXMLTagsFull (xmlXPathContext *ctx, xmlNode *root,
 			 int tableTableIndex,
+			 void (* runAfter) (xmlXPathContext *, xmlNode *, void *),
 			 void *userData)
 {
 }
 
 #endif
+
+extern void findXMLTags (xmlXPathContext *ctx, xmlNode *root,
+			 int tableTableIndex,
+			 void *userData)
+{
+	findXMLTagsFull (ctx, root, tableTableIndex, NULL, userData);
+}

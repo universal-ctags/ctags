@@ -98,6 +98,11 @@ typedef struct sXpathFileSpec {
 */
 
 /* Xpath interface */
+extern void findXMLTagsFull (xmlXPathContext *ctx, xmlNode *root,
+			 int tableTableIndex,
+			 void (* runAfter) (xmlXPathContext *, xmlNode *, void *),
+			 void *userData);
+
 extern void findXMLTags (xmlXPathContext *ctx, xmlNode *root,
 			 int tableTableIndex,
 			 void *userData);

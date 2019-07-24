@@ -151,10 +151,25 @@ static void findNsPrefix (xmlNode *node,
 	findXMLTags (ctx, node, spec->nextTable, userData);
 }
 
+static void runAfter (xmlXPathContext *ctx, xmlNode *root, void *user_data)
+{
+	subparser *sub;
+	foreachSubparser (sub, false)
+	{
+		xmlSubparser *xmlsub = (xmlSubparser *)sub;
+		if (xmlsub->runXPathEngine)
+		{
+			enterSubparser(sub);
+			xmlsub->runXPathEngine (xmlsub, ctx, root);
+			leaveSubparser();
+		}
+	}
+}
+
 static void
 findXmlTags (void)
 {
-	findXMLTags (NULL, NULL, TABLE_MAIN, NULL);
+	findXMLTagsFull (NULL, NULL, TABLE_MAIN, runAfter, NULL);
 }
 
 extern parserDefinition*
