@@ -31,7 +31,9 @@
 
 #ifdef _MSC_VER
 #define _CRT_SECURE_NO_WARNINGS
+#if _MSC_VER < 1900
 #define snprintf _snprintf
+#endif
 #define unlink _unlink
 #ifdef _DEBUG
 #define _CRTDBG_MAP_ALLOC
