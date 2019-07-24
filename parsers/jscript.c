@@ -126,6 +126,9 @@ typedef enum eTokenType {
 	TOKEN_REGEXP,
 	TOKEN_POSTFIX_OPERATOR,
 	TOKEN_STAR,
+	/* To handle Babel's decorators.
+	 * Used only in readTokenFull or lower functions. */
+	TOKEN_ATMARK,
 	TOKEN_BINARY_OPERATOR
 } tokenType;
 
@@ -218,6 +221,7 @@ static const keywordTable JsKeywordTable [] = {
 
 /* Recursive functions */
 static void readTokenFull (tokenInfo *const token, bool include_newlines, vString *const repr);
+static void skipArgumentList (tokenInfo *const token, bool include_newlines, vString *const repr);
 static void parseFunction (tokenInfo *const token);
 static bool parseBlock (tokenInfo *const token, const vString *const parentScope);
 static bool parseLine (tokenInfo *const token, bool is_inside_class);
@@ -800,7 +804,7 @@ static void parseTemplateString (vString *const string)
 	while (c != EOF);
 }
 
-static void readTokenFull (tokenInfo *const token, bool include_newlines, vString *const repr)
+static void readTokenFullRaw (tokenInfo *const token, bool include_newlines, vString *const repr)
 {
 	int c;
 	int i;
@@ -971,6 +975,10 @@ getNextChar:
 				  }
 				  break;
 
+		case '@':
+				  token->type = TOKEN_ATMARK;
+				  break;
+
 		case '\\':
 				  c = readUnicodeEscapeSequence (c);
 				  /* fallthrough */
@@ -1045,6 +1053,65 @@ getNextChar:
 	}
 
 	LastTokenType = token->type;
+}
+
+/* See https://babeljs.io/blog/2018/09/17/decorators */
+static void skipBabelDecorator (tokenInfo *token, bool include_newlines, vString *const repr)
+{
+	readTokenFullRaw (token, include_newlines, repr);
+	if (isType (token, TOKEN_OPEN_PAREN))
+	{
+		/*  @(complex ? dec1 : dec2) */
+		skipArgumentList (token, include_newlines, repr);
+		TRACE_PRINT ("found @(...) style decorator");
+	}
+	else if (isType (token, TOKEN_IDENTIFIER))
+	{
+		/*  @namespace.foo (...) */
+		bool found_period = false;
+		while (1)
+		{
+			readTokenFullRaw (token, include_newlines, repr);
+			if (isType (token, TOKEN_IDENTIFIER))
+			{
+				if (!found_period)
+				{
+					TRACE_PRINT("found @namespace.bar style decorator");
+					break;
+				}
+				found_period = false;
+			}
+			else if (isType (token, TOKEN_PERIOD))
+				found_period = true;
+			else if (isType (token, TOKEN_OPEN_PAREN))
+			{
+				skipArgumentList (token, include_newlines, repr);
+				TRACE_PRINT("found @foo(...) style decorator");
+				break;
+			}
+			else
+			{
+				TRACE_PRINT("found @foo style decorator");
+				break;
+			}
+		}
+	}
+	else
+		/* Unexpected token after @ */
+		TRACE_PRINT("found unexpected token during skipping a decorator");
+}
+
+static void readTokenFull (tokenInfo *const token, bool include_newlines, vString *const repr)
+{
+	readTokenFullRaw (token, include_newlines, repr);
+
+	while (1)
+	{
+		if (!isType (token, TOKEN_ATMARK))
+			break;
+		skipBabelDecorator (token, include_newlines, repr);
+		/* @decorator0 @decorator1 ... There can be more than one decorator. */
+	}
 }
 
 #ifdef JSCRIPT_DO_DEBUGGING
