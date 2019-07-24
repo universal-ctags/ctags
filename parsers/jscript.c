@@ -137,7 +137,6 @@ typedef struct sTokenInfo {
 	unsigned long 	lineNumber;
 	MIOPos 			filePosition;
 	int				nestLevel;
-	bool			ignoreTag;
 	bool			dynamicProp;
 } tokenInfo;
 
@@ -247,7 +246,6 @@ static void clearPoolToken (void *data)
 	token->type			= TOKEN_UNDEFINED;
 	token->keyword		= KEYWORD_NONE;
 	token->nestLevel	= 0;
-	token->ignoreTag	= false;
 	token->dynamicProp  = false;
 	token->lineNumber   = getInputLineNumber ();
 	token->filePosition = getInputFilePosition ();
@@ -294,7 +292,7 @@ static void makeJsTagCommon (const tokenInfo *const token, const jsKind kind,
 							 vString *const signature, vString *const inheritance,
 							 bool anonymous)
 {
-	if (JsKinds [kind].enabled && ! token->ignoreTag )
+	if (JsKinds [kind].enabled )
 	{
 		const char *name = vStringValue (token->string);
 		vString *fullscope = vStringNewCopy (token->scope);
@@ -369,11 +367,10 @@ static void makeJsTag (const tokenInfo *const token, const jsKind kind,
 static void makeClassTagCommon (tokenInfo *const token, vString *const signature,
                           vString *const inheritance, bool anonymous)
 {
-	vString *	fulltag;
 
-	if ( ! token->ignoreTag )
+
 	{
-		fulltag = vStringNew ();
+		vString *	fulltag = vStringNew ();
 		if (vStringLength (token->scope) > 0)
 		{
 			vStringCopy(fulltag, token->scope);
@@ -403,11 +400,8 @@ static void makeClassTag (tokenInfo *const token, vString *const signature,
 static void makeFunctionTagCommon (tokenInfo *const token, vString *const signature, bool generator,
 								   bool anonymous)
 {
-	vString *	fulltag;
-
-	if ( ! token->ignoreTag )
 	{
-		fulltag = vStringNew ();
+		vString *	fulltag = vStringNew ();
 		if (vStringLength (token->scope) > 0)
 		{
 			vStringCopy(fulltag, token->scope);
@@ -1535,7 +1529,10 @@ static bool parseBlock (tokenInfo *const token, const vString *const parentScope
 static bool parseMethods (tokenInfo *const token, const tokenInfo *const class,
                           const bool is_es6_class)
 {
-	TRACE_ENTER();
+	TRACE_ENTER_TEXT("token is '%s' of type %s in classToken '%s' of type %s (es6: %s)",
+					 vStringValue(token->string), tokenTypeName (token->type),
+					 vStringValue(class->string), tokenTypeName (class->type),
+					 is_es6_class? "yes": "no");
 
 	tokenInfo *const name = newToken ();
 	bool has_methods = false;
@@ -1749,7 +1746,7 @@ cleanUp:
 	vStringDelete (saveScope);
 	deleteToken (name);
 
-	TRACE_LEAVE();
+	TRACE_LEAVE_TEXT("found method(s): %s", has_methods? "yes": "no");
 
 	return has_methods;
 }
@@ -1830,7 +1827,7 @@ static bool parseES6Class (tokenInfo *const token, const tokenInfo *targetName)
 
 static bool parseStatement (tokenInfo *const token, bool is_inside_class)
 {
-	TRACE_ENTER();
+	TRACE_ENTER_TEXT("is_inside_class: %s", is_inside_class? "yes": "no");
 
 	tokenInfo *const name = newToken ();
 	tokenInfo *const secondary_name = newToken ();
@@ -2046,7 +2043,6 @@ nextVar:
 							 * Find to the end of the statement
 							 */
 							findCmdTerm (token, false, false);
-							token->ignoreTag = false;
 							is_terminated = true;
 							goto cleanUp;
 						}
@@ -2222,9 +2218,12 @@ nextVar:
 			 * Or checks if this is a hash variable.
 			 *     var z = {};
 			 */
+			bool anonClass = vStringIsEmpty (name->string);
+			if (anonClass)
+				anonGenerate (name->string, "AnonymousClass", JSTAG_CLASS);
 			has_methods = parseMethods(token, name, false);
 			if (has_methods)
-				makeJsTag (name, JSTAG_CLASS, NULL, NULL);
+				makeJsTagCommon (name, JSTAG_CLASS, NULL, NULL, anonClass);
 			else
 			{
 				/*
@@ -2675,7 +2674,7 @@ extern parserDefinition* JavaScriptParser (void)
 {
 	// .jsx files are JSX: https://facebook.github.io/jsx/
 	// which have JS function definitions, so we just use the JS parser
-	static const char *const extensions [] = { "js", "jsx", NULL };
+	static const char *const extensions [] = { "js", "jsx", "mjs", NULL };
 	static const char *const aliases [] = { "js", "node", "nodejs",
 	                                        "seed", "gjs", NULL };
 	parserDefinition *const def = parserNew ("JavaScript");
