@@ -2,6 +2,7 @@
 Ant                  XML        base <> sub {bidirectional}
 Autoconf             M4         base <> sub {bidirectional}
 Automake             Make       base <= sub {dedicated}
+DBusIntrospect       XML        base <> sub {bidirectional}
 ITcl                 Tcl        base <> sub {bidirectional}
 Moose                Perl       base <> sub {bidirectional}
 PythonLoggingConfig  Iniconf    base <> sub {bidirectional}
