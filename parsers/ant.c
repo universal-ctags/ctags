@@ -19,6 +19,7 @@
 #ifdef HAVE_LIBXML
 #include "read.h"
 #include "selectors.h"
+#include "xml.h"
 #endif
 
 #ifdef HAVE_LIBXML
@@ -207,8 +208,22 @@ static void makeTagWithScope (xmlNode *node CTAGS_ATTR_UNUSED,
 static void
 findAntTags (void)
 {
-	findXMLTags (NULL, NULL, TABLE_MAIN, NULL);
+	scheduleRunningBaseparser (RUN_DEFAULT_SUBPARSERS);
 }
+
+static void
+runXPathEngine(xmlSubparser *s,
+			   xmlXPathContext *ctx, xmlNode *root)
+{
+	findXMLTags (ctx, root, TABLE_MAIN, NULL);
+}
+
+static xmlSubparser antSubparser = {
+	.subparser = {
+		.direction = SUBPARSER_BI_DIRECTION,
+	},
+	.runXPathEngine = runXPathEngine,
+};
 #endif
 
 extern parserDefinition* AntParser (void)
@@ -243,6 +258,9 @@ extern parserDefinition* AntParser (void)
 			.rootNSHref      = "",
 		}
 	};
+	static parserDependency dependencies [] = {
+		[0] = { DEPTYPE_SUBPARSER, "XML", &antSubparser },
+	};
 #endif
 	def->extensions = extensions;
 	def->patterns = patterns;
@@ -256,6 +274,8 @@ extern parserDefinition* AntParser (void)
 	def->selectLanguage = selectors;
 	def->xpathFileSpecs = xpathFileSpecs;
 	def->xpathFileSpecCount = ARRAY_SIZE (xpathFileSpecs);
+	def->dependencies = dependencies;
+	def->dependencyCount = ARRAY_SIZE (dependencies);
 #else
 	def->tagRegexTable = antTagRegexTable;
 	def->tagRegexCount = ARRAY_SIZE (antTagRegexTable);
