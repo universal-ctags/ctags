@@ -1,4 +1,4 @@
-Onigmo (Oniguruma-mod) Unicode Properties  Version 6.2.0    2019/01/24
+Onigmo (Oniguruma-mod) Unicode Properties  Version 6.2.1    2019/07/28
 
 * POSIX brackets
     Alpha
@@ -96,6 +96,7 @@ Onigmo (Oniguruma-mod) Unicode Properties  Version 6.2.0    2019/01/24
     Duployan
     Egyptian_Hieroglyphs
     Elbasan
+    Elymaic
     Ethiopic
     Georgian
     Glagolitic
@@ -153,10 +154,12 @@ Onigmo (Oniguruma-mod) Unicode Properties  Version 6.2.0    2019/01/24
     Multani
     Myanmar
     Nabataean
+    Nandinagari
     New_Tai_Lue
     Newa
     Nko
     Nushu
+    Nyiakeng_Puachue_Hmong
     Ogham
     Ol_Chiki
     Old_Hungarian
@@ -208,6 +211,7 @@ Onigmo (Oniguruma-mod) Unicode Properties  Version 6.2.0    2019/01/24
     Ugaritic
     Unknown
     Vai
+    Wancho
     Warang_Citi
     Yi
     Zanabazar_Square
@@ -396,6 +400,7 @@ Onigmo (Oniguruma-mod) Unicode Properties  Version 6.2.0    2019/01/24
     Dupl
     Egyp
     Elba
+    Elym
     Ethi
     Geor
     Glag
@@ -414,6 +419,7 @@ Onigmo (Oniguruma-mod) Unicode Properties  Version 6.2.0    2019/01/24
     Hira
     Hluw
     Hmng
+    Hmnp
     Hung
     Ital
     Java
@@ -448,6 +454,7 @@ Onigmo (Oniguruma-mod) Unicode Properties  Version 6.2.0    2019/01/24
     Mtei
     Mult
     Mymr
+    Nand
     Narb
     Nbat
     Nkoo
@@ -502,6 +509,7 @@ Onigmo (Oniguruma-mod) Unicode Properties  Version 6.2.0    2019/01/24
     Ugar
     Vaii
     Wara
+    Wcho
     Xpeo
     Xsux
     Yiii
@@ -515,6 +523,8 @@ Onigmo (Oniguruma-mod) Unicode Properties  Version 6.2.0    2019/01/24
     Age=1.1
     Age=10.0
     Age=11.0
+    Age=12.0
+    Age=12.1
     Age=2.0
     Age=2.1
     Age=3.0
@@ -741,6 +751,7 @@ Onigmo (Oniguruma-mod) Unicode Properties  Version 6.2.0    2019/01/24
     In_Rumi_Numeral_Symbols
     In_Old_Sogdian
     In_Sogdian
+    In_Elymaic
     In_Brahmi
     In_Kaithi
     In_Sora_Sompeng
@@ -761,6 +772,7 @@ Onigmo (Oniguruma-mod) Unicode Properties  Version 6.2.0    2019/01/24
     In_Ahom
     In_Dogra
     In_Warang_Citi
+    In_Nandinagari
     In_Zanabazar_Square
     In_Soyombo
     In_Pau_Cin_Hau
@@ -769,10 +781,12 @@ Onigmo (Oniguruma-mod) Unicode Properties  Version 6.2.0    2019/01/24
     In_Masaram_Gondi
     In_Gunjala_Gondi
     In_Makasar
+    In_Tamil_Supplement
     In_Cuneiform
     In_Cuneiform_Numbers_and_Punctuation
     In_Early_Dynastic_Cuneiform
     In_Egyptian_Hieroglyphs
+    In_Egyptian_Hieroglyph_Format_Controls
     In_Anatolian_Hieroglyphs
     In_Bamum_Supplement
     In_Mro
@@ -785,6 +799,7 @@ Onigmo (Oniguruma-mod) Unicode Properties  Version 6.2.0    2019/01/24
     In_Tangut_Components
     In_Kana_Supplement
     In_Kana_Extended_A
+    In_Small_Kana_Extension
     In_Nushu
     In_Duployan
     In_Shorthand_Format_Controls
@@ -797,9 +812,12 @@ Onigmo (Oniguruma-mod) Unicode Properties  Version 6.2.0    2019/01/24
     In_Mathematical_Alphanumeric_Symbols
     In_Sutton_SignWriting
     In_Glagolitic_Supplement
+    In_Nyiakeng_Puachue_Hmong
+    In_Wancho
     In_Mende_Kikakui
     In_Adlam
     In_Indic_Siyaq_Numbers
+    In_Ottoman_Siyaq_Numbers
     In_Arabic_Mathematical_Alphabetic_Symbols
     In_Mahjong_Tiles
     In_Domino_Tiles
@@ -815,6 +833,7 @@ Onigmo (Oniguruma-mod) Unicode Properties  Version 6.2.0    2019/01/24
     In_Supplemental_Arrows_C
     In_Supplemental_Symbols_and_Pictographs
     In_Chess_Symbols
+    In_Symbols_and_Pictographs_Extended_A
     In_CJK_Unified_Ideographs_Extension_B
     In_CJK_Unified_Ideographs_Extension_C
     In_CJK_Unified_Ideographs_Extension_D
