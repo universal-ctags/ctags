@@ -10,7 +10,7 @@ import os
 import re
 import datetime
 
-onig_ver = "6.2.0"
+onig_ver = "6.2.1"
 ucddir = "."
 
 def print_list(arr, title):
