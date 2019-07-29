@@ -1320,6 +1320,7 @@ def main():
     n("\\M#", "", err=onigmo.ONIGERR_META_CODE_SYNTAX)
     n("\\C", "", err=onigmo.ONIGERR_END_PATTERN_AT_CONTROL)
     n("\\C#", "", err=onigmo.ONIGERR_CONTROL_CODE_SYNTAX)
+    n("(?0d", "", syn=onigmo.ONIG_SYNTAX_PERL, err=onigmo.ONIGERR_INVALID_GROUP_NAME) # Issue #132
 
     # ONIG_OPTION_FIND_LONGEST option
     x2("foo|foobar", "foobar", 0, 3)
