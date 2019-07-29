@@ -100,17 +100,15 @@
 
 */
 
-#ifdef NOT_RUBY
+#ifdef RUBY
+#include "internal.h"
+#else
 #include "regint.h"
 #include "st.h"
-#else
-#include "internal.h"
 #endif
 
 #include <stdio.h>
-#ifdef HAVE_STDLIB_H
 #include <stdlib.h>
-#endif
 #include <string.h>
 #include <assert.h>
 
@@ -139,6 +137,7 @@ struct st_table_entry {
     st_data_t record;
 };
 
+#ifdef RUBY
 #define type_numhash st_hashtype_num
 static const struct st_hash_type st_hashtype_num = {
     st_numcmp,
@@ -157,6 +156,7 @@ static const struct st_hash_type type_strcasehash = {
     st_locale_insensitive_strcasecmp,
     strcasehash,
 };
+#endif /* RUBY */
 
 /* Value used to catch uninitialized entries/bins during debugging.
    There is a possibility for a false alarm, but its probability is
@@ -173,7 +173,9 @@ static const struct st_hash_type type_strcasehash = {
 #define calloc ruby_xcalloc
 #define realloc ruby_xrealloc
 #define free ruby_xfree
-#endif
+#else /* RUBY */
+#define MEMCPY(p1,p2,type,n)  memcpy((p1), (p2), sizeof(type)*(n))
+#endif /* RUBY */
 
 #define EQUAL(tab,x,y) ((x) == (y) || (*(tab)->type->compare)((x),(y)) == 0)
 #define PTR_EQUAL(tab, ptr, hash_val, key_) \
@@ -350,7 +352,7 @@ get_power2(st_index_t size)
         size >>= 1;
     if (n <= MAX_POWER2)
         return n < MINIMAL_POWER2 ? MINIMAL_POWER2 : n;
-#ifndef NOT_RUBY
+#ifdef RUBY
     /* Ran out of the table entries */
     rb_raise(rb_eRuntimeError, "st_table too big");
 #endif
@@ -563,6 +565,8 @@ stat_col(void)
     FILE *f;
     if (!collision.total) return;
     f = fopen((snprintf(fname, sizeof(fname), "/tmp/col%ld", (long)getpid()), fname), "w");
+    if (f == 0) return ;
+
     fprintf(f, "collision: %d / %d (%6.2f)\n", collision.all, collision.total,
             ((double)collision.all / (collision.total)) * 100);
     fprintf(f, "num: %d, str: %d, strcase: %d\n", collision.num, collision.str, collision.strcase);
@@ -633,6 +637,7 @@ st_init_table_with_size(const struct st_hash_type *type, st_index_t size)
     return tab;
 }
 
+#ifdef RUBY
 /* Create and return table with TYPE which can hold a minimal number
    of entries (see comments for get_power2).  */
 st_table *
@@ -697,6 +702,7 @@ st_clear(st_table *tab)
     st_check(tab);
 #endif
 }
+#endif /* RUBY */
 
 /* Free table TAB space.  */
 void
@@ -708,6 +714,7 @@ st_free_table(st_table *tab)
     free(tab);
 }
 
+#ifdef RUBY
 /* Return byte size of memory allocted for table TAB.  */
 size_t
 st_memsize(const st_table *tab)
@@ -716,6 +723,7 @@ st_memsize(const st_table *tab)
            + (tab->bins == NULL ? 0 : bins_size(tab))
            + get_allocated_entries(tab) * sizeof(st_table_entry));
 }
+#endif /* RUBY */
 
 static st_index_t
 find_table_entry_ind(st_table *tab, st_hash_t hash_value, st_data_t key);
@@ -1118,6 +1126,7 @@ st_lookup(st_table *tab, st_data_t key, st_data_t *value)
     return 1;
 }
 
+#ifdef RUBY
 /* Find an entry with KEY in table TAB.  Return non-zero if we found
    it.  Set up *RESULT to the found table entry key.  */
 int
@@ -1146,6 +1155,7 @@ st_get_key(st_table *tab, st_data_t key, st_data_t *result)
         *result = tab->entries[bin].key;
     return 1;
 }
+#endif /* RUBY */
 
 /* Check the table and rebuild it if it is necessary.  */
 static inline void
@@ -1212,6 +1222,7 @@ st_insert(st_table *tab, st_data_t key, st_data_t value)
     return 1;
 }
 
+#ifdef RUBY
 /* Insert (KEY, VALUE, HASH) into table TAB.  The table should not have
    entry with KEY before the insertion.  */
 void
@@ -1343,6 +1354,7 @@ st_copy(st_table *old_tab)
 #endif
     return new_tab;
 }
+#endif /* RUBY */
 
 /* Update the entries start of table TAB after removing an entry
    with index N in the array entries.  */
@@ -1355,6 +1367,7 @@ update_range_for_deleted(st_table *tab, st_index_t n)
         tab->entries_start = n + 1;
 }
 
+#ifdef RUBY
 /* Delete entry with KEY from table TAB, set up *VALUE (unless
    VALUE is zero) from deleted table entry, and return non-zero.  If
    there is no entry with KEY in the table, clear *VALUE (unless VALUE
@@ -1564,6 +1577,7 @@ st_update(st_table *tab, st_data_t key,
 #endif
     return existing;
 }
+#endif /* RUBY */
 
 /* Traverse all entries in table TAB calling FUNC with current entry
    key and value and zero.  If the call returns ST_STOP, stop
@@ -1684,11 +1698,13 @@ st_general_foreach(st_table *tab, int (*func)(ANYARGS), st_update_callback_func 
     return 0;
 }
 
+#ifdef RUBY
 int
 st_foreach_with_replace(st_table *tab, int (*func)(ANYARGS), st_update_callback_func *replace, st_data_t arg)
 {
     return st_general_foreach(tab, func, replace, arg, TRUE);
 }
+#endif /* RUBY */
 
 int
 st_foreach(st_table *tab, int (*func)(ANYARGS), st_data_t arg)
@@ -1696,6 +1712,7 @@ st_foreach(st_table *tab, int (*func)(ANYARGS), st_data_t arg)
     return st_general_foreach(tab, func, NULL, arg, FALSE);
 }
 
+#ifdef RUBY
 /* See comments for function st_delete_safe.  */
 int
 st_foreach_check(st_table *tab, int (*func)(ANYARGS), st_data_t arg,
@@ -2280,7 +2297,6 @@ st_rehash(st_table *tab)
     } while (rebuilt_p);
 }
 
-#ifdef RUBY
 static st_data_t
 st_stringify(VALUE key)
 {
@@ -2353,4 +2369,4 @@ rb_hash_bulk_insert_into_st_table(long argc, const VALUE *argv, VALUE hash)
     else
         st_insert_generic(tab, argc, argv, hash);
 }
-#endif
+#endif /* RUBY */
