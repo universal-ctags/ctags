@@ -14,14 +14,7 @@ extern "C" {
 #endif
 #endif
 
-#ifdef RUBY
 #include "ruby/defines.h"
-#else /* RUBY */
-#ifndef RUBY_SYMBOL_EXPORT_BEGIN
-#define RUBY_SYMBOL_EXPORT_BEGIN
-#define RUBY_SYMBOL_EXPORT_END
-#endif
-#endif /* RUBY */
 
 RUBY_SYMBOL_EXPORT_BEGIN
 
@@ -103,7 +96,7 @@ struct st_table {
 
 #define st_is_member(table,key) st_lookup((table),(key),(st_data_t *)0)
 
-enum st_retval {ST_CONTINUE, ST_STOP, ST_DELETE, ST_CHECK};
+enum st_retval {ST_CONTINUE, ST_STOP, ST_DELETE, ST_CHECK, ST_REPLACE};
 
 st_table *st_init_table(const struct st_hash_type *);
 st_table *st_init_table_with_size(const struct st_hash_type *, st_index_t);
@@ -125,6 +118,7 @@ typedef int st_update_callback_func(st_data_t *key, st_data_t *value, st_data_t 
  * results of hash() are same and compare() returns 0, otherwise the
  * behavior is undefined */
 int st_update(st_table *table, st_data_t key, st_update_callback_func *func, st_data_t arg);
+int st_foreach_with_replace(st_table *tab, int (*func)(ANYARGS), st_update_callback_func *replace, st_data_t arg);
 int st_foreach(st_table *, int (*)(ANYARGS), st_data_t);
 int st_foreach_check(st_table *, int (*)(ANYARGS), st_data_t, st_data_t);
 st_index_t st_keys(st_table *table, st_data_t *keys, st_index_t size);
@@ -136,19 +130,21 @@ void st_free_table(st_table *);
 void st_cleanup_safe(st_table *, st_data_t);
 void st_clear(st_table *);
 st_table *st_copy(st_table *);
-int st_numcmp(st_data_t, st_data_t);
-st_index_t st_numhash(st_data_t);
-int st_locale_insensitive_strcasecmp(const char *s1, const char *s2);
-int st_locale_insensitive_strncasecmp(const char *s1, const char *s2, size_t n);
+CONSTFUNC(int st_numcmp(st_data_t, st_data_t));
+CONSTFUNC(st_index_t st_numhash(st_data_t));
+PUREFUNC(int st_locale_insensitive_strcasecmp(const char *s1, const char *s2));
+PUREFUNC(int st_locale_insensitive_strncasecmp(const char *s1, const char *s2, size_t n));
 #define st_strcasecmp st_locale_insensitive_strcasecmp
 #define st_strncasecmp st_locale_insensitive_strncasecmp
-size_t st_memsize(const st_table *);
-st_index_t st_hash(const void *ptr, size_t len, st_index_t h);
-st_index_t st_hash_uint32(st_index_t h, uint32_t i);
-st_index_t st_hash_uint(st_index_t h, st_index_t i);
-st_index_t st_hash_end(st_index_t h);
-st_index_t st_hash_start(st_index_t h);
+PUREFUNC(size_t st_memsize(const st_table *));
+PUREFUNC(st_index_t st_hash(const void *ptr, size_t len, st_index_t h));
+CONSTFUNC(st_index_t st_hash_uint32(st_index_t h, uint32_t i));
+CONSTFUNC(st_index_t st_hash_uint(st_index_t h, st_index_t i));
+CONSTFUNC(st_index_t st_hash_end(st_index_t h));
+CONSTFUNC(st_index_t st_hash_start(st_index_t h));
 #define st_hash_start(h) ((st_index_t)(h))
+
+void rb_hash_bulk_insert_into_st_table(long, const VALUE *, VALUE);
 
 RUBY_SYMBOL_EXPORT_END
 
