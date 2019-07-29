@@ -1713,7 +1713,9 @@ def main():
     # These patterns need deep parse stack.
     x2("(" * 200 + "a" + ")" * 200, "a", 0, 1)
     n("(" * 2000 + "a" + ")" * 2000, "a", err=onigmo.ONIGERR_PARSE_DEPTH_LIMIT_OVER)
-    onigmo.onig_set_match_stack_limit_size(0)
+    x2("X" + "+" * 100, "X", 0, 1)
+    n("X" + "+" * 10000, "X", err=onigmo.ONIGERR_PARSE_DEPTH_LIMIT_OVER)
+    onigmo.onig_set_parse_depth_limit(0)
 
     # syntax functions
     onigmo.onig_set_syntax_op(syntax_default,
