@@ -4244,7 +4244,7 @@ endcheck:
     }
   }
 
-  return len;
+  return (int )len;
 }
 
 typedef struct {
