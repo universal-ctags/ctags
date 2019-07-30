@@ -1,0 +1,6 @@
+Example	input.js	/^class Example {$/;"	c
+doSomething	input.js	/^  doSomething() {$/;"	m	class:Example
+MyClass	input.js	/^class MyClass {$/;"	c
+my_method	input.js	/^  my_method() {}$/;"	m	class:MyClass
+YourClass	input.js	/^class YourClass {$/;"	c
+your_method	input.js	/^  @decorator @dec(arg1, arg2) @namespace.decorator @(complex ? dec1 : dec2) your_method() {}$/;"	m	class:YourClass
