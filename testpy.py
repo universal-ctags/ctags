@@ -1263,6 +1263,7 @@ def main():
     n("[c-a]", "", err=onigmo.ONIGERR_EMPTY_RANGE_IN_CHAR_CLASS)
     x2("[[:ab:\\x{30}]]+", ":ab0x", 0, 4)
     x2("[[:x\\]:]+", "[x:]", 0, 4)
+    x2("[\n\n]", "\n", 0, 1)
     x2("[!--x]+", "!-x", 0, 3)
     x2(" ]", " ]", 0, 2)    # warning: ']' without escape
     n("\\x{FFFFFFFF}", "", err=onigmo.ONIGERR_TOO_BIG_WIDE_CHAR_VALUE);
