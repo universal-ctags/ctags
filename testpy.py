@@ -1322,6 +1322,17 @@ def main():
     n("\\C", "", err=onigmo.ONIGERR_END_PATTERN_AT_CONTROL)
     n("\\C#", "", err=onigmo.ONIGERR_CONTROL_CODE_SYNTAX)
     n("(?0d", "", syn=onigmo.ONIG_SYNTAX_PERL, err=onigmo.ONIGERR_INVALID_GROUP_NAME) # Issue #132
+    if onig_encoding == onigmo.ONIG_ENCODING_UTF8:
+        n("\\x{1000000}", "", err=onigmo.ONIGERR_TOO_BIG_WIDE_CHAR_VALUE)
+    else:
+        n("\\x{1000000}", "")   # TODO: Should be an error? (code_to_mbc())
+    if onig_encoding == onigmo.ONIG_ENCODING_SJIS or \
+            onig_encoding == onigmo.ONIG_ENCODING_CP932 or \
+            onig_encoding == onigmo.ONIG_ENCODING_EUC_JP or \
+            onig_encoding == onigmo.ONIG_ENCODING_UTF8:
+        n("[\\x{1000000}]", "", err=onigmo.ONIGERR_TOO_BIG_WIDE_CHAR_VALUE)
+    else:
+        n("[\\x{1000000}]", "") # TODO: Should be an error? (code_to_mbclen())
 
     # ONIG_OPTION_FIND_LONGEST option
     x2("foo|foobar", "foobar", 0, 3)
