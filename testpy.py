@@ -1248,6 +1248,12 @@ def main():
     x2("(.)(?<a>a)(?<a>b)\\k<a>", "xaba", 0, 4)
     x2("\\p{Print}+", "\n a", 1, 3)
     x2("\\p{Graph}+", "\n a", 2, 3)
+    x2("\\p{^Space}", "x", 0, 1)
+    x2("\\P{^Space}", " ", 0, 1)
+    n("\\px", "")   # warning: invalid Unicode Property
+    x2("[\\p{^Space}]", "x", 0, 1)
+    x2("[\\P{^Space}]", " ", 0, 1)
+    n("[\\px]", "")   # warning: invalid Unicode Property
     n("a(?!b)", "ab");
     x2("(?:(.)\\1)*", "a" * 300, 0, 300)
     x2("\\cA\\C-B\\a[\\b]\\t\\n\\v\\f\\r\\e\\c?", "\x01\x02\x07\x08\x09\x0a\x0b\x0c\x0d\x1b\x7f", 0, 11)
