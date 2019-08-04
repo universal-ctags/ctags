@@ -212,6 +212,9 @@ static void leaveMoose (struct mooseSubparser *moose)
 {
 	moose->notContinuousExtendsLines = true;
 
+	if (moose->classCork == CORK_NIL)
+		return;
+
 	tagEntryInfo *e = getEntryInCorkQueue (moose->classCork);
 	Assert (e);
 	e->extensionFields.endLine = getInputLineNumber ();
