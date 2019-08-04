@@ -3,6 +3,9 @@
 
 CTAGS="$1"
 
+. ../utils.sh
+is_feature_available $CTAGS xpath
+
 ${CTAGS} --quiet --options=NONE \
 		 --list-subparsers=all \
 	| grep -v AnsiblePlaybook
