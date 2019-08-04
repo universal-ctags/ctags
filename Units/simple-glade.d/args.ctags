@@ -1,5 +1,5 @@
 --extras=+rf
---fields=+rKn
+--fields=+rKnl
 --regex-Glade=/.*SYSTEM "([^"]*)">/\1/D,DOCTYPE/
 --sort=no
 --excmd=mixed
