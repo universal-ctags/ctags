@@ -19,11 +19,6 @@
 #include "routines.h"
 #include "selectors.h"
 
-#ifdef HAVE_LIBXML
-#include <libxml/xpath.h>
-#include <libxml/tree.h>
-#endif
-
 #include <string.h>
 
 typedef enum {
@@ -172,7 +167,6 @@ static char* attachVersionIfExisting (struct sTagEntryInfo *tag, xmlNode *node)
 {
 	char *version = NULL;
 
-#ifdef HAVE_LIBXML
 	for (node = node->next; node != NULL; node = node->next)
 	{
 		if (strcmp ((char *)node->name, "version") == 0)
@@ -181,7 +175,6 @@ static char* attachVersionIfExisting (struct sTagEntryInfo *tag, xmlNode *node)
 			break;
 		}
 	}
-#endif
 	if (version)
 		attachParserField (tag, Maven2Fields [F_VERSION].ftype, version);
 	return version;

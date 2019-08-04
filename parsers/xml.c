@@ -17,10 +17,6 @@
 #include "routines.h"
 #include "selectors.h"
 
-#ifndef HAVE_LIBXML
-typedef void *xmlNsPtr;
-#endif
-
 typedef enum {
 	K_ID,
 	K_NSPREFIX,
@@ -76,8 +72,6 @@ static tagXpathTableTable xmlXpathTableTable[] = {
 static int makeNsPrefixTag (const char *name, xmlNode *node, xmlNsPtr ns)
 {
 	int n = CORK_NIL;
-
-#ifdef HAVE_LIBXML
 	tagEntryInfo tag;
 	vString *anon = NULL;
 
@@ -103,7 +97,6 @@ static int makeNsPrefixTag (const char *name, xmlNode *node, xmlNsPtr ns)
 		xmlFree (p);
 	if (anon)
 		vStringDelete (anon);
-#endif
 
 	return n;
 }
@@ -114,12 +107,10 @@ static void findNsPrefix (xmlNode *node,
 					   xmlXPathContext *ctx,
 					   void *userData)
 {
-#ifdef HAVE_LIBXML
 	for (xmlNsPtr ns = node->nsDef; ns; ns = ns->next)
 		makeNsPrefixTag ((char *)ns->prefix, node, ns);
 
 	findXMLTags (ctx, node, spec->nextTable, userData);
-#endif
 }
 
 static void
