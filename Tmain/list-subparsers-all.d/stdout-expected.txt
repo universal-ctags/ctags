@@ -15,4 +15,5 @@ RelaxNG              XML        base <> sub {bidirectional}
 SVG                  XML        base <> sub {bidirectional}
 SystemdUnit          Iniconf    base <= sub {dedicated}
 TclOO                Tcl        base <> sub {bidirectional}
+XSLT                 XML        base <> sub {bidirectional}
 YumRepo              Iniconf    base <= sub {dedicated}

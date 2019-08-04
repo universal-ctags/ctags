@@ -1,3 +1,7 @@
+xsl	input.xsl	/^  xmlns="http:\/\/www.w3.org\/TR\/REC-html40">$/;"	n	roles:def	uri:http://www.w3.org/1999/XSL/Transform
+gjdoc	input.xsl	/^  xmlns="http:\/\/www.w3.org\/TR\/REC-html40">$/;"	n	roles:def	uri:http://www.gnu.org/software/cp-tools/gjdocxml
+html	input.xsl	/^  xmlns="http:\/\/www.w3.org\/TR\/REC-html40">$/;"	n	roles:def	uri:http://www.w3.org/TR/REC-html40
+ns9777d4f00101	input.xsl	/^  xmlns="http:\/\/www.w3.org\/TR\/REC-html40">$/;"	n	roles:def	uri:http://www.w3.org/TR/REC-html40
 html_common.xsl	input.xsl	/^  <xsl:include href="html_common.xsl"\/>$/;"	s	roles:included
 /	input.xsl	/^  <xsl:template match="\/">$/;"	m	roles:def
 output_title	input.xsl	/^        <xsl:call-template name="output_title">$/;"	n	matchedTemplate:/	roles:called
