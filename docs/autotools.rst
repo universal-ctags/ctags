@@ -1,13 +1,5 @@
 Building with configure (\*nix including GNU/Linux)
 ---------------------------------------------------------------------
-
-To install Universal-ctags' dependencies on Debian-based systems, do::
-
-	$ sudo apt install \
-		  pkg-config autoconf python3-docutils \
-		  libseccomp-dev libseccomp2 \
-		  libjansson-dev libjansson4
-
 Like most Autotools-based projects, you need to do::
 
     $ ./autogen.sh
