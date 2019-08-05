@@ -5,17 +5,16 @@ To install Universal-ctags' dependencies on Debian-based systems, do::
 
 	$ sudo apt install \
 		  pkg-config autoconf python3-docutils \
-		  libseccomp-dev libseccomp2 \
-		  libjansson-dev libjansson4
+		  libseccomp-dev libjansson-dev
 
-Like most Autotools-based projects, you need to do::
+As with most Autotools-based projects, you'll need to do::
 
     $ ./autogen.sh
     $ ./configure --prefix=/where/you/want # defaults to /usr/local
     $ make
     $ make install # may require extra privileges depending on where to install
 
-After installation the `ctags` executable will be in `$prefix/bin/`.
+After installing, the `ctags` executable can be found in `$prefix/bin/`.
 
 `autogen.sh` runs `autoreconf` internally.
 If you use a (binary oriented) GNU/Linux distribution, `autoreconf` may
