@@ -289,7 +289,9 @@ static void findShTags (void)
 				while (*cp == '\t')
 					cp++;
 			}
-			if (strcmp ((const char *) cp, vStringValue (hereDocDelimiter)) == 0)
+			if ((strncmp ((const char *) cp, vStringValue (hereDocDelimiter), vStringLength (hereDocDelimiter)) == 0)
+				&& ((*(cp + vStringLength (hereDocDelimiter)) == '\0')
+					|| isspace (*(cp + vStringLength (hereDocDelimiter)) )))
 			{
 				hdocStateUpdateTag (&hstate, getInputLineNumber ());
 				hdocStateMakePromiseMaybe (&hstate);

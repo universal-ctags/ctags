@@ -54,8 +54,8 @@
 --_mtable-regex-Markdown=rest/^[^\n]+//
 
 --_mtable-regex-Markdown=main/^#///{tjump=sharp}{_advanceTo=0start}
---_mtable-regex-Markdown=main/^[ \t]*````*[^`\n]*[\n]//{tenter=codeblockBacktick}
---_mtable-regex-Markdown=main/^[ \t]*~~~~*[^~\n]*[\n]//{tenter=codeblockTildes}
+--_mtable-regex-Markdown=main/^[ \t]*````*([a-zA-Z0-9][-#+a-zA-Z0-9]*)?[^`\n]*[\n]//{tenter=codeblockBacktick}{_guest=\1,0end,}
+--_mtable-regex-Markdown=main/^[ \t]*~~~~*([a-zA-Z0-9][-#+a-zA-Z0-9]*)?[^~\n]*[\n]//{tenter=codeblockTildes}{_guest=\1,0end,}
 --_mtable-regex-Markdown=main/^([^\n]+)[\n]=+[\n]/\1/c/{_field=sectionMarker:=}
 --_mtable-regex-Markdown=main/^([^\n]+)[\n]-+[\n]/\1/s/{_field=sectionMarker:-}
 --_mtable-extend-Markdown=main+rest
@@ -77,8 +77,8 @@
 --_mtable-regex-Markdown=sharp/[\n]+//{tjump=main}
 --_mtable-regex-Markdown=sharp/^[^\n]+//{tjump=main}
 
---_mtable-regex-Markdown=codeblockBacktick/^[ \t]*````*[ \t]*[\n]//{tleave}
+--_mtable-regex-Markdown=codeblockBacktick/^[ \t]*````*[ \t]*[\n]//{tleave}{_guest=,,0start}
 --_mtable-extend-Markdown=codeblockBacktick+rest
 
---_mtable-regex-Markdown=codeblockTildes/^[ \t]*~~~~*[ \t]*[\n]//{tleave}
+--_mtable-regex-Markdown=codeblockTildes/^[ \t]*~~~~*[ \t]*[\n]//{tleave}{_guest=,,0start}
 --_mtable-extend-Markdown=codeblockTildes+rest

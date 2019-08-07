@@ -6,6 +6,7 @@ OPTLIB2C_INPUT = \
 	optlib/elixir.ctags		\
 	optlib/elm.ctags		\
 	optlib/gdbinit.ctags			\
+	optlib/inko.ctags			\
 	optlib/man.ctags			\
 	optlib/markdown.ctags			\
 	optlib/passwd.ctags			\
@@ -13,6 +14,5 @@ OPTLIB2C_INPUT = \
 	optlib/qemuhx.ctags			\
 	optlib/puppetManifest.ctags		\
 	optlib/systemtap.ctags			\
-	optlib/inko.ctags			\
 	\
 	$(NULL)
