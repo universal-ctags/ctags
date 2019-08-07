@@ -1,0 +1,19 @@
+<!-- Derived from https://developer.mozilla.org/en/docs/Web/SVG/Element/defs -->
+<svg width="80px" height="30px" viewBox="0 0 80 30"
+     xmlns="http://www.w3.org/2000/svg">
+
+  <defs>
+    <linearGradient id="Gradient01">
+      <stop offset="20%" stop-color="#39F" />
+      <stop offset="90%" stop-color="#F3F" />
+    </linearGradient>
+    <linearGradient id="Gradient02">
+      <stop offset="20%" stop-color="#39F" />
+      <stop offset="90%" stop-color="#F3F" />
+    </linearGradient>
+  </defs>
+
+  <rect x="10" y="10" width="60" height="10"
+        fill="url(#Gradient01)"  />
+</svg>
+

@@ -15,6 +15,7 @@
 #include "parse.h"
 #include "read.h"
 #include "routines.h"
+#include "xml.h"
 
 
 typedef enum {
@@ -34,12 +35,10 @@ static roleDefinition GladeHandlerRoles [] = {
 };
 
 typedef enum {
-	K_ID, K_CLASS, K_HANDLER,
+	K_CLASS, K_HANDLER,
 } gladeKind;
 
 static kindDefinition GladeKinds [] = {
-	{ true,  'i', "id",	  "identifiers" },
-
 	/* These two are appeared on names in C source code. */
 	{ true,  'c', "class",	  "classes",
 	  .referenceOnly = true, ATTACH_ROLES (GladeClassRoles) },
@@ -48,10 +47,6 @@ static kindDefinition GladeKinds [] = {
 };
 
 static tagXpathTable gladeXpathMainTable[] = {
-	{ "///glade-interface//widget//@id",
-	  LXPATH_TABLE_DO_MAKE,
-	  { .makeTagSpec = { K_ID, ROLE_DEFINITION_INDEX } }
-	},
 	{ "///glade-interface//widget//@class",
 	  LXPATH_TABLE_DO_MAKE,
 	  { .makeTagSpec = { K_CLASS, R_CLASS_WIDGET } }
@@ -73,14 +68,32 @@ static tagXpathTableTable gladeXpathTableTable[] = {
 static void
 findGladeTags (void)
 {
-	findXMLTags (NULL, NULL, TABLE_MAIN, NULL);
+	scheduleRunningBaseparser (RUN_DEFAULT_SUBPARSERS);
 }
+
+
+static void
+runXPathEngine(xmlSubparser *s,
+			   xmlXPathContext *ctx, xmlNode *root)
+{
+	findXMLTags (ctx, root, TABLE_MAIN, NULL);
+}
+
+static xmlSubparser gladeSubparser = {
+	.subparser = {
+		.direction = SUBPARSER_BI_DIRECTION,
+	},
+	.runXPathEngine = runXPathEngine,
+};
 
 extern parserDefinition*
 GladeParser (void)
 {
 	static const char *const extensions [] = { "glade", NULL };
 	parserDefinition* const def = parserNew ("Glade");
+	static parserDependency dependencies [] = {
+		[0] = { DEPTYPE_SUBPARSER, "XML", &gladeSubparser },
+	};
 
 	def->kindTable         = GladeKinds;
 	def->kindCount     = ARRAY_SIZE (GladeKinds);
@@ -88,5 +101,7 @@ GladeParser (void)
 	def->parser        = findGladeTags;
 	def->tagXpathTableTable  = gladeXpathTableTable;
 	def->tagXpathTableCount  = ARRAY_SIZE (gladeXpathTableTable);
+	def->dependencies = dependencies;
+	def->dependencyCount = ARRAY_SIZE (dependencies);
 	return def;
 }

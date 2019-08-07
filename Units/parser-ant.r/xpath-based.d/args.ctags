@@ -1,3 +1,3 @@
 --language-force=ant
 --extras=+r
---fields=+r
+--fields=+rl

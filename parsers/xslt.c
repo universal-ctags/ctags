@@ -21,6 +21,7 @@
 #include "read.h"
 #include "routines.h"
 #include "selectors.h"
+#include "xml.h"
 
 typedef enum {
 	K_STYLESHEET,
@@ -312,16 +313,33 @@ static void makeTagWithProvidingScope (xmlNode *node CTAGS_ATTR_UNUSED,
 static void
 findXsltTags (void)
 {
-	int scopeIndex = CORK_NIL;
-
-	findXMLTags (NULL, NULL, TABLE_MAIN, &scopeIndex);
+	scheduleRunningBaseparser (RUN_DEFAULT_SUBPARSERS);
 }
+
+static void
+runXPathEngine(xmlSubparser *s,
+			   xmlXPathContext *ctx, xmlNode *root)
+{
+	int corkIndex = CORK_NIL;
+
+	findXMLTags (ctx, root, TABLE_MAIN, &corkIndex);
+}
+
+static xmlSubparser xsltSubparser = {
+	.subparser = {
+		.direction = SUBPARSER_BI_DIRECTION,
+	},
+	.runXPathEngine = runXPathEngine,
+};
 
 extern parserDefinition*
 XsltParser (void)
 {
 	static const char *const extensions [] = { "xsl", "xslt", NULL };
 	parserDefinition* const def = parserNew ("XSLT");
+	static parserDependency dependencies [] = {
+		[0] = { DEPTYPE_SUBPARSER, "XML", &xsltSubparser },
+	};
 
 	def->kindTable         = XsltKinds;
 	def->kindCount     = ARRAY_SIZE (XsltKinds);
@@ -330,5 +348,8 @@ XsltParser (void)
 	def->tagXpathTableTable = xsltXpathTableTable;
 	def->tagXpathTableCount = ARRAY_SIZE (xsltXpathTableTable);
 	def->useCork = true;
+	def->dependencies = dependencies;
+	def->dependencyCount = ARRAY_SIZE (dependencies);
+
 	return def;
 }

@@ -16,36 +16,49 @@
 #include "parse.h"
 #include "read.h"
 #include "routines.h"
+#include "xml.h"
 
+#include <string.h>
 
 typedef enum {
-	K_ID,
+	K_DEF,
 } svgKind;
 
 static kindDefinition SvgKinds [] = {
-	{ true,  'i', "id", "id attributes" },
-};
-
-static tagXpathTable svgXpathMainTable [] = {
-	{ "//*[local-name()='svg']//*/@id",
-	  LXPATH_TABLE_DO_MAKE,
-	  { .makeTagSpec = {K_ID, ROLE_DEFINITION_INDEX } }
-	},
-};
-
-enum svgXpathTable {
-	TABLE_MAIN,
-};
-
-static tagXpathTableTable svgXpathTableTable[] = {
-	[TABLE_MAIN] = { ARRAY_AND_SIZE (svgXpathMainTable) },
+	{ true,  'd', "def", "ids in defs tags" },
 };
 
 static void
 findSvgTags (void)
 {
-	findXMLTags (NULL, NULL, TABLE_MAIN, NULL);
+	scheduleRunningBaseparser (RUN_DEFAULT_SUBPARSERS);
 }
+
+static void
+makeTagEntryWithNodeNotify (xmlSubparser *s,
+							xmlNode *node,
+							tagEntryInfo *xmlTag)
+{
+	if (node->type == XML_ATTRIBUTE_NODE
+		&& (strcmp ((char *)node->name, "id") == 0)
+		&& node->parent && node->parent->parent
+		&& node->parent->parent->type == XML_ELEMENT_NODE
+		&& (strcmp ((char *)node->parent->parent->name, "defs") == 0))
+	{
+		tagEntryInfo tag;
+		initTagEntry (&tag, xmlTag->name, K_DEF);
+		tag.filePosition = xmlTag->filePosition;
+		tag.lineNumber = xmlTag->lineNumber;
+		makeTagEntry (&tag);
+	}
+}
+
+static xmlSubparser svgSubparser = {
+	.subparser = {
+		.direction = SUBPARSER_BI_DIRECTION,
+	},
+	.makeTagEntryWithNodeNotify = makeTagEntryWithNodeNotify,
+};
 
 extern parserDefinition*
 SvgParser (void)
@@ -53,11 +66,16 @@ SvgParser (void)
 	static const char *const extensions [] = { "svg", NULL };
 	parserDefinition* const def = parserNew ("SVG");
 
+	static parserDependency dependencies [] = {
+		[0] = { DEPTYPE_SUBPARSER, "XML", &svgSubparser },
+	};
+
+	def->dependencies = dependencies;
+	def->dependencyCount = ARRAY_SIZE (dependencies);
+
 	def->kindTable         = SvgKinds;
 	def->kindCount     = ARRAY_SIZE (SvgKinds);
 	def->extensions    = extensions;
 	def->parser        = findSvgTags;
-	def->tagXpathTableTable = svgXpathTableTable;
-	def->tagXpathTableCount = ARRAY_SIZE (svgXpathTableTable);
 	return def;
 }

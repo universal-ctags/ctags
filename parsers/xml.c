@@ -16,10 +16,14 @@
 #include "read.h"
 #include "routines.h"
 #include "selectors.h"
+#include "subparser.h"
+#include "xml.h"
 
-#ifndef HAVE_LIBXML
-typedef void *xmlNsPtr;
-#endif
+static void makeTagWithNotification (xmlNode *node,
+									 const char *xpath,
+									 const tagXpathMakeTagSpec *spec,
+									 tagEntryInfo *tag,
+									 void *userData);
 
 typedef enum {
 	K_ID,
@@ -64,7 +68,8 @@ static tagXpathTable XmlXpathMainTable [] = {
 static tagXpathTable XmlXpathIdTable [] = {
 	{ "./@id",
 	  LXPATH_TABLE_DO_MAKE,
-	  { .makeTagSpec = { K_ID, ROLE_DEFINITION_INDEX } }
+	  { .makeTagSpec = { K_ID, ROLE_DEFINITION_INDEX,
+						 .make = makeTagWithNotification,} }
 	},
 };
 
@@ -73,14 +78,49 @@ static tagXpathTableTable xmlXpathTableTable[] = {
 	[TABLE_ID]   = { ARRAY_AND_SIZE (XmlXpathIdTable) },
 };
 
+static int makeTagWithNotificationCommon (tagEntryInfo *tag,
+										   xmlNode *node)
+{
+	int n = makeTagEntry (tag);
+
+	subparser *sub;
+	foreachSubparser (sub, false)
+	{
+		xmlSubparser *xmlsub = (xmlSubparser *)sub;
+
+		if (xmlsub->makeTagEntryWithNodeNotify)
+		{
+			enterSubparser(sub);
+			xmlsub->makeTagEntryWithNodeNotify (xmlsub, node, tag);
+			leaveSubparser();
+		}
+	}
+	return n;
+}
+
+static void makeTagWithNotification (xmlNode *node,
+									 const char *xpath CTAGS_ATTR_UNUSED,
+									 const tagXpathMakeTagSpec *spec CTAGS_ATTR_UNUSED,
+									 tagEntryInfo *tag,
+									 void *userData CTAGS_ATTR_UNUSED)
+{
+	makeTagWithNotificationCommon (tag, node);
+}
+
 static int makeNsPrefixTag (const char *name, xmlNode *node, xmlNsPtr ns)
 {
 	int n = CORK_NIL;
-
-#ifdef HAVE_LIBXML
 	tagEntryInfo tag;
+	vString *anon = NULL;
 
-	initTagEntry (&tag, name, K_NSPREFIX);
+	if (name)
+		initTagEntry (&tag, name, K_NSPREFIX);
+	else
+	{
+		anon = anonGenerateNew ("ns", K_NSPREFIX);
+		initTagEntry (&tag, vStringValue (anon), K_NSPREFIX);
+		markTagExtraBit (&tag, XTAG_ANONYMOUS);
+	}
 	/* TODO
 	 * - move this code block to lxpath.c.
 	 * - adjust the line number for nsprefixes forward. */
@@ -90,10 +130,11 @@ static int makeNsPrefixTag (const char *name, xmlNode *node, xmlNsPtr ns)
 	if (ns->href && *ns->href)
 		attachParserField (&tag, XmlFields [F_NS_URI].ftype, (char *)ns->href);
 
-	n = makeTagEntry (&tag);
+	n = makeTagWithNotificationCommon (&tag, node);
 	if (p)
 		xmlFree (p);
-#endif
+	if (anon)
+		vStringDelete (anon);
 
 	return n;
 }
@@ -104,28 +145,31 @@ static void findNsPrefix (xmlNode *node,
 					   xmlXPathContext *ctx,
 					   void *userData)
 {
-#ifdef HAVE_LIBXML
-	if (node->ns && node->ns->prefix == NULL)
-	{
-		vString *prefix = anonGenerateNew ("ns", K_NSPREFIX);
-		makeNsPrefixTag (vStringValue (prefix), node, node->ns);
-		vStringDelete (prefix);
-	}
-
 	for (xmlNsPtr ns = node->nsDef; ns; ns = ns->next)
-	{
-		if (ns->prefix)
-			makeNsPrefixTag ((char *)ns->prefix, node, ns);
-	}
+		makeNsPrefixTag ((char *)ns->prefix, node, ns);
 
 	findXMLTags (ctx, node, spec->nextTable, userData);
-#endif
+}
+
+static void runAfter (xmlXPathContext *ctx, xmlNode *root, void *user_data)
+{
+	subparser *sub;
+	foreachSubparser (sub, false)
+	{
+		xmlSubparser *xmlsub = (xmlSubparser *)sub;
+		if (xmlsub->runXPathEngine)
+		{
+			enterSubparser(sub);
+			xmlsub->runXPathEngine (xmlsub, ctx, root);
+			leaveSubparser();
+		}
+	}
 }
 
 static void
 findXmlTags (void)
 {
-	findXMLTags (NULL, NULL, TABLE_MAIN, NULL);
+	findXMLTagsFull (NULL, NULL, TABLE_MAIN, runAfter, NULL);
 }
 
 extern parserDefinition*

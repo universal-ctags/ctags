@@ -1,0 +1,10 @@
+cc	input.svg	/^   width="12cm">$/;"	n	uri:http://creativecommons.org/ns#
+dc	input.svg	/^   width="12cm">$/;"	n	uri:http://purl.org/dc/elements/1.1/
+defs10	input.svg	/^     id="defs10" \/>$/;"	i	xpath:/*/*[2]/@id
+desc4	input.svg	/^     id="desc4">RECTANGLE<\/desc>$/;"	i	xpath:/*/*[3]/@id
+metadata12	input.svg	/^     id="metadata12">$/;"	i	xpath:/*/*[1]/@id
+ns380f7e730101	input.svg	/^   width="12cm">$/;"	n	uri:http://www.w3.org/2000/svg
+rdf	input.svg	/^   width="12cm">$/;"	n	uri:http://www.w3.org/1999/02/22-rdf-syntax-ns#
+rect6	input.svg	/^     x="19.018383" \/>$/;"	i	xpath:/*/*[4]/@id
+svg	input.svg	/^   width="12cm">$/;"	n	uri:http://www.w3.org/2000/svg
+svg2	input.svg	/^   width="12cm">$/;"	i	xpath:/*/@id

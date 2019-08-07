@@ -19,6 +19,7 @@
 #include "read.h"
 #include "routines.h"
 #include "strlist.h"
+#include "xml.h"
 
 
 typedef enum {
@@ -154,14 +155,31 @@ static void makeTagWithScope (xmlNode *node CTAGS_ATTR_UNUSED,
 static void
 findPlistTags (void)
 {
-	findXMLTags (NULL, NULL, TABLE_MAIN, NULL);
+	scheduleRunningBaseparser (RUN_DEFAULT_SUBPARSERS);
 }
+
+static void
+runXPathEngine(xmlSubparser *s,
+			   xmlXPathContext *ctx, xmlNode *root)
+{
+	findXMLTags (ctx, root, TABLE_MAIN, NULL);
+}
+
+static xmlSubparser plistSubparser = {
+	.subparser = {
+		.direction = SUBPARSER_BI_DIRECTION,
+	},
+	.runXPathEngine = runXPathEngine,
+};
 
 extern parserDefinition*
 PlistXMLParser (void)
 {
 	static const char *const extensions [] = { "plist", NULL };
 	parserDefinition* const def = parserNew ("PlistXML");
+	static parserDependency dependencies [] = {
+		[0] = { DEPTYPE_SUBPARSER, "XML", &plistSubparser },
+	};
 
 	def->kindTable         = PlistKinds;
 	def->kindCount     = ARRAY_SIZE (PlistKinds);
@@ -169,5 +187,8 @@ PlistXMLParser (void)
 	def->parser        = findPlistTags;
 	def->tagXpathTableTable  = plistXpathTableTable;
 	def->tagXpathTableCount  = ARRAY_SIZE (plistXpathTableTable);
+	def->dependencies = dependencies;
+	def->dependencyCount = ARRAY_SIZE (dependencies);
+
 	return def;
 }

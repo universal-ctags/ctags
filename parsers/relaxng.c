@@ -16,6 +16,7 @@
 #include "entry.h"
 #include "parse.h"
 #include "read.h"
+#include "xml.h"
 
 typedef enum {
 	K_ELEMENT,
@@ -208,9 +209,7 @@ makeTagWithUpdatingScope (xmlNode *node CTAGS_ATTR_UNUSED,
 static void
 findRelaxNGTags (void)
 {
-	int corkIndex = CORK_NIL;
-
-	findXMLTags (NULL, NULL, TABLE_MAIN, &corkIndex);
+	scheduleRunningBaseparser (RUN_DEFAULT_SUBPARSERS);
 }
 
 static void
@@ -225,12 +224,31 @@ makeTagWithScope (xmlNode *node CTAGS_ATTR_UNUSED,
 	makeTagEntry (tag);
 }
 
+static void
+runXPathEngine(xmlSubparser *s,
+			   xmlXPathContext *ctx, xmlNode *root)
+{
+	int corkIndex = CORK_NIL;
+
+	findXMLTags (ctx, root, TABLE_MAIN, &corkIndex);
+}
+
+static xmlSubparser relaxngSubparser = {
+	.subparser = {
+		.direction = SUBPARSER_BI_DIRECTION,
+	},
+	.runXPathEngine = runXPathEngine,
+};
+
 extern parserDefinition*
 RelaxNGParser (void)
 {
 	static const char *const extensions [] = { "rng", NULL };
 	parserDefinition* const def = parserNew ("RelaxNG");
 	/* static selectLanguage selectors[] = { selectByDTD, NULL }; */
+	static parserDependency dependencies [] = {
+		[0] = { DEPTYPE_SUBPARSER, "XML", &relaxngSubparser },
+	};
 
 	def->kindTable         = RelaxNGKinds;
 	def->kindCount     = ARRAY_SIZE (RelaxNGKinds);
@@ -240,5 +258,8 @@ RelaxNGParser (void)
 	def->tagXpathTableCount = ARRAY_SIZE (relaxngXpathTableTable);
 	def->useCork = true;
 	/* def->selectLanguage = selectors; */
+	def->dependencies = dependencies;
+	def->dependencyCount = ARRAY_SIZE (dependencies);
+
 	return def;
 }

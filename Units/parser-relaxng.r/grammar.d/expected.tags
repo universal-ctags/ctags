@@ -1,3 +1,6 @@
+ns47c728eb0101	input.rng	26;"	n	uri:http://relaxng.org/ns/structure/1.0
+a	input.rng	26;"	n	uri:http://relaxng.org/ns/annotation/1.0
+gjdoc	input.rng	26;"	n	uri:http://www.gnu.org/software/cp-tools/gjdocxml
 firstSentenceTags-element	input.rng	34;"	n
 gjdoc:firstSentenceTags	input.rng	39;"	e	namedPattern:firstSentenceTags-element
 inlineTags-element	input.rng	44;"	n

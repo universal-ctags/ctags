@@ -24,6 +24,7 @@
 #include "read.h"
 #include "routines.h"
 #include "selectors.h"
+#include "xml.h"
 
 #include <string.h>
 
@@ -201,13 +202,26 @@ static int decideKindForMainName (xmlNode *node CTAGS_ATTR_UNUSED,
 static void
 findDbusIntrospectTags (void)
 {
+	scheduleRunningBaseparser (RUN_DEFAULT_SUBPARSERS);
+}
+
+static void
+runXPathEngine(xmlSubparser *s,
+			   xmlXPathContext *ctx, xmlNode *root)
+{
 	struct dbusIntrospectData data = {
 		.scopeIndex = CORK_NIL,
 		.kindForName = KIND_GHOST_INDEX,
 	};
-
-	findXMLTags (NULL, NULL, TABLE_ROOT, &data);
+	findXMLTags (ctx, root, TABLE_ROOT, &data);
 }
+
+static xmlSubparser dbusIntrospectSubparser = {
+	.subparser = {
+		.direction = SUBPARSER_BI_DIRECTION,
+	},
+	.runXPathEngine = runXPathEngine,
+};
 
 extern parserDefinition*
 DbusIntrospectParser (void)
@@ -239,6 +253,9 @@ DbusIntrospectParser (void)
 			.rootNSHref      = "",
 		},
 	};
+	static parserDependency dependencies [] = {
+		[0] = { DEPTYPE_SUBPARSER, "XML", &dbusIntrospectSubparser },
+	};
 	def->kindTable         = DbusIntrospectKinds;
 	def->kindCount     = ARRAY_SIZE (DbusIntrospectKinds);
 	def->extensions    = extensions;
@@ -249,6 +266,8 @@ DbusIntrospectParser (void)
 	def->selectLanguage = selectors;
 	def->xpathFileSpecs = xpathFileSpecs;
 	def->xpathFileSpecCount = ARRAY_SIZE (xpathFileSpecs);
+	def->dependencies = dependencies;
+	def->dependencyCount = ARRAY_SIZE (dependencies);
 
 	return def;
 }

@@ -18,11 +18,7 @@
 #include "read.h"
 #include "routines.h"
 #include "selectors.h"
-
-#ifdef HAVE_LIBXML
-#include <libxml/xpath.h>
-#include <libxml/tree.h>
-#endif
+#include "xml.h"
 
 #include <string.h>
 
@@ -172,7 +168,6 @@ static char* attachVersionIfExisting (struct sTagEntryInfo *tag, xmlNode *node)
 {
 	char *version = NULL;
 
-#ifdef HAVE_LIBXML
 	for (node = node->next; node != NULL; node = node->next)
 	{
 		if (strcmp ((char *)node->name, "version") == 0)
@@ -181,7 +176,6 @@ static char* attachVersionIfExisting (struct sTagEntryInfo *tag, xmlNode *node)
 			break;
 		}
 	}
-#endif
 	if (version)
 		attachParserField (tag, Maven2Fields [F_VERSION].ftype, version);
 	return version;
@@ -242,8 +236,22 @@ static void makeTagRecursively (xmlNode *node,
 static void
 findMaven2Tags (void)
 {
-	findMaven2TagsForTable (TABLE_MAIN, NULL, NULL);
+	scheduleRunningBaseparser (RUN_DEFAULT_SUBPARSERS);
 }
+
+static void
+runXPathEngine(xmlSubparser *s,
+			   xmlXPathContext *ctx, xmlNode *root)
+{
+	findMaven2TagsForTable (TABLE_MAIN, root, ctx);
+}
+
+static xmlSubparser maven2Subparser = {
+	.subparser = {
+		.direction = SUBPARSER_BI_DIRECTION,
+	},
+	.runXPathEngine = runXPathEngine,
+};
 
 extern parserDefinition*
 Maven2Parser (void)
@@ -259,6 +267,13 @@ Maven2Parser (void)
 			.rootNSHref      = "http://maven.apache.org/POM/4.0.0",
 		},
 	};
+
+	static parserDependency dependencies [] = {
+		[0] = { DEPTYPE_SUBPARSER, "XML", &maven2Subparser },
+	};
+
+	def->dependencies = dependencies;
+	def->dependencyCount = ARRAY_SIZE (dependencies);
 
 	def->kindTable         = Maven2Kinds;
 	def->kindCount     = ARRAY_SIZE (Maven2Kinds);
