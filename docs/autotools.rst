@@ -3,7 +3,7 @@ Building with configure (\*nix including GNU/Linux)
 
 If you are going to build Universal-ctags on a popular GNU/Linux
 distribution, you can install the tools and libraries that Universal-ctags
-requires (or may use) as packages. See `GNU/Linux distribution`_ about
+requires (or may use) as packages. See `GNU/Linux distributions`_ about
 the packages.
 
 Like most Autotools-based projects, you need to do::
@@ -20,7 +20,7 @@ If you use a (binary oriented) GNU/Linux distribution, `autoreconf` may
 be part of the `autoconf` package. In addition you may have to install
 `automake` and/or `pkg-config`, too.
 
-GNU/Linux distribution
+GNU/Linux distributions
 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 
 Before running ./autogen.sh, install some packages.
@@ -35,6 +35,17 @@ On Debian-based systems, do::
         libjansson-dev \
         libyaml-dev \
         libxml2-dev
+
+On Fedora systems, do::
+
+    $ sudo dnf install \
+        gcc make \
+        pkgconfig autoconf automake \
+        python3-docutils \
+        libseccomp-devel \
+        jansson-devel \
+        libyaml-devel \
+        libxml2-devel
 
 Changing the executable's name
 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
