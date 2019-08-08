@@ -1,12 +1,10 @@
 Building with configure (\*nix including GNU/Linux)
 ---------------------------------------------------------------------
 
-To install Universal-ctags' dependencies on Debian-based systems, do::
-
-	$ sudo apt install \
-		  pkg-config autoconf python3-docutils \
-		  libseccomp-dev libseccomp2 \
-		  libjansson-dev libjansson4
+If you are going to build Universal-ctags on a popular GNU/Linux
+distribution, you can install the tools and libraries that Universal-ctags
+requires (or may use) as packages. See `GNU/Linux distributions`_ about
+the packages.
 
 Like most Autotools-based projects, you need to do::
 
@@ -21,6 +19,33 @@ After installation the `ctags` executable will be in `$prefix/bin/`.
 If you use a (binary oriented) GNU/Linux distribution, `autoreconf` may
 be part of the `autoconf` package. In addition you may have to install
 `automake` and/or `pkg-config`, too.
+
+GNU/Linux distributions
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+
+Before running ./autogen.sh, install some packages.
+
+On Debian-based systems, do::
+
+    $ sudo apt install \
+        gcc make \
+        pkg-config autoconf automake \
+        python3-docutils \
+        libseccomp-dev \
+        libjansson-dev \
+        libyaml-dev \
+        libxml2-dev
+
+On Fedora systems, do::
+
+    $ sudo dnf install \
+        gcc make \
+        pkgconfig autoconf automake \
+        python3-docutils \
+        libseccomp-devel \
+        jansson-devel \
+        libyaml-devel \
+        libxml2-devel
 
 Changing the executable's name
 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
