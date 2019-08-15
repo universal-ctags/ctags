@@ -54,3 +54,8 @@ options	input.ts	/^  longArgsFun(options: {$/;"	z	method:A.longArgsFun
 closure	input.ts	/^  closure($/;"	m	class:A
 x	input.ts	/^    x: number,$/;"	z	method:A.closure
 normalizedPath	input.ts	/^    const normalizedPath = path === '\/*' ? '' : path;$/;"	C	method:A.closure
+X	input.ts	/^class X {$/;"	c
+f	input.ts	/^    public f(a: T): number {$/;"	m	class:X
+a	input.ts	/^    public f(a: T): number {$/;"	z	method:X.f
+g	input.ts	/^    public g(a: T): number {$/;"	m	class:X
+a	input.ts	/^    public g(a: T): number {$/;"	z	method:X.g

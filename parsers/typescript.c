@@ -753,11 +753,16 @@ static bool tryInSequence(tokenInfo *const token, bool skipUnparsed, ...)
 
 	if (skipUnparsed && ! result)
 	{
-		int c;
+		bool skippedNextWord = false;
+		int c = uwiGetC ();
 
-		do {
+		while (c != EOF && isIdentChar(c))
+		{
 			c = uwiGetC ();
-		} while (c != EOF && isIdentChar(c));
+			skippedNextWord = true;
+		}
+
+		if (c != EOF && skippedNextWord) uwiUngetC (c);
 
 		return c != EOF;
 	}
