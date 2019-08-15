@@ -40,3 +40,11 @@ async function fn(): Promise<number> {
 function isCat(a: Animal): a is Cat {
   return a.name === 'kitty';
 }
+
+var foo = function() {
+  console.log();
+};
+
+var foo2 = () => {
+  console.log();
+};

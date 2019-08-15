@@ -1150,18 +1150,20 @@ static void parseEnum (const int scope, tokenInfo *const token)
 	parseEnumBody (nscope, token);
 }
 
-MULTI_CHAR_PARSER_DEF (VariableChars, "|&=?[]{})\n:;,.=-+/^<>*",
+MULTI_CHAR_PARSER_DEF (VariableChars, "|&=?[]{}()\n:;,.=-+/^<>*",
 		TOKEN_PIPE, TOKEN_AMPERSAND, TOKEN_EQUAL_SIGN, TOKEN_QUESTION_MARK,
 		TOKEN_OPEN_SQUARE, TOKEN_CLOSE_SQUARE, TOKEN_OPEN_CURLY, TOKEN_CLOSE_CURLY,
-		TOKEN_CLOSE_PAREN, TOKEN_NL, TOKEN_COLON, TOKEN_SEMICOLON, TOKEN_COMMA, TOKEN_PERIOD,
-		TOKEN_EQUAL_SIGN, TOKEN_MINUS, TOKEN_PLUS, TOKEN_DIV, TOKEN_POWER, TOKEN_GREATER,
-		TOKEN_STAR)
+		TOKEN_OPEN_PAREN, TOKEN_CLOSE_PAREN, TOKEN_NL, TOKEN_COLON, TOKEN_SEMICOLON,
+		TOKEN_COMMA, TOKEN_PERIOD, TOKEN_EQUAL_SIGN, TOKEN_MINUS, TOKEN_PLUS,
+		TOKEN_DIV, TOKEN_POWER, TOKEN_GREATER, TOKEN_STAR)
 static void parseVariable (bool constVar, bool localVar, const int scope, tokenInfo *const token)
 {
 	tokenInfo *member = NULL;
 	bool parsed = false;
 	bool parsingType = false;
-	int nestLevel = 0;
+	bool mayBeFun = false;
+	bool isFunction = false;
+	int nestLevel = 0, parenLevel = 0;
 	tsKind varKind = constVar ? TSTAG_CONSTANT : (localVar ? TSTAG_LOCAL : TSTAG_VARIABLE);
 
 	do
@@ -1174,11 +1176,11 @@ static void parseVariable (bool constVar, bool localVar, const int scope, tokenI
 								parseStringSQuote,
 								parseStringDQuote,
 								parseStringTemplate,
-								parseParens,
 								parseNumber,
 								parseArrow,
 								parseAwaitKeyword,
 								parseForKeyword,
+								parseFunctionKeyword,
 								parseWhileKeyword,
 								parseThisKeyword,
 								parseEnumKeyword,
@@ -1198,16 +1200,26 @@ static void parseVariable (bool constVar, bool localVar, const int scope, tokenI
 				case TOKEN_OPEN_CURLY:
 					nestLevel += 1;
 					break;
+				case TOKEN_OPEN_PAREN:
+					parenLevel += 1;
+					nestLevel += 1;
+					if (mayBeFun) isFunction = true;
+					break;
 				case TOKEN_CLOSE_SQUARE:
+					nestLevel -= 1;
+					break;
+				case TOKEN_CLOSE_PAREN:
+					parenLevel -= 1;
+					nestLevel -= 1;
+					break;
 				case TOKEN_CLOSE_CURLY:
 					nestLevel -= 1;
+					if (nestLevel <= 0) isFunction = false;
 					break;
 				case TOKEN_COMMA:
 				case TOKEN_SEMICOLON:
-				case TOKEN_CLOSE_PAREN:
 				case TOKEN_NUMBER:
 				case TOKEN_STRING:
-				case TOKEN_PARENS:
 					if (nestLevel <= 0)
 					{
 						parsingType = false;
@@ -1228,8 +1240,11 @@ static void parseVariable (bool constVar, bool localVar, const int scope, tokenI
 				case TOKEN_EQUAL_SIGN:
 					parsingType = true;
 					break;
+				case TOKEN_ARROW:
+					isFunction = true;
+					break;
 				case TOKEN_IDENTIFIER:
-					if (! parsingType)
+					if (parenLevel <= 0 && ! isFunction && ! parsingType)
 					{
 						member = newToken ();
 						copyToken (member, token, false);
@@ -1255,10 +1270,14 @@ static void parseVariable (bool constVar, bool localVar, const int scope, tokenI
 					}
 					break;
 				default:
+					if (nestLevel <= 0) parsingType = false;
 					break;
 			}
+
+			if (isType (token, TOKEN_EQUAL_SIGN) || isKeyword (token, KEYWORD_function)) mayBeFun = true;
+			else if (! isType(token, TOKEN_COMMENT_BLOCK) && nestLevel <= 0) mayBeFun = false;
 		}
-	} while (parsed && ! ((token->type == TOKEN_SEMICOLON || token->type == TOKEN_CLOSE_PAREN || token->type == TOKEN_NL) && ! parsingType && nestLevel <= 0));
+	} while (parsed && ! ((token->type == TOKEN_SEMICOLON || (token->type == TOKEN_CLOSE_PAREN && ! isFunction) || token->type == TOKEN_NL) && ! parsingType && nestLevel <= 0));
 
 	clearPoolToken (token);
 }
