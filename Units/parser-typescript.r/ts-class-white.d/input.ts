@@ -116,3 +116,11 @@ class X {
 class C extends A implements B, D {
     x: number
 }
+
+class Ct<T> extends A<T> implements B<T>, D, E<T> {
+    x: number
+}
+
+class A<T> implements I<T>
+{
+}

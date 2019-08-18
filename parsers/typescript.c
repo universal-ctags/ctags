@@ -85,11 +85,13 @@ enum eKeywordId {
 	KEYWORD_constructor,
 	KEYWORD_const,
 	KEYWORD_enum,
+	KEYWORD_extends,
 	KEYWORD_for,
 	KEYWORD_function,
 	KEYWORD_instanceof,
 	KEYWORD_in,
 	KEYWORD_interface,
+	KEYWORD_implements,
 	KEYWORD_let,
 	KEYWORD_namespace,
 	KEYWORD_new,
@@ -194,10 +196,12 @@ static const keywordTable TsKeywordTable [] = {
 	{ "const"       , KEYWORD_const       },
 	{ "constructor" , KEYWORD_constructor },
 	{ "enum"        , KEYWORD_enum        },
+	{ "extends"     , KEYWORD_extends     },
 	{ "for"         , KEYWORD_for         },
 	{ "function"    , KEYWORD_function    },
 	{ "in"          , KEYWORD_in          },
 	{ "interface"   , KEYWORD_interface   },
+	{ "implements"  , KEYWORD_implements  },
 	{ "let"         , KEYWORD_let         },
 	{ "namespace"   , KEYWORD_namespace   },
 	{ "new"			, KEYWORD_new		  },
@@ -648,10 +652,12 @@ PARSER_DEF (ClassKeyword, parseWord, "class", num)
 PARSER_DEF (ConstKeyword, parseWord, "const", num)
 PARSER_DEF (ConstructorKeyword, parseWord, "constructor", num)
 PARSER_DEF (EnumKeyword, parseWord, "enum", num)
+PARSER_DEF (ExtendsKeyword, parseWord, "extends", num)
 PARSER_DEF (ForKeyword, parseWord, "for", num)
 PARSER_DEF (FunctionKeyword, parseWord, "function", num)
 PARSER_DEF (InKeyword, parseWord, "in", num)
 PARSER_DEF (InterfaceKeyword, parseWord, "interface", num)
+PARSER_DEF (ImplementsKeyword, parseWord, "implements", num)
 PARSER_DEF (LetKeyword, parseWord, "let", num)
 PARSER_DEF (NamespaceKeyword, parseWord, "namespace", num)
 PARSER_DEF (NewKeyword, parseWord, "new", num)
@@ -1632,6 +1638,7 @@ MULTI_CHAR_PARSER_DEF (ClassBodyAfterCurlyChars, "\n}*@(:;=-+/^<>.,|&",
 static void parseClassBody (const int scope, tokenInfo *const token)
 {
 	bool parsed = false;
+	vString *inheritance = NULL;
 
 	//parse until {
 	do
@@ -1642,11 +1649,33 @@ static void parseClassBody (const int scope, tokenInfo *const token)
 								parseClassBodyChars,
 								parseTemplate,
 								parseComment,
+								parseExtendsKeyword,
+								parseImplementsKeyword,
 								parseIdentifier,
 								NULL);
+
+		if (token->type == TOKEN_KEYWORD
+			&& (token->keyword == KEYWORD_extends || token->keyword == KEYWORD_implements)
+			&& inheritance == NULL) inheritance = vStringNew ();
+		else if (inheritance && token->type == TOKEN_IDENTIFIER)
+		{
+			if (!vStringIsEmpty (inheritance)) vStringPut(inheritance, ',');
+			vStringCat(inheritance, token->string);
+		}
 	} while (parsed && token->type != TOKEN_OPEN_CURLY);
 
-	if (! parsed) return;
+	if (! parsed)
+	{
+		if (inheritance) vStringDelete (inheritance);
+		return;
+	}
+
+	if (inheritance)
+	{
+		tagEntryInfo *klass = getEntryInCorkQueue (scope);
+		klass->extensionFields.inheritance = vStringDeleteUnwrap (inheritance);
+		inheritance = NULL;
+	}
 
 	tokenInfo *member = NULL;
 	bool isGenerator = false;
