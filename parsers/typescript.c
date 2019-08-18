@@ -1622,7 +1622,7 @@ static void parseConstructorParams (const int classScope, const int constrScope,
 
 }
 
-MULTI_CHAR_PARSER_DEF (ClassBodyChars, "\n{", TOKEN_NL, TOKEN_OPEN_CURLY)
+MULTI_CHAR_PARSER_DEF (ClassBodyChars, "\n,{", TOKEN_NL, TOKEN_COMMA, TOKEN_OPEN_CURLY)
 MULTI_CHAR_PARSER_DEF (ClassBodyAfterCurlyChars, "\n}*@(:;=-+/^<>.,|&",
 		TOKEN_NL, TOKEN_CLOSE_CURLY, TOKEN_STAR, TOKEN_AT, TOKEN_OPEN_PAREN,
 		TOKEN_COLON, TOKEN_SEMICOLON, TOKEN_EQUAL_SIGN,

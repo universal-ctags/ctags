@@ -112,3 +112,7 @@ class X {
         return 1
     }
 }
+
+class C extends A implements B, D {
+    x: number
+}
