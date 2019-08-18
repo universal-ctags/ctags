@@ -21,3 +21,5 @@ fn	input.ts	/^async function fn(): Promise<number> {  $/;"	f
 i	input.ts	/^  var i = await p \/\/ suspend execution until 'p' is settled. 'i' has type "number"  $/;"	l	function:fn
 isCat	input.ts	/^function isCat(a: Animal): a is Cat {$/;"	f
 a	input.ts	/^function isCat(a: Animal): a is Cat {$/;"	z	function:isCat
+foo	input.ts	/^var foo = function() {$/;"	v
+foo2	input.ts	/^var foo2 = () => {$/;"	v

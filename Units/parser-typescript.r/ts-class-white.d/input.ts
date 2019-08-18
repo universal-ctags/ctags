@@ -102,3 +102,13 @@ class A {
     const normalizedPath = path === '/*' ? '' : path
   }
 }
+
+class X {
+    public f(a: T): number {
+        return g({ a: a})
+    }
+
+    public g(a: T): number {
+        return 1
+    }
+}
