@@ -8,7 +8,7 @@ BankAccount	input.ts	/^class BankAccount {$/;"	c
 balance	input.ts	/^  balance = 0$/;"	p	class:BankAccount
 deposit	input.ts	/^  deposit(credit: number) {$/;"	m	class:BankAccount
 credit	input.ts	/^  deposit(credit: number) {$/;"	z	method:BankAccount.deposit
-CheckingAccount	input.ts	/^class CheckingAccount extends BankAccount {$/;"	c
+CheckingAccount	input.ts	/^class CheckingAccount extends BankAccount {$/;"	c	inherits:BankAccount
 constructor	input.ts	/^  constructor(balance: number) {$/;"	m	class:CheckingAccount
 balance	input.ts	/^  constructor(balance: number) {$/;"	z	method:CheckingAccount.constructor
 writeCheck	input.ts	/^  writeCheck(debit: number) {$/;"	m	class:CheckingAccount
@@ -59,3 +59,8 @@ f	input.ts	/^    public f(a: T): number {$/;"	m	class:X
 a	input.ts	/^    public f(a: T): number {$/;"	z	method:X.f
 g	input.ts	/^    public g(a: T): number {$/;"	m	class:X
 a	input.ts	/^    public g(a: T): number {$/;"	z	method:X.g
+C	input.ts	/^class C extends A implements B, D {$/;"	c	inherits:A,B,D
+x	input.ts	/^    x: number$/;"	p	class:C
+Ct	input.ts	/^class Ct<T> extends A<T> implements B<T>, D, E<T> {$/;"	c	inherits:A,B,D,E
+x	input.ts	/^    x: number$/;"	p	class:Ct
+A	input.ts	/^class A<T> implements I<T>$/;"	c	inherits:I
