@@ -79,6 +79,7 @@ static objPool *TokenPool = NULL;
 /*	Used to specify type of keyword.
  */
 enum eKeywordId {
+	KEYWORD_as,
 	KEYWORD_async,
 	KEYWORD_await,
 	KEYWORD_class,
@@ -190,6 +191,7 @@ typedef struct sBlockState {
 
 static const keywordTable TsKeywordTable [] = {
 	/* keyword		  keyword ID */
+	{ "as"	        , KEYWORD_as          },
 	{ "async"       , KEYWORD_async       },
 	{ "await"       , KEYWORD_await       },
 	{ "class"       , KEYWORD_class       },
@@ -646,6 +648,7 @@ CTAGS_INLINE void parseFQIdentifier(const int c, tokenInfo *const token, int *pa
 	parseIdentifierCommon (c, token, parsed, result, true);
 }
 
+PARSER_DEF (AsKeyword, parseWord, "as", num)
 PARSER_DEF (AsyncKeyword, parseWord, "async", num)
 PARSER_DEF (AwaitKeyword, parseWord, "await", num)
 PARSER_DEF (ClassKeyword, parseWord, "class", num)
@@ -1184,6 +1187,7 @@ static void parseVariable (bool constVar, bool localVar, const int scope, tokenI
 								parseStringTemplate,
 								parseNumber,
 								parseArrow,
+								parseAsKeyword,
 								parseAwaitKeyword,
 								parseForKeyword,
 								parseFunctionKeyword,
@@ -1266,6 +1270,7 @@ static void parseVariable (bool constVar, bool localVar, const int scope, tokenI
 						case KEYWORD_enum:
 							parseEnum (scope, token);
 							break;
+						case KEYWORD_as:
 						case KEYWORD_of:
 						case KEYWORD_in:
 						case KEYWORD_await:
