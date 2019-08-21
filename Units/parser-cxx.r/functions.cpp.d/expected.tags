@@ -35,5 +35,5 @@ p07	input.cpp	/^unsigned int p07(int (*p07a01)(int * x1,int x2),...);$/;"	p	type
 p08	input.cpp	/^void (*p08(void (*)(int *p08a01)))(int *);$/;"	p	typeref:typename:void (*)(int *)	file:	signature:(void (*)(int * p08a01))
 t01	input.cpp	/^template <typename T> std::unique_ptr<T> t01(T && t01a01)$/;"	f	typeref:typename:std::unique_ptr<T>	signature:(T && t01a01)	end:85
 t01a01	input.cpp	/^template <typename T> std::unique_ptr<T> t01(T && t01a01)$/;"	z	function:t01	typeref:typename:T &&	file:
-t02	input.cpp	/^template <typename T> auto t02(T && t02a01) -> std::unique_ptr<T>$/;"	f	typeref:typename:std::unique_ptr<T>	signature:(T && t02a01)	end:90
+t02	input.cpp	/^template <typename T> auto t02(T && t02a01) -> std::unique_ptr<T>$/;"	f	typeref:typename:std::unique_ptr<T>	signature:(T && t02a01)	end:94
 t02a01	input.cpp	/^template <typename T> auto t02(T && t02a01) -> std::unique_ptr<T>$/;"	z	function:t02	typeref:typename:T &&	file:

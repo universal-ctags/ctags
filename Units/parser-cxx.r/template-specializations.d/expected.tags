@@ -11,4 +11,5 @@ g2	input.cpp	/^template<> void A<int>::g2<char>(int, char); \/\/ for X2 = char$/
 g1	input.cpp	/^template<> void A<int>::g1(int, char);$/;"	p	class:A	typeref:typename:void	file:	signature:(int,char)	template:<>	properties:scopespecialization,specialization
 m	input.cpp	/^template<typename X> void m(X)$/;"	f	typeref:typename:void	signature:(X)	template:<typename X>
 m	input.cpp	/^template<> void m<int>(int)$/;"	f	typeref:typename:void	signature:(int)	template:<>	properties:specialization
+m	input.cpp	/^template<> void m<A>(A)$/;"	f	typeref:typename:void	signature:(A)	template:<>	properties:specialization
 m	input.cpp	/^template<> void m(char)$/;"	f	typeref:typename:void	signature:(char)	template:<>	properties:specialization

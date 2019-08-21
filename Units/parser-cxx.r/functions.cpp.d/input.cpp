@@ -84,12 +84,21 @@ template <typename T> std::unique_ptr<T> t01(T && t01a01)
     return std::unique_ptr<T>(NULL);
 }
 
+#define MACRO_TEXT ""
+
 template <typename T> auto t02(T && t02a01) -> std::unique_ptr<T>
 {
+	// throw may look like a prototype, but it isn't
+	throw std::string(MACRO_TEXT);
     return std::unique_ptr<T>(NULL);
 }
 
 // Things that might look similar to function prototypes but are NOT function prototypes (but still valid C++)
 std::string x01("test");
 
-
+#if NOTVALIDCPP
+	// This is not really valid C++ because it appears in the wrong context.
+	// However we simulate the parser being wrong about the current state (it happens).
+	// This should be NOT marked as a prototype even if found out of a function.
+	throw std::string(MACRO_TEXT);
+#endif
