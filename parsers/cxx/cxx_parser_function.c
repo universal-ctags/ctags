@@ -1462,6 +1462,7 @@ int cxxParserEmitFunctionTags(
 	CXX_DEBUG_PRINT("Identifier is '%s'",vStringValue(pIdentifier->pszWord));
 
 	tagEntryInfo * tag;
+	CXXToken * pSavedScope;
 
 	if(
 			(uTagKind == CXXTagKindFUNCTION) &&
@@ -1481,9 +1482,8 @@ int cxxParserEmitFunctionTags(
 		// Here y() is implicitly defined as a function in the namespace contaning X
 		// (so it is NOT X::y()).
 
-		CXXToken * pSavedScope = cxxScopeTakeTop();
+		pSavedScope = cxxScopeTakeTop();
 		tag = cxxTagBegin(uTagKind,pIdentifier);
-		cxxScopePushTop(pSavedScope);
 
 		// We shouldn't really push back the last scope while the function is being
 		// parsed, but this is hard to do with the current implementation. We would need
@@ -1494,6 +1494,7 @@ int cxxParserEmitFunctionTags(
 		// so "sane" such declarations are short and usually don't have meaningful tags inside.
 
 	} else {
+		pSavedScope = NULL;
 		tag = cxxTagBegin(uTagKind,pIdentifier);
 	}
 
@@ -1650,6 +1651,8 @@ int cxxParserEmitFunctionTags(
 			cxxTokenDestroy(pTypeName);
 	}
 
+	if(pSavedScope)
+		cxxScopePushTop(pSavedScope);
 
 #ifdef CXX_DO_DEBUGGING
 	if(uTagKind == CXXTagKindFUNCTION)
