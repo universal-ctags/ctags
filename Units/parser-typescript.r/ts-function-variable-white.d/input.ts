@@ -59,3 +59,7 @@ function f5([first, second]: [number, number]) {
   console.log(first)
   console.log(second)
 }
+
+function d(p: string): void {
+    const view = p as BigTableView
+}

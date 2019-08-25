@@ -35,3 +35,6 @@ second	input.ts	/^  let [first, second] = input$/;"	l	function:f4
 f5	input.ts	/^function f5([first, second]: [number, number]) {$/;"	f
 first	input.ts	/^function f5([first, second]: [number, number]) {$/;"	z	function:f5
 second	input.ts	/^function f5([first, second]: [number, number]) {$/;"	z	function:f5
+d	input.ts	/^function d(p: string): void {$/;"	f
+p	input.ts	/^function d(p: string): void {$/;"	z	function:d
+view	input.ts	/^    const view = p as BigTableView$/;"	C	function:d
