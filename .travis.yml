@@ -43,6 +43,7 @@ addons:
       - libxml2-dev
       - gdb
       - valgrind
+      - python-docutils
 
 env:
   - TARGET=Unix
