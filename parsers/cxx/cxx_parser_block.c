@@ -493,7 +493,7 @@ process_token:
 						// broken input and we might also be wrong about the current scope.
 						if((cxxScopeGetType() == CXXScopeTypeFunction) || (g_cxx.pTokenChain->iCount < 3))
 						{
-							CXX_DEBUG_LEAVE_TEXT("Skipping throw statement");
+							CXX_DEBUG_PRINT("Skipping throw statement");
 							if(!cxxParserParseUpToOneOf(CXXTokenTypeSemicolon | CXXTokenTypeEOF,
 								   false))
 							{
