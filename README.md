@@ -44,11 +44,6 @@ Go to the [releases](https://github.com/universal-ctags/ctags-win32/releases) pa
 ### Mac
 See [Homebrew Tap for Universal Ctags](https://github.com/universal-ctags/homebrew-universal-ctags)
 
-### Docker
-Go to [ctags-docker](https://github.com/universal-ctags/ctags-docker) and follow
-instructions to download the `uctags` script. Docker will automatically fetch
-the image from Docker Hub.
-
 ## How to build and install ##
 
 To build with Autotools, see `docs/autotools.rst` for more information.
