@@ -34,6 +34,16 @@ template<> void m<int>(int)
 {
 }
 
+// bug #2181
+template<> void m<A>(A)
+{
+}
+
 template<> void m(char)
 {
 }
+
+#if HANDLE_BROKEN_INPUT
+	// This is broken input. Should *not* be extracted.
+	template <> void int<int>(int a);
+#endif

@@ -685,6 +685,8 @@ bool cxxParserLookForFunctionSignature(
 	CXXToken * pIdentifierEnd = NULL;
 	CXXToken * pTopLevelParenthesis = NULL;
 
+	bool bSkippedAngleBrackets = false;
+
 	// Strategy:
 	//
 	//    Scan the toplevel token chain and look for the first identifier immediately
@@ -775,6 +777,7 @@ bool cxxParserLookForFunctionSignature(
 				CXX_DEBUG_LEAVE_TEXT("Couldn't skip past angle bracket chain");
 				return false;
 			}
+			bSkippedAngleBrackets = true;
 			CXX_DEBUG_PRINT("Skipped angle bracket chain");
 			goto next_token;
 		}
@@ -790,8 +793,6 @@ bool cxxParserLookForFunctionSignature(
 
 		// Parenthesis+identifier hasn't been found yet, look for it.
 		// Several specialized cases follow.
-
-		CXXTokenChain * pIdentifierChain = pChain;
 
 		if(cxxTokenIsKeyword(pToken,CXXKeywordOPERATOR))
 		{
@@ -900,7 +901,7 @@ bool cxxParserLookForFunctionSignature(
 
 			cxxParserLookForFunctionSignatureCheckParenthesisAndIdentifier(
 					pTopLevelParenthesis,
-					pIdentifierChain,
+					pChain,
 					pIdentifierStart,
 					pIdentifierEnd,
 					pInfo,
@@ -948,7 +949,7 @@ bool cxxParserLookForFunctionSignature(
 			if(
 				cxxParserLookForFunctionSignatureCheckParenthesisAndIdentifier(
 						pTopLevelParenthesis,
-						pIdentifierChain,
+						pChain,
 						pIdentifierStart,
 						pIdentifierEnd,
 						pInfo,
@@ -999,7 +1000,59 @@ bool cxxParserLookForFunctionSignature(
 			}
 
 			// If the check above failed, try different identifier possibilities
+			CXX_DEBUG_PRINT("Checks for common case failed: trying other options");
 		}
+
+		if(
+				// The previous token is >
+				cxxTokenTypeIs(pToken->pPrev,CXXTokenTypeGreaterThanSign) &&
+				// We extracted an initial template<*> token chain
+				// (which has been removed from the currently examined chain)
+				g_cxx.pTemplateTokenChain &&
+				// We skipped an additional <...> block in *this* chain
+				bSkippedAngleBrackets
+			)
+		{
+			// look for template specialisation
+			CXX_DEBUG_PRINT("Maybe template specialisation?");
+
+			CXXToken * pSpecBegin = cxxTokenChainSkipBackToStartOfTemplateAngleBracket(
+					pToken->pPrev
+				);
+
+			if(
+					pSpecBegin &&
+					pSpecBegin->pPrev &&
+					cxxTokenTypeIs(pSpecBegin->pPrev,CXXTokenTypeIdentifier)
+				)
+			{
+				// template specialisation
+
+				CXX_DEBUG_PRINT("Template specialization looks quite right");
+
+				pIdentifierStart = pSpecBegin->pPrev;
+				pIdentifierEnd = pSpecBegin->pPrev;
+				pInfo->uFlags |= CXXFunctionSignatureInfoTemplateSpecialization;
+
+
+				if(
+					cxxParserLookForFunctionSignatureCheckParenthesisAndIdentifier(
+							pTopLevelParenthesis,
+							pChain,
+							pIdentifierStart,
+							pIdentifierEnd,
+							pInfo,
+							pParamInfo
+						)
+					)
+						goto next_token;
+
+			}
+
+			CXX_DEBUG_PRINT("Checks for template spec failed: trying other options");
+		}
+
+		CXXTokenChain * pIdentifierChain;
 
 		if(
 			// check for complex parenthesized declarations.
@@ -1039,58 +1092,26 @@ bool cxxParserLookForFunctionSignature(
 				pIdentifierEnd = pIdentifierStart;
 				// correct our guess for parenthesis
 				pTopLevelParenthesis = pIdentifierStart->pNext;
+
+				if(
+					cxxParserLookForFunctionSignatureCheckParenthesisAndIdentifier(
+							pTopLevelParenthesis,
+							pIdentifierChain,
+							pIdentifierStart,
+							pIdentifierEnd,
+							pInfo,
+							pParamInfo
+						)
+					)
+					goto next_token;
+	
 			} else {
 				// Looks more like a function pointer or something else we can't figure out
 				CXX_DEBUG_LEAVE_TEXT("Identifier NOT followed by a parameter-like parenthesis chain");
-				return false;
 			}
-
-			if(
-				cxxParserLookForFunctionSignatureCheckParenthesisAndIdentifier(
-						pTopLevelParenthesis,
-						pIdentifierChain,
-						pIdentifierStart,
-						pIdentifierEnd,
-						pInfo,
-						pParamInfo
-					)
-				)
-				goto next_token;
 
 			// If the check above failed, try different identifier possibilities
-		}
-
-		if(
-				pToken->pPrev->pPrev &&
-				cxxTokenTypeIs(pToken->pPrev,CXXTokenTypeGreaterThanSign)
-			)
-		{
-			// look for template specialisation
-			CXXToken * pSpecBegin = cxxTokenChainSkipBackToStartOfTemplateAngleBracket(
-					pToken->pPrev
-				);
-
-			if(
-					pSpecBegin &&
-					pSpecBegin->pPrev &&
-					cxxTokenTypeIs(pSpecBegin->pPrev,CXXTokenTypeIdentifier)
-				)
-			{
-				// template specialisation
-				CXX_DEBUG_PRINT("Maybe template specialisation?");
-				pIdentifierStart = pSpecBegin->pPrev;
-				pIdentifierEnd = pSpecBegin->pPrev;
-				pInfo->uFlags |= CXXFunctionSignatureInfoTemplateSpecialization;
-
-				cxxParserLookForFunctionSignatureCheckParenthesisAndIdentifier(
-						pTopLevelParenthesis,
-						pIdentifierChain,
-						pIdentifierStart,
-						pIdentifierEnd,
-						pInfo,
-						pParamInfo
-					);
-			}
+			CXX_DEBUG_PRINT("Checks for nested () failed: trying other options");
 		}
 
 next_token:

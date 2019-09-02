@@ -485,13 +485,19 @@ process_token:
 						cxxParserNewStatement();
 					break;
 					case CXXKeywordTHROW:
-						// ignore when inside a function
-						if(cxxScopeGetType() == CXXScopeTypeFunction)
+						// We ignore whole "throw expressions" as they contain nothing useful
+						// and may confuse us. We keep "throw" when used as exception specification,
+						// and this is certainly outside of a function and when the token chain
+						// already contains at least a type, an identifier and a parenthesis.
+						// This check seems excessive but keep in mind that we deal with
+						// broken input and we might also be wrong about the current scope.
+						if((cxxScopeGetType() == CXXScopeTypeFunction) || (g_cxx.pTokenChain->iCount < 3))
 						{
+							CXX_DEBUG_PRINT("Skipping throw statement");
 							if(!cxxParserParseUpToOneOf(CXXTokenTypeSemicolon | CXXTokenTypeEOF,
 								   false))
 							{
-								CXX_DEBUG_LEAVE_TEXT("Failed to parse return/continue/break");
+								CXX_DEBUG_LEAVE_TEXT("Failed to skip throw statement");
 								return false;
 							}
 							cxxParserNewStatement();
