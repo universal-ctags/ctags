@@ -1,0 +1,6 @@
+.alert:hover	input.scss	/^.alert:hover, %strong-alert {$/;"	c
+%strong-alert	input.scss	/^.alert:hover, %strong-alert {$/;"	P
+%strong-alert:hover	input.scss	/^%strong-alert:hover {$/;"	P
+%toolbelt	input.scss	/^%toolbelt {$/;"	P
+.action-buttons	input.scss	/^.action-buttons {$/;"	c
+.reset-buttons	input.scss	/^.reset-buttons {$/;"	c

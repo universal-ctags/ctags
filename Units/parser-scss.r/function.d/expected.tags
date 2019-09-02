@@ -1,0 +1,10 @@
+remove-where	input.scss	/^@function remove-where($list, $condition) {$/;"	f
+list	input.scss	/^@function remove-where($list, $condition) {$/;"	z
+condition	input.scss	/^@function remove-where($list, $condition) {$/;"	z
+new-list	input.scss	/^  $new-list: ();$/;"	v
+separator	input.scss	/^  $separator: list-separator($list);$/;"	v
+element	input.scss	/^  @each $element in $list {$/;"	v
+new-list	input.scss	/^      $new-list: append($new-list, $element, $separator: $separator);$/;"	v
+fonts	input.scss	/^$fonts: Tahoma, Geneva, "Helvetica Neue", Helvetica, Arial, sans-serif;$/;"	v
+contains-helvetica	input.scss	/^  @function contains-helvetica($string) {$/;"	f
+string	input.scss	/^  @function contains-helvetica($string) {$/;"	z

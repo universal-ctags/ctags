@@ -1,0 +1,22 @@
+// Taken from https://sass-lang.com/documentation/values/functions
+/// Return a copy of $list with all elements for which $condition returns `true`
+/// removed.
+@function remove-where($list, $condition) {
+  $new-list: ();
+  $separator: list-separator($list);
+  @each $element in $list {
+    @if not call($condition, $element) {
+      $new-list: append($new-list, $element, $separator: $separator);
+    }
+  }
+  @return $new-list;
+}
+
+$fonts: Tahoma, Geneva, "Helvetica Neue", Helvetica, Arial, sans-serif;
+
+content {
+  @function contains-helvetica($string) {
+    @return str-index($string, "Helvetica");
+  }
+  font-family: remove-where($fonts, get-function("contains-helvetica"));
+}

@@ -1,0 +1,23 @@
+/* Taken from https://sass-lang.com/documentation/style-rules */
+.alert, .warning {
+  ul, p {
+    margin-right: 0;
+    margin-left: 0;
+    padding-bottom: 0;
+  }
+}
+
+/* Taken from _bodal.scss of bootstrap */
+.modal-open {
+  // Kill the scroll on the body
+  overflow: hidden;
+
+  .modal {
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
+  #foo {
+      color: red;
+  }
+}

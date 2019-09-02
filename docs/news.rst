@@ -87,6 +87,7 @@ The following parsers have been added:
 * RpmSpec
 * RSpec *optlib*
 * Rust
+* SCSS *optlib*
 * SystemdUnit
 * SystemTap *optlib*
 * SystemVerilog

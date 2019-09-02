@@ -1,0 +1,89 @@
+#
+## This one is derrived from https://gist.githubusercontent.com/Roy-Orbison/71bc81f488f85adaeacfb76a7967eda0/raw/5eed9f1ef75c0921123651d419b3944a155f438f/scss.ctags
+#
+# Copyright 2019 Roy-Orbison
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+#
+--langdef=SCSS
+--map-SCSS=+.scss
+
+--kinddef-SCSS=m,mixin,mixins
+--kinddef-SCSS=f,function,functions
+--kinddef-SCSS=v,variable,variables
+--kinddef-SCSS=c,class,classes
+--kinddef-SCSS=P,placeholder,placeholder classes
+--kinddef-SCSS=i,id,identities
+# --kinddef-SCSS=p,pseudo,pseudos
+--kinddef-SCSS=z,parameter,function parameters
+
+--_tabledef-SCSS=toplevel
+--_tabledef-SCSS=comment
+--_tabledef-SCSS=interp
+--_tabledef-SCSS=args
+--_tabledef-SCSS=map
+--_tabledef-SCSS=strs
+--_tabledef-SCSS=strd
+
+--_mtable-regex-SCSS=toplevel/\/\/[^\n]*\n?//
+--_mtable-regex-SCSS=toplevel/\/\*//{tenter=comment}
+--_mtable-regex-SCSS=toplevel/#\{//{tenter=interp}
+--_mtable-regex-SCSS=toplevel/'///{tenter=strs}
+--_mtable-regex-SCSS=toplevel/"///{tenter=strd}
+--_mtable-regex-SCSS=toplevel/[ \t]([A-Za-z0-9_-]+)[ \t]*:[^\n]*\n?//
+--_mtable-regex-SCSS=toplevel/@mixin[ \t]+([A-Za-z0-9_-]+)/\1/m/{tenter=args}
+--_mtable-regex-SCSS=toplevel/@function[ \t]+([A-Za-z0-9_-]+)/\1/f/{tenter=args}
+--_mtable-regex-SCSS=toplevel/@each[ \t]+\$([A-Za-z0-9_-]+)[ \t]in[ \t]+/\1/v/
+--_mtable-regex-SCSS=toplevel/@for[ \t]+\$([A-Za-z0-9_-]+)[ \t]from[ \t]+.*[ \t]+(to|through)[ \t]+[^{]+/\1/v/
+--_mtable-regex-SCSS=toplevel/@[^\n]+\n?//
+--_mtable-regex-SCSS=toplevel/:[^{;]+;\n?//
+--_mtable-regex-SCSS=toplevel/:[^\n;{]+\n//
+# --_mtable-regex-SCSS=toplevel/::?([A-Za-z0-9_-]+)[ \t]*[,({]/\1/p/
+--_mtable-regex-SCSS=toplevel/::?([A-Za-z0-9_-]+)[ \t]*[,({]//
+--_mtable-regex-SCSS=toplevel/:[^\n{]+[;{]\n?//
+--_mtable-regex-SCSS=toplevel/\$([A-Za-z0-9_-]+)[ \t]*:[ \t]*\(/\1/v/{tenter=map}
+--_mtable-regex-SCSS=toplevel/\$([A-Za-z0-9_-]+)[ \t]*:[^\n]*\n?/\1/v/
+--_mtable-regex-SCSS=toplevel/([.][A-Za-z0-9_:-]+)/\1/c/
+--_mtable-regex-SCSS=toplevel/(%[A-Za-z0-9_:-]+)/\1/P/
+--_mtable-regex-SCSS=toplevel/#([A-Za-z0-9_:-]+)/\1/i/
+--_mtable-regex-SCSS=toplevel/.//
+--_mtable-regex-SCSS=comment/\*\///{tleave}
+--_mtable-regex-SCSS=comment/.//
+--_mtable-regex-SCSS=interp/\}//{tleave}
+--_mtable-regex-SCSS=interp/.//
+--_mtable-regex-SCSS=args/\{//{tleave}
+--_mtable-regex-SCSS=args/#\{//{tenter=interp}
+--_mtable-regex-SCSS=args/\$([A-Za-z0-9_-]+)[ \t]*(:([ \t]*\$)?|[,)])/\1/z/
+--_mtable-regex-SCSS=args/.//
+--_mtable-regex-SCSS=map/\/\/[^\n]*\n?//
+--_mtable-regex-SCSS=map/\/\*//{tenter=comment}
+--_mtable-regex-SCSS=map/#\{//{tenter=interp}
+--_mtable-regex-SCSS=map/\)//{tleave}
+--_mtable-regex-SCSS=map/([A-Za-z0-9_-]+)[ \t]*:/\1/v/
+--_mtable-regex-SCSS=map/'///{tenter=strs}
+--_mtable-regex-SCSS=map/"///{tenter=strd}
+--_mtable-regex-SCSS=map/.//
+--_mtable-regex-SCSS=strs/'///{tleave}
+--_mtable-regex-SCSS=strs/#\{//{tenter=interp}
+--_mtable-regex-SCSS=strs/[^'#\\]+//
+--_mtable-regex-SCSS=strs/\\?.//
+--_mtable-regex-SCSS=strd/"///{tleave}
+--_mtable-regex-SCSS=strd/#\{//{tenter=interp}
+--_mtable-regex-SCSS=strd/[^"#\\]+//
+--_mtable-regex-SCSS=strd/\\?.//
