@@ -25,3 +25,9 @@ ul li { padding-left: 1em; }
 ul > li > a {
   font: monospace;
 }
+
+/* The general sibling combinator (~)
+ * See https://developer.mozilla.org/en-US/docs/Web/CSS/General_sibling_combinator */
+img ~ p {
+  color: red;
+}

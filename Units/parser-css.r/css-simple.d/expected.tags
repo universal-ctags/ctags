@@ -6,5 +6,6 @@
 .red	input.css	/^.red { color: red }$/;"	c
 div.magic	input.css	/^div.magic $/;"	c
 html	input.css	/^html$/;"	s
+img ~ p	input.css	/^img ~ p {$/;"	s
 ul > li > a	input.css	/^ul > li > a {$/;"	s
 ul li	input.css	/^ul li { padding-left: 1em; }$/;"	s

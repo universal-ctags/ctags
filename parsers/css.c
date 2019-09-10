@@ -21,6 +21,7 @@
 		(c) == '-' || /* allowed char */ \
 		(c) == '+' || /* allow all sibling in a single tag */ \
 		(c) == '>' || /* allow all child in a single tag */ \
+		(c) == '~' || /* allow general sibling combinator */ \
 		(c) == '|' || /* allow namespace separator */ \
 		(c) == '(' || /* allow pseudo-class arguments */ \
 		(c) == ')' || \
