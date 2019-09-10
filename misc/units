@@ -1102,7 +1102,7 @@ $0 run [OPTIONS] UNITS-DIR
 	   Run all tests case under UNITS-DIR.
 
 	   OPTIONS:
-		--ctags CTAGS: ctags exectuable file for testing
+		--ctags CTAGS: ctags executable file for testing
 		--categories CATEGORY1[,CATEGORY2,...]: run only CATEGORY* related cases.
 							Category selection is done in upper
 							layer than unit selection. This
@@ -1645,7 +1645,7 @@ $0 fuzz [OPTIONS] UNITS-DIR
 	   Run all tests case under UNITS-DIR.
 
 	   OPTIONS:
-		--ctags CTAGS: ctags exectuable file for testing
+		--ctags CTAGS: ctags executable file for testing
 		--languages PARSER1[,PARSER2,...]: run only PARSER* related cases
 		--quiet: don't print dots as passed test cases.
 		--with-timeout DURATION: run a test case under timeout
@@ -1864,7 +1864,7 @@ cat <<EOF
 $0 noise [OPTIONS] UNITS-DIR
 
 	   Run all tests case for LANGUAGE with "noise" for
-	   finding unexepcted behavior like entering an
+	   finding unexpected behavior like entering an
 	   infinite loop.
 	   Here "noise" means removing one byte from
 	   somewhere file position of the original test case;
@@ -1872,7 +1872,7 @@ $0 noise [OPTIONS] UNITS-DIR
 	   somewhere file position of the original test case.
 
 	   OPTIONS:
-		--ctags CTAGS: ctags exectuable file for testing
+		--ctags CTAGS: ctags executable file for testing
 		--languages PARSER1[,PARSER2,...]: run only PARSER* related cases
 		--quiet: don't print dots as passed test cases.
 		--with-timeout DURATION: run a test case under timeout
@@ -2188,7 +2188,7 @@ $0 tmain [OPTIONS] TMAIN-DIR [BUILD-DIR]
 
 	   OPTIONS:
 
-		--ctags CTAGS: ctags exectuable file for testing
+		--ctags CTAGS: ctags executable file for testing
 		--colorized-output yes|no: print the result in color.
 		--with-valgrind: (not implemented) run a test case under valgrind
 		--show-diff-output: (not implemented)show diff output for failed test cases in the summary.
@@ -2245,7 +2245,7 @@ $0 chop|slap [OPTIONS] UNITS-DIR
 
 	   OPTIONS:
 
-		--ctags CTAGS: ctags exectuable file for testing
+		--ctags CTAGS: ctags executable file for testing
 		--languages PARSER1[,PARSER2,...]: run only PARSER* related cases
 		--quiet: don't print dots as passed test cases.
 		--with-timeout DURATION: run a test case under timeout
