@@ -185,7 +185,7 @@ if "%normalbuild%"=="yes" (
 )
 md package
 :: Build html docs and man pages
-bash -lc "make -C docs html && make -C man html RST2HTML=rst2html3" || exit 1
+bash -lc "make -C docs html && make -C man html" || exit 1
 move docs\_build\html package\docs > nul
 rd /s/q package\docs\_sources
 
