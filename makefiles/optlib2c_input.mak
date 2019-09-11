@@ -13,6 +13,7 @@ OPTLIB2C_INPUT = \
 	optlib/pod.ctags			\
 	optlib/qemuhx.ctags			\
 	optlib/puppetManifest.ctags		\
+	optlib/scss.ctags			\
 	optlib/systemtap.ctags			\
 	\
 	$(NULL)

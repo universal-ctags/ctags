@@ -124,6 +124,7 @@
 	RubyParser, \
 	RustParser, \
 	SchemeParser, \
+	SCSSParser, \
 	ShParser, \
 	SlangParser, \
 	SmlParser, \

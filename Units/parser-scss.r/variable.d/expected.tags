@@ -1,0 +1,7 @@
+base-color	input.scss	/^$base-color: #c6538c;$/;"	v
+border-dark	input.scss	/^$border-dark: rgba($base-color, 0.88);$/;"	v
+.alert	input.scss	/^.alert {$/;"	c
+i	input.scss	/^@for $i from 1 through 3 {$/;"	v
+sizes	input.scss	/^$sizes: 40px, 50px, 80px;$/;"	v
+size	input.scss	/^@each $size in $sizes {$/;"	v
+.icon-	input.scss	/^  .icon-#{$size} {$/;"	c

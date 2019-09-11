@@ -1,0 +1,5 @@
+.alert	input.scss	/^.alert, .warning {$/;"	c
+.warning	input.scss	/^.alert, .warning {$/;"	c
+.modal-open	input.scss	/^.modal-open {$/;"	c
+.modal	input.scss	/^  .modal {$/;"	c
+foo	input.scss	/^  #foo {$/;"	i

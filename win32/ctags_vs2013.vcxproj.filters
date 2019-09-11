@@ -219,6 +219,9 @@
     <ClCompile Include="..\optlib\qemuhx.c">
       <Filter>Source Files\optlib</Filter>
     </ClCompile>
+    <ClCompile Include="..\optlib\scss.c">
+      <Filter>Source Files\optlib</Filter>
+    </ClCompile>
     <ClCompile Include="..\optlib\systemtap.c">
       <Filter>Source Files\optlib</Filter>
     </ClCompile>

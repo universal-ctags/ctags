@@ -1,0 +1,25 @@
+// Taken from https://sass-lang.com/documentation/variables
+$base-color: #c6538c;
+$border-dark: rgba($base-color, 0.88);
+
+.alert {
+  border: 1px solid $border-dark;
+}
+
+// Taken from https://sass-lang.com/documentation/at-rules/control/for
+@for $i from 1 through 3 {
+  ul:nth-child(3n + #{$i}) {
+    background-color: lighten($base-color, $i * 5%);
+  }
+}
+
+// Taken from https://sass-lang.com/documentation/at-rules/control/each
+$sizes: 40px, 50px, 80px;
+
+@each $size in $sizes {
+  .icon-#{$size} {
+    font-size: $size;
+    height: $size;
+    width: $size;
+  }
+}
