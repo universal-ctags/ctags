@@ -1,0 +1,7 @@
+book	input.xml	/^<!DOCTYPE book [$/;"	r	language:XML
+ns8b4f64860101	input.xml	/^<book xmlns="http:\/\/docbook.org\/ns\/docbook" version="5.0">$/;"	n	language:XML	uri:http://docbook.org/ns/docbook
+chap1	input.xml	/^<!ENTITY chap1 SYSTEM "chap1.xml">$/;"	E	language:DTD
+chap2	input.xml	/^<!ENTITY chap2 SYSTEM "chap2.xml">$/;"	E	language:DTD
+chap3	input.xml	/^<!ENTITY chap3 SYSTEM "chap3.xml">$/;"	E	language:DTD
+appa	input.xml	/^<!ENTITY appa SYSTEM "appa.xml">$/;"	E	language:DTD
+appb	input.xml	/^<!ENTITY appb SYSTEM "appb.xml">$/;"	E	language:DTD
