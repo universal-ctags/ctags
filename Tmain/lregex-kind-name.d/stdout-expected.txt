@@ -1,0 +1,32 @@
+param: |(.)|\1|x,name| => acceptable
+#LETTER NAME ENABLED REFONLY NROLES MASTER DESCRIPTION
+x       name yes     no      0      NONE   name
+param: |(.)|\1|x,name,documents| => acceptable
+#LETTER NAME ENABLED REFONLY NROLES MASTER DESCRIPTION
+x       name yes     no      0      NONE   documents
+param: |(.)|\1|x,name,0documents| => acceptable
+#LETTER NAME ENABLED REFONLY NROLES MASTER DESCRIPTION
+x       name yes     no      0      NONE   0documents
+param: |(.)|\1|x,name,doc uments| => acceptable
+#LETTER NAME ENABLED REFONLY NROLES MASTER DESCRIPTION
+x       name yes     no      0      NONE   doc uments
+param: |(.)|\1|x,name0| => acceptable
+#LETTER NAME  ENABLED REFONLY NROLES MASTER DESCRIPTION
+x       name0 yes     no      0      NONE   name0
+param: |(.)|\1|x,name0,documents| => acceptable
+#LETTER NAME  ENABLED REFONLY NROLES MASTER DESCRIPTION
+x       name0 yes     no      0      NONE   documents
+param: |(.)|\1|x,name0,0documents| => acceptable
+#LETTER NAME  ENABLED REFONLY NROLES MASTER DESCRIPTION
+x       name0 yes     no      0      NONE   0documents
+param: |(.)|\1|x,name0,doc uments| => acceptable
+#LETTER NAME  ENABLED REFONLY NROLES MASTER DESCRIPTION
+x       name0 yes     no      0      NONE   doc uments
+param: |(.)|\1|x,0name| => unacceptable
+param: |(.)|\1|x,0name,documents| => unacceptable
+param: |(.)|\1|x,0name,0documents| => unacceptable
+param: |(.)|\1|x,0name,doc uments| => unacceptable
+param: |(.)|\1|x,na me| => unacceptable
+param: |(.)|\1|x,na me,documents| => unacceptable
+param: |(.)|\1|x,na me,0documents| => unacceptable
+param: |(.)|\1|x,na me,doc uments| => unacceptable

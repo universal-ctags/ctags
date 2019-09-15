@@ -1,0 +1,10 @@
+param: |(.)|\1|^ => ignoring
+#LETTER NAME  ENABLED REFONLY NROLES MASTER DESCRIPTION
+r       regex yes     no      0      NONE   regex
+param: |(.)|\1|^| => warning
+param: |(.)|\1|, => ignoring
+#LETTER NAME  ENABLED REFONLY NROLES MASTER DESCRIPTION
+r       regex yes     no      0      NONE   regex
+param: |(.)|\1|,| => using the default letter and name
+#LETTER NAME  ENABLED REFONLY NROLES MASTER DESCRIPTION
+r       regex yes     no      0      NONE   regex

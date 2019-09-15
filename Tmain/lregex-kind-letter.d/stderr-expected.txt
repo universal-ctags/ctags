@@ -1,0 +1,5 @@
+param: |(.)|\1|^ => ignoring
+param: |(.)|\1|^| => warning
+ctags: Kind letter must be an alphabetical character: "^"
+param: |(.)|\1|, => ignoring
+param: |(.)|\1|,| => using the default letter and name

@@ -1,0 +1,24 @@
+param: |(.)|\1|x,name| => acceptable
+param: |(.)|\1|x,name,documents| => acceptable
+param: |(.)|\1|x,name,0documents| => acceptable
+param: |(.)|\1|x,name,doc uments| => acceptable
+param: |(.)|\1|x,name0| => acceptable
+param: |(.)|\1|x,name0,documents| => acceptable
+param: |(.)|\1|x,name0,0documents| => acceptable
+param: |(.)|\1|x,name0,doc uments| => acceptable
+param: |(.)|\1|x,0name| => unacceptable
+ctags: A kind name doesn't start with an alphabetical character: '0name' in "--regex-x" option
+param: |(.)|\1|x,0name,documents| => unacceptable
+ctags: A kind name doesn't start with an alphabetical character: '0name' in "--regex-x" option
+param: |(.)|\1|x,0name,0documents| => unacceptable
+ctags: A kind name doesn't start with an alphabetical character: '0name' in "--regex-x" option
+param: |(.)|\1|x,0name,doc uments| => unacceptable
+ctags: A kind name doesn't start with an alphabetical character: '0name' in "--regex-x" option
+param: |(.)|\1|x,na me| => unacceptable
+ctags: Non-alphanumeric char is used in kind name: 'na me' in "--regex-x" option
+param: |(.)|\1|x,na me,documents| => unacceptable
+ctags: Non-alphanumeric char is used in kind name: 'na me' in "--regex-x" option
+param: |(.)|\1|x,na me,0documents| => unacceptable
+ctags: Non-alphanumeric char is used in kind name: 'na me' in "--regex-x" option
+param: |(.)|\1|x,na me,doc uments| => unacceptable
+ctags: Non-alphanumeric char is used in kind name: 'na me' in "--regex-x" option

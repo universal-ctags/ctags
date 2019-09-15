@@ -2388,9 +2388,9 @@ static bool processLangDefineKind(const langType language,
 	const char * p = parameter;
 	char *name;
 	char *description;
-	const char *tmp_start;
-	const char *tmp_end;
-	size_t tmp_len;
+	const char *name_start;
+	const char *marker_end;
+	size_t name_len;
 	const char *flags;
 
 
@@ -2402,11 +2402,12 @@ static bool processLangDefineKind(const langType language,
 	if (p[0] == '\0')
 		error (FATAL, "no kind definition specified in \"--%s\" option", option);
 
-	letter = p[0];
+	/* See #1697. isalnum expects 0~255 as the range of characters. */
+	letter = (unsigned char)p[0];
 	if (letter == ',')
 		error (FATAL, "no kind letter specified in \"--%s\" option", option);
-	if (!isalnum (letter))
-		error (FATAL, "the kind letter given in \"--%s\" option is not an alphabet or a number", option);
+	if (!isalpha (letter))
+		error (FATAL, "the kind letter given in \"--%s\" option is not an alphabet", option);
 	else if (letter == KIND_FILE_DEFAULT_LETTER)
 		error (FATAL, "the kind letter `F' in \"--%s\" option is reserved for \"file\" kind", option);
 	else if (getKindForLetter (parser->kindControlBlock, letter))
@@ -2422,28 +2423,48 @@ static bool processLangDefineKind(const langType language,
 	p += 2;
 	if (p[0] == '\0')
 		error (FATAL, "no kind name specified in \"--%s\" option", option);
-	tmp_end = strchr (p, ',');
-	if (!tmp_end)
+	marker_end = strchr (p, ',');
+	if (!marker_end)
 		error (FATAL, "no kind description specified in \"--%s\" option", option);
 
-	tmp_start = p;
-	while (p != tmp_end)
+	name_start = p;
+	while (p != marker_end)
 	{
-		if (!isalnum (*p))
-			error (FATAL, "unacceptable char as part of kind name in \"--%s\" option", option);
+		if (p == name_start)
+		{
+			if (!isalpha(*p))
+			{
+				char *name_in_msg = eStrndup (name_start, marker_end - name_start);
+				error (FATAL,
+					   "a kind name doesn't start with an alphabetical character: "
+					   "'%s' in \"--%s\" option",
+					   name_in_msg, option);
+			}
+		}
+		else
+		{
+			if (!isalnum (*p))
+			{
+				char *name_in_msg = eStrndup (name_start, marker_end - name_start);
+				error (FATAL,
+					   "non-alphanumeric char is used as part of kind name: "
+					   "'%s' in \"--%s\" option",
+					   name_in_msg, option);
+			}
+		}
 		p++;
 	}
 
-	if (tmp_end == tmp_start)
+	if (marker_end == name_start)
 		error (FATAL, "the kind name in \"--%s\" option is empty", option);
 
-	tmp_len = tmp_end - tmp_start;
-	if (strncmp (tmp_start, KIND_FILE_DEFAULT_NAME, tmp_len) == 0)
+	name_len = marker_end - name_start;
+	if (strncmp (name_start, KIND_FILE_DEFAULT_NAME, name_len) == 0)
 		error (FATAL,
 			   "the kind name " KIND_FILE_DEFAULT_NAME " in \"--%s\" option is reserved",
 			   option);
 
-	name = eStrndup (tmp_start, tmp_len);
+	name = eStrndup (name_start, name_len);
 	if (getKindForName (parser->kindControlBlock, name))
 	{
 		error (WARNING, "the kind for name `%s' specified in \"--%s\" option is already defined.",

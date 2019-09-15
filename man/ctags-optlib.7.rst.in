@@ -169,13 +169,19 @@ OPTION ITEMS
 	Define a kind for *<LANG>*.
 	Be not confused this with ``--kinds-<LANG>``.
 
-	*letter* must be an alphabetical character ('[0-9a-zA-EG-Z]')
+	*letter* must be an alphabetical character ('[a-zA-EG-Z]')
 	other than "F". "F" has been reserved for representing a file
 	since Exuberant-ctags.
 
-	*name* also must come from alphabetical characters ('[0-9a-zA-Z]+').
-	Do not use "file" as *name*. It has been reserved for representing
-	a file since Exuberant-ctags.
+	*name* must start with an alphabetic character, and the rest
+	must  be alphanumeric ('[a-zA-Z][a-zA-Z0-9]*'). Do not use
+	"file" as *name*. It has been reserved for representing a file
+	since Exuberant-ctags.
+
+	Note that using a number character in a *name* violates the
+	version 2 of tags file format. The version 3 revised by
+	Universal-ctags project allows using the number character as an
+	initial in a kind name.
 
 	*description* comes from any printable ASCII characters. The
 	exception is "{" and "\". "{" is reserved for adding flags
@@ -241,14 +247,13 @@ OPTION ITEMS
 	``--kinddef-<LANG>``. This form is recommended in Universal-ctags.
 
 	The full form of *kind-spec* is in the form of a single *letter*, a
-	comma, a *name* (only out of alphabetical characters), a comma, a
-	*description*. See the description of
+	comma, a *name*, a comma, a *description*. See the description of
 	``--kinddef-<LANG>=letter,name,description`` option about how the
 	elements are used.
 
 	Either the kind *name* and/or the *description* can be omitted.
 	However, unless the *letter* is not defined with
-	``--kinddef-<LANG>`` option, omitting is not recommended in in
+	``--kinddef-<LANG>`` option, omitting is not recommended in
 	Universal-ctags. The omitting form is supported only for keeping
 	the compatibility with Exuberant-ctags. Supporting the omitting
 	form will be removed from Universal-ctags in the future.  If

@@ -5,13 +5,13 @@
 --kinddef-FOO=c,class,classes
 --kinddef-FOO=v,variable,variables
 
---regex-FOO=/namespace ([a-zA-Z]+) /\1/N,another_namespace/{warning="found namespace '\1'"}{exclusive}
+--regex-FOO=/namespace ([a-zA-Z]+) /\1/N,anotherNamespace/{warning="found namespace '\1'"}{exclusive}
 --regex-FOO=/namespace ([a-zA-Z]+) /\1/x,bad/{fatal="should not get this"}
 --regex-FOO=/bad regex ([a-zA-Z-]+)/\1/x,bad/{fatal="bad='\1'"}
 
 
---mline-regex-FOO=/namespace ([a-zA-Z]+) /\1/m,mline_namespace/{mgroup=1}{warning="got namespace"}
---mline-regex-FOO=/var ([a-zA-Z]+) ([a-zA-Z]+);/\2/V,mline_variable/{warning="got variable '\2' of type \1"}{mgroup=2}
+--mline-regex-FOO=/namespace ([a-zA-Z]+) /\1/m,mlineNamespace/{mgroup=1}{warning="got namespace"}
+--mline-regex-FOO=/var ([a-zA-Z]+) ([a-zA-Z]+);/\2/V,mlineVariable/{warning="got variable '\2' of type \1"}{mgroup=2}
 --mline-regex-FOO=/bad multi-line ([a-zA-Z-]+)/\1/x,bad/{fatal="bad='\1'"}
 
 

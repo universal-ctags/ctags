@@ -5,7 +5,7 @@ CTAGS=$1
 
 ${CTAGS} --quiet --options=NONE -o - \
 	 --langdef=foo \
-	 --regex-foo='/a/\0/a,x y,x y z/' --kinds-foo=-a --foo-kinds=+a \
+	 --regex-foo='/a/\0/a,xy,x y z/' --kinds-foo=-a --foo-kinds=+a \
 	 --regex-foo=/b/\0/b/ --foo-kinds=-b \
 	 --regex-foo=/c/\0/c/ \
 	 --kinds-foo=-c \
