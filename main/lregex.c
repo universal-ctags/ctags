@@ -1336,7 +1336,7 @@ static void parseKinds (
 		*kind = KIND_REGEX_DEFAULT_LETTER;
 		*kindName = eStrdup (KIND_REGEX_DEFAULT_NAME);
 	}
-	else if (kinds [0] != '\0')
+	else
 	{
 		const char* k = kinds;
 		if (k [0] != ','  &&  (k [1] == ','  ||  k [1] == '\0'))
