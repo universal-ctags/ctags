@@ -34,7 +34,6 @@ They have these additional language parsers:
 * `Abaqus <http://en.wikipedia.org/wiki/Abaqus>`_
 * `ActionScript <http://en.wikipedia.org/wiki/ActionScript>`_
 * `AsciiDoc <http://en.wikipedia.org/wiki/AsciiDoc>`_
-* `DocBook <http://en.wikipedia.org/wiki/DocBook>`_
 * `Ferite (c.c) <http://en.wikipedia.org/wiki/Ferite>`_
 * `GLSL (c.c) <http://en.wikipedia.org/wiki/OpenGL_Shading_Language>`_
 * `Haskell <http://en.wikipedia.org/wiki/Haskell_%28programming_language%29>`_
@@ -92,5 +91,3 @@ Linux kernel
 
 	See linux/scripts/tags.sh of Linux kernel source tree.
 	It utilizes c parser to the utmost limit.
-
-
