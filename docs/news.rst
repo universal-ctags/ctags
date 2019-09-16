@@ -51,6 +51,7 @@ The following parsers have been added:
 * D
 * DBusIntrospect *libxml*
 * Diff
+* DocBook *libxml*
 * DTD
 * DTS
 * Elixir *optlib*

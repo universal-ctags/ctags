@@ -19,6 +19,12 @@
 *	 DATA DECLARATIONS
 */
 
+enum XMLKindType {
+	KIND_XML_NONE = -1,
+	KIND_XML_ID,
+	KIND_XML_NSPREFIX,
+};
+
 typedef struct sXmlSubparser xmlSubparser;
 struct sXmlSubparser {
 	subparser subparser;

@@ -25,10 +25,7 @@ static void makeTagWithNotification (xmlNode *node,
 									 tagEntryInfo *tag,
 									 void *userData);
 
-typedef enum {
-	K_ID,
-	K_NSPREFIX,
-} xmlKind;
+typedef enum XMLKindType xmlKind;
 
 static kindDefinition XmlKinds [] = {
 	{ true, 'i', "id", "id attributes" },
@@ -68,7 +65,7 @@ static tagXpathTable XmlXpathMainTable [] = {
 static tagXpathTable XmlXpathIdTable [] = {
 	{ "./@id",
 	  LXPATH_TABLE_DO_MAKE,
-	  { .makeTagSpec = { K_ID, ROLE_DEFINITION_INDEX,
+	  { .makeTagSpec = { KIND_XML_ID, ROLE_DEFINITION_INDEX,
 						 .make = makeTagWithNotification,} }
 	},
 };
@@ -114,11 +111,11 @@ static int makeNsPrefixTag (const char *name, xmlNode *node, xmlNsPtr ns)
 	vString *anon = NULL;
 
 	if (name)
-		initTagEntry (&tag, name, K_NSPREFIX);
+		initTagEntry (&tag, name, KIND_XML_NSPREFIX);
 	else
 	{
-		anon = anonGenerateNew ("ns", K_NSPREFIX);
-		initTagEntry (&tag, vStringValue (anon), K_NSPREFIX);
+		anon = anonGenerateNew ("ns", KIND_XML_NSPREFIX);
+		initTagEntry (&tag, vStringValue (anon), KIND_XML_NSPREFIX);
 		markTagExtraBit (&tag, XTAG_ANONYMOUS);
 	}
 	/* TODO
