@@ -1354,9 +1354,7 @@ static void parseKinds (
 				*kindName = eStrdup (k);
 			else
 			{
-				*kindName = (char*) eMalloc (comma - k + 1);
-				strncpy (*kindName, k, comma - k);
-				(*kindName) [comma - k] = '\0';
+				*kindName = eStrndup (k, comma - k );
 				k = comma + 1;
 				if (k [0] != '\0')
 					*description = eStrdup (k);
