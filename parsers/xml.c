@@ -81,7 +81,7 @@ static tagXpathTableTable xmlXpathTableTable[] = {
 static int makeTagWithNotificationCommon (tagEntryInfo *tag,
 										   xmlNode *node)
 {
-	int n = makeTagEntry (tag);
+	int corkIndex = makeTagEntry (tag);
 
 	subparser *sub;
 	foreachSubparser (sub, false)
@@ -91,11 +91,11 @@ static int makeTagWithNotificationCommon (tagEntryInfo *tag,
 		if (xmlsub->makeTagEntryWithNodeNotify)
 		{
 			enterSubparser(sub);
-			xmlsub->makeTagEntryWithNodeNotify (xmlsub, node, tag);
+			xmlsub->makeTagEntryWithNodeNotify (xmlsub, node, corkIndex);
 			leaveSubparser();
 		}
 	}
-	return n;
+	return corkIndex;
 }
 
 static void makeTagWithNotification (xmlNode *node,
@@ -188,6 +188,7 @@ XmlParser (void)
 	def->selectLanguage = selectors;
 	def->fieldTable = XmlFields;
 	def->fieldCount = ARRAY_SIZE (XmlFields);
+	def->useCork = true;
 
 	return def;
 }

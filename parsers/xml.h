@@ -28,7 +28,7 @@ struct sXmlSubparser {
 	 * just found to subparsers.
 	 */
 	void (* makeTagEntryWithNodeNotify) (xmlSubparser *s,
-										 xmlNode *node, tagEntryInfo *xmlTag);
+										 xmlNode *node, int corKIndex);
 
 	/* A subparser should call findXMLTags() in the callback function
 	 * assigned to this field. The XML base parser prepares CTX and ROOT.
