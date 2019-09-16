@@ -1328,9 +1328,8 @@ static void parseKinds (
 		const char* const kindSpec, char* const kindLetter, char** const kindName,
 		char **description)
 {
-	*kindLetter = '\0';
-	*kindName = NULL;
 	*description = NULL;
+
 	if (kindSpec == NULL  ||  kindSpec [0] == '\0')
 	{
 		*kindLetter = KIND_REGEX_DEFAULT_LETTER;
@@ -1339,17 +1338,21 @@ static void parseKinds (
 	else
 	{
 		const char* k = kindSpec;
+
 		if (k [0] != ','  &&  (k [1] == ','  ||  k [1] == '\0'))
 			*kindLetter = *k++;
 		else
 			*kindLetter = KIND_REGEX_DEFAULT_LETTER;
+
 		if (*k == ',')
 			++k;
+
 		if (k [0] == '\0')
 			*kindName = eStrdup (KIND_REGEX_DEFAULT_NAME);
 		else
 		{
 			const char *const comma = strchr (k, ',');
+
 			if (comma == NULL)
 				*kindName = eStrdup (k);
 			else
