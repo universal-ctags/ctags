@@ -1325,24 +1325,24 @@ static regex_t* compileRegex (enum regexParserType regptype,
 
 
 static void parseKinds (
-		const char* const kinds, char* const kind, char** const kindName,
+		const char* const kinds, char* const kindLetter, char** const kindName,
 		char **description)
 {
-	*kind = '\0';
+	*kindLetter = '\0';
 	*kindName = NULL;
 	*description = NULL;
 	if (kinds == NULL  ||  kinds [0] == '\0')
 	{
-		*kind = KIND_REGEX_DEFAULT_LETTER;
+		*kindLetter = KIND_REGEX_DEFAULT_LETTER;
 		*kindName = eStrdup (KIND_REGEX_DEFAULT_NAME);
 	}
 	else
 	{
 		const char* k = kinds;
 		if (k [0] != ','  &&  (k [1] == ','  ||  k [1] == '\0'))
-			*kind = *k++;
+			*kindLetter = *k++;
 		else
-			*kind = KIND_REGEX_DEFAULT_LETTER;
+			*kindLetter = KIND_REGEX_DEFAULT_LETTER;
 		if (*k == ',')
 			++k;
 		if (k [0] == '\0')
