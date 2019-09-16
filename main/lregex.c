@@ -1325,20 +1325,20 @@ static regex_t* compileRegex (enum regexParserType regptype,
 
 
 static void parseKinds (
-		const char* const kinds, char* const kindLetter, char** const kindName,
+		const char* const kindSpec, char* const kindLetter, char** const kindName,
 		char **description)
 {
 	*kindLetter = '\0';
 	*kindName = NULL;
 	*description = NULL;
-	if (kinds == NULL  ||  kinds [0] == '\0')
+	if (kindSpec == NULL  ||  kindSpec [0] == '\0')
 	{
 		*kindLetter = KIND_REGEX_DEFAULT_LETTER;
 		*kindName = eStrdup (KIND_REGEX_DEFAULT_NAME);
 	}
 	else
 	{
-		const char* k = kinds;
+		const char* k = kindSpec;
 		if (k [0] != ','  &&  (k [1] == ','  ||  k [1] == '\0'))
 			*kindLetter = *k++;
 		else
