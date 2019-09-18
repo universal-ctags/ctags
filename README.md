@@ -43,6 +43,12 @@ Go to the [releases](https://github.com/universal-ctags/ctags-win32/releases) pa
 ### Mac
 See [Homebrew Tap for Universal Ctags](https://github.com/universal-ctags/homebrew-universal-ctags)
 
+### Snap
+Go to [ctags-snap](https://github.com/universal-ctags/ctags-snap) and
+clone the `ctags-snap` repo. Then, follow instructions to build the
+snap package of ctags. Snapcraft will automatically fetch the source
+code from GitHub.
+
 ## How to build and install ##
 
 To build with Autotools, see `docs/autotools.rst` for more information.
