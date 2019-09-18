@@ -125,5 +125,5 @@ runs the command in two ways.
     The make target runs the command with "validate* and an input
     file name for validating the input file.  The command exits
     non-zero if the input file contains invalid syntax. This method
-	will never run if *is_runnable* method of the command exits with
-	non-zero.
+    will never run if *is_runnable* method of the command exits with
+    non-zero.
