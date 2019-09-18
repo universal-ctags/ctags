@@ -172,6 +172,9 @@ optionValues Option = {
 	.putFieldPrefix = false,
 	.maxRecursionDepth = 0xffffffff,
 	.interactive = false,
+#ifdef WIN32
+	.useSlashAsFilenameSeparator = FILENAME_SEP_UNSET,
+#endif
 #ifdef DEBUG
 	.breakLine = 0,
 #endif
@@ -416,6 +419,10 @@ static optionDescription LongOptionDescription [] = {
  {0,"       never:  be absolute even if input files are passed in with relative paths" },
  {1,"  --totals=[yes|no|extra]"},
  {1,"       Print statistics about input and tag files [no]."},
+#ifdef WIN32
+ {1,"  --use-slash-as-filename-separator"},
+ {1,"       Use slash as filename separator [no]."},
+#endif
  {1,"  --verbose=[yes|no]"},
  {1,"       Enable verbose messages describing actions on each input file."},
  {1,"  --version"},
@@ -2786,6 +2793,9 @@ static booleanOption BooleanOptions [] = {
 	{ "recurse",        &Option.recurse,                false, STAGE_ANY },
 #endif
 	{ "verbose",        &ctags_verbose,                false, STAGE_ANY },
+#ifdef WIN32
+	{ "use-slash-as-filename-separator", (bool *)&Option.useSlashAsFilenameSeparator, false, STAGE_ANY },
+#endif
 	{ "with-list-header", &localOption.withListHeader,       true,  STAGE_ANY },
 	{ "_fatal-warnings",&Option.fatalWarnings,          false, STAGE_ANY },
 };

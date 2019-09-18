@@ -11,6 +11,7 @@
 
 #include "general.h"  /* must always come first */
 #include "mio.h"
+#include "options_p.h"
 #include "types.h"
 
 /* Other than writeEntry can be NULL.
@@ -49,6 +50,11 @@ struct sTagWriter {
 	void (* rescanFailedEntry) (tagWriter *writer, unsigned long validTagNum,
 								void *clientData);
 	bool (* treatFieldAsFixed) (int fieldType);
+
+#ifdef WIN32
+	enum filenameSepOp (* overrideFilenameSeparator) (enum filenameSepOp currentSetting);
+#endif	/* WIN32 */
+
 	const char *defaultFileName;
 
 	/* The value returned from preWriteEntry is stored `private' field.
@@ -86,4 +92,7 @@ extern bool ptagMakeCtagsOutputMode (ptagDesc *desc, void *data CTAGS_ATTR_UNUSE
 extern bool writerCanPrintPtag (void);
 extern bool writerDoesTreatFieldAsFixed (int fieldType);
 
+#ifdef WIN32
+extern enum filenameSepOp getFilenameSeparator (enum filenameSepOp currentSetting);
+#endif	/* WIN32 */
 #endif	/* CTAGS_MAIN_WRITER_PRIVATE_H */

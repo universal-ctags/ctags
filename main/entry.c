@@ -1236,6 +1236,20 @@ static void writeTagEntry (const tagEntryInfo *const tag, bool checkingNeeded)
 
 	DebugStatement ( debugEntry (tag); )
 
+#ifdef WIN32
+	if (getFilenameSeparator(Option.useSlashAsFilenameSeparator) == FILENAME_SEP_USE_SLASH)
+	{
+		Assert (((const tagEntryInfo *)tag)->inputFileName);
+		char *c = (char *)(((tagEntryInfo *const)tag)->inputFileName);
+		while (*c)
+		{
+			if (*c == PATH_SEPARATOR)
+				*c = OUTPUT_PATH_SEPARATOR;
+			c++;
+		}
+	}
+#endif
+
 	if (includeExtensionFlags ()
 	    && isXtagEnabled (XTAG_QUALIFIED_TAGS)
 	    && doesInputLanguageRequestAutomaticFQTag ()

@@ -119,3 +119,12 @@ extern bool writerDoesTreatFieldAsFixed (int fieldType)
 		return writer->treatFieldAsFixed (fieldType);
 	return false;
 }
+
+#ifdef WIN32
+extern enum filenameSepOp getFilenameSeparator (enum filenameSepOp currentSetting)
+{
+	if (writer->overrideFilenameSeparator)
+		return writer->overrideFilenameSeparator (currentSetting);
+	return currentSetting;
+}
+#endif

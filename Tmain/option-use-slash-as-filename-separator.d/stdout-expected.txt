@@ -1,0 +1,12 @@
+#u-ctags output
+n	src/input.c	/^int n;$/;"	v	typeref:typename:int
+n	src/input.c	/^int n;$/;"	v	typeref:typename:int
+n	src\\input.c	/^int n;$/;"	v	typeref:typename:int
+#e-ctags output
+n	src\input.c	/^int n;$/;"	v	typeref:typename:int
+n	src/input.c	/^int n;$/;"	v	typeref:typename:int
+n	src\input.c	/^int n;$/;"	v	typeref:typename:int
+#xref output
+n                variable      1 src\\input.c     int n;
+n                variable      1 src/input.c      int n;
+n                variable      1 src\\input.c     int n;
