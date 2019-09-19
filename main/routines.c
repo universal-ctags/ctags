@@ -128,7 +128,7 @@
 /*  Hack for ridiculous practice of Microsoft Visual C++.
  */
 #if defined (WIN32)
-# if defined (_MSC_VER)
+# if defined (_MSC_VER) || defined (__MINGW32__)
 #  define stat    _stat
 #  define getcwd  _getcwd
 #  define currentdrive() (_getdrive() + 'A' - 1)
