@@ -192,7 +192,8 @@ In the context of the SPY-WARS example, scheme parser is called a *base
 parser*. The SPY-WARS is called a *subparser*. A base parser tags
 definitions found in lower level view. A subparser on the base parser tags
 definitions found in higher level view. This relationship can be nested.
-A subparser can be a base parser for another sub parsers.
+A subparser can be a base parser for another su
+parsers.
 
 .. figure:: stack-and-parsers.svg
 	    :scale: 80%
@@ -647,7 +648,7 @@ must call `scheduleRunningBaseparser` in the main `parser` method.
     }
 
 A subparser can do nothing actively. A base parser makes its subparser
-work b calling methods of the subparser.  Therefor a subparser must
+work by calling methods of the subparser.  Therefor a subparser must
 run its base parser when the subparser is chosen in a top down way,
 The main part prepares `scheduleRunningBaseparser` function for the purpose.
 
