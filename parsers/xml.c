@@ -28,11 +28,15 @@ static void makeTagWithNotification (xmlNode *node,
 typedef enum {
 	K_ID,
 	K_NSPREFIX,
+	K_ROOT,
 } xmlKind;
 
+#define ROOT_ELT_LETTER 'r'
+static const char ROOT_ELT_LETTER_STR[2] = {ROOT_ELT_LETTER, '\0'};
 static kindDefinition XmlKinds [] = {
 	{ true, 'i', "id", "id attributes" },
 	{ true, 'n', "nsprefix", "namespace prefixes" },
+	{ true, ROOT_ELT_LETTER, "root", "root elements" },
 };
 
 enum xmlXpathTables {
@@ -76,6 +80,21 @@ static tagXpathTable XmlXpathIdTable [] = {
 static tagXpathTableTable xmlXpathTableTable[] = {
 	[TABLE_MAIN] = { ARRAY_AND_SIZE (XmlXpathMainTable) },
 	[TABLE_ID]   = { ARRAY_AND_SIZE (XmlXpathIdTable) },
+};
+
+/* Pick up the root element specifier from "<!DOCTYPE...", and
+ * run DTD parser for the "[" ... "]>" area.
+ *
+ * optlib2c translates the following .ctags elements:
+ * ==========================================================
+ * --langdef=Xml
+ * --kinddef-Xml=r,root,root elements
+ * --mline-regex-Xml=/<!DOCTYPE[[:space:]]+([a-zA-Z0-9]+)[[:space:]]+[^[]+\[((.|[\n])+)\]>/\1/r/{mgroup=1}{_guest=DTD,2start,2end}
+ * ==========================================================
+ */
+static tagRegexTable XmlTagRegexTable [] = {
+	{"<!DOCTYPE[[:space:]]+([a-zA-Z0-9]+)[[:space:]]+[^[]*\\[((.|[\n])+)\\]>", "\\1",
+	 ROOT_ELT_LETTER_STR, "{mgroup=1}{_guest=DTD,2start,2end}", NULL, true},
 };
 
 static int makeTagWithNotificationCommon (tagEntryInfo *tag,
@@ -188,6 +207,8 @@ XmlParser (void)
 	def->selectLanguage = selectors;
 	def->fieldTable = XmlFields;
 	def->fieldCount = ARRAY_SIZE (XmlFields);
+	def->tagRegexTable = XmlTagRegexTable;
+	def->tagRegexCount = ARRAY_SIZE(XmlTagRegexTable);
 
 	return def;
 }

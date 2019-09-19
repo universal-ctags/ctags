@@ -161,6 +161,7 @@ static xmlDocPtr makeXMLDoc (void)
 	data = getInputFileData (&size);
 	if (data)
 	{
+		xmlSetGenericErrorFunc (NULL, suppressWarning);
 		xmlLineNumbersDefault (1);
 		doc = xmlParseMemory((const char*)data, size);
 	}
@@ -185,8 +186,6 @@ extern void findXMLTagsFull (xmlXPathContext *ctx, xmlNode *root,
 		usedAsEntryPoint = true;
 
 		findRegexTags ();
-
-		xmlSetGenericErrorFunc (NULL, suppressWarning);
 
 		doc = makeXMLDoc ();
 
