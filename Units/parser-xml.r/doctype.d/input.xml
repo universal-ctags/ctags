@@ -1,0 +1,16 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE book [
+<!ENTITY chap1 SYSTEM "chap1.xml">
+<!ENTITY chap2 SYSTEM "chap2.xml">
+<!ENTITY chap3 SYSTEM "chap3.xml">
+<!ENTITY appa SYSTEM "appa.xml">
+<!ENTITY appb SYSTEM "appb.xml">
+]>
+<book xmlns="http://docbook.org/ns/docbook" version="5.0">
+<title>My First Book</title>
+&chap1;
+&chap2;
+&chap3;
+&appa;
+&appb;
+</book>

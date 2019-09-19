@@ -510,7 +510,7 @@ static kindDefinition *kindNew (char letter, const char *name, const char *descr
 {
 	kindDefinition *kdef = xCalloc (1, kindDefinition);
 	kdef->letter        = letter;
-	kdef->name = eStrdup (name? name: KIND_REGEX_DEFAULT_NAME);
+	kdef->name = eStrdup (name);
 	kdef->description = eStrdup(description? description: kdef->name);
 	kdef->enabled = true;
 	return kdef;
@@ -1151,6 +1151,7 @@ static void setKind(regexPattern * ptrn, const langType owner,
 {
 	Assert (ptrn);
 	Assert (ptrn->u.tag.name_pattern);
+	Assert (kindName);
 
 	if (*ptrn->u.tag.name_pattern == '\0' &&
 		ptrn->exclusive &&
@@ -1165,7 +1166,7 @@ static void setKind(regexPattern * ptrn, const langType owner,
 		kdef = getLanguageKindForLetter (owner, kindLetter);
 		if (kdef)
 		{
-			if (kindName && strcmp (kdef->name, kindName) && (strcmp(kindName, KIND_REGEX_DEFAULT_NAME)))
+			if (strcmp (kdef->name, kindName) && (strcmp(kindName, KIND_REGEX_DEFAULT_NAME)))
 				/* When using a same kind letter for multiple regex patterns, the name of kind
 				   should be the same. */
 				error  (WARNING, "Don't reuse the kind letter `%c' in a language %s (old: \"%s\", new: \"%s\")",
@@ -1325,38 +1326,39 @@ static regex_t* compileRegex (enum regexParserType regptype,
 
 
 static void parseKinds (
-		const char* const kinds, char* const kind, char** const kindName,
+		const char* const kindSpec, char* const kindLetter, char** const kindName,
 		char **description)
 {
-	*kind = '\0';
-	*kindName = NULL;
 	*description = NULL;
-	if (kinds == NULL  ||  kinds [0] == '\0')
+
+	if (kindSpec == NULL  ||  kindSpec [0] == '\0')
 	{
-		*kind = KIND_REGEX_DEFAULT_LETTER;
+		*kindLetter = KIND_REGEX_DEFAULT_LETTER;
 		*kindName = eStrdup (KIND_REGEX_DEFAULT_NAME);
 	}
-	else if (kinds [0] != '\0')
+	else
 	{
-		const char* k = kinds;
+		const char* k = kindSpec;
+
 		if (k [0] != ','  &&  (k [1] == ','  ||  k [1] == '\0'))
-			*kind = *k++;
+			*kindLetter = *k++;
 		else
-			*kind = KIND_REGEX_DEFAULT_LETTER;
+			*kindLetter = KIND_REGEX_DEFAULT_LETTER;
+
 		if (*k == ',')
 			++k;
+
 		if (k [0] == '\0')
 			*kindName = eStrdup (KIND_REGEX_DEFAULT_NAME);
 		else
 		{
 			const char *const comma = strchr (k, ',');
+
 			if (comma == NULL)
 				*kindName = eStrdup (k);
 			else
 			{
-				*kindName = (char*) eMalloc (comma - k + 1);
-				strncpy (*kindName, k, comma - k);
-				(*kindName) [comma - k] = '\0';
+				*kindName = eStrndup (k, comma - k );
 				k = comma + 1;
 				if (k [0] != '\0')
 					*description = eStrdup (k);
@@ -1904,7 +1906,6 @@ static regexPattern *addTagRegexInternal (struct lregexControlBlock *lcb,
 					  const char* const flags,
 					  bool *disabled)
 {
-	regexPattern *rptr = NULL;
 	Assert (regex != NULL);
 	Assert (name != NULL);
 
@@ -1912,97 +1913,91 @@ static regexPattern *addTagRegexInternal (struct lregexControlBlock *lcb,
 		return NULL;
 
 	regex_t* const cp = compileRegex (regptype, regex, flags);
+	if (cp == NULL)
+		return NULL;
 
-	if (cp != NULL)
+	char kindLetter;
+	char* kindName;
+	char* description;
+	kindDefinition* fileKind;
+
+	parseKinds (kinds, &kindLetter, &kindName, &description);
+	fileKind = getLanguageKind (lcb->owner, KIND_FILE_INDEX);
+	if (kindLetter == fileKind->letter)
+		error (FATAL,
+			   "Kind letter \'%c\' used in regex definition \"%s\" of %s language is reserved in ctags main",
+			   kindLetter,
+			   regex,
+			   getLanguageName (lcb->owner));
+	else if (!isalpha ((unsigned char)kindLetter))
+		error (FATAL,
+			   "Kind letter must be an alphabetical character: \"%c\"",
+			   kindLetter);
+
+	if (strcmp (kindName, fileKind->name) == 0)
+		error (FATAL,
+			   "Kind name \"%s\" used in regex definition \"%s\" of %s language is reserved in ctags main",
+			   kindName,
+			   regex,
+			   getLanguageName (lcb->owner));
+
+	const char *option_bsae = (regptype == REG_PARSER_SINGLE_LINE? "regex"        :
+							   regptype == REG_PARSER_MULTI_LINE ? "mline-regex"  :
+							   regptype == REG_PARSER_MULTI_TABLE? "_mtable-regex":
+							   NULL);
+	Assert (option_bsae);
+
+	for (const char * p = kindName; *p; p++)
 	{
-		char kindLetter;
-		char* kindName;
-		char* description;
-		kindDefinition* fileKind;
-
-		parseKinds (kinds, &kindLetter, &kindName, &description);
-		fileKind = getLanguageKind (lcb->owner, KIND_FILE_INDEX);
-		if (kindLetter == fileKind->letter)
-			error (FATAL,
-				   "Kind letter \'%c\' used in regex definition \"%s\" of %s language is reserved in ctags main",
-				   kindLetter,
-				   regex,
-				   getLanguageName (lcb->owner));
-		else if (!isalpha ((unsigned char)kindLetter))
-			error (FATAL,
-				   "Kind letter must be an alphabetical character: \"%c\"",
-				   kindLetter);
-
-		if (kindName)
+		if (p == kindName)
 		{
-			if (strcmp (kindName, fileKind->name) == 0)
+			if (!isalpha(*p))
 				error (FATAL,
-					   "Kind name \"%s\" used in regex definition \"%s\" of %s language is reserved in ctags main",
+					   "A kind name doesn't start with an alphabetical character: "
+					   "'%s' in \"--%s-%s\" option",
 					   kindName,
-					   regex,
+					   option_bsae,
+					   getLanguageName (lcb->owner));
+		}
+		else
+		{
+			/*
+			 * People may object to this error.
+			 * Searching github repositories, I found not a few .ctags files
+			 * in which Exuberant-ctags users define kind names with whitespaces.
+			 * "FATAL" error breaks the compatibility.
+			 */
+			if (!isalnum(*p))
+				error (/* regptype == REG_PARSER_SINGLE_LINE? WARNING: */ FATAL,
+					   "Non-alphanumeric char is used in kind name: "
+					   "'%s' in \"--%s-%s\" option",
+					   kindName,
+					   option_bsae,
 					   getLanguageName (lcb->owner));
 
-
-			const char *option_bsae = (regptype == REG_PARSER_SINGLE_LINE? "regex"        :
-									   regptype == REG_PARSER_MULTI_LINE ? "mline-regex"  :
-									   regptype == REG_PARSER_MULTI_TABLE? "_mtable-regex":
-									   NULL);
-			Assert (option_bsae);
-
-			for (const char * p = kindName; *p; p++)
-			{
-				if (p == kindName)
-				{
-					if (!isalpha(*p))
-						error (FATAL,
-							   "A kind name doesn't start with an alphabetical character: "
-							   "'%s' in \"--%s-%s\" option",
-							   kindName,
-							   option_bsae,
-							   getLanguageName (lcb->owner));
-				}
-				else
-				{
-					/*
-					 * People may object to this error.
-					 * Searching github repositories, I found not a few .ctags files
-					 * in which Exuberant-ctags users define kind names with whitespaces.
-					 * "FATAL" error breaks the compatibility.
-					 */
-					if (!isalnum(*p))
-						error (/* regptype == REG_PARSER_SINGLE_LINE? WARNING: */ FATAL,
-							   "Non-alphanumeric char is used in kind name: "
-							   "'%s' in \"--%s-%s\" option",
-							   kindName,
-							   option_bsae,
-							   getLanguageName (lcb->owner));
-
-				}
-
-			}
 		}
+	}
 
-		rptr = addCompiledTagPattern (lcb, table_index,
-									  regptype, cp, name,
-									  kindLetter, kindName, description, flags,
-									  disabled);
-		rptr->pattern_string = escapeRegexPattern(regex);
-		if (kindName)
-			eFree (kindName);
-		if (description)
-			eFree (description);
+	regexPattern *rptr = addCompiledTagPattern (lcb, table_index,
+												regptype, cp, name,
+												kindLetter, kindName, description, flags,
+												disabled);
+	rptr->pattern_string = escapeRegexPattern(regex);
 
-		if (*name == '\0')
-		{
-			if (rptr->exclusive || rptr->scopeActions & SCOPE_PLACEHOLDER
-				|| rptr->anonymous_tag_prefix
-				|| regptype == REG_PARSER_MULTI_TABLE
-				|| rptr->guest.lang.type != GUEST_LANG_UNKNOWN
-				)
-				rptr->accept_empty_name = true;
-			else
-				error (WARNING, "%s: regexp missing name pattern", regex);
-		}
+	eFree (kindName);
+	if (description)
+		eFree (description);
+
+	if (*name == '\0')
+	{
+		if (rptr->exclusive || rptr->scopeActions & SCOPE_PLACEHOLDER
+			|| rptr->anonymous_tag_prefix
+			|| regptype == REG_PARSER_MULTI_TABLE
+			|| rptr->guest.lang.type != GUEST_LANG_UNKNOWN
+			)
+			rptr->accept_empty_name = true;
+		else
+			error (WARNING, "%s: regexp missing name pattern", regex);
 	}
 
 	return rptr;
