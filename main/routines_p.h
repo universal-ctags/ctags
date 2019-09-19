@@ -27,7 +27,7 @@
 # endif
 #endif
 
-#if defined (MSDOS_STYLE_PATH) && defined (UNIX_PATH_SEPARATOR)
+#if defined (MSDOS_STYLE_PATH)
 # define OUTPUT_PATH_SEPARATOR	'/'
 #else
 # define OUTPUT_PATH_SEPARATOR	PATH_SEPARATOR

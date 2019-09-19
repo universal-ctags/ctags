@@ -526,7 +526,7 @@ static struct Feature {
 #ifdef CUSTOM_CONFIGURATION_FILE
 	{"custom-conf", "read \"" CUSTOM_CONFIGURATION_FILE "\" as config file"},
 #endif
-#if defined (WIN32) && defined (UNIX_PATH_SEPARATOR)
+#if defined (WIN32)
 	{"unix-path-separator", "can use '/' as file name separator"},
 #endif
 #ifdef HAVE_ICONV

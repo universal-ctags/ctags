@@ -257,7 +257,7 @@ extern vString* stringListFileFinds (
 		matched = fileNameMatched (vstr, normalized);
 	}
 
-#if defined (WIN32) && defined (UNIX_PATH_SEPARATOR)
+#if defined (WIN32)
 	vStringDelete (tmp);
 #endif
 
