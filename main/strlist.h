@@ -14,6 +14,7 @@
 */
 #include "general.h"  /* must always come first */
 
+#include "routines_p.h"
 #include "vstring.h"
 #include "ptrarray.h"
 

@@ -247,7 +247,7 @@ extern vString* stringListFileFinds (
 
 #if defined (WIN32)
 	vString *tmp = vStringNewInit (fileName);
-	vStringTranslate (tmp, '\\', '/');
+	vStringTranslate (tmp, PATH_SEPARATOR, OUTPUT_PATH_SEPARATOR);
 	normalized = vStringValue (tmp);
 #endif
 

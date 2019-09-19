@@ -1146,7 +1146,7 @@ static void processExcludeOption (
 	{
 		vString *const item = vStringNewInit (parameter);
 #if defined (WIN32)
-		vStringTranslate(item, '\\', '/');
+		vStringTranslate(item, PATH_SEPARATOR, OUTPUT_PATH_SEPARATOR);
 #endif
 		if (Excluded == NULL)
 			Excluded = stringListNew ();
