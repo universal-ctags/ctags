@@ -192,8 +192,7 @@ In the context of the SPY-WARS example, scheme parser is called a *base
 parser*. The SPY-WARS is called a *subparser*. A base parser tags
 definitions found in lower level view. A subparser on the base parser tags
 definitions found in higher level view. This relationship can be nested.
-A subparser can be a base parser for another su
-parsers.
+A subparser can be a base parser for another sub parsers.
 
 .. figure:: stack-and-parsers.svg
 	    :scale: 80%
