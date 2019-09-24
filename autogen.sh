@@ -11,7 +11,7 @@ if [ -z "${MAKE}" ]; then
 	elif type bmake > /dev/null; then
 		MAKE=bmake
 	else
-		echo "make command is not found" 1>&1
+		echo "make command is not found" 1>&2
 		exit 1
 	fi
 fi
