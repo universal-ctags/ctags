@@ -34,6 +34,9 @@ misc/dist-test-cases && \
 				echo "use pre-translated file: $o"
 			done
 		fi
+	else
+		echo "failed in running autoreconf" 1>&2
+		exit 1
     fi
 
 exit $?
