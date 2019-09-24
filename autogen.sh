@@ -23,7 +23,10 @@ misc/dist-test-cases && \
 			for i in ${ctags_files}; do
 				o=${i%.ctags}.c
 				echo "optlib2c: translating $i to $o"
-				./misc/optlib2c $i > $o
+				if ! ./misc/optlib2c $i > $o; then
+					echo "failed in running optlib2c" 1>&2
+					exit 1
+				fi
 			done
 		else
 			for i in ${ctags_files}; do
