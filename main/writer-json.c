@@ -242,7 +242,7 @@ static int writeJsonPtagEntry (tagWriter *writer CTAGS_ATTR_UNUSED,
 #undef OPT
 }
 
-extern bool ptagMakeJsonOutputVersion (ptagDesc *desc, void *data CTAGS_ATTR_UNUSED)
+extern bool ptagMakeJsonOutputVersion (ptagDesc *desc, const void *data CTAGS_ATTR_UNUSED)
 {
 	return writePseudoTag (desc,
 			       "0.0",
@@ -260,7 +260,7 @@ tagWriter jsonWriter = {
 	.defaultFileName = "-",
 };
 
-extern bool ptagMakeJsonOutputVersion (ptagDesc *desc, void *data CTAGS_ATTR_UNUSED)
+extern bool ptagMakeJsonOutputVersion (ptagDesc *desc, const void *data CTAGS_ATTR_UNUSED)
 {
 	return false;
 }

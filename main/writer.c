@@ -88,7 +88,7 @@ extern void writerRescanFailed (unsigned long validTagNum)
 		writer->rescanFailedEntry(writer, validTagNum, writer->clientData);
 }
 
-extern bool ptagMakeCtagsOutputMode (ptagDesc *desc, void *data CTAGS_ATTR_UNUSED)
+extern bool ptagMakeCtagsOutputMode (ptagDesc *desc, const void *data CTAGS_ATTR_UNUSED)
 {
 	const char *mode ="";
 

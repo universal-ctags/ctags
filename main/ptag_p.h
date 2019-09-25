@@ -43,11 +43,11 @@ struct sPtagDesc {
 	bool enabled;
 	const char* name;
 	const char* description;  /* displayed in --list-pseudo-tags output */
-	bool (* makeTag) (ptagDesc *, void *);
+	bool (* makeTag) (ptagDesc *, const void *);
 	bool commonInParsers;
 };
 
-extern bool makePtagIfEnabled (ptagType type, void *data);
+extern bool makePtagIfEnabled (ptagType type, const void *data);
 extern ptagDesc* getPtagDesc (ptagType type);
 extern ptagType  getPtagTypeForName (const char *name);
 extern void printPtags (bool withListHeader, bool machinable, FILE *fp);
