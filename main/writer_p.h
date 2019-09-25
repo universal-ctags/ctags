@@ -88,6 +88,7 @@ extern void abort_if_ferror(MIO *const fp);
 
 extern bool ptagMakeJsonOutputVersion (ptagDesc *desc, const void *data CTAGS_ATTR_UNUSED);
 extern bool ptagMakeCtagsOutputMode (ptagDesc *desc, const void *data CTAGS_ATTR_UNUSED);
+extern bool ptagMakeCtagsOutputFilesep (ptagDesc *desc, const void *data);
 
 extern bool writerCanPrintPtag (void);
 extern bool writerDoesTreatFieldAsFixed (int fieldType);

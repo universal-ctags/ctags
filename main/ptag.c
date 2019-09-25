@@ -144,6 +144,10 @@ static ptagDesc ptagDescs [] = {
 	  "the output mode: u-ctags or e-ctags",
 	  ptagMakeCtagsOutputMode,
 	  true },
+	{ true, "TAG_OUTPUT_FILESEP",
+	  "the separator used in file name (slash or backslash)",
+	  ptagMakeCtagsOutputFilesep,
+	  true },
 };
 
 extern bool makePtagIfEnabled (ptagType type, const void *data)
