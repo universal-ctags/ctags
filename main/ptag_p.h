@@ -43,6 +43,12 @@ struct sPtagDesc {
 	bool enabled;
 	const char* name;
 	const char* description;  /* displayed in --list-pseudo-tags output */
+
+	/* For the common ptags, the pointer for optionValues type value
+	 * is passed as the second argument.
+	 * For parser specific ptags, the pointer for parserObject
+	 * of the parser is passed as the second argument.
+	 */
 	bool (* makeTag) (ptagDesc *, const void *);
 	bool commonInParsers;
 };
