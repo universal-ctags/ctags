@@ -207,7 +207,7 @@ following two areas.
 Tag file compatibility with Exuberant-ctags
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 We will not accept a patch that breaks the tags file format described
-in "Proposal for extended Vi tags file format" a.k.a. FORMAT file.
+in tags(5) man page.
 
 TBW.
 

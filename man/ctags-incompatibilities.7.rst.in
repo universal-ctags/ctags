@@ -185,3 +185,7 @@ to follow the above rule.
 * Ruby's "F" (singletonMethod) is changed to "S".
 
 * SQL's "F" (field) is changed to "E".
+
+SEE ALSO
+--------
+ctags(1) and tags(5).
