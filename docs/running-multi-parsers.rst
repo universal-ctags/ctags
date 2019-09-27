@@ -647,7 +647,7 @@ must call `scheduleRunningBaseparser` in the main `parser` method.
     }
 
 A subparser can do nothing actively. A base parser makes its subparser
-work by calling methods of the subparser.  Therefor a subparser must
+work by calling methods of the subparser.  Therefore a subparser must
 run its base parser when the subparser is chosen in a top down way,
 The main part prepares `scheduleRunningBaseparser` function for the purpose.
 
