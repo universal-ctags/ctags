@@ -44,7 +44,7 @@ if [ "$TARGET" = "Unix" ]; then
         (
             cd "${BUILDDIR}"
             ${CONFIGURE_CMDLINE} --enable-coverage-gcov
-            make -j2 COVERAGE=1
+            make -j2
             echo 'List features'
             ./ctags --list-features
             echo 'Run "make check" with gcov'

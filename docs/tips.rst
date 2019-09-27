@@ -42,7 +42,7 @@ Before starting coverage measuring, you need to specify
 
 
 After doing ``make clean``, you can build coverage measuring ready
-ctags by ``make COVERAGE=1``. At this time *\*.gcno* files are generated
+ctags by ``make``. At this time *\*.gcno* files are generated
 by the compiler. *\*.gcno* files can be removed with ``make clean``.
 
 After building ctags, you can run run-gcov target.  When running
