@@ -82,7 +82,7 @@ e.g. ::
 
   make units LANGUAGES=TTCN VG=1 is passed.
   make fuzz LANGUAGES=TTCN VG=1  is passed.
-  make chop LANGUAGES=TTCN VG=1  is passed.  
+  make chop LANGUAGES=TTCN VG=1  is passed.
 
 
 C language
@@ -197,7 +197,7 @@ Add a test case to Tmain when modifying the core.
 
 Add a test case to Tinst when modifying the install target in the
 Makefile.
-  
+
 Compatibility
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -296,7 +296,7 @@ Here is an example.
     *   This module contains functions for generating tags for property list defined
     *   in http://www.apple.com/DTDs/PropertyList-1.0.dtd.
     */
-		
+
 Testing your parser
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
