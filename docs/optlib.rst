@@ -1833,15 +1833,12 @@ test case own *args.ctags*.
 Assume your test name is *swine-simile.d*. Put ``--option=swine`` in
 *Units/swine-simile.d/args.ctags*.
 
-Makefile.in
+Incorporating your parser to ctags build process
 ......................................................................
-Add your optlib file, *swine.ctags* to ``PRELOAD_OPTLIB`` variable of
-*Makefile.in*.
 
+Add your optlib file, *swine.ctags* to ``OPTLIB2C_INPUT`` variable of
++*makefiles/optlib2c_input.mak* in Universal-ctags source tree.
 
-If you don't want your optlib loaded automatically when ``ctags`` starts up,
-put your optlib file into ``OPTLIB`` of *Makefile.in* instead of
-``PRELOAD_OPTLIB``.
 
 Verification
 ......................................................................
