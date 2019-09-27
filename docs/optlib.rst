@@ -1855,7 +1855,7 @@ Let's verify all your work here.
 	$ ./configure --prefix=/tmp/tmp
 	$ make
 	$ make install
-	$ /tmp/tmp/ctags -o - --option=swine something_input.swn
+	$ /tmp/tmp/ctags -o - --languages=Swine something_input.swn
 
 
 Pull-request
