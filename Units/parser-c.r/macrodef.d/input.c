@@ -42,22 +42,9 @@
 #define __MAP(n,...) __MAP##n(__VA_ARGS__)
 
 #define __SC_DECL(t, a)	t a
-
+#if 0
 SYSCALL_DEFINE2(setregid16, old_gid_t, rgid, old_gid_t, egid)
 {
 	return __sys_setregid(low2highgid(rgid), low2highgid(egid));
 }
-
-#define slash_fn(t) t fn (t i, t j) {			\
-	return i / j;								\
-}
-
-#define question_fn(t) t fn (t i, t j) {		\
-	return (i < j)? i: j;						\
-}
-
-#define finally(X) \
-	int fin_##X(void) { return 0; } \
-\
-	\
-\
+#endif

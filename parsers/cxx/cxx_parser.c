@@ -1831,7 +1831,7 @@ static rescanReason cxxParserMain(const unsigned int passCount)
 			kind_for_header,
 			role_for_header_system,
 			role_for_header_local,
-			FIELD_UNKNOWN
+			g_cxx.pFieldOptions[CXXTagFieldMacrodef].ftype
 		);
 
 	g_cxx.iChar = ' ';

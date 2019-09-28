@@ -93,6 +93,10 @@ static const char * g_aCXXAccessStrings [] = {
 		.name = "properties", \
 		.description = "properties (static, inline, mutable,...)", \
 		.enabled = false \
+	}, { \
+		.name = "macrodef", \
+		.description = "macro definition", \
+			.enabled = false \
 	}
 
 static fieldDefinition g_aCXXCFields [] = {
