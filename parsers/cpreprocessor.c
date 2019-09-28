@@ -1233,12 +1233,12 @@ static int skipToEndOfChar ()
 	return CHAR_SYMBOL;  /* symbolic representation of character */
 }
 
-static void attachEndField (int macroCorkIndex)
+static void attachFields (int macroCorkIndex, unsigned long endLine)
 {
 	tagEntryInfo *tag;
 
 	tag = getEntryInCorkQueue (macroCorkIndex);
-	tag->extensionFields.endLine = getInputLineNumber ();
+	tag->extensionFields.endLine = endLine;
 }
 
 
@@ -1266,7 +1266,8 @@ process:
 				directive = false;
 				if (macroCorkIndex != CORK_NIL)
 				{
-					attachEndFieldMaybe (macroCorkIndex);
+					attachFields (macroCorkIndex,
+								  getInputLineNumber());
 					macroCorkIndex = CORK_NIL;
 				}
 				break;
@@ -1281,7 +1282,8 @@ process:
 					directive = false;
 					if (macroCorkIndex != CORK_NIL)
 					{
-						attachEndFieldMaybe (macroCorkIndex);
+						attachFields (macroCorkIndex,
+									  getInputLineNumber());
 						macroCorkIndex = CORK_NIL;
 					}
 				}
