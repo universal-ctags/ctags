@@ -1233,12 +1233,14 @@ static int skipToEndOfChar ()
 	return CHAR_SYMBOL;  /* symbolic representation of character */
 }
 
-static void attachFields (int macroCorkIndex, unsigned long endLine)
+static void attachFields (int macroCorkIndex, unsigned long endLine, const char *macrodef)
 {
 	tagEntryInfo *tag = getEntryInCorkQueue (macroCorkIndex);
 	Assert(tag);
 
 	tag->extensionFields.endLine = endLine;
+	if (macrodef)
+		attachParserFieldToCorkEntry (macroCorkIndex, Cpp.macrodefFieldIndex, macrodef);
 }
 
 
@@ -1253,6 +1255,7 @@ extern int cppGetc (void)
 	bool ignore = false;
 	int c;
 	int macroCorkIndex = CORK_NIL;
+	vString *macrodef = NULL;
 
 
 	do {
@@ -1267,13 +1270,17 @@ process:
 				if (macroCorkIndex != CORK_NIL)
 				{
 					attachFields (macroCorkIndex,
-								  getInputLineNumber());
+								  getInputLineNumber(),
+								  macrodef? vStringValue (macrodef): NULL);
 					macroCorkIndex = CORK_NIL;
 				}
 				break;
 
 			case TAB:
 			case SPACE:
+				if (macrodef && vStringLength (macrodef) > 0
+					&& vStringLast (macrodef) != ' ')
+					vStringPut (macrodef, ' ');
 				break;  /* ignore most white space */
 
 			case NEWLINE:
@@ -1283,7 +1290,8 @@ process:
 					if (macroCorkIndex != CORK_NIL)
 					{
 						attachFields (macroCorkIndex,
-									  getInputLineNumber());
+									  getInputLineNumber(),
+									  macrodef? vStringValue (macrodef): NULL);
 						macroCorkIndex = CORK_NIL;
 					}
 				}
@@ -1299,6 +1307,16 @@ process:
 					c = skipToEndOfString (false);
 				}
 
+				if (macrodef)
+				{
+					/* We record the contents of string literal.
+					 *
+					 */
+					vStringPut (macrodef, '"');
+					vStringCat (macrodef, Cpp.charOrStringContents);
+					vStringPut (macrodef, '"');
+				}
+
 				break;
 
 			case '#':
@@ -1308,11 +1326,19 @@ process:
 					Cpp.directive.state  = DRCTV_HASH;
 					Cpp.directive.accept = false;
 				}
+				if (macrodef)
+					vStringPut (macrodef, '#');
 				break;
 
 			case SINGLE_QUOTE:
 				Cpp.directive.accept = false;
 				c = skipToEndOfChar ();
+
+				/* We assume none may want to know the content of the
+				 * literal; just put ''. */
+				if (macrodef)
+					vStringCatS (macrodef, "''");
+
 				break;
 
 			case '/':
@@ -1330,7 +1356,11 @@ process:
 				else if (comment == COMMENT_D)
 					c = skipOverDComment ();
 				else
+				{
 					Cpp.directive.accept = false;
+					if (macrodef)
+						vStringPut (macrodef, '/');
+				}
 				break;
 			}
 
@@ -1341,7 +1371,11 @@ process:
 				if (next == NEWLINE)
 					goto start_loop;
 				else
+				{
 					cppUngetc (next);
+					if (macrodef)
+						vStringPut (macrodef, '\\');
+				}
 				break;
 			}
 
@@ -1349,7 +1383,11 @@ process:
 			{
 				int next = cppGetcFromUngetBufferOrFile ();
 				if (next != '?')
+				{
 					cppUngetc (next);
+					if (macrodef)
+						vStringPut (macrodef, '?');
+				}
 				else
 				{
 					next = cppGetcFromUngetBufferOrFile ();
@@ -1369,6 +1407,8 @@ process:
 							cppUngetc (next);
 							break;
 					}
+					if (macrodef)
+						vStringPut (macrodef, c);
 				}
 			} break;
 
@@ -1417,6 +1457,10 @@ process:
 					case '%':	c = '{'; break;
 					default: cppUngetc (next[0]);
 				}
+
+				if (macrodef)
+					vStringPut (macrodef, c);
+
 				goto enter;
 			}
 			case ':':
@@ -1426,6 +1470,10 @@ process:
 					c = ']';
 				else
 					cppUngetc (next);
+
+				if (macrodef)
+					vStringPut (macrodef, c);
+
 				goto enter;
 			}
 			case '%':
@@ -1437,6 +1485,10 @@ process:
 					case ':':	c = '#'; goto process;
 					default: cppUngetc (next);
 				}
+
+				if (macrodef)
+					vStringPut (macrodef, c);
+
 				goto enter;
 			}
 
@@ -1448,10 +1500,16 @@ process:
 					{
 						Cpp.directive.accept = false;
 						c = skipToEndOfString (true);
+						if (macrodef)
+							vStringCatS (macrodef, "@\"\"");
 						break;
 					}
 					else
+					{
 						cppUngetc (next);
+						if (macrodef)
+							vStringPut (macrodef, '@');
+					}
 				}
 				else if (c == 'R' && Cpp.hasCxxRawLiteralStrings)
 				{
@@ -1482,13 +1540,28 @@ process:
 					{
 						int next = cppGetcFromUngetBufferOrFile ();
 						if (next != DOUBLE_QUOTE)
+						{
 							cppUngetc (next);
+							if (macrodef)
+								vStringPut (macrodef, 'R');
+						}
 						else
 						{
 							Cpp.directive.accept = false;
 							c = skipToEndOfCxxRawLiteralString ();
+
+							/* We assume none may want to know the content of the
+							 * literal; just put "". */
+							if (macrodef)
+								vStringCatS (macrodef, "\"\"");
+
 							break;
 						}
+					}
+					else
+					{
+						if (macrodef)
+							vStringPut (macrodef, 'R');
 					}
 				}
 				else if(isxdigit(c))
@@ -1497,14 +1570,31 @@ process:
 					int next = cppGetcFromUngetBufferOrFile();
 					if(next != SINGLE_QUOTE)
 						cppUngetc(next);
+					if (macrodef)
+						vStringPut (macrodef, c);
+
+				}
+				else
+				{
+					if (macrodef)
+						vStringPut (macrodef, c);
 				}
 			enter:
 				Cpp.directive.accept = false;
 				if (directive)
+				{
 					ignore = handleDirective (c, &macroCorkIndex);
+					if (Cpp.macrodefFieldIndex != FIELD_UNKNOWN
+						&& macroCorkIndex != CORK_NIL
+						&& macrodef == NULL)
+						macrodef = vStringNew ();
+				}
 				break;
 		}
 	} while (directive || ignore);
+
+	if (macrodef)
+		vStringDelete (macrodef);
 
 	DebugStatement ( debugPutc (DEBUG_CPP, c); )
 	DebugStatement ( if (c == NEWLINE)

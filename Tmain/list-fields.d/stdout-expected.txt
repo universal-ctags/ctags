@@ -28,6 +28,7 @@ z	kind	no	NONE	s--	no	Include the "kind:" key in kind field (use k or K) in tags
 -	name	yes	C++	s--	no	aliased names
 -	properties	no	C++	s--	no	properties (static, inline, mutable,...)
 -	template	no	C++	s--	no	template parameters
+-	macrodef	no	CPreProcessor	s--	no	macro definition
 -	properties	no	CUDA	s--	no	properties (static, inline, mutable,...)
 -	access	yes	Elixir	s--	no	access
 -	howImported	no	Go	s--	no	how the package is imported ("inline" for `.' or "init" for `_')
