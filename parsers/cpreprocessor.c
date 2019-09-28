@@ -98,6 +98,8 @@ typedef struct sCppState {
 	int headerSystemRoleIndex;
 	int headerLocalRoleIndex;
 
+	int macrodefFieldIndex;
+
 	struct sDirective {
 		enum eState state;       /* current directive being processed */
 		bool	accept;          /* is a directive syntactically permitted? */
@@ -138,6 +140,17 @@ static kindDefinition CPreProKinds [] = {
 	{ true, 'h', "header",     "included header files",
 	  .referenceOnly = true, ATTACH_ROLES(CPREPROHeaderRoles)},
 	{ false, 'D', "parameter", "macro parameters", },
+};
+
+typedef enum {
+	F_MACRODEF,
+	COUNT_FIELD
+} cPreProField;
+
+static fieldDefinition CPreProFields[COUNT_FIELD] = {
+	{ .name = "macrodef",
+	  .description = "macro definition",
+	  .enabled = false },
 };
 
 /*
@@ -190,6 +203,7 @@ static cppState Cpp = {
 	.headerKindIndex = CPREPRO_HEADER,
 	.headerSystemRoleIndex = CPREPRO_HEADER_KIND_SYSTEM_ROLE,
 	.headerLocalRoleIndex = CPREPRO_HEADER_KIND_LOCAL_ROLE,
+	.macrodefFieldIndex = FIELD_UNKNOWN,
 	.directive = {
 		.state = DRCTV_NONE,
 		.accept = false,
@@ -228,7 +242,8 @@ static void cppInitCommon(langType clientLang,
 		     int macroUndefRoleIndex,
 		     int macroParamKindIndex,
 		     int headerKindIndex,
-		     int headerSystemRoleIndex, int headerLocalRoleIndex)
+		     int headerSystemRoleIndex, int headerLocalRoleIndex,
+		     int macrodefFieldIndex)
 {
 	BraceFormat = state;
 
@@ -262,6 +277,7 @@ static void cppInitCommon(langType clientLang,
 		Cpp.useClientLangDefineMacroKindIndex = true;
 
 		Cpp.macroUndefRoleIndex = macroUndefRoleIndex;
+		Cpp.macrodefFieldIndex = macrodefFieldIndex;
 	}
 	else
 	{
@@ -269,6 +285,7 @@ static void cppInitCommon(langType clientLang,
 		Cpp.useClientLangDefineMacroKindIndex = false;
 
 		Cpp.macroUndefRoleIndex = CPREPRO_MACRO_KIND_UNDEF_ROLE;
+		Cpp.macrodefFieldIndex = CPreProFields [F_MACRODEF].ftype;
 	}
 
 	if (macroParamKindIndex != KIND_GHOST_INDEX)
@@ -318,7 +335,8 @@ extern void cppInit (const bool state, const bool hasAtLiteralStrings,
 		     int macroUndefRoleIndex,
 		     int macroParamKindIndex,
 		     int headerKindIndex,
-		     int headerSystemRoleIndex, int headerLocalRoleIndex)
+		     int headerSystemRoleIndex, int headerLocalRoleIndex,
+		     int macrodefFieldIndex)
 {
 	langType client = getInputLanguage ();
 
@@ -1494,7 +1512,8 @@ static void findCppTags (void)
 {
 	cppInitCommon (Cpp.lang, 0, false, false, false,
 				   KIND_GHOST_INDEX, 0, KIND_GHOST_INDEX,
-				   KIND_GHOST_INDEX, 0, 0);
+				   KIND_GHOST_INDEX, 0, 0,
+				   FIELD_UNKNOWN);
 
 	findRegexTagsMainloop (cppGetc);
 

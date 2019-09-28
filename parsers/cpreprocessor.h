@@ -82,7 +82,8 @@ extern void cppInit (const bool state,
 		     int macroUndefRoleIndex,
 		     int headerKindIndex,
 		     int headerSystemRoleIndex, int headerLocalRoleIndex,
-		     int macroParamKindIndex);
+		     int macroParamKindIndex,
+		     int macrodefFieldIndex);
 
 extern void cppTerminate (void);
 extern void cppBeginStatement (void);
