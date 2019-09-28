@@ -1278,9 +1278,9 @@ process:
 			case NEWLINE:
 				if (directive  &&  ! ignore)
 				{
+					directive = false;
 					attachEndFieldMaybe (macroCorkIndex);
 					macroCorkIndex = CORK_NIL;
-					directive = false;
 				}
 				Cpp.directive.accept = true;
 				break;
