@@ -1233,15 +1233,12 @@ static int skipToEndOfChar ()
 	return CHAR_SYMBOL;  /* symbolic representation of character */
 }
 
-static void attachEndFieldMaybe (int macroCorkIndex)
+static void attachEndField (int macroCorkIndex)
 {
-	if (macroCorkIndex != CORK_NIL)
-	{
-		tagEntryInfo *tag;
+	tagEntryInfo *tag;
 
-		tag = getEntryInCorkQueue (macroCorkIndex);
-		tag->extensionFields.endLine = getInputLineNumber ();
-	}
+	tag = getEntryInCorkQueue (macroCorkIndex);
+	tag->extensionFields.endLine = getInputLineNumber ();
 }
 
 
@@ -1267,8 +1264,11 @@ process:
 			case EOF:
 				ignore    = false;
 				directive = false;
-				attachEndFieldMaybe (macroCorkIndex);
-				macroCorkIndex = CORK_NIL;
+				if (macroCorkIndex != CORK_NIL)
+				{
+					attachEndFieldMaybe (macroCorkIndex);
+					macroCorkIndex = CORK_NIL;
+				}
 				break;
 
 			case TAB:
@@ -1279,8 +1279,11 @@ process:
 				if (directive  &&  ! ignore)
 				{
 					directive = false;
-					attachEndFieldMaybe (macroCorkIndex);
-					macroCorkIndex = CORK_NIL;
+					if (macroCorkIndex != CORK_NIL)
+					{
+						attachEndFieldMaybe (macroCorkIndex);
+						macroCorkIndex = CORK_NIL;
+					}
 				}
 				Cpp.directive.accept = true;
 				break;
