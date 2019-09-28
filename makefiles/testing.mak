@@ -219,7 +219,7 @@ codecheck: $(CTAGS_TEST)
 	$(V_RUN) $(SHELL) misc/src-check
 
 #
-# Report coverage (usable only if ctags is built with COVERAGE=1.)
+# Report coverage (usable only if ctags is built with "configure --enable-coverage-gcov".)
 #
 run-gcov:
 	$(CTAGS_TEST) -o - $$(find ./Units -name 'input.*'| grep -v '.*b/.*') > /dev/null
