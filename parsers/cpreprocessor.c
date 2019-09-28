@@ -1235,9 +1235,9 @@ static int skipToEndOfChar ()
 
 static void attachFields (int macroCorkIndex, unsigned long endLine)
 {
-	tagEntryInfo *tag;
+	tagEntryInfo *tag = getEntryInCorkQueue (macroCorkIndex);
+	Assert(tag);
 
-	tag = getEntryInCorkQueue (macroCorkIndex);
 	tag->extensionFields.endLine = endLine;
 }
 
