@@ -317,7 +317,7 @@ extern void cppInit (const bool state, const bool hasAtLiteralStrings,
 		     int defineMacroKindIndex,
 		     int macroUndefRoleIndex,
 		     int macroParamKindIndex,
-			 int headerKindIndex,
+		     int headerKindIndex,
 		     int headerSystemRoleIndex, int headerLocalRoleIndex)
 {
 	langType client = getInputLanguage ();
@@ -325,7 +325,8 @@ extern void cppInit (const bool state, const bool hasAtLiteralStrings,
 	cppInitCommon (client, state, hasAtLiteralStrings,
 				   hasCxxRawLiteralStrings, hasSingleQuoteLiteralNumbers,
 				   defineMacroKindIndex, macroUndefRoleIndex, macroParamKindIndex,
-				   headerKindIndex, headerSystemRoleIndex, headerLocalRoleIndex);
+				   headerKindIndex, headerSystemRoleIndex, headerLocalRoleIndex,
+				   macrodefFieldIndex);
 }
 
 extern void cppTerminate (void)
@@ -2016,6 +2017,9 @@ extern parserDefinition* CPreProParser (void)
 	def->kindCount  = ARRAY_SIZE (CPreProKinds);
 	def->initialize = initializeCpp;
 	def->parser     = findCppTags;
+
+	def->fieldTable = CPreProFields;
+	def->fieldCount = ARRAY_SIZE (CPreProFields);
 
 	def->parameterHandlerTable = CpreProParameterHandlerTable;
 	def->parameterHandlerCount = ARRAY_SIZE(CpreProParameterHandlerTable);
