@@ -143,6 +143,14 @@ size_t        countEntryInCorkQueue (void);
 extern void    markTagExtraBit     (tagEntryInfo *const tag, xtagType extra);
 extern bool isTagExtraBitMarked (const tagEntryInfo *const tag, xtagType extra);
 
+/* Attaching parser speicificc fields
+ *
+ * If your parser doesn't use Cork API, use attachParserField().
+ * If your parser use Cork API, use attachParserFieldToCorkEntry(),
+ *
+ * Calling either one, the caller owns VALUE. If the parser allocates VALUE
+ * dynamically, the parser must free it.
+ */
 extern void attachParserField (tagEntryInfo *const tag, fieldType ftype, const char* value);
 extern void attachParserFieldToCorkEntry (int index, fieldType ftype, const char* value);
 
