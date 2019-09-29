@@ -12,6 +12,7 @@ EXTRA_DIST   = README.md autogen.sh \
 	       win32/ctags_vs2013.sln \
 	       win32/ctags_vs2013.vcxproj win32/ctags_vs2013.vcxproj.filters \
 	       win32/gen-repoinfo.bat \
+	       man/tags.5.rst \
 		$(PEG_INPUT) $(OPTLIB2C_INPUT)
 
 bin_PROGRAMS = ctags
@@ -179,14 +180,24 @@ include $(top_srcdir)/makefiles/testing.mak
 include $(top_srcdir)/makefiles/help.mak
 
 if HAVE_RST2MAN
-man_MANS = man/ctags.1 man/ctags-incompatibilities.7 man/ctags-optlib.7
+man_MANS = \
+	man/ctags.1 \
+	\
+	man/tags.5 \
+	\
+	man/ctags-incompatibilities.7 \
+	man/ctags-optlib.7 \
+	\
+	$(NULL)
 rst2man_verbose = $(rst2man_verbose_@AM_V@)
 rst2man_verbose_ = $(rst2man_verbose_@AM_DEFAULT_V@)
 rst2man_verbose_0 = @echo RST2MAN "  $@";
-SUFFIXES += .1.rst .1 .7.rst .7
+SUFFIXES += .1.rst .1 .5.rst .5 .7.rst .7
 # See man/Makefile
 RST2MAN_OPTIONS=--syntax-highlight=none
 .1.rst.1:
+	$(rst2man_verbose)$(RST2MAN) $(RST2MAN_OPTIONS) $< $@
+.5.rst.5:
 	$(rst2man_verbose)$(RST2MAN) $(RST2MAN_OPTIONS) $< $@
 .7.rst.7:
 	$(rst2man_verbose)$(RST2MAN) $(RST2MAN_OPTIONS) $< $@

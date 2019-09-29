@@ -39,14 +39,19 @@ CONFIGURE_FLAGS =
 
 .SUFFIXES: .rst .html .pdf .in
 
-SOURCE_FILES = \
+IN_SOURCE_FILES = \
 	ctags.1.rst.in \
 	ctags-optlib.7.rst.in \
 	ctags-incompatibilities.7.rst.in \
 	\
 	$(NULL)
 
-rst_files  = $(basename $(SOURCE_FILES))
+SOURCE_FILES = \
+	tags.5.rst \
+	\
+	$(NULL)
+
+rst_files  = $(basename $(IN_SOURCE_FILES)) $(SOURCE_FILES)
 man_pages  = $(basename $(rst_files))
 html_pages = $(addsuffix .html,$(man_pages))
 pdf_pages  = $(addsuffix .pdf,$(man_pages))

@@ -238,7 +238,7 @@ OPTION ITEMS
 	message will be reported unless ``{placeholder}`` regex flag is
 	specified. An optional kind specifier for tags matching regexp may
 	follow *replacement*, which will determine what kind of tag is
-	reported in the "kind" extension field (see ctags-tags(5)).
+	reported in the "kind" extension field (see tags(5)).
 
 	*kind-spec* has two forms: letter only form and full form.  The
 	letter form assumes using ``--regex-<LANG>`` option with
@@ -421,7 +421,7 @@ The official Universal-ctags web site at:
 
 https://ctags.io/
 
-ctags(1), regex(5,7), egrep(1)
+ctags(1), tags(5), regex(5,7), egrep(1)
 
 AUTHOR
 ------

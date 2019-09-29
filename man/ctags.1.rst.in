@@ -1795,6 +1795,8 @@ SEE ALSO
 See ctags-optlib(7) for defining (or extending) a parser
 in a configuration file.
 
+See tags(5) for the format of tag files.
+
 The official Universal-ctags web site at:
 
 https://ctags.io/
