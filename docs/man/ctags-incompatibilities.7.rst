@@ -1,0 +1,1 @@
+../../man/ctags-incompatibilities.7.rst.in

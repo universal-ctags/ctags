@@ -1,0 +1,1 @@
+../../man/ctags-optlib.7.rst.in

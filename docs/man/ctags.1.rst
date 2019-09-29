@@ -1,0 +1,1 @@
+../../man/ctags.1.rst.in

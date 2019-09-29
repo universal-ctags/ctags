@@ -472,6 +472,10 @@ file, and provided solely for documentation purposes::
     !_TAG_PROGRAM_URL	{URL}	/optional comment/
     !_TAG_PROGRAM_VERSION	{version-id}	/optional comment/
 
+
+----
+
+
 Exceptions in Universal-ctags
 --------------------------------------------
 

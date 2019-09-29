@@ -46,4 +46,5 @@ This is a draft document. Proofreading and pull-requests are welcome!
 	tips.rst
 	other-projects.rst
 	development-process.rst
+	man-pages.rst
 	developers.rst
