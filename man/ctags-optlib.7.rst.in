@@ -21,8 +21,8 @@ DESCRIPTION
 **Exuberant-ctags**, the ancestor of **Universal-ctags**, has provided
 the way to define a new parser from command line.  Universal-ctags
 extends and refines this feature. **optlib parser** is the name for such
-parser in Universal-ctags. "opt" intents a parser is defined with
-combination of command line options. "lib" intents an optlib parser
+parser in Universal-ctags. "opt" intends a parser is defined with
+combination of command line options. "lib" intends an optlib parser
 can be more than ad-hoc personal configuration.
 
 This man page is for people who wants to define an optlib parser. The
