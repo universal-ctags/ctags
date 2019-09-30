@@ -1,0 +1,6 @@
+/* Taken from  https://github.com/readthedocs/sphinx_rtd_theme/issues/468 */
+/* adds scrollbar to sidenav */
+.wy-side-scroll {
+  width: auto;
+  overflow-y: auto;
+}
