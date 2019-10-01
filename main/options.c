@@ -421,7 +421,7 @@ static optionDescription LongOptionDescription [] = {
  {1,"       Print statistics about input and tag files [no]."},
 #ifdef WIN32
  {1,"  --use-slash-as-filename-separator"},
- {1,"       Use slash as filename separator [no]."},
+ {1,"       Use slash as filename separator [yes] for u-ctags output format."},
 #endif
  {1,"  --verbose=[yes|no]"},
  {1,"       Enable verbose messages describing actions on each input file."},
