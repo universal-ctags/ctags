@@ -285,9 +285,9 @@ The example usage can be found in *Tmain/{input,output}-encoding-option.d*.
 Acceptable ``IN`` and ``OUT`` values can be listed with *iconv -l* or
 *iconv --list*. It is platform dependant.
 
-To enable the option, libiconv is needed on your platform. In addition
-``--enable-iconv`` must be given to configure before making ctags.
-On Windows mingw32, you must specify ``WITH_ICONV=yes`` like this::
+To enable the option, libiconv is needed on your platform.
+On Windows mingw (without msys2), you must specify ``WITH_ICONV=yes``
+like this::
 
 	C:\dev\ctags>mingw32-make -f mk_mingw.mak WITH_ICONV=yes
 
