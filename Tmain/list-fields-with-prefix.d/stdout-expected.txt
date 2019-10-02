@@ -5,11 +5,15 @@ p       UCTAGSscopeKind     no      NONE             s--    no    Kind of scope 
 r       UCTAGSroles         no      NONE             s--    no    Roles
 x       UCTAGSxpath         no      NONE             s--    no    xpath for the tag
 -       UCTAGSproperties    no      AutoIt           s--    no    properties (static, volatile, ...)
+-       UCTAGSmacrodef      no      C                s--    no    macro definition
 -       UCTAGSproperties    no      C                s--    no    properties (static, inline, mutable,...)
 -       UCTAGScaptures      no      C++              s--    no    lambda capture list
+-       UCTAGSmacrodef      no      C++              s--    no    macro definition
 -       UCTAGSname          yes     C++              s--    no    aliased names
 -       UCTAGSproperties    no      C++              s--    no    properties (static, inline, mutable,...)
 -       UCTAGStemplate      no      C++              s--    no    template parameters
+-       UCTAGSmacrodef      no      CPreProcessor    s--    no    macro definition
+-       UCTAGSmacrodef      no      CUDA             s--    no    macro definition
 -       UCTAGSproperties    no      CUDA             s--    no    properties (static, inline, mutable,...)
 -       UCTAGSaccess        yes     Elixir           s--    no    access
 -       UCTAGShowImported   no      Go               s--    no    how the package is imported ("inline" for `.' or "init" for `_')

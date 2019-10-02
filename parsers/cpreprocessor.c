@@ -98,6 +98,8 @@ typedef struct sCppState {
 	int headerSystemRoleIndex;
 	int headerLocalRoleIndex;
 
+	int macrodefFieldIndex;
+
 	struct sDirective {
 		enum eState state;       /* current directive being processed */
 		bool	accept;          /* is a directive syntactically permitted? */
@@ -138,6 +140,17 @@ static kindDefinition CPreProKinds [] = {
 	{ true, 'h', "header",     "included header files",
 	  .referenceOnly = true, ATTACH_ROLES(CPREPROHeaderRoles)},
 	{ false, 'D', "parameter", "macro parameters", },
+};
+
+typedef enum {
+	F_MACRODEF,
+	COUNT_FIELD
+} cPreProField;
+
+static fieldDefinition CPreProFields[COUNT_FIELD] = {
+	{ .name = "macrodef",
+	  .description = "macro definition",
+	  .enabled = false },
 };
 
 /*
@@ -190,6 +203,7 @@ static cppState Cpp = {
 	.headerKindIndex = CPREPRO_HEADER,
 	.headerSystemRoleIndex = CPREPRO_HEADER_KIND_SYSTEM_ROLE,
 	.headerLocalRoleIndex = CPREPRO_HEADER_KIND_LOCAL_ROLE,
+	.macrodefFieldIndex = FIELD_UNKNOWN,
 	.directive = {
 		.state = DRCTV_NONE,
 		.accept = false,
@@ -228,7 +242,8 @@ static void cppInitCommon(langType clientLang,
 		     int macroUndefRoleIndex,
 		     int macroParamKindIndex,
 		     int headerKindIndex,
-		     int headerSystemRoleIndex, int headerLocalRoleIndex)
+		     int headerSystemRoleIndex, int headerLocalRoleIndex,
+		     int macrodefFieldIndex)
 {
 	BraceFormat = state;
 
@@ -262,6 +277,7 @@ static void cppInitCommon(langType clientLang,
 		Cpp.useClientLangDefineMacroKindIndex = true;
 
 		Cpp.macroUndefRoleIndex = macroUndefRoleIndex;
+		Cpp.macrodefFieldIndex = macrodefFieldIndex;
 	}
 	else
 	{
@@ -269,6 +285,7 @@ static void cppInitCommon(langType clientLang,
 		Cpp.useClientLangDefineMacroKindIndex = false;
 
 		Cpp.macroUndefRoleIndex = CPREPRO_MACRO_KIND_UNDEF_ROLE;
+		Cpp.macrodefFieldIndex = CPreProFields [F_MACRODEF].ftype;
 	}
 
 	if (macroParamKindIndex != KIND_GHOST_INDEX)
@@ -317,15 +334,17 @@ extern void cppInit (const bool state, const bool hasAtLiteralStrings,
 		     int defineMacroKindIndex,
 		     int macroUndefRoleIndex,
 		     int macroParamKindIndex,
-			 int headerKindIndex,
-		     int headerSystemRoleIndex, int headerLocalRoleIndex)
+		     int headerKindIndex,
+		     int headerSystemRoleIndex, int headerLocalRoleIndex,
+		     int macrodefFieldIndex)
 {
 	langType client = getInputLanguage ();
 
 	cppInitCommon (client, state, hasAtLiteralStrings,
 				   hasCxxRawLiteralStrings, hasSingleQuoteLiteralNumbers,
 				   defineMacroKindIndex, macroUndefRoleIndex, macroParamKindIndex,
-				   headerKindIndex, headerSystemRoleIndex, headerLocalRoleIndex);
+				   headerKindIndex, headerSystemRoleIndex, headerLocalRoleIndex,
+				   macrodefFieldIndex);
 }
 
 extern void cppTerminate (void)
@@ -1214,15 +1233,14 @@ static int skipToEndOfChar ()
 	return CHAR_SYMBOL;  /* symbolic representation of character */
 }
 
-static void attachEndFieldMaybe (int macroCorkIndex)
+static void attachFields (int macroCorkIndex, unsigned long endLine, const char *macrodef)
 {
-	if (macroCorkIndex != CORK_NIL)
-	{
-		tagEntryInfo *tag;
+	tagEntryInfo *tag = getEntryInCorkQueue (macroCorkIndex);
+	Assert(tag);
 
-		tag = getEntryInCorkQueue (macroCorkIndex);
-		tag->extensionFields.endLine = getInputLineNumber ();
-	}
+	tag->extensionFields.endLine = endLine;
+	if (macrodef)
+		attachParserFieldToCorkEntry (macroCorkIndex, Cpp.macrodefFieldIndex, macrodef);
 }
 
 
@@ -1237,6 +1255,7 @@ extern int cppGetc (void)
 	bool ignore = false;
 	int c;
 	int macroCorkIndex = CORK_NIL;
+	vString *macrodef = NULL;
 
 
 	do {
@@ -1248,20 +1267,33 @@ process:
 			case EOF:
 				ignore    = false;
 				directive = false;
-				attachEndFieldMaybe (macroCorkIndex);
-				macroCorkIndex = CORK_NIL;
+				if (macroCorkIndex != CORK_NIL)
+				{
+					attachFields (macroCorkIndex,
+								  getInputLineNumber(),
+								  macrodef? vStringValue (macrodef): NULL);
+					macroCorkIndex = CORK_NIL;
+				}
 				break;
 
 			case TAB:
 			case SPACE:
+				if (macrodef && vStringLength (macrodef) > 0
+					&& vStringLast (macrodef) != ' ')
+					vStringPut (macrodef, ' ');
 				break;  /* ignore most white space */
 
 			case NEWLINE:
 				if (directive  &&  ! ignore)
 				{
-					attachEndFieldMaybe (macroCorkIndex);
-					macroCorkIndex = CORK_NIL;
 					directive = false;
+					if (macroCorkIndex != CORK_NIL)
+					{
+						attachFields (macroCorkIndex,
+									  getInputLineNumber(),
+									  macrodef? vStringValue (macrodef): NULL);
+						macroCorkIndex = CORK_NIL;
+					}
 				}
 				Cpp.directive.accept = true;
 				break;
@@ -1275,6 +1307,16 @@ process:
 					c = skipToEndOfString (false);
 				}
 
+				if (macrodef)
+				{
+					/* We record the contents of string literal.
+					 *
+					 */
+					vStringPut (macrodef, '"');
+					vStringCat (macrodef, Cpp.charOrStringContents);
+					vStringPut (macrodef, '"');
+				}
+
 				break;
 
 			case '#':
@@ -1284,11 +1326,19 @@ process:
 					Cpp.directive.state  = DRCTV_HASH;
 					Cpp.directive.accept = false;
 				}
+				if (macrodef)
+					vStringPut (macrodef, '#');
 				break;
 
 			case SINGLE_QUOTE:
 				Cpp.directive.accept = false;
 				c = skipToEndOfChar ();
+
+				/* We assume none may want to know the content of the
+				 * literal; just put ''. */
+				if (macrodef)
+					vStringCatS (macrodef, "''");
+
 				break;
 
 			case '/':
@@ -1306,7 +1356,11 @@ process:
 				else if (comment == COMMENT_D)
 					c = skipOverDComment ();
 				else
+				{
 					Cpp.directive.accept = false;
+					if (macrodef)
+						vStringPut (macrodef, '/');
+				}
 				break;
 			}
 
@@ -1317,7 +1371,11 @@ process:
 				if (next == NEWLINE)
 					goto start_loop;
 				else
+				{
 					cppUngetc (next);
+					if (macrodef)
+						vStringPut (macrodef, '\\');
+				}
 				break;
 			}
 
@@ -1325,7 +1383,11 @@ process:
 			{
 				int next = cppGetcFromUngetBufferOrFile ();
 				if (next != '?')
+				{
 					cppUngetc (next);
+					if (macrodef)
+						vStringPut (macrodef, '?');
+				}
 				else
 				{
 					next = cppGetcFromUngetBufferOrFile ();
@@ -1345,6 +1407,8 @@ process:
 							cppUngetc (next);
 							break;
 					}
+					if (macrodef)
+						vStringPut (macrodef, c);
 				}
 			} break;
 
@@ -1393,6 +1457,10 @@ process:
 					case '%':	c = '{'; break;
 					default: cppUngetc (next[0]);
 				}
+
+				if (macrodef)
+					vStringPut (macrodef, c);
+
 				goto enter;
 			}
 			case ':':
@@ -1402,6 +1470,10 @@ process:
 					c = ']';
 				else
 					cppUngetc (next);
+
+				if (macrodef)
+					vStringPut (macrodef, c);
+
 				goto enter;
 			}
 			case '%':
@@ -1413,6 +1485,10 @@ process:
 					case ':':	c = '#'; goto process;
 					default: cppUngetc (next);
 				}
+
+				if (macrodef)
+					vStringPut (macrodef, c);
+
 				goto enter;
 			}
 
@@ -1424,10 +1500,16 @@ process:
 					{
 						Cpp.directive.accept = false;
 						c = skipToEndOfString (true);
+						if (macrodef)
+							vStringCatS (macrodef, "@\"\"");
 						break;
 					}
 					else
+					{
 						cppUngetc (next);
+						if (macrodef)
+							vStringPut (macrodef, '@');
+					}
 				}
 				else if (c == 'R' && Cpp.hasCxxRawLiteralStrings)
 				{
@@ -1458,13 +1540,28 @@ process:
 					{
 						int next = cppGetcFromUngetBufferOrFile ();
 						if (next != DOUBLE_QUOTE)
+						{
 							cppUngetc (next);
+							if (macrodef)
+								vStringPut (macrodef, 'R');
+						}
 						else
 						{
 							Cpp.directive.accept = false;
 							c = skipToEndOfCxxRawLiteralString ();
+
+							/* We assume none may want to know the content of the
+							 * literal; just put "". */
+							if (macrodef)
+								vStringCatS (macrodef, "\"\"");
+
 							break;
 						}
+					}
+					else
+					{
+						if (macrodef)
+							vStringPut (macrodef, 'R');
 					}
 				}
 				else if(isxdigit(c))
@@ -1473,14 +1570,31 @@ process:
 					int next = cppGetcFromUngetBufferOrFile();
 					if(next != SINGLE_QUOTE)
 						cppUngetc(next);
+					if (macrodef)
+						vStringPut (macrodef, c);
+
+				}
+				else
+				{
+					if (macrodef)
+						vStringPut (macrodef, c);
 				}
 			enter:
 				Cpp.directive.accept = false;
 				if (directive)
+				{
 					ignore = handleDirective (c, &macroCorkIndex);
+					if (Cpp.macrodefFieldIndex != FIELD_UNKNOWN
+						&& macroCorkIndex != CORK_NIL
+						&& macrodef == NULL)
+						macrodef = vStringNew ();
+				}
 				break;
 		}
 	} while (directive || ignore);
+
+	if (macrodef)
+		vStringDelete (macrodef);
 
 	DebugStatement ( debugPutc (DEBUG_CPP, c); )
 	DebugStatement ( if (c == NEWLINE)
@@ -1493,7 +1607,8 @@ static void findCppTags (void)
 {
 	cppInitCommon (Cpp.lang, 0, false, false, false,
 				   KIND_GHOST_INDEX, 0, KIND_GHOST_INDEX,
-				   KIND_GHOST_INDEX, 0, 0);
+				   KIND_GHOST_INDEX, 0, 0,
+				   FIELD_UNKNOWN);
 
 	findRegexTagsMainloop (cppGetc);
 
@@ -2016,6 +2131,9 @@ extern parserDefinition* CPreProParser (void)
 	def->kindCount  = ARRAY_SIZE (CPreProKinds);
 	def->initialize = initializeCpp;
 	def->parser     = findCppTags;
+
+	def->fieldTable = CPreProFields;
+	def->fieldCount = ARRAY_SIZE (CPreProFields);
 
 	def->parameterHandlerTable = CpreProParameterHandlerTable;
 	def->parameterHandlerCount = ARRAY_SIZE(CpreProParameterHandlerTable);

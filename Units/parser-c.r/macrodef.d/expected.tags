@@ -1,0 +1,13 @@
+INT	input.c	/^#define INT /;"	d	language:C	file:	macrodef:1
+STR	input.c	/^#define STR /;"	d	language:C	file:	macrodef:"bar"
+CHR	input.c	/^#define CHR /;"	d	language:C	file:	macrodef:''
+HEX	input.c	/^#define HEX /;"	d	language:C	file:	macrodef:0xff01
+OCT	input.c	/^#define OCT /;"	d	language:C	file:	macrodef:0644
+SYSCALL_METADATA	input.c	/^#define SYSCALL_METADATA(/;"	d	language:C	file:	signature:(sname,nb,...)	macrodef:
+SYSCALL_DEFINE2	input.c	/^#define SYSCALL_DEFINE2(/;"	d	language:C	file:	signature:(name,...)	macrodef:SYSCALL_DEFINEx(2, _##name, __VA_ARGS__)
+SYSCALL_DEFINEx	input.c	/^#define SYSCALL_DEFINEx(/;"	d	language:C	file:	signature:(x,sname,...)	macrodef:SYSCALL_METADATA(sname, x, __VA_ARGS__) __SYSCALL_DEFINEx(x, sname, __VA_ARGS__)
+__SYSCALL_DEFINEx	input.c	/^#define __SYSCALL_DEFINEx(/;"	d	language:C	file:	signature:(x,name,...)	macrodef:__diag_push(); __diag_ignore(GCC, 8, "-Wattribute-alias", "Type aliasing is used to sanitize syscall arguments"); asmlinkage long sys##name(__MAP(x,__SC_DECL,__VA_ARGS__)) __attribute__((alias(__stringify(__se_sys##name)))); ALLOW_ERROR_INJECTION(sys##name, ERRNO); static inline long __do_sys##name(__MAP(x,__SC_DECL,__VA_ARGS__)); asmlinkage long __se_sys##name(__MAP(x,__SC_LONG,__VA_ARGS__)); asmlinkage long __se_sys##name(__MAP(x,__SC_LONG,__VA_ARGS__)) { long ret = __do_sys##name(__MAP(x,__SC_CAST,__VA_ARGS__)); __MAP(x,__SC_TEST,__VA_ARGS__); __PROTECT(x, ret,__MAP(x,__SC_ARGS,__VA_ARGS__)); return ret; } __diag_pop(); static inline long __do_sys##name(__MAP(x,__SC_DECL,__VA_ARGS__))
+__MAP1	input.c	/^#define __MAP1(/;"	d	language:C	file:	signature:(m,t,a,...)	macrodef:m(t,a)
+__MAP2	input.c	/^#define __MAP2(/;"	d	language:C	file:	signature:(m,t,a,...)	macrodef:m(t,a), __MAP1(m,__VA_ARGS__)
+__MAP	input.c	/^#define __MAP(/;"	d	language:C	file:	signature:(n,...)	macrodef:__MAP##n(__VA_ARGS__)
+__SC_DECL	input.c	/^#define __SC_DECL(/;"	d	language:C	file:	signature:(t,a)	macrodef:t a

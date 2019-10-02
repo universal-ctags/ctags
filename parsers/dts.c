@@ -12,6 +12,7 @@
 */
 #include "general.h"
 #include "cpreprocessor.h"
+#include "field.h"
 #include "kind.h"
 #include "parse.h"
 #include "routines.h"
@@ -39,7 +40,8 @@ static void runCppGetc (void)
 {
 	cppInit (false, false, false, false,
 			 KIND_GHOST_INDEX, 0, KIND_GHOST_INDEX,
-			 KIND_GHOST_INDEX, 0, 0);
+			 KIND_GHOST_INDEX, 0, 0,
+			 FIELD_UNKNOWN);
 
 	findRegexTagsMainloop (cppGetc);
 
