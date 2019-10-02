@@ -40,7 +40,7 @@ jobs:
            name: Install build tools
            # TODO: enable spell checker
            command: |
-              yum -y install gcc automake autoconf pkgconfig make libxml2-devel jansson-devel libyaml-devel findutils
+              yum -y --enablerepo=PowerTools install gcc automake autoconf pkgconfig make libxml2-devel jansson-devel libyaml-devel findutils diffutils
        - run:
            name: Build
            command: |
