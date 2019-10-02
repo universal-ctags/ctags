@@ -1,0 +1,15 @@
+nsb3014c060101	input.docbook	/^<article xmlns='http:\/\/docbook.org\/ns\/docbook'>$/;"	n	uri:http://docbook.org/ns/docbook
+chapter1	input.docbook	/^  <chapter id="chapter1"><title>Required Chapter<\/title>$/;"	i
+intro	input.docbook	/^ <section id="intro">$/;"	i
+sect1	input.docbook	/^ <sect1 id="sect1">$/;"	i
+sect2	input.docbook	/^ <sect2 id="sect2">$/;"	i
+sect3	input.docbook	/^ <sect3 id="sect3">$/;"	i
+conclusion	input.docbook	/^ <section id="conclusion">$/;"	i
+My first docbook document	input.docbook	/^  <title>My first docbook document<\/title>$/;"	t	parentTag:info
+Required Chapter	input.docbook	/^  <chapter id="chapter1"><title>Required Chapter<\/title>$/;"	t	parentTag:chapter	parentId:chapter1
+Introduction	input.docbook	/^  <title>Introduction<\/title>$/;"	t	parentTag:section	parentId:intro
+Section with a title	input.docbook	/^  <title>Section with a title<\/title>$/;"	t	parentTag:sect1	parentId:sect1
+Section with a title	input.docbook	/^  <title>Section with a title<\/title>$/;"	t	parentTag:sect2	parentId:sect2
+Section with a title	input.docbook	/^  <title>Section with a title<\/title>$/;"	t	parentTag:sect3	parentId:sect3
+Conclusion	input.docbook	/^  <title>Conclusion<\/title>$/;"	t	parentTag:section	parentId:conclusion
+Demonstration Appendix	input.docbook	/^ <appendix><title>Demonstration Appendix<\/title>$/;"	t	parentTag:appendix

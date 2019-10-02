@@ -19,6 +19,12 @@
 *	 DATA DECLARATIONS
 */
 
+enum XMLKindType {
+	KIND_XML_NONE = -1,
+	KIND_XML_ID,
+	KIND_XML_NSPREFIX,
+};
+
 typedef struct sXmlSubparser xmlSubparser;
 struct sXmlSubparser {
 	subparser subparser;
@@ -28,7 +34,7 @@ struct sXmlSubparser {
 	 * just found to subparsers.
 	 */
 	void (* makeTagEntryWithNodeNotify) (xmlSubparser *s,
-										 xmlNode *node, tagEntryInfo *xmlTag);
+										 xmlNode *node, int corKIndex);
 
 	/* A subparser should call findXMLTags() in the callback function
 	 * assigned to this field. The XML base parser prepares CTX and ROOT.

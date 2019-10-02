@@ -25,11 +25,7 @@ static void makeTagWithNotification (xmlNode *node,
 									 tagEntryInfo *tag,
 									 void *userData);
 
-typedef enum {
-	K_ID,
-	K_NSPREFIX,
-	K_ROOT,
-} xmlKind;
+typedef enum XMLKindType xmlKind;
 
 #define ROOT_ELT_LETTER 'r'
 static const char ROOT_ELT_LETTER_STR[2] = {ROOT_ELT_LETTER, '\0'};
@@ -72,7 +68,7 @@ static tagXpathTable XmlXpathMainTable [] = {
 static tagXpathTable XmlXpathIdTable [] = {
 	{ "./@id",
 	  LXPATH_TABLE_DO_MAKE,
-	  { .makeTagSpec = { K_ID, ROLE_DEFINITION_INDEX,
+	  { .makeTagSpec = { KIND_XML_ID, ROLE_DEFINITION_INDEX,
 						 .make = makeTagWithNotification,} }
 	},
 };
@@ -100,7 +96,7 @@ static tagRegexTable XmlTagRegexTable [] = {
 static int makeTagWithNotificationCommon (tagEntryInfo *tag,
 										   xmlNode *node)
 {
-	int n = makeTagEntry (tag);
+	int corkIndex = makeTagEntry (tag);
 
 	subparser *sub;
 	foreachSubparser (sub, false)
@@ -110,11 +106,11 @@ static int makeTagWithNotificationCommon (tagEntryInfo *tag,
 		if (xmlsub->makeTagEntryWithNodeNotify)
 		{
 			enterSubparser(sub);
-			xmlsub->makeTagEntryWithNodeNotify (xmlsub, node, tag);
+			xmlsub->makeTagEntryWithNodeNotify (xmlsub, node, corkIndex);
 			leaveSubparser();
 		}
 	}
-	return n;
+	return corkIndex;
 }
 
 static void makeTagWithNotification (xmlNode *node,
@@ -133,11 +129,11 @@ static int makeNsPrefixTag (const char *name, xmlNode *node, xmlNsPtr ns)
 	vString *anon = NULL;
 
 	if (name)
-		initTagEntry (&tag, name, K_NSPREFIX);
+		initTagEntry (&tag, name, KIND_XML_NSPREFIX);
 	else
 	{
-		anon = anonGenerateNew ("ns", K_NSPREFIX);
-		initTagEntry (&tag, vStringValue (anon), K_NSPREFIX);
+		anon = anonGenerateNew ("ns", KIND_XML_NSPREFIX);
+		initTagEntry (&tag, vStringValue (anon), KIND_XML_NSPREFIX);
 		markTagExtraBit (&tag, XTAG_ANONYMOUS);
 	}
 	/* TODO
@@ -207,6 +203,7 @@ XmlParser (void)
 	def->selectLanguage = selectors;
 	def->fieldTable = XmlFields;
 	def->fieldCount = ARRAY_SIZE (XmlFields);
+	def->useCork = true;
 	def->tagRegexTable = XmlTagRegexTable;
 	def->tagRegexCount = ARRAY_SIZE(XmlTagRegexTable);
 

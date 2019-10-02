@@ -1,0 +1,45 @@
+<article xmlns='http://docbook.org/ns/docbook'>
+ <info>
+  <title>My first docbook document</title>
+  <author><personname>
+ <firstname>Seth</firstname>
+ <surname>Kenlon</surname>
+  </personname></author>
+  <publisher><publishername>opensource.com</publishername></publisher>
+  <pubdate>2017</pubdate>
+ </info>
+
+  <chapter id="chapter1"><title>Required Chapter</title>
+  <para>
+  At least one chapter, reference, part, or article is required in a book.
+  </para>
+  </chapter>
+
+ <section id="intro">
+  <title>Introduction</title>
+  <para>Introductory text goes here.</para>
+  </section>
+
+ <sect1 id="sect1">
+  <title>Section with a title</title>
+  <para>Main body text goes here.</para>
+ </sect1>
+
+ <sect2 id="sect2">
+  <title>Section with a title</title>
+  <para>Main body text goes here.</para>
+ </sect2>
+
+ <sect3 id="sect3">
+  <title>Section with a title</title>
+  <para>Main body text goes here.</para>
+ </sect3>
+
+ <section id="conclusion">
+  <title>Conclusion</title>
+  <para>Exciting and inspiring conclusion goes here.</para>
+ </section>
+
+ <appendix><title>Demonstration Appendix</title>
+ </appendix>
+</article>

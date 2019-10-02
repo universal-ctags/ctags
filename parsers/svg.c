@@ -37,9 +37,11 @@ findSvgTags (void)
 static void
 makeTagEntryWithNodeNotify (xmlSubparser *s,
 							xmlNode *node,
-							tagEntryInfo *xmlTag)
+							int corkIndex)
 {
-	if (node->type == XML_ATTRIBUTE_NODE
+	tagEntryInfo *xmlTag = getEntryInCorkQueue (corkIndex);
+	if (xmlTag
+		&& node->type == XML_ATTRIBUTE_NODE
 		&& (strcmp ((char *)node->name, "id") == 0)
 		&& node->parent && node->parent->parent
 		&& node->parent->parent->type == XML_ELEMENT_NODE
