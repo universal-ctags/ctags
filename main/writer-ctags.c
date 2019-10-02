@@ -34,6 +34,10 @@ static int writeCtagsPtagEntry (tagWriter *writer CTAGS_ATTR_UNUSED,
 								void *clientData);
 static bool treatFieldAsFixed (int fieldType);
 
+#ifdef WIN32
+static enum filenameSepOp overrideFilenameSeparator (enum filenameSepOp currentSetting);
+#endif	/* WIN32 */
+
 struct rejection {
 	bool rejectionInThisInput;
 };
@@ -45,6 +49,9 @@ tagWriter uCtagsWriter = {
 	.postWriteEntry = NULL,
 	.rescanFailedEntry = NULL,
 	.treatFieldAsFixed = treatFieldAsFixed,
+#ifdef WIN32
+	.overrideFilenameSeparator = overrideFilenameSeparator,
+#endif
 	.defaultFileName = CTAGS_FILE,
 };
 
@@ -64,6 +71,15 @@ static bool endECTagsFile (tagWriter *writer, MIO * mio CTAGS_ATTR_UNUSED, const
 	struct rejection *rej = writer->private;
 	return rej->rejectionInThisInput;
 }
+
+#ifdef WIN32
+static enum filenameSepOp overrideFilenameSeparator (enum filenameSepOp currentSetting)
+{
+	if (currentSetting == FILENAME_SEP_UNSET)
+		return FILENAME_SEP_USE_SLASH;
+	return currentSetting;
+}
+#endif
 
 tagWriter eCtagsWriter = {
 	.writeEntry = writeCtagsEntry,

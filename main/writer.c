@@ -9,6 +9,7 @@
 
 #include "general.h"
 #include "entry_p.h"
+#include "options_p.h"
 #include "writer_p.h"
 
 extern tagWriter uCtagsWriter;
@@ -88,7 +89,7 @@ extern void writerRescanFailed (unsigned long validTagNum)
 		writer->rescanFailedEntry(writer, validTagNum, writer->clientData);
 }
 
-extern bool ptagMakeCtagsOutputMode (ptagDesc *desc, void *data CTAGS_ATTR_UNUSED)
+extern bool ptagMakeCtagsOutputMode (ptagDesc *desc, const void *data CTAGS_ATTR_UNUSED)
 {
 	const char *mode ="";
 
@@ -118,4 +119,25 @@ extern bool writerDoesTreatFieldAsFixed (int fieldType)
 	if (writer->treatFieldAsFixed)
 		return writer->treatFieldAsFixed (fieldType);
 	return false;
+}
+
+#ifdef WIN32
+extern enum filenameSepOp getFilenameSeparator (enum filenameSepOp currentSetting)
+{
+	if (writer->overrideFilenameSeparator)
+		return writer->overrideFilenameSeparator (currentSetting);
+	return currentSetting;
+}
+#endif
+
+extern bool ptagMakeCtagsOutputFilesep (ptagDesc *desc, const void *data CTAGS_ATTR_UNUSED)
+{
+	const char *sep = "slash";
+#ifdef WIN32
+	const optionValues *opt = data;
+	if (getFilenameSeparator (opt->useSlashAsFilenameSeparator)
+		!= FILENAME_SEP_USE_SLASH)
+		sep = "backslash";
+#endif
+	return writePseudoTag (desc, sep, "slash or backslash", NULL);
 }

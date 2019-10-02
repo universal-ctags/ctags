@@ -172,6 +172,9 @@ optionValues Option = {
 	.putFieldPrefix = false,
 	.maxRecursionDepth = 0xffffffff,
 	.interactive = false,
+#ifdef WIN32
+	.useSlashAsFilenameSeparator = FILENAME_SEP_UNSET,
+#endif
 #ifdef DEBUG
 	.breakLine = 0,
 #endif
@@ -416,6 +419,10 @@ static optionDescription LongOptionDescription [] = {
  {0,"       never:  be absolute even if input files are passed in with relative paths" },
  {1,"  --totals=[yes|no|extra]"},
  {1,"       Print statistics about input and tag files [no]."},
+#ifdef WIN32
+ {1,"  --use-slash-as-filename-separator"},
+ {1,"       Use slash as filename separator [yes] for u-ctags output format."},
+#endif
  {1,"  --verbose=[yes|no]"},
  {1,"       Enable verbose messages describing actions on each input file."},
  {1,"  --version"},
@@ -526,7 +533,7 @@ static struct Feature {
 #ifdef CUSTOM_CONFIGURATION_FILE
 	{"custom-conf", "read \"" CUSTOM_CONFIGURATION_FILE "\" as config file"},
 #endif
-#if defined (WIN32) && defined (UNIX_PATH_SEPARATOR)
+#if defined (WIN32)
 	{"unix-path-separator", "can use '/' as file name separator"},
 #endif
 #ifdef HAVE_ICONV
@@ -1146,7 +1153,7 @@ static void processExcludeOption (
 	{
 		vString *const item = vStringNewInit (parameter);
 #if defined (WIN32)
-		vStringTranslate(item, '\\', '/');
+		vStringTranslate(item, PATH_SEPARATOR, OUTPUT_PATH_SEPARATOR);
 #endif
 		if (Excluded == NULL)
 			Excluded = stringListNew ();
@@ -2786,6 +2793,9 @@ static booleanOption BooleanOptions [] = {
 	{ "recurse",        &Option.recurse,                false, STAGE_ANY },
 #endif
 	{ "verbose",        &ctags_verbose,                false, STAGE_ANY },
+#ifdef WIN32
+	{ "use-slash-as-filename-separator", (bool *)&Option.useSlashAsFilenameSeparator, false, STAGE_ANY },
+#endif
 	{ "with-list-header", &localOption.withListHeader,       true,  STAGE_ANY },
 	{ "_fatal-warnings",&Option.fatalWarnings,          false, STAGE_ANY },
 };

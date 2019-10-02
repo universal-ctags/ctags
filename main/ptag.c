@@ -24,7 +24,7 @@
 #include <string.h>
 
 
-static bool ptagMakeFormat (ptagDesc *desc, void *data CTAGS_ATTR_UNUSED)
+static bool ptagMakeFormat (ptagDesc *desc, const void *data CTAGS_ATTR_UNUSED)
 {
 	char format [11];
 	const char *formatComment = "unknown format";
@@ -38,7 +38,7 @@ static bool ptagMakeFormat (ptagDesc *desc, void *data CTAGS_ATTR_UNUSED)
 	return writePseudoTag (desc, format, formatComment, NULL);
 }
 
-static bool ptagMakeHowSorted (ptagDesc *desc, void *data CTAGS_ATTR_UNUSED)
+static bool ptagMakeHowSorted (ptagDesc *desc, const void *data CTAGS_ATTR_UNUSED)
 {
 	return writePseudoTag (desc,
 			       Option.sorted == SO_FOLDSORTED ? "2" :
@@ -47,32 +47,32 @@ static bool ptagMakeHowSorted (ptagDesc *desc, void *data CTAGS_ATTR_UNUSED)
 			       NULL);
 }
 
-static bool ptagMakeAuthor (ptagDesc *desc, void *data CTAGS_ATTR_UNUSED)
+static bool ptagMakeAuthor (ptagDesc *desc, const void *data CTAGS_ATTR_UNUSED)
 {
 	return writePseudoTag (desc,
 						   AUTHOR_NAME,  "", NULL);
 }
 
-static bool ptagMakeProgName (ptagDesc *desc, void *data CTAGS_ATTR_UNUSED)
+static bool ptagMakeProgName (ptagDesc *desc, const void *data CTAGS_ATTR_UNUSED)
 {
 	return writePseudoTag (desc,
 						   PROGRAM_NAME,  "Derived from Exuberant Ctags", NULL);
 }
 
-static bool ptagMakeProgURL (ptagDesc *desc, void *data CTAGS_ATTR_UNUSED)
+static bool ptagMakeProgURL (ptagDesc *desc, const void *data CTAGS_ATTR_UNUSED)
 {
 	return writePseudoTag (desc,
 						   PROGRAM_URL, "official site", NULL);
 }
 
-static bool ptagMakeProgVersion (ptagDesc *desc, void *data CTAGS_ATTR_UNUSED)
+static bool ptagMakeProgVersion (ptagDesc *desc, const void *data CTAGS_ATTR_UNUSED)
 {
 	const char* repoinfo = ctags_repoinfo? ctags_repoinfo: "";
 	return writePseudoTag (desc, PROGRAM_VERSION, repoinfo, NULL);
 }
 
 #ifdef HAVE_ICONV
-static bool ptagMakeFileEncoding (ptagDesc *desc, void *data CTAGS_ATTR_UNUSED)
+static bool ptagMakeFileEncoding (ptagDesc *desc, const void *data CTAGS_ATTR_UNUSED)
 {
 	if (! Option.outputEncoding)
 		return false;
@@ -81,16 +81,16 @@ static bool ptagMakeFileEncoding (ptagDesc *desc, void *data CTAGS_ATTR_UNUSED)
 }
 #endif
 
-static bool ptagMakeKindSeparators (ptagDesc *desc, void *data)
+static bool ptagMakeKindSeparators (ptagDesc *desc, const void *data)
 {
-	langType *language = data;
+	const langType *language = data;
 
 	return makeKindSeparatorsPseudoTags (*language, desc);
 }
 
-static bool ptagMakeKindDescriptions (ptagDesc *desc, void *data)
+static bool ptagMakeKindDescriptions (ptagDesc *desc, const void *data)
 {
-	langType *language = data;
+	const langType *language = data;
 	return makeKindDescriptionsPseudoTags (*language, desc);
 }
 
@@ -144,9 +144,13 @@ static ptagDesc ptagDescs [] = {
 	  "the output mode: u-ctags or e-ctags",
 	  ptagMakeCtagsOutputMode,
 	  true },
+	{ true, "TAG_OUTPUT_FILESEP",
+	  "the separator used in file name (slash or backslash)",
+	  ptagMakeCtagsOutputFilesep,
+	  true },
 };
 
-extern bool makePtagIfEnabled (ptagType type, void *data)
+extern bool makePtagIfEnabled (ptagType type, const void *data)
 {
 	ptagDesc *desc;
 

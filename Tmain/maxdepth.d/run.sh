@@ -3,13 +3,8 @@
 
 CTAGS=$1
 
-convsep ()
-{
-    sed -e 's#\\\\#/#g'
-}
-
 echo '# DEPTH=1'
-${CTAGS} --quiet --options=NONE --maxdepth=1 -R -o - ./src | convsep
+${CTAGS} --quiet --options=NONE --maxdepth=1 -R -o - ./src
 echo '# DEPTH=2'
-${CTAGS} --quiet --options=NONE --maxdepth=2 -R -o - ./src | convsep
+${CTAGS} --quiet --options=NONE --maxdepth=2 -R -o - ./src
 exit $?

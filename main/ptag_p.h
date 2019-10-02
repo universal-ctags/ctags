@@ -36,6 +36,7 @@ typedef enum ePtagType { /* pseudo tag content control */
 	PTAG_KIND_SEPARATOR,
 	PTAG_KIND_DESCRIPTION,
 	PTAG_OUTPUT_MODE,
+	PTAG_OUTPUT_FILESEP,
 	PTAG_COUNT
 } ptagType;
 
@@ -43,11 +44,17 @@ struct sPtagDesc {
 	bool enabled;
 	const char* name;
 	const char* description;  /* displayed in --list-pseudo-tags output */
-	bool (* makeTag) (ptagDesc *, void *);
+
+	/* For the common ptags, the pointer for optionValues type value
+	 * is passed as the second argument.
+	 * For parser specific ptags, the pointer for parserObject
+	 * of the parser is passed as the second argument.
+	 */
+	bool (* makeTag) (ptagDesc *, const void *);
 	bool commonInParsers;
 };
 
-extern bool makePtagIfEnabled (ptagType type, void *data);
+extern bool makePtagIfEnabled (ptagType type, const void *data);
 extern ptagDesc* getPtagDesc (ptagType type);
 extern ptagType  getPtagTypeForName (const char *name);
 extern void printPtags (bool withListHeader, bool machinable, FILE *fp);

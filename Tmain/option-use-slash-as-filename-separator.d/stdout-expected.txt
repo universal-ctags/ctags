@@ -1,0 +1,20 @@
+#u-ctags output
+n	src/input.c	/^int n;$/;"	v	typeref:typename:int
+n	src/input.c	/^int n;$/;"	v	typeref:typename:int
+n	src\\input.c	/^int n;$/;"	v	typeref:typename:int
+#u-ctags ptag output
+!_TAG_OUTPUT_FILESEP	slash	/slash or backslash/
+!_TAG_OUTPUT_FILESEP	slash	/slash or backslash/
+!_TAG_OUTPUT_FILESEP	backslash	/slash or backslash/
+#e-ctags output
+n	src\input.c	/^int n;$/;"	v	typeref:typename:int
+n	src/input.c	/^int n;$/;"	v	typeref:typename:int
+n	src\input.c	/^int n;$/;"	v	typeref:typename:int
+#e-ctags ptag output
+!_TAG_OUTPUT_FILESEP	backslash	/slash or backslash/
+!_TAG_OUTPUT_FILESEP	slash	/slash or backslash/
+!_TAG_OUTPUT_FILESEP	backslash	/slash or backslash/
+#xref output
+n                variable      1 src\\input.c     int n;
+n                variable      1 src/input.c      int n;
+n                variable      1 src\\input.c     int n;

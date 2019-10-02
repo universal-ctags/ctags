@@ -570,6 +570,7 @@ are not listed here. They are experimental or for debugging purpose.
 	ctags of SVR4 Unix.
 
 ``-x``
+	Same as ``--output-format=xref``.
 	Print a tabular, human-readable cross reference (xref) file to standard
 	output instead of generating a tag file. The information contained in
 	the output includes: the tag name; the kind of tag; the line number,
@@ -752,9 +753,7 @@ are not listed here. They are experimental or for debugging purpose.
 		Note: Using backslash characters as separators forming
 		qualified name in PHP. However, in tags output of
 		Universal-ctags, a backslash character in a name is escaped
-		with a backslash character.
-
-		.. TODO: Write about the detail of escaping in somewhere.
+		with a backslash character. See tags(5) about the escaping.
 
 	r/reference
 		Include reference tags. See "TAG ENTRIES" about reference tags.
@@ -1389,6 +1388,17 @@ are not listed here. They are experimental or for debugging purpose.
 	Add an optlib *directory* to or reset **optlib** path list.
 	By default, the optlib path list is empty.
 
+``--output-format=u-ctags|e-ctags|etags|xref|json``
+	Specify the output format. The default is "u-ctags".
+	See tags(5) for "u-ctags" and "e-ctags".
+	See ``-e`` for "etags", and ``-x`` for "xref".
+	"json" is experimental format, and available only if
+	the ctags executable is built with libjansson.
+	This option must appear before the first file name.
+
+.. TODO: convert output-json.rst to ctags-json-output.1.rst (ctags-json-output(1)).
+   and add a link to it here.
+
 ``--print-language``
 	Just prints the language parsers for specified source files, and then exits.
 
@@ -1438,6 +1448,13 @@ are not listed here. They are experimental or for debugging purpose.
 
 	The extra value prints parser specific statistics for parsers
 	gathering such information.
+
+``--use-slash-as-filename-separator[=yes|no]``
+	Uses slash character as filename separators instead of backslash
+	character when priting ``input:`` field.
+	This option is available on MSWindows only.
+	The default is yes for the default "u-ctags" output format, and
+	no for the other formats.
 
 ``--verbose[=yes|no]``
 	Enable verbose mode. This prints out information on option processing
