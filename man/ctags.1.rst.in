@@ -753,9 +753,7 @@ are not listed here. They are experimental or for debugging purpose.
 		Note: Using backslash characters as separators forming
 		qualified name in PHP. However, in tags output of
 		Universal-ctags, a backslash character in a name is escaped
-		with a backslash character.
-
-		.. TODO: Write about the detail of escaping in somewhere.
+		with a backslash character. See tags(5) about the escaping.
 
 	r/reference
 		Include reference tags. See "TAG ENTRIES" about reference tags.
