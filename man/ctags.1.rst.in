@@ -1449,6 +1449,13 @@ are not listed here. They are experimental or for debugging purpose.
 	The extra value prints parser specific statistics for parsers
 	gathering such information.
 
+``--use-slash-as-filename-separator[=yes|no]``
+	Uses slash character as filename separators instead of backslash
+	character when priting ``input:`` field.
+	This option is available on MSWindows only.
+	The default is yes for the default "u-ctags" output format, and
+	no for the other formats.
+
 ``--verbose[=yes|no]``
 	Enable verbose mode. This prints out information on option processing
 	and a brief message describing what action is being taken for each file
