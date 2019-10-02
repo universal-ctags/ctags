@@ -2018,7 +2018,9 @@ static void parseTable (tokenInfo *const token)
 	if (isType (token, TOKEN_OPEN_PAREN))
 	{
 		if (isType (name, TOKEN_IDENTIFIER) ||
-			isType (name, TOKEN_STRING))
+			isType (name, TOKEN_STRING) ||
+			(isType (name, TOKEN_KEYWORD)
+			 && (!isReservedWord (name))))
 		{
 			makeSqlTag (name, SQLTAG_TABLE);
 			emitted = true;
