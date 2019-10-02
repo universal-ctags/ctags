@@ -1206,7 +1206,9 @@ static void parseRecord (tokenInfo *const token)
 			/* keyword test above is redundant as only a TOKEN_KEYWORD could
 			 * match any isKeyword() anyway */
 			if (isType (token, TOKEN_IDENTIFIER) ||
-				isType (token, TOKEN_STRING))
+				isType (token, TOKEN_STRING)     ||
+				(isType (token, TOKEN_KEYWORD)
+				 && (!isReservedWord (token))))
 			{
 				makeSqlTag (token, SQLTAG_FIELD);
 			}
