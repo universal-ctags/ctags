@@ -25,7 +25,6 @@
 #include "vstring.h"
 #include "param.h"
 #include "parse.h"
-#include "trashbox.h"
 #include "xtag.h"
 
 #include "cxx/cxx_debug.h"
@@ -2078,22 +2077,30 @@ static hashTable *makeMacroTable (void)
 static void initializeCpp (const langType language)
 {
 	Cpp.lang = language;
+}
 
-	cmdlineMacroTable = makeMacroTable ();
-	DEFAULT_TRASH_BOX(cmdlineMacroTable,hashTableDelete);
+static void finalizeCpp (const langType language, bool initialized)
+{
+	if (cmdlineMacroTable)
+	{
+		hashTableDelete (cmdlineMacroTable);
+		cmdlineMacroTable = NULL;
+	}
 }
 
 static void CpreProInstallIgnoreToken (const langType language CTAGS_ATTR_UNUSED, const char *optname CTAGS_ATTR_UNUSED, const char *arg)
 {
 	if (arg == NULL || arg[0] == '\0')
 	{
-		DEFAULT_TRASH_BOX_TAKE_BACK(cmdlineMacroTable);
-		hashTableDelete(cmdlineMacroTable);
-		cmdlineMacroTable = makeMacroTable ();
-		DEFAULT_TRASH_BOX(cmdlineMacroTable,hashTableDelete);
-
+		if (cmdlineMacroTable)
+		{
+			hashTableDelete(cmdlineMacroTable);
+			cmdlineMacroTable = NULL;
+		}
 		verbose ("    clearing list\n");
 	} else {
+		if (!cmdlineMacroTable)
+			cmdlineMacroTable = makeMacroTable ();
 		saveIgnoreToken(arg);
 	}
 }
@@ -2102,10 +2109,15 @@ static void CpreProInstallMacroToken (const langType language CTAGS_ATTR_UNUSED,
 {
 	if (arg == NULL || arg[0] == '\0')
 	{
-		hashTableDelete(cmdlineMacroTable);
-		cmdlineMacroTable = makeMacroTable ();
+		if (cmdlineMacroTable)
+		{
+			hashTableDelete(cmdlineMacroTable);
+			cmdlineMacroTable = NULL;
+		}
 		verbose ("    clearing list\n");
 	} else {
+		if (!cmdlineMacroTable)
+			cmdlineMacroTable = makeMacroTable ();
 		saveMacro(cmdlineMacroTable, arg);
 	}
 }
@@ -2138,6 +2150,7 @@ extern parserDefinition* CPreProParser (void)
 	def->kindCount  = ARRAY_SIZE (CPreProKinds);
 	def->initialize = initializeCpp;
 	def->parser     = findCppTags;
+	def->finalize   = finalizeCpp;
 
 	def->fieldTable = CPreProFields;
 	def->fieldCount = ARRAY_SIZE (CPreProFields);
