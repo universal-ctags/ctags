@@ -117,6 +117,13 @@ Cygwin provides ports of many GNU/Linux tools and a POSIX API layer. This is the
 
 It is easy to build a Cygwin version of ctags using the normal GNU/Linux build steps. This ctags.exe will depend on cygwin1.dll and should only be used within the Cygwin ecosystem.
 
+The following packages are needed to build a full-featured version:
+
+- libiconv-devel
+- libjansson-devel
+- libxml2-devel
+- libyaml-devel
+
 Cygwin has packages with a recent version of MinGW-w64 as well. This way it is easy to cross-compile a native Windows application with ``make -f mk_mingw.mak  CC=i686-w64-mingw32-gcc``.
 
 You can also build a native Windows version using Autotools.
