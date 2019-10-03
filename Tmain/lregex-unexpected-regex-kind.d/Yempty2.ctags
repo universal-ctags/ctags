@@ -1,0 +1,3 @@
+--langdef=Ye1
+--map-Ye1=.yyy
+--regex-Ye1=/^block//,,/{_anonymous=yyy}

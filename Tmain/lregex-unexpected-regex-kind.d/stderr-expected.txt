@@ -1,0 +1,16 @@
+# no kind is specified
+ctags: Warning: use "_anonymous" regex flag only with an explicitly defined kind
+ctags: Warning: ^block: regexp missing name pattern
+ctags: Warning: input.yyy:1: null expansion of name pattern ""
+# no kind (empty,) is specified
+ctags: Warning: use "_anonymous" regex flag only with an explicitly defined kind
+ctags: Warning: ^block: regexp missing name pattern
+ctags: Warning: input.yyy:1: null expansion of name pattern ""
+# no kind (empty,,) is specified
+ctags: Warning: use "_anonymous" regex flag only with an explicitly defined kind
+ctags: Warning: ^block: regexp missing name pattern
+ctags: Warning: input.yyy:1: null expansion of name pattern ""
+# (r/) kind is specified inline
+# (/regex) kind is specified inline
+# (r/regex) kind is specified inline
+# (r/regex) kind defined with --kinddef-<LANG> option
