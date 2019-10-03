@@ -1160,7 +1160,6 @@ static void setKind(regexPattern * ptrn, const langType owner,
 	Assert (kindName);
 
 	if (*ptrn->u.tag.name_pattern == '\0' &&
-		ptrn->exclusive &&
 		kindLetter == KIND_REGEX_DEFAULT_LETTER)
 	{
 		ptrn->u.tag.kindIndex = KIND_GHOST_INDEX;
