@@ -1206,7 +1206,7 @@ static void parseConstTypeVar (tokenInfo *const token, goKind kind, const int sc
 				skipType (token, &collector);
 				collectorTruncate (&collector, true);
 
-				if (!vStringIsEmpty (buffer))
+				if ((member_scope != CORK_NIL) && !vStringIsEmpty (buffer))
 				{
 					tagEntryInfo *e = getEntryInCorkQueue (member_scope);
 					e->extensionFields.typeRef [0] = eStrdup ("typename");
