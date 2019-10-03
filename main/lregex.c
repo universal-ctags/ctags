@@ -1020,7 +1020,7 @@ static void common_flag_role_long (const char* const s, const char* const v, voi
 	ptrn->u.tag.roleBits |= makeRoleBit(role->id);
 }
 
-static void common_flag_anonymous_long (const char* const s CTAGS_ATTR_UNUSED, const char* const v, void* data)
+static void common_flag_anonymous_long (const char* const s, const char* const v, void* data)
 {
 	struct commonFlagData * cdata = data;
 	regexPattern *ptrn = cdata->ptrn;
@@ -1039,6 +1039,12 @@ static void common_flag_anonymous_long (const char* const s CTAGS_ATTR_UNUSED, c
 	{
 		error (WARNING, "no PREFIX for anonymous regex flag is given (pattern == %s)",
 			   ptrn->pattern_string? ptrn->pattern_string: "");
+		return;
+	}
+
+	if (ptrn->u.tag.kindIndex == KIND_GHOST_INDEX)
+	{
+		error (WARNING, "use \"%s\" regex flag only with an explicitly defined kind", s);
 		return;
 	}
 
