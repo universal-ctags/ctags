@@ -1,0 +1,5 @@
+comment	input.sql	/^create table api.comment ($/;"	t
+id	input.sql	/^  id serial primary key,$/;"	E	table:comment
+body	input.sql	/^  body character varying(250) not null,$/;"	E	table:comment
+created_at	input.sql	/^  created_at timestamptz default now(),$/;"	E	table:comment
+updated_at	input.sql	/^  updated_at timestamptz default now()$/;"	E	table:comment
