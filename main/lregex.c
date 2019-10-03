@@ -1325,7 +1325,8 @@ static regex_t* compileRegex (enum regexParserType regptype,
 }
 
 
-static void parseKinds (
+/* If a letter and/or a name are defined in kindSpec, return true. */
+static bool parseKinds (
 		const char* const kindSpec, char* const kindLetter, char** const kindName,
 		char **description)
 {
@@ -1335,13 +1336,18 @@ static void parseKinds (
 	{
 		*kindLetter = KIND_REGEX_DEFAULT_LETTER;
 		*kindName = eStrdup (KIND_REGEX_DEFAULT_NAME);
+		return false;
 	}
 	else
 	{
+		bool explicitly_defined = false;
 		const char* k = kindSpec;
 
 		if (k [0] != ','  &&  (k [1] == ','  ||  k [1] == '\0'))
+		{
 			*kindLetter = *k++;
+			explicitly_defined = true;
+		}
 		else
 			*kindLetter = KIND_REGEX_DEFAULT_LETTER;
 
@@ -1355,15 +1361,30 @@ static void parseKinds (
 			const char *const comma = strchr (k, ',');
 
 			if (comma == NULL)
-				*kindName = eStrdup (k);
+			{
+				if (strlen (k) == 0)
+					*kindName = eStrdup (KIND_REGEX_DEFAULT_NAME);
+				else
+				{
+					*kindName = eStrdup (k);
+					explicitly_defined = true;
+				}
+			}
 			else
 			{
-				*kindName = eStrndup (k, comma - k );
+				if (comma - k == 0)
+					*kindName = eStrdup (KIND_REGEX_DEFAULT_NAME);
+				else
+				{
+					*kindName = eStrndup (k, comma - k );
+					explicitly_defined = true;
+				}
 				k = comma + 1;
 				if (k [0] != '\0')
 					*description = eStrdup (k);
 			}
 		}
+		return explicitly_defined;
 	}
 }
 
