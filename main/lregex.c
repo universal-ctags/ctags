@@ -1208,11 +1208,10 @@ static regexPattern *addCompiledTagPattern (struct lregexControlBlock *lcb,
 	ptrn->u.tag.name_pattern = eStrdup (name);
 	ptrn->disabled = disabled;
 
-	/* need to check for exclusive before setting the kind */
+	setKind(ptrn, lcb->owner, kindLetter, kindName, description);
+
 	if (regptype == REG_PARSER_SINGLE_LINE)
 		flagsEval (flags, prePtrnFlagDef, ARRAY_SIZE(prePtrnFlagDef), &ptrn->exclusive);
-
-	setKind(ptrn, lcb->owner, kindLetter, kindName, description);
 
 	flagsEval (flags, commonSpecFlagDef, ARRAY_SIZE(commonSpecFlagDef), &commonFlagData);
 
