@@ -114,7 +114,7 @@ typedef enum {
 	GOTAG_METHODSPEC,
 	GOTAG_UNKNOWN,
 	GOTAG_PACKAGE_NAME,
-	GOTAG_ALIAS,
+	GOTAG_TALIAS,
 } goKind;
 
 typedef enum {
@@ -1154,7 +1154,7 @@ static void parseConstTypeVar (tokenInfo *const token, goKind kind, const int sc
 					readToken (token);
 					if (isType (token, TOKEN_EQUAL))
 					{
-						kind = GOTAG_ALIAS;
+						kind = GOTAG_TALIAS;
 						readToken (token);
 					}
 
@@ -1206,7 +1206,7 @@ static void parseConstTypeVar (tokenInfo *const token, goKind kind, const int sc
 				skipType (token, &collector);
 				collectorTruncate (&collector, true);
 
-				if (!vStringIsEmpty (buffer))
+				if ((member_scope != CORK_NIL) && !vStringIsEmpty (buffer))
 				{
 					tagEntryInfo *e = getEntryInCorkQueue (member_scope);
 					e->extensionFields.typeRef [0] = eStrdup ("typename");
