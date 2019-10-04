@@ -315,7 +315,7 @@ devel mailing list (ctags-devel@sourceforge)
     From: Frank Fesevur <ffes@unns...> - 2013-08-30 21:23:50
 
 	A parser for Windows Resource files.
-	http://en.wikipedia.org/wiki/Resource_%28Windows%29
+	https://en.wikipedia.org/wiki/Resource_%28Windows%29
 
 	::
 

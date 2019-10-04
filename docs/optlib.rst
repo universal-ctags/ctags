@@ -259,11 +259,11 @@ Another detail to keep in mind is how the regex engine treats newlines.
 Universal-ctags compiles the regular expressions in the ``--regex-<LANG>`` and
 ``--mline-regex-<LANG>`` options with REG_NEWLINE set. What that means is documented
 in the
-`POSIX spec <http://pubs.opengroup.org/onlinepubs/009695399/functions/regcomp.html>`_.
+`POSIX spec <https://pubs.opengroup.org/onlinepubs/009695399/functions/regcomp.html>`_.
 One obvious effect is that the regex special dot any-character ``.`` does not match
 newline characters, the ``^`` anchor *does* match right after a newline, and
 the ``$`` anchor matches right before a newline. A more subtle issue is this text from the
-`Regular Expressions chapter <http://pubs.opengroup.org/onlinepubs/009695399/basedefs/xbd_chap09.html>`_:
+`Regular Expressions chapter <https://pubs.opengroup.org/onlinepubs/009695399/basedefs/xbd_chap09.html>`_:
 "the use of literal <newline>s or any escape sequence equivalent produces undefined
 results". What that means is using a regex pattern with ``[^\n]+`` is invalid,
 and indeed in glibc produces very odd results. **Never** use ``\n`` in patterns

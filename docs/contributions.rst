@@ -103,8 +103,8 @@ Don't use them in function declarations, variable declarations or
 macro names in header files.
 
 Basic whitespace settings are specified in the `EditorConfig
-<http://editorconfig.org/>`_ configuration file (`.editorconfig`).
-There are `plugins <http://editorconfig.org/#download>`_ available
+<https://editorconfig.org/>`_ configuration file (`.editorconfig`).
+There are `plugins <https://editorconfig.org/#download>`_ available
 for most popular editors to automatically configure these settings.
 
 Style guidelines are largely captured in the `Uncrustify

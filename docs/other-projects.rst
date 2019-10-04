@@ -31,16 +31,16 @@ Changes known by devs worth backporting:
 
 They have these additional language parsers:
 
-* `Abaqus <http://en.wikipedia.org/wiki/Abaqus>`_
-* `ActionScript <http://en.wikipedia.org/wiki/ActionScript>`_
-* `AsciiDoc <http://en.wikipedia.org/wiki/AsciiDoc>`_
-* `DocBook <http://en.wikipedia.org/wiki/DocBook>`_
-* `Ferite (c.c) <http://en.wikipedia.org/wiki/Ferite>`_
-* `GLSL (c.c) <http://en.wikipedia.org/wiki/OpenGL_Shading_Language>`_
-* `Haskell <http://en.wikipedia.org/wiki/Haskell_%28programming_language%29>`_
-* `Haxe <http://en.wikipedia.org/wiki/Haxe>`_
-* `txt2tags <http://en.wikipedia.org/wiki/Txt2tags>`_
-* `Vala (c.c) <http://en.wikipedia.org/wiki/Vala_%28programming_language%29>`_
+* `Abaqus <https://en.wikipedia.org/wiki/Abaqus>`_
+* `ActionScript <https://en.wikipedia.org/wiki/ActionScript>`_
+* `AsciiDoc <https://en.wikipedia.org/wiki/AsciiDoc>`_
+* `DocBook <https://en.wikipedia.org/wiki/DocBook>`_
+* `Ferite (c.c) <https://en.wikipedia.org/wiki/Ferite>`_
+* `GLSL (c.c) <https://en.wikipedia.org/wiki/OpenGL_Shading_Language>`_
+* `Haskell <https://en.wikipedia.org/wiki/Haskell_%28programming_language%29>`_
+* `Haxe <https://en.wikipedia.org/wiki/Haxe>`_
+* `txt2tags <https://en.wikipedia.org/wiki/Txt2tags>`_
+* `Vala (c.c) <https://en.wikipedia.org/wiki/Vala_%28programming_language%29>`_
 
 These changes have been merged:
 
@@ -73,13 +73,13 @@ GNU global
 	A person at GNU global project proposed an extension for the tags file
 	format:
 
-	http://sourceforge.net/p/ctags/mailman/message/30020186/
+	https://sourceforge.net/p/ctags/mailman/message/30020186/
 
 GNU source highlight
 
 	highlight can generate html files. It can utilize tags file
 	as input for making hyperlinks.
-	http://www.gnu.org/software/src-highlite/source-highlight.html#Generating-References
+	https://www.gnu.org/software/src-highlite/source-highlight.html#Generating-References
 
 	I(Masatake YAMATO) have not tried the feature yet.
 

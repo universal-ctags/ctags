@@ -107,7 +107,7 @@ domain own concepts.
 
 Let me show the part of source code of SPY-WARS, an imaginary game application.
 It is written in scheme language, a dialect of lisp.
-(Here `gauche <http://practical-scheme.net/gauche/index.html>`_ is considered
+(Here `gauche <https://practical-scheme.net/gauche/index.html>`_ is considered
 as the implementation of scheme interpreter).
 
 .. code-block:: scheme

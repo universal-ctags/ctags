@@ -16,7 +16,7 @@ There are many compilers for Windows. Compilers not mentioned here may work but 
 
 Microsoft Visual Studio
 .............................................................................
-http://www.visualstudio.com/
+https://www.visualstudio.com/
 
 Obviously there is Microsoft Visual Studio 2013. Many professional developers targeting Windows use Visual Studio. Visual Studio comes in a couple of different editions. Their Express and Community editions are free to use, but a Microsoft-account is required to download the .iso and when you want to continue using it after a 30-days trial period. Other editions of Visual Studio must be purchased.
 

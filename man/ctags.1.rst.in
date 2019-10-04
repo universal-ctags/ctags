@@ -55,7 +55,7 @@ describes how the capability is extended.
 
 Newly introduced experimental features are not explained here. If you
 are interested in such features and @CTAGS_NAME_EXECUTABLE@ internals,
-visit http://docs.ctags.io/en/latest/.
+visit https://docs.ctags.io/en/latest/.
 
 
 SOURCE FILES
@@ -932,7 +932,7 @@ are not listed here. They are experimental or for debugging purpose.
 
 ``--help-full``
 	Prints to standard output a detailed usage description about experimental
-	features, and then exits. Visit http://docs.ctags.io/en/latest for information
+	features, and then exits. Visit https://docs.ctags.io/en/latest/ for information
 	about the latest exciting experimental features.
 
 ``--if0[=yes|no]``
@@ -1821,14 +1821,14 @@ https://ctags.io/
 Also ex(1), vi(1), elvis, or, better yet, vim, the official editor of ctags.
 For more information on vim, see the VIM Pages web site at:
 
-http://www.vim.org/
+https://www.vim.org/
 
 
 AUTHOR
 ------
 
 Universal-ctags project
-https://ctags.io
+https://ctags.io/
 
 Darren Hiebert <dhiebert@users.sourceforge.net>
 http://DarrenHiebert.com/
