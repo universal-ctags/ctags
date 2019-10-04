@@ -1188,27 +1188,16 @@ static void setKind(regexPattern * ptrn, const langType owner,
 	}
 }
 
-
-static regexPattern *addCompiledTagPattern (struct lregexControlBlock *lcb,
-											int table_index,
-											enum regexParserType regptype, regex_t* const pattern,
-					    const char* const name, char kindLetter, const char* kindName,
-					    char *const description, const char* flags,
-					    bool *disabled)
+static void patternEvalFlags (struct lregexControlBlock *lcb,
+							  regexPattern * ptrn,
+							  enum regexParserType regptype,
+							  const char* flags)
 {
-	regexPattern * ptrn = addCompiledTagCommon(lcb, table_index, pattern, regptype);
-
 	struct commonFlagData commonFlagData = {
 		.owner = lcb->owner,
 		.lcb = lcb,
 		.ptrn = ptrn
 	};
-
-	ptrn->type = PTRN_TAG;
-	ptrn->u.tag.name_pattern = eStrdup (name);
-	ptrn->disabled = disabled;
-
-	setKind(ptrn, lcb->owner, kindLetter, kindName, description);
 
 	if (regptype == REG_PARSER_SINGLE_LINE)
 		flagsEval (flags, prePtrnFlagDef, ARRAY_SIZE(prePtrnFlagDef), &ptrn->exclusive);
@@ -1233,6 +1222,23 @@ static regexPattern *addCompiledTagPattern (struct lregexControlBlock *lcb,
 
 	if (regptype == REG_PARSER_MULTI_TABLE)
 		flagsEval (flags, multitablePtrnFlagDef, ARRAY_SIZE(multitablePtrnFlagDef), &commonFlagData);
+}
+
+static regexPattern *addCompiledTagPattern (struct lregexControlBlock *lcb,
+											int table_index,
+											enum regexParserType regptype, regex_t* const pattern,
+					    const char* const name, char kindLetter, const char* kindName,
+					    char *const description, const char* flags,
+					    bool *disabled)
+{
+	regexPattern * ptrn = addCompiledTagCommon(lcb, table_index, pattern, regptype);
+
+	ptrn->type = PTRN_TAG;
+	ptrn->u.tag.name_pattern = eStrdup (name);
+	ptrn->disabled = disabled;
+
+	setKind(ptrn, lcb->owner, kindLetter, kindName, description);
+	patternEvalFlags (lcb, ptrn, regptype, flags);
 
 	return ptrn;
 }
