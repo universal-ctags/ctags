@@ -1153,37 +1153,33 @@ static flagDefinition multitablePtrnFlagDef[] = {
 
 static void setKind(regexPattern * ptrn, const langType owner,
 					const char kindLetter, const char* kindName,
-					const char *const description)
+					const char *const description,
+					bool kind_explicitly_defined)
 {
 	Assert (ptrn);
 	Assert (ptrn->u.tag.name_pattern);
 	Assert (kindName);
+	kindDefinition *kdef = getLanguageKindForLetter (owner, kindLetter);
 
-	if (*ptrn->u.tag.name_pattern == '\0' &&
-		kindLetter == KIND_REGEX_DEFAULT_LETTER)
+	if (kdef)
 	{
-		ptrn->u.tag.kindIndex = KIND_GHOST_INDEX;
+		if (strcmp (kdef->name, kindName) && (strcmp(kindName, KIND_REGEX_DEFAULT_NAME)))
+			/* When using a same kind letter for multiple regex patterns, the name of kind
+			   should be the same. */
+			error  (WARNING, "Don't reuse the kind letter `%c' in a language %s (old: \"%s\", new: \"%s\")",
+					kdef->letter, getLanguageName (owner),
+					kdef->name, kindName);
+		ptrn->u.tag.kindIndex = kdef->id;
 	}
+	else if (*ptrn->u.tag.name_pattern == '\0' &&
+			 kindLetter == KIND_REGEX_DEFAULT_LETTER &&
+			 (strcmp(kindName, KIND_REGEX_DEFAULT_NAME) == 0) &&
+			 (!kind_explicitly_defined))
+		ptrn->u.tag.kindIndex = KIND_GHOST_INDEX;
 	else
 	{
-		kindDefinition *kdef;
-
-		kdef = getLanguageKindForLetter (owner, kindLetter);
-		if (kdef)
-		{
-			if (strcmp (kdef->name, kindName) && (strcmp(kindName, KIND_REGEX_DEFAULT_NAME)))
-				/* When using a same kind letter for multiple regex patterns, the name of kind
-				   should be the same. */
-				error  (WARNING, "Don't reuse the kind letter `%c' in a language %s (old: \"%s\", new: \"%s\")",
-						kdef->letter, getLanguageName (owner),
-						kdef->name, kindName);
-		}
-		else
-		{
-			kdef = kindNew (kindLetter, kindName, description);
-			defineLanguageKind (owner, kdef, kindFree);
-		}
-
+		kdef = kindNew (kindLetter, kindName, description);
+		defineLanguageKind (owner, kdef, kindFree);
 		ptrn->u.tag.kindIndex = kdef->id;
 	}
 }
@@ -1229,6 +1225,7 @@ static regexPattern *addCompiledTagPattern (struct lregexControlBlock *lcb,
 											enum regexParserType regptype, regex_t* const pattern,
 					    const char* const name, char kindLetter, const char* kindName,
 					    char *const description, const char* flags,
+					    bool kind_explicitly_defined,
 					    bool *disabled)
 {
 	regexPattern * ptrn = addCompiledTagCommon(lcb, table_index, pattern, regptype);
@@ -1237,7 +1234,7 @@ static regexPattern *addCompiledTagPattern (struct lregexControlBlock *lcb,
 	ptrn->u.tag.name_pattern = eStrdup (name);
 	ptrn->disabled = disabled;
 
-	setKind(ptrn, lcb->owner, kindLetter, kindName, description);
+	setKind(ptrn, lcb->owner, kindLetter, kindName, description, kind_explicitly_defined);
 	patternEvalFlags (lcb, ptrn, regptype, flags);
 
 	return ptrn;
@@ -1952,7 +1949,7 @@ static regexPattern *addTagRegexInternal (struct lregexControlBlock *lcb,
 	char* description;
 	kindDefinition* fileKind;
 
-	parseKinds (kinds, &kindLetter, &kindName, &description);
+	bool explictly_defined =  parseKinds (kinds, &kindLetter, &kindName, &description);
 	fileKind = getLanguageKind (lcb->owner, KIND_FILE_INDEX);
 	if (kindLetter == fileKind->letter)
 		error (FATAL,
@@ -2012,6 +2009,7 @@ static regexPattern *addTagRegexInternal (struct lregexControlBlock *lcb,
 	regexPattern *rptr = addCompiledTagPattern (lcb, table_index,
 												regptype, cp, name,
 												kindLetter, kindName, description, flags,
+												explictly_defined,
 												disabled);
 	rptr->pattern_string = escapeRegexPattern(regex);
 
