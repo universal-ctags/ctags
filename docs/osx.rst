@@ -17,7 +17,7 @@ packaging scripts use autotools and make (as you'd expect).
 
 You may need to install the xcode command line tools. You can install the entire xcode distribution from the App Store,
 or for a lighter install, you can simply run ``xcode-select --install`` to *only* install the compilers and such. See
-http://stackoverflow.com/a/9329325 for more information. Once your build toolchain is installed, proceed to the next
+https://stackoverflow.com/a/9329325 for more information. Once your build toolchain is installed, proceed to the next
 section.
 
 At this point, if you'd like to build from an IDE, you'll have to figure it out. Building ctags is a pretty straightforward
@@ -31,7 +31,7 @@ You can simply run the build instructions in README.md.
 Building with Homebrew
 .............................................................................
 
-Homebrew (http://brew.sh/) is the preferred method for installing Universal-ctags for end users. Currently, the process
+Homebrew (https://brew.sh/) is the preferred method for installing Universal-ctags for end users. Currently, the process
 for installing with Homebrew looks like this::
 
         brew tap universal-ctags/universal-ctags
