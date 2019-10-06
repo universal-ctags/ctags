@@ -1020,7 +1020,7 @@ static void common_flag_role_long (const char* const s, const char* const v, voi
 	ptrn->u.tag.roleBits |= makeRoleBit(role->id);
 }
 
-static void common_flag_anonymous_long (const char* const s CTAGS_ATTR_UNUSED, const char* const v, void* data)
+static void common_flag_anonymous_long (const char* const s, const char* const v, void* data)
 {
 	struct commonFlagData * cdata = data;
 	regexPattern *ptrn = cdata->ptrn;
@@ -1039,6 +1039,12 @@ static void common_flag_anonymous_long (const char* const s CTAGS_ATTR_UNUSED, c
 	{
 		error (WARNING, "no PREFIX for anonymous regex flag is given (pattern == %s)",
 			   ptrn->pattern_string? ptrn->pattern_string: "");
+		return;
+	}
+
+	if (ptrn->u.tag.kindIndex == KIND_GHOST_INDEX)
+	{
+		error (WARNING, "use \"%s\" regex flag only with an explicitly defined kind", s);
 		return;
 	}
 
@@ -1147,67 +1153,50 @@ static flagDefinition multitablePtrnFlagDef[] = {
 
 static void setKind(regexPattern * ptrn, const langType owner,
 					const char kindLetter, const char* kindName,
-					const char *const description)
+					const char *const description,
+					bool kind_explicitly_defined)
 {
 	Assert (ptrn);
 	Assert (ptrn->u.tag.name_pattern);
 	Assert (kindName);
+	kindDefinition *kdef = getLanguageKindForLetter (owner, kindLetter);
 
-	if (*ptrn->u.tag.name_pattern == '\0' &&
-		ptrn->exclusive &&
-		kindLetter == KIND_REGEX_DEFAULT_LETTER)
+	if (kdef)
 	{
-		ptrn->u.tag.kindIndex = KIND_GHOST_INDEX;
+		if (strcmp (kdef->name, kindName) && (strcmp(kindName, KIND_REGEX_DEFAULT_NAME)))
+			/* When using a same kind letter for multiple regex patterns, the name of kind
+			   should be the same. */
+			error  (WARNING, "Don't reuse the kind letter `%c' in a language %s (old: \"%s\", new: \"%s\")",
+					kdef->letter, getLanguageName (owner),
+					kdef->name, kindName);
+		ptrn->u.tag.kindIndex = kdef->id;
 	}
+	else if (*ptrn->u.tag.name_pattern == '\0' &&
+			 kindLetter == KIND_REGEX_DEFAULT_LETTER &&
+			 (strcmp(kindName, KIND_REGEX_DEFAULT_NAME) == 0) &&
+			 (!kind_explicitly_defined))
+		ptrn->u.tag.kindIndex = KIND_GHOST_INDEX;
 	else
 	{
-		kindDefinition *kdef;
-
-		kdef = getLanguageKindForLetter (owner, kindLetter);
-		if (kdef)
-		{
-			if (strcmp (kdef->name, kindName) && (strcmp(kindName, KIND_REGEX_DEFAULT_NAME)))
-				/* When using a same kind letter for multiple regex patterns, the name of kind
-				   should be the same. */
-				error  (WARNING, "Don't reuse the kind letter `%c' in a language %s (old: \"%s\", new: \"%s\")",
-						kdef->letter, getLanguageName (owner),
-						kdef->name, kindName);
-		}
-		else
-		{
-			kdef = kindNew (kindLetter, kindName, description);
-			defineLanguageKind (owner, kdef, kindFree);
-		}
-
+		kdef = kindNew (kindLetter, kindName, description);
+		defineLanguageKind (owner, kdef, kindFree);
 		ptrn->u.tag.kindIndex = kdef->id;
 	}
 }
 
-
-static regexPattern *addCompiledTagPattern (struct lregexControlBlock *lcb,
-											int table_index,
-											enum regexParserType regptype, regex_t* const pattern,
-					    const char* const name, char kindLetter, const char* kindName,
-					    char *const description, const char* flags,
-					    bool *disabled)
+static void patternEvalFlags (struct lregexControlBlock *lcb,
+							  regexPattern * ptrn,
+							  enum regexParserType regptype,
+							  const char* flags)
 {
-	regexPattern * ptrn = addCompiledTagCommon(lcb, table_index, pattern, regptype);
-
 	struct commonFlagData commonFlagData = {
 		.owner = lcb->owner,
 		.lcb = lcb,
 		.ptrn = ptrn
 	};
 
-	ptrn->type = PTRN_TAG;
-	ptrn->u.tag.name_pattern = eStrdup (name);
-	ptrn->disabled = disabled;
-
-	/* need to check for exclusive before setting the kind */
 	if (regptype == REG_PARSER_SINGLE_LINE)
 		flagsEval (flags, prePtrnFlagDef, ARRAY_SIZE(prePtrnFlagDef), &ptrn->exclusive);
-
-	setKind(ptrn, lcb->owner, kindLetter, kindName, description);
 
 	flagsEval (flags, commonSpecFlagDef, ARRAY_SIZE(commonSpecFlagDef), &commonFlagData);
 
@@ -1229,6 +1218,24 @@ static regexPattern *addCompiledTagPattern (struct lregexControlBlock *lcb,
 
 	if (regptype == REG_PARSER_MULTI_TABLE)
 		flagsEval (flags, multitablePtrnFlagDef, ARRAY_SIZE(multitablePtrnFlagDef), &commonFlagData);
+}
+
+static regexPattern *addCompiledTagPattern (struct lregexControlBlock *lcb,
+											int table_index,
+											enum regexParserType regptype, regex_t* const pattern,
+					    const char* const name, char kindLetter, const char* kindName,
+					    char *const description, const char* flags,
+					    bool kind_explicitly_defined,
+					    bool *disabled)
+{
+	regexPattern * ptrn = addCompiledTagCommon(lcb, table_index, pattern, regptype);
+
+	ptrn->type = PTRN_TAG;
+	ptrn->u.tag.name_pattern = eStrdup (name);
+	ptrn->disabled = disabled;
+
+	setKind(ptrn, lcb->owner, kindLetter, kindName, description, kind_explicitly_defined);
+	patternEvalFlags (lcb, ptrn, regptype, flags);
 
 	return ptrn;
 }
@@ -1325,7 +1332,8 @@ static regex_t* compileRegex (enum regexParserType regptype,
 }
 
 
-static void parseKinds (
+/* If a letter and/or a name are defined in kindSpec, return true. */
+static bool parseKinds (
 		const char* const kindSpec, char* const kindLetter, char** const kindName,
 		char **description)
 {
@@ -1335,13 +1343,18 @@ static void parseKinds (
 	{
 		*kindLetter = KIND_REGEX_DEFAULT_LETTER;
 		*kindName = eStrdup (KIND_REGEX_DEFAULT_NAME);
+		return false;
 	}
 	else
 	{
+		bool explicitly_defined = false;
 		const char* k = kindSpec;
 
 		if (k [0] != ','  &&  (k [1] == ','  ||  k [1] == '\0'))
+		{
 			*kindLetter = *k++;
+			explicitly_defined = true;
+		}
 		else
 			*kindLetter = KIND_REGEX_DEFAULT_LETTER;
 
@@ -1355,15 +1368,30 @@ static void parseKinds (
 			const char *const comma = strchr (k, ',');
 
 			if (comma == NULL)
-				*kindName = eStrdup (k);
+			{
+				if (strlen (k) == 0)
+					*kindName = eStrdup (KIND_REGEX_DEFAULT_NAME);
+				else
+				{
+					*kindName = eStrdup (k);
+					explicitly_defined = true;
+				}
+			}
 			else
 			{
-				*kindName = eStrndup (k, comma - k );
+				if (comma - k == 0)
+					*kindName = eStrdup (KIND_REGEX_DEFAULT_NAME);
+				else
+				{
+					*kindName = eStrndup (k, comma - k );
+					explicitly_defined = true;
+				}
 				k = comma + 1;
 				if (k [0] != '\0')
 					*description = eStrdup (k);
 			}
 		}
+		return explicitly_defined;
 	}
 }
 
@@ -1921,7 +1949,7 @@ static regexPattern *addTagRegexInternal (struct lregexControlBlock *lcb,
 	char* description;
 	kindDefinition* fileKind;
 
-	parseKinds (kinds, &kindLetter, &kindName, &description);
+	bool explictly_defined =  parseKinds (kinds, &kindLetter, &kindName, &description);
 	fileKind = getLanguageKind (lcb->owner, KIND_FILE_INDEX);
 	if (kindLetter == fileKind->letter)
 		error (FATAL,
@@ -1981,6 +2009,7 @@ static regexPattern *addTagRegexInternal (struct lregexControlBlock *lcb,
 	regexPattern *rptr = addCompiledTagPattern (lcb, table_index,
 												regptype, cp, name,
 												kindLetter, kindName, description, flags,
+												explictly_defined,
 												disabled);
 	rptr->pattern_string = escapeRegexPattern(regex);
 

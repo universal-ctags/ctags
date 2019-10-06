@@ -1,0 +1,4 @@
+--langdef=Y3
+--map-Y3=.yyy
+--kinddef-Y3=r,regex,captured by regex patterns
+--regex-Y3=/^block//r/{_anonymous=yyy}

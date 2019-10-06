@@ -1,0 +1,7 @@
+--langdef=X
+--kinddef-X=f,foo,foobars
+--_tabledef-X=main
+--_tabledef-X=sharp
+--_mtable-regex-X=main/^#///{tjump=sharp}{_advanceTo=0start}
+--_mtable-regex-X=sharp/^[^\n]+[\n]//{tjump=main}
+--mline-regex-X=/^#.*//{_guest=C,0start,0end}
