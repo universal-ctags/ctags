@@ -109,6 +109,7 @@
 	Perl6Parser, \
 	PhpParser, \
 	PodParser, \
+	PowerShellParser, \
 	ProtobufParser, \
 	PuppetManifestParser, \
 	PythonParser, \

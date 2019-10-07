@@ -75,6 +75,7 @@ The following parsers have been added:
 * PuppetManifest *optlib*
 * Perl6
 * Pod *optlib*
+* PowerShell
 * PropertyList(plist) *libxml*
 * Protobuf
 * PythonLoggingConfig
