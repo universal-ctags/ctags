@@ -61,8 +61,6 @@
  *	 DATA DECLARATIONS
  */
 
-typedef enum eException { ExceptionNone, ExceptionEOF } exception_t;
-
 /*
  * Used to specify type of keyword.
  */
