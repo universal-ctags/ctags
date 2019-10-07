@@ -34,7 +34,7 @@ print_m4_header()
 make_am_sub_with_git ()
 {
     sub_d=$1
-    sub_f
+    sub_f=
 
     print_am_header
     echo "EXTRA_DIST    ="
@@ -55,7 +55,7 @@ make_am_with_git ()
     echo "EXTRA_DIST    ="
     echo
 
-    for d in $(git ls-files | grep ${git_top} | sed -n -e 's|^\(^'${git_top}'/[^/]\+\)\(/.*\)\?|\1|p'  | sort | uniq); do
+    for top_d in $(git ls-files | grep ${git_top} | sed -n -e 's|^\(^'${git_top}'/[^/]\+\)\(/.*\)\?|\1|p'  | sort | uniq); do
 	if [ -d "${top_d}" ]; then
 	    echo "DIST_SUBDIRS +=" $(basename "${top_d}")
 	    make_am_sub_with_git ${top_d} > ${top_d}/Makefile.am
