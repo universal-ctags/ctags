@@ -1359,7 +1359,7 @@ are not listed here. They are experimental or for debugging purpose.
 	the option can be specified with different arguments multiple times
 	in a command line.
 
-``--maxdepth``
+``--maxdepth=N``
 	Limits the depth of directory recursion enabled with the ``--recurse``
 	(``-R``) option.
 
