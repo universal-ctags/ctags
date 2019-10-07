@@ -92,5 +92,3 @@ Linux kernel
 
 	See linux/scripts/tags.sh of Linux kernel source tree.
 	It utilizes c parser to the utmost limit.
-
-
