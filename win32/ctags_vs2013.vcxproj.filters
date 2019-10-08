@@ -120,9 +120,6 @@
     <ClCompile Include="..\main\portable-scandir.c">
       <Filter>Source Files\Main</Filter>
     </ClCompile>
-    <ClCompile Include="..\main\powershell.c">
-      <Filter>Source Files\Main</Filter>
-    </ClCompile>
     <ClCompile Include="..\main\promise.c">
       <Filter>Source Files\Main</Filter>
     </ClCompile>
@@ -436,6 +433,9 @@
       <Filter>Source Files\Parsers</Filter>
     </ClCompile>
     <ClCompile Include="..\parsers\php.c">
+      <Filter>Source Files\Parsers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\parsers\powershell.c">
       <Filter>Source Files\Parsers</Filter>
     </ClCompile>
     <ClCompile Include="..\parsers\protobuf.c">
