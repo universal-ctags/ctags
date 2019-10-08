@@ -25,8 +25,6 @@
 #endif
 #include <regex.h>
 
-#include <inttypes.h>
-
 #include "debug.h"
 #include "colprint_p.h"
 #include "entry_p.h"
@@ -2755,10 +2753,10 @@ static void   guestRequestSubmit (struct guestRequest *r)
 {
 	const char *langName = getLanguageName (r->lang);
 	verbose ("guestRequestSubmit: %s; "
-			 "range: %"PRIdPTR" - %"PRIdPTR"\n",
+			 "range: %lld - %lld\n",
 			 langName,
-			 r->boundary[BOUNDARY_START].offset,
-			 r->boundary[BOUNDARY_END].offset);
+			 (long long)r->boundary[BOUNDARY_START].offset,
+			 (long long)r->boundary[BOUNDARY_END].offset);
 	makePromiseForAreaSpecifiedWithOffsets (langName,
 											r->boundary[BOUNDARY_START].offset,
 											r->boundary[BOUNDARY_END].offset);
