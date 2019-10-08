@@ -39,9 +39,11 @@ make_am_sub_with_git ()
     print_am_header
     echo "EXTRA_DIST    ="
 
-    for sub_f in $(git ls-files | sed -n -e 's|^'"${sub_d}"'/\(.\+\)|\1|p' | uniq); do
+    cd "${sub_d}"
+    for sub_f in $(git ls-files .); do
 	echo "EXTRA_DIST   +=" "${sub_f}"
     done
+    cd ..
 
 }
 
@@ -55,15 +57,17 @@ make_am_with_git ()
     echo "EXTRA_DIST    ="
     echo
 
-    for top_d in $(git ls-files | grep ${git_top} | sed -n -e 's|^\(^'${git_top}'/[^/]\+\)\(/.*\)\?|\1|p'  | sort | uniq); do
+    cd "${git_top}"
+    for top_d in $(git ls-tree --name-only HEAD | sort); do
 	if [ -d "${top_d}" ]; then
-	    echo "DIST_SUBDIRS +=" $(basename "${top_d}")
+	    echo "DIST_SUBDIRS +=" "${top_d}"
 	    make_am_sub_with_git ${top_d} > ${top_d}/Makefile.am
-	    echo 'AC_CONFIG_FILES(['${top_d}'/Makefile])' >> ${git_top}/dist.m4
+	    echo "AC_CONFIG_FILES([${git_top}/${top_d}/Makefile])" >> dist.m4
 	else
-	    echo "EXTRA_DIST   +=" $(basename "${top_d}")
+	    echo "EXTRA_DIST   +=" "${top_d}"
 	fi
     done
+    cd ..
 }
 
 rm -f Tmain/dist.m4
