@@ -14,6 +14,12 @@ indent_size = 4
 indent_style = tab
 trim_trailing_whitespace = true
 
+[fnmatch/*.{c,h}]
+tab_width = 8
+
+[gnu_regex/*.{c,h}]
+tab_width = 8
+
 [win32/*]
 end_of_line = crlf
 
