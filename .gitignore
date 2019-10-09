@@ -17,6 +17,7 @@
 *.tmp
 *~
 /packcc
+/packcc.exe
 .deps
 .dirstamp
 .DS_Store
