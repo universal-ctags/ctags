@@ -2030,6 +2030,7 @@ tmain_run ()
     local basedir
 
     local test_name
+    local r_failed="_failed.result"
     local failed
     local f
 
@@ -2039,6 +2040,7 @@ tmain_run ()
     local r
     local a
     local status_=0
+    local msg
 
     local need_rearrange
 
@@ -2046,6 +2048,7 @@ tmain_run ()
 	need_rearrange=yes
     fi
 
+    rm -f ${r_failed}
     basedir=$(pwd)
     for subdir in ${topdir}/*.d; do
 	if [ "${subdir}" = ${topdir}/'*.d' ]; then
@@ -2063,67 +2066,72 @@ tmain_run ()
 	    return 1
 	fi
 
-	rm -f ${build_subdir}/*-actual.txt
-
-	echo "Testing ${test_name}"
-	line '-'
+	# Run this block in parallel
 	(
-	    cd ${subdir}
-	    ${SHELL} run.sh \
-		     ${basedir}/${CTAGS} \
-		     ${build_subdir} \
-		     ${basedir}/${READTAGS}
-	) > ${build_subdir}/stdout-actual.txt 2> ${build_subdir}/stderr-actual.txt
-	r=$?
-	echo $r > ${build_subdir}/exit-actual.txt
+	    rm -f ${build_subdir}/*-actual.txt
 
-	if [ -n "${need_rearrange}" ]; then
-	    sed -i -e 's|^'$(basename "${CTAGS}")':|ctags:|' ${build_subdir}/stderr-actual.txt
-	fi
+	    msg="\nTesting ${test_name}"
+	    msg="${msg}\n$(line '-')"
+	    (
+		cd ${subdir}
+		${SHELL} run.sh \
+			 ${basedir}/${CTAGS} \
+			 ${build_subdir} \
+			 ${basedir}/${READTAGS}
+	    ) > ${build_subdir}/stdout-actual.txt 2> ${build_subdir}/stderr-actual.txt
+	    r=$?
+	    echo $r > ${build_subdir}/exit-actual.txt
 
-	if [ $r = $CODE_FOR_IGNORING_THIS_TMAIN_TEST ]; then
-	    run_result skip "" '/dev/null' "$(cat ${build_subdir}/stdout-actual.txt)"
-	    for a in ${build_subdir}/*-actual.txt; do
-		if [ -f "$a" ]; then
-		    rm $a
+	    if [ -n "${need_rearrange}" ]; then
+		sed -i -e 's|^'$(basename "${CTAGS}")':|ctags:|' ${build_subdir}/stderr-actual.txt
+	    fi
+
+	    if [ $r = $CODE_FOR_IGNORING_THIS_TMAIN_TEST ]; then
+		msg="${msg}\n$(run_result skip "" '/dev/null' "$(cat ${build_subdir}/stdout-actual.txt)")"
+		for a in ${build_subdir}/*-actual.txt; do
+		    if [ -f "$a" ]; then
+			rm $a
+		    fi
+		done
+		printf "%b\n" "${msg}"
+		exit
+	    fi
+
+	    if [ -f ${build_subdir}/tags ]; then
+		mv ${build_subdir}/tags ${build_subdir}/tags-actual.txt
+	    fi
+	    for aspect in stdout stderr exit tags; do
+		if [ -f ${subdir}/${aspect}-expected.txt ]; then
+		    engine=compare
+		    msg="${msg}\n$(tmain_${engine} ${subdir} ${build_subdir} ${aspect})"
+		    if [ $? -eq 0 ]; then
+			rm ${build_subdir}/${aspect}-actual.txt
+		    else
+			echo "${test_name}/${aspect}-${engine}$(failed_git_marker ${subdir}/${aspect}-expected.txt)" >> ${r_failed}
+			if [ ${aspect} = stderr ] &&
+			       is_crashed ${build_subdir}/${aspect}-actual.txt &&
+			       type "gdb" > /dev/null 2>&1; then
+			    print_backtraces "${basedir}/${CTAGS}" \
+					     ${build_subdir}/core* \
+					     > ${build_subdir}/gdb-backtrace.txt
+			fi
+		    fi
+		elif [ -f ${build_subdir}/${aspect}-actual.txt ]; then
+		    rm ${build_subdir}/${aspect}-actual.txt
 		fi
 	    done
-	    echo
-	    continue
-	fi
 
-	if [ -f ${build_subdir}/tags ]; then
-	    mv ${build_subdir}/tags ${build_subdir}/tags-actual.txt
-	fi
-	for aspect in stdout stderr exit tags; do
-	    if [ -f ${subdir}/${aspect}-expected.txt ]; then
-		engine=compare
-		if tmain_${engine} ${subdir} ${build_subdir} ${aspect}; then
-		    rm ${build_subdir}/${aspect}-actual.txt
-		else
-		    failed="${failed} ${test_name}/${aspect}-${engine}"
-		    failed="${failed}$(failed_git_marker ${subdir}/${aspect}-expected.txt)"
-		    status_=1
-		    if [ ${aspect} = stderr ] &&
-			   is_crashed ${build_subdir}/${aspect}-actual.txt &&
-			   type "gdb" > /dev/null 2>&1; then
-			print_backtraces "${basedir}/${CTAGS}" \
-					 ${build_subdir}/core* \
-					 > ${build_subdir}/gdb-backtrace.txt
-		    fi
-		fi
-	    elif [ -f ${build_subdir}/${aspect}-actual.txt ]; then
-		     rm ${build_subdir}/${aspect}-actual.txt
-	    fi
-	done
-
-	echo
+	    printf "%b\n" "${msg}"
+	) &
     done
+    wait
 
-    if [ -n "${failed}" ]; then
+    if [ -f "${r_failed}" ]; then
+	status_=1
 	echo
 	echo Failed tests
 	line '='
+	failed=$(cat ${r_failed})
 	for f in ${failed}; do
 	    echo $f | sed -e 's|<G>| (not committed/cached yet)|'
 	done
@@ -2135,6 +2143,7 @@ tmain_run ()
 	    line '-'
 	    tmain_${engine}_result ${build_topdir}
 	fi
+	rm ${r_failed}
     fi
 
     return $status_
