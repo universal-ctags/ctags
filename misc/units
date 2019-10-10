@@ -1005,13 +1005,21 @@ action_run ()
 	    --categories)
 		shift
 		for c in $(echo "$1" | tr ',' ' '); do
-		    CATEGORIES="$CATEGORIES ${c%.r}.r"
+		    if [ "$c" = "ROOT" ]; then
+			CATEGORIES="$CATEGORIES ROOT"
+		    else
+			CATEGORIES="$CATEGORIES ${c%.r}.r"
+		    fi
 		done
 		shift
 		;;
 	    --categories=*)
 		for c in $(echo "${1#--categories=}" | tr ',' ' '); do
-		    CATEGORIES="$CATEGORIES ${c%.r}.r"
+		    if [ "$c" = "ROOT" ]; then
+			CATEGORIES="$CATEGORIES ROOT"
+		    else
+			CATEGORIES="$CATEGORIES ${c%.r}.r"
+		    fi
 		done
 		shift
 		;;
