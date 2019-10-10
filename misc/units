@@ -47,6 +47,7 @@ VALIDATORS=
 _CMDLINE=
 _CMDLINE_FOR_SHRINKING=
 _PREPERE_ENV=
+_FEATURE_LIST=
 readonly _DEFAULT_CATEGORY=ROOT
 readonly _TIMEOUT_EXIT=124
 readonly _VG_TIMEOUT_FACTOR=10
@@ -206,6 +207,15 @@ check_units ()
     return 1
 }
 
+init_features()
+{
+    _FEATURE_LIST=$( ${CTAGS} --quiet --options=NONE \
+			      --list-features --with-list-header=no \
+			      2> /dev/null \
+		| "${_LINE_SPLITTER}" \
+		| cut -f 1 -d ' ')
+}
+
 check_features()
 {
     local flag="$1"
@@ -228,11 +238,7 @@ check_features()
     for expected in $([ -f "$ffile" ] && cat "$ffile") ${feature}; do
 	    found=no
 	    found_unexpectedly=no
-	    for f in $( ${CTAGS} --quiet --options=NONE \
-				 --list-features --with-list-header=no \
-				 2> /dev/null \
-			    | "${_LINE_SPLITTER}" \
-			    | cut -f 1 -d ' ') ; do
+	    for f in ${_FEATURE_LIST} ; do
 		[ "$expected" = "$f" ] && found=yes
 		[ "$expected" = '!'"$f" ] && found_unexpectedly=yes
 	    done
@@ -735,9 +741,7 @@ unwanted_file ()
 {
     local file=$1
     # ignore backup files
-    if echo "$file" | grep -q '~$'; then
-	return 0
-    elif echo "$file" | grep -q '\*'; then
+    if echo "$file" | grep -q '~$\|\*'; then
 	return 0
     fi
     return 1
@@ -754,6 +758,7 @@ run_dir ()
     local build_tcase_dir
     local input
     local name
+    local dname
     local class
 
     local extra_tmp
@@ -774,8 +779,9 @@ run_dir ()
 	    continue
 	fi
 
-	extra_inputs=$(for extra_tmp in $(dirname $input)/input[-_][0-9].* \
-					$(dirname $input)/input[-_][0-9][-_]*.* ; do
+	dname=$(dirname $input)
+	extra_inputs=$(for extra_tmp in $dname/input[-_][0-9].* \
+					$dname/input[-_][0-9][-_]*.* ; do
 	    if unwanted_file "$extra_tmp"; then
 		continue
 	    fi
@@ -1067,6 +1073,7 @@ action_run ()
     [ "$MSYSTEM" != '' ] && check_availability dos2unix
     check_availability grep
     check_availability diff
+    init_features
 
 
     category="${_DEFAULT_CATEGORY}"
