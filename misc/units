@@ -763,12 +763,19 @@ run_tcase ()
 }
 
 
-unwanted_file ()
+failure_in_globing ()
 {
+    # skip if globing failed, also ignore backup files
     local file=$1
-    # ignore backup files
-    if echo "$file" | grep -q '~$\|\*'; then
-	return 0
+    # use [[ if it is available in the shell implementation.
+    if type '[[' > /dev/null 2>&1; then
+	if [[ "$file" =~ ~$|\* ]]; then
+	    return 0
+	fi
+    else
+	if echo "$file" | grep -q '~$\|\*'; then
+	    return 0
+	fi
     fi
     return 1
 }
@@ -801,14 +808,14 @@ run_dir ()
     echo "Category: $category"
     line
     for input in ${base_dir}/*.[dbtiv]/input.*; do
-	if unwanted_file "$input"; then
+	if failure_in_globing "$input"; then
 	    continue
 	fi
 
 	dname=$(dirname $input)
 	extra_inputs=$(for extra_tmp in $dname/input[-_][0-9].* \
 					$dname/input[-_][0-9][-_]*.* ; do
-	    if unwanted_file "$extra_tmp"; then
+	    if failure_in_globing "$extra_tmp"; then
 		continue
 	    fi
 	    echo "$extra_tmp"
