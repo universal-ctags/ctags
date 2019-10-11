@@ -443,7 +443,7 @@ prepare_bundles ()
 	if [ "${from}"'/*' = "${src}" ]; then
 	    break
 	fi
-	case $(basename "$src") in
+	case "${src##*/}" in
 	    input.*)
 		continue
 		;;
@@ -460,7 +460,7 @@ prepare_bundles ()
 		continue
 		;;
 	    *)
-		dist="${to}/$(basename ${src})"
+		dist="${to}/${src##*/}"
 		if ! cp -a "${src}" "${to}"; then
 		    ERROR 1 "failure in copying bundle file \"${src}\" to \"${to}\""
 		else
