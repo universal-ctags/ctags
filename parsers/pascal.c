@@ -274,6 +274,8 @@ static void findPascalTags (void)
 			/* grab block name */
 			while (isspace ((int) *dbp))
 				++dbp;
+			if (!starttoken(*dbp))
+				continue;
 			for (cp = dbp  ;  *cp != '\0' && !endtoken (*cp)  ;  cp++)
 				continue;
 			vStringNCopyS (name, (const char*) dbp,  cp - dbp);
