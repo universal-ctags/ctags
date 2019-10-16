@@ -47,6 +47,7 @@ VALIDATORS=
 _CMDLINE=
 _CMDLINE_FOR_SHRINKING=
 _PREPERE_ENV=
+_FEATURE_LIST=
 readonly _DEFAULT_CATEGORY=ROOT
 readonly _TIMEOUT_EXIT=124
 readonly _VG_TIMEOUT_FACTOR=10
@@ -64,8 +65,19 @@ _RUNNABLE_VALIDATORS=
 _UNAVAILABLE_VALIDATORS=
 
 #
-# Results
+# Result files and results
 #
+readonly R_PASSED="_PASSED.result"
+readonly R_FIXED="_FIXED.result"
+readonly R_FAILED_BY_STATUS="_FAILED_BY_STATUS.result"
+readonly R_FAILED_BY_DIFF="_FAILED_BY_DIFF.result"
+readonly R_SKIPPED_BY_FEATURES="_SKIPPED_BY_FEATURES.result"
+readonly R_SKIPPED_BY_LANGUAGES="_SKIPPED_BY_LANGUAGES.result"
+readonly R_SKIPPED_BY_ILOOP="_SKIPPED_BY_ILOOP.result"
+readonly R_KNOWN_BUGS="_KNOWN_BUGS.result"
+readonly R_FAILED_BY_TIMEED_OUT="_FAILED_BY_TIMEED_OUT.result"
+readonly R_BROKEN_ARGS_CTAGS="_BROKEN_ARGS_CTAGS.result"
+readonly R_VALGRIND="_VALGRIND.result"
 L_PASSED=
 L_FIXED=
 L_FAILED_BY_STATUS=
@@ -76,6 +88,7 @@ L_SKIPPED_BY_ILOOP=
 L_KNOWN_BUGS=
 L_FAILED_BY_TIMEED_OUT=
 L_BROKEN_ARGS_CTAGS=
+L_VALGRIND=
 
 V_VALID=0
 V_INVALID=0
@@ -206,6 +219,15 @@ check_units ()
     return 1
 }
 
+init_features()
+{
+    _FEATURE_LIST=$( ${CTAGS} --quiet --options=NONE \
+			      --list-features --with-list-header=no \
+			      2> /dev/null \
+		| "${_LINE_SPLITTER}" \
+		| cut -f 1 -d ' ')
+}
+
 check_features()
 {
     local flag="$1"
@@ -228,11 +250,7 @@ check_features()
     for expected in $([ -f "$ffile" ] && cat "$ffile") ${feature}; do
 	    found=no
 	    found_unexpectedly=no
-	    for f in $( ${CTAGS} --quiet --options=NONE \
-				 --list-features --with-list-header=no \
-				 2> /dev/null \
-			    | "${_LINE_SPLITTER}" \
-			    | cut -f 1 -d ' ') ; do
+	    for f in ${_FEATURE_LIST} ; do
 		[ "$expected" = "$f" ] && found=yes
 		[ "$expected" = '!'"$f" ] && found_unexpectedly=yes
 	    done
@@ -297,52 +315,65 @@ decorate ()
 run_result ()
 {
     local result_type="$1"
-    local output="$2"
-    shift 2
+    local msg="$2"
+    local output="$3"
+    shift 3
     local f="run_result_${result_type}"
     local tmp
 
     type "$f" > /dev/null 2>&1 || ERROR 1 \
-	"INTERNAL ERROR: wrong run_result function: $f"
+	"${msg}INTERNAL ERROR: wrong run_result function: $f"
 
-    "$f" "$@"
+    "$f" "${msg}" "$@"
 
     tmp="${COLORIZED_OUTPUT}"
     COLORIZED_OUTPUT=no
-    "$f" "$@" > "${output}"
+    "$f" "${msg}" "$@" > "${output}"
     COLORIZED_OUTPUT="${tmp}"
 }
 
 run_result_skip ()
 {
+    local msg="$1"
+    shift 1
+
     if [ -n "$1" ]; then
-	printf '%b\n' $(decorate yellow "skipped")" ($1)"
+	printf '%b%b\n' "${msg}" $(decorate yellow "skipped")" ($1)"
     else
-	printf '%b\n' $(decorate yellow "skipped")
+	printf '%b%b\n' "${msg}" $(decorate yellow "skipped")
     fi
 }
 
 run_result_error ()
 {
+    local msg="$1"
+    shift 1
+
     if [ ! -n "$1" ]; then
-	printf '%b\n' $(decorate red "failed")
+	printf '%b%b\n' "${msg}" $(decorate red "failed")
     else
-	printf '%b\n' $(decorate red "failed")" ($1)"
+	printf '%b%b\n' "${msg}" $(decorate red "failed")" ($1)"
     fi
 }
 
 run_result_ok ()
 {
+    local msg="$1"
+    shift 1
+
     if [ ! -n "$1" ]; then
-	printf '%b\n' $(decorate green "passed")
+	printf '%b%b\n' "${msg}" $(decorate green "passed")
     else
-	printf '%b\n' $(decorate green "passed")" ($1)"
+	printf '%b%b\n' "${msg}" $(decorate green "passed")" ($1)"
     fi
 }
 
 run_result_known_error ()
 {
-    printf '%b\n' $(decorate yellow "failed")" (KNOWN bug)"
+    local msg="$1"
+    shift 1
+
+    printf '%b%b\n' "${msg}" $(decorate yellow "failed")" (KNOWN bug)"
 }
 
 run_shrink ()
@@ -412,7 +443,7 @@ prepare_bundles ()
 	if [ "${from}"'/*' = "${src}" ]; then
 	    break
 	fi
-	case $(basename "$src") in
+	case "${src##*/}" in
 	    input.*)
 		continue
 		;;
@@ -429,7 +460,7 @@ prepare_bundles ()
 		continue
 		;;
 	    *)
-		dist="${to}/$(basename ${src})"
+		dist="${to}/${src##*/}"
 		if ! cp -a "${src}" "${to}"; then
 		    ERROR 1 "failure in copying bundle file \"${src}\" to \"${to}\""
 		else
@@ -547,6 +578,7 @@ run_tcase ()
     local cmdline_template
     local timeout_value
     local tmp
+    local msg
 
     local broke_args_ctags
 
@@ -584,27 +616,27 @@ run_tcase ()
     fi
 
 
-    printf '%-60s' "Testing ${name} as ${guessed_lang}${output_lang_extras}${output_label}"
+    msg=$(printf '%-60s' "Testing ${name} as ${guessed_lang}${output_lang_extras}${output_label}")
 
     if tmp=$( ( [ -n "${output_feature}" ] && ! check_features -e "${output_feature}" ) ||
 	      ( [ -f "${ffeatures}" ] && ! check_features -f "${ffeatures}" ) ); then
-	L_SKIPPED_BY_FEATURES="$L_SKIPPED_BY_FEATURES ${category}/${name}"
+	echo "${category}/${name}" >> ${R_SKIPPED_BY_FEATURES}
 	case "${tmp}" in
-	    !*) run_result skip "${oresult}" "unwanted feature \"${tmp#?}\" is available";;
-	    *)  run_result skip "${oresult}" "required feature \"${tmp}\" is not available";;
+	    !*) run_result skip "${msg}" "${oresult}" "unwanted feature \"${tmp#?}\" is available";;
+	    *)  run_result skip "${msg}" "${oresult}" "required feature \"${tmp}\" is not available";;
 	esac
 	return 1
     elif [ -f "${flanguages}" ] && ! tmp=$(check_languages "${flanguages}"); then
-	L_SKIPPED_BY_LANGUAGES="$L_SKIPPED_BY_LANGUAGES ${category}/${name}"
-	run_result skip "${oresult}" "required language parser \"$tmp\" is not available"
+	echo "${category}/${name}" >> ${R_SKIPPED_BY_LANGUAGES}
+	run_result skip "${msg}" "${oresult}" "required language parser \"$tmp\" is not available"
 	return 1
     elif [ "$WITH_TIMEOUT" = 0 ] && [ "${class}" = 'i' ]; then
-	L_SKIPPED_BY_ILOOP="$L_SKIPPED_BY_ILOOP ${category}/${name}"
-	run_result skip "${oresult}" "may cause an infinite loop"
+	echo "${category}/${name}" >> ${R_SKIPPED_BY_ILOOP}
+	run_result skip "${msg}" "${oresult}" "may cause an infinite loop"
 	return 1
     elif [ "$broke_args_ctags" = 1 ]; then
-	run_result error '/dev/null' "broken args.ctags?"
-	L_BROKEN_ARGS_CTAGS="${L_BROKEN_ARGS_CTAGS} ${category}/${name}/"
+	run_result error "${msg}" '/dev/null' "broken args.ctags?"
+	echo "${category}/${name}/" >> ${R_BROKEN_ARGS_CTAGS}
 	return 1
     fi
 
@@ -651,29 +683,29 @@ run_tcase ()
 	if [ "${tmp}" = "${_BASH_INTERRUPT_EXIT}" ]; then
 	    ERROR 1 "The execution is interrupted"
 	elif ! [ "$WITH_TIMEOUT" = 0 ] && [ "${tmp}" = "${_TIMEOUT_EXIT}" ]; then
-	    L_FAILED_BY_TIMEED_OUT="${L_FAILED_BY_TIMEED_OUT} ${category}/${name}"
-	    run_result error "${oresult}" "TIMED OUT"
+	    echo "${category}/${name}" >> ${R_FAILED_BY_TIMEED_OUT}
+	    run_result error "${msg}" "${oresult}" "TIMED OUT"
 	    run_record_cmdline "${ffilter}" "${ocmdline}"
 	    [ "${RUN_SHRINK}" = 'yes' ] \
 		&& [ $# -eq 0 ] \
 		&& run_shrink "${cmdline_template}" "${input}" "${oshrink}" "${guessed_lang}"
 	    return 1
 	elif [ "$WITH_VALGRIND" = 'yes' ] && [ "${tmp}" = "${_VALGRIND_EXIT}" ] && ! [ "${class}" = v ]; then
-	    L_VALGRIND="${L_VALGRIND} ${category}/${name}"
-	    run_result error "${oresult}" "valgrind-error"
+	    echo "${category}/${name}" >> ${R_VALGRIND}
+	    run_result error "${msg}" "${oresult}" "valgrind-error"
 	    run_record_cmdline "${ffilter}" "${ocmdline}"
 	    return 1
 	elif [ "$class" = 'b' ]; then
-	    L_KNOWN_BUGS="$L_KNOWN_BUGS ${category}/${name}"
-	    run_result known_error "${oresult}"
+	    echo "${category}/${name}" >> ${R_KNOWN_BUGS}
+	    run_result known_error "${msg}" "${oresult}"
 	    run_record_cmdline "${ffilter}" "${ocmdline}"
 	    [ "${RUN_SHRINK}" = 'yes' ] \
 		&& [ $# -eq 0 ] \
 		&& run_shrink "${cmdline_template}" "${input}" "${oshrink}" "${guessed_lang}"
 	    return 0
 	else
-	    L_FAILED_BY_STATUS="$L_FAILED_BY_STATUS ${category}/${name}"
-	    run_result error  "${oresult}" "unexpected exit status: $tmp"
+	    echo "${category}/${name}" >> ${R_FAILED_BY_STATUS}
+	    run_result error "${msg}" "${oresult}" "unexpected exit status: $tmp"
 	    run_record_cmdline "${ffilter}" "${ocmdline}"
 	    [ "${RUN_SHRINK}" = 'yes' ] \
 		&& [ $# -eq 0 ] \
@@ -681,18 +713,18 @@ run_tcase ()
 	    return 1
 	fi
     elif [ "$WITH_VALGRIND" = 'yes' ] && [ "$class" = 'v' ]; then
-	L_FIXED="$L_FIXED ${category}/${name}"
+	echo "${category}/${name}" >> ${R_FIXED}
     fi
 
     if ! [ -f "${fexpected}" ]; then
 	clean_tcase "${o}" "${obundles}"
 	if [ "$class" = 'b' ]; then
-	    L_FIXED="$L_FIXED ${category}/${name}"
+	    echo "${category}/${name}" >> ${R_FIXED}
 	elif [ "$class" = 'i' ]; then
-	    L_FIXED="$L_FIXED ${category}/${name}"
+	    echo "${category}/${name}" >> ${R_FIXED}
 	fi
-	L_PASSED="$L_PASSED ${category}/${name}"
-	run_result ok '/dev/null' "\"expected.tags*\" not found"
+	echo "${category}/${name}" >> ${R_PASSED}
+	run_result ok "${msg}" '/dev/null' "\"expected.tags*\" not found"
 	return 0
     fi
 
@@ -707,23 +739,23 @@ run_tcase ()
     if [ "${tmp}" = 0 ]; then
 	clean_tcase "${o}" "${obundles}"
 	if [ "${class}" = 'b' ]; then
-	    L_FIXED="$L_FIXED ${category}/${name}"
+	    echo "${category}/${name}" >> ${R_FIXED}
 	elif ! [ "$WITH_TIMEOUT" = 0 ] && [ "${class}" = 'i' ]; then
-	    L_FIXED="$L_FIXED ${category}/${name}"
+	    echo "${category}/${name}" >> ${R_FIXED}
 	fi
 
-	L_PASSED="$L_PASSED ${category}/${name}"
-	run_result ok '/dev/null'
+	echo "${category}/${name}" >> ${R_PASSED}
+	run_result ok "${msg}" '/dev/null'
 	return 0
     else
 	if [ "${class}" = 'b' ]; then
-	    L_KNOWN_BUGS="$L_KNOWN_BUGS ${category}/${name}"
-	    run_result known_error "${oresult}"
+	    echo "${category}/${name}" >> ${R_KNOWN_BUGS}
+	    run_result known_error "${msg}" "${oresult}"
 	    run_record_cmdline "${ffilter}" "${ocmdline}"
 	    return 0
 	else
-	    L_FAILED_BY_DIFF="$L_FAILED_BY_DIFF ${category}/${name}"
-	    run_result error "${oresult}" "unexpected output"
+	    echo "${category}/${name}" >> ${R_FAILED_BY_DIFF}
+	    run_result error "${msg}" "${oresult}" "unexpected output"
 	    run_record_cmdline "${ffilter}" "${ocmdline}"
 	    return 1
 	fi
@@ -731,14 +763,19 @@ run_tcase ()
 }
 
 
-unwanted_file ()
+failure_in_globing ()
 {
+    # skip if globing failed, also ignore backup files
     local file=$1
-    # ignore backup files
-    if echo "$file" | grep -q '~$'; then
-	return 0
-    elif echo "$file" | grep -q '\*'; then
-	return 0
+    # use [[ if it is available in the shell implementation.
+    if type '[[' > /dev/null 2>&1; then
+	if [[ "$file" =~ ~$|\* ]]; then
+	    return 0
+	fi
+    else
+	if echo "$file" | grep -q '~$\|\*'; then
+	    return 0
+	fi
     fi
     return 1
 }
@@ -754,6 +791,7 @@ run_dir ()
     local build_tcase_dir
     local input
     local name
+    local dname
     local class
 
     local extra_tmp
@@ -770,13 +808,14 @@ run_dir ()
     echo "Category: $category"
     line
     for input in ${base_dir}/*.[dbtiv]/input.*; do
-	if unwanted_file "$input"; then
+	if failure_in_globing "$input"; then
 	    continue
 	fi
 
-	extra_inputs=$(for extra_tmp in $(dirname $input)/input[-_][0-9].* \
-					$(dirname $input)/input[-_][0-9][-_]*.* ; do
-	    if unwanted_file "$extra_tmp"; then
+	dname=$(dirname $input)
+	extra_inputs=$(for extra_tmp in $dname/input[-_][0-9].* \
+					$dname/input[-_][0-9][-_]*.* ; do
+	    if failure_in_globing "$extra_tmp"; then
 		continue
 	    fi
 	    echo "$extra_tmp"
@@ -787,8 +826,10 @@ run_dir ()
 	name="${tcase_dir%.[dbtiv]}"
 	name="${name##*/}"
 	class="${tcase_dir#*${name}.}"
-	run_tcase "${input}" "${tcase_dir}" "${name}" "${class}" "${category}" "${build_tcase_dir}" ${extra_inputs}
+	# Run this in parallel
+	run_tcase "${input}" "${tcase_dir}" "${name}" "${class}" "${category}" "${build_tcase_dir}" ${extra_inputs} &
     done
+    wait
 
     return 0
 }
@@ -825,21 +866,25 @@ run_summary ()
     line
 
     printf '  %-40s' "#passed:"
+    L_PASSED=$([ -f $R_PASSED ] && cat $R_PASSED)
     count_list $L_PASSED
 
     printf '  %-40s' "#FIXED:"
+    L_FIXED=$([ -f $R_FIXED ] && cat $R_FIXED)
     count_list $L_FIXED
     for t in $L_FIXED; do
 	echo "	${t#${_DEFAULT_CATEGORY}/}"
     done
 
     printf '  %-40s' "#FAILED (broken args.ctags?):"
+    L_BROKEN_ARGS_CTAGS=$([ -f $R_BROKEN_ARGS_CTAGS ] && cat $R_BROKEN_ARGS_CTAGS)
     count_list $L_BROKEN_ARGS_CTAGS
     for t in $L_BROKEN_ARGS_CTAGS; do
 	echo "	${t#${_DEFAULT_CATEGORY}/}"
     done
 
     printf '  %-40s' "#FAILED (unexpected-exit-status):"
+    L_FAILED_BY_STATUS=$([ -f $R_FAILED_BY_STATUS ] && cat $R_FAILED_BY_STATUS)
     count_list $L_FAILED_BY_STATUS
     for t in $L_FAILED_BY_STATUS; do
 	echo "	${t#${_DEFAULT_CATEGORY}/}"
@@ -849,6 +894,7 @@ run_summary ()
     done
 
     printf '  %-40s' "#FAILED (unexpected-output):"
+    L_FAILED_BY_DIFF=$([ -f $R_FAILED_BY_DIFF ] && cat $R_FAILED_BY_DIFF)
     count_list $L_FAILED_BY_DIFF
     for t in $L_FAILED_BY_DIFF; do
 	echo "	${t#${_DEFAULT_CATEGORY}/}"
@@ -860,6 +906,7 @@ run_summary ()
 
     if ! [ "$WITH_TIMEOUT" = 0 ]; then
 	printf '  %-40s' "#TIMED-OUT (${WITH_TIMEOUT}s)"
+	L_FAILED_BY_TIMEED_OUT=$([ -f $R_FAILED_BY_TIMEED_OUT ] && cat $R_FAILED_BY_TIMEED_OUT)
 	count_list $L_FAILED_BY_TIMEED_OUT
 	for t in $L_FAILED_BY_TIMEED_OUT; do
 	    echo "	${t#${_DEFAULT_CATEGORY}/}"
@@ -867,12 +914,14 @@ run_summary ()
     fi
 
     printf '  %-40s' "#skipped (features):"
+    L_SKIPPED_BY_FEATURES=$([ -f $R_SKIPPED_BY_FEATURES ] && cat $R_SKIPPED_BY_FEATURES)
     count_list $L_SKIPPED_BY_FEATURES
     for t in $L_SKIPPED_BY_FEATURES; do
 	echo "	${t#${_DEFAULT_CATEGORY}/}"
     done
 
     printf '  %-40s' "#skipped (languages):"
+    L_SKIPPED_BY_LANGUAGES=$([ -f $R_SKIPPED_BY_LANGUAGES ] && cat $R_SKIPPED_BY_LANGUAGES)
     count_list $L_SKIPPED_BY_LANGUAGES
     for t in $L_SKIPPED_BY_LANGUAGES; do
 	echo "	${t#${_DEFAULT_CATEGORY}/}"
@@ -880,6 +929,7 @@ run_summary ()
 
     if [ "$WITH_TIMEOUT" = 0 ]; then
 	printf '  %-40s' "#skipped (infinite-loop):"
+	L_SKIPPED_BY_ILOOP=$([ -f $R_SKIPPED_BY_ILOOP ] && cat $R_SKIPPED_BY_ILOOP)
 	count_list $L_SKIPPED_BY_ILOOP
 	for t in $L_SKIPPED_BY_ILOOP; do
 	    echo "	${t#${_DEFAULT_CATEGORY}/}"
@@ -887,6 +937,7 @@ run_summary ()
     fi
 
     printf '  %-40s' "#known-bugs:"
+    L_KNOWN_BUGS=$([ -f $R_KNOWN_BUGS ] && cat $R_KNOWN_BUGS)
     count_list $L_KNOWN_BUGS
     for t in $L_KNOWN_BUGS; do
 	echo "	${t#${_DEFAULT_CATEGORY}/}"
@@ -894,6 +945,7 @@ run_summary ()
 
     if [ "$WITH_VALGRIND" = yes ]; then
 	printf '  %-40s' "#valgrind-error:"
+	L_VALGRIND=$([ -f $R_VALGRIND ] && cat $R_VALGRIND)
 	count_list $L_VALGRIND
 	for t in $L_VALGRIND; do
 	    echo "	${t#${_DEFAULT_CATEGORY}/}"
@@ -925,6 +977,14 @@ make_pretense_map ()
     echo $r
 }
 
+delete_result_files ()
+{
+    rm -f ${R_PASSED} ${R_FIXED} ${R_FAILED_BY_STATUS} ${R_FAILED_BY_DIFF} \
+	${R_SKIPPED_BY_FEATURES} ${R_SKIPPED_BY_LANGUAGES} \
+	${R_SKIPPED_BY_ILOOP} ${R_KNOWN_BUGS} ${R_FAILED_BY_TIMEED_OUT} \
+	${R_BROKEN_ARGS_CTAGS}
+}
+
 action_run ()
 {
     local action="$1"
@@ -952,13 +1012,21 @@ action_run ()
 	    --categories)
 		shift
 		for c in $(echo "$1" | tr ',' ' '); do
-		    CATEGORIES="$CATEGORIES ${c%.r}.r"
+		    if [ "$c" = "ROOT" ]; then
+			CATEGORIES="$CATEGORIES ROOT"
+		    else
+			CATEGORIES="$CATEGORIES ${c%.r}.r"
+		    fi
 		done
 		shift
 		;;
 	    --categories=*)
 		for c in $(echo "${1#--categories=}" | tr ',' ' '); do
-		    CATEGORIES="$CATEGORIES ${c%.r}.r"
+		    if [ "$c" = "ROOT" ]; then
+			CATEGORIES="$CATEGORIES ROOT"
+		    else
+			CATEGORIES="$CATEGORIES ${c%.r}.r"
+		    fi
 		done
 		shift
 		;;
@@ -1067,7 +1135,9 @@ action_run ()
     [ "$MSYSTEM" != '' ] && check_availability dos2unix
     check_availability grep
     check_availability diff
+    init_features
 
+    delete_result_files
 
     category="${_DEFAULT_CATEGORY}"
     if [ -z "$CATEGORIES" ] \
@@ -1083,6 +1153,7 @@ action_run ()
     done
 
     run_summary "${build_dir}"
+    delete_result_files
 
     if [ -n "${L_FAILED_BY_STATUS}" ] ||
 	   [ -n "${L_FAILED_BY_DIFF}" ] ||
@@ -1910,18 +1981,19 @@ tmain_compare()
     local build_subdir=$2
     local aspect=$3
     local generated
+    local msg
 
-    printf '%-60s' "${aspect}"
+    msg=$(printf '%-60s' "${aspect}")
     generated=${build_subdir}/${aspect}-diff.txt
     if diff -U 0 --strip-trailing-cr \
 	    ${build_subdir}/${aspect}-actual.txt \
 	    ${subdir}/${aspect}-expected.txt \
 	    > ${generated} 2>&1; then
-	run_result ok '/dev/null'
+	run_result ok "${msg}" '/dev/null'
 	rm ${generated}
 	return 0
     else
-	run_result error '/dev/null' "diff: ${generated}"
+	run_result error "${msg}" '/dev/null' "diff: ${generated}"
 	return 1
     fi
 }
@@ -1973,6 +2045,7 @@ tmain_run ()
     local basedir
 
     local test_name
+    local r_failed="_failed.result"
     local failed
     local f
 
@@ -1982,6 +2055,7 @@ tmain_run ()
     local r
     local a
     local status_=0
+    local msg
 
     local need_rearrange
 
@@ -1989,6 +2063,7 @@ tmain_run ()
 	need_rearrange=yes
     fi
 
+    rm -f ${r_failed}
     basedir=$(pwd)
     for subdir in ${topdir}/*.d; do
 	if [ "${subdir}" = ${topdir}/'*.d' ]; then
@@ -2006,67 +2081,72 @@ tmain_run ()
 	    return 1
 	fi
 
-	rm -f ${build_subdir}/*-actual.txt
-
-	echo "Testing ${test_name}"
-	line '-'
+	# Run this block in parallel
 	(
-	    cd ${subdir}
-	    ${SHELL} run.sh \
-		     ${basedir}/${CTAGS} \
-		     ${build_subdir} \
-		     ${basedir}/${READTAGS}
-	) > ${build_subdir}/stdout-actual.txt 2> ${build_subdir}/stderr-actual.txt
-	r=$?
-	echo $r > ${build_subdir}/exit-actual.txt
+	    rm -f ${build_subdir}/*-actual.txt
 
-	if [ -n "${need_rearrange}" ]; then
-	    sed -i -e 's|^'$(basename "${CTAGS}")':|ctags:|' ${build_subdir}/stderr-actual.txt
-	fi
+	    msg="\nTesting ${test_name}"
+	    msg="${msg}\n$(line '-')"
+	    (
+		cd ${subdir}
+		${SHELL} run.sh \
+			 ${basedir}/${CTAGS} \
+			 ${build_subdir} \
+			 ${basedir}/${READTAGS}
+	    ) > ${build_subdir}/stdout-actual.txt 2> ${build_subdir}/stderr-actual.txt
+	    r=$?
+	    echo $r > ${build_subdir}/exit-actual.txt
 
-	if [ $r = $CODE_FOR_IGNORING_THIS_TMAIN_TEST ]; then
-	    run_result skip '/dev/null' "$(cat ${build_subdir}/stdout-actual.txt)"
-	    for a in ${build_subdir}/*-actual.txt; do
-		if [ -f "$a" ]; then
-		    rm $a
+	    if [ -n "${need_rearrange}" ]; then
+		sed -i -e 's|^'$(basename "${CTAGS}")':|ctags:|' ${build_subdir}/stderr-actual.txt
+	    fi
+
+	    if [ $r = $CODE_FOR_IGNORING_THIS_TMAIN_TEST ]; then
+		msg="${msg}\n$(run_result skip "" '/dev/null' "$(cat ${build_subdir}/stdout-actual.txt)")"
+		for a in ${build_subdir}/*-actual.txt; do
+		    if [ -f "$a" ]; then
+			rm $a
+		    fi
+		done
+		printf "%b\n" "${msg}"
+		exit
+	    fi
+
+	    if [ -f ${build_subdir}/tags ]; then
+		mv ${build_subdir}/tags ${build_subdir}/tags-actual.txt
+	    fi
+	    for aspect in stdout stderr exit tags; do
+		if [ -f ${subdir}/${aspect}-expected.txt ]; then
+		    engine=compare
+		    msg="${msg}\n$(tmain_${engine} ${subdir} ${build_subdir} ${aspect})"
+		    if [ $? -eq 0 ]; then
+			rm ${build_subdir}/${aspect}-actual.txt
+		    else
+			echo "${test_name}/${aspect}-${engine}$(failed_git_marker ${subdir}/${aspect}-expected.txt)" >> ${r_failed}
+			if [ ${aspect} = stderr ] &&
+			       is_crashed ${build_subdir}/${aspect}-actual.txt &&
+			       type "gdb" > /dev/null 2>&1; then
+			    print_backtraces "${basedir}/${CTAGS}" \
+					     ${build_subdir}/core* \
+					     > ${build_subdir}/gdb-backtrace.txt
+			fi
+		    fi
+		elif [ -f ${build_subdir}/${aspect}-actual.txt ]; then
+		    rm ${build_subdir}/${aspect}-actual.txt
 		fi
 	    done
-	    echo
-	    continue
-	fi
 
-	if [ -f ${build_subdir}/tags ]; then
-	    mv ${build_subdir}/tags ${build_subdir}/tags-actual.txt
-	fi
-	for aspect in stdout stderr exit tags; do
-	    if [ -f ${subdir}/${aspect}-expected.txt ]; then
-		engine=compare
-		if tmain_${engine} ${subdir} ${build_subdir} ${aspect}; then
-		    rm ${build_subdir}/${aspect}-actual.txt
-		else
-		    failed="${failed} ${test_name}/${aspect}-${engine}"
-		    failed="${failed}$(failed_git_marker ${subdir}/${aspect}-expected.txt)"
-		    status_=1
-		    if [ ${aspect} = stderr ] &&
-			   is_crashed ${build_subdir}/${aspect}-actual.txt &&
-			   type "gdb" > /dev/null 2>&1; then
-			print_backtraces "${basedir}/${CTAGS}" \
-					 ${build_subdir}/core* \
-					 > ${build_subdir}/gdb-backtrace.txt
-		    fi
-		fi
-	    elif [ -f ${build_subdir}/${aspect}-actual.txt ]; then
-		     rm ${build_subdir}/${aspect}-actual.txt
-	    fi
-	done
-
-	echo
+	    printf "%b\n" "${msg}"
+	) &
     done
+    wait
 
-    if [ -n "${failed}" ]; then
+    if [ -f "${r_failed}" ]; then
+	status_=1
 	echo
 	echo Failed tests
 	line '='
+	failed=$(cat ${r_failed})
 	for f in ${failed}; do
 	    echo $f | sed -e 's|<G>| (not committed/cached yet)|'
 	done
@@ -2078,6 +2158,7 @@ tmain_run ()
 	    line '-'
 	    tmain_${engine}_result ${build_topdir}
 	fi
+	rm ${r_failed}
     fi
 
     return $status_
