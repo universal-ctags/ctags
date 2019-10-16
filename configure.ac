@@ -293,6 +293,9 @@ if test "${TESTING_TIMEOUT:+set}" = "set"; then
 fi
 AM_CONDITIONAL([HAVE_TIMEOUT], [test "x${have_timeout}" = "xyes"])
 
+AC_CHECK_PROGS([PYTHON],
+			   [python3 python3.8 python3.7 python3.6 python3.5 python], [])
+
 
 # Check for temporary directory
 AC_MSG_CHECKING(directory to use for temporary files)

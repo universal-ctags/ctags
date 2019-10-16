@@ -1,7 +1,7 @@
 # -*- makefile -*-
 .PHONY: check units fuzz noise tmain tinst tlib clean-units clean-tlib clean-tmain clean-gcov run-gcov codecheck cppcheck dicts cspell validate-input
 
-EXTRA_DIST += misc/units
+EXTRA_DIST += misc/units misc/units.py
 EXTRA_DIST += misc/tlib misc/mini-geany.expected
 
 DIST_SUBDIRS = Tmain Units
@@ -108,9 +108,26 @@ units: $(CTAGS_TEST)
 		SHOW_DIFF_OUTPUT=--show-diff-output;		\
 	fi;							\
 	builddir=$$(pwd); \
+	if ! test x$(PYTHON) = x; then	\
+		PROG=$(PYTHON);		\
+		SCRIPT=$(srcdir)/misc/units.py;	\
+		if type cygpath > /dev/null 2>&1; then	\
+			builddir=$$(cygpath -m "$$(pwd)");	\
+			if ! test x$(SHELL) = x; then	\
+				SHELL_OPT=--shell=$$(cygpath -m $(SHELL));	\
+			fi;	\
+		else	\
+			if ! test x$(SHELL) = x; then	\
+				SHELL_OPT=--shell=$(SHELL);	\
+			fi;	\
+		fi;	\
+	else	\
+		PROG=$(SHELL);		\
+		SCRIPT=$(srcdir)/misc/units;	\
+	fi;	\
 	mkdir -p $${builddir}/Units && \
 	\
-	c="$(srcdir)/misc/units run \
+	c="$${SCRIPT} run \
 		--ctags=$(CTAGS_TEST) \
 		--languages=$(LANGUAGES) \
 		--categories=$(CATEGORIES) \
@@ -118,9 +135,10 @@ units: $(CTAGS_TEST)
 		--with-pretense-map=$(PMAP) \
 		$${VALGRIND} --run-shrink \
 		--with-timeout=`expr $(TIMEOUT) '*' 10`\
+		$${SHELL_OPT} \
 		$${SHOW_DIFF_OUTPUT}"; \
 	 TRAVIS=$(TRAVIS) APPVEYOR=$(APPVEYOR) CIRCLECI=$(CIRCLECI)\
-		 $(SHELL) $${c} $(srcdir)/Units $${builddir}/Units
+		 $${PROG} $${c} $(srcdir)/Units $${builddir}/Units
 
 clean-units:
 	$(SILENT) echo Cleaning test units
@@ -155,15 +173,33 @@ tmain: $(CTAGS_TEST)
 		SHOW_DIFF_OUTPUT=--show-diff-output;		\
 	fi;							\
 	builddir=$$(pwd); \
+	if ! test x$(PYTHON) = x; then	\
+		PROG=$(PYTHON);		\
+		SCRIPT=$(srcdir)/misc/units.py;	\
+		if type cygpath > /dev/null 2>&1; then	\
+			builddir=$$(cygpath -m "$$(pwd)");	\
+			if ! test x$(SHELL) = x; then	\
+				SHELL_OPT=--shell=$$(cygpath -m $(SHELL));	\
+			fi;	\
+		else	\
+			if ! test x$(SHELL) = x; then	\
+				SHELL_OPT=--shell=$(SHELL);	\
+			fi;	\
+		fi;	\
+	else	\
+		PROG=$(SHELL);		\
+		SCRIPT=$(srcdir)/misc/units;	\
+	fi;	\
 	mkdir -p $${builddir}/Tmain && \
 	\
-	c="$(srcdir)/misc/units tmain \
+	c="$${SCRIPT} tmain \
 		--ctags=$(CTAGS_TEST) \
 		--units=$(UNITS) \
 		$${VALGRIND} \
+		$${SHELL_OPT} \
 		$${SHOW_DIFF_OUTPUT}"; \
 	TRAVIS=$(TRAVIS) APPVEYOR=$(APPVEYOR) CIRCLECI=$(CIRCLECI)\
-		$(SHELL) $${c} $(srcdir)/Tmain $${builddir}/Tmain
+		$${PROG} $${c} $(srcdir)/Tmain $${builddir}/Tmain
 
 clean-tmain:
 	$(SILENT) echo Cleaning main part tests
