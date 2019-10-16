@@ -28,6 +28,8 @@ type
     procedure   Test3;
   end;
 
+function {} Fun1 : integer;
+
 implementation
 
 end.
