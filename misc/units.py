@@ -1,9 +1,36 @@
 #!/usr/bin/env python3
 
+#
+# units.py - Units test harness for ctags
+#
+# Copyright (C) 2019 Ken Takata
+# (Based on "units" written by Masatake YAMATO.)
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+
+#
+# Python 3.5 or later is required.
+# On Windows, this should be executed by Cygwin/MSYS2 python3.
+# Windows native versions of python don't work for now.
+#
+
 import time     # for debugging
 import argparse
 import filecmp
 import glob
+import io
 import os
 import platform
 import queue
@@ -13,7 +40,12 @@ import subprocess
 import sys
 import threading
 
+#
+# Global Parameters
+#
+SHELL = '/bin/sh'
 CTAGS = './ctags'
+READTAGS = './readtags'
 WITH_TIMEOUT = 0
 WITH_VALGRIND = False
 COLORIZED_OUTPUT = True
@@ -23,7 +55,11 @@ LANGUAGES = []
 PRETENSE_OPTS = ''
 RUN_SHRINK = False
 SHOW_DIFF_OUTPUT = False
+NUM_WORKER_THREADS = 4
 
+#
+# Internal variables and constants
+#
 _FEATURE_LIST = []
 _PREPERE_ENV = ''
 _DEFAULT_CATEGORY = 'ROOT'
@@ -47,6 +83,8 @@ L_KNOWN_BUGS = []
 L_FAILED_BY_TIMEED_OUT = []
 L_BROKEN_ARGS_CTAGS = []
 L_VALGRIND = []
+TMAIN_STATUS = True
+TMAIN_FAILED = []
 
 def remove_prefix(string, prefix):
     if string.startswith(prefix):
@@ -184,27 +222,27 @@ def run_result(result_type, msg, output, *args, file=sys.stdout):
 
 def run_result_skip(msg, f, colorized, *args):
     if len(args) > 0:
-        print(msg + ' ' + decorate('yellow', 'skipped', colorized) + \
+        print(msg + decorate('yellow', 'skipped', colorized) +
                 ' (' + args[0] + ')', file=f)
     else:
-        print(msg + ' ' + decorate('yellow', 'skipped', colorized), file=f)
+        print(msg + decorate('yellow', 'skipped', colorized), file=f)
 
 def run_result_error(msg, f, colorized, *args):
     if len(args) > 0:
-        print(msg + ' ' + decorate('red', 'failed', colorized) + \
+        print(msg + decorate('red', 'failed', colorized) +
                 ' (' + args[0] + ')', file=f)
     else:
-        print(msg + ' ' + decorate('red', 'failed', colorized), file=f)
+        print(msg + decorate('red', 'failed', colorized), file=f)
 
 def run_result_ok(msg, f, colorized, *args):
     if len(args) > 0:
-        print(msg + ' ' + decorate('green', 'passed', colorized) + \
+        print(msg + decorate('green', 'passed', colorized) +
                 ' (' + args[0] + ')', file=f)
     else:
-        print(msg + ' ' + decorate('green', 'passed', colorized), file=f)
+        print(msg + decorate('green', 'passed', colorized), file=f)
 
 def run_result_known_error(msg, f, colorized, *args):
-    print(msg + ' ' + decorate('yellow', 'failed', colorized) + \
+    print(msg + decorate('yellow', 'failed', colorized) +
             ' (KNOWN bug)', file=f)
 
 def run_shrink(cmdline_template, finput, foutput, lang):
@@ -406,7 +444,7 @@ def run_tcase(finput, t, name, tclass, category, build_t, extra_inputs):
         prepare_bundles(t, o, obundles)
 
 
-    msg = '%-59s' % ('Testing ' + name + ' as ' + guessed_lang + output_lang_extras + output_label)
+    msg = '%-59s ' % ('Testing ' + name + ' as ' + guessed_lang + output_lang_extras + output_label)
 
     (tmp, feat) = check_features(output_feature, ffeatures)
     if not tmp:
@@ -537,25 +575,57 @@ def run_tcase(finput, t, name, tclass, category, build_t, extra_inputs):
             run_record_cmdline(cmdline, ffilter, ocmdline, output_type)
             return False
 
-def run_dir_worker(q):
+def create_thread_queue(func):
+    q = queue.Queue()
+    threads = []
+    for i in range(NUM_WORKER_THREADS):
+        t = threading.Thread(target=worker, args=(func, q), daemon=True)
+        t.start()
+        threads.append(t)
+    return (q, threads)
+
+def worker(func, q):
     while True:
         item = q.get()
         if item is None:
             break
         try:
-            run_tcase(*item)
+            func(*item)
         except:
             import traceback
             traceback.print_exc()
         q.task_done()
+
+def join_workers(q, threads):
+    # block until all tasks are done
+    try:
+        q.join()
+    except KeyboardInterrupt:
+        # empty the queue
+        while True:
+            try:
+                q.get_nowait()
+            except queue.Empty:
+                break
+        # try to stop workers
+        for i in range(NUM_WORKER_THREADS):
+            q.put(None)
+        for t in threads:
+            t.join(timeout=2)
+        # exit regardless that workers are stopped
+        sys.exit(1)
+
+    # stop workers
+    for i in range(NUM_WORKER_THREADS):
+        q.put(None)
+    for t in threads:
+        t.join()
 
 def accepted_file(fname):
     # Ignore backup files
     return not fname.endswith('~')
 
 def run_dir(category, base_dir, build_base_dir):
-    num_worker_threads = 4
-
     #
     # Filtered by CATEGORIES
     #
@@ -565,12 +635,7 @@ def run_dir(category, base_dir, build_base_dir):
     print("\nCategory: " + category)
     line()
 
-    q = queue.Queue()
-    threads = []
-    for i in range(num_worker_threads):
-        t = threading.Thread(target=run_dir_worker, args=(q,), daemon=True)
-        t.start()
-        threads.append(t)
+    (q, threads) = create_thread_queue(run_tcase)
 
     for finput in glob.glob(base_dir + '/*.[dbtiv]/input.*'):
         finput = finput.replace('\\', '/')  # for Windows
@@ -590,29 +655,7 @@ def run_dir(category, base_dir, build_base_dir):
         (name, tclass) = ret.group(1, 2)
         q.put((finput, tcase_dir, name, tclass, category, build_tcase_dir, extra_inputs))
 
-    # block until all tasks are done
-    try:
-        q.join()
-    except KeyboardInterrupt:
-        # empty the queue
-        while True:
-            try:
-                q.get_nowait()
-            except queue.Empty:
-                break
-        # try to stop workers
-        for i in range(num_worker_threads):
-            q.put(None)
-        for t in threads:
-            t.join(timeout=2)
-        # exit regardless that workers are stopped
-        sys.exit(1)
-
-    # stop workers
-    for i in range(num_worker_threads):
-        q.put(None)
-    for t in threads:
-        t.join()
+    join_workers(q, threads)
 
 def run_show_diff_output(units_dir, t):
     print("\t", end='')
@@ -717,6 +760,7 @@ def action_run(parser, action, *args):
     global RUN_SHRINK
     global SHOW_DIFF_OUTPUT
     global PRETENSE_OPTS
+    global NUM_WORKER_THREADS
 
     parser.add_argument('--categories')
     parser.add_argument('--ctags')
@@ -728,6 +772,7 @@ def action_run(parser, action, *args):
     parser.add_argument('--run-shrink', action='store_true', default=False)
     parser.add_argument('--show-diff-output', action='store_true', default=False)
     parser.add_argument('--with-pretense-map')
+    parser.add_argument('--threads', type=int, default=NUM_WORKER_THREADS)
     parser.add_argument('units_dir')
     parser.add_argument('build_dir', nargs='?', default='')
 
@@ -748,6 +793,7 @@ def action_run(parser, action, *args):
     SHOW_DIFF_OUTPUT = res.show_diff_output
     if res.with_pretense_map:
         PRETENSE_OPTS = make_pretense_map(res.with_pretense_map)
+    NUM_WORKER_THREADS = res.threads
     if res.build_dir == '':
         res.build_dir = res.units_dir
 
@@ -781,6 +827,223 @@ def action_run(parser, action, *args):
     else:
         return 0
 
+def tmain_compare_result(build_topdir):
+    for fn in glob.glob(build_topdir + '/*/*-diff.txt'):
+        print(fn)
+        print()
+        with open(fn, 'r', errors='replace') as f:
+            for l in f:
+                print("\t" + l, end='')
+        print()
+
+    for fn in glob.glob(build_topdir + '/*/gdb-backtrace.txt'):
+        with open(fn, 'r', errors='replace') as f:
+            for l in f:
+                print("\t" + l, end='')
+
+def tmain_compare(subdir, build_subdir, aspect, file):
+    msg = '%-59s ' % (aspect)
+    generated = build_subdir + '/' + aspect + '-diff.txt'
+    actual = build_subdir + '/' + aspect + '-actual.txt'
+    expected = subdir + '/' + aspect + '-expected.txt'
+    if os.path.isfile(actual) and os.path.isfile(expected) and \
+            filecmp.cmp(actual, expected):
+        run_result('ok', msg, None, file=file)
+        return True
+    else:
+        ret = subprocess.run(['diff -U 0 --strip-trailing-cr "' +
+                actual + '" "' + expected +
+                '" > "' + generated + '" 2>&1'],
+                shell=True)
+        run_result('error', msg, None, 'diff: ' + generated, file=file)
+        return False
+
+def failed_git_marker(fn):
+    if shutil.which('git'):
+        ret = subprocess.run(['git ls-files -- "' + fn + '"'],
+            shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        if ret.stdout == b'':
+            return '<G>'
+    return ''
+
+def is_crashed(fn):
+    with open(fn, 'r') as f:
+        if 'core dump' in f.read():
+            return True
+    return False
+
+def print_backtraces(ctags_exe, cores, fn):
+    with open(fn, 'w') as f:
+        for coref in cores:
+            ret = subprocess.run(['gdb "' + ctags_exe + '" -c "' + coref + '" -ex where -batch'],
+                shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            print(ret.stdout.decode('utf-8'), end='', file=f)
+
+def tmain_sub(test_name, basedir, subdir, build_subdir):
+    global TMAIN_STATUS
+    global TMAIN_FAILED
+
+    CODE_FOR_IGNORING_THIS_TMAIN_TEST = 77
+
+    os.makedirs(build_subdir, exist_ok=True)
+
+    for fn in glob.glob(build_subdir + '/*-actual.txt'):
+        os.remove(fn)
+
+    strbuf = io.StringIO()
+    print("\nTesting " + test_name, file=strbuf)
+    line('-', file=strbuf)
+
+    if isabs(CTAGS):
+        ctags_path = CTAGS
+    else:
+        ctags_path = os.path.join(basedir, CTAGS)
+
+    if isabs(READTAGS):
+        readtags_path = READTAGS
+    else:
+        readtags_path = os.path.join(basedir, READTAGS)
+
+    ret = subprocess.run([SHELL + ' run.sh ' +
+            ctags_path + ' ' +
+            build_subdir + ' ' +
+            readtags_path],
+            cwd=subdir,
+            shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+    encoding = 'utf-8'
+    try:
+        stdout = ret.stdout.decode(encoding).replace("\r\n", "\n")
+    except UnicodeError:
+        encoding = 'iso-8859-1'
+        stdout = ret.stdout.decode(encoding).replace("\r\n", "\n")
+    stderr = ret.stderr.decode('utf-8').replace("\r\n", "\n")
+    if os.path.basename(CTAGS) != 'ctags':
+        # program name needs to be canonicalized
+        stderr = re.sub('(?m)^' + os.path.basename(CTAGS) + ':', 'ctags:', stderr)
+
+    if ret.returncode == CODE_FOR_IGNORING_THIS_TMAIN_TEST:
+        run_result('skip', '', None, stdout.replace("\n", ''), file=strbuf)
+        print(strbuf.getvalue(), end='')
+        sys.stdout.flush()
+        strbuf.close()
+        return True
+
+    with open(build_subdir + '/exit-actual.txt', 'w', newline='\n') as f:
+        print(ret.returncode, file=f)
+    with open(build_subdir + '/stdout-actual.txt', 'w', newline='\n', encoding=encoding) as f:
+        print(stdout, end='', file=f)
+    with open(build_subdir + '/stderr-actual.txt', 'w', newline='\n') as f:
+        print(stderr, end='', file=f)
+
+    if os.path.isfile(build_subdir + '/tags'):
+        os.rename(build_subdir + '/tags', build_subdir + '/tags-actual.txt')
+
+    for aspect in ['stdout', 'stderr', 'exit', 'tags']:
+        expected_txt = subdir + '/' + aspect + '-expected.txt'
+        actual_txt = build_subdir + '/' + aspect + '-actual.txt'
+        if os.path.isfile(expected_txt):
+            if tmain_compare(subdir, build_subdir, aspect, strbuf):
+                os.remove(actual_txt)
+            else:
+                TMAIN_FAILED += [test_name + '/' + aspect + '-compare' +
+                        failed_git_marker(expected_txt)]
+                TMAIN_STATUS = False
+                if aspect == 'stderr' and \
+                        is_crashed(actual_txt) and \
+                        shutil.which('gdb'):
+                    print_backtraces(ctags_path,
+                            glob.glob(build_subdir + '/core*'),
+                            build_subdir + '/gdb-backtrace.txt')
+        elif os.path.isfile(actual_txt):
+            os.remove(actual_txt)
+
+    print(strbuf.getvalue(), end='')
+    sys.stdout.flush()
+    strbuf.close()
+    return True
+
+def tmain_run(topdir, build_topdir, units):
+    global TMAIN_STATUS
+
+    TMAIN_STATUS = True
+
+    (q, threads) = create_thread_queue(tmain_sub)
+
+    basedir = os.getcwd()
+    for subdir in glob.glob(topdir + '/*.d'):
+        test_name = os.path.basename(subdir)[:-2]
+
+        if len(units) > 0 and not test_name in units:
+            continue
+
+        build_subdir = build_topdir + '/' + os.path.basename(subdir)
+        q.put((test_name, basedir, subdir, build_subdir))
+
+    join_workers(q, threads)
+
+    print()
+    if not TMAIN_STATUS:
+        print('Failed tests')
+        line('=')
+        for f in TMAIN_FAILED:
+            print(re.sub('<G>', ' (not committed/cached yet)', f))
+        print()
+
+        if SHOW_DIFF_OUTPUT:
+            print('Detail [compare]')
+            line('-')
+            tmain_compare_result(build_topdir)
+
+    return TMAIN_STATUS
+
+def action_tmain(parser, action, *args):
+    global CTAGS
+    global COLORIZED_OUTPUT
+    global WITH_VALGRIND
+    global SHOW_DIFF_OUTPUT
+    global READTAGS
+    global UNITS
+    global NUM_WORKER_THREADS
+
+    parser.add_argument('--ctags')
+    parser.add_argument('--colorized-output', choices=['yes', 'no'], default='yes')
+    parser.add_argument('--with-valgrind', action='store_true', default=False)
+    parser.add_argument('--show-diff-output', action='store_true', default=False)
+    parser.add_argument('--readtags')
+    parser.add_argument('--units')
+    parser.add_argument('--threads', type=int, default=NUM_WORKER_THREADS)
+    parser.add_argument('tmain_dir')
+    parser.add_argument('build_dir', nargs='?', default='')
+
+    res = parser.parse_args(args)
+    if res.ctags:
+        CTAGS = res.ctags
+    COLORIZED_OUTPUT = (res.colorized_output == 'yes')
+    WITH_VALGRIND = res.with_valgrind
+    SHOW_DIFF_OUTPUT = res.show_diff_output
+    if res.readtags:
+        READTAGS = res.readtags
+    if res.units:
+        UNITS = res.units.split(',')
+    NUM_WORKER_THREADS = res.threads
+    if res.build_dir == '':
+        res.build_dir = res.tmain_dir
+
+    #check_availability('awk')
+    check_availability('diff')
+
+    if isabs(res.build_dir):
+        build_dir = res.build_dir
+    else:
+        build_dir = os.path.realpath(res.build_dir)
+
+    ret = tmain_run(res.tmain_dir, build_dir, UNITS)
+    if ret:
+        return 0
+    else:
+        return 1
+
 def action_help(parser, *args):
     parser.print_help()
     return 0
@@ -803,6 +1066,7 @@ def main():
     cmdmap = {}
     cmdmap['run'] = [action_run, subparsers.add_parser('run', aliases=['units'])]
     cmdmap['units'] = cmdmap['run']
+    cmdmap['tmain'] = [action_tmain, subparsers.add_parser('tmain')]
     subparsers.add_parser('help')
     cmdmap['help'] = [action_help, parser]
 
