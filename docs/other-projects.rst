@@ -23,8 +23,6 @@ Geany has created a library out of ctags
 Their language parsers have many improvements to various parsers.
 Changes known by devs worth backporting:
 
-* HTML reads <h1><h2><h3> tags
-* Make has support for targets
 * Various fixes for D parser (c.c), but currently the code diverges
   from ours to some extent.
 
@@ -44,6 +42,8 @@ They have these additional language parsers:
 
 These changes have been merged:
 
+* HTML reads <h1><h2><h3> tags
+* Make has support for targets
 * Fix regex callback match count - https://github.com/universal-ctags/ctags/pull/104
 * SQL tags are stored with scopes instead of "tablename.field" - https://github.com/universal-ctags/ctags/pull/100
 * Some fixes for D parser
@@ -92,5 +92,3 @@ Linux kernel
 
 	See linux/scripts/tags.sh of Linux kernel source tree.
 	It utilizes c parser to the utmost limit.
-
-
