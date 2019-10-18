@@ -103,6 +103,14 @@ def isabs(path):
             return True
     return os.path.isabs(path)
 
+def action_help(parser, action, *args):
+    parser.print_help()
+    return 0
+
+def error_exit(status, msg):
+    print(msg, file=sys.stderr)
+    sys.exit(status)
+
 def line(*args, file=sys.stdout):
     if len(args) > 0:
         ch = args[0]
@@ -110,18 +118,23 @@ def line(*args, file=sys.stdout):
         ch = '-'
     print(ch * 60, file=file)
 
+def clean_bundles(bundles):
+    if not os.path.isfile(bundles):
+        return
+    with open(bundles, 'r') as f:
+        for fn in f.read().splitlines():
+            if os.path.isdir(fn):
+                shutil.rmtree(fn)
+            elif os.path.isfile(fn):
+                os.remove(fn)
+    os.remove(bundles)
+
 def clean_tcase(d, bundles):
     if os.path.isdir(d):
-        if os.path.isfile(bundles):
-            with open(bundles, 'r') as f:
-                for l in f:
-                    fn = l.replace("\n", '')
-                    if os.path.isdir(fn):
-                        shutil.rmtree(fn)
-                    elif os.path.isfile(fn):
-                        os.remove(fn)
-            os.remove(bundles)
-        for fn in glob.glob(d + '/*.tmp') + glob.glob(d + '/*.TMP'):
+        clean_bundles(bundles)
+        for fn in glob.glob(d + '/*.tmp'):
+            os.remove(fn)
+        for fn in glob.glob(d + '/*.TMP'):
             os.remove(fn)
 
 def check_availability(cmd):
@@ -198,8 +211,7 @@ def decorate(decorator, msg, colorized):
     elif decorator == 'yellow':
         num = '33'
     else:
-        print('INTERNAL ERROR: wrong run_result function', file=sys.stderr)
-        sys.exit(1)
+        error_exit(1, 'INTERNAL ERROR: wrong run_result function')
 
     if colorized:
         return "\x1b[" + num + 'm' + msg + "\x1b[m"
@@ -827,6 +839,24 @@ def action_run(parser, action, *args):
     else:
         return 0
 
+def action_clean(parser, action, *args):
+    parser.add_argument('units_dir')
+
+    res = parser.parse_args(args)
+    units_dir = res.units_dir
+
+    if not os.path.isdir(units_dir):
+        error_exit(1, 'No such directory: ' + units_dir)
+
+    for bundles in glob.glob(units_dir + '/**/BUNDLES', recursive=True):
+        clean_bundles(bundles)
+
+    for fn in glob.glob(units_dir + '/**/*.tmp', recursive=True):
+        os.remove(fn)
+    for fn in glob.glob(units_dir + '/**/*.TMP', recursive=True):
+        os.remove(fn)
+    return 0
+
 def tmain_compare_result(build_topdir):
     for fn in glob.glob(build_topdir + '/*/*-diff.txt'):
         print(fn)
@@ -1044,8 +1074,21 @@ def action_tmain(parser, action, *args):
     else:
         return 1
 
-def action_help(parser, *args):
-    parser.print_help()
+def action_clean_tmain(parser, action, *args):
+    parser.add_argument('tmain_dir')
+
+    res = parser.parse_args(args)
+    tmain_dir = res.tmain_dir
+
+    if not os.path.isdir(tmain_dir):
+        error_exit(1, 'No such directory: ' + tmain_dir)
+
+    for obj in ['stdout', 'stderr', 'exit', 'tags']:
+        for typ in ['actual', 'diff']:
+            for fn in glob.glob(tmain_dir + '/**/' + obj + '-' + typ + '.txt', recursive=True):
+                os.remove(fn)
+    for fn in glob.glob(tmain_dir + '/**/gdb-backtrace.txt', recursive=True):
+        os.remove(fn)
     return 0
 
 def prepare_environment():
@@ -1066,7 +1109,9 @@ def main():
     cmdmap = {}
     cmdmap['run'] = [action_run, subparsers.add_parser('run', aliases=['units'])]
     cmdmap['units'] = cmdmap['run']
+    cmdmap['clean'] = [action_clean, subparsers.add_parser('clean')]
     cmdmap['tmain'] = [action_tmain, subparsers.add_parser('tmain')]
+    cmdmap['clean-tmain'] = [action_clean_tmain, subparsers.add_parser('clean-tmain')]
     subparsers.add_parser('help')
     cmdmap['help'] = [action_help, parser]
 
