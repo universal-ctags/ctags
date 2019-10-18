@@ -774,19 +774,34 @@ def action_run(parser, action, *args):
     global PRETENSE_OPTS
     global NUM_WORKER_THREADS
 
-    parser.add_argument('--categories')
-    parser.add_argument('--ctags')
-    parser.add_argument('--units')
-    parser.add_argument('--languages')
-    parser.add_argument('--with-timeout', type=int, default=0)
-    parser.add_argument('--with-valgrind', action='store_true', default=False)
-    parser.add_argument('--colorized-output', choices=['yes', 'no'], default='yes')
-    parser.add_argument('--run-shrink', action='store_true', default=False)
-    parser.add_argument('--show-diff-output', action='store_true', default=False)
-    parser.add_argument('--with-pretense-map')
-    parser.add_argument('--threads', type=int, default=NUM_WORKER_THREADS)
-    parser.add_argument('units_dir')
-    parser.add_argument('build_dir', nargs='?', default='')
+    parser.add_argument('--categories', metavar='CATEGORY1[,CATEGORY2,...]',
+            help='run only CATEGORY* related cases.')
+    parser.add_argument('--ctags',
+            help='ctags executable file for testing')
+    parser.add_argument('--units', metavar='UNITS1[,UNITS2,...]',
+            help='run only UNIT(S).')
+    parser.add_argument('--languages', metavar='PARSER1[,PARSER2,...]',
+            help='run only PARSER* related cases.')
+    parser.add_argument('--with-timeout', type=int, default=0,
+            metavar='DURATION',
+            help='run a test case with specified timeout in seconds. 0 means no timeout (default).')
+    parser.add_argument('--with-valgrind', action='store_true', default=False,
+            help='run a test case under valgrind')
+    parser.add_argument('--colorized-output', choices=['yes', 'no'], default='yes',
+            help='print the result in color.')
+    parser.add_argument('--run-shrink', action='store_true', default=False,
+            help='(TODO: NOT IMPLEMENTED YET)')
+    parser.add_argument('--show-diff-output', action='store_true', default=False,
+            help='show diff output for failed test cases in the summary.')
+    parser.add_argument('--with-pretense-map',
+            metavar='NEWLANG0/OLDLANG0[,...]',
+            help='make NEWLANG parser pretend OLDLANG.')
+    parser.add_argument('--threads', type=int, default=NUM_WORKER_THREADS,
+            help='number of worker threads')
+    parser.add_argument('units_dir',
+            help='Units directory.')
+    parser.add_argument('build_dir', nargs='?', default='',
+            help='Build directory. If not given, units_dir is used.')
 
     res = parser.parse_args(args)
     if res.categories:
@@ -840,7 +855,8 @@ def action_run(parser, action, *args):
         return 0
 
 def action_clean(parser, action, *args):
-    parser.add_argument('units_dir')
+    parser.add_argument('units_dir',
+            help='Build directory for units testing.')
 
     res = parser.parse_args(args)
     units_dir = res.units_dir
@@ -1036,15 +1052,24 @@ def action_tmain(parser, action, *args):
     global UNITS
     global NUM_WORKER_THREADS
 
-    parser.add_argument('--ctags')
-    parser.add_argument('--colorized-output', choices=['yes', 'no'], default='yes')
-    parser.add_argument('--with-valgrind', action='store_true', default=False)
-    parser.add_argument('--show-diff-output', action='store_true', default=False)
-    parser.add_argument('--readtags')
-    parser.add_argument('--units')
-    parser.add_argument('--threads', type=int, default=NUM_WORKER_THREADS)
-    parser.add_argument('tmain_dir')
-    parser.add_argument('build_dir', nargs='?', default='')
+    parser.add_argument('--ctags',
+            help='ctags executable file for testing')
+    parser.add_argument('--colorized-output', choices=['yes', 'no'], default='yes',
+            help='print the result in color.')
+    parser.add_argument('--with-valgrind', action='store_true', default=False,
+            help='(not implemented) run a test case under valgrind')
+    parser.add_argument('--show-diff-output', action='store_true', default=False,
+            help='how diff output for failed test cases in the summary.')
+    parser.add_argument('--readtags',
+            help='readtags executable file for testing')
+    parser.add_argument('--units', metavar='UNITS1[,UNITS2,...]',
+            help='run only Tmain/UNIT*.d (.d is not needed)')
+    parser.add_argument('--threads', type=int, default=NUM_WORKER_THREADS,
+            help='number of worker threads')
+    parser.add_argument('tmain_dir',
+            help='Tmain directory.')
+    parser.add_argument('build_dir', nargs='?', default='',
+            help='Build directory. If not given, tmain_dir is used.')
 
     res = parser.parse_args(args)
     if res.ctags:
@@ -1075,7 +1100,8 @@ def action_tmain(parser, action, *args):
         return 1
 
 def action_clean_tmain(parser, action, *args):
-    parser.add_argument('tmain_dir')
+    parser.add_argument('tmain_dir',
+            help='Build directory for tmain testing.')
 
     res = parser.parse_args(args)
     tmain_dir = res.tmain_dir
@@ -1104,15 +1130,29 @@ MSYS2_ARG_CONV_EXCL='--regex-;--_scopesep' export MSYS2_ARG_CONV_EXCL
 def main():
     prepare_environment()
 
-    parser = argparse.ArgumentParser()
-    subparsers = parser.add_subparsers(dest='action')
+    parser = argparse.ArgumentParser(
+            description='Units test harness for ctags.')
+    subparsers = parser.add_subparsers(dest='action', metavar='ACTION')
     cmdmap = {}
-    cmdmap['run'] = [action_run, subparsers.add_parser('run', aliases=['units'])]
+    cmdmap['run'] = [action_run,
+            subparsers.add_parser('run', aliases=['units'],
+                description='Run all tests case under units_dir.',
+                help='Run all tests case')]
     cmdmap['units'] = cmdmap['run']
-    cmdmap['clean'] = [action_clean, subparsers.add_parser('clean')]
-    cmdmap['tmain'] = [action_tmain, subparsers.add_parser('tmain')]
-    cmdmap['clean-tmain'] = [action_clean_tmain, subparsers.add_parser('clean-tmain')]
-    subparsers.add_parser('help')
+    cmdmap['clean'] = [action_clean,
+            subparsers.add_parser('clean',
+                description='Clean all files created during units testing.',
+                help='Clean all files created during units testing')]
+    cmdmap['tmain'] = [action_tmain,
+            subparsers.add_parser('tmain',
+                description='Run tests for main part of ctags.',
+                help='Run tests for main part of ctags')]
+    cmdmap['clean-tmain'] = [action_clean_tmain,
+            subparsers.add_parser('clean-tmain',
+                description='Clean all files created during tmain testing.',
+                help='Clean all files created during tmain testing')]
+    subparsers.add_parser('help',
+            help='show this help message and exit')
     cmdmap['help'] = [action_help, parser]
 
     if len(sys.argv) < 2:
