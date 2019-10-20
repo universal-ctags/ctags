@@ -22,8 +22,8 @@
 
 #
 # Python 3.5 or later is required.
-# On Windows, this should be executed by Cygwin/MSYS2 python3.
-# Windows native versions of python don't work for now.
+# On Windows, unix-like shell (e.g. bash) and some unix tools (sed,
+# diff, etc.) are needed.
 #
 
 import time     # for debugging
@@ -156,8 +156,8 @@ def check_units(name, category):
 
 def init_features():
     global _FEATURE_LIST
-    ret = subprocess.run([CTAGS + ' --quiet --options=NONE --list-features --with-list=no'],
-            shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    ret = subprocess.run([CTAGS, '--quiet', '--options=NONE', '--list-features', '--with-list=no'],
+            stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
     _FEATURE_LIST = re.sub(r'(?m)^([^ ]+).*$', r'\1',
             ret.stdout.decode('utf-8')).splitlines()
 
@@ -190,8 +190,8 @@ def check_languages(cmdline, lfile):
     if not os.path.isfile(lfile):
         return (True, '')
 
-    ret = subprocess.run([cmdline + ' --list-languages'],
-            shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    ret = subprocess.run(cmdline + ['--list-languages'],
+            stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
     langs = ret.stdout.decode('utf-8').splitlines()
 
     with open(lfile, 'r') as f:
@@ -261,29 +261,41 @@ def run_shrink(cmdline_template, finput, foutput, lang):
     # TODO
     pass
 
+# return a filter for normalizing the basename
+#
+# If internal is True, return a pair of [pattern, replacement],
+# otherwise return a list of command line arguments.
 def basename_filter(internal, output_type):
-    filters = {
-            'ctags': '\'s%\(^[^\t]\{1,\}\t\)\(/\{0,1\}\([^/\t]\{1,\}/\)*\)%\\1%\'',
-            'etags': '\'s%.*\/\([[:print:]]\{1,\}\),\([0-9]\{1,\}$\)%\\1,\\2%\'',
-            'xref': '\'s%\(.*[[:digit:]]\{1,\} \)\([^ ]\{1,\}[^ ]\{1,\}\)/\([^ ].\{1,\}.\{1,\}$\)%\\1\\3%\'',
-            'json': '\'s%\("path": \)"[^"]\{1,\}/\([^/"]\{1,\}\)"%\\1"\\2"%\'',
+    filters_external = {
+            'ctags': 's%\(^[^\t]\{1,\}\t\)\(/\{0,1\}\([^/\t]\{1,\}/\)*\)%\\1%',
+            'etags': 's%.*\/\([[:print:]]\{1,\}\),\([0-9]\{1,\}$\)%\\1,\\2%',
+            'xref': 's%\(.*[[:digit:]]\{1,\} \)\([^ ]\{1,\}[^ ]\{1,\}\)/\([^ ].\{1,\}.\{1,\}$\)%\\1\\3%',
+            'json': 's%\("path": \)"[^"]\{1,\}/\([^/"]\{1,\}\)"%\\1"\\2"%',
             }
     filters_internal = {
-            'ctags': (r'(^[^\t]+\t)(/?([^/\t]+/)*)', r'\1'),
-            'etags': (r'.*/(\S+),([0-9]+$)', r'\1,\2'),
-            'xref': (r'(.*\d+ )([^ ]+[^ ]+)/([^ ].+.+$)', r'\1\3'),
-            'json': (r'("path": )"[^"]+/([^/"]+)"', r'\1"\2"'),
+            'ctags': [r'(^[^\t]+\t)(/?([^/\t]+/)*)', r'\1'],
+            'etags': [r'.*/(\S+),([0-9]+$)', r'\1,\2'],
+            'xref': [r'(.*\d+ )([^ ]+[^ ]+)/([^ ].+.+$)', r'\1\3'],
+            'json': [r'("path": )"[^"]+/([^/"]+)"', r'\1"\2"'],
             }
     if internal:
         return filters_internal[output_type]
     else:
-        return 'sed -e ' + filters[output_type]
+        return ['sed', '-e', filters_external[output_type]]
+
+# convert a command line list to a command line string
+def join_cmdline(cmdline):
+    # surround with '' if an argument include spaces or '\'
+    # TODO: use more robust way
+    return ' '.join(["'" + x + "'" if (' ' in x) or ('\\' in x) else x
+        for x in cmdline])
 
 def run_record_cmdline(cmdline, ffilter, ocmdline, output_type):
     with open(ocmdline, 'w') as f:
         print("%s\n%s \\\n| %s \\\n| %s\n" % (
-            _PREPERE_ENV, cmdline,
-            basename_filter(False, output_type),
+            _PREPERE_ENV,
+            join_cmdline(cmdline),
+            join_cmdline(basename_filter(False, output_type)),
             ffilter), file=f)
 
 def prepare_bundles(frm, to, obundles):
@@ -312,25 +324,21 @@ def anon_normalize_sub(internal, ctags, input_actual, *args):
     # TODO: "Units" should not be hardcoded.
     input_expected = './Units' + re.sub(r'^.*?/Units', r'', input_actual, 1)
 
-    ret = subprocess.run([CTAGS + ' --quiet --options=NONE --_anonhash="' + input_actual + '"'],
-            shell=True, stdout=subprocess.PIPE)
+    ret = subprocess.run([CTAGS, '--quiet', '--options=NONE', '--_anonhash=' + input_actual],
+            stdout=subprocess.PIPE)
     actual = ret.stdout.decode('utf-8').splitlines()[0]
-    ret = subprocess.run([CTAGS + ' --quiet --options=NONE --_anonhash="' + input_expected + '"'],
-            shell=True, stdout=subprocess.PIPE)
+    ret = subprocess.run([CTAGS, '--quiet', '--options=NONE', '--_anonhash=' + input_expected],
+            stdout=subprocess.PIPE)
     expected = ret.stdout.decode('utf-8').splitlines()[0]
 
     if internal:
-        rettup = (actual, expected)
-        if len(args) > 0:
-            return [rettup] + anon_normalize_sub(internal, ctags, *args)
-        else:
-            return [rettup]
+        retlist = [[actual, expected]]
     else:
-        retstr = ' -e s/' + actual + '/' + expected + '/g'
-        if len(args) > 0:
-            return retstr + anon_normalize_sub(internal, ctags, *args)
-        else:
-            return retstr
+        retlist = ['-e', 's/' + actual + '/' + expected + '/g']
+    if len(args) > 0:
+        return retlist + anon_normalize_sub(internal, ctags, *args)
+    else:
+        return retlist
 
 def is_anon_normalize_needed(rawout):
     with open(rawout, 'r', errors='ignore') as f:
@@ -338,14 +346,15 @@ def is_anon_normalize_needed(rawout):
             return True
     return False
 
+# return a list of filters for normalizing anonhash
+#
+# If internal is True, return a list of pairs of [pattern, replacement],
+# otherwise return a list of command line arguments.
 def anon_normalize(internal, rawout, ctags, input_actual, *args):
     if is_anon_normalize_needed(rawout):
         return anon_normalize_sub(internal, ctags, input_actual, *args)
     else:
-        if internal:
-            return ()
-        else:
-            return ''
+        return []
 
 def run_filter(finput, foutput, base_filter, anon_filters):
     pat1 = [re.compile(base_filter[0]), base_filter[1]]
@@ -381,7 +390,7 @@ def run_tcase(finput, t, name, tclass, category, build_t, extra_inputs):
     fexpected = t + '/expected.tags'
     output_type = 'ctags'
     output_label = ''
-    output_tflag = ''
+    output_tflag = []
     output_feature = ''
     output_lang_extras = ''
 
@@ -391,17 +400,17 @@ def run_tcase(finput, t, name, tclass, category, build_t, extra_inputs):
         fexpected = t + '/expected.tags-e'
         output_type = 'etags'
         output_label = '/' + output_type
-        output_tflag = '-e --tag-relative=no'
+        output_tflag = ['-e', '--tag-relative=no']
     elif os.path.isfile(t + '/expected.tags-x'):
         fexpected = t + '/expected.tags-x'
         output_type = 'xref'
         output_label = '/' + output_type
-        output_tflag = '-x'
+        output_tflag = ['-x']
     elif os.path.isfile(t + '/expected.tags-json'):
         fexpected = t + '/expected.tags-json'
         output_type = 'json'
         output_label = '/' + output_type
-        output_tflag = '--output-format=json'
+        output_tflag = ['--output-format=json']
         output_feature = 'json'
 
     if len(extra_inputs) > 0:
@@ -431,11 +440,14 @@ def run_tcase(finput, t, name, tclass, category, build_t, extra_inputs):
     #
     # Build cmdline
     #
-    cmdline = CTAGS + ' --verbose --options=NONE ' + PRETENSE_OPTS + ' --optlib-dir=+' + t + '/optlib -o -'
+    cmdline = [CTAGS, '--verbose', '--options=NONE']
+    if PRETENSE_OPTS != '':
+        cmdline += [PRETENSE_OPTS]
+    cmdline += ['--optlib-dir=+' + t + '/optlib', '-o', '-']
     if os.path.isfile(fargs):
-        cmdline += ' --options=' + fargs
-        ret = subprocess.run([cmdline + ' --_force-quit=0'],
-                shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        cmdline += ['--options=' + fargs]
+        ret = subprocess.run(cmdline + ['--_force-quit=0'],
+                stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         if ret.returncode != 0:
             broken_args_ctags = True
 
@@ -443,8 +455,8 @@ def run_tcase(finput, t, name, tclass, category, build_t, extra_inputs):
     # Filtered by LANGUAGES
     #
     start = time.time()
-    ret = subprocess.run([cmdline + ' --print-language "' + finput + '"'],
-            shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    ret = subprocess.run(cmdline + ['--print-language', finput],
+            stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
     #print('lang time: %f' % (time.time() - start))
     guessed_lang = re.sub(r'^.*: ', r'',
             ret.stdout.decode('utf-8').replace("\r\n", "\n").replace("\n", ''))
@@ -480,22 +492,24 @@ def run_tcase(finput, t, name, tclass, category, build_t, extra_inputs):
         run_result('error', msg, None, 'broken args.ctags?')
         return False
 
-    cmdline_template = cmdline + ' --language-force=' + guessed_lang + ' %s > /dev/null 2>&1'
-    cmdline += ' ' + output_tflag + ' ' + finput
+    cmdline_template = join_cmdline(cmdline) + ' --language-force=' + guessed_lang + ' %s > /dev/null 2>&1'
+    cmdline += output_tflag + [finput]
     if len(extra_inputs) > 0:
-        cmdline += ' "' + '" "'.join(extra_inputs) + '"'
+        cmdline += extra_inputs
 
     timeout_value = WITH_TIMEOUT
     if WITH_VALGRIND:
-        cmdline = 'valgrind --leak-check=full --error-exitcode=' + str(_VALGRIND_EXIT) + ' --log-file=' + ovalgrind + ' ' + cmdline
+        cmdline = ['valgrind', '--leak-check=full', '--error-exitcode=' + str(_VALGRIND_EXIT), '--log-file=' + ovalgrind] + cmdline
         timeout_value *= _VG_TIMEOUT_FACTOR
     if timeout_value == 0:
         timeout_value = None
 
     start = time.time()
     try:
-        ret = subprocess.run([cmdline + ' 2> ' + ostderr + ' > ' + orawout],
-                shell=True, timeout=timeout_value)
+        with open(orawout, 'wb') as fo, \
+                open(ostderr, 'wb') as fe:
+            ret = subprocess.run(cmdline, stdout=fo, stderr=fe,
+                    timeout=timeout_value)
         run_record_cmdline(cmdline, ffilter, ocmdline, output_type)
     except subprocess.TimeoutExpired:
         L_FAILED_BY_TIMEED_OUT += [category + '/' + name]
@@ -546,11 +560,11 @@ def run_tcase(finput, t, name, tclass, category, build_t, extra_inputs):
         # Use external filter
         filter_cmd = basename_filter(False, output_type) + \
                 anon_normalize(False, orawout, CTAGS, finput, *extra_inputs) + \
-                ' < ' + orawout
-        filter_cmd += ' | ' + ffilter
-        filter_cmd += ' > ' + '"' + ofiltered + '"'
+                ['<', orawout]
+        filter_cmd += ['|', ffilter]
+        filter_cmd += ['>', ofiltered]
         #print(filter_cmd)
-        subprocess.run([filter_cmd], shell=True)
+        subprocess.run([SHELL, '-c', join_cmdline(filter_cmd)])
     else:
         # Use internal filter
         run_filter(orawout, ofiltered, basename_filter(True, output_type),
@@ -561,8 +575,9 @@ def run_tcase(finput, t, name, tclass, category, build_t, extra_inputs):
     if filecmp.cmp(fexpected, ofiltered):
         ret.returncode = 0
     else:
-        ret = subprocess.run(['diff -U 0 -I \'^!_TAG\' --strip-trailing-cr "' + fexpected + '" "' + ofiltered + '" > "' + odiff + '"'],
-                shell=True)
+        with open(odiff, 'wb') as f:
+            ret = subprocess.run(['diff', '-U', '0', '-I', '^!_TAG', '--strip-trailing-cr', fexpected, ofiltered],
+                stdout=f)
     #print('diff time: %f' % (time.time() - start))
 
     if ret.returncode == 0:
@@ -773,6 +788,7 @@ def action_run(parser, action, *args):
     global SHOW_DIFF_OUTPUT
     global PRETENSE_OPTS
     global NUM_WORKER_THREADS
+    global SHELL
 
     parser.add_argument('--categories', metavar='CATEGORY1[,CATEGORY2,...]',
             help='run only CATEGORY* related cases.')
@@ -798,6 +814,8 @@ def action_run(parser, action, *args):
             help='make NEWLANG parser pretend OLDLANG.')
     parser.add_argument('--threads', type=int, default=NUM_WORKER_THREADS,
             help='number of worker threads')
+    parser.add_argument('--shell',
+            help='shell to be used.')
     parser.add_argument('units_dir',
             help='Units directory.')
     parser.add_argument('build_dir', nargs='?', default='',
@@ -821,6 +839,8 @@ def action_run(parser, action, *args):
     if res.with_pretense_map:
         PRETENSE_OPTS = make_pretense_map(res.with_pretense_map)
     NUM_WORKER_THREADS = res.threads
+    if res.shell:
+        SHELL = res.shell
     if res.build_dir == '':
         res.build_dir = res.units_dir
 
@@ -897,18 +917,18 @@ def tmain_compare(subdir, build_subdir, aspect, file):
         run_result('ok', msg, None, file=file)
         return True
     else:
-        ret = subprocess.run(['diff -U 0 --strip-trailing-cr "' +
-                actual + '" "' + expected +
-                '" > "' + generated + '" 2>&1'],
-                shell=True)
+        with open(generated, 'wb') as f:
+            subprocess.run(['diff', '-U', '0', '--strip-trailing-cr',
+                actual, expected],
+                stdout=f, stderr=subprocess.STDOUT)
         run_result('error', msg, None, 'diff: ' + generated, file=file)
         return False
 
 def failed_git_marker(fn):
     if shutil.which('git'):
-        ret = subprocess.run(['git ls-files -- "' + fn + '"'],
-            shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        if ret.stdout == b'':
+        ret = subprocess.run(['git', 'ls-files', '--', fn],
+            stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
+        if ret.returncode == 0 and ret.stdout == b'':
             return '<G>'
     return ''
 
@@ -919,11 +939,10 @@ def is_crashed(fn):
     return False
 
 def print_backtraces(ctags_exe, cores, fn):
-    with open(fn, 'w') as f:
+    with open(fn, 'wb') as f:
         for coref in cores:
-            ret = subprocess.run(['gdb "' + ctags_exe + '" -c "' + coref + '" -ex where -batch'],
-                shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            print(ret.stdout.decode('utf-8'), end='', file=f)
+            subprocess.run(['gdb', ctags_exe, '-c', coref, '-ex', 'where', '-batch'],
+                stdout=f, stderr=subprocess.DEVNULL)
 
 def tmain_sub(test_name, basedir, subdir, build_subdir):
     global TMAIN_STATUS
@@ -950,12 +969,14 @@ def tmain_sub(test_name, basedir, subdir, build_subdir):
     else:
         readtags_path = os.path.join(basedir, READTAGS)
 
-    ret = subprocess.run([SHELL + ' run.sh ' +
-            ctags_path + ' ' +
-            build_subdir + ' ' +
+    start = time.time()
+    ret = subprocess.run([SHELL, 'run.sh',
+            ctags_path,
+            build_subdir,
             readtags_path],
             cwd=subdir,
-            shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    #print('execute time: %f' % (time.time() - start), file=strbuf)
 
     encoding = 'utf-8'
     try:
@@ -1051,6 +1072,7 @@ def action_tmain(parser, action, *args):
     global READTAGS
     global UNITS
     global NUM_WORKER_THREADS
+    global SHELL
 
     parser.add_argument('--ctags',
             help='ctags executable file for testing')
@@ -1066,6 +1088,8 @@ def action_tmain(parser, action, *args):
             help='run only Tmain/UNIT*.d (.d is not needed)')
     parser.add_argument('--threads', type=int, default=NUM_WORKER_THREADS,
             help='number of worker threads')
+    parser.add_argument('--shell',
+            help='shell to be used.')
     parser.add_argument('tmain_dir',
             help='Tmain directory.')
     parser.add_argument('build_dir', nargs='?', default='',
@@ -1082,6 +1106,8 @@ def action_tmain(parser, action, *args):
     if res.units:
         UNITS = res.units.split(',')
     NUM_WORKER_THREADS = res.threads
+    if res.shell:
+        SHELL = res.shell
     if res.build_dir == '':
         res.build_dir = res.tmain_dir
 
