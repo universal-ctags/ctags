@@ -1225,12 +1225,9 @@ static void buildFqTagCache (tagEntryInfo *const tag)
 	getTagScopeInformation (tag, NULL, NULL);
 }
 
-static void writeTagEntry (const tagEntryInfo *const tag, bool checkingNeeded)
+static void writeTagEntry (const tagEntryInfo *const tag)
 {
 	int length = 0;
-
-	if (checkingNeeded && !isTagWritable(tag))
-		return;
 
 	Assert (tag->kindIndex != KIND_GHOST_INDEX);
 
@@ -1316,7 +1313,11 @@ extern void uncorkTagFile(void)
 	for (i = 1; i < TagFile.corkQueue.count; i++)
 	{
 		tagEntryInfo *tag = TagFile.corkQueue.queue + i;
-		writeTagEntry (tag, true);
+
+		if (!isTagWritable(tag))
+			continue;
+
+		writeTagEntry (tag);
 
 		if (doesInputLanguageRequestAutomaticFQTag ()
 		    && isXtagEnabled (XTAG_QUALIFIED_TAGS)
@@ -1398,7 +1399,7 @@ static void makeTagEntriesForSubwords (tagEntryInfo *const subtag)
 		if (TagFile.cork)
 			queueTagEntry (subtag);
 		else
-			writeTagEntry (subtag, false);
+			writeTagEntry (subtag);
 	}
 	stringListDelete (list);
 }
@@ -1424,7 +1425,7 @@ extern int makeTagEntry (const tagEntryInfo *const tag)
 	if (TagFile.cork)
 		r = queueTagEntry (tag);
 	else
-		writeTagEntry (tag, false);
+		writeTagEntry (tag);
 
 	notifyMakeTagEntry (tag, r);
 
