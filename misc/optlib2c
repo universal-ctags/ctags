@@ -44,7 +44,7 @@ my $options =
 	   parse_optlib ($1, $_[0]);
        } ],
      #
-     # TODO: We should not assumed the order of flags.
+     # TODO: We should not assume the order of flags.
      #
      [ qr/^--langdef=([^\{]+)(((\{base=([^\{]+)\})(\{(dedicated|shared|bidirectional)\})?)?)(\{_autoFQTag\})?/, sub {
 	   die "LANG is already defined as $_[0]->{'langdef'}: $1"
