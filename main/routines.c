@@ -914,6 +914,19 @@ extern MIO *tempFile (const char *const mode, char **const pName)
 	name = xMalloc (strlen (tmpdir) + 1 + strlen (pattern) + 1, char);
 	sprintf (name, "%s%c%s", tmpdir, OUTPUT_PATH_SEPARATOR, pattern);
 	fd = mkstemp (name);
+# ifdef WIN32
+	if (fd == -1)
+	{
+		/* mkstemp() sometimes fails with unknown reasons.
+		 * Retry a few times. */
+		int i;
+		for (i = 0; i < 5 && fd == -1; i++)
+		{
+			sprintf (name, "%s%c%s", tmpdir, OUTPUT_PATH_SEPARATOR, pattern);
+			fd = mkstemp (name);
+		}
+	}
+# endif
 	eStatFree (file);
 #elif defined(HAVE_TEMPNAM)
 	const char *tmpdir = NULL;
