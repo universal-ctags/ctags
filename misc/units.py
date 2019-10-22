@@ -1153,8 +1153,27 @@ def prepare_environment():
 MSYS2_ARG_CONV_EXCL='--regex-;--_scopesep' export MSYS2_ARG_CONV_EXCL
 """
 
+# enable ANSI escape sequences on Windows 10 1511 (10.0.10586) or later
+def enable_esc_sequence():
+    if os.name != 'nt':
+        return
+
+    import ctypes
+
+    kernel32 = ctypes.windll.kernel32
+
+    ENABLE_VIRTUAL_TERMINAL_PROCESSING = 4
+    STD_OUTPUT_HANDLE = -11
+
+    out = kernel32.GetStdHandle(STD_OUTPUT_HANDLE)
+    mode = ctypes.c_ulong()
+    if kernel32.GetConsoleMode(out, ctypes.byref(mode)):
+        kernel32.SetConsoleMode(out,
+                mode.value | ENABLE_VIRTUAL_TERMINAL_PROCESSING)
+
 def main():
     prepare_environment()
+    enable_esc_sequence()
 
     parser = argparse.ArgumentParser(
             description='Units test harness for ctags.')
