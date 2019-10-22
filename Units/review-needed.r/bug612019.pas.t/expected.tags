@@ -1,3 +1,4 @@
-Test1	input.pas	/^    procedure Test1;$/;"	p
+Fun1	input.pas	/^function {} Fun1 : integer;$/;"	f
+TTest	input.pas	/^  TTest=class$/;"	t
 Test2	input.pas	/^    procedure  Test2;$/;"	p
 Test3	input.pas	/^    procedure   Test3;$/;"	p
