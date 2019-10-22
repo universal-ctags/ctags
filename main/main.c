@@ -28,7 +28,9 @@
 #include <crt_externs.h>
 #endif
 
+#include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 /*  To provide directory searching for recursion feature.
  */
@@ -546,6 +548,11 @@ static void sanitizeEnviron (void)
 extern int ctags_cli_main (int argc CTAGS_ATTR_UNUSED, char **argv)
 {
 	cookedArgs *args;
+
+#if defined(WIN32) && defined(HAVE_MKSTEMP)
+	/* MinGW-w64's mkstemp() uses rand() for generating temporary files. */
+	srand ((unsigned int) clock ());
+#endif
 
 	initDefaultTrashBox ();
 
