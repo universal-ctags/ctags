@@ -8,9 +8,7 @@
 
 AC_PREREQ([2.59])
 AC_INIT([universal-ctags],[0.0.0])
-AM_INIT_AUTOMAKE([foreign subdir-objects tar-ustar])
-AM_SILENT_RULES([yes])
-AC_CONFIG_HEADERS([config.h])
+
 if ! test -e "${srcdir}/config.h.in"; then
    echo "---"
    echo "--- ${srcdir}/config.h.in WAS NOT FOUND." 1>&2
@@ -19,6 +17,17 @@ if ! test -e "${srcdir}/config.h.in"; then
    echo "---"
    exit 1
 fi
+
+# Report system info
+# ------------------
+program_name=[`grep 'PROGRAM_NAME  *"' $srcdir/main/ctags.h | sed -e 's/.*"\([^"]*\)".*/\1/'`]
+program_version=[`grep 'PROGRAM_VERSION  *"' $srcdir/main/ctags.h | sed -e 's/.*"\([^"]*\)".*/\1/'`]
+echo "$program_name, version $program_version"
+uname -mrsv 2>/dev/null
+
+AM_INIT_AUTOMAKE([foreign subdir-objects tar-ustar])
+AM_SILENT_RULES([yes])
+AC_CONFIG_HEADERS([config.h])
 
 AC_CANONICAL_BUILD
 AC_CANONICAL_HOST
@@ -85,13 +94,6 @@ AH_TEMPLATE([MSDOS_STYLE_PATH],
 AH_TEMPLATE([ENABLE_GCOV],
 	[Define to 1 if gcov is instrumented.])
 
-
-# Report system info
-# ------------------
-program_name=[`grep 'PROGRAM_NAME  *"' $srcdir/main/ctags.h | sed -e 's/.*"\([^"]*\)".*/\1/'`]
-program_version=[`grep 'PROGRAM_VERSION  *"' $srcdir/main/ctags.h | sed -e 's/.*"\([^"]*\)".*/\1/'`]
-echo "$program_name, version $program_version"
-uname -mrsv 2>/dev/null
 
 # Define convenience macros
 # -------------------------
