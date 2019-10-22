@@ -36,7 +36,7 @@ In the example, *Tmain* does:
    and `exit-expected.txt`.
 5. compares it with `tags-expected.txt` if run.sh generates `tags` file.
 
-`run.sh` is run with following 4 arguments:
+`run.sh` is run with following 3 arguments:
 
 1. the path for the target ctags
 2. the path for `builddir` directory
@@ -45,14 +45,14 @@ In the example, *Tmain* does:
 The path for readtags is not reliable; readtags command is not
 available if --disable-readcmd was given in configure time.  A case,
 testing the behavior of readtags, must verify the command existence
-with `test -x $4` before going into the main part of the test.
+with `test -x $3` before going into the main part of the test.
 
 When comparing `tags` file with `tags-expected.txt`, you
 must specify the path of `tags` explicitly with -o option
 in ctags command line like::
 
 	CTAGS=$1
-	BUILDDIR=$3
+	BUILDDIR=$2
 	${CTAGS} ... -o $BUILDDIR/tags ...
 
 This makes it possible to keep the original source directory clean.
