@@ -129,7 +129,9 @@
  */
 #if defined (WIN32)
 # if defined (_MSC_VER) || defined (__MINGW32__)
-#  define stat    _stat
+#  ifndef stat
+#   define stat    _stat
+#  endif
 #  define getcwd  _getcwd
 #  define currentdrive() (_getdrive() + 'A' - 1)
 # else

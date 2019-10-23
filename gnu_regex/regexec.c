@@ -227,7 +227,9 @@ regexec (preg, string, nmatch, pmatch, eflags)
 {
   reg_errcode_t err;
   int start, length;
+#ifdef _LIBC
   re_dfa_t *dfa = (re_dfa_t *) preg->buffer;
+#endif
 
   if (eflags & ~(REG_NOTBOL | REG_NOTEOL | REG_STARTEND))
     return REG_BADPAT;
@@ -418,7 +420,9 @@ re_search_stub (bufp, string, length, start, range, stop, regs, ret_len)
   regmatch_t *pmatch;
   int nregs, rval;
   int eflags = 0;
+#ifdef _LIBC
   re_dfa_t *dfa = (re_dfa_t *) bufp->buffer;
+#endif
 
   /* Check for out-of-range.  */
   if (BE (start < 0 || start > length, 0))
@@ -3037,7 +3041,9 @@ check_arrival_add_next_nodes (re_match_context_t *mctx, int str_idx,
   const re_dfa_t *const dfa = mctx->dfa;
   int result;
   int cur_idx;
+#ifdef RE_ENABLE_I18N
   reg_errcode_t err = REG_NOERROR;
+#endif
   re_node_set union_set;
   re_node_set_init_empty (&union_set);
   for (cur_idx = 0; cur_idx < cur_nodes->nelem; ++cur_idx)
