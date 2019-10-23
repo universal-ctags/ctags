@@ -5,6 +5,8 @@
 
 ----
 
+**Test facility**
+
 Exuberant ctags has a test facility. The test case were *Test*
 directory. So Here I call it *Test*.
 
@@ -19,6 +21,8 @@ language is added. You may want to add a sample source code for that
 language to *Test*. An older ctags version is unable to generate a
 tags file for that sample code, but the newer ctags version does. At
 this point a difference is found and *Test* reports failure.
+
+**Units facility**
 
 The units test facility(*Units*) I describe here takes a different
 approach. An input file and an expected output file are given by a
@@ -85,7 +89,7 @@ have its own directory under Units directory.
 	put multiple options to one line. Multiple options in
 	one line doesn't work.
 
-*Units/TEST/filter-\*.\** **optional**
+*Units/TEST/filter* **optional**
 
 	You can rearrange the output of ctags with this command
 	before comparing with *executed.tags*.
