@@ -4,7 +4,7 @@
 [![Coverity Scan Build Status](https://scan.coverity.com/projects/4355/badge.svg)](https://scan.coverity.com/projects/4355)
 [![Coverage Status](https://coveralls.io/repos/universal-ctags/ctags/badge.svg?branch=master&service=github)](https://coveralls.io/github/universal-ctags/ctags?branch=master)
 [![Build status](https://ci.appveyor.com/api/projects/status/6hk2p5lv6jsrd9o7/branch/master?svg=true)](https://ci.appveyor.com/project/universalctags/ctags/branch/master)
-[![RTD build status](https://readthedocs.org/projects/ctags/badge)](http://docs.ctags.io)
+[![RTD build status](https://readthedocs.org/projects/ctags/badge)](https://docs.ctags.io)
 [![CircleCI Build Status](https://circleci.com/gh/universal-ctags/ctags.svg?style=shield&circle-token=2e582261da84ebc6d21725b05381f410bc5de29d)](https://circleci.com/gh/universal-ctags)
 
 Universal Ctags generates an index (or tag) file of language objects found in source files for many popular programming languages. This index makes it easy for text editors and other tools to locate the indexed items. Universal Ctags improves on traditional ctags because of its multilanguage support, its ability for the user to define new languages searched by regular expressions, and its ability to generate emacs-style TAGS files.
@@ -67,7 +67,7 @@ rst2man is part of the python-docutils package on Ubuntu.
 You may be interested in how universal-ctags is different from
 exuberant-ctags. The critical and attractive changes are explained
 in docs/\*.rst. The preformatted version is available on line,
-http://docs.ctags.io/.
+https://docs.ctags.io/.
 
 The most significant incompatible changes:
 
