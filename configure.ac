@@ -198,6 +198,10 @@ AC_ARG_ENABLE([debugging],
 	[AS_HELP_STRING([--enable-debugging],
 		[enable debugging features])])
 
+AC_ARG_ENABLE([static],
+	[AS_HELP_STRING([--enable-static],
+		[enable static linking (mainly for MinGW)])])
+
 AC_ARG_PROGRAM
 
 # Process configuration options
@@ -449,6 +453,10 @@ AC_C_CONST
 AC_OBJEXT
 AC_EXEEXT
 
+if test "${enable_static}" = "yes"; then
+	LDFLAGS="$LDFLAGS -static"
+fi
+
 # Check for host type
 case "$host" in
   i?86-*-mingw* | x86_64-*-mingw*)
@@ -592,6 +600,12 @@ AC_CHECK_FUNCS(scandir,have_scandir=yes)
 have_dirent_h=no
 AC_CHECK_HEADERS(dirent.h,have_dirent_h=yes)
 
+dnl Dummy check for setting $PKG_CONFIG.
+PKG_CHECK_EXISTS([dummy])
+if test "${enable_static}" = "yes"; then
+	PKG_CONFIG="$PKG_CONFIG --static"
+fi
+
 AC_ARG_ENABLE([xml],
 	[AS_HELP_STRING([--disable-xml],
 		[disable xml support])])
@@ -608,6 +622,15 @@ AS_IF([test "x$enable_xml" != "xno"], [
 			           AC_MSG_ERROR([libxml2 not found])])])
 ])
 AM_CONDITIONAL(HAVE_LIBXML, test "x$have_libxml" = xyes)
+
+if test "${enable_static}" = "yes"; then
+	if test "${have_libxml}" = "yes"; then
+		if test "${host_mingw}" = "yes"; then
+			dnl -DLIBXML_STATIC needs to be added manually.
+			LIBXML_CFLAGS="$LIBXML_CFLAGS -DLIBXML_STATIC"
+		fi
+	fi
+fi
 
 AC_ARG_ENABLE([json],
 	[AS_HELP_STRING([--disable-json],
