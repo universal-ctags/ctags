@@ -60,9 +60,15 @@ make_am_with_git ()
     cd "${git_top}"
     for top_d in $(git ls-tree --name-only HEAD | sort); do
 	if [ -d "${top_d}" ]; then
-	    echo "DIST_SUBDIRS +=" "${top_d}"
-	    make_am_sub_with_git ${top_d} > ${top_d}/Makefile.am
-	    echo "AC_CONFIG_FILES([${git_top}/${top_d}/Makefile])" >> dist.m4
+	    if [ "${top_d##*.}" = "r" ]; then
+		echo "DIST_SUBDIRS +=" "${top_d}"
+		make_am_sub_with_git ${top_d} > ${top_d}/Makefile.am
+		echo "AC_CONFIG_FILES([${git_top}/${top_d}/Makefile])" >> dist.m4
+	    else
+		for sub_f in $(git ls-files ${top_d}); do
+		    echo "EXTRA_DIST   +=" "${sub_f}"
+		done
+	    fi
 	else
 	    echo "EXTRA_DIST   +=" "${top_d}"
 	fi
