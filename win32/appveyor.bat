@@ -155,7 +155,7 @@ bash -lc "for i in {1..3}; do pacman --noconfirm --noprogressbar -S --needed min
 
 bash -lc "./autogen.sh"
 :: Use static link.
-bash -lc "./configure --enable-iconv --disable-external-sort EXTRA_CFLAGS=-DLIBXML_STATIC LDFLAGS=-static LIBS='-lz -llzma -lws2_32' && make"
+bash -lc "./configure --disable-external-sort --enable-static && make"
 
 @echo off
 goto :eof
