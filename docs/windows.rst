@@ -106,7 +106,7 @@ If you want to build a single static-linked binary, you can use the following co
 .. code-block:: bash
 
         ./autogen.sh
-        ./configure --disable-external-sort EXTRA_CFLAGS=-DLIBXML_STATIC LDFLAGS=-static LIBS='-lz -llzma -lws2_32'
+        ./configure --disable-external-sort --enable-static
         make
 
 ``--disable-external-sort`` is a recommended option for Windows builds.
