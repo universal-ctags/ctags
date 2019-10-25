@@ -367,6 +367,20 @@ def run_filter(finput, foutput, base_filter, anon_filters):
                 l = p[0].sub(p[1], l)
             print(l, end='', file=fout)
 
+def guess_lang(cmdline, finput):
+    ret = subprocess.run(cmdline + ['--print-language', finput],
+            stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
+    return re.sub(r'^.*: ', r'',
+            ret.stdout.decode('utf-8').replace("\r\n", "\n").replace("\n", ''))
+
+def guess_lang_from_log(log):
+    with open(log, 'r', encoding='utf-8', errors='ignore') as f:
+        for l in f:
+            ret = re.match('OPENING.* as (.*) language .*file ', l)
+            if ret:
+                return ret.group(1)
+    return ''
+
 def run_tcase(finput, t, name, tclass, category, build_t, extra_inputs):
     global L_PASSED
     global L_FIXED
@@ -450,17 +464,7 @@ def run_tcase(finput, t, name, tclass, category, build_t, extra_inputs):
                 stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         if ret.returncode != 0:
             broken_args_ctags = True
-
-    #
-    # Filtered by LANGUAGES
-    #
-    start = time.time()
-    ret = subprocess.run(cmdline + ['--print-language', finput],
-            stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
-    #print('lang time: %f' % (time.time() - start))
-    guessed_lang = re.sub(r'^.*: ', r'',
-            ret.stdout.decode('utf-8').replace("\r\n", "\n").replace("\n", ''))
-    oshrink = oshrink_template % (guessed_lang.replace('/', '-'))
+    basecmdline = cmdline
 
     clean_tcase(o, obundles)
     os.makedirs(o, exist_ok=True)
@@ -468,31 +472,42 @@ def run_tcase(finput, t, name, tclass, category, build_t, extra_inputs):
         prepare_bundles(t, o, obundles)
 
 
-    msg = '%-59s ' % ('Testing ' + name + ' as ' + guessed_lang + output_lang_extras + output_label)
+    # helper function for building some strings based on guessed_lang
+    def build_strings(guessed_lang):
+        return ('%-59s ' % ('Testing ' + name + ' as ' + guessed_lang + output_lang_extras + output_label),
+                join_cmdline(basecmdline) + ' --language-force=' + guessed_lang + ' %s > /dev/null 2>&1',
+                oshrink_template % (guessed_lang.replace('/', '-')))
 
     (tmp, feat) = check_features(output_feature, ffeatures)
     if not tmp:
+        guessed_lang = guess_lang(basecmdline, finput)
+        msg = build_strings(guessed_lang)[0]
         L_SKIPPED_BY_FEATURES += [category + '/' + name]
         if feat.startswith('!'):
             run_result('skip', msg, oresult, 'unwanted feature "' + feat[1:] + '" is available')
         else:
             run_result('skip', msg, oresult, 'required feature "' + feat + '" is not available')
         return False
-    (tmp, lang) = check_languages(cmdline, flanguages)
+    (tmp, lang) = check_languages(basecmdline, flanguages)
     if not tmp:
+        guessed_lang = guess_lang(basecmdline, finput)
+        msg = build_strings(guessed_lang)[0]
         L_SKIPPED_BY_LANGUAGES += [category + '/' + name]
         run_result('skip', msg, oresult, 'required language parser "' + lang + '" is not available')
         return False
     if WITH_TIMEOUT == 0 and tclass == 'i':
+        guessed_lang = guess_lang(basecmdline, finput)
+        msg = build_strings(guessed_lang)[0]
         L_SKIPPED_BY_ILOOP += [category + '/' + name]
         run_result('skip', msg, oresult, 'may cause an infinite loop')
         return False
     if broken_args_ctags:
+        guessed_lang = guess_lang(basecmdline, finput)
+        msg = build_strings(guessed_lang)[0]
         L_BROKEN_ARGS_CTAGS += [category + '/' + name]
         run_result('error', msg, None, 'broken args.ctags?')
         return False
 
-    cmdline_template = join_cmdline(cmdline) + ' --language-force=' + guessed_lang + ' %s > /dev/null 2>&1'
     cmdline += output_tflag + [finput]
     if len(extra_inputs) > 0:
         cmdline += extra_inputs
@@ -512,6 +527,8 @@ def run_tcase(finput, t, name, tclass, category, build_t, extra_inputs):
                     timeout=timeout_value)
         run_record_cmdline(cmdline, ffilter, ocmdline, output_type)
     except subprocess.TimeoutExpired:
+        guessed_lang = guess_lang(basecmdline, finput)
+        (msg, cmdline_template, oshrink) = build_strings(guessed_lang)
         L_FAILED_BY_TIMEED_OUT += [category + '/' + name]
         run_result('error', msg, oresult, 'TIMED OUT')
         run_record_cmdline(cmdline, ffilter, ocmdline, output_type)
@@ -519,6 +536,9 @@ def run_tcase(finput, t, name, tclass, category, build_t, extra_inputs):
             run_shrink(cmdline_template, finput, oshrink, guessed_lang)
         return False
     #print('execute time: %f' % (time.time() - start))
+
+    guessed_lang = guess_lang_from_log(ostderr)
+    (msg, cmdline_template, oshrink) = build_strings(guessed_lang)
 
     if ret.returncode != 0:
         if WITH_VALGRIND and ret.returncode == _VALGRIND_EXIT and \
