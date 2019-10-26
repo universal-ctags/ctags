@@ -194,17 +194,21 @@ evaluate_current_token:
 					);
 
 				bool bIsGreaterThan = cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeGreaterThanSign);
+				CXXToken *pTokenBeforeGT = cxxTokenChainPreviousTokenNotOfType(g_cxx.pToken->pPrev,
+																			   CXXTokenTypeGreaterThanSign);
 
 				if(
 					(!bFollowedBySpace) && bIsGreaterThan &&
-					! (g_cxx.pToken->pPrev->pPrev
+					! (pTokenBeforeGT
 					   && (
-						   /* int >>: in this case ">>" cannot be an operator. */
-						   cxxTokenIsNonConstantKeyword(g_cxx.pToken->pPrev->pPrev)
+						   /* int >>: in this case ">>" cannot be an operator.
+							* '>>' can be repeated more. */
+						   cxxTokenIsNonConstantKeyword(pTokenBeforeGT)
 						   || (
-							   /* <typename T, ... T >>: in this case ">>" cannot be an operator. */
-							   cxxTokenTypeIs(g_cxx.pToken->pPrev->pPrev, CXXTokenTypeIdentifier)
-							   && stringListHas(pslTypeParams, vStringValue(g_cxx.pToken->pPrev->pPrev->pszWord))
+							   /* <typename T, ... T >>: in this case ">>" cannot be an operator.
+								* '>>' can be repeated more. */
+							   cxxTokenTypeIs(pTokenBeforeGT, CXXTokenTypeIdentifier)
+							   && stringListHas(pslTypeParams, vStringValue(pTokenBeforeGT->pszWord))
 							   )
 						   )
 						)
