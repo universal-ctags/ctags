@@ -339,8 +339,12 @@ evaluate_current_token:
 					}
 
 					if (cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeIdentifier))
+					{
 						stringListAdd(pslTypeParams, vStringNewCopy (g_cxx.pToken->pszWord));
-					else
+						CXX_DEBUG_PRINT("Add '%s' to type parameter list",
+										vStringValue (g_cxx.pToken->pszWord));
+
+					} else
 						cxxParserUngetCurrentToken();
 				}
 			break;
