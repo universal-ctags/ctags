@@ -617,8 +617,12 @@ int cxxTagCommit(void)
 	return iCorkQueueIndex;
 }
 
-void cxxTag(unsigned int uKind,CXXToken * pToken)
+int cxxTag(unsigned int uKind,CXXToken * pToken)
 {
+	int iCorkQueueIndex = CORK_NIL;
+
 	if(cxxTagBegin(uKind,pToken) != NULL)
-		cxxTagCommit();
+		iCorkQueueIndex = cxxTagCommit();
+
+	return iCorkQueueIndex;
 }

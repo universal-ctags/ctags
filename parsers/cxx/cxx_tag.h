@@ -176,7 +176,7 @@ void cxxTagSetCorkQueueField(
 int cxxTagCommit(void);
 
 // Same as cxxTagBegin() eventually followed by cxxTagCommit()
-void cxxTag(unsigned int uKind,CXXToken * pToken);
+int cxxTag(unsigned int uKind,CXXToken * pToken);
 
 typedef enum {
 	CR_MACRO_UNDEF,
