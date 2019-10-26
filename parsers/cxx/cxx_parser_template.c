@@ -188,9 +188,10 @@ evaluate_current_token:
 				}
 
 				CXX_DEBUG_PRINT(
-						"Got token '%s' of type 0x%02x",
+						"Got token '%s' of type 0x%02x (%s)",
 						vStringValue(g_cxx.pToken->pszWord),
-						g_cxx.pToken->eType
+						g_cxx.pToken->eType,
+						cxxDebugTypeDecode (g_cxx.pToken->eType)
 					);
 
 				bool bIsGreaterThan = cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeGreaterThanSign);
