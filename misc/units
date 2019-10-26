@@ -2256,6 +2256,9 @@ action_tmain ()
 	ERROR 1 "unexpected option argument for --colorized-output: ${COLORIZED_OUTPUT}"
     fi
 
+    check_availability awk
+    check_availability diff
+
     tmain_run ${tmain_dir} ${build_dir} ${UNITS}
     return $?
 }

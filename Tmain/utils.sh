@@ -112,19 +112,7 @@ filter_by_column_index()
 {
 	local index=$1
 
-	local line
-	local column
-	local tmp
-
-	while read line; do
-		tmp=0
-		for column in $line; do
-			if [ $tmp = $index ]; then
-				echo $column
-			fi
-			tmp=$(expr $tmp + 1)
-		done
-	done
+	awk '{print $'$(expr $index + 1)'}'
 }
 
 echo2()
