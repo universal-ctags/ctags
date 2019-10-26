@@ -533,7 +533,7 @@ static bool cxxParserParseEnumStructClassOrUnionFullDeclarationTrailer(
 	if(cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeOpeningBracket))
 	{
 		CXX_DEBUG_PRINT("Found opening bracket: possibly a function declaration?");
-		if(!cxxParserParseBlockHandleOpeningBracket())
+		if(!cxxParserParseBlockHandleOpeningBracket(NULL))
 		{
 			CXX_DEBUG_LEAVE_TEXT("Failed to handle the opening bracket");
 			return false;
@@ -920,7 +920,8 @@ bool cxxParserParseEnum(void)
 static bool cxxParserParseClassStructOrUnionInternal(
 		CXXKeyword eKeyword,
 		unsigned int uTagKind,
-		unsigned int uScopeType
+		unsigned int uScopeType,
+		intArray *piaTypeParamCorks
 	)
 {
 	CXX_DEBUG_ENTER();
@@ -1005,7 +1006,7 @@ static bool cxxParserParseClassStructOrUnionInternal(
 		// FIXME: Should we add the specialisation arguments somewhere?
 		//        Maybe as a separate field?
 
-		bRet = cxxParserParseTemplateAngleBracketsToSeparateChain(false);
+		bRet = cxxParserParseTemplateAngleBracketsToSeparateChain(NULL);
 
 		if(!bRet)
 		{
@@ -1322,7 +1323,18 @@ static bool cxxParserParseClassStructOrUnionInternal(
 	}
 
 	if(iCorkQueueIndex > CORK_NIL)
+	{
 		cxxParserMarkEndLineForTagInCorkQueue(iCorkQueueIndex);
+		if (piaTypeParamCorks)
+		{
+			for (int i = 0; i < intArrayCount (piaTypeParamCorks); i++)
+			{
+				int corkIndex = intArrayItem (piaTypeParamCorks, i);
+				tagEntryInfo * tag = getEntryInCorkQueue (corkIndex);
+				tag->extensionFields.scopeIndex = iCorkQueueIndex;
+			}
+		}
+	}
 
 	iPushedScopes++;
 	while(iPushedScopes > 0)
@@ -1348,7 +1360,8 @@ static bool cxxParserParseClassStructOrUnionInternal(
 bool cxxParserParseClassStructOrUnion(
 		CXXKeyword eKeyword,
 		unsigned int uTagKind,
-		unsigned int uScopeType
+		unsigned int uScopeType,
+		intArray *piaTypeParamCorks
 	)
 {
 	// Trick for "smart" handling of public/protected/private keywords in .h files parsed as C++.
@@ -1357,7 +1370,8 @@ bool cxxParserParseClassStructOrUnion(
 	// Enable public/protected/private keywords and save the previous state
 	bool bEnablePublicProtectedPrivateKeywords = cxxKeywordEnablePublicProtectedPrivate(true);
 
-	bool bRet = cxxParserParseClassStructOrUnionInternal(eKeyword,uTagKind,uScopeType);
+	bool bRet = cxxParserParseClassStructOrUnionInternal(eKeyword,uTagKind,uScopeType,
+														 piaTypeParamCorks);
 
 	// If parsing succeeded, we're in C++ mode and the keyword is "class" then
 	// we're fairly certain that the source code is *really* C++.

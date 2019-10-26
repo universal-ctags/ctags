@@ -22,12 +22,14 @@
 #include "debug.h"
 #include "keyword.h"
 #include "read.h"
+#include "entry.h"
+#include "trashbox.h"
 
 #include "cxx_subparser_internal.h"
 
 #include <string.h>
 
-bool cxxParserParseBlockHandleOpeningBracket(void)
+bool cxxParserParseBlockHandleOpeningBracket(intArray *piaTypeParamCorks)
 {
 	CXX_DEBUG_ENTER();
 
@@ -234,7 +236,18 @@ bool cxxParserParseBlockHandleOpeningBracket(void)
  	}
 
 	if(iCorkQueueIndex > CORK_NIL)
+	{
 		cxxParserSetEndLineForTagInCorkQueue(iCorkQueueIndex,uEndPosition);
+		if (piaTypeParamCorks)
+		{
+			for (int i = 0; i < intArrayCount (piaTypeParamCorks); i++)
+			{
+				int corkIndex = intArrayItem (piaTypeParamCorks, i);
+				tagEntryInfo * tag = getEntryInCorkQueue (corkIndex);
+				tag->extensionFields.scopeIndex = iCorkQueueIndex;
+			}
+		}
+	}
 
 	while(iScopes > 0)
 	{
@@ -246,7 +259,7 @@ bool cxxParserParseBlockHandleOpeningBracket(void)
 	return true;
 }
 
-static bool cxxParserParseBlockInternal(bool bExpectClosingBracket)
+static bool cxxParserParseBlockInternal(bool bExpectClosingBracket, TrashBox *pTrashBox)
 {
 	CXX_DEBUG_ENTER();
 
@@ -262,6 +275,7 @@ static bool cxxParserParseBlockInternal(bool bExpectClosingBracket)
 		cppBeginStatement();
 	}
 
+	intArray * piaTypeParamCorks = NULL;
 	for(;;)
 	{
 		if(!cxxParserParseNextToken())
@@ -357,7 +371,12 @@ process_token:
 					}
 					break;
 					case CXXKeywordTEMPLATE:
-						if(!cxxParserParseTemplatePrefix())
+
+						piaTypeParamCorks = intArrayNew ();
+						trashBoxPut (pTrashBox, piaTypeParamCorks,
+									 (TrashBoxDestroyItemProc)intArrayDelete);
+
+						if(!cxxParserParseTemplatePrefix(piaTypeParamCorks))
 						{
 							CXX_DEBUG_LEAVE_TEXT("Failed to parse template");
 							return false;
@@ -377,25 +396,31 @@ process_token:
 						}
 					break;
 					case CXXKeywordCLASS:
-						if(!cxxParserParseClassStructOrUnion(CXXKeywordCLASS,CXXTagCPPKindCLASS,CXXScopeTypeClass))
+						if(!cxxParserParseClassStructOrUnion(CXXKeywordCLASS,CXXTagCPPKindCLASS,CXXScopeTypeClass,
+															 piaTypeParamCorks))
 						{
 							CXX_DEBUG_LEAVE_TEXT("Failed to parse class/struct/union");
 							return false;
 						}
+						piaTypeParamCorks = NULL;
 					break;
 					case CXXKeywordSTRUCT:
-						if(!cxxParserParseClassStructOrUnion(CXXKeywordSTRUCT,CXXTagKindSTRUCT,CXXScopeTypeStruct))
+						if(!cxxParserParseClassStructOrUnion(CXXKeywordSTRUCT,CXXTagKindSTRUCT,CXXScopeTypeStruct,
+															 piaTypeParamCorks))
 						{
 							CXX_DEBUG_LEAVE_TEXT("Failed to parse class/struct/union");
 							return false;
 						}
+						piaTypeParamCorks = NULL;
 					break;
 					case CXXKeywordUNION:
-						if(!cxxParserParseClassStructOrUnion(CXXKeywordUNION,CXXTagKindUNION,CXXScopeTypeUnion))
+						if(!cxxParserParseClassStructOrUnion(CXXKeywordUNION,CXXTagKindUNION,CXXScopeTypeUnion,
+															 piaTypeParamCorks))
 						{
 							CXX_DEBUG_LEAVE_TEXT("Failed to parse class/struct/union");
 							return false;
 						}
+						piaTypeParamCorks = NULL;
 					break;
 					case CXXKeywordPUBLIC:
 					case CXXKeywordPROTECTED:
@@ -671,11 +696,12 @@ process_token:
 			}
 			break;
 			case CXXTokenTypeOpeningBracket:
-				if(!cxxParserParseBlockHandleOpeningBracket())
+				if(!cxxParserParseBlockHandleOpeningBracket(piaTypeParamCorks))
 				{
 					CXX_DEBUG_LEAVE_TEXT("Failed to handle opening bracket");
 					return false;
 				}
+				piaTypeParamCorks = NULL;
 			break;
 			case CXXTokenTypeClosingBracket:
 				// scope finished
@@ -752,7 +778,9 @@ bool cxxParserParseBlock(bool bExpectClosingBracket)
 	cxxSubparserNotifyEnterBlock ();
 
 	cppPushExternalParserBlock();
-	bool bRet = cxxParserParseBlockInternal(bExpectClosingBracket);
+	TrashBox *pTrashBox = trashBoxNew ();
+	bool bRet = cxxParserParseBlockInternal(bExpectClosingBracket, pTrashBox);
+	trashBoxDelete(pTrashBox);
 	cppPopExternalParserBlock();
 
 	cxxSubparserNotifyLeaveBlock ();

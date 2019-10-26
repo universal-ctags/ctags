@@ -10,6 +10,7 @@
 */
 
 #include "general.h"
+#include "numarray.h"
 
 #include "parse.h"
 
@@ -42,7 +43,7 @@ bool cxxParserHandleLambda(CXXToken * pParenthesis);
 
 // cxx_parser_block.c
 bool cxxParserParseBlock(bool bExpectClosingBracket);
-bool cxxParserParseBlockHandleOpeningBracket(void);
+bool cxxParserParseBlockHandleOpeningBracket(intArray *piaTypeParamCorks);
 
 enum CXXExtractVariableDeclarationsFlags
 {
@@ -215,7 +216,8 @@ bool cxxParserParseEnum(void);
 bool cxxParserParseClassStructOrUnion(
 		CXXKeyword eKeyword,
 		unsigned int uTagKind,
-		unsigned int uScopeType
+		unsigned int uScopeType,
+		intArray *piaTypeParamCorks
 	);
 bool cxxParserParseAndCondenseCurrentSubchain(
 		unsigned int uInitialSubchainMarkerTypes,
@@ -225,8 +227,8 @@ bool cxxParserParseAndCondenseCurrentSubchain(
 bool cxxParserParseUpToOneOf(unsigned int uTokenTypes,
 							 bool bCanReduceInnerElements);
 bool cxxParserParseIfForWhileSwitchCatchParenthesis(void);
-bool cxxParserParseTemplatePrefix(void);
-bool cxxParserParseTemplateAngleBracketsToSeparateChain(bool bCaptureTypeParams);
+bool cxxParserParseTemplatePrefix(intArray *piaTypeParamCorks);
+bool cxxParserParseTemplateAngleBracketsToSeparateChain(intArray *piaTypeParamCorks);
 bool cxxParserParseUsingClause(void);
 bool cxxParserParseAccessSpecifier(void);
 void cxxParserAnalyzeOtherStatement(void);
