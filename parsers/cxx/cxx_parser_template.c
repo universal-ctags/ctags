@@ -44,7 +44,7 @@ typedef enum _CXXParserParseTemplateAngleBracketsResult
 // Here we are pointing at the initial <.
 //
 static CXXParserParseTemplateAngleBracketsResult
-cxxParserParseTemplateAngleBracketsInternal(stringList *pslTypeParams)
+cxxParserParseTemplateAngleBracketsInternal(stringList *pslTypeParams, bool bCaptureTypeParams)
 {
 	CXX_DEBUG_ENTER();
 
@@ -300,7 +300,7 @@ evaluate_current_token:
 						return CXXParserParseTemplateAngleBracketsFailed;
 					}
 
-					switch(cxxParserParseTemplateAngleBracketsInternal(pslTypeParams))
+					switch(cxxParserParseTemplateAngleBracketsInternal(pslTypeParams, bCaptureTypeParams))
 					{
 						case CXXParserParseTemplateAngleBracketsFailed:
 							CXX_DEBUG_LEAVE_TEXT("Nested template parsing failed");
@@ -343,9 +343,11 @@ evaluate_current_token:
 					if (cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeIdentifier))
 					{
 						stringListAdd(pslTypeParams, vStringNewCopy (g_cxx.pToken->pszWord));
-						CXX_DEBUG_PRINT("Add '%s' to type parameter list",
-										vStringValue (g_cxx.pToken->pszWord));
-
+						CXX_DEBUG_PRINT("Add '%s' to type parameter list as %d",
+										vStringValue (g_cxx.pToken->pszWord),
+										stringListCount (pslTypeParams));
+						if (bCaptureTypeParams)
+							cxxTag (CXXTagKindTYPEPARAM, g_cxx.pToken);
 					} else
 						cxxParserUngetCurrentToken();
 				}
@@ -392,14 +394,14 @@ evaluate_current_token:
 // Parses the <parameters> part of a template specification.
 // Here we are pointing at the initial <.
 //
-static bool cxxParserParseTemplateAngleBrackets(void)
+static bool cxxParserParseTemplateAngleBrackets(bool bCaptureTypeParams)
 {
 	CXX_DEBUG_ENTER();
 
 	CXXParserParseTemplateAngleBracketsResult r;
 	stringList *typeParams = stringListNew ();
 
-	r = cxxParserParseTemplateAngleBracketsInternal(typeParams);
+	r = cxxParserParseTemplateAngleBracketsInternal(typeParams, bCaptureTypeParams);
 	stringListDelete (typeParams);
 
 	switch(r)
@@ -424,7 +426,7 @@ static bool cxxParserParseTemplateAngleBrackets(void)
 //
 // Parses the template angle brackets and puts it in g_cxx.pTemplateTokenChain.
 //
-bool cxxParserParseTemplateAngleBracketsToSeparateChain(void)
+bool cxxParserParseTemplateAngleBracketsToSeparateChain(bool bCaptureTypeParams)
 {
 	CXX_DEBUG_ENTER();
 
@@ -439,7 +441,7 @@ bool cxxParserParseTemplateAngleBracketsToSeparateChain(void)
 	g_cxx.pTokenChain = cxxTokenChainCreate();
 	cxxTokenChainAppend(g_cxx.pTokenChain,cxxTokenChainTakeLast(pSave));
 
-	if(!cxxParserParseTemplateAngleBrackets())
+	if(!cxxParserParseTemplateAngleBrackets(bCaptureTypeParams))
 	{
 		CXX_DEBUG_LEAVE_TEXT("Failed to parse angle brackets");
 		cxxTokenChainDestroy(pSave);
@@ -490,7 +492,7 @@ bool cxxParserParseTemplatePrefix(void)
 		return true; // tolerate syntax error
 	}
 
-	bool bRet = cxxParserParseTemplateAngleBracketsToSeparateChain();
+	bool bRet = cxxParserParseTemplateAngleBracketsToSeparateChain(true);
 
 	CXX_DEBUG_LEAVE();
 	return bRet;

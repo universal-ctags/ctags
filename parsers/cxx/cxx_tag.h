@@ -46,7 +46,8 @@ enum CXXTagCPPKind
 	CXXTagCPPKindNAMESPACE,
 	CXXTagCPPKindALIAS,
 	CXXTagCPPKindNAME,
-	CXXTagCPPKindUSING
+	CXXTagCPPKindUSING,
+	CXXTagKindTYPEPARAM,
 };
 
 // The fields common to all (sub)languages this parser supports.

@@ -1005,7 +1005,7 @@ static bool cxxParserParseClassStructOrUnionInternal(
 		// FIXME: Should we add the specialisation arguments somewhere?
 		//        Maybe as a separate field?
 
-		bRet = cxxParserParseTemplateAngleBracketsToSeparateChain();
+		bRet = cxxParserParseTemplateAngleBracketsToSeparateChain(false);
 
 		if(!bRet)
 		{

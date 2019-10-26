@@ -1,3 +1,6 @@
 g	input.cpp	/^int g() {$/;"	f	typeref:typename:int
+Accessor	input.cpp	/^template< typename Accessor, typename bEnable = void >$/;"	Z
+bEnable	input.cpp	/^template< typename Accessor, typename bEnable = void >$/;"	Z
+Accessor	input.cpp	/^template< typename Accessor >$/;"	Z
 IntroduceBitDef	input.cpp	/^struct IntroduceBitDef< Accessor, typename$/;"	s	file:
 f	input.cpp	/^ int f() { }$/;"	f	struct:IntroduceBitDef	typeref:typename:int	file:

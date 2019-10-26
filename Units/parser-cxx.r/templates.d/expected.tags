@@ -1,9 +1,12 @@
+T	input.cpp	/^template <typename T> int $/;"	Z
 zero	input.cpp	/^zero (const T &v1, const T &v2)$/;"	f	typeref:typename:int	template:<typename T>
 v1	input.cpp	/^zero (const T &v1, const T &v2)$/;"	z	function:zero	typeref:typename:const T &	file:
 v2	input.cpp	/^zero (const T &v1, const T &v2)$/;"	z	function:zero	typeref:typename:const T &	file:
+T	input.cpp	/^template <typename T> inline T $/;"	Z
 min	input.cpp	/^min(const T&v1, const T&v2)$/;"	f	typeref:typename:T	template:<typename T>
 v1	input.cpp	/^min(const T&v1, const T&v2)$/;"	z	function:min	typeref:typename:const T &	file:
 v2	input.cpp	/^min(const T&v1, const T&v2)$/;"	z	function:min	typeref:typename:const T &	file:
+Type	input.cpp	/^template <class Type> $/;"	Z
 Item	input.cpp	/^class Item$/;"	c	file:	template:<class Type>
 Item	input.cpp	/^  Item(const Type &t) : item (t), next (0) { }$/;"	f	class:Item	file:
 Item::Item	input.cpp	/^  Item(const Type &t) : item (t), next (0) { }$/;"	f	class:Item	file:

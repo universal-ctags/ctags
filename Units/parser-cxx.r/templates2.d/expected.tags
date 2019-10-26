@@ -1,5 +1,10 @@
+Container	input.cpp	/^template<template<class...> class Container, class Elem>$/;"	Z
+Elem	input.cpp	/^template<template<class...> class Container, class Elem>$/;"	Z
 foo1	input.cpp	/^auto foo1(const Container<Elem> & p_container)$/;"	f	typeref:typename:auto	template:<template<class...> class Container,class Elem>
 p_container	input.cpp	/^auto foo1(const Container<Elem> & p_container)$/;"	z	function:foo1	typeref:typename:const Container<Elem> &	file:
+Container	input.cpp	/^template<template<class...> class Container, class Key, class Elem>$/;"	Z
+Key	input.cpp	/^template<template<class...> class Container, class Key, class Elem>$/;"	Z
+Elem	input.cpp	/^template<template<class...> class Container, class Key, class Elem>$/;"	Z
 foo2	input.cpp	/^auto foo2(const Container<Key,Elem> & p_container)$/;"	f	typeref:typename:auto	template:<template<class...> class Container,class Key,class Elem>
 p_container	input.cpp	/^auto foo2(const Container<Key,Elem> & p_container)$/;"	z	function:foo2	typeref:typename:const Container<Key,Elem> &	file:
 bar	input.cpp	/^void bar()$/;"	f	typeref:typename:void

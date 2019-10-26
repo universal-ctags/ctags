@@ -1,0 +1,10 @@
+T	input.cpp	/^template <typename T, typename S>$/;"	Z
+S	input.cpp	/^template <typename T, typename S>$/;"	Z
+f	input.cpp	/^S f (T a, T b)$/;"	f	typeref:typename:S
+f	input.cpp	/^int f (int a, int b)$/;"	f	typeref:typename:int
+T	input.cpp	/^template <typename T>$/;"	Z
+klass	input.cpp	/^class klass$/;"	c	file:
+v	input.cpp	/^  T v;$/;"	m	class:klass	typeref:typename:T	file:
+g	input.cpp	/^  T g (T a)$/;"	f	class:klass	typeref:typename:T	file:
+T	input.cpp	/^template <class T>$/;"	Z
+c	input.cpp	/^using c = klass<T>;$/;"	t	typeref:typename:klass<T>	file:
