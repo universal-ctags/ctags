@@ -328,7 +328,9 @@ evaluate_current_token:
 											 CXXKeywordTYPENAME|CXXKeywordCLASS)
 						 &&
 						 g_cxx.pToken->pPrev &&
+						 // CXXTokenTypeGreaterThanSign is for T in "template<template<class...> class T,"
 						 cxxTokenTypeIsOneOf(g_cxx.pToken->pPrev,
+											 CXXTokenTypeGreaterThanSign|
 											 CXXTokenTypeSmallerThanSign|CXXTokenTypeComma))
 				{
 					/* < typename X , class Y> */
