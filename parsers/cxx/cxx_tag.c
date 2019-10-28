@@ -75,6 +75,7 @@ static kindDefinition g_aCXXCPPKinds [] = {
 	{ false, 'N', "name",       "names imported via using scope::symbol" },
 	{ false, 'U', "using",      "using namespace statements",
 			.referenceOnly = true },
+	{ false, 'Z', "ttparam",    "template type parameters" },
 };
 
 static kindDefinition g_aCXXCUDAKinds [] = {
@@ -527,6 +528,24 @@ void cxxTagSetCorkQueueField(
 	CXX_DEBUG_ASSERT(g_cxx.pFieldOptions[uField].enabled,"The field must be enabled!");
 
 	attachParserFieldToCorkEntry(iIndex,g_cxx.pFieldOptions[uField].ftype,szValue);
+}
+
+void cxxTagHandleTemplateField()
+{
+	CXX_DEBUG_ASSERT(
+		g_cxx.pTemplateTokenChain &&
+		(g_cxx.pTemplateTokenChain->iCount > 0) &&
+		cxxParserCurrentLanguageIsCPP() &&
+		cxxTagFieldEnabled(CXXTagCPPFieldTemplate),
+		"Template existence must be checked before calling this function"
+	);
+
+	cxxTokenChainNormalizeTypeNameSpacing(g_cxx.pTemplateTokenChain);
+	cxxTokenChainCondense(g_cxx.pTemplateTokenChain,0);
+	cxxTagSetField(
+			CXXTagCPPFieldTemplate,
+			vStringValue(cxxTokenChainFirst(g_cxx.pTemplateTokenChain)->pszWord)
+		);
 }
 
 int cxxTagCommit(void)

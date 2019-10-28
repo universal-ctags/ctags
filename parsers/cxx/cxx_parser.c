@@ -1242,6 +1242,10 @@ static bool cxxParserParseClassStructOrUnionInternal(
 
 	int iCorkQueueIndex = CORK_NIL;
 
+	bool bGotTemplate = g_cxx.pTemplateTokenChain &&
+			(g_cxx.pTemplateTokenChain->iCount > 0) &&
+			cxxParserCurrentLanguageIsCPP();
+
 	if(tag)
 	{
 		if (bAnonymous)
@@ -1287,21 +1291,15 @@ static bool cxxParserParseClassStructOrUnionInternal(
 		}
 
 		if(
-			g_cxx.pTemplateTokenChain && (g_cxx.pTemplateTokenChain->iCount > 0) &&
-			cxxTagFieldEnabled(CXXTagCPPFieldTemplate)
-		)
-		{
-			cxxTokenChainNormalizeTypeNameSpacing(g_cxx.pTemplateTokenChain);
-			cxxTokenChainCondense(g_cxx.pTemplateTokenChain,0);
-			cxxTagSetField(
-					CXXTagCPPFieldTemplate,
-					vStringValue(cxxTokenChainFirst(g_cxx.pTemplateTokenChain)->pszWord)
-				);
-		}
+				bGotTemplate &&
+				cxxTagFieldEnabled(CXXTagCPPFieldTemplate)
+			)
+			cxxTagHandleTemplateField();
 
 		tag->isFileScope = !isInputHeaderFile();
 
 		iCorkQueueIndex = cxxTagCommit();
+
 	}
 
 	cxxScopePush(
@@ -1310,6 +1308,12 @@ static bool cxxParserParseClassStructOrUnionInternal(
 			(uTagKind == CXXTagCPPKindCLASS) ?
 				CXXScopeAccessPrivate : CXXScopeAccessPublic
 		);
+
+	if(
+			bGotTemplate &&
+			cxxTagKindEnabled(CXXTagCPPKindTYPETEMPLATEPARAM)
+		)
+		cxxParserEmitTemplateTypeParameterTags();
 
 	vString * pScopeName = cxxScopeGetFullNameAsString();
 
@@ -1961,6 +1965,8 @@ void cxxParserCleanup(langType language CTAGS_ATTR_UNUSED,bool initialized CTAGS
 		cxxTokenChainDestroy(g_cxx.pTokenChain);
 	if(g_cxx.pTemplateTokenChain)
 		cxxTokenChainDestroy(g_cxx.pTemplateTokenChain);
+	if(g_cxx.pTemplateTypeParameters)
+		ptrArrayDelete(g_cxx.pTemplateTypeParameters);
 
 	cxxScopeDone();
 

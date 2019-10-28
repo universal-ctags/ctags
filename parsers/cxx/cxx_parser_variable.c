@@ -721,20 +721,23 @@ bool cxxParserExtractVariableDeclarations(CXXTokenChain * pChain,unsigned int uF
 				pszProperties = cxxTagSetProperties(uProperties);
 			}
 
+			bool bGotTemplate = g_cxx.pTemplateTokenChain &&
+					(g_cxx.pTemplateTokenChain->iCount > 0) &&
+					cxxParserCurrentLanguageIsCPP();
+
 			if(
-				g_cxx.pTemplateTokenChain && (g_cxx.pTemplateTokenChain->iCount > 0) &&
-				cxxTagFieldEnabled(CXXTagCPPFieldTemplate)
+					bGotTemplate &&
+					cxxTagFieldEnabled(CXXTagCPPFieldTemplate)
 				)
-			{
-				cxxTokenChainNormalizeTypeNameSpacing(g_cxx.pTemplateTokenChain);
-				cxxTokenChainCondense(g_cxx.pTemplateTokenChain,0);
-				cxxTagSetField(
-					CXXTagCPPFieldTemplate,
-					vStringValue(cxxTokenChainFirst(g_cxx.pTemplateTokenChain)->pszWord)
-					);
-			}
+				cxxTagHandleTemplateField();
 
 			cxxTagCommit();
+
+			if(
+					bGotTemplate &&
+					cxxTagKindEnabled(CXXTagCPPKindTYPETEMPLATEPARAM)
+				)
+				cxxParserEmitTemplateTypeParameterTags();
 
 			if(pTypeToken)
 				cxxTokenDestroy(pTypeToken);
