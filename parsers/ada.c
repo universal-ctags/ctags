@@ -1879,7 +1879,7 @@ static adaTokenInfo *adaParse(adaParseMode mode, adaTokenInfo *parent)
            * found, if we didn't just fall through */
           if((pos + i) < lineLen)
           {
-            token = newAdaToken(&line[pos], i, ADA_KIND_LABEL, false, parent);
+            newAdaToken(&line[pos], i, ADA_KIND_LABEL, false, parent);
             skipPast(">>");
             token = NULL;
           }

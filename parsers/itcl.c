@@ -237,7 +237,6 @@ static int parseClass (tclSubparser *s CTAGS_ATTR_UNUSED, int parentIndex,
 			}
 			else if (token->type == '}')
 			{
-				protection = KEYWORD_NONE;
 				break;
 			}
 			else

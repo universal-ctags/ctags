@@ -287,7 +287,7 @@ static void findNsisTags (void)
 		else if (lineStartingWith (cp, "sectiongroup", false))
 		{
 			cp += 12;
-			cp = parseSection (cp, name, K_SECTION_GROUP, CORK_NIL, &sectionGroupIndex);
+			parseSection (cp, name, K_SECTION_GROUP, CORK_NIL, &sectionGroupIndex);
 		}
 		else if (lineStartingWith (cp, "sectiongroupend", true))
 		{
@@ -298,19 +298,19 @@ static void findNsisTags (void)
 		else if (lineStartingWith (cp, "section", false))
 		{
 			cp += 7;
-			cp = parseSection (cp, name, K_SECTION, sectionGroupIndex, NULL);
+			parseSection (cp, name, K_SECTION, sectionGroupIndex, NULL);
 		}
 		/* LangString */
 		else if (lineStartingWith (cp, "langstring", false))
 		{
 			cp += 10;
-			cp = parseLangString (cp, name);
+			parseLangString (cp, name);
 		}
 		/* LicenseLangString */
 		else if (lineStartingWith (cp, "licenselangstring", false))
 		{
 			cp += 17;
-			cp = parseLangString (cp, name);
+			parseLangString (cp, name);
 		}
 		/* definitions */
 		else if (lineStartingWith (cp, "!define", false))

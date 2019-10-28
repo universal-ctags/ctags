@@ -107,7 +107,6 @@ static void plistFindTagsUnderKey (xmlNode *node,
 	int c;
 
 	queue = stringListNew ();
-	current = node;
 	for (current = node; current; current = current->parent)
 	{
 		if (isCompoundElement (current)
