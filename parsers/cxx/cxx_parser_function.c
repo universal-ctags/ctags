@@ -1692,9 +1692,9 @@ int cxxParserEmitFunctionTags(
 
 	if(
 			bGotTemplate &&
-			cxxTagKindEnabled(CXXTagCPPKindTYPETEMPLATEPARAM)
+			cxxTagKindEnabled(CXXTagCPPKindTEMPLATEPARAM)
 		)
-		cxxParserEmitTemplateTypeParameterTags();
+		cxxParserEmitTemplateParameterTags();
 
 	CXX_DEBUG_LEAVE();
 	return iScopesPushed;

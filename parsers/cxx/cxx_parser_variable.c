@@ -735,9 +735,9 @@ bool cxxParserExtractVariableDeclarations(CXXTokenChain * pChain,unsigned int uF
 
 			if(
 					bGotTemplate &&
-					cxxTagKindEnabled(CXXTagCPPKindTYPETEMPLATEPARAM)
+					cxxTagKindEnabled(CXXTagCPPKindTEMPLATEPARAM)
 				)
-				cxxParserEmitTemplateTypeParameterTags();
+				cxxParserEmitTemplateParameterTags();
 
 			if(pTypeToken)
 				cxxTokenDestroy(pTypeToken);

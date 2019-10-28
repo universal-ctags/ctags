@@ -75,7 +75,7 @@ static kindDefinition g_aCXXCPPKinds [] = {
 	{ false, 'N', "name",       "names imported via using scope::symbol" },
 	{ false, 'U', "using",      "using namespace statements",
 			.referenceOnly = true },
-	{ false, 'Z', "ttparam",    "template type parameters" },
+	{ false, 'Z', "tparam",     "template parameters" },
 };
 
 static kindDefinition g_aCXXCUDAKinds [] = {

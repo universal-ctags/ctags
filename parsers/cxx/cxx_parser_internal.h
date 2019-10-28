@@ -228,7 +228,7 @@ bool cxxParserParseUpToOneOf(unsigned int uTokenTypes,
 bool cxxParserParseIfForWhileSwitchCatchParenthesis(void);
 bool cxxParserParseTemplatePrefix(void);
 bool cxxParserParseTemplateAngleBracketsToSeparateChain(void);
-void cxxParserEmitTemplateTypeParameterTags(void);
+void cxxParserEmitTemplateParameterTags(void);
 bool cxxParserParseUsingClause(void);
 bool cxxParserParseAccessSpecifier(void);
 void cxxParserAnalyzeOtherStatement(void);
@@ -313,7 +313,7 @@ typedef struct _CXXParserState
 	// The validity of this array is tied to the validity of
 	// pTemplateTokenChain above. If there is no pTemplateTokenChain
 	// then this array is simply invalid (even if not empty)
-	ptrArray * pTemplateTypeParameters;
+	ptrArray * pTemplateParameters;
 
 	// The last token we have extracted. This is always pushed to
 	// the token chain tail (which will take care of deletion)

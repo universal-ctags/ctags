@@ -1311,9 +1311,9 @@ static bool cxxParserParseClassStructOrUnionInternal(
 
 	if(
 			bGotTemplate &&
-			cxxTagKindEnabled(CXXTagCPPKindTYPETEMPLATEPARAM)
+			cxxTagKindEnabled(CXXTagCPPKindTEMPLATEPARAM)
 		)
-		cxxParserEmitTemplateTypeParameterTags();
+		cxxParserEmitTemplateParameterTags();
 
 	vString * pScopeName = cxxScopeGetFullNameAsString();
 
@@ -1965,8 +1965,8 @@ void cxxParserCleanup(langType language CTAGS_ATTR_UNUSED,bool initialized CTAGS
 		cxxTokenChainDestroy(g_cxx.pTokenChain);
 	if(g_cxx.pTemplateTokenChain)
 		cxxTokenChainDestroy(g_cxx.pTemplateTokenChain);
-	if(g_cxx.pTemplateTypeParameters)
-		ptrArrayDelete(g_cxx.pTemplateTypeParameters);
+	if(g_cxx.pTemplateParameters)
+		ptrArrayDelete(g_cxx.pTemplateParameters);
 
 	cxxScopeDone();
 

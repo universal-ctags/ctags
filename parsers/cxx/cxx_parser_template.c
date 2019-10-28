@@ -47,7 +47,7 @@ static bool cxxTokenCompareWord(const void *pToken,void * szWord)
 	return strcmp(vStringValue(t->pszWord),w) == 0;
 }
 
-static bool cxxTokenIsPresentInTemplateTypeParameters(CXXToken * t)
+static bool cxxTokenIsPresentInTemplateParameters(CXXToken * t)
 {
 	CXX_DEBUG_ASSERT(
 			cxxTokenTypeIsOneOf(t,CXXTokenTypeIdentifier | CXXTokenTypeKeyword),
@@ -55,7 +55,7 @@ static bool cxxTokenIsPresentInTemplateTypeParameters(CXXToken * t)
 		);
 
 	return ptrArrayHasTest(
-			g_cxx.pTemplateTypeParameters,
+			g_cxx.pTemplateParameters,
 			cxxTokenCompareWord,
 			vStringValue(t->pszWord)
 		);
@@ -177,7 +177,7 @@ cxxParserParseTemplateAngleBracketsInternal(bool bCaptureTypeParameters)
 					// ... << class
 					(!cxxTokenIsNonConstantKeyword(g_cxx.pToken)) &&
 					// T <<
-					(!cxxTokenIsPresentInTemplateTypeParameters(pFirstSmallerThan->pPrev))
+					(!cxxTokenIsPresentInTemplateParameters(pFirstSmallerThan->pPrev))
 				)
 				{
 					// assume it's an operator
@@ -199,7 +199,7 @@ cxxParserParseTemplateAngleBracketsInternal(bool bCaptureTypeParameters)
 						// ... typeParam < 1 ...
 						(
 							cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeNumber) &&
-							cxxTokenIsPresentInTemplateTypeParameters(pFirstSmallerThan->pPrev)
+							cxxTokenIsPresentInTemplateParameters(pFirstSmallerThan->pPrev)
 						)
 					)
 				)
@@ -306,7 +306,7 @@ cxxParserParseTemplateAngleBracketsInternal(bool bCaptureTypeParameters)
 					// ... >> class
 					(!cxxTokenIsNonConstantKeyword(g_cxx.pToken)) &&
 					// T >>
-					(!cxxTokenIsPresentInTemplateTypeParameters(pFirstGreaterThan->pPrev))
+					(!cxxTokenIsPresentInTemplateParameters(pFirstGreaterThan->pPrev))
 				)
 				{
 					// assume it's an operator
@@ -501,11 +501,11 @@ cxxParserParseTemplateAngleBracketsInternal(bool bCaptureTypeParameters)
 					}
 
 					CXX_DEBUG_PRINT(
-							"Adding '%s' to template type parameter list",
+							"Adding '%s' to template parameter list",
 							vStringValue(pParam->pszWord)
 						);
 
-					ptrArrayAdd(g_cxx.pTemplateTypeParameters,pParam);
+					ptrArrayAdd(g_cxx.pTemplateParameters,pParam);
 
 					if(cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeGreaterThanSign))
 						cxxParserUngetCurrentToken();
@@ -605,10 +605,10 @@ bool cxxParserParseTemplateAngleBracketsToSeparateChain(void)
 	//       Not for template<template<>> as it is handled separately
 	//       But maybe for nasty things like template<...(template<>)...>?
 
-	if(g_cxx.pTemplateTypeParameters)
-		ptrArrayClear(g_cxx.pTemplateTypeParameters);
+	if(g_cxx.pTemplateParameters)
+		ptrArrayClear(g_cxx.pTemplateParameters);
 	else
-		g_cxx.pTemplateTypeParameters = ptrArrayNew(NULL);
+		g_cxx.pTemplateParameters = ptrArrayNew(NULL);
 
 	if(!cxxParserParseTemplateAngleBrackets())
 	{
@@ -667,27 +667,27 @@ bool cxxParserParseTemplatePrefix(void)
 	return bRet;
 }
 
-void cxxParserEmitTemplateTypeParameterTags(void)
+void cxxParserEmitTemplateParameterTags(void)
 {
 	CXX_DEBUG_ASSERT(
 			g_cxx.pTemplateTokenChain &&
 			(g_cxx.pTemplateTokenChain->iCount > 0) &&
 			cxxParserCurrentLanguageIsCPP() &&
-			g_cxx.pTemplateTypeParameters && // this should be ensured by chain existence
-			cxxTagKindEnabled(CXXTagCPPKindTYPETEMPLATEPARAM),
+			g_cxx.pTemplateParameters && // this should be ensured by chain existence
+			cxxTagKindEnabled(CXXTagCPPKindTEMPLATEPARAM),
 			"Template existence must be checked before calling this function"
 		);
 
-	int c = ptrArrayCount(g_cxx.pTemplateTypeParameters);
+	int c = ptrArrayCount(g_cxx.pTemplateParameters);
 
 	for(int i=0;i<c;i++)
 	{
-		CXXToken * t = (CXXToken *)ptrArrayItem(g_cxx.pTemplateTypeParameters,i);
+		CXXToken * t = (CXXToken *)ptrArrayItem(g_cxx.pTemplateParameters,i);
 
-		CXX_DEBUG_PRINT("Emitting template type param tag for '%s'",vStringValue(t->pszWord));
+		CXX_DEBUG_PRINT("Emitting template param tag for '%s'",vStringValue(t->pszWord));
 
 		tagEntryInfo * tag = cxxTagBegin(
-				CXXTagCPPKindTYPETEMPLATEPARAM,
+				CXXTagCPPKindTEMPLATEPARAM,
 				t
 			);
 
