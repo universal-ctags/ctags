@@ -635,6 +635,15 @@ bool cxxParserExtractVariableDeclarations(CXXTokenChain * pChain,unsigned int uF
 			}
 		}
 
+		CXX_DEBUG_ASSERT(t != pIdentifier,"This should not happen");
+
+		// remove the identifier
+		cxxTokenChainTakeRecursive(pChain,pIdentifier);
+
+		bool bGotTemplate = g_cxx.pTemplateTokenChain &&
+				(g_cxx.pTemplateTokenChain->iCount > 0) &&
+				cxxParserCurrentLanguageIsCPP();
+
 		bool bKnRStyleParameters =
 				(uFlags & CXXExtractVariableDeclarationsKnRStyleParameters);
 
@@ -648,13 +657,9 @@ bool cxxParserExtractVariableDeclarations(CXXTokenChain * pChain,unsigned int uF
 
 		if(tag)
 		{
-			CXX_DEBUG_ASSERT(t != pIdentifier,"This should not happen");
-			// remove the identifier
-			cxxTokenChainTakeRecursive(pChain,pIdentifier);
-
 			// Fix square parentheses: if they contain something that is not a numeric
 			// constant then empty them up
-			CXXToken * pPartOfType = t->pPrev;
+			CXXToken * pPartOfType = t->pPrev; // identifier has been removed
 			CXX_DEBUG_ASSERT(pPartOfType,"There should be a part of type name here");
 
 			while(pPartOfType && cxxTokenTypeIs(pPartOfType,CXXTokenTypeSquareParenthesisChain))
@@ -721,10 +726,6 @@ bool cxxParserExtractVariableDeclarations(CXXTokenChain * pChain,unsigned int uF
 				pszProperties = cxxTagSetProperties(uProperties);
 			}
 
-			bool bGotTemplate = g_cxx.pTemplateTokenChain &&
-					(g_cxx.pTemplateTokenChain->iCount > 0) &&
-					cxxParserCurrentLanguageIsCPP();
-
 			if(
 					bGotTemplate &&
 					cxxTagFieldEnabled(CXXTagCPPFieldTemplate)
@@ -733,16 +734,21 @@ bool cxxParserExtractVariableDeclarations(CXXTokenChain * pChain,unsigned int uF
 
 			cxxTagCommit();
 
-			if(
-					bGotTemplate &&
-					cxxTagKindEnabled(CXXTagCPPKindTEMPLATEPARAM)
-				)
-				cxxParserEmitTemplateParameterTags();
-
 			if(pTypeToken)
 				cxxTokenDestroy(pTypeToken);
 			if(pszProperties)
 				vStringDelete(pszProperties);
+		}
+
+		if(
+				bGotTemplate &&
+				cxxTagKindEnabled(CXXTagCPPKindTEMPLATEPARAM)
+			)
+		{
+			cxxScopePush(pIdentifier,CXXScopeTypeVariable,CXXScopeAccessPublic);
+			cxxParserEmitTemplateParameterTags();
+			cxxScopePop();
+		} else {
 			cxxTokenDestroy(pIdentifier);
 		}
 
