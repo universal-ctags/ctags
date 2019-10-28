@@ -477,24 +477,23 @@ CXXTokenChain * cxxTokenChainSplitOnComma(CXXTokenChain * tc)
 	return pRet;
 }
 
-
-void cxxTokenChainCondense(CXXTokenChain * tc,unsigned int uFlags)
+CXXToken * cxxTokenChainCondenseIntoToken(CXXTokenChain * tc,unsigned int uFlags)
 {
 	if(!tc)
-		return;
-	if(tc->iCount <= 1)
-		return;
+		return NULL;
+
+	CXXToken * t = tc->pHead;
+	if(!t)
+		return NULL;
 
 	CXXToken * pCondensed = cxxTokenCreate();
 
 	pCondensed->eType = CXXTokenTypeUnknown;
-	pCondensed->iLineNumber = tc->pHead->iLineNumber;
-	pCondensed->oFilePosition = tc->pHead->oFilePosition;
+	pCondensed->iLineNumber = t->iLineNumber;
+	pCondensed->oFilePosition = t->oFilePosition;
 
-	while(tc->iCount > 0)
+	while(t)
 	{
-		CXXToken * t = cxxTokenChainTakeFirst(tc);
-
 		cxxTokenAppendToString(pCondensed->pszWord,t);
 
 		if(
@@ -504,8 +503,20 @@ void cxxTokenChainCondense(CXXTokenChain * tc,unsigned int uFlags)
 			vStringPut (pCondensed->pszWord, ' ');
 
 		pCondensed->bFollowedBySpace = t->bFollowedBySpace;
-		cxxTokenDestroy(t);
+
+		t = t->pNext;
 	}
+
+	return pCondensed;
+}
+
+void cxxTokenChainCondense(CXXTokenChain * tc,unsigned int uFlags)
+{
+	CXXToken * pCondensed = cxxTokenChainCondenseIntoToken(tc,uFlags);
+	if(!pCondensed)
+		return;
+
+	cxxTokenChainClear(tc);
 
 	cxxTokenChainAppend(tc,pCondensed);
 }

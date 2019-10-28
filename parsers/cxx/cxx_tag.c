@@ -541,11 +541,18 @@ void cxxTagHandleTemplateField()
 	);
 
 	cxxTokenChainNormalizeTypeNameSpacing(g_cxx.pTemplateTokenChain);
-	cxxTokenChainCondense(g_cxx.pTemplateTokenChain,0);
-	cxxTagSetField(
-			CXXTagCPPFieldTemplate,
-			vStringValue(cxxTokenChainFirst(g_cxx.pTemplateTokenChain)->pszWord)
-		);
+
+	CXXToken * t = cxxTokenChainCondenseIntoToken(g_cxx.pTemplateTokenChain,0);
+
+	if(t)
+	{
+		cxxTagSetField(
+				CXXTagCPPFieldTemplate,
+				vStringValue(t->pszWord)
+			);
+
+		cxxTokenDestroy(t);
+	}
 }
 
 int cxxTagCommit(void)
