@@ -44,7 +44,9 @@
  */
 #define isType(token,t)		(bool) ((token)->type == (t))
 #define isKeyword(token,k)	(bool) ((token)->keyword == (k))
-#define isReservedWord(token) (bool) (SqlReservedWord[(token)->keyword])
+#define isReservedWord(token) (SqlReservedWord[(token)->keyword].fn \
+							   ?(bool)SqlReservedWord[(token)->keyword].fn(token) \
+							   :SqlReservedWord[(token)->keyword].bit)
 #define isIdentChar1(c) \
 	/*
 	 * Other databases are less restrictive on the first character of
@@ -329,7 +331,16 @@ static const keywordTable SqlKeywordTable [] = {
  *
  * We will mark a keyword as a reserved word only if all the SQL dialects
  * specify it as a reserved word.
- *
+ */
+struct SqlReservedWord {
+	/* If fn is non-NULL, value returned from fn(token) is used
+	 * to repreesnt whether a keyword is reserved (true) or not.
+	 * If fn is NULL, bit is used. */
+	unsigned int bit;
+	bool (* fn) (tokenInfo *const token);
+};
+
+/*
  * MYSQL
  * => https://dev.mysql.com/doc/refman/8.0/en/keywords.html
  * POSTGRESQL,SQL2016,SQL2011,SQL92
@@ -339,88 +350,87 @@ static const keywordTable SqlKeywordTable [] = {
  * SQLANYWERE
  * => http://dcx.sap.com/1200/en/dbreference/alhakeywords.html
  */
-
-static unsigned int SqlReservedWord [SQLKEYWORD_COUNT] = {
+static bool SqlReservedWordPredicatorForIsOrAs (tokenInfo *const token);
+static struct SqlReservedWord SqlReservedWord [SQLKEYWORD_COUNT] = {
 	/*
 	 * RESERVED_BIT: MYSQL & POSTGRESQL&SQL2016&SQL2011&SQL92 & ORACLE11g&PLSQL & SQLANYWERE
 	 */
-	[KEYWORD_is]            = 1 & 1&1&1&1 & 1&1 & 1,
-	[KEYWORD_at]            = 0 & 0&1&1&1 & 0&1 & 0,
-	[KEYWORD_begin]         = 0 & 0&1&1&1 & 0&1 & 1,
-	[KEYWORD_body]          = 0 & 0&0&0&0 & 0&1 & 0,
-	[KEYWORD_call]          = 1 & 0&1&1&0 & 0&0 & 1,
-	[KEYWORD_case]          = 1 & 1&1&1&1 & 0&1 & 1,
-	[KEYWORD_check]         = 1 & 1&1&1&1 & 1&1 & 1,
-	[KEYWORD_comment]       = 0 & 0&0&0&0 & 1&1 & 1,
-	[KEYWORD_constraint]    = 1 & 1&1&1&1 & 0&1 & 1,
-	[KEYWORD_create]        = 1 & 1&1&1&1 & 1&1 & 1,
-	[KEYWORD_cursor]        = 1 & 0&1&1&1 & 0&1 & 1,
-	[KEYWORD_datatype]      = 0 & 0&0&0&0 & 0&0 & 0,
-	[KEYWORD_declare]       = 1 & 0&1&1&1 & 0&1 & 1,
-	[KEYWORD_do]            = 0 & 1&0&0&0 & 0&1 & 1,
-	[KEYWORD_domain]        = 0 & 0&0&0&1 & 0&0 & 0,
-	[KEYWORD_drop]          = 1 & 0&1&1&1 & 1&1 & 1,
-	[KEYWORD_else]          = 1 & 1&1&1&1 & 1&1 & 1,
-	[KEYWORD_elseif]        = 1 & 0&0&0&0 & 0&0 & 1,
-	[KEYWORD_end]           = 0 & 1&1&1&1 & 0&1 & 1,
-	[KEYWORD_endif]         = 0 & 0&0&0&0 & 0&0 & 1,
-	[KEYWORD_event]         = 0 & 0&0&0&0 & 0&0 & 0,
-	[KEYWORD_exception]     = 0 & 0&0&0&1 & 0&1 & 1,
-	[KEYWORD_external]      = 0 & 0&1&1&1 & 0&0 & 0,
-	[KEYWORD_for]           = 1 & 1&1&1&1 & 1&1 & 1,
-	[KEYWORD_foreign]       = 1 & 1&1&1&1 & 0&0 & 1,
-	[KEYWORD_from]          = 1 & 1&1&1&1 & 1&1 & 1,
-	[KEYWORD_function]      = 1 & 0&1&1&0 & 0&1 & 0,
-	[KEYWORD_go]            = 0 & 0&0&0&1 & 0&0 & 0,
-	[KEYWORD_handler]       = 0 & 0&0&0&0 & 0&0 & 0,
-	[KEYWORD_if]            = 1 & 0&0&0&0 & 0&1 & 1,
-	[KEYWORD_index]         = 1 & 0&0&0&0 & 1&1 & 1,
-	[KEYWORD_internal]      = 1 & 0&1&1&0 & 0&0 & 0,
-	[KEYWORD_is]            = 1 & 0&1&1&1 & 1&1 & 1,
-	[KEYWORD_local]         = 0 & 0&1&1&1 & 0&0 & 0,
-	[KEYWORD_loop]          = 1 & 1&1&1&1 & 0&1 & 0,
-	[KEYWORD_ml_conn]       = 0 & 0&0&0&0 & 0&0 & 0,
-	[KEYWORD_ml_conn_dnet]  = 0 & 0&0&0&0 & 0&0 & 0,
-	[KEYWORD_ml_table_dnet] = 0 & 0&0&0&0 & 0&0 & 0,
-	[KEYWORD_ml_conn_java]  = 0 & 0&0&0&0 & 0&0 & 0,
-	[KEYWORD_ml_table_java] = 0 & 0&0&0&0 & 0&0 & 0,
-	[KEYWORD_ml_conn_chk]   = 0 & 0&0&0&0 & 0&0 & 0,
-	[KEYWORD_ml_conn_lang]  = 0 & 0&0&0&0 & 0&0 & 0,
-	[KEYWORD_ml_table_lang] = 0 & 0&0&0&0 & 0&0 & 0,
-	[KEYWORD_ml_table_chk]  = 0 & 0&0&0&0 & 0&0 & 0,
-	[KEYWORD_ml_prop]       = 0 & 0&0&0&0 & 0&0 & 0,
-	[KEYWORD_ml_table]      = 0 & 0&0&0&0 & 0&0 & 0,
-	[KEYWORD_object]        = 0 & 0&0&0&0 & 0&0 & 0,
-	[KEYWORD_on]            = 1 & 1&1&1&1 & 1&1 & 1,
-	[KEYWORD_package]       = 0 & 0&0&0&0 & 0&1 & 0,
-	[KEYWORD_pragma]        = 0 & 0&0&0&0 & 0&1 & 0,
-	[KEYWORD_primary]       = 1 & 1&1&1&1 & 0&0 & 1,
-	[KEYWORD_procedure]     = 1 & 0&0&0&0 & 0&1 & 1,
-	[KEYWORD_publication]   = 0 & 0&0&0&0 & 0&0 & 1,
-	[KEYWORD_record]        = 0 & 0&0&0&0 & 0&1 & 0,
-	[KEYWORD_ref]           = 0 & 0&1&1&0 & 0&0 & 0,
-	[KEYWORD_references]    = 1 & 1&1&1&1 & 0&0 & 1,
-	[KEYWORD_rem]           = 0 & 0&0&0&0 & 0&0 & 0,
-	[KEYWORD_result]        = 0 & 0&1&1&0 & 0&0 & 0,
-	[KEYWORD_return]        = 1 & 0&1&1&0 & 0&1 & 1,
-	[KEYWORD_returns]       = 0 & 0&0&0&0 & 0&0 & 0,
-	[KEYWORD_select]        = 1 & 1&1&1&1 & 1&1 & 1,
-	[KEYWORD_service]       = 0 & 0&0&0&0 & 0&0 & 0,
-	[KEYWORD_subtype]       = 0 & 0&0&0&0 & 0&1 & 0,
-	[KEYWORD_synonym]       = 0 & 0&0&0&0 & 1&0 & 0,
-	[KEYWORD_table]         = 1 & 1&1&1&1 & 1&1 & 1,
-	[KEYWORD_temporary]     = 0 & 0&0&0&1 & 0&0 & 1,
-	[KEYWORD_then]          = 1 & 1&1&1&1 & 1&1 & 1,
-	[KEYWORD_trigger]       = 1 & 0&1&1&0 & 1&0 & 1,
-	[KEYWORD_type]          = 0 & 0&0&0&0 & 0&1 & 0,
-	[KEYWORD_unique]        = 1 & 1&1&1&1 & 1&1 & 1,
-	[KEYWORD_url]           = 0 & 0&0&0&0 & 0&0 & 0,
-	[KEYWORD_variable]      = 0 & 0&0&0&0 & 0&0 & 1,
-	[KEYWORD_view]          = 0 & 0&0&0&1 & 1&1 & 1,
-	[KEYWORD_when]          = 1 & 1&1&1&1 & 0&1 & 1,
-	[KEYWORD_while]         = 1 & 0&0&0&0 & 0&1 & 1,
-	[KEYWORD_with]          = 1 & 1&1&1&1 & 1&1 & 1,
-	[KEYWORD_without]       = 0 & 0&1&1&0 & 0&0 & 0,
+	[KEYWORD_at]            = {0 & 0&1&1&1 & 0&1 & 0},
+	[KEYWORD_begin]         = {0 & 0&1&1&1 & 0&1 & 1},
+	[KEYWORD_body]          = {0 & 0&0&0&0 & 0&1 & 0},
+	[KEYWORD_call]          = {1 & 0&1&1&0 & 0&0 & 1},
+	[KEYWORD_case]          = {1 & 1&1&1&1 & 0&1 & 1},
+	[KEYWORD_check]         = {1 & 1&1&1&1 & 1&1 & 1},
+	[KEYWORD_comment]       = {0 & 0&0&0&0 & 1&1 & 1},
+	[KEYWORD_constraint]    = {1 & 1&1&1&1 & 0&1 & 1},
+	[KEYWORD_create]        = {1 & 1&1&1&1 & 1&1 & 1},
+	[KEYWORD_cursor]        = {1 & 0&1&1&1 & 0&1 & 1},
+	[KEYWORD_datatype]      = {0 & 0&0&0&0 & 0&0 & 0},
+	[KEYWORD_declare]       = {1 & 0&1&1&1 & 0&1 & 1},
+	[KEYWORD_do]            = {0 & 1&0&0&0 & 0&1 & 1},
+	[KEYWORD_domain]        = {0 & 0&0&0&1 & 0&0 & 0},
+	[KEYWORD_drop]          = {1 & 0&1&1&1 & 1&1 & 1},
+	[KEYWORD_else]          = {1 & 1&1&1&1 & 1&1 & 1},
+	[KEYWORD_elseif]        = {1 & 0&0&0&0 & 0&0 & 1},
+	[KEYWORD_end]           = {0 & 1&1&1&1 & 0&1 & 1},
+	[KEYWORD_endif]         = {0 & 0&0&0&0 & 0&0 & 1},
+	[KEYWORD_event]         = {0 & 0&0&0&0 & 0&0 & 0},
+	[KEYWORD_exception]     = {0 & 0&0&0&1 & 0&1 & 1},
+	[KEYWORD_external]      = {0 & 0&1&1&1 & 0&0 & 0},
+	[KEYWORD_for]           = {1 & 1&1&1&1 & 1&1 & 1},
+	[KEYWORD_foreign]       = {1 & 1&1&1&1 & 0&0 & 1},
+	[KEYWORD_from]          = {1 & 1&1&1&1 & 1&1 & 1},
+	[KEYWORD_function]      = {1 & 0&1&1&0 & 0&1 & 0},
+	[KEYWORD_go]            = {0 & 0&0&0&1 & 0&0 & 0},
+	[KEYWORD_handler]       = {0 & 0&0&0&0 & 0&0 & 0},
+	[KEYWORD_if]            = {1 & 0&0&0&0 & 0&1 & 1},
+	[KEYWORD_index]         = {1 & 0&0&0&0 & 1&1 & 1},
+	[KEYWORD_internal]      = {1 & 0&1&1&0 & 0&0 & 0},
+	[KEYWORD_is]            = {0, SqlReservedWordPredicatorForIsOrAs},
+	[KEYWORD_local]         = {0 & 0&1&1&1 & 0&0 & 0},
+	[KEYWORD_loop]          = {1 & 1&1&1&1 & 0&1 & 0},
+	[KEYWORD_ml_conn]       = {0 & 0&0&0&0 & 0&0 & 0},
+	[KEYWORD_ml_conn_dnet]  = {0 & 0&0&0&0 & 0&0 & 0},
+	[KEYWORD_ml_table_dnet] = {0 & 0&0&0&0 & 0&0 & 0},
+	[KEYWORD_ml_conn_java]  = {0 & 0&0&0&0 & 0&0 & 0},
+	[KEYWORD_ml_table_java] = {0 & 0&0&0&0 & 0&0 & 0},
+	[KEYWORD_ml_conn_chk]   = {0 & 0&0&0&0 & 0&0 & 0},
+	[KEYWORD_ml_conn_lang]  = {0 & 0&0&0&0 & 0&0 & 0},
+	[KEYWORD_ml_table_lang] = {0 & 0&0&0&0 & 0&0 & 0},
+	[KEYWORD_ml_table_chk]  = {0 & 0&0&0&0 & 0&0 & 0},
+	[KEYWORD_ml_prop]       = {0 & 0&0&0&0 & 0&0 & 0},
+	[KEYWORD_ml_table]      = {0 & 0&0&0&0 & 0&0 & 0},
+	[KEYWORD_object]        = {0 & 0&0&0&0 & 0&0 & 0},
+	[KEYWORD_on]            = {1 & 1&1&1&1 & 1&1 & 1},
+	[KEYWORD_package]       = {0 & 0&0&0&0 & 0&1 & 0},
+	[KEYWORD_pragma]        = {0 & 0&0&0&0 & 0&1 & 0},
+	[KEYWORD_primary]       = {1 & 1&1&1&1 & 0&0 & 1},
+	[KEYWORD_procedure]     = {1 & 0&0&0&0 & 0&1 & 1},
+	[KEYWORD_publication]   = {0 & 0&0&0&0 & 0&0 & 1},
+	[KEYWORD_record]        = {0 & 0&0&0&0 & 0&1 & 0},
+	[KEYWORD_ref]           = {0 & 0&1&1&0 & 0&0 & 0},
+	[KEYWORD_references]    = {1 & 1&1&1&1 & 0&0 & 1},
+	[KEYWORD_rem]           = {0 & 0&0&0&0 & 0&0 & 0},
+	[KEYWORD_result]        = {0 & 0&1&1&0 & 0&0 & 0},
+	[KEYWORD_return]        = {1 & 0&1&1&0 & 0&1 & 1},
+	[KEYWORD_returns]       = {0 & 0&0&0&0 & 0&0 & 0},
+	[KEYWORD_select]        = {1 & 1&1&1&1 & 1&1 & 1},
+	[KEYWORD_service]       = {0 & 0&0&0&0 & 0&0 & 0},
+	[KEYWORD_subtype]       = {0 & 0&0&0&0 & 0&1 & 0},
+	[KEYWORD_synonym]       = {0 & 0&0&0&0 & 1&0 & 0},
+	[KEYWORD_table]         = {1 & 1&1&1&1 & 1&1 & 1},
+	[KEYWORD_temporary]     = {0 & 0&0&0&1 & 0&0 & 1},
+	[KEYWORD_then]          = {1 & 1&1&1&1 & 1&1 & 1},
+	[KEYWORD_trigger]       = {1 & 0&1&1&0 & 1&0 & 1},
+	[KEYWORD_type]          = {0 & 0&0&0&0 & 0&1 & 0},
+	[KEYWORD_unique]        = {1 & 1&1&1&1 & 1&1 & 1},
+	[KEYWORD_url]           = {0 & 0&0&0&0 & 0&0 & 0},
+	[KEYWORD_variable]      = {0 & 0&0&0&0 & 0&0 & 1},
+	[KEYWORD_view]          = {0 & 0&0&0&1 & 1&1 & 1},
+	[KEYWORD_when]          = {1 & 1&1&1&1 & 0&1 & 1},
+	[KEYWORD_while]         = {1 & 0&0&0&0 & 0&1 & 1},
+	[KEYWORD_with]          = {1 & 1&1&1&1 & 1&1 & 1},
+	[KEYWORD_without]       = {0 & 0&1&1&0 & 0&0 & 0},
 };
 
 /*
@@ -436,6 +446,15 @@ static tokenType parseSqlFile (tokenInfo *const token);
 /*
  *	 FUNCTION DEFINITIONS
  */
+
+static bool SqlReservedWordPredicatorForIsOrAs (tokenInfo *const token)
+{
+	if (strcasecmp ("as", vStringValue (token->string)) == 0)
+		return (bool) (1 & 1&1&1&1 & 1&1 & 1);
+	else						/* for "is" */
+		return (bool) (1 & 0&1&1&1 & 1&1 & 1);
+	/* PostgresSQL can use "is" as a name of function. */
+}
 
 static bool isCmdTerm (tokenInfo *const token)
 {
