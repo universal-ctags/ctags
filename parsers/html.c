@@ -390,8 +390,8 @@ static bool skipScriptContent (tokenInfo *token, long *line, long *lineOffset)
 	bool found_start = false;
 	bool found_script = false;
 
-	long line_tmp[2];
-	long lineOffset_tmp[2];
+	long line_tmp[2] = {0};
+	long lineOffset_tmp[2] = {0};
 
 	tokenType type;
 
