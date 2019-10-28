@@ -1,6 +1,7 @@
 include $(top_srcdir)/source.mak
 
-# Test cases are added to EXTRA_DIST in makefiles/test-cases.mak
+# Test cases are added to EXTRA_DIST by makefiles under Tmain and Units
+# Documents are added to EXTRA_DIST by makefiles/docs.mak
 EXTRA_DIST   = README.md autogen.sh \
 	       makefiles/list-optlib2c-input.mak misc/optlib2c \
 	       .ctags.d/exclusion.ctags .dir-locals.el .editorconfig .gdbinit .gitignore \
@@ -177,6 +178,7 @@ uninstall-hook:
 	rm $(DESTDIR)$(bindir)/etags$(EXEEXT)
 endif
 
+include $(top_srcdir)/makefiles/docs.mak
 include $(top_srcdir)/makefiles/testing.mak
 
 include $(top_srcdir)/makefiles/help.mak
