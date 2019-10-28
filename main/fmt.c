@@ -338,7 +338,7 @@ extern fmtElement *fmtNew (const char*  fmtString)
 	{
 		char* l = vStringDeleteUnwrap (literal);
 		literal = NULL;
-		last = queueLiteral (last, l);
+		queueLiteral (last, l);
 	}
 	return code;
 }
