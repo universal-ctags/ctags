@@ -291,7 +291,6 @@ static void findNsisTags (void)
 		}
 		else if (lineStartingWith (cp, "sectiongroupend", true))
 		{
-			cp += 15;
 			sectionGroupIndex = CORK_NIL;
 		}
 		/* sections */

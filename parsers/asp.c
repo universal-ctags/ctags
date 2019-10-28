@@ -77,13 +77,11 @@ static void findAspTags (void)
 
 					if (strncasecmp ((const char*) cp, "function", (size_t) 8) == 0)
 					{
-						cp+=8;
 						break;
 					}
 
 					else if (strncasecmp ((const char*) cp, "sub", (size_t) 3) == 0)
 					{
-						cp+=3;
 						break;
 					}
 				}
@@ -100,13 +98,11 @@ static void findAspTags (void)
 
 					if (strncasecmp ((const char*) cp, "function", (size_t) 8) == 0)
 					{
-						cp+=8;
 						break;
 					}
 
 					else if (strncasecmp ((const char*) cp, "sub", (size_t) 3) == 0)
 					{
-						cp+=3;
 						break;
 					}
 				}
