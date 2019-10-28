@@ -27,18 +27,6 @@ if [ "$TARGET" = "Unix" ]; then
     BUILDDIR0="$TRAVIS_OS_NAME"-"$CC"
     if [ "$TRAVIS_OS_NAME" = "linux" ] && [ "$CC" = "gcc" ]; then
 
-        BUILDDIR=${BUILDDIR0}
-        mkdir -p "${BUILDDIR}"
-        (
-            cd "${BUILDDIR}"
-            ${CONFIGURE_CMDLINE}
-            make -j2
-            echo 'Run "make tmain (sandbox only)" without gcov'
-            make tmain TRAVIS=1 UNITS=${SANDBOX_CASES}
-
-            make clean
-        )
-
         BUILDDIR=${BUILDDIR0}-gcov
         mkdir -p "${BUILDDIR}"
         (
@@ -53,8 +41,17 @@ if [ "$TARGET" = "Unix" ]; then
 			tar zxvf universal-ctags*tar.gz
 			(
 				cd universal-ctags*[0-9]
-				./configure
-				make -j2
+				BUILDDIR=${BUILDDIR0}
+				mkdir -p "${BUILDDIR}"
+				(
+					cd "${BUILDDIR}"
+					${CONFIGURE_CMDLINE}
+					make -j2
+					echo 'Run "make tmain (sandbox only)" without gcov'
+					make tmain TRAVIS=1 UNITS=${SANDBOX_CASES}
+
+					make clean
+				)
 			)
         )
 
