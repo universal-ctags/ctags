@@ -8,8 +8,14 @@ EXTRA_DIST   = README.md autogen.sh \
 	       .indent.pro .uncrustify.cfg \
 	       gnu_regex/README.txt gnu_regex/regcomp.c gnu_regex/regexec.c \
 	       gnu_regex/regex_internal.c gnu_regex/regex_internal.h \
+	       misc/ctags-optlib-mode.el \
+	       misc/mk-interactive-request.sh misc/roundtrip misc/tinst \
 	       misc/packcc/.gitignore misc/packcc/LICENSE.txt \
 	       misc/packcc/README.md \
+	       misc/validators/validator-jq \
+	       misc/validators/validator-KNOWN-INVALIDATION \
+	       misc/validators/validator-NONE \
+	       misc/validators/validator-puppet \
 	       $(WIN32_HEADS) $(WIN32_SRCS) mk_mingw.mak mk_mvc.mak \
 	       win32/mkstemp/COPYING.MinGW-w64-runtime.txt \
 	       win32/ctags_vs2013.sln \
