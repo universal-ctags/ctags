@@ -12,40 +12,40 @@ MIO_HEADS = main/mio.h
 MIO_SRCS  = main/mio.c
 
 MAIN_PUBLIC_HEADS =		\
-		main/dependency.h\
-		main/entry.h	\
-		main/field.h	\
-		main/gcc-attr.h	\
-		main/gvars.h	\
-		main/htable.h	\
-		main/inline.h	\
-		main/keyword.h	\
-		main/kind.h	\
-		main/lregex.h	\
-		main/lxpath.h	\
-		main/mbcs.h	\
-		main/nestlevel.h\
-		main/numarray.h	\
-		main/objpool.h	\
-		main/options.h	\
-		main/param.h	\
-		main/parse.h	\
-		main/promise.h	\
-		main/ptrarray.h	\
-		main/read.h	\
-		main/routines.h	\
-		main/selectors.h\
-		main/strlist.h	\
-		main/subparser.h\
-		main/tokeninfo.h\
-		main/trace.h	\
-		main/trashbox.h \
-		main/types.h	\
-		main/unwindi.h  \
-		main/vstring.h	\
-		main/xtag.h	\
-		\
-		$(NULL)
+	main/dependency.h	\
+	main/entry.h		\
+	main/field.h		\
+	main/gcc-attr.h		\
+	main/gvars.h		\
+	main/htable.h		\
+	main/inline.h		\
+	main/keyword.h		\
+	main/kind.h		\
+	main/lregex.h		\
+	main/lxpath.h		\
+	main/mbcs.h		\
+	main/nestlevel.h	\
+	main/numarray.h		\
+	main/objpool.h		\
+	main/options.h		\
+	main/param.h		\
+	main/parse.h		\
+	main/promise.h		\
+	main/ptrarray.h		\
+	main/read.h		\
+	main/routines.h		\
+	main/selectors.h	\
+	main/strlist.h		\
+	main/subparser.h	\
+	main/tokeninfo.h	\
+	main/trace.h		\
+	main/trashbox.h 	\
+	main/types.h		\
+	main/unwindi.h  	\
+	main/vstring.h		\
+	main/xtag.h		\
+	\
+	$(NULL)
 
 LIB_PRIVATE_HEADS =		\
 	main/args_p.h		\
@@ -78,15 +78,15 @@ LIB_PRIVATE_HEADS =		\
 	main/trashbox_p.h	\
 	main/writer_p.h		\
 	main/xtag_p.h		\
-		\
-		$(NULL)
+	\
+	$(NULL)
 
 LIB_HEADS =			\
 	main/ctags.h		\
 	main/general.h		\
 	\
-	$(MAIN_PUBLIC_HEADS)    \
-	$(LIB_PRIVATE_HEADS)   \
+	$(MAIN_PUBLIC_HEADS)	\
+	$(LIB_PRIVATE_HEADS)	\
 	\
 	$(MIO_HEADS)
 
@@ -195,7 +195,7 @@ PARSER_SRCS =				\
 	parsers/awk.c			\
 	parsers/basic.c			\
 	parsers/beta.c			\
-	parsers/bibtex.c			\
+	parsers/bibtex.c		\
 	parsers/c.c			\
 	parsers/clojure.c		\
 	parsers/css.c			\
@@ -208,20 +208,20 @@ PARSER_SRCS =				\
 	parsers/cxx/cxx_keyword.c		\
 	parsers/cxx/cxx_parser.c		\
 	parsers/cxx/cxx_parser_block.c		\
-	parsers/cxx/cxx_parser_function.c		\
+	parsers/cxx/cxx_parser_function.c	\
 	parsers/cxx/cxx_parser_lambda.c		\
-	parsers/cxx/cxx_parser_namespace.c		\
-	parsers/cxx/cxx_parser_template.c		\
-	parsers/cxx/cxx_parser_tokenizer.c		\
-	parsers/cxx/cxx_parser_typedef.c		\
+	parsers/cxx/cxx_parser_namespace.c	\
+	parsers/cxx/cxx_parser_template.c	\
+	parsers/cxx/cxx_parser_tokenizer.c	\
+	parsers/cxx/cxx_parser_typedef.c	\
 	parsers/cxx/cxx_parser_using.c		\
-	parsers/cxx/cxx_parser_variable.c		\
+	parsers/cxx/cxx_parser_variable.c	\
 	parsers/cxx/cxx_subparser.c	\
 	parsers/cxx/cxx_qtmoc.c		\
 	parsers/cxx/cxx_scope.c		\
 	parsers/cxx/cxx_tag.c		\
 	parsers/cxx/cxx_token.c		\
-	parsers/cxx/cxx_token_chain.c		\
+	parsers/cxx/cxx_token_chain.c	\
 	parsers/diff.c			\
 	parsers/dosbatch.c		\
 	parsers/dtd.c			\
@@ -289,24 +289,24 @@ PARSER_SRCS =				\
 
 XML_HEADS = parsers/xml.h
 XML_SRCS = \
-	 parsers/maven2.c		\
-	 parsers/dbusintrospect.c	\
-	 parsers/glade.c		\
-	 parsers/svg.c			\
-	 parsers/plist.c		\
-	 parsers/relaxng.c		\
-	 parsers/xml.c			\
-	 parsers/xslt.c			\
-	 \
-	 $(NULL)
+	parsers/maven2.c		\
+	parsers/dbusintrospect.c	\
+	parsers/glade.c			\
+	parsers/svg.c			\
+	parsers/plist.c			\
+	parsers/relaxng.c		\
+	parsers/xml.c			\
+	parsers/xslt.c			\
+	\
+	$(NULL)
 
 YAML_HEADS = parsers/yaml.h
 YAML_SRCS = \
-	  parsers/yaml.c		\
-	  \
-	  parsers/ansibleplaybook.c	\
-	  \
-	  $(NULL)
+	parsers/yaml.c		\
+	\
+	parsers/ansibleplaybook.c	\
+	\
+	$(NULL)
 
 DEBUG_HEADS = main/debug.h
 DEBUG_SRCS = main/debug.c
@@ -343,7 +343,7 @@ READTAGS_DSL_SRCS = \
 	dsl/es-lang-c-stdc99.c \
 	dsl/qualifier.c \
 	\
-	 $(MIO_SRCS) \
+	$(MIO_SRCS) \
 	\
 	$(NULL)
 
@@ -355,17 +355,17 @@ ALL_OBJS = \
 
 
 READTAGS_SRCS  = \
-	       read/readtags.c      \
-	       read/readtags-cmd.c  \
-	       \
-	       $(NULL)
+	read/readtags.c      \
+	read/readtags-cmd.c  \
+	\
+	$(NULL)
 READTAGS_HEADS = read/readtags.h
 READTAGS_OBJS  = $(READTAGS_SRCS:.c=.$(OBJEXT))
 
 PACKCC_SRCS = \
-	    misc/packcc/packcc.c \
-	    \
-	    $(NULL)
+	misc/packcc/packcc.c \
+	\
+	$(NULL)
 
 PACKCC_OBJS = $(PACKCC_SRCS:.c=.$(OBJEXT))
 # vim: ts=8
