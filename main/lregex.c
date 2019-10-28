@@ -2631,8 +2631,6 @@ extern void extendRegexTable (struct lregexControlBlock *lcb, const char *src, c
 
 extern void printMultitableStatistics (struct lregexControlBlock *lcb)
 {
-	struct regexTable *table = ptrArrayItem (lcb->tables, 0);
-
 	if (ptrArrayCount(lcb->tables) == 0)
 		return;
 
@@ -2640,7 +2638,7 @@ extern void printMultitableStatistics (struct lregexControlBlock *lcb)
 	fputs("==============================================\n", stderr);
 	for (unsigned int i = 0; i < ptrArrayCount(lcb->tables); i++)
 	{
-		table = ptrArrayItem (lcb->tables, i);
+		struct regexTable *table = ptrArrayItem (lcb->tables, i);
 		fprintf(stderr, "%s\n", table->name);
 		fputs("-----------------------\n", stderr);
 		for (unsigned int j = 0; j < ptrArrayCount(table->entries); j++)
