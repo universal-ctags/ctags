@@ -16,3 +16,6 @@ item	input.cpp	/^  Type item;$/;"	m	class:Item	typeref:typename:Type	file:
 Item::item	input.cpp	/^  Type item;$/;"	m	class:Item	typeref:typename:Type	file:
 next	input.cpp	/^  Item *next;$/;"	m	class:Item	typeref:typename:Item *	file:
 Item::next	input.cpp	/^  Item *next;$/;"	m	class:Item	typeref:typename:Item *	file:
+constant	input.cpp	/^template<typename T> const T constant = T(10.0);/;"	v	typeref:typename:const T	template:<typename T>
+T	input.cpp	/^template<typename T> const T constant = T(10.0);/;"	Z	variable:constant
+constant::T	input.cpp	/^template<typename T> const T constant = T(10.0);/;"	Z	variable:constant

@@ -20,3 +20,5 @@ class Item
   Type item;
   Item *next;
 };
+
+template<typename T> const T constant = T(10.0);
