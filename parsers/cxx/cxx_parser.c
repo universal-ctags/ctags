@@ -1844,9 +1844,11 @@ static rescanReason cxxParserMain(const unsigned int passCount)
 
 	cppTerminate ();
 
+	// Shut up coveralls: LCOV_EXCL_START
 	cxxTokenChainClear(g_cxx.pTokenChain);
 	if(g_cxx.pTemplateTokenChain)
 		cxxTokenChainClear(g_cxx.pTemplateTokenChain);
+	// Restart coveralls: LCOV_EXCL_END
 
 	if(!bRet && (passCount == 1))
 	{
@@ -1959,6 +1961,7 @@ void cxxParserCleanup(langType language CTAGS_ATTR_UNUSED,bool initialized CTAGS
 	// The next line forces this function to be called only once
 	g_bFirstRun = true;
 
+	// Shut up coveralls: LCOV_EXCL_START
 	if(g_cxx.pUngetToken)
 		cxxTokenDestroy(g_cxx.pUngetToken);
 	if(g_cxx.pTokenChain)
@@ -1967,6 +1970,7 @@ void cxxParserCleanup(langType language CTAGS_ATTR_UNUSED,bool initialized CTAGS
 		cxxTokenChainDestroy(g_cxx.pTemplateTokenChain);
 	if(g_cxx.pTemplateParameters)
 		ptrArrayDelete(g_cxx.pTemplateParameters);
+	// Restart coveralls: LCOV_EXCL_END
 
 	cxxScopeDone();
 
