@@ -18,7 +18,8 @@ fi
 
 ctags_files=`${MAKE} -s -f makefiles/list-optlib2c-input.mak`
 misc/dist-test-cases && \
-    if autoreconf -vfi; then
+	misc/dist-docs && \
+	if autoreconf -vfi; then
 		if type perl > /dev/null; then
 			for i in ${ctags_files}; do
 				o=${i%.ctags}.c
@@ -37,6 +38,6 @@ misc/dist-test-cases && \
 	else
 		echo "failed in running autoreconf" 1>&2
 		exit 1
-    fi
+	fi
 
 exit $?

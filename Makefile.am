@@ -1,14 +1,21 @@
 include $(top_srcdir)/source.mak
 
-# Test cases are added to EXTRA_DIST in makefiles/test-cases.mak
+# Test cases are added to EXTRA_DIST by makefiles under Tmain and Units
+# Documents are added to EXTRA_DIST by makefiles/docs.mak
 EXTRA_DIST   = README.md autogen.sh \
 	       makefiles/list-optlib2c-input.mak misc/optlib2c \
 	       .ctags.d/exclusion.ctags .dir-locals.el .editorconfig .gdbinit .gitignore \
 	       .indent.pro .uncrustify.cfg \
 	       gnu_regex/README.txt gnu_regex/regcomp.c gnu_regex/regexec.c \
 	       gnu_regex/regex_internal.c gnu_regex/regex_internal.h \
+	       misc/ctags-optlib-mode.el \
+	       misc/mk-interactive-request.sh misc/roundtrip misc/tinst \
 	       misc/packcc/.gitignore misc/packcc/LICENSE.txt \
 	       misc/packcc/README.md \
+	       misc/validators/validator-jq \
+	       misc/validators/validator-KNOWN-INVALIDATION \
+	       misc/validators/validator-NONE \
+	       misc/validators/validator-puppet \
 	       $(WIN32_HEADS) $(WIN32_SRCS) mk_mingw.mak mk_mvc.mak \
 	       win32/mkstemp/COPYING.MinGW-w64-runtime.txt \
 	       win32/ctags_vs2013.sln \
@@ -177,6 +184,7 @@ uninstall-hook:
 	rm $(DESTDIR)$(bindir)/etags$(EXEEXT)
 endif
 
+include $(top_srcdir)/makefiles/docs.mak
 include $(top_srcdir)/makefiles/testing.mak
 
 include $(top_srcdir)/makefiles/help.mak
