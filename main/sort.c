@@ -15,9 +15,7 @@
 #if defined (HAVE_IO_H)
 # include <io.h>
 #endif
-#if defined (HAVE_STDLIB_H)
-# include <stdlib.h>  /* to declare malloc () */
-#endif
+#include <stdlib.h>  /* to declare malloc () */
 #if defined (HAVE_UNISTD_H)
 # include <unistd.h>
 #endif

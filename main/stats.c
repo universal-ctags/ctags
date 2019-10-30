@@ -53,17 +53,15 @@ extern void printTotals (const clock_t *const timeStamps, bool append, sortType 
 			Totals.files, plural (Totals.files),
 			Totals.lines, plural (Totals.lines),
 			Totals.bytes/1024L);
-#ifdef CLOCK_AVAILABLE
-	{
-		const double interval = ((double) (timeStamps [1] - timeStamps [0])) /
-								CLOCKS_PER_SEC;
 
-		fprintf (stderr, " in %.01f seconds", interval);
-		if (interval != (double) 0.0)
-			fprintf (stderr, " (%lu kB/s)",
-					(unsigned long) (Totals.bytes / interval) / 1024L);
-	}
-#endif
+	const double interval = ((double) (timeStamps [1] - timeStamps [0])) /
+							CLOCKS_PER_SEC;
+
+	fprintf (stderr, " in %.01f seconds", interval);
+	if (interval != (double) 0.0)
+		fprintf (stderr, " (%lu kB/s)",
+				(unsigned long) (Totals.bytes / interval) / 1024L);
+
 	fputc ('\n', stderr);
 
 	fprintf (stderr, "%lu tag%s added to tag file",
@@ -75,10 +73,8 @@ extern void printTotals (const clock_t *const timeStamps, bool append, sortType 
 	if (totalTags > 0  &&  sorted != SO_UNSORTED)
 	{
 		fprintf (stderr, "%lu tag%s sorted", totalTags, plural (totalTags));
-#ifdef CLOCK_AVAILABLE
 		fprintf (stderr, " in %.02f seconds",
 				((double) (timeStamps [2] - timeStamps [1])) / CLOCKS_PER_SEC);
-#endif
 		fputc ('\n', stderr);
 	}
 

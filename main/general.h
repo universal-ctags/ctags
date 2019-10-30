@@ -18,19 +18,9 @@
 # include "e_msoft.h"
 #endif
 
-/*  To provide timings features if available.
+/*  To provide timings features.
  */
-#ifdef HAVE_CLOCK
-# ifdef HAVE_TIME_H
-#  include <time.h>
-# endif
-#else
-# ifdef HAVE_TIMES
-#  ifdef HAVE_SYS_TIMES_H
-#   include <sys/times.h>
-#  endif
-# endif
-#endif
+#include <time.h>
 
 /*
 *   MACROS
@@ -65,22 +55,6 @@
 #endif
 
 /*
-*   FUNCTION PROTOTYPES
-*/
-
-#if defined (NEED_PROTO_REMOVE) && defined (HAVE_REMOVE)
-extern int remove (const char *);
-#endif
-
-#if defined (NEED_PROTO_UNLINK) && ! defined (HAVE_REMOVE)
-extern void *unlink (const char *);
-#endif
-
-#ifdef NEED_PROTO_GETENV
-extern char *getenv (const char *);
-#endif
-
-/*
 *   HACK for #1610.
 */
 
@@ -88,28 +62,6 @@ extern char *getenv (const char *);
 #define iconv libiconv
 #define iconv_open libiconv_open
 #define iconv_close libiconv_close
-#endif
-
-/*
-*  Prepare clock() and its related macros
-*/
-#if defined (HAVE_CLOCK)
-# define CLOCK_AVAILABLE
-# ifndef CLOCKS_PER_SEC
-#  define CLOCKS_PER_SEC		1000000
-# endif
-#elif defined (HAVE_TIMES)
-# define CLOCK_AVAILABLE
-# define CLOCKS_PER_SEC	60
-static clock_t clock (void)
-{
-	struct tms buf;
-
-	times (&buf);
-	return (buf.tms_utime + buf.tms_stime);
-}
-#else
-# define clock()  (clock_t)0
 #endif
 
 #endif  /* CTAGS_MAIN_GENERAL_H */
