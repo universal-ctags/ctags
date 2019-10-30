@@ -46,7 +46,8 @@ enum CXXTagCPPKind
 	CXXTagCPPKindNAMESPACE,
 	CXXTagCPPKindALIAS,
 	CXXTagCPPKindNAME,
-	CXXTagCPPKindUSING
+	CXXTagCPPKindUSING,
+	CXXTagCPPKindTEMPLATEPARAM
 };
 
 // The fields common to all (sub)languages this parser supports.
@@ -169,6 +170,9 @@ void cxxTagSetCorkQueueField(
 		unsigned int uField,
 		const char * szValue
 	);
+
+// Handle the template-related parts of the tag (class, function, variable)
+void cxxTagHandleTemplateField();
 
 // Commit the composed tag. Must follow a successful cxxTagBegin() call.
 // Returns the index of the tag in the cork queue.

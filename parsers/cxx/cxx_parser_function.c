@@ -1104,7 +1104,7 @@ bool cxxParserLookForFunctionSignature(
 						)
 					)
 					goto next_token;
-	
+
 			} else {
 				// Looks more like a function pointer or something else we can't figure out
 				CXX_DEBUG_LEAVE_TEXT("Identifier NOT followed by a parameter-like parenthesis chain");
@@ -1519,6 +1519,10 @@ int cxxParserEmitFunctionTags(
 		tag = cxxTagBegin(uTagKind,pIdentifier);
 	}
 
+	bool bGotTemplate = g_cxx.pTemplateTokenChain &&
+				(g_cxx.pTemplateTokenChain->iCount > 0) &&
+				cxxParserCurrentLanguageIsCPP();
+
 	if(tag)
 	{
 		if(pInfo->pParenthesis->pChain->pTail)
@@ -1597,21 +1601,17 @@ int cxxParserEmitFunctionTags(
 		if(pszSignature)
 			tag->extensionFields.signature = vStringValue(pszSignature);
 
-		bool bIsEmptyTemplate = false;
+		bool bIsEmptyTemplate;
 
 		if(
-			g_cxx.pTemplateTokenChain && (g_cxx.pTemplateTokenChain->iCount > 0) &&
-			cxxParserCurrentLanguageIsCPP() &&
-			cxxTagFieldEnabled(CXXTagCPPFieldTemplate)
-		)
+				bGotTemplate &&
+				cxxTagFieldEnabled(CXXTagCPPFieldTemplate)
+			)
 		{
 			bIsEmptyTemplate = g_cxx.pTemplateTokenChain->iCount == 2;
-			cxxTokenChainNormalizeTypeNameSpacing(g_cxx.pTemplateTokenChain);
-			cxxTokenChainCondense(g_cxx.pTemplateTokenChain,0);
-			cxxTagSetField(
-					CXXTagCPPFieldTemplate,
-					vStringValue(cxxTokenChainFirst(g_cxx.pTemplateTokenChain)->pszWord)
-				);
+			cxxTagHandleTemplateField();
+		} else {
+			bIsEmptyTemplate = false;
 		}
 
 		vString * pszProperties = NULL;
@@ -1689,6 +1689,12 @@ int cxxParserEmitFunctionTags(
 	} else {
 		cxxTokenDestroy(pIdentifier);
 	}
+
+	if(
+			bGotTemplate &&
+			cxxTagKindEnabled(CXXTagCPPKindTEMPLATEPARAM)
+		)
+		cxxParserEmitTemplateParameterTags();
 
 	CXX_DEBUG_LEAVE();
 	return iScopesPushed;

@@ -105,6 +105,8 @@ unsigned int cxxScopeGetKind(void)
 			return CXXTagKindSTRUCT;
 		case CXXScopeTypeUnion:
 			return CXXTagKindUNION;
+		case CXXScopeTypeVariable:
+			return CXXTagKindVARIABLE;
 		default:
 			CXX_DEBUG_ASSERT(false,"Unhandled scope type!");
 			break;

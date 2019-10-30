@@ -1,6 +1,16 @@
 Test	input.hpp	/^class Test : public set<int> {$/;"	c	template:<int,class _Comp0=less<int>,class _Comp1=less<pair<int,int>>>
+_Comp0	input.hpp	/^         class _Comp0=less<int>,$/;"	Z	class:Test
+_Comp1	input.hpp	/^         class _Comp1=less<pair<int, int> > >$/;"	Z	class:Test
 xxx	input.hpp	/^  typedef int xxx;$/;"	t	class:Test	typeref:typename:int
 Foo	input-0.hpp	/^class Foo {};$/;"	c	template:<typename X>
+X	input-0.hpp	/^template <typename X>$/;"	Z	class:Foo
 bar	input-0.hpp	/^constexpr Foo<Y> bar {};$/;"	v	typeref:typename:Foo<Y>	template:<typename Y=Foo<int>>
+Y	input-0.hpp	/^template <typename Y = Foo<int>>$/;"	Z	variable:bar
 i	input-0.hpp	/^const int i = 3;$/;"	v	typeref:typename:const int
 failure	input-1.hpp	/^class failure {};$/;"	c	template:<class T,class Hash=std::hash<T>>
+T	input-1.hpp	/^template <class T, class Hash=std::hash<T>>$/;"	Z	class:failure
+Hash	input-1.hpp	/^template <class T, class Hash=std::hash<T>>$/;"	Z	class:failure
+V	input-2.hpp	/^const int V = 10;$/;"	v	typeref:typename:const int
+func	input-2.hpp	/^template<typename T,int I = V << 1 > void func(T t)$/;"	f	typeref:typename:void	template:<typename T,int I=V<<1>
+T	input-2.hpp	/^template<typename T,int I = V << 1 > void func(T t)$/;"	Z	function:func
+I	input-2.hpp	/^template<typename T,int I = V << 1 > void func(T t)$/;"	Z	function:func

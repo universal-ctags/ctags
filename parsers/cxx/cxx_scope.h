@@ -29,6 +29,7 @@ enum CXXScopeType
 	CXXScopeTypeEnum,
 	CXXScopeTypeUnion,
 	CXXScopeTypeStruct,
+	CXXScopeTypeVariable, // template variables, mainly
 	CXXScopeTypeLAST
 };
 

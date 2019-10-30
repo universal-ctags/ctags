@@ -12,6 +12,7 @@
 #include "general.h"
 
 #include "parse.h"
+#include "ptrarray.h"
 
 #include "cxx_tag.h"
 #include "cxx_keyword.h"
@@ -227,6 +228,7 @@ bool cxxParserParseUpToOneOf(unsigned int uTokenTypes,
 bool cxxParserParseIfForWhileSwitchCatchParenthesis(void);
 bool cxxParserParseTemplatePrefix(void);
 bool cxxParserParseTemplateAngleBracketsToSeparateChain(void);
+void cxxParserEmitTemplateParameterTags(void);
 bool cxxParserParseUsingClause(void);
 bool cxxParserParseAccessSpecifier(void);
 void cxxParserAnalyzeOtherStatement(void);
@@ -301,8 +303,17 @@ typedef struct _CXXParserState
 	// The current token chain
 	CXXTokenChain * pTokenChain;
 
-	// The last template we found
+	// The last template token chain we found
+	// This remains valid within the statement, so it can be used slightly
+	// after the template has been parsed (i.e. in the class coming after)
 	CXXTokenChain * pTemplateTokenChain;
+
+	// The array of CXXToken objects that are found to be template
+	// type parameters and belong to the pTemplateTokenChain above.
+	// The validity of this array is tied to the validity of
+	// pTemplateTokenChain above. If there is no pTemplateTokenChain
+	// then this array is simply invalid (even if not empty)
+	ptrArray * pTemplateParameters;
 
 	// The last token we have extracted. This is always pushed to
 	// the token chain tail (which will take care of deletion)

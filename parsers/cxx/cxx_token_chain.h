@@ -213,6 +213,7 @@ enum CXXTokenChainCondenseFlags
 	CXXTokenChainCondenseNoTrailingSpaces = 1
 };
 
+CXXToken * cxxTokenChainCondenseIntoToken(CXXTokenChain * tc,unsigned int uFlags);
 void cxxTokenChainCondense(CXXTokenChain * tc,unsigned int uFlags);
 
 
