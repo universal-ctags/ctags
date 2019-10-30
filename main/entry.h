@@ -143,6 +143,9 @@ size_t        countEntryInCorkQueue (void);
 extern void    markTagExtraBit     (tagEntryInfo *const tag, xtagType extra);
 extern bool isTagExtraBitMarked (const tagEntryInfo *const tag, xtagType extra);
 
+/* If any extra bit is on, return true. */
+extern bool isTagExtra (const tagEntryInfo *const tag);
+
 /* Attaching parser speicificc fields
  *
  * If your parser doesn't use Cork API, use attachParserField().

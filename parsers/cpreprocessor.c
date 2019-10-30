@@ -802,11 +802,14 @@ static void regenreateSignatureFromParameters (vString * buffer, int from, int t
 	for (int pindex = from; pindex < to; pindex++)
 	{
 		tagEntryInfo *e = getEntryInCorkQueue (pindex);
-		if (e)
+		if (e && !isTagExtra (e))
+		{
 			vStringCatS (buffer, e->name);
-		if (pindex != (to - 1))
 			vStringPut (buffer, ',');
+		}
 	}
+	if (vStringLast (buffer) == ',')
+		vStringChop (buffer);
 	vStringPut (buffer, ')');
 }
 
