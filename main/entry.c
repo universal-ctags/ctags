@@ -1658,6 +1658,14 @@ extern bool isTagExtraBitMarked (const tagEntryInfo *const tag, xtagType extra)
 	return !! ((slot [ index ]) & (1 << offset));
 }
 
+extern bool isTagExtra (const tagEntryInfo *const tag)
+{
+	for (unsigned int i = 0; i < XTAG_COUNT; i++)
+		if (isTagExtraBitMarked (tag, i))
+			return true;
+	return false;
+}
+
 static void assignRoleFull(tagEntryInfo *const e, int roleIndex, bool assign)
 {
 	if (roleIndex == ROLE_DEFINITION_INDEX)
