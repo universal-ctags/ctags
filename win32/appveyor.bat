@@ -86,36 +86,24 @@ copy %ICONV_BUILD_DIR%\msvc10\iconv.dll %APPVEYOR_BUILD_FOLDER% > nul
 cd %APPVEYOR_BUILD_FOLDER%
 nmake -f mk_mvc.mak WITH_ICONV=yes ICONV_DIR=%ICONV_DIR% PDB=yes || exit 1
 
-:: Backup VC binaries
-mkdir vc
-move *.exe vc > nul
-
-:: Create Makefile with msys2
-path C:\%MSYS2_DIR%\usr\bin;%PATH%
-set CHERE_INVOKING=yes
-:: Install and update necessary packages
-rem bash -lc "for i in {1..3}; do pacman --noconfirm -S mingw-w64-%MSYS2_ARCH%-{python3-sphinx,jansson,libxml2,libyaml} && break || sleep 15; done"
-
-bash -lc "./autogen.sh"
-bash -lc "./configure && make -t"
-
-:: Restore VC binaries
-copy vc\*.exe . /y > nul
-touch *.exe
-
 @echo off
 goto :eof
 
 :msvc_test
 @echo on
+:: Prepare for msys2
+path C:\%MSYS2_DIR%\usr\bin;%PATH%
+set CHERE_INVOKING=yes
+
 :: Check filetype (VC binaries)
 c:\cygwin64\bin\file ctags.exe
 c:\cygwin64\bin\file readtags.exe
 :: Check if it works
 .\ctags --version || exit 1
 
-:: Run tests on msys2
-bash -lc "make check APPVEYOR=1"
+:: Run tests using misc/units.py on msys2
+bash -lc "py misc/units.py tmain ./Tmain --ctags=./ctags.exe --readtags=./readtags.exe --show-diff-output --shell=c:/msys64/usr/bin/sh" || exit 1
+bash -lc "py misc/units.py run ./Units --ctags=./ctags.exe --show-diff-output --with-timeout=10 --shell=c:/msys64/usr/bin/sh" || exit 1
 
 @echo off
 goto :eof
@@ -173,7 +161,7 @@ if "%normalbuild%-%ARCH%"=="yes-x64" (
   @echo Tests for msys2 x64 are skipped.
   exit 0
 )
-bash -lc "make check APPVEYOR=1"
+bash -lc "make check APPVEYOR=1 PYTHON=py"
 
 @echo off
 goto :eof
@@ -261,7 +249,7 @@ c:\cygwin64\bin\file readtags.exe
 :: Check if it works
 .\ctags --version || exit 1
 :: Run tests
-bash -lc "make check APPVEYOR=1"
+bash -lc "make check APPVEYOR=1 PYTHON=py"
 
 @echo off
 goto :eof
