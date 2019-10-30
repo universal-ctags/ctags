@@ -957,7 +957,7 @@ static void parseBlock (lexerState *lexer, bool delim, int kind, vString *scope)
 
 static void findRustTags (void)
 {
-	lexerState lexer;
+	lexerState lexer = {0};
 	vString* scope = vStringNew();
 	initLexer(&lexer);
 
