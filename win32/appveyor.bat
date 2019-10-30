@@ -155,7 +155,7 @@ bash -lc "for i in {1..3}; do pacman --noconfirm --noprogressbar -S --needed min
 
 bash -lc "./autogen.sh"
 :: Use static link.
-bash -lc "./configure --disable-external-sort --enable-static && make"
+bash -lc "./configure --disable-external-sort --enable-static && make -j2"
 
 @echo off
 goto :eof
@@ -219,7 +219,7 @@ goto :eof
 :: Using MinGW without autotools, iconv disabled
 @echo on
 path C:\MinGW\bin;C:\MinGW\msys\1.0\bin;%path%
-make -f mk_mingw.mak
+make -f mk_mingw.mak -j2
 
 @echo off
 goto :eof
@@ -248,7 +248,7 @@ c:\cygwin64\setup-x86_64.exe -qnNdO -P dos2unix,libiconv-devel,libjansson-devel,
 PATH c:\cygwin64\bin;%PATH%
 set CHERE_INVOKING=yes
 bash -lc "./autogen.sh"
-bash -lc "./configure --enable-iconv && make"
+bash -lc "./configure && make -j2"
 
 @echo off
 goto :eof
