@@ -1646,8 +1646,10 @@ static bool fillGuestRequest (const char *start,
 		int size = pmatch [guest_spec->lang.spec.patternGroup].rm_eo
 			- pmatch [guest_spec->lang.spec.patternGroup].rm_so;
 		if (size > 0)
+		{
 			guest_req->lang = getNamedLanguage (name, size);
-		guest_req->lang_set = true;
+			guest_req->lang_set = true;
+		}
 	}
 	else if (guest_spec->lang.type == GUEST_LANG_PTN_GROUP_FOR_FILEMAP)
 	{
@@ -1659,9 +1661,9 @@ static bool fillGuestRequest (const char *start,
 		if (fname)
 		{
 			guest_req->lang = getLanguageForFilename (fname, LANG_AUTO);
+			guest_req->lang_set = true;
 			eFree (fname);
 		}
-		guest_req->lang_set = true;
 	}
 
 	for (int i = 0; i < 2; i++)
