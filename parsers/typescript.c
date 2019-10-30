@@ -479,40 +479,40 @@ CTAGS_INLINE void parseWordToken(const int c, tokenInfo *const token, const char
 	result->status = PARSER_FAILED;
 }
 
-CTAGS_INLINE void parseComment(const int c, tokenInfo *const token, commentState *state, parserResult *const result)
+CTAGS_INLINE void parseComment(const int c, tokenInfo *const token, parserState *state, parserResult *const result)
 {
-	if (state->parsed < 2)
+	if (state->comment.parsed < 2)
 	{
-		parseWordToken (c, token, "//", TOKEN_COMMENT_BLOCK, &state->parsed, result);
+		parseWordToken (c, token, "//", TOKEN_COMMENT_BLOCK, &state->comment.parsed, result);
 
 		if (result->status == PARSER_FAILED)
 		{
-			parseWordToken (c, token, "/*", TOKEN_COMMENT_BLOCK, &state->parsed, result);
+			parseWordToken (c, token, "/*", TOKEN_COMMENT_BLOCK, &state->comment.parsed, result);
 			if (result->status == PARSER_FINISHED)
 			{
 				result->status = PARSER_NEEDS_MORE_INPUT;
-				state->isBlock = true;
+				state->comment.isBlock = true;
 			}
 		}
 		else if (result->status == PARSER_FINISHED)
 		{
 			result->status = PARSER_NEEDS_MORE_INPUT;
-			state->isBlock = false;
+			state->comment.isBlock = false;
 		}
 
 		return;
 	}
 
-	state->parsed += 1;
+	state->comment.parsed += 1;
 
 	if (c == EOF) result->status = PARSER_FINISHED;
-	else if (state->isBlock)
+	else if (state->comment.isBlock)
 	{
-		parseWordToken (c, token, "*/", TOKEN_COMMENT_BLOCK, &state->blockParsed, result);
+		parseWordToken (c, token, "*/", TOKEN_COMMENT_BLOCK, &state->comment.blockParsed, result);
 
 		if (result->status == PARSER_FAILED)
 		{
-			state->blockParsed = c == '*' ? 1 : 0;
+			state->comment.blockParsed = c == '*' ? 1 : 0;
 			result->status = PARSER_NEEDS_MORE_INPUT;
 		}
 	}
@@ -729,7 +729,7 @@ CTAGS_INLINE bool tryParser(Parser parser, tokenInfo *const token, bool skipWhit
 	return result.status == PARSER_FINISHED;
 }
 
-static bool tryInSequence(tokenInfo *const token, bool skipUnparsed, ...)
+static bool tryInSequence(tokenInfo *const token, bool skipUnparsed, Parser parser, ...)
 {
 	Parser currentParser = NULL;
 	bool result = false;
@@ -737,9 +737,9 @@ static bool tryInSequence(tokenInfo *const token, bool skipUnparsed, ...)
 	tryParser (parseWhiteChars, token, false);
 
 	va_list args;
-	va_start (args, skipUnparsed);
+	va_start (args, parser);
 
-	currentParser = va_arg (args, Parser);
+	currentParser = parser;
 	while (! result && currentParser)
 	{
 		result = tryParser (currentParser, token, false);
