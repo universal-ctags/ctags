@@ -51,7 +51,8 @@ SOURCE_FILES = \
 	\
 	$(NULL)
 
-rst_files  = $(basename $(IN_SOURCE_FILES)) $(SOURCE_FILES)
+gen_rst_files = $(basename $(IN_SOURCE_FILES))
+rst_files  = $(gen_rst_files) $(SOURCE_FILES)
 man_pages  = $(basename $(rst_files))
 html_pages = $(addsuffix .html,$(man_pages))
 pdf_pages  = $(addsuffix .pdf,$(man_pages))
@@ -62,13 +63,18 @@ man: $(man_pages)
 html: $(html_pages)
 pdf: $(pdf_pages)
 
+update-docs: $(rst_files)
+	cp $(rst_files) ../docs/man
+
 %.rst: %.rst.in
 ifeq ($(QUICK),)
 	(cd ..; ./configure $(CONFIGURE_FLAGS))
 else
+	version=`sed -n -e 's/AC_INIT(.*, *\[\(.*\)\])/\1/p' ../configure.ac`; \
 	sed \
 		-e s/@CTAGS_NAME_EXECUTABLE@/ctags/g \
 		-e s/@ETAGS_NAME_EXECUTABLE@/etags/g \
+		-e s/@VERSION@/$$version/g \
 	< $< > $@
 endif
 
@@ -80,4 +86,4 @@ endif
 	$(RST2PDF) $(RST2PDF_FLAGS) $< -o $@
 
 clean:
-	rm -f $(man_pages) $(html_pages) $(pdf_pages)
+	rm -f $(gen_rst_files) $(man_pages) $(html_pages) $(pdf_pages)
