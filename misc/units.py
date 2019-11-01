@@ -258,8 +258,14 @@ def run_result_known_error(msg, f, colorized, *args):
             ' (KNOWN bug)', file=f)
 
 def run_shrink(cmdline_template, finput, foutput, lang):
-    # TODO
-    pass
+    script = sys.argv[0]
+    script = os.path.splitext(script)[0]   # remove '.py'
+
+    print('Shrinking ' + finput + ' as ' + lang)
+    # fallback to the shell script version
+    subproces.run([SHELL, script, 'shrink',
+        '--timeout=1', '--foreground',
+        cmdline_template, finput, foutput])
 
 # return a filter for normalizing the basename
 #
