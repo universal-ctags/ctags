@@ -2749,7 +2749,7 @@ validate_dir ()
     local has_expected_tags=no
     for f in "${base_dir}"/expected.tags*; do
 	[ -r "$f" ] || continue
-	unwanted_file "$f" && continue
+	failure_in_globing "$f" && continue
 	has_expected_tags=yes
 	break
     done
@@ -2759,7 +2759,7 @@ validate_dir ()
     # doesn't exit.
     inputs0=$(for f in "${base_dir}"/input.*; do
 		  [ -r "$f" ] || continue
-		  unwanted_file "$f" && continue
+		  failure_in_globing "$f" && continue
 		  echo $f
 	      done | sort)
     v0=$(resolve_validator "${base_dir}"/validator \
@@ -2795,7 +2795,7 @@ validate_dir ()
     inputs=$(for f in "${base_dir}"/input[-_][0-9].* \
 		      "${base_dir}"/input[-_][0-9][-_]*.*; do
 		 [ -r "$f" ] || continue
-		 unwanted_file "$f" && continue
+		 failure_in_globing "$f" && continue
 		 echo $f
 	     done | sort)
 
