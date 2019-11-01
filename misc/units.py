@@ -233,29 +233,26 @@ def run_result(result_type, msg, output, *args, file=sys.stdout):
             func_dict[result_type](msg, f, False, *args)
 
 def run_result_skip(msg, f, colorized, *args):
+    s = msg + decorate('yellow', 'skipped', colorized)
     if len(args) > 0:
-        print(msg + decorate('yellow', 'skipped', colorized) +
-                ' (' + args[0] + ')', file=f)
-    else:
-        print(msg + decorate('yellow', 'skipped', colorized), file=f)
+        s += ' (' + args[0] + ')'
+    print(s, file=f)
 
 def run_result_error(msg, f, colorized, *args):
+    s = msg + decorate('red', 'failed', colorized)
     if len(args) > 0:
-        print(msg + decorate('red', 'failed', colorized) +
-                ' (' + args[0] + ')', file=f)
-    else:
-        print(msg + decorate('red', 'failed', colorized), file=f)
+        s += ' (' + args[0] + ')'
+    print(s, file=f)
 
 def run_result_ok(msg, f, colorized, *args):
+    s = msg + decorate('green', 'passed', colorized)
     if len(args) > 0:
-        print(msg + decorate('green', 'passed', colorized) +
-                ' (' + args[0] + ')', file=f)
-    else:
-        print(msg + decorate('green', 'passed', colorized), file=f)
+        s += ' (' + args[0] + ')'
+    print(s, file=f)
 
 def run_result_known_error(msg, f, colorized, *args):
-    print(msg + decorate('yellow', 'failed', colorized) +
-            ' (KNOWN bug)', file=f)
+    s = msg + decorate('yellow', 'failed', colorized) + ' (KNOWN bug)'
+    print(s, file=f)
 
 def run_shrink(cmdline_template, finput, foutput, lang):
     # TODO
