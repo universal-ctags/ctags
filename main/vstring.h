@@ -14,9 +14,7 @@
 */
 #include "general.h"  /* must always come first */
 
-#if defined(HAVE_STDLIB_H)
-# include <stdlib.h>  /* to define size_t */
-#endif
+#include <stdlib.h>  /* to define size_t */
 
 #include <stdio.h>
 

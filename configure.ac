@@ -359,57 +359,21 @@ fi
 # Checks for header files
 # -----------------------
 
-AC_CHECK_HEADERS([direct.h])
-AC_CHECK_HEADERS([dirent.h errno.h fcntl.h io.h limits.h stat.h stdlib.h string.h])
-AC_CHECK_HEADERS([time.h types.h unistd.h])
-AC_CHECK_HEADERS([sys/dir.h sys/stat.h sys/times.h sys/types.h sys/wait.h])
+AC_CHECK_HEADERS([direct.h dirent.h fcntl.h io.h stat.h types.h unistd.h])
+AC_CHECK_HEADERS([sys/dir.h sys/stat.h sys/types.h sys/wait.h])
 
 # Checks for header file macros
 # -----------------------------
 
 CHECK_HEADER_DEFINE(L_tmpnam, [stdio.h],, AC_DEFINE(L_tmpnam, 20))
 
-CHECK_HEADER_DEFINE(INT_MAX, [limits.h],,
-	CHECK_HEADER_DEFINE(MAXINT, [limits.h],
-		AC_DEFINE(INT_MAX, MAXINT), AC_DEFINE(INT_MAX, 32767)))
-
 
 # Checks for typedefs and types
 # -----------------------------
 
-AC_TYPE_SIZE_T
 AC_TYPE_OFF_T
 
-AC_MSG_CHECKING(for fpos_t)
-AC_EGREP_HEADER(fpos_t, stdio.h, AC_MSG_RESULT(yes),
-[
-	AC_MSG_RESULT(no)
-	AC_DEFINE(fpos_t, long)
-])
-
-AC_MSG_CHECKING(for clock_t)
-AC_EGREP_HEADER(clock_t, time.h, AC_MSG_RESULT(yes),
-[
-	AC_MSG_RESULT(no)
-	AC_DEFINE(clock_t, long)
-])
-
-AC_CHECK_HEADERS([stdbool.h],
-[
-	AH_TEMPLATE([HAVE_STDBOOL_H], [whether or not to use <stdbool.h>.])
-	AC_DEFINE([HAVE_STDBOOL_H])
-],
-[
-	AH_TEMPLATE([bool],  [type for 'bool' if <stdbool.h> is missing or broken.])
-	AH_TEMPLATE([true],  [value of 'true' if <stdbool.h> is missing or broken.])
-	AH_TEMPLATE([false], [value of 'false' if <stdbool.h> is missing or broken.])
-
-	AC_CHECK_TYPES([_Bool],
-		       [AC_DEFINE([bool], [_Bool])],
-		       [AC_DEFINE([bool], [int])])
-	AC_DEFINE([true],  [1])
-	AC_DEFINE([false], [0])
-])
+AC_CHECK_HEADERS([stdbool.h])
 
 AC_MSG_CHECKING(if "%zu" in printf works)
 AC_RUN_IFELSE([AC_LANG_SOURCE([[
@@ -450,8 +414,6 @@ AM_CONDITIONAL([USE_ULONGLONG_FORMATTER_FOR_SIZE_T], [test "x${use_ulonglong_for
 # Checks for compiler characteristics
 # -----------------------------------
 
-# AC_CYGWIN
-# AC_MINGW32
 AC_C_CONST
 AC_OBJEXT
 AC_EXEEXT
@@ -512,7 +474,6 @@ AC_CHECK_FUNCS(asprintf)
 AC_CHECK_FUNCS(strstr)
 AC_CHECK_FUNCS(strcasecmp stricmp, break)
 AC_CHECK_FUNCS(strncasecmp strnicmp, break)
-AC_CHECK_FUNCS(fgetpos, have_fgetpos=yes)
 
 AC_CHECK_FUNCS(mkstemp, have_mkstemp=yes)
 if test "$have_mkstemp" != yes ; then
@@ -527,9 +488,6 @@ fi
 
 AC_CHECK_FUNCS(opendir findfirst _findfirst, break)
 AC_CHECK_FUNCS(strerror)
-AC_CHECK_FUNCS(clock times, break)
-AC_CHECK_FUNCS(remove, have_remove=yes,
-	CHECK_HEADER_DEFINE(remove, unistd.h,, AC_DEFINE(remove, unlink)))
 
 AC_CHECK_FUNCS(truncate, have_truncate=yes)
 # === Cannot nest AC_CHECK_FUNCS() calls
@@ -700,18 +658,8 @@ AS_IF([test "x$enable_aspell" != "xno"], [
 # -----------------------------
 AC_MSG_NOTICE(checking for new missing prototypes)
 
-if test "$have_remove" = yes ; then
-	CHECK_PROTO(remove, stdio.h)
-else
-	CHECK_PROTO(unlink,	unistd.h)
-fi
-CHECK_PROTO(malloc,	stdlib.h)
-CHECK_PROTO(getenv,	stdlib.h)
 CHECK_PROTO(stat,	sys/stat.h)
 CHECK_PROTO(lstat,	sys/stat.h)
-if test "$have_fgetpos" = yes ; then
-	CHECK_PROTO(fgetpos, stdio.h)
-fi
 if test "$have_truncate" = yes ; then
 	CHECK_PROTO(truncate, unistd.h)
 fi

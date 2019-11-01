@@ -12,9 +12,7 @@
 */
 #include "general.h"  /* must always come first */
 
-#ifdef HAVE_STDLIB_H
-# include <stdlib.h>  /* to declare malloc (), realloc (), mbcs() */
-#endif
+#include <stdlib.h>  /* to declare malloc (), realloc (), mbcs() */
 #include <ctype.h>
 #include <string.h>
 #include <stdio.h>  /* to declare tempnam(), and SEEK_SET (hopefully) */
@@ -26,9 +24,7 @@
 # include <unistd.h>  /* to declare mkstemp () */
 #endif
 
-#ifdef HAVE_LIMITS_H
-# include <limits.h>  /* to declare MB_LEN_MAX */
-#endif
+#include <limits.h>  /* to declare MB_LEN_MAX */
 #ifndef MB_LEN_MAX
 # define MB_LEN_MAX 6
 #endif
@@ -59,9 +55,7 @@
 #include "debug.h"
 #include "routines.h"
 #include "routines_p.h"
-#ifdef HAVE_ERRNO_H
-# include <errno.h>
-#endif
+#include <errno.h>
 
 #include "vstring.h"
 
