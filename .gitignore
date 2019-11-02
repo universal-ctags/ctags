@@ -49,6 +49,7 @@ libctags.a
 Makefile
 Makefile.in
 mini-geany
+mini-geany.exe
 missing
 mkinstalldirs
 perf.data*
