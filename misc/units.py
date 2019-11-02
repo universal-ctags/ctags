@@ -471,7 +471,7 @@ def run_tcase(finput, t, name, tclass, category, build_t, extra_inputs):
 
     clean_tcase(o, obundles)
     os.makedirs(o, exist_ok=True)
-    if os.path.realpath(o) != os.path.realpath(t):
+    if not os.path.samefile(o, t):
         prepare_bundles(t, o, obundles)
 
 
