@@ -27,7 +27,7 @@ run()
 				   -o - \
 				   "${tmp}" \
 				   input_tab.rst input_space.rst
-		rm "${tmp}"
+		rm -f "${tmp}"
 
 		echo "# WITH SCOPE"
 		"${CTAGS}" --quiet --options=NONE ${1} --output-format=e-ctags \
@@ -42,7 +42,7 @@ run()
 				   input_scope.rst
 
 		if [ "$copied" = "yes" ]; then
-			rm input_*.rst
+			rm -f input_*.rst
 		fi
 	)
 }
