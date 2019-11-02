@@ -87,7 +87,7 @@ endif
 PARSER_SRCS += $(PEG_SRCS)
 PARSER_HEADS += $(PEG_HEADS) $(PEG_EXTRA_HEADS)
 
-libctags_a_CPPFLAGS = -I. -I$(srcdir) -I$(srcdir)/main -DHAVE_PACKCC
+libctags_a_CPPFLAGS = -I. -I$(srcdir) -I$(srcdir)/main -I$(srcdir)/peg -DHAVE_PACKCC
 if ENABLE_DEBUGGING
 libctags_a_CPPFLAGS+= $(DEBUG_CPPFLAGS)
 endif
@@ -145,12 +145,12 @@ packcc_verbose_0 = @echo PACKCC "    $@";
 PACKCC = $(top_builddir)/packcc$(EXEEXT)
 SUFFIXES += .peg
 .peg.c:
-	$(packcc_verbose)$(PACKCC) $<
+	$(packcc_verbose)$(PACKCC) -o $(top_builddir)/peg/$(*F) $<
 .peg.h:
-	$(packcc_verbose)$(PACKCC) $<
+	$(packcc_verbose)$(PACKCC) -o $(top_builddir)/peg/$(*F) $<
 # You cannot use $(PACKCC) as a target name here.
-$(PEG_INPUT): packcc$(EXEEXT) Makefile
 $(PEG_HEADS): packcc$(EXEEXT) Makefile
+$(PEG_SRCS): packcc$(EXEEXT) Makefile
 dist_libctags_a_SOURCES = $(ALL_LIB_HEADS) $(ALL_LIB_SRCS)
 
 ctags_CPPFLAGS = $(libctags_a_CPPFLAGS)
