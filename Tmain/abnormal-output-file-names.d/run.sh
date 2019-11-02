@@ -2,42 +2,43 @@
 # License: GPL-2
 
 CTAGS=$1
+BUILDDIR=$2
 
 . ../utils.sh
 
 exit_if_win32 "$CTAGS"
 
-rm -f ./"'"
-rm -f ./'"'
-rm -f ./'$(ls)'
-rm -f ./'a b'
+rm -f $BUILDDIR/"'"
+rm -f $BUILDDIR/'"'
+rm -f $BUILDDIR/'$(ls)'
+rm -f $BUILDDIR/'a b'
 
-${CTAGS} --quiet --options=NONE -o ./"'" --extras=-pF input.c
-${CTAGS} --quiet --options=NONE -o ./'"' --extras=-pF input.c
-${CTAGS} --quiet --options=NONE -o ./'$(ls)' --extras=-pF input.c
-${CTAGS} --quiet --options=NONE -o ./'a b' --extras=-pF input.c
+${CTAGS} --quiet --options=NONE -o $BUILDDIR/"'" --extras=-pF input.c
+${CTAGS} --quiet --options=NONE -o $BUILDDIR/'"' --extras=-pF input.c
+${CTAGS} --quiet --options=NONE -o $BUILDDIR/'$(ls)' --extras=-pF input.c
+${CTAGS} --quiet --options=NONE -o $BUILDDIR/'a b' --extras=-pF input.c
 
 echo '#' SINGLE QUOTE
-if [ -e "'" ]; then
-	cat "'"
+if [ -e $BUILDDIR/"'" ]; then
+	cat $BUILDDIR/"'"
 fi
 
 echo '#' DOUBLE QUOTES
-if [ -e '"' ]; then
-	cat '"'
+if [ -e $BUILDDIR/'"' ]; then
+	cat $BUILDDIR/'"'
 fi
 
 echo '#' PROCESS SUBSTITUTION
-if [ -e '$(ls)' ]; then
-	cat '$(ls)'
+if [ -e $BUILDDIR/'$(ls)' ]; then
+	cat $BUILDDIR/'$(ls)'
 fi
 
 echo '#' SPACE
-if [ -e 'a b' ]; then
-	cat 'a b'
+if [ -e $BUILDDIR/'a b' ]; then
+	cat $BUILDDIR/'a b'
 fi
 
-rm -f ./"'"
-rm -f ./'"'
-rm -f ./'$(ls)'
-rm -f ./'a b'
+rm -f $BUILDDIR/"'"
+rm -f $BUILDDIR/'"'
+rm -f $BUILDDIR/'$(ls)'
+rm -f $BUILDDIR/'a b'

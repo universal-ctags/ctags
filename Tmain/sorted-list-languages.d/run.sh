@@ -1,6 +1,7 @@
 # Copyright: 2016 Masatake YAMATO
 # License: GPL-2
 CTAGS=$1
+BUILDDIR=$2
 
 . ../utils.sh
 
@@ -13,9 +14,9 @@ list_languages()
     ${CTAGS} --quiet --options=NONE --list-languages
 }
 
-list_languages > ./ll.tmp
-list_languages | sort --ignore-case > ./sorted-ll.tmp
-diff -uN ./ll.tmp ./sorted-ll.tmp
+list_languages > $BUILDDIR/ll.tmp
+list_languages | sort --ignore-case > $BUILDDIR/sorted-ll.tmp
+diff -uN $BUILDDIR/ll.tmp $BUILDDIR/sorted-ll.tmp
 r=$?
-rm ./ll.tmp ./sorted-ll.tmp
+rm $BUILDDIR/ll.tmp $BUILDDIR/sorted-ll.tmp
 exit $r

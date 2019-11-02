@@ -1,10 +1,10 @@
 -o - --sort=no => ok
---sort=no => ok
- => ok
+-o tags --sort=no => ok
+-o tags => ok
 -o - => ok
 -e -o - --sort=no => ok
--e --sort=no => ok
--e => ok
+-e -o TAGS --sort=no => ok
+-e -o TAGS => ok
 -e -o - => ok
 -x -o - --sort=no => ok
 -x -o tags-x --sort=no => ok
