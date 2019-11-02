@@ -15,6 +15,12 @@ Rules for writing man pages
 
 * use one asterisk for option parameter like *LANG* in --kind-<LANG> option.
 
+* the files in ../docs/man/ need to be updated after writing man pages.
+  Execute the following command to update them:
+
+	make QUICK=1 update-docs
+
+
 Testing and verification
 ---------------------------------------------------------------------
 * pick reserved words
