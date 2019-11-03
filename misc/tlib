@@ -39,6 +39,6 @@ test "$N" -gt 0
 sed -i -e '/^Number of all parsers is: [0-9]*$/d' ${actual}
 
 echo "comparing with expected output:"
-diff -uN --strip-trailing-cr ${expected} ${actual}
+diff -uN --strip-trailing-cr ${expected} ${actual} && rm ${actual}
 
 exit 0

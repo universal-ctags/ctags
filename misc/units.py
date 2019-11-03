@@ -36,6 +36,7 @@ import platform
 import queue
 import re
 import shutil
+import stat
 import subprocess
 import sys
 import threading
@@ -118,13 +119,20 @@ def line(*args, file=sys.stdout):
         ch = '-'
     print(ch * 60, file=file)
 
+def remove_readonly(func, path, _):
+    # Clear the readonly bit and reattempt the removal
+    os.chmod(path, stat.S_IWRITE | stat.S_IREAD)
+    dname = os.path.dirname(path)
+    os.chmod(dname, os.stat(dname).st_mode | stat.S_IWRITE)
+    func(path)
+
 def clean_bundles(bundles):
     if not os.path.isfile(bundles):
         return
     with open(bundles, 'r') as f:
         for fn in f.read().splitlines():
             if os.path.isdir(fn):
-                shutil.rmtree(fn)
+                shutil.rmtree(fn, onerror=remove_readonly)
             elif os.path.isfile(fn):
                 os.remove(fn)
     os.remove(bundles)
@@ -317,9 +325,9 @@ def prepare_bundles(frm, to, obundles):
         else:
             dist = to + '/' + fn
             if os.path.isdir(src):
-                shutil.copytree(src, dist)
+                shutil.copytree(src, dist, copy_function=shutil.copyfile)
             else:
-                shutil.copy(src, dist)
+                shutil.copyfile(src, dist)
             with open(obundles, 'a') as f:
                 print(dist, file=f)
 

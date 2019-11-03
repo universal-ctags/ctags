@@ -2,6 +2,7 @@
 # License: GPL-2
 
 CTAGS=$1
+BUILDDIR=$2
 
 . ../utils.sh
 
@@ -40,12 +41,12 @@ extract_debug_options()
 
 gdiff()
 {
-    print_help | extract_$1_options > ./$1.tmp
-    print_help | extract_$1_options | opt_sort > ./sorted-$1.tmp
+    print_help | extract_$1_options > $BUILDDIR/$1.tmp
+    print_help | extract_$1_options | opt_sort > $BUILDDIR/sorted-$1.tmp
 
-    diff -ruN ./$1.tmp ./sorted-$1.tmp
+    diff -ruN $BUILDDIR/$1.tmp $BUILDDIR/sorted-$1.tmp
     r=$?
-    rm ./$1.tmp ./sorted-$1.tmp
+    rm $BUILDDIR/$1.tmp $BUILDDIR/sorted-$1.tmp
 
     return $r
 }

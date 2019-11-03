@@ -74,7 +74,7 @@ exit_status_for_input_c()
 	local remove_file=$1
 	shift
 
-	printf "%s => " "$*"
+	printf "%s => " "$(echo "$*" | sed -e 's#[^ ][^ ]*/\([^ ]*\)#\1#g')"
 	${ctags} --quiet --options=NONE "$@" input.c > /dev/null
 	local result_local=$?
 
@@ -121,4 +121,10 @@ echo2()
 	# built-in echo suppresses \1.
 	/bin/echo "$@"
 	/bin/echo "$@" 1>&2
+}
+
+direq ()
+{
+    [ "$(cd ${1} && pwd)" = "$(cd ${2} && pwd)" ]
+    return $?
 }
