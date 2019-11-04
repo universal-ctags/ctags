@@ -22,7 +22,8 @@ EXTRA_DIST   = README.md autogen.sh \
 	       win32/ctags_vs2013.vcxproj win32/ctags_vs2013.vcxproj.filters \
 	       win32/gen-repoinfo.bat \
 	       man/Makefile man/README man/tags.5.rst \
-	       $(PEG_INPUT) $(OPTLIB2C_INPUT)
+	       $(PEG_INPUT) $(OPTLIB2C_INPUT) \
+	       docs Tmain Units
 
 clean-local:
 	@if test "$(top_srcdir)" != "$(top_builddir)"; then \
@@ -189,7 +190,15 @@ uninstall-hook:
 	rm $(DESTDIR)$(bindir)/etags$(EXEEXT)
 endif
 
-include $(top_srcdir)/makefiles/docs.mak
+dist-hook:
+	rm -rf $(distdir)/docs/_build
+	find $(distdir)/Tmain $(distdir)/Units \( \
+		-name '*-actual.txt' -o -name '*-diff.txt' -o \
+		-name '*.TMP' -o -name '*.tmp' -o -name '*~' -o \
+		-name 'dist.m4' -o -name 'Makefile.am' -o \
+		-name 'Makefile.in' -o -name 'Makefile' -o \
+		-name 'BUNDLES' \) -exec rm -f {} +
+
 include $(top_srcdir)/makefiles/testing.mak
 
 include $(top_srcdir)/makefiles/help.mak
