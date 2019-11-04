@@ -186,12 +186,14 @@ static int Lang_html;
 static void readTag (tokenInfo *token, vString *text, int depth);
 
 #ifdef DEBUG
+#if 0
 static void dumpToken (tokenInfo *token, const char *context, const char* extra_context)
 {
 	fprintf (stderr, "[%7s] %-20s@%s.%s\n",
 			 tokenTypes[token->type], vStringValue(token->string),
 			 context, extra_context? extra_context: "_");
 }
+#endif
 #endif
 
 static void readTokenText (tokenInfo *const token, bool collectText)
