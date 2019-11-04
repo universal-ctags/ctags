@@ -26,6 +26,31 @@ jobs:
            command: |
              MAKE=bmake bmake validate-input check roundtrip codecheck CIRCLECI=1
 
+   fedora_distcheck:
+     working_directory: ~/universal-ctags
+     docker:
+       - image: docker.io/fedora:latest
+     steps:
+       - run:
+           name: Install Git and Gdb
+           command: |
+             dnf -y install git gdb
+       - checkout
+       - run:
+           name: Install build tools
+           command: |
+             dnf -y install gcc automake autoconf pkgconfig make aspell-devel aspell-en libseccomp-devel libxml2-devel jansson-devel libyaml-devel findutils diffutils
+             dnf -y install jq puppet
+       - run:
+           name: Build
+           command: |
+             bash ./autogen.sh
+             ./configure
+       - run:
+           name: Test
+           command: |
+             make distcheck
+
    centos_make:
      working_directory: ~/universal-ctags
      docker:
@@ -57,4 +82,5 @@ workflows:
   build_and_test:
     jobs:
       - fedora30_bmake
+      - fedora_distcheck
       - centos_make
