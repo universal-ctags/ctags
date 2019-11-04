@@ -24,6 +24,11 @@ EXTRA_DIST   = README.md autogen.sh \
 	       man/Makefile man/README man/tags.5.rst \
 	       $(PEG_INPUT) $(OPTLIB2C_INPUT)
 
+clean-local:
+	@if test "$(top_srcdir)" != "$(top_builddir)"; then \
+		rm -rf $(OPTLIB2C_SRCS); \
+	fi
+
 bin_PROGRAMS = ctags
 noinst_LIBRARIES = libctags.a
 
@@ -109,9 +114,9 @@ libctags_a_CFLAGS  += $(LIBYAML_CFLAGS)
 libctags_a_CFLAGS  += $(ASPELL_CFLAGS)
 libctags_a_CFLAGS  += $(SECCOMP_CFLAGS)
 
-nodist_libctags_a_SOURCES = $(REPOINFO_HEADS)
+nodist_libctags_a_SOURCES = $(REPOINFO_HEADS) $(PEG_SRCS) $(PEG_HEADS)
 BUILT_SOURCES = $(REPOINFO_HEADS)
-CLEANFILES = $(REPOINFO_HEADS)
+CLEANFILES = $(REPOINFO_HEADS) $(PEG_SRCS) $(PEG_HEADS)
 $(REPOINFO_OBJS): $(REPOINFO_SRCS) $(REPOINFO_HEADS)
 repoinfo_verbose = $(repoinfo_verbose_@AM_V@)
 repoinfo_verbose_ = $(repoinfo_verbose_@AM_DEFAULT_V@)
