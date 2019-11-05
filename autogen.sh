@@ -17,27 +17,25 @@ if [ -z "${MAKE}" ]; then
 fi
 
 ctags_files=`${MAKE} -s -f makefiles/list-optlib2c-input.mak`
-misc/dist-test-cases && \
-	misc/dist-docs && \
-	if autoreconf -vfi; then
-		if type perl > /dev/null; then
-			for i in ${ctags_files}; do
-				o=${i%.ctags}.c
-				echo "optlib2c: translating $i to $o"
-				if ! ./misc/optlib2c $i > $o; then
-					echo "failed in running optlib2c" 1>&2
-					exit 1
-				fi
-			done
-		else
-			for i in ${ctags_files}; do
-				o=${i%.ctags}.c
-				echo "use pre-translated file: $o"
-			done
-		fi
+if autoreconf -vfi; then
+	if type perl > /dev/null; then
+		for i in ${ctags_files}; do
+			o=${i%.ctags}.c
+			echo "optlib2c: translating $i to $o"
+			if ! ./misc/optlib2c $i > $o; then
+				echo "failed in running optlib2c" 1>&2
+				exit 1
+			fi
+		done
 	else
-		echo "failed in running autoreconf" 1>&2
-		exit 1
+		for i in ${ctags_files}; do
+			o=${i%.ctags}.c
+			echo "use pre-translated file: $o"
+		done
 	fi
+else
+	echo "failed in running autoreconf" 1>&2
+	exit 1
+fi
 
 exit $?

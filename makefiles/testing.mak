@@ -4,8 +4,6 @@
 EXTRA_DIST += misc/units misc/units.py
 EXTRA_DIST += misc/tlib misc/mini-geany.expected
 
-DIST_SUBDIRS = Tmain Units
-
 check: tmain units tlib
 
 clean-local: clean-units clean-tmain

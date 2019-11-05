@@ -913,7 +913,7 @@ def action_clean(parser, action, *args):
     units_dir = res.units_dir
 
     if not os.path.isdir(units_dir):
-        error_exit(1, 'No such directory: ' + units_dir)
+        error_exit(0, 'No such directory: ' + units_dir)
 
     for bundles in glob.glob(units_dir + '/**/BUNDLES', recursive=True):
         clean_bundles(bundles)
@@ -1164,7 +1164,7 @@ def action_clean_tmain(parser, action, *args):
     tmain_dir = res.tmain_dir
 
     if not os.path.isdir(tmain_dir):
-        error_exit(1, 'No such directory: ' + tmain_dir)
+        error_exit(0, 'No such directory: ' + tmain_dir)
 
     for obj in ['stdout', 'stderr', 'exit', 'tags']:
         for typ in ['actual', 'diff']:

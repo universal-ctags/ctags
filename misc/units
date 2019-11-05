@@ -1217,7 +1217,7 @@ action_clean ()
     fi
 
     if ! [ -d "$units_dir" ]; then
-	ERROR 1 "No such directory: ${units_dir}"
+	ERROR 0 "No such directory: ${units_dir}"
     fi
 
     check_availability find
@@ -1667,7 +1667,7 @@ action_fuzz_common ()
     fi
 
     if ! [ -d "$units_dir" ]; then
-	ERROR 1 "No such directory: ${units_dir}"
+	ERROR 0 "No such directory: ${units_dir}"
     fi
 
     if ! [ -f "${CTAGS}" ]; then
