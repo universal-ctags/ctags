@@ -243,10 +243,11 @@ can be used to disable them.
 
 .. TODO: Review...
 
-Japanese programmers sometimes use the Japanese language in source
-code comments. Of course, it is not limited to Japanese. People may
-use their own native language and in such cases encoding becomes an
-issue.
+People may use their own native language in source code comments (or
+sometimes in identifiers) and in such cases encoding may become an issue.
+Nowadays UTF-8 is the most widely used encoding, but some source codes
+still use legacy encodings like latin1, cp932 and so on. These options
+are useful for such files.
 
 ctags doesn't consider the input encoding; it just reads input as a
 sequence of bytes and uses them as is when writing tags entries.
