@@ -38,7 +38,8 @@ noinst_PROGRAMS += packcc
 noinst_PROGRAMS += mini-geany
 
 packcc_CPPFLAGS =
-packcc_CFLAGS =
+packcc_CFLAGS  =
+packcc_CFLAGS += $(EXTRA_CFLAGS)
 dist_packcc_SOURCES = $(PACKCC_SRCS)
 
 if HAVE_STRNLEN
