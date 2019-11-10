@@ -57,7 +57,7 @@ if [ "$TARGET" = "Unix" ]; then
 
     else
 		make -C man QUICK=1 update-docs
-		if ! git diff --quiet docs/man; then
+		if ! git diff --exit-code docs/man; then
 			echo "Files under docs/man/ are not up to date."
 			echo "Please execute 'make -C man QUICK=1 update-docs' and commit them."
 			exit 1
