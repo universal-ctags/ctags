@@ -421,6 +421,14 @@ are not listed here. They are experimental or for debugging purpose.
 ``-B``
 	Use backward searching patterns (e.g. ?pattern?). [Ignored in etags mode]
 
+``-D macro=definition``
+	Defines a C preprocessor macro. This emulates the behaviour of the
+	corresponding gcc option. All types of macros are supported,
+	including the ones with parameters and variable arguments.
+	Stringification, token pasting and recursive macro expansion are also
+	supported.
+	This extends the function provided by ``-I`` option.
+
 ``-e``
 	Same as ``--output-format=etags``.
 	Enable etags mode, which will create a tag file for use with the Emacs
@@ -945,6 +953,15 @@ are not listed here. They are experimental or for debugging purpose.
 	tags when preprocessor conditionals are too complex follows all branches
 	of a conditional. This option is disabled by default.
 
+``--input-encoding=encoding``
+	Specifies the encoding of the input files.
+	If this option is specified, Universal-ctags converts the input from this
+	encoding to the encoding specified by ``--output-encoding=encoding``.
+
+``--input-encoding-<LANG>=encoding``
+	Specifies a specific input encoding for ``LANG``. It overrides the global
+	default value given with ``--input-encoding``.
+
 ``--kinddef-<LANG>=letter,name,description``
 	See ctags-optlib(7).
 	Be not confused this with ``--kinds-<LANG>``.
@@ -1304,6 +1321,16 @@ are not listed here. They are experimental or for debugging purpose.
 	This option does not work with ``--machinable`` nor
 	``--with-list-header``.
 
+``--list-mline-regex-flags``
+	Output list of flags which can be used in a multiline regex parser
+	definition.
+
+``--list-params=[language|all]``
+	Output list of language parameters. This works with ``--machinable``.
+
+``--list-pseudo-tags``
+	Output list of pseudo tags.
+
 ``--list-regex-flags``
 	See ctags-optlib(7).
 
@@ -1363,6 +1390,9 @@ are not listed here. They are experimental or for debugging purpose.
 	Limits the depth of directory recursion enabled with the ``--recurse``
 	(``-R``) option.
 
+``--mline-regex-<LANG>=/line_pattern/name_pattern/[flags]``
+	Define multiline regular expression for locating tags in specific language.
+
 ``--options=pathname``
 	Read additional options from file or directory.
 
@@ -1388,6 +1418,15 @@ are not listed here. They are experimental or for debugging purpose.
 	Add an optlib *directory* to or reset **optlib** path list.
 	By default, the optlib path list is empty.
 
+``--output-encoding=encoding``
+	Specifies the encoding of the tags file.
+	Universal-ctags converts the encoding of input files from the encoding
+	specified by ``--input-encoding=encoding`` to this encoding.
+
+	In addition ``encoding`` is specified at the top the tags file as the
+	value for the ``TAG_FILE_ENCODING`` pseudo tag. The default value of
+	``encoding`` is UTF-8.
+
 ``--output-format=u-ctags|e-ctags|etags|xref|json``
 	Specify the output format. The default is "u-ctags".
 	See tags(5) for "u-ctags" and "e-ctags".
@@ -1399,8 +1438,25 @@ are not listed here. They are experimental or for debugging purpose.
 .. TODO: convert output-json.rst to ctags-json-output.1.rst (ctags-json-output(1)).
    and add a link to it here.
 
+``--param-<LANG>:name=argument``
+	Set <LANG> specific parameter. Available parameters can be listed with
+	``--list-params``.
+
+``--pattern-length-limit=N``
+	Cutoff patterns of tag entries after N characters. Disable by setting to 0
+	(default is 96).
+
 ``--print-language``
 	Just prints the language parsers for specified source files, and then exits.
+
+``--pseudo-tags=[+|-]ptag``
+``--pseudo-tags=*``
+	Enable/disable emitting pseudo tag named ptag.
+	if \* is given, enable emitting all pseudo tags.
+
+``--put-field-prefix``
+	Put "UCTAGS" as prefix for the name of fields newly introduced in
+	universal-ctags.
 
 ``--quiet[=yes|no]``
 	Write fewer messages (default is no).
