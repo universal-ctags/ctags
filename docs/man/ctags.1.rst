@@ -1449,8 +1449,7 @@ are not listed here. They are experimental or for debugging purpose.
 ``--print-language``
 	Just prints the language parsers for specified source files, and then exits.
 
-``--pseudo-tags=[+|-]ptag``
-``--pseudo-tags=*``
+``--pseudo-tags=[+|-]ptag``, ``--pseudo-tags=*``
 	Enable/disable emitting pseudo tag named ptag.
 	if \* is given, enable emitting all pseudo tags.
 
