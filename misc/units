@@ -1531,7 +1531,7 @@ fuzz_lang_file ()
 
     [ "${QUIET}" = 'yes' ] || printf "."
     echo "${cmdline}" > "${ocmdline}"
-    ( exec 2>&-; ${cmdline} 2> /dev/null > /dev/null )
+    ${cmdline} > /dev/null
     r=$?
 
     case $r in
@@ -1685,7 +1685,7 @@ action_fuzz_common ()
     [ "$WITH_VALGRIND" = 'yes' ] && check_availability valgrind
     check_availability find
 
-    cmdline="${CTAGS} --options=NONE --\*-kinds=\* --fields=\*"
+    cmdline="${CTAGS} --quiet --options=NONE --kinds-all=* --fields=*"
     _CMDLINE="${cmdline} -G -o - "
     _CMDLINE_FOR_SHRINKING="${_CMDLINE}"
     if [ "$WITH_VALGRIND" = yes ]; then
