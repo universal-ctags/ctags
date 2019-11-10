@@ -152,9 +152,9 @@ packcc_verbose_0 = @echo PACKCC "    $@";
 PACKCC = $(top_builddir)/packcc$(EXEEXT)
 SUFFIXES += .peg
 .peg.c:
-	$(packcc_verbose)$(PACKCC) -o $(top_builddir)/peg/$(*F) $<
+	$(packcc_verbose)$(PACKCC) -o $(top_builddir)/peg/$(*F) "$<"
 .peg.h:
-	$(packcc_verbose)$(PACKCC) -o $(top_builddir)/peg/$(*F) $<
+	$(packcc_verbose)$(PACKCC) -o $(top_builddir)/peg/$(*F) "$<"
 # You cannot use $(PACKCC) as a target name here.
 $(PEG_HEADS): packcc$(EXEEXT) Makefile
 $(PEG_SRCS): packcc$(EXEEXT) Makefile
