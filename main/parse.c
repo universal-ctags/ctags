@@ -1921,6 +1921,8 @@ extern void initializeParsing (void)
 			bool accepted = false;
 			if (def->name == NULL  ||  def->name[0] == '\0')
 				error (FATAL, "parser definition must contain name\n");
+			else if (strcmp (def->name, RSV_LANG_ALL) == 0)
+				error (FATAL, "\"all\" is reserved; don't use it as the name for defining a new language");
 			else if (def->method & METHOD_NOT_CRAFTED)
 			{
 				def->parser = findRegexTags;
@@ -2137,54 +2139,64 @@ static parserDefinition* OptlibParser(const char *name, const char *base,
 extern void processLanguageDefineOption (
 		const char *const option, const char *const parameter)
 {
-	if (parameter [0] == '\0')
-		error (WARNING, "No language specified for \"%s\" option", option);
-	else if (getNamedLanguage (parameter, 0) != LANG_IGNORE)
-		error (WARNING, "Language \"%s\" already defined", parameter);
+	char *name;
+	char *flags;
+	parserDefinition*  def;
+
+	flags = strchr (parameter, LONG_FLAGS_OPEN);
+	if (flags)
+		name = eStrndup (parameter, flags - parameter);
 	else
+		name = eStrdup (parameter);
+
+	/* Veirfy that the name of new language is acceptable or not. */
+	if (name [0] == '\0')
 	{
-		char *name;
-		char *flags;
-		parserDefinition*  def;
-
-		flags = strchr (parameter, LONG_FLAGS_OPEN);
-		if (flags)
-			name = eStrndup (parameter, flags - parameter);
-		else
-			name = eStrdup (parameter);
-
-		LanguageTable = xRealloc (LanguageTable, LanguageCount + 1, parserObject);
-		memset (LanguageTable + LanguageCount, 0, sizeof(parserObject));
-
-		struct preLangDefFlagData data = {
-			.base = NULL,
-			.direction = SUBPARSER_UNKNOWN_DIRECTION,
-			.autoFQTag = false,
-		};
-		flagsEval (flags, PreLangDefFlagDef, ARRAY_SIZE (PreLangDefFlagDef), &data);
-
-		if (data.base == NULL && data.direction != SUBPARSER_UNKNOWN_DIRECTION)
-			error (WARNING, "Ignore the direction of subparser because \"{base=}\" is not given");
-
-		if (data.base && data.direction == SUBPARSER_UNKNOWN_DIRECTION)
-			data.direction = SUBPARSER_BASE_RUNS_SUB;
-
-		def = OptlibParser (name, data.base, data.direction);
-		if (data.base)
-			eFree (data.base);
-
-		def->requestAutomaticFQTag = data.autoFQTag;
-
-		initializeParsingCommon (def, false);
-		linkDependenciesAtInitializeParsing (def);
-
-		LanguageTable [def->id].currentPatterns = stringListNew ();
-		LanguageTable [def->id].currentExtensions = stringListNew ();
-		LanguageTable [def->id].pretendingAsLanguage = LANG_IGNORE;
-		LanguageTable [def->id].pretendedAsLanguage = LANG_IGNORE;
-
 		eFree (name);
+		error (FATAL, "No language specified for \"%s\" option", option);
 	}
+	else if (getNamedLanguage (name, 0) != LANG_IGNORE)
+	{
+		eFree (name);
+		error (FATAL, "Language \"%s\" already defined", parameter);
+	}
+	else if (strcmp(name, RSV_LANG_ALL) == 0)
+	{
+		eFree (name);
+		error (FATAL, "\"all\" is reserved; don't use it as the name for defining a new language");
+	}
+
+	LanguageTable = xRealloc (LanguageTable, LanguageCount + 1, parserObject);
+	memset (LanguageTable + LanguageCount, 0, sizeof(parserObject));
+
+	struct preLangDefFlagData data = {
+		.base = NULL,
+		.direction = SUBPARSER_UNKNOWN_DIRECTION,
+		.autoFQTag = false,
+	};
+	flagsEval (flags, PreLangDefFlagDef, ARRAY_SIZE (PreLangDefFlagDef), &data);
+
+	if (data.base == NULL && data.direction != SUBPARSER_UNKNOWN_DIRECTION)
+		error (WARNING, "Ignore the direction of subparser because \"{base=}\" is not given");
+
+	if (data.base && data.direction == SUBPARSER_UNKNOWN_DIRECTION)
+		data.direction = SUBPARSER_BASE_RUNS_SUB;
+
+	def = OptlibParser (name, data.base, data.direction);
+	if (data.base)
+		eFree (data.base);
+
+	def->requestAutomaticFQTag = data.autoFQTag;
+
+	initializeParsingCommon (def, false);
+	linkDependenciesAtInitializeParsing (def);
+
+	LanguageTable [def->id].currentPatterns = stringListNew ();
+	LanguageTable [def->id].currentExtensions = stringListNew ();
+	LanguageTable [def->id].pretendingAsLanguage = LANG_IGNORE;
+	LanguageTable [def->id].pretendedAsLanguage = LANG_IGNORE;
+
+	eFree (name);
 }
 
 extern bool isLanguageKindEnabled (const langType language, int kindIndex)
