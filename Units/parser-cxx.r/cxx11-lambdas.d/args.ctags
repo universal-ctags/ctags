@@ -1,4 +1,4 @@
---c++-kinds=+pflz
+--kinds-c++=+pflz
 --fields=+SsKe
 --fields-c++=+{captures}
 --sort=no

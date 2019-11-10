@@ -1,2 +1,2 @@
 --fields=+S 
---Fortran-kinds=+LP
+--kinds-Fortran=+LP

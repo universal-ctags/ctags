@@ -296,7 +296,6 @@ static optionDescription LongOptionDescription [] = {
  {1,"  --kinddef-<LANG>=letter,name,desc"},
  {1,"       Define new kind for <LANG>."},
  {1,"  --kinds-<LANG>=[+|-]kinds, or"},
- {1,"  --<LANG>-kinds=[+|-]kinds"},
  {1,"       Enable/disable tag kinds for language <LANG>."},
  {1,"  --langdef=name"},
  {1,"       Define a new language to be parsed with regular expressions."},

@@ -988,15 +988,14 @@ are not listed here. They are experimental or for debugging purpose.
 
 	As an example for the C language, in order to add prototypes and
 	external variable declarations to the default set of tag kinds,
-	but exclude macros, use "--c-kinds=+px-d"; to include only tags for
-	functions, use "--c-kinds=f".
+	but exclude macros, use "--kinds-c=+px-d"; to include only tags for
+	functions, use "--kinds-c=f".
 
 	A name associated with a kind can be used as alternative to a
 	one-letter flag. See "Letters and names" for more details.
 
 ``--<LANG>-kinds=[+|-]kinds|*``
-	Equivalent to ``--kinds-<LANG>=...``. This option is kept for
-	backward-compatibility with Exuberant-ctags.
+	This option is obsolete. Use ``--kinds-<LANG>=...`` instead.
 
 ``--langdef=name``
 	See ctags-optlib(7).
@@ -1785,7 +1784,7 @@ is defined outside of the class declaration (the usual case), the access
 specification (i.e. public, protected, or private) and implementation
 information (e.g. virtual, pure virtual) contained in the function
 declaration are not known when the tag is generated for the function
-definition. It will, however be available for prototypes (e.g. "--c++-kinds=+p").
+definition. It will, however be available for prototypes (e.g. "--kinds-c++=+p").
 
 No qualified tags are generated for language objects inherited into a class.
 

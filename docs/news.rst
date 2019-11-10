@@ -169,15 +169,11 @@ source code the "wildcard"(``*``) option value has been introduced.
 
 	Enables all available fields.
 
-``--<LANG>-kinds=*``
+``--kinds-<LANG>=*``
 
 	Enables all available kinds for ``LANG``.
 
-``--kinds-<LANG>=*``
-
-	Alternative representation of ``--<LANG>-kinds=*``.
-
-``--all-kinds=*``
+``--kinds-all=*``
 
 	Enables all available kinds for all available language parsers.
 

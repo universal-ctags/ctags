@@ -1,4 +1,4 @@
 --sort=no
 --fields=+e
 --fields-c++=+{properties}
---c++-kinds=+A
+--kinds-c++=+A

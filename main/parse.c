@@ -2652,25 +2652,26 @@ extern bool processKindsOption (
 		(strcmp (dash + 1, "kinds") == 0  ||  strcmp (dash + 1, "types") == 0))
 	{
 		size_t len = dash - option;
+		char *langName = eStrndup (option, len);
 
-		if ((len == 3) && (strncmp (option, RSV_LANG_ALL, len) == 0))
+		if ((len == 3) && (strcmp (langName, RSV_LANG_ALL) == 0))
 		{
+			error (WARNING,
+				   "\"--%s\" option is obsolete; use \"--kinds-%s\" instead",
+				   option, langName);
 			if (*parameter != '*' && *parameter != '\0')
 				error (FATAL, "only '*' is acceptable as kind letter for --%s", option);
 			foreachLanguage(processLangKindDefinitionEach, &arg);
 		}
 		else
 		{
-			language = getNamedLanguage (option, len);
+			language = getNamedLanguage (langName, 0);
 			if (language == LANG_IGNORE)
-			{
-				char *langName = eStrndup (option, len);
 				error (WARNING, "Unknown language \"%s\" in \"%s\" option", langName, option);
-				eFree (langName);
-			}
 			else
 				processLangKindDefinition (language, option, parameter);
 		}
+		eFree (langName);
 		handled = true;
 	}
 	else if ( strncmp (option, PREFIX, PREFIX_LEN) == 0 )

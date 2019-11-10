@@ -1,4 +1,4 @@
 --fields=nksSaf
 --file-scope=yes
 --sort=no
---go-kinds=picsmtfv
+--kinds-go=picsmtfv

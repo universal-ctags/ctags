@@ -8,7 +8,7 @@ Exuberant ctags generates following tags file
 
 Universal ctags generates following tags file
 
-	$ ./ctags -o - --C-kinds='x'  input.h
+	$ ./ctags -o - --kinds-C='x'  input.h
 	a	/home/jet/var/ctags/Units/review-needed.r/extern_variable.h.t/input.h	/^extern int a;$/;"	x	typeref:typename:int
 	b	/home/jet/var/ctags/Units/review-needed.r/extern_variable.h.t/input.h	/^extern struct B b;$/;"	x	typeref:struct:B
 
