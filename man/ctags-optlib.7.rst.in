@@ -149,6 +149,10 @@ OPTION ITEMS
 	expressions. Once defined, name may be used in other options taking
 	language names.
 
+	"all" as *name* is not acceptable. It is a reserved word. See
+	the description of ``--kinds-<LANG>=[+|-]kinds|*`` option in ctags(1)
+	about how the reserved word is used.
+
 	The names of built-in parsers are capitalized. When
 	@CTAGS_NAME_EXECUTABLE@ evaluates an option in a command line, and
 	chooses a parser, @CTAGS_NAME_EXECUTABLE@ uses the names of

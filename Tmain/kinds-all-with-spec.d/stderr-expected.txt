@@ -1,0 +1,2 @@
+ctags: only '*' is acceptable as kind letter for --kinds-all
+ctags: only '*' is acceptable as kind letter for --all-kinds
