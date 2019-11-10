@@ -2642,7 +2642,11 @@ extern bool processKindsOption (
 		size_t len = dash - option;
 
 		if ((len == 3) && (strncmp (option, RSV_LANG_ALL, len) == 0))
+		{
+			if (*parameter != '*' && *parameter != '\0')
+				error (FATAL, "only '*' is acceptable as kind letter for --%s", option);
 			foreachLanguage(processLangKindDefinitionEach, &arg);
+		}
 		else
 		{
 			language = getNamedLanguage (option, len);
@@ -2665,7 +2669,14 @@ extern bool processKindsOption (
 		if (lang[0] == '\0')
 			error (WARNING, "No language given in \"%s\" option", option);
 		else if (strcmp (lang, RSV_LANG_ALL) == 0)
+		{
+			/* Though only '*' is documented as an acceptable kind spec for
+			 * --kinds-all option in our man page, we accept '\0' here because
+			 * it will be useful for testing purpose. */
+			if (*parameter != '*' && *parameter != '\0')
+				error (FATAL, "only '*' is acceptable as kind letter for --%s", option);
 			foreachLanguage(processLangKindDefinitionEach, &arg);
+		}
 		else
 		{
 			language = getNamedLanguage (lang, 0);

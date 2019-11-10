@@ -177,10 +177,6 @@ source code the "wildcard"(``*``) option value has been introduced.
 
 	Alternative representation of ``--<LANG>-kinds=*``.
 
-``--all-kinds=SPEC``
-
-	Applies SPEC as kinds to all available language parsers.
-
 ``--all-kinds=*``
 
 	Enables all available kinds for all available language parsers.
