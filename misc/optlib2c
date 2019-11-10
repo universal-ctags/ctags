@@ -49,6 +49,8 @@ my $options =
      [ qr/^--langdef=([^\{]+)(((\{base=([^\{]+)\})(\{(dedicated|shared|bidirectional)\})?)?)(\{_autoFQTag\})?/, sub {
 	   die "LANG is already defined as $_[0]->{'langdef'}: $1"
 	       if (defined $_[0]->{'langdef'});
+	   die "Don't use \"all\" as a language name. It is reserved word."
+	       if ($1 eq "all");
 	   $_[0]->{'langdef'} = $1;
 	   $_[0]->{'base'} = $5 if defined $5;
 	   $_[0]->{'direction'} = $7 if defined $7;
