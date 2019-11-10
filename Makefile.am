@@ -91,8 +91,7 @@ PARSER_SRCS += $(YAML_SRCS)
 PARSER_HEADS += $(YAML_HEADS)
 endif
 
-PARSER_SRCS += $(PEG_SRCS)
-PARSER_HEADS += $(PEG_HEADS) $(PEG_EXTRA_HEADS)
+PARSER_HEADS += $(PEG_EXTRA_HEADS)
 
 libctags_a_CPPFLAGS = -I. -I$(srcdir) -I$(srcdir)/main -I$(srcdir)/peg -DHAVE_PACKCC
 if ENABLE_DEBUGGING
@@ -156,8 +155,7 @@ SUFFIXES += .peg
 .peg.h:
 	$(packcc_verbose)$(PACKCC) -o $(top_builddir)/peg/$(*F) "$<"
 # You cannot use $(PACKCC) as a target name here.
-$(PEG_HEADS): packcc$(EXEEXT) Makefile
-$(PEG_SRCS): packcc$(EXEEXT) Makefile
+$(PEG_SRCS) $(PEG_HEADS): packcc$(EXEEXT) Makefile
 dist_libctags_a_SOURCES = $(ALL_LIB_HEADS) $(ALL_LIB_SRCS)
 
 ctags_CPPFLAGS = $(libctags_a_CPPFLAGS)
