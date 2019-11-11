@@ -25,7 +25,7 @@ GNU/Linux distributions
 
 Before running ./autogen.sh, install some packages.
 
-On Debian-based systems, do::
+On Debian-based systems (including Ubuntu), do::
 
     $ sudo apt install \
         gcc make \
