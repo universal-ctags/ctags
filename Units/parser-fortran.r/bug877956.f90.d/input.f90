@@ -15,7 +15,7 @@
 ! Initial Comment:
 ! When I run ctags v5.5.2 on Redhat Linux 9 with the command
 !
-! ctags --Fortran-kinds=v  -x test.f90
+! ctags --kinds-Fortran=v  -x test.f90
 !                                      
 ! where test.f90 is
 ! ----------------------------------
@@ -42,7 +42,7 @@ END PROGRAM test
 ! -----------------------------------------
 ! and run the command
 !                                      
-! ctags --Fortran-kinds=v  -x test.f90
+! ctags --kinds-Fortran=v  -x test.f90
 !                                      
 ! I get this correct output
 !                                      

@@ -1,2 +1,2 @@
 --extras=+q
---systemverilog-kinds=+Q
+--kinds-systemverilog=+Q

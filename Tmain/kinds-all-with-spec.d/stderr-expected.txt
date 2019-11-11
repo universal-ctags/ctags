@@ -1,2 +1,3 @@
 ctags: only '*' is acceptable as kind letter for --kinds-all
+ctags: Warning: "--all-kinds" option is obsolete; use "--kinds-all" instead
 ctags: only '*' is acceptable as kind letter for --all-kinds

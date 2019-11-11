@@ -1,4 +1,4 @@
---c-kinds=+p
+--kinds-c=+p
 --fields=+S
 -I MACRO2
 --fields=+r

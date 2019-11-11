@@ -1,3 +1,3 @@
 --fields=+ne
 --extras=+g
---Fortran-kinds=+P
+--kinds-Fortran=+P

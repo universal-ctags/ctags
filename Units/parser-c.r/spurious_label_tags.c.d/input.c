@@ -1,4 +1,4 @@
-/* When run with --c-kinds=+lp option demonstrates spurious tags for statement
+/* When run with --kinds-c=+lp option demonstrates spurious tags for statement
  * following a label
  */
 static void label_forced_tags(void)
