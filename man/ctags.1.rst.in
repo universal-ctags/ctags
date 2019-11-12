@@ -493,7 +493,7 @@ are not listed here. They are experimental or for debugging purpose.
 	the second identifiers for parsing purposes. The list of identifiers may
 	be supplied directly on the command line or read in from a separate file.
 	If the first character of identifier-list is '@', '.' or a pathname
-	separator ('/' or '\\'), or the first two characters specify a drive
+	separator (``'/'`` or ``'\'``), or the first two characters specify a drive
 	letter (e.g. "C:"), the parameter identifier-list will be interpreted as
 	a filename from which to read a list of identifiers, one per input line.
 	Otherwise, identifier-list is a list of identifiers (or identifier
