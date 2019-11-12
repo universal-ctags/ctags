@@ -293,5 +293,8 @@ extern parserDefinition* ProtobufParser (void)
 	def->keywordTable = ProtobufKeywordTable;
 	def->keywordCount = ARRAY_SIZE (ProtobufKeywordTable);
 
+	/* cpreprocessor wants corkQueue. */
+	def->useCork    = true;
+
 	return def;
 }
