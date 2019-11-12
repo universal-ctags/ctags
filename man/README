@@ -15,6 +15,12 @@ Rules for writing man pages
 
 * use one asterisk for option parameter like *LANG* in --kind-<LANG> option.
 
+* To represent a backslash, surround it with double backquote. i.e. ``\``.
+  Escaping a backslash with another backslash doesn't work well depending
+  on the tools. When converting rst to man, two backslashes are converted
+  into one, however when converting to html, four backslashes are converted
+  into one.
+
 * the files in ../docs/man/ need to be updated after writing man pages.
   Execute the following command to update them:
 
