@@ -1382,28 +1382,6 @@ extern int makePlaceholder (const char *const name)
 	return makeTagEntry (&e);
 }
 
-static void makeTagEntriesForSubwords (tagEntryInfo *const subtag)
-{
-	stringList *list;
-
-	subtag->extensionFields.scopeIndex = CORK_NIL;
-	markTagExtraBit (subtag, XTAG_SUBWORD);
-
-	list = stringListNewBySplittingWordIntoSubwords(subtag->name);
-	for (unsigned int i = 0; i < stringListCount(list); i++)
-	{
-		vString *subword = stringListItem (list, i);
-
-		subtag->name = vStringValue(subword);
-
-		if (TagFile.cork)
-			queueTagEntry (subtag);
-		else
-			writeTagEntry (subtag);
-	}
-	stringListDelete (list);
-}
-
 extern int makeTagEntry (const tagEntryInfo *const tag)
 {
 	int r = CORK_NIL;
@@ -1429,11 +1407,6 @@ extern int makeTagEntry (const tagEntryInfo *const tag)
 
 	notifyMakeTagEntry (tag, r);
 
-	if (isXtagEnabled (XTAG_SUBWORD))
-	{
-		tagEntryInfo subtag = *tag;
-		makeTagEntriesForSubwords (&subtag);
-	}
 out:
 	return r;
 }

@@ -14,7 +14,7 @@
 {"_type": "tag", "name": "main", "path": "input.c", "pattern": "/^main(void)$/", "language": "C", "line": 9, "signature": "(void)", "typeref": "typename:int", "kind": "function", "roles": "def", "end": 12}
 {"_type": "tag", "name": "main", "path": "input.go", "pattern": "/^func main() {$/", "language": "Go", "line": 3, "signature": "()", "kind": "func", "roles": "def", "scope": "main", "scopeKind": "package", "end": 4}
 {"_type": "tag", "name": "main", "path": "input.go", "pattern": "/^package main$/", "language": "Go", "line": 1, "kind": "package", "roles": "def"}
-# json --languages=+man --fields=* --extras=*-{subword}
+# json --languages=+man --fields=* --extras=*
 {"_type": "ptag", "name": "JSON_OUTPUT_VERSION", "path": "0.0", "pattern": "in development"}
 {"_type": "ptag", "name": "TAG_FILE_SORTED", "path": "1", "pattern": "0=unsorted, 1=sorted, 2=foldcase"}
 {"_type": "ptag", "name": "TAG_PROGRAM_AUTHOR", "path": "Universal Ctags Team", "pattern": ""}

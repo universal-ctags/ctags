@@ -1,5 +1,5 @@
 # -*- makefile -*-
-.PHONY: check units fuzz noise tmain tinst tlib clean-units clean-tlib clean-tmain clean-gcov run-gcov codecheck cppcheck dicts cspell validate-input
+.PHONY: check units fuzz noise tmain tinst tlib clean-units clean-tlib clean-tmain clean-gcov run-gcov codecheck cppcheck dicts validate-input
 
 EXTRA_DIST += misc/units misc/units.py
 EXTRA_DIST += misc/tlib misc/mini-geany.expected
@@ -275,10 +275,3 @@ cppcheck:
 	cppcheck $(CPPCHECK_DEFS) $(CPPCHECK_UNDEFS) $(CPPCHECK_FLAGS) \
 		 $$(git  ls-files | grep '^\(parsers\|main\)/.*\.[ch]' )
 
-#
-# Spelling
-#
-dicts: $(CTAGS_TEST)
-	${SHELL} misc/make-dictfiles.sh
-cspell: $(CTAGS_TEST)
-	${SHELL} misc/cspell

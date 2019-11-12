@@ -174,7 +174,6 @@
     <ClCompile Include="..\parsers\cobol.c" />
     <ClCompile Include="..\parsers\cpreprocessor.c" />
     <ClCompile Include="..\parsers\css.c" />
-    <ClCompile Include="..\parsers\ctags-aspell.c" />
     <ClCompile Include="..\parsers\cxx\cxx.c" />
     <ClCompile Include="..\parsers\cxx\cxx_debug.c" />
     <ClCompile Include="..\parsers\cxx\cxx_debug_type.c" />
