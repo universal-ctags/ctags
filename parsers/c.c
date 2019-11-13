@@ -3583,6 +3583,9 @@ extern parserDefinition* OldCParser (void)
 	def->parser2    = findCTags;
 	def->initialize = initializeCParser;
 	def->enabled = 0;
+
+	/* cpreprocessor wants corkQueue. */
+	def->useCork    = true;
 	return def;
 }
 
@@ -3596,7 +3599,9 @@ extern parserDefinition* DParser (void)
 	def->parser2    = findCTags;
 	def->initialize = initializeDParser;
 	// end: field is not tested.
-	// def->useCork    = true;
+
+	/* cpreprocessor wants corkQueue. */
+	def->useCork    = true;
 	return def;
 }
 
@@ -3621,6 +3626,9 @@ extern parserDefinition* OldCppParser (void)
 	def->initialize = initializeCppParser;
 	def->selectLanguage = selectors;
 	def->enabled = 0;
+
+	/* cpreprocessor wants corkQueue. */
+	def->useCork    = true;
 	return def;
 }
 
@@ -3636,7 +3644,9 @@ extern parserDefinition* CsharpParser (void)
 	def->parser2    = findCTags;
 	def->initialize = initializeCsharpParser;
 	// end: field is not tested.
-	// def->useCork    = true;
+
+	/* cpreprocessor wants corkQueue. */
+	def->useCork    = true;
 	return def;
 }
 
@@ -3663,6 +3673,9 @@ extern parserDefinition* VeraParser (void)
 	def->parser2    = findCTags;
 	def->initialize = initializeVeraParser;
 	// end: field is not tested.
-	// def->useCork    = true;
+
+	/* cpreprocessor wants corkQueue. */
+	def->useCork    = true;
+
 	return def;
 }
