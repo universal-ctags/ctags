@@ -20,5 +20,4 @@ resources.
 	chop.rst
 	tmain.rst
 	tinst.rst
-	cspell.rst
 	input-validation.rst

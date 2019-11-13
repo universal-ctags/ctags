@@ -210,4 +210,4 @@ The version of u-ctags is `83b0d1f6`::
 	Exuberant Ctags 5.8, Copyright (C) 1996-2009 Darren Hiebert
 	  Compiled: Dec 15 2017, 08:07:36
 	  URL: https://ctags.io/
-	  Optional compiled features: +wildcards, +regex, +multibyte, +debug, +option-directory, +xpath, +json, +interactive, +sandbox, +yaml, +aspell
+	  Optional compiled features: +wildcards, +regex, +multibyte, +debug, +option-directory, +xpath, +json, +interactive, +sandbox, +yaml

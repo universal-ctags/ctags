@@ -140,7 +140,6 @@
 	VeraParser, \
 	VerilogParser, \
 	SystemVerilogParser, \
-	UCtagsAspellParser, \
 	VhdlParser, \
 	VimParser, \
 	WindResParser, \

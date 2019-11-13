@@ -1,3 +1,0 @@
---sort=no
---extras=*-{inputFile}{pseudo}
---fields=+{signature}{extras}

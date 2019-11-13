@@ -60,7 +60,7 @@ Universal Ctags is derived from Exuberant Ctags.
 Exuberant Ctags 5.8, Copyright (C) 1996-2009 Darren Hiebert
   Compiled: May 11 1018, 23:16:36
   URL: https://ctags.io/
-  Optional compiled features: +wildcards, +regex, +iconv, +option-directory, +xpath, +json, +interactive, +sandbox, +yaml, +aspell
+  Optional compiled features: +wildcards, +regex, +iconv, +option-directory, +xpath, +json, +interactive, +sandbox, +yaml
 ```
 
 How do you get ctags binary:

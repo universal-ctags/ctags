@@ -563,9 +563,6 @@ static struct Feature {
 #ifdef ENABLE_GCOV
 	{"gcov", "linked with code for coverage analysis"},
 #endif
-#ifdef HAVE_ASPELL
-	{"aspell", "linked with code for spell checking (internal use)"},
-#endif
 #ifdef HAVE_PACKCC
 	/* The test harnesses use this as hints for skipping test cases */
 	{"packcc", "has peg based parser(s)"},
