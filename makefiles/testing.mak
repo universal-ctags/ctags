@@ -46,7 +46,7 @@ fuzz: $(CTAGS_TEST)
 		--ctags=$(CTAGS_TEST) \
 		--languages=$(LANGUAGES) \
 		$${VALGRIND} --run-shrink \
-		--with-timeout=$(TIMEOUT)"; \
+		--with-timeout=`expr $(TIMEOUT) '*' 10`"; \
 	$(SHELL) $${c} $(srcdir)/Units
 
 #
