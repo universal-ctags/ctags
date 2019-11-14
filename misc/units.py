@@ -477,6 +477,15 @@ def run_tcase(finput, t, name, tclass, category, build_t, extra_inputs):
             broken_args_ctags = True
     basecmdline = cmdline
 
+    #
+    # Filtered by LANGUAGES
+    #
+    guessed_lang = None
+    if len(LANGUAGES) > 0:
+        guessed_lang = guess_lang(basecmdline, finput)
+        if not guessed_lang in LANGUAGES:
+            return False
+
     clean_tcase(o, obundles)
     os.makedirs(o, exist_ok=True)
     if not os.path.samefile(o, t):
@@ -491,7 +500,8 @@ def run_tcase(finput, t, name, tclass, category, build_t, extra_inputs):
 
     (tmp, feat) = check_features(output_feature, ffeatures)
     if not tmp:
-        guessed_lang = guess_lang(basecmdline, finput)
+        if not guessed_lang:
+            guessed_lang = guess_lang(basecmdline, finput)
         msg = build_strings(guessed_lang)[0]
         L_SKIPPED_BY_FEATURES += [category + '/' + name]
         if feat.startswith('!'):
@@ -501,19 +511,22 @@ def run_tcase(finput, t, name, tclass, category, build_t, extra_inputs):
         return False
     (tmp, lang) = check_languages(basecmdline, flanguages)
     if not tmp:
-        guessed_lang = guess_lang(basecmdline, finput)
+        if not guessed_lang:
+            guessed_lang = guess_lang(basecmdline, finput)
         msg = build_strings(guessed_lang)[0]
         L_SKIPPED_BY_LANGUAGES += [category + '/' + name]
         run_result('skip', msg, oresult, 'required language parser "' + lang + '" is not available')
         return False
     if WITH_TIMEOUT == 0 and tclass == 'i':
-        guessed_lang = guess_lang(basecmdline, finput)
+        if not guessed_lang:
+            guessed_lang = guess_lang(basecmdline, finput)
         msg = build_strings(guessed_lang)[0]
         L_SKIPPED_BY_ILOOP += [category + '/' + name]
         run_result('skip', msg, oresult, 'may cause an infinite loop')
         return False
     if broken_args_ctags:
-        guessed_lang = guess_lang(basecmdline, finput)
+        if not guessed_lang:
+            guessed_lang = guess_lang(basecmdline, finput)
         msg = build_strings(guessed_lang)[0]
         L_BROKEN_ARGS_CTAGS += [category + '/' + name]
         run_result('error', msg, None, 'broken args.ctags?')
@@ -538,7 +551,8 @@ def run_tcase(finput, t, name, tclass, category, build_t, extra_inputs):
                     timeout=timeout_value)
         run_record_cmdline(cmdline, ffilter, ocmdline, output_type)
     except subprocess.TimeoutExpired:
-        guessed_lang = guess_lang(basecmdline, finput)
+        if not guessed_lang:
+            guessed_lang = guess_lang(basecmdline, finput)
         (msg, cmdline_template, oshrink) = build_strings(guessed_lang)
         L_FAILED_BY_TIMEED_OUT += [category + '/' + name]
         run_result('error', msg, oresult, 'TIMED OUT')
