@@ -74,8 +74,8 @@
 extern bool cppIsBraceFormat (void);
 extern unsigned int cppGetDirectiveNestLevel (void);
 
-/* Don't forget to set useCort true if your parser.
- * The corkQueue is needed to capture macro parameters
+/* Don't forget to set useCort true in your parser.
+ * The corkQueue is needed to capture macro parameters.
  */
 extern void cppInit (const bool state,
 		     const bool hasAtLiteralStrings,
@@ -96,8 +96,8 @@ extern void cppUngetString(const char * string,int len);
 extern int cppGetc (void);
 extern const vString * cppGetLastCharOrStringContents (void);
 
-/* notify the external parser state for the purpose of conditional
-   branch choice. The CXX parser stores the block level here. */
+/* Notify the external parser state for the purpose of conditional
+ * branch choice. The CXX parser stores the block level here. */
 extern void cppPushExternalParserBlock(void);
 extern void cppPopExternalParserBlock(void);
 
