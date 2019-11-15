@@ -268,7 +268,7 @@ def run_shrink(cmdline_template, finput, foutput, lang):
 
     print('Shrinking ' + finput + ' as ' + lang)
     # fallback to the shell script version
-    subproces.run([SHELL, script, 'shrink',
+    subprocess.run([SHELL, script, 'shrink',
         '--timeout=1', '--foreground',
         cmdline_template, finput, foutput])
 
