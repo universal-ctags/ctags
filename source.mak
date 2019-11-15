@@ -307,6 +307,14 @@ YAML_SRCS = \
 	\
 	$(NULL)
 
+VALA_HEADS = parsers/ctags-vala.h
+VALA_SRCS = \
+	parsers/ctags-visitor.c		\
+	\
+	parsers/vala.c		\
+	\
+	$(NULL)
+
 DEBUG_HEADS = main/debug.h
 DEBUG_SRCS = main/debug.c
 

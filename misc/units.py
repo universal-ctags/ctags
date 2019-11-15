@@ -547,6 +547,7 @@ def run_tcase(finput, t, name, tclass, category, build_t, extra_inputs):
     try:
         with open(orawout, 'wb') as fo, \
                 open(ostderr, 'wb') as fe:
+            print(' '.join(cmdline))
             ret = subprocess.run(cmdline, stdout=fo, stderr=fe,
                     timeout=timeout_value)
         run_record_cmdline(cmdline, ffilter, ocmdline, output_type)

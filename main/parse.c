@@ -141,6 +141,10 @@ static parserDefinitionFunc* BuiltInParsers[] = {
 #ifdef HAVE_PACKCC
        ,
 #endif
+	VALA_PARSER_LIST
+#ifdef ENABLE_VALA
+	,
+#endif
 #endif	/* EXTERNAL_PARSER_LIST */
 };
 static parserObject* LanguageTable = NULL;

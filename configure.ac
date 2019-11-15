@@ -95,6 +95,49 @@ AH_TEMPLATE([ENABLE_GCOV],
 	[Define to 1 if gcov is instrumented.])
 
 
+dnl Check for vala
+dnl -------------------------------------------------------------
+
+AC_ARG_ENABLE(vala,
+	AS_HELP_STRING([--disable-vala],[Disable vala support]),
+	[ if test "$enableval" = "no"; then
+		user_disabled_vala=1
+	  fi ],
+	[ user_disabled_vala=0 ])
+
+AH_TEMPLATE([ENABLE_VALA],
+	[Define this value if vala is available.])
+AC_MSG_CHECKING(if vala support is disabled)
+if test "$user_disabled_vala" = 1; then
+        AC_MSG_RESULT(yes)
+	enable_vala="no"
+else
+        AC_MSG_RESULT(no)
+	AC_MSG_CHECKING(if libvala is available)
+	m4_foreach_w([VERSION], [0.46 0.44 0.42 0.40 0.38 0.36 0.34 0.32],
+		[PKG_CHECK_EXISTS([ libvala-VERSION ],
+			 [ valaver="-VERSION" ])
+			 ])
+	if test "x$valaver" != "x"; then
+		AC_MSG_RESULT(yes)
+		enable_vala="yes"
+		LIBVALA="libvala${valaver}"
+		PKG_CHECK_MODULES([VALA], ${LIBVALA},[AC_DEFINE(ENABLE_VALA)])
+	else
+		AC_MSG_RESULT(no)
+		enable_vala="no"
+		VALA_REQUIRED=0.32.0
+	fi
+	AC_SUBST(LIBVALA)
+fi
+
+if test x$enable_vala = xyes; then
+	AC_PATH_PROGS(VALAC, [valac${valaver} valac], valac)
+	AC_SUBST(VALAC)
+fi
+
+AM_CONDITIONAL(ENABLE_VALA, [test x$enable_vala = xyes])
+
 # Define convenience macros
 # -------------------------
 # CHECK_HEADER_DEFINE(LABEL, HEADER [,ACTION-IF-FOUND [, ACTION-IF-NOT-FOUND ] ])

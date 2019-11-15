@@ -34,6 +34,14 @@
 #define YAML_PARSER_LIST
 #endif
 
+#ifdef ENABLE_VALA
+#define VALA_PARSER_LIST						\
+	CTagsValaParser,							\
+	GenieParser
+#else
+#define VALA_PARSER_LIST
+#endif
+
 #ifdef HAVE_PACKCC
 #define PEG_PARSER_LIST						\
 	VarlinkParser

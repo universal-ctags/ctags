@@ -91,6 +91,11 @@ PARSER_SRCS += $(YAML_SRCS)
 PARSER_HEADS += $(YAML_HEADS)
 endif
 
+if ENABLE_VALA
+PARSER_SRCS += $(VALA_SRCS)
+PARSER_HEADS += $(VALA_HEADS)
+endif
+
 PARSER_HEADS += $(PEG_EXTRA_HEADS)
 
 libctags_a_CPPFLAGS = -I. -I$(srcdir) -I$(srcdir)/main -I$(srcdir)/peg -DHAVE_PACKCC
@@ -112,11 +117,19 @@ libctags_a_CFLAGS  += $(CGCC_CFLAGS)
 libctags_a_CFLAGS  += $(LIBXML_CFLAGS)
 libctags_a_CFLAGS  += $(JANSSON_CFLAGS)
 libctags_a_CFLAGS  += $(LIBYAML_CFLAGS)
+libctags_a_CFLAGS  += $(VALA_CFLAGS)
 libctags_a_CFLAGS  += $(SECCOMP_CFLAGS)
+
+libctags_a_LIBS  = $(VALA_LIBS)
 
 nodist_libctags_a_SOURCES = $(REPOINFO_HEADS) $(PEG_SRCS) $(PEG_HEADS)
 BUILT_SOURCES = $(REPOINFO_HEADS)
 CLEANFILES = $(REPOINFO_HEADS) $(PEG_SRCS) $(PEG_HEADS)
+if ENABLE_VALA
+nodist_libctags_a_SOURCES += parsers/ctags-visitor.c
+CLEANFILES += parsers/ctags-visitor.c parsers/ctags-vala.h
+endif
+
 $(REPOINFO_OBJS): $(REPOINFO_SRCS) $(REPOINFO_HEADS)
 repoinfo_verbose = $(repoinfo_verbose_@AM_V@)
 repoinfo_verbose_ = $(repoinfo_verbose_@AM_DEFAULT_V@)
@@ -156,6 +169,9 @@ SUFFIXES += .peg
 # You cannot use $(PACKCC) as a target name here.
 $(PEG_SRCS) $(PEG_HEADS): packcc$(EXEEXT) Makefile
 dist_libctags_a_SOURCES = $(ALL_LIB_HEADS) $(ALL_LIB_SRCS)
+if ENABLE_VALA
+dist_libctags_a_SOURCES += parsers/ctags-visitor.vala
+endif
 
 ctags_CPPFLAGS = $(libctags_a_CPPFLAGS)
 ctags_CFLAGS = $(libctags_a_CFLAGS)
@@ -163,6 +179,7 @@ ctags_LDADD  =libctags.a
 ctags_LDADD += $(LIBXML_LIBS)
 ctags_LDADD += $(JANSSON_LIBS)
 ctags_LDADD += $(LIBYAML_LIBS)
+ctags_LDADD += $(VALA_LIBS)
 ctags_LDADD += $(SECCOMP_LIBS)
 ctags_LDADD += $(ICONV_LIBS)
 dist_ctags_SOURCES = $(CMDLINE_HEADS) $(CMDLINE_SRCS)
@@ -173,6 +190,7 @@ mini_geany_LDADD  = libctags.a
 mini_geany_LDADD += $(LIBXML_LIBS)
 mini_geany_LDADD += $(JANSSON_LIBS)
 mini_geany_LDADD += $(LIBYAML_LIBS)
+mini_geany_LDADD += $(VALA_LIBS)
 mini_geany_LDADD += $(SECCOMP_LIBS)
 mini_geany_LDADD += $(ICONV_LIBS)
 mini_geany_SOURCES = $(MINI_GEANY_HEADS) $(MINI_GEANY_SRCS)
@@ -194,6 +212,12 @@ dist-hook:
 		-name 'dist.m4' -o -name 'Makefile.am' -o \
 		-name 'Makefile.in' -o -name 'Makefile' -o \
 		-name 'BUNDLES' \) -exec rm -f {} +
+
+parsers/ctags-vala.h: parsers/ctags-visitor.vala
+	$(VALAC) -g -h parsers/ctags-vala.h -C --pkg $(LIBVALA) $^
+
+parsers/ctags-visitor.c: parsers/ctags-visitor.vala
+	$(VALAC) -g -h parsers/ctags-vala.h -C --pkg $(LIBVALA) $^
 
 include $(top_srcdir)/makefiles/testing.mak
 
@@ -222,3 +246,4 @@ RST2MAN_OPTIONS=--syntax-highlight=none
 .7.rst.7:
 	$(rst2man_verbose)$(RST2MAN) $(RST2MAN_OPTIONS) $< $@
 endif
+
