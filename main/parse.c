@@ -2157,8 +2157,8 @@ extern void processLanguageDefineOption (
 	}
 	else if (getNamedLanguage (name, 0) != LANG_IGNORE)
 	{
-		eFree (name);
-		error (FATAL, "Language \"%s\" already defined", parameter);
+		/* name cannot be freed because it is used in the FATAL message. */
+		error (FATAL, "Language \"%s\" already defined", name);
 	}
 	else if (strcmp(name, RSV_LANG_ALL) == 0)
 	{
