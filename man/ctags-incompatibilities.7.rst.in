@@ -70,8 +70,14 @@ q/qualified". Unexpectedly the command line becomes as if
 
 In this case, the user should set "--extras=+q" instead of "--extras=q".
 
-Kind definitions
+Language and kind definitions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Language name defined with ``--langdef=name`` option
+....................................................................................
+
+The characters you can use are more restricted than Exuberant-ctags.
+For more details, see the description of ``--langdef=name`` in ctags-optlib(7).
 
 Obsoleting ``--<LANG>-kinds`` option
 ....................................................................................
@@ -188,4 +194,4 @@ to follow the above rule.
 
 SEE ALSO
 --------
-ctags(1) and tags(5).
+ctags(1), ctags-optlib(7), and tags(5).

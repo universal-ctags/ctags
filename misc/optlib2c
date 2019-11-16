@@ -51,10 +51,14 @@ my $options =
 	       if (defined $_[0]->{'langdef'});
 	   die "Don't use \"all\" as a language name. It is reserved word."
 	       if ($1 eq "all");
+
 	   $_[0]->{'langdef'} = $1;
 	   $_[0]->{'base'} = $5 if defined $5;
 	   $_[0]->{'direction'} = $7 if defined $7;
 	   $_[0]->{'autoFQTag'} = (defined $8)? 1: 0;
+
+	   die "Don't use a character as a language name other than alphanumeric, # and +."
+	       unless ($_[0]->{'langdef'} =~ /^[a-zA-Z#+]+$/);
        } ],
      [ qr/^--kinddef-(.*)=([^,]),([^,]+),([^\{]+)(\{_refonly\})?/, sub {
 	 die "Don't use --kinddef-<LANG>=+ option before defining the language"

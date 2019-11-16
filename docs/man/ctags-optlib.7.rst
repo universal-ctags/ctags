@@ -149,9 +149,17 @@ OPTION ITEMS
 	expressions. Once defined, name may be used in other options taking
 	language names.
 
-	"all" as *name* is not acceptable. It is a reserved word. See
-	the description of ``--kinds-<LANG>=[+|-]kinds|*`` option in ctags(1)
-	about how the reserved word is used.
+	*name* must consist of alphanumeric characters, "#", or "+"
+	 ('[a-zA-Z0-9#+]+'). The graph characters other than "#" and
+	 "+" are disallowed (or reserved). Some of them ('[-=:{]') are
+	 disallowed because they can make the command line parser of
+	 ctags confused. The rest of them are just
+	 reserved for future extending ctags.
+
+	 "all" is an exception.  "all" as *name* is not acceptable. It is
+	 a reserved word. See the description of
+	 ``--kinds-<LANG>=[+|-]kinds|*`` option in ctags(1) about how the
+	 reserved word is used.
 
 	The names of built-in parsers are capitalized. When
 	ctags evaluates an option in a command line, and
