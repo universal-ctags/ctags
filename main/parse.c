@@ -1918,24 +1918,17 @@ extern void initializeParsing (void)
 		parserDefinition* const def = (*BuiltInParsers [i]) ();
 		if (def != NULL)
 		{
-			bool accepted = false;
-			if (def->name == NULL  ||  def->name[0] == '\0')
-				error (FATAL, "parser definition must contain name\n");
-			else if (strcmp (def->name, RSV_LANG_ALL) == 0)
-				error (FATAL, "\"all\" is reserved; don't use it as the name for defining a new language");
-			else if (def->method & METHOD_NOT_CRAFTED)
-			{
+			Assert (def->name);
+			Assert (def->name[0] != '\0');
+			Assert (strcmp (def->name, RSV_LANG_ALL));
+
+			if (def->method & METHOD_NOT_CRAFTED)
 				def->parser = findRegexTags;
-				accepted = true;
-			}
-			else if ((!def->invisible) && (((!!def->parser) + (!!def->parser2)) != 1))
-				error (FATAL,
-		"%s parser definition must define one and only one parsing routine\n",
-					   def->name);
 			else
-				accepted = true;
-			if (accepted)
-				initializeParsingCommon (def, true);
+				/* parser definition must define one and only one parsing routine */
+				Assert ((!!def->parser) + (!!def->parser2) == 1);
+
+			initializeParsingCommon (def, true);
 		}
 	}
 	verbose ("\n");
