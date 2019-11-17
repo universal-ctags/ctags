@@ -141,6 +141,7 @@
 	VerilogParser, \
 	SystemVerilogParser, \
 	VhdlParser, \
+	ValaParser, \
 	VimParser, \
 	WindResParser, \
 	YaccParser, \
