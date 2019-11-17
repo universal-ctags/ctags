@@ -344,13 +344,15 @@ So the following ``--regex-<LANG>`` expression:
 
 .. code-block:: perl
 
-   --regex-m4=/^m4_define\(\[([^]$\(]+).+$/\1/d,definition/x
+   --kinddef-m4=d,definition,definitions
+   --regex-m4=/^m4_define\(\[([^]$\(]+).+$/\1/d/x
 
 is the same as:
 
 .. code-block:: perl
 
-   --regex-m4=/^m4_define\(\[([^]$\(]+).+$/\1/d,definition/{extend}
+   --kinddef-m4=d,definition,definitions
+   --regex-m4=/^m4_define\(\[([^]$\(]+).+$/\1/d/{extend}
 
 The characters ``{`` and ``}`` may not be suitable for command line
 use, but long flags are mostly intended for option files.
@@ -515,9 +517,11 @@ Example 1:
 	# in /tmp/foo.ctags:
 	--langdef=Foo
 	--map-Foo=+.foo
+	--kinddef-Foo=c,class,classes
+	--kinddef-Foo=d,definition,definitions
 
-	--regex-Foo=/^class[[:blank:]]+([[:alpha:]]+):/\1/c,class/{scope=set}
-	--regex-Foo=/^[[:blank:]]+def[[:blank:]]+([[:alpha:]]+).*:/\1/d,definition/{scope=ref}
+	--regex-Foo=/^class[[:blank:]]+([[:alpha:]]+):/\1/c/{scope=set}
+	--regex-Foo=/^[[:blank:]]+def[[:blank:]]+([[:alpha:]]+).*:/\1/d/{scope=ref}
 
 .. code-block:: console
 
@@ -542,10 +546,12 @@ Example 2:
 	# in /tmp/pp.ctags:
 	--langdef=pp
 	--map-pp=+.pp
+	--kinddef-pp=c,class,classes
+	--kinddef-pp=v,variable,variables
 
 	--regex-pp=/^[[:blank:]]*\}//{scope=pop}{exclusive}
-	--regex-pp=/^class[[:blank:]]*([[:alnum:]]+)[[[:blank:]]]*\{/\1/c,class,classes/{scope=push}
-	--regex-pp=/^[[:blank:]]*int[[:blank:]]*([[:alnum:]]+)/\1/v,variable,variables/{scope=ref}
+	--regex-pp=/^class[[:blank:]]*([[:alnum:]]+)[[[:blank:]]]*\{/\1/c/{scope=push}
+	--regex-pp=/^[[:blank:]]*int[[:blank:]]*([[:alnum:]]+)/\1/v/{scope=ref}
 
 .. code-block:: console
 
