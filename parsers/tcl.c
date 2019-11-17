@@ -79,7 +79,7 @@ struct tokenExtra {
 	struct sTclParserState *pstate;
 };
 
-struct tokenTypePair typePairs [] = {
+static struct tokenTypePair typePairs [] = {
 	{ '{', '}' },
 	{ '[', ']' },
 };
