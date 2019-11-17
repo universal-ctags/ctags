@@ -123,7 +123,7 @@ struct tokenExtra {
 	tokenKeyword assignment;
 };
 
-struct tokenTypePair ldScriptTypePairs [] = {
+static struct tokenTypePair ldScriptTypePairs [] = {
 	{ '{', '}' },
 };
 
