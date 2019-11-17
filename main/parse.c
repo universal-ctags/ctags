@@ -1918,24 +1918,18 @@ extern void initializeParsing (void)
 		parserDefinition* const def = (*BuiltInParsers [i]) ();
 		if (def != NULL)
 		{
-			bool accepted = false;
-			if (def->name == NULL  ||  def->name[0] == '\0')
-				error (FATAL, "parser definition must contain name\n");
-			else if (strcmp (def->name, RSV_LANG_ALL) == 0)
-				error (FATAL, "\"all\" is reserved; don't use it as the name for defining a new language");
-			else if (def->method & METHOD_NOT_CRAFTED)
-			{
+			Assert (def->name);
+			Assert (def->name[0] != '\0');
+			Assert (strcmp (def->name, RSV_LANG_ALL));
+			Assert (strpbrk (def->name, "!\"$%&'()*,-./:;<=>?@[\\]^`|~") == NULL);
+
+			if (def->method & METHOD_NOT_CRAFTED)
 				def->parser = findRegexTags;
-				accepted = true;
-			}
-			else if ((!def->invisible) && (((!!def->parser) + (!!def->parser2)) != 1))
-				error (FATAL,
-		"%s parser definition must define one and only one parsing routine\n",
-					   def->name);
 			else
-				accepted = true;
-			if (accepted)
-				initializeParsingCommon (def, true);
+				/* parser definition must define one and only one parsing routine */
+				Assert ((!!def->parser) + (!!def->parser2) == 1);
+
+			initializeParsingCommon (def, true);
 		}
 	}
 	verbose ("\n");
@@ -2150,6 +2144,7 @@ extern void processLanguageDefineOption (
 		name = eStrdup (parameter);
 
 	/* Veirfy that the name of new language is acceptable or not. */
+	char *unacceptable;
 	if (name [0] == '\0')
 	{
 		eFree (name);
@@ -2157,13 +2152,26 @@ extern void processLanguageDefineOption (
 	}
 	else if (getNamedLanguage (name, 0) != LANG_IGNORE)
 	{
-		eFree (name);
-		error (FATAL, "Language \"%s\" already defined", parameter);
+		/* name cannot be freed because it is used in the FATAL message. */
+		error (FATAL, "Language \"%s\" already defined", name);
 	}
 	else if (strcmp(name, RSV_LANG_ALL) == 0)
 	{
 		eFree (name);
 		error (FATAL, "\"all\" is reserved; don't use it as the name for defining a new language");
+	}
+	else if ((unacceptable = strpbrk (name, "!\"$%&'()*,-./:;<=>?@[\\]^`|~")))
+	{
+		char c = *unacceptable;
+
+		/* name cannot be freed because it is used in the FATAL message. */
+		/* We accept '_'.
+		 * We accept # and + because they are already used in C# parser and C++ parser.
+		 * {... is already trimmed at the beginning of this function. */
+		if ((c == '`') || (c == '\''))
+			error (FATAL, "don't use \"%c\" in a language name (%s)", c, name);
+		else
+			error (FATAL, "don't use `%c' in a language name (%s)", c, name);
 	}
 
 	LanguageTable = xRealloc (LanguageTable, LanguageCount + 1, parserObject);
