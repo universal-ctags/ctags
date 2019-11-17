@@ -624,6 +624,9 @@
     <ClCompile Include="..\parsers\typescript.c">
       <Filter>Source Files\parsers</Filter>
     </ClCompile>
+    <ClCompile Include="..\parsers\vala.c">
+      <Filter>Source Files\parsers</Filter>
+    </ClCompile>
     <ClCompile Include="..\parsers\vera.c">
       <Filter>Source Files\parsers</Filter>
     </ClCompile>
