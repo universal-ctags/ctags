@@ -212,18 +212,9 @@ Tips for writing an option file
 
 * Use ``--quiet --options=NONE`` to disable preloading.
 
-.. IN MAN PAGE
-
-* Two options are introduced for debugging the process of loading
-  option files.
-
-	``--_echo=MSG``
-
-		Prints MSG to standard error immediately.
-
-	``--_force-quit=[NUM]``
-
-		Exit immediately with the status of the specified NUM.
+* ``--_echo=MSG`` and  ``--_force-quit=[NUM]`` options are introduced for
+  debugging the process of loading option files. See "OPTION ITEMS"
+  section of :ref:`ctags-optlib(7) <ctags-optlib(7)>`.
 
 * Universal-ctags has an ``optlib2c`` script that translates an option file
   into C source code. Your optlib parser can thus easily become a built-in parser,
@@ -462,43 +453,8 @@ Normally you don't need to know this.
 Scope tracking in a regex parser
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. IN MAN PAGE
-
-With the ``scope`` long flag, you can record/track scope context.
-A stack is used for tracking the scope context.
-
-``{scope=push}``
-
-	Push the tag captured with a regex pattern to the top of the stack.
-	If you don't want to record this tag but just push, use
-	`placeholder` long option together.
-
-``{scope=ref}``
-
-	Refer to the thing at the top of the stack as a scope where the tag captured
-	with a regex pattern is. The stack is not modified with this specification.
-	If the stack is empty, this flag is just ignored.
-
-``{scope=pop}``
-
-	Pop the thing at the top of the stack.
-	If the stack is empty, this flag is just ignored.
-
-``{scope=clear}``
-
-	Empty the stack.
-
-``{scope=set}``
-
-	Clear then push.
-
-``{placeholder}``
-
-	Don't print a tag captured with a regex pattern to a tag file. This is
-	useful when you need to push non-named context information to the stack.
-	Well known non-named scope in C language is established with `{`. A non-
-	named scope never appears in tags file as a name or scope name.  However,
-	pushing it is important to balance ``push`` and ``pop``.
+About the `{scope=..}` flag itself for scope tracking, see "FLAGS FOR
+--regex-<LANG> OPTION" section of :ref:`ctags-optlib(7) <ctags-optlib(7)>`.
 
 Example 1:
 
