@@ -281,6 +281,7 @@ PARSER_SRCS =				\
 	parsers/tex-beamer.c		\
 	parsers/ttcn.c			\
 	parsers/typescript.c		\
+	parsers/vala.c			\
 	parsers/verilog.c		\
 	parsers/vhdl.c			\
 	parsers/vim.c			\
