@@ -56,6 +56,7 @@ rst_files  = $(gen_rst_files) $(SOURCE_FILES)
 man_pages  = $(basename $(rst_files))
 html_pages = $(addsuffix .html,$(man_pages))
 pdf_pages  = $(addsuffix .pdf,$(man_pages))
+doc_files = $(addprefix ../docs/man/,$(rst_files))
 
 all: man html pdf
 
@@ -63,8 +64,15 @@ man: $(man_pages)
 html: $(html_pages)
 pdf: $(pdf_pages)
 
-update-docs: $(rst_files)
-	cp $(rst_files) ../docs/man
+update-docs: $(doc_files)
+
+../docs/man/%.rst: %.rst
+	sed \
+		-e 's/\<ctags(1)/:ref:`& <&>`/g' \
+		-e 's/\<ctags-incompatibilities(7)/:ref:`& <&>`/g' \
+		-e 's/\<ctags-optlib(7)/:ref:`& <&>`/g' \
+		-e 's/\<tags(5)/:ref:`& <&>`/g' \
+	< $< > $@
 
 %.rst: %.rst.in
 ifeq ($(QUICK),)

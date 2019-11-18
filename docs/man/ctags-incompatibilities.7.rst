@@ -77,7 +77,7 @@ Language name defined with ``--langdef=name`` option
 ....................................................................................
 
 The characters you can use are more restricted than Exuberant-ctags.
-For more details, see the description of ``--langdef=name`` in ctags-optlib(7).
+For more details, see the description of ``--langdef=name`` in :ref:`ctags-optlib(7) <ctags-optlib(7)>`.
 
 Obsoleting ``--<LANG>-kinds`` option
 ....................................................................................
@@ -175,7 +175,7 @@ Option files loading at starting up time (preload files)
 
 File paths for preload files are changed.
 Universal-ctags doesn't load "~/.ctags" at starting up time.
-See "FILES" section of ctags(1).
+See "FILES" section of :ref:`ctags(1) <ctags(1)>`.
 
 Kind letters and names
 -------------------------------------------------------------
@@ -194,4 +194,4 @@ to follow the above rule.
 
 SEE ALSO
 --------
-ctags(1), ctags-optlib(7), and tags(5).
+:ref:`ctags(1) <ctags(1)>`, :ref:`ctags-optlib(7) <ctags-optlib(7)>`, and :ref:`tags(5) <tags(5)>`.

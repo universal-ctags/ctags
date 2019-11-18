@@ -46,11 +46,11 @@ options.
 This man page describes **Universal-ctags**, an implementation of ctags
 derived from **Exuberant-ctags**. The major incompatible changes between
 Universal-ctags and Exuberant-ctags are enumerated in
-ctags-incompatibilities(7).
+:ref:`ctags-incompatibilities(7) <ctags-incompatibilities(7)>`.
 
 One of the advantages of Exuberant-ctags is that it allows a user to
 define a new parser from the command line. Extending this capability is one
-of the major features of Universal-ctags. ctags-optlib(7)
+of the major features of Universal-ctags. :ref:`ctags-optlib(7) <ctags-optlib(7)>`
 describes how the capability is extended.
 
 Newly introduced experimental features are not explained here. If you
@@ -761,7 +761,7 @@ are not listed here. They are experimental or for debugging purpose.
 		Note: Using backslash characters as separators forming
 		qualified name in PHP. However, in tags output of
 		Universal-ctags, a backslash character in a name is escaped
-		with a backslash character. See tags(5) about the escaping.
+		with a backslash character. See :ref:`tags(5) <tags(5)>` about the escaping.
 
 	r/reference
 		Include reference tags. See "TAG ENTRIES" about reference tags.
@@ -897,7 +897,7 @@ are not listed here. They are experimental or for debugging purpose.
 	Universal-ctags provides an alternative way to control this option,
 	with the "F/fileScope" extra, and recommends users to use the
 	extra. However, this extra can cause issues.
-	See ctags-incompatibilities(7).
+	See :ref:`ctags-incompatibilities(7) <ctags-incompatibilities(7)>`.
 
 ``--filter[=yes|no]``
 	Makes ctags behave as a filter, reading source
@@ -963,7 +963,7 @@ are not listed here. They are experimental or for debugging purpose.
 	default value given with ``--input-encoding``.
 
 ``--kinddef-<LANG>=letter,name,description``
-	See ctags-optlib(7).
+	See :ref:`ctags-optlib(7) <ctags-optlib(7)>`.
 	Be not confused this with ``--kinds-<LANG>``.
 
 ``--kinds-<LANG>=[+|-]kinds|*``
@@ -998,7 +998,7 @@ are not listed here. They are experimental or for debugging purpose.
 	This option is obsolete. Use ``--kinds-<LANG>=...`` instead.
 
 ``--langdef=name``
-	See ctags-optlib(7).
+	See :ref:`ctags-optlib(7) <ctags-optlib(7)>`.
 
 ``--langmap=map[,map[...]]``
 	Controls how file names are mapped to languages (see the ``--list-maps``
@@ -1044,7 +1044,7 @@ are not listed here. They are experimental or for debugging purpose.
 
 	Note that file name patterns are tested before file extensions when inferring
 	the language of a file. This order of Universal-ctags is different from
-	Exuberant-ctags. See ctags-incompatibilities(7) for the background of
+	Exuberant-ctags. See :ref:`ctags-incompatibilities(7) <ctags-incompatibilities(7)>` for the background of
 	this incompatible change.
 
 ``--language-force=language``
@@ -1331,7 +1331,7 @@ are not listed here. They are experimental or for debugging purpose.
 	Output list of pseudo tags.
 
 ``--list-regex-flags``
-	See ctags-optlib(7).
+	See :ref:`ctags-optlib(7) <ctags-optlib(7)>`.
 
 ``--list-roles[=language|all[.kinds]]``
 	List the roles for either the specified language or "all"
@@ -1428,7 +1428,7 @@ are not listed here. They are experimental or for debugging purpose.
 
 ``--output-format=u-ctags|e-ctags|etags|xref|json``
 	Specify the output format. The default is "u-ctags".
-	See tags(5) for "u-ctags" and "e-ctags".
+	See :ref:`tags(5) <tags(5)>` for "u-ctags" and "e-ctags".
 	See ``-e`` for "etags", and ``-x`` for "xref".
 	"json" is experimental format, and available only if
 	the ctags executable is built with libjansson.
@@ -1471,7 +1471,7 @@ are not listed here. They are experimental or for debugging purpose.
 	recursion.
 
 ``--regex-<LANG>=/regexp/replacement/[kind-spec/][flags]``
-	See ctags-optlib(7).
+	See :ref:`ctags-optlib(7) <ctags-optlib(7)>`.
 
 ``--sort[=yes|no|foldcase]``
 	Indicates whether the tag file should be sorted on the tag name
@@ -1863,10 +1863,10 @@ TAGS
 SEE ALSO
 --------
 
-See ctags-optlib(7) for defining (or extending) a parser
+See :ref:`ctags-optlib(7) <ctags-optlib(7)>` for defining (or extending) a parser
 in a configuration file.
 
-See tags(5) for the format of tag files.
+See :ref:`tags(5) <tags(5)>` for the format of tag files.
 
 The official Universal-ctags web site at:
 

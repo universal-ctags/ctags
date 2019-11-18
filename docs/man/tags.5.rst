@@ -515,4 +515,4 @@ used when ctags generating tags file.
 
 SEE ALSO
 --------
-ctags(1), ctags-incompatibilities(7)
+:ref:`ctags(1) <ctags(1)>`, :ref:`ctags-incompatibilities(7) <ctags-incompatibilities(7)>`

@@ -26,7 +26,7 @@ combination of command line options. "lib" intends an optlib parser
 can be more than ad-hoc personal configuration.
 
 This man page is for people who wants to define an optlib parser. The
-reader should read ctags(1) of Universal-ctags first. Following
+reader should read :ref:`ctags(1) <ctags(1)>` of Universal-ctags first. Following
 options are for defining (or customizing) a parser:
 
 * ``--langdef=``
@@ -65,15 +65,15 @@ want to type the same command line each time when you need the parser.
 You can store options for defining a parser into a file.
 
 ctags loads files (preload files) listed in "FILES"
-section of ctags(1) at program starting up. You can put your parser
+section of :ref:`ctags(1) <ctags(1)>` at program starting up. You can put your parser
 definition needed usually to the files.
 
 ``--options=pathname``, ``--options-maybe=pathname``, and
 ``--optlib-dir=[+]directory`` are for loading optlib files you need
-occasionally. See "COMMAND LINE INTERFACE" section of ctags(1) for
+occasionally. See "COMMAND LINE INTERFACE" section of :ref:`ctags(1) <ctags(1)>` for
 these options.
 
-As explained in FILES section of ctags(1), options for defining a
+As explained in FILES section of :ref:`ctags(1) <ctags(1)>`, options for defining a
 parser listed line by line in an optlib file. Prefixed white spaces are
 ignored. A line starting with '#' is treated as a comment.  Escaping
 shell meta character is not needed.
@@ -93,7 +93,7 @@ Overview for defining a parser
 
    You need know both the target language and the ctags'
    concepts (definition, reference, kind, role, field, extra). About
-   the concepts, ctags(1) of Universal-ctags may help you.
+   the concepts, :ref:`ctags(1) <ctags(1)>` of Universal-ctags may help you.
 
 2. Give a name to the parser
 
@@ -158,7 +158,7 @@ OPTION ITEMS
 
 	 "all" is an exception.  "all" as *name* is not acceptable. It is
 	 a reserved word. See the description of
-	 ``--kinds-<LANG>=[+|-]kinds|*`` option in ctags(1) about how the
+	 ``--kinds-<LANG>=[+|-]kinds|*`` option in :ref:`ctags(1) <ctags(1)>` about how the
 	 reserved word is used.
 
 	The names of built-in parsers are capitalized. When
@@ -250,7 +250,7 @@ OPTION ITEMS
 	message will be reported unless ``{placeholder}`` regex flag is
 	specified. An optional kind specifier for tags matching regexp may
 	follow *replacement*, which will determine what kind of tag is
-	reported in the "kind" extension field (see tags(5)).
+	reported in the "kind" extension field (see :ref:`tags(5) <tags(5)>`).
 
 	*kind-spec* has two forms: letter only form and full form.  The
 	letter form assumes using ``--regex-<LANG>`` option with
@@ -433,14 +433,14 @@ The official Universal-ctags web site at:
 
 https://ctags.io/
 
-ctags(1), tags(5), regex(5,7), egrep(1)
+:ref:`ctags(1) <ctags(1)>`, :ref:`tags(5) <tags(5)>`, regex(5,7), egrep(1)
 
 AUTHOR
 ------
 
 Universal-ctags project
 https://ctags.io/
-(This man page partially derived from ctags(1) of
+(This man page partially derived from :ref:`ctags(1) <ctags(1)>` of
 Executable-ctags)
 
 Darren Hiebert <dhiebert@users.sourceforge.net>
