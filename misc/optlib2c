@@ -65,9 +65,26 @@ my $options =
 	     if (! defined $_[0]->{'langdef'});
 	 die "Adding a kind is allowed only to the language specified with --langdef: $1"
 	     unless ($_[0]->{'langdef'} eq $1);
+
+	 my $letter = $2;
+	 my $name = $3;
+	 my $desc = $4;
 	 my $refonly = 0;
 	 $refonly = 1 if defined $5;
-	 push @{$_[0]->{'kinddefs'}}, { enabled => 1, letter => $2, name => $3, desc => $4,
+
+	 die "'F' as a kind letter is reserved for file kind."
+	     if ($letter eq 'F');
+	 die "unacceptable character is used for kind letter: $letter"
+	     unless ($letter =~ /^[a-zA-EG-Z]$/);
+
+	 die "'file' as a kind name is reserved"
+	     if ($name eq 'file');
+	 die "The initial letter of kind name must be alphabetic character: $name"
+	     unless (substr ($name, 0, 1) =~ /[a-zA-Z]/);
+	 die "Letters used in kind name other than initial letter must be alphanumeric characters: $name"
+	     unless (substr ($name, 1) =~ /^[a-zA-Z0-9]+$/);
+
+	 push @{$_[0]->{'kinddefs'}}, { enabled => 1, letter => $letter, name => $name, desc => $desc,
 					refonly => $refonly, roles => [], seps => [] };
        } ],
      [ qr/^--_extradef-(.*)=([^,]+),(.+)/, sub {
