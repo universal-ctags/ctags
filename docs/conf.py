@@ -95,6 +95,10 @@ pygments_style = 'sphinx'
 # If true, keep warnings as "system message" paragraphs in the built documents.
 #keep_warnings = False
 
+# Customizes the Smart Quotes transform. The default 'qDe' educates normal
+# quote characters ", ', em- and en-Dashes ---, --, and ellipses ....
+smartquotes_action = 'qe'  # Exclude dashes transform for cmdline options.
+
 
 # -- Options for HTML output ----------------------------------------------
 
