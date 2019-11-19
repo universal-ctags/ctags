@@ -212,18 +212,9 @@ Tips for writing an option file
 
 * Use ``--quiet --options=NONE`` to disable preloading.
 
-.. IN MAN PAGE
-
-* Two options are introduced for debugging the process of loading
-  option files.
-
-	``--_echo=MSG``
-
-		Prints MSG to standard error immediately.
-
-	``--_force-quit=[NUM]``
-
-		Exit immediately with the status of the specified NUM.
+* ``--_echo=MSG`` and  ``--_force-quit=[NUM]`` options are introduced for
+  debugging the process of loading option files. See "OPTION ITEMS"
+  section of :ref:`ctags-optlib(7) <ctags-optlib(7)>`.
 
 * Universal-ctags has an ``optlib2c`` script that translates an option file
   into C source code. Your optlib parser can thus easily become a built-in parser,
@@ -344,13 +335,15 @@ So the following ``--regex-<LANG>`` expression:
 
 .. code-block:: perl
 
-   --regex-m4=/^m4_define\(\[([^]$\(]+).+$/\1/d,definition/x
+   --kinddef-m4=d,definition,definitions
+   --regex-m4=/^m4_define\(\[([^]$\(]+).+$/\1/d/x
 
 is the same as:
 
 .. code-block:: perl
 
-   --regex-m4=/^m4_define\(\[([^]$\(]+).+$/\1/d,definition/{extend}
+   --kinddef-m4=d,definition,definitions
+   --regex-m4=/^m4_define\(\[([^]$\(]+).+$/\1/d/{extend}
 
 The characters ``{`` and ``}`` may not be suitable for command line
 use, but long flags are mostly intended for option files.
@@ -460,43 +453,8 @@ Normally you don't need to know this.
 Scope tracking in a regex parser
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. IN MAN PAGE
-
-With the ``scope`` long flag, you can record/track scope context.
-A stack is used for tracking the scope context.
-
-``{scope=push}``
-
-	Push the tag captured with a regex pattern to the top of the stack.
-	If you don't want to record this tag but just push, use
-	`placeholder` long option together.
-
-``{scope=ref}``
-
-	Refer to the thing at the top of the stack as a scope where the tag captured
-	with a regex pattern is. The stack is not modified with this specification.
-	If the stack is empty, this flag is just ignored.
-
-``{scope=pop}``
-
-	Pop the thing at the top of the stack.
-	If the stack is empty, this flag is just ignored.
-
-``{scope=clear}``
-
-	Empty the stack.
-
-``{scope=set}``
-
-	Clear then push.
-
-``{placeholder}``
-
-	Don't print a tag captured with a regex pattern to a tag file. This is
-	useful when you need to push non-named context information to the stack.
-	Well known non-named scope in C language is established with `{`. A non-
-	named scope never appears in tags file as a name or scope name.  However,
-	pushing it is important to balance ``push`` and ``pop``.
+About the `{scope=..}` flag itself for scope tracking, see "FLAGS FOR
+--regex-<LANG> OPTION" section of :ref:`ctags-optlib(7) <ctags-optlib(7)>`.
 
 Example 1:
 
@@ -515,9 +473,11 @@ Example 1:
 	# in /tmp/foo.ctags:
 	--langdef=Foo
 	--map-Foo=+.foo
+	--kinddef-Foo=c,class,classes
+	--kinddef-Foo=d,definition,definitions
 
-	--regex-Foo=/^class[[:blank:]]+([[:alpha:]]+):/\1/c,class/{scope=set}
-	--regex-Foo=/^[[:blank:]]+def[[:blank:]]+([[:alpha:]]+).*:/\1/d,definition/{scope=ref}
+	--regex-Foo=/^class[[:blank:]]+([[:alpha:]]+):/\1/c/{scope=set}
+	--regex-Foo=/^[[:blank:]]+def[[:blank:]]+([[:alpha:]]+).*:/\1/d/{scope=ref}
 
 .. code-block:: console
 
@@ -542,10 +502,12 @@ Example 2:
 	# in /tmp/pp.ctags:
 	--langdef=pp
 	--map-pp=+.pp
+	--kinddef-pp=c,class,classes
+	--kinddef-pp=v,variable,variables
 
 	--regex-pp=/^[[:blank:]]*\}//{scope=pop}{exclusive}
-	--regex-pp=/^class[[:blank:]]*([[:alnum:]]+)[[[:blank:]]]*\{/\1/c,class,classes/{scope=push}
-	--regex-pp=/^[[:blank:]]*int[[:blank:]]*([[:alnum:]]+)/\1/v,variable,variables/{scope=ref}
+	--regex-pp=/^class[[:blank:]]*([[:alnum:]]+)[[[:blank:]]]*\{/\1/c/{scope=push}
+	--regex-pp=/^[[:blank:]]*int[[:blank:]]*([[:alnum:]]+)/\1/v/{scope=ref}
 
 .. code-block:: console
 
@@ -576,8 +538,7 @@ Generating fully qualified tags automatically from scope information
 If scope fields are filled properly with `{scope=...}` regex flags,
 you can use the field values for generating fully qualified tags.
 About the `{scope=..}` flag itself, see "FLAGS FOR --regex-<LANG>
-OPTION" section of `ctags-optlib(7)` man page or
-`Universal-ctags parser definition language <https://github.com/universal-ctags/ctags/blob/master/man/ctags-optlib.7.rst.in>`_.
+OPTION" section of :ref:`ctags-optlib(7) <ctags-optlib(7)>`.
 
 Specify `{_autoFQTag}` to the end of ``--langdef=<LANG>`` option like
 ``-langdef=Foo{_autoFQTag}`` to make ctags generate fully qualified
