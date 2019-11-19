@@ -102,7 +102,7 @@ Rules for modifying our repository
 
   Tmain
 
-    Changes for the test cases under Units directory
+    Changes for the test cases under Tmain directory
 
   docs(web)
 
@@ -160,7 +160,7 @@ Rules for modifying our repository
   an explanation in man/ctags-incompatibilities.7.rst.in about the
   detail of breakage.
 
-* Use [SELE-INCOMPATIBLE] as a prefix for both pull request and commit
+* Use [SELF-INCOMPATIBLE] as a prefix for both pull request and commit
   log if the change breaks the compatibility with Universal-ctags
   itself.
 
