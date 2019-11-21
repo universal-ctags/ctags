@@ -269,10 +269,10 @@ A tagfield has a name, a colon, and a value: "name:value".
 * The value may be empty.
   It cannot contain a <Tab>.
 
-  - When a value contains a "\\t", this stands for a <Tab>.
-  - When a value contains a "\\r", this stands for a <CR>.
-  - When a value contains a "\\n", this stands for a <NL>.
-  - When a value contains a "\\\\", this stands for a single '\\' character.
+  - When a value contains a ``\t``, this stands for a <Tab>.
+  - When a value contains a ``\r``, this stands for a <CR>.
+  - When a value contains a ``\n``, this stands for a <NL>.
+  - When a value contains a ``\\``, this stands for a single ``\`` character.
 
   Other use of the backslash character is reserved for future expansion.
   Warning: When a tagfield value holds an MS-DOS file name, the backslashes
@@ -280,12 +280,12 @@ A tagfield has a name, a colon, and a value: "name:value".
 
   EXCEPTION: Universal-ctags introduces more conversion rules.
 
-  - When a value contains a "\\a", this stands for a <BEL> (0x07).
-  - When a value contains a "\\b", this stands for a <BS> (0x08).
-  - When a value contains a "\\v", this stands for a <VT> (0x0b).
-  - When a value contains a "\\f", this stands for a <FF> (0x0c).
+  - When a value contains a ``\a``, this stands for a <BEL> (0x07).
+  - When a value contains a ``\b``, this stands for a <BS> (0x08).
+  - When a value contains a ``\v``, this stands for a <VT> (0x0b).
+  - When a value contains a ``\f``, this stands for a <FF> (0x0c).
   - The characters in range 0x01 to 0x1F included, 0x7F, and leading space
-    (0x20) and '!' (0x21) are converted to \x prefixed hexadecimal number if
+    (0x20) and ``!`` (0x21) are converted to ``\x`` prefixed hexadecimal number if
     the characters are not handled in the above "value" rules.
 
 Proposed tagfield names:
@@ -415,9 +415,9 @@ compatibility.  However, all known programs that generate tags use a single
 
 There is a problem for using file names with embedded white space in the
 tagfile field.  To work around this, the same special characters could be used
-as in the new fields, for example "\\s".  But, unfortunately, in MS-DOS the
+as in the new fields, for example ``\s``.  But, unfortunately, in MS-DOS the
 backslash character is used to separate file names.  The file name
-"c:\\vim\\sap" contains "\\s", but this is not a <Space>.  The number of
+``c:\vim\sap`` contains ``\s``, but this is not a <Space>.  The number of
 backslashes could be doubled, but that will add a lot of characters, and make
 parsing the tags file slower and clumsy.
 

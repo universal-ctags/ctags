@@ -196,10 +196,10 @@ OPTION ITEMS
 	initial in a kind name.
 
 	*description* comes from any printable ASCII characters. The
-	exception is "{" and "\". "{" is reserved for adding flags
-	this option in the future. So put "\" before "{" to include
-	"{" to a description. To include "\" itself to a description,
-	put "\" before "\".
+	exception is ``{`` and ``\``. ``{`` is reserved for adding flags
+	this option in the future. So put ``\`` before ``{`` to include
+	``{`` to a description. To include ``\`` itself to a description,
+	put ``\`` before ``\``.
 
 	Both *letter*, *name* and their combination must be unique in
 	a *<LANG>*.
@@ -231,14 +231,14 @@ OPTION ITEMS
 	or user-defined language). The regular expression, regexp, defines
 	an extended regular expression (roughly that used by egrep(1)),
 	which is used to locate a single source line containing a tag and
-	may specify tab characters using \t. When a matching line is
+	may specify tab characters using ``\t``. When a matching line is
 	found, a tag will be generated for the name defined by
 	*replacement*, which generally will contain the special
-	back-references \1 through \9 to refer to matching sub-expression
-	groups within regexp.  The '/' separator characters shown in the
+	back-references ``\1`` through ``\9`` to refer to matching sub-expression
+	groups within regexp.  The ``/`` separator characters shown in the
 	parameter to the option can actually be replaced by any
 	character. Note that whichever separator character is used will
-	have to be escaped with a backslash ('\') character wherever it is
+	have to be escaped with a backslash (``\``) character wherever it is
 	used in the parameter as something other than a separator. The
 	regular expression defined by this option is added to the current
 	list of regular expressions for the specified language unless the
