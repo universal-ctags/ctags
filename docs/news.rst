@@ -1263,6 +1263,16 @@ The third line means ``\\`` is used when for combining a namespace item
 Of course, ctags uses the more specific line when choosing a
 separator; the third line has higher priority than the first.
 
+``TAG_OUTPUT_FILESEP``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This pseudo tag represents the separator used in file name: slash or
+backslash.  This is always 'slash' on Unix-like environments.
+This is also 'slash' by default on Windows, however when
+``--output-format=e-tags`` or ``--use-slash-as-filename-separator=no``
+is specified, it becomes 'backslash'.
+
+
 ``TAG_OUTPUT_MODE``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
