@@ -1359,6 +1359,10 @@ are not listed here. They are experimental or for debugging purpose.
 	DESCRIPTION
 		Human readable description for the role.
 
+``--list-subparsers[=baselang|all]``
+	Lists the subparsers for a base language for either the specified
+	*baselang* or **all** languages, and then exits.
+
 ``--machinable[=yes|no]``
 	Use tab character as separators for ``--list-`` option output.  It
 	may be suitable for scripting. See "List options" for considered
@@ -1450,7 +1454,7 @@ are not listed here. They are experimental or for debugging purpose.
 
 ``--pseudo-tags=[+|-]ptag``, ``--pseudo-tags=*``
 	Enable/disable emitting pseudo tag named ptag.
-	if \* is given, enable emitting all pseudo tags.
+	If \* is given, enable emitting all pseudo tags.
 
 ``--put-field-prefix``
 	Put "UCTAGS" as prefix for the name of fields newly introduced in
@@ -1505,7 +1509,7 @@ are not listed here. They are experimental or for debugging purpose.
 
 ``--use-slash-as-filename-separator[=yes|no]``
 	Uses slash character as filename separators instead of backslash
-	character when priting ``input:`` field.
+	character when printing ``input:`` field.
 	This option is available on MSWindows only.
 	The default is yes for the default "u-ctags" output format, and
 	no for the other formats.
