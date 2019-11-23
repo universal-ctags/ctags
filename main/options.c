@@ -699,7 +699,6 @@ extern void freeList (stringList** const pList)
 }
 
 extern void setDefaultTagFileName (void)
-
 {
 	if (Option.filter || Option.interactive)
 		return;
