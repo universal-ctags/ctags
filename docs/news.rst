@@ -1251,13 +1251,13 @@ Example output:
     !_TAG_KIND_SEPARATOR!PHP	\\	/nc/
     ...
 
-The first line means `::` is used when combining something with an
+The first line means ``::`` is used when combining something with an
 item of the class kind.
 
-The second line means `\\` is used when a class item is at the top
+The second line means ``\\`` is used when a class item is at the top
 level; no upper item is specified.
 
-The third line means `\\` is used when for combining a namespace item
+The third line means ``\\`` is used when for combining a namespace item
 (upper) and a class item (lower).
 
 Of course, ctags uses the more specific line when choosing a
@@ -1712,7 +1712,7 @@ Instead ``-D`` is used for defining a macro in CPreProcessor parser.
 Skipping utf-8 BOM
 ---------------------------------------------------------------------
 
-The three bytes sequence('\xEF\xBB\xBF') at the head of an input
+The three bytes sequence(``\xEF\xBB\xBF``) at the head of an input
 file is skipped when parsing.
 
 TODO:
