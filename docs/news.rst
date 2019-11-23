@@ -1279,6 +1279,7 @@ is specified, it becomes 'backslash'.
 .. NOT REVIEWED YET
 
 This pseudo tag represents output mode: u-ctags or e-ctags.
+This is controlled by ``--output-format`` option.
 
 See also :ref:`Compatible output and weakness <compat-output>`.
 
