@@ -296,10 +296,10 @@ def basename_filter(internal, output_type):
 
 # convert a command line list to a command line string
 def join_cmdline(cmdline):
-    # surround with '' if an argument include spaces or '\'
+    # surround with '' if an argument includes spaces or '\'
     # TODO: use more robust way
-    return ' '.join(["'" + x + "'" if (' ' in x) or ('\\' in x) else x
-        for x in cmdline])
+    return ' '.join("'" + x + "'" if (' ' in x) or ('\\' in x) else x
+        for x in cmdline)
 
 def run_record_cmdline(cmdline, ffilter, ocmdline, output_type):
     with open(ocmdline, 'w') as f:
