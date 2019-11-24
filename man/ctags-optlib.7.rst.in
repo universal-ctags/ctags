@@ -191,9 +191,8 @@ OPTION ITEMS
 	since Exuberant-ctags.
 
 	Note that using a number character in a *name* violates the
-	version 2 of tags file format. The version 3 revised by
-	Universal-ctags project allows using the number character as an
-	initial in a kind name.
+	version 2 of tags file format though @CTAGS_NAME_EXECUTABLE@
+	accepts it. For more detail, see tags(5).
 
 	*description* comes from any printable ASCII characters. The
 	exception is ``{`` and ``\``. ``{`` is reserved for adding flags
