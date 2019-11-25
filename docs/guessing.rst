@@ -10,4 +10,4 @@ Choosing a proper parser in ctags
 	:depth: 3
 	:local:
 
-See :ref:`ctags(1) <ctags(1)>` within the source tree.
+See :ref:`ctags(1) <ctags(1)>`.
