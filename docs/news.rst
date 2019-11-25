@@ -126,30 +126,8 @@ Heavily improved parsers
 ``F`` kind usage
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. IN MAN PAGE
-
-``F`` is used as a kind letter for file kind in Exuberant-ctags; the
-``F`` was hard-coded in ctags internal. However, we found some built-in
-parsers including Ruby uses ``F`` for their own purpose. So if you
-find a tag having ``F`` as a kind letter, you cannot say what it is
-well: a file name or something peculiar in the language. Long kind
-description strings may help you but we are not sure all tools
-utilizing ``tags`` file refer the long kind description strings.
-
-Universal-ctags disallows parsers to use ``F`` their own purpose
-in both built-in and optlib parsers.
-
-``F`` in built-in parsers are replaced as follows:
-
-============  ================  ===========
-Language      Long description  Replacement
-============  ================  ===========
-ObjectiveC    field             E
-Ruby          singletonMethod   S
-Rust          method            P
-SQL           field             E
-============  ================  ===========
-
+You cannot use ``F`` (``file``) kind in your .ctags because Universal-ctags
+reserves it. See :ref:`ctags-incompatibilities(7) <ctags-incompatibilities(7)>`.
 
 
 New and extended options
@@ -340,67 +318,8 @@ header is easy because it starts with a `#` character.
 
 Kinds synchronization
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. IN MAN PAGE
-
-In Universal-ctags, as in Exuberant-ctags, most kinds are parser
-local; enabling (or disabling) a kind in a parser has no effect on
-kinds in any other parsers even those with the same name and/or
-letter.
-
-However, there are exceptions, such as C and C++ for example. C++ can
-be considered a language extended from C. Therefore it is natural
-that all kinds defined in the C parser are also defined in the C++
-parser. Enabling a kind in the C parser also enables a kind having
-the same name in the C++ parser, and vice versa.
-
-A kind group is a group of kinds satisfying the following conditions:
-
-1. Having the same name and letter, and
-2. Being synchronized with each other
-
-A master parser manages the synchronization of a kind group. The
-`MASTER` column of ``--list-kinds-full`` shows the master parser of
-the kind.
-
-Internally, a state change (enabled or disabled with
-``--kind-<LANG>=[+|-]...``) of a kind in a kind group is reported to
-its master parser as an event. Then the master parser updates the
-state of all kinds in the kind group as specified with the option.
-
-.. code-block:: console
-
-    $ ./ctags --list-kinds-full=C++
-    #LETTER NAME            ENABLED  REFONLY NROLES MASTER     DESCRIPTION
-    d       macro           on       FALSE   1      C          macro definitions
-    ...
-    $ ./ctags --list-kinds-full=C
-    #LETTER NAME            ENABLED  REFONLY NROLES MASTER     DESCRIPTION
-    d       macro           on       FALSE   1      C          macro definitions
-    ...
-
-The example output indicates that the `d` kinds of both the C++ and C
-parsers are in the same group and that the `C` parser manages the
-group.
-
-.. code-block:: console
-
-    $ ./ctags --kinds-C++=-d --list-kinds-full=C | head -2
-    #LETTER NAME            ENABLED  REFONLY NROLES MASTER     DESCRIPTION
-    d       macro           off      FALSE   1      C          macro definitions
-    $ ./ctags --kinds-C=-d --list-kinds-full=C | head -2
-    #LETTER NAME            ENABLED  REFONLY NROLES MASTER     DESCRIPTION
-    d       macro           off      FALSE   1      C          macro definitions
-    $ ./ctags --kinds-C++=-d --list-kinds-full=C++ | head -2
-    #LETTER NAME            ENABLED  REFONLY NROLES MASTER     DESCRIPTION
-    d       macro           off      FALSE   1      C          macro definitions
-    $ ./ctags --kinds-C=-d --list-kinds-full=C++ | head -2
-    #LETTER NAME            ENABLED  REFONLY NROLES MASTER     DESCRIPTION
-    d       macro           off      FALSE   1      C          macro definitions
-
-In the above example, the `d` kind is disabled via C or C++.
-Disabling a `d` kind via one language disables the `d` kind for the
-other parser, too.
+See the description about ``--kinds-<LANG>`` and ``--list-kinds-full``
+option in :ref:`ctags(1) <ctags(1)>`.
 
 
 ``--put-field-prefix`` options
@@ -432,10 +351,8 @@ In this example, ``roles`` is prefixed.
 ``--maxdepth`` option
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. IN MAN PAGE
+See :ref:`ctags(1) <ctags(1)>`.
 
-``--maxdepth`` limits the depth of directory recursion enabled with
-the ``-R`` option.
 
 ``--map-<LANG>`` option
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -503,9 +420,7 @@ the langmap in a parser-centric manner.
 Guessing parser from file contents (``-G`` option)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. IN MAN PAGE
-
-See "Choosing a proper parser in ctags" section.
+See :ref:`ctags(1) <ctags(1)>`.
 
 
 Enabling/disabling pseudo tags (``--pseudo-tags`` option)
@@ -553,20 +468,7 @@ See :ref:`JSON output <output-json>` for more details.
 "always" and "never" as an argument for --tag-relative
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-..
-	NOT REVIEWED YET
-	IN MAN PAGE
-
-Even if "yes" is specified as an option argument for --tag-relative,
-absolute paths are used in tags output if an input is given as
-an absolute path. This behavior is expected in exuberant-ctags
-as written in its man-page.
-
-In addition to "yes" and "no", universal-ctags takes "never" and "always".
-
-If "never" is given, absolute paths are used in tags output regardless
-of the path representation for input file(s). If "always" is given,
-relative paths are used always.
+``--tag-relative`` option is extend. See :ref:`ctags(1) <ctags(1)>`.
 
 
 Defining a macro in CPreProcessor input
@@ -684,27 +586,8 @@ See :ref:`--_interactive Mode <interactive-mode>` for more details.
 Defining a kind
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. IN MAN PAGE
+See :ref:`ctags-optlib(7) <ctags-optlib(7)>`.
 
-A new ``--kinddef-<LANG>=letter,name,description`` option reduces the
-typing defining a regex pattern with ``--regex-<LANG>=``, and keeps
-the consistency of dynamically defined kinds in a language.
-
-A kind letter defined with ``--kinddef-<LANG>`` can be referred in
-``--kinddef-<LANG>``.
-
-Previously you had to write in your optlib::
-
-    --regex-elm=/^([[:lower:]_][[:alnum:]_]*)[^=]*=$/\1/f,function,Functions/{scope=set}
-    --regex-elm=/^[[:blank:]]+([[:lower:]_][[:alnum:]_]*)[^=]*=$/\1/f,function,Functions/{scope=ref}
-
-With new ``--kinddef-<LANG>`` you can write the same things like::
-
-    --kinddef-elm=f,function,Functions
-    --regex-elm=/^([[:lower:]_][[:alnum:]_]*)[^=]*=$/\1/f/{scope=set}
-    --regex-elm=/^[[:blank:]]+([[:lower:]_][[:alnum:]_]*)[^=]*=$/\1/f/{scope=ref}
-
-We can say now "kind" is a first class object in Universal-ctags.
 
 ..
 	NOT REVIEWED YET
@@ -927,34 +810,8 @@ Subparsers can be listed with ``--list-subparser``:
 Including line number to pattern field
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-``--excmd=type`` specifies how ctags prints pattern field in a tags file.
-Universal-ctags introduces ``combine`` as a new ``type``.
 
-.. IN MAN PAGE
-
-If ``combine`` is given, Universal-ctags combines adjusted line number
-and pattern with a semicolon as pattern. ctags adjusts the line number
-by decrementing or incrementing (if ``-B`` option is given) one.  This
-adjustment helps a client tool like vim to search the pattern from the
-line before (or after) the pattern starts.
-
-Let's see an example.
-
-.. code-block:: console
-
-	$ cat -n /tmp/foo.cc
-		 1	int foo(int i)
-		 2	{
-		 3	  return i;
-		 4	}
-		 5
-		 6	int foo(int i, int j)
-		 7	{
-		 8	  return i + j;
-		 9	}
-	$ ./ctags --excmd=combine -o - /tmp/foo.cc
-	foo	/tmp/foo.cc	0;/^int foo(int i)$/;"	f	typeref:typename:int
-	foo	/tmp/foo.cc	5;/^int foo(int i, int j)$/;"	f	typeref:typename:int
+See :ref:`ctags(1) <ctags(1)>`.
 
 
 Changes to the tags file format
@@ -1118,31 +975,13 @@ specified role.
 Automatic parser selection
 ---------------------------------------------------------------------
 
-See "Choosing a proper parser in ctags" section.
+See :ref:`ctags(1) <ctags(1)>`.
 
 
 Incompatible changes to file name pattern and extension handling
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. IN MAN PAGE
-
-When guessing a proper parser for a given input file, Exuberant-ctags
-tests file name patterns AFTER file extensions (e-order).
-Universal-ctags does this differently; it tests file name patterns
-BEFORE file extensions (u-order).
-
-This incompatible change is introduced to deal with the following
-situation: "build.xml" is an input file. The Ant parser declares it
-handles a file name pattern "build.xml" and another parser, Foo,
-declares it handles a file extension "xml".
-
-Which parser should be used for parsing the input? The user may want
-to use the Ant parser because the pattern it declares is more
-specific than the extension Foo declares. However, in e-order, the
-other parser, Foo, is chosen.
-
-So Universal-ctags uses the u-order even though it introduces an
-incompatibility.
+See :ref:`ctags-incompatible(7) <ctags-incompatible(7)>`.
 
 
 Pseudo tags
