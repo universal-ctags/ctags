@@ -64,15 +64,16 @@ man: $(man_pages)
 html: $(html_pages)
 pdf: $(pdf_pages)
 
+empty :=
+space := $(empty) $(empty)
+op_paren := (
+cl_paren := )
+reppat := \<\($(subst $(space),\|,$(subst .,$(op_paren),$(addsuffix $(cl_paren),$(man_pages))))\)
+
 update-docs: $(doc_files)
 
 ../docs/man/%.rst: %.rst
-	sed \
-		-e 's/\<ctags(1)/:ref:`& <&>`/g' \
-		-e 's/\<ctags-incompatibilities(7)/:ref:`& <&>`/g' \
-		-e 's/\<ctags-optlib(7)/:ref:`& <&>`/g' \
-		-e 's/\<tags(5)/:ref:`& <&>`/g' \
-	< $< > $@
+	sed -e 's/$(reppat)/:ref:`& <&>`/g' < $< > $@
 
 %.rst: %.rst.in
 ifeq ($(QUICK),)
