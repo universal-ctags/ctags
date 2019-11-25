@@ -991,6 +991,11 @@ are not listed here. They are experimental or for debugging purpose.
 	but exclude macros, use "--kinds-c=+px-d"; to include only tags for
 	functions, use "--kinds-c=f".
 
+	Some kinds of C and C++ languages are synchronized; enabling
+	(or disabling) a kind in one language enables the kind having
+	the same letter and name in the other language. See also the
+	description of MASTER column of ``--list-kinds-full``.
+
 	A name associated with a kind can be used as alternative to a
 	one-letter flag. See "Letters and names" for more details.
 
