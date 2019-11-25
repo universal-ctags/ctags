@@ -123,7 +123,7 @@ Heavily improved parsers
 * Verilog
 
 
-`F` kind usage
+``F`` kind usage
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. IN MAN PAGE
