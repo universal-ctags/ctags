@@ -56,7 +56,7 @@ rst_files  = $(gen_rst_files) $(SOURCE_FILES)
 man_pages  = $(basename $(rst_files))
 html_pages = $(addsuffix .html,$(man_pages))
 pdf_pages  = $(addsuffix .pdf,$(man_pages))
-doc_files = $(addprefix ../docs/man/,$(rst_files))
+doc_files  = $(addprefix ../docs/man/,$(rst_files))
 
 all: man html pdf
 
@@ -66,9 +66,7 @@ pdf: $(pdf_pages)
 
 empty :=
 space := $(empty) $(empty)
-op_paren := (
-cl_paren := )
-reppat := \<\($(subst $(space),\|,$(subst .,$(op_paren),$(addsuffix $(cl_paren),$(man_pages))))\)
+reppat := \<\(${subst ${space},\|,${subst .,(,${addsuffix ),${man_pages}}}}\)
 
 update-docs: $(doc_files)
 
@@ -90,7 +88,7 @@ endif
 %: %.rst
 	$(RST2MAN) $(RST2MAN_FLAGS) $< > $@
 %.html: %.rst
-	$(RST2HTML) $(RST2HTML_FLAGS)  $< > $@
+	$(RST2HTML) $(RST2HTML_FLAGS) $< > $@
 %.pdf: %.rst
 	$(RST2PDF) $(RST2PDF_FLAGS) $< -o $@
 
