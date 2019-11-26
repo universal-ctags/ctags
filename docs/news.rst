@@ -1251,17 +1251,27 @@ Example output:
     !_TAG_KIND_SEPARATOR!PHP	\\	/nc/
     ...
 
-The first line means `::` is used when combining something with an
+The first line means ``::`` is used when combining something with an
 item of the class kind.
 
-The second line means `\\` is used when a class item is at the top
+The second line means ``\\`` is used when a class item is at the top
 level; no upper item is specified.
 
-The third line means `\\` is used when for combining a namespace item
+The third line means ``\\`` is used when for combining a namespace item
 (upper) and a class item (lower).
 
 Of course, ctags uses the more specific line when choosing a
 separator; the third line has higher priority than the first.
+
+``TAG_OUTPUT_FILESEP``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This pseudo tag represents the separator used in file name: slash or
+backslash.  This is always 'slash' on Unix-like environments.
+This is also 'slash' by default on Windows, however when
+``--output-format=e-tags`` or ``--use-slash-as-filename-separator=no``
+is specified, it becomes 'backslash'.
+
 
 ``TAG_OUTPUT_MODE``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1269,6 +1279,7 @@ separator; the third line has higher priority than the first.
 .. NOT REVIEWED YET
 
 This pseudo tag represents output mode: u-ctags or e-ctags.
+This is controlled by ``--output-format`` option.
 
 See also :ref:`Compatible output and weakness <compat-output>`.
 
@@ -1712,7 +1723,7 @@ Instead ``-D`` is used for defining a macro in CPreProcessor parser.
 Skipping utf-8 BOM
 ---------------------------------------------------------------------
 
-The three bytes sequence('\xEF\xBB\xBF') at the head of an input
+The three bytes sequence(``\xEF\xBB\xBF``) at the head of an input
 file is skipped when parsing.
 
 TODO:

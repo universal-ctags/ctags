@@ -1109,16 +1109,19 @@ are not listed here. They are experimental or for debugging purpose.
 	When disabled, symbolic links are ignored. This option is on by default.
 
 ``--list-aliases[=language|all]``
-	Lists the aliases for either the specified language or all
-	languages, and then exits. The aliases are used when heuristically
-	testing a language parser for a source file.
+	Lists the aliases for either the specified *language* or **all**
+	languages, and then exits.
+	**all** is used as default value if the option argument is omitted.
+	The aliases are used when heuristically testing a language parser for a
+	source file.
 
 ``--list-excludes``
 	Lists the current exclusion patterns used to exclude files.
 
-``--list-extras[=languages|all]``
-	Lists the extras recognized for either the specified language or
-	"all" languages. See "Extras" subsection to know what are extras.
+``--list-extras[=language|all]``
+	Lists the extras recognized for either the specified *language* or
+	**all** languages. See "Extras" subsection to know what are extras.
+	**all** is used as default value if the option argument is omitted.
 
 	An extra can be enabled or disabled with ``--extras=`` for common
 	extras in all languages, or ``--extras-<LANG>=`` for the specified
@@ -1147,8 +1150,9 @@ are not listed here. They are experimental or for debugging purpose.
 	Lists the compiled features.
 
 ``--list-fields[=language|all]``
-	Lists the fields recognized for either the specified language or
-	"all" languages. See "Fields" subsection to know what are fields.
+	Lists the fields recognized for either the specified *language* or
+	**all** languages. See "Fields" subsection to know what are fields.
+	**all** is used as default value if the option argument is omitted.
 
 	.. TODO? xref output
 
@@ -1215,9 +1219,10 @@ are not listed here. They are experimental or for debugging purpose.
 	``--with-list-header``.
 
 ``--list-kinds-full[=language|all]``
-	Lists the tag kinds recognized for either the specified language
-	or "all" languages, and then exits. See "Kinds" subsection to
+	Lists the tag kinds recognized for either the specified *language*
+	or **all** languages, and then exits. See "Kinds" subsection to
 	learn what kinds are.
+	**all** is used as default value if the option argument is omitted.
 
 	Each kind of tag recorded in the tag file is represented by a
 	one-letter flag, or name. They are also used to filter the tags
@@ -1302,16 +1307,19 @@ are not listed here. They are experimental or for debugging purpose.
 	Lists the file extensions which associate a file
 	name with a language for either the specified *language* or **all**
 	languages, and then exits.
+	**all** is used as default value if the option argument is omitted.
 
 ``--list-map-patterns[=language|all]``
 	Lists the file name patterns which associate a file
 	name with a language for either the specified *language* or **all**
 	languages, and then exits.
+	**all** is used as default value if the option argument is omitted.
 
 ``--list-maps[=language|all]``
 	Lists file name patterns and the file extensions which associate a file
 	name with a language for either the specified *language* or **all**
 	languages, and then exits. See the ``--langmap`` option, and "SOURCE FILES", above.
+	**all** is used as default value if the option argument is omitted.
 
 	To list the file extensions or file name patterns individually, use
 	``--list-map-extensions`` or ``--list-map-patterns`` option.
@@ -1324,8 +1332,10 @@ are not listed here. They are experimental or for debugging purpose.
 	Output list of flags which can be used in a multiline regex parser
 	definition.
 
-``--list-params=[language|all]``
-	Output list of language parameters. This works with ``--machinable``.
+``--list-params[=language|all]``
+	Lists the parameters for either the specified *language* or **all**
+	languages, and then exits.
+	**all** is used as default value if the option argument is omitted.
 
 ``--list-pseudo-tags``
 	Output list of pseudo tags.
@@ -1334,9 +1344,10 @@ are not listed here. They are experimental or for debugging purpose.
 	See ctags-optlib(7).
 
 ``--list-roles[=language|all[.kinds]]``
-	List the roles for either the specified language or "all"
-	languages. If the parameter kinds is given after the parameter
-	language or "all" with concatenating with '.', list only roles
+	List the roles for either the specified *language* or **all** languages.
+	**all** is used as default value if the option argument is omitted.
+	If the parameter kinds is given after the parameter
+	*language* or **all** with concatenating with '.', list only roles
 	defined in the kinds. Both one-letter flags and names surrounded
 	by braces are acceptable as the parameter kinds.
 
@@ -1358,6 +1369,11 @@ are not listed here. They are experimental or for debugging purpose.
 
 	DESCRIPTION
 		Human readable description for the role.
+
+``--list-subparsers[=baselang|all]``
+	Lists the subparsers for a base language for either the specified
+	*baselang* or **all** languages, and then exits.
+	**all** is used as default value if the option argument is omitted.
 
 ``--machinable[=yes|no]``
 	Use tab character as separators for ``--list-`` option output.  It
@@ -1450,7 +1466,7 @@ are not listed here. They are experimental or for debugging purpose.
 
 ``--pseudo-tags=[+|-]ptag``, ``--pseudo-tags=*``
 	Enable/disable emitting pseudo tag named ptag.
-	if \* is given, enable emitting all pseudo tags.
+	If \* is given, enable emitting all pseudo tags.
 
 ``--put-field-prefix``
 	Put "UCTAGS" as prefix for the name of fields newly introduced in
@@ -1505,7 +1521,7 @@ are not listed here. They are experimental or for debugging purpose.
 
 ``--use-slash-as-filename-separator[=yes|no]``
 	Uses slash character as filename separators instead of backslash
-	character when priting ``input:`` field.
+	character when printing ``input:`` field.
 	This option is available on MSWindows only.
 	The default is yes for the default "u-ctags" output format, and
 	no for the other formats.
