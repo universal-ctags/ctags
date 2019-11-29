@@ -25,8 +25,9 @@
 
 --langdef=Passwd
 --map-Passwd=+(passwd)
+--kinddef-Passwd=u,username,user names
 --_fielddef-Passwd=home,home directory
 --_fielddef-Passwd=shell,login shell
 --fields-Passwd=+{home}
 --fields-Passwd=+{shell}
---regex-Passwd=/^([^:]+):([^:]+):([^:]+):([^:]+):([^:]*):([^:]+):([^:]+)/\1/u,username,user names/{_field=home:\6}{_field=shell:\7}
+--regex-Passwd=/^([^:]+):([^:]+):([^:]+):([^:]+):([^:]*):([^:]+):([^:]+)/\1/u/{_field=home:\6}{_field=shell:\7}
