@@ -27,6 +27,20 @@ Rules for writing man pages
 	make QUICK=1 update-docs
 
 
+Tips for writing man pages
+---------------------------------------------------------------------
+
+* about hyperlinks
+
+  + `phrase reference`_ style is valid only in the same page.
+    When this is used on rst2man, it is shown with underline.
+
+  + rst2html (and sphinx) converts this to a hyperlink.
+    :ref:`title <tag>` style can jump across files, but this can
+    be used only on sphinx and cause error on old docutils
+    (rst2man).
+
+
 Testing and verification
 ---------------------------------------------------------------------
 * pick reserved words

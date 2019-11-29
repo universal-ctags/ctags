@@ -981,7 +981,7 @@ See :ref:`ctags(1) <ctags(1)>`.
 Incompatible changes to file name pattern and extension handling
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-See :ref:`ctags-incompatible(7) <ctags-incompatible(7)>`.
+See :ref:`ctags-incompatibilities(7) <ctags-incompatibilities(7)>`.
 
 
 Pseudo tags
