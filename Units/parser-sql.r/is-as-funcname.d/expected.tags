@@ -1,0 +1,1 @@
+is	input.sql	/^CREATE FUNCTION is() RETURNS integer AS $\$$/;"	f

@@ -1,0 +1,12 @@
+This test case is originally made for testing the change proposed in
+#2268. However, it doesn't verify the behavior affected by the change.
+
+In Postgresql, "is" can be used as a function name.  In many of the
+other SQL DB implementations, "is" is a reserved word, Therefore, "is"
+cannot be used as a function name.
+
+When SQL parser of ctags reads a SQL input file, it doesn't care
+whether an identifier appearing at the position where a function name
+is expected is a reserved word or not. Therefore, the change proposed
+in #2268 has no impact on the way to capture function name.
+
