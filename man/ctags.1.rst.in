@@ -792,19 +792,6 @@ are not listed here. They are experimental or for debugging purpose.
 	Check the output of the ``--list-extras=<LANG>`` option for the
 	extras of specific language <LANG>.
 
-``--fields-<LANG>=[+|-]flags|*``
-	Specifies which language-specific fields are to be included in
-	the entries of the tag file. Universal-ctags
-	supports language-specific fields. (See "`Language-specific fields and
-	extras`_" about the concept). This option is for controlling them.
-
-	Specify "all" as <LANG> to apply the parameter flags to all
-	fields; all fields are enabled with specifying '*' as the
-	parameter flags. If specifying nothing as the parameter flags
-	("--fields-all="), all fields are disabled. These two combinations
-	are useful for testing.
-
-
 ``--fields=[+|-]flags|*``
 	Specifies which available extension fields are to be included in
 	the tag entries (see "`TAG FILE FORMAT`_", below, and, "`Fields`_", above, for more
@@ -890,6 +877,18 @@ are not listed here. They are experimental or for debugging purpose.
 	one-letter flag. Some minor fields have no one-letters flag. In
 	that case, names must be specified anyway. See "`Letters and names`_"
 	for more details.
+
+``--fields-<LANG>=[+|-]flags|*``
+	Specifies which language-specific fields are to be included in
+	the entries of the tag file. Universal-ctags
+	supports language-specific fields. (See "`Language-specific fields and
+	extras`_" about the concept). This option is for controlling them.
+
+	Specify "all" as <LANG> to apply the parameter flags to all
+	fields; all fields are enabled with specifying '*' as the
+	parameter flags. If specifying nothing as the parameter flags
+	("--fields-all="), all fields are disabled. These two combinations
+	are useful for testing.
 
 ``--file-scope[=yes|no]``
 	Indicates whether tags scoped only for a single file (i.e. tags which
