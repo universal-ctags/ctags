@@ -314,7 +314,7 @@ static void parseClass (tokenInfo *const token)
 	if (!tokenIsType (token, IDENTIFIER))
 		return;					/* Unexpected sequence of token */
 
-	makeSimpleTag (token->string, K_CLASS);
+	int classCorkIndex = makeSimpleTag (token->string, K_CLASS);
 
 	/* Skip the class definition. */
 	tokenRead (token);
@@ -350,6 +350,7 @@ extern parserDefinition* ValaParser (void)
 	def->extensions = extensions;
 	def->keywordTable = ValaKeywordTable;
 	def->keywordCount = ARRAY_SIZE (ValaKeywordTable);
+	def->useCork = true;
 
 	def->parser = findValaTags;
 	return def;
