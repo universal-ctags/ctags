@@ -27,6 +27,11 @@ extern parserDefinition* PasswdParser (void)
 		NULL
 	};
 
+	static kindDefinition PasswdKindTable [] = {
+		{
+		  true, 'u', "username", "user names",
+		},
+	};
 	static fieldDefinition PasswdFieldTable [] = {
 		{
 		  .enabled     = true,
@@ -41,7 +46,7 @@ extern parserDefinition* PasswdParser (void)
 	};
 	static tagRegexTable PasswdTagRegexTable [] = {
 		{"^([^:]+):([^:]+):([^:]+):([^:]+):([^:]*):([^:]+):([^:]+)", "\\1",
-		"u,username,user names", "{_field=home:\\6}{_field=shell:\\7}", NULL, false},
+		"u", "{_field=home:\\6}{_field=shell:\\7}", NULL, false},
 	};
 
 
@@ -52,6 +57,8 @@ extern parserDefinition* PasswdParser (void)
 	def->patterns      = patterns;
 	def->aliases       = aliases;
 	def->method        = METHOD_NOT_CRAFTED|METHOD_REGEX;
+	def->kindTable     = PasswdKindTable;
+	def->kindCount     = ARRAY_SIZE(PasswdKindTable);
 	def->fieldTable    = PasswdFieldTable;
 	def->fieldCount    = ARRAY_SIZE(PasswdFieldTable);
 	def->tagRegexTable = PasswdTagRegexTable;
