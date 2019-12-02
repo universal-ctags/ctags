@@ -99,7 +99,13 @@ my $options =
 	     if (! defined $_[0]->{'langdef'});
 	 die "Adding a field is allowed only to the language specified with --langdef: $1"
 	     unless ($_[0]->{'langdef'} eq $1);
-	 push @{$_[0]->{'fielddefs'}}, { name => $2, desc => $3 };
+
+	 my $name = $2;
+	 my $desc = $3;
+	 die "unacceptable character is used for field name: $name"
+	     unless ($name =~ /^[a-zA-Z]+$/);
+
+	 push @{$_[0]->{'fielddefs'}}, { name => $name, desc => $desc };
        } ],
      [ qr/^--_roledef-(.*)=([a-zA-Z])\.([a-zA-Z][a-zA-Z0-9]*),(.+)/, sub {
 	   die "Don't use --_roledef-<LANG>=+ option before defining the language"
