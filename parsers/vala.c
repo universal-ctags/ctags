@@ -35,12 +35,14 @@ typedef enum {
 	K_CLASS,
 	K_FIELD,
 	K_METHOD,
+	K_PROP,
 } valaKind;
 
 static kindDefinition ValaKinds [] = {
 	{ true,  'c', "class",      "classes"},
 	{ true,  'f', "field",      "fields"},
 	{ true,  'm', "method",     "methods"},
+	{ true,  'p', "property",   "properties"},
 };
 
 enum eKeywordId
@@ -340,11 +342,16 @@ static void parseClassBody (tokenInfo *const token, int classCorkIndex)
 			tokenCopy (nameToken, token);
 
 		tokenRead (token);
-		if (!tokenEqType (token, ';'))
-			break;				/* Unexpected */
+		int kind;
+		if (tokenEqType (token, ';'))
+			kind = K_FIELD;
+		else if (tokenEqType (token, '{'))
+			kind = K_PROP;
+		else
+			break;				/* Unexpected sequence of token */
 
-		int fieldCorkIndex = makeSimpleTag (nameToken->string, K_FIELD);
-		tagEntryInfo *entry = getEntryInCorkQueue (fieldCorkIndex);
+		int memberCorkIndex = makeSimpleTag (nameToken->string, kind);
+		tagEntryInfo *entry = getEntryInCorkQueue (memberCorkIndex);
 
 		/* Fill access field. */
 		entry->extensionFields.access = isPublic? eStrdup ("public"): NULL;
@@ -361,6 +368,9 @@ static void parseClassBody (tokenInfo *const token, int classCorkIndex)
 
 		/* Fill scope field. */
 		entry->extensionFields.scopeIndex = classCorkIndex;
+
+		if (kind == K_PROP)
+			tokenSkipOverPair (token);
 	} while (!tokenIsEOF (token));
 
 	tokenDestroy (typerefToken);
