@@ -360,13 +360,13 @@ built-in language names.
 Letters and names
 ~~~~~~~~~~~~~~~~~
 
-Some options take letters as parameters (e.g. ``--kinds-<LANG>`` option).
+Some options take one-letter flags as parameters (e.g. ``--kinds-<LANG>`` option).
 Specifying just letters help a user create a complicated command line
-quickly.  However, a command line including sequences of single letters
+quickly.  However, a command line including sequences of one-letter flags
 becomes difficult to understand.
 
-Universal-ctags accepts names in
-addition to such letters. The names and letters can be mixed in an
+Universal-ctags accepts name flags in
+addition to such one-letter flags. The name and one-letter flags can be mixed in an
 option parameter by surrounding each name by braces. Thus, for an
 example, the following three notations for ``--kinds-C`` option have
 the same meaning::
@@ -378,7 +378,7 @@ the same meaning::
 Note that braces may be meta characters in your shell. Put
 single quotes in such case.
 
-``--list-...`` options shows letters and associated names.
+``--list-...`` options shows one-letter flags and associated name flags.
 
 
 List options
@@ -730,7 +730,7 @@ are not listed here. They are experimental or for debugging purpose.
 	extras`_" about the concept). Use ``--extras-<LANG>=`` option for
 	controlling them.
 
-	The meaning of major extras is as follows (one-letter flag/name):
+	The meaning of major extras is as follows (one-letter flag/name flag):
 
 	F/fileScope
 		Equivalent to ``--file-scope``.
@@ -773,7 +773,7 @@ are not listed here. They are experimental or for debugging purpose.
 	extras.
 
 	A name associated with an extra can be used as alternative to a
-	one-letter flag. Some minor extras have no one-letters flag. In
+	one-letter flag. Some minor extras have no one-letter flags. In
 	that case, names must be specified anyway. See "`Letters and names`_"
 	for more details.
 
@@ -813,7 +813,7 @@ are not listed here. They are experimental or for debugging purpose.
 	controlling them.
 
 
-	The meaning of major fields is as follows (one-letter flag/name):
+	The meaning of major fields is as follows (one-letter flag/name flag):
 
 	a/access
 		Access (or export) of class members
@@ -828,12 +828,12 @@ are not listed here. They are experimental or for debugging purpose.
 		Inheritance information.
 
 	k
-		Kind of tag as a single letter. Enabled by default.
-		Exceptionally this has no name.
+		Kind of tag as one-letter. Enabled by default.
+		Exceptionally this has no field name.
 
 	K
 		Kind of tag as full name
-		Exceptionally this has no name.
+		Exceptionally this has no field name.
 
 	l/language
 		Language of source file containing tag
@@ -874,7 +874,7 @@ are not listed here. They are experimental or for debugging purpose.
 	fields.
 
 	A name associated with a field can be used as alternative to a
-	one-letter flag. Some minor fields have no one-letters flag. In
+	one-letter flag. Some minor fields have no one-letter flags. In
 	that case, names must be specified anyway. See "`Letters and names`_"
 	for more details.
 
@@ -995,7 +995,7 @@ are not listed here. They are experimental or for debugging purpose.
 
 	Some kinds of C and C++ languages are synchronized; enabling
 	(or disabling) a kind in one language enables the kind having
-	the same letter and name in the other language. See also the
+	the same one-letter and name in the other language. See also the
 	description of MASTER column of ``--list-kinds-full``.
 
 	A name associated with a kind can be used as alternative to a
@@ -1269,7 +1269,7 @@ are not listed here. They are experimental or for debugging purpose.
 		A kind belongs to a language (owner) in Universal-ctags;
 		enabling and disabling a kind in a language has no effect on
 		a kind in another language even if both kinds has the
-		same letter and/or the same name. In other words,
+		same one-letter flag and/or the same name flag. In other words,
 		the namespace of kinds are separated by language.
 
 		However, Exuberant-ctags does not separate the kinds of C and

@@ -49,7 +49,7 @@ define (or customize) a parser quickly.
 On the other hand, the design in Universal-ctags focuses on
 maintainability. The notation of Universal-ctags is redundant than
 that of Exuberant-ctags; the newly introduced kind should be declared
-explicitly, (long) names are approved than single letter flags
+explicitly, (long) names are approved than one-letter flags
 specifying kinds, and naming rules are stricter.
 
 This man page explains only stable options and flags.  Universal-ctags
@@ -116,7 +116,7 @@ Overview for defining a parser
 
    Use ``--regex-<LANG>=/regexp/replacement/[kind-spec/][flags]`` option.
 
-   As *KIND-SPEC*, you can use the letter defined with
+   As *KIND-SPEC*, you can use the one-letter flag defined with
    ``--kinddef-<LANG>=letter,name,description`` option.
 
 EXAMPLE
@@ -251,8 +251,8 @@ OPTION ITEMS
 	follow *replacement*, which will determine what kind of tag is
 	reported in the "kind" extension field (see :ref:`tags(5) <tags(5)>`).
 
-	*kind-spec* has two forms: letter only form and full form.  The
-	letter form assumes using ``--regex-<LANG>`` option with
+	*kind-spec* has two forms: one-letter form and full form.  The
+	one-letter form assumes using ``--regex-<LANG>`` option with
 	``--kinddef-<LANG>`` option. The *kind-spec* in ``--regex-<LANG>``
 	option just refers a letter defined with
 	``--kinddef-<LANG>``. This form is recommended in Universal-ctags.
@@ -296,21 +296,21 @@ Exuberant-ctags uses a *letter* to represent a flag. In
 Universal-ctags, a *name* surrounded by braces (name form) can be used
 in addition to *letter*. The name form makes a user reading an optlib
 file easier. The most of all flags newly added in Universal-ctags
-don't have the letter representation. All of them have only the name
+don't have the one-letter representation. All of them have only the name
 representation. ``--list-regex-flags`` lists all the flags.
 
-``basic`` (letter form ``b``)
+``basic`` (one-letter form ``b``)
 	The pattern is interpreted as a Posix basic regular expression.
 
-``exclusive`` (letter form ``x``)
+``exclusive`` (one-letter form ``x``)
 	Skip testing the other patterns if a line is matched to this
 	pattern. This is useful to avoid using CPU to parse line comments.
 
-``extend`` (letter form ``e``)
+``extend`` (one-letter form ``e``)
 	The pattern is interpreted as a Posix extended regular
 	expression (default).
 
-``icase`` (letter form ``i``)
+``icase`` (one-letter form ``i``)
 	The regular expression is to be applied in a case-insensitive
 	manner.
 
