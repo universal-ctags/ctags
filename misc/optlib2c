@@ -92,7 +92,14 @@ my $options =
 	     if (! defined $_[0]->{'langdef'});
 	 die "Adding an extra is allowed only to the language specified with --langdef: $1"
 	     unless ($_[0]->{'langdef'} eq $1);
-	 push @{$_[0]->{'extradefs'}}, { name => $2, desc => $3 };
+
+	 my $name = $2;
+	 my $desc = $3;
+
+	 die "unacceptable character is used for extra name: $name"
+	     unless ($name =~ /^[a-zA-Z0-9]+$/);
+
+	 push @{$_[0]->{'extradefs'}}, { name => $name, desc => $desc };
        } ],
      [ qr/^--_fielddef-(.*)=([^,]+),([^\{]+)/, sub {
 	 die "Don't use --_fielddef-<LANG>=+ option before defining the language"
