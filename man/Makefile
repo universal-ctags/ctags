@@ -64,14 +64,26 @@ man: $(man_pages)
 html: $(html_pages)
 pdf: $(pdf_pages)
 
-empty :=
-space := $(empty) $(empty)
-reppat := \<\(${subst ${space},\|,${subst .,(,${addsuffix ),${man_pages}}}}\)
+#
+# Convert the names of man page files (without suffix) to man page citations.
+#
+# ctags.1 tags.5 ...
+# => ctags(1) tags(5) ...
+#
+cites := ${subst .,(,${addsuffix ),${man_pages}}}
+
+#
+# Convert the man page citations to sed patterns for making hyperlinks.
+#
+# ctags(1) tags(5) ...
+# => -e 's/\<ctags(1)/:ref:`& <&>`/g' -e 's/\<ctags(5)/:ref:`& <&>`/g' ...
+#
+reppat := $(foreach m,$(cites),-e 's/\<$(m)/:ref:`& <&>`/g')
 
 update-docs: $(doc_files)
 
 ../docs/man/%.rst: %.rst
-	sed -e 's/$(reppat)/:ref:`& <&>`/g' < $< > $@
+	sed $(reppat) < $< > $@
 
 %.rst: %.rst.in
 ifeq ($(QUICK),)
