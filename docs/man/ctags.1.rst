@@ -1483,8 +1483,8 @@ are not listed here. They are experimental or for debugging purpose.
 	explicitly specify the files or pipe the output of find(1) into
 	ctags -L- instead. Note: This option is not supported on
 	all platforms at present. It is available if the output of the ``--help``
-	option includes this option. See, also, the ``--exclude`` to limit
-	recursion.
+	option includes this option. See, also, the ``--exclude`` and
+	``--maxdepth`` to limit recursion.
 
 ``--regex-<LANG>=/regexp/replacement/[kind-spec/][flags]``
 	See :ref:`ctags-optlib(7) <ctags-optlib(7)>`.
