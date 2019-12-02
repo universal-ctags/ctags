@@ -825,10 +825,12 @@ are not listed here. They are experimental or for debugging purpose.
 	k
 		Kind of tag as one-letter. Enabled by default.
 		Exceptionally this has no field name.
+		See also z/kind flag.
 
 	K
 		Kind of tag as full name
 		Exceptionally this has no field name.
+		See also z/kind flag.
 
 	l/language
 		Language of source file containing tag
@@ -849,6 +851,9 @@ are not listed here. They are experimental or for debugging purpose.
 	s
 		Scope of tag definition. Enabled by default.
 		Exceptionally this has no name.
+		See also Z flag.
+
+		.. TODO? implement "scope" of Z/scope flag.
 
 	S/signature
 		Signature of routine (e.g. prototype or parameter list)
