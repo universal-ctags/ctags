@@ -717,7 +717,7 @@ are not listed here. They are experimental or for debugging purpose.
 	Specifies whether to include extra tag entries for certain kinds of
 	information. See also "`Extras`_" subsection to know what are kinds.
 
-	The parameter flags is a set of one-letter flags, each
+	The parameter flags is a set of one-letter flags (and/or name flags), each
 	representing one kind of extra tag entry to include in the tag file.
 	If flags is preceded by either the '+' or '-' character, the effect of
 	each flag is added to, or removed from, those currently enabled;
@@ -772,11 +772,6 @@ are not listed here. They are experimental or for debugging purpose.
 	Inquire the output of ``--list-extras`` option for the other minor
 	extras.
 
-	A name associated with an extra can be used as alternative to a
-	one-letter flag. Some minor extras have no one-letter flags. In
-	that case, names must be specified anyway. See "`Letters and names`_"
-	for more details.
-
 ``--extras-<LANG>=[+|-]flags|*``
 	Specifies whether to include extra tag entries for certain kinds of
 	information for language <LANG>. Universal-ctags
@@ -797,7 +792,7 @@ are not listed here. They are experimental or for debugging purpose.
 	the tag entries (see "`TAG FILE FORMAT`_", below, and, "`Fields`_", above, for more
 	information).
 
-	The parameter flags is a set of one-letter flags,
+	The parameter flags is a set of one-letter flags (and/or name flags),
 	each representing one type of extension field to include.
 	Each letter or group of letters may be preceded by either '+' to add it
 	to the default set, or '-' to exclude it. In the absence of any
@@ -872,11 +867,6 @@ are not listed here. They are experimental or for debugging purpose.
 
 	Check the output of the ``--list-fields`` option for the other minor
 	fields.
-
-	A name associated with a field can be used as alternative to a
-	one-letter flag. Some minor fields have no one-letter flags. In
-	that case, names must be specified anyway. See "`Letters and names`_"
-	for more details.
 
 ``--fields-<LANG>=[+|-]flags|*``
 	Specifies which language-specific fields are to be included in
@@ -973,7 +963,7 @@ are not listed here. They are experimental or for debugging purpose.
 	include in the output file for a particular language, where <LANG> is
 	case-insensitive and is one of the built-in language names (see the
 	``--list-languages`` option for a complete list). The parameter kinds is a group
-	of one-letter flags designating kinds of tags (particular to the language)
+	of one-letter flags (and/or name flags) designating kinds of tags (particular to the language)
 	to either include or exclude from the output. The specific sets of
 	flags recognized for each language, their meanings and defaults may be
 	list using the ``--list-kinds-full`` option. Each letter or group of letters
@@ -997,9 +987,6 @@ are not listed here. They are experimental or for debugging purpose.
 	(or disabling) a kind in one language enables the kind having
 	the same one-letter and name in the other language. See also the
 	description of MASTER column of ``--list-kinds-full``.
-
-	A name associated with a kind can be used as alternative to a
-	one-letter flag. See "`Letters and names`_" for more details.
 
 ``--<LANG>-kinds=[+|-]kinds|*``
 	This option is obsolete. Use ``--kinds-<LANG>=...`` instead.
