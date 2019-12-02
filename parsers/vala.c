@@ -33,17 +33,20 @@
 typedef enum {
 	K_UNDEFINED = -1,
 	K_CLASS,
+	K_FIELD,
 	K_METHOD,
 } valaKind;
 
 static kindDefinition ValaKinds [] = {
 	{ true,  'c', "class",      "classes"},
+	{ true,  'f', "field",      "fields"},
 	{ true,  'm', "method",     "methods"},
 };
 
 enum eKeywordId
 {
 	KEYWORD_CLASS,
+	KEYWORD_PUBLIC,
 	KEYWORD_STRING,
 	KEYWORD_VOID,
 };
@@ -52,6 +55,7 @@ typedef int keywordId; /* to allow KEYWORD_NONE */
 
 static const keywordTable ValaKeywordTable [] = {
 	{ "class",  KEYWORD_CLASS  },
+	{ "public", KEYWORD_PUBLIC },
 	{ "string", KEYWORD_STRING },
 	{ "void",   KEYWORD_VOID  },
 };
@@ -308,6 +312,61 @@ static void parseStatement (tokenInfo *const token)
 	tokenDestroy (lastToken);
 }
 
+static void parseClassBody (tokenInfo *const token, int classCorkIndex)
+{
+	bool isPublic;
+	tokenInfo *typerefToken = newValaToken ();
+	tokenInfo *nameToken = newValaToken ();
+
+	do
+	{
+		tokenRead (token);
+		if (tokenEqType (token, '}'))
+			break;
+
+		isPublic = tokenIsKeyword(token, PUBLIC)? true: false;
+
+		if (isPublic)
+			tokenRead (token);
+
+		if (tokenIsType (token, IDENTIFIER)
+			|| tokenIsType (token, KEYWORD))
+			tokenCopy (typerefToken, token);
+		else
+			break;				/* Unexpected sequence to token */
+
+		tokenRead (token);
+		if (tokenIsType (token, IDENTIFIER))
+			tokenCopy (nameToken, token);
+
+		tokenRead (token);
+		if (!tokenEqType (token, ';'))
+			break;				/* Unexpected */
+
+		int fieldCorkIndex = makeSimpleTag (nameToken->string, K_FIELD);
+		tagEntryInfo *entry = getEntryInCorkQueue (fieldCorkIndex);
+
+		/* Fill access field. */
+		entry->extensionFields.access = isPublic? eStrdup ("public"): NULL;
+		/* Fill typeref field. */
+		entry->extensionFields.typeRef [0] = eStrdup (
+			tokenIsType (typerefToken, KEYWORD)?
+			/* "typename" is choice in C++ parser. However, "builtin" may be
+			 * better. See #862. This should be fixed in ctags-6.0.0. */
+			"typename":
+			/* Till we implement symbol table, we cannot resolve this.
+			 * ctags-7.0.0. */
+			"unknown");
+		entry->extensionFields.typeRef [1] = vStringStrdup(typerefToken->string);
+
+		/* Fill scope field. */
+		entry->extensionFields.scopeIndex = classCorkIndex;
+	} while (!tokenIsEOF (token));
+
+	tokenDestroy (typerefToken);
+	tokenDestroy (nameToken);
+}
+
 static void parseClass (tokenInfo *const token)
 {
 	tokenRead (token);
@@ -318,8 +377,10 @@ static void parseClass (tokenInfo *const token)
 
 	/* Skip the class definition. */
 	tokenRead (token);
-	if (tokenSkipToType (token, '{'))
-		tokenSkipOverPair (token);
+	if (!tokenSkipToType (token, '{'))
+		return;					/* Unexpected sequence of token */
+
+	parseClassBody (token, classCorkIndex);
 }
 
 static void findValaTags (void)
