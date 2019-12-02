@@ -32,15 +32,18 @@
 
 typedef enum {
 	K_UNDEFINED = -1,
+	K_CLASS,
 	K_METHOD,
 } valaKind;
 
 static kindDefinition ValaKinds [] = {
+	{ true,  'c', "class",      "classes"},
 	{ true,  'm', "method",     "methods"},
 };
 
 enum eKeywordId
 {
+	KEYWORD_CLASS,
 	KEYWORD_STRING,
 	KEYWORD_VOID,
 };
@@ -48,6 +51,7 @@ enum eKeywordId
 typedef int keywordId; /* to allow KEYWORD_NONE */
 
 static const keywordTable ValaKeywordTable [] = {
+	{ "class",  KEYWORD_CLASS  },
 	{ "string", KEYWORD_STRING },
 	{ "void",   KEYWORD_VOID  },
 };
@@ -304,13 +308,29 @@ static void parseStatement (tokenInfo *const token)
 	tokenDestroy (lastToken);
 }
 
+static void parseClass (tokenInfo *const token)
+{
+	tokenRead (token);
+	if (!tokenIsType (token, IDENTIFIER))
+		return;					/* Unexpected sequence of token */
+
+	makeSimpleTag (token->string, K_CLASS);
+
+	/* Skip the class definition. */
+	tokenRead (token);
+	if (tokenSkipToType (token, '{'))
+		tokenSkipOverPair (token);
+}
+
 static void findValaTags (void)
 {
 	tokenInfo *const token = newValaToken ();
 	do
 	{
 		tokenRead (token);
-		if (tokenIsType (token, IDENTIFIER)
+		if (tokenIsKeyword(token, CLASS))
+			parseClass (token);
+		else if (tokenIsType (token, IDENTIFIER)
 			|| tokenIsType (token, KEYWORD))
 			parseStatement (token);
 	}
