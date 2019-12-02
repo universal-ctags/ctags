@@ -175,7 +175,7 @@ static void readToken (tokenInfo *const token, void *data CTAGS_ATTR_UNUSED)
 	{
 		c = getcFromInputFile ();
 	}
-	while (c == ' ' || c== '\t' || c == '\f');
+	while (c == ' ' || c== '\t' || c == '\f' || c == '\n');
 
 	if (c == '/')
 	{
