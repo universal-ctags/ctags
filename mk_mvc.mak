@@ -23,7 +23,8 @@ FNMATCH_OBJS = $(FNMATCH_SRCS:.c=.obj)
 WIN32_OBJS = $(WIN32_SRCS:.c=.obj)
 PEG_OBJS = $(PEG_SRCS:.c=.obj)
 PACKCC_OBJS = $(PACKCC_SRCS:.c=.obj)
-ALL_OBJS = $(ALL_SRCS:.c=.obj) $(REGEX_OBJS) $(FNMATCH_OBJS) $(WIN32_OBJS) $(PEG_OBJS)
+RES_OBJ = win32/ctags.res
+ALL_OBJS = $(ALL_SRCS:.c=.obj) $(REGEX_OBJS) $(FNMATCH_OBJS) $(WIN32_OBJS) $(PEG_OBJS) $(RES_OBJ)
 READTAGS_OBJS = $(READTAGS_SRCS:.c=.obj)
 
 !if "$(WITH_ICONV)" == "yes"
@@ -93,8 +94,11 @@ main\repoinfo.obj: main\repoinfo.c main\repoinfo.h
 
 peg\varlink.c peg\varlink.h: peg\varlink.peg $(PACKCC)
 
+$(RES_OBJ): win32/ctags.rc win32/ctags.exe.manifest win32/resource.h
+	$(RC) /nologo /l 0x409 /Fo$@ $*.rc
+
 
 clean:
-	- del *.obj main\*.obj optlib\*.obj parsers\*.obj parsers\cxx\*.obj gnu_regex\*.obj fnmatch\*.obj misc\packcc\*.obj peg\*.obj read\*.obj win32\mkstemp\*.obj main\repoinfo.h
+	- del *.obj main\*.obj optlib\*.obj parsers\*.obj parsers\cxx\*.obj gnu_regex\*.obj fnmatch\*.obj misc\packcc\*.obj peg\*.obj read\*.obj win32\mkstemp\*.obj win32\*.res main\repoinfo.h
 	- del ctags.exe readtags.exe $(PACKCC)
 	- del tags
