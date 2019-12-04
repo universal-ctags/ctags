@@ -1,7 +1,5 @@
 include $(top_srcdir)/source.mak
 
-# Test cases are added to EXTRA_DIST by makefiles under Tmain and Units
-# Documents are added to EXTRA_DIST by makefiles/docs.mak
 EXTRA_DIST   = README.md autogen.sh \
 	       makefiles/list-optlib2c-input.mak misc/optlib2c \
 	       .ctags.d/exclusion.ctags .dir-locals.el .editorconfig .gdbinit .gitignore \
@@ -18,6 +16,7 @@ EXTRA_DIST   = README.md autogen.sh \
 	       misc/validators/validator-puppet \
 	       $(WIN32_HEADS) $(WIN32_SRCS) mk_mingw.mak mk_mvc.mak \
 	       win32/mkstemp/COPYING.MinGW-w64-runtime.txt \
+	       win32/ctags.rc win32/ctags.exe.manifest win32/resource.h \
 	       win32/ctags_vs2013.sln \
 	       win32/ctags_vs2013.vcxproj win32/ctags_vs2013.vcxproj.filters \
 	       win32/gen-repoinfo.bat \
@@ -166,6 +165,16 @@ ctags_LDADD += $(LIBYAML_LIBS)
 ctags_LDADD += $(SECCOMP_LIBS)
 ctags_LDADD += $(ICONV_LIBS)
 dist_ctags_SOURCES = $(CMDLINE_HEADS) $(CMDLINE_SRCS)
+
+if HOST_MINGW
+WINDRES = windres
+RES_OBJ = win32/ctags.res.o
+ctags_LDADD += $(RES_OBJ)
+$(RES_OBJ): win32/ctags.rc win32/ctags.exe.manifest win32/resource.h
+	mkdir -p $(builddir)/win32
+	$(WINDRES) -o $@ -O coff $<
+MOSTLYCLEANFILES = $(RES_OBJ)
+endif
 
 mini_geany_CPPFLAGS = $(libctags_a_CPPFLAGS)
 mini_geany_CFLAGS = $(libctags_a_CFLAGS)
