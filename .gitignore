@@ -66,6 +66,7 @@ tags.test
 test.*.diff
 tg
 tinst-root
+win32/*.aps
 win32/*.opensdf
 win32/*.sdf
 win32/*.suo
