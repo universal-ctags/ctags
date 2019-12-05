@@ -48,6 +48,7 @@ typedef enum {
 	K_METHOD,
 	K_PROP,
 	K_LOCAL,
+	K_NAMESPACE,
 	COUNT_KIND
 } valaKind;
 
@@ -65,6 +66,7 @@ static kindDefinition ValaKinds [] = {
 	{ true,  'm', "method",      "methods" },
 	{ true,  'p', "property",    "properties" },
 	{ false, 'l', "local",       "local variables" },
+	{ true,  'n', "namespace",   "namespace" },
 };
 
 enum eKeywordId
@@ -240,6 +242,9 @@ enum ValaTokenType {
 */
 
 static void readToken (tokenInfo *const token, void *data);
+static void parseNamespace (tokenInfo *const token, int corkIndex);
+static void parseClass (tokenInfo *const token, int corkIndex);
+static void parseStatement (tokenInfo *const token, int corkIndex);
 
 
 /*
@@ -468,7 +473,7 @@ static tokenInfo *newValaToken (void)
 	return newToken (&valaTokenInfoClass);
 }
 
-static void parseStatement (tokenInfo *const token)
+static void parseStatement (tokenInfo *const token, int corkIndex)
 {
 	tokenInfo *lastToken = newValaToken ();
 	bool foundSignature = false;
@@ -505,6 +510,35 @@ static void parseStatement (tokenInfo *const token)
 			tokenSkipOverPair (token);
 	}
 	tokenDestroy (lastToken);
+}
+
+static void recurseValaTags (tokenInfo *token, int corkIndex)
+{
+	if (tokenIsKeyword(token, NAMESPACE))
+		parseNamespace (token, corkIndex);
+	if (tokenIsKeyword(token, CLASS))
+		parseClass (token, corkIndex);
+	else if (tokenIsType (token, IDENTIFIER))
+		parseStatement (token, corkIndex);
+}
+
+static void parseNamespaceBody (tokenInfo *const token, int corkIndex)
+{
+	tokenInfo *typerefToken = newValaToken ();
+	tokenInfo *nameToken = newValaToken ();
+
+	do
+	{
+		tokenRead (token);
+		if (tokenEqType (token, '}'))
+			break;
+
+		recurseValaTags (token, corkIndex);
+
+		if (tokenEqType (token, '{'))
+			tokenSkipOverPair (token);
+
+	} while (!tokenIsEOF (token));
 }
 
 static bool readIdentifierExtended (tokenInfo *const resultToken, bool *extended)
@@ -621,13 +655,33 @@ static void parseClassBody (tokenInfo *const token, int classCorkIndex)
 	tokenDestroy (nameToken);
 }
 
-static void parseClass (tokenInfo *const token)
+static void parseNamespace (tokenInfo *const token, int corkIndex)
+{
+
+	tokenRead (token);
+	if (!tokenIsType (token, IDENTIFIER))
+		return;					/* Unexpected sequence of token */
+
+	int namespaceCorkIndex = makeSimpleTag (token->string, K_NAMESPACE);
+	tagEntryInfo *entry = getEntryInCorkQueue (namespaceCorkIndex);
+	entry->extensionFields.scopeIndex = corkIndex;
+
+	tokenRead (token);
+	if (!tokenSkipToType (token, '{'))
+		return;					/* Unexpected sequence of token */
+
+	parseNamespaceBody (token, namespaceCorkIndex);
+}
+
+static void parseClass (tokenInfo *const token, int corkIndex)
 {
 	tokenRead (token);
 	if (!tokenIsType (token, IDENTIFIER))
 		return;					/* Unexpected sequence of token */
 
 	int classCorkIndex = makeSimpleTag (token->string, K_CLASS);
+	tagEntryInfo *entry = getEntryInCorkQueue (classCorkIndex);
+	entry->extensionFields.scopeIndex = corkIndex;
 
 	/* Skip the class definition. */
 	tokenRead (token);
@@ -643,11 +697,7 @@ static void findValaTags (void)
 	do
 	{
 		tokenRead (token);
-		if (tokenIsKeyword(token, CLASS))
-			parseClass (token);
-		else if (tokenIsType (token, IDENTIFIER)
-			|| tokenIsType (token, KEYWORD))
-			parseStatement (token);
+		recurseValaTags (token, CORK_NIL);
 	}
 	while (!tokenIsEOF (token));
 
