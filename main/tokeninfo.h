@@ -76,6 +76,7 @@ void tokenCopy       (tokenInfo *dest, tokenInfo *src);
 /* Helper macro & functions */
 
 #define tokenIsType(TKN,T)     ((TKN)->type == TOKEN_##T)
+#define tokenIsTypeVal(TKN,TV)   ((TKN)->type == (TV))
 #define tokenIsKeyword(TKN,K)  ((TKN)->type == TKN->klass->typeForKeyword \
 									&& (TKN)->keyword == KEYWORD_##K)
 #define tokenIsEOF(TKN)      ((TKN)->type == (TKN)->klass->typeForEOF)
