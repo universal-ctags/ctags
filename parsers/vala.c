@@ -314,6 +314,47 @@ static void parseStatement (tokenInfo *const token)
 	tokenDestroy (lastToken);
 }
 
+static bool readIdentifierExtended (tokenInfo *const resultToken, bool *extended)
+{
+	bool nextTokeIsIdentifier = false;
+	tokenInfo *token = newValaToken ();
+	if (extended)
+		*extended = false;
+
+	do
+	{
+		tokenRead (token);
+		if (tokenIsTypeVal (token, '.'))
+		{
+			tokenPutc (resultToken, '.');
+			if (extended)
+				*extended = true;
+		}
+		else if (tokenIsType (token, IDENTIFIER))
+		{
+			if (tokenLast (resultToken) == '.')
+				tokenCat (resultToken, token->string);
+			else
+			{
+				tokenUnread (token);
+				nextTokeIsIdentifier = true;
+				break;
+			}
+		}
+		else
+		{
+			if (!tokenIsEOF (token))
+				tokenUnread (token);
+			nextTokeIsIdentifier = false;
+			break;
+		}
+	}
+	while (1);
+
+	tokenDestroy (token);
+	return nextTokeIsIdentifier;
+}
+
 static void parseClassBody (tokenInfo *const token, int classCorkIndex)
 {
 	bool isPublic;
@@ -337,6 +378,10 @@ static void parseClassBody (tokenInfo *const token, int classCorkIndex)
 		else
 			break;				/* Unexpected sequence to token */
 
+		bool typerefIsClass;
+		if (!readIdentifierExtended (typerefToken, &typerefIsClass))
+			goto out;
+
 		tokenRead (token);
 		if (tokenIsType (token, IDENTIFIER))
 			tokenCopy (nameToken, token);
@@ -357,10 +402,15 @@ static void parseClassBody (tokenInfo *const token, int classCorkIndex)
 		entry->extensionFields.access = isPublic? eStrdup ("public"): NULL;
 		/* Fill typeref field. */
 		entry->extensionFields.typeRef [0] = eStrdup (
-			tokenIsType (typerefToken, KEYWORD)?
+			typerefIsClass?
+			/* '.' is included in typeref name. Can I expect it as a class?
+			 */
+			"class"
+			:tokenIsType (typerefToken, KEYWORD)?
 			/* "typename" is choice in C++ parser. However, "builtin" may be
 			 * better. See #862. This should be fixed in ctags-6.0.0. */
-			"typename":
+			"typename"
+			:
 			/* Till we implement symbol table, we cannot resolve this.
 			 * ctags-7.0.0. */
 			"unknown");
@@ -373,6 +423,7 @@ static void parseClassBody (tokenInfo *const token, int classCorkIndex)
 			tokenSkipOverPair (token);
 	} while (!tokenIsEOF (token));
 
+ out:
 	tokenDestroy (typerefToken);
 	tokenDestroy (nameToken);
 }
