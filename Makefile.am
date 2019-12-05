@@ -170,9 +170,12 @@ if HOST_MINGW
 WINDRES = windres
 RES_OBJ = win32/ctags.res.o
 ctags_LDADD += $(RES_OBJ)
+windres_verbose = $(windres_verbose_@AM_V@)
+windres_verbose_ = $(windres_verbose_@AM_DEFAULT_V@)
+windres_verbose_0 = @echo WINDRES "   $@";
 $(RES_OBJ): win32/ctags.rc win32/ctags.exe.manifest win32/resource.h
-	mkdir -p $(builddir)/win32
-	$(WINDRES) -o $@ -O coff $<
+	@mkdir -p $(builddir)/win32
+	$(windres_verbose)$(WINDRES) -o $@ -O coff $<
 MOSTLYCLEANFILES = $(RES_OBJ)
 endif
 

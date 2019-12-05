@@ -62,6 +62,10 @@ V_PACKCC   = $(V_PACKCC_$(V))
 V_PACKCC_0 = @echo [PACKCC] $@;
 V_PACKCC_1 =
 
+V_WINDRES   = $(V_WINDRES_$(V))
+V_WINDRES_0 = @echo [WINDRES] $@;
+V_WINDRES_1 =
+
 
 .c.o:
 	$(V_CC) $(CC) -c $(OPT) $(CFLAGS) $(DEFINES) $(INCLUDES) -o $@ $<
@@ -86,7 +90,7 @@ ctags.exe: $(ALL_OBJS) $(ALL_HEADS) $(PEG_HEADS) $(PEG_EXTRA_HEADS) $(REGEX_HEAD
 	$(V_CC) $(CC) $(OPT) $(CFLAGS) $(LDFLAGS) $(DEFINES) $(INCLUDES) -o $@ $(ALL_OBJS) $(LIBS)
 
 $(RES_OBJ): win32/ctags.rc win32/ctags.exe.manifest win32/resource.h
-	$(WINDRES) -o $@ -O coff $<
+	$(V_WINDRES) $(WINDRES) -o $@ -O coff $<
 
 read/%.o: read/%.c
 	$(V_CC) $(CC) -c $(OPT) $(CFLAGS) -DWIN32 -Iread -o $@ $<
