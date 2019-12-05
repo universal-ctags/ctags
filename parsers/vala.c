@@ -19,6 +19,8 @@
 #include "keyword.h"
 #include "entry.h"
 
+#include <string.h>
+
 /*
 *   MACROS
 */
@@ -167,9 +169,10 @@ static void readIdentifier (tokenInfo *token)
 	}
 }
 
-static void readToken (tokenInfo *const token, void *data CTAGS_ATTR_UNUSED)
+static void readToken (tokenInfo *const token, void *data)
 {
 	int c;
+	bool semi_terminaotr = false;
 
 	token->type		= TOKEN_UNDEFINED;
 	token->keyword	= KEYWORD_NONE;
@@ -249,14 +252,15 @@ static void readToken (tokenInfo *const token, void *data CTAGS_ATTR_UNUSED)
 		tokenPutc (token, c);
 		readIdentifier (token);
 		break;
-	case '{':
+	case ',':
 	case '}':
-	case '[':
 	case ']':
-	case '(':
 	case ')':
 	case ';':
-	case ',':
+		semi_terminaotr = true;
+	case '{':
+	case '[':
+	case '(':
 		token->type = c;
 		tokenPutc (token, c);
 		break;
@@ -280,6 +284,20 @@ static void readToken (tokenInfo *const token, void *data CTAGS_ATTR_UNUSED)
 			break;
 		}
 	}
+
+	if (data)
+	{
+		vString *collector = data;
+		if (vStringIsEmpty (collector))
+			vStringCat (collector, token->string);
+		else
+		{
+			if (!semi_terminaotr
+				&& !strchr ("{[(", vStringLast(collector)))
+				vStringPut(collector, ' ');
+			vStringCat (collector, token->string);
+		}
+	}
 }
 
 static tokenInfo *newValaToken (void)
@@ -298,8 +316,16 @@ static void parseStatement (tokenInfo *const token)
 		tokenRead (token);
 		if (tokenEqType (token, '('))
 		{
-			makeSimpleTag (lastToken->string, K_METHOD);
-			foundSignature = tokenSkipOverPair (token);
+			vString *signature = vStringNewInit ("(");
+			int corkIndex = makeSimpleTag (lastToken->string, K_METHOD);
+			foundSignature = tokenSkipOverPairFull (token, signature);
+			if (foundSignature)
+			{
+				tagEntryInfo *e = getEntryInCorkQueue (corkIndex);
+				e->extensionFields.signature = vStringDeleteUnwrap (signature);
+			}
+			else
+				vStringDelete (signature);
 			break;
 		}
 	}
