@@ -24,6 +24,9 @@ EXTRA_DIST   = README.md autogen.sh \
 	       $(PEG_INPUT) $(OPTLIB2C_INPUT) \
 	       docs Tmain Units
 
+CLEANFILES =
+MOSTLYCLEANFILES =
+
 clean-local:
 	@if test "$(top_srcdir)" != "$(top_builddir)"; then \
 		rm -rf $(OPTLIB2C_SRCS); \
@@ -115,7 +118,7 @@ libctags_a_CFLAGS  += $(SECCOMP_CFLAGS)
 
 nodist_libctags_a_SOURCES = $(REPOINFO_HEADS) $(PEG_SRCS) $(PEG_HEADS)
 BUILT_SOURCES = $(REPOINFO_HEADS)
-CLEANFILES = $(REPOINFO_HEADS) $(PEG_SRCS) $(PEG_HEADS)
+CLEANFILES += $(REPOINFO_HEADS) $(PEG_SRCS) $(PEG_HEADS)
 $(REPOINFO_OBJS): $(REPOINFO_SRCS) $(REPOINFO_HEADS)
 repoinfo_verbose = $(repoinfo_verbose_@AM_V@)
 repoinfo_verbose_ = $(repoinfo_verbose_@AM_DEFAULT_V@)
@@ -176,7 +179,7 @@ windres_verbose_0 = @echo WINDRES "   $@";
 $(RES_OBJ): win32/ctags.rc win32/ctags.exe.manifest win32/resource.h
 	@mkdir -p $(builddir)/win32
 	$(windres_verbose)$(WINDRES) -o $@ -O coff $<
-MOSTLYCLEANFILES = $(RES_OBJ)
+MOSTLYCLEANFILES += $(RES_OBJ)
 endif
 
 mini_geany_CPPFLAGS = $(libctags_a_CPPFLAGS)
