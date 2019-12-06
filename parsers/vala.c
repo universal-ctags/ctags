@@ -499,6 +499,7 @@ extern parserDefinition* ValaParser (void)
 	def->keywordTable = ValaKeywordTable;
 	def->keywordCount = ARRAY_SIZE (ValaKeywordTable);
 	def->useCork = true;
+	def->requestAutomaticFQTag = true;
 
 	def->parser = findValaTags;
 	return def;
