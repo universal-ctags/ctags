@@ -1,10 +1,11 @@
 /*
-*   Copyright (c) 2019, <YOURNAME HERE>
+*   Copyright (c) 2019, Masatake Yamato <yamato@redhat.com>
+*   Copyright (c) 2019, Alberto Fanjul <albertofanjul@gmail.com>
 *
 *   This source code is released for free distribution under the terms of the
 *   GNU General Public License version 2 or (at your option) any later version.
 *
-*   This module contains functions for parsing and scanning Vaka source files.
+*   This module contains functions for parsing and scanning Vala source files.
 */
 
 /*
@@ -35,33 +36,194 @@
 typedef enum {
 	K_UNDEFINED = -1,
 	K_CLASS,
+	K_STRUCT,
+	K_INTERFACE,
+	K_ENUM,
+	K_ENUMVALUE,
+	K_ERRORDOMAIN,
+	K_ERRORCODE,
+	K_DELEGATE,
+	K_SIGNAL,
 	K_FIELD,
 	K_METHOD,
 	K_PROP,
+	K_LOCAL,
+	K_NAMESPACE,
+	COUNT_KIND
 } valaKind;
 
 static kindDefinition ValaKinds [] = {
-	{ true,  'c', "class",      "classes"},
-	{ true,  'f', "field",      "fields"},
-	{ true,  'm', "method",     "methods"},
-	{ true,  'p', "property",   "properties"},
+	{ true,  'c', "class",       "classes" },
+	{ true,  's', "struct",      "structures" },
+	{ true,  'i', "interface",   "interfaces" },
+	{ true,  'e', "enum",        "enumerations" },
+	{ true,  'v', "enumvalue",   "enumeration Values" },
+	{ true,  'E', "errordomain", "error domains" },
+	{ true,  'r', "errorcode",   "error codes" },
+	{ true,  'd', "delegate",    "delegates" },
+	{ true,  'S', "signal",      "signals" },
+	{ true,  'f', "field",       "fields" },
+	{ true,  'm', "method",      "methods" },
+	{ true,  'p', "property",    "properties" },
+	{ false, 'l', "local",       "local variables" },
+	{ true,  'n', "namespace",   "namespace" },
 };
 
 enum eKeywordId
 {
-	KEYWORD_CLASS,
-	KEYWORD_PUBLIC,
 	KEYWORD_STRING,
+	KEYWORD_INT,
+	KEYWORD_DOUBLE,
+	KEYWORD_FLOAT,
+	KEYWORD_BOOL,
 	KEYWORD_VOID,
+	KEYWORD_TYPE,
+	KEYWORD_ABSTRACT,
+	KEYWORD_AS,
+	KEYWORD_ASYNC,
+	KEYWORD_BASE,
+	KEYWORD_BREAK,
+	KEYWORD_CASE,
+	KEYWORD_CATCH,
+	KEYWORD_CLASS,
+	KEYWORD_CONST,
+	KEYWORD_CONSTRUCT,
+	KEYWORD_CONTINUE,
+	KEYWORD_DEFAULT,
+	KEYWORD_DELEGATE,
+	KEYWORD_DELETE,
+	KEYWORD_DO,
+	KEYWORD_DYNAMIC,
+	KEYWORD_ELSE,
+	KEYWORD_ENSURES,
+	KEYWORD_ENUM,
+	KEYWORD_ERRORDOMAIN,
+	KEYWORD_EXTERN,
+	KEYWORD_FALSE,
+	KEYWORD_FINALLY,
+	KEYWORD_FOR,
+	KEYWORD_FOREACH,
+	KEYWORD_GET,
+	KEYWORD_GLOBAL,
+	KEYWORD_IF,
+	KEYWORD_IN,
+	KEYWORD_INLINE,
+	KEYWORD_INTERFACE,
+	KEYWORD_INTERNAL,
+	KEYWORD_IS,
+	KEYWORD_LOCK,
+	KEYWORD_NAMESPACE,
+	KEYWORD_NEW,
+	KEYWORD_NULL,
+	KEYWORD_OUT,
+	KEYWORD_OVERRIDE,
+	KEYWORD_OWNED,
+	KEYWORD_PRIVATE,
+	KEYWORD_PROTECTED,
+	KEYWORD_PUBLIC,
+	KEYWORD_REF,
+	KEYWORD_REQUIRES,
+	KEYWORD_RETURN,
+	KEYWORD_SET,
+	KEYWORD_SIGNAL,
+	KEYWORD_SIZEOF,
+	KEYWORD_STATIC,
+	KEYWORD_STRUCT,
+	KEYWORD_SWITCH,
+	KEYWORD_THIS,
+	KEYWORD_THROW,
+	KEYWORD_THROWS,
+	KEYWORD_TRUE,
+	KEYWORD_TRY,
+	KEYWORD_TYPEOF,
+	KEYWORD_UNOWNED,
+	KEYWORD_USING,
+	KEYWORD_VALUE,
+	KEYWORD_VAR,
+	KEYWORD_VIRTUAL,
+	KEYWORD_WEAK,
+	KEYWORD_WHILE,
+	KEYWORD_YIELD,
+
 };
 
 typedef int keywordId; /* to allow KEYWORD_NONE */
 
 static const keywordTable ValaKeywordTable [] = {
-	{ "class",  KEYWORD_CLASS  },
-	{ "public", KEYWORD_PUBLIC },
 	{ "string", KEYWORD_STRING },
+	{ "int", KEYWORD_INT },
+	{ "double", KEYWORD_DOUBLE },
+	{ "float", KEYWORD_FLOAT },
+	{ "bool", KEYWORD_BOOL },
+
 	{ "void",   KEYWORD_VOID  },
+	{ "Type",       KEYWORD_TYPE },
+	{ "abstract",       KEYWORD_ABSTRACT },
+	{ "as",       KEYWORD_AS },
+	{ "async",       KEYWORD_ASYNC },
+	{ "base",       KEYWORD_BASE },
+	{ "break",       KEYWORD_BREAK },
+	{ "case",       KEYWORD_CASE },
+	{ "catch",       KEYWORD_CATCH },
+	{ "class",       KEYWORD_CLASS },
+	{ "const",       KEYWORD_CONST },
+	{ "construct",       KEYWORD_CONSTRUCT },
+	{ "continue",       KEYWORD_CONTINUE },
+	{ "default",       KEYWORD_DEFAULT },
+	{ "delegate",       KEYWORD_DELEGATE },
+	{ "delete",       KEYWORD_DELETE },
+	{ "do",       KEYWORD_DO },
+	{ "dynamic",       KEYWORD_DYNAMIC },
+	{ "else",       KEYWORD_ELSE },
+	{ "ensures",       KEYWORD_ENSURES },
+	{ "enum",       KEYWORD_ENUM },
+	{ "errordomain",       KEYWORD_ERRORDOMAIN },
+	{ "extern",       KEYWORD_EXTERN },
+	{ "false",       KEYWORD_FALSE },
+	{ "finally",       KEYWORD_FINALLY },
+	{ "for",       KEYWORD_FOR },
+	{ "foreach",       KEYWORD_FOREACH },
+	{ "get",       KEYWORD_GET },
+	{ "global",       KEYWORD_GLOBAL },
+	{ "if",       KEYWORD_IF },
+	{ "in",       KEYWORD_IN },
+	{ "inline",       KEYWORD_INLINE },
+	{ "interface",       KEYWORD_INTERFACE },
+	{ "internal",       KEYWORD_INTERNAL },
+	{ "is",       KEYWORD_IS },
+	{ "lock",       KEYWORD_LOCK },
+	{ "namespace",       KEYWORD_NAMESPACE },
+	{ "new",       KEYWORD_NEW },
+	{ "null",       KEYWORD_NULL },
+	{ "out",       KEYWORD_OUT },
+	{ "override",       KEYWORD_OVERRIDE },
+	{ "owned",       KEYWORD_OWNED },
+	{ "private",       KEYWORD_PRIVATE },
+	{ "protected",       KEYWORD_PROTECTED },
+	{ "public",       KEYWORD_PUBLIC },
+	{ "ref",       KEYWORD_REF },
+	{ "requires",       KEYWORD_REQUIRES },
+	{ "return",       KEYWORD_RETURN },
+	{ "set",       KEYWORD_SET },
+	{ "signal",       KEYWORD_SIGNAL },
+	{ "sizeof",       KEYWORD_SIZEOF },
+	{ "static",       KEYWORD_STATIC },
+	{ "struct",       KEYWORD_STRUCT },
+	{ "switch",       KEYWORD_SWITCH },
+	{ "this",       KEYWORD_THIS },
+	{ "throw",       KEYWORD_THROW },
+	{ "throws",       KEYWORD_THROWS },
+	{ "true",       KEYWORD_TRUE },
+	{ "try",       KEYWORD_TRY },
+	{ "typeof",       KEYWORD_TYPEOF },
+	{ "unowned",       KEYWORD_UNOWNED },
+	{ "using",       KEYWORD_USING },
+	{ "value",       KEYWORD_VALUE },
+	{ "var",       KEYWORD_VAR },
+	{ "virtual",       KEYWORD_VIRTUAL },
+	{ "weak",       KEYWORD_WEAK },
+	{ "while",       KEYWORD_WHILE },
+	{ "yield",       KEYWORD_YIELD },
 };
 
 enum ValaTokenType {
@@ -80,16 +242,21 @@ enum ValaTokenType {
 */
 
 static void readToken (tokenInfo *const token, void *data);
+static void parseNamespace (tokenInfo *const token, int corkIndex);
+static void parseClass (tokenInfo *const token, int corkIndex);
+static void parseStatement (tokenInfo *const token, int corkIndex);
 
 
 /*
 *   DATA DEFINITIONS
 */
 
+static bool trianglePairState = true;
 static struct tokenTypePair typePairs [] = {
 	{ '{', '}', NULL },
 	{ '[', ']', NULL },
 	{ '(', ')', NULL },
+	{ '<', '>', &trianglePairState },
 };
 
 static struct tokenInfoClass valaTokenInfoClass = {
@@ -172,7 +339,7 @@ static void readIdentifier (tokenInfo *token)
 static void readToken (tokenInfo *const token, void *data)
 {
 	int c;
-	bool semi_terminaotr = false;
+	bool semi_terminator = false;
 
 	token->type		= TOKEN_UNDEFINED;
 	token->keyword	= KEYWORD_NONE;
@@ -256,8 +423,10 @@ static void readToken (tokenInfo *const token, void *data)
 	case '}':
 	case ']':
 	case ')':
+	case '<':
+	case '>':
 	case ';':
-		semi_terminaotr = true;
+		semi_terminator = true;
 	case '{':
 	case '[':
 	case '(':
@@ -292,7 +461,7 @@ static void readToken (tokenInfo *const token, void *data)
 			vStringCat (collector, token->string);
 		else
 		{
-			if (!semi_terminaotr
+			if (!semi_terminator
 				&& !strchr ("{[(", vStringLast(collector)))
 				vStringPut(collector, ' ');
 			vStringCat (collector, token->string);
@@ -305,7 +474,7 @@ static tokenInfo *newValaToken (void)
 	return newToken (&valaTokenInfoClass);
 }
 
-static void parseStatement (tokenInfo *const token)
+static void parseStatement (tokenInfo *const token, int corkIndex)
 {
 	tokenInfo *lastToken = newValaToken ();
 	bool foundSignature = false;
@@ -316,16 +485,20 @@ static void parseStatement (tokenInfo *const token)
 		tokenRead (token);
 		if (tokenEqType (token, '('))
 		{
-			vString *signature = vStringNewInit ("(");
-			int corkIndex = makeSimpleTag (lastToken->string, K_METHOD);
-			foundSignature = tokenSkipOverPairFull (token, signature);
-			if (foundSignature)
-			{
-				tagEntryInfo *e = getEntryInCorkQueue (corkIndex);
-				e->extensionFields.signature = vStringDeleteUnwrap (signature);
-			}
-			else
-				vStringDelete (signature);
+			if (tokenIsType (lastToken, KEYWORD)) {
+				tokenSkipOverPair (token);
+			} else {
+				vString *signature = vStringNewInit ("(");
+				int corkIndex = makeSimpleTag (lastToken->string, K_METHOD);
+				foundSignature = tokenSkipOverPairFull (token, signature);
+				if (foundSignature)
+				{
+					tagEntryInfo *e = getEntryInCorkQueue (corkIndex);
+					e->extensionFields.signature = vStringDeleteUnwrap (signature);
+				}
+				else
+					vStringDelete (signature);
+				}
 			break;
 		}
 	}
@@ -338,6 +511,32 @@ static void parseStatement (tokenInfo *const token)
 			tokenSkipOverPair (token);
 	}
 	tokenDelete (lastToken);
+}
+
+static void recurseValaTags (tokenInfo *token, int corkIndex)
+{
+	if (tokenIsKeyword(token, NAMESPACE))
+		parseNamespace (token, corkIndex);
+	if (tokenIsKeyword(token, CLASS))
+		parseClass (token, corkIndex);
+	else if (tokenIsType (token, IDENTIFIER))
+		parseStatement (token, corkIndex);
+}
+
+static void parseNamespaceBody (tokenInfo *const token, int corkIndex)
+{
+	do
+	{
+		tokenRead (token);
+		if (tokenEqType (token, '}'))
+			break;
+
+		recurseValaTags (token, corkIndex);
+
+		if (tokenEqType (token, '{'))
+			tokenSkipOverPair (token);
+
+	} while (!tokenIsEOF (token));
 }
 
 static bool readIdentifierExtended (tokenInfo *const resultToken, bool *extended)
@@ -454,13 +653,33 @@ static void parseClassBody (tokenInfo *const token, int classCorkIndex)
 	tokenDelete (nameToken);
 }
 
-static void parseClass (tokenInfo *const token)
+static void parseNamespace (tokenInfo *const token, int corkIndex)
+{
+
+	tokenRead (token);
+	if (!tokenIsType (token, IDENTIFIER))
+		return;					/* Unexpected sequence of token */
+
+	int namespaceCorkIndex = makeSimpleTag (token->string, K_NAMESPACE);
+	tagEntryInfo *entry = getEntryInCorkQueue (namespaceCorkIndex);
+	entry->extensionFields.scopeIndex = corkIndex;
+
+	tokenRead (token);
+	if (!tokenSkipToType (token, '{'))
+		return;					/* Unexpected sequence of token */
+
+	parseNamespaceBody (token, namespaceCorkIndex);
+}
+
+static void parseClass (tokenInfo *const token, int corkIndex)
 {
 	tokenRead (token);
 	if (!tokenIsType (token, IDENTIFIER))
 		return;					/* Unexpected sequence of token */
 
 	int classCorkIndex = makeSimpleTag (token->string, K_CLASS);
+	tagEntryInfo *entry = getEntryInCorkQueue (classCorkIndex);
+	entry->extensionFields.scopeIndex = corkIndex;
 
 	/* Skip the class definition. */
 	tokenRead (token);
@@ -476,11 +695,7 @@ static void findValaTags (void)
 	do
 	{
 		tokenRead (token);
-		if (tokenIsKeyword(token, CLASS))
-			parseClass (token);
-		else if (tokenIsType (token, IDENTIFIER)
-			|| tokenIsType (token, KEYWORD))
-			parseStatement (token);
+		recurseValaTags (token, CORK_NIL);
 	}
 	while (!tokenIsEOF (token));
 
