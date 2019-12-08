@@ -338,7 +338,7 @@ static void readIdentifier (tokenInfo *token)
 static void readToken (tokenInfo *const token, void *data)
 {
 	int c;
-	bool semi_terminaotr = false;
+	bool semi_terminator = false;
 
 	token->type		= TOKEN_UNDEFINED;
 	token->keyword	= KEYWORD_NONE;
@@ -425,7 +425,7 @@ static void readToken (tokenInfo *const token, void *data)
 	case '<':
 	case '>':
 	case ';':
-		semi_terminaotr = true;
+		semi_terminator = true;
 	case '{':
 	case '[':
 	case '(':
@@ -460,7 +460,7 @@ static void readToken (tokenInfo *const token, void *data)
 			vStringCat (collector, token->string);
 		else
 		{
-			if (!semi_terminaotr
+			if (!semi_terminator
 				&& !strchr ("{[(", vStringLast(collector)))
 				vStringPut(collector, ' ');
 			vStringCat (collector, token->string);
