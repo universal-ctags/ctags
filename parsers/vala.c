@@ -479,16 +479,20 @@ static void parseStatement (tokenInfo *const token)
 		tokenRead (token);
 		if (tokenEqType (token, '('))
 		{
-			vString *signature = vStringNewInit ("(");
-			int corkIndex = makeSimpleTag (lastToken->string, K_METHOD);
-			foundSignature = tokenSkipOverPairFull (token, signature);
-			if (foundSignature)
-			{
-				tagEntryInfo *e = getEntryInCorkQueue (corkIndex);
-				e->extensionFields.signature = vStringDeleteUnwrap (signature);
-			}
-			else
-				vStringDelete (signature);
+			if (tokenIsType (lastToken, KEYWORD)) {
+				tokenSkipOverPair (token);
+			} else {
+				vString *signature = vStringNewInit ("(");
+				int corkIndex = makeSimpleTag (lastToken->string, K_METHOD);
+				foundSignature = tokenSkipOverPairFull (token, signature);
+				if (foundSignature)
+				{
+					tagEntryInfo *e = getEntryInCorkQueue (corkIndex);
+					e->extensionFields.signature = vStringDeleteUnwrap (signature);
+				}
+				else
+					vStringDelete (signature);
+				}
 			break;
 		}
 	}
