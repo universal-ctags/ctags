@@ -6,7 +6,7 @@ ctags-client-tools
 --------------------------------------------------------------------------------
 Hints for developing a tool using ctags command and tags output
 --------------------------------------------------------------------------------
-:Version: 0.0.0
+:Version: 5.9.0
 :Manual group: Universal-ctags
 :Manual section: 7
 

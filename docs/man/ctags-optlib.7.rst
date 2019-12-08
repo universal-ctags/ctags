@@ -6,7 +6,7 @@ ctags-optlib
 --------------------------------------------------------------
 Universal-ctags parser definition language
 --------------------------------------------------------------
-:Version: 0.0.0
+:Version: 5.9.0
 :Manual group: Universal-ctags
 :Manual section: 7
 
