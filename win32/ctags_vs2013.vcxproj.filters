@@ -144,7 +144,7 @@
     <ClCompile Include="..\main\sort.c">
       <Filter>Source Files\Main</Filter>
     </ClCompile>
-    <ClCompile Include="..\main\stat.c">
+    <ClCompile Include="..\main\stats.c">
       <Filter>Source Files\Main</Filter>
     </ClCompile>
     <ClCompile Include="..\main\strlist.c">
@@ -159,7 +159,7 @@
     <ClCompile Include="..\main\vstring.c">
       <Filter>Source Files\Main</Filter>
     </ClCompile>
-    <ClCompile Include="..\main\uwindi.c">
+    <ClCompile Include="..\main\unwindi.c">
       <Filter>Source Files\Main</Filter>
     </ClCompile>
     <ClCompile Include="..\main\writer-ctags.c">
@@ -566,9 +566,6 @@
     <ClInclude Include="..\main\flags_p.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\main\fmt.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\main\fmt_p.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -641,7 +638,7 @@
     <ClInclude Include="..\main\parse.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\main\parse_.h">
+    <ClInclude Include="..\main\parse_p.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\main\parsers_p.h">
@@ -767,5 +764,13 @@
     <ClInclude Include="..\parsers\tcl.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="ctags.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
   </ItemGroup>
 </Project>

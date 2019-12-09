@@ -11,13 +11,16 @@ COMMON_DEFINES=-DUSE_SYSTEM_STRNLEN
 DEFINES = -DWIN32 $(REGEX_DEFINES) -DHAVE_PACKCC $(COMMON_DEFINES)
 INCLUDES = -I. -Imain -Ignu_regex -Ifnmatch -Iparsers
 CC = gcc
+WINDRES = windres
 OPTLIB2C = ./misc/optlib2c
 PACKCC   = ./packcc.exe
 OBJEXT = o
+RES_OBJ = win32/ctags.res.o
 ALL_OBJS += $(REGEX_OBJS)
 ALL_OBJS += $(FNMATCH_OBJS)
 ALL_OBJS += $(WIN32_OBJS)
 ALL_OBJS += $(PEG_OBJS)
+ALL_OBJS += $(RES_OBJ)
 VPATH = . ./main ./parsers ./optlib ./read ./win32
 
 ifeq (yes, $(WITH_ICONV))
@@ -59,6 +62,10 @@ V_PACKCC   = $(V_PACKCC_$(V))
 V_PACKCC_0 = @echo [PACKCC] $@;
 V_PACKCC_1 =
 
+V_WINDRES   = $(V_WINDRES_$(V))
+V_WINDRES_0 = @echo [WINDRES] $@;
+V_WINDRES_1 =
+
 
 .c.o:
 	$(V_CC) $(CC) -c $(OPT) $(CFLAGS) $(DEFINES) $(INCLUDES) -o $@ $<
@@ -82,6 +89,9 @@ $(PACKCC): $(PACKCC_OBJS)
 ctags.exe: $(ALL_OBJS) $(ALL_HEADS) $(PEG_HEADS) $(PEG_EXTRA_HEADS) $(REGEX_HEADS) $(FNMATCH_HEADS) $(WIN32_HEADS)
 	$(V_CC) $(CC) $(OPT) $(CFLAGS) $(LDFLAGS) $(DEFINES) $(INCLUDES) -o $@ $(ALL_OBJS) $(LIBS)
 
+$(RES_OBJ): win32/ctags.rc win32/ctags.exe.manifest win32/resource.h
+	$(V_WINDRES) $(WINDRES) -o $@ -O coff $<
+
 read/%.o: read/%.c
 	$(V_CC) $(CC) -c $(OPT) $(CFLAGS) -DWIN32 -Iread -o $@ $<
 
@@ -92,4 +102,4 @@ clean:
 	$(SILENT) echo Cleaning
 	$(SILENT) rm -f ctags.exe readtags.exe $(PACKCC)
 	$(SILENT) rm -f tags
-	$(SILENT) rm -f main/*.o optlib/*.o parsers/*.o parsers/cxx/*.o gnu_regex/*.o fnmatch/*.o misc/packcc/*.o peg/*.o read/*.o win32/mkstemp/*.o
+	$(SILENT) rm -f main/*.o optlib/*.o parsers/*.o parsers/cxx/*.o gnu_regex/*.o fnmatch/*.o misc/packcc/*.o peg/*.o read/*.o win32/*.o win32/mkstemp/*.o

@@ -78,7 +78,7 @@ if [ "$TARGET" = "Unix" ]; then
 
 elif [ "$TARGET" = "Mingw32" ]; then
     # Don't run test units in Mingw32 target.
-    make -j2 CC=i686-w64-mingw32-gcc CC_FOR_PACKCC=gcc -f mk_mingw.mak
+    make -j2 CC=i686-w64-mingw32-gcc WINDRES=i686-w64-mingw32-windres CC_FOR_PACKCC=gcc -f mk_mingw.mak
 
 else
     echo "Invalid TARGET value: $TARGET" 1>&2

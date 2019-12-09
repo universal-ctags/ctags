@@ -429,6 +429,7 @@ case "$host" in
 	AC_DEFINE(MSDOS_STYLE_PATH)
 	;;
 esac
+AM_CONDITIONAL([HOST_MINGW], [test "x${host_mingw}" = "xyes"])
 
 # Check if struct stat contains st_ino.
 # MinGW has st_ino, but it doesn't work.
