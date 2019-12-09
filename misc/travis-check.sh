@@ -26,6 +26,11 @@ if [ "$TARGET" = "Unix" ]; then
 
     BUILDDIR0="$TRAVIS_OS_NAME"-"$CC"
     if [ "$TRAVIS_OS_NAME" = "linux" ] && [ "$CC" = "gcc" ]; then
+		if ! git diff --exit-code optlib; then
+			echo "Files under optlib are not up to date."
+			echo "If you change optlib/foo.ctags, don't forget to add optlib/foo.c to your commit."
+			exit 1
+		fi
 
         BUILDDIR=${BUILDDIR0}-gcov
         mkdir -p "${BUILDDIR}"
