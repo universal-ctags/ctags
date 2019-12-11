@@ -360,14 +360,14 @@ built-in language names.
 Letters and names
 ~~~~~~~~~~~~~~~~~
 
-Some options take letters as parameters (e.g. ``--kinds-<LANG>`` option).
+Some options take one-letter flags as parameters (e.g. ``--kinds-<LANG>`` option).
 Specifying just letters help a user create a complicated command line
-quickly.  However, a command line including sequences of single letters
+quickly.  However, a command line including sequences of one-letter flags
 becomes difficult to understand.
 
-Universal-ctags accepts names in
-addition to such letters. The names and letters can be mixed in an
-option parameter by surrounding each name by braces. Thus, for an
+Universal-ctags accepts long-name flags in
+addition to such one-letter flags. The long-name and one-letter flags can be mixed in an
+option parameter by surrounding each long-name by braces. Thus, for an
 example, the following three notations for ``--kinds-C`` option have
 the same meaning::
 
@@ -378,7 +378,7 @@ the same meaning::
 Note that braces may be meta characters in your shell. Put
 single quotes in such case.
 
-``--list-...`` options shows letters and associated names.
+``--list-...`` options shows one-letter flags and associated long-name flags.
 
 
 List options
@@ -717,7 +717,7 @@ are not listed here. They are experimental or for debugging purpose.
 	Specifies whether to include extra tag entries for certain kinds of
 	information. See also "`Extras`_" subsection to know what are kinds.
 
-	The parameter flags is a set of one-letter flags, each
+	The parameter flags is a set of one-letter flags (and/or long-name flags), each
 	representing one kind of extra tag entry to include in the tag file.
 	If flags is preceded by either the '+' or '-' character, the effect of
 	each flag is added to, or removed from, those currently enabled;
@@ -730,7 +730,7 @@ are not listed here. They are experimental or for debugging purpose.
 	extras`_" about the concept). Use ``--extras-<LANG>=`` option for
 	controlling them.
 
-	The meaning of major extras is as follows (one-letter flag/name):
+	The meaning of major extras is as follows (one-letter flag/long-name flag):
 
 	F/fileScope
 		Equivalent to ``--file-scope``.
@@ -772,11 +772,6 @@ are not listed here. They are experimental or for debugging purpose.
 	Inquire the output of ``--list-extras`` option for the other minor
 	extras.
 
-	A name associated with an extra can be used as alternative to a
-	one-letter flag. Some minor extras have no one-letters flag. In
-	that case, names must be specified anyway. See "`Letters and names`_"
-	for more details.
-
 ``--extras-<LANG>=[+|-]flags|*``
 	Specifies whether to include extra tag entries for certain kinds of
 	information for language <LANG>. Universal-ctags
@@ -792,25 +787,12 @@ are not listed here. They are experimental or for debugging purpose.
 	Check the output of the ``--list-extras=<LANG>`` option for the
 	extras of specific language <LANG>.
 
-``--fields-<LANG>=[+|-]flags|*``
-	Specifies which language-specific fields are to be included in
-	the entries of the tag file. Universal-ctags
-	supports language-specific fields. (See "`Language-specific fields and
-	extras`_" about the concept). This option is for controlling them.
-
-	Specify "all" as <LANG> to apply the parameter flags to all
-	fields; all fields are enabled with specifying '*' as the
-	parameter flags. If specifying nothing as the parameter flags
-	("--fields-all="), all fields are disabled. These two combinations
-	are useful for testing.
-
-
 ``--fields=[+|-]flags|*``
 	Specifies which available extension fields are to be included in
 	the tag entries (see "`TAG FILE FORMAT`_", below, and, "`Fields`_", above, for more
 	information).
 
-	The parameter flags is a set of one-letter flags,
+	The parameter flags is a set of one-letter flags (and/or long-name flags),
 	each representing one type of extension field to include.
 	Each letter or group of letters may be preceded by either '+' to add it
 	to the default set, or '-' to exclude it. In the absence of any
@@ -826,7 +808,7 @@ are not listed here. They are experimental or for debugging purpose.
 	controlling them.
 
 
-	The meaning of major fields is as follows (one-letter flag/name):
+	The meaning of major fields is as follows (one-letter flag/long-name flag):
 
 	a/access
 		Access (or export) of class members
@@ -841,12 +823,14 @@ are not listed here. They are experimental or for debugging purpose.
 		Inheritance information.
 
 	k
-		Kind of tag as a single letter. Enabled by default.
-		Exceptionally this has no name.
+		Kind of tag as one-letter. Enabled by default.
+		Exceptionally this has no field name.
+		See also z/kind flag.
 
 	K
 		Kind of tag as full name
-		Exceptionally this has no name.
+		Exceptionally this has no field name.
+		See also z/kind flag.
 
 	l/language
 		Language of source file containing tag
@@ -867,6 +851,9 @@ are not listed here. They are experimental or for debugging purpose.
 	s
 		Scope of tag definition. Enabled by default.
 		Exceptionally this has no name.
+		See also Z flag.
+
+		.. TODO? implement "scope" of Z/scope flag.
 
 	S/signature
 		Signature of routine (e.g. prototype or parameter list)
@@ -886,10 +873,17 @@ are not listed here. They are experimental or for debugging purpose.
 	Check the output of the ``--list-fields`` option for the other minor
 	fields.
 
-	A name associated with a field can be used as alternative to a
-	one-letter flag. Some minor fields have no one-letters flag. In
-	that case, names must be specified anyway. See "`Letters and names`_"
-	for more details.
+``--fields-<LANG>=[+|-]flags|*``
+	Specifies which language-specific fields are to be included in
+	the entries of the tag file. Universal-ctags
+	supports language-specific fields. (See "`Language-specific fields and
+	extras`_" about the concept). This option is for controlling them.
+
+	Specify "all" as <LANG> to apply the parameter flags to all
+	fields; all fields are enabled with specifying '*' as the
+	parameter flags. If specifying nothing as the parameter flags
+	("--fields-all="), all fields are disabled. These two combinations
+	are useful for testing.
 
 ``--file-scope[=yes|no]``
 	Indicates whether tags scoped only for a single file (i.e. tags which
@@ -974,7 +968,7 @@ are not listed here. They are experimental or for debugging purpose.
 	include in the output file for a particular language, where <LANG> is
 	case-insensitive and is one of the built-in language names (see the
 	``--list-languages`` option for a complete list). The parameter kinds is a group
-	of one-letter flags designating kinds of tags (particular to the language)
+	of one-letter flags (and/or long-name flags) designating kinds of tags (particular to the language)
 	to either include or exclude from the output. The specific sets of
 	flags recognized for each language, their meanings and defaults may be
 	list using the ``--list-kinds-full`` option. Each letter or group of letters
@@ -996,11 +990,8 @@ are not listed here. They are experimental or for debugging purpose.
 
 	Some kinds of C and C++ languages are synchronized; enabling
 	(or disabling) a kind in one language enables the kind having
-	the same letter and name in the other language. See also the
+	the same one-letter and long-name in the other language. See also the
 	description of MASTER column of ``--list-kinds-full``.
-
-	A name associated with a kind can be used as alternative to a
-	one-letter flag. See "`Letters and names`_" for more details.
 
 ``--<LANG>-kinds=[+|-]kinds|*``
 	This option is obsolete. Use ``--kinds-<LANG>=...`` instead.
@@ -1133,7 +1124,7 @@ are not listed here. They are experimental or for debugging purpose.
 
 	An extra can be enabled or disabled with ``--extras=`` for common
 	extras in all languages, or ``--extras-<LANG>=`` for the specified
-	language.  These option takes one-letter flag or name as a parameter
+	language.  These option takes one-letter flag or long-name flag as a parameter
 	for specifying an extra.
 
 	The meaning of columns are as follows:
@@ -1142,7 +1133,7 @@ are not listed here. They are experimental or for debugging purpose.
 		One-letter flag. '-' means the extra does not have one-letter flag.
 
 	NAME
-		The name of extra. The name is used in ``extras:`` field.
+		Long-name flag. The long-name is used in ``extras:`` field.
 
 	ENABLED
 		Whether the extra is enabled or not. It takes "yes" or "no".
@@ -1166,8 +1157,8 @@ are not listed here. They are experimental or for debugging purpose.
 
 	A field can be enabled or disabled with ``--fields=`` for common
 	extras in all languages, or ``--fields-<LANG>=`` for the specified
-	language.  These option takes one-letter flag or name as a parameter
-	for specifying a field.
+	language.  These option takes one-letter flags and/or long-name flags
+	as a parameter for specifying fields.
 
 	The meaning of columns are as follows:
 
@@ -1175,7 +1166,7 @@ are not listed here. They are experimental or for debugging purpose.
 		One-letter flag. '-' means the field does not have one-letter flag.
 
 	NAME
-		The name of field.
+		Long-name of field.
 
 	ENABLED
 		Whether the field is enabled or not. It takes "yes" or "no".
@@ -1233,7 +1224,7 @@ are not listed here. They are experimental or for debugging purpose.
 	**all** is used as default value if the option argument is omitted.
 
 	Each kind of tag recorded in the tag file is represented by a
-	one-letter flag, or name. They are also used to filter the tags
+	one-letter flag, or a long-name flag. They are also used to filter the tags
 	placed into the output through use of the ``--kinds-<LANG>``
 	option.
 
@@ -1246,12 +1237,12 @@ are not listed here. They are experimental or for debugging purpose.
 		One-letter flag. This must be unique in a language.
 
 	NAME
-		Name of the kind. This can be used as the alternative
-		one-letter flag described above. If enabling 'K' field with
-		``--fields=+K``, ctags uses name instead of
-		letter in tags output. To enable/disable a kind with
-		``--kinds-<LANG>`` option, name surrounded by braces instead
-		of letter. See "`Letters and names`_" for details. This must be
+		The long-name flag of the kind. This can be used as the alternative
+		to the one-letter flag described above. If enabling 'K' field with
+		``--fields=+K``, ctags uses long-names instead of
+		one-letters in tags output. To enable/disable a kind with
+		``--kinds-<LANG>`` option, long-name surrounded by braces instead
+		of one-letter. See "`Letters and names`_" for details. This must be
 		unique in a language.
 
 	ENABLED
@@ -1270,12 +1261,12 @@ are not listed here. They are experimental or for debugging purpose.
 		A kind belongs to a language (owner) in Universal-ctags;
 		enabling and disabling a kind in a language has no effect on
 		a kind in another language even if both kinds has the
-		same letter and/or the same name. In other words,
+		same one-letter flag and/or the same long-name flag. In other words,
 		the namespace of kinds are separated by language.
 
 		However, Exuberant-ctags does not separate the kinds of C and
 		C++. Enabling/disabling kindX in C language enables/disables a
-		kind in C++ language having the same name with kindX. To
+		kind in C++ language having the same long-name flag with kindX. To
 		emulate this behavior in Universal-ctags, a concept named
 		"master parser" is introduced. Enabling/disabling some kinds
 		are synchronized under the control of a master language.
@@ -1357,19 +1348,19 @@ are not listed here. They are experimental or for debugging purpose.
 	**all** is used as default value if the option argument is omitted.
 	If the parameter kinds is given after the parameter
 	*language* or **all** with concatenating with '.', list only roles
-	defined in the kinds. Both one-letter flags and names surrounded
+	defined in the kinds. Both one-letter flags and long name flags surrounded
 	by braces are acceptable as the parameter kinds.
 
 	The meaning of columns are as follows:
 
 	LANGUAGE
-		Name of language having the role.
+		The name of language having the role.
 
 	KIND(L/N)
-		One-letter flag and name of kind having the role.
+		The one-letter flag and the long-name flag of kind having the role.
 
 	NAME
-		Name of the role.
+		The long-name flag of the role.
 
 	ENABLED
 		Whether the kind is enabled or not. It takes "yes" or "no".
@@ -1492,8 +1483,8 @@ are not listed here. They are experimental or for debugging purpose.
 	explicitly specify the files or pipe the output of find(1) into
 	ctags -L- instead. Note: This option is not supported on
 	all platforms at present. It is available if the output of the ``--help``
-	option includes this option. See, also, the ``--exclude`` to limit
-	recursion.
+	option includes this option. See, also, the ``--exclude`` and
+	``--maxdepth`` to limit recursion.
 
 ``--regex-<LANG>=/regexp/replacement/[kind-spec/][flags]``
 	See :ref:`ctags-optlib(7) <ctags-optlib(7)>`.
@@ -1678,7 +1669,7 @@ file
 kind
 	Indicates the type, or kind, of tag. Its value is either one of the
 	corresponding one-letter flags described under the various
-	``--kinds-<LANG>`` options above, or a full name. It is permitted
+	``--kinds-<LANG>`` options above, or a long-name flag. It is permitted
 	(and is, in fact, the default) for the key portion of this field to be
 	omitted. The optional behaviors are controlled with the ``--fields`` option.
 
