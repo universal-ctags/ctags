@@ -864,6 +864,40 @@ static CXXCharTypeData g_aCharTable[128] =
 	{ 0, 0, 0 }
 };
 
+// Parse the contents of an attribute chain.
+// The input is the innermost chain of __attribute__((...)) or [[...]]
+static void cxxParserAnalyzeAttributeChain(CXXTokenChain * pChain)
+{
+	CXXToken * pToken = cxxTokenChainFirst(pChain);
+
+	while(pToken)
+	{
+		if(cxxTokenTypeIs(pToken,CXXTokenTypeIdentifier))
+		{
+			CXX_DEBUG_PRINT("Analyzing attribute %s",vStringValue(pToken->pszWord));
+			if(
+					(strcmp(vStringValue(pToken->pszWord),"always_inline") == 0) ||
+					(strcmp(vStringValue(pToken->pszWord),"__always_inline__") == 0)
+				)
+			{
+				CXX_DEBUG_PRINT("Found attribute 'always_inline'");
+				// assume "inline" has been seen.
+				g_cxx.uKeywordState |= CXXParserKeywordStateSeenInline;
+			} else if(
+					(strcmp(vStringValue(pToken->pszWord),"deprecated") == 0) ||
+					(strcmp(vStringValue(pToken->pszWord),"__deprecated__") == 0)
+				)
+			{
+				CXX_DEBUG_PRINT("Found attribute 'deprecated'");
+				// assume "inline" has been seen.
+				g_cxx.uKeywordState |= CXXParserKeywordStateSeenAttributeDeprecated;
+			}
+		}
+
+		pToken = pToken->pNext;
+	}
+}
+
 //
 // The __attribute__((...)) sequence complicates parsing quite a lot.
 // For this reason we attempt to "hide" it from the rest of the parser
@@ -939,49 +973,96 @@ static bool cxxParserParseNextTokenCondenseAttribute(void)
 	if(pInner)
 	{
 		if(pInner->pNext && cxxTokenTypeIs(pInner->pNext,CXXTokenTypeParenthesisChain))
-			pInner = cxxTokenChainFirst(pInner->pNext->pChain);
-
-		while(pInner)
-		{
-			if(cxxTokenTypeIs(pInner,CXXTokenTypeIdentifier))
-			{
-				CXX_DEBUG_PRINT("Analyzing attribyte %s",vStringValue(pInner->pszWord));
-				if(
-						(strcmp(vStringValue(pInner->pszWord),"always_inline") == 0) ||
-						(strcmp(vStringValue(pInner->pszWord),"__always_inline__") == 0)
-					)
-				{
-					CXX_DEBUG_PRINT("Found attribute 'always_inline'");
-					// assume "inline" has been seen.
-					g_cxx.uKeywordState |= CXXParserKeywordStateSeenInline;
-				} else if(
-						(strcmp(vStringValue(pInner->pszWord),"deprecated") == 0) ||
-						(strcmp(vStringValue(pInner->pszWord),"__deprecated__") == 0)
-					)
-				{
-					CXX_DEBUG_PRINT("Found attribute 'deprecated'");
-					// assume "inline" has been seen.
-					g_cxx.uKeywordState |= CXXParserKeywordStateSeenAttributeDeprecated;
-				}
-			}
-
-			// If needed, we could attach certain attributes to previous
-			// identifiers. But note that __attribute__ may apply to a
-			// following identifier too.
-
-			pInner = pInner->pNext;
-		}
+			cxxParserAnalyzeAttributeChain(pInner->pNext->pChain);
 	}
 
 	// Now just kill the chain.
 	cxxTokenChainDestroyLast(g_cxx.pTokenChain);
 
 	// And finally extract yet another token.
+	bool bRet = cxxParserParseNextToken();
+
 	CXX_DEBUG_LEAVE();
-	return cxxParserParseNextToken();
+	return bRet;
 }
 
-// An macro token was encountered and it expects a parameter list.
+//
+// We handle the attribute [[...]] sequence introduced in c++11 in the same way
+// as __attribute__((...)). We move it out of the parser's way as it complicates parsing.
+//
+// Returns false if it finds an EOF. This is an important invariant required by
+// cxxParserParseNextToken(), the only caller.
+//
+static bool cxxParserParseNextTokenCondenseCXX11Attribute(void)
+{
+	CXX_DEBUG_ENTER();
+
+	CXX_DEBUG_ASSERT(
+			cxxTokenTypeIs(g_cxx.pToken, CXXTokenTypeOpeningSquareParenthesis),
+			"This function should be called only after we have parsed ["
+		);
+
+	// Input stream: [[foo]]...
+	//
+	// g_cxx.pToken points the first '['.
+	// g_cxx.iChar points the second '['.
+	//
+	// A caller calls this function only when the second '[' is found.
+
+	if(!cxxParserParseAndCondenseCurrentSubchain(
+			CXXTokenTypeOpeningParenthesis |
+				CXXTokenTypeOpeningSquareParenthesis |
+				CXXTokenTypeOpeningBracket,
+			false,
+			false
+		))
+	{
+		// Parsing and/or condensation of the subchain failed. This implies broken
+		// input (mismatched parenthesis/bracket, early EOF).
+
+		CXX_DEBUG_LEAVE_TEXT("Failed to parse subchains. The input is broken...");
+
+		// However our invariant
+		// forbids us to return false if we didn't find an EOF. So we attempt
+		// to resume parsing anyway. If there is an EOF, cxxParserParseNextToken()
+		// will report it.
+
+		// Kill the token chain
+		cxxTokenChainDestroyLast(g_cxx.pTokenChain);
+
+		return cxxParserParseNextToken();
+	}
+
+	// Now the current token should be replaced by a square parenthesis chain
+	// that contains another square parenthesis chain.
+	CXX_DEBUG_ASSERT(
+			cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeSquareParenthesisChain),
+			"Should have a parenthesis chain as last token!"
+		);
+	CXX_DEBUG_ASSERT(
+			(g_cxx.pToken->pChain->iCount == 3) &&
+			cxxTokenTypeIs(
+					cxxTokenChainAt(g_cxx.pToken->pChain,1),
+					CXXTokenTypeSquareParenthesisChain
+				),
+			"Should have a nested parenthesis chain inside the last token!"
+		);
+
+	cxxParserAnalyzeAttributeChain(
+			cxxTokenChainAt(g_cxx.pToken->pChain,1)->pChain
+		);
+
+	// Now just kill it.
+	cxxTokenChainDestroyLast(g_cxx.pTokenChain);
+
+	// And finally extract yet another token.
+	bool bRet = cxxParserParseNextToken();
+
+	CXX_DEBUG_LEAVE();
+	return bRet;
+}
+
+// A macro token was encountered and it expects a parameter list.
 // The routine has to check if there is a following parenthesis
 // and eventually skip it but it MUST NOT parse the next token
 // if it is not a parenthesis. This is because the macro token
@@ -1486,6 +1567,22 @@ bool cxxParserParseNextToken(void)
 		vStringPut(t->pszWord,g_cxx.iChar);
 		g_cxx.iChar = cppGetc();
 		t->bFollowedBySpace = cppIsspace(g_cxx.iChar);
+		if(t->eType == CXXTokenTypeOpeningSquareParenthesis)
+		{
+			// special handling for [[ attribute ]] which can appear almost anywhere
+			// in the source code and is kind of annoying for the parser.
+
+			if(t->bFollowedBySpace)
+			{
+				// The tokens can be separated by a space, at least according to gcc.
+				do {
+					g_cxx.iChar = cppGetc();
+				} while(cppIsspace(g_cxx.iChar));
+			}
+
+			if(g_cxx.iChar == '[')
+				return cxxParserParseNextTokenCondenseCXX11Attribute();
+		}
 		return true;
 	}
 

@@ -1,0 +1,14 @@
+f	input.cpp	/^inline int f(); \/\/ declare f with four attributes$/;"	p	typeref:typename:int	file:	signature:()	properties:inline
+g	input.cpp	/^int g(); \/\/ same as above, but uses a single attr specifier that contains four attributes$/;"	p	typeref:typename:int	file:	signature:()	properties:inline
+h	input.cpp	/^int h[[gnu::always_inline]](); \/\/ an attribute may appear in multiple specifiers$/;"	p	typeref:typename:int	file:	signature:()	properties:inline
+i	input.cpp	/^int i() { return 0; }$/;"	f	typeref:typename:int	signature:()
+j	input.cpp	/^[ [ deprecated ] ] int j(int k) {$/;"	f	typeref:typename:int	signature:(int k)	properties:deprecated
+k	input.cpp	/^[ [ deprecated ] ] int j(int k) {$/;"	z	function:j	typeref:typename:int	file:
+v1	input.cpp	/^	int v1;$/;"	l	function:j	typeref:typename:int	file:
+foo	input.cpp	/^void foo();$/;"	p	typeref:typename:void	file:	signature:()
+main	input.cpp	/^int main([[maybe_unused]]int argc, [[maybe_unused]]char *argv[]) {$/;"	f	typeref:typename:int	signature:(int argc,char * argv[])
+argc	input.cpp	/^int main([[maybe_unused]]int argc, [[maybe_unused]]char *argv[]) {$/;"	z	function:main	typeref:typename:int	file:
+argv	input.cpp	/^int main([[maybe_unused]]int argc, [[maybe_unused]]char *argv[]) {$/;"	z	function:main	typeref:typename:char * []	file:
+alpha	input.cpp	/^  int alpha;$/;"	l	function:main	typeref:typename:int	file:
+bravo	input.cpp	/^  int bravo;$/;"	l	function:main	typeref:typename:int	file:
+charlie	input.cpp	/^  int charlie;$/;"	l	function:main	typeref:typename:int	file:
