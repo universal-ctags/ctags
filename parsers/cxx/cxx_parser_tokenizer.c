@@ -981,6 +981,68 @@ static bool cxxParserParseNextTokenCondenseAttribute(void)
 	return cxxParserParseNextToken();
 }
 
+//
+// The way to handle the [[...]] sequence introduced in c++11 is the
+// same as that of __attribute__((...)).
+//
+// Returns false if it finds an EOF. This is an important invariant required by
+// cxxParserParseNextToken(), the only caller.
+//
+static bool cxxParserParseNextTokenCondenseCxx11Attribute(void)
+{
+	CXX_DEBUG_ENTER();
+
+	CXX_DEBUG_ASSERT(
+		cxxTokenTypeIs(g_cxx.pToken, CXXTokenTypeOpeningSquareParenthesis),
+		"This function should be called only after we have parsed ["
+		);
+
+	// Input stream: [[foo]]...
+	// g_cxx.pToken points the first '['.
+	// g_cxx.iChar points the second '['.
+	//
+	// A caller calls this function only when the
+	// second '[' is found.
+
+	// And go ahead.
+
+	if(!cxxParserParseAndCondenseCurrentSubchain(
+			CXXTokenTypeOpeningParenthesis |
+				CXXTokenTypeOpeningSquareParenthesis |
+				CXXTokenTypeOpeningBracket,
+			false,
+			false
+		))
+	{
+		// Parsing and/or condensation of the subchain failed. This implies broken
+		// input (mismatched parenthesis/bracket, early EOF).
+
+		CXX_DEBUG_LEAVE_TEXT("Failed to parse subchains. The input is broken...");
+
+		// However our invariant
+		// forbids us to return false if we didn't find an EOF. So we attempt
+		// to resume parsing anyway. If there is an EOF, cxxParserParseNextToken()
+		// will report it.
+
+		// Kill the token chain
+		cxxTokenChainDestroyLast(g_cxx.pTokenChain);
+
+		return cxxParserParseNextToken();
+	}
+
+
+	CXX_DEBUG_ASSERT(
+			cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeSquareParenthesisChain),
+			"Should have a parenthesis chain as last token!"
+		);
+
+	// Now just kill the chain.
+	cxxTokenChainDestroyLast(g_cxx.pTokenChain);
+
+	// And finally extract yet another token.
+	CXX_DEBUG_LEAVE();
+	return cxxParserParseNextToken();
+}
 // An macro token was encountered and it expects a parameter list.
 // The routine has to check if there is a following parenthesis
 // and eventually skip it but it MUST NOT parse the next token
@@ -1485,6 +1547,10 @@ bool cxxParserParseNextToken(void)
 		t->eType = g_aCharTable[g_cxx.iChar].uSingleTokenType;
 		vStringPut(t->pszWord,g_cxx.iChar);
 		g_cxx.iChar = cppGetc();
+		if (t->eType == CXXTokenTypeOpeningSquareParenthesis
+			&& g_cxx.iChar == '[')
+			return cxxParserParseNextTokenCondenseCxx11Attribute();
+
 		t->bFollowedBySpace = cppIsspace(g_cxx.iChar);
 		return true;
 	}

@@ -1,0 +1,8 @@
+f	input.cpp	/^inline int f(); \/\/ declare f with four attributes$/;"	p	typeref:typename:int	file:
+g	input.cpp	/^int g(); \/\/ same as above, but uses a single attr specifier that contains four attributes$/;"	p	typeref:typename:int	file:
+h	input.cpp	/^int h[[gnu::always_inline]](); \/\/ an attribute may appear in multiple specifiers$/;"	p	typeref:typename:int	file:
+i	input.cpp	/^int i() { return 0; }$/;"	f	typeref:typename:int
+foo	input.cpp	/^void foo();$/;"	p	typeref:typename:void	file:
+main	input.cpp	/^int main([[maybe_unused]]int argc, [[maybe_unused]]char *argv[]) {$/;"	f	typeref:typename:int
+argc	input.cpp	/^int main([[maybe_unused]]int argc, [[maybe_unused]]char *argv[]) {$/;"	z	function:main	typeref:typename:int	file:
+argv	input.cpp	/^int main([[maybe_unused]]int argc, [[maybe_unused]]char *argv[]) {$/;"	z	function:main	typeref:typename:char * []	file:
