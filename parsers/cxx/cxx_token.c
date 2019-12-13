@@ -145,6 +145,7 @@ void cxxTokenAppendToString(vString * s,CXXToken * t)
 		case CXXTokenTypeSquareParenthesisChain:
 		case CXXTokenTypeBracketChain:
 		case CXXTokenTypeAngleBracketChain:
+		case CXXTokenTypeAttributeChain:
 			CXX_DEBUG_ASSERT(t->pChain,"This token should have a nested chain!");
 			cxxTokenChainJoinInString(t->pChain,s,NULL,0);
 		break;

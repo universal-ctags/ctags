@@ -437,20 +437,24 @@ CXXToken * cxxTagCheckAndSetTypeField(
 	// allowed by C++ for unqualified types. However I haven't been able
 	// to come up with something better... so "typename" it is for now.
 
-	// FIXME: The typeRef forma with two fields should be dropped.
+	// FIXME: The typeRef form with two fields should be dropped.
 	//        It has been created with specific use cases in mind
 	//        and we are pushing it way beyond them.
 	//        We should have a plain "type" field instead.
 
 	static const char * szTypename = "typename";
 
-	// Filter out initial keywords that need to be excluded from typenames
+	// Filter out initial keywords and attribute chains that need to be excluded
+	// from typenames
 	for(;;)
 	{
-		if(!cxxTokenTypeIs(pTypeStart,CXXTokenTypeKeyword))
-			break;
-		if(!cxxKeywordExcludeFromTypeNames(pTypeStart->eKeyword))
-			break;
+		if(!cxxTokenTypeIs(pTypeStart,CXXTokenTypeAttributeChain))
+		{
+			if(!cxxTokenTypeIs(pTypeStart,CXXTokenTypeKeyword))
+				break;
+			if(!cxxKeywordExcludeFromTypeNames(pTypeStart->eKeyword))
+				break;
+		}
 		// must be excluded
 		if(pTypeStart == pTypeEnd)
 		{

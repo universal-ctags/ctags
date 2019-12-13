@@ -1552,7 +1552,7 @@ int cxxParserEmitFunctionTags(
 			}
 		}
 
-		vString * pszSignature = cxxTokenChainJoin(pInfo->pParenthesis->pChain,NULL,0);
+		vString * pszSignature = cxxTokenChainJoinFiltered(pInfo->pParenthesis->pChain,CXXTokenTypeAttributeChain,0);
 		if(pInfo->pSignatureConst)
 		{
 			vStringPut (pszSignature, ' ');
@@ -1893,12 +1893,14 @@ bool cxxParserTokenChainLooksLikeFunctionParameterList(
 		if(!cxxTokenTypeIsOneOf(
 				t,
 				CXXTokenTypeIdentifier | CXXTokenTypeKeyword |
-					CXXTokenTypeMultipleDots | CXXTokenTypeMultipleColons
+					CXXTokenTypeMultipleDots | CXXTokenTypeMultipleColons |
+					CXXTokenTypeAttributeChain
 			))
 		{
 			CXX_DEBUG_LEAVE_TEXT(
-					"Token '%s' is something that is not a identifier, keyword, :: or ...",
-					vStringValue(t->pszWord)
+					"Token '%s' of type %s is something that is not a identifier, keyword, :: or ...",
+					vStringValue(t->pszWord),
+					cxxDebugTypeDecode(t->eType)
 				);
 			return false;
 		}

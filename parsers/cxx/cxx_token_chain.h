@@ -185,6 +185,18 @@ vString * cxxTokenChainJoin(
 		unsigned int uFlags
 	);
 
+void cxxTokenChainJoinFilteredInString(
+		CXXTokenChain * tc,
+		vString * s,
+		unsigned int uFilterTokenTypes,
+		unsigned int uFlags
+	);
+vString * cxxTokenChainJoinFiltered(
+		CXXTokenChain * tc,
+		unsigned int uFilterTokenTypes,
+		unsigned int uFlags
+	);
+
 void cxxTokenChainJoinRangeInString(
 		CXXToken * from,
 		CXXToken * to,

@@ -59,6 +59,13 @@ enum CXXTokenType
 	CXXTokenTypeParenthesisChain = (1 << 28), // (...)
 	CXXTokenTypeSquareParenthesisChain = (1 << 29), // [...]
 	CXXTokenTypeAngleBracketChain = (1 << 30), // <...>
+
+	// A special chain that really has no opening/closing marker.
+	// It is generated as a special case when condensing a square parenthesis
+	// chain. The reason is that two consecutive closing square parentheses
+	// are ambiguous and can't be always treated as a closing ]] token.
+	// There must be a matching [[ at the same chain level.
+	CXXTokenTypeAttributeChain = (1 << 31), // [[...]]
 };
 
 // Forward decl

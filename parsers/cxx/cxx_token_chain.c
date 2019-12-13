@@ -365,7 +365,6 @@ void cxxTokenChainJoinInString(
 	}
 }
 
-
 vString * cxxTokenChainJoin(
 		CXXTokenChain * tc,
 		const char * szSeparator,
@@ -384,6 +383,70 @@ vString * cxxTokenChainJoin(
 
 	return s;
 }
+
+void cxxTokenChainJoinFilteredInString(
+		CXXTokenChain * tc,
+		vString * s,
+		unsigned int uFilterTokenTypes,
+		unsigned int uFlags
+	)
+{
+	if(!tc)
+		return;
+
+	if(tc->iCount == 0)
+		return;
+
+	CXXToken * t = tc->pHead;
+
+	if(!cxxTokenTypeIsOneOf(t,uFilterTokenTypes))
+	{
+		cxxTokenAppendToString(s,t);
+
+		if(
+				(!(uFlags & CXXTokenChainJoinNoTrailingSpaces)) &&
+				t->bFollowedBySpace
+			)
+			vStringPut (s, ' ');
+	}
+
+	t = t->pNext;
+	while(t)
+	{
+		if(!cxxTokenTypeIsOneOf(t,uFilterTokenTypes))
+		{
+			cxxTokenAppendToString(s,t);
+
+			if(
+					(!(uFlags & CXXTokenChainJoinNoTrailingSpaces)) &&
+					t->bFollowedBySpace
+				)
+				vStringPut (s, ' ');
+		}
+
+		t = t->pNext;
+	}
+}
+
+vString * cxxTokenChainJoinFiltered(
+		CXXTokenChain * tc,
+		unsigned int uFilterTokenTypes,
+		unsigned int uFlags
+	)
+{
+	if(!tc)
+		return NULL;
+
+	if(tc->iCount == 0)
+		return NULL;
+
+	vString * s = vStringNew();
+
+	cxxTokenChainJoinFilteredInString(tc,s,uFilterTokenTypes,uFlags);
+
+	return s;
+}
+
 
 void cxxTokenChainMoveEntries(CXXTokenChain * src,CXXTokenChain * dest)
 {
@@ -1020,10 +1083,13 @@ CXXToken * cxxTokenChainExtractRangeFilterTypeName(
 	CXXToken * pToken = from;
 	for(;;)
 	{
-		if(!cxxTokenTypeIs(pToken,CXXTokenTypeKeyword))
-			break;
-		if(!cxxKeywordExcludeFromTypeNames(pToken->eKeyword))
-			break;
+		if(!cxxTokenTypeIs(pToken,CXXTokenTypeAttributeChain))
+		{
+			if(!cxxTokenTypeIs(pToken,CXXTokenTypeKeyword))
+				break;
+			if(!cxxKeywordExcludeFromTypeNames(pToken->eKeyword))
+				break;
+		}
 		// must be excluded
 		if(pToken == to)
 			return NULL; // only excluded keywords
@@ -1051,10 +1117,13 @@ CXXToken * cxxTokenChainExtractRangeFilterTypeName(
 
 		for(;;)
 		{
-			if(!cxxTokenTypeIs(pToken,CXXTokenTypeKeyword))
-				break;
-			if(!cxxKeywordExcludeFromTypeNames(pToken->eKeyword))
-				break;
+			if(!cxxTokenTypeIs(pToken,CXXTokenTypeAttributeChain))
+			{
+				if(!cxxTokenTypeIs(pToken,CXXTokenTypeKeyword))
+					break;
+				if(!cxxKeywordExcludeFromTypeNames(pToken->eKeyword))
+					break;
+			}
 			// must be excluded
 			if(pToken == to)
 				return pRet;

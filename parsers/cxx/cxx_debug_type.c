@@ -48,6 +48,7 @@ const char * cxxDebugTypeDecode (enum CXXTokenType eType)
 	if (eType & CXXTokenTypeParenthesisChain) a = append (buf, "ParenthesisChain", a);
 	if (eType & CXXTokenTypeSquareParenthesisChain) a = append (buf, "SquareParenthesisChain", a);
 	if (eType & CXXTokenTypeAngleBracketChain) a = append (buf, "AngleBracketChain", a);
+	if (eType & CXXTokenTypeAttributeChain) a = append (buf, "AttributeChain", a);
 	if (vStringLength(buf) == 0) vStringCatS(buf, "REALLY-UNKNOWN");
 	return vStringValue (buf);
 }

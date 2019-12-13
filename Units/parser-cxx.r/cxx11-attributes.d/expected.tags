@@ -1,0 +1,8 @@
+deprecated	input.cpp	/^[[deprecated("does nothing")]] [[gnu::always_inline, noreturn]] void deprecated()$/;"	f	typeref:typename:void	signature:()
+main	input.cpp	/^int main([[maybe_unused]] int argc,[[maybe_unused]] char ** argv)$/;"	f	typeref:typename:int	signature:(int argc,char ** argv)
+argc	input.cpp	/^int main([[maybe_unused]] int argc,[[maybe_unused]] char ** argv)$/;"	z	function:main	typeref:typename:int	file:
+argv	input.cpp	/^int main([[maybe_unused]] int argc,[[maybe_unused]] char ** argv)$/;"	z	function:main	typeref:typename:char **	file:
+v1	input.cpp	/^	int v1;$/;"	l	function:main	typeref:typename:int	file:
+v2	input.cpp	/^		int v2;$/;"	l	function:main	typeref:typename:int	file:
+v3	input.cpp	/^			int v3;$/;"	l	function:main	typeref:typename:int	file:
+v4	input.cpp	/^			int v4;$/;"	l	function:main	typeref:typename:int	file:

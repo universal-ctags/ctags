@@ -85,11 +85,12 @@ bool cxxParserParseAndCondenseCurrentSubchain(
 {
 	CXX_DEBUG_ENTER();
 
-	CXXTokenChain * pCurrentChain = g_cxx.pTokenChain;
+	CXXTokenChain * pTopChain = g_cxx.pTokenChain;
 
 	g_cxx.pTokenChain = cxxTokenChainCreate();
 
-	CXXToken * pInitial = cxxTokenChainTakeLast(pCurrentChain);
+	CXXToken * pInitial = cxxTokenChainTakeLast(pTopChain);
+	CXX_DEBUG_ASSERT(pInitial,"There should be an initial token");
 	cxxTokenChainAppend(g_cxx.pTokenChain,pInitial);
 
 	CXXToken * pChainToken = cxxTokenCreate();
@@ -98,9 +99,10 @@ bool cxxParserParseAndCondenseCurrentSubchain(
 	pChainToken->oFilePosition = pInitial->oFilePosition;
 	// see the declaration of CXXTokenType enum.
 	// Shifting by 8 gives the corresponding chain marker
-	pChainToken->eType = (enum CXXTokenType)(g_cxx.pToken->eType << 8);
+	enum CXXTokenType eChainMarker = (enum CXXTokenType)(g_cxx.pToken->eType << 8);
+	pChainToken->eType = eChainMarker;
 	pChainToken->pChain = g_cxx.pTokenChain;
-	cxxTokenChainAppend(pCurrentChain,pChainToken);
+	cxxTokenChainAppend(pTopChain,pChainToken);
 
 	// see the declaration of CXXTokenType enum.
 	// Shifting by 4 gives the corresponding closing token type
@@ -159,10 +161,47 @@ bool cxxParserParseAndCondenseCurrentSubchain(
 		pFakeLast->pChain = NULL;
 
 		cxxTokenChainAppend(g_cxx.pTokenChain,pFakeLast);
+
+	} else if(
+		(eChainMarker == CXXTokenTypeSquareParenthesisChain) &&
+		(pChainToken->pChain->iCount == 3)
+	)
+	{
+		// Special treatment for [[attribute]] chains.
+		//
+		// A double closing square parenthesis ]] is ambiguous at tokenizer level
+		// and cannot be generated without taking into consideration the previous input.
+		// This is why we generate the attribute chain marker at this level.
+		// We simply look for two nested square parenthesis chains with no other tokens
+		// in the way.
+
+		CXXToken * pMiddle = cxxTokenChainFirst(pChainToken->pChain)->pNext;
+		CXX_DEBUG_ASSERT(pMiddle,"Should have a middle token here");
+
+		if(cxxTokenTypeIs(pMiddle,CXXTokenTypeSquareParenthesisChain))
+		{
+			CXX_DEBUG_PRINT("Found two nested square parenthesis chains: condensing into an attribute chain");
+
+			CXXTokenChain * pOuter = pChainToken->pChain;
+
+			CXX_DEBUG_ASSERT(pMiddle->pChain,"The inner chain should indeed have a chain");
+			pChainToken->pChain = pMiddle->pChain;
+
+			CXX_DEBUG_ASSERT(pChainToken->pChain->iCount > 1,"The inner chain should have at least two tokens");
+			vStringCopyS(cxxTokenChainFirst(pChainToken->pChain)->pszWord,"[[");
+			vStringCopyS(cxxTokenChainLast(pChainToken->pChain)->pszWord,"]]");
+
+			pMiddle->pChain = NULL;
+			cxxTokenChainDestroy(pOuter);
+
+			pChainToken->eType = CXXTokenTypeAttributeChain;
+		}
 	}
 
-	g_cxx.pTokenChain = pCurrentChain;
-	g_cxx.pToken = pCurrentChain->pTail;
+	g_cxx.pTokenChain = pTopChain;
+	g_cxx.pToken = pTopChain->pTail;
+
+
 
 	CXX_DEBUG_LEAVE();
 	return bRet;
