@@ -25,7 +25,9 @@ RST2PDF  = rst2pdf
 
 # rst2man had a bug about code-block:: handling.
 # https://sourceforge.net/p/docutils/patches/141
-RST2MAN_FLAGS = --syntax-highlight=none
+RST2MAN_FLAGS = $(shell if $(RST2MAN) --help | grep -q -e --syntax-highlight; then \
+				echo --syntax-highlight=none; \
+			fi)
 RST2HTML_FLAGS =
 RST2PDF_FLAGS =
 
