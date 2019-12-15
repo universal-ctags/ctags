@@ -78,7 +78,12 @@ cites := ${subst .,(,${addsuffix ),${man_pages}}}
 # ctags(1) tags(5) ...
 # => -e 's/\<ctags(1)/:ref:`& <&>`/g' -e 's/\<ctags(5)/:ref:`& <&>`/g' ...
 #
+is_gnu_sed := $(shell sed --version | grep -q GNU && echo 1)
+ifeq ($(is_gnu_sed),1)
 reppat := $(foreach m,$(cites),-e 's/\<$(m)/:ref:`& <&>`/g')
+else
+reppat := $(foreach m,$(cites),-e 's/[[:<:]]$(m)/:ref:`& <&>`/g')
+endif
 
 update-docs: $(doc_files)
 
