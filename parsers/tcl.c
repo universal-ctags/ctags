@@ -242,7 +242,7 @@ static void readToken0 (tokenInfo *const token, struct sTclParserState *pstate)
 		if (!escaped)
 		{
 			token->type = TOKEN_TCL_STRING;
-			vStringPut (token->string, c);
+			tokenPutc (token, c);
 			readString (token->string);
 			break;
 		}
@@ -259,20 +259,20 @@ static void readToken0 (tokenInfo *const token, struct sTclParserState *pstate)
 	case '$':
 		if (!escaped)
 		{
-			vStringPut (token->string, c);
+			tokenPutc (token, c);
 			token->type = TOKEN_TCL_VARIABLE;
 
 			int c0 = getcFromInputFile ();
 			if (c0 == EOF)
 				break;
 
-			vStringPut (token->string, c0);
+			tokenPutc (token, c0);
 			if (c0 == '{')
 			{
 
 				while ((c0 = getcFromInputFile ()) != EOF)
 				{
-					vStringPut (token->string, c0);
+					tokenPutc (token, c0);
 					if (c0 == '}')
 						break;
 				}
@@ -282,7 +282,7 @@ static void readToken0 (tokenInfo *const token, struct sTclParserState *pstate)
 			break;
 		}
 	default:
-			vStringPut (token->string, c);
+			tokenPutc (token, c);
 			readIdentifier (token->string);
 
 			token->keyword = resolveKeyword (token->string);
@@ -330,12 +330,12 @@ extern void skipToEndOfTclCmdline (tokenInfo *const token)
 
 static bool isAbsoluteIdentifier(tokenInfo *const token)
 {
-	return !strncmp (vStringValue (token->string), "::", 2);
+	return !strncmp (tokenString (token), "::", 2);
 }
 
 static const char* getLastComponentInIdentifier(tokenInfo *const token)
 {
-	const char* s = vStringValue (token->string);
+	const char* s = tokenString (token);
 	char *last = strrstr(s, "::");
 
 	if (last)
@@ -355,7 +355,7 @@ static void notifyPackageRequirement (tokenInfo *const token)
 		if (tclsub->packageRequirementNotify)
 		{
 			enterSubparser(sub);
-			tclsub->packageRequirementNotify (tclsub, vStringValue (token->string),
+			tclsub->packageRequirementNotify (tclsub, tokenString (token),
 											  TOKEN_PSTATE(token));
 			leaveSubparser();
 		}
@@ -373,7 +373,7 @@ static void notifyNamespaceImport (tokenInfo *const token)
 		if (tclsub->namespaceImportNotify)
 		{
 			enterSubparser(sub);
-			tclsub->namespaceImportNotify (tclsub, vStringValue (token->string),
+			tclsub->namespaceImportNotify (tclsub, tokenString (token),
 										   TOKEN_PSTATE(token));
 			leaveSubparser();
 		}
@@ -392,7 +392,7 @@ static int notifyCommand (tokenInfo *const token, unsigned int parent)
 		if (tclsub->commandNotify)
 		{
 			enterSubparser(sub);
-			r = tclsub->commandNotify (tclsub, vStringValue (token->string), parent,
+			r = tclsub->commandNotify (tclsub, tokenString (token), parent,
 									   TOKEN_PSTATE(token));
 			leaveSubparser();
 			if (r != CORK_NIL)
@@ -421,7 +421,7 @@ static void parseProc (tokenInfo *const token,
 			e.lineNumber = token->lineNumber;
 			e.filePosition = token->filePosition;
 
-			int len  = (last - vStringValue (token->string));
+			int len  = (last - tokenString (token));
 			vString *ns = vStringNew();
 			if (isAbsoluteIdentifier (token))
 			{
@@ -514,7 +514,7 @@ static void parseNamespace (tokenInfo *const token,
 			if (!tokenIsType (token, TCL_IDENTIFIER))
 				break;
 
-			if (vStringValue(token->string)[0] == '-')
+			if (tokenString(token)[0] == '-')
 				continue;
 
 			notifyNamespaceImport (token);
@@ -572,14 +572,14 @@ static void parsePackage (tokenInfo *const token)
 {
 	tokenRead (token);
 	if (tokenIsType (token, TCL_IDENTIFIER)
-		&& (strcmp (vStringValue (token->string), "require") == 0))
+		&& (strcmp (tokenString (token), "require") == 0))
 	{
 	next:
 		tokenRead (token);
 		if (tokenIsType (token, TCL_IDENTIFIER)
 			&& (vStringLength (token->string) > 0))
 		{
-			if (vStringValue(token->string)[0] == '-')
+			if (tokenString(token)[0] == '-')
 				goto next;
 
 			if (tokenIsType (token, TCL_IDENTIFIER)

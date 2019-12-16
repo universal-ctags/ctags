@@ -42,7 +42,7 @@ static void parseMethod (tokenInfo *token, int owner)
 	{
 		tagEntryInfo e;
 
-		initTagEntry(&e, vStringValue (token->string), K_METHOD);
+		initTagEntry(&e, tokenString (token), K_METHOD);
 		e.extensionFields.scopeIndex = owner;
 		makeTagEntry (&e);
 	}
@@ -83,7 +83,7 @@ static int parseClass (tclSubparser *s CTAGS_ATTR_UNUSED, int parentIndex,
 		{
 			tagEntryInfo e;
 
-			initTagEntry(&e, vStringValue (token->string), K_CLASS);
+			initTagEntry(&e, tokenString (token), K_CLASS);
 			e.extensionFields.scopeIndex = parentIndex;
 			r = makeTagEntry (&e);
 		}
