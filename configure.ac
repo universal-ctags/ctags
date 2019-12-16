@@ -271,6 +271,19 @@ AM_CONDITIONAL([RUN_OPTLIB2C], [test "${perl_found}" = "yes"])
 AC_PATH_PROGS(RST2MAN, [rst2man rst2man.py rst2man3 rst2man3.py], [no])
 AM_CONDITIONAL([HAVE_RST2MAN], [test "x$RST2MAN" != "xno"])
 
+RST2MAN_OPTIONS=
+if ! test "x$RST2MAN" = "xno"; then
+   RST2MAN_SUPPORTING_SYNTAX_HIGHLIGHT_OPTION=no
+   AC_MSG_CHECKING(whether rst2mn has --syntax-highlight option)
+   if $RST2MAN --help | grep -q -e --syntax-highlight; then
+      RST2MAN_SUPPORTING_SYNTAX_HIGHLIGHT_OPTION=yes
+      dnl See man/Makefile about the option
+      RST2MAN_OPTIONS=--syntax-highlight=none
+   fi
+   AC_MSG_RESULT($RST2MAN_SUPPORTING_SYNTAX_HIGHLIGHT_OPTION)
+fi
+AC_SUBST(RST2MAN_OPTIONS)
+
 # Checks for operating environment
 # --------------------------------
 in_git_repo=no
