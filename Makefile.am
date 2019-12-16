@@ -228,8 +228,6 @@ rst2man_verbose = $(rst2man_verbose_@AM_V@)
 rst2man_verbose_ = $(rst2man_verbose_@AM_DEFAULT_V@)
 rst2man_verbose_0 = @echo RST2MAN "   $@";
 SUFFIXES += .1.rst .1 .5.rst .5 .7.rst .7
-# See man/Makefile
-RST2MAN_OPTIONS=--syntax-highlight=none
 .1.rst.1:
 	$(rst2man_verbose)$(RST2MAN) $(RST2MAN_OPTIONS) $< $@
 .5.rst.5:
