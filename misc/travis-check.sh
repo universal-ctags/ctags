@@ -40,6 +40,11 @@ if [ "$TARGET" = "Unix" ]; then
             make -j2
             echo 'List features'
             ./ctags --list-features
+
+			echo 'Issue #2379'
+			./ctags --kinds-C++=f --kinds-GO=f --fields=n --recurse --sort=no -f /tmp/x123y456 ../main
+			head /tmp/x123y456
+
             echo 'Run "make check" with gcov'
             make check roundtrip TRAVIS=1
 			make dist
