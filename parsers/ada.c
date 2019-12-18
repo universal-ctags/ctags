@@ -227,7 +227,9 @@ typedef enum eAdaKeywords
   ADA_KEYWORD_IS,
   ADA_KEYWORD_LOOP,
   ADA_KEYWORD_NEW,
+  ADA_KEYWORD_NOT,
   ADA_KEYWORD_OR,
+  ADA_KEYWORD_OVERRIDING,		/* Ada 2005 */
   ADA_KEYWORD_PACKAGE,
   ADA_KEYWORD_PRAGMA,
   ADA_KEYWORD_PRIVATE,
@@ -270,7 +272,9 @@ static const char *AdaKeywords[] =
   "is",
   "loop",
   "new",
+  "not",
   "or",
+  "overriding",
   "package",
   "pragma",
   "private",
@@ -1722,6 +1726,12 @@ static adaTokenInfo *adaParse(adaParseMode mode, adaTokenInfo *parent)
           }
 
           skipWhiteSpace();
+        }
+        else if (adaKeywordCmp(ADA_KEYWORD_OVERRIDING)
+                 || adaKeywordCmp (ADA_KEYWORD_NOT))
+        {
+          /* Do nothing, just ignore these keywords. */
+          ;
         }
         else
         {
