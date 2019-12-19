@@ -3520,13 +3520,11 @@ struct preloadPathElt {
 
 static char* prependEnvvar (const char *path, const char* envvar)
 {
-	char *full_path = NULL;
-
 	const char* const envval = getenv (envvar);
-	if (envval)
-		full_path = combinePathAndFile(envval, path);
+	if (envval == NULL || strlen(envval) == 0)
+		return NULL;
 
-	return full_path;
+	return combinePathAndFile(envval, path);
 }
 
 #ifdef WIN32
