@@ -576,6 +576,7 @@ static const char *const StageDescription [] = {
 	[OptionLoadingStageDosCnf] = "DOS .cnf file",
 	[OptionLoadingStageEtc] = "file under /etc (e.g. ctags.conf)",
 	[OptionLoadingStageLocalEtc] = "file under /usr/local/etc (e.g. ctags.conf)",
+	[OptionLoadingStageXdg] = "file(s) under $XDG_CONFIG_HOME and $HOME/.config",
 	[OptionLoadingStageHomeRecursive] = "file(s) under $HOME",
 	[OptionLoadingStageCurrentRecursive] = "file(s) under the current directory",
 	[OptionLoadingStagePreload] = "optlib preload files",
@@ -3528,6 +3529,18 @@ static char* prependEnvvar (const char *path, const char* envvar)
 	return full_path;
 }
 
+#ifndef WIN32
+static char *getConfigForXDG (const char *path CTAGS_ATTR_UNUSED,
+							  const char* extra CTAGS_ATTR_UNUSED)
+{
+	char *r = prependEnvvar ("ctags", "XDG_CONFIG_HOME");
+	if (r)
+		return r;
+
+	return prependEnvvar (".config/ctags", "HOME");
+}
+#endif
+
 #ifdef WIN32
 static char *getConfigAtHomeOnWindows (const char *path,
 									   const char* extra CTAGS_ATTR_UNUSED)
@@ -3600,6 +3613,14 @@ static struct preloadPathElt preload_path_list [] = {
 		.isDirectory = false,
 		.makePath = NULL,
 		.stage = OptionLoadingStageCustom,
+	},
+#endif
+#ifndef WIN32
+	{
+		.path = NULL,
+		.isDirectory = true,
+		.makePath = getConfigForXDG,
+		.stage = OptionLoadingStageXdg,
 	},
 #endif
 	{

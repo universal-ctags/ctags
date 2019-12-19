@@ -1842,6 +1842,9 @@ TMPDIR
 FILES
 -----
 
+$XDG_CONFIG_HOME/ctags/\*.ctags, or $HOME/.config/ctags/\*.ctags if $XDG_CONFIG_HOME is not defeind
+(on other than MSWindows)
+
 $HOME/.ctags.d/\*.ctags
 
 $HOMEDRIVE$HOMEPATH/ctags.d/\*.ctags (on MSWindows only)
