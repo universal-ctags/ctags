@@ -76,6 +76,7 @@ typedef enum eOptionLoadingStage {
 	OptionLoadingStageDosCnf,
 	OptionLoadingStageEtc,
 	OptionLoadingStageLocalEtc,
+	OptionLoadingStageXdg,
 	OptionLoadingStageHomeRecursive,
 	OptionLoadingStageCurrentRecursive,
 	OptionLoadingStagePreload,

@@ -576,6 +576,7 @@ static const char *const StageDescription [] = {
 	[OptionLoadingStageDosCnf] = "DOS .cnf file",
 	[OptionLoadingStageEtc] = "file under /etc (e.g. ctags.conf)",
 	[OptionLoadingStageLocalEtc] = "file under /usr/local/etc (e.g. ctags.conf)",
+	[OptionLoadingStageXdg] = "file(s) under XDG_CONFIG_HOME",
 	[OptionLoadingStageHomeRecursive] = "file(s) under HOME",
 	[OptionLoadingStageCurrentRecursive] = "file(s) under the current directory",
 	[OptionLoadingStagePreload] = "optlib preload files",
@@ -3600,6 +3601,13 @@ static struct preloadPathElt preload_path_list [] = {
 		.stage = OptionLoadingStageCustom,
 	},
 #endif
+	{
+		.path = "ctags",
+		.isDirectory = true,
+		.makePath = prependEnvvar,
+		.extra = "XDG_CONFIG_HOME",
+		.stage = OptionLoadingStageXdg,
+	},
 	{
 		.path = ".ctags.d",
 		.isDirectory = true,
