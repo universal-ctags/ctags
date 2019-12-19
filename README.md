@@ -73,8 +73,8 @@ The most significant incompatible changes:
 
 * Universal-ctags doesn't load
 `~/.ctags` and `./.ctags` at starting up time. Instead, it loads
-`~/.ctags.d/*.ctags` and `./.ctags.d/*.ctags`. See the above web
-site and man pages
+`$XDG_CONFIG_HOME/ctags/*.ctags`, `~/.ctags.d/*.ctags` and
+`./.ctags.d/*.ctags`. See the above web site and man pages
 (man/ctags.1.rst.in and man/ctags-incompatibilities.7.in in the
 source tree).
 
