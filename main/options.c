@@ -3544,9 +3544,11 @@ static char *getConfigAtHomeOnWindows (const char *path,
 		vStringCatS (windowsHome, homeDrive);
 		vStringCatS (windowsHome, homePath);
 
-		char *tmp = combinePathAndFile (vStringValue(windowsHome), path);
-		vStringDelete (windowsHome);
+		char *tmp = vStringIsEmpty (windowsHome)
+			? NULL
+			: combinePathAndFile (vStringValue(windowsHome), path);
 
+		vStringDelete (windowsHome);
 		return tmp;
 	}
 	return NULL;
