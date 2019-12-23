@@ -3522,7 +3522,7 @@ static char* prependEnvvar (const char *path, const char* envvar)
 	char *full_path = NULL;
 
 	const char* const envval = getenv (envvar);
-	if (envval)
+	if (envval && strlen (envval))
 		full_path = combinePathAndFile(envval, path);
 
 	return full_path;
