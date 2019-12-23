@@ -1,6 +1,40 @@
 version: 2
 jobs:
   #
+  # This is for the latest RELEASED Fedora.
+  # Update the version of Fedora when new version is released.
+  # We don't use row hide, the development version of Fedora
+  # till the list of TODO items of u-ctags becomes nil.
+  #
+  # We assume GNU Make is available.
+  #
+   fedora31_gmake:
+     working_directory: ~/universal-ctags
+     docker:
+       - image: docker.io/fedora:31
+     steps:
+       - run:
+           name: Install Git
+           command: |
+             yum -y install git gdb
+       - checkout
+       - run:
+           name: Install build tools
+           command: |
+             dnf -y install gcc automake autoconf pkgconfig make libseccomp-devel libxml2-devel jansson-devel libyaml-devel findutils diffutils
+             dnf -y install jq puppet
+       - run:
+           name: Build
+           command: |
+             bash ./autogen.sh
+             ./configure --enable-debugging
+             make -j 2
+       - run:
+           name: Test
+           command: |
+             make check roundtrip CIRCLECI=1
+
+  #
   # On Fedora 31 bmake package cannot be installed because a package
   # required by bmake is not available. More inspection is needed.
   # Fedora 30 is the last version where bmake can be installed.
@@ -95,3 +129,4 @@ workflows:
       - fedora30_bmake
       - fedora_distcheck
       - centos_make
+      - fedora31_gmake
