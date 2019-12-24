@@ -4,5 +4,6 @@ CTAGS=$1
 
 exit_if_win32 "$CTAGS"
 
+# $XDG_CONFIG_HOME/ctags/*.ctags are loaded
 export XDG_CONFIG_HOME=./.config
 ${CTAGS}
