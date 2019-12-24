@@ -1,3 +1,6 @@
+# Copyright: 2019 itchyny
+# License: GPL-2
+
 CTAGS=$1
 
 . ../utils.sh
