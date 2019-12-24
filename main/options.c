@@ -3607,6 +3607,13 @@ static struct preloadPathElt preload_path_list [] = {
 		.stage = OptionLoadingStageXdg,
 	},
 	{
+		.path = ".config/ctags",
+		.isDirectory = true,
+		.makePath = prependEnvvar,
+		.extra = "HOME",
+		.stage = OptionLoadingStageXdg,
+	},
+	{
 		.path = ".ctags.d",
 		.isDirectory = true,
 		.makePath = prependEnvvar,

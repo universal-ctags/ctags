@@ -73,10 +73,10 @@ The most significant incompatible changes:
 
 * Universal-ctags doesn't load
 `~/.ctags` and `./.ctags` at starting up time. Instead, it loads
-`$XDG_CONFIG_HOME/ctags/*.ctags`, `~/.ctags.d/*.ctags` and
-`./.ctags.d/*.ctags`. See the above web site and man pages
-(man/ctags.1.rst.in and man/ctags-incompatibilities.7.in in the
-source tree).
+`$XDG_CONFIG_HOME/ctags/*.ctags`, `~/.config/ctags/*.ctags`,
+`~/.ctags.d/*.ctags` and `./.ctags.d/*.ctags`. See the above web site
+and man pages (man/ctags.1.rst.in and man/ctags-incompatibilities.7.in
+in the source tree).
 
 * Universal-ctags is more strict about characters that can be
   used in kind letters and kind names than Exuberant-ctags.

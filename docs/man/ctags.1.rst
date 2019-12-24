@@ -1844,6 +1844,8 @@ FILES
 
 $XDG_CONFIG_HOME/ctags/\*.ctags
 
+$HOME/.config/ctags/\*.ctags
+
 $HOME/.ctags.d/\*.ctags
 
 $HOMEDRIVE$HOMEPATH/ctags.d/\*.ctags (on MSWindows only)
