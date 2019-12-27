@@ -3561,7 +3561,7 @@ static void preload (struct preloadPathElt *pathList)
 	stringList* loaded;
 
 	loaded = stringListNew ();
-	for (i = 0; pathList[i].path != NULL; ++i)
+	for (i = 0; pathList[i].path != NULL || pathList[i].makePath != NULL; ++i)
 	{
 		struct preloadPathElt *elt = pathList + i;
 		preloadMakePathFunc maker = elt->makePath;
@@ -3630,7 +3630,10 @@ static struct preloadPathElt preload_path_list [] = {
 		.makePath = NULL,
 		.stage = OptionLoadingStageCurrentRecursive,
 	},
-	{ .path = NULL },
+	{
+		.path = NULL,
+		.makePath = NULL,
+	},
 };
 
 static void parseConfigurationFileOptions (void)
