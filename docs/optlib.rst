@@ -67,6 +67,7 @@ from Exuberant-ctags.
 At start-up time, Universal-ctags loads files having :file:`.ctags` as a
 file extension under the following statically defined directories:
 
+#. :file:`$XDG_CONFIG_HOME/ctags`, or :file:`$HOME/.config/ctags` if `$XDG_CONFIG_HOME` is not defined (on other than ``Windows``)
 #. :file:`$HOME/.ctags.d`
 #. :file:`$HOMEDRIVE$HOMEPATH/ctags.d` (in ``Windows``)
 #. :file:`.ctags.d`

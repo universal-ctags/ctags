@@ -714,14 +714,18 @@ extern char *combinePathAndFile (
 	const char *const path, const char *const file)
 {
 	vString *const filePath = vStringNew ();
-	const int lastChar = path [strlen (path) - 1];
-	bool terminated = isPathSeparator (lastChar);
+	size_t len = strlen (path);
 
-	vStringCopyS (filePath, path);
-	if (! terminated)
-		vStringPut (filePath, OUTPUT_PATH_SEPARATOR);
+	if (len)
+	{
+		const int lastChar = path [len - 1];
+		bool terminated = isPathSeparator (lastChar);
+		vStringCopyS (filePath, path);
+		if (! terminated)
+			vStringPut (filePath, OUTPUT_PATH_SEPARATOR);
+	}
+
 	vStringCatS (filePath, file);
-
 	return vStringDeleteUnwrap (filePath);
 }
 
