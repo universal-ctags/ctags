@@ -2,138 +2,138 @@
 #
 #
 #
-#LANGUAGE      KIND(L/N)         NAME                ENABLED DESCRIPTION
-Asm            s/section         placement           on      placement where the assembled code goes
-AutoIt         S/script          local               on      local include
-AutoIt         S/script          system              on      system include
-Automake       c/condition       branched            on      used for branching
-Automake       d/directory       data                on      directory for DATA primary
-Automake       d/directory       library             on      directory for LIBRARIES primary
-Automake       d/directory       ltlibrary           on      directory for LTLIBRARIES primary
-Automake       d/directory       man                 on      directory for MANS primary
-Automake       d/directory       program             on      directory for PROGRAMS primary
-Automake       d/directory       script              on      directory for SCRIPTS primary
-C              d/macro           undef               on      undefined
-C              h/header          local               on      local header
-C              h/header          system              on      system header
-C++            d/macro           undef               on      undefined
-C++            h/header          local               on      local header
-C++            h/header          system              on      system header
-CPreProcessor  d/macro           undef               on      undefined
-CPreProcessor  h/header          local               on      local header
-CPreProcessor  h/header          system              on      system header
-CUDA           d/macro           undef               on      undefined
-CUDA           h/header          local               on      local header
-CUDA           h/header          system              on      system header
-Cobol          S/sourcefile      copied              on      copied in source file
-DTD            e/element         attOwner            on      attributes owner
-DTD            p/parameterEntity condition           on      conditions
-DTD            p/parameterEntity elementName         on      element names
-DTD            p/parameterEntity partOfAttDef        on      part of attribute definition
-Elm            m/module          imported            on      imported module
-Flex           I/import          import              on      imports
-Go             p/package         imported            on      imported package
-Go             u/unknown         receiverType        on      receiver type
-HTML           C/stylesheet      extFile             on      referenced as external files
-HTML           J/script          extFile             on      referenced as external files
-HTML           c/class           attribute           on      assigned as attributes
-Java           p/package         imported            on      imported package
-LdScript       i/inputSection    discarded           on      discarded when linking
-LdScript       i/inputSection    mapped              on      mapped to output section
-LdScript       s/symbol          entrypoint          on      entry points
-M4             I/macrofile       included            on      included macro
-M4             I/macrofile       sincluded           on      silently included macro
-M4             d/macro           undef               on      undefined
-Make           I/makefile        included            on      included
-Make           I/makefile        optional            on      optionally included
-NSIS           i/script          included            on      included with !include
-Perl           M/module          unused              on      specified in `no' built-in function
-Perl           M/module          used                on      specified in `use' built-in function
-Python         i/module          imported            on      imported modules
-Python         i/module          indirectly-imported on      module imported in alternative name
-Python         i/module          namespace           on      namespace from where classes/variables/functions are imported
-Python         x/unknown         imported            on      imported from the other module
-Python         x/unknown         indirectly-imported on      classes/variables/functions/modules imported in alternative name
-RpmSpec        m/macro           undef               on      undefined
-Sh             h/heredoc         endmarker           on      end marker
-Sh             s/script          loaded              on      loaded
-SystemdUnit    u/unit            After               on      referred in After key
-SystemdUnit    u/unit            Before              on      referred in Before key
-SystemdUnit    u/unit            RequiredBy          on      referred in RequiredBy key
-SystemdUnit    u/unit            Requires            on      referred in Requires key
-SystemdUnit    u/unit            WantedBy            on      referred in WantedBy key
-SystemdUnit    u/unit            Wants               on      referred in Wants key
-Vera           d/macro           undef               on      undefined
-Vera           h/header          local               on      local header
-Vera           h/header          system              on      system header
+#LANGUAGE      KIND(L/N)         NAME               ENABLED DESCRIPTION
+Asm            s/section         placement          on      placement where the assembled code goes
+AutoIt         S/script          local              on      local include
+AutoIt         S/script          system             on      system include
+Automake       c/condition       branched           on      used for branching
+Automake       d/directory       data               on      directory for DATA primary
+Automake       d/directory       library            on      directory for LIBRARIES primary
+Automake       d/directory       ltlibrary          on      directory for LTLIBRARIES primary
+Automake       d/directory       man                on      directory for MANS primary
+Automake       d/directory       program            on      directory for PROGRAMS primary
+Automake       d/directory       script             on      directory for SCRIPTS primary
+C              d/macro           undef              on      undefined
+C              h/header          local              on      local header
+C              h/header          system             on      system header
+C++            d/macro           undef              on      undefined
+C++            h/header          local              on      local header
+C++            h/header          system             on      system header
+CPreProcessor  d/macro           undef              on      undefined
+CPreProcessor  h/header          local              on      local header
+CPreProcessor  h/header          system             on      system header
+CUDA           d/macro           undef              on      undefined
+CUDA           h/header          local              on      local header
+CUDA           h/header          system             on      system header
+Cobol          S/sourcefile      copied             on      copied in source file
+DTD            e/element         attOwner           on      attributes owner
+DTD            p/parameterEntity condition          on      conditions
+DTD            p/parameterEntity elementName        on      element names
+DTD            p/parameterEntity partOfAttDef       on      part of attribute definition
+Elm            m/module          imported           on      imported module
+Flex           I/import          import             on      imports
+Go             p/package         imported           on      imported package
+Go             u/unknown         receiverType       on      receiver type
+HTML           C/stylesheet      extFile            on      referenced as external files
+HTML           J/script          extFile            on      referenced as external files
+HTML           c/class           attribute          on      assigned as attributes
+Java           p/package         imported           on      imported package
+LdScript       i/inputSection    discarded          on      discarded when linking
+LdScript       i/inputSection    mapped             on      mapped to output section
+LdScript       s/symbol          entrypoint         on      entry points
+M4             I/macrofile       included           on      included macro
+M4             I/macrofile       sincluded          on      silently included macro
+M4             d/macro           undef              on      undefined
+Make           I/makefile        included           on      included
+Make           I/makefile        optional           on      optionally included
+NSIS           i/script          included           on      included with !include
+Perl           M/module          unused             on      specified in `no' built-in function
+Perl           M/module          used               on      specified in `use' built-in function
+Python         i/module          imported           on      imported modules
+Python         i/module          indirectlyImported on      module imported in alternative name
+Python         i/module          namespace          on      namespace from where classes/variables/functions are imported
+Python         x/unknown         imported           on      imported from the other module
+Python         x/unknown         indirectlyImported on      classes/variables/functions/modules imported in alternative name
+RpmSpec        m/macro           undef              on      undefined
+Sh             h/heredoc         endmarker          on      end marker
+Sh             s/script          loaded             on      loaded
+SystemdUnit    u/unit            After              on      referred in After key
+SystemdUnit    u/unit            Before             on      referred in Before key
+SystemdUnit    u/unit            RequiredBy         on      referred in RequiredBy key
+SystemdUnit    u/unit            Requires           on      referred in Requires key
+SystemdUnit    u/unit            WantedBy           on      referred in WantedBy key
+SystemdUnit    u/unit            Wants              on      referred in Wants key
+Vera           d/macro           undef              on      undefined
+Vera           h/header          local              on      local header
+Vera           h/header          system             on      system header
 
 #
 # all.*
 #
-#LANGUAGE      KIND(L/N)         NAME                ENABLED DESCRIPTION
-Asm            s/section         placement           on      placement where the assembled code goes
-AutoIt         S/script          local               on      local include
-AutoIt         S/script          system              on      system include
-Automake       c/condition       branched            on      used for branching
-Automake       d/directory       data                on      directory for DATA primary
-Automake       d/directory       library             on      directory for LIBRARIES primary
-Automake       d/directory       ltlibrary           on      directory for LTLIBRARIES primary
-Automake       d/directory       man                 on      directory for MANS primary
-Automake       d/directory       program             on      directory for PROGRAMS primary
-Automake       d/directory       script              on      directory for SCRIPTS primary
-C              d/macro           undef               on      undefined
-C              h/header          local               on      local header
-C              h/header          system              on      system header
-C++            d/macro           undef               on      undefined
-C++            h/header          local               on      local header
-C++            h/header          system              on      system header
-CPreProcessor  d/macro           undef               on      undefined
-CPreProcessor  h/header          local               on      local header
-CPreProcessor  h/header          system              on      system header
-CUDA           d/macro           undef               on      undefined
-CUDA           h/header          local               on      local header
-CUDA           h/header          system              on      system header
-Cobol          S/sourcefile      copied              on      copied in source file
-DTD            e/element         attOwner            on      attributes owner
-DTD            p/parameterEntity condition           on      conditions
-DTD            p/parameterEntity elementName         on      element names
-DTD            p/parameterEntity partOfAttDef        on      part of attribute definition
-Elm            m/module          imported            on      imported module
-Flex           I/import          import              on      imports
-Go             p/package         imported            on      imported package
-Go             u/unknown         receiverType        on      receiver type
-HTML           C/stylesheet      extFile             on      referenced as external files
-HTML           J/script          extFile             on      referenced as external files
-HTML           c/class           attribute           on      assigned as attributes
-Java           p/package         imported            on      imported package
-LdScript       i/inputSection    discarded           on      discarded when linking
-LdScript       i/inputSection    mapped              on      mapped to output section
-LdScript       s/symbol          entrypoint          on      entry points
-M4             I/macrofile       included            on      included macro
-M4             I/macrofile       sincluded           on      silently included macro
-M4             d/macro           undef               on      undefined
-Make           I/makefile        included            on      included
-Make           I/makefile        optional            on      optionally included
-NSIS           i/script          included            on      included with !include
-Perl           M/module          unused              on      specified in `no' built-in function
-Perl           M/module          used                on      specified in `use' built-in function
-Python         i/module          imported            on      imported modules
-Python         i/module          indirectly-imported on      module imported in alternative name
-Python         i/module          namespace           on      namespace from where classes/variables/functions are imported
-Python         x/unknown         imported            on      imported from the other module
-Python         x/unknown         indirectly-imported on      classes/variables/functions/modules imported in alternative name
-RpmSpec        m/macro           undef               on      undefined
-Sh             h/heredoc         endmarker           on      end marker
-Sh             s/script          loaded              on      loaded
-SystemdUnit    u/unit            After               on      referred in After key
-SystemdUnit    u/unit            Before              on      referred in Before key
-SystemdUnit    u/unit            RequiredBy          on      referred in RequiredBy key
-SystemdUnit    u/unit            Requires            on      referred in Requires key
-SystemdUnit    u/unit            WantedBy            on      referred in WantedBy key
-SystemdUnit    u/unit            Wants               on      referred in Wants key
-Vera           d/macro           undef               on      undefined
-Vera           h/header          local               on      local header
-Vera           h/header          system              on      system header
+#LANGUAGE      KIND(L/N)         NAME               ENABLED DESCRIPTION
+Asm            s/section         placement          on      placement where the assembled code goes
+AutoIt         S/script          local              on      local include
+AutoIt         S/script          system             on      system include
+Automake       c/condition       branched           on      used for branching
+Automake       d/directory       data               on      directory for DATA primary
+Automake       d/directory       library            on      directory for LIBRARIES primary
+Automake       d/directory       ltlibrary          on      directory for LTLIBRARIES primary
+Automake       d/directory       man                on      directory for MANS primary
+Automake       d/directory       program            on      directory for PROGRAMS primary
+Automake       d/directory       script             on      directory for SCRIPTS primary
+C              d/macro           undef              on      undefined
+C              h/header          local              on      local header
+C              h/header          system             on      system header
+C++            d/macro           undef              on      undefined
+C++            h/header          local              on      local header
+C++            h/header          system             on      system header
+CPreProcessor  d/macro           undef              on      undefined
+CPreProcessor  h/header          local              on      local header
+CPreProcessor  h/header          system             on      system header
+CUDA           d/macro           undef              on      undefined
+CUDA           h/header          local              on      local header
+CUDA           h/header          system             on      system header
+Cobol          S/sourcefile      copied             on      copied in source file
+DTD            e/element         attOwner           on      attributes owner
+DTD            p/parameterEntity condition          on      conditions
+DTD            p/parameterEntity elementName        on      element names
+DTD            p/parameterEntity partOfAttDef       on      part of attribute definition
+Elm            m/module          imported           on      imported module
+Flex           I/import          import             on      imports
+Go             p/package         imported           on      imported package
+Go             u/unknown         receiverType       on      receiver type
+HTML           C/stylesheet      extFile            on      referenced as external files
+HTML           J/script          extFile            on      referenced as external files
+HTML           c/class           attribute          on      assigned as attributes
+Java           p/package         imported           on      imported package
+LdScript       i/inputSection    discarded          on      discarded when linking
+LdScript       i/inputSection    mapped             on      mapped to output section
+LdScript       s/symbol          entrypoint         on      entry points
+M4             I/macrofile       included           on      included macro
+M4             I/macrofile       sincluded          on      silently included macro
+M4             d/macro           undef              on      undefined
+Make           I/makefile        included           on      included
+Make           I/makefile        optional           on      optionally included
+NSIS           i/script          included           on      included with !include
+Perl           M/module          unused             on      specified in `no' built-in function
+Perl           M/module          used               on      specified in `use' built-in function
+Python         i/module          imported           on      imported modules
+Python         i/module          indirectlyImported on      module imported in alternative name
+Python         i/module          namespace          on      namespace from where classes/variables/functions are imported
+Python         x/unknown         imported           on      imported from the other module
+Python         x/unknown         indirectlyImported on      classes/variables/functions/modules imported in alternative name
+RpmSpec        m/macro           undef              on      undefined
+Sh             h/heredoc         endmarker          on      end marker
+Sh             s/script          loaded             on      loaded
+SystemdUnit    u/unit            After              on      referred in After key
+SystemdUnit    u/unit            Before             on      referred in Before key
+SystemdUnit    u/unit            RequiredBy         on      referred in RequiredBy key
+SystemdUnit    u/unit            Requires           on      referred in Requires key
+SystemdUnit    u/unit            WantedBy           on      referred in WantedBy key
+SystemdUnit    u/unit            Wants              on      referred in Wants key
+Vera           d/macro           undef              on      undefined
+Vera           h/header          local              on      local header
+Vera           h/header          system             on      system header
 
 #
 # C.*
