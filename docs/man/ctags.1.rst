@@ -58,159 +58,6 @@ are interested in such features and ctags internals,
 visit https://docs.ctags.io/en/latest/.
 
 
-SOURCE FILES
-------------
-
-.. Q: it's strange to have a MAN page put this section here so early in the
-	man page, instead of having the "OPTION ITEMS" section be right after
-	the Description section, no? I mean the man page for most programs starts
-	with a very brief description of the program, then all the command-line
-	options, then later detailed background and descriptions like this section.
-
-Unless the ``--language-force`` option is specified, the language of each source
-file is automatically selected based upon a **mapping** of file names to
-languages. The mappings in effect for each language may be displayed using
-the ``--list-maps`` option and may be changed using the ``--langmap`` or
-``--map-<LANG>`` options.
-
-If the name of a file is not mapped to a language, ctags tries
-to heuristically guess the language for the file by inspecting its content. See
-"`Determining file language`_".
-
-All files that have no file name mapping and no guessed parser are
-ignored. This permits running ctags on all files in
-either a single directory (e.g.  "ctags \*"), or on
-all files in an entire source directory tree
-(e.g. "ctags -R"), since only those files whose
-names are mapped to languages will be scanned.
-
-The same extensions are mapped to multiple parsers. For example, ".h"
-are mapped to C++, C and ObjectiveC. These mappings can cause
-issues. ctags tries to select the proper parser
-for the source file by applying heuristics to its content, however
-it is not perfect.  In case of issues one can use ``--language-force=language``,
-``--langmap=map[,map[...]]``, or the ``--map-<LANG>=-pattern|extension``
-options. (Some of the heuristics are applied whether ``--guess-language-eagerly``
-is given or not.)
-
-.. options should be revised here
-	``--map-<LANG>`` (done)
-	``--langmap=map[,map[...]]`` (done)
-	``--language-force=language`` (done)
-	``--languages=[+|-]list`` (done)
-	``--list-maps[=language|all]`` (done)
-	``--list-map-extensions`` (done)
-	``--list-map-patterns`` (done)
-
-
-Determining file language
-~~~~~~~~~~~~~~~~~~~~~~~~~
-
-If ctags cannot select a parser from the mapping of file names,
-various heuristic tests are conducted to determine the language:
-
-template file name testing
-	If the file name has an ".in" extension, ctags applies
-	the mapping to the file name without the extension. For example,
-	"config.h" is tested for a file named "config.h.in".
-
-"interpreter" testing
-	The first line of the file is checked to see if the file is a "#!"
-	script for a recognized language.  ctags looks for
-	a parser having the same name.
-
-	If ctags finds no such parser,
-	ctags looks for the name in alias lists. For
-	example, consider if the first line is "#!/bin/sh".  Though
-	ctags has a "shell" parser, it doesn't have a "sh"
-	parser. However, "sh" is listed as an alias for "shell", therefore
-	ctags selects the "shell" parser for the file.
-
-	An exception is "env". If "env" is specified, ctags
-	reads more lines to find real interpreter specification.
-
-	To display the list of aliases, use ``--list-aliases`` option.
-	To add/remove an item to/from the list, use the
-	``--alias-<LANG>=[+|-]aliasPattern`` option.
-
-"zsh autoload tag" testing
-	If the first line starts with "#compdef" or "#autoload",
-	ctags regards the line as "zsh".
-
-"emacs mode at the first line" testing
-	The Emacs editor has multiple editing modes specialized for programming
-	languages. Emacs can recognize a marker called modeline in a file
-	and utilize the marker for the mode selection. This heuristic test does
-	the same as what Emacs does.
-
-	ctags treats *MODE* as a name of interpreter and applies the same
-	rule of "interpreter" testing if the first line has one of
-	the following patterns::
-
-		-*- mode: MODE -*-
-
-	or
-
-	::
-
-		-*- MODE -*-
-
-"emacs mode at the EOF" testing
-	Emacs editor recognizes another marker at the end of file as a
-	mode specifier. This heuristic test does the same as what Emacs does.
-
-	ctags treats *MODE* as a name of an interpreter and applies the same
-	rule of "interpreter" heuristic testing, if the lines at the tail of the file
-	have the following pattern::
-
-		Local Variables:
-		...
-		mode: MODE
-		...
-		End:
-
-	3000 characters are sought from the end of file to find the pattern.
-
-"vim modeline" testing
-	Like the modeline of the Emacs editor, Vim editor has the same concept.
-	ctags treats *TYPE* as a name of interpreter and applies the same
-	rule of "interpreter" heuristic testing if the last 5 lines of the file
-	have one of the following patterns::
-
-		filetype=TYPE
-
-	or
-
-	::
-
-		ft=TYPE
-
-"PHP marker" testing
-	If the first line is started with "<?php",
-	ctags regards the line as "php".
-
-Looking into the file contents is a more expensive operation than file
-name matching. So ctags runs the testings in limited
-conditions.  "interpreter" testing is enabled only when a file is an
-executable or the ``--guess-language-eagerly`` (``-G`` in short) option is
-given. The other heuristic tests are enabled only when ``-G`` option is
-given.
-
-The ``--print-language`` option can be used just to print the results of
-parser selections for given files instead of generating a tags file.
-
-Examples:
-
-.. code-block:: console
-
-	$ ctags --print-language config.h.in input.m input.unknown
-	config.h.in: C++
-	input.m: MatLab
-	input.unknown: NONE
-
-``NONE`` means that ctags does not select any parser for the file.
-
-
 TAG ENTRIES
 -----------
 
@@ -480,7 +327,7 @@ are not listed here. They are experimental or for debugging purpose.
 	current list. See, also, the ``--file-scope`` option. The default list is
 	".h.H.hh.hpp.hxx.h++.inc.def". To restore the default list, specify ``-h``
 	default. Note that if an extension supplied to this option is not
-	already mapped to a particular language (see "`SOURCE FILES`_", above),
+	already mapped to a particular language (see "`Determining file language`_", above),
 	you will also need to use either the ``--langmap`` or ``--language-force`` option.
 
 ``-I identifier-list``
@@ -1049,7 +896,7 @@ are not listed here. They are experimental or for debugging purpose.
 ``--language-force=language``
 	By default, ctags automatically selects the language
 	of a source file, ignoring those files whose language cannot be
-	determined (see "`SOURCE FILES`_", above). This option forces the specified
+	determined (see "`Determining file language`_", above). This option forces the specified
 	*language* (case-insensitive; either built-in or user-defined) to be used
 	for every supplied file instead of automatically selecting the language
 	based upon its extension. In addition, the special value "auto" indicates
@@ -1318,12 +1165,12 @@ are not listed here. They are experimental or for debugging purpose.
 	Lists file name patterns and the file extensions which associate a file
 	name with a language for either the specified *language* or **all**
 	languages, and then exits. See the ``--langmap`` option, and
-	"`SOURCE FILES`_", above.
+	"`Determining file language`_", above.
 	**all** is used as default value if the option argument is omitted.
 
 	To list the file extensions or file name patterns individually, use
 	``--list-map-extensions`` or ``--list-map-patterns`` option.
-	See the ``--langmap`` option, and "`SOURCE FILES`_", above.
+	See the ``--langmap`` option, and "`Determining file language`_", above.
 
 	This option does not work with ``--machinable`` nor
 	``--with-list-header``.
@@ -1566,15 +1413,9 @@ are not listed here. They are experimental or for debugging purpose.
 
 OPERATIONAL DETAILS
 -------------------
-As ctags considers each file name in turn, it tries to
-determine the language of the file by applying the following three tests
-in order: if the file extension has been mapped to a language, if the
-filename matches a shell pattern mapped to a language, and finally if the
-file is executable and its first line specifies an interpreter using the
-Unix-style "#!" specification (if supported on the platform). Additionally,
-if the ``--guess-language-eagerly`` option is given, heuristic testing is
-also performed to determine if a language parser applies. (See
-"`Determining file language`_")
+As ctags considers each source file name in turn, it tries to
+determine the language of the file by applying tests described in
+"`Determining file language`_".
 
 If a language was identified, the file is opened and then the appropriate
 language parser is called to operate on the currently open file. The parser
@@ -1633,6 +1474,155 @@ name in the tag file will always be preceded by the string "operator "
 
 After creating or appending to the tag file, it is sorted by the tag name,
 removing identical tag lines.
+
+
+Determining file language
+--------------------------
+
+File name mapping
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Unless the ``--language-force`` option is specified, the language of each source
+file is automatically selected based upon a **mapping** of file names to
+languages. The mappings in effect for each language may be displayed using
+the ``--list-maps`` option and may be changed using the ``--langmap`` or
+``--map-<LANG>`` options.
+
+If the name of a file is not mapped to a language, ctags tries
+to heuristically guess the language for the file by inspecting its content. See
+"`Determining file language`_".
+
+All files that have no file name mapping and no guessed parser are
+ignored. This permits running ctags on all files in
+either a single directory (e.g.  "ctags \*"), or on
+all files in an entire source directory tree
+(e.g. "ctags -R"), since only those files whose
+names are mapped to languages will be scanned.
+
+The same extensions are mapped to multiple parsers. For example, ".h"
+are mapped to C++, C and ObjectiveC. These mappings can cause
+issues. ctags tries to select the proper parser
+for the source file by applying heuristics to its content, however
+it is not perfect.  In case of issues one can use ``--language-force=language``,
+``--langmap=map[,map[...]]``, or the ``--map-<LANG>=-pattern|extension``
+options. (Some of the heuristics are applied whether ``--guess-language-eagerly``
+is given or not.)
+
+.. options should be revised here
+	``--map-<LANG>`` (done)
+	``--langmap=map[,map[...]]`` (done)
+	``--language-force=language`` (done)
+	``--languages=[+|-]list`` (done)
+	``--list-maps[=language|all]`` (done)
+	``--list-map-extensions`` (done)
+	``--list-map-patterns`` (done)
+
+Heuristically guessing
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If ctags cannot select a parser from the mapping of file names,
+various heuristic tests are conducted to determine the language:
+
+template file name testing
+	If the file name has an ".in" extension, ctags applies
+	the mapping to the file name without the extension. For example,
+	"config.h" is tested for a file named "config.h.in".
+
+"interpreter" testing
+	The first line of the file is checked to see if the file is a "#!"
+	script for a recognized language. ctags looks for
+	a parser having the same name.
+
+	If ctags finds no such parser,
+	ctags looks for the name in alias lists. For
+	example, consider if the first line is "#!/bin/sh".  Though
+	ctags has a "shell" parser, it doesn't have a "sh"
+	parser. However, "sh" is listed as an alias for "shell", therefore
+	ctags selects the "shell" parser for the file.
+
+	An exception is "env". If "env" is specified, ctags
+	reads more lines to find real interpreter specification.
+
+	To display the list of aliases, use ``--list-aliases`` option.
+	To add/remove an item to/from the list, use the
+	``--alias-<LANG>=[+|-]aliasPattern`` option.
+
+"zsh autoload tag" testing
+	If the first line starts with "#compdef" or "#autoload",
+	ctags regards the line as "zsh".
+
+"emacs mode at the first line" testing
+	The Emacs editor has multiple editing modes specialized for programming
+	languages. Emacs can recognize a marker called modeline in a file
+	and utilize the marker for the mode selection. This heuristic test does
+	the same as what Emacs does.
+
+	ctags treats *MODE* as a name of interpreter and applies the same
+	rule of "interpreter" testing if the first line has one of
+	the following patterns::
+
+		-*- mode: MODE -*-
+
+	or
+
+	::
+
+		-*- MODE -*-
+
+"emacs mode at the EOF" testing
+	Emacs editor recognizes another marker at the end of file as a
+	mode specifier. This heuristic test does the same as what Emacs does.
+
+	ctags treats *MODE* as a name of an interpreter and applies the same
+	rule of "interpreter" heuristic testing, if the lines at the tail of the file
+	have the following pattern::
+
+		Local Variables:
+		...
+		mode: MODE
+		...
+		End:
+
+	3000 characters are sought from the end of file to find the pattern.
+
+"vim modeline" testing
+	Like the modeline of the Emacs editor, Vim editor has the same concept.
+	ctags treats *TYPE* as a name of interpreter and applies the same
+	rule of "interpreter" heuristic testing if the last 5 lines of the file
+	have one of the following patterns::
+
+		filetype=TYPE
+
+	or
+
+	::
+
+		ft=TYPE
+
+"PHP marker" testing
+	If the first line is started with "<?php",
+	ctags regards the line as "php".
+
+Looking into the file contents is a more expensive operation than file
+name matching. So ctags runs the testings in limited
+conditions.  "interpreter" testing is enabled only when a file is an
+executable or the ``--guess-language-eagerly`` (``-G`` in short) option is
+given. The other heuristic tests are enabled only when ``-G`` option is
+given.
+
+The ``--print-language`` option can be used just to print the results of
+parser selections for given files instead of generating a tags file.
+
+Examples:
+
+.. code-block:: console
+
+	$ ctags --print-language config.h.in input.m input.unknown
+	config.h.in: C++
+	input.m: MatLab
+	input.unknown: NONE
+
+``NONE`` means that ctags does not select any parser for the file.
 
 
 TAG FILE FORMAT
