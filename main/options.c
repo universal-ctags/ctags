@@ -2199,7 +2199,8 @@ static void processListRolesOptions (const char *const option CTAGS_ATTR_UNUSED,
 
 	kindspecs = sep + 1;
 	if (strncmp (parameter, "all.", 4) == 0
-	    || strncmp (parameter, "*.", 1) == 0
+		/* Handle the case if no language is specified.
+		 * This case is not documented. */
 	    || strncmp (parameter, ".", 1) == 0)
 		lang = LANG_AUTO;
 	else
