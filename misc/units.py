@@ -960,6 +960,13 @@ def tmain_compare(subdir, build_subdir, aspect, file):
     if os.path.isfile(actual) and os.path.isfile(expected) and \
             filecmp.cmp(actual, expected):
         run_result('ok', msg, None, file=file)
+        # When successful, remove files generated in the last
+        # failure to make the directory clean.
+        # Unlike other generated files like gdb-backtrace.txt
+        # misc/review script looks at the -diff.txt file.
+        # Therefore we handle -diff.txt specially here.
+        if os.path.isfile(generated):
+            os.remove(generated)
         return True
     else:
         with open(generated, 'wb') as f:
