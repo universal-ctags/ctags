@@ -12,6 +12,7 @@
 
 #include "general.h"
 
+#include <ctype.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -82,6 +83,11 @@ extern void enableKind (kindDefinition *kind, bool enable)
 
 static void initRoleObject (roleObject *robj, roleDefinition *rdef, freeRoleDefFunc freefunc, int roleId)
 {
+#ifdef DEBUG
+	size_t len = strlen (rdef->name);
+	for (int i = 0; i < len; i++)
+		Assert (isalnum (rdef->name [i]));
+#endif
 	robj->def = rdef;
 	robj->free = freefunc;
 	robj->def->id = roleId;
