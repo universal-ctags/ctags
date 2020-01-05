@@ -35,6 +35,7 @@ typedef enum {
 	K_SECTION,
 	K_SUBSECTION,
 	K_SUBSUBSECTION,
+	K_CITATION,
 	K_TARGET,
 	SECTION_COUNT
 } rstKind;
@@ -44,6 +45,7 @@ static kindDefinition RstKinds[] = {
 	{ true, 's', "section",       "sections" },
 	{ true, 'S', "subsection",    "subsections" },
 	{ true, 't', "subsubsection", "subsubsections" },
+	{ true, 'C', "citation",      "citations"},
 	{ true, 'T', "target",        "targets" },
 };
 
@@ -98,11 +100,11 @@ static NestingLevel *getNestingLevel(const int kind)
 	return nl;
 }
 
-static int makeTargetRstTag(const vString* const name)
+static int makeTargetRstTag(const vString* const name, rstKind kindex)
 {
 	tagEntryInfo e;
 
-	initTagEntry (&e, vStringValue (name), K_TARGET);
+	initTagEntry (&e, vStringValue (name), kindex);
 
 	const NestingLevel *nl = nestingLevelsGetCurrent(nestingLevels);
 	tagEntryInfo *parent = NULL;
@@ -233,15 +235,15 @@ static int utf8_strlen(const char *buf, int buf_len)
 }
 
 
-static const unsigned char *is_target_line (const unsigned char *line)
+static const unsigned char *is_markup_line (const unsigned char *line, char reftype)
 {
 	if ((line [0] == '.') && (line [1] == '.') && (line [2] == ' ')
-		&& (line [3] == '_'))
+		&& (line [3] == reftype))
 		return line + 4;
 	return NULL;
 }
 
-static int capture_target (const unsigned char *target_line)
+static int capture_markup (const unsigned char *target_line, char defaultTerminator, rstKind kindex)
 {
 	vString *name = vStringNew ();
 	unsigned char terminator;
@@ -258,7 +260,7 @@ static int capture_target (const unsigned char *target_line)
 		 * -- http://docutils.sourceforge.net/docs/ref/rst/restructuredtext.html#reference-names
 		 */
 		vStringPut (name, *target_line);
-		terminator = ':';
+		terminator = defaultTerminator;
 	}
 	else
 		goto out;
@@ -292,7 +294,7 @@ static int capture_target (const unsigned char *target_line)
 	if (vStringLength (name) == 0)
 		goto out;
 
-	r = makeTargetRstTag (name);
+	r = makeTargetRstTag (name, kindex);
 
  out:
 	vStringDelete (name);
@@ -305,7 +307,7 @@ static void findRstTags (void)
 	vString *name = vStringNew ();
 	MIOPos filepos;
 	const unsigned char *line;
-	const unsigned char *target_line;
+	const unsigned char *markup_line;
 
 	memset(&filepos, 0, sizeof(filepos));
 	memset(kindchars, 0, sizeof kindchars);
@@ -313,12 +315,23 @@ static void findRstTags (void)
 
 	while ((line = readLineFromInputFile ()) != NULL)
 	{
-		/* Handle .. _target:
-		 * http://docutils.sourceforge.net/docs/ref/rst/restructuredtext.html#hyperlink-targets
-		 */
-		if ((target_line = is_target_line (line)) != NULL)
+		if ((markup_line = is_markup_line (line, '_')) != NULL)
 		{
-			if (capture_target (target_line) != CORK_NIL)
+			/* Handle .. _target:
+			 * http://docutils.sourceforge.net/docs/ref/rst/restructuredtext.html#hyperlink-targets
+			 */
+			if (capture_markup (markup_line, ':', K_TARGET) != CORK_NIL)
+			{
+				vStringClear (name);
+				continue;
+			}
+		}
+		else if ((markup_line = is_markup_line (line, '[')) != NULL)
+		{
+			/* Handle .. [citation]
+			 * https://docutils.sourceforge.io/docs/ref/rst/restructuredtext.html#citations
+			 */
+			if (capture_markup (markup_line, ']', K_CITATION) != CORK_NIL)
 			{
 				vStringClear (name);
 				continue;
