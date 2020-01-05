@@ -98,7 +98,7 @@ typedef enum {
  * ==========================
  * import X              X = (kind:module, role:imported)
  *
- * import X as Y         X = (kind:module, role:indirectly-imported),
+ * import X as Y         X = (kind:module, role:indirectlyImported),
  *                       Y = (kind:namespace, [nameref:X])
  *                       ------------------------------------------------
  *                       Don't confuse with namespace role of module kind.
@@ -109,7 +109,7 @@ typedef enum {
  *                       Y = (kind:unknown, role:imported, [scope:X])
  *
  * from X import Y as Z  X = (kind:module,  role:namespace),
- *                       Y = (kind:unknown, role:indirectly-imported, [scope:X])
+ *                       Y = (kind:unknown, role:indirectlyImported, [scope:X])
  *                       Z = (kind:unknown, [nameref:X.Y]) */
 
 static roleDefinition PythonModuleRoles [] = {
@@ -117,13 +117,13 @@ static roleDefinition PythonModuleRoles [] = {
 	  "imported modules" },
 	{ true, "namespace",
 	  "namespace from where classes/variables/functions are imported" },
-	{ true, "indirectly-imported",
+	{ true, "indirectlyImported",
 	  "module imported in alternative name" },
 };
 
 static roleDefinition PythonUnknownRoles [] = {
 	{ true, "imported",   "imported from the other module" },
-	{ true, "indirectly-imported",
+	{ true, "indirectlyImported",
 	  "classes/variables/functions/modules imported in alternative name" },
 };
 
@@ -990,7 +990,7 @@ static bool parseImport (tokenInfo *const token)
 							/* from x import Y as Z
 							 * ----------------------------
 							 * x = (kind:module,  role:namespace),
-							 * Y = (kind:unknown, role:indirectly-imported),
+							 * Y = (kind:unknown, role:indirectlyImported),
 							 * Z = (kind:unknown) */
 
 							/* Y */
@@ -1015,7 +1015,7 @@ static bool parseImport (tokenInfo *const token)
 						{
 							/* import x as Y
 							 * ----------------------------
-							 * X = (kind:module, role:indirectly-imported)
+							 * X = (kind:module, role:indirectlyImported)
 							 * Y = (kind:namespace)*/
 							/* X */
 							makeSimplePythonRefTag (name, NULL, K_MODULE,

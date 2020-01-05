@@ -12,6 +12,7 @@
 
 #include "general.h"
 
+#include <ctype.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -80,6 +81,18 @@ extern void enableKind (kindDefinition *kind, bool enable)
 	}
 }
 
+static void initRoleObject (roleObject *robj, roleDefinition *rdef, freeRoleDefFunc freefunc, int roleId)
+{
+#ifdef DEBUG
+	size_t len = strlen (rdef->name);
+	for (int i = 0; i < len; i++)
+		Assert (isalnum (rdef->name [i]));
+#endif
+	robj->def = rdef;
+	robj->free = freefunc;
+	robj->def->id = roleId;
+}
+
 static struct roleControlBlock* allocRoleControlBlock (kindObject *kind)
 {
 	unsigned int j;
@@ -90,12 +103,7 @@ static struct roleControlBlock* allocRoleControlBlock (kindObject *kind)
 	rcb->owner = kind->def->id;
 	rcb->role = xMalloc(rcb->count, roleObject);
 	for (j = 0; j < rcb->count; j++)
-	{
-		roleObject *role = rcb->role + j;
-		role->def = kind->def->roles + j;
-		role->free = NULL;
-		role->def->id = j;
-	}
+		initRoleObject (rcb->role + j, kind->def->roles + j, NULL, j);
 
 	return rcb;
 }
@@ -189,7 +197,6 @@ extern int defineRole (struct kindControlBlock* kcb, int kindIndex,
 {
 	struct roleControlBlock *rcb = kcb->kind[kindIndex].rcb;
 	int roleIndex = rcb->count++;
-	roleObject *role;
 
 	if (roleIndex == ROLE_MAX_COUNT)
 	{
@@ -201,10 +208,8 @@ extern int defineRole (struct kindControlBlock* kcb, int kindIndex,
 	}
 
 	rcb->role = xRealloc (rcb->role, rcb->count, roleObject);
-	role = rcb->role + roleIndex;
-	role->def = def;
-	role->free = freeRoleDef;
-	role->def->id = roleIndex;
+	initRoleObject (rcb->role + roleIndex, def, freeRoleDef, roleIndex);
+
 	return roleIndex;
 }
 
