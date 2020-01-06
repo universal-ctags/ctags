@@ -478,7 +478,7 @@ static flagDefinition prePtrnFlagDef[] = {
 static void scope_ptrn_flag_eval (const char* const f  CTAGS_ATTR_UNUSED,
 				  const char* const v, void* data)
 {
-	unsigned long *bfields = data;
+	unsigned int *bfields = data;
 
 	if (strcmp (v, "ref") == 0)
 		*bfields |= SCOPE_REF;
@@ -497,7 +497,7 @@ static void scope_ptrn_flag_eval (const char* const f  CTAGS_ATTR_UNUSED,
 static void placeholder_ptrn_flag_eval (const char* const f  CTAGS_ATTR_UNUSED,
 				     const char* const v  CTAGS_ATTR_UNUSED, void* data)
 {
-	unsigned long *bfields = data;
+	unsigned int *bfields = data;
 	*bfields |= SCOPE_PLACEHOLDER;
 }
 
