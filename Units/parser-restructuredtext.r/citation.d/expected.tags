@@ -1,0 +1,6 @@
+KVM VCPU Requests	input.rst	/^KVM VCPU Requests$/;"	c
+VCPU Request Internals	input.rst	/^VCPU Request Internals$/;"	c
+References	input.rst	/^References$/;"	c
+atomic-ops	input.rst	/^.. [atomic-ops] Documentation\/core-api\/atomic_ops.rst$/;"	C	chapter:References
+memory-barriers	input.rst	/^.. [memory-barriers] Documentation\/memory-barriers.txt$/;"	C	chapter:References
+lwn-mb	input.rst	/^.. [lwn-mb] https:\/\/lwn.net\/Articles\/573436\/$/;"	C	chapter:References
