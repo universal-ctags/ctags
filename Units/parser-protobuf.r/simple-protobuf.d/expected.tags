@@ -15,3 +15,4 @@ field6	input.proto	/^    required .TestPackage.Message2.Enum1 field6 = 6;$/;"	ki
 field7	input.proto	/^    optional Message2 . NestedMessage field7 = 7;$/;"	kind:field
 field8	input.proto	/^    repeated int32 field8 = 8 [packed=true];$/;"	kind:field
 Service1	input.proto	/^service Service1 {$/;"	kind:service
+Method1	input.proto	/^    rpc Method1(Message1) returns(Message2);$/;"	kind:rpc	typeref:typename:Message2	signature:Message1

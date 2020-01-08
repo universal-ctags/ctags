@@ -79,7 +79,7 @@ static kindDefinition ProtobufKinds [] = {
 	{ true,  'e', "enumerator", "enum constants" },
 	{ true,  'g', "enum",       "enum types" },
 	{ true,  's', "service",    "services" },
-	{ false, 'r', "rpc",        "RPC methods" }
+	{ true, 'r', "rpc",         "RPC methods" }
 };
 
 typedef enum eKeywordId {
@@ -92,6 +92,8 @@ typedef enum eKeywordId {
 	KEYWORD_REQUIRED,
 	KEYWORD_SERVICE,
 	KEYWORD_RPC,
+	KEYWORD_STREAM,
+	KEYWORD_RETURNS,
 } keywordId;
 
 static const keywordTable ProtobufKeywordTable [] = {
@@ -104,6 +106,8 @@ static const keywordTable ProtobufKeywordTable [] = {
 	{ "required", KEYWORD_REQUIRED },
 	{ "service",  KEYWORD_SERVICE  },
 	{ "rpc",      KEYWORD_RPC      },
+	{ "stream",   KEYWORD_STREAM   },
+	{ "returns",  KEYWORD_RETURNS  },
 };
 
 #define TOKEN_EOF   0
@@ -161,15 +165,18 @@ static int tokenIsKeyword(keywordId keyword)
 	return token.type == TOKEN_ID && token.keyword == keyword;
 }
 
-static void createProtobufTag (const vString *name, int kind)
+static int createProtobufTag (const vString *name, int kind)
 {
 	static tagEntryInfo tag;
+	int corkIndex = CORK_NIL;
 
 	if (ProtobufKinds [kind].enabled)
 	{
 		initTagEntry (&tag, vStringValue (name), kind);
-		makeTagEntry (&tag);
+		corkIndex = makeTagEntry (&tag);
 	}
+
+	return corkIndex;
 }
 
 static void parseEnumConstants (void)
@@ -194,6 +201,51 @@ static void parseEnumConstants (void)
 	}
 }
 
+#define gatherTypeinfo(VSTRING,CONDITION)			\
+	while (CONDITION)								\
+	{												\
+		if (token.type == TOKEN_ID)					\
+			vStringCat (VSTRING, token.value);		\
+		else if (tokenIsKeyword (KEYWORD_STREAM))	\
+		{											\
+			vStringCat (VSTRING, token.value);		\
+			vStringPut (VSTRING, ' ');				\
+		}											\
+		else										\
+			vStringPut (VSTRING, token.type);		\
+		nextToken ();								\
+	}
+
+static void parseRPCTypeinfos (int corkIndex)
+{
+	tagEntryInfo *e = getEntryInCorkQueue (corkIndex);
+
+	vString *signature = vStringNew ();
+	gatherTypeinfo(signature,
+				   (token.type != TOKEN_EOF
+					&& token.type != '{' && token.type != ';'
+					&& !tokenIsKeyword (KEYWORD_RETURNS)));
+	if (!vStringIsEmpty(signature))
+		e->extensionFields.signature = vStringDeleteUnwrap (signature);
+	else
+		vStringDelete (signature);
+
+	if (!tokenIsKeyword (KEYWORD_RETURNS))
+		return;
+	nextToken ();
+
+	vString *typeref = vStringNew ();
+	gatherTypeinfo(typeref, (token.type != EOF
+							 && token.type != '{' && token.type != ';'));
+	if (!vStringIsEmpty(typeref))
+	{
+		e->extensionFields.typeRef [0] = eStrdup ("typename"); /* As C++ parser does */
+		e->extensionFields.typeRef [1] = vStringDeleteUnwrap (typeref);
+	}
+	else
+		vStringDelete (typeref);
+}
+
 static void parseStatement (int kind)
 {
 	nextToken ();
@@ -214,8 +266,11 @@ static void parseStatement (int kind)
 	if (token.type != TOKEN_ID)
 		return;
 
-	createProtobufTag (token.value, kind);
+	int corkIndex = createProtobufTag (token.value, kind);
 	nextToken ();
+
+	if (kind == PK_RPC && corkIndex != CORK_NIL)
+		parseRPCTypeinfos (corkIndex);
 
 	if (kind == PK_ENUM)
 		parseEnumConstants ();
