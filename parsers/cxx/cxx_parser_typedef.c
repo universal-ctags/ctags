@@ -320,7 +320,43 @@ skip_to_comma_or_end:
 				{
 					// Nasty "typedef blah foo(baz)" case.
 					t = pFirstParenthesis->pPrev;
-					pTParentChain = pChain;
+
+					// Let's have a consistent typeref too. We correct user
+					// input so it becomes "typedef blah (foo)(baz)".
+
+					pTParentChain = cxxTokenChainCreate();
+
+					CXXToken * par = cxxTokenCreate();
+					par->eType = CXXTokenTypeOpeningParenthesis;
+					par->iLineNumber = t->iLineNumber;
+					par->oFilePosition = t->oFilePosition;
+					vStringPut(par->pszWord,'(');
+					par->pChain = NULL;
+					cxxTokenChainAppend(pTParentChain,par);
+
+					par = cxxTokenCreate();
+					par->eType = CXXTokenTypeIdentifier;
+					par->iLineNumber = t->iLineNumber;
+					par->oFilePosition = t->oFilePosition;
+					vStringCopy(par->pszWord,t->pszWord);
+					par->pChain = NULL;
+					cxxTokenChainAppend(pTParentChain,par);
+
+					t->eType = CXXTokenTypeParenthesisChain;
+					t->pChain = pTParentChain;
+					vStringClear(t->pszWord);
+
+					pFirstParenthesis = t;
+					t = par;
+
+					par = cxxTokenCreate();
+					par->eType = CXXTokenTypeClosingParenthesis;
+					par->iLineNumber = t->iLineNumber;
+					par->oFilePosition = t->oFilePosition;
+					vStringPut(par->pszWord,')');
+					par->pChain = NULL;
+					cxxTokenChainAppend(pTParentChain,par);
+
 				} else {
 					CXX_DEBUG_LEAVE_TEXT("Parenthesis but no identifier: no clue");
 					return;
