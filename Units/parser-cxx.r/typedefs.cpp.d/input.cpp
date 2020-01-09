@@ -34,6 +34,10 @@ typedef AClass (T307)(int);
 typedef enum AEnum (T308)(int);
 typedef int T309(int);
 typedef int T310(AUnion *);
+#if 0
+	// broken input (to make coveralls happy)
+	typedef int int(int);
+#endif
 
 // arrays
 typedef int T401 [ 10];
