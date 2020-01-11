@@ -107,6 +107,9 @@ bool cxxParserParseGenericTypedef(void)
 //    [typedef] int (x)(void)
 //        x = int ()(void) <--- function type (not a pointer!)
 //
+//    [typedef] int x(void)
+//        x = int ()(void) <--- still function type
+//
 //    [typedef] int (MACRO *x)(void);
 //        x = int (MACRO *)(void) <--- function pointer
 //    (WINAPI is an example of MACRO.)
@@ -275,16 +278,90 @@ skip_to_comma_or_end:
 			pTParentChain = pChain;
 		} else if(pFirstParenthesis)
 		{
-			// look for the last nested identifier in here
-			// e.g.
-			// typedef void (WINAPI *func_t) (void);
-			// We expect func_t we want to capture is at the end of parenthesis chain.
 			CXX_DEBUG_PRINT("Identifier not at end, but got parenthesis chain");
-			t = cxxTokenChainLastPossiblyNestedTokenOfType(
-					pFirstParenthesis->pChain,
-					CXXTokenTypeIdentifier,
-					&pTParentChain
-				);
+			//
+			// Possibly function pointer or function type definition.
+			//
+			//    typedef blah (*(foo))(baz)
+			//    typedef blah (*foo)(baz)
+			//    typedef blah (*foo)[...]
+			//    typedef blah (foo)(baz)
+			//    typedef blah ((foo))(baz)
+			//    typedef blah foo(baz)
+			//
+			// So we have two cases: either there are at least two parentheses at the
+			// top level or there is only one. If there are at least two then
+			// we expect foo we want to capture to be at the end of the first nested
+			// parenthesis chain. If there is only one then we expect it to be the
+			// last identifier before the parenthesis.
+			//
+			if(
+					pFirstParenthesis->pNext &&
+					cxxTokenTypeIsOneOf(
+							pFirstParenthesis->pNext,
+							CXXTokenTypeParenthesisChain |
+								CXXTokenTypeSquareParenthesisChain
+						)
+				)
+			{
+				CXX_DEBUG_PRINT("There are two parenthesis chains. Looking in the first one");
+				t = cxxTokenChainLastPossiblyNestedTokenOfType(
+						pFirstParenthesis->pChain,
+						CXXTokenTypeIdentifier,
+						&pTParentChain
+					);
+			} else {
+				CXX_DEBUG_PRINT("There is one parenthesis chain. Looking just before");
+
+				if(
+					pFirstParenthesis->pPrev &&
+					cxxTokenTypeIs(pFirstParenthesis->pPrev,CXXTokenTypeIdentifier)
+				)
+				{
+					// Nasty "typedef blah foo(baz)" case.
+					t = pFirstParenthesis->pPrev;
+
+					// Let's have a consistent typeref too. We correct user
+					// input so it becomes "typedef blah (foo)(baz)".
+
+					pTParentChain = cxxTokenChainCreate();
+
+					CXXToken * par = cxxTokenCreate();
+					par->eType = CXXTokenTypeOpeningParenthesis;
+					par->iLineNumber = t->iLineNumber;
+					par->oFilePosition = t->oFilePosition;
+					vStringPut(par->pszWord,'(');
+					par->pChain = NULL;
+					cxxTokenChainAppend(pTParentChain,par);
+
+					par = cxxTokenCreate();
+					par->eType = CXXTokenTypeIdentifier;
+					par->iLineNumber = t->iLineNumber;
+					par->oFilePosition = t->oFilePosition;
+					vStringCopy(par->pszWord,t->pszWord);
+					par->pChain = NULL;
+					cxxTokenChainAppend(pTParentChain,par);
+
+					t->eType = CXXTokenTypeParenthesisChain;
+					t->pChain = pTParentChain;
+					vStringClear(t->pszWord);
+
+					pFirstParenthesis = t;
+					t = par;
+
+					par = cxxTokenCreate();
+					par->eType = CXXTokenTypeClosingParenthesis;
+					par->iLineNumber = t->iLineNumber;
+					par->oFilePosition = t->oFilePosition;
+					vStringPut(par->pszWord,')');
+					par->pChain = NULL;
+					cxxTokenChainAppend(pTParentChain,par);
+
+				} else {
+					CXX_DEBUG_LEAVE_TEXT("Parenthesis but no identifier: no clue");
+					return;
+				}
+			}
 		} else {
 			// just scan backwards to the last identifier
 			CXX_DEBUG_PRINT("No identifier and no parenthesis chain, trying to scan backwards");

@@ -15,6 +15,8 @@ T305	input.cpp	/^typedef struct AStruct (T305)(int);$/;"	t	typeref:struct:AStruc
 T306	input.cpp	/^typedef union AUnion & (T306)(int);$/;"	t	typeref:union:AUnion & ()(int)	file:
 T307	input.cpp	/^typedef AClass (T307)(int);$/;"	t	typeref:typename:AClass ()(int)	file:
 T308	input.cpp	/^typedef enum AEnum (T308)(int);$/;"	t	typeref:enum:AEnum ()(int)	file:
+T309	input.cpp	/^typedef int T309(int);$/;"	t	typeref:typename:int ()(int)	file:
+T310	input.cpp	/^typedef int T310(AUnion *);$/;"	t	typeref:typename:int ()(AUnion *)	file:
 T401	input.cpp	/^typedef int T401 [ 10];$/;"	t	typeref:typename:int[10]	file:
 T501	input.cpp	/^typedef ATemplate1<int > T501;$/;"	t	typeref:typename:ATemplate1<int>	file:
 T502	input.cpp	/^typedef ATemplate1< unsigned short int> T502;$/;"	t	typeref:typename:ATemplate1<unsigned short int>	file:
