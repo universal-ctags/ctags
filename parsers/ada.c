@@ -1016,8 +1016,19 @@ static adaTokenInfo *adaParseBlock(adaTokenInfo *parent, adaKind kind)
       }
       else if(adaKeywordCmp(ADA_KEYWORD_NEW))
       {
-        /* if this is a "new" something then no need to parse */
-        skipPast(";");
+        struct cmpKeywordOrWordDataElt *elt;
+
+        elt = skipPastKeywordOrWord ((struct cmpKeywordOrWordDataElt []) {{
+              .type = ELT_KEYWORD,
+              .u.keyword = ADA_KEYWORD_WITH,
+              }, {
+              .type = ELT_WORD,
+              .u.word = ";",
+              }
+          }, 2);
+
+        if (elt && elt->type == ELT_KEYWORD)
+          adaParse(ADA_DECLARATIONS, token);
       }
       else
       {
