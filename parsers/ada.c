@@ -338,6 +338,24 @@ static void skipPast(const char *past);
 static void skipPastKeyword(adaKeyword keyword);
 static void skipPastWord(void);
 
+typedef bool (* skipCompFn) (void *data);
+static void skipPastLambda(skipCompFn cmpfn, void *data);
+
+struct cmpKeywordOrWordDataElt
+{
+  enum eltType {
+    ELT_KEYWORD,
+    ELT_WORD,
+  } type;
+  union
+  {
+    adaKeyword keyword;
+    const char* word;
+  } u;
+};
+static struct cmpKeywordOrWordDataElt *skipPastKeywordOrWord(struct cmpKeywordOrWordDataElt * elt,
+                                                             int count);
+
 /* prototypes of functions for parsing the high-level Ada constructs */
 static adaTokenInfo *adaParseBlock(adaTokenInfo *parent, adaKind kind);
 static adaTokenInfo *adaParseSubprogram(adaTokenInfo *parent, adaKind kind);
@@ -860,6 +878,76 @@ static void skipPastWord(void)
     }
   } /* while(!isspace(line[pos])) */
 } /* static void skipPastWord(void) */
+
+static void skipPastLambda(skipCompFn cmpfn, void *data)
+{
+  /* first check for a comment line, because this would cause the isspace
+   * check to fail immediately */
+  while(exception != EXCEPTION_EOF && isAdaComment(line, pos, lineLen))
+  {
+    readNewLine();
+  }
+
+  /* now call the predicate */
+  while(exception != EXCEPTION_EOF && !cmpfn(data))
+  {
+    movePos(1);
+
+    /* now check for comments here */
+    while(exception != EXCEPTION_EOF && isAdaComment(line, pos, lineLen))
+    {
+      readNewLine();
+    }
+  }
+} /* static void skipPast(char *past) */
+
+struct cmpKeywordOrWordData
+{
+  struct cmpKeywordOrWordDataElt *found;
+  int count;
+  struct cmpKeywordOrWordDataElt *elt;
+};
+
+static bool cmpKeywordOrWord (void *data)
+{
+  struct cmpKeywordOrWordData *cmdData = data;
+
+  cmdData->found = NULL;
+  for (int i = 0; i < cmdData->count; i++)
+  {
+    if (cmdData->elt[i].type == ELT_KEYWORD)
+    {
+      if (adaKeywordCmp(cmdData->elt[i].u.keyword))
+      {
+        cmdData->found = cmdData->elt + i;
+        return true;
+      }
+    }
+    else if (cmdData->elt[i].type == ELT_WORD)
+    {
+      if (adaCmp(cmdData->elt[i].u.word))
+      {
+        cmdData->found = cmdData->elt + i;
+        return true;
+      }
+    }
+    else
+      AssertNotReached ();
+  }
+  return false;
+}
+
+static struct cmpKeywordOrWordDataElt *skipPastKeywordOrWord(struct cmpKeywordOrWordDataElt * elt,
+                                                             int count)
+{
+  struct cmpKeywordOrWordData data = {
+    .found = NULL,
+    .count = count,
+    .elt = elt
+  };
+  skipPastLambda (cmpKeywordOrWord, &data);
+  return data.found;
+}
 
 static adaTokenInfo *adaParseBlock(adaTokenInfo *parent, adaKind kind)
 {
