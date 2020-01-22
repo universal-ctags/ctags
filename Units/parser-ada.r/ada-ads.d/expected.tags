@@ -4,6 +4,7 @@ Data_Ptr	input.ads	/^    type Data_Ptr is access StackData'Class;$/;"	t	packspec
 Empty	input.ads	/^    function Empty(S: Stack) return Boolean;$/;"	R	packspec:GenStack
 Finalize	input.ads	/^    procedure Finalize(S: in out Stack);$/;"	R	packspec:GenStack
 GenStack	input.ads	/^package GenStack is$/;"	P
+Head	input.ads	/^        Head: Node_Ptr;$/;"	c	type:Stack	file:
 Initialize	input.ads	/^    procedure Initialize(S: in out Stack);$/;"	R	packspec:GenStack
 Next	input.ads	/^        Next: Node_Ptr;$/;"	c	type:Node	file:
 Node	input.ads	/^    type Node is record$/;"	t	packspec:GenStack	file:

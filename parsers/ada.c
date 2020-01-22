@@ -1219,38 +1219,69 @@ static adaTokenInfo *adaParseType(adaTokenInfo *parent, adaKind kind)
       movePos(1);
       adaParseVariables(token, ADA_KIND_ENUM_LITERAL);
     }
-    else if(adaKeywordCmp(ADA_KEYWORD_RECORD))
+    else
     {
-      /* until we hit "end record" we need to gather type variables */
-      while(exception != EXCEPTION_EOF)
+	  /* Parsing following form here.
+	   *
+	   * A. type foo is record ...;
+	   * B. type foo is new bar with record ...;
+	   * C. type foo is new bar;
+	   */
+      if(adaKeywordCmp(ADA_KEYWORD_NEW))
       {
-        skipWhiteSpace();
+        /* B and C */
+        struct cmpKeywordOrWordDataElt *elt;
+        elt = skipPastKeywordOrWord ((struct cmpKeywordOrWordDataElt []) {{
+              .type = ELT_KEYWORD,
+              .u.keyword = ADA_KEYWORD_WITH,
+              }, {
+              .type = ELT_WORD,
+              .u.word = ";",
+              }
+          }, 2);
+        if (elt && elt->type == ELT_WORD)
+        {
+          /* C */
+          return token;
+        }
 
-        if(adaKeywordCmp(ADA_KEYWORD_END))
+        /* B */
+        skipWhiteSpace();
+      }
+      if(adaKeywordCmp(ADA_KEYWORD_RECORD))
+      {
+        /* A and B */
+        /* until we hit "end record" we need to gather type variables */
+        while(exception != EXCEPTION_EOF)
         {
           skipWhiteSpace();
-          if(adaKeywordCmp(ADA_KEYWORD_RECORD))
+
+          if(adaKeywordCmp(ADA_KEYWORD_END))
           {
-            break;
+            skipWhiteSpace();
+            if(adaKeywordCmp(ADA_KEYWORD_RECORD))
+            {
+              break;
+            }
+            skipPast(";");
+          } /* if(adaKeywordCmp(ADA_KEYWORD_END)) */
+          /* handle variant types */
+          else if(adaKeywordCmp(ADA_KEYWORD_CASE))
+          {
+            skipPastKeyword(ADA_KEYWORD_IS);
           }
-          skipPast(";");
-        } /* if(adaKeywordCmp(ADA_KEYWORD_END)) */
-        /* handle variant types */
-        else if(adaKeywordCmp(ADA_KEYWORD_CASE))
-        {
-          skipPastKeyword(ADA_KEYWORD_IS);
-        }
-        else if(adaKeywordCmp(ADA_KEYWORD_WHEN))
-        {
-          skipPast("=>");
-        }
-        else
-        {
-          adaParseVariables(token, ADA_KIND_RECORD_COMPONENT);
-          skipPast(";");
-        }
-      } /* while(true) - end of record not found */
-    } /* else if(adaKeywordCmp(ADA_KEYWORD_RECORD)) */
+          else if(adaKeywordCmp(ADA_KEYWORD_WHEN))
+          {
+            skipPast("=>");
+          }
+          else
+          {
+            adaParseVariables(token, ADA_KIND_RECORD_COMPONENT);
+            skipPast(";");
+          }
+        } /* while(true) - end of record not found */
+      } /* else if(adaKeywordCmp(ADA_KEYWORD_RECORD)) */
+    }
   } /* if(adaKeywordCmp(ADA_KEYWORD_IS)) */
   else
   {
