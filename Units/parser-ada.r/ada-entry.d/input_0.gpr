@@ -1,0 +1,17 @@
+-- project Client is
+project Input_0 is
+
+   for Main use ("input.adb");
+
+   for Source_Dirs use ("./**");
+   for Object_Dir  use "obj/";
+   for Exec_Dir    use "bin/";
+
+   for Create_Missing_Dirs use "True";
+
+   package Compiler is
+      for Default_Switches ("Ada")  use ("-O0", "-Wall");
+   end Compiler;
+
+end Input_0;
+-- end Client;

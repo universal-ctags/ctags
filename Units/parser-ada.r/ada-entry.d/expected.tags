@@ -1,0 +1,50 @@
+Input	input.adb	/^procedure Input is$/;"	r
+Input_0	input_0.gpr	/^project Input_0 is$/;"	P
+Input_1	input_1.adb	/^package body Input_1 is$/;"	p
+Ma_Tasche	input_1.adb	/^   task body Ma_Tasche is$/;"	k	package:Input_1	file:
+Var_Continuer	input_1.adb	/^      Var_Continuer : Boolean := False;$/;"	v	task:Ma_Tasche	file:
+Mon_Autre_Tasche	input_1.adb	/^   task body Mon_Autre_Tasche is$/;"	k	package:Input_1	file:
+Une_Autre_Tasche_1	input_1.adb	/^   Une_Autre_Tasche_1 : Tasche_Type_1_T;$/;"	v	package:Input_1	file:
+Tasche_Type_1_T	input_1.adb	/^   task body Tasche_Type_1_T is$/;"	k	package:Input_1	file:
+Tasche_Type_2_T	input_1.adb	/^   task body Tasche_Type_2_T is$/;"	k	package:Input_1	file:
+Tasche_Type_3_T	input_1.adb	/^   task body Tasche_Type_3_T is$/;"	k	package:Input_1	file:
+Une_Autre_Tasche_2	input_1.adb	/^   Une_Autre_Tasche_2 : Tasche_Type_2_T;$/;"	v	package:Input_1	file:
+Une_Autre_Tasche_3	input_1.adb	/^   Une_Autre_Tasche_3 : Tasche_Type_3_T (Taille => 5);$/;"	v	package:Input_1	file:
+Objet_Protege	input_1.adb	/^   protected body Objet_Protege is$/;"	o	package:Input_1	file:
+Demarrer	input_1.adb	/^      entry Demarrer$/;"	e	protected:Objet_Protege	file:
+Faire	input_1.adb	/^      procedure Faire is$/;"	r	protected:Objet_Protege	file:
+Tester	input_1.adb	/^      function Tester$/;"	r	protected:Objet_Protege	file:
+Type_Protege	input_1.adb	/^   protected body Type_Protege is$/;"	o	package:Input_1	file:
+Demarrer	input_1.adb	/^      entry Demarrer$/;"	e	protected:Type_Protege	file:
+Faire	input_1.adb	/^      procedure Faire is$/;"	r	protected:Type_Protege	file:
+Tester	input_1.adb	/^      function Tester$/;"	r	protected:Type_Protege	file:
+Discriminant_Protege	input_1.adb	/^   protected body Discriminant_Protege is$/;"	o	package:Input_1	file:
+Demarrer	input_1.adb	/^      entry Demarrer$/;"	e	protected:Discriminant_Protege	file:
+Faire	input_1.adb	/^      procedure Faire is$/;"	r	protected:Discriminant_Protege	file:
+Tester	input_1.adb	/^      function Tester$/;"	r	protected:Discriminant_Protege	file:
+Input_1	input_1.ads	/^package Input_1 is$/;"	P
+Ma_Tasche	input_1.ads	/^   task Ma_Tasche is$/;"	K	packspec:Input_1
+Accepter	input_1.ads	/^      entry Accepter$/;"	E	taskspec:Ma_Tasche
+Mon_Autre_Tasche	input_1.ads	/^   task Mon_Autre_Tasche;$/;"	K	packspec:Input_1
+Tasche_Type_1_T	input_1.ads	/^   task type Tasche_Type_1_T;$/;"	K	packspec:Input_1
+Une_Tasche	input_1.ads	/^   Une_Tasche : Tasche_Type_1_T;$/;"	v	packspec:Input_1
+Tasche_Type_2_T	input_1.ads	/^   task type Tasche_Type_2_T is$/;"	K	packspec:Input_1
+Start	input_1.ads	/^      entry Start;$/;"	E	taskspec:Tasche_Type_2_T
+Lire	input_1.ads	/^      entry Lire$/;"	E	taskspec:Tasche_Type_2_T
+Tasche_Type_3_T	input_1.ads	/^   task type Tasche_Type_3_T$/;"	K	packspec:Input_1
+Start	input_1.ads	/^      entry Start;$/;"	E	taskspec:Tasche_Type_3_T
+Objet_Protege	input_1.ads	/^   protected Objet_Protege is$/;"	O	packspec:Input_1
+Demarrer	input_1.ads	/^      entry Demarrer;$/;"	E	protectspec:Objet_Protege
+Faire	input_1.ads	/^      procedure Faire;$/;"	R	protectspec:Objet_Protege
+Tester	input_1.ads	/^      function Tester return Boolean;$/;"	R	protectspec:Objet_Protege
+Variable	input_1.ads	/^      Variable : Boolean := True;$/;"	v	protectspec:Objet_Protege	file:
+Type_Protege	input_1.ads	/^   protected type Type_Protege is$/;"	O	packspec:Input_1
+Demarrer	input_1.ads	/^      entry Demarrer;$/;"	E	protectspec:Type_Protege
+Faire	input_1.ads	/^      procedure Faire;$/;"	R	protectspec:Type_Protege
+Tester	input_1.ads	/^      function Tester return Boolean;$/;"	R	protectspec:Type_Protege
+Variable	input_1.ads	/^      Variable : Boolean := True;$/;"	v	protectspec:Type_Protege	file:
+Discriminant_Protege	input_1.ads	/^   protected type Discriminant_Protege$/;"	O	packspec:Input_1
+Demarrer	input_1.ads	/^      entry Demarrer;$/;"	E	protectspec:Discriminant_Protege
+Faire	input_1.ads	/^      procedure Faire;$/;"	R	protectspec:Discriminant_Protege
+Tester	input_1.ads	/^      function Tester return Boolean;$/;"	R	protectspec:Discriminant_Protege
+Variable	input_1.ads	/^      Variable : Boolean := True;$/;"	v	protectspec:Discriminant_Protege	file:
