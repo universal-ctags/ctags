@@ -75,7 +75,7 @@ int  makePromise   (const char *parser,
 						   endLine,
 						   endCharOffset,
 						   sourceLineOffset))
-		&& ( !isXtagEnabled (XTAG_TAGS_GENERATED_BY_GUEST_PARSERS)))
+		&& ( !isXtagEnabled (XTAG_GUEST)))
 		return -1;
 
 	lang = getNamedLanguage (parser, 0);
