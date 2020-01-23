@@ -1,5 +1,6 @@
 Input	input.ads	/^package Input$/;"	P
 Tasche_T	input.ads	/^   task type Tasche_T is new Carte_T with$/;"	K	packspec:Input
+Coucou	input.ads	/^      entry Coucou;$/;"	E	taskspec:Tasche_T
 Inutile	input.ads	/^   procedure Inutile$/;"	R	packspec:Input
 input_2	input_2.adb	/^package body input_2$/;"	p
 Tasche_T	input_2.adb	/^   task body Tasche_T is$/;"	k	package:input_2	file:

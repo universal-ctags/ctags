@@ -1,0 +1,9 @@
+Input	input.adb	/^procedure Input  is$/;"	r
+Pak	input.adb	/^   package Pak  is$/;"	P	subprogram:Input	file:
+Integer_1	input.adb	/^      type Integer_1  is  range 1 .. 10;$/;"	t	packspec:Pak
+P	input.adb	/^      procedure P (I:  in Integer_1); -- primitive operation, assumes 1 .. 10$/;"	R	packspec:Pak
+I	input.adb	/^      procedure P (I:  in Integer_1); -- primitive operation, assumes 1 .. 10$/;"	a	subprogspec:P	file:
+Integer_2	input.adb	/^      type Integer_2  is  new Integer_1  range 8 .. 10; -- must not break P's assumption$/;"	t	packspec:Pak
+Pak	input.adb	/^   package  body Pak  is$/;"	p	subprogram:Input	file:
+A	input.adb	/^   A: Integer_1 := 4;$/;"	v	subprogram:Input	file:
+B	input.adb	/^   B: Integer_2 := 9;$/;"	v	subprogram:Input	file:

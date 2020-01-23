@@ -338,6 +338,24 @@ static void skipPast(const char *past);
 static void skipPastKeyword(adaKeyword keyword);
 static void skipPastWord(void);
 
+typedef bool (* skipCompFn) (void *data);
+static void skipPastLambda(skipCompFn cmpfn, void *data);
+
+struct cmpKeywordOrWordDataElt
+{
+  enum eltType {
+    ELT_KEYWORD,
+    ELT_WORD,
+  } type;
+  union
+  {
+    adaKeyword keyword;
+    const char* word;
+  } u;
+};
+static struct cmpKeywordOrWordDataElt *skipPastKeywordOrWord(struct cmpKeywordOrWordDataElt * elt,
+                                                             int count);
+
 /* prototypes of functions for parsing the high-level Ada constructs */
 static adaTokenInfo *adaParseBlock(adaTokenInfo *parent, adaKind kind);
 static adaTokenInfo *adaParseSubprogram(adaTokenInfo *parent, adaKind kind);
@@ -861,6 +879,76 @@ static void skipPastWord(void)
   } /* while(!isspace(line[pos])) */
 } /* static void skipPastWord(void) */
 
+static void skipPastLambda(skipCompFn cmpfn, void *data)
+{
+  /* first check for a comment line, because this would cause the isspace
+   * check to fail immediately */
+  while(exception != EXCEPTION_EOF && isAdaComment(line, pos, lineLen))
+  {
+    readNewLine();
+  }
+
+  /* now call the predicate */
+  while(exception != EXCEPTION_EOF && !cmpfn(data))
+  {
+    movePos(1);
+
+    /* now check for comments here */
+    while(exception != EXCEPTION_EOF && isAdaComment(line, pos, lineLen))
+    {
+      readNewLine();
+    }
+  }
+} /* static void skipPast(char *past) */
+
+struct cmpKeywordOrWordData
+{
+  struct cmpKeywordOrWordDataElt *found;
+  int count;
+  struct cmpKeywordOrWordDataElt *elt;
+};
+
+static bool cmpKeywordOrWord (void *data)
+{
+  struct cmpKeywordOrWordData *cmdData = data;
+
+  cmdData->found = NULL;
+  for (int i = 0; i < cmdData->count; i++)
+  {
+    if (cmdData->elt[i].type == ELT_KEYWORD)
+    {
+      if (adaKeywordCmp(cmdData->elt[i].u.keyword))
+      {
+        cmdData->found = cmdData->elt + i;
+        return true;
+      }
+    }
+    else if (cmdData->elt[i].type == ELT_WORD)
+    {
+      if (adaCmp(cmdData->elt[i].u.word))
+      {
+        cmdData->found = cmdData->elt + i;
+        return true;
+      }
+    }
+    else
+      AssertNotReached ();
+  }
+  return false;
+}
+
+static struct cmpKeywordOrWordDataElt *skipPastKeywordOrWord(struct cmpKeywordOrWordDataElt * elt,
+                                                             int count)
+{
+  struct cmpKeywordOrWordData data = {
+    .found = NULL,
+    .count = count,
+    .elt = elt
+  };
+  skipPastLambda (cmpKeywordOrWord, &data);
+  return data.found;
+}
+
 static adaTokenInfo *adaParseBlock(adaTokenInfo *parent, adaKind kind)
 {
   int i;
@@ -928,8 +1016,19 @@ static adaTokenInfo *adaParseBlock(adaTokenInfo *parent, adaKind kind)
       }
       else if(adaKeywordCmp(ADA_KEYWORD_NEW))
       {
-        /* if this is a "new" something then no need to parse */
-        skipPast(";");
+        struct cmpKeywordOrWordDataElt *elt;
+
+        elt = skipPastKeywordOrWord ((struct cmpKeywordOrWordDataElt []) {{
+              .type = ELT_KEYWORD,
+              .u.keyword = ADA_KEYWORD_WITH,
+              }, {
+              .type = ELT_WORD,
+              .u.word = ";",
+              }
+          }, 2);
+
+        if (elt && elt->type == ELT_KEYWORD)
+          adaParse(ADA_DECLARATIONS, token);
       }
       else
       {
@@ -1120,38 +1219,69 @@ static adaTokenInfo *adaParseType(adaTokenInfo *parent, adaKind kind)
       movePos(1);
       adaParseVariables(token, ADA_KIND_ENUM_LITERAL);
     }
-    else if(adaKeywordCmp(ADA_KEYWORD_RECORD))
+    else
     {
-      /* until we hit "end record" we need to gather type variables */
-      while(exception != EXCEPTION_EOF)
+	  /* Parsing following form here.
+	   *
+	   * A. type foo is record ...;
+	   * B. type foo is new bar with record ...;
+	   * C. type foo is new bar;
+	   */
+      if(adaKeywordCmp(ADA_KEYWORD_NEW))
       {
-        skipWhiteSpace();
+        /* B and C */
+        struct cmpKeywordOrWordDataElt *elt;
+        elt = skipPastKeywordOrWord ((struct cmpKeywordOrWordDataElt []) {{
+              .type = ELT_KEYWORD,
+              .u.keyword = ADA_KEYWORD_WITH,
+              }, {
+              .type = ELT_WORD,
+              .u.word = ";",
+              }
+          }, 2);
+        if (elt && elt->type == ELT_WORD)
+        {
+          /* C */
+          return token;
+        }
 
-        if(adaKeywordCmp(ADA_KEYWORD_END))
+        /* B */
+        skipWhiteSpace();
+      }
+      if(adaKeywordCmp(ADA_KEYWORD_RECORD))
+      {
+        /* A and B */
+        /* until we hit "end record" we need to gather type variables */
+        while(exception != EXCEPTION_EOF)
         {
           skipWhiteSpace();
-          if(adaKeywordCmp(ADA_KEYWORD_RECORD))
+
+          if(adaKeywordCmp(ADA_KEYWORD_END))
           {
-            break;
+            skipWhiteSpace();
+            if(adaKeywordCmp(ADA_KEYWORD_RECORD))
+            {
+              break;
+            }
+            skipPast(";");
+          } /* if(adaKeywordCmp(ADA_KEYWORD_END)) */
+          /* handle variant types */
+          else if(adaKeywordCmp(ADA_KEYWORD_CASE))
+          {
+            skipPastKeyword(ADA_KEYWORD_IS);
           }
-          skipPast(";");
-        } /* if(adaKeywordCmp(ADA_KEYWORD_END)) */
-        /* handle variant types */
-        else if(adaKeywordCmp(ADA_KEYWORD_CASE))
-        {
-          skipPastKeyword(ADA_KEYWORD_IS);
-        }
-        else if(adaKeywordCmp(ADA_KEYWORD_WHEN))
-        {
-          skipPast("=>");
-        }
-        else
-        {
-          adaParseVariables(token, ADA_KIND_RECORD_COMPONENT);
-          skipPast(";");
-        }
-      } /* while(true) - end of record not found */
-    } /* else if(adaKeywordCmp(ADA_KEYWORD_RECORD)) */
+          else if(adaKeywordCmp(ADA_KEYWORD_WHEN))
+          {
+            skipPast("=>");
+          }
+          else
+          {
+            adaParseVariables(token, ADA_KIND_RECORD_COMPONENT);
+            skipPast(";");
+          }
+        } /* while(true) - end of record not found */
+      } /* else if(adaKeywordCmp(ADA_KEYWORD_RECORD)) */
+    }
   } /* if(adaKeywordCmp(ADA_KEYWORD_IS)) */
   else
   {

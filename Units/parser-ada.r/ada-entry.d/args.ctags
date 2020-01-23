@@ -1,0 +1,9 @@
+--sort=no
+--kinds-Ada=+E
+
+--langdef=GnatProject
+--map-GnatProject=.gpr
+
+--kinddef-GnatProject=P,project,projects
+--regex-GnatProject=/^project[ \t]+([a-zA-Z0-9_]+)/\1/P/
+
