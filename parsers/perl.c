@@ -315,6 +315,14 @@ static void findPerlTags (void)
 	const unsigned char *line;
 	unsigned long podStart = 0UL;
 
+	/* A pod area can be after __END__ marker.
+	 * Perl parser itself doesn't need to parse the area
+	 * after the marker. Parsing the area is needed only
+	 * if Perl parser runs Pod parser as a guest.
+	 * This variable is set true when it is needed.
+	 */
+	bool parse_only_pod_area = false;
+
 	/* Core modules AutoLoader and SelfLoader support delayed compilation
 	 * by allowing Perl code that follows __END__ and __DATA__ tokens,
 	 * respectively.  When we detect that one of these modules is used
@@ -365,18 +373,31 @@ static void findPerlTags (void)
 		else if (strcmp ((const char*) line, "__DATA__") == 0)
 		{
 			if (respect_token & RESPECT_DATA)
-				break;
+			{
+				if (isXtagEnabled (XTAG_GUEST))
+					parse_only_pod_area = true;
+				else
+					break;
+			}
 			else
 				continue;
 		}
 		else if (strcmp ((const char*) line, "__END__") == 0)
 		{
 			if (respect_token & RESPECT_END)
-				break;
+			{
+				if (isXtagEnabled (XTAG_GUEST))
+					parse_only_pod_area = true;
+				else
+					break;
+			}
 			else
 				continue;
 		}
 		else if (line [0] == '#')
+			continue;
+
+		if (parse_only_pod_area)
 			continue;
 
 		while (isspace (*cp))

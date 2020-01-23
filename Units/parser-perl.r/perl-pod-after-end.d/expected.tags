@@ -1,0 +1,4 @@
+CAPTURE ME	input.pl	/^=head1 CAPTURE ME$/;"	c	language:Pod
+CAPTURE ME in DATA	input-1.pl	/^=head1 CAPTURE ME in DATA$/;"	c	language:Pod
+data_do_nothing	input-1.pl	/^sub data_do_nothing {$/;"	s	language:Perl
+do_nothing	input.pl	/^sub do_nothing {$/;"	s	language:Perl
