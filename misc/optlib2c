@@ -837,6 +837,7 @@ sub emit_fields_initialization {
     my $opts = shift;
     my $enabled = $opts->{"disabled"} ? "false": "true";
     my $method;
+    my $sep;
 
     $method  = "METHOD_NOT_CRAFTED";
     if (@{$opts->{"regexs"}} || $opts->{'tablenames'}) {
@@ -898,13 +899,17 @@ EOF
     }
 
     if ($opts->{'defaultScopeSeparator'}) {
+	$sep = "$opts->{'defaultScopeSeparator'}";
+	$sep = escape_dquotes "$sep" if ($sep eq '"');
 	print <<EOF;
-	def->defaultScopeSeparator = "$opts->{'defaultScopeSeparator'}";
+	def->defaultScopeSeparator = "$sep";
 EOF
     }
     if ($opts->{'defaultRootScopeSeparator'}) {
+	$sep = $opts->{'defaultRootScopeSeparator'};
+	$sep = escape_dquotes "$sep" if ($sep eq '"');
 	print <<EOF;
-	def->defaultRootScopeSeparator = "$opts->{'defaultRootScopeSeparator'}";
+	def->defaultRootScopeSeparator = "$sep";
 EOF
     }
     print <<EOF;
