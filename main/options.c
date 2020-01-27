@@ -445,7 +445,7 @@ static optionDescription ExperimentalLongOptionDescription [] = {
  {1,"       Echo MSG to standard error. Useful to debug the chain"},
  {1,"       of loading option files."},
  {1,"  --_extradef-<LANG>=name,desc"},
- {1,"       Define new extra for <LANG>. \"--extra-<LANG>=+{name}\" enables it."},
+ {1,"       Define new extra for <LANG>. \"--extras-<LANG>=+{name}\" enables it."},
  {1,"  --_fatal-warnings"},
  {1,"       Make all warnings fatal."},
  {1,"  --_fielddef-<LANG>=name,description"},
