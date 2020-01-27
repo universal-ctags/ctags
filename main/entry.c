@@ -1462,7 +1462,7 @@ extern int makeQualifiedTagEntry (const tagEntryInfo *const e)
 
 		bool in_subparser
 			= isTagExtraBitMarked (&x,
-								   XTAG_TAGS_GENERATED_BY_SUBPARSER);
+								   XTAG_SUBPARSER);
 
 		if (in_subparser)
 			pushLanguage(x.langType);
@@ -1512,9 +1512,9 @@ static void initTagEntryFull (tagEntryInfo *const e, const char *const name,
 		markTagExtraBit (e, XTAG_REFERENCE_TAGS);
 
 	if (doesParserRunAsGuest ())
-		markTagExtraBit (e, XTAG_TAGS_GENERATED_BY_GUEST_PARSERS);
+		markTagExtraBit (e, XTAG_GUEST);
 	if (doesSubparserRun ())
-		markTagExtraBit (e, XTAG_TAGS_GENERATED_BY_SUBPARSER);
+		markTagExtraBit (e, XTAG_SUBPARSER);
 
 	e->sourceLangType = sourceLangType;
 	e->sourceFileName = sourceFileName;

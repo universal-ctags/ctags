@@ -104,7 +104,7 @@ extern void initializeDependencies (parserDefinition *parser,
 		{
 			initializeParser (sp->id);
 			if (sp->type == DEPTYPE_SUBPARSER
-				&& isXtagEnabled (XTAG_TAGS_GENERATED_BY_SUBPARSER))
+				&& isXtagEnabled (XTAG_SUBPARSER))
 			{
 				subparser *subparser = sp->data;
 				attachSubparser (cb, subparser);
