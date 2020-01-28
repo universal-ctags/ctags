@@ -28,6 +28,7 @@ static void initializeMarkdownParser (const langType language)
 	addLanguageRegexTable (language, "subsubsection");
 	addLanguageRegexTable (language, "l4subsection");
 	addLanguageRegexTable (language, "l5subsection");
+	addLanguageRegexTable (language, "emptyLine");
 	addLanguageRegexTable (language, "gfmLeave");
 	addLanguageRegexTable (language, "rest");
 	addLanguageRegexTable (language, "code");
@@ -40,6 +41,9 @@ static void initializeMarkdownParser (const langType language)
 	addLanguageTagMultiTableRegex (language, "main",
 	                               "^#[ \t]+([^\n]+)[\n]",
 	                               "\\1", "c", "{_field=sectionMarker:#}{scope=push}{tenter=chapter}", NULL);
+	addLanguageTagMultiTableRegex (language, "main",
+	                               "^([\t ]*)[\n]+",
+	                               "", "", "", NULL);
 	addLanguageTagMultiTableRegex (language, "main",
 	                               "^([^\n]+)[\n]=+[\n]",
 	                               "\\1", "c", "{_field=sectionMarker:=}{scope=push}{tenter=chapter}", NULL);
@@ -64,6 +68,9 @@ static void initializeMarkdownParser (const langType language)
 	addLanguageTagMultiTableRegex (language, "chapter",
 	                               "^##[ \t]+([^\n]+)[\n]",
 	                               "\\1", "s", "{_field=sectionMarker:#}{scope=push}{tenter=section}", NULL);
+	addLanguageTagMultiTableRegex (language, "chapter",
+	                               "^([\t ]*)[\n]+",
+	                               "", "", "", NULL);
 	addLanguageTagMultiTableRegex (language, "chapter",
 	                               "^([^\n]+)[\n]-+[\n]",
 	                               "\\1", "s", "{_field=sectionMarker:-}{scope=push}{tenter=section}", NULL);
@@ -98,6 +105,9 @@ static void initializeMarkdownParser (const langType language)
 	                               "^#{1,2}[ \t]+([^\n]+)",
 	                               "", "", "{scope=pop}{tleave}{_advanceTo=0start}", NULL);
 	addLanguageTagMultiTableRegex (language, "section",
+	                               "^([\t ]*)[\n]+",
+	                               "", "", "", NULL);
+	addLanguageTagMultiTableRegex (language, "section",
 	                               "^([^\n]+)[\n](=+|-+)[\n]",
 	                               "", "", "{scope=pop}{tleave}{_advanceTo=0start}", NULL);
 	addLanguageTagMultiTableRegex (language, "section",
@@ -124,6 +134,9 @@ static void initializeMarkdownParser (const langType language)
 	addLanguageTagMultiTableRegex (language, "subsection",
 	                               "^#{1,3}[ \t]+([^\n]+)",
 	                               "", "", "{scope=pop}{tleave}{_advanceTo=0start}", NULL);
+	addLanguageTagMultiTableRegex (language, "subsection",
+	                               "^([\t ]*)[\n]+",
+	                               "", "", "", NULL);
 	addLanguageTagMultiTableRegex (language, "subsection",
 	                               "^([^\n]+)[\n](=+|-+)[\n]",
 	                               "", "", "{scope=pop}{tleave}{_advanceTo=0start}", NULL);
@@ -152,6 +165,9 @@ static void initializeMarkdownParser (const langType language)
 	                               "^#{1,4}[ \t]+([^\n]+)",
 	                               "", "", "{scope=pop}{tleave}{_advanceTo=0start}", NULL);
 	addLanguageTagMultiTableRegex (language, "subsubsection",
+	                               "^([\t ]*)[\n]+",
+	                               "", "", "", NULL);
+	addLanguageTagMultiTableRegex (language, "subsubsection",
 	                               "^([^\n]+)[\n](=+|-+)[\n]",
 	                               "", "", "{scope=pop}{tleave}{_advanceTo=0start}", NULL);
 	addLanguageTagMultiTableRegex (language, "subsubsection",
@@ -179,6 +195,9 @@ static void initializeMarkdownParser (const langType language)
 	                               "^#{1,5}[ \t]+([^\n]+)",
 	                               "", "", "{scope=pop}{tleave}{_advanceTo=0start}", NULL);
 	addLanguageTagMultiTableRegex (language, "l4subsection",
+	                               "^([\t ]*)[\n]+",
+	                               "", "", "", NULL);
+	addLanguageTagMultiTableRegex (language, "l4subsection",
 	                               "^([^\n]+)[\n](=+|-+)[\n]",
 	                               "", "", "{scope=pop}{tleave}{_advanceTo=0start}", NULL);
 	addLanguageTagMultiTableRegex (language, "l4subsection",
@@ -200,6 +219,9 @@ static void initializeMarkdownParser (const langType language)
 	                               "^#{1,6}[ \t]+([^\n]+)",
 	                               "", "", "{scope=pop}{tleave}{_advanceTo=0start}", NULL);
 	addLanguageTagMultiTableRegex (language, "l5subsection",
+	                               "^([\t ]*)[\n]+",
+	                               "", "", "", NULL);
+	addLanguageTagMultiTableRegex (language, "l5subsection",
 	                               "^([^\n]+)[\n](=+|-+)[\n]",
 	                               "", "", "{scope=pop}{tleave}{_advanceTo=0start}", NULL);
 	addLanguageTagMultiTableRegex (language, "l5subsection",
@@ -216,6 +238,12 @@ static void initializeMarkdownParser (const langType language)
 	                               "", "", "", NULL);
 	addLanguageTagMultiTableRegex (language, "l5subsection",
 	                               "^[^\n]+",
+	                               "", "", "", NULL);
+	addLanguageTagMultiTableRegex (language, "emptyLine",
+	                               "^([\t ]*)[\n]+",
+	                               "", "", "", NULL);
+	addLanguageTagMultiTableRegex (language, "gfmLeave",
+	                               "^([\t ]*)[\n]+",
 	                               "", "", "", NULL);
 	addLanguageTagMultiTableRegex (language, "gfmLeave",
 	                               "^([^\n]+)[\n](=+|-+)[\n]",
