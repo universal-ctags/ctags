@@ -28,6 +28,7 @@ static void initializeMarkdownParser (const langType language)
 	addLanguageRegexTable (language, "subsubsection");
 	addLanguageRegexTable (language, "l4subsection");
 	addLanguageRegexTable (language, "l5subsection");
+	addLanguageRegexTable (language, "gfmLeave");
 	addLanguageRegexTable (language, "rest");
 	addLanguageRegexTable (language, "code");
 	addLanguageRegexTable (language, "codeblockBacktick");
@@ -216,6 +217,9 @@ static void initializeMarkdownParser (const langType language)
 	addLanguageTagMultiTableRegex (language, "l5subsection",
 	                               "^[^\n]+",
 	                               "", "", "", NULL);
+	addLanguageTagMultiTableRegex (language, "gfmLeave",
+	                               "^([^\n]+)[\n](=+|-+)[\n]",
+	                               "", "", "{scope=pop}{tleave}{_advanceTo=0start}", NULL);
 	addLanguageTagMultiTableRegex (language, "rest",
 	                               "^[^\n]+[\n]",
 	                               "", "", "", NULL);

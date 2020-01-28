@@ -45,6 +45,7 @@
 --_tabledef-Markdown=l4subsection
 --_tabledef-Markdown=l5subsection
 
+--_tabledef-Markdown=gfmLeave
 --_tabledef-Markdown=rest
 --_tabledef-Markdown=code
 
@@ -56,6 +57,8 @@
 --_mtable-regex-Markdown=rest/^[^\n]+[\n]//
 --_mtable-regex-Markdown=rest/[\n]+//
 --_mtable-regex-Markdown=rest/^[^\n]+//
+
+--_mtable-regex-Markdown=gfmLeave/^([^\n]+)[\n](=+|-+)[\n]//{scope=pop}{tleave}{_advanceTo=0start}
 
 --_mtable-regex-Markdown=code/^[ \t]*~~~~*([a-zA-Z0-9][-#+a-zA-Z0-9]*)?[^~\n]*[\n]//{tenter=codeblockTildes}{_guest=\1,0end,}
 --_mtable-regex-Markdown=code/^[ \t]*````*([a-zA-Z0-9][-#+a-zA-Z0-9]*)?[^`\n]*[\n]//{tenter=codeblockBacktick}{_guest=\1,0end,}
@@ -78,33 +81,33 @@
 --_mtable-regex-Markdown=section/^###[ \t]+([^\n]+)([ \t]+#+)[\n]/\1/S/{_field=sectionMarker:##}{scope=push}{tenter=subsection}
 --_mtable-regex-Markdown=section/^###[ \t]+([^\n]+)[\n]/\1/S/{_field=sectionMarker:#}{scope=push}{tenter=subsection}
 --_mtable-regex-Markdown=section/^#{1,2}[ \t]+([^\n]+)//{scope=pop}{tleave}{_advanceTo=0start}
---_mtable-regex-Markdown=section/^([^\n]+)[\n](=+|-+)[\n]//{scope=pop}{tleave}{_advanceTo=0start}
+--_mtable-extend-Markdown=section+gfmLeave
 --_mtable-extend-Markdown=section+code
 --_mtable-extend-Markdown=section+rest
 
 --_mtable-regex-Markdown=subsection/^####[ \t]+([^\n]+)([ \t]+#+)[\n]/\1/t/{_field=sectionMarker:##}{scope=push}{tenter=subsubsection}
 --_mtable-regex-Markdown=subsection/^####[ \t]+([^\n]+)[\n]/\1/t/{_field=sectionMarker:#}{scope=push}{tenter=subsubsection}
 --_mtable-regex-Markdown=subsection/^#{1,3}[ \t]+([^\n]+)//{scope=pop}{tleave}{_advanceTo=0start}
---_mtable-regex-Markdown=subsection/^([^\n]+)[\n](=+|-+)[\n]//{scope=pop}{tleave}{_advanceTo=0start}
+--_mtable-extend-Markdown=subsection+gfmLeave
 --_mtable-extend-Markdown=subsection+code
 --_mtable-extend-Markdown=subsection+rest
 
 --_mtable-regex-Markdown=subsubsection/^#####[ \t]+([^\n]+)([ \t]+#+)[\n]/\1/T/{_field=sectionMarker:##}{scope=push}{tenter=l4subsection}
 --_mtable-regex-Markdown=subsubsection/^#####[ \t]+([^\n]+)[\n]/\1/T/{_field=sectionMarker:#}{scope=push}{tenter=l4subsection}
 --_mtable-regex-Markdown=subsubsection/^#{1,4}[ \t]+([^\n]+)//{scope=pop}{tleave}{_advanceTo=0start}
---_mtable-regex-Markdown=subsubsection/^([^\n]+)[\n](=+|-+)[\n]//{scope=pop}{tleave}{_advanceTo=0start}
+--_mtable-extend-Markdown=subsubsection+gfmLeave
 --_mtable-extend-Markdown=subsubsection+code
 --_mtable-extend-Markdown=subsubsection+rest
 
 --_mtable-regex-Markdown=l4subsection/^######[ \t]+([^\n]+)([ \t]+#+)[\n]/\1/u/{_field=sectionMarker:##}{scope=push}{tenter=l5subsection}
 --_mtable-regex-Markdown=l4subsection/^######[ \t]+([^\n]+)[\n]/\1/u/{_field=sectionMarker:#}{scope=push}{tenter=l5subsection}
 --_mtable-regex-Markdown=l4subsection/^#{1,5}[ \t]+([^\n]+)//{scope=pop}{tleave}{_advanceTo=0start}
---_mtable-regex-Markdown=l4subsection/^([^\n]+)[\n](=+|-+)[\n]//{scope=pop}{tleave}{_advanceTo=0start}
+--_mtable-extend-Markdown=l4subsection+gfmLeave
 --_mtable-extend-Markdown=l4subsection+code
 --_mtable-extend-Markdown=l4subsection+rest
 
 --_mtable-regex-Markdown=l5subsection/^#{1,6}[ \t]+([^\n]+)//{scope=pop}{tleave}{_advanceTo=0start}
---_mtable-regex-Markdown=l5subsection/^([^\n]+)[\n](=+|-+)[\n]//{scope=pop}{tleave}{_advanceTo=0start}
+--_mtable-extend-Markdown=l5subsection+gfmLeave
 --_mtable-extend-Markdown=l5subsection+code
 --_mtable-extend-Markdown=l5subsection+rest
 
