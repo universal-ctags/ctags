@@ -36,10 +36,10 @@ static void initializeMarkdownParser (const langType language)
 	addLanguageRegexTable (language, "codeblockTildes");
 
 	addLanguageTagMultiTableRegex (language, "main",
-	                               "^#[ \t]+([^\n]+)([ \t]+#+)[\n]",
+	                               "^#[ \t]+([^\n]+)([ \t]+#+)[\n]+",
 	                               "\\1", "c", "{_field=sectionMarker:##}{scope=push}{tenter=chapter}", NULL);
 	addLanguageTagMultiTableRegex (language, "main",
-	                               "^#[ \t]+([^\n]+)[\n]",
+	                               "^#[ \t]+([^\n]+)[\n]+",
 	                               "\\1", "c", "{_field=sectionMarker:#}{scope=push}{tenter=chapter}", NULL);
 	addLanguageTagMultiTableRegex (language, "main",
 	                               "^([\t ]*)[\n]+",
@@ -54,19 +54,16 @@ static void initializeMarkdownParser (const langType language)
 	                               "^[ \t]*````*([a-zA-Z0-9][-#+a-zA-Z0-9]*)?[^`\n]*[\n]",
 	                               "", "", "{tenter=codeblockBacktick}{_guest=\\1,0end,}", NULL);
 	addLanguageTagMultiTableRegex (language, "main",
-	                               "^[^\n]+[\n]",
+	                               "^[^\n]*[\n]+",
 	                               "", "", "", NULL);
 	addLanguageTagMultiTableRegex (language, "main",
-	                               "^[\n]+",
-	                               "", "", "", NULL);
-	addLanguageTagMultiTableRegex (language, "main",
-	                               "^[^\n]+",
-	                               "", "", "", NULL);
+	                               "^[^\n]*",
+	                               "", "", "{tquit}", NULL);
 	addLanguageTagMultiTableRegex (language, "chapter",
-	                               "^##[ \t]+([^\n]+)([ \t]+#+)[\n]",
+	                               "^##[ \t]+([^\n]+)([ \t]+#+)[\n]+",
 	                               "\\1", "s", "{_field=sectionMarker:##}{scope=push}{tenter=section}", NULL);
 	addLanguageTagMultiTableRegex (language, "chapter",
-	                               "^##[ \t]+([^\n]+)[\n]",
+	                               "^##[ \t]+([^\n]+)[\n]+",
 	                               "\\1", "s", "{_field=sectionMarker:#}{scope=push}{tenter=section}", NULL);
 	addLanguageTagMultiTableRegex (language, "chapter",
 	                               "^([\t ]*)[\n]+",
@@ -87,19 +84,16 @@ static void initializeMarkdownParser (const langType language)
 	                               "^[ \t]*````*([a-zA-Z0-9][-#+a-zA-Z0-9]*)?[^`\n]*[\n]",
 	                               "", "", "{tenter=codeblockBacktick}{_guest=\\1,0end,}", NULL);
 	addLanguageTagMultiTableRegex (language, "chapter",
-	                               "^[^\n]+[\n]",
+	                               "^[^\n]*[\n]+",
 	                               "", "", "", NULL);
 	addLanguageTagMultiTableRegex (language, "chapter",
-	                               "^[\n]+",
-	                               "", "", "", NULL);
-	addLanguageTagMultiTableRegex (language, "chapter",
-	                               "^[^\n]+",
-	                               "", "", "", NULL);
+	                               "^[^\n]*",
+	                               "", "", "{tquit}", NULL);
 	addLanguageTagMultiTableRegex (language, "section",
-	                               "^###[ \t]+([^\n]+)([ \t]+#+)[\n]",
+	                               "^###[ \t]+([^\n]+)([ \t]+#+)[\n]+",
 	                               "\\1", "S", "{_field=sectionMarker:##}{scope=push}{tenter=subsection}", NULL);
 	addLanguageTagMultiTableRegex (language, "section",
-	                               "^###[ \t]+([^\n]+)[\n]",
+	                               "^###[ \t]+([^\n]+)[\n]+",
 	                               "\\1", "S", "{_field=sectionMarker:#}{scope=push}{tenter=subsection}", NULL);
 	addLanguageTagMultiTableRegex (language, "section",
 	                               "^#{1,2}[ \t]+([^\n]+)",
@@ -117,19 +111,16 @@ static void initializeMarkdownParser (const langType language)
 	                               "^[ \t]*````*([a-zA-Z0-9][-#+a-zA-Z0-9]*)?[^`\n]*[\n]",
 	                               "", "", "{tenter=codeblockBacktick}{_guest=\\1,0end,}", NULL);
 	addLanguageTagMultiTableRegex (language, "section",
-	                               "^[^\n]+[\n]",
+	                               "^[^\n]*[\n]+",
 	                               "", "", "", NULL);
 	addLanguageTagMultiTableRegex (language, "section",
-	                               "^[\n]+",
-	                               "", "", "", NULL);
-	addLanguageTagMultiTableRegex (language, "section",
-	                               "^[^\n]+",
-	                               "", "", "", NULL);
+	                               "^[^\n]*",
+	                               "", "", "{tquit}", NULL);
 	addLanguageTagMultiTableRegex (language, "subsection",
-	                               "^####[ \t]+([^\n]+)([ \t]+#+)[\n]",
+	                               "^####[ \t]+([^\n]+)([ \t]+#+)[\n]+",
 	                               "\\1", "t", "{_field=sectionMarker:##}{scope=push}{tenter=subsubsection}", NULL);
 	addLanguageTagMultiTableRegex (language, "subsection",
-	                               "^####[ \t]+([^\n]+)[\n]",
+	                               "^####[ \t]+([^\n]+)[\n]+",
 	                               "\\1", "t", "{_field=sectionMarker:#}{scope=push}{tenter=subsubsection}", NULL);
 	addLanguageTagMultiTableRegex (language, "subsection",
 	                               "^#{1,3}[ \t]+([^\n]+)",
@@ -147,19 +138,16 @@ static void initializeMarkdownParser (const langType language)
 	                               "^[ \t]*````*([a-zA-Z0-9][-#+a-zA-Z0-9]*)?[^`\n]*[\n]",
 	                               "", "", "{tenter=codeblockBacktick}{_guest=\\1,0end,}", NULL);
 	addLanguageTagMultiTableRegex (language, "subsection",
-	                               "^[^\n]+[\n]",
+	                               "^[^\n]*[\n]+",
 	                               "", "", "", NULL);
 	addLanguageTagMultiTableRegex (language, "subsection",
-	                               "^[\n]+",
-	                               "", "", "", NULL);
-	addLanguageTagMultiTableRegex (language, "subsection",
-	                               "^[^\n]+",
-	                               "", "", "", NULL);
+	                               "^[^\n]*",
+	                               "", "", "{tquit}", NULL);
 	addLanguageTagMultiTableRegex (language, "subsubsection",
-	                               "^#####[ \t]+([^\n]+)([ \t]+#+)[\n]",
+	                               "^#####[ \t]+([^\n]+)([ \t]+#+)[\n]+",
 	                               "\\1", "T", "{_field=sectionMarker:##}{scope=push}{tenter=l4subsection}", NULL);
 	addLanguageTagMultiTableRegex (language, "subsubsection",
-	                               "^#####[ \t]+([^\n]+)[\n]",
+	                               "^#####[ \t]+([^\n]+)[\n]+",
 	                               "\\1", "T", "{_field=sectionMarker:#}{scope=push}{tenter=l4subsection}", NULL);
 	addLanguageTagMultiTableRegex (language, "subsubsection",
 	                               "^#{1,4}[ \t]+([^\n]+)",
@@ -177,19 +165,16 @@ static void initializeMarkdownParser (const langType language)
 	                               "^[ \t]*````*([a-zA-Z0-9][-#+a-zA-Z0-9]*)?[^`\n]*[\n]",
 	                               "", "", "{tenter=codeblockBacktick}{_guest=\\1,0end,}", NULL);
 	addLanguageTagMultiTableRegex (language, "subsubsection",
-	                               "^[^\n]+[\n]",
+	                               "^[^\n]*[\n]+",
 	                               "", "", "", NULL);
 	addLanguageTagMultiTableRegex (language, "subsubsection",
-	                               "^[\n]+",
-	                               "", "", "", NULL);
-	addLanguageTagMultiTableRegex (language, "subsubsection",
-	                               "^[^\n]+",
-	                               "", "", "", NULL);
+	                               "^[^\n]*",
+	                               "", "", "{tquit}", NULL);
 	addLanguageTagMultiTableRegex (language, "l4subsection",
-	                               "^######[ \t]+([^\n]+)([ \t]+#+)[\n]",
+	                               "^######[ \t]+([^\n]+)([ \t]+#+)[\n]+",
 	                               "\\1", "u", "{_field=sectionMarker:##}{scope=push}{tenter=l5subsection}", NULL);
 	addLanguageTagMultiTableRegex (language, "l4subsection",
-	                               "^######[ \t]+([^\n]+)[\n]",
+	                               "^######[ \t]+([^\n]+)[\n]+",
 	                               "\\1", "u", "{_field=sectionMarker:#}{scope=push}{tenter=l5subsection}", NULL);
 	addLanguageTagMultiTableRegex (language, "l4subsection",
 	                               "^#{1,5}[ \t]+([^\n]+)",
@@ -207,14 +192,11 @@ static void initializeMarkdownParser (const langType language)
 	                               "^[ \t]*````*([a-zA-Z0-9][-#+a-zA-Z0-9]*)?[^`\n]*[\n]",
 	                               "", "", "{tenter=codeblockBacktick}{_guest=\\1,0end,}", NULL);
 	addLanguageTagMultiTableRegex (language, "l4subsection",
-	                               "^[^\n]+[\n]",
+	                               "^[^\n]*[\n]+",
 	                               "", "", "", NULL);
 	addLanguageTagMultiTableRegex (language, "l4subsection",
-	                               "^[\n]+",
-	                               "", "", "", NULL);
-	addLanguageTagMultiTableRegex (language, "l4subsection",
-	                               "^[^\n]+",
-	                               "", "", "", NULL);
+	                               "^[^\n]*",
+	                               "", "", "{tquit}", NULL);
 	addLanguageTagMultiTableRegex (language, "l5subsection",
 	                               "^#{1,6}[ \t]+([^\n]+)",
 	                               "", "", "{scope=pop}{tleave}{_advanceTo=0start}", NULL);
@@ -231,14 +213,11 @@ static void initializeMarkdownParser (const langType language)
 	                               "^[ \t]*````*([a-zA-Z0-9][-#+a-zA-Z0-9]*)?[^`\n]*[\n]",
 	                               "", "", "{tenter=codeblockBacktick}{_guest=\\1,0end,}", NULL);
 	addLanguageTagMultiTableRegex (language, "l5subsection",
-	                               "^[^\n]+[\n]",
+	                               "^[^\n]*[\n]+",
 	                               "", "", "", NULL);
 	addLanguageTagMultiTableRegex (language, "l5subsection",
-	                               "^[\n]+",
-	                               "", "", "", NULL);
-	addLanguageTagMultiTableRegex (language, "l5subsection",
-	                               "^[^\n]+",
-	                               "", "", "", NULL);
+	                               "^[^\n]*",
+	                               "", "", "{tquit}", NULL);
 	addLanguageTagMultiTableRegex (language, "emptyLine",
 	                               "^([\t ]*)[\n]+",
 	                               "", "", "", NULL);
@@ -249,14 +228,11 @@ static void initializeMarkdownParser (const langType language)
 	                               "^([^\n]+)[\n](=+|-+)[\n]",
 	                               "", "", "{scope=pop}{tleave}{_advanceTo=0start}", NULL);
 	addLanguageTagMultiTableRegex (language, "rest",
-	                               "^[^\n]+[\n]",
+	                               "^[^\n]*[\n]+",
 	                               "", "", "", NULL);
 	addLanguageTagMultiTableRegex (language, "rest",
-	                               "^[\n]+",
-	                               "", "", "", NULL);
-	addLanguageTagMultiTableRegex (language, "rest",
-	                               "^[^\n]+",
-	                               "", "", "", NULL);
+	                               "^[^\n]*",
+	                               "", "", "{tquit}", NULL);
 	addLanguageTagMultiTableRegex (language, "code",
 	                               "^[ \t]*~~~~*([a-zA-Z0-9][-#+a-zA-Z0-9]*)?[^~\n]*[\n]",
 	                               "", "", "{tenter=codeblockTildes}{_guest=\\1,0end,}", NULL);
@@ -267,26 +243,20 @@ static void initializeMarkdownParser (const langType language)
 	                               "^[ \t]*````*[ \t]*[\n]",
 	                               "", "", "{tleave}{_guest=,,0start}", NULL);
 	addLanguageTagMultiTableRegex (language, "codeblockBacktick",
-	                               "^[^\n]+[\n]",
+	                               "^[^\n]*[\n]+",
 	                               "", "", "", NULL);
 	addLanguageTagMultiTableRegex (language, "codeblockBacktick",
-	                               "^[\n]+",
-	                               "", "", "", NULL);
-	addLanguageTagMultiTableRegex (language, "codeblockBacktick",
-	                               "^[^\n]+",
-	                               "", "", "", NULL);
+	                               "^[^\n]*",
+	                               "", "", "{tquit}", NULL);
 	addLanguageTagMultiTableRegex (language, "codeblockTildes",
 	                               "^[ \t]*~~~~*[ \t]*[\n]",
 	                               "", "", "{tleave}{_guest=,,0start}", NULL);
 	addLanguageTagMultiTableRegex (language, "codeblockTildes",
-	                               "^[^\n]+[\n]",
+	                               "^[^\n]*[\n]+",
 	                               "", "", "", NULL);
 	addLanguageTagMultiTableRegex (language, "codeblockTildes",
-	                               "^[\n]+",
-	                               "", "", "", NULL);
-	addLanguageTagMultiTableRegex (language, "codeblockTildes",
-	                               "^[^\n]+",
-	                               "", "", "", NULL);
+	                               "^[^\n]*",
+	                               "", "", "{tquit}", NULL);
 }
 
 extern parserDefinition* MarkdownParser (void)
