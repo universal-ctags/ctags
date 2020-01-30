@@ -81,8 +81,8 @@ void tokenCopy       (tokenInfo *dest, tokenInfo *src);
 									&& (TKN)->keyword == KEYWORD_##K)
 #define tokenIsEOF(TKN)      ((TKN)->type == (TKN)->klass->typeForEOF)
 
-#define tokenString(TKN)	   (vStringValue ((TKN)->string))
-#define tokenPutc(TKN,C)      (vStringPut ((TKN)->string, C))
+#define tokenString(TKN)       (vStringValue ((TKN)->string))
+#define tokenPutc(TKN,C)       (vStringPut ((TKN)->string, C))
 #define tokenCat(TKN,VS)       (vStringCat ((TKN)->string, VS))
 #define tokenLast(TKN)         (vStringIsEmpty((TKN)->string)? '\0': vStringLast((TKN)->string))
 
