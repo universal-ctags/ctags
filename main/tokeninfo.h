@@ -84,6 +84,7 @@ void tokenCopy       (tokenInfo *dest, tokenInfo *src);
 #define tokenString(TKN)       (vStringValue ((TKN)->string))
 #define tokenPutc(TKN,C)       (vStringPut ((TKN)->string, C))
 #define tokenCat(TKN,VS)       (vStringCat ((TKN)->string, VS))
+#define tokenCatS(TKN,S)       (vStringCatS ((TKN)->string, S))
 #define tokenLast(TKN)         (vStringIsEmpty((TKN)->string)? '\0': vStringLast((TKN)->string))
 
 /* return true if t is found. In that case token holds an
