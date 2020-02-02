@@ -50,7 +50,7 @@ struct tokenInfoClass {
 	void (*init)   (tokenInfo *token, void *data);
 	void (*read)   (tokenInfo *token, void *data);
 	void (*clear)  (tokenInfo *token);
-	void (*destroy) (tokenInfo *token);
+	void (*delete) (tokenInfo *token);
 	void (*copy)   (tokenInfo *dest, tokenInfo *src, void *data);
 	objPool *pool;
 	ptrArray *backlog;
@@ -62,7 +62,7 @@ void *newTokenByCopying (tokenInfo *src);
 void *newTokenByCopyingFull (tokenInfo *src, void *data);
 
 void  flashTokenBacklog (struct tokenInfoClass *klass);
-void  tokenDestroy    (tokenInfo *token);
+void  tokenDelete    (tokenInfo *token);
 
 void tokenReadFull   (tokenInfo *token, void *data);
 void tokenRead       (tokenInfo *token);

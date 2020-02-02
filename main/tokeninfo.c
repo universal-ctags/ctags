@@ -42,12 +42,12 @@ static void clearToken (void *data)
 	token->filePosition = getInputFilePosition ();
 }
 
-static void destroyToken (void *data)
+static void deleteToken (void *data)
 {
 	tokenInfo *token = data;
 
-	if (token->klass->destroy)
-		token->klass->destroy (token);
+	if (token->klass->delete)
+		token->klass->delete (token);
 
 	vStringDelete (token->string);
 	eFree (token);
@@ -72,7 +72,7 @@ void *newTokenFull (struct tokenInfoClass *klass, void *data)
 	{
 		klass->pool = objPoolNew (klass->nPreAlloc,
 					  createToken,
-					  destroyToken,
+					  deleteToken,
 					  clearToken,
 					  klass);
 		goto retry;
@@ -89,7 +89,7 @@ void  flashTokenBacklog (struct tokenInfoClass *klass)
 		ptrArrayClear (klass->backlog);
 }
 
-void tokenDestroy (tokenInfo *token)
+void tokenDelete (tokenInfo *token)
 {
 	objPoolPut (token->klass->pool, token);
 }
@@ -98,14 +98,14 @@ void tokenDestroy (tokenInfo *token)
 void tokenReadFull (tokenInfo *token, void *data)
 {
 	if (!token->klass->backlog)
-		token->klass->backlog = ptrArrayNew ((ptrArrayDeleteFunc)tokenDestroy);
+		token->klass->backlog = ptrArrayNew ((ptrArrayDeleteFunc)tokenDelete);
 
 	if (ptrArrayCount (token->klass->backlog) > 0)
 	{
 		tokenInfo *backlog = ptrArrayLast (token->klass->backlog);
 		tokenCopyFull (token, backlog, data);
 		ptrArrayRemoveLast (token->klass->backlog);
-		tokenDestroy (backlog);
+		tokenDelete (backlog);
 	}
 	else
 		token->klass->read (token, data);
@@ -164,7 +164,7 @@ void tokenUnreadFull (tokenInfo *token, void *data)
 	tokenInfo *backlog;
 
 	if (!token->klass->backlog)
-		token->klass->backlog = ptrArrayNew ((ptrArrayDeleteFunc)tokenDestroy);
+		token->klass->backlog = ptrArrayNew ((ptrArrayDeleteFunc)tokenDelete);
 
 	backlog = newToken (token->klass);
 	tokenCopyFull (backlog, token, data);
