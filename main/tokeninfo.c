@@ -180,6 +180,7 @@ bool tokenSkipOverPair (tokenInfo *token)
 {
 	return tokenSkipOverPairFull(token, NULL);
 }
+
 bool tokenSkipOverPairFull (tokenInfo *token, void *data)
 {
 	int start = token->type;
