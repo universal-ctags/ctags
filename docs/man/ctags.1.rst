@@ -1511,7 +1511,7 @@ are not listed here. They are experimental or for debugging purpose.
 	The never value indicates the recorded file paths should be absolute
 	even if source file names are passed in with relative paths.
 
-``--totals[=yes|no]``
+``--totals[=yes|no|extra]``
 	Prints statistics about the source files read and the tag file written
 	during the current invocation of ctags. This option
 	is off by default. This option must appear before the first file name.
