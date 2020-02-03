@@ -22,12 +22,19 @@ static void initializeMarkdownParser (const langType language)
 {
 
 	addLanguageRegexTable (language, "main");
+	addLanguageRegexTable (language, "main_sharp");
 	addLanguageRegexTable (language, "chapter");
+	addLanguageRegexTable (language, "chapter_sharp");
 	addLanguageRegexTable (language, "section");
+	addLanguageRegexTable (language, "section_sharp");
 	addLanguageRegexTable (language, "subsection");
+	addLanguageRegexTable (language, "subsection_sharp");
 	addLanguageRegexTable (language, "subsubsection");
+	addLanguageRegexTable (language, "subsubsection_sharp");
 	addLanguageRegexTable (language, "l4subsection");
+	addLanguageRegexTable (language, "l4subsection_sharp");
 	addLanguageRegexTable (language, "l5subsection");
+	addLanguageRegexTable (language, "l5subsection_sharp");
 	addLanguageRegexTable (language, "emptyLine");
 	addLanguageRegexTable (language, "gfmLeave");
 	addLanguageRegexTable (language, "rest");
@@ -36,11 +43,8 @@ static void initializeMarkdownParser (const langType language)
 	addLanguageRegexTable (language, "codeblockTildes");
 
 	addLanguageTagMultiTableRegex (language, "main",
-	                               "^#[ \t]+([^\n]+)([ \t]+#+)[\n]+",
-	                               "\\1", "c", "{_field=sectionMarker:##}{scope=push}{tenter=chapter}", NULL);
-	addLanguageTagMultiTableRegex (language, "main",
-	                               "^#[ \t]+([^\n]+)[\n]+",
-	                               "\\1", "c", "{_field=sectionMarker:#}{scope=push}{tenter=chapter}", NULL);
+	                               "^#",
+	                               "", "", "{_advanceTo=0start}{tjump=main_sharp}", NULL);
 	addLanguageTagMultiTableRegex (language, "main",
 	                               "^([\t ]*)[\n]+",
 	                               "", "", "", NULL);
@@ -48,23 +52,62 @@ static void initializeMarkdownParser (const langType language)
 	                               "^([^\n]+)[\n]=+[\n]",
 	                               "\\1", "c", "{_field=sectionMarker:=}{scope=push}{tenter=chapter}", NULL);
 	addLanguageTagMultiTableRegex (language, "main",
-	                               "^[ \t]*~~~~*([a-zA-Z0-9][-#+a-zA-Z0-9]*)?[^~\n]*[\n]",
-	                               "", "", "{tenter=codeblockTildes}{_guest=\\1,0end,}", NULL);
+	                               "^([^\n]+)[\n]-+[\n]",
+	                               "\\1", "s", "{_field=sectionMarker:-}{scope=push}{tenter=section}", NULL);
 	addLanguageTagMultiTableRegex (language, "main",
 	                               "^[ \t]*````*([a-zA-Z0-9][-#+a-zA-Z0-9]*)?[^`\n]*[\n]",
 	                               "", "", "{tenter=codeblockBacktick}{_guest=\\1,0end,}", NULL);
+	addLanguageTagMultiTableRegex (language, "main",
+	                               "^[ \t]*~~~~*([a-zA-Z0-9][-#+a-zA-Z0-9]*)?[^~\n]*[\n]",
+	                               "", "", "{tenter=codeblockTildes}{_guest=\\1,0end,}", NULL);
 	addLanguageTagMultiTableRegex (language, "main",
 	                               "^[^\n]*[\n]+",
 	                               "", "", "", NULL);
 	addLanguageTagMultiTableRegex (language, "main",
 	                               "^[^\n]*",
 	                               "", "", "{tquit}", NULL);
+	addLanguageTagMultiTableRegex (language, "main_sharp",
+	                               "^#[ \t]+([^\n]+)([ \t]+#+)[\n]*",
+	                               "\\1", "c", "{_field=sectionMarker:##}{scope=push}{tenter=chapter,main}", NULL);
+	addLanguageTagMultiTableRegex (language, "main_sharp",
+	                               "^#[ \t]+([^\n]+)[\n]*",
+	                               "\\1", "c", "{_field=sectionMarker:#}{scope=push}{tenter=chapter,main}", NULL);
+	addLanguageTagMultiTableRegex (language, "main_sharp",
+	                               "^##[ \t]+([^\n]+)([ \t]+#+)[\n]*",
+	                               "\\1", "s", "{_field=sectionMarker:##}{scope=push}{tenter=section,main}", NULL);
+	addLanguageTagMultiTableRegex (language, "main_sharp",
+	                               "^##[ \t]+([^\n]+)[\n]*",
+	                               "\\1", "s", "{_field=sectionMarker:#}{scope=push}{tenter=section,main}", NULL);
+	addLanguageTagMultiTableRegex (language, "main_sharp",
+	                               "^###[ \t]+([^\n]+)([ \t]+#+)[\n]*",
+	                               "\\1", "S", "{_field=sectionMarker:##}{scope=push}{tenter=subsection,main}", NULL);
+	addLanguageTagMultiTableRegex (language, "main_sharp",
+	                               "^###[ \t]+([^\n]+)[\n]*",
+	                               "\\1", "S", "{_field=sectionMarker:#}{scope=push}{tenter=subsection,main}", NULL);
+	addLanguageTagMultiTableRegex (language, "main_sharp",
+	                               "^####[ \t]+([^\n]+)([ \t]+#+)[\n]*",
+	                               "\\1", "t", "{_field=sectionMarker:##}{scope=push}{tenter=subsubsection,main}", NULL);
+	addLanguageTagMultiTableRegex (language, "main_sharp",
+	                               "^####[ \t]+([^\n]+)[\n]*",
+	                               "\\1", "t", "{_field=sectionMarker:#}{scope=push}{tenter=subsubsection,main}", NULL);
+	addLanguageTagMultiTableRegex (language, "main_sharp",
+	                               "^#####[ \t]+([^\n]+)([ \t]+#+)[\n]*",
+	                               "\\1", "T", "{_field=sectionMarker:##}{scope=push}{tenter=l4subsection,main}", NULL);
+	addLanguageTagMultiTableRegex (language, "main_sharp",
+	                               "^#####[ \t]+([^\n]+)[\n]*",
+	                               "\\1", "T", "{_field=sectionMarker:#}{scope=push}{tenter=l4subsection,main}", NULL);
+	addLanguageTagMultiTableRegex (language, "main_sharp",
+	                               "^######[ \t]+([^\n]+)([ \t]+#+)[\n]*",
+	                               "\\1", "u", "{_field=sectionMarker:##}{scope=push}{tenter=l5subsection,main}", NULL);
+	addLanguageTagMultiTableRegex (language, "main_sharp",
+	                               "^######[ \t]+([^\n]+)[\n]*",
+	                               "\\1", "u", "{_field=sectionMarker:#}{scope=push}{tenter=l5subsection,main}", NULL);
+	addLanguageTagMultiTableRegex (language, "main_sharp",
+	                               "^.",
+	                               "", "", "{tjump=main}", NULL);
 	addLanguageTagMultiTableRegex (language, "chapter",
-	                               "^##[ \t]+([^\n]+)([ \t]+#+)[\n]+",
-	                               "\\1", "s", "{_field=sectionMarker:##}{scope=push}{tenter=section}", NULL);
-	addLanguageTagMultiTableRegex (language, "chapter",
-	                               "^##[ \t]+([^\n]+)[\n]+",
-	                               "\\1", "s", "{_field=sectionMarker:#}{scope=push}{tenter=section}", NULL);
+	                               "^#",
+	                               "", "", "{_advanceTo=0start}{tjump=chapter_sharp}", NULL);
 	addLanguageTagMultiTableRegex (language, "chapter",
 	                               "^([\t ]*)[\n]+",
 	                               "", "", "", NULL);
@@ -72,152 +115,251 @@ static void initializeMarkdownParser (const langType language)
 	                               "^([^\n]+)[\n]-+[\n]",
 	                               "\\1", "s", "{_field=sectionMarker:-}{scope=push}{tenter=section}", NULL);
 	addLanguageTagMultiTableRegex (language, "chapter",
-	                               "^#[ \t]+([^\n]+)",
-	                               "", "", "{scope=pop}{tleave}{_advanceTo=0start}", NULL);
-	addLanguageTagMultiTableRegex (language, "chapter",
 	                               "^([^\n]+)[\n]=+[\n]",
 	                               "", "", "{scope=pop}{tleave}{_advanceTo=0start}", NULL);
 	addLanguageTagMultiTableRegex (language, "chapter",
-	                               "^[ \t]*~~~~*([a-zA-Z0-9][-#+a-zA-Z0-9]*)?[^~\n]*[\n]",
-	                               "", "", "{tenter=codeblockTildes}{_guest=\\1,0end,}", NULL);
-	addLanguageTagMultiTableRegex (language, "chapter",
 	                               "^[ \t]*````*([a-zA-Z0-9][-#+a-zA-Z0-9]*)?[^`\n]*[\n]",
 	                               "", "", "{tenter=codeblockBacktick}{_guest=\\1,0end,}", NULL);
+	addLanguageTagMultiTableRegex (language, "chapter",
+	                               "^[ \t]*~~~~*([a-zA-Z0-9][-#+a-zA-Z0-9]*)?[^~\n]*[\n]",
+	                               "", "", "{tenter=codeblockTildes}{_guest=\\1,0end,}", NULL);
 	addLanguageTagMultiTableRegex (language, "chapter",
 	                               "^[^\n]*[\n]+",
 	                               "", "", "", NULL);
 	addLanguageTagMultiTableRegex (language, "chapter",
 	                               "^[^\n]*",
 	                               "", "", "{tquit}", NULL);
+	addLanguageTagMultiTableRegex (language, "chapter_sharp",
+	                               "^#{1,1}[ \t]+([^\n]+)",
+	                               "", "", "{scope=pop}{tleave}{_advanceTo=0start}", NULL);
+	addLanguageTagMultiTableRegex (language, "chapter_sharp",
+	                               "^##[ \t]+([^\n]+)([ \t]+#+)[\n]*",
+	                               "\\1", "s", "{_field=sectionMarker:##}{scope=push}{tenter=section,chapter}", NULL);
+	addLanguageTagMultiTableRegex (language, "chapter_sharp",
+	                               "^##[ \t]+([^\n]+)[\n]*",
+	                               "\\1", "s", "{_field=sectionMarker:#}{scope=push}{tenter=section,chapter}", NULL);
+	addLanguageTagMultiTableRegex (language, "chapter_sharp",
+	                               "^###[ \t]+([^\n]+)([ \t]+#+)[\n]*",
+	                               "\\1", "S", "{_field=sectionMarker:##}{scope=push}{tenter=subsection,chapter}", NULL);
+	addLanguageTagMultiTableRegex (language, "chapter_sharp",
+	                               "^###[ \t]+([^\n]+)[\n]*",
+	                               "\\1", "S", "{_field=sectionMarker:#}{scope=push}{tenter=subsection,chapter}", NULL);
+	addLanguageTagMultiTableRegex (language, "chapter_sharp",
+	                               "^####[ \t]+([^\n]+)([ \t]+#+)[\n]*",
+	                               "\\1", "t", "{_field=sectionMarker:##}{scope=push}{tenter=subsubsection,chapter}", NULL);
+	addLanguageTagMultiTableRegex (language, "chapter_sharp",
+	                               "^####[ \t]+([^\n]+)[\n]*",
+	                               "\\1", "t", "{_field=sectionMarker:#}{scope=push}{tenter=subsubsection,chapter}", NULL);
+	addLanguageTagMultiTableRegex (language, "chapter_sharp",
+	                               "^#####[ \t]+([^\n]+)([ \t]+#+)[\n]*",
+	                               "\\1", "T", "{_field=sectionMarker:##}{scope=push}{tenter=l4subsection,chapter}", NULL);
+	addLanguageTagMultiTableRegex (language, "chapter_sharp",
+	                               "^#####[ \t]+([^\n]+)[\n]*",
+	                               "\\1", "T", "{_field=sectionMarker:#}{scope=push}{tenter=l4subsection,chapter}", NULL);
+	addLanguageTagMultiTableRegex (language, "chapter_sharp",
+	                               "^######[ \t]+([^\n]+)([ \t]+#+)[\n]*",
+	                               "\\1", "u", "{_field=sectionMarker:##}{scope=push}{tenter=l5subsection,chapter}", NULL);
+	addLanguageTagMultiTableRegex (language, "chapter_sharp",
+	                               "^######[ \t]+([^\n]+)[\n]*",
+	                               "\\1", "u", "{_field=sectionMarker:#}{scope=push}{tenter=l5subsection,chapter}", NULL);
+	addLanguageTagMultiTableRegex (language, "chapter_sharp",
+	                               "^.",
+	                               "", "", "{tjump=chapter}", NULL);
 	addLanguageTagMultiTableRegex (language, "section",
-	                               "^###[ \t]+([^\n]+)([ \t]+#+)[\n]+",
-	                               "\\1", "S", "{_field=sectionMarker:##}{scope=push}{tenter=subsection}", NULL);
+	                               "^#",
+	                               "", "", "{_advanceTo=0start}{tjump=section_sharp}", NULL);
 	addLanguageTagMultiTableRegex (language, "section",
-	                               "^###[ \t]+([^\n]+)[\n]+",
-	                               "\\1", "S", "{_field=sectionMarker:#}{scope=push}{tenter=subsection}", NULL);
+	                               "^([\t ]*)[\n]+",
+	                               "", "", "", NULL);
 	addLanguageTagMultiTableRegex (language, "section",
+	                               "^([^\n]+)[\n](=+|-+)[\n]",
+	                               "", "", "{scope=pop}{tleave}{_advanceTo=0start}", NULL);
+	addLanguageTagMultiTableRegex (language, "section",
+	                               "^[ \t]*````*([a-zA-Z0-9][-#+a-zA-Z0-9]*)?[^`\n]*[\n]",
+	                               "", "", "{tenter=codeblockBacktick}{_guest=\\1,0end,}", NULL);
+	addLanguageTagMultiTableRegex (language, "section",
+	                               "^[ \t]*~~~~*([a-zA-Z0-9][-#+a-zA-Z0-9]*)?[^~\n]*[\n]",
+	                               "", "", "{tenter=codeblockTildes}{_guest=\\1,0end,}", NULL);
+	addLanguageTagMultiTableRegex (language, "section",
+	                               "^[^\n]*[\n]+",
+	                               "", "", "", NULL);
+	addLanguageTagMultiTableRegex (language, "section",
+	                               "^[^\n]*",
+	                               "", "", "{tquit}", NULL);
+	addLanguageTagMultiTableRegex (language, "section_sharp",
 	                               "^#{1,2}[ \t]+([^\n]+)",
 	                               "", "", "{scope=pop}{tleave}{_advanceTo=0start}", NULL);
-	addLanguageTagMultiTableRegex (language, "section",
+	addLanguageTagMultiTableRegex (language, "section_sharp",
+	                               "^###[ \t]+([^\n]+)([ \t]+#+)[\n]*",
+	                               "\\1", "S", "{_field=sectionMarker:##}{scope=push}{tenter=subsection,section}", NULL);
+	addLanguageTagMultiTableRegex (language, "section_sharp",
+	                               "^###[ \t]+([^\n]+)[\n]*",
+	                               "\\1", "S", "{_field=sectionMarker:#}{scope=push}{tenter=subsection,section}", NULL);
+	addLanguageTagMultiTableRegex (language, "section_sharp",
+	                               "^####[ \t]+([^\n]+)([ \t]+#+)[\n]*",
+	                               "\\1", "t", "{_field=sectionMarker:##}{scope=push}{tenter=subsubsection,section}", NULL);
+	addLanguageTagMultiTableRegex (language, "section_sharp",
+	                               "^####[ \t]+([^\n]+)[\n]*",
+	                               "\\1", "t", "{_field=sectionMarker:#}{scope=push}{tenter=subsubsection,section}", NULL);
+	addLanguageTagMultiTableRegex (language, "section_sharp",
+	                               "^#####[ \t]+([^\n]+)([ \t]+#+)[\n]*",
+	                               "\\1", "T", "{_field=sectionMarker:##}{scope=push}{tenter=l4subsection,section}", NULL);
+	addLanguageTagMultiTableRegex (language, "section_sharp",
+	                               "^#####[ \t]+([^\n]+)[\n]*",
+	                               "\\1", "T", "{_field=sectionMarker:#}{scope=push}{tenter=l4subsection,section}", NULL);
+	addLanguageTagMultiTableRegex (language, "section_sharp",
+	                               "^######[ \t]+([^\n]+)([ \t]+#+)[\n]*",
+	                               "\\1", "u", "{_field=sectionMarker:##}{scope=push}{tenter=l5subsection,section}", NULL);
+	addLanguageTagMultiTableRegex (language, "section_sharp",
+	                               "^######[ \t]+([^\n]+)[\n]*",
+	                               "\\1", "u", "{_field=sectionMarker:#}{scope=push}{tenter=l5subsection,section}", NULL);
+	addLanguageTagMultiTableRegex (language, "section_sharp",
+	                               "^.",
+	                               "", "", "{tjump=section}", NULL);
+	addLanguageTagMultiTableRegex (language, "subsection",
+	                               "^#",
+	                               "", "", "{_advanceTo=0start}{tjump=subsection_sharp}", NULL);
+	addLanguageTagMultiTableRegex (language, "subsection",
 	                               "^([\t ]*)[\n]+",
 	                               "", "", "", NULL);
-	addLanguageTagMultiTableRegex (language, "section",
+	addLanguageTagMultiTableRegex (language, "subsection",
 	                               "^([^\n]+)[\n](=+|-+)[\n]",
 	                               "", "", "{scope=pop}{tleave}{_advanceTo=0start}", NULL);
-	addLanguageTagMultiTableRegex (language, "section",
-	                               "^[ \t]*~~~~*([a-zA-Z0-9][-#+a-zA-Z0-9]*)?[^~\n]*[\n]",
-	                               "", "", "{tenter=codeblockTildes}{_guest=\\1,0end,}", NULL);
-	addLanguageTagMultiTableRegex (language, "section",
+	addLanguageTagMultiTableRegex (language, "subsection",
 	                               "^[ \t]*````*([a-zA-Z0-9][-#+a-zA-Z0-9]*)?[^`\n]*[\n]",
 	                               "", "", "{tenter=codeblockBacktick}{_guest=\\1,0end,}", NULL);
-	addLanguageTagMultiTableRegex (language, "section",
+	addLanguageTagMultiTableRegex (language, "subsection",
+	                               "^[ \t]*~~~~*([a-zA-Z0-9][-#+a-zA-Z0-9]*)?[^~\n]*[\n]",
+	                               "", "", "{tenter=codeblockTildes}{_guest=\\1,0end,}", NULL);
+	addLanguageTagMultiTableRegex (language, "subsection",
 	                               "^[^\n]*[\n]+",
 	                               "", "", "", NULL);
-	addLanguageTagMultiTableRegex (language, "section",
+	addLanguageTagMultiTableRegex (language, "subsection",
 	                               "^[^\n]*",
 	                               "", "", "{tquit}", NULL);
-	addLanguageTagMultiTableRegex (language, "subsection",
-	                               "^####[ \t]+([^\n]+)([ \t]+#+)[\n]+",
-	                               "\\1", "t", "{_field=sectionMarker:##}{scope=push}{tenter=subsubsection}", NULL);
-	addLanguageTagMultiTableRegex (language, "subsection",
-	                               "^####[ \t]+([^\n]+)[\n]+",
-	                               "\\1", "t", "{_field=sectionMarker:#}{scope=push}{tenter=subsubsection}", NULL);
-	addLanguageTagMultiTableRegex (language, "subsection",
+	addLanguageTagMultiTableRegex (language, "subsection_sharp",
 	                               "^#{1,3}[ \t]+([^\n]+)",
-	                               "", "", "{scope=pop}{tleave}{_advanceTo=0start}", NULL);
-	addLanguageTagMultiTableRegex (language, "subsection",
+	                               "", "", "{scope=pop}{tleave}{_advanceTo=0start,subsection}", NULL);
+	addLanguageTagMultiTableRegex (language, "subsection_sharp",
+	                               "^####[ \t]+([^\n]+)([ \t]+#+)[\n]*",
+	                               "\\1", "t", "{_field=sectionMarker:##}{scope=push}{tenter=subsubsection,subsection}", NULL);
+	addLanguageTagMultiTableRegex (language, "subsection_sharp",
+	                               "^####[ \t]+([^\n]+)[\n]*",
+	                               "\\1", "t", "{_field=sectionMarker:#}{scope=push}{tenter=subsubsection,subsection}", NULL);
+	addLanguageTagMultiTableRegex (language, "subsection_sharp",
+	                               "^#####[ \t]+([^\n]+)([ \t]+#+)[\n]*",
+	                               "\\1", "T", "{_field=sectionMarker:##}{scope=push}{tenter=l4subsection,subsection}", NULL);
+	addLanguageTagMultiTableRegex (language, "subsection_sharp",
+	                               "^#####[ \t]+([^\n]+)[\n]*",
+	                               "\\1", "T", "{_field=sectionMarker:#}{scope=push}{tenter=l4subsection,subsection}", NULL);
+	addLanguageTagMultiTableRegex (language, "subsection_sharp",
+	                               "^######[ \t]+([^\n]+)([ \t]+#+)[\n]*",
+	                               "\\1", "u", "{_field=sectionMarker:##}{scope=push}{tenter=l5subsection,subsection}", NULL);
+	addLanguageTagMultiTableRegex (language, "subsection_sharp",
+	                               "^######[ \t]+([^\n]+)[\n]*",
+	                               "\\1", "u", "{_field=sectionMarker:#}{scope=push}{tenter=l5subsection,subsection}", NULL);
+	addLanguageTagMultiTableRegex (language, "subsection_sharp",
+	                               "^.",
+	                               "", "", "{tjump=subsection}", NULL);
+	addLanguageTagMultiTableRegex (language, "subsubsection",
+	                               "^#",
+	                               "", "", "{_advanceTo=0start}{tjump=subsubsection_sharp}", NULL);
+	addLanguageTagMultiTableRegex (language, "subsubsection",
 	                               "^([\t ]*)[\n]+",
 	                               "", "", "", NULL);
-	addLanguageTagMultiTableRegex (language, "subsection",
+	addLanguageTagMultiTableRegex (language, "subsubsection",
 	                               "^([^\n]+)[\n](=+|-+)[\n]",
 	                               "", "", "{scope=pop}{tleave}{_advanceTo=0start}", NULL);
-	addLanguageTagMultiTableRegex (language, "subsection",
-	                               "^[ \t]*~~~~*([a-zA-Z0-9][-#+a-zA-Z0-9]*)?[^~\n]*[\n]",
-	                               "", "", "{tenter=codeblockTildes}{_guest=\\1,0end,}", NULL);
-	addLanguageTagMultiTableRegex (language, "subsection",
+	addLanguageTagMultiTableRegex (language, "subsubsection",
 	                               "^[ \t]*````*([a-zA-Z0-9][-#+a-zA-Z0-9]*)?[^`\n]*[\n]",
 	                               "", "", "{tenter=codeblockBacktick}{_guest=\\1,0end,}", NULL);
-	addLanguageTagMultiTableRegex (language, "subsection",
+	addLanguageTagMultiTableRegex (language, "subsubsection",
+	                               "^[ \t]*~~~~*([a-zA-Z0-9][-#+a-zA-Z0-9]*)?[^~\n]*[\n]",
+	                               "", "", "{tenter=codeblockTildes}{_guest=\\1,0end,}", NULL);
+	addLanguageTagMultiTableRegex (language, "subsubsection",
 	                               "^[^\n]*[\n]+",
 	                               "", "", "", NULL);
-	addLanguageTagMultiTableRegex (language, "subsection",
+	addLanguageTagMultiTableRegex (language, "subsubsection",
 	                               "^[^\n]*",
 	                               "", "", "{tquit}", NULL);
-	addLanguageTagMultiTableRegex (language, "subsubsection",
-	                               "^#####[ \t]+([^\n]+)([ \t]+#+)[\n]+",
-	                               "\\1", "T", "{_field=sectionMarker:##}{scope=push}{tenter=l4subsection}", NULL);
-	addLanguageTagMultiTableRegex (language, "subsubsection",
-	                               "^#####[ \t]+([^\n]+)[\n]+",
-	                               "\\1", "T", "{_field=sectionMarker:#}{scope=push}{tenter=l4subsection}", NULL);
-	addLanguageTagMultiTableRegex (language, "subsubsection",
+	addLanguageTagMultiTableRegex (language, "subsubsection_sharp",
 	                               "^#{1,4}[ \t]+([^\n]+)",
 	                               "", "", "{scope=pop}{tleave}{_advanceTo=0start}", NULL);
-	addLanguageTagMultiTableRegex (language, "subsubsection",
+	addLanguageTagMultiTableRegex (language, "subsubsection_sharp",
+	                               "^#####[ \t]+([^\n]+)([ \t]+#+)[\n]*",
+	                               "\\1", "T", "{_field=sectionMarker:##}{scope=push}{tenter=l4subsection,subsubsection}", NULL);
+	addLanguageTagMultiTableRegex (language, "subsubsection_sharp",
+	                               "^#####[ \t]+([^\n]+)[\n]*",
+	                               "\\1", "T", "{_field=sectionMarker:#}{scope=push}{tenter=l4subsection,subsubsection}", NULL);
+	addLanguageTagMultiTableRegex (language, "subsubsection_sharp",
+	                               "^######[ \t]+([^\n]+)([ \t]+#+)[\n]*",
+	                               "\\1", "u", "{_field=sectionMarker:##}{scope=push}{tenter=l5subsection,subsubsection}", NULL);
+	addLanguageTagMultiTableRegex (language, "subsubsection_sharp",
+	                               "^######[ \t]+([^\n]+)[\n]*",
+	                               "\\1", "u", "{_field=sectionMarker:#}{scope=push}{tenter=l5subsection,subsubsection}", NULL);
+	addLanguageTagMultiTableRegex (language, "subsubsection_sharp",
+	                               "^.",
+	                               "", "", "{tjump=subsubsection}", NULL);
+	addLanguageTagMultiTableRegex (language, "l4subsection",
+	                               "^#",
+	                               "", "", "{_advanceTo=0start}{tjump=l4subsection_sharp}", NULL);
+	addLanguageTagMultiTableRegex (language, "l4subsection",
 	                               "^([\t ]*)[\n]+",
 	                               "", "", "", NULL);
-	addLanguageTagMultiTableRegex (language, "subsubsection",
+	addLanguageTagMultiTableRegex (language, "l4subsection",
 	                               "^([^\n]+)[\n](=+|-+)[\n]",
 	                               "", "", "{scope=pop}{tleave}{_advanceTo=0start}", NULL);
-	addLanguageTagMultiTableRegex (language, "subsubsection",
-	                               "^[ \t]*~~~~*([a-zA-Z0-9][-#+a-zA-Z0-9]*)?[^~\n]*[\n]",
-	                               "", "", "{tenter=codeblockTildes}{_guest=\\1,0end,}", NULL);
-	addLanguageTagMultiTableRegex (language, "subsubsection",
+	addLanguageTagMultiTableRegex (language, "l4subsection",
 	                               "^[ \t]*````*([a-zA-Z0-9][-#+a-zA-Z0-9]*)?[^`\n]*[\n]",
 	                               "", "", "{tenter=codeblockBacktick}{_guest=\\1,0end,}", NULL);
-	addLanguageTagMultiTableRegex (language, "subsubsection",
+	addLanguageTagMultiTableRegex (language, "l4subsection",
+	                               "^[ \t]*~~~~*([a-zA-Z0-9][-#+a-zA-Z0-9]*)?[^~\n]*[\n]",
+	                               "", "", "{tenter=codeblockTildes}{_guest=\\1,0end,}", NULL);
+	addLanguageTagMultiTableRegex (language, "l4subsection",
 	                               "^[^\n]*[\n]+",
 	                               "", "", "", NULL);
-	addLanguageTagMultiTableRegex (language, "subsubsection",
+	addLanguageTagMultiTableRegex (language, "l4subsection",
 	                               "^[^\n]*",
 	                               "", "", "{tquit}", NULL);
-	addLanguageTagMultiTableRegex (language, "l4subsection",
-	                               "^######[ \t]+([^\n]+)([ \t]+#+)[\n]+",
-	                               "\\1", "u", "{_field=sectionMarker:##}{scope=push}{tenter=l5subsection}", NULL);
-	addLanguageTagMultiTableRegex (language, "l4subsection",
-	                               "^######[ \t]+([^\n]+)[\n]+",
-	                               "\\1", "u", "{_field=sectionMarker:#}{scope=push}{tenter=l5subsection}", NULL);
-	addLanguageTagMultiTableRegex (language, "l4subsection",
+	addLanguageTagMultiTableRegex (language, "l4subsection_sharp",
 	                               "^#{1,5}[ \t]+([^\n]+)",
 	                               "", "", "{scope=pop}{tleave}{_advanceTo=0start}", NULL);
-	addLanguageTagMultiTableRegex (language, "l4subsection",
+	addLanguageTagMultiTableRegex (language, "l4subsection_sharp",
+	                               "^######[ \t]+([^\n]+)([ \t]+#+)[\n]*",
+	                               "\\1", "u", "{_field=sectionMarker:##}{scope=push}{tenter=l5subsection,l4subsection}", NULL);
+	addLanguageTagMultiTableRegex (language, "l4subsection_sharp",
+	                               "^######[ \t]+([^\n]+)[\n]*",
+	                               "\\1", "u", "{_field=sectionMarker:#}{scope=push}{tenter=l5subsection,l4subsection}", NULL);
+	addLanguageTagMultiTableRegex (language, "l4subsection_sharp",
+	                               "^.",
+	                               "", "", "{tjump=l4subsection}", NULL);
+	addLanguageTagMultiTableRegex (language, "l5subsection",
+	                               "^#",
+	                               "", "", "{_advanceTo=0start}{tjump=l5subsection_sharp}", NULL);
+	addLanguageTagMultiTableRegex (language, "l5subsection",
 	                               "^([\t ]*)[\n]+",
 	                               "", "", "", NULL);
-	addLanguageTagMultiTableRegex (language, "l4subsection",
+	addLanguageTagMultiTableRegex (language, "l5subsection",
 	                               "^([^\n]+)[\n](=+|-+)[\n]",
 	                               "", "", "{scope=pop}{tleave}{_advanceTo=0start}", NULL);
-	addLanguageTagMultiTableRegex (language, "l4subsection",
-	                               "^[ \t]*~~~~*([a-zA-Z0-9][-#+a-zA-Z0-9]*)?[^~\n]*[\n]",
-	                               "", "", "{tenter=codeblockTildes}{_guest=\\1,0end,}", NULL);
-	addLanguageTagMultiTableRegex (language, "l4subsection",
+	addLanguageTagMultiTableRegex (language, "l5subsection",
 	                               "^[ \t]*````*([a-zA-Z0-9][-#+a-zA-Z0-9]*)?[^`\n]*[\n]",
 	                               "", "", "{tenter=codeblockBacktick}{_guest=\\1,0end,}", NULL);
-	addLanguageTagMultiTableRegex (language, "l4subsection",
+	addLanguageTagMultiTableRegex (language, "l5subsection",
+	                               "^[ \t]*~~~~*([a-zA-Z0-9][-#+a-zA-Z0-9]*)?[^~\n]*[\n]",
+	                               "", "", "{tenter=codeblockTildes}{_guest=\\1,0end,}", NULL);
+	addLanguageTagMultiTableRegex (language, "l5subsection",
 	                               "^[^\n]*[\n]+",
 	                               "", "", "", NULL);
-	addLanguageTagMultiTableRegex (language, "l4subsection",
+	addLanguageTagMultiTableRegex (language, "l5subsection",
 	                               "^[^\n]*",
 	                               "", "", "{tquit}", NULL);
-	addLanguageTagMultiTableRegex (language, "l5subsection",
+	addLanguageTagMultiTableRegex (language, "l5subsection_sharp",
 	                               "^#{1,6}[ \t]+([^\n]+)",
 	                               "", "", "{scope=pop}{tleave}{_advanceTo=0start}", NULL);
-	addLanguageTagMultiTableRegex (language, "l5subsection",
-	                               "^([\t ]*)[\n]+",
-	                               "", "", "", NULL);
-	addLanguageTagMultiTableRegex (language, "l5subsection",
-	                               "^([^\n]+)[\n](=+|-+)[\n]",
-	                               "", "", "{scope=pop}{tleave}{_advanceTo=0start}", NULL);
-	addLanguageTagMultiTableRegex (language, "l5subsection",
-	                               "^[ \t]*~~~~*([a-zA-Z0-9][-#+a-zA-Z0-9]*)?[^~\n]*[\n]",
-	                               "", "", "{tenter=codeblockTildes}{_guest=\\1,0end,}", NULL);
-	addLanguageTagMultiTableRegex (language, "l5subsection",
-	                               "^[ \t]*````*([a-zA-Z0-9][-#+a-zA-Z0-9]*)?[^`\n]*[\n]",
-	                               "", "", "{tenter=codeblockBacktick}{_guest=\\1,0end,}", NULL);
-	addLanguageTagMultiTableRegex (language, "l5subsection",
-	                               "^[^\n]*[\n]+",
-	                               "", "", "", NULL);
-	addLanguageTagMultiTableRegex (language, "l5subsection",
-	                               "^[^\n]*",
-	                               "", "", "{tquit}", NULL);
+	addLanguageTagMultiTableRegex (language, "l5subsection_sharp",
+	                               "^.",
+	                               "", "", "{tjump=l5subsection}", NULL);
 	addLanguageTagMultiTableRegex (language, "emptyLine",
 	                               "^([\t ]*)[\n]+",
 	                               "", "", "", NULL);
@@ -234,11 +376,11 @@ static void initializeMarkdownParser (const langType language)
 	                               "^[^\n]*",
 	                               "", "", "{tquit}", NULL);
 	addLanguageTagMultiTableRegex (language, "code",
-	                               "^[ \t]*~~~~*([a-zA-Z0-9][-#+a-zA-Z0-9]*)?[^~\n]*[\n]",
-	                               "", "", "{tenter=codeblockTildes}{_guest=\\1,0end,}", NULL);
-	addLanguageTagMultiTableRegex (language, "code",
 	                               "^[ \t]*````*([a-zA-Z0-9][-#+a-zA-Z0-9]*)?[^`\n]*[\n]",
 	                               "", "", "{tenter=codeblockBacktick}{_guest=\\1,0end,}", NULL);
+	addLanguageTagMultiTableRegex (language, "code",
+	                               "^[ \t]*~~~~*([a-zA-Z0-9][-#+a-zA-Z0-9]*)?[^~\n]*[\n]",
+	                               "", "", "{tenter=codeblockTildes}{_guest=\\1,0end,}", NULL);
 	addLanguageTagMultiTableRegex (language, "codeblockBacktick",
 	                               "^[ \t]*````*[ \t]*[\n]",
 	                               "", "", "{tleave}{_guest=,,0start}", NULL);

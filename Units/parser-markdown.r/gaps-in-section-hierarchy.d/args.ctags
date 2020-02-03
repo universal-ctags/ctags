@@ -1,0 +1,4 @@
+--sort=no
+--fields=+K
+--fields-Markdown=+{sectionMarker}
+--_scopesep-Markdown=*/*:|
