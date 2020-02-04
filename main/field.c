@@ -31,6 +31,8 @@
 #include "writer_p.h"
 #include "xtag_p.h"
 
+#define FIELD_NULL_LETTER_CHAR '-'
+#define FIELD_NULL_LETTER_STRING "-"
 
 typedef struct sFieldObject {
 	fieldDefinition *def;
@@ -98,7 +100,7 @@ static bool     isEndFieldAvailable       (const tagEntryInfo *const tag);
 		.dataType = DT, \
 	}
 
-#define WITH_DEFUALT_VALUE(str) ((str)?(str):"-")
+#define WITH_DEFUALT_VALUE(str) ((str)?(str):FIELD_NULL_LETTER_STRING)
 
 static fieldDefinition fieldDefinitionsFixed [] = {
         /* FIXED FIELDS */
@@ -520,7 +522,7 @@ static const char *renderFieldTyperef (const tagEntryInfo *const tag, const char
 	/* Return "-" instead of "-:-". */
 	if (tag->extensionFields.typeRef [0] == NULL
 		&& tag->extensionFields.typeRef [1] == NULL)
-		return renderAsIs (b, "-");
+		return renderAsIs (b, FIELD_NULL_LETTER_STRING);
 
 	vStringCatS (b, WITH_DEFUALT_VALUE (tag->extensionFields.typeRef [0]));
 	vStringPut  (b, ':');
@@ -752,7 +754,7 @@ static const char *renderFieldFile (const tagEntryInfo *const tag,
 				    const char *value CTAGS_ATTR_UNUSED,
 				    vString* b)
 {
-	return renderAsIs (b, tag->isFileScope? "file": "-");
+	return renderAsIs (b, tag->isFileScope? "file": FIELD_NULL_LETTER_STRING);
 }
 
 static const char *renderFieldPattern (const tagEntryInfo *const tag,
@@ -1092,7 +1094,7 @@ static void  fieldColprintAddLine (struct colprintTable *table, int i)
 
 	colprintLineAppendColumnChar (line,
 								  (fdef->letter == NUL_FIELD_LETTER)
-								  ? '-'
+								  ? FIELD_NULL_LETTER_CHAR
 								  : fdef->letter);
 
 	const char *name = getFieldName (i);
