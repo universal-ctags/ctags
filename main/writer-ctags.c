@@ -405,4 +405,17 @@ static void checkCtagsOptions (tagWriter *writer CTAGS_ATTR_UNUSED)
 			   getFieldName (FIELD_KIND_KEY));
 		enableField (FIELD_KIND_LONG, true, true);
 	}
+	if (isFieldEnabled (FIELD_SCOPE_KEY)
+		&& !isFieldEnabled (FIELD_SCOPE))
+	{
+		error (WARNING, "though %c/%s field is enabled, %c field is not enabled",
+			   getFieldLetter (FIELD_SCOPE_KEY),
+			   getFieldName (FIELD_SCOPE_KEY),
+			   getFieldLetter (FIELD_SCOPE));
+		error (WARNING, "enable the %c field to make the %c/%s field printable",
+			   getFieldLetter (FIELD_SCOPE),
+			   getFieldLetter (FIELD_SCOPE_KEY),
+			   getFieldName (FIELD_SCOPE_KEY));
+		enableField (FIELD_SCOPE, true, true);
+	}
 }

@@ -1,0 +1,5 @@
+# Z only
+ctags: Warning: enable the s field to make the Z/scope field printable
+ctags: Warning: though Z/scope field is enabled, s field is not enabled
+i	input.c	/^	int i;$/;"	scope:struct:s
+s	input.c	/^struct s {$/
