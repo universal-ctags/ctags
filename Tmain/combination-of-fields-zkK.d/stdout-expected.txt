@@ -1,0 +1,5 @@
+# z only
+ctags: Warning: enable the K field to make the z/kind field printable
+ctags: Warning: though z/kind field is enabled, neither k nor K field is not enabled
+i	input.c	/^	int i;$/;"	kind:member
+s	input.c	/^struct s {$/;"	kind:struct

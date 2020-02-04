@@ -1,0 +1,3 @@
+struct s {
+	int i;
+};
