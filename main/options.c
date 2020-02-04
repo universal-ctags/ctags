@@ -752,6 +752,7 @@ extern void checkOptions (void)
 		if (Option.tagFileName != NULL)
 			error (WARNING, "%s ignores output tag file name", notice);
 	}
+	writerCheckOptions ();
 }
 
 extern langType getLanguageComponentInOptionFull (const char *const option,
