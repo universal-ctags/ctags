@@ -361,6 +361,15 @@ extern const char* getFieldName(fieldType type)
 		return fobj->def->name;
 }
 
+extern unsigned char getFieldLetter (fieldType type)
+{
+	fieldObject* fobj = getFieldObject (type);
+
+	return fobj->def->letter == '\0'
+		? FIELD_NULL_LETTER_CHAR
+		: fobj->def->letter;
+}
+
 extern bool doesFieldHaveValue (fieldType type, const tagEntryInfo *tag)
 {
 	if (getFieldObject(type)->def->isValueAvailable)

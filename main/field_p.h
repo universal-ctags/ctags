@@ -47,6 +47,7 @@ extern bool enableField (fieldType type, bool state, bool warnIfFixedField);
 extern bool isCommonField (fieldType type);
 extern int     getFieldOwner (fieldType type);
 extern const char* getFieldName (fieldType type);
+extern unsigned char getFieldLetter (fieldType type);
 extern unsigned int getFieldDataType (fieldType type);
 extern void printFields (int language);
 
