@@ -173,7 +173,7 @@ static fieldDefinition fieldDefinitionsExuberant [] = {
 			   renderFieldSignature, renderFieldSignatureNoEscape,
 			   doesContainAnyCharInSignature),
 	DEFINE_FIELD_FULL ('s', NULL,             true,
-			   "Scope of tag definition (`p' can be used for printing its kind)",
+			   "[tags output] scope (kind:name) of tag definition, [xref and json output] name of scope",
 			   NULL,
 			   FIELDTYPE_STRING,
 			   renderFieldScope, renderFieldScopeNoEscape,
@@ -184,7 +184,7 @@ static fieldDefinition fieldDefinitionsExuberant [] = {
 			   FIELDTYPE_STRING,
 			   renderFieldTyperef, NULL, NULL),
 	DEFINE_FIELD ('z', "kind",           false,
-			   "Include the \"kind:\" key in kind field (use k or K) in tags output, kind in long-name form in xref output",
+			   "[tags output] prepend \"kind:\" to k/ (or K/) field output, [xref and json output] kind in long-name form",
 			   FIELDTYPE_STRING,
 			   /* Following renderer is for handling --_xformat=%{kind};
 			      and is not for tags output. */
@@ -201,7 +201,7 @@ static fieldDefinition fieldDefinitionsUniversal [] = {
 			   FIELDTYPE_STRING,
 			   renderFieldRefMarker),
 	DEFINE_FIELD_FULL ('Z', "scope",   false,
-			  "Include the \"scope:\" key in scope field (use s) in tags output, scope name in xref output",
+			  "[tags output] prepend \"scope:\" key to s/scope field output, [xref and json output] the same as s/ field",
 			   NULL,
 			   FIELDTYPE_STRING,
 			   /* Following renderer is for handling --_xformat=%{scope};
@@ -219,7 +219,7 @@ static fieldDefinition fieldDefinitionsUniversal [] = {
 			   FIELDTYPE_STRING,
 			   renderFieldXpath, NULL, NULL),
 	DEFINE_FIELD ('p', "scopeKind", false,
-			   "Kind of scope in long-name form",
+			   "[tags output] no effect, [xref and json output] kind of scope in long-name form",
 			   FIELDTYPE_STRING,
 			   renderFieldScopeKindName),
 	DEFINE_FIELD_FULL ('e', "end", false,
