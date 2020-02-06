@@ -35,7 +35,7 @@ static void clearToken (void *data)
 	if (token->klass->clear)
 		token->klass->clear (token);
 
-	token->type = token->klass->typeForKeyword;
+	token->type = token->klass->typeForUndefined;
 	token->keyword = token->klass->keywordNone;
 	vStringClear (token->string);
 	token->lineNumber = getInputLineNumber ();
