@@ -33,6 +33,7 @@ static int writeCtagsPtagEntry (tagWriter *writer CTAGS_ATTR_UNUSED,
 								const char *const parserName,
 								void *clientData);
 static bool treatFieldAsFixed (int fieldType);
+static void checkCtagsOptions (tagWriter *writer);
 
 #ifdef WIN32
 static enum filenameSepOp overrideFilenameSeparator (enum filenameSepOp currentSetting);
@@ -49,6 +50,7 @@ tagWriter uCtagsWriter = {
 	.postWriteEntry = NULL,
 	.rescanFailedEntry = NULL,
 	.treatFieldAsFixed = treatFieldAsFixed,
+	.checkOptions = checkCtagsOptions,
 #ifdef WIN32
 	.overrideFilenameSeparator = overrideFilenameSeparator,
 #endif
@@ -89,6 +91,7 @@ tagWriter eCtagsWriter = {
 	.rescanFailedEntry = NULL,
 	.treatFieldAsFixed = treatFieldAsFixed,
 	.defaultFileName = CTAGS_FILE,
+	.checkOptions = checkCtagsOptions,
 };
 
 static bool hasTagEntryTabOrNewlineChar (const tagEntryInfo * const tag)
@@ -382,5 +385,37 @@ static bool treatFieldAsFixed (int fieldType)
 		return true;
 	default:
 		return false;
+	}
+}
+
+static void checkCtagsOptions (tagWriter *writer CTAGS_ATTR_UNUSED)
+{
+	if (isFieldEnabled (FIELD_KIND_KEY)
+		&& (!(isFieldEnabled (FIELD_KIND_LONG) ||
+			  isFieldEnabled (FIELD_KIND))))
+	{
+		error (WARNING, "though %c/%s field is enabled, neither %c nor %c field is not enabled",
+			   getFieldLetter (FIELD_KIND_KEY),
+			   getFieldName (FIELD_KIND_KEY),
+			   getFieldLetter (FIELD_KIND),
+			   getFieldLetter (FIELD_KIND_LONG));
+		error (WARNING, "enable the %c field to make the %c/%s field printable",
+			   getFieldLetter (FIELD_KIND_LONG),
+			   getFieldLetter (FIELD_KIND_KEY),
+			   getFieldName (FIELD_KIND_KEY));
+		enableField (FIELD_KIND_LONG, true, true);
+	}
+	if (isFieldEnabled (FIELD_SCOPE_KEY)
+		&& !isFieldEnabled (FIELD_SCOPE))
+	{
+		error (WARNING, "though %c/%s field is enabled, %c field is not enabled",
+			   getFieldLetter (FIELD_SCOPE_KEY),
+			   getFieldName (FIELD_SCOPE_KEY),
+			   getFieldLetter (FIELD_SCOPE));
+		error (WARNING, "enable the %c field to make the %c/%s field printable",
+			   getFieldLetter (FIELD_SCOPE),
+			   getFieldLetter (FIELD_SCOPE_KEY),
+			   getFieldName (FIELD_SCOPE_KEY));
+		enableField (FIELD_SCOPE, true, true);
 	}
 }

@@ -51,6 +51,8 @@ struct sTagWriter {
 								void *clientData);
 	bool (* treatFieldAsFixed) (int fieldType);
 
+	void (* checkOptions) (tagWriter *writer);
+
 #ifdef WIN32
 	enum filenameSepOp (* overrideFilenameSeparator) (enum filenameSepOp currentSetting);
 #endif	/* WIN32 */
@@ -92,6 +94,8 @@ extern bool ptagMakeCtagsOutputFilesep (ptagDesc *desc, const void *data);
 
 extern bool writerCanPrintPtag (void);
 extern bool writerDoesTreatFieldAsFixed (int fieldType);
+
+extern void writerCheckOptions (void);
 
 #ifdef WIN32
 extern enum filenameSepOp getFilenameSeparator (enum filenameSepOp currentSetting);

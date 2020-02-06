@@ -57,6 +57,7 @@ PRETENSE_OPTS = ''
 RUN_SHRINK = False
 SHOW_DIFF_OUTPUT = False
 NUM_WORKER_THREADS = 4
+DIFF_U_NUM = 0
 
 #
 # Internal variables and constants
@@ -621,7 +622,8 @@ def run_tcase(finput, t, name, tclass, category, build_t, extra_inputs):
         ret.returncode = 0
     else:
         with open(odiff, 'wb') as f:
-            ret = subprocess.run(['diff', '-U', '0', '-I', '^!_TAG', '--strip-trailing-cr', fexpected, ofiltered],
+            ret = subprocess.run(['diff', '-U', str(DIFF_U_NUM),
+                '-I', '^!_TAG', '--strip-trailing-cr', fexpected, ofiltered],
                 stdout=f)
     #print('diff time: %f' % (time.time() - start))
 
@@ -970,7 +972,8 @@ def tmain_compare(subdir, build_subdir, aspect, file):
         return True
     else:
         with open(generated, 'wb') as f:
-            subprocess.run(['diff', '-U', '0', '--strip-trailing-cr',
+            subprocess.run(['diff', '-U',
+                str(DIFF_U_NUM), '--strip-trailing-cr',
                 actual, expected],
                 stdout=f, stderr=subprocess.STDOUT)
         run_result('error', msg, None, 'diff: ' + generated, file=file)

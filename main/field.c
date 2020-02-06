@@ -31,6 +31,8 @@
 #include "writer_p.h"
 #include "xtag_p.h"
 
+#define FIELD_NULL_LETTER_CHAR '-'
+#define FIELD_NULL_LETTER_STRING "-"
 
 typedef struct sFieldObject {
 	fieldDefinition *def;
@@ -98,7 +100,7 @@ static bool     isEndFieldAvailable       (const tagEntryInfo *const tag);
 		.dataType = DT, \
 	}
 
-#define WITH_DEFUALT_VALUE(str) ((str)?(str):"-")
+#define WITH_DEFUALT_VALUE(str) ((str)?(str):FIELD_NULL_LETTER_STRING)
 
 static fieldDefinition fieldDefinitionsFixed [] = {
         /* FIXED FIELDS */
@@ -143,11 +145,11 @@ static fieldDefinition fieldDefinitionsExuberant [] = {
 			  FIELDTYPE_STRING|FIELDTYPE_BOOL,
 		      renderFieldInherits, NULL, NULL),
 	DEFINE_FIELD ('K', NULL,             false,
-		      "Kind of tag as full name",
+		      "Kind of tag in long-name form",
 		      FIELDTYPE_STRING,
 		      renderFieldKindName),
 	DEFINE_FIELD ('k', NULL,             true,
-			   "Kind of tag as a single letter",
+			   "Kind of tag in one-letter form",
 			   FIELDTYPE_STRING,
 			   renderFieldKindLetter),
 	DEFINE_FIELD_FULL ('l', "language",       false,
@@ -171,7 +173,7 @@ static fieldDefinition fieldDefinitionsExuberant [] = {
 			   renderFieldSignature, renderFieldSignatureNoEscape,
 			   doesContainAnyCharInSignature),
 	DEFINE_FIELD_FULL ('s', NULL,             true,
-			   "Scope of tag definition (`p' can be used for printing its kind)",
+			   "[tags output] scope (kind:name) of tag definition, [xref and json output] name of scope",
 			   NULL,
 			   FIELDTYPE_STRING,
 			   renderFieldScope, renderFieldScopeNoEscape,
@@ -182,7 +184,7 @@ static fieldDefinition fieldDefinitionsExuberant [] = {
 			   FIELDTYPE_STRING,
 			   renderFieldTyperef, NULL, NULL),
 	DEFINE_FIELD ('z', "kind",           false,
-			   "Include the \"kind:\" key in kind field (use k or K) in tags output, kind full name in xref output",
+			   "[tags output] prepend \"kind:\" to k/ (or K/) field output, [xref and json output] kind in long-name form",
 			   FIELDTYPE_STRING,
 			   /* Following renderer is for handling --_xformat=%{kind};
 			      and is not for tags output. */
@@ -199,7 +201,7 @@ static fieldDefinition fieldDefinitionsUniversal [] = {
 			   FIELDTYPE_STRING,
 			   renderFieldRefMarker),
 	DEFINE_FIELD_FULL ('Z', "scope",   false,
-			  "Include the \"scope:\" key in scope field (use s) in tags output, scope name in xref output",
+			  "[tags output] prepend \"scope:\" key to s/scope field output, [xref and json output] the same as s/ field",
 			   NULL,
 			   FIELDTYPE_STRING,
 			   /* Following renderer is for handling --_xformat=%{scope};
@@ -217,7 +219,7 @@ static fieldDefinition fieldDefinitionsUniversal [] = {
 			   FIELDTYPE_STRING,
 			   renderFieldXpath, NULL, NULL),
 	DEFINE_FIELD ('p', "scopeKind", false,
-			   "Kind of scope as full name",
+			   "[tags output] no effect, [xref and json output] kind of scope in long-name form",
 			   FIELDTYPE_STRING,
 			   renderFieldScopeKindName),
 	DEFINE_FIELD_FULL ('e', "end", false,
@@ -357,6 +359,15 @@ extern const char* getFieldName(fieldType type)
 		return fobj->nameWithPrefix;
 	else
 		return fobj->def->name;
+}
+
+extern unsigned char getFieldLetter (fieldType type)
+{
+	fieldObject* fobj = getFieldObject (type);
+
+	return fobj->def->letter == '\0'
+		? FIELD_NULL_LETTER_CHAR
+		: fobj->def->letter;
 }
 
 extern bool doesFieldHaveValue (fieldType type, const tagEntryInfo *tag)
@@ -520,7 +531,7 @@ static const char *renderFieldTyperef (const tagEntryInfo *const tag, const char
 	/* Return "-" instead of "-:-". */
 	if (tag->extensionFields.typeRef [0] == NULL
 		&& tag->extensionFields.typeRef [1] == NULL)
-		return renderAsIs (b, "-");
+		return renderAsIs (b, FIELD_NULL_LETTER_STRING);
 
 	vStringCatS (b, WITH_DEFUALT_VALUE (tag->extensionFields.typeRef [0]));
 	vStringPut  (b, ':');
@@ -752,7 +763,7 @@ static const char *renderFieldFile (const tagEntryInfo *const tag,
 				    const char *value CTAGS_ATTR_UNUSED,
 				    vString* b)
 {
-	return renderAsIs (b, tag->isFileScope? "file": "-");
+	return renderAsIs (b, tag->isFileScope? "file": FIELD_NULL_LETTER_STRING);
 }
 
 static const char *renderFieldPattern (const tagEntryInfo *const tag,
@@ -1092,7 +1103,7 @@ static void  fieldColprintAddLine (struct colprintTable *table, int i)
 
 	colprintLineAppendColumnChar (line,
 								  (fdef->letter == NUL_FIELD_LETTER)
-								  ? '-'
+								  ? FIELD_NULL_LETTER_CHAR
 								  : fdef->letter);
 
 	const char *name = getFieldName (i);
