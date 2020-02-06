@@ -1184,7 +1184,7 @@ static void processExcmdOption (
 			if (strcmp(parameter, "combine") == 0)
 				Option.locate = EX_COMBINE;
 			else
-				error (FATAL, "Invalid value for \"%s\" option", option);
+				error (FATAL, "Invalid value for \"%s\" option: %s", option, parameter);
 			break;
 	}
 }
