@@ -46,6 +46,7 @@ struct rejection {
 tagWriter uCtagsWriter = {
 	.writeEntry = writeCtagsEntry,
 	.writePtagEntry = writeCtagsPtagEntry,
+	.printPtagByDefault = true,
 	.preWriteEntry = NULL,
 	.postWriteEntry = NULL,
 	.rescanFailedEntry = NULL,
@@ -86,6 +87,7 @@ static enum filenameSepOp overrideFilenameSeparator (enum filenameSepOp currentS
 tagWriter eCtagsWriter = {
 	.writeEntry = writeCtagsEntry,
 	.writePtagEntry = writeCtagsPtagEntry,
+	.printPtagByDefault = true,
 	.preWriteEntry = beginECtagsFile,
 	.postWriteEntry = endECTagsFile,
 	.rescanFailedEntry = NULL,

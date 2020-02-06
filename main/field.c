@@ -398,7 +398,7 @@ static const char *renderEscapedName (const bool isTagName,
 {
 	int unexpected_byte = 0;
 
-	if (isTagName && (*s == ' ' || *s == '!'))
+	if (isTagName && (!tag->isPseudoTag) &&  (*s == ' ' || *s == '!'))
 	{
 		/* Don't allow a leading space or exclamation mark as it conflicts with
 		 * pseudo-tags when sorting.  Anything with a lower byte value is
@@ -658,6 +658,12 @@ static const char *renderFieldCompactInputLine (const tagEntryInfo *const tag,
 {
 	const char *line;
 	static vString *tmp;
+
+	if (tag->isPseudoTag)
+	{
+		Assert (tag->pattern);
+		return tag->pattern;
+	}
 
 	tmp = vStringNewOrClearWithAutoRelease (tmp);
 
