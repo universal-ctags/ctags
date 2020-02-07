@@ -1,0 +1,62 @@
+c00	input.r	/^c00 = 1$/;"	g	line:1	end:1	assignmentop:=
+c01	input.r	/^c01 <- 2$/;"	g	line:2	end:2	assignmentop:<-
+c02	input.r	/^c02 <<- 3$/;"	g	line:3	end:3	assignmentop:<<-
+f0	input.r	/^f0 <- function() {$/;"	f	line:5	signature:()	end:7	assignmentop:<-
+r0	input.r	/^   r0 <- c00 + c01 + c02$/;"	v	line:6	function:f0	end:6	assignmentop:<-
+f1	input.r	/^f1 <- function(a1) {$/;"	f	line:9	signature:(a1)	end:11	assignmentop:<-
+a1	input.r	/^f1 <- function(a1) {$/;"	z	line:9	function:f1
+r1	input.r	/^   r1 = c00 + c01 + c02 + a1$/;"	v	line:10	function:f1	end:10	assignmentop:=
+f2	input.r	/^f2 <- function(a20, a21) {$/;"	f	line:13	signature:(a20, a21)	end:15	assignmentop:<-
+a20	input.r	/^f2 <- function(a20, a21) {$/;"	z	line:13	function:f2
+a21	input.r	/^f2 <- function(a20, a21) {$/;"	z	line:13	function:f2
+r2	input.r	/^   r2 <<- c00 + c01 + c02 + a20 + a21$/;"	v	line:14	function:f2	end:14	assignmentop:<<-
+f4	input.r	/^f4 <- function() c02 +$/;"	f	line:17	signature:()	end:19	assignmentop:<-
+f5	input.r	/^f5 <- function(a5) c(1,$/;"	f	line:21	signature:(a5)	end:24	assignmentop:<-
+a5	input.r	/^f5 <- function(a5) c(1,$/;"	z	line:21	function:f5
+r5	input.r	/^r5 <- 3,$/;"	v	line:23	function:f5	end:23	assignmentop:<-
+c50	input.r	/^f5((c50 = 4))$/;"	g	line:27	end:27	assignmentop:=
+c51	input.r	/^f5(c51 <- 4)$/;"	g	line:28	end:28	assignmentop:<-
+c52	input.r	/^f5(c52 <<- 4)$/;"	g	line:29	end:29	assignmentop:<<-
+c0	input-2.r	/^{c0 = 1$/;"	g	line:1	end:1	assignmentop:=
+d0	input-2.r	/^   d0 <- 2}$/;"	g	line:3	end:3	assignmentop:<-
+f0	input-2.r	/^{f0 = 1;$/;"	g	line:5	end:5	assignmentop:=
+g0	input-2.r	/^   g0 <- 2}$/;"	g	line:6	end:6	assignmentop:<-
+h0	input-2.r	/^{h0 = 1; j0 <- 2}$/;"	g	line:8	end:8	assignmentop:=
+j0	input-2.r	/^{h0 = 1; j0 <- 2}$/;"	g	line:8	end:8	assignmentop:<-
+f	input-2.r	/^f <- function () {$/;"	f	line:10	signature:()	end:32	assignmentop:<-
+c1	input-2.r	/^    {c1 = 1$/;"	v	line:11	function:f	end:11	assignmentop:=
+d1	input-2.r	/^       d1 <- 2}$/;"	v	line:13	function:f	end:13	assignmentop:<-
+f1	input-2.r	/^    {f1 = 1;$/;"	v	line:15	function:f	end:15	assignmentop:=
+g1	input-2.r	/^       g1 <- 2}$/;"	v	line:16	function:f	end:16	assignmentop:<-
+h1	input-2.r	/^    {h1 = 1; j1 <- 2}$/;"	v	line:18	function:f	end:18	assignmentop:=
+j1	input-2.r	/^    {h1 = 1; j1 <- 2}$/;"	v	line:18	function:f	end:18	assignmentop:<-
+g	input-2.r	/^    g = function () {$/;"	v	line:19	function:f	signature:()	end:28	assignmentop:=
+c2	input-2.r	/^	{c2 = 1$/;"	v	line:20	functionVar:f.g	end:20	assignmentop:=
+d2	input-2.r	/^	   d2 <- 2}$/;"	v	line:22	functionVar:f.g	end:22	assignmentop:<-
+f2	input-2.r	/^	{f2 = 1;$/;"	v	line:24	functionVar:f.g	end:24	assignmentop:=
+g2	input-2.r	/^	   g2 <- 2}$/;"	v	line:25	functionVar:f.g	end:25	assignmentop:<-
+h2	input-2.r	/^	{h2 = 1; j2 <- 2}$/;"	v	line:27	functionVar:f.g	end:27	assignmentop:=
+j2	input-2.r	/^	{h2 = 1; j2 <- 2}$/;"	v	line:27	functionVar:f.g	end:27	assignmentop:<-
+h0	input-2.r	/^    }; h0 = function () {$/;"	v	line:28	function:f	signature:()	end:31	assignmentop:=
+k	input-2.r	/^	   k <<- 3$/;"	v	line:29	functionVar:f.h0	end:29	assignmentop:<<-
+f	input-3.r	/^f <- function () {$/;"	f	line:1	signature:()	end:8	assignmentop:<-
+d	input-3.r	/^	d <- ($/;"	v	line:2	function:f	end:4	assignmentop:<-
+a	input-3.r	/^	<- 4) + 5)$/;"	v	line:4	function:f	end:4	assignmentop:<-
+f	input-4.r	/^f <- function () {$/;"	f	line:1	signature:()	end:3	assignmentop:<-
+c0	input-4.r	/^  {;c0 = 1;}$/;"	v	line:2	function:f	end:2	assignmentop:=
+g	input-4.r	/^}; g <- function () {$/;"	f	line:3	signature:()	end:5	assignmentop:<-
+c1	input-4.r	/^  {c1 = 2}$/;"	v	line:4	function:g	end:4	assignmentop:=
+`f<<-`	input-5.r	/^`f<<-` <- function() {$/;"	f	line:1	signature:()	end:3	assignmentop:<-
+f	input-6.r	/^f <- function (x, y) {$/;"	f	line:1	signature:(x, y)	end:3	assignmentop:<-
+x	input-6.r	/^f <- function (x, y) {$/;"	z	line:1	function:f
+y	input-6.r	/^f <- function (x, y) {$/;"	z	line:1	function:f
+z	input-6.r	/^} + y + (z <- 3) + 4$/;"	v	line:3	function:f	end:3	assignmentop:<-
+a	input-7.r	/^	a <- function ()$/;"	f	line:2	signature:()	end:5	assignmentop:<-
+b	input-7.r	/^	b <- function (x)$/;"	f	line:7	signature:(x)	end:8	assignmentop:<-
+x	input-7.r	/^	b <- function (x)$/;"	z	line:7	function:b
+c	input-7.r	/^	c <- function (x)$/;"	f	line:10	signature:(x)	end:11	assignmentop:<-
+x	input-7.r	/^	c <- function (x)$/;"	z	line:10	function:c
+f8	input-8.r	/^f8 <- function () {$/;"	f	line:2	signature:()	end:3	assignmentop:<-
+g8	input-8.r	/^} -> g8$/;"	v	line:3	function:f8	assignmentop:->
+x8	input-8.r	/^x8 <- 1 -> y8$/;"	g	line:6	end:6	assignmentop:<-
+y8	input-8.r	/^x8 <- 1 -> y8$/;"	g	line:6	assignmentop:->

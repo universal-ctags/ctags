@@ -1,0 +1,9 @@
+x	input.r	/^x <- NULL$/;"	g
+y	input.r	/^x$x1 <- y <- 1:10$/;"	g
+z	input.r	/^x$x2 <- z <- 0:9 -> a$/;"	g
+a	input.r	/^x$x2 <- z <- 0:9 -> a$/;"	g
+f	input.r	/^f <- function () {$/;"	f
+X	input.r	/^	X <- NULL$/;"	v	function:f
+Y	input.r	/^	X$x1 <- Y <- 1:10$/;"	v	function:f
+Z	input.r	/^	X$x2 <- Z <- 0:9 -> A$/;"	v	function:f
+A	input.r	/^	X$x2 <- Z <- 0:9 -> A$/;"	v	function:f
