@@ -957,9 +957,22 @@ static void attachParserFieldGeneric (tagEntryInfo *const tag, fieldType ftype, 
 	}
 }
 
-extern void attachParserField (tagEntryInfo *const tag, fieldType ftype, const char * value)
+extern void attachParserField (tagEntryInfo *const tag, bool inCorkQueue, fieldType ftype, const char * value)
 {
-	attachParserFieldGeneric (tag, ftype, value, false);
+	Assert (tag != NULL);
+
+	if (inCorkQueue)
+	{
+		const char * v;
+		v = eStrdup (value);
+
+		bool dynfields_allocated = tag->parserFieldsDynamic? true: false;
+		attachParserFieldGeneric (tag, ftype, v, true);
+		if (!dynfields_allocated && tag->parserFieldsDynamic)
+			PARSER_TRASH_BOX_TAKE_BACK(tag->parserFieldsDynamic);
+	}
+	else
+		attachParserFieldGeneric (tag, ftype, value, false);
 }
 
 extern void attachParserFieldToCorkEntry (int index,
@@ -967,20 +980,12 @@ extern void attachParserFieldToCorkEntry (int index,
 					 const char *value)
 {
 	tagEntryInfo * tag;
-	const char * v;
 
 	if (index == CORK_NIL)
 		return;
 
 	tag = getEntryInCorkQueue(index);
-	Assert (tag != NULL);
-
-	v = eStrdup (value);
-
-	bool dynfields_allocated = tag->parserFieldsDynamic? true: false;
-	attachParserFieldGeneric (tag, ftype, v, true);
-	if (!dynfields_allocated && tag->parserFieldsDynamic)
-		PARSER_TRASH_BOX_TAKE_BACK(tag->parserFieldsDynamic);
+	attachParserField (tag, true, ftype, value);
 }
 
 extern const tagField* getParserField (const tagEntryInfo * tag, int index)

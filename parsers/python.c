@@ -274,7 +274,7 @@ static int makeClassTag (const tokenInfo *const token,
 		e.extensionFields.inheritance = inheritance ? vStringValue (inheritance) : "";
 		if (decorators && vStringLength (decorators) > 0)
 		{
-			attachParserField (&e, PythonFields[F_DECORATORS].ftype,
+			attachParserField (&e, false, PythonFields[F_DECORATORS].ftype,
 			                   vStringValue (decorators));
 		}
 
@@ -298,7 +298,7 @@ static int makeFunctionTag (const tokenInfo *const token,
 			e.extensionFields.signature = vStringValue (arglist);
 		if (decorators && vStringLength (decorators) > 0)
 		{
-			attachParserField (&e, PythonFields[F_DECORATORS].ftype,
+			attachParserField (&e, false, PythonFields[F_DECORATORS].ftype,
 			                   vStringValue (decorators));
 		}
 
