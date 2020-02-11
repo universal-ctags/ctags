@@ -732,10 +732,12 @@ extern char *readLineFromBypassForTag (vString *const vLine, const tagEntryInfo 
 
 /*  Truncates the text line containing the tag at the character following the
  *  tag, providing a character which designates the end of the tag.
+ *  Returns the length of the truncated line (or 0 if it doesn't truncate).
  */
-extern void truncateTagLineAfterTag (
+extern size_t truncateTagLineAfterTag (
 		char *const line, const char *const token, const bool discardNewline)
 {
+	size_t len = 0;
 	char *p = strstr (line, token);
 
 	if (p != NULL)
@@ -744,7 +746,10 @@ extern void truncateTagLineAfterTag (
 		if (*p != '\0'  &&  ! (*p == '\n'  &&  discardNewline))
 			++p;    /* skip past character terminating character */
 		*p = '\0';
+		len = p - line;
 	}
+
+	return len;
 }
 
 static char* getFullQualifiedScopeNameFromCorkQueue (const tagEntryInfo * inner_scope)
@@ -878,8 +883,11 @@ static int   makePatternStringCommon (const tagEntryInfo *const tag,
 
 	if (tag->truncateLineAfterTag)
 	{
-		truncateTagLineAfterTag (line, tag->name, false);
-		line_len = strlen (line);
+		size_t truncted_len;
+
+		truncted_len = truncateTagLineAfterTag (line, tag->name, false);
+		if (truncted_len > 0)
+			line_len = truncted_len;
 	}
 
 	searchChar = Option.backward ? '?' : '/';
