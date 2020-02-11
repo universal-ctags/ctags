@@ -871,12 +871,17 @@ static int   makePatternStringCommon (const tagEntryInfo *const tag,
 		/* This can be occurs if the size of input file is zero, and
 		   an empty regex pattern (//) matches to the input. */
 		line = "";
+		line_len = 0;
 	}
+	else
+		line_len = vStringLength (TagFile.vLine);
 
 	if (tag->truncateLineAfterTag)
+	{
 		truncateTagLineAfterTag (line, tag->name, false);
+		line_len = strlen (line);
+	}
 
-	line_len = strlen (line);
 	searchChar = Option.backward ? '?' : '/';
 	terminator = (line_len > 0 && (line [line_len - 1] == '\n')) ? "$": "";
 
