@@ -654,7 +654,9 @@ extern void closeTagFile (const bool resize)
  *  are doubled and a leading '^' or trailing '$' is also quoted. End of line
  *  characters (line feed or carriage return) are dropped.
  */
-static size_t appendInputLine (int putc_func (char , void *), const char *const line, void * data, bool *omitted)
+static size_t appendInputLine (int putc_func (char , void *), const char *const line,
+							   unsigned int patternLengthLimit,
+							   void * data, bool *omitted)
 {
 	size_t length = 0;
 	const char *p;
@@ -671,7 +673,7 @@ static size_t appendInputLine (int putc_func (char , void *), const char *const 
 		if (c == CRETURN  ||  c == NEWLINE)
 			break;
 
-		if (Option.patternLengthLimit != 0 && length >= Option.patternLengthLimit &&
+		if (patternLengthLimit != 0 && length >= patternLengthLimit &&
 			/* Do not cut inside a multi-byte UTF-8 character, but safe-guard it not to
 			 * allow more than one extra valid UTF-8 character in case it's not actually
 			 * UTF-8.  To do that, limit to an extra 3 UTF-8 sub-bytes (0b10xxxxxx). */
@@ -908,7 +910,8 @@ static int   makePatternStringCommon (const tagEntryInfo *const tag,
 	length += putc_func(searchChar, output);
 	if ((tag->boundaryInfo & BOUNDARY_START) == 0)
 		length += putc_func('^', output);
-	length += appendInputLine (putc_func, line, output, &omitted);
+	length += appendInputLine (putc_func, line, Option.patternLengthLimit,
+							   output, &omitted);
 	length += puts_func (omitted? "": terminator, output);
 	length += putc_func (searchChar, output);
 
