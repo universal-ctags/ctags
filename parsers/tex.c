@@ -358,7 +358,7 @@ static void copyToken (tokenInfo *const dest, tokenInfo *const src)
  *	 Scanning functions
  */
 
-static bool parseTag (tokenInfo *const token, texKind kind)
+static bool parseTag (tokenInfo *const token, texKind kind, bool enterSquare)
 {
 	tokenInfo *const name = newToken ();
 	vString *	fullname;
@@ -377,9 +377,10 @@ static bool parseTag (tokenInfo *const token, texKind kind)
 	 * the curly braces for the tag name.
 	 *
 	 * If the keyword is label like \label, words in the square
-	 * brackets are skipped.
+	 * brackets should be skipped. This can be controlled
+	 * with `enterSquare' parameter; true is for tagging, and
+	 * false is for skipping.
 	 */
-	bool enterSquare = (kind == TEXTAG_LABEL)? false: true;
 
 	if (isType (token, TOKEN_KEYWORD))
 	{
@@ -532,31 +533,31 @@ static void parseTexFile (tokenInfo *const token)
 			switch (token->keyword)
 			{
 				case KEYWORD_part:
-					eof = parseTag (token, TEXTAG_PART);
+					eof = parseTag (token, TEXTAG_PART, true);
 					break;
 				case KEYWORD_chapter:
-					eof = parseTag (token, TEXTAG_CHAPTER);
+					eof = parseTag (token, TEXTAG_CHAPTER, true);
 					break;
 				case KEYWORD_section:
-					eof = parseTag (token, TEXTAG_SECTION);
+					eof = parseTag (token, TEXTAG_SECTION, true);
 					break;
 				case KEYWORD_subsection:
-					eof = parseTag (token, TEXTAG_SUBSECTION);
+					eof = parseTag (token, TEXTAG_SUBSECTION, true);
 					break;
 				case KEYWORD_subsubsection:
-					eof = parseTag (token, TEXTAG_SUBSUBSECTION);
+					eof = parseTag (token, TEXTAG_SUBSUBSECTION, true);
 					break;
 				case KEYWORD_paragraph:
-					eof = parseTag (token, TEXTAG_PARAGRAPH);
+					eof = parseTag (token, TEXTAG_PARAGRAPH, true);
 					break;
 				case KEYWORD_subparagraph:
-					eof = parseTag (token, TEXTAG_SUBPARAGRAPH);
+					eof = parseTag (token, TEXTAG_SUBPARAGRAPH, true);
 					break;
 				case KEYWORD_label:
-					eof = parseTag (token, TEXTAG_LABEL);
+					eof = parseTag (token, TEXTAG_LABEL, false);
 					break;
 				case KEYWORD_include:
-					eof = parseTag (token, TEXTAG_INCLUDE);
+					eof = parseTag (token, TEXTAG_INCLUDE, true);
 					break;
 				default:
 					break;
