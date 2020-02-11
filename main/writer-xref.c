@@ -14,22 +14,61 @@
 #include "fmt_p.h"
 #include "mio.h"
 #include "options_p.h"
+#include "ptag_p.h"
 #include "writer_p.h"
+
+#include <string.h>
 
 
 static int writeXrefEntry  (tagWriter *writer CTAGS_ATTR_UNUSED,
 							MIO * mio, const tagEntryInfo *const tag,
 							void *clientData CTAGS_ATTR_UNUSED);
+static int writeXrefPtagEntry (tagWriter *writer, MIO * mio, const ptagDesc *desc,
+							   const char *const fileName,
+							   const char *const pattern,
+							   const char *const parserName,
+							   void *clientData);
 
 tagWriter xrefWriter = {
 	.writeEntry = writeXrefEntry,
-	.writePtagEntry = NULL,
+	.writePtagEntry = writeXrefPtagEntry,
+	.printPtagByDefault = false,
 	.preWriteEntry = NULL,
 	.postWriteEntry = NULL,
 	.rescanFailedEntry = NULL,
 	.treatFieldAsFixed = NULL,
 	.defaultFileName = NULL,
 };
+
+static int writeXrefPtagEntry (tagWriter *writer, MIO * mio, const ptagDesc *desc,
+							   const char *const fileName,
+							   const char *const pattern,
+							   const char *const parserName,
+							   void *clientData)
+{
+	tagEntryInfo e;
+	vString *name = vStringNewInit(PSEUDO_TAG_PREFIX);
+
+	memset (&e, 0, sizeof(e));
+
+	e.isPseudoTag = 1;
+
+	vStringCatS (name, desc->name);
+	if (parserName)
+	{
+		vStringCatS (name, PSEUDO_TAG_SEPARATOR);
+		vStringCatS (name, parserName);
+	}
+	e.name = vStringValue (name);
+	e.inputFileName = fileName;
+	e.pattern = pattern;
+
+	int length = writeXrefEntry (writer, mio, &e, clientData);
+
+	vStringDelete (name);
+
+	return length;
+}
 
 static int writeXrefEntry (tagWriter *writer CTAGS_ATTR_UNUSED,
 						   MIO * mio, const tagEntryInfo *const tag,

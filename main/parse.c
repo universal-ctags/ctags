@@ -122,11 +122,13 @@ static void uninstallTagXpathTable (const langType language);
 /*
 *   DATA DEFINITIONS
 */
+static parserDefinition *CTagsParser (void);
 static parserDefinition *CTagsSelfTestParser (void);
 static parserDefinitionFunc* BuiltInParsers[] = {
 #ifdef EXTERNAL_PARSER_LIST
 	EXTERNAL_PARSER_LIST
 #else  /* ! EXTERNAL_PARSER_LIST */
+	CTagsParser,				/* This must be first entry. */
 	CTagsSelfTestParser,
 	PARSER_LIST,
 	XML_PARSER_LIST
@@ -4488,6 +4490,28 @@ extern bool processPretendOption (const char *const option, const char *const pa
 	enableLanguage (old_language, false);
 
 	return true;
+}
+
+/*
+ * A dummy parser for printing pseudo tags in xref output
+ */
+static void dontFindTags (void)
+{
+}
+
+static kindDefinition CtagsKinds[] = {
+	{true, 'p', "ptag", "pseudo tags"},
+};
+
+static parserDefinition *CTagsParser (void)
+{
+	parserDefinition *const def = parserNew ("UniversalCtags");
+	def->extensions = NULL;
+	def->kindTable = CtagsKinds;
+	def->kindCount = ARRAY_SIZE(CtagsKinds);
+	def->parser = dontFindTags;
+	def->invisible = true;
+	return def;
 }
 
 /*

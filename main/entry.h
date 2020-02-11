@@ -50,6 +50,8 @@ struct sTagEntryInfo {
 					    don't print it to tags file. */
 	unsigned int skipAutoFQEmission:1; /* If a parser makes a fq tag for the
 										  current tag by itself, set this. */
+	unsigned int isPseudoTag:1;	/* Used only in xref output.
+								   If a tag is a pseudo, set this. */
 
 	unsigned long lineNumber;     /* line number of tag */
 	const char* pattern;	      /* pattern for locating input line

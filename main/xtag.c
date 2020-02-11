@@ -35,6 +35,8 @@ static bool isPseudoTagsEnabled (xtagDefinition *pdef CTAGS_ATTR_UNUSED)
 {
 	if (!writerCanPrintPtag())
 		return false;
+	if (!writerPrintPtagByDefault())
+		return false;
 
 	return ! isDestinationStdout ();
 }

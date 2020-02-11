@@ -44,6 +44,7 @@ static int writeJsonPtagEntry (tagWriter *writer CTAGS_ATTR_UNUSED,
 tagWriter jsonWriter = {
 	.writeEntry = writeJsonEntry,
 	.writePtagEntry = writeJsonPtagEntry,
+	.printPtagByDefault = true,
 	.preWriteEntry = NULL,
 	.postWriteEntry = NULL,
 	.rescanFailedEntry = NULL,

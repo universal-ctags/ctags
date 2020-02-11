@@ -1,0 +1,8 @@
+!_TAG_FILE_FORMAT ptag          0 2                extended format; --format=1 will not append ;" to lines
+!_TAG_FILE_SORTED ptag          0 1                0=unsorted, 1=sorted, 2=foldcase
+!_TAG_OUTPUT_FILESEP ptag          0 slash            slash or backslash
+!_TAG_OUTPUT_MODE ptag          0                  u-ctags or e-ctags
+!_TAG_PROGRAM_AUTHOR ptag          0 Universal Ctags Team 
+!_TAG_PROGRAM_NAME ptag          0 Universal Ctags  Derived from Exuberant Ctags
+!_TAG_PROGRAM_URL ptag          0 https://ctags.io/ official site
+main             function      1 input.c int main (void)
