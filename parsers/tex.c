@@ -354,6 +354,40 @@ static void copyToken (tokenInfo *const dest, tokenInfo *const src)
 	vStringCopy (dest->scope, src->scope);
 }
 
+static void updateScopeInfo (texKind kind, vString *fullname)
+{
+	switch (kind)
+	{
+		case TEXTAG_PART:
+			vStringCopy(lastPart, fullname);
+			vStringClear(lastChapter);
+			vStringClear(lastSection);
+			vStringClear(lastSubS);
+			vStringClear(lastSubSubS);
+			break;
+		case TEXTAG_CHAPTER:
+			vStringCopy(lastChapter, fullname);
+			vStringClear(lastSection);
+			vStringClear(lastSubS);
+			vStringClear(lastSubSubS);
+			break;
+		case TEXTAG_SECTION:
+			vStringCopy(lastSection, fullname);
+			vStringClear(lastSubS);
+			vStringClear(lastSubSubS);
+			break;
+		case TEXTAG_SUBSECTION:
+			vStringCopy(lastSubS, fullname);
+			vStringClear(lastSubSubS);
+			break;
+		case TEXTAG_SUBSUBSECTION:
+			vStringCopy(lastSubSubS, fullname);
+			break;
+		default:
+			break;
+	}
+}
+
 /*
  *	 Scanning functions
  */
@@ -482,36 +516,7 @@ static bool parseTag (tokenInfo *const token, texKind kind, bool enterSquare)
 	 * save the name of the last section definitions for scope-resolution
 	 * later
 	 */
-	switch (kind)
-	{
-		case TEXTAG_PART:
-			vStringCopy(lastPart, fullname);
-			vStringClear(lastChapter);
-			vStringClear(lastSection);
-			vStringClear(lastSubS);
-			vStringClear(lastSubSubS);
-			break;
-		case TEXTAG_CHAPTER:
-			vStringCopy(lastChapter, fullname);
-			vStringClear(lastSection);
-			vStringClear(lastSubS);
-			vStringClear(lastSubSubS);
-			break;
-		case TEXTAG_SECTION:
-			vStringCopy(lastSection, fullname);
-			vStringClear(lastSubS);
-			vStringClear(lastSubSubS);
-			break;
-		case TEXTAG_SUBSECTION:
-			vStringCopy(lastSubS, fullname);
-			vStringClear(lastSubSubS);
-			break;
-		case TEXTAG_SUBSUBSECTION:
-			vStringCopy(lastSubSubS, fullname);
-			break;
-		default:
-			break;
-	}
+	updateScopeInfo (kind, fullname);
 
  out:
 	deleteToken (name);
