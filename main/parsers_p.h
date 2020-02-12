@@ -136,6 +136,7 @@
 	TclParser, \
 	TclOOParser, \
 	TexParser, \
+	TexBeamerParser, \
 	TTCNParser, \
 	TypeScriptParser, \
 	VeraParser, \
