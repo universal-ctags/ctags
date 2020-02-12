@@ -481,6 +481,11 @@ static bool parseTag (tokenInfo *const token, texKind kind, bool enterSquare)
 			eof = true;
 			goto out;
 		}
+
+		/* Handle the case the code like \section{} */
+		if (isType (token, TOKEN_CLOSE_CURLY))
+			goto out;
+
 		while (depth > 0)
 		{
 			/* if (isType (token, TOKEN_IDENTIFIER) && useLongName) */
