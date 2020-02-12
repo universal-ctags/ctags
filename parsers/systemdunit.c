@@ -117,11 +117,10 @@ static void findSystemdUnitTags (void)
 
 extern parserDefinition* SystemdUnitParser (void)
 {
-	static const char *const extensions [] = { "unit", "service", "socket", "device",
+	static const char *const extensions [] = { "service", "socket", "device",
 											   "mount", "automount", "swap", "target",
-											   "path", "timer", "snapshot", "scope",
-											   "slice", "time", /* ... */
-											   NULL };
+											   "path", "timer", "snapshot",
+											   "slice", NULL };
 	static iniconfSubparser systemdUnitSubparser = {
 		.subparser = {
 			.direction = SUBPARSER_SUB_RUNS_BASE,
