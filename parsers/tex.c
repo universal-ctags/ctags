@@ -56,7 +56,9 @@ enum eKeywordId {
 	KEYWORD_paragraph,
 	KEYWORD_subparagraph,
 	KEYWORD_label,
-	KEYWORD_include
+	KEYWORD_include,
+	KEYWORD_begin,
+	KEYWORD_end,
 };
 typedef int keywordId; /* to allow KEYWORD_NONE */
 
@@ -133,14 +135,18 @@ static const keywordTable TexKeywordTable [] = {
 	{ "paragraph",		KEYWORD_paragraph			},
 	{ "subparagraph",	KEYWORD_subparagraph		},
 	{ "label",			KEYWORD_label				},
-	{ "include",		KEYWORD_include				}
+	{ "include",		KEYWORD_include				},
+	{ "begin",			KEYWORD_begin				},
+	{ "end",			KEYWORD_end					},
 };
 
 /*
  * FUNCTION DECLARATIONS
  */
 
-static bool notifyReadingIdentifier (tokenInfo *id_token, bool *tokenUnprocessed);
+static bool notifyReadingIdentifier  (tokenInfo *id_token, bool *tokenUnprocessed);
+static bool notifyReadingBeginEnvironment (tokenInfo *token, vString *envName, bool *tokenUnprocessed);
+static bool notifyReadingEndEnvironment (vString *envName);
 
 
 /*
@@ -655,6 +661,44 @@ static bool parseTag (tokenInfo *const token, texKind kind, bool enterSquare, bo
 	return eof;
 }
 
+static bool parseEnv (tokenInfo *const token, bool begin, bool *tokenUnprocessed)
+{
+	bool eof = false;
+	vString *envName = vStringNew ();
+	struct TexParseStrategy strategy [] = {
+		{
+			.type = '{',
+			.flags = TEX_NAME_FLAG_INCLUDING_WHITESPACE,
+			.kindIndex = KIND_GHOST_INDEX,
+			.name = envName,
+		},
+		{
+			.type = 0
+		}
+	};
+
+	if (parseWithStrategy (token, strategy, tokenUnprocessed))
+	{
+		eof = true;
+		goto out;
+	}
+
+
+	if (vStringLength (envName) > 0)
+	{
+		if (begin)
+			eof = notifyReadingBeginEnvironment (token, envName, tokenUnprocessed);
+		else
+			eof = notifyReadingEndEnvironment (envName);
+	}
+
+ out:
+	vStringDelete (envName);
+
+	return eof;
+
+}
+
 static void parseTexFile (tokenInfo *const token)
 {
 	bool eof = false;
@@ -699,6 +743,12 @@ static void parseTexFile (tokenInfo *const token)
 					break;
 				case KEYWORD_include:
 					eof = parseTag (token, TEXTAG_INCLUDE, true, &tokenUnprocessed);
+					break;
+				case KEYWORD_begin:
+					eof = parseEnv (token, true, &tokenUnprocessed);
+					break;
+				case KEYWORD_end:
+					eof = parseEnv (token, false, &tokenUnprocessed);
 					break;
 				default:
 					break;
@@ -778,6 +828,57 @@ static bool notifyReadingIdentifier (tokenInfo *id_token, bool *tokenUnprocessed
 	}
 
 	return eof;
+}
+
+static bool notifyReadingBeginEnvironment (tokenInfo *token,
+										   vString *envName,
+										   bool *tokenUnprocessed)
+{
+	subparser *sub;
+	bool eof = false;
+
+	foreachSubparser (sub, false)
+	{
+		texSubparser *texsub = (texSubparser *)sub;
+
+		if (texsub->readEnviromentBeginNotify)
+		{
+			struct TexParseStrategy *strategy;
+
+			enterSubparser (sub);
+			strategy = texsub->readEnviromentBeginNotify (texsub, envName);
+			if (strategy)
+				eof = parseWithStrategy (token, strategy, tokenUnprocessed);
+			leaveSubparser ();
+			if (strategy)
+				break;
+		}
+	}
+
+	return eof;
+}
+
+static bool notifyReadingEndEnvironment (vString  *envName)
+{
+	subparser *sub;
+
+	foreachSubparser (sub, false)
+	{
+		texSubparser *texsub = (texSubparser *)sub;
+
+		if (texsub->readEnviromentEndNotify)
+		{
+			bool consuming;
+
+			enterSubparser (sub);
+			consuming = texsub->readEnviromentEndNotify (texsub, envName);
+			leaveSubparser ();
+			if (consuming)
+				break;
+		}
+	}
+
+	return false;
 }
 
 /* Create parser definition structure */

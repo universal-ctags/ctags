@@ -70,6 +70,22 @@ typedef struct sTexSubparser texSubparser;
 struct sTexSubparser {
 	subparser subparser;
 
+	/* When Tex parser reads an \begin{foo}, it calls
+	 * this method.
+	 *
+	 * A subparser having interests in successor tokens may return strategies.
+	 * If it doesn't, just return NULL; Tex base parser may call the next subparser.
+	 */
+	struct TexParseStrategy * (* readEnviromentBeginNotify) (texSubparser *s,
+															 vString *env);
+	/* When Tex parser reads an \end{foo}, it calls
+	 * this method.
+	 *
+	 * If this method returns true, Tex base parser may call the next subparser.
+	 * If it returns false, Tex base parser stops calling the rest of subparsers.
+	 */
+	bool (* readEnviromentEndNotify) (texSubparser *s, vString *env);
+
 	/* When Tex parser reads an \identifier, it calls
 	 * this method.
 	 *
