@@ -224,8 +224,9 @@ static int getScopeInfo(texKind kind, vString *const parentName)
 /*
  *	 Tag generation functions
  */
-static void makeTexTag (tokenInfo *const token, texKind kind)
+static int makeTexTag (tokenInfo *const token, texKind kind)
 {
+	int corkQueue = CORK_NIL;
 	if (TexKinds [kind].enabled)
 	{
 		const char *const name = vStringValue (token->string);
@@ -243,9 +244,10 @@ static void makeTexTag (tokenInfo *const token, texKind kind)
 			e.extensionFields.scopeName = vStringValue(parentName);
 		}
 
-		makeTagEntry (&e);
+		corkQueue = makeTagEntry (&e);
 		vStringDelete (parentName);
 	}
+	return corkQueue;
 }
 
 /*
