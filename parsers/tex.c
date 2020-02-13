@@ -29,6 +29,8 @@
 #include "routines.h"
 #include "vstring.h"
 
+#include "tex.h"
+
 /*
  *	 MACROS
  */
@@ -85,50 +87,6 @@ typedef struct sTokenInfo {
 } tokenInfo;
 
 /*
- * Parsing strategy
- */
-
-enum TexNameFlag {
-	/* Allow that the type of input token doesn't match
-	 * the type of strategy. In stread of aborting,
-	 * apply the next strategy to the same token. */
-	TEX_NAME_FLAG_OPTIONAL             = (1 << 0),
-
-	/* When reading tokens inside pair,
-	 * call readTokenFull (token, true); */
-	TEX_NAME_FLAG_INCLUDING_WHITESPACE = (1 << 1),
-
-	/* If a tag is created with this strategy, don't
-	 * create a tag in its successor strategies. */
-	TEX_NAME_FLAG_EXCLUSIVE            = (1 << 2),
-};
-
-struct TexParseStrategy {
-	/* expected token type '<', '[', '*', and '{' are supported.
-	 * 0 means the end of strategies.
-	 *
-	 * A string between <>, [], or {} (pairs) can be tagged or store to
-	 * a vString. See kindIndex and name field of this structure.
-	 */
-	tokenType type;
-
-	/* Bits combination of enum TexNameFlag */
-	unsigned int flags;
-
-	/* Kind for making a tag for the string surrounded by one of pairs.
-	 * If you don't need to make a tag for the string,
-	 * specify KIND_GHOST_INDEX. */
-	int kindIndex;
-
-	/* If a tag is made, Tex parser stores its cork index here. */
-	int corkIndex;
-
-	/* Store the string surrounded by one of paris.
-	 * If you don't need to store the string, set NULL here. */
-	vString *name;
-};
-
-/*
  *	DATA DEFINITIONS
  */
 
@@ -177,6 +135,13 @@ static const keywordTable TexKeywordTable [] = {
 	{ "label",			KEYWORD_label				},
 	{ "include",		KEYWORD_include				}
 };
+
+/*
+ * FUNCTION DECLARATIONS
+ */
+
+static bool notifyReadingIdentifier (tokenInfo *id_token, bool *tokenUnprocessed);
+
 
 /*
  *	 FUNCTION DEFINITIONS
@@ -739,6 +704,8 @@ static void parseTexFile (tokenInfo *const token)
 					break;
 			}
 		}
+		else if (isType (token, TOKEN_IDENTIFIER))
+			eof = notifyReadingIdentifier (token, &tokenUnprocessed);
 		if (eof)
 			break;
 	} while (true);
@@ -781,6 +748,36 @@ static void findTexTags (void)
 	parseTexFile (token);
 
 	deleteToken (token);
+}
+
+static bool notifyReadingIdentifier (tokenInfo *id_token, bool *tokenUnprocessed)
+{
+	subparser *sub;
+	bool eof = false;
+
+	foreachSubparser (sub, false)
+	{
+		texSubparser *texsub = (texSubparser *)sub;
+
+		if (texsub->readIdentifierNotify)
+		{
+			struct TexParseStrategy *strategy;
+
+			enterSubparser(sub);
+
+			strategy = texsub->readIdentifierNotify (texsub, id_token->string);
+
+			if (strategy)
+				eof = parseWithStrategy (id_token, strategy, tokenUnprocessed);
+
+			leaveSubparser();
+
+			if (strategy)
+				break;
+		}
+	}
+
+	return eof;
 }
 
 /* Create parser definition structure */
