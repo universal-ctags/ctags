@@ -818,7 +818,11 @@ static bool notifyReadingIdentifier (tokenInfo *id_token, bool *tokenUnprocessed
 			strategy = texsub->readIdentifierNotify (texsub, id_token->string);
 
 			if (strategy)
+			{
 				eof = parseWithStrategy (id_token, strategy, tokenUnprocessed);
+				if (texsub->reportStrategicParsing)
+					texsub->reportStrategicParsing (texsub, strategy);
+			}
 
 			leaveSubparser();
 
@@ -848,7 +852,11 @@ static bool notifyReadingBeginEnvironment (tokenInfo *token,
 			enterSubparser (sub);
 			strategy = texsub->readEnviromentBeginNotify (texsub, envName);
 			if (strategy)
+			{
 				eof = parseWithStrategy (token, strategy, tokenUnprocessed);
+				if (texsub->reportStrategicParsing)
+					texsub->reportStrategicParsing (texsub, strategy);
+			}
 			leaveSubparser ();
 			if (strategy)
 				break;

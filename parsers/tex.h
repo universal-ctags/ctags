@@ -94,6 +94,13 @@ struct sTexSubparser {
 	 */
 	struct TexParseStrategy *(* readIdentifierNotify) (texSubparser *s,
 													   vString *identifier);
+
+	/* After Tex parser runs the strategies returned from readIdentifierNotify
+	 * method, Tex parser calls this method to notify the subparser the result
+	 * of running the strategies; corkIndex and/or name fields of strategies
+	 * may be filled. */
+	void (* reportStrategicParsing) (texSubparser *s,
+									 const struct TexParseStrategy *strategy);
 };
 
 #endif	/* CTAGS_PARSER_TEX_H */
