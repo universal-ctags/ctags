@@ -1,0 +1,71 @@
+\documentclass{beamer}
+
+\begin{document}
+\begin{frame}{Concept}
+\end{frame}
+\begin{frame}{Concept}{kind}
+\end{frame}
+\begin{frame}\frametitle{Concept}
+  \framesubtitle{field}
+\end{frame}
+\begin{frame}{Concept}
+  \framesubtitle{extra}
+\end{frame}
+
+\begin{frame}[fragile]{Concept}{pseudo tag}
+\end{frame}
+
+\begin{frame}<1-2>\frametitle{Options}
+\onslide*<1>{
+  \begin{itemize}
+  \item --kinds=
+  \item --fields=
+  \item --extras=
+  \end{itemize}
+}
+\onslide*<2>{
+  \begin{itemize}
+  \item --list-kinds-full=
+  \item --list-fields=
+  \item --list-extras=
+  \end{itemize}
+}
+\end{frame}
+
+\begin{frame}<1-2>[fragile]\frametitle{Optlib}
+\onslide*<1>{
+  \begin{itemize}
+  \item --langdef=
+  \item --map-LANG=
+  \end{itemize}
+}
+\onslide*<2>{
+  \begin{itemize}
+  \item --kinddef-LANG=
+  \item --fielddef-LANG=
+  \item --extradef-LANG=
+  \end{itemize}
+}
+\end{frame}
+
+\begin{frame}<1-2>[fragile]\frametitle{Optlib}\framesubtitle{Line oriented parser}
+\onslide*<1>{
+--regex-LANG=...
+}
+\onslide*<2>{
+  \begin{itemize}
+  \item \{scope\}
+  \item \{exclusive\}
+  \item \{placeholder\}
+  \end{itemize}
+}
+\end{frame}
+\begin{frame}[<+->][plain]{Optlib}\framesubtitle{Multiline parser}
+--mline-regex-LANG=...
+\begin{itemize}
+\item \{mgroup\}
+\item \{\_advanceTo\}
+\item \{\_guest\}
+\end{itemize}
+\end{frame}
+\end{document}
