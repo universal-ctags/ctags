@@ -73,6 +73,7 @@
 	EiffelParser, \
 	ElixirParser, \
 	ElmParser, \
+	EmacsLispParser, \
 	ErlangParser, \
 	FalconParser, \
 	FlexParser, \
