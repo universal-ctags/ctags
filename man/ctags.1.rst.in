@@ -560,7 +560,7 @@ are not listed here. They are experimental or for debugging purpose.
 		See also z/kind flag.
 
 	K
-		Kind of tag as full name
+		Kind of tag as long-name.
 		Exceptionally this has no field name.
 		See also z/kind flag.
 
@@ -574,7 +574,7 @@ are not listed here. They are experimental or for debugging purpose.
 		Line number of tag definition
 
 	p/scopeKind
-		Kind of scope as full name
+		Kind of scope as long-name
 
 	r/roles
 		Roles assigned to the tag.
