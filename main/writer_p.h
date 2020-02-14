@@ -85,7 +85,7 @@ void writerRescanFailed (unsigned long validTagNum);
 
 extern const char *outputDefaultFileName (void);
 
-extern void truncateTagLineAfterTag (char *const line, const char *const token,
+extern size_t truncateTagLineAfterTag (char *const line, const char *const token,
 			     const bool discardNewline);
 extern void abort_if_ferror(MIO *const fp);
 

@@ -654,7 +654,9 @@ extern void closeTagFile (const bool resize)
  *  are doubled and a leading '^' or trailing '$' is also quoted. End of line
  *  characters (line feed or carriage return) are dropped.
  */
-static size_t appendInputLine (int putc_func (char , void *), const char *const line, void * data, bool *omitted)
+static size_t appendInputLine (int putc_func (char , void *), const char *const line,
+							   unsigned int patternLengthLimit,
+							   void * data, bool *omitted)
 {
 	size_t length = 0;
 	const char *p;
@@ -671,7 +673,7 @@ static size_t appendInputLine (int putc_func (char , void *), const char *const 
 		if (c == CRETURN  ||  c == NEWLINE)
 			break;
 
-		if (Option.patternLengthLimit != 0 && length >= Option.patternLengthLimit &&
+		if (patternLengthLimit != 0 && length >= patternLengthLimit &&
 			/* Do not cut inside a multi-byte UTF-8 character, but safe-guard it not to
 			 * allow more than one extra valid UTF-8 character in case it's not actually
 			 * UTF-8.  To do that, limit to an extra 3 UTF-8 sub-bytes (0b10xxxxxx). */
@@ -732,10 +734,12 @@ extern char *readLineFromBypassForTag (vString *const vLine, const tagEntryInfo 
 
 /*  Truncates the text line containing the tag at the character following the
  *  tag, providing a character which designates the end of the tag.
+ *  Returns the length of the truncated line (or 0 if it doesn't truncate).
  */
-extern void truncateTagLineAfterTag (
+extern size_t truncateTagLineAfterTag (
 		char *const line, const char *const token, const bool discardNewline)
 {
+	size_t len = 0;
 	char *p = strstr (line, token);
 
 	if (p != NULL)
@@ -744,7 +748,10 @@ extern void truncateTagLineAfterTag (
 		if (*p != '\0'  &&  ! (*p == '\n'  &&  discardNewline))
 			++p;    /* skip past character terminating character */
 		*p = '\0';
+		len = p - line;
 	}
+
+	return len;
 }
 
 static char* getFullQualifiedScopeNameFromCorkQueue (const tagEntryInfo * inner_scope)
@@ -871,12 +878,20 @@ static int   makePatternStringCommon (const tagEntryInfo *const tag,
 		/* This can be occurs if the size of input file is zero, and
 		   an empty regex pattern (//) matches to the input. */
 		line = "";
+		line_len = 0;
 	}
+	else
+		line_len = vStringLength (TagFile.vLine);
 
 	if (tag->truncateLineAfterTag)
-		truncateTagLineAfterTag (line, tag->name, false);
+	{
+		size_t truncted_len;
 
-	line_len = strlen (line);
+		truncted_len = truncateTagLineAfterTag (line, tag->name, false);
+		if (truncted_len > 0)
+			line_len = truncted_len;
+	}
+
 	searchChar = Option.backward ? '?' : '/';
 	terminator = (line_len > 0 && (line [line_len - 1] == '\n')) ? "$": "";
 
@@ -895,7 +910,8 @@ static int   makePatternStringCommon (const tagEntryInfo *const tag,
 	length += putc_func(searchChar, output);
 	if ((tag->boundaryInfo & BOUNDARY_START) == 0)
 		length += putc_func('^', output);
-	length += appendInputLine (putc_func, line, output, &omitted);
+	length += appendInputLine (putc_func, line, Option.patternLengthLimit,
+							   output, &omitted);
 	length += puts_func (omitted? "": terminator, output);
 	length += putc_func (searchChar, output);
 
