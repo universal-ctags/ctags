@@ -63,7 +63,7 @@ static void L_getit (vString *const name, const unsigned char *dbp)
 	{
 		dbp += 7;
 		while (isspace (*dbp))
-		dbp++;
+			dbp++;
 	}
 	for (p=dbp ; *p!='\0' && *p!='(' && !isspace ((int) *p) && *p!=')' ; p++)
 		vStringPut (name, *p);
