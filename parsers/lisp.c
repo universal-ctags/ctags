@@ -17,15 +17,25 @@
 #include "routines.h"
 #include "vstring.h"
 
+#include <string.h>
+
 /*
 *   DATA DEFINITIONS
 */
 typedef enum {
-	K_FUNCTION
+	K_UNKNOWN,
+	K_FUNCTION,
+	K_VARIABLE,
+	K_MACRO,
+	K_CONST,
 } lispKind;
 
 static kindDefinition LispKinds [] = {
-	{ true, 'f', "function", "functions" }
+	{ true, 'u', "unknown", "unknown type of definitions" },
+	{ true, 'f', "function", "functions" },
+	{ true, 'v', "variable", "variables" },
+	{ true, 'm', "macro", "macros" },
+	{ true, 'c', "const", "constants" },
 };
 
 /*
@@ -36,30 +46,71 @@ static kindDefinition LispKinds [] = {
  * lisp tag functions
  *  look for (def or (DEF, quote or QUOTE
  */
-static int L_isdef (const unsigned char *strp)
+static int L_isdef (const unsigned char *strp, bool case_insensitive)
 {
-	return ( (strp [1] == 'd' || strp [1] == 'D')
-		  && (strp [2] == 'e' || strp [2] == 'E')
-		  && (strp [3] == 'f' || strp [3] == 'F'));
+	bool cis = case_insensitive; /* Renaming for making code short */
+
+	return ( (strp [1] == 'd' || (cis && strp [1] == 'D'))
+		  && (strp [2] == 'e' || (cis && strp [2] == 'E'))
+		  && (strp [3] == 'f' || (cis && strp [3] == 'F')));
 }
 
-static int L_isquote (const unsigned char *strp)
+static int L_isquote (const unsigned char *strp, bool case_insensitive)
 {
-	return ( (*(++strp) == 'q' || *strp == 'Q')
-		  && (*(++strp) == 'u' || *strp == 'U')
-		  && (*(++strp) == 'o' || *strp == 'O')
-		  && (*(++strp) == 't' || *strp == 'T')
-		  && (*(++strp) == 'e' || *strp == 'E')
+	bool cis = case_insensitive; /* Renaming for making code short */
+
+	return ( (*(++strp) == 'q' || (cis && *strp == 'Q'))
+		  && (*(++strp) == 'u' || (cis && *strp == 'U'))
+		  && (*(++strp) == 'o' || (cis && *strp == 'O'))
+		  && (*(++strp) == 't' || (cis && *strp == 'T'))
+		  && (*(++strp) == 'e' || (cis && *strp == 'E'))
 		  && isspace (*(++strp)));
 }
 
-static void L_getit (vString *const name, const unsigned char *dbp)
+static int  lisp_hint2kind (const vString *const hint)
+{
+	int k = K_UNKNOWN;
+	int n;
+
+	/* 4 means strlen("(def"). */
+#define EQN(X) strncmp(vStringValue (hint) + 4, X + 3, n) == 0
+	switch (vStringLength (hint) - 4)
+	{
+	case 2:
+		n = 2;
+		if (EQN("DEFUN"))
+			k = K_FUNCTION;
+		break;
+	case 3:
+		n = 3;
+		if (EQN("DEFVAR"))
+			k = K_VARIABLE;
+		break;
+	case 5:
+		n = 5;
+		if (EQN("DEFMACRO"))
+			k = K_MACRO;
+		break;
+	case 8:
+		n = 8;
+		if (EQN("DEFCONSTANT"))
+			k = K_CONST;
+		break;
+	}
+#undef EQN
+	return k;
+}
+
+static void L_getit (vString *const name, const unsigned char *dbp,
+					 bool case_insensitive,
+					 int (*hint2kind) (const vString *),
+					 const vString *const kind_hint)
 {
 	const unsigned char *p;
 
 	if (*dbp == '\'')  /* Skip prefix quote */
 		dbp++;
-	else if (*dbp == '(' && L_isquote (dbp))  /* Skip "(quote " */
+	else if (*dbp == '(' && L_isquote (dbp, case_insensitive))  /* Skip "(quote " */
 	{
 		dbp += 7;
 		while (isspace (*dbp))
@@ -69,15 +120,22 @@ static void L_getit (vString *const name, const unsigned char *dbp)
 		vStringPut (name, *p);
 
 	if (vStringLength (name) > 0)
-		makeSimpleTag (name, K_FUNCTION);
+	{
+		int kind = hint2kind (kind_hint);
+		if (kind != KIND_GHOST_INDEX)
+			makeSimpleTag (name, kind);
+	}
 	vStringClear (name);
 }
 
 /* Algorithm adapted from from GNU etags.
  */
-static void findLispTags (void)
+static void findLispTagsCommon (bool case_insensitive,
+								bool has_namespace,
+								int (*hint2kind) (const vString *))
 {
 	vString *name = vStringNew ();
+	vString *kind_hint = vStringNew ();
 	const unsigned char* p;
 
 
@@ -85,17 +143,21 @@ static void findLispTags (void)
 	{
 		if (*p == '(')
 		{
-			if (L_isdef (p))
+			if (L_isdef (p, case_insensitive))
 			{
+				vStringClear (kind_hint);
 				while (*p != '\0' && !isspace ((int) *p))
+				{
+					vStringPut (kind_hint,
+								case_insensitive? toupper((int)*p): *p);
 					p++;
+				}
 				while (isspace ((int) *p))
 					p++;
-				L_getit (name, p);
+				L_getit (name, p, case_insensitive, hint2kind, kind_hint);
 			}
-			else
+			else if (has_namespace)
 			{
-				/* Check for (foo::defmumble name-defined ... */
 				do
 					p++;
 				while (*p != '\0' && !isspace ((int) *p)
@@ -106,19 +168,30 @@ static void findLispTags (void)
 						p++;
 					while (*p == ':');
 
-					if (L_isdef (p - 1))
+					if (L_isdef (p - 1, case_insensitive))
 					{
+						vStringClear (kind_hint);
 						while (*p != '\0' && !isspace ((int) *p))
+						{
+							vStringPut (kind_hint,
+										case_insensitive? toupper((int)*p): *p);
 							p++;
+						}
 						while (isspace (*p))
 							p++;
-						L_getit (name, p);
+						L_getit (name, p, case_insensitive, hint2kind, kind_hint);
 					}
 				}
 			}
 		}
 	}
 	vStringDelete (name);
+	vStringDelete (kind_hint);
+}
+
+static void findLispTags (void)
+{
+	findLispTagsCommon (true, true, lisp_hint2kind);
 }
 
 extern parserDefinition* LispParser (void)
