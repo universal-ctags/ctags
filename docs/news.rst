@@ -575,7 +575,7 @@ Defining an extra
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 A new ``--_extradef-<LANG>=name,description`` option allows you to
-defining a parser own extra which turning on and off can be
+defining a parser specific extra which turning on and off can be
 referred from a regex based parser for ``<LANG>``.
 
 See :ref:`Conditional tagging with extras <extras>` for more details.
@@ -1101,9 +1101,9 @@ This is controlled by ``--output-format`` option.
 
 See also :ref:`Compatible output and weakness <compat-output>`.
 
-.. _parser-own-fields:
+.. _parser-specific-fields:
 
-Parser own fields
+Parser specific fields
 ---------------------------------------------------------------------
 
 A tag has a `name`, an `input` file name, and a `pattern` as basic
@@ -1112,9 +1112,9 @@ attached to the tag as optional information.
 
 In Exuberant-ctags, fields are common to all languages.
 Universal-ctags extends the concept of fields; a parser can define
-its own field. This extension was proposed by @pragmaware in #857.
+its specific field. This extension was proposed by @pragmaware in #857.
 
-For implementing the parser own fields, the options for listing and
+For implementing the parser specific fields, the options for listing and
 enabling/disabling fields are also extended.
 
 In the output of ``--list-fields``, the owner of the field is printed
@@ -1146,7 +1146,7 @@ given, ``--list-fields`` prints only the fields for that parser:
 	#LETTER NAME            ENABLED LANGUAGE        XFMT  DESCRIPTION
 	-       version         off     Maven2          TRUE  version of artifact
 
-A parser own field only has a long name, no letter. For
+A parser specific field only has a long name, no letter. For
 enabling/disabling such fields, the name must be passed to
 ``--fields-<LANG>``.
 
@@ -1157,7 +1157,7 @@ e.g. for enabling the `sectionMarker` field owned by the
 
 	$ ./ctags --fields-reStructuredText=+{sectionMarker} ...
 
-The wild card notation can be used for enabling/disabling parser own
+The wild card notation can be used for enabling/disabling parser specific
 fields, too. The following example enables all fields owned by the
 `C++` parser.
 
@@ -1184,7 +1184,7 @@ avoid incompatibilities between versions of Universal-ctags itself
 (SELF INCOMPATIBLY).
 
 In Universal-ctags development, a parser developer may add a new
-parser own field for a certain language.  Sometimes other developers
+parser specific field for a certain language.  Sometimes other developers
 then recognize it is meaningful not only for the original language
 but also other languages. In this case the field may be promoted to a
 common field. Such a promotion will break the command line
@@ -1192,12 +1192,12 @@ compatibility for ``--fields-<LANG>`` usage. The wild card for
 `<LANG>` will help in avoiding this unwanted effect of the promotion.
 
 With respect to the tags file format, nothing is changed when
-introducing parser own fields; `<fieldname>`:`<value>` is used as
+introducing parser specific fields; `<fieldname>`:`<value>` is used as
 before and the name of field owner is never prefixed. The `language:`
 field of the tag identifies the owner.
 
 
-Parser own extras
+Parser specific extras
 ---------------------------------------------------------------------
 
 .. NOT REVIEWED YET
@@ -1206,7 +1206,7 @@ As man page of Exuberant-ctags says, ``--extras`` option specifies
 whether to include extra tag entries for certain kinds of information.
 This option is available in Universal-ctags, too.
 
-In Universal-ctags it is extended; a parser can define its own
+In Universal-ctags it is extended; a parser can define its specific
 extra flags. They can be controlled with ``--extras-<LANG>=[+|-]{...}``.
 
 See some examples:
@@ -1345,17 +1345,17 @@ objects: functions, variables, macros, types, etc. The concept extra
 can handle the other aspects like scope (static or extern).
 
 However, a parser developer can take another approach instead of
-introducing parser own extra; one can prepare `staticFunction` and
+introducing parser specific extra; one can prepare `staticFunction` and
 `exportedFunction` as kinds of one's parser.  The second idea is a
 just guide; the parser developer must decide suitable approach for the
 target language.
 
-Anyway, in the second idea, ``--extra`` is for controlling inclusion
+Anyway, in the second idea, ``--extras`` is for controlling inclusion
 of tags. If what you want is not about inclusion, ``--param-<LANG>``
 can be used as the last resort.
 
 
-Parser own parameter
+Parser specific parameter
 ---------------------------------------------------------------------
 
 .. NOT REVIEWED YET
@@ -1428,8 +1428,8 @@ the same option. To specify a field owned by a parser, prepend
 the parser name to the name string with `.` as a separator.
 
 Wild card (`*`) can be used where a parser name is specified. In this
-case both common and parser own fields are activated and printed.
-If a common field and a parser own field have the same name,
+case both common and parser specific fields are activated and printed.
+If a common field and a parser specific field have the same name,
 the common field has higher priority.
 
 `WIDTH-AND-ADJUSTMENT` is a positive number.
@@ -1484,7 +1484,7 @@ elements of the format.
 
 	Printed as is.
 
-Another example of specifying parser own fields:
+Another example of specifying parser specific fields:
 
 .. code-block:: console
 
