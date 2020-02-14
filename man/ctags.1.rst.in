@@ -888,7 +888,7 @@ are not listed here. They are experimental or for debugging purpose.
 	.. TODO? xref output
 
 	A field can be enabled or disabled with ``--fields=`` for common
-	extras in all languages, or ``--fields-<LANG>=`` for the specified
+	fields in all languages, or ``--fields-<LANG>=`` for the specified
 	language.  These option takes one-letter flags and/or long-name flags
 	as a parameter for specifying fields.
 
