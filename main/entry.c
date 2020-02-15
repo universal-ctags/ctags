@@ -91,11 +91,7 @@ typedef struct eTagFile {
 	vString *vLine;
 
 	unsigned int cork;
-	struct sCorkQueue {
-		struct sTagEntryInfo* queue;
-		unsigned int length;
-		unsigned int count;
-	} corkQueue;
+	ptrArray *corkQueue;
 
 	bool patternCacheValid;
 } tagFile;
@@ -112,11 +108,7 @@ static tagFile TagFile = {
     { 0, 0 },        /* max */
     NULL,                /* vLine */
     .cork = false,
-    .corkQueue = {
-	    .queue = NULL,
-	    .length = 0,
-	    .count  = 0
-    },
+    .corkQueue = NULL,
     .patternCacheValid = false,
 };
 
@@ -815,7 +807,7 @@ extern void getTagScopeInformation (tagEntryInfo *const tag,
 	if (tag->extensionFields.scopeKindIndex == KIND_GHOST_INDEX
 	    && tag->extensionFields.scopeName == NULL
 	    && tag->extensionFields.scopeIndex != CORK_NIL
-	    && TagFile.corkQueue.count > 0)
+	    && ptrArrayCount (TagFile.corkQueue) > 0)
 	{
 		const tagEntryInfo * scope;
 		char *full_qualified_scope_name;
@@ -1040,8 +1032,17 @@ static void copyParserFields (const tagEntryInfo *const tag, tagEntryInfo* slot)
 
 }
 
-static void recordTagEntryInQueue (const tagEntryInfo *const tag, tagEntryInfo* slot)
+static tagEntryInfo *newNilTagEntry (void)
 {
+	tagEntryInfo *slot = xCalloc (1, tagEntryInfo);
+	slot->kindIndex = KIND_FILE_INDEX;
+	return slot;
+}
+
+static tagEntryInfo *copyTagEntry (const tagEntryInfo *const tag)
+{
+	tagEntryInfo *slot = xMalloc (1, tagEntryInfo);
+
 	*slot = *tag;
 
 	if (slot->pattern)
@@ -1086,6 +1087,8 @@ static void recordTagEntryInQueue (const tagEntryInfo *const tag, tagEntryInfo* 
 	copyParserFields (tag, slot);
 	if (slot->parserFieldsDynamic)
 		PARSER_TRASH_BOX_TAKE_BACK(slot->parserFieldsDynamic);
+
+	return slot;
 }
 
 static void clearParserFields (tagEntryInfo *const tag)
@@ -1113,8 +1116,13 @@ static void clearParserFields (tagEntryInfo *const tag)
 	}
 }
 
-static void clearTagEntryInQueue (tagEntryInfo* slot)
+static void deleteTagEnry (void *data)
 {
+	tagEntryInfo *slot = data;
+
+	if (slot->kindIndex == KIND_FILE_INDEX)
+		goto out;
+
 	if (slot->pattern)
 		eFree ((char *)slot->pattern);
 	eFree ((char *)slot->inputFileName);
@@ -1148,36 +1156,16 @@ static void clearTagEntryInQueue (tagEntryInfo* slot)
 		eFree ((char *)slot->sourceFileName);
 
 	clearParserFields (slot);
+
+ out:
+	eFree (slot);
 }
 
 static unsigned int queueTagEntry(const tagEntryInfo *const tag)
 {
-	unsigned int i;
-	void *tmp;
-	tagEntryInfo * slot;
-
-	if (! (TagFile.corkQueue.count < TagFile.corkQueue.length))
-	{
-		if (!TagFile.corkQueue.length)
-			TagFile.corkQueue.length = 1;
-
-		tmp = eRealloc (TagFile.corkQueue.queue,
-				sizeof (*TagFile.corkQueue.queue) * TagFile.corkQueue.length * 2);
-
-		TagFile.corkQueue.length *= 2;
-		TagFile.corkQueue.queue = tmp;
-	}
-
-	i = TagFile.corkQueue.count;
-	TagFile.corkQueue.count++;
-
-
-	slot = TagFile.corkQueue.queue + i;
-	recordTagEntryInQueue (tag, slot);
-
-	return i;
+	tagEntryInfo * slot = copyTagEntry (tag);
+	return ptrArrayAdd (TagFile.corkQueue, slot);
 }
-
 
 extern void setupWriter (void *writerClientData)
 {
@@ -1315,10 +1303,9 @@ extern void corkTagFile(void)
 	TagFile.cork++;
 	if (TagFile.cork == 1)
 	{
-		  TagFile.corkQueue.length = 1;
-		  TagFile.corkQueue.count = 1;
-		  TagFile.corkQueue.queue = eMalloc (sizeof (*TagFile.corkQueue.queue));
-		  memset (TagFile.corkQueue.queue, 0, sizeof (*TagFile.corkQueue.queue));
+		TagFile.corkQueue = ptrArrayNew (deleteTagEnry);
+		tagEntryInfo *nil = newNilTagEntry ();
+		ptrArrayAdd (TagFile.corkQueue, nil);
 	}
 }
 
@@ -1331,9 +1318,9 @@ extern void uncorkTagFile(void)
 	if (TagFile.cork > 0)
 		return ;
 
-	for (i = 1; i < TagFile.corkQueue.count; i++)
+	for (i = 1; i < ptrArrayCount (TagFile.corkQueue); i++)
 	{
-		tagEntryInfo *tag = TagFile.corkQueue.queue + i;
+		tagEntryInfo *tag = ptrArrayItem (TagFile.corkQueue, i);
 
 		if (!isTagWritable(tag))
 			continue;
@@ -1352,21 +1339,15 @@ extern void uncorkTagFile(void)
 					&& tag->extensionFields.scopeIndex == CORK_NIL)))
 			makeQualifiedTagEntry (tag);
 	}
-	for (i = 1; i < TagFile.corkQueue.count; i++)
-		clearTagEntryInQueue (TagFile.corkQueue.queue + i);
 
-	memset (TagFile.corkQueue.queue, 0,
-		sizeof (*TagFile.corkQueue.queue) * TagFile.corkQueue.count);
-	TagFile.corkQueue.count = 0;
-	eFree (TagFile.corkQueue.queue);
-	TagFile.corkQueue.queue = NULL;
-	TagFile.corkQueue.length = 0;
+	ptrArrayDelete (TagFile.corkQueue);
+	TagFile.corkQueue = NULL;
 }
 
 extern tagEntryInfo *getEntryInCorkQueue   (unsigned int n)
 {
-	if ((CORK_NIL < n) && (n < TagFile.corkQueue.count))
-		return TagFile.corkQueue.queue + n;
+	if ((CORK_NIL < n) && (n < ptrArrayCount (TagFile.corkQueue)))
+		return ptrArrayItem (TagFile.corkQueue, n);
 	else
 		return NULL;
 }
@@ -1380,7 +1361,7 @@ extern tagEntryInfo *getEntryOfNestingLevel (const NestingLevel *nl)
 
 extern size_t        countEntryInCorkQueue (void)
 {
-	return TagFile.corkQueue.count;
+	return ptrArrayCount (TagFile.corkQueue);
 }
 
 extern int makePlaceholder (const char *const name)
