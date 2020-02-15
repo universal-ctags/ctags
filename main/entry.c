@@ -46,6 +46,7 @@
 #include "nestlevel.h"
 #include "options_p.h"
 #include "ptag_p.h"
+#include "rbtree.h"
 #include "read.h"
 #include "read_p.h"
 #include "routines.h"
@@ -96,6 +97,13 @@ typedef struct eTagFile {
 
 	bool patternCacheValid;
 } tagFile;
+
+typedef struct sTagEntryInfoX  {
+	tagEntryInfo slot;
+	unsigned int corkIndex;
+	struct rb_root symtab;
+	struct rb_node symnode;
+} tagEntryInfoX;
 
 /*
 *   DATA DEFINITIONS
@@ -1035,15 +1043,20 @@ static void copyParserFields (const tagEntryInfo *const tag, tagEntryInfo* slot)
 
 static tagEntryInfo *newNilTagEntry (unsigned int corkFlags)
 {
-	tagEntryInfo *slot = xCalloc (1, tagEntryInfo);
-	slot->kindIndex = KIND_FILE_INDEX;
-	return slot;
+	tagEntryInfoX *x = xCalloc (1, tagEntryInfoX);
+	x->corkIndex = CORK_NIL;
+	x->symtab = RB_ROOT;
+	x->slot.kindIndex = KIND_FILE_INDEX;
+	return &(x->slot);
 }
 
-static tagEntryInfo *copyTagEntry (const tagEntryInfo *const tag,
+static tagEntryInfoX *copyTagEntry (const tagEntryInfo *const tag,
 								   unsigned int corkFlags)
 {
-	tagEntryInfo *slot = xMalloc (1, tagEntryInfo);
+	tagEntryInfoX *x = xMalloc (1, tagEntryInfoX);
+	x->symtab = RB_ROOT;
+	x->corkIndex = CORK_NIL;
+	tagEntryInfo  *slot = (tagEntryInfo *)x;
 
 	*slot = *tag;
 
@@ -1090,7 +1103,7 @@ static tagEntryInfo *copyTagEntry (const tagEntryInfo *const tag,
 	if (slot->parserFieldsDynamic)
 		PARSER_TRASH_BOX_TAKE_BACK(slot->parserFieldsDynamic);
 
-	return slot;
+	return x;
 }
 
 static void clearParserFields (tagEntryInfo *const tag)
@@ -1163,11 +1176,164 @@ static void deleteTagEnry (void *data)
 	eFree (slot);
 }
 
+static void corkSymtabPut (tagEntryInfoX *scope, const char* name, tagEntryInfoX *item)
+{
+	struct rb_root *root = &scope->symtab;
+
+	struct rb_node **new = &(root->rb_node), *parent = NULL;
+
+	while (*new)
+	{
+		tagEntryInfoX *this = container_of(*new, tagEntryInfoX, symnode);
+		int result = strcmp(item->slot.name, this->slot.name);
+
+		parent = *new;
+
+		if (result < 0)
+			new = &((*new)->rb_left);
+		else if (result > 0)
+			new = &((*new)->rb_right);
+		else
+		{
+			unsigned long lthis = this->slot.lineNumber;
+			unsigned long litem = item->slot.lineNumber;
+
+			/* Comparing lineNumber */
+			if (litem < lthis)
+				new = &((*new)->rb_left);
+			else if (litem > lthis)
+				new = &((*new)->rb_right);
+			else
+			{
+				/* Comparing memory address */
+				if (item < this)
+					new = &((*new)->rb_left);
+				else if (item > this)
+					new = &((*new)->rb_right);
+				else
+				{
+					AssertNotReached(); /* registering the same object twice. */
+					return;
+				}
+			}
+		}
+	}
+
+	verbose ("symtbl[:=] %s<-%s/%p (line: %lu)\n",
+			*new? container_of(*new, tagEntryInfoX, symnode)->slot.name: "*root*",
+			 item->slot.name, &item->slot, item->slot.lineNumber);
+	/* Add new node and rebalance tree. */
+	rb_link_node(&item->symnode, parent, new);
+	rb_insert_color(&item->symnode, root);
+}
+
+extern bool foreachEntriesInScope (unsigned int corkIndex,
+								   const char *name,
+								   entryForeachFunc func,
+								   void *data)
+{
+	tagEntryInfoX *x = ptrArrayItem (TagFile.corkQueue, corkIndex);
+
+	struct rb_root *root = &x->symtab;
+	tagEntryInfoX *rep = NULL;
+
+	/* More than one tag can have a same name.
+	 * Visit them from the last.
+	 *
+	 * 1. find one of them as the representative,
+	 * 2. find the last one of them from the representative with rb_next,
+	 * 3. call FUNC iteratively from the last to the first.
+	 */
+	if (name)
+	{
+		struct rb_node *node = root->rb_node;
+		while (node)
+		{
+			tagEntryInfoX *entry = container_of(node, tagEntryInfoX, symnode);
+			int result;
+
+			result = strcmp(name, entry->slot.name);
+
+			if (result < 0)
+				node = node->rb_left;
+			else if (result > 0)
+				node = node->rb_right;
+			else
+			{
+				rep = entry;
+				break;
+			}
+		}
+		if (rep == NULL)
+			return true;
+
+		verbose("symtbl[<>] %s->%p\n", name, &rep->slot);
+	}
+
+	struct rb_node *last;
+
+	if (name)
+	{
+		struct rb_node *tmp = &rep->symnode;
+		last = tmp;
+
+		while ((tmp = rb_next (tmp)))
+		{
+			tagEntryInfoX *entry = container_of(tmp, tagEntryInfoX, symnode);
+			if (strcmp(name, entry->slot.name) == 0)
+			{
+				verbose ("symtbl[ >] %s->%p\n", name, &container_of(tmp, tagEntryInfoX, symnode)->slot);
+				last = tmp;
+			}
+			else
+				break;
+		}
+	}
+	else
+		last = rb_last(root);
+	verbose ("symtbl[>|] %s->%p\n", name, &container_of(last, tagEntryInfoX, symnode)->slot);
+
+	struct rb_node *cursor = last;
+	bool revisited_rep = false;
+	do
+	{
+		tagEntryInfoX *entry = container_of(cursor, tagEntryInfoX, symnode);
+		if (!revisited_rep || !name || strcmp(name, entry->slot.name))
+		{
+			verbose ("symtbl[< ] %s->%p\n", name, &entry->slot);
+			if (!func (entry->corkIndex, &entry->slot, data))
+				return false;
+			if (cursor == &rep->symnode)
+				revisited_rep = true;
+		}
+		else if (name)
+			break;
+	}
+	while ((cursor = rb_prev(cursor)));
+
+	return true;
+}
+
+extern void registerEntry (unsigned int corkIndex)
+{
+	Assert (TagFile.corkFlags & CORK_SYMTAB);
+
+	tagEntryInfoX *e = ptrArrayItem (TagFile.corkQueue, corkIndex);
+	{
+		tagEntryInfoX *scope = ptrArrayItem (TagFile.corkQueue, e->slot.extensionFields.scopeIndex);
+		corkSymtabPut (scope, e->slot.name, e);
+	}
+}
+
 static unsigned int queueTagEntry(const tagEntryInfo *const tag)
 {
-	tagEntryInfo * slot = copyTagEntry (tag,
+	unsigned int corkIndex;
+	tagEntryInfoX * entry = copyTagEntry (tag,
 										TagFile.corkFlags);
-	return ptrArrayAdd (TagFile.corkQueue, slot);
+	corkIndex = ptrArrayAdd (TagFile.corkQueue, entry);
+	entry->corkIndex = corkIndex;
+
+	return corkIndex;
 }
 
 extern void setupWriter (void *writerClientData)

@@ -66,7 +66,8 @@ typedef struct {
 
 typedef enum {
 	CORK_NO_USE,
-	CORK_QUEUE = (1 << 0),
+	CORK_QUEUE  = (1 << 0),
+	CORK_SYMTAB = (1 << 1),
 } corkUsage;
 
 struct sParserDefinition {
