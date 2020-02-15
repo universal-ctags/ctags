@@ -44,7 +44,7 @@ extern ptrArray *ptrArrayNew (ptrArrayDeleteFunc deleteFunc)
 	return result;
 }
 
-extern void ptrArrayAdd (ptrArray *const current, void *ptr)
+extern unsigned int ptrArrayAdd (ptrArray *const current, void *ptr)
 {
 	Assert (current != NULL);
 	if (current->count == current->max)
@@ -52,7 +52,8 @@ extern void ptrArrayAdd (ptrArray *const current, void *ptr)
 		current->max *= 2;
 		current->array = xRealloc (current->array, current->max, void*);
 	}
-	current->array [current->count++] = ptr;
+	current->array [current->count] = ptr;
+	return current->count++;
 }
 
 extern void *ptrArrayRemoveLast (ptrArray *const current)
