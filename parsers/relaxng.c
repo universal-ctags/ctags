@@ -256,7 +256,7 @@ RelaxNGParser (void)
 	def->parser        = findRelaxNGTags;
 	def->tagXpathTableTable = relaxngXpathTableTable;
 	def->tagXpathTableCount = ARRAY_SIZE (relaxngXpathTableTable);
-	def->useCork = true;
+	def->useCork = CORK_QUEUE;
 	/* def->selectLanguage = selectors; */
 	def->dependencies = dependencies;
 	def->dependencyCount = ARRAY_SIZE (dependencies);

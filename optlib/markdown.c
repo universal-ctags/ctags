@@ -452,7 +452,7 @@ extern parserDefinition* MarkdownParser (void)
 	def->patterns      = patterns;
 	def->aliases       = aliases;
 	def->method        = METHOD_NOT_CRAFTED|METHOD_REGEX;
-	def->useCork       = 1;
+	def->useCork       = CORK_QUEUE;
 	def->kindTable     = MarkdownKindTable;
 	def->kindCount     = ARRAY_SIZE(MarkdownKindTable);
 	def->fieldTable    = MarkdownFieldTable;

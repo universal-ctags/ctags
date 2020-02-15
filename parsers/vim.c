@@ -723,6 +723,6 @@ extern parserDefinition *VimParser (void)
 	def->extensions = extensions;
 	def->patterns   = patterns;
 	def->parser     = findVimTags;
-	def->useCork    = true;
+	def->useCork    = CORK_QUEUE;
 	return def;
 }

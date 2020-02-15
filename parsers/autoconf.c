@@ -188,7 +188,7 @@ extern parserDefinition* AutoconfParser (void)
 	def->patterns = patterns;
 	def->extensions = extensions;
 	def->parser = findAutoconfTags;
-	def->useCork = true;
+	def->useCork = CORK_QUEUE;
 
 	def->keywordTable = autoconfKeywordTable;
 	def->keywordCount = ARRAY_SIZE (autoconfKeywordTable);

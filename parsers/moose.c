@@ -513,7 +513,7 @@ extern parserDefinition* MooseParser (void)
 
 	def->initialize = initializeMooseParser;
 	def->parser = findMooseTags;
-	def->useCork = true;
+	def->useCork = CORK_QUEUE;
 
 	return def;
 }

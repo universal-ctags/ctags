@@ -258,7 +258,7 @@ extern parserDefinition* TexBeamerParser (void)
 	def->kindCount = ARRAY_SIZE(beamerKinds);
 
 	def->parser = findBeamerTags;
-	def->useCork = true;
+	def->useCork = CORK_QUEUE;
 
 	return def;
 }

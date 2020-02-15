@@ -189,6 +189,6 @@ extern parserDefinition *ClojureParser (void)
 	def->extensions = extensions;
 	def->aliases = aliases;
 	def->parser = findClojureTags;
-	def->useCork = true;
+	def->useCork = CORK_QUEUE;
 	return def;
 }

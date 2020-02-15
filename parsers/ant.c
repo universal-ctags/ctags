@@ -270,7 +270,7 @@ extern parserDefinition* AntParser (void)
 	def->parser = findAntTags;
 	def->tagXpathTableTable = antXpathTableTable;
 	def->tagXpathTableCount = ARRAY_SIZE (antXpathTableTable);
-	def->useCork = true;
+	def->useCork = CORK_QUEUE;
 	def->selectLanguage = selectors;
 	def->xpathFileSpecs = xpathFileSpecs;
 	def->xpathFileSpecCount = ARRAY_SIZE (xpathFileSpecs);

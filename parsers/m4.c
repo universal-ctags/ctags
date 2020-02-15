@@ -522,7 +522,7 @@ extern parserDefinition* M4Parser (void)
 	def->kindCount = ARRAY_SIZE(M4Kinds);
 	def->extensions = extensions;
 	def->parser = findM4Tags;
-	def->useCork = 1;
+	def->useCork = CORK_QUEUE;
 	def->keywordTable = m4KeywordTable;
 	def->keywordCount = ARRAY_SIZE (m4KeywordTable);
 

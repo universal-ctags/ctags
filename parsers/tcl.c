@@ -719,7 +719,7 @@ extern parserDefinition* TclParser (void)
 	def->keywordCount = ARRAY_SIZE (TclKeywordTable);
 
 	def->parser     = findTclTags;
-	def->useCork    = true;
+	def->useCork    = CORK_QUEUE;
 	def->requestAutomaticFQTag = true;
 	def->defaultScopeSeparator = "::";
 	def->defaultRootScopeSeparator = "::";

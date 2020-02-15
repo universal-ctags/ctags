@@ -1351,6 +1351,6 @@ extern parserDefinition *ObjcParser (void)
 	def->selectLanguage = selectors;
 	def->keywordTable = objcKeywordTable;
 	def->keywordCount = ARRAY_SIZE (objcKeywordTable);
-	def->useCork = true;
+	def->useCork = CORK_QUEUE;
 	return def;
 }

@@ -2141,6 +2141,6 @@ extern parserDefinition* CPreProParser (void)
 	def->parameterHandlerTable = CpreProParameterHandlerTable;
 	def->parameterHandlerCount = ARRAY_SIZE(CpreProParameterHandlerTable);
 
-	def->useCork = true;
+	def->useCork = CORK_QUEUE;
 	return def;
 }

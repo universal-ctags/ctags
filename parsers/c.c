@@ -3585,7 +3585,7 @@ extern parserDefinition* OldCParser (void)
 	def->enabled = 0;
 
 	/* cpreprocessor wants corkQueue. */
-	def->useCork    = true;
+	def->useCork    = CORK_QUEUE;
 	return def;
 }
 
@@ -3601,7 +3601,7 @@ extern parserDefinition* DParser (void)
 	// end: field is not tested.
 
 	/* cpreprocessor wants corkQueue. */
-	def->useCork    = true;
+	def->useCork    = CORK_QUEUE;
 	return def;
 }
 
@@ -3628,7 +3628,7 @@ extern parserDefinition* OldCppParser (void)
 	def->enabled = 0;
 
 	/* cpreprocessor wants corkQueue. */
-	def->useCork    = true;
+	def->useCork    = CORK_QUEUE;
 	return def;
 }
 
@@ -3646,7 +3646,7 @@ extern parserDefinition* CsharpParser (void)
 	// end: field is not tested.
 
 	/* cpreprocessor wants corkQueue. */
-	def->useCork    = true;
+	def->useCork    = CORK_QUEUE;
 	return def;
 }
 
@@ -3659,7 +3659,7 @@ extern parserDefinition* JavaParser (void)
 	def->extensions = extensions;
 	def->parser2    = findCTags;
 	def->initialize = initializeJavaParser;
-	def->useCork    = true;
+	def->useCork    = CORK_QUEUE;
 	return def;
 }
 
@@ -3675,7 +3675,7 @@ extern parserDefinition* VeraParser (void)
 	// end: field is not tested.
 
 	/* cpreprocessor wants corkQueue. */
-	def->useCork    = true;
+	def->useCork    = CORK_QUEUE;
 
 	return def;
 }

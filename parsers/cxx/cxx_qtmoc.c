@@ -336,7 +336,7 @@ extern parserDefinition* QtMocParser (void)
 
 	def->parser = findQtMocTags;
 	def->initialize = initialize;
-	def->useCork = true;
+	def->useCork = CORK_QUEUE;
 
 	return def;
 }

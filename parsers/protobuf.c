@@ -349,7 +349,7 @@ extern parserDefinition* ProtobufParser (void)
 	def->keywordCount = ARRAY_SIZE (ProtobufKeywordTable);
 
 	/* cpreprocessor wants corkQueue. */
-	def->useCork    = true;
+	def->useCork    = CORK_QUEUE;
 
 	return def;
 }

@@ -392,7 +392,7 @@ extern parserDefinition* RpmSpecParser (void)
 	def->initialize = initializeRpmSpecParser;
 	def->parser = findRpmSpecTags;
 	def->method     = METHOD_REGEX;
-	def->useCork = true;
+	def->useCork = CORK_QUEUE;
 	def->requestAutomaticFQTag = true;
 	return def;
 }

@@ -208,6 +208,6 @@ extern parserDefinition* DiffParser (void)
 	def->kindCount  = ARRAY_SIZE (DiffKinds);
 	def->extensions = extensions;
 	def->parser     = findDiffTags;
-	def->useCork    = true;
+	def->useCork    = CORK_QUEUE;
 	return def;
 }

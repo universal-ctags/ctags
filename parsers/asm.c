@@ -412,6 +412,6 @@ extern parserDefinition* AsmParser (void)
 	def->keywordTable = AsmKeywords;
 	def->keywordCount = ARRAY_SIZE (AsmKeywords);
 	def->selectLanguage = selectors;
-	def->useCork = true;
+	def->useCork = CORK_QUEUE;
 	return def;
 }

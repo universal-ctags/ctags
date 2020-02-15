@@ -237,7 +237,7 @@ extern parserDefinition* IniconfParser (void)
 	def->kindCount  = ARRAY_SIZE (IniconfKinds);
 	def->extensions = extensions;
 	def->parser     = findIniconfTags;
-	def->useCork   = true;
+	def->useCork   = CORK_QUEUE;
 
 	return def;
 }

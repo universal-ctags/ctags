@@ -91,6 +91,7 @@ typedef struct eTagFile {
 	vString *vLine;
 
 	unsigned int cork;
+	unsigned int corkFlags;
 	ptrArray *corkQueue;
 
 	bool patternCacheValid;
@@ -1032,14 +1033,15 @@ static void copyParserFields (const tagEntryInfo *const tag, tagEntryInfo* slot)
 
 }
 
-static tagEntryInfo *newNilTagEntry (void)
+static tagEntryInfo *newNilTagEntry (unsigned int corkFlags)
 {
 	tagEntryInfo *slot = xCalloc (1, tagEntryInfo);
 	slot->kindIndex = KIND_FILE_INDEX;
 	return slot;
 }
 
-static tagEntryInfo *copyTagEntry (const tagEntryInfo *const tag)
+static tagEntryInfo *copyTagEntry (const tagEntryInfo *const tag,
+								   unsigned int corkFlags)
 {
 	tagEntryInfo *slot = xMalloc (1, tagEntryInfo);
 
@@ -1163,7 +1165,8 @@ static void deleteTagEnry (void *data)
 
 static unsigned int queueTagEntry(const tagEntryInfo *const tag)
 {
-	tagEntryInfo * slot = copyTagEntry (tag);
+	tagEntryInfo * slot = copyTagEntry (tag,
+										TagFile.corkFlags);
 	return ptrArrayAdd (TagFile.corkQueue, slot);
 }
 
@@ -1298,13 +1301,14 @@ extern bool writePseudoTag (const ptagDesc *desc,
 	return true;
 }
 
-extern void corkTagFile(void)
+extern void corkTagFile(unsigned int corkFlags)
 {
 	TagFile.cork++;
 	if (TagFile.cork == 1)
 	{
+		TagFile.corkFlags = corkFlags;
 		TagFile.corkQueue = ptrArrayNew (deleteTagEnry);
-		tagEntryInfo *nil = newNilTagEntry ();
+		tagEntryInfo *nil = newNilTagEntry (corkFlags);
 		ptrArrayAdd (TagFile.corkQueue, nil);
 	}
 }

@@ -262,7 +262,7 @@ DbusIntrospectParser (void)
 	def->parser        = findDbusIntrospectTags;
 	def->tagXpathTableTable = dbusIntrospectXpathTableTable;
 	def->tagXpathTableCount = ARRAY_SIZE (dbusIntrospectXpathTableTable);
-	def->useCork = true;
+	def->useCork = CORK_QUEUE;
 	def->selectLanguage = selectors;
 	def->xpathFileSpecs = xpathFileSpecs;
 	def->xpathFileSpecCount = ARRAY_SIZE (xpathFileSpecs);

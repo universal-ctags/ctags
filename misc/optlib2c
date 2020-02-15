@@ -855,7 +855,7 @@ EOF
 
     if ($opts->{'useCork'}) {
 	print <<EOF;
-	def->useCork       = 1;
+	def->useCork       = CORK_QUEUE;
 EOF
     }
     if (@{$opts->{'kinddefs'}}) {

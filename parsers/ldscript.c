@@ -759,7 +759,7 @@ extern parserDefinition* LdScriptParser (void)
 	def->fieldTable = LdScriptFields;
 	def->fieldCount = ARRAY_SIZE (LdScriptFields);
 
-	def->useCork    = true;
+	def->useCork    = CORK_QUEUE;
 
 	return def;
 }

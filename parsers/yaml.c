@@ -166,7 +166,7 @@ extern parserDefinition* YamlParser (void)
 	def->kindTable = YamlKinds;
 	def->extensions = extensions;
 	def->parser     = findYamlTags;
-	def->useCork    = true;
+	def->useCork    = CORK_QUEUE;
 	def->kindTable         = YamlKinds;
 	def->kindCount     = ARRAY_SIZE (YamlKinds);
 	def->useMemoryStreamInput = true;
