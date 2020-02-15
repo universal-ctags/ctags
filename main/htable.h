@@ -82,5 +82,7 @@ extern hashTable* hashTableIntNew (unsigned int size,
 								   hashTableFreeFunc keyfreefn);
 #define HT_PTR_TO_INT(P) ((int)(intptr_t)(P))
 #define HT_INT_TO_PTR(P) ((void*)(intptr_t)(P))
+#define HT_PTR_TO_UINT(P) ((unsigned int)(uintptr_t)(P))
+#define HT_UINT_TO_PTR(P) ((void*)(uintptr_t)(P))
 
 #endif	/* CTAGS_MAIN_HTABLE_H */
