@@ -2690,9 +2690,21 @@ static void processPatternLengthLimit(const char *const option, const char *cons
 		error (FATAL, "-%s: Invalid pattern length limit", option);
 }
 
-static void setBooleanToXtag(booleanOption *const option, bool value)
+static void setBooleanToXtagWithWarning(booleanOption *const option, bool value)
 {
 	/* WARNING/TODO: This function breaks capsulization. */
+
+	char x = 0;
+
+	if (strcmp (option->name, "file-tags") == 0)
+		x = 'f';
+	else if (strcmp (option->name, "file-scope") == 0)
+		x = 'F';
+
+	if (x)
+		error (WARNING, "\"--%s\" option is obsolete; use \"--extras=%c%c\" instead",
+			   option->name, value? '+': '-', x);
+
 	xtagType t = (xtagType)option->pValue;
 	enableXtag (t, value);
 }
@@ -2774,8 +2786,8 @@ static parametricOption ParametricOptions [] = {
 
 static booleanOption BooleanOptions [] = {
 	{ "append",         &Option.append,                 true,  STAGE_ANY },
-	{ "file-scope",     ((bool *)XTAG_FILE_SCOPE),   false, STAGE_ANY, setBooleanToXtag },
-	{ "file-tags",      ((bool *)XTAG_FILE_NAMES),   false, STAGE_ANY, setBooleanToXtag },
+	{ "file-scope",     ((bool *)XTAG_FILE_SCOPE),   false, STAGE_ANY, setBooleanToXtagWithWarning },
+	{ "file-tags",      ((bool *)XTAG_FILE_NAMES),   false, STAGE_ANY, setBooleanToXtagWithWarning },
 	{ "filter",         &Option.filter,                 true,  STAGE_ANY },
 	{ "guess-language-eagerly", &Option.guessLanguageEagerly, false, STAGE_ANY },
 	{ "line-directives",&Option.lineDirectives,         false, STAGE_ANY },
