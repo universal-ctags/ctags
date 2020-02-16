@@ -1191,7 +1191,25 @@ are not listed here. They are experimental or for debugging purpose.
 
 ``--pattern-length-limit=N``
 	Cutoff patterns of tag entries after N characters. Disable by setting to 0
-	(default is 96).
+	(default is 96). Specifying 0 as *N* results no truncation.
+
+	An input source file with long lines and multiple tag matches per
+	line can generate an excessively large tags file with an
+	unconstrained pattern length. For example, running ctags on a
+	minified JavaScript source file often exhibits this behaviour.
+
+	The truncation avoids cutting in the middle of a UTF-8 code point
+	spanning multiple bytes to prevent writing invalid byte sequences from
+	valid input files. This handling allows for an extra 3 bytes above the
+	configured limit in the worse case of a 4 byte code point starting
+	right before the limit. Please also note that this handling is fairly
+	naive and fast, and although it is resistant against any input, it
+	requires a valid input to work properly; it is not guaranteed to work
+	as the user expects when dealing with partially invalid UTF-8 input.
+	This also partially affect non-UTF-8 input, if the byte sequence at
+	the truncation length looks like a multibyte UTF-8 sequence. This
+	should however be rare, and in the worse case will lead to including
+	up to an extra 3 bytes above the limit.
 
 ``--print-language``
 	Just prints the language parsers for specified source files, and then exits.

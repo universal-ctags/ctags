@@ -170,6 +170,14 @@ letters other than initial letter of the name part.
 The kinds "heading1", "heading2", and "heading3" in the HTML parser
 are the examples.
 
+Truncating the pattern for long input lines
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To prevent generating overly large tags files, a pattern field is
+truncated, by default, when its size exceeds 96 bytes. A different
+limit can be specified with ``--pattern-length-limit=N``. Specifying
+0 as *N* results no truncation as Exuberant-ctags does not.
+
 Option files loading at starting up time (preload files)
 -------------------------------------------------------------
 
