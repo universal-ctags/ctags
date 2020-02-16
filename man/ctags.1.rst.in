@@ -339,10 +339,10 @@ are not listed here. They are experimental or for debugging purpose.
 	parameter aliasPattern. Using "all" for *<LANG>* has meaning in
 	following two cases:
 
-	"--alias-all="
+	``--alias-all=``
 		This clears aliases setting of all languages.
 
-	"--alias-all=default"
+	``--alias-all=default``
 		This restores the default languages aliases for all languages.
 
 ``--append[=yes|no]``
@@ -513,7 +513,7 @@ are not listed here. They are experimental or for debugging purpose.
 	Specifies "all" as <LANG> to apply the parameter flags to all
 	languages; all extras are enabled with specifying '*' as the
 	parameter flags. If specifying nothing as the parameter flags
-	("--extras-all="), all extras are disabled. These two combinations
+	(``--extras-all=``), all extras are disabled. These two combinations
 	are useful for testing.
 
 	Check the output of the ``--list-extras=<LANG>`` option for the
@@ -614,7 +614,7 @@ are not listed here. They are experimental or for debugging purpose.
 	Specify "all" as <LANG> to apply the parameter flags to all
 	fields; all fields are enabled with specifying '*' as the
 	parameter flags. If specifying nothing as the parameter flags
-	("--fields-all="), all fields are disabled. These two combinations
+	(``--fields-all=``), all fields are disabled. These two combinations
 	are useful for testing.
 
 ``--file-scope[=yes|no]``
