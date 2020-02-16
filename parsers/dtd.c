@@ -337,7 +337,7 @@ static tokenInfo *parserParameterEntityRef (tokenInfo *const token)
 			return identifier;
 		else
 		{
-			tokenDestroy (identifier);
+			tokenDelete (identifier);
 			return NULL;
 		}
 	}
@@ -361,7 +361,7 @@ static void parseElement (tokenInfo *const token, bool skipToClose)
 			makeDtdTagMaybe (&e, identifier,
 							 K_PARAMETER_ENTITY,
 							 DTD_PARAMETER_ENTITY_ELEMENT_NAME);
-			tokenDestroy (identifier);
+			tokenDelete (identifier);
 		}
 	}
 	else if (tokenIsType(token, IDENTIFIER))
@@ -441,7 +441,7 @@ static void parseAttDefs (tokenInfo *const token)
 				makeDtdTagMaybe (&e, identifier,
 								 K_PARAMETER_ENTITY,
 								 DTD_PARAMETER_ENTITY_PART_OF_ATT_DEF);
-				tokenDestroy (identifier);
+				tokenDelete (identifier);
 			}
 		}
 		else if (tokenIsType(token, CLOSE))
@@ -470,7 +470,7 @@ static void parseAttlist (tokenInfo *const token)
 				index = makeDtdTagMaybe (&e, identifier,
 										 K_ENTITY,
 										 DTD_PARAMETER_ENTITY_ELEMENT_NAME);
-				tokenDestroy (identifier);
+				tokenDelete (identifier);
 
 				TOKENX (token, tokenExtra)->scopeIndex = index;
 				parseAttDefs (token);
@@ -484,7 +484,7 @@ static void parseAttlist (tokenInfo *const token)
 
 		index = makeDtdTagMaybe (&e, element,
 								 K_ELEMENT, DTD_ELEMENT_ATT_OWNER);
-		tokenDestroy (element);
+		tokenDelete (element);
 
 		TOKENX (token, tokenExtra)->scopeIndex = index;
 		parseAttDefs (token);
@@ -563,7 +563,7 @@ static void parseSection (tokenInfo *const token)
 				index = makeDtdTagMaybe (&e, condition,
 										 K_PARAMETER_ENTITY,
 										 DTD_PARAMETER_ENTITY_CONDITION);
-				tokenDestroy (condition);
+				tokenDelete (condition);
 				tokenRead (token);
 				if (token->type == '[')
 				{
@@ -589,7 +589,7 @@ static void findDtdTags (void)
 		parseDtdTag1 (token);
 	} while (!tokenIsEOF (token));
 
-	tokenDestroy (token);
+	tokenDelete (token);
 
 	flashTokenBacklog (&dtdTokenInfoClass);
 }

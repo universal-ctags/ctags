@@ -162,7 +162,7 @@ static void makeSectionRstTag(const vString* const name, const int kind, const M
 		}
 
 		m[0] = marker;
-		attachParserField (&e, RstFields [F_SECTION_MARKER].ftype, m);
+		attachParserField (&e, false, RstFields [F_SECTION_MARKER].ftype, m);
 		r = makeTagEntry (&e);
 	}
 	nestingLevelsPush(nestingLevels, r);

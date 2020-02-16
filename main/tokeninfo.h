@@ -50,7 +50,7 @@ struct tokenInfoClass {
 	void (*init)   (tokenInfo *token, void *data);
 	void (*read)   (tokenInfo *token, void *data);
 	void (*clear)  (tokenInfo *token);
-	void (*destroy) (tokenInfo *token);
+	void (*delete) (tokenInfo *token);
 	void (*copy)   (tokenInfo *dest, tokenInfo *src, void *data);
 	objPool *pool;
 	ptrArray *backlog;
@@ -62,7 +62,7 @@ void *newTokenByCopying (tokenInfo *src);
 void *newTokenByCopyingFull (tokenInfo *src, void *data);
 
 void  flashTokenBacklog (struct tokenInfoClass *klass);
-void  tokenDestroy    (tokenInfo *token);
+void  tokenDelete    (tokenInfo *token);
 
 void tokenReadFull   (tokenInfo *token, void *data);
 void tokenRead       (tokenInfo *token);
@@ -81,9 +81,10 @@ void tokenCopy       (tokenInfo *dest, tokenInfo *src);
 									&& (TKN)->keyword == KEYWORD_##K)
 #define tokenIsEOF(TKN)      ((TKN)->type == (TKN)->klass->typeForEOF)
 
-#define tokenString(TKN)	   (vStringValue ((TKN)->string))
-#define tokenPutc(TKN,C)      (vStringPut ((TKN)->string, C))
+#define tokenString(TKN)       (vStringValue ((TKN)->string))
+#define tokenPutc(TKN,C)       (vStringPut ((TKN)->string, C))
 #define tokenCat(TKN,VS)       (vStringCat ((TKN)->string, VS))
+#define tokenCatS(TKN,S)       (vStringCatS ((TKN)->string, S))
 #define tokenLast(TKN)         (vStringIsEmpty((TKN)->string)? '\0': vStringLast((TKN)->string))
 
 /* return true if t is found. In that case token holds an

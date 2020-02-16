@@ -511,7 +511,7 @@ void cxxTagSetField(unsigned int uField,const char * szValue)
 	if(!g_cxx.pFieldOptions[uField].enabled)
 		return;
 
-	attachParserField(&g_oCXXTag,g_cxx.pFieldOptions[uField].ftype,szValue);
+	attachParserField(&g_oCXXTag,false,g_cxx.pFieldOptions[uField].ftype,szValue);
 }
 
 void cxxTagSetCorkQueueField(

@@ -148,15 +148,19 @@ extern bool isTagExtraBitMarked (const tagEntryInfo *const tag, xtagType extra);
 /* If any extra bit is on, return true. */
 extern bool isTagExtra (const tagEntryInfo *const tag);
 
-/* Attaching parser speicificc fields
+/* Attaching parser speicific fields
  *
- * If your parser doesn't use Cork API, use attachParserField().
- * If your parser use Cork API, use attachParserFieldToCorkEntry(),
+ * If your parser doesn't use Cork API, use attachParserField() with specifying
+ * inCorkQueue to false.
+ * If your parser use Cork API, use use attachParserField() with specifying
+ * inCorkQueue to true, or use attachParserFieldToCorkEntry().
+ * attachParserField takes tagEntryInfo object.
+ * attachParserFieldToCorkEntry takes an index on the CorkQueue.
  *
  * Calling either one, the caller owns VALUE. If the parser allocates VALUE
  * dynamically, the parser must free it.
  */
-extern void attachParserField (tagEntryInfo *const tag, fieldType ftype, const char* value);
+extern void attachParserField (tagEntryInfo *const tag, bool inCorkQueue, fieldType ftype, const char* value);
 extern void attachParserFieldToCorkEntry (int index, fieldType ftype, const char* value);
 
 extern int makePlaceholder (const char *const name);

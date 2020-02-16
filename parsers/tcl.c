@@ -617,7 +617,7 @@ static void findTclTags (void)
 			skipToEndOfCmdline(token);
 	} while (!tokenIsEOF(token));
 
-	tokenDestroy (token);
+	tokenDelete (token);
 	flashTokenBacklog (&tclTokenInfoClass);
 }
 

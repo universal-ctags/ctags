@@ -248,7 +248,7 @@ static int parseClass (tclSubparser *s CTAGS_ATTR_UNUSED, int parentIndex,
 		} while (!tokenIsEOF(token));
 	}
 
-	tokenDestroy(token);
+	tokenDelete(token);
 	return r;
 }
 

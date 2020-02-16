@@ -109,7 +109,7 @@ static int parseClass (tclSubparser *s CTAGS_ATTR_UNUSED, int parentIndex,
 	}
 
 	skipToEndOfTclCmdline (token);
-	tokenDestroy(token);
+	tokenDelete(token);
 	return r;
 }
 

@@ -216,7 +216,7 @@ static int makeLdScriptTagMaybe (tagEntryInfo *const e, tokenInfo *const token,
 		}
 
 		if (assignment)
-			attachParserField (e, LdScriptFields[F_ASSIGNMENT].ftype,
+			attachParserField (e, false, LdScriptFields[F_ASSIGNMENT].ftype,
 							   assignment);
 	}
 
@@ -318,7 +318,7 @@ static void readToken (tokenInfo *const token, void *data CTAGS_ATTR_UNUSED)
 			}
 			else
 				tokenUnread (discard);
-			tokenDestroy (discard);
+			tokenDelete (discard);
 		}
 		else
 			cppUngetc (c0);
@@ -476,7 +476,7 @@ static void parseEntry (tokenInfo *const token)
 			tokenRead (token);
 			tokenSkipToType (token, ')');
 		}
-		tokenDestroy (name);
+		tokenDelete (name);
 	}
 }
 
@@ -592,7 +592,7 @@ static void parseOutputSectionCommands (tokenInfo *const token, int terminator)
 			parseProvide (token);
 	} while (! (tokenIsEOF (token) || token->type == terminator));
 
-	tokenDestroy (tmp);
+	tokenDelete (tmp);
 }
 
 static void parseSection (tokenInfo * name)
@@ -640,7 +640,7 @@ static void parseSection (tokenInfo * name)
 			}
 		}
 	}
-	tokenDestroy (token);
+	tokenDelete (token);
 }
 
 static void parseSections (tokenInfo *const token)
@@ -721,8 +721,8 @@ static void findLdScriptTags (void)
 
 	cppTerminate ();
 
-	tokenDestroy (tmp);
-	tokenDestroy (token);
+	tokenDelete (tmp);
+	tokenDelete (token);
 
 	flashTokenBacklog (&ldScriptTokenInfoClass);
 }

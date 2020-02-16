@@ -1538,7 +1538,7 @@ static void matchTagPattern (struct lregexControlBlock *lcb,
 				{
 					vString * const value = substitute (line, fp->template,
 														BACK_REFERENCE_COUNT, pmatch);
-					attachParserField (&e, fp->ftype, vStringValue (value));
+					attachParserField (&e, false, fp->ftype, vStringValue (value));
 					trashBoxPut (field_trashbox, value,
 								 (TrashBoxDestroyItemProc)vStringDelete);
 				}
