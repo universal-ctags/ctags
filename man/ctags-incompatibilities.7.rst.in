@@ -52,23 +52,24 @@ incompatibility.
 options are helpful to verify and the file extensions and the file
 name patterns of given *language*.
 
-Unexpected synchronization between ``--file-scope`` option and "F/fileScope" extra
+Remove ``--file-tags`` and ``--file-scope`` options
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Universal-ctags introduces "F/fileScope" extra as the alternative to
+Even in Exuberant-ctags, "--file-tags" is not documented in its man page.
+Instead of specifying "--file-tags" or "--file-tags=yes", use
+"--extras=+f" or "--extras=+{inputFile}".
+
+Instead of specifying "--file-tags=no", use
+"--extras=-f" or "--extras=-{inputFile}".
+
+Universal-ctags introduces "F/fileScope" extra as the replacement for
 ``--file-scope`` option.
 
-Providing the two way to control the same thing in Universal-ctags
-internal can cause a trouble.
+Instead of specifying "--file-tags" or "--file-tags=yes", use
+"--extras=+F" or "--extras=+{fileScope}".
 
-A user, expecting "--file-scope=yes" is enabled by default, gives
-"--extras=q". The intention of the user may be just enabling
-"q/qualified". However, "--extras=q" is evaluated as "disabling all
-extras including F/fileScope, then enabling only
-q/qualified". Unexpectedly the command line becomes as if
-"--file-scope=no" is set.
-
-In this case, the user should set "--extras=+q" instead of "--extras=q".
+Instead of specifying "--file-tags=no", use
+"--extras=-F" or "--extras=-{fileScope}".
 
 Language and kind definitions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

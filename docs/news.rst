@@ -276,7 +276,7 @@ These extra tag entries are newly introduced.
 
 ``F``
 
-	Equivalent to --file-scope.
+	Replacement for --file-scope.
 
 ``p``
 

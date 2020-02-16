@@ -209,7 +209,8 @@ are not listed here. They are experimental or for debugging purpose.
 	will be considered to have file-limited scope. If the first character
 	in the list is a plus sign, then the extensions in the list will be
 	appended to the current list; otherwise, the list will replace the
-	current list. See, also, the ``--file-scope`` option. The default list is
+	current list. See, also, the "F/fileScope" flag of ``--extras`` option.
+	The default list is
 	".h.H.hh.hpp.hxx.h++.inc.def". To restore the default list, specify ``-h``
 	default. Note that if an extension supplied to this option is not
 	already mapped to a particular language (see "`Determining file language`_", above),
@@ -323,7 +324,7 @@ are not listed here. They are experimental or for debugging purpose.
 	feature are generating a listing of all functions located in a source
 	file (e.g. "ctags -x --kinds-c=f file"), or generating
 	a list of all externally visible global variables located in a source
-	file (e.g. "ctags -x --kinds-c=v --file-scope=no file").
+	file (e.g. "ctags -x --kinds-c=v --extras=-F file").
 	This option must appear before the first file name.
 
 ``--alias-<LANG>=[+|-]aliasPattern``
@@ -465,13 +466,19 @@ are not listed here. They are experimental or for debugging purpose.
 	The meaning of major extras is as follows (one-letter flag/long-name flag):
 
 	F/fileScope
-		Equivalent to ``--file-scope``.
+		Indicates whether tags scoped only for a single file (i.e. tags which
+		cannot be seen outside of the file in which they are defined, such as
+		language objects with "static" modifier of C language) should be included
+		in the output. See, also, the ``-h`` option. This option is enabled by
+		default. This is the replacement for ``--file-scope`` option of
+		Exuberant-ctags.
 
 	f/inputFile
 		Include an entry for the base file name of every source file
 		(e.g. "example.c"), which addresses the first line of the file.
 		If the ``end:`` field is enabled, the end line number of the file
-		can be attached to the tag.
+		can be attached to the tag. This is the replacement for ``--file-tags``
+		hidden option of Exuberant-ctags.
 
 	p/pseudo
 		Include pseudo tags. Enabled by default unless the tag file is
@@ -618,15 +625,8 @@ are not listed here. They are experimental or for debugging purpose.
 	are useful for testing.
 
 ``--file-scope[=yes|no]``
-	Indicates whether tags scoped only for a single file (i.e. tags which
-	cannot be seen outside of the file in which they are defined, such as
-	"static" tags) should be included in the output. See, also, the ``-h``
-	option. This option is enabled by default.
-
-	Universal-ctags provides an alternative way to control this option,
-	with the "F/fileScope" extra, and recommends users to use the
-	extra. However, this extra can cause issues.
-	See :ref:`ctags-incompatibilities(7) <ctags-incompatibilities(7)>`.
+	This options is removed. Use "--extras=[+|-]F" or
+	"--extras=[+|-]{fileScope}" instead.
 
 ``--filter[=yes|no]``
 	Makes ctags behave as a filter, reading source
