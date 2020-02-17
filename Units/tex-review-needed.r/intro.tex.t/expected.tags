@@ -2,9 +2,7 @@ Introduction	input.tex	/^\\section{Introduction}$/;"	s	chapter:chapter text
 Part1	input.tex	/^\\part{Part1}$/;"	p
 Part2	input.tex	/^\\part{Part2}$/;"	p
 chapter text	input.tex	/^\\chapter{chapter text}$/;"	c
-chapter1-intro.inc	input.tex	/^\\include{chapter1-intro.inc}$/;"	i
 chapter2	input.tex	/^\\chapter{chapter2}$/;"	c	part:Part2
-chapter2-intro.inc	input.tex	/^\\include{chapter2-intro.inc}$/;"	i
 long paragraph2	input.tex	/^\\paragraph{long paragraph2}$/;"	P	section:Part1""short section4
 long subparagraph2	input.tex	/^\\subparagraph{long subparagraph2}$/;"	G	subsection:Part2""shorter intro2""subsec5 text
 section1 text	input.tex	/^\\section{section1 text}$/;"	s	chapter:chapter text

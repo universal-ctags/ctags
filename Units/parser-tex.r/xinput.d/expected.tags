@@ -1,0 +1,4 @@
+input-1	input.tex	/^\\include{input-1}$/;"	i	roles:included
+input-2	input.tex	/^\\input{input-2}$/;"	i	roles:input
+The first section	input-1.tex	/^\\section {The first section}$/;"	s	roles:def
+The second section	input-2.tex	/^\\section {The second section}$/;"	s	roles:def

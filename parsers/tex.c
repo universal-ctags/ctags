@@ -57,6 +57,7 @@ enum eKeywordId {
 	KEYWORD_subparagraph,
 	KEYWORD_label,
 	KEYWORD_include,
+	KEYWORD_input,
 	KEYWORD_begin,
 	KEYWORD_end,
 };
@@ -109,9 +110,21 @@ typedef enum {
 	TEXTAG_PARAGRAPH,
 	TEXTAG_SUBPARAGRAPH,
 	TEXTAG_LABEL,
-	TEXTAG_INCLUDE,
+	TEXTAG_XINPUT,
 	TEXTAG_COUNT
 } texKind;
+
+typedef enum {
+	TEX_XINPUT_INCLUDED,
+	TEX_XINPUT_INPUT,
+} texInputRole;
+
+static roleDefinition TexInputRoles [] = {
+	{ true, "included",
+	  "external input file specified with \\include" },
+	{ true, "input",
+	  "external input file specified with \\input" },
+};
 
 static kindDefinition TexKinds [] = {
 	{ true,  'p', "part",			  "parts"			   },
@@ -122,7 +135,8 @@ static kindDefinition TexKinds [] = {
 	{ true,  'P', "paragraph",		  "paragraphs"		   },
 	{ true,  'G', "subparagraph",	  "subparagraphs"	   },
 	{ true,  'l', "label",			  "labels"			   },
-	{ true,  'i', "include",	  	  "includes"		   }
+	{ true,  'i', "xinput",			  "external input files",
+	  .referenceOnly = true, ATTACH_ROLES(TexInputRoles)   },
 };
 
 static const keywordTable TexKeywordTable [] = {
@@ -136,6 +150,7 @@ static const keywordTable TexKeywordTable [] = {
 	{ "subparagraph",	KEYWORD_subparagraph		},
 	{ "label",			KEYWORD_label				},
 	{ "include",		KEYWORD_include				},
+	{ "input",			KEYWORD_input				},
 	{ "begin",			KEYWORD_begin				},
 	{ "end",			KEYWORD_end					},
 };
@@ -589,7 +604,7 @@ static bool parseWithStrategy (tokenInfo *token,
 	return eof;
 }
 
-static bool parseTag (tokenInfo *const token, texKind kind, bool enterSquare, bool *tokenUnprocessed)
+static bool parseTagFull (tokenInfo *const token, texKind kind, int roleIndex, bool enterSquare, bool *tokenUnprocessed)
 {
 	bool eof = false;
 	vString *taggedName = vStringNew();
@@ -614,7 +629,6 @@ static bool parseTag (tokenInfo *const token, texKind kind, bool enterSquare, bo
 			.type = '[',
 			.flags = TEX_NAME_FLAG_OPTIONAL,
 			/* .kindIndex is initialized dynamically. */
-			.roleIndex = ROLE_DEFINITION_INDEX,
 		},
 		{
 			.type = '*',
@@ -626,7 +640,7 @@ static bool parseTag (tokenInfo *const token, texKind kind, bool enterSquare, bo
 			.type = '{',
 			.flags = TEX_NAME_FLAG_INCLUDING_WHITESPACE,
 			.kindIndex = kind,
-			.roleIndex = ROLE_DEFINITION_INDEX,
+			.roleIndex = roleIndex,
 			.name = taggedName,
 		},
 		{
@@ -638,6 +652,7 @@ static bool parseTag (tokenInfo *const token, texKind kind, bool enterSquare, bo
 	if (enterSquare)
 	{
 		strategy [0].kindIndex = kind;
+		strategy [0].roleIndex = roleIndex;
 		strategy [0].flags |= TEX_NAME_FLAG_EXCLUSIVE;
 		strategy [0].name = taggedName;
 	}
@@ -664,6 +679,13 @@ static bool parseTag (tokenInfo *const token, texKind kind, bool enterSquare, bo
 	vStringDelete (taggedName);
 
 	return eof;
+}
+
+static bool parseTag (tokenInfo *const token, texKind kind,
+					  bool enterSquare, bool *tokenUnprocessed)
+{
+	return parseTagFull (token, kind, ROLE_DEFINITION_INDEX,
+						 enterSquare, tokenUnprocessed);
 }
 
 static bool parseEnv (tokenInfo *const token, bool begin, bool *tokenUnprocessed)
@@ -747,7 +769,12 @@ static void parseTexFile (tokenInfo *const token)
 					eof = parseTag (token, TEXTAG_LABEL, false, &tokenUnprocessed);
 					break;
 				case KEYWORD_include:
-					eof = parseTag (token, TEXTAG_INCLUDE, true, &tokenUnprocessed);
+					eof = parseTagFull (token, TEXTAG_XINPUT, TEX_XINPUT_INCLUDED,
+										false, &tokenUnprocessed);
+					break;
+				case KEYWORD_input:
+					eof = parseTagFull (token, TEXTAG_XINPUT, TEX_XINPUT_INPUT,
+										false, &tokenUnprocessed);
 					break;
 				case KEYWORD_begin:
 					eof = parseEnv (token, true, &tokenUnprocessed);

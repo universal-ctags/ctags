@@ -53,7 +53,7 @@ struct TexParseStrategy {
 	/* Bits combination of enum TexNameFlag */
 	unsigned int flags;
 
-	/* Kind for making a tag for the string surrounded by one of pairs.
+	/* Kind and role for making a tag for the string surrounded by one of pairs.
 	 * If you don't need to make a tag for the string,
 	 * specify KIND_GHOST_INDEX. */
 	int kindIndex;
