@@ -61,6 +61,7 @@ enum eKeywordId {
 	KEYWORD_begin,
 	KEYWORD_end,
 	KEYWORD_bibitem,
+	KEYWORD_bibliography,
 };
 typedef int keywordId; /* to allow KEYWORD_NONE */
 
@@ -119,6 +120,7 @@ typedef enum {
 typedef enum {
 	TEX_XINPUT_INCLUDED,
 	TEX_XINPUT_INPUT,
+	TEX_XINPUT_BIBLIOGRAPHY,
 } texInputRole;
 
 static roleDefinition TexInputRoles [] = {
@@ -126,6 +128,8 @@ static roleDefinition TexInputRoles [] = {
 	  "external input file specified with \\include" },
 	{ true, "input",
 	  "external input file specified with \\input" },
+	{ true, "bibliography",
+	  "bibliography (.bib) file" },
 };
 
 static kindDefinition TexKinds [] = {
@@ -157,6 +161,7 @@ static const keywordTable TexKeywordTable [] = {
 	{ "begin",			KEYWORD_begin				},
 	{ "end",			KEYWORD_end					},
 	{ "bibitem",		KEYWORD_bibitem				},
+	{ "bibliography",	KEYWORD_bibliography		},
 };
 
 /*
@@ -788,6 +793,10 @@ static void parseTexFile (tokenInfo *const token)
 					break;
 				case KEYWORD_bibitem:
 					eof = parseTag (token, TEXTAG_BIBITEM, false, &tokenUnprocessed);
+					break;
+				case KEYWORD_bibliography:
+					eof = parseTagFull (token, TEXTAG_XINPUT, TEX_XINPUT_BIBLIOGRAPHY,
+										false, &tokenUnprocessed);
 					break;
 				default:
 					break;
