@@ -16,4 +16,6 @@ eq:mdiv	input.tex	/^\\label{eq:mdiv}$/;"	l
 fig:lj	input.tex	/^\\caption{\\label{fig:lj}Plot of the$/;"	l
 fig:qm/complexfunctions	input.tex	/^\\caption{\\label{fig:qm\/complexfunctions} Two representations of complex$/;"	l
 fig:typical	input.tex	/^\\caption{\\label{fig:typical}Show me a sine.}$/;"	l
+latex	input.tex	/^\\bibitem{latex}Helmut Kopka and Patrick W. Daly, \\textsl{A Guide to$/;"	B
 tab:5/tc	input.tex	/^\\caption{\\label{tab:5\/tc}Comparison of the mean-field predictions$/;"	l
+website	input.tex	/^\\bibitem{website}Some useful links are$/;"	B

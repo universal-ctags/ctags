@@ -1,0 +1,2 @@
+X	input.tex	/^\\bibitem [A] {X} XXX$/;"	B
+Y	input.tex	/^\\bibitem {Y} YYY$/;"	B
