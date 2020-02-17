@@ -135,5 +135,7 @@ Why does snort report ``Packet loss statistics are unavailable under Linux?''	in
 Why does the `error deleting alert' message occur when attempting to delete an alert with BASE?	input.tex	/^\\subsection{Why does the `error deleting alert' message occur when attempting to delete an aler/;"	u	section:Problems
 Why does the portscan plugin log ``stealth'' packets even though the host is in the portscan-ignorehosts list?	input.tex	/^\\subsection{Why does the portscan plugin log ``stealth'' packets even though the host is in the/;"	u	section:Configuring Snort
 Why does the program generate alerts on packets that have pass rules?	input.tex	/^\\subsection{Why does the program generate alerts on packets that have pass rules?  }$/;"	u	section:Rules and Alerts
+\\myquote	input.tex	/^\\newcommand{\\myquote}[1]{\\begin{quote}#1\\end{quote}}$/;"	C
+\\myref	input.tex	/^\\newcommand{\\myref}[1]{(see FAQ \\ref{#1})}$/;"	C
 stealth	input.tex	/^\\subsection{How do I setup snort on a `stealth' interface? }\\label{stealth}$/;"	l
 stream4	input.tex	/^\\label{stream4}$/;"	l

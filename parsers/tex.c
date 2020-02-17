@@ -62,6 +62,7 @@ enum eKeywordId {
 	KEYWORD_end,
 	KEYWORD_bibitem,
 	KEYWORD_bibliography,
+	KEYWORD_newcommand,
 };
 typedef int keywordId; /* to allow KEYWORD_NONE */
 
@@ -114,6 +115,7 @@ typedef enum {
 	TEXTAG_LABEL,
 	TEXTAG_XINPUT,
 	TEXTAG_BIBITEM,
+	TEXTAG_COMMAND,
 	TEXTAG_COUNT
 } texKind;
 
@@ -144,6 +146,7 @@ static kindDefinition TexKinds [] = {
 	{ true,  'i', "xinput",			  "external input files",
 	  .referenceOnly = true, ATTACH_ROLES(TexInputRoles)   },
 	{ true,  'B', "bibitem",		  "bibliography items" },
+	{ true,  'C', "command",		  "command created with \\newcommand" },
 };
 
 static const keywordTable TexKeywordTable [] = {
@@ -162,6 +165,7 @@ static const keywordTable TexKeywordTable [] = {
 	{ "end",			KEYWORD_end					},
 	{ "bibitem",		KEYWORD_bibitem				},
 	{ "bibliography",	KEYWORD_bibliography		},
+	{ "newcommand",		KEYWORD_newcommand			},
 };
 
 /*
@@ -735,6 +739,48 @@ static bool parseEnv (tokenInfo *const token, bool begin, bool *tokenUnprocessed
 
 }
 
+static bool parseNewcommand (tokenInfo *const token, bool *tokenUnprocessed)
+{
+	bool eof = false;
+
+	/* \newcommand {cmd}[args][opt]{def} */
+	struct TexParseStrategy strategy [] = {
+		{
+			.type = '{',
+			.flags = 0,
+			.kindIndex = TEXTAG_COMMAND,
+			.roleIndex = ROLE_DEFINITION_INDEX,
+			.name = NULL,
+		},
+		{
+			.type = '[',
+			.flags = TEX_NAME_FLAG_OPTIONAL,
+			.kindIndex = KIND_GHOST_INDEX,
+			.name = NULL,
+		},
+		{
+			.type = '[',
+			.flags = TEX_NAME_FLAG_OPTIONAL,
+			.kindIndex = KIND_GHOST_INDEX,
+			.name = NULL,
+		},
+		{
+			.type = '{',
+			.flags = 0,
+			.kindIndex = KIND_GHOST_INDEX,
+			.name = NULL,
+		},
+		{
+			.type = 0
+		}
+	};
+
+	if (parseWithStrategy (token, strategy, tokenUnprocessed))
+		eof = true;
+
+	return eof;
+}
+
 static void parseTexFile (tokenInfo *const token)
 {
 	bool eof = false;
@@ -797,6 +843,8 @@ static void parseTexFile (tokenInfo *const token)
 				case KEYWORD_bibliography:
 					eof = parseTagFull (token, TEXTAG_XINPUT, TEX_XINPUT_BIBLIOGRAPHY,
 										false, &tokenUnprocessed);
+				case KEYWORD_newcommand:
+					eof = parseNewcommand (token, &tokenUnprocessed);
 					break;
 				default:
 					break;

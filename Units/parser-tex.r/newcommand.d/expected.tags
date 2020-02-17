@@ -1,0 +1,3 @@
+\\mysection0	input.tex	/^\\newcommand{\\mysection0}{\\section{#1}}$/;"	C
+\\mysection1	input.tex	/^\\newcommand{\\mysection1}[1]{\\section{#1}}$/;"	C
+\\mysection2	input.tex	/^\\newcommand{\\mysection2}[1][1]{\\section{#1}}$/;"	C

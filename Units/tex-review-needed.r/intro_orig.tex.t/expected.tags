@@ -9,6 +9,11 @@ Special symbols	input.tex	/^\\subsection{Special symbols}$/;"	u	section:Special 
 Tables	input.tex	/^\\section{Tables}$/;"	s
 \\color{red}Use of Color	input.tex	/^\\section{\\color{red}Use of Color}$/;"	s
 \\label{morefig}Subfigures	input.tex	/^\\section{\\label{morefig}Subfigures}$/;"	s
+\\lb	input.tex	/^ \\newcommand{\\lb}{{\\langle}}$/;"	C
+\\lb	input.tex	/^\\newcommand{\\lb}{{\\langle}}$/;"	C
+\\rb	input.tex	/^ \\newcommand{\\rb}{{\\rangle}}$/;"	C
+\\rb	input.tex	/^\\newcommand{\\rb}{{\\rangle}}$/;"	C
+\\rv	input.tex	/^\\newcommand{\\rv}{\\textbf{r}}$/;"	C
 eq:fine	input.tex	/^I = \\! \\int_{-\\infty}^\\infty f(x)\\,dx \\label{eq:fine}.$/;"	l
 eq:ising	input.tex	/^\\label{eq:ising}$/;"	l
 eq:mdiv	input.tex	/^\\label{eq:mdiv}$/;"	l
