@@ -1,0 +1,2 @@
+m	input.tex	/^\\newcounter{m}{n}$/;"	N
+n	input.tex	/^\\newcounter{n}$/;"	N

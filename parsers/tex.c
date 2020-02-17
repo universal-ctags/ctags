@@ -63,6 +63,7 @@ enum eKeywordId {
 	KEYWORD_bibitem,
 	KEYWORD_bibliography,
 	KEYWORD_newcommand,
+	KEYWORD_newcounter,
 };
 typedef int keywordId; /* to allow KEYWORD_NONE */
 
@@ -116,6 +117,7 @@ typedef enum {
 	TEXTAG_XINPUT,
 	TEXTAG_BIBITEM,
 	TEXTAG_COMMAND,
+	TEXTAG_COUNTER,
 	TEXTAG_COUNT
 } texKind;
 
@@ -147,6 +149,7 @@ static kindDefinition TexKinds [] = {
 	  .referenceOnly = true, ATTACH_ROLES(TexInputRoles)   },
 	{ true,  'B', "bibitem",		  "bibliography items" },
 	{ true,  'C', "command",		  "command created with \\newcommand" },
+	{ true,  'N', "counter",		  "counter created with \\newcounter" },
 };
 
 static const keywordTable TexKeywordTable [] = {
@@ -166,6 +169,7 @@ static const keywordTable TexKeywordTable [] = {
 	{ "bibitem",		KEYWORD_bibitem				},
 	{ "bibliography",	KEYWORD_bibliography		},
 	{ "newcommand",		KEYWORD_newcommand			},
+	{ "newcounter",		KEYWORD_newcounter			},
 };
 
 /*
@@ -781,6 +785,34 @@ static bool parseNewcommand (tokenInfo *const token, bool *tokenUnprocessed)
 	return eof;
 }
 
+static bool parseNewcounter (tokenInfo *const token, bool *tokenUnprocessed)
+{
+	bool eof = false;
+	/* \newccounter {counter}[parentCounter] */
+	struct TexParseStrategy strategy [] = {
+		{
+			.type = '{',
+			.flags = 0,
+			.kindIndex = TEXTAG_COUNTER,
+			.roleIndex = ROLE_DEFINITION_INDEX,
+			.name = NULL,
+		},
+		{
+			.type = '[',
+			.flags = 0,
+			.kindIndex = KIND_GHOST_INDEX,
+			.name = NULL,
+		},
+		{
+			.type = 0
+		}
+	};
+
+	if (parseWithStrategy (token, strategy, tokenUnprocessed))
+		eof = true;
+
+	return eof;
+}
 static void parseTexFile (tokenInfo *const token)
 {
 	bool eof = false;
@@ -845,6 +877,9 @@ static void parseTexFile (tokenInfo *const token)
 										false, &tokenUnprocessed);
 				case KEYWORD_newcommand:
 					eof = parseNewcommand (token, &tokenUnprocessed);
+					break;
+				case KEYWORD_newcounter:
+					eof = parseNewcounter (token, &tokenUnprocessed);
 					break;
 				default:
 					break;
