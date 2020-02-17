@@ -57,6 +57,7 @@ struct TexParseStrategy {
 	 * If you don't need to make a tag for the string,
 	 * specify KIND_GHOST_INDEX. */
 	int kindIndex;
+	int roleIndex;
 
 	/* If a tag is made, Tex parser stores its cork index here. */
 	int corkIndex;

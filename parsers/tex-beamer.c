@@ -61,12 +61,14 @@ static struct TexParseStrategy frametitle_strategy[] = {
 		.type = '[',
 		.flags = TEX_NAME_FLAG_OPTIONAL|TEX_NAME_FLAG_EXCLUSIVE,
 		.kindIndex = K_FRAMETITLE,
+		.roleIndex = ROLE_DEFINITION_INDEX,
 		.name = NULL,
 	},
 	{
 		.type = '{',
 		.flags = TEX_NAME_FLAG_INCLUDING_WHITESPACE,
 		.kindIndex = K_FRAMETITLE,
+		.roleIndex = ROLE_DEFINITION_INDEX,
 		.name = NULL,
 	},
 	{
@@ -86,6 +88,7 @@ static struct TexParseStrategy framesubtitle_strategy[] = {
 		.type = '{',
 		.flags = TEX_NAME_FLAG_INCLUDING_WHITESPACE,
 		.kindIndex = K_FRAMESUBTITLE,
+		.roleIndex = ROLE_DEFINITION_INDEX,
 		.name = NULL,
 	},
 	{
@@ -117,6 +120,7 @@ static struct TexParseStrategy frame_env_strategy [] = {
 		.type = '{',
 		.flags = TEX_NAME_FLAG_INCLUDING_WHITESPACE,
 		.kindIndex = K_FRAMETITLE,
+		.roleIndex = ROLE_DEFINITION_INDEX,
 		.name = NULL,
 	},
 	{
@@ -124,6 +128,7 @@ static struct TexParseStrategy frame_env_strategy [] = {
 		.type = '{',
 		.flags = TEX_NAME_FLAG_INCLUDING_WHITESPACE,
 		.kindIndex = K_FRAMESUBTITLE,
+		.roleIndex = ROLE_DEFINITION_INDEX,
 		.name = NULL,
 	},
 	{

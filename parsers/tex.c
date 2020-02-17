@@ -239,7 +239,8 @@ static int getScopeInfo(texKind kind, vString *const parentName)
 /*
  *	 Tag generation functions
  */
-static int makeTexTag (tokenInfo *const token, texKind kind)
+static int makeTexTag (tokenInfo *const token, texKind kind,
+					   int roleIndex)
 {
 	int corkQueue = CORK_NIL;
 	if (TexKinds [kind].enabled)
@@ -258,6 +259,8 @@ static int makeTexTag (tokenInfo *const token, texKind kind)
 			e.extensionFields.scopeKindIndex = parentKind;
 			e.extensionFields.scopeName = vStringValue(parentName);
 		}
+
+		assignRole (&e, roleIndex);
 
 		corkQueue = makeTagEntry (&e);
 		vStringDelete (parentName);
@@ -504,7 +507,7 @@ static bool parseWithStrategy (tokenInfo *token,
 			if (!exclusive && capture_name && vStringLength (name->string) > 0)
 			{
 				if (s->kindIndex != KIND_GHOST_INDEX)
-					s->corkIndex = makeTexTag (name, s->kindIndex);
+					s->corkIndex = makeTexTag (name, s->kindIndex, s->roleIndex);
 
 				if (s->name)
 					vStringCopy(s->name, name->string);
@@ -560,7 +563,7 @@ static bool parseWithStrategy (tokenInfo *token,
 				vStringStripTrailing (name->string);
 
 				if (s->kindIndex != KIND_GHOST_INDEX)
-					s->corkIndex = makeTexTag (name, s->kindIndex);
+					s->corkIndex = makeTexTag (name, s->kindIndex, s->roleIndex);
 
 				if (s->name)
 					vStringCopy(s->name, name->string);
@@ -611,6 +614,7 @@ static bool parseTag (tokenInfo *const token, texKind kind, bool enterSquare, bo
 			.type = '[',
 			.flags = TEX_NAME_FLAG_OPTIONAL,
 			/* .kindIndex is initialized dynamically. */
+			.roleIndex = ROLE_DEFINITION_INDEX,
 		},
 		{
 			.type = '*',
@@ -622,6 +626,7 @@ static bool parseTag (tokenInfo *const token, texKind kind, bool enterSquare, bo
 			.type = '{',
 			.flags = TEX_NAME_FLAG_INCLUDING_WHITESPACE,
 			.kindIndex = kind,
+			.roleIndex = ROLE_DEFINITION_INDEX,
 			.name = taggedName,
 		},
 		{
