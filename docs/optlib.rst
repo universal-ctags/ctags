@@ -214,7 +214,7 @@ Tips for writing an option file
 * Use ``--quiet --options=NONE`` to disable preloading.
 
 * ``--_echo=MSG`` and  ``--_force-quit=[NUM]`` options are introduced for
-  debugging the process of loading option files. See "OPTION ITEMS"
+  debugging the process of loading option files. See "OPTIONS"
   section of :ref:`ctags-optlib(7) <ctags-optlib(7)>`.
 
 * Universal-ctags has an ``optlib2c`` script that translates an option file
@@ -1413,7 +1413,7 @@ be used as a part of the name of a tagEntry.
 
 Universal-ctags allows using the other groups in the regex pattern.
 
-An optlib parser can have its own fields. The groups can be used as a
+An optlib parser can have its specific fields. The groups can be used as a
 value of the fields of a tagEntry.
 
 Let's think about *Unknown*, an imaginary language.
@@ -1484,8 +1484,8 @@ the group 4 as a value for `signature` field to the tag. You can use the long re
 
 ``--fields-<LANG>=[+|-]{FIELDNAME}`` can be used to enable or disable specified field.
 
-When defining a new parser own field, it is disabled by default. Enable the
-field explicitly to use the field. See :ref:`Parser own fields <parser-own-fields>`
+When defining a new parser specific field, it is disabled by default. Enable the
+field explicitly to use the field. See :ref:`Parser specific fields <parser-specific-fields>`
 about `--fields-<LANG>` option.
 
 `passwd` parser is a simple example that uses ``--fields-<LANG>`` option.

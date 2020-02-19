@@ -141,7 +141,7 @@ This is the definition (pod.ctags) used in ctags for parsing pod
    --regex-pod=/^=head4[ \t]+(.+)/\1/t/
 
 
-OPTION ITEMS
+OPTIONS
 ------------
 
 ``--langdef=name``

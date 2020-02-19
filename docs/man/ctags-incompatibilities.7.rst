@@ -52,23 +52,24 @@ incompatibility.
 options are helpful to verify and the file extensions and the file
 name patterns of given *language*.
 
-Unexpected synchronization between ``--file-scope`` option and "F/fileScope" extra
+Remove ``--file-tags`` and ``--file-scope`` options
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Universal-ctags introduces "F/fileScope" extra as the alternative to
+Even in Exuberant-ctags, "--file-tags" is not documented in its man page.
+Instead of specifying "--file-tags" or "--file-tags=yes", use
+"--extras=+f" or "--extras=+{inputFile}".
+
+Instead of specifying "--file-tags=no", use
+"--extras=-f" or "--extras=-{inputFile}".
+
+Universal-ctags introduces "F/fileScope" extra as the replacement for
 ``--file-scope`` option.
 
-Providing the two way to control the same thing in Universal-ctags
-internal can cause a trouble.
+Instead of specifying "--file-tags" or "--file-tags=yes", use
+"--extras=+F" or "--extras=+{fileScope}".
 
-A user, expecting "--file-scope=yes" is enabled by default, gives
-"--extras=q". The intention of the user may be just enabling
-"q/qualified". However, "--extras=q" is evaluated as "disabling all
-extras including F/fileScope, then enabling only
-q/qualified". Unexpectedly the command line becomes as if
-"--file-scope=no" is set.
-
-In this case, the user should set "--extras=+q" instead of "--extras=q".
+Instead of specifying "--file-tags=no", use
+"--extras=-F" or "--extras=-{fileScope}".
 
 Language and kind definitions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -169,6 +170,14 @@ letters other than initial letter of the name part.
 
 The kinds "heading1", "heading2", and "heading3" in the HTML parser
 are the examples.
+
+Truncating the pattern for long input lines
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To prevent generating overly large tags files, a pattern field is
+truncated, by default, when its size exceeds 96 bytes. A different
+limit can be specified with ``--pattern-length-limit=N``. Specifying
+0 as *N* results no truncation as Exuberant-ctags does not.
 
 Option files loading at starting up time (preload files)
 -------------------------------------------------------------

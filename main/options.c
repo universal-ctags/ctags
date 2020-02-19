@@ -236,14 +236,14 @@ static optionDescription LongOptionDescription [] = {
  {1,"  -V   Equivalent to --verbose."},
  {1,"  -x   Print a tabular cross reference file to standard output."},
  {1,"  --alias-<LANG>=[+|-]aliasPattern"},
- {1,"      Add a pattern detecting a name, can be used as an alternative name"},
- {1,"      for LANG."},
+ {1,"       Add a pattern detecting a name, can be used as an alternative name"},
+ {1,"       for LANG."},
  {1,"  --append=[yes|no]"},
  {1,"       Should tags should be appended to existing tag file [no]?"},
  {1,"  --etags-include=file"},
- {1,"      Include reference to 'file' in Emacs-style tag file (requires -e)."},
+ {1,"       Include reference to 'file' in Emacs-style tag file (requires -e)."},
  {1,"  --exclude=pattern"},
- {1,"      Exclude files and directories matching 'pattern'."},
+ {1,"       Exclude files and directories matching 'pattern'."},
  {0,"  --excmd=number|pattern|mix|combine"},
 #ifdef MACROS_USE_PATTERNS
  {0,"       Uses the specified type of EX command to locate tags [pattern]."},
@@ -251,18 +251,15 @@ static optionDescription LongOptionDescription [] = {
  {0,"       Uses the specified type of EX command to locate tags [mix]."},
 #endif
  {1,"  --extras=[+|-]flags"},
- {1,"      Include extra tag entries for selected information (flags: \"fFgpqrs\") [F]."},
+ {1,"       Include extra tag entries for selected information (flags: \"fFgpqrs\") [F]."},
  {1,"  --extras-<LANG|all>=[+|-]flags"},
- {1,"      Include <LANG> own extra tag entries for selected information"},
- {1,"      (flags: see the output of --list-extras=<LANG> option)."},
+ {1,"       Include <LANG> own extra tag entries for selected information"},
+ {1,"       (flags: see the output of --list-extras=<LANG> option)."},
  {1,"  --fields=[+|-]flags"},
- {1,"      Include selected extension fields (flags: \"aCeEfFikKlmnNpPrRsStxzZ\") [fks]."},
+ {1,"       Include selected extension fields (flags: \"aCeEfFikKlmnNpPrRsStxzZ\") [fks]."},
  {1,"  --fields-<LANG|all>=[+|-]flags"},
- {1,"      Include selected <LANG> own extension fields"},
- {1,"      (flags: see the output of --list-fields=<LANG> option)."},
- {1,"  --file-scope=[yes|no]"},
- {1,"       Should tags scoped only for a single file (e.g. \"static\" tags)"},
- {1,"       be included in the output [yes]?"},
+ {1,"       Include selected <LANG> own extension fields"},
+ {1,"       (flags: see the output of --list-fields=<LANG> option)."},
  {1,"  --filter=[yes|no]"},
  {1,"       Behave as a filter, reading file names from standard input and"},
  {1,"       writing tags to standard output [no]."},
@@ -289,9 +286,9 @@ static optionDescription LongOptionDescription [] = {
  {1,"       Should code within #if 0 conditional branches be parsed [no]?"},
 #ifdef HAVE_ICONV
  {1,"  --input-encoding=encoding"},
- {1,"      Specify encoding of all input files."},
+ {1,"       Specify encoding of all input files."},
  {1,"  --input-encoding-<LANG>=encoding"},
- {1,"      Specify encoding of the LANG input files."},
+ {1,"       Specify encoding of the LANG input files."},
 #endif
  {1,"  --kinddef-<LANG>=letter,name,desc"},
  {1,"       Define new kind for <LANG>."},
@@ -374,11 +371,11 @@ static optionDescription LongOptionDescription [] = {
  {1,"  --options-maybe=path"},
  {1,"       Do the same as --options but this doesn't make an error for non-existing file."},
  {1,"  --optlib-dir=[+]DIR"},
- {1,"      Add or set DIR to optlib search path."},
+ {1,"       Add or set DIR to optlib search path."},
 #ifdef HAVE_ICONV
  {1,"  --output-encoding=encoding"},
- {1,"      The encoding to write the tag file in. Defaults to UTF-8 if --input-encoding"},
- {1,"      is specified, otherwise no conversion is performed."},
+ {1,"       The encoding to write the tag file in. Defaults to UTF-8 if --input-encoding"},
+ {1,"       is specified, otherwise no conversion is performed."},
 #endif
  {0,"  --output-format=u-ctags|e-ctags|etags|xref"
 #ifdef HAVE_JANSSON
@@ -2693,9 +2690,21 @@ static void processPatternLengthLimit(const char *const option, const char *cons
 		error (FATAL, "-%s: Invalid pattern length limit", option);
 }
 
-static void setBooleanToXtag(booleanOption *const option, bool value)
+static void setBooleanToXtagWithWarning(booleanOption *const option, bool value)
 {
 	/* WARNING/TODO: This function breaks capsulization. */
+
+	char x = 0;
+
+	if (strcmp (option->name, "file-tags") == 0)
+		x = 'f';
+	else if (strcmp (option->name, "file-scope") == 0)
+		x = 'F';
+
+	if (x)
+		error (WARNING, "\"--%s\" option is obsolete; use \"--extras=%c%c\" instead",
+			   option->name, value? '+': '-', x);
+
 	xtagType t = (xtagType)option->pValue;
 	enableXtag (t, value);
 }
@@ -2777,8 +2786,8 @@ static parametricOption ParametricOptions [] = {
 
 static booleanOption BooleanOptions [] = {
 	{ "append",         &Option.append,                 true,  STAGE_ANY },
-	{ "file-scope",     ((bool *)XTAG_FILE_SCOPE),   false, STAGE_ANY, setBooleanToXtag },
-	{ "file-tags",      ((bool *)XTAG_FILE_NAMES),   false, STAGE_ANY, setBooleanToXtag },
+	{ "file-scope",     ((bool *)XTAG_FILE_SCOPE),   false, STAGE_ANY, setBooleanToXtagWithWarning },
+	{ "file-tags",      ((bool *)XTAG_FILE_NAMES),   false, STAGE_ANY, setBooleanToXtagWithWarning },
 	{ "filter",         &Option.filter,                 true,  STAGE_ANY },
 	{ "guess-language-eagerly", &Option.guessLanguageEagerly, false, STAGE_ANY },
 	{ "line-directives",&Option.lineDirectives,         false, STAGE_ANY },

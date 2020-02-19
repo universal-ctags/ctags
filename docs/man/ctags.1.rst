@@ -58,274 +58,6 @@ are interested in such features and ctags internals,
 visit https://docs.ctags.io/en/latest/.
 
 
-SOURCE FILES
-------------
-
-.. Q: it's strange to have a MAN page put this section here so early in the
-	man page, instead of having the "OPTION ITEMS" section be right after
-	the Description section, no? I mean the man page for most programs starts
-	with a very brief description of the program, then all the command-line
-	options, then later detailed background and descriptions like this section.
-
-Unless the ``--language-force`` option is specified, the language of each source
-file is automatically selected based upon a **mapping** of file names to
-languages. The mappings in effect for each language may be displayed using
-the ``--list-maps`` option and may be changed using the ``--langmap`` or
-``--map-<LANG>`` options.
-
-If the name of a file is not mapped to a language, ctags tries
-to heuristically guess the language for the file by inspecting its content. See
-"`Determining file language`_".
-
-All files that have no file name mapping and no guessed parser are
-ignored. This permits running ctags on all files in
-either a single directory (e.g.  "ctags \*"), or on
-all files in an entire source directory tree
-(e.g. "ctags -R"), since only those files whose
-names are mapped to languages will be scanned.
-
-The same extensions are mapped to multiple parsers. For example, ".h"
-are mapped to C++, C and ObjectiveC. These mappings can cause
-issues. ctags tries to select the proper parser
-for the source file by applying heuristics to its content, however
-it is not perfect.  In case of issues one can use ``--language-force=language``,
-``--langmap=map[,map[...]]``, or the ``--map-<LANG>=-pattern|extension``
-options. (Some of the heuristics are applied whether ``--guess-language-eagerly``
-is given or not.)
-
-.. options should be revised here
-	``--map-<LANG>`` (done)
-	``--langmap=map[,map[...]]`` (done)
-	``--language-force=language`` (done)
-	``--languages=[+|-]list`` (done)
-	``--list-maps[=language|all]`` (done)
-	``--list-map-extensions`` (done)
-	``--list-map-patterns`` (done)
-
-
-Determining file language
-~~~~~~~~~~~~~~~~~~~~~~~~~
-
-If ctags cannot select a parser from the mapping of file names,
-various heuristic tests are conducted to determine the language:
-
-template file name testing
-	If the file name has an ".in" extension, ctags applies
-	the mapping to the file name without the extension. For example,
-	"config.h" is tested for a file named "config.h.in".
-
-"interpreter" testing
-	The first line of the file is checked to see if the file is a "#!"
-	script for a recognized language.  ctags looks for
-	a parser having the same name.
-
-	If ctags finds no such parser,
-	ctags looks for the name in alias lists. For
-	example, consider if the first line is "#!/bin/sh".  Though
-	ctags has a "shell" parser, it doesn't have a "sh"
-	parser. However, "sh" is listed as an alias for "shell", therefore
-	ctags selects the "shell" parser for the file.
-
-	An exception is "env". If "env" is specified, ctags
-	reads more lines to find real interpreter specification.
-
-	To display the list of aliases, use ``--list-aliases`` option.
-	To add/remove an item to/from the list, use the
-	``--alias-<LANG>=[+|-]aliasPattern`` option.
-
-"zsh autoload tag" testing
-	If the first line starts with "#compdef" or "#autoload",
-	ctags regards the line as "zsh".
-
-"emacs mode at the first line" testing
-	The Emacs editor has multiple editing modes specialized for programming
-	languages. Emacs can recognize a marker called modeline in a file
-	and utilize the marker for the mode selection. This heuristic test does
-	the same as what Emacs does.
-
-	ctags treats *MODE* as a name of interpreter and applies the same
-	rule of "interpreter" testing if the first line has one of
-	the following patterns::
-
-		-*- mode: MODE -*-
-
-	or
-
-	::
-
-		-*- MODE -*-
-
-"emacs mode at the EOF" testing
-	Emacs editor recognizes another marker at the end of file as a
-	mode specifier. This heuristic test does the same as what Emacs does.
-
-	ctags treats *MODE* as a name of an interpreter and applies the same
-	rule of "interpreter" heuristic testing, if the lines at the tail of the file
-	have the following pattern::
-
-		Local Variables:
-		...
-		mode: MODE
-		...
-		End:
-
-	3000 characters are sought from the end of file to find the pattern.
-
-"vim modeline" testing
-	Like the modeline of the Emacs editor, Vim editor has the same concept.
-	ctags treats *TYPE* as a name of interpreter and applies the same
-	rule of "interpreter" heuristic testing if the last 5 lines of the file
-	have one of the following patterns::
-
-		filetype=TYPE
-
-	or
-
-	::
-
-		ft=TYPE
-
-"PHP marker" testing
-	If the first line is started with "<?php",
-	ctags regards the line as "php".
-
-Looking into the file contents is a more expensive operation than file
-name matching. So ctags runs the testings in limited
-conditions.  "interpreter" testing is enabled only when a file is an
-executable or the ``--guess-language-eagerly`` (``-G`` in short) option is
-given. The other heuristic tests are enabled only when ``-G`` option is
-given.
-
-The ``--print-language`` option can be used just to print the results of
-parser selections for given files instead of generating a tags file.
-
-Examples:
-
-.. code-block:: console
-
-	$ ctags --print-language config.h.in input.m input.unknown
-	config.h.in: C++
-	input.m: MatLab
-	input.unknown: NONE
-
-``NONE`` means that ctags does not select any parser for the file.
-
-
-TAG ENTRIES
------------
-
-A tag is an index for a language object. The concept of a tag and related
-items in Exuberant-ctags are refined and extended in Universal-ctags.
-
-A tag is categorized into **definition tags** or **reference tags**.
-In general, Exuberant-ctags only tags *definitions* of
-language objects: places where newly named language objects are introduced.
-Universal-ctags, on the other hand, can also tag *references* of language
-objects: places where named language objects are used. However, support
-for generating reference tags is new and limited to specific areas of
-specific languages in the current version.
-
-
-Fields
-~~~~~~
-
-A tag can record various information, called **fields**. The
-essential fields are: **name** of language objects, **input**,
-**pattern**, and **line**. ``input:`` is the name of source file where
-``name:`` is defined or referenced. ``pattern:`` can be used to search
-the **name** in ``input:``. **line** is the line number where
-``name:`` is defined or referenced in ``input:``.
-
-ctags offers extension fields. See also the
-descriptions of ``--list-fields`` option and ``--fields`` option.
-
-
-Kinds
-~~~~~~
-
-``kind:`` is a field which represents the *kind* of language object
-specified by a tag. Kinds used and defined are very different between
-parsers. For example, C language defines "macro", "function",
-"variable", "typedef", etc. See also the descriptions of
-``--list-kinds-full`` option and ``--kinds-<LANG>`` option.
-
-
-Extras
-~~~~~~
-
-Generally, ctags tags only language objects appearing
-in source files, as is. In other words, a value for a ``name:`` field
-should be found on the source file associated with the ``name:``. An
-"extra" type tag (*extra*) is for tagging a language object with a processed
-name, or for tagging something not associated with a language object. A typical
-extra tag is "qualified", which tags a language object with a
-class-qualified or scope-qualified name.
-
-The following example demonstrates the "qualified" extra tag.
-
-.. code-block:: Java
-
-	package Bar;
-	import Baz;
-
-	class Foo {
-		// ...
-	}
-
-For the above source file, ctags tags "Bar" and "Foo" by
-default.  If the "qualified" extra is enabled from the command line
-(``--extras=+q``), then "Bar.Foo" is also tagged even though the string
-"Bar.Foo" is not in the source code.
-
-See also the descriptions of ``--list-extras`` option and ``--extras``
-option in "`OPTION ITEMS`_".
-
-
-Roles
-~~~~~~
-
-*Role* is a newly introduced concept in Universal-ctags. Role is a
-concept associated with reference tags, and is not implemented widely yet.
-
-As described previously in "Kinds", the "kind" field represents the type
-of language object specified with a tag, such as a function vs. a variable.
-Specific kinds are defined for reference tags, such as the C++ kind "header" for
-header file, or Java kind "package" for package statements. For such reference
-kinds, a "roles" field can be added to distinguish the role of the reference
-kind. In other words, the "kind" field identifies the "what" of the language
-object, whereas the "roles" field identifies the "how" of a referenced language
-object. Roles are only used with specific kinds.
-
-For example, for the source file used for demonstrating in the "`Extras`_"
-subsection, "Baz" is tagged as a reference tag with kind "package" and with
-role "imported". Another example is for a C++ "header" kind tag, generated by
-"#include" statements: the ``roles:system`` or ``roles:local`` fields will be
-added depending on whether the include file name begins with "<" or not.
-
-See also the descriptions of ``--list-roles`` option.
-
-
-Language-specific fields and extras
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Exuberant-ctags has the concept of "fields" and "extras". They are common
-between parsers of different languages. Universal-ctags extends this concept
-by providing language-specific fields and extras.
-
-.. options should be explained and revised here
-   ``--list-languages`` (done)
-   ``--list-kinds``     (done)
-   ``--list-kinds-full``(done)
-   ``--list-fields``    (done)
-   ``--list-extras``    (done)
-   ``--list-roles``     (done)
-   ``--kinds-<LANG>=``  (done)
-   ``--fields=``        (done)
-   ``--fields-<LANG>``  (done)
-   ``--extras=``        (done)
-   ``--extras-<LANG>=`` (done)
-
-
 COMMAND LINE INTERFACE
 ----------------------
 
@@ -409,7 +141,7 @@ column.
    ``--with-list-header`` (done)
 
 
-OPTION ITEMS
+OPTIONS
 ------------
 ctags has more options than listed here.
 Options starting with an underscore character, such as ``--_echo=msg``,
@@ -477,10 +209,11 @@ are not listed here. They are experimental or for debugging purpose.
 	will be considered to have file-limited scope. If the first character
 	in the list is a plus sign, then the extensions in the list will be
 	appended to the current list; otherwise, the list will replace the
-	current list. See, also, the ``--file-scope`` option. The default list is
+	current list. See, also, the "F/fileScope" flag of ``--extras`` option.
+	The default list is
 	".h.H.hh.hpp.hxx.h++.inc.def". To restore the default list, specify ``-h``
 	default. Note that if an extension supplied to this option is not
-	already mapped to a particular language (see "`SOURCE FILES`_", above),
+	already mapped to a particular language (see "`Determining file language`_", above),
 	you will also need to use either the ``--langmap`` or ``--language-force`` option.
 
 ``-I identifier-list``
@@ -591,7 +324,7 @@ are not listed here. They are experimental or for debugging purpose.
 	feature are generating a listing of all functions located in a source
 	file (e.g. "ctags -x --kinds-c=f file"), or generating
 	a list of all externally visible global variables located in a source
-	file (e.g. "ctags -x --kinds-c=v --file-scope=no file").
+	file (e.g. "ctags -x --kinds-c=v --extras=-F file").
 	This option must appear before the first file name.
 
 ``--alias-<LANG>=[+|-]aliasPattern``
@@ -607,10 +340,10 @@ are not listed here. They are experimental or for debugging purpose.
 	parameter aliasPattern. Using "all" for *<LANG>* has meaning in
 	following two cases:
 
-	"--alias-all="
+	``--alias-all=``
 		This clears aliases setting of all languages.
 
-	"--alias-all=default"
+	``--alias-all=default``
 		This restores the default languages aliases for all languages.
 
 ``--append[=yes|no]``
@@ -715,7 +448,7 @@ are not listed here. They are experimental or for debugging purpose.
 
 ``--extras=[+|-]flags|*``
 	Specifies whether to include extra tag entries for certain kinds of
-	information. See also "`Extras`_" subsection to know what are kinds.
+	information. See also "`Extras`_" subsection to know what are extras.
 
 	The parameter flags is a set of one-letter flags (and/or long-name flags), each
 	representing one kind of extra tag entry to include in the tag file.
@@ -733,13 +466,19 @@ are not listed here. They are experimental or for debugging purpose.
 	The meaning of major extras is as follows (one-letter flag/long-name flag):
 
 	F/fileScope
-		Equivalent to ``--file-scope``.
+		Indicates whether tags scoped only for a single file (i.e. tags which
+		cannot be seen outside of the file in which they are defined, such as
+		language objects with "static" modifier of C language) should be included
+		in the output. See, also, the ``-h`` option. This option is enabled by
+		default. This is the replacement for ``--file-scope`` option of
+		Exuberant-ctags.
 
 	f/inputFile
 		Include an entry for the base file name of every source file
 		(e.g. "example.c"), which addresses the first line of the file.
 		If the ``end:`` field is enabled, the end line number of the file
-		can be attached to the tag.
+		can be attached to the tag. This is the replacement for ``--file-tags``
+		hidden option of Exuberant-ctags.
 
 	p/pseudo
 		Include pseudo tags. Enabled by default unless the tag file is
@@ -775,13 +514,13 @@ are not listed here. They are experimental or for debugging purpose.
 ``--extras-<LANG>=[+|-]flags|*``
 	Specifies whether to include extra tag entries for certain kinds of
 	information for language <LANG>. Universal-ctags
-	introduces language-specific extras. (See "`Language-specific fields and
-	extras`_" about the concept). This option is for controlling them.
+	introduces language-specific extras. See "`Language-specific fields and
+	extras`_" about the concept. This option is for controlling them.
 
 	Specifies "all" as <LANG> to apply the parameter flags to all
 	languages; all extras are enabled with specifying '*' as the
 	parameter flags. If specifying nothing as the parameter flags
-	("--extras-all="), all extras are disabled. These two combinations
+	(``--extras-all=``), all extras are disabled. These two combinations
 	are useful for testing.
 
 	Check the output of the ``--list-extras=<LANG>`` option for the
@@ -789,8 +528,8 @@ are not listed here. They are experimental or for debugging purpose.
 
 ``--fields=[+|-]flags|*``
 	Specifies which available extension fields are to be included in
-	the tag entries (see "`TAG FILE FORMAT`_", below, and, "`Fields`_", above, for more
-	information).
+	the tag entries (see "`TAG FILE FORMAT`_" second, and "`Fields`_"
+	subsection , for more information).
 
 	The parameter flags is a set of one-letter flags (and/or long-name flags),
 	each representing one type of extension field to include.
@@ -828,7 +567,7 @@ are not listed here. They are experimental or for debugging purpose.
 		See also z/kind flag.
 
 	K
-		Kind of tag as full name
+		Kind of tag as long-name.
 		Exceptionally this has no field name.
 		See also z/kind flag.
 
@@ -842,7 +581,7 @@ are not listed here. They are experimental or for debugging purpose.
 		Line number of tag definition
 
 	p/scopeKind
-		Kind of scope as full name
+		Kind of scope as long-name
 
 	r/roles
 		Roles assigned to the tag.
@@ -882,19 +621,12 @@ are not listed here. They are experimental or for debugging purpose.
 	Specify "all" as <LANG> to apply the parameter flags to all
 	fields; all fields are enabled with specifying '*' as the
 	parameter flags. If specifying nothing as the parameter flags
-	("--fields-all="), all fields are disabled. These two combinations
+	(``--fields-all=``), all fields are disabled. These two combinations
 	are useful for testing.
 
 ``--file-scope[=yes|no]``
-	Indicates whether tags scoped only for a single file (i.e. tags which
-	cannot be seen outside of the file in which they are defined, such as
-	"static" tags) should be included in the output. See, also, the ``-h``
-	option. This option is enabled by default.
-
-	Universal-ctags provides an alternative way to control this option,
-	with the "F/fileScope" extra, and recommends users to use the
-	extra. However, this extra can cause issues.
-	See :ref:`ctags-incompatibilities(7) <ctags-incompatibilities(7)>`.
+	This options is removed. Use "--extras=[+|-]F" or
+	"--extras=[+|-]{fileScope}" instead.
 
 ``--filter[=yes|no]``
 	Makes ctags behave as a filter, reading source
@@ -1049,7 +781,7 @@ are not listed here. They are experimental or for debugging purpose.
 ``--language-force=language``
 	By default, ctags automatically selects the language
 	of a source file, ignoring those files whose language cannot be
-	determined (see "`SOURCE FILES`_", above). This option forces the specified
+	determined (see "`Determining file language`_", above). This option forces the specified
 	*language* (case-insensitive; either built-in or user-defined) to be used
 	for every supplied file instead of automatically selecting the language
 	based upon its extension. In addition, the special value "auto" indicates
@@ -1156,7 +888,7 @@ are not listed here. They are experimental or for debugging purpose.
 	.. TODO? xref output
 
 	A field can be enabled or disabled with ``--fields=`` for common
-	extras in all languages, or ``--fields-<LANG>=`` for the specified
+	fields in all languages, or ``--fields-<LANG>=`` for the specified
 	language.  These option takes one-letter flags and/or long-name flags
 	as a parameter for specifying fields.
 
@@ -1318,12 +1050,12 @@ are not listed here. They are experimental or for debugging purpose.
 	Lists file name patterns and the file extensions which associate a file
 	name with a language for either the specified *language* or **all**
 	languages, and then exits. See the ``--langmap`` option, and
-	"`SOURCE FILES`_", above.
+	"`Determining file language`_", above.
 	**all** is used as default value if the option argument is omitted.
 
 	To list the file extensions or file name patterns individually, use
 	``--list-map-extensions`` or ``--list-map-patterns`` option.
-	See the ``--langmap`` option, and "`SOURCE FILES`_", above.
+	See the ``--langmap`` option, and "`Determining file language`_", above.
 
 	This option does not work with ``--machinable`` nor
 	``--with-list-header``.
@@ -1459,7 +1191,25 @@ are not listed here. They are experimental or for debugging purpose.
 
 ``--pattern-length-limit=N``
 	Cutoff patterns of tag entries after N characters. Disable by setting to 0
-	(default is 96).
+	(default is 96). Specifying 0 as *N* results no truncation.
+
+	An input source file with long lines and multiple tag matches per
+	line can generate an excessively large tags file with an
+	unconstrained pattern length. For example, running ctags on a
+	minified JavaScript source file often exhibits this behaviour.
+
+	The truncation avoids cutting in the middle of a UTF-8 code point
+	spanning multiple bytes to prevent writing invalid byte sequences from
+	valid input files. This handling allows for an extra 3 bytes above the
+	configured limit in the worse case of a 4 byte code point starting
+	right before the limit. Please also note that this handling is fairly
+	naive and fast, and although it is resistant against any input, it
+	requires a valid input to work properly; it is not guaranteed to work
+	as the user expects when dealing with partially invalid UTF-8 input.
+	This also partially affect non-UTF-8 input, if the byte sequence at
+	the truncation length looks like a multibyte UTF-8 sequence. This
+	should however be rare, and in the worse case will lead to including
+	up to an extra 3 bytes above the limit.
 
 ``--print-language``
 	Just prints the language parsers for specified source files, and then exits.
@@ -1470,7 +1220,26 @@ are not listed here. They are experimental or for debugging purpose.
 
 ``--put-field-prefix``
 	Put "UCTAGS" as prefix for the name of fields newly introduced in
-	universal-ctags.
+	Universal-ctags.
+
+	Some fields are newly introduced in Universal-ctags and more will
+	be introduced in the future. Other tags generators may also
+	introduce their specific fields.
+
+	In such a situation, there is a concern about conflicting field
+	names; mixing tags files generated by multiple tags generators
+	including Universal-ctags is difficult. This option provides a
+	workaround for such station.
+
+	.. code-block:: console
+
+		$ ctags --fields='{line}{end}' -o - hello.c
+		main	hello.c	/^main(int argc, char **argv)$/;"	f	line:3	end:6
+		$ ctags --put-field-prefix --fields='{line}{end}' -o - /tmp/hello.c
+		main	/tmp/hello.c	/^main(int argc, char **argv)$/;"	f	line:3	UCTAGSend:6
+
+	In the above exapmle, the prefix is put to "end" field which is
+	newly introduced in Universal-ctags.
 
 ``--quiet[=yes|no]``
 	Write fewer messages (default is no).
@@ -1547,15 +1316,9 @@ are not listed here. They are experimental or for debugging purpose.
 
 OPERATIONAL DETAILS
 -------------------
-As ctags considers each file name in turn, it tries to
-determine the language of the file by applying the following three tests
-in order: if the file extension has been mapped to a language, if the
-filename matches a shell pattern mapped to a language, and finally if the
-file is executable and its first line specifies an interpreter using the
-Unix-style "#!" specification (if supported on the platform). Additionally,
-if the ``--guess-language-eagerly`` option is given, heuristic testing is
-also performed to determine if a language parser applies. (See
-"`Determining file language`_")
+As ctags considers each source file name in turn, it tries to
+determine the language of the file by applying tests described in
+"`Determining file language`_".
 
 If a language was identified, the file is opened and then the appropriate
 language parser is called to operate on the currently open file. The parser
@@ -1614,6 +1377,270 @@ name in the tag file will always be preceded by the string "operator "
 
 After creating or appending to the tag file, it is sorted by the tag name,
 removing identical tag lines.
+
+
+Determining file language
+--------------------------
+
+File name mapping
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Unless the ``--language-force`` option is specified, the language of each source
+file is automatically selected based upon a **mapping** of file names to
+languages. The mappings in effect for each language may be displayed using
+the ``--list-maps`` option and may be changed using the ``--langmap`` or
+``--map-<LANG>`` options.
+
+If the name of a file is not mapped to a language, ctags tries
+to heuristically guess the language for the file by inspecting its content. See
+"`Determining file language`_".
+
+All files that have no file name mapping and no guessed parser are
+ignored. This permits running ctags on all files in
+either a single directory (e.g.  "ctags \*"), or on
+all files in an entire source directory tree
+(e.g. "ctags -R"), since only those files whose
+names are mapped to languages will be scanned.
+
+The same extensions are mapped to multiple parsers. For example, ".h"
+are mapped to C++, C and ObjectiveC. These mappings can cause
+issues. ctags tries to select the proper parser
+for the source file by applying heuristics to its content, however
+it is not perfect.  In case of issues one can use ``--language-force=language``,
+``--langmap=map[,map[...]]``, or the ``--map-<LANG>=-pattern|extension``
+options. (Some of the heuristics are applied whether ``--guess-language-eagerly``
+is given or not.)
+
+.. options should be revised here
+	``--map-<LANG>`` (done)
+	``--langmap=map[,map[...]]`` (done)
+	``--language-force=language`` (done)
+	``--languages=[+|-]list`` (done)
+	``--list-maps[=language|all]`` (done)
+	``--list-map-extensions`` (done)
+	``--list-map-patterns`` (done)
+
+Heuristically guessing
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If ctags cannot select a parser from the mapping of file names,
+various heuristic tests are conducted to determine the language:
+
+template file name testing
+	If the file name has an ".in" extension, ctags applies
+	the mapping to the file name without the extension. For example,
+	"config.h" is tested for a file named "config.h.in".
+
+"interpreter" testing
+	The first line of the file is checked to see if the file is a "#!"
+	script for a recognized language. ctags looks for
+	a parser having the same name.
+
+	If ctags finds no such parser,
+	ctags looks for the name in alias lists. For
+	example, consider if the first line is "#!/bin/sh".  Though
+	ctags has a "shell" parser, it doesn't have a "sh"
+	parser. However, "sh" is listed as an alias for "shell", therefore
+	ctags selects the "shell" parser for the file.
+
+	An exception is "env". If "env" is specified, ctags
+	reads more lines to find real interpreter specification.
+
+	To display the list of aliases, use ``--list-aliases`` option.
+	To add/remove an item to/from the list, use the
+	``--alias-<LANG>=[+|-]aliasPattern`` option.
+
+"zsh autoload tag" testing
+	If the first line starts with "#compdef" or "#autoload",
+	ctags regards the line as "zsh".
+
+"emacs mode at the first line" testing
+	The Emacs editor has multiple editing modes specialized for programming
+	languages. Emacs can recognize a marker called modeline in a file
+	and utilize the marker for the mode selection. This heuristic test does
+	the same as what Emacs does.
+
+	ctags treats *MODE* as a name of interpreter and applies the same
+	rule of "interpreter" testing if the first line has one of
+	the following patterns::
+
+		-*- mode: MODE -*-
+
+	or
+
+	::
+
+		-*- MODE -*-
+
+"emacs mode at the EOF" testing
+	Emacs editor recognizes another marker at the end of file as a
+	mode specifier. This heuristic test does the same as what Emacs does.
+
+	ctags treats *MODE* as a name of an interpreter and applies the same
+	rule of "interpreter" heuristic testing, if the lines at the tail of the file
+	have the following pattern::
+
+		Local Variables:
+		...
+		mode: MODE
+		...
+		End:
+
+	3000 characters are sought from the end of file to find the pattern.
+
+"vim modeline" testing
+	Like the modeline of the Emacs editor, Vim editor has the same concept.
+	ctags treats *TYPE* as a name of interpreter and applies the same
+	rule of "interpreter" heuristic testing if the last 5 lines of the file
+	have one of the following patterns::
+
+		filetype=TYPE
+
+	or
+
+	::
+
+		ft=TYPE
+
+"PHP marker" testing
+	If the first line is started with "<?php",
+	ctags regards the line as "php".
+
+Looking into the file contents is a more expensive operation than file
+name matching. So ctags runs the testings in limited
+conditions.  "interpreter" testing is enabled only when a file is an
+executable or the ``--guess-language-eagerly`` (``-G`` in short) option is
+given. The other heuristic tests are enabled only when ``-G`` option is
+given.
+
+The ``--print-language`` option can be used just to print the results of
+parser selections for given files instead of generating a tags file.
+
+Examples:
+
+.. code-block:: console
+
+	$ ctags --print-language config.h.in input.m input.unknown
+	config.h.in: C++
+	input.m: MatLab
+	input.unknown: NONE
+
+``NONE`` means that ctags does not select any parser for the file.
+
+
+TAG ENTRIES
+-----------
+
+A tag is an index for a language object. The concept of a tag and related
+items in Exuberant-ctags are refined and extended in Universal-ctags.
+
+A tag is categorized into **definition tags** or **reference tags**.
+In general, Exuberant-ctags only tags *definitions* of
+language objects: places where newly named language objects are introduced.
+Universal-ctags, on the other hand, can also tag *references* of language
+objects: places where named language objects are used. However, support
+for generating reference tags is new and limited to specific areas of
+specific languages in the current version.
+
+
+Fields
+~~~~~~
+
+A tag can record various information, called **fields**. The
+essential fields are: **name** of language objects, **input**,
+**pattern**, and **line**. ``input:`` is the name of source file where
+``name:`` is defined or referenced. ``pattern:`` can be used to search
+the **name** in ``input:``. **line** is the line number where
+``name:`` is defined or referenced in ``input:``.
+
+ctags offers extension fields. See also the
+descriptions of ``--list-fields`` option and ``--fields`` option.
+
+
+Kinds
+~~~~~~
+
+``kind:`` is a field which represents the *kind* of language object
+specified by a tag. Kinds used and defined are very different between
+parsers. For example, C language defines "macro", "function",
+"variable", "typedef", etc. See also the descriptions of
+``--list-kinds-full`` option and ``--kinds-<LANG>`` option.
+
+
+Extras
+~~~~~~
+
+Generally, ctags tags only language objects appearing
+in source files, as is. In other words, a value for a ``name:`` field
+should be found on the source file associated with the ``name:``. An
+"extra" type tag (*extra*) is for tagging a language object with a processed
+name, or for tagging something not associated with a language object. A typical
+extra tag is "qualified", which tags a language object with a
+class-qualified or scope-qualified name.
+
+The following example demonstrates the "qualified" extra tag.
+
+.. code-block:: Java
+
+	package Bar;
+	import Baz;
+
+	class Foo {
+		// ...
+	}
+
+For the above source file, ctags tags "Bar" and "Foo" by
+default.  If the "qualified" extra is enabled from the command line
+(``--extras=+q``), then "Bar.Foo" is also tagged even though the string
+"Bar.Foo" is not in the source code.
+
+See also the descriptions of ``--list-extras`` option and ``--extras``
+option in "`OPTIONS`_".
+
+
+Roles
+~~~~~~
+
+*Role* is a newly introduced concept in Universal-ctags. Role is a
+concept associated with reference tags, and is not implemented widely yet.
+
+As described previously in "Kinds", the "kind" field represents the type
+of language object specified with a tag, such as a function vs. a variable.
+Specific kinds are defined for reference tags, such as the C++ kind "header" for
+header file, or Java kind "package" for package statements. For such reference
+kinds, a "roles" field can be added to distinguish the role of the reference
+kind. In other words, the "kind" field identifies the "what" of the language
+object, whereas the "roles" field identifies the "how" of a referenced language
+object. Roles are only used with specific kinds.
+
+For example, for the source file used for demonstrating in the "`Extras`_"
+subsection, "Baz" is tagged as a reference tag with kind "package" and with
+role "imported". Another example is for a C++ "header" kind tag, generated by
+"#include" statements: the ``roles:system`` or ``roles:local`` fields will be
+added depending on whether the include file name begins with "<" or not.
+
+See also the descriptions of ``--list-roles`` option.
+
+
+Language-specific fields and extras
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Exuberant-ctags has the concept of "fields" and "extras". They are common
+between parsers of different languages. Universal-ctags extends this concept
+by providing language-specific fields and extras.
+
+.. options should be explained and revised here
+   ``--list-languages`` (done)
+   ``--list-kinds``     (done)
+   ``--list-kinds-full``(done)
+   ``--list-fields``    (done)
+   ``--list-extras``    (done)
+   ``--list-roles``     (done)
+   ``--kinds-<LANG>=``  (done)
+   ``--fields=``        (done)
+   ``--fields-<LANG>``  (done)
+   ``--extras=``        (done)
+   ``--extras-<LANG>=`` (done)
 
 
 TAG FILE FORMAT
