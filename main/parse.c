@@ -2644,6 +2644,49 @@ static void processLangKindDefinitionEach(
 	processLangKindDefinition (lang, arg->option, arg->parameter);
 }
 
+static bool parameterEnablingAllOrFileKind (const char *const option,
+											const char *const parameter,
+											bool following_plus_or_minus_op)
+{
+	size_t file_long_flag_len = strlen(KIND_FILE_DEFAULT_NAME);
+
+	switch (parameter[0])
+	{
+	/* Though only '*' is documented as an acceptable kind spec for
+	 * --kinds-all option in our man page, we accept '\0' here because
+	 * it will be useful for testing purpose. */
+	case '\0':
+		if (following_plus_or_minus_op)
+			error(FATAL, "no kind specification after + (or -) in --%s option",
+				  option);
+		else
+			return true;
+	case '+':
+	case '-':
+		if (following_plus_or_minus_op)
+			error(FATAL, "don't repeat + (nor -) in --%s option",
+				  option);
+		else
+			return parameterEnablingAllOrFileKind (option, parameter + 1, true);
+	case KIND_WILDCARD_LETTER:
+		if (following_plus_or_minus_op)
+			error(FATAL, "don't use '*' after + (nor -) in --%s option",
+				  option);
+		else
+			return parameterEnablingAllOrFileKind (option, parameter + 1, false);
+	case KIND_FILE_DEFAULT_LETTER:
+		return parameterEnablingAllOrFileKind (option, parameter + 1, false);
+	case '{':
+		if (strncmp (parameter + 1, KIND_FILE_DEFAULT_NAME, file_long_flag_len) == 0
+			&& parameter [1 + file_long_flag_len] == '}')
+			return parameterEnablingAllOrFileKind (option,
+												   parameter + 1 + file_long_flag_len + 1,
+												   false);
+		break;
+	}
+	return false;
+}
+
 extern bool processKindsOption (
 		const char *const option, const char *const parameter)
 {
@@ -2669,8 +2712,8 @@ extern bool processKindsOption (
 			error (WARNING,
 				   "\"--%s\" option is obsolete; use \"--kinds-%s\" instead",
 				   option, langName);
-			if (*parameter != '*' && *parameter != '\0')
-				error (FATAL, "only '*' is acceptable as kind letter for --%s", option);
+			if (!parameterEnablingAllOrFileKind (option, parameter, false))
+				error (FATAL, "only '*', 'F', \"{file}\" or their combination is acceptable as kind letter for --%s", option);
 			foreachLanguage(processLangKindDefinitionEach, &arg);
 		}
 		else
@@ -2693,11 +2736,8 @@ extern bool processKindsOption (
 			error (WARNING, "No language given in \"%s\" option", option);
 		else if (strcmp (lang, RSV_LANG_ALL) == 0)
 		{
-			/* Though only '*' is documented as an acceptable kind spec for
-			 * --kinds-all option in our man page, we accept '\0' here because
-			 * it will be useful for testing purpose. */
-			if (*parameter != '*' && *parameter != '\0')
-				error (FATAL, "only '*' is acceptable as kind letter for --%s", option);
+			if (!parameterEnablingAllOrFileKind (option, parameter, false))
+				error (FATAL, "only '*', 'F', \"{file}\" or their combination is acceptable as kind letter for --%s", option);
 			foreachLanguage(processLangKindDefinitionEach, &arg);
 		}
 		else

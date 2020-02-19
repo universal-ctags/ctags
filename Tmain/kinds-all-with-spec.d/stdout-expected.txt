@@ -1,0 +1,10 @@
+input.c	input.c	1;"	F
+input.c	input.c	1;"	F
+input.c	input.c	1;"	F
+main	input.c	/^int main(void) {return 0;}$/;"	f	typeref:typename:int
+input.c	input.c	1;"	F
+input.c	input.c	1;"	F
+input.c	input.c	1;"	F
+input.c	input.c	1;"	F
+main	input.c	/^int main(void) {return 0;}$/;"	f	typeref:typename:int
+input.c	input.c	1;"	F
