@@ -1,0 +1,23 @@
+a0	input.el	/^(defun a0 (n) (+ 1 n))$/;"	function
+b0	input.el	/^(defvar b0 3)$/;"	variable
+c0	input.el	/^(defconstant c0 5)$/;"	unknown
+defunknown0	input.el	/^(defmacro defunknown0 (s)$/;"	macro
+defunknown1	input.el	/^(defmacro* defunknown1 (s)$/;"	macro
+e0	input.el	/^(defalias 'e0 'a0)$/;"	alias
+f0	input.el	/^(defvaralias 'f0 'b0)$/;"	varalias
+g0	input.el	/^(defsubst g0 () nil)$/;"	subst
+h0	input.el	/^(define-error 'h0 (purecopy "TEST"))$/;"	error
+h1	input.el	/^(define-error (quote h1) (purecopy "TEST"))$/;"	error
+i0	input.el	/^(define-minor-mode i0 "DOC")$/;"	minorMode
+j0	input.el	/^(define-derived-mode j0 nil "TEST")$/;"	derivedMode
+k0	input.el	/^(defcustom k0 t$/;"	custom
+l0	input.el	/^(defgroup l0 nil "DOC" :group 'editing)$/;"	group
+m0	input.el	/^(defface m0$/;"	face
+n0	input.el	/^(deftheme n0 "DOC")$/;"	theme
+o0	input.el	/^(defvar-local o0 1)$/;"	variable
+p0	input.el	/^(define-globalized-minor-mode p0$/;"	minorMode
+q0	input.el	/^(define-obsolete-function-alias 'q0 'f0)$/;"	alias
+r0	input.el	/^(define-global-minor-mode r0$/;"	minorMode
+s0	input.el	/^(define-inline s0 (n)$/;"	inline
+t0	input.el	/^(defun* t0 (n)$/;"	function
+u0	input.el	/^(defsubst* u0 () nil)$/;"	subst

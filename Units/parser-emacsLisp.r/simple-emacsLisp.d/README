@@ -1,0 +1,5 @@
+The input is taken from simple.el of GNU Emacs.  I didn't check all
+the entries of expected.tags because it has so many entires. However,
+I put this to our git repository because there are so various def* in
+simple.el. So when we change the code of EmacsLisp parser, this test
+case may notify something useful.

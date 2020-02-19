@@ -1,0 +1,444 @@
+compilation-current-error	input.el	/^(defvar compilation-current-error)$/;"	variable
+compilation-context-lines	input.el	/^(defvar compilation-context-lines)$/;"	variable
+shell-command-dont-erase-buffer	input.el	/^(defcustom shell-command-dont-erase-buffer nil$/;"	custom
+shell-command-saved-pos	input.el	/^(defvar shell-command-saved-pos nil$/;"	variable
+idle-update-delay	input.el	/^(defcustom idle-update-delay 0.5$/;"	custom
+killing	input.el	/^(defgroup killing nil$/;"	group
+paren-matching	input.el	/^(defgroup paren-matching nil$/;"	group
+next-error	input.el	/^(defgroup next-error nil$/;"	group
+next-error	input.el	/^(defface next-error$/;"	face
+next-error-highlight	input.el	/^(defcustom next-error-highlight 0.5$/;"	custom
+next-error-highlight-no-select	input.el	/^(defcustom next-error-highlight-no-select 0.5$/;"	custom
+next-error-recenter	input.el	/^(defcustom next-error-recenter nil$/;"	custom
+next-error-hook	input.el	/^(defcustom next-error-hook nil$/;"	custom
+next-error-highlight-timer	input.el	/^(defvar next-error-highlight-timer nil)$/;"	variable
+next-error-overlay-arrow-position	input.el	/^(defvar next-error-overlay-arrow-position nil)$/;"	variable
+next-error-last-buffer	input.el	/^(defvar next-error-last-buffer nil$/;"	variable
+next-error-function	input.el	/^(defvar next-error-function nil$/;"	variable
+next-error-move-function	input.el	/^(defvar next-error-move-function nil$/;"	variable
+next-error-buffer-p	input.el	/^(defsubst next-error-buffer-p (buffer$/;"	subst
+next-error-find-buffer	input.el	/^(defun next-error-find-buffer (&optional avoid-current$/;"	function
+next-error	input.el	/^(defun next-error (&optional arg reset)$/;"	function
+next-error-internal	input.el	/^(defun next-error-internal ()$/;"	function
+goto-next-locus	input.el	/^(defalias 'goto-next-locus 'next-error)$/;"	alias
+next-match	input.el	/^(defalias 'next-match 'next-error)$/;"	alias
+previous-error	input.el	/^(defun previous-error (&optional n)$/;"	function
+first-error	input.el	/^(defun first-error (&optional n)$/;"	function
+next-error-no-select	input.el	/^(defun next-error-no-select (&optional n)$/;"	function
+previous-error-no-select	input.el	/^(defun previous-error-no-select (&optional n)$/;"	function
+next-error-follow-last-line	input.el	/^(defvar next-error-follow-last-line nil)$/;"	variable
+next-error-follow-minor-mode	input.el	/^(define-minor-mode next-error-follow-minor-mode$/;"	minorMode
+next-error-follow-mode-post-command-hook	input.el	/^(defun next-error-follow-mode-post-command-hook ()$/;"	function
+fundamental-mode	input.el	/^(defun fundamental-mode ()$/;"	function
+special-mode-map	input.el	/^(defvar special-mode-map$/;"	variable
+special-mode	input.el	/^(define-derived-mode special-mode nil "Special"$/;"	derivedMode
+self-insert-uses-region-functions	input.el	/^(defvar self-insert-uses-region-functions nil$/;"	variable
+hard-newline	input.el	/^(defvar hard-newline (propertize "\\n" 'hard t 'rear-nonsticky '(hard))$/;"	variable
+newline	input.el	/^(defun newline (&optional arg interactive)$/;"	function
+set-hard-newline-properties	input.el	/^(defun set-hard-newline-properties (from to)$/;"	function
+open-line	input.el	/^(defun open-line (n)$/;"	function
+split-line	input.el	/^(defun split-line (&optional arg)$/;"	function
+delete-indentation	input.el	/^(defun delete-indentation (&optional arg)$/;"	function
+join-line	input.el	/^(defalias 'join-line #'delete-indentation) ; easier to find$/;"	alias
+delete-blank-lines	input.el	/^(defun delete-blank-lines ()$/;"	function
+delete-trailing-lines	input.el	/^(defcustom delete-trailing-lines t$/;"	custom
+region-modifiable-p	input.el	/^(defun region-modifiable-p (start end)$/;"	function
+delete-trailing-whitespace	input.el	/^(defun delete-trailing-whitespace (&optional start end)$/;"	function
+newline-and-indent	input.el	/^(defun newline-and-indent ()$/;"	function
+reindent-then-newline-and-indent	input.el	/^(defun reindent-then-newline-and-indent ()$/;"	function
+read-quoted-char-radix	input.el	/^(defcustom read-quoted-char-radix 8$/;"	custom
+read-quoted-char	input.el	/^(defun read-quoted-char (&optional prompt)$/;"	function
+quoted-insert	input.el	/^(defun quoted-insert (arg)$/;"	function
+forward-to-indentation	input.el	/^(defun forward-to-indentation (&optional arg)$/;"	function
+backward-to-indentation	input.el	/^(defun backward-to-indentation (&optional arg)$/;"	function
+back-to-indentation	input.el	/^(defun back-to-indentation ()$/;"	function
+fixup-whitespace	input.el	/^(defun fixup-whitespace ()$/;"	function
+delete-horizontal-space	input.el	/^(defun delete-horizontal-space (&optional backward-only)$/;"	function
+just-one-space	input.el	/^(defun just-one-space (&optional n)$/;"	function
+cycle-spacing--context	input.el	/^(defvar cycle-spacing--context nil$/;"	variable
+cycle-spacing	input.el	/^(defun cycle-spacing (&optional n preserve-nl-back mode)$/;"	function
+beginning-of-buffer	input.el	/^(defun beginning-of-buffer (&optional arg)$/;"	function
+end-of-buffer	input.el	/^(defun end-of-buffer (&optional arg)$/;"	function
+delete-active-region	input.el	/^(defcustom delete-active-region t$/;"	custom
+region-extract-function	input.el	/^(defvar region-extract-function$/;"	variable
+region-insert-function	input.el	/^(defvar region-insert-function$/;"	variable
+delete-backward-char	input.el	/^(defun delete-backward-char (n &optional killflag)$/;"	function
+delete-forward-char	input.el	/^(defun delete-forward-char (n &optional killflag)$/;"	function
+mark-whole-buffer	input.el	/^(defun mark-whole-buffer ()$/;"	function
+goto-line	input.el	/^(defun goto-line (line &optional buffer)$/;"	function
+count-words-region	input.el	/^(defun count-words-region (start end &optional arg)$/;"	function
+count-words	input.el	/^(defun count-words (start end)$/;"	function
+count-words--buffer-message	input.el	/^(defun count-words--buffer-message ()$/;"	function
+count-words--message	input.el	/^(defun count-words--message (str start end)$/;"	function
+count-lines-region	input.el	/^(define-obsolete-function-alias 'count-lines-region 'count-words-region "24.1")$/;"	alias
+what-line	input.el	/^(defun what-line ()$/;"	function
+count-lines	input.el	/^(defun count-lines (start end)$/;"	function
+line-number-at-pos	input.el	/^(defun line-number-at-pos (&optional pos absolute)$/;"	function
+what-cursor-position	input.el	/^(defun what-cursor-position (&optional detail)$/;"	function
+read-expression-map	input.el	/^(defvar read-expression-map$/;"	variable
+read-minibuffer	input.el	/^(defun read-minibuffer (prompt &optional initial-contents)$/;"	function
+eval-minibuffer	input.el	/^(defun eval-minibuffer (prompt &optional initial-contents)$/;"	function
+minibuffer-completing-symbol	input.el	/^(defvar minibuffer-completing-symbol nil$/;"	variable
+minibuffer-default	input.el	/^(defvar minibuffer-default nil$/;"	variable
+eval-expression-print-level	input.el	/^(defcustom eval-expression-print-level 4$/;"	custom
+eval-expression-print-length	input.el	/^(defcustom eval-expression-print-length 12$/;"	custom
+eval-expression-debug-on-error	input.el	/^(defcustom eval-expression-debug-on-error t$/;"	custom
+eval-expression-print-maximum-character	input.el	/^(defcustom eval-expression-print-maximum-character 127$/;"	custom
+eval-expression-print-format	input.el	/^(defun eval-expression-print-format (value)$/;"	function
+eval-expression-minibuffer-setup-hook	input.el	/^(defvar eval-expression-minibuffer-setup-hook nil$/;"	variable
+read--expression	input.el	/^(defun read--expression (prompt &optional initial-contents)$/;"	function
+eval-expression-get-print-arguments	input.el	/^(defun eval-expression-get-print-arguments (prefix-argument)$/;"	function
+eval-expression	input.el	/^(defun eval-expression (exp &optional insert-value no-truncate char-print-limit)$/;"	function
+edit-and-eval-command	input.el	/^(defun edit-and-eval-command (prompt command)$/;"	function
+repeat-complex-command	input.el	/^(defun repeat-complex-command (arg)$/;"	function
+extended-command-history	input.el	/^(defvar extended-command-history nil)$/;"	variable
+execute-extended-command--last-typed	input.el	/^(defvar execute-extended-command--last-typed nil)$/;"	variable
+read-extended-command	input.el	/^(defun read-extended-command ()$/;"	function
+suggest-key-bindings	input.el	/^(defcustom suggest-key-bindings t$/;"	custom
+extended-command-suggest-shorter	input.el	/^(defcustom extended-command-suggest-shorter t$/;"	custom
+execute-extended-command--shorter-1	input.el	/^(defun execute-extended-command--shorter-1 (name length)$/;"	function
+execute-extended-command--shorter	input.el	/^(defun execute-extended-command--shorter (name typed)$/;"	function
+execute-extended-command	input.el	/^(defun execute-extended-command (prefixarg &optional command-name typed)$/;"	function
+command-execute	input.el	/^(defun command-execute (cmd &optional record-flag keys special)$/;"	function
+minibuffer-history	input.el	/^(defvar minibuffer-history nil$/;"	variable
+minibuffer-history-sexp-flag	input.el	/^(defvar minibuffer-history-sexp-flag nil$/;"	variable
+minibuffer-history-search-history	input.el	/^(defvar minibuffer-history-search-history nil)$/;"	variable
+minibuffer-text-before-history	input.el	/^(defvar minibuffer-text-before-history nil$/;"	variable
+minibuffer-history-initialize	input.el	/^(defun minibuffer-history-initialize ()$/;"	function
+minibuffer-avoid-prompt	input.el	/^(defun minibuffer-avoid-prompt (_new _old)$/;"	function
+minibuffer-history-case-insensitive-variables	input.el	/^(defcustom minibuffer-history-case-insensitive-variables nil$/;"	custom
+previous-matching-history-element	input.el	/^(defun previous-matching-history-element (regexp n)$/;"	function
+next-matching-history-element	input.el	/^(defun next-matching-history-element (regexp n)$/;"	function
+minibuffer-temporary-goal-position	input.el	/^(defvar minibuffer-temporary-goal-position nil)$/;"	variable
+minibuffer-default-add-function	input.el	/^(defvar minibuffer-default-add-function 'minibuffer-default-add-completions$/;"	variable
+minibuffer-default-add-done	input.el	/^(defvar minibuffer-default-add-done nil$/;"	variable
+minibuffer-default-add-completions	input.el	/^(defun minibuffer-default-add-completions ()$/;"	function
+goto-history-element	input.el	/^(defun goto-history-element (nabs)$/;"	function
+next-history-element	input.el	/^(defun next-history-element (n)$/;"	function
+previous-history-element	input.el	/^(defun previous-history-element (n)$/;"	function
+next-line-or-history-element	input.el	/^(defun next-line-or-history-element (&optional arg)$/;"	function
+previous-line-or-history-element	input.el	/^(defun previous-line-or-history-element (&optional arg)$/;"	function
+next-complete-history-element	input.el	/^(defun next-complete-history-element (n)$/;"	function
+previous-complete-history-element	input.el	/^(defun previous-complete-history-element (n)$/;"	function
+minibuffer-prompt-width	input.el	/^(defun minibuffer-prompt-width ()$/;"	function
+minibuffer-history-isearch-message-overlay	input.el	/^(defvar minibuffer-history-isearch-message-overlay)$/;"	variable
+minibuffer-history-isearch-setup	input.el	/^(defun minibuffer-history-isearch-setup ()$/;"	function
+minibuffer-history-isearch-end	input.el	/^(defun minibuffer-history-isearch-end ()$/;"	function
+minibuffer-history-isearch-search	input.el	/^(defun minibuffer-history-isearch-search ()$/;"	function
+minibuffer-history-isearch-message	input.el	/^(defun minibuffer-history-isearch-message (&optional c-q-hack ellipsis)$/;"	function
+minibuffer-history-isearch-wrap	input.el	/^(defun minibuffer-history-isearch-wrap ()$/;"	function
+minibuffer-history-isearch-push-state	input.el	/^(defun minibuffer-history-isearch-push-state ()$/;"	function
+minibuffer-history-isearch-pop-state	input.el	/^(defun minibuffer-history-isearch-pop-state (_cmd hist-pos)$/;"	function
+advertised-undo	input.el	/^(define-obsolete-function-alias 'advertised-undo 'undo "23.2")$/;"	alias
+undo-equiv-table	input.el	/^(defconst undo-equiv-table (make-hash-table :test 'eq :weakness t)$/;"	const
+undo-in-region	input.el	/^(defvar undo-in-region nil$/;"	variable
+undo-no-redo	input.el	/^(defvar undo-no-redo nil$/;"	variable
+pending-undo-list	input.el	/^(defvar pending-undo-list nil$/;"	variable
+undo	input.el	/^(defun undo (&optional arg)$/;"	function
+buffer-disable-undo	input.el	/^(defun buffer-disable-undo (&optional buffer)$/;"	function
+undo-only	input.el	/^(defun undo-only (&optional arg)$/;"	function
+undo-in-progress	input.el	/^(defvar undo-in-progress nil$/;"	variable
+undo-more	input.el	/^(defun undo-more (n)$/;"	function
+primitive-undo	input.el	/^(defun primitive-undo (n list)$/;"	function
+undo-copy-list	input.el	/^(defun undo-copy-list (list)$/;"	function
+undo-copy-list-1	input.el	/^(defun undo-copy-list-1 (elt)$/;"	function
+undo-start	input.el	/^(defun undo-start (&optional beg end)$/;"	function
+undo-make-selective-list	input.el	/^(defun undo-make-selective-list (start end)$/;"	function
+undo-elt-in-region	input.el	/^(defun undo-elt-in-region (undo-elt start end)$/;"	function
+undo-elt-crosses-region	input.el	/^(defun undo-elt-crosses-region (undo-elt start end)$/;"	function
+undo-adjust-elt	input.el	/^(defun undo-adjust-elt (elt deltas)$/;"	function
+undo-adjust-beg-end	input.el	/^(defun undo-adjust-beg-end (beg end deltas)$/;"	function
+undo-adjust-pos	input.el	/^(defun undo-adjust-pos (pos deltas &optional use-<)$/;"	function
+undo-delta	input.el	/^(defun undo-delta (undo-elt)$/;"	function
+undo-auto--last-boundary-cause	input.el	/^(defvar-local undo-auto--last-boundary-cause nil$/;"	variable
+undo-auto-current-boundary-timer	input.el	/^(defvar undo-auto-current-boundary-timer nil$/;"	variable
+undo-auto--this-command-amalgamating	input.el	/^(defvar undo-auto--this-command-amalgamating nil$/;"	variable
+undo-auto--needs-boundary-p	input.el	/^(defun undo-auto--needs-boundary-p ()$/;"	function
+undo-auto--last-boundary-amalgamating-number	input.el	/^(defun undo-auto--last-boundary-amalgamating-number ()$/;"	function
+undo-auto--ensure-boundary	input.el	/^(defun undo-auto--ensure-boundary (cause)$/;"	function
+undo-auto--boundaries	input.el	/^(defun undo-auto--boundaries (cause)$/;"	function
+undo-auto--boundary-timer	input.el	/^(defun undo-auto--boundary-timer ()$/;"	function
+undo-auto--boundary-ensure-timer	input.el	/^(defun undo-auto--boundary-ensure-timer ()$/;"	function
+undo-auto--undoably-changed-buffers	input.el	/^(defvar undo-auto--undoably-changed-buffers nil$/;"	variable
+undo-auto--add-boundary	input.el	/^(defun undo-auto--add-boundary ()$/;"	function
+undo-auto-amalgamate	input.el	/^(defun undo-auto-amalgamate ()$/;"	function
+undo-auto--undoable-change	input.el	/^(defun undo-auto--undoable-change ()$/;"	function
+undo-amalgamate-change-group	input.el	/^(defun undo-amalgamate-change-group (handle)$/;"	function
+undo-ask-before-discard	input.el	/^(defcustom undo-ask-before-discard nil$/;"	custom
+undo-extra-outer-limit	input.el	/^(defvar undo-extra-outer-limit nil$/;"	variable
+undo-outer-limit-truncate	input.el	/^(defun undo-outer-limit-truncate (size)$/;"	function
+password-word-equivalents	input.el	/^(defcustom password-word-equivalents$/;"	custom
+shell-command-history	input.el	/^(defvar shell-command-history nil$/;"	variable
+shell-command-switch	input.el	/^(defvar shell-command-switch (purecopy "-c")$/;"	variable
+shell-command-default-error-buffer	input.el	/^(defvar shell-command-default-error-buffer nil$/;"	variable
+minibuffer-default-add-shell-commands	input.el	/^(defun minibuffer-default-add-shell-commands ()$/;"	function
+minibuffer-local-shell-command-map	input.el	/^(defvar minibuffer-local-shell-command-map$/;"	variable
+read-shell-command	input.el	/^(defun read-shell-command (prompt &optional initial-contents hist &rest args)$/;"	function
+async-shell-command-buffer	input.el	/^(defcustom async-shell-command-buffer 'confirm-new-buffer$/;"	custom
+async-shell-command-display-buffer	input.el	/^(defcustom async-shell-command-display-buffer t$/;"	custom
+shell-command--save-pos-or-erase	input.el	/^(defun shell-command--save-pos-or-erase ()$/;"	function
+shell-command--set-point-after-cmd	input.el	/^(defun shell-command--set-point-after-cmd (&optional buffer)$/;"	function
+async-shell-command	input.el	/^(defun async-shell-command (command &optional output-buffer error-buffer)$/;"	function
+shell-command	input.el	/^(defun shell-command (command &optional output-buffer error-buffer)$/;"	function
+display-message-or-buffer	input.el	/^(defun display-message-or-buffer (message &optional buffer-name action frame)$/;"	function
+shell-command-sentinel	input.el	/^(defun shell-command-sentinel (process signal)$/;"	function
+shell-command-on-region	input.el	/^(defun shell-command-on-region (start end command$/;"	function
+shell-command-to-string	input.el	/^(defun shell-command-to-string (command)$/;"	function
+process-file	input.el	/^(defun process-file (program &optional infile buffer display &rest args)$/;"	function
+process-file-side-effects	input.el	/^(defvar process-file-side-effects t$/;"	variable
+start-file-process	input.el	/^(defun start-file-process (name buffer program &rest program-args)$/;"	function
+tabulated-list-format	input.el	/^(defvar tabulated-list-format)$/;"	variable
+tabulated-list-entries	input.el	/^(defvar tabulated-list-entries)$/;"	variable
+tabulated-list-sort-key	input.el	/^(defvar tabulated-list-sort-key)$/;"	variable
+process-menu-query-only	input.el	/^(defvar process-menu-query-only nil)$/;"	variable
+process-menu-mode-map	input.el	/^(defvar process-menu-mode-map$/;"	variable
+process-menu-mode	input.el	/^(define-derived-mode process-menu-mode tabulated-list-mode "Process Menu"$/;"	derivedMode
+process-menu-delete-process	input.el	/^(defun process-menu-delete-process ()$/;"	function
+list-processes--refresh	input.el	/^(defun list-processes--refresh ()$/;"	function
+process-menu-visit-buffer	input.el	/^(defun process-menu-visit-buffer (button)$/;"	function
+list-processes	input.el	/^(defun list-processes (&optional query-only buffer)$/;"	function
+internal-echo-keystrokes-prefix	input.el	/^(defun internal-echo-keystrokes-prefix ()$/;"	function
+prefix-command-echo-keystrokes-functions	input.el	/^(defvar prefix-command-echo-keystrokes-functions nil$/;"	variable
+prefix-command-update	input.el	/^(defun prefix-command-update ()$/;"	function
+prefix-command-preserve-state-hook	input.el	/^(defvar prefix-command-preserve-state-hook nil$/;"	variable
+prefix-command-preserve-state	input.el	/^(defun prefix-command-preserve-state ()$/;"	function
+reset-this-command-lengths	input.el	/^(defun reset-this-command-lengths ()$/;"	function
+universal-argument--description	input.el	/^(defun universal-argument--description ()$/;"	function
+universal-argument--preserve	input.el	/^(defun universal-argument--preserve ()$/;"	function
+universal-argument-map	input.el	/^(defvar universal-argument-map$/;"	variable
+universal-argument--mode	input.el	/^(defun universal-argument--mode ()$/;"	function
+universal-argument	input.el	/^(defun universal-argument ()$/;"	function
+universal-argument-more	input.el	/^(defun universal-argument-more (arg)$/;"	function
+negative-argument	input.el	/^(defun negative-argument (arg)$/;"	function
+digit-argument	input.el	/^(defun digit-argument (arg)$/;"	function
+filter-buffer-substring-functions	input.el	/^(defvar filter-buffer-substring-functions nil$/;"	variable
+filter-buffer-substring-function	input.el	/^(defvar filter-buffer-substring-function #'buffer-substring--filter$/;"	variable
+buffer-substring-filters	input.el	/^(defvar buffer-substring-filters nil$/;"	variable
+filter-buffer-substring	input.el	/^(defun filter-buffer-substring (beg end &optional delete)$/;"	function
+buffer-substring--filter	input.el	/^(defun buffer-substring--filter (beg end &optional delete)$/;"	function
+interprogram-cut-function	input.el	/^(defvar interprogram-cut-function #'gui-select-text$/;"	variable
+interprogram-paste-function	input.el	/^(defvar interprogram-paste-function #'gui-selection-value$/;"	variable
+kill-ring	input.el	/^(defvar kill-ring nil$/;"	variable
+kill-ring-max	input.el	/^(defcustom kill-ring-max 60$/;"	custom
+kill-ring-yank-pointer	input.el	/^(defvar kill-ring-yank-pointer nil$/;"	variable
+save-interprogram-paste-before-kill	input.el	/^(defcustom save-interprogram-paste-before-kill nil$/;"	custom
+kill-do-not-save-duplicates	input.el	/^(defcustom kill-do-not-save-duplicates nil$/;"	custom
+kill-new	input.el	/^(defun kill-new (string &optional replace)$/;"	function
+kill-append-merge-undo	input.el	/^(defcustom kill-append-merge-undo nil$/;"	custom
+kill-append	input.el	/^(defun kill-append (string before-p)$/;"	function
+yank-pop-change-selection	input.el	/^(defcustom yank-pop-change-selection nil$/;"	custom
+current-kill	input.el	/^(defun current-kill (n &optional do-not-move)$/;"	function
+kill-read-only-ok	input.el	/^(defcustom kill-read-only-ok nil$/;"	custom
+kill-region	input.el	/^(defun kill-region (beg end &optional region)$/;"	function
+copy-region-as-kill	input.el	/^(defun copy-region-as-kill (beg end &optional region)$/;"	function
+kill-ring-save	input.el	/^(defun kill-ring-save (beg end &optional region)$/;"	function
+indicate-copied-region	input.el	/^(defun indicate-copied-region (&optional message-len)$/;"	function
+append-next-kill	input.el	/^(defun append-next-kill (&optional interactive)$/;"	function
+bidi-directional-controls-chars	input.el	/^(defvar bidi-directional-controls-chars "\\x202a-\\x202e\\x2066-\\x2069"$/;"	variable
+bidi-directional-non-controls-chars	input.el	/^(defvar bidi-directional-non-controls-chars "^\\x202a-\\x202e\\x2066-\\x2069"$/;"	variable
+squeeze-bidi-context-1	input.el	/^(defun squeeze-bidi-context-1 (from to category replacement)$/;"	function
+squeeze-bidi-context	input.el	/^(defun squeeze-bidi-context (from to)$/;"	function
+line-substring-with-bidi-context	input.el	/^(defun line-substring-with-bidi-context (start end &optional no-properties)$/;"	function
+buffer-substring-with-bidi-context	input.el	/^(defun buffer-substring-with-bidi-context (start end &optional no-properties)$/;"	function
+yank-handled-properties	input.el	/^(defcustom yank-handled-properties$/;"	custom
+yank-excluded-properties	input.el	/^(defcustom yank-excluded-properties$/;"	custom
+yank-window-start	input.el	/^(defvar yank-window-start nil)$/;"	variable
+yank-undo-function	input.el	/^(defvar yank-undo-function nil$/;"	variable
+yank-pop	input.el	/^(defun yank-pop (&optional arg)$/;"	function
+yank	input.el	/^(defun yank (&optional arg)$/;"	function
+rotate-yank-pointer	input.el	/^(defun rotate-yank-pointer (arg)$/;"	function
+kill-forward-chars	input.el	/^(defun kill-forward-chars (arg)$/;"	function
+kill-backward-chars	input.el	/^(defun kill-backward-chars (arg)$/;"	function
+backward-delete-char-untabify-method	input.el	/^(defcustom backward-delete-char-untabify-method 'untabify$/;"	custom
+backward-delete-char-untabify	input.el	/^(defun backward-delete-char-untabify (arg &optional killp)$/;"	function
+zap-to-char	input.el	/^(defun zap-to-char (arg char)$/;"	function
+kill-whole-line	input.el	/^(defcustom kill-whole-line nil$/;"	custom
+kill-line	input.el	/^(defun kill-line (&optional arg)$/;"	function
+kill-whole-line	input.el	/^(defun kill-whole-line (&optional arg)$/;"	function
+forward-visible-line	input.el	/^(defun forward-visible-line (arg)$/;"	function
+end-of-visible-line	input.el	/^(defun end-of-visible-line ()$/;"	function
+kill-current-buffer	input.el	/^(defun kill-current-buffer ()$/;"	function
+insert-buffer	input.el	/^(defun insert-buffer (buffer)$/;"	function
+append-to-buffer	input.el	/^(defun append-to-buffer (buffer start end)$/;"	function
+prepend-to-buffer	input.el	/^(defun prepend-to-buffer (buffer start end)$/;"	function
+copy-to-buffer	input.el	/^(defun copy-to-buffer (buffer start end)$/;"	function
+mark-inactive	input.el	/^(define-error 'mark-inactive (purecopy "The mark is not active now"))$/;"	error
+activate-mark-hook	input.el	/^(defvar activate-mark-hook nil$/;"	variable
+deactivate-mark-hook	input.el	/^(defvar deactivate-mark-hook nil$/;"	variable
+mark	input.el	/^(defun mark (&optional force)$/;"	function
+deactivate-mark	input.el	/^(defun deactivate-mark (&optional force)$/;"	function
+activate-mark	input.el	/^(defun activate-mark (&optional no-tmm)$/;"	function
+set-mark	input.el	/^(defun set-mark (pos)$/;"	function
+save-mark-and-excursion--save	input.el	/^(defun save-mark-and-excursion--save ()$/;"	function
+save-mark-and-excursion--restore	input.el	/^(defun save-mark-and-excursion--restore (saved-mark-info)$/;"	function
+save-mark-and-excursion	input.el	/^(defmacro save-mark-and-excursion (&rest body)$/;"	macro
+use-empty-active-region	input.el	/^(defcustom use-empty-active-region nil$/;"	custom
+use-region-p	input.el	/^(defun use-region-p ()$/;"	function
+region-active-p	input.el	/^(defun region-active-p ()$/;"	function
+region-bounds	input.el	/^(defun region-bounds ()$/;"	function
+region-noncontiguous-p	input.el	/^(defun region-noncontiguous-p ()$/;"	function
+redisplay-unhighlight-region-function	input.el	/^(defvar redisplay-unhighlight-region-function$/;"	variable
+redisplay-highlight-region-function	input.el	/^(defvar redisplay-highlight-region-function$/;"	variable
+redisplay--update-region-highlight	input.el	/^(defun redisplay--update-region-highlight (window)$/;"	function
+pre-redisplay-functions	input.el	/^(defvar pre-redisplay-functions (list #'redisplay--update-region-highlight)$/;"	variable
+redisplay--pre-redisplay-functions	input.el	/^(defun redisplay--pre-redisplay-functions (windows)$/;"	function
+mark-ring	input.el	/^(defvar-local mark-ring nil$/;"	variable
+mark-ring-max	input.el	/^(defcustom mark-ring-max 16$/;"	custom
+global-mark-ring	input.el	/^(defvar global-mark-ring nil$/;"	variable
+global-mark-ring-max	input.el	/^(defcustom global-mark-ring-max 16$/;"	custom
+pop-to-mark-command	input.el	/^(defun pop-to-mark-command ()$/;"	function
+push-mark-command	input.el	/^(defun push-mark-command (arg &optional nomsg)$/;"	function
+set-mark-command-repeat-pop	input.el	/^(defcustom set-mark-command-repeat-pop nil$/;"	custom
+set-mark-command	input.el	/^(defun set-mark-command (arg)$/;"	function
+push-mark	input.el	/^(defun push-mark (&optional location nomsg activate)$/;"	function
+pop-mark	input.el	/^(defun pop-mark ()$/;"	function
+exchange-dot-and-mark	input.el	/^(define-obsolete-function-alias 'exchange-dot-and-mark$/;"	alias
+exchange-point-and-mark	input.el	/^(defun exchange-point-and-mark (&optional arg)$/;"	function
+shift-select-mode	input.el	/^(defcustom shift-select-mode t$/;"	custom
+handle-shift-selection	input.el	/^(defun handle-shift-selection ()$/;"	function
+transient-mark-mode	input.el	/^(define-minor-mode transient-mark-mode$/;"	minorMode
+widen-automatically	input.el	/^(defvar widen-automatically t$/;"	variable
+non-essential	input.el	/^(defvar non-essential nil$/;"	variable
+pop-global-mark	input.el	/^(defun pop-global-mark ()$/;"	function
+next-line-add-newlines	input.el	/^(defcustom next-line-add-newlines nil$/;"	custom
+next-line	input.el	/^(defun next-line (&optional arg try-vscroll)$/;"	function
+previous-line	input.el	/^(defun previous-line (&optional arg try-vscroll)$/;"	function
+track-eol	input.el	/^(defcustom track-eol nil$/;"	custom
+goal-column	input.el	/^(defcustom goal-column nil$/;"	custom
+temporary-goal-column	input.el	/^(defvar temporary-goal-column 0$/;"	variable
+last--line-number-width	input.el	/^(defvar last--line-number-width 0$/;"	variable
+line-move-ignore-invisible	input.el	/^(defcustom line-move-ignore-invisible t$/;"	custom
+line-move-visual	input.el	/^(defcustom line-move-visual t$/;"	custom
+default-font-height	input.el	/^(defun default-font-height ()$/;"	function
+default-font-width	input.el	/^(defun default-font-width ()$/;"	function
+default-line-height	input.el	/^(defun default-line-height ()$/;"	function
+window-screen-lines	input.el	/^(defun window-screen-lines ()$/;"	function
+line-move-partial	input.el	/^(defun line-move-partial (arg noerror &optional _to-end)$/;"	function
+line-move	input.el	/^(defun line-move (arg &optional noerror _to-end try-vscroll)$/;"	function
+line-move-visual	input.el	/^(defun line-move-visual (arg &optional noerror)$/;"	function
+line-move-1	input.el	/^(defun line-move-1 (arg &optional noerror _to-end)$/;"	function
+line-move-finish	input.el	/^(defun line-move-finish (column opoint forward)$/;"	function
+line-move-to-column	input.el	/^(defun line-move-to-column (col)$/;"	function
+move-end-of-line	input.el	/^(defun move-end-of-line (arg)$/;"	function
+move-beginning-of-line	input.el	/^(defun move-beginning-of-line (arg)$/;"	function
+set-goal-column	input.el	/^(defun set-goal-column (arg)$/;"	function
+end-of-visual-line	input.el	/^(defun end-of-visual-line (&optional n)$/;"	function
+beginning-of-visual-line	input.el	/^(defun beginning-of-visual-line (&optional n)$/;"	function
+kill-visual-line	input.el	/^(defun kill-visual-line (&optional arg)$/;"	function
+next-logical-line	input.el	/^(defun next-logical-line (&optional arg try-vscroll)$/;"	function
+previous-logical-line	input.el	/^(defun previous-logical-line (&optional arg try-vscroll)$/;"	function
+visual-line	input.el	/^(defgroup visual-line nil$/;"	group
+visual-line-mode-map	input.el	/^(defvar visual-line-mode-map$/;"	variable
+visual-line-fringe-indicators	input.el	/^(defcustom visual-line-fringe-indicators '(nil nil)$/;"	custom
+visual-line--saved-state	input.el	/^(defvar visual-line--saved-state nil)$/;"	variable
+visual-line-mode	input.el	/^(define-minor-mode visual-line-mode$/;"	minorMode
+turn-on-visual-line-mode	input.el	/^(defun turn-on-visual-line-mode ()$/;"	function
+global-visual-line-mode	input.el	/^(define-globalized-minor-mode global-visual-line-mode$/;"	minorMode
+transpose-chars	input.el	/^(defun transpose-chars (arg)$/;"	function
+transpose-words	input.el	/^(defun transpose-words (arg)$/;"	function
+transpose-sexps	input.el	/^(defun transpose-sexps (arg)$/;"	function
+transpose-lines	input.el	/^(defun transpose-lines (arg)$/;"	function
+transpose-subr	input.el	/^(defun transpose-subr (mover arg &optional special)$/;"	function
+transpose-subr-1	input.el	/^(defun transpose-subr-1 (pos1 pos2)$/;"	function
+backward-word	input.el	/^(defun backward-word (&optional arg)$/;"	function
+mark-word	input.el	/^(defun mark-word (&optional arg allow-extend)$/;"	function
+kill-word	input.el	/^(defun kill-word (arg)$/;"	function
+backward-kill-word	input.el	/^(defun backward-kill-word (arg)$/;"	function
+current-word	input.el	/^(defun current-word (&optional strict really-word)$/;"	function
+fill-prefix	input.el	/^(defcustom fill-prefix nil$/;"	custom
+auto-fill-inhibit-regexp	input.el	/^(defcustom auto-fill-inhibit-regexp nil$/;"	custom
+do-auto-fill	input.el	/^(defun do-auto-fill ()$/;"	function
+comment-line-break-function	input.el	/^(defvar comment-line-break-function 'comment-indent-new-line$/;"	variable
+default-indent-new-line	input.el	/^(defun default-indent-new-line (&optional soft)$/;"	function
+internal-auto-fill	input.el	/^(defun internal-auto-fill ()$/;"	function
+normal-auto-fill-function	input.el	/^(defvar normal-auto-fill-function 'do-auto-fill$/;"	variable
+auto-fill-mode	input.el	/^(define-minor-mode auto-fill-mode$/;"	minorMode
+auto-fill-function	input.el	/^(defun auto-fill-function ()$/;"	function
+turn-on-auto-fill	input.el	/^(defun turn-on-auto-fill ()$/;"	function
+turn-off-auto-fill	input.el	/^(defun turn-off-auto-fill ()$/;"	function
+set-fill-column	input.el	/^(defun set-fill-column (arg)$/;"	function
+set-selective-display	input.el	/^(defun set-selective-display (arg)$/;"	function
+indicate-unused-lines	input.el	/^(defvaralias 'indicate-unused-lines 'indicate-empty-lines)$/;"	varalias
+toggle-truncate-lines	input.el	/^(defun toggle-truncate-lines (&optional arg)$/;"	function
+toggle-word-wrap	input.el	/^(defun toggle-word-wrap (&optional arg)$/;"	function
+overwrite-mode-textual	input.el	/^(defvar overwrite-mode-textual (purecopy " Ovwrt")$/;"	variable
+overwrite-mode-binary	input.el	/^(defvar overwrite-mode-binary (purecopy " Bin Ovwrt")$/;"	variable
+overwrite-mode	input.el	/^(define-minor-mode overwrite-mode$/;"	minorMode
+binary-overwrite-mode	input.el	/^(define-minor-mode binary-overwrite-mode$/;"	minorMode
+line-number-mode	input.el	/^(define-minor-mode line-number-mode$/;"	minorMode
+column-number-mode	input.el	/^(define-minor-mode column-number-mode$/;"	minorMode
+size-indication-mode	input.el	/^(define-minor-mode size-indication-mode$/;"	minorMode
+auto-save-mode	input.el	/^(define-minor-mode auto-save-mode$/;"	minorMode
+paren-blinking	input.el	/^(defgroup paren-blinking nil$/;"	group
+blink-matching-paren	input.el	/^(defcustom blink-matching-paren t$/;"	custom
+blink-matching-paren-on-screen	input.el	/^(defcustom blink-matching-paren-on-screen t$/;"	custom
+blink-matching-paren-distance	input.el	/^(defcustom blink-matching-paren-distance (* 100 1024)$/;"	custom
+blink-matching-delay	input.el	/^(defcustom blink-matching-delay 1$/;"	custom
+blink-matching-paren-dont-ignore-comments	input.el	/^(defcustom blink-matching-paren-dont-ignore-comments nil$/;"	custom
+blink-matching-check-mismatch	input.el	/^(defun blink-matching-check-mismatch (start end)$/;"	function
+blink-matching-check-function	input.el	/^(defvar blink-matching-check-function #'blink-matching-check-mismatch$/;"	variable
+blink-matching--overlay	input.el	/^(defvar blink-matching--overlay$/;"	variable
+blink-matching-open	input.el	/^(defun blink-matching-open ()$/;"	function
+blink-paren-function	input.el	/^(defvar blink-paren-function 'blink-matching-open$/;"	variable
+blink-paren-post-self-insert-function	input.el	/^(defun blink-paren-post-self-insert-function ()$/;"	function
+keyboard-quit	input.el	/^(defun keyboard-quit ()$/;"	function
+buffer-quit-function	input.el	/^(defvar buffer-quit-function nil$/;"	variable
+keyboard-escape-quit	input.el	/^(defun keyboard-escape-quit ()$/;"	function
+play-sound-file	input.el	/^(defun play-sound-file (file &optional volume device)$/;"	function
+read-mail-command	input.el	/^(defcustom read-mail-command 'rmail$/;"	custom
+mail-user-agent	input.el	/^(defcustom mail-user-agent 'message-user-agent$/;"	custom
+compose-mail-user-agent-warnings	input.el	/^(defcustom compose-mail-user-agent-warnings t$/;"	custom
+rfc822-goto-eoh	input.el	/^(defun rfc822-goto-eoh ()$/;"	function
+mail-encode-mml	input.el	/^(defvar mail-encode-mml nil$/;"	variable
+compose-mail	input.el	/^(defun compose-mail (&optional to subject other-headers continue$/;"	function
+compose-mail-other-window	input.el	/^(defun compose-mail-other-window (&optional to subject other-headers continue$/;"	function
+compose-mail-other-frame	input.el	/^(defun compose-mail-other-frame (&optional to subject other-headers continue$/;"	function
+set-variable-value-history	input.el	/^(defvar set-variable-value-history nil$/;"	variable
+set-variable	input.el	/^(defun set-variable (variable value &optional make-local)$/;"	function
+completion-list-mode-map	input.el	/^(defvar completion-list-mode-map$/;"	variable
+completion-reference-buffer	input.el	/^(defvar completion-reference-buffer nil$/;"	variable
+completion-no-auto-exit	input.el	/^(defvar completion-no-auto-exit nil$/;"	variable
+completion-base-position	input.el	/^(defvar completion-base-position nil$/;"	variable
+completion-list-insert-choice-function	input.el	/^(defvar completion-list-insert-choice-function #'completion--replace$/;"	variable
+completion-base-size	input.el	/^(defvar completion-base-size nil$/;"	variable
+delete-completion-window	input.el	/^(defun delete-completion-window ()$/;"	function
+previous-completion	input.el	/^(defun previous-completion (n)$/;"	function
+next-completion	input.el	/^(defun next-completion (n)$/;"	function
+choose-completion	input.el	/^(defun choose-completion (&optional event)$/;"	function
+choose-completion-guess-base-position	input.el	/^(defun choose-completion-guess-base-position (string)$/;"	function
+choose-completion-delete-max-match	input.el	/^(defun choose-completion-delete-max-match (string)$/;"	function
+choose-completion-string-functions	input.el	/^(defvar choose-completion-string-functions nil$/;"	variable
+choose-completion-string	input.el	/^(defun choose-completion-string (choice &optional$/;"	function
+completion-list-mode	input.el	/^(define-derived-mode completion-list-mode nil "Completion List"$/;"	derivedMode
+completion-list-mode-finish	input.el	/^(defun completion-list-mode-finish ()$/;"	function
+completion-show-help	input.el	/^(defcustom completion-show-help t$/;"	custom
+completion-setup-function	input.el	/^(defun completion-setup-function ()$/;"	function
+switch-to-completions	input.el	/^(defun switch-to-completions ()$/;"	function
+event-apply-alt-modifier	input.el	/^(defun event-apply-alt-modifier (_ignore-prompt)$/;"	function
+event-apply-super-modifier	input.el	/^(defun event-apply-super-modifier (_ignore-prompt)$/;"	function
+event-apply-hyper-modifier	input.el	/^(defun event-apply-hyper-modifier (_ignore-prompt)$/;"	function
+event-apply-shift-modifier	input.el	/^(defun event-apply-shift-modifier (_ignore-prompt)$/;"	function
+event-apply-control-modifier	input.el	/^(defun event-apply-control-modifier (_ignore-prompt)$/;"	function
+event-apply-meta-modifier	input.el	/^(defun event-apply-meta-modifier (_ignore-prompt)$/;"	function
+event-apply-modifier	input.el	/^(defun event-apply-modifier (event symbol lshiftby prefix)$/;"	function
+clone-buffer-hook	input.el	/^(defvar clone-buffer-hook nil$/;"	variable
+clone-indirect-buffer-hook	input.el	/^(defvar clone-indirect-buffer-hook nil$/;"	variable
+clone-process	input.el	/^(defun clone-process (process &optional newname)$/;"	function
+clone-buffer	input.el	/^(defun clone-buffer (&optional newname display-flag)$/;"	function
+clone-indirect-buffer	input.el	/^(defun clone-indirect-buffer (newname display-flag &optional norecord)$/;"	function
+clone-indirect-buffer-other-window	input.el	/^(defun clone-indirect-buffer-other-window (newname display-flag &optional norecord)$/;"	function
+normal-erase-is-backspace	input.el	/^(defcustom normal-erase-is-backspace 'maybe$/;"	custom
+normal-erase-is-backspace-setup-frame	input.el	/^(defun normal-erase-is-backspace-setup-frame (&optional frame)$/;"	function
+normal-erase-is-backspace-mode	input.el	/^(define-minor-mode normal-erase-is-backspace-mode$/;"	minorMode
+vis-mode-saved-buffer-invisibility-spec	input.el	/^(defvar vis-mode-saved-buffer-invisibility-spec nil$/;"	variable
+read-only-mode	input.el	/^(define-minor-mode read-only-mode$/;"	minorMode
+visible-mode	input.el	/^(define-minor-mode visible-mode$/;"	minorMode
+messages-buffer-mode-map	input.el	/^(defvar messages-buffer-mode-map$/;"	variable
+messages-buffer-mode	input.el	/^(define-derived-mode messages-buffer-mode special-mode "Messages"$/;"	derivedMode
+messages-buffer	input.el	/^(defun messages-buffer ()$/;"	function
+bad-packages-alist	input.el	/^(defconst bad-packages-alist$/;"	const
+bad-package-check	input.el	/^(defun bad-package-check (package)$/;"	function
+define-alternatives	input.el	/^(defmacro define-alternatives (command &rest customizations)$/;"	macro
+upcase-dwim	input.el	/^(defun upcase-dwim (arg)$/;"	function
+downcase-dwim	input.el	/^(defun downcase-dwim (arg)$/;"	function
+capitalize-dwim	input.el	/^(defun capitalize-dwim (arg)$/;"	function
