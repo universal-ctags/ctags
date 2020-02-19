@@ -712,8 +712,8 @@ are not listed here. They are experimental or for debugging purpose.
 	Specify '*' as the parameter to include all kinds implemented
 	in <LANG> in the output. Furthermore if "all" is given as <LANG>,
 	specification of the parameter kinds affects all languages defined
-	in ctags. Giving "all" makes sense only when '*' is
-	given as the parameter kinds.
+	in ctags. Giving "all" makes sense only when '*' or
+	'F' is given as the parameter kinds.
 
 	As an example for the C language, in order to add prototypes and
 	external variable declarations to the default set of tag kinds,
