@@ -692,9 +692,6 @@ static int makeTagFull (tokenInfo *const token, const goKind kind,
 
 	initRefTagEntry (&e, name, kind, role);
 
-	if (!GoKinds [kind].enabled)
-		return CORK_NIL;
-
 	e.lineNumber = token->lineNumber;
 	e.filePosition = token->filePosition;
 	if (argList)
