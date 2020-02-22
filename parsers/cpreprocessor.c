@@ -1625,16 +1625,16 @@ static void findCppTags (void)
  *  Token ignore processing
  */
 
-static hashTable * defineMacroTable;
+static hashTable * cmdlineMacroTable;
 
 /*  Determines whether or not "name" should be ignored, per the ignore list.
  */
 extern const cppMacroInfo * cppFindMacro(const char *const name)
 {
-	if(!defineMacroTable)
+	if(!cmdlineMacroTable)
 		return NULL;
 
-	return (const cppMacroInfo *)hashTableGetItem(defineMacroTable,(char *)name);
+	return (const cppMacroInfo *)hashTableGetItem(cmdlineMacroTable,(char *)name);
 }
 
 extern vString * cppBuildMacroReplacement(
@@ -1694,7 +1694,7 @@ static void saveIgnoreToken(const char * ignoreToken)
 	if(!ignoreToken)
 		return;
 
-	Assert (defineMacroTable);
+	Assert (cmdlineMacroTable);
 
 	const char * c = ignoreToken;
 	char cc = *c;
@@ -1749,7 +1749,7 @@ static void saveIgnoreToken(const char * ignoreToken)
 		info->replacements = NULL;
 	}
 
-	hashTablePutItem(defineMacroTable,eStrndup(tokenBegin,tokenEnd - tokenBegin),info);
+	hashTablePutItem(cmdlineMacroTable,eStrndup(tokenBegin,tokenEnd - tokenBegin),info);
 
 	verbose ("    ignore token: %s\n", ignoreToken);
 }
@@ -1761,7 +1761,7 @@ static void saveMacro(const char * macro)
 	if(!macro)
 		return;
 
-	Assert (defineMacroTable);
+	Assert (cmdlineMacroTable);
 
 	const char * c = macro;
 
@@ -2042,7 +2042,7 @@ static void saveMacro(const char * macro)
 			ADD_CONSTANT_REPLACEMENT(begin,c - begin);
 	}
 
-	hashTablePutItem(defineMacroTable,eStrndup(identifierBegin,identifierEnd - identifierBegin),info);
+	hashTablePutItem(cmdlineMacroTable,eStrndup(identifierBegin,identifierEnd - identifierBegin),info);
 	CXX_DEBUG_LEAVE();
 }
 
@@ -2077,18 +2077,18 @@ static void initializeCpp (const langType language)
 {
 	Cpp.lang = language;
 
-	defineMacroTable = makeMacroTable ();
-	DEFAULT_TRASH_BOX(defineMacroTable,hashTableDelete);
+	cmdlineMacroTable = makeMacroTable ();
+	DEFAULT_TRASH_BOX(cmdlineMacroTable,hashTableDelete);
 }
 
 static void CpreProInstallIgnoreToken (const langType language CTAGS_ATTR_UNUSED, const char *optname CTAGS_ATTR_UNUSED, const char *arg)
 {
 	if (arg == NULL || arg[0] == '\0')
 	{
-		DEFAULT_TRASH_BOX_TAKE_BACK(defineMacroTable);
-		hashTableDelete(defineMacroTable);
-		defineMacroTable = makeMacroTable ();
-		DEFAULT_TRASH_BOX(defineMacroTable,hashTableDelete);
+		DEFAULT_TRASH_BOX_TAKE_BACK(cmdlineMacroTable);
+		hashTableDelete(cmdlineMacroTable);
+		cmdlineMacroTable = makeMacroTable ();
+		DEFAULT_TRASH_BOX(cmdlineMacroTable,hashTableDelete);
 
 		verbose ("    clearing list\n");
 	} else {
@@ -2100,8 +2100,8 @@ static void CpreProInstallMacroToken (const langType language CTAGS_ATTR_UNUSED,
 {
 	if (arg == NULL || arg[0] == '\0')
 	{
-		hashTableDelete(defineMacroTable);
-		defineMacroTable = makeMacroTable ();
+		hashTableDelete(cmdlineMacroTable);
+		cmdlineMacroTable = makeMacroTable ();
 		verbose ("    clearing list\n");
 	} else {
 		saveMacro(arg);
