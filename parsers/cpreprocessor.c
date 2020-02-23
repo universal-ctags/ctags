@@ -1754,12 +1754,12 @@ static void saveIgnoreToken(const char * ignoreToken)
 	verbose ("    ignore token: %s\n", ignoreToken);
 }
 
-static void saveMacro(const char * macro)
+static cppMacroInfo * saveMacro(hashTable *table, const char * macro)
 {
 	CXX_DEBUG_ENTER_TEXT("Save macro %s",macro);
 
 	if(!macro)
-		return;
+		return NULL;
 
 	Assert (cmdlineMacroTable);
 
@@ -1772,13 +1772,13 @@ static void saveMacro(const char * macro)
 	if(!*c)
 	{
 		CXX_DEBUG_LEAVE_TEXT("Bad empty macro definition");
-		return;
+		return NULL;
 	}
 
 	if(!(isalpha(*c) || (*c == '_' || (*c == '$') )))
 	{
 		CXX_DEBUG_LEAVE_TEXT("Macro does not start with an alphanumeric character");
-		return; // must be a sequence of letters and digits
+		return NULL; // must be a sequence of letters and digits
 	}
 
 	const char * identifierBegin = c;
@@ -2042,8 +2042,10 @@ static void saveMacro(const char * macro)
 			ADD_CONSTANT_REPLACEMENT(begin,c - begin);
 	}
 
-	hashTablePutItem(cmdlineMacroTable,eStrndup(identifierBegin,identifierEnd - identifierBegin),info);
+	hashTablePutItem(table,eStrndup(identifierBegin,identifierEnd - identifierBegin),info);
 	CXX_DEBUG_LEAVE();
+
+	return info;
 }
 
 static void freeMacroInfo(cppMacroInfo * info)
@@ -2104,7 +2106,7 @@ static void CpreProInstallMacroToken (const langType language CTAGS_ATTR_UNUSED,
 		cmdlineMacroTable = makeMacroTable ();
 		verbose ("    clearing list\n");
 	} else {
-		saveMacro(arg);
+		saveMacro(cmdlineMacroTable, arg);
 	}
 }
 
