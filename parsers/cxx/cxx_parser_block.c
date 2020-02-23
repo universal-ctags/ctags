@@ -357,7 +357,7 @@ process_token:
 					}
 					break;
 					case CXXKeywordTEMPLATE:
-						if(!cxxParserParseTemplatePrefix())
+						if(!cxxParserParseTemplatePrefix(false))
 						{
 							CXX_DEBUG_LEAVE_TEXT("Failed to parse template");
 							return false;

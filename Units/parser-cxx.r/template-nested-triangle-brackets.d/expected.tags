@@ -21,3 +21,4 @@ T	input-3.hpp	/^template <typename T> struct TemplateParameterStruct {};$/;"	Z	s
 ParameterStruct	input-3.hpp	/^struct ParameterStruct {};$/;"	s
 TestStruct	input-3.hpp	/^template <> struct TestStruct<ParameterStruct> {};$/;"	s	template:<ParameterStruct>
 TestStruct	input-3.hpp	/^template <typename P> struct TestStruct<TemplateParameterStruct<P>> {};$/;"	s	template:<TemplateParameterStruct<P>>
+P	input-3.hpp	/^template <typename P> struct TestStruct<TemplateParameterStruct<P>> {};$/;"	Z	struct:TestStruct

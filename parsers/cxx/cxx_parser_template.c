@@ -53,12 +53,26 @@ static bool cxxTokenIsPresentInTemplateParameters(CXXToken * t)
 			cxxTokenTypeIsOneOf(t,CXXTokenTypeIdentifier | CXXTokenTypeKeyword),
 			"Token must be identifier or keyword"
 		);
-
-	return ptrArrayHasTest(
+	CXX_DEBUG_ASSERT(
 			g_cxx.pTemplateParameters,
-			cxxTokenCompareWord,
-			vStringValue(t->pszWord)
+			"pTemplateParameters is not prepared"
 		);
+
+	ptrArray *pTemplateParameters = g_cxx.pTemplateParameters;
+
+	/* Search szWord in nested template parameters */
+	while(pTemplateParameters)
+	{
+		if(ptrArrayHasTestWithOffset(
+				pTemplateParameters,
+				1,
+				cxxTokenCompareWord,
+				vStringValue(t->pszWord)))
+			return true;
+		pTemplateParameters = ptrArrayItem(pTemplateParameters, 0);
+
+	}
+	return false;
 }
 
 //
@@ -512,8 +526,9 @@ cxxParserParseTemplateAngleBracketsInternal(bool bCaptureTypeParameters)
 					}
 
 					CXX_DEBUG_PRINT(
-							"Adding '%s' to template parameter list",
-							vStringValue(pParam->pszWord)
+							"Adding '%s' to template parameter list %p",
+							vStringValue(pParam->pszWord),
+							g_cxx.pTemplateParameters
 						);
 
 					ptrArrayAdd(g_cxx.pTemplateParameters,pParam);
@@ -597,8 +612,10 @@ static bool cxxParserParseTemplateAngleBrackets(void)
 //
 // Parses the template angle brackets and puts it in g_cxx.pTemplateTokenChain.
 //
-bool cxxParserParseTemplateAngleBracketsToSeparateChain(void)
+bool cxxParserParseTemplateAngleBracketsToSeparateChain(bool bTemplateSpecialization)
 {
+	bool bRet = true;
+
 	CXX_DEBUG_ENTER();
 
 	CXX_DEBUG_ASSERT(cxxParserCurrentLanguageIsCPP(),"This should be called only in C++");
@@ -616,16 +633,28 @@ bool cxxParserParseTemplateAngleBracketsToSeparateChain(void)
 	//       Not for template<template<>> as it is handled separately
 	//       But maybe for nasty things like template<...(template<>)...>?
 
-	if(g_cxx.pTemplateParameters)
-		ptrArrayClear(g_cxx.pTemplateParameters);
-	else
-		g_cxx.pTemplateParameters = ptrArrayNew(NULL);
+	// If bTemplateSpecialization is set, parameters stored to
+	// pTemplateParameters are never tagged. They are just used
+	// only in cxxTokenIsPresentInTemplateParameters.
+	ptrArray *pTemplateParameters = ptrArrayNew(NULL);
+
+	// The first slot of pTemplateParameters has a special purpose:
+	// keeping the upper level pTemplateParameters. The actual
+	// template parameters are stored to slots after the second.
+	ptrArrayAdd(pTemplateParameters, g_cxx.pTemplateParameters);
+	CXX_DEBUG_PRINT(
+		"Pushing a new template parameter array %p on %p",
+		pTemplateParameters,
+		g_cxx.pTemplateParameters
+		);
+	g_cxx.pTemplateParameters = pTemplateParameters;
 
 	if(!cxxParserParseTemplateAngleBrackets())
 	{
 		CXX_DEBUG_LEAVE_TEXT("Failed to parse angle brackets");
 		cxxTokenChainDestroy(pSave);
-		return false;
+		bRet = false;
+		goto out;
 	}
 
 	if(g_cxx.pTemplateTokenChain)
@@ -635,7 +664,14 @@ bool cxxParserParseTemplateAngleBracketsToSeparateChain(void)
 	g_cxx.pTokenChain = pSave;
 
 	CXX_DEBUG_LEAVE();
-	return true;
+ out:
+	if(!bRet || bTemplateSpecialization)
+	{
+		pTemplateParameters = ptrArrayItem(g_cxx.pTemplateParameters, 0);
+		ptrArrayDelete(g_cxx.pTemplateParameters);
+		g_cxx.pTemplateParameters = pTemplateParameters;
+	}
+	return bRet;
 }
 
 
@@ -643,7 +679,7 @@ bool cxxParserParseTemplateAngleBracketsToSeparateChain(void)
 // Parses a template<anything> prefix.
 // The parsed template parameter definition is stored in a separate token chain.
 //
-bool cxxParserParseTemplatePrefix(void)
+bool cxxParserParseTemplatePrefix(bool bTemplateSpecialization)
 {
 	CXX_DEBUG_ENTER();
 
@@ -672,39 +708,50 @@ bool cxxParserParseTemplatePrefix(void)
 		return true; // tolerate syntax error
 	}
 
-	bool bRet = cxxParserParseTemplateAngleBracketsToSeparateChain();
+	bool bRet = cxxParserParseTemplateAngleBracketsToSeparateChain(bTemplateSpecialization);
 
 	CXX_DEBUG_LEAVE();
 	return bRet;
 }
 
-void cxxParserEmitTemplateParameterTags(void)
+void cxxParserEmitTemplateParameterTagsAndReleaseResource(void)
 {
 	CXX_DEBUG_ASSERT(
 			g_cxx.pTemplateTokenChain &&
 			(g_cxx.pTemplateTokenChain->iCount > 0) &&
 			cxxParserCurrentLanguageIsCPP() &&
-			g_cxx.pTemplateParameters && // this should be ensured by chain existence
-			cxxTagKindEnabled(CXXTagCPPKindTEMPLATEPARAM),
+			g_cxx.pTemplateParameters, // this should be ensured by chain existence
 			"Template existence must be checked before calling this function"
 		);
 
-	int c = ptrArrayCount(g_cxx.pTemplateParameters);
-
-	for(int i=0;i<c;i++)
+	if(cxxTagKindEnabled(CXXTagCPPKindTEMPLATEPARAM))
 	{
-		CXXToken * t = (CXXToken *)ptrArrayItem(g_cxx.pTemplateParameters,i);
+		int c = ptrArrayCount(g_cxx.pTemplateParameters);
 
-		CXX_DEBUG_PRINT("Emitting template param tag for '%s'",vStringValue(t->pszWord));
+		for(int i=1;i<c;i++)
+		{
+			CXXToken * t = (CXXToken *)ptrArrayItem(g_cxx.pTemplateParameters,i);
 
-		tagEntryInfo * tag = cxxTagBegin(
-				CXXTagCPPKindTEMPLATEPARAM,
-				t
+			CXX_DEBUG_PRINT("Emitting template param tag for '%s'",vStringValue(t->pszWord));
+
+			tagEntryInfo * tag = cxxTagBegin(
+					CXXTagCPPKindTEMPLATEPARAM,
+					t
 			);
 
-		if(!tag)
-			continue;
+			if(!tag)
+				continue;
 
-		cxxTagCommit();
+			cxxTagCommit();
+		}
 	}
+
+	ptrArray *pTemplateParameters = ptrArrayItem(g_cxx.pTemplateParameters, 0);
+	CXX_DEBUG_PRINT(
+		"Poping a template parameter array %p, the new top is %p",
+		g_cxx.pTemplateParameters,
+		pTemplateParameters
+		);
+	ptrArrayDelete(g_cxx.pTemplateParameters);
+	g_cxx.pTemplateParameters = pTemplateParameters;
 }

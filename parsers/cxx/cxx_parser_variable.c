@@ -740,13 +740,10 @@ bool cxxParserExtractVariableDeclarations(CXXTokenChain * pChain,unsigned int uF
 				vStringDelete(pszProperties);
 		}
 
-		if(
-				bGotTemplate &&
-				cxxTagKindEnabled(CXXTagCPPKindTEMPLATEPARAM)
-			)
+		if(bGotTemplate)
 		{
 			cxxScopePush(pIdentifier,CXXScopeTypeVariable,CXXScopeAccessPublic);
-			cxxParserEmitTemplateParameterTags();
+			cxxParserEmitTemplateParameterTagsAndReleaseResource();
 			cxxScopePop();
 		} else {
 			cxxTokenDestroy(pIdentifier);

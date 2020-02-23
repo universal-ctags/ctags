@@ -1005,7 +1005,7 @@ static bool cxxParserParseClassStructOrUnionInternal(
 		// FIXME: Should we add the specialisation arguments somewhere?
 		//        Maybe as a separate field?
 
-		bRet = cxxParserParseTemplateAngleBracketsToSeparateChain();
+		bRet = cxxParserParseTemplateAngleBracketsToSeparateChain(true);
 
 		if(!bRet)
 		{
@@ -1309,11 +1309,8 @@ static bool cxxParserParseClassStructOrUnionInternal(
 				CXXScopeAccessPrivate : CXXScopeAccessPublic
 		);
 
-	if(
-			bGotTemplate &&
-			cxxTagKindEnabled(CXXTagCPPKindTEMPLATEPARAM)
-		)
-		cxxParserEmitTemplateParameterTags();
+	if(bGotTemplate)
+		cxxParserEmitTemplateParameterTagsAndReleaseResource();
 
 	vString * pScopeName = cxxScopeGetFullNameAsString();
 
@@ -1968,8 +1965,12 @@ void cxxParserCleanup(langType language CTAGS_ATTR_UNUSED,bool initialized CTAGS
 		cxxTokenChainDestroy(g_cxx.pTokenChain);
 	if(g_cxx.pTemplateTokenChain)
 		cxxTokenChainDestroy(g_cxx.pTemplateTokenChain);
-	if(g_cxx.pTemplateParameters)
+	while(g_cxx.pTemplateParameters)
+	{
+		ptrArray *pTemplateParameters = ptrArrayItem(g_cxx.pTemplateParameters, 0);
 		ptrArrayDelete(g_cxx.pTemplateParameters);
+		g_cxx.pTemplateParameters = pTemplateParameters;
+	}
 	// Restart coveralls: LCOV_EXCL_END
 
 	cxxScopeDone();

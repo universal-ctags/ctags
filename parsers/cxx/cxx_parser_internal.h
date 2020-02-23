@@ -226,9 +226,15 @@ bool cxxParserParseAndCondenseCurrentSubchain(
 bool cxxParserParseUpToOneOf(unsigned int uTokenTypes,
 							 bool bCanReduceInnerElements);
 bool cxxParserParseIfForWhileSwitchCatchParenthesis(void);
-bool cxxParserParseTemplatePrefix(void);
-bool cxxParserParseTemplateAngleBracketsToSeparateChain(void);
-void cxxParserEmitTemplateParameterTags(void);
+
+// Resources for tracking template parameters allocated by cxxParserParseTemplate*()
+// internally must be freed by calling
+// cxxParserEmitTemplateParameterTagsAndReleaseResource() if cxxParserParseTemplate*()
+// returns true and bTemplateSpecialization is set true.
+bool cxxParserParseTemplatePrefix(bool bTemplateSpecialization);
+bool cxxParserParseTemplateAngleBracketsToSeparateChain(bool bTemplateSpecialization);
+void cxxParserEmitTemplateParameterTagsAndReleaseResource(void);
+
 bool cxxParserParseUsingClause(void);
 bool cxxParserParseAccessSpecifier(void);
 void cxxParserAnalyzeOtherStatement(void);
