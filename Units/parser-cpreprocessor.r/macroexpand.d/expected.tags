@@ -1,0 +1,20 @@
+defStruct	input.c	/^#define defStruct(/;"	d	file:	signature:(PREFIX,X)	macrodef:struct PREFIX##X
+begin	input.c	/^#define begin /;"	d	file:	macrodef:{
+defField	input.c	/^#define defField(/;"	d	file:	signature:(PREFIX,T,F)	macrodef:T PREFIX##F;
+endf	input.c	/^#define endf /;"	d	file:	macrodef:;
+ends	input.c	/^#define ends /;"	d	file:	macrodef:};
+mydefs	input.c	/^#define mydefs(/;"	d	file:	signature:(X)	macrodef:defStruct(my_,X)
+mydeff	input.c	/^#define mydeff(/;"	d	file:	signature:(T,Y)	macrodef:defField(my_,T,Y)
+your_point	input.c	/^defStruct(your_,point) begin$/;"	s	file:
+your_x	input.c	/^  defField(your_,int, x) endf$/;"	m	struct:your_point	typeref:typename:int	file:
+your_y	input.c	/^  defField(your_,int, y) endf$/;"	m	struct:your_point	typeref:typename:int	file:
+my_point3d	input.c	/^mydefs(point3d) begin$/;"	s	file:
+my_x	input.c	/^  mydeff(int, x) endf$/;"	m	struct:my_point3d	typeref:typename:int	file:
+my_y	input.c	/^  mydeff(int, y) endf$/;"	m	struct:my_point3d	typeref:typename:int	file:
+my_z	input.c	/^  mydeff(int, z) endf$/;"	m	struct:my_point3d	typeref:typename:int	file:
+T	input-0.c	/^#define T /;"	d	file:	macrodef:int
+mytype0	input-0.c	/^typedef T mytype0;$/;"	t	typeref:typename:int	file:
+S	input-0.c	/^#define S /;"	d	file:	macrodef:int
+mytype1	input-0.c	/^typedef S mytype1;$/;"	t	typeref:typename:float	file:
+IO7__POX_ERRSUM__UPE_ERROR	input-1.c	/^#define IO7__POX_ERRSUM__UPE_ERROR /;"	d	file:	macrodef:GEN_MASK(IO7__POX_ERRSUM__UPE_ERROR)
+f	input-1.c	/^f(int err_sum)$/;"	f	typeref:typename:int	signature:(int err_sum)
