@@ -14,3 +14,10 @@ V	input-2.hpp	/^const int V = 10;$/;"	v	typeref:typename:const int
 func	input-2.hpp	/^template<typename T,int I = V << 1 > void func(T t)$/;"	f	typeref:typename:void	template:<typename T,int I=V<<1>
 T	input-2.hpp	/^template<typename T,int I = V << 1 > void func(T t)$/;"	Z	function:func
 I	input-2.hpp	/^template<typename T,int I = V << 1 > void func(T t)$/;"	Z	function:func
+TestStruct	input-3.hpp	/^template <typename T> struct TestStruct {};$/;"	s	template:<typename T>
+T	input-3.hpp	/^template <typename T> struct TestStruct {};$/;"	Z	struct:TestStruct
+TemplateParameterStruct	input-3.hpp	/^template <typename T> struct TemplateParameterStruct {};$/;"	s	template:<typename T>
+T	input-3.hpp	/^template <typename T> struct TemplateParameterStruct {};$/;"	Z	struct:TemplateParameterStruct
+ParameterStruct	input-3.hpp	/^struct ParameterStruct {};$/;"	s
+TestStruct	input-3.hpp	/^template <> struct TestStruct<ParameterStruct> {};$/;"	s	template:<ParameterStruct>
+TestStruct	input-3.hpp	/^template <typename P> struct TestStruct<TemplateParameterStruct<P>> {};$/;"	s	template:<TemplateParameterStruct<P>>

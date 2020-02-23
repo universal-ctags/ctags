@@ -374,14 +374,23 @@ cxxParserParseTemplateAngleBracketsInternal(bool bCaptureTypeParameters)
 					return CXXParserParseTemplateAngleBracketsFinishedPrematurely;
 				}
 
-				if(cxxTokenTypeIsOneOf(
+				if(
+					cxxTokenTypeIsOneOf(
 						g_cxx.pToken,
 						CXXTokenTypeOpeningParenthesis |
 							CXXTokenTypeOpeningSquareParenthesis
-					))
+					)
+					|| (iNestedTemplateLevel == -1)
+					)
 				{
 					// would need to be condensed: unget and try again above
 					cxxParserUngetCurrentToken();
+				}
+
+				if(iNestedTemplateLevel == -1)
+				{
+					CXX_DEBUG_LEAVE_TEXT("Found end of template");
+					return CXXParserParseTemplateAngleBracketsSucceeded;
 				}
 
 				// anything else is OK
