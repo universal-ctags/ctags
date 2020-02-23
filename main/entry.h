@@ -198,6 +198,7 @@ extern bool isTagExtra (const tagEntryInfo *const tag);
  */
 extern void attachParserField (tagEntryInfo *const tag, bool inCorkQueue, fieldType ftype, const char* value);
 extern void attachParserFieldToCorkEntry (int index, fieldType ftype, const char* value);
+extern const char* getParserFieldValueForType (tagEntryInfo *const tag, fieldType ftype);
 
 extern int makePlaceholder (const char *const name);
 
