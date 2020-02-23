@@ -40,6 +40,10 @@ extern void ptrArrayDelete (ptrArray *const current);
 extern bool ptrArrayHasTest (const ptrArray *const current,
 				  bool (*test)(const void *ptr, void *userData),
 				  void *userData);
+extern bool ptrArrayHasTestWithOffset (const ptrArray *const current,
+				  const unsigned int offset,
+				  bool (*test)(const void *ptr, void *userData),
+				  void *userData);
 extern bool ptrArrayHas (const ptrArray *const current, void *ptr);
 extern void ptrArrayReverse (const ptrArray *const current);
 extern void ptrArrayDeleteItem (ptrArray* const current, unsigned int indx);

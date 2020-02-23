@@ -100,16 +100,23 @@
 		}																\
 	}																	\
 																		\
-	extern bool prefix##ArrayHasTest (const prefix##Array *const current, \
+	extern bool prefix##ArrayHasTestWithOffset (const prefix##Array *const current, \
+									  const unsigned int offset,		\
 									  bool (*test)(const type num, void *userData),	\
 									  void *userData)					\
 	{																	\
 		bool result = false;											\
 		unsigned int i;													\
 		Assert (current != NULL);										\
-		for (i = 0  ;  ! result  &&  i < current->count  ;  ++i)		\
+		for (i = offset  ;  ! result  &&  i < current->count  ;  ++i)	\
 			result = (*test)(current->array [i], userData);				\
 		return result;													\
+	}																	\
+	extern bool prefix##ArrayHasTest (const prefix##Array *const current, \
+									  bool (*test)(const type num, void *userData),	\
+									  void *userData)					\
+	{																	\
+		return prefix##ArrayHasTestWithOffset (current, 0, test, userData);	\
 	}																	\
 																		\
 	static bool prefix##Eq (const type num, void *userData)				\

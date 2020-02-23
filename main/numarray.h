@@ -29,6 +29,10 @@
 	extern type prefix##ArrayItem (const prefix##Array *const current, const unsigned int indx); \
 	extern type prefix##ArrayLast (const prefix##Array *const current); \
 	extern void prefix##ArrayDelete (prefix##Array *const current);		\
+	extern bool prefix##ArrayHasTestWithOffsest (const prefix##Array *const current, \
+									  const unsigned int offset, \
+									  bool (*test)(const type num, void *userData), \
+									  void *userData);					\
 	extern bool prefix##ArrayHasTest (const prefix##Array *const current, \
 									  bool (*test)(const type num, void *userData), \
 									  void *userData);					\
