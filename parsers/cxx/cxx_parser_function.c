@@ -1690,10 +1690,7 @@ int cxxParserEmitFunctionTags(
 		cxxTokenDestroy(pIdentifier);
 	}
 
-	if(
-			bGotTemplate &&
-			cxxTagKindEnabled(CXXTagCPPKindTEMPLATEPARAM)
-		)
+	if(bGotTemplate)
 		cxxParserEmitTemplateParameterTags();
 
 	CXX_DEBUG_LEAVE();

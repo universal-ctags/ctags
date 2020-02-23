@@ -226,8 +226,8 @@ bool cxxParserParseAndCondenseCurrentSubchain(
 bool cxxParserParseUpToOneOf(unsigned int uTokenTypes,
 							 bool bCanReduceInnerElements);
 bool cxxParserParseIfForWhileSwitchCatchParenthesis(void);
-bool cxxParserParseTemplatePrefix(void);
-bool cxxParserParseTemplateAngleBracketsToSeparateChain(void);
+bool cxxParserParseTemplatePrefix(bool bTemplateSpecialization);
+bool cxxParserParseTemplateAngleBracketsToSeparateChain(bool bTemplateSpecialization);
 void cxxParserEmitTemplateParameterTags(void);
 bool cxxParserParseUsingClause(void);
 bool cxxParserParseAccessSpecifier(void);
