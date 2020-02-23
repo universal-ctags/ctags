@@ -318,21 +318,6 @@ cxxParserParseTemplateAngleBracketsInternal(bool bCaptureTypeParameters)
 					continue;
 				}
 
-				if(iGreaterThanCount > iMaxGreaterThanCount)
-				{
-					// ops! scanned one too much
-					// Possibly something like template<template<...>>
-
-					// invariant: at most one too much
-					CXX_DEBUG_ASSERT(iGreaterThanCount == (iMaxGreaterThanCount+1),"Bug");
-					CXX_DEBUG_ASSERT(iGreaterThanCount > 2,"Bug");
-
-					cxxParserUngetCurrentToken();
-
-					CXX_DEBUG_LEAVE_TEXT("Found end of template");
-					return CXXParserParseTemplateAngleBracketsSucceeded;
-				}
-
 				// Check greater than operator for the special conditions
 				// we can be sure of:
 				//    ... blah > 1 ...
@@ -348,6 +333,32 @@ cxxParserParseTemplateAngleBracketsInternal(bool bCaptureTypeParameters)
 				{
 					CXX_DEBUG_PRINT("Treating > as greater-than operator");
 					continue;
+				}
+
+				if(iGreaterThanCount > iMaxGreaterThanCount)
+				{
+					// Ops! scanned one too much.
+					// Since iMaxGreaterThanCount >= 2, we have scanned at least 3.
+					// Possibly something like template<template<...>>>
+
+					// invariant: at most one too much
+					CXX_DEBUG_ASSERT(iGreaterThanCount == (iMaxGreaterThanCount+1),"Bug");
+					CXX_DEBUG_ASSERT(iGreaterThanCount > 2,"Bug");
+
+					cxxParserUngetCurrentToken();
+
+					CXX_DEBUG_LEAVE_TEXT("Found end of template");
+					return CXXParserParseTemplateAngleBracketsSucceeded;
+				}
+
+				if(iGreaterThanCount > iNestedTemplateLevel)
+				{
+					CXX_DEBUG_ASSERT(iGreaterThanCount == (iNestedTemplateLevel + 1),"Bug");
+
+					cxxParserUngetCurrentToken();
+
+					CXX_DEBUG_LEAVE_TEXT("Found end of template");
+					return CXXParserParseTemplateAngleBracketsSucceeded;
 				}
 
 				CXX_DEBUG_PRINT("Decreasing template level by %d",iGreaterThanCount);
