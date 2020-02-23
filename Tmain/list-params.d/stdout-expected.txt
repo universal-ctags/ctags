@@ -1,36 +1,42 @@
 # ALL
-#LANGUAGE      NAME   DESCRIPTION
-CPreProcessor  define define replacement for an identifier (name(params,...)=definition)
-CPreProcessor  if0    examine code within "#if 0" branch (true or [false])
-CPreProcessor  ignore a token to be specially handled
-Fypp           guest  parser run after Fypp parser parses the original input ("NONE" or a parser name [Fortran])
+#LANGUAGE      NAME    DESCRIPTION
+CPreProcessor  _expand expand macro definitions found in input file (true or [false])
+CPreProcessor  define  define replacement for an identifier (name(params,...)=definition)
+CPreProcessor  if0     examine code within "#if 0" branch (true or [false])
+CPreProcessor  ignore  a token to be specially handled
+Fypp           guest   parser run after Fypp parser parses the original input ("NONE" or a parser name [Fortran])
 
 # ALL MACHINABLE
 #LANGUAGE	NAME	DESCRIPTION
+CPreProcessor	_expand	expand macro definitions found in input file (true or [false])
 CPreProcessor	define	define replacement for an identifier (name(params,...)=definition)
 CPreProcessor	if0	examine code within "#if 0" branch (true or [false])
 CPreProcessor	ignore	a token to be specially handled
 Fypp	guest	parser run after Fypp parser parses the original input ("NONE" or a parser name [Fortran])
 
 # ALL MACHINABLE NOHEADER
+CPreProcessor	_expand	expand macro definitions found in input file (true or [false])
 CPreProcessor	define	define replacement for an identifier (name(params,...)=definition)
 CPreProcessor	if0	examine code within "#if 0" branch (true or [false])
 CPreProcessor	ignore	a token to be specially handled
 Fypp	guest	parser run after Fypp parser parses the original input ("NONE" or a parser name [Fortran])
 
 # CPP
-#NAME   DESCRIPTION
-define  define replacement for an identifier (name(params,...)=definition)
-if0     examine code within "#if 0" branch (true or [false])
-ignore  a token to be specially handled
+#NAME    DESCRIPTION
+_expand  expand macro definitions found in input file (true or [false])
+define   define replacement for an identifier (name(params,...)=definition)
+if0      examine code within "#if 0" branch (true or [false])
+ignore   a token to be specially handled
 
 # CPP MACHINABLE
 #NAME	DESCRIPTION
+_expand	expand macro definitions found in input file (true or [false])
 define	define replacement for an identifier (name(params,...)=definition)
 if0	examine code within "#if 0" branch (true or [false])
 ignore	a token to be specially handled
 
 # CPP MACHINABLE NOHEADER
+_expand	expand macro definitions found in input file (true or [false])
 define	define replacement for an identifier (name(params,...)=definition)
 if0	examine code within "#if 0" branch (true or [false])
 ignore	a token to be specially handled
