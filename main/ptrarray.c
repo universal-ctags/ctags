@@ -121,10 +121,18 @@ extern bool ptrArrayHasTest (const ptrArray *const current,
 				  bool (*test)(const void *ptr, void *userData),
 				  void *userData)
 {
+	return ptrArrayHasTestFull (current, 0, test, userData);
+}
+
+extern bool ptrArrayHasTestFull (const ptrArray *const current,
+				  unsigned int offset,
+				  bool (*test)(const void *ptr, void *userData),
+				  void *userData)
+{
 	bool result = false;
 	unsigned int i;
 	Assert (current != NULL);
-	for (i = 0  ;  ! result  &&  i < current->count  ;  ++i)
+	for (i = offset  ;  ! result  &&  i < current->count  ;  ++i)
 		result = (*test)(current->array [i], userData);
 	return result;
 }
