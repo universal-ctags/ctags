@@ -1013,6 +1013,17 @@ extern const tagField* getParserFieldForIndex (const tagEntryInfo * tag, int ind
 	}
 }
 
+extern const char* getParserFieldValueForType (tagEntryInfo *const tag, fieldType ftype)
+{
+	for (int i = 0; i < tag->usedParserFields; i++)
+	{
+		const tagField *f = getParserFieldForIndex (tag, i);
+		if (f && f->ftype == ftype)
+			return f->value;
+	}
+	return NULL;
+}
+
 static void copyParserFields (const tagEntryInfo *const tag, tagEntryInfo* slot)
 {
 	unsigned int i;
