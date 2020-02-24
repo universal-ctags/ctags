@@ -159,4 +159,6 @@ int mio_flush (MIO *mio);
 void  mio_attach_user_data (MIO *mio, void *user_data, MIODestroyNotify user_data_free_func);
 void *mio_get_user_data (MIO *mio);
 
+int mio_try_resize (MIO *mio, size_t new_size);
+
 #endif /* MIO_H */
