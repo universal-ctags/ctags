@@ -456,6 +456,7 @@ void interactiveLoop (cookedArgs *args CTAGS_ATTR_UNUSED, void *user)
 				if (iargs->sandbox) {
 					error (FATAL,
 						   "invalid request in sandbox submode: reading file contents from a file is limited");
+					closeTagFile (false);
 					goto next;
 				}
 
