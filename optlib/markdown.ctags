@@ -26,7 +26,7 @@
 --map-Markdown=+.md
 --map-Markdown=+.markdown
 
---_scopesep-Markdown=*/*:"
+--_scopesep-Markdown=*/*:""
 
 --kinddef-Markdown=c,chapter,chapsters
 --kinddef-Markdown=s,section,sections
