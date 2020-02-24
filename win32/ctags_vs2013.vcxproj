@@ -252,6 +252,7 @@
     <ClCompile Include="..\parsers\tcl.c" />
     <ClCompile Include="..\parsers\tcloo.c" />
     <ClCompile Include="..\parsers\tex.c" />
+    <ClCompile Include="..\parsers\tex-beamer.c" />
     <ClCompile Include="..\parsers\ttcn.c" />
     <ClCompile Include="..\parsers\typescript.c" />
     <ClCompile Include="..\parsers\verilog.c" />
@@ -344,6 +345,7 @@
     <ClInclude Include="..\parsers\make.h" />
     <ClInclude Include="..\parsers\perl.h" />
     <ClInclude Include="..\parsers\tcl.h" />
+    <ClInclude Include="..\parsers\tex.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>

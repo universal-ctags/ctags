@@ -1,0 +1,6 @@
+input-1	input.tex	/^\\include{input-1}$/;"	i	roles:included
+input-2	input.tex	/^\\input{input-2}$/;"	i	roles:input
+input-3	input.tex	/^\\bibliography{input-3}$/;"	i	roles:bibliography
+The first section	input-1.tex	/^\\section {The first section}$/;"	s	roles:def
+The second section	input-2.tex	/^\\section {The second section}$/;"	s	roles:def
+1957-doe_loc_ident	input-3.bib	/^@article{1957-doe_loc_ident,$/;"	a	roles:def

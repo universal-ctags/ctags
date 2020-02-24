@@ -29,6 +29,8 @@
 #include "routines.h"
 #include "vstring.h"
 
+#include "tex.h"
+
 /*
  *	 MACROS
  */
@@ -54,7 +56,14 @@ enum eKeywordId {
 	KEYWORD_paragraph,
 	KEYWORD_subparagraph,
 	KEYWORD_label,
-	KEYWORD_include
+	KEYWORD_include,
+	KEYWORD_input,
+	KEYWORD_begin,
+	KEYWORD_end,
+	KEYWORD_bibitem,
+	KEYWORD_bibliography,
+	KEYWORD_newcommand,
+	KEYWORD_newcounter,
 };
 typedef int keywordId; /* to allow KEYWORD_NONE */
 
@@ -105,9 +114,27 @@ typedef enum {
 	TEXTAG_PARAGRAPH,
 	TEXTAG_SUBPARAGRAPH,
 	TEXTAG_LABEL,
-	TEXTAG_INCLUDE,
+	TEXTAG_XINPUT,
+	TEXTAG_BIBITEM,
+	TEXTAG_COMMAND,
+	TEXTAG_COUNTER,
 	TEXTAG_COUNT
 } texKind;
+
+typedef enum {
+	TEX_XINPUT_INCLUDED,
+	TEX_XINPUT_INPUT,
+	TEX_XINPUT_BIBLIOGRAPHY,
+} texInputRole;
+
+static roleDefinition TexInputRoles [] = {
+	{ true, "included",
+	  "external input file specified with \\include" },
+	{ true, "input",
+	  "external input file specified with \\input" },
+	{ true, "bibliography",
+	  "bibliography (.bib) file" },
+};
 
 static kindDefinition TexKinds [] = {
 	{ true,  'p', "part",			  "parts"			   },
@@ -118,7 +145,11 @@ static kindDefinition TexKinds [] = {
 	{ true,  'P', "paragraph",		  "paragraphs"		   },
 	{ true,  'G', "subparagraph",	  "subparagraphs"	   },
 	{ true,  'l', "label",			  "labels"			   },
-	{ true,  'i', "include",	  	  "includes"		   }
+	{ true,  'i', "xinput",			  "external input files",
+	  .referenceOnly = true, ATTACH_ROLES(TexInputRoles)   },
+	{ true,  'B', "bibitem",		  "bibliography items" },
+	{ true,  'C', "command",		  "command created with \\newcommand" },
+	{ true,  'N', "counter",		  "counter created with \\newcounter" },
 };
 
 static const keywordTable TexKeywordTable [] = {
@@ -131,8 +162,24 @@ static const keywordTable TexKeywordTable [] = {
 	{ "paragraph",		KEYWORD_paragraph			},
 	{ "subparagraph",	KEYWORD_subparagraph		},
 	{ "label",			KEYWORD_label				},
-	{ "include",		KEYWORD_include				}
+	{ "include",		KEYWORD_include				},
+	{ "input",			KEYWORD_input				},
+	{ "begin",			KEYWORD_begin				},
+	{ "end",			KEYWORD_end					},
+	{ "bibitem",		KEYWORD_bibitem				},
+	{ "bibliography",	KEYWORD_bibliography		},
+	{ "newcommand",		KEYWORD_newcommand			},
+	{ "newcounter",		KEYWORD_newcounter			},
 };
+
+/*
+ * FUNCTION DECLARATIONS
+ */
+
+static bool notifyReadingIdentifier  (tokenInfo *id_token, bool *tokenUnprocessed);
+static bool notifyReadingBeginEnvironment (tokenInfo *token, vString *envName, bool *tokenUnprocessed);
+static bool notifyReadingEndEnvironment (vString *envName);
+
 
 /*
  *	 FUNCTION DEFINITIONS
@@ -224,8 +271,10 @@ static int getScopeInfo(texKind kind, vString *const parentName)
 /*
  *	 Tag generation functions
  */
-static void makeTexTag (tokenInfo *const token, texKind kind)
+static int makeTexTag (tokenInfo *const token, texKind kind,
+					   int roleIndex)
 {
+	int corkQueue = CORK_NIL;
 	if (TexKinds [kind].enabled)
 	{
 		const char *const name = vStringValue (token->string);
@@ -243,9 +292,12 @@ static void makeTexTag (tokenInfo *const token, texKind kind)
 			e.extensionFields.scopeName = vStringValue(parentName);
 		}
 
-		makeTagEntry (&e);
+		assignRole (&e, roleIndex);
+
+		corkQueue = makeTagEntry (&e);
 		vStringDelete (parentName);
 	}
+	return corkQueue;
 }
 
 /*
@@ -354,133 +406,8 @@ static void copyToken (tokenInfo *const dest, tokenInfo *const src)
 	vStringCopy (dest->scope, src->scope);
 }
 
-/*
- *	 Scanning functions
- */
-
-static bool parseTag (tokenInfo *const token, texKind kind)
+static void updateScopeInfo (texKind kind, vString *fullname)
 {
-	tokenInfo *const name = newToken ();
-	vString *	fullname;
-	bool		useLongName = true;
-	bool        eof = false;
-
-	fullname = vStringNew ();
-
-	/*
-	 * Tex tags are of these formats:
-	 *   \keyword{any number of words}
-	 *   \keyword[short desc]{any number of words}
-	 *   \keyword*[short desc]{any number of words}
-	 *
-	 * When a keyword is found, loop through all words within
-	 * the curly braces for the tag name.
-	 *
-	 * If the keyword is label like \label, words in the square
-	 * brackets are skipped.
-	 */
-	bool enterSquare = (kind == TEXTAG_LABEL)? false: true;
-
-	if (isType (token, TOKEN_KEYWORD))
-	{
-		copyToken (name, token);
-		if (!readToken (token))
-		{
-			eof = true;
-			goto out;
-		}
-	}
-
-	if (isType (token, TOKEN_OPEN_SQUARE))
-	{
-		if (enterSquare)
-			useLongName = false;
-
-		if (!readToken (token))
-		{
-			eof = true;
-			goto out;
-		}
-		while (! isType (token, TOKEN_CLOSE_SQUARE) )
-		{
-			if (enterSquare
-				&& isType (token, TOKEN_IDENTIFIER))
-			{
-				if (vStringLength (fullname) > 0)
-					vStringPut (fullname, ' ');
-				vStringCat (fullname, token->string);
-			}
-			if (!readToken (token))
-			{
-				eof = true;
-				goto out;
-			}
-		}
-		if (enterSquare)
-		{
-			vStringCopy (name->string, fullname);
-			makeTexTag (name, kind);
-		}
-		else if (!readToken (token))
-		{
-			eof = true;
-			goto out;
-		}
-	}
-
-	if (isType (token, TOKEN_STAR))
-	{
-		if (!readToken (token))
-		{
-			eof = true;
-			goto out;
-		}
-	}
-
-	if (isType (token, TOKEN_OPEN_CURLY))
-	{
-		int depth = 1;
-
-		if (!readToken (token))
-		{
-			eof = true;
-			goto out;
-		}
-		while (depth > 0)
-		{
-			/* if (isType (token, TOKEN_IDENTIFIER) && useLongName) */
-			if (useLongName)
-			{
-				if (isType (token, TOKEN_IDENTIFIER) || isType (token, TOKEN_KEYWORD))
-					vStringCat (fullname, token->string);
-				else
-					vStringPut (fullname, token->type);
-			}
-			if (!readTokenFull (token, useLongName))
-			{
-				eof = true;
-				goto out;
-			}
-			else if (isType (token, TOKEN_OPEN_CURLY))
-				depth++;
-			else if (isType (token, TOKEN_CLOSE_CURLY))
-				depth--;
-		}
-		if (useLongName)
-		{
-			vStringStripTrailing (fullname);
-			if (vStringLength (fullname) > 0)
-			{
-				vStringCopy (name->string, fullname);
-				makeTexTag (name, kind);
-			}
-		}
-	}
-
-	/*
-	 * save the name of the last section definitions for scope-resolution
-	 * later
-	 */
 	switch (kind)
 	{
 		case TEXTAG_PART:
@@ -511,57 +438,455 @@ static bool parseTag (tokenInfo *const token, texKind kind)
 		default:
 			break;
 	}
+}
 
- out:
-	deleteToken (name);
-	vStringDelete (fullname);
+/*
+ *	 Scanning functions
+ */
+
+/* STRATEGY array represents the sequence of * expected tokens. If an
+ * input token matches the current * expectation (the current strategy),
+ * parseWithStrategy() runs * the actions attached to the strategy.
+ *
+ * The actions are making a tag with the kind specified with kindIndex
+ * field of the current strategy and/or storing a name to NAME field
+ * of the current strategy.
+ *
+ * If the input token doesn't much the current strategy, above actions
+ * are not run. If TEX_NAME_FLAG_OPTIONAL is specified in FLAGS field
+ * of the current specified, parseWithStrategy() tries the next
+ * strategy of STRATEGY array without reading a new token.  If
+ * TEX_NAME_FLAG_OPTIONAL is not in FLAGS field, parseWithStrategy()
+ * returns the control to its caller immediately.
+ *
+ * TOKENUNPROCESSED is used for both input and output.  As input,
+ * TOKENUNPROCESSED tells whether parseWithStrategy() should read a
+ * new token before matching the STRATEGY array or not.  If
+ * TOKENUNPROCESSED is true, parseWithStrategy function reads a new
+ * token before matching.  As output, TOKENUNPROCESSED tells the
+ * caller of parseWithStrategy() that a new token is already stored to
+ * TOKEN but parseWithStrategy() has not processed yet.
+ */
+static bool parseWithStrategy (tokenInfo *token,
+							   struct TexParseStrategy *strategy,
+							   bool *tokenUnprocessed)
+{
+	bool next_token = !*tokenUnprocessed;
+	tokenInfo * name = NULL;
+	bool eof = false;
+	bool exclusive = false;
+
+	for (struct TexParseStrategy *s = strategy; s->type != 0; ++s)
+		s->corkIndex = CORK_NIL;
+
+	for (struct TexParseStrategy *s = strategy; !eof && s->type != 0; ++s)
+	{
+		if (s->kindIndex != KIND_GHOST_INDEX || s->name)
+		{
+			name = newToken ();
+			break;
+		}
+	}
+
+	for (struct TexParseStrategy *s = strategy; !eof && s->type != 0; ++s)
+	{
+		bool capture_name = s->kindIndex != KIND_GHOST_INDEX || s->name;
+
+		if (next_token)
+		{
+			if (!readToken (token))
+			{
+				eof = true;
+				break;
+			}
+		}
+
+		if ((s->type == '<' && isType (token, '<'))
+			|| (s->type == '[' && isType (token, '[')))
+		{
+			tokenType terminator = (s->type == '<') ? '>' : ']';
+
+			next_token = true;
+
+
+			if (!readToken (token))
+			{
+				eof = true;
+				break;
+			}
+			if (capture_name)
+			{
+				copyToken (name, token);
+				vStringClear (name->string);
+			}
+
+			while (! isType (token, terminator))
+			{
+				if (capture_name && isType (token, TOKEN_IDENTIFIER))
+				{
+					if (vStringLength (name->string) > 0)
+						vStringPut (name->string, ' ');
+					vStringCat (name->string, token->string);
+				}
+
+				if (!readTokenFull (token,
+									s->flags & TEX_NAME_FLAG_INCLUDING_WHITESPACE))
+				{
+					eof = true;
+					break;
+				}
+			}
+			if (!exclusive && capture_name && vStringLength (name->string) > 0)
+			{
+				if (s->kindIndex != KIND_GHOST_INDEX)
+					s->corkIndex = makeTexTag (name, s->kindIndex, s->roleIndex);
+
+				if (s->name)
+					vStringCopy(s->name, name->string);
+
+				if (s->flags & TEX_NAME_FLAG_EXCLUSIVE)
+					exclusive = true;
+			}
+		}
+		else if (s->type == '*' && isType (token, '*'))
+			next_token = true;
+		else if (s->type == '{' && isType (token, '{'))
+		{
+			int depth = 1;
+
+			next_token = true;
+
+			if (!readToken (token))
+			{
+				eof = true;
+				break;
+			}
+			if (capture_name)
+			{
+				copyToken (name, token);
+				vStringClear (name->string);
+			}
+
+			/* Handle the case the code like \section{} */
+			if (isType (token, '}'))
+				break;
+			while (depth > 0)
+			{
+				if (capture_name)
+				{
+					if (isType (token, TOKEN_IDENTIFIER) || isType (token, TOKEN_KEYWORD))
+						vStringCat (name->string, token->string);
+					else
+						vStringPut (name->string, token->type);
+				}
+				if (!readTokenFull (token,
+									s->flags & TEX_NAME_FLAG_INCLUDING_WHITESPACE))
+				{
+					eof = true;
+					break;
+				}
+				else if (isType (token, TOKEN_OPEN_CURLY))
+					depth++;
+				else if (isType (token, TOKEN_CLOSE_CURLY))
+					depth--;
+			}
+			if (!exclusive && depth == 0 && capture_name && vStringLength (name->string) > 0)
+			{
+				vStringStripTrailing (name->string);
+
+				if (s->kindIndex != KIND_GHOST_INDEX)
+					s->corkIndex = makeTexTag (name, s->kindIndex, s->roleIndex);
+
+				if (s->name)
+					vStringCopy(s->name, name->string);
+
+				if (s->flags & TEX_NAME_FLAG_EXCLUSIVE)
+					exclusive = true;
+
+			}
+		}
+		else if (s->flags & TEX_NAME_FLAG_OPTIONAL)
+			/* Apply next strategy to the same token */
+			next_token = false;
+		else
+		{
+			*tokenUnprocessed = true;
+			break;
+		}
+	}
+
+	if (name)
+		deleteToken (name);
+
 	return eof;
 }
 
-static void parseTexFile (tokenInfo *const token)
+static bool parseTagFull (tokenInfo *const token, texKind kind, int roleIndex, bool enterSquare, bool *tokenUnprocessed)
+{
+	bool eof = false;
+	vString *taggedName = vStringNew();
+
+	/*
+	 * Tex tags are of these formats:
+	 *   \keyword{any number of words}
+	 *   \keyword[short desc]{any number of words}
+	 *   \keyword*[short desc]{any number of words}
+	 *
+	 * When a keyword is found, loop through all words within
+	 * the curly braces for the tag name.
+	 *
+	 * If the keyword is label like \label, words in the square
+	 * brackets should be skipped. This can be controlled
+	 * with `enterSquare' parameter; true is for tagging, and
+	 * false is for skipping.
+	 */
+
+	struct TexParseStrategy strategy [] = {
+		{
+			.type = '[',
+			.flags = TEX_NAME_FLAG_OPTIONAL,
+			/* .kindIndex is initialized dynamically. */
+		},
+		{
+			.type = '*',
+			.flags = TEX_NAME_FLAG_OPTIONAL,
+			.kindIndex = KIND_GHOST_INDEX,
+			.name = NULL,
+		},
+		{
+			.type = '{',
+			.flags = TEX_NAME_FLAG_INCLUDING_WHITESPACE,
+			.kindIndex = kind,
+			.roleIndex = roleIndex,
+			.name = taggedName,
+		},
+		{
+			.type = 0
+		}
+	};
+
+
+	if (enterSquare)
+	{
+		strategy [0].kindIndex = kind;
+		strategy [0].roleIndex = roleIndex;
+		strategy [0].flags |= TEX_NAME_FLAG_EXCLUSIVE;
+		strategy [0].name = taggedName;
+	}
+	else
+	{
+		strategy [0].kindIndex = KIND_GHOST_INDEX;
+		strategy [0].name = NULL;
+	}
+
+	if (parseWithStrategy (token, strategy, tokenUnprocessed))
+	{
+		eof = true;
+		goto out;
+	}
+
+	/*
+	 * save the name of the last section definitions for scope-resolution
+	 * later
+	 */
+	if (vStringLength (taggedName) > 0)
+		updateScopeInfo (kind, taggedName);
+
+ out:
+	vStringDelete (taggedName);
+
+	return eof;
+}
+
+static bool parseTag (tokenInfo *const token, texKind kind,
+					  bool enterSquare, bool *tokenUnprocessed)
+{
+	return parseTagFull (token, kind, ROLE_DEFINITION_INDEX,
+						 enterSquare, tokenUnprocessed);
+}
+
+static bool parseEnv (tokenInfo *const token, bool begin, bool *tokenUnprocessed)
+{
+	bool eof = false;
+	vString *envName = vStringNew ();
+	struct TexParseStrategy strategy [] = {
+		{
+			.type = '{',
+			.flags = TEX_NAME_FLAG_INCLUDING_WHITESPACE,
+			.kindIndex = KIND_GHOST_INDEX,
+			.name = envName,
+		},
+		{
+			.type = 0
+		}
+	};
+
+	if (parseWithStrategy (token, strategy, tokenUnprocessed))
+	{
+		eof = true;
+		goto out;
+	}
+
+
+	if (vStringLength (envName) > 0)
+	{
+		if (begin)
+			eof = notifyReadingBeginEnvironment (token, envName, tokenUnprocessed);
+		else
+			eof = notifyReadingEndEnvironment (envName);
+	}
+
+ out:
+	vStringDelete (envName);
+
+	return eof;
+
+}
+
+static bool parseNewcommand (tokenInfo *const token, bool *tokenUnprocessed)
 {
 	bool eof = false;
 
+	/* \newcommand {cmd}[args][opt]{def} */
+	struct TexParseStrategy strategy [] = {
+		{
+			.type = '{',
+			.flags = 0,
+			.kindIndex = TEXTAG_COMMAND,
+			.roleIndex = ROLE_DEFINITION_INDEX,
+			.name = NULL,
+		},
+		{
+			.type = '[',
+			.flags = TEX_NAME_FLAG_OPTIONAL,
+			.kindIndex = KIND_GHOST_INDEX,
+			.name = NULL,
+		},
+		{
+			.type = '[',
+			.flags = TEX_NAME_FLAG_OPTIONAL,
+			.kindIndex = KIND_GHOST_INDEX,
+			.name = NULL,
+		},
+		{
+			.type = '{',
+			.flags = 0,
+			.kindIndex = KIND_GHOST_INDEX,
+			.name = NULL,
+		},
+		{
+			.type = 0
+		}
+	};
+
+	if (parseWithStrategy (token, strategy, tokenUnprocessed))
+		eof = true;
+
+	return eof;
+}
+
+static bool parseNewcounter (tokenInfo *const token, bool *tokenUnprocessed)
+{
+	bool eof = false;
+	/* \newccounter {counter}[parentCounter] */
+	struct TexParseStrategy strategy [] = {
+		{
+			.type = '{',
+			.flags = 0,
+			.kindIndex = TEXTAG_COUNTER,
+			.roleIndex = ROLE_DEFINITION_INDEX,
+			.name = NULL,
+		},
+		{
+			.type = '[',
+			.flags = 0,
+			.kindIndex = KIND_GHOST_INDEX,
+			.name = NULL,
+		},
+		{
+			.type = 0
+		}
+	};
+
+	if (parseWithStrategy (token, strategy, tokenUnprocessed))
+		eof = true;
+
+	return eof;
+}
+static void parseTexFile (tokenInfo *const token)
+{
+	bool eof = false;
+	bool tokenUnprocessed = false;
+
 	do
 	{
-		if (!readToken (token))
-			break;
+		if (!tokenUnprocessed)
+		{
+			if (!readToken (token))
+				break;
+		}
+		tokenUnprocessed = false;
 
 		if (isType (token, TOKEN_KEYWORD))
 		{
 			switch (token->keyword)
 			{
 				case KEYWORD_part:
-					eof = parseTag (token, TEXTAG_PART);
+					eof = parseTag (token, TEXTAG_PART, true, &tokenUnprocessed);
 					break;
 				case KEYWORD_chapter:
-					eof = parseTag (token, TEXTAG_CHAPTER);
+					eof = parseTag (token, TEXTAG_CHAPTER, true, &tokenUnprocessed);
 					break;
 				case KEYWORD_section:
-					eof = parseTag (token, TEXTAG_SECTION);
+					eof = parseTag (token, TEXTAG_SECTION, true, &tokenUnprocessed);
 					break;
 				case KEYWORD_subsection:
-					eof = parseTag (token, TEXTAG_SUBSECTION);
+					eof = parseTag (token, TEXTAG_SUBSECTION, true, &tokenUnprocessed);
 					break;
 				case KEYWORD_subsubsection:
-					eof = parseTag (token, TEXTAG_SUBSUBSECTION);
+					eof = parseTag (token, TEXTAG_SUBSUBSECTION, true, &tokenUnprocessed);
 					break;
 				case KEYWORD_paragraph:
-					eof = parseTag (token, TEXTAG_PARAGRAPH);
+					eof = parseTag (token, TEXTAG_PARAGRAPH, true, &tokenUnprocessed);
 					break;
 				case KEYWORD_subparagraph:
-					eof = parseTag (token, TEXTAG_SUBPARAGRAPH);
+					eof = parseTag (token, TEXTAG_SUBPARAGRAPH, true, &tokenUnprocessed);
 					break;
 				case KEYWORD_label:
-					eof = parseTag (token, TEXTAG_LABEL);
+					eof = parseTag (token, TEXTAG_LABEL, false, &tokenUnprocessed);
 					break;
 				case KEYWORD_include:
-					eof = parseTag (token, TEXTAG_INCLUDE);
+					eof = parseTagFull (token, TEXTAG_XINPUT, TEX_XINPUT_INCLUDED,
+										false, &tokenUnprocessed);
+					break;
+				case KEYWORD_input:
+					eof = parseTagFull (token, TEXTAG_XINPUT, TEX_XINPUT_INPUT,
+										false, &tokenUnprocessed);
+					break;
+				case KEYWORD_begin:
+					eof = parseEnv (token, true, &tokenUnprocessed);
+					break;
+				case KEYWORD_end:
+					eof = parseEnv (token, false, &tokenUnprocessed);
+					break;
+				case KEYWORD_bibitem:
+					eof = parseTag (token, TEXTAG_BIBITEM, false, &tokenUnprocessed);
+					break;
+				case KEYWORD_bibliography:
+					eof = parseTagFull (token, TEXTAG_XINPUT, TEX_XINPUT_BIBLIOGRAPHY,
+										false, &tokenUnprocessed);
+				case KEYWORD_newcommand:
+					eof = parseNewcommand (token, &tokenUnprocessed);
+					break;
+				case KEYWORD_newcounter:
+					eof = parseNewcounter (token, &tokenUnprocessed);
 					break;
 				default:
 					break;
 			}
 		}
+		else if (isType (token, TOKEN_IDENTIFIER))
+			eof = notifyReadingIdentifier (token, &tokenUnprocessed);
 		if (eof)
 			break;
 	} while (true);
@@ -604,6 +929,95 @@ static void findTexTags (void)
 	parseTexFile (token);
 
 	deleteToken (token);
+}
+
+static bool notifyReadingIdentifier (tokenInfo *id_token, bool *tokenUnprocessed)
+{
+	subparser *sub;
+	bool eof = false;
+
+	foreachSubparser (sub, false)
+	{
+		texSubparser *texsub = (texSubparser *)sub;
+
+		if (texsub->readIdentifierNotify)
+		{
+			struct TexParseStrategy *strategy;
+
+			enterSubparser(sub);
+
+			strategy = texsub->readIdentifierNotify (texsub, id_token->string);
+
+			if (strategy)
+			{
+				eof = parseWithStrategy (id_token, strategy, tokenUnprocessed);
+				if (texsub->reportStrategicParsing)
+					texsub->reportStrategicParsing (texsub, strategy);
+			}
+
+			leaveSubparser();
+
+			if (strategy)
+				break;
+		}
+	}
+
+	return eof;
+}
+
+static bool notifyReadingBeginEnvironment (tokenInfo *token,
+										   vString *envName,
+										   bool *tokenUnprocessed)
+{
+	subparser *sub;
+	bool eof = false;
+
+	foreachSubparser (sub, false)
+	{
+		texSubparser *texsub = (texSubparser *)sub;
+
+		if (texsub->readEnviromentBeginNotify)
+		{
+			struct TexParseStrategy *strategy;
+
+			enterSubparser (sub);
+			strategy = texsub->readEnviromentBeginNotify (texsub, envName);
+			if (strategy)
+			{
+				eof = parseWithStrategy (token, strategy, tokenUnprocessed);
+				if (texsub->reportStrategicParsing)
+					texsub->reportStrategicParsing (texsub, strategy);
+			}
+			leaveSubparser ();
+			if (strategy)
+				break;
+		}
+	}
+
+	return eof;
+}
+
+static bool notifyReadingEndEnvironment (vString  *envName)
+{
+	subparser *sub;
+
+	foreachSubparser (sub, false)
+	{
+		texSubparser *texsub = (texSubparser *)sub;
+
+		if (texsub->readEnviromentEndNotify)
+		{
+			bool consuming;
+
+			enterSubparser (sub);
+			consuming = texsub->readEnviromentEndNotify (texsub, envName);
+			leaveSubparser ();
+			if (consuming)
+				break;
+		}
+	}
+
+	return false;
 }
 
 /* Create parser definition structure */

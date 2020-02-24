@@ -20,6 +20,7 @@
 .bzrignore
 .cvsignore
 .deps
+.dvi
 .git
 .gitattributes
 .gitignore

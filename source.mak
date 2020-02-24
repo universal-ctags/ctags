@@ -180,6 +180,7 @@ PARSER_HEADS = \
 	parsers/make.h \
 	parsers/perl.h \
 	parsers/tcl.h \
+	parsers/tex.h \
 	\
 	$(NULL)
 
@@ -273,6 +274,7 @@ PARSER_SRCS =				\
 	parsers/tcl.c			\
 	parsers/tcloo.c			\
 	parsers/tex.c			\
+	parsers/tex-beamer.c		\
 	parsers/ttcn.c			\
 	parsers/typescript.c		\
 	parsers/verilog.c		\
