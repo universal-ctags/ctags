@@ -3449,7 +3449,15 @@ static bool createTagsWithFallback1 (const langType language,
 
 	addParserPseudoTags (language);
 	initializeParserStats (parser);
-	tagFilePosition (&tagfpos);
+	switch (tagFilePosition (&tagfpos))
+	{
+	case -1:
+		error (FATAL|PERROR, "failed in tagFilePosition\n");
+		break;
+	case -2:
+		error (FATAL, "failed in tagFilePosition\n");
+		break;
+	}
 
 	anonResetMaybe (parser);
 
@@ -3468,7 +3476,16 @@ static bool createTagsWithFallback1 (const langType language,
 		{
 			/*  Restore prior state of tag file.
 			*/
-			setTagFilePosition (&tagfpos);
+			switch (setTagFilePosition (&tagfpos))
+			{
+			case -1:
+				error (FATAL|PERROR, "failed in setTagFilePosition\n");
+				break;
+			case -2:
+				error (FATAL, "failed in setTagFilePosition\n");
+				break;
+			}
+
 			setNumTagsAdded (numTags);
 			writerRescanFailed (numTags);
 			tagFileResized = true;

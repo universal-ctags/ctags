@@ -38,8 +38,8 @@ extern void setNumTagsAdded (unsigned long nadded);
 extern unsigned long numTagsTotal(void);
 extern unsigned long maxTagsLine(void);
 extern void invalidatePatternCache(void);
-extern void tagFilePosition (MIOPos *p);
-extern void setTagFilePosition (MIOPos *p);
+extern int tagFilePosition (MIOPos *p);
+extern int setTagFilePosition (MIOPos *p);
 extern const char* getTagFileDirectory (void);
 extern void getTagScopeInformation (tagEntryInfo *const tag,
 				    const char **kind, const char **name);

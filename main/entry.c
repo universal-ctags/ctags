@@ -1916,16 +1916,18 @@ extern void invalidatePatternCache(void)
 	TagFile.patternCacheValid = false;
 }
 
-extern void tagFilePosition (MIOPos *p)
+extern int tagFilePosition (MIOPos *p)
 {
 	if (TagFile.mio)
-		mio_getpos (TagFile.mio, p);
+		return mio_getpos (TagFile.mio, p);
+	return -2;
 }
 
-extern void setTagFilePosition (MIOPos *p)
+extern int setTagFilePosition (MIOPos *p)
 {
 	if (TagFile.mio)
-		mio_setpos (TagFile.mio, p);
+		return mio_setpos (TagFile.mio, p);
+	return -2;
 }
 
 extern const char* getTagFileDirectory (void)
