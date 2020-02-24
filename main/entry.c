@@ -2001,14 +2001,24 @@ extern void invalidatePatternCache(void)
 
 extern void tagFilePosition (MIOPos *p)
 {
-	if (TagFile.mio)
-		mio_getpos (TagFile.mio, p);
+	/* mini-geany doesn't set TagFile.mio. */
+	if 	(TagFile.mio == NULL)
+		return;
+
+	if (mio_getpos (TagFile.mio, p) == -1)
+		error (FATAL|PERROR,
+			   "failed to get file position of the tag file\n");
 }
 
 extern void setTagFilePosition (MIOPos *p)
 {
-	if (TagFile.mio)
-		mio_setpos (TagFile.mio, p);
+	/* mini-geany doesn't set TagFile.mio. */
+	if 	(TagFile.mio == NULL)
+		return;
+
+	if (mio_setpos (TagFile.mio, p) == -1)
+		error (FATAL|PERROR,
+			   "failed to set file position of the tag file\n");
 }
 
 extern const char* getTagFileDirectory (void)
