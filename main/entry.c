@@ -388,20 +388,13 @@ extern void openTagFile (void)
 	 */
 	if (TagsToStdout)
 	{
-		if (Option.sorted == SO_UNSORTED)
+		if (Option.interactive == INTERACTIVE_SANDBOX)
 		{
-			/* Passing NULL for keeping stdout open.
-			   stdout can be used for debugging purpose.*/
-			TagFile.mio = mio_new_fp(stdout, NULL);
-			TagFile.name = eStrdup ("/dev/stdout");
+			TagFile.mio = mio_new_memory (NULL, 0, eRealloc, eFreeNoNullCheck);
+			TagFile.name = NULL;
 		}
 		else
-		{
-			/* Open a tempfile with read and write mode. Read mode is used when
-			 * write the result to stdout. */
 			TagFile.mio = tempFile ("w+", &TagFile.name);
-		}
-
 		if (isXtagEnabled (XTAG_PSEUDO_TAGS))
 			addCommonPseudoTags ();
 	}
@@ -563,6 +556,12 @@ static void resizeTagFile (const long newSize)
 {
 	int result;
 
+	if (!TagFile.name)
+	{
+		mio_try_resize (TagFile.mio, newSize);
+		return;
+	}
+
 #ifdef USE_REPLACEMENT_TRUNCATE
 	result = replacementTruncate (TagFile.name, newSize);
 #else
@@ -611,13 +610,6 @@ extern void closeTagFile (const bool resize)
 		writeEtagsIncludes (TagFile.mio);
 	mio_flush (TagFile.mio);
 
-	if ((TagsToStdout && (Option.sorted == SO_UNSORTED)))
-	{
-		if (mio_unref (TagFile.mio) != 0)
-			error (FATAL | PERROR, "cannot close tag file");
-		goto out;
-	}
-
 	abort_if_ferror (TagFile.mio);
 	desiredSize = mio_tell (TagFile.mio);
 	mio_seek (TagFile.mio, 0L, SEEK_END);
@@ -631,7 +623,7 @@ extern void closeTagFile (const bool resize)
 	{
 		DebugStatement (
 			debugPrintf (DEBUG_STATUS, "shrinking %s from %ld to %ld bytes\n",
-				TagFile.name, size, desiredSize); )
+				TagFile.name? TagFile.name: "<mio>", size, desiredSize); )
 		resizeTagFile (desiredSize);
 	}
 	sortTagFile ();
@@ -639,11 +631,13 @@ extern void closeTagFile (const bool resize)
 	{
 		if (mio_unref (TagFile.mio) != 0)
 			error (FATAL | PERROR, "cannot close tag file");
-		remove (tagFileName ());  /* remove temporary file */
+		if (TagFile.name)
+			remove (TagFile.name);  /* remove temporary file */
 	}
 
- out:
-	eFree (TagFile.name);
+	TagFile.mio = NULL;
+	if (TagFile.name)
+		eFree (TagFile.name);
 	TagFile.name = NULL;
 }
 
