@@ -70,6 +70,7 @@ static bool endEtagsFile (tagWriter *writer,
 	struct sEtags *etags = writer->private;
 
 	mio_printf (mainfp, "\f\n%s,%ld\n", filename, (long) etags->byteCount);
+	setNumTagsAdded (numTagsAdded () + 1);
 	abort_if_ferror (mainfp);
 
 	if (etags->mio != NULL)
