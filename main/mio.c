@@ -648,6 +648,11 @@ static int mem_try_resize (MIO *mio, size_t new_size)
 	return success;
 }
 
+int mio_try_resize (MIO *mio, size_t new_size)
+{
+	return mem_try_resize (mio, new_size);
+}
+
 /*
  * mem_try_ensure_space:
  * @mio: A #MIO object
