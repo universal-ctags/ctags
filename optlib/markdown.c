@@ -457,7 +457,7 @@ extern parserDefinition* MarkdownParser (void)
 	def->kindCount     = ARRAY_SIZE(MarkdownKindTable);
 	def->fieldTable    = MarkdownFieldTable;
 	def->fieldCount    = ARRAY_SIZE(MarkdownFieldTable);
-	def->defaultScopeSeparator = "\"";
+	def->defaultScopeSeparator = "\"\"";
 	def->initialize    = initializeMarkdownParser;
 
 	return def;
