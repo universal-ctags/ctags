@@ -33,6 +33,12 @@ LIBS += $(shell pkg-config --libs yaml-0.1)
 PARSER_SRCS += $(YAML_SRCS)
 PARSER_HEADS += $(YAML_HEADS)
 endif
+ifeq (yes, $(WITH_XML))
+CFLAGS += -DHAVE_LIBXML=1 $(shell pkg-config --cflags libxml-2.0)
+LIBS += $(shell pkg-config --libs libxml-2.0)
+PARSER_SRCS += $(XML_SRCS)
+PARSER_HEADS += $(XML_HEADS)
+endif
 
 ifdef DEBUG
 DEFINES += -DDEBUG
