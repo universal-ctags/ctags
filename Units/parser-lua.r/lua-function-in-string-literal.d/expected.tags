@@ -1,0 +1,9 @@
+caller	input.lua	/^local function caller(str, foo)$/;"	f
+a	input.lua	/^function a()$/;"	f
+ab	input.lua	/^function ab()$/;"	f
+abc	input.lua	/^function abc ()$/;"	f
+e	input.lua	/^function e ()$/;"	f
+ef	input.lua	/^function ef ()$/;"	f
+x	input.lua	/^x = function()$/;"	f
+y	input.lua	/^y = function ()$/;"	f
+z	input.lua	/^z = function  ()$/;"	f

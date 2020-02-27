@@ -14,6 +14,7 @@
 
 #include <string.h>
 
+#include "debug.h"
 #include "parse.h"
 #include "read.h"
 #include "routines.h"
@@ -64,35 +65,46 @@ static bool isLuaIdentifier (char c)
 
 static void extract_next_token (const char *begin, const char *end_sentinel, vString *name)
 {
-	bool found;
-
 	if (begin == NULL || end_sentinel == NULL)
 		return;
 
-	if (! (begin < end_sentinel))
+	Assert (begin <= end_sentinel);
+
+	/* Both on '(' */
+	if (begin == end_sentinel)
 		return;
 
+	/* Trim prefixed white spaces  */
 	while (isspace ((int) *begin))
-	{
 		begin++;
-		if (! (begin < end_sentinel))
+
+	/* Both on '(' */
+	if (begin == end_sentinel)
+		return;
+
+	const char *end = end_sentinel - 1;
+
+	/* Trim suffixed white spaces  */
+	while (isspace ((int) *end))
+		end--;
+
+	Assert (begin <= end);
+
+	for (const char *c = begin; c <= end; ++c)
+	{
+		if (isLuaIdentifier (*c))
+			vStringPut (name, (int) *c);
+		else
+		{
+			/* An unexpected character is found
+			 * between "function" and "(" */
+			vStringClear (name);
 			return;
+		}
 	}
 
-	found = false;
-	while (begin != end_sentinel && isLuaIdentifier (*begin))
-	{
-		vStringPut (name, (int) *begin);
-		begin++;
-		found = true;
-	}
-
-	if (found)
-	{
-		makeSimpleTag (name, K_FUNCTION);
-		vStringClear (name);
-	}
-
+	makeSimpleTag (name, K_FUNCTION);
+	vStringClear (name);
 }
 
 static void extract_prev_token (const char *end, const char *begin_sentinel, vString *name)
@@ -143,7 +155,11 @@ static void findLuaTags (void)
 		q = strchr ((const char*) line, '=');
 
 		if (q == NULL) {
-			p = p + 9;  /* skip the `function' word */
+			p = p + 8;  /* skip the `function' word */
+
+			/* We expect [ \t(] */
+			if (! (*p == '(' || isspace ((int)*p)))
+				continue;
 			q = strchr ((const char*) p, '(');
 			if (q)
 				extract_next_token (p, q, name);
