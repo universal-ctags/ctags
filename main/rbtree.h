@@ -113,6 +113,7 @@ static inline struct page * rb_insert_page_cache(struct inode * inode,
 #include "general.h"
 #include "inline.h"
 #include "gcc-attr.h"
+#include <stdint.h>
 
 #if defined(container_of)
   #undef container_of
@@ -151,7 +152,7 @@ static inline struct page * rb_insert_page_cache(struct inode * inode,
 
 struct rb_node
 {
-	unsigned long  rb_parent_color;
+	uintptr_t  rb_parent_color;
 #define	RB_RED		0
 #define	RB_BLACK	1
 	struct rb_node *rb_right;
@@ -174,7 +175,7 @@ struct rb_root
 
 CTAGS_INLINE void rb_set_parent(struct rb_node *rb, struct rb_node *p)
 {
-	rb->rb_parent_color = (rb->rb_parent_color & 3) | (unsigned long)p;
+	rb->rb_parent_color = (rb->rb_parent_color & 3) | (uintptr_t)p;
 }
 CTAGS_INLINE void rb_set_color(struct rb_node *rb, int color)
 {
@@ -220,7 +221,7 @@ extern void rb_replace_node(struct rb_node *victim, struct rb_node *new,
 CTAGS_INLINE void rb_link_node(struct rb_node * node, struct rb_node * parent,
 				struct rb_node ** rb_link)
 {
-	node->rb_parent_color = (unsigned long )parent;
+	node->rb_parent_color = (uintptr_t)parent;
 	node->rb_left = node->rb_right = NULL;
 
 	*rb_link = node;
