@@ -420,10 +420,6 @@ if test x$have_zu_formatter != xyes; then
 	fi
 fi
 
-AM_CONDITIONAL([USE_NO_FORMATTER_FOR_SIZE_T], [test "x${use_no_formatter_for_size_t}" = "xyes"])
-AM_CONDITIONAL([USE_ULONG_FORMATTER_FOR_SIZE_T], [test "x${use_ulong_formatter_for_size_t}" = "xyes"])
-AM_CONDITIONAL([USE_ULONGLONG_FORMATTER_FOR_SIZE_T], [test "x${use_ulonglong_formatter_for_size_t}" = "xyes"])
-
 # Checks for compiler characteristics
 # -----------------------------------
 
