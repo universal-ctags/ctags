@@ -107,19 +107,33 @@ static inline struct page * rb_insert_page_cache(struct inode * inode,
 -----------------------------------------------------------------------
 */
 
-#ifndef	_LINUX_RBTREE_H
-#define	_LINUX_RBTREE_H
+#ifndef	CTAGS_MAIN_RBTREE_H
+#define	CTAGS_MAIN_RBTREE_H
+
+#include "general.h"
+#include "inline.h"
+#include "gcc-attr.h"
 
 #if defined(container_of)
   #undef container_of
+#if defined(HAVE_TYPEOF) && defined(HAVE_STATEMENT_EXPRESSION_EXT)
   #define container_of(ptr, type, member) ({			\
         const typeof( ((type *)0)->member ) *__mptr = (ptr);	\
         (type *)( (char *)__mptr - offsetof(type,member) );})
 #else
+  #define container_of(ptr, type, member) \
+        ((type *)( (char *)ptr - offsetof(type,member)))
+#endif	/* defined(HAVE_TYPEOF) && defined(HAVE_STATEMENT_EXPRESSION_EXT) */
+#else
+#if defined(HAVE_TYPEOF) && defined(HAVE_STATEMENT_EXPRESSION_EXT)
   #define container_of(ptr, type, member) ({			\
         const typeof( ((type *)0)->member ) *__mptr = (ptr);	\
         (type *)( (char *)__mptr - offsetof(type,member) );})
-#endif
+#else
+  #define container_of(ptr, type, member) \
+        ((type *)( (char *)ptr - offsetof(type,member)))
+#endif /* defined(HAVE_TYPEOF) && defined(HAVE_STATEMENT_EXPRESSION_EXT) */
+#endif /* defined(container_of) */
 
 #if defined(offsetof)
   #undef offsetof
@@ -142,7 +156,7 @@ struct rb_node
 #define	RB_BLACK	1
 	struct rb_node *rb_right;
 	struct rb_node *rb_left;
-} __attribute__((aligned(sizeof(long))));
+} CTAGA_ATTR_ALIGNED(sizeof(long));
     /* The alignment might seem pointless, but allegedly CRIS needs it */
 
 struct rb_root
@@ -158,11 +172,11 @@ struct rb_root
 #define rb_set_red(r)  do { (r)->rb_parent_color &= ~1; } while (0)
 #define rb_set_black(r)  do { (r)->rb_parent_color |= 1; } while (0)
 
-static inline void rb_set_parent(struct rb_node *rb, struct rb_node *p)
+CTAGS_INLINE void rb_set_parent(struct rb_node *rb, struct rb_node *p)
 {
 	rb->rb_parent_color = (rb->rb_parent_color & 3) | (unsigned long)p;
 }
-static inline void rb_set_color(struct rb_node *rb, int color)
+CTAGS_INLINE void rb_set_color(struct rb_node *rb, int color)
 {
 	rb->rb_parent_color = (rb->rb_parent_color & ~1) | color;
 }
@@ -174,7 +188,7 @@ static inline void rb_set_color(struct rb_node *rb, int color)
 #define RB_EMPTY_NODE(node)	(rb_parent(node) == node)
 #define RB_CLEAR_NODE(node)	(rb_set_parent(node, node))
 
-static inline void rb_init_node(struct rb_node *rb)
+CTAGS_INLINE void rb_init_node(struct rb_node *rb)
 {
 	rb->rb_parent_color = 0;
 	rb->rb_right = NULL;
@@ -203,7 +217,7 @@ extern struct rb_node *rb_last(const struct rb_root *);
 extern void rb_replace_node(struct rb_node *victim, struct rb_node *new,
 			    struct rb_root *root);
 
-static inline void rb_link_node(struct rb_node * node, struct rb_node * parent,
+CTAGS_INLINE void rb_link_node(struct rb_node * node, struct rb_node * parent,
 				struct rb_node ** rb_link)
 {
 	node->rb_parent_color = (unsigned long )parent;
@@ -212,4 +226,4 @@ static inline void rb_link_node(struct rb_node * node, struct rb_node * parent,
 	*rb_link = node;
 }
 
-#endif	/* _LINUX_RBTREE_H */
+#endif	/* CTAGS_MAIN_RBTREE_H */
