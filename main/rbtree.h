@@ -17,7 +17,7 @@
 /*
   Red Black Trees
   (C) 1999  Andrea Arcangeli <andrea@suse.de>
-  
+
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation; either version 2 of the License, or
@@ -124,7 +124,7 @@ static inline struct page * rb_insert_page_cache(struct inode * inode,
 #if defined(offsetof)
   #undef offsetof
   #define offsetof(TYPE, MEMBER) ((size_t) &((TYPE *)0)->MEMBER)
-#else 
+#else
   #define offsetof(TYPE, MEMBER) ((size_t) &((TYPE *)0)->MEMBER)
 #endif
 
@@ -200,7 +200,7 @@ extern struct rb_node *rb_first(const struct rb_root *);
 extern struct rb_node *rb_last(const struct rb_root *);
 
 /* Fast replacement of a single node without remove/rebalance/add/rebalance */
-extern void rb_replace_node(struct rb_node *victim, struct rb_node *new, 
+extern void rb_replace_node(struct rb_node *victim, struct rb_node *new,
 			    struct rb_root *root);
 
 static inline void rb_link_node(struct rb_node * node, struct rb_node * parent,
@@ -213,4 +213,3 @@ static inline void rb_link_node(struct rb_node * node, struct rb_node * parent,
 }
 
 #endif	/* _LINUX_RBTREE_H */
-
