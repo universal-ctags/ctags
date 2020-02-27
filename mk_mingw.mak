@@ -4,9 +4,9 @@ include source.mak
 
 REGEX_DEFINES = -DHAVE_REGCOMP -D__USE_GNU -DHAVE_STDBOOL_H -DHAVE_STDINT_H -Dstrcasecmp=stricmp
 
-CFLAGS = -Wall -std=gnu99
+CFLAGS = -Wall -std=gnu99 -D__USE_MINGW_ANSI_STDIO
 # sizeof (size_t) == sizeof(unsigned long) == 4 on i686-w64-mingw32-gcc.
-SIZE_T_FMT_CHAR='""'
+SIZE_T_FMT_CHAR='"z"'
 COMMON_DEFINES=-DUSE_SYSTEM_STRNLEN
 DEFINES = -DWIN32 $(REGEX_DEFINES) -DHAVE_PACKCC $(COMMON_DEFINES)
 INCLUDES = -I. -Imain -Ignu_regex -Ifnmatch -Iparsers
