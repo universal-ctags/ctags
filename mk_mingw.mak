@@ -9,7 +9,7 @@ CFLAGS = -Wall -std=gnu99
 SIZE_T_FMT_CHAR='""'
 COMMON_DEFINES=-DUSE_SYSTEM_STRNLEN
 DEFINES = -DWIN32 $(REGEX_DEFINES) -DHAVE_PACKCC $(COMMON_DEFINES)
-INCLUDES = -I. -Ignu_regex -Ifnmatch -iquote parser -iquote main
+INCLUDES = -I. -Ignu_regex -Ifnmatch -iquote parsers -iquote main
 CC = gcc
 WINDRES = windres
 OPTLIB2C = ./misc/optlib2c
