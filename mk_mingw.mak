@@ -39,6 +39,10 @@ LIBS += $(shell pkg-config --libs libxml-2.0)
 PARSER_SRCS += $(XML_SRCS)
 PARSER_HEADS += $(XML_HEADS)
 endif
+ifeq (yes, $(WITH_JSON))
+CFLAGS += -DHAVE_JANSSON=1 $(shell pkg-config --cflags jansson)
+LIBS += $(shell pkg-config --libs jansson)
+endif
 
 ifdef DEBUG
 DEFINES += -DDEBUG
