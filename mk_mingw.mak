@@ -9,7 +9,7 @@ CFLAGS = -Wall -std=gnu99
 SIZE_T_FMT_CHAR='""'
 COMMON_DEFINES=-DUSE_SYSTEM_STRNLEN
 DEFINES = -DWIN32 $(REGEX_DEFINES) -DHAVE_PACKCC $(COMMON_DEFINES)
-INCLUDES = -I. -Imain -Ignu_regex -Ifnmatch -Iparsers
+INCLUDES = -I. -Ignu_regex -Ifnmatch -iquote parser -iquote main
 CC = gcc
 WINDRES = windres
 OPTLIB2C = ./misc/optlib2c
@@ -28,10 +28,14 @@ DEFINES += -DHAVE_ICONV
 LIBS += -liconv
 endif
 ifeq (yes, $(WITH_YAML))
+CFLAGS += -DHAVE_LIBYAML=1 $(shell pkg-config --cflags yaml-0.1)
+LIBS += $(shell pkg-config --libs yaml-0.1)
 PARSER_SRCS += $(YAML_SRCS)
 PARSER_HEADS += $(YAML_HEADS)
 endif
 ifeq (yes, $(WITH_XML))
+CFLAGS += -DHAVE_LIBXML=1 $(shell pkg-config --cflags libxml-2.0)
+LIBS += $(shell pkg-config --libs libxml-2.0)
 PARSER_SRCS += $(XML_SRCS)
 PARSER_HEADS += $(XML_HEADS)
 endif
