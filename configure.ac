@@ -424,6 +424,7 @@ fi
 AC_C_CONST
 AC_OBJEXT
 AC_EXEEXT
+AC_C_TYPEOF
 
 if test "${enable_static}" = "yes"; then
 	LDFLAGS="$LDFLAGS -static"
