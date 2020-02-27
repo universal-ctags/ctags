@@ -476,7 +476,21 @@ def run_tcase(finput, t, name, tclass, category, build_t, extra_inputs):
                 stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         if ret.returncode != 0:
             broken_args_ctags = True
-    basecmdline = cmdline
+
+    #
+    # make a backup (basedcmdline) of cmdline.  basedcmdline is used
+    # as a command line template for running shrinker.  basedcmdline
+    # should not include the name of the input file name.  The
+    # shrinker makes a another cmdline by applying a real input file
+    # name to the template.  On the other hand, cmdline is
+    # destructively updated by appending input file name in this
+    # function. The file name should not be included in the cmdline
+    # template.
+    #
+    # To avoid the updating in this function propagating to
+    # basecmdline, we copy the cmdline here.
+    #
+    basecmdline = cmdline[:]
 
     #
     # Filtered by LANGUAGES
