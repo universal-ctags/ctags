@@ -27,6 +27,14 @@ ifeq (yes, $(WITH_ICONV))
 DEFINES += -DHAVE_ICONV
 LIBS += -liconv
 endif
+ifeq (yes, $(WITH_YAML))
+PARSER_SRCS += $(YAML_SRCS)
+PARSER_HEADS += $(YAML_HEADS)
+endif
+ifeq (yes, $(WITH_XML))
+PARSER_SRCS += $(XML_SRCS)
+PARSER_HEADS += $(XML_HEADS)
+endif
 
 ifdef DEBUG
 DEFINES += -DDEBUG
