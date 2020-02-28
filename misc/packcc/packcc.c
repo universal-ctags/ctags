@@ -41,10 +41,7 @@
 #endif
 #endif
 
-#ifndef SIZE_T_FMT_CHAR
-#define SIZE_T_FMT_CHAR "z"
-#endif
-
+#include <inttypes.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
@@ -2114,17 +2111,17 @@ static code_reach_t generate_matching_string_code(generate_t *gen, const char *v
             write_characters(gen->stream, ' ', indent);
             fputs("if (\n", gen->stream);
             write_characters(gen->stream, ' ', indent + 4);
-            fprintf(gen->stream, "pcc_refill_buffer(ctx, %" SIZE_T_FMT_CHAR "u) < %" SIZE_T_FMT_CHAR "u ||\n", n, n);
+            fprintf(gen->stream, "pcc_refill_buffer(ctx, %" PRIuPTR ") < %" PRIuPTR " ||\n", n, n);
             for (i = 0; i < n - 1; i++) {
                 write_characters(gen->stream, ' ', indent + 4);
-                fprintf(gen->stream, "((const char *)(ctx->buffer.buf + ctx->pos))[%" SIZE_T_FMT_CHAR "u] != '%s' ||\n", i, escape_character(value[i], &s));
+                fprintf(gen->stream, "((const char *)(ctx->buffer.buf + ctx->pos))[%" PRIuPTR "] != '%s' ||\n", i, escape_character(value[i], &s));
             }
             write_characters(gen->stream, ' ', indent + 4);
-            fprintf(gen->stream, "((const char *)(ctx->buffer.buf + ctx->pos))[%" SIZE_T_FMT_CHAR "u] != '%s'\n", i, escape_character(value[i], &s));
+            fprintf(gen->stream, "((const char *)(ctx->buffer.buf + ctx->pos))[%" PRIuPTR "] != '%s'\n", i, escape_character(value[i], &s));
             write_characters(gen->stream, ' ', indent);
             fprintf(gen->stream, ") goto L%04d;\n", onfail);
             write_characters(gen->stream, ' ', indent);
-            fprintf(gen->stream, "ctx->pos += %" SIZE_T_FMT_CHAR "u;\n", n);
+            fprintf(gen->stream, "ctx->pos += %" PRIuPTR ";\n", n);
             if (!bare) {
                 indent -= 4;
                 write_characters(gen->stream, ' ', indent);
