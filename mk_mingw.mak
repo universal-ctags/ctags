@@ -5,8 +5,6 @@ include source.mak
 REGEX_DEFINES = -DHAVE_REGCOMP -D__USE_GNU -DHAVE_STDBOOL_H -DHAVE_STDINT_H -Dstrcasecmp=stricmp
 
 CFLAGS = -Wall -std=gnu99
-# sizeof (size_t) == sizeof(unsigned long) == 4 on i686-w64-mingw32-gcc.
-SIZE_T_FMT_CHAR='""'
 COMMON_DEFINES=-DUSE_SYSTEM_STRNLEN
 DEFINES = -DWIN32 $(REGEX_DEFINES) -DHAVE_PACKCC $(COMMON_DEFINES)
 INCLUDES = -I. -Ignu_regex -Ifnmatch -iquote parsers -iquote main
@@ -97,7 +95,7 @@ all: $(PACKCC) ctags.exe readtags.exe
 ctags: ctags.exe
 
 $(PACKCC_OBJS): $(PACKCC_SRCS)
-	$(V_CC) $(CC_FOR_PACKCC) -c $(OPT) $(CFLAGS) $(COMMON_DEFINES) -DSIZE_T_FMT_CHAR=$(SIZE_T_FMT_CHAR) -o $@ $<
+	$(V_CC) $(CC_FOR_PACKCC) -c $(OPT) $(CFLAGS) $(COMMON_DEFINES) -o $@ $<
 
 $(PACKCC): $(PACKCC_OBJS)
 	$(V_CC) $(CC_FOR_PACKCC) $(OPT) -o $@ $^
