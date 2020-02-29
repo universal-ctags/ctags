@@ -11,14 +11,27 @@ failure	input-1.hpp	/^class failure {};$/;"	c	template:<class T,class Hash=std::
 T	input-1.hpp	/^template <class T, class Hash=std::hash<T>>$/;"	Z	class:failure
 Hash	input-1.hpp	/^template <class T, class Hash=std::hash<T>>$/;"	Z	class:failure
 V	input-2.hpp	/^const int V = 10;$/;"	v	typeref:typename:const int
-func	input-2.hpp	/^template<typename T,int I = V << 1 > void func(T t)$/;"	f	typeref:typename:void	template:<typename T,int I=V<<1>
-T	input-2.hpp	/^template<typename T,int I = V << 1 > void func(T t)$/;"	Z	function:func
-I	input-2.hpp	/^template<typename T,int I = V << 1 > void func(T t)$/;"	Z	function:func
+funcA	input-2.hpp	/^template<typename T,int I = V << 1 > void funcA(T t)$/;"	f	typeref:typename:void	template:<typename T,int I=V<<1>
+T	input-2.hpp	/^template<typename T,int I = V << 1 > void funcA(T t)$/;"	Z	function:funcA
+I	input-2.hpp	/^template<typename T,int I = V << 1 > void funcA(T t)$/;"	Z	function:funcA
+K	input-2.hpp	/^typedef int K;$/;"	t	typeref:typename:int
+funcB	input-2.hpp	/^template<typename T,int I,int J = I < V> void funcB(T t)$/;"	f	typeref:typename:void	template:<typename T,int I,int J=I<V>
+T	input-2.hpp	/^template<typename T,int I,int J = I < V> void funcB(T t)$/;"	Z	function:funcB
+I	input-2.hpp	/^template<typename T,int I,int J = I < V> void funcB(T t)$/;"	Z	function:funcB
+J	input-2.hpp	/^template<typename T,int I,int J = I < V> void funcB(T t)$/;"	Z	function:funcB
+funcC	input-2.hpp	/^template<typename T,int I,int J = I < V> K funcC(T t)$/;"	f	typeref:typename:K	template:<typename T,int I,int J=I<V>
+T	input-2.hpp	/^template<typename T,int I,int J = I < V> K funcC(T t)$/;"	Z	function:funcC
+I	input-2.hpp	/^template<typename T,int I,int J = I < V> K funcC(T t)$/;"	Z	function:funcC
+J	input-2.hpp	/^template<typename T,int I,int J = I < V> K funcC(T t)$/;"	Z	function:funcC
+funcD	input-2.hpp	/^template<typename T,int I,int J = I >> 2> K funcD(T t)$/;"	f	typeref:typename:>2> K	template:<typename T,int I,int J=I>
+T	input-2.hpp	/^template<typename T,int I,int J = I >> 2> K funcD(T t)$/;"	Z	function:funcD
+I	input-2.hpp	/^template<typename T,int I,int J = I >> 2> K funcD(T t)$/;"	Z	function:funcD
+J	input-2.hpp	/^template<typename T,int I,int J = I >> 2> K funcD(T t)$/;"	Z	function:funcD
 TestStruct	input-3.hpp	/^template <typename T> struct TestStruct {};$/;"	s	template:<typename T>
 T	input-3.hpp	/^template <typename T> struct TestStruct {};$/;"	Z	struct:TestStruct
 TemplateParameterStruct	input-3.hpp	/^template <typename T> struct TemplateParameterStruct {};$/;"	s	template:<typename T>
 T	input-3.hpp	/^template <typename T> struct TemplateParameterStruct {};$/;"	Z	struct:TemplateParameterStruct
 ParameterStruct	input-3.hpp	/^struct ParameterStruct {};$/;"	s
-TestStruct	input-3.hpp	/^template <> struct TestStruct<ParameterStruct> {};$/;"	s	template:<>
-TestStruct	input-3.hpp	/^template <typename P> struct TestStruct<TemplateParameterStruct<P>> {};$/;"	s	template:<typename P>
+TestStruct	input-3.hpp	/^template <> struct TestStruct<ParameterStruct> {};$/;"	s	template:<>	specialization:<ParameterStruct>
+TestStruct	input-3.hpp	/^template <typename P> struct TestStruct<TemplateParameterStruct<P>> {};$/;"	s	template:<typename P>	specialization:<TemplateParameterStruct<P>>
 P	input-3.hpp	/^template <typename P> struct TestStruct<TemplateParameterStruct<P>> {};$/;"	Z	struct:TestStruct

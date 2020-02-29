@@ -680,6 +680,7 @@ bool cxxParserLookForFunctionSignature(
 	pInfo->uFlags = 0;
 	pInfo->pParenthesis = NULL;
 	pInfo->pTrailingComma = NULL;
+	pInfo->pTemplateSpecializationStart = NULL;
 
 	CXXToken * pIdentifierStart = NULL;
 	CXXToken * pIdentifierEnd = NULL;
@@ -1034,6 +1035,8 @@ bool cxxParserLookForFunctionSignature(
 				pIdentifierEnd = pSpecBegin->pPrev;
 				pInfo->uFlags |= CXXFunctionSignatureInfoTemplateSpecialization;
 
+				pInfo->pTemplateSpecializationStart = pSpecBegin;
+				pInfo->pTemplateSpecializationEnd = pToken->pPrev;
 
 				if(
 					cxxParserLookForFunctionSignatureCheckParenthesisAndIdentifier(
@@ -1603,13 +1606,39 @@ int cxxParserEmitFunctionTags(
 
 		bool bIsEmptyTemplate;
 
-		if(
-				bGotTemplate &&
-				cxxTagFieldEnabled(CXXTagCPPFieldTemplate)
-			)
+		if(bGotTemplate)
 		{
 			bIsEmptyTemplate = g_cxx.pTemplateTokenChain->iCount == 2;
-			cxxTagHandleTemplateField();
+
+			if(pInfo->pTemplateSpecializationStart)
+			{
+				CXX_DEBUG_ASSERT(pInfo->pTemplateSpecializationEnd,"Bug");
+				cxxTokenChainNormalizeTypeNameSpacingInRange(
+						pInfo->pTemplateSpecializationStart,
+						pInfo->pTemplateSpecializationEnd
+					);
+				// make sure we don't emit the trailing space
+				pInfo->pTemplateSpecializationStart->bFollowedBySpace = false;
+
+				CXXToken * pToken = cxxTokenChainExtractRange(
+						pInfo->pTemplateSpecializationStart,
+						pInfo->pTemplateSpecializationEnd,
+						0
+					);
+
+				// Tricky. We append it to the specialization chain which will
+				// be then used by cxxTagHandleTemplateFileds()
+				if(pToken)
+				{
+					if(g_cxx.pTemplateSpecializationTokenChain)
+						cxxTokenChainClear(g_cxx.pTemplateSpecializationTokenChain);
+					else
+						g_cxx.pTemplateSpecializationTokenChain = cxxTokenChainCreate();
+					cxxTokenChainAppend(g_cxx.pTemplateSpecializationTokenChain,pToken);
+				}
+			}
+
+			cxxTagHandleTemplateFields();
 		} else {
 			bIsEmptyTemplate = false;
 		}

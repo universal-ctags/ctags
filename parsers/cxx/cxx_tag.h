@@ -64,7 +64,8 @@ enum CXXTagCPPField
 {
 	CXXTagCPPFieldTemplate = CXXTagCommonFieldCount,
 	CXXTagCPPFieldLambdaCaptureList,
-	CXXTagCPPFieldAliasedName
+	CXXTagCPPFieldAliasedName,
+	CXXTagCPPFieldTemplateSpecialization
 };
 
 
@@ -158,9 +159,13 @@ typedef enum _CXXTagProperty
 // not enabled or similar...)
 vString * cxxTagSetProperties(unsigned int uProperties);
 
-// Set a parser-local field. The szValue pointer must persist
-// until cxxTagCommit() is called.
-void cxxTagSetField(unsigned int uField,const char * szValue);
+// Set a parser-local field.
+// If bCopyValue is set to false then szValue is not copied and it must
+// persist in memory until cxxTagCommit() is called.
+// If bCopyValue is set to true then szValue is copied and it can be
+// safely destroyed before cxxTagCommit() is called.
+// bCopyValue == false is faster: use it whenever possible.
+void cxxTagSetField(unsigned int uField,const char * szValue,bool bCopyValue);
 
 // Set a parser-local CPP field for a tag in cork queue.
 // The szValue pointer is copied.
@@ -172,7 +177,7 @@ void cxxTagSetCorkQueueField(
 	);
 
 // Handle the template-related parts of the tag (class, function, variable)
-void cxxTagHandleTemplateField();
+void cxxTagHandleTemplateFields();
 
 // Commit the composed tag. Must follow a successful cxxTagBegin() call.
 // Returns the index of the tag in the cork queue.

@@ -12,10 +12,30 @@ g1	input.cpp	/^template<class X1> void A<T>::g1(T, X1) { }$/;"	f	class:A	typeref
 X1	input.cpp	/^template<class X1> void A<T>::g1(T, X1) { }$/;"	Z	function:A::g1
 g1	input.cpp	/^template<class X1> void A<int>::g1(int, X1);$/;"	p	class:A	typeref:typename:void	file:	signature:(int,X1)	template:<class X1>	properties:scopespecialization,specialization
 X1	input.cpp	/^template<class X1> void A<int>::g1(int, X1);$/;"	Z	function:A::g1
-g2	input.cpp	/^template<> void A<int>::g2<char>(int, char); \/\/ for X2 = char$/;"	p	class:A	typeref:typename:void	file:	signature:(int,char)	template:<>	properties:scopespecialization,specialization
+g2	input.cpp	/^template<> void A<int>::g2<char>(int, char); \/\/ for X2 = char$/;"	p	class:A	typeref:typename:void	file:	signature:(int,char)	template:<>	specialization:<char>	properties:scopespecialization,specialization
 g1	input.cpp	/^template<> void A<int>::g1(int, char);$/;"	p	class:A	typeref:typename:void	file:	signature:(int,char)	template:<>	properties:scopespecialization,specialization
 m	input.cpp	/^template<typename X> void m(X)$/;"	f	typeref:typename:void	signature:(X)	template:<typename X>
 X	input.cpp	/^template<typename X> void m(X)$/;"	Z	function:m
-m	input.cpp	/^template<> void m<int>(int)$/;"	f	typeref:typename:void	signature:(int)	template:<>	properties:specialization
-m	input.cpp	/^template<> void m<A>(A)$/;"	f	typeref:typename:void	signature:(A)	template:<>	properties:specialization
+m	input.cpp	/^template<> void m<int>(int)$/;"	f	typeref:typename:void	signature:(int)	template:<>	specialization:<int>	properties:specialization
+m	input.cpp	/^template<> void m<A<int>>(A<int> a)$/;"	f	typeref:typename:void	signature:(A<int> a)	template:<>	specialization:<A<int>>	properties:specialization
+a	input.cpp	/^template<> void m<A<int>>(A<int> a)$/;"	z	function:m	typeref:typename:A<int>	file:
+B	input.cpp	/^struct B { };$/;"	s	file:
+m	input.cpp	/^template<> void m<B>(B)$/;"	f	typeref:typename:void	signature:(B)	template:<>	specialization:<B>	properties:specialization
 m	input.cpp	/^template<> void m(char)$/;"	f	typeref:typename:void	signature:(char)	template:<>	properties:specialization
+C	input.cpp	/^class C {};$/;"	c	file:	template:<class T1,class T2,int I>
+T1	input.cpp	/^template<class T1, class T2, int I>$/;"	Z	class:C
+T2	input.cpp	/^template<class T1, class T2, int I>$/;"	Z	class:C
+I	input.cpp	/^template<class T1, class T2, int I>$/;"	Z	class:C
+C	input.cpp	/^class C<T, T*, I> {};$/;"	c	file:	template:<class T,int I>	specialization:<T,T *,I>
+T	input.cpp	/^template<class T, int I>$/;"	Z	class:C
+I	input.cpp	/^template<class T, int I>$/;"	Z	class:C
+C	input.cpp	/^class C<T*, T2, I> {};$/;"	c	file:	template:<class T,class T2,int I>	specialization:<T *,T2,I>
+T	input.cpp	/^template<class T, class T2, int I>$/;"	Z	class:C
+T2	input.cpp	/^template<class T, class T2, int I>$/;"	Z	class:C
+I	input.cpp	/^template<class T, class T2, int I>$/;"	Z	class:C
+C	input.cpp	/^class C<int, T*, 5> {};$/;"	c	file:	template:<class T>	specialization:<int,T *,5>
+T	input.cpp	/^template<class T>$/;"	Z	class:C
+C	input.cpp	/^class C<X, T*, I> {};$/;"	c	file:	template:<class X,class T,int I>	specialization:<X,T *,I>
+X	input.cpp	/^template<class X, class T, int I>$/;"	Z	class:C
+T	input.cpp	/^template<class X, class T, int I>$/;"	Z	class:C
+I	input.cpp	/^template<class X, class T, int I>$/;"	Z	class:C

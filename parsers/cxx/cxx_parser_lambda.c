@@ -252,7 +252,8 @@ bool cxxParserHandleLambda(CXXToken * pParenthesis)
 				);
 			cxxTagSetField(
 					CXXTagCPPFieldLambdaCaptureList,
-					vStringValue(cxxTokenChainFirst(pCaptureList->pChain)->pszWord)
+					vStringValue(cxxTokenChainFirst(pCaptureList->pChain)->pszWord),
+					false
 				);
 		}
 

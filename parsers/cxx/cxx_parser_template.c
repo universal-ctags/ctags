@@ -40,23 +40,61 @@ typedef enum _CXXParserParseTemplateAngleBracketsResult
 } CXXParserParseTemplateAngleBracketsResult;
 
 
-static bool cxxTokenCompareWord(const void *pToken,void * szWord)
+static bool cxxTemplateTokenCheckIsNonTypeAndCompareWord(const void *pToken,void * szWord)
 {
+	// To be non type the token must NOT be preceeded by class/struct/union
 	CXXToken * t = (CXXToken *)pToken;
+	if(!t->pPrev)
+		return false;
+	if(cxxTokenTypeIs(t->pPrev,CXXTokenTypeKeyword))
+	{
+		if(cxxKeywordIsTypeRefMarker(t->pPrev->eKeyword))
+			return false; // preceeded by a type ref marker
+
+		// otherwise it's probably something like "int"
+	}
 	const char * w = (const char *)szWord;
 	return strcmp(vStringValue(t->pszWord),w) == 0;
 }
 
-static bool cxxTokenIsPresentInTemplateParameters(CXXToken * t)
+static bool cxxTokenIsPresentInTemplateParametersAsNonType(CXXToken * t)
 {
 	CXX_DEBUG_ASSERT(
-			cxxTokenTypeIsOneOf(t,CXXTokenTypeIdentifier | CXXTokenTypeKeyword),
-			"Token must be identifier or keyword"
+			cxxTokenTypeIsOneOf(t,CXXTokenTypeIdentifier),
+			"Token must be identifier"
 		);
 
 	return ptrArrayHasTest(
 			g_cxx.pTemplateParameters,
-			cxxTokenCompareWord,
+			cxxTemplateTokenCheckIsNonTypeAndCompareWord,
+			vStringValue(t->pszWord)
+		);
+}
+
+static bool cxxTemplateTokenCheckIsTypeAndCompareWord(const void *pToken,void * szWord)
+{
+	// To be non type the token must be preceeded by class/struct/union
+	CXXToken * t = (CXXToken *)pToken;
+	if(!t->pPrev)
+		return false;
+	if(!cxxTokenTypeIs(t->pPrev,CXXTokenTypeKeyword))
+		return false;
+	if(!cxxKeywordIsTypeRefMarker(t->pPrev->eKeyword))
+		return false;
+	const char * w = (const char *)szWord;
+	return strcmp(vStringValue(t->pszWord),w) == 0;
+}
+
+static bool cxxTokenIsPresentInTemplateParametersAsType(CXXToken * t)
+{
+	CXX_DEBUG_ASSERT(
+			cxxTokenTypeIsOneOf(t,CXXTokenTypeIdentifier),
+			"Token must be identifier"
+		);
+
+	return ptrArrayHasTest(
+			g_cxx.pTemplateParameters,
+			cxxTemplateTokenCheckIsTypeAndCompareWord,
 			vStringValue(t->pszWord)
 		);
 }
@@ -130,60 +168,20 @@ cxxParserParseTemplateAngleBracketsInternal(bool bCaptureTypeParameters)
 			{
 				// blah <
 
-				CXXToken * pFirstSmallerThan = g_cxx.pToken;
+				CXXToken * pSmallerThan = g_cxx.pToken;
 
-				bool bFirstFollowedBySpace = g_cxx.pToken->bFollowedBySpace;
-
-				int iSmallerThanCount = 1;
-
-				// Here we skip ALL of the smaller-than signs we find.
-				for(;;)
+				if(!cxxParserParseNextToken())
 				{
-					if(!cxxParserParseNextToken())
-					{
-						CXX_DEBUG_LEAVE_TEXT("Syntax error, but tolerate it at this level");
-						return CXXParserParseTemplateAngleBracketsFailedRecoverable;
-					}
-
-					CXX_DEBUG_PRINT(
-							"< followed by token '%s' of type 0x%02x (%s)",
-							vStringValue(g_cxx.pToken->pszWord),
-							g_cxx.pToken->eType,
-							cxxDebugTypeDecode(g_cxx.pToken->eType)
-						);
-
-					if(!cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeSmallerThanSign))
-						break;
-
-					iSmallerThanCount++;
+					CXX_DEBUG_LEAVE_TEXT("Syntax error, but tolerate it at this level");
+					return CXXParserParseTemplateAngleBracketsFailedRecoverable;
 				}
 
-				// check left shift operator: very narrow conditions
-				if(
-					(!bFirstFollowedBySpace) &&
-					(iSmallerThanCount == 2) &&
-					cxxTokenTypeIsOneOf(
-							g_cxx.pToken,
-							CXXTokenTypeIdentifier | CXXTokenTypeParenthesisChain |
-							CXXTokenTypeNumber | CXXTokenTypeKeyword
-						) &&
-					// note that pFirstGreaterThan->pPrev is certainly valid here
-					cxxTokenTypeIsOneOf(
-							pFirstSmallerThan->pPrev,
-							CXXTokenTypeIdentifier | CXXTokenTypeKeyword
-						) &&
-					// int << ...
-					(!cxxTokenIsNonConstantKeyword(pFirstSmallerThan->pPrev)) &&
-					// ... << class
-					(!cxxTokenIsNonConstantKeyword(g_cxx.pToken)) &&
-					// T <<
-					(!cxxTokenIsPresentInTemplateParameters(pFirstSmallerThan->pPrev))
-				)
-				{
-					// assume it's an operator
-					CXX_DEBUG_PRINT("Treating << as shift-left operator");
-					continue;
-				}
+				CXX_DEBUG_PRINT(
+						"< followed by token '%s' of type 0x%02x (%s)",
+						vStringValue(g_cxx.pToken->pszWord),
+						g_cxx.pToken->eType,
+						cxxDebugTypeDecode(g_cxx.pToken->eType)
+					);
 
 				// Check less than operator for the special conditions
 				// we can be sure of:
@@ -192,24 +190,19 @@ cxxParserParseTemplateAngleBracketsInternal(bool bCaptureTypeParameters)
 				// The other cases can't be handled safely. We expect the user
 				// to use parentheses.
 				if(
-					(iSmallerThanCount == 1) &&
-					(
-						// ... 1 < whatever ...
-						cxxTokenTypeIs(pFirstSmallerThan->pPrev,CXXTokenTypeNumber) ||
-						// ... typeParam < 1 ...
-						(
-							cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeNumber) &&
-							cxxTokenIsPresentInTemplateParameters(pFirstSmallerThan->pPrev)
-						)
-					)
+					// ... 1 < whatever ...
+					cxxTokenTypeIs(pSmallerThan->pPrev,CXXTokenTypeNumber) ||
+					// ... nonTypeParam < whatever ...
+					cxxTokenIsPresentInTemplateParametersAsNonType(pSmallerThan->pPrev)
 				)
 				{
 					CXX_DEBUG_PRINT("Treating < as less-than operator");
-					continue;
-				}
 
-				CXX_DEBUG_PRINT("Increasing template level by %d",iSmallerThanCount);
-				iNestedTemplateLevel += iSmallerThanCount;
+				} else {
+
+					CXX_DEBUG_PRINT("Increasing template level by one");
+					iNestedTemplateLevel++;
+				}
 
 				if(cxxTokenTypeIsOneOf(
 						g_cxx.pToken,
@@ -291,22 +284,27 @@ cxxParserParseTemplateAngleBracketsInternal(bool bCaptureTypeParameters)
 				if(
 					(!bFirstFollowedBySpace) &&
 					(iGreaterThanCount == 2) &&
-					cxxTokenTypeIsOneOf(
-							g_cxx.pToken,
-							CXXTokenTypeIdentifier | CXXTokenTypeParenthesisChain |
-							CXXTokenTypeNumber | CXXTokenTypeKeyword
-						) &&
-					// note that pFirstGreaterThan->pPrev is certainly valid here
-					cxxTokenTypeIsOneOf(
-							pFirstGreaterThan->pPrev,
-							CXXTokenTypeIdentifier | CXXTokenTypeKeyword
-						) &&
-					// int >> ...
-					(!cxxTokenIsNonConstantKeyword(pFirstGreaterThan->pPrev)) &&
-					// ... >> class
-					(!cxxTokenIsNonConstantKeyword(g_cxx.pToken)) &&
-					// T >>
-					(!cxxTokenIsPresentInTemplateParameters(pFirstGreaterThan->pPrev))
+					(
+						// whatever >> 2 [C++03 allows this without parens]
+						// whatever >> (...) [C++03 allows this without parens]
+						cxxTokenTypeIsOneOf(
+								g_cxx.pToken,
+								CXXTokenTypeNumber | CXXTokenTypeOpeningParenthesis
+							) ||
+						// whatever >> nonTypeParameter [C++03 allows this without parens]
+						(
+							cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeIdentifier) &&
+							cxxTokenIsPresentInTemplateParametersAsNonType(g_cxx.pToken)
+						)
+					) && (
+						// we got a number on the left
+						cxxTokenTypeIsOneOf(pFirstGreaterThan->pPrev,CXXTokenTypeNumber) ||
+						// or we got an identifier that wasn't identified as a type
+						(
+							cxxTokenTypeIsOneOf(pFirstGreaterThan->pPrev,CXXTokenTypeIdentifier) &&
+							(!cxxTokenIsPresentInTemplateParametersAsType(pFirstGreaterThan->pPrev))
+						)
+					)
 				)
 				{
 					// assume it's an operator
@@ -651,6 +649,14 @@ bool cxxParserParseTemplateAngleBracketsToTemplateChain(void)
 		cxxTokenChainDestroy(g_cxx.pTemplateTokenChain);
 
 	g_cxx.pTemplateTokenChain = pOut;
+
+	// make sure we have no stale specializations
+	// (note that specializations always come AFTER the main template)
+	if(g_cxx.pTemplateSpecializationTokenChain)
+	{
+		cxxTokenChainDestroy(g_cxx.pTemplateSpecializationTokenChain);
+		g_cxx.pTemplateSpecializationTokenChain = NULL;
+	}
 
 	CXX_DEBUG_LEAVE();
 	return true;

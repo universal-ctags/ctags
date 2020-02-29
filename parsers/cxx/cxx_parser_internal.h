@@ -145,6 +145,10 @@ typedef struct _CXXFunctionSignatureInfo
 	//     RetType functionA(...), functionB(...);
 	CXXToken * pTrailingComma;
 
+	// Template specialization token range, if any.
+	CXXToken * pTemplateSpecializationStart;
+	CXXToken * pTemplateSpecializationEnd;
+
 	// Additional informations
 	unsigned int uFlags;
 
@@ -308,6 +312,10 @@ typedef struct _CXXParserState
 	// This remains valid within the statement, so it can be used slightly
 	// after the template has been parsed (i.e. in the class coming after)
 	CXXTokenChain * pTemplateTokenChain;
+
+	// The last template specialization token chain we found. May be null.
+	// This pointer, if non null, is valid only if pTemplateTokenChain is non null.
+	CXXTokenChain * pTemplateSpecializationTokenChain;
 
 	// The array of CXXToken objects that are found to be template
 	// type parameters and belong to the pTemplateTokenChain above.

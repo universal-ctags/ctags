@@ -422,6 +422,7 @@ void cxxTokenChainMoveEntryRange(
 			"The start token must come before the end token"
 		);
 
+	// FIXME: We could have a more efficient version of this
 	CXXToken * t = start;
 	for(;;)
 	{

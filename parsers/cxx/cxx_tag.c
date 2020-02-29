@@ -120,7 +120,12 @@ static fieldDefinition g_aCXXCPPFields [] = {
 		.name = "name",
 		.description = "aliased names",
 		.enabled = true
-	}
+	},
+	{
+		.name = "specialization",
+		.description = "template specialization parameters",
+		.enabled = false,
+	},
 };
 
 static fieldDefinition g_aCXXCUDAFields [] = {
@@ -329,7 +334,7 @@ vString * cxxTagSetProperties(unsigned int uProperties)
 	if(uProperties & CXXTagPropertyFunctionTryBlock)
 		ADD_PROPERTY("fntryblock");
 
-	cxxTagSetField(CXXTagFieldProperties,vStringValue(pszProperties));
+	cxxTagSetField(CXXTagFieldProperties,vStringValue(pszProperties),false);
 
 	return pszProperties;
 }
@@ -501,7 +506,7 @@ CXXToken * cxxTagCheckAndSetTypeField(
 	return pTypeName;
 }
 
-void cxxTagSetField(unsigned int uField,const char * szValue)
+void cxxTagSetField(unsigned int uField,const char * szValue,bool bCopyValue)
 {
 	CXX_DEBUG_ASSERT(
 			uField < g_cxx.uFieldOptionCount,
@@ -511,7 +516,7 @@ void cxxTagSetField(unsigned int uField,const char * szValue)
 	if(!g_cxx.pFieldOptions[uField].enabled)
 		return;
 
-	attachParserField(&g_oCXXTag,false,g_cxx.pFieldOptions[uField].ftype,szValue);
+	attachParserField(&g_oCXXTag,bCopyValue,g_cxx.pFieldOptions[uField].ftype,szValue);
 }
 
 void cxxTagSetCorkQueueField(
@@ -530,29 +535,54 @@ void cxxTagSetCorkQueueField(
 	attachParserFieldToCorkEntry(iIndex,g_cxx.pFieldOptions[uField].ftype,szValue);
 }
 
-void cxxTagHandleTemplateField()
+void cxxTagHandleTemplateFields()
 {
 	CXX_DEBUG_ASSERT(
 		g_cxx.pTemplateTokenChain &&
 		(g_cxx.pTemplateTokenChain->iCount > 0) &&
-		cxxParserCurrentLanguageIsCPP() &&
-		cxxTagFieldEnabled(CXXTagCPPFieldTemplate),
+		cxxParserCurrentLanguageIsCPP(),
 		"Template existence must be checked before calling this function"
 	);
 
-	cxxTokenChainNormalizeTypeNameSpacing(g_cxx.pTemplateTokenChain);
-
-	CXXToken * t = cxxTokenChainCondenseIntoToken(g_cxx.pTemplateTokenChain,0);
-
-	if(t)
+	if(cxxTagFieldEnabled(CXXTagCPPFieldTemplate))
 	{
-		cxxTagSetField(
-				CXXTagCPPFieldTemplate,
-				vStringValue(t->pszWord)
-			);
+		cxxTokenChainNormalizeTypeNameSpacing(g_cxx.pTemplateTokenChain);
 
-		cxxTokenDestroy(t);
+		CXXToken * t = cxxTokenChainCondenseIntoToken(g_cxx.pTemplateTokenChain,0);
+
+		if(t)
+		{
+			cxxTagSetField(
+					CXXTagCPPFieldTemplate,
+					vStringValue(t->pszWord),
+					true
+				);
+
+			cxxTokenDestroy(t);
+		}
 	}
+
+	if(
+			g_cxx.pTemplateSpecializationTokenChain &&
+			cxxTagFieldEnabled(CXXTagCPPFieldTemplateSpecialization)
+		)
+	{
+		cxxTokenChainNormalizeTypeNameSpacing(g_cxx.pTemplateSpecializationTokenChain);
+
+		CXXToken * tx = cxxTokenChainCondenseIntoToken(g_cxx.pTemplateSpecializationTokenChain,0);
+
+		if(tx)
+		{
+			cxxTagSetField(
+					CXXTagCPPFieldTemplateSpecialization,
+					vStringValue(tx->pszWord),
+					true
+				);
+
+			cxxTokenDestroy(tx);
+		}
+	}
+
 }
 
 int cxxTagCommit(void)
