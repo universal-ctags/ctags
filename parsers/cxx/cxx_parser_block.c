@@ -357,12 +357,27 @@ process_token:
 					}
 					break;
 					case CXXKeywordTEMPLATE:
-						if(!cxxParserParseTemplatePrefix())
+						if(
+							// beginning of the statement
+							(!g_cxx.pToken->pPrev) ||
+							// previous token is not "." or "->", syntax that is found in
+							//     p.template func<int>();
+							(!cxxTokenTypeIsOneOf(
+									g_cxx.pToken->pPrev,
+									CXXTokenTypeDotOperator | CXXTokenTypePointerOperator
+								)
+							)
+						)
 						{
-							CXX_DEBUG_LEAVE_TEXT("Failed to parse template");
-							return false;
+							if(!cxxParserParseTemplatePrefix())
+							{
+								CXX_DEBUG_LEAVE_TEXT("Failed to parse template");
+								return false;
+							}
+							// Here we are just after the "template<parameters>" prefix.
+						} else {
+							CXX_DEBUG_LEAVE_TEXT("Template keyword that is not a prefix");
 						}
-						// Here we are just after the "template<parameters>" prefix.
 					break;
 					case CXXKeywordTYPEDEF:
 						// Mark the next declaration as a typedef
