@@ -29,6 +29,7 @@ z	kind	no	NONE	s--	no	[tags output] prepend "kind:" to k/ (or K/) field output, 
 -	macrodef	no	C++	s--	no	macro definition
 -	name	yes	C++	s--	no	aliased names
 -	properties	no	C++	s--	no	properties (static, inline, mutable,...)
+-	specialization	no	C++	s--	no	template specialization parameters
 -	template	no	C++	s--	no	template parameters
 -	macrodef	no	CPreProcessor	s--	no	macro definition
 -	macrodef	no	CUDA	s--	no	macro definition
