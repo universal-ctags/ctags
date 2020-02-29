@@ -36,6 +36,14 @@ T	input-2.hpp	/^template<typename T,int I,int L,int J = I >> L> K funcF(T t)$/;"
 I	input-2.hpp	/^template<typename T,int I,int L,int J = I >> L> K funcF(T t)$/;"	Z	function:funcF
 L	input-2.hpp	/^template<typename T,int I,int L,int J = I >> L> K funcF(T t)$/;"	Z	function:funcF
 J	input-2.hpp	/^template<typename T,int I,int L,int J = I >> L> K funcF(T t)$/;"	Z	function:funcF
+funcG	input-2.hpp	/^template<typename T,int I,int J = 1 >> V> K funcG(T t)$/;"	f	typeref:typename:K	template:<typename T,int I,int J=1>> V>
+T	input-2.hpp	/^template<typename T,int I,int J = 1 >> V> K funcG(T t)$/;"	Z	function:funcG
+I	input-2.hpp	/^template<typename T,int I,int J = 1 >> V> K funcG(T t)$/;"	Z	function:funcG
+J	input-2.hpp	/^template<typename T,int I,int J = 1 >> V> K funcG(T t)$/;"	Z	function:funcG
+funcH	input-2.hpp	/^template<typename T,int I,int J = I >> V> K funcH(T t)$/;"	f	typeref:typename:K	template:<typename T,int I,int J=I>> V>
+T	input-2.hpp	/^template<typename T,int I,int J = I >> V> K funcH(T t)$/;"	Z	function:funcH
+I	input-2.hpp	/^template<typename T,int I,int J = I >> V> K funcH(T t)$/;"	Z	function:funcH
+J	input-2.hpp	/^template<typename T,int I,int J = I >> V> K funcH(T t)$/;"	Z	function:funcH
 funcI	input-2.hpp	/^template<typename T,int I,int J = 1 >> (1+2)> K funcI(T t)$/;"	f	typeref:typename:K	template:<typename T,int I,int J=1>> (1+2)>
 T	input-2.hpp	/^template<typename T,int I,int J = 1 >> (1+2)> K funcI(T t)$/;"	Z	function:funcI
 I	input-2.hpp	/^template<typename T,int I,int J = 1 >> (1+2)> K funcI(T t)$/;"	Z	function:funcI
@@ -53,10 +61,10 @@ T	input-2.hpp	/^template<typename T,int I,int L,int J = I > L> K funcL(T t)$/;"	
 I	input-2.hpp	/^template<typename T,int I,int L,int J = I > L> K funcL(T t)$/;"	Z	function:funcL
 L	input-2.hpp	/^template<typename T,int I,int L,int J = I > L> K funcL(T t)$/;"	Z	function:funcL
 J	input-2.hpp	/^template<typename T,int I,int L,int J = I > L> K funcL(T t)$/;"	Z	function:funcL
-funcO	input-2.hpp	/^template<typename T,int I,int J = 1 > (1+2)> K funcO(T t)$/;"	f	typeref:typename:K	template:<typename T,int I,int J=1> (1+2)>
-T	input-2.hpp	/^template<typename T,int I,int J = 1 > (1+2)> K funcO(T t)$/;"	Z	function:funcO
-I	input-2.hpp	/^template<typename T,int I,int J = 1 > (1+2)> K funcO(T t)$/;"	Z	function:funcO
-J	input-2.hpp	/^template<typename T,int I,int J = 1 > (1+2)> K funcO(T t)$/;"	Z	function:funcO
+funcM	input-2.hpp	/^template<typename T,int I,int J = 1 > (1+2)> K funcM(T t)$/;"	f	typeref:typename:K	template:<typename T,int I,int J=1> (1+2)>
+T	input-2.hpp	/^template<typename T,int I,int J = 1 > (1+2)> K funcM(T t)$/;"	Z	function:funcM
+I	input-2.hpp	/^template<typename T,int I,int J = 1 > (1+2)> K funcM(T t)$/;"	Z	function:funcM
+J	input-2.hpp	/^template<typename T,int I,int J = 1 > (1+2)> K funcM(T t)$/;"	Z	function:funcM
 TestStruct	input-3.hpp	/^template <typename T> struct TestStruct {};$/;"	s	template:<typename T>
 T	input-3.hpp	/^template <typename T> struct TestStruct {};$/;"	Z	struct:TestStruct
 TemplateParameterStruct	input-3.hpp	/^template <typename T> struct TemplateParameterStruct {};$/;"	s	template:<typename T>

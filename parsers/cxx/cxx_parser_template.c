@@ -104,7 +104,7 @@ static bool cxxTokenIsPresentInTemplateParametersAsType(CXXToken * t)
 // Here we are pointing at the initial <.
 //
 static CXXParserParseTemplateAngleBracketsResult
-cxxParserParseTemplateAngleBracketsInternal(bool bCaptureTypeParameters)
+cxxParserParseTemplateAngleBracketsInternal(bool bCaptureTypeParameters,int iNestedTemplateLevel)
 {
 	CXX_DEBUG_ENTER();
 
@@ -142,7 +142,7 @@ cxxParserParseTemplateAngleBracketsInternal(bool bCaptureTypeParameters)
 			"We should be pointing at the opening angle bracket here"
 		);
 
-	int iNestedTemplateLevel = 1;
+	int iNestedAngleBracketLevel = 1;
 
 	for(;;)
 	{
@@ -201,7 +201,7 @@ cxxParserParseTemplateAngleBracketsInternal(bool bCaptureTypeParameters)
 				} else {
 
 					CXX_DEBUG_PRINT("Increasing template level by one");
-					iNestedTemplateLevel++;
+					iNestedAngleBracketLevel++;
 				}
 
 				if(cxxTokenTypeIsOneOf(
@@ -230,7 +230,7 @@ cxxParserParseTemplateAngleBracketsInternal(bool bCaptureTypeParameters)
 				// The minimum of three means that in the following loop we skip
 				// at least two greater than signs AND at least another token.
 
-				int iMaxGreaterThanCount = iNestedTemplateLevel;
+				int iMaxGreaterThanCount = iNestedAngleBracketLevel;
 				if(iMaxGreaterThanCount < 3)
 					iMaxGreaterThanCount = 3;
 
@@ -257,15 +257,10 @@ cxxParserParseTemplateAngleBracketsInternal(bool bCaptureTypeParameters)
 
 				CXX_DEBUG_PRINT("Found %d greater-than signs",iGreaterThanCount);
 
-				// check right shift and greater than operator: very narrow conditions
+				// check greater than operator: very narrow conditions
 				if(
+					(iGreaterThanCount == 1) &&
 					(
-						(iGreaterThanCount == 1) ||
-						(
-							(!bFirstFollowedBySpace) &&
-							(iGreaterThanCount == 2)
-						)
-					) && (
 						// whatever op 2 [C++03 allows this without parens]
 						// whatever op (...) [C++03 allows this without parens]
 						cxxTokenTypeIsOneOf(
@@ -283,12 +278,53 @@ cxxParserParseTemplateAngleBracketsInternal(bool bCaptureTypeParameters)
 					)
 				)
 				{
-					CXX_DEBUG_PRINT(
-							"Treating as %s",
-								(iGreaterThanCount == 1) ?
-									"greater-than sign" : "right shift operator"
-						);
+					CXX_DEBUG_PRINT("Treating as greater-than sign");
 
+					if(cxxTokenTypeIsOneOf(g_cxx.pToken,CXXTokenTypeOpeningParenthesis))
+						cxxParserUngetCurrentToken(); // needs to be condensed
+
+					continue;
+				}
+
+
+				// check right shift operator: a bit broader conditions
+				if(
+					(
+						(!bFirstFollowedBySpace) &&
+						(iGreaterThanCount == 2)
+					) && (
+						// whatever op 2 [C++03 allows this without parens]
+						// whatever op (...) [C++03 allows this without parens]
+						cxxTokenTypeIsOneOf(
+								g_cxx.pToken,
+								CXXTokenTypeNumber | CXXTokenTypeOpeningParenthesis
+							) ||
+						// whatever op nonTypeParameter [C++03 allows this without parens]
+						(
+							cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeIdentifier) &&
+							cxxTokenIsPresentInTemplateParametersAsNonType(g_cxx.pToken)
+						) ||
+						// a broader condition that kind-of-works at top level
+						(
+							// topmost template nesting level
+							(iNestedTemplateLevel == 0) &&
+							// Only one level of angle brackets.
+							// This means that:
+							// - >> has one angle bracket too much to exit the template
+							// - we have screwed up the parsing of an opening angle bracket
+							// In the first case it's very likely that we're over a shift
+							// operator. In the other case we're screwed anyway.
+							(iNestedAngleBracketLevel == 1) &&
+							// identifier on the right that is not clearly identified as type
+							(
+								cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeIdentifier) &&
+								(!cxxTokenIsPresentInTemplateParametersAsType(g_cxx.pToken))
+							)
+						)
+					)
+				)
+				{
+					CXX_DEBUG_PRINT("Treating as right shift operator");
 					if(cxxTokenTypeIsOneOf(g_cxx.pToken,CXXTokenTypeOpeningParenthesis))
 						cxxParserUngetCurrentToken(); // needs to be condensed
 
@@ -322,7 +358,7 @@ cxxParserParseTemplateAngleBracketsInternal(bool bCaptureTypeParameters)
 	
 						cxxParserUngetCurrentToken();
 						
-						if(iGreaterThanCount > iNestedTemplateLevel)
+						if(iGreaterThanCount > iNestedAngleBracketLevel)
 						{
 							// Most likely explanation:
 							// We screwed up the parsing of the template.
@@ -338,7 +374,7 @@ cxxParserParseTemplateAngleBracketsInternal(bool bCaptureTypeParameters)
 					cxxParserUngetCurrentToken();
 				}
 
-				while(iGreaterThanCount > iNestedTemplateLevel)
+				while(iGreaterThanCount > iNestedAngleBracketLevel)
 				{
 					CXX_DEBUG_PRINT("Going back one >");
 					iGreaterThanCount--;
@@ -347,9 +383,9 @@ cxxParserParseTemplateAngleBracketsInternal(bool bCaptureTypeParameters)
 				}
 
 				CXX_DEBUG_PRINT("Decreasing template level by %d",iGreaterThanCount);
-				iNestedTemplateLevel -= iGreaterThanCount;
+				iNestedAngleBracketLevel -= iGreaterThanCount;
 
-				if(iNestedTemplateLevel == 0)
+				if(iNestedAngleBracketLevel == 0)
 				{
 					CXX_DEBUG_PRINT("Found end of template");
 					return CXXParserParseTemplateAngleBracketsSucceeded;
@@ -382,7 +418,12 @@ cxxParserParseTemplateAngleBracketsInternal(bool bCaptureTypeParameters)
 						return CXXParserParseTemplateAngleBracketsFailed;
 					}
 
-					switch(cxxParserParseTemplateAngleBracketsInternal(false))
+					switch(
+							cxxParserParseTemplateAngleBracketsInternal(
+									false,
+									iNestedTemplateLevel+1
+								)
+						)
 					{
 						case CXXParserParseTemplateAngleBracketsFailed:
 							CXX_DEBUG_LEAVE_TEXT("Nested template parsing failed");
@@ -531,7 +572,7 @@ static bool cxxParserParseTemplateAngleBrackets(bool bCaptureTypeParameters)
 	CXX_DEBUG_ENTER();
 
 	CXXParserParseTemplateAngleBracketsResult r;
-	r = cxxParserParseTemplateAngleBracketsInternal(bCaptureTypeParameters);
+	r = cxxParserParseTemplateAngleBracketsInternal(bCaptureTypeParameters,0);
 
 	switch(r)
 	{
