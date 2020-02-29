@@ -205,8 +205,8 @@ static bool createTagsForEntry (const char *const entryName)
 	fileStatus *status = eStat (entryName);
 
 	Assert (entryName != NULL);
-	if (isExcludedFile (entryName))
-		verbose ("excluding \"%s\"\n", entryName);
+	if (isExcludedFile (entryName, true))
+		verbose ("excluding \"%s\" (the early stage)\n", entryName);
 	else if (status->isSymbolicLink  &&  ! Option.followLinks)
 		verbose ("ignoring \"%s\" (symbolic link)\n", entryName);
 	else if (! status->exists)
@@ -215,6 +215,8 @@ static bool createTagsForEntry (const char *const entryName)
 		resize = recurseIntoDirectory (entryName);
 	else if (! status->isNormalFile)
 		verbose ("ignoring \"%s\" (special file)\n", entryName);
+	else if (isExcludedFile (entryName, false))
+		verbose ("excluding \"%s\"\n", entryName);
 	else
 		resize = parseFile (entryName);
 
