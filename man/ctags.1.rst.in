@@ -386,6 +386,18 @@ are not listed here. They are experimental or for debugging purpose.
 	``--recurse`` option. To see the list of built-in exclude patterns, use
 	``--list-excludes``.
 
+	See also the description for ``--exclude-exception=`` option.
+
+``--exclude-exception=[pattern]``
+	Add pattern to a list of included files and directories. The pattern
+	affects the files and directories that are excluded by the pattern
+	specified with ``--exclude=`` option.
+
+	For an example, you want @CTAGS_NAME_EXAMPLE@ to ignore all files
+	under "foo" directory except "foo/main.c", use the following command
+	line: "--exclude=foo/* --exclude-exception=foo/main.c". Don't forget
+	shell quoting for '*'.
+
 ``--excmd=type``
 	Determines the type of EX command used to locate tags in the source
 	file. [Ignored in etags mode]

@@ -450,6 +450,12 @@ See :ref:`JSON output <output-json>` for more details.
 ``--tag-relative`` option is extend. See :ref:`ctags(1) <ctags(1)>`.
 
 
+``--exclude-exception``, an option complementing ``--exclude``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+See :ref:`ctags(1) <ctags(1)>`.
+
+
 Defining a macro in CPreProcessor input
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
