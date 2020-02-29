@@ -1,0 +1,4 @@
+A	input.d/a.h	/^#define A$/;"	d
+A	input.d/a.h	/^struct A {$/;"	s
+a0	input.d/a.h	/^	int a0, a1;$/;"	m	struct:A	typeref:typename:int
+a1	input.d/a.h	/^	int a0, a1;$/;"	m	struct:A	typeref:typename:int
