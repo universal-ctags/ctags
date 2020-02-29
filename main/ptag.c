@@ -148,6 +148,10 @@ static ptagDesc ptagDescs [] = {
 	  "the separator used in file name (slash or backslash)",
 	  ptagMakeCtagsOutputFilesep,
 	  true },
+	{ true, "TAG_PATTERN_LENGTH_LIMIT",
+	  "the limit of pattern length",
+	  ptagMakePatternLengthLimit,
+	  true },
 };
 
 extern bool makePtagIfEnabled (ptagType type, const void *data)

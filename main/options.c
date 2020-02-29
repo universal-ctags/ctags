@@ -25,6 +25,7 @@
 
 #include "ctags.h"
 #include "debug.h"
+#include "entry_p.h"
 #include "field_p.h"
 #include "gvars.h"
 #include "keyword_p.h"
@@ -2688,6 +2689,16 @@ static void processPatternLengthLimit(const char *const option, const char *cons
 
 	if (!strToUInt(parameter, 0, &Option.patternLengthLimit))
 		error (FATAL, "-%s: Invalid pattern length limit", option);
+}
+
+extern bool ptagMakePatternLengthLimit (ptagDesc *pdesc, const void *data)
+{
+	const optionValues *opt = data;
+	char buf [21];
+
+	if (snprintf (buf, 21, "%u", opt->patternLengthLimit) >= 0)
+		return writePseudoTag (pdesc, buf, "0 for no limit", NULL);
+	return false;
 }
 
 static void setBooleanToXtagWithWarning(booleanOption *const option, bool value)
