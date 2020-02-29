@@ -1002,17 +1002,18 @@ static bool cxxParserParseClassStructOrUnionInternal(
 		// {
 		// }
 
-		// FIXME: Should we add the specialisation arguments somewhere?
-		//        Maybe as a separate field?
-
-		bRet = cxxParserParseTemplateAngleBracketsToSeparateChain();
-
-		if(!bRet)
+		CXXTokenChain * pSpecChain = cxxParserParseTemplateAngleBracketsToSeparateChain(false);
+		if(!pSpecChain)
 		{
 			cxxKeywordEnableFinal(false);
 			CXX_DEBUG_LEAVE_TEXT("Could not parse class/struct/union name");
 			return false;
 		}
+
+		// FIXME: We currently just discard the specialization chain.
+		//        Should we add it as a new field?
+
+		cxxTokenChainDestroy(pSpecChain);
 	}
 
 	// Once we reached the terminator, "final" is not a keyword anymore.

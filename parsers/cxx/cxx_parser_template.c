@@ -568,12 +568,12 @@ cxxParserParseTemplateAngleBracketsInternal(bool bCaptureTypeParameters)
 // Parses the <parameters> part of a template specification.
 // Here we are pointing at the initial <.
 //
-static bool cxxParserParseTemplateAngleBrackets(void)
+static bool cxxParserParseTemplateAngleBrackets(bool bCaptureTypeParameters)
 {
 	CXX_DEBUG_ENTER();
 
 	CXXParserParseTemplateAngleBracketsResult r;
-	r = cxxParserParseTemplateAngleBracketsInternal(true);
+	r = cxxParserParseTemplateAngleBracketsInternal(bCaptureTypeParameters);
 
 	switch(r)
 	{
@@ -594,10 +594,7 @@ static bool cxxParserParseTemplateAngleBrackets(void)
 	CXX_DEBUG_ASSERT(false,"Never here");
 }
 
-//
-// Parses the template angle brackets and puts it in g_cxx.pTemplateTokenChain.
-//
-bool cxxParserParseTemplateAngleBracketsToSeparateChain(void)
+CXXTokenChain * cxxParserParseTemplateAngleBracketsToSeparateChain(bool bCaptureTypeParameters)
 {
 	CXX_DEBUG_ENTER();
 
@@ -608,36 +605,56 @@ bool cxxParserParseTemplateAngleBracketsToSeparateChain(void)
 			"We should be pointing at the opening angle bracket here"
 		);
 
-	CXXTokenChain * pSave = g_cxx.pTokenChain;
-	g_cxx.pTokenChain = cxxTokenChainCreate();
-	cxxTokenChainAppend(g_cxx.pTokenChain,cxxTokenChainTakeLast(pSave));
+	CXXTokenChain * pOut = cxxTokenChainCreate();
+	cxxTokenChainAppend(pOut,cxxTokenChainTakeLast(g_cxx.pTokenChain));
 
-	// TODO: Do we need to handle nesting?
-	//       Not for template<template<>> as it is handled separately
-	//       But maybe for nasty things like template<...(template<>)...>?
+	CXXTokenChain * pSave = g_cxx.pTokenChain;
+	g_cxx.pTokenChain = pOut;
+
+	bool bRet = cxxParserParseTemplateAngleBrackets(bCaptureTypeParameters);
+
+	g_cxx.pTokenChain = pSave;
+
+	if(!bRet)
+	{
+		CXX_DEBUG_LEAVE_TEXT("Failed to parse angle brackets");
+		cxxTokenChainDestroy(pOut);
+		return NULL;
+	}
+
+	CXX_DEBUG_LEAVE();
+	return pOut;
+}
+
+//
+// Parses the template angle brackets and puts it in g_cxx.pTemplateTokenChain.
+// Also captures he template type parameters in g_cxx.pTemplateParameters.
+//
+bool cxxParserParseTemplateAngleBracketsToTemplateChain(void)
+{
+	CXX_DEBUG_ENTER();
 
 	if(g_cxx.pTemplateParameters)
 		ptrArrayClear(g_cxx.pTemplateParameters);
 	else
 		g_cxx.pTemplateParameters = ptrArrayNew(NULL);
 
-	if(!cxxParserParseTemplateAngleBrackets())
+	CXXTokenChain * pOut = cxxParserParseTemplateAngleBracketsToSeparateChain(true);
+
+	if(!pOut)
 	{
 		CXX_DEBUG_LEAVE_TEXT("Failed to parse angle brackets");
-		cxxTokenChainDestroy(pSave);
 		return false;
 	}
 
 	if(g_cxx.pTemplateTokenChain)
 		cxxTokenChainDestroy(g_cxx.pTemplateTokenChain);
 
-	g_cxx.pTemplateTokenChain = g_cxx.pTokenChain;
-	g_cxx.pTokenChain = pSave;
+	g_cxx.pTemplateTokenChain = pOut;
 
 	CXX_DEBUG_LEAVE();
 	return true;
 }
-
 
 //
 // Parses a template<anything> prefix.
@@ -672,7 +689,7 @@ bool cxxParserParseTemplatePrefix(void)
 		return true; // tolerate syntax error
 	}
 
-	bool bRet = cxxParserParseTemplateAngleBracketsToSeparateChain();
+	bool bRet = cxxParserParseTemplateAngleBracketsToTemplateChain();
 
 	CXX_DEBUG_LEAVE();
 	return bRet;
