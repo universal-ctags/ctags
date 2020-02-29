@@ -444,7 +444,7 @@ used to enable it.
 
 See :ref:`JSON output <output-json>` for more details.
 
-"always" and "never" as an argument for --tag-relative
+"always" and "never" as an argument for ``--tag-relative``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ``--tag-relative`` option is extend. See :ref:`ctags(1) <ctags(1)>`.
