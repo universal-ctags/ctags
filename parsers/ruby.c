@@ -248,7 +248,7 @@ static bool parseRubyOperator (vString* name, const unsigned char** cp)
 /*
 * Emits a tag for the given 'name' of kind 'kind' at the current nesting.
 */
-static void emitRubyTag (vString* name, rubyKind kind)
+static int emitRubyTag (vString* name, rubyKind kind)
 {
 	tagEntryInfo tag;
 	vString* scope;
@@ -260,7 +260,7 @@ static void emitRubyTag (vString* name, rubyKind kind)
 	int r;
 
         if (!RubyKinds[kind].enabled) {
-            return;
+            return CORK_NIL;
         }
 
 	scope = nestingLevelsToScope (nesting);
@@ -301,6 +301,8 @@ static void emitRubyTag (vString* name, rubyKind kind)
 
 	vStringClear (name);
 	vStringDelete (scope);
+
+	return r;
 }
 
 /* Tests whether 'ch' is a character in 'list'. */
@@ -402,8 +404,9 @@ static rubyKind parseIdentifier (
 	return kind;
 }
 
-static void readAndEmitTag (const unsigned char** cp, rubyKind expected_kind)
+static int readAndEmitTag (const unsigned char** cp, rubyKind expected_kind)
 {
+	int r = CORK_NIL;
 	if (isspace (**cp))
 	{
 		vString *name = vStringNew ();
@@ -434,10 +437,11 @@ static void readAndEmitTag (const unsigned char** cp, rubyKind expected_kind)
 		}
 		else
 		{
-			emitRubyTag (name, actual_kind);
+			r = emitRubyTag (name, actual_kind);
 		}
 		vStringDelete (name);
 	}
+	return r;
 }
 
 static void enterUnnamedScope (void)
@@ -529,7 +533,25 @@ static void findRubyTags (void)
 		}
 		else if (canMatchKeywordWithAssign (&cp, "class"))
 		{
-			readAndEmitTag (&cp, K_CLASS);
+			int r = readAndEmitTag (&cp, K_CLASS);
+
+			if (r != CORK_NIL)
+			{
+				skipWhitespace (&cp);
+				if (*cp == '<' && *(cp + 1) != '<')
+				{
+					cp++;
+					vString *parent = vStringNew ();
+					parseIdentifier (&cp, parent, K_CLASS);
+					if (vStringLength (parent) > 0)
+					{
+						tagEntryInfo *e = getEntryInCorkQueue (r);
+						e->extensionFields.inheritance = vStringDeleteUnwrap (parent);
+					}
+					else
+						vStringDelete (parent);
+				}
+			}
 		}
 		else if (canMatchKeywordWithAssign (&cp, "def"))
 		{

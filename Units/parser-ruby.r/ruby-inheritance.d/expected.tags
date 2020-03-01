@@ -1,0 +1,2 @@
+A	input.rb	/^class A$/;"	c
+B	input.rb	/^class B < A$/;"	c	inherits:A
