@@ -1216,10 +1216,10 @@ def prepare_environment():
     global _PREPERE_ENV
 
     os.environ['LC_ALL'] = 'C'
-    os.environ['MSYS2_ARG_CONV_EXCL'] = '--regex-;--_scopesep'
+    os.environ['MSYS2_ARG_CONV_EXCL'] = '--regex-;--_scopesep;--exclude;--exclude-exception'
 
     _PREPERE_ENV = """LC_ALL="C"; export LC_ALL
-MSYS2_ARG_CONV_EXCL='--regex-;--_scopesep' export MSYS2_ARG_CONV_EXCL
+MSYS2_ARG_CONV_EXCL='--regex-;--_scopesep;--exclude;--exclude-exception' export MSYS2_ARG_CONV_EXCL
 """
 
 # enable ANSI escape sequences on Windows 10 1511 (10.0.10586) or later

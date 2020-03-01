@@ -122,7 +122,7 @@ static stringList *OptionFiles;
 typedef stringList searchPathList;
 static searchPathList *OptlibPathList;
 
-static stringList* Excluded;
+static stringList *Excluded, *ExcludedException;
 static bool FilesRequired = true;
 static bool SkipConfiguration;
 
@@ -244,6 +244,10 @@ static optionDescription LongOptionDescription [] = {
  {1,"       Include reference to 'file' in Emacs-style tag file (requires -e)."},
  {1,"  --exclude=pattern"},
  {1,"       Exclude files and directories matching 'pattern'."},
+ {1,"       See also --exclude-exception option."},
+ {1,"  --exclude-exception=pattern"},
+ {1,"      Don't exclude files and directories matching 'pattern' even if"},
+ {1,"      they match the pattern specified with --exclude option."},
  {0,"  --excmd=number|pattern|mix|combine"},
 #ifdef MACROS_USE_PATTERNS
  {0,"       Uses the specified type of EX command to locate tags [pattern]."},
@@ -1126,22 +1130,22 @@ static void processEtagsInclude (
 	}
 }
 
-static void processExcludeOption (
-		const char *const option CTAGS_ATTR_UNUSED, const char *const parameter)
+static void processExcludeOptionCommon (
+	stringList** list, const char *const optname, const char *const parameter)
 {
 	const char *const fileName = parameter + 1;
 	if (parameter [0] == '\0')
-		freeList (&Excluded);
+		freeList (list);
 	else if (parameter [0] == '@')
 	{
 		stringList* const sl = stringListNewFromFile (fileName);
 		if (sl == NULL)
 			error (FATAL | PERROR, "cannot open \"%s\"", fileName);
-		if (Excluded == NULL)
-			Excluded = sl;
+		if (*list == NULL)
+			*list = sl;
 		else
-			stringListCombine (Excluded, sl);
-		verbose ("    adding exclude patterns from %s\n", fileName);
+			stringListCombine (*list, sl);
+		verbose ("    adding %s patterns from %s\n", optname, fileName);
 	}
 	else
 	{
@@ -1149,22 +1153,53 @@ static void processExcludeOption (
 #if defined (WIN32)
 		vStringTranslate(item, PATH_SEPARATOR, OUTPUT_PATH_SEPARATOR);
 #endif
-		if (Excluded == NULL)
-			Excluded = stringListNew ();
-		stringListAdd (Excluded, item);
-		verbose ("    adding exclude pattern: %s\n", parameter);
+		if (*list == NULL)
+			*list = stringListNew ();
+		stringListAdd (*list, item);
+		verbose ("    adding %s pattern: %s\n", optname, parameter);
 	}
 }
 
-extern bool isExcludedFile (const char* const name)
+static void processExcludeOption (
+		const char *const option, const char *const parameter)
+{
+	processExcludeOptionCommon (&Excluded, option, parameter);
+}
+
+static void processExcludeExceptionOption (
+		const char *const option, const char *const parameter)
+{
+	processExcludeOptionCommon (&ExcludedException, option, parameter);
+}
+
+extern bool isExcludedFile (const char* const name,
+							bool falseIfExceptionsAreDefeind)
 {
 	const char* base = baseFilename (name);
 	bool result = false;
+
+	if (falseIfExceptionsAreDefeind
+		&& ExcludedException != NULL
+		&& stringListCount (ExcludedException) > 0)
+		return false;
+
 	if (Excluded != NULL)
 	{
 		result = stringListFileMatched (Excluded, base);
 		if (! result  &&  name != base)
 			result = stringListFileMatched (Excluded, name);
+	}
+
+	if (result && ExcludedException != NULL)
+	{
+		bool result_exception;
+
+		result_exception = stringListFileMatched (ExcludedException, base);
+		if (! result_exception && name != base)
+			result_exception = stringListFileMatched (ExcludedException, name);
+
+		if (result_exception)
+			result = false;
 	}
 	return result;
 }
@@ -2718,6 +2753,7 @@ static void processDumpOptionsOption (const char *const option, const char *cons
 static parametricOption ParametricOptions [] = {
 	{ "etags-include",          processEtagsInclude,            false,  STAGE_ANY },
 	{ "exclude",                processExcludeOption,           false,  STAGE_ANY },
+	{ "exclude-exception",      processExcludeExceptionOption,  false,  STAGE_ANY },
 	{ "excmd",                  processExcmdOption,             false,  STAGE_ANY },
 	{ "extra",                  processExtraTagsOption,         false,  STAGE_ANY },
 	{ "extras",                 processExtraTagsOption,         false,  STAGE_ANY },
@@ -3797,6 +3833,7 @@ extern void freeOptionResources (void)
 	freeString (&Option.filterTerminator);
 
 	freeList (&Excluded);
+	freeList (&ExcludedException);
 	freeList (&Option.headerExt);
 	freeList (&Option.etagsInclude);
 

@@ -1,0 +1,2 @@
+x	input.d/bazel-x/x.c	/^int x = 1;$/;"	v	typeref:typename:int
+z	input.d/bazel-z/z.c	/^int z = 1;$/;"	v	typeref:typename:int

@@ -1,0 +1,1 @@
+a	input.d/labze-a/a.c	/^int a = 3;$/;"	v	typeref:typename:int
