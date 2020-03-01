@@ -40,10 +40,9 @@ typedef enum _CXXParserParseTemplateAngleBracketsResult
 } CXXParserParseTemplateAngleBracketsResult;
 
 
-static bool cxxTemplateTokenCheckIsNonTypeAndCompareWord(const void *pToken,void * szWord)
+static bool cxxTemplateTokenCheckIsNonTypeAndCompareWord(const CXXToken *t,void * szWord)
 {
 	// To be non type the token must NOT be preceeded by class/struct/union
-	CXXToken * t = (CXXToken *)pToken;
 	if(!t->pPrev)
 		return false;
 	if(cxxTokenTypeIs(t->pPrev,CXXTokenTypeKeyword))
@@ -64,17 +63,23 @@ static bool cxxTokenIsPresentInTemplateParametersAsNonType(CXXToken * t)
 			"Token must be identifier"
 		);
 
-	return ptrArrayHasTest(
-			g_cxx.pTemplateParameters,
-			cxxTemplateTokenCheckIsNonTypeAndCompareWord,
-			vStringValue(t->pszWord)
-		);
+	for(unsigned int u=0;u<g_cxx.oTemplateParameters.uCount;u++)
+	{
+		if(
+			cxxTemplateTokenCheckIsNonTypeAndCompareWord(
+					t,
+					vStringValue(g_cxx.oTemplateParameters.aIdentifiers[u]->pszWord)
+				)
+			)
+			return true;
+	}
+
+	return false;
 }
 
-static bool cxxTemplateTokenCheckIsTypeAndCompareWord(const void *pToken,void * szWord)
+static bool cxxTemplateTokenCheckIsTypeAndCompareWord(const CXXToken * t,void * szWord)
 {
 	// To be non type the token must be preceeded by class/struct/union
-	CXXToken * t = (CXXToken *)pToken;
 	if(!t->pPrev)
 		return false;
 	if(!cxxTokenTypeIs(t->pPrev,CXXTokenTypeKeyword))
@@ -92,11 +97,18 @@ static bool cxxTokenIsPresentInTemplateParametersAsType(CXXToken * t)
 			"Token must be identifier"
 		);
 
-	return ptrArrayHasTest(
-			g_cxx.pTemplateParameters,
-			cxxTemplateTokenCheckIsTypeAndCompareWord,
-			vStringValue(t->pszWord)
-		);
+	for(unsigned int u=0;u<g_cxx.oTemplateParameters.uCount;u++)
+	{
+		if(
+			cxxTemplateTokenCheckIsTypeAndCompareWord(
+					t,
+					vStringValue(g_cxx.oTemplateParameters.aIdentifiers[u]->pszWord)
+				)
+			)
+			return true;
+	}
+
+	return false;
 }
 
 // Attempt to capture a template parameter that is between the
@@ -111,6 +123,12 @@ static void cxxParserParseTemplateAngleBracketsCaptureTypeParameter(
 	)
 {
 	CXX_DEBUG_ENTER();
+
+	if(g_cxx.oTemplateParameters.uCount >= CXX_TYPED_VARIABLE_SET_ITEM_COUNT)
+	{
+		CXX_DEBUG_LEAVE_TEXT("No space for more parameters");
+		return;
+	}
 
 	CXX_DEBUG_ASSERT(
 			pParameterStart &&
@@ -212,7 +230,13 @@ static void cxxParserParseTemplateAngleBracketsCaptureTypeParameter(
 			vStringValue(t->pPrev->pszWord)
 		);
 
-	ptrArrayAdd(g_cxx.pTemplateParameters,t->pPrev);
+	unsigned int c = g_cxx.oTemplateParameters.uCount;
+
+	g_cxx.oTemplateParameters.aIdentifiers[c] = t->pPrev;
+	g_cxx.oTemplateParameters.aTypeStarts[c] = pParameterStart;
+	g_cxx.oTemplateParameters.aTypeEnds[c] = t->pPrev->pPrev;
+
+	g_cxx.oTemplateParameters.uCount++;
 
 	CXX_DEBUG_LEAVE();
 }
@@ -715,10 +739,7 @@ bool cxxParserParseTemplateAngleBracketsToTemplateChain(void)
 {
 	CXX_DEBUG_ENTER();
 
-	if(g_cxx.pTemplateParameters)
-		ptrArrayClear(g_cxx.pTemplateParameters);
-	else
-		g_cxx.pTemplateParameters = ptrArrayNew(NULL);
+	g_cxx.oTemplateParameters.uCount = 0;
 
 	CXXTokenChain * pOut = cxxParserParseTemplateAngleBracketsToSeparateChain(true);
 
@@ -732,6 +753,8 @@ bool cxxParserParseTemplateAngleBracketsToTemplateChain(void)
 		cxxTokenChainDestroy(g_cxx.pTemplateTokenChain);
 
 	g_cxx.pTemplateTokenChain = pOut;
+
+	g_cxx.oTemplateParameters.pChain = pOut;
 
 	// make sure we have no stale specializations
 	// (note that specializations always come AFTER the main template)
@@ -790,26 +813,31 @@ void cxxParserEmitTemplateParameterTags(void)
 			g_cxx.pTemplateTokenChain &&
 			(g_cxx.pTemplateTokenChain->iCount > 0) &&
 			cxxParserCurrentLanguageIsCPP() &&
-			g_cxx.pTemplateParameters && // this should be ensured by chain existence
 			cxxTagKindEnabled(CXXTagCPPKindTEMPLATEPARAM),
 			"Template existence must be checked before calling this function"
 		);
 
-	int c = ptrArrayCount(g_cxx.pTemplateParameters);
+	unsigned int c = g_cxx.oTemplateParameters.uCount;
 
-	for(int i=0;i<c;i++)
+	for(unsigned int i=0;i<c;i++)
 	{
-		CXXToken * t = (CXXToken *)ptrArrayItem(g_cxx.pTemplateParameters,i);
-
-		CXX_DEBUG_PRINT("Emitting template param tag for '%s'",vStringValue(t->pszWord));
+		CXX_DEBUG_PRINT(
+				"Emitting template param tag for '%s'",
+				vStringValue(g_cxx.oTemplateParameters.aIdentifiers[i]->pszWord)
+			);
 
 		tagEntryInfo * tag = cxxTagBegin(
 				CXXTagCPPKindTEMPLATEPARAM,
-				t
+				g_cxx.oTemplateParameters.aIdentifiers[i]
 			);
 
 		if(!tag)
 			continue;
+
+		cxxTagCheckAndSetTypeField(
+				g_cxx.oTemplateParameters.aTypeStarts[i],
+				g_cxx.oTemplateParameters.aTypeEnds[i]
+			);
 
 		cxxTagCommit();
 	}

@@ -448,6 +448,7 @@ CXXToken * cxxTagCheckAndSetTypeField(
 	//        We should have a plain "type" field instead.
 
 	static const char * szTypename = "typename";
+	static const char * szMeta = "meta"; // for type template arguments
 
 	// Filter out initial keywords that need to be excluded from typenames
 	for(;;)
@@ -480,7 +481,17 @@ CXXToken * cxxTagCheckAndSetTypeField(
 			szTypeRef0 = szTypename;
 		}
 	} else {
-		szTypeRef0 = szTypename;
+		if(
+				cxxTokenTypeIs(pTypeStart,CXXTokenTypeKeyword) &&
+				cxxKeywordIsTypeRefMarker(pTypeStart->eKeyword)
+			)
+		{
+			// A lone "typename", "class", "struct" or similar.
+			// This almost certainly comes from a template.
+			szTypeRef0 = szMeta;
+		} else {
+			szTypeRef0 = szTypename;
+		}
 	}
 
 	if(!cxxTagCheckTypeField(pTypeStart,pTypeEnd))

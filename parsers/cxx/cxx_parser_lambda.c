@@ -287,7 +287,7 @@ bool cxxParserHandleLambda(CXXToken * pParenthesis)
 		cxxTagKindEnabled(CXXTagKindPARAMETER)
 	)
 	{
-		CXXFunctionParameterInfo oParamInfo;
+		CXXTypedVariableSet oParamInfo;
 		if(cxxParserTokenChainLooksLikeFunctionParameterList(
 				pParenthesis->pChain,&oParamInfo
 			))

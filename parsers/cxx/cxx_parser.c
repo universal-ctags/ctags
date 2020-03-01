@@ -1971,8 +1971,6 @@ void cxxParserCleanup(langType language CTAGS_ATTR_UNUSED,bool initialized CTAGS
 		cxxTokenChainDestroy(g_cxx.pTemplateTokenChain);
 	if(g_cxx.pTemplateSpecializationTokenChain)
 		cxxTokenChainDestroy(g_cxx.pTemplateSpecializationTokenChain);
-	if(g_cxx.pTemplateParameters)
-		ptrArrayDelete(g_cxx.pTemplateParameters);
 	// Restart coveralls: LCOV_EXCL_END
 
 	cxxScopeDone();
