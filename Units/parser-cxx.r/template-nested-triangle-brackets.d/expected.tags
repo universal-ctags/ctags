@@ -61,10 +61,10 @@ T	input-2.hpp	/^template<typename T,int I,int L,int J = I > L> K funcL(T t)$/;"	
 I	input-2.hpp	/^template<typename T,int I,int L,int J = I > L> K funcL(T t)$/;"	Z	function:funcL
 L	input-2.hpp	/^template<typename T,int I,int L,int J = I > L> K funcL(T t)$/;"	Z	function:funcL
 J	input-2.hpp	/^template<typename T,int I,int L,int J = I > L> K funcL(T t)$/;"	Z	function:funcL
-funcM	input-2.hpp	/^template<typename T,int I,int J = 1 > (1+2)> K funcM(T t)$/;"	f	typeref:typename:K	template:<typename T,int I,int J=1> (1+2)>
-T	input-2.hpp	/^template<typename T,int I,int J = 1 > (1+2)> K funcM(T t)$/;"	Z	function:funcM
-I	input-2.hpp	/^template<typename T,int I,int J = 1 > (1+2)> K funcM(T t)$/;"	Z	function:funcM
-J	input-2.hpp	/^template<typename T,int I,int J = 1 > (1+2)> K funcM(T t)$/;"	Z	function:funcM
+funcO	input-2.hpp	/^template<typename T,int I,unsigned int J = 1 > (1+2)> K funcO(T t)$/;"	f	typeref:typename:K	template:<typename T,int I,unsigned int J=1> (1+2)>
+T	input-2.hpp	/^template<typename T,int I,unsigned int J = 1 > (1+2)> K funcO(T t)$/;"	Z	function:funcO
+I	input-2.hpp	/^template<typename T,int I,unsigned int J = 1 > (1+2)> K funcO(T t)$/;"	Z	function:funcO
+J	input-2.hpp	/^template<typename T,int I,unsigned int J = 1 > (1+2)> K funcO(T t)$/;"	Z	function:funcO
 TestStruct	input-3.hpp	/^template <typename T> struct TestStruct {};$/;"	s	template:<typename T>
 T	input-3.hpp	/^template <typename T> struct TestStruct {};$/;"	Z	struct:TestStruct
 TemplateParameterStruct	input-3.hpp	/^template <typename T> struct TemplateParameterStruct {};$/;"	s	template:<typename T>

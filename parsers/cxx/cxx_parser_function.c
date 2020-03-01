@@ -1705,10 +1705,13 @@ int cxxParserEmitFunctionTags(
 		cxxScopePushTop(pSavedScope);
 
 #ifdef CXX_DO_DEBUGGING
-	if(uTagKind == CXXTagKindFUNCTION)
-		CXX_DEBUG_PRINT("Emitted function '%s'",vStringValue(pIdentifier->pszWord));
-	else
-		CXX_DEBUG_PRINT("Emitted prototype '%s'",vStringValue(pIdentifier->pszWord));
+	if(tag)
+	{
+		if(uTagKind == CXXTagKindFUNCTION)
+			CXX_DEBUG_PRINT("Emitted function '%s'",vStringValue(pIdentifier->pszWord));
+		else
+			CXX_DEBUG_PRINT("Emitted prototype '%s'",vStringValue(pIdentifier->pszWord));
+	}
 #endif
 
 	if(bPushScopes)
@@ -1720,6 +1723,7 @@ int cxxParserEmitFunctionTags(
 	}
 
 	if(
+			tag &&
 			bGotTemplate &&
 			cxxTagKindEnabled(CXXTagCPPKindTEMPLATEPARAM)
 		)

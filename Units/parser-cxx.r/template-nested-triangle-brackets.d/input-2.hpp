@@ -63,7 +63,22 @@ template<typename T,int I,int L,int J = I > L> K funcL(T t)
 	return 0;
 }
 
-template<typename T,int I,int J = 1 > (1+2)> K funcM(T t)
+/*
+
+Without the knowledge of V these two are too ambiguous.
+
+template<typename T,int I,long int J = 1 > V> K funcM(T t)
+{
+	return 0;
+}
+
+template<typename T,int I,unsigned long int J = I > V> K funcN(T t)
+{
+	return 0;
+}
+*/
+
+template<typename T,int I,unsigned int J = 1 > (1+2)> K funcO(T t)
 {
 	return 0;
 }

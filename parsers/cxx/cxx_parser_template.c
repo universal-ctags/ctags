@@ -99,6 +99,125 @@ static bool cxxTokenIsPresentInTemplateParametersAsType(CXXToken * t)
 		);
 }
 
+// Attempt to capture a template parameter that is between the
+// specified tokens. pBeforeParameter points to the first token
+// of the parameter (just after < or ,). pAfterParameter points
+// somewhere after the end of the parameter, usually to the next
+// , or > but it may happen that it points to an unbalanced >
+// because of broken input or because we screwed up parsing a bit.
+static void cxxParserParseTemplateAngleBracketsCaptureTypeParameter(
+		CXXToken * pParameterStart,
+		CXXToken * pAfterParameter
+	)
+{
+	CXX_DEBUG_ENTER();
+
+	CXX_DEBUG_ASSERT(
+			pParameterStart &&
+			pParameterStart->pPrev &&
+			cxxTokenTypeIsOneOf(
+					pParameterStart->pPrev,
+					CXXTokenTypeSmallerThanSign | CXXTokenTypeComma
+				),
+			"pParameterStart should point to the parameter start"
+		);
+
+	CXX_DEBUG_ASSERT(
+			pAfterParameter &&
+			pAfterParameter->pPrev &&
+			cxxTokenTypeIsOneOf(
+					pAfterParameter,
+					CXXTokenTypeGreaterThanSign | CXXTokenTypeComma
+				),
+			"pAfterParameter should point after the parameter"
+		);
+
+	CXX_DEBUG_ASSERT(
+			pParameterStart != pAfterParameter,
+			"The tokens should not be the same"
+		);
+
+	// We're OK with:
+	//
+	// typename X
+	// class X
+	// int X
+	// unsigned int X
+	// typeName * X
+	// typeName X
+	// typeName ...X
+	//
+	// but not
+	//
+	// typename boost::enable_if...
+	//
+
+	if(pParameterStart->pNext == g_cxx.pToken)
+	{
+		// Only one token in the parameter. Can't be.
+		CXX_DEBUG_LEAVE_TEXT("Single parameter token");
+		return;
+	}
+
+	// Straegy: run to the first , > or =.
+
+	CXXToken * t = pParameterStart;
+
+	for(;;)
+	{
+		CXX_DEBUG_PRINT(
+				"Token '%s' [%s]",
+				vStringValue(t->pszWord),
+				cxxDebugTypeDecode(t->eType)
+			);
+
+		if(cxxTokenTypeIsOneOf(
+				t,
+				CXXTokenTypeComma | CXXTokenTypeGreaterThanSign |
+				CXXTokenTypeAssignment
+			))
+		{
+			CXX_DEBUG_PRINT("Found terminator, stopping");
+			break;
+		}
+
+		if(!((
+				cxxTokenTypeIs(t,CXXTokenTypeKeyword) &&
+				cxxKeywordMayBePartOfTypeName(t->eKeyword)
+			) || (
+				cxxTokenTypeIsOneOf(
+					t,
+					CXXTokenTypeIdentifier | CXXTokenTypeStar |
+					CXXTokenTypeAnd | CXXTokenTypeMultipleAnds |
+					CXXTokenTypeMultipleDots
+				)
+			)))
+		{
+			// something we don't like
+			CXX_DEBUG_LEAVE_TEXT("This is something we don't like");
+			return;
+		}
+
+		t = t->pNext;
+	}
+
+	if(!cxxTokenTypeIs(t->pPrev,CXXTokenTypeIdentifier))
+	{
+		CXX_DEBUG_LEAVE_TEXT("The previous token is not an identifier");
+		return; // bad
+	}
+
+	CXX_DEBUG_PRINT(
+			"Adding %s to template parameters",
+			vStringValue(t->pPrev->pszWord)
+		);
+
+	ptrArrayAdd(g_cxx.pTemplateParameters,t->pPrev);
+
+	CXX_DEBUG_LEAVE();
+}
+
+
 //
 // Parses the <parameters> part of a template specification.
 // Here we are pointing at the initial <.
@@ -144,13 +263,16 @@ cxxParserParseTemplateAngleBracketsInternal(bool bCaptureTypeParameters,int iNes
 
 	int iNestedAngleBracketLevel = 1;
 
+	// This points to the token before the current parameter start: < or a comma.
+	CXXToken * pBeforeParameterStart = g_cxx.pToken;
+
 	for(;;)
 	{
 		// Within parentheses everything is permitted.
 		if(!cxxParserParseAndCondenseSubchainsUpToOneOf(
 				CXXTokenTypeGreaterThanSign | CXXTokenTypeSmallerThanSign |
 					CXXTokenTypeOpeningBracket | CXXTokenTypeSemicolon |
-					CXXTokenTypeEOF | CXXTokenTypeKeyword,
+					CXXTokenTypeComma | CXXTokenTypeEOF | CXXTokenTypeKeyword,
 				CXXTokenTypeOpeningParenthesis |
 					CXXTokenTypeOpeningSquareParenthesis,
 				false
@@ -164,6 +286,21 @@ cxxParserParseTemplateAngleBracketsInternal(bool bCaptureTypeParameters,int iNes
 
 		switch(g_cxx.pToken->eType)
 		{
+			case CXXTokenTypeComma:
+				if(
+					bCaptureTypeParameters &&
+					(iNestedTemplateLevel == 0) &&
+					(iNestedAngleBracketLevel == 1) &&
+					(pBeforeParameterStart->pNext != g_cxx.pToken)
+				)
+					cxxParserParseTemplateAngleBracketsCaptureTypeParameter(
+							pBeforeParameterStart->pNext,
+							g_cxx.pToken
+						);
+
+				if(iNestedAngleBracketLevel == 1)
+					pBeforeParameterStart = g_cxx.pToken;
+			break;
 			case CXXTokenTypeSmallerThanSign:
 			{
 				// blah <
@@ -200,7 +337,7 @@ cxxParserParseTemplateAngleBracketsInternal(bool bCaptureTypeParameters,int iNes
 
 				} else {
 
-					CXX_DEBUG_PRINT("Increasing template level by one");
+					CXX_DEBUG_PRINT("Increasing angle bracket level by one");
 					iNestedAngleBracketLevel++;
 				}
 
@@ -335,7 +472,7 @@ cxxParserParseTemplateAngleBracketsInternal(bool bCaptureTypeParameters,int iNes
 				{
 					// The loop above stopped because of a non > token.
 					CXX_DEBUG_ASSERT(iGreaterThanCount < iMaxGreaterThanCount,"Bug");
-					
+
 					// Handle gracefully some special cases
 					if(
 							cxxTokenIsNonConstantKeyword(g_cxx.pToken) ||
@@ -350,14 +487,24 @@ cxxParserParseTemplateAngleBracketsInternal(bool bCaptureTypeParameters,int iNes
 						//   ... > static ...
 						//   ... > typeParameter ...
 						// The part on the right of > does not seem to be a constant
-						// so this is not a comparison. 
+						// so this is not a comparison.
 						CXX_DEBUG_PRINT(
 								"Found '> %s': assuming end of template",
 								vStringValue(g_cxx.pToken->pszWord)
 							);
-	
+
 						cxxParserUngetCurrentToken();
-						
+
+						if(
+							bCaptureTypeParameters &&
+							(iNestedTemplateLevel == 0) &&
+							(pBeforeParameterStart->pNext != g_cxx.pToken)
+						)
+							cxxParserParseTemplateAngleBracketsCaptureTypeParameter(
+									pBeforeParameterStart->pNext,
+									g_cxx.pToken
+								);
+
 						if(iGreaterThanCount > iNestedAngleBracketLevel)
 						{
 							// Most likely explanation:
@@ -379,15 +526,24 @@ cxxParserParseTemplateAngleBracketsInternal(bool bCaptureTypeParameters,int iNes
 					CXX_DEBUG_PRINT("Going back one >");
 					iGreaterThanCount--;
 					cxxParserUngetCurrentToken();
-					continue;
 				}
 
-				CXX_DEBUG_PRINT("Decreasing template level by %d",iGreaterThanCount);
+				CXX_DEBUG_PRINT("Decreasing angle bracket level by %d",iGreaterThanCount);
 				iNestedAngleBracketLevel -= iGreaterThanCount;
 
 				if(iNestedAngleBracketLevel == 0)
 				{
-					CXX_DEBUG_PRINT("Found end of template");
+					if(
+						bCaptureTypeParameters &&
+						(iNestedTemplateLevel == 0) &&
+						(pBeforeParameterStart->pNext != g_cxx.pToken)
+					)
+						cxxParserParseTemplateAngleBracketsCaptureTypeParameter(
+								pBeforeParameterStart->pNext,
+								g_cxx.pToken
+							);
+
+					CXX_DEBUG_LEAVE_TEXT("Found end of template");
 					return CXXParserParseTemplateAngleBracketsSucceeded;
 				}
 			}
@@ -449,80 +605,6 @@ cxxParserParseTemplateAngleBracketsInternal(bool bCaptureTypeParameters,int iNes
 
 					continue;
 				}
-
-				if(
-						bCaptureTypeParameters &&
-						cxxKeywordMayBePartOfTypeName(g_cxx.pToken->eKeyword) &&
-						g_cxx.pToken->pPrev &&
-						cxxTokenTypeIsOneOf(
-								g_cxx.pToken->pPrev,
-								CXXTokenTypeSmallerThanSign | CXXTokenTypeComma
-							)
-					)
-				{
-					// < typename X
-					// , class Y
-					// , int z
-					//
-					// but not
-					//
-					// < typename boost::enable_if...
-					//
-
-					CXX_DEBUG_PRINT("Found part of typename: look for type param");
-
-					if(!cxxParserParseNextToken())
-					{
-						CXX_DEBUG_LEAVE_TEXT("Syntax error, but tolerable");
-						return CXXParserParseTemplateAngleBracketsFailedRecoverable;
-					}
-
-					if(!cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeIdentifier))
-					{
-						// FIXME: this doesn't handle types with multiple keywords
-						//        (unsigned int)
-
-						CXX_DEBUG_PRINT("Found non-identifier: not a type param");
-						cxxParserUngetCurrentToken();
-						continue;
-					}
-
-					CXXToken * pParam = g_cxx.pToken;
-
-					CXX_DEBUG_PRINT("Found identifier '%s'",vStringValue(pParam->pszWord));
-
-					if(!cxxParserParseNextToken())
-					{
-						CXX_DEBUG_LEAVE_TEXT("Syntax error, but tolerable");
-						return CXXParserParseTemplateAngleBracketsFailedRecoverable;
-					}
-
-					if(!cxxTokenTypeIsOneOf(
-							g_cxx.pToken,
-							CXXTokenTypeGreaterThanSign |
-							CXXTokenTypeComma |
-							CXXTokenTypeAssignment
-						))
-					{
-						// nope.
-						CXX_DEBUG_PRINT("Followed by unexpected stuff: no type param");
-						cxxParserUngetCurrentToken();
-						continue;
-					}
-
-					CXX_DEBUG_PRINT(
-							"Adding '%s' to template parameter list",
-							vStringValue(pParam->pszWord)
-						);
-
-					ptrArrayAdd(g_cxx.pTemplateParameters,pParam);
-
-					if(cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeGreaterThanSign))
-						cxxParserUngetCurrentToken();
-
-					continue;
-				}
-
 				// other keyword
 			break;
 			case CXXTokenTypeEOF:
