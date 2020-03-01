@@ -385,6 +385,8 @@ vString * cxxTokenChainJoin(
 	return s;
 }
 
+#if 0
+// currently unused
 void cxxTokenChainMoveEntries(CXXTokenChain * src,CXXTokenChain * dest)
 {
 	if(dest->iCount > 0)
@@ -437,6 +439,7 @@ void cxxTokenChainMoveEntryRange(
 		t = next;
 	}
 }
+#endif
 
 CXXTokenChain * cxxTokenChainSplitOnComma(CXXTokenChain * tc)
 {
