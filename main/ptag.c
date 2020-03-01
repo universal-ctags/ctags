@@ -28,11 +28,12 @@ static bool ptagMakeFormat (ptagDesc *desc, const void *data CTAGS_ATTR_UNUSED)
 {
 	char format [11];
 	const char *formatComment = "unknown format";
+	const optionValues *opt = data;
 
-	sprintf (format, "%u", Option.tagFileFormat);
-	if (Option.tagFileFormat == 1)
+	sprintf (format, "%u", opt->tagFileFormat);
+	if (opt->tagFileFormat == 1)
 		formatComment = "original ctags format";
-	else if (Option.tagFileFormat == 2)
+	else if (opt->tagFileFormat == 2)
 		formatComment =
 			"extended format; --format=1 will not append ;\" to lines";
 	return writePseudoTag (desc, format, formatComment, NULL);
@@ -40,9 +41,10 @@ static bool ptagMakeFormat (ptagDesc *desc, const void *data CTAGS_ATTR_UNUSED)
 
 static bool ptagMakeHowSorted (ptagDesc *desc, const void *data CTAGS_ATTR_UNUSED)
 {
+	const optionValues *opt = data;
 	return writePseudoTag (desc,
-			       Option.sorted == SO_FOLDSORTED ? "2" :
-			       (Option.sorted == SO_SORTED ? "1" : "0"),
+			       opt->sorted == SO_FOLDSORTED ? "2" :
+			       (opt->sorted == SO_SORTED ? "1" : "0"),
 			       "0=unsorted, 1=sorted, 2=foldcase",
 			       NULL);
 }
@@ -74,10 +76,11 @@ static bool ptagMakeProgVersion (ptagDesc *desc, const void *data CTAGS_ATTR_UNU
 #ifdef HAVE_ICONV
 static bool ptagMakeFileEncoding (ptagDesc *desc, const void *data CTAGS_ATTR_UNUSED)
 {
-	if (! Option.outputEncoding)
+	const optionValues *opt = data;
+	if (! opt->outputEncoding)
 		return false;
 
-	return writePseudoTag (desc, Option.outputEncoding, "", NULL);
+	return writePseudoTag (desc, opt->outputEncoding, "", NULL);
 }
 #endif
 
@@ -147,6 +150,10 @@ static ptagDesc ptagDescs [] = {
 	{ true, "TAG_OUTPUT_FILESEP",
 	  "the separator used in file name (slash or backslash)",
 	  ptagMakeCtagsOutputFilesep,
+	  true },
+	{ true, "TAG_PATTERN_LENGTH_LIMIT",
+	  "the limit of pattern length",
+	  ptagMakePatternLengthLimit,
 	  true },
 };
 
