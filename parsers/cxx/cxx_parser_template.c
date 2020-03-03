@@ -40,33 +40,214 @@ typedef enum _CXXParserParseTemplateAngleBracketsResult
 } CXXParserParseTemplateAngleBracketsResult;
 
 
-static bool cxxTokenCompareWord(const void *pToken,void * szWord)
+static bool cxxTemplateTokenCheckIsNonTypeAndCompareWord(const CXXToken *t,void * szWord)
 {
-	CXXToken * t = (CXXToken *)pToken;
+	// To be non type the token must NOT be preceeded by class/struct/union
+	if(!t->pPrev)
+		return false;
+	if(cxxTokenTypeIs(t->pPrev,CXXTokenTypeKeyword))
+	{
+		if(cxxKeywordIsTypeRefMarker(t->pPrev->eKeyword))
+			return false; // preceeded by a type ref marker
+
+		// otherwise it's probably something like "int"
+	}
 	const char * w = (const char *)szWord;
 	return strcmp(vStringValue(t->pszWord),w) == 0;
 }
 
-static bool cxxTokenIsPresentInTemplateParameters(CXXToken * t)
+static bool cxxTokenIsPresentInTemplateParametersAsNonType(CXXToken * t)
 {
 	CXX_DEBUG_ASSERT(
-			cxxTokenTypeIsOneOf(t,CXXTokenTypeIdentifier | CXXTokenTypeKeyword),
-			"Token must be identifier or keyword"
+			cxxTokenTypeIsOneOf(t,CXXTokenTypeIdentifier),
+			"Token must be identifier"
 		);
 
-	return ptrArrayHasTest(
-			g_cxx.pTemplateParameters,
-			cxxTokenCompareWord,
-			vStringValue(t->pszWord)
-		);
+	for(unsigned int u=0;u<g_cxx.oTemplateParameters.uCount;u++)
+	{
+		if(
+			cxxTemplateTokenCheckIsNonTypeAndCompareWord(
+					t,
+					vStringValue(g_cxx.oTemplateParameters.aIdentifiers[u]->pszWord)
+				)
+			)
+			return true;
+	}
+
+	return false;
 }
+
+static bool cxxTemplateTokenCheckIsTypeAndCompareWord(const CXXToken * t,void * szWord)
+{
+	// To be non type the token must be preceeded by class/struct/union
+	if(!t->pPrev)
+		return false;
+	if(!cxxTokenTypeIs(t->pPrev,CXXTokenTypeKeyword))
+		return false;
+	if(!cxxKeywordIsTypeRefMarker(t->pPrev->eKeyword))
+		return false;
+	const char * w = (const char *)szWord;
+	return strcmp(vStringValue(t->pszWord),w) == 0;
+}
+
+static bool cxxTokenIsPresentInTemplateParametersAsType(CXXToken * t)
+{
+	CXX_DEBUG_ASSERT(
+			cxxTokenTypeIsOneOf(t,CXXTokenTypeIdentifier),
+			"Token must be identifier"
+		);
+
+	for(unsigned int u=0;u<g_cxx.oTemplateParameters.uCount;u++)
+	{
+		if(
+			cxxTemplateTokenCheckIsTypeAndCompareWord(
+					t,
+					vStringValue(g_cxx.oTemplateParameters.aIdentifiers[u]->pszWord)
+				)
+			)
+			return true;
+	}
+
+	return false;
+}
+
+// Attempt to capture a template parameter that is between the
+// specified tokens. pBeforeParameter points to the first token
+// of the parameter (just after < or ,). pAfterParameter points
+// somewhere after the end of the parameter, usually to the next
+// , or > but it may happen that it points to an unbalanced >
+// because of broken input or because we screwed up parsing a bit.
+static void cxxParserParseTemplateAngleBracketsCaptureTypeParameter(
+		CXXToken * pParameterStart,
+		CXXToken * pAfterParameter
+	)
+{
+	CXX_DEBUG_ENTER();
+
+	if(g_cxx.oTemplateParameters.uCount >= CXX_TYPED_VARIABLE_SET_ITEM_COUNT)
+	{
+		CXX_DEBUG_LEAVE_TEXT("No space for more parameters");
+		return;
+	}
+
+	CXX_DEBUG_ASSERT(
+			pParameterStart &&
+			pParameterStart->pPrev &&
+			cxxTokenTypeIsOneOf(
+					pParameterStart->pPrev,
+					CXXTokenTypeSmallerThanSign | CXXTokenTypeComma
+				),
+			"pParameterStart should point to the parameter start"
+		);
+
+	CXX_DEBUG_ASSERT(
+			pAfterParameter &&
+			pAfterParameter->pPrev &&
+			cxxTokenTypeIsOneOf(
+					pAfterParameter,
+					CXXTokenTypeGreaterThanSign | CXXTokenTypeComma
+				),
+			"pAfterParameter should point after the parameter"
+		);
+
+	CXX_DEBUG_ASSERT(
+			pParameterStart != pAfterParameter,
+			"The tokens should not be the same"
+		);
+
+	// We're OK with:
+	//
+	// typename X
+	// class X
+	// int X
+	// unsigned int X
+	// typeName * X
+	// typeName X
+	// typeName ...X
+	//
+	// but not
+	//
+	// typename boost::enable_if...
+	//
+
+	if(pParameterStart->pNext == g_cxx.pToken)
+	{
+		// Only one token in the parameter. Can't be.
+		CXX_DEBUG_LEAVE_TEXT("Single parameter token");
+		return;
+	}
+
+	// Straegy: run to the first , > or =.
+
+	CXXToken * t = pParameterStart;
+
+	for(;;)
+	{
+		CXX_DEBUG_PRINT(
+				"Token '%s' [%s]",
+				vStringValue(t->pszWord),
+				cxxDebugTypeDecode(t->eType)
+			);
+
+		if(cxxTokenTypeIsOneOf(
+				t,
+				CXXTokenTypeComma | CXXTokenTypeGreaterThanSign |
+				CXXTokenTypeAssignment
+			))
+		{
+			CXX_DEBUG_PRINT("Found terminator, stopping");
+			break;
+		}
+
+		if(!((
+				cxxTokenTypeIs(t,CXXTokenTypeKeyword) &&
+				cxxKeywordMayBePartOfTypeName(t->eKeyword)
+			) || (
+				cxxTokenTypeIsOneOf(
+					t,
+					CXXTokenTypeIdentifier | CXXTokenTypeStar |
+					CXXTokenTypeAnd | CXXTokenTypeMultipleAnds |
+					CXXTokenTypeMultipleDots
+				)
+			)))
+		{
+			// something we don't like
+			CXX_DEBUG_LEAVE_TEXT("This is something we don't like");
+			return;
+		}
+
+		t = t->pNext;
+	}
+
+	if(!cxxTokenTypeIs(t->pPrev,CXXTokenTypeIdentifier))
+	{
+		CXX_DEBUG_LEAVE_TEXT("The previous token is not an identifier");
+		return; // bad
+	}
+
+	CXX_DEBUG_PRINT(
+			"Adding %s to template parameters",
+			vStringValue(t->pPrev->pszWord)
+		);
+
+	unsigned int c = g_cxx.oTemplateParameters.uCount;
+
+	g_cxx.oTemplateParameters.aIdentifiers[c] = t->pPrev;
+	g_cxx.oTemplateParameters.aTypeStarts[c] = pParameterStart;
+	g_cxx.oTemplateParameters.aTypeEnds[c] = t->pPrev->pPrev;
+
+	g_cxx.oTemplateParameters.uCount++;
+
+	CXX_DEBUG_LEAVE();
+}
+
 
 //
 // Parses the <parameters> part of a template specification.
 // Here we are pointing at the initial <.
 //
 static CXXParserParseTemplateAngleBracketsResult
-cxxParserParseTemplateAngleBracketsInternal(bool bCaptureTypeParameters)
+cxxParserParseTemplateAngleBracketsInternal(bool bCaptureTypeParameters,int iNestedTemplateLevel)
 {
 	CXX_DEBUG_ENTER();
 
@@ -104,7 +285,10 @@ cxxParserParseTemplateAngleBracketsInternal(bool bCaptureTypeParameters)
 			"We should be pointing at the opening angle bracket here"
 		);
 
-	int iNestedTemplateLevel = 0;
+	int iNestedAngleBracketLevel = 1;
+
+	// This points to the token before the current parameter start: < or a comma.
+	CXXToken * pBeforeParameterStart = g_cxx.pToken;
 
 	for(;;)
 	{
@@ -112,7 +296,7 @@ cxxParserParseTemplateAngleBracketsInternal(bool bCaptureTypeParameters)
 		if(!cxxParserParseAndCondenseSubchainsUpToOneOf(
 				CXXTokenTypeGreaterThanSign | CXXTokenTypeSmallerThanSign |
 					CXXTokenTypeOpeningBracket | CXXTokenTypeSemicolon |
-					CXXTokenTypeEOF | CXXTokenTypeKeyword,
+					CXXTokenTypeComma | CXXTokenTypeEOF | CXXTokenTypeKeyword,
 				CXXTokenTypeOpeningParenthesis |
 					CXXTokenTypeOpeningSquareParenthesis,
 				false
@@ -126,64 +310,39 @@ cxxParserParseTemplateAngleBracketsInternal(bool bCaptureTypeParameters)
 
 		switch(g_cxx.pToken->eType)
 		{
+			case CXXTokenTypeComma:
+				if(
+					bCaptureTypeParameters &&
+					(iNestedTemplateLevel == 0) &&
+					(iNestedAngleBracketLevel == 1) &&
+					(pBeforeParameterStart->pNext != g_cxx.pToken)
+				)
+					cxxParserParseTemplateAngleBracketsCaptureTypeParameter(
+							pBeforeParameterStart->pNext,
+							g_cxx.pToken
+						);
+
+				if(iNestedAngleBracketLevel == 1)
+					pBeforeParameterStart = g_cxx.pToken;
+			break;
 			case CXXTokenTypeSmallerThanSign:
 			{
 				// blah <
 
-				CXXToken * pFirstSmallerThan = g_cxx.pToken;
+				CXXToken * pSmallerThan = g_cxx.pToken;
 
-				bool bFirstFollowedBySpace = g_cxx.pToken->bFollowedBySpace;
-
-				int iSmallerThanCount = 1;
-
-				// Here we skip ALL of the smaller-than signs we find.
-				for(;;)
+				if(!cxxParserParseNextToken())
 				{
-					if(!cxxParserParseNextToken())
-					{
-						CXX_DEBUG_LEAVE_TEXT("Syntax error, but tolerate it at this level");
-						return CXXParserParseTemplateAngleBracketsFailedRecoverable;
-					}
-
-					CXX_DEBUG_PRINT(
-							"< followed by token '%s' of type 0x%02x (%s)",
-							vStringValue(g_cxx.pToken->pszWord),
-							g_cxx.pToken->eType,
-							cxxDebugTypeDecode(g_cxx.pToken->eType)
-						);
-
-					if(!cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeSmallerThanSign))
-						break;
-
-					iSmallerThanCount++;
+					CXX_DEBUG_LEAVE_TEXT("Syntax error, but tolerate it at this level");
+					return CXXParserParseTemplateAngleBracketsFailedRecoverable;
 				}
 
-				// check left shift operator: very narrow conditions
-				if(
-					(!bFirstFollowedBySpace) &&
-					(iSmallerThanCount == 2) &&
-					cxxTokenTypeIsOneOf(
-							g_cxx.pToken,
-							CXXTokenTypeIdentifier | CXXTokenTypeParenthesisChain |
-							CXXTokenTypeNumber | CXXTokenTypeKeyword
-						) &&
-					// note that pFirstGreaterThan->pPrev is certainly valid here
-					cxxTokenTypeIsOneOf(
-							pFirstSmallerThan->pPrev,
-							CXXTokenTypeIdentifier | CXXTokenTypeKeyword
-						) &&
-					// int << ...
-					(!cxxTokenIsNonConstantKeyword(pFirstSmallerThan->pPrev)) &&
-					// ... << class
-					(!cxxTokenIsNonConstantKeyword(g_cxx.pToken)) &&
-					// T <<
-					(!cxxTokenIsPresentInTemplateParameters(pFirstSmallerThan->pPrev))
-				)
-				{
-					// assume it's an operator
-					CXX_DEBUG_PRINT("Treating << as shift-left operator");
-					continue;
-				}
+				CXX_DEBUG_PRINT(
+						"< followed by token '%s' of type 0x%02x (%s)",
+						vStringValue(g_cxx.pToken->pszWord),
+						g_cxx.pToken->eType,
+						cxxDebugTypeDecode(g_cxx.pToken->eType)
+					);
 
 				// Check less than operator for the special conditions
 				// we can be sure of:
@@ -192,24 +351,19 @@ cxxParserParseTemplateAngleBracketsInternal(bool bCaptureTypeParameters)
 				// The other cases can't be handled safely. We expect the user
 				// to use parentheses.
 				if(
-					(iSmallerThanCount == 1) &&
-					(
-						// ... 1 < whatever ...
-						cxxTokenTypeIs(pFirstSmallerThan->pPrev,CXXTokenTypeNumber) ||
-						// ... typeParam < 1 ...
-						(
-							cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeNumber) &&
-							cxxTokenIsPresentInTemplateParameters(pFirstSmallerThan->pPrev)
-						)
-					)
+					// ... 1 < whatever ...
+					cxxTokenTypeIs(pSmallerThan->pPrev,CXXTokenTypeNumber) ||
+					// ... nonTypeParam < whatever ...
+					cxxTokenIsPresentInTemplateParametersAsNonType(pSmallerThan->pPrev)
 				)
 				{
 					CXX_DEBUG_PRINT("Treating < as less-than operator");
-					continue;
-				}
 
-				CXX_DEBUG_PRINT("Increasing template level by %d",iSmallerThanCount);
-				iNestedTemplateLevel += iSmallerThanCount;
+				} else {
+
+					CXX_DEBUG_PRINT("Increasing angle bracket level by one");
+					iNestedAngleBracketLevel++;
+				}
 
 				if(cxxTokenTypeIsOneOf(
 						g_cxx.pToken,
@@ -226,44 +380,22 @@ cxxParserParseTemplateAngleBracketsInternal(bool bCaptureTypeParameters)
 			break;
 			case CXXTokenTypeGreaterThanSign:
 			{
-				if(iNestedTemplateLevel == 0)
-				{
-					// Non-nested > : always a terminator
-					CXX_DEBUG_LEAVE_TEXT("Found end of template");
-					return CXXParserParseTemplateAngleBracketsSucceeded;
-				}
-
-				// Nested > : is it a shift operator?
-
-				CXXToken * pFirstGreaterThan = g_cxx.pToken;
+				// > : is it a part of a shift operator?
 
 				bool bFirstFollowedBySpace = g_cxx.pToken->bFollowedBySpace;
 
 				int iGreaterThanCount = 1;
 
-				// Here we skip ALL of the greater than signs we find
-				// unless they're more than we need to exit the template
-				// parsing routine.
-				//
-				// Rationale:
-				//
-				// iNestedTemplateLevel is certainly > 0 here (see check above).
-				// So it is always safe to parse N = (iNestedTemplateLevel + 1)
-				// greater-than signs. And N >= 2, for sure.
-				// If we parse exactly 2 greater-than signs (that is, a >>) then
-				// it MAY be a shift operator, depending on what is found on the
-				// left and right. To check what is found on right we need to
-				// continue parsing even after then second greater-than.
-				// So we really just continue parsing until either a
-				// non-greater-than token is found OR we parse N+1 greater-than
-				// tokens. In the latter case the shift operator is excluded
-				// and we will have to unget one of the greater-thans.
+				// Here we skip all of the greater than signs we find
+				// up to the number we need to exit the template, but at least three.
+				// The minimum of three means that in the following loop we skip
+				// at least two greater than signs AND at least another token.
 
-				int iMaxGreaterThanCount = iNestedTemplateLevel + 1;
+				int iMaxGreaterThanCount = iNestedAngleBracketLevel;
+				if(iMaxGreaterThanCount < 3)
+					iMaxGreaterThanCount = 3;
 
-				CXX_DEBUG_ASSERT(iMaxGreaterThanCount >= 2,"Invariant violated");
-
-				for(;;)
+				while(iGreaterThanCount < iMaxGreaterThanCount)
 				{
 					if(!cxxParserParseNextToken())
 					{
@@ -282,120 +414,162 @@ cxxParserParseTemplateAngleBracketsInternal(bool bCaptureTypeParameters)
 						break;
 
 					iGreaterThanCount++;
-
-					if(iGreaterThanCount > iMaxGreaterThanCount)
-						break; // one greater than too much
 				}
 
-				// check right shift operator: very narrow conditions
-				if(
-					(!bFirstFollowedBySpace) &&
-					(iGreaterThanCount == 2) &&
-					cxxTokenTypeIsOneOf(
-							g_cxx.pToken,
-							CXXTokenTypeIdentifier | CXXTokenTypeParenthesisChain |
-							CXXTokenTypeNumber | CXXTokenTypeKeyword
-						) &&
-					// note that pFirstGreaterThan->pPrev is certainly valid here
-					cxxTokenTypeIsOneOf(
-							pFirstGreaterThan->pPrev,
-							CXXTokenTypeIdentifier | CXXTokenTypeKeyword
-						) &&
-					// int >> ...
-					(!cxxTokenIsNonConstantKeyword(pFirstGreaterThan->pPrev)) &&
-					// ... >> class
-					(!cxxTokenIsNonConstantKeyword(g_cxx.pToken)) &&
-					// T >>
-					(!cxxTokenIsPresentInTemplateParameters(pFirstGreaterThan->pPrev))
-				)
-				{
-					// assume it's an operator
-					CXX_DEBUG_PRINT("Treating >> as shift-right operator");
+				CXX_DEBUG_PRINT("Found %d greater-than signs",iGreaterThanCount);
 
-					// invariant: iGreaterThanCount == 2 but iMaxGreaterTanCount >= 2
-					CXX_DEBUG_ASSERT(iGreaterThanCount <= iMaxGreaterThanCount,"Bug");
-
-					continue;
-				}
-
-				// Check greater than operator for the special conditions
-				// we can be sure of:
-				//    ... blah > 1 ...
-				// The other cases can't be handled safely. We expect the user
-				// to use parentheses.
+				// check greater than operator: very narrow conditions
 				if(
 					(iGreaterThanCount == 1) &&
-					cxxTokenTypeIsOneOf(
-							g_cxx.pToken,
-							CXXTokenTypeNumber
+					(
+						// whatever op 2 [C++03 allows this without parens]
+						// whatever op (...) [C++03 allows this without parens]
+						cxxTokenTypeIsOneOf(
+								g_cxx.pToken,
+								CXXTokenTypeNumber | CXXTokenTypeOpeningParenthesis
+							) ||
+						// whatever op nonTypeParameter [C++03 allows this without parens]
+						(
+							cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeIdentifier) &&
+							cxxTokenIsPresentInTemplateParametersAsNonType(g_cxx.pToken)
 						)
+						// WARNING: don't be tempted to add a loose condition that has
+						// (!cxxTokenIsPresentInTemplateParametersAsType()) on the right.
+						// It's unsafe.
+					)
 				)
 				{
-					CXX_DEBUG_PRINT("Treating > as greater-than operator");
+					CXX_DEBUG_PRINT("Treating as greater-than sign");
+
+					if(cxxTokenTypeIsOneOf(g_cxx.pToken,CXXTokenTypeOpeningParenthesis))
+						cxxParserUngetCurrentToken(); // needs to be condensed
+
 					continue;
 				}
 
-				if(iGreaterThanCount > iMaxGreaterThanCount)
-				{
-					// Ops! scanned one too much.
-					// Since iMaxGreaterThanCount >= 2, we have scanned at least 3.
-					// Possibly something like template<template<...>>>
 
-					// invariant: at most one too much
-					CXX_DEBUG_ASSERT(iGreaterThanCount == (iMaxGreaterThanCount+1),"Bug");
-					CXX_DEBUG_ASSERT(iGreaterThanCount > 2,"Bug");
+				// check right shift operator: a bit broader conditions
+				if(
+					(
+						(!bFirstFollowedBySpace) &&
+						(iGreaterThanCount == 2)
+					) && (
+						// whatever op 2 [C++03 allows this without parens]
+						// whatever op (...) [C++03 allows this without parens]
+						cxxTokenTypeIsOneOf(
+								g_cxx.pToken,
+								CXXTokenTypeNumber | CXXTokenTypeOpeningParenthesis
+							) ||
+						// whatever op nonTypeParameter [C++03 allows this without parens]
+						(
+							cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeIdentifier) &&
+							cxxTokenIsPresentInTemplateParametersAsNonType(g_cxx.pToken)
+						) ||
+						// a broader condition that kind-of-works at top level
+						(
+							// topmost template nesting level
+							(iNestedTemplateLevel == 0) &&
+							// Only one level of angle brackets.
+							// This means that:
+							// - >> has one angle bracket too much to exit the template
+							// - we have screwed up the parsing of an opening angle bracket
+							// In the first case it's very likely that we're over a shift
+							// operator. In the other case we're screwed anyway.
+							(iNestedAngleBracketLevel == 1) &&
+							// identifier on the right that is not clearly identified as type
+							(
+								cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeIdentifier) &&
+								(!cxxTokenIsPresentInTemplateParametersAsType(g_cxx.pToken))
+							)
+						)
+					)
+				)
+				{
+					CXX_DEBUG_PRINT("Treating as right shift operator");
+					if(cxxTokenTypeIsOneOf(g_cxx.pToken,CXXTokenTypeOpeningParenthesis))
+						cxxParserUngetCurrentToken(); // needs to be condensed
+
+					continue;
+				}
+
+				if(!cxxTokenTypeIsOneOf(g_cxx.pToken,CXXTokenTypeGreaterThanSign))
+				{
+					// The loop above stopped because of a non > token.
+					CXX_DEBUG_ASSERT(iGreaterThanCount < iMaxGreaterThanCount,"Bug");
+
+					// Handle gracefully some special cases
+					if(
+							cxxTokenIsNonConstantKeyword(g_cxx.pToken) ||
+							(
+								cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeIdentifier) &&
+								cxxTokenIsPresentInTemplateParametersAsType(g_cxx.pToken)
+							)
+						)
+					{
+						// We found something like
+						//   ... > void ...
+						//   ... > static ...
+						//   ... > typeParameter ...
+						// The part on the right of > does not seem to be a constant
+						// so this is not a comparison.
+						CXX_DEBUG_PRINT(
+								"Found '> %s': assuming end of template",
+								vStringValue(g_cxx.pToken->pszWord)
+							);
+
+						cxxParserUngetCurrentToken();
+
+						if(
+							bCaptureTypeParameters &&
+							(iNestedTemplateLevel == 0) &&
+							(pBeforeParameterStart->pNext != g_cxx.pToken)
+						)
+							cxxParserParseTemplateAngleBracketsCaptureTypeParameter(
+									pBeforeParameterStart->pNext,
+									g_cxx.pToken
+								);
+
+						if(iGreaterThanCount > iNestedAngleBracketLevel)
+						{
+							// Most likely explanation:
+							// We screwed up the parsing of the template.
+							// However we can still attempt to emit a symbol here.
+							CXX_DEBUG_LEAVE_TEXT("Found (broken) end of template");
+							return CXXParserParseTemplateAngleBracketsFinishedPrematurely;
+						}
+
+						CXX_DEBUG_LEAVE_TEXT("Found end of template");
+						return CXXParserParseTemplateAngleBracketsSucceeded;
+					}
 
 					cxxParserUngetCurrentToken();
+				}
+
+				while(iGreaterThanCount > iNestedAngleBracketLevel)
+				{
+					CXX_DEBUG_PRINT("Going back one >");
+					iGreaterThanCount--;
+					cxxParserUngetCurrentToken();
+				}
+
+				CXX_DEBUG_PRINT("Decreasing angle bracket level by %d",iGreaterThanCount);
+				iNestedAngleBracketLevel -= iGreaterThanCount;
+
+				if(iNestedAngleBracketLevel == 0)
+				{
+					if(
+						bCaptureTypeParameters &&
+						(iNestedTemplateLevel == 0) &&
+						(pBeforeParameterStart->pNext != g_cxx.pToken)
+					)
+						cxxParserParseTemplateAngleBracketsCaptureTypeParameter(
+								pBeforeParameterStart->pNext,
+								g_cxx.pToken
+							);
 
 					CXX_DEBUG_LEAVE_TEXT("Found end of template");
 					return CXXParserParseTemplateAngleBracketsSucceeded;
 				}
-
-				if(iGreaterThanCount > iNestedTemplateLevel)
-				{
-					CXX_DEBUG_ASSERT(iGreaterThanCount == (iNestedTemplateLevel + 1),"Bug");
-
-					cxxParserUngetCurrentToken();
-
-					CXX_DEBUG_LEAVE_TEXT("Found end of template");
-					return CXXParserParseTemplateAngleBracketsSucceeded;
-				}
-
-				CXX_DEBUG_PRINT("Decreasing template level by %d",iGreaterThanCount);
-
-				iNestedTemplateLevel -= iGreaterThanCount;
-
-				// Handle gracefully some special cases
-				if(cxxTokenIsNonConstantKeyword(g_cxx.pToken))
-				{
-					// We found something like
-					//   ... > void ...
-					//   ... > static ...
-					// The part on the right of > does not seem to be a constant
-					// so this is not a comparison. Most likely explanation:
-					// We screwed up the parsing of the template.
-					// However we can still attempt to emit a symbol here.
-					CXX_DEBUG_PRINT(
-							"Found '> %s': assuming end of template",
-							vStringValue(g_cxx.pToken->pszWord)
-						);
-
-					cxxParserUngetCurrentToken();
-					CXX_DEBUG_LEAVE_TEXT("Found (broken) end of template");
-					return CXXParserParseTemplateAngleBracketsFinishedPrematurely;
-				}
-
-				if(cxxTokenTypeIsOneOf(
-						g_cxx.pToken,
-						CXXTokenTypeOpeningParenthesis |
-							CXXTokenTypeOpeningSquareParenthesis
-					))
-				{
-					// would need to be condensed: unget and try again above
-					cxxParserUngetCurrentToken();
-				}
-
-				// anything else is OK
 			}
 			break;
 			case CXXTokenTypeKeyword:
@@ -424,7 +598,12 @@ cxxParserParseTemplateAngleBracketsInternal(bool bCaptureTypeParameters)
 						return CXXParserParseTemplateAngleBracketsFailed;
 					}
 
-					switch(cxxParserParseTemplateAngleBracketsInternal(false))
+					switch(
+							cxxParserParseTemplateAngleBracketsInternal(
+									false,
+									iNestedTemplateLevel+1
+								)
+						)
 					{
 						case CXXParserParseTemplateAngleBracketsFailed:
 							CXX_DEBUG_LEAVE_TEXT("Nested template parsing failed");
@@ -450,80 +629,6 @@ cxxParserParseTemplateAngleBracketsInternal(bool bCaptureTypeParameters)
 
 					continue;
 				}
-
-				if(
-						bCaptureTypeParameters &&
-						cxxKeywordMayBePartOfTypeName(g_cxx.pToken->eKeyword) &&
-						g_cxx.pToken->pPrev &&
-						cxxTokenTypeIsOneOf(
-								g_cxx.pToken->pPrev,
-								CXXTokenTypeSmallerThanSign | CXXTokenTypeComma
-							)
-					)
-				{
-					// < typename X
-					// , class Y
-					// , int z
-					//
-					// but not
-					//
-					// < typename boost::enable_if...
-					//
-
-					CXX_DEBUG_PRINT("Found part of typename: look for type param");
-
-					if(!cxxParserParseNextToken())
-					{
-						CXX_DEBUG_LEAVE_TEXT("Syntax error, but tolerable");
-						return CXXParserParseTemplateAngleBracketsFailedRecoverable;
-					}
-
-					if(!cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeIdentifier))
-					{
-						// FIXME: this doesn't handle types with multiple keywords
-						//        (unsigned int)
-
-						CXX_DEBUG_PRINT("Found non-identifier: not a type param");
-						cxxParserUngetCurrentToken();
-						continue;
-					}
-
-					CXXToken * pParam = g_cxx.pToken;
-
-					CXX_DEBUG_PRINT("Found identifier '%s'",vStringValue(pParam->pszWord));
-
-					if(!cxxParserParseNextToken())
-					{
-						CXX_DEBUG_LEAVE_TEXT("Syntax error, but tolerable");
-						return CXXParserParseTemplateAngleBracketsFailedRecoverable;
-					}
-
-					if(!cxxTokenTypeIsOneOf(
-							g_cxx.pToken,
-							CXXTokenTypeGreaterThanSign |
-							CXXTokenTypeComma |
-							CXXTokenTypeAssignment
-						))
-					{
-						// nope.
-						CXX_DEBUG_PRINT("Followed by unexpected stuff: no type param");
-						cxxParserUngetCurrentToken();
-						continue;
-					}
-
-					CXX_DEBUG_PRINT(
-							"Adding '%s' to template parameter list",
-							vStringValue(pParam->pszWord)
-						);
-
-					ptrArrayAdd(g_cxx.pTemplateParameters,pParam);
-
-					if(cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeGreaterThanSign))
-						cxxParserUngetCurrentToken();
-
-					continue;
-				}
-
 				// other keyword
 			break;
 			case CXXTokenTypeEOF:
@@ -568,12 +673,12 @@ cxxParserParseTemplateAngleBracketsInternal(bool bCaptureTypeParameters)
 // Parses the <parameters> part of a template specification.
 // Here we are pointing at the initial <.
 //
-static bool cxxParserParseTemplateAngleBrackets(void)
+static bool cxxParserParseTemplateAngleBrackets(bool bCaptureTypeParameters)
 {
 	CXX_DEBUG_ENTER();
 
 	CXXParserParseTemplateAngleBracketsResult r;
-	r = cxxParserParseTemplateAngleBracketsInternal(true);
+	r = cxxParserParseTemplateAngleBracketsInternal(bCaptureTypeParameters,0);
 
 	switch(r)
 	{
@@ -594,10 +699,7 @@ static bool cxxParserParseTemplateAngleBrackets(void)
 	CXX_DEBUG_ASSERT(false,"Never here");
 }
 
-//
-// Parses the template angle brackets and puts it in g_cxx.pTemplateTokenChain.
-//
-bool cxxParserParseTemplateAngleBracketsToSeparateChain(void)
+CXXTokenChain * cxxParserParseTemplateAngleBracketsToSeparateChain(bool bCaptureTypeParameters)
 {
 	CXX_DEBUG_ENTER();
 
@@ -608,36 +710,63 @@ bool cxxParserParseTemplateAngleBracketsToSeparateChain(void)
 			"We should be pointing at the opening angle bracket here"
 		);
 
+	CXXTokenChain * pOut = cxxTokenChainCreate();
+	cxxTokenChainAppend(pOut,cxxTokenChainTakeLast(g_cxx.pTokenChain));
+
 	CXXTokenChain * pSave = g_cxx.pTokenChain;
-	g_cxx.pTokenChain = cxxTokenChainCreate();
-	cxxTokenChainAppend(g_cxx.pTokenChain,cxxTokenChainTakeLast(pSave));
+	g_cxx.pTokenChain = pOut;
 
-	// TODO: Do we need to handle nesting?
-	//       Not for template<template<>> as it is handled separately
-	//       But maybe for nasty things like template<...(template<>)...>?
+	bool bRet = cxxParserParseTemplateAngleBrackets(bCaptureTypeParameters);
 
-	if(g_cxx.pTemplateParameters)
-		ptrArrayClear(g_cxx.pTemplateParameters);
-	else
-		g_cxx.pTemplateParameters = ptrArrayNew(NULL);
+	g_cxx.pTokenChain = pSave;
 
-	if(!cxxParserParseTemplateAngleBrackets())
+	if(!bRet)
 	{
 		CXX_DEBUG_LEAVE_TEXT("Failed to parse angle brackets");
-		cxxTokenChainDestroy(pSave);
+		cxxTokenChainDestroy(pOut);
+		return NULL;
+	}
+
+	CXX_DEBUG_LEAVE();
+	return pOut;
+}
+
+//
+// Parses the template angle brackets and puts it in g_cxx.pTemplateTokenChain.
+// Also captures he template type parameters in g_cxx.pTemplateParameters.
+//
+bool cxxParserParseTemplateAngleBracketsToTemplateChain(void)
+{
+	CXX_DEBUG_ENTER();
+
+	g_cxx.oTemplateParameters.uCount = 0;
+
+	CXXTokenChain * pOut = cxxParserParseTemplateAngleBracketsToSeparateChain(true);
+
+	if(!pOut)
+	{
+		CXX_DEBUG_LEAVE_TEXT("Failed to parse angle brackets");
 		return false;
 	}
 
 	if(g_cxx.pTemplateTokenChain)
 		cxxTokenChainDestroy(g_cxx.pTemplateTokenChain);
 
-	g_cxx.pTemplateTokenChain = g_cxx.pTokenChain;
-	g_cxx.pTokenChain = pSave;
+	g_cxx.pTemplateTokenChain = pOut;
+
+	g_cxx.oTemplateParameters.pChain = pOut;
+
+	// make sure we have no stale specializations
+	// (note that specializations always come AFTER the main template)
+	if(g_cxx.pTemplateSpecializationTokenChain)
+	{
+		cxxTokenChainDestroy(g_cxx.pTemplateSpecializationTokenChain);
+		g_cxx.pTemplateSpecializationTokenChain = NULL;
+	}
 
 	CXX_DEBUG_LEAVE();
 	return true;
 }
-
 
 //
 // Parses a template<anything> prefix.
@@ -672,7 +801,7 @@ bool cxxParserParseTemplatePrefix(void)
 		return true; // tolerate syntax error
 	}
 
-	bool bRet = cxxParserParseTemplateAngleBracketsToSeparateChain();
+	bool bRet = cxxParserParseTemplateAngleBracketsToTemplateChain();
 
 	CXX_DEBUG_LEAVE();
 	return bRet;
@@ -684,26 +813,31 @@ void cxxParserEmitTemplateParameterTags(void)
 			g_cxx.pTemplateTokenChain &&
 			(g_cxx.pTemplateTokenChain->iCount > 0) &&
 			cxxParserCurrentLanguageIsCPP() &&
-			g_cxx.pTemplateParameters && // this should be ensured by chain existence
 			cxxTagKindEnabled(CXXTagCPPKindTEMPLATEPARAM),
 			"Template existence must be checked before calling this function"
 		);
 
-	int c = ptrArrayCount(g_cxx.pTemplateParameters);
+	unsigned int c = g_cxx.oTemplateParameters.uCount;
 
-	for(int i=0;i<c;i++)
+	for(unsigned int i=0;i<c;i++)
 	{
-		CXXToken * t = (CXXToken *)ptrArrayItem(g_cxx.pTemplateParameters,i);
-
-		CXX_DEBUG_PRINT("Emitting template param tag for '%s'",vStringValue(t->pszWord));
+		CXX_DEBUG_PRINT(
+				"Emitting template param tag for '%s'",
+				vStringValue(g_cxx.oTemplateParameters.aIdentifiers[i]->pszWord)
+			);
 
 		tagEntryInfo * tag = cxxTagBegin(
 				CXXTagCPPKindTEMPLATEPARAM,
-				t
+				g_cxx.oTemplateParameters.aIdentifiers[i]
 			);
 
 		if(!tag)
 			continue;
+
+		cxxTagCheckAndSetTypeField(
+				g_cxx.oTemplateParameters.aTypeStarts[i],
+				g_cxx.oTemplateParameters.aTypeEnds[i]
+			);
 
 		cxxTagCommit();
 	}

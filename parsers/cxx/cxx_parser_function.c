@@ -563,7 +563,7 @@ static bool cxxParserLookForFunctionSignatureCheckParenthesisAndIdentifier(
 		CXXToken * pIdentifierStart,
 		CXXToken * pIdentifierEnd,
 		CXXFunctionSignatureInfo * pInfo,
-		CXXFunctionParameterInfo * pParamInfo
+		CXXTypedVariableSet * pParamInfo
 	)
 {
 	CXX_DEBUG_ENTER();
@@ -650,7 +650,7 @@ static bool cxxParserLookForFunctionSignatureCheckParenthesisAndIdentifier(
 bool cxxParserLookForFunctionSignature(
 		CXXTokenChain * pChain,
 		CXXFunctionSignatureInfo * pInfo,
-		CXXFunctionParameterInfo * pParamInfo
+		CXXTypedVariableSet * pParamInfo
 	)
 {
 	CXX_DEBUG_ENTER();
@@ -671,7 +671,7 @@ bool cxxParserLookForFunctionSignature(
 #endif
 
 	if(pParamInfo)
-		pParamInfo->uParameterCount = 0;
+		pParamInfo->uCount = 0;
 
 	CXX_DEBUG_ASSERT(pChain,"Null chain");
 
@@ -680,6 +680,7 @@ bool cxxParserLookForFunctionSignature(
 	pInfo->uFlags = 0;
 	pInfo->pParenthesis = NULL;
 	pInfo->pTrailingComma = NULL;
+	pInfo->pTemplateSpecializationStart = NULL;
 
 	CXXToken * pIdentifierStart = NULL;
 	CXXToken * pIdentifierEnd = NULL;
@@ -1034,6 +1035,8 @@ bool cxxParserLookForFunctionSignature(
 				pIdentifierEnd = pSpecBegin->pPrev;
 				pInfo->uFlags |= CXXFunctionSignatureInfoTemplateSpecialization;
 
+				pInfo->pTemplateSpecializationStart = pSpecBegin;
+				pInfo->pTemplateSpecializationEnd = pToken->pPrev;
 
 				if(
 					cxxParserLookForFunctionSignatureCheckParenthesisAndIdentifier(
@@ -1603,13 +1606,39 @@ int cxxParserEmitFunctionTags(
 
 		bool bIsEmptyTemplate;
 
-		if(
-				bGotTemplate &&
-				cxxTagFieldEnabled(CXXTagCPPFieldTemplate)
-			)
+		if(bGotTemplate)
 		{
 			bIsEmptyTemplate = g_cxx.pTemplateTokenChain->iCount == 2;
-			cxxTagHandleTemplateField();
+
+			if(pInfo->pTemplateSpecializationStart)
+			{
+				CXX_DEBUG_ASSERT(pInfo->pTemplateSpecializationEnd,"Bug");
+				cxxTokenChainNormalizeTypeNameSpacingInRange(
+						pInfo->pTemplateSpecializationStart,
+						pInfo->pTemplateSpecializationEnd
+					);
+				// make sure we don't emit the trailing space
+				pInfo->pTemplateSpecializationStart->bFollowedBySpace = false;
+
+				CXXToken * pToken = cxxTokenChainExtractRange(
+						pInfo->pTemplateSpecializationStart,
+						pInfo->pTemplateSpecializationEnd,
+						0
+					);
+
+				// Tricky. We append it to the specialization chain which will
+				// be then used by cxxTagHandleTemplateFileds()
+				if(pToken)
+				{
+					if(g_cxx.pTemplateSpecializationTokenChain)
+						cxxTokenChainClear(g_cxx.pTemplateSpecializationTokenChain);
+					else
+						g_cxx.pTemplateSpecializationTokenChain = cxxTokenChainCreate();
+					cxxTokenChainAppend(g_cxx.pTemplateSpecializationTokenChain,pToken);
+				}
+			}
+
+			cxxTagHandleTemplateFields();
 		} else {
 			bIsEmptyTemplate = false;
 		}
@@ -1676,10 +1705,13 @@ int cxxParserEmitFunctionTags(
 		cxxScopePushTop(pSavedScope);
 
 #ifdef CXX_DO_DEBUGGING
-	if(uTagKind == CXXTagKindFUNCTION)
-		CXX_DEBUG_PRINT("Emitted function '%s'",vStringValue(pIdentifier->pszWord));
-	else
-		CXX_DEBUG_PRINT("Emitted prototype '%s'",vStringValue(pIdentifier->pszWord));
+	if(tag)
+	{
+		if(uTagKind == CXXTagKindFUNCTION)
+			CXX_DEBUG_PRINT("Emitted function '%s'",vStringValue(pIdentifier->pszWord));
+		else
+			CXX_DEBUG_PRINT("Emitted prototype '%s'",vStringValue(pIdentifier->pszWord));
+	}
 #endif
 
 	if(bPushScopes)
@@ -1691,6 +1723,7 @@ int cxxParserEmitFunctionTags(
 	}
 
 	if(
+			tag &&
 			bGotTemplate &&
 			cxxTagKindEnabled(CXXTagCPPKindTEMPLATEPARAM)
 		)
@@ -1737,7 +1770,7 @@ int cxxParserExtractFunctionSignatureBeforeOpeningBracket(
 
 	cxxTokenChainDestroyLast(g_cxx.pTokenChain);
 
-	CXXFunctionParameterInfo oParamInfo;
+	CXXTypedVariableSet oParamInfo;
 
 	if(!cxxParserLookForFunctionSignature(g_cxx.pTokenChain,pInfo,&oParamInfo))
 	{
@@ -1763,12 +1796,12 @@ int cxxParserExtractFunctionSignatureBeforeOpeningBracket(
 }
 
 // This function *may* change the token chain
-void cxxParserEmitFunctionParameterTags(CXXFunctionParameterInfo * pInfo)
+void cxxParserEmitFunctionParameterTags(CXXTypedVariableSet * pInfo)
 {
 	// emit parameters
 
 	unsigned int i = 0;
-	while(i < pInfo->uParameterCount)
+	while(i < pInfo->uCount)
 	{
 		tagEntryInfo * tag = cxxTagBegin(
 				CXXTagKindPARAMETER,
@@ -1780,7 +1813,7 @@ void cxxParserEmitFunctionParameterTags(CXXFunctionParameterInfo * pInfo)
 
 		CXXToken * pTypeName;
 
-		if(pInfo->aDeclarationStarts[i] && pInfo->aDeclarationEnds[i])
+		if(pInfo->aTypeStarts[i] && pInfo->aTypeEnds[i])
 		{
 			// This is tricky.
 			// We know that the declaration contains the identifier.
@@ -1791,8 +1824,8 @@ void cxxParserEmitFunctionParameterTags(CXXFunctionParameterInfo * pInfo)
 			// and in that case we would be effectively breaking the type chain.
 			// Work around it.
 
-			CXXToken * pTypeStart = pInfo->aDeclarationStarts[i];
-			CXXToken * pTypeEnd = pInfo->aDeclarationEnds[i];
+			CXXToken * pTypeStart = pInfo->aTypeStarts[i];
+			CXXToken * pTypeEnd = pInfo->aTypeEnds[i];
 
 			if(pTypeStart != pTypeEnd)
 			{
@@ -1840,7 +1873,7 @@ void cxxParserEmitFunctionParameterTags(CXXFunctionParameterInfo * pInfo)
 //
 bool cxxParserTokenChainLooksLikeFunctionParameterList(
 		CXXTokenChain * tc,
-		CXXFunctionParameterInfo * pParamInfo
+		CXXTypedVariableSet * pParamInfo
 	)
 {
 	CXX_DEBUG_ENTER();
@@ -1857,7 +1890,7 @@ bool cxxParserTokenChainLooksLikeFunctionParameterList(
 
 	if(pParamInfo)
 	{
-		pParamInfo->uParameterCount = 0;
+		pParamInfo->uCount = 0;
 		pParamInfo->pChain = tc;
 	}
 
@@ -2012,7 +2045,7 @@ try_again:
 		if(pParamInfo && (t->pPrev != pStart))
 		{
 			// FIXME: This may break in some special macro cases?
-			if(pParamInfo->uParameterCount < CXX_MAX_EXTRACTED_PARAMETERS)
+			if(pParamInfo->uCount < CXX_TYPED_VARIABLE_SET_ITEM_COUNT)
 			{
 				// locate identifier
 
@@ -2097,10 +2130,10 @@ try_again:
 
 				if(pIdentifier)
 				{
-					pParamInfo->aDeclarationStarts[pParamInfo->uParameterCount] = pStart;
-					pParamInfo->aDeclarationEnds[pParamInfo->uParameterCount] = t->pPrev;
-					pParamInfo->aIdentifiers[pParamInfo->uParameterCount] = pIdentifier;
-					pParamInfo->uParameterCount++;
+					pParamInfo->aTypeStarts[pParamInfo->uCount] = pStart;
+					pParamInfo->aTypeEnds[pParamInfo->uCount] = t->pPrev;
+					pParamInfo->aIdentifiers[pParamInfo->uCount] = pIdentifier;
+					pParamInfo->uCount++;
 
 #ifdef CXX_DO_DEBUGGING
 					CXXToken * pDecl = cxxTokenChainExtractRange(pStart,t->pPrev,0);

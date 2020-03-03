@@ -155,6 +155,8 @@ void cxxTokenChainAppend(CXXTokenChain * tc,CXXToken * t);
 void cxxTokenChainPrepend(CXXTokenChain * tc,CXXToken * t);
 void cxxTokenChainInsertAfter(CXXTokenChain * tc,CXXToken * before,CXXToken * t);
 
+#if 0
+// currently unused
 void cxxTokenChainMoveEntries(
 		CXXTokenChain * src,
 		CXXTokenChain * dest
@@ -166,6 +168,7 @@ void cxxTokenChainMoveEntryRange(
 		CXXToken * end,
 		CXXTokenChain * dest
 	);
+#endif
 
 enum CXXTokenChainJoinFlags
 {

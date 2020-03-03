@@ -141,7 +141,8 @@ bool cxxParserParseNamespace(void)
 
 					cxxTagSetField(
 							CXXTagCPPFieldAliasedName,
-							vStringValue(pAliasedName->pszWord)
+							vStringValue(pAliasedName->pszWord),
+							false
 						);
 
 					cxxTagCommit();

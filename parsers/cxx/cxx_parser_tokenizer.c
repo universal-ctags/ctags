@@ -1184,11 +1184,13 @@ void cxxParserUngetCurrentToken(void)
 			"There should be at least one token to unget"
 		);
 
-	CXX_DEBUG_ASSERT(!g_cxx.pUngetToken,"The parser supports only one unget token at a time.");
-
 	if(g_cxx.pUngetToken)
+	{
+		if(g_cxx.pUngetToken->bFollowedBySpace)
+			cppUngetc(' ');
+		cppUngetString(vStringValue(g_cxx.pUngetToken->pszWord),vStringLength(g_cxx.pUngetToken->pszWord));
 		cxxTokenDestroy(g_cxx.pUngetToken);
-
+	}
 
 	g_cxx.pUngetToken = cxxTokenChainTakeLast(g_cxx.pTokenChain);
 

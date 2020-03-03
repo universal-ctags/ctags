@@ -145,6 +145,10 @@ typedef struct _CXXFunctionSignatureInfo
 	//     RetType functionA(...), functionB(...);
 	CXXToken * pTrailingComma;
 
+	// Template specialization token range, if any.
+	CXXToken * pTemplateSpecializationStart;
+	CXXToken * pTemplateSpecializationEnd;
+
 	// Additional informations
 	unsigned int uFlags;
 
@@ -156,31 +160,31 @@ int cxxParserExtractFunctionSignatureBeforeOpeningBracket(
 		int * piCorkQueueIndex
 	);
 
-#define CXX_MAX_EXTRACTED_PARAMETERS 24
+#define CXX_TYPED_VARIABLE_SET_ITEM_COUNT 24
 
-typedef struct _CXXFunctionParameterInfo
+typedef struct _CXXTypedVariableSet
 {
 	// The number of parameters found
-	unsigned int uParameterCount;
+	unsigned int uCount;
 
 	// All the tokens are references to the source chain (do not delete)
 	CXXTokenChain * pChain;
-	// The initial tokens of the declaration
-	CXXToken * aDeclarationStarts[CXX_MAX_EXTRACTED_PARAMETERS];
-	// The final tokens of the declaration
-	CXXToken * aDeclarationEnds[CXX_MAX_EXTRACTED_PARAMETERS];
-	// The identifier tokens (between initial and final)
-	CXXToken * aIdentifiers[CXX_MAX_EXTRACTED_PARAMETERS];
-} CXXFunctionParameterInfo;
+	// The initial tokens of the type
+	CXXToken * aTypeStarts[CXX_TYPED_VARIABLE_SET_ITEM_COUNT];
+	// The final tokens of the type
+	CXXToken * aTypeEnds[CXX_TYPED_VARIABLE_SET_ITEM_COUNT];
+	// The identifier tokens
+	CXXToken * aIdentifiers[CXX_TYPED_VARIABLE_SET_ITEM_COUNT];
+} CXXTypedVariableSet;
 
 bool cxxParserTokenChainLooksLikeFunctionParameterList(
 		CXXTokenChain * tc,
-		CXXFunctionParameterInfo * pParamInfo
+		CXXTypedVariableSet * pParamInfo
 	);
 bool cxxParserLookForFunctionSignature(
 		CXXTokenChain * pChain,
 		CXXFunctionSignatureInfo * pInfo,
-		CXXFunctionParameterInfo * pParamInfo
+		CXXTypedVariableSet * pParamInfo
 	);
 
 enum CXXEmitFunctionTagsOptions
@@ -196,7 +200,7 @@ int cxxParserEmitFunctionTags(
 		int * piCorkQueueIndex
 	);
 
-void cxxParserEmitFunctionParameterTags(CXXFunctionParameterInfo * pInfo);
+void cxxParserEmitFunctionParameterTags(CXXTypedVariableSet * pInfo);
 
 // cxx_parser_typedef.c
 bool cxxParserParseGenericTypedef(void);
@@ -227,7 +231,8 @@ bool cxxParserParseUpToOneOf(unsigned int uTokenTypes,
 							 bool bCanReduceInnerElements);
 bool cxxParserParseIfForWhileSwitchCatchParenthesis(void);
 bool cxxParserParseTemplatePrefix(void);
-bool cxxParserParseTemplateAngleBracketsToSeparateChain(void);
+CXXTokenChain * cxxParserParseTemplateAngleBracketsToSeparateChain(bool bCaptureTypeParameters);
+bool cxxParserParseTemplateAngleBracketsToTemplateChain(void);
 void cxxParserEmitTemplateParameterTags(void);
 bool cxxParserParseUsingClause(void);
 bool cxxParserParseAccessSpecifier(void);
@@ -308,12 +313,16 @@ typedef struct _CXXParserState
 	// after the template has been parsed (i.e. in the class coming after)
 	CXXTokenChain * pTemplateTokenChain;
 
+	// The last template specialization token chain we found. May be null.
+	// This pointer, if non null, is valid only if pTemplateTokenChain is non null.
+	CXXTokenChain * pTemplateSpecializationTokenChain;
+
 	// The array of CXXToken objects that are found to be template
 	// type parameters and belong to the pTemplateTokenChain above.
 	// The validity of this array is tied to the validity of
 	// pTemplateTokenChain above. If there is no pTemplateTokenChain
 	// then this array is simply invalid (even if not empty)
-	ptrArray * pTemplateParameters;
+	CXXTypedVariableSet oTemplateParameters;
 
 	// The last token we have extracted. This is always pushed to
 	// the token chain tail (which will take care of deletion)

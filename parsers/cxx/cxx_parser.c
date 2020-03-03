@@ -51,6 +51,9 @@ void cxxParserNewStatement(void)
 	{
 		cxxTokenChainDestroy(g_cxx.pTemplateTokenChain);
 		g_cxx.pTemplateTokenChain = NULL;
+	} else {
+		// we don't care about stale specializations as they
+		// are destroyed wen the base template prefix is extracted
 	}
 	g_cxx.uKeywordState = 0;
 
@@ -1002,12 +1005,11 @@ static bool cxxParserParseClassStructOrUnionInternal(
 		// {
 		// }
 
-		// FIXME: Should we add the specialisation arguments somewhere?
-		//        Maybe as a separate field?
+		if(g_cxx.pTemplateSpecializationTokenChain)
+			cxxTokenChainDestroy(g_cxx.pTemplateSpecializationTokenChain);
 
-		bRet = cxxParserParseTemplateAngleBracketsToSeparateChain();
-
-		if(!bRet)
+		g_cxx.pTemplateSpecializationTokenChain = cxxParserParseTemplateAngleBracketsToSeparateChain(false);
+		if(!g_cxx.pTemplateSpecializationTokenChain)
 		{
 			cxxKeywordEnableFinal(false);
 			CXX_DEBUG_LEAVE_TEXT("Could not parse class/struct/union name");
@@ -1290,11 +1292,8 @@ static bool cxxParserParseClassStructOrUnionInternal(
 			}
 		}
 
-		if(
-				bGotTemplate &&
-				cxxTagFieldEnabled(CXXTagCPPFieldTemplate)
-			)
-			cxxTagHandleTemplateField();
+		if(bGotTemplate)
+			cxxTagHandleTemplateFields();
 
 		tag->isFileScope = !isInputHeaderFile();
 
@@ -1848,6 +1847,8 @@ static rescanReason cxxParserMain(const unsigned int passCount)
 	cxxTokenChainClear(g_cxx.pTokenChain);
 	if(g_cxx.pTemplateTokenChain)
 		cxxTokenChainClear(g_cxx.pTemplateTokenChain);
+	if(g_cxx.pTemplateSpecializationTokenChain)
+		cxxTokenChainClear(g_cxx.pTemplateSpecializationTokenChain);
 	// Restart coveralls: LCOV_EXCL_END
 
 	if(!bRet && (passCount == 1))
@@ -1968,8 +1969,8 @@ void cxxParserCleanup(langType language CTAGS_ATTR_UNUSED,bool initialized CTAGS
 		cxxTokenChainDestroy(g_cxx.pTokenChain);
 	if(g_cxx.pTemplateTokenChain)
 		cxxTokenChainDestroy(g_cxx.pTemplateTokenChain);
-	if(g_cxx.pTemplateParameters)
-		ptrArrayDelete(g_cxx.pTemplateParameters);
+	if(g_cxx.pTemplateSpecializationTokenChain)
+		cxxTokenChainDestroy(g_cxx.pTemplateSpecializationTokenChain);
 	// Restart coveralls: LCOV_EXCL_END
 
 	cxxScopeDone();

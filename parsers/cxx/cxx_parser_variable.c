@@ -726,11 +726,8 @@ bool cxxParserExtractVariableDeclarations(CXXTokenChain * pChain,unsigned int uF
 				pszProperties = cxxTagSetProperties(uProperties);
 			}
 
-			if(
-					bGotTemplate &&
-					cxxTagFieldEnabled(CXXTagCPPFieldTemplate)
-				)
-				cxxTagHandleTemplateField();
+			if(bGotTemplate)
+				cxxTagHandleTemplateFields();
 
 			cxxTagCommit();
 

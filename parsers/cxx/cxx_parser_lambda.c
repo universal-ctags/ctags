@@ -252,7 +252,8 @@ bool cxxParserHandleLambda(CXXToken * pParenthesis)
 				);
 			cxxTagSetField(
 					CXXTagCPPFieldLambdaCaptureList,
-					vStringValue(cxxTokenChainFirst(pCaptureList->pChain)->pszWord)
+					vStringValue(cxxTokenChainFirst(pCaptureList->pChain)->pszWord),
+					false
 				);
 		}
 
@@ -286,7 +287,7 @@ bool cxxParserHandleLambda(CXXToken * pParenthesis)
 		cxxTagKindEnabled(CXXTagKindPARAMETER)
 	)
 	{
-		CXXFunctionParameterInfo oParamInfo;
+		CXXTypedVariableSet oParamInfo;
 		if(cxxParserTokenChainLooksLikeFunctionParameterList(
 				pParenthesis->pChain,&oParamInfo
 			))

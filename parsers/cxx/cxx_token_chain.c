@@ -385,6 +385,8 @@ vString * cxxTokenChainJoin(
 	return s;
 }
 
+#if 0
+// currently unused
 void cxxTokenChainMoveEntries(CXXTokenChain * src,CXXTokenChain * dest)
 {
 	if(dest->iCount > 0)
@@ -422,6 +424,7 @@ void cxxTokenChainMoveEntryRange(
 			"The start token must come before the end token"
 		);
 
+	// FIXME: We could have a more efficient version of this
 	CXXToken * t = start;
 	for(;;)
 	{
@@ -436,6 +439,7 @@ void cxxTokenChainMoveEntryRange(
 		t = next;
 	}
 }
+#endif
 
 CXXTokenChain * cxxTokenChainSplitOnComma(CXXTokenChain * tc)
 {
