@@ -14,18 +14,18 @@
 #include "general.h"
 #include <stdint.h>
 
-/* This hashtable allows adding multiple items for a same key.
+/* This hashtable allows adding multiple items for the same key.
  *
  * hashTablePutItem() adds a key/item pair to the htable even if the
  * htable has an item for the key already.
  *
- * hashTableGetItem() returns the first occurrence item for a given
+ * hashTableGetItem() returns the first occurrence item for the given
  * key.
  *
- * hashTableDeleteItem() deletes the first occurrence item for a given
+ * hashTableDeleteItem() deletes the first occurrence item for the given
  * key.
  *
- * Use hashTableForeachItemOnChain () to process all items for a same key.
+ * Use hashTableForeachItemOnChain () to process all items for the same key.
  */
 typedef struct sHashTable hashTable;
 typedef unsigned int (* hashTableHashFunc)  (const void * const key);
