@@ -17,3 +17,9 @@ docs	input.spec	/^%package docs$/;"	kind:package	line:37	package:ctags	roles:def
 ctags-docs	input.spec	/^%package docs$/;"	kind:package	line:37	package:ctags	roles:def
 universal-ctags-devel	input.spec	/^%package -n universal-ctags-devel$/;"	kind:package	line:41	package:ctags	roles:def
 ctags-universal-ctags-devel	input.spec	/^%package -n universal-ctags-devel$/;"	kind:package	line:41	package:ctags	roles:def
+libxml	input.spec	/^%configure --with-libxml=%{YES} --with-libyml=%{YES}\\$/;"	kind:optwith	line:49	roles:cmdline
+libyml	input.spec	/^%configure --with-libxml=%{YES} --with-libyml=%{YES}\\$/;"	kind:optwith	line:49	roles:cmdline
+foo	input.spec	/^	   --without-foo --enable-bar \\$/;"	kind:optwith	line:50	roles:cmdline
+bar	input.spec	/^	   --without-foo --enable-bar \\$/;"	kind:optenable	line:50	roles:cmdline
+baz	input.spec	/^	   --disable-baz\\$/;"	kind:optenable	line:51	roles:cmdline
+bazz	input.spec	/^	   --with-bazz=0$/;"	kind:optwith	line:52	roles:cmdline

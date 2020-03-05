@@ -11,6 +11,7 @@
 
 #include <string.h>
 
+#include "autoconf.h"
 #include "m4.h"
 
 #include "debug.h"
@@ -20,23 +21,23 @@
 #include "kind.h"
 #include "parse.h"
 
-enum {
-	PACKAGE_KIND,
-	TEMPLATE_KIND,
-	MACRO_KIND,
-	OPTWITH_KIND,
-	OPTENABLE_KIND,
-	SUBST_KIND,
-	CONDITION_KIND,
-	DEFINITION_KIND,
+
+static roleDefinition AutoconfOptwithRoles [] = {
+	{ true, "cmdline", "specified in a configure command line" },
+};
+
+static roleDefinition AutoconfOptenableRoles [] = {
+	{ true, "cmdline", "specified in a configure command line" },
 };
 
 static kindDefinition AutoconfKinds[] = {
 	{ true, 'p', "package", "packages" },
 	{ true, 't', "template", "templates" },
 	{ true, 'm', "macro", "autoconf macros" },
-	{ true, 'w', "optwith", "options specified with --with-..."},
-	{ true, 'e', "optenable", "options specified with --enable-..."},
+	{ true, 'w', "optwith", "options specified with --with-...",
+	  .referenceOnly = false, ATTACH_ROLES(AutoconfOptwithRoles)},
+	{ true, 'e', "optenable", "options specified with --enable-...",
+	  .referenceOnly = false, ATTACH_ROLES(AutoconfOptenableRoles)},
 	{ true, 's', "subst", "substitution keys"},
 	{ true, 'c', "condition", "automake conditions" },
 	{ true, 'd', "definition", "definitions" },
@@ -120,28 +121,28 @@ static int newMacroCallback (m4Subparser *m4 CTAGS_ATTR_UNUSED, const char* toke
 	case KEYWORD_NONE:
 		break;
 	case KEYWORD_init:
-		index = makeAutoconfTag (PACKAGE_KIND);
+		index = makeAutoconfTag (AUTOCONF_PACKAGE_KIND);
 		break;
 	case KEYWORD_template:
-		index = makeAutoconfTag (TEMPLATE_KIND);
+		index = makeAutoconfTag (AUTOCONF_TEMPLATE_KIND);
 		break;
 	case KEYWORD_defun:
-		index = makeAutoconfTag (MACRO_KIND);
+		index = makeAutoconfTag (AUTOCONF_MACRO_KIND);
 		break;
 	case KEYWORD_argwith:
-		index = makeAutoconfTag (OPTWITH_KIND);
+		index = makeAutoconfTag (AUTOCONF_OPTWITH_KIND);
 		break;
 	case KEYWORD_argenable:
-		index = makeAutoconfTag (OPTENABLE_KIND);
+		index = makeAutoconfTag (AUTOCONF_OPTENABLE_KIND);
 		break;
 	case KEYWORD_subst:
-		index = makeAutoconfTag (SUBST_KIND);
+		index = makeAutoconfTag (AUTOCONF_SUBST_KIND);
 		break;
 	case KEYWORD_conditional:
-		index = makeAutoconfTag (CONDITION_KIND);
+		index = makeAutoconfTag (AUTOCONF_CONDITION_KIND);
 		break;
 	case KEYWORD_define:
-		index = makeAutoconfTag (DEFINITION_KIND);
+		index = makeAutoconfTag (AUTOCONF_DEFINITION_KIND);
 		break;
 	default:
 		AssertNotReached ();

@@ -163,6 +163,9 @@ PEG_EXTRA_HEADS = $(PEG_INPUT:.peg=_pre.h) $(PEG_INPUT:.peg=_post.h)
 PEG_OBJS = $(PEG_SRCS:.c=.$(OBJEXT))
 
 PARSER_HEADS = \
+	parsers/autoconf.h \
+	parsers/cpreprocessor.h \
+	\
 	parsers/cxx/cxx_debug.h \
 	parsers/cxx/cxx_keyword.h \
 	parsers/cxx/cxx_parser_internal.h \
@@ -174,7 +177,6 @@ PARSER_HEADS = \
 	parsers/cxx/cxx_token.h \
 	parsers/cxx/cxx_token_chain.h \
 	\
-	parsers/cpreprocessor.h \
 	parsers/iniconf.h \
 	parsers/m4.h \
 	parsers/make.h \
