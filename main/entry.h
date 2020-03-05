@@ -130,7 +130,9 @@ extern void initTagEntry (tagEntryInfo *const e, const char *const name,
 			  int kindIndex);
 extern void initRefTagEntry (tagEntryInfo *const e, const char *const name,
 			     int kindIndex, int roleIndex);
-
+extern void initForeignRefTagEntry (tagEntryInfo *const e, const char *const name,
+									langType type,
+									int kindIndex, int roleIndex);
 extern void assignRole(tagEntryInfo *const e, int roleIndex);
 extern bool isRoleAssigned(const tagEntryInfo *const e, int roleIndex);
 
