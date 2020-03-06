@@ -435,7 +435,6 @@ bool cxxParserExtractVariableDeclarations(CXXTokenChain * pChain,unsigned int uF
 				}
 
 				t = t->pNext;
-				pRemoveStart = t;
 			break;
 			default:
 				// Must be identifier
