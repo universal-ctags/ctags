@@ -181,6 +181,16 @@ units_inspect_show_input ()
     inspect_cmd_show_generic $tcase $(basename ./Units/${tcase}/input.*) pygmentize_or_cat
 }
 
+units_inspect_show_expected_tags ()
+{
+    local tcase=$1
+
+    (
+	shopt -s extglob
+	inspect_cmd_show_generic $tcase $(basename ./Units/${tcase}/expected.tags?(-*)) "cat" "-n"
+    )
+}
+
 inspect_cmd_quit ()
 {
     echo "BYE" 1>&2
@@ -204,7 +214,7 @@ do_units_inspect()
     local r
     local t=$1
 
-    select r in '<a>ccept' '<s>kip' '<S>hell' '<d>iff' 'show args.<c>tags' 'show <i>nput' '<q>uit'; do
+    select r in '<a>ccept' '<s>kip' '<S>hell' '<d>iff' 'show args.<c>tags' 'show <i>nput' '<e>xpected tags' '<q>uit'; do
 	case $r-$REPLY in
 	    ("<a>ccept"-*|-a)
 		if units_inspect_cmd_accept "$t"; then
@@ -229,6 +239,9 @@ do_units_inspect()
 		;;
 	    ("show <i>nput"-*|-i|-input)
 		units_inspect_show_input "$t"
+		;;
+	    ("<e>xpected tags"-*|-e|-expected.tags)
+		units_inspect_show_expected_tags "$t"
 		;;
 	    (*)
 		inspect_cmd_unknown
