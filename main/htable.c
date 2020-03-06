@@ -47,6 +47,12 @@ struct sHashTable {
 	hashTableFreeFunc valfreefn;
 };
 
+struct chainTracker {
+	const void *const target_key;
+	hashTableForeachFunc user_proc;
+	void *user_data;
+	hashTableEqualFunc equalfn;
+};
 
 static hentry* entry_new (void *key, void *value, hentry* next)
 {
@@ -96,7 +102,7 @@ static void *entry_find (hentry* entry, const void* const key, hashTableEqualFun
 	return NULL;
 }
 
-static bool		entry_delete (hentry **entry, void *key, hashTableEqualFunc equalfn,
+static bool		entry_delete (hentry **entry, const void *key, hashTableEqualFunc equalfn,
 			      hashTableFreeFunc keyfreefn, hashTableFreeFunc valfreefn)
 {
 	while (*entry)
@@ -111,13 +117,15 @@ static bool		entry_delete (hentry **entry, void *key, hashTableEqualFunc equalfn
 	return false;
 }
 
-static void  entry_foreach (hentry *entry, hashTableForeachFunc proc, void *user_data)
+static bool  entry_foreach (hentry *entry, hashTableForeachFunc proc, void *user_data)
 {
 	while (entry)
 	{
-		proc (entry->key, entry->value, user_data);
+		if (!proc (entry->key, entry->value, user_data))
+			return false;
 		entry = entry->next;
 	}
+	return true;
 }
 
 extern hashTable *hashTableNew    (unsigned int size,
@@ -191,7 +199,7 @@ extern void*      hashTableGetItem   (hashTable *htable, const void * key)
 	return entry_find(htable->table[i], key, htable->equalfn);
 }
 
-extern bool     hashTableDeleteItem (hashTable *htable, void *key)
+extern bool     hashTableDeleteItem (hashTable *htable, const void *key)
 {
 	unsigned int i;
 
@@ -205,18 +213,49 @@ extern bool    hashTableHasItem    (hashTable *htable, const void *key)
 	return hashTableGetItem (htable, key)? true: false;
 }
 
-extern void       hashTableForeachItem (hashTable *htable, hashTableForeachFunc proc, void *user_data)
+extern bool       hashTableForeachItem (hashTable *htable, hashTableForeachFunc proc, void *user_data)
 {
 	unsigned int i;
 
 	for (i = 0; i < htable->size; i++)
-		entry_foreach(htable->table[i], proc, user_data);
+		if (!entry_foreach(htable->table[i], proc, user_data))
+			return false;
+	return true;
 }
 
-static void count (void *key CTAGS_ATTR_UNUSED, void *value CTAGS_ATTR_UNUSED, void *data)
+static bool track_chain (const void *const key, void *value, void *chain_data)
+{
+	struct chainTracker *chain_tracker = chain_data;
+
+	if (chain_tracker->equalfn (chain_tracker->target_key, key))
+	{
+		if (! chain_tracker->user_proc (key, value, chain_tracker->user_data))
+			return false;
+	}
+	return true;
+}
+
+extern bool       hashTableForeachItemOnChain (hashTable *htable, const void *key, hashTableForeachFunc proc, void *user_data)
+{
+	unsigned int i;
+	struct chainTracker chain_tracker = {
+		.target_key = key,
+		.user_proc = proc,
+		.user_data = user_data,
+		.equalfn   = htable->equalfn,
+	};
+
+	i = htable->hashfn (key) % htable->size;
+	if (!entry_foreach(htable->table[i], track_chain, &chain_tracker))
+		return false;
+	return true;
+}
+
+static bool count (const void *const key CTAGS_ATTR_UNUSED, void *value CTAGS_ATTR_UNUSED, void *data)
 {
 	int *c = data;
 	++*c;
+	return true;
 }
 
 extern int        hashTableCountItem   (hashTable *htable)

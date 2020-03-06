@@ -14,11 +14,27 @@
 #include "general.h"
 #include <stdint.h>
 
+/* This hashtable allows adding multiple items for the same key.
+ *
+ * hashTablePutItem() adds a key/item pair to the htable even if the
+ * htable has an item for the key already.
+ *
+ * hashTableGetItem() returns the first occurrence item for the given
+ * key.
+ *
+ * hashTableDeleteItem() deletes the first occurrence item for the given
+ * key.
+ *
+ * Use hashTableForeachItemOnChain () to process all items for the same key.
+ */
 typedef struct sHashTable hashTable;
 typedef unsigned int (* hashTableHashFunc)  (const void * const key);
 typedef bool      (* hashTableEqualFunc) (const void* a, const void* b);
 typedef void         (* hashTableFreeFunc)  (void * ptr);
-typedef void         (* hashTableForeachFunc) (void *key, void *value, void* user_data);
+
+/* To continue interation, return true.
+ * To break interation, return false. */
+typedef bool         (* hashTableForeachFunc) (const void *key, void *value, void *user_data);
 
 unsigned int hashPtrhash (const void * x);
 bool hashPtreq (const void * a, const void * constb);
@@ -43,8 +59,21 @@ extern void       hashTableClear       (hashTable *htable);
 extern void       hashTablePutItem     (hashTable *htable, void *key, void *value);
 extern void*      hashTableGetItem     (hashTable *htable, const void * key);
 extern bool    hashTableHasItem     (hashTable * htable, const void * key);
-extern bool    hashTableDeleteItem  (hashTable *htable, void *key);
-extern void       hashTableForeachItem (hashTable *htable, hashTableForeachFunc proc, void *user_data);
+extern bool    hashTableDeleteItem  (hashTable *htable, const void *key);
+
+/* Return true if proc never returns false; proc returns true for all
+ * the items, or htable holds no item.
+ *
+ * Return false if htable holds at least one item and proc returns false
+ * for one of the items. */
+extern bool       hashTableForeachItem (hashTable *htable, hashTableForeachFunc proc, void *user_data);
+
+/* This function is useful for htable having multiple items for a key.
+ * By giving a key, you can traverse all the items associated with the
+ * key via proc.  * "Chain" means group of items associated with a
+ * key. */
+extern bool       hashTableForeachItemOnChain (hashTable *htable, const void *key, hashTableForeachFunc proc, void *user_data);
+
 extern int        hashTableCountItem   (hashTable *htable);
 
 extern hashTable* hashTableIntNew (unsigned int size,
@@ -53,5 +82,7 @@ extern hashTable* hashTableIntNew (unsigned int size,
 								   hashTableFreeFunc keyfreefn);
 #define HT_PTR_TO_INT(P) ((int)(intptr_t)(P))
 #define HT_INT_TO_PTR(P) ((void*)(intptr_t)(P))
+#define HT_PTR_TO_UINT(P) ((unsigned int)(uintptr_t)(P))
+#define HT_UINT_TO_PTR(P) ((void*)(uintptr_t)(P))
 
 #endif	/* CTAGS_MAIN_HTABLE_H */
