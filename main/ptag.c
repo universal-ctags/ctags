@@ -140,7 +140,7 @@ static ptagDesc ptagDescs [] = {
 	  ptagMakeKindSeparators,
 	  false },
 	{ false, "TAG_KIND_DESCRIPTION",
-	  "the letters, names and descriptions of kinds in a parser",
+	  "the letters, names and descriptions of enabled kinds in the language",
 	  ptagMakeKindDescriptions,
 	  false },
 	{ true, "TAG_OUTPUT_MODE",

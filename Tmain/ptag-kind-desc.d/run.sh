@@ -1,17 +1,11 @@
-# Copyright: 2016 Masatake YAMATO
+# Copyright: 2020 Masatake YAMATO
 # License: GPL-2
 
 CTAGS=$1
+O="--quiet --options=NONE "
 
-. ../utils.sh
-
-{
-    echo '# BUILTIN'
-    ${CTAGS} --quiet --options=NONE -o - --extras=p --pseudo-tags='*' \
-	     input.sh
-
-    echo '# REGEX'
-    ${CTAGS} --quiet --options=NONE -o - --extras=p --pseudo-tags='*' \
-	     --langdef=foo --langmap=foo:+.foo \
-	     --regex-foo='/abc/\1/k,kind,kinds/' input.foo
-} | grep -v VERSION
+${CTAGS} $O \
+		 --extras=+p --pseudo-tags=TAG_KIND_DESCRIPTION \
+		 --kinds-C=df \
+		 -o - \
+		 input.c

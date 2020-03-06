@@ -4183,6 +4183,9 @@ extern bool makeKindDescriptionsPseudoTags (const langType language,
 
 	for (i = 0; i < kindCount; ++i)
 	{
+		if (!isLanguageKindEnabled (language, i))
+			continue;
+
 		kind = getKind (kcb, i);
 		makeKindDescriptionPseudoTag (kind, &data);
 	}
