@@ -167,7 +167,10 @@ units_inspect_show_args_ctags ()
 
 pygmentize_or_cat ()
 {
-    if which pygmentize > /dev/null 2>&1; then
+    # It seems that pygmentize ignores the empty lines at the head of input.
+    if [ -z $(head -1 $1) ]; then
+	cat -n $1
+    elif which pygmentize > /dev/null 2>&1; then
 	pygmentize -O "style=colorful,linenos=1" $1 2>/dev/null || cat -n $1
     else
 	cat -n $1
@@ -179,6 +182,16 @@ units_inspect_show_input ()
     local tcase=$1
 
     inspect_cmd_show_generic $tcase $(basename ./Units/${tcase}/input.*) pygmentize_or_cat
+}
+
+units_inspect_show_expected_tags ()
+{
+    local tcase=$1
+
+    (
+	shopt -s extglob
+	inspect_cmd_show_generic $tcase $(basename ./Units/${tcase}/expected.tags?(-*)) "cat" "-n"
+    )
 }
 
 inspect_cmd_quit ()
@@ -204,14 +217,14 @@ do_units_inspect()
     local r
     local t=$1
 
-    select r in '<a>ccept' '<s>kip' '<S>hell' '<d>iff' 'show args.<c>tags' 'show <i>nput' '<q>uit'; do
+    select r in '<a>ccept' '<s>kip (or <n>)' '<S>hell' '<d>iff' 'show args.<c>tags' 'show <i>nput' '<e>xpected tags' '<q>uit'; do
 	case $r-$REPLY in
 	    ("<a>ccept"-*|-a)
 		if units_inspect_cmd_accept "$t"; then
 		    next=1
 		fi
 		;;
-	    ("<s>kip"-*|-s|-!|-skip)
+	    ("<s>kip (or <n>)"-*|-s|-!|-skip|-n|-next)
 		units_inspect_cmd_skip "$t"
 		next=1
 		;;
@@ -229,6 +242,9 @@ do_units_inspect()
 		;;
 	    ("show <i>nput"-*|-i|-input)
 		units_inspect_show_input "$t"
+		;;
+	    ("<e>xpected tags"-*|-e|-expected.tags)
+		units_inspect_show_expected_tags "$t"
 		;;
 	    (*)
 		inspect_cmd_unknown
