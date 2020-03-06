@@ -214,14 +214,14 @@ do_units_inspect()
     local r
     local t=$1
 
-    select r in '<a>ccept' '<s>kip' '<S>hell' '<d>iff' 'show args.<c>tags' 'show <i>nput' '<e>xpected tags' '<q>uit'; do
+    select r in '<a>ccept' '<s>kip (or <n>)' '<S>hell' '<d>iff' 'show args.<c>tags' 'show <i>nput' '<e>xpected tags' '<q>uit'; do
 	case $r-$REPLY in
 	    ("<a>ccept"-*|-a)
 		if units_inspect_cmd_accept "$t"; then
 		    next=1
 		fi
 		;;
-	    ("<s>kip"-*|-s|-!|-skip)
+	    ("<s>kip (or <n>)"-*|-s|-!|-skip|-n|-next)
 		units_inspect_cmd_skip "$t"
 		next=1
 		;;
