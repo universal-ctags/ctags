@@ -6,6 +6,8 @@
 Asm            s/section         placement          on      placement where the assembled code goes
 AutoIt         S/script          local              on      local include
 AutoIt         S/script          system             on      system include
+Autoconf       e/optenable       cmdline            on      specified in a configure command line
+Autoconf       w/optwith         cmdline            on      specified in a configure command line
 Automake       c/condition       branched           on      used for branching
 Automake       d/directory       data               on      directory for DATA primary
 Automake       d/directory       library            on      directory for LIBRARIES primary
@@ -77,6 +79,8 @@ Vera           h/header          system             on      system header
 Asm            s/section         placement          on      placement where the assembled code goes
 AutoIt         S/script          local              on      local include
 AutoIt         S/script          system             on      system include
+Autoconf       e/optenable       cmdline            on      specified in a configure command line
+Autoconf       w/optwith         cmdline            on      specified in a configure command line
 Automake       c/condition       branched           on      used for branching
 Automake       d/directory       data               on      directory for DATA primary
 Automake       d/directory       library            on      directory for LIBRARIES primary

@@ -46,7 +46,10 @@ Something must be written here.
 %setup -q
 
 %build
-%configure --with-libxml=%{YES} --with-libyml=%{YES}
+%configure --with-libxml=%{YES} --with-libyml=%{YES}\
+	   --without-foo --enable-bar \
+	   --disable-baz\
+	   --with-bazz=0
 make
 
 %install

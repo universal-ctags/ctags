@@ -31,6 +31,8 @@
 #include "routines.h"
 #include "trace.h"
 
+#include "autoconf.h"
+
 typedef enum {
 	K_TAG,
 	K_MACOR,
@@ -72,6 +74,7 @@ struct rpmSpecCtx {
 	struct macro_cb_data undef;
 	int package_index;
 	int macro_index;
+	bool in_configure;
 } rpmSpecCtx;
 
 
@@ -84,6 +87,75 @@ static bool is_line_continued(const char *line)
 
 	return ((line[len - 1] == '\\')
 		|| ((len >= 2) && (line[len - 1] == '\n') && (line[len - 2] == '\\')))? true: false;
+}
+
+static void scan_configure_options (const char *line)
+{
+	struct configure_opt_prefix {
+		const char *prefix;
+		int kindIndex, roleIndex;
+	} prefixes[] = {
+		{.prefix = "--with-",
+		 .kindIndex = AUTOCONF_OPTWITH_KIND,
+		 .roleIndex = AUTOCONF_OPTWITH_CMDLINE_ROLE},
+		{.prefix = "--without-",
+		 .kindIndex = AUTOCONF_OPTWITH_KIND,
+		 .roleIndex = AUTOCONF_OPTWITH_CMDLINE_ROLE},
+		{.prefix = "--enable-",
+		 .kindIndex = AUTOCONF_OPTENABLE_KIND,
+		 .roleIndex = AUTOCONF_OPTENABLE_CMDLINE_ROLE},
+		{.prefix = "--disable-",
+		 .kindIndex = AUTOCONF_OPTENABLE_KIND,
+		 .roleIndex = AUTOCONF_OPTENABLE_CMDLINE_ROLE},
+		{.prefix = NULL,},
+	};
+	vString *name = vStringNew ();
+
+	for (struct configure_opt_prefix *prefix = &(prefixes [0]);
+		 prefix->prefix;
+		 prefix++)
+	{
+		const char *tmp = line;
+
+		while ((tmp = strstr (tmp, prefix->prefix)))
+		{
+			tmp += strlen(prefix->prefix);
+			while (*tmp)
+			{
+				if (isspace (*tmp) || iscntrl (*tmp)
+					|| *tmp == '=' || *tmp == '\\')
+					break;
+				vStringPut(name, *tmp);
+				tmp++;
+			}
+			if (vStringLength (name) > 0)
+			{
+				tagEntryInfo e;
+
+				initForeignRefTagEntry (&e,
+										vStringValue (name),
+										getNamedLanguage ("Autoconf", 0),
+										prefix->kindIndex,
+										prefix->roleIndex);
+				makeTagEntry (&e);
+				vStringClear (name);
+			}
+			tmp++;
+		}
+	}
+	vStringDelete (name);
+}
+
+static bool found_configure_cb (const char *line,
+							const regexMatch *matches,
+							unsigned int count,
+							void *userData)
+{
+	struct rpmSpecCtx *ctx = (struct rpmSpecCtx *)userData;
+	ctx->rejecting = (line && is_line_continued (line));
+	ctx->in_configure = true;
+	scan_configure_options (line);
+	return true;
 }
 
 static bool found_macro_cb_full (const char *line,
@@ -236,6 +308,12 @@ static bool check_line_continuation (const char *line,
 		e->extensionFields.endLine = getInputLineNumber();
 		ctx->macro_index = CORK_NIL;
 	}
+	else if (rejecting && ctx->in_configure)
+	{
+		scan_configure_options (line);
+		if (!ctx->rejecting)
+			ctx->in_configure = false;
+	}
 
 	return true;
 }
@@ -248,6 +326,7 @@ static void findRpmSpecTags (void)
 	rpmSpecCtx.undef = (struct macro_cb_data){K_MACOR,  R_MACRO_UNDEF};
 	rpmSpecCtx.package_index = CORK_NIL;
 	rpmSpecCtx.macro_index = CORK_NIL;
+	rpmSpecCtx.in_configure = false;
 
 	findRegexTags ();
 }
@@ -256,6 +335,8 @@ static void initializeRpmSpecParser (langType language)
 {
 	addLanguageCallbackRegex (language,  "^([A-Za-z_][A-Za-z_0-9()]+)[ \t]*:[ \t]*([^ \t]*)",
 			  "{exclusive}", found_tag_cb, &rpmSpecCtx.rejecting, &rpmSpecCtx);
+	addLanguageCallbackRegex (language, "^%configure",
+			  "{exclusive}", found_configure_cb, &rpmSpecCtx.rejecting, &rpmSpecCtx);
 	addLanguageCallbackRegex (language, "^%define[ \t]+([A-Za-z_][A-Za-z_0-9]+)(\\([^)]+\\))?",
 			  "{exclusive}", found_macro_cb, &rpmSpecCtx.rejecting, &rpmSpecCtx);
 	addLanguageCallbackRegex (language, "^%undef[ \t]+([A-Za-z_][A-Za-z_0-9]+)",

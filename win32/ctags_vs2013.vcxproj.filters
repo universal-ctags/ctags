@@ -719,6 +719,9 @@
     <ClInclude Include="..\main\xtag_p.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\parsers\autoconf.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="..\parsers\cpreprocessor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
