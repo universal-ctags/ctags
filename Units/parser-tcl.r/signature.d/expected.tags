@@ -1,0 +1,112 @@
+fn	input.tcl	/^proc fn a {$/;"	p	signature:a
+::fn	input.tcl	/^proc fn a {$/;"	p	signature:a
+a	input.tcl	/^proc fn a {$/;"	z	procedure:::fn
+::fn{a	input.tcl	/^proc fn a {$/;"	z	procedure:::fn
+f11	input.tcl	/^proc f11 {a} {$/;"	p	signature:{a}
+::f11	input.tcl	/^proc f11 {a} {$/;"	p	signature:{a}
+a	input.tcl	/^proc f11 {a} {$/;"	z	procedure:::f11
+::f11{a	input.tcl	/^proc f11 {a} {$/;"	z	procedure:::f11
+f10	input.tcl	/^proc f10 {{a 0}} {$/;"	p	signature:{{a 0}}
+::f10	input.tcl	/^proc f10 {{a 0}} {$/;"	p	signature:{{a 0}}
+a	input.tcl	/^proc f10 {{a 0}} {$/;"	z	procedure:::f10
+::f10{a	input.tcl	/^proc f10 {{a 0}} {$/;"	z	procedure:::f10
+g1121	input.tcl	/^proc g1121 {a b} {$/;"	p	signature:{a b}
+::g1121	input.tcl	/^proc g1121 {a b} {$/;"	p	signature:{a b}
+a	input.tcl	/^proc g1121 {a b} {$/;"	z	procedure:::g1121
+::g1121{a	input.tcl	/^proc g1121 {a b} {$/;"	z	procedure:::g1121
+b	input.tcl	/^proc g1121 {a b} {$/;"	z	procedure:::g1121
+::g1121{b	input.tcl	/^proc g1121 {a b} {$/;"	z	procedure:::g1121
+g1021	input.tcl	/^proc g1021 {{a 0} b} {$/;"	p	signature:{{a 0} b}
+::g1021	input.tcl	/^proc g1021 {{a 0} b} {$/;"	p	signature:{{a 0} b}
+a	input.tcl	/^proc g1021 {{a 0} b} {$/;"	z	procedure:::g1021
+::g1021{a	input.tcl	/^proc g1021 {{a 0} b} {$/;"	z	procedure:::g1021
+b	input.tcl	/^proc g1021 {{a 0} b} {$/;"	z	procedure:::g1021
+::g1021{b	input.tcl	/^proc g1021 {{a 0} b} {$/;"	z	procedure:::g1021
+g1020	input.tcl	/^proc g1020 {{a 0} {b 1}} {$/;"	p	signature:{{a 0} {b 1}}
+::g1020	input.tcl	/^proc g1020 {{a 0} {b 1}} {$/;"	p	signature:{{a 0} {b 1}}
+a	input.tcl	/^proc g1020 {{a 0} {b 1}} {$/;"	z	procedure:::g1020
+::g1020{a	input.tcl	/^proc g1020 {{a 0} {b 1}} {$/;"	z	procedure:::g1020
+b	input.tcl	/^proc g1020 {{a 0} {b 1}} {$/;"	z	procedure:::g1020
+::g1020{b	input.tcl	/^proc g1020 {{a 0} {b 1}} {$/;"	z	procedure:::g1020
+g1120	input.tcl	/^proc g1120 {a {b 1}} {$/;"	p	signature:{a {b 1}}
+::g1120	input.tcl	/^proc g1120 {a {b 1}} {$/;"	p	signature:{a {b 1}}
+a	input.tcl	/^proc g1120 {a {b 1}} {$/;"	z	procedure:::g1120
+::g1120{a	input.tcl	/^proc g1120 {a {b 1}} {$/;"	z	procedure:::g1120
+b	input.tcl	/^proc g1120 {a {b 1}} {$/;"	z	procedure:::g1120
+::g1120{b	input.tcl	/^proc g1120 {a {b 1}} {$/;"	z	procedure:::g1120
+h112131	input.tcl	/^proc h112131 {a b c} {$/;"	p	signature:{a b c}
+::h112131	input.tcl	/^proc h112131 {a b c} {$/;"	p	signature:{a b c}
+a	input.tcl	/^proc h112131 {a b c} {$/;"	z	procedure:::h112131
+::h112131{a	input.tcl	/^proc h112131 {a b c} {$/;"	z	procedure:::h112131
+b	input.tcl	/^proc h112131 {a b c} {$/;"	z	procedure:::h112131
+::h112131{b	input.tcl	/^proc h112131 {a b c} {$/;"	z	procedure:::h112131
+c	input.tcl	/^proc h112131 {a b c} {$/;"	z	procedure:::h112131
+::h112131{c	input.tcl	/^proc h112131 {a b c} {$/;"	z	procedure:::h112131
+h102131	input.tcl	/^proc h102131 {{a 0} b c} {$/;"	p	signature:{{a 0} b c}
+::h102131	input.tcl	/^proc h102131 {{a 0} b c} {$/;"	p	signature:{{a 0} b c}
+a	input.tcl	/^proc h102131 {{a 0} b c} {$/;"	z	procedure:::h102131
+::h102131{a	input.tcl	/^proc h102131 {{a 0} b c} {$/;"	z	procedure:::h102131
+b	input.tcl	/^proc h102131 {{a 0} b c} {$/;"	z	procedure:::h102131
+::h102131{b	input.tcl	/^proc h102131 {{a 0} b c} {$/;"	z	procedure:::h102131
+c	input.tcl	/^proc h102131 {{a 0} b c} {$/;"	z	procedure:::h102131
+::h102131{c	input.tcl	/^proc h102131 {{a 0} b c} {$/;"	z	procedure:::h102131
+h112031	input.tcl	/^proc h112031 {a {b 0} c} {$/;"	p	signature:{a {b 0} c}
+::h112031	input.tcl	/^proc h112031 {a {b 0} c} {$/;"	p	signature:{a {b 0} c}
+a	input.tcl	/^proc h112031 {a {b 0} c} {$/;"	z	procedure:::h112031
+::h112031{a	input.tcl	/^proc h112031 {a {b 0} c} {$/;"	z	procedure:::h112031
+b	input.tcl	/^proc h112031 {a {b 0} c} {$/;"	z	procedure:::h112031
+::h112031{b	input.tcl	/^proc h112031 {a {b 0} c} {$/;"	z	procedure:::h112031
+c	input.tcl	/^proc h112031 {a {b 0} c} {$/;"	z	procedure:::h112031
+::h112031{c	input.tcl	/^proc h112031 {a {b 0} c} {$/;"	z	procedure:::h112031
+h112130	input.tcl	/^proc h112130 {a b {c 0}} {$/;"	p	signature:{a b {c 0}}
+::h112130	input.tcl	/^proc h112130 {a b {c 0}} {$/;"	p	signature:{a b {c 0}}
+a	input.tcl	/^proc h112130 {a b {c 0}} {$/;"	z	procedure:::h112130
+::h112130{a	input.tcl	/^proc h112130 {a b {c 0}} {$/;"	z	procedure:::h112130
+b	input.tcl	/^proc h112130 {a b {c 0}} {$/;"	z	procedure:::h112130
+::h112130{b	input.tcl	/^proc h112130 {a b {c 0}} {$/;"	z	procedure:::h112130
+c	input.tcl	/^proc h112130 {a b {c 0}} {$/;"	z	procedure:::h112130
+::h112130{c	input.tcl	/^proc h112130 {a b {c 0}} {$/;"	z	procedure:::h112130
+h102031	input.tcl	/^proc h102031 {{a 0} {b 0} c} {$/;"	p	signature:{{a 0} {b 0} c}
+::h102031	input.tcl	/^proc h102031 {{a 0} {b 0} c} {$/;"	p	signature:{{a 0} {b 0} c}
+a	input.tcl	/^proc h102031 {{a 0} {b 0} c} {$/;"	z	procedure:::h102031
+::h102031{a	input.tcl	/^proc h102031 {{a 0} {b 0} c} {$/;"	z	procedure:::h102031
+b	input.tcl	/^proc h102031 {{a 0} {b 0} c} {$/;"	z	procedure:::h102031
+::h102031{b	input.tcl	/^proc h102031 {{a 0} {b 0} c} {$/;"	z	procedure:::h102031
+c	input.tcl	/^proc h102031 {{a 0} {b 0} c} {$/;"	z	procedure:::h102031
+::h102031{c	input.tcl	/^proc h102031 {{a 0} {b 0} c} {$/;"	z	procedure:::h102031
+h112030	input.tcl	/^proc h112030 {a {b 0} {c 0}} {$/;"	p	signature:{a {b 0} {c 0}}
+::h112030	input.tcl	/^proc h112030 {a {b 0} {c 0}} {$/;"	p	signature:{a {b 0} {c 0}}
+a	input.tcl	/^proc h112030 {a {b 0} {c 0}} {$/;"	z	procedure:::h112030
+::h112030{a	input.tcl	/^proc h112030 {a {b 0} {c 0}} {$/;"	z	procedure:::h112030
+b	input.tcl	/^proc h112030 {a {b 0} {c 0}} {$/;"	z	procedure:::h112030
+::h112030{b	input.tcl	/^proc h112030 {a {b 0} {c 0}} {$/;"	z	procedure:::h112030
+c	input.tcl	/^proc h112030 {a {b 0} {c 0}} {$/;"	z	procedure:::h112030
+::h112030{c	input.tcl	/^proc h112030 {a {b 0} {c 0}} {$/;"	z	procedure:::h112030
+h102130	input.tcl	/^proc h102130 {{a 0} b {c 0}} {$/;"	p	signature:{{a 0} b {c 0}}
+::h102130	input.tcl	/^proc h102130 {{a 0} b {c 0}} {$/;"	p	signature:{{a 0} b {c 0}}
+a	input.tcl	/^proc h102130 {{a 0} b {c 0}} {$/;"	z	procedure:::h102130
+::h102130{a	input.tcl	/^proc h102130 {{a 0} b {c 0}} {$/;"	z	procedure:::h102130
+b	input.tcl	/^proc h102130 {{a 0} b {c 0}} {$/;"	z	procedure:::h102130
+::h102130{b	input.tcl	/^proc h102130 {{a 0} b {c 0}} {$/;"	z	procedure:::h102130
+c	input.tcl	/^proc h102130 {{a 0} b {c 0}} {$/;"	z	procedure:::h102130
+::h102130{c	input.tcl	/^proc h102130 {{a 0} b {c 0}} {$/;"	z	procedure:::h102130
+h102030	input.tcl	/^proc h102030 {{a 0} {b 0} {c 0}} {$/;"	p	signature:{{a 0} {b 0} {c 0}}
+::h102030	input.tcl	/^proc h102030 {{a 0} {b 0} {c 0}} {$/;"	p	signature:{{a 0} {b 0} {c 0}}
+a	input.tcl	/^proc h102030 {{a 0} {b 0} {c 0}} {$/;"	z	procedure:::h102030
+::h102030{a	input.tcl	/^proc h102030 {{a 0} {b 0} {c 0}} {$/;"	z	procedure:::h102030
+b	input.tcl	/^proc h102030 {{a 0} {b 0} {c 0}} {$/;"	z	procedure:::h102030
+::h102030{b	input.tcl	/^proc h102030 {{a 0} {b 0} {c 0}} {$/;"	z	procedure:::h102030
+c	input.tcl	/^proc h102030 {{a 0} {b 0} {c 0}} {$/;"	z	procedure:::h102030
+::h102030{c	input.tcl	/^proc h102030 {{a 0} {b 0} {c 0}} {$/;"	z	procedure:::h102030
+i10_0	input.tcl	/^proc i10_0 {{a d}} {$/;"	p	signature:{{a d}}
+::i10_0	input.tcl	/^proc i10_0 {{a d}} {$/;"	p	signature:{{a d}}
+a	input.tcl	/^proc i10_0 {{a d}} {$/;"	z	procedure:::i10_0
+::i10_0{a	input.tcl	/^proc i10_0 {{a d}} {$/;"	z	procedure:::i10_0
+i10_1	input.tcl	/^proc i10_1 {{a {d}}} {$/;"	p	signature:{{a {d}}}
+::i10_1	input.tcl	/^proc i10_1 {{a {d}}} {$/;"	p	signature:{{a {d}}}
+a	input.tcl	/^proc i10_1 {{a {d}}} {$/;"	z	procedure:::i10_1
+::i10_1{a	input.tcl	/^proc i10_1 {{a {d}}} {$/;"	z	procedure:::i10_1
+i10_2	input.tcl	/^proc i10_2 {{a {[h102030]}}} {$/;"	p	signature:{{a {[h102030]}}}
+::i10_2	input.tcl	/^proc i10_2 {{a {[h102030]}}} {$/;"	p	signature:{{a {[h102030]}}}
+a	input.tcl	/^proc i10_2 {{a {[h102030]}}} {$/;"	z	procedure:::i10_2
+::i10_2{a	input.tcl	/^proc i10_2 {{a {[h102030]}}} {$/;"	z	procedure:::i10_2
