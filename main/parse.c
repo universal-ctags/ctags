@@ -3646,8 +3646,8 @@ static void addParserPseudoTags (langType language)
 	parserObject *parser = LanguageTable + language;
 	if (!parser->pseudoTagPrinted)
 	{
-		makePtagIfEnabled (PTAG_KIND_DESCRIPTION, &language);
-		makePtagIfEnabled (PTAG_KIND_SEPARATOR, &language);
+		makePtagIfEnabled (PTAG_KIND_DESCRIPTION, language, parser);
+		makePtagIfEnabled (PTAG_KIND_SEPARATOR, language, parser);
 
 		parser->pseudoTagPrinted = 1;
 	}

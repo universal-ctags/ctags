@@ -89,9 +89,9 @@ extern size_t truncateTagLineAfterTag (char *const line, const char *const token
 			     const bool discardNewline);
 extern void abort_if_ferror(MIO *const fp);
 
-extern bool ptagMakeJsonOutputVersion (ptagDesc *desc, const void *data CTAGS_ATTR_UNUSED);
-extern bool ptagMakeCtagsOutputMode (ptagDesc *desc, const void *data CTAGS_ATTR_UNUSED);
-extern bool ptagMakeCtagsOutputFilesep (ptagDesc *desc, const void *data);
+extern bool ptagMakeJsonOutputVersion (ptagDesc *desc, langType language CTAGS_ATTR_UNUSED, const void *data CTAGS_ATTR_UNUSED);
+extern bool ptagMakeCtagsOutputMode (ptagDesc *desc, langType language CTAGS_ATTR_UNUSED, const void *data CTAGS_ATTR_UNUSED);
+extern bool ptagMakeCtagsOutputFilesep (ptagDesc *desc, langType language CTAGS_ATTR_UNUSED, const void *data);
 
 extern bool writerCanPrintPtag (void);
 extern bool writerDoesTreatFieldAsFixed (int fieldType);

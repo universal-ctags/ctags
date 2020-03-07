@@ -173,7 +173,7 @@ static void addCommonPseudoTags (void)
 	for (int i = 0; i < PTAG_COUNT; i++)
 	{
 		if (isPtagCommonInParsers (i))
-			makePtagIfEnabled (i, &Option);
+			makePtagIfEnabled (i, LANG_IGNORE, &Option);
 	}
 }
 

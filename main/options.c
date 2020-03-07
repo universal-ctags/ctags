@@ -2726,7 +2726,8 @@ static void processPatternLengthLimit(const char *const option, const char *cons
 		error (FATAL, "-%s: Invalid pattern length limit", option);
 }
 
-extern bool ptagMakePatternLengthLimit (ptagDesc *pdesc, const void *data)
+extern bool ptagMakePatternLengthLimit (ptagDesc *pdesc, langType language CTAGS_ATTR_UNUSED,
+										const void *data)
 {
 	const optionValues *opt = data;
 	char buf [21];

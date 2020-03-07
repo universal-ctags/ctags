@@ -46,16 +46,18 @@ struct sPtagDesc {
 	const char* name;
 	const char* description;  /* displayed in --list-pseudo-tags output */
 
-	/* For the common ptags, the pointer for optionValues type value
-	 * is passed as the second argument.
+	/* For making ptags for common in parsers, LANG_IGNOR is for the second
+	 * argument and a pointer for optionValues type value for the third argument
+	 * are passed.
+	 *
 	 * For parser specific ptags, the pointer for parserObject
-	 * of the parser is passed as the second argument.
+	 * of the parser is passed as the thrid argument.
 	 */
-	bool (* makeTag) (ptagDesc *, const void *);
+	bool (* makeTag) (ptagDesc *, langType, const void *);
 	bool commonInParsers;
 };
 
-extern bool makePtagIfEnabled (ptagType type, const void *data);
+extern bool makePtagIfEnabled (ptagType type, langType language, const void *data);
 extern ptagDesc* getPtagDesc (ptagType type);
 extern ptagType  getPtagTypeForName (const char *name);
 extern void printPtags (bool withListHeader, bool machinable, FILE *fp);

@@ -24,7 +24,8 @@
 #include <string.h>
 
 
-static bool ptagMakeFormat (ptagDesc *desc, const void *data CTAGS_ATTR_UNUSED)
+static bool ptagMakeFormat (ptagDesc *desc, langType language CTAGS_ATTR_UNUSED,
+							const void *data CTAGS_ATTR_UNUSED)
 {
 	char format [11];
 	const char *formatComment = "unknown format";
@@ -39,7 +40,8 @@ static bool ptagMakeFormat (ptagDesc *desc, const void *data CTAGS_ATTR_UNUSED)
 	return writePseudoTag (desc, format, formatComment, NULL);
 }
 
-static bool ptagMakeHowSorted (ptagDesc *desc, const void *data CTAGS_ATTR_UNUSED)
+static bool ptagMakeHowSorted (ptagDesc *desc, langType language CTAGS_ATTR_UNUSED,
+							   const void *data CTAGS_ATTR_UNUSED)
 {
 	const optionValues *opt = data;
 	return writePseudoTag (desc,
@@ -49,32 +51,37 @@ static bool ptagMakeHowSorted (ptagDesc *desc, const void *data CTAGS_ATTR_UNUSE
 			       NULL);
 }
 
-static bool ptagMakeAuthor (ptagDesc *desc, const void *data CTAGS_ATTR_UNUSED)
+static bool ptagMakeAuthor (ptagDesc *desc, langType language CTAGS_ATTR_UNUSED,
+							const void *data CTAGS_ATTR_UNUSED)
 {
 	return writePseudoTag (desc,
 						   AUTHOR_NAME,  "", NULL);
 }
 
-static bool ptagMakeProgName (ptagDesc *desc, const void *data CTAGS_ATTR_UNUSED)
+static bool ptagMakeProgName (ptagDesc *desc, langType language CTAGS_ATTR_UNUSED,
+							  const void *data CTAGS_ATTR_UNUSED)
 {
 	return writePseudoTag (desc,
 						   PROGRAM_NAME,  "Derived from Exuberant Ctags", NULL);
 }
 
-static bool ptagMakeProgURL (ptagDesc *desc, const void *data CTAGS_ATTR_UNUSED)
+static bool ptagMakeProgURL (ptagDesc *desc, langType language CTAGS_ATTR_UNUSED,
+							 const void *data CTAGS_ATTR_UNUSED)
 {
 	return writePseudoTag (desc,
 						   PROGRAM_URL, "official site", NULL);
 }
 
-static bool ptagMakeProgVersion (ptagDesc *desc, const void *data CTAGS_ATTR_UNUSED)
+static bool ptagMakeProgVersion (ptagDesc *desc, langType language CTAGS_ATTR_UNUSED,
+								 const void *data CTAGS_ATTR_UNUSED)
 {
 	const char* repoinfo = ctags_repoinfo? ctags_repoinfo: "";
 	return writePseudoTag (desc, PROGRAM_VERSION, repoinfo, NULL);
 }
 
 #ifdef HAVE_ICONV
-static bool ptagMakeFileEncoding (ptagDesc *desc, const void *data CTAGS_ATTR_UNUSED)
+static bool ptagMakeFileEncoding (ptagDesc *desc, langType language CTAGS_ATTR_UNUSED,
+								  const void *data)
 {
 	const optionValues *opt = data;
 	if (! opt->outputEncoding)
@@ -84,17 +91,16 @@ static bool ptagMakeFileEncoding (ptagDesc *desc, const void *data CTAGS_ATTR_UN
 }
 #endif
 
-static bool ptagMakeKindSeparators (ptagDesc *desc, const void *data)
+static bool ptagMakeKindSeparators (ptagDesc *desc, langType language,
+									const void *data CTAGS_ATTR_UNUSED)
 {
-	const langType *language = data;
-
-	return makeKindSeparatorsPseudoTags (*language, desc);
+	return makeKindSeparatorsPseudoTags (language, desc);
 }
 
-static bool ptagMakeKindDescriptions (ptagDesc *desc, const void *data)
+static bool ptagMakeKindDescriptions (ptagDesc *desc, langType language,
+									  const void *data CTAGS_ATTR_UNUSED)
 {
-	const langType *language = data;
-	return makeKindDescriptionsPseudoTags (*language, desc);
+	return makeKindDescriptionsPseudoTags (language, desc);
 }
 
 static ptagDesc ptagDescs [] = {
@@ -157,7 +163,7 @@ static ptagDesc ptagDescs [] = {
 	  true },
 };
 
-extern bool makePtagIfEnabled (ptagType type, const void *data)
+extern bool makePtagIfEnabled (ptagType type, langType language, const void *data)
 {
 	ptagDesc *desc;
 
@@ -165,7 +171,7 @@ extern bool makePtagIfEnabled (ptagType type, const void *data)
 
 	desc = ptagDescs + type;
 	if (desc->enabled)
-		return desc->makeTag (desc, data);
+		return desc->makeTag (desc, language, data);
 	else
 		return false;
 }

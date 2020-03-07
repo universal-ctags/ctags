@@ -89,7 +89,8 @@ extern void writerRescanFailed (unsigned long validTagNum)
 		writer->rescanFailedEntry(writer, validTagNum, writer->clientData);
 }
 
-extern bool ptagMakeCtagsOutputMode (ptagDesc *desc, const void *data CTAGS_ATTR_UNUSED)
+extern bool ptagMakeCtagsOutputMode (ptagDesc *desc, langType langType CTAGS_ATTR_UNUSED,
+									 const void *data CTAGS_ATTR_UNUSED)
 {
 	const char *mode ="";
 
@@ -130,7 +131,9 @@ extern enum filenameSepOp getFilenameSeparator (enum filenameSepOp currentSettin
 }
 #endif
 
-extern bool ptagMakeCtagsOutputFilesep (ptagDesc *desc, const void *data CTAGS_ATTR_UNUSED)
+extern bool ptagMakeCtagsOutputFilesep (ptagDesc *desc,
+										langType language CTAGS_ATTR_UNUSED,
+										const void *data)
 {
 	const char *sep = "slash";
 #ifdef WIN32
