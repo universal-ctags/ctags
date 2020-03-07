@@ -804,6 +804,17 @@ bool cxxParserExtractVariableDeclarations(CXXTokenChain * pChain,unsigned int uF
 			return bGotVariable;
 		}
 
+		// *, &, && and similar stuff do not "propagate" to the next type
+		while(
+				pRemoveStart->pPrev &&
+				cxxTokenTypeIsOneOf(
+						pRemoveStart->pPrev,
+						CXXTokenTypeStar | CXXTokenTypeAnd |
+						CXXTokenTypeMultipleAnds | CXXTokenTypeSquareParenthesisChain
+					)
+			)
+			pRemoveStart = pRemoveStart->pPrev;
+
 		cxxTokenChainDestroyRange(pChain,pRemoveStart,t->pPrev);
 	}
 

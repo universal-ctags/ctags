@@ -6,7 +6,7 @@ l05	input.cpp	/^	std::string l05;$/;"	l	function:main	typeref:typename:std::stri
 l06	input.cpp	/^	std::string l06("test");$/;"	l	function:main	typeref:typename:std::string	file:
 l07	input.cpp	/^	std::string l07 = "test";$/;"	l	function:main	typeref:typename:std::string	file:
 l08	input.cpp	/^	const std::string & l08 = l07, l09 = l07;$/;"	l	function:main	typeref:typename:const std::string &	file:
-l09	input.cpp	/^	const std::string & l08 = l07, l09 = l07;$/;"	l	function:main	typeref:typename:const std::string &	file:
+l09	input.cpp	/^	const std::string & l08 = l07, l09 = l07;$/;"	l	function:main	typeref:typename:const std::string	file:
 l10	input.cpp	/^	const void * (*l10)() = NULL;$/;"	l	function:main	typeref:typename:const void * (*)()	file:
 l11	input.cpp	/^	unsigned long int & (*l11)(void *);$/;"	l	function:main	typeref:typename:unsigned long int & (*)(void *)	file:
 l12	input.cpp	/^	std::string & (*l12)(void);$/;"	l	function:main	typeref:typename:std::string & (*)(void)	file:
@@ -14,8 +14,8 @@ l13	input.cpp	/^	std::string ** (*l13)(int a,int b);$/;"	l	function:main	typeref
 l14	input.cpp	/^	std::basic_string<wchar_t, std::char_traits<wchar_t>, std::allocator<wchar_t> > l14;$/;"	l	function:main	typeref:typename:std::basic_string<wchar_t,std::char_traits<wchar_t>,std::allocator<wchar_t>>	file:
 l15	input.cpp	/^	struct Struct1 l15;$/;"	l	function:main	typeref:struct:Struct1	file:
 l16	input.cpp	/^	struct Struct1 * l16, l17, l18[10];$/;"	l	function:main	typeref:struct:Struct1 *	file:
-l17	input.cpp	/^	struct Struct1 * l16, l17, l18[10];$/;"	l	function:main	typeref:struct:Struct1 *	file:
-l18	input.cpp	/^	struct Struct1 * l16, l17, l18[10];$/;"	l	function:main	typeref:struct:Struct1 * [10]	file:
+l17	input.cpp	/^	struct Struct1 * l16, l17, l18[10];$/;"	l	function:main	typeref:struct:Struct1	file:
+l18	input.cpp	/^	struct Struct1 * l16, l17, l18[10];$/;"	l	function:main	typeref:struct:Struct1[10]	file:
 l19	input.cpp	/^	Struct1 l19 = {};$/;"	l	function:main	typeref:typename:Struct1	file:
 l20	input.cpp	/^	std::string ** l20[SIZE];$/;"	l	function:main	typeref:typename:std::string ** []	file:
 l21	input.cpp	/^	std::string l21[1 << 2];$/;"	l	function:main	typeref:typename:std::string[]	file:
@@ -36,7 +36,7 @@ l35	input.cpp	/^	int (Struct1::*l35)(int) = NULL;$/;"	l	function:anotherFunc	typ
 m01	input.cpp	/^	unsigned int m01;$/;"	m	struct:Struct1	typeref:typename:unsigned int	file:
 m02	input.cpp	/^	std::string m02;$/;"	m	struct:Struct1	typeref:typename:std::string	file:
 m03	input.cpp	/^	std::string ** m03, m04;$/;"	m	struct:Struct1	typeref:typename:std::string **	file:
-m04	input.cpp	/^	std::string ** m03, m04;$/;"	m	struct:Struct1	typeref:typename:std::string **	file:
+m04	input.cpp	/^	std::string ** m03, m04;$/;"	m	struct:Struct1	typeref:typename:std::string	file:
 m05	input.cpp	/^	std::string & (*m05)(int a,int b);$/;"	m	struct:Struct1	typeref:typename:std::string & (*)(int a,int b)	file:
 m06	input.cpp	/^	std::basic_string<wchar_t, std::char_traits<wchar_t>, std::allocator<wchar_t> > m06[10];$/;"	m	struct:Struct1	typeref:typename:std::basic_string<wchar_t,std::char_traits<wchar_t>,std::allocator<wchar_t>>[10]	file:
 m07	input.cpp	/^	std::string m07 { "test" }; \/\/ C++11$/;"	m	struct:Struct1	typeref:typename:std::string	file:
