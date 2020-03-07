@@ -368,7 +368,7 @@ static int writeCtagsPtagEntry (tagWriter *writer CTAGS_ATTR_UNUSED,
 	return parserName
 
 #define OPT(X) ((X)?(X):"")
-		? mio_printf (mio, "%s%s%s%s\t%s\t%s\n",
+		? mio_printf (mio, "%s%s%s%s\t%s\t/%s/\n",
 			      PSEUDO_TAG_PREFIX, desc->name, PSEUDO_TAG_SEPARATOR, parserName,
 			      OPT(fileName), OPT(pattern))
 		: mio_printf (mio, "%s%s\t%s\t/%s/\n",

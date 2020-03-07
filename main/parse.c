@@ -4084,7 +4084,7 @@ extern bool makeKindSeparatorsPseudoTags (const langType language,
 		kind = getKind (kcb, i);
 		for (j = 0; j < kind->separatorCount; ++j)
 		{
-			char name[5] = {[0] = '/', [3] = '/', [4] = '\0'};
+			char name[3] = {[1] = '\0', [2] = '\0'};
 			const kindDefinition *upperKind;
 			const scopeSeparator *sep;
 
@@ -4092,15 +4092,13 @@ extern bool makeKindSeparatorsPseudoTags (const langType language,
 
 			if (sep->parentKindIndex == KIND_WILDCARD_INDEX)
 			{
-				name[1] = KIND_WILDCARD_LETTER;
-				name[2] = kind->letter;
+				name[0] = KIND_WILDCARD_LETTER;
+				name[1] = kind->letter;
 			}
 			else if (sep->parentKindIndex == KIND_GHOST_INDEX)
 			{
 				/* This is root separator: no upper item is here. */
-				name[1] = kind->letter;
-				name[2] = name[3];
-				name[3] = '\0';
+				name[0] = kind->letter;
 			}
 			else
 			{
@@ -4109,8 +4107,8 @@ extern bool makeKindSeparatorsPseudoTags (const langType language,
 				if (!upperKind)
 					continue;
 
-				name[1] = upperKind->letter;
-				name[2] = kind->letter;
+				name[0] = upperKind->letter;
+				name[1] = kind->letter;
 			}
 
 
@@ -4147,9 +4145,7 @@ static bool makeKindDescriptionPseudoTag (kindDefinition *kind,
 	vStringCatS (letter_and_name, kind -> name);
 
 	d = kind->description? kind->description: kind->name;
-	vStringPut (description, '/');
 	vStringCatSWithEscapingAsPattern (description, d);
-	vStringPut (description, '/');
 	data->written |=  writePseudoTag (data->pdesc, vStringValue (letter_and_name),
 					  vStringValue (description),
 					  data->langName);
