@@ -437,7 +437,6 @@ bool cxxParserExtractVariableDeclarations(CXXTokenChain * pChain,unsigned int uF
 				}
 
 				t = t->pNext;
-				pRemoveStart = t;
 			break;
 			default:
 				// Must be identifier
@@ -817,6 +816,17 @@ bool cxxParserExtractVariableDeclarations(CXXTokenChain * pChain,unsigned int uF
 			CXX_DEBUG_LEAVE_TEXT("Could not properly fix type name for next token: stopping here");
 			return bGotVariable;
 		}
+
+		// *, &, && and similar stuff do not "propagate" to the next type
+		while(
+				pRemoveStart->pPrev &&
+				cxxTokenTypeIsOneOf(
+						pRemoveStart->pPrev,
+						CXXTokenTypeStar | CXXTokenTypeAnd |
+						CXXTokenTypeMultipleAnds | CXXTokenTypeSquareParenthesisChain
+					)
+			)
+			pRemoveStart = pRemoveStart->pPrev;
 
 		cxxTokenChainDestroyRange(pChain,pRemoveStart,t->pPrev);
 	}
