@@ -4074,13 +4074,9 @@ extern bool makeKindSeparatorsPseudoTags (const langType language,
 	if (kindCount == 0)
 		return r;
 
+	vString *sepval = vStringNew();
 	for (i = 0; i < kindCount; ++i)
 	{
-		static vString *sepval;
-
-		if (!sepval)
-			sepval = vStringNew ();
-
 		kind = getKind (kcb, i);
 		for (j = 0; j < kind->separatorCount; ++j)
 		{
@@ -4119,6 +4115,7 @@ extern bool makeKindSeparatorsPseudoTags (const langType language,
 					    name, lang->name) || r;
 		}
 	}
+	vStringDelete (sepval);
 
 	return r;
 }
