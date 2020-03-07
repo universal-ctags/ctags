@@ -1,0 +1,6 @@
+!_TAG_FIELD_DESCRIPTION	end	/end lines of various items/
+!_TAG_FIELD_DESCRIPTION	input	/input file/
+!_TAG_FIELD_DESCRIPTION	language	/Language of input file containing tag/
+!_TAG_FIELD_DESCRIPTION	name	/tag name/
+!_TAG_FIELD_DESCRIPTION	pattern	/pattern/
+!_TAG_FIELD_DESCRIPTION!C	macrodef	/macro definition/

@@ -1,5 +1,6 @@
 #NAME                     ENABLED DESCRIPTION
 JSON_OUTPUT_VERSION       off     the version of json output stream format
+TAG_FIELD_DESCRIPTION     off     the names and descriptions of enabled fields
 TAG_FILE_FORMAT           on      the version of tags file format
 TAG_FILE_SORTED           on      how tags are sorted
 TAG_KIND_DESCRIPTION      off     the letters, names and descriptions of enabled kinds in the language
