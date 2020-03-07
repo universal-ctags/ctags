@@ -8,11 +8,13 @@ CTAGS=$1
 {
     echo '# BUILTIN'
     ${CTAGS} --quiet --options=NONE -o - --extras=p --pseudo-tags='*' \
+		 --pseudo-tags=-TAG_PROC_CWD \
 		 --fields='-{typeref}{file}' \
 	     input.sh
 
     echo '# REGEX'
     ${CTAGS} --quiet --options=NONE -o - --extras=p --pseudo-tags='*' \
+		 --pseudo-tags=-TAG_PROC_CWD \
 	     --langdef=foo --langmap=foo:+.foo \
 		 --_fielddef-foo='field,field example' \
 		 --fields='-{typeref}{file}' \

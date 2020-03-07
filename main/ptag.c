@@ -20,6 +20,7 @@
 #include "options_p.h"
 #include "parse_p.h"
 #include "ptag_p.h"
+#include "routines_p.h"
 #include "writer_p.h"
 #include <string.h>
 
@@ -115,6 +116,12 @@ static bool ptagMakeExtraDescriptions (ptagDesc *desc, langType language,
 	return makeExtraDescriptionsPseudoTags (language, desc);
 }
 
+static bool ptagMakeProcCwd (ptagDesc *desc, langType language,
+									   const void *data CTAGS_ATTR_UNUSED)
+{
+	return writePseudoTag (desc, CurrentDirectory, "", NULL);
+}
+
 static ptagDesc ptagDescs [] = {
 	{
 	  /* The prefix is not "TAG_".
@@ -180,6 +187,10 @@ static ptagDesc ptagDescs [] = {
 	{ true, "TAG_PATTERN_LENGTH_LIMIT",
 	  "the limit of pattern length",
 	  ptagMakePatternLengthLimit,
+	  true },
+	{ false, "TAG_PROC_CWD",
+	  "the current working directory of the tags generator",
+	  ptagMakeProcCwd,
 	  true },
 };
 
