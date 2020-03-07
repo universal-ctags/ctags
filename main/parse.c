@@ -3649,6 +3649,7 @@ static void addParserPseudoTags (langType language)
 		makePtagIfEnabled (PTAG_KIND_DESCRIPTION, language, parser);
 		makePtagIfEnabled (PTAG_KIND_SEPARATOR, language, parser);
 		makePtagIfEnabled (PTAG_FIELD_DESCRIPTION, language, parser);
+		makePtagIfEnabled (PTAG_EXTRA_DESCRIPTION, language, parser);
 
 		parser->pseudoTagPrinted = 1;
 	}
@@ -4219,6 +4220,44 @@ extern bool makeFieldDescriptionsPseudoTags (const langType language,
 			&& isFieldEnabled (i))
 		{
 			if (makeFieldDescriptionPseudoTag (language, i, pdesc))
+				written = true;
+		}
+	}
+	return written;
+}
+
+static bool makeExtraDescriptionPseudoTag (const langType language,
+										   xtagType x,
+										   const ptagDesc *pdesc)
+{
+	vString *description;
+	const char *name = getXtagName (x);
+
+	if (name == NULL || name [0] == '\0')
+		return false;
+
+	description = vStringNew ();
+	vStringCatSWithEscapingAsPattern (description,
+									  getXtagDescription (x));
+
+	bool r = writePseudoTag (pdesc, name,
+							 vStringValue (description),
+							 language == LANG_IGNORE? NULL: getLanguageName (language));
+
+	vStringDelete (description);
+	return r;
+}
+
+extern bool makeExtraDescriptionsPseudoTags (const langType language,
+											 const ptagDesc *pdesc)
+{
+	bool written = false;
+	for (int i = 0; i < countXtags (); i++)
+	{
+		if (getXtagOwner (i) == language
+			&& isXtagEnabled (i))
+		{
+			if (makeExtraDescriptionPseudoTag (language, i, pdesc))
 				written = true;
 		}
 	}

@@ -17,5 +17,7 @@ CTAGS=$1
 		 --_fielddef-foo='field,field example' \
 		 --fields='-{typeref}{file}' \
 		 --fields-foo='{field}' \
+		 --_extradef-foo='extra,extra example' \
+		 --extras-foo='{extra}' \
 	     --regex-foo='/abc/\1/k,kind,kinds/' input.foo
 } | grep -v VERSION

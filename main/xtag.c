@@ -296,6 +296,15 @@ const char* getXtagName (xtagType type)
 		return NULL;
 }
 
+const char* getXtagDescription (xtagType type)
+{
+	xtagDefinition* def = getXtagDefinition (type);
+	if (def)
+		return def->description;
+	else
+		return NULL;
+}
+
 extern void initXtagObjects (void)
 {
 	xtagObject *xobj;

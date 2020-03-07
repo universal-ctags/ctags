@@ -1,4 +1,5 @@
 # BUILTIN
+!_TAG_EXTRA_DESCRIPTION	pseudo	/Include pseudo tags/
 !_TAG_FIELD_DESCRIPTION	input	/input file/
 !_TAG_FIELD_DESCRIPTION	name	/tag name/
 !_TAG_FIELD_DESCRIPTION	pattern	/pattern/
@@ -15,6 +16,8 @@
 !_TAG_PROGRAM_NAME	Universal Ctags	/Derived from Exuberant Ctags/
 !_TAG_PROGRAM_URL	https://ctags.io/	/official site/
 # REGEX
+!_TAG_EXTRA_DESCRIPTION	pseudo	/Include pseudo tags/
+!_TAG_EXTRA_DESCRIPTION!foo	extra	/extra example/
 !_TAG_FIELD_DESCRIPTION	input	/input file/
 !_TAG_FIELD_DESCRIPTION	name	/tag name/
 !_TAG_FIELD_DESCRIPTION	pattern	/pattern/

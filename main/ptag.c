@@ -109,6 +109,12 @@ static bool ptagMakeFieldDescriptions (ptagDesc *desc, langType language,
 	return makeFieldDescriptionsPseudoTags (language, desc);
 }
 
+static bool ptagMakeExtraDescriptions (ptagDesc *desc, langType language,
+									   const void *data CTAGS_ATTR_UNUSED)
+{
+	return makeExtraDescriptionsPseudoTags (language, desc);
+}
+
 static ptagDesc ptagDescs [] = {
 	{
 	  /* The prefix is not "TAG_".
@@ -158,6 +164,10 @@ static ptagDesc ptagDescs [] = {
 	{ false, "TAG_FIELD_DESCRIPTION",
 	  "the names and descriptions of enabled fields",
 	  ptagMakeFieldDescriptions,
+	  true },
+	{ false, "TAG_EXTRA_DESCRIPTION",
+	  "the names and descriptions of enabled extras",
+	  ptagMakeExtraDescriptions,
 	  true },
 	{ true, "TAG_OUTPUT_MODE",
 	  "the output mode: u-ctags or e-ctags",
