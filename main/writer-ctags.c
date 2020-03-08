@@ -18,6 +18,8 @@
 #include "ptag_p.h"
 #include "read.h"
 #include "writer_p.h"
+#include "xtag.h"
+#include "xtag_p.h"
 
 
 #define CTAGS_FILE  "tags"
@@ -365,15 +367,24 @@ static int writeCtagsPtagEntry (tagWriter *writer CTAGS_ATTR_UNUSED,
 				const char *const parserName,
 				void *clientData CTAGS_ATTR_UNUSED)
 {
+
+	bool extras = includeExtensionFlags () && isFieldEnabled (FIELD_EXTRAS);
+	const char *xsep = extras? ";\"	": "";
+	const char *fsep = extras? ":": "";
+	const char *fieldx = extras? getFieldName (FIELD_EXTRAS): "";
+	const char *xptag = extras? getXtagName (XTAG_PSEUDO_TAGS): "";
+
 	return parserName
 
 #define OPT(X) ((X)?(X):"")
-		? mio_printf (mio, "%s%s%s%s\t%s\t/%s/\n",
+		? mio_printf (mio, "%s%s%s%s\t%s\t/%s/%s%s%s%s\n",
 			      PSEUDO_TAG_PREFIX, desc->name, PSEUDO_TAG_SEPARATOR, parserName,
-			      OPT(fileName), OPT(pattern))
-		: mio_printf (mio, "%s%s\t%s\t/%s/\n",
+			      OPT(fileName), OPT(pattern),
+				  xsep, fieldx, fsep, xptag)
+		: mio_printf (mio, "%s%s\t%s\t/%s/%s%s%s%s\n",
 			      PSEUDO_TAG_PREFIX, desc->name,
-			      OPT(fileName), OPT(pattern));
+			      OPT(fileName), OPT(pattern),
+			      xsep, fieldx, fsep, xptag);
 #undef OPT
 }
 
