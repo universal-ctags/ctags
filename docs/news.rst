@@ -429,6 +429,13 @@ To specify only a single pseudo tag, omit the sign::
 
 	--pseudo-tags=ptag
 
+With `{` and `}` characters, you can specify multiple pseudo tags at once::
+
+  --pseudo-tags={ptag1}{ptag2}...
+  --pseudo-tags=+{ptag1}{ptag2}...
+  --pseudo-tags=-{ptag1}{ptag2}...
+  --pseudo-tags=+{ptag1}{ptag2}-{ptag3}...
+
 JSON output
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

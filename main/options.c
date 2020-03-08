@@ -2389,43 +2389,70 @@ static void processPseudoTags (const char *const option CTAGS_ATTR_UNUSED,
 			       const char *const parameter)
 {
 	const char *p = parameter;
-	bool s;
+	bool s = true;
 	ptagType t;
+	vString *str = vStringNew();
 
-	if (*p == '*')
+	if (*p == '\0' || !strchr ("*+-", *p))
 	{
-		int i;
-		for (i = 0; i < PTAG_COUNT; i++)
-			enablePtag (i, true);
-		return;
-	}
-
-	if (*p == '-')
-	{
-		s= false;
-		p++;
-	}
-	else if (*p == '+')
-	{
-		s = true;
-		p++;
-	}
-	else
-	{
-		unsigned int i;
-
-		s = true;
-		for (i = 0; i < PTAG_COUNT; i++)
+		for (unsigned int i = 0; i < PTAG_COUNT; i++)
 			enablePtag (i, false);
-		if (*p == '\0')
-			return;
 	}
 
-	t = getPtagTypeForName (p);
-	if (t == PTAG_UNKNOWN)
-		error (FATAL, "Unknown pseudo tag name: %s", p);
+	while (1)
+	{
+		if (*p == '\0')
+			break;
 
-	enablePtag (t, s);
+		if (*p == '*')
+		{
+			int i;
+			for (i = 0; i < PTAG_COUNT; i++)
+				enablePtag (i, true);
+			p++;
+			continue;
+		}
+		else if (*p == '-')
+		{
+			s= false;
+			p++;
+			continue;
+		}
+		else if (*p == '+')
+		{
+			s = true;
+			p++;
+			continue;
+		}
+		else if (*p == '{')
+		{
+			const char *origin = p;
+
+			p++;
+			while (*p != '\0' && *p != '}')
+			{
+				vStringPut (str, *p);
+				p++;
+			}
+			if (*p != '}')
+				error (FATAL, "curly bracket specifying a pseudo tags is unbalanced: %s",
+					   origin);
+			p++;
+		}
+		else
+		{
+			vStringCopyS (str, p);
+			p += vStringLength (str);
+		}
+
+		char *name = vStringValue (str);
+		t = getPtagTypeForName (name);
+		if (t == PTAG_UNKNOWN)
+			error (FATAL, "Unknown pseudo tag name: %s", name);
+		enablePtag (t, s);
+		vStringClear (str);
+	}
+	vStringDelete (str);
 }
 
 static void processSortOption (
