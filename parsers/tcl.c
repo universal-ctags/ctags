@@ -31,12 +31,18 @@
 *   DATA DEFINITIONS
 */
 typedef enum {
-	K_PROCEDURE, K_NAMESPACE
+	K_PROCEDURE, K_NAMESPACE, K_PARAMETER,
 } tclKind;
+
+static scopeSeparator TclParameterSeparators [] = {
+	{ K_PROCEDURE        , "{" },
+};
 
 static kindDefinition TclKinds [] = {
 	{ true, 'p', "procedure", "procedures", },
 	{ true, 'n', "namespace", "namespaces", },
+	{ false, 'z', "parameter", "procedure parameters",
+	  ATTACH_SEPARATORS(TclParameterSeparators)},
 };
 
 enum {
@@ -57,10 +63,19 @@ static const keywordTable TclKeywordTable[] = {
 	{ "package",        KEYWORD_PACKAGE     },
 };
 
+typedef struct sCollector collector;
+struct sCollector {
+	void (* proc) (const tokenInfo *const, collector *);
+	vString *str;
+	int depth;
+	int scopeIndex;
+};
+
 /*
 *   FUNCTION DEFINITIONS
 */
 
+static bool tokenIsEOL (const tokenInfo *const token);
 
 static void initToken (tokenInfo *token, void *data);
 static void readToken (tokenInfo *const token, void *data);
@@ -253,6 +268,7 @@ static void readToken0 (tokenInfo *const token, struct sTclParserState *pstate)
 	case ']':
 		if (!escaped)
 		{
+			tokenPutc (token, c);
 			token->type = c;
 			break;
 		}
@@ -294,16 +310,22 @@ static void readToken0 (tokenInfo *const token, struct sTclParserState *pstate)
 	}
 }
 
-static void readToken (tokenInfo *const token, void *data CTAGS_ATTR_UNUSED)
+static void readToken (tokenInfo *const token, void *data)
 {
 	struct sTclParserState *pstate = TOKEN_PSTATE(token);
 
 	readToken0 (token, pstate);
 
 	pstate->lastTokenType = token->type;
+
+	if (data)
+	{
+		collector *col = data;
+		col->proc (token, col);
+	}
 }
 
-static bool tokenIsEOL (tokenInfo *const token)
+static bool tokenIsEOL (const tokenInfo *const token)
 {
 	if (token->type == ';'
 		|| tokenIsType (token, TCL_EOL)
@@ -402,6 +424,37 @@ static int notifyCommand (tokenInfo *const token, unsigned int parent)
 	return r;
 }
 
+static void collectSignature (const tokenInfo *const token, collector * col)
+{
+	if (tokenIsEOL (token))
+		return;
+
+	if (tokenIsType (token, TCL_IDENTIFIER) &&
+		(col->depth == 1
+		 || (col->depth == 2 && tokenIsType (token, TCL_IDENTIFIER)
+			 && vStringLast (col->str) == '{')))
+	{
+		tagEntryInfo e;
+		initTagEntry (&e, tokenString (token), K_PARAMETER);
+		e.extensionFields.scopeIndex = col->scopeIndex;
+		makeTagEntry (&e);
+	}
+	else if (tokenIsTypeVal (token, '{'))
+		col->depth++;
+	else if (tokenIsTypeVal (token, '}'))
+		col->depth--;
+
+	if ((vStringLength (col->str) > 0
+		 && vStringLast (col->str) != '{'
+		 && vStringLast (col->str) != '['
+		 && vStringLast (col->str) != '(')
+		&& (!tokenIsTypeVal (token, '}'))
+		&& (!tokenIsTypeVal (token, ']'))
+		&& (!tokenIsTypeVal (token, ')')))
+		vStringPut (col->str, ' ');
+	vStringCat (col->str, token->string);
+}
+
 static void parseProc (tokenInfo *const token,
 					   unsigned int parent)
 {
@@ -476,9 +529,30 @@ static void parseProc (tokenInfo *const token,
 		}
 	}
 
+	vString *signature = NULL;
 	if (!tokenIsEOL (token))
 	{
 		tokenRead (token);
+		if (tokenIsType (token, TCL_IDENTIFIER))
+		{
+			tagEntryInfo e;
+			initTagEntry (&e, tokenString (token), K_PARAMETER);
+			e.extensionFields.scopeIndex = index;
+			makeTagEntry (&e);
+			signature = vStringNewCopy (token->string);
+		}
+		else if (token->type == '{')
+		{
+			signature = vStringNewInit ("{");
+			collector col = {
+				.proc = collectSignature,
+				.str = signature,
+				.depth = 1,
+				.scopeIndex = index,
+			};
+			tokenSkipOverPairFull (token, &col);
+		}
+
 		skipToEndOfCmdline(token);
 	}
 
@@ -489,12 +563,22 @@ static void parseProc (tokenInfo *const token,
 		e = getEntryInCorkQueue (index);
 		e->extensionFields.endLine = token->lineNumber;
 
+		if (signature)
+		{
+			e->extensionFields.signature = vStringDeleteUnwrap (signature);
+			signature = NULL;
+		}
+
 		if (index_fq != CORK_NIL)
 		{
+			const char *sig = e->extensionFields.signature;
 			e = getEntryInCorkQueue (index_fq);
 			e->extensionFields.endLine = token->lineNumber;
+			if (sig)
+				e->extensionFields.signature = eStrdup (sig);
 		}
 	}
+	vStringDelete (signature);	/* NULL is acceptable */
 }
 
 static void parseNamespace (tokenInfo *const token,
