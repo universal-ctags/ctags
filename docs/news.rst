@@ -231,7 +231,7 @@ the definition of a tag as users expect when attempting to match the
 patterns in a tags file.
 
 The good news is that there is a way to notify Vim of the encoding
-used in a tags file with the ``TAG_FILE_ENCODING`` pseudo tag.
+used in a tags file with the ``TAG_FILE_ENCODING`` pseudo-tag.
 
 Two new options have been introduced (``--input-encoding=IN`` and
 ``--output-encoding=OUT``).
@@ -242,7 +242,7 @@ the pattern parts of each tag line. As a result the tags output is
 encoded in ``OUT`` encoding.
 
 In addition ``OUT`` is specified at the top the tags file as the
-value for the ``TAG_FILE_ENCODING`` pseudo tag. The default value of
+value for the ``TAG_FILE_ENCODING`` pseudo-tag. The default value of
 ``OUT`` is UTF-8.
 
 NOTE: Converted input is NOT passed to language parsers.
@@ -280,7 +280,7 @@ These extra tag entries are newly introduced.
 
 ``p``
 
-	Include pseudo tags.
+	Include pseudo-tags.
 
 
 Options for inspecting ctags internals
@@ -402,39 +402,13 @@ Guessing parser from file contents (``-G`` option)
 See :ref:`ctags(1) <ctags(1)>`.
 
 
-Enabling/disabling pseudo tags (``--pseudo-tags`` option)
+Enabling/disabling pseudo-tags (``--pseudo-tags`` option)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Each pseudo tag can be enabled/disabled with ``--pseudo-tags``.
-::
+.. IN MAN PAGE
 
-	--pseudo-tags=+ptag
-	--pseudo-tags=-ptag
-
-When prefixed with `+`, the pseudo tag specified as ``ptag`` is
-enabled.  When prefixed with `-`, the pseudo tag is disabled.
-``--list-pseudo-tags`` shows all recognized ptag names.
-
-All pseudo tags are enabled if `*` is given as the value of ptag
-like::
-
-	--pseudo-tags='*'
-
-All pseudo tags are disabled if no option value is given to
-``--pseudo-tags`` like::
-
-	--pseudo-tags=
-
-To specify only a single pseudo tag, omit the sign::
-
-	--pseudo-tags=ptag
-
-With `{` and `}` characters, you can specify multiple pseudo tags at once::
-
-  --pseudo-tags={ptag1}{ptag2}...
-  --pseudo-tags=+{ptag1}{ptag2}...
-  --pseudo-tags=-{ptag1}{ptag2}...
-  --pseudo-tags=+{ptag1}{ptag2}-{ptag3}...
+See :ref:`ctags-client-tools(7) <ctags-client-tools(7)>` about the
+option.
 
 JSON output
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -957,49 +931,19 @@ Incompatible changes to file name pattern and extension handling
 See :ref:`ctags-incompatibilities(7) <ctags-incompatibilities(7)>`.
 
 
-Pseudo tags
+Pseudo-tags
 ---------------------------------------------------------------------
 
-Pseudo tags are used to add meta data to a tags file. Universal-ctags
-will utilize pseudo tags aggressively.
+.. IN MAN PAGE
 
-Universal-ctags is not mature yet; there is a possibility that
-incompatible changes will be introduced. As a result tools reading
-a tags file may not work as expected.
-
-To mitigate this issue pseudo tags are employed to make a tags file
-more self-descriptive. We hope some of the incompatibilities can be
-overcome in client tools by utilizing this approach.
-
-Example output:
-
-.. code-block:: console
-
-    $ ./ctags -o - --extras=p --pseudo-tags='TAG_KIND_DESCRIPTION' foo.c
-    !_TAG_KIND_DESCRIPTION!C	L,label	/goto label/
-    !_TAG_KIND_DESCRIPTION!C	c,class	/classes/
-    !_TAG_KIND_DESCRIPTION!C	d,macro	/macro definitions/
-    !_TAG_KIND_DESCRIPTION!C	e,enumerator	/enumerators (values inside an enumeration)/
-    !_TAG_KIND_DESCRIPTION!C	f,function	/function definitions/
-    !_TAG_KIND_DESCRIPTION!C	g,enum	/enumeration names/
-    !_TAG_KIND_DESCRIPTION!C	h,header	/included header files/
-    !_TAG_KIND_DESCRIPTION!C	l,local	/local variables/
-    !_TAG_KIND_DESCRIPTION!C	m,member	/class, struct, and union members/
-    !_TAG_KIND_DESCRIPTION!C	n,namespace	/namespaces/
-    !_TAG_KIND_DESCRIPTION!C	p,prototype	/function prototypes/
-    !_TAG_KIND_DESCRIPTION!C	s,struct	/structure names/
-    !_TAG_KIND_DESCRIPTION!C	t,typedef	/typedefs/
-    !_TAG_KIND_DESCRIPTION!C	u,union	/union names/
-    !_TAG_KIND_DESCRIPTION!C	v,variable	/variable definitions/
-    !_TAG_KIND_DESCRIPTION!C	x,externvar	/external and forward variable declarations/
-    foo	foo.c	/^foo (int i, int j)$/;"	f
-    main	foo.c	/^main (void)$/;"	f
+See :ref:`ctags-client-tools(7) <ctags-client-tools(7)>` about the
+concept of the pseudo-tags.
 
 
 ``TAG_KIND_DESCRIPTION``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-This is a newly introduced pseudo tag. It is not emitted by default.
+This is a newly introduced pseudo-tag. It is not emitted by default.
 It is emitted only when ``--pseudo-tags=+TAG_KIND_DESCRIPTION`` is
 given.
 
@@ -1016,7 +960,7 @@ A backslash and a slash in {description} is escaped with a backslash.
 ``TAG_KIND_SEPARATOR``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-This is a newly introduced pseudo tag. It is not emitted by default.
+This is a newly introduced pseudo-tag. It is not emitted by default.
 It is emitted only when ``--pseudo-tags=+TAG_KIND_SEPARATOR`` is
 given.
 
@@ -1078,7 +1022,7 @@ separator; the third line has higher priority than the first.
 ``TAG_OUTPUT_FILESEP``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-This pseudo tag represents the separator used in file name: slash or
+This pseudo-tag represents the separator used in file name: slash or
 backslash.  This is always 'slash' on Unix-like environments.
 This is also 'slash' by default on Windows, however when
 ``--output-format=e-tags`` or ``--use-slash-as-filename-separator=no``
@@ -1090,7 +1034,7 @@ is specified, it becomes 'backslash'.
 
 .. NOT REVIEWED YET
 
-This pseudo tag represents output mode: u-ctags or e-ctags.
+This pseudo-tag represents output mode: u-ctags or e-ctags.
 This is controlled by ``--output-format`` option.
 
 See also :ref:`Compatible output and weakness <compat-output>`.

@@ -45,6 +45,7 @@ IN_SOURCE_FILES = \
 	ctags.1.rst.in \
 	ctags-optlib.7.rst.in \
 	ctags-incompatibilities.7.rst.in \
+	ctags-client-tools.7.rst.in \
 	\
 	$(NULL)
 

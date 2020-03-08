@@ -472,6 +472,8 @@ file, and provided solely for documentation purposes::
     !_TAG_PROGRAM_URL	{URL}	/optional comment/
     !_TAG_PROGRAM_VERSION	{version-id}	/optional comment/
 
+EXCEPTION: Universal-ctags introduces more kinds of pseudo-tags.
+See ctags-client-tools(7) about them.
 
 ----
 
@@ -510,9 +512,9 @@ exceptions.  In other hand, with ``--output-format=e-ctags`` option
 ctags has no exception; Universal-ctags command may use the same file
 format as Exuberant-ctags. However, ``--output-format=e-ctags`` throws
 away a tag entry which name includes a space or a tab
-character. ``TAG_OUTPUT_MODE`` pseudo tag tells which format is
+character. ``TAG_OUTPUT_MODE`` pseudo-tag tells which format is
 used when ctags generating tags file.
 
 SEE ALSO
 --------
-ctags(1), ctags-incompatibilities(7)
+ctags(1), ctags-client-tools(7), ctags-incompatibilities(7)

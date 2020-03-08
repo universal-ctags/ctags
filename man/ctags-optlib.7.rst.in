@@ -25,8 +25,8 @@ parser in Universal-ctags. "opt" intends a parser is defined with
 combination of command line options. "lib" intends an optlib parser
 can be more than ad-hoc personal configuration.
 
-This man page is for people who wants to define an optlib parser. The
-reader should read ctags(1) of Universal-ctags first. Following
+This man page is for people who want to define an optlib parser. The
+readers should read ctags(1) of Universal-ctags first. Following
 options are for defining (or customizing) a parser:
 
 * ``--langdef=``

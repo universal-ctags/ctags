@@ -493,8 +493,9 @@ are not listed here. They are experimental or for debugging purpose.
 		hidden option of Exuberant-ctags.
 
 	p/pseudo
-		Include pseudo tags. Enabled by default unless the tag file is
-		written to standard output.
+		Include pseudo-tags. Enabled by default unless the tag file is
+		written to standard output. See :ref:`ctags-client-tools(7) <ctags-client-tools(7)>` about
+		the detail of pseudo-tags.
 
 	q/qualified
 		Include an extra class-qualified or namespace-qualified tag entry
@@ -1082,7 +1083,7 @@ are not listed here. They are experimental or for debugging purpose.
 	**all** is used as default value if the option argument is omitted.
 
 ``--list-pseudo-tags``
-	Output list of pseudo tags.
+	Output list of pseudo-tags.
 
 ``--list-regex-flags``
 	See :ref:`ctags-optlib(7) <ctags-optlib(7)>`.
@@ -1183,7 +1184,7 @@ are not listed here. They are experimental or for debugging purpose.
 	specified by ``--input-encoding=encoding`` to this encoding.
 
 	In addition ``encoding`` is specified at the top the tags file as the
-	value for the ``TAG_FILE_ENCODING`` pseudo tag. The default value of
+	value for the ``TAG_FILE_ENCODING`` pseudo-tag. The default value of
 	``encoding`` is UTF-8.
 
 ``--output-format=u-ctags|e-ctags|etags|xref|json``
@@ -1227,8 +1228,8 @@ are not listed here. They are experimental or for debugging purpose.
 	Just prints the language parsers for specified source files, and then exits.
 
 ``--pseudo-tags=[+|-]ptag``, ``--pseudo-tags=*``
-	Enable/disable emitting pseudo tag named ptag.
-	If \* is given, enable emitting all pseudo tags.
+	Enable/disable emitting pseudo-tag named ptag.
+	If \* is given, enable emitting all pseudo-tags.
 
 ``--put-field-prefix``
 	Put "UCTAGS" as prefix for the name of fields newly introduced in
@@ -1926,6 +1927,12 @@ See :ref:`ctags-optlib(7) <ctags-optlib(7)>` for defining (or extending) a parse
 in a configuration file.
 
 See :ref:`tags(5) <tags(5)>` for the format of tag files.
+
+See :ref:`ctags-incompatibilities(7) <ctags-incompatibilities(7)>` about known incompatible changes
+with Exuberant-ctags.
+
+See :ref:`ctags-client-tools(7) <ctags-client-tools(7)>` if you are interested in writing
+a tool for processing tags files.
 
 The official Universal-ctags web site at:
 
