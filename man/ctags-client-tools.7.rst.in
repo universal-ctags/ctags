@@ -1,7 +1,7 @@
 .. _ctags-client-tools(7):
 
 ==============================================================
-@CTAGS_NAME_EXECUTABLE@
+ctags-client-tools
 ==============================================================
 --------------------------------------------------------------------------------
 Hints for developing a tool using @CTAGS_NAME_EXECUTABLE@ command and tags output
