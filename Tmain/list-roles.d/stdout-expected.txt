@@ -57,6 +57,7 @@ Python         i/module          namespace          on      namespace from where
 Python         x/unknown         imported           on      imported from the other module
 Python         x/unknown         indirectlyImported on      classes/variables/functions/modules imported in alternative name
 RpmSpec        m/macro           undef              on      undefined
+RpmSpec        p/patch           decl               on      declared for applying later
 Sh             h/heredoc         endmarker          on      end marker
 Sh             s/script          loaded             on      loaded
 SystemdUnit    u/unit            After              on      referred in After key
@@ -130,6 +131,7 @@ Python         i/module          namespace          on      namespace from where
 Python         x/unknown         imported           on      imported from the other module
 Python         x/unknown         indirectlyImported on      classes/variables/functions/modules imported in alternative name
 RpmSpec        m/macro           undef              on      undefined
+RpmSpec        p/patch           decl               on      declared for applying later
 Sh             h/heredoc         endmarker          on      end marker
 Sh             s/script          loaded             on      loaded
 SystemdUnit    u/unit            After              on      referred in After key
