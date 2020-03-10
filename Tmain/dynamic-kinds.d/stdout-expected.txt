@@ -1,3 +1,0 @@
-#LETTER NAME   ENABLED REFONLY NROLES MASTER DESCRIPTION
-a       anchor yes     no      0      NONE   anchors
-b       batch  yes     no      0      NONE   batches

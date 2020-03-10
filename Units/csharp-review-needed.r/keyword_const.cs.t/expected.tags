@@ -1,8 +1,0 @@
-ConstTest	input.cs	/^public class ConstTest $/;"	c
-Main	input.cs	/^   public static void Main() $/;"	m	class:ConstTest
-MyClass	input.cs	/^      public MyClass(int p1, int p2) $/;"	m	class:ConstTest.MyClass
-MyClass	input.cs	/^   class MyClass $/;"	c	class:ConstTest
-c1	input.cs	/^      public const int c1 = 5;$/;"	f	class:ConstTest.MyClass
-c2	input.cs	/^      public const int c2 = c1 + 5;$/;"	f	class:ConstTest.MyClass
-x	input.cs	/^      public int x;$/;"	f	class:ConstTest.MyClass
-y	input.cs	/^      public int y;$/;"	f	class:ConstTest.MyClass

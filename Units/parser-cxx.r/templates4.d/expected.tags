@@ -1,4 +1,0 @@
-INT	input.cpp	/^#define INT /;"	d	file:
-x	input.cpp	/^template<char i, bool B = i < 10> INT x(void) { return 0; }$/;"	f	typeref:typename:INT	template:<char i,bool B=i<10>
-i	input.cpp	/^template<char i, bool B = i < 10> INT x(void) { return 0; }$/;"	Z	function:x	typeref:typename:char
-B	input.cpp	/^template<char i, bool B = i < 10> INT x(void) { return 0; }$/;"	Z	function:x	typeref:typename:bool

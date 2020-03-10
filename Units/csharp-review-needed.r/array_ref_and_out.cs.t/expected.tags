@@ -1,5 +1,0 @@
-FillArray	input.cs	/^   static public void FillArray(out int[] myArray) $/;"	m	class:TestOut
-Main	input.cs	/^   static public void Main() $/;"	m	class:TestOut
-MyMethod	input.cs	/^public static void MyMethod(out int[] arr) $/;"	m
-MyMethod	input.cs	/^public static void MyMethod(ref int[] arr) $/;"	m
-TestOut	input.cs	/^class TestOut $/;"	c

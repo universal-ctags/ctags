@@ -1,9 +1,0 @@
-AddEmployee	input.cs	/^   public static int AddEmployee() $/;"	m	class:Employee
-Employee	input.cs	/^   public Employee () $/;"	m	class:Employee
-Employee	input.cs	/^   public Employee (string name, string id) $/;"	m	class:Employee
-Employee	input.cs	/^public class Employee $/;"	c
-Main	input.cs	/^   public static void Main() $/;"	m	class:MainClass
-MainClass	input.cs	/^class MainClass: Employee $/;"	c
-employeeCounter	input.cs	/^   public static int employeeCounter;$/;"	f	class:Employee
-id	input.cs	/^   public string id;$/;"	f	class:Employee
-name	input.cs	/^   public string name;$/;"	f	class:Employee

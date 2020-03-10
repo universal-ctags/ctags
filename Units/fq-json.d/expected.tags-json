@@ -1,3 +1,0 @@
-{"_type": "tag", "name": "A", "path": "input.py", "pattern": "/^class A:$/"}
-{"_type": "tag", "name": "A.f", "path": "input.py", "pattern": "/^    def f():$/", "extras": "qualified"}
-{"_type": "tag", "name": "f", "path": "input.py", "pattern": "/^    def f():$/"}

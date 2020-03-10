@@ -1,3 +1,0 @@
-Input	input.ml	/^(* the string "(*" does NOT start a comment *)$/;"	M
-_	input.ml	/^let _ = p "foo"$/;"	f
-p	input.ml	/^let p = print_endline$/;"	v

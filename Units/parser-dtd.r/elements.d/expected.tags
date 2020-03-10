@@ -1,2 +1,0 @@
-SUB	input.mod	/^<!ELEMENT (SUB|SUP) - - (%inline;)*    -- subscript, superscript -->$/;"	e	roles:def	end:1
-SUP	input.mod	/^<!ELEMENT (SUB|SUP) - - (%inline;)*    -- subscript, superscript -->$/;"	e	roles:def	end:1

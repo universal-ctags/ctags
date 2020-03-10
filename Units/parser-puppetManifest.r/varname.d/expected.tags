@@ -1,2 +1,0 @@
-_msg	input.pp	/^$_msg = 'hello, world!'$/;"	v
-helloworld	input.pp	/^class helloworld {$/;"	c

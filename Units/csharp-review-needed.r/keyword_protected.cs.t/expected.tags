@@ -1,5 +1,0 @@
-Main	input.cs	/^   public static void Main() $/;"	m	class:MyDerivedC
-MyClass	input.cs	/^class MyClass $/;"	c
-MyDerivedC	input.cs	/^class MyDerivedC: MyClass $/;"	c
-x	input.cs	/^   protected int x; $/;"	f	class:MyClass
-y	input.cs	/^   protected int y;$/;"	f	class:MyClass

@@ -1,7 +1,0 @@
-D	input.rb	/^class D$/;"	c
-_a?	input.rb	/^  def self._a?$/;"	S	class:D
-_b!	input.rb	/^  def self._b!$/;"	S	class:D
-_c=	input.rb	/^  def self._c=(a)$/;"	S	class:D
-x?	input.rb	/^  def self.x?$/;"	S	class:D
-y!	input.rb	/^  def self.y!$/;"	S	class:D
-z=	input.rb	/^  def self.z=(a)$/;"	S	class:D

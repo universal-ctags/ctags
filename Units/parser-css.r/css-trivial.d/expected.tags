@@ -1,5 +1,0 @@
-a	input.css	/^a{ color: red; }$/;"	s
-html	input.css	/^html{ font: sans-serif; }$/;"	s
-input	input.css	/^input, textarea{ border: 1px solid green; }$/;"	s
-p	input.css	/^p{ text-align: justify; }$/;"	s
-textarea	input.css	/^input, textarea{ border: 1px solid green; }$/;"	s

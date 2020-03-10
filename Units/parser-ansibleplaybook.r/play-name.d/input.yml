@@ -1,4 +1,0 @@
-- name: Update ctags
-  yum: pkg=ctags latest
-- name: Update etags
-  yum: pkg=etags latest

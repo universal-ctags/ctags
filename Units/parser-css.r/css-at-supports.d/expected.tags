@@ -1,2 +1,0 @@
-html	input.css	/^  html { test-property: 42; }$/;"	s
-html	input.css	/^html { color: blue; }$/;"	s

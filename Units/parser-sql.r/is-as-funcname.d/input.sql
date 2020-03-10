@@ -1,3 +1,0 @@
-CREATE FUNCTION is() RETURNS integer AS $$
-SELECT 1 as result;
-$$ LANGUAGE SQL;

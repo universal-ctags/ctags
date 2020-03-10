@@ -1,2 +1,0 @@
-f1	input.ksh	/^f1() {$/;"	f
-f2	input.ksh	/^function f2 {$/;"	f

@@ -1,3 +1,0 @@
-*|div	input.css	/^*|div { color: blue; }$/;"	s
-svg|a	input.css	/^svg|a { color: green; }$/;"	s
-|a	input.css	/^|a { color: red; }$/;"	s

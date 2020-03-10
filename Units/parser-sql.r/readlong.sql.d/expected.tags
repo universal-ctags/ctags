@@ -1,8 +1,0 @@
-longtable	input.sql	/^create table longtable (longcol long) tablespace TOOLS;$/;"	t
-longcol	input.sql	/^create table longtable (longcol long) tablespace TOOLS;$/;"	E	table:longtable
-cur1	input.sql	/^  cur1       PLS_INTEGER         := DBMS_SQL.OPEN_CURSOR;;$/;"	v
-rc	input.sql	/^  rc         NUMBER;$/;"	v
-long_piece	input.sql	/^  long_piece VARCHAR2(256);$/;"	v
-piece_len	input.sql	/^  piece_len  INTEGER             := 0;$/;"	v
-long_tab	input.sql	/^  long_tab   DBMS_SQL.VARCHAR2S;$/;"	v
-long_len	input.sql	/^  long_len   INTEGER             := 0;$/;"	v

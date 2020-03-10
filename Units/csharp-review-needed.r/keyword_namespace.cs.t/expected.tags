@@ -1,8 +1,0 @@
-AlternativeNestedNameSpaceClass	input.cs	/^	public class AlternativeNestedNameSpaceClass$/;"	c	namespace:SomeNameSpace.Nested
-Main	input.cs	/^      public static void Main() $/;"	m	class:SomeNameSpace.MyClass
-MyClass	input.cs	/^   public class MyClass $/;"	c	namespace:SomeNameSpace
-Nested	input.cs	/^   namespace Nested   \/\/ a nested namespace$/;"	n	namespace:SomeNameSpace
-NestedNameSpaceClass	input.cs	/^      public class NestedNameSpaceClass $/;"	c	namespace:SomeNameSpace.Nested
-SayHello	input.cs	/^         public static void SayHello() $/;"	m	class:SomeNameSpace.Nested.NestedNameSpaceClass
-SomeNameSpace	input.cs	/^namespace SomeNameSpace$/;"	n
-SomeNameSpace.Nested	input.cs	/^namespace SomeNameSpace.Nested$/;"	n

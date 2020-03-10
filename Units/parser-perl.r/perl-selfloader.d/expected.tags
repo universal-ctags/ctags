@@ -1,2 +1,0 @@
-SL	input.pm	/^package SL;$/;"	p
-xyz	input.pm	/^sub xyz {$/;"	s

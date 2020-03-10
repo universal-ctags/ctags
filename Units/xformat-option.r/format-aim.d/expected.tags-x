@@ -1,4 +1,0 @@
-getTarget  <access =    private, parent =          -, impl =          ->
-input      <access =          -, parent =     Object, impl =          ->
-life       <access =  protected, parent =          -, impl =   abstract>
-main       <access =     public, parent =          -, impl =          ->

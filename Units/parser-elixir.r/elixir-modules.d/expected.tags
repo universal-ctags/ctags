@@ -1,3 +1,0 @@
-Foo	input.ex	/^defmodule Foo do$/;"	module
-Bar	input.ex	/^defmodule Foo.Bar do$/;"	module
-Baz	input.ex	/^  defmodule Baz do$/;"	module

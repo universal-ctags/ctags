@@ -1,7 +1,0 @@
-A	input.pl	/^use constant A => 3;$/;"	c	language:Perl
-A::B	input.pl	/^package A::B;$/;"	p	language:Perl
-A::B::A	input.pl	/^use constant A => 3;$/;"	c	language:Perl
-A::B::MySub	input.pl	/^sub MySub {}$/;"	s	language:Perl
-LABEL	input.pl	/^LABEL:$/;"	l	language:Perl
-MySub	input.pl	/^sub MySub {}$/;"	s	language:Perl
-NAME	input.pl	/^=head1 NAME$/;"	c	language:Pod

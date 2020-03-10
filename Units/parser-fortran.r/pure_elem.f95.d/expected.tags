@@ -1,4 +1,0 @@
-F	input.f95	/^	PURE REAL FU/;"	f
-elem_maxabs	input.f95	/^	ELEMENTAL REAL FUNCTION elem_maxabs(/;"	f
-pure_func	input.f95	/^	PURE REAL FUNCTION pure_func(/;"	f
-pure_maxabs2	input.f95	/^	PURE REAL FUNCTION pure_maxabs2(/;"	f

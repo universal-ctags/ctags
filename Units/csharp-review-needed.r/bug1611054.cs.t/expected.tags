@@ -1,3 +1,0 @@
-C	input.cs	/^class C {$/;"	c
-a	input.cs	/^	public String a() {$/;"	m	class:C
-b	input.cs	/^	public void b() {$/;"	m	class:C

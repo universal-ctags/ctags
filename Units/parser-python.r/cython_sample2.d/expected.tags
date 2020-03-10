@@ -1,5 +1,0 @@
-my_fun	input.pyx	/^cpdef np.ndarray[dtype=double, ndim=1] my_fun(np.ndarray[dtype=double, ndim=1] x):$/;"	f	signature:(np.ndarray[dtype=double, ndim=1] x)
-np	input.pyx	/^cimport numpy as np$/;"	I
-np	input.pyx	/^import numpy as np$/;"	I
-numpy	input.pyx	/^cimport numpy as np$/;"	i
-numpy	input.pyx	/^import numpy as np$/;"	i

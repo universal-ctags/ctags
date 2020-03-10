@@ -1,2 +1,0 @@
-A	input.inko	/^trait A {}$/;"	t
-B	input.inko	/^trait B: SomeRequiredTrait {}$/;"	t

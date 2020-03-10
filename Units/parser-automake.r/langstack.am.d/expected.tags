@@ -1,9 +1,0 @@
-prefix	input.am	/^prefix=c$/;"	macro	language:Make	roles:def
-$(top_srcdir)/source.mak	input.am	/^include $(top_srcdir)\/source.mak$/;"	makefile	language:Make	roles:included
-cbin	input.am	/^cbin=$(bindir)\/ctags$/;"	macro	language:Make	roles:def
-cbin_PROGRAMS	input.am	/^cbin_PROGRAMS = $(prefix)ctags$/;"	macro	language:Make	roles:def
-cbin	input.am	/^cbin_PROGRAMS = $(prefix)ctags$/;"	directory	language:Automake	roles:program
-$(prefix)ctags	input.am	/^cbin_PROGRAMS = $(prefix)ctags$/;"	program	language:Automake	directory:cbin	roles:def
-INSTALL_ETAGS	input.am	/^if INSTALL_ETAGS$/;"	condition	language:Automake	roles:branched
-install-exec-hook	input.am	/^install-exec-hook:$/;"	target	language:Make	roles:def
-uninstall-hook	input.am	/^uninstall-hook:$/;"	target	language:Make	roles:def

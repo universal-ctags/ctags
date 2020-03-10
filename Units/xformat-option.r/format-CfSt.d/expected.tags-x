@@ -1,6 +1,0 @@
-S         -          -, file =>  struct S{
-T         -          typename:S, file => typedef S T;
-func      (T x)      typename:int,    - => int func (T x)
-i         -          typename:int, file =>     int i;
-t0        -          struct:S, file => static struct S t0;
-t0        -          typename:T, file => static T t0;

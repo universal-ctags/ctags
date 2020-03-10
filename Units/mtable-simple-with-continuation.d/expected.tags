@@ -1,3 +1,0 @@
-a	input.mtable	/^class a$/;"	class	line:1	end:4
-c	input.mtable	/^class c$/;"	class	line:13	scope:namespace:e	end:21
-d	input.mtable	/^	class d {$/;"	class	line:17	scope:class:e.c	end:19

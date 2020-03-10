@@ -1,1 +1,0 @@
-MACRO_TO_SEE	input.c	/^#define MACRO_TO_SEE$/;"	d	file:

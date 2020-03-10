@@ -1,9 +1,0 @@
-Counter	input.cs	/^   public static int Counter $/;"	p	class:Employee
-Employee	input.cs	/^   public Employee() $/;"	m	class:Employee
-Employee	input.cs	/^public class Employee $/;"	c
-Main	input.cs	/^   public static void Main() $/;"	m	class:MainClass
-MainClass	input.cs	/^public class MainClass$/;"	c
-Name	input.cs	/^   public string Name $/;"	p	class:Employee
-counter	input.cs	/^   private static int counter;$/;"	f	class:Employee	file:
-name	input.cs	/^   private string name;$/;"	f	class:Employee	file:
-numberOfEmployees	input.cs	/^   public static int numberOfEmployees;$/;"	f	class:Employee

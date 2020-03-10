@@ -1,3 +1,0 @@
-f	input.go	/^func f(from string) {$/;"	f	package:main	signature:(from string)
-main	input.go	/^func main() {$/;"	f	package:main	signature:()
-main	input.go	/^package main$/;"	p

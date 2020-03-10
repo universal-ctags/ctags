@@ -1,4 +1,0 @@
-VERBATIM	input.e	/^class VERBATIM$/;"	c
-constant	input.e	/^	constant: STRING = "[$/;"	f	class:VERBATIM
-cpp_query	input.e	/^	cpp_query (obj: FX_OBJECT; app: POINTER): POINTER$/;"	f	class:VERBATIM	file:
-tail_attribute	input.e	/^	tail_attribute: INTEGER$/;"	f	class:VERBATIM	file:

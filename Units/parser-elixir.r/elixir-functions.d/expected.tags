@@ -1,9 +1,0 @@
-FunctionModule	input.ex	/^defmodule FunctionModule do$/;"	module
-one_liner_func	input.ex	/^  def one_liner_func, do: :baz$/;"	function	module:FunctionModule	access:public
-func_no_params	input.ex	/^  def func_no_params do$/;"	function	module:FunctionModule	access:public
-func_head	input.ex	/^  def func_head(string1, string2 \\\\ nil, separator \\\\ " ")$/;"	function	module:FunctionModule	access:public
-func_one_arity	input.ex	/^  def func_one_arity(string1, nil, _separator) do$/;"	function	module:FunctionModule	access:public
-normal_func	input.ex	/^  def normal_func(string1, string2, separator) do$/;"	function	module:FunctionModule	access:public
-private_func	input.ex	/^  defp private_func(a), do: a <> " alone"$/;"	function	module:FunctionModule	access:private
-private_func_no_params	input.ex	/^  defp private_func_no_params do$/;"	function	module:FunctionModule	access:private
-function_with_comma	input.ex	/^  def function_with_comma,$/;"	function	module:FunctionModule	access:public

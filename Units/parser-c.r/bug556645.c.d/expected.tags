@@ -1,2 +1,0 @@
-A1	input.c	/^#define A1(/;"	d	file:
-Qtype	input.c	/^typedef A1(ilm_struct, 1) Qtype;$/;"	t	file:

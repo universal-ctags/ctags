@@ -1,3 +1,0 @@
-procedure Altivec is:
-
-   V

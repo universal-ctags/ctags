@@ -1,2 +1,0 @@
-hex2dec	input.sql	/^CREATE OR REPLACE FUNCTION hex2dec (hexnum in char) RETURN number IS$/;"	f
-num2hex	input.sql	/^CREATE OR REPLACE FUNCTION num2hex (N in number) RETURN varchar2 IS$/;"	f

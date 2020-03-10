@@ -1,3 +1,0 @@
---fields=*
---fields=-Z
---fields-ObjectiveC=+{category}{protocols}

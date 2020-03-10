@@ -1,4 +1,0 @@
-para_a	input.f90	/^para_a,/;"	v	module:test
-para_b	input.f90	/^para_b,/;"	v	module:test
-para_c	input.f90	/^para_c /;"	v	module:test
-test	input.f90	/^module test$/;"	m

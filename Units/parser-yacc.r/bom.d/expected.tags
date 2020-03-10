@@ -1,2 +1,0 @@
-x	input.y	/^int x;$/;"	v	line:2	typeref:typename:int
-y	input.y	/^int y;/;"	v	line:8	typeref:typename:int

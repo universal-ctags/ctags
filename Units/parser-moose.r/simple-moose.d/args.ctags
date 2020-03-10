@@ -1,8 +1,0 @@
---sort=no
---fields=+lineK
---extras=+s
-#
-# NOTE: Moose parser works without following options.
-#
---kinds-Perl=+M
---extras=+r

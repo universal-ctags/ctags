@@ -1,3 +1,0 @@
-_a_b	input.sh	/^function _a_b() {$/;"	f
-f1	input.sh	/^f1() {$/;"	f
-f2	input.sh	/^function f2() {$/;"	f

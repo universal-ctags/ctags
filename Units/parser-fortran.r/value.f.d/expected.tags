@@ -1,3 +1,0 @@
-aa	input.f	/^	REAL aa$/;"	v	program:figure
-fig	input.f	/^	integer fig$/;"	v	program:figure
-figure	input.f	/^	program figure(/;"	p

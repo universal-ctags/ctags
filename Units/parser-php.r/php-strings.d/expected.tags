@@ -1,8 +1,0 @@
-a	input.php	/^$a = "hello";$/;"	v
-b	input.php	/^$b = 'hello';$/;"	v
-c	input.php	/^$c = "hello \\"buddy\\"";$/;"	v
-d	input.php	/^$d = 'hello \\'buddy\\'';$/;"	v
-e	input.php	/^$e = <<<EOS$/;"	v
-f	input.php	/^$f = <<<'EOS'$/;"	v
-g	input.php	/^$g = <<<"EOS"$/;"	v
-zzz_end	input.php	/^$zzz_end = 42;$/;"	v

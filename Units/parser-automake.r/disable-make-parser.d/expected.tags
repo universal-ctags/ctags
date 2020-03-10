@@ -1,2 +1,0 @@
-bin	input.am	/^bin_PROGRAMS = x$/;"	d	roles:program
-x	input.am	/^bin_PROGRAMS = x$/;"	P	directory:bin	roles:def

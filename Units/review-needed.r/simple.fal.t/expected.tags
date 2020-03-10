@@ -1,3 +1,0 @@
-regex	input.fal	/^load regex$/;"	i
-socket	input.fal	/^import from socket$/;"	i
-test	input.fal	/^function test_func( parameter )$/;"	f

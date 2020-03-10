@@ -1,3 +1,0 @@
-SPACE	input.hrl	/^-define(SPACE, $ ).$/;"	d
-WALL	input.hrl	/^-define(WALL,  $#).$/;"	d
-maze	input.hrl	/^-record(maze,{width = 40,height = 30, space = ?SPACE ,wall = ?WALL}).$/;"	r

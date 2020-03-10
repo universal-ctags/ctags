@@ -1,2 +1,0 @@
-guardTimer	input.ttcn	/^timer guardTimer;$/;"	T
-maxDuration	input.ttcn	/^var float maxDuration;$/;"	v

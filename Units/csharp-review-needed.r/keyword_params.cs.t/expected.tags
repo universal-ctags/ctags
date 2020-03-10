@@ -1,4 +1,0 @@
-Main	input.cs	/^   public static void Main() $/;"	m	class:MyClass
-MyClass	input.cs	/^public class MyClass $/;"	c
-UseParams	input.cs	/^   public static void UseParams(params int[] list) $/;"	m	class:MyClass
-UseParams2	input.cs	/^   public static void UseParams2(params object[] list) $/;"	m	class:MyClass

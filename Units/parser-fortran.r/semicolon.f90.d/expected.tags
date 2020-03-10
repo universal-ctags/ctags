@@ -1,3 +1,0 @@
-SEMI	input.f90	/^      MODULE SEMI$/;"	m
-VAR1	input.f90	/^      INTEGER (4) :: VAR1;/;"	v	module:SEMI
-VAR2	input.f90	/^      INTEGER (4) :: VAR1; INTEGER (4) VAR2$/;"	v	module:SEMI

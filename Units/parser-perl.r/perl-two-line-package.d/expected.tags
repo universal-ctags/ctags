@@ -1,6 +1,0 @@
-AL	input.pm	/^    AL;$/;"	p
-AL::wild_thing	input.pm	/^sub wild_thing {$/;"	s
-Peggy	input.pm	/^Peggy$/;"	p
-Peggy::eat_bonbons	input.pm	/^sub eat_bonbons {$/;"	s
-eat_bonbons	input.pm	/^sub eat_bonbons {$/;"	s
-wild_thing	input.pm	/^sub wild_thing {$/;"	s

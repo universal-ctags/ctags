@@ -1,6 +1,0 @@
-X	input.s	/^#define X /;"	d	line:7	file:	end:7
-_EQU	input.s	/^.equ _EQU equ1$/;"	d	line:14
-_EQUIV	input.s	/^.equiv _EQUIV equiv2$/;"	d	line:15
-_EQV	input.s	/^.eqv _EQV eqv3$/;"	d	line:16
-altsum	input.s	/^.macro  altsum from=0, to=6$/;"	m	line:8	end:13
-sum	input.s	/^.macro  sum from=0, to=5$/;"	m	line:1	end:6

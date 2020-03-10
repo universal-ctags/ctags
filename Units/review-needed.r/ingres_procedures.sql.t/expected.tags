@@ -1,9 +1,0 @@
-db0001	input.sql	/^CREATE PROCEDURE db0001 (short_name varchar(12) not null)  $/;"	p	line:1
-db0002	input.sql	/^PROCEDURE db0002 (short_name varchar(12) not null)  =$/;"	p	line:5
-db0003	input.sql	/^PROCEDURE db0003 (short_name varchar(12) not null)  $/;"	p	line:35
-err	input.sql	/^err = varchar(80) not null not default; $/;"	l	line:40	procedure:db0003
-err	input.sql	/^err = varchar(80) not null not default; $/;"	v	line:9
-n	input.sql	/^n = i4 not null; $/;"	l	line:39	procedure:db0003
-n	input.sql	/^n = i4 not null; $/;"	v	line:8
-x	input.sql	/^x = varchar(12) not null; $/;"	l	line:38	procedure:db0003
-x	input.sql	/^x = varchar(12) not null; $/;"	v	line:7

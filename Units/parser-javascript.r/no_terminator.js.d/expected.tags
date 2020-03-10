@@ -1,5 +1,0 @@
-checkForUpdate	input.js	/^function checkForUpdate() {$/;"	f
-checkForUpdate2	input.js	/^function checkForUpdate2() {$/;"	f
-getParent	input.js	/^function getParent(el, pTagName) {$/;"	f
-ts_resortTable	input.js	/^function ts_resortTable(lnk) {$/;"	f
-ts_sort_currency	input.js	/^function ts_sort_currency(a,b) { $/;"	f

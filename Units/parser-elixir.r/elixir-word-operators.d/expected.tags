@@ -1,7 +1,0 @@
-OperatorModule	input.ex	/^defmodule OperatorModule do$/;"	module
-and	input.ex	/^  def a and b, do: max(a, b)$/;"	operator	module:OperatorModule
-or	input.ex	/^  def a or b, do: max(a, b)$/;"	operator	module:OperatorModule
-not	input.ex	/^  defp a not b, do: max(a, b)$/;"	operator	module:OperatorModule
-in	input.ex	/^  defmacro a in b, do: max(a, b)$/;"	operator	module:OperatorModule
-not in	input.ex	/^  defmacrop a not in b, do: max(a, b)$/;"	operator	module:OperatorModule
-when	input.ex	/^  defmacrop a when b, do: max(a, b)$/;"	operator	module:OperatorModule

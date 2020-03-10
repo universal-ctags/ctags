@@ -1,8 +1,0 @@
-# u-ctags
-main	input.c	/^main(void)$/;"	f	typeref:typename:int
-# etags
-
-input.c,20
-main(void)main2,4
-# xref
-main             function      2 input.c          main(void)

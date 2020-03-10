@@ -1,2 +1,0 @@
-HEADER_TEMPLATE	input.py	/^HEADER_TEMPLATE = {$/;"	v
-Quit	input.py	/^def Quit(msg, exitcode=0): print msg ; sys.exit(exitcode)$/;"	f

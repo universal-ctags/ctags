@@ -1,4 +1,0 @@
-a	input.m4	/^undefine(a,b,c)$/;"	d	line:1	language:M4	roles:undef
-b	input.m4	/^undefine(a,b,c)$/;"	d	line:1	language:M4	roles:undef
-c	input.m4	/^undefine(a,b,c)$/;"	d	line:1	language:M4	roles:undef
-input.m4	input.m4	1;"	F	line:1	language:M4	roles:def	end:1

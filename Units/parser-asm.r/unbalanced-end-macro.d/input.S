@@ -1,2 +1,0 @@
-	NOP
-	.endm

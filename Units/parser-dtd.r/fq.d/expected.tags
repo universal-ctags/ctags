@@ -1,6 +1,0 @@
-a	input.dtd	/^<!ELEMENT a (b)>$/;"	e	roles:def
-a	input.dtd	/^<!ATTLIST a$/;"	e	roles:attOwner	extras:reference
-id-attr	input.dtd	/^        %id-attr;$/;"	p	element:a	roles:partOfAttDef	extras:reference
-a/%id-attr	input.dtd	/^        %id-attr;$/;"	p	element:a	roles:partOfAttDef	extras:qualified,reference
-type	input.dtd	/^        type CDATA      "text\/smil-basic-layout"$/;"	a	element:a	roles:def
-a/@type	input.dtd	/^        type CDATA      "text\/smil-basic-layout"$/;"	a	element:a	roles:def	extras:qualified

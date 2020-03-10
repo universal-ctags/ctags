@@ -1,5 +1,0 @@
-z	input.tex	/^\\subsection{z}$/;"	u
-A	input.tex	/^\\section{A}$/;"	s
-a	input.tex	/^\\subsection{a}$/;"	u	section:A
-B	input.tex	/^\\section{B}$/;"	s
-b	input.tex	/^\\subsection{b}$/;"	u	section:B

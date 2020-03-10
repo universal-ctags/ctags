@@ -1,8 +1,0 @@
-../a	input.sh	/^. ..\/a$/;"	s	roles:loaded
-../x	input.sh	/^source ..\/x$/;"	s	roles:loaded
-0.sh	input.sh	/^source 0.sh$/;"	s	roles:loaded
-1.sh	input.sh	/^. 1.sh$/;"	s	roles:loaded
-a	input.sh	/^. a$/;"	s	roles:loaded
-a/b	input.sh	/^. a\/b$/;"	s	roles:loaded
-x	input.sh	/^source x$/;"	s	roles:loaded
-x/y	input.sh	/^source x\/y$/;"	s	roles:loaded

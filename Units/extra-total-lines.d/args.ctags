@@ -1,9 +1,0 @@
-# `f' is optional
-# There was a bug that `.' was disabled when `f' was specified together.
-
-## This test case lost the original aim when
-## `.` extra field is replaced with `end:` field.
-
---extras=+f
---fields=+e
---excmd=number

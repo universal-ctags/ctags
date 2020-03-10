@@ -1,1 +1,0 @@
-undefine(a,b,c)

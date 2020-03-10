@@ -1,1 +1,0 @@
-mysub	input.awk	/^function mysub(pat, repl, str, global)$/;"	f

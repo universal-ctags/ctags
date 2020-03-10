@@ -1,9 +1,0 @@
-A	input.cpp	/^class A$/;"	class	file:	roles:def
-B	input.cpp	/^class B : public A$/;"	class	file:	roles:def
-std	input.cpp	/^using namespace std;$/;"	using	file:	roles:def
-string	input.cpp	/^#include <string>/;"	header	roles:system
-string	input.cpp	/^using std::string;$/;"	name	file:	roles:def
-test	input.cpp	/^	using A::test;$/;"	name	class:B	roles:def
-test	input.cpp	/^	void test();$/;"	prototype	class:A	typeref:typename:void	file:	signature:()	roles:def
-test	input.cpp	/^	void test(x t);$/;"	prototype	class:B	typeref:typename:void	file:	signature:(x t)	roles:def
-x	input.cpp	/^using x = std::string;$/;"	typedef	typeref:typename:std::string	file:	roles:def

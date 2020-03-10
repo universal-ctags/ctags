@@ -1,7 +1,0 @@
-add	input.f90	/^    procedure, pass :: add$/;"	M	type:atype
-append	input.f90	/^    procedure, pass(self) :: append$/;"	M	type:atype
-atype	input.f90	/^  type atype$/;"	t	module:test
-list	input.f90	/^    procedure, deferred :: list$/;"	M	type:atype
-print	input.f90	/^    procedure, nopass :: print$/;"	M	type:atype
-test	input.f90	/^module test$/;"	m
-write	input.f90	/^    procedure, non_overridable :: write$/;"	M	type:atype

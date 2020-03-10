@@ -1,5 +1,0 @@
-FAC010	input.for	/^        character*5     FAC010 /;"	v
-FEC010	input.for	/^        character*6     FEC010 /;"	v
-PER010	input.for	/^        character*40    PER010 /;"	v
-REM010	input.for	/^        character*5     REM010 /;"	v
-URE010	input.for	/^        character*5     URE010 /;"	v

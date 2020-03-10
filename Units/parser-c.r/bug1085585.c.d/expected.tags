@@ -1,2 +1,0 @@
-check_parity	input.c	/^static int check_parity(des_cblock (*key));$/;"	p	typeref:typename:int	file:
-des_check_key	input.c	/^int des_check_key=0;$/;"	v	typeref:typename:int

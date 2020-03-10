@@ -1,5 +1,0 @@
-IMyInterface	input.cs	/^public interface IMyInterface $/;"	i
-IndexerClass	input.cs	/^class IndexerClass : IMyInterface$/;"	c
-Main	input.cs	/^   public static void Main() $/;"	m	class:MainClass
-MainClass	input.cs	/^public class MainClass $/;"	c
-myArray	input.cs	/^   private int [] myArray = new int[100]; $/;"	f	class:IndexerClass	file:

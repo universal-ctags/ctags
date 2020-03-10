@@ -1,3 +1,0 @@
-A	input.tcl	/^namespace eval A {$/;"	n
-B	input.tcl	/^    itcl::class B {$/;"	c	namespace:A
-A::B	input.tcl	/^    itcl::class B {$/;"	c	namespace:A

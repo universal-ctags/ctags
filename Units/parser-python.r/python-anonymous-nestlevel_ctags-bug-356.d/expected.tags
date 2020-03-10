@@ -1,3 +1,0 @@
-Testclass	input.py	/^class Testclass():$/;"	c
-main	input.py	/^    def main(self):$/;"	m	class:Testclass
-module_level_attribute	input.py	/^    module_level_attribute = True$/;"	v

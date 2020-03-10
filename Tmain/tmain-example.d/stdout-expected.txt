@@ -1,4 +1,0 @@
-c  classes
-f  methods
-m  modules
-S  singleton methods

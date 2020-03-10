@@ -1,2 +1,0 @@
-C	input.cs	/^public class C {$/;"	c
-m_name	input.cs	/^  private System.String m_name;$/;"	f	class:C	file:

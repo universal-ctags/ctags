@@ -1,8 +1,0 @@
-a	input.js	/^var a = `he$llo${`lala`\/*+{}*\/\/\/;var bug1=2;$/;"	v
-b	input.js	/^var b = 2;$/;"	v
-c	input.js	/^var c = `$/;"	v
-d	input.js	/^var d = `$\\{42`;$/;"	v
-e	input.js	/^var e = `${{_:{}} || 1}`;$/;"	v
-f	input.js	/^function f() {$/;"	f
-f2	input.js	/^function f2() {}$/;"	f
-z	input.js	/^var z = 42;$/;"	v

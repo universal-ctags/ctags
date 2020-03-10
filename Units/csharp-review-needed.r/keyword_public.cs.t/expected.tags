@@ -1,5 +1,0 @@
-Main	input.cs	/^   public static void Main() $/;"	m	class:MyClass2
-MyClass1	input.cs	/^class MyClass1 $/;"	c
-MyClass2	input.cs	/^class MyClass2 $/;"	c
-x	input.cs	/^   public int x; $/;"	f	class:MyClass1
-y	input.cs	/^   public int y;$/;"	f	class:MyClass1

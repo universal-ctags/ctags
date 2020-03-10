@@ -1,5 +1,0 @@
-a	input.js	/^var a = (42 + 1) * 2;$/;"	v
-b	input.js	/^var b = 2 * (42 + 1);$/;"	v
-x	input.js	/^var x = 1;$/;"	v
-y	input.js	/^var y = [];$/;"	v
-z	input.js	/^var z = {};$/;"	v

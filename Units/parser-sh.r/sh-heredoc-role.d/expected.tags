@@ -1,2 +1,0 @@
-EOF	input.sh	/^EOF$/;"	h	line:3	language:Sh	roles:endmarker
-EOF	input.sh	/^cat <<EOF$/;"	h	line:1	language:Sh	roles:def	end:3

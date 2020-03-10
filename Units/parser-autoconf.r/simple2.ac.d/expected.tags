@@ -1,5 +1,0 @@
-x	input.ac	/^define(`x', 1)$/;"	d	line:2	language:M4	roles:def	end:2
-PKG_PREREQ	input.ac	/^AC_DEFUN([PKG_PREREQ],$/;"	m	line:4	language:Autoconf	roles:def	end:8
-y	input.ac	/^m4_define([y], 2)$/;"	d	line:9	language:M4	roles:def	end:9
-z	input.ac	/^define(`z', 3)$/;"	d	line:11	language:M4	roles:def	end:11
-input.ac	input.ac	1;"	F	line:1	language:Autoconf	roles:def	end:12

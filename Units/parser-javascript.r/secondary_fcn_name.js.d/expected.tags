@@ -1,5 +1,0 @@
-D1	input.js	/^function D1(a, b) $/;"	f
-D2	input.js	/^var D2=function(a, b) $/;"	f
-D2A	input.js	/^var D2A=function theAdd(a, b) $/;"	f
-my_global_var1	input.js	/^var my_global_var1 = 'global';$/;"	v
-theAdd	input.js	/^var D2A=function theAdd(a, b) $/;"	f

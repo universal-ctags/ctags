@@ -1,4 +1,0 @@
-AUTO_TEST	input.f	/^	program AUTO_TEST$/;"	p
-D	input.f	/^	AUTOMATIC REAL P, D,/;"	v	program:AUTO_TEST
-P	input.f	/^	AUTOMATIC REAL P,/;"	v	program:AUTO_TEST
-Q	input.f	/^	AUTOMATIC REAL P, D, Q /;"	v	program:AUTO_TEST

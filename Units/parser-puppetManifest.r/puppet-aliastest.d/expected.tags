@@ -1,3 +1,0 @@
-a file	input.pp	/^file { "a file":$/;"	resource	line:1	language:PuppetManifest	end:4
-another	input.pp	/^file { "another":$/;"	resource	line:6	language:PuppetManifest	end:10
-a third	input.pp	/^file { "a third":$/;"	resource	line:12	language:PuppetManifest	end:16

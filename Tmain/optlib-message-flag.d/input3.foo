@@ -1,7 +1,0 @@
-namespace XXX {
-	class YYY {
-		var bool ZZZ;
-	};
-}
-
-bad multi-table found-mtable

@@ -1,4 +1,0 @@
-
-input.c,76
-int main(void) { return 0; }main1,0
-int foo (void) { return 0; }foo2,29

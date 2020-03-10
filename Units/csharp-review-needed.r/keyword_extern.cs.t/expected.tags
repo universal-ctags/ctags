@@ -1,3 +1,0 @@
-Main	input.cs	/^   public static int Main() $/;"	m	class:MyClass
-MessageBox	input.cs	/^   public static extern int MessageBox(int h, string m, string c, int type);$/;"	m	class:MyClass	file:
-MyClass	input.cs	/^class MyClass $/;"	c

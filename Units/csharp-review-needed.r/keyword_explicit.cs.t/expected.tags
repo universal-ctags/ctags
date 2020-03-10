@@ -1,6 +1,0 @@
-Digit	input.cs	/^   public Digit(byte value) $/;"	m	struct:Digit
-Digit	input.cs	/^struct Digit$/;"	s
-Main	input.cs	/^   public static void Main() $/;"	m	class:Test
-Test	input.cs	/^class Test $/;"	c
-operator Digit	input.cs	/^   public static explicit operator Digit(byte b) $/;"	m	struct:Digit
-value	input.cs	/^   byte value;$/;"	f	struct:Digit

@@ -1,6 +1,0 @@
-Person	input.h	/^@interface Person : NSObject {$/;"	i
-initWithAge:	input.h	/^-(id)initWithAge:(int)age;$/;"	m	interface:Person
-m_age	input.h	/^        int m_age;$/;"	E	interface:Person
-m_name	input.h	/^        NSString *m_name;$/;"	E	interface:Person
-personAge	input.h	/^@property(readonly) int personAge;$/;"	p	interface:Person
-personName	input.h	/^@property(copy) NSString *personName;$/;"	p	interface:Person

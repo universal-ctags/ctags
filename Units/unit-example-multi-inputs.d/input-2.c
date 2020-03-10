@@ -1,3 +1,0 @@
-struct {
-	char *name;
-} x;

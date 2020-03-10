@@ -1,3 +1,0 @@
-fedora	input.repo	/^[fedora]$/;"	repoid	language:YumRepo
-fedora-debuginfo	input.repo	/^[fedora-debuginfo]$/;"	repoid	language:YumRepo
-fedora-source	input.repo	/^[fedora-source]$/;"	repoid	language:YumRepo

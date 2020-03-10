@@ -1,2 +1,0 @@
-component	input.pp	/^define component {$/;"	definition	line:3	language:PuppetManifest	end:4
-testing	input.pp	/^class testing {$/;"	class	line:6	language:PuppetManifest	end:7

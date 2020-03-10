@@ -1,3 +1,0 @@
-a	input.py	/^a, b, c = 1, 2, 3$/;"	v
-b	input.py	/^a, b, c = 1, 2, 3$/;"	v
-c	input.py	/^a, b, c = 1, 2, 3$/;"	v

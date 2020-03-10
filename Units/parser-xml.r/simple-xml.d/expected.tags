@@ -1,6 +1,0 @@
-nsa9858b760101	input.xml	/^       >$/;"	n	line:4	language:XML	uri:https://ctags.io/root
-abc	input.xml	/^       >$/;"	n	line:4	language:XML	uri:https://ctags.io/nosuchthing
-unused	input.xml	/^       >$/;"	n	line:4	language:XML	uri:https://ctags.io/unused
-efg	input.xml	/^<abc:UnKnownTag id="a" xmlns:efg="https:\/\/ctags.io\/nosuchthing2">$/;"	n	line:5	language:XML	uri:https://ctags.io/nosuchthing2
-a	input.xml	/^<abc:UnKnownTag id="a" xmlns:efg="https:\/\/ctags.io\/nosuchthing2">$/;"	i	line:5	language:XML	xpath:/*/abc:UnKnownTag/@id
-b	input.xml	/^  <efg:UnKnownTag2 id="b"\/>$/;"	i	line:6	language:XML	xpath:/*/abc:UnKnownTag/efg:UnKnownTag2/@id

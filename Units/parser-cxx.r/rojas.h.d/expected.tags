@@ -1,6 +1,0 @@
-FFunc	input.h	/^typedef uint32 (*FFunc) (const astruct * pP, int n);$/;"	t	typeref:typename:uint32 (*)(const astruct * pP,int n)
-FooBar	input.h	/^typedef void * FooBar;$/;"	t	typeref:typename:void *
-afunc	input.h	/^FooBar * afunc (const char * aparam);$/;"	p	typeref:typename:FooBar *
-astruct	input.h	/^struct astruct$/;"	s
-astruct	input.h	/^typedef struct astruct astruct;$/;"	t	typeref:struct:astruct
-m_member	input.h	/^    int m_member;$/;"	m	struct:astruct	typeref:typename:int

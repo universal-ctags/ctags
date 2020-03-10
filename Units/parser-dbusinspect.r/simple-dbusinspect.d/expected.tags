@@ -1,8 +1,0 @@
-ClientAdded	input.xml	/^    <signal name="ClientAdded">$/;"	s	language:DBusIntrospect	interface:org.gnome.SessionManager
-SessionName	input.xml	/^    <property name="SessionName" type="s" access="read">$/;"	p	language:DBusIntrospect	interface:org.gnome.SessionManager
-Setenv	input.xml	/^    <method name="Setenv">$/;"	m	language:DBusIntrospect	interface:org.gnome.SessionManager
-doc	input.xml	/^<node xmlns:doc="http:\/\/www.freedesktop.org\/dbus\/1.0\/doc.dtd">$/;"	n	language:XML	uri:http://www.freedesktop.org/dbus/1.0/doc.dtd
-id	input.xml	/^      <arg name="id" type="o">$/;"	a	language:DBusIntrospect	signal:org.gnome.SessionManager.ClientAdded
-org.gnome.SessionManager	input.xml	/^  <interface name="org.gnome.SessionManager">$/;"	i	language:DBusIntrospect
-value	input.xml	/^      <arg name="value" type="s" direction="in">$/;"	a	language:DBusIntrospect	method:org.gnome.SessionManager.Setenv
-variable	input.xml	/^      <arg name="variable" type="s" direction="in">$/;"	a	language:DBusIntrospect	method:org.gnome.SessionManager.Setenv

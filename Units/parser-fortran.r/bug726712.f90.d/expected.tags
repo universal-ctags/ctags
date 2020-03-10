@@ -1,3 +1,0 @@
-sub1	input.f90	/^      subroutine sub1(/;"	s
-sub2	input.f90	/^      subroutine sub2(/;"	s
-tagstest_ctrl	input.f90	/^      subroutine tagstest_ctrl(/;"	s

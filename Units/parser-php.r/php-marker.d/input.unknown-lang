@@ -1,4 +1,0 @@
-<?php
-function a() {
-	return true;
-}

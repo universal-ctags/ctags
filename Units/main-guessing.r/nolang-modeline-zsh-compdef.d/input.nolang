@@ -1,4 +1,0 @@
-#compdef ctags
-_ctags() {
-	 return 0
-}

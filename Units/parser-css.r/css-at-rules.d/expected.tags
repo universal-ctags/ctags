@@ -1,4 +1,0 @@
-body	input.css	/^  body { font-size: 10pt; }$/;"	s
-body	input.css	/^  body { font-size: 12px; }$/;"	s
-body	input.css	/^  body { line-height: 1.2 }$/;"	s
-html	input.css	/^html { color: blue; }$/;"	s

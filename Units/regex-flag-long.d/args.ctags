@@ -1,3 +1,0 @@
---langdef=dummy
---langmap=dummy:.dummy
---regex-dummy=/^define:(.*)$/\1/d,definition/{icase}

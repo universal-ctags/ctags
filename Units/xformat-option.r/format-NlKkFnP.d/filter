@@ -1,2 +1,0 @@
-#!/bin/sh
-sed -e 's|\.\{1,\}/.*/input.m|input.m|'

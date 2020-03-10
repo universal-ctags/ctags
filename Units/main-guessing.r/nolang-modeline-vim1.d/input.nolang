@@ -1,7 +1,0 @@
-int
-main(void)
-{
-	return 0;
-}
-
-/* vim: se noet ft=c.qt: */

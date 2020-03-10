@@ -1,2 +1,0 @@
-input	input.css	/^input,textarea{border: 1px solid red;}$/;"	s
-textarea	input.css	/^input,textarea{border: 1px solid red;}$/;"	s

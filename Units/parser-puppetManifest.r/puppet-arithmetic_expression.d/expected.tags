@@ -1,3 +1,0 @@
-one	input.pp	/^$one = 1.30$/;"	variable	line:2	language:PuppetManifest
-two	input.pp	/^$two = 2.034e-2$/;"	variable	line:3	language:PuppetManifest
-result	input.pp	/^$result = ((( $two + 2) \/ $one) + 4 * 5.45) - (6 << 7) + (0x800 + -9)$/;"	variable	line:5	language:PuppetManifest

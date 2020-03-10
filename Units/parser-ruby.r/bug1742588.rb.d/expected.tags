@@ -1,3 +1,0 @@
-A	input.rb	/^class A$/;"	c
-a	input.rb	/^ def a()$/;"	f	class:A
-b	input.rb	/^ def b()$/;"	f	class:A

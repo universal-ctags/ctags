@@ -1,3 +1,0 @@
-TestModule	input.ex	/^defmodule TestModule do$/;"	module
-good with spaces	input.ex	/^  test "good with spaces" do$/;"	test	module:TestModule
-good with parens	input.ex	/^  test("good with parens") do$/;"	test	module:TestModule

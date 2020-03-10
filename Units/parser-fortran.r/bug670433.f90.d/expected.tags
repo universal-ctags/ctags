@@ -1,4 +1,0 @@
-bar	input.f90	/^    subroutine bar /;"	s	module:foobar
-f	input.f90	/^        real fu/;"	f	function:foo
-foo	input.f90	/^    integer function foo /;"	f	module:foobar
-foobar	input.f90	/^module foobar$/;"	m

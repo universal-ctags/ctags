@@ -1,2 +1,0 @@
-/tmp/funccomma1	input.pp	/^    ["\/tmp\/funccomma1","\/tmp\/funccomma2"]: content => "1"$/;"	resource	line:2	language:PuppetManifest
-/tmp/funccomma2	input.pp	/^    ["\/tmp\/funccomma1","\/tmp\/funccomma2"]: content => "1"$/;"	resource	line:2	language:PuppetManifest

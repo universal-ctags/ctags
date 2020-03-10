@@ -1,6 +1,0 @@
-a	input.bb	/^Global a$/;"	v
-b	input.bb	/^Dim b(100)$/;"	v
-f	input.bb	/^Function f()$/;"	f
-one#	input.bb	/^Const one# = 1.0$/;"	c
-start	input.bb	/^.start$/;"	l
-test	input.bb	/^Type test$/;"	t

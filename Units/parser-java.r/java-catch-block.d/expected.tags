@@ -1,2 +1,0 @@
-C	input.java	/^class C {$/;"	class	end:7
-m	input.java	/^   public void m(String a[]) {$/;"	method	class:C	end:6

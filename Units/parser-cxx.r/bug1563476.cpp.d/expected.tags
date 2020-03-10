@@ -1,4 +1,0 @@
-g	input.cpp	/^int g() {$/;"	f	typeref:typename:int
-IntroduceBitDef	input.cpp	/^struct IntroduceBitDef< Accessor, typename$/;"	s	file:
-Accessor	input.cpp	/^template< typename Accessor >$/;"	Z	struct:IntroduceBitDef	typeref:meta:typename
-f	input.cpp	/^ int f() { }$/;"	f	struct:IntroduceBitDef	typeref:typename:int	file:

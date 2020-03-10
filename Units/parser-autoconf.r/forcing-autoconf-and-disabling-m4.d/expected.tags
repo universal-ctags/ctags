@@ -1,2 +1,0 @@
-PKG_PREREQ	input.m4	/^AC_DEFUN([PKG_PREREQ],$/;"	m	line:4	language:Autoconf	roles:def	end:8
-input.m4	input.m4	1;"	F	line:1	language:Autoconf	roles:def	end:12

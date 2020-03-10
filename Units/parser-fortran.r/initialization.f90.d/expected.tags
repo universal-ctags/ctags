@@ -1,3 +1,0 @@
-funcon	input.f90	/^      MODULE funcon$/;"	m
-imat	input.f90	/^         imat=/;"	v	module:funcon
-imat6	input.f90	/^         imat6=/;"	v	module:funcon

@@ -1,7 +1,0 @@
-Activity	input.f90	/^         Integer(2) :: Activity$/;"	k	type:Detection_Record
-DR_Filename	input.f90	/^      Character*1024  DR_Filename$/;"	v	module:TR_DetectionRecording
-DR_Lun	input.f90	/^      Integer :: DR_Lun$/;"	v	module:TR_DetectionRecording
-Detection_Record	input.f90	/^      Type Detection_Record$/;"	t	module:TR_DetectionRecording
-Face	input.f90	/^         Integer(2) :: Face$/;"	k	type:Detection_Record
-TR_DetectionRecording	input.f90	/^      Module TR_DetectionRecording$/;"	m
-Type	input.f90	/^         Integer(2) :: Type /;"	k	type:Detection_Record

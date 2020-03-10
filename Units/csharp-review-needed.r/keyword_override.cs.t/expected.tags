@@ -1,9 +1,0 @@
-Area	input.cs	/^      public override double Area() $/;"	m	class:TestClass.Cube
-Area	input.cs	/^      public virtual double Area() $/;"	m	class:TestClass.Square
-Cube	input.cs	/^      public Cube(double x): base(x) $/;"	m	class:TestClass.Cube
-Cube	input.cs	/^   class Cube: Square $/;"	c	class:TestClass
-Main	input.cs	/^   public static void Main()$/;"	m	class:TestClass
-Square	input.cs	/^      public Square(double x) $/;"	m	class:TestClass.Square
-Square	input.cs	/^   public class Square $/;"	c	class:TestClass
-TestClass	input.cs	/^class TestClass $/;"	c
-x	input.cs	/^      public double x;$/;"	f	class:TestClass.Square

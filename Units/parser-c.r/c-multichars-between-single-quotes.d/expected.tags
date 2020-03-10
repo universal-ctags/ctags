@@ -1,1 +1,0 @@
-c	input.c	/^char c[]={'o.'};$/;"	v	typeref:typename:char[]

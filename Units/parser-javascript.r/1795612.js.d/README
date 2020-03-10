@@ -1,2 +1,0 @@
-Though the original comment expects generating full qualified tags,
-JavaScript parser doesn't support generating them.

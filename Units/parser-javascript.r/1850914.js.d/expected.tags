@@ -1,3 +1,0 @@
-objLiteralMethod	input.js	/^objLiteralMethod : function(){}$/;"	m	class:objectLiteral
-objLiteralProperty	input.js	/^objLiteralProperty : 1,$/;"	p	class:objectLiteral
-objectLiteral	input.js	/^var objectLiteral = {$/;"	c

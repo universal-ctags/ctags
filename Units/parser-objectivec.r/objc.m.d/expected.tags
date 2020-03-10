@@ -1,3 +1,0 @@
-MyClass	input.m	/^@implementation MyClass$/;"	I
-myClassMethod:with:	input.m	/^+ (void)myClassMethod:(int)arg1 with:(id)arg2;$/;"	c	implementation:MyClass
-myInstanceMethod:with:	input.m	/^- (void)myInstanceMethod:(int)arg1 with:(id)arg2;$/;"	m	implementation:MyClass

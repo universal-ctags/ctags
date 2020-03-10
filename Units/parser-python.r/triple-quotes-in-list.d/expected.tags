@@ -1,3 +1,0 @@
-Bar	input.py	/^class Bar():$/;"	c
-Foo	input.py	/^class Foo():$/;"	c
-a	input.py	/^    a=(("""$/;"	v	class:Foo

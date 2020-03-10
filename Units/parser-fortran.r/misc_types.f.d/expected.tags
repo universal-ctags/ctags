@@ -1,3 +1,0 @@
-INFOOBAR	input.f	/^	INTEGER INFOOBAR$/;"	v	program:specs
-M	input.f	/^	INTEGER M(/;"	v	program:specs
-specs	input.f	/^	program specs$/;"	p

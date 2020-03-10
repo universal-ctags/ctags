@@ -1,1 +1,0 @@
-/tmp/defaulttest	input.pp	/^file { "\/tmp\/defaulttest": ensure => file }$/;"	resource	line:5	language:PuppetManifest	end:5

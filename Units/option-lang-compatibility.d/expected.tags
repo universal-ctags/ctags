@@ -1,3 +1,0 @@
-x	input.foo	/^\/x def$/;"	d
-y	input.foo	/^\/y def$/;"	d
-z	input.foo	/^\/z def$/;"	d

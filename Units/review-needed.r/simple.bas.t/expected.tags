@@ -1,7 +1,0 @@
-a	input.bas	/^Common a As Integer$/;"	v
-b	input.bas	/^Dim b As Integer$/;"	v
-f	input.bas	/^Function f()$/;"	f
-one	input.bas	/^Const one = 1$/;"	c
-start	input.bas	/^start:$/;"	l
-str	input.bas	/^DIM AS STRING str$/;"	v
-test	input.bas	/^Type test$/;"	t

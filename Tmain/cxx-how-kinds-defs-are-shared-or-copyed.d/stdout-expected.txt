@@ -1,8 +1,0 @@
-[C] enabling in C: f  function definitions
-[C] disabling in C: f  function definitions [off]
-[C++] enabling in C: f  function definitions
-[C++] disabling in C: f  function definitions [off]
-[C] enabling in C++: f  function definitions
-[C] disabling in C++: f  function definitions [off]
-[C++] enabling in C++: f  function definitions
-[C++] disabling in C++: f  function definitions [off]

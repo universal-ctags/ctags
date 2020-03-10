@@ -1,3 +1,0 @@
-C	input.cs	/^public class C {$/;"	c
-title	input.cs	/^ private string title;$/;"	f	class:C	file:
-window	input.cs	/^ private Gtk.Window window;$/;"	f	class:C	file:

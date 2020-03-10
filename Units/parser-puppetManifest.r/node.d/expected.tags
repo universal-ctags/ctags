@@ -1,4 +1,0 @@
-default	input.pp	/^node 'default' {}$/;"	node	line:2	language:PuppetManifest
-www1.example.com	input.pp	/^node 'www1.example.com' {$/;"	node	line:3	language:PuppetManifest
-www2.example.com	input.pp	/^node 'www2.example.com', 'www3.example.com' {$/;"	node	line:13	language:PuppetManifest
-www3.example.com	input.pp	/^node 'www2.example.com', 'www3.example.com' {$/;"	node	line:13	language:PuppetManifest

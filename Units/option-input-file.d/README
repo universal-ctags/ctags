@@ -1,1 +1,0 @@
-This test case is intended to be run under valgrind for capaturing memory leaks.

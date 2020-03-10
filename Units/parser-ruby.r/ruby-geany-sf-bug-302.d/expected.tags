@@ -1,3 +1,0 @@
-UtilitiesController	input.rb	/^class UtilitiesController$/;"	c
-new	input.rb	/^  def new$/;"	f	class:UtilitiesController
-set_utilities_class	input.rb	/^  def set_utilities_class$/;"	f	class:UtilitiesController

@@ -1,5 +1,0 @@
-Foo	input.cpp	/^namespace Foo$/;"	namespace	file:	end:10
-bar	input.cpp	/^T bar() $/;"	function	namespace:Foo	typeref:typename:T	signature:()	end:9	template:<class T>
-main	input.cpp	/^int main()$/;"	function	typeref:typename:int	signature:()	end:16
-__anonaa3dc9860102	input.cpp	/^    auto l = []{return Foo::template bar<int>();};$/;"	function	function:main	file:	end:14	captures:[]
-l	input.cpp	/^    auto l = []{return Foo::template bar<int>();};$/;"	local	function:main	typeref:typename:auto	file:	end:14

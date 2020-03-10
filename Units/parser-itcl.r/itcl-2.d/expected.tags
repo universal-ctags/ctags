@@ -1,2 +1,0 @@
-A	input.tcl	/^itcl::class A {$/;"	c	language:ITcl
-B	input.tcl	/^class B {$/;"	c	language:ITcl

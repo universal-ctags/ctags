@@ -1,3 +1,0 @@
-Main	input.cs	/^   public static void Main() $/;"	m	class:MyClass
-MyClass	input.cs	/^public class MyClass $/;"	c
-TestOut	input.cs	/^   public static int TestOut(out char i) $/;"	m	class:MyClass

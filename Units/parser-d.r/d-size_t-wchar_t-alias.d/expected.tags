@@ -1,2 +1,0 @@
-size_t	input.d	/^alias size_t = int;$/;"	a	file:
-wchar_t	input.d	/^alias wchar_t = int;$/;"	a	file:

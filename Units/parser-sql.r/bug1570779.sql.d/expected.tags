@@ -1,7 +1,0 @@
-employees	input.sql	/^CREATE TABLE employees ($/;"	t	line:8
-employees.id	input.sql	/^    id integer NOT NULL,$/;"	E	line:9	table:employees
-id	input.sql	/^    id integer NOT NULL,$/;"	E	line:9	table:employees
-employees.name	input.sql	/^    name varchar(20),$/;"	E	line:10	table:employees
-name	input.sql	/^    name varchar(20),$/;"	E	line:10	table:employees
-employees.address	input.sql	/^    address varchar(50),$/;"	E	line:11	table:employees
-address	input.sql	/^    address varchar(50),$/;"	E	line:11	table:employees

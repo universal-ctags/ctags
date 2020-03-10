@@ -1,3 +1,0 @@
-listOfType	input.ttcn	/^template list<Type> listOfType := { }$/;"	d
-listOfTemplateType	input.ttcn	/^template list<TemplateType<Type> > listOfTemplateType := { }$/;"	d
-matpWithKeyAndTemplateValue	input.ttcn	/^template Map<Key, TemplateVal<Val> > matpWithKeyAndTemplateValue := { }$/;"	d

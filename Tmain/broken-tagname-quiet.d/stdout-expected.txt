@@ -1,5 +1,0 @@
-newline-in-scope	input.cst	/^b$/;"	b	broken tag:parent\nscope
-one\nof\rbroken\tname	input.cst	/^b$/;"	b	broken tag:\\Broken\tContext
-only\nnewline	input.cst	/^b$/;"	b
-only\ttab	input.cst	/^b$/;"	b
-tab-in-scope	input.cst	/^b$/;"	b	broken tag:parent\tscope

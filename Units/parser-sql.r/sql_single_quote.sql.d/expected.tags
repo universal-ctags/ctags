@@ -1,3 +1,0 @@
-p1	input.sql	/^CREATE PROCEDURE "p1"($/;"	p
-p2	input.sql	/^CREATE PROCEDURE "p2"($/;"	p
-p3	input.sql	/^CREATE PROCEDURE "p3"($/;"	p

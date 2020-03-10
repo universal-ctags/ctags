@@ -1,5 +1,0 @@
-MacroModule	input.ex	/^defmodule MacroModule do$/;"	module
-macro	input.ex	/^  defmacro macro(expr, opts) do$/;"	macro	module:MacroModule	access:public
-macro_no_params	input.ex	/^  defmacro macro_no_params do$/;"	macro	module:MacroModule	access:public
-private_macro	input.ex	/^  defmacrop private_macro(expr, opts) do$/;"	macro	module:MacroModule	access:private
-private_macro_no_params	input.ex	/^  defmacrop private_macro_no_params do$/;"	macro	module:MacroModule	access:private

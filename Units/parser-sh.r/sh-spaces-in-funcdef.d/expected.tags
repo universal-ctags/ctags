@@ -1,2 +1,0 @@
-func	input.sh	/^func (                 	)$/;"	f
-proc	input.sh	/^function proc (  )$/;"	f

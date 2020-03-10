@@ -1,3 +1,0 @@
-ctags: Notice: No options will be read from files or environment
-ctags: Notice: a
-ctags: Notice: b

@@ -1,7 +1,0 @@
-impl SomeObject {
-  def foo {}
-}
-
-impl SomeTrait for SomeObject {
-  def bar {}
-}

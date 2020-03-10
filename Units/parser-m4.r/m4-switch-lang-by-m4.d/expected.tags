@@ -1,3 +1,0 @@
-y	input.m4	/^m4_define([y], 2)$/;"	d	line:1	language:M4	roles:def	end:1
-z	input.m4	/^define(`z', 3)$/;"	d	line:3	language:M4	roles:def	end:3
-input.m4	input.m4	1;"	F	line:1	language:Autoconf	roles:def	end:3

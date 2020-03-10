@@ -1,3 +1,0 @@
-X	input.py	/^class X(list):$/;"	c
-a	input.py	/^a, x.a = x$/;"	v
-x	input.py	/^x = X()$/;"	v

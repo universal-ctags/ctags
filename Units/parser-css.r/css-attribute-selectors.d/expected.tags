@@ -1,5 +1,0 @@
-a[href^="http://"]	input.css	/^a[href^="http:\/\/"] { color: red; }$/;"	s
-a[href^="https://"]	input.css	/^a[href^="https:\/\/"] { color: green; }$/;"	s
-a[lang~=en]	input.css	/^a[lang~=en] { background-color: light-green; }$/;"	s
-body	input.css	/^body { color: black; }$/;"	s
-p	input.css	/^p { color: gray }$/;"	s

@@ -1,1 +1,0 @@
-variable1	input.sql	/^   variable1 CLOB;$/;"	v

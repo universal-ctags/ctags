@@ -1,4 +1,0 @@
-RPC	input.js	/^Test.RPC =$/;"	c	class:Test
-asyncMethod	input.js	/^	asyncMethod: function($/;"	m	class:Test.RPC
-asyncRequest	input.js	/^	asyncRequest: function($/;"	m	class:Test.RPC
-request_id	input.js	/^	request_id: 0,$/;"	p	class:Test.RPC

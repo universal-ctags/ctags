@@ -1,9 +1,0 @@
-CONST	input.pm	/^CONST => 1;$/;"	c
-END	input.pm	/^END:$/;"	l
-END2	input.pm	/^END2  :$/;"	l
-Test	input.pm	/^package Test;$/;"	p
-Test::One	input.pm	/^package Test::One;$/;"	p
-Test::One::Two	input.pm	/^package Test::One::Two;$/;"	p
-dude	input.pm	/^dude$/;"	s
-init	input.pm	/^ init {$/;"	s
-quo	input.pm	/^sub quo {$/;"	s

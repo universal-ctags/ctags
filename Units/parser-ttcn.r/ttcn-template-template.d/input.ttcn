@@ -1,3 +1,0 @@
-template list<Type> listOfType := { }
-template list<TemplateType<Type> > listOfTemplateType := { }
-template Map<Key, TemplateVal<Val> > matpWithKeyAndTemplateValue := { }

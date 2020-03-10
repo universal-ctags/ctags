@@ -1,3 +1,0 @@
-RecordsModule	input.ex	/^defmodule RecordsModule do$/;"	module
-user1	input.ex	/^  Record.defrecord(:user1, name: "megan", age: "25")$/;"	record	module:RecordsModule	access:public
-user2	input.ex	/^  Record.defrecordp :user2, name: "ivan", age: "23"$/;"	record	module:RecordsModule	access:private

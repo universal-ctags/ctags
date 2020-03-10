@@ -1,3 +1,0 @@
-type record of T list<type T>
-type record of list<T> RecordOfList<type T>
-

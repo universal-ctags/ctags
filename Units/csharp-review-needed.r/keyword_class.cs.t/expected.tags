@@ -1,8 +1,0 @@
-Kid	input.cs	/^   public Kid() $/;"	m	class:Kid
-Kid	input.cs	/^   public Kid(string name, int age) $/;"	m	class:Kid
-Kid	input.cs	/^public class Kid $/;"	c
-Main	input.cs	/^   public static void Main() $/;"	m	class:MainClass
-MainClass	input.cs	/^public class MainClass $/;"	c
-PrintKid	input.cs	/^   public void PrintKid() $/;"	m	class:Kid
-age	input.cs	/^   private int age;$/;"	f	class:Kid	file:
-name	input.cs	/^   private string name;$/;"	f	class:Kid	file:

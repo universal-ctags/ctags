@@ -1,3 +1,0 @@
-insig	input.v	/^input insig;$/;"	p	module:top
-outsig	input.v	/^output outsig;$/;"	p	module:top
-top	input.v	/^module top(outsig, insig);$/;"	m

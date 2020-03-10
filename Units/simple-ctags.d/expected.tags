@@ -1,4 +1,0 @@
-class	input.ctags	/^--regex-coffee=\/^[ \\t]*class ([a-zA-Z_$][0-9a-zA-Z_.$]*).*$\/\\1\/c,class\/$/;"	k	langdef:coffee
-coffee	input.ctags	/^--langdef=coffee$/;"	l
-function	input.ctags	/^--regex-coffee=\/^[ \\t]*([a-zA-Z_$@][0-9a-zA-Z_$\\.]*)[ \\t]*[:=].*[=-]>.*$\/\\1\/f,function\/$/;"	k	langdef:coffee
-variable	input.ctags	/^--kinddef-coffee=v,variable,variables$/;"	k	langdef:coffee

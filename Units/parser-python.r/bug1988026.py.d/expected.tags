@@ -1,4 +1,0 @@
-im_a_function	input.py	/^	def im_a_function():$/;"	f
-main	input.py	/^    def main():$/;"	m	class:testClass
-my_var	input.py	/^    my_var = 0$/;"	v	class:testClass
-testClass	input.py	/^class testClass:$/;"	c

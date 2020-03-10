@@ -1,8 +1,0 @@
-0x00	input.dts	/^	     phandle = <0x00>;$/;"	p	language:DTS	scope:label:label	roles:def
-bar	input.dts	/^#define bar /;"	d	language:CPreProcessor	file:	roles:def
-bar	input.dts	/^#undef bar$/;"	d	language:CPreProcessor	file:	roles:undef
-foo.dtsi	input.dts	/^#include "foo.dtsi"/;"	h	language:CPreProcessor	roles:local
-label	input.dts	/^label: test {$/;"	l	language:DTS	roles:def
-label.0x00	input.dts	/^	     phandle = <0x00>;$/;"	p	language:DTS	scope:label:label	roles:def
-label.label2	input.dts	/^	     label2: chosen { } ;$/;"	l	language:DTS	scope:label:label	roles:def
-label2	input.dts	/^	     label2: chosen { } ;$/;"	l	language:DTS	scope:label:label	roles:def

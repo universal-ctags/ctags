@@ -1,3 +1,0 @@
-VAR1, VAR2, VAR3 = 1, 2, 3
-VAR4 = 4
-VAR5, VAR6 = 5, 6

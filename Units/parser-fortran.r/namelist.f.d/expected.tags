@@ -1,4 +1,0 @@
-main	input.f	/^        PROGRAM main$/;"	p
-namelist1	input.f	/^        NAMELIST \/namelist1\//;"	n	program:main
-namelist2	input.f	/^        NAMELIST \/namelist2\//;"	n	program:main
-namelist3	input.f	/^        NAMELIST \/namelist2\/ n2a, n2b \/namelist3\//;"	n	program:main

@@ -1,1 +1,0 @@
-struct a::b{

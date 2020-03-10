@@ -1,3 +1,0 @@
-myGet	input.mxml	/^			public override function get myGet():MyClass$/;"	p
-myOverride	input.mxml	/^			public override function myOverride():void$/;"	f
-save	input.mxml	/^			private function save():void$/;"	f

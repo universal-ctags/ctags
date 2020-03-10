@@ -1,2 +1,0 @@
-templateFunctionThatReturnTemplateType	input.ttcn	/^function templateFunctionThatReturnTemplateType<type PARAM>(PARAM parameter)$/;"	f
-templateFunction	input.ttcn	/^function templateFunction<type PARAM>(PARAM parameter)$/;"	f

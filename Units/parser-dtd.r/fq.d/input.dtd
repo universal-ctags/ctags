@@ -1,5 +1,0 @@
-<!ELEMENT a (b)>
-<!ATTLIST a
-        %id-attr;
-        type CDATA      "text/smil-basic-layout"
->

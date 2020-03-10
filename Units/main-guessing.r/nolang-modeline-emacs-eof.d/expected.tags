@@ -1,1 +1,0 @@
-hello-world	input.nolang	/^(defun hello-world () (message "hello, world"))$/;"	f

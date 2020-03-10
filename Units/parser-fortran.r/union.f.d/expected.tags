@@ -1,8 +1,0 @@
-10	input.f	/^10      format (a)$/;"	l	program:writedate	file:
-date	input.f	/^                    character*6 date$/;"	k	type:start
-day	input.f	/^                    character*2 day$/;"	k	type:start
-month	input.f	/^                    character*2 month$/;"	k	type:start
-sdate	input.f	/^        record \/start\/ sdate$/;"	v	program:writedate
-start	input.f	/^        structure \/start\//;"	t	program:writedate
-writedate	input.f	/^        program writedate$/;"	p
-year	input.f	/^                    character*2 year$/;"	k	type:start

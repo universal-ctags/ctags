@@ -1,2 +1,0 @@
-a	input.c	/^  define a;$/;"	f
-main	input.c	/^main(void)$/;"	f	typeref:typename:int

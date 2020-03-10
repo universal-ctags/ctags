@@ -1,8 +1,0 @@
-_g	input.php	/^$_g = 42;$/;"	v
-a	input.php	/^$a = function() {};$/;"	f
-b	input.php	/^$b = function($x, $y) {};$/;"	f
-c	input.php	/^$c = function() {$/;"	f
-d	input.php	/^$d = function() {$/;"	f
-e	input.php	/^$e = function&() {$/;"	f
-f	input.php	/^$f = function&() use (&$_g) {$/;"	f
-f_sub	input.php	/^  function f_sub() {}$/;"	f	function:f

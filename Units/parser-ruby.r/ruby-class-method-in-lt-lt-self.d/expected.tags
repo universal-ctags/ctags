@@ -1,2 +1,0 @@
-C	input.rb	/^class C$/;"	c
-foo	input.rb	/^    def foo() end$/;"	S	class:C

@@ -1,4 +1,0 @@
---sort=no
---kinds-C++=*
---fields=+sS
---fields-c++=+{template}{properties}{specialization}

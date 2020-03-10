@@ -1,2 +1,0 @@
-FOO	input.f90	/^  subroutine FOO /;"	s	module:FOO
-FOO	input.f90	/^module FOO$/;"	m
