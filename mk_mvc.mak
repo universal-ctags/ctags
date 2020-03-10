@@ -14,7 +14,7 @@ REGEX_DEFINES = -DHAVE_REGCOMP -D__USE_GNU -DHAVE_STDBOOL_H -Dstrcasecmp=stricmp
 OBJEXT = obj
 COMMON_DEFINES =
 DEFINES = -DWIN32 $(REGEX_DEFINES) -DHAVE_PACKCC $(COMMON_DEFINES) -DHAVE_REPOINFO_H
-INCLUDES = -I. -Imain -Ignu_regex -Ifnmatch -Iparsers
+INCLUDES = -I. -Imain -Ignu_regex -Ifnmatch -Iparsers -Ilibreadtags
 OPT = /O2 /WX
 PACKCC = packcc.exe
 REGEX_OBJS = $(REGEX_SRCS:.c=.obj)
@@ -58,8 +58,10 @@ PDBFLAG =
 	$(CC) $(OPT) $(DEFINES) $(INCLUDES) /Foparsers\ /c $<
 {parsers\cxx}.c{parsers\cxx}.obj::
 	$(CC) $(OPT) $(DEFINES) $(INCLUDES) /Foparsers\cxx\ /c $<
-{read}.c{read}.obj::
-	$(CC) $(OPT) $(DEFINES) $(INCLUDES) /Foread\ /c $<
+{readtags-cmd}.c{readtags-cmd}.obj::
+	$(CC) $(OPT) $(DEFINES) $(INCLUDES) /Foreadtags-cmd\ /c $<
+{libreadtags}.c{libreadtags}.obj::
+	$(CC) $(OPT) $(DEFINES) $(INCLUDES) /Folibreadtags\ /c $<
 {win32\mkstemp}.c{win32\mkstemp}.obj::
 	$(CC) $(OPT) $(DEFINES) $(INCLUDES) /Fowin32\mkstemp\ /c $<
 {peg}.peg{peg}.c::
@@ -98,6 +100,6 @@ $(RES_OBJ): win32/ctags.rc win32/ctags.exe.manifest win32/resource.h
 
 
 clean:
-	- del *.obj main\*.obj optlib\*.obj parsers\*.obj parsers\cxx\*.obj gnu_regex\*.obj fnmatch\*.obj misc\packcc\*.obj peg\*.obj read\*.obj win32\mkstemp\*.obj win32\*.res main\repoinfo.h
+	- del *.obj main\*.obj optlib\*.obj parsers\*.obj parsers\cxx\*.obj gnu_regex\*.obj fnmatch\*.obj misc\packcc\*.obj peg\*.obj readtags-cmd\*.obj libreadtags\*.obj win32\mkstemp\*.obj win32\*.res main\repoinfo.h
 	- del ctags.exe readtags.exe $(PACKCC)
 	- del tags
