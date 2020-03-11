@@ -151,10 +151,6 @@ AC_ARG_ENABLE([coverage-gcov],
 	[AS_HELP_STRING([--enable-coverage-gcov],
 		[enable 'gcov' coverage testing tool [no]])])
 
-AC_ARG_ENABLE(readlib,
-	[AS_HELP_STRING([--enable-readlib],
-		[include readtags library object during install])])
-
 AC_ARG_ENABLE(readcmd,
 	[AS_HELP_STRING([--disable-readcmd],
 		[do not include readtags command during install])],
@@ -207,7 +203,6 @@ AC_ARG_PROGRAM
 # Process configuration options
 # -----------------------------
 
-AM_CONDITIONAL(INSTALL_LIB, [test "x$enable_readlib" = "xyes"])
 AM_CONDITIONAL(INSTALL_ETAGS, [test "x$enable_etags" = "xyes"])
 AM_CONDITIONAL(USE_READCMD, [test "x$enable_readcmd" = "xyes"])
 

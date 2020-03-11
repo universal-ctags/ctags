@@ -19,7 +19,7 @@ ALL_OBJS += $(FNMATCH_OBJS)
 ALL_OBJS += $(WIN32_OBJS)
 ALL_OBJS += $(PEG_OBJS)
 ALL_OBJS += $(RES_OBJ)
-VPATH = . ./main ./parsers ./optlib ./read ./win32
+VPATH = . ./main ./parsers ./optlib ./readtags-cmd ./libreadtags ./win32
 
 ifeq (yes, $(WITH_ICONV))
 DEFINES += -DHAVE_ICONV
@@ -106,8 +106,10 @@ ctags.exe: $(ALL_OBJS) $(ALL_HEADS) $(PEG_HEADS) $(PEG_EXTRA_HEADS) $(REGEX_HEAD
 $(RES_OBJ): win32/ctags.rc win32/ctags.exe.manifest win32/resource.h
 	$(V_WINDRES) $(WINDRES) -o $@ -O coff $<
 
-read/%.o: read/%.c
-	$(V_CC) $(CC) -c $(OPT) $(CFLAGS) -DWIN32 -Iread -o $@ $<
+readtags-cmd/%.o: readtags-cmd/%.c
+	$(V_CC) $(CC) -c $(OPT) $(CFLAGS) -DWIN32 -Ilibreadtags -o $@ $<
+libreadtags/%.o: libreadtags/%.c
+	$(V_CC) $(CC) -c $(OPT) $(CFLAGS) -DWIN32 -Ilibreadtags -o $@ $<
 
 readtags.exe: $(READTAGS_OBJS) $(READTAGS_HEADS)
 	$(V_CC) $(CC) $(OPT) -o $@ $(READTAGS_OBJS) $(LIBS)
@@ -116,4 +118,4 @@ clean:
 	$(SILENT) echo Cleaning
 	$(SILENT) rm -f ctags.exe readtags.exe $(PACKCC)
 	$(SILENT) rm -f tags
-	$(SILENT) rm -f main/*.o optlib/*.o parsers/*.o parsers/cxx/*.o gnu_regex/*.o fnmatch/*.o misc/packcc/*.o peg/*.o read/*.o win32/*.o win32/mkstemp/*.o
+	$(SILENT) rm -f main/*.o optlib/*.o parsers/*.o parsers/cxx/*.o gnu_regex/*.o fnmatch/*.o misc/packcc/*.o peg/*.o readtags-cmd/*.o libreadtags/*.o win32/*.o win32/mkstemp/*.o
