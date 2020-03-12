@@ -1,11 +1,11 @@
 include $(top_srcdir)/source.mak
 
+SUBDIRS = Onigmo
+
 EXTRA_DIST   = README.md autogen.sh \
 	       makefiles/list-optlib2c-input.mak misc/optlib2c \
 	       .ctags.d/exclusion.ctags .dir-locals.el .editorconfig .gdbinit .gitignore \
 	       .indent.pro .uncrustify.cfg \
-	       gnu_regex/README.txt gnu_regex/regcomp.c gnu_regex/regexec.c \
-	       gnu_regex/regex_internal.c gnu_regex/regex_internal.h \
 	       misc/ctags-optlib-mode.el \
 	       misc/mk-interactive-request.sh misc/roundtrip misc/tinst \
 	       misc/packcc/.gitignore misc/packcc/LICENSE.txt \
@@ -63,11 +63,6 @@ LIB_SRCS += $(FNMATCH_SRCS)
 LIB_HEADS += $(FNMATCH_HEADS)
 endif
 
-if !HAVE_REGCOMP
-LIB_SRCS += $(REGEX_SRCS)
-LIB_HEADS += $(REGEX_HEADS)
-endif
-
 if HAVE_LIBXML
 PARSER_SRCS += $(XML_SRCS)
 PARSER_HEADS += $(XML_HEADS)
@@ -93,7 +88,6 @@ if HAVE_STRNLEN
 libctags_a_CPPFLAGS += -DUSE_SYSTEM_STRNLEN
 endif
 libctags_a_CPPFLAGS+= $(FNMATCH_CPPFLAGS)
-libctags_a_CPPFLAGS+= $(REGCOMP_CPPFLAGS)
 libctags_a_CPPFLAGS+= -DHAVE_REPOINFO_H
 
 libctags_a_CFLAGS   =
@@ -151,7 +145,8 @@ dist_libctags_a_SOURCES = $(ALL_LIB_HEADS) $(ALL_LIB_SRCS)
 
 ctags_CPPFLAGS = $(libctags_a_CPPFLAGS)
 ctags_CFLAGS = $(libctags_a_CFLAGS)
-ctags_LDADD  =libctags.a
+ctags_LDADD  = libctags.a
+ctags_LDADD += $(top_builddir)/Onigmo/.libs/libonigmo.a
 ctags_LDADD += $(LIBXML_LIBS)
 ctags_LDADD += $(JANSSON_LIBS)
 ctags_LDADD += $(LIBYAML_LIBS)
@@ -175,6 +170,7 @@ endif
 mini_geany_CPPFLAGS = $(libctags_a_CPPFLAGS)
 mini_geany_CFLAGS = $(libctags_a_CFLAGS)
 mini_geany_LDADD  = libctags.a
+mini_geany_LDADD += $(top_builddir)/Onigmo/.libs/libonigmo.a
 mini_geany_LDADD += $(LIBXML_LIBS)
 mini_geany_LDADD += $(JANSSON_LIBS)
 mini_geany_LDADD += $(LIBYAML_LIBS)

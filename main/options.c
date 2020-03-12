@@ -569,6 +569,7 @@ static struct Feature {
 	/* The test harnesses use this as hints for skipping test cases */
 	{"packcc", "has peg based parser(s)"},
 #endif
+	{"onigmo", "uses onigmo as regex engine"},
 	{NULL,}
 };
 
@@ -2015,6 +2016,10 @@ static void processLicenseOption (
 	puts ("");
 	puts (License1);
 	puts (License2);
+
+	extern const char* onig_copyright(void);
+	puts (onig_copyright());
+
 	exit (0);
 }
 

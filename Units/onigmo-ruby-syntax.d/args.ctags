@@ -1,0 +1,7 @@
+--langdef=mylang
+--map-mylang=.mylang
+--kinddef-mylang=f,fun,function, function returing a function, or function returing a function returing function...
+--_fielddef-mylang=symbol,symbol binding to the function
+--fields-mylang={symbol}
+--regex-mylang=/\(define +(([-a-z0-9]+)|\(\g<1>\))/\1/f/r{_field=symbol:\2}
+

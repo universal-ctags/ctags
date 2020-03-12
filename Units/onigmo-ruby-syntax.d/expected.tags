@@ -1,0 +1,3 @@
+(((f3)))	input.mylang	/^(define (((f3))) "abc")$/;"	f	symbol:f3
+((f2))	input.mylang	/^(define ((f2)) #t)$/;"	f	symbol:f2
+(f1)	input.mylang	/^(define (f1) 1)$/;"	f	symbol:f1

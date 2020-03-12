@@ -23,7 +23,7 @@
 #ifdef HAVE_SYS_TYPES_H
 # include <sys/types.h>  /* declare off_t (not known to regex.h on FreeBSD) */
 #endif
-#include <regex.h>
+#include "Onigmo/onigmoposix.h"
 
 #include <inttypes.h>
 
@@ -1293,6 +1293,16 @@ static void regex_flag_icase_long (const char* s CTAGS_ATTR_UNUSED, const char* 
 	regex_flag_icase_short ('i', data);
 }
 
+static void regex_flag_ruby_short (char c CTAGS_ATTR_UNUSED, void* data)
+{
+	int* cflags = data;
+	*cflags *= -1;
+}
+
+static void regex_flag_ruby_long (const char* s CTAGS_ATTR_UNUSED, const char* const unused CTAGS_ATTR_UNUSED, void* data)
+{
+	regex_flag_ruby_short ('r', data);
+}
 
 static flagDefinition regexFlagDefs[] = {
 	{ 'b', "basic",  regex_flag_basic_short,  regex_flag_basic_long,
@@ -1301,6 +1311,8 @@ static flagDefinition regexFlagDefs[] = {
 	  NULL, "interpreted as a Posix extended regular expression (default)"},
 	{ 'i', "icase",  regex_flag_icase_short,  regex_flag_icase_long,
 	  NULL, "applied in a case-insensitive manner"},
+	{ 'r', "ruby",  regex_flag_ruby_short,  regex_flag_ruby_long,
+	  NULL, "used ruby syntax of Onigmo regex engine"},
 };
 
 static regex_t* compileRegex (enum regexParserType regptype,
@@ -1320,6 +1332,18 @@ static regex_t* compileRegex (enum regexParserType regptype,
 		   &cflags);
 
 	result = xMalloc (1, regex_t);
+
+	if (cflags < 0)
+	{
+		cflags *= -1;
+		onig_set_default_syntax (ONIG_SYNTAX_RUBY);
+
+	}
+	else
+		onig_set_default_syntax (cflags & REG_EXTENDED
+								 ? ONIG_SYNTAX_POSIX_EXTENDED
+								 : ONIG_SYNTAX_POSIX_BASIC);
+
 	errcode = regcomp (result, regexp, cflags);
 	if (errcode != 0)
 	{
@@ -1452,10 +1476,14 @@ static void matchTagPattern (struct lregexControlBlock *lcb,
 		const regmatch_t* const pmatch,
 			     off_t offset)
 {
+	int num_match = patbuf->pattern->re_nsub + 1;
+	if (num_match > BACK_REFERENCE_COUNT)
+		num_match = BACK_REFERENCE_COUNT;
+
 	vString *const name =
 		(patbuf->u.tag.name_pattern[0] != '\0') ? substitute (line,
 															  patbuf->u.tag.name_pattern,
-															  BACK_REFERENCE_COUNT, pmatch):
+															  num_match, pmatch):
 		(patbuf->anonymous_tag_prefix) ? anonGenerateNew (patbuf->anonymous_tag_prefix,
 														  patbuf->u.tag.kindIndex):
 		vStringNewInit ("");
@@ -1536,8 +1564,12 @@ static void matchTagPattern (struct lregexControlBlock *lcb,
 				struct fieldPattern *fp = ptrArrayItem(patbuf->fieldPatterns, i);
 				if (isFieldEnabled (fp->ftype))
 				{
+					int num_match = patbuf->pattern->re_nsub + 1;
+					if (num_match > BACK_REFERENCE_COUNT)
+						num_match = BACK_REFERENCE_COUNT;
+
 					vString * const value = substitute (line, fp->template,
-														BACK_REFERENCE_COUNT, pmatch);
+														num_match, pmatch);
 					attachParserField (&e, false, fp->ftype, vStringValue (value));
 					trashBoxPut (field_trashbox, value,
 								 (TrashBoxDestroyItemProc)vStringDelete);
@@ -1607,7 +1639,11 @@ static void printMessage(const langType language,
 	Assert (ptrn->message.selection > 0);
 	Assert (ptrn->message.message_string);
 
-	msg = substitute (line, ptrn->message.message_string, BACK_REFERENCE_COUNT, pmatch);
+	int num_match = ptrn->pattern->re_nsub + 1;
+	if (num_match > BACK_REFERENCE_COUNT)
+		num_match = BACK_REFERENCE_COUNT;
+
+	msg = substitute (line, ptrn->message.message_string, num_match, pmatch);
 
 	error (ptrn->message.selection, "%sMessage from regex<%s>: %s (%s:%lu)",
 		   (ptrn->message.selection == FATAL ? "Fatal: " : ""),
@@ -1825,6 +1861,15 @@ extern bool matchRegex (struct lregexControlBlock *lcb, const vString* const lin
 {
 	bool result = false;
 	unsigned int i;
+
+	bool trimed = false;
+	if (vStringLength (line) > 0 &&
+		vStringLast (line) == '\n')
+	{
+		vStringChop ((vString* const)line);
+		trimed = true;
+	}
+
 	for (i = 0  ;  i < ptrArrayCount(lcb->entries[REG_PARSER_SINGLE_LINE])  ;  ++i)
 	{
 		regexTableEntry *entry = ptrArrayItem(lcb->entries[REG_PARSER_SINGLE_LINE], i);
@@ -1843,6 +1888,10 @@ extern bool matchRegex (struct lregexControlBlock *lcb, const vString* const lin
 				break;
 		}
 	}
+
+	if (trimed)
+		vStringPut ((vString *const)line, '\n');
+
 	return result;
 }
 
@@ -2362,7 +2411,11 @@ static void printMultitableMessage(const langType language,
 	Assert (ptrn->message.selection > 0);
 	Assert (ptrn->message.message_string);
 
-	msg = substitute (current, ptrn->message.message_string, BACK_REFERENCE_COUNT, pmatch);
+	int num_match = ptrn->pattern->re_nsub + 1;
+	if (num_match > BACK_REFERENCE_COUNT)
+		num_match = BACK_REFERENCE_COUNT;
+
+	msg = substitute (current, ptrn->message.message_string, num_match, pmatch);
 
 	error (ptrn->message.selection, "%sMessage from mtable<%s/%s[%2u]>: %s (%s:%lu)",
 		   (ptrn->message.selection == FATAL ? "Fatal: " : ""),

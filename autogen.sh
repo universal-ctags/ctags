@@ -4,6 +4,7 @@ set -xe
 
 type autoreconf > /dev/null || exit 1
 type pkg-config > /dev/null || exit 1
+type libtoolize > /dev/null || exit 1
 
 if [ -z "${MAKE}" ]; then
 	if type make > /dev/null; then
@@ -36,6 +37,6 @@ if autoreconf -vfi; then
 else
 	echo "failed in running autoreconf" 1>&2
 	exit 1
-fi
+fi && (cd Onigmo; ./autogen.sh)
 
 exit $?

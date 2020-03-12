@@ -1,0 +1,5 @@
+(define (f1) 1)
+(define ((f2)) #t)
+(define (((f3))) "abc")
+
+

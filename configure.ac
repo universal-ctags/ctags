@@ -748,6 +748,8 @@ AC_CONFIG_FILES([Makefile
 		 man/ctags-optlib.7.rst
 		 ])
 
+AC_CONFIG_SUBDIRS([Onigmo])
+
 AC_OUTPUT
 
 # vim:ts=4:sw=4:
