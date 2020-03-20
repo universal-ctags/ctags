@@ -79,7 +79,7 @@ Options for Pseudo-tags
 	``--extras=+{pseudo}`` is for force writing pseudo-tags.
 
 ``--list-pseudo-tags``
-	Lists available kinds of pseudo-tags and shows whether they are enabled or disabled.
+	Lists available types of pseudo-tags and shows whether they are enabled or disabled.
 
 	Running ctags with ``--list-pseudo-tags`` option
 	lists available pseudo-tags. Some of pseudo-tags newly introduced
@@ -87,7 +87,7 @@ Options for Pseudo-tags
 	``--pseudo-tags=...`` option for enabling them.
 
 ``--pseudo-tags=[+|-]names|*``
-	A list of kinds of pseudo-tags to include in the output.
+	Specifies a list of pseudo-tag types to include in the output.
 
 	The parameters are a set of pseudo tag names. Valid pseudo tag names
 	can be listed with ``--list-pseudo-tags``. Surround each name in the set
@@ -117,7 +117,7 @@ Options for Pseudo-tags
 
 List of notable pseudo-tags
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Running ctags with ``--list-pseudo-tags`` option lists available kinds
+Running ctags with ``--list-pseudo-tags`` option lists available types
 of pseudo-tags with short descriptions. This subsection shows hints
 for using notable ones.
 
@@ -127,8 +127,8 @@ for using notable ones.
 	  !_TAG_EXTRA_DESCRIPTION	{extra-name}	/description/
 	  !_TAG_EXTRA_DESCRIPTION!{language-name}	{extra-name}	/description/
 
-	If your tool relies on some kinds of extra tags (extras), refer to
-	the pseudo-tags of this kind. A tool can reject the tags file that
+	If your tool relies on some extra tags (extras), refer to
+	the pseudo-tags of this type. A tool can reject the tags file that
 	doesn't include expected extras, and raise an error in an early
 	stage of processing.
 
@@ -151,7 +151,7 @@ for using notable ones.
 	  !_TAG_FIELD_DESCRIPTION!{language-name}	{field-name}	/description/
 
 	If your tool relies on some fields, refer to the pseudo-tags of
-	this kind.  A tool can reject a tags file that doesn't include
+	this type.  A tool can reject a tags file that doesn't include
 	expected fields, and raise an error in an early stage of
 	processing.
 
@@ -186,7 +186,7 @@ for using notable ones.
 	  !_TAG_KIND_DESCRIPTION!{language-name}	{kind-letter},{kind-name}	/description/
 
 	If your tool relies on some kinds, refer to the pseudo-tags of
-	this kind.  A tool can reject the tags file that doesn't include
+	this type.  A tool can reject the tags file that doesn't include
 	expected kinds, and raise an error in an early stage of
 	processing.
 
