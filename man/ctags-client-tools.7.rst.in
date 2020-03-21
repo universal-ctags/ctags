@@ -26,20 +26,20 @@ This man page gathers hints for people who develop client tools.
 PSEUDO-TAGS
 -----------
 **Pseudo-tags**, stored in a tag file, indicate how
-@CTAGS_NAME_EXECUTABLE@ command generated the tags file: whether the
+@CTAGS_NAME_EXECUTABLE@ generated the tags file: whether the
 tags file is sorted or not, which version of tags file format is used,
 the name of tags generator, and so on. The opposite term for
 pseudo-tags is **regular-tags**. A regular-tag is for a language
-object in a input file. A pseudo-tag is for the tags file
+object in an input file. A pseudo-tag is for the tags file
 itself. Client tools may use pseudo-tags as reference for processing
 regular-tags.
 
 A pseudo-tag is stored in a tags file in the same format as
-regular-tags as described in tags(5). An exception is names of
-pseudo-tags start with "!_". For the general information about
+regular-tags as described in tags(5), except that pseudo-tag names
+are prefixed with "!_". For the general information about
 pseudo-tags, see "TAG FILE INFORMATION" in tags(5).
 
-An example of pseudo tags::
+An example of a pseudo tag::
 
 	!_TAG_PROGRAM_NAME	Universal Ctags	/Derived from Exuberant Ctags/
 
@@ -59,12 +59,11 @@ An example of pseudo tag with a language suffix::
 
 	!_TAG_KIND_DESCRIPTION!C	f,function	/function definitions/
 
-This pseudo-tag represents "the function kind of C language is enabled
+This pseudo-tag says "the function kind of C language is enabled
 when generating this tags file." ``--pseudo-tags`` is the option for
 enabling/disabling individual pseudo-tags. When enabling/disabling a
-pseudo tag with the option, don't include the prefix ("!_")
-or the suffix ("!C"). Specify the body of the name, here
-"TAG_KIND_DESCRIPTION".
+pseudo tag with the option, specify the tag name only
+"TAG_KIND_DESCRIPTION", without the prefix ("!_") or the suffix ("!C").
 
 
 Options for Pseudo-tags
@@ -73,10 +72,10 @@ Options for Pseudo-tags
 	Forces writing pseudo-tags.
 
 	@CTAGS_NAME_EXECUTABLE@ emits pseudo-tags by default when writing tags
-	to a regular fie (like "tags' file.) However, when specifying ``-o -``
+	to a regular file (e.g. "tags'.) However, when specifying ``-o -``
 	or ``-f -`` for writing tags to standard output,
 	@CTAGS_NAME_EXECUTABLE@ doesn't emit pseudo-tags. ``--extras=+p`` or
-	``--extras=+{pseudo}`` is for force writing pseudo-tags.
+	``--extras=+{pseudo}`` will force pseudo-tags to be written.
 
 ``--list-pseudo-tags``
 	Lists available types of pseudo-tags and shows whether they are enabled or disabled.
@@ -84,7 +83,7 @@ Options for Pseudo-tags
 	Running @CTAGS_NAME_EXECUTABLE@ with ``--list-pseudo-tags`` option
 	lists available pseudo-tags. Some of pseudo-tags newly introduced
 	in Universal-ctags project are disabled by default. Use
-	``--pseudo-tags=...`` option for enabling them.
+	``--pseudo-tags=...`` to enable them.
 
 ``--pseudo-tags=[+|-]names|*``
 	Specifies a list of pseudo-tag types to include in the output.
@@ -97,10 +96,9 @@ Options for Pseudo-tags
 
 	pseudo-tags don't have a notation using one-letter flags.
 
-	If names is preceded by either the '+' or '-' character, the
-	effect of each name is added to, or removed from, those currently
-	enabled; otherwise the names replace any current settings. All
-	entries are included if '*' is given.
+	If a name is preceded by either the '+' or '-' characters, that
+	tags's effect has been added or removed. Otherwise the names replace
+	any current settings. All entries are included if '*' is given.
 
 ``--fields=+E`` (or ``--fields=+{extras}``)
 	Attach "extras:pseudo" field to pseudo-tags.
