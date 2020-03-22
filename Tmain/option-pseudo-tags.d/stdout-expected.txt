@@ -1,0 +1,18 @@
+# single with no curly bracket
+!_TAG_PROGRAM_URL	https://ctags.io/	/official site/
+# single with curly bracket
+!_TAG_PROGRAM_URL	https://ctags.io/	/official site/
+# single with + no curly bracket
+!_TAG_PROGRAM_URL	https://ctags.io/	/official site/
+# single with + curly bracket
+!_TAG_PROGRAM_URL	https://ctags.io/	/official site/
+# single with +- no curly bracket
+!_TAG_PROGRAM_URL	https://ctags.io/	/official site/
+# single with +- curly bracket
+!_TAG_PROGRAM_URL	https://ctags.io/	/official site/
+# multiple specifications with +- curly bracket
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_URL	https://ctags.io/	/official site/
+# multiple specifications with -+- curly bracket
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_PROGRAM_URL	https://ctags.io/	/official site/

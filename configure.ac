@@ -739,6 +739,7 @@ AC_CHECK_FUNCS(mblen)
 
 AC_CONFIG_FILES([Makefile
 		 man/ctags.1.rst
+		 man/ctags-client-tools.7.rst
 		 man/ctags-incompatibilities.7.rst
 		 man/ctags-optlib.7.rst
 		 ])

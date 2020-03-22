@@ -193,5 +193,5 @@ extern bool isDestinationStdout (void);
 
 extern void setMainLoop (mainLoopFunc func, void *data);
 
-extern bool ptagMakePatternLengthLimit (ptagDesc *pdesc, const void *data);
+extern bool ptagMakePatternLengthLimit (ptagDesc *pdesc, langType langType, const void *data);
 #endif  /* CTAGS_MAIN_OPTIONS_PRIVATE_H */

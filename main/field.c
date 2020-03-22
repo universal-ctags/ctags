@@ -350,6 +350,14 @@ extern fieldType getFieldTypeForNameAndLanguage (const char *fieldName, langType
 	return FIELD_UNKNOWN;
 }
 
+extern const char* getFieldDescription (fieldType type)
+{
+	fieldObject* fobj;
+
+	fobj = getFieldObject (type);
+	return fobj->def->description;
+}
+
 extern const char* getFieldName(fieldType type)
 {
 	fieldObject* fobj;

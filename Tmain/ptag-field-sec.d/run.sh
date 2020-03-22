@@ -5,7 +5,8 @@ CTAGS=$1
 O="--quiet --options=NONE "
 
 ${CTAGS} $O \
-		 --extras=+p --pseudo-tags=TAG_KIND_DESCRIPTION \
-		 --kinds-C=df \
+		 --extras=+p --pseudo-tags=TAG_FIELD_DESCRIPTION \
+		 --fields=le \
+		 --fields-C='{macrodef}' \
 		 -o - \
 		 input.c

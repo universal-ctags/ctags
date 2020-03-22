@@ -34,6 +34,7 @@ extern bool isCommonXtag (xtagType type);
 extern int  getXtagOwner (xtagType type);
 
 const char* getXtagName (xtagType type);
+const char* getXtagDescription (xtagType type);
 
 extern void initXtagObjects (void);
 extern int countXtags (void);

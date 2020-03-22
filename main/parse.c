@@ -3646,8 +3646,10 @@ static void addParserPseudoTags (langType language)
 	parserObject *parser = LanguageTable + language;
 	if (!parser->pseudoTagPrinted)
 	{
-		makePtagIfEnabled (PTAG_KIND_DESCRIPTION, &language);
-		makePtagIfEnabled (PTAG_KIND_SEPARATOR, &language);
+		makePtagIfEnabled (PTAG_KIND_DESCRIPTION, language, parser);
+		makePtagIfEnabled (PTAG_KIND_SEPARATOR, language, parser);
+		makePtagIfEnabled (PTAG_FIELD_DESCRIPTION, language, parser);
+		makePtagIfEnabled (PTAG_EXTRA_DESCRIPTION, language, parser);
 
 		parser->pseudoTagPrinted = 1;
 	}
@@ -4074,17 +4076,13 @@ extern bool makeKindSeparatorsPseudoTags (const langType language,
 	if (kindCount == 0)
 		return r;
 
+	vString *sepval = vStringNew();
 	for (i = 0; i < kindCount; ++i)
 	{
-		static vString *sepval;
-
-		if (!sepval)
-			sepval = vStringNew ();
-
 		kind = getKind (kcb, i);
 		for (j = 0; j < kind->separatorCount; ++j)
 		{
-			char name[5] = {[0] = '/', [3] = '/', [4] = '\0'};
+			char name[3] = {[1] = '\0', [2] = '\0'};
 			const kindDefinition *upperKind;
 			const scopeSeparator *sep;
 
@@ -4092,15 +4090,13 @@ extern bool makeKindSeparatorsPseudoTags (const langType language,
 
 			if (sep->parentKindIndex == KIND_WILDCARD_INDEX)
 			{
-				name[1] = KIND_WILDCARD_LETTER;
-				name[2] = kind->letter;
+				name[0] = KIND_WILDCARD_LETTER;
+				name[1] = kind->letter;
 			}
 			else if (sep->parentKindIndex == KIND_GHOST_INDEX)
 			{
 				/* This is root separator: no upper item is here. */
-				name[1] = kind->letter;
-				name[2] = name[3];
-				name[3] = '\0';
+				name[0] = kind->letter;
 			}
 			else
 			{
@@ -4109,8 +4105,8 @@ extern bool makeKindSeparatorsPseudoTags (const langType language,
 				if (!upperKind)
 					continue;
 
-				name[1] = upperKind->letter;
-				name[2] = kind->letter;
+				name[0] = upperKind->letter;
+				name[1] = kind->letter;
 			}
 
 
@@ -4121,6 +4117,7 @@ extern bool makeKindSeparatorsPseudoTags (const langType language,
 					    name, lang->name) || r;
 		}
 	}
+	vStringDelete (sepval);
 
 	return r;
 }
@@ -4147,9 +4144,7 @@ static bool makeKindDescriptionPseudoTag (kindDefinition *kind,
 	vStringCatS (letter_and_name, kind -> name);
 
 	d = kind->description? kind->description: kind->name;
-	vStringPut (description, '/');
 	vStringCatSWithEscapingAsPattern (description, d);
-	vStringPut (description, '/');
 	data->written |=  writePseudoTag (data->pdesc, vStringValue (letter_and_name),
 					  vStringValue (description),
 					  data->langName);
@@ -4183,11 +4178,90 @@ extern bool makeKindDescriptionsPseudoTags (const langType language,
 
 	for (i = 0; i < kindCount; ++i)
 	{
+		if (!isLanguageKindEnabled (language, i))
+			continue;
+
 		kind = getKind (kcb, i);
 		makeKindDescriptionPseudoTag (kind, &data);
 	}
 
 	return data.written;
+}
+
+static bool makeFieldDescriptionPseudoTag (const langType language,
+										   fieldType f,
+										   const ptagDesc *pdesc)
+{
+	vString *description;
+	const char *name = getFieldName (f);
+
+	if (name == NULL || name [0] == '\0')
+		return false;
+
+	description = vStringNew ();
+	vStringCatSWithEscapingAsPattern (description,
+									  getFieldDescription (f));
+
+	bool r = writePseudoTag (pdesc, name,
+							 vStringValue (description),
+							 language == LANG_IGNORE? NULL: getLanguageName (language));
+
+	vStringDelete (description);
+	return r;
+}
+
+extern bool makeFieldDescriptionsPseudoTags (const langType language,
+											 const ptagDesc *pdesc)
+{
+	bool written = false;
+	for (int i = 0; i < countFields (); i++)
+	{
+		if (getFieldOwner (i) == language
+			&& isFieldEnabled (i))
+		{
+			if (makeFieldDescriptionPseudoTag (language, i, pdesc))
+				written = true;
+		}
+	}
+	return written;
+}
+
+static bool makeExtraDescriptionPseudoTag (const langType language,
+										   xtagType x,
+										   const ptagDesc *pdesc)
+{
+	vString *description;
+	const char *name = getXtagName (x);
+
+	if (name == NULL || name [0] == '\0')
+		return false;
+
+	description = vStringNew ();
+	vStringCatSWithEscapingAsPattern (description,
+									  getXtagDescription (x));
+
+	bool r = writePseudoTag (pdesc, name,
+							 vStringValue (description),
+							 language == LANG_IGNORE? NULL: getLanguageName (language));
+
+	vStringDelete (description);
+	return r;
+}
+
+extern bool makeExtraDescriptionsPseudoTags (const langType language,
+											 const ptagDesc *pdesc)
+{
+	bool written = false;
+	for (int i = 0; i < countXtags (); i++)
+	{
+		if (getXtagOwner (i) == language
+			&& isXtagEnabled (i))
+		{
+			if (makeExtraDescriptionPseudoTag (language, i, pdesc))
+				written = true;
+		}
+	}
+	return written;
 }
 
 /*

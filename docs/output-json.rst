@@ -5,7 +5,7 @@ JSON output
 ======================================================================
 
 Format
-----------------------------------------------------------------------   
+----------------------------------------------------------------------
 
 JSON output goes to standard output by default.
 Each generated tag line is represented as an object.
@@ -21,12 +21,14 @@ directly to the fields of the default tags file format.
 
 Keys that have names starting with `_` are a JSON format meta field.
 Currently only `_type` is used and it can have the values `tag` for a
-normal tag or `ptag` for a pseudo tag.
+normal tag or `ptag` for a pseudo-tag.
 
 JSON output is still under development and it is expected the format
 will change in the future. To give applications a chance to handle
-these changes ctags uses a pseudo tag, `JSON_OUTPUT_VERSION`, for
+these changes ctags uses a pseudo-tag, `JSON_OUTPUT_VERSION`, for
 specifying the format version.
+See :ref:`ctags-client-tools(7) <ctags-client-tools(7)>` about the
+concept of the pseudo-tags.
 
 .. code-block:: console
 
@@ -52,7 +54,7 @@ Universal-ctags.
 .. NOT REVIEWED YET
 
 Field introspection
-----------------------------------------------------------------------   
+----------------------------------------------------------------------
 
 Values for the most of all fields are represented in JSON string type.
 However, some of them are represented in integer type and/or boolean type.
@@ -68,7 +70,7 @@ of ``--list-fields`` option:
         ...
         n       line            off     NONE             TRUE   -i-    Line number of tag definition
         ...
-    
+
 `JSTYPE` column tells the data type of fields.
 
 s
@@ -81,5 +83,3 @@ b
 	boolean
 
 For example, The value for "inherits" field is represented in the string or boolean type.
-
-	

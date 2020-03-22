@@ -210,6 +210,7 @@ man_MANS = \
 	\
 	man/tags.5 \
 	\
+	man/ctags-client-tools.7 \
 	man/ctags-incompatibilities.7 \
 	man/ctags-optlib.7 \
 	\
