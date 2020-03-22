@@ -38,6 +38,7 @@ typedef enum {
 	K_MACOR,
 	K_PACKAGE,
 	K_GLOBAL,
+	K_PATCH,
 } rpmSpecKind;
 
 enum rpmSpecMacroRole {
@@ -47,6 +48,14 @@ typedef int rpmSpecMacroRole; /* to allow ROLE_INDEX_* */
 
 static roleDefinition RpmSpecMacroRoles [] = {
 	{ true, "undef", "undefined" },
+};
+
+enum rpmSpecPatchRole {
+	R_PATCH_DECL,
+};
+
+static roleDefinition RpmSpecPatchRoles [] = {
+	{ true, "decl", "declared for applying later" },
 };
 
 static scopeSeparator RpmSpecPackageSeparators [] = {
@@ -60,6 +69,8 @@ static kindDefinition RpmSpecKinds[] = {
 	{ true, 'p', "package", "packages",
 	  ATTACH_SEPARATORS(RpmSpecPackageSeparators) },
 	{ true, 'g', "global", "global macros" },
+	{ true, 'p', "patch", "patch files",
+	  .referenceOnly = true, ATTACH_ROLES(RpmSpecPatchRoles) },
 };
 
 struct macro_cb_data {
@@ -244,6 +255,16 @@ static bool found_undef_cb (const char *line,
 }
 
 
+static bool alldigits (const char * str)
+{
+	while (isdigit ((int)*str))
+		str++;
+
+	if (*str == '\0')
+		return true;
+	return false;
+}
+
 static bool found_tag_cb (const char *line,
 			  const regexMatch *matches,
 			  unsigned int count,
@@ -264,6 +285,14 @@ static bool found_tag_cb (const char *line,
 				((struct rpmSpecCtx *)userData)->package_index
 					= makeSimpleTag (package, K_PACKAGE);
 				vStringDelete (package);
+			}
+			else if (strncasecmp (vStringValue (name), "patch", 5) == 0
+					 && alldigits (vStringValue (name) + 5))
+			{
+				vString *patch = vStringNew ();
+				vStringNCopyS (patch, line + matches[2].start, matches[2].length);
+				makeSimpleRefTag (patch, K_PATCH, R_PATCH_DECL);
+				vStringDelete (patch);
 			}
 		}
 		vStringDelete (name);

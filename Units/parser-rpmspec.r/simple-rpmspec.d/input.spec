@@ -8,6 +8,9 @@ Source: http://prdownloads.sourceforge.net/ctags/ctags-%{version}.tar.gz
 URL: http://ctags.sourceforge.net
 Buildroot: %{_tmppath}/%{name}-%{version}-root
 
+Patch0: empty0.patch
+Patch9999: dummy1.patch
+
 %define __scm_apply_git(qp:m:) %{__git} am
 
 %define YES yes
