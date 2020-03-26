@@ -138,6 +138,11 @@ static const char *const Usage =
 	"Usage: \n"
 	"    %s -h | --help\n"
 	"        Print this help message.\n"
+#ifdef READTAGS_DSL
+	"    %s -H POSTPROCESSOR | --help-expression POSTPROCESSOR\n"
+	"        Print available terms that can be used in POSTPROCESSOR expression.\n"
+	"        POSTPROCESSOR: filter\n"
+#endif
 	"    %s [OPTIONS] ACTION\n"
 	"        Do the specified action.\n"
 	"Actions:\n"
@@ -172,15 +177,18 @@ static const char *const Usage =
 
 static void printUsage(FILE* stream, int exitCode)
 {
-	fprintf (stream, Usage, ProgramName, ProgramName);
-#ifdef READTAGS_DSL
-	fprintf (stream, "\nFilter expression: \n");
-	q_help (stream);
-#endif
+	fprintf (stream, Usage, ProgramName, ProgramName, ProgramName);
 	exit (exitCode);
 }
 
 #ifdef READTAGS_DSL
+static void printFilterExpressoin (FILE *stream, int exitCode)
+{
+	fprintf (stream, "Filter expression: \n");
+	q_help (stream);
+	exit (exitCode);
+}
+
 static QCode *convertToQualifier(const char* exp)
 {
 	EsObject *sexp = es_read_from_string (exp, NULL);
@@ -238,6 +246,30 @@ extern int main (int argc, char **argv)
 			}
 			else if (strcmp (optname, "help") == 0)
 				printUsage (stdout, 0);
+#ifdef READTAGS_DSL
+			else if (strcmp (optname, "help-expression") == 0)
+			{
+				if (i + 1 < argc)
+				{
+					const char *exp_klass = argv [++i];
+					if (strcmp (exp_klass, "filter") == 0)
+						printFilterExpressoin (stdout, 0);
+					else
+					{
+						fprintf (stderr, "%s: unknown expression class for --%s option",
+								 ProgramName, optname);
+						exit (1);
+
+					}
+				}
+				else
+				{
+					fprintf (stderr, "%s: missing expression class for --%s option",
+							 ProgramName, optname);
+					exit (1);
+				}
+			}
+#endif
 			else if (strcmp (optname, "extension-fields") == 0)
 				extensionFields = 1;
 			else if (strcmp (optname, "icase-match") == 0)
@@ -317,6 +349,19 @@ extern int main (int argc, char **argv)
 					case 'd': debugMode++; break;
 					case 'D': listTags (1); actionSupplied = 1; break;
 					case 'h': printUsage (stdout, 0); break;
+#ifdef READTAGS_DSL
+					case 'H':
+						if (i + 1 < argc)
+						{
+							const char *exp_klass = argv [++i];
+							if (strcmp (exp_klass, "filter") == 0)
+								printFilterExpressoin (stdout, 0);
+							else
+								printUsage(stderr, 1);
+						}
+						else
+							printUsage(stderr, 1);
+#endif
 					case 'e': extensionFields = 1;         break;
 					case 'i': options |= TAG_IGNORECASE;   break;
 					case 'p': options |= TAG_PARTIALMATCH; break;
