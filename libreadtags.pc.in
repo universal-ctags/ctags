@@ -4,7 +4,7 @@ libdir=@libdir@
 includedir=@includedir@
 
 Name: libreadtags
-Description: command line editor library provides generic line editing, history, and tokenization functions.
+Description: a library for looking up tag entries in tag files
 Version: @VERSION@
 Requires:
 Libs: -L${libdir} -lreadtags

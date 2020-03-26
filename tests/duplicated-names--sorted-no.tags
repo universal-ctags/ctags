@@ -1,0 +1,21 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	0	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Universal Ctags Team	//
+!_TAG_PROGRAM_NAME	Universal Ctags	/Derived from Exuberant Ctags/
+!_TAG_PROGRAM_URL	https://ctags.io/	/official site/
+!_TAG_PROGRAM_VERSION	0.0.0	/9b73623f/
+!_TAG_OUTPUT_MODE	u-ctags	/u-ctags or e-ctags/
+!_TAG_OUTPUT_FILESEP	slash	/slash or backslash/
+!_TAG_PATTERN_LENGTH_LIMIT	96	/0 for no limit/
+o	input.c	/^int o;$/;"	v	typeref:typename:int
+O	input.c	/^int O (void) { return 0; }$/;"	f	typeref:typename:int
+N	input.c	/^int N;$/;"	v	typeref:typename:int
+n	input.c	/^struct n {$/;"	s	file:
+n	input.c	/^	int n;$/;"	m	struct:n	typeref:typename:int	file:
+n	input.c	/^typedef int n;$/;"	t	typeref:typename:int	file:
+main	input.c	/^int main(int n)$/;"	f	typeref:typename:int
+n	input.c	/^int main(int n)$/;"	z	function:main	typeref:typename:int	file:
+n	input.c	/^	for (int n = 0; n < 1; n++)$/;"	l	function:main	typeref:typename:int	file:
+n	input.c	/^		int n;$/;"	l	function:main	typeref:typename:int	file:
+m	input.c	/^int m;$/;"	v	typeref:typename:int
+M	input.c	/^int M (void) { return 0; }$/;"	f	typeref:typename:int

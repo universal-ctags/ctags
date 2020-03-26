@@ -1,0 +1,55 @@
+version: 2
+jobs:
+  fedora31:
+    working_directory: ~/libreadtags
+    docker:
+      - image: docker.io/fedora:31
+    steps:
+      - run:
+          name: Install Git
+          command: |
+            yum -y install git
+      - checkout
+      - run:
+          name: Install build tools
+          command: |
+            yum -y install gcc automake autoconf libtool make
+      - run:
+          name: Build
+          command: |
+            bash ./autogen.sh
+            ./configure
+            make
+      - run:
+          name: Test
+          command: |
+            make check
+  fedora31_distcheck:
+    working_directory: ~/libreadtags
+    docker:
+      - image: docker.io/fedora:31
+    steps:
+      - run:
+          name: Install Git
+          command: |
+            yum -y install git
+      - checkout
+      - run:
+          name: Install build tools
+          command: |
+            yum -y install gcc automake autoconf libtool make
+      - run:
+          name: Build
+          command: |
+            bash ./autogen.sh
+            ./configure
+      - run:
+          name: Test
+          command: |
+            make distcheck
+workflows:
+  version: 2
+  build_and_test:
+    jobs:
+      - fedora31
+      - fedora31_distcheck
