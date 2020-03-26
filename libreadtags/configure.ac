@@ -12,5 +12,6 @@ AC_SUBST(LT_VERSION, [0:0:0])
 AC_PROG_CC_C99
 
 AC_CONFIG_FILES([Makefile
-		libreadtags.pc])
+		libreadtags.pc
+		tests/Makefile])
 AC_OUTPUT

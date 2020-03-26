@@ -150,9 +150,11 @@ typedef struct {
 *  information about the tag file. If successful, the function will return a
 *  handle which must be supplied to other calls to read information from the
 *  tag file, and info.status.opened will be set to true. If unsuccessful,
+*  the function will return NULL, and
 *  info.status.opened will be set to false and info.status.error_number will
 *  be set to the errno value representing the system error preventing the tag
-*  file from being successfully opened.
+*  file from being successfully opened. The error_number will be zero if the
+*  memory allocation for the handle is failed.
 */
 extern tagFile *tagsOpen (const char *const filePath, tagFileInfo *const info);
 
@@ -234,6 +236,19 @@ extern tagResult tagsFind (tagFile *const file, tagEntry *const entry, const cha
 *  or TagFailure if not.
 */
 extern tagResult tagsFindNext (tagFile *const file, tagEntry *const entry);
+
+/*
+*  Does the same as tagsFirst(), but is specialized to pseudo tags.
+*  If tagFileInfo doesn't contain pseudo tags you are interested, read
+*  them sequentially with this function and tagsNextPseudoTag().
+*/
+extern tagResult tagsFirstPseudoTag (tagFile *const file, tagEntry *const entry);
+
+/*
+*  Does the same as tagsNext(), but is specialized to pseudo tags. Use with
+*  tagsFirstPseudoTag().
+*/
+extern tagResult tagsNextPseudoTag (tagFile *const file, tagEntry *const entry);
 
 /*
 *  Call tagsTerminate() at completion of reading the tag file, which will

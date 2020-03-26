@@ -108,7 +108,7 @@ static void findTag (const char *const name, const int options)
 	}
 }
 
-static void listTags (void)
+static void listTags (int pseudoTags)
 {
 	tagFileInfo info;
 	tagEntry entry;
@@ -118,6 +118,12 @@ static void listTags (void)
 		fprintf (stderr, "%s: cannot open tag file: %s: %s\n",
 				ProgramName, strerror (info.status.error_number), TagFileName);
 		exit (1);
+	}
+	else if (pseudoTags)
+	{
+		if (tagsFirstPseudoTag (file, &entry) == TagSuccess)
+			walkTags (file, &entry, tagsNextPseudoTag, printTag);
+		tagsClose (file);
 	}
 	else
 	{
@@ -138,6 +144,7 @@ static const char *const Usage =
 	"[-s[0|1]] [-t file] [-] [name(s)]\n\n"
 	"Options:\n"
 	"    -d           Turn on debugging output.\n"
+	"    -D           List all pseudo tags.\n"
 	"    -e           Include extension fields in output.\n"
 	"    -h           Print this help message.\n"
 	"    -i           Perform case-insensitive matching.\n"
@@ -216,11 +223,12 @@ extern int main (int argc, char **argv)
 				switch (arg [j])
 				{
 					case 'd': debugMode++; break;
+					case 'D': listTags (1); actionSupplied = 1; break;
 					case 'h': printUsage (stdout, 0); break;
 					case 'e': extensionFields = 1;         break;
 					case 'i': options |= TAG_IGNORECASE;   break;
 					case 'p': options |= TAG_PARTIALMATCH; break;
-					case 'l': listTags (); actionSupplied = 1; break;
+					case 'l': listTags (0); actionSupplied = 1; break;
 					case 'n': allowPrintLineNumber = 1; break;
 					case 't':
 						if (arg [j+1] != '\0')
