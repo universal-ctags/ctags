@@ -88,6 +88,7 @@ struct sTagFile {
 */
 static const char *const EmptyString = "";
 static const char *const PseudoTagPrefix = "!_";
+static const size_t PseudoTagPrefixLength = 2;
 
 /*
 *   FUNCTION DEFINITIONS
@@ -532,6 +533,11 @@ static char *duplicate (const char *str)
 	return result;
 }
 
+static int isPseudoTagLine (const char *buffer)
+{
+	return (strncmp (buffer, PseudoTagPrefix, PseudoTagPrefixLength) == 0);
+}
+
 static void readPseudoTags (tagFile *const file, tagFileInfo *const info)
 {
 	fpos_t startOfLine;
@@ -550,7 +556,7 @@ static void readPseudoTags (tagFile *const file, tagFileInfo *const info)
 		fgetpos (file->fp, &startOfLine);
 		if (! readTagLine (file))
 			break;
-		if (strncmp (file->line.buffer, PseudoTagPrefix, prefixLength) != 0)
+		if (!isPseudoTagLine (file->line.buffer))
 			break;
 		else
 		{
@@ -585,17 +591,21 @@ static void readPseudoTags (tagFile *const file, tagFileInfo *const info)
 	fsetpos (file->fp, &startOfLine);
 }
 
+static int doesFilePointPseudoTag (tagFile *const file, void *unused)
+{
+	return isPseudoTagLine (file->name.buffer);
+}
+
 static void gotoFirstLogicalTag (tagFile *const file)
 {
 	fpos_t startOfLine;
-	const size_t prefixLength = strlen (PseudoTagPrefix);
 	rewind (file->fp);
 	while (1)
 	{
 		fgetpos (file->fp, &startOfLine);
 		if (! readTagLine (file))
 			break;
-		if (strncmp (file->line.buffer, PseudoTagPrefix, prefixLength) != 0)
+		if (!isPseudoTagLine (file->line.buffer))
 			break;
 	}
 	fsetpos (file->fp, &startOfLine);
@@ -606,29 +616,56 @@ static tagFile *initialize (const char *const filePath, tagFileInfo *const info)
 	tagFile *result = (tagFile*) calloc ((size_t) 1, sizeof (tagFile));
 	if (result != NULL)
 	{
-		growString (&result->line);
-		growString (&result->name);
+		if (growString (&result->line) == 0)
+			goto mem_error;
+		if (growString (&result->name) == 0)
+			goto mem_error;
 		result->fields.max = 20;
 		result->fields.list = (tagExtensionField*) calloc (
 			result->fields.max, sizeof (tagExtensionField));
+		if (result->fields.list == NULL)
+			goto mem_error;
 		result->fp = fopen (filePath, "rb");
 		if (result->fp == NULL)
 		{
-			free (result);
-			result = NULL;
-			info->status.error_number = errno;
+			if (info)
+				info->status.error_number = errno;
+			goto file_error;
 		}
 		else
 		{
-			fseek (result->fp, 0, SEEK_END);
+			if (fseek (result->fp, 0, SEEK_END) == -1)
+			{
+				if (info)
+					info->status.error_number = errno;
+				goto file_error;
+			}
 			result->size = ftell (result->fp);
+			if (result->size == -1)
+			{
+				if (info)
+					info->status.error_number = errno;
+				goto file_error;
+			}
 			rewind (result->fp);
 			readPseudoTags (result, info);
-			info->status.opened = 1;
+			if (info)
+				info->status.opened = 1;
 			result->initialized = 1;
 		}
 	}
 	return result;
+ mem_error:
+	if (info)
+		info->status.error_number = 0;
+ file_error:
+	free (result->line.buffer);
+	free (result->name.buffer);
+	free (result->fields.list);
+	free (result);
+	if (info)
+		info->status.opened = 0;
+	return NULL;
 }
 
 static void terminate (tagFile *const file)
@@ -796,18 +833,30 @@ static tagResult findBinary (tagFile *const file)
 	return result;
 }
 
-static tagResult findSequential (tagFile *const file)
+static tagResult findSequentialFull (tagFile *const file,
+									 int (* isAcceptable) (tagFile *const, void *),
+									 void *data)
 {
 	tagResult result = TagFailure;
 	if (file->initialized)
 	{
 		while (result == TagFailure  &&  readTagLine (file))
 		{
-			if (nameComparison (file) == 0)
+			if (isAcceptable (file, data))
 				result = TagSuccess;
 		}
 	}
 	return result;
+}
+
+static int nameAcceptable (tagFile *const file, void *unused)
+{
+	return (nameComparison (file) == 0);
+}
+
+static tagResult findSequential (tagFile *const file)
+{
+	return findSequentialFull (file, nameAcceptable, NULL);
 }
 
 static tagResult find (tagFile *const file, tagEntry *const entry,
@@ -850,24 +899,50 @@ static tagResult find (tagFile *const file, tagEntry *const entry,
 	return result;
 }
 
-static tagResult findNext (tagFile *const file, tagEntry *const entry)
+static tagResult findNextFull (tagFile *const file, tagEntry *const entry,
+							   int sorted,
+							   int (* isAcceptable) (tagFile *const, void *),
+							   void *data)
 {
 	tagResult result;
-	if ((file->sortMethod == TAG_SORTED      && !file->search.ignorecase) ||
-		(file->sortMethod == TAG_FOLDSORTED  &&  file->search.ignorecase))
+	if (sorted)
 	{
 		result = tagsNext (file, entry);
-		if (result == TagSuccess  && nameComparison (file) != 0)
+		if (result == TagSuccess  && !isAcceptable (file, data))
 			result = TagFailure;
 	}
 	else
 	{
-		result = findSequential (file);
+		result = findSequentialFull (file, isAcceptable, data);
 		if (result == TagSuccess  &&  entry != NULL)
 			parseTagLine (file, entry);
 	}
 	return result;
 }
+
+static tagResult findNext (tagFile *const file, tagEntry *const entry)
+{
+	return findNextFull (file, entry,
+						 (file->sortMethod == TAG_SORTED      && !file->search.ignorecase) ||
+						 (file->sortMethod == TAG_FOLDSORTED  &&  file->search.ignorecase),
+						 nameAcceptable, NULL);
+}
+
+static tagResult findPseudoTag (tagFile *const file, int rewindBeforeFinding, tagEntry *const entry)
+{
+	tagResult result = TagFailure;
+	if (file != NULL  &&  file->initialized)
+	{
+		if (rewindBeforeFinding)
+			rewind (file->fp);
+		result = findNextFull (file, entry,
+							   (file->sortMethod == TAG_SORTED || file->sortMethod == TAG_FOLDSORTED),
+							   doesFilePointPseudoTag,
+							   NULL);
+	}
+	return result;
+}
+
 
 /*
 *  EXTERNAL INTERFACE
@@ -931,6 +1006,16 @@ extern tagResult tagsFindNext (tagFile *const file, tagEntry *const entry)
 	if (file != NULL  &&  file->initialized)
 		result = findNext (file, entry);
 	return result;
+}
+
+extern tagResult tagsFirstPseudoTag (tagFile *const file, tagEntry *const entry)
+{
+	return findPseudoTag (file, 1, entry);
+}
+
+extern tagResult tagsNextPseudoTag (tagFile *const file, tagEntry *const entry)
+{
+	return findPseudoTag (file, 0, entry);
 }
 
 extern tagResult tagsClose (tagFile *const file)
