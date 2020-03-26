@@ -136,35 +136,36 @@ static void listTags (int pseudoTags)
 static const char *const Usage =
 	"Find tag file entries matching specified names.\n\n"
 	"Usage: \n"
-	"    %s -h\n"
+	"    %s -h | --help\n"
 	"        Print this help message.\n"
 	"    %s [OPTIONS] ACTION\n"
 	"        Do the specified action.\n"
 	"Actions:\n"
-	"    -l\n"
+	"    -l | --list\n"
 	"        List regular tags.\n"
 	"    [-] NAME...\n"
 	"        List regular tags matching NAME(s).\n"
 	"        \"-\" indicates arguments after this as NAME(s) even if they start with -.\n"
-	"    -D\n"
+	"    -D | --list-pseudo-tags\n"
 	"        List pseudo tags.\n"
 	"Options:\n"
-	"    -d\n"
+	"    -d | --debug\n"
 	"        Turn on debugging output.\n"
-	"    -e\n"
+	"    -e | --extension-fields\n"
 	"        Include extension fields in output.\n"
-	"    -i\n"
+	"    -i | --icase-match\n"
 	"        Perform case-insensitive matching in the NAME action.\n"
-	"    -n\n"
+	"    -n | --line-number\n"
 	"        Also include the line number field when -e option is given.\n"
-	"    -p\n"
+	"    -p | --prefix-match\n"
 	"        Perform prefix matching in the NAME action.\n"
-	"    -t TAGFILE\n"
+	"    -t TAGFILE | --tag-file TAGFILE\n"
 	"        Use specified tag file (default: \"tags\").\n"
-	"    -s[0|1|2]\n"
+	"    -s[0|1|2] | --override-sort-detection METHOD\n"
 	"        Override sort detection of tag file.\n"
+	"        METHOD: unsorted|sorted|foldcase\n"
 #ifdef READTAGS_DSL
-	"    -Q EXP\n"
+	"    -Q EXP | --filter EXP\n"
 	"        Filter the tags listed by ACTION with EXP before printing.\n"
 #endif
 	;
@@ -225,6 +226,87 @@ extern int main (int argc, char **argv)
 		}
 		else if (arg [0] == '-' && arg [1] == '\0')
 			ignore_prefix = 1;
+		else if (arg [0] == '-' && arg [1] == '-')
+		{
+			const char *optname = arg + 2;
+			if (strcmp (optname, "debug") == 0)
+				debugMode++;
+			else if (strcmp (optname, "list-pseudo-tags") == 0)
+			{
+				listTags (1);
+				actionSupplied = 1;
+			}
+			else if (strcmp (optname, "help") == 0)
+				printUsage (stdout, 0);
+			else if (strcmp (optname, "extension-fields") == 0)
+				extensionFields = 1;
+			else if (strcmp (optname, "icase-match") == 0)
+				options |= TAG_IGNORECASE;
+			else if (strcmp (optname, "prefix-match") == 0)
+				options |= TAG_PARTIALMATCH;
+			else if (strcmp (optname, "list") == 0)
+			{
+				listTags (0);
+				actionSupplied = 1;
+			}
+			else if (strcmp (optname, "line-number") == 0)
+				allowPrintLineNumber = 1;
+			else if (strcmp (optname, "tag-file") == 0)
+			{
+				if (i + 1 < argc)
+					TagFileName = argv [++i];
+				else
+					printUsage (stderr, 1);
+			}
+			else if (strcmp (optname, "override-sort-detection") == 0)
+			{
+				if (i + 1 < argc)
+				{
+					const char *sort_spec = argv [++i];
+					if (strcmp (sort_spec, "0") == 0
+						|| strcmp (sort_spec, "unsorted") == 0)
+						SortMethod = 0;
+					else if (strcmp (sort_spec, "1") == 0
+							 || strcmp (sort_spec, "sorted") == 0)
+						SortMethod = 1;
+					else if (strcmp (sort_spec, "2") == 0
+							 || strcmp (sort_spec, "foldcase") == 0)
+						SortMethod = 2;
+					else
+					{
+						fprintf (stderr, "%s: unknown sort method for --%s option",
+								 ProgramName, optname);
+						exit (1);
+					}
+				}
+				else
+				{
+					fprintf (stderr, "%s: missing sort method for --%s option",
+							 ProgramName, optname);
+					exit (1);
+				}
+			}
+#ifdef READTAGS_DSL
+			else if (strcmp (optname, "filter") == 0)
+			{
+				if (i + 1 < argc)
+					Qualifier = convertToQualifier (argv[++i]);
+				else
+				{
+					fprintf (stderr, "%s: missing filter expression for --%s option",
+							 ProgramName, optname);
+					exit (1);
+				}
+			}
+#endif
+			else
+			{
+				fprintf (stderr, "%s: unknown long options: --%s",
+						 ProgramName, optname);
+				exit (1);
+				break;
+			}
+		}
 		else
 		{
 			size_t j;
