@@ -137,27 +137,37 @@ static const char *const Usage =
 	"Find tag file entries matching specified names.\n\n"
 	"Usage: \n"
 	"    %s -h\n"
-	"    %s [-ilp] [-n] "
-#ifdef READTAGS_DSL
-	"[-Q EXP] "
-#endif
-	"[-s[0|1]] [-t file] [-] [name(s)]\n\n"
+	"        Print this help message.\n"
+	"    %s [OPTIONS] ACTION\n"
+	"        Do the specified action.\n"
+	"Actions:\n"
+	"    -l\n"
+	"        List regular tags.\n"
+	"    [-] NAME...\n"
+	"        List regular tags matching NAME(s).\n"
+	"        \"-\" indicates arguments after this as NAME(s) even if they start with -.\n"
+	"    -D\n"
+	"        List pseudo tags.\n"
 	"Options:\n"
-	"    -d           Turn on debugging output.\n"
-	"    -D           List all pseudo tags.\n"
-	"    -e           Include extension fields in output.\n"
-	"    -h           Print this help message.\n"
-	"    -i           Perform case-insensitive matching.\n"
-	"    -l           List all tags.\n"
-	"    -n           Allow print line numbers if -e option is given.\n"
-	"    -p           Perform partial matching.\n"
+	"    -d\n"
+	"        Turn on debugging output.\n"
+	"    -e\n"
+	"        Include extension fields in output.\n"
+	"    -i\n"
+	"        Perform case-insensitive matching in the NAME action.\n"
+	"    -n\n"
+	"        Also include the line number field when -e option is given.\n"
+	"    -p\n"
+	"        Perform prefix matching in the NAME action.\n"
+	"    -t TAGFILE\n"
+	"        Use specified tag file (default: \"tags\").\n"
+	"    -s[0|1|2]\n"
+	"        Override sort detection of tag file.\n"
 #ifdef READTAGS_DSL
-	"    -Q EXP       Filter the result with EXP.\n"
+	"    -Q EXP\n"
+	"        Filter the tags listed by ACTION with EXP before printing.\n"
 #endif
-	"    -s[0|1|2]    Override sort detection of tag file.\n"
-	"    -t file      Use specified tag file (default: \"tags\").\n"
-	"    -            Treat arguments after this as NAME even if they start with -.\n"
-	"Note that options are acted upon as encountered, so order is significant.\n";
+	;
 
 static void printUsage(FILE* stream, int exitCode)
 {
@@ -270,7 +280,7 @@ extern int main (int argc, char **argv)
 	if (! actionSupplied)
 	{
 		fprintf (stderr,
-			"%s: no action specified: specify tag name(s) or -l option\n",
+			"%s: no action specified: specify one of NAME, -l or -D",
 			ProgramName);
 		exit (1);
 	}
