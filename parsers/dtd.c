@@ -123,12 +123,6 @@ enum eTokenType {
 };
 
 static void readToken (tokenInfo *const token, void *data CTAGS_ATTR_UNUSED);
-static void clearToken (tokenInfo *token);
-static void copyToken (tokenInfo *dest, tokenInfo *src, void *data CTAGS_ATTR_UNUSED);
-
-typedef struct sTokenExtra {
-	int scopeIndex;
-} tokenExtra;
 
 static struct tokenInfoClass dtdTokenInfoClass = {
 	.nPreAlloc = 16,
@@ -136,10 +130,10 @@ static struct tokenInfoClass dtdTokenInfoClass = {
 	.keywordNone      = KEYWORD_NONE,
 	.typeForKeyword   = TOKEN_KEYWORD,
 	.typeForEOF       = TOKEN_EOF,
-	.extraSpace       = sizeof (tokenExtra),
+	.extraSpace       = 0,
+	.clear			  = NULL,
 	.read             = readToken,
-	.clear            = clearToken,
-	.copy             = copyToken,
+	.copy             = NULL,
 };
 
 static langType Lang_dtd;
@@ -150,17 +144,6 @@ static langType Lang_dtd;
 static tokenInfo *newDtdToken (void)
 {
 	return newToken (&dtdTokenInfoClass);
-}
-
-static void clearToken (tokenInfo *token)
-{
-	TOKENX (token, tokenExtra)->scopeIndex = CORK_NIL;
-}
-
-static void copyToken (tokenInfo *dest, tokenInfo *src, void *data CTAGS_ATTR_UNUSED)
-{
-	TOKENX (dest, tokenExtra)->scopeIndex =
-		TOKENX (src, tokenExtra)->scopeIndex;
 }
 
 static void readToken (tokenInfo *const token, void *data CTAGS_ATTR_UNUSED)
@@ -290,7 +273,7 @@ static int makeDtdTagMaybe (tagEntryInfo *const e, tokenInfo *const token,
 					 role);
 	e->lineNumber = token->lineNumber;
 	e->filePosition = token->filePosition;
-	e->extensionFields.scopeIndex = TOKENX (token, tokenExtra)->scopeIndex;
+	e->extensionFields.scopeIndex = token->scopeIndex;
 
 	return makeTagEntry (e);
 }
@@ -446,7 +429,6 @@ static void parseAttDefs (tokenInfo *const token)
 		}
 		else if (tokenIsType(token, CLOSE))
 		{
-			TOKENX (token, tokenExtra)->scopeIndex = CORK_NIL;
 			tokenUnread (token);
 			break;
 		}
@@ -472,9 +454,9 @@ static void parseAttlist (tokenInfo *const token)
 										 DTD_PARAMETER_ENTITY_ELEMENT_NAME);
 				tokenDelete (identifier);
 
-				TOKENX (token, tokenExtra)->scopeIndex = index;
+				token->scopeIndex = index;
 				parseAttDefs (token);
-				TOKENX (token, tokenExtra)->scopeIndex = CORK_NIL;
+				token->scopeIndex = CORK_NIL;
 			}
 		}
 	}
@@ -486,9 +468,9 @@ static void parseAttlist (tokenInfo *const token)
 								 K_ELEMENT, DTD_ELEMENT_ATT_OWNER);
 		tokenDelete (element);
 
-		TOKENX (token, tokenExtra)->scopeIndex = index;
+		token->scopeIndex = index;
 		parseAttDefs (token);
-		TOKENX (token, tokenExtra)->scopeIndex = CORK_NIL;
+		token->scopeIndex = CORK_NIL;
 	}
 
 	tokenSkipToType (token, TOKEN_CLOSE);

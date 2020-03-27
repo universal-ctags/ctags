@@ -28,6 +28,7 @@ typedef struct sTokenInfo {
 	struct tokenInfoClass *klass;
 	unsigned long lineNumber;
 	MIOPos filePosition;
+	int scopeIndex;
 } tokenInfo;
 
 struct tokenTypePair {
@@ -66,7 +67,17 @@ void  tokenDelete    (tokenInfo *token);
 
 void tokenReadFull   (tokenInfo *token, void *data);
 void tokenRead       (tokenInfo *token);
-void tokenUnreadFull (tokenInfo *token, void *data); /* DATA passed to copy method internally. */
+
+/* tokenUnread* ()
+
+   Make a copy for TOKEN and put the copy to the tokenInfoClass internal queue.
+   For copying tokenCopy* function is used. DATA passed to copy method internally.
+
+   All fields are copyed. An exception is about `scopeIndex'.
+   The field is cleared to CORK_NIL if keepScopeIndex is false.
+
+   tokenUnread implies keepScopeIndex is false. */
+void tokenUnreadFull (tokenInfo *token, bool keepScopeIndex, void *data);
 void tokenUnread     (tokenInfo *token);
 
 
