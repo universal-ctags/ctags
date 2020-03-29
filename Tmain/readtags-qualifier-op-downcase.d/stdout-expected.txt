@@ -1,0 +1,7 @@
+# (downcase $name)
+C	input.cpp	/^class C: A, B {$/
+# (member "a" (downcase $inherits))
+C	input.cpp	/^class C: A, B {$/
+# (member "b" (downcase $inherits))
+C	input.cpp	/^class C: A, B {$/
+# (member "d" (downcase $inherits))

@@ -18,6 +18,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <limits.h>
+#include <ctype.h>
 
 /*
  * Types
@@ -58,6 +59,7 @@ static EsObject* builtin_suffix (EsObject *args, tagEntry *entry);
 static EsObject* builtin_substr (EsObject *args, tagEntry *entry);
 static EsObject* builtin_member (EsObject *args, tagEntry *entry);
 static EsObject* builtin_entry_ref (EsObject *args, tagEntry *entry);
+static EsObject* builtin_downcase (EsObject *args, tagEntry *entry);
 static EsObject* bulitin_debug_print (EsObject *args, tagEntry *entry);
 
 
@@ -102,6 +104,8 @@ struct sCode {
 	  .helpstr = "(substr? TARGET<string> SUBSTR<string>) -> <boolean>" },
 	{ "member",  builtin_member, NULL, CHECK_ARITY, 2,
 	  .helpstr = "(member ELEMENT LIST) -> #f|<list>" },
+	{ "downcase", builtin_downcase, NULL, CHECK_ARITY, 1,
+	  .helpstr = "(downcase elt<string>|<list>) -> <string>|<list>" },
 	{ "$",       builtin_entry_ref, NULL, CHECK_ARITY, 1,
 	  .helpstr = "($ NAME) -> #f|<string>" },
 	{ "print",   bulitin_debug_print, NULL, CHECK_ARITY, 1,
@@ -520,6 +524,60 @@ static EsObject* builtin_entry_ref (EsObject *args, tagEntry *entry)
 		       es_symbol_intern ("$"));
 	else
 		return entry_xget_string (entry, es_string_get (key));
+}
+
+static EsObject* caseop (EsObject *o, int (*op)(int))
+{
+	if (es_string_p (o))
+	{
+		const char *s = es_string_get (o);
+		char *r = strdup (s);
+
+		for (char *tmp = r; *tmp != '\0'; tmp++)
+			*tmp = op (*tmp);
+
+		EsObject *q = es_object_autounref (es_string_new (r));
+		free (r);
+		return q;
+	}
+	else
+		return o;
+}
+
+static EsObject* downcase (EsObject *o)
+{
+	return caseop (o, tolower);
+}
+
+static EsObject* builtin_caseop0 (EsObject *o,
+								  EsObject *(* op) (EsObject*))
+{
+	if (es_null (o)
+		|| es_error_p (o))
+		return o;
+	else if (es_list_p (o))
+	{
+		EsObject *oa = es_car (o);
+		EsObject *od = es_cdr (o);
+		EsObject *da, *dd;
+
+		da = op (oa);
+		if (es_error_p (da))
+			return da;
+		dd = builtin_caseop0 (od, op);
+		if (es_error_p (dd))
+			return dd;
+
+		return es_object_autounref (es_cons (da, dd));
+	}
+	else
+		return op (o);
+}
+
+static EsObject* builtin_downcase (EsObject *args, tagEntry *entry)
+{
+	EsObject *o = es_car(args);
+	return builtin_caseop0 (o, downcase);
 }
 
 static MIO  *miodebug;
