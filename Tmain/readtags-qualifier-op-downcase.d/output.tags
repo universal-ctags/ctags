@@ -1,0 +1,15 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_OUTPUT_FILESEP	slash	/slash or backslash/
+!_TAG_OUTPUT_MODE	u-ctags	/u-ctags or e-ctags/
+!_TAG_PATTERN_LENGTH_LIMIT	96	/0 for no limit/
+!_TAG_PROGRAM_AUTHOR	Universal Ctags Team	//
+!_TAG_PROGRAM_NAME	Universal Ctags	/Derived from Exuberant Ctags/
+!_TAG_PROGRAM_URL	https://ctags.io/	/official site/
+!_TAG_PROGRAM_VERSION	0.0.0	/e87283aa/
+A	input.cpp	/^class A {$/;"	c	file:
+B	input.cpp	/^class B {$/;"	c	file:
+C	input.cpp	/^class C: A, B {$/;"	c	file:	inherits:A,B
+f	input.cpp	/^  int f (void) {$/;"	f	class:A	typeref:typename:int	file:
+g	input.cpp	/^  int g (void) {$/;"	f	class:B	typeref:typename:int	file:
+h	input.cpp	/^  int h (void) {$/;"	f	class:C	typeref:typename:int	file:

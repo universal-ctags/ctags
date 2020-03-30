@@ -9,6 +9,10 @@ V=
 
 . ../utils.sh
 
+if ! [ -x "${READTAGS}" ]; then
+    skip "no readtags"
+fi
+
 echo '# SORT=NO'
 ${V} ${READTAGS} -t ./ptag-sort-no.tags -D
 
