@@ -1,0 +1,6 @@
+X	input.rb	/^module X$/;"	m
+hi	input.rb	/^  def hi$/;"	f	module:X
+Y	input.rb	/^module Y$/;"	m
+hoi	input.rb	/^  def hoi$/;"	f	module:Y
+A	input.rb	/^class A$/;"	c	mixin:include:X,include:Y
+hi	input.rb	/^  def hi$/;"	f	class:A
