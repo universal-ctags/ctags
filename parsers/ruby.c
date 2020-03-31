@@ -623,6 +623,10 @@ static void findRubyTags (void)
 				}
 			}
 		}
+		else if (canMatchKeywordWithAssign (&cp, "include"))
+		{
+			readAndStoreMixinSpec (&cp, "include");
+		}
 		else if (canMatchKeywordWithAssign (&cp, "def"))
 		{
 			rubyKind kind = K_METHOD;
