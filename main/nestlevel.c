@@ -18,6 +18,8 @@
 #include "routines.h"
 #include "nestlevel.h"
 
+#include <string.h>
+
 /* TODO: Alignment */
 #define NL_SIZE(nls) (sizeof(NestingLevel) + (nls)->userDataSize)
 #define NL_NTH(nls,n) (NestingLevel *)(((char *)((nls)->levels)) + ((n) * NL_SIZE (nls)))
@@ -61,6 +63,9 @@ extern NestingLevel * nestingLevelsPush(NestingLevels *nls, int corkIndex)
 	nls->n++;
 
 	nl->corkIndex = corkIndex;
+	if (nls->userDataSize > 0)
+		memset (nl->userData, 0, nls->userDataSize);
+
 	return nl;
 }
 
