@@ -561,7 +561,7 @@ static const char* renderFieldCommon (fieldType type,
 
 	if (index >= 0)
 	{
-		const tagField *f = getParserField (tag, index);
+		const tagField *f = getParserFieldForIndex (tag, index);
 
 		value = f->value;
 	}
@@ -612,7 +612,7 @@ extern bool  doesFieldHaveTabOrNewlineChar (fieldType type, const tagEntryInfo *
 
 	if (index >= 0)
 	{
-		const tagField *f = getParserField (tag, index);
+		const tagField *f = getParserFieldForIndex (tag, index);
 
 		value = f->value;
 	}

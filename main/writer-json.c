@@ -130,7 +130,7 @@ static void addParserFields (json_t *response, const tagEntryInfo *const tag)
 
 	for (i = 0; i < tag->usedParserFields; i++)
 	{
-		const tagField *f = getParserField(tag, i);
+		const tagField *f = getParserFieldForIndex(tag, i);
 		fieldType ftype = f->ftype;
 		if (! isFieldEnabled (ftype))
 			continue;

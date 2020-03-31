@@ -69,7 +69,7 @@ static int printTagField (fmtSpec* fspec, MIO* fp, const tagEntryInfo * tag)
 
 		for (findex = 0; findex < tag->usedParserFields; findex++)
 		{
-			f = getParserField(tag, findex);
+			f = getParserFieldForIndex(tag, findex);
 			if (isParserFieldCompatibleWithFtype (f, ftype))
 				break;
 		}
