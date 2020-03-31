@@ -47,6 +47,16 @@ static kindDefinition RubyKinds [] = {
 #endif
 };
 
+typedef enum {
+	F_MIXIN,
+} rubyField;
+
+static fieldDefinition RubyFields[] = {
+	{ .name = "mixin",
+	  .description = "how the class or module is mixed in (mixin:HOW:MODULE)",
+	  .enabled = true },
+};
+
 static NestingLevels* nesting = NULL;
 
 #define SCOPE_SEPARATOR '.'
@@ -645,6 +655,8 @@ extern parserDefinition* RubyParser (void)
 	def->kindCount  = ARRAY_SIZE (RubyKinds);
 	def->extensions = extensions;
 	def->parser     = findRubyTags;
+	def->fieldTable = RubyFields;
+	def->fieldCount = ARRAY_SIZE (RubyFields);
 	def->useCork    = true;
 	return def;
 }
