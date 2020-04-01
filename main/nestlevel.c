@@ -18,6 +18,8 @@
 #include "routines.h"
 #include "nestlevel.h"
 
+#include <string.h>
+
 /* TODO: Alignment */
 #define NL_SIZE(nls) (sizeof(NestingLevel) + (nls)->userDataSize)
 #define NL_NTH(nls,n) (NestingLevel *)(((char *)((nls)->levels)) + ((n) * NL_SIZE (nls)))
@@ -26,11 +28,18 @@
 *   FUNCTION DEFINITIONS
 */
 
-extern NestingLevels *nestingLevelsNew(size_t userDataSize)
+extern NestingLevels *nestingLevelsNewFull(size_t userDataSize,
+										   void (* deleteUserData)(NestingLevel *))
 {
 	NestingLevels *nls = xCalloc (1, NestingLevels);
 	nls->userDataSize = userDataSize;
+	nls->deleteUserData = deleteUserData;
 	return nls;
+}
+
+extern NestingLevels *nestingLevelsNew(size_t userDataSize)
+{
+	return nestingLevelsNewFull (userDataSize, NULL);
 }
 
 extern void nestingLevelsFree(NestingLevels *nls)
@@ -38,9 +47,11 @@ extern void nestingLevelsFree(NestingLevels *nls)
 	int i;
 	NestingLevel *nl;
 
-	for (i = 0; i < nls->allocated; i++)
+	for (i = 0; i < nls->n; i++)
 	{
 		nl = NL_NTH(nls, i);
+		if (nls->deleteUserData)
+			nls->deleteUserData (nl);
 		nl->corkIndex = CORK_NIL;
 	}
 	if (nls->levels) eFree(nls->levels);
@@ -61,6 +72,9 @@ extern NestingLevel * nestingLevelsPush(NestingLevels *nls, int corkIndex)
 	nls->n++;
 
 	nl->corkIndex = corkIndex;
+	if (nls->userDataSize > 0)
+		memset (nl->userData, 0, nls->userDataSize);
+
 	return nl;
 }
 
@@ -80,6 +94,8 @@ extern void nestingLevelsPop(NestingLevels *nls)
 	NestingLevel *nl = nestingLevelsGetCurrent(nls);
 
 	Assert (nl != NULL);
+	if (nls->deleteUserData)
+		nls->deleteUserData (nl);
 	nl->corkIndex = CORK_NIL;
 	nls->n--;
 }

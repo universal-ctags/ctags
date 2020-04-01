@@ -23,6 +23,7 @@
 #include "nestlevel.h"
 #include "read.h"
 #include "routines.h"
+#include "strlist.h"
 #include "vstring.h"
 
 /*
@@ -45,6 +46,20 @@ static kindDefinition RubyKinds [] = {
 	{ true, 'd', "describe", "describes and contexts for Rspec" },
 	{ true, 'C', "constant", "constants" },
 #endif
+};
+
+typedef enum {
+	F_MIXIN,
+} rubyField;
+
+static fieldDefinition RubyFields[] = {
+	{ .name = "mixin",
+	  .description = "how the class or module is mixed in (mixin:HOW:MODULE)",
+	  .enabled = true },
+};
+
+struct blockData {
+	stringList *mixin;
 };
 
 static NestingLevels* nesting = NULL;
@@ -444,6 +459,43 @@ static int readAndEmitTag (const unsigned char** cp, rubyKind expected_kind)
 	return r;
 }
 
+static void readAndStoreMixinSpec (const unsigned char** cp, const char *how_mixin)
+{
+
+	NestingLevel *nl = nestingLevelsGetCurrent (nesting);
+	tagEntryInfo *e  = getEntryOfNestingLevel (nl);
+
+	if (e->kindIndex == K_SINGLETON)
+	{
+		nl = nestingLevelsGetNth (nesting, nesting->n - 2);
+		if (nl == NULL)
+			return;
+		e = getEntryOfNestingLevel (nl);
+	}
+
+	if (! (e->kindIndex == K_CLASS || e->kindIndex == K_MODULE))
+		return;
+
+	if (isspace (**cp))
+	{
+		vString *spec = vStringNewInit (how_mixin);
+		vStringPut(spec, ':');
+
+		size_t len = vStringLength (spec);
+		parseIdentifier (cp, spec, K_MODULE);
+		if (len == vStringLength (spec))
+		{
+			vStringDelete (spec);
+			return;
+		}
+
+		struct blockData *bdata =  nestingLevelGetUserData (nl);
+		if (bdata->mixin == NULL)
+			bdata->mixin = stringListNew ();
+		stringListAdd (bdata->mixin, spec);
+	}
+}
+
 static void enterUnnamedScope (void)
 {
 	int r = CORK_NIL;
@@ -460,12 +512,38 @@ static void enterUnnamedScope (void)
 	nestingLevelsPush (nesting, r);
 }
 
+static void attachMixinField (int corkIndex, stringList *mixinSpec)
+{
+	vString *mixinField = stringListItem (mixinSpec, 0);
+	for (unsigned int i = 1; i < stringListCount (mixinSpec); i++)
+	{
+		vStringPut (mixinField, ',');
+		vStringCat (mixinField, stringListItem (mixinSpec, 1));
+	}
+
+	attachParserFieldToCorkEntry (corkIndex, RubyFields [F_MIXIN].ftype,
+								  vStringValue (mixinField));
+}
+
+static void deleteBlockData (NestingLevel *nl)
+{
+	struct blockData *bdata = nestingLevelGetUserData (nl);
+
+	if (nl->corkIndex != CORK_NIL
+		&& bdata->mixin != NULL
+		&& stringListCount (bdata->mixin) > 0)
+		attachMixinField (nl->corkIndex, bdata->mixin);
+
+	if (bdata->mixin)
+		stringListDelete (bdata->mixin);
+}
+
 static void findRubyTags (void)
 {
 	const unsigned char *line;
 	bool inMultiLineComment = false;
 
-	nesting = nestingLevelsNew (0);
+	nesting = nestingLevelsNewFull (sizeof (struct blockData), deleteBlockData);
 
 	/* FIXME: this whole scheme is wrong, because Ruby isn't line-based.
 	* You could perfectly well write:
@@ -552,6 +630,10 @@ static void findRubyTags (void)
 						vStringDelete (parent);
 				}
 			}
+		}
+		else if (canMatchKeywordWithAssign (&cp, "include"))
+		{
+			readAndStoreMixinSpec (&cp, "include");
 		}
 		else if (canMatchKeywordWithAssign (&cp, "def"))
 		{
@@ -645,6 +727,8 @@ extern parserDefinition* RubyParser (void)
 	def->kindCount  = ARRAY_SIZE (RubyKinds);
 	def->extensions = extensions;
 	def->parser     = findRubyTags;
+	def->fieldTable = RubyFields;
+	def->fieldCount = ARRAY_SIZE (RubyFields);
 	def->useCork    = true;
 	return def;
 }

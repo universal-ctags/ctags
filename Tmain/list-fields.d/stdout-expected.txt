@@ -49,6 +49,7 @@ z	kind	no	NONE	s--	no	[tags output] prepend "kind:" to k/ (or K/) field output, 
 -	shell	yes	Passwd	s--	no	login shell
 -	decorators	no	Python	s--	no	decorators on functions and classes
 -	sectionMarker	no	ReStructuredText	s--	no	character used for declaring section
+-	mixin	yes	Ruby	s--	no	how the class or module is mixed in (mixin:HOW:MODULE)
 #
 Foo	input.java	/^abstract public class Foo extends Bar$/
 x	input.java	/^    public int x;$/

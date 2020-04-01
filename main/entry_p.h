@@ -63,7 +63,7 @@ void          uncorkTagFile(void);
 
 extern void makeFileTag (const char *const fileName);
 
-extern const tagField* getParserField (const tagEntryInfo * tag, int index);
+extern const tagField* getParserFieldForIndex (const tagEntryInfo * tag, int index);
 
 
 CTAGS_INLINE roleBitsType makeRoleBit(int roleIndex)

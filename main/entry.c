@@ -1004,7 +1004,7 @@ extern void attachParserFieldToCorkEntry (int index,
 	attachParserField (tag, true, ftype, value);
 }
 
-extern const tagField* getParserField (const tagEntryInfo * tag, int index)
+extern const tagField* getParserFieldForIndex (const tagEntryInfo * tag, int index)
 {
 	if (index < 0
 		|| tag->usedParserFields <= ((unsigned int)index) )
@@ -1025,7 +1025,7 @@ static void copyParserFields (const tagEntryInfo *const tag, tagEntryInfo* slot)
 
 	for (i = 0; i < tag->usedParserFields; i++)
 	{
-		const tagField *f = getParserField (tag, i);
+		const tagField *f = getParserFieldForIndex (tag, i);
 		Assert(f);
 
 		value = f->value;
