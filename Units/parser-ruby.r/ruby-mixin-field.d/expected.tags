@@ -4,3 +4,5 @@ Y	input.rb	/^module Y$/;"	m
 hoi	input.rb	/^  def hoi$/;"	f	module:Y
 A	input.rb	/^class A$/;"	c	mixin:include:X,include:Y
 hi	input.rb	/^  def hi$/;"	f	class:A
+B	input.rb	/^class B$/;"	c	mixin:include:X
+prep	input.rb	/^  def self.prep$/;"	S	class:B

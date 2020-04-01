@@ -19,3 +19,9 @@ class A
   end
   include Y
 end
+
+class B
+  def self.prep
+    include X
+  end
+end

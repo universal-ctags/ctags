@@ -465,6 +465,14 @@ static void readAndStoreMixinSpec (const unsigned char** cp, const char *how_mix
 	NestingLevel *nl = nestingLevelsGetCurrent (nesting);
 	tagEntryInfo *e  = getEntryOfNestingLevel (nl);
 
+	if (e->kindIndex == K_SINGLETON)
+	{
+		nl = nestingLevelsGetNth (nesting, nesting->n - 2);
+		if (nl == NULL)
+			return;
+		e = getEntryOfNestingLevel (nl);
+	}
+
 	if (! (e->kindIndex == K_CLASS || e->kindIndex == K_MODULE))
 		return;
 
