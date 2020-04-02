@@ -18,3 +18,5 @@ F	input.rb	/^class F$/;"	c	mixin:extend:X
 prep	input.rb	/^  def self.prep$/;"	S	class:F
 G	input.rb	/^class G$/;"	c	mixin:include:X,prepend:Y,extend:Z
 prep	input.rb	/^  def self.prep$/;"	S	class:G
+H	input.rb	/^class H$/;"	c	mixin:include:X,prepend:Y,extend:Z
+prep	input.rb	/^  def self.prep$/;"	S	class:H

@@ -68,3 +68,19 @@ class G
   end
   extend ( Z)
 end
+
+class H
+  if true
+    unless false
+      include(X)
+    end
+  end
+  def self.prep
+    if true
+      unless false
+        prepend (Y)
+      end
+    end
+  end
+  extend ( Z)
+end

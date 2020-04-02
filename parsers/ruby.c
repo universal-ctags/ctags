@@ -462,16 +462,35 @@ static int readAndEmitTag (const unsigned char** cp, rubyKind expected_kind)
 static void readAndStoreMixinSpec (const unsigned char** cp, const char *how_mixin)
 {
 
-	NestingLevel *nl = nestingLevelsGetCurrent (nesting);
-	tagEntryInfo *e  = getEntryOfNestingLevel (nl);
+	NestingLevel *nl = NULL;
+	tagEntryInfo *e = NULL;
+	int ownerLevel = 0;
+
+	for (ownerLevel = 0; ownerLevel < nesting->n; ownerLevel++)
+	{
+		nl = nestingLevelsGetNthParent (nesting, ownerLevel);
+		e = nl? getEntryOfNestingLevel (nl): NULL;
+
+		/* Ignore "if", "unless", "while" ... */
+		if ((nl && (nl->corkIndex == CORK_NIL)) || (e && e->placeholder))
+			continue;
+		break;
+	}
+
+	if (!e)
+		return;
 
 	if (e->kindIndex == K_SINGLETON)
 	{
-		nl = nestingLevelsGetNthParent (nesting, 1);
+		nl = nestingLevelsGetNthParent (nesting,
+										ownerLevel + 1);
 		if (nl == NULL)
 			return;
 		e = getEntryOfNestingLevel (nl);
 	}
+
+	if (!e)
+		return;
 
 	if (! (e->kindIndex == K_CLASS || e->kindIndex == K_MODULE))
 		return;
