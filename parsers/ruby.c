@@ -476,8 +476,13 @@ static void readAndStoreMixinSpec (const unsigned char** cp, const char *how_mix
 	if (! (e->kindIndex == K_CLASS || e->kindIndex == K_MODULE))
 		return;
 
-	if (isspace (**cp))
+	if (isspace (**cp) || (**cp == '('))
 	{
+		if (isspace (**cp))
+			skipWhitespace (cp);
+		if (**cp == '(')
+			++*cp;
+
 		vString *spec = vStringNewInit (how_mixin);
 		vStringPut(spec, ':');
 
