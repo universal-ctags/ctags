@@ -635,6 +635,14 @@ static void findRubyTags (void)
 		{
 			readAndStoreMixinSpec (&cp, "include");
 		}
+		else if (canMatchKeywordWithAssign (&cp, "prepend"))
+		{
+			readAndStoreMixinSpec (&cp, "prepend");
+		}
+		else if (canMatchKeywordWithAssign (&cp, "extend"))
+		{
+			readAndStoreMixinSpec (&cp, "extend");
+		}
 		else if (canMatchKeywordWithAssign (&cp, "def"))
 		{
 			rubyKind kind = K_METHOD;

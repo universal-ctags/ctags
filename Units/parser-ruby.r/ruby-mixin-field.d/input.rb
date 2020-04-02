@@ -25,3 +25,31 @@ class B
     include X
   end
 end
+
+class C
+  prepend X
+  def hi
+    p "Calling 'hi' in C."
+  end
+  prepend Y
+end
+
+class D
+  def self.prep
+    prepend X
+  end
+end
+
+class E
+  extend X
+  def hi
+    p "Calling 'hi' in E."
+  end
+  extend Y
+end
+
+class F
+  def self.prep
+    extend X
+  end
+end
