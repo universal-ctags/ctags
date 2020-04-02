@@ -12,6 +12,12 @@ module Y
   end
 end
 
+module Z
+  def zoo
+    p "Calling 'zoo' in Z."
+  end
+end
+
 class A
   include X
   def hi
@@ -46,6 +52,7 @@ class E
     p "Calling 'hi' in E."
   end
   extend Y
+  extend Z
 end
 
 class F
