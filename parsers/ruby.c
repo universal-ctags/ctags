@@ -556,6 +556,14 @@ static void deleteBlockData (NestingLevel *nl)
 		&& stringListCount (bdata->mixin) > 0)
 		attachMixinField (nl->corkIndex, bdata->mixin);
 
+	if (nl->corkIndex != CORK_NIL)
+	{
+		tagEntryInfo *e = getEntryInCorkQueue (nl->corkIndex);
+		if (e && !e->placeholder)
+			e->extensionFields.endLine = getInputLineNumber ();
+	}
+
+
 	if (bdata->mixin)
 		stringListDelete (bdata->mixin);
 }
