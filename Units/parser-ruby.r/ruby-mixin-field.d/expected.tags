@@ -6,3 +6,11 @@ A	input.rb	/^class A$/;"	c	mixin:include:X,include:Y
 hi	input.rb	/^  def hi$/;"	f	class:A
 B	input.rb	/^class B$/;"	c	mixin:include:X
 prep	input.rb	/^  def self.prep$/;"	S	class:B
+C	input.rb	/^class C$/;"	c	mixin:prepend:X,prepend:Y
+hi	input.rb	/^  def hi$/;"	f	class:C
+D	input.rb	/^class D$/;"	c	mixin:prepend:X
+prep	input.rb	/^  def self.prep$/;"	S	class:D
+E	input.rb	/^class E$/;"	c	mixin:extend:X,extend:Y
+hi	input.rb	/^  def hi$/;"	f	class:E
+F	input.rb	/^class F$/;"	c	mixin:extend:X
+prep	input.rb	/^  def self.prep$/;"	S	class:F
