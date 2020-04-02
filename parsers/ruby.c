@@ -518,7 +518,7 @@ static void attachMixinField (int corkIndex, stringList *mixinSpec)
 	for (unsigned int i = 1; i < stringListCount (mixinSpec); i++)
 	{
 		vStringPut (mixinField, ',');
-		vStringCat (mixinField, stringListItem (mixinSpec, 1));
+		vStringCat (mixinField, stringListItem (mixinSpec, i));
 	}
 
 	attachParserFieldToCorkEntry (corkIndex, RubyFields [F_MIXIN].ftype,
