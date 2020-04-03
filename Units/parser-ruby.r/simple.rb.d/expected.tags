@@ -1,11 +1,11 @@
-CONST1	input.rb	/^    CONST1 = 1$/;"	C	module:ModuleExample
-ClassExample	input.rb	/^    class ClassExample$/;"	c	module:ModuleExample
-Const2	input.rb	/^        Const2 = "a"$/;"	C	class:ModuleExample.ClassExample
-ModuleExample	input.rb	/^module ModuleExample$/;"	m
-`	input.rb	/^        def `(command)$/;"	f	class:ModuleExample.ClassExample
-class_method	input.rb	/^        def class_method$/;"	f	class:ModuleExample.ClassExample
-class_method_exclamation!	input.rb	/^        def class_method_exclamation!$/;"	f	class:ModuleExample.ClassExample
-class_method_question?	input.rb	/^        def class_method_question?$/;"	f	class:ModuleExample.ClassExample
-module_method	input.rb	/^    def module_method$/;"	f	module:ModuleExample
-singleton_class_method	input.rb	/^        def ClassExample.singleton_class_method$/;"	S	class:ModuleExample.ClassExample
-singleton_module_method	input.rb	/^    def ModuleExample.singleton_module_method$/;"	S	module:ModuleExample
+CONST1	input.rb	/^    CONST1 = 1$/;"	C	line:4	module:ModuleExample
+ClassExample	input.rb	/^    class ClassExample$/;"	c	line:5	module:ModuleExample	end:22
+Const2	input.rb	/^        Const2 = "a"$/;"	C	line:6	class:ModuleExample.ClassExample
+ModuleExample	input.rb	/^module ModuleExample$/;"	m	line:3	end:29
+`	input.rb	/^        def `(command)$/;"	f	line:19	class:ModuleExample.ClassExample	end:21
+class_method	input.rb	/^        def class_method$/;"	f	line:7	class:ModuleExample.ClassExample	end:9
+class_method_exclamation!	input.rb	/^        def class_method_exclamation!$/;"	f	line:13	class:ModuleExample.ClassExample	end:15
+class_method_question?	input.rb	/^        def class_method_question?$/;"	f	line:16	class:ModuleExample.ClassExample	end:18
+module_method	input.rb	/^    def module_method$/;"	f	line:23	module:ModuleExample	end:25
+singleton_class_method	input.rb	/^        def ClassExample.singleton_class_method$/;"	S	line:10	class:ModuleExample.ClassExample	end:12
+singleton_module_method	input.rb	/^    def ModuleExample.singleton_module_method$/;"	S	line:26	module:ModuleExample	end:28
