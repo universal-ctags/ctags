@@ -1,4 +1,6 @@
+CONST1	input.rb	/^    CONST1 = 1$/;"	C	module:ModuleExample
 ClassExample	input.rb	/^    class ClassExample$/;"	c	module:ModuleExample
+Const2	input.rb	/^        Const2 = "a"$/;"	C	class:ModuleExample.ClassExample
 ModuleExample	input.rb	/^module ModuleExample$/;"	m
 `	input.rb	/^        def `(command)$/;"	f	class:ModuleExample.ClassExample
 class_method	input.rb	/^        def class_method$/;"	f	class:ModuleExample.ClassExample

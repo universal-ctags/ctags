@@ -15,6 +15,7 @@
 */
 #include "general.h"  /* must always come first */
 
+#include <ctype.h>
 #include <string.h>
 
 #include "debug.h"
@@ -30,7 +31,7 @@
 *   DATA DECLARATIONS
 */
 typedef enum {
-	K_UNDEFINED = -1, K_CLASS, K_METHOD, K_MODULE, K_SINGLETON,
+	K_UNDEFINED = -1, K_CLASS, K_METHOD, K_MODULE, K_SINGLETON, K_CONST,
 } rubyKind;
 
 /*
@@ -41,11 +42,7 @@ static kindDefinition RubyKinds [] = {
 	{ true, 'f', "method", "methods" },
 	{ true, 'm', "module", "modules" },
 	{ true, 'S', "singletonMethod", "singleton methods" },
-#if 0
-	/* Following two kinds are reserved. */
-	{ true, 'd', "describe", "describes and contexts for Rspec" },
 	{ true, 'C', "constant", "constants" },
-#endif
 };
 
 typedef enum {
@@ -312,7 +309,8 @@ static int emitRubyTag (vString* name, rubyKind kind)
 	}
 	r = makeTagEntry (&tag);
 
-	nestingLevelsPush (nesting, r);
+	if (kind != K_CONST)
+		nestingLevelsPush (nesting, r);
 
 	vStringClear (name);
 	vStringDelete (scope);
@@ -562,10 +560,41 @@ static void deleteBlockData (NestingLevel *nl)
 		stringListDelete (bdata->mixin);
 }
 
+static bool doesLineIncludeConstant (const unsigned char **cp, vString *constant)
+{
+	const unsigned char **p = cp;
+
+	if (isspace (**p))
+		skipWhitespace (p);
+
+	if (isupper (**p))
+	{
+		while (**p != 0 && isIdentChar (**p))
+		{
+			vStringPut (constant, **p);
+			++*p;
+		}
+		if (isspace (**p))
+			skipWhitespace (p);
+
+		if (**p == '=')
+		{
+			*cp = *p;
+			return true;
+		}
+		vStringClear (constant);
+	}
+
+	return false;
+}
+
+
+
 static void findRubyTags (void)
 {
 	const unsigned char *line;
 	bool inMultiLineComment = false;
+	vString *constant = vStringNew ();
 
 	nesting = nestingLevelsNewFull (sizeof (struct blockData), deleteBlockData);
 
@@ -688,6 +717,12 @@ static void findRubyTags (void)
 				kind = K_SINGLETON;
 			readAndEmitTag (&cp, kind);
 		}
+		else if (doesLineIncludeConstant (&cp, constant))
+		{
+			emitRubyTag (constant, K_CONST);
+			vStringClear (constant);
+		}
+
 		while (*cp != '\0')
 		{
 			/* FIXME: we don't cope with here documents,
@@ -749,6 +784,7 @@ static void findRubyTags (void)
 		}
 	}
 	nestingLevelsFree (nesting);
+	vStringDelete (constant);
 }
 
 extern parserDefinition* RubyParser (void)

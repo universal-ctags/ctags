@@ -1,7 +1,9 @@
 #!/usr/bin/ruby
 
 module ModuleExample
+    CONST1 = 1
     class ClassExample
+        Const2 = "a"
         def class_method
             puts "in class_method"
         end
