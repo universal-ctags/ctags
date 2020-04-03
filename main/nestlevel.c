@@ -100,23 +100,19 @@ extern void nestingLevelsPop(NestingLevels *nls)
 	nls->n--;
 }
 
-extern NestingLevel *nestingLevelsGetCurrent(const NestingLevels *nls)
-{
-	Assert (nls != NULL);
-
-	if (nls->n < 1)
-		return NULL;
-
-	return NL_NTH(nls, (nls->n - 1));
-}
-
-extern NestingLevel *nestingLevelsGetNth(const NestingLevels *nls, int n)
+extern NestingLevel *nestingLevelsGetNthFromRoot (const NestingLevels *nls, int n)
 {
 	Assert (nls != NULL);
 	if (nls->n > n && n >= 0)
 		return  NL_NTH(nls, n);
 	else
 		return NULL;
+}
+
+extern NestingLevel *nestingLevelsGetNthParent (const NestingLevels *nls, int n)
+{
+	Assert (nls != NULL);
+	return nestingLevelsGetNthFromRoot (nls, nls->n - 1 - n);
 }
 
 extern void *nestingLevelGetUserData (const NestingLevel *nl)

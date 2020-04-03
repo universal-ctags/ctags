@@ -87,7 +87,7 @@ static vString* nestingLevelsToScope (const NestingLevels* nls)
 	vString* result = vStringNew ();
 	for (i = 0; i < nls->n; ++i)
 	{
-	    NestingLevel *nl = nestingLevelsGetNth (nls, i);
+	    NestingLevel *nl = nestingLevelsGetNthFromRoot (nls, i);
 	    tagEntryInfo *e = getEntryOfNestingLevel (nl);
 	    if (e && strlen (e->name) > 0 && (!e->placeholder))
 	    {
@@ -462,22 +462,46 @@ static int readAndEmitTag (const unsigned char** cp, rubyKind expected_kind)
 static void readAndStoreMixinSpec (const unsigned char** cp, const char *how_mixin)
 {
 
-	NestingLevel *nl = nestingLevelsGetCurrent (nesting);
-	tagEntryInfo *e  = getEntryOfNestingLevel (nl);
+	NestingLevel *nl = NULL;
+	tagEntryInfo *e = NULL;
+	int ownerLevel = 0;
+
+	for (ownerLevel = 0; ownerLevel < nesting->n; ownerLevel++)
+	{
+		nl = nestingLevelsGetNthParent (nesting, ownerLevel);
+		e = nl? getEntryOfNestingLevel (nl): NULL;
+
+		/* Ignore "if", "unless", "while" ... */
+		if ((nl && (nl->corkIndex == CORK_NIL)) || (e && e->placeholder))
+			continue;
+		break;
+	}
+
+	if (!e)
+		return;
 
 	if (e->kindIndex == K_SINGLETON)
 	{
-		nl = nestingLevelsGetNth (nesting, nesting->n - 2);
+		nl = nestingLevelsGetNthParent (nesting,
+										ownerLevel + 1);
 		if (nl == NULL)
 			return;
 		e = getEntryOfNestingLevel (nl);
 	}
 
+	if (!e)
+		return;
+
 	if (! (e->kindIndex == K_CLASS || e->kindIndex == K_MODULE))
 		return;
 
-	if (isspace (**cp))
+	if (isspace (**cp) || (**cp == '('))
 	{
+		if (isspace (**cp))
+			skipWhitespace (cp);
+		if (**cp == '(')
+			++*cp;
+
 		vString *spec = vStringNewInit (how_mixin);
 		vStringPut(spec, ':');
 

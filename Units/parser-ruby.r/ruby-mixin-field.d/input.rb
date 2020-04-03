@@ -60,3 +60,27 @@ class F
     extend X
   end
 end
+
+class G
+  include(X)
+  def self.prep
+    prepend (Y)
+  end
+  extend ( Z)
+end
+
+class H
+  if true
+    unless false
+      include(X)
+    end
+  end
+  def self.prep
+    if true
+      unless false
+        prepend (Y)
+      end
+    end
+  end
+  extend ( Z)
+end
