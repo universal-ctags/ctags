@@ -373,7 +373,7 @@ static const char *parseAttributeOrWrapper (const char *str, int parentCorkIndex
 	return str[i] == '\0'? NULL: str + i;
 }
 
-static void solveKindAndWrappng (const char *str, int *kind, enum Wrapping *wrapping)
+static void solveKindAndWrapping (const char *str, int *kind, enum Wrapping *wrapping)
 {
 	*kind = K_WRAPPER;
 	*wrapping = W_UNKNOWN;
@@ -413,13 +413,13 @@ static bool findAttributeOrWrapperOne (const char *line,
 	if (count < 3)
 		return true;
 
-	solveKindAndWrappng (line + matches[1].start, &kind, &wrapping);
+	solveKindAndWrapping (line + matches[1].start, &kind, &wrapping);
 	parseAttributeOrWrapper (line + matches[2].start, moose->classCork, -1,
 							 kind, wrapping);
 	return true;
 }
 
-static bool findAttributeOrWrapperMulit (const char *line,
+static bool findAttributeOrWrapperMulti (const char *line,
 										 const regexMatch *matches,
 										 unsigned int count,
 										 void *data)
@@ -438,7 +438,7 @@ static bool findAttributeOrWrapperMulit (const char *line,
 	if (count < 4)
 		return true;
 
-	solveKindAndWrappng (line + matches[1].start, &kind, &wrapping);
+	solveKindAndWrapping (line + matches[1].start, &kind, &wrapping);
 	terminator = line[matches[2].start];
 
 
@@ -486,7 +486,7 @@ static void initializeMooseParser (langType language)
 							   * ([qw/foo bar/] => ()) */
 							  "([a-zA-Z_][a-zA-Z0-9_]*([ \t][a-zA-Z_][a-zA-Z0-9_]*)*).*=>",
 							  "{exclusive}",
-							  findAttributeOrWrapperMulit, &mooseSubparser.notInMoose,
+							  findAttributeOrWrapperMulti, &mooseSubparser.notInMoose,
 							  &mooseSubparser);
 	addLanguageCallbackRegex (language, "^[ \t]*(.+)",
 							  "{exclusive}",
