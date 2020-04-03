@@ -271,32 +271,42 @@ static int getScopeInfo(texKind kind, vString *const parentName)
 /*
  *	 Tag generation functions
  */
-static int makeTexTag (tokenInfo *const token, texKind kind,
+static int makeTexTag (tokenInfo *const token, int kind,
 					   int roleIndex)
 {
 	int corkQueue = CORK_NIL;
-	if (TexKinds [kind].enabled)
+	const char *const name = vStringValue (token->string);
+	tagEntryInfo e;
+	initTagEntry (&e, name, kind);
+
+	e.lineNumber   = token->lineNumber;
+	e.filePosition = token->filePosition;
+
+	vString *parentName = NULL;
+
+	/* Filling e.extensionFields.scopeKindIndex and
+	 * e.extensionFields.scopeName can be filled with the value calculated
+	 * from getScopeInfo() with the kind parameter only if the kind is defined
+	 * in the Tex parser.
+	 * Is a subparser indirectly calls this function, getScopeInfo() doesn't
+	 * work well. So in the a context of a subparser, the scope fields should
+	 * not be filled here.
+	 */
+	if (Lang_tex == getInputLanguage ())
 	{
-		const char *const name = vStringValue (token->string);
 		int parentKind = KIND_GHOST_INDEX;
-		vString *parentName = vStringNew();
-		tagEntryInfo e;
-		initTagEntry (&e, name, kind);
-
-		e.lineNumber   = token->lineNumber;
-		e.filePosition = token->filePosition;
-
+		parentName = vStringNew();
 		parentKind = getScopeInfo(kind, parentName);
 		if (parentKind != KIND_GHOST_INDEX) {
 			e.extensionFields.scopeKindIndex = parentKind;
 			e.extensionFields.scopeName = vStringValue(parentName);
 		}
-
-		assignRole (&e, roleIndex);
-
-		corkQueue = makeTagEntry (&e);
-		vStringDelete (parentName);
 	}
+
+	assignRole (&e, roleIndex);
+
+	corkQueue = makeTagEntry (&e);
+	vStringDelete (parentName);	/* NULL is o.k. */
 	return corkQueue;
 }
 
@@ -1036,5 +1046,6 @@ extern parserDefinition* TexParser (void)
 	def->finalize   = finalize;
 	def->keywordTable =  TexKeywordTable;
 	def->keywordCount = ARRAY_SIZE (TexKeywordTable);
+	def->useCork = CORK_QUEUE;
 	return def;
 }
