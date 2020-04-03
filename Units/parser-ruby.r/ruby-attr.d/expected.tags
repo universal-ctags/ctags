@@ -1,0 +1,49 @@
+X	input.rb	/^class X$/;"	c
+rr0	input.rb	/^  attr_reader :rr0$/;"	A	class:X
+rr1	input.rb	/^  attr_reader(:rr1)$/;"	A	class:X
+rr2	input.rb	/^  attr_reader "rr2"$/;"	A	class:X
+rr3	input.rb	/^  attr_reader :rr3, :rr4$/;"	A	class:X
+rr4	input.rb	/^  attr_reader :rr3, :rr4$/;"	A	class:X
+rr5	input.rb	/^  attr_reader "rr5", "rr6"$/;"	A	class:X
+rr6	input.rb	/^  attr_reader "rr5", "rr6"$/;"	A	class:X
+rr7	input.rb	/^  attr_reader :rr7, "rr8"$/;"	A	class:X
+rr8	input.rb	/^  attr_reader :rr7, "rr8"$/;"	A	class:X
+rr9	input.rb	/^  attr_reader "rr9", :rr10$/;"	A	class:X
+rr10	input.rb	/^  attr_reader "rr9", :rr10$/;"	A	class:X
+rr11	input.rb	/^  attr_reader("rr11")$/;"	A	class:X
+ww0=	input.rb	/^  attr_writer :ww0$/;"	A	class:X
+ww1=	input.rb	/^  attr_writer (:ww1)$/;"	A	class:X
+ww2=	input.rb	/^  attr_writer "ww2"$/;"	A	class:X
+ww3=	input.rb	/^  attr_writer :ww3, :ww4$/;"	A	class:X
+ww4=	input.rb	/^  attr_writer :ww3, :ww4$/;"	A	class:X
+ww5=	input.rb	/^  attr_writer "ww5", "ww6"$/;"	A	class:X
+ww6=	input.rb	/^  attr_writer "ww5", "ww6"$/;"	A	class:X
+ww7=	input.rb	/^  attr_writer :ww7, "ww8"$/;"	A	class:X
+ww8=	input.rb	/^  attr_writer :ww7, "ww8"$/;"	A	class:X
+ww9=	input.rb	/^  attr_writer "ww9", :ww10$/;"	A	class:X
+ww10=	input.rb	/^  attr_writer "ww9", :ww10$/;"	A	class:X
+ww11=	input.rb	/^  attr_writer ("ww11")$/;"	A	class:X
+rw0	input.rb	/^  attr_accessor :rw0$/;"	A	class:X
+rw0=	input.rb	/^  attr_accessor :rw0$/;"	A	class:X
+rw1	input.rb	/^  attr_accessor (  :rw1)$/;"	A	class:X
+rw1=	input.rb	/^  attr_accessor (  :rw1)$/;"	A	class:X
+rw2	input.rb	/^  attr_accessor "rw2"$/;"	A	class:X
+rw2=	input.rb	/^  attr_accessor "rw2"$/;"	A	class:X
+rw3	input.rb	/^  attr_accessor :rw3, :rw4$/;"	A	class:X
+rw3=	input.rb	/^  attr_accessor :rw3, :rw4$/;"	A	class:X
+rw4	input.rb	/^  attr_accessor :rw3, :rw4$/;"	A	class:X
+rw4=	input.rb	/^  attr_accessor :rw3, :rw4$/;"	A	class:X
+rw5	input.rb	/^  attr_accessor "rw5", "rw6"$/;"	A	class:X
+rw5=	input.rb	/^  attr_accessor "rw5", "rw6"$/;"	A	class:X
+rw6	input.rb	/^  attr_accessor "rw5", "rw6"$/;"	A	class:X
+rw6=	input.rb	/^  attr_accessor "rw5", "rw6"$/;"	A	class:X
+rw7	input.rb	/^  attr_accessor :rw7, "rw8"$/;"	A	class:X
+rw7=	input.rb	/^  attr_accessor :rw7, "rw8"$/;"	A	class:X
+rw8	input.rb	/^  attr_accessor :rw7, "rw8"$/;"	A	class:X
+rw8=	input.rb	/^  attr_accessor :rw7, "rw8"$/;"	A	class:X
+rw9	input.rb	/^  attr_accessor "rw9", :rw10$/;"	A	class:X
+rw9=	input.rb	/^  attr_accessor "rw9", :rw10$/;"	A	class:X
+rw10	input.rb	/^  attr_accessor "rw9", :rw10$/;"	A	class:X
+rw10=	input.rb	/^  attr_accessor "rw9", :rw10$/;"	A	class:X
+rw11	input.rb	/^  attr_accessor (  "rw11")$/;"	A	class:X
+rw11=	input.rb	/^  attr_accessor (  "rw11")$/;"	A	class:X

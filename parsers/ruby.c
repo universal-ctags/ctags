@@ -31,7 +31,7 @@
 *   DATA DECLARATIONS
 */
 typedef enum {
-	K_UNDEFINED = -1, K_CLASS, K_METHOD, K_MODULE, K_SINGLETON, K_CONST,
+	K_UNDEFINED = -1, K_CLASS, K_METHOD, K_MODULE, K_SINGLETON, K_CONST, K_ACCESSOR,
 } rubyKind;
 
 /*
@@ -43,6 +43,7 @@ static kindDefinition RubyKinds [] = {
 	{ true, 'm', "module", "modules" },
 	{ true, 'S', "singletonMethod", "singleton methods" },
 	{ true, 'C', "constant", "constants" },
+	{ true, 'A', "accessor", "accessors" },
 };
 
 typedef enum {
@@ -260,7 +261,7 @@ static bool parseRubyOperator (vString* name, const unsigned char** cp)
 /*
 * Emits a tag for the given 'name' of kind 'kind' at the current nesting.
 */
-static int emitRubyTag (vString* name, rubyKind kind)
+static int emitRubyTagFull (vString* name, rubyKind kind, bool pushLevel, bool clearName)
 {
 	tagEntryInfo tag;
 	vString* scope;
@@ -309,13 +310,19 @@ static int emitRubyTag (vString* name, rubyKind kind)
 	}
 	r = makeTagEntry (&tag);
 
-	if (kind != K_CONST)
+	if (pushLevel)
 		nestingLevelsPush (nesting, r);
 
-	vStringClear (name);
+	if (clearName)
+		vStringClear (name);
 	vStringDelete (scope);
 
 	return r;
+}
+
+static int emitRubyTag (vString* name, rubyKind kind)
+{
+	return emitRubyTagFull (name, kind, kind != K_CONST, true);
 }
 
 /* Tests whether 'ch' is a character in 'list'. */
@@ -596,7 +603,71 @@ static bool doesLineIncludeConstant (const unsigned char **cp, vString *constant
 	return false;
 }
 
+static void emitRubyAccessorTags (vString *a, bool reader, bool writer)
+{
+	if (vStringLength (a) == 0)
+		return;
 
+	if (reader)
+		emitRubyTagFull (a, K_ACCESSOR, false, !writer);
+	if (writer)
+	{
+		vStringPut (a, '=');
+		emitRubyTagFull (a, K_ACCESSOR, false, true);
+	}
+}
+
+static void readAttrsAndEmitTags (const unsigned char **cp, bool reader, bool writer)
+{
+	vString *a = vStringNew ();
+
+	skipWhitespace (cp);
+	if (**cp == '(')
+		++*cp;
+
+	do {
+		skipWhitespace (cp);
+		if (**cp == ':')
+		{
+			++*cp;
+			if (K_METHOD == parseIdentifier (cp, a, K_METHOD))
+			{
+				emitRubyAccessorTags (a, reader, writer);
+				skipWhitespace (cp);
+				if (**cp == ',')
+				{
+					++*cp;
+					continue;
+				}
+			}
+		}
+		else if (**cp == '"')
+		{
+			++*cp;
+			/* Skip string literals.
+			 * FIXME: should cope with escapes and interpolation.
+			 */
+			while (**cp != 0 && **cp != '"')
+			{
+				vStringPut (a, **cp);
+				++*cp;
+			}
+			if (**cp != 0)
+				++*cp;
+
+			emitRubyAccessorTags (a, reader, writer);
+			skipWhitespace (cp);
+			if (**cp == ',')
+			{
+				++*cp;
+				continue;
+			}
+		}
+		break;
+	} while (1);
+
+	vStringDelete (a);
+}
 
 static void findRubyTags (void)
 {
@@ -724,6 +795,18 @@ static void findRubyTags (void)
 			if (e && e->kindIndex == K_CLASS && strlen (e->name) == 0)
 				kind = K_SINGLETON;
 			readAndEmitTag (&cp, kind);
+		}
+		else if (canMatchKeywordWithAssign (&cp, "attr_reader"))
+		{
+			readAttrsAndEmitTags (&cp, true, false);
+		}
+		else if (canMatchKeywordWithAssign (&cp, "attr_writer"))
+		{
+			readAttrsAndEmitTags (&cp, false, true);
+		}
+		else if (canMatchKeywordWithAssign (&cp, "attr_accessor"))
+		{
+			readAttrsAndEmitTags (&cp, true, true);
 		}
 		else if (doesLineIncludeConstant (&cp, constant))
 		{
