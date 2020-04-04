@@ -42,7 +42,7 @@ enum TexNameFlag {
 };
 
 struct TexParseStrategy {
-	/* expected token type '<', '[', '*', and '{' are supported.
+	/* Expected token type '<', '[', '*', and '{' are supported.
 	 * 0 means the end of strategies.
 	 *
 	 * A string between <>, [], or {} (pairs) can be tagged or store to
