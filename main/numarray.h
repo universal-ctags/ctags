@@ -21,7 +21,7 @@
 	typedef struct s##Prefix##Array prefix##Array;						\
 																		\
 	extern prefix##Array *prefix##ArrayNew (void);						\
-	extern void prefix##ArrayAdd (prefix##Array *const current, type num); \
+	extern unsigned int prefix##ArrayAdd (prefix##Array *const current, type num); \
 	extern void prefix##ArrayRemoveLast (prefix##Array *const current);	\
 	extern void prefix##ArrayCombine (prefix##Array *const current, prefix##Array *const from);	\
 	extern void prefix##ArrayClear (prefix##Array *const current);		\

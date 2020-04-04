@@ -131,6 +131,7 @@
     <ClCompile Include="..\main\promise.c" />
     <ClCompile Include="..\main\ptag.c" />
     <ClCompile Include="..\main\ptrarray.c" />
+    <ClCompile Include="..\main\rbtree.c" />
     <ClCompile Include="..\main\read.c" />
     <ClCompile Include="..\main\repoinfo.c" />
     <ClCompile Include="..\main\routines.c" />
@@ -310,6 +311,7 @@
     <ClInclude Include="..\main\promise_p.h" />
     <ClInclude Include="..\main\ptag_p.h" />
     <ClInclude Include="..\main\ptrarray.h" />
+    <ClInclude Include="..\main\rbtree.h" />
     <ClInclude Include="..\main\read.h" />
     <ClInclude Include="..\main\read_p.h" />
     <ClInclude Include="..\main\routines.h" />

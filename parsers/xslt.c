@@ -347,7 +347,7 @@ XsltParser (void)
 	def->parser        = findXsltTags;
 	def->tagXpathTableTable = xsltXpathTableTable;
 	def->tagXpathTableCount = ARRAY_SIZE (xsltXpathTableTable);
-	def->useCork = true;
+	def->useCork = CORK_QUEUE;
 	def->dependencies = dependencies;
 	def->dependencyCount = ARRAY_SIZE (dependencies);
 

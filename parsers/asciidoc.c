@@ -406,7 +406,7 @@ extern parserDefinition* AsciidocParser (void)
 	def->extensions = extensions;
 	def->parser = findAsciidocTags;
 	/* do we even need to use Cork? */
-	def->useCork = true;
+	def->useCork = CORK_QUEUE;
 
 	return def;
 }

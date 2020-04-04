@@ -44,6 +44,9 @@ AH_TEMPLATE([L_tmpnam],
 AH_TEMPLATE([HAVE_STAT_ST_INO],
 	[Define this macro if the field "st_ino" exists in struct stat in
 	<sys/stat.h>.])
+AH_TEMPLATE([HAVE_STATEMENT_EXPRESSION_EXT],
+	[Define this macro if compiler supports statement expression non-standard
+	C feature.])
 AH_TEMPLATE([remove],
 	[Define remove to unlink if you have unlink(), but not remove().])
 AH_TEMPLATE([INT_MAX],
@@ -421,6 +424,7 @@ fi
 AC_C_CONST
 AC_OBJEXT
 AC_EXEEXT
+AC_C_TYPEOF
 
 if test "${enable_static}" = "yes"; then
 	LDFLAGS="$LDFLAGS -static"
@@ -434,6 +438,16 @@ case "$host" in
 	;;
 esac
 AM_CONDITIONAL([HOST_MINGW], [test "x${host_mingw}" = "xyes"])
+
+AC_MSG_CHECKING(if compiler supprots statement expressions)
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([],[
+int main(int argc, char **argv) {return ({ int x = 1; x + argc;});}
+])],[have_statment_expression_ext=yes],[have_statment_expression_ext=no])
+AC_MSG_RESULT($have_statment_expression_ext)
+if test yes = "$have_statment_expression_ext"; then
+	AC_DEFINE(HAVE_STATEMENT_EXPRESSION_EXT)
+fi
+
 
 # Check if struct stat contains st_ino.
 # MinGW has st_ino, but it doesn't work.

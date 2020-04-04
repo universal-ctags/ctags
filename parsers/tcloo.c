@@ -175,7 +175,7 @@ extern parserDefinition* TclOOParser (void)
 	def->kindCount = ARRAY_SIZE(TclOOKinds);
 
 	def->parser = findTclOOTags;
-	def->useCork = true;
+	def->useCork = CORK_QUEUE;
 	def->requestAutomaticFQTag = true;
 
 	return def;

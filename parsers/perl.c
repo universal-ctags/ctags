@@ -652,7 +652,7 @@ extern parserDefinition* PerlParser (void)
 	def->selectLanguage = selectors;
 
 	/* Subparsers need this */
-	def->useCork = true;
+	def->useCork = CORK_QUEUE;
 
 	return def;
 }

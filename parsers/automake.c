@@ -350,6 +350,6 @@ extern parserDefinition* AutomakeParser (void)
 	def->extensions = extensions;
 	def->patterns   = patterns;
 	def->parser     = findAutomakeTags;
-	def->useCork    = true;
+	def->useCork    = CORK_QUEUE;
 	return def;
 }

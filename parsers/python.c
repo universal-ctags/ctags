@@ -1362,7 +1362,7 @@ extern parserDefinition* PythonParser (void)
 	def->keywordCount = ARRAY_SIZE (PythonKeywordTable);
 	def->fieldTable = PythonFields;
 	def->fieldCount = ARRAY_SIZE (PythonFields);
-	def->useCork = true;
+	def->useCork = CORK_QUEUE;
 	def->requestAutomaticFQTag = true;
 	return def;
 }

@@ -129,6 +129,9 @@
     <ClCompile Include="..\main\ptrarray.c">
       <Filter>Source Files\Main</Filter>
     </ClCompile>
+    <ClCompile Include="..\main\rbtree.c">
+      <Filter>Source Files\Main</Filter>
+    </ClCompile>
     <ClCompile Include="..\main\read.c">
       <Filter>Source Files\Main</Filter>
     </ClCompile>
@@ -660,6 +663,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\main\ptrarray.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\main\rbtree.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\main\read.h">

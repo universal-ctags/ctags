@@ -485,6 +485,6 @@ extern parserDefinition* ShParser (void)
 	def->extensions = extensions;
 	def->aliases = aliases;
 	def->parser     = findShTags;
-	def->useCork    = true;
+	def->useCork    = CORK_QUEUE;
 	return def;
 }

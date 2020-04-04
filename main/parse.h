@@ -64,6 +64,12 @@ typedef struct {
 	const int id;
 } keywordTable;
 
+typedef enum {
+	CORK_NO_USE,
+	CORK_QUEUE  = (1 << 0),
+	CORK_SYMTAB = (1 << 1),
+} corkUsage;
+
 struct sParserDefinition {
 	/* defined by parser */
 	char* name;                    /* name of language */
@@ -78,7 +84,7 @@ struct sParserDefinition {
 	rescanParser parser2;          /* rescanning parser (unusual case) */
 	selectLanguage* selectLanguage; /* may be used to resolve conflicts */
 	unsigned int method;           /* See METHOD_ definitions above */
-	bool useCork;
+	unsigned int useCork;		   /* bit or of corkUsage */
 	bool useMemoryStreamInput;
 	bool allowNullTag;
 	bool requestAutomaticFQTag;

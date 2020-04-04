@@ -888,6 +888,6 @@ extern parserDefinition* RubyParser (void)
 	def->parser     = findRubyTags;
 	def->fieldTable = RubyFields;
 	def->fieldCount = ARRAY_SIZE (RubyFields);
-	def->useCork    = true;
+	def->useCork    = CORK_QUEUE;
 	return def;
 }

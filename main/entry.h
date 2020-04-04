@@ -116,6 +116,9 @@ struct sTagEntryInfo {
 	unsigned long sourceLineNumberDifference;
 };
 
+typedef bool (* entryForeachFunc) (unsigned int corkIndex,
+								   tagEntryInfo * entry,
+								   void * data);
 
 /*
 *   GLOBAL VARIABLES
@@ -143,6 +146,25 @@ extern int makeQualifiedTagEntry (const tagEntryInfo *const e);
 tagEntryInfo *getEntryInCorkQueue   (unsigned int n);
 tagEntryInfo *getEntryOfNestingLevel (const NestingLevel *nl);
 size_t        countEntryInCorkQueue (void);
+
+/* If a parser sets (CORK_QUEUE and )CORK_SYMTAB to useCork,
+ * the parsesr can use symbol lookup tables for the current input.
+ * Each scope has a symbol lookup table.
+ * To register an tag to the table, use registerEntry().
+ * registerEntry registers CORKINDEX to a symbol table of a parent tag
+ * specified in the scopeIndex field of the tag specified with CORKINDEX.
+ */
+void          registerEntry (unsigned int corkIndex);
+
+/* foreachEntriesInScope is for traversing the symbol table for a table
+ * specified with CORKINDEX. If CORK_NIL is given, this function traverses
+ * top-level entries. If name is NULL, this function traverses all entries
+ * under the scope.
+ */
+bool          foreachEntriesInScope (unsigned int corkIndex,
+									 const char *name, /* or NULL */
+									 entryForeachFunc func,
+									 void *data);
 
 extern void    markTagExtraBit     (tagEntryInfo *const tag, xtagType extra);
 extern bool isTagExtraBitMarked (const tagEntryInfo *const tag, xtagType extra);

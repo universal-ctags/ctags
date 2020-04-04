@@ -32,6 +32,7 @@ MAIN_PUBLIC_HEADS =		\
 	main/parse.h		\
 	main/promise.h		\
 	main/ptrarray.h		\
+	main/rbtree.h		\
 	main/read.h		\
 	main/routines.h		\
 	main/selectors.h	\
@@ -117,6 +118,7 @@ LIB_SRCS =			\
 	main/promise.c			\
 	main/ptag.c			\
 	main/ptrarray.c			\
+	main/rbtree.c			\
 	main/read.c			\
 	main/routines.c			\
 	main/seccomp.c			\

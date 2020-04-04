@@ -119,7 +119,7 @@ extern parserDefinition* PythonLoggingConfigParser (void)
 	def->kindTable      = PythonLoggingConfigKinds;
 	def->kindCount  = ARRAY_SIZE (PythonLoggingConfigKinds);
 	def->parser     = findPythonLoggingConfigTags;
-	def->useCork    = true;
+	def->useCork    = CORK_QUEUE;
 
 	return def;
 }

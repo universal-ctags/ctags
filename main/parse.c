@@ -3352,30 +3352,22 @@ extern void notifyLanguageRegexInputEnd (langType language)
 	notifyRegexInputEnd((LanguageTable + language)->lregexControlBlock);
 }
 
-static bool doesParserUseCork (parserDefinition *parser)
+static unsigned int parserCorkFlags (parserDefinition *parser)
 {
 	subparser *tmp;
-	bool r = false;
+	unsigned int r = 0;
 
-	if (parser->useCork)
-		return true;
+	r |= parser->useCork;
 
 	if (hasLanguageScopeActionInRegex (parser->id)
 	    || parser->requestAutomaticFQTag)
-	{
-		parser->useCork = true;
-		return true;
-	}
+		r |= CORK_QUEUE;
 
 	pushLanguage (parser->id);
 	foreachSubparser(tmp, true)
 	{
 		langType t = getSubparserLanguage (tmp);
-		if (doesParserUseCork (LanguageTable[t].def))
-		{
-			r = true;
-			break;
-		}
+		r |= parserCorkFlags (LanguageTable[t].def);
 	}
 	popLanguage ();
 	return r;
@@ -3442,16 +3434,18 @@ static bool createTagsWithFallback1 (const langType language,
 	unsigned int passCount = 0;
 	rescanReason whyRescan;
 	parserObject *parser;
-	bool useCork;
+	unsigned int corkFlags;
+	bool useCork = false;
 
 	initializeParser (language);
 	parser = &(LanguageTable [language]);
 
 	setupLanguageSubparsersInUse (language);
 
-	useCork = doesParserUseCork(parser->def);
+	corkFlags = parserCorkFlags (parser->def);
+	useCork = corkFlags & CORK_QUEUE;
 	if (useCork)
-		corkTagFile();
+		corkTagFile(corkFlags);
 
 	addParserPseudoTags (language);
 	initializeParserStats (parser);
@@ -3466,7 +3460,7 @@ static bool createTagsWithFallback1 (const langType language,
 		if (useCork)
 		{
 			uncorkTagFile();
-			corkTagFile();
+			corkTagFile(corkFlags);
 		}
 
 
@@ -4891,7 +4885,7 @@ static parserDefinition *CTagsSelfTestParser (void)
 	def->parser = createCTSTTags;
 	def->invisible = true;
 	def->useMemoryStreamInput = true;
-	def->useCork = true;
+	def->useCork = CORK_QUEUE;
 	def->initStats = initStatsCTST;
 	def->printStats = printStatsCTST;
 	return def;

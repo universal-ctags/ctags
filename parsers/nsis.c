@@ -389,6 +389,6 @@ extern parserDefinition* NsisParser (void)
 	def->fieldTable = NsisFields;
 	def->fieldCount = ARRAY_SIZE (NsisFields);
 	def->parser     = findNsisTags;
-	def->useCork    = true;
+	def->useCork    = CORK_QUEUE;
 	return def;
 }

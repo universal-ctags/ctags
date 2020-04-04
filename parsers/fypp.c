@@ -473,7 +473,7 @@ extern parserDefinition* FyppParser (void)
 	def->parameterHandlerTable = FyppParameterHandlerTable;
 	def->parameterHandlerCount = ARRAY_SIZE(FyppParameterHandlerTable);
 
-	def->useCork = true;
+	def->useCork = CORK_QUEUE;
 
 	fyppGuestParser = vStringNewInit ("Fortran");
 

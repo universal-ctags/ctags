@@ -346,11 +346,11 @@ enables it in your parser.
 
 		typedef struct {
 		...
-				boolean useCork;
+				unsigned int useCork;
 		...
 		} parserDefinition;
 
-Set `TRUE` to `useCork` like:
+Set `CORK_QUEUE` to `useCork` like:
 
 .. code-block:: c
 
@@ -359,11 +359,11 @@ Set `TRUE` to `useCork` like:
 	    ...
 	    parserDefinition *def = parserNew ("Clojure");
 	    ...
-	    def->useCork = TRUE;
+	    def->useCork = CORK_QUEUE;
 	    return def;
     }
 
-When ctags running a parser with `useCork` being `TRUE`, all output
+When ctags running a parser with `useCork` being `CORK_QUEUE`, all output
 requested via `makeTagEntry` function calling is stored to an internal
 queue, not to `tags` file.  When parsing an input file is done, the
 tag information stored automatically to the queue are flushed to
@@ -420,4 +420,4 @@ An example can be found in DTS parser:
     }
 
 Setting `requestAutomaticFQTag` to `TRUE` implies setting
-`useCork` to `TRUE`.
+`useCork` to `CORK_QUEUE`.

@@ -271,32 +271,83 @@ static int getScopeInfo(texKind kind, vString *const parentName)
 /*
  *	 Tag generation functions
  */
-static int makeTexTag (tokenInfo *const token, texKind kind,
-					   int roleIndex)
+
+struct symbolData {
+	langType lang;
+	int kind;
+	int *corkQueue;
+};
+
+static bool findTheName (unsigned int corkIndex, tagEntryInfo *entry, void *data)
+{
+	struct symbolData *symbolData = data;
+
+	if (entry->langType == symbolData->lang && entry->kindIndex == symbolData->kind)
+	{
+		/* TODO: The case operation should be removed */
+		*symbolData->corkQueue = (unsigned int)corkIndex;
+		return false;
+	}
+	return true;
+}
+
+static int makeTexTag (tokenInfo *const token, int kind,
+					   int roleIndex, bool unique, int scopeIndex)
 {
 	int corkQueue = CORK_NIL;
-	if (TexKinds [kind].enabled)
+	const char *const name = vStringValue (token->string);
+
+	if (unique)
 	{
-		const char *const name = vStringValue (token->string);
+		struct symbolData data = {
+			.lang = getInputLanguage(),
+			.kind = kind,
+			.corkQueue = &corkQueue,
+		};
+		/* TODO: The case operation should be removed */
+		if (foreachEntriesInScope ((unsigned int)scopeIndex, name, findTheName, (void *)&data) == false)
+			return *data.corkQueue;
+	}
+
+	tagEntryInfo e;
+	initTagEntry (&e, name, kind);
+
+	e.lineNumber   = token->lineNumber;
+	e.filePosition = token->filePosition;
+
+	vString *parentName = NULL;
+
+
+	if (unique)
+		e.extensionFields.scopeIndex = scopeIndex;
+
+	/* Filling e.extensionFields.scopeKindIndex and
+	 * e.extensionFields.scopeName can be filled from "kind" parameter
+	 * of this function only when Tex parser calls this function. The
+	 * fields cannot be filled with a kind defined in a subparser.
+	 * Subparsers may fill the scope after running strategy. So in the
+	 * context of a subparser, filling the scope fields here is not
+	 * needed.
+	 */
+	if (Lang_tex == getInputLanguage ())
+	{
 		int parentKind = KIND_GHOST_INDEX;
-		vString *parentName = vStringNew();
-		tagEntryInfo e;
-		initTagEntry (&e, name, kind);
-
-		e.lineNumber   = token->lineNumber;
-		e.filePosition = token->filePosition;
-
+		parentName = vStringNew();
 		parentKind = getScopeInfo(kind, parentName);
 		if (parentKind != KIND_GHOST_INDEX) {
 			e.extensionFields.scopeKindIndex = parentKind;
 			e.extensionFields.scopeName = vStringValue(parentName);
 		}
-
-		assignRole (&e, roleIndex);
-
-		corkQueue = makeTagEntry (&e);
-		vStringDelete (parentName);
 	}
+
+	assignRole (&e, roleIndex);
+
+	corkQueue = makeTagEntry (&e);
+	vStringDelete (parentName);	/* NULL is o.k. */
+
+	if (unique)
+		registerEntry (corkQueue);
+
 	return corkQueue;
 }
 
@@ -539,7 +590,8 @@ static bool parseWithStrategy (tokenInfo *token,
 			if (!exclusive && capture_name && vStringLength (name->string) > 0)
 			{
 				if (s->kindIndex != KIND_GHOST_INDEX)
-					s->corkIndex = makeTexTag (name, s->kindIndex, s->roleIndex);
+					s->corkIndex = makeTexTag (name, s->kindIndex, s->roleIndex,
+											   s->unique, s->scopeIndex);
 
 				if (s->name)
 					vStringCopy(s->name, name->string);
@@ -595,7 +647,8 @@ static bool parseWithStrategy (tokenInfo *token,
 				vStringStripTrailing (name->string);
 
 				if (s->kindIndex != KIND_GHOST_INDEX)
-					s->corkIndex = makeTexTag (name, s->kindIndex, s->roleIndex);
+					s->corkIndex = makeTexTag (name, s->kindIndex, s->roleIndex,
+											   s->unique, s->scopeIndex);
 
 				if (s->name)
 					vStringCopy(s->name, name->string);
@@ -659,6 +712,7 @@ static bool parseTagFull (tokenInfo *const token, texKind kind, int roleIndex, b
 			.kindIndex = kind,
 			.roleIndex = roleIndex,
 			.name = taggedName,
+			.unique = false,
 		},
 		{
 			.type = 0
@@ -672,6 +726,7 @@ static bool parseTagFull (tokenInfo *const token, texKind kind, int roleIndex, b
 		strategy [0].roleIndex = roleIndex;
 		strategy [0].flags |= TEX_NAME_FLAG_EXCLUSIVE;
 		strategy [0].name = taggedName;
+		strategy [0].unique = false;
 	}
 	else
 	{
@@ -755,6 +810,7 @@ static bool parseNewcommand (tokenInfo *const token, bool *tokenUnprocessed)
 			.kindIndex = TEXTAG_COMMAND,
 			.roleIndex = ROLE_DEFINITION_INDEX,
 			.name = NULL,
+			.unique = false,
 		},
 		{
 			.type = '[',
@@ -796,6 +852,7 @@ static bool parseNewcounter (tokenInfo *const token, bool *tokenUnprocessed)
 			.kindIndex = TEXTAG_COUNTER,
 			.roleIndex = ROLE_DEFINITION_INDEX,
 			.name = NULL,
+			.unique = false,
 		},
 		{
 			.type = '[',
@@ -1036,5 +1093,6 @@ extern parserDefinition* TexParser (void)
 	def->finalize   = finalize;
 	def->keywordTable =  TexKeywordTable;
 	def->keywordCount = ARRAY_SIZE (TexKeywordTable);
+	def->useCork = CORK_QUEUE  | CORK_SYMTAB;
 	return def;
 }

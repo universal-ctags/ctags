@@ -42,7 +42,7 @@ enum TexNameFlag {
 };
 
 struct TexParseStrategy {
-	/* expected token type '<', '[', '*', and '{' are supported.
+	/* Expected token type '<', '[', '*', and '{' are supported.
 	 * 0 means the end of strategies.
 	 *
 	 * A string between <>, [], or {} (pairs) can be tagged or store to
@@ -65,6 +65,13 @@ struct TexParseStrategy {
 	/* Store the string surrounded by one of paris.
 	 * If you don't need to store the string, set NULL here. */
 	vString *name;
+
+	/* If true, make at most one tag for the name in the scope specified
+	 * with scopeIndex. When making a tag, scopeIndex is set to
+	 * extensionFields.scopeIndex only if unique is true.
+	 * scopeIndex is never referred if unique if false. */
+	bool unique;
+	int scopeIndex;
 };
 
 typedef struct sTexSubparser texSubparser;

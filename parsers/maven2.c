@@ -282,7 +282,7 @@ Maven2Parser (void)
 	def->parser        = findMaven2Tags;
 	def->tagXpathTableTable  = maven2XpathTableTable;
 	def->tagXpathTableCount  = ARRAY_SIZE (maven2XpathTableTable);
-	def->useCork = true;
+	def->useCork = CORK_QUEUE;
 	def->selectLanguage = selectors;
 	def->fieldTable = Maven2Fields;
 	def->fieldCount = ARRAY_SIZE (Maven2Fields);

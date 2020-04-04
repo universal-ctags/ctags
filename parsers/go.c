@@ -1393,7 +1393,7 @@ extern parserDefinition *GoParser (void)
 	def->keywordCount = ARRAY_SIZE (GoKeywordTable);
 	def->fieldTable = GoFields;
 	def->fieldCount = ARRAY_SIZE (GoFields);
-	def->useCork = true;
+	def->useCork = CORK_QUEUE;
 	def->requestAutomaticFQTag = true;
 	return def;
 }

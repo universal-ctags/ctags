@@ -314,6 +314,6 @@ parserDefinition *AutoItParser (void)
 	def->fieldCount = ARRAY_SIZE (AutoItFields);
 	def->extensions = extensions;
 	def->parser     = findAutoItTags;
-	def->useCork    = true;
+	def->useCork    = CORK_QUEUE;
 	return def;
 }

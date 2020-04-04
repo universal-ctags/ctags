@@ -329,7 +329,7 @@ extern parserDefinition* ITclParser (void)
 
 	def->extensions = extensions;
 	def->parser = findITclTags;
-	def->useCork = true;
+	def->useCork = CORK_QUEUE;
 	def->requestAutomaticFQTag = true;
 
 	def->keywordTable = ITclKeywordTable;
