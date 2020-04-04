@@ -1,0 +1,9 @@
+scene	input.ts	/^let scene: three.Scene,$/;"	v
+camera	input.ts	/^  camera: three.PerspectiveCamera,$/;"	v
+renderer	input.ts	/^  renderer: three.WebGLRenderer;$/;"	v
+cubeArr	input.ts	/^const cubeArr = new three.Group();$/;"	C
+setupScene	input.ts	/^const setupScene = (): void => {$/;"	C
+createCubeArr	input.ts	/^const createCubeArr = (): void => {$/;"	C
+createWall	input.ts	/^const createWall = (): void => {$/;"	C
+createCube	input.ts	/^const createCube = (): three.Mesh => {$/;"	C
+animate	input.ts	/^const animate = (): void => {$/;"	C
