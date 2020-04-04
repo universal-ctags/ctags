@@ -994,7 +994,7 @@ static void processTypedef (tokenInfo *const token)
 	}
 
 	/* Skip bus width definition */
-	if (c == '[')
+	while (c == '[')
 	{
 		c = skipWhite (skipPastMatch ("[]"));
 	}
