@@ -160,6 +160,10 @@ void          registerEntry (unsigned int corkIndex);
  * specified with CORKINDEX. If CORK_NIL is given, this function traverses
  * top-level entries. If name is NULL, this function traverses all entries
  * under the scope.
+ *
+ * If FUNC returns false, this function returns false.
+ * If FUNC never returns false, this func returns true.
+ * If FUNC is not called because no node for NAME in the symbol table.
  */
 bool          foreachEntriesInScope (unsigned int corkIndex,
 									 const char *name, /* or NULL */
