@@ -40,6 +40,11 @@
 /*
  *   DATA DECLARATIONS
  */
+
+/* A callback function searching a symbol from the cork symbol table assumes
+ * this kind definitions are shared in Verilog and SystemVerilog parsers.
+ * If you will separate the definitions for the parsers, you must revise the
+ * code related to the symbol table. */
 typedef enum {
 	K_IGNORE = -2,
 	K_UNDEFINED,
@@ -646,7 +651,13 @@ static void createTag (tokenInfo *const token)
 		tag.extensionFields.inheritance = vStringValue (token->inheritance);
 		verbose ("Class %s extends %s\n", vStringValue (token->name), tag.extensionFields.inheritance);
 	}
-	makeTagEntry (&tag);
+
+	int corkIndex = makeTagEntry (&tag);
+	if (isInputLanguage (Lang_systemverilog)
+		&& corkIndex != CORK_NIL
+		&& kind == K_TYPEDEF)
+		registerEntry (corkIndex);
+
 	if (isXtagEnabled(XTAG_QUALIFIED_TAGS) && currentContext->kind != K_UNDEFINED)
 	{
 		vString *const scopedName = vStringNew ();
@@ -1124,6 +1135,29 @@ static void processClass (tokenInfo *const token)
 	}
 }
 
+static bool doesNameForKindExist (unsigned int corkIndex, tagEntryInfo *entry, void *data)
+{
+	verilogKind *kind = data;
+
+	if (entry->kindIndex == *kind)
+		return false;
+
+	return true;
+}
+
+static bool isAlreadyTaggedAs (tokenInfo *token, verilogKind kind)
+{
+	if (!isInputLanguage (Lang_systemverilog))
+		return false;
+
+	vString *name = token->name;
+	if (vStringIsEmpty (name))
+		return false;
+
+	return (foreachEntriesInScope (CORK_NIL, vStringValue (name),
+								   doesNameForKindExist, &kind) == false);
+}
+
 static void tagNameList (tokenInfo* token, int c)
 {
 	verilogKind localKind;
@@ -1159,13 +1193,8 @@ static void tagNameList (tokenInfo* token, int c)
 		{
 			readIdentifier (token, c);
 			localKind = getKindForToken (token);
-			/* Create tag in case name is not a known kind ... */
-			if (localKind == K_UNDEFINED)
-			{
-				createTag (token);
-			}
-			/* ... or else continue searching for names */
-			else
+
+			if (localKind != K_UNDEFINED || isAlreadyTaggedAs (token, K_TYPEDEF))
 			{
 				/* Update kind unless it's a port or an ignored keyword */
 				if (token->kind != K_PORT && localKind != K_IGNORE)
@@ -1173,6 +1202,11 @@ static void tagNameList (tokenInfo* token, int c)
 					token->kind = localKind;
 				}
 				repeat = true;
+			}
+			else
+			/* Create tag in case name is not a known kind ... */
+			{
+				createTag (token);
 			}
 		}
 		else
@@ -1384,5 +1418,6 @@ extern parserDefinition* SystemVerilogParser (void)
 	def->extensions = extensions;
 	def->parser     = findVerilogTags;
 	def->initialize = initializeSystemVerilog;
+	def->useCork    = CORK_QUEUE | CORK_SYMTAB;
 	return def;
 }

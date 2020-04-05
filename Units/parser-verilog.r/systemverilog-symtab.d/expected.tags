@@ -1,0 +1,6 @@
+int32_t	input.sv	/^typedef bit[31:0] int32_t;$/;"	T
+mod	input.sv	/^module mod($/;"	m
+clk	input.sv	/^  input bit clk,$/;"	p	module:mod
+mod.clk	input.sv	/^  input bit clk,$/;"	p	module:mod
+a	input.sv	/^  input int32_t a$/;"	p	module:mod
+mod.a	input.sv	/^  input int32_t a$/;"	p	module:mod
