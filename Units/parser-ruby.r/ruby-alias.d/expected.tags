@@ -1,0 +1,5 @@
+MyModule	input.rb	/^module MyModule$/;"	m
+my_method	input.rb	/^  def my_method$/;"	f	module:MyModule
+MyModule	input.rb	/^module MyModule$/;"	m
+my_alias	input.rb	/^  alias my_alias my_method$/;"	a	module:MyModule
+$new	input.rb	/^  alias $new $old$/;"	a

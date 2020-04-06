@@ -31,7 +31,14 @@
 *   DATA DECLARATIONS
 */
 typedef enum {
-	K_UNDEFINED = -1, K_CLASS, K_METHOD, K_MODULE, K_SINGLETON, K_CONST, K_ACCESSOR,
+	K_UNDEFINED = -1,
+	K_CLASS,
+	K_METHOD,
+	K_MODULE,
+	K_SINGLETON,
+	K_CONST,
+	K_ACCESSOR,
+	K_ALIAS,
 } rubyKind;
 
 /*
@@ -44,6 +51,7 @@ static kindDefinition RubyKinds [] = {
 	{ true, 'S', "singletonMethod", "singleton methods" },
 	{ true, 'C', "constant", "constants" },
 	{ true, 'A', "accessor", "accessors" },
+	{ true, 'a', "alias",    "aliases" },
 };
 
 typedef enum {
@@ -301,7 +309,11 @@ static int emitRubyTagFull (vString* name, rubyKind kind, bool pushLevel, bool c
 		unqualified_name = qualified_name;
 
 	initTagEntry (&tag, unqualified_name, kind);
-	if (vStringLength (scope) > 0) {
+
+	/* Don't fill the scope field for a tag entry representing
+	 * a global variable. */
+	if (unqualified_name[0] != '$'
+		&& vStringLength (scope) > 0) {
 		Assert (0 <= parent_kind &&
 		        (size_t) parent_kind < (ARRAY_SIZE (RubyKinds)));
 
@@ -424,7 +436,8 @@ static rubyKind parseIdentifier (
 	return kind;
 }
 
-static int readAndEmitTag (const unsigned char** cp, rubyKind expected_kind)
+static int readAndEmitTagFull (const unsigned char** cp, rubyKind expected_kind,
+							   bool pushLevel, bool clearName)
 {
 	int r = CORK_NIL;
 	if (isspace (**cp))
@@ -457,11 +470,16 @@ static int readAndEmitTag (const unsigned char** cp, rubyKind expected_kind)
 		}
 		else
 		{
-			r = emitRubyTag (name, actual_kind);
+			r = emitRubyTagFull (name, actual_kind, pushLevel, clearName);
 		}
 		vStringDelete (name);
 	}
 	return r;
+}
+
+static int readAndEmitTag (const unsigned char** cp, rubyKind expected_kind)
+{
+	return readAndEmitTagFull (cp, expected_kind, expected_kind != K_CONST, true);
 }
 
 static void readAndStoreMixinSpec (const unsigned char** cp, const char *how_mixin)
@@ -812,6 +830,21 @@ static void findRubyTags (void)
 		{
 			emitRubyTag (constant, K_CONST);
 			vStringClear (constant);
+		}
+		else if (canMatchKeywordWithAssign (&cp, "alias"))
+		{
+			if (!readAndEmitTagFull (&cp, K_ALIAS, false, true)
+				&& (*cp == '$'))
+			{
+				/* Alias for a global variable. */
+				++cp;
+				vString *alias = vStringNew ();
+				vStringPut (alias, '$');
+				if (K_METHOD == parseIdentifier (&cp, alias, K_METHOD)
+					&& vStringLength (alias) > 0)
+					emitRubyTagFull (alias, K_ALIAS, false, false);
+				vStringDelete (alias);
+			}
 		}
 
 		while (*cp != '\0')
