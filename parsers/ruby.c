@@ -687,6 +687,44 @@ static void readAttrsAndEmitTags (const unsigned char **cp, bool reader, bool wr
 	vStringDelete (a);
 }
 
+static int readAliasMethodAndEmitTags (const unsigned char **cp)
+{
+	int r = CORK_NIL;
+	vString *a = vStringNew ();
+
+	skipWhitespace (cp);
+	if (**cp == '(')
+		++*cp;
+
+	skipWhitespace (cp);
+	if (**cp == ':')
+	{
+		++*cp;
+		if (K_METHOD != parseIdentifier (cp, a, K_METHOD))
+			vStringClear (a);
+	}
+	else if (**cp == '"')
+	{
+		++*cp;
+		/* Skip string literals.
+		 * FIXME: should cope with escapes and interpolation.
+		 */
+		while (**cp != 0 && **cp != '"')
+		{
+			vStringPut (a, **cp);
+			++*cp;
+		}
+		if (**cp != 0)
+			++*cp;
+	}
+
+	if (vStringLength (a) > 0)
+		r = emitRubyTagFull (a, K_ALIAS, false, false);
+
+	vStringDelete (a);
+	return r;
+}
+
 static void findRubyTags (void)
 {
 	const unsigned char *line;
@@ -846,6 +884,8 @@ static void findRubyTags (void)
 				vStringDelete (alias);
 			}
 		}
+		else if (canMatchKeywordWithAssign (&cp, "alias_method"))
+			readAliasMethodAndEmitTags (&cp);
 
 		while (*cp != '\0')
 		{

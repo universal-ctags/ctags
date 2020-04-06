@@ -11,6 +11,10 @@ end
 module MyModule
   alias my_alias my_method
   alias $new $old
+  alias_method :my_alias_method0, :my_method
+  alias_method "my_alias_method1", :my_method
+  alias_method(:my_alias_method2, :my_method)
+  alias_method("my_alias_method3", :my_method)
 end
 
 p $new # prints 0
