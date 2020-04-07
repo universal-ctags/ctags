@@ -466,6 +466,47 @@ static void parseString (const unsigned char** cp, vString* vstr)
 		++*cp;
 }
 
+static void parseSignature (const unsigned char** cp, vString* vstr)
+{
+	int depth = 1;
+
+	while (1)
+	{
+		/* FIXME:
+		 * - handle string literals including ( or ), and
+		 * - skip comments.
+		 */
+		while (! (depth == 0 || **cp == '\0'))
+		{
+			if (**cp == '(' || **cp == ')')
+			{
+				depth += (**cp == '(')? 1: -1;
+				vStringPut (vstr, **cp);
+			}
+			else if (isspace (vStringLast (vstr)))
+			{
+				if (! (isspace (**cp)))
+				{
+					if (**cp == ',')
+						vStringChop (vstr);
+					vStringPut (vstr, **cp);
+				}
+			}
+			else
+				vStringPut (vstr, **cp);
+			++*cp;
+		}
+		if (depth == 0)
+			return;
+
+		const unsigned char *line = readLineFromInputFile ();
+		if (line == NULL)
+			return;
+		else
+			*cp = line;
+	}
+}
+
 static int readAndEmitTagFull (const unsigned char** cp, rubyKind expected_kind,
 							   bool pushLevel, bool clearName)
 {
@@ -886,7 +927,30 @@ static void findRubyTags (void)
 			 */
 			if (e && e->kindIndex == K_CLASS && strlen (e->name) == 0)
 				kind = K_SINGLETON;
-			readAndEmitTag (&cp, kind);
+			int corkIndex = readAndEmitTag (&cp, kind);
+
+			/* Fill signature: field. */
+			if (corkIndex != CORK_NIL)
+			{
+				vString *signature = vStringNewInit ("(");
+				skipWhitespace (&cp);
+				if (*cp == '(')
+				{
+					++cp;
+					parseSignature (&cp, signature);
+					if (vStringLast(signature) != ')')
+					{
+						vStringDelete (signature);
+						signature = NULL;
+					}
+				}
+				else
+					vStringPut (signature, ')');
+				tagEntryInfo *e = getEntryInCorkQueue (corkIndex);
+				e->extensionFields.signature = vStringDeleteUnwrap (signature);
+				signature = NULL;;
+				vStringDelete (signature);
+			}
 		}
 		else if (canMatchKeywordWithAssign (&cp, "attr_reader"))
 		{
