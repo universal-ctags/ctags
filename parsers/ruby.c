@@ -436,6 +436,20 @@ static rubyKind parseIdentifier (
 	return kind;
 }
 
+static void parseString (const unsigned char** cp, vString* vstr)
+{
+	while (**cp != 0 && **cp != '"')
+	{
+		if (vstr)
+			vStringPut (vstr, **cp);
+		++*cp;
+	}
+
+	/* skip the last found '"' */
+	if (**cp == '"')
+		++*cp;
+}
+
 static int readAndEmitTagFull (const unsigned char** cp, rubyKind expected_kind,
 							   bool pushLevel, bool clearName)
 {
@@ -662,16 +676,7 @@ static void readAttrsAndEmitTags (const unsigned char **cp, bool reader, bool wr
 		else if (**cp == '"')
 		{
 			++*cp;
-			/* Skip string literals.
-			 * FIXME: should cope with escapes and interpolation.
-			 */
-			while (**cp != 0 && **cp != '"')
-			{
-				vStringPut (a, **cp);
-				++*cp;
-			}
-			if (**cp != 0)
-				++*cp;
+			parseString (cp, a);
 
 			emitRubyAccessorTags (a, reader, writer);
 			skipWhitespace (cp);
@@ -706,16 +711,7 @@ static int readAliasMethodAndEmitTags (const unsigned char **cp)
 	else if (**cp == '"')
 	{
 		++*cp;
-		/* Skip string literals.
-		 * FIXME: should cope with escapes and interpolation.
-		 */
-		while (**cp != 0 && **cp != '"')
-		{
-			vStringPut (a, **cp);
-			++*cp;
-		}
-		if (**cp != 0)
-			++*cp;
+		parseString (cp, a);
 	}
 
 	if (vStringLength (a) > 0)
@@ -928,11 +924,8 @@ static void findRubyTags (void)
 				/* Skip string literals.
 				 * FIXME: should cope with escapes and interpolation.
 				 */
-				do {
-					++cp;
-				} while (*cp != 0 && *cp != '"');
-				if (*cp == '"')
-					cp++; /* skip the last found '"' */
+				++cp;
+				parseString (&cp, NULL);
 			}
 			else if (*cp == ';')
 			{
