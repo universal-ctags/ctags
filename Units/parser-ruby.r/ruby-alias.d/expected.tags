@@ -1,0 +1,9 @@
+MyModule	input.rb	/^module MyModule$/;"	m
+my_method	input.rb	/^  def my_method$/;"	f	module:MyModule
+MyModule	input.rb	/^module MyModule$/;"	m
+my_alias	input.rb	/^  alias my_alias my_method$/;"	a	module:MyModule
+$new	input.rb	/^  alias $new $old$/;"	a
+my_alias_method0	input.rb	/^  alias_method :my_alias_method0, :my_method$/;"	a	module:MyModule
+my_alias_method1	input.rb	/^  alias_method "my_alias_method1", :my_method$/;"	a	module:MyModule
+my_alias_method2	input.rb	/^  alias_method(:my_alias_method2, :my_method)$/;"	a	module:MyModule
+my_alias_method3	input.rb	/^  alias_method("my_alias_method3", :my_method)$/;"	a	module:MyModule

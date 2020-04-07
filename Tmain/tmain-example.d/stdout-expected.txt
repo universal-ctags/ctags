@@ -4,3 +4,4 @@ m  modules
 S  singleton methods
 C  constants
 A  accessors
+a  aliases
