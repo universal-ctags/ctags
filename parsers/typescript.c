@@ -565,6 +565,12 @@ CTAGS_INLINE void parseString(const int c, tokenInfo *const token, const char qu
 
 		return;
 	}
+	else if (quote == '/' && c == '\n') // regex cannot contain new lines
+	{
+		result->status = PARSER_FAILED;
+
+		return;
+	}
 
 	*prev = c;
 	result->status = PARSER_NEEDS_MORE_INPUT;
@@ -1147,17 +1153,18 @@ static void parseEnum (const int scope, tokenInfo *const token)
 	parseEnumBody (nscope, token);
 }
 
-MULTI_CHAR_PARSER_DEF (VariableChars, "|&=?[]{}()\n:;,.=-+/^<>*",
+MULTI_CHAR_PARSER_DEF (VariableChars, "|&=?[]{}()\n:;,.-+/^<>*",
 		TOKEN_PIPE, TOKEN_AMPERSAND, TOKEN_EQUAL_SIGN, TOKEN_QUESTION_MARK,
 		TOKEN_OPEN_SQUARE, TOKEN_CLOSE_SQUARE, TOKEN_OPEN_CURLY, TOKEN_CLOSE_CURLY,
 		TOKEN_OPEN_PAREN, TOKEN_CLOSE_PAREN, TOKEN_NL, TOKEN_COLON, TOKEN_SEMICOLON,
-		TOKEN_COMMA, TOKEN_PERIOD, TOKEN_EQUAL_SIGN, TOKEN_MINUS, TOKEN_PLUS,
-		TOKEN_DIV, TOKEN_POWER, TOKEN_GREATER, TOKEN_STAR)
+		TOKEN_COMMA, TOKEN_PERIOD, TOKEN_MINUS, TOKEN_PLUS,
+		TOKEN_DIV, TOKEN_POWER, TOKEN_LOWER, TOKEN_GREATER, TOKEN_STAR)
 static void parseVariable (bool constVar, bool localVar, const int scope, tokenInfo *const token)
 {
 	tokenInfo *member = NULL;
 	bool parsed = false;
 	bool parsingType = false;
+	bool expectingVariable = false;
 	bool mayBeFun = false;
 	bool isFunction = false;
 	int nestLevel = 0, parenLevel = 0;
@@ -1215,6 +1222,7 @@ static void parseVariable (bool constVar, bool localVar, const int scope, tokenI
 					if (nestLevel <= 0) isFunction = false;
 					break;
 				case TOKEN_COMMA:
+					expectingVariable = true;
 				case TOKEN_SEMICOLON:
 				case TOKEN_NUMBER:
 				case TOKEN_STRING:
@@ -1250,6 +1258,7 @@ static void parseVariable (bool constVar, bool localVar, const int scope, tokenI
 						emitTag (member, varKind);
 						deleteToken (member);
 					}
+					expectingVariable = false;
 					parsingType = false;
 					break;
 				case TOKEN_KEYWORD:
@@ -1270,13 +1279,18 @@ static void parseVariable (bool constVar, bool localVar, const int scope, tokenI
 					break;
 				default:
 					if (nestLevel <= 0) parsingType = false;
+					if (token->type != TOKEN_NL) expectingVariable = false;
 					break;
 			}
 
 			if (isType (token, TOKEN_EQUAL_SIGN) || isKeyword (token, KEYWORD_function)) mayBeFun = true;
 			else if (! isType(token, TOKEN_COMMENT_BLOCK) && nestLevel <= 0) mayBeFun = false;
 		}
-	} while (parsed && ! ((token->type == TOKEN_SEMICOLON || (token->type == TOKEN_CLOSE_PAREN && ! isFunction) || token->type == TOKEN_NL) && ! parsingType && nestLevel <= 0));
+	} while (parsed &&
+			! ((token->type == TOKEN_SEMICOLON
+					|| (token->type == TOKEN_CLOSE_PAREN && ! isFunction)
+					|| (token->type == TOKEN_NL && ! expectingVariable))
+				&& ! parsingType && nestLevel <= 0));
 
 	clearPoolToken (token);
 }
