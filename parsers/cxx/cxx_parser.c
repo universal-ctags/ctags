@@ -1485,7 +1485,13 @@ check_function_signature:
 			// out its proper scope. Better avoid emitting this one.
 			CXX_DEBUG_PRINT("But it has been preceded by the 'friend' keyword: this is not a real prototype");
 		} else {
-			int iScopesPushed = cxxParserEmitFunctionTags(&oInfo,CXXTagKindPROTOTYPE,CXXEmitFunctionTagsPushScopes,NULL);
+			int piCorkQueueIndex;
+			int iScopesPushed = cxxParserEmitFunctionTags(&oInfo,CXXTagKindPROTOTYPE,CXXEmitFunctionTagsPushScopes, &piCorkQueueIndex);
+			if (piCorkQueueIndex != CORK_NIL)
+			{
+				CXXToken * t = cxxTokenChainLast(g_cxx.pTokenChain);
+				cxxParserSetEndLineForTagInCorkQueue (piCorkQueueIndex, t->iLineNumber);
+			}
 			while(iScopesPushed > 0)
 			{
 				cxxScopePop();
