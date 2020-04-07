@@ -39,11 +39,25 @@ typedef enum {
 	K_CONST,
 	K_ACCESSOR,
 	K_ALIAS,
+	K_LIBRARY,
 } rubyKind;
+
+typedef enum {
+	RUBY_LIBRARY_REQUIRED,
+	RUBY_LIBRARY_REQUIRED_REL,
+	RUBY_LIBRARY_LOADED,
+} rubyLibraryRole;
 
 /*
 *   DATA DEFINITIONS
 */
+
+static roleDefinition RubyLibraryRoles [] = {
+	{ true, "required",  "loaded by \"require\" method" },
+	{ true, "requiredRel", "loaded by \"require_relative\" method" },
+	{ true, "loaded", "loaded by \"load\" method" },
+};
+
 static kindDefinition RubyKinds [] = {
 	{ true, 'c', "class",  "classes" },
 	{ true, 'f', "method", "methods" },
@@ -52,6 +66,8 @@ static kindDefinition RubyKinds [] = {
 	{ true, 'C', "constant", "constants" },
 	{ true, 'A', "accessor", "accessors" },
 	{ true, 'a', "alias",    "aliases" },
+	{ true, 'L', "library",  "libraries",
+	  .referenceOnly = true, ATTACH_ROLES(RubyLibraryRoles) },
 };
 
 typedef enum {
@@ -721,6 +737,30 @@ static int readAliasMethodAndEmitTags (const unsigned char **cp)
 	return r;
 }
 
+static int readStringAndEmitTag (const unsigned char **cp, rubyKind kind, int role)
+{
+	int r = CORK_NIL;
+	vString *s = NULL;
+
+	skipWhitespace (cp);
+	if (**cp == '(')
+		++*cp;
+
+	skipWhitespace (cp);
+	if (**cp == '"')
+	{
+		++*cp;
+		s = vStringNew ();
+		parseString (cp, s);
+	}
+
+	if (s && vStringLength (s) > 0)
+		r = makeSimpleRefTag (s, kind, role);
+
+	vStringDelete (s);
+	return r;
+}
+
 static void findRubyTags (void)
 {
 	const unsigned char *line;
@@ -864,6 +904,18 @@ static void findRubyTags (void)
 		{
 			emitRubyTag (constant, K_CONST);
 			vStringClear (constant);
+		}
+		else if (canMatchKeywordWithAssign (&cp, "require"))
+		{
+			readStringAndEmitTag (&cp, K_LIBRARY, RUBY_LIBRARY_REQUIRED);
+		}
+		else if (canMatchKeywordWithAssign (&cp, "require_relative"))
+		{
+			readStringAndEmitTag (&cp, K_LIBRARY, RUBY_LIBRARY_REQUIRED_REL);
+		}
+		else if (canMatchKeywordWithAssign (&cp, "load"))
+		{
+			readStringAndEmitTag (&cp, K_LIBRARY, RUBY_LIBRARY_LOADED);
 		}
 		else if (canMatchKeywordWithAssign (&cp, "alias"))
 		{

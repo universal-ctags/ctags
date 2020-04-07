@@ -5,3 +5,4 @@ S  singleton methods
 C  constants
 A  accessors
 a  aliases
+L  libraries

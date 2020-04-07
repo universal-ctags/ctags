@@ -1,0 +1,6 @@
+a	input.rb	/^require "a"$/;"	L	roles:required
+b	input.rb	/^require("b")$/;"	L	roles:required
+c	input.rb	/^require_relative "c"$/;"	L	roles:requiredRel
+d	input.rb	/^require_relative("d")$/;"	L	roles:requiredRel
+e.rb	input.rb	/^load "e.rb"$/;"	L	roles:loaded
+f.rb	input.rb	/^load("f.rb")$/;"	L	roles:loaded
