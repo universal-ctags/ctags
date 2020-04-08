@@ -1,0 +1,9 @@
+X	input.rb	/^module X$/;"	m
+add0	input.rb	/^  def add0()$/;"	f	module:X	signature:()
+add00	input.rb	/^  def add00$/;"	f	module:X	signature:()
+add1	input.rb	/^  def add1(n)$/;"	f	module:X	signature:(n)
+add2	input.rb	/^  def add2(n, m)$/;"	f	module:X	signature:(n, m)
+add3	input.rb	/^  def add3(n = 0, m)$/;"	f	module:X	signature:(n = 0, m)
+add4	input.rb	/^  def add4(n = 0, m = 0)$/;"	f	module:X	signature:(n = 0, m = 0)
+add5	input.rb	/^  def add5(n    =     0    ,    m    =   0)$/;"	f	module:X	signature:(n = 0, m = 0)
+addm	input.rb	/^  def addm (n = 0,$/;"	f	module:X	signature:(n = 0, m = 0)
