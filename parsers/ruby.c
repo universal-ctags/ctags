@@ -39,11 +39,25 @@ typedef enum {
 	K_CONST,
 	K_ACCESSOR,
 	K_ALIAS,
+	K_LIBRARY,
 } rubyKind;
+
+typedef enum {
+	RUBY_LIBRARY_REQUIRED,
+	RUBY_LIBRARY_REQUIRED_REL,
+	RUBY_LIBRARY_LOADED,
+} rubyLibraryRole;
 
 /*
 *   DATA DEFINITIONS
 */
+
+static roleDefinition RubyLibraryRoles [] = {
+	{ true, "required",  "loaded by \"require\" method" },
+	{ true, "requiredRel", "loaded by \"require_relative\" method" },
+	{ true, "loaded", "loaded by \"load\" method" },
+};
+
 static kindDefinition RubyKinds [] = {
 	{ true, 'c', "class",  "classes" },
 	{ true, 'f', "method", "methods" },
@@ -52,6 +66,8 @@ static kindDefinition RubyKinds [] = {
 	{ true, 'C', "constant", "constants" },
 	{ true, 'A', "accessor", "accessors" },
 	{ true, 'a', "alias",    "aliases" },
+	{ true, 'L', "library",  "libraries",
+	  .referenceOnly = true, ATTACH_ROLES(RubyLibraryRoles) },
 };
 
 typedef enum {
@@ -436,6 +452,20 @@ static rubyKind parseIdentifier (
 	return kind;
 }
 
+static void parseString (const unsigned char** cp, vString* vstr)
+{
+	while (**cp != 0 && **cp != '"')
+	{
+		if (vstr)
+			vStringPut (vstr, **cp);
+		++*cp;
+	}
+
+	/* skip the last found '"' */
+	if (**cp == '"')
+		++*cp;
+}
+
 static int readAndEmitTagFull (const unsigned char** cp, rubyKind expected_kind,
 							   bool pushLevel, bool clearName)
 {
@@ -662,16 +692,7 @@ static void readAttrsAndEmitTags (const unsigned char **cp, bool reader, bool wr
 		else if (**cp == '"')
 		{
 			++*cp;
-			/* Skip string literals.
-			 * FIXME: should cope with escapes and interpolation.
-			 */
-			while (**cp != 0 && **cp != '"')
-			{
-				vStringPut (a, **cp);
-				++*cp;
-			}
-			if (**cp != 0)
-				++*cp;
+			parseString (cp, a);
 
 			emitRubyAccessorTags (a, reader, writer);
 			skipWhitespace (cp);
@@ -706,22 +727,37 @@ static int readAliasMethodAndEmitTags (const unsigned char **cp)
 	else if (**cp == '"')
 	{
 		++*cp;
-		/* Skip string literals.
-		 * FIXME: should cope with escapes and interpolation.
-		 */
-		while (**cp != 0 && **cp != '"')
-		{
-			vStringPut (a, **cp);
-			++*cp;
-		}
-		if (**cp != 0)
-			++*cp;
+		parseString (cp, a);
 	}
 
 	if (vStringLength (a) > 0)
 		r = emitRubyTagFull (a, K_ALIAS, false, false);
 
 	vStringDelete (a);
+	return r;
+}
+
+static int readStringAndEmitTag (const unsigned char **cp, rubyKind kind, int role)
+{
+	int r = CORK_NIL;
+	vString *s = NULL;
+
+	skipWhitespace (cp);
+	if (**cp == '(')
+		++*cp;
+
+	skipWhitespace (cp);
+	if (**cp == '"')
+	{
+		++*cp;
+		s = vStringNew ();
+		parseString (cp, s);
+	}
+
+	if (s && vStringLength (s) > 0)
+		r = makeSimpleRefTag (s, kind, role);
+
+	vStringDelete (s);
 	return r;
 }
 
@@ -869,6 +905,18 @@ static void findRubyTags (void)
 			emitRubyTag (constant, K_CONST);
 			vStringClear (constant);
 		}
+		else if (canMatchKeywordWithAssign (&cp, "require"))
+		{
+			readStringAndEmitTag (&cp, K_LIBRARY, RUBY_LIBRARY_REQUIRED);
+		}
+		else if (canMatchKeywordWithAssign (&cp, "require_relative"))
+		{
+			readStringAndEmitTag (&cp, K_LIBRARY, RUBY_LIBRARY_REQUIRED_REL);
+		}
+		else if (canMatchKeywordWithAssign (&cp, "load"))
+		{
+			readStringAndEmitTag (&cp, K_LIBRARY, RUBY_LIBRARY_LOADED);
+		}
 		else if (canMatchKeywordWithAssign (&cp, "alias"))
 		{
 			if (!readAndEmitTagFull (&cp, K_ALIAS, false, true)
@@ -928,11 +976,8 @@ static void findRubyTags (void)
 				/* Skip string literals.
 				 * FIXME: should cope with escapes and interpolation.
 				 */
-				do {
-					++cp;
-				} while (*cp != 0 && *cp != '"');
-				if (*cp == '"')
-					cp++; /* skip the last found '"' */
+				++cp;
+				parseString (&cp, NULL);
 			}
 			else if (*cp == ';')
 			{

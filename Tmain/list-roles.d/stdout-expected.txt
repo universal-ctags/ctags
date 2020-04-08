@@ -58,6 +58,9 @@ Python         x/unknown         imported           on      imported from the ot
 Python         x/unknown         indirectlyImported on      classes/variables/functions/modules imported in alternative name
 RpmSpec        m/macro           undef              on      undefined
 RpmSpec        p/patch           decl               on      declared for applying later
+Ruby           L/library         loaded             on      loaded by "load" method
+Ruby           L/library         required           on      loaded by "require" method
+Ruby           L/library         requiredRel        on      loaded by "require_relative" method
 Sh             h/heredoc         endmarker          on      end marker
 Sh             s/script          loaded             on      loaded
 SystemdUnit    u/unit            After              on      referred in After key
@@ -132,6 +135,9 @@ Python         x/unknown         imported           on      imported from the ot
 Python         x/unknown         indirectlyImported on      classes/variables/functions/modules imported in alternative name
 RpmSpec        m/macro           undef              on      undefined
 RpmSpec        p/patch           decl               on      declared for applying later
+Ruby           L/library         loaded             on      loaded by "load" method
+Ruby           L/library         required           on      loaded by "require" method
+Ruby           L/library         requiredRel        on      loaded by "require_relative" method
 Sh             h/heredoc         endmarker          on      end marker
 Sh             s/script          loaded             on      loaded
 SystemdUnit    u/unit            After              on      referred in After key
