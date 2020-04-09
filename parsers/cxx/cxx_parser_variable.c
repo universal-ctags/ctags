@@ -790,10 +790,7 @@ bool cxxParserExtractVariableDeclarations(CXXTokenChain * pChain,unsigned int uF
 		if(cxxTokenTypeIsOneOf(t,CXXTokenTypeSemicolon | CXXTokenTypeOpeningBracket))
 		{
 			if (iCorkIndex != CORK_NIL)
-			{
 				cxxParserSetEndLineForTagInCorkQueue (iCorkIndex, t->iLineNumber);
-				iCorkIndex = CORK_NIL;
-			}
 			CXX_DEBUG_LEAVE_TEXT("Noting else");
 			return bGotVariable;
 		}
