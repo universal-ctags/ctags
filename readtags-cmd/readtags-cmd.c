@@ -407,7 +407,7 @@ extern int main (int argc, char **argv)
 	if (! actionSupplied)
 	{
 		fprintf (stderr,
-			"%s: no action specified: specify one of NAME, -l or -D",
+			"%s: no action specified: specify one of NAME, -l or -D\n",
 			ProgramName);
 		exit (1);
 	}
