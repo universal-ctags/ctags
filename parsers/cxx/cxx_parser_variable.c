@@ -98,11 +98,22 @@ CXXToken * cxxParserFindFirstPossiblyNestedAndQualifiedIdentifier(
 //   If the function returns false the chain has not been modified (and
 //   to extract something else from it).
 //
+// - This function attaches "end:" fields to the tags for the captured variables if possible.
+//   There is a case that "end:" field cannot be attached in this function. In such a case,
+//   the caller should attach the field.
+//   The parameter iCorkIndexForLastEmittedTag is for the purpose.
+//   *iCorkIndexForLastEmittedTag is set only when a tag is emitted but its "end:" field is
+//   not filled. It allows the caller fills the field to the tagEntry specified with
+//   *iCorkIndexForLastEmittedTag. A caller can pass NULL for iCorkIndexForLastEmittedTag.
+//
 // - This function is quite tricky.
 //
-bool cxxParserExtractVariableDeclarations(CXXTokenChain * pChain,unsigned int uFlags)
+bool cxxParserExtractVariableDeclarations(CXXTokenChain * pChain,unsigned int uFlags, int * iCorkIndexForLastEmittedTag)
 {
 	int iCorkIndex = CORK_NIL;
+
+	if (iCorkIndexForLastEmittedTag)
+		*iCorkIndexForLastEmittedTag = CORK_NIL;
 
 	CXX_DEBUG_ENTER();
 
@@ -758,6 +769,8 @@ bool cxxParserExtractVariableDeclarations(CXXTokenChain * pChain,unsigned int uF
 
 		if(!t)
 		{
+			if (iCorkIndex != CORK_NIL && iCorkIndexForLastEmittedTag)
+				*iCorkIndexForLastEmittedTag = iCorkIndex;
 			CXX_DEBUG_LEAVE_TEXT("Nothing more");
 			return bGotVariable;
 		}
@@ -778,10 +791,14 @@ bool cxxParserExtractVariableDeclarations(CXXTokenChain * pChain,unsigned int uF
 			if(!t)
 			{
 				CXX_DEBUG_LEAVE_TEXT("Didn't find a comma, semicolon or {");
+				if (iCorkIndex != CORK_NIL && iCorkIndexForLastEmittedTag)
+					*iCorkIndexForLastEmittedTag = iCorkIndex;
 				return bGotVariable;
 			}
 			if(cxxTokenTypeIs(t,CXXTokenTypeSmallerThanSign))
 			{
+				if (iCorkIndex != CORK_NIL && iCorkIndexForLastEmittedTag)
+					*iCorkIndexForLastEmittedTag = iCorkIndex;
 				CXX_DEBUG_LEAVE_TEXT("Found '<': probably a template on the right side of declaration");
 				return bGotVariable;
 			}

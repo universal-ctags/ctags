@@ -548,7 +548,7 @@ static bool cxxParserParseEnumStructClassOrUnionFullDeclarationTrailer(
 	if(uKeywordState & CXXParserKeywordStateSeenTypedef)
 		cxxParserExtractTypedef(g_cxx.pTokenChain,true);
 	else
-		cxxParserExtractVariableDeclarations(g_cxx.pTokenChain,0);
+		cxxParserExtractVariableDeclarations(g_cxx.pTokenChain,0,NULL);
 
 	/*
 	  Skip initializer in
@@ -712,7 +712,7 @@ bool cxxParserParseEnum(void)
 			if(g_cxx.uKeywordState & CXXParserKeywordStateSeenTypedef)
 				cxxParserExtractTypedef(g_cxx.pTokenChain,true);
 			else
-				cxxParserExtractVariableDeclarations(g_cxx.pTokenChain,0);
+				cxxParserExtractVariableDeclarations(g_cxx.pTokenChain,0,NULL);
 		}
 
 		cxxParserNewStatement();
@@ -1082,7 +1082,7 @@ static bool cxxParserParseClassStructOrUnionInternal(
 			if(uInitialKeywordState & CXXParserKeywordStateSeenTypedef)
 				cxxParserExtractTypedef(g_cxx.pTokenChain,true);
 			else if(!(g_cxx.uKeywordState & CXXParserKeywordStateSeenFriend))
-				cxxParserExtractVariableDeclarations(g_cxx.pTokenChain,0);
+				cxxParserExtractVariableDeclarations(g_cxx.pTokenChain,0,NULL);
 		}
 
 		cxxParserNewStatement();
@@ -1095,7 +1095,7 @@ static bool cxxParserParseClassStructOrUnionInternal(
 		if(g_cxx.pTokenChain->iCount > 3)
 		{
 			// struct X Y = ...;
-			cxxParserExtractVariableDeclarations(g_cxx.pTokenChain,0);
+			cxxParserExtractVariableDeclarations(g_cxx.pTokenChain,0,NULL);
 		}
 
 		// Skip the initialization (which almost certainly contains a block)
@@ -1452,7 +1452,7 @@ void cxxParserAnalyzeOtherStatement(void)
 	{
 		// prefer variable declarations.
 		// if none found then try function prototype
-		if(cxxParserExtractVariableDeclarations(g_cxx.pTokenChain,0))
+		if(cxxParserExtractVariableDeclarations(g_cxx.pTokenChain,0,NULL))
 		{
 			CXX_DEBUG_LEAVE_TEXT("Found variable declarations");
 			return;
@@ -1543,7 +1543,7 @@ check_function_signature:
 		return;
 	}
 
-	cxxParserExtractVariableDeclarations(g_cxx.pTokenChain,0);
+	cxxParserExtractVariableDeclarations(g_cxx.pTokenChain,0,NULL);
 	CXX_DEBUG_LEAVE_TEXT("Nothing else");
 }
 
@@ -1807,7 +1807,7 @@ bool cxxParserParseIfForWhileSwitchCatchParenthesis(void)
 		vStringPut(t->pszWord,';');
 
 		// and extract variable declarations if possible
-		cxxParserExtractVariableDeclarations(pChain,0);
+		cxxParserExtractVariableDeclarations(pChain,0,NULL);
 	}
 
 	CXX_DEBUG_LEAVE();

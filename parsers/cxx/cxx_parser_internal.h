@@ -54,7 +54,8 @@ enum CXXExtractVariableDeclarationsFlags
 // cxx_parser_variable.c
 bool cxxParserExtractVariableDeclarations(
 		CXXTokenChain * pChain,
-		unsigned int uFlags
+		unsigned int uFlags,
+		int * iCorkIndexForLastEmittedTag
 	);
 
 CXXToken * cxxParserFindFirstPossiblyNestedAndQualifiedIdentifier(

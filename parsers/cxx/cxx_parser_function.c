@@ -325,7 +325,8 @@ int cxxParserMaybeParseKnRStyleFunctionDefinition(void)
 		{
 			cxxParserExtractVariableDeclarations(
 					g_cxx.pTokenChain,
-					CXXExtractVariableDeclarationsKnRStyleParameters
+					CXXExtractVariableDeclarationsKnRStyleParameters,
+					NULL
 				);
 			if(iIdx >= iExtraStatementsInChain)
 				break;
