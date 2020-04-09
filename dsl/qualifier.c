@@ -60,6 +60,7 @@ static EsObject* builtin_substr (EsObject *args, tagEntry *entry);
 static EsObject* builtin_member (EsObject *args, tagEntry *entry);
 static EsObject* builtin_entry_ref (EsObject *args, tagEntry *entry);
 static EsObject* builtin_downcase (EsObject *args, tagEntry *entry);
+static EsObject* builtin_upcase (EsObject *args, tagEntry *entry);
 static EsObject* bulitin_debug_print (EsObject *args, tagEntry *entry);
 
 
@@ -106,6 +107,8 @@ struct sCode {
 	  .helpstr = "(member ELEMENT LIST) -> #f|<list>" },
 	{ "downcase", builtin_downcase, NULL, CHECK_ARITY, 1,
 	  .helpstr = "(downcase elt<string>|<list>) -> <string>|<list>" },
+	{ "upcase", builtin_upcase, NULL, CHECK_ARITY, 1,
+	  .helpstr = "(upcate elt<string>|<list>) -> <string>|<list>" },
 	{ "$",       builtin_entry_ref, NULL, CHECK_ARITY, 1,
 	  .helpstr = "($ NAME) -> #f|<string>" },
 	{ "print",   bulitin_debug_print, NULL, CHECK_ARITY, 1,
@@ -549,6 +552,11 @@ static EsObject* downcase (EsObject *o)
 	return caseop (o, tolower);
 }
 
+static EsObject* upcase (EsObject *o)
+{
+	return caseop (o, toupper);
+}
+
 static EsObject* builtin_caseop0 (EsObject *o,
 								  EsObject *(* op) (EsObject*))
 {
@@ -578,6 +586,12 @@ static EsObject* builtin_downcase (EsObject *args, tagEntry *entry)
 {
 	EsObject *o = es_car(args);
 	return builtin_caseop0 (o, downcase);
+}
+
+static EsObject* builtin_upcase (EsObject *args, tagEntry *entry)
+{
+	EsObject *o = es_car(args);
+	return builtin_caseop0 (o, upcase);
 }
 
 static MIO  *miodebug;
