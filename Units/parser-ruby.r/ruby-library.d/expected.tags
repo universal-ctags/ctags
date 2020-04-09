@@ -4,3 +4,9 @@ c	input.rb	/^require_relative "c"$/;"	L	roles:requiredRel
 d	input.rb	/^require_relative("d")$/;"	L	roles:requiredRel
 e.rb	input.rb	/^load "e.rb"$/;"	L	roles:loaded
 f.rb	input.rb	/^load("f.rb")$/;"	L	roles:loaded
+i	input.rb	/^require 'i'$/;"	L	roles:required
+j	input.rb	/^require('j')$/;"	L	roles:required
+k	input.rb	/^require_relative 'k'$/;"	L	roles:requiredRel
+l	input.rb	/^require_relative('l')$/;"	L	roles:requiredRel
+m.rb	input.rb	/^load 'm.rb'$/;"	L	roles:loaded
+n.rb	input.rb	/^load('n.rb')$/;"	L	roles:loaded
