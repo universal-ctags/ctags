@@ -87,7 +87,7 @@ struct sCode {
 	int arity;
 	const char* helpstr;
 } codes [] = {
-	{ "null?",    builtin_null,   NULL, CHECK_ARITY, 1 },
+	{ "null?",   builtin_null,   NULL, CHECK_ARITY, 1 },
 	{ "and",     builtin_and,    NULL, SELF_EVAL },
 	{ "or",      builtin_or,     NULL, SELF_EVAL },
 	{ "not",     builtin_not,    NULL, CHECK_ARITY, 1},
