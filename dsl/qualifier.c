@@ -46,6 +46,8 @@ enum ProcAttr {
  * Decls
  */
 static EsObject* builtin_null  (EsObject *args, tagEntry *entry);
+static EsObject* builtin_begin (EsObject *args, tagEntry *entry);
+static EsObject* builtin_begin0 (EsObject *args, tagEntry *entry);
 static EsObject* builtin_and  (EsObject *args, tagEntry *entry);
 static EsObject* builtin_or  (EsObject *args, tagEntry *entry);
 static EsObject* builtin_not  (EsObject *args, tagEntry *entry);
@@ -88,6 +90,10 @@ struct sCode {
 	const char* helpstr;
 } codes [] = {
 	{ "null?",   builtin_null,   NULL, CHECK_ARITY, 1 },
+	{ "begin",   builtin_begin,  NULL, SELF_EVAL,  0UL,
+	  .helpstr = "(begin exp0 ... expN) -> expN" },
+	{ "begin0",  builtin_begin0, NULL, SELF_EVAL,  0UL,
+	  .helpstr = "(begin exp0 ... expN) -> exp0" },
 	{ "and",     builtin_and,    NULL, SELF_EVAL },
 	{ "or",      builtin_or,     NULL, SELF_EVAL },
 	{ "not",     builtin_not,    NULL, CHECK_ARITY, 1},
@@ -284,6 +290,46 @@ static EsObject* reverse (EsObject *object)
 static EsObject* builtin_null  (EsObject *args, tagEntry *entry)
 {
 	return es_null(es_car (args))? es_true: es_false;
+}
+
+static EsObject* builtin_begin  (EsObject *args, tagEntry *entry)
+{
+	if (es_null (args))
+		throw (TOO_FEW_ARGUMENTS,
+			   es_symbol_intern ("begin"));
+
+	EsObject *o = es_false;
+	while (! es_null (args))
+	{
+		o = es_car (args);
+		o = eval (o, entry);
+		if (es_error_p (o))
+			return o;
+		args = es_cdr (args);
+	}
+	return o;
+}
+
+static EsObject* builtin_begin0  (EsObject *args, tagEntry *entry)
+{
+	if (es_null (args))
+		throw (TOO_FEW_ARGUMENTS,
+			   es_symbol_intern ("begin0"));
+
+	int count = 0;
+	EsObject *o, *o0 = es_false;
+	while (! es_null (args))
+	{
+		o = es_car (args);
+		o = eval (o, entry);
+		if (!count++)
+			o0 = o;
+
+		if (es_error_p (o))
+			return o;
+		args = es_cdr (args);
+	}
+	return o0;
 }
 
 static EsObject* builtin_and  (EsObject *args, tagEntry *entry)

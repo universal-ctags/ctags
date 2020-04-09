@@ -1,0 +1,16 @@
+;; (begin #f (print $name) (print $line) #t)
+abc	sample.c	/^int abc;$/;"	kind:variable	language:C	typeref:typename:int	roles:def	end:2
+efg	sample.c	/^int efg;$/;"	kind:variable	language:C	typeref:typename:int	roles:def	end:3
+;; (begin #t (print $name) (print $line) #f)
+;; (begin #t (print $name) (print $line) (eq? $name "efg"))
+efg	sample.c	/^int efg;$/;"	kind:variable	language:C	typeref:typename:int	roles:def	end:3
+;; (begin #t (and (eq? $name "abc") (print $name) (print $line)) (eq? $name "efg"))
+efg	sample.c	/^int efg;$/;"	kind:variable	language:C	typeref:typename:int	roles:def	end:3
+;; (begin0 #t                (print $name) (print $line) #f)
+abc	sample.c	/^int abc;$/;"	kind:variable	language:C	typeref:typename:int	roles:def	end:2
+efg	sample.c	/^int efg;$/;"	kind:variable	language:C	typeref:typename:int	roles:def	end:3
+;; (begin0 #f                (print $name) (print $line) #t)
+;; (begin0 (eq? $name "abc") (print $name) (print $line) #t)
+abc	sample.c	/^int abc;$/;"	kind:variable	language:C	typeref:typename:int	roles:def	end:2
+;; (begin0 (eq? $name "abc") (and (eq? $name "efg") (print $name) (print $line)) #t)
+abc	sample.c	/^int abc;$/;"	kind:variable	language:C	typeref:typename:int	roles:def	end:2
