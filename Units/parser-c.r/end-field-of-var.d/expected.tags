@@ -1,3 +1,7 @@
 n	input.c	/^int n [2] = {$/;"	v	line:1	typeref:typename:int[2]	end:4
 m0	input.c	/^int m0 [2] = {$/;"	v	line:7	typeref:typename:int[2]	end:10
 m1	input.c	/^}, m1 [3] = {$/;"	v	line:10	typeref:typename:int[3]	end:14
+point	input.c	/^struct point {$/;"	s	line:16	file:	end:18
+x	input.c	/^	int x, y;$/;"	m	line:17	struct:point	typeref:typename:int	file:	end:17
+y	input.c	/^	int x, y;$/;"	m	line:17	struct:point	typeref:typename:int	file:	end:17
+P	input.c	/^struct point P = {$/;"	v	line:20	typeref:struct:point	end:23

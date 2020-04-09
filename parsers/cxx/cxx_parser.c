@@ -1092,10 +1092,11 @@ static bool cxxParserParseClassStructOrUnionInternal(
 
 	if(cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeAssignment))
 	{
+		int iCorkIndex = CORK_NIL;
 		if(g_cxx.pTokenChain->iCount > 3)
 		{
 			// struct X Y = ...;
-			cxxParserExtractVariableDeclarations(g_cxx.pTokenChain,0,NULL);
+			cxxParserExtractVariableDeclarations(g_cxx.pTokenChain,0,&iCorkIndex);
 		}
 
 		// Skip the initialization (which almost certainly contains a block)
@@ -1104,6 +1105,10 @@ static bool cxxParserParseClassStructOrUnionInternal(
 			CXX_DEBUG_LEAVE_TEXT("Failed to parse up to EOF/semicolon");
 			return false;
 		}
+
+		if (iCorkIndex != CORK_NIL)
+			cxxParserSetEndLineForTagInCorkQueue (iCorkIndex,
+												  cxxTokenChainLast(g_cxx.pTokenChain)->iLineNumber);
 
 		cxxParserNewStatement();
 		CXX_DEBUG_LEAVE();
