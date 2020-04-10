@@ -2149,8 +2149,12 @@ static void parseEvent (tokenInfo *const token)
 		readToken (token);
 	}
 
-	if (isKeyword (token, KEYWORD_handler) ||
-		isType (token, TOKEN_SEMICOLON))
+	if ((isKeyword (token, KEYWORD_handler) ||
+		 isType (token, TOKEN_SEMICOLON))
+		&& (isType (name, TOKEN_IDENTIFIER) ||
+			isType (name, TOKEN_STRING)     ||
+			(isType (name, TOKEN_KEYWORD)
+			 && (!isReservedWord (name)))))
 	{
 		makeSqlTag (name, SQLTAG_EVENT);
 	}
