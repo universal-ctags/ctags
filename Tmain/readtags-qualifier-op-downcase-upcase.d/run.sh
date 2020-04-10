@@ -18,7 +18,7 @@ if ! ( "${READTAGS}" -h | grep -q -e -Q ); then
     skip "no qualifier function in readtags"
 fi
 
-echo '# (downcase $name)'
+echo '# (eq? "c" (downcase $name))'
 ${V} ${READTAGS} -t output.tags -Q '(eq? "c" (downcase $name))' -l
 
 echo '# (member "a" (downcase $inherits))'
@@ -28,4 +28,13 @@ echo '# (member "b" (downcase $inherits))'
 ${V} ${READTAGS} -t output.tags -Q '(member "b" (downcase $inherits))' -l
 
 echo '# (member "d" (downcase $inherits))'
-${V} ${READTAGS} -t output.tags -Q '(member "c" (downcase $inherits))' -l
+${V} ${READTAGS} -t output.tags -Q '(member "d" (downcase $inherits))' -l
+
+echo '# (eq? "F" (upcase $name))'
+${V} ${READTAGS} -t output.tags -Q '(eq? "F" (upcase $name))' -l
+
+echo '# (eq? "G" (upcase $name))'
+${V} ${READTAGS} -t output.tags -Q '(eq? "G" (upcase $name))' -l
+
+echo '# (eq? "J" (upcase $name))'
+${V} ${READTAGS} -t output.tags -Q '(eq? "J" (upcase $name))' -l
