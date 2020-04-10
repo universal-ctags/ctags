@@ -1314,6 +1314,24 @@ extern bool foreachEntriesInScope (unsigned int corkIndex,
 	return true;
 }
 
+static bool findName (unsigned int corkIndex, tagEntryInfo *entry, void *data)
+{
+	int *index = data;
+
+	*index =  (int)corkIndex;
+	return false;
+}
+
+int anyEntryInScope (unsigned int corkIndex, const char *name)
+{
+	int index = CORK_NIL;
+
+	if (foreachEntriesInScope (corkIndex, name, findName, &index) == false)
+		return index;
+
+	return CORK_NIL;
+}
+
 extern void registerEntry (unsigned int corkIndex)
 {
 	Assert (TagFile.corkFlags & CORK_SYMTAB);
