@@ -1,0 +1,11 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/;"	extras:pseudo
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/;"	extras:pseudo
+!_TAG_OUTPUT_FILESEP	slash	/slash or backslash/;"	extras:pseudo
+!_TAG_OUTPUT_MODE	u-ctags	/u-ctags or e-ctags/;"	extras:pseudo
+!_TAG_PATTERN_LENGTH_LIMIT	96	/0 for no limit/;"	extras:pseudo
+!_TAG_PROGRAM_AUTHOR	Universal Ctags Team	//;"	extras:pseudo
+!_TAG_PROGRAM_NAME	Universal Ctags	/Derived from Exuberant Ctags/;"	extras:pseudo
+!_TAG_PROGRAM_URL	https://ctags.io/	/official site/;"	extras:pseudo
+!_TAG_PROGRAM_VERSION	0.0.0	/8957c2ce/;"	extras:pseudo
+abc	sample.c	/^int abc;$/;"	kind:variable	line:2	language:C	typeref:typename:int	roles:def	end:2
+efg	sample.c	/^int efg;$/;"	kind:variable	line:3	language:C	typeref:typename:int	roles:def	end:3
