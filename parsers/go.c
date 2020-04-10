@@ -1119,7 +1119,6 @@ static void parseConstTypeVar (tokenInfo *const token, goKind kind, const int sc
 	// VarDecl     = "var" ( VarSpec | "(" { VarSpec ";" } ")" ) .
 	// VarSpec     = IdentifierList ( Type [ "=" ExpressionList ] | "=" ExpressionList ) .
 	bool usesParens = false;
-	int member_scope = scope;
 	intArray *corks
 		= (kind == GOTAG_VAR || kind == GOTAG_CONST)? intArrayNew (): NULL;
 
@@ -1134,6 +1133,7 @@ static void parseConstTypeVar (tokenInfo *const token, goKind kind, const int sc
 	do
 	{
 		tokenInfo *typeToken = NULL;
+		int member_scope = scope;
 
 		while (!isType (token, TOKEN_EOF))
 		{
@@ -1226,6 +1226,12 @@ static void parseConstTypeVar (tokenInfo *const token, goKind kind, const int sc
 		{
 			readToken (token);
 			skipToMatched (token, NULL);
+		}
+
+		if (member_scope != scope && member_scope != CORK_NIL)
+		{
+			tagEntryInfo *e = getEntryInCorkQueue (member_scope);
+			e->extensionFields.endLine = getInputLineNumber ();
 		}
 
 		if (usesParens && !isType (token, TOKEN_CLOSE_PAREN))

@@ -1,0 +1,13 @@
+A	input.go	/^package A$/;"	p
+Point	input.go	/^	Point struct {$/;"	s	package:A	end:7
+X	input.go	/^		X int$/;"	m	struct:A.Point	typeref:typename:int
+Y	input.go	/^		Y int$/;"	m	struct:A.Point	typeref:typename:int
+Point3D	input.go	/^	Point3D struct {$/;"	s	package:A	end:12
+X	input.go	/^		X int$/;"	m	struct:A.Point3D	typeref:typename:int
+Y	input.go	/^		Y int$/;"	m	struct:A.Point3D	typeref:typename:int
+Z	input.go	/^		Z int$/;"	m	struct:A.Point3D	typeref:typename:int
+Range	input.go	/^type Range struct {$/;"	s	package:A	end:18
+start	input.go	/^	start int$/;"	m	struct:A.Range	typeref:typename:int
+end	input.go	/^	end int$/;"	m	struct:A.Range	typeref:typename:int
+s	input.go	/^var s, t =$/;"	v	package:A
+t	input.go	/^var s, t =$/;"	v	package:A
