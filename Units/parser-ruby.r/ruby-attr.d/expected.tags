@@ -11,6 +11,18 @@ rr8	input.rb	/^  attr_reader :rr7, "rr8"$/;"	A	class:X
 rr9	input.rb	/^  attr_reader "rr9", :rr10$/;"	A	class:X
 rr10	input.rb	/^  attr_reader "rr9", :rr10$/;"	A	class:X
 rr11	input.rb	/^  attr_reader("rr11")$/;"	A	class:X
+rr12	input.rb	/^  attr_reader 'rr12'$/;"	A	class:X
+rr13	input.rb	/^  attr_reader 'rr13', 'rr14'$/;"	A	class:X
+rr14	input.rb	/^  attr_reader 'rr13', 'rr14'$/;"	A	class:X
+rr15	input.rb	/^  attr_reader :rr15, 'rr16'$/;"	A	class:X
+rr16	input.rb	/^  attr_reader :rr15, 'rr16'$/;"	A	class:X
+rr17	input.rb	/^  attr_reader 'rr17', :rr18$/;"	A	class:X
+rr18	input.rb	/^  attr_reader 'rr17', :rr18$/;"	A	class:X
+rr19	input.rb	/^  attr_reader('rr19')$/;"	A	class:X
+rr20	input.rb	/^  attr_reader 'rr20', "rr21"$/;"	A	class:X
+rr21	input.rb	/^  attr_reader 'rr20', "rr21"$/;"	A	class:X
+rr22	input.rb	/^  attr_reader "rr22", 'rr23'$/;"	A	class:X
+rr23	input.rb	/^  attr_reader "rr22", 'rr23'$/;"	A	class:X
 ww0=	input.rb	/^  attr_writer :ww0$/;"	A	class:X
 ww1=	input.rb	/^  attr_writer (:ww1)$/;"	A	class:X
 ww2=	input.rb	/^  attr_writer "ww2"$/;"	A	class:X

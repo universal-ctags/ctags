@@ -452,9 +452,9 @@ static rubyKind parseIdentifier (
 	return kind;
 }
 
-static void parseString (const unsigned char** cp, vString* vstr)
+static void parseString (const unsigned char** cp, unsigned char boundary, vString* vstr)
 {
-	while (**cp != 0 && **cp != '"')
+	while (**cp != 0 && **cp != boundary)
 	{
 		if (vstr)
 			vStringPut (vstr, **cp);
@@ -462,7 +462,7 @@ static void parseString (const unsigned char** cp, vString* vstr)
 	}
 
 	/* skip the last found '"' */
-	if (**cp == '"')
+	if (**cp == boundary)
 		++*cp;
 }
 
@@ -730,10 +730,11 @@ static void readAttrsAndEmitTags (const unsigned char **cp, bool reader, bool wr
 				}
 			}
 		}
-		else if (**cp == '"')
+		else if (**cp == '"' || **cp == '\'')
 		{
+			unsigned char b = **cp;
 			++*cp;
-			parseString (cp, a);
+			parseString (cp, b, a);
 
 			emitRubyAccessorTags (a, reader, writer);
 			skipWhitespace (cp);
@@ -765,10 +766,11 @@ static int readAliasMethodAndEmitTags (const unsigned char **cp)
 		if (K_METHOD != parseIdentifier (cp, a, K_METHOD))
 			vStringClear (a);
 	}
-	else if (**cp == '"')
+	else if (**cp == '"' || **cp == '\'')
 	{
+		unsigned char b = **cp;
 		++*cp;
-		parseString (cp, a);
+		parseString (cp, b, a);
 	}
 
 	if (vStringLength (a) > 0)
@@ -788,11 +790,12 @@ static int readStringAndEmitTag (const unsigned char **cp, rubyKind kind, int ro
 		++*cp;
 
 	skipWhitespace (cp);
-	if (**cp == '"')
+	if (**cp == '"' || **cp == '\'')
 	{
+		unsigned char b = **cp;
 		++*cp;
 		s = vStringNew ();
-		parseString (cp, s);
+		parseString (cp, b, s);
 	}
 
 	if (s && vStringLength (s) > 0)
@@ -1035,13 +1038,14 @@ static void findRubyTags (void)
 				/* Leave the most recent scope. */
 				nestingLevelsPop (nesting);
 			}
-			else if (*cp == '"')
+			else if (*cp == '"' || *cp == '\'')
 			{
+				unsigned char b = *cp;
 				/* Skip string literals.
 				 * FIXME: should cope with escapes and interpolation.
 				 */
 				++cp;
-				parseString (&cp, NULL);
+				parseString (&cp, b, NULL);
 			}
 			else if (*cp == ';')
 			{

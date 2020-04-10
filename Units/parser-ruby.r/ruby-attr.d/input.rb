@@ -19,6 +19,27 @@ class X
   attr_reader :rr7, "rr8"
   attr_reader "rr9", :rr10
   attr_reader("rr11")
+
+  @rr12 = 0
+  @rr13 = 0
+  @rr14 = 0
+  @rr15 = 0
+  @rr16 = 0
+  @rr17 = 0
+  @rr18 = 0
+  @rr19 = 0
+  @rr20 = 0
+  @rr21 = 0
+  @rr22 = 0
+  @rr23 = 0
+  attr_reader 'rr12'
+  attr_reader 'rr13', 'rr14'
+  attr_reader :rr15, 'rr16'
+  attr_reader 'rr17', :rr18
+  attr_reader('rr19')
+  attr_reader 'rr20', "rr21"
+  attr_reader "rr22", 'rr23'
+
   @ww0 = 0
   @ww1 = 0
   @ww2 = 0
