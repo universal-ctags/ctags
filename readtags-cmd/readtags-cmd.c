@@ -182,7 +182,7 @@ static void printUsage(FILE* stream, int exitCode)
 }
 
 #ifdef READTAGS_DSL
-static void printFilterExpressoin (FILE *stream, int exitCode)
+static void printFilterExpression (FILE *stream, int exitCode)
 {
 	fprintf (stream, "Filter expression: \n");
 	q_help (stream);
@@ -253,7 +253,7 @@ extern int main (int argc, char **argv)
 				{
 					const char *exp_klass = argv [++i];
 					if (strcmp (exp_klass, "filter") == 0)
-						printFilterExpressoin (stdout, 0);
+						printFilterExpression (stdout, 0);
 					else
 					{
 						fprintf (stderr, "%s: unknown expression class for --%s option",
@@ -355,7 +355,7 @@ extern int main (int argc, char **argv)
 						{
 							const char *exp_klass = argv [++i];
 							if (strcmp (exp_klass, "filter") == 0)
-								printFilterExpressoin (stdout, 0);
+								printFilterExpression (stdout, 0);
 							else
 								printUsage(stderr, 1);
 						}
