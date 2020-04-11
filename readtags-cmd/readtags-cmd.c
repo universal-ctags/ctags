@@ -23,7 +23,9 @@ static int debugMode;
 static QCode *Qualifier;
 #endif
 
-static void printTag (const tagEntry *entry)
+static void tagsPrintTag (FILE *outfp, const tagEntry *entry,
+						  int printingExtensionFields,
+						  int printingLineNumber)
 {
 	int i;
 	int first = 1;
@@ -31,34 +33,39 @@ static void printTag (const tagEntry *entry)
 	const char* const empty = "";
 /* "sep" returns a value only the first time it is evaluated */
 #define sep (first ? (first = 0, separator) : empty)
-	printf ("%s\t%s\t%s",
+	fprintf (outfp, "%s\t%s\t%s",
 		entry->name, entry->file, entry->address.pattern);
-	if (extensionFields)
+	if (printingExtensionFields)
 	{
 		if (entry->kind != NULL  &&  entry->kind [0] != '\0')
 		{
-			  printf ("%s\tkind:%s", sep, entry->kind);
+			  fprintf (outfp, "%s\tkind:%s", sep, entry->kind);
 			  first = 0;
 		}
 		if (entry->fileScope)
 		{
-			printf ("%s\tfile:", sep);
+			fprintf (outfp, "%s\tfile:", sep);
 			first = 0;
 		}
-		if (allowPrintLineNumber && entry->address.lineNumber > 0)
+		if (printingLineNumber && entry->address.lineNumber > 0)
 		{
-			printf ("%s\tline:%lu", sep, entry->address.lineNumber);
+			fprintf (outfp, "%s\tline:%lu", sep, entry->address.lineNumber);
 			first = 0;
 		}
 		for (i = 0  ;  i < entry->fields.count  ;  ++i)
 		{
-			printf ("%s\t%s:%s", sep, entry->fields.list [i].key,
+			fprintf (outfp, "%s\t%s:%s", sep, entry->fields.list [i].key,
 				entry->fields.list [i].value);
 			first = 0;
 		}
 	}
-	putchar ('\n');
+	putc ('\n', outfp);
 #undef sep
+}
+
+static void printTag (const tagEntry *entry)
+{
+	tagsPrintTag (stdout, entry, extensionFields, allowPrintLineNumber);
 }
 
 static void walkTags (tagFile *const file, tagEntry *first_entry,
