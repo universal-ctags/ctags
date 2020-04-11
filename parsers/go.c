@@ -188,7 +188,6 @@ static fieldDefinition GoFields [] = {
 	},
 };
 
-static hashTable *typeTable;
 
 /*
 *   FUNCTION DEFINITIONS
@@ -799,10 +798,8 @@ static void parseFunctionOrMethod (tokenInfo *const token, const int scope)
 		collectorTruncate (&collector, false);
 		if (receiver_type_token)
 		{
-			void *p = hashTableGetItem (typeTable, vStringValue (receiver_type_token->string));
-			if (p)
-				func_scope = HT_PTR_TO_INT(p);
-			else
+			func_scope = anyEntryInScope (scope, vStringValue (receiver_type_token->string));
+			if (func_scope == CORK_NIL)
 				func_scope = makeTagFull(receiver_type_token, GOTAG_UNKNOWN,
 										 scope, NULL, NULL,
 										 R_GOTAG_UNKNOWN_RECEIVER);
@@ -853,15 +850,13 @@ static void parseFunctionOrMethod (tokenInfo *const token, const int scope)
 		deleteToken(receiver_type_token);
 }
 
-static void attachTypeRefField (intArray *corks, const char *const type)
+static void attachTypeRefField (int scope, intArray *corks, const char *const type)
 {
 	tagEntryInfo *type_e = NULL;
-	void *p = hashTableGetItem (typeTable, type);
-	if (p)
-	{
-		int type_cork = HT_PTR_TO_INT(p);
+	int type_cork = anyEntryInScope (scope, type);
+
+	if (type_cork != CORK_NIL)
 		type_e = getEntryInCorkQueue (type_cork);
-	}
 
 	for (unsigned int i = 0; i < intArrayCount (corks); i++)
 	{
@@ -1085,7 +1080,7 @@ static void parseStructMembers (tokenInfo *const token, const int scope)
 				makeTag (memberCandidate, GOTAG_MEMBER, scope, NULL,
 						 vStringValue (typeForMember));
 
-			attachTypeRefField (corkForFields, vStringValue (typeForMember));
+			attachTypeRefField (scope, corkForFields, vStringValue (typeForMember));
 			intArrayClear (corkForFields);
 			vStringDelete (typeForMember);
 		}
@@ -1124,7 +1119,6 @@ static void parseConstTypeVar (tokenInfo *const token, goKind kind, const int sc
 	// VarDecl     = "var" ( VarSpec | "(" { VarSpec ";" } ")" ) .
 	// VarSpec     = IdentifierList ( Type [ "=" ExpressionList ] | "=" ExpressionList ) .
 	bool usesParens = false;
-	int member_scope = scope;
 	intArray *corks
 		= (kind == GOTAG_VAR || kind == GOTAG_CONST)? intArrayNew (): NULL;
 
@@ -1139,6 +1133,7 @@ static void parseConstTypeVar (tokenInfo *const token, goKind kind, const int sc
 	do
 	{
 		tokenInfo *typeToken = NULL;
+		int member_scope = scope;
 
 		while (!isType (token, TOKEN_EOF))
 		{
@@ -1166,12 +1161,7 @@ static void parseConstTypeVar (tokenInfo *const token, goKind kind, const int sc
 												scope, NULL, NULL);
 
 					if (member_scope != CORK_NIL)
-					{
-						tagEntryInfo *e = getEntryInCorkQueue (member_scope);
-						hashTablePutItem (typeTable,
-										  (char *)e->name,
-										  HT_INT_TO_PTR(member_scope));
-					}
+						registerEntry (member_scope);
 					break;
 				}
 				else
@@ -1224,7 +1214,7 @@ static void parseConstTypeVar (tokenInfo *const token, goKind kind, const int sc
 			collectorTruncate (&collector, true);
 
 			if (!vStringIsEmpty (buffer))
-				attachTypeRefField (corks, vStringValue (buffer));
+				attachTypeRefField (scope, corks, vStringValue (buffer));
 			vStringDelete (buffer);
 			intArrayClear (corks);
 		}
@@ -1236,6 +1226,12 @@ static void parseConstTypeVar (tokenInfo *const token, goKind kind, const int sc
 		{
 			readToken (token);
 			skipToMatched (token, NULL);
+		}
+
+		if (member_scope != scope && member_scope != CORK_NIL)
+		{
+			tagEntryInfo *e = getEntryInCorkQueue (member_scope);
+			e->extensionFields.endLine = getInputLineNumber ();
 		}
 
 		if (usesParens && !isType (token, TOKEN_CLOSE_PAREN))
@@ -1368,13 +1364,8 @@ static void parseGoFile (tokenInfo *const token)
 static void findGoTags (void)
 {
 	tokenInfo *const token = newToken ();
-	typeTable = hashTableIntNew (43, hashCstrhash, hashCstreq,
-								 NULL);
 
 	parseGoFile (token);
-
-	hashTableDelete (typeTable);
-	typeTable = NULL;
 
 	deleteToken (token);
 }
@@ -1393,7 +1384,7 @@ extern parserDefinition *GoParser (void)
 	def->keywordCount = ARRAY_SIZE (GoKeywordTable);
 	def->fieldTable = GoFields;
 	def->fieldCount = ARRAY_SIZE (GoFields);
-	def->useCork = CORK_QUEUE;
+	def->useCork = CORK_QUEUE | CORK_SYMTAB;
 	def->requestAutomaticFQTag = true;
 	return def;
 }

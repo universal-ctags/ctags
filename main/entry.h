@@ -170,6 +170,14 @@ bool          foreachEntriesInScope (unsigned int corkIndex,
 									 entryForeachFunc func,
 									 void *data);
 
+/* Return the cork index for NAME in the scope specified with CORKINDEX.
+ * Even if more than one entries for NAME are in the scope, this function
+ * just returns one of them. Returning CORK_NIL means there is no entry
+ * for NAME.
+ */
+int           anyEntryInScope       (unsigned int corkIndex,
+									 const char *name);
+
 extern void    markTagExtraBit     (tagEntryInfo *const tag, xtagType extra);
 extern bool isTagExtraBitMarked (const tagEntryInfo *const tag, xtagType extra);
 

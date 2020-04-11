@@ -1,2 +1,2 @@
 --sort=no
---fields=+{typeref}{inherits}{signature}{scope}{kind}K
+--fields=+{typeref}{inherits}{signature}{scope}{kind}{end}K
