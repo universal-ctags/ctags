@@ -168,7 +168,7 @@ units_inspect_show_args_ctags ()
 pygmentize_or_cat ()
 {
     # It seems that pygmentize ignores the empty lines at the head of input.
-    if [ -z $(head -1 $1) ]; then
+    if [ -z "$(head -1 $1)" ]; then
 	cat -n $1
     elif which pygmentize > /dev/null 2>&1; then
 	pygmentize -O "style=colorful,linenos=1" $1 2>/dev/null || cat -n $1
