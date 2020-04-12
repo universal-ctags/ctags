@@ -23,6 +23,26 @@ static int debugMode;
 static QCode *Qualifier;
 #endif
 
+static void ultostr (char dst [21], unsigned long d)
+{
+	int o [20];
+	int i;
+
+	if (d == 0)
+	{
+		dst [0] = '0';
+		dst [1] = '\0';
+		return;
+	}
+
+	for (i = 0; d != 0; i++, d = d/10)
+		o [i] = d % 10;
+
+	for (int j = i - 1; j >= 0; j--)
+		dst [i - j - 1] = o[j] + '0';
+	dst [i] = '\0';
+}
+
 static void tagsPrintTag (FILE *outfp, const tagEntry *entry,
 						  int printingExtensionFields,
 						  int printingLineNumber)
@@ -33,33 +53,56 @@ static void tagsPrintTag (FILE *outfp, const tagEntry *entry,
 	const char* const empty = "";
 /* "sep" returns a value only the first time it is evaluated */
 #define sep (first ? (first = 0, separator) : empty)
-	fprintf (outfp, "%s\t%s\t%s",
-		entry->name, entry->file, entry->address.pattern);
+
+	if (entry->name == NULL
+		|| entry->file == NULL
+		|| entry->address.pattern == NULL)
+		return;
+	fputs (entry->name, outfp);
+	putc ('\t', outfp);
+	fputs (entry->file, outfp);
+	putc ('\t', outfp);
+	fputs (entry->address.pattern, outfp);
+
 	if (printingExtensionFields)
 	{
 		if (entry->kind != NULL  &&  entry->kind [0] != '\0')
 		{
-			  fprintf (outfp, "%s\tkind:%s", sep, entry->kind);
-			  first = 0;
+			fputs (sep, outfp);
+			fputs ("\tkind:", outfp);
+			fputs (entry->kind, outfp);
+			first = 0;
 		}
 		if (entry->fileScope)
 		{
-			fprintf (outfp, "%s\tfile:", sep);
+			fputs (sep, outfp);
+			fputs ("\tfile:", outfp);
 			first = 0;
 		}
 		if (printingLineNumber && entry->address.lineNumber > 0)
 		{
-			fprintf (outfp, "%s\tline:%lu", sep, entry->address.lineNumber);
+			fputs (sep, outfp);
+			fputs ("\tline:", outfp);
+			char buf [20 + 1];	/* 20 comes from UINNT64_MAX, 1 is for \0. */
+			ultostr (buf, entry->address.lineNumber);
+			fputs (buf, outfp);
 			first = 0;
 		}
 		for (i = 0  ;  i < entry->fields.count  ;  ++i)
 		{
-			fprintf (outfp, "%s\t%s:%s", sep, entry->fields.list [i].key,
-				entry->fields.list [i].value);
-			first = 0;
+			if (entry->fields.list [i].key)
+			{
+				fputs (sep, outfp);
+				fputc ('\t', outfp);
+				fputs (entry->fields.list [i].key, outfp);
+				fputc (':', outfp);
+				if (entry->fields.list  [i].value)
+					fputs (entry->fields.list [i].value, outfp);
+				first = 0;
+			}
 		}
 	}
-	putc ('\n', outfp);
+	fputc ('\n', outfp);
 #undef sep
 }
 
