@@ -79,7 +79,7 @@ static kindDefinition ProtobufKinds [] = {
 	{ true,  'e', "enumerator", "enum constants" },
 	{ true,  'g', "enum",       "enum types" },
 	{ true,  's', "service",    "services" },
-	{ true, 'r', "rpc",         "RPC methods" }
+	{ true,  'r', "rpc",        "RPC methods" },
 };
 
 typedef enum eKeywordId {
