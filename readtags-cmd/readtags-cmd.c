@@ -18,6 +18,7 @@ static int SortOverride;
 static sortType SortMethod;
 static int allowPrintLineNumber;
 static int debugMode;
+static int escaping;
 #ifdef READTAGS_DSL
 #include "dsl/qualifier.h"
 static QCode *Qualifier;
@@ -43,9 +44,61 @@ static void ultostr (char dst [21], unsigned long d)
 	dst [i] = '\0';
 }
 
+static void printValue (const char *val, FILE *outfp, int printingWithEscaping)
+{
+	if (printingWithEscaping)
+	{
+		for(; *val != '\0'; val++)
+		{
+			switch (*val)
+			{
+				case '\t': fputs ("\\t",  outfp); break;
+				case '\r': fputs ("\\r",  outfp); break;
+				case '\n': fputs ("\\n",  outfp); break;
+				case '\\': fputs ("\\\\", outfp); break;
+					/* Universal-CTags extensions */
+				case '\a': fputs ("\\a", outfp); break;
+				case '\b': fputs ("\\b", outfp); break;
+				case '\v': fputs ("\\v", outfp); break;
+				case '\f': fputs ("\\f", outfp); break;
+				default:
+					if ((0x01 <= *val && *val <= 0x1F) || *val == 0x7F)
+					{
+						char c[5] = {
+							[0] = '\\',
+							[1] = 'x',
+						};
+						c [2] = (*val / 16) % 16;
+#if 0
+						if (c [2] == 0)
+						{
+							c [2] = *val % 16;
+							c [2] += ( c [2] < 10 )? '0': 'A' - 9;
+							c [3] = '\0';
+						}
+						else
+#endif
+						{
+							c [2] += ( c [2] < 10 )? '0': 'A' - 9;
+							c [3] = *val % 16;
+							c [3] += ( c [3] < 10 )? '0': 'A' - 9;
+							c [4] = '\0';
+						}
+						fputs (c, outfp);
+					}
+					else
+						fputc (*val, outfp);
+			}
+		}
+	}
+	else
+		fputs (val, outfp);
+}
+
 static void tagsPrintTag (FILE *outfp, const tagEntry *entry,
 						  int printingExtensionFields,
-						  int printingLineNumber)
+						  int printingLineNumber,
+						  int printingWithEscaping)
 {
 	int i;
 	int first = 1;
@@ -58,9 +111,9 @@ static void tagsPrintTag (FILE *outfp, const tagEntry *entry,
 		|| entry->file == NULL
 		|| entry->address.pattern == NULL)
 		return;
-	fputs (entry->name, outfp);
+	printValue (entry->name, outfp, printingWithEscaping);
 	putc ('\t', outfp);
-	fputs (entry->file, outfp);
+	printValue  (entry->file, outfp, printingWithEscaping);
 	putc ('\t', outfp);
 	fputs (entry->address.pattern, outfp);
 
@@ -70,7 +123,7 @@ static void tagsPrintTag (FILE *outfp, const tagEntry *entry,
 		{
 			fputs (sep, outfp);
 			fputs ("\tkind:", outfp);
-			fputs (entry->kind, outfp);
+			printValue (entry->kind, outfp, printingWithEscaping);
 			first = 0;
 		}
 		if (entry->fileScope)
@@ -97,7 +150,7 @@ static void tagsPrintTag (FILE *outfp, const tagEntry *entry,
 				fputs (entry->fields.list [i].key, outfp);
 				fputc (':', outfp);
 				if (entry->fields.list  [i].value)
-					fputs (entry->fields.list [i].value, outfp);
+					printValue (entry->fields.list [i].value, outfp, printingWithEscaping);
 				first = 0;
 			}
 		}
@@ -108,7 +161,7 @@ static void tagsPrintTag (FILE *outfp, const tagEntry *entry,
 
 static void printTag (const tagEntry *entry)
 {
-	tagsPrintTag (stdout, entry, extensionFields, allowPrintLineNumber);
+	tagsPrintTag (stdout, entry, extensionFields, allowPrintLineNumber, escaping);
 }
 
 static void walkTags (tagFile *const file, tagEntry *first_entry,
@@ -206,6 +259,8 @@ static const char *const Usage =
 	"Options:\n"
 	"    -d | --debug\n"
 	"        Turn on debugging output.\n"
+	"    -E | --escape\n"
+	"        Escape characters like tab as described in tags(5).\n"
 	"    -e | --extension-fields\n"
 	"        Include extension fields in output.\n"
 	"    -i | --icase-match\n"
@@ -320,6 +375,8 @@ extern int main (int argc, char **argv)
 				}
 			}
 #endif
+			else if (strcmp (optname, "escape") == 0)
+				escaping = 1;
 			else if (strcmp (optname, "extension-fields") == 0)
 				extensionFields = 1;
 			else if (strcmp (optname, "icase-match") == 0)
@@ -412,6 +469,7 @@ extern int main (int argc, char **argv)
 						else
 							printUsage(stderr, 1);
 #endif
+					case 'E': escaping = 1; break;
 					case 'e': extensionFields = 1;         break;
 					case 'i': options |= TAG_IGNORECASE;   break;
 					case 'p': options |= TAG_PARTIALMATCH; break;
