@@ -165,21 +165,27 @@ static int tokenIsKeyword(keywordId keyword)
 	return token.type == TOKEN_ID && token.keyword == keyword;
 }
 
-static int createProtobufTag (const vString *name, int kind)
+static int createProtobufTagFull (const vString *name, int kind, int role, int scopeCorkIndex)
 {
 	static tagEntryInfo tag;
 	int corkIndex = CORK_NIL;
 
 	if (ProtobufKinds [kind].enabled)
 	{
-		initTagEntry (&tag, vStringValue (name), kind);
+		initRefTagEntry (&tag, vStringValue (name), kind, role);
+		tag.extensionFields.scopeIndex = scopeCorkIndex;
 		corkIndex = makeTagEntry (&tag);
 	}
 
 	return corkIndex;
 }
 
-static void parseEnumConstants (void)
+static int createProtobufTag (const vString *name, int kind, int scopeCorkIndex)
+{
+	return createProtobufTagFull (name, kind, ROLE_DEFINITION_INDEX, scopeCorkIndex);
+}
+
+static void parseEnumConstants (int scopeCorkIndex)
 {
 	if (token.type != '{')
 		return;
@@ -191,7 +197,7 @@ static void parseEnumConstants (void)
 		{
 			nextToken ();  /* doesn't clear token.value if it's punctuation */
 			if (token.type == '=')
-				createProtobufTag (token.value, PK_ENUMERATOR);
+				createProtobufTag (token.value, PK_ENUMERATOR, scopeCorkIndex);
 		}
 
 		skipUntil (";}");
@@ -246,7 +252,7 @@ static void parseRPCTypeinfos (int corkIndex)
 		vStringDelete (typeref);
 }
 
-static void parseStatement (int kind)
+static int parseStatementFull (int kind, int role, int scopeCorkIndex)
 {
 	nextToken ();
 
@@ -258,26 +264,35 @@ static void parseStatement (int kind)
 			if (token.type == '.')
 				nextToken ();
 			if (token.type != TOKEN_ID)
-				return;
+				return CORK_NIL;
 			nextToken ();
 		} while (token.type == '.');
 	}
 
 	if (token.type != TOKEN_ID)
-		return;
+		return CORK_NIL;
 
-	int corkIndex = createProtobufTag (token.value, kind);
+	int corkIndex = createProtobufTagFull (token.value, kind, role, scopeCorkIndex);
 	nextToken ();
 
 	if (kind == PK_RPC && corkIndex != CORK_NIL)
 		parseRPCTypeinfos (corkIndex);
 
 	if (kind == PK_ENUM)
-		parseEnumConstants ();
+		parseEnumConstants (corkIndex);
+
+	return corkIndex;
 }
 
-static void parsePackage (void)
+static int parseStatement (int kind, int scopeCorkIndex)
 {
+	return parseStatementFull (kind, ROLE_DEFINITION_INDEX, scopeCorkIndex);
+}
+
+static int parsePackage (void)
+{
+	int corkIndex = CORK_NIL;
+
 	vString *pkg = vStringNew ();
 
 	while (true)
@@ -293,8 +308,9 @@ static void parsePackage (void)
 	}
 
 	if (vStringLength (pkg) > 0)
-		createProtobufTag (pkg, PK_PACKAGE);
+		corkIndex = createProtobufTag (pkg, PK_PACKAGE, CORK_NIL);
 	vStringDelete (pkg);
+	return corkIndex;
 }
 
 static void findProtobufTags (void)
@@ -307,22 +323,42 @@ static void findProtobufTags (void)
 
 	nextToken ();
 
+	int scopeCorkIndex = CORK_NIL;
 	while (token.type != TOKEN_EOF)
 	{
+		int corkIndex = CORK_NIL;
+		bool dontChangeScope = false;
 		if (tokenIsKeyword (KEYWORD_PACKAGE))
-			parsePackage ();
+		{
+			corkIndex = parsePackage ();
+			scopeCorkIndex = corkIndex;
+		}
 		else if (tokenIsKeyword (KEYWORD_MESSAGE))
-			parseStatement (PK_MESSAGE);
+			corkIndex = parseStatement (PK_MESSAGE, scopeCorkIndex);
 		else if (tokenIsKeyword (KEYWORD_ENUM))
-			parseStatement (PK_ENUM);
+		{
+			corkIndex = parseStatement (PK_ENUM, scopeCorkIndex);
+			dontChangeScope = true;
+		}
 		else if (tokenIsKeyword (KEYWORD_REPEATED) || tokenIsKeyword (KEYWORD_OPTIONAL) || tokenIsKeyword (KEYWORD_REQUIRED))
-			parseStatement (PK_FIELD);
+			corkIndex = parseStatement (PK_FIELD, scopeCorkIndex);
 		else if (tokenIsKeyword (KEYWORD_SERVICE))
-			parseStatement (PK_SERVICE);
+			corkIndex = parseStatement (PK_SERVICE, scopeCorkIndex);
 		else if (tokenIsKeyword (KEYWORD_RPC))
-			parseStatement (PK_RPC);
+			corkIndex = parseStatement (PK_RPC, scopeCorkIndex);
 
 		skipUntil (";{}");
+		if (!dontChangeScope && token.type == '{' && corkIndex != CORK_NIL)
+		{
+			/* Enter the new scope. */
+			scopeCorkIndex = corkIndex;
+		}
+		else if (!dontChangeScope && token.type == '}' && scopeCorkIndex != CORK_NIL)
+		{
+			/* Return to the parent scope. */
+			tagEntryInfo *e = getEntryInCorkQueue (scopeCorkIndex);
+			scopeCorkIndex = e->extensionFields.scopeIndex;
+		}
 		nextToken ();
 	}
 
