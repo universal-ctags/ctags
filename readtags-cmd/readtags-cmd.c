@@ -98,7 +98,8 @@ static void printValue (const char *val, FILE *outfp, int printingWithEscaping)
 static void tagsPrintTag (FILE *outfp, const tagEntry *entry,
 						  int printingExtensionFields,
 						  int printingLineNumber,
-						  int printingWithEscaping)
+						  int printingWithEscaping,
+						  int pseudoTag)
 {
 	int i;
 	int first = 1;
@@ -111,7 +112,21 @@ static void tagsPrintTag (FILE *outfp, const tagEntry *entry,
 		|| entry->file == NULL
 		|| entry->address.pattern == NULL)
 		return;
-	printValue (entry->name, outfp, printingWithEscaping);
+	if (pseudoTag)
+		fputs (entry->name, outfp);
+	else if (*entry->name == '!' && printingWithEscaping)
+	{
+		fputs ("\\x21", outfp);
+		printValue (entry->name + 1, outfp, printingWithEscaping);
+	}
+	else if (*entry->name == ' ' && printingWithEscaping)
+	{
+		fputs ("\\x20", outfp);
+		printValue (entry->name + 1, outfp, printingWithEscaping);
+	}
+	else
+		printValue (entry->name, outfp, printingWithEscaping);
+
 	putc ('\t', outfp);
 	printValue  (entry->file, outfp, printingWithEscaping);
 	putc ('\t', outfp);
@@ -161,7 +176,12 @@ static void tagsPrintTag (FILE *outfp, const tagEntry *entry,
 
 static void printTag (const tagEntry *entry)
 {
-	tagsPrintTag (stdout, entry, extensionFields, allowPrintLineNumber, escaping);
+	tagsPrintTag (stdout, entry, extensionFields, allowPrintLineNumber, escaping, 0);
+}
+
+static void printPseudoTag (const tagEntry *entry)
+{
+	tagsPrintTag (stdout, entry, extensionFields, allowPrintLineNumber, escaping, 1);
 }
 
 static void walkTags (tagFile *const file, tagEntry *first_entry,
@@ -225,7 +245,7 @@ static void listTags (int pseudoTags)
 	else if (pseudoTags)
 	{
 		if (tagsFirstPseudoTag (file, &entry) == TagSuccess)
-			walkTags (file, &entry, tagsNextPseudoTag, printTag);
+			walkTags (file, &entry, tagsNextPseudoTag, printPseudoTag);
 		tagsClose (file);
 	}
 	else
