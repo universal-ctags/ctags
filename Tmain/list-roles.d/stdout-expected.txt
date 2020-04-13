@@ -51,6 +51,7 @@ Make           I/makefile        optional           on      optionally included
 NSIS           i/script          included           on      included with !include
 Perl           M/module          unused             on      specified in `no' built-in function
 Perl           M/module          used               on      specified in `use' built-in function
+Protobuf       m/message         extension          on      extending the message
 Python         i/module          imported           on      imported modules
 Python         i/module          indirectlyImported on      module imported in alternative name
 Python         i/module          namespace          on      namespace from where classes/variables/functions are imported
@@ -128,6 +129,7 @@ Make           I/makefile        optional           on      optionally included
 NSIS           i/script          included           on      included with !include
 Perl           M/module          unused             on      specified in `no' built-in function
 Perl           M/module          used               on      specified in `use' built-in function
+Protobuf       m/message         extension          on      extending the message
 Python         i/module          imported           on      imported modules
 Python         i/module          indirectlyImported on      module imported in alternative name
 Python         i/module          namespace          on      namespace from where classes/variables/functions are imported

@@ -12,7 +12,7 @@ field4	input.proto	/^    optional Enum1 field4 = 4;$/;"	kind:field	message:TestP
 Message3	input.proto	/^message Message3 {$/;"	kind:message	package:TestPackage
 field5	input.proto	/^    required Message2.NestedMessage field5 = 5;$/;"	kind:field	message:TestPackage.Message3
 field6	input.proto	/^    required .TestPackage.Message2.Enum1 field6 = 6;$/;"	kind:field	message:TestPackage.Message3
-field7	input.proto	/^    optional Message2 . NestedMessage field7 = 7;$/;"	kind:field	package:TestPackage
-field8	input.proto	/^    repeated int32 field8 = 8 [packed=true];$/;"	kind:field	package:TestPackage
-Service1	input.proto	/^service Service1 {$/;"	kind:service
-Method1	input.proto	/^    rpc Method1(Message1) returns(Message2);$/;"	kind:rpc	service:Service1	typeref:typename:Message2	signature:Message1
+field7	input.proto	/^    optional Message2 . NestedMessage field7 = 7;$/;"	kind:field	message:TestPackage.Message3
+field8	input.proto	/^    repeated int32 field8 = 8 [packed=true];$/;"	kind:field	message:TestPackage.Message3
+Service1	input.proto	/^service Service1 {$/;"	kind:service	package:TestPackage
+Method1	input.proto	/^    rpc Method1(Message1) returns(Message2);$/;"	kind:rpc	service:TestPackage.Service1	typeref:typename:Message2	signature:Message1

@@ -72,9 +72,18 @@ typedef enum {
 	PK_RPC
 } protobufKind;
 
+typedef enum {
+	R_MESSAGE_EXTENSION,
+} protobufMessageRole;
+
+static roleDefinition ProtobufMessageRoles [] = {
+	{ true, "extension", "extending the message" },
+};
+
 static kindDefinition ProtobufKinds [] = {
 	{ true,  'p', "package",    "packages" },
-	{ true,  'm', "message",    "messages" },
+	{ true,  'm', "message",    "messages",
+	  .referenceOnly = false, ATTACH_ROLES (ProtobufMessageRoles)},
 	{ true,  'f', "field",      "fields" },
 	{ true,  'e', "enumerator", "enum constants" },
 	{ true,  'g', "enum",       "enum types" },
@@ -94,6 +103,7 @@ typedef enum eKeywordId {
 	KEYWORD_RPC,
 	KEYWORD_STREAM,
 	KEYWORD_RETURNS,
+	KEYWORD_EXTEND,
 } keywordId;
 
 static const keywordTable ProtobufKeywordTable [] = {
@@ -108,6 +118,7 @@ static const keywordTable ProtobufKeywordTable [] = {
 	{ "rpc",      KEYWORD_RPC      },
 	{ "stream",   KEYWORD_STREAM   },
 	{ "returns",  KEYWORD_RETURNS  },
+	{ "extend",   KEYWORD_EXTEND   },
 };
 
 #define TOKEN_EOF   0
@@ -254,6 +265,8 @@ static void parseRPCTypeinfos (int corkIndex)
 
 static int parseStatementFull (int kind, int role, int scopeCorkIndex)
 {
+	vString *fullName = NULL;
+
 	nextToken ();
 
 	if (kind == PK_FIELD)
@@ -269,11 +282,35 @@ static int parseStatementFull (int kind, int role, int scopeCorkIndex)
 		} while (token.type == '.');
 	}
 
-	if (token.type != TOKEN_ID)
+	/* When extending message defined in the external package, the name
+	 * becomes longer. */
+	if (kind == PK_MESSAGE && role == R_MESSAGE_EXTENSION)
+	{
+		if (token.type != TOKEN_ID)
+			return CORK_NIL;
+
+		fullName = vStringNewCopy (token.value);
+		while (true)
+		{
+			nextToken ();
+
+			if (token.type == TOKEN_ID)
+				vStringCat (fullName, token.value);
+			else if (token.type == '.')
+				vStringPut (fullName, '.');
+			else
+				break;
+		}
+	}
+	else if (token.type != TOKEN_ID)
 		return CORK_NIL;
 
-	int corkIndex = createProtobufTagFull (token.value, kind, role, scopeCorkIndex);
-	nextToken ();
+	int corkIndex = createProtobufTagFull (fullName? fullName: token.value,
+										   kind, role, scopeCorkIndex);
+
+	if (!fullName)
+		nextToken ();
+	vStringDelete (fullName);
 
 	if (kind == PK_RPC && corkIndex != CORK_NIL)
 		parseRPCTypeinfos (corkIndex);
@@ -346,6 +383,8 @@ static void findProtobufTags (void)
 			corkIndex = parseStatement (PK_SERVICE, scopeCorkIndex);
 		else if (tokenIsKeyword (KEYWORD_RPC))
 			corkIndex = parseStatement (PK_RPC, scopeCorkIndex);
+		else if (tokenIsKeyword (KEYWORD_EXTEND))
+			corkIndex = parseStatementFull (PK_MESSAGE, R_MESSAGE_EXTENSION, scopeCorkIndex);
 
 		skipUntil (";{}");
 		if (!dontChangeScope && token.type == '{' && corkIndex != CORK_NIL)
