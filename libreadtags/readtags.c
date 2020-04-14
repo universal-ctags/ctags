@@ -419,6 +419,12 @@ static void parseTagLine (tagFile *file, tagEntry *const entry)
 	{
 		*tab = '\0';
 	}
+
+	/* When unescaping, the input string becomes shorter.
+	 * e.g. \t occupies two bytes on the tag file.
+	 * It is converted to 0x9 and occupies one byte.
+	 * memmove called here for shortening the line
+	 * buffer. */
 	while (*p != '\0')
 	{
 		const char *next = p;
@@ -430,7 +436,8 @@ static void parseTagLine (tagFile *file, tagEntry *const entry)
 		p_len -= skip;
 		if (skip > 1)
 		{
-			memmove (p, next, p_len);
+			/* + 1 is for moving the area including the last '\0'. */
+			memmove (p, next, p_len + 1);
 			tab -= skip - 1;
 		}
 	}
