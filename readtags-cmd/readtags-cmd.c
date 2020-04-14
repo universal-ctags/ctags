@@ -44,7 +44,10 @@ static void ultostr (char dst [21], unsigned long d)
 	dst [i] = '\0';
 }
 
-static void printValue (const char *val, FILE *outfp, int printingWithEscaping)
+static void printValue (const char *val, int printingWithEscaping,
+						int  (* print_str) (const char *, void *),
+						int  (* print_char) (int, void *),
+						void *outfp)
 {
 	if (printingWithEscaping)
 	{
@@ -52,15 +55,15 @@ static void printValue (const char *val, FILE *outfp, int printingWithEscaping)
 		{
 			switch (*val)
 			{
-				case '\t': fputs ("\\t",  outfp); break;
-				case '\r': fputs ("\\r",  outfp); break;
-				case '\n': fputs ("\\n",  outfp); break;
-				case '\\': fputs ("\\\\", outfp); break;
+				case '\t': print_str ("\\t",  outfp); break;
+				case '\r': print_str ("\\r",  outfp); break;
+				case '\n': print_str ("\\n",  outfp); break;
+				case '\\': print_str ("\\\\", outfp); break;
 					/* Universal-CTags extensions */
-				case '\a': fputs ("\\a", outfp); break;
-				case '\b': fputs ("\\b", outfp); break;
-				case '\v': fputs ("\\v", outfp); break;
-				case '\f': fputs ("\\f", outfp); break;
+				case '\a': print_str ("\\a", outfp); break;
+				case '\b': print_str ("\\b", outfp); break;
+				case '\v': print_str ("\\v", outfp); break;
+				case '\f': print_str ("\\f", outfp); break;
 				default:
 					if ((0x01 <= *val && *val <= 0x1F) || *val == 0x7F)
 					{
@@ -84,22 +87,25 @@ static void printValue (const char *val, FILE *outfp, int printingWithEscaping)
 							c [3] += ( c [3] < 10 )? '0': 'A' - 9;
 							c [4] = '\0';
 						}
-						fputs (c, outfp);
+						print_str (c, outfp);
 					}
 					else
-						fputc (*val, outfp);
+						print_char (*val, outfp);
 			}
 		}
 	}
 	else
-		fputs (val, outfp);
+		print_str (val, outfp);
 }
 
-static void tagsPrintTag (FILE *outfp, const tagEntry *entry,
+static void tagsPrintTag (const tagEntry *entry,
 						  int printingExtensionFields,
 						  int printingLineNumber,
 						  int printingWithEscaping,
-						  int pseudoTag)
+						  int pseudoTag,
+						  int  (* print_str) (const char *, void *),
+						  int  (* print_char) (int, void *),
+						  void *outfp)
 {
 	int i;
 	int first = 1;
@@ -113,75 +119,94 @@ static void tagsPrintTag (FILE *outfp, const tagEntry *entry,
 		|| entry->address.pattern == NULL)
 		return;
 	if (pseudoTag)
-		fputs (entry->name, outfp);
+		print_str (entry->name, outfp);
 	else if (*entry->name == '!' && printingWithEscaping)
 	{
-		fputs ("\\x21", outfp);
-		printValue (entry->name + 1, outfp, printingWithEscaping);
+		print_str ("\\x21", outfp);
+		printValue (entry->name + 1, printingWithEscaping,
+					print_str, print_char, outfp);
 	}
 	else if (*entry->name == ' ' && printingWithEscaping)
 	{
-		fputs ("\\x20", outfp);
-		printValue (entry->name + 1, outfp, printingWithEscaping);
+		print_str ("\\x20", outfp);
+		printValue (entry->name + 1, printingWithEscaping,
+					print_str, print_char, outfp);
 	}
 	else
-		printValue (entry->name, outfp, printingWithEscaping);
+		printValue (entry->name, printingWithEscaping,
+					print_str, print_char, outfp);
 
-	putc ('\t', outfp);
-	printValue  (entry->file, outfp, printingWithEscaping);
-	putc ('\t', outfp);
-	fputs (entry->address.pattern, outfp);
+	print_char ('\t', outfp);
+	printValue  (entry->file, printingWithEscaping,
+				 print_str, print_char, outfp);
+	print_char ('\t', outfp);
+	print_str (entry->address.pattern, outfp);
 
 	if (printingExtensionFields)
 	{
 		if (entry->kind != NULL  &&  entry->kind [0] != '\0')
 		{
-			fputs (sep, outfp);
-			fputs ("\tkind:", outfp);
-			printValue (entry->kind, outfp, printingWithEscaping);
+			print_str (sep, outfp);
+			print_str ("\tkind:", outfp);
+			printValue (entry->kind, printingWithEscaping,
+						print_str, print_char, outfp);
 			first = 0;
 		}
 		if (entry->fileScope)
 		{
-			fputs (sep, outfp);
-			fputs ("\tfile:", outfp);
+			print_str (sep, outfp);
+			print_str ("\tfile:", outfp);
 			first = 0;
 		}
 		if (printingLineNumber && entry->address.lineNumber > 0)
 		{
-			fputs (sep, outfp);
-			fputs ("\tline:", outfp);
+			print_str (sep, outfp);
+			print_str ("\tline:", outfp);
 			char buf [20 + 1];	/* 20 comes from UINNT64_MAX, 1 is for \0. */
 			ultostr (buf, entry->address.lineNumber);
-			fputs (buf, outfp);
+			print_str (buf, outfp);
 			first = 0;
 		}
 		for (i = 0  ;  i < entry->fields.count  ;  ++i)
 		{
 			if (entry->fields.list [i].key)
 			{
-				fputs (sep, outfp);
-				fputc ('\t', outfp);
-				fputs (entry->fields.list [i].key, outfp);
-				fputc (':', outfp);
+				print_str (sep, outfp);
+				print_char ('\t', outfp);
+				print_str (entry->fields.list [i].key, outfp);
+				print_char (':', outfp);
 				if (entry->fields.list  [i].value)
-					printValue (entry->fields.list [i].value, outfp, printingWithEscaping);
+					printValue (entry->fields.list [i].value,
+								printingWithEscaping, print_str, print_char, outfp);
 				first = 0;
 			}
 		}
 	}
-	fputc ('\n', outfp);
+	print_char ('\n', outfp);
 #undef sep
+}
+
+static void tagsPrintTagToFILE (FILE *outfp, const tagEntry *entry,
+								int printingExtensionFields,
+								int printingLineNumber,
+								int printingWithEscaping,
+								int pseudoTag)
+{
+	tagsPrintTag (entry,
+				  printingExtensionFields, printingLineNumber, printingWithEscaping, pseudoTag,
+				  (int  (*) (const char *, void *))fputs,
+				  (int  (*) (const int, void *))fputc,
+				  outfp);
 }
 
 static void printTag (const tagEntry *entry)
 {
-	tagsPrintTag (stdout, entry, extensionFields, allowPrintLineNumber, escaping, 0);
+	tagsPrintTagToFILE (stdout, entry, extensionFields, allowPrintLineNumber, escaping, 0);
 }
 
 static void printPseudoTag (const tagEntry *entry)
 {
-	tagsPrintTag (stdout, entry, extensionFields, allowPrintLineNumber, escaping, 1);
+	tagsPrintTagToFILE (stdout, entry, extensionFields, allowPrintLineNumber, escaping, 1);
 }
 
 static void walkTags (tagFile *const file, tagEntry *first_entry,
