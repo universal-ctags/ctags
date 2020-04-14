@@ -4,6 +4,8 @@ TESTS = \
 	test-api-tagsFind \
 	test-api-tagsFirstPseudoTag \
 	\
+	test-fix-unescaping \
+	\
 	$(NULL)
 
 check_PROGRAMS = \
@@ -11,6 +13,8 @@ check_PROGRAMS = \
 	test-api-tagsOpen \
 	test-api-tagsFind \
 	test-api-tagsFirstPseudoTag \
+	\
+	test-fix-unescaping \
 	\
 	$(NULL)
 
@@ -35,3 +39,7 @@ test_api_tagsFirstPseudoTag = test-api-tagsFirstPseudoTag.c
 test_api_tagsFirstPseudoTag_DEPENDENCIES = $(DEPS)
 EXTRA_DIST += ptag-sort-no.tags
 EXTRA_DIST += ptag-sort-yes.tags
+
+test_fix_unescaping = test-fix-unescaping.c
+test_fix_unescaping_DEPENDENCIES = $(DEPS)
+EXTRA_DIST += unescaping.tags
