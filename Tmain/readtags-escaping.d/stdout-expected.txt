@@ -49,3 +49,17 @@ aa	main/Makefile	/^%:$/;"	kind:t
 !_TAG_PROGRAM_NAME	Universal Ctags	/Derived from Exuberant Ctags/
 !_TAG_PROGRAM_URL	https://ctags.io/	/official site/
 !_TAG_PROGRAM_VERSION	0.0.0	/8d952eba/
+# -en -l (output2)
+level1	input.rst	/^level1$/;"	kind:c
+level2	input.rst	/^level2$/;"	kind:s	scope:chapter:level1
+!level3	input.rst	/^!level3$/;"	kind:S	scope:section:level2
+!level1+	input.rst	/^!level1+$/;"	kind:c
+level2+	input.rst	/^level2+$/;"	kind:s	scope:chapter:!level1+
+level3+	input.rst	/^level3+$/;"	kind:S	scope:section:level2+
+# -en --escape -l (output2)
+\x01level1	input.rst	/^level1$/;"	kind:c
+level2	input.rst	/^level2$/;"	kind:s	scope:chapter:\x01level1
+\x21level3\x03	input.rst	/^!level3$/;"	kind:S	scope:section:level2
+\x21level1+	input.rst	/^!level1+$/;"	kind:c
+level2+	input.rst	/^level2+$/;"	kind:s	scope:chapter:!level1+
+\x02level3+\x04	input.rst	/^level3+$/;"	kind:S	scope:section:level2+

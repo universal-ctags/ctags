@@ -31,4 +31,10 @@ ${V} ${READTAGS} -en -E -t ./output.tags -D &&
 
 echo '# -en --escape -D' &&
 ${V} ${READTAGS} -en --escape -t ./output.tags -D &&
+
+echo '# -en -l (output2)' &&
+${V} ${READTAGS} -en -t ./output2.tags -l &&
+
+echo '# -en --escape -l (output2)' &&
+${V} ${READTAGS} -en --escape -t ./output2.tags -l &&
 :
