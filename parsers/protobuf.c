@@ -171,6 +171,31 @@ static void skipUntil (const char *punctuation)
 		nextToken ();
 }
 
+static void parseFullQualifiedId (vString *buf)
+{
+	while (true)
+	{
+		nextToken ();
+
+		if (token.type == TOKEN_ID)
+		{
+			if (vStringIsEmpty (buf) || vStringLast (buf) == '.')
+				vStringCat (buf, token.value);
+			else
+				break;
+		}
+		else if (token.type == '.')
+		{
+			if (vStringIsEmpty (buf) || vStringLast (buf) != '.')
+				vStringPut (buf, '.');
+			else
+				break;
+		}
+		else
+			break;
+	}
+}
+
 static int tokenIsKeyword(keywordId keyword)
 {
 	return token.type == TOKEN_ID && token.keyword == keyword;
@@ -290,17 +315,7 @@ static int parseStatementFull (int kind, int role, int scopeCorkIndex)
 			return CORK_NIL;
 
 		fullName = vStringNewCopy (token.value);
-		while (true)
-		{
-			nextToken ();
-
-			if (token.type == TOKEN_ID)
-				vStringCat (fullName, token.value);
-			else if (token.type == '.')
-				vStringPut (fullName, '.');
-			else
-				break;
-		}
+		parseFullQualifiedId (fullName);
 	}
 	else if (token.type != TOKEN_ID)
 		return CORK_NIL;
@@ -331,22 +346,11 @@ static int parsePackage (void)
 	int corkIndex = CORK_NIL;
 
 	vString *pkg = vStringNew ();
-
-	while (true)
-	{
-		nextToken ();
-
-		if (token.type == TOKEN_ID)
-			vStringCat (pkg, token.value);
-		else if (token.type == '.')
-			vStringPut (pkg, '.');
-		else
-			break;
-	}
-
+	parseFullQualifiedId (pkg);
 	if (vStringLength (pkg) > 0)
 		corkIndex = createProtobufTag (pkg, PK_PACKAGE, CORK_NIL);
 	vStringDelete (pkg);
+
 	return corkIndex;
 }
 
