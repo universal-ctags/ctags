@@ -71,6 +71,7 @@ typedef enum {
 	PK_SERVICE,
 	PK_RPC,
 	PK_ONEOF,
+	PK_GROUP,
 } protobufKind;
 
 typedef enum {
@@ -91,6 +92,7 @@ static kindDefinition ProtobufKinds [] = {
 	{ true,  's', "service",    "services" },
 	{ true,  'r', "rpc",        "RPC methods" },
 	{ true,  'o', "oneof",      "oneof names" },
+	{ true,  'G', "group",      "groups" },
 };
 
 typedef enum eKeywordId {
@@ -108,6 +110,7 @@ typedef enum eKeywordId {
 	KEYWORD_EXTEND,
 	KEYWORD_ONEOF,
 	KEYWORD_MAP,
+	KEYWORD_GROUP,
 } keywordId;
 
 static const keywordTable ProtobufKeywordTable [] = {
@@ -125,6 +128,7 @@ static const keywordTable ProtobufKeywordTable [] = {
 	{ "extend",   KEYWORD_EXTEND   },
 	{ "oneof",    KEYWORD_ONEOF    },
 	{ "map",      KEYWORD_MAP      },
+	{ "group",    KEYWORD_GROUP    },
 };
 
 #define TOKEN_EOF   0
@@ -135,6 +139,13 @@ static struct sTokenInfo {
 	keywordId keyword;
 	vString *value;
 } token;
+
+
+/*
+ *   FUNCTION DECLARATIONS
+ */
+static void findProtobufTags0 (bool oneshot, int originalScopeCorkIndex);
+
 
 /*
  *   FUNCTION DEFINITIONS
@@ -251,6 +262,12 @@ static void parseEnumConstants (int scopeCorkIndex)
 
 static void parseOneofField (int scopeCorkIndex)
 {
+	if (tokenIsKeyword (KEYWORD_GROUP))
+	{
+		findProtobufTags0 (true, scopeCorkIndex);
+		return;
+	}
+
 	vString *type = vStringNewCopy (token.value);
 	parseFullQualifiedId (type);
 
@@ -449,17 +466,10 @@ static void parseMap (int scopeCorkIndex)
 	vStringDelete (typeref);
 }
 
-static void findProtobufTags (void)
+
+static void findProtobufTags0 (bool oneshot, int originalScopeCorkIndex)
 {
-	cppInit (false, false, false, false,
-			 KIND_GHOST_INDEX, 0, KIND_GHOST_INDEX,
-			 KIND_GHOST_INDEX, 0, 0,
-			 FIELD_UNKNOWN);
-	token.value = vStringNew ();
-
-	nextToken ();
-
-	int scopeCorkIndex = CORK_NIL;
+	int scopeCorkIndex = originalScopeCorkIndex;
 	while (token.type != TOKEN_EOF)
 	{
 		int corkIndex = CORK_NIL;
@@ -491,6 +501,9 @@ static void findProtobufTags (void)
 		}
 		else if (tokenIsKeyword (KEYWORD_MAP))
 			parseMap (scopeCorkIndex);
+		else if (tokenIsKeyword (KEYWORD_GROUP))
+			corkIndex = parseStatement (PK_GROUP, scopeCorkIndex);
+
 
 		skipUntil (";{}");
 		if (!dontChangeScope && token.type == '{' && corkIndex != CORK_NIL)
@@ -505,7 +518,22 @@ static void findProtobufTags (void)
 			scopeCorkIndex = e->extensionFields.scopeIndex;
 		}
 		nextToken ();
+
+		if (oneshot && scopeCorkIndex == originalScopeCorkIndex)
+			break;
 	}
+}
+
+static void findProtobufTags (void)
+{
+	cppInit (false, false, false, false,
+			 KIND_GHOST_INDEX, 0, KIND_GHOST_INDEX,
+			 KIND_GHOST_INDEX, 0, 0,
+			 FIELD_UNKNOWN);
+	token.value = vStringNew ();
+
+	nextToken ();
+	findProtobufTags0 (false, CORK_NIL);
 
 	vStringDelete (token.value);
 	cppTerminate ();
