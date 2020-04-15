@@ -69,7 +69,8 @@ typedef enum {
 	PK_ENUMERATOR,
 	PK_ENUM,
 	PK_SERVICE,
-	PK_RPC
+	PK_RPC,
+	PK_ONEOF,
 } protobufKind;
 
 typedef enum {
@@ -89,6 +90,7 @@ static kindDefinition ProtobufKinds [] = {
 	{ true,  'g', "enum",       "enum types" },
 	{ true,  's', "service",    "services" },
 	{ true,  'r', "rpc",        "RPC methods" },
+	{ true,  'o', "oneof",      "oneof names" },
 };
 
 typedef enum eKeywordId {
@@ -104,6 +106,7 @@ typedef enum eKeywordId {
 	KEYWORD_STREAM,
 	KEYWORD_RETURNS,
 	KEYWORD_EXTEND,
+	KEYWORD_ONEOF,
 } keywordId;
 
 static const keywordTable ProtobufKeywordTable [] = {
@@ -119,6 +122,7 @@ static const keywordTable ProtobufKeywordTable [] = {
 	{ "stream",   KEYWORD_STREAM   },
 	{ "returns",  KEYWORD_RETURNS  },
 	{ "extend",   KEYWORD_EXTEND   },
+	{ "oneof",    KEYWORD_ONEOF    },
 };
 
 #define TOKEN_EOF   0
@@ -243,6 +247,46 @@ static void parseEnumConstants (int scopeCorkIndex)
 	}
 }
 
+static void parseOneofField (int scopeCorkIndex)
+{
+	vString *type = vStringNewCopy (token.value);
+	parseFullQualifiedId (type);
+
+	if (token.type == TOKEN_ID)
+	{
+		int corkIndex = createProtobufTag (token.value, PK_FIELD, scopeCorkIndex);
+		tagEntryInfo *e = getEntryInCorkQueue (corkIndex);
+		if (e)
+		{
+			e->extensionFields.typeRef [0] = eStrdup ("typename"); /* As C++ parser does */
+			e->extensionFields.typeRef [1] = vStringDeleteUnwrap (type);
+			type = NULL;
+		}
+	}
+
+	skipUntil (";}");
+	vStringDelete (type);		/* NULL is acceptable */
+}
+
+static void parseOneofFields (int scopeCorkIndex)
+{
+	if (token.type != '{')
+		return;
+	nextToken ();
+
+	while (token.type != TOKEN_EOF && token.type != '}')
+	{
+		if (token.type == TOKEN_ID || token.type == '.')
+		{
+			parseOneofField (scopeCorkIndex);
+			if (token.type == ';')
+				nextToken ();
+		}
+		else
+			break;
+	}
+}
+
 #define gatherTypeinfo(VSTRING,CONDITION)			\
 	while (CONDITION)								\
 	{												\
@@ -332,6 +376,8 @@ static int parseStatementFull (int kind, int role, int scopeCorkIndex)
 
 	if (kind == PK_ENUM)
 		parseEnumConstants (corkIndex);
+	else if (kind == PK_ONEOF)
+		parseOneofFields (corkIndex);
 
 	return corkIndex;
 }
@@ -389,6 +435,11 @@ static void findProtobufTags (void)
 			corkIndex = parseStatement (PK_RPC, scopeCorkIndex);
 		else if (tokenIsKeyword (KEYWORD_EXTEND))
 			corkIndex = parseStatementFull (PK_MESSAGE, R_MESSAGE_EXTENSION, scopeCorkIndex);
+		else if (tokenIsKeyword (KEYWORD_ONEOF))
+		{
+			corkIndex = parseStatement (PK_ONEOF, scopeCorkIndex);
+			dontChangeScope = true;
+		}
 
 		skipUntil (";{}");
 		if (!dontChangeScope && token.type == '{' && corkIndex != CORK_NIL)

@@ -1,0 +1,16 @@
+imp	input.proto	/^package imp;$/;"	package
+ImportedMessage	input.proto	/^message ImportedMessage {$/;"	message	package:imp
+field	input.proto	/^  required int64 field = 1;$/;"	field	message:imp.ImportedMessage
+local_msg	input.proto	/^  optional ImportedMessage2 local_msg = 2;$/;"	field	message:imp.ImportedMessage
+foreign_msg	input.proto	/^  optional ForeignImportedMessage foreign_msg = 3;  \/\/ in imp3.proto$/;"	field	message:imp.ImportedMessage
+enum_field	input.proto	/^  optional Owner enum_field = 4;$/;"	field	message:imp.ImportedMessage
+union	input.proto	/^  oneof union {$/;"	oneof	message:imp.ImportedMessage
+state	input.proto	/^    int32 state = 9;$/;"	field	oneof:imp.ImportedMessage.union	typeref:typename:int32
+name	input.proto	/^  repeated string name = 5;$/;"	field	message:imp.ImportedMessage
+boss	input.proto	/^  repeated Owner boss = 6;$/;"	field	message:imp.ImportedMessage
+memo	input.proto	/^  repeated ImportedMessage2 memo = 7;$/;"	field	message:imp.ImportedMessage
+Owner	input.proto	/^  enum Owner {$/;"	enum	message:imp.ImportedMessage
+DAVE	input.proto	/^    DAVE = 1;$/;"	enumerator	enum:imp.ImportedMessage.Owner
+MIKE	input.proto	/^    MIKE = 2;$/;"	enumerator	enum:imp.ImportedMessage.Owner
+ImportedMessage2	input.proto	/^message ImportedMessage2 {$/;"	message	package:imp
+ImportedExtendable	input.proto	/^message ImportedExtendable {$/;"	message	package:imp
