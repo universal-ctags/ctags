@@ -107,6 +107,7 @@ typedef enum eKeywordId {
 	KEYWORD_RETURNS,
 	KEYWORD_EXTEND,
 	KEYWORD_ONEOF,
+	KEYWORD_MAP,
 } keywordId;
 
 static const keywordTable ProtobufKeywordTable [] = {
@@ -123,6 +124,7 @@ static const keywordTable ProtobufKeywordTable [] = {
 	{ "returns",  KEYWORD_RETURNS  },
 	{ "extend",   KEYWORD_EXTEND   },
 	{ "oneof",    KEYWORD_ONEOF    },
+	{ "map",      KEYWORD_MAP      },
 };
 
 #define TOKEN_EOF   0
@@ -152,7 +154,7 @@ repeat:
 	token.keyword = KEYWORD_NONE;
 	if (c <= 0)
 		token.type = TOKEN_EOF;
-	else if (c == '{' || c == '}' || c == ';' || c == '.' || c == '=')
+	else if (c == '{' || c == '}' || c == ';' || c == '.' || c == '=' || c == ',' || c == '<' || c == '>')
 		token.type = c;
 	else if (cppIsalnum (c) || c == '_')
 	{
@@ -400,6 +402,53 @@ static int parsePackage (void)
 	return corkIndex;
 }
 
+static void parseMap (int scopeCorkIndex)
+{
+	nextToken ();
+	if (token.type != '<')
+		return;
+
+	vString *typeref = vStringNewInit ("map<");
+
+	nextToken ();
+	if (token.type != TOKEN_ID)
+		goto out;
+
+	vStringCat (typeref, token.value);
+
+	nextToken ();
+	if (token.type != ',')
+		goto out;
+	vStringPut (typeref, ',');
+
+	vString *vtyperef = vStringNew ();
+	parseFullQualifiedId (vtyperef);
+	vStringCat (typeref, vtyperef);
+	vStringDelete (vtyperef);
+	if (vStringLast (typeref) == ',')
+		goto out;
+
+	if (token.type != '>')
+		goto out;
+	vStringPut (typeref, '>');
+
+	nextToken ();
+	if (token.type != TOKEN_ID)
+		goto out;
+
+	int corkIndex = createProtobufTag (token.value, PK_FIELD, scopeCorkIndex);
+	tagEntryInfo *e = getEntryInCorkQueue (corkIndex);
+	if (e)
+	{
+		e->extensionFields.typeRef [0] = eStrdup ("typename"); /* As C++ parser does */
+		e->extensionFields.typeRef [1] = vStringDeleteUnwrap (typeref);
+		typeref = NULL;
+	}
+
+ out:
+	vStringDelete (typeref);
+}
+
 static void findProtobufTags (void)
 {
 	cppInit (false, false, false, false,
@@ -440,6 +489,8 @@ static void findProtobufTags (void)
 			corkIndex = parseStatement (PK_ONEOF, scopeCorkIndex);
 			dontChangeScope = true;
 		}
+		else if (tokenIsKeyword (KEYWORD_MAP))
+			parseMap (scopeCorkIndex);
 
 		skipUntil (";{}");
 		if (!dontChangeScope && token.type == '{' && corkIndex != CORK_NIL)

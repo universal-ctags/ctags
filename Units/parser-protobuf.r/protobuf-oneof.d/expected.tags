@@ -9,6 +9,7 @@ state	input.proto	/^    int32 state = 9;$/;"	field	oneof:imp.ImportedMessage.uni
 name	input.proto	/^  repeated string name = 5;$/;"	field	message:imp.ImportedMessage
 boss	input.proto	/^  repeated Owner boss = 6;$/;"	field	message:imp.ImportedMessage
 memo	input.proto	/^  repeated ImportedMessage2 memo = 7;$/;"	field	message:imp.ImportedMessage
+msg_map	input.proto	/^  map<string, ImportedMessage2> msg_map = 8;$/;"	field	message:imp.ImportedMessage	typeref:typename:map<string,ImportedMessage2>
 Owner	input.proto	/^  enum Owner {$/;"	enum	message:imp.ImportedMessage
 DAVE	input.proto	/^    DAVE = 1;$/;"	enumerator	enum:imp.ImportedMessage.Owner
 MIKE	input.proto	/^    MIKE = 2;$/;"	enumerator	enum:imp.ImportedMessage.Owner
