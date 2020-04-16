@@ -5,6 +5,7 @@ TESTS = \
 	test-api-tagsFirstPseudoTag \
 	\
 	test-fix-unescaping \
+	test-fix-null-deref \
 	\
 	$(NULL)
 
@@ -15,6 +16,7 @@ check_PROGRAMS = \
 	test-api-tagsFirstPseudoTag \
 	\
 	test-fix-unescaping \
+	test-fix-null-deref \
 	\
 	$(NULL)
 
@@ -43,3 +45,7 @@ EXTRA_DIST += ptag-sort-yes.tags
 test_fix_unescaping = test-fix-unescaping.c
 test_fix_unescaping_DEPENDENCIES = $(DEPS)
 EXTRA_DIST += unescaping.tags
+
+test_fix_null_deref = test-fix-null-deref.c
+test_fix_null_deref_DEPENDENCIES = $(DEPS)
+EXTRA_DIST += null-deref.tags

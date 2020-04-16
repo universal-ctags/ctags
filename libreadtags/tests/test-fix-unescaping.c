@@ -31,6 +31,31 @@
 	} \
 	do {} while (0)
 
+#define CHECK_X(FIELD,EXP)												\
+	{																	\
+		unsigned short i;												\
+		for (i = 0; i < e.fields.count; i++)							\
+		{																\
+			if (strcmp (e.fields.list [i].key, FIELD) == 0)				\
+			{															\
+				if (strcmp(e.fields.list [i].value, EXP) == 0)			\
+					break;												\
+				else													\
+				{														\
+					fprintf (stderr, "unexpected " #FIELD "(expected: %s, actual: %s) in tagsFirst\n", \
+							 EXP, e.fields.list [i].value);				\
+					return 1;											\
+				}														\
+			}															\
+		}																\
+		if (i >= e.fields.count)										\
+		{																\
+			fprintf (stderr, "unexpected " #FIELD " field is not found in tagsFirst (count: %u)\n", \
+					 e.fields.count);									\
+			return 1;													\
+		}																\
+	}
+
 int
 main (void)
 {
@@ -90,6 +115,54 @@ main (void)
 	CHECK ("/^%:$/", address.pattern);
 	CHECK ("t", kind);
 
+	NEXT ();
+	CHECK ("\x01level1", name);
+	CHECK ("input.rst", file);
+	CHECK ("/^\x01level1$/", address.pattern);
+	CHECK ("c", kind);
+
+	NEXT ();
+	CHECK ("level2", name);
+	CHECK ("input.rst", file);
+	CHECK ("/^level2$/", address.pattern);
+	CHECK ("s", kind);
+	CHECK_X ("scope", "chapter:\x01level1");
+
+	NEXT ();
+	CHECK ("!level3\x03", name);
+	CHECK ("input.rst", file);
+	CHECK ("/^!level3\x03$/", address.pattern);
+	CHECK ("S", kind);
+	CHECK_X ("scope", "section:level2");
+
+	NEXT ();
+	CHECK ("!level1+", name);
+	CHECK ("input.rst", file);
+	CHECK ("/^!level1+$/", address.pattern);
+	CHECK ("c", kind);
+
+	NEXT ();
+	CHECK ("level2+", name);
+	CHECK ("input.rst", file);
+	CHECK ("/^level2+$/", address.pattern);
+	CHECK ("s", kind);
+	CHECK_X ("scope", "chapter:!level1+");
+
+	NEXT ();
+	CHECK ("\x02level3+\x04", name);
+	CHECK ("input.rst", file);
+	CHECK ("/^\x02level3+\x04$/", address.pattern);
+	CHECK ("S", kind);
+	CHECK_X ("scope", "section:level2+");
+
+	NEXT ();
+	CHECK ("ClassFour", name);
+	CHECK ("input.php", file);
+	CHECK ("/^  use NS2\\\\{NS30 as NameSpaceTreePointO, NS31\\\\Cls4 as ClassFour};$/", address.pattern);
+	CHECK ("a", kind);
+	CHECK_X ("typeref", "unknown:NS2\\NS31\\Cls4");
+
+	r = tagsClose(t);
 	if (r != TagSuccess)
 	{
 		fprintf (stderr, "error in tagsClose\n");
