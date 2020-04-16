@@ -9,12 +9,7 @@
 !_TAG_PROGRAM_VERSION	0.0.0	/8d952eba/
 aa	main/Makefile	/^%:$/;"	t
 \taa	parsers/Makefile	/^%:$/;"	t
-bb	main/Makefile	/^%:$/;"	t
+!b!b	main/Makefile	/^%:$/;"	t
+\x20c!c	main/Makefile	/^%:$/;"	t
+\x21d!d	main/Makefile	/^%:$/;"	t
 \\\aa	parsers/cxx/Makefile	/^%:$/;"	t
-\x01level1	input.rst	/^level1$/;"	c
-level2	input.rst	/^level2$/;"	s	scope:chapter:\x01level1
-\x21level3\x03	input.rst	/^!level3$/;"	S	scope:section:level2
-\x21level1+	input.rst	/^!level1+$/;"	c
-level2+	input.rst	/^level2+$/;"	s	scope:chapter:!level1+
-\x02level3+\x04	input.rst	/^level3+$/;"	S	scope:section:level2+
-ClassFour	input.php	/^  use NS2\\{NS30 as NameSpaceTreePointO, NS31\\Cls4 as ClassFour};$/;"	a	typeref:unknown:NS2\\NS31\\Cls4

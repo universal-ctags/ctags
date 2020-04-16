@@ -18,12 +18,94 @@ static int SortOverride;
 static sortType SortMethod;
 static int allowPrintLineNumber;
 static int debugMode;
+static int escaping;
 #ifdef READTAGS_DSL
 #include "dsl/qualifier.h"
 static QCode *Qualifier;
 #endif
 
-static void printTag (const tagEntry *entry)
+static void ultostr (char dst [21], unsigned long d)
+{
+	int o [20];
+	int i;
+
+	if (d == 0)
+	{
+		dst [0] = '0';
+		dst [1] = '\0';
+		return;
+	}
+
+	for (i = 0; d != 0; i++, d = d/10)
+		o [i] = d % 10;
+
+	for (int j = i - 1; j >= 0; j--)
+		dst [i - j - 1] = o[j] + '0';
+	dst [i] = '\0';
+}
+
+static void printValue (const char *val, int printingWithEscaping,
+						int  (* print_str) (const char *, void *),
+						int  (* print_char) (int, void *),
+						void *outfp)
+{
+	if (printingWithEscaping)
+	{
+		for(; *val != '\0'; val++)
+		{
+			switch (*val)
+			{
+				case '\t': print_str ("\\t",  outfp); break;
+				case '\r': print_str ("\\r",  outfp); break;
+				case '\n': print_str ("\\n",  outfp); break;
+				case '\\': print_str ("\\\\", outfp); break;
+					/* Universal-CTags extensions */
+				case '\a': print_str ("\\a", outfp); break;
+				case '\b': print_str ("\\b", outfp); break;
+				case '\v': print_str ("\\v", outfp); break;
+				case '\f': print_str ("\\f", outfp); break;
+				default:
+					if ((0x01 <= *val && *val <= 0x1F) || *val == 0x7F)
+					{
+						char c[5] = {
+							[0] = '\\',
+							[1] = 'x',
+						};
+						c [2] = (*val / 16) % 16;
+#if 0
+						if (c [2] == 0)
+						{
+							c [2] = *val % 16;
+							c [2] += ( c [2] < 10 )? '0': 'A' - 9;
+							c [3] = '\0';
+						}
+						else
+#endif
+						{
+							c [2] += ( c [2] < 10 )? '0': 'A' - 9;
+							c [3] = *val % 16;
+							c [3] += ( c [3] < 10 )? '0': 'A' - 9;
+							c [4] = '\0';
+						}
+						print_str (c, outfp);
+					}
+					else
+						print_char (*val, outfp);
+			}
+		}
+	}
+	else
+		print_str (val, outfp);
+}
+
+static void tagsPrintTag (const tagEntry *entry,
+						  int printingExtensionFields,
+						  int printingLineNumber,
+						  int printingWithEscaping,
+						  int pseudoTag,
+						  int  (* print_str) (const char *, void *),
+						  int  (* print_char) (int, void *),
+						  void *outfp)
 {
 	int i;
 	int first = 1;
@@ -31,34 +113,100 @@ static void printTag (const tagEntry *entry)
 	const char* const empty = "";
 /* "sep" returns a value only the first time it is evaluated */
 #define sep (first ? (first = 0, separator) : empty)
-	printf ("%s\t%s\t%s",
-		entry->name, entry->file, entry->address.pattern);
-	if (extensionFields)
+
+	if (entry->name == NULL
+		|| entry->file == NULL
+		|| entry->address.pattern == NULL)
+		return;
+	if (pseudoTag)
+		print_str (entry->name, outfp);
+	else if (*entry->name == '!' && printingWithEscaping)
+	{
+		print_str ("\\x21", outfp);
+		printValue (entry->name + 1, printingWithEscaping,
+					print_str, print_char, outfp);
+	}
+	else if (*entry->name == ' ' && printingWithEscaping)
+	{
+		print_str ("\\x20", outfp);
+		printValue (entry->name + 1, printingWithEscaping,
+					print_str, print_char, outfp);
+	}
+	else
+		printValue (entry->name, printingWithEscaping,
+					print_str, print_char, outfp);
+
+	print_char ('\t', outfp);
+	printValue  (entry->file, printingWithEscaping,
+				 print_str, print_char, outfp);
+	print_char ('\t', outfp);
+	print_str (entry->address.pattern, outfp);
+
+	if (printingExtensionFields)
 	{
 		if (entry->kind != NULL  &&  entry->kind [0] != '\0')
 		{
-			  printf ("%s\tkind:%s", sep, entry->kind);
-			  first = 0;
+			print_str (sep, outfp);
+			print_str ("\tkind:", outfp);
+			printValue (entry->kind, printingWithEscaping,
+						print_str, print_char, outfp);
+			first = 0;
 		}
 		if (entry->fileScope)
 		{
-			printf ("%s\tfile:", sep);
+			print_str (sep, outfp);
+			print_str ("\tfile:", outfp);
 			first = 0;
 		}
-		if (allowPrintLineNumber && entry->address.lineNumber > 0)
+		if (printingLineNumber && entry->address.lineNumber > 0)
 		{
-			printf ("%s\tline:%lu", sep, entry->address.lineNumber);
+			print_str (sep, outfp);
+			print_str ("\tline:", outfp);
+			char buf [20 + 1];	/* 20 comes from UINNT64_MAX, 1 is for \0. */
+			ultostr (buf, entry->address.lineNumber);
+			print_str (buf, outfp);
 			first = 0;
 		}
 		for (i = 0  ;  i < entry->fields.count  ;  ++i)
 		{
-			printf ("%s\t%s:%s", sep, entry->fields.list [i].key,
-				entry->fields.list [i].value);
-			first = 0;
+			if (entry->fields.list [i].key)
+			{
+				print_str (sep, outfp);
+				print_char ('\t', outfp);
+				print_str (entry->fields.list [i].key, outfp);
+				print_char (':', outfp);
+				if (entry->fields.list  [i].value)
+					printValue (entry->fields.list [i].value,
+								printingWithEscaping, print_str, print_char, outfp);
+				first = 0;
+			}
 		}
 	}
-	putchar ('\n');
+	print_char ('\n', outfp);
 #undef sep
+}
+
+static void tagsPrintTagToFILE (FILE *outfp, const tagEntry *entry,
+								int printingExtensionFields,
+								int printingLineNumber,
+								int printingWithEscaping,
+								int pseudoTag)
+{
+	tagsPrintTag (entry,
+				  printingExtensionFields, printingLineNumber, printingWithEscaping, pseudoTag,
+				  (int  (*) (const char *, void *))fputs,
+				  (int  (*) (const int, void *))fputc,
+				  outfp);
+}
+
+static void printTag (const tagEntry *entry)
+{
+	tagsPrintTagToFILE (stdout, entry, extensionFields, allowPrintLineNumber, escaping, 0);
+}
+
+static void printPseudoTag (const tagEntry *entry)
+{
+	tagsPrintTagToFILE (stdout, entry, extensionFields, allowPrintLineNumber, escaping, 1);
 }
 
 static void walkTags (tagFile *const file, tagEntry *first_entry,
@@ -92,7 +240,7 @@ static void findTag (const char *const name, const int options)
 	if (file == NULL)
 	{
 		fprintf (stderr, "%s: cannot open tag file: %s: %s\n",
-				ProgramName, strerror (info.status.error_number), name);
+				ProgramName, strerror (info.status.error_number), TagFileName);
 		exit (1);
 	}
 	else
@@ -122,7 +270,7 @@ static void listTags (int pseudoTags)
 	else if (pseudoTags)
 	{
 		if (tagsFirstPseudoTag (file, &entry) == TagSuccess)
-			walkTags (file, &entry, tagsNextPseudoTag, printTag);
+			walkTags (file, &entry, tagsNextPseudoTag, printPseudoTag);
 		tagsClose (file);
 	}
 	else
@@ -156,6 +304,8 @@ static const char *const Usage =
 	"Options:\n"
 	"    -d | --debug\n"
 	"        Turn on debugging output.\n"
+	"    -E | --escape\n"
+	"        Escape characters like tab as described in tags(5).\n"
 	"    -e | --extension-fields\n"
 	"        Include extension fields in output.\n"
 	"    -i | --icase-match\n"
@@ -182,7 +332,7 @@ static void printUsage(FILE* stream, int exitCode)
 }
 
 #ifdef READTAGS_DSL
-static void printFilterExpressoin (FILE *stream, int exitCode)
+static void printFilterExpression (FILE *stream, int exitCode)
 {
 	fprintf (stream, "Filter expression: \n");
 	q_help (stream);
@@ -253,7 +403,7 @@ extern int main (int argc, char **argv)
 				{
 					const char *exp_klass = argv [++i];
 					if (strcmp (exp_klass, "filter") == 0)
-						printFilterExpressoin (stdout, 0);
+						printFilterExpression (stdout, 0);
 					else
 					{
 						fprintf (stderr, "%s: unknown expression class for --%s option",
@@ -270,6 +420,8 @@ extern int main (int argc, char **argv)
 				}
 			}
 #endif
+			else if (strcmp (optname, "escape") == 0)
+				escaping = 1;
 			else if (strcmp (optname, "extension-fields") == 0)
 				extensionFields = 1;
 			else if (strcmp (optname, "icase-match") == 0)
@@ -355,13 +507,14 @@ extern int main (int argc, char **argv)
 						{
 							const char *exp_klass = argv [++i];
 							if (strcmp (exp_klass, "filter") == 0)
-								printFilterExpressoin (stdout, 0);
+								printFilterExpression (stdout, 0);
 							else
 								printUsage(stderr, 1);
 						}
 						else
 							printUsage(stderr, 1);
 #endif
+					case 'E': escaping = 1; break;
 					case 'e': extensionFields = 1;         break;
 					case 'i': options |= TAG_IGNORECASE;   break;
 					case 'p': options |= TAG_PARTIALMATCH; break;

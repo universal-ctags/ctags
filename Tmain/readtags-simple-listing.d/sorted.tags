@@ -1,0 +1,14 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/;"	extras:pseudo
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/;"	extras:pseudo
+!_TAG_OUTPUT_FILESEP	slash	/slash or backslash/;"	extras:pseudo
+!_TAG_OUTPUT_MODE	u-ctags	/u-ctags or e-ctags/;"	extras:pseudo
+!_TAG_PATTERN_LENGTH_LIMIT	96	/0 for no limit/;"	extras:pseudo
+!_TAG_PROGRAM_AUTHOR	Universal Ctags Team	//;"	extras:pseudo
+!_TAG_PROGRAM_NAME	Universal Ctags	/Derived from Exuberant Ctags/;"	extras:pseudo
+!_TAG_PROGRAM_URL	https://ctags.io/	/official site/;"	extras:pseudo
+!_TAG_PROGRAM_VERSION	0.0.0	/5cbc78e4/;"	extras:pseudo
+c	input.c	/^char c;$/;"	kind:variable	line:7	language:C	typeref:typename:char	roles:def	end:7
+m0	input.c	/^	int m0;$/;"	kind:variable	line:4	language:C	typeref:typename:int	roles:def	end:4
+m2	input.c	/^	int m2;$/;"	kind:variable	line:5	language:C	typeref:typename:int	roles:def	end:5
+tst	input.c	/^typedef strcut st tst;$/;"	kind:typedef	line:8	language:C	typeref:typename:strcut st	file:	roles:def	extras:fileScope
+var	input.c	/^int var;$/;"	kind:variable	line:65535	language:C	typeref:typename:int	roles:def	end:4294967295

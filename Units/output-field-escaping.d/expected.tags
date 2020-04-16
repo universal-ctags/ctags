@@ -1,0 +1,6 @@
+\x01level1	input.rst	/^level1$/;"	c
+level2	input.rst	/^level2$/;"	s	scope:chapter:\x01level1
+\x21level3\x03	input.rst	/^!level3$/;"	S	scope:section:level2
+\x21level1+	input.rst	/^!level1+$/;"	c
+level2+	input.rst	/^level2+$/;"	s	scope:chapter:!level1+
+\x02level3+\x04	input.rst	/^level3+$/;"	S	scope:section:level2+

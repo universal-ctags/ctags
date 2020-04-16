@@ -340,6 +340,9 @@ static void parseExtensionFields (tagFile *const file, tagEntry *const entry,
 								  char *const string)
 {
 	char *p = string;
+	char *tail = string + (string? strlen(string):0);
+	size_t q_len;
+
 	while (p != NULL  &&  *p != '\0')
 	{
 		while (*p == TAB)
@@ -357,9 +360,34 @@ static void parseExtensionFields (tagFile *const file, tagEntry *const entry,
 			else
 			{
 				const char *key = field;
-				const char *value = colon + 1;
+				char *q = colon + 1;
+				const char *value = q;
 				const int key_len = colon - key;
 				*colon = '\0';
+
+				q_len = tail - q;
+
+				/* Unescaping */
+				while (*q != '\0')
+				{
+					const char *next = q;
+					int ch = readTagCharacter (&next);
+					size_t skip = next - q;
+
+					*q = (char) ch;
+					q++;
+					q_len -= skip;
+					if (skip > 1)
+					{
+						/* + 1 is for moving the area including the last '\0'. */
+						memmove (q, next, q_len + 1);
+						if (p)
+							p -= skip - 1;
+						if (tail != string)
+							tail -= skip - 1;
+					}
+				}
+
 				if (key_len == 4)
 				{
 					if (memcmp (key, "kind", 4) == 0)
@@ -438,7 +466,8 @@ static void parseTagLine (tagFile *file, tagEntry *const entry)
 		{
 			/* + 1 is for moving the area including the last '\0'. */
 			memmove (p, next, p_len + 1);
-			tab -= skip - 1;
+			if (tab)
+				tab -= skip - 1;
 		}
 	}
 

@@ -31,3 +31,5 @@ tests/*.trs
 tests/test-api-tagsFind
 tests/test-api-tagsFirstPseudoTag
 tests/test-api-tagsOpen
+tests/test-fix-null-deref
+tests/test-fix-unescaping

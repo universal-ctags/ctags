@@ -1,0 +1,18 @@
+# no -e option
+c	input.c	/^char c;$/
+m0	input.c	/^	int m0;$/
+m2	input.c	/^	int m2;$/
+tst	input.c	/^typedef strcut st tst;$/
+var	input.c	/^int var;$/
+# with -e option
+c	input.c	/^char c;$/;"	kind:variable	language:C	typeref:typename:char	roles:def	end:7
+m0	input.c	/^	int m0;$/;"	kind:variable	language:C	typeref:typename:int	roles:def	end:4
+m2	input.c	/^	int m2;$/;"	kind:variable	language:C	typeref:typename:int	roles:def	end:5
+tst	input.c	/^typedef strcut st tst;$/;"	kind:typedef	file:	language:C	typeref:typename:strcut st	roles:def	extras:fileScope
+var	input.c	/^int var;$/;"	kind:variable	language:C	typeref:typename:int	roles:def	end:4294967295
+# with -e -n option
+c	input.c	/^char c;$/;"	kind:variable	line:7	language:C	typeref:typename:char	roles:def	end:7
+m0	input.c	/^	int m0;$/;"	kind:variable	line:4	language:C	typeref:typename:int	roles:def	end:4
+m2	input.c	/^	int m2;$/;"	kind:variable	line:5	language:C	typeref:typename:int	roles:def	end:5
+tst	input.c	/^typedef strcut st tst;$/;"	kind:typedef	file:	line:8	language:C	typeref:typename:strcut st	roles:def	extras:fileScope
+var	input.c	/^int var;$/;"	kind:variable	line:65535	language:C	typeref:typename:int	roles:def	end:4294967295

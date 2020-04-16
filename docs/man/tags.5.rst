@@ -284,9 +284,14 @@ A tagfield has a name, a colon, and a value: "name:value".
   - When a value contains a ``\b``, this stands for a <BS> (0x08).
   - When a value contains a ``\v``, this stands for a <VT> (0x0b).
   - When a value contains a ``\f``, this stands for a <FF> (0x0c).
-  - The characters in range 0x01 to 0x1F included, 0x7F, and leading space
-    (0x20) and ``!`` (0x21) are converted to ``\x`` prefixed hexadecimal number if
-    the characters are not handled in the above "value" rules.
+  - The characters in range 0x01 to 0x1F included, and 0x7F are
+    converted to ``\x`` prefixed hexadecimal number if the characters are
+    not handled in the above "value" rules.
+  - The leading space (0x20) and ``!`` (0x21) in {tagname} are converted
+    to ``\x`` prefixed hexadecimal number (``\x20`` and ``\x21``) if the
+    tag is not a pseudo-tag. As described later, a pseudo-tag starts with
+    ``!``. These rules are for distinguishing pseudo-tags and non pseudo-tags
+    (regular tags) when tags lines in a tag file are sorted.
 
 Proposed tagfield names:
 
