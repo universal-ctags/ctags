@@ -240,7 +240,7 @@ static void findTag (const char *const name, const int options)
 	if (file == NULL)
 	{
 		fprintf (stderr, "%s: cannot open tag file: %s: %s\n",
-				ProgramName, strerror (info.status.error_number), name);
+				ProgramName, strerror (info.status.error_number), TagFileName);
 		exit (1);
 	}
 	else
