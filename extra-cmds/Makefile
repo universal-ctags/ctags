@@ -3,6 +3,6 @@ all:
 .SUFFIXES: .c .o
 
 .c.o:
-	$(MAKE) -C .. readtags-cmd/$@
+	$(MAKE) -C .. extra-cmds/$@
 %:
 	$(MAKE) -C .. $@

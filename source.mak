@@ -361,10 +361,15 @@ ALL_OBJS = \
 
 READTAGS_SRCS  = \
 	libreadtags/readtags.c      \
-	readtags-cmd/readtags-cmd.c  \
+	extra-cmds/printtags.c  \
+	extra-cmds/readtags-cmd.c  \
 	\
 	$(NULL)
-READTAGS_HEADS = libreadtags/readtags.h
+READTAGS_HEADS = \
+	       libreadtags/readtags.h \
+	       extra-cmds/printtags.h  \
+	       \
+	       $(NULL)
 READTAGS_OBJS  = $(READTAGS_SRCS:.c=.$(OBJEXT))
 
 PACKCC_SRCS = \
