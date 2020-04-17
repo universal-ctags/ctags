@@ -304,8 +304,8 @@ static const char *const Usage =
 	"Options:\n"
 	"    -d | --debug\n"
 	"        Turn on debugging output.\n"
-	"    -E | --escape\n"
-	"        Escape characters like tab as described in tags(5).\n"
+	"    -E | --escape-output\n"
+	"        Escape characters like tabs in output as described in tags(5).\n"
 	"    -e | --extension-fields\n"
 	"        Include extension fields in output.\n"
 	"    -i | --icase-match\n"
@@ -420,7 +420,7 @@ extern int main (int argc, char **argv)
 				}
 			}
 #endif
-			else if (strcmp (optname, "escape") == 0)
+			else if (strcmp (optname, "escape-output") == 0)
 				escaping = 1;
 			else if (strcmp (optname, "extension-fields") == 0)
 				extensionFields = 1;
