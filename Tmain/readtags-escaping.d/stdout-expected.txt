@@ -12,7 +12,7 @@ aa	main/Makefile	/^%:$/;"	kind:t
 \x20c!c	main/Makefile	/^%:$/;"	kind:t
 \x21d!d	main/Makefile	/^%:$/;"	kind:t
 \\\aa	parsers/cxx/Makefile	/^%:$/;"	kind:t
-# -en --escape -l
+# -en --escape-output -l
 aa	main/Makefile	/^%:$/;"	kind:t
 \taa	parsers/Makefile	/^%:$/;"	kind:t
 \x21b!b	main/Makefile	/^%:$/;"	kind:t
@@ -39,7 +39,7 @@ aa	main/Makefile	/^%:$/;"	kind:t
 !_TAG_PROGRAM_NAME	Universal Ctags	/Derived from Exuberant Ctags/
 !_TAG_PROGRAM_URL	https://ctags.io/	/official site/
 !_TAG_PROGRAM_VERSION	0.0.0	/8d952eba/
-# -en --escape -D
+# -en --escape-output -D
 !_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
 !_TAG_FILE_SORTED	0	/0=unsorted, 1=sorted, 2=foldcase/
 !_TAG_OUTPUT_FILESEP	slash	/slash or backslash/
@@ -56,7 +56,7 @@ level2	input.rst	/^level2$/;"	kind:s	scope:chapter:level1
 !level1+	input.rst	/^!level1+$/;"	kind:c
 level2+	input.rst	/^level2+$/;"	kind:s	scope:chapter:!level1+
 level3+	input.rst	/^level3+$/;"	kind:S	scope:section:level2+
-# -en --escape -l (output2)
+# -en --escape-output -l (output2)
 \x01level1	input.rst	/^level1$/;"	kind:c
 level2	input.rst	/^level2$/;"	kind:s	scope:chapter:\x01level1
 \x21level3\x03	input.rst	/^!level3$/;"	kind:S	scope:section:level2
