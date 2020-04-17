@@ -58,8 +58,8 @@ PDBFLAG =
 	$(CC) $(OPT) $(DEFINES) $(INCLUDES) /Foparsers\ /c $<
 {parsers\cxx}.c{parsers\cxx}.obj::
 	$(CC) $(OPT) $(DEFINES) $(INCLUDES) /Foparsers\cxx\ /c $<
-{readtags-cmd}.c{readtags-cmd}.obj::
-	$(CC) $(OPT) $(DEFINES) $(INCLUDES) /Foreadtags-cmd\ /c $<
+{extra-cmds}.c{extra-cmds}.obj::
+	$(CC) $(OPT) $(DEFINES) $(INCLUDES) /Foextra-cmds\ /c $<
 {libreadtags}.c{libreadtags}.obj::
 	$(CC) $(OPT) $(DEFINES) $(INCLUDES) /Folibreadtags\ /c $<
 {win32\mkstemp}.c{win32\mkstemp}.obj::
@@ -100,6 +100,6 @@ $(RES_OBJ): win32/ctags.rc win32/ctags.exe.manifest win32/resource.h
 
 
 clean:
-	- del *.obj main\*.obj optlib\*.obj parsers\*.obj parsers\cxx\*.obj gnu_regex\*.obj fnmatch\*.obj misc\packcc\*.obj peg\*.obj readtags-cmd\*.obj libreadtags\*.obj win32\mkstemp\*.obj win32\*.res main\repoinfo.h
+	- del *.obj main\*.obj optlib\*.obj parsers\*.obj parsers\cxx\*.obj gnu_regex\*.obj fnmatch\*.obj misc\packcc\*.obj peg\*.obj extra-cmds\*.obj libreadtags\*.obj win32\mkstemp\*.obj win32\*.res main\repoinfo.h
 	- del ctags.exe readtags.exe $(PACKCC)
 	- del tags
