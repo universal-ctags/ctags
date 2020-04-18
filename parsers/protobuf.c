@@ -64,6 +64,13 @@
 static langType Lang_protobuf;
 
 typedef enum {
+	SYNTAX_UNKNOWN,
+	SYNTAX_PROTO2,
+	SYNTAX_PROTO3,
+} protobufSyntax;
+static protobufSyntax syntax = SYNTAX_UNKNOWN;;
+
+typedef enum {
 	PK_PACKAGE,
 	PK_MESSAGE,
 	PK_FIELD,
@@ -126,6 +133,7 @@ typedef enum eKeywordId {
 	KEYWORD_IMPORT,
 	KEYWORD_PUBLIC,
 	KEYWORD_WEAK,
+	KEYWORD_SYNTAX,
 } keywordId;
 
 static const keywordTable ProtobufKeywordTable [] = {
@@ -147,6 +155,7 @@ static const keywordTable ProtobufKeywordTable [] = {
 	{ "import",   KEYWORD_IMPORT   },
 	{ "public",   KEYWORD_PUBLIC   },
 	{ "weak",     KEYWORD_WEAK     },
+	{ "syntax",   KEYWORD_SYNTAX   },
 };
 
 #define TOKEN_EOF   0
@@ -530,6 +539,25 @@ static int parseImport (int scopeCorkIndex)
 	return CORK_NIL;
 }
 
+static void parseSyntax (void)
+{
+	nextToken ();
+	if (token.type != '=')
+		return;
+
+	nextTokenFull (true);
+	if (token.type == TOKEN_STR)
+	{
+		const vString *proto = cppGetLastCharOrStringContents ();
+		if (strcmp (vStringValue (proto), "proto2") == 0)
+			syntax = SYNTAX_PROTO2;
+		else if (strcmp (vStringValue (proto), "proto3") == 0)
+			syntax = SYNTAX_PROTO3;
+		else
+			syntax = SYNTAX_UNKNOWN;
+	}
+}
+
 static void findProtobufTags0 (bool oneshot, int originalScopeCorkIndex)
 {
 	int scopeCorkIndex = originalScopeCorkIndex;
@@ -537,7 +565,13 @@ static void findProtobufTags0 (bool oneshot, int originalScopeCorkIndex)
 	{
 		int corkIndex = CORK_NIL;
 		bool dontChangeScope = false;
-		if (tokenIsKeyword (KEYWORD_PACKAGE))
+
+		if (tokenIsKeyword (KEYWORD_SYNTAX) && originalScopeCorkIndex == CORK_NIL)
+		{
+			parseSyntax ();
+			dontChangeScope = true;
+		}
+		else if (tokenIsKeyword (KEYWORD_PACKAGE))
 		{
 			corkIndex = parsePackage ();
 			scopeCorkIndex = corkIndex;
