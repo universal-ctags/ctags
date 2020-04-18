@@ -25,11 +25,6 @@ static int escaping;
 static QCode *Qualifier;
 #endif
 
-static tagPrintProcs printProcs = {
-	.printStr = (int  (*) (const char *, void *))fputs,
-	.printChar = (int  (*) (int, void *))fputc,
-};
-
 static void printTag (const tagEntry *entry)
 {
 	tagPrintOptions opts = {
@@ -37,7 +32,7 @@ static void printTag (const tagEntry *entry)
 		.lineNumber = allowPrintLineNumber,
 		.escaping = escaping,
 	};
-	tagsPrint (entry, &opts, &printProcs, stdout);
+	tagsPrint (entry, &opts, NULL, stdout);
 }
 
 static void printPseudoTag (const tagEntry *entry)
@@ -47,7 +42,7 @@ static void printPseudoTag (const tagEntry *entry)
 		.lineNumber = allowPrintLineNumber,
 		.escaping = escaping,
 	};
-	tagsPrintPseudoTag (entry, &opts, &printProcs, stdout);
+	tagsPrintPseudoTag (entry, &opts, NULL, stdout);
 }
 
 static void walkTags (tagFile *const file, tagEntry *first_entry,

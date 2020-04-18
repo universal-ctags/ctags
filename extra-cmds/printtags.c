@@ -13,6 +13,17 @@
 #include "printtags.h"
 #include <stdio.h>
 
+
+/*
+*   DATA DEFINITIONS
+*/
+
+static tagPrintProcs printFILEProcs = {
+	.printStr = (int  (*) (const char *, void *))fputs,
+	.printChar = (int  (*) (int, void *))fputc,
+};
+
+
 /*
 *   FUNCTION DEFINITIONS
 */
@@ -182,6 +193,9 @@ static void tagsPrintTag (const tagEntry *entry,
 extern int tagsPrint (const tagEntry *entry,
 					  tagPrintOptions *opt, tagPrintProcs *procs, void *outfp)
 {
+	if (!procs)
+		procs = &printFILEProcs;
+
 	tagsPrintTag (entry,
 				  opt->extensionFields,
 				  opt->lineNumber,
@@ -196,6 +210,9 @@ extern int tagsPrint (const tagEntry *entry,
 extern int tagsPrintPseudoTag (const tagEntry *entry,
 							   tagPrintOptions *opt, tagPrintProcs *procs, void *outfp)
 {
+	if (!procs)
+		procs = &printFILEProcs;
+
 	tagsPrintTag (entry,
 				  opt->extensionFields,
 				  opt->lineNumber,
