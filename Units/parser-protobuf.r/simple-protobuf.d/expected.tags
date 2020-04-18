@@ -1,18 +1,19 @@
 TestPackage	input.proto	/^package TestPackage;$/;"	kind:package
-Message1	input.proto	/^message Message1 {$/;"	kind:message	package:TestPackage
+Message1	input.proto	/^message Message1 {$/;"	kind:message	package:TestPackage	end:39
 field1	input.proto	/^    required string field1 = 1 [default="; required string thisIsNotAField = 1;"];$/;"	kind:field	message:TestPackage.Message1	typeref:typename:string
-Message2	input.proto	/^message Message2 {$/;"	kind:message	package:TestPackage
-NestedMessage	input.proto	/^    message NestedMessage {$/;"	kind:message	message:TestPackage.Message2
+Message2	input.proto	/^message Message2 {$/;"	kind:message	package:TestPackage	end:53
+NestedMessage	input.proto	/^    message NestedMessage {$/;"	kind:message	message:TestPackage.Message2	end:44
 field2	input.proto	/^        required string field2 = 2;$/;"	kind:field	message:TestPackage.Message2.NestedMessage	typeref:typename:string
-Enum1	input.proto	/^    enum Enum1 {$/;"	kind:enum	message:TestPackage.Message2
+Enum1	input.proto	/^    enum Enum1 {$/;"	kind:enum	message:TestPackage.Message2	end:49
 YES	input.proto	/^        YES = 1;$/;"	kind:enumerator	enum:TestPackage.Message2.Enum1
 NO	input.proto	/^        NO = 2;$/;"	kind:enumerator	enum:TestPackage.Message2.Enum1
 field3	input.proto	/^    repeated NestedMessage field3 = 3;$/;"	kind:field	message:TestPackage.Message2	typeref:typename:NestedMessage
 field4	input.proto	/^    optional Enum1 field4 = 4;$/;"	kind:field	message:TestPackage.Message2	typeref:typename:Enum1
-Message3	input.proto	/^message Message3 {$/;"	kind:message	package:TestPackage
+Message3	input.proto	/^message Message3 {$/;"	kind:message	package:TestPackage	end:60
 field5	input.proto	/^    required Message2.NestedMessage field5 = 5;$/;"	kind:field	message:TestPackage.Message3	typeref:typename:Message2.NestedMessage
 field6	input.proto	/^    required .TestPackage.Message2.Enum1 field6 = 6;$/;"	kind:field	message:TestPackage.Message3	typeref:typename:.TestPackage.Message2.Enum1
+Message3	input.proto	/^extend Message3 {$/;"	kind:message	package:TestPackage	end:65
 field7	input.proto	/^    optional Message2 . NestedMessage field7 = 7;$/;"	kind:field	message:TestPackage.Message3	typeref:typename:Message2.NestedMessage
 field8	input.proto	/^    repeated int32 field8 = 8 [packed=true];$/;"	kind:field	message:TestPackage.Message3	typeref:typename:int32
-Service1	input.proto	/^service Service1 {$/;"	kind:service	package:TestPackage
+Service1	input.proto	/^service Service1 {$/;"	kind:service	package:TestPackage	end:69
 Method1	input.proto	/^    rpc Method1(Message1) returns(Message2);$/;"	kind:rpc	service:TestPackage.Service1	typeref:typename:Message2	signature:Message1

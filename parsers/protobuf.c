@@ -55,6 +55,7 @@
 #include "entry.h"
 #include "keyword.h"
 #include "parse.h"
+#include "read.h"
 #include "vstring.h"
 
 /*
@@ -258,6 +259,8 @@ static void parseEnumConstants (int scopeCorkIndex)
 		if (token.type == ';')
 			nextToken ();
 	}
+	tagEntryInfo *e = getEntryInCorkQueue (scopeCorkIndex);
+	e->extensionFields.endLine = getInputLineNumber ();
 }
 
 static void parseOneofField (int scopeCorkIndex)
@@ -304,6 +307,9 @@ static void parseOneofFields (int scopeCorkIndex)
 		else
 			break;
 	}
+
+	tagEntryInfo *e = getEntryInCorkQueue (scopeCorkIndex);
+	e->extensionFields.endLine = getInputLineNumber ();
 }
 
 #define gatherTypeinfo(VSTRING,CONDITION)			\
@@ -523,6 +529,7 @@ static void findProtobufTags0 (bool oneshot, int originalScopeCorkIndex)
 			/* Return to the parent scope. */
 			tagEntryInfo *e = getEntryInCorkQueue (scopeCorkIndex);
 			scopeCorkIndex = e->extensionFields.scopeIndex;
+			e->extensionFields.endLine = getInputLineNumber ();
 		}
 		nextToken ();
 
