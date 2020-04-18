@@ -73,14 +73,23 @@ typedef enum {
 	PK_RPC,
 	PK_ONEOF,
 	PK_GROUP,
+	PK_PROTODEF,
 } protobufKind;
 
 typedef enum {
 	R_MESSAGE_EXTENSION,
 } protobufMessageRole;
 
+typedef enum {
+	R_PROTODEF_IMPORTED,
+} protobufProtodefRole;
+
 static roleDefinition ProtobufMessageRoles [] = {
 	{ true, "extension", "extending the message" },
+};
+
+static roleDefinition ProtobufProtodefRoles [] = {
+	{ true, "imported", "imported" },
 };
 
 static kindDefinition ProtobufKinds [] = {
@@ -94,6 +103,8 @@ static kindDefinition ProtobufKinds [] = {
 	{ true,  'r', "rpc",        "RPC methods" },
 	{ true,  'o', "oneof",      "oneof names" },
 	{ true,  'G', "group",      "groups" },
+	{ true,  'D', "protodef",   ".proto definition",
+	  .referenceOnly = true, ATTACH_ROLES (ProtobufProtodefRoles)},
 };
 
 typedef enum eKeywordId {
@@ -112,6 +123,9 @@ typedef enum eKeywordId {
 	KEYWORD_ONEOF,
 	KEYWORD_MAP,
 	KEYWORD_GROUP,
+	KEYWORD_IMPORT,
+	KEYWORD_PUBLIC,
+	KEYWORD_WEAK,
 } keywordId;
 
 static const keywordTable ProtobufKeywordTable [] = {
@@ -130,10 +144,14 @@ static const keywordTable ProtobufKeywordTable [] = {
 	{ "oneof",    KEYWORD_ONEOF    },
 	{ "map",      KEYWORD_MAP      },
 	{ "group",    KEYWORD_GROUP    },
+	{ "import",   KEYWORD_IMPORT   },
+	{ "public",   KEYWORD_PUBLIC   },
+	{ "weak",     KEYWORD_WEAK     },
 };
 
 #define TOKEN_EOF   0
 #define TOKEN_ID    'i'
+#define TOKEN_STR   's'
 
 static struct sTokenInfo {
 	int type;         /* one of TOKEN_* constants or punctuation characters */
@@ -152,7 +170,7 @@ static void findProtobufTags0 (bool oneshot, int originalScopeCorkIndex);
  *   FUNCTION DEFINITIONS
  */
 
-static void nextToken (void)
+static void nextTokenFull (bool expectingStringLiteral)
 {
 	int c;
 
@@ -179,8 +197,19 @@ repeat:
 		token.keyword = lookupCaseKeyword (vStringValue (token.value), Lang_protobuf);
 		cppUngetc (c);
 	}
+	else if (expectingStringLiteral && c == STRING_SYMBOL)
+	{
+		token.type = TOKEN_STR;
+		vStringCopy (token.value,
+					 cppGetLastCharOrStringContents ());
+	}
 	else
 		goto repeat;  /* anything else is not important for this parser */
+}
+
+static void nextToken (void)
+{
+	nextTokenFull (false);
 }
 
 static void skipUntil (const char *punctuation)
@@ -479,6 +508,27 @@ static void parseMap (int scopeCorkIndex)
 	vStringDelete (typeref);
 }
 
+static int parseImport (int scopeCorkIndex)
+{
+	nextTokenFull (true);
+	if (token.type == TOKEN_ID)
+	{
+		if (tokenIsKeyword (KEYWORD_PUBLIC)
+			|| tokenIsKeyword (KEYWORD_WEAK))
+			nextTokenFull (true);
+		else
+			return CORK_NIL;	/* Unexpected */
+	}
+
+	if (token.type == TOKEN_STR)
+		return createProtobufTagFull (token.value,
+									  PK_PROTODEF, R_PROTODEF_IMPORTED,
+									  /* TODO: whether the package scope should be specified or not. */
+									  scopeCorkIndex
+			);
+
+	return CORK_NIL;
+}
 
 static void findProtobufTags0 (bool oneshot, int originalScopeCorkIndex)
 {
@@ -516,6 +566,11 @@ static void findProtobufTags0 (bool oneshot, int originalScopeCorkIndex)
 			parseMap (scopeCorkIndex);
 		else if (tokenIsKeyword (KEYWORD_GROUP))
 			corkIndex = parseStatement (PK_GROUP, scopeCorkIndex);
+		else if (tokenIsKeyword (KEYWORD_IMPORT))
+		{
+			corkIndex = parseImport (scopeCorkIndex);
+			dontChangeScope = true;
+		}
 
 
 		skipUntil (";{}");

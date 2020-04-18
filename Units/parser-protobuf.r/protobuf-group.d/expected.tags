@@ -1,4 +1,5 @@
 my.test	input.proto	/^package my.test;  \/\/ dotted package name$/;"	p	roles:def
+multi/multi1.proto	input.proto	/^import "multi\/multi1.proto";  \/\/ unused import$/;"	D	package:my.test	roles:imported
 HatType	input.proto	/^enum HatType {$/;"	g	package:my.test	roles:def	end:44
 FEDORA	input.proto	/^  FEDORA = 1;$/;"	e	enum:my.test.HatType	roles:def
 FEZ	input.proto	/^  FEZ = 2;$/;"	e	enum:my.test.HatType	roles:def

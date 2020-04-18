@@ -1,4 +1,6 @@
 imp	input.proto	/^package imp;$/;"	package
+imp2.proto	input.proto	/^import "imp2.proto";$/;"	protodef	package:imp
+imp3.proto	input.proto	/^import "imp3.proto";$/;"	protodef	package:imp
 ImportedMessage	input.proto	/^message ImportedMessage {$/;"	message	package:imp	end:62
 field	input.proto	/^  required int64 field = 1;$/;"	field	message:imp.ImportedMessage	typeref:typename:int64
 local_msg	input.proto	/^  optional ImportedMessage2 local_msg = 2;$/;"	field	message:imp.ImportedMessage	typeref:typename:ImportedMessage2
