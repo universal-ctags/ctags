@@ -1,0 +1,19 @@
+imp	input.proto	/^package imp;$/;"	package
+imp2.proto	input.proto	/^import "imp2.proto";$/;"	protodef	package:imp
+imp3.proto	input.proto	/^import "imp3.proto";$/;"	protodef	package:imp
+ImportedMessage	input.proto	/^message ImportedMessage {$/;"	message	package:imp	end:62
+field	input.proto	/^  required int64 field = 1;$/;"	field	message:imp.ImportedMessage	typeref:typename:int64
+local_msg	input.proto	/^  optional ImportedMessage2 local_msg = 2;$/;"	field	message:imp.ImportedMessage	typeref:typename:ImportedMessage2
+foreign_msg	input.proto	/^  optional ForeignImportedMessage foreign_msg = 3;  \/\/ in imp3.proto$/;"	field	message:imp.ImportedMessage	typeref:typename:ForeignImportedMessage
+enum_field	input.proto	/^  optional Owner enum_field = 4;$/;"	field	message:imp.ImportedMessage	typeref:typename:Owner
+union	input.proto	/^  oneof union {$/;"	oneof	message:imp.ImportedMessage	end:48
+state	input.proto	/^    int32 state = 9;$/;"	field	oneof:imp.ImportedMessage.union	typeref:typename:int32
+name	input.proto	/^  repeated string name = 5;$/;"	field	message:imp.ImportedMessage	typeref:typename:string
+boss	input.proto	/^  repeated Owner boss = 6;$/;"	field	message:imp.ImportedMessage	typeref:typename:Owner
+memo	input.proto	/^  repeated ImportedMessage2 memo = 7;$/;"	field	message:imp.ImportedMessage	typeref:typename:ImportedMessage2
+msg_map	input.proto	/^  map<string, ImportedMessage2> msg_map = 8;$/;"	field	message:imp.ImportedMessage	typeref:typename:map<string,ImportedMessage2>
+Owner	input.proto	/^  enum Owner {$/;"	enum	message:imp.ImportedMessage	end:59
+DAVE	input.proto	/^    DAVE = 1;$/;"	enumerator	enum:imp.ImportedMessage.Owner
+MIKE	input.proto	/^    MIKE = 2;$/;"	enumerator	enum:imp.ImportedMessage.Owner
+ImportedMessage2	input.proto	/^message ImportedMessage2 {$/;"	message	package:imp	end:65
+ImportedExtendable	input.proto	/^message ImportedExtendable {$/;"	message	package:imp	end:70

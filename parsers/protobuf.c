@@ -55,6 +55,7 @@
 #include "entry.h"
 #include "keyword.h"
 #include "parse.h"
+#include "read.h"
 #include "vstring.h"
 
 /*
@@ -69,17 +70,41 @@ typedef enum {
 	PK_ENUMERATOR,
 	PK_ENUM,
 	PK_SERVICE,
-	PK_RPC
+	PK_RPC,
+	PK_ONEOF,
+	PK_GROUP,
+	PK_PROTODEF,
 } protobufKind;
+
+typedef enum {
+	R_MESSAGE_EXTENSION,
+} protobufMessageRole;
+
+typedef enum {
+	R_PROTODEF_IMPORTED,
+} protobufProtodefRole;
+
+static roleDefinition ProtobufMessageRoles [] = {
+	{ true, "extension", "extending the message" },
+};
+
+static roleDefinition ProtobufProtodefRoles [] = {
+	{ true, "imported", "imported" },
+};
 
 static kindDefinition ProtobufKinds [] = {
 	{ true,  'p', "package",    "packages" },
-	{ true,  'm', "message",    "messages" },
+	{ true,  'm', "message",    "messages",
+	  .referenceOnly = false, ATTACH_ROLES (ProtobufMessageRoles)},
 	{ true,  'f', "field",      "fields" },
 	{ true,  'e', "enumerator", "enum constants" },
 	{ true,  'g', "enum",       "enum types" },
 	{ true,  's', "service",    "services" },
-	{ true, 'r', "rpc",         "RPC methods" }
+	{ true,  'r', "rpc",        "RPC methods" },
+	{ true,  'o', "oneof",      "oneof names" },
+	{ true,  'G', "group",      "groups" },
+	{ true,  'D', "protodef",   ".proto definition",
+	  .referenceOnly = true, ATTACH_ROLES (ProtobufProtodefRoles)},
 };
 
 typedef enum eKeywordId {
@@ -94,6 +119,13 @@ typedef enum eKeywordId {
 	KEYWORD_RPC,
 	KEYWORD_STREAM,
 	KEYWORD_RETURNS,
+	KEYWORD_EXTEND,
+	KEYWORD_ONEOF,
+	KEYWORD_MAP,
+	KEYWORD_GROUP,
+	KEYWORD_IMPORT,
+	KEYWORD_PUBLIC,
+	KEYWORD_WEAK,
 } keywordId;
 
 static const keywordTable ProtobufKeywordTable [] = {
@@ -108,10 +140,18 @@ static const keywordTable ProtobufKeywordTable [] = {
 	{ "rpc",      KEYWORD_RPC      },
 	{ "stream",   KEYWORD_STREAM   },
 	{ "returns",  KEYWORD_RETURNS  },
+	{ "extend",   KEYWORD_EXTEND   },
+	{ "oneof",    KEYWORD_ONEOF    },
+	{ "map",      KEYWORD_MAP      },
+	{ "group",    KEYWORD_GROUP    },
+	{ "import",   KEYWORD_IMPORT   },
+	{ "public",   KEYWORD_PUBLIC   },
+	{ "weak",     KEYWORD_WEAK     },
 };
 
 #define TOKEN_EOF   0
 #define TOKEN_ID    'i'
+#define TOKEN_STR   's'
 
 static struct sTokenInfo {
 	int type;         /* one of TOKEN_* constants or punctuation characters */
@@ -119,11 +159,18 @@ static struct sTokenInfo {
 	vString *value;
 } token;
 
+
+/*
+ *   FUNCTION DECLARATIONS
+ */
+static void findProtobufTags0 (bool oneshot, int originalScopeCorkIndex);
+
+
 /*
  *   FUNCTION DEFINITIONS
  */
 
-static void nextToken (void)
+static void nextTokenFull (bool expectingStringLiteral)
 {
 	int c;
 
@@ -137,7 +184,7 @@ repeat:
 	token.keyword = KEYWORD_NONE;
 	if (c <= 0)
 		token.type = TOKEN_EOF;
-	else if (c == '{' || c == '}' || c == ';' || c == '.' || c == '=')
+	else if (c == '{' || c == '}' || c == ';' || c == '.' || c == '=' || c == ',' || c == '<' || c == '>')
 		token.type = c;
 	else if (cppIsalnum (c) || c == '_')
 	{
@@ -150,8 +197,19 @@ repeat:
 		token.keyword = lookupCaseKeyword (vStringValue (token.value), Lang_protobuf);
 		cppUngetc (c);
 	}
+	else if (expectingStringLiteral && c == STRING_SYMBOL)
+	{
+		token.type = TOKEN_STR;
+		vStringCopy (token.value,
+					 cppGetLastCharOrStringContents ());
+	}
 	else
 		goto repeat;  /* anything else is not important for this parser */
+}
+
+static void nextToken (void)
+{
+	nextTokenFull (false);
 }
 
 static void skipUntil (const char *punctuation)
@@ -160,26 +218,57 @@ static void skipUntil (const char *punctuation)
 		nextToken ();
 }
 
+static void parseFullQualifiedId (vString *buf)
+{
+	while (true)
+	{
+		nextToken ();
+
+		if (token.type == TOKEN_ID)
+		{
+			if (vStringIsEmpty (buf) || vStringLast (buf) == '.')
+				vStringCat (buf, token.value);
+			else
+				break;
+		}
+		else if (token.type == '.')
+		{
+			if (vStringIsEmpty (buf) || vStringLast (buf) != '.')
+				vStringPut (buf, '.');
+			else
+				break;
+		}
+		else
+			break;
+	}
+}
+
 static int tokenIsKeyword(keywordId keyword)
 {
 	return token.type == TOKEN_ID && token.keyword == keyword;
 }
 
-static int createProtobufTag (const vString *name, int kind)
+static int createProtobufTagFull (const vString *name, int kind, int role, int scopeCorkIndex)
 {
 	static tagEntryInfo tag;
 	int corkIndex = CORK_NIL;
 
 	if (ProtobufKinds [kind].enabled)
 	{
-		initTagEntry (&tag, vStringValue (name), kind);
+		initRefTagEntry (&tag, vStringValue (name), kind, role);
+		tag.extensionFields.scopeIndex = scopeCorkIndex;
 		corkIndex = makeTagEntry (&tag);
 	}
 
 	return corkIndex;
 }
 
-static void parseEnumConstants (void)
+static int createProtobufTag (const vString *name, int kind, int scopeCorkIndex)
+{
+	return createProtobufTagFull (name, kind, ROLE_DEFINITION_INDEX, scopeCorkIndex);
+}
+
+static void parseEnumConstants (int scopeCorkIndex)
 {
 	if (token.type != '{')
 		return;
@@ -191,7 +280,7 @@ static void parseEnumConstants (void)
 		{
 			nextToken ();  /* doesn't clear token.value if it's punctuation */
 			if (token.type == '=')
-				createProtobufTag (token.value, PK_ENUMERATOR);
+				createProtobufTag (token.value, PK_ENUMERATOR, scopeCorkIndex);
 		}
 
 		skipUntil (";}");
@@ -199,6 +288,57 @@ static void parseEnumConstants (void)
 		if (token.type == ';')
 			nextToken ();
 	}
+	tagEntryInfo *e = getEntryInCorkQueue (scopeCorkIndex);
+	e->extensionFields.endLine = getInputLineNumber ();
+}
+
+static void parseOneofField (int scopeCorkIndex)
+{
+	if (tokenIsKeyword (KEYWORD_GROUP))
+	{
+		findProtobufTags0 (true, scopeCorkIndex);
+		return;
+	}
+
+	vString *type = vStringNewCopy (token.value);
+	parseFullQualifiedId (type);
+
+	if (token.type == TOKEN_ID)
+	{
+		int corkIndex = createProtobufTag (token.value, PK_FIELD, scopeCorkIndex);
+		tagEntryInfo *e = getEntryInCorkQueue (corkIndex);
+		if (e)
+		{
+			e->extensionFields.typeRef [0] = eStrdup ("typename"); /* As C++ parser does */
+			e->extensionFields.typeRef [1] = vStringDeleteUnwrap (type);
+			type = NULL;
+		}
+	}
+
+	skipUntil (";}");
+	vStringDelete (type);		/* NULL is acceptable */
+}
+
+static void parseOneofFields (int scopeCorkIndex)
+{
+	if (token.type != '{')
+		return;
+	nextToken ();
+
+	while (token.type != TOKEN_EOF && token.type != '}')
+	{
+		if (token.type == TOKEN_ID || token.type == '.')
+		{
+			parseOneofField (scopeCorkIndex);
+			if (token.type == ';')
+				nextToken ();
+		}
+		else
+			break;
+	}
+
+	tagEntryInfo *e = getEntryInCorkQueue (scopeCorkIndex);
+	e->extensionFields.endLine = getInputLineNumber ();
 }
 
 #define gatherTypeinfo(VSTRING,CONDITION)			\
@@ -246,55 +386,211 @@ static void parseRPCTypeinfos (int corkIndex)
 		vStringDelete (typeref);
 }
 
-static void parseStatement (int kind)
+static int parseStatementFull (int kind, int role, int scopeCorkIndex)
 {
-	nextToken ();
+	int corkIndex = CORK_NIL;
+	vString *fullName = NULL;
+	vString *fieldType = NULL;
 
 	if (kind == PK_FIELD)
 	{
-		/* skip field's type */
-		do
-		{
-			if (token.type == '.')
-				nextToken ();
-			if (token.type != TOKEN_ID)
-				return;
-			nextToken ();
-		} while (token.type == '.');
+		fieldType = vStringNew ();
+		parseFullQualifiedId (fieldType);
+		if (vStringIsEmpty (fieldType) || vStringLast (fieldType) == '.')
+			goto out;
 	}
+	else
+		nextToken ();
 
-	if (token.type != TOKEN_ID)
-		return;
+	/* When extending message defined in the external package, the name
+	 * becomes longer. */
+	if (kind == PK_MESSAGE && role == R_MESSAGE_EXTENSION)
+	{
+		if (token.type != TOKEN_ID)
+			goto out;
 
-	int corkIndex = createProtobufTag (token.value, kind);
-	nextToken ();
+		fullName = vStringNewCopy (token.value);
+		parseFullQualifiedId (fullName);
+	}
+	else if (token.type != TOKEN_ID)
+		goto out;
+
+	corkIndex = createProtobufTagFull (fullName? fullName: token.value,
+									   kind, role, scopeCorkIndex);
+
+	if (!fullName)
+		nextToken ();
+
+	if (fieldType && corkIndex != CORK_NIL)
+	{
+		tagEntryInfo *e = getEntryInCorkQueue (corkIndex);
+		e->extensionFields.typeRef [0] = eStrdup ("typename"); /* As C++ parser does */
+		e->extensionFields.typeRef [1] = vStringDeleteUnwrap (fieldType);
+		fieldType = NULL;
+	}
 
 	if (kind == PK_RPC && corkIndex != CORK_NIL)
 		parseRPCTypeinfos (corkIndex);
 
 	if (kind == PK_ENUM)
-		parseEnumConstants ();
+		parseEnumConstants (corkIndex);
+	else if (kind == PK_ONEOF)
+		parseOneofFields (corkIndex);
+
+ out:
+	vStringDelete (fieldType);	/* NULL is acceptable. */
+	vStringDelete (fullName);	/* NULL is acceptable. */
+	return corkIndex;
 }
 
-static void parsePackage (void)
+static int parseStatement (int kind, int scopeCorkIndex)
 {
+	return parseStatementFull (kind, ROLE_DEFINITION_INDEX, scopeCorkIndex);
+}
+
+static int parsePackage (void)
+{
+	int corkIndex = CORK_NIL;
+
 	vString *pkg = vStringNew ();
+	parseFullQualifiedId (pkg);
+	if (vStringLength (pkg) > 0)
+		corkIndex = createProtobufTag (pkg, PK_PACKAGE, CORK_NIL);
+	vStringDelete (pkg);
 
-	while (true)
+	return corkIndex;
+}
+
+static void parseMap (int scopeCorkIndex)
+{
+	nextToken ();
+	if (token.type != '<')
+		return;
+
+	vString *typeref = vStringNewInit ("map<");
+
+	nextToken ();
+	if (token.type != TOKEN_ID)
+		goto out;
+
+	vStringCat (typeref, token.value);
+
+	nextToken ();
+	if (token.type != ',')
+		goto out;
+	vStringPut (typeref, ',');
+
+	vString *vtyperef = vStringNew ();
+	parseFullQualifiedId (vtyperef);
+	vStringCat (typeref, vtyperef);
+	vStringDelete (vtyperef);
+	if (vStringLast (typeref) == ',')
+		goto out;
+
+	if (token.type != '>')
+		goto out;
+	vStringPut (typeref, '>');
+
+	nextToken ();
+	if (token.type != TOKEN_ID)
+		goto out;
+
+	int corkIndex = createProtobufTag (token.value, PK_FIELD, scopeCorkIndex);
+	tagEntryInfo *e = getEntryInCorkQueue (corkIndex);
+	if (e)
 	{
-		nextToken ();
-
-		if (token.type == TOKEN_ID)
-			vStringCat (pkg, token.value);
-		else if (token.type == '.')
-			vStringPut (pkg, '.');
-		else
-			break;
+		e->extensionFields.typeRef [0] = eStrdup ("typename"); /* As C++ parser does */
+		e->extensionFields.typeRef [1] = vStringDeleteUnwrap (typeref);
+		typeref = NULL;
 	}
 
-	if (vStringLength (pkg) > 0)
-		createProtobufTag (pkg, PK_PACKAGE);
-	vStringDelete (pkg);
+ out:
+	vStringDelete (typeref);
+}
+
+static int parseImport (int scopeCorkIndex)
+{
+	nextTokenFull (true);
+	if (token.type == TOKEN_ID)
+	{
+		if (tokenIsKeyword (KEYWORD_PUBLIC)
+			|| tokenIsKeyword (KEYWORD_WEAK))
+			nextTokenFull (true);
+		else
+			return CORK_NIL;	/* Unexpected */
+	}
+
+	if (token.type == TOKEN_STR)
+		return createProtobufTagFull (token.value,
+									  PK_PROTODEF, R_PROTODEF_IMPORTED,
+									  /* TODO: whether the package scope should be specified or not. */
+									  scopeCorkIndex
+			);
+
+	return CORK_NIL;
+}
+
+static void findProtobufTags0 (bool oneshot, int originalScopeCorkIndex)
+{
+	int scopeCorkIndex = originalScopeCorkIndex;
+	while (token.type != TOKEN_EOF)
+	{
+		int corkIndex = CORK_NIL;
+		bool dontChangeScope = false;
+		if (tokenIsKeyword (KEYWORD_PACKAGE))
+		{
+			corkIndex = parsePackage ();
+			scopeCorkIndex = corkIndex;
+		}
+		else if (tokenIsKeyword (KEYWORD_MESSAGE))
+			corkIndex = parseStatement (PK_MESSAGE, scopeCorkIndex);
+		else if (tokenIsKeyword (KEYWORD_ENUM))
+		{
+			corkIndex = parseStatement (PK_ENUM, scopeCorkIndex);
+			dontChangeScope = true;
+		}
+		else if (tokenIsKeyword (KEYWORD_REPEATED) || tokenIsKeyword (KEYWORD_OPTIONAL) || tokenIsKeyword (KEYWORD_REQUIRED))
+			corkIndex = parseStatement (PK_FIELD, scopeCorkIndex);
+		else if (tokenIsKeyword (KEYWORD_SERVICE))
+			corkIndex = parseStatement (PK_SERVICE, scopeCorkIndex);
+		else if (tokenIsKeyword (KEYWORD_RPC))
+			corkIndex = parseStatement (PK_RPC, scopeCorkIndex);
+		else if (tokenIsKeyword (KEYWORD_EXTEND))
+			corkIndex = parseStatementFull (PK_MESSAGE, R_MESSAGE_EXTENSION, scopeCorkIndex);
+		else if (tokenIsKeyword (KEYWORD_ONEOF))
+		{
+			corkIndex = parseStatement (PK_ONEOF, scopeCorkIndex);
+			dontChangeScope = true;
+		}
+		else if (tokenIsKeyword (KEYWORD_MAP))
+			parseMap (scopeCorkIndex);
+		else if (tokenIsKeyword (KEYWORD_GROUP))
+			corkIndex = parseStatement (PK_GROUP, scopeCorkIndex);
+		else if (tokenIsKeyword (KEYWORD_IMPORT))
+		{
+			corkIndex = parseImport (scopeCorkIndex);
+			dontChangeScope = true;
+		}
+
+
+		skipUntil (";{}");
+		if (!dontChangeScope && token.type == '{' && corkIndex != CORK_NIL)
+		{
+			/* Enter the new scope. */
+			scopeCorkIndex = corkIndex;
+		}
+		else if (!dontChangeScope && token.type == '}' && scopeCorkIndex != CORK_NIL)
+		{
+			/* Return to the parent scope. */
+			tagEntryInfo *e = getEntryInCorkQueue (scopeCorkIndex);
+			scopeCorkIndex = e->extensionFields.scopeIndex;
+			e->extensionFields.endLine = getInputLineNumber ();
+		}
+		nextToken ();
+
+		if (oneshot && scopeCorkIndex == originalScopeCorkIndex)
+			break;
+	}
 }
 
 static void findProtobufTags (void)
@@ -306,25 +602,7 @@ static void findProtobufTags (void)
 	token.value = vStringNew ();
 
 	nextToken ();
-
-	while (token.type != TOKEN_EOF)
-	{
-		if (tokenIsKeyword (KEYWORD_PACKAGE))
-			parsePackage ();
-		else if (tokenIsKeyword (KEYWORD_MESSAGE))
-			parseStatement (PK_MESSAGE);
-		else if (tokenIsKeyword (KEYWORD_ENUM))
-			parseStatement (PK_ENUM);
-		else if (tokenIsKeyword (KEYWORD_REPEATED) || tokenIsKeyword (KEYWORD_OPTIONAL) || tokenIsKeyword (KEYWORD_REQUIRED))
-			parseStatement (PK_FIELD);
-		else if (tokenIsKeyword (KEYWORD_SERVICE))
-			parseStatement (PK_SERVICE);
-		else if (tokenIsKeyword (KEYWORD_RPC))
-			parseStatement (PK_RPC);
-
-		skipUntil (";{}");
-		nextToken ();
-	}
+	findProtobufTags0 (false, CORK_NIL);
 
 	vStringDelete (token.value);
 	cppTerminate ();
