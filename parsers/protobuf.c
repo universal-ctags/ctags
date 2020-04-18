@@ -353,42 +353,46 @@ static void parseRPCTypeinfos (int corkIndex)
 
 static int parseStatementFull (int kind, int role, int scopeCorkIndex)
 {
+	int corkIndex = CORK_NIL;
 	vString *fullName = NULL;
-
-	nextToken ();
+	vString *fieldType = NULL;
 
 	if (kind == PK_FIELD)
 	{
-		/* skip field's type */
-		do
-		{
-			if (token.type == '.')
-				nextToken ();
-			if (token.type != TOKEN_ID)
-				return CORK_NIL;
-			nextToken ();
-		} while (token.type == '.');
+		fieldType = vStringNew ();
+		parseFullQualifiedId (fieldType);
+		if (vStringIsEmpty (fieldType) || vStringLast (fieldType) == '.')
+			goto out;
 	}
+	else
+		nextToken ();
 
 	/* When extending message defined in the external package, the name
 	 * becomes longer. */
 	if (kind == PK_MESSAGE && role == R_MESSAGE_EXTENSION)
 	{
 		if (token.type != TOKEN_ID)
-			return CORK_NIL;
+			goto out;
 
 		fullName = vStringNewCopy (token.value);
 		parseFullQualifiedId (fullName);
 	}
 	else if (token.type != TOKEN_ID)
-		return CORK_NIL;
+		goto out;
 
-	int corkIndex = createProtobufTagFull (fullName? fullName: token.value,
-										   kind, role, scopeCorkIndex);
+	corkIndex = createProtobufTagFull (fullName? fullName: token.value,
+									   kind, role, scopeCorkIndex);
 
 	if (!fullName)
 		nextToken ();
-	vStringDelete (fullName);
+
+	if (fieldType && corkIndex != CORK_NIL)
+	{
+		tagEntryInfo *e = getEntryInCorkQueue (corkIndex);
+		e->extensionFields.typeRef [0] = eStrdup ("typename"); /* As C++ parser does */
+		e->extensionFields.typeRef [1] = vStringDeleteUnwrap (fieldType);
+		fieldType = NULL;
+	}
 
 	if (kind == PK_RPC && corkIndex != CORK_NIL)
 		parseRPCTypeinfos (corkIndex);
@@ -398,6 +402,9 @@ static int parseStatementFull (int kind, int role, int scopeCorkIndex)
 	else if (kind == PK_ONEOF)
 		parseOneofFields (corkIndex);
 
+ out:
+	vStringDelete (fieldType);	/* NULL is acceptable. */
+	vStringDelete (fullName);	/* NULL is acceptable. */
 	return corkIndex;
 }
 
