@@ -1,0 +1,11 @@
+other.proto	input.proto	/^import public "other.proto";$/;"	kind:D	line:3
+EnumAllowingAlias	input.proto	/^enum EnumAllowingAlias {$/;"	kind:g	line:5	end:10
+UNKNOWN	input.proto	/^  UNKNOWN = 0;$/;"	kind:e	line:7	scope:enum:EnumAllowingAlias
+STARTED	input.proto	/^  STARTED = 1;$/;"	kind:e	line:8	scope:enum:EnumAllowingAlias
+RUNNING	input.proto	/^  RUNNING = 2 [(custom_option) = "hello world"];$/;"	kind:e	line:9	scope:enum:EnumAllowingAlias
+outer	input.proto	/^message outer {$/;"	kind:m	line:11	end:19
+inner	input.proto	/^  message inner {   \/\/ Level 2$/;"	kind:m	line:13	scope:message:outer	end:15
+ival	input.proto	/^    int64 ival = 1;$/;"	kind:f	line:14	scope:message:outer.inner	typeref:typename:int64
+inner_message	input.proto	/^  repeated inner inner_message = 2;$/;"	kind:f	line:16	scope:message:outer	typeref:typename:inner
+enum_field	input.proto	/^  EnumAllowingAlias enum_field =3;$/;"	kind:f	line:17	scope:message:outer	typeref:typename:EnumAllowingAlias
+my_map	input.proto	/^  map<int32, string> my_map = 4;$/;"	kind:f	line:18	scope:message:outer	typeref:typename:map<int32,string>

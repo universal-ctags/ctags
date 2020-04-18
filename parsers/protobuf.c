@@ -404,6 +404,16 @@ static int parseStatementFull (int kind, int role, int scopeCorkIndex)
 	if (kind == PK_FIELD)
 	{
 		fieldType = vStringNew ();
+
+		if (syntax == SYNTAX_PROTO3
+			&& !tokenIsKeyword (KEYWORD_REPEATED))
+		{
+			if (token.type == TOKEN_ID)
+				vStringCat (fieldType, token.value);
+			else if (token.type == '.')
+				vStringPut (fieldType, '.');
+		}
+
 		parseFullQualifiedId (fieldType);
 		if (vStringIsEmpty (fieldType) || vStringLast (fieldType) == '.')
 			goto out;
@@ -605,7 +615,16 @@ static void findProtobufTags0 (bool oneshot, int originalScopeCorkIndex)
 			corkIndex = parseImport (scopeCorkIndex);
 			dontChangeScope = true;
 		}
-
+		else if (tokenIsKeyword (KEYWORD_OPTION))
+			dontChangeScope = true;
+		else if (syntax == SYNTAX_PROTO3
+				 && (token.type == '.' || token.type == TOKEN_ID)
+				 && (scopeCorkIndex != CORK_NIL))
+		{
+			tagEntryInfo *e = getEntryInCorkQueue (scopeCorkIndex);
+			if (e->kindIndex == PK_MESSAGE)
+				corkIndex = parseStatement (PK_FIELD, scopeCorkIndex);
+		}
 
 		skipUntil (";{}");
 		if (!dontChangeScope && token.type == '{' && corkIndex != CORK_NIL)
