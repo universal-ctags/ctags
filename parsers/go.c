@@ -115,6 +115,7 @@ typedef enum {
 	GOTAG_UNKNOWN,
 	GOTAG_PACKAGE_NAME,
 	GOTAG_TALIAS,
+	GOTAG_RECEIVER,
 } goKind;
 
 typedef enum {
@@ -149,6 +150,7 @@ static kindDefinition GoKinds[] = {
 	 .referenceOnly = true, ATTACH_ROLES (GoUnknownRoles)},
 	{true, 'P', "packageName", "name for specifying imported package"},
 	{true, 'a', "talias", "type aliases"},
+	{false,'R', "receiver", "receivers"},
 };
 
 static const keywordTable GoKeywordTable[] = {
@@ -730,16 +732,20 @@ static int parsePackage (tokenInfo *const token)
 		return CORK_NIL;
 }
 
-static tokenInfo * parseReceiver (tokenInfo *const token)
+static tokenInfo * parseReceiver (tokenInfo *const token, int *corkIndex)
 {
 	tokenInfo *receiver_type_token = NULL;
 	int nest_level = 1;
+
+	*corkIndex = CORK_NIL;
 
 	/* Looking for an identifier before ')'. */
 	while (nest_level > 0 && !isType (token, TOKEN_EOF))
 	{
 		if (isType (token, TOKEN_IDENTIFIER))
 		{
+			if (*corkIndex == CORK_NIL)
+				*corkIndex = makeTag (token, GOTAG_RECEIVER, CORK_NIL, NULL, NULL);
 			if (!receiver_type_token)
 				receiver_type_token = newToken ();
 			copyToken (receiver_type_token, token);
@@ -758,12 +764,19 @@ static tokenInfo * parseReceiver (tokenInfo *const token)
 		receiver_type_token = NULL;
 	}
 
+	if (*corkIndex != CORK_NIL && receiver_type_token)
+	{
+		tagEntryInfo *e = getEntryInCorkQueue (*corkIndex);
+		e->extensionFields.typeRef [0] = eStrdup ("typename");
+		e->extensionFields.typeRef [1] = vStringStrdup (receiver_type_token->string);
+	}
 	readToken (token);
 	return receiver_type_token;
 }
 
 static void parseFunctionOrMethod (tokenInfo *const token, const int scope)
 {
+	int receiver_cork = CORK_NIL;
 	tokenInfo *receiver_type_token = NULL;
 
 	// FunctionDecl = "func" identifier Signature [ Body ] .
@@ -776,7 +789,7 @@ static void parseFunctionOrMethod (tokenInfo *const token, const int scope)
 	// Pick up receiver type.
 	readToken (token);
 	if (isType (token, TOKEN_OPEN_PAREN))
-		receiver_type_token = parseReceiver (token);
+		receiver_type_token = parseReceiver (token, &receiver_cork);
 
 	if (isType (token, TOKEN_IDENTIFIER))
 	{
@@ -810,7 +823,15 @@ static void parseFunctionOrMethod (tokenInfo *const token, const int scope)
 		cork = makeTag (functionToken, GOTAG_FUNCTION,
 						func_scope, vStringValue (buffer), NULL);
 		if (cork != CORK_NIL)
+		{
 			e = getEntryInCorkQueue (cork);
+
+			if (receiver_cork != CORK_NIL)
+			{
+				tagEntryInfo *receiver = getEntryInCorkQueue (receiver_cork);
+				receiver->extensionFields.scopeIndex = cork;
+			}
+		}
 
 		deleteToken (functionToken);
 
