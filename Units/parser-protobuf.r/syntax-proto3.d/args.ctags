@@ -1,0 +1,3 @@
+--sort=no
+--fields=+{end}{typeref}{scope}{line}{kind}
+--extras=+r

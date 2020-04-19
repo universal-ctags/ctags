@@ -64,6 +64,13 @@
 static langType Lang_protobuf;
 
 typedef enum {
+	SYNTAX_UNKNOWN,
+	SYNTAX_PROTO2,
+	SYNTAX_PROTO3,
+} protobufSyntax;
+static protobufSyntax syntax = SYNTAX_UNKNOWN;;
+
+typedef enum {
 	PK_PACKAGE,
 	PK_MESSAGE,
 	PK_FIELD,
@@ -126,6 +133,7 @@ typedef enum eKeywordId {
 	KEYWORD_IMPORT,
 	KEYWORD_PUBLIC,
 	KEYWORD_WEAK,
+	KEYWORD_SYNTAX,
 } keywordId;
 
 static const keywordTable ProtobufKeywordTable [] = {
@@ -147,6 +155,7 @@ static const keywordTable ProtobufKeywordTable [] = {
 	{ "import",   KEYWORD_IMPORT   },
 	{ "public",   KEYWORD_PUBLIC   },
 	{ "weak",     KEYWORD_WEAK     },
+	{ "syntax",   KEYWORD_SYNTAX   },
 };
 
 #define TOKEN_EOF   0
@@ -395,6 +404,16 @@ static int parseStatementFull (int kind, int role, int scopeCorkIndex)
 	if (kind == PK_FIELD)
 	{
 		fieldType = vStringNew ();
+
+		if (syntax == SYNTAX_PROTO3
+			&& !tokenIsKeyword (KEYWORD_REPEATED))
+		{
+			if (token.type == TOKEN_ID)
+				vStringCat (fieldType, token.value);
+			else if (token.type == '.')
+				vStringPut (fieldType, '.');
+		}
+
 		parseFullQualifiedId (fieldType);
 		if (vStringIsEmpty (fieldType) || vStringLast (fieldType) == '.')
 			goto out;
@@ -530,6 +549,25 @@ static int parseImport (int scopeCorkIndex)
 	return CORK_NIL;
 }
 
+static void parseSyntax (void)
+{
+	nextToken ();
+	if (token.type != '=')
+		return;
+
+	nextTokenFull (true);
+	if (token.type == TOKEN_STR)
+	{
+		const vString *proto = cppGetLastCharOrStringContents ();
+		if (strcmp (vStringValue (proto), "proto2") == 0)
+			syntax = SYNTAX_PROTO2;
+		else if (strcmp (vStringValue (proto), "proto3") == 0)
+			syntax = SYNTAX_PROTO3;
+		else
+			syntax = SYNTAX_UNKNOWN;
+	}
+}
+
 static void findProtobufTags0 (bool oneshot, int originalScopeCorkIndex)
 {
 	int scopeCorkIndex = originalScopeCorkIndex;
@@ -537,7 +575,13 @@ static void findProtobufTags0 (bool oneshot, int originalScopeCorkIndex)
 	{
 		int corkIndex = CORK_NIL;
 		bool dontChangeScope = false;
-		if (tokenIsKeyword (KEYWORD_PACKAGE))
+
+		if (tokenIsKeyword (KEYWORD_SYNTAX) && originalScopeCorkIndex == CORK_NIL)
+		{
+			parseSyntax ();
+			dontChangeScope = true;
+		}
+		else if (tokenIsKeyword (KEYWORD_PACKAGE))
 		{
 			corkIndex = parsePackage ();
 			scopeCorkIndex = corkIndex;
@@ -571,7 +615,16 @@ static void findProtobufTags0 (bool oneshot, int originalScopeCorkIndex)
 			corkIndex = parseImport (scopeCorkIndex);
 			dontChangeScope = true;
 		}
-
+		else if (tokenIsKeyword (KEYWORD_OPTION))
+			dontChangeScope = true;
+		else if (syntax == SYNTAX_PROTO3
+				 && (token.type == '.' || token.type == TOKEN_ID)
+				 && (scopeCorkIndex != CORK_NIL))
+		{
+			tagEntryInfo *e = getEntryInCorkQueue (scopeCorkIndex);
+			if (e->kindIndex == PK_MESSAGE)
+				corkIndex = parseStatement (PK_FIELD, scopeCorkIndex);
+		}
 
 		skipUntil (";{}");
 		if (!dontChangeScope && token.type == '{' && corkIndex != CORK_NIL)
