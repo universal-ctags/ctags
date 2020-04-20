@@ -72,6 +72,7 @@ EsObject *dsl_code_define (DSLEngineType engine, DSLCode *code);
 DSLCode  *dsl_code_lookup (DSLEngineType engine, EsObject *name);
 void      dsl_help        (DSLEngineType engine, FILE *fp);
 void      dsl_code_reset  (DSLCode  *code);
+EsObject *dsl_eval        (EsObject *object, DSLEnv *env);
 
 
 #endif
