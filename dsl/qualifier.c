@@ -13,6 +13,7 @@
 */
 
 #include "qualifier.h"
+#include "dsl.h"
 #include "es-lang-c-stdc99.h"
 
 #include <stdlib.h>
@@ -35,12 +36,7 @@ enum ProcAttr {
 /*
  * Errors
  */
-#define ERR_UNBOUND_VARIABLE    (es_error_intern("unbound-variable"))
-#define ERR_TOO_FEW_ARGUMENTS   (es_error_intern("too-few-arguments"))
-#define ERR_TOO_MANY_ARGUMENTS  (es_error_intern("too-many-arguments"))
-#define ERR_NUMBER_REQUIRED     (es_error_intern("number-required"))
-#define ERR_WRONG_TYPE_ARGUMENT (es_error_intern("wrong-type-argument"))
-#define throw(e,o)               return es_error_set_object(ERR_##e, o)
+
 
 /*
  * Decls
@@ -216,10 +212,7 @@ static EsObject *eval (EsObject *object, tagEntry *entry)
 				return code->cache;
 
 			if (code->flags & PURE_PROC)
-			  {
-				  throw (UNBOUND_VARIABLE,
-					 object);
-			  }
+				dsl_throw (UNBOUND_VARIABLE, object);
 
 			r = code->proc (es_nil, entry);
 			if (code->flags & MEMORABLE)
@@ -227,7 +220,7 @@ static EsObject *eval (EsObject *object, tagEntry *entry)
 			return r;
 		}
 		else
-			throw (UNBOUND_VARIABLE, object);
+			dsl_throw (UNBOUND_VARIABLE, object);
 
 	}
 	else if (es_atom (object))
@@ -241,7 +234,7 @@ static EsObject *eval (EsObject *object, tagEntry *entry)
 		code = es_symbol_get_data (car);
 
 		if (!code)
-			throw (UNBOUND_VARIABLE, car);
+			dsl_throw (UNBOUND_VARIABLE, car);
 
 		if (code->cache)
 			return code->cache;
@@ -250,9 +243,9 @@ static EsObject *eval (EsObject *object, tagEntry *entry)
 		{
 			l = length (cdr);
 			if (l < code->arity)
-				throw (TOO_FEW_ARGUMENTS, car);
+				dsl_throw (TOO_FEW_ARGUMENTS, car);
 			else if (l > code->arity)
-				throw (TOO_MANY_ARGUMENTS, car);
+				dsl_throw (TOO_MANY_ARGUMENTS, car);
 		}
 
 		if (! (code->flags & SELF_EVAL))
@@ -298,8 +291,8 @@ static EsObject* builtin_null  (EsObject *args, tagEntry *entry)
 static EsObject* builtin_begin  (EsObject *args, tagEntry *entry)
 {
 	if (es_null (args))
-		throw (TOO_FEW_ARGUMENTS,
-			   es_symbol_intern ("begin"));
+		dsl_throw (TOO_FEW_ARGUMENTS,
+				   es_symbol_intern ("begin"));
 
 	EsObject *o = es_false;
 	while (! es_null (args))
@@ -316,8 +309,7 @@ static EsObject* builtin_begin  (EsObject *args, tagEntry *entry)
 static EsObject* builtin_begin0  (EsObject *args, tagEntry *entry)
 {
 	if (es_null (args))
-		throw (TOO_FEW_ARGUMENTS,
-			   es_symbol_intern ("begin0"));
+		dsl_throw (TOO_FEW_ARGUMENTS, es_symbol_intern ("begin0"));
 
 	int count = 0;
 	EsObject *o, *o0 = es_false;
@@ -388,8 +380,8 @@ static EsObject* builtin_not  (EsObject *args, tagEntry *entry)
 									\
 		a = es_car (args);					\
 		b = es_car (es_cdr (args));				\
-		if (!C (a)) throw(E, O);				\
-		if (!C (b)) throw(E, O);				\
+		if (!C (a)) dsl_throw(E, O);			\
+		if (!C (b)) dsl_throw(E, O);			\
 		if (X)							\
 			return es_true;					\
 		else							\
@@ -424,8 +416,7 @@ static EsObject* builtin_prefix (EsObject* args, tagEntry *entry)
 
 	if ((! es_string_p (target))
 	    || (! es_string_p (prefix)))
-		throw (WRONG_TYPE_ARGUMENT,
-		       es_symbol_intern ("prefix?"));
+		dsl_throw (WRONG_TYPE_ARGUMENT, es_symbol_intern ("prefix?"));
 
 	ts = es_string_get (target);
 	ps = es_string_get (prefix);
@@ -448,8 +439,7 @@ static EsObject* builtin_suffix (EsObject* args, tagEntry *entry)
 
 	if ((! es_string_p (target))
 	    || (! es_string_p (suffix)))
-		throw (WRONG_TYPE_ARGUMENT,
-		       es_symbol_intern ("suffix?"));
+		dsl_throw (WRONG_TYPE_ARGUMENT, es_symbol_intern ("suffix?"));
 
 	ts = es_string_get (target);
 	ss = es_string_get (suffix);
@@ -470,7 +460,7 @@ static EsObject* builtin_substr (EsObject* args, tagEntry *entry)
 
 	if ((! es_string_p (target))
 	    || (! es_string_p (substr)))
-		throw (WRONG_TYPE_ARGUMENT, es_symbol_intern("substr?"));
+		dsl_throw (WRONG_TYPE_ARGUMENT, es_symbol_intern("substr?"));
 	ts = es_string_get (target);
 	ss = es_string_get (substr);
 
@@ -483,7 +473,7 @@ static EsObject* builtin_member (EsObject *args, tagEntry *entry)
 	EsObject *lst = es_car (es_cdr (args));
 
 	if (! es_list_p (lst))
-		throw (WRONG_TYPE_ARGUMENT, es_symbol_intern ("member"));
+		dsl_throw (WRONG_TYPE_ARGUMENT, es_symbol_intern ("member"));
 
 	while (!es_null (lst))
 	{
@@ -569,8 +559,7 @@ static EsObject* builtin_entry_ref (EsObject *args, tagEntry *entry)
 	if (es_error_p (key))
 		return key;
 	else if (! es_string_p (key))
-		throw (WRONG_TYPE_ARGUMENT,
-		       es_symbol_intern ("$"));
+		dsl_throw (WRONG_TYPE_ARGUMENT, es_symbol_intern ("$"));
 	else
 		return entry_xget_string (entry, es_string_get (key));
 }

@@ -338,6 +338,7 @@ WIN32_OBJS = $(WIN32_SRCS:.c=.$(OBJEXT))
 
 READTAGS_DSL_HEADS = \
 	dsl/es-lang-c-stdc99.h \
+	dsl/dsl.h \
 	dsl/qualifier.h \
 	\
 	$(MIO_HEADS) \
