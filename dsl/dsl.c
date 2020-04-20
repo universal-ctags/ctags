@@ -79,3 +79,9 @@ void dsl_help (DSLEngineType engine, FILE *fp)
 
 	es_object_unref (rcodes);
 }
+
+void dsl_code_reset (DSLCode  *code)
+{
+	if (code->flags & DSL_PATTR_MEMORABLE)
+		code->cache = NULL;
+}

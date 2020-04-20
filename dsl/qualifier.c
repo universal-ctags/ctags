@@ -150,8 +150,7 @@ static void reset (void)
 	for (i = 0; i < sizeof(codes)/sizeof(codes [0]); i++)
 	{
 		code = codes + i;
-		if (code->flags & DSL_PATTR_MEMORABLE)
-			code->cache = NULL;
+		dsl_code_reset (code);
 	}
 }
 
