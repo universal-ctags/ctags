@@ -32,10 +32,10 @@ static EsObject* value_##N (EsObject *args, DSLEnv *env)	\
  * FUNCTION DECLARATIONS
  */
 static EsObject* builtin_null  (EsObject *args, DSLEnv *env);
-static EsObject* builtin_begin (EsObject *args, DSLEnv *env);
-static EsObject* builtin_begin0 (EsObject *args, DSLEnv *env);
-static EsObject* builtin_and  (EsObject *args, DSLEnv *env);
-static EsObject* builtin_or  (EsObject *args, DSLEnv *env);
+static EsObject* sform_begin (EsObject *args, DSLEnv *env);
+static EsObject* sform_begin0 (EsObject *args, DSLEnv *env);
+static EsObject* sfrom_and  (EsObject *args, DSLEnv *env);
+static EsObject* sform_or  (EsObject *args, DSLEnv *env);
 static EsObject* builtin_not  (EsObject *args, DSLEnv *env);
 static EsObject* builtin_eq  (EsObject *args, DSLEnv *env);
 static EsObject* builtin_lt  (EsObject *args, DSLEnv *env);
@@ -74,12 +74,12 @@ static EsObject **engine_codes;
 
 static DSLCode codes [] = {
 	{ "null?",   builtin_null,   NULL, DSL_PATTR_CHECK_ARITY, 1 },
-	{ "begin",   builtin_begin,  NULL, DSL_PATTR_SELF_EVAL,  0UL,
+	{ "begin",   sform_begin,  NULL, DSL_PATTR_SELF_EVAL,  0UL,
 	  .helpstr = "(begin exp0 ... expN) -> expN" },
-	{ "begin0",  builtin_begin0, NULL, DSL_PATTR_SELF_EVAL,  0UL,
+	{ "begin0",  sform_begin0, NULL, DSL_PATTR_SELF_EVAL,  0UL,
 	  .helpstr = "(begin0 exp0 ... expN) -> exp0" },
-	{ "and",     builtin_and,    NULL, DSL_PATTR_SELF_EVAL },
-	{ "or",      builtin_or,     NULL, DSL_PATTR_SELF_EVAL },
+	{ "and",     sfrom_and,    NULL, DSL_PATTR_SELF_EVAL },
+	{ "or",      sform_or,     NULL, DSL_PATTR_SELF_EVAL },
 	{ "not",     builtin_not,    NULL, DSL_PATTR_CHECK_ARITY, 1},
 	{ "eq?",     builtin_eq,     NULL, DSL_PATTR_CHECK_ARITY, 2 },
 	{ "<",       builtin_lt,     NULL, DSL_PATTR_CHECK_ARITY, 2 },
@@ -329,7 +329,7 @@ static EsObject* builtin_null  (EsObject *args, DSLEnv *env)
 	return es_null(es_car (args))? es_true: es_false;
 }
 
-static EsObject* builtin_begin  (EsObject *args, DSLEnv *env)
+static EsObject* sform_begin  (EsObject *args, DSLEnv *env)
 {
 	if (es_null (args))
 		dsl_throw (TOO_FEW_ARGUMENTS,
@@ -347,7 +347,7 @@ static EsObject* builtin_begin  (EsObject *args, DSLEnv *env)
 	return o;
 }
 
-static EsObject* builtin_begin0  (EsObject *args, DSLEnv *env)
+static EsObject* sform_begin0  (EsObject *args, DSLEnv *env)
 {
 	if (es_null (args))
 		dsl_throw (TOO_FEW_ARGUMENTS, es_symbol_intern ("begin0"));
@@ -368,7 +368,7 @@ static EsObject* builtin_begin0  (EsObject *args, DSLEnv *env)
 	return o0;
 }
 
-static EsObject* builtin_and  (EsObject *args, DSLEnv *env)
+static EsObject* sfrom_and  (EsObject *args, DSLEnv *env)
 {
 	EsObject *o = es_true;
 
@@ -386,7 +386,7 @@ static EsObject* builtin_and  (EsObject *args, DSLEnv *env)
 	return o;
 }
 
-static EsObject* builtin_or  (EsObject *args, DSLEnv *env)
+static EsObject* sform_or  (EsObject *args, DSLEnv *env)
 {
 	EsObject *o;
 
