@@ -16,6 +16,19 @@
 #include <ctype.h>
 
 /*
+ * MACROS
+ */
+
+#define DECLARE_VALUE_FN(N)									\
+static EsObject* value_##N (EsObject *args, DSLEnv *env)
+
+#define DEFINE_VALUE_FN(N)									\
+static EsObject* value_##N (EsObject *args, DSLEnv *env)	\
+{															\
+	return dsl_entry_##N (env->entry);						\
+}
+
+/*
  * FUNCTION DECLARATIONS
  */
 static EsObject* builtin_null  (EsObject *args, DSLEnv *env);
@@ -36,6 +49,23 @@ static EsObject* builtin_member (EsObject *args, DSLEnv *env);
 static EsObject* builtin_downcase (EsObject *args, DSLEnv *env);
 static EsObject* builtin_upcase (EsObject *args, DSLEnv *env);
 static EsObject* bulitin_debug_print (EsObject *args, DSLEnv *env);
+static EsObject* builtin_entry_ref (EsObject *args, DSLEnv *env);
+
+DECLARE_VALUE_FN(name);
+DECLARE_VALUE_FN(input);
+DECLARE_VALUE_FN(access);
+DECLARE_VALUE_FN(file);
+DECLARE_VALUE_FN(language);
+DECLARE_VALUE_FN(implementation);
+DECLARE_VALUE_FN(line);
+DECLARE_VALUE_FN(kind);
+DECLARE_VALUE_FN(roles);
+DECLARE_VALUE_FN(pattern);
+DECLARE_VALUE_FN(inherits);
+DECLARE_VALUE_FN(scope_kind);
+DECLARE_VALUE_FN(scope_name);
+DECLARE_VALUE_FN(end);
+
 
 /*
  * DATA DEFINITIONS
@@ -70,6 +100,26 @@ static DSLCode codes [] = {
 	  .helpstr = "(upcate elt<string>|<list>) -> <string>|<list>" },
 	{ "print",   bulitin_debug_print, NULL, DSL_PATTR_CHECK_ARITY, 1,
 	  .helpstr = "(print OBJ) -> OBJ" },
+	{ "$",       builtin_entry_ref, NULL, DSL_PATTR_CHECK_ARITY, 1,
+	  .helpstr = "($ NAME) -> #f|<string>" },
+	{ "$name",           value_name,           NULL, DSL_PATTR_MEMORABLE, 0UL,},
+	{ "$input",          value_input,          NULL, DSL_PATTR_MEMORABLE, 0UL,
+	  .helpstr = "input file name" },
+	{ "$access",         value_access,         NULL, DSL_PATTR_MEMORABLE, 0UL },
+	{ "$file",           value_file,           NULL, DSL_PATTR_MEMORABLE, 0UL,
+	  .helpstr = "file scope<boolean>" },
+	{ "$language",       value_language,       NULL, DSL_PATTR_MEMORABLE, 0UL },
+	{ "$implementation", value_implementation, NULL, DSL_PATTR_MEMORABLE, 0UL },
+	{ "$line",           value_line,           NULL, DSL_PATTR_MEMORABLE, 0UL },
+	{ "$kind",           value_kind,           NULL, DSL_PATTR_MEMORABLE, 0UL },
+	{ "$roles",          value_roles,          NULL, DSL_PATTR_MEMORABLE, 0UL,
+	  .helpstr = "<list>" },
+	{ "$pattern",        value_pattern,        NULL, DSL_PATTR_MEMORABLE, 0UL },
+	{ "$inherits",       value_inherits,       NULL, DSL_PATTR_MEMORABLE, 0UL,
+	  .helpstr = "<list>" },
+	{ "$scope-kind",     value_scope_kind,     NULL, DSL_PATTR_MEMORABLE, 0UL },
+	{ "$scope-name",     value_scope_name,     NULL, DSL_PATTR_MEMORABLE, 0UL },
+	{ "$end",            value_end,            NULL, DSL_PATTR_MEMORABLE, 0UL },
 };
 
 
@@ -552,4 +602,247 @@ static EsObject* bulitin_debug_print (EsObject *args, DSLEnv *env)
 	putc('\n', stderr);
 
 	return o;
+}
+
+/*
+ * Accessesors for tagEntry
+ */
+static EsObject* reverse (EsObject *object)
+{
+	EsObject *h;
+	EsObject *r = es_nil;
+
+	while (!es_null (object))
+	{
+		h = es_car (object);
+		r = es_object_autounref (es_cons (h, r));
+		object = es_cdr (object);
+	}
+	return r;
+}
+
+/*
+ * Value functions
+ */
+DEFINE_VALUE_FN(name)
+DEFINE_VALUE_FN(input)
+DEFINE_VALUE_FN(access)
+DEFINE_VALUE_FN(file)
+DEFINE_VALUE_FN(language)
+DEFINE_VALUE_FN(implementation)
+DEFINE_VALUE_FN(line)
+DEFINE_VALUE_FN(kind)
+DEFINE_VALUE_FN(roles)
+DEFINE_VALUE_FN(pattern)
+DEFINE_VALUE_FN(inherits)
+DEFINE_VALUE_FN(scope_kind)
+DEFINE_VALUE_FN(scope_name)
+DEFINE_VALUE_FN(end)
+
+static const char*entry_xget (const tagEntry *entry, const char* name)
+{
+	unsigned int i;
+	unsigned short count = entry->fields.count;
+	tagExtensionField *list = entry->fields.list;
+
+	for (i = 0; i < count; ++i)
+	{
+		if (strcmp (list [i].key, name) == 0)
+			return list [i].value;
+	}
+	return NULL;
+
+}
+
+static EsObject* entry_xget_string (const tagEntry *entry, const char* name)
+{
+	const char* value = entry_xget (entry, name);
+	if (value)
+		return es_object_autounref (es_string_new (value));
+	else
+		return es_false;
+}
+
+static EsObject* entry_xget_csvlist (const tagEntry *entry, const char* field)
+{
+	const char* inherits = entry_xget (entry, field);
+
+	if (inherits == NULL)
+		return es_nil;
+	else
+	{
+		EsObject *s = es_nil;
+		char *d = strdup (inherits);
+		char *h = d;
+		char *t;
+
+		if (h == NULL)
+		{
+			fprintf(stderr, "MEMORY EXHAUSTED\n");
+			exit (1);
+		}
+
+		while ((t = strchr (h, ',')))
+		{
+			*t = '\0';
+			s = es_cons (es_object_autounref (es_string_new (h)),
+				     s);
+			s = es_object_autounref (s);
+			h = t + 1;
+		}
+		if (*h != '\0')
+		{
+			s = es_cons (es_object_autounref (es_string_new (h)),
+				     s);
+			s = es_object_autounref (s);
+		}
+
+		free (d);
+		s = reverse (s);
+		return s;
+	}
+}
+
+/*
+ * Accessesors for tagEntry
+ */
+
+static EsObject* builtin_entry_ref (EsObject *args, DSLEnv *env)
+{
+	EsObject *key = es_car(args);
+
+	if (es_error_p (key))
+		return key;
+	else if (! es_string_p (key))
+		dsl_throw (WRONG_TYPE_ARGUMENT, es_symbol_intern ("$"));
+	else
+		return entry_xget_string (env->entry, es_string_get (key));
+}
+
+EsObject* dsl_entry_name (const tagEntry *entry)
+{
+	return es_object_autounref (es_string_new (entry->name));
+}
+
+EsObject* dsl_entry_input (const tagEntry *entry)
+{
+	return es_object_autounref (es_string_new (entry->file));
+}
+
+EsObject* dsl_entry_access (const tagEntry *entry)
+{
+	return entry_xget_string (entry, "access");
+}
+
+EsObject* dsl_entry_file (const tagEntry *entry)
+{
+	return entry->fileScope? es_true: es_false;
+}
+
+EsObject* dsl_entry_language (const tagEntry *entry)
+{
+	return entry_xget_string (entry, "language");
+}
+
+EsObject* dsl_entry_implementation (const tagEntry *entry)
+{
+	return entry_xget_string (entry, "implementation");
+}
+
+EsObject* dsl_entry_line (const tagEntry *entry)
+{
+	unsigned long ln = entry->address.lineNumber;
+
+	if (ln == 0)
+		return es_false;
+	else
+		return es_object_autounref (es_integer_new (ln));
+}
+
+EsObject* dsl_entry_end (const tagEntry *entry)
+{
+	const char *end_str = entry_xget(entry, "end");
+	EsObject *o;
+
+	if (end_str)
+	{
+		o = es_read_from_string (end_str, NULL);
+		if (es_error_p (o))
+			return es_false;
+		else
+			return es_object_autounref (o);
+	}
+	else
+		return es_false;
+}
+
+EsObject* dsl_entry_kind (const tagEntry *entry)
+{
+	const char* kind;
+	kind = entry->kind;
+
+	if (kind)
+		return es_object_autounref (es_string_new (entry->kind));
+	else
+		return es_false;
+}
+
+EsObject* dsl_entry_roles (const tagEntry *entry)
+{
+	return entry_xget_csvlist(entry, "roles");
+}
+
+EsObject* dsl_entry_pattern (const tagEntry *entry)
+{
+	const char *pattern = entry->address.pattern;
+
+	if (pattern == NULL)
+		return es_false;
+	else
+		return es_object_autounref (es_string_new (pattern));
+}
+
+EsObject* dsl_entry_inherits (const tagEntry *entry)
+{
+	return entry_xget_csvlist (entry, "inherits");
+}
+
+EsObject* dsl_entry_scope_kind (const tagEntry *entry)
+{
+	const char* scope = entry_xget (entry, "scope");
+	const char* kind;
+	EsObject *r;
+
+	if (scope == NULL)
+		return es_false;
+
+	kind = strchr (scope, ':');
+	if (kind == NULL)
+		return es_false;
+
+	*(char *)kind = '\0';
+	r = es_object_autounref (es_string_new (scope));
+	*(char *)kind = ':';
+	return r;
+}
+
+EsObject* dsl_entry_scope_name (const tagEntry *entry)
+{
+	const char* scope = entry_xget (entry, "scope");
+	const char* kind;
+	EsObject *r;
+
+	if (scope == NULL)
+		return es_false;
+
+	kind = strchr (scope, ':');
+	if (kind == NULL)
+		return es_false;
+
+	if (*(kind + 1) == '\0')
+		return es_false;
+
+	r = es_object_autounref (es_string_new (kind + 1));
+
+	return r;
 }
