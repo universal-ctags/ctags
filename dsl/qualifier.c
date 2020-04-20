@@ -124,6 +124,11 @@ static DSLCode codes [] = {
 
 static void initialize (void)
 {
+	static int initialized;
+
+	if (initialized)
+		return;
+
 	int i;
 
 	for (i = 0; i < sizeof(codes)/sizeof(codes [0]); i++)
@@ -134,6 +139,7 @@ static void initialize (void)
 			exit (1);
 		}
 	}
+	initialized = 1;
 }
 
 static void reset (void)
@@ -767,13 +773,8 @@ struct sQCode
 QCode  *q_compile (EsObject *exp)
 {
 	static QCode code;
-	static int initialized;
 
-	if (!initialized)
-	{
-		initialize ();
-		initialized = 1;
-	}
+	initialize ();
 
 	code.es = es_object_ref (exp);
 	return &code;
