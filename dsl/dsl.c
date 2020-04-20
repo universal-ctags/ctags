@@ -36,6 +36,7 @@ static EsObject* sform_begin (EsObject *args, DSLEnv *env);
 static EsObject* sform_begin0 (EsObject *args, DSLEnv *env);
 static EsObject* sfrom_and  (EsObject *args, DSLEnv *env);
 static EsObject* sform_or  (EsObject *args, DSLEnv *env);
+static EsObject* sform_if  (EsObject *args, DSLEnv *env);
 static EsObject* builtin_not  (EsObject *args, DSLEnv *env);
 static EsObject* builtin_eq  (EsObject *args, DSLEnv *env);
 static EsObject* builtin_lt  (EsObject *args, DSLEnv *env);
@@ -80,6 +81,7 @@ static DSLCode codes [] = {
 	  .helpstr = "(begin0 exp0 ... expN) -> exp0" },
 	{ "and",     sfrom_and,    NULL, DSL_PATTR_SELF_EVAL },
 	{ "or",      sform_or,     NULL, DSL_PATTR_SELF_EVAL },
+	{ "if",      sform_if,       NULL, DSL_PATTR_CHECK_ARITY, 3},
 	{ "not",     builtin_not,    NULL, DSL_PATTR_CHECK_ARITY, 1},
 	{ "eq?",     builtin_eq,     NULL, DSL_PATTR_CHECK_ARITY, 2 },
 	{ "<",       builtin_lt,     NULL, DSL_PATTR_CHECK_ARITY, 2 },
@@ -400,6 +402,22 @@ static EsObject* sform_or  (EsObject *args, DSLEnv *env)
 			return o;
 		args = es_cdr (args);
 	}
+
+	return es_false;
+}
+
+static EsObject* sform_if (EsObject *args, DSLEnv *env)
+{
+	EsObject *o;
+
+	o = es_car (args);
+	o = dsl_eval (o, env);
+	if (es_object_equal (o, es_false))
+		return dsl_eval (es_car (es_cdr (args)), env);
+	else if (es_error_p (o))
+		return o;
+	else
+		return dsl_eval (es_car (es_cdr (es_cdr (args))), env);
 
 	return es_false;
 }
