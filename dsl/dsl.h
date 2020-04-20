@@ -20,6 +20,7 @@
  * TYPES
  */
 enum eDSLEngineType {
+	DSL_COMMON,
 	DSL_QUALIFIER,
 	DSL_ENGINE_COUNT
 };
@@ -68,6 +69,10 @@ struct sDSLCode {
 /*
  * Function declarations
  */
+
+/* Return 1 if no error. */
+int       dsl_init        (void);
+
 EsObject *dsl_code_define (DSLEngineType engine, DSLCode *code);
 DSLCode  *dsl_code_lookup (DSLEngineType engine, EsObject *name);
 void      dsl_help        (DSLEngineType engine, FILE *fp);
