@@ -122,20 +122,18 @@ static DSLCode codes [] = {
 	{ "$end",            value_end,            NULL, DSL_PATTR_MEMORABLE, 0UL },
 };
 
-static void define (DSLCode *code)
-{
-	EsObject *name;
-
-	name = es_symbol_intern (code->name);
-	es_symbol_set_data (name, code);
-}
-
 static void initialize (void)
 {
 	int i;
 
 	for (i = 0; i < sizeof(codes)/sizeof(codes [0]); i++)
-		define (codes + i);
+	{
+		if (dsl_code_define (codes + i) == NULL)
+		{
+			fprintf(stderr, "MEMORY EXHAUSTED\n");
+			exit (1);
+		}
+	}
 }
 
 static void reset (void)
@@ -190,7 +188,7 @@ static EsObject *eval (EsObject *object, tagEntry *entry)
 		return es_nil;
 	else if (es_symbol_p (object))
 	{
-		code = es_symbol_get_data (object);
+		code = dsl_code_lookup (object);
 
 		if (code)
 		{
@@ -217,7 +215,7 @@ static EsObject *eval (EsObject *object, tagEntry *entry)
 		EsObject *cdr = es_cdr (object);
 		int l;
 
-		code = es_symbol_get_data (car);
+		code = dsl_code_lookup (car);
 
 		if (!code)
 			dsl_throw (UNBOUND_VARIABLE, car);

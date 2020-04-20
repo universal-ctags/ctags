@@ -347,6 +347,7 @@ READTAGS_DSL_HEADS = \
 
 READTAGS_DSL_SRCS = \
 	dsl/es-lang-c-stdc99.c \
+	dsl/dsl.c \
 	dsl/qualifier.c \
 	\
 	$(MIO_SRCS) \

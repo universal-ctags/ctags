@@ -1,6 +1,6 @@
 /*
-*   Copyright (c) 2016, Masatake YAMATO
-*   Copyright (c) 2016, Red Hat, Inc.
+*   Copyright (c) 2020, Masatake YAMATO
+*   Copyright (c) 2020, Red Hat, Inc.
 *
 *   This source code is released for free distribution under the terms of the
 *   GNU General Public License version 2 or (at your option) any later version.
@@ -55,5 +55,9 @@ struct sDSLCode {
 /*
  * Function declarations
  */
+
+EsObject *dsl_code_define (DSLCode *code);
+DSLCode  *dsl_code_lookup (EsObject *name);
+
 
 #endif
