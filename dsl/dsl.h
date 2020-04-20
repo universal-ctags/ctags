@@ -25,7 +25,14 @@ enum eDSLEngineType {
 };
 typedef enum eDSLEngineType DSLEngineType;
 
-typedef EsObject* (* DSLProc)  (EsObject *args, tagEntry *entry);
+struct sDSLEnv {
+	enum eDSLEngineType engine;
+	const tagEntry *entry;
+};
+typedef struct sDSLEnv DSLEnv;
+
+typedef EsObject* (* DSLProc)  (EsObject *args, DSLEnv *env);
+
 
 enum eDSLPAttr {
 	DSL_PATTR_MEMORABLE   = 1UL << 0,

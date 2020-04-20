@@ -34,41 +34,41 @@
 /*
  * Decls
  */
-static EsObject* builtin_null  (EsObject *args, tagEntry *entry);
-static EsObject* builtin_begin (EsObject *args, tagEntry *entry);
-static EsObject* builtin_begin0 (EsObject *args, tagEntry *entry);
-static EsObject* builtin_and  (EsObject *args, tagEntry *entry);
-static EsObject* builtin_or  (EsObject *args, tagEntry *entry);
-static EsObject* builtin_not  (EsObject *args, tagEntry *entry);
-static EsObject* builtin_eq  (EsObject *args, tagEntry *entry);
-static EsObject* builtin_lt  (EsObject *args, tagEntry *entry);
-static EsObject* builtin_gt  (EsObject *args, tagEntry *entry);
-static EsObject* builtin_le  (EsObject *args, tagEntry *entry);
-static EsObject* builtin_ge  (EsObject *args, tagEntry *entry);
-static EsObject* builtin_prefix (EsObject *args, tagEntry *entry);
-static EsObject* builtin_suffix (EsObject *args, tagEntry *entry);
-static EsObject* builtin_substr (EsObject *args, tagEntry *entry);
-static EsObject* builtin_member (EsObject *args, tagEntry *entry);
-static EsObject* builtin_entry_ref (EsObject *args, tagEntry *entry);
-static EsObject* builtin_downcase (EsObject *args, tagEntry *entry);
-static EsObject* builtin_upcase (EsObject *args, tagEntry *entry);
-static EsObject* bulitin_debug_print (EsObject *args, tagEntry *entry);
+static EsObject* builtin_null  (EsObject *args, DSLEnv *env);
+static EsObject* builtin_begin (EsObject *args, DSLEnv *env);
+static EsObject* builtin_begin0 (EsObject *args, DSLEnv *env);
+static EsObject* builtin_and  (EsObject *args, DSLEnv *env);
+static EsObject* builtin_or  (EsObject *args, DSLEnv *env);
+static EsObject* builtin_not  (EsObject *args, DSLEnv *env);
+static EsObject* builtin_eq  (EsObject *args, DSLEnv *env);
+static EsObject* builtin_lt  (EsObject *args, DSLEnv *env);
+static EsObject* builtin_gt  (EsObject *args, DSLEnv *env);
+static EsObject* builtin_le  (EsObject *args, DSLEnv *env);
+static EsObject* builtin_ge  (EsObject *args, DSLEnv *env);
+static EsObject* builtin_prefix (EsObject *args, DSLEnv *env);
+static EsObject* builtin_suffix (EsObject *args, DSLEnv *env);
+static EsObject* builtin_substr (EsObject *args, DSLEnv *env);
+static EsObject* builtin_member (EsObject *args, DSLEnv *env);
+static EsObject* builtin_entry_ref (EsObject *args, DSLEnv *env);
+static EsObject* builtin_downcase (EsObject *args, DSLEnv *env);
+static EsObject* builtin_upcase (EsObject *args, DSLEnv *env);
+static EsObject* bulitin_debug_print (EsObject *args, DSLEnv *env);
 
 
-static EsObject* value_name (EsObject *args, tagEntry *entry);
-static EsObject* value_input (EsObject *args, tagEntry *entry);
-static EsObject* value_access (EsObject *args, tagEntry *entry);
-static EsObject* value_file (EsObject *args, tagEntry *entry);
-static EsObject* value_language (EsObject *args, tagEntry *entry);
-static EsObject* value_implementation (EsObject *args, tagEntry *entry);
-static EsObject* value_line (EsObject *args, tagEntry *entry);
-static EsObject* value_kind (EsObject *args, tagEntry *entry);
-static EsObject* value_roles (EsObject *args, tagEntry *entry);
-static EsObject* value_pattern (EsObject *args, tagEntry *entry);
-static EsObject* value_inherits (EsObject *args, tagEntry *entry);
-static EsObject* value_scope_kind (EsObject *args, tagEntry *entry);
-static EsObject* value_scope_name (EsObject *args, tagEntry *entry);
-static EsObject* value_end (EsObject *args, tagEntry *entry);
+static EsObject* value_name (EsObject *args, DSLEnv *env);
+static EsObject* value_input (EsObject *args, DSLEnv *env);
+static EsObject* value_access (EsObject *args, DSLEnv *env);
+static EsObject* value_file (EsObject *args, DSLEnv *env);
+static EsObject* value_language (EsObject *args, DSLEnv *env);
+static EsObject* value_implementation (EsObject *args, DSLEnv *env);
+static EsObject* value_line (EsObject *args, DSLEnv *env);
+static EsObject* value_kind (EsObject *args, DSLEnv *env);
+static EsObject* value_roles (EsObject *args, DSLEnv *env);
+static EsObject* value_pattern (EsObject *args, DSLEnv *env);
+static EsObject* value_inherits (EsObject *args, DSLEnv *env);
+static EsObject* value_scope_kind (EsObject *args, DSLEnv *env);
+static EsObject* value_scope_name (EsObject *args, DSLEnv *env);
+static EsObject* value_end (EsObject *args, DSLEnv *env);
 
 
 static DSLCode codes [] = {
@@ -173,18 +173,18 @@ static EsObject *error_included (EsObject *object)
 	return es_false;
 }
 
-static EsObject *eval (EsObject *object, tagEntry *entry);
-static EsObject *eval0 (EsObject *object, tagEntry *entry)
+static EsObject *eval (EsObject *object, DSLEnv *env);
+static EsObject *eval0 (EsObject *object, DSLEnv *env)
 {
 	if (es_null (object))
 		return es_nil;
 	else
 		return es_object_autounref (
-			es_cons(eval (es_car (object), entry),
-				eval0 (es_cdr (object), entry))
+			es_cons(eval (es_car (object), env),
+				eval0 (es_cdr (object), env))
 			);
 }
-static EsObject *eval (EsObject *object, tagEntry *entry)
+static EsObject *eval (EsObject *object, DSLEnv *env)
 {
 	EsObject *r;
 	DSLCode *code;
@@ -193,7 +193,7 @@ static EsObject *eval (EsObject *object, tagEntry *entry)
 		return es_nil;
 	else if (es_symbol_p (object))
 	{
-		code = dsl_code_lookup (DSL_QUALIFIER, object);
+		code = dsl_code_lookup (env->engine, object);
 
 		if (code)
 		{
@@ -203,7 +203,7 @@ static EsObject *eval (EsObject *object, tagEntry *entry)
 			if (code->flags & DSL_PATTR_PURE)
 				dsl_throw (UNBOUND_VARIABLE, object);
 
-			r = code->proc (es_nil, entry);
+			r = code->proc (es_nil, env);
 			if (code->flags & DSL_PATTR_MEMORABLE)
 				code->cache = r;
 			return r;
@@ -220,7 +220,7 @@ static EsObject *eval (EsObject *object, tagEntry *entry)
 		EsObject *cdr = es_cdr (object);
 		int l;
 
-		code = dsl_code_lookup (DSL_QUALIFIER, car);
+		code = dsl_code_lookup (env->engine, car);
 
 		if (!code)
 			dsl_throw (UNBOUND_VARIABLE, car);
@@ -241,14 +241,14 @@ static EsObject *eval (EsObject *object, tagEntry *entry)
 		{
 			EsObject *err;
 
-			cdr = eval0(cdr, entry);
+			cdr = eval0(cdr, env);
 
 			err = error_included (cdr);
 			if (!es_object_equal (err, es_false))
 				return err;
 		}
 
-		r = code->proc (cdr, entry);
+		r = code->proc (cdr, env);
 		if (code->flags & DSL_PATTR_MEMORABLE)
 			code->cache = r;
 		return r;
@@ -272,12 +272,12 @@ static EsObject* reverse (EsObject *object)
 /*
  * Built-ins
  */
-static EsObject* builtin_null  (EsObject *args, tagEntry *entry)
+static EsObject* builtin_null  (EsObject *args, DSLEnv *env)
 {
 	return es_null(es_car (args))? es_true: es_false;
 }
 
-static EsObject* builtin_begin  (EsObject *args, tagEntry *entry)
+static EsObject* builtin_begin  (EsObject *args, DSLEnv *env)
 {
 	if (es_null (args))
 		dsl_throw (TOO_FEW_ARGUMENTS,
@@ -287,7 +287,7 @@ static EsObject* builtin_begin  (EsObject *args, tagEntry *entry)
 	while (! es_null (args))
 	{
 		o = es_car (args);
-		o = eval (o, entry);
+		o = eval (o, env);
 		if (es_error_p (o))
 			return o;
 		args = es_cdr (args);
@@ -295,7 +295,7 @@ static EsObject* builtin_begin  (EsObject *args, tagEntry *entry)
 	return o;
 }
 
-static EsObject* builtin_begin0  (EsObject *args, tagEntry *entry)
+static EsObject* builtin_begin0  (EsObject *args, DSLEnv *env)
 {
 	if (es_null (args))
 		dsl_throw (TOO_FEW_ARGUMENTS, es_symbol_intern ("begin0"));
@@ -305,7 +305,7 @@ static EsObject* builtin_begin0  (EsObject *args, tagEntry *entry)
 	while (! es_null (args))
 	{
 		o = es_car (args);
-		o = eval (o, entry);
+		o = eval (o, env);
 		if (!count++)
 			o0 = o;
 
@@ -316,14 +316,14 @@ static EsObject* builtin_begin0  (EsObject *args, tagEntry *entry)
 	return o0;
 }
 
-static EsObject* builtin_and  (EsObject *args, tagEntry *entry)
+static EsObject* builtin_and  (EsObject *args, DSLEnv *env)
 {
 	EsObject *o = es_true;
 
 	while (! es_null (args))
 	{
 		o = es_car (args);
-		o = eval (o, entry);
+		o = eval (o, env);
 		if (es_object_equal (o, es_false))
 			return es_false;
 		else if (es_error_p (o))
@@ -334,14 +334,14 @@ static EsObject* builtin_and  (EsObject *args, tagEntry *entry)
 	return o;
 }
 
-static EsObject* builtin_or  (EsObject *args, tagEntry *entry)
+static EsObject* builtin_or  (EsObject *args, DSLEnv *env)
 {
 	EsObject *o;
 
 	while (! es_null (args))
 	{
 		o = es_car (args);
-		o = eval (o, entry);
+		o = eval (o, env);
 		if (! es_object_equal (o, es_false))
 			return o;
 		else if (es_error_p (o))
@@ -352,7 +352,7 @@ static EsObject* builtin_or  (EsObject *args, tagEntry *entry)
 	return es_false;
 }
 
-static EsObject* builtin_not  (EsObject *args, tagEntry *entry)
+static EsObject* builtin_not  (EsObject *args, DSLEnv *env)
 {
 	if (es_object_equal (es_car(args), es_false))
 		return es_true;
@@ -363,7 +363,7 @@ static EsObject* builtin_not  (EsObject *args, tagEntry *entry)
 }
 
 #define DEFINE_OP_WITH_CHECK(N, X, C, E, O)				\
-	static EsObject* builtin_##N  (EsObject *args, tagEntry *entry)	\
+	static EsObject* builtin_##N  (EsObject *args, DSLEnv *env)	\
 	{								\
 		EsObject *a, *b;					\
 									\
@@ -377,7 +377,7 @@ static EsObject* builtin_not  (EsObject *args, tagEntry *entry)
 			return es_false;				\
 	}
 
-static EsObject* builtin_eq  (EsObject *args, tagEntry *entry)
+static EsObject* builtin_eq  (EsObject *args, DSLEnv *env)
 {
 	EsObject *a, *b;
 	a = es_car (args);
@@ -394,7 +394,7 @@ DEFINE_OP_WITH_CHECK(gt, es_number_get (a) > es_number_get (b), es_number_p,  NU
 DEFINE_OP_WITH_CHECK(le, es_number_get (a) <= es_number_get (b), es_number_p, NUMBER_REQUIRED, es_symbol_intern ("<="));
 DEFINE_OP_WITH_CHECK(ge, es_number_get (a) >= es_number_get (b), es_number_p, NUMBER_REQUIRED, es_symbol_intern (">="));
 
-static EsObject* builtin_prefix (EsObject* args, tagEntry *entry)
+static EsObject* builtin_prefix (EsObject* args, DSLEnv *env)
 {
 	EsObject *target = es_car (args);
 	EsObject *prefix = es_car (es_cdr (args));
@@ -416,7 +416,7 @@ static EsObject* builtin_prefix (EsObject* args, tagEntry *entry)
 	return (strncmp (ts, ps, pl) == 0)? es_true: es_false;
 }
 
-static EsObject* builtin_suffix (EsObject* args, tagEntry *entry)
+static EsObject* builtin_suffix (EsObject* args, DSLEnv *env)
 {
 	EsObject *target = es_car (args);
 	EsObject *suffix = es_car (es_cdr (args));
@@ -440,7 +440,7 @@ static EsObject* builtin_suffix (EsObject* args, tagEntry *entry)
 	return (strcmp (ts + d, ss) == 0)? es_true: es_false;
 }
 
-static EsObject* builtin_substr (EsObject* args, tagEntry *entry)
+static EsObject* builtin_substr (EsObject* args, DSLEnv *env)
 {
 	EsObject *target = es_car (args);
 	EsObject *substr = es_car (es_cdr (args));
@@ -456,7 +456,7 @@ static EsObject* builtin_substr (EsObject* args, tagEntry *entry)
 	return strstr(ts, ss) == NULL? es_false: es_true;
 }
 
-static EsObject* builtin_member (EsObject *args, tagEntry *entry)
+static EsObject* builtin_member (EsObject *args, DSLEnv *env)
 {
 	EsObject *elt  = es_car (args);
 	EsObject *lst = es_car (es_cdr (args));
@@ -477,7 +477,7 @@ static EsObject* builtin_member (EsObject *args, tagEntry *entry)
 /*
  * Value
  */
-static const char*entry_xget (tagEntry *entry, const char* name)
+static const char*entry_xget (const tagEntry *entry, const char* name)
 {
 	unsigned int i;
 	unsigned short count = entry->fields.count;
@@ -492,7 +492,7 @@ static const char*entry_xget (tagEntry *entry, const char* name)
 
 }
 
-static EsObject* entry_xget_string (tagEntry *entry, const char* name)
+static EsObject* entry_xget_string (const tagEntry *entry, const char* name)
 {
 	const char* value = entry_xget (entry, name);
 	if (value)
@@ -501,7 +501,7 @@ static EsObject* entry_xget_string (tagEntry *entry, const char* name)
 		return es_false;
 }
 
-static EsObject* value_xget_csvlist (tagEntry *entry, const char* field)
+static EsObject* value_xget_csvlist (const tagEntry *entry, const char* field)
 {
 	const char* inherits = entry_xget (entry, field);
 
@@ -541,7 +541,7 @@ static EsObject* value_xget_csvlist (tagEntry *entry, const char* field)
 	}
 }
 
-static EsObject* builtin_entry_ref (EsObject *args, tagEntry *entry)
+static EsObject* builtin_entry_ref (EsObject *args, DSLEnv *env)
 {
 	EsObject *key = es_car(args);
 
@@ -550,7 +550,7 @@ static EsObject* builtin_entry_ref (EsObject *args, tagEntry *entry)
 	else if (! es_string_p (key))
 		dsl_throw (WRONG_TYPE_ARGUMENT, es_symbol_intern ("$"));
 	else
-		return entry_xget_string (entry, es_string_get (key));
+		return entry_xget_string (env->entry, es_string_get (key));
 }
 
 static EsObject* caseop (EsObject *o, int (*op)(int))
@@ -606,20 +606,20 @@ static EsObject* builtin_caseop0 (EsObject *o,
 		return op (o);
 }
 
-static EsObject* builtin_downcase (EsObject *args, tagEntry *entry)
+static EsObject* builtin_downcase (EsObject *args, DSLEnv *env)
 {
 	EsObject *o = es_car(args);
 	return builtin_caseop0 (o, downcase);
 }
 
-static EsObject* builtin_upcase (EsObject *args, tagEntry *entry)
+static EsObject* builtin_upcase (EsObject *args, DSLEnv *env)
 {
 	EsObject *o = es_car(args);
 	return builtin_caseop0 (o, upcase);
 }
 
 static MIO  *miodebug;
-static EsObject* bulitin_debug_print (EsObject *args, tagEntry *entry)
+static EsObject* bulitin_debug_print (EsObject *args, DSLEnv *env)
 {
 	if (miodebug == NULL)
 		miodebug = mio_new_fp (stderr, NULL);
@@ -631,39 +631,39 @@ static EsObject* bulitin_debug_print (EsObject *args, tagEntry *entry)
 	return o;
 }
 
-static EsObject* value_name (EsObject *args, tagEntry *entry)
+static EsObject* value_name (EsObject *args, DSLEnv *env)
 {
-	return es_object_autounref (es_string_new (entry->name));
+	return es_object_autounref (es_string_new (env->entry->name));
 }
 
-static EsObject* value_input (EsObject *args, tagEntry *entry)
+static EsObject* value_input (EsObject *args, DSLEnv *env)
 {
-	return es_object_autounref (es_string_new (entry->file));
+	return es_object_autounref (es_string_new (env->entry->file));
 }
 
-static EsObject* value_access (EsObject *args, tagEntry *entry)
+static EsObject* value_access (EsObject *args, DSLEnv *env)
 {
-	return entry_xget_string (entry, "access");
+	return entry_xget_string (env->entry, "access");
 }
 
-static EsObject* value_file (EsObject *args, tagEntry *entry)
+static EsObject* value_file (EsObject *args, DSLEnv *env)
 {
-	return entry->fileScope? es_true: es_false;
+	return env->entry->fileScope? es_true: es_false;
 }
 
-static EsObject* value_language (EsObject *args, tagEntry *entry)
+static EsObject* value_language (EsObject *args, DSLEnv *env)
 {
-	return entry_xget_string (entry, "language");
+	return entry_xget_string (env->entry, "language");
 }
 
-static EsObject* value_implementation (EsObject *args, tagEntry *entry)
+static EsObject* value_implementation (EsObject *args, DSLEnv *env)
 {
-	return entry_xget_string (entry, "implementation");
+	return entry_xget_string (env->entry, "implementation");
 }
 
-static EsObject* value_line (EsObject *args, tagEntry *entry)
+static EsObject* value_line (EsObject *args, DSLEnv *env)
 {
-	unsigned long ln = entry->address.lineNumber;
+	unsigned long ln = env->entry->address.lineNumber;
 
 	if (ln == 0)
 		return es_false;
@@ -671,9 +671,9 @@ static EsObject* value_line (EsObject *args, tagEntry *entry)
 		return es_object_autounref (es_integer_new (ln));
 }
 
-static EsObject* value_end (EsObject *args, tagEntry *entry)
+static EsObject* value_end (EsObject *args, DSLEnv *env)
 {
-	const char *end_str = entry_xget(entry, "end");
+	const char *end_str = entry_xget(env->entry, "end");
 	EsObject *o;
 
 	if (end_str)
@@ -688,25 +688,25 @@ static EsObject* value_end (EsObject *args, tagEntry *entry)
 		return es_false;
 }
 
-static EsObject* value_kind (EsObject *args, tagEntry *entry)
+static EsObject* value_kind (EsObject *args, DSLEnv *env)
 {
 	const char* kind;
-	kind = entry->kind;
+	kind = env->entry->kind;
 
 	if (kind)
-		return es_object_autounref (es_string_new (entry->kind));
+		return es_object_autounref (es_string_new (env->entry->kind));
 	else
 		return es_false;
 }
 
-static EsObject* value_roles (EsObject *args, tagEntry *entry)
+static EsObject* value_roles (EsObject *args, DSLEnv *env)
 {
-	return value_xget_csvlist(entry, "roles");
+	return value_xget_csvlist(env->entry, "roles");
 }
 
-static EsObject* value_pattern (EsObject *args, tagEntry *entry)
+static EsObject* value_pattern (EsObject *args, DSLEnv *env)
 {
-	const char *pattern = entry->address.pattern;
+	const char *pattern = env->entry->address.pattern;
 
 	if (pattern == NULL)
 		return es_false;
@@ -714,14 +714,14 @@ static EsObject* value_pattern (EsObject *args, tagEntry *entry)
 		return es_object_autounref (es_string_new (pattern));
 }
 
-static EsObject* value_inherits (EsObject *args, tagEntry *entry)
+static EsObject* value_inherits (EsObject *args, DSLEnv *env)
 {
-	return value_xget_csvlist (entry, "inherits");
+	return value_xget_csvlist (env->entry, "inherits");
 }
 
-static EsObject* value_scope_kind (EsObject *args, tagEntry *entry)
+static EsObject* value_scope_kind (EsObject *args, DSLEnv *env)
 {
-	const char* scope = entry_xget (entry, "scope");
+	const char* scope = entry_xget (env->entry, "scope");
 	const char* kind;
 	EsObject *r;
 
@@ -738,9 +738,9 @@ static EsObject* value_scope_kind (EsObject *args, tagEntry *entry)
 	return r;
 }
 
-static EsObject* value_scope_name (EsObject *args, tagEntry *entry)
+static EsObject* value_scope_name (EsObject *args, DSLEnv *env)
 {
-	const char* scope = entry_xget (entry, "scope");
+	const char* scope = entry_xget (env->entry, "scope");
 	const char* kind;
 	EsObject *r;
 
@@ -784,8 +784,12 @@ enum QRESULT q_is_acceptable  (QCode *code, tagEntry *entry)
 	EsObject *r;
 	int i;
 
+	DSLEnv env = {
+		.engine = DSL_QUALIFIER,
+		.entry  = entry,
+	};
 	es_autounref_pool_push ();
-	r = eval (code->es, entry);
+	r = eval (code->es, &env);
 	if (es_object_equal (r, es_false))
 		i = Q_REJECT;
 	else if (es_error_p (r))
