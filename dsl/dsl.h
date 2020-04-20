@@ -13,11 +13,31 @@
  * INCLUDES
  */
 #include "es-lang-c-stdc99.h"
+#include "readtags.h"
 
 
 /*
  * TYPES
  */
+typedef EsObject* (* DSLProc)  (EsObject *args, tagEntry *entry);
+
+enum eDSLPAttr {
+	DSL_PATTR_MEMORABLE   = 1UL << 0,
+	DSL_PATTR_PURE        = 1UL << 1,
+	DSL_PATTR_SELF_EVAL   = 1UL << 2,
+	DSL_PATTR_CHECK_ARITY = 1UL << 3,
+};
+typedef enum eDSLPAttr DSLPAttr;
+
+typedef struct sDSLCode DSLCode;
+struct sDSLCode {
+	const char *name;
+	DSLProc proc;
+	EsObject* cache;
+	DSLPAttr flags;
+	int arity;
+	const char* helpstr;
+};
 
 #define DSL_ERR_UNBOUND_VARIABLE    (es_error_intern("unbound-variable"))
 #define DSL_ERR_TOO_FEW_ARGUMENTS   (es_error_intern("too-few-arguments"))
@@ -31,5 +51,9 @@
  */
 #define dsl_throw(e,o)               return es_error_set_object(DSL_ERR_##e, o)
 
+
+/*
+ * Function declarations
+ */
 
 #endif

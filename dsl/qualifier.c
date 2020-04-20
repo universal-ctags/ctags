@@ -24,14 +24,7 @@
 /*
  * Types
  */
-typedef struct sCode Code;
-typedef EsObject* (* EsEntryProc)  (EsObject *args, tagEntry *entry);
-enum ProcAttr {
-	MEMORABLE   = 1UL << 0,
-	PURE_PROC   = 1UL << 1,
-	SELF_EVAL   = 1UL << 2,
-	CHECK_ARITY = 1UL << 3,
-};
+
 
 /*
  * Errors
@@ -78,65 +71,58 @@ static EsObject* value_scope_name (EsObject *args, tagEntry *entry);
 static EsObject* value_end (EsObject *args, tagEntry *entry);
 
 
-struct sCode {
-	const char *name;
-	EsEntryProc proc;
-	EsObject* cache;
-	enum ProcAttr flags;
-	int arity;
-	const char* helpstr;
-} codes [] = {
-	{ "null?",   builtin_null,   NULL, CHECK_ARITY, 1 },
-	{ "begin",   builtin_begin,  NULL, SELF_EVAL,  0UL,
+static DSLCode codes [] = {
+	{ "null?",   builtin_null,   NULL, DSL_PATTR_CHECK_ARITY, 1 },
+	{ "begin",   builtin_begin,  NULL, DSL_PATTR_SELF_EVAL,  0UL,
 	  .helpstr = "(begin exp0 ... expN) -> expN" },
-	{ "begin0",  builtin_begin0, NULL, SELF_EVAL,  0UL,
+	{ "begin0",  builtin_begin0, NULL, DSL_PATTR_SELF_EVAL,  0UL,
 	  .helpstr = "(begin0 exp0 ... expN) -> exp0" },
-	{ "and",     builtin_and,    NULL, SELF_EVAL },
-	{ "or",      builtin_or,     NULL, SELF_EVAL },
-	{ "not",     builtin_not,    NULL, CHECK_ARITY, 1},
-	{ "eq?",     builtin_eq,     NULL, CHECK_ARITY, 2 },
-	{ "<",       builtin_lt,     NULL, CHECK_ARITY, 2 },
-	{ ">",       builtin_gt,     NULL, CHECK_ARITY, 2 },
-	{ "<=",      builtin_le,     NULL, CHECK_ARITY, 2 },
-	{ ">=",      builtin_ge,     NULL, CHECK_ARITY, 2 },
-	{ "prefix?", builtin_prefix, NULL, CHECK_ARITY, 2,
+	{ "and",     builtin_and,    NULL, DSL_PATTR_SELF_EVAL },
+	{ "or",      builtin_or,     NULL, DSL_PATTR_SELF_EVAL },
+	{ "not",     builtin_not,    NULL, DSL_PATTR_CHECK_ARITY, 1},
+	{ "eq?",     builtin_eq,     NULL, DSL_PATTR_CHECK_ARITY, 2 },
+	{ "<",       builtin_lt,     NULL, DSL_PATTR_CHECK_ARITY, 2 },
+	{ ">",       builtin_gt,     NULL, DSL_PATTR_CHECK_ARITY, 2 },
+	{ "<=",      builtin_le,     NULL, DSL_PATTR_CHECK_ARITY, 2 },
+	{ ">=",      builtin_ge,     NULL, DSL_PATTR_CHECK_ARITY, 2 },
+	{ "prefix?", builtin_prefix, NULL, DSL_PATTR_CHECK_ARITY, 2,
 	  .helpstr = "(prefix? TARGET<string> PREFIX<string>) -> <boolean>" },
-	{ "suffix?", builtin_suffix, NULL, CHECK_ARITY, 2,
+	{ "suffix?", builtin_suffix, NULL, DSL_PATTR_CHECK_ARITY, 2,
 	  .helpstr = "(suffix? TARGET<string> SUFFIX<string>) -> <boolean>" },
-	{ "substr?", builtin_substr, NULL, CHECK_ARITY, 2,
+	{ "substr?", builtin_substr, NULL, DSL_PATTR_CHECK_ARITY, 2,
 	  .helpstr = "(substr? TARGET<string> SUBSTR<string>) -> <boolean>" },
-	{ "member",  builtin_member, NULL, CHECK_ARITY, 2,
+	{ "member",  builtin_member, NULL, DSL_PATTR_CHECK_ARITY, 2,
 	  .helpstr = "(member ELEMENT LIST) -> #f|<list>" },
-	{ "downcase", builtin_downcase, NULL, CHECK_ARITY, 1,
+	{ "downcase", builtin_downcase, NULL, DSL_PATTR_CHECK_ARITY, 1,
 	  .helpstr = "(downcase elt<string>|<list>) -> <string>|<list>" },
-	{ "upcase", builtin_upcase, NULL, CHECK_ARITY, 1,
+	{ "upcase", builtin_upcase, NULL, DSL_PATTR_CHECK_ARITY, 1,
 	  .helpstr = "(upcate elt<string>|<list>) -> <string>|<list>" },
-	{ "$",       builtin_entry_ref, NULL, CHECK_ARITY, 1,
+	{ "$",       builtin_entry_ref, NULL, DSL_PATTR_CHECK_ARITY, 1,
 	  .helpstr = "($ NAME) -> #f|<string>" },
-	{ "print",   bulitin_debug_print, NULL, CHECK_ARITY, 1,
+	{ "print",   bulitin_debug_print, NULL, DSL_PATTR_CHECK_ARITY, 1,
 	  .helpstr = "(print OBJ) -> OBJ" },
 
-	{ "$name",           value_name,           NULL, MEMORABLE, 0UL,},
-	{ "$input",          value_input,          NULL, MEMORABLE, 0UL,
+	{ "$name",           value_name,           NULL, DSL_PATTR_MEMORABLE, 0UL,},
+	{ "$input",          value_input,          NULL, DSL_PATTR_MEMORABLE, 0UL,
 	  .helpstr = "input file name" },
-	{ "$access",         value_access,         NULL, MEMORABLE, 0UL },
-	{ "$file",           value_file,           NULL, MEMORABLE, 0UL,
+	{ "$access",         value_access,         NULL, DSL_PATTR_MEMORABLE, 0UL },
+	{ "$file",           value_file,           NULL, DSL_PATTR_MEMORABLE, 0UL,
 	  .helpstr = "file scope<boolean>" },
-	{ "$language",       value_language,       NULL, MEMORABLE, 0UL },
-	{ "$implementation", value_implementation, NULL, MEMORABLE, 0UL },
-	{ "$line",           value_line,           NULL, MEMORABLE, 0UL },
-	{ "$kind",           value_kind,           NULL, MEMORABLE, 0UL },
-	{ "$roles",          value_roles,          NULL, MEMORABLE, 0UL,
+	{ "$language",       value_language,       NULL, DSL_PATTR_MEMORABLE, 0UL },
+	{ "$implementation", value_implementation, NULL, DSL_PATTR_MEMORABLE, 0UL },
+	{ "$line",           value_line,           NULL, DSL_PATTR_MEMORABLE, 0UL },
+	{ "$kind",           value_kind,           NULL, DSL_PATTR_MEMORABLE, 0UL },
+	{ "$roles",          value_roles,          NULL, DSL_PATTR_MEMORABLE, 0UL,
 	  .helpstr = "<list>" },
-	{ "$pattern",        value_pattern,        NULL, MEMORABLE, 0UL },
-	{ "$inherits",       value_inherits,       NULL, MEMORABLE, 0UL,
+	{ "$pattern",        value_pattern,        NULL, DSL_PATTR_MEMORABLE, 0UL },
+	{ "$inherits",       value_inherits,       NULL, DSL_PATTR_MEMORABLE, 0UL,
 	  .helpstr = "<list>" },
-	{ "$scope-kind",     value_scope_kind,     NULL, MEMORABLE, 0UL },
-	{ "$scope-name",     value_scope_name,     NULL, MEMORABLE, 0UL },
-	{ "$end",            value_end,            NULL, MEMORABLE, 0UL },
+	{ "$scope-kind",     value_scope_kind,     NULL, DSL_PATTR_MEMORABLE, 0UL },
+	{ "$scope-name",     value_scope_name,     NULL, DSL_PATTR_MEMORABLE, 0UL },
+	{ "$end",            value_end,            NULL, DSL_PATTR_MEMORABLE, 0UL },
 };
 
-static void define (Code *code)
+static void define (DSLCode *code)
 {
 	EsObject *name;
 
@@ -155,12 +141,12 @@ static void initialize (void)
 static void reset (void)
 {
 	int i;
-	Code *code;
+	DSLCode *code;
 
 	for (i = 0; i < sizeof(codes)/sizeof(codes [0]); i++)
 	{
 		code = codes + i;
-		if (code->flags & MEMORABLE)
+		if (code->flags & DSL_PATTR_MEMORABLE)
 			code->cache = NULL;
 	}
 }
@@ -198,7 +184,7 @@ static EsObject *eval0 (EsObject *object, tagEntry *entry)
 static EsObject *eval (EsObject *object, tagEntry *entry)
 {
 	EsObject *r;
-	Code *code;
+	DSLCode *code;
 
 	if (es_null (object))
 		return es_nil;
@@ -211,11 +197,11 @@ static EsObject *eval (EsObject *object, tagEntry *entry)
 			if (code->cache)
 				return code->cache;
 
-			if (code->flags & PURE_PROC)
+			if (code->flags & DSL_PATTR_PURE)
 				dsl_throw (UNBOUND_VARIABLE, object);
 
 			r = code->proc (es_nil, entry);
-			if (code->flags & MEMORABLE)
+			if (code->flags & DSL_PATTR_MEMORABLE)
 				code->cache = r;
 			return r;
 		}
@@ -239,7 +225,7 @@ static EsObject *eval (EsObject *object, tagEntry *entry)
 		if (code->cache)
 			return code->cache;
 
-		if (code->flags & CHECK_ARITY)
+		if (code->flags & DSL_PATTR_CHECK_ARITY)
 		{
 			l = length (cdr);
 			if (l < code->arity)
@@ -248,7 +234,7 @@ static EsObject *eval (EsObject *object, tagEntry *entry)
 				dsl_throw (TOO_MANY_ARGUMENTS, car);
 		}
 
-		if (! (code->flags & SELF_EVAL))
+		if (! (code->flags & DSL_PATTR_SELF_EVAL))
 		{
 			EsObject *err;
 
@@ -260,7 +246,7 @@ static EsObject *eval (EsObject *object, tagEntry *entry)
 		}
 
 		r = code->proc (cdr, entry);
-		if (code->flags & MEMORABLE)
+		if (code->flags & DSL_PATTR_MEMORABLE)
 			code->cache = r;
 		return r;
 	}
