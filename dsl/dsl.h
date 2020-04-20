@@ -63,6 +63,7 @@ struct sDSLCode {
  */
 EsObject *dsl_code_define (DSLEngineType engine, DSLCode *code);
 DSLCode  *dsl_code_lookup (DSLEngineType engine, EsObject *name);
+void      dsl_help        (DSLEngineType engine, FILE *fp);
 
 
 #endif

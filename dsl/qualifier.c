@@ -818,11 +818,6 @@ void    q_destroy (QCode *code)
 
 void         q_help           (FILE *fp)
 {
-	int i;
-
-	for (i = 0; i < sizeof (codes) / sizeof (codes[0]); i ++)
-	{
-		const char* hs = codes[i].helpstr;
-		fprintf(fp, "%15s: %s\n", codes[i].name, hs? hs: "");
-	}
+	initialize ();
+	dsl_help (DSL_QUALIFIER, fp);
 }
