@@ -19,6 +19,12 @@
 /*
  * TYPES
  */
+enum eDSLEngineType {
+	DSL_QUALIFIER,
+	DSL_ENGINE_COUNT
+};
+typedef enum eDSLEngineType DSLEngineType;
+
 typedef EsObject* (* DSLProc)  (EsObject *args, tagEntry *entry);
 
 enum eDSLPAttr {
@@ -55,9 +61,8 @@ struct sDSLCode {
 /*
  * Function declarations
  */
-
-EsObject *dsl_code_define (DSLCode *code);
-DSLCode  *dsl_code_lookup (EsObject *name);
+EsObject *dsl_code_define (DSLEngineType engine, DSLCode *code);
+DSLCode  *dsl_code_lookup (DSLEngineType engine, EsObject *name);
 
 
 #endif

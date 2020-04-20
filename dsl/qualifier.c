@@ -128,7 +128,7 @@ static void initialize (void)
 
 	for (i = 0; i < sizeof(codes)/sizeof(codes [0]); i++)
 	{
-		if (dsl_code_define (codes + i) == NULL)
+		if (dsl_code_define (DSL_QUALIFIER, codes + i) == NULL)
 		{
 			fprintf(stderr, "MEMORY EXHAUSTED\n");
 			exit (1);
@@ -188,7 +188,7 @@ static EsObject *eval (EsObject *object, tagEntry *entry)
 		return es_nil;
 	else if (es_symbol_p (object))
 	{
-		code = dsl_code_lookup (object);
+		code = dsl_code_lookup (DSL_QUALIFIER, object);
 
 		if (code)
 		{
@@ -215,7 +215,7 @@ static EsObject *eval (EsObject *object, tagEntry *entry)
 		EsObject *cdr = es_cdr (object);
 		int l;
 
-		code = dsl_code_lookup (car);
+		code = dsl_code_lookup (DSL_QUALIFIER, car);
 
 		if (!code)
 			dsl_throw (UNBOUND_VARIABLE, car);
