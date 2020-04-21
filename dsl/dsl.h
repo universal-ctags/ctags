@@ -53,6 +53,8 @@ struct sDSLProcBind {
 	const char* helpstr;
 };
 
+typedef struct sDSLCode DSLCode;
+
 #define DSL_ERR_UNBOUND_VARIABLE    (es_error_intern("unbound-variable"))
 #define DSL_ERR_TOO_FEW_ARGUMENTS   (es_error_intern("too-few-arguments"))
 #define DSL_ERR_TOO_MANY_ARGUMENTS  (es_error_intern("too-many-arguments"))
@@ -76,8 +78,9 @@ EsObject      *dsl_define      (DSLEngineType engine, DSLProcBind *pbind);
 DSLProcBind   *dsl_lookup      (DSLEngineType engine, EsObject *name);
 void           dsl_help        (DSLEngineType engine, FILE *fp);
 void           dsl_cache_reset (DSLProcBind  *pbind);
-EsObject      *dsl_eval        (EsObject *object, DSLEnv *env);
-
+DSLCode       *dsl_compile     (DSLEngineType engine, EsObject *expr);
+EsObject      *dsl_eval        (DSLCode *code, DSLEnv *env);
+void           dsl_release     (DSLEngineType engine, DSLCode *code);
 
 EsObject* dsl_entry_name (const tagEntry *entry);
 EsObject* dsl_entry_input (const tagEntry *entry);

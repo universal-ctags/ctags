@@ -16,6 +16,14 @@
 #include <ctype.h>
 
 /*
+ * TYPES
+ */
+struct sDSLCode
+{
+	EsObject *expr;
+};
+
+/*
  * MACROS
  */
 
@@ -31,6 +39,9 @@ static EsObject* value_##N (EsObject *args, DSLEnv *env)	\
 /*
  * FUNCTION DECLARATIONS
  */
+
+static EsObject *dsl_eval0 (EsObject *object, DSLEnv *env);
+
 static EsObject* builtin_null  (EsObject *args, DSLEnv *env);
 static EsObject* sform_begin (EsObject *args, DSLEnv *env);
 static EsObject* sform_begin0 (EsObject *args, DSLEnv *env);
@@ -247,12 +258,12 @@ static EsObject *eval0 (EsObject *object, DSLEnv *env)
 		return es_nil;
 	else
 		return es_object_autounref (
-			es_cons(dsl_eval (es_car (object), env),
+			es_cons(dsl_eval0 (es_car (object), env),
 				eval0 (es_cdr (object), env))
 			);
 }
 
-EsObject *dsl_eval (EsObject *object, DSLEnv *env)
+static EsObject *dsl_eval0 (EsObject *object, DSLEnv *env)
 {
 	EsObject *r;
 	DSLProcBind *pb;
@@ -323,6 +334,27 @@ EsObject *dsl_eval (EsObject *object, DSLEnv *env)
 	}
 }
 
+EsObject *dsl_eval (DSLCode *code, DSLEnv *env)
+{
+	return dsl_eval0 (code->expr, env);
+}
+
+DSLCode *dsl_compile (DSLEngineType engine, EsObject *expr)
+{
+	DSLCode *code = malloc (sizeof (DSLCode));
+	if (code == NULL)
+		return NULL;
+
+	code->expr = es_object_ref (expr);
+	return code;
+}
+
+void dsl_release (DSLEngineType engine, DSLCode *code)
+{
+	es_object_unref (code->expr);
+	free (code);
+}
+
 /*
  * Built-ins
  */
@@ -341,7 +373,7 @@ static EsObject* sform_begin  (EsObject *args, DSLEnv *env)
 	while (! es_null (args))
 	{
 		o = es_car (args);
-		o = dsl_eval (o, env);
+		o = dsl_eval0 (o, env);
 		if (es_error_p (o))
 			return o;
 		args = es_cdr (args);
@@ -359,7 +391,7 @@ static EsObject* sform_begin0  (EsObject *args, DSLEnv *env)
 	while (! es_null (args))
 	{
 		o = es_car (args);
-		o = dsl_eval (o, env);
+		o = dsl_eval0 (o, env);
 		if (!count++)
 			o0 = o;
 
@@ -377,7 +409,7 @@ static EsObject* sfrom_and  (EsObject *args, DSLEnv *env)
 	while (! es_null (args))
 	{
 		o = es_car (args);
-		o = dsl_eval (o, env);
+		o = dsl_eval0 (o, env);
 		if (es_object_equal (o, es_false))
 			return es_false;
 		else if (es_error_p (o))
@@ -395,7 +427,7 @@ static EsObject* sform_or  (EsObject *args, DSLEnv *env)
 	while (! es_null (args))
 	{
 		o = es_car (args);
-		o = dsl_eval (o, env);
+		o = dsl_eval0 (o, env);
 		if (! es_object_equal (o, es_false))
 			return o;
 		else if (es_error_p (o))
@@ -411,13 +443,13 @@ static EsObject* sform_if (EsObject *args, DSLEnv *env)
 	EsObject *o;
 
 	o = es_car (args);
-	o = dsl_eval (o, env);
+	o = dsl_eval0 (o, env);
 	if (es_object_equal (o, es_false))
-		return dsl_eval (es_car (es_cdr (args)), env);
+		return dsl_eval0 (es_car (es_cdr (args)), env);
 	else if (es_error_p (o))
 		return o;
 	else
-		return dsl_eval (es_car (es_cdr (es_cdr (args))), env);
+		return dsl_eval0 (es_car (es_cdr (es_cdr (args))), env);
 
 	return es_false;
 }

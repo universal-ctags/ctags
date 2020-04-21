@@ -20,7 +20,7 @@
  */
 struct sQCode
 {
-	EsObject *es;
+	DSLCode *dsl;
 };
 
 
@@ -87,7 +87,7 @@ QCode  *q_compile (EsObject *exp)
 		exit (1);
 	}
 
-	code->es = es_object_ref (exp);
+	code->dsl = dsl_compile (DSL_QUALIFIER, exp);
 	return code;
 }
 
@@ -101,7 +101,7 @@ enum QRESULT q_is_acceptable  (QCode *code, tagEntry *entry)
 		.entry  = entry,
 	};
 	es_autounref_pool_push ();
-	r = dsl_eval (code->es, &env);
+	r = dsl_eval (code->dsl, &env);
 	if (es_object_equal (r, es_false))
 		i = Q_REJECT;
 	else if (es_error_p (r))
@@ -127,7 +127,7 @@ enum QRESULT q_is_acceptable  (QCode *code, tagEntry *entry)
 
 void q_destroy (QCode *code)
 {
-	es_object_unref (code->es);
+	dsl_release (DSL_QUALIFIER, code->dsl);
 	free (code);
 }
 
