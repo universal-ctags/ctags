@@ -33,7 +33,7 @@
 /*
  * Decls
  */
-static DSLCode codes [] = {
+static DSLProcBind pbinds [] = {
 };
 
 static void initialize (void)
@@ -50,9 +50,9 @@ static void initialize (void)
 	}
 
 	int i;
-	for (i = 0; i < sizeof(codes)/sizeof(codes [0]); i++)
+	for (i = 0; i < sizeof(pbinds)/sizeof(pbinds [0]); i++)
 	{
-		if (dsl_code_define (DSL_QUALIFIER, codes + i) == NULL)
+		if (dsl_define (DSL_QUALIFIER, pbinds + i) == NULL)
 		{
 			fprintf(stderr, "MEMORY EXHAUSTED\n");
 			exit (1);
@@ -64,13 +64,13 @@ static void initialize (void)
 static void reset (void)
 {
 	int i;
-	DSLCode *code;
+	DSLProcBind *pb;
 
-	dsl_code_reset (NULL);
-	for (i = 0; i < sizeof(codes)/sizeof(codes [0]); i++)
+	dsl_cache_reset (NULL);
+	for (i = 0; i < sizeof(pbinds)/sizeof(pbinds [0]); i++)
 	{
-		code = codes + i;
-		dsl_code_reset (code);
+		pb = pbinds + i;
+		dsl_cache_reset (pb);
 	}
 }
 

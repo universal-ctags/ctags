@@ -43,8 +43,8 @@ enum eDSLPAttr {
 };
 typedef enum eDSLPAttr DSLPAttr;
 
-typedef struct sDSLCode DSLCode;
-struct sDSLCode {
+typedef struct sDSLProcBind DSLProcBind;
+struct sDSLProcBind {
 	const char *name;
 	DSLProc proc;
 	EsObject* cache;
@@ -71,13 +71,12 @@ struct sDSLCode {
  */
 
 /* Return 1 if no error. */
-int       dsl_init        (void);
-
-EsObject *dsl_code_define (DSLEngineType engine, DSLCode *code);
-DSLCode  *dsl_code_lookup (DSLEngineType engine, EsObject *name);
-void      dsl_help        (DSLEngineType engine, FILE *fp);
-void      dsl_code_reset  (DSLCode  *code);
-EsObject *dsl_eval        (EsObject *object, DSLEnv *env);
+int            dsl_init        (void);
+EsObject      *dsl_define      (DSLEngineType engine, DSLProcBind *pbind);
+DSLProcBind   *dsl_lookup      (DSLEngineType engine, EsObject *name);
+void           dsl_help        (DSLEngineType engine, FILE *fp);
+void           dsl_cache_reset (DSLProcBind  *pbind);
+EsObject      *dsl_eval        (EsObject *object, DSLEnv *env);
 
 
 EsObject* dsl_entry_name (const tagEntry *entry);
