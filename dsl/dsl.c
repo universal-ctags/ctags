@@ -23,6 +23,13 @@ struct sDSLCode
 	EsObject *expr;
 };
 
+struct sDSLEngine
+{
+	DSLProcBind *pbinds;
+	int pbinds_count;
+};
+typedef struct sDSLEngine DSLEngine;
+
 /*
  * MACROS
  */
@@ -83,7 +90,7 @@ DECLARE_VALUE_FN(end);
 /*
  * DATA DEFINITIONS
  */
-static EsObject **engine_procs;
+static DSLEngine engines [DSL_ENGINE_COUNT];
 
 static DSLProcBind pbinds [] = {
 	{ "null?",   builtin_null,   NULL, DSL_PATTR_CHECK_ARITY, 1 },
@@ -157,19 +164,6 @@ static EsObject * dsl_define (DSLEngineType engine, DSLProcBind *pbind)
 
 	pbs [engine] = pbind;
 
-	if (engine_procs == NULL)
-	{
-		engine_procs = calloc (DSL_ENGINE_COUNT, sizeof (engine_procs[0]));
-		if (!engine_procs)
-			return es_nil;
-		for (int i = 0; i < DSL_ENGINE_COUNT; i++)
-			engine_procs [i] = es_nil;
-	}
-	es_autounref_pool_push ();
-	engine_procs [engine] = es_cons (es_object_autounref (name),
-									 es_object_autounref (engine_procs [engine]));
-	es_autounref_pool_pop ();
-
 	return name;
 }
 
@@ -184,6 +178,9 @@ int dsl_init (DSLEngineType engine, DSLProcBind *engine_pbinds, int count)
 			if (dsl_define (DSL_COMMON, pbinds + i) == NULL)
 				return 0;
 		}
+		engines [DSL_COMMON].pbinds = pbinds;
+		engines [DSL_COMMON].pbinds_count = sizeof(pbinds)/sizeof(pbinds [0]);
+
 		initialized = 1;
 	}
 
@@ -192,6 +189,9 @@ int dsl_init (DSLEngineType engine, DSLProcBind *engine_pbinds, int count)
 		if (dsl_define (engine, engine_pbinds + i) == NULL)
 			return 0;
 	}
+
+	engines [engine].pbinds = engine_pbinds;
+	engines [engine].pbinds_count = count;
 
 	return 1;
 }
@@ -206,22 +206,13 @@ DSLProcBind *dsl_lookup (DSLEngineType engine, EsObject *name)
 
 static void dsl_help0 (DSLEngineType engine, FILE *fp)
 {
-	EsObject *procs = engine_procs [engine];
-	EsObject *rprocs = es_reverse (procs);
-	EsObject *name, *cdr = rprocs;
+	DSLEngine *e = engines + engine;
 
-	while (!es_null (cdr))
+	for (int i = 0; i < e->pbinds_count; i++)
 	{
-		name = es_car (cdr);
-		cdr = es_cdr (cdr);
-		DSLProcBind *pb = dsl_lookup (engine, name);
-		assert (pb);
-
-		const char* hs = pb->helpstr;
-		fprintf(fp, "%15s: %s\n", pb->name, hs? hs: "");
+		const char* hs = e->pbinds [i].helpstr;
+		fprintf(fp, "%15s: %s\n", e->pbinds [i].name, hs? hs: "");
 	}
-
-	es_object_unref (rprocs);
 }
 
 void dsl_help (DSLEngineType engine, FILE *fp)
@@ -236,15 +227,14 @@ static void dsl_cache_reset0 (DSLProcBind  *pb)
 		pb->cache = NULL;
 }
 
-void dsl_cache_reset (DSLProcBind  *pb)
+void dsl_cache_reset (DSLEngineType engine)
 {
-	if (pb == NULL)
-	{
-		for (int i = 0; i < sizeof(pbinds)/sizeof(pbinds [0]); i++)
-			dsl_cache_reset0 (pbinds + i);
-	}
-	else
-		dsl_cache_reset (pb);
+	for (int i = 0; i < sizeof(pbinds)/sizeof(pbinds [0]); i++)
+		dsl_cache_reset0 (pbinds + i);
+
+	DSLEngine *e = engines + engine;
+	for (int i = 0; i < e->pbinds_count; i++)
+		dsl_cache_reset0( e->pbinds + i);
 }
 
 static int length (EsObject *object)

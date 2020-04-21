@@ -76,7 +76,7 @@ typedef struct sDSLCode DSLCode;
 int            dsl_init        (DSLEngineType engine, DSLProcBind *engine_pbinds, int count);
 DSLProcBind   *dsl_lookup      (DSLEngineType engine, EsObject *name);
 void           dsl_help        (DSLEngineType engine, FILE *fp);
-void           dsl_cache_reset (DSLProcBind  *pbind);
+void           dsl_cache_reset (DSLEngineType engine);
 DSLCode       *dsl_compile     (DSLEngineType engine, EsObject *expr);
 EsObject      *dsl_eval        (DSLCode *code, DSLEnv *env);
 void           dsl_release     (DSLEngineType engine, DSLCode *code);

@@ -51,19 +51,6 @@ static int initialize (void)
 	return 1;
 }
 
-static void reset (void)
-{
-	int i;
-	DSLProcBind *pb;
-
-	dsl_cache_reset (NULL);
-	for (i = 0; i < sizeof(pbinds)/sizeof(pbinds [0]); i++)
-	{
-		pb = pbinds + i;
-		dsl_cache_reset (pb);
-	}
-}
-
 QCode  *q_compile (EsObject *exp)
 {
 	QCode *code;
@@ -111,7 +98,7 @@ enum QRESULT q_is_acceptable  (QCode *code, tagEntry *entry)
 		i = Q_ACCEPT;
 	es_autounref_pool_pop ();
 
-	reset ();
+	dsl_cache_reset (DSL_QUALIFIER);
 
 	return i;
 }
