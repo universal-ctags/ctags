@@ -90,7 +90,7 @@ struct sCode {
 	{ "begin",   builtin_begin,  NULL, SELF_EVAL,  0UL,
 	  .helpstr = "(begin exp0 ... expN) -> expN" },
 	{ "begin0",  builtin_begin0, NULL, SELF_EVAL,  0UL,
-	  .helpstr = "(begin exp0 ... expN) -> exp0" },
+	  .helpstr = "(begin0 exp0 ... expN) -> exp0" },
 	{ "and",     builtin_and,    NULL, SELF_EVAL },
 	{ "or",      builtin_or,     NULL, SELF_EVAL },
 	{ "not",     builtin_not,    NULL, CHECK_ARITY, 1},
