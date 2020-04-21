@@ -175,29 +175,30 @@ static void printFilterExpression (FILE *stream, int exitCode)
 	exit (exitCode);
 }
 
-static QCode *convertToQualifier(const char* exp)
+static void *compileExpression(const char* exp, void * (*compiler) (EsObject *),
+							   const char *compiler_name)
 {
 	EsObject *sexp = es_read_from_string (exp, NULL);
-	QCode *qcode;
+	void *code;
 
 	if (es_error_p (sexp))
 	{
 		fprintf (stderr,
-			 "Failed to read the expression of qualifier: %s\n", exp);
+				 "Failed to read the expression for %s: %s\n", compiler_name, exp);
 		fprintf (stderr,
-			 "Reason: %s\n", es_error_name (sexp));
+				 "Reason: %s\n", es_error_name (sexp));
 		exit (1);
 	}
 
-	qcode = q_compile (sexp);
-	if (qcode == NULL)
+	code = compiler (sexp);
+	if (code == NULL)
 	{
 		fprintf (stderr,
-			 "Failed to compile the expression of qualifier: %s\n", exp);
+				 "Failed to compile the expression of %s: %s\n", compiler_name, exp);
 		exit (1);
 	}
 	es_object_unref (sexp);
-	return qcode;
+	return code;
 }
 #endif
 extern int main (int argc, char **argv)
@@ -310,7 +311,9 @@ extern int main (int argc, char **argv)
 			else if (strcmp (optname, "filter") == 0)
 			{
 				if (i + 1 < argc)
-					Qualifier = convertToQualifier (argv[++i]);
+					Qualifier = compileExpression (argv[++i],
+												   (void * (*)(EsObject *))q_compile,
+												   optname);
 				else
 				{
 					fprintf (stderr, "%s: missing filter expression for --%s option",
@@ -381,7 +384,9 @@ extern int main (int argc, char **argv)
 					case 'Q':
 						if (i + 1 == argc)
 							printUsage(stderr, 1);
-						Qualifier = convertToQualifier (argv[++i]);
+						Qualifier = compileExpression (argv[++i],
+													   (void * (*)(EsObject *))q_compile,
+													   "filter");
 						break;
 #endif
 					default:
