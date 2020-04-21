@@ -86,12 +86,16 @@ struct sQCode
 
 QCode  *q_compile (EsObject *exp)
 {
-	static QCode code;
+	QCode *code;
 
 	initialize ();
 
-	code.es = es_object_ref (exp);
-	return &code;
+	code = malloc (sizeof (QCode));
+	if (code == NULL)
+		return NULL;
+
+	code->es = es_object_ref (exp);
+	return code;
 }
 
 enum QRESULT q_is_acceptable  (QCode *code, tagEntry *entry)
