@@ -4,38 +4,36 @@
 *
 *   This source code is released for free distribution under the terms of the
 *   GNU General Public License version 2 or (at your option) any later version.
-*
-*   This module contains functions for applying regular expression matching.
-*
-*   The code for utilizing the Gnu regex package with regards to processing the
-*   regex option and checking for regex matches was adapted from routines in
-*   Gnu etags.
 */
 
+/*
+ * INCLUDES
+ */
 #include "qualifier.h"
 #include "dsl.h"
 #include "es-lang-c-stdc99.h"
 
 #include <stdlib.h>
-#include <string.h>
-#include <limits.h>
 
 /*
- * Types
+ * TYPES
  */
+struct sQCode
+{
+	EsObject *es;
+};
 
 
 /*
- * Errors
- */
-
-
-/*
- * Decls
+ * DATA DEFINITIONS
  */
 static DSLProcBind pbinds [] = {
 };
 
+
+/*
+ * FUNCTION DEFINITIONS
+ */
 static void initialize (void)
 {
 	static int initialized;
@@ -73,16 +71,6 @@ static void reset (void)
 		dsl_cache_reset (pb);
 	}
 }
-
-
-/*
- * QCode
- */
-
-struct sQCode
-{
-	EsObject *es;
-};
 
 QCode  *q_compile (EsObject *exp)
 {
@@ -132,13 +120,13 @@ enum QRESULT q_is_acceptable  (QCode *code, tagEntry *entry)
 	return i;
 }
 
-void    q_destroy (QCode *code)
+void q_destroy (QCode *code)
 {
 	es_object_unref (code->es);
 	free (code);
 }
 
-void         q_help           (FILE *fp)
+void q_help (FILE *fp)
 {
 	initialize ();
 	dsl_help (DSL_QUALIFIER, fp);
