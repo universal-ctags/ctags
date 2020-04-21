@@ -34,17 +34,17 @@ static DSLProcBind pbinds [] = {
 /*
  * FUNCTION DEFINITIONS
  */
-static void initialize (void)
+static int initialize (void)
 {
 	static int initialized;
 
 	if (initialized)
-		return;
+		return 1;
 
 	if (!dsl_init ())
 	{
 		fprintf(stderr, "MEMORY EXHAUSTED\n");
-		exit (1);
+		return 0;
 	}
 
 	int i;
@@ -53,10 +53,11 @@ static void initialize (void)
 		if (dsl_define (DSL_QUALIFIER, pbinds + i) == NULL)
 		{
 			fprintf(stderr, "MEMORY EXHAUSTED\n");
-			exit (1);
+			return 0;
 		}
 	}
 	initialized = 1;
+	return 1;
 }
 
 static void reset (void)
@@ -76,11 +77,15 @@ QCode  *q_compile (EsObject *exp)
 {
 	QCode *code;
 
-	initialize ();
+	if (!initialize ())
+		exit (1);
 
 	code = malloc (sizeof (QCode));
 	if (code == NULL)
-		return NULL;
+	{
+		fprintf(stderr, "MEMORY EXHAUSTED\n");
+		exit (1);
+	}
 
 	code->es = es_object_ref (exp);
 	return code;
