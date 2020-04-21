@@ -73,8 +73,7 @@ typedef struct sDSLCode DSLCode;
  */
 
 /* Return 1 if no error. */
-int            dsl_init        (void);
-EsObject      *dsl_define      (DSLEngineType engine, DSLProcBind *pbind);
+int            dsl_init        (DSLEngineType engine, DSLProcBind *engine_pbinds, int count);
 DSLProcBind   *dsl_lookup      (DSLEngineType engine, EsObject *name);
 void           dsl_help        (DSLEngineType engine, FILE *fp);
 void           dsl_cache_reset (DSLProcBind  *pbind);

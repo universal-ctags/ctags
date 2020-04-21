@@ -41,6 +41,7 @@ static EsObject* value_##N (EsObject *args, DSLEnv *env)	\
  */
 
 static EsObject *dsl_eval0 (EsObject *object, DSLEnv *env);
+static EsObject *dsl_define (DSLEngineType engine, DSLProcBind *pbind);
 
 static EsObject* builtin_null  (EsObject *args, DSLEnv *env);
 static EsObject* sform_begin (EsObject *args, DSLEnv *env);
@@ -139,7 +140,7 @@ static DSLProcBind pbinds [] = {
 /*
  * FUNCTION DEFINITIONS
  */
-EsObject * dsl_define (DSLEngineType engine, DSLProcBind *pbind)
+static EsObject * dsl_define (DSLEngineType engine, DSLProcBind *pbind)
 {
 	EsObject *name = es_symbol_intern (pbind->name);
 	if (name == es_nil)
@@ -172,13 +173,26 @@ EsObject * dsl_define (DSLEngineType engine, DSLProcBind *pbind)
 	return name;
 }
 
-int dsl_init (void)
+int dsl_init (DSLEngineType engine, DSLProcBind *engine_pbinds, int count)
 {
-	for (int i = 0; i < sizeof(pbinds)/sizeof(pbinds [0]); i++)
+	static int initialized = 0;
+
+	if (!initialized)
 	{
-		if (dsl_define (DSL_COMMON, pbinds + i) == NULL)
+		for (int i = 0; i < sizeof(pbinds)/sizeof(pbinds [0]); i++)
+		{
+			if (dsl_define (DSL_COMMON, pbinds + i) == NULL)
+				return 0;
+		}
+		initialized = 1;
+	}
+
+	for (int i = 0; i < count; i++)
+	{
+		if (dsl_define (engine, engine_pbinds + i) == NULL)
 			return 0;
 	}
+
 	return 1;
 }
 

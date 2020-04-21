@@ -41,21 +41,12 @@ static int initialize (void)
 	if (initialized)
 		return 1;
 
-	if (!dsl_init ())
+	if (!dsl_init (DSL_QUALIFIER, pbinds, sizeof(pbinds)/sizeof(pbinds [0])))
 	{
 		fprintf(stderr, "MEMORY EXHAUSTED\n");
 		return 0;
 	}
 
-	int i;
-	for (i = 0; i < sizeof(pbinds)/sizeof(pbinds [0]); i++)
-	{
-		if (dsl_define (DSL_QUALIFIER, pbinds + i) == NULL)
-		{
-			fprintf(stderr, "MEMORY EXHAUSTED\n");
-			return 0;
-		}
-	}
 	initialized = 1;
 	return 1;
 }
@@ -133,6 +124,7 @@ void q_destroy (QCode *code)
 
 void q_help (FILE *fp)
 {
-	initialize ();
+	if (!initialize ())
+		exit (1);
 	dsl_help (DSL_QUALIFIER, fp);
 }
