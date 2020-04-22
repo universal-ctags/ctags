@@ -1636,7 +1636,7 @@ is given, or `#f`.
 Let's see examples.
 
 Examples of input
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+......................................................................
 Create the tags file (*foo.tags*) with following command line
 
 .. code-block:: console
@@ -1673,7 +1673,7 @@ for following input (*foo.py*)
 	    pass
 
 Examples of filter expressions
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+......................................................................
 * Print entries ending with "q"
 
   .. code-block:: console
