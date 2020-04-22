@@ -1525,37 +1525,52 @@ represented as `#f`, indicates rejection: readtags doesn't print it.
 	SYMBOL
 
 	LIST = ( SEXP... ) | ()
-	INTEGER = [0-9]+
-	BOOLEAN = #t | #f
-	STRING  = "..."
-	SYMBOL  = null?
-		    and
-		     or
-		    not
-		    eq?
-		      <
-		      >
-		     <=
-		     >=
-		prefix?
-		suffix?
-		substr?
-		 member
-		      $
-		  $name
-		 $input
-		$access
-		  $file
-	      $language
-	$implementation
-		  $line
-		  $kind
-		  $role
-	       $pattern
-	      $inherits
-	    $scope-kind
-	    $scope-name
-		   $end
+	INTEGER  = [0-9]+
+	BOOLEAN  = #t | #f
+	STRING   = "..."
+	SYMBOL   = OPERATOR | FIELDVAR
+	OPERATOR =
+          null?
+             if
+            and
+             or
+            not
+            eq?
+              <
+              >
+             <=
+             >=
+        prefix?
+        suffix?
+        substr?
+         member
+         upcase
+       downcase
+              +
+              -
+          print
+          begin
+         begin0
+              $
+
+          print
+          begin
+         begin0
+    FIELDVAR =
+          $name
+         $input
+        $access
+          $file
+      $language
+    $implementation
+          $line
+          $kind
+          $role
+       $pattern
+      $inherits
+    $scope-kind
+    $scope-name
+           $end
 
 All symbols starting with `$` represent a field of a tag entry which
 is being tested against the S expression. Most will evaluate as a
