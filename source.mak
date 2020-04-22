@@ -340,6 +340,7 @@ READTAGS_DSL_HEADS = \
 	dsl/es-lang-c-stdc99.h \
 	dsl/dsl.h \
 	dsl/qualifier.h \
+	dsl/sorter.h \
 	\
 	$(MIO_HEADS) \
 	\
@@ -349,6 +350,7 @@ READTAGS_DSL_SRCS = \
 	dsl/es-lang-c-stdc99.c \
 	dsl/dsl.c \
 	dsl/qualifier.c \
+	dsl/sorter.c \
 	\
 	$(MIO_SRCS) \
 	\

@@ -71,6 +71,9 @@ static EsObject* builtin_upcase (EsObject *args, DSLEnv *env);
 static EsObject* bulitin_debug_print (EsObject *args, DSLEnv *env);
 static EsObject* builtin_entry_ref (EsObject *args, DSLEnv *env);
 
+static EsObject* builtin_add  (EsObject *args, DSLEnv *env);
+static EsObject* builtin_sub  (EsObject *args, DSLEnv *env);
+
 DECLARE_VALUE_FN(name);
 DECLARE_VALUE_FN(input);
 DECLARE_VALUE_FN(access);
@@ -141,6 +144,10 @@ static DSLProcBind pbinds [] = {
 	{ "$scope-kind",     value_scope_kind,     NULL, DSL_PATTR_MEMORABLE, 0UL },
 	{ "$scope-name",     value_scope_name,     NULL, DSL_PATTR_MEMORABLE, 0UL },
 	{ "$end",            value_end,            NULL, DSL_PATTR_MEMORABLE, 0UL },
+	{ "+",               builtin_add,          NULL, DSL_PATTR_CHECK_ARITY, 2,
+	  .helpstr = "(+ <integer> <integer>)", },
+	{ "-",               builtin_sub,          NULL, DSL_PATTR_CHECK_ARITY, 2,
+	  .helpstr = "(- <integer> <integer>)", },
 };
 
 
@@ -316,7 +323,8 @@ static EsObject *dsl_eval0 (EsObject *object, DSLEnv *env)
 			l = length (cdr);
 			if (l < pb->arity)
 				dsl_throw (TOO_FEW_ARGUMENTS, car);
-			else if (l > pb->arity)
+			else if (l > pb->arity &&
+					 !(pb->flags & DSL_PATTR_CHECK_ARITY_OPT))
 				dsl_throw (TOO_MANY_ARGUMENTS, car);
 		}
 
@@ -341,6 +349,11 @@ static EsObject *dsl_eval0 (EsObject *object, DSLEnv *env)
 EsObject *dsl_eval (DSLCode *code, DSLEnv *env)
 {
 	return dsl_eval0 (code->expr, env);
+}
+
+EsObject *dsl_compile_and_eval (EsObject *expr, DSLEnv *env)
+{
+	return dsl_eval0 (expr, env);
 }
 
 DSLCode *dsl_compile (DSLEngineType engine, EsObject *expr)
@@ -708,7 +721,7 @@ static const char*entry_xget (const tagEntry *entry, const char* name)
 
 }
 
-static EsObject* entry_xget_string (const tagEntry *entry, const char* name)
+EsObject* dsl_entry_xget_string (const tagEntry *entry, const char* name)
 {
 	const char* value = entry_xget (entry, name);
 	if (value)
@@ -770,7 +783,7 @@ static EsObject* builtin_entry_ref (EsObject *args, DSLEnv *env)
 	else if (! es_string_p (key))
 		dsl_throw (WRONG_TYPE_ARGUMENT, es_symbol_intern ("$"));
 	else
-		return entry_xget_string (env->entry, es_string_get (key));
+		return dsl_entry_xget_string (env->entry, es_string_get (key));
 }
 
 EsObject* dsl_entry_name (const tagEntry *entry)
@@ -785,7 +798,7 @@ EsObject* dsl_entry_input (const tagEntry *entry)
 
 EsObject* dsl_entry_access (const tagEntry *entry)
 {
-	return entry_xget_string (entry, "access");
+	return dsl_entry_xget_string (entry, "access");
 }
 
 EsObject* dsl_entry_file (const tagEntry *entry)
@@ -795,12 +808,12 @@ EsObject* dsl_entry_file (const tagEntry *entry)
 
 EsObject* dsl_entry_language (const tagEntry *entry)
 {
-	return entry_xget_string (entry, "language");
+	return dsl_entry_xget_string (entry, "language");
 }
 
 EsObject* dsl_entry_implementation (const tagEntry *entry)
 {
-	return entry_xget_string (entry, "implementation");
+	return dsl_entry_xget_string (entry, "implementation");
 }
 
 EsObject* dsl_entry_line (const tagEntry *entry)
@@ -899,4 +912,40 @@ EsObject* dsl_entry_scope_name (const tagEntry *entry)
 	r = es_object_autounref (es_string_new (kind + 1));
 
 	return r;
+}
+
+static EsObject* builtin_add  (EsObject *args, DSLEnv *env)
+{
+	EsObject *a = es_car (args);
+	if (!es_integer_p (a))
+		dsl_throw (INTEGER_REQUIRED,
+				   es_symbol_intern ("+"));
+
+	EsObject *b = es_car (es_cdr (args));
+	if (!es_integer_p (b))
+		dsl_throw (INTEGER_REQUIRED,
+				   es_symbol_intern ("+"));
+
+	int ai = es_integer_get (a);
+	int bi = es_integer_get (b);
+
+	return es_object_autounref (es_integer_new (ai + bi));
+}
+
+static EsObject* builtin_sub  (EsObject *args, DSLEnv *env)
+{
+	EsObject *a = es_car (args);
+	if (!es_integer_p (a))
+		dsl_throw (INTEGER_REQUIRED,
+				   es_symbol_intern ("-"));
+
+	EsObject *b = es_car (es_cdr (args));
+	if (!es_integer_p (b))
+		dsl_throw (INTEGER_REQUIRED,
+				   es_symbol_intern ("-"));
+
+	int ai = es_integer_get (a);
+	int bi = es_integer_get (b);
+
+	return es_object_autounref (es_integer_new (ai - bi));
 }

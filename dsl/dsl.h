@@ -22,6 +22,7 @@
 enum eDSLEngineType {
 	DSL_COMMON,
 	DSL_QUALIFIER,
+	DSL_SORTER,
 	DSL_ENGINE_COUNT
 };
 typedef enum eDSLEngineType DSLEngineType;
@@ -29,6 +30,7 @@ typedef enum eDSLEngineType DSLEngineType;
 struct sDSLEnv {
 	enum eDSLEngineType engine;
 	const tagEntry *entry;
+	const tagEntry *alt_entry;
 };
 typedef struct sDSLEnv DSLEnv;
 
@@ -40,6 +42,7 @@ enum eDSLPAttr {
 	DSL_PATTR_PURE        = 1UL << 1,
 	DSL_PATTR_SELF_EVAL   = 1UL << 2,
 	DSL_PATTR_CHECK_ARITY = 1UL << 3,
+	DSL_PATTR_CHECK_ARITY_OPT = 1UL << 4 | DSL_PATTR_CHECK_ARITY,
 };
 typedef enum eDSLPAttr DSLPAttr;
 
@@ -58,8 +61,12 @@ typedef struct sDSLCode DSLCode;
 #define DSL_ERR_UNBOUND_VARIABLE    (es_error_intern("unbound-variable"))
 #define DSL_ERR_TOO_FEW_ARGUMENTS   (es_error_intern("too-few-arguments"))
 #define DSL_ERR_TOO_MANY_ARGUMENTS  (es_error_intern("too-many-arguments"))
+#define DSL_ERR_STRING_REQUIRED     (es_error_intern("string-required"))
+#define DSL_ERR_BOOLEAN_REQUIRED    (es_error_intern("boolean-required"))
+#define DSL_ERR_INTEGER_REQUIRED    (es_error_intern("integer-required"))
 #define DSL_ERR_NUMBER_REQUIRED     (es_error_intern("number-required"))
 #define DSL_ERR_WRONG_TYPE_ARGUMENT (es_error_intern("wrong-type-argument"))
+#define DSL_ERR_NO_ALT_ENTRY        (es_error_intern("the-alternative-entry-unavailable"))
 
 
 /*
@@ -80,6 +87,12 @@ void           dsl_cache_reset (DSLEngineType engine);
 DSLCode       *dsl_compile     (DSLEngineType engine, EsObject *expr);
 EsObject      *dsl_eval        (DSLCode *code, DSLEnv *env);
 void           dsl_release     (DSLEngineType engine, DSLCode *code);
+
+/* This should be remove when we have a real compiler. */
+EsObject *dsl_compile_and_eval (EsObject *expr, DSLEnv *env);
+
+
+EsObject* dsl_entry_xget_string (const tagEntry *entry, const char* name);
 
 EsObject* dsl_entry_name (const tagEntry *entry);
 EsObject* dsl_entry_input (const tagEntry *entry);
