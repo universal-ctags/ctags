@@ -1717,6 +1717,163 @@ Examples of filter expressions
 	Bar	foo.py	/^class Bar (Foo):$/;"	kind:class	language:Python	inherits:Foo	access:public
 	Baz	foo.py	/^class Baz (Foo): $/;"	kind:class	language:Python	inherits:Foo	access:public
 
+.. NOT REVIEWED YET
+
+Sorting in readtags command
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+readtags can sort the tag entries before printing.
+You can specify the way to sort with -S option. Like ``-Q`` option, ``-S``
+also takes an S expression.
+
+If ``-S`` is given, readtags gathers found tag entries to an array before
+printing them, and sorts entries in the array as specified the S expression.
+
+The S expression is for comparing two tag entries (let's call ``A``
+and ``B``) in the array. The result of evaluating the S expression
+should be -1 when ``A < B``, 0 when ``A == B``, and 1 when ``A >
+B``. What the expression does is similar to strcmp(3) C standard
+library function. For sorting, readtags chooses two from the array,
+and evaluates the S expression with ``A`` and ``B`` repeatedly.
+
+``A`` and ``B`` are not appeared in the S expression explicitly.
+Instead, symbols started from ``$`` or ``&`` can be used to access the
+fields of ``A`` and ``B``.
+
+A symbol ``$field`` is for accessing fields named "field" of
+``A``. Available symbols are the same as ``-Q`` option: e.g. ``$kind``
+and ``"$name"``.
+
+A symbol ``&field`` is for that of ``B``: e.g. ``&kind`` and ``&name``.
+
+Generic field accessor ``$`` in ``-Q`` option also can be used in
+expressions specified with ``-S``. In addition ``&`` is available in ``-S``
+option. ``($ "name")`` is for accessing "name" field of ``A``.
+``(& "name")`` is for that of ``B``.
+
+Operators for comparison
+......................................................................
+All the operators and the fieldvars available in -Q expression can be used in
+-S option. In addition, following 3 operators specialized to comparisons
+can be used.
+
+::
+
+             <>
+             *-
+           <or>
+
+
+``(<> A B) -> -1|0|1``
+
+	compares two numbers, two strings or two booleans.
+	For strings, ``<>`` calls strcmp internally.
+
+``(*- A) -> -A``
+
+	flips the result (-1, 0, or 1)of comparison. This is useful to reverse
+	the result of comparisons
+
+``(<or> COMPARISON ...)``
+
+	evaluates the sequence of COMPARISON from left to right till one of
+	COMPARISON returns -1 or 1. That means if a COMPARISON cannot decide
+	the order of two tag entries and returns 0, readtags evaluates the next
+	COMPARISON.
+
+Let's see examples.
+
+The target tags file
+......................................................................
+
+target.tags:
+```
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/;"	extras:pseudo
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/;"	extras:pseudo
+!_TAG_OUTPUT_FILESEP	slash	/slash or backslash/;"	extras:pseudo
+!_TAG_OUTPUT_MODE	u-ctags	/u-ctags or e-ctags/;"	extras:pseudo
+!_TAG_PATTERN_LENGTH_LIMIT	96	/0 for no limit/;"	extras:pseudo
+!_TAG_PROGRAM_AUTHOR	Universal Ctags Team	//;"	extras:pseudo
+!_TAG_PROGRAM_NAME	Universal Ctags	/Derived from Exuberant Ctags/;"	extras:pseudo
+!_TAG_PROGRAM_URL	https://ctags.io/	/official site/;"	extras:pseudo
+!_TAG_PROGRAM_VERSION	0.0.0	/77f9ac3f/;"	extras:pseudo
+INPUT_DATA_H	src/input.h	/^#define INPUT_DATA_H$/;"	kind:macro	line:2	end:2
+area	src/input-area.cpp	/^float area   (fpoint2d &p)$/;"	kind:function	line:8	typeref:typename:float	end:11
+area	src/input-area.cpp	/^float area   (ipoint2d &p)$/;"	kind:function	line:3	typeref:typename:float	end:6
+fpoint2d	src/input.h	/^struct fpoint2d {$/;"	kind:struct	line:12	end:14
+fpoint3d	src/input.h	/^struct fpoint3d {$/;"	kind:struct	line:16	end:19
+ipoint2d	src/input.h	/^struct ipoint2d {$/;"	kind:struct	line:4	end:6
+ipoint3d	src/input.h	/^struct ipoint3d {$/;"	kind:struct	line:8	end:10
+parent	src/input.h	/^  fpoint2d parent;$/;"	kind:member	line:17	scope:struct:fpoint3d	typeref:typename:fpoint2d	end:17
+volume	src/input-volume.cpp	/^float volume (fpoint3d *p)$/;"	kind:function	line:8	typeref:typename:float	end:11
+volume	src/input-volume.cpp	/^float volume (ipoint3d *p)$/;"	kind:function	line:3	typeref:typename:float	end:6
+x	src/input.h	/^  float x, y;$/;"	kind:member	line:13	scope:struct:fpoint2d	typeref:typename:float	end:13
+x	src/input.h	/^  int x, y, z;$/;"	kind:member	line:9	scope:struct:ipoint3d	typeref:typename:int	end:9
+x	src/input.h	/^  int x, y;$/;"	kind:member	line:5	scope:struct:ipoint2d	typeref:typename:int	end:5
+y	src/input.h	/^  float x, y;$/;"	kind:member	line:13	scope:struct:fpoint2d	typeref:typename:float	end:13
+y	src/input.h	/^  int x, y, z;$/;"	kind:member	line:9	scope:struct:ipoint3d	typeref:typename:int	end:9
+y	src/input.h	/^  int x, y;$/;"	kind:member	line:5	scope:struct:ipoint2d	typeref:typename:int	end:5
+z	src/input.h	/^  float z;$/;"	kind:member	line:18	scope:struct:fpoint3d	typeref:typename:float	end:18
+z	src/input.h	/^  int x, y, z;$/;"	kind:member	line:9	scope:struct:ipoint3d	typeref:typename:int	end:9
+```
+
+This tags file sorted by name. It is the default behavior of the tags generator, Universal-ctags.
+
+Examples of sorter expressions
+......................................................................
+* Sort by input file names then, sort the lines where name is defined, and finally sort by names.
+
+  .. code-block:: console
+
+	$ ./readtags -t target.tags -ne \
+	  -S 'o(<or> (<> $input &input) (<> $line &line) (<> $name &name))' \
+	  -l
+	area	src/input-area.cpp	/^float area   (ipoint2d &p)$/;"	kind:function	line:3	typeref:typename:float	end:6
+	area	src/input-area.cpp	/^float area   (fpoint2d &p)$/;"	kind:function	line:8	typeref:typename:float	end:11
+	volume	src/input-volume.cpp	/^float volume (ipoint3d *p)$/;"	kind:function	line:3	typeref:typename:float	end:6
+	volume	src/input-volume.cpp	/^float volume (fpoint3d *p)$/;"	kind:function	line:8	typeref:typename:float	end:11
+	INPUT_DATA_H	src/input.h	/^#define INPUT_DATA_H$/;"	kind:macro	line:2	end:2
+	ipoint2d	src/input.h	/^struct ipoint2d {$/;"	kind:struct	line:4	end:6
+	x	src/input.h	/^  int x, y;$/;"	kind:member	line:5	scope:struct:ipoint2d	typeref:typename:int	end:5
+	y	src/input.h	/^  int x, y;$/;"	kind:member	line:5	scope:struct:ipoint2d	typeref:typename:int	end:5
+	ipoint3d	src/input.h	/^struct ipoint3d {$/;"	kind:struct	line:8	end:10
+	x	src/input.h	/^  int x, y, z;$/;"	kind:member	line:9	scope:struct:ipoint3d	typeref:typename:int	end:9
+	y	src/input.h	/^  int x, y, z;$/;"	kind:member	line:9	scope:struct:ipoint3d	typeref:typename:int	end:9
+	z	src/input.h	/^  int x, y, z;$/;"	kind:member	line:9	scope:struct:ipoint3d	typeref:typename:int	end:9
+	fpoint2d	src/input.h	/^struct fpoint2d {$/;"	kind:struct	line:12	end:14
+	x	src/input.h	/^  float x, y;$/;"	kind:member	line:13	scope:struct:fpoint2d	typeref:typename:float	end:13
+	y	src/input.h	/^  float x, y;$/;"	kind:member	line:13	scope:struct:fpoint2d	typeref:typename:float	end:13
+	fpoint3d	src/input.h	/^struct fpoint3d {$/;"	kind:struct	line:16	end:19
+	parent	src/input.h	/^  fpoint2d parent;$/;"	kind:member	line:17	scope:struct:fpoint3d	typeref:typename:fpoint2d	end:17
+	z	src/input.h	/^  float z;$/;"	kind:member	line:18	scope:struct:fpoint3d	typeref:typename:float	end:18
+
+  C1. The input file names are compared with ``(<> $input &input)``.
+  C2. The lines are compared with ``(<> $line &line)``.
+  C3. The names are compared with ``(<> $name &name)``.
+
+  These 3 are list as arguments for ``<or>``.
+  So if C1 returns 0, that means the two entries are defined in the same file,
+  C2 is evaluated.  If C2 returns 0, that means the two entries are define on the
+  same line in the same file, C3 is evaluated.
+
+* Filter "struct" kinds entries and sort them by line counts of their definitions, larger one coming first:
+
+  .. code-block:: console
+
+    $ ./readtags -t target.tags -ne \
+	  -Q '(eq? $kind "struct")' \
+	  -S '(*- (<> (- (or $end $line) $line) (- (or &end &line) &line)))' \
+	  -l
+	fpoint3d	src/input.h	/^struct fpoint3d {$/;"	kind:struct	line:16	end:19
+	fpoint2d	src/input.h	/^struct fpoint2d {$/;"	kind:struct	line:12	end:14
+	ipoint2d	src/input.h	/^struct ipoint2d {$/;"	kind:struct	line:4	end:6
+	ipoint3d	src/input.h	/^struct ipoint3d {$/;"	kind:struct	line:8	end:10
+
+   ``(or $end $line)`` and ``(or &end &line)`` are for suppressing errors reported
+   when comparing tag entries having no ``end`` field.
+
+   Flipping by ``*-`` needed to realize "larger one coming first" .
+
+
 Listing pseudo tags with ``-D``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 You can list all pseudo tags in a tags file with ``-D`` option.
