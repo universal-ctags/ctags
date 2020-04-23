@@ -1092,18 +1092,18 @@ static bool cxxParserParseClassStructOrUnionInternal(
 
 	if(cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeAssignment))
 	{
-		if(g_cxx.pTokenChain->iCount > 3)
-		{
-			// struct X Y = ...;
-			cxxParserExtractVariableDeclarations(g_cxx.pTokenChain,0);
-		}
+		// struct X Y = ...;
+		bool bCanExtractVariables = g_cxx.pTokenChain->iCount > 3;
 
 		// Skip the initialization (which almost certainly contains a block)
-		if(!cxxParserParseUpToOneOf(CXXTokenTypeEOF | CXXTokenTypeSemicolon, true))
+		if(!cxxParserParseUpToOneOf(CXXTokenTypeEOF | CXXTokenTypeSemicolon, false))
 		{
 			CXX_DEBUG_LEAVE_TEXT("Failed to parse up to EOF/semicolon");
 			return false;
 		}
+
+		if(bCanExtractVariables)
+			cxxParserExtractVariableDeclarations(g_cxx.pTokenChain,0);
 
 		cxxParserNewStatement();
 		CXX_DEBUG_LEAVE();
