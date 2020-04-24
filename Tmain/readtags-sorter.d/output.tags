@@ -1,0 +1,27 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/;"	extras:pseudo
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/;"	extras:pseudo
+!_TAG_OUTPUT_FILESEP	slash	/slash or backslash/;"	extras:pseudo
+!_TAG_OUTPUT_MODE	u-ctags	/u-ctags or e-ctags/;"	extras:pseudo
+!_TAG_PATTERN_LENGTH_LIMIT	96	/0 for no limit/;"	extras:pseudo
+!_TAG_PROGRAM_AUTHOR	Universal Ctags Team	//;"	extras:pseudo
+!_TAG_PROGRAM_NAME	Universal Ctags	/Derived from Exuberant Ctags/;"	extras:pseudo
+!_TAG_PROGRAM_URL	https://ctags.io/	/official site/;"	extras:pseudo
+!_TAG_PROGRAM_VERSION	0.0.0	/77f9ac3f/;"	extras:pseudo
+INPUT_DATA_H	src/input.h	/^#define INPUT_DATA_H$/;"	kind:macro	line:2	language:C++	roles:def	end:2
+area	src/input-area.cpp	/^float area   (fpoint2d &p)$/;"	kind:function	line:8	language:C++	typeref:typename:float	signature:(fpoint2d & p)	roles:def	end:11
+area	src/input-area.cpp	/^float area   (ipoint2d &p)$/;"	kind:function	line:3	language:C++	typeref:typename:float	signature:(ipoint2d & p)	roles:def	end:6
+fpoint2d	src/input.h	/^struct fpoint2d {$/;"	kind:struct	line:12	language:C++	roles:def	end:14
+fpoint3d	src/input.h	/^struct fpoint3d {$/;"	kind:struct	line:16	language:C++	roles:def	end:19
+ipoint2d	src/input.h	/^struct ipoint2d {$/;"	kind:struct	line:4	language:C++	roles:def	end:6
+ipoint3d	src/input.h	/^struct ipoint3d {$/;"	kind:struct	line:8	language:C++	roles:def	end:10
+parent	src/input.h	/^  fpoint2d parent;$/;"	kind:member	line:17	language:C++	scope:struct:fpoint3d	typeref:typename:fpoint2d	access:public	roles:def	end:17
+volume	src/input-volume.cpp	/^float volume (fpoint3d *p)$/;"	kind:function	line:8	language:C++	typeref:typename:float	signature:(fpoint3d * p)	roles:def	end:11
+volume	src/input-volume.cpp	/^float volume (ipoint3d *p)$/;"	kind:function	line:3	language:C++	typeref:typename:float	signature:(ipoint3d * p)	roles:def	end:6
+x	src/input.h	/^  float x, y;$/;"	kind:member	line:13	language:C++	scope:struct:fpoint2d	typeref:typename:float	access:public	roles:def	end:13
+x	src/input.h	/^  int x, y, z;$/;"	kind:member	line:9	language:C++	scope:struct:ipoint3d	typeref:typename:int	access:public	roles:def	end:9
+x	src/input.h	/^  int x, y;$/;"	kind:member	line:5	language:C++	scope:struct:ipoint2d	typeref:typename:int	access:public	roles:def	end:5
+y	src/input.h	/^  float x, y;$/;"	kind:member	line:13	language:C++	scope:struct:fpoint2d	typeref:typename:float	access:public	roles:def	end:13
+y	src/input.h	/^  int x, y, z;$/;"	kind:member	line:9	language:C++	scope:struct:ipoint3d	typeref:typename:int	access:public	roles:def	end:9
+y	src/input.h	/^  int x, y;$/;"	kind:member	line:5	language:C++	scope:struct:ipoint2d	typeref:typename:int	access:public	roles:def	end:5
+z	src/input.h	/^  float z;$/;"	kind:member	line:18	language:C++	scope:struct:fpoint3d	typeref:typename:float	access:public	roles:def	end:18
+z	src/input.h	/^  int x, y, z;$/;"	kind:member	line:9	language:C++	scope:struct:ipoint3d	typeref:typename:int	access:public	roles:def	end:9

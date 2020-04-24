@@ -23,6 +23,8 @@ static int escaping;
 #ifdef READTAGS_DSL
 #include "dsl/qualifier.h"
 static QCode *Qualifier;
+#include "dsl/sorter.h"
+static SCode *Sorter;
 #endif
 
 static void printTag (const tagEntry *entry)
@@ -45,13 +47,152 @@ static void printPseudoTag (const tagEntry *entry)
 	tagsPrintPseudoTag (entry, &opts, NULL, stdout);
 }
 
+#ifdef READTAGS_DSL
+static void freeCopiedTag (tagEntry *e)
+{
+	free ((void *)e->name);
+	free ((void *)e->file);
+	if (e->address.pattern)
+		free ((void *)e->address.pattern);
+	if (e->kind)
+		free ((void *)e->kind);
+	for (unsigned short c = 0; c < e->fields.count; c++)
+	{
+		free ((void *)e->fields.list[c].key);
+		free ((void *)e->fields.list[c].value);
+	}
+	if (e->fields.count)
+		free ((void *)e->fields.list);
+	free ((void *)e);
+}
+
+static tagEntry *copyTag (tagEntry *o)
+{
+	tagEntry *n;
+
+	n = calloc (1, sizeof  (*o));
+	if (!n)
+		perror (__FUNCTION__);
+
+	n->name = strdup (o->name);
+
+	if (!n->name)
+		perror (__FUNCTION__);
+
+	if (o->file)
+		n->file = strdup (o->file);
+	if (o->file && !n->file)
+		perror (__FUNCTION__);
+
+	if (o->address.pattern)
+	{
+		n->address.pattern = strdup (o->address.pattern);
+		if (!n->address.pattern)
+			perror (__FUNCTION__);
+	}
+
+	n->address.lineNumber = o->address.lineNumber;
+
+	if (o->kind)
+	{
+		n->kind = strdup (o->kind);
+		if (!n->kind)
+			perror (__FUNCTION__);
+	}
+
+	n->fileScope = o->fileScope;
+	n->fields.count = o->fields.count;
+
+	if (o->fields.count == 0)
+		return n;
+
+	n->fields.list = malloc (o->fields.count *sizeof (*o->fields.list));
+	if (!n->fields.list)
+		perror (__FUNCTION__);
+
+	for (unsigned short c = 0; c < o->fields.count; c++)
+	{
+		n->fields.list[c].key = strdup (o->fields.list[c].key);
+		if (!n->fields.list[c].key)
+			perror (__FUNCTION__);
+
+		n->fields.list[c].value = strdup (o->fields.list[c].value);
+		if (!n->fields.list[c].value)
+			perror (__FUNCTION__);
+	}
+
+	return n;
+}
+
+struct tagEntryHolder {
+	tagEntry *e;
+};
+struct tagEntryArray {
+	int count;
+	int length;
+	struct tagEntryHolder *a;
+};
+
+struct tagEntryArray *tagEntryArrayNew (void)
+{
+	struct tagEntryArray * a = malloc (sizeof (struct tagEntryArray));
+	if (!a)
+		perror(__FUNCTION__);
+
+	a->count = 0;
+	a->length = 1024;
+	a->a = malloc(a->length * sizeof (a->a[0]));
+	if (!a->a)
+		perror(__FUNCTION__);
+
+	return a;
+}
+
+void tagEntryArrayPush (struct tagEntryArray *a, tagEntry *e)
+{
+	if (a->count + 1 == a->length)
+	{
+		if (a->length * 2 < a->length)
+			perror("Too large array allocation");
+
+		struct tagEntryHolder *tmp = realloc (a->a, sizeof (a->a[0]) * (a->length * 2));
+		if (!tmp)
+			perror(__FUNCTION__);
+
+		a->a = tmp;
+		a->length *= 2;
+	}
+
+	a->a[a->count++].e = e;
+}
+
+void tagEntryArrayFree (struct tagEntryArray *a, int freeTags)
+{
+	if (freeTags)
+	{
+		for (int i = 0; i < a->count; i++)
+			freeCopiedTag (a->a[i].e);
+	}
+	free (a->a);
+	free (a);
+}
+
+static int compareTagEntry (const void *a, const void *b)
+{
+	return s_compare (((struct tagEntryHolder *)a)->e, ((struct tagEntryHolder *)b)->e, Sorter);
+}
+
 static void walkTags (tagFile *const file, tagEntry *first_entry,
 					  tagResult (* nextfn) (tagFile *const, tagEntry *),
 					  void (* actionfn) (const tagEntry *))
 {
+	struct tagEntryArray *a = NULL;
+
+	if (Sorter)
+		a = tagEntryArrayNew ();
+
 	do
 	{
-#ifdef READTAGS_DSL
 		if (Qualifier)
 		{
 			int i = q_is_acceptable (Qualifier, first_entry);
@@ -63,10 +204,35 @@ static void walkTags (tagFile *const file, tagEntry *first_entry,
 				exit (1);
 			}
 		}
-#endif
-		(* actionfn) (first_entry);
+
+		if (a)
+		{
+			tagEntry *e = copyTag (first_entry);
+			tagEntryArrayPush (a, e);
+		}
+		else
+			(* actionfn) (first_entry);
 	} while ( (*nextfn) (file, first_entry) == TagSuccess);
+
+
+	if (a)
+	{
+		qsort (a->a, a->count, sizeof (a->a[0]), compareTagEntry);
+		for (int i = 0; i < a->count; i++)
+			(* actionfn) (a->a[i].e);
+		tagEntryArrayFree (a, 1);
+	}
 }
+#else
+static void walkTags (tagFile *const file, tagEntry *first_entry,
+					  tagResult (* nextfn) (tagFile *const, tagEntry *),
+					  void (* actionfn) (const tagEntry *))
+{
+	do
+		(* actionfn) (first_entry);
+	while ( (*nextfn) (file, first_entry) == TagSuccess);
+}
+#endif
 
 static void findTag (const char *const name, const int options)
 {
@@ -125,7 +291,7 @@ static const char *const Usage =
 #ifdef READTAGS_DSL
 	"    %s -H POSTPROCESSOR | --help-expression POSTPROCESSOR\n"
 	"        Print available terms that can be used in POSTPROCESSOR expression.\n"
-	"        POSTPROCESSOR: filter\n"
+	"        POSTPROCESSOR: filter sorter\n"
 #endif
 	"    %s [OPTIONS] ACTION\n"
 	"        Do the specified action.\n"
@@ -158,6 +324,8 @@ static const char *const Usage =
 #ifdef READTAGS_DSL
 	"    -Q EXP | --filter EXP\n"
 	"        Filter the tags listed by ACTION with EXP before printing.\n"
+	"    -S EXP | --sorter EXP\n"
+	"        Sort the tags listed by ACTION with EXP before printing.\n"
 #endif
 	;
 
@@ -175,31 +343,40 @@ static void printFilterExpression (FILE *stream, int exitCode)
 	exit (exitCode);
 }
 
-static QCode *convertToQualifier(const char* exp)
+static void printSorterExpression (FILE *stream, int exitCode)
+{
+	fprintf (stream, "Sorter expression: \n");
+	s_help (stream);
+	exit (exitCode);
+}
+
+static void *compileExpression(const char* exp, void * (*compiler) (EsObject *),
+							   const char *compiler_name)
 {
 	EsObject *sexp = es_read_from_string (exp, NULL);
-	QCode *qcode;
+	void *code;
 
 	if (es_error_p (sexp))
 	{
 		fprintf (stderr,
-			 "Failed to read the expression of qualifier: %s\n", exp);
+				 "Failed to read the expression for %s: %s\n", compiler_name, exp);
 		fprintf (stderr,
-			 "Reason: %s\n", es_error_name (sexp));
+				 "Reason: %s\n", es_error_name (sexp));
 		exit (1);
 	}
 
-	qcode = q_compile (sexp);
-	if (qcode == NULL)
+	code = compiler (sexp);
+	if (code == NULL)
 	{
 		fprintf (stderr,
-			 "Failed to compile the expression of qualifier: %s\n", exp);
+				 "Failed to compile the expression of %s: %s\n", compiler_name, exp);
 		exit (1);
 	}
 	es_object_unref (sexp);
-	return qcode;
+	return code;
 }
 #endif
+
 extern int main (int argc, char **argv)
 {
 	int options = 0;
@@ -240,6 +417,8 @@ extern int main (int argc, char **argv)
 					const char *exp_klass = argv [++i];
 					if (strcmp (exp_klass, "filter") == 0)
 						printFilterExpression (stdout, 0);
+					if (strcmp (exp_klass, "sorter") == 0)
+						printSorterExpression (stdout, 0);
 					else
 					{
 						fprintf (stderr, "%s: unknown expression class for --%s option",
@@ -310,10 +489,25 @@ extern int main (int argc, char **argv)
 			else if (strcmp (optname, "filter") == 0)
 			{
 				if (i + 1 < argc)
-					Qualifier = convertToQualifier (argv[++i]);
+					Qualifier = compileExpression (argv[++i],
+												   (void * (*)(EsObject *))q_compile,
+												   optname);
 				else
 				{
 					fprintf (stderr, "%s: missing filter expression for --%s option",
+							 ProgramName, optname);
+					exit (1);
+				}
+			}
+			else if (strcmp (optname, "sorter") == 0)
+			{
+				if (i + 1 < argc)
+					Sorter = compileExpression (argv[++i],
+												(void * (*)(EsObject *))s_compile,
+												optname);
+				else
+				{
+					fprintf (stderr, "%s: missing sorter expression for --%s option",
 							 ProgramName, optname);
 					exit (1);
 				}
@@ -344,6 +538,8 @@ extern int main (int argc, char **argv)
 							const char *exp_klass = argv [++i];
 							if (strcmp (exp_klass, "filter") == 0)
 								printFilterExpression (stdout, 0);
+							else if (strcmp (exp_klass, "sorter") == 0)
+								printSorterExpression (stdout, 0);
 							else
 								printUsage(stderr, 1);
 						}
@@ -381,7 +577,16 @@ extern int main (int argc, char **argv)
 					case 'Q':
 						if (i + 1 == argc)
 							printUsage(stderr, 1);
-						Qualifier = convertToQualifier (argv[++i]);
+						Qualifier = compileExpression (argv[++i],
+													   (void * (*)(EsObject *))q_compile,
+													   "filter");
+						break;
+					case 'S':
+						if (i + 1 == argc)
+							printUsage(stderr, 1);
+						Sorter = compileExpression (argv[++i],
+													   (void * (*)(EsObject *))s_compile,
+													   "sorter");
 						break;
 #endif
 					default:

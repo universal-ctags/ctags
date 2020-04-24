@@ -1,0 +1,3 @@
+--fields=*
+-L .ctags.d/src.list
+-o output.tags

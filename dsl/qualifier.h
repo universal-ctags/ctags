@@ -4,12 +4,6 @@
 *
 *   This source code is released for free distribution under the terms of the
 *   GNU General Public License version 2 or (at your option) any later version.
-*
-*   This module contains functions for applying regular expression matching.
-*
-*   The code for utilizing the Gnu regex package with regards to processing the
-*   regex option and checking for regex matches was adapted from routines in
-*   Gnu etags.
 */
 
 #ifndef QUALIFIER_H
