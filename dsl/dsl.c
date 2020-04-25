@@ -74,6 +74,9 @@ static EsObject* builtin_entry_ref (EsObject *args, DSLEnv *env);
 static EsObject* builtin_add  (EsObject *args, DSLEnv *env);
 static EsObject* builtin_sub  (EsObject *args, DSLEnv *env);
 
+static EsObject* value_true (EsObject *args, DSLEnv *env);
+static EsObject* value_false (EsObject *args, DSLEnv *env);
+
 DECLARE_VALUE_FN(name);
 DECLARE_VALUE_FN(input);
 DECLARE_VALUE_FN(access);
@@ -124,6 +127,10 @@ static DSLProcBind pbinds [] = {
 	  .helpstr = "(upcate elt<string>|<list>) -> <string>|<list>" },
 	{ "print",   bulitin_debug_print, NULL, DSL_PATTR_CHECK_ARITY, 1,
 	  .helpstr = "(print OBJ) -> OBJ" },
+	{ "true",    value_true, NULL, 0, 0UL,
+	  .helpstr = "true -> #t" },
+	{ "false",    value_false, NULL, 0, 0UL,
+	  .helpstr = "true -> #f" },
 	{ "$",       builtin_entry_ref, NULL, DSL_PATTR_CHECK_ARITY, 1,
 	  .helpstr = "($ NAME) -> #f|<string>" },
 	{ "$name",           value_name,           NULL, DSL_PATTR_MEMORABLE, 0UL,},
@@ -948,4 +955,14 @@ static EsObject* builtin_sub  (EsObject *args, DSLEnv *env)
 	int bi = es_integer_get (b);
 
 	return es_object_autounref (es_integer_new (ai - bi));
+}
+
+static EsObject* value_true (EsObject *args, DSLEnv *env)
+{
+	return es_true;
+}
+
+static EsObject* value_false (EsObject *args, DSLEnv *env)
+{
+	return es_false;
 }
