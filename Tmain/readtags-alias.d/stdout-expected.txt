@@ -16,3 +16,14 @@ y	input.c	/^	int x, y ,z;$/
 z	input.c	/^	int x, y ,z;$/
 !_ -Q #f -l
 !_ -Q false -l
+!_ -Q (null? nil) -l
+point3d	input.c	/^struct point3d {$/
+x	input.c	/^	int x, y ,z;$/
+y	input.c	/^	int x, y ,z;$/
+z	input.c	/^	int x, y ,z;$/
+!_ -Q (null? ()) -l
+point3d	input.c	/^struct point3d {$/
+x	input.c	/^	int x, y ,z;$/
+y	input.c	/^	int x, y ,z;$/
+z	input.c	/^	int x, y ,z;$/
+!_ -Q (null? false) -l
