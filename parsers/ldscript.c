@@ -118,10 +118,13 @@ static void readToken (tokenInfo *const token, void *data CTAGS_ATTR_UNUSED);
 static void clearToken (tokenInfo *token);
 static void copyToken (tokenInfo *dest, tokenInfo *src, void *data CTAGS_ATTR_UNUSED);
 
-struct tokenExtra {
+typedef struct sLdScriptToken {
+	tokenInfo base;
 	int scopeIndex;
 	tokenKeyword assignment;
-};
+} ldScriptToken;
+
+#define LDSCRIPT(TOKEN) ((ldScriptToken *)TOKEN)
 
 static struct tokenTypePair ldScriptTypePairs [] = {
 	{ '{', '}' },
@@ -133,7 +136,7 @@ static struct tokenInfoClass ldScriptTokenInfoClass = {
 	.keywordNone      = KEYWORD_NONE,
 	.typeForKeyword   = TOKEN_KEYWORD,
 	.typeForEOF       = TOKEN_EOF,
-	.extraSpace       = sizeof (struct tokenExtra),
+	.extraSpace       = sizeof (ldScriptToken) - sizeof (tokenInfo),
 	.pairs            = ldScriptTypePairs,
 	.pairCount        = ARRAY_SIZE (ldScriptTypePairs),
 	.read             = readToken,
@@ -165,16 +168,16 @@ static tokenInfo *newLdScriptToken (void)
 
 static void clearToken (tokenInfo *token)
 {
-	TOKENX (token, struct tokenExtra)->scopeIndex = CORK_NIL;
-	TOKENX (token, struct tokenExtra)->assignment = KEYWORD_NONE;
+	LDSCRIPT(token)->scopeIndex = CORK_NIL;
+	LDSCRIPT(token)->assignment = KEYWORD_NONE;
 }
 
 static void copyToken (tokenInfo *dest, tokenInfo *src, void *data CTAGS_ATTR_UNUSED)
 {
-	TOKENX (dest, struct tokenExtra)->scopeIndex =
-		TOKENX (src, struct tokenExtra)->scopeIndex;
-	TOKENX (dest, struct tokenExtra)->assignment =
-		TOKENX (src, struct tokenExtra)->assignment;
+	LDSCRIPT (dest)->scopeIndex =
+		LDSCRIPT (src)->scopeIndex;
+	LDSCRIPT (dest)->assignment =
+		LDSCRIPT (src)->assignment;
 }
 
 static int makeLdScriptTagMaybe (tagEntryInfo *const e, tokenInfo *const token,
@@ -194,7 +197,7 @@ static int makeLdScriptTagMaybe (tagEntryInfo *const e, tokenInfo *const token,
 					 role);
 	e->lineNumber = token->lineNumber;
 	e->filePosition = token->filePosition;
-	e->extensionFields.scopeIndex = TOKENX (token, struct tokenExtra)->scopeIndex;
+	e->extensionFields.scopeIndex = LDSCRIPT (token)->scopeIndex;
 
 	/* TODO: implement file: field. */
 	if ((kind == K_SYMBOL)
@@ -202,7 +205,7 @@ static int makeLdScriptTagMaybe (tagEntryInfo *const e, tokenInfo *const token,
 	{
 		const char *assignment = NULL;
 
-		switch (TOKENX (token, struct tokenExtra)->assignment)
+		switch (LDSCRIPT (token)->assignment)
 		{
 		case KEYWORD_PROVIDE:
 			assignment = "provide";
@@ -490,11 +493,11 @@ static void parseProvide (tokenInfo * token)
 		tokenRead (token);
 		if (tokenIsType(token, IDENTIFIER))
 		{
-			TOKENX (token, struct tokenExtra)->assignment = p;
+			LDSCRIPT (token)->assignment = p;
 
 			makeLdScriptTagMaybe (&e, token,
 								  K_SYMBOL, ROLE_DEFINITION_INDEX);
-			TOKENX (token, struct tokenExtra)->assignment = KEYWORD_NONE;
+			LDSCRIPT (token)->assignment = KEYWORD_NONE;
 		}
 		tokenSkipToType (token, ')');
 	}
@@ -515,7 +518,7 @@ static void parseInputSections (tokenInfo *const token)
 		else if (tokenIsType (token, IDENTIFIER))
 			makeLdScriptTagMaybe (&e, token,
 								  K_INPUT_SECTION,
-								  TOKENX(token, struct tokenExtra)->scopeIndex == CORK_NIL
+								  LDSCRIPT(token)->scopeIndex == CORK_NIL
 								  ? LD_SCRIPT_INPUT_SECTION_DISCARDED
 								  : LD_SCRIPT_INPUT_SECTION_MAPPED);
 		else if (tokenIsKeyword (token, EXCLUDE_FILE))
@@ -537,11 +540,11 @@ static void parseInputSections (tokenInfo *const token)
 static void parseOutputSectionCommands (tokenInfo *const token, int terminator)
 {
 	tokenInfo *const tmp = newLdScriptToken ();
-	int scope_index = TOKENX (token, struct tokenExtra)->scopeIndex;
+	int scope_index = LDSCRIPT (token)->scopeIndex;
 
 	do {
 		tokenRead (token);
-		TOKENX (token, struct tokenExtra)->scopeIndex = scope_index;
+		LDSCRIPT (token)->scopeIndex = scope_index;
 
 		if (tokenIsKeyword (token, INPUT_SECTION_FLAGS))
 		{
@@ -635,7 +638,7 @@ static void parseSection (tokenInfo * name)
 
 			if (tokenSkipToType (token, '{'))
 			{
-				TOKENX (token, struct tokenExtra)->scopeIndex = scope_index;
+				LDSCRIPT (token)->scopeIndex = scope_index;
 				parseOutputSectionCommands (token, '}');
 			}
 		}
