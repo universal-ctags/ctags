@@ -40,3 +40,12 @@ ${V} ${READTAGS} -t output.tags -Q '#f' -l
 
 echo '!_ -Q false -l'
 ${V} ${READTAGS} -t output.tags -Q 'false' -l
+
+echo '!_ -Q (null? nil) -l'
+${V} ${READTAGS} -t output.tags -Q '(null? nil)' -l
+
+echo '!_ -Q (null? ()) -l'
+${V} ${READTAGS} -t output.tags -Q '(null? ())' -l
+
+echo '!_ -Q (null? false) -l'
+${V} ${READTAGS} -t output.tags -Q '(null? false)' -l

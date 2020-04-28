@@ -76,6 +76,7 @@ static EsObject* builtin_sub  (EsObject *args, DSLEnv *env);
 
 static EsObject* value_true (EsObject *args, DSLEnv *env);
 static EsObject* value_false (EsObject *args, DSLEnv *env);
+static EsObject* value_nil (EsObject *args, DSLEnv *env);
 
 DECLARE_VALUE_FN(name);
 DECLARE_VALUE_FN(input);
@@ -131,6 +132,8 @@ static DSLProcBind pbinds [] = {
 	  .helpstr = "true -> #t" },
 	{ "false",    value_false, NULL, 0, 0UL,
 	  .helpstr = "true -> #f" },
+	{ "nil",    value_nil, NULL, 0, 0UL,
+	  .helpstr = "nil -> ()" },
 	{ "$",       builtin_entry_ref, NULL, DSL_PATTR_CHECK_ARITY, 1,
 	  .helpstr = "($ NAME) -> #f|<string>" },
 	{ "$name",           value_name,           NULL, DSL_PATTR_MEMORABLE, 0UL,},
@@ -965,4 +968,9 @@ static EsObject* value_true (EsObject *args, DSLEnv *env)
 static EsObject* value_false (EsObject *args, DSLEnv *env)
 {
 	return es_false;
+}
+
+static EsObject* value_nil (EsObject *args, DSLEnv *env)
+{
+	return es_nil;
 }
