@@ -50,6 +50,16 @@ extern TrashBoxDestroyItemProc trashBoxTakeBack  (TrashBox* trash_box, void* ite
 extern void      trashBoxFree      (TrashBox* trash_box, void* item);
 extern void      trashBoxMakeEmpty (TrashBox* trash_box);
 
+/* A parser trash box is prepared when `parser' method of a parser is called.
+ * The parser can register a pair of a memory object and destructor for the object to
+ * the trash box with parserTrashBoxPut ().
+ *
+ * The registered memory objects are destructed after `parser' method is finished in
+ * the main side. You can delay the destruction with parserTrashBoxPut ().
+ *
+ * You can unregister the pair in the `parser' method with parserTrashBoxTakeBack ().
+ * In that case, specify the memory object of the pair as the argument.
+ */
 extern void* parserTrashBoxPut  (void* item, TrashBoxDestroyItemProc destroy);
 extern TrashBoxDestroyItemProc parserTrashBoxTakeBack  (void* item);
 
