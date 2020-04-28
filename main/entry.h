@@ -184,17 +184,39 @@ extern bool isTagExtraBitMarked (const tagEntryInfo *const tag, xtagType extra);
 /* If any extra bit is on, return true. */
 extern bool isTagExtra (const tagEntryInfo *const tag);
 
-/* Attaching parser speicific fields
+/* Functions for attaching parser specific fields
  *
- * If your parser doesn't use Cork API, use attachParserField() with specifying
- * inCorkQueue to false.
- * If your parser use Cork API, use use attachParserField() with specifying
- * inCorkQueue to true, or use attachParserFieldToCorkEntry().
- * attachParserField takes tagEntryInfo object.
- * attachParserFieldToCorkEntry takes an index on the CorkQueue.
+ * Case A:
  *
- * Calling either one, the caller owns VALUE. If the parser allocates VALUE
- * dynamically, the parser must free it.
+ * If your parser uses the Cork API, and your parser called
+ * makeTagEntry () already, you can use both
+ * attachParserFieldToCorkEntry () and attachParserField ().  Your
+ * parser has the cork index returned from makeTagEntry ().  With the
+ * cork index, your parser can call attachParserFieldToCorkEntry ().
+ * If your parser already call getEntryInCorkQueue () to get the tag
+ * entry for the cork index, your parser can call attachParserField ()
+ * with passing true for `inCorkQueue' parameter. attachParserField ()
+ * is a bit faster than attachParserFieldToCorkEntry ().
+ *
+ * attachParserField () and attachParserFieldToCorkEntry () duplicates
+ * the memory object specified with `value' and stores the duplicated
+ * object to the entry on the cork queue. So the parser must/can free
+ * the original one passed to the functions after calling. The cork
+ * queue manages the life of the duplicated object. It is not the
+ * parser's concern.
+ *
+ *
+ * Case B:
+ *
+ * If your parser called one of initTagEntry () family but didn't call
+ * makeTagEntry () for a tagEntry yet, use attachParserField () with
+ * false for `inCorkQueue' whether your parser uses the Cork API or
+ * not.
+ *
+ * The parser (== caller) keeps the memory object specified with `value'
+ * till calling makeTagEntry (). The parser must free the memory object
+ * after calling makeTagEntry () if it is allocated dynamically in the
+ * parser side.
  */
 extern void attachParserField (tagEntryInfo *const tag, bool inCorkQueue, fieldType ftype, const char* value);
 extern void attachParserFieldToCorkEntry (int index, fieldType ftype, const char* value);
