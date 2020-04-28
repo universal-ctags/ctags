@@ -131,7 +131,7 @@ static DSLProcBind pbinds [] = {
 	{ "true",    value_true, NULL, 0, 0UL,
 	  .helpstr = "true -> #t" },
 	{ "false",    value_false, NULL, 0, 0UL,
-	  .helpstr = "true -> #f" },
+	  .helpstr = "false -> #f" },
 	{ "nil",    value_nil, NULL, 0, 0UL,
 	  .helpstr = "nil -> ()" },
 	{ "$",       builtin_entry_ref, NULL, DSL_PATTR_CHECK_ARITY, 1,

@@ -20,7 +20,7 @@ fi
 echo '!_ -Q #t point3d'
 ${V} ${READTAGS} -t output.tags -Q '#t' point3d
 
-echo '!_ -Q ture point3d'
+echo '!_ -Q true point3d'
 ${V} ${READTAGS} -t output.tags -Q 'true' point3d
 
 echo '!_ -Q #f point3d'
@@ -32,7 +32,7 @@ ${V} ${READTAGS} -t output.tags -Q 'false' point3d
 echo '!_ -Q #t -l'
 ${V} ${READTAGS} -t output.tags -Q '#t' -l
 
-echo '!_ -Q ture -l'
+echo '!_ -Q true -l'
 ${V} ${READTAGS} -t output.tags -Q 'true' -l
 
 echo '!_ -Q #f -l'

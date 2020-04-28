@@ -1,6 +1,6 @@
 !_ -Q #t point3d
 point3d	input.c	/^struct point3d {$/
-!_ -Q ture point3d
+!_ -Q true point3d
 point3d	input.c	/^struct point3d {$/
 !_ -Q #f point3d
 !_ -Q false point3d
@@ -9,7 +9,7 @@ point3d	input.c	/^struct point3d {$/
 x	input.c	/^	int x, y ,z;$/
 y	input.c	/^	int x, y ,z;$/
 z	input.c	/^	int x, y ,z;$/
-!_ -Q ture -l
+!_ -Q true -l
 point3d	input.c	/^struct point3d {$/
 x	input.c	/^	int x, y ,z;$/
 y	input.c	/^	int x, y ,z;$/
