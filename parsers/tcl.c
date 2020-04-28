@@ -86,13 +86,14 @@ struct sTclParserState {
 	enum TclTokenType lastTokenType;
 };
 
-#define TOKEN_PSTATE(TOKEN) \
-	TOKENX(TOKEN, struct tokenExtra)->pstate
-
-struct tokenExtra {
+typedef struct sTclToken {
+	tokenInfo base;
 	int scopeIndex;
 	struct sTclParserState *pstate;
-};
+} tclToken;
+
+#define TCL(TOKEN) ((tclToken *)TOKEN)
+#define TCL_PSTATE(TOKEN) (TCL(TOKEN)->pstate)
 
 static struct tokenTypePair typePairs [] = {
 	{ '{', '}' },
@@ -106,7 +107,7 @@ static struct tokenInfoClass tclTokenInfoClass = {
 	.keywordNone      = KEYWORD_NONE,
 	.typeForKeyword   = TOKEN_TCL_KEYWORD,
 	.typeForEOF       = TOKEN_TCL_EOF,
-	.extraSpace       = sizeof (struct tokenExtra),
+	.extraSpace       = sizeof (tclToken) - sizeof (tokenInfo),
 	.pairs            = typePairs,
 	.pairCount        = ARRAY_SIZE (typePairs),
 	.init             = initToken,
@@ -122,16 +123,16 @@ extern tokenInfo *newTclToken (void *pstate)
 
 static void clearToken (tokenInfo *token)
 {
-	TOKENX (token, struct tokenExtra)->scopeIndex = CORK_NIL;
-	TOKENX (token, struct tokenExtra)->pstate = NULL;
+	TCL (token)->scopeIndex = CORK_NIL;
+	TCL (token)->pstate = NULL;
 }
 
 static void copyToken (tokenInfo *dest, tokenInfo *src, void *data CTAGS_ATTR_UNUSED)
 {
-	TOKENX (dest, struct tokenExtra)->scopeIndex =
-		TOKENX (src, struct tokenExtra)->scopeIndex;
-	TOKENX (dest, struct tokenExtra)->pstate =
-		TOKENX (src, struct tokenExtra)->pstate;
+	TCL (dest)->scopeIndex =
+		TCL (src)->scopeIndex;
+	TCL (dest)->pstate =
+		TCL (src)->pstate;
 }
 
 static void readString (vString *string)
@@ -193,7 +194,7 @@ static keywordId resolveKeyword (vString *string)
 
 static void initToken (tokenInfo *token, void *data)
 {
-	TOKENX (token, struct tokenExtra)->pstate = data;
+	TCL (token)->pstate = data;
 }
 
 static void readToken0 (tokenInfo *const token, struct sTclParserState *pstate)
@@ -312,7 +313,7 @@ static void readToken0 (tokenInfo *const token, struct sTclParserState *pstate)
 
 static void readToken (tokenInfo *const token, void *data)
 {
-	struct sTclParserState *pstate = TOKEN_PSTATE(token);
+	struct sTclParserState *pstate = TCL_PSTATE(token);
 
 	readToken0 (token, pstate);
 
@@ -378,7 +379,7 @@ static void notifyPackageRequirement (tokenInfo *const token)
 		{
 			enterSubparser(sub);
 			tclsub->packageRequirementNotify (tclsub, tokenString (token),
-											  TOKEN_PSTATE(token));
+											  TCL_PSTATE(token));
 			leaveSubparser();
 		}
 	}
@@ -396,7 +397,7 @@ static void notifyNamespaceImport (tokenInfo *const token)
 		{
 			enterSubparser(sub);
 			tclsub->namespaceImportNotify (tclsub, tokenString (token),
-										   TOKEN_PSTATE(token));
+										   TCL_PSTATE(token));
 			leaveSubparser();
 		}
 	}
@@ -415,7 +416,7 @@ static int notifyCommand (tokenInfo *const token, unsigned int parent)
 		{
 			enterSubparser(sub);
 			r = tclsub->commandNotify (tclsub, tokenString (token), parent,
-									   TOKEN_PSTATE(token));
+									   TCL_PSTATE(token));
 			leaveSubparser();
 			if (r != CORK_NIL)
 				break;
