@@ -8,10 +8,10 @@ jobs:
   #
   # We assume GNU Make is available.
   #
-   fedora31_gmake:
+   fedora32_gmake:
      working_directory: ~/universal-ctags
      docker:
-       - image: docker.io/fedora:31
+       - image: docker.io/fedora:32
      steps:
        - run:
            name: Install Git
@@ -129,4 +129,4 @@ workflows:
       - fedora30_bmake
       - fedora_distcheck
       - centos_make
-      - fedora31_gmake
+      - fedora32_gmake

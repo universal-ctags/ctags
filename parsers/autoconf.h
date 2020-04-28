@@ -12,7 +12,7 @@
 
 #include "general.h"
 
-enum {
+typedef enum {
 	AUTOCONF_PACKAGE_KIND,
 	AUTOCONF_TEMPLATE_KIND,
 	AUTOCONF_MACRO_KIND,
