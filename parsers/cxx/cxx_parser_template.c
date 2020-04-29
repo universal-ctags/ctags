@@ -834,11 +834,13 @@ void cxxParserEmitTemplateParameterTags(void)
 		if(!tag)
 			continue;
 
-		cxxTagCheckAndSetTypeField(
+		CXXToken * pTypeToken = cxxTagCheckAndSetTypeField(
 				g_cxx.oTemplateParameters.aTypeStarts[i],
 				g_cxx.oTemplateParameters.aTypeEnds[i]
 			);
 
 		cxxTagCommit();
+		if (pTypeToken)
+			cxxTokenDestroy(pTypeToken);
 	}
 }
