@@ -13,6 +13,7 @@
 */
 #include "general.h"  /* must always come first */
 
+#include "debug.h"
 #include "routines.h"
 #include "objpool.h"
 
@@ -75,7 +76,12 @@ extern void objPoolPut (objPool *pool, void *obj)
 	if (obj == NULL)
 		return;
 
-	if (ptrArrayCount (pool->array) < pool->size)
+	if (
+#ifdef DISABLE_OBJPOOL
+		0 &&
+#endif
+		ptrArrayCount (pool->array) < pool->size
+		)
 		ptrArrayAdd (pool->array, obj);
 	else
 		pool->deleteFunc (obj);
