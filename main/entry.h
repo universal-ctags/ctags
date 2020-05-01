@@ -116,7 +116,7 @@ struct sTagEntryInfo {
 	unsigned long sourceLineNumberDifference;
 };
 
-typedef bool (* entryForeachFunc) (unsigned int corkIndex,
+typedef bool (* entryForeachFunc) (int corkIndex,
 								   tagEntryInfo * entry,
 								   void * data);
 
@@ -143,7 +143,7 @@ extern int makeQualifiedTagEntry (const tagEntryInfo *const e);
 
 
 #define CORK_NIL 0
-tagEntryInfo *getEntryInCorkQueue   (unsigned int n);
+tagEntryInfo *getEntryInCorkQueue   (int n);
 tagEntryInfo *getEntryOfNestingLevel (const NestingLevel *nl);
 size_t        countEntryInCorkQueue (void);
 
@@ -154,7 +154,7 @@ size_t        countEntryInCorkQueue (void);
  * registerEntry registers CORKINDEX to a symbol table of a parent tag
  * specified in the scopeIndex field of the tag specified with CORKINDEX.
  */
-void          registerEntry (unsigned int corkIndex);
+void          registerEntry (int corkIndex);
 
 /* foreachEntriesInScope is for traversing the symbol table for a table
  * specified with CORKINDEX. If CORK_NIL is given, this function traverses
@@ -165,7 +165,7 @@ void          registerEntry (unsigned int corkIndex);
  * If FUNC never returns false, this func returns true.
  * If FUNC is not called because no node for NAME in the symbol table.
  */
-bool          foreachEntriesInScope (unsigned int corkIndex,
+bool          foreachEntriesInScope (int corkIndex,
 									 const char *name, /* or NULL */
 									 entryForeachFunc func,
 									 void *data);
@@ -175,7 +175,7 @@ bool          foreachEntriesInScope (unsigned int corkIndex,
  * just returns one of them. Returning CORK_NIL means there is no entry
  * for NAME.
  */
-int           anyEntryInScope       (unsigned int corkIndex,
+int           anyEntryInScope       (int corkIndex,
 									 const char *name);
 
 extern void    markTagExtraBit     (tagEntryInfo *const tag, xtagType extra);

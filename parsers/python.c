@@ -1227,7 +1227,7 @@ static void setIndent (tokenInfo *const token)
 	{
 		if (lv->corkIndex != CORK_NIL)
 		{
-			tagEntryInfo *e = getEntryInCorkQueue ((unsigned int) lv->corkIndex);
+			tagEntryInfo *e = getEntryInCorkQueue (lv->corkIndex);
 
 			e->extensionFields.endLine = token->lineNumber;
 		}

@@ -37,6 +37,7 @@
 #endif
 
 #include <stdint.h>
+#include <limits.h>  /* to define INT_MAX */
 
 #include "debug.h"
 #include "entry_p.h"
@@ -91,7 +92,7 @@ typedef struct eTagFile {
 	struct sMax { size_t line, tag; } max;
 	vString *vLine;
 
-	unsigned int cork;
+	int cork;
 	unsigned int corkFlags;
 	ptrArray *corkQueue;
 
@@ -100,7 +101,7 @@ typedef struct eTagFile {
 
 typedef struct sTagEntryInfoX  {
 	tagEntryInfo slot;
-	unsigned int corkIndex;
+	int corkIndex;
 	struct rb_root symtab;
 	struct rb_node symnode;
 } tagEntryInfoX;
@@ -1227,7 +1228,7 @@ static void corkSymtabPut (tagEntryInfoX *scope, const char* name, tagEntryInfoX
 	rb_insert_color(&item->symnode, root);
 }
 
-extern bool foreachEntriesInScope (unsigned int corkIndex,
+extern bool foreachEntriesInScope (int corkIndex,
 								   const char *name,
 								   entryForeachFunc func,
 								   void *data)
@@ -1314,7 +1315,7 @@ extern bool foreachEntriesInScope (unsigned int corkIndex,
 	return true;
 }
 
-static bool findName (unsigned int corkIndex, tagEntryInfo *entry, void *data)
+static bool findName (int corkIndex, tagEntryInfo *entry, void *data)
 {
 	int *index = data;
 
@@ -1322,7 +1323,7 @@ static bool findName (unsigned int corkIndex, tagEntryInfo *entry, void *data)
 	return false;
 }
 
-int anyEntryInScope (unsigned int corkIndex, const char *name)
+int anyEntryInScope (int corkIndex, const char *name)
 {
 	int index = CORK_NIL;
 
@@ -1332,7 +1333,7 @@ int anyEntryInScope (unsigned int corkIndex, const char *name)
 	return CORK_NIL;
 }
 
-extern void registerEntry (unsigned int corkIndex)
+extern void registerEntry (int corkIndex)
 {
 	Assert (TagFile.corkFlags & CORK_SYMTAB);
 
@@ -1343,12 +1344,29 @@ extern void registerEntry (unsigned int corkIndex)
 	}
 }
 
-static unsigned int queueTagEntry(const tagEntryInfo *const tag)
+static int queueTagEntry(const tagEntryInfo *const tag)
 {
-	unsigned int corkIndex;
+	static bool warned;
+
+	int corkIndex;
 	tagEntryInfoX * entry = copyTagEntry (tag,
 										TagFile.corkFlags);
-	corkIndex = ptrArrayAdd (TagFile.corkQueue, entry);
+
+	if (ptrArrayCount (TagFile.corkQueue) == (size_t)INT_MAX)
+	{
+		if (!warned)
+		{
+			warned = true;
+			error (WARNING,
+				   "The tag entry queue overflows; drop the tag entry at %lu in %s",
+				   tag->lineNumber,
+				   tag->inputFileName);
+		}
+		return CORK_NIL;
+	}
+	warned = false;
+
+	corkIndex = (int)ptrArrayAdd (TagFile.corkQueue, entry);
 	entry->corkIndex = corkIndex;
 
 	return corkIndex;
@@ -1532,9 +1550,9 @@ extern void uncorkTagFile(void)
 	TagFile.corkQueue = NULL;
 }
 
-extern tagEntryInfo *getEntryInCorkQueue   (unsigned int n)
+extern tagEntryInfo *getEntryInCorkQueue   (int n)
 {
-	if ((CORK_NIL < n) && (n < ptrArrayCount (TagFile.corkQueue)))
+	if ((CORK_NIL < n) && (((size_t)n) < ptrArrayCount (TagFile.corkQueue)))
 		return ptrArrayItem (TagFile.corkQueue, n);
 	else
 		return NULL;

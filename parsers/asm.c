@@ -190,7 +190,7 @@ static void makeAsmTag (
 		const bool labelCandidate,
 		const bool nameFollows,
 		const bool directive,
-		unsigned int *lastMacroCorkIndex)
+		int *lastMacroCorkIndex)
 {
 	if (vStringLength (name) > 0)
 	{
@@ -315,7 +315,7 @@ static void findAsmTags (void)
 			 KIND_GHOST_INDEX, 0, KIND_GHOST_INDEX, KIND_GHOST_INDEX, 0, 0,
 			 FIELD_UNKNOWN);
 
-	unsigned int lastMacroCorkIndex = CORK_NIL;
+	 int lastMacroCorkIndex = CORK_NIL;
 
 	while ((line = asmReadLineFromInputFile ()) != NULL)
 	{

@@ -403,7 +403,7 @@ static void notifyNamespaceImport (tokenInfo *const token)
 	}
 }
 
-static int notifyCommand (tokenInfo *const token, unsigned int parent)
+static int notifyCommand (tokenInfo *const token, int parent)
 {
 	subparser *sub;
 	int r = CORK_NIL;
@@ -457,7 +457,7 @@ static void collectSignature (const tokenInfo *const token, collector * col)
 }
 
 static void parseProc (tokenInfo *const token,
-					   unsigned int parent)
+					   int parent)
 {
 	int index = CORK_NIL;
 	int index_fq = CORK_NIL;
@@ -583,7 +583,7 @@ static void parseProc (tokenInfo *const token,
 }
 
 static void parseNamespace (tokenInfo *const token,
-							unsigned int parent)
+							int parent)
 {
 	tokenRead (token);
 	if (tokenIsEOF(token))
