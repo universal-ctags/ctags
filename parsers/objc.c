@@ -461,8 +461,8 @@ static void parseImplemMethods (vString * const ident, objcToken what);
 static vString *tempName = NULL;
 static vString *parentName = NULL;
 static objcKind parentType = K_INTERFACE;
-static unsigned int parentCorkIndex = CORK_NIL;
-static unsigned int categoryCorkIndex = CORK_NIL;
+static int parentCorkIndex = CORK_NIL;
+static int categoryCorkIndex = CORK_NIL;
 
 /* used to prepare tag for OCaml, just in case their is a need to
  * add additional information to the tag. */
@@ -483,7 +483,7 @@ static void pushEnclosingContext (const vString * parent, objcKind type)
 	parentType = type;
 }
 
-static void pushEnclosingContextFull (const vString * parent, objcKind type, unsigned int corkIndex)
+static void pushEnclosingContextFull (const vString * parent, objcKind type, int corkIndex)
 {
 	pushEnclosingContext (parent, type);
 	parentCorkIndex = corkIndex;
@@ -495,7 +495,7 @@ static void popEnclosingContext (void)
 	parentCorkIndex = CORK_NIL;
 }
 
-static void pushCategoryContext (unsigned int category_index)
+static void pushCategoryContext (int category_index)
 {
 	categoryCorkIndex = category_index;
 }
@@ -628,7 +628,7 @@ static void parseMethodsNameCommon (vString * const ident, objcToken what,
 									parseNext reEnter,
 									parseNext nextAction)
 {
-	unsigned int index;
+	int index;
 
 	switch (what)
 	{
@@ -746,7 +746,7 @@ static void parseCategory (vString * const ident, objcToken what)
 			else
 				toDoNext = &parseImplemMethods;
 
-			unsigned int index = addTag (ident, K_CATEGORY);
+			int index = addTag (ident, K_CATEGORY);
 			pushCategoryContext (index);
 		}
 	}
@@ -913,7 +913,7 @@ static void parseProtocol (vString * const ident, objcToken what)
 {
 	if (what == ObjcIDENTIFIER)
 	{
-		unsigned int index = addTag (ident, K_PROTOCOL);
+		int index = addTag (ident, K_PROTOCOL);
 		pushEnclosingContextFull (ident, K_PROTOCOL, index);
 	}
 	toDoNext = &parseMethods;
@@ -923,7 +923,7 @@ static void parseImplementation (vString * const ident, objcToken what)
 {
 	if (what == ObjcIDENTIFIER)
 	{
-		unsigned int index = addTag (ident, K_IMPLEMENTATION);
+		int index = addTag (ident, K_IMPLEMENTATION);
 		pushEnclosingContextFull (ident, K_IMPLEMENTATION, index);
 	}
 	toDoNext = &parseImplemMethods;
@@ -933,7 +933,7 @@ static void parseInterface (vString * const ident, objcToken what)
 {
 	if (what == ObjcIDENTIFIER)
 	{
-		unsigned int index = addTag (ident, K_INTERFACE);
+		int index = addTag (ident, K_INTERFACE);
 		pushEnclosingContextFull (ident, K_INTERFACE, index);
 	}
 

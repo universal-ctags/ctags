@@ -207,7 +207,7 @@ struct guestRequest {
 };
 
 struct lregexControlBlock {
-	unsigned long currentScope;
+	int currentScope;
 	ptrArray *entries [2];
 
 	ptrArray *tables;
@@ -1436,7 +1436,7 @@ static unsigned long getInputLineNumberInRegPType (enum regexParserType regptype
 static void fillEndLineFieldOfUpperScopes (struct lregexControlBlock *lcb, unsigned long endline)
 {
 	tagEntryInfo *entry;
-	unsigned int n = lcb->currentScope;
+	int n = lcb->currentScope;
 
 	while ((entry = getEntryInCorkQueue (n))
 		   && (entry->extensionFields.endLine == 0))
@@ -1460,7 +1460,7 @@ static void matchTagPattern (struct lregexControlBlock *lcb,
 														  patbuf->u.tag.kindIndex):
 		vStringNewInit ("");
 	bool placeholder = !!((patbuf->scopeActions & SCOPE_PLACEHOLDER) == SCOPE_PLACEHOLDER);
-	unsigned long scope = CORK_NIL;
+	int scope = CORK_NIL;
 	int n;
 
 	vStringStripLeading (name);
@@ -2299,7 +2299,7 @@ extern void addRegexTable (struct lregexControlBlock *lcb, const char *name)
 	ptrArrayAdd (lcb->tables, table);
 }
 
-static void dumpSstack(FILE* fp, unsigned long scope)
+static void dumpSstack(FILE* fp, int scope)
 {
 	fprintf (fp, "scope : ");
 	while (scope != CORK_NIL)

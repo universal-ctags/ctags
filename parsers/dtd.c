@@ -13,6 +13,7 @@
 #include "general.h"
 #include "tokeninfo.h"
 
+#include "debug.h"
 #include "entry.h"
 #include "keyword.h"
 #include "parse.h"
@@ -297,7 +298,7 @@ static int makeDtdTagMaybe (tagEntryInfo *const e, tokenInfo *const token,
 	return makeTagEntry (e);
 }
 
-static void backpatchEndField (unsigned int index, unsigned long lineNumber)
+static void backpatchEndField (int index, unsigned long lineNumber)
 {
 	tagEntryInfo *ep = getEntryInCorkQueue (index);
 
@@ -308,7 +309,7 @@ static void backpatchEndField (unsigned int index, unsigned long lineNumber)
 static void parseEntity (tokenInfo *const token)
 {
 	tagEntryInfo e;
-	unsigned int index = CORK_NIL;
+	int index = CORK_NIL;
 
 	tokenRead (token);
 	if (token->type == '%')
@@ -349,10 +350,10 @@ static tokenInfo *parserParameterEntityRef (tokenInfo *const token)
 static void parseElement (tokenInfo *const token, bool skipToClose)
 {
 	tagEntryInfo e;
-	size_t original_index;
+	int original_index;
 
 	if (skipToClose)
-		original_index = countEntryInCorkQueue ();
+		original_index = (int)countEntryInCorkQueue ();
 
 	tokenRead (token);
 	if (token->type == '%')
@@ -378,14 +379,11 @@ static void parseElement (tokenInfo *const token, bool skipToClose)
 
 	if (skipToClose)
 	{
-		size_t current_index;
-		current_index = countEntryInCorkQueue ();
+		int current_index = (int)countEntryInCorkQueue ();
 		if (tokenSkipToType (token, TOKEN_CLOSE)
 			&& (current_index > original_index))
 		{
-			unsigned int index;
-
-			for (index = original_index; index < current_index; index++)
+			for (int index = original_index; index < current_index; index++)
 				backpatchEndField (index, token->lineNumber);
 		}
 	}
@@ -458,7 +456,7 @@ static void parseAttDefs (tokenInfo *const token)
 static void parseAttlist (tokenInfo *const token)
 {
 	tagEntryInfo e;
-	unsigned int index = CORK_NIL;
+	int index = CORK_NIL;
 
 	tokenRead (token);
 	if (token->type == '%')
@@ -499,7 +497,7 @@ static void parseAttlist (tokenInfo *const token)
 
 static void parseNotation (tokenInfo *const token)
 {
-	unsigned int index = CORK_NIL;
+	int index = CORK_NIL;
 	tagEntryInfo e;
 
 	tokenRead (token);
@@ -561,10 +559,9 @@ static void parseSection (tokenInfo *const token)
 			if (condition)
 			{
 				tagEntryInfo e;
-				unsigned int index;
-				index = makeDtdTagMaybe (&e, condition,
-										 K_PARAMETER_ENTITY,
-										 DTD_PARAMETER_ENTITY_CONDITION);
+				int index = makeDtdTagMaybe (&e, condition,
+											 K_PARAMETER_ENTITY,
+											 DTD_PARAMETER_ENTITY_CONDITION);
 				tokenDelete (condition);
 				tokenRead (token);
 				if (token->type == '[')

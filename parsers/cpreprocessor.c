@@ -843,7 +843,7 @@ static int directiveDefine (const int c, bool undef)
 			if (p == '(')
 			{
 				vString *param = vStringNew ();
-				int param_start = countEntryInCorkQueue();
+				int param_start = (int)countEntryInCorkQueue();
 				do {
 					p = cppGetcFromUngetBufferOrFile ();
 					if (isalnum(p) || p == '_' || p == '$'
@@ -864,7 +864,7 @@ static int directiveDefine (const int c, bool undef)
 				} while (p != ')' && p != EOF);
 				vStringDelete (param);
 
-				int param_end = countEntryInCorkQueue();
+				int param_end = (int)countEntryInCorkQueue();
 				if (p == ')')
 				{
 					vString *signature = vStringNew ();

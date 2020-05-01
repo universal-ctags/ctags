@@ -278,14 +278,14 @@ struct symbolData {
 	int *corkQueue;
 };
 
-static bool findTheName (unsigned int corkIndex, tagEntryInfo *entry, void *data)
+static bool findTheName (int corkIndex, tagEntryInfo *entry, void *data)
 {
 	struct symbolData *symbolData = data;
 
 	if (entry->langType == symbolData->lang && entry->kindIndex == symbolData->kind)
 	{
 		/* TODO: The case operation should be removed */
-		*symbolData->corkQueue = (unsigned int)corkIndex;
+		*symbolData->corkQueue = corkIndex;
 		return false;
 	}
 	return true;
@@ -305,7 +305,7 @@ static int makeTexTag (tokenInfo *const token, int kind,
 			.corkQueue = &corkQueue,
 		};
 		/* TODO: The case operation should be removed */
-		if (foreachEntriesInScope ((unsigned int)scopeIndex, name, findTheName, (void *)&data) == false)
+		if (foreachEntriesInScope (scopeIndex, name, findTheName, (void *)&data) == false)
 			return *data.corkQueue;
 	}
 

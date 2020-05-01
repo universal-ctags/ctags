@@ -1135,7 +1135,7 @@ static void processClass (tokenInfo *const token)
 	}
 }
 
-static bool doesNameForKindExist (unsigned int corkIndex, tagEntryInfo *entry, void *data)
+static bool doesNameForKindExist (int corkIndex, tagEntryInfo *entry, void *data)
 {
 	verilogKind *kind = data;
 
