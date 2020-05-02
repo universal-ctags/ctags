@@ -194,12 +194,8 @@ static void valueCallback (makeSubparser *make, char *name)
 	int k;
 	tagEntryInfo elt;
 
-
-	if (p == CORK_NIL)
-		return;
-
 	parent = getEntryInCorkQueue (p);
-	if ((parent->kindIndex == K_AM_DIR)
+	if (parent && (parent->kindIndex == K_AM_DIR)
 	    && (parent->extensionFields.roleBits))
 	{
 		int roleIndex;

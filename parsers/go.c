@@ -764,11 +764,14 @@ static tokenInfo * parseReceiver (tokenInfo *const token, int *corkIndex)
 		receiver_type_token = NULL;
 	}
 
-	if (*corkIndex != CORK_NIL && receiver_type_token)
+	if (receiver_type_token)
 	{
 		tagEntryInfo *e = getEntryInCorkQueue (*corkIndex);
-		e->extensionFields.typeRef [0] = eStrdup ("typename");
-		e->extensionFields.typeRef [1] = vStringStrdup (receiver_type_token->string);
+		if (e)
+		{
+			e->extensionFields.typeRef [0] = eStrdup ("typename");
+			e->extensionFields.typeRef [1] = vStringStrdup (receiver_type_token->string);
+		}
 	}
 	readToken (token);
 	return receiver_type_token;
@@ -822,15 +825,11 @@ static void parseFunctionOrMethod (tokenInfo *const token, const int scope)
 
 		cork = makeTag (functionToken, GOTAG_FUNCTION,
 						func_scope, vStringValue (buffer), NULL);
-		if (cork != CORK_NIL)
+		if ((e = getEntryInCorkQueue (cork)))
 		{
-			e = getEntryInCorkQueue (cork);
-
-			if (receiver_cork != CORK_NIL)
-			{
-				tagEntryInfo *receiver = getEntryInCorkQueue (receiver_cork);
+			tagEntryInfo *receiver = getEntryInCorkQueue (receiver_cork);
+			if (receiver)
 				receiver->extensionFields.scopeIndex = cork;
-			}
 		}
 
 		deleteToken (functionToken);
@@ -873,20 +872,18 @@ static void parseFunctionOrMethod (tokenInfo *const token, const int scope)
 
 static void attachTypeRefField (int scope, intArray *corks, const char *const type)
 {
-	tagEntryInfo *type_e = NULL;
 	int type_cork = anyEntryInScope (scope, type);
-
-	if (type_cork != CORK_NIL)
-		type_e = getEntryInCorkQueue (type_cork);
+	tagEntryInfo *type_e = getEntryInCorkQueue (type_cork);
 
 	for (unsigned int i = 0; i < intArrayCount (corks); i++)
 	{
 		int cork = intArrayItem (corks, i);
 		tagEntryInfo *e = getEntryInCorkQueue (cork);
-		if (type_e)
-			e->extensionFields.typeRef [0] = eStrdup (GoKinds[type_e->kindIndex].name);
-		else
-			e->extensionFields.typeRef [0] = eStrdup ("typename");
+		if (!e)
+			continue;
+		e->extensionFields.typeRef [0] = eStrdup (type_e
+												  ?GoKinds[type_e->kindIndex].name
+												  :"typename");
 		e->extensionFields.typeRef [1] = eStrdup (type);
 	}
 }
@@ -977,10 +974,13 @@ static void parseInterfaceMethods (tokenInfo *const token, const int scope)
 	if (!collectorIsEmpty(&inherits))
 	{
 		tagEntryInfo *e = getEntryInCorkQueue (scope);
-		e->extensionFields.inheritance = vStringDeleteUnwrap (inheritsBuf);
+		if (e)
+		{
+			e->extensionFields.inheritance = vStringDeleteUnwrap (inheritsBuf);
+			inheritsBuf = NULL;
+		}
 	}
-	else
-		vStringDelete (inheritsBuf);
+	vStringDelete (inheritsBuf);
 }
 
 static void parseStructMembers (tokenInfo *const token, const int scope)
@@ -1217,8 +1217,11 @@ static void parseConstTypeVar (tokenInfo *const token, goKind kind, const int sc
 				if ((member_scope != CORK_NIL) && !vStringIsEmpty (buffer))
 				{
 					tagEntryInfo *e = getEntryInCorkQueue (member_scope);
-					e->extensionFields.typeRef [0] = eStrdup ("typename");
-					e->extensionFields.typeRef [1] = vStringDeleteUnwrap (buffer);
+					if (e)
+					{
+						e->extensionFields.typeRef [0] = eStrdup ("typename");
+						e->extensionFields.typeRef [1] = vStringDeleteUnwrap (buffer);
+					}
 				}
 				else
 					vStringDelete (buffer);
@@ -1252,7 +1255,8 @@ static void parseConstTypeVar (tokenInfo *const token, goKind kind, const int sc
 		if (member_scope != scope && member_scope != CORK_NIL)
 		{
 			tagEntryInfo *e = getEntryInCorkQueue (member_scope);
-			e->extensionFields.endLine = getInputLineNumber ();
+			if (e)
+				e->extensionFields.endLine = getInputLineNumber ();
 		}
 
 		if (usesParens && !isType (token, TOKEN_CLOSE_PAREN))
@@ -1309,9 +1313,10 @@ static void parseImportSpec (tokenInfo *const token)
 			if (package_cork != CORK_NIL)
 			{
 				tagEntryInfo *e = getEntryInCorkQueue (packageName_cork);
-				attachParserFieldToCorkEntry (package_cork,
-											  GoFields [F_PACKAGE_NAME].ftype,
-											  e->name);
+				if (e)
+					attachParserFieldToCorkEntry (package_cork,
+												  GoFields [F_PACKAGE_NAME].ftype,
+												  e->name);
 			}
 		}
 	}

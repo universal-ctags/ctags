@@ -118,18 +118,18 @@ static int parseHunk (const unsigned char* cp, vString *hunk, int scope_index)
 			return i;
 	vStringNCopyS (hunk, start, end - start);
 	i = makeSimpleTag (hunk, K_HUNK);
-	if (i > CORK_NIL && scope_index > CORK_NIL)
-	{
-		tagEntryInfo *e =  getEntryInCorkQueue (i);
+	tagEntryInfo *e =  getEntryInCorkQueue (i);
+	if (e && scope_index > CORK_NIL)
 		e->extensionFields.scopeIndex = scope_index;
-	}
 	return i;
 }
 
 static void markTheLastTagAsDeletedFile (int scope_index)
 {
 	tagEntryInfo *e =  getEntryInCorkQueue (scope_index);
-	e->kindIndex = K_DELETED_FILE;
+
+	if (e)
+		e->kindIndex = K_DELETED_FILE;
 }
 
 static void findDiffTags (void)

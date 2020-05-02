@@ -185,11 +185,9 @@ static void reportStrategicParsing (texSubparser *s,
 	}
 	else if (strategy == framesubtitle_strategy)
 	{
-		if (strategy [1].corkIndex != CORK_NIL)
-		{
-			tagEntryInfo *e = getEntryInCorkQueue (strategy [1].corkIndex);
+		tagEntryInfo *e = getEntryInCorkQueue (strategy [1].corkIndex);
+		if (e)
 			e->extensionFields.scopeIndex = b->lastTitleCorkIndex;
-		}
 	}
 	else if (strategy == frame_env_strategy)
 	{
@@ -197,12 +195,10 @@ static void reportStrategicParsing (texSubparser *s,
 
 		if (strategy [3].corkIndex != CORK_NIL)
 			b->lastTitleCorkIndex = strategy [3].corkIndex;
-		if (b->lastTitleCorkIndex != CORK_NIL
-			&& strategy [4].corkIndex != CORK_NIL)
-		{
-			tagEntryInfo *e = getEntryInCorkQueue (strategy [4].corkIndex);
+
+		tagEntryInfo *e = getEntryInCorkQueue (strategy [4].corkIndex);
+		if (e && b->lastTitleCorkIndex != CORK_NIL)
 			e->extensionFields.scopeIndex = b->lastTitleCorkIndex;
-		}
 	}
 }
 
@@ -220,12 +216,9 @@ static bool readEnviromentEndNotify (texSubparser *s,
 	if (strcmp (vStringValue (env), "frame") == 0)
 	{
 		struct beamerSubparser *b = (struct beamerSubparser *)s;
-		if (b->lastTitleCorkIndex != CORK_NIL)
-		{
-			tagEntryInfo *e = getEntryInCorkQueue (b->lastTitleCorkIndex);
-			if (e)
-				e->extensionFields.endLine = getInputLineNumber ();
-		}
+		tagEntryInfo *e = getEntryInCorkQueue (b->lastTitleCorkIndex);
+		if (e)
+			e->extensionFields.endLine = getInputLineNumber ();
 		return true;
 	}
 	return false;

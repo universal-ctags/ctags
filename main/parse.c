@@ -4844,7 +4844,8 @@ static void createCTSTTags (void)
 						assignRole(&e, R_ROLES_KIND_D_ROLE);
 						qindex = makeTagEntry (&e);
 						qe = getEntryInCorkQueue (qindex);
-						assignRole(qe, R_ROLES_KIND_B_ROLE);
+						if (qe)
+							assignRole(qe, R_ROLES_KIND_B_ROLE);
 						break;
 					}
 					case K_ROLES_DISABLED:

@@ -216,12 +216,9 @@ findMaven2TagsForTable (enum maven2XpathTable tindex,
 
 	findXMLTags (ctx, node, tindex, &corkIndexes);
 
-	if ( corkIndexes [K_ARTIFACT_ID] != CORK_NIL
-	     && corkIndexes [K_GROUP_ID] != CORK_NIL)
-	{
-		tagEntryInfo *tag = getEntryInCorkQueue (corkIndexes [K_ARTIFACT_ID]);
+	tagEntryInfo *tag = getEntryInCorkQueue (corkIndexes [K_ARTIFACT_ID]);
+	if (tag && corkIndexes [K_GROUP_ID] != CORK_NIL)
 		tag->extensionFields.scopeIndex = corkIndexes [K_GROUP_ID];
-	}
 }
 
 static void makeTagRecursively (xmlNode *node,

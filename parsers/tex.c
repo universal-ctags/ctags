@@ -345,7 +345,7 @@ static int makeTexTag (tokenInfo *const token, int kind,
 	corkQueue = makeTagEntry (&e);
 	vStringDelete (parentName);	/* NULL is o.k. */
 
-	if (unique)
+	if (unique && corkQueue != CORK_NIL)
 		registerEntry (corkQueue);
 
 	return corkQueue;

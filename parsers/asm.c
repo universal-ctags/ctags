@@ -227,12 +227,10 @@ static void makeAsmTag (
 													 kind_for_directive);
 				break;
 			case K_PSUEDO_MACRO_END:
-				if (*lastMacroCorkIndex != CORK_NIL)
-				{
-					macro_tag = getEntryInCorkQueue (*lastMacroCorkIndex);
+				macro_tag = getEntryInCorkQueue (*lastMacroCorkIndex);
+				if (macro_tag)
 					macro_tag->extensionFields.endLine = getInputLineNumber ();
-					*lastMacroCorkIndex = CORK_NIL;
-				}
+				*lastMacroCorkIndex = CORK_NIL;
 				break;
 			case K_SECTION:
 				makeSimpleRefTag (operator,

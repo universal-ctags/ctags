@@ -3193,11 +3193,9 @@ static void checkStatementEnd (statementInfo *const st, int corkIndex)
 {
 	const tokenInfo *const token = activeToken (st);
 
-	if (corkIndex != CORK_NIL)
-	{
-		tagEntryInfo *e = getEntryInCorkQueue (corkIndex);
+	tagEntryInfo *e = getEntryInCorkQueue (corkIndex);
+	if (e)
 		e->extensionFields.endLine = token->lineNumber;
-	}
 
 	if (isType (token, TOKEN_COMMA))
 		reinitStatement (st, true);

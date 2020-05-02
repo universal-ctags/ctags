@@ -2301,10 +2301,10 @@ extern void addRegexTable (struct lregexControlBlock *lcb, const char *name)
 
 static void dumpSstack(FILE* fp, int scope)
 {
+	tagEntryInfo *entry;
 	fprintf (fp, "scope : ");
-	while (scope != CORK_NIL)
+	while ((entry = getEntryInCorkQueue (scope)))
 	{
-		tagEntryInfo *entry = getEntryInCorkQueue (scope);
 		fprintf(fp, "%s", entry->name);
 
 		scope = entry->extensionFields.scopeIndex;
