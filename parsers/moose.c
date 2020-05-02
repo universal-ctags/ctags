@@ -150,13 +150,9 @@ static void inputStart (subparser *s)
 static void inputEnd (subparser *s)
 {
 	struct mooseSubparser *moose = (struct mooseSubparser *)s;
-
-	if (moose->classCork != CORK_NIL)
-	{
-		tagEntryInfo *e = getEntryInCorkQueue (moose->classCork);
-		Assert (e);
+	tagEntryInfo *e = getEntryInCorkQueue (moose->classCork);
+	if (e)
 		e->extensionFields.endLine = getInputLineNumber ();
-	}
 
 	if (moose->superClass)
 		eFree ((char *)moose->superClass);
@@ -212,11 +208,10 @@ static void leaveMoose (struct mooseSubparser *moose)
 {
 	moose->notContinuousExtendsLines = true;
 
-	if (moose->classCork == CORK_NIL)
+	tagEntryInfo *e = getEntryInCorkQueue (moose->classCork);
+	if (!e)
 		return;
 
-	tagEntryInfo *e = getEntryInCorkQueue (moose->classCork);
-	Assert (e);
 	e->extensionFields.endLine = getInputLineNumber ();
 
 	moose->classCork = CORK_NIL;
@@ -228,12 +223,11 @@ static void enterMoose (struct mooseSubparser *moose)
 {
 	moose->notContinuousExtendsLines = true;
 
-	if (moose->packageCork == CORK_NIL)
+	tagEntryInfo *perl_e = getEntryInCorkQueue (moose->packageCork);
+	if (!perl_e)
 		return;
 
 	moose->notInMoose = false;
-	tagEntryInfo *perl_e = getEntryInCorkQueue (moose->packageCork);
-	Assert (perl_e);
 
 	tagEntryInfo moose_e;
 	initTagEntry (&moose_e, perl_e->name, K_CLASS);
@@ -289,7 +283,8 @@ static bool findExtendsClass (const char *line,
 
 	moose->notContinuousExtendsLines = true;
 
-	if (moose->classCork == CORK_NIL)
+	tagEntryInfo *e = getEntryInCorkQueue (moose->classCork);
+	if (!e)
 		return true;
 
 	const char *input = line + matches[1].start;
@@ -304,8 +299,6 @@ static bool findExtendsClass (const char *line,
 		return true;
 	}
 
-	tagEntryInfo *e = getEntryInCorkQueue (moose->classCork);
-	Assert (e);
 	if (e->extensionFields.inheritance == NULL)
 		e->extensionFields.inheritance = vStringDeleteUnwrap (str);
 
@@ -321,7 +314,8 @@ static bool findExtendsClassContinuation (const char *line,
 	moose->notContinuousExtendsLines = true;
 
 	tagEntryInfo *e = getEntryInCorkQueue (moose->classCork);
-	Assert (e);
+	if (!e)
+		return true;
 
 	const char *input = line + matches[1].start;
 	vString *str;

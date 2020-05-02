@@ -212,13 +212,9 @@ static bool macro_end_cb (const char *line,
 {
 	struct fyppParseCtx *ctx = userData;
 
-	if (ctx->macro_cork_index == CORK_NIL)
-		return true;
-
 	tagEntryInfo *e = getEntryInCorkQueue (ctx->macro_cork_index);
-	ctx->macro_cork_index = CORK_NIL;
-
-	e->extensionFields.endLine = getInputLineNumber ();
+	if (e)
+		e->extensionFields.endLine = getInputLineNumber ();
 	ctx->macro_cork_index = CORK_NIL;
 
 	fypp_end_cb (line, matches, count, userData);

@@ -652,13 +652,9 @@ static void deleteBlockData (NestingLevel *nl)
 		&& stringListCount (bdata->mixin) > 0)
 		attachMixinField (nl->corkIndex, bdata->mixin);
 
-	if (nl->corkIndex != CORK_NIL)
-	{
-		tagEntryInfo *e = getEntryInCorkQueue (nl->corkIndex);
-		if (e && !e->placeholder)
+	tagEntryInfo *e = getEntryInCorkQueue (nl->corkIndex);
+	if (e && !e->placeholder)
 			e->extensionFields.endLine = getInputLineNumber ();
-	}
-
 
 	if (bdata->mixin)
 		stringListDelete (bdata->mixin);
@@ -880,8 +876,9 @@ static void findRubyTags (void)
 		else if (canMatchKeywordWithAssign (&cp, "class"))
 		{
 			int r = readAndEmitTag (&cp, K_CLASS);
+			tagEntryInfo *e = getEntryInCorkQueue (r);
 
-			if (r != CORK_NIL)
+			if (e)
 			{
 				skipWhitespace (&cp);
 				if (*cp == '<' && *(cp + 1) != '<')
@@ -890,10 +887,7 @@ static void findRubyTags (void)
 					vString *parent = vStringNew ();
 					parseIdentifier (&cp, parent, K_CLASS);
 					if (vStringLength (parent) > 0)
-					{
-						tagEntryInfo *e = getEntryInCorkQueue (r);
 						e->extensionFields.inheritance = vStringDeleteUnwrap (parent);
-					}
 					else
 						vStringDelete (parent);
 				}
@@ -915,7 +909,7 @@ static void findRubyTags (void)
 		{
 			rubyKind kind = K_METHOD;
 			NestingLevel *nl = nestingLevelsGetCurrent (nesting);
-			tagEntryInfo *e  = getEntryOfNestingLevel (nl);
+			tagEntryInfo *e_scope  = getEntryOfNestingLevel (nl);
 
 			/* if the def is inside an unnamed scope at the class level, assume
 			 * it's from a singleton from a construct like this:
@@ -928,12 +922,13 @@ static void findRubyTags (void)
 			 *   end
 			 * end
 			 */
-			if (e && e->kindIndex == K_CLASS && strlen (e->name) == 0)
+			if (e_scope && e_scope->kindIndex == K_CLASS && strlen (e_scope->name) == 0)
 				kind = K_SINGLETON;
 			int corkIndex = readAndEmitTag (&cp, kind);
+			tagEntryInfo *e = getEntryInCorkQueue (corkIndex);
 
 			/* Fill signature: field. */
-			if (corkIndex != CORK_NIL)
+			if (e)
 			{
 				vString *signature = vStringNewInit ("(");
 				skipWhitespace (&cp);
@@ -949,7 +944,6 @@ static void findRubyTags (void)
 				}
 				else
 					vStringPut (signature, ')');
-				tagEntryInfo *e = getEntryInCorkQueue (corkIndex);
 				e->extensionFields.signature = vStringDeleteUnwrap (signature);
 				signature = NULL;;
 				vStringDelete (signature);

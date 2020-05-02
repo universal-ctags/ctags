@@ -69,13 +69,9 @@ static void popBlockType (struct sAnsiblePlaybookSubparser *ansible,
 	ansible->type_stack = s->next;
 
 	s->next = NULL;
-	if (s->associatedCorkIndex != CORK_NIL)
-	{
-		tagEntryInfo *tag;
-
-		tag = getEntryInCorkQueue (s->associatedCorkIndex);
+	tagEntryInfo *tag = getEntryInCorkQueue (s->associatedCorkIndex);
+	if (tag)
 		attachYamlPosition (tag, token, true);
-	}
 
 	eFree (s);
 }

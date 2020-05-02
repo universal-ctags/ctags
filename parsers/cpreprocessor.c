@@ -792,7 +792,8 @@ static void makeParamTag (vString *name, bool placeholder)
 	if (placeholder)
 	{
 		tagEntryInfo *e = getEntryInCorkQueue (r);
-		e->placeholder = 1;
+		if (e)
+			e->placeholder = 1;
 	}
 }
 
@@ -875,9 +876,9 @@ static int directiveDefine (const int c, bool undef)
 				else
 					r = makeDefineTag (vStringValue (Cpp.directive.name), NULL, undef);
 
-				if (r != CORK_NIL)
+				tagEntryInfo *e = getEntryInCorkQueue (r);
+				if (e)
 				{
-					tagEntryInfo *e = getEntryInCorkQueue (r);
 					e->lineNumber = lineNumber;
 					e->filePosition = filePosition;
 					patchScopeFieldOfParameters (param_start, param_end, r);
@@ -1239,7 +1240,8 @@ static int skipToEndOfChar ()
 static void attachFields (int macroCorkIndex, unsigned long endLine, const char *macrodef)
 {
 	tagEntryInfo *tag = getEntryInCorkQueue (macroCorkIndex);
-	Assert(tag);
+	if (!tag)
+		return;
 
 	tag->extensionFields.endLine = endLine;
 	if (macrodef)

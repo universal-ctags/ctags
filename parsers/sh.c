@@ -258,9 +258,9 @@ static int hdocStateReadDestfileName (struct hereDocParsingState *hstate,
 
 static void hdocStateUpdateTag (struct hereDocParsingState *hstate, unsigned long endLine)
 {
-	if (hstate->corkIndex != CORK_NIL)
+	tagEntryInfo *tag = getEntryInCorkQueue (hstate->corkIndex);
+	if (tag)
 	{
-		tagEntryInfo *tag = getEntryInCorkQueue (hstate->corkIndex);
 		tag->extensionFields.endLine = endLine;
 		hstate->corkIndex = CORK_NIL;
 	}

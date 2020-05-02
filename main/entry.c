@@ -814,16 +814,13 @@ extern void getTagScopeInformation (tagEntryInfo *const tag,
 	if (name)
 		*name = NULL;
 
+	const tagEntryInfo * scope = getEntryInCorkQueue (tag->extensionFields.scopeIndex);
 	if (tag->extensionFields.scopeKindIndex == KIND_GHOST_INDEX
 	    && tag->extensionFields.scopeName == NULL
-	    && tag->extensionFields.scopeIndex != CORK_NIL
+	    && scope
 	    && ptrArrayCount (TagFile.corkQueue) > 0)
 	{
-		const tagEntryInfo * scope;
-		char *full_qualified_scope_name;
-
-		scope = getEntryInCorkQueue (tag->extensionFields.scopeIndex);
-		full_qualified_scope_name = getFullQualifiedScopeNameFromCorkQueue(scope);
+		char *full_qualified_scope_name = getFullQualifiedScopeNameFromCorkQueue(scope);
 		Assert (full_qualified_scope_name);
 
 		/* Make the information reusable to generate full qualified entry, and xformat output*/
@@ -997,13 +994,9 @@ extern void attachParserFieldToCorkEntry (int index,
 					 fieldType ftype,
 					 const char *value)
 {
-	tagEntryInfo * tag;
-
-	if (index == CORK_NIL)
-		return;
-
-	tag = getEntryInCorkQueue(index);
-	attachParserField (tag, true, ftype, value);
+	tagEntryInfo * tag = getEntryInCorkQueue (index);
+	if (tag)
+		attachParserField (tag, true, ftype, value);
 }
 
 extern const tagField* getParserFieldForIndex (const tagEntryInfo * tag, int index)
@@ -1336,6 +1329,7 @@ int anyEntryInScope (int corkIndex, const char *name)
 extern void registerEntry (int corkIndex)
 {
 	Assert (TagFile.corkFlags & CORK_SYMTAB);
+	Assert (corkIndex != CORK_NIL);
 
 	tagEntryInfoX *e = ptrArrayItem (TagFile.corkQueue, corkIndex);
 	{
@@ -1613,7 +1607,8 @@ extern int makeTagEntry (const tagEntryInfo *const tag)
 	else
 		writeTagEntry (tag);
 
-	notifyMakeTagEntry (tag, r);
+	if (r != CORK_NIL)
+		notifyMakeTagEntry (tag, r);
 
 out:
 	return r;

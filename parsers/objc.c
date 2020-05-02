@@ -691,10 +691,9 @@ static void parseMethodsNameCommon (vString * const ident, objcToken what,
 		parseImplemMethods (ident, what);
 		vStringClear (prevIdent);
 
-		if (index != CORK_NIL)
+		tagEntryInfo *e = getEntryInCorkQueue (index);
+		if (e)
 		{
-			tagEntryInfo *e = getEntryInCorkQueue (index);
-
 			if (vStringLast (signature) == ',')
 				vStringCatS (signature, "id");
 			vStringPut (signature, ')');
@@ -704,13 +703,11 @@ static void parseMethodsNameCommon (vString * const ident, objcToken what,
 			vStringClear (signature);
 			vStringPut (signature, '(');
 
-			if (categoryCorkIndex != CORK_NIL)
-			{
-				tagEntryInfo *e = getEntryInCorkQueue (categoryCorkIndex);
+			tagEntryInfo *e_cat = getEntryInCorkQueue (categoryCorkIndex);
+			if (e_cat)
 				attachParserFieldToCorkEntry (index,
 											  ObjcFields [F_CATEGORY].ftype,
-											  e->name);
-			}
+											  e_cat->name);
 		}
 		break;
 
@@ -733,22 +730,20 @@ static void parseCategory (vString * const ident, objcToken what)
 {
 	if (what == ObjcIDENTIFIER)
 	{
-		if (parentCorkIndex != CORK_NIL)
+		tagEntryInfo *e = getEntryInCorkQueue (parentCorkIndex);
+		if (e)
 		{
-			tagEntryInfo *e = getEntryInCorkQueue (parentCorkIndex);
-			if (e)
-				attachParserFieldToCorkEntry (parentCorkIndex,
-											  ObjcFields [F_CATEGORY].ftype,
-											  vStringValue (ident));
-
+			attachParserFieldToCorkEntry (parentCorkIndex,
+										  ObjcFields [F_CATEGORY].ftype,
+										  vStringValue (ident));
 			if (e->kindIndex == K_INTERFACE)
 				toDoNext = &parseMethods;
 			else
 				toDoNext = &parseImplemMethods;
-
-			int index = addTag (ident, K_CATEGORY);
-			pushCategoryContext (index);
 		}
+
+		int index = addTag (ident, K_CATEGORY);
+		pushCategoryContext (index);
 	}
 }
 
@@ -816,15 +811,9 @@ static void parseProperty (vString * const ident, objcToken what)
 
 static void parseInterfaceSuperclass (vString * const ident, objcToken what)
 {
-	if (what == ObjcIDENTIFIER && parentCorkIndex != CORK_NIL)
-	{
-		tagEntryInfo *e = getEntryInCorkQueue (parentCorkIndex);
-		if (e)
-		{
-			Assert (!e->extensionFields.inheritance);
-			e->extensionFields.inheritance = vStringStrdup (ident);
-		}
-	}
+	tagEntryInfo *e = getEntryInCorkQueue (parentCorkIndex);
+	if (what == ObjcIDENTIFIER && e)
+		e->extensionFields.inheritance = vStringStrdup (ident);
 
 	toDoNext = &parseMethods;
 }

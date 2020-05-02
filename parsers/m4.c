@@ -500,10 +500,11 @@ static void findM4Tags(void)
 			ungetcToInputFile(c);
 			readQuotedWord(token);
 		}
-		else if (c == ')'&& (index != CORK_NIL))
+		else if (c == ')')
 		{
 			tagEntryInfo *e = getEntryInCorkQueue (index);
-			e->extensionFields.endLine = getInputLineNumber ();
+			if (e)
+				e->extensionFields.endLine = getInputLineNumber ();
 			index = CORK_NIL;
 		}
 	}

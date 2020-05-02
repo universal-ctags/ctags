@@ -298,7 +298,8 @@ static void parseEnumConstants (int scopeCorkIndex)
 			nextToken ();
 	}
 	tagEntryInfo *e = getEntryInCorkQueue (scopeCorkIndex);
-	e->extensionFields.endLine = getInputLineNumber ();
+	if (e)
+		e->extensionFields.endLine = getInputLineNumber ();
 }
 
 static void parseOneofField (int scopeCorkIndex)
@@ -347,7 +348,8 @@ static void parseOneofFields (int scopeCorkIndex)
 	}
 
 	tagEntryInfo *e = getEntryInCorkQueue (scopeCorkIndex);
-	e->extensionFields.endLine = getInputLineNumber ();
+	if (e)
+		e->extensionFields.endLine = getInputLineNumber ();
 }
 
 #define gatherTypeinfo(VSTRING,CONDITION)			\
@@ -368,6 +370,8 @@ static void parseOneofFields (int scopeCorkIndex)
 static void parseRPCTypeinfos (int corkIndex)
 {
 	tagEntryInfo *e = getEntryInCorkQueue (corkIndex);
+	if (!e)
+		return;
 
 	vString *signature = vStringNew ();
 	gatherTypeinfo(signature,
@@ -440,9 +444,9 @@ static int parseStatementFull (int kind, int role, int scopeCorkIndex)
 	if (!fullName)
 		nextToken ();
 
-	if (fieldType && corkIndex != CORK_NIL)
+	tagEntryInfo *e = getEntryInCorkQueue (corkIndex);
+	if (fieldType && e)
 	{
-		tagEntryInfo *e = getEntryInCorkQueue (corkIndex);
 		e->extensionFields.typeRef [0] = eStrdup ("typename"); /* As C++ parser does */
 		e->extensionFields.typeRef [1] = vStringDeleteUnwrap (fieldType);
 		fieldType = NULL;
@@ -618,11 +622,10 @@ static void findProtobufTags0 (bool oneshot, int originalScopeCorkIndex)
 		else if (tokenIsKeyword (KEYWORD_OPTION))
 			dontChangeScope = true;
 		else if (syntax == SYNTAX_PROTO3
-				 && (token.type == '.' || token.type == TOKEN_ID)
-				 && (scopeCorkIndex != CORK_NIL))
+				 && (token.type == '.' || token.type == TOKEN_ID))
 		{
 			tagEntryInfo *e = getEntryInCorkQueue (scopeCorkIndex);
-			if (e->kindIndex == PK_MESSAGE)
+			if (e && e->kindIndex == PK_MESSAGE)
 				corkIndex = parseStatement (PK_FIELD, scopeCorkIndex);
 		}
 
@@ -632,12 +635,15 @@ static void findProtobufTags0 (bool oneshot, int originalScopeCorkIndex)
 			/* Enter the new scope. */
 			scopeCorkIndex = corkIndex;
 		}
-		else if (!dontChangeScope && token.type == '}' && scopeCorkIndex != CORK_NIL)
+		else if (!dontChangeScope && token.type == '}')
 		{
 			/* Return to the parent scope. */
 			tagEntryInfo *e = getEntryInCorkQueue (scopeCorkIndex);
-			scopeCorkIndex = e->extensionFields.scopeIndex;
-			e->extensionFields.endLine = getInputLineNumber ();
+			if (e)
+			{
+				scopeCorkIndex = e->extensionFields.scopeIndex;
+				e->extensionFields.endLine = getInputLineNumber ();
+			}
 		}
 		nextToken ();
 

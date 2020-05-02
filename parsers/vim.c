@@ -269,12 +269,9 @@ static void parseFunction (const unsigned char *line)
 	{
 		if (wordMatchLen (line, "endfunction", 4))
 		{
-			tagEntryInfo *e;
-			if (index != CORK_NIL)
-			{
-				e = getEntryInCorkQueue (index);
+			tagEntryInfo *e = getEntryInCorkQueue (index);
+			if (e)
 				e->extensionFields.endLine = getInputLineNumber ();
-			}
 			break;
 		}
 

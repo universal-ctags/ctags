@@ -331,9 +331,9 @@ static bool check_line_continuation (const char *line,
 	TRACE_PRINT("Line %04d continuation: %d -> %d",
 				getInputLineNumber(), rejecting, ctx->rejecting);
 
-	if (rejecting && (!ctx->rejecting) && (ctx->macro_index != CORK_NIL))
+	tagEntryInfo *e = getEntryInCorkQueue (ctx->macro_index);
+	if (rejecting && (!ctx->rejecting) && e)
 	{
-		tagEntryInfo *e = getEntryInCorkQueue (ctx->macro_index);
 		e->extensionFields.endLine = getInputLineNumber();
 		ctx->macro_index = CORK_NIL;
 	}

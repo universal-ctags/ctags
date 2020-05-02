@@ -1680,8 +1680,12 @@ static void parseClassBody (const int scope, tokenInfo *const token)
 	if (inheritance)
 	{
 		tagEntryInfo *klass = getEntryInCorkQueue (scope);
-		klass->extensionFields.inheritance = vStringDeleteUnwrap (inheritance);
-		inheritance = NULL;
+		if (klass)
+		{
+			klass->extensionFields.inheritance = vStringDeleteUnwrap (inheritance);
+			inheritance = NULL;
+		}
+		vStringDelete (inheritance);
 	}
 
 	tokenInfo *member = NULL;
