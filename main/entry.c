@@ -1322,7 +1322,7 @@ static bool findName (int corkIndex, tagEntryInfo *entry, void *data)
 {
 	int *index = data;
 
-	*index =  (int)corkIndex;
+	*index =  corkIndex;
 	return false;
 }
 
