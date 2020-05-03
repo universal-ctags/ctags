@@ -1,0 +1,4 @@
+"./input-0.r"	input.r	/^source(".\/input-0.r", echo = T)$/;"	s	roles:source
+splines	input.r	/^library(splines)            # attach package 'splines'$/;"	l	roles:library
+base	input.r	/^require(base)$/;"	l	roles:require
+x	input-0.r	/^x <- 1$/;"	g	roles:def

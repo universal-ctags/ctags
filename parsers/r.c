@@ -13,6 +13,9 @@
 *   The language references are available at
 *   https://cran.r-project.org/manuals.html, and
 *   https://cran.r-project.org/doc/manuals/r-release/R-lang.html
+*
+*   The base library (including library and source fucntions) release is at
+*   https://stat.ethz.ch/R-manual/R-devel/library/base/html/00Index.html
 */
 
 /*
@@ -52,11 +55,6 @@
 										 tokenIsTypeVal(token, '\n')? "\\n": tokenString(token), \
 										 tokenTypeStr(token->type), \
 										 parent == CORK_NIL? "": getEntryInCorkQueue(parent)->name)
-/*
-#define R_TRACE_LEAVE() TRACE_LEAVE_TEXT("token: %s (%s), parent: %s", \
-										 tokenIsTypeVal(token, '\n')? "\\n": tokenString(token), \
-										 tokenTypeStr(token->type), \
-										 parent == CORK_NIL? "": getEntryInCorkQueue(parent)->name)*/
 #define R_TRACE_LEAVE() TRACE_LEAVE()
 #else
 #define R_TRACE_TOKEN_TEXT(TXT,T,Q) do {} while (0);
@@ -80,10 +78,30 @@ typedef enum {
 	KIND_COUNT
 } rKind;
 
+typedef enum {
+	R_LIBRARY_ATTACHED_BY_LIBRARY,
+	R_LIBRARY_ATTACHED_BY_REQUIRE,
+} rLibraryRole;
+
+typedef enum {
+	R_SOURCE_LOADED_BY_SOURCE,
+} rSourceRole;
+
+static roleDefinition RLibraryRoles [] = {
+	{ true, "library", "library attached by library fucntion" },
+	{ true, "require", "library attached by require fucntion" },
+};
+
+static roleDefinition RSourceRoles [] = {
+	{ true, "source", "source loaded by source fucntion" },
+};
+
 static kindDefinition RKinds[KIND_COUNT] = {
 	{true, 'f', "function", "functions"},
-	{true, 'l', "library", "libraries"},
-	{true, 's', "source", "sources"},
+	{true, 'l', "library", "libraries",
+	 .referenceOnly = true, ATTACH_ROLES (RLibraryRoles) },
+	{true, 's', "source", "sources",
+	 .referenceOnly = true, ATTACH_ROLES (RSourceRoles) },
 	{true, 'g', "globalVar", "global variables"},
 	{true, 'v', "functionVar", "function variables"},
 	{false,'z', "parameter",  "function parameters inside function definitions" },
@@ -146,6 +164,7 @@ static const keywordTable RKeywordTable [] = {
 	{ "NA_character_", KEYWORD_NA, },
 	{ "source",   KEYWORD_SOURCE   },
 	{ "library",  KEYWORD_LIBRARY  },
+	{ "require",  KEYWORD_LIBRARY  },
 };
 
 enum RTokenType {
@@ -210,8 +229,8 @@ static struct tokenInfoClass rTokenInfoClass = {
  * FUNCTION PROTOTYPES
  */
 
-static void parseStatement (tokenInfo *const token, int parent, bool in_arg_list, bool in_continuous_pair);
-static void parsePair (tokenInfo *const token, int parent, bool in_arg_list);
+static void parseStatement (tokenInfo *const token, int parent, tokenInfo *const funcall, bool in_continuous_pair);
+static void parsePair (tokenInfo *const token, int parent, tokenInfo *const funcall);
 
 
 /*
@@ -696,7 +715,7 @@ static void parseRightSide (tokenInfo *const token, tokenInfo *const symbol, int
 
 	R_TRACE_TOKEN_TEXT("body", token, in_func? corkIndex: parent);
 
-	parseStatement (token, in_func? corkIndex: parent, false, false);
+	parseStatement (token, in_func? corkIndex: parent, NULL, false);
 
 	tagEntryInfo *tag = getEntryInCorkQueue (corkIndex);
 	if (tag)
@@ -718,19 +737,97 @@ static void parseRightSide (tokenInfo *const token, tokenInfo *const symbol, int
 	R_TRACE_LEAVE();
 }
 
-static void parsePair (tokenInfo *const token, int parent, bool in_arg_list)
+/* Parse arguments for library and source. */
+static bool preParseExternalEntitiy (tokenInfo *const token, tokenInfo *const funcall)
+{
+	TRACE_ENTER();
+
+	bool r = true;
+	tokenInfo *prefetch_token = newRToken ();
+
+	tokenReadNoNewline (prefetch_token);
+	if (tokenIsType (prefetch_token, SYMBOL)
+		|| tokenIsType (prefetch_token, STRING))
+	{
+		tokenInfo *const loaded_obj_token = newTokenByCopying (prefetch_token);
+		tokenReadNoNewline (prefetch_token);
+		if (tokenIsTypeVal (prefetch_token, ')')
+			|| tokenIsTypeVal (prefetch_token, ','))
+		{
+			if (tokenIsTypeVal (prefetch_token, ')'))
+				r = false;
+
+			makeSimpleRefTag (loaded_obj_token->string,
+							  (tokenIsKeyword (funcall, LIBRARY)
+							   ? K_LIBRARY
+							   : K_SOURCE),
+							  (tokenIsKeyword (funcall, LIBRARY)
+							   ? (strcmp (tokenString(funcall), "library") == 0
+								  ? R_LIBRARY_ATTACHED_BY_LIBRARY
+								  : R_LIBRARY_ATTACHED_BY_REQUIRE)
+							   : R_SOURCE_LOADED_BY_SOURCE));
+			tokenDelete (loaded_obj_token);
+		}
+		else if (tokenIsEOF (prefetch_token))
+		{
+			tokenCopy (token, prefetch_token);
+			tokenDelete (loaded_obj_token);
+			r = false;
+		}
+		else
+		{
+			tokenUnread (prefetch_token);
+			tokenUnread (loaded_obj_token);
+			tokenDelete (loaded_obj_token);
+		}
+	}
+	else if (tokenIsEOF (prefetch_token))
+	{
+		tokenCopy (token, prefetch_token);
+		r = false;
+	}
+	else
+		tokenUnread (prefetch_token);
+
+	tokenDelete (prefetch_token);
+
+	TRACE_LEAVE_TEXT(r
+					 ? "unread tokens and request parsing again to the upper context"
+					 : "parse all arguments");
+	return r;
+}
+
+
+/* If funcall is non-NULL, this pair represents the argument list for the function
+ * call for FUNCALL. */
+static void parsePair (tokenInfo *const token, int parent, tokenInfo *const funcall)
 {
 	R_TRACE_ENTER();
 
 	bool in_continuous_pair = tokenIsTypeVal (token, '(')
 		|| tokenIsTypeVal (token, '[')
 		|| tokenIsType(token, DBRACKET_OEPN);
+	bool is_funcall = funcall && tokenIsTypeVal (token, '(');
+	bool done = false;
+
+	if (is_funcall)
+	{
+		if 	(tokenIsKeyword (funcall, LIBRARY) ||
+			 tokenIsKeyword (funcall, SOURCE))
+			done = !preParseExternalEntitiy (token, funcall);
+	}
+
+	if (done)
+	{
+		R_TRACE_LEAVE();
+		return;
+	}
 
 	do
 	{
 		tokenRead (token);
 		R_TRACE_TOKEN_TEXT("inside pair", token, parent);
-		parseStatement (token, parent, in_arg_list, in_continuous_pair);
+		parseStatement (token, parent, funcall, in_continuous_pair);
 	}
 	while (! (tokenIsEOF (token)
 			  || tokenIsTypeVal (token, ')')
@@ -741,7 +838,7 @@ static void parsePair (tokenInfo *const token, int parent, bool in_arg_list)
 }
 
 static void parseStatement (tokenInfo *const token, int parent,
-							bool in_arg_list, bool in_continuous_pair)
+							tokenInfo *const funcall, bool in_continuous_pair)
 {
 	R_TRACE_ENTER();
 
@@ -781,7 +878,7 @@ static void parseStatement (tokenInfo *const token, int parent,
 			else if (tokenIsTypeVal (token, '='))
 			{
 				/* Assignment */
-				if (in_arg_list)
+				if (funcall)
 				{
 					tokenRead (token);
 					R_TRACE_TOKEN_TEXT("(in arg list) after = body", token, parent);
@@ -797,7 +894,7 @@ static void parseStatement (tokenInfo *const token, int parent,
 			else if (tokenIsTypeVal (token, '('))
 			{
 				/* function call */
-				parsePair (token, parent, true);
+				parsePair (token, parent, symbol);
 				tokenRead (token);
 				R_TRACE_TOKEN_TEXT("after arglist", token, parent);
 			}
@@ -845,7 +942,7 @@ static void parseStatement (tokenInfo *const token, int parent,
 				 || tokenIsTypeVal (token, '[')
 				 || tokenIsType (token, DBRACKET_OEPN))
 		{
-			parsePair (token, parent, false);
+			parsePair (token, parent, NULL);
 			tokenRead (token);
 			R_TRACE_TOKEN_TEXT("after pair", token, parent);
 		}
@@ -884,7 +981,7 @@ static void findRTags (void)
 	{
 		tokenRead(token);
 		R_TRACE_TOKEN(token, CORK_NIL);
-		parseStatement (token, CORK_NIL, false, false);
+		parseStatement (token, CORK_NIL, NULL, false);
 	}
 	while (!tokenIsEOF (token));
 
