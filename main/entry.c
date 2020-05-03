@@ -1336,6 +1336,50 @@ int anyEntryInScope (int corkIndex, const char *name)
 	return CORK_NIL;
 }
 
+struct anyKindsEntryInScopeData {
+	int  index;
+	const int *kinds;
+	int  count;
+};
+
+static bool findNameOfKinds (int corkIndex, tagEntryInfo *entry, void *data)
+{
+	struct anyKindsEntryInScopeData * kdata = data;
+
+	for (int i = 0; i < kdata->count; i++)
+	{
+		int k = kdata->kinds [i];
+		if (entry->kindIndex == k)
+		{
+			kdata->index = corkIndex;
+			return false;
+		}
+	}
+	return true;
+}
+
+int anyKindEntryInScope (int corkIndex,
+						 const char *name, int kind)
+{
+	return anyKindsEntryInScope (corkIndex, name, &kind, 1);
+}
+
+int anyKindsEntryInScope (int corkIndex,
+						  const char *name,
+						  const int *kinds, int count)
+{
+	struct anyKindsEntryInScopeData data = {
+		.index = CORK_NIL,
+		.kinds = kinds,
+		.count = count,
+	};
+
+	if (foreachEntriesInScope (corkIndex, name, findNameOfKinds, &data) == false)
+		return data.index;
+
+	return CORK_NIL;
+}
+
 extern void registerEntry (int corkIndex)
 {
 	Assert (TagFile.corkFlags & CORK_SYMTAB);

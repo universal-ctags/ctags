@@ -178,6 +178,13 @@ bool          foreachEntriesInScope (int corkIndex,
 int           anyEntryInScope       (int corkIndex,
 									 const char *name);
 
+int           anyKindEntryInScope (int corkIndex,
+								   const char *name, int kind);
+
+int           anyKindsEntryInScope (int corkIndex,
+									const char *name,
+									const int * kinds, int count);
+
 extern void    markTagExtraBit     (tagEntryInfo *const tag, xtagType extra);
 extern bool isTagExtraBitMarked (const tagEntryInfo *const tag, xtagType extra);
 
