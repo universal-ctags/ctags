@@ -208,4 +208,17 @@ extern void attachParserFieldToCorkEntry (int index, fieldType ftype, const char
 
 extern int makePlaceholder (const char *const name);
 
+/* Marking all tag entries entries under the scope specified
+ * with index recursively.
+ *
+ * The parser calling this function enables CORK_SYMTAB.
+ * Entries to be marked must be registered to the scope
+ * specified with index or its descendant scopes with
+ * registerEntry ().
+ *
+ * Call makePlaceholder () at the start of your parser for
+ * making the root scope where the entries are registered.
+ */
+extern void markAllEntriesInScopeAsPlaceholder (int index);
+
 #endif  /* CTAGS_MAIN_ENTRY_H */

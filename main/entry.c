@@ -1981,3 +1981,15 @@ extern const char* getTagFileDirectory (void)
 {
 	return TagFile.directory;
 }
+
+static bool markAsPlaceholder  (int index, tagEntryInfo *e, void *data CTAGS_ATTR_UNUSED)
+{
+	e->placeholder = 1;
+	markAllEntriesInScopeAsPlaceholder (index);
+	return true;
+}
+
+extern void markAllEntriesInScopeAsPlaceholder (int index)
+{
+	foreachEntriesInScope (index, NULL, markAsPlaceholder, NULL);
+}
