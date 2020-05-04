@@ -1284,7 +1284,17 @@ extern bool foreachEntriesInScope (int corkIndex,
 		}
 	}
 	else
+	{
 		last = rb_last(root);
+		verbose ("last for %d<%p>: %p\n", corkIndex, root, last);
+	}
+
+	if (!last)
+	{
+		verbose ("symtbl[>V] %s->%p\n", name, NULL);
+		return true;			/* Nothing here in this node. */
+	}
+
 	verbose ("symtbl[>|] %s->%p\n", name, &container_of(last, tagEntryInfoX, symnode)->slot);
 
 	struct rb_node *cursor = last;
