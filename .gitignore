@@ -97,3 +97,4 @@ Units/**/Makefile.am
 Units/**/Makefile.in
 Tmain/dist.m4
 Units/dist.m4
+VALGRIND.tmp.core.*
