@@ -185,6 +185,10 @@ int           anyKindsEntryInScope (int corkIndex,
 									const char *name,
 									const int * kinds, int count);
 
+int           anyKindsEntryInScopeRecursive (int corkIndex,
+											 const char *name,
+											 const int * kinds, int count);
+
 extern void    markTagExtraBit     (tagEntryInfo *const tag, xtagType extra);
 extern bool isTagExtraBitMarked (const tagEntryInfo *const tag, xtagType extra);
 

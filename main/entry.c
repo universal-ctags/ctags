@@ -1380,6 +1380,35 @@ int anyKindsEntryInScope (int corkIndex,
 	return CORK_NIL;
 }
 
+int anyKindsEntryInScopeRecursive (int corkIndex,
+								   const char *name,
+								   const int *kinds, int count)
+{
+	struct anyKindsEntryInScopeData data = {
+		.index = CORK_NIL,
+		.kinds = kinds,
+		.count = count,
+	};
+
+	tagEntryInfo *e;
+	do
+	{
+		if (foreachEntriesInScope (corkIndex, name, findNameOfKinds, &data) == false)
+			return data.index;
+
+		if (corkIndex == CORK_NIL)
+			break;
+
+		e = getEntryInCorkQueue (corkIndex);
+		if (!e)
+			break;
+		corkIndex = e->extensionFields.scopeIndex;
+	}
+	while (1);
+
+	return CORK_NIL;
+}
+
 extern void registerEntry (int corkIndex)
 {
 	Assert (TagFile.corkFlags & CORK_SYMTAB);
