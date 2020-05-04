@@ -1,0 +1,15 @@
+x	input.r	/^x <- 1$/;"	g	line:1
+f	input.r	/^f <- function () {$/;"	f	line:4
+x	input.r	/^  x <- 3$/;"	v	line:5	function:f
+f	input.r	/^f <- function () {$/;"	f	line:10
+x	input.r	/^  x <- 4$/;"	v	line:11	function:f
+f	input.r	/^f <- function (x) {$/;"	f	line:14
+x	input.r	/^f <- function (x) {$/;"	z	line:14	function:f
+f	input.r	/^f <- function (x) {$/;"	f	line:18
+x	input.r	/^f <- function (x) {$/;"	z	line:18	function:f
+g	input.r	/^  g <- function () {$/;"	v	line:19	function:f
+x	input.r	/^    x <- 6$/;"	v	line:20	functionVar:f.g
+f	input.r	/^f <- function (x) {$/;"	f	line:24
+x	input.r	/^f <- function (x) {$/;"	z	line:24	function:f
+g	input.r	/^  g <- function () {$/;"	v	line:25	function:f
+x	input.r	/^    x <- 6$/;"	v	line:26	functionVar:f.g

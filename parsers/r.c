@@ -207,6 +207,8 @@ typedef struct sRToken {
 
 #define R(TOKEN) ((rToken *)TOKEN)
 
+static int blackHoleIndex;
+
 static void readToken (tokenInfo *const token, void *data);
 static void clearToken (tokenInfo *token);
 static struct tokenInfoClass rTokenInfoClass = {
@@ -236,6 +238,30 @@ static void parsePair (tokenInfo *const token, int parent, tokenInfo *const func
 /*
 *   FUNCTION DEFINITIONS
 */
+
+static int makeSimpleRTag (tokenInfo *const token, int parent, int kind)
+{
+	if (kind != K_FUNCTION)
+	{
+		if (kind == K_FUNCVAR)
+		{
+			if (anyKindsEntryInScope (parent, tokenString (token),
+									  (int[]){K_FUNCVAR, K_PARAM}, 2) != CORK_NIL)
+				return CORK_NIL;
+		}
+		else if (anyKindEntryInScope (parent, tokenString (token), kind) != CORK_NIL)
+			return CORK_NIL;
+	}
+
+	int corkIndex = makeSimpleTag (token->string, kind);
+	tagEntryInfo *tag = getEntryInCorkQueue (corkIndex);
+	if (tag)
+	{
+		tag->extensionFields.scopeIndex = parent;
+		registerEntry (corkIndex);
+	}
+	return corkIndex;
+}
 
 static void clearToken (tokenInfo *token)
 {
@@ -645,12 +671,7 @@ static void readToken (tokenInfo *const token, void *data)
 
 		if (R (token)->parenDepth == 1 && tokenIsType (token, SYMBOL)
 			&& signatureExpectingParameter (signature))
-		{
-			int index = makeSimpleTag (token->string, K_PARAM);
-			tagEntryInfo *tag = getEntryInCorkQueue (index);
-			if (tag)
-				tag->extensionFields.scopeIndex = R (token)->scopeIndex;
-		}
+			makeSimpleRTag (token, R (token)->scopeIndex, K_PARAM);
 
 		if (vStringLast (signature) != '(' &&
 			!tokenIsTypeVal (token, ',') &&
@@ -676,7 +697,6 @@ static void tokenReadNoNewline (tokenInfo *const token)
 	}
 }
 
-
 static void parseRightSide (tokenInfo *const token, tokenInfo *const symbol, int parent)
 {
 	R_TRACE_ENTER();
@@ -690,37 +710,45 @@ static void parseRightSide (tokenInfo *const token, tokenInfo *const symbol, int
 	bool in_func = tokenIsKeyword (token, FUNCTION);
 	if (in_func)
 	{
-
-		corkIndex = makeSimpleTag (symbol->string,
+		corkIndex = makeSimpleRTag (symbol, parent,
 								   parent == CORK_NIL? K_FUNCTION: K_FUNCVAR);
 		tokenReadNoNewline (token);
 
 		/* Signature */
 		if (tokenIsTypeVal (token, '('))
 		{
-			signature = vStringNewInit("(");
-			R (token)->signature = signature;
-			R (token)->scopeIndex = corkIndex;
-			R (token)->parenDepth = 1;
-			tokenSkipOverPair (token);
-			R (token)->parenDepth = 0;
-			R (token)->scopeIndex = CORK_NIL;
-			R (token)->signature = NULL;
+			if (corkIndex == CORK_NIL)
+				tokenSkipOverPair (token);
+			else
+			{
+				signature = vStringNewInit("(");
+				R (token)->signature = signature;
+				R (token)->scopeIndex = corkIndex;
+				R (token)->parenDepth = 1;
+				tokenSkipOverPair (token);
+				R (token)->parenDepth = 0;
+				R (token)->scopeIndex = CORK_NIL;
+				R (token)->signature = NULL;
+			}
 			tokenReadNoNewline (token);
 		}
 	}
 	else
-		corkIndex = makeSimpleTag (symbol->string,
-								   parent == CORK_NIL? K_GLOBALVAR: K_FUNCVAR);
+		corkIndex = makeSimpleRTag (symbol, parent,
+									parent == CORK_NIL? K_GLOBALVAR: K_FUNCVAR);
 
-	R_TRACE_TOKEN_TEXT("body", token, in_func? corkIndex: parent);
+	int new_scope = (in_func
+					 ? (corkIndex == CORK_NIL
+						? blackHoleIndex
+						: corkIndex)
+					 : parent);
+	R_TRACE_TOKEN_TEXT("body", token, new_scope);
 
-	parseStatement (token, in_func? corkIndex: parent, NULL, false);
+	parseStatement (token, new_scope, NULL, false);
 
 	tagEntryInfo *tag = getEntryInCorkQueue (corkIndex);
 	if (tag)
 	{
-		tag->extensionFields.scopeIndex = parent;
 		tag->extensionFields.endLine = token->lineNumber;
 		if (signature)
 		{
@@ -917,16 +945,13 @@ static void parseStatement (tokenInfo *const token, int parent,
 			if (tokenIsType (token, SYMBOL)
 				|| tokenIsType (token, STRING))
 			{
-				int corkIndex = makeSimpleTag (token->string,
-											   parent == CORK_NIL? K_GLOBALVAR: K_FUNCVAR);
+				int corkIndex = makeSimpleRTag (token, parent,
+												parent == CORK_NIL? K_GLOBALVAR: K_FUNCVAR);
 				tagEntryInfo *tag = getEntryInCorkQueue (corkIndex);
 				if (tag)
-				{
-					tag->extensionFields.scopeIndex = parent;
 					attachParserField (tag, true,
 									   RFields [F_ASSIGNMENT_OPERATOR].ftype,
 									   assignment_operator);
-				}
 				tokenRead (token);
 			}
 			eFree (assignment_operator);
@@ -977,6 +1002,11 @@ static void findRTags (void)
 {
 	tokenInfo *const token = newRToken ();
 
+	blackHoleIndex = makePlaceholder ("**BLACK-HOLE/DON'T TAG ME**");
+	registerEntry (blackHoleIndex);
+
+	TRACE_PRINT ("install blackhole: %d", blackHoleIndex);
+
 	do
 	{
 		tokenRead(token);
@@ -984,6 +1014,9 @@ static void findRTags (void)
 		parseStatement (token, CORK_NIL, NULL, false);
 	}
 	while (!tokenIsEOF (token));
+
+	TRACE_PRINT ("run blackhole", blackHoleIndex);
+	markAllEntriesInScopeAsPlaceholder (blackHoleIndex);
 
 	tokenDelete (token);
 }
@@ -1002,7 +1035,7 @@ extern parserDefinition *RParser (void)
 	def->fieldCount = ARRAY_SIZE (RFields);
 	def->keywordTable = RKeywordTable;
 	def->keywordCount = ARRAY_SIZE(RKeywordTable);
-	def->useCork = CORK_QUEUE;
+	def->useCork = CORK_QUEUE | CORK_SYMTAB;
 	def->parser = findRTags;
 	def->selectLanguage = selectors;
 
