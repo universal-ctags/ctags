@@ -1,0 +1,11 @@
+f	input.r	/^f <- function () {$/;"	f
+x	input.r	/^  x <<- 1$/;"	g
+y	input.r	/^y <- 1$/;"	g
+g	input.r	/^g <- function () {$/;"	f
+h	input.r	/^h <- function () {$/;"	f
+h0	input.r	/^  h0 <- function () {$/;"	v	function:h
+i	input.r	/^i <- function () {$/;"	f
+z	input.r	/^  z <- 1$/;"	v	function:i
+i0	input.r	/^  i0 <- function () {$/;"	v	function:i
+v	input.r	/^    v <<- 13$/;"	g
+u	input.r	/^    v ->> u$/;"	g

@@ -239,9 +239,25 @@ static void parsePair (tokenInfo *const token, int parent, tokenInfo *const func
 *   FUNCTION DEFINITIONS
 */
 
-static int makeSimpleRTag (tokenInfo *const token, int parent, int kind)
+static int makeSimpleRTag (tokenInfo *const token, int parent, int kind,
+						   const char * assignmentOp)
 {
-	if (kind != K_FUNCTION)
+	if (assignmentOp && (strlen (assignmentOp) == 3))
+	{
+		/* <<- or ->> is used here. */
+		if (anyKindsEntryInScopeRecursive (parent, tokenString (token),
+										   (int[]){K_FUNCTION,
+												   K_GLOBALVAR,
+												   K_FUNCVAR,
+												   K_PARAM}, 4) != CORK_NIL)
+			return CORK_NIL;
+
+		parent = CORK_NIL;
+		/* TODO: we must choose K_GLOBALVAR or K_FUNCTION though K_GLOBALVAR
+		 * is used statically here.*/
+		kind = K_GLOBALVAR;
+	}
+	else if (kind != K_FUNCTION)
 	{
 		if (kind == K_FUNCVAR)
 		{
@@ -258,6 +274,10 @@ static int makeSimpleRTag (tokenInfo *const token, int parent, int kind)
 	if (tag)
 	{
 		tag->extensionFields.scopeIndex = parent;
+		if (assignmentOp)
+			attachParserField (tag, true,
+							   RFields [F_ASSIGNMENT_OPERATOR].ftype,
+							   assignmentOp);
 		registerEntry (corkIndex);
 	}
 	return corkIndex;
@@ -671,7 +691,7 @@ static void readToken (tokenInfo *const token, void *data)
 
 		if (R (token)->parenDepth == 1 && tokenIsType (token, SYMBOL)
 			&& signatureExpectingParameter (signature))
-			makeSimpleRTag (token, R (token)->scopeIndex, K_PARAM);
+			makeSimpleRTag (token, R (token)->scopeIndex, K_PARAM, NULL);
 
 		if (vStringLast (signature) != '(' &&
 			!tokenIsTypeVal (token, ',') &&
@@ -711,7 +731,8 @@ static void parseRightSide (tokenInfo *const token, tokenInfo *const symbol, int
 	if (in_func)
 	{
 		corkIndex = makeSimpleRTag (symbol, parent,
-								   parent == CORK_NIL? K_FUNCTION: K_FUNCVAR);
+									parent == CORK_NIL? K_FUNCTION: K_FUNCVAR,
+									assignment_operator);
 		tokenReadNoNewline (token);
 
 		/* Signature */
@@ -735,7 +756,8 @@ static void parseRightSide (tokenInfo *const token, tokenInfo *const symbol, int
 	}
 	else
 		corkIndex = makeSimpleRTag (symbol, parent,
-									parent == CORK_NIL? K_GLOBALVAR: K_FUNCVAR);
+									parent == CORK_NIL? K_GLOBALVAR: K_FUNCVAR,
+									assignment_operator);
 
 	int new_scope = (in_func
 					 ? (corkIndex == CORK_NIL
@@ -755,9 +777,6 @@ static void parseRightSide (tokenInfo *const token, tokenInfo *const symbol, int
 			tag->extensionFields.signature = vStringDeleteUnwrap(signature);
 			signature = NULL;
 		}
-		attachParserField (tag, true,
-						   RFields [F_ASSIGNMENT_OPERATOR].ftype,
-						   assignment_operator);
 	}
 
 	vStringDelete (signature);	/* NULL is acceptable. */
@@ -945,13 +964,9 @@ static void parseStatement (tokenInfo *const token, int parent,
 			if (tokenIsType (token, SYMBOL)
 				|| tokenIsType (token, STRING))
 			{
-				int corkIndex = makeSimpleRTag (token, parent,
-												parent == CORK_NIL? K_GLOBALVAR: K_FUNCVAR);
-				tagEntryInfo *tag = getEntryInCorkQueue (corkIndex);
-				if (tag)
-					attachParserField (tag, true,
-									   RFields [F_ASSIGNMENT_OPERATOR].ftype,
-									   assignment_operator);
+				makeSimpleRTag (token, parent,
+								parent == CORK_NIL? K_GLOBALVAR: K_FUNCVAR,
+								assignment_operator);
 				tokenRead (token);
 			}
 			eFree (assignment_operator);
