@@ -1,0 +1,4 @@
+--kinds-R=*
+--fields-R=*
+--fields=+E
+--sort=no

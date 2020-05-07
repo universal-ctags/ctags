@@ -275,9 +275,14 @@ static int makeSimpleRTag (tokenInfo *const token, int parent, int kind,
 	{
 		tag->extensionFields.scopeIndex = parent;
 		if (assignmentOp)
-			attachParserField (tag, true,
-							   RFields [F_ASSIGNMENT_OPERATOR].ftype,
-							   assignmentOp);
+		{
+			if (strlen (assignmentOp) > 0)
+				attachParserField (tag, true,
+								   RFields [F_ASSIGNMENT_OPERATOR].ftype,
+								   assignmentOp);
+			else
+				markTagExtraBit (tag, XTAG_ANONYMOUS);
+		}
 		registerEntry (corkIndex);
 	}
 	return corkIndex;
@@ -902,6 +907,19 @@ static void parseStatement (tokenInfo *const token, int parent,
 		{
 			R_TRACE_TOKEN_TEXT ("break with \\n", token, parent);
 			break;
+		}
+		else if (tokenIsType (token, KEYWORD)
+				 && tokenIsKeyword (token, FUNCTION))
+		{
+			/* This statement doesn't start with a symbol.
+			 * This function is not assigned to any symbol. */
+			tokenInfo *const anonfunc = newTokenByCopying (token);
+			anonGenerate (anonfunc->string, "anonFunc",
+						  parent == CORK_NIL? K_GLOBALVAR: K_FUNCVAR);
+			tokenUnread (token);
+			vStringClear (token->string);
+			parseRightSide (token, anonfunc, parent);
+			tokenDelete (anonfunc);
 		}
 		else if (tokenIsType (token, SYMBOL)
 				 || tokenIsType (token, STRING)
