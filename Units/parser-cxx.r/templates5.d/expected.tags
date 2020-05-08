@@ -1,0 +1,11 @@
+Checks	input.cpp	/^struct Checks$/;"	s	file:
+Check	input.cpp	/^	template <typename X> static constexpr bool Check()$/;"	f	struct:Checks	typeref:typename:bool	file:	template:<typename X>
+X	input.cpp	/^	template <typename X> static constexpr bool Check()$/;"	Z	function:Checks::Check	typeref:meta:typename
+S	input.cpp	/^template<typename A, typename std::enable_if<Checks::template Check<A>(),bool>::type = true> cla/;"	c	file:	template:<typename A,typename std::enable_if<Checks::template Check<A> (),bool>::type=true>
+A	input.cpp	/^template<typename A, typename std::enable_if<Checks::template Check<A>(),bool>::type = true> cla/;"	Z	class:S	typeref:meta:typename
+foo	input.cpp	/^	template<typename U> void foo(){}$/;"	f	class:S	typeref:typename:void	file:	template:<typename U>
+U	input.cpp	/^	template<typename U> void foo(){}$/;"	Z	function:S::foo	typeref:meta:typename
+bar	input.cpp	/^template<typename T> void bar()$/;"	f	typeref:typename:void	template:<typename T>
+T	input.cpp	/^template<typename T> void bar()$/;"	Z	function:bar	typeref:meta:typename
+s	input.cpp	/^	S<T> s;$/;"	l	function:bar	typeref:typename:S<T>	file:
+marker	input.cpp	/^int marker;$/;"	v	typeref:typename:int
