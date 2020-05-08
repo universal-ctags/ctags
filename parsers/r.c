@@ -849,6 +849,26 @@ static bool preParseExternalEntitiy (tokenInfo *const token, tokenInfo *const fu
 	return r;
 }
 
+static bool preParseLoopCounter(tokenInfo *const token, int parent)
+{
+	bool r = true;
+	TRACE_ENTER();
+
+	tokenReadNoNewline (token);
+	if (tokenIsType (token, SYMBOL))
+		makeSimpleRTag (token, parent,
+						(parent == CORK_NIL) ? K_GLOBALVAR: K_FUNCVAR , NULL);
+
+	if (tokenIsEOF (token)
+		|| tokenIsTypeVal (token, ')'))
+		r = false;
+
+	TRACE_LEAVE_TEXT(r
+					 ? "unread tokens and request parsing again to the upper context"
+					 : "parse all arguments");
+	return r;
+}
+
 
 /* If funcall is non-NULL, this pair represents the argument list for the function
  * call for FUNCALL. */
@@ -867,6 +887,8 @@ static void parsePair (tokenInfo *const token, int parent, tokenInfo *const func
 		if 	(tokenIsKeyword (funcall, LIBRARY) ||
 			 tokenIsKeyword (funcall, SOURCE))
 			done = !preParseExternalEntitiy (token, funcall);
+		else if (tokenIsKeyword (funcall, FOR))
+			done = !preParseLoopCounter (token, parent);
 	}
 
 	if (done)
