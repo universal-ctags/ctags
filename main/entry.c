@@ -1284,7 +1284,17 @@ extern bool foreachEntriesInScope (int corkIndex,
 		}
 	}
 	else
+	{
 		last = rb_last(root);
+		verbose ("last for %d<%p>: %p\n", corkIndex, root, last);
+	}
+
+	if (!last)
+	{
+		verbose ("symtbl[>V] %s->%p\n", name, NULL);
+		return true;			/* Nothing here in this node. */
+	}
+
 	verbose ("symtbl[>|] %s->%p\n", name, &container_of(last, tagEntryInfoX, symnode)->slot);
 
 	struct rb_node *cursor = last;
@@ -1312,7 +1322,7 @@ static bool findName (int corkIndex, tagEntryInfo *entry, void *data)
 {
 	int *index = data;
 
-	*index =  (int)corkIndex;
+	*index =  corkIndex;
 	return false;
 }
 
@@ -1322,6 +1332,79 @@ int anyEntryInScope (int corkIndex, const char *name)
 
 	if (foreachEntriesInScope (corkIndex, name, findName, &index) == false)
 		return index;
+
+	return CORK_NIL;
+}
+
+struct anyKindsEntryInScopeData {
+	int  index;
+	const int *kinds;
+	int  count;
+};
+
+static bool findNameOfKinds (int corkIndex, tagEntryInfo *entry, void *data)
+{
+	struct anyKindsEntryInScopeData * kdata = data;
+
+	for (int i = 0; i < kdata->count; i++)
+	{
+		int k = kdata->kinds [i];
+		if (entry->kindIndex == k)
+		{
+			kdata->index = corkIndex;
+			return false;
+		}
+	}
+	return true;
+}
+
+int anyKindEntryInScope (int corkIndex,
+						 const char *name, int kind)
+{
+	return anyKindsEntryInScope (corkIndex, name, &kind, 1);
+}
+
+int anyKindsEntryInScope (int corkIndex,
+						  const char *name,
+						  const int *kinds, int count)
+{
+	struct anyKindsEntryInScopeData data = {
+		.index = CORK_NIL,
+		.kinds = kinds,
+		.count = count,
+	};
+
+	if (foreachEntriesInScope (corkIndex, name, findNameOfKinds, &data) == false)
+		return data.index;
+
+	return CORK_NIL;
+}
+
+int anyKindsEntryInScopeRecursive (int corkIndex,
+								   const char *name,
+								   const int *kinds, int count)
+{
+	struct anyKindsEntryInScopeData data = {
+		.index = CORK_NIL,
+		.kinds = kinds,
+		.count = count,
+	};
+
+	tagEntryInfo *e;
+	do
+	{
+		if (foreachEntriesInScope (corkIndex, name, findNameOfKinds, &data) == false)
+			return data.index;
+
+		if (corkIndex == CORK_NIL)
+			break;
+
+		e = getEntryInCorkQueue (corkIndex);
+		if (!e)
+			break;
+		corkIndex = e->extensionFields.scopeIndex;
+	}
+	while (1);
 
 	return CORK_NIL;
 }
@@ -1926,4 +2009,16 @@ extern void setTagFilePosition (MIOPos *p)
 extern const char* getTagFileDirectory (void)
 {
 	return TagFile.directory;
+}
+
+static bool markAsPlaceholder  (int index, tagEntryInfo *e, void *data CTAGS_ATTR_UNUSED)
+{
+	e->placeholder = 1;
+	markAllEntriesInScopeAsPlaceholder (index);
+	return true;
+}
+
+extern void markAllEntriesInScopeAsPlaceholder (int index)
+{
+	foreachEntriesInScope (index, NULL, markAsPlaceholder, NULL);
 }

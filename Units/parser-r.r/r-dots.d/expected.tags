@@ -1,0 +1,13 @@
+f0	input.r	/^f0 <- function (x0) {$/;"	f	signature:(x0)
+x0	input.r	/^f0 <- function (x0) {$/;"	z	function:f0
+f1	input.r	/^f1 <- function (x1 = c(1, 2, 3)) {$/;"	f	signature:(x1 = c (1, 2, 3))
+x1	input.r	/^f1 <- function (x1 = c(1, 2, 3)) {$/;"	z	function:f1
+f2	input.r	/^f2 <- function (x2, y2) {$/;"	f	signature:(x2, y2)
+x2	input.r	/^f2 <- function (x2, y2) {$/;"	z	function:f2
+y2	input.r	/^f2 <- function (x2, y2) {$/;"	z	function:f2
+f3	input.r	/^f3 <- function (x3 = c(1, 2, 3), y3 = c(c(1,2,3))) {$/;"	f	signature:(x3 = c (1, 2, 3), y3 = c (c (1, 2, 3)))
+x3	input.r	/^f3 <- function (x3 = c(1, 2, 3), y3 = c(c(1,2,3))) {$/;"	z	function:f3
+y3	input.r	/^f3 <- function (x3 = c(1, 2, 3), y3 = c(c(1,2,3))) {$/;"	z	function:f3
+f4	input.r	/^f4 <- function (x4 = c(1, 2, 3), y4 = c(c(1,2,3)), ...) {$/;"	f	signature:(x4 = c (1, 2, 3), y4 = c (c (1, 2, 3)), ...)
+x4	input.r	/^f4 <- function (x4 = c(1, 2, 3), y4 = c(c(1,2,3)), ...) {$/;"	z	function:f4
+y4	input.r	/^f4 <- function (x4 = c(1, 2, 3), y4 = c(c(1,2,3)), ...) {$/;"	z	function:f4

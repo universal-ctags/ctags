@@ -1,0 +1,6 @@
+`%*%`	input.r	/^`%*%` <- function (v, p) {$/;"	f
+v	input.r	/^`%*%` <- function (v, p) {$/;"	z	function:`%*%`
+p	input.r	/^`%*%` <- function (v, p) {$/;"	z	function:`%*%`
+r	input.r	/^    r <- 1$/;"	v	function:`%*%`
+i	input.r	/^        for (i in 1:p) {$/;"	v	function:`%*%`
+j	input.r	/^for (j in 1:3) {$/;"	g

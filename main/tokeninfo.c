@@ -21,7 +21,7 @@ static void* createToken (void *createArg)
 	struct tokenInfoClass *klass = createArg;
 	tokenInfo *token;
 
-	token = eMalloc (sizeof (*token) + klass->extraSpace);
+	token = eCalloc (1, sizeof (*token) + klass->extraSpace);
 	token->klass = klass;
 	token->string  = vStringNew ();
 

@@ -1,0 +1,4 @@
+g	input.r	/^g <- function (x = 1, 	y = 2  ,$/;"	f	signature:(x = 1, y = 2, z = 3)
+x	input.r	/^g <- function (x = 1, 	y = 2  ,$/;"	z	function:g
+y	input.r	/^g <- function (x = 1, 	y = 2  ,$/;"	z	function:g
+z	input.r	/^  z = 3$/;"	z	function:g

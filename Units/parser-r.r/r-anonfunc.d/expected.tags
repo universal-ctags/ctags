@@ -1,0 +1,5 @@
+anonFunccf813d470103	input.r	/^setGeneric("run", function(object) 1)$/;"	f	extras:anonymous
+object	input.r	/^setGeneric("run", function(object) 1)$/;"	z	function:anonFunccf813d470103
+anonFunccf813d470203	input.r	/^setMethod("run", c("C"), definition = function (object) {$/;"	f	extras:anonymous
+object	input.r	/^setMethod("run", c("C"), definition = function (object) {$/;"	z	function:anonFunccf813d470203
+c	input.r	/^c <- new ("C", x = 2)$/;"	g	assignmentop:<-
