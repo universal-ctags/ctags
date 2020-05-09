@@ -244,12 +244,23 @@ bool cxxParserParseAndCondenseSubchainsUpToOneOf(
 					return false;
 				}
 			} else {
-				if(!cxxParserParseAndCondenseCurrentSubchain(
+				g_cxx.iNestingLevels++;
+
+				if(g_cxx.iNestingLevels > CXX_PARSER_MAXIMUM_NESTING_LEVELS)
+				{
+					CXX_DEBUG_LEAVE_TEXT("Nesting level grown too much: something nasty is going on");
+					return false;
+				}
+
+				bool bRet = cxxParserParseAndCondenseCurrentSubchain(
 						uInitialSubchainMarkerTypes,
 						(uTokenTypes & CXXTokenTypeEOF),
 						bCanReduceInnerElements
-					)
-				)
+					);
+
+				g_cxx.iNestingLevels--;
+
+				if(!bRet)
 				{
 					CXX_DEBUG_LEAVE_TEXT(
 							"Failed to parse subchain of type 0x%x",
@@ -1844,6 +1855,8 @@ static rescanReason cxxParserMain(const unsigned int passCount)
 		);
 
 	g_cxx.iChar = ' ';
+
+	g_cxx.iNestingLevels = 0;
 
 	bool bRet = cxxParserParseBlock(false);
 

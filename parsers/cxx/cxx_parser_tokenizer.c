@@ -1343,13 +1343,12 @@ bool cxxParserParseNextToken(void)
 
 				// This is used to avoid infinite recursion in substitution
 				// (things like -D foo=foo or similar)
-				static int iReplacementRecursionCount = 0;
 
 				if(pMacro->replacements)
 				{
 					CXX_DEBUG_PRINT("The token has replacements: applying");
 
-					if(iReplacementRecursionCount < 1024)
+					if(g_cxx.iNestingLevels < CXX_PARSER_MAXIMUM_NESTING_LEVELS)
 					{
 						// unget last char
 						cppUngetc(g_cxx.iChar);
@@ -1360,18 +1359,21 @@ bool cxxParserParseNextToken(void)
 							);
 
 						g_cxx.iChar = cppGetc();
+					} else {
+						// Possibly a recursive macro
+						CXX_DEBUG_PRINT("Token has replacement but nesting level is too big");
 					}
 				}
 
 				if(pParameterChain)
 					cxxTokenDestroy(pParameterChain);
 
-				iReplacementRecursionCount++;
+				g_cxx.iNestingLevels++;
 				// Have no token to return: parse it
 				CXX_DEBUG_PRINT("Parse inner token");
 				bool bRet = cxxParserParseNextToken();
 				CXX_DEBUG_PRINT("Parsed inner token: %s type %d",g_cxx.pToken->pszWord->buffer,g_cxx.pToken->eType);
-				iReplacementRecursionCount--;
+				g_cxx.iNestingLevels--;
 				return bRet;
 			}
 		}
