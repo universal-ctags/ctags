@@ -587,15 +587,25 @@ cxxParserParseTemplateAngleBracketsInternal(bool bCaptureTypeParameters,int iNes
 
 					if(!cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeSmallerThanSign))
 					{
-						// aaargh...
-						CXX_DEBUG_PRINT(
-								"Found unexpected token '%s' of type 0x%02x",
-								vStringValue(g_cxx.pToken->pszWord),
-								g_cxx.pToken->eType
-							);
+						if(!cxxTokenTypeIs(g_cxx.pToken->pPrev->pPrev,CXXTokenTypeMultipleColons))
+						{
+							// aaargh...
+							CXX_DEBUG_PRINT(
+									"Found unexpected token '%s' of type 0x%02x",
+									vStringValue(g_cxx.pToken->pszWord),
+									g_cxx.pToken->eType
+								);
 
-						CXX_DEBUG_LEAVE_TEXT("No smaller than sign after template keyword");
-						return CXXParserParseTemplateAngleBracketsFailed;
+							CXX_DEBUG_LEAVE_TEXT("No smaller than sign after template keyword");
+							return CXXParserParseTemplateAngleBracketsFailed;
+						}
+
+						//
+						// Possibly X::template Something<Y,Z> disambiguation syntax.
+						// See https://en.cppreference.com/w/cpp/language/dependent_name
+						//
+						CXX_DEBUG_PRINT("But it's not followed by a < and has leading ::");
+						continue;
 					}
 
 					switch(
