@@ -16,6 +16,7 @@
 #include "entry.h"
 #include "../cpreprocessor.h"
 #include "routines.h"
+#include "trashbox.h"
 #include "xtag.h"
 
 #define CXX_COMMON_MACRO_ROLES(__langPrefix) \
@@ -527,7 +528,11 @@ void cxxTagSetField(unsigned int uField,const char * szValue,bool bCopyValue)
 	if(!g_cxx.pFieldOptions[uField].enabled)
 		return;
 
-	attachParserField(&g_oCXXTag,bCopyValue,g_cxx.pFieldOptions[uField].ftype,szValue);
+	/* If we make a copy for the value, the copy must be freed after
+	 * calling cxxTagCommit() for g_oCXXTag. The parser trash box
+	 * allows us to delay freeing the copy. */
+	attachParserField(&g_oCXXTag,false,g_cxx.pFieldOptions[uField].ftype,
+					  bCopyValue?parserTrashBoxPut(eStrdup(szValue),eFree):szValue);
 }
 
 void cxxTagSetCorkQueueField(
