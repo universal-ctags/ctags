@@ -1,7 +1,14 @@
 // Recursive macro expansion causes a segmentation fault
-// M here is expected to be a macro defined from outside.
+// or infinite loop
+
+struct test
+{
+	int x;
+};
 
 int f(int v)
 {
-    return v & M;
+	struct test y;
+	y.x = 10;
+	return v & M;
 }
