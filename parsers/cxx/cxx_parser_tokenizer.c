@@ -1200,6 +1200,8 @@ void cxxParserUngetCurrentToken(void)
 }
 
 
+#define CXX_PARSER_MAXIMUM_TOKEN_CHAIN_SIZE 16384
+
 // Returns false if it finds an EOF. Returns true otherwise.
 //
 // In some special cases this function may parse more than one token,
@@ -1213,7 +1215,8 @@ bool cxxParserParseNextToken(void)
 	// information in them. This includes multiple function prototypes
 	// in a single statement (ImageMagick has some examples) but probably
 	// does NOT include large data tables.
-	if(g_cxx.pTokenChain->iCount > 16384)
+	int iInitialTokenChainSize = g_cxx.pTokenChain->iCount;
+	if(iInitialTokenChainSize >= CXX_PARSER_MAXIMUM_TOKEN_CHAIN_SIZE)
 		cxxTokenChainDestroyLast(g_cxx.pTokenChain);
 
 	if(g_cxx.pUngetToken)
@@ -1348,7 +1351,16 @@ bool cxxParserParseNextToken(void)
 				{
 					CXX_DEBUG_PRINT("The token has replacements: applying");
 
-					if(g_cxx.iNestingLevels < CXX_PARSER_MAXIMUM_NESTING_LEVELS)
+					if(
+						// Exclude possible cases of recursive macro expansion that
+						// causes level nesting
+						//    -D'x=y(x)'
+						(g_cxx.iNestingLevels < CXX_PARSER_MAXIMUM_NESTING_LEVELS) &&
+						// Exclude possible cases of recursive macro expansion that
+						// causes a single token chain to grow too big
+						//    -D'x=y.x'
+						(iInitialTokenChainSize < CXX_PARSER_MAXIMUM_TOKEN_CHAIN_SIZE)
+					)
 					{
 						// unget last char
 						cppUngetc(g_cxx.iChar);
@@ -1361,7 +1373,12 @@ bool cxxParserParseNextToken(void)
 						g_cxx.iChar = cppGetc();
 					} else {
 						// Possibly a recursive macro
-						CXX_DEBUG_PRINT("Token has replacement but nesting level is too big");
+						CXX_DEBUG_PRINT(
+								"Token has replacement but either nesting level is too "
+								"big (%d) or the token chain has grown too large (%d)",
+								g_cxx.iNestingLevels,
+								g_cxx.pTokenChain->iCount
+							);
 					}
 				}
 
