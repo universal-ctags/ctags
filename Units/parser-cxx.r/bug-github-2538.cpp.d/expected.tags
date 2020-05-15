@@ -1,0 +1,3 @@
+f	input.cpp	/^int f(int v)$/;"	f	typeref:typename:int
+test	input.cpp	/^struct test$/;"	s	file:
+x	input.cpp	/^	int x;$/;"	m	struct:test	typeref:typename:int	file:

@@ -279,6 +279,7 @@ typedef enum _CXXParserKeywordState
 	CXXParserKeywordStateSeenFriend = (1 << 12),
 } CXXParserKeywordState;
 
+#define CXX_PARSER_MAXIMUM_NESTING_LEVELS 1024
 
 typedef struct _CXXParserState
 {
@@ -344,6 +345,17 @@ typedef struct _CXXParserState
 	// or we're parsing a header but we have encountered valid C++ constructs that
 	// definitely confirm we're parsing C++.
 	bool bConfirmedCPPLanguage;
+
+	// The nesting levels our parser is in.
+	//
+	// Note that this is really a kind-of arbitrary measure as the counter
+	// is increased in certain parser code paths that often lead to recursion.
+	// It does not necessairly match the real number of stack frames or nested
+	// brackets/parentheses in the input.
+	//
+	// The counter is used to avoid stack overflow when nesting grows too much.
+	// This usually happens only with erroneous macro usage or broken input.
+	int iNestingLevels;
 
 } CXXParserState;
 
