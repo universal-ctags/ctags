@@ -448,6 +448,12 @@ it defines a C preprocessor macro. See `The new C/C++ parser <cxx>`
 for more defailts.
 
 
+Automatically expanding CPreProcessor macros defined in the same input file (HIGHLY EXPERIMENTAL)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+See `The new C/C++ parser <cxx>` for more defailts.
+
+
 ``--_interactive`` Mode
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

@@ -170,6 +170,72 @@ will be processed as
 
 	int x(int a,int b);
 
+Automatically expanding macros defined in the same input file (HIGHLY EXPERIMENTAL)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If a CPreProcessor macro defined in a C/C++/CUDA file, the macro invocation in the
+SAME file can be expanded with following options:
+
+.. code-block:: text
+
+   --param-CPreProcessor:_expand=1
+   --fields-C=+{macrodef}
+   --fields-C++=+{macrodef}
+   --fields-CUDA=+{macrodef}
+   --fields=+{signature}
+
+Let's see an example.
+
+input.c:
+.. code-block:: C
+
+	#define DEFUN(NAME) int NAME (int x, int y)
+	#define BEGIN {
+	#define END }
+
+	DEFUN(myfunc)
+	  BEGIN
+	  return -1
+	  END
+
+The output without options:
+.. code-block::
+
+   $ ctags -o - input.c
+   BEGIN	input.c	/^#define BEGIN /;"	d	language:C	file:
+   DEFUN	input.c	/^#define DEFUN(/;"	d	language:C	file:
+   END	input.c	/^#define END /;"	d	language:C	file:
+
+The output with options:
+.. code-block::
+
+   $ ctags --param-CPreProcessor:_expand=1 --fields-C=+'{macrodef}' --fields=+'{signature}' -o - input.c
+   BEGIN	input.c	/^#define BEGIN /;"	d	language:C	file:	macrodef:{
+   DEFUN	input.c	/^#define DEFUN(/;"	d	language:C	file:	signature:(NAME)	macrodef:int NAME (int x, int y)
+   END	input.c	/^#define END /;"	d	language:C	file:	macrodef:}
+   myfunc	input.c	/^DEFUN(myfunc)$/;"	f	language:C	typeref:typename:int	signature:(int x,int y)
+
+``myfunc`` coded by ``DEFUN`` macro is captured well.
+
+
+This feature is highly experimental. At least three limitations are known.
+
+* This feature doesn't understand ``#undef`` yet.
+  Once a macro is defined, its invocation is always expanded even
+  after the parser sees ``#undef`` for the macro in the same input
+  file.
+
+* Macros are expanded incorrectly if the result of macro expansion
+  includes the macro invocation again.
+
+* Currently, ctags can expand a macro invocation only if its
+  definitions are in the same input file. ctags cannot expand a macro
+  defined in the header file included from the current input file.
+
+Enabling this macro expansion feature makes the parsing speed about
+two times slower.
+
+
 Incompatible Changes
 ---------------------------------------------------------------------
 
