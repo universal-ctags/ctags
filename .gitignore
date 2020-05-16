@@ -86,6 +86,9 @@ man/ctags-incompatibilities.7.rst
 man/ctags-optlib.7
 man/ctags-optlib.7.html
 man/ctags-optlib.7.rst
+man/readtags.1
+man/readtags.1.rst
+man/readtags.1.html
 man/tags.5
 man/tags.5.html
 misc/mini-geany.actual
