@@ -70,6 +70,9 @@ At the time of writing the following properties are reported:
 Preprocessor macros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Defining a macro from command line
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 The new parser supports the definition of real preprocessor macros
 via the ``-D`` option. All types of macros are supported,
 including the ones with parameters and variable arguments.
