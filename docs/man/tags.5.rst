@@ -522,4 +522,4 @@ used when ctags generating tags file.
 
 SEE ALSO
 --------
-:ref:`ctags(1) <ctags(1)>`, :ref:`ctags-client-tools(7) <ctags-client-tools(7)>`, :ref:`ctags-incompatibilities(7) <ctags-incompatibilities(7)>`
+:ref:`ctags(1) <ctags(1)>`, :ref:`ctags-client-tools(7) <ctags-client-tools(7)>`, :ref:`ctags-incompatibilities(7) <ctags-incompatibilities(7)>`, :ref:`readtags(1) <readtags(1)>`

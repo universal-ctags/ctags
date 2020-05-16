@@ -205,8 +205,10 @@ include $(top_srcdir)/makefiles/testing.mak
 include $(top_srcdir)/makefiles/help.mak
 
 if HAVE_RST2MAN
+# TODO: the list of man pages should be shared with man/Makefile.
 man_MANS = \
 	man/ctags.1 \
+	man/readtags.1 \
 	\
 	man/tags.5 \
 	\

@@ -756,6 +756,7 @@ AC_CONFIG_FILES([Makefile
 		 man/ctags-client-tools.7.rst
 		 man/ctags-incompatibilities.7.rst
 		 man/ctags-optlib.7.rst
+		 man/readtags.1.rst
 		 ])
 
 AC_OUTPUT
