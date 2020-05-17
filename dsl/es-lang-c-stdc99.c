@@ -45,73 +45,73 @@ typedef struct _EsCons EsCons;
 
 struct _EsObject
 {
-  EsType  type;
-  union
-  {
-    int     ref_count;
-    EsSingleton* next;
-  };
+	EsType  type;
+	union
+	{
+		int     ref_count;
+		EsSingleton* next;
+	};
 };
 
 struct _EsInteger
 {
-  EsObject base;
-  int      value;
+	EsObject base;
+	int      value;
 };
 
 struct _EsReal
 {
-  EsObject base;
-  double   value;
+	EsObject base;
+	double   value;
 };
 
 struct _EsBoolean
 {
-  EsObject base;
-  int      value;
+	EsObject base;
+	int      value;
 };
 
 struct _EsString
 {
-  EsObject    base;
-  char*       value;
+	EsObject    base;
+	char*       value;
 };
 
 struct _EsSingleton
 {
-  EsObject     base;
-  char*        quark;
+	EsObject     base;
+	char*        quark;
 };
 
 struct _EsSymbol
 {
-  EsSingleton base;
-  void       *data;
+	EsSingleton base;
+	void       *data;
 };
 
 struct _EsError
 {
-  EsSingleton base;
-  EsObject   *object;
+	EsSingleton base;
+	EsObject   *object;
 };
 
 struct _EsCons
 {
-  EsObject base;
-  EsObject* car;
-  EsObject* cdr;
+	EsObject base;
+	EsObject* car;
+	EsObject* cdr;
 };
 
 typedef struct _EsObjectClass EsObjectClass;
 struct _EsObjectClass
 {
-  size_t         size;
-  void           (* free)  (EsObject* object);
-  int            (* equal) (const EsObject* self, const EsObject* other);
-  void           (* print) (const EsObject* object, MIO* fp);
-  char           atom_p;
-  EsSingleton  **obarray;
-  const char*    name;
+	size_t         size;
+	void           (* free)  (EsObject* object);
+	int            (* equal) (const EsObject* self, const EsObject* other);
+	void           (* print) (const EsObject* object, MIO* fp);
+	char           atom_p;
+	EsSingleton  **obarray;
+	const char*    name;
 };
 
 
@@ -156,110 +156,110 @@ static EsSingleton  *symbol_obarray[OBARRAY_SIZE];
 static EsSingleton  *error_obarray [OBARRAY_SIZE];
 
 static EsObjectClass classes[] = {
-  [ES_TYPE_NIL] = {
-    .size    = 0,
-    .free    = es_nil_free,
-    .equal   = es_nil_equal,
-    .print   = es_nil_print,
-    .atom_p  = 1,
-    .obarray = NULL,
-    .name    = "nil",
-  },
-  [ES_TYPE_INTEGER] = {
-    .size    = sizeof(EsInteger),
-    .free    = es_integer_free,
-    .equal   = es_integer_equal,
-    .print   = es_integer_print,
-    .atom_p  = 1,
-    .obarray = NULL,
-    .name    = "integer",
-  },
-  [ES_TYPE_REAL]    = {
-    .size    = sizeof(EsReal),
-    .free    = es_real_free,
-    .equal   = es_real_equal,
-    .print   = es_real_print,
-    .atom_p  = 1,
-    .obarray = NULL,
-    .name    = "real",
-  },
-  [ES_TYPE_BOOLEAN] = {
-    .size    = sizeof(EsBoolean),
-    .free    = es_boolean_free,
-    .equal   = es_boolean_equal,
-    .print   = es_boolean_print,
-    .atom_p  = 1,
-    .obarray = (void*)1,
-    .name    = "boolean",
-  },
-  [ES_TYPE_SYMBOL]  = {
-    .size    = sizeof(EsSymbol),
-    .free    = es_symbol_free,
-    .equal   = es_symbol_equal,
-    .print   = es_symbol_print,
-    .atom_p  = 1,
-    .obarray = symbol_obarray,
-    .name    = "symbol",
-  },
-  [ES_TYPE_STRING]  = {
-    .size    = sizeof(EsString),
-    .free    = es_string_free,
-    .equal   = es_string_equal,
-    .print   = es_string_print,
-    .atom_p  = 1,
-    .obarray = NULL,
-    .name    = "string",
-  },
-  [ES_TYPE_CONS]    = {
-    .size    = sizeof(EsCons),
-    .free    = es_cons_free,
-    .equal   = es_cons_equal,
-    .print   = es_cons_print,
-    .atom_p  = 0,
-    .obarray = NULL,
-    .name    = "cons",
-  },
-  [ES_TYPE_ERROR] = {
-    .size    = sizeof(EsError),
-    .free    = es_error_free,
-    .equal   = es_error_equal,
-    .print   = es_error_print,
-    .atom_p  = 1,
-    .obarray = error_obarray,
-    .name    = "error",
-  },
+	[ES_TYPE_NIL] = {
+		.size    = 0,
+		.free    = es_nil_free,
+		.equal   = es_nil_equal,
+		.print   = es_nil_print,
+		.atom_p  = 1,
+		.obarray = NULL,
+		.name    = "nil",
+	},
+	[ES_TYPE_INTEGER] = {
+		.size    = sizeof(EsInteger),
+		.free    = es_integer_free,
+		.equal   = es_integer_equal,
+		.print   = es_integer_print,
+		.atom_p  = 1,
+		.obarray = NULL,
+		.name    = "integer",
+	},
+	[ES_TYPE_REAL]    = {
+		.size    = sizeof(EsReal),
+		.free    = es_real_free,
+		.equal   = es_real_equal,
+		.print   = es_real_print,
+		.atom_p  = 1,
+		.obarray = NULL,
+		.name    = "real",
+	},
+	[ES_TYPE_BOOLEAN] = {
+		.size    = sizeof(EsBoolean),
+		.free    = es_boolean_free,
+		.equal   = es_boolean_equal,
+		.print   = es_boolean_print,
+		.atom_p  = 1,
+		.obarray = (void*)1,
+		.name    = "boolean",
+	},
+	[ES_TYPE_SYMBOL]  = {
+		.size    = sizeof(EsSymbol),
+		.free    = es_symbol_free,
+		.equal   = es_symbol_equal,
+		.print   = es_symbol_print,
+		.atom_p  = 1,
+		.obarray = symbol_obarray,
+		.name    = "symbol",
+	},
+	[ES_TYPE_STRING]  = {
+		.size    = sizeof(EsString),
+		.free    = es_string_free,
+		.equal   = es_string_equal,
+		.print   = es_string_print,
+		.atom_p  = 1,
+		.obarray = NULL,
+		.name    = "string",
+	},
+	[ES_TYPE_CONS]    = {
+		.size    = sizeof(EsCons),
+		.free    = es_cons_free,
+		.equal   = es_cons_equal,
+		.print   = es_cons_print,
+		.atom_p  = 0,
+		.obarray = NULL,
+		.name    = "cons",
+	},
+	[ES_TYPE_ERROR] = {
+		.size    = sizeof(EsError),
+		.free    = es_error_free,
+		.equal   = es_error_equal,
+		.print   = es_error_print,
+		.atom_p  = 1,
+		.obarray = error_obarray,
+		.name    = "error",
+	},
 };
 
 
 
 static MIO *mio_stdout (void)
 {
-  static MIO  *out;
+	static MIO  *out;
 
-  if (out == NULL)
-    out = mio_new_fp (stdout, NULL);
+	if (out == NULL)
+		out = mio_new_fp (stdout, NULL);
 
-  return out;
+	return out;
 }
 
 static MIO *mio_stdin (void)
 {
-  static MIO  *out;
+	static MIO  *out;
 
-  if (out == NULL)
-    out = mio_new_fp (stdin, NULL);
+	if (out == NULL)
+		out = mio_new_fp (stdin, NULL);
 
-  return out;
+	return out;
 }
 
 static MIO *mio_stderr (void)
 {
-  static MIO  *out;
+	static MIO  *out;
 
-  if (out == NULL)
-    out = mio_new_fp (stderr, NULL);
+	if (out == NULL)
+		out = mio_new_fp (stderr, NULL);
 
-  return out;
+	return out;
 }
 
 
@@ -267,125 +267,125 @@ static MIO *mio_stderr (void)
 static EsObjectClass*
 class_of(const EsObject* object)
 {
-  return &(classes[es_object_get_type(object)]);
+	return &(classes[es_object_get_type(object)]);
 }
 
 static EsObject*
 es_object_new(EsType type)
 {
-  EsObject* r;
+	EsObject* r;
 
 
-  r = calloc(1, (&classes[type])->size);
-  r->type = type;
-  r->ref_count = 1;
+	r = calloc(1, (&classes[type])->size);
+	r->type = type;
+	r->ref_count = 1;
 
-  if (es_debug)
-    mio_printf(mio_stderr(), ";; new{%s}: 0x%p\n",
-	    (&classes[type])->name,
-	    r);
+	if (es_debug)
+		mio_printf(mio_stderr(), ";; new{%s}: 0x%p\n",
+				   (&classes[type])->name,
+				   r);
 
-  return r;
+	return r;
 }
 
 static void
 es_object_free(EsObject* object)
 {
-  memset(object, 0, class_of(object)->size);
-  free(object);
+	memset(object, 0, class_of(object)->size);
+	free(object);
 }
 
 static int
 es_object_type_p(const EsObject* object, EsType type)
 {
-  return es_object_get_type(object) == type;
+	return es_object_get_type(object) == type;
 }
 
 EsType
 es_object_get_type      (const EsObject*      object)
 {
-  return object? object->type: ES_TYPE_NIL;
+	return object? object->type: ES_TYPE_NIL;
 }
 
 EsObject*
 es_object_ref           (EsObject*       object)
 {
-  if (object)
+	if (object)
     {
-      if (class_of(object)->obarray)
-	return object;
+		if (class_of(object)->obarray)
+			return object;
 
-      if (es_debug)
-	mio_printf(mio_stderr(), ";; ref{%s}: [%d]0x%p\n",
-		class_of(object)->name,
-		object->ref_count,
-		object);
-      object->ref_count++;
+		if (es_debug)
+			mio_printf(mio_stderr(), ";; ref{%s}: [%d]0x%p\n",
+					   class_of(object)->name,
+					   object->ref_count,
+					   object);
+		object->ref_count++;
     }
-  return object;
+	return object;
 }
 
 void
 es_object_unref         (EsObject*       object)
 {
 
-  if (object)
+	if (object)
     {
-      if (class_of(object)->obarray)
-	return;
+		if (class_of(object)->obarray)
+			return;
 
-      if (object->ref_count == 0)
-	if ((1 || es_debug))
-	  {
-	    mio_printf(mio_stderr(), "*** ref_count < 0: 0x%p ***\n", object);
-	    mio_printf(mio_stderr(), "*** BOOSTING while(1). ***\n");
-	    while (1);
-	  }
+		if (object->ref_count == 0)
+			if ((1 || es_debug))
+			{
+				mio_printf(mio_stderr(), "*** ref_count < 0: 0x%p ***\n", object);
+				mio_printf(mio_stderr(), "*** BOOSTING while(1). ***\n");
+				while (1);
+			}
 
-      object->ref_count--;
-      if (es_debug)
-	mio_printf(mio_stderr(), ";; unref{%s}: [%d]0x%p\n",
-		class_of(object)->name,
-		object->ref_count, object);
-      if (object->ref_count == 0)
-	{
-	  if (es_debug)
-	    mio_printf(mio_stderr(), ";; free{%s}: 0x%p\n",
-		    class_of(object)->name,
-		    object);
-	  class_of(object)->free(object);
-	}
+		object->ref_count--;
+		if (es_debug)
+			mio_printf(mio_stderr(), ";; unref{%s}: [%d]0x%p\n",
+					   class_of(object)->name,
+					   object->ref_count, object);
+		if (object->ref_count == 0)
+		{
+			if (es_debug)
+				mio_printf(mio_stderr(), ";; free{%s}: 0x%p\n",
+						   class_of(object)->name,
+						   object);
+			class_of(object)->free(object);
+		}
     }
 }
 
 void
 es_object_unref_batch (EsObject*       array[],
-		       unsigned int    count)
+					   unsigned int    count)
 {
-  unsigned int i;
+	unsigned int i;
 
-  for (i = 0; i < count; i++)
+	for (i = 0; i < count; i++)
     {
-      es_object_unref(array[i]);
-      array[i] = es_nil;
+		es_object_unref(array[i]);
+		array[i] = es_nil;
     }
 }
 
 int
 es_object_equal         (const EsObject* self,
-			 const EsObject* other)
+						 const EsObject* other)
 {
-  if (self == other)
-    return 1;
+	if (self == other)
+		return 1;
 
-  return class_of(self)->equal(self, other);
+	return class_of(self)->equal(self, other);
 }
 
 
 int
 es_atom         (const EsObject* object)
 {
-  return class_of(object)->atom_p;
+	return class_of(object)->atom_p;
 }
 
 
@@ -395,25 +395,25 @@ es_atom         (const EsObject* object)
 int
 es_null(const EsObject* object)
 {
-  return (object == es_nil)? 1: 0;
+	return (object == es_nil)? 1: 0;
 }
 
 static void
 es_nil_free(EsObject* object)
 {
-  /* DO NOTHING */
+	/* DO NOTHING */
 }
 
 static int
 es_nil_equal(const EsObject* self, const EsObject* other)
 {
-  return es_null(other);
+	return es_null(other);
 }
 
 static void
 es_nil_print(const EsObject* object, MIO* fp)
 {
-  mio_puts(fp, "()");
+	mio_puts(fp, "()");
 }
 
 /*
@@ -422,50 +422,50 @@ es_nil_print(const EsObject* object, MIO* fp)
 EsObject*
 es_integer_new (int                value)
 {
-  EsObject* r;
+	EsObject* r;
 
-  r = es_object_new(ES_TYPE_INTEGER);
-  ((EsInteger*)r)->value = value;
-  return r;
+	r = es_object_new(ES_TYPE_INTEGER);
+	((EsInteger*)r)->value = value;
+	return r;
 }
 
 int
 es_integer_p   (const EsObject*   object)
 {
-  return es_object_type_p(object, ES_TYPE_INTEGER);
+	return es_object_type_p(object, ES_TYPE_INTEGER);
 }
 
 int
 es_integer_get (const EsObject*   object)
 {
-  if (es_integer_p(object))
-    return ((EsInteger *)object)->value;
-  else
+	if (es_integer_p(object))
+		return ((EsInteger *)object)->value;
+	else
     {
-      mio_printf(mio_stderr(), ";; es_integer_get, Wrong type argument: ");
-      es_print(object, mio_stderr());
-      mio_putc(mio_stderr(), '\n');
-      return -1;
+		mio_printf(mio_stderr(), ";; es_integer_get, Wrong type argument: ");
+		es_print(object, mio_stderr());
+		mio_putc(mio_stderr(), '\n');
+		return -1;
     }
 }
 
 static void
 es_integer_free(EsObject* object)
 {
-  es_object_free(object);
+	es_object_free(object);
 }
 
 static int
 es_integer_equal(const EsObject* self, const EsObject* other)
 {
-  return ((es_integer_p(other))
-	  && (es_integer_get(self) == es_integer_get(other)))? 1: 0;
+	return ((es_integer_p(other))
+			&& (es_integer_get(self) == es_integer_get(other)))? 1: 0;
 }
 
 static void
 es_integer_print(const EsObject* object, MIO* fp)
 {
-  mio_printf(fp, "%d", es_integer_get(object));
+	mio_printf(fp, "%d", es_integer_get(object));
 }
 
 
@@ -475,51 +475,51 @@ es_integer_print(const EsObject* object, MIO* fp)
 EsObject*
 es_real_new (double                value)
 {
-  EsObject* r;
+	EsObject* r;
 
-  r = es_object_new(ES_TYPE_REAL);
-  ((EsReal*)r)->value = value;
-  return r;
+	r = es_object_new(ES_TYPE_REAL);
+	((EsReal*)r)->value = value;
+	return r;
 }
 
 int
 es_real_p   (const EsObject*   object)
 {
-  return es_object_type_p(object, ES_TYPE_REAL);
+	return es_object_type_p(object, ES_TYPE_REAL);
 }
 
 double
 es_real_get (const EsObject*   object)
 {
-  if (es_real_p(object))
-    return ((EsReal *)object)->value;
-  else
+	if (es_real_p(object))
+		return ((EsReal *)object)->value;
+	else
     {
-      mio_printf(mio_stderr(), ";; es_real_get, Wrong type argument: ");
-      es_print(object, mio_stderr());
-      mio_putc(mio_stderr(), '\n');
-      return -1;
+		mio_printf(mio_stderr(), ";; es_real_get, Wrong type argument: ");
+		es_print(object, mio_stderr());
+		mio_putc(mio_stderr(), '\n');
+		return -1;
     }
 }
 
 static void
 es_real_free(EsObject* object)
 {
-  es_object_free(object);
+	es_object_free(object);
 }
 
 static int
 es_real_equal(const EsObject* self, const EsObject* other)
 {
-  return ((es_real_p(other))
-	  /* TODO: Too restricted? */
-	  && (es_real_get(self) == es_real_get(other)))? 1: 0;
+	return ((es_real_p(other))
+			/* TODO: Too restricted? */
+			&& (es_real_get(self) == es_real_get(other)))? 1: 0;
 }
 
 static void
 es_real_print(const EsObject* object, MIO* fp)
 {
-  mio_printf(fp, "%f", es_real_get(object));
+	mio_printf(fp, "%f", es_real_get(object));
 }
 
 /*
@@ -528,30 +528,30 @@ es_real_print(const EsObject* object, MIO* fp)
 int
 es_number_p    (const EsObject*   object)
 {
-  return (es_integer_p(object) || es_real_p(object))? 1: 0;
+	return (es_integer_p(object) || es_real_p(object))? 1: 0;
 }
 
 double
 es_number_get  (const EsObject*   object)
 {
-  double r;
+	double r;
 
-  switch(es_object_get_type(object))
+	switch(es_object_get_type(object))
     {
     case ES_TYPE_INTEGER:
-      r = (double)es_integer_get(object);
-      break;
+		r = (double)es_integer_get(object);
+		break;
     case ES_TYPE_REAL:
-      r = es_real_get(object);
-      break;
+		r = es_real_get(object);
+		break;
     default:
-      mio_printf(mio_stderr(), ";; es_number_get, Wrong type argument: ");
-      es_print(object, mio_stderr());
-      mio_putc(mio_stderr(), '\n');
-      r = -1.0;
-      break;
+		mio_printf(mio_stderr(), ";; es_number_get, Wrong type argument: ");
+		es_print(object, mio_stderr());
+		mio_putc(mio_stderr(), '\n');
+		r = -1.0;
+		break;
     }
-  return r;
+	return r;
 }
 
 
@@ -561,59 +561,59 @@ es_number_get  (const EsObject*   object)
 EsObject*
 es_boolean_new (int                value)
 {
-  static EsObject* T;
-  static EsObject* F;
+	static EsObject* T;
+	static EsObject* F;
 
-  if (!T)
+	if (!T)
     {
-      T = es_object_new(ES_TYPE_BOOLEAN);
-      ((EsBoolean*)T)->value = 1;
+		T = es_object_new(ES_TYPE_BOOLEAN);
+		((EsBoolean*)T)->value = 1;
     }
-  if (!F)
+	if (!F)
     {
-      F = es_object_new(ES_TYPE_BOOLEAN);
-      ((EsBoolean*)F)->value = 0;
+		F = es_object_new(ES_TYPE_BOOLEAN);
+		((EsBoolean*)F)->value = 0;
     }
 
-  return value? T: F;
+	return value? T: F;
 }
 
 int
 es_boolean_p   (const EsObject*   object)
 {
-  return es_object_type_p(object, ES_TYPE_BOOLEAN);
+	return es_object_type_p(object, ES_TYPE_BOOLEAN);
 }
 
 int
 es_boolean_get (const EsObject*   object)
 {
-  if (es_boolean_p(object))
-    return ((EsBoolean *)object)->value;
-  else
+	if (es_boolean_p(object))
+		return ((EsBoolean *)object)->value;
+	else
     {
-      mio_printf(mio_stderr(), ";; es_boolean_get, Wrong type argument: ");
-      es_print(object, mio_stderr());
-      mio_putc(mio_stderr(), '\n');
-      return -1;
+		mio_printf(mio_stderr(), ";; es_boolean_get, Wrong type argument: ");
+		es_print(object, mio_stderr());
+		mio_putc(mio_stderr(), '\n');
+		return -1;
     }
 }
 
 static void
 es_boolean_free(EsObject* object)
 {
-  /* Do nothing */
+	/* Do nothing */
 }
 
 static int
 es_boolean_equal(const EsObject* self, const EsObject* other)
 {
-  return (self == other)? 1: 0;
+	return (self == other)? 1: 0;
 }
 
 static void
 es_boolean_print(const EsObject* object, MIO* fp)
 {
-  mio_printf(fp, "#%c", (es_boolean_get(object)? 't': 'f'));
+	mio_printf(fp, "#%c", (es_boolean_get(object)? 't': 'f'));
 }
 
 /*
@@ -622,48 +622,48 @@ es_boolean_print(const EsObject* object, MIO* fp)
 static EsSingleton*
 es_obarray_intern(EsType type, const char* name)
 {
-  unsigned int hv;
-  EsSingleton** obarray;
-  EsSingleton* s;
-  EsSingleton* tmp;
+	unsigned int hv;
+	EsSingleton** obarray;
+	EsSingleton* s;
+	EsSingleton* tmp;
 
 
-  obarray = (&classes[type])->obarray;
-  if (!obarray)
-    return NULL;
+	obarray = (&classes[type])->obarray;
+	if (!obarray)
+		return NULL;
 
-  hv = hash(name);
-  tmp = obarray[hv];
+	hv = hash(name);
+	tmp = obarray[hv];
 
-  s = NULL;
-  while (tmp)
+	s = NULL;
+	while (tmp)
     {
-      if (!strcmp(tmp->quark, name))
-	{
-	  s = tmp;
-	  break;
-	}
-      else
-	tmp = ((EsObject *)tmp)->next;
+		if (!strcmp(tmp->quark, name))
+		{
+			s = tmp;
+			break;
+		}
+		else
+			tmp = ((EsObject *)tmp)->next;
     }
 
-  if (!s)
+	if (!s)
     {
-      s = (EsSingleton*) es_object_new(type);
-      s->quark = strdup(name);
-      tmp = obarray[hv];
-      obarray[hv] = s;
-      ((EsObject *)s)->next = tmp;
+		s = (EsSingleton*) es_object_new(type);
+		s->quark = strdup(name);
+		tmp = obarray[hv];
+		obarray[hv] = s;
+		((EsObject *)s)->next = tmp;
     }
 
-  return s;
+	return s;
 
 }
 
 static const char*
 es_singleton_get   (EsSingleton *singleton)
 {
-  return singleton->quark;
+	return singleton->quark;
 }
 
 
@@ -676,127 +676,127 @@ static unsigned char get_char_class(int c);
 EsObject*
 es_symbol_intern  (const char*       name)
 {
-  EsSingleton* r;
+	EsSingleton* r;
 
-  r = es_obarray_intern(ES_TYPE_SYMBOL, name);
-  return (EsObject*)r;
+	r = es_obarray_intern(ES_TYPE_SYMBOL, name);
+	return (EsObject*)r;
 }
 
 int
 es_symbol_p    (const EsObject*   object)
 {
-  return es_object_type_p(object, ES_TYPE_SYMBOL);
+	return es_object_type_p(object, ES_TYPE_SYMBOL);
 }
 
 const char*
 es_symbol_get  (const EsObject*   object)
 {
-  if (es_symbol_p(object))
-    return es_singleton_get((EsSingleton*)object);
-  else
+	if (es_symbol_p(object))
+		return es_singleton_get((EsSingleton*)object);
+	else
     {
-      mio_printf(mio_stderr(), ";; es_symbol_get, Wrong type argument: ");
-      es_print(object, mio_stderr());
-      mio_putc(mio_stderr(), '\n');
-      return NULL;
+		mio_printf(mio_stderr(), ";; es_symbol_get, Wrong type argument: ");
+		es_print(object, mio_stderr());
+		mio_putc(mio_stderr(), '\n');
+		return NULL;
     }
 }
 
 void*        es_symbol_set_data (const EsObject*   object, void *data)
 {
-  if (es_symbol_p(object))
+	if (es_symbol_p(object))
     {
-      void* old_data;
+		void* old_data;
 
-      old_data = ((EsSymbol*)object)->data;
-      ((EsSymbol*)object)->data = data;
-      return  old_data;
+		old_data = ((EsSymbol*)object)->data;
+		((EsSymbol*)object)->data = data;
+		return  old_data;
     }
-  else
+	else
     {
-      mio_printf(mio_stderr(), ";; es_symbol_set_data, Wrong type argument: ");
-      es_print(object, mio_stderr());
-      mio_putc(mio_stderr(), '\n');
-      return NULL;
+		mio_printf(mio_stderr(), ";; es_symbol_set_data, Wrong type argument: ");
+		es_print(object, mio_stderr());
+		mio_putc(mio_stderr(), '\n');
+		return NULL;
     }
 }
 
 void*        es_symbol_get_data (const EsObject*   object)
 {
-  if (es_symbol_p(object))
-      return ((EsSymbol*)object)->data;
-  else
+	if (es_symbol_p(object))
+		return ((EsSymbol*)object)->data;
+	else
     {
-      mio_printf(mio_stderr(), ";; es_symbol_get_data, Wrong type argument: ");
-      es_print(object, mio_stderr());
-      mio_putc(mio_stderr(), '\n');
-      return NULL;
+		mio_printf(mio_stderr(), ";; es_symbol_get_data, Wrong type argument: ");
+		es_print(object, mio_stderr());
+		mio_putc(mio_stderr(), '\n');
+		return NULL;
     }
 }
 
 static void
 es_symbol_free(EsObject* object)
 {
-  /* DO NOTHING */
+	/* DO NOTHING */
 }
 
 static int
 es_symbol_equal(const EsObject* self, const EsObject* other)
 {
-  return (self == other)? 1: 0;
+	return (self == other)? 1: 0;
 }
 
 static void
 es_symbol_print(const EsObject* object, MIO* fp)
 {
-  const char* string;
-  size_t len;
-  char c;
-  unsigned char cc;
-  unsigned char mask;
-  int needs_bar;
-  int i;
+	const char* string;
+	size_t len;
+	char c;
+	unsigned char cc;
+	unsigned char mask;
+	int needs_bar;
+	int i;
 
-  string = es_symbol_get(object);
-  if (!string)
-    return;
+	string = es_symbol_get(object);
+	if (!string)
+		return;
 
-  len = strlen(string);
-  if (len == 0)
-    needs_bar = 1;
+	len = strlen(string);
+	if (len == 0)
+		needs_bar = 1;
 
-  c = string[0];
-  cc = get_char_class(c);
-  mask = 0x1;
-  needs_bar = (cc & mask)? 1: 0;
-  if (!needs_bar)
+	c = string[0];
+	cc = get_char_class(c);
+	mask = 0x1;
+	needs_bar = (cc & mask)? 1: 0;
+	if (!needs_bar)
     {
-      /* 0 => 1? */
-      mask = 0x2;
-      for (i = 0; i< len; i++)
-	{
-	  c = string[i];
-	  cc = get_char_class(c);
-	  needs_bar = (cc & mask)? 1: 0;
-	  if (needs_bar)
-	    break;
-	}
+		/* 0 => 1? */
+		mask = 0x2;
+		for (i = 0; i< len; i++)
+		{
+			c = string[i];
+			cc = get_char_class(c);
+			needs_bar = (cc & mask)? 1: 0;
+			if (needs_bar)
+				break;
+		}
 
     }
 
-  if (needs_bar)
-    mio_printf(fp, "|");
+	if (needs_bar)
+		mio_printf(fp, "|");
 
-  for (i = 0; i < len; i++)
+	for (i = 0; i < len; i++)
     {
-      c = string[i];
-      if (c == '\\' || c == '|')
-	mio_printf(fp, "\\");
-      mio_printf(fp, "%c", c);
+		c = string[i];
+		if (c == '\\' || c == '|')
+			mio_printf(fp, "\\");
+		mio_printf(fp, "%c", c);
     }
 
-  if (needs_bar)
-    mio_printf(fp, "|");
+	if (needs_bar)
+		mio_printf(fp, "|");
 }
 
 
@@ -840,24 +840,24 @@ es_symbol_print(const EsObject* object, MIO* fp)
    bit 2: bad char for symbol, and should be written as \nnn
    bit 3: bad char for symbol, and should be written as \c
    bit 4: may be escaped when case fold mode
- */
+*/
 static char symbol_special[] = {
- /* NUL .... */
-    7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
- /* .... */
-    7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
- /*    !  "  #  $  %  &  '  (  )  *  +  ,  -  .  /  */
-    3, 0, 3, 3, 0, 0, 0, 3, 3, 3, 0, 1, 3, 1, 1, 0,
- /* 0  1  2  3  4  5  6  7  8  9  :  ;  <  =  >  ?  */
-    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 3, 0, 0, 0, 0,
- /* @  A  B  C  D  E  F  G  H  I  J  K  L  M  N  O  */
-    1, 16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,
- /* P  Q  R  S  T  U  V  W  X  Y  Z  [  \  ]  ^  _  */
-    16,16,16,16,16,16,16,16,16,16,16,3, 11,3, 0, 0,
- /* `  a  b  c  d  e  f  g  h  i  j  k  l  m  n  o  */
-    3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
- /* p  q  r  s  t  u  v  w  x  y  z  {  |  }  ~  ^? */
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 11,3, 0, 7
+	/* NUL .... */
+	7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
+	/* .... */
+	7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
+	/*    !  "  #  $  %  &  '  (  )  *  +  ,  -  .  /  */
+	3, 0, 3, 3, 0, 0, 0, 3, 3, 3, 0, 1, 3, 1, 1, 0,
+	/* 0  1  2  3  4  5  6  7  8  9  :  ;  <  =  >  ?  */
+	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 3, 0, 0, 0, 0,
+	/* @  A  B  C  D  E  F  G  H  I  J  K  L  M  N  O  */
+	1, 16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,
+	/* P  Q  R  S  T  U  V  W  X  Y  Z  [  \  ]  ^  _  */
+	16,16,16,16,16,16,16,16,16,16,16,3, 11,3, 0, 0,
+	/* `  a  b  c  d  e  f  g  h  i  j  k  l  m  n  o  */
+	3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	/* p  q  r  s  t  u  v  w  x  y  z  {  |  }  ~  ^? */
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 11,3, 0, 7
 };
 
 /* symbol_special[':'] was 1 in the symbol.c of Gauche.
@@ -867,7 +867,7 @@ static char symbol_special[] = {
 static unsigned char
 get_char_class(int c)
 {
-  return (c < 0)? 0xff: symbol_special[c];
+	return (c < 0)? 0xff: symbol_special[c];
 }
 
 /*
@@ -876,48 +876,48 @@ get_char_class(int c)
 EsObject*
 es_string_new  (const char*        value)
 {
-  EsObject* r;
+	EsObject* r;
 
-  r = es_object_new(ES_TYPE_STRING);
-  ((EsString*)r)->value = strdup(value);
-  return r;
+	r = es_object_new(ES_TYPE_STRING);
+	((EsString*)r)->value = strdup(value);
+	return r;
 }
 
 int
 es_string_p    (const EsObject*   object)
 {
-  return es_object_type_p(object, ES_TYPE_STRING);
+	return es_object_type_p(object, ES_TYPE_STRING);
 }
 
 const char*
 es_string_get  (const EsObject*   object)
 {
-  if (es_string_p(object))
-    return ((EsString *)object)->value;
-  else
+	if (es_string_p(object))
+		return ((EsString *)object)->value;
+	else
     {
-      mio_printf(mio_stderr(), ";; es_string_get, Wrong type argument: ");
-      es_print(object, mio_stderr());
-      mio_putc(mio_stderr(), '\n');
-      return NULL;
+		mio_printf(mio_stderr(), ";; es_string_get, Wrong type argument: ");
+		es_print(object, mio_stderr());
+		mio_putc(mio_stderr(), '\n');
+		return NULL;
     }
 }
 
 static void
 es_string_free(EsObject* object)
 {
-  if (es_string_p(object))
+	if (es_string_p(object))
     {
-      free(((EsString*) object)->value);
-      ((EsString*) object)->value = NULL;
-      es_object_free(object);
+		free(((EsString*) object)->value);
+		((EsString*) object)->value = NULL;
+		es_object_free(object);
     }
-  else
+	else
     {
-      mio_printf(mio_stderr(), ";; Internal error: \n");
-      mio_printf(mio_stderr(), ";;es_string_free, Wrong type argument: ");
-      es_print(object, mio_stderr());
-      mio_putc(mio_stderr(), '\n');
+		mio_printf(mio_stderr(), ";; Internal error: \n");
+		mio_printf(mio_stderr(), ";;es_string_free, Wrong type argument: ");
+		es_print(object, mio_stderr());
+		mio_putc(mio_stderr(), '\n');
     }
 }
 
@@ -925,64 +925,64 @@ es_string_free(EsObject* object)
 static int
 es_string_equal(const EsObject* self, const EsObject* other)
 {
-  if (es_string_p(other))
+	if (es_string_p(other))
     {
-      return (!strcmp(es_string_get(self), es_string_get(other)));
+		return (!strcmp(es_string_get(self), es_string_get(other)));
     }
-  else
-    return 0;
+	else
+		return 0;
 }
 
 static void
 es_string_print(const EsObject* object, MIO* fp)
 {
-  const char* string;
-  char  c;
-  size_t len;
-  int      i;
+	const char* string;
+	char  c;
+	size_t len;
+	int      i;
 
 
-  string = es_string_get(object);
-  len    = strlen(string);
+	string = es_string_get(object);
+	len    = strlen(string);
 
-  mio_printf(fp, "\"");
+	mio_printf(fp, "\"");
 
-  for (i = 0; i < len; i++)
+	for (i = 0; i < len; i++)
     {
-      char cc;
+		char cc;
 
-      c = string[i];
-      switch (c)
-	{
-	case '\n':
-	  cc = 'n';
-	  break;
-	case '\t':
-	  cc = 't';
-	  break;
-	case '\r':
-	  cc = 'r';
-	  break;
-	case '\f':
-	  cc = 'f';
-	  break;
-	default:
-	  cc = 0;
-	  break;
-	}
-      if (cc)
-	{
-	  mio_printf(fp, "\\");
-	  mio_printf(fp, "%c", cc);
-	  continue;
-	}
+		c = string[i];
+		switch (c)
+		{
+		case '\n':
+			cc = 'n';
+			break;
+		case '\t':
+			cc = 't';
+			break;
+		case '\r':
+			cc = 'r';
+			break;
+		case '\f':
+			cc = 'f';
+			break;
+		default:
+			cc = 0;
+			break;
+		}
+		if (cc)
+		{
+			mio_printf(fp, "\\");
+			mio_printf(fp, "%c", cc);
+			continue;
+		}
 
-      if (c == '\\' || c == '"')
-	mio_printf(fp, "\\");
-      mio_printf(fp, "%c", c);
+		if (c == '\\' || c == '"')
+			mio_printf(fp, "\\");
+		mio_printf(fp, "%c", c);
     }
 
-  mio_printf(fp, "\"");
+	mio_printf(fp, "\"");
 }
 
 /*
@@ -991,181 +991,181 @@ es_string_print(const EsObject* object, MIO* fp)
 EsObject*
 es_cons        (EsObject* car, EsObject* cdr)
 {
-  EsObject* r;
+	EsObject* r;
 
-  if (!es_list_p(cdr))
+	if (!es_list_p(cdr))
     {
-      /* This library doesn't permit to dotted list. */
-      return es_nil;
+		/* This library doesn't permit to dotted list. */
+		return es_nil;
     }
 
 
-  r = es_object_new(ES_TYPE_CONS);
-  if (es_debug)
+	r = es_object_new(ES_TYPE_CONS);
+	if (es_debug)
     {
-      mio_printf(mio_stderr(), ";; cons[0x%p] = (0x%p . 0x%p)\n", r, car, cdr);
-      /* es_print(car, mio_stderr());
-	 mio_putc('\n', mio_stderr());
-	 es_print(cdr, mio_stderr());
-	 mio_putc('\n', mio_stderr()); */
+		mio_printf(mio_stderr(), ";; cons[0x%p] = (0x%p . 0x%p)\n", r, car, cdr);
+		/* es_print(car, mio_stderr());
+		   mio_putc('\n', mio_stderr());
+		   es_print(cdr, mio_stderr());
+		   mio_putc('\n', mio_stderr()); */
     }
-  ((EsCons*)r)->car = es_object_ref(car);
-  ((EsCons*)r)->cdr = es_object_ref(cdr);
+	((EsCons*)r)->car = es_object_ref(car);
+	((EsCons*)r)->cdr = es_object_ref(cdr);
 
-  return r;
+	return r;
 }
 
 int
 es_cons_p      (const EsObject* object)
 {
-  return es_object_type_p(object, ES_TYPE_CONS);
+	return es_object_type_p(object, ES_TYPE_CONS);
 }
 
 int
 es_list_p      (const EsObject* object)
 {
-  EsType t;
+	EsType t;
 
-  t = es_object_get_type(object);
-  return (t == ES_TYPE_NIL || t == ES_TYPE_CONS);
+	t = es_object_get_type(object);
+	return (t == ES_TYPE_NIL || t == ES_TYPE_CONS);
 }
 
 EsObject*
 es_car         (const EsObject* object)
 {
-  if (es_cons_p(object))
-    return ((EsCons*)object)->car;
-  else if (es_null(object))
-    return es_nil;
-  else
+	if (es_cons_p(object))
+		return ((EsCons*)object)->car;
+	else if (es_null(object))
+		return es_nil;
+	else
     {
-      mio_printf(mio_stderr(), ";; es_car, Wrong type argument: ");
-      es_print(object, mio_stderr());
-      mio_putc(mio_stderr(), '\n');
-      return es_nil;
+		mio_printf(mio_stderr(), ";; es_car, Wrong type argument: ");
+		es_print(object, mio_stderr());
+		mio_putc(mio_stderr(), '\n');
+		return es_nil;
     }
 }
 
 EsObject*
 es_cdr         (const EsObject* object)
 {
-  if (es_cons_p(object))
-    return ((EsCons*)object)->cdr;
-  else if (es_null(object))
-    return es_nil;
-  else
+	if (es_cons_p(object))
+		return ((EsCons*)object)->cdr;
+	else if (es_null(object))
+		return es_nil;
+	else
     {
-      mio_printf(mio_stderr(), ";; es_cdr, Wrong type argument: ");
-      es_print(object, mio_stderr());
-      mio_putc(mio_stderr(), '\n');
-      return es_nil;
+		mio_printf(mio_stderr(), ";; es_cdr, Wrong type argument: ");
+		es_print(object, mio_stderr());
+		mio_putc(mio_stderr(), '\n');
+		return es_nil;
     }
 }
 
 static void
 es_cons_free(EsObject* object)
 {
-  EsCons* cons;
+	EsCons* cons;
 
-  if (es_cons_p(object))
+	if (es_cons_p(object))
     {
-      cons = ((EsCons*)object);
+		cons = ((EsCons*)object);
 
-      es_object_unref(cons->car);
-      cons->car = NULL;
+		es_object_unref(cons->car);
+		cons->car = NULL;
 
-      es_object_unref(cons->cdr);
-      cons->cdr = NULL;
-      es_object_free(object);
+		es_object_unref(cons->cdr);
+		cons->cdr = NULL;
+		es_object_free(object);
     }
-  else if (es_null(object))
-    ;				/* DO NOTHING */
-  else
+	else if (es_null(object))
+		;				/* DO NOTHING */
+	else
     {
-      mio_printf(mio_stderr(), ";; Internal error: \n");
-      mio_printf(mio_stderr(), ";; es_cons_free, Wrong type argument: ");
-      es_print(object, mio_stderr());
-      mio_putc(mio_stderr(), '\n');
+		mio_printf(mio_stderr(), ";; Internal error: \n");
+		mio_printf(mio_stderr(), ";; es_cons_free, Wrong type argument: ");
+		es_print(object, mio_stderr());
+		mio_putc(mio_stderr(), '\n');
     }
 }
 
 static int
 es_cons_equal(const EsObject* self, const EsObject* other)
 {
-  return (es_null(other)
-	  || (!es_cons_p(other))
-	  || (!es_object_equal(es_car(self), es_car(other)))
-	  || (!es_object_equal(es_cdr(self), es_cdr(other))))
-    ? 0
-    : 1;
+	return (es_null(other)
+			|| (!es_cons_p(other))
+			|| (!es_object_equal(es_car(self), es_car(other)))
+			|| (!es_object_equal(es_cdr(self), es_cdr(other))))
+		? 0
+		: 1;
 }
 
 static void
 es_cons_print(const EsObject* object, MIO* fp)
 {
-  EsObject* car;
-  EsObject* cdr;
+	EsObject* car;
+	EsObject* cdr;
 
-  mio_printf(fp, "(");
-  while(!es_null(object))
+	mio_printf(fp, "(");
+	while(!es_null(object))
     {
-      car = es_car(object);
-      cdr = es_cdr(object);
+		car = es_car(object);
+		cdr = es_cdr(object);
 
-      es_print(car, fp);
-      if (es_cons_p(cdr))
-	mio_putc(fp, ' ');
-      else if (!es_null(cdr))
-	{
-	  mio_printf(mio_stderr(), ";; es_cons_print, dotted list given: ");
-	  mio_putc(mio_stderr(), '\n');
-	}
-      object = cdr;
+		es_print(car, fp);
+		if (es_cons_p(cdr))
+			mio_putc(fp, ' ');
+		else if (!es_null(cdr))
+		{
+			mio_printf(mio_stderr(), ";; es_cons_print, dotted list given: ");
+			mio_putc(mio_stderr(), '\n');
+		}
+		object = cdr;
     }
-  mio_printf(fp, ")");
+	mio_printf(fp, ")");
 }
 
 static EsObject* es_cons_reverse_rec(EsObject* cdr,
-				     EsObject* car,
-				     EsObject* gathered);
+									 EsObject* car,
+									 EsObject* gathered);
 
 static EsObject*
 es_cons_reverse  (EsObject*        cons)
 {
-  /* g_return_val_if_fail (es_null(cons) || es_cons_p(cons), es_nil);
-     g_return_val_if_fail (!es_cproc_dotted_p(cons), es_nil); */
+	/* g_return_val_if_fail (es_null(cons) || es_cons_p(cons), es_nil);
+	   g_return_val_if_fail (!es_cproc_dotted_p(cons), es_nil); */
 
-  if (es_null(cons))
-    return es_nil;
-  else
-    return es_cons_reverse_rec(es_cdr(cons),
-			       es_car(cons),
-			       es_nil);
+	if (es_null(cons))
+		return es_nil;
+	else
+		return es_cons_reverse_rec(es_cdr(cons),
+								   es_car(cons),
+								   es_nil);
 }
 
 EsObject*
 es_reverse  (EsObject* cons)
 {
-  return es_cons_reverse(cons);
+	return es_cons_reverse(cons);
 }
 
 static EsObject*
 es_cons_reverse_rec(EsObject* cdr,
-		    EsObject* car,
-		    EsObject* gathered)
+					EsObject* car,
+					EsObject* gathered)
 {
-  EsObject* cons;
-  EsObject* o;
+	EsObject* cons;
+	EsObject* o;
 
-  cons = es_cons(car, o = gathered);
-  es_object_unref(o);
+	cons = es_cons(car, o = gathered);
+	es_object_unref(o);
 
-  if (es_null(cdr))
-    return cons;
-  else
-    return es_cons_reverse_rec(es_cdr(cdr),
-			       es_car(cdr),
-			       cons);
+	if (es_null(cdr))
+		return cons;
+	else
+		return es_cons_reverse_rec(es_cdr(cdr),
+								   es_car(cdr),
+								   cons);
 }
 
 /*
@@ -1174,71 +1174,71 @@ es_cons_reverse_rec(EsObject* cdr,
 EsObject*
 es_error_intern  (const char*       name)
 {
-  EsSingleton* r;
+	EsSingleton* r;
 
-  r = es_obarray_intern(ES_TYPE_ERROR, name);
-  return (EsObject*)r;
+	r = es_obarray_intern(ES_TYPE_ERROR, name);
+	return (EsObject*)r;
 }
 
 int
 es_error_p    (const EsObject*   object)
 {
-  return es_object_type_p(object, ES_TYPE_ERROR);
+	return es_object_type_p(object, ES_TYPE_ERROR);
 }
 
 const char*
 es_error_name  (const EsObject*   object)
 {
-  if (es_error_p(object))
-    return es_singleton_get((EsSingleton *)object);
-  else
+	if (es_error_p(object))
+		return es_singleton_get((EsSingleton *)object);
+	else
     {
-      mio_printf(mio_stderr(), ";; es_error_name, Wrong type argument: ");
-      es_print(object, mio_stderr());
-      mio_putc(mio_stderr(), '\n');
-      return NULL;
+		mio_printf(mio_stderr(), ";; es_error_name, Wrong type argument: ");
+		es_print(object, mio_stderr());
+		mio_putc(mio_stderr(), '\n');
+		return NULL;
     }
 }
 
 EsObject*
 es_error_set_object (EsObject*   error, EsObject*   object)
 {
-  EsError *e = (EsError *)error;
-  if (e->object)
-    es_object_unref (e->object);
+	EsError *e = (EsError *)error;
+	if (e->object)
+		es_object_unref (e->object);
 
-  e->object = es_object_ref (object);
-  return error;
+	e->object = es_object_ref (object);
+	return error;
 }
 
 EsObject*
 es_error_get_object (const EsObject*   error)
 {
-  EsError *e = (EsError *)error;
-  return e->object;
+	EsError *e = (EsError *)error;
+	return e->object;
 }
 
 static void
 es_error_free(EsObject* object)
 {
-  /* DO NOTHING */
+	/* DO NOTHING */
 }
 
 static int
 es_error_equal(const EsObject* self, const EsObject* other)
 {
-  return (self == other)? 1: 0;
+	return (self == other)? 1: 0;
 }
 
 static void
 es_error_print(const EsObject* object, MIO* fp)
 {
-  const char* string;
-  EsError *e = (EsError *)object;
+	const char* string;
+	EsError *e = (EsError *)object;
 
-  string = es_error_name(object);
-  mio_printf(fp, "#%s:", string);
-  es_print (e->object, fp);
+	string = es_error_name(object);
+	mio_printf(fp, "#%s:", string);
+	es_print (e->object, fp);
 }
 
 
@@ -1266,105 +1266,105 @@ static unsigned int hash(const char* keyarg)
  */
 void
 es_print           (const EsObject* object,
-		    MIO*           out)
+					MIO*           out)
 {
-  class_of(object)->print(object, out? out: mio_stdout());
+	class_of(object)->print(object, out? out: mio_stdout());
 }
 
 
 char*
 es_print_to_string (EsObject*        object)
 {
-  char *bp;
-  size_t size;
-  MIO* out;
+	char *bp;
+	size_t size;
+	MIO* out;
 
 
-  out = mio_new_memory (NULL, 0, realloc, NULL);
-  if (!out)
+	out = mio_new_memory (NULL, 0, realloc, NULL);
+	if (!out)
     {
-      /* TODO: Report error */
-      return NULL;
+		/* TODO: Report error */
+		return NULL;
     }
 
-  es_print(object, out);
-  bp = (char *)mio_memory_get_data (out, &size);
-  mio_unref(out);
+	es_print(object, out);
+	bp = (char *)mio_memory_get_data (out, &size);
+	mio_unref(out);
 
-  return bp;
+	return bp;
 }
 
 static const char* comment_prefix = ";; ";
 void
 es_comment (const char* comment, MIO* out)
 {
-  const char* p;
-  const char* c;
+	const char* p;
+	const char* c;
 
-  p = comment_prefix? comment_prefix: ";; ";
-  c = comment? comment: "";
-  out = out? out: mio_stdout();
+	p = comment_prefix? comment_prefix: ";; ";
+	c = comment? comment: "";
+	out = out? out: mio_stdout();
 
-  /* ""
-     => ;;
+	/* ""
+	   => ;;
 
-     "a"
-     => ;; a
+	   "a"
+	   => ;; a
 
-     "a\n"
-     => ;; a
-
-
-     "a\nb"
-     => ;; a
-     ;; b
-
-     "a\nb\n"
-     => ;; a
-     ;;b
+	   "a\n"
+	   => ;; a
 
 
-  */
-  while (1)
+	   "a\nb"
+	   => ;; a
+	   ;; b
+
+	   "a\nb\n"
+	   => ;; a
+	   ;;b
+
+
+	*/
+	while (1)
     {
-      mio_puts(out, p);
+		mio_puts(out, p);
 
-      while(1)
-	{
-	  if (*c == '\0')
-	    {
-	      mio_putc(out, '\n');
-	      return;
-	    }
-	  else
-	    {
-	      mio_putc(out, *c++);
-	      if (*(c - 1) == '\n')
-		break;
-	    }
-	}
+		while(1)
+		{
+			if (*c == '\0')
+			{
+				mio_putc(out, '\n');
+				return;
+			}
+			else
+			{
+				mio_putc(out, *c++);
+				if (*(c - 1) == '\n')
+					break;
+			}
+		}
     }
 }
 
 char*
 es_comment_to_string (const char* comment)
 {
-  char *bp;
-  size_t size;
-  MIO* out;
+	char *bp;
+	size_t size;
+	MIO* out;
 
-  out = mio_new_memory (NULL, 0, realloc, NULL);
-  if (!out)
+	out = mio_new_memory (NULL, 0, realloc, NULL);
+	if (!out)
     {
-      /* TODO: Report error */
-      return NULL;
+		/* TODO: Report error */
+		return NULL;
     }
 
-  es_comment(comment, out);
-  bp = (char *)mio_memory_get_data (out, &size);
-  mio_unref(out);
+	es_comment(comment, out);
+	bp = (char *)mio_memory_get_data (out, &size);
+	mio_unref(out);
 
-  return bp;
+	return bp;
 }
 
 
@@ -1376,9 +1376,9 @@ es_comment_to_string (const char* comment)
 typedef struct _Token Token;
 struct _Token
 {
-  char*  buffer;
-  size_t filled;
-  size_t allocated;
+	char*  buffer;
+	size_t filled;
+	size_t allocated;
 };
 static Token* token_new   (char seed);
 static void   token_free  (Token* token);
@@ -1401,16 +1401,16 @@ static int      is_string_start  (char c);
 static int      is_fence_start   (char c);
 
 typedef
-       int (*TerminalDetector) (int c);
+int (*TerminalDetector) (int c);
 
 static int is_string_end       (int c);
 static int is_fence_end        (int c);
 static int is_separator        (int c);
 
 static Token* get_sequence      (MIO* fp,
-				 Token* seed,
-				 TerminalDetector is_terminator,
-				 int              include_terminator);
+								 Token* seed,
+								 TerminalDetector is_terminator,
+								 int              include_terminator);
 static Token* get_string        (MIO* fp, char seed);
 static Token* get_escaped_symbol(MIO* fp, char seed);
 static Token* get_symbol        (MIO* fp, char seed);
@@ -1419,635 +1419,635 @@ static EsObject* fill_list    (MIO*  fp);
 static EsObject* make_atom    (Token* token);
 static EsObject* make_string  (char* t);
 static EsObject* make_symbol  (char* t,
-			       int is_wrapped);
+							   int is_wrapped);
 static EsObject* make_boolean (int b);
 static int  is_integer   (const char* t,
-			  int* i);
+						  int* i);
 static EsObject* make_integer (int  i);
 static int  is_real      (const char* t,
-			  double* d);
+						  double* d);
 static EsObject* make_real    (double d);
 
 
 EsObject*
 es_read            (MIO* in)
 {
-  Token* t;
-  EsObject* r;
+	Token* t;
+	EsObject* r;
 
 
-  in = in? in: mio_stdin();
+	in = in? in: mio_stdin();
 
-  t = get_token(in);
+	t = get_token(in);
 
-  if (t == NULL)
-    return ES_READER_ERROR;
-  else if (t == EOF_TOKEN)
-    return ES_READER_EOF;
-  else if (t == OPEN_PAREN_TOKEN)
-    r = fill_list(in);
-  else if (t == CLOSE_PAREN_TOKEN)
-    return ES_READER_ERROR;
-  else
-    r = make_atom(t);
+	if (t == NULL)
+		return ES_READER_ERROR;
+	else if (t == EOF_TOKEN)
+		return ES_READER_EOF;
+	else if (t == OPEN_PAREN_TOKEN)
+		r = fill_list(in);
+	else if (t == CLOSE_PAREN_TOKEN)
+		return ES_READER_ERROR;
+	else
+		r = make_atom(t);
 
-  token_free(t);
+	token_free(t);
 
-  return r;
+	return r;
 }
 
 
 static Token*
 get_token(MIO* in)
 {
-  Token* t;
+	Token* t;
 
-  int c;
-  while (1)
+	int c;
+	while (1)
     {
-      c = mio_getc(in);
+		c = mio_getc(in);
 
-      if (c == EOF)
-	{
-	  t = EOF_TOKEN;
-	  break;
-	}
-      else
-	{
-	  char c0;
+		if (c == EOF)
+		{
+			t = EOF_TOKEN;
+			break;
+		}
+		else
+		{
+			char c0;
 
-	  c0 = (char)c;
+			c0 = (char)c;
 
-	  if (is_whitespace(c0))
-	    continue;
-	  else if (is_comment_start(c0))
-	    {
-	      skip_to_newline(in);
-	      /* TODO */
-	      continue;
-	    }
-	  else if (is_paren_open(c0))
-	    {
-	      t = OPEN_PAREN_TOKEN;
-	      break;
-	    }
-	  else if (is_paren_close(c0))
-	    {
-	      t = CLOSE_PAREN_TOKEN;
-	      break;
-	    }
-	  else if (is_string_start(c0))
-	    {
-	      t = get_string(in, c0);
-	      break;
-	    }
-	  else if (is_fence_start(c0))
-	    {
-	      t = get_escaped_symbol(in, c0);
-	      break;
-	    }
-	  else
-	    {
-	      t = get_symbol(in, c0);
-	      break;
-	    }
-	}
+			if (is_whitespace(c0))
+				continue;
+			else if (is_comment_start(c0))
+			{
+				skip_to_newline(in);
+				/* TODO */
+				continue;
+			}
+			else if (is_paren_open(c0))
+			{
+				t = OPEN_PAREN_TOKEN;
+				break;
+			}
+			else if (is_paren_close(c0))
+			{
+				t = CLOSE_PAREN_TOKEN;
+				break;
+			}
+			else if (is_string_start(c0))
+			{
+				t = get_string(in, c0);
+				break;
+			}
+			else if (is_fence_start(c0))
+			{
+				t = get_escaped_symbol(in, c0);
+				break;
+			}
+			else
+			{
+				t = get_symbol(in, c0);
+				break;
+			}
+		}
     }
 
-  return t;
+	return t;
 }
 
 static int
 is_whitespace    (char c)
 {
-  static const char* const whitespace_chars = " \t\n\r\f";
+	static const char* const whitespace_chars = " \t\n\r\f";
 
-  return strchr(whitespace_chars, c)? 1: 0;
+	return strchr(whitespace_chars, c)? 1: 0;
 }
 
 static int
 is_paren_open    (char c)
 {
-  return (c == '(')? 1: 0;
+	return (c == '(')? 1: 0;
 }
 
 static int
 is_paren_close   (char c)
 {
-  return (c == ')')? 1: 0;
+	return (c == ')')? 1: 0;
 }
 
 static int
 is_comment_start (char c)
 {
-  return (c == ';')? 1: 0;
+	return (c == ';')? 1: 0;
 }
 
 static int
 is_string_start  (char c)
 {
-  return (c == '"')? 1: 0;
+	return (c == '"')? 1: 0;
 }
 
 static int
 is_fence_start  (char c)
 {
-  return (c == '|')? 1: 0;
+	return (c == '|')? 1: 0;
 }
 
 static void
 skip_to_newline  (MIO* fp)
 {
-  int c;
+	int c;
 
 
-  while (1)
+	while (1)
     {
-      char c0;
+		char c0;
 
 
-      c = mio_getc(fp);
-      if (c == EOF)
-	break;
+		c = mio_getc(fp);
+		if (c == EOF)
+			break;
 
-      c0 = (char)c;
-      if (c0 == '\n')
-	break;
+		c0 = (char)c;
+		if (c0 == '\n')
+			break;
     }
 }
 
 static int
 is_string_end    (int c)
 {
-  return ((char)(c) == '"')? 1: 0;
+	return ((char)(c) == '"')? 1: 0;
 }
 
 static int
 is_fence_end     (int c)
 {
-  return ((char)(c) == '|')? 1: 0;
+	return ((char)(c) == '|')? 1: 0;
 }
 
 static int
 is_separator     (int c)
 {
-  if (c == EOF)
-    return 1;
-  else
+	if (c == EOF)
+		return 1;
+	else
     {
-      char c0;
+		char c0;
 
 
-      c0 = (char)(c);
-      if (is_whitespace(c0)
-	  || is_comment_start(c0)
-	  || is_paren_open(c0)
-	  || is_paren_close(c0)
-	  || is_string_start(c0)
-	  || is_fence_start(c0))
-	return 1;
+		c0 = (char)(c);
+		if (is_whitespace(c0)
+			|| is_comment_start(c0)
+			|| is_paren_open(c0)
+			|| is_paren_close(c0)
+			|| is_string_start(c0)
+			|| is_fence_start(c0))
+			return 1;
     }
 
-  return 0;
+	return 0;
 }
 
 static Token*
 get_string         (MIO* fp,
-		    char seed)
+					char seed)
 {
-  Token* t;
+	Token* t;
 
-  t = token_new(seed);
-  return get_sequence(fp, t, is_string_end, 1);
+	t = token_new(seed);
+	return get_sequence(fp, t, is_string_end, 1);
 }
 
 static Token*
 get_escaped_symbol (MIO* fp,
-		    char seed)
+					char seed)
 {
-  Token* t;
+	Token* t;
 
-  t = token_new(seed);
-  return get_sequence(fp, t, is_fence_end, 1);
+	t = token_new(seed);
+	return get_sequence(fp, t, is_fence_end, 1);
 }
 
 static Token*
 get_symbol         (MIO* fp,
-		    char seed)
+					char seed)
 {
-  Token* t;
+	Token* t;
 
-  t = token_new(seed);
-  return get_sequence(fp, t, is_separator, 0);
+	t = token_new(seed);
+	return get_sequence(fp, t, is_separator, 0);
 }
 
 static void
 dump_token (MIO* stream, const char* prefix, Token* seed)
 {
-  const char* buf;
-  int i;
-  char  c;
+	const char* buf;
+	int i;
+	char  c;
 
 
-  buf = seed->buffer;
-  mio_printf(stream, "%s", prefix);
-  for (i = 0; i < ( seed->filled - 1 ); i++)
-    {
-      c = buf[i];
-      mio_putc(stream, c);
-      if (buf[i] == '\n')
+	buf = seed->buffer;
 	mio_printf(stream, "%s", prefix);
+	for (i = 0; i < ( seed->filled - 1 ); i++)
+    {
+		c = buf[i];
+		mio_putc(stream, c);
+		if (buf[i] == '\n')
+			mio_printf(stream, "%s", prefix);
     }
-  mio_putc(mio_stderr(), '\n');
+	mio_putc(mio_stderr(), '\n');
 }
 
 static Token*
 get_sequence       (MIO* fp,
-		    Token* seed,
-		    TerminalDetector     is_terminator,
-		    int             include_terminator)
+					Token* seed,
+					TerminalDetector     is_terminator,
+					int             include_terminator)
 {
-  int c;
-  int in_escape;
+	int c;
+	int in_escape;
 
-  in_escape = 0;
-  while (1)
+	in_escape = 0;
+	while (1)
     {
-      c = mio_getc(fp);
-      if (EOF == c)
-	{
-	  if (in_escape)
-	    {
-	      /*
-		throw ReadError("no character after escape character: " + seed);
-	      */
-	      mio_printf(mio_stderr(), ";; no character after escape character:\n");
-	      {
-		seed = token_append(seed, '\\');
-		dump_token(mio_stderr(), "; ", seed);
-	      }
-	      token_free(seed);
-	      return NULL;
-	    }
-	  else if (is_terminator(c))
-	    break;
-	  else
-	    {
-	      /*
-		throw ReadError("got EOF during reading a sequence: " + seed);
-	      */
-	      mio_printf(mio_stderr(), ";; got EOF during reading a sequence: \n");
-	      dump_token(mio_stderr(), "; ", seed);
-	      token_free(seed);
-	      return NULL;
-	    }
-	}
-      else
-	{
-	  char c0;
+		c = mio_getc(fp);
+		if (EOF == c)
+		{
+			if (in_escape)
+			{
+				/*
+				  throw ReadError("no character after escape character: " + seed);
+				*/
+				mio_printf(mio_stderr(), ";; no character after escape character:\n");
+				{
+					seed = token_append(seed, '\\');
+					dump_token(mio_stderr(), "; ", seed);
+				}
+				token_free(seed);
+				return NULL;
+			}
+			else if (is_terminator(c))
+				break;
+			else
+			{
+				/*
+				  throw ReadError("got EOF during reading a sequence: " + seed);
+				*/
+				mio_printf(mio_stderr(), ";; got EOF during reading a sequence: \n");
+				dump_token(mio_stderr(), "; ", seed);
+				token_free(seed);
+				return NULL;
+			}
+		}
+		else
+		{
+			char c0;
 
 
-	  c0 = (char)(c);
-	  if (in_escape)
-	    {
-	      switch (c0)
-		{
-		case 'n': c0 = '\n'; break;
-		case 't': c0 = '\t'; break;
-		case 'r': c0 = '\r'; break;
-		case 'f': c0 = '\f'; break;
-		default:  c0 = c0  ; break;
+			c0 = (char)(c);
+			if (in_escape)
+			{
+				switch (c0)
+				{
+				case 'n': c0 = '\n'; break;
+				case 't': c0 = '\t'; break;
+				case 'r': c0 = '\r'; break;
+				case 'f': c0 = '\f'; break;
+				default:  c0 = c0  ; break;
+				}
+				seed = token_append(seed, c0);
+				in_escape = 0;
+				continue;
+			}
+			else if (c0 == '\\')
+			{
+				in_escape = 1;
+				continue;
+			}
+			else if (is_terminator(c))
+			{
+				if (include_terminator)
+					seed = token_append(seed, c0);
+				else
+				{
+					if (mio_ungetc(fp, c) == EOF)
+					{
+						token_free(seed);
+						return NULL;
+					}
+				}
+				break;
+			}
+			else
+			{
+				seed = token_append(seed, c0);
+				in_escape = 0;
+				continue;
+			}
 		}
-	      seed = token_append(seed, c0);
-	      in_escape = 0;
-	      continue;
-	    }
-	  else if (c0 == '\\')
-	    {
-	      in_escape = 1;
-	      continue;
-	    }
-	  else if (is_terminator(c))
-	    {
-	      if (include_terminator)
-		seed = token_append(seed, c0);
-	      else
-		{
-		  if (mio_ungetc(fp, c) == EOF)
-		    {
-		      token_free(seed);
-		      return NULL;
-		    }
-		}
-	      break;
-	    }
-	  else
-	    {
-	      seed = token_append(seed, c0);
-	      in_escape = 0;
-	      continue;
-	    }
-	}
     }
-  return seed;
+	return seed;
 }
 
 
 /*
-(let ((total-length 0)
-      (count-symbol 0))
+  (let ((total-length 0)
+  (count-symbol 0))
   (mapatoms (lambda (s) (setq total-length (+ total-length (length (symbol-name s)))
-			      count-symbol (+ 1 count-symbol)
-			      )))
+  count-symbol (+ 1 count-symbol)
+  )))
   (/ total-length count-symbol)) => 15
 */
 #define DEFAULT_TOKEN_LENGHT 16
 static Token*
 token_new   (char seed)
 {
-  Token *t;
+	Token *t;
 
 
-  t = malloc(sizeof(Token));
-  if (!t)
-    return NULL;
+	t = malloc(sizeof(Token));
+	if (!t)
+		return NULL;
 
-  t->buffer = calloc(1, sizeof(char) * DEFAULT_TOKEN_LENGHT);
-  if (!t->buffer)
+	t->buffer = calloc(1, sizeof(char) * DEFAULT_TOKEN_LENGHT);
+	if (!t->buffer)
     {
-      free(t);
-      return NULL;
+		free(t);
+		return NULL;
     }
 
-  t->filled = 0;
-  t->buffer[t->filled++] = seed;
-  t->buffer[t->filled++]   = '\0';
-  t->allocated = DEFAULT_TOKEN_LENGHT;
+	t->filled = 0;
+	t->buffer[t->filled++] = seed;
+	t->buffer[t->filled++]   = '\0';
+	t->allocated = DEFAULT_TOKEN_LENGHT;
 
-  return t;
+	return t;
 }
 
 static void
 token_free  (Token* token)
 {
-  if ((token == NULL)
-      || (token == EOF_TOKEN)
-      || (token == OPEN_PAREN_TOKEN)
-      || (token == CLOSE_PAREN_TOKEN))
-    return;
+	if ((token == NULL)
+		|| (token == EOF_TOKEN)
+		|| (token == OPEN_PAREN_TOKEN)
+		|| (token == CLOSE_PAREN_TOKEN))
+		return;
 
 
-  free(token->buffer);
-  token->buffer = NULL;
-  free(token);
+	free(token->buffer);
+	token->buffer = NULL;
+	free(token);
 }
 
 static Token*
 token_append(Token* t, char c)
 {
-  size_t d;
+	size_t d;
 
 
-  d = t->allocated - t->filled;
-  if (d < 1)
+	d = t->allocated - t->filled;
+	if (d < 1)
     {
-      char* tmp;
+		char* tmp;
 
-      tmp = t->buffer;
-      t->buffer = realloc(t->buffer, t->allocated *= 2);
-      if (!t->buffer)
-	{
-	  t->buffer = tmp;
-	  token_free(t);
-	  return NULL;
-	}
+		tmp = t->buffer;
+		t->buffer = realloc(t->buffer, t->allocated *= 2);
+		if (!t->buffer)
+		{
+			t->buffer = tmp;
+			token_free(t);
+			return NULL;
+		}
     }
 
-  t->buffer[t->filled - 1] = c;
-  t->buffer[t->filled++]   = '\0';
+	t->buffer[t->filled - 1] = c;
+	t->buffer[t->filled++]   = '\0';
 
-  return t;
+	return t;
 }
 
 static EsObject*
 fill_list (MIO* fp)
 {
-  EsObject* r;
-  Token*    t;
+	EsObject* r;
+	Token*    t;
 
-  r = es_nil;
-  while(1)
+	r = es_nil;
+	while(1)
     {
-      t = get_token(fp);
-      if (t == NULL)
-	{
-	  es_object_unref(r);
-	  return ES_READER_ERROR;
-	}
-      else if (t == EOF_TOKEN)
-	{
-	  es_object_unref(r);
-	  return ES_READER_ERROR;
-	}
-      else if (t == CLOSE_PAREN_TOKEN)
-	{
-	  EsObject* tmp;
+		t = get_token(fp);
+		if (t == NULL)
+		{
+			es_object_unref(r);
+			return ES_READER_ERROR;
+		}
+		else if (t == EOF_TOKEN)
+		{
+			es_object_unref(r);
+			return ES_READER_ERROR;
+		}
+		else if (t == CLOSE_PAREN_TOKEN)
+		{
+			EsObject* tmp;
 
-	  tmp = es_cons_reverse(r);
-	  es_object_unref(r);
-	  r = tmp;
-	  break;
-	}
-      else if (t == OPEN_PAREN_TOKEN)
-	{
-	  EsObject* car;
-	  EsObject* cdr;
+			tmp = es_cons_reverse(r);
+			es_object_unref(r);
+			r = tmp;
+			break;
+		}
+		else if (t == OPEN_PAREN_TOKEN)
+		{
+			EsObject* car;
+			EsObject* cdr;
 
-	  car = fill_list(fp);
-	  if (es_error_p(car))
-	    {
-	      es_object_unref(r);
-	      r = car;
-	      break;
-	    }
+			car = fill_list(fp);
+			if (es_error_p(car))
+			{
+				es_object_unref(r);
+				r = car;
+				break;
+			}
 
-	  cdr = r;
-	  r = es_cons(car, cdr);
-	  es_object_unref(car);
-	  es_object_unref(cdr);
+			cdr = r;
+			r = es_cons(car, cdr);
+			es_object_unref(car);
+			es_object_unref(cdr);
 
-	  continue;
-	}
-      else
-	{
-	  EsObject* car;
-	  EsObject* cdr;
+			continue;
+		}
+		else
+		{
+			EsObject* car;
+			EsObject* cdr;
 
-	  car = make_atom(t);
-	  token_free(t);
-	  /* TODO: check error */
-	  cdr = r;
-	  r = es_cons(car, cdr);
-	  es_object_unref(car);
-	  es_object_unref(cdr);
+			car = make_atom(t);
+			token_free(t);
+			/* TODO: check error */
+			cdr = r;
+			r = es_cons(car, cdr);
+			es_object_unref(car);
+			es_object_unref(cdr);
 
-	  continue;
-	}
+			continue;
+		}
     }
 
-  return r;
+	return r;
 }
 
 
 static EsObject*
 make_atom          (Token*   token)
 {
-  EsObject* r;
-  char* t;
+	EsObject* r;
+	char* t;
 
-  int i;
-  double d;
+	int i;
+	double d;
 
 
-  t = token->buffer;
+	t = token->buffer;
 
-  if (t[0] == '"')
-    r = make_string(t);
-  else if (t[0] == '|')
-    r = make_symbol(t, 1);
-  else if (strcmp(t, "#t") == 0)
-    r = make_boolean(1);
-  else if (strcmp(t, "#f") == 0)
-    r = make_boolean(0);
-  else if (is_integer(t, &i))
+	if (t[0] == '"')
+		r = make_string(t);
+	else if (t[0] == '|')
+		r = make_symbol(t, 1);
+	else if (strcmp(t, "#t") == 0)
+		r = make_boolean(1);
+	else if (strcmp(t, "#f") == 0)
+		r = make_boolean(0);
+	else if (is_integer(t, &i))
     {
-      r = make_integer(i);
+		r = make_integer(i);
     }
-  else if (is_real(t, &d))
+	else if (is_real(t, &d))
     {
-      r = make_real(d);
+		r = make_real(d);
     }
-  else
-    r = make_symbol(t, 0);
+	else
+		r = make_symbol(t, 0);
 
-  return r;
+	return r;
 }
 
 static EsObject*
 make_string  (char* t)
 {
-  size_t len;
+	size_t len;
 
 
-  len = strlen(t);
-  t[(len - 1)] = '\0';
-  return es_string_new(t + 1);
+	len = strlen(t);
+	t[(len - 1)] = '\0';
+	return es_string_new(t + 1);
 }
 
 static EsObject*
 make_symbol  (char* t,
-	      int is_wrapped)
+			  int is_wrapped)
 {
-  if (is_wrapped)
+	if (is_wrapped)
     {
-      size_t len;
+		size_t len;
 
-      len = strlen(t);
-      t[(len - 1)] = '\0';
-      t = t + 1;
+		len = strlen(t);
+		t[(len - 1)] = '\0';
+		t = t + 1;
     }
 
-  return es_symbol_intern(t);
+	return es_symbol_intern(t);
 }
 
 
 static EsObject*
 make_boolean (int b)
 {
-  return es_boolean_new(b);
+	return es_boolean_new(b);
 }
 
 static int
 is_integer   (const char* cstr,
-	      int* i)
+			  int* i)
 {
-  char* endptr;
-  long  r;
+	char* endptr;
+	long  r;
 
-  endptr = NULL;
-  errno = 0;
-  r = strtol(cstr, &endptr, 10);
+	endptr = NULL;
+	errno = 0;
+	r = strtol(cstr, &endptr, 10);
 
-  if (errno || (endptr == cstr))
-    return 0;
-  else if (*endptr != '\0')
-    return 0;
+	if (errno || (endptr == cstr))
+		return 0;
+	else if (*endptr != '\0')
+		return 0;
 
-  if ((r > INT_MAX) || r < INT_MIN)
+	if ((r > INT_MAX) || r < INT_MIN)
     {
-      /* TODO: What I should do?
-	 TODO: Set error */
-      /*
-      throw ReadError("Too large integer for `int': " + r);
-      */
-      mio_printf(mio_stderr(), ";; is_integer, Integer out of range: %s\n", cstr);
-      return 0;
+		/* TODO: What I should do?
+		   TODO: Set error */
+		/*
+		  throw ReadError("Too large integer for `int': " + r);
+		*/
+		mio_printf(mio_stderr(), ";; is_integer, Integer out of range: %s\n", cstr);
+		return 0;
     }
 
-  *i = r;
-  return 1;
+	*i = r;
+	return 1;
 }
 
 static EsObject*
 make_integer (int  i)
 {
-  return es_integer_new(i);
+	return es_integer_new(i);
 }
 
 static int
 is_real      (const char* cstr,
-	      double* d)
+			  double* d)
 {
-  char* endptr;
+	char* endptr;
 
-  endptr = NULL;
-  errno = 0;
-  *d = strtod(cstr, &endptr);
+	endptr = NULL;
+	errno = 0;
+	*d = strtod(cstr, &endptr);
 
-  if (errno || (endptr == cstr))
-    return 0;
-  else if (*endptr != '\0')
-    return 0;
+	if (errno || (endptr == cstr))
+		return 0;
+	else if (*endptr != '\0')
+		return 0;
 
-  /* TODO: INF, NAN... */
-  return 1;
+	/* TODO: INF, NAN... */
+	return 1;
 }
 
 static EsObject*
 make_real (double d)
 {
-  return es_real_new(d);
+	return es_real_new(d);
 }
 
 
 
 EsObject*
 es_read_from_string(const char* buf,
-		    const char** saveptr)
+					const char** saveptr)
 {
-  MIO* in;
-  EsObject* o;
+	MIO* in;
+	EsObject* o;
 
 
-  /* IN is opend in "r" mode and the stream pointed by
-     IN is short-lived here. */
-  in = mio_new_memory((void *)buf, strlen(buf), NULL, NULL);
-  o = es_read(in);
-  if (saveptr)
-    *saveptr = buf + mio_tell(in);
-  mio_unref(in);
+	/* IN is opend in "r" mode and the stream pointed by
+	   IN is short-lived here. */
+	in = mio_new_memory((void *)buf, strlen(buf), NULL, NULL);
+	o = es_read(in);
+	if (saveptr)
+		*saveptr = buf + mio_tell(in);
+	mio_unref(in);
 
-  return o;
+	return o;
 }
 
 
@@ -2057,14 +2057,14 @@ typedef struct _EsChain EsChain;
 
 struct _EsChain
 {
-  EsObject* object;
-  EsChain*  next;
+	EsObject* object;
+	EsChain*  next;
 };
 
 struct _EsAutounrefPool
 {
-  EsAutounrefPool * parent_pool;
-  EsChain*          chain;
+	EsAutounrefPool * parent_pool;
+	EsChain*          chain;
 };
 
 static EsAutounrefPool * currrent_pool;
@@ -2078,79 +2078,79 @@ static void             es_chain_free(EsChain* chain);
 void
 es_autounref_pool_push(void)
 {
-  EsAutounrefPool* r;
+	EsAutounrefPool* r;
 
-  r = es_autounref_pool_new();
-  r->parent_pool = currrent_pool;
-  currrent_pool = r;
+	r = es_autounref_pool_new();
+	r->parent_pool = currrent_pool;
+	currrent_pool = r;
 }
 
 void
 es_autounref_pool_pop (void)
 {
-  EsAutounrefPool *tmp;
+	EsAutounrefPool *tmp;
 
-  tmp = currrent_pool;
-  currrent_pool = tmp->parent_pool;
+	tmp = currrent_pool;
+	currrent_pool = tmp->parent_pool;
 
-  es_autounref_pool_free(tmp);
+	es_autounref_pool_free(tmp);
 }
 
 static void
 es_autounref_pool_free(EsAutounrefPool* pool)
 {
-  pool->parent_pool = NULL;
-  es_chain_free(pool->chain);
-  pool->chain = NULL;
+	pool->parent_pool = NULL;
+	es_chain_free(pool->chain);
+	pool->chain = NULL;
 
-  free(pool);
+	free(pool);
 }
 
 EsObject*
 es_object_autounref   (EsObject* object)
 {
-  EsChain* r;
+	EsChain* r;
 
-  r = es_chain_new(object);
-  r->next = currrent_pool->chain;
-  currrent_pool->chain = r;
+	r = es_chain_new(object);
+	r->next = currrent_pool->chain;
+	currrent_pool->chain = r;
 
-  return object;
+	return object;
 }
 
 static EsAutounrefPool*
 es_autounref_pool_new(void)
 {
-  EsAutounrefPool* r;
+	EsAutounrefPool* r;
 
-  r = calloc(1, sizeof(EsAutounrefPool));
-  return r;
+	r = calloc(1, sizeof(EsAutounrefPool));
+	return r;
 }
 
 static EsChain*
 es_chain_new(EsObject *object)
 {
-  EsChain* r;
+	EsChain* r;
 
-  r = calloc(1, sizeof(EsChain));
-  r->object = object;
-  return r;
+	r = calloc(1, sizeof(EsChain));
+	r->object = object;
+	return r;
 }
 
 static void
 es_chain_free(EsChain *chain)
 {
-  EsChain *tmp;
+	EsChain *tmp;
 
-  while(chain)
+	while(chain)
     {
-      tmp = chain;
-      chain = chain->next;
+		tmp = chain;
+		chain = chain->next;
 
-      es_object_unref(tmp->object);
-      tmp->object = NULL;
-      tmp->next = NULL;
-      free(tmp);
+		es_object_unref(tmp->object);
+		tmp->object = NULL;
+		tmp->next = NULL;
+		free(tmp);
     }
 }
 
@@ -2161,40 +2161,40 @@ static EsObject* es_list_va(EsObject* object, va_list *ap);
 EsObject*
 es_list(EsObject* object,...)
 {
-  EsObject* r;
-  va_list ap;
+	EsObject* r;
+	va_list ap;
 
-  va_start(ap, object);
-  r = es_list_va(object, &ap);
-  va_end(ap);
+	va_start(ap, object);
+	r = es_list_va(object, &ap);
+	va_end(ap);
 
-  return r;
+	return r;
 }
 
 static EsObject*
 es_list_va(EsObject* object, va_list *ap)
 {
-  EsObject* r;
-  EsObject* p;
-  EsObject* tmp;
+	EsObject* r;
+	EsObject* p;
+	EsObject* tmp;
 
-  r = es_nil;
-  p = object;
-  es_autounref_pool_push();
-  do {
-    if (p == ES_READER_EOF)
-      break;
+	r = es_nil;
+	p = object;
+	es_autounref_pool_push();
+	do {
+		if (p == ES_READER_EOF)
+			break;
 
-    r = es_cons((p), es_object_autounref(r));
-    p = va_arg(*ap, EsObject *);
-  } while(1);
-  es_autounref_pool_pop();
+		r = es_cons((p), es_object_autounref(r));
+		p = va_arg(*ap, EsObject *);
+	} while(1);
+	es_autounref_pool_pop();
 
-  tmp = r;
-  r = es_cons_reverse(r);
-  es_object_unref(tmp);
+	tmp = r;
+	r = es_cons_reverse(r);
+	es_object_unref(tmp);
 
-  return r;
+	return r;
 }
 
 
@@ -2204,64 +2204,64 @@ static EsObject* es_append1(EsObject* tail, EsObject* body0);
 EsObject*
 es_append(EsObject* list,...)
 {
-  EsObject *r;
-  EsObject *tmp;
-  EsObject *tail;
-  EsObject *body;
-  va_list ap;
+	EsObject *r;
+	EsObject *tmp;
+	EsObject *tail;
+	EsObject *body;
+	va_list ap;
 
 
-  va_start(ap, list);
-  r = es_list_va(list, &ap);
-  va_end(ap);
+	va_start(ap, list);
+	r = es_list_va(list, &ap);
+	va_end(ap);
 
-  tmp = r;
-  r = es_cons_reverse(r);
-  es_object_unref(tmp);
+	tmp = r;
+	r = es_cons_reverse(r);
+	es_object_unref(tmp);
 
-  /* r */
-  tail = es_car(r);
-  body = es_cdr(r);
-  tmp  = r;
-  r = es_append0(tail, body);
-  es_object_unref(tmp);
+	/* r */
+	tail = es_car(r);
+	body = es_cdr(r);
+	tmp  = r;
+	r = es_append0(tail, body);
+	es_object_unref(tmp);
 
-  return r;
+	return r;
 }
 
 static EsObject*
 es_append0(EsObject* tail, EsObject* body)
 {
-  if (es_null(body))
-    return tail;
-  else
+	if (es_null(body))
+		return tail;
+	else
     {
-      EsObject* car;
+		EsObject* car;
 
-      car = es_cons_reverse(es_car(body));
-      tail = es_append1(tail, car);
-      es_object_unref(car);
-      body = es_cdr(body);
-      return es_append0(tail, body);
+		car = es_cons_reverse(es_car(body));
+		tail = es_append1(tail, car);
+		es_object_unref(car);
+		body = es_cdr(body);
+		return es_append0(tail, body);
     }
 }
 
 static EsObject*
 es_append1(EsObject* tail, EsObject* body0)
 {
-  if (es_null(body0))
-    return es_object_ref(tail);
-  else
+	if (es_null(body0))
+		return es_object_ref(tail);
+	else
     {
-      EsObject* car;
-      EsObject* r;
+		EsObject* car;
+		EsObject* r;
 
-      car  = es_car(body0);
-      tail = es_cons(car, tail);
+		car  = es_car(body0);
+		tail = es_cons(car, tail);
 
-      r = es_append1(tail, es_cdr(body0));
-      es_object_unref(tail);
-      return r;
+		r = es_append1(tail, es_cdr(body0));
+		es_object_unref(tail);
+		return r;
     }
 }
 
@@ -2289,434 +2289,434 @@ static EsObject* pattern_i_unquote = NULL;
 static void
 pattern_init(void)
 {
-  if (!pattern_d) (pattern_d = es_symbol_intern("%d"));
-  if (!pattern_f) (pattern_f = es_symbol_intern("%f"));
-  if (!pattern_F) (pattern_F = es_symbol_intern("%F"));
-  if (!pattern_s) (pattern_s = es_symbol_intern("%s"));
-  if (!pattern_S) (pattern_S = es_symbol_intern("%S"));
-  if (!pattern_b) (pattern_b = es_symbol_intern("%b"));
-  if (!pattern_rest) (pattern_rest = es_symbol_intern("%@"));
-  if (!pattern_unquote) (pattern_unquote = es_symbol_intern("%,"));
-  if (!pattern_splice) (pattern_splice = es_symbol_intern("%,@"));
+	if (!pattern_d) (pattern_d = es_symbol_intern("%d"));
+	if (!pattern_f) (pattern_f = es_symbol_intern("%f"));
+	if (!pattern_F) (pattern_F = es_symbol_intern("%F"));
+	if (!pattern_s) (pattern_s = es_symbol_intern("%s"));
+	if (!pattern_S) (pattern_S = es_symbol_intern("%S"));
+	if (!pattern_b) (pattern_b = es_symbol_intern("%b"));
+	if (!pattern_rest) (pattern_rest = es_symbol_intern("%@"));
+	if (!pattern_unquote) (pattern_unquote = es_symbol_intern("%,"));
+	if (!pattern_splice) (pattern_splice = es_symbol_intern("%,@"));
 
-  if (!pattern_i_d) (pattern_i_d = es_symbol_intern("%_d"));
-  if (!pattern_i_f) (pattern_i_f = es_symbol_intern("%_f"));
-  if (!pattern_i_F) (pattern_i_F = es_symbol_intern("%_F"));
-  if (!pattern_i_s) (pattern_i_s = es_symbol_intern("%_s"));
-  if (!pattern_i_S) (pattern_i_S = es_symbol_intern("%_S"));
-  if (!pattern_i_b) (pattern_i_b = es_symbol_intern("%_b"));
-  if (!pattern_i_rest) (pattern_i_rest = es_symbol_intern("%_@"));
-  if (!pattern_i_unquote) (pattern_i_unquote = es_symbol_intern("%_,"));
+	if (!pattern_i_d) (pattern_i_d = es_symbol_intern("%_d"));
+	if (!pattern_i_f) (pattern_i_f = es_symbol_intern("%_f"));
+	if (!pattern_i_F) (pattern_i_F = es_symbol_intern("%_F"));
+	if (!pattern_i_s) (pattern_i_s = es_symbol_intern("%_s"));
+	if (!pattern_i_S) (pattern_i_S = es_symbol_intern("%_S"));
+	if (!pattern_i_b) (pattern_i_b = es_symbol_intern("%_b"));
+	if (!pattern_i_rest) (pattern_i_rest = es_symbol_intern("%_@"));
+	if (!pattern_i_unquote) (pattern_i_unquote = es_symbol_intern("%_,"));
 }
 
 static EsObject*
 es_vrealize_atom(EsObject* fmt_object, va_list *ap)
 {
-  if (fmt_object == pattern_d)
-    return es_integer_new(va_arg(*ap, int));
-  else if (fmt_object == pattern_f)
+	if (fmt_object == pattern_d)
+		return es_integer_new(va_arg(*ap, int));
+	else if (fmt_object == pattern_f)
     {
-      double x = va_arg(*ap, double);
-      mio_printf(mio_stderr(), "=>%f\n", x);
-      return es_real_new(x);
+		double x = va_arg(*ap, double);
+		mio_printf(mio_stderr(), "=>%f\n", x);
+		return es_real_new(x);
     }
-  else if (fmt_object == pattern_s)
-    return es_string_new(va_arg(*ap, char *));
-  else if (fmt_object == pattern_S)
-    return es_symbol_intern(va_arg(*ap, char *));
-  else if (fmt_object == pattern_b)
-    return es_boolean_new(va_arg(*ap, int));
-  else if ((fmt_object == pattern_unquote)
-	   || (fmt_object == pattern_splice))
-    return es_object_ref(va_arg(*ap, EsObject*));
-  else
-    return es_object_ref(fmt_object);
+	else if (fmt_object == pattern_s)
+		return es_string_new(va_arg(*ap, char *));
+	else if (fmt_object == pattern_S)
+		return es_symbol_intern(va_arg(*ap, char *));
+	else if (fmt_object == pattern_b)
+		return es_boolean_new(va_arg(*ap, int));
+	else if ((fmt_object == pattern_unquote)
+			 || (fmt_object == pattern_splice))
+		return es_object_ref(va_arg(*ap, EsObject*));
+	else
+		return es_object_ref(fmt_object);
 }
 
 static EsObject*
 es_vrealize(EsObject* fmt_object, va_list *ap)
 {
-  pattern_init();
+	pattern_init();
 
-  if (es_cons_p(fmt_object))
+	if (es_cons_p(fmt_object))
     {
-      EsObject* car;
-      EsObject* cdr;
-      EsObject* kar;
-      EsObject* kdr;
-      EsObject* r;
+		EsObject* car;
+		EsObject* cdr;
+		EsObject* kar;
+		EsObject* kdr;
+		EsObject* r;
 
-      car = es_car(fmt_object);
+		car = es_car(fmt_object);
 
-      if (car == pattern_rest)
-	r = es_object_ref(va_arg(*ap, EsObject*));
-      else
-	{
-	  cdr = es_cdr(fmt_object);
-
-	  kar = es_vrealize(car, ap);
-	  kdr = es_vrealize(cdr, ap);
-
-	  if (car == pattern_splice)
-	    {
-	      if (es_cons_p(kar))
-		r = es_append(kar, kdr, ES_READER_EOF);
-	      else
+		if (car == pattern_rest)
+			r = es_object_ref(va_arg(*ap, EsObject*));
+		else
 		{
-		  /* TODO: error */
-		  char *fmt;
+			cdr = es_cdr(fmt_object);
 
-		  mio_printf(mio_stderr(),
-			  ";; an atom is passed for splice format:\n");
-		  fmt = es_print_to_string(fmt_object);
-		  mio_printf(mio_stderr(), ";; => %s\n", fmt);
-		  free(fmt);
-		  r = es_nil;
+			kar = es_vrealize(car, ap);
+			kdr = es_vrealize(cdr, ap);
+
+			if (car == pattern_splice)
+			{
+				if (es_cons_p(kar))
+					r = es_append(kar, kdr, ES_READER_EOF);
+				else
+				{
+					/* TODO: error */
+					char *fmt;
+
+					mio_printf(mio_stderr(),
+							   ";; an atom is passed for splice format:\n");
+					fmt = es_print_to_string(fmt_object);
+					mio_printf(mio_stderr(), ";; => %s\n", fmt);
+					free(fmt);
+					r = es_nil;
+				}
+			}
+			else
+				r = es_cons(kar, kdr);
+
+			es_object_unref(kar);
+			es_object_unref(kdr);
 		}
-	    }
-	  else
-	    r = es_cons(kar, kdr);
-
-	  es_object_unref(kar);
-	  es_object_unref(kdr);
-	}
-      return r;
+		return r;
     }
-  else
-    return es_vrealize_atom(fmt_object, ap);
+	else
+		return es_vrealize_atom(fmt_object, ap);
 }
 
 EsObject*
 es_realize   (EsObject* fmt_object,...)
 {
-  EsObject* object;
-  va_list ap;
+	EsObject* object;
+	va_list ap;
 
-  if (es_error_p(fmt_object))
-    return es_object_ref(fmt_object);
+	if (es_error_p(fmt_object))
+		return es_object_ref(fmt_object);
 
-  va_start(ap, fmt_object);
-  object = es_vrealize(fmt_object, &ap);
-  va_end(ap);
+	va_start(ap, fmt_object);
+	object = es_vrealize(fmt_object, &ap);
+	va_end(ap);
 
-  return object;
+	return object;
 }
 
 EsObject*
 es_srealize  (const char* fmt,...)
 {
-  EsObject* fmt_object;
-  EsObject* object;
-  va_list ap;
+	EsObject* fmt_object;
+	EsObject* object;
+	va_list ap;
 
-  fmt_object = es_read_from_string(fmt, NULL);
-  if (es_error_p(fmt_object))
-    return fmt_object;
+	fmt_object = es_read_from_string(fmt, NULL);
+	if (es_error_p(fmt_object))
+		return fmt_object;
 
-  va_start(ap, fmt);
-  object = es_vrealize(fmt_object, &ap);
-  va_end(ap);
+	va_start(ap, fmt);
+	object = es_vrealize(fmt_object, &ap);
+	va_end(ap);
 
-  es_object_unref(fmt_object);
+	es_object_unref(fmt_object);
 
-  return object;
+	return object;
 }
 
 
 static EsObject*
 es_vmatch_atom_input(EsObject* input, EsObject* fmt_object, va_list *ap)
 {
-  return ES_READER_ERROR;
+	return ES_READER_ERROR;
 }
 
 static EsObject*
 es_vmatch_atom_fmt(EsObject* input, EsObject* fmt_object, va_list *ap)
 {
-  if (fmt_object == pattern_unquote)
-    *(va_arg(*ap, EsObject**)) = /* es_object_ref */(input);
-  else if (fmt_object == pattern_i_unquote)
-    ;
-  else
-    return ES_READER_ERROR;
+	if (fmt_object == pattern_unquote)
+		*(va_arg(*ap, EsObject**)) = /* es_object_ref */(input);
+	else if (fmt_object == pattern_i_unquote)
+		;
+	else
+		return ES_READER_ERROR;
 
-  return fmt_object;
+	return fmt_object;
 }
 
 static EsObject*
 es_vmatch_atom(EsObject* input, EsObject* fmt_object, va_list *ap)
 {
-  if (fmt_object == pattern_d)
+	if (fmt_object == pattern_d)
     {
-      if (es_integer_p(input))
-	*(va_arg(*ap, int*)) = es_integer_get(input);
-      else
-	return ES_READER_ERROR;
+		if (es_integer_p(input))
+			*(va_arg(*ap, int*)) = es_integer_get(input);
+		else
+			return ES_READER_ERROR;
     }
-  else if (fmt_object == pattern_i_d)
+	else if (fmt_object == pattern_i_d)
     {
-      if (es_integer_p(input))
-	;
-      else
-	return ES_READER_ERROR;
+		if (es_integer_p(input))
+			;
+		else
+			return ES_READER_ERROR;
     }
-  else if (fmt_object == pattern_f)
+	else if (fmt_object == pattern_f)
     {
-      if (es_real_p(input))
-	*(va_arg(*ap, double*)) = es_real_get(input);
-      else
-	return ES_READER_ERROR;
+		if (es_real_p(input))
+			*(va_arg(*ap, double*)) = es_real_get(input);
+		else
+			return ES_READER_ERROR;
     }
-  else if (fmt_object == pattern_i_f)
+	else if (fmt_object == pattern_i_f)
     {
-      if (es_real_p(input))
-	;
-      else
-	return ES_READER_ERROR;
+		if (es_real_p(input))
+			;
+		else
+			return ES_READER_ERROR;
     }
-  else if (fmt_object == pattern_F)
+	else if (fmt_object == pattern_F)
     {
-      if (es_integer_p(input))
-	{
-	  int i;
+		if (es_integer_p(input))
+		{
+			int i;
 
-	  i = es_integer_get(input);
-	  *(va_arg(*ap, double*)) = (double)i;
-	}
-      else if (es_real_p(input))
-	{
-	  *(va_arg(*ap, double*)) = es_real_get(input);
-	}
-      else
-	return ES_READER_ERROR;
+			i = es_integer_get(input);
+			*(va_arg(*ap, double*)) = (double)i;
+		}
+		else if (es_real_p(input))
+		{
+			*(va_arg(*ap, double*)) = es_real_get(input);
+		}
+		else
+			return ES_READER_ERROR;
     }
-  else if (fmt_object == pattern_i_F)
+	else if (fmt_object == pattern_i_F)
     {
-      if (es_integer_p(input) || es_real_p(input))
-	;
-      else
-	return ES_READER_ERROR;
+		if (es_integer_p(input) || es_real_p(input))
+			;
+		else
+			return ES_READER_ERROR;
     }
-  else if (fmt_object == pattern_s)
+	else if (fmt_object == pattern_s)
     {
-      if (es_string_p(input))
-	*(va_arg(*ap, const char**)) = /* strdup */(es_string_get(input));
-      else
-	return ES_READER_ERROR;
+		if (es_string_p(input))
+			*(va_arg(*ap, const char**)) = /* strdup */(es_string_get(input));
+		else
+			return ES_READER_ERROR;
     }
-  else if (fmt_object == pattern_i_s)
+	else if (fmt_object == pattern_i_s)
     {
-      if (es_string_p(input))
-	;
-      else
-	return ES_READER_ERROR;
+		if (es_string_p(input))
+			;
+		else
+			return ES_READER_ERROR;
     }
-  else if (fmt_object == pattern_S)
+	else if (fmt_object == pattern_S)
     {
-      if (es_symbol_p(input))
-	*(va_arg(*ap, const char**)) = /* strdup */(es_symbol_get(input));
-      else
-	return ES_READER_ERROR;
+		if (es_symbol_p(input))
+			*(va_arg(*ap, const char**)) = /* strdup */(es_symbol_get(input));
+		else
+			return ES_READER_ERROR;
     }
-  else if (fmt_object == pattern_i_S)
+	else if (fmt_object == pattern_i_S)
     {
-      if (es_symbol_p(input))
-	;
-      else
-	return ES_READER_ERROR;
+		if (es_symbol_p(input))
+			;
+		else
+			return ES_READER_ERROR;
     }
-  else if (fmt_object == pattern_b)
+	else if (fmt_object == pattern_b)
     {
-      if (es_boolean_p(input))
-	*(va_arg(*ap, int*)) = es_boolean_get(input);
-      else
-	return ES_READER_ERROR;
+		if (es_boolean_p(input))
+			*(va_arg(*ap, int*)) = es_boolean_get(input);
+		else
+			return ES_READER_ERROR;
     }
-  else if (fmt_object == pattern_i_b)
+	else if (fmt_object == pattern_i_b)
     {
-      if (es_boolean_p(input))
-	;
-      else
-	return ES_READER_ERROR;
+		if (es_boolean_p(input))
+			;
+		else
+			return ES_READER_ERROR;
     }
-  else if (fmt_object == pattern_unquote)
-    *(va_arg(*ap, EsObject**)) = /* es_object_ref */(input);
-  else if (fmt_object == pattern_i_unquote)
-    ;
-  else if (es_object_equal(fmt_object, input))
-    ;
-  else
-    return ES_READER_ERROR;
+	else if (fmt_object == pattern_unquote)
+		*(va_arg(*ap, EsObject**)) = /* es_object_ref */(input);
+	else if (fmt_object == pattern_i_unquote)
+		;
+	else if (es_object_equal(fmt_object, input))
+		;
+	else
+		return ES_READER_ERROR;
 
-  return fmt_object;
+	return fmt_object;
 }
 
 static void
 recover(EsObject* fmt_object, va_list *aq)
 {
-  if (es_cons_p(fmt_object))
+	if (es_cons_p(fmt_object))
     {
-      recover(es_car(fmt_object), aq);
-      recover(es_cdr(fmt_object), aq);
+		recover(es_car(fmt_object), aq);
+		recover(es_cdr(fmt_object), aq);
     }
-  else
+	else
     {
-      if (fmt_object == pattern_s
-	  || fmt_object == pattern_S)
-	{
-	  char **s;
+		if (fmt_object == pattern_s
+			|| fmt_object == pattern_S)
+		{
+			char **s;
 
-	  s = va_arg(*aq, char **);
-	  (void)/* free */(*s);
+			s = va_arg(*aq, char **);
+			(void)/* free */(*s);
 
-	  *s = NULL;
-	}
-      else if (fmt_object == pattern_rest
-	       || fmt_object == pattern_unquote)
-	{
-	  EsObject** o;
+			*s = NULL;
+		}
+		else if (fmt_object == pattern_rest
+				 || fmt_object == pattern_unquote)
+		{
+			EsObject** o;
 
-	  o = va_arg(*aq, EsObject**);
-	  (void)/* es_object_unref */(*o);
-	  *o = NULL;
-	}
+			o = va_arg(*aq, EsObject**);
+			(void)/* es_object_unref */(*o);
+			*o = NULL;
+		}
     }
 }
 
 static EsObject*
 es_vmatch(EsObject* input, EsObject* fmt_object, va_list *ap)
 {
-  pattern_init();
+	pattern_init();
 
-  if (es_cons_p(fmt_object) && es_cons_p(input))
+	if (es_cons_p(fmt_object) && es_cons_p(input))
     {
-      EsObject* fmt_car;
-      EsObject* fmt_cdr;
-      EsObject* i_car;
-      EsObject* i_cdr;
+		EsObject* fmt_car;
+		EsObject* fmt_cdr;
+		EsObject* i_car;
+		EsObject* i_cdr;
 
-      EsObject* r_car;
-      EsObject* r_cdr;
+		EsObject* r_car;
+		EsObject* r_cdr;
 
-      va_list   aq;
+		va_list   aq;
 
-      fmt_car = es_car(fmt_object);
+		fmt_car = es_car(fmt_object);
 
-      if (fmt_car == pattern_rest)
-	{
-	  *(va_arg(*ap, EsObject**)) = /* es_object_ref */(input);
-	  return fmt_car;
-	}
-      else if (fmt_car == pattern_i_rest)
-	{
-	  return fmt_car;
-	}
+		if (fmt_car == pattern_rest)
+		{
+			*(va_arg(*ap, EsObject**)) = /* es_object_ref */(input);
+			return fmt_car;
+		}
+		else if (fmt_car == pattern_i_rest)
+		{
+			return fmt_car;
+		}
 
-      fmt_cdr = es_cdr(fmt_object);
+		fmt_cdr = es_cdr(fmt_object);
 
-      i_car   = es_car(input);
-      i_cdr   = es_cdr(input);
+		i_car   = es_car(input);
+		i_cdr   = es_cdr(input);
 
-      va_copy(aq, *ap);
-      r_car = es_vmatch(i_car, fmt_car, ap);
-      if (es_error_p(r_car))
-	{
-	  va_end(aq);
-	  return r_car;
-	}
+		va_copy(aq, *ap);
+		r_car = es_vmatch(i_car, fmt_car, ap);
+		if (es_error_p(r_car))
+		{
+			va_end(aq);
+			return r_car;
+		}
 
-      r_cdr = es_vmatch(i_cdr, fmt_cdr, ap);
-      if (es_error_p(r_cdr))
-	{
-	  recover(fmt_car, &aq);
-	  va_end(aq);
-	  return r_cdr;
-	}
-      va_end(aq);
-      return r_cdr;
+		r_cdr = es_vmatch(i_cdr, fmt_cdr, ap);
+		if (es_error_p(r_cdr))
+		{
+			recover(fmt_car, &aq);
+			va_end(aq);
+			return r_cdr;
+		}
+		va_end(aq);
+		return r_cdr;
     }
-  else if (es_cons_p(fmt_object))
+	else if (es_cons_p(fmt_object))
     {
-      return es_vmatch_atom_input(input, fmt_object, ap);
+		return es_vmatch_atom_input(input, fmt_object, ap);
     }
-  else if (es_cons_p(input))
+	else if (es_cons_p(input))
     {
-      if (fmt_object == pattern_rest)
-	{
-	  *(va_arg(*ap, EsObject**)) = /* es_object_ref */(input);
-	  return fmt_object;
-	}
-      else if (fmt_object == pattern_i_rest)
-	return fmt_object;
-      else
-	return es_vmatch_atom_fmt(input, fmt_object, ap);
+		if (fmt_object == pattern_rest)
+		{
+			*(va_arg(*ap, EsObject**)) = /* es_object_ref */(input);
+			return fmt_object;
+		}
+		else if (fmt_object == pattern_i_rest)
+			return fmt_object;
+		else
+			return es_vmatch_atom_fmt(input, fmt_object, ap);
     }
-  else
+	else
     {
-      return es_vmatch_atom(input, fmt_object, ap);
+		return es_vmatch_atom(input, fmt_object, ap);
     }
 }
 
 int
 es_match(EsObject* input, EsObject* fmt_object,...)
 {
-  EsObject* object;
-  va_list ap;
+	EsObject* object;
+	va_list ap;
 
-  va_start(ap, fmt_object);
-  object = es_vmatch(input, fmt_object, &ap);
-  va_end(ap);
+	va_start(ap, fmt_object);
+	object = es_vmatch(input, fmt_object, &ap);
+	va_end(ap);
 
-  return !(es_error_p(object));
+	return !(es_error_p(object));
 }
 
 int
 es_smatch   (EsObject* input, const char* fmt,...)
 {
-  int r;
-  EsObject* object;
-  EsObject* fmt_object;
-  va_list ap;
+	int r;
+	EsObject* object;
+	EsObject* fmt_object;
+	va_list ap;
 
-  fmt_object = es_read_from_string(fmt, NULL);
-  if (es_error_p(fmt_object))
-    return 0;
+	fmt_object = es_read_from_string(fmt, NULL);
+	if (es_error_p(fmt_object))
+		return 0;
 
-  va_start(ap, fmt);
-  object = es_vmatch(input, fmt_object, &ap);
-  va_end(ap);
+	va_start(ap, fmt);
+	object = es_vmatch(input, fmt_object, &ap);
+	va_end(ap);
 
-  r = !(es_error_p(object));
-  es_object_unref(fmt_object);
+	r = !(es_error_p(object));
+	es_object_unref(fmt_object);
 
-  return r;
+	return r;
 }
 
 EsObject*
 es_pget (EsObject* plist, EsObject* key, EsObject* default_value)
 {
-  if (es_cons_p(plist))
+	if (es_cons_p(plist))
     {
-      EsObject* car;
-      EsObject* cdr;
-      EsObject* cadr;
-      EsObject* cddr;
+		EsObject* car;
+		EsObject* cdr;
+		EsObject* cadr;
+		EsObject* cddr;
 
-      car = es_car(plist);
-      cdr = es_cdr(plist);
+		car = es_car(plist);
+		cdr = es_cdr(plist);
 
-      if (es_cons_p(cdr))
-	{
-	  cadr = es_car(cdr);
-	  cddr = es_cdr(cdr);
+		if (es_cons_p(cdr))
+		{
+			cadr = es_car(cdr);
+			cddr = es_cdr(cdr);
 
-	  if (es_object_equal(car, key))
-	    return cadr;
-	  else
-	    return es_pget(cddr, key, default_value);
-	}
-      else
-	return ES_READER_ERROR;
+			if (es_object_equal(car, key))
+				return cadr;
+			else
+				return es_pget(cddr, key, default_value);
+		}
+		else
+			return ES_READER_ERROR;
     }
-  else
-    return default_value;
+	else
+		return default_value;
 }
