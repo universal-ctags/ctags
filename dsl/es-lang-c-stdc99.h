@@ -64,6 +64,7 @@ int         es_object_equal         (const EsObject* self,
 
 int         es_atom                 (const EsObject* object);
 
+#define     ES_ERROR_MEMORY   es_error_intern("MEMORY-EXHAUSTED")
 
 /*
  * Nil
@@ -159,7 +160,6 @@ EsObject*    es_read_from_string(const char* in,
 
 #define      ES_READER_ERROR es_error_intern("READ-ERROR")
 #define      ES_READER_EOF   es_error_intern("EOF")
-
 
 /*
  * Comment
