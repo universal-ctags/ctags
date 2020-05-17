@@ -318,7 +318,7 @@ int s_compare        (const tagEntry * a, const tagEntry * b, SCode *code)
 	{
 		MIO  *mioerr = mio_new_fp (stderr, NULL);
 
-		fprintf(stderr, "GOT ERROR in SORITING: %s: ",
+		fprintf(stderr, "GOT ERROR in SORTING: %s: ",
 			 es_error_name (r));
 		es_print(es_error_get_object(r), mioerr);
 		putc('\n', stderr);
@@ -330,7 +330,7 @@ int s_compare        (const tagEntry * a, const tagEntry * b, SCode *code)
 	{
 		MIO  *mioerr = mio_new_fp (stderr, NULL);
 
-		fprintf(stderr, "Get unexpected value as the result of soriting: ");
+		fprintf(stderr, "Get unexpected value as the result of sorting: ");
 		es_print(r, mioerr);
 		putc('\n', stderr);
 		mio_unref(mioerr);
