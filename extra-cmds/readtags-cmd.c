@@ -421,7 +421,7 @@ extern int main (int argc, char **argv)
 						printSorterExpression (stdout, 0);
 					else
 					{
-						fprintf (stderr, "%s: unknown expression class for --%s option",
+						fprintf (stderr, "%s: unknown expression class for --%s option\n",
 								 ProgramName, optname);
 						exit (1);
 
@@ -429,7 +429,7 @@ extern int main (int argc, char **argv)
 				}
 				else
 				{
-					fprintf (stderr, "%s: missing expression class for --%s option",
+					fprintf (stderr, "%s: missing expression class for --%s option\n",
 							 ProgramName, optname);
 					exit (1);
 				}
@@ -473,14 +473,14 @@ extern int main (int argc, char **argv)
 						SortMethod = 2;
 					else
 					{
-						fprintf (stderr, "%s: unknown sort method for --%s option",
+						fprintf (stderr, "%s: unknown sort method for --%s option\n",
 								 ProgramName, optname);
 						exit (1);
 					}
 				}
 				else
 				{
-					fprintf (stderr, "%s: missing sort method for --%s option",
+					fprintf (stderr, "%s: missing sort method for --%s option\n",
 							 ProgramName, optname);
 					exit (1);
 				}
@@ -494,7 +494,7 @@ extern int main (int argc, char **argv)
 												   optname);
 				else
 				{
-					fprintf (stderr, "%s: missing filter expression for --%s option",
+					fprintf (stderr, "%s: missing filter expression for --%s option\n",
 							 ProgramName, optname);
 					exit (1);
 				}
@@ -507,7 +507,7 @@ extern int main (int argc, char **argv)
 												optname);
 				else
 				{
-					fprintf (stderr, "%s: missing sorter expression for --%s option",
+					fprintf (stderr, "%s: missing sorter expression for --%s option\n",
 							 ProgramName, optname);
 					exit (1);
 				}
@@ -515,7 +515,7 @@ extern int main (int argc, char **argv)
 #endif
 			else
 			{
-				fprintf (stderr, "%s: unknown long options: --%s",
+				fprintf (stderr, "%s: unknown long options: --%s\n",
 						 ProgramName, optname);
 				exit (1);
 				break;
