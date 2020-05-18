@@ -221,7 +221,7 @@ file:
 
 .. code-block:: console
 
-   $readtags -S '(<or> (<> $input &input) (<> $line &line))' -l
+   $ readtags -S '(<or> (<> $input &input) (<> $line &line))' -l
 
 The ``*-`` operator is used to flip the compare result. i.e., ``(*- (<> a b))``
 is the same as ``(<> b a)``.
@@ -233,7 +233,7 @@ example:
 
 .. code-block:: console
 
-   $readtags -Q '(print $name)' -l
+   $ readtags -Q '(print $name)' -l
 
 prints the name of each tag entry before it. Since the return value of
 ``print`` is not #f, all the tag entries are printed. We could control this
@@ -243,7 +243,7 @@ example:
 
 .. code-block:: console
 
-   $readtags -Q '(begin0 #f (print (prefix? "ctags" "ct")))' -l
+   $ readtags -Q '(begin0 #f (print (prefix? "ctags" "ct")))' -l
 
 prints a bunch of "#t" (depending on how many lines are in the tags file), and
 the actual tag entries are not printed.
