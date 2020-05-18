@@ -250,8 +250,83 @@ TBW
 
 UTILIZING READTAGS
 -----------------------------------
-TBW
+See readtags(1) to know how to use readtags. This section is for discussing
+some notable topics for client tools.
 
+Build Filter/Sorter Expressions
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Certain escape sequences in expressions are recognized by readtags. For
+example, when searching for a tag that matches ``a\?b``, if using a filter
+expression like ``'(eq? $name "a\?b")'``, since ``\?`` is translated into a
+single ``?`` by readtags, it actually searches for ``a?b``.
+
+Another problem is if a single quote appear in filter expressions (which is
+also wrapped by single quotes), it terminates the expression, producing broken
+expressions, and may even cause unintended shell injection. Single quotes can
+be escaped using ``'"'"'``.
+
+So, client tools need to:
+
+* Replace ``\`` by ``\\``
+* Replace ``'`` by ``'"'"'``
+
+inside the expressions. If the expression also contains strings, ``"`` in the
+strings needs to be replaced by ``\"``.
+
+Client tools written in Lisp could buid the expression using lists. ``prin1``
+(in Common Lisp style Lisps) and ``write`` (in Scheme style Lisps) can
+translate the list into a string that can be directly used. For example, in
+EmacsLisp:
+
+.. code-block:: EmacsLisp
+
+   (let ((name "hi"))
+     (prin1 `(eq? $name ,name)))
+   => "(eq\\? $name "hi")"
+
+The "?" is escaped, and readtags can handle it. Scheme style Lisps should do
+proper escaping so the expression readtags gets is just the expression passed
+into ``write``. Common Lisp style Lisps may produce unrecognized escape
+sequences by readtags, like ``\#``. Readtags provides some aliases for these
+Lisps:
+
+* Use ``true`` for ``#t``.
+* Use ``false`` for ``#f``.
+* Use ``nil`` or ``()`` for ``()``.
+
+Notice that even when the client tool uses this method, ``'`` still needs to be
+replaced by ``'"'"'`` to prevent broken expressions and shell injection.
+
+Parse Readtags Output
+~~~~~~~~~~~~~~~~~~~~~
+In the output of readtags, tabs can appear in all field values (e.g., the tag
+name itself cound contain tabs), which makes it hard to split the line into
+fields. Client tools should use the ``-E`` option, which keeps the escape
+sequences in the tags file, so the only field that could contain tabs is the
+pattern field.
+
+Client tools could then split the line using the following steps:
+
+* Find the first 2 tabs in the line, so we get the name and input field.
+* From the 2nd tab
+
+  * If a "/" follows, then the pattern delimiter is "/".
+  * If a "?" follows, then the pattern delimiter is "?".
+  * If a number follows, then if after the end of the number is a ";/", then
+    the pattern delimiter is "/"; If it's a ";?", then the delimiter is "?".
+
+* Find the 3rd tab, and count the delimiters between it and the 2nd tab. Notice
+  that delimiters can be escaped, so only the ones with a even number
+  (including 0) of backslashes before should be counted.
+* If there are even numbers of delimiters, then the 3rd tab is the end of the
+  pattern. If not, keep searching tabs forward until this condition is
+  satisfied.
+* From here, split the rest of the line into fields by tabs.
+
+Then, the escape sequences in fields other than the pattern field should be
+translated. See "Proposal" in tags(5) to know about all the escape sequences.
+The pattern field needs no special treatment. It can be directly used by
+editors supporting Ex commands.
 
 SEE ALSO
 --------

@@ -18,54 +18,240 @@ SYNOPSIS
 
 DESCRIPTION
 -----------
-
-readtags lists or finds tag entries in a tags file.
-...
+The **readtags** program filters, sorts and prints tag entries in a tags file.
+The basic filtering is done using **actions**, by which you can list all
+regular tags, pseudo tags or regular tags matching specific name. Then, further
+filtering and sorting can be done using **post processors**, namely **filter
+expressions** and **sorter expressions**.
 
 ACTIONS
 -------
-
-``-l``
-	Equivalent to ``--list``.
-
-``--list``
+``-l``, ``--list``
 	List regular tags.
 
 ``[-] NAME``
 	List regular tags matching NAME.
 	"-" as NAME indicates arguments after this as NAME even if they start with -.
 
-``-D``
+``-D``, ``--list-pseudo-tags``
 	Equivalent to ``--list-pseudo-tags``.
-
-``--list-pseudo-tags``
-	List pseudo tags.
 
 OPTIONS
 -------
 
-...
+Controlling the Tags Reading Behavior
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The behavior of reading tags can be controlled using these options:
+
+``-t TAGFILE``, ``--tag-file TAGFILE``
+	Use specified tag file (default: "tags").
+
+``-s[0|1|2]``, ``--override-sort-detection METHOD``
+	Override sort detection of tag file.
+	METHOD: unsorted|sorted|foldcase
+
+The NAME action will perform binary search on sorted (including "foldcase")
+tags files, which is much faster then on unsorted tags files.
+
+Controlling the NAME Action Behavior
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The behavior of the NAME action can be controlled using these options:
+
+``-i``, ``--icase-match``
+	Perform case-insensitive matching in the NAME action.
+
+``-p``, ``--prefix-match``
+	Perform prefix matching in the NAME action.
+
+Controlling the Output
+~~~~~~~~~~~~~~~~~~~~~~
+By default, the output of readtags contains only the name, input and pattern
+field. The Output can be tweaked using these options:
+
+``-d``, ``--debug``
+	Turn on debugging output.
+
+``-E``, ``--escape-output``
+	Escape characters like tabs in output as described in :ref:`tags(5) <tags(5)>`.
+
+``-e``, ``--extension-fields``
+	Include extension fields in output.
+
+``-n``, ``--line-number``
+	Also include the line number field when ``-e`` option is give.
+
+About the ``-E`` option: certain characters are escaped in a tags file, to make
+it machine-readable. e.g., ensuring no tabs character appear in fields other
+than the pattern field. By default, readtags translates them to make it
+human-readable, but when utilizing readtags output in a script or a client
+tool, ``-E`` option should be used. See :ref:`ctags-client-tools(7) <ctags-client-tools(7)>` for more
+discussion on this.
+
+Filtering and Sorting
+~~~~~~~~~~~~~~~~~~~~~
+Further filtering and sorting on the tags listed by actions are performed using:
+
+``-Q EXP``, ``--filter EXP``
+	Filter the tags listed by ACTION with EXP before printing.
+
+``-S EXP``, ``--sorter EXP``
+	Sort the tags listed by ACTION with EXP before printing.
+
+These are discussed in the `EXPRESSION`_ section.
+
+Examples
+~~~~~~~~
+* List all tags in "/path/to/tags":
+
+  .. code-block:: console
+
+     $ readtags -t /path/to/tags -l
+
+* List all tags in "tags" that start with ``ctags``:
+
+  .. code-block:: console
+
+     $ readtags -p - ctags
+
+* List all tags matching "ctags", case insensitively:
+
+  .. code-block:: console
+
+     $ readtags -i - ctags
+
+* List all tags start with "ctags", and printing all fields (i.e., the whole line):
+
+  .. code-block:: console
+
+     $ readtags -p -ne - ctags
 
 EXPRESSION
 ----------
+Scheme-style expressions are used for the ``-Q`` and ``-S`` options. For those
+who doesn't know Scheme or Lisp, just remember:
 
-...
+* A function call is wrapped in a pair of parenthesis. The first item in it is
+  the function/operator name, the others are arguments.
+* Function calls can be nested.
+
+So, ``(+ 1 (+ 2 3))`` means add 2 and 3 first, then add the result with 1.
 
 Filtering
 ~~~~~~~~~
+The tag entries that makes the filter expression produces non-#f values are
+filtered out (#f means false).
 
-...
+The basic operators for filtering are ``eq?``, ``prefix?``, ``suffix?`` and
+``substr?``. Language common fields can be accessed using ``$``, e.g.,
+``$language`` represents the language field. For example:
+
+* List all tags start with "ctags" in Python code files:
+
+  .. code-block:: console
+
+     $ readtags -p -Q '(eq? $language "Python")' - ctags
+
+``downcase`` or ``upcase`` operators can be used to perform case-insensitive
+matching:
+
+* List all tags containing "ctags", case insensitively:
+
+    .. code-block:: console
+
+     $ readtags -Q '(substr? (downcase $name) "ctags")' -l
+
+We have logical operators like ``and``, ``or`` and ``not``. The value of a
+missing field is #f, so we could deal with missing fields:
+
+* List all tags containing "ctags" in Python code files, but allow the
+  ``language:`` field to be missing:
+
+  .. code-block:: console
+
+     $ readtags -Q '(and (substr? $name "ctags")\
+                         (or (eq? $language "Python")\
+                             (not $language)))' -l
+
+The ``member`` operator is used to deal with lists. Currently lists can't be
+built by hand, and they are only generated for the ``inherits:`` field. For
+example:
+
+* List all tags inherits from the class "A":
+
+  .. code-block:: console
+
+     $ readtags -Q '(member "A" $inherits)' -l
+
+WARNING: It's planned to remove the ``member`` operator, and replace this
+technique with regular expression matching. By then, ``$inherits`` will not be
+a list, but the value of the ``inherits:`` field as it is.
+
+Run "readtags -H filter" to know about all valid functions and variables.
 
 Sorting
 ~~~~~~~
+When sorting, the sorter expression is evaluated on two tag entries to decide
+which should sort before the other one, until the order of all tag entries is
+decided.
 
-...
+In a sorter expression, ``$`` and ``&`` are used to access the fields in the
+two tag entries, and let's call them $-entry and &-entry. The sorter expression
+should have a value of -1, 0 or 1. The value -1 means the $-entry should sort
+before the &-entry, 1 means the contrary, and 0 makes their order in the output
+uncertain.
+
+The core operator of sorting is ``<>``. It's used to compare two strings or two
+numbers (numbers are for the ``line:`` or ``end:`` fields). In ``(<> a b)``, if
+``a`` < ``b``, the result is -1; ``a`` > ``b`` produces 1, and ``a`` = ``b``
+produces 0. Strings are compared using the ``strcmp`` function, see strcmp(3).
+
+For example, sort by names, and make those shorter or alphabetically smaller
+ones appear before the others:
+
+.. code-block:: console
+
+   $ readtags -S '(<> $name &name)' -l
+
+This reads "If the tag name in the $-entry is smaller, it goes before the
+&-entry".
+
+The ``<or>`` operator is used to chain multiple expressions until one returns
+-1. For example, sort by input file names, then line numbers if in the same
+file:
+
+.. code-block:: console
+
+   $readtags -S '(<or> (<> $input &input) (<> $line &line))' -l
+
+The ``*-`` operator is used to flip the compare result. i.e., ``(*- (<> a b))``
+is the same as ``(<> b a)``.
+
+Inspecting the Behavior of Expressions
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The `print` operator can be used to print the value of an expression. For
+example:
+
+.. code-block:: console
+
+   $readtags -Q '(print $name)' -l
+
+prints the name of each tag entry before it. Since the return value of
+``print`` is not #f, all the tag entries are printed. We could control this
+using the ``begin`` or ``begin0`` operator. ``begin`` returns the value of its
+last argument, and ``begin0`` returns the value of its first argument. For
+example:
+
+.. code-block:: console
+
+   $readtags -Q '(begin0 #f (print (prefix? "ctags" "ct")))' -l
+
+prints a bunch of "#t" (depending on how many lines are in the tags file), and
+the actual tag entries are not printed.
 
 BUGS
 ----
-
-...
-
+Sometimes readtags exits with status 0 even when an error occurs, e.g., when a
+directory is passed to the ``-t`` option.
 
 SEE ALSO
 --------
@@ -78,20 +264,12 @@ The official Universal-ctags web site at:
 
 https://ctags.io/
 
-
 The git repository for the library used in readtags command:
 
 https://github.com/universal-ctags/libreadtags
 
-AUTHOR
-------
-
-YOUR NAME HERE
-
-
 CREDITS
 -------
-
 Universal-ctags project
 https://ctags.io/
 
