@@ -1493,19 +1493,16 @@ Readtags
 
 Printing line numbers with ``-n``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-If both ``-e`` and ``-n`` are given, readtags prints the `line:`
-field.
-
+See :ref:`readtags(1) <readtags(1)>`.
 
 Filtering in readtags command
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+See :ref:`readtags(1) <readtags(1)>`.
+
 readtags has ability to find tag entries by name.
 
 The concept of filtering is inspired by the display filter of
 Wireshark. You can specify more complex conditions for searching.
-Currently this feature is available only on platforms where
-`fmemopen` is available as part of libc. Filtering in readtags is an
-experimental feature.
 
 The syntax of filtering rules is based on the Scheme language, a
 variant of Lisp. The language has prefix notation and parentheses.
@@ -1763,22 +1760,7 @@ can be used.
            <or>
 
 
-``(<> A B) -> -1|0|1``
-
-	compares two numbers, two strings or two booleans.
-	For strings, ``<>`` calls strcmp internally.
-
-``(*- A) -> -A``
-
-	flips the result (-1, 0, or 1)of comparison. This is useful to reverse
-	the result of comparisons
-
-``(<or> COMPARISON ...)``
-
-	evaluates the sequence of COMPARISON from left to right till one of
-	COMPARISON returns -1 or 1. That means if a COMPARISON cannot decide
-	the order of two tag entries and returns 0, readtags evaluates the next
-	COMPARISON.
+See :ref:`readtags(1) <readtags(1)>` about operators.
 
 Let's see examples.
 
@@ -1873,7 +1855,6 @@ Examples of sorter expressions
 
    Flipping by ``*-`` needed to realize "larger one coming first" .
 
-
 Listing pseudo tags with ``-D``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-You can list all pseudo tags in a tags file with ``-D`` option.
+See :ref:`readtags(1) <readtags(1)>`.
