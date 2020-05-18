@@ -107,7 +107,7 @@ Examples
 
      $ readtags -t /path/to/tags -l
 
-* List all tags in "tags" that start with ``mymethod``:
+* List all tags in "tags" that start with "mymethod":
 
   .. code-block:: console
 
