@@ -93,7 +93,7 @@ parserDefinition * CParser (void)
 	def->initialize = cxxCParserInitialize;
 	def->finalize = cxxParserCleanup;
 	def->selectLanguage = selectors;
-	def->useCork = CORK_QUEUE; // We use corking to block output until the end of file
+	def->useCork = CORK_QUEUE|CORK_SYMTAB; // We use corking to block output until the end of file
 
 	return def;
 }
@@ -128,7 +128,7 @@ parserDefinition * CppParser (void)
 	def->initialize = cxxCppParserInitialize;
 	def->finalize = cxxParserCleanup;
 	def->selectLanguage = selectors;
-	def->useCork = CORK_QUEUE; // We use corking to block output until the end of file
+	def->useCork = CORK_QUEUE|CORK_SYMTAB; // We use corking to block output until the end of file
 
 	return def;
 }
@@ -157,7 +157,7 @@ parserDefinition * CUDAParser (void)
 	def->initialize = cxxCUDAParserInitialize;
 	def->finalize = cxxParserCleanup;
 	def->selectLanguage = NULL;
-	def->useCork = CORK_QUEUE; // We use corking to block output until the end of file
+	def->useCork = CORK_QUEUE|CORK_SYMTAB; // We use corking to block output until the end of file
 
 	return def;
 }

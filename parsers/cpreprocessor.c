@@ -25,7 +25,6 @@
 #include "vstring.h"
 #include "param.h"
 #include "parse.h"
-#include "trashbox.h"
 #include "xtag.h"
 
 #include "cxx/cxx_debug.h"
@@ -107,6 +106,9 @@ typedef struct sCppState {
 		unsigned int nestLevel;  /* level 0 is not used */
 		conditionalInfo ifdef [MaxCppNestingLevel];
 	} directive;
+
+	hashTable * fileMacroTable;
+
 } cppState;
 
 
@@ -158,6 +160,7 @@ static fieldDefinition CPreProFields[COUNT_FIELD] = {
 */
 
 static bool doesExaminCodeWithInIf0Branch;
+static bool doesExpandMacros;
 
 /*
 * CXX parser state. This is stored at the beginning of a conditional.
@@ -219,6 +222,13 @@ static cppState Cpp = {
 		}
 	}  /* directive */
 };
+
+/*
+*   FUNCTION DECLARATIONS
+*/
+
+static hashTable *makeMacroTable (void);
+static cppMacroInfo * saveMacro(hashTable *table, const char * macro);
 
 /*
 *   FUNCTION DEFINITIONS
@@ -326,6 +336,11 @@ static void cppInitCommon(langType clientLang,
 	Cpp.directive.ifdef [0].ignoring     = false;
 
 	Cpp.directive.name = vStringNewOrClear (Cpp.directive.name);
+
+	Cpp.fileMacroTable =
+		doesExpandMacros && isFieldEnabled (FIELD_SIGNATURE) && isFieldEnabled (Cpp.macrodefFieldIndex)
+		? makeMacroTable ()
+		: NULL;
 }
 
 extern void cppInit (const bool state, const bool hasAtLiteralStrings,
@@ -368,6 +383,12 @@ extern void cppTerminate (void)
 	}
 
 	Cpp.clientLang = LANG_IGNORE;
+
+	if (Cpp.fileMacroTable)
+	{
+		hashTableDelete (Cpp.fileMacroTable);
+		Cpp.fileMacroTable = NULL;
+	}
 }
 
 extern void cppBeginStatement (void)
@@ -892,6 +913,9 @@ static int directiveDefine (const int c, bool undef)
 		}
 	}
 	Cpp.directive.state = DRCTV_NONE;
+
+	if (r != CORK_NIL && Cpp.fileMacroTable)
+		registerEntry (r);
 	return r;
 }
 
@@ -1625,16 +1649,68 @@ static void findCppTags (void)
  *  Token ignore processing
  */
 
-static hashTable * defineMacroTable;
+static hashTable * cmdlineMacroTable;
+
+
+static bool buildMacroInfoFromTagEntry (int corkIndex,
+										tagEntryInfo * entry,
+										void * data)
+{
+	cppMacroInfo **info = data;
+
+	if (entry->langType == Cpp.clientLang
+		&& entry->kindIndex == Cpp.defineMacroKindIndex
+		&& isRoleAssigned (entry, ROLE_DEFINITION_INDEX))
+	{
+		vString *macrodef = vStringNewInit (entry->name);
+		if (entry->extensionFields.signature)
+			vStringCatS (macrodef, entry->extensionFields.signature);
+		vStringPut (macrodef, '=');
+
+		const char *val = getParserFieldValueForType (entry, Cpp.macrodefFieldIndex);
+		if (val)
+			vStringCatS (macrodef, val);
+
+		*info = saveMacro (Cpp.fileMacroTable, vStringValue (macrodef));
+		vStringDelete (macrodef);
+
+		return false;
+	}
+	return true;
+}
+
+extern cppMacroInfo * cppFindMacroFromSymtab (const char *const name)
+{
+	cppMacroInfo *info = NULL;
+	foreachEntriesInScope (CORK_NIL, name, buildMacroInfoFromTagEntry, &info);
+
+	return info;
+}
 
 /*  Determines whether or not "name" should be ignored, per the ignore list.
  */
-extern const cppMacroInfo * cppFindMacro(const char *const name)
+extern const cppMacroInfo * cppFindMacro (const char *const name)
 {
-	if(!defineMacroTable)
-		return NULL;
+	cppMacroInfo *info;
 
-	return (const cppMacroInfo *)hashTableGetItem(defineMacroTable,(char *)name);
+	if (cmdlineMacroTable)
+	{
+		info = (cppMacroInfo *)hashTableGetItem (cmdlineMacroTable,(char *)name);
+		if (info)
+			return info;
+	}
+
+	if (Cpp.fileMacroTable)
+	{
+		info = (cppMacroInfo *)hashTableGetItem (Cpp.fileMacroTable,(char *)name);
+		if (info)
+			return info;
+
+		info = cppFindMacroFromSymtab(name);
+		if (info)
+			return info;
+	}
+	return NULL;
 }
 
 extern vString * cppBuildMacroReplacement(
@@ -1694,7 +1770,7 @@ static void saveIgnoreToken(const char * ignoreToken)
 	if(!ignoreToken)
 		return;
 
-	Assert (defineMacroTable);
+	Assert (cmdlineMacroTable);
 
 	const char * c = ignoreToken;
 	char cc = *c;
@@ -1749,19 +1825,19 @@ static void saveIgnoreToken(const char * ignoreToken)
 		info->replacements = NULL;
 	}
 
-	hashTablePutItem(defineMacroTable,eStrndup(tokenBegin,tokenEnd - tokenBegin),info);
+	hashTablePutItem(cmdlineMacroTable,eStrndup(tokenBegin,tokenEnd - tokenBegin),info);
 
 	verbose ("    ignore token: %s\n", ignoreToken);
 }
 
-static void saveMacro(const char * macro)
+static cppMacroInfo * saveMacro(hashTable *table, const char * macro)
 {
 	CXX_DEBUG_ENTER_TEXT("Save macro %s",macro);
 
 	if(!macro)
-		return;
+		return NULL;
 
-	Assert (defineMacroTable);
+	Assert (table);
 
 	const char * c = macro;
 
@@ -1772,13 +1848,13 @@ static void saveMacro(const char * macro)
 	if(!*c)
 	{
 		CXX_DEBUG_LEAVE_TEXT("Bad empty macro definition");
-		return;
+		return NULL;
 	}
 
 	if(!(isalpha(*c) || (*c == '_' || (*c == '$') )))
 	{
 		CXX_DEBUG_LEAVE_TEXT("Macro does not start with an alphanumeric character");
-		return; // must be a sequence of letters and digits
+		return NULL; // must be a sequence of letters and digits
 	}
 
 	const char * identifierBegin = c;
@@ -2042,8 +2118,10 @@ static void saveMacro(const char * macro)
 			ADD_CONSTANT_REPLACEMENT(begin,c - begin);
 	}
 
-	hashTablePutItem(defineMacroTable,eStrndup(identifierBegin,identifierEnd - identifierBegin),info);
+	hashTablePutItem(table,eStrndup(identifierBegin,identifierEnd - identifierBegin),info);
 	CXX_DEBUG_LEAVE();
+
+	return info;
 }
 
 static void freeMacroInfo(cppMacroInfo * info)
@@ -2076,22 +2154,36 @@ static hashTable *makeMacroTable (void)
 static void initializeCpp (const langType language)
 {
 	Cpp.lang = language;
+}
 
-	defineMacroTable = makeMacroTable ();
-	DEFAULT_TRASH_BOX(defineMacroTable,hashTableDelete);
+static void finalizeCpp (const langType language, bool initialized)
+{
+	if (cmdlineMacroTable)
+	{
+		hashTableDelete (cmdlineMacroTable);
+		cmdlineMacroTable = NULL;
+	}
+}
+
+static void CpreProExpandMacrosInInput (const langType language CTAGS_ATTR_UNUSED, const char *name, const char *arg)
+{
+	doesExpandMacros = paramParserBool (arg, doesExpandMacros,
+										name, "parameter");
 }
 
 static void CpreProInstallIgnoreToken (const langType language CTAGS_ATTR_UNUSED, const char *optname CTAGS_ATTR_UNUSED, const char *arg)
 {
 	if (arg == NULL || arg[0] == '\0')
 	{
-		DEFAULT_TRASH_BOX_TAKE_BACK(defineMacroTable);
-		hashTableDelete(defineMacroTable);
-		defineMacroTable = makeMacroTable ();
-		DEFAULT_TRASH_BOX(defineMacroTable,hashTableDelete);
-
+		if (cmdlineMacroTable)
+		{
+			hashTableDelete(cmdlineMacroTable);
+			cmdlineMacroTable = NULL;
+		}
 		verbose ("    clearing list\n");
 	} else {
+		if (!cmdlineMacroTable)
+			cmdlineMacroTable = makeMacroTable ();
 		saveIgnoreToken(arg);
 	}
 }
@@ -2100,11 +2192,16 @@ static void CpreProInstallMacroToken (const langType language CTAGS_ATTR_UNUSED,
 {
 	if (arg == NULL || arg[0] == '\0')
 	{
-		hashTableDelete(defineMacroTable);
-		defineMacroTable = makeMacroTable ();
+		if (cmdlineMacroTable)
+		{
+			hashTableDelete(cmdlineMacroTable);
+			cmdlineMacroTable = NULL;
+		}
 		verbose ("    clearing list\n");
 	} else {
-		saveMacro(arg);
+		if (!cmdlineMacroTable)
+			cmdlineMacroTable = makeMacroTable ();
+		saveMacro(cmdlineMacroTable, arg);
 	}
 }
 
@@ -2124,9 +2221,13 @@ static parameterHandlerTable CpreProParameterHandlerTable [] = {
 	  .handleParameter = CpreProInstallIgnoreToken,
 	},
 	{ .name = "define",
-	  .desc = "define replacement for an identifier",
+	  .desc = "define replacement for an identifier (name(params,...)=definition)",
 	  .handleParameter = CpreProInstallMacroToken,
 	},
+	{ .name = "_expand",
+	  .desc = "expand macros if their definitions are in the current C/C++/CUDA input file (true or [false])",
+	  .handleParameter = CpreProExpandMacrosInInput,
+	}
 };
 
 extern parserDefinition* CPreProParser (void)
@@ -2136,6 +2237,7 @@ extern parserDefinition* CPreProParser (void)
 	def->kindCount  = ARRAY_SIZE (CPreProKinds);
 	def->initialize = initializeCpp;
 	def->parser     = findCppTags;
+	def->finalize   = finalizeCpp;
 
 	def->fieldTable = CPreProFields;
 	def->fieldCount = ARRAY_SIZE (CPreProFields);
@@ -2143,6 +2245,6 @@ extern parserDefinition* CPreProParser (void)
 	def->parameterHandlerTable = CpreProParameterHandlerTable;
 	def->parameterHandlerCount = ARRAY_SIZE(CpreProParameterHandlerTable);
 
-	def->useCork = CORK_QUEUE;
+	def->useCork = CORK_QUEUE | CORK_SYMTAB;
 	return def;
 }

@@ -437,106 +437,22 @@ See :ref:`JSON output <output-json>` for more details.
 See :ref:`ctags(1) <ctags(1)>`.
 
 
-Defining a macro in CPreProcessor input
+Defining a CPreProcessor macro from command line
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Newly introduced ``-D`` option extends the function provided by
 ``-I`` option.
 
 ``-D`` emulates the behaviour of the corresponding gcc option:
-it defines a C preprocessor macro. All types of macros are supported,
-including the ones with parameters and variable arguments.
-Stringification, token pasting and recursive macro expansion are also supported.
+it defines a C preprocessor macro. See `The new C/C++ parser <cxx>`
+for more defailts.
 
-``-I`` is now simply a backward-compatible syntax to define a
-macro with no replacement.
 
-Some examples follow.
+Automatically expanding CPreProcessor macros defined in the same input file (HIGHLY EXPERIMENTAL)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. code-block:: console
+See `The new C/C++ parser <cxx>` for more defailts.
 
-	$ ctags ... -D IGNORE_THIS ...
-
-With this commandline the following C/C++ input
-
-.. code-block:: C
-
-	int IGNORE_THIS a;
-
-will be processed as if it was
-
-.. code-block:: C
-
-	int a;
-
-Defining a macro with parameters uses the following syntax:
-
-.. code-block:: console
-
-	$ ctags ... -D "foreach(arg)=for(arg;;)" ...
-
-This example defines `for(arg;;)` as the replacement `foreach(arg)`.
-So the following C/C++ input
-
-.. code-block:: C
-
-	foreach(char * p,pointers)
-	{
-
-	}
-
-is processed in new C/C++ parser as:
-
-.. code-block:: C
-
-	for(char * p;;)
-	{
-
-	}
-
-and the p local variable can be extracted.
-
-The previous commandline includes quotes since the macros generally contain
-characters that are treated specially by the shells. You may need some escaping.
-
-Token pasting is performed by the ## operator, just like in the normal
-C preprocessor.
-
-.. code-block:: console
-
-	$ ctags ... -D "DECLARE_FUNCTION(prefix)=int prefix ## Call();"
-
-So the following code
-
-.. code-block:: C
-
-	DECLARE_FUNCTION(a)
-	DECLARE_FUNCTION(b)
-
-will be processed as
-
-.. code-block:: C
-
-	int aCall();
-	int bCall();
-
-Macros with variable arguments use the gcc __VA_ARGS__ syntax.
-
-.. code-block:: console
-
-	$ ctags ... -D "DECLARE_FUNCTION(name,...)=int name(__VA_ARGS__);"
-
-So the following code
-
-.. code-block:: C
-
-	DECLARE_FUNCTION(x,int a,int b)
-
-will be processed as
-
-.. code-block:: C
-
-	int x(int a,int b);
 
 ``--_interactive`` Mode
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

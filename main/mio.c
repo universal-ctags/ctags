@@ -648,6 +648,11 @@ static int mem_try_resize (MIO *mio, size_t new_size)
 	return success;
 }
 
+int mio_try_resize (MIO *mio, size_t new_size)
+{
+	return mem_try_resize (mio, new_size);
+}
+
 /*
  * mem_try_ensure_space:
  * @mio: A #MIO object
@@ -808,7 +813,7 @@ int mio_vprintf (MIO *mio, const char *format, va_list ap)
 		old_size = mio->impl.mem.size;
 		va_copy (ap_copy, ap);
 		/* compute the size we will need into the buffer */
-		n = vsnprintf (&dummy, 1, format, ap_copy);
+		n = vsnprintf (&dummy, 1, format, ap_copy) + 1;
 		va_end (ap_copy);
 		if (mem_try_ensure_space (mio, n))
 		{
