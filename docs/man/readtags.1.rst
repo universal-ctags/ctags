@@ -107,23 +107,23 @@ Examples
 
      $ readtags -t /path/to/tags -l
 
-* List all tags in "tags" that start with ``ctags``:
+* List all tags in "tags" that start with "mymethod":
 
   .. code-block:: console
 
-     $ readtags -p - ctags
+     $ readtags -p - mymethod
 
-* List all tags matching "ctags", case insensitively:
-
-  .. code-block:: console
-
-     $ readtags -i - ctags
-
-* List all tags start with "ctags", and printing all fields (i.e., the whole line):
+* List all tags matching "mymethod", case insensitively:
 
   .. code-block:: console
 
-     $ readtags -p -ne - ctags
+     $ readtags -i - mymethod
+
+* List all tags start with "myvar", and printing all fields (i.e., the whole line):
+
+  .. code-block:: console
+
+     $ readtags -p -ne - myvar
 
 EXPRESSION
 ----------
@@ -145,30 +145,30 @@ The basic operators for filtering are ``eq?``, ``prefix?``, ``suffix?`` and
 ``substr?``. Language common fields can be accessed using ``$``, e.g.,
 ``$language`` represents the language field. For example:
 
-* List all tags start with "ctags" in Python code files:
+* List all tags start with "myfunc" in Python code files:
 
   .. code-block:: console
 
-     $ readtags -p -Q '(eq? $language "Python")' - ctags
+     $ readtags -p -Q '(eq? $language "Python")' - myfunc
 
 ``downcase`` or ``upcase`` operators can be used to perform case-insensitive
 matching:
 
-* List all tags containing "ctags", case insensitively:
+* List all tags containing "my", case insensitively:
 
     .. code-block:: console
 
-     $ readtags -Q '(substr? (downcase $name) "ctags")' -l
+     $ readtags -Q '(substr? (downcase $name) "my")' -l
 
 We have logical operators like ``and``, ``or`` and ``not``. The value of a
 missing field is #f, so we could deal with missing fields:
 
-* List all tags containing "ctags" in Python code files, but allow the
+* List all tags containing "impl" in Python code files, but allow the
   ``language:`` field to be missing:
 
   .. code-block:: console
 
-     $ readtags -Q '(and (substr? $name "ctags")\
+     $ readtags -Q '(and (substr? $name "impl")\
                          (or (eq? $language "Python")\
                              (not $language)))' -l
 
@@ -221,7 +221,7 @@ file:
 
 .. code-block:: console
 
-   $readtags -S '(<or> (<> $input &input) (<> $line &line))' -l
+   $ readtags -S '(<or> (<> $input &input) (<> $line &line))' -l
 
 The ``*-`` operator is used to flip the compare result. i.e., ``(*- (<> a b))``
 is the same as ``(<> b a)``.
@@ -233,7 +233,7 @@ example:
 
 .. code-block:: console
 
-   $readtags -Q '(print $name)' -l
+   $ readtags -Q '(print $name)' -l
 
 prints the name of each tag entry before it. Since the return value of
 ``print`` is not #f, all the tag entries are printed. We could control this
@@ -243,7 +243,7 @@ example:
 
 .. code-block:: console
 
-   $readtags -Q '(begin0 #f (print (prefix? "ctags" "ct")))' -l
+   $ readtags -Q '(begin0 #f (print (prefix? "ctags" "ct")))' -l
 
 prints a bunch of "#t" (depending on how many lines are in the tags file), and
 the actual tag entries are not printed.
