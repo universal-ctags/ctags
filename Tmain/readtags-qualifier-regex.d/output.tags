@@ -1,0 +1,27 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_OUTPUT_FILESEP	slash	/slash or backslash/
+!_TAG_OUTPUT_MODE	u-ctags	/u-ctags or e-ctags/
+!_TAG_PATTERN_LENGTH_LIMIT	96	/0 for no limit/
+!_TAG_PROGRAM_AUTHOR	Universal Ctags Team	//
+!_TAG_PROGRAM_NAME	Universal Ctags	/Derived from Exuberant Ctags/
+!_TAG_PROGRAM_URL	https://ctags.io/	/official site/
+!_TAG_PROGRAM_VERSION	0.0.0	/e9d9780d/
+CHAR	input.hxx	/^typedef char CHAR;$/
+INT	input.hxx	/^typedef int  INT;$/
+f	input.hxx	/^int f ( int,  int,  int);$/;"	signature:(int,int,int)
+f	input.hxx	/^int f ( int,  int, char);$/;"	signature:(int,int,char)
+f	input.hxx	/^int f ( int, char,  int);$/;"	signature:(int,char,int)
+f	input.hxx	/^int f ( int, char, char);$/;"	signature:(int,char,char)
+f	input.hxx	/^int f (char,  int,  int);$/;"	signature:(char,int,int)
+f	input.hxx	/^int f (char,  int, char);$/;"	signature:(char,int,char)
+f	input.hxx	/^int f (char, char,  int);$/;"	signature:(char,char,int)
+f	input.hxx	/^int f (char, char, char);$/;"	signature:(char,char,char)
+g	input.hxx	/^int g ( INT,  INT,  INT);$/;"	signature:(INT,INT,INT)
+g	input.hxx	/^int g ( INT,  INT, CHAR);$/;"	signature:(INT,INT,CHAR)
+g	input.hxx	/^int g ( INT, CHAR,  INT);$/;"	signature:(INT,CHAR,INT)
+g	input.hxx	/^int g ( INT, CHAR, CHAR);$/;"	signature:(INT,CHAR,CHAR)
+g	input.hxx	/^int g (CHAR,  INT,  INT);$/;"	signature:(CHAR,INT,INT)
+g	input.hxx	/^int g (CHAR,  INT, CHAR);$/;"	signature:(CHAR,INT,CHAR)
+g	input.hxx	/^int g (CHAR, CHAR,  INT);$/;"	signature:(CHAR,CHAR,INT)
+g	input.hxx	/^int g (CHAR, CHAR, CHAR);$/;"	signature:(CHAR,CHAR,CHAR)

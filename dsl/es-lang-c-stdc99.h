@@ -41,6 +41,7 @@ enum _EsType {
   ES_TYPE_SYMBOL,
   ES_TYPE_STRING,
   ES_TYPE_CONS,
+  ES_TYPE_REGEX,
   /* ... */
   ES_TYPE_ERROR
 };
@@ -65,6 +66,7 @@ int         es_object_equal         (const EsObject* self,
 int         es_atom                 (const EsObject* object);
 
 #define     ES_ERROR_MEMORY   es_error_intern("MEMORY-EXHAUSTED")
+#define     ES_ERROR_REGEX    es_error_intern("WRONG-REGEX-SYNTAX")
 
 /*
  * Nil
@@ -144,6 +146,14 @@ EsObject*    es_car         (const EsObject* object);
 EsObject*    es_cdr         (const EsObject* object);
 
 
+/*
+ * Regex
+ */
+EsObject*    es_regex_compile (const char* pat,
+							   int case_insensitive);
+int          es_regex_p       (const EsObject* object);
+EsObject*    es_regex_exec    (const EsObject* regex,
+							   const EsObject* str);
 
 /*
  * Print

@@ -324,6 +324,7 @@ static EsObject *dsl_eval0 (EsObject *object, DSLEnv *env)
 {
 	EsObject *r;
 	DSLProcBind *pb;
+	EsObject *car;
 
 	if (es_null (object))
 		return es_nil;
@@ -350,9 +351,34 @@ static EsObject *dsl_eval0 (EsObject *object, DSLEnv *env)
 	}
 	else if (es_atom (object))
 		return object;
+	else if (es_regex_p(car = es_car (object)))
+	{
+		EsObject *cdr = es_cdr (object);
+		int l = length (cdr);
+
+		if (l < 1)
+			dsl_throw (TOO_FEW_ARGUMENTS, car);
+		else if (l > 1)
+			dsl_throw (TOO_MANY_ARGUMENTS, car);
+
+		cdr = eval0(cdr, env);
+		EsObject *err;
+
+		err = error_included (cdr);
+		if (!es_object_equal (err, es_false))
+			return err;
+
+		EsObject *cadr = es_car (cdr);
+		if (!es_string_p (cadr))
+			dsl_throw (WRONG_TYPE_ARGUMENT, object);
+
+		r = es_regex_exec (car, cadr);
+		return r;
+	}
+	else if (es_error_p(car))
+		return car;
 	else
 	{
-		EsObject *car = es_car (object);
 		EsObject *cdr = es_cdr (object);
 		int l;
 

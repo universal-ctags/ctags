@@ -31,6 +31,7 @@
 #include <errno.h>
 #include <limits.h>
 
+#include <regex.h>
 
 static int es_debug = 0;
 
@@ -42,6 +43,7 @@ typedef struct _EsSingleton EsSingleton;
 typedef struct _EsSymbol EsSymbol;
 typedef struct _EsError EsError;
 typedef struct _EsCons EsCons;
+typedef struct _EsRegex EsRegex;
 
 struct _EsObject
 {
@@ -102,6 +104,14 @@ struct _EsCons
 	EsObject* cdr;
 };
 
+struct _EsRegex
+{
+	EsObject base;
+	regex_t *code;
+	char* literal;
+	int   case_insensitive;
+};
+
 typedef struct _EsObjectClass EsObjectClass;
 struct _EsObjectClass
 {
@@ -142,6 +152,10 @@ static void es_symbol_print(const EsObject* object, MIO* fp);
 static void es_cons_free(EsObject* object);
 static int  es_cons_equal(const EsObject* self, const EsObject* other);
 static void es_cons_print(const EsObject* object, MIO* fp);
+
+static void es_regex_free(EsObject* object);
+static int  es_regex_equal(const EsObject* self, const EsObject* other);
+static void es_regex_print(const EsObject* object, MIO* fp);
 
 static void es_error_free(EsObject* object);
 static int  es_error_equal(const EsObject* self, const EsObject* other);
@@ -218,6 +232,15 @@ static EsObjectClass classes[] = {
 		.atom_p  = 0,
 		.obarray = NULL,
 		.name    = "cons",
+	},
+	[ES_TYPE_REGEX]   = {
+		.size    = sizeof(EsRegex),
+		.free    = es_regex_free,
+		.equal   = es_regex_equal,
+		.print   = es_regex_print,
+		.atom_p  = 1,
+		.obarray = NULL,
+		.name    = "regex",
 	},
 	[ES_TYPE_ERROR] = {
 		.size    = sizeof(EsError),
@@ -1191,6 +1214,99 @@ es_cons_reverse_rec(EsObject* cdr,
 }
 
 /*
+ * Regex
+ */
+EsObject*
+es_regex_compile   (const char* pattern_literal, int case_insensitive)
+{
+	EsObject* r;
+	regex_t *code;
+	int err;
+	int flag = REG_EXTENDED | REG_NEWLINE
+		| (case_insensitive? REG_ICASE: 0);
+
+	code = malloc(sizeof(regex_t));
+	if (!code)
+		return ES_ERROR_MEMORY;
+
+	err = regcomp(code, pattern_literal,
+				  flag);
+	if (err)
+	{
+#if 0
+/* TODO: This should be reported to caller. */
+		char errmsg [256];
+		regerror (err, code, errmsg, 256);
+#endif
+		regfree (code);
+		free (code);
+		return ES_ERROR_REGEX;
+	}
+
+	r = es_object_new(ES_TYPE_REGEX);
+	((EsRegex*)r)->code = code;
+	((EsRegex*)r)->literal = strdup(pattern_literal);
+	if (!((EsRegex*)r)->literal)
+	{
+		regfree(((EsRegex*)r)->code);
+		free(((EsRegex*)r)->code);
+		es_object_free(r);
+		return ES_ERROR_MEMORY;
+	}
+	((EsRegex*)r)->case_insensitive = case_insensitive;
+	return r;
+}
+
+int
+es_regex_p   (const EsObject*   object)
+{
+	return es_object_type_p(object, ES_TYPE_REGEX);
+}
+
+static void es_regex_free(EsObject* object)
+{
+	free(((EsRegex*)object)->literal);
+	regfree(((EsRegex*)object)->code);
+	free(((EsRegex*)object)->code);
+	es_object_free(object);
+}
+
+static int
+es_regex_equal(const EsObject* self, const EsObject* other)
+{
+	return (es_regex_p (other)
+			&& (strcmp (((EsRegex*)self)->literal,
+						((EsRegex*)other)->literal) == 0)
+			&& (((EsRegex*)self)->case_insensitive ==
+				((EsRegex*)other)->case_insensitive));
+}
+
+static void
+es_regex_print(const EsObject* object, MIO* fp)
+{
+	mio_puts(fp, "#/");
+	const char *s = ((EsRegex*)object)->literal;
+	while (*s)
+	{
+		if (*s == '/')
+			mio_putc(fp, '\\');
+		mio_putc(fp, *s);
+		s++;
+	}
+	mio_putc(fp, '/');
+	if (((EsRegex*)object)->case_insensitive)
+		mio_putc(fp, 'i');
+}
+
+EsObject*
+es_regex_exec    (const EsObject* regex,
+				  const EsObject* str)
+{
+	return regexec (((EsRegex*)regex)->code, es_string_get (str),
+					0, NULL, 0)? es_false: es_true;
+}
+
+/*
  * Error
  */
 EsObject*
@@ -1421,6 +1537,7 @@ static int      is_paren_close   (char c);
 static int      is_comment_start (char c);
 static int      is_string_start  (char c);
 static int      is_fence_start   (char c);
+static int      is_reader_macro_prefix(char c);
 
 typedef
 int (*TerminalDetector) (int c);
@@ -1436,6 +1553,8 @@ static Token* get_sequence      (MIO* fp,
 static Token* get_string        (MIO* fp, char seed);
 static Token* get_escaped_symbol(MIO* fp, char seed);
 static Token* get_symbol        (MIO* fp, char seed);
+static Token* get_regex         (MIO* fp);
+static void   inject_regex_flag (Token* t, char c);
 
 static EsObject* fill_list    (MIO*  fp);
 static EsObject* make_atom    (Token* token);
@@ -1449,6 +1568,8 @@ static EsObject* make_integer (int  i);
 static int  is_real      (const char* t,
 						  double* d);
 static EsObject* make_real    (double d);
+static EsObject* make_regex (const char *pat,
+							 int case_insensitive);
 
 
 EsObject*
@@ -1528,6 +1649,26 @@ get_token(MIO* in)
 				t = get_escaped_symbol(in, c0);
 				break;
 			}
+			else if (is_reader_macro_prefix(c0))
+			{
+				c = mio_getc(in);
+				if (c == EOF)
+				{
+					t = get_symbol(in, c0);
+					break;
+				}
+				else if (c == '/')
+				{
+					t = get_regex(in);
+					break;
+				}
+				else
+				{
+					mio_ungetc (in, c);
+					t = get_symbol(in, c0);
+					break;
+				}
+			}
 			else
 			{
 				t = get_symbol(in, c0);
@@ -1575,6 +1716,12 @@ static int
 is_fence_start  (char c)
 {
 	return (c == '|')? 1: 0;
+}
+
+static int
+is_reader_macro_prefix(char c)
+{
+	return (c == '#')? 1: 0;
 }
 
 static void
@@ -1661,6 +1808,73 @@ get_symbol         (MIO* fp,
 
 	t = token_new(seed);
 	return get_sequence(fp, t, is_separator, 0);
+}
+
+static Token*
+get_regex (MIO* fp)
+{
+	Token *t;
+	t = token_new('#');
+	if (!t)
+		return NULL;
+
+	if (!token_append(t, '/'))
+		return NULL;
+
+	/* Inject a placeholder representing
+	 * case-{in}sesitive. */
+	if (!token_append(t, ' '))
+		return NULL;
+
+	int c;
+	int in_escape = 0;
+	while (1)
+	{
+		c = mio_getc(fp);
+		if (EOF == c)
+		{
+			/* TODO: Propagate the error to upper layer. */
+			mio_printf(mio_stderr(),
+					   ";; unexpected termination during parsing regex pattern\n");
+			token_free (t);
+			return NULL;
+		}
+
+		char c0 = c;
+		if (in_escape)
+		{
+			in_escape = 0;
+
+			if (c0 == 'n')
+				c0 = '\n';
+			else if (c0 == 't')
+				c0 = '\t';
+			else if (c0 != '/')
+			{
+				if (!token_append(t, '\\'))
+					return NULL;
+			}
+
+			if (!token_append(t, c0))
+				return NULL;
+		}
+		else if (c0 == '\\')
+			in_escape = 1;
+		else if (c0 == '/')
+		{
+			c = mio_getc(fp);
+			if (c == 'i')
+				/* Refill the placeholder. */
+				inject_regex_flag (t, 'i');
+			else if (c != EOF)
+				mio_ungetc (fp, c);
+			break;
+		}
+		else
+			if (!token_append(t, c0))
+				return NULL;
+	}
+	return t;
 }
 
 static void
@@ -1851,6 +2065,18 @@ token_append(Token* t, char c)
 	return t;
 }
 
+/* We use the third character of buffer
+ * as a flag representing an option for
+ * regex pattern.
+ *
+ * 'i': case_insensitive
+ */
+static void
+inject_regex_flag(Token* t, char c)
+{
+	t->buffer [2] = c;
+}
+
 static EsObject*
 fill_list (MIO* fp)
 {
@@ -1941,6 +2167,9 @@ make_atom          (Token*   token)
 		r = make_boolean(1);
 	else if (strcmp(t, "#f") == 0)
 		r = make_boolean(0);
+	else if ((strncmp(t, "#/", 2) == 0)
+			 && t[2] != '\0')
+		r = make_regex (t + 3, (t[2] == 'i'));
 	else if (is_integer(t, &i))
     {
 		r = make_integer(i);
@@ -2051,7 +2280,12 @@ make_real (double d)
 	return es_real_new(d);
 }
 
-
+static EsObject*
+make_regex (const char *pat,
+			int case_insensitive)
+{
+	return es_regex_compile(pat, case_insensitive);
+}
 
 EsObject*
 es_read_from_string(const char* buf,

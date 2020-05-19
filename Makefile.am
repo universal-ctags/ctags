@@ -56,6 +56,10 @@ readtags_CFLAGS = $(COVERAGE_CFLAGS) $(WARNING_CFLAGS)
 dist_readtags_SOURCES = $(READTAGS_SRCS) $(READTAGS_HEADS)
 readtags_CPPFLAGS += -DREADTAGS_DSL -I$(srcdir)/dsl
 dist_readtags_SOURCES += $(READTAGS_DSL_SRCS) $(READTAGS_DSL_HEADS)
+if !HAVE_REGCOMP
+readtags_CPPFLAGS += $(REGCOMP_CPPFLAGS)
+dist_readtags_SOURCES += $(REGEX_SRCS) $(REGEX_HEADS)
+endif
 endif
 
 if !HAVE_FNMATCH
