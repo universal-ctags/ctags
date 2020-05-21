@@ -58,8 +58,8 @@ Python         i/module          indirectlyImported on      module imported in a
 Python         i/module          namespace          on      namespace from where classes/variables/functions are imported
 Python         x/unknown         imported           on      imported from the other module
 Python         x/unknown         indirectlyImported on      classes/variables/functions/modules imported in alternative name
-R              l/library         library            on      library attached by library fucntion
-R              l/library         require            on      library attached by require fucntion
+R              l/library         library            on      library attached by library function
+R              l/library         require            on      library attached by require function
 R              s/source          source             on      source loaded by source fucntion
 RpmSpec        m/macro           undef              on      undefined
 RpmSpec        p/patch           decl               on      declared for applying later
@@ -140,8 +140,8 @@ Python         i/module          indirectlyImported on      module imported in a
 Python         i/module          namespace          on      namespace from where classes/variables/functions are imported
 Python         x/unknown         imported           on      imported from the other module
 Python         x/unknown         indirectlyImported on      classes/variables/functions/modules imported in alternative name
-R              l/library         library            on      library attached by library fucntion
-R              l/library         require            on      library attached by require fucntion
+R              l/library         library            on      library attached by library function
+R              l/library         require            on      library attached by require function
 R              s/source          source             on      source loaded by source fucntion
 RpmSpec        m/macro           undef              on      undefined
 RpmSpec        p/patch           decl               on      declared for applying later

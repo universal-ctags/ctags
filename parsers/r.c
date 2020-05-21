@@ -14,7 +14,7 @@
 *   https://cran.r-project.org/manuals.html, and
 *   https://cran.r-project.org/doc/manuals/r-release/R-lang.html
 *
-*   The base library (including library and source fucntions) release is at
+*   The base library (including library and source functions) release is at
 *   https://stat.ethz.ch/R-manual/R-devel/library/base/html/00Index.html
 */
 
@@ -88,8 +88,8 @@ typedef enum {
 } rSourceRole;
 
 static roleDefinition RLibraryRoles [] = {
-	{ true, "library", "library attached by library fucntion" },
-	{ true, "require", "library attached by require fucntion" },
+	{ true, "library", "library attached by library function" },
+	{ true, "require", "library attached by require function" },
 };
 
 static roleDefinition RSourceRoles [] = {
