@@ -1001,10 +1001,11 @@ static void findRubyTags (void)
 		}
 		else if (canMatchKeywordWithAssign (&cp, "alias_method"))
 			readAliasMethodAndEmitTags (&cp);
-		else if (canMatchKeywordWithAssign (&cp, "private")
-				 || canMatchKeywordWithAssign (&cp, "protected")
-				 || canMatchKeywordWithAssign (&cp, "public"))
-
+		else if ((canMatchKeywordWithAssign (&cp, "private")
+				  || canMatchKeywordWithAssign (&cp, "protected")
+				  || canMatchKeywordWithAssign (&cp, "public")
+				  || canMatchKeywordWithAssign (&cp, "private_class_method")
+				  || canMatchKeywordWithAssign (&cp, "public_class_method")))
 		{
 			skipWhitespace (&cp);
 			if (canMatchKeywordWithAssign (&cp, "def"))
