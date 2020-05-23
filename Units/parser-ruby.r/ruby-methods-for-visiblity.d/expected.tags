@@ -1,0 +1,4 @@
+Mod	input.rb	/^module Mod$/;"	m
+a	input.rb	/^  public def a()  end$/;"	f	module:Mod
+b	input.rb	/^  private def b()  end$/;"	f	module:Mod
+c	input.rb	/^  protected def c()  end$/;"	f	module:Mod

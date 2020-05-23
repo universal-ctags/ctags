@@ -801,6 +801,52 @@ static int readStringAndEmitTag (const unsigned char **cp, rubyKind kind, int ro
 	return r;
 }
 
+static int readAndEmitDef (const unsigned char **cp)
+{
+	rubyKind kind = K_METHOD;
+	NestingLevel *nl = nestingLevelsGetCurrent (nesting);
+	tagEntryInfo *e_scope  = getEntryOfNestingLevel (nl);
+
+	/* if the def is inside an unnamed scope at the class level, assume
+	 * it's from a singleton from a construct like this:
+	 *
+	 * class C
+	 *   class << self
+	 *     def singleton
+	 *       ...
+	 *     end
+	 *   end
+	 * end
+	 */
+	if (e_scope && e_scope->kindIndex == K_CLASS && strlen (e_scope->name) == 0)
+		kind = K_SINGLETON;
+	int corkIndex = readAndEmitTag (cp, kind);
+	tagEntryInfo *e = getEntryInCorkQueue (corkIndex);
+
+	/* Fill signature: field. */
+	if (e)
+	{
+		vString *signature = vStringNewInit ("(");
+		skipWhitespace (cp);
+		if (**cp == '(')
+		{
+			++(*cp);
+			parseSignature (cp, signature);
+			if (vStringLast(signature) != ')')
+			{
+				vStringDelete (signature);
+				signature = NULL;
+			}
+		}
+		else
+			vStringPut (signature, ')');
+		e->extensionFields.signature = vStringDeleteUnwrap (signature);
+		signature = NULL;;
+		vStringDelete (signature);
+	}
+	return corkIndex;
+}
+
 static void findRubyTags (void)
 {
 	const unsigned char *line;
@@ -907,47 +953,7 @@ static void findRubyTags (void)
 		}
 		else if (canMatchKeywordWithAssign (&cp, "def"))
 		{
-			rubyKind kind = K_METHOD;
-			NestingLevel *nl = nestingLevelsGetCurrent (nesting);
-			tagEntryInfo *e_scope  = getEntryOfNestingLevel (nl);
-
-			/* if the def is inside an unnamed scope at the class level, assume
-			 * it's from a singleton from a construct like this:
-			 *
-			 * class C
-			 *   class << self
-			 *     def singleton
-			 *       ...
-			 *     end
-			 *   end
-			 * end
-			 */
-			if (e_scope && e_scope->kindIndex == K_CLASS && strlen (e_scope->name) == 0)
-				kind = K_SINGLETON;
-			int corkIndex = readAndEmitTag (&cp, kind);
-			tagEntryInfo *e = getEntryInCorkQueue (corkIndex);
-
-			/* Fill signature: field. */
-			if (e)
-			{
-				vString *signature = vStringNewInit ("(");
-				skipWhitespace (&cp);
-				if (*cp == '(')
-				{
-					++cp;
-					parseSignature (&cp, signature);
-					if (vStringLast(signature) != ')')
-					{
-						vStringDelete (signature);
-						signature = NULL;
-					}
-				}
-				else
-					vStringPut (signature, ')');
-				e->extensionFields.signature = vStringDeleteUnwrap (signature);
-				signature = NULL;;
-				vStringDelete (signature);
-			}
+			readAndEmitDef (&cp);
 		}
 		else if (canMatchKeywordWithAssign (&cp, "attr_reader"))
 		{
@@ -995,6 +1001,18 @@ static void findRubyTags (void)
 		}
 		else if (canMatchKeywordWithAssign (&cp, "alias_method"))
 			readAliasMethodAndEmitTags (&cp);
+		else if (canMatchKeywordWithAssign (&cp, "private")
+				 || canMatchKeywordWithAssign (&cp, "protected")
+				 || canMatchKeywordWithAssign (&cp, "public"))
+
+		{
+			skipWhitespace (&cp);
+			if (canMatchKeywordWithAssign (&cp, "def"))
+				readAndEmitDef (&cp);
+			/* TODO: store the method for controlling visibility
+			 * to the "access:" field of the tag.*/
+		}
+
 
 		while (*cp != '\0')
 		{
