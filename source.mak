@@ -243,7 +243,6 @@ PARSER_SRCS =				\
 	parsers/jprop.c			\
 	parsers/jscript.c		\
 	parsers/json.c			\
-	parsers/kconfig.c		\
 	parsers/ldscript.c		\
 	parsers/lisp.c			\
 	parsers/lua.c			\

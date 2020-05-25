@@ -156,6 +156,7 @@
     <ClCompile Include="..\optlib\elm.c" />
     <ClCompile Include="..\optlib\gdbinit.c" />
     <ClCompile Include="..\optlib\inko.c" />
+    <ClCompile Include="..\optlib\kconfig.c" />
     <ClCompile Include="..\optlib\man.c" />
     <ClCompile Include="..\optlib\markdown.c" />
     <ClCompile Include="..\optlib\passwd.c" />
@@ -218,7 +219,6 @@
     <ClCompile Include="..\parsers\jprop.c" />
     <ClCompile Include="..\parsers\jscript.c" />
     <ClCompile Include="..\parsers\json.c" />
-    <ClCompile Include="..\parsers\kconfig.c" />
     <ClCompile Include="..\parsers\ldscript.c" />
     <ClCompile Include="..\parsers\lisp.c" />
     <ClCompile Include="..\parsers\lua.c" />

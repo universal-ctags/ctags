@@ -7,6 +7,7 @@ OPTLIB2C_INPUT = \
 	optlib/elm.ctags			\
 	optlib/gdbinit.ctags			\
 	optlib/inko.ctags			\
+	optlib/kconfig.ctags			\
 	optlib/man.ctags			\
 	optlib/markdown.ctags			\
 	optlib/passwd.ctags			\

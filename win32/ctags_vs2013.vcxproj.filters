@@ -204,6 +204,9 @@
     <ClCompile Include="..\optlib\inko.c">
       <Filter>Source Files\optlib</Filter>
     </ClCompile>
+    <ClCompile Include="..\optlib\kconfig.c">
+      <Filter>Source Files\optlib</Filter>
+    </ClCompile>
     <ClCompile Include="..\optlib\man.c">
       <Filter>Source Files\optlib</Filter>
     </ClCompile>
@@ -388,9 +391,6 @@
       <Filter>Source Files\Parsers</Filter>
     </ClCompile>
     <ClCompile Include="..\parsers\json.c">
-      <Filter>Source Files\Parsers</Filter>
-    </ClCompile>
-    <ClCompile Include="..\parsers\kconfig.c">
       <Filter>Source Files\Parsers</Filter>
     </ClCompile>
     <ClCompile Include="..\parsers\ldscript.c">
