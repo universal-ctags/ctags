@@ -1,0 +1,4 @@
+--map-Kconfig=.kconfig
+--extras=+r
+--fields=+r
+--sort=no
