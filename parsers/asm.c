@@ -225,6 +225,8 @@ static void makeAsmTag (
 			case K_MACRO:
 				*lastMacroCorkIndex = makeSimpleTag (operator,
 													 kind_for_directive);
+				if (*lastMacroCorkIndex != CORK_NIL)
+					registerEntry (*lastMacroCorkIndex);
 				break;
 			case K_PSUEDO_MACRO_END:
 				macro_tag = getEntryInCorkQueue (*lastMacroCorkIndex);
@@ -341,10 +343,17 @@ static void findAsmTags (void)
 		}
 
 		cp = readSymbol (cp, name);
-		if (vStringLength (name) > 0  &&  *cp == ':')
+		if (vStringLength (name) > 0)
 		{
-			labelCandidate = true;
-			++cp;
+			if (*cp == ':')
+			{
+				labelCandidate = true;
+				++cp;
+			}
+			else if (anyKindEntryInScope (CORK_NIL,
+										  vStringValue (name),
+										  K_MACRO))
+				labelCandidate = false;
 		}
 
 		if (! isspace ((int) *cp)  &&  *cp != '\0')
@@ -410,6 +419,6 @@ extern parserDefinition* AsmParser (void)
 	def->keywordTable = AsmKeywords;
 	def->keywordCount = ARRAY_SIZE (AsmKeywords);
 	def->selectLanguage = selectors;
-	def->useCork = CORK_QUEUE;
+	def->useCork = CORK_QUEUE | CORK_SYMTAB;
 	return def;
 }

@@ -1,0 +1,1 @@
+idtentry	input.S	/^.macro idtentry sym do_sym has_error_code:req paranoid=0 shift_ist=-1 ist_offset=0 create_gap=0 /;"	m
