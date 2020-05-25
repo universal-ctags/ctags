@@ -62,6 +62,7 @@ The following parsers have been added:
 * Inko *optlib*
 * JavaProperties
 * JSON
+* Kconfig
 * GNU linker script(LdScript)
 * Man page *optlib*
 * Markdown *optlib*
