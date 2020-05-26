@@ -84,6 +84,7 @@ DECLARE_VALUE_FN(access);
 DECLARE_VALUE_FN(file);
 DECLARE_VALUE_FN(language);
 DECLARE_VALUE_FN(implementation);
+DECLARE_VALUE_FN(signature);
 DECLARE_VALUE_FN(line);
 DECLARE_VALUE_FN(kind);
 DECLARE_VALUE_FN(roles);
@@ -144,6 +145,7 @@ static DSLProcBind pbinds [] = {
 	  .helpstr = "file scope<boolean>" },
 	{ "$language",       value_language,       NULL, DSL_PATTR_MEMORABLE, 0UL },
 	{ "$implementation", value_implementation, NULL, DSL_PATTR_MEMORABLE, 0UL },
+	{ "$signature",      value_signature,      NULL, DSL_PATTR_MEMORABLE, 0UL },
 	{ "$line",           value_line,           NULL, DSL_PATTR_MEMORABLE, 0UL },
 	{ "$kind",           value_kind,           NULL, DSL_PATTR_MEMORABLE, 0UL },
 	{ "$roles",          value_roles,          NULL, DSL_PATTR_MEMORABLE, 0UL,
@@ -707,6 +709,7 @@ DEFINE_VALUE_FN(access)
 DEFINE_VALUE_FN(file)
 DEFINE_VALUE_FN(language)
 DEFINE_VALUE_FN(implementation)
+DEFINE_VALUE_FN(signature)
 DEFINE_VALUE_FN(line)
 DEFINE_VALUE_FN(kind)
 DEFINE_VALUE_FN(roles)
@@ -824,6 +827,11 @@ EsObject* dsl_entry_language (const tagEntry *entry)
 EsObject* dsl_entry_implementation (const tagEntry *entry)
 {
 	return dsl_entry_xget_string (entry, "implementation");
+}
+
+EsObject* dsl_entry_signature (const tagEntry *entry)
+{
+	return dsl_entry_xget_string (entry, "signature");
 }
 
 EsObject* dsl_entry_line (const tagEntry *entry)

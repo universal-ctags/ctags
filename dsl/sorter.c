@@ -52,6 +52,7 @@ DECLARE_ALT_VALUE_FN(access);
 DECLARE_ALT_VALUE_FN(file);
 DECLARE_ALT_VALUE_FN(language);
 DECLARE_ALT_VALUE_FN(implementation);
+DECLARE_ALT_VALUE_FN(signature);
 DECLARE_ALT_VALUE_FN(line);
 DECLARE_ALT_VALUE_FN(kind);
 DECLARE_ALT_VALUE_FN(roles);
@@ -82,6 +83,7 @@ static DSLProcBind pbinds [] = {
 	  .helpstr = "file scope<boolean>" },
 	{ "&language",       alt_value_language,       NULL, DSL_PATTR_MEMORABLE, 0UL },
 	{ "&implementation", alt_value_implementation, NULL, DSL_PATTR_MEMORABLE, 0UL },
+	{ "&signature",      alt_value_signature,      NULL, DSL_PATTR_MEMORABLE, 0UL },
 	{ "&line",           alt_value_line,           NULL, DSL_PATTR_MEMORABLE, 0UL },
 	{ "&kind",           alt_value_kind,           NULL, DSL_PATTR_MEMORABLE, 0UL },
 	{ "&roles",          alt_value_roles,          NULL, DSL_PATTR_MEMORABLE, 0UL,
@@ -114,6 +116,7 @@ DEFINE_ALT_VALUE_FN(access)
 DEFINE_ALT_VALUE_FN(file)
 DEFINE_ALT_VALUE_FN(language)
 DEFINE_ALT_VALUE_FN(implementation)
+DEFINE_ALT_VALUE_FN(signature)
 DEFINE_ALT_VALUE_FN(line)
 DEFINE_ALT_VALUE_FN(kind)
 DEFINE_ALT_VALUE_FN(roles)

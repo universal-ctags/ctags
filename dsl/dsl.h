@@ -100,6 +100,7 @@ EsObject* dsl_entry_access (const tagEntry *entry);
 EsObject* dsl_entry_file (const tagEntry *entry);
 EsObject* dsl_entry_language (const tagEntry *entry);
 EsObject* dsl_entry_implementation (const tagEntry *entry);
+EsObject* dsl_entry_signature (const tagEntry *entry);
 EsObject* dsl_entry_line (const tagEntry *entry);
 EsObject* dsl_entry_kind (const tagEntry *entry);
 EsObject* dsl_entry_roles (const tagEntry *entry);
