@@ -1,0 +1,163 @@
+Linux/$(ARCH) $(KERNELVERSION) Kernel Configuration	input.kconfig	/^mainmenu "Linux\/$(ARCH) $(KERNELVERSION) Kernel Configuration"$/;"	M	roles:def
+scripts/Kconfig.include	input.kconfig	/^source "scripts\/Kconfig.include"$/;"	k	roles:source
+init/Kconfig	input.kconfig	/^source "init\/Kconfig"$/;"	k	roles:source
+kernel/Kconfig.freezer	input.kconfig	/^source "kernel\/Kconfig.freezer"$/;"	k	roles:source
+fs/Kconfig.binfmt	input.kconfig	/^source "fs\/Kconfig.binfmt"$/;"	k	roles:source
+mm/Kconfig	input.kconfig	/^source "mm\/Kconfig"$/;"	k	roles:source
+net/Kconfig	input.kconfig	/^source "net\/Kconfig"$/;"	k	roles:source
+drivers/Kconfig	input.kconfig	/^source "drivers\/Kconfig"$/;"	k	roles:source
+fs/Kconfig	input.kconfig	/^source "fs\/Kconfig"$/;"	k	roles:source
+security/Kconfig	input.kconfig	/^source "security\/Kconfig"$/;"	k	roles:source
+crypto/Kconfig	input.kconfig	/^source "crypto\/Kconfig"$/;"	k	roles:source
+lib/Kconfig	input.kconfig	/^source "lib\/Kconfig"$/;"	k	roles:source
+lib/Kconfig.debug	input.kconfig	/^source "lib\/Kconfig.debug"$/;"	k	roles:source
+Documentation/Kconfig	input.kconfig	/^source "Documentation\/Kconfig"$/;"	k	roles:source
+JFFS2_FS	input-1.kconfig	/^config JFFS2_FS$/;"	c	roles:def
+CONFIG_JFFS2_FS	input-1.kconfig	/^config JFFS2_FS$/;"	c	roles:def
+JFFS2_FS_DEBUG	input-1.kconfig	/^config JFFS2_FS_DEBUG$/;"	c	roles:def
+CONFIG_JFFS2_FS_DEBUG	input-1.kconfig	/^config JFFS2_FS_DEBUG$/;"	c	roles:def
+JFFS2_FS_WRITEBUFFER	input-1.kconfig	/^config JFFS2_FS_WRITEBUFFER$/;"	c	roles:def
+CONFIG_JFFS2_FS_WRITEBUFFER	input-1.kconfig	/^config JFFS2_FS_WRITEBUFFER$/;"	c	roles:def
+JFFS2_FS_WBUF_VERIFY	input-1.kconfig	/^config JFFS2_FS_WBUF_VERIFY$/;"	c	roles:def
+CONFIG_JFFS2_FS_WBUF_VERIFY	input-1.kconfig	/^config JFFS2_FS_WBUF_VERIFY$/;"	c	roles:def
+JFFS2_SUMMARY	input-1.kconfig	/^config JFFS2_SUMMARY$/;"	c	roles:def
+CONFIG_JFFS2_SUMMARY	input-1.kconfig	/^config JFFS2_SUMMARY$/;"	c	roles:def
+JFFS2_FS_XATTR	input-1.kconfig	/^config JFFS2_FS_XATTR$/;"	c	roles:def
+CONFIG_JFFS2_FS_XATTR	input-1.kconfig	/^config JFFS2_FS_XATTR$/;"	c	roles:def
+JFFS2_FS_POSIX_ACL	input-1.kconfig	/^config JFFS2_FS_POSIX_ACL$/;"	c	roles:def
+CONFIG_JFFS2_FS_POSIX_ACL	input-1.kconfig	/^config JFFS2_FS_POSIX_ACL$/;"	c	roles:def
+JFFS2_FS_SECURITY	input-1.kconfig	/^config JFFS2_FS_SECURITY$/;"	c	roles:def
+CONFIG_JFFS2_FS_SECURITY	input-1.kconfig	/^config JFFS2_FS_SECURITY$/;"	c	roles:def
+JFFS2_COMPRESSION_OPTIONS	input-1.kconfig	/^config JFFS2_COMPRESSION_OPTIONS$/;"	c	roles:def
+CONFIG_JFFS2_COMPRESSION_OPTIONS	input-1.kconfig	/^config JFFS2_COMPRESSION_OPTIONS$/;"	c	roles:def
+JFFS2_ZLIB	input-1.kconfig	/^config JFFS2_ZLIB$/;"	c	roles:def
+CONFIG_JFFS2_ZLIB	input-1.kconfig	/^config JFFS2_ZLIB$/;"	c	roles:def
+JFFS2_LZO	input-1.kconfig	/^config JFFS2_LZO$/;"	c	roles:def
+CONFIG_JFFS2_LZO	input-1.kconfig	/^config JFFS2_LZO$/;"	c	roles:def
+JFFS2_RTIME	input-1.kconfig	/^config JFFS2_RTIME$/;"	c	roles:def
+CONFIG_JFFS2_RTIME	input-1.kconfig	/^config JFFS2_RTIME$/;"	c	roles:def
+JFFS2_RUBIN	input-1.kconfig	/^config JFFS2_RUBIN$/;"	c	roles:def
+CONFIG_JFFS2_RUBIN	input-1.kconfig	/^config JFFS2_RUBIN$/;"	c	roles:def
+choice29ffa23a0104	input-1.kconfig	/^choice$/;"	C	roles:def
+JFFS2_CMODE_NONE	input-1.kconfig	/^config JFFS2_CMODE_NONE$/;"	c	choice:choice29ffa23a0104	roles:def
+CONFIG_JFFS2_CMODE_NONE	input-1.kconfig	/^config JFFS2_CMODE_NONE$/;"	c	choice:choice29ffa23a0104	roles:def
+JFFS2_CMODE_PRIORITY	input-1.kconfig	/^config JFFS2_CMODE_PRIORITY$/;"	c	choice:choice29ffa23a0104	roles:def
+CONFIG_JFFS2_CMODE_PRIORITY	input-1.kconfig	/^config JFFS2_CMODE_PRIORITY$/;"	c	choice:choice29ffa23a0104	roles:def
+JFFS2_CMODE_SIZE	input-1.kconfig	/^config JFFS2_CMODE_SIZE$/;"	c	choice:choice29ffa23a0104	roles:def
+CONFIG_JFFS2_CMODE_SIZE	input-1.kconfig	/^config JFFS2_CMODE_SIZE$/;"	c	choice:choice29ffa23a0104	roles:def
+JFFS2_CMODE_FAVOURLZO	input-1.kconfig	/^config JFFS2_CMODE_FAVOURLZO$/;"	c	choice:choice29ffa23a0104	roles:def
+CONFIG_JFFS2_CMODE_FAVOURLZO	input-1.kconfig	/^config JFFS2_CMODE_FAVOURLZO$/;"	c	choice:choice29ffa23a0104	roles:def
+HAVE_ARCH_KGDB	input-2.kconfig	/^config HAVE_ARCH_KGDB$/;"	c	roles:def
+CONFIG_HAVE_ARCH_KGDB	input-2.kconfig	/^config HAVE_ARCH_KGDB$/;"	c	roles:def
+KGDB	input-2.kconfig	/^menuconfig KGDB$/;"	c	roles:def
+CONFIG_KGDB	input-2.kconfig	/^menuconfig KGDB$/;"	c	roles:def
+KGDB_SERIAL_CONSOLE	input-2.kconfig	/^config KGDB_SERIAL_CONSOLE$/;"	c	roles:def
+CONFIG_KGDB_SERIAL_CONSOLE	input-2.kconfig	/^config KGDB_SERIAL_CONSOLE$/;"	c	roles:def
+KGDB_TESTS	input-2.kconfig	/^config KGDB_TESTS$/;"	c	roles:def
+CONFIG_KGDB_TESTS	input-2.kconfig	/^config KGDB_TESTS$/;"	c	roles:def
+KGDB_TESTS_ON_BOOT	input-2.kconfig	/^config KGDB_TESTS_ON_BOOT$/;"	c	roles:def
+CONFIG_KGDB_TESTS_ON_BOOT	input-2.kconfig	/^config KGDB_TESTS_ON_BOOT$/;"	c	roles:def
+KGDB_TESTS_BOOT_STRING	input-2.kconfig	/^config KGDB_TESTS_BOOT_STRING$/;"	c	roles:def
+CONFIG_KGDB_TESTS_BOOT_STRING	input-2.kconfig	/^config KGDB_TESTS_BOOT_STRING$/;"	c	roles:def
+KGDB_LOW_LEVEL_TRAP	input-2.kconfig	/^config KGDB_LOW_LEVEL_TRAP$/;"	c	roles:def
+CONFIG_KGDB_LOW_LEVEL_TRAP	input-2.kconfig	/^config KGDB_LOW_LEVEL_TRAP$/;"	c	roles:def
+KGDB_KDB	input-2.kconfig	/^config KGDB_KDB$/;"	c	roles:def
+CONFIG_KGDB_KDB	input-2.kconfig	/^config KGDB_KDB$/;"	c	roles:def
+KDB_DEFAULT_ENABLE	input-2.kconfig	/^config KDB_DEFAULT_ENABLE$/;"	c	roles:def
+CONFIG_KDB_DEFAULT_ENABLE	input-2.kconfig	/^config KDB_DEFAULT_ENABLE$/;"	c	roles:def
+KDB_KEYBOARD	input-2.kconfig	/^config KDB_KEYBOARD$/;"	c	roles:def
+CONFIG_KDB_KEYBOARD	input-2.kconfig	/^config KDB_KEYBOARD$/;"	c	roles:def
+KDB_CONTINUE_CATASTROPHIC	input-2.kconfig	/^config KDB_CONTINUE_CATASTROPHIC$/;"	c	roles:def
+CONFIG_KDB_CONTINUE_CATASTROPHIC	input-2.kconfig	/^config KDB_CONTINUE_CATASTROPHIC$/;"	c	roles:def
+Networking options	input-3.kconfig	/^menu "Networking options"$/;"	m	roles:def
+net/packet/Kconfig	input-3.kconfig	/^source "net\/packet\/Kconfig"$/;"	k	menu:Networking options	roles:source
+net/unix/Kconfig	input-3.kconfig	/^source "net\/unix\/Kconfig"$/;"	k	menu:Networking options	roles:source
+net/tls/Kconfig	input-3.kconfig	/^source "net\/tls\/Kconfig"$/;"	k	menu:Networking options	roles:source
+net/xfrm/Kconfig	input-3.kconfig	/^source "net\/xfrm\/Kconfig"$/;"	k	menu:Networking options	roles:source
+net/iucv/Kconfig	input-3.kconfig	/^source "net\/iucv\/Kconfig"$/;"	k	menu:Networking options	roles:source
+net/smc/Kconfig	input-3.kconfig	/^source "net\/smc\/Kconfig"$/;"	k	menu:Networking options	roles:source
+net/xdp/Kconfig	input-3.kconfig	/^source "net\/xdp\/Kconfig"$/;"	k	menu:Networking options	roles:source
+INET	input-3.kconfig	/^config INET$/;"	c	menu:Networking options	roles:def
+CONFIG_INET	input-3.kconfig	/^config INET$/;"	c	menu:Networking options	roles:def
+net/ipv4/Kconfig	input-3.kconfig	/^source "net\/ipv4\/Kconfig"$/;"	k	menu:Networking options	roles:source
+net/ipv6/Kconfig	input-3.kconfig	/^source "net\/ipv6\/Kconfig"$/;"	k	menu:Networking options	roles:source
+net/netlabel/Kconfig	input-3.kconfig	/^source "net\/netlabel\/Kconfig"$/;"	k	menu:Networking options	roles:source
+net/mptcp/Kconfig	input-3.kconfig	/^source "net\/mptcp\/Kconfig"$/;"	k	menu:Networking options	roles:source
+NETWORK_SECMARK	input-3.kconfig	/^config NETWORK_SECMARK$/;"	c	menu:Networking options	roles:def
+CONFIG_NETWORK_SECMARK	input-3.kconfig	/^config NETWORK_SECMARK$/;"	c	menu:Networking options	roles:def
+NET_PTP_CLASSIFY	input-3.kconfig	/^config NET_PTP_CLASSIFY$/;"	c	menu:Networking options	roles:def
+CONFIG_NET_PTP_CLASSIFY	input-3.kconfig	/^config NET_PTP_CLASSIFY$/;"	c	menu:Networking options	roles:def
+NETWORK_PHY_TIMESTAMPING	input-3.kconfig	/^config NETWORK_PHY_TIMESTAMPING$/;"	c	menu:Networking options	roles:def
+CONFIG_NETWORK_PHY_TIMESTAMPING	input-3.kconfig	/^config NETWORK_PHY_TIMESTAMPING$/;"	c	menu:Networking options	roles:def
+NETFILTER	input-3.kconfig	/^menuconfig NETFILTER$/;"	c	menu:Networking options	roles:def
+CONFIG_NETFILTER	input-3.kconfig	/^menuconfig NETFILTER$/;"	c	menu:Networking options	roles:def
+NETFILTER_ADVANCED	input-3.kconfig	/^config NETFILTER_ADVANCED$/;"	c	menu:Networking options	roles:def
+CONFIG_NETFILTER_ADVANCED	input-3.kconfig	/^config NETFILTER_ADVANCED$/;"	c	menu:Networking options	roles:def
+BRIDGE_NETFILTER	input-3.kconfig	/^config BRIDGE_NETFILTER$/;"	c	menu:Networking options	roles:def
+CONFIG_BRIDGE_NETFILTER	input-3.kconfig	/^config BRIDGE_NETFILTER$/;"	c	menu:Networking options	roles:def
+net/netfilter/Kconfig	input-3.kconfig	/^source "net\/netfilter\/Kconfig"$/;"	k	menu:Networking options	roles:source
+net/ipv4/netfilter/Kconfig	input-3.kconfig	/^source "net\/ipv4\/netfilter\/Kconfig"$/;"	k	menu:Networking options	roles:source
+net/ipv6/netfilter/Kconfig	input-3.kconfig	/^source "net\/ipv6\/netfilter\/Kconfig"$/;"	k	menu:Networking options	roles:source
+net/decnet/netfilter/Kconfig	input-3.kconfig	/^source "net\/decnet\/netfilter\/Kconfig"$/;"	k	menu:Networking options	roles:source
+net/bridge/netfilter/Kconfig	input-3.kconfig	/^source "net\/bridge\/netfilter\/Kconfig"$/;"	k	menu:Networking options	roles:source
+net/bpfilter/Kconfig	input-3.kconfig	/^source "net\/bpfilter\/Kconfig"$/;"	k	menu:Networking options	roles:source
+net/dccp/Kconfig	input-3.kconfig	/^source "net\/dccp\/Kconfig"$/;"	k	menu:Networking options	roles:source
+net/sctp/Kconfig	input-3.kconfig	/^source "net\/sctp\/Kconfig"$/;"	k	menu:Networking options	roles:source
+net/rds/Kconfig	input-3.kconfig	/^source "net\/rds\/Kconfig"$/;"	k	menu:Networking options	roles:source
+net/tipc/Kconfig	input-3.kconfig	/^source "net\/tipc\/Kconfig"$/;"	k	menu:Networking options	roles:source
+net/atm/Kconfig	input-3.kconfig	/^source "net\/atm\/Kconfig"$/;"	k	menu:Networking options	roles:source
+net/l2tp/Kconfig	input-3.kconfig	/^source "net\/l2tp\/Kconfig"$/;"	k	menu:Networking options	roles:source
+net/802/Kconfig	input-3.kconfig	/^source "net\/802\/Kconfig"$/;"	k	menu:Networking options	roles:source
+net/bridge/Kconfig	input-3.kconfig	/^source "net\/bridge\/Kconfig"$/;"	k	menu:Networking options	roles:source
+net/dsa/Kconfig	input-3.kconfig	/^source "net\/dsa\/Kconfig"$/;"	k	menu:Networking options	roles:source
+net/8021q/Kconfig	input-3.kconfig	/^source "net\/8021q\/Kconfig"$/;"	k	menu:Networking options	roles:source
+net/decnet/Kconfig	input-3.kconfig	/^source "net\/decnet\/Kconfig"$/;"	k	menu:Networking options	roles:source
+net/llc/Kconfig	input-3.kconfig	/^source "net\/llc\/Kconfig"$/;"	k	menu:Networking options	roles:source
+drivers/net/appletalk/Kconfig	input-3.kconfig	/^source "drivers\/net\/appletalk\/Kconfig"$/;"	k	menu:Networking options	roles:source
+net/x25/Kconfig	input-3.kconfig	/^source "net\/x25\/Kconfig"$/;"	k	menu:Networking options	roles:source
+net/lapb/Kconfig	input-3.kconfig	/^source "net\/lapb\/Kconfig"$/;"	k	menu:Networking options	roles:source
+net/phonet/Kconfig	input-3.kconfig	/^source "net\/phonet\/Kconfig"$/;"	k	menu:Networking options	roles:source
+net/6lowpan/Kconfig	input-3.kconfig	/^source "net\/6lowpan\/Kconfig"$/;"	k	menu:Networking options	roles:source
+net/ieee802154/Kconfig	input-3.kconfig	/^source "net\/ieee802154\/Kconfig"$/;"	k	menu:Networking options	roles:source
+net/mac802154/Kconfig	input-3.kconfig	/^source "net\/mac802154\/Kconfig"$/;"	k	menu:Networking options	roles:source
+net/sched/Kconfig	input-3.kconfig	/^source "net\/sched\/Kconfig"$/;"	k	menu:Networking options	roles:source
+net/dcb/Kconfig	input-3.kconfig	/^source "net\/dcb\/Kconfig"$/;"	k	menu:Networking options	roles:source
+net/dns_resolver/Kconfig	input-3.kconfig	/^source "net\/dns_resolver\/Kconfig"$/;"	k	menu:Networking options	roles:source
+net/batman-adv/Kconfig	input-3.kconfig	/^source "net\/batman-adv\/Kconfig"$/;"	k	menu:Networking options	roles:source
+net/openvswitch/Kconfig	input-3.kconfig	/^source "net\/openvswitch\/Kconfig"$/;"	k	menu:Networking options	roles:source
+net/vmw_vsock/Kconfig	input-3.kconfig	/^source "net\/vmw_vsock\/Kconfig"$/;"	k	menu:Networking options	roles:source
+net/netlink/Kconfig	input-3.kconfig	/^source "net\/netlink\/Kconfig"$/;"	k	menu:Networking options	roles:source
+net/mpls/Kconfig	input-3.kconfig	/^source "net\/mpls\/Kconfig"$/;"	k	menu:Networking options	roles:source
+net/nsh/Kconfig	input-3.kconfig	/^source "net\/nsh\/Kconfig"$/;"	k	menu:Networking options	roles:source
+net/hsr/Kconfig	input-3.kconfig	/^source "net\/hsr\/Kconfig"$/;"	k	menu:Networking options	roles:source
+net/switchdev/Kconfig	input-3.kconfig	/^source "net\/switchdev\/Kconfig"$/;"	k	menu:Networking options	roles:source
+net/l3mdev/Kconfig	input-3.kconfig	/^source "net\/l3mdev\/Kconfig"$/;"	k	menu:Networking options	roles:source
+net/qrtr/Kconfig	input-3.kconfig	/^source "net\/qrtr\/Kconfig"$/;"	k	menu:Networking options	roles:source
+net/ncsi/Kconfig	input-3.kconfig	/^source "net\/ncsi\/Kconfig"$/;"	k	menu:Networking options	roles:source
+RPS	input-3.kconfig	/^config RPS$/;"	c	menu:Networking options	roles:def
+CONFIG_RPS	input-3.kconfig	/^config RPS$/;"	c	menu:Networking options	roles:def
+RFS_ACCEL	input-3.kconfig	/^config RFS_ACCEL$/;"	c	menu:Networking options	roles:def
+CONFIG_RFS_ACCEL	input-3.kconfig	/^config RFS_ACCEL$/;"	c	menu:Networking options	roles:def
+XPS	input-3.kconfig	/^config XPS$/;"	c	menu:Networking options	roles:def
+CONFIG_XPS	input-3.kconfig	/^config XPS$/;"	c	menu:Networking options	roles:def
+HWBM	input-3.kconfig	/^config HWBM$/;"	c	menu:Networking options	roles:def
+CONFIG_HWBM	input-3.kconfig	/^config HWBM$/;"	c	menu:Networking options	roles:def
+CGROUP_NET_PRIO	input-3.kconfig	/^config CGROUP_NET_PRIO$/;"	c	menu:Networking options	roles:def
+CONFIG_CGROUP_NET_PRIO	input-3.kconfig	/^config CGROUP_NET_PRIO$/;"	c	menu:Networking options	roles:def
+CGROUP_NET_CLASSID	input-3.kconfig	/^config CGROUP_NET_CLASSID$/;"	c	menu:Networking options	roles:def
+CONFIG_CGROUP_NET_CLASSID	input-3.kconfig	/^config CGROUP_NET_CLASSID$/;"	c	menu:Networking options	roles:def
+NET_RX_BUSY_POLL	input-3.kconfig	/^config NET_RX_BUSY_POLL$/;"	c	menu:Networking options	roles:def
+CONFIG_NET_RX_BUSY_POLL	input-3.kconfig	/^config NET_RX_BUSY_POLL$/;"	c	menu:Networking options	roles:def
+BQL	input-3.kconfig	/^config BQL$/;"	c	menu:Networking options	roles:def
+CONFIG_BQL	input-3.kconfig	/^config BQL$/;"	c	menu:Networking options	roles:def
+BPF_JIT	input-3.kconfig	/^config BPF_JIT$/;"	c	menu:Networking options	roles:def
+CONFIG_BPF_JIT	input-3.kconfig	/^config BPF_JIT$/;"	c	menu:Networking options	roles:def
+BPF_STREAM_PARSER	input-3.kconfig	/^config BPF_STREAM_PARSER$/;"	c	menu:Networking options	roles:def
+CONFIG_BPF_STREAM_PARSER	input-3.kconfig	/^config BPF_STREAM_PARSER$/;"	c	menu:Networking options	roles:def
+NET_FLOW_LIMIT	input-3.kconfig	/^config NET_FLOW_LIMIT$/;"	c	menu:Networking options	roles:def
+CONFIG_NET_FLOW_LIMIT	input-3.kconfig	/^config NET_FLOW_LIMIT$/;"	c	menu:Networking options	roles:def
+Network testing	input-3.kconfig	/^menu "Network testing"$/;"	m	menu:Networking options	roles:def
+NET_PKTGEN	input-3.kconfig	/^config NET_PKTGEN$/;"	c	menu:Networking options""Network testing	roles:def
+CONFIG_NET_PKTGEN	input-3.kconfig	/^config NET_PKTGEN$/;"	c	menu:Networking options""Network testing	roles:def
+NET_DROP_MONITOR	input-3.kconfig	/^config NET_DROP_MONITOR$/;"	c	menu:Networking options""Network testing	roles:def
+CONFIG_NET_DROP_MONITOR	input-3.kconfig	/^config NET_DROP_MONITOR$/;"	c	menu:Networking options""Network testing	roles:def

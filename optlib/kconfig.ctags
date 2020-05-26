@@ -1,0 +1,65 @@
+#
+#  Copyright (c) 2020, Maxime Chretien <maxime.chretien@bootlin.com>
+#
+#  This source code is released for free distribution under the terms of the
+#  GNU General Public License version 2 or (at your option) any later version.
+#
+#  This module contains functions for generating tags for the Kconfig language
+#
+#  Reference
+#     https://www.kernel.org/doc/html/latest/kbuild/kconfig-language.html
+#
+#  
+#  This parser was originally written in C as proplosed in #2553 by Maxime.
+#  Masatake converted it to an optlib file.
+#
+--langdef=Kconfig
+--map-Kconfig=+(Kconfig*)
+
+--kinddef-Kconfig=c,config,configs
+--kinddef-Kconfig=m,menu,menus
+--kinddef-Kconfig=M,mainMenu,the main menu
+--kinddef-Kconfig=k,kconfig,kconfig file
+--kinddef-Kconfig=C,choice,choices
+
+--_roledef-Kconfig=k.source,kconfig file loaded with source directive
+
+# Menus can be nested. Combine the parent menu and its child with "".
+--_scopesep-Kconfig=*/*:""
+
+#
+# The next extra is useful for jumpping from
+#
+#    #ifdef CONFIG_FOO
+#    ...
+#
+# in C code.
+#
+# Masatake proposed this extra to linux-kbuild ML and it was
+# merged as
+# ----------------------------------------------------------------------
+# commit e838db685fcfd2e9a0548ffc5cb9447e6c3c11be
+# Author: Masatake YAMATO <jet@gyve.org>
+# Date:   Thu Jun 22 12:21:20 2006 +0900
+#
+#    kbuild: adding symbols in Kconfig and defconfig to TAGS
+#    
+--_extradef-Kconfig=configPrefixed,prepend CONFIG_ to config names
+--extras-Kconfig=+{configPrefixed}
+
+# skip the comment lines.
+--regex-Kconfig=/^[ \t]*#.*$//{placeholder}
+
+--regex-Kconfig=/^[ \t]*(menu)?config[ \t]+([A-Za-z0-9_]+)[ \t]*$/\2/c/{scope=ref}
+--regex-Kconfig=/^[ \t]*(menu)?config[ \t]+([A-Za-z0-9_]+)[ \t]*$/CONFIG_\2/c/{scope=ref}{_extra=configPrefixed}{exclusive}
+
+--regex-Kconfig=/^[ \t]*menu[ \t]+"([^"]+)"[ \t]*/\1/m/{scope=push}{exclusive}
+--regex-Kconfig=/^[ \t]*endmenu[ \t]*//{scope=pop}{placeholder}{exclusive}
+
+--regex-Kconfig=/^[ \t]*source[ \t]+"([^"]+)"[ \t]*/\1/k/{_role=source}{exclusive}{scope=ref}
+
+--regex-Kconfig=/^[ \t]*choice[ \t]+([A-Za-z0-9_]+)[ \t]*/\1/C/{scope=push}{exclusive}
+--regex-Kconfig=/^[ \t]*choice[ \t]*$//C/{_anonymous=choice}{scope=push}{exclusive}
+--regex-Kconfig=/^[ \t]*endchoice[ \t]*//{scope=pop}{placeholder}{exclusive}
+
+--regex-Kconfig=/^[ \t]*mainmenu[ \t]+"([^"]+)"[ \t]*/\1/M/{exclusive}
