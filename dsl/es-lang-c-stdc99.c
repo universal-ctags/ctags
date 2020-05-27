@@ -762,8 +762,6 @@ es_symbol_print(const EsObject* object, MIO* fp)
     return;
 
   len = strlen(string);
-  if (len == 0)
-    needs_bar = 1;
 
   c = string[0];
   cc = get_char_class(c);
