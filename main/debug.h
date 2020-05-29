@@ -51,6 +51,10 @@
 # endif
 #endif
 
+#ifdef DEBUG
+/* This makes valgrind report an error earlier. */
+#define DISABLE_OBJPOOL
+#endif
 /*
 *   Data declarations
 */
