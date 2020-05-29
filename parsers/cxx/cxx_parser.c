@@ -559,24 +559,26 @@ static bool cxxParserParseEnumStructClassOrUnionFullDeclarationTrailer(
 	if(uKeywordState & CXXParserKeywordStateSeenTypedef)
 		cxxParserExtractTypedef(g_cxx.pTokenChain,true);
 	else
+	{
 		cxxParserExtractVariableDeclarations(g_cxx.pTokenChain,0);
 
-	/*
-	  Skip initializer in
+		/*
+		  Skip initializer in
 
-	  struct foo { ... } x = { ... };
+		  struct foo { ... } x = { ... };
 
-	  if we are at --------^.
-	  we go to ---------------------^.
+		  if we are at --------^.
+		  we go to ---------------------^.
 
-	  The above example is known case.
-	  To be tolerant and handle unrecognized case, we
-	  put the code for skipping here. */
-	if(cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeAssignment) &&
-	   (!cxxParserParseUpToOneOf(CXXTokenTypeEOF | CXXTokenTypeSemicolon, true)))
-	{
-		CXX_DEBUG_LEAVE_TEXT("Failed to parse up to EOF/semicolon");
-		return false;
+		  The above example is known case.
+		  To be tolerant and handle unrecognized case, we
+		  put the code for skipping here. */
+		if(cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeAssignment) &&
+		   (!cxxParserParseUpToOneOf(CXXTokenTypeEOF | CXXTokenTypeSemicolon, true)))
+		{
+			CXX_DEBUG_LEAVE_TEXT("Failed to parse up to EOF/semicolon");
+			return false;
+		}
 	}
 
 
