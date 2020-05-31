@@ -852,10 +852,10 @@ EsObject* dsl_entry_end (const tagEntry *entry)
 	if (end_str)
 	{
 		o = es_read_from_string (end_str, NULL);
-		if (es_error_p (o))
-			return es_false;
-		else
+		if (es_integer_p (o))
 			return es_object_autounref (o);
+		else
+			return es_false;
 	}
 	else
 		return es_false;
