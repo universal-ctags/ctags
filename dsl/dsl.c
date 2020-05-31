@@ -80,19 +80,20 @@ static EsObject* value_nil (EsObject *args, DSLEnv *env);
 
 DECLARE_VALUE_FN(name);
 DECLARE_VALUE_FN(input);
-DECLARE_VALUE_FN(access);
-DECLARE_VALUE_FN(file);
-DECLARE_VALUE_FN(language);
-DECLARE_VALUE_FN(implementation);
-DECLARE_VALUE_FN(signature);
-DECLARE_VALUE_FN(line);
-DECLARE_VALUE_FN(kind);
-DECLARE_VALUE_FN(roles);
 DECLARE_VALUE_FN(pattern);
+DECLARE_VALUE_FN(line);
+
+DECLARE_VALUE_FN(access);
+DECLARE_VALUE_FN(end);
+DECLARE_VALUE_FN(file);
 DECLARE_VALUE_FN(inherits);
+DECLARE_VALUE_FN(implementation);
+DECLARE_VALUE_FN(kind);
+DECLARE_VALUE_FN(language);
 DECLARE_VALUE_FN(scope_kind);
 DECLARE_VALUE_FN(scope_name);
-DECLARE_VALUE_FN(end);
+DECLARE_VALUE_FN(signature);
+DECLARE_VALUE_FN(roles);
 
 
 /*
@@ -137,6 +138,10 @@ static DSLProcBind pbinds [] = {
 	  .helpstr = "(downcase elt<string>|<list>) -> <string>|<list>" },
 	{ "upcase", builtin_upcase, NULL, DSL_PATTR_CHECK_ARITY, 1,
 	  .helpstr = "(upcate elt<string>|<list>) -> <string>|<list>" },
+	{ "+",               builtin_add,          NULL, DSL_PATTR_CHECK_ARITY, 2,
+	  .helpstr = "(+ <integer> <integer>) -> <integer>", },
+	{ "-",               builtin_sub,          NULL, DSL_PATTR_CHECK_ARITY, 2,
+	  .helpstr = "(- <integer> <integer>) -> <integer>", },
 	{ "print",   bulitin_debug_print, NULL, DSL_PATTR_CHECK_ARITY, 1,
 	  .helpstr = "(print OBJ) -> OBJ" },
 	{ "true",    value_true, NULL, 0, 0UL,
@@ -151,36 +156,32 @@ static DSLProcBind pbinds [] = {
 	  .helpstr = "-> <string>"},
 	{ "$input",          value_input,          NULL, DSL_PATTR_MEMORABLE, 0UL,
 	  .helpstr = "-> <string>; input file name" },
-	{ "$access",         value_access,         NULL, DSL_PATTR_MEMORABLE, 0UL,
-	  .helpstr = "-> #f|<string>" },
-	{ "$file",           value_file,           NULL, DSL_PATTR_MEMORABLE, 0UL,
-	  .helpstr = "-> <boolean>; whether the scope is limited in the file or not." },
-	{ "$language",       value_language,       NULL, DSL_PATTR_MEMORABLE, 0UL,
-	  .helpstr = "-> #f|<string>" },
-	{ "$implementation", value_implementation, NULL, DSL_PATTR_MEMORABLE, 0UL,
-	  .helpstr = "-> #f|<string>" },
-	{ "$signature",      value_signature,      NULL, DSL_PATTR_MEMORABLE, 0UL,
-	  .helpstr = "-> #f|<string>" },
-	{ "$line",           value_line,           NULL, DSL_PATTR_MEMORABLE, 0UL,
-	  .helpstr = "-> #f|<integer>" },
-	{ "$kind",           value_kind,           NULL, DSL_PATTR_MEMORABLE, 0UL,
-	  .helpstr = "-> #f|<string>"},
-	{ "$roles",          value_roles,          NULL, DSL_PATTR_MEMORABLE, 0UL,
-	  .helpstr = "-> <list>" },
 	{ "$pattern",        value_pattern,        NULL, DSL_PATTR_MEMORABLE, 0UL,
 	  .helpstr = "-> #f|<string>"},
+	{ "$line",           value_line,           NULL, DSL_PATTR_MEMORABLE, 0UL,
+	  .helpstr = "-> #f|<integer>" },
+	{ "$access",         value_access,         NULL, DSL_PATTR_MEMORABLE, 0UL,
+	  .helpstr = "-> #f|<string>" },
+	{ "$end",            value_end,            NULL, DSL_PATTR_MEMORABLE, 0UL,
+	  .helpstr = "-> #f|<integer>"},
+	{ "$file",           value_file,           NULL, DSL_PATTR_MEMORABLE, 0UL,
+	  .helpstr = "-> <boolean>; whether the scope is limited in the file or not." },
 	{ "$inherits",       value_inherits,       NULL, DSL_PATTR_MEMORABLE, 0UL,
 	  .helpstr = "-> <list>" },
+	{ "$implementation", value_implementation, NULL, DSL_PATTR_MEMORABLE, 0UL,
+	  .helpstr = "-> #f|<string>" },
+	{ "$kind",           value_kind,           NULL, DSL_PATTR_MEMORABLE, 0UL,
+	  .helpstr = "-> #f|<string>"},
+	{ "$language",       value_language,       NULL, DSL_PATTR_MEMORABLE, 0UL,
+	  .helpstr = "-> #f|<string>" },
 	{ "$scope-kind",     value_scope_kind,     NULL, DSL_PATTR_MEMORABLE, 0UL,
 	  .helpstr = "-> #f|<string>"},
 	{ "$scope-name",     value_scope_name,     NULL, DSL_PATTR_MEMORABLE, 0UL,
 	  .helpstr = "-> #f|<string>"},
-	{ "$end",            value_end,            NULL, DSL_PATTR_MEMORABLE, 0UL,
-	  .helpstr = "-> #f|<integer>"},
-	{ "+",               builtin_add,          NULL, DSL_PATTR_CHECK_ARITY, 2,
-	  .helpstr = "(+ <integer> <integer>) -> <integer>", },
-	{ "-",               builtin_sub,          NULL, DSL_PATTR_CHECK_ARITY, 2,
-	  .helpstr = "(- <integer> <integer>) -> <integer>", },
+	{ "$signature",      value_signature,      NULL, DSL_PATTR_MEMORABLE, 0UL,
+	  .helpstr = "-> #f|<string>" },
+	{ "$roles",          value_roles,          NULL, DSL_PATTR_MEMORABLE, 0UL,
+	  .helpstr = "-> <list>" },
 };
 
 
@@ -726,19 +727,21 @@ static EsObject* reverse (EsObject *object)
  */
 DEFINE_VALUE_FN(name)
 DEFINE_VALUE_FN(input)
-DEFINE_VALUE_FN(access)
-DEFINE_VALUE_FN(file)
-DEFINE_VALUE_FN(language)
-DEFINE_VALUE_FN(implementation)
-DEFINE_VALUE_FN(signature)
-DEFINE_VALUE_FN(line)
-DEFINE_VALUE_FN(kind)
-DEFINE_VALUE_FN(roles)
 DEFINE_VALUE_FN(pattern)
+DEFINE_VALUE_FN(line)
+
+DEFINE_VALUE_FN(access)
+DEFINE_VALUE_FN(end)
+DEFINE_VALUE_FN(file)
 DEFINE_VALUE_FN(inherits)
+DEFINE_VALUE_FN(implementation)
+DEFINE_VALUE_FN(kind)
+DEFINE_VALUE_FN(language)
 DEFINE_VALUE_FN(scope_kind)
 DEFINE_VALUE_FN(scope_name)
-DEFINE_VALUE_FN(end)
+DEFINE_VALUE_FN(signature)
+DEFINE_VALUE_FN(roles)
+
 
 static const char*entry_xget (const tagEntry *entry, const char* name)
 {
