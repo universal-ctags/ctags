@@ -34,4 +34,6 @@ echo ';; (member "superClass" $roles)' &&
 ${V} ${READTAGS}  -e -n -t roles.tags -Q '(member "superClass" $roles)' -l &&
 echo ';; (substr? (or ($ "roles") "") "super")' &&
 ${V} ${READTAGS}  -e -t roles.tags -Q '(substr? (or ($ "roles") "") "super")' -l &&
+echo ';; (and (eq? $scope-kind "function") (eq? $kind "local"))' &&
+${V} ${READTAGS}  -e -t c.tags -Q '(and (eq? $scope-kind "function") (eq? $kind "local"))' -l &&
 :

@@ -57,3 +57,5 @@ Foo	base.py	/^class Baz (Foo): $/;"	kind:class	line:21	language:Python	roles:sup
 ;; (substr? (or ($ "roles") "") "super")
 Foo	base.py	/^class Bar (Foo):$/;"	kind:class	language:Python	roles:superClass
 Foo	base.py	/^class Baz (Foo): $/;"	kind:class	language:Python	roles:superClass
+;; (and (eq? $scope-kind "function") (eq? $kind "local"))
+r	base.c	/^	int r = argc + 1;$/;"	kind:local	file:	language:C	scope:function:main	typeref:typename:int	roles:def	extras:fileScope	end:7

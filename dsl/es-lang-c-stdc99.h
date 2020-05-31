@@ -108,6 +108,7 @@ int          es_boolean_get (const EsObject*   object);
  * String
  */
 EsObject*    es_string_new  (const char*        value);
+EsObject*    es_string_newL (const char*        value, size_t lenght);
 int          es_string_p    (const EsObject*   object);
 const char*  es_string_get  (const EsObject*   object);
 

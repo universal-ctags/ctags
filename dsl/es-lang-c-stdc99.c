@@ -883,6 +883,28 @@ es_string_new  (const char*        value)
 	return r;
 }
 
+EsObject*
+es_string_newL (const char* value, size_t len)
+{
+	EsObject* r;
+
+	r = es_object_new(ES_TYPE_STRING);
+	if (es_error_p (r))
+		return r;
+
+	void * v = malloc (len + 1);
+	if (v == NULL)
+	{
+		((EsString*)r)->value = NULL;
+		es_object_free (r);
+		return ES_ERROR_MEMORY;
+	}
+	memcpy (v, value, len);
+	((char *)v)[len] = '\0';
+	((EsString*)r)->value = v;
+	return r;
+}
+
 int
 es_string_p    (const EsObject*   object)
 {

@@ -926,9 +926,8 @@ EsObject* dsl_entry_scope_kind (const tagEntry *entry)
 	if (kind == NULL)
 		return es_false;
 
-	*(char *)kind = '\0';
-	r = es_object_autounref (es_string_new (scope));
-	*(char *)kind = ':';
+	r = es_object_autounref (es_string_newL (scope,
+											 kind - scope));
 	return r;
 }
 
