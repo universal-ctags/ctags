@@ -53,15 +53,19 @@ DECLARE_ALT_VALUE_FN(line);
 
 DECLARE_ALT_VALUE_FN(access);
 DECLARE_ALT_VALUE_FN(end);
+DECLARE_ALT_VALUE_FN(extras);
 DECLARE_ALT_VALUE_FN(file);
 DECLARE_ALT_VALUE_FN(inherits);
 DECLARE_ALT_VALUE_FN(implementation);
 DECLARE_ALT_VALUE_FN(kind);
 DECLARE_ALT_VALUE_FN(language);
+DECLARE_ALT_VALUE_FN(scope);
 DECLARE_ALT_VALUE_FN(scope_kind);
 DECLARE_ALT_VALUE_FN(scope_name);
 DECLARE_ALT_VALUE_FN(signature);
+DECLARE_ALT_VALUE_FN(typeref);
 DECLARE_ALT_VALUE_FN(roles);
+DECLARE_ALT_VALUE_FN(xpath);
 
 
 static EsObject* sorter_proc_cmp (EsObject* args, DSLEnv *env);
@@ -97,6 +101,8 @@ static DSLProcBind pbinds [] = {
 	  .helpstr = "-> #f|<string>" },
 	{ "&end",            alt_value_end,            NULL, DSL_PATTR_MEMORABLE, 0UL,
 	  .helpstr = "-> #f|<integer>"},
+	{ "&extras",         alt_value_extras,         NULL, DSL_PATTR_MEMORABLE, 0UL,
+	  .helpstr = "-> #f|<string>"},
 	{ "&file",           alt_value_file,           NULL, DSL_PATTR_MEMORABLE, 0UL,
 	  .helpstr = "-> <boolean>; whether the scope is limited in the file or not." },
 	{ "&inherits",       alt_value_inherits,       NULL, DSL_PATTR_MEMORABLE, 0UL,
@@ -107,14 +113,20 @@ static DSLProcBind pbinds [] = {
 	  .helpstr = "-> #f|<string>"},
 	{ "&language",       alt_value_language,       NULL, DSL_PATTR_MEMORABLE, 0UL,
 	  .helpstr = "-> #f|<string>" },
+	{ "&scope",          alt_value_scope,          NULL, DSL_PATTR_MEMORABLE, 0UL,
+	  .helpstr = "-> #f|<string>; $scope-kind:$scope-name"},
 	{ "&scope-kind",     alt_value_scope_kind,     NULL, DSL_PATTR_MEMORABLE, 0UL,
 	  .helpstr = "-> #f|<string>"},
 	{ "&scope-name",     alt_value_scope_name,     NULL, DSL_PATTR_MEMORABLE, 0UL,
 	  .helpstr = "-> #f|<string>"},
 	{ "&signature",      alt_value_signature,      NULL, DSL_PATTR_MEMORABLE, 0UL,
 	  .helpstr = "-> #f|<string>" },
+	{ "&typeref",        alt_value_typeref,        NULL, DSL_PATTR_MEMORABLE, 0UL,
+	  .helpstr = "-> #f|<string>"},
 	{ "&roles",          alt_value_roles,          NULL, DSL_PATTR_MEMORABLE, 0UL,
 	  .helpstr = "-> <list>" },
+	{ "&xpath",         alt_value_xpath,           NULL, DSL_PATTR_MEMORABLE, 0UL,
+	  .helpstr = "-> #f|<string>"},
 };
 
 /*
@@ -131,16 +143,19 @@ DEFINE_ALT_VALUE_FN(line);
 
 DEFINE_ALT_VALUE_FN(access);
 DEFINE_ALT_VALUE_FN(end);
+DEFINE_ALT_VALUE_FN(extras);
 DEFINE_ALT_VALUE_FN(file);
 DEFINE_ALT_VALUE_FN(inherits);
 DEFINE_ALT_VALUE_FN(implementation);
 DEFINE_ALT_VALUE_FN(kind);
 DEFINE_ALT_VALUE_FN(language);
+DEFINE_ALT_VALUE_FN(scope);
 DEFINE_ALT_VALUE_FN(scope_kind);
 DEFINE_ALT_VALUE_FN(scope_name);
 DEFINE_ALT_VALUE_FN(signature);
+DEFINE_ALT_VALUE_FN(typeref);
 DEFINE_ALT_VALUE_FN(roles);
-
+DEFINE_ALT_VALUE_FN(xpath);
 
 /*
  * Special form(s)

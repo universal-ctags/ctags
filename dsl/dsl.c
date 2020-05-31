@@ -85,15 +85,19 @@ DECLARE_VALUE_FN(line);
 
 DECLARE_VALUE_FN(access);
 DECLARE_VALUE_FN(end);
+DECLARE_VALUE_FN(extras);
 DECLARE_VALUE_FN(file);
 DECLARE_VALUE_FN(inherits);
 DECLARE_VALUE_FN(implementation);
 DECLARE_VALUE_FN(kind);
 DECLARE_VALUE_FN(language);
+DECLARE_VALUE_FN(scope);
 DECLARE_VALUE_FN(scope_kind);
 DECLARE_VALUE_FN(scope_name);
 DECLARE_VALUE_FN(signature);
+DECLARE_VALUE_FN(typeref);
 DECLARE_VALUE_FN(roles);
+DECLARE_VALUE_FN(xpath);
 
 
 /*
@@ -164,6 +168,8 @@ static DSLProcBind pbinds [] = {
 	  .helpstr = "-> #f|<string>" },
 	{ "$end",            value_end,            NULL, DSL_PATTR_MEMORABLE, 0UL,
 	  .helpstr = "-> #f|<integer>"},
+	{ "$extras",         value_extras,         NULL, DSL_PATTR_MEMORABLE, 0UL,
+	  .helpstr = "-> #f|<string>"},
 	{ "$file",           value_file,           NULL, DSL_PATTR_MEMORABLE, 0UL,
 	  .helpstr = "-> <boolean>; whether the scope is limited in the file or not." },
 	{ "$inherits",       value_inherits,       NULL, DSL_PATTR_MEMORABLE, 0UL,
@@ -174,14 +180,20 @@ static DSLProcBind pbinds [] = {
 	  .helpstr = "-> #f|<string>"},
 	{ "$language",       value_language,       NULL, DSL_PATTR_MEMORABLE, 0UL,
 	  .helpstr = "-> #f|<string>" },
+	{ "$scope",          value_scope,          NULL, DSL_PATTR_MEMORABLE, 0UL,
+	  .helpstr = "-> #f|<string>; $scope-kind:$scope-name"},
 	{ "$scope-kind",     value_scope_kind,     NULL, DSL_PATTR_MEMORABLE, 0UL,
 	  .helpstr = "-> #f|<string>"},
 	{ "$scope-name",     value_scope_name,     NULL, DSL_PATTR_MEMORABLE, 0UL,
 	  .helpstr = "-> #f|<string>"},
 	{ "$signature",      value_signature,      NULL, DSL_PATTR_MEMORABLE, 0UL,
 	  .helpstr = "-> #f|<string>" },
+	{ "$typeref",        value_typeref,        NULL, DSL_PATTR_MEMORABLE, 0UL,
+	  .helpstr = "-> #f|<string>"},
 	{ "$roles",          value_roles,          NULL, DSL_PATTR_MEMORABLE, 0UL,
 	  .helpstr = "-> <list>" },
+	{ "$xpath",         value_xpath,           NULL, DSL_PATTR_MEMORABLE, 0UL,
+	  .helpstr = "-> #f|<string>"},
 };
 
 
@@ -732,16 +744,19 @@ DEFINE_VALUE_FN(line)
 
 DEFINE_VALUE_FN(access)
 DEFINE_VALUE_FN(end)
+DEFINE_VALUE_FN(extras)
 DEFINE_VALUE_FN(file)
 DEFINE_VALUE_FN(inherits)
 DEFINE_VALUE_FN(implementation)
 DEFINE_VALUE_FN(kind)
 DEFINE_VALUE_FN(language)
+DEFINE_VALUE_FN(scope)
 DEFINE_VALUE_FN(scope_kind)
 DEFINE_VALUE_FN(scope_name)
 DEFINE_VALUE_FN(signature)
+DEFINE_VALUE_FN(typeref)
 DEFINE_VALUE_FN(roles)
-
+DEFINE_VALUE_FN(xpath)
 
 static const char*entry_xget (const tagEntry *entry, const char* name)
 {
@@ -868,6 +883,11 @@ EsObject* dsl_entry_line (const tagEntry *entry)
 		return es_object_autounref (es_integer_new (ln));
 }
 
+EsObject* dsl_entry_extras (const tagEntry *entry)
+{
+	return dsl_entry_xget_string (entry, "extras");
+}
+
 EsObject* dsl_entry_end (const tagEntry *entry)
 {
 	const char *end_str = entry_xget(entry, "end");
@@ -914,6 +934,21 @@ EsObject* dsl_entry_pattern (const tagEntry *entry)
 EsObject* dsl_entry_inherits (const tagEntry *entry)
 {
 	return entry_xget_csvlist (entry, "inherits");
+}
+
+EsObject* dsl_entry_scope (const tagEntry *entry)
+{
+	return dsl_entry_xget_string (entry, "scope");
+}
+
+EsObject* dsl_entry_typeref (const tagEntry *entry)
+{
+	return dsl_entry_xget_string (entry, "typeref");
+}
+
+EsObject* dsl_entry_xpath (const tagEntry *entry)
+{
+	return dsl_entry_xget_string (entry, "xpath");
 }
 
 EsObject* dsl_entry_scope_kind (const tagEntry *entry)
