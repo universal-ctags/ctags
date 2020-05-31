@@ -55,6 +55,7 @@ enum CXXTagCommonField
 {
 	CXXTagFieldProperties,
 	CXXTagFieldMacrodef,
+	CXXTagFieldSection,
 
 	CXXTagCommonFieldCount
 };

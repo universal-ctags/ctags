@@ -60,6 +60,16 @@ Changes about parser specific kinds, roles, fields, and extras
   + New role `foreigndecl` for `function` kind
   + New role `foreigndecl` for `struct` kind
 
+  + New filed `section`
+
+* C++
+
+  + New filed `section`
+
+* CUDA
+
+  + New field `section`
+
 * Fortran
 
   + New extra `linkName`.

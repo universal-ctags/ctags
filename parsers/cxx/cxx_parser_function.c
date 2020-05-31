@@ -14,6 +14,7 @@
 #include "cxx_token.h"
 #include "cxx_token_chain.h"
 #include "cxx_scope.h"
+#include "cxx_side_chain.h"
 
 #include "parse.h"
 #include "vstring.h"
@@ -284,6 +285,7 @@ int cxxParserMaybeParseKnRStyleFunctionDefinition(void)
 
 	if(tag)
 	{
+		cxxSideChainScan(pIdentifier->pSideChain);
 		if(pParenthesis->pChain->pTail)
 		{
 			// normalize signature
@@ -1543,6 +1545,7 @@ int cxxParserEmitFunctionTags(
 			0
 		);
 
+	cxxSideChainCollectInRange(pInfo->pIdentifierStart,pInfo->pIdentifierEnd,pIdentifier);
 	cxxTokenChainDestroyRange(pInfo->pIdentifierChain,pInfo->pIdentifierStart,pInfo->pIdentifierEnd);
 
 	CXX_DEBUG_ASSERT(
@@ -1653,6 +1656,7 @@ int cxxParserEmitFunctionTags(
 					CXXToken * pTokenBeforeParenthesis = pInfo->pParenthesis->pPrev;
 					cxxTokenChainTake(pInfo->pParenthesisContainerChain,pInfo->pParenthesis);
 
+					cxxSideChainCollectInRange(pInfo->pTypeStart,pInfo->pTypeEnd, pIdentifier);
 					pTypeName = cxxTagCheckAndSetTypeField(pInfo->pTypeStart,pInfo->pTypeEnd);
 
 					cxxTokenChainInsertAfter(
@@ -1664,6 +1668,7 @@ int cxxParserEmitFunctionTags(
 					pTypeName = NULL;
 				}
 			} else {
+				cxxSideChainCollectInRange(pInfo->pTypeStart,pInfo->pTypeEnd, pIdentifier);
 				pTypeName = cxxTagCheckAndSetTypeField(pInfo->pTypeStart,pInfo->pTypeEnd);
 			}
 		} else {
@@ -1759,6 +1764,8 @@ int cxxParserEmitFunctionTags(
 
 			pszProperties = cxxTagSetProperties(uProperties);
 		}
+
+		cxxSideChainScan(pIdentifier->pSideChain);
 
 		int iCorkQueueIndex = cxxTagCommit(piCorkQueueIndexFQ);
 		cxxTagUseTokenAsPartOfDefTag(iCorkQueueIndex, pIdentifier);

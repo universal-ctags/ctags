@@ -31,6 +31,8 @@ GEN_IN_MAN_FILES = \
 	ctags-lang-autoit.7 \
 	ctags-lang-automake.7 \
 	ctags-lang-c.7 \
+	ctags-lang-c++.7 \
+	ctags-lang-cuda.7 \
 	ctags-lang-elm.7 \
 	ctags-lang-fortran.7 \
 	ctags-lang-gdscript.7 \

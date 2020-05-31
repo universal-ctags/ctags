@@ -14,6 +14,7 @@
 #include "cxx_token.h"
 #include "cxx_token_chain.h"
 #include "cxx_scope.h"
+#include "cxx_side_chain.h"
 
 #include "vstring.h"
 #include "read.h"
@@ -228,6 +229,7 @@ bool cxxParserExtractVariableDeclarations(CXXTokenChain * pChain,unsigned int uF
 			return bGotVariable;
 		}
 
+		CXXToken * pEndScanningAttrs = t;
 		CXX_DEBUG_PRINT(
 				"Found notable token '%s' of type 0x%02x(%s)",
 				vStringValue(t->pszWord),
@@ -782,6 +784,10 @@ got_identifier:
 
 			if(bGotTemplate)
 				cxxTagHandleTemplateFields();
+
+			cxxSideChainCollectInRange(cxxTokenChainFirst(pChain), pEndScanningAttrs,
+									   pIdentifier);
+			cxxSideChainScan(pIdentifier->pSideChain);
 
 			iCorkIndex = cxxTagCommit(&iCorkIndexFQ);
 			cxxTagUseTokenAsPartOfDefTag(iCorkIndexFQ, pIdentifier);

@@ -133,6 +133,9 @@ parserDefinition * CppParser (void)
 	def->selectLanguage = selectors;
 	def->useCork = CORK_QUEUE|CORK_SYMTAB; // We use corking to block output until the end of file
 
+	def->versionCurrent = 1;
+	def->versionAge = 1;
+
 	return def;
 }
 
@@ -161,6 +164,9 @@ parserDefinition * CUDAParser (void)
 	def->finalize = cxxParserCleanup;
 	def->selectLanguage = NULL;
 	def->useCork = CORK_QUEUE|CORK_SYMTAB; // We use corking to block output until the end of file
+
+	def->versionCurrent = 1;
+	def->versionAge = 1;
 
 	return def;
 }

@@ -10,15 +10,18 @@ x       UCTAGSxpath          no      NONE             s--    no    -- xpath for 
 -       UCTAGSproperties     no      AutoIt           s--    no    -- properties (static, volatile, ...)
 -       UCTAGSmacrodef       no      C                s--    no    -- macro definition
 -       UCTAGSproperties     no      C                s--    no    -- properties (static, inline, mutable,...)
+-       UCTAGSsection        no      C                s--    no    -- the place where the object is placed
 -       UCTAGScaptures       no      C++              s--    no    -- lambda capture list
 -       UCTAGSmacrodef       no      C++              s--    no    -- macro definition
 -       UCTAGSname           yes     C++              s--    no    -- aliased names
 -       UCTAGSproperties     no      C++              s--    no    -- properties (static, inline, mutable,...)
+-       UCTAGSsection        no      C++              s--    no    -- the place where the object is placed
 -       UCTAGSspecialization no      C++              s--    no    -- template specialization parameters
 -       UCTAGStemplate       no      C++              s--    no    -- template parameters
 -       UCTAGSmacrodef       no      CPreProcessor    s--    no    -- macro definition
 -       UCTAGSmacrodef       no      CUDA             s--    no    -- macro definition
 -       UCTAGSproperties     no      CUDA             s--    no    -- properties (static, inline, mutable,...)
+-       UCTAGSsection        no      CUDA             s--    no    -- the place where the object is placed
 -       UCTAGSmoduleName     yes     Elm              s--    no    -- actual name of renamed module
 -       UCTAGSannotations    yes     GDScript         s--    no    -- annotations on functions and variables
 -       UCTAGShowImported    no      Go               s--    no    -- how the package is imported ("inline" for `.' or "init" for `_')

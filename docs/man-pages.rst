@@ -20,6 +20,8 @@ Man pages
 	ctags-lang-autoit(7) <man/ctags-lang-autoit.7.rst>
 	ctags-lang-automake(7) <man/ctags-lang-automake.7.rst>
 	ctags-lang-c(7) <man/ctags-lang-c.7.rst>
+	ctags-lang-c++(7) <man/ctags-lang-c++.7.rst>
+	ctags-lang-cuda(7) <man/ctags-lang-cuda.7.rst>
 	ctags-lang-elm(7) <man/ctags-lang-elm.7.rst>
 	ctags-lang-fortran(7) <man/ctags-lang-fortran.7.rst>
 	ctags-lang-gdscript(7) <man/ctags-lang-gdscript.7.rst>
