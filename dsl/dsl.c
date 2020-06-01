@@ -146,6 +146,8 @@ static DSLProcBind pbinds [] = {
 	  .helpstr = "(+ <integer> <integer>) -> <integer>", },
 	{ "-",               builtin_sub,          NULL, DSL_PATTR_CHECK_ARITY, 2,
 	  .helpstr = "(- <integer> <integer>) -> <integer>", },
+	{ "string->regexp",  NULL,                 NULL, 0, 0,
+	  .helpstr = "((string->regexp \"PATTERN\") $target) -> <boolean>; PATTERN must be string literal." },
 	{ "print",   bulitin_debug_print, NULL, DSL_PATTR_CHECK_ARITY, 1,
 	  .helpstr = "(print OBJ) -> OBJ" },
 	{ "true",    value_true, NULL, 0, 0UL,
@@ -428,13 +430,52 @@ EsObject *dsl_compile_and_eval (EsObject *expr, DSLEnv *env)
 	return dsl_eval0 (expr, env);
 }
 
+static EsObject *compile (EsObject *expr, void *unused_data)
+{
+	EsObject * s2r = es_symbol_intern ("string->regexp");
+	if (es_error_p (s2r))
+		return s2r;
+
+	if (!es_cons_p (expr))
+		return es_object_ref (expr);
+	else if (es_object_equal (es_car (expr), s2r))
+	{
+		EsObject *args = es_cdr (expr);
+		if (!es_cons_p (args))
+			dsl_throw(TOO_FEW_ARGUMENTS, s2r);
+		else if (!es_string_p (es_car (args)))
+			dsl_throw(STRING_REQUIRED, s2r);
+		else if (!es_null (es_cdr (es_cdr (args))))
+			dsl_throw(TOO_MANY_ARGUMENTS, s2r);
+		else
+		{
+			EsObject *icase = es_car (es_cdr (args));
+			EsObject *pattern = es_car (args);
+
+			if (!(es_null (icase)
+				  || es_symbol_intern (":case-fold")))
+				dsl_throw (WRONG_TYPE_ARGUMENT, s2r);
+
+			return es_regex_compile (es_string_get (pattern),
+									 !es_null (icase));
+		}
+	}
+	else
+		return es_map (compile, expr, unused_data);
+}
+
 DSLCode *dsl_compile (DSLEngineType engine, EsObject *expr)
 {
 	DSLCode *code = malloc (sizeof (DSLCode));
 	if (code == NULL)
 		return NULL;
 
-	code->expr = es_object_ref (expr);
+	code->expr = compile (expr, NULL);
+	if (es_error_p (code->expr))
+	{
+		free (code);
+		return NULL;
+	}
 	return code;
 }
 
