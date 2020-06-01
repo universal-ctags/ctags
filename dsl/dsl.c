@@ -787,19 +787,6 @@ static EsObject* bulitin_debug_print (EsObject *args, DSLEnv *env)
 /*
  * Accessesors for tagEntry
  */
-static EsObject* reverse (EsObject *object)
-{
-	EsObject *h;
-	EsObject *r = es_nil;
-
-	while (!es_null (object))
-	{
-		h = es_car (object);
-		r = es_object_autounref (es_cons (h, r));
-		object = es_cdr (object);
-	}
-	return r;
-}
 
 /*
  * Value functions
@@ -847,46 +834,6 @@ EsObject* dsl_entry_xget_string (const tagEntry *entry, const char* name)
 		return es_object_autounref (es_string_new (value));
 	else
 		return es_false;
-}
-
-static EsObject* entry_xget_csvlist (const tagEntry *entry, const char* field)
-{
-	const char* inherits = entry_xget (entry, field);
-
-	if (inherits == NULL)
-		return es_nil;
-	else
-	{
-		EsObject *s = es_nil;
-		char *d = strdup (inherits);
-		char *h = d;
-		char *t;
-
-		if (h == NULL)
-		{
-			fprintf(stderr, "MEMORY EXHAUSTED\n");
-			exit (1);
-		}
-
-		while ((t = strchr (h, ',')))
-		{
-			*t = '\0';
-			s = es_cons (es_object_autounref (es_string_new (h)),
-				     s);
-			s = es_object_autounref (s);
-			h = t + 1;
-		}
-		if (*h != '\0')
-		{
-			s = es_cons (es_object_autounref (es_string_new (h)),
-				     s);
-			s = es_object_autounref (s);
-		}
-
-		free (d);
-		s = reverse (s);
-		return s;
-	}
 }
 
 /*
@@ -985,7 +932,7 @@ EsObject* dsl_entry_kind (const tagEntry *entry)
 
 EsObject* dsl_entry_roles (const tagEntry *entry)
 {
-	return entry_xget_csvlist(entry, "roles");
+	return dsl_entry_xget_string(entry, "roles");
 }
 
 EsObject* dsl_entry_pattern (const tagEntry *entry)
@@ -1000,7 +947,7 @@ EsObject* dsl_entry_pattern (const tagEntry *entry)
 
 EsObject* dsl_entry_inherits (const tagEntry *entry)
 {
-	return entry_xget_csvlist (entry, "inherits");
+	return dsl_entry_xget_string (entry, "inherits");
 }
 
 EsObject* dsl_entry_scope (const tagEntry *entry)

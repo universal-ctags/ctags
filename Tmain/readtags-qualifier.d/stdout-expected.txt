@@ -18,7 +18,7 @@ Baz.bw	base.py	/^    def bw ():$/;"	kind:member	language:Python	scope:class:Baz	
 Foo.ae	base.py	/^    def ae ():$/;"	kind:member	language:Python	scope:class:Foo	access:public	signature:()
 Foo.aq	base.py	/^    def aq ():$/;"	kind:member	language:Python	scope:class:Foo	access:public	signature:()
 Foo.aw	base.py	/^    def aw ():$/;"	kind:member	language:Python	scope:class:Foo	access:public	signature:()
-;; (and (member "Foo" $inherits) (eq? $kind "class"))
+;; (and $inherits (#/(^|,)Foo(,|$)/ $inherits) (eq? $kind "class"))
 Bar	base.py	/^class Bar (Foo):$/;"	kind:class	language:Python	inherits:Foo	access:public
 Baz	base.py	/^class Baz (Foo): $/;"	kind:class	language:Python	inherits:Foo	access:public
 ;; (not ($ "signature"))
@@ -51,7 +51,7 @@ bq	base.py	/^    def bq ():$/;"	kind:member	language:Python	scope:class:Bar	acce
 bq	base.py	/^    def bq ():$/;"	kind:member	language:Python	scope:class:Baz	access:public	signature:()
 bw	base.py	/^    def bw ():$/;"	kind:member	language:Python	scope:class:Bar	access:public	signature:()
 bw	base.py	/^    def bw ():$/;"	kind:member	language:Python	scope:class:Baz	access:public	signature:()
-;; (member "superClass" $roles)
+;; (and $roles (#/(^|,)superClass(,|$)/ $roles))
 Foo	base.py	/^class Bar (Foo):$/;"	kind:class	line:13	language:Python	roles:superClass
 Foo	base.py	/^class Baz (Foo): $/;"	kind:class	line:21	language:Python	roles:superClass
 ;; (substr? (or ($ "roles") "") "super")
