@@ -35,3 +35,9 @@ ${V} ${READTAGS} -t output.tags -Q '(or #f #f (or #f (and $signature ((string->r
 
 echo '# case insensitive: the pattern is upper case (string->regexp)'
 ${V} ${READTAGS} -t output.tags -Q '(or #f #f (or #f (and $signature ((string->regexp "CHAR,.*,CHAR|INT,.*,INT" :case-fold) $signature)) #f) #f)' -en -l
+
+echo '# RAISING AN ERROR' 1>&2
+${V} ${READTAGS} -t output.tags -Q '(or #f #f (or #f (and $signature (#/[/ $signature)) #f) #f)' -en -l
+
+echo '# RAISING AN ERROR (string->regexp)' 1>&2
+${V} ${READTAGS} -t output.tags -Q '(or #f #f (or #f (and $signature ((string->regexp "[") $signature)) #f) #f)' -en -l
