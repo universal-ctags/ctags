@@ -300,6 +300,8 @@ es_object_new(EsType type)
 
 
 	r = calloc(1, (&classes[type])->size);
+	if (r == NULL)
+		return ES_ERROR_MEMORY;
 	r->type = type;
 	r->ref_count = 1;
 
@@ -1046,6 +1048,8 @@ es_cons        (EsObject* car, EsObject* cdr)
 
 
 	r = es_object_new(ES_TYPE_CONS);
+	if (es_error_p (r))
+		return r;
 	if (es_debug)
     {
 		mio_printf(mio_stderr(), ";; cons[0x%p] = (0x%p . 0x%p)\n", r, car, cdr);
@@ -2678,6 +2682,30 @@ es_srealize  (const char* fmt,...)
 	return object;
 }
 
+EsObject* es_map   (EsObject * (*fn) (EsObject *, void *),
+					EsObject *list, void *user_data)
+{
+	if (es_null (list))
+		return list;
+
+	EsObject *c = es_car (list);
+	c = fn (c, user_data);
+	if (es_error_p (c))
+		return c;
+
+	EsObject *r = es_map (fn, es_cdr (list), user_data);
+	if (es_error_p (r))
+	{
+		es_object_unref (c);
+		return r;
+	}
+
+	EsObject *o = es_cons (c, r);
+	es_object_unref (r);
+	es_object_unref (c);
+
+	return o;
+}
 
 static EsObject*
 es_vmatch_atom_input(EsObject* input, EsObject* fmt_object, va_list *ap)

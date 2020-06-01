@@ -198,6 +198,15 @@ EsObject* es_reverse  (EsObject* cons);
 EsObject* es_realize   (EsObject* fmt_object,...);
 EsObject* es_srealize  (const char* fmt,...);
 
+/* The value returned from FN treated as if it is returned from
+ * a *_new function. es_map may call es_object_unref() for the value.
+ * The value returned from es_map should be treated as if it is
+ * returned from a *_new function. The caller must free the returned
+ * value.
+ */
+EsObject* es_map   (EsObject * (*fn) (EsObject *, void *),
+					EsObject *list, void *user_data);
+
 /*
  * Rich element accessors
  */
