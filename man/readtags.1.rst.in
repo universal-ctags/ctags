@@ -141,9 +141,10 @@ Filtering
 The tag entries that makes the filter expression produces non-#f values are
 filtered out (#f means false).
 
-The basic operators for filtering are ``eq?``, ``prefix?``, ``suffix?`` and
-``substr?``. Language common fields can be accessed using ``$``, e.g.,
-``$language`` represents the language field. For example:
+The basic operators for filtering are ``eq?``, ``prefix?``, ``suffix?``,
+``substr?``, and ``#/PATTERN/``. Language common fields can be accessed using
+variables starting with ``$``, e.g., ``$language`` represents the language field.
+For example:
 
 * List all tags start with "myfunc" in Python code files:
 
@@ -172,19 +173,34 @@ missing field is #f, so we could deal with missing fields:
                          (or (eq? $language "Python")\
                              (not $language)))' -l
 
-The ``member`` operator is used to deal with lists. Currently lists can't be
-built by hand, and they are only generated for the ``inherits:`` field. For
-example:
+``#/PATTERN/`` is for the case when string predicates (``prefix?``,
+``suffix``, and ``substr?``) are not enough. You can use "Posix
+extended regular expression" as PATTERN.
 
 * List all tags inherits from the class "A":
 
   .. code-block:: console
 
-     $ readtags -Q '(member "A" $inherits)' -l
+     $ readtags -Q '(#/(^|,)A(,|$)/ $inherits)' -l
 
-WARNING: It's planned to remove the ``member`` operator, and replace this
-technique with regular expression matching. By then, ``$inherits`` will not be
-a list, but the value of the ``inherits:`` field as it is.
+Here ``$inherits`` holds a comma-separated class list like "A,B,C",
+"Z,A", "P,A,Q", or just "A". A tags file read by readtags may have tag entries
+that has no ``inherits:`` field. In that case ``$inherits`` holds #f,
+and the regular expression matching raises an error; the regular
+expression matching works only for a string.
+
+* Safely list all tags inherits from the class "A":
+
+  .. code-block:: console
+
+     $ readtags -Q '(and $inherits (#/(^|,)A(,|$)/ $inherits))' -l
+
+
+* Safely list all tags inherits from the class "A" or "a":
+
+  .. code-block:: console
+
+     $ readtags -Q '(and $inherits (#/(^|,)A(,|$)/i $inherits))' -l
 
 Run "readtags -H filter" to know about all valid functions and variables.
 
