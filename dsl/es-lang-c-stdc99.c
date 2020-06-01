@@ -2137,7 +2137,14 @@ fill_list (MIO* fp)
 
 			car = make_atom(t);
 			token_free(t);
-			/* TODO: check error */
+
+			if (es_error_p (car))
+			{
+				es_object_unref(r);
+				r = car;
+				break;
+			}
+
 			cdr = r;
 			r = es_cons(car, cdr);
 			es_object_unref(car);

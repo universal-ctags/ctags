@@ -315,10 +315,16 @@ SCode *s_compile (EsObject *exp)
 	if (code == NULL)
 	{
 		fprintf(stderr, "MEMORY EXHAUSTED\n");
-		exit (1);
+		return NULL;
 	}
 
 	code->dsl = dsl_compile (DSL_SORTER, exp);
+	if (code->dsl == NULL)
+	{
+		fprintf(stderr, "MEMORY EXHAUSTED or SYNTAX ERROR\n");
+		free (code);
+		return NULL;
+	}
 	return code;
 }
 
