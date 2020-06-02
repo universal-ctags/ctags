@@ -22,7 +22,7 @@
  * A: capturing 'foo' as a reference tag with 'method' kind and 'wrapped' role, and
  * B: capturing 'foo' as a definition tag with 'wrapper' kind.
  *
- * This implementation takes idea B. */
+ * This implementation takes the idea B. */
 
 /*
  *   INCLUDE FILES
