@@ -1,0 +1,20 @@
+Eq	input.pl	/^package Eq;$/;"	p
+Eq	input.pl	/^package Eq;$/;"	r
+no_equal	input.pl	/^sub no_equal {$/;"	s
+no_equal	input.pl	/^sub no_equal {$/;"	m	role:Eq
+R0	input.pl	/^package R0;$/;"	p
+R0	input.pl	/^package R0;$/;"	r
+R1	input.pl	/^package R1;$/;"	p
+R1	input.pl	/^package R1;$/;"	r
+R2	input.pl	/^package R2;$/;"	p
+R2	input.pl	/^package R2;$/;"	r
+C0	input.pl	/^package C0;$/;"	p
+C0	input.pl	/^package C0;$/;"	c
+C1	input.pl	/^package C1;$/;"	p
+C1	input.pl	/^package C1;$/;"	c
+C2	input.pl	/^package C2;$/;"	p
+C2	input.pl	/^package C2;$/;"	c
+Currency	input.pl	/^package Currency;$/;"	p
+Currency	input.pl	/^package Currency;$/;"	c	inherits:C1,Eq,C2,C3,R0,R1,R2
+equal	input.pl	/^sub equal {$/;"	s
+equal	input.pl	/^sub equal {$/;"	m	class:Currency
