@@ -115,4 +115,6 @@ EsObject* dsl_entry_typeref (const tagEntry *entry);
 EsObject* dsl_entry_roles (const tagEntry *entry);
 EsObject* dsl_entry_xpath (const tagEntry *entry);
 
+void dsl_report_error (const char *msg, EsObject *obj);
+
 #endif

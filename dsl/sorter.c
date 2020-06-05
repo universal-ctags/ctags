@@ -355,24 +355,14 @@ int s_compare        (const tagEntry * a, const tagEntry * b, SCode *code)
 	}
 	else if (es_error_p (r))
 	{
-		MIO  *mioerr = mio_new_fp (stderr, NULL);
-
-		fprintf(stderr, "GOT ERROR in SORTING: %s: ",
-			 es_error_name (r));
-		es_print(es_error_get_object(r), mioerr);
-		putc('\n', stderr);
-		mio_unref(mioerr);
+		dsl_report_error ("GOT ERROR in SORTING", r);
 		i = 0;					/* ??? */
 		goto out;
 	}
 	else
 	{
-		MIO  *mioerr = mio_new_fp (stderr, NULL);
-
-		fprintf(stderr, "Get unexpected value as the result of sorting: ");
-		es_print(r, mioerr);
-		putc('\n', stderr);
-		mio_unref(mioerr);
+		dsl_report_error ("Get unexpected value as the result of sorting",
+						  r);
 		i = 0;					/* ??? */
 		goto out;
 	}

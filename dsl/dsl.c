@@ -1054,3 +1054,21 @@ static EsObject* value_nil (EsObject *args, DSLEnv *env)
 {
 	return es_nil;
 }
+
+void dsl_report_error (const char *msg, EsObject *obj)
+{
+	MIO  *mioerr = mio_new_fp (stderr, NULL);
+
+	if (es_error_p (obj))
+	{
+		fprintf(stderr, "%s: %s: ", msg, es_error_name (obj));
+		es_print(es_error_get_object(obj), mioerr);
+	}
+	else
+	{
+		fprintf(stderr, "%s: ", msg);
+		es_print(obj, mioerr);
+	}
+	putc('\n', stderr);
+	mio_unref(mioerr);
+}
