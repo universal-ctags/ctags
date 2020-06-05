@@ -99,6 +99,7 @@ DECLARE_VALUE_FN(typeref);
 DECLARE_VALUE_FN(roles);
 DECLARE_VALUE_FN(xpath);
 
+static EsObject* string2regex (EsObject *args);
 
 /*
  * DATA DEFINITIONS
@@ -147,7 +148,8 @@ static DSLProcBind pbinds [] = {
 	{ "-",               builtin_sub,          NULL, DSL_PATTR_CHECK_ARITY, 2,
 	  .helpstr = "(- <integer> <integer>) -> <integer>", },
 	{ "string->regexp",  NULL,                 NULL, 0, 0,
-	  .helpstr = "((string->regexp \"PATTERN\") $target) -> <boolean>; PATTERN must be string literal." },
+	  .helpstr = "((string->regexp \"PATTERN\") $target) -> <boolean>; PATTERN must be string literal.",
+	  .macro = string2regex},
 	{ "print",   bulitin_debug_print, NULL, DSL_PATTR_CHECK_ARITY, 1,
 	  .helpstr = "(print OBJ) -> OBJ" },
 	{ "true",    value_true, NULL, 0, 0UL,
@@ -430,38 +432,25 @@ EsObject *dsl_compile_and_eval (EsObject *expr, DSLEnv *env)
 	return dsl_eval0 (expr, env);
 }
 
-static EsObject *compile (EsObject *expr, void *unused_data)
+static EsObject *compile (EsObject *expr, void *engine)
 {
-	EsObject * s2r = es_symbol_intern ("string->regexp");
-	if (es_error_p (s2r))
-		return s2r;
-
 	if (!es_cons_p (expr))
 		return es_object_ref (expr);
-	else if (es_object_equal (es_car (expr), s2r))
+
+	EsObject *head = es_car (expr);
+	if (es_symbol_p (head))
 	{
-		EsObject *args = es_cdr (expr);
-		if (!es_cons_p (args))
-			dsl_throw(TOO_FEW_ARGUMENTS, s2r);
-		else if (!es_string_p (es_car (args)))
-			dsl_throw(STRING_REQUIRED, s2r);
-		else if (!es_null (es_cdr (es_cdr (args))))
-			dsl_throw(TOO_MANY_ARGUMENTS, s2r);
-		else
+		DSLProcBind *pb = dsl_lookup (*((DSLEngineType *)engine),
+									  head);
+		if (!pb)
+			dsl_throw (UNBOUND_VARIABLE, head);
+		if (pb->macro)
 		{
-			EsObject *icase = es_car (es_cdr (args));
-			EsObject *pattern = es_car (args);
-
-			if (!(es_null (icase)
-				  || es_symbol_intern (":case-fold")))
-				dsl_throw (WRONG_TYPE_ARGUMENT, s2r);
-
-			return es_regex_compile (es_string_get (pattern),
-									 !es_null (icase));
+			/* TODO: compile recursively */
+			return pb->macro (expr);
 		}
 	}
-	else
-		return es_map (compile, expr, unused_data);
+	return es_map (compile, expr, engine);
 }
 
 DSLCode *dsl_compile (DSLEngineType engine, EsObject *expr)
@@ -470,9 +459,15 @@ DSLCode *dsl_compile (DSLEngineType engine, EsObject *expr)
 	if (code == NULL)
 		return NULL;
 
-	code->expr = compile (expr, NULL);
-	if (es_error_p (code->expr))
+	code->expr = compile (expr, &engine);
+	if (es_null (code->expr))
 	{
+		free (code);
+		return NULL;
+	}
+	else if (es_error_p (code->expr))
+	{
+		dsl_report_error ("COMPILE ERROR", code->expr);
 		free (code);
 		return NULL;
 	}
@@ -1053,6 +1048,29 @@ static EsObject* value_false (EsObject *args, DSLEnv *env)
 static EsObject* value_nil (EsObject *args, DSLEnv *env)
 {
 	return es_nil;
+}
+
+static EsObject* string2regex (EsObject *expr)
+{
+	EsObject *args = es_cdr (expr);
+	if (!es_cons_p (args))
+		dsl_throw(TOO_FEW_ARGUMENTS, es_car (expr));
+	else if (!es_string_p (es_car (args)))
+		dsl_throw(STRING_REQUIRED, es_car (expr));
+	else if (!es_null (es_cdr (es_cdr (args))))
+		dsl_throw(TOO_MANY_ARGUMENTS, es_car (expr));
+	else
+	{
+		EsObject *icase = es_car (es_cdr (args));
+		EsObject *pattern = es_car (args);
+
+		if (!(es_null (icase)
+			  || es_symbol_intern (":case-fold")))
+			dsl_throw (WRONG_TYPE_ARGUMENT, es_car (expr));
+
+		return es_regex_compile (es_string_get (pattern),
+								 !es_null (icase));
+	}
 }
 
 void dsl_report_error (const char *msg, EsObject *obj)

@@ -35,6 +35,7 @@ struct sDSLEnv {
 typedef struct sDSLEnv DSLEnv;
 
 typedef EsObject* (* DSLProc)  (EsObject *args, DSLEnv *env);
+typedef EsObject* (* DSLMacro)  (EsObject *expr);
 
 
 enum eDSLPAttr {
@@ -54,6 +55,7 @@ struct sDSLProcBind {
 	DSLPAttr flags;
 	int arity;
 	const char* helpstr;
+	DSLMacro macro;
 };
 
 typedef struct sDSLCode DSLCode;
