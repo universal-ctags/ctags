@@ -169,88 +169,106 @@ static unsigned int hash(const char* keyarg);
 static EsSingleton  *symbol_obarray[OBARRAY_SIZE];
 static EsSingleton  *error_obarray [OBARRAY_SIZE];
 
-static EsObjectClass classes[] = {
-	[ES_TYPE_NIL] = {
-		.size    = 0,
-		.free    = es_nil_free,
-		.equal   = es_nil_equal,
-		.print   = es_nil_print,
-		.atom_p  = 1,
-		.obarray = NULL,
-		.name    = "nil",
-	},
-	[ES_TYPE_INTEGER] = {
-		.size    = sizeof(EsInteger),
-		.free    = es_integer_free,
-		.equal   = es_integer_equal,
-		.print   = es_integer_print,
-		.atom_p  = 1,
-		.obarray = NULL,
-		.name    = "integer",
-	},
-	[ES_TYPE_REAL]    = {
-		.size    = sizeof(EsReal),
-		.free    = es_real_free,
-		.equal   = es_real_equal,
-		.print   = es_real_print,
-		.atom_p  = 1,
-		.obarray = NULL,
-		.name    = "real",
-	},
-	[ES_TYPE_BOOLEAN] = {
-		.size    = sizeof(EsBoolean),
-		.free    = es_boolean_free,
-		.equal   = es_boolean_equal,
-		.print   = es_boolean_print,
-		.atom_p  = 1,
-		.obarray = (void*)1,
-		.name    = "boolean",
-	},
-	[ES_TYPE_SYMBOL]  = {
-		.size    = sizeof(EsSymbol),
-		.free    = es_symbol_free,
-		.equal   = es_symbol_equal,
-		.print   = es_symbol_print,
-		.atom_p  = 1,
-		.obarray = symbol_obarray,
-		.name    = "symbol",
-	},
-	[ES_TYPE_STRING]  = {
-		.size    = sizeof(EsString),
-		.free    = es_string_free,
-		.equal   = es_string_equal,
-		.print   = es_string_print,
-		.atom_p  = 1,
-		.obarray = NULL,
-		.name    = "string",
-	},
-	[ES_TYPE_CONS]    = {
-		.size    = sizeof(EsCons),
-		.free    = es_cons_free,
-		.equal   = es_cons_equal,
-		.print   = es_cons_print,
-		.atom_p  = 0,
-		.obarray = NULL,
-		.name    = "cons",
-	},
-	[ES_TYPE_REGEX]   = {
-		.size    = sizeof(EsRegex),
-		.free    = es_regex_free,
-		.equal   = es_regex_equal,
-		.print   = es_regex_print,
-		.atom_p  = 1,
-		.obarray = NULL,
-		.name    = "regex",
-	},
-	[ES_TYPE_ERROR] = {
-		.size    = sizeof(EsError),
-		.free    = es_error_free,
-		.equal   = es_error_equal,
-		.print   = es_error_print,
-		.atom_p  = 1,
-		.obarray = error_obarray,
-		.name    = "error",
-	},
+static EsObjectClass es_nil_class = {
+	.size    = 0,
+	.free    = es_nil_free,
+	.equal   = es_nil_equal,
+	.print   = es_nil_print,
+	.atom_p  = 1,
+	.obarray = NULL,
+	.name    = "nil",
+};
+
+static EsObjectClass es_integer_class = {
+	.size    = sizeof(EsInteger),
+	.free    = es_integer_free,
+	.equal   = es_integer_equal,
+	.print   = es_integer_print,
+	.atom_p  = 1,
+	.obarray = NULL,
+	.name    = "integer",
+};
+
+static EsObjectClass es_real_class = {
+	.size    = sizeof(EsReal),
+	.free    = es_real_free,
+	.equal   = es_real_equal,
+	.print   = es_real_print,
+	.atom_p  = 1,
+	.obarray = NULL,
+	.name    = "real",
+};
+
+static EsObjectClass es_boolean_class = {
+	.size    = sizeof(EsBoolean),
+	.free    = es_boolean_free,
+	.equal   = es_boolean_equal,
+	.print   = es_boolean_print,
+	.atom_p  = 1,
+	.obarray = (void*)1,
+	.name    = "boolean",
+};
+
+static EsObjectClass es_symbol_class = {
+	.size    = sizeof(EsSymbol),
+	.free    = es_symbol_free,
+	.equal   = es_symbol_equal,
+	.print   = es_symbol_print,
+	.atom_p  = 1,
+	.obarray = symbol_obarray,
+	.name    = "symbol",
+};
+
+static EsObjectClass es_string_class = {
+	.size    = sizeof(EsString),
+	.free    = es_string_free,
+	.equal   = es_string_equal,
+	.print   = es_string_print,
+	.atom_p  = 1,
+	.obarray = NULL,
+	.name    = "string",
+};
+
+static EsObjectClass es_cons_class = {
+	.size    = sizeof(EsCons),
+	.free    = es_cons_free,
+	.equal   = es_cons_equal,
+	.print   = es_cons_print,
+	.atom_p  = 0,
+	.obarray = NULL,
+	.name    = "cons",
+};
+
+static EsObjectClass es_regex_class = {
+	.size    = sizeof(EsRegex),
+	.free    = es_regex_free,
+	.equal   = es_regex_equal,
+	.print   = es_regex_print,
+	.atom_p  = 1,
+	.obarray = NULL,
+	.name    = "regex",
+};
+
+static EsObjectClass es_error_class = {
+	.size    = sizeof(EsError),
+	.free    = es_error_free,
+	.equal   = es_error_equal,
+	.print   = es_error_print,
+	.atom_p  = 1,
+	.obarray = error_obarray,
+	.name    = "error",
+};
+
+static EsObjectClass *classes[] = {
+	[ES_TYPE_NIL]     = &es_nil_class,
+	[ES_TYPE_INTEGER] = &es_integer_class,
+	[ES_TYPE_REAL]    = &es_real_class,
+	[ES_TYPE_BOOLEAN] = &es_boolean_class,
+	[ES_TYPE_SYMBOL]  = &es_symbol_class,
+	[ES_TYPE_STRING]  = &es_string_class,
+	[ES_TYPE_CONS]    = &es_cons_class,
+	[ES_TYPE_REGEX]   = &es_regex_class,
+	[ES_TYPE_ERROR]   = &es_error_class,
 };
 
 
@@ -290,7 +308,7 @@ static MIO *mio_stderr (void)
 static EsObjectClass*
 class_of(const EsObject* object)
 {
-	return &(classes[es_object_get_type(object)]);
+	return (classes[es_object_get_type(object)]);
 }
 
 static EsObject*
@@ -299,7 +317,7 @@ es_object_new(EsType type)
 	EsObject* r;
 
 
-	r = calloc(1, (&classes[type])->size);
+	r = calloc(1, (classes[type])->size);
 	if (r == NULL)
 		return ES_ERROR_MEMORY;
 	r->type = type;
@@ -307,7 +325,7 @@ es_object_new(EsType type)
 
 	if (es_debug)
 		mio_printf(mio_stderr(), ";; new{%s}: 0x%p\n",
-				   (&classes[type])->name,
+				   (classes[type])->name,
 				   r);
 
 	return r;
@@ -653,7 +671,7 @@ es_obarray_intern(EsType type, const char* name)
 	EsSingleton* tmp;
 
 
-	obarray = (&classes[type])->obarray;
+	obarray = (classes[type])->obarray;
 	if (!obarray)
 		return NULL;
 
