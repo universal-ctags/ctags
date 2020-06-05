@@ -203,6 +203,12 @@ raises an error, since it works only for strings. To avoid this problem:
 
 Run "readtags -H filter" to know about all valid functions and variables.
 
+NOTE: The above regular expression pattern for inspecting inheritances is just an
+example to show how to use ``#/PATTERN/`` expression.  Tags file generators have
+no consensus about the format of ``inherits:``.  Even parsers in ctags have no
+consensus. Handling such language-specific aspects is inevitable in a client tool
+side.
+
 Sorting
 ~~~~~~~
 When sorting, the sorter expression is evaluated on two tag entries to decide
