@@ -106,6 +106,13 @@ static EsObject* string2regex (EsObject *args);
  */
 static DSLEngine engines [DSL_ENGINE_COUNT];
 
+static DSLProcBind pbinds_interanl_pseudo [] = {
+	{ "#/PATTERN/", NULL, NULL, 0, 0,
+	  .helpstr = "(#/PATTER/ <string>) -> <boolean>; regular expression matching" },
+	{ "#/PATTERN/i", NULL, NULL, 0, 0,
+	  .helpstr = "(#/PATTER/i <string>) -> <boolean>; in case insensitive way" },
+};
+
 static DSLProcBind pbinds [] = {
 	{ "null?",   builtin_null,   NULL, DSL_PATTR_CHECK_ARITY, 1,
 	  .helpstr = "(null? obj) -> <boolean>" },
@@ -230,6 +237,10 @@ int dsl_init (DSLEngineType engine, DSLProcBind *engine_pbinds, int count)
 
 	if (!initialized)
 	{
+		engines [DSL_INTERNAL_PSEUDO].pbinds = pbinds_interanl_pseudo;
+		engines [DSL_INTERNAL_PSEUDO].pbinds_count
+			= sizeof(pbinds_interanl_pseudo)/sizeof(pbinds_interanl_pseudo [0]);
+
 		for (int i = 0; i < sizeof(pbinds)/sizeof(pbinds [0]); i++)
 		{
 			if (dsl_define (DSL_COMMON, pbinds + i) == NULL)
@@ -274,6 +285,7 @@ static void dsl_help0 (DSLEngineType engine, FILE *fp)
 
 void dsl_help (DSLEngineType engine, FILE *fp)
 {
+	dsl_help0 (DSL_INTERNAL_PSEUDO, fp);
 	dsl_help0 (DSL_COMMON, fp);
 	dsl_help0 (engine, fp);
 }
