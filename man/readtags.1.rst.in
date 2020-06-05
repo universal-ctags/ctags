@@ -173,34 +173,33 @@ missing field is #f, so we could deal with missing fields:
                          (or (eq? $language "Python")\
                              (not $language)))' -l
 
-``#/PATTERN/`` is for the case when string predicates (``prefix?``,
-``suffix``, and ``substr?``) are not enough. You can use "Posix
-extended regular expression" as PATTERN.
+``#/PATTERN/`` is for the case when string predicates (``prefix?``, ``suffix``,
+and ``substr?``) are not enough. You can use "Posix extended regular expression"
+as PATTERN.
 
 * List all tags inherits from the class "A":
 
   .. code-block:: console
 
-     $ readtags -Q '(#/(^|,)A(,|$)/ $inherits)' -l
+     $ readtags -Q '(#/(^|, )A(,|$)/ $inherits)' -l
 
-Here ``$inherits`` holds a comma-separated class list like "A,B,C",
-"Z,A", "P,A,Q", or just "A". A tags file read by readtags may have tag entries
-that has no ``inherits:`` field. In that case ``$inherits`` holds #f,
-and the regular expression matching raises an error; the regular
-expression matching works only for a string.
+Here ``$inherits`` is a comma-separated class list like "A, B, C", "Z, A", "P, A,
+Q", or just "A". The tags file may have tag entries that has no ``inherits:``
+field. In that case ``$inherits`` is #f, and the regular expression matching
+raises an error, since it works only for strings. To avoid this problem:
 
 * Safely list all tags inherits from the class "A":
 
   .. code-block:: console
 
-     $ readtags -Q '(and $inherits (#/(^|,)A(,|$)/ $inherits))' -l
+     $ readtags -Q '(and $inherits (#/(^|, )A(,|$)/ $inherits))' -l
 
 
 * Safely list all tags inherits from the class "A" or "a":
 
   .. code-block:: console
 
-     $ readtags -Q '(and $inherits (#/(^|,)A(,|$)/i $inherits))' -l
+     $ readtags -Q '(and $inherits (#/(^|, )A(,|$)/i $inherits))' -l
 
 Run "readtags -H filter" to know about all valid functions and variables.
 
