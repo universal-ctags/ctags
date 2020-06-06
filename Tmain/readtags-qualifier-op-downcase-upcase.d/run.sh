@@ -21,14 +21,14 @@ fi
 echo '# (eq? "c" (downcase $name))'
 ${V} ${READTAGS} -t output.tags -Q '(eq? "c" (downcase $name))' -l
 
-echo '# (member "a" (downcase $inherits))'
-${V} ${READTAGS} -t output.tags -Q '(member "a" (downcase $inherits))' -l
+echo '# (and $inherits (#/(^|,)a(,|$)/ (downcase $inherits)))'
+${V} ${READTAGS} -t output.tags -Q '(and $inherits (#/(^|,)a(,|$)/ (downcase $inherits)))' -l
 
-echo '# (member "b" (downcase $inherits))'
-${V} ${READTAGS} -t output.tags -Q '(member "b" (downcase $inherits))' -l
+echo '# (and $inherits (#/(^|,)b(,|$)/ (downcase $inherits)))'
+${V} ${READTAGS} -t output.tags -Q '(and $inherits (#/(^|,)b(,|$)/ (downcase $inherits)))' -l
 
-echo '# (member "d" (downcase $inherits))'
-${V} ${READTAGS} -t output.tags -Q '(member "d" (downcase $inherits))' -l
+echo '# (and $inherits (#/(^|,)d(,|$)/ (downcase $inherits)))'
+${V} ${READTAGS} -t output.tags -Q '(and $inherits (#/(^|,)d(,|$)/ (downcase $inherits)))' -l
 
 echo '# (eq? "F" (upcase $name))'
 ${V} ${READTAGS} -t output.tags -Q '(eq? "F" (upcase $name))' -l

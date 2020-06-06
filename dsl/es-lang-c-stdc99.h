@@ -41,6 +41,7 @@ enum _EsType {
   ES_TYPE_SYMBOL,
   ES_TYPE_STRING,
   ES_TYPE_CONS,
+  ES_TYPE_REGEX,
   /* ... */
   ES_TYPE_ERROR
 };
@@ -56,14 +57,16 @@ EsType      es_object_get_type      (const EsObject*      object);
 EsObject*   es_object_ref           (EsObject*       object);
 void        es_object_unref         (EsObject*       object);
 void        es_object_unref_batch   (EsObject*       array[],
-				     unsigned int    count);
+									 unsigned int    count);
 EsObject*   es_object_autounref     (EsObject*      object);
 
 int         es_object_equal         (const EsObject* self,
-				     const EsObject* other);
+									 const EsObject* other);
 
 int         es_atom                 (const EsObject* object);
 
+#define     ES_ERROR_MEMORY   es_error_intern("MEMORY-EXHAUSTED")
+#define     ES_ERROR_REGEX    es_error_intern("WRONG-REGEX-SYNTAX")
 
 /*
  * Nil
@@ -107,6 +110,7 @@ int          es_boolean_get (const EsObject*   object);
  * String
  */
 EsObject*    es_string_new  (const char*        value);
+EsObject*    es_string_newL (const char*        value, size_t lenght);
 int          es_string_p    (const EsObject*   object);
 const char*  es_string_get  (const EsObject*   object);
 
@@ -142,6 +146,14 @@ EsObject*    es_car         (const EsObject* object);
 EsObject*    es_cdr         (const EsObject* object);
 
 
+/*
+ * Regex
+ */
+EsObject*    es_regex_compile (const char* pat,
+							   int case_insensitive);
+int          es_regex_p       (const EsObject* object);
+EsObject*    es_regex_exec    (const EsObject* regex,
+							   const EsObject* str);
 
 /*
  * Print
@@ -155,17 +167,16 @@ char*        es_print_to_string (EsObject*        object);
  */
 EsObject*    es_read            (MIO* in);
 EsObject*    es_read_from_string(const char* in,
-				 const char** saveptr);
+								 const char** saveptr);
 
 #define      ES_READER_ERROR es_error_intern("READ-ERROR")
 #define      ES_READER_EOF   es_error_intern("EOF")
-
 
 /*
  * Comment
  */
 void         es_comment           (const char* comment,
-				   MIO*       out);
+								   MIO*       out);
 char*        es_comment_to_string (const char* comment);
 
 /*
@@ -186,6 +197,15 @@ EsObject* es_reverse  (EsObject* cons);
 #define      ES_PROC_UNIMPLEMENTED es_error_intern("PROC-UNIMPLEMENTED")
 EsObject* es_realize   (EsObject* fmt_object,...);
 EsObject* es_srealize  (const char* fmt,...);
+
+/* The value returned from FN treated as if it is returned from
+ * a *_new function. es_map may call es_object_unref() for the value.
+ * The value returned from es_map should be treated as if it is
+ * returned from a *_new function. The caller must free the returned
+ * value.
+ */
+EsObject* es_map   (EsObject * (*fn) (EsObject *, void *),
+					EsObject *list, void *user_data);
 
 /*
  * Rich element accessors

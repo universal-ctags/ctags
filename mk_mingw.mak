@@ -111,8 +111,8 @@ extra-cmds/%.o: extra-cmds/%.c
 libreadtags/%.o: libreadtags/%.c
 	$(V_CC) $(CC) -c $(OPT) $(CFLAGS) -DWIN32 -Ilibreadtags -o $@ $<
 
-readtags.exe: $(READTAGS_OBJS) $(READTAGS_HEADS)
-	$(V_CC) $(CC) $(OPT) -o $@ $(READTAGS_OBJS) $(LIBS)
+readtags.exe: $(READTAGS_OBJS) $(READTAGS_HEADS) $(REGEX_OBJS) $(REGEX_HEADS)
+	$(V_CC) $(CC) $(OPT) -o $@ $(READTAGS_OBJS) $(REGEX_OBJS) $(LIBS)
 
 clean:
 	$(SILENT) echo Cleaning

@@ -1,0 +1,7 @@
+# RAISING AN ERROR
+Failed to read the expression for filter: (or #f #f (or #f (and $signature (#/[/ $signature)) #f) #f)
+Reason: WRONG-REGEX-SYNTAX
+# RAISING AN ERROR (string->regexp)
+COMPILE ERROR: WRONG-REGEX-SYNTAX: ()
+MEMORY EXHAUSTED or SYNTAX ERROR
+Failed to compile the expression of filter: (or #f #f (or #f (and $signature ((string->regexp "[") $signature)) #f) #f)

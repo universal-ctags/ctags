@@ -1,10 +1,10 @@
 # (eq? "c" (downcase $name))
 C	input.cpp	/^class C: A, B {$/
-# (member "a" (downcase $inherits))
+# (and $inherits (#/(^|,)a(,|$)/ (downcase $inherits)))
 C	input.cpp	/^class C: A, B {$/
-# (member "b" (downcase $inherits))
+# (and $inherits (#/(^|,)b(,|$)/ (downcase $inherits)))
 C	input.cpp	/^class C: A, B {$/
-# (member "d" (downcase $inherits))
+# (and $inherits (#/(^|,)d(,|$)/ (downcase $inherits)))
 # (eq? "F" (upcase $name))
 f	input.cpp	/^  int f (void) {$/
 # (eq? "G" (upcase $name))

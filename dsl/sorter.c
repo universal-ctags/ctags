@@ -48,18 +48,25 @@ static EsObject* sorter_alt_entry_ref (EsObject *args, DSLEnv *env);
 
 DECLARE_ALT_VALUE_FN(name);
 DECLARE_ALT_VALUE_FN(input);
-DECLARE_ALT_VALUE_FN(access);
-DECLARE_ALT_VALUE_FN(file);
-DECLARE_ALT_VALUE_FN(language);
-DECLARE_ALT_VALUE_FN(implementation);
-DECLARE_ALT_VALUE_FN(line);
-DECLARE_ALT_VALUE_FN(kind);
-DECLARE_ALT_VALUE_FN(roles);
 DECLARE_ALT_VALUE_FN(pattern);
+DECLARE_ALT_VALUE_FN(line);
+
+DECLARE_ALT_VALUE_FN(access);
+DECLARE_ALT_VALUE_FN(end);
+DECLARE_ALT_VALUE_FN(extras);
+DECLARE_ALT_VALUE_FN(file);
 DECLARE_ALT_VALUE_FN(inherits);
+DECLARE_ALT_VALUE_FN(implementation);
+DECLARE_ALT_VALUE_FN(kind);
+DECLARE_ALT_VALUE_FN(language);
+DECLARE_ALT_VALUE_FN(scope);
 DECLARE_ALT_VALUE_FN(scope_kind);
 DECLARE_ALT_VALUE_FN(scope_name);
-DECLARE_ALT_VALUE_FN(end);
+DECLARE_ALT_VALUE_FN(signature);
+DECLARE_ALT_VALUE_FN(typeref);
+DECLARE_ALT_VALUE_FN(roles);
+DECLARE_ALT_VALUE_FN(xpath);
+
 
 static EsObject* sorter_proc_cmp (EsObject* args, DSLEnv *env);
 static EsObject* sorter_proc_flip (EsObject* args, DSLEnv *env);
@@ -72,33 +79,54 @@ static EsObject* sorter_sform_cmp_or (EsObject* args, DSLEnv *env);
 #define DSL_ERR_NO_ALT_ENTRY    (es_error_intern("the-alternative-entry-unavailable"))
 
 static DSLProcBind pbinds [] = {
-	{ "&",               sorter_alt_entry_ref, NULL, DSL_PATTR_CHECK_ARITY,  1,
-	  .helpstr = "(& NAME) -> #f|<string>" },
-	{ "&name",           alt_value_name,           NULL, DSL_PATTR_MEMORABLE, 0UL,},
-	{ "&input",          alt_value_input,          NULL, DSL_PATTR_MEMORABLE, 0UL,
-	  .helpstr = "input file name" },
-	{ "&access",         alt_value_access,         NULL, DSL_PATTR_MEMORABLE, 0UL },
-	{ "&file",           alt_value_file,           NULL, DSL_PATTR_MEMORABLE, 0UL,
-	  .helpstr = "file scope<boolean>" },
-	{ "&language",       alt_value_language,       NULL, DSL_PATTR_MEMORABLE, 0UL },
-	{ "&implementation", alt_value_implementation, NULL, DSL_PATTR_MEMORABLE, 0UL },
-	{ "&line",           alt_value_line,           NULL, DSL_PATTR_MEMORABLE, 0UL },
-	{ "&kind",           alt_value_kind,           NULL, DSL_PATTR_MEMORABLE, 0UL },
-	{ "&roles",          alt_value_roles,          NULL, DSL_PATTR_MEMORABLE, 0UL,
-	  .helpstr = "<list>" },
-	{ "&pattern",        alt_value_pattern,        NULL, DSL_PATTR_MEMORABLE, 0UL },
-	{ "&inherits",       alt_value_inherits,       NULL, DSL_PATTR_MEMORABLE, 0UL,
-	  .helpstr = "<list>" },
-	{ "&scope-kind",     alt_value_scope_kind,     NULL, DSL_PATTR_MEMORABLE, 0UL },
-	{ "&scope-name",     alt_value_scope_name,     NULL, DSL_PATTR_MEMORABLE, 0UL },
-	{ "&end",            alt_value_end,            NULL, DSL_PATTR_MEMORABLE, 0UL },
-	// "string<>"
 	{ "<>",              sorter_proc_cmp,          NULL, DSL_PATTR_CHECK_ARITY,     2,
 	  .helpstr = "(<> a b) -> -1|0|1; compare a b. The types of a and b must be the same." },
 	{ "*-",              sorter_proc_flip,         NULL, DSL_PATTR_CHECK_ARITY,     1,
-	  .helpstr = "(*- n) -> -n; filp the result of comparison." },
+	  .helpstr = "(*- n<interger>) -> -n<integer>; filp the result of comparison." },
 	{ "<or>",            sorter_sform_cmp_or,      NULL, DSL_PATTR_CHECK_ARITY_OPT, 1,
-	  .helpstr = "(<or> args...); evaluate arguments left to right till one of thme returns -1 or 1." },
+	  .helpstr = "(<or> args...) -> -1|0|1; evaluate arguments left to right till one of thme returns -1 or 1." },
+
+	{ "&",               sorter_alt_entry_ref, NULL, DSL_PATTR_CHECK_ARITY,  1,
+	  .helpstr = "(& FIELD) -> #f|<string>" },
+	{ "&name",           alt_value_name,           NULL, DSL_PATTR_MEMORABLE, 0UL,
+	  .helpstr = "-> <string>"},
+	{ "&input",          alt_value_input,          NULL, DSL_PATTR_MEMORABLE, 0UL,
+	  .helpstr = "-> <string>"},
+	{ "&pattern",        alt_value_pattern,        NULL, DSL_PATTR_MEMORABLE, 0UL,
+	  .helpstr = "-> #f|<string>"},
+	{ "&line",           alt_value_line,           NULL, DSL_PATTR_MEMORABLE, 0UL,
+	  .helpstr = "-> #f|<integer>" },
+
+	{ "&access",         alt_value_access,         NULL, DSL_PATTR_MEMORABLE, 0UL,
+	  .helpstr = "-> #f|<string>" },
+	{ "&end",            alt_value_end,            NULL, DSL_PATTR_MEMORABLE, 0UL,
+	  .helpstr = "-> #f|<integer>"},
+	{ "&extras",         alt_value_extras,         NULL, DSL_PATTR_MEMORABLE, 0UL,
+	  .helpstr = "-> #f|<string>"},
+	{ "&file",           alt_value_file,           NULL, DSL_PATTR_MEMORABLE, 0UL,
+	  .helpstr = "-> <boolean>; whether the scope is limited in the file or not." },
+	{ "&inherits",       alt_value_inherits,       NULL, DSL_PATTR_MEMORABLE, 0UL,
+	  .helpstr = "-> <list>" },
+	{ "&implementation", alt_value_implementation, NULL, DSL_PATTR_MEMORABLE, 0UL,
+	  .helpstr = "-> #f|<string>" },
+	{ "&kind",           alt_value_kind,           NULL, DSL_PATTR_MEMORABLE, 0UL,
+	  .helpstr = "-> #f|<string>"},
+	{ "&language",       alt_value_language,       NULL, DSL_PATTR_MEMORABLE, 0UL,
+	  .helpstr = "-> #f|<string>" },
+	{ "&scope",          alt_value_scope,          NULL, DSL_PATTR_MEMORABLE, 0UL,
+	  .helpstr = "-> #f|<string>; $scope-kind:$scope-name"},
+	{ "&scope-kind",     alt_value_scope_kind,     NULL, DSL_PATTR_MEMORABLE, 0UL,
+	  .helpstr = "-> #f|<string>"},
+	{ "&scope-name",     alt_value_scope_name,     NULL, DSL_PATTR_MEMORABLE, 0UL,
+	  .helpstr = "-> #f|<string>"},
+	{ "&signature",      alt_value_signature,      NULL, DSL_PATTR_MEMORABLE, 0UL,
+	  .helpstr = "-> #f|<string>" },
+	{ "&typeref",        alt_value_typeref,        NULL, DSL_PATTR_MEMORABLE, 0UL,
+	  .helpstr = "-> #f|<string>"},
+	{ "&roles",          alt_value_roles,          NULL, DSL_PATTR_MEMORABLE, 0UL,
+	  .helpstr = "-> <list>" },
+	{ "&xpath",         alt_value_xpath,           NULL, DSL_PATTR_MEMORABLE, 0UL,
+	  .helpstr = "-> #f|<string>"},
 };
 
 /*
@@ -108,21 +136,26 @@ static DSLProcBind pbinds [] = {
 /*
  * Value functions
  */
-DEFINE_ALT_VALUE_FN(name)
-DEFINE_ALT_VALUE_FN(input)
-DEFINE_ALT_VALUE_FN(access)
-DEFINE_ALT_VALUE_FN(file)
-DEFINE_ALT_VALUE_FN(language)
-DEFINE_ALT_VALUE_FN(implementation)
-DEFINE_ALT_VALUE_FN(line)
-DEFINE_ALT_VALUE_FN(kind)
-DEFINE_ALT_VALUE_FN(roles)
-DEFINE_ALT_VALUE_FN(pattern)
-DEFINE_ALT_VALUE_FN(inherits)
-DEFINE_ALT_VALUE_FN(scope_kind)
-DEFINE_ALT_VALUE_FN(scope_name)
-DEFINE_ALT_VALUE_FN(end)
+DEFINE_ALT_VALUE_FN(name);
+DEFINE_ALT_VALUE_FN(input);
+DEFINE_ALT_VALUE_FN(pattern);
+DEFINE_ALT_VALUE_FN(line);
 
+DEFINE_ALT_VALUE_FN(access);
+DEFINE_ALT_VALUE_FN(end);
+DEFINE_ALT_VALUE_FN(extras);
+DEFINE_ALT_VALUE_FN(file);
+DEFINE_ALT_VALUE_FN(inherits);
+DEFINE_ALT_VALUE_FN(implementation);
+DEFINE_ALT_VALUE_FN(kind);
+DEFINE_ALT_VALUE_FN(language);
+DEFINE_ALT_VALUE_FN(scope);
+DEFINE_ALT_VALUE_FN(scope_kind);
+DEFINE_ALT_VALUE_FN(scope_name);
+DEFINE_ALT_VALUE_FN(signature);
+DEFINE_ALT_VALUE_FN(typeref);
+DEFINE_ALT_VALUE_FN(roles);
+DEFINE_ALT_VALUE_FN(xpath);
 
 /*
  * Special form(s)
@@ -282,10 +315,16 @@ SCode *s_compile (EsObject *exp)
 	if (code == NULL)
 	{
 		fprintf(stderr, "MEMORY EXHAUSTED\n");
-		exit (1);
+		return NULL;
 	}
 
 	code->dsl = dsl_compile (DSL_SORTER, exp);
+	if (code->dsl == NULL)
+	{
+		fprintf(stderr, "MEMORY EXHAUSTED or SYNTAX ERROR\n");
+		free (code);
+		return NULL;
+	}
 	return code;
 }
 
@@ -316,24 +355,14 @@ int s_compare        (const tagEntry * a, const tagEntry * b, SCode *code)
 	}
 	else if (es_error_p (r))
 	{
-		MIO  *mioerr = mio_new_fp (stderr, NULL);
-
-		fprintf(stderr, "GOT ERROR in SORTING: %s: ",
-			 es_error_name (r));
-		es_print(es_error_get_object(r), mioerr);
-		putc('\n', stderr);
-		mio_unref(mioerr);
+		dsl_report_error ("GOT ERROR in SORTING", r);
 		i = 0;					/* ??? */
 		goto out;
 	}
 	else
 	{
-		MIO  *mioerr = mio_new_fp (stderr, NULL);
-
-		fprintf(stderr, "Get unexpected value as the result of sorting: ");
-		es_print(r, mioerr);
-		putc('\n', stderr);
-		mio_unref(mioerr);
+		dsl_report_error ("Get unexpected value as the result of sorting",
+						  r);
 		i = 0;					/* ??? */
 		goto out;
 	}

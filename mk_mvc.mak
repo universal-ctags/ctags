@@ -76,8 +76,8 @@ ctags: ctags.exe
 ctags.exe: $(ALL_OBJS) $(ALL_HEADS) $(PEG_HEADS) $(PEG_EXTRA_HEADS) $(REGEX_HEADS) $(FNMATCH_HEADS) $(WIN32_HEADS) $(REPOINFO_HEADS)
 	$(CC) $(OPT) /Fe$@ $(ALL_OBJS) /link setargv.obj $(LIBS) $(PDBFLAG)
 
-readtags.exe: $(READTAGS_OBJS) $(READTAGS_HEADS)
-	$(CC) $(OPT) /Fe$@ $(READTAGS_OBJS) /link setargv.obj $(PDBFLAG)
+readtags.exe: $(READTAGS_OBJS) $(READTAGS_HEADS) $(REGEX_OBJS) $(REGEX_HEADS)
+	$(CC) $(OPT) /Fe$@ $(READTAGS_OBJS) $(REGEX_OBJS) /link setargv.obj $(PDBFLAG)
 
 $(REGEX_OBJS): $(REGEX_SRCS)
 	$(CC) /c $(OPT) /Fo$@ $(INCLUDES) $(DEFINES) $(REGEX_SRCS)

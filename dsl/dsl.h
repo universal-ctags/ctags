@@ -20,6 +20,7 @@
  * TYPES
  */
 enum eDSLEngineType {
+	DSL_INTERNAL_PSEUDO,
 	DSL_COMMON,
 	DSL_QUALIFIER,
 	DSL_SORTER,
@@ -35,6 +36,7 @@ struct sDSLEnv {
 typedef struct sDSLEnv DSLEnv;
 
 typedef EsObject* (* DSLProc)  (EsObject *args, DSLEnv *env);
+typedef EsObject* (* DSLMacro)  (EsObject *expr);
 
 
 enum eDSLPAttr {
@@ -54,6 +56,7 @@ struct sDSLProcBind {
 	DSLPAttr flags;
 	int arity;
 	const char* helpstr;
+	DSLMacro macro;
 };
 
 typedef struct sDSLCode DSLCode;
@@ -96,17 +99,25 @@ EsObject* dsl_entry_xget_string (const tagEntry *entry, const char* name);
 
 EsObject* dsl_entry_name (const tagEntry *entry);
 EsObject* dsl_entry_input (const tagEntry *entry);
-EsObject* dsl_entry_access (const tagEntry *entry);
-EsObject* dsl_entry_file (const tagEntry *entry);
-EsObject* dsl_entry_language (const tagEntry *entry);
-EsObject* dsl_entry_implementation (const tagEntry *entry);
-EsObject* dsl_entry_line (const tagEntry *entry);
-EsObject* dsl_entry_kind (const tagEntry *entry);
-EsObject* dsl_entry_roles (const tagEntry *entry);
 EsObject* dsl_entry_pattern (const tagEntry *entry);
+EsObject* dsl_entry_line (const tagEntry *entry);
+
+EsObject* dsl_entry_access (const tagEntry *entry);
+EsObject* dsl_entry_end (const tagEntry *entry);
+EsObject* dsl_entry_extras (const tagEntry *entry);
+EsObject* dsl_entry_file (const tagEntry *entry);
 EsObject* dsl_entry_inherits (const tagEntry *entry);
+EsObject* dsl_entry_implementation (const tagEntry *entry);
+EsObject* dsl_entry_kind (const tagEntry *entry);
+EsObject* dsl_entry_language (const tagEntry *entry);
+EsObject* dsl_entry_scope (const tagEntry *entry);
 EsObject* dsl_entry_scope_kind (const tagEntry *entry);
 EsObject* dsl_entry_scope_name (const tagEntry *entry);
-EsObject* dsl_entry_end (const tagEntry *entry);
+EsObject* dsl_entry_signature (const tagEntry *entry);
+EsObject* dsl_entry_typeref (const tagEntry *entry);
+EsObject* dsl_entry_roles (const tagEntry *entry);
+EsObject* dsl_entry_xpath (const tagEntry *entry);
+
+void dsl_report_error (const char *msg, EsObject *obj);
 
 #endif

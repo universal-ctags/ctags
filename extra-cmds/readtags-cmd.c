@@ -605,5 +605,11 @@ extern int main (int argc, char **argv)
 			ProgramName);
 		exit (1);
 	}
+#ifdef READTAGS_DSL
+	if (Qualifier)
+		q_destroy (Qualifier);
+	if (Sorter)
+		s_destroy (Sorter);
+#endif
 	return 0;
 }
