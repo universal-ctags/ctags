@@ -43,7 +43,10 @@ enum _EsType {
   ES_TYPE_CONS,
   ES_TYPE_REGEX,
   /* ... */
-  ES_TYPE_ERROR
+  ES_TYPE_ERROR,
+  /* ... */
+  ES_TYPE_BUILTIN_LAST = ES_TYPE_ERROR,
+  ES_TYPE_FOREIGNER_START,
 };
 typedef enum _EsType EsType;
 

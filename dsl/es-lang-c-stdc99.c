@@ -44,6 +44,7 @@ typedef struct _EsSymbol EsSymbol;
 typedef struct _EsError EsError;
 typedef struct _EsCons EsCons;
 typedef struct _EsRegex EsRegex;
+typedef struct _EsPointer EsPointer;
 
 struct _EsObject
 {
@@ -112,6 +113,12 @@ struct _EsRegex
 	int   case_insensitive;
 };
 
+struct _EsPointer
+{
+	EsObject base;
+	void *ptr;
+};
+
 enum EsObjectFlag
 {
 	ES_OBJECT_FLAG_ATOM = 1 << 0,
@@ -166,6 +173,9 @@ static void es_error_free(EsObject* object);
 static int  es_error_equal(const EsObject* self, const EsObject* other);
 static void es_error_print(const EsObject* object, MIO* fp);
 
+static void es_pointer_free(EsObject* object);
+static int  es_pointer_equal(const EsObject* self, const EsObject* other);
+static void es_pointer_print(const EsObject* object, MIO* fp);
 
 static EsSingleton* es_obarray_intern(EsType type, const char* name);
 static const char*  es_singleton_get   (EsSingleton *singleton);
@@ -264,7 +274,10 @@ static EsObjectClass es_error_class = {
 	.name    = "error",
 };
 
-static EsObjectClass *classes[] = {
+
+#define ES_TYPE_CLASS_MAX 32
+static int classes_count = ES_TYPE_FOREIGNER_START;
+static EsObjectClass *classes[ES_TYPE_CLASS_MAX] = {
 	[ES_TYPE_NIL]     = &es_nil_class,
 	[ES_TYPE_INTEGER] = &es_integer_class,
 	[ES_TYPE_REAL]    = &es_real_class,
@@ -1405,6 +1418,130 @@ es_error_print(const EsObject* object, MIO* fp)
 	mio_printf(fp, "#%s:", string);
 	es_print (e->object, fp);
 }
+
+/*
+ * Foreigner
+ */
+typedef struct _EsPointerClass EsPointerClass;
+struct _EsPointerClass
+{
+	EsObjectClass base;
+	void (* free_ptr) (void *);
+	int  (* equal_ptr) (const void*, const void*);
+	void (* print_ptr) (const void*, MIO *);
+};
+
+EsType
+es_class_define_pointer(const char *name,
+						void (* freefn) (void *),
+						int  (* equalfn) (const void*, const void*),
+						void (* printfn) (const void*, MIO *))
+{
+	EsType t = ES_TYPE_NIL;
+	if (classes_count >= ES_TYPE_CLASS_MAX)
+		return t;
+
+	EsPointerClass *c = calloc (1, sizeof (EsPointerClass));
+	if (c == NULL)
+		return t;
+
+	c->base.size  = sizeof (EsPointer);
+	c->base.free  = es_pointer_free;
+	c->base.equal = es_pointer_equal;
+	c->base.print = es_pointer_print;
+	c->base.flags = ES_OBJECT_FLAG_ATOM;
+	c->base.name  = strdup (name);
+	if (c->base.name == NULL)
+	{
+		free (c);
+		return t;
+	}
+	c->free_ptr = freefn;
+	c->equal_ptr = equalfn;
+	c->print_ptr = printfn;
+
+	t = classes_count++;
+	classes [t] = (EsObjectClass *)c;
+	return t;
+}
+
+static void es_pointer_free(EsObject* object)
+{
+	EsObjectClass *c = class_of(object);
+	if (((EsPointer*)object)->ptr)
+	{
+		if (((EsPointerClass *)c)->free_ptr)
+			((EsPointerClass *)c)->free_ptr (((EsPointer*)object)->ptr);
+		((EsPointer*)object)->ptr = NULL;
+	}
+	es_object_free (object);
+}
+
+static int  es_pointer_equal(const EsObject* self, const EsObject* other)
+{
+	if (es_object_get_type (self) != es_object_get_type (other))
+		return 0;
+
+	void *self_ptr  = ((EsPointer *)self)->ptr;
+	void *other_ptr = ((EsPointer *)other)->ptr;
+
+	if (self_ptr == other_ptr)
+		return 1;
+
+	if (self_ptr == NULL)
+		return 0;
+
+	EsObjectClass *c = class_of(self);
+
+	if (((EsPointerClass *)c)->equal_ptr)
+		return ((EsPointerClass *)c)->equal_ptr (self_ptr, other_ptr);
+	return 0;
+}
+
+static void es_pointer_print(const EsObject* object, MIO* fp)
+{
+	EsObjectClass *c = class_of(object);
+	mio_puts(fp, "#<");
+	mio_puts(fp, c->name);
+
+	if (((EsPointerClass *)c)->print_ptr)
+	{
+		mio_putc(fp, ' ');
+		((EsPointerClass *)c)->print_ptr (((EsPointer *)object)->ptr, fp);
+	}
+	mio_putc(fp, '>');
+}
+
+/*
+ * Pointer
+ */
+EsObject*
+es_pointer_new    (EsType type, void *ptr)
+{
+	EsObject *r;
+
+	r = es_object_new (type);
+	if (es_error_p (r))
+		return r;
+
+	((EsPointer *)r)->ptr = ptr;
+	return r;
+}
+
+void*
+es_pointer_get    (const EsObject *object)
+{
+	return ((EsPointer *)object)->ptr;
+}
+
+void*
+es_pointer_take    (EsObject *object)
+{
+	void *r = ((EsPointer *)object)->ptr;
+	((EsPointer *)object)->ptr = NULL;
+	return r;
+}
+
 
 
 
