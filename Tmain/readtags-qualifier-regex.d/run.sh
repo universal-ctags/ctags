@@ -30,11 +30,17 @@ ${V} ${READTAGS} -t output.tags -Q '(and $signature (#/CHAR,.*,CHAR|INT,.*,INT/i
 echo '# case sensitive (string->regexp)'
 ${V} ${READTAGS} -t output.tags -Q '(or #f #f (or #f (and $signature ((string->regexp "char,.*,char|int,.*,int") $signature)) #f) #f)' -en -l
 
-echo '# case insensitive: the pattern is lower case (string->regexp)'
-${V} ${READTAGS} -t output.tags -Q '(or #f #f (or #f (and $signature ((string->regexp "char,.*,char|int,.*,int" :case-fold) $signature)) #f) #f)' -en -l
+echo '# case sensitive (string->regexp :case-fold #f)'
+${V} ${READTAGS} -t output.tags -Q '(or #f #f (or #f (and $signature ((string->regexp "char,.*,char|int,.*,int" :case-fold #f) $signature)) #f) #f)' -en -l
 
-echo '# case insensitive: the pattern is upper case (string->regexp)'
-${V} ${READTAGS} -t output.tags -Q '(or #f #f (or #f (and $signature ((string->regexp "CHAR,.*,CHAR|INT,.*,INT" :case-fold) $signature)) #f) #f)' -en -l
+echo '# case sensitive (string->regexp :case-fold false)'
+${V} ${READTAGS} -t output.tags -Q '(or #f #f (or #f (and $signature ((string->regexp "char,.*,char|int,.*,int" :case-fold false) $signature)) #f) #f)' -en -l
+
+echo '# case insensitive: the pattern is lower case (string->regexp :case-fold #t)'
+${V} ${READTAGS} -t output.tags -Q '(or #f #f (or #f (and $signature ((string->regexp "char,.*,char|int,.*,int" :case-fold #t) $signature)) #f) #f)' -en -l
+
+echo '# case insensitive: the pattern is upper case (string->regexp :case-fold true)'
+${V} ${READTAGS} -t output.tags -Q '(or #f #f (or #f (and $signature ((string->regexp "CHAR,.*,CHAR|INT,.*,INT" :case-fold true) $signature)) #f) #f)' -en -l
 
 echo '# RAISING AN ERROR' 1>&2
 ${V} ${READTAGS} -t output.tags -Q '(or #f #f (or #f (and $signature (#/[/ $signature)) #f) #f)' -en -l

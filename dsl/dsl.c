@@ -1069,19 +1069,28 @@ static EsObject* string2regex (EsObject *expr)
 		dsl_throw(TOO_FEW_ARGUMENTS, es_car (expr));
 	else if (!es_string_p (es_car (args)))
 		dsl_throw(STRING_REQUIRED, es_car (expr));
-	else if (!es_null (es_cdr (es_cdr (args))))
-		dsl_throw(TOO_MANY_ARGUMENTS, es_car (expr));
 	else
 	{
-		EsObject *icase = es_car (es_cdr (args));
+		EsObject *case_fold = es_car (es_cdr (args));
 		EsObject *pattern = es_car (args);
+		int icase = 0;
 
-		if (!(es_null (icase)
-			  || es_symbol_intern (":case-fold")))
-			dsl_throw (WRONG_TYPE_ARGUMENT, es_car (expr));
+		if (!es_null (case_fold))
+		{
+			if (!es_object_equal (case_fold,
+								  es_symbol_intern (":case-fold")))
+				dsl_throw (WRONG_TYPE_ARGUMENT, expr);
 
-		return es_regex_compile (es_string_get (pattern),
-								 !es_null (icase));
+			case_fold = es_car (es_cdr (es_cdr (args)));
+			if (es_null (case_fold))
+				dsl_throw (TOO_FEW_ARGUMENTS, expr);
+
+			icase = ! (es_object_equal(case_fold, es_false)
+					   /* TODO: remove the next condition. */
+					   || es_object_equal(case_fold, es_symbol_intern ("false")));
+		}
+
+		return es_regex_compile (es_string_get (pattern), icase);
 	}
 }
 
