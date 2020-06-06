@@ -43,8 +43,8 @@ struct sHashTable {
 	unsigned int size;
 	hashTableHashFunc hashfn;
 	hashTableEqualFunc equalfn;
-	hashTableFreeFunc keyfreefn;
-	hashTableFreeFunc valfreefn;
+	hashTableDeleteFunc keyfreefn;
+	hashTableDeleteFunc valfreefn;
 };
 
 struct chainTracker {
@@ -66,8 +66,8 @@ static hentry* entry_new (void *key, void *value, hentry* next)
 }
 
 static hentry* entry_destroy (hentry* entry,
-			      hashTableFreeFunc keyfreefn,
-			      hashTableFreeFunc valfreefn)
+			      hashTableDeleteFunc keyfreefn,
+			      hashTableDeleteFunc valfreefn)
 {
 	hentry* tmp;
 
@@ -84,8 +84,8 @@ static hentry* entry_destroy (hentry* entry,
 }
 
 static void  entry_reclaim (hentry* entry,
-			    hashTableFreeFunc keyfreefn,
-			    hashTableFreeFunc valfreefn)
+			    hashTableDeleteFunc keyfreefn,
+			    hashTableDeleteFunc valfreefn)
 {
 	while (entry)
 		entry = entry_destroy (entry, keyfreefn, valfreefn);
@@ -103,7 +103,7 @@ static void *entry_find (hentry* entry, const void* const key, hashTableEqualFun
 }
 
 static bool		entry_delete (hentry **entry, const void *key, hashTableEqualFunc equalfn,
-			      hashTableFreeFunc keyfreefn, hashTableFreeFunc valfreefn)
+			      hashTableDeleteFunc keyfreefn, hashTableDeleteFunc valfreefn)
 {
 	while (*entry)
 	{
@@ -131,8 +131,8 @@ static bool  entry_foreach (hentry *entry, hashTableForeachFunc proc, void *user
 extern hashTable *hashTableNew    (unsigned int size,
 				   hashTableHashFunc hashfn,
 				   hashTableEqualFunc equalfn,
-				   hashTableFreeFunc keyfreefn,
-				   hashTableFreeFunc valfreefn)
+				   hashTableDeleteFunc keyfreefn,
+				   hashTableDeleteFunc valfreefn)
 {
 	hashTable *htable;
 
@@ -151,7 +151,7 @@ extern hashTable *hashTableNew    (unsigned int size,
 extern hashTable* hashTableIntNew (unsigned int size,
 								   hashTableHashFunc hashfn,
 								   hashTableEqualFunc equalfn,
-								   hashTableFreeFunc keyfreefn)
+								   hashTableDeleteFunc keyfreefn)
 {
 	return hashTableNew (size, hashfn, equalfn, keyfreefn, NULL);
 }

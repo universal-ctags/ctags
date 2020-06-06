@@ -30,7 +30,7 @@
 typedef struct sHashTable hashTable;
 typedef unsigned int (* hashTableHashFunc)  (const void * const key);
 typedef bool      (* hashTableEqualFunc) (const void* a, const void* b);
-typedef void         (* hashTableFreeFunc)  (void * ptr);
+typedef void         (* hashTableDeleteFunc)  (void * ptr);
 
 /* To continue interation, return true.
  * To break interation, return false. */
@@ -51,8 +51,8 @@ bool hashInteq (const void * a, const void * b);
 extern hashTable* hashTableNew         (unsigned int size,
 					hashTableHashFunc hashfn,
 					hashTableEqualFunc equalfn,
-					hashTableFreeFunc keyfreefn,
-					hashTableFreeFunc valfreefn);
+					hashTableDeleteFunc keyfreefn,
+					hashTableDeleteFunc valfreefn);
 
 extern void       hashTableDelete      (hashTable *htable);
 extern void       hashTableClear       (hashTable *htable);
@@ -79,7 +79,7 @@ extern int        hashTableCountItem   (hashTable *htable);
 extern hashTable* hashTableIntNew (unsigned int size,
 								   hashTableHashFunc hashfn,
 								   hashTableEqualFunc equalfn,
-								   hashTableFreeFunc keyfreefn);
+								   hashTableDeleteFunc keyfreefn);
 #define HT_PTR_TO_INT(P) ((int)(intptr_t)(P))
 #define HT_INT_TO_PTR(P) ((void*)(intptr_t)(P))
 #define HT_PTR_TO_UINT(P) ((unsigned int)(uintptr_t)(P))
