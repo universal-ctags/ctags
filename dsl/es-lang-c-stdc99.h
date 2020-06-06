@@ -156,10 +156,22 @@ EsObject*    es_regex_exec    (const EsObject* regex,
 							   const EsObject* str);
 
 /*
+ * Foreign pointer
+ */
+EsType       es_class_define_pointer   (const char *name,
+										void (* freefn) (void *),
+										int  (* equalfn) (const void*, const void*),
+										void (* printfn) (const void*, MIO *));
+
+EsObject*    es_pointer_new    (EsType type, void *ptr);
+void*        es_pointer_get    (const EsObject *object);
+void*        es_pointer_take   (EsObject *object);
+
+/*
  * Print
  */
 void         es_print           (const EsObject* object,
-				 MIO*           out);
+								 MIO*           out);
 char*        es_print_to_string (EsObject*        object);
 
 /*
