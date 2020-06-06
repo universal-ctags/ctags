@@ -112,6 +112,11 @@ struct _EsRegex
 	int   case_insensitive;
 };
 
+enum EsObjectFlag
+{
+	ES_OBJECT_FLAG_ATOM = 1 << 0,
+};
+
 typedef struct _EsObjectClass EsObjectClass;
 struct _EsObjectClass
 {
@@ -119,7 +124,7 @@ struct _EsObjectClass
 	void           (* free)  (EsObject* object);
 	int            (* equal) (const EsObject* self, const EsObject* other);
 	void           (* print) (const EsObject* object, MIO* fp);
-	char           atom_p;
+	unsigned       flags;
 	EsSingleton  **obarray;
 	const char*    name;
 };
@@ -174,7 +179,7 @@ static EsObjectClass es_nil_class = {
 	.free    = es_nil_free,
 	.equal   = es_nil_equal,
 	.print   = es_nil_print,
-	.atom_p  = 1,
+	.flags   = ES_OBJECT_FLAG_ATOM,
 	.obarray = NULL,
 	.name    = "nil",
 };
@@ -184,7 +189,7 @@ static EsObjectClass es_integer_class = {
 	.free    = es_integer_free,
 	.equal   = es_integer_equal,
 	.print   = es_integer_print,
-	.atom_p  = 1,
+	.flags   = ES_OBJECT_FLAG_ATOM,
 	.obarray = NULL,
 	.name    = "integer",
 };
@@ -194,7 +199,7 @@ static EsObjectClass es_real_class = {
 	.free    = es_real_free,
 	.equal   = es_real_equal,
 	.print   = es_real_print,
-	.atom_p  = 1,
+	.flags   = ES_OBJECT_FLAG_ATOM,
 	.obarray = NULL,
 	.name    = "real",
 };
@@ -204,7 +209,7 @@ static EsObjectClass es_boolean_class = {
 	.free    = es_boolean_free,
 	.equal   = es_boolean_equal,
 	.print   = es_boolean_print,
-	.atom_p  = 1,
+	.flags   = ES_OBJECT_FLAG_ATOM,
 	.obarray = (void*)1,
 	.name    = "boolean",
 };
@@ -214,7 +219,7 @@ static EsObjectClass es_symbol_class = {
 	.free    = es_symbol_free,
 	.equal   = es_symbol_equal,
 	.print   = es_symbol_print,
-	.atom_p  = 1,
+	.flags   = ES_OBJECT_FLAG_ATOM,
 	.obarray = symbol_obarray,
 	.name    = "symbol",
 };
@@ -224,7 +229,7 @@ static EsObjectClass es_string_class = {
 	.free    = es_string_free,
 	.equal   = es_string_equal,
 	.print   = es_string_print,
-	.atom_p  = 1,
+	.flags   = ES_OBJECT_FLAG_ATOM,
 	.obarray = NULL,
 	.name    = "string",
 };
@@ -234,7 +239,7 @@ static EsObjectClass es_cons_class = {
 	.free    = es_cons_free,
 	.equal   = es_cons_equal,
 	.print   = es_cons_print,
-	.atom_p  = 0,
+	.flags   = 0,
 	.obarray = NULL,
 	.name    = "cons",
 };
@@ -244,7 +249,7 @@ static EsObjectClass es_regex_class = {
 	.free    = es_regex_free,
 	.equal   = es_regex_equal,
 	.print   = es_regex_print,
-	.atom_p  = 1,
+	.flags   = ES_OBJECT_FLAG_ATOM,
 	.obarray = NULL,
 	.name    = "regex",
 };
@@ -254,7 +259,7 @@ static EsObjectClass es_error_class = {
 	.free    = es_error_free,
 	.equal   = es_error_equal,
 	.print   = es_error_print,
-	.atom_p  = 1,
+	.flags   = ES_OBJECT_FLAG_ATOM,
 	.obarray = error_obarray,
 	.name    = "error",
 };
@@ -428,7 +433,7 @@ es_object_equal         (const EsObject* self,
 int
 es_atom         (const EsObject* object)
 {
-	return class_of(object)->atom_p;
+	return class_of(object)->flags  & ES_OBJECT_FLAG_ATOM;
 }
 
 
