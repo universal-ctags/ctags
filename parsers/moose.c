@@ -10,14 +10,6 @@
  *   This module can gather tags for Moo perl extension, too.
  *   https://metacpan.org/pod/Moo
  *
- *   From the output of this parser, a client cannot know which extension is used
- *   in the input source file. However, perl parser can give you hints about the
- *   extension; with "--extras=+r --kinds-Perl=+M" options, the perl parser tags
- *   module names specified as arguments for `use' perl built-in function.
- *   You don't need the options if you just want to run This parser.
- *   This parser just needs --extras=+s option that run subparsers including this
- *   parser.
- *
  */
 
 /* NOTE about kind/role design:
@@ -30,7 +22,7 @@
  * A: capturing 'foo' as a reference tag with 'method' kind and 'wrapped' role, and
  * B: capturing 'foo' as a definition tag with 'wrapper' kind.
  *
- * This implementation takes idea B. */
+ * This implementation takes the idea B. */
 
 /*
  *   INCLUDE FILES
@@ -57,6 +49,7 @@ enum MooseKind {
 	K_METHOD,
 	K_ATTR,
 	K_WRAPPER,
+	K_ROLE,
 };
 
 static kindDefinition MooseKinds[] = {
@@ -64,6 +57,7 @@ static kindDefinition MooseKinds[] = {
 	{ true, 'm', "method", "methods" },
 	{ true, 'a', "attribute", "attributes" },
 	{ true, 'w', "wrapper", "wrappers" },
+	{ true, 'r', "role", "roles" },
 };
 
 typedef enum {
@@ -99,7 +93,8 @@ struct mooseSubparser {
 	int packageCork;
 	int classCork;
 	bool notContinuousExtendsLines;
-	const char *superClass;
+
+	vString *supersOrRoles;
 };
 
 /*
@@ -108,7 +103,7 @@ struct mooseSubparser {
 static void inputStart (subparser *s);
 static void inputEnd (subparser *s);
 static void makeTagEntryNotify (subparser *s, const tagEntryInfo *tag, int corkIndex);
-static void enterMoose (struct mooseSubparser *moose);
+static void enterMoose (struct mooseSubparser *moose, bool role);
 static void leaveMoose (struct mooseSubparser *moose);
 static void enteringPodNotify (perlSubparser *perl);
 static void leavingPodNotify  (perlSubparser *perl);
@@ -143,7 +138,7 @@ static void inputStart (subparser *s)
 	moose->packageCork = CORK_NIL;
 	moose->classCork = CORK_NIL;
 	moose->inPod = false;
-	moose->superClass = NULL;
+	moose->supersOrRoles = vStringNew ();
 	moose->notContinuousExtendsLines = true;
 }
 
@@ -154,8 +149,8 @@ static void inputEnd (subparser *s)
 	if (e)
 		e->extensionFields.endLine = getInputLineNumber ();
 
-	if (moose->superClass)
-		eFree ((char *)moose->superClass);
+	vStringDelete (moose->supersOrRoles);
+	moose->supersOrRoles = NULL;
 }
 
 static void makeTagEntryNotify (subparser *s, const tagEntryInfo *tag, int corkIndex)
@@ -181,7 +176,9 @@ static void makeTagEntryNotify (subparser *s, const tagEntryInfo *tag, int corkI
 		{
 			if (strcmp (tag->name, "Moose") == 0
 				|| strcmp (tag->name, "Moo") == 0)
-				enterMoose (moose);
+				enterMoose (moose, false);
+			else if (strcmp (tag->name, "Moose::Role") == 0)
+				enterMoose (moose, true);
 		}
 		else if (isRoleAssigned(tag, ROLE_PERL_MODULE_UNUSED))
 		{
@@ -219,7 +216,7 @@ static void leaveMoose (struct mooseSubparser *moose)
 	moose->packageCork = CORK_NIL;
 }
 
-static void enterMoose (struct mooseSubparser *moose)
+static void enterMoose (struct mooseSubparser *moose, bool role)
 {
 	moose->notContinuousExtendsLines = true;
 
@@ -230,10 +227,11 @@ static void enterMoose (struct mooseSubparser *moose)
 	moose->notInMoose = false;
 
 	tagEntryInfo moose_e;
-	initTagEntry (&moose_e, perl_e->name, K_CLASS);
+	initTagEntry (&moose_e, perl_e->name, role? K_ROLE: K_CLASS);
 	moose_e.lineNumber = perl_e->lineNumber;
 	moose_e.filePosition = perl_e->filePosition;
 	moose->classCork = makeTagEntry (&moose_e);
+	vStringClear (moose->supersOrRoles);
 
 	return;
 }
@@ -277,30 +275,30 @@ static bool findExtendsClass (const char *line,
 							  void *data)
 {
 	struct mooseSubparser *moose = data;
+	moose->notContinuousExtendsLines = true;
 
 	if (moose->inPod)
 		return true;
-
-	moose->notContinuousExtendsLines = true;
 
 	tagEntryInfo *e = getEntryInCorkQueue (moose->classCork);
 	if (!e)
 		return true;
 
-	const char *input = line + matches[1].start;
-	vString *str = vStringNew ();
+	const char *input = line + matches[2].start;
+	vString *str = moose->supersOrRoles;
 
-	parseExtendsClass (input, matches[1].length, str,
+	if (vStringLength (str) > 0)
+		vStringPut (str, ',');
+	parseExtendsClass (input, matches[2].length, str,
 					   &moose->notContinuousExtendsLines);
 
-	if (vStringLength(str) == 0)
+	if (moose->notContinuousExtendsLines == true
+		&& vStringLength (str) > 0)
 	{
-		vStringDelete (str);
-		return true;
+		if (e->extensionFields.inheritance)
+			eFree ((void *)e->extensionFields.inheritance);
+		e->extensionFields.inheritance = vStringStrdup (str);
 	}
-
-	if (e->extensionFields.inheritance == NULL)
-		e->extensionFields.inheritance = vStringDeleteUnwrap (str);
 
 	return true;
 }
@@ -318,20 +316,18 @@ static bool findExtendsClassContinuation (const char *line,
 		return true;
 
 	const char *input = line + matches[1].start;
-	vString *str;
-
-	if (e->extensionFields.inheritance)
-		str = vStringNewInit (e->extensionFields.inheritance);
-	else
-		str = vStringNew ();
+	vString *str = moose->supersOrRoles;
 
 	parseExtendsClass (input, matches[1].length, str,
 					   &moose->notContinuousExtendsLines);
 
-	if (e->extensionFields.inheritance != NULL)
-		eFree ((char *)e->extensionFields.inheritance);
-
-	e->extensionFields.inheritance = vStringDeleteUnwrap (str);
+	if (moose->notContinuousExtendsLines == true
+		&& vStringLength (str) > 0)
+	{
+		if (e->extensionFields.inheritance)
+			eFree ((void *)e->extensionFields.inheritance);
+		e->extensionFields.inheritance = vStringStrdup (str);
+	}
 
 	return true;
 }
@@ -458,7 +454,7 @@ static void findMooseTags (void)
 
 static void initializeMooseParser (langType language)
 {
-	addLanguageCallbackRegex (language, "^[ \t]*extends *(.+)",
+	addLanguageCallbackRegex (language, "^[ \t]*(extends|with) *(.+)",
 							  "{exclusive}",
 							  findExtendsClass, &mooseSubparser.notInMoose,
 							  &mooseSubparser);
