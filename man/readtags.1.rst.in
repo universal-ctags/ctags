@@ -195,19 +195,31 @@ raises an error, since it works only for strings. To avoid this problem:
      $ readtags -Q '(and $inherits (#/(^|, )A(,|$)/ $inherits))' -l
 
 
+Case-insensitive matching can be performed by ``#/PATTERN/i``.
+
 * Safely list all tags inherits from the class "A" or "a":
 
   .. code-block:: console
 
      $ readtags -Q '(and $inherits (#/(^|, )A(,|$)/i $inherits))' -l
 
-Run "readtags -H filter" to know about all valid functions and variables.
+To include "/" in a pattern, prefix "\" to the "/".
 
 NOTE: The above regular expression pattern for inspecting inheritances is just an
 example to show how to use ``#/PATTERN/`` expression.  Tags file generators have
 no consensus about the format of ``inherits:``.  Even parsers in ctags have no
 consensus. Noticing the format of the ``inherits:`` field of specific languages
 is needed for such queries.
+
+The expressions ``#/PATTERN/`` and ``#/PATTERN/i`` are for interactive use.
+Readtags also offers an alias ``string->regexp``, so ``#/PATTERN/`` is equal to
+``(string->regexp "PATTERN")``, and ``#/PATTERN/i`` is equal to
+``(string->regexp "PATTERN" :case-fold #t)``. ``string->regexp`` doesn't need to
+prefix "\" for inclulding "/" in a pattern. ``string->regexp`` may simplify a
+client tool building an expression. See also ctags-client-tools(7) for making an
+expression in your tool.
+
+Run "readtags -H filter" to know about all valid functions and variables.
 
 Sorting
 ~~~~~~~
