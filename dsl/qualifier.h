@@ -9,7 +9,7 @@
 #ifndef QUALIFIER_H
 #define QUALIFIER_H
 
-#include "es-lang-c-stdc99.h"
+#include "es.h"
 #include "readtags.h"
 
 #include <stdio.h>

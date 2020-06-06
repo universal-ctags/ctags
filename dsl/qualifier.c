@@ -11,7 +11,7 @@
  */
 #include "qualifier.h"
 #include "dsl.h"
-#include "es-lang-c-stdc99.h"
+#include "es.h"
 
 #include <stdlib.h>
 

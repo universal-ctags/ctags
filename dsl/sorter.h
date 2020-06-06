@@ -13,7 +13,7 @@
  * Includes
  */
 
-#include "es-lang-c-stdc99.h"
+#include "es.h"
 #include "readtags.h"
 
 #include <stdio.h>

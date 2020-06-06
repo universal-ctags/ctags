@@ -23,7 +23,7 @@
 # include <config.h>
 #endif
 
-#include "es-lang-c-stdc99.h"
+#include "es.h"
 
 
 #include <stdlib.h>
