@@ -99,7 +99,7 @@ endif
 
 PARSER_HEADS += $(PEG_EXTRA_HEADS)
 
-libctags_a_CPPFLAGS = -I. -I$(srcdir) -I$(srcdir)/main -I$(srcdir)/peg -DHAVE_PACKCC
+libctags_a_CPPFLAGS = -I. -I$(srcdir) -I$(srcdir)/main -I$(srcdir)/dsl -I$(srcdir)/peg -DHAVE_PACKCC
 if ENABLE_DEBUGGING
 libctags_a_CPPFLAGS+= $(DEBUG_CPPFLAGS)
 endif
@@ -193,6 +193,18 @@ mini_geany_LDADD += $(LIBYAML_LIBS)
 mini_geany_LDADD += $(SECCOMP_LIBS)
 mini_geany_LDADD += $(ICONV_LIBS)
 mini_geany_SOURCES = $(MINI_GEANY_HEADS) $(MINI_GEANY_SRCS)
+
+bin_PROGRAMS += optscript
+optscript_CPPFLAGS = $(libctags_a_CPPFLAGS)
+optscript_CFLAGS = $(libctags_a_CFLAGS)
+optscript_LDADD  = libctags.a
+# TODO: remove these dependencies from optscript command.
+optscript_LDADD += $(LIBXML_LIBS)
+optscript_LDADD += $(JANSSON_LIBS)
+optscript_LDADD += $(LIBYAML_LIBS)
+optscript_LDADD += $(SECCOMP_LIBS)
+optscript_LDADD += $(ICONV_LIBS)
+optscript_SOURCES = $(OPTSCRIPT_SRCS)
 
 if INSTALL_ETAGS
 install-exec-hook:

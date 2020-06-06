@@ -1,0 +1,85 @@
+(array)
+[/a /b]
+[/abc /efg]
+[/1 /b]
+[/a /2]
+[/123 /123]
+(dict)
+/b
+/b
+/efg
+/efg
+/2
+/2
+/123
+/123
+(cvn)
+//a
+//a /x
+(immediate)
+1
+(a\nb\tc\rd\fe)
+(abcd\n\f\r\v\t z)
+0
+[0]
+[-10]
+[0 -10]
+abc
+efg
+-dict:5-
+-dict:5-
+<<
+  /printer /===
+  /a 1
+  /b /ab
+  /c (efg)
+  /d -dict:4-
+>> 
+<<
+  /printer /====
+  /a 1
+  /b /ab
+  /c (efg)
+  /d <<
+    /e 2
+    /f /ef
+    /g (xyz)
+    /h <<
+      /i 3
+      /j /ij
+    >> 
+  >> 
+>> 
+[-dict:6-]
+[-dict:6-]
+[<<
+  /printer /===
+  /a 1
+  /b /ab
+  /c (efg)
+  /d -dict:4-
+  /z [-dict:2-]
+>> ]
+[<<
+  /printer /====
+  /a 1
+  /b /ab
+  /c (efg)
+  /d <<
+    /e 2
+    /f /ef
+    /g (xyz)
+    /h <<
+      /i 3
+      /j /ij
+      /k [<<
+        /X 1
+        /Y [0 1 2]
+      >> ]
+    >> 
+  >> 
+  /z [<<
+    /A 1
+    /B [0 1 2]
+  >> ]
+>> ]

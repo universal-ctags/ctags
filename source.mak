@@ -155,6 +155,11 @@ MINI_GEANY_SRCS = \
 	\
 	$(NULL)
 
+OPTSCRIPT_SRCS = \
+	extra-cmds/optscript-repl.c \
+	\
+	$(NULL)
+
 include makefiles/optlib2c_input.mak
 OPTLIB2C_SRCS = $(OPTLIB2C_INPUT:.ctags=.c)
 
@@ -326,8 +331,8 @@ YAML_SRCS = \
 DEBUG_HEADS = main/debug.h
 DEBUG_SRCS = main/debug.c
 
-ALL_LIB_HEADS = $(LIB_HEADS) $(PARSER_HEADS) $(DEBUG_HEADS)
-ALL_LIB_SRCS  = $(LIB_SRCS) $(PARSER_SRCS) $(DEBUG_SRCS)
+ALL_LIB_HEADS = $(LIB_HEADS) $(PARSER_HEADS) $(DEBUG_HEADS) $(DSL_HEADS) $(OPTSCRIPT_DSL_HEADS)
+ALL_LIB_SRCS  = $(LIB_SRCS) $(PARSER_SRCS) $(DEBUG_SRCS) $(DSL_SRCS) $(OPTSCRIPT_DSL_SRCS)
 ALL_HEADS = $(ALL_LIB_HEADS) $(CMDLINE_HEADS)
 ALL_SRCS = $(ALL_LIB_SRCS) $(CMDLINE_SRCS)
 
@@ -345,6 +350,18 @@ FNMATCH_OBJS = $(FNMATCH_SRCS:.c=.$(OBJEXT))
 WIN32_HEADS = main/e_msoft.h
 WIN32_SRCS = win32/mkstemp/mkstemp.c
 WIN32_OBJS = $(WIN32_SRCS:.c=.$(OBJEXT))
+
+OPTSCRIPT_DSL_HEADS = \
+	dsl/es.h \
+	dsl/optscript.h \
+	\
+	$(NULL)
+
+OPTSCRIPT_DSL_SRCS = \
+	dsl/es.c \
+	dsl/optscript.c \
+	\
+	$(NULL)
 
 READTAGS_DSL_HEADS = \
 	dsl/es.h \
@@ -395,4 +412,9 @@ PACKCC_SRCS = \
 	$(NULL)
 
 PACKCC_OBJS = $(PACKCC_SRCS:.c=.$(OBJEXT))
+
+OPTSCRIPT_DSL_OBJS = $(OPTSCRIPT_DSL_SRCS:.c=.$(OBJEXT))
+
+OPTSCRIPT_OBJS = $(OPTSCRIPT_SRCS:.c=.$(OBJEXT))
+
 # vim: ts=8

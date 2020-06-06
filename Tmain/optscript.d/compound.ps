@@ -1,0 +1,217 @@
+/pc { pstack clear } def
+(abc) dup length pc
+<< /a 1 /b 2 >> dup length pc
+[ true false null ] dup length pc
+
+(abc) () copy pc
+
+<< /a 1 /b 2 >> <<>> copy /a known pc
+<< /a 1 /b 2 >> <<>> copy /b known pc
+<< /a 1 /b 2 >> <<>> copy /c known pc
+
+[ true false null ] [] copy pc
+
+(---------------- get array ----------------) ==
+(a ->) [ (a) (b) (c) ] 0 get pc
+(b ->) [ (a) (b) (c) ] 1 get pc
+(c ->) [ (a) (b) (c) ] 2 get pc
+(true ->) { [ (a) (b) (c) ] 3 get } stopped pc
+
+(---------------- get dict ----------------) ==
+(a ->) << /a (a) true (b) 1 (c) >> /a get pc
+(b ->) << /a (a) true (b) 1 (c) >> true get pc
+(c ->) << /a (a) true (b) 1 (c) >> 1 get pc
+(true ->) { << /a (a) true (b) 1 (c) >> false get } stopped pc
+
+(---------------- get str ----------------) ==
+(97 ->) (abc) 0 get pc
+(98 ->) (abc) 1 get pc
+(99 ->) (abc) 2 get pc
+(true ->) { (abc) 3 get } stopped pc
+
+(---------------- forall array ----------------) ==
+(6 -> ) 0 [ 1 2 3 ] { add } forall pc
+
+(---------------- forall dict values ----------------) ==
+(6 -> ) 0 << /a 1 /b 2 /c 3 >> { exch pop add } forall pc
+
+(---------------- forall dict keys ----------------) ==
+(false ->)
+<< /a 1 /b 2 >> { pop } forall
+{
+    count 3 ne {
+	stop
+    } if
+    dup /a eq {
+	pop
+	/b ne {
+	    stop
+	} if
+    } {
+	/b eq {
+	    /a ne {
+		stop
+	    } if
+	} {
+	    stop
+	} ifelse
+    } ifelse
+} stopped pc
+
+(---------------- forall string ----------------) ==
+(294 ->)
+0 (abc) { add } forall pc
+
+(---------------- put string ----------------) ==
+((abc) ->)
+(xbc) dup 0 97 put pc
+
+((abcd) ->)
+(abc) dup 3 100 put pc
+
+((abc e) ->)
+(abc) dup 4 101 put pc
+
+(---------------- put array ----------------) ==
+([/a /b /c] ->)
+[ /a null /c ] dup 1 /b put pc
+
+([/a /b /c /d] ->)
+[ /a /b /c ] dup 3 /d put pc
+
+([/a /b /c null /e] ->)
+[ /a /b /c ] dup 4 /e put pc
+
+(---------------- put dict ----------------) ==
+(1 ->)
+<< /a 0 /b null /c 2 >> dup /b 1 put /b get pc
+
+(---------------- putinterval string ----------------) ==
+((xyzdef) ->)
+(abcdef) dup 0 (xyz) putinterval pc
+
+((xyz123) ->)
+(abcdef) dup 0 (xyz123) putinterval pc
+
+((xyz1234) ->)
+(abcdef) dup 0 (xyz1234) putinterval pc
+
+((abcdex) ->)
+(abcdef) dup 5 (x) putinterval pc
+
+((abcdefx) ->)
+(abcdef) dup 6 (x) putinterval pc
+
+((abcdxf) ->)
+(abcdef) dup 4 (x) putinterval pc
+
+((abcdxyz) ->)
+(abcdef) dup 4 (xyz) putinterval pc
+
+(---------------- putinterval array ----------------) ==
+([/x /b /c] ->)
+[ /a /b /c ] dup 0 [ /x ] putinterval pc
+
+([/a /x /c] ->)
+[ /a /b /c ] dup 1 [ /x ] putinterval pc
+
+([/a /b /x] ->)
+[ /a /b /c ] dup 2 [ /x ] putinterval pc
+
+([/a /b /c /x] ->)
+[ /a /b /c ] dup 3 [ /x ] putinterval pc
+
+([/a /b /c /x /y] ->)
+[ /a /b /c ] dup 3 [ /x /y ] putinterval pc
+
+([/a /b /x /y] ->)
+[ /a /b /c ] dup 2 [ /x /y ] putinterval pc
+
+([/a /x /y] ->)
+[ /a /b /c ] dup 1 [ /x /y ] putinterval pc
+
+([/x /y /c] ->)
+[ /a /b /c ] dup 0 [ /x /y ] putinterval pc
+
+([/x /y /z] ->)
+[ /a /b /c ] dup 0 [ /x /y /z ] putinterval pc
+
+([/a /x /y /z] ->)
+[ /a /b /c ] dup 1 [ /x /y /z ] putinterval pc
+
+([/a /b /x /y /z] ->)
+[ /a /b /c ] dup 2 [ /x /y /z ] putinterval pc
+
+([/a /b /c /x /y /z] ->)
+[ /a /b /c ] dup 3 [ /x /y /z ] putinterval pc
+
+([/a /b /c /x /y /z /1] ->)
+[ /a /b /c ] dup 3 [ /x /y /z /1 ] putinterval pc
+
+([/a /b /x /y /z /1] ->)
+[ /a /b /c ] dup 2 [ /x /y /z /1 ] putinterval pc
+
+([/a /x /y /z /1] ->)
+[ /a /b /c ] dup 1 [ /x /y /z /1 ] putinterval pc
+
+([/x /y /z /1] ->)
+[ /a /b /c ] dup 0 [ /x /y /z /1 ] putinterval pc
+
+(---------------- _copyinterval string ----------------) ==
+(() ->)
+(abcde) 0 0 () _copyinterval pc
+
+((1) ->)
+(abcde) 0 0 (1) _copyinterval pc
+
+((a) ->)
+(abcde) 0 1 () _copyinterval pc
+
+((1a) ->)
+(abcde) 0 1 (1) _copyinterval pc
+
+((ab) ->)
+(abcde) 0 2 () _copyinterval pc
+
+((bc) ->)
+(abcde) 1 2 () _copyinterval pc
+
+((cde) ->)
+(abcde) 2 3 () _copyinterval pc
+
+((e) ->)
+(abcde) 4 1 () _copyinterval pc
+
+(() ->)
+(abcde) 5 0 () _copyinterval pc
+
+(---------------- _copyinterval array ----------------) ==
+([] ->)
+[ /a /b /c /d /e ] 0 0 [] _copyinterval pc
+
+([1] ->)
+[ /a /b /c /d /e ] 0 0 [ 1 ] _copyinterval pc
+
+([/a] ->)
+[ /a /b /c /d /e ] 0 1 [] _copyinterval pc
+
+([1 /a] ->)
+[ /a /b /c /d /e ] 0 1 [ 1 ] _copyinterval pc
+
+([ /a /b ] ->)
+[ /a /b /c /d /e ] 0 2 [] _copyinterval pc
+
+([/b /c] ->)
+[ /a /b /c /d /e ] 1 2 [] _copyinterval pc
+
+([/c /d /e] ->)
+[ /a /b /c /d /e ] 2 3 [] _copyinterval pc
+
+([/e] ->)
+[ /a /b /c /d /e ] 4 1 [] _copyinterval pc
+
+([] ->)
+[ /a /b /c /d /e ] 5 0 [] _copyinterval pc
+
+
+

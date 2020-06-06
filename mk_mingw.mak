@@ -7,18 +7,21 @@ REGEX_DEFINES = -DHAVE_REGCOMP -D__USE_GNU -DHAVE_STDBOOL_H -DHAVE_STDINT_H -Dst
 CFLAGS = -Wall -std=gnu99
 COMMON_DEFINES=-DUSE_SYSTEM_STRNLEN
 DEFINES = -DWIN32 $(REGEX_DEFINES) -DHAVE_PACKCC $(COMMON_DEFINES)
-INCLUDES = -I. -Ignu_regex -Ifnmatch -iquote parsers -iquote main
+INCLUDES = -I. -Ignu_regex -Ifnmatch -iquote parsers -iquote main -iquote dsl
 CC = gcc
 WINDRES = windres
 OPTLIB2C = ./misc/optlib2c
 PACKCC   = ./packcc.exe
 OBJEXT = o
 RES_OBJ = win32/ctags.res.o
-ALL_OBJS += $(REGEX_OBJS)
-ALL_OBJS += $(FNMATCH_OBJS)
-ALL_OBJS += $(WIN32_OBJS)
-ALL_OBJS += $(PEG_OBJS)
-ALL_OBJS += $(RES_OBJ)
+EXTRA_OBJS  =
+EXTRA_OBJS += $(REGEX_OBJS)
+EXTRA_OBJS += $(FNMATCH_OBJS)
+EXTRA_OBJS += $(WIN32_OBJS)
+EXTRA_OBJS += $(PEG_OBJS)
+EXTRA_OBJS += $(RES_OBJ)
+ALL_OBJS   += $(EXTRA_OBJS)
+ALL_LIB_OBJS += $(EXTRA_OBJS)
 VPATH = . ./main ./parsers ./optlib ./extra-cmds ./libreadtags ./win32
 
 ifeq (yes, $(WITH_ICONV))
@@ -90,7 +93,7 @@ V_WINDRES_1 =
 peg/%.c peg/%.h: peg/%.peg $(PACKCC)
 	$(V_PACKCC) $(PACKCC) $<
 
-all: $(PACKCC) ctags.exe readtags.exe
+all: $(PACKCC) ctags.exe readtags.exe optscript.exe
 
 ctags: ctags.exe
 
@@ -107,15 +110,18 @@ $(RES_OBJ): win32/ctags.rc win32/ctags.exe.manifest win32/resource.h
 	$(V_WINDRES) $(WINDRES) -o $@ -O coff $<
 
 extra-cmds/%.o: extra-cmds/%.c
-	$(V_CC) $(CC) -c $(OPT) $(CFLAGS) -DWIN32 -Ilibreadtags -o $@ $<
+	$(V_CC) $(CC) -c $(OPT) $(CFLAGS) -DWIN32 -Ilibreadtags $(INCLUDES) -o $@ $<
 libreadtags/%.o: libreadtags/%.c
 	$(V_CC) $(CC) -c $(OPT) $(CFLAGS) -DWIN32 -Ilibreadtags -o $@ $<
 
 readtags.exe: $(READTAGS_OBJS) $(READTAGS_HEADS) $(REGEX_OBJS) $(REGEX_HEADS)
 	$(V_CC) $(CC) $(OPT) -o $@ $(READTAGS_OBJS) $(REGEX_OBJS) $(LIBS)
 
+optscript.exe: $(ALL_LIB_OBJS) $(OPTSCRIPT_OBJS) $(ALL_LIB_HEADS) $(OPTSCRIPT_DSL_HEADS) $(WIN32_HEADS)
+	$(V_CC) $(CC) $(OPT) $(CFLAGS) $(LDFLAGS) $(DEFINES) $(INCLUDES) -o $@ $(ALL_LIB_OBJS) $(OPTSCRIPT_OBJS) $(LIBS)
+
 clean:
 	$(SILENT) echo Cleaning
-	$(SILENT) rm -f ctags.exe readtags.exe $(PACKCC)
+	$(SILENT) rm -f ctags.exe readtags.exe optscript.exe $(PACKCC)
 	$(SILENT) rm -f tags
-	$(SILENT) rm -f main/*.o optlib/*.o parsers/*.o parsers/cxx/*.o gnu_regex/*.o fnmatch/*.o misc/packcc/*.o peg/*.o extra-cmds/*.o libreadtags/*.o win32/*.o win32/mkstemp/*.o
+	$(SILENT) rm -f main/*.o optlib/*.o parsers/*.o parsers/cxx/*.o gnu_regex/*.o fnmatch/*.o misc/packcc/*.o peg/*.o extra-cmds/*.o libreadtags/*.o dsl/*.o win32/*.o win32/mkstemp/*.o

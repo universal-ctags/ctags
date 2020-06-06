@@ -1,0 +1,93 @@
+/pc { pstack clear } def
+(2 2 eq) 2 2 eq pc
+(2 0 eq) 2 0 eq pc
+(2 /a eq) 2 /a eq pc
+(2 true eq) 2 true eq pc
+(2 false eq) 2 false eq pc
+(2 << >> eq) 2 << >> eq pc
+(2 [ ] eq) 2 [ ] eq pc
+(2 { } eq) 2 { } eq pc
+(2 \( \) eq) 2 ( ) eq pc
+(2 null eq) 2 null eq pc
+
+(/a /a eq) /a /a eq pc
+(/a /b eq) /a /b eq pc
+(/a \(a\) eq) /a (a) eq pc
+
+(----------------------- logical operators -----------------------) ==
+(true  true  and => true )  true  true  and pc
+(false true  and => false)  false true  and pc
+(true  false and => false)  true  false and pc
+(false false and => false)  false false and pc
+
+(true  true  or  => true )  true  true  or  pc
+(false true  or  => true )  false true  or  pc
+(true  false or  => true )  true  false or  pc
+(false false or  => false)  false false or  pc
+
+(true  true  xor => false)  true  true  xor pc
+(false true  xor => true )  false true  xor pc
+(true  false xor => true )  true  false xor pc
+(false false xor => false)  false false xor pc
+
+(true  not => false) true  not pc
+(false not => true ) false not pc
+
+(----------------------- comparison -----------------------) ==
+(1 2 gt => false) 1 2 gt pc
+(1 1 gt => false) 1 1 gt pc
+(2 1 gt => true ) 2 1 gt pc
+
+(1 2 ge => false) 1 2 ge pc
+(1 1 ge => true ) 1 1 ge pc
+(2 1 ge => true ) 2 1 ge pc
+
+(1 2 lt => true ) 1 2 lt pc
+(1 1 lt => false) 1 1 lt pc
+(2 1 lt => false) 2 1 lt pc
+
+(1 2 le => true ) 1 2 le pc
+(1 1 le => true ) 1 1 le pc
+(2 1 le => false) 2 1 le pc
+
+((a) (b) gt => false) (a) (b) gt pc
+((a) (a) gt => false) (a) (a) gt pc
+((b) (a) gt => true ) (b) (a) gt pc
+
+((a) (b) ge => false) (a) (b) ge pc
+((a) (a) ge => true ) (a) (a) ge pc
+((b) (a) ge => true ) (b) (a) ge pc
+
+((a) (b) lt => true ) (a) (b) lt pc
+((a) (a) lt => false) (a) (a) lt pc
+((b) (a) lt => false) (b) (a) lt pc
+
+((a) (b) le => true ) (a) (b) le pc
+((a) (a) le => true ) (a) (a) le pc
+((b) (a) le => false) (b) (a) le pc
+
+(----------------------- bit operators -----------------------) ==
+(0 0 and => 0) 0 0 and pc
+(0 1 and => 0) 0 1 and pc
+(1 1 and => 1) 1 1 and pc
+(3 1 and => 1) 3 1 and pc
+(2 1 and => 0) 2 1 and pc
+
+(0 0 or  => 0) 0 0 or pc
+(0 1 or  => 1) 0 1 or pc
+(1 1 or  => 1) 1 1 or pc
+(3 1 or  => 3) 3 1 or pc
+(2 1 or  => 3) 2 1 or pc
+
+(0 0 xor => 0) 0 0 xor pc
+(0 1 xor => 1) 0 1 xor pc
+(1 1 xor => 0) 1 1 xor pc
+(3 1 xor => 2) 3 1 xor pc
+(2 1 xor => 3) 2 1 xor pc
+
+(0 not => 0) 0 not pc
+(1 not => -2) 1 not pc
+(1 not not => 1) 1 not not pc
+
+(7    3  bitshift => 56) 7    3  bitshift pc
+(142 -3  bitshift => 17) 142 -3  bitshift pc
