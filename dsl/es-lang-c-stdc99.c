@@ -164,7 +164,7 @@ static void es_regex_print(const EsObject* object, MIO* fp);
 
 static void es_error_free(EsObject* object);
 static int  es_error_equal(const EsObject* self, const EsObject* other);
-static void es_error_print(const EsObject* other, MIO* fp);
+static void es_error_print(const EsObject* object, MIO* fp);
 
 
 static EsSingleton* es_obarray_intern(EsType type, const char* name);
