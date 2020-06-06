@@ -34,6 +34,7 @@ extern void *ptrArrayRemoveLast (ptrArray *const current);
 extern void ptrArrayCombine (ptrArray *const current, ptrArray *const from);
 extern void ptrArrayClear (ptrArray *const current);
 extern unsigned int ptrArrayCount (const ptrArray *const current);
+#define ptrArrayIsEmpty(A) (ptrArrayCount(A) == 0)
 extern void* ptrArrayItem (const ptrArray *const current, const unsigned int indx);
 extern void* ptrArrayLast (const ptrArray *const current);
 extern void ptrArrayDelete (ptrArray *const current);
