@@ -395,7 +395,8 @@ ctags_basename_filter()
     sed "${ctags_basename_filter_regex}"
 }
 
-etags_basename_filter_regex='s%.*\/\([[:print:]]\{1,\}\),\([0-9]\{1,\}$\)%\1,\2%'
+# About "input" in the expression, see units.py.
+etags_basename_filter_regex='s%.*\/\(input[-._][[:print:]]\{1,\}\),\([0-9]\{1,\}$\)%\1,\2%'
 etags_basename_filter()
 {
     sed "${etags_basename_filter_regex}"
