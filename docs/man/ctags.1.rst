@@ -488,9 +488,19 @@ are not listed here. They are experimental or for debugging purpose.
 	f/inputFile
 		Include an entry for the base file name of every source file
 		(e.g. "example.c"), which addresses the first line of the file.
-		If the ``end:`` field is enabled, the end line number of the file
-		can be attached to the tag. This is the replacement for ``--file-tags``
-		hidden option of Exuberant-ctags.
+		This flag is the replacement for ``--file-tags`` hidden option of
+		Exuberant-ctags.
+
+		If the ``end:`` field is enabled, the end line number of the file can be
+		attached to the tag. (However, @CTAGS_NAME_EXAMPLE@ omits the ``end:`` field
+		if no newline is in the file like an empty file.)
+
+		By default, @CTAGS_NAME_EXAMPLE@ doesn't create the "f/inputFile" extra
+		tag for the source file when @CTAGS_NAME_EXAMPLE@ doesn't find a parser
+		for it. Enabling "Unknown" parser with "--languages=+Unknown" forces
+		@CTAGS_NAME_EXAMPLE@ to create the extra tags for any source files.
+
+		The etags mode enables the "Unknown" parser implicitly.
 
 	p/pseudo
 		Include pseudo-tags. Enabled by default unless the tag file is
