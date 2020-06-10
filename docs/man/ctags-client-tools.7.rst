@@ -293,6 +293,9 @@ Lisps:
 * Use ``true`` for ``#t``.
 * Use ``false`` for ``#f``.
 * Use ``nil`` or ``()`` for ``()``.
+* Use ``(string->regexp "PATTERN")`` for ``#/PATTERN/``. Use
+  ``(string->regexp "PATTERN" :case-fold true)`` for ``#/PATTERN/i``. Notice
+  that ``string->regexp`` doesn't require escaping "/" in the pattern.
 
 Notice that even when the client tool uses this method, ``'`` still needs to be
 replaced by ``'"'"'`` to prevent broken expressions and shell injection.
