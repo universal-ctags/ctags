@@ -122,14 +122,17 @@ static void uninstallTagXpathTable (const langType language);
 /*
 *   DATA DEFINITIONS
 */
+static parserDefinition *FallbackParser (void);
 static parserDefinition *CTagsParser (void);
 static parserDefinition *CTagsSelfTestParser (void);
 static parserDefinitionFunc* BuiltInParsers[] = {
+	CTagsParser,				/* This must be first entry. */
+	FallbackParser,				/* LANG_FALLBACK */
+	CTagsSelfTestParser,
 #ifdef EXTERNAL_PARSER_LIST
 	EXTERNAL_PARSER_LIST
 #else  /* ! EXTERNAL_PARSER_LIST */
-	CTagsParser,				/* This must be first entry. */
-	CTagsSelfTestParser,
+
 	PARSER_LIST,
 	XML_PARSER_LIST
 #ifdef HAVE_LIBXML
@@ -1479,6 +1482,14 @@ getFileLanguageForRequestInternal (struct GetLanguageRequest *req)
         verbose ("	fallback[hint = %d]: %s\n", i, getLanguageName (language));
     }
 
+	/* We cannot use isLanguageEnabled() here. */
+	if (language == LANG_IGNORE
+		&& LanguageTable[LANG_FALLBACK].def->enabled)
+	{
+		language = LANG_FALLBACK;
+		verbose ("	last resort: using \"%s\" parser\n",
+				 getLanguageName (LANG_FALLBACK));
+	}
     return language;
 }
 
@@ -4598,6 +4609,34 @@ extern bool processPretendOption (const char *const option, const char *const pa
 	enableLanguage (old_language, false);
 
 	return true;
+}
+
+/*
+ * The universal fallback parser.
+ * If any parser doesn't handle the input, this parser is
+ * used for the input when --languages=+Unknown is given.
+ * writer-etags enables this parser implicitly.
+ */
+static parserDefinition *FallbackParser (void)
+{
+	parserDefinition *const def = parserNew ("Unknown");
+	def->extensions = NULL;
+	def->kindTable = NULL;
+	def->kindCount = 0;
+
+	/* A user can extend this parser with --regex-Unknown=...
+	 * or --langdef=MyParser{base=Unknown}.
+	 *
+	 * TODO: if following conditions are met, dontFindTags()
+	 * defined below can be used.
+	 * - any regex pattern is not defined,
+	 * - any sub parser is not defined, and
+	 * - end: field is not enabled.
+	 */
+	def->parser = findRegexTags;
+	def->enabled = 0;
+	def->method = METHOD_REGEX;
+	return def;
 }
 
 /*

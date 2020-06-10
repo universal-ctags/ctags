@@ -9,13 +9,13 @@ V=
 # V=valgrind
 
 echo '#' disabling fields
-${V} ${CTAGS} --options=NONE --options=./unknown.ctags -o - input.unknown
+${V} ${CTAGS} --options=NONE --options=./unknownx.ctags -o - input.unknownx
 
 echo '#' enabling signature only
-${V} ${CTAGS} --options=NONE --options=./unknown.ctags --fields-unknown=+'{signature}' -o - input.unknown
+${V} ${CTAGS} --options=NONE --options=./unknownx.ctags --fields-unknownx=+'{signature}' -o - input.unknownx
 
 echo '#' enabling protection only
-${V} ${CTAGS} --options=NONE --options=./unknown.ctags --fields-unknown=+'{protection}' -o - input.unknown
+${V} ${CTAGS} --options=NONE --options=./unknownx.ctags --fields-unknownx=+'{protection}' -o - input.unknownx
 
 echo '#' enabling both signature and protection
-${V} ${CTAGS} --options=NONE --options=./unknown.ctags --fields-unknown=+'{protection}{signature}' -o - input.unknown
+${V} ${CTAGS} --options=NONE --options=./unknownx.ctags --fields-unknownx=+'{protection}{signature}' -o - input.unknownx
