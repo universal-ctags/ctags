@@ -117,6 +117,7 @@ struct _EsPointer
 {
 	EsObject base;
 	void *ptr;
+	char  fat [];
 };
 
 enum EsObjectFlag
@@ -1426,16 +1427,32 @@ typedef struct _EsPointerClass EsPointerClass;
 struct _EsPointerClass
 {
 	EsObjectClass base;
+
+	size_t fat_size;
+	EsObject *(* init_fat) (void *fat, void * ptr, void *extra);
+
 	void (* free_ptr) (void *);
 	int  (* equal_ptr) (const void*, const void*);
 	void (* print_ptr) (const void*, MIO *);
+
+
+	void (* free_fatptr) (void *, void *);
+	int  (* equal_fatptr) (const void*, const void*,
+						   const void*, const void*);
+	void (* print_fatptr) (const void*, const void*, MIO *);
 };
 
-EsType
-es_class_define_pointer(const char *name,
-						void (* freefn) (void *),
-						int  (* equalfn) (const void*, const void*),
-						void (* printfn) (const void*, MIO *))
+static EsType
+es_class_define_pointer_full(const char *name,
+							 size_t fat_size,
+							 EsObject *(* initfat_fn) (void *fat, void * ptr, void *extra),
+							 void (* freefn) (void *),
+							 int  (* equalfn) (const void*, const void*),
+							 void (* printfn) (const void*, MIO *),
+							 void (* freefn_fat)  (void * ptr, void *fat),
+							 int  (* equalfn_fat) (const void* ptr_a, const void* fat_a,
+												   const void* ptr_b, const void* fat_b),
+							 void (* printfn_fat) (const void* ptr, const void *fat, MIO *))
 {
 	EsType t = ES_TYPE_NIL;
 	if (classes_count >= ES_TYPE_CLASS_MAX)
@@ -1445,7 +1462,16 @@ es_class_define_pointer(const char *name,
 	if (c == NULL)
 		return t;
 
-	c->base.size  = sizeof (EsPointer);
+	c->fat_size  = fat_size;
+	c->init_fat = initfat_fn;
+	c->free_ptr  = freefn;
+	c->equal_ptr = equalfn;
+	c->print_ptr = printfn;
+	c->free_fatptr  = freefn_fat;
+	c->equal_fatptr = equalfn_fat;
+	c->print_fatptr = printfn_fat;
+
+	c->base.size  = sizeof (EsPointer) + c->fat_size;
 	c->base.free  = es_pointer_free;
 	c->base.equal = es_pointer_equal;
 	c->base.print = es_pointer_print;
@@ -1456,13 +1482,37 @@ es_class_define_pointer(const char *name,
 		free (c);
 		return t;
 	}
-	c->free_ptr = freefn;
-	c->equal_ptr = equalfn;
-	c->print_ptr = printfn;
 
 	t = classes_count++;
 	classes [t] = (EsObjectClass *)c;
+
 	return t;
+}
+
+EsType
+es_class_define_pointer(const char *name,
+						void (* freefn) (void *),
+						int  (* equalfn) (const void*, const void*),
+						void (* printfn) (const void*, MIO *))
+{
+
+	return es_class_define_pointer_full (name, 0, NULL,
+										 freefn, equalfn, printfn,
+										 NULL, NULL, NULL);
+}
+
+EsType
+es_class_define_fatptr    (const char *name,
+						   size_t fat_size,
+						   EsObject *(* initfat_fn) (void *fat, void * ptr, void *extra),
+						   void (* freefn) (void * ptr, void *fat),
+						   int  (* equalfn) (const void* ptr_a, const void* fat_a,
+											 const void* ptr_b, const void* fat_b),
+						   void (* printfn) (const void* ptr, const void *fat, MIO *))
+{
+	return es_class_define_pointer_full (name, fat_size, initfat_fn,
+										 NULL, NULL, NULL,
+										 freefn, equalfn, printfn);
 }
 
 static void es_pointer_free(EsObject* object)
@@ -1470,9 +1520,11 @@ static void es_pointer_free(EsObject* object)
 	EsObjectClass *c = class_of(object);
 	if (((EsPointer*)object)->ptr)
 	{
-		if (((EsPointerClass *)c)->free_ptr)
+		if (((EsPointerClass *)c)->free_fatptr)
+			((EsPointerClass *)c)->free_fatptr (((EsPointer*)object)->ptr,
+												((EsPointer*)object)->fat);
+		else if (((EsPointerClass *)c)->free_ptr)
 			((EsPointerClass *)c)->free_ptr (((EsPointer*)object)->ptr);
-		((EsPointer*)object)->ptr = NULL;
 	}
 	es_object_free (object);
 }
@@ -1482,19 +1534,21 @@ static int  es_pointer_equal(const EsObject* self, const EsObject* other)
 	if (es_object_get_type (self) != es_object_get_type (other))
 		return 0;
 
+	EsPointerClass *c = (EsPointerClass *)class_of(self);
 	void *self_ptr  = ((EsPointer *)self)->ptr;
 	void *other_ptr = ((EsPointer *)other)->ptr;
 
-	if (self_ptr == other_ptr)
+	if (c->fat_size == 0 && self_ptr == other_ptr)
 		return 1;
 
 	if (self_ptr == NULL)
 		return 0;
 
-	EsObjectClass *c = class_of(self);
-
-	if (((EsPointerClass *)c)->equal_ptr)
-		return ((EsPointerClass *)c)->equal_ptr (self_ptr, other_ptr);
+	if (c->equal_fatptr)
+		return c->equal_fatptr (self_ptr, ((EsPointer*)self)->fat,
+								other_ptr, ((EsPointer*)other)->fat);
+	else if (c->equal_ptr)
+		return c->equal_ptr (self_ptr, other_ptr);
 	return 0;
 }
 
@@ -1504,7 +1558,14 @@ static void es_pointer_print(const EsObject* object, MIO* fp)
 	mio_puts(fp, "#<");
 	mio_puts(fp, c->name);
 
-	if (((EsPointerClass *)c)->print_ptr)
+	if (((EsPointerClass *)c)->print_fatptr)
+	{
+		mio_putc(fp, ' ');
+		((EsPointerClass *)c)->print_fatptr (((EsPointer *)object)->ptr,
+											 ((EsPointer *)object)->fat,
+											 fp);
+	}
+	else if (((EsPointerClass *)c)->print_ptr)
 	{
 		mio_putc(fp, ' ');
 		((EsPointerClass *)c)->print_ptr (((EsPointer *)object)->ptr, fp);
@@ -1512,11 +1573,8 @@ static void es_pointer_print(const EsObject* object, MIO* fp)
 	mio_putc(fp, '>');
 }
 
-/*
- * Pointer
- */
-EsObject*
-es_pointer_new    (EsType type, void *ptr)
+static EsObject*
+es_pointer_new_common (EsType type, void *ptr)
 {
 	EsObject *r;
 
@@ -1525,6 +1583,22 @@ es_pointer_new    (EsType type, void *ptr)
 		return r;
 
 	((EsPointer *)r)->ptr = ptr;
+	return r;
+}
+
+/*
+ * Pointer
+ */
+EsObject*
+es_pointer_new (EsType type, void *ptr)
+{
+	EsObject *r = es_pointer_new_common (type, ptr);
+	if (es_error_p (r))
+		return r;
+
+	if (((EsPointerClass *) (classes [type]))->fat_size > 0)
+		memset(((EsPointer *)r)->fat, 0,
+			   ((EsPointerClass *) (classes [type]))->fat_size);
 	return r;
 }
 
@@ -1542,6 +1616,47 @@ es_pointer_take    (EsObject *object)
 	return r;
 }
 
+/*
+ * Fat pointer
+ */
+EsObject*
+es_fatptr_new (EsType type, void *ptr, void *extra)
+{
+	EsObject *r = es_pointer_new_common (type, ptr);
+	if (es_error_p (r))
+		return r;
+
+	if (((EsPointerClass *) (classes [type]))->fat_size > 0)
+	{
+		if (((EsPointerClass *) (classes [type]))->init_fat)
+		{
+			EsObject *f = (* ((EsPointerClass *) (classes [type]))->init_fat)
+				(((EsPointer *)r)->fat, ptr, extra);
+			if (es_error_p (f))
+			{
+				es_object_free (r);
+				return f;
+			}
+		}
+		else if (extra)
+			memcpy (((EsPointer *)r)->fat, extra,
+					((EsPointerClass *) (classes [type]))->fat_size);
+		else
+			memset(((EsPointer *)r)->fat, 0,
+				   ((EsPointerClass *) (classes [type]))->fat_size);
+	}
+	return r;
+}
+
+void*
+es_fatptr_get     (const EsObject *object)
+{
+	EsObjectClass *c = class_of(object);
+	if (((EsPointerClass *)c)->fat_size == 0)
+		return NULL;
+
+	return ((EsPointer *)object)->fat;
+}
 
 
 
