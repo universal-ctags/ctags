@@ -867,7 +867,7 @@ static const char *renderFieldEnd (const tagEntryInfo *const tag,
 				   const char *value CTAGS_ATTR_UNUSED,
 				   vString* b)
 {
-	static char buf[16];
+	static char buf[21];
 
 	if (tag->extensionFields.endLine != 0)
 	{
