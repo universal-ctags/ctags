@@ -477,6 +477,34 @@ are not listed here. They are experimental or for debugging purpose.
 
 	The meaning of major extras is as follows (one-letter flag/long-name flag):
 
+	/anonymous
+		Include an entry for the language object that has no name like lambda
+		function. This extra has no one-letter flag and is enabled by
+		default. The extra tag is useful as a placeholder to fill scope fields
+		for language objects defined in a language object with no name.
+
+		.. code-block:: C
+
+			struct {
+				double x, y;
+			} p = { .x = 0.0, .y = 0.0 };
+
+		"x" and "y" are the members of a structure. When filling the scope
+		fields for them, ctags gets trouble because the struct
+		where "x" and "y" belong to has no name. For overcoming the truble,
+		ctags generates an anonymous extra tag for the struct
+		and fills the scope fields with the name of the extra tag.
+
+		.. code-block::
+
+			__anon9f26d2460108	input.c	/^struct {$/;"	s
+			p	input.c	/^} p = { .x = 0.0, .y = 0.0 };$/;"	v	typeref:struct:__anon9f26d2460108
+			x	input.c	/^	double x, y;$/;"	m	struct:__anon9f26d2460108
+			y	input.c	/^	double x, y;$/;"	m	struct:__anon9f26d2460108
+
+		The above tag output has "__anon9f26d2460108" as an anonymous extra tag.
+		The typeref field of "p" also receives the benefit of it.
+
 	F/fileScope
 		Indicates whether tags scoped only for a single file (i.e. tags which
 		cannot be seen outside of the file in which they are defined, such as
