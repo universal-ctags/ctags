@@ -166,6 +166,32 @@ extern void ptrArrayDeleteItem (ptrArray* const current, unsigned int indx)
 	--current->count;
 }
 
+extern void*ptrArrayRemoveItem (ptrArray* const current, unsigned int indx)
+{
+	void *ptr = current->array[indx];
+
+	memmove (current->array + indx, current->array + indx + 1,
+			(current->count - indx) * sizeof (*current->array));
+	--current->count;
+
+	return ptr;
+}
+
+extern void ptrArrayInsertItem (ptrArray* const current, unsigned int indx, void *ptr)
+{
+	Assert (current != NULL);
+	if (current->count == current->max)
+	{
+		current->max *= 2;
+		current->array = xRealloc (current->array, current->max, void*);
+	}
+
+	memmove (current->array + indx + 1, current->array + indx,
+			 (current->count - indx) * sizeof (*current->array));
+	current->array[indx] = ptr;
+	++current->count;
+}
+
 static int (*ptrArraySortCompareVar)(const void *, const void *);
 
 static int ptrArraySortCompare(const void *a0, const void *b0)

@@ -44,6 +44,8 @@ extern bool ptrArrayHasTest (const ptrArray *const current,
 extern bool ptrArrayHas (const ptrArray *const current, void *ptr);
 extern void ptrArrayReverse (const ptrArray *const current);
 extern void ptrArrayDeleteItem (ptrArray* const current, unsigned int indx);
+extern void*ptrArrayRemoveItem (ptrArray* const current, unsigned int indx);
+extern void ptrArrayInsertItem (ptrArray* const current, unsigned int indx, void *ptr);
 
 extern void ptrArraySort (ptrArray *const current, int (*compare)(const void *, const void *));
 
