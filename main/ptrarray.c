@@ -65,6 +65,16 @@ extern void *ptrArrayRemoveLast (ptrArray *const current)
 	return r;
 }
 
+extern void ptrArrayDeleteLast (ptrArray *const current)
+{
+	Assert (current != NULL);
+	Assert (current->count > 0);
+	void *r = ptrArrayLast (current);
+	if (current->deleteFunc)
+		current->deleteFunc (r);
+	--current->count;
+}
+
 /* Combine array `from' into `current', deleting `from' */
 extern void ptrArrayCombine (ptrArray *const current, ptrArray *const from)
 {
