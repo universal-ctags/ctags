@@ -490,8 +490,8 @@ are not listed here. They are experimental or for debugging purpose.
 			} p = { .x = 0.0, .y = 0.0 };
 
 		"x" and "y" are the members of a structure. When filling the scope
-		fields for them, ctags gets trouble because the struct
-		where "x" and "y" belong to has no name. For overcoming the truble,
+		fields for them, ctags has trouble because the struct
+		where "x" and "y" belong to has no name. For overcoming the trouble,
 		ctags generates an anonymous extra tag for the struct
 		and fills the scope fields with the name of the extra tag.
 
