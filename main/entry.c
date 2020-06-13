@@ -1296,7 +1296,7 @@ extern bool foreachEntriesInScope (int corkIndex,
 
 	if (!last)
 	{
-		verbose ("symtbl[>V] %s->%p\n", name, NULL);
+		verbose ("symtbl[>V] %s->%p\n", name? name: "(null)", NULL);
 		return true;			/* Nothing here in this node. */
 	}
 
