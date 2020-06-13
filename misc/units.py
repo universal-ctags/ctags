@@ -280,13 +280,32 @@ def run_shrink(cmdline_template, finput, foutput, lang):
 def basename_filter(internal, output_type):
     filters_external = {
             'ctags': 's%\(^[^\t]\{1,\}\t\)\(/\{0,1\}\([^/\t]\{1,\}/\)*\)%\\1%',
-            'etags': 's%.*\/\([[:print:]]\{1,\}\),\([0-9]\{1,\}$\)%\\1,\\2%',
+            # "input" in the expresion is for finding input file names in the TAGS file.
+            # RAWOUT.tmp:
+            #
+            #   ./Units/parser-ada.r/ada-etags-suffix.d/input_0.adb,238
+            #   package body Input_0 is   ^?Input_0/b^A1,0
+            #
+            # With the original expression, both "./Units/parser-ada.r/ada-etags-suffix.d/"
+            # and "package body Input_0 is   Input_0/' are deleted.
+            # FILTERED.tmp:
+            #
+            # input_0.adb,238
+            # b^A1,0
+            #
+            # Adding "input" ot the expression is for deleting only the former one and for
+            # skpping the later one.
+            #
+            # FIXME: if "input" is included as a substring of tag entry names, filtering
+            # with this expression makes the test fail.
+            'etags': 's%.*\/\(input[-._][[:print:]]\{1,\}\),\([0-9]\{1,\}$\)%\\1,\\2%',
             'xref': 's%\(.*[[:digit:]]\{1,\} \)\([^ ]\{1,\}[^ ]\{1,\}\)/\([^ ].\{1,\}.\{1,\}$\)%\\1\\3%',
             'json': 's%\("path": \)"[^"]\{1,\}/\([^/"]\{1,\}\)"%\\1"\\2"%',
             }
     filters_internal = {
             'ctags': [r'(^[^\t]+\t)(/?([^/\t]+/)*)', r'\1'],
-            'etags': [r'.*/(\S+),([0-9]+$)', r'\1,\2'],
+            # See above comments about "input".
+            'etags': [r'.*/(input[-._]\S+),([0-9]+$)', r'\1,\2'],
             'xref': [r'(.*\d+ )([^ ]+[^ ]+)/([^ ].+.+$)', r'\1\3'],
             'json': [r'("path": )"[^"]+/([^/"]+)"', r'\1"\2"'],
             }

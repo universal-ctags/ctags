@@ -1,0 +1,16 @@
+
+input.ads,0
+
+input_0.adb,234
+package body Input_0 isInput_0/b1,0
+   function My_Function return Boolean isMy_Function/f2,24
+   procedure My_Procedure isMy_Procedure/p7,115
+   task body My_Task isMy_Task/b12,187
+      accept GET (X: in My_T) doGET14,220
+
+input_0.ads,217
+package Input_0 isInput_0/s1,0
+   function My_Function return Boolean;My_Function/f5,192
+   procedure My_Procedure;My_Procedure/p9,411
+   type My_T is (A, B, C);My_T/t16,792
+  task My_Task isMy_Task/k20,973

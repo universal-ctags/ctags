@@ -15,6 +15,8 @@
 #include "entry_p.h"
 #include "mio.h"
 #include "options_p.h"
+#include "parse.h"
+#include "parse_p.h"
 #include "read.h"
 #include "routines.h"
 #include "routines_p.h"
@@ -91,10 +93,63 @@ static bool endEtagsFile (tagWriter *writer,
 	return false;
 }
 
+static const char* ada_suffix (const tagEntryInfo *const tag, const char *const line)
+{
+	kindDefinition *kdef = getLanguageKind(tag->langType, tag->kindIndex);
+
+	Assert (kdef);
+
+	/* Mapping from ctags' kind letter to etags's suffix string.
+	 * See https://www.gnu.org/software/emacs/manual/html_node/emacs/Tag-Syntax.html */
+	switch (kdef->letter)
+	{
+	case 'p':
+	case 'k':
+		return "/b";
+	case 'K':
+		return "/k";
+	case 'P':
+		return "/s";
+	case 't':
+		return "/t";
+	case 'R':
+	case 'r':
+	{
+		/* Unlike etags, ctags uses the procedure kind for both
+		 * procedures and functions. So in the level, emitting a tag,
+		 * we cannot distinguish whether a tag is for a procedureor a
+		 * function.
+		 *
+		 * If the typeref field of the tag is filled, we can say the tag
+		 * is for a function. However, Ada parser doesn't implement the
+		 * typeref field yet, and implementing it is not so easy.
+		 *
+		 * So we have to take an unclean way here: scanning the input
+		 * line again.
+		 * FIXME: remove the scanning code and implement the typeref field
+		 * in Ada.
+		 */
+		const char *r = strstr (line, "return");
+		const char *f = strstr (line, "function");
+		const char *p = strstr (line, "procedure");
+		if (r && f)
+			return "/f";
+		else if (p && !r)
+			return "/p";
+		return "";				/* Unknown */
+	}
+	default:
+		return "";
+	}
+}
+
 static int writeEtagsEntry (tagWriter *writer,
 							MIO * mio, const tagEntryInfo *const tag,
 							void *clientData CTAGS_ATTR_UNUSED)
 {
+	langType adaLangType = getNamedLanguage ("Ada", 0);
+	Assert (adaLangType != LANG_IGNORE);
+
 	int length;
 	struct sEtags *etags = writer->private;
 
@@ -134,8 +189,12 @@ static int writeEtagsEntry (tagWriter *writer,
 			line [truncationLength] = '\0';
 		}
 
-		length = mio_printf (mio, "%s\177%s\001%lu,%ld\n", line,
-				tag->name, tag->lineNumber, seekValue);
+		length = mio_printf (mio, "%s\177%s%s\001%lu,%ld\n", line,
+							 tag->name,
+							 (tag->langType == adaLangType)
+							 ? ada_suffix (tag, line)
+							 : "",
+							 tag->lineNumber, seekValue);
 	}
 	etags->byteCount += length;
 
