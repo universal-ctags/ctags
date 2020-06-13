@@ -25,6 +25,7 @@
 /*
 *   MACROS
 */
+#define LANG_FALLBACK   (1)
 
 /*
 *   DATA DECLARATIONS

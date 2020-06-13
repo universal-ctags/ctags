@@ -803,6 +803,7 @@ static void setEtagsMode (void)
 	Option.sorted = SO_UNSORTED;
 	Option.lineDirectives = false;
 	Option.tagRelative = TREL_YES;
+	enableLanguage (LANG_FALLBACK, true);
 	setTagWriter (WRITER_ETAGS, NULL);
 }
 
