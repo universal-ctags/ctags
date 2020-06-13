@@ -332,6 +332,7 @@ int s_compare        (const tagEntry * a, const tagEntry * b, SCode *code)
 {
 	EsObject *r;
 	int i;
+	int exit_code = 0;
 
 	DSLEnv env = {
 		.engine = DSL_SORTER,
@@ -356,14 +357,14 @@ int s_compare        (const tagEntry * a, const tagEntry * b, SCode *code)
 	else if (es_error_p (r))
 	{
 		dsl_report_error ("GOT ERROR in SORTING", r);
-		i = 0;					/* ??? */
+		exit_code = 1;
 		goto out;
 	}
 	else
 	{
 		dsl_report_error ("Get unexpected value as the result of sorting",
 						  r);
-		i = 0;					/* ??? */
+		exit_code = 1;
 		goto out;
 	}
 
@@ -371,6 +372,9 @@ int s_compare        (const tagEntry * a, const tagEntry * b, SCode *code)
 	es_autounref_pool_pop ();
 
 	dsl_cache_reset (DSL_SORTER);
+
+	if (exit_code)
+		exit (exit_code);
 
 	return i;
 }
