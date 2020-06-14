@@ -61,6 +61,8 @@ However, some of them are represented in integer type and/or boolean type.
 What kind of JSON data types used in a field can be known with the output
 of ``--list-fields`` option:
 
+.. code-block:: console
+
         $ ./ctags --list-fields
         #LETTER NAME            ENABLED LANGUAGE         XFMT   JSTYPE DESCRIPTION
         N       name            on      NONE             TRUE   s--    tag name (fixed field)
