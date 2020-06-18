@@ -99,11 +99,11 @@ extern void* ptrArrayItem (const ptrArray *const current, const unsigned int ind
 	return current->array [indx];
 }
 
-extern void* ptrArrayLast (const ptrArray *const current)
+extern void* ptrArrayItemFromLast (const ptrArray *const current, const unsigned int indx)
 {
 	Assert (current != NULL);
-	Assert (current->count > 0);
-	return current->array [current->count - 1];
+	Assert (current->count > indx);
+	return current->array [current->count - 1 - indx];
 }
 
 extern void ptrArrayClear (ptrArray *const current)
