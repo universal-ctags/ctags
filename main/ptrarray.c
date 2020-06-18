@@ -65,14 +65,18 @@ extern void *ptrArrayRemoveLast (ptrArray *const current)
 	return r;
 }
 
-extern void ptrArrayDeleteLast (ptrArray *const current)
+extern void  ptrArrayDeleteLastInBatch (ptrArray *const current, unsigned int count)
 {
 	Assert (current != NULL);
-	Assert (current->count > 0);
-	void *r = ptrArrayLast (current);
-	if (current->deleteFunc)
-		current->deleteFunc (r);
-	--current->count;
+	Assert (current->count >= count);
+	while (count > 0)
+	{
+		void *r = ptrArrayLast (current);
+		if (current->deleteFunc)
+			current->deleteFunc (r);
+		--current->count;
+		--count;
+	}
 }
 
 /* Combine array `from' into `current', deleting `from' */
