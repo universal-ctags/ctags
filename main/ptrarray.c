@@ -96,6 +96,7 @@ extern unsigned int ptrArrayCount (const ptrArray *const current)
 extern void* ptrArrayItem (const ptrArray *const current, const unsigned int indx)
 {
 	Assert (current != NULL);
+	Assert (current->count > indx);
 	return current->array [indx];
 }
 
