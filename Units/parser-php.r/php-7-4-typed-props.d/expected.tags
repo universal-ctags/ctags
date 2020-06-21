@@ -1,0 +1,9 @@
+Person	input.php	/^class Person$/;"	c
+age	input.php	/^        public int $age;$/;"	v	class:Person	typeref:unknown:int
+User	input.php	/^class User extends Person$/;"	c	inherits:Person
+id	input.php	/^    public int $id;$/;"	v	class:User	typeref:unknown:int
+name	input.php	/^    public ?string $name;$/;"	v	class:User	typeref:unknown:?string
+next	input.php	/^    public self $next;$/;"	v	class:User	typeref:class:User
+child	input.php	/^    public parent $child;$/;"	v	class:User	typeref:class:Person
+__construct	input.php	/^    public function __construct($id, $name) {$/;"	f	class:User
+u	input.php	/^$u = new User (0, "A");$/;"	v
