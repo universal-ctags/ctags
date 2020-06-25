@@ -234,7 +234,7 @@ extern kindDefinition *getKind (struct kindControlBlock* kcb, int kindIndex)
 	return kcb->kind [kindIndex].def;
 }
 
-extern kindDefinition *getKindForLetter (struct kindControlBlock* kcb, int letter)
+extern kindDefinition *getKindForLetter (struct kindControlBlock* kcb, char letter)
 {
 	unsigned int i;
 	kindDefinition * kdef;

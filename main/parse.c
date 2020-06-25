@@ -2417,7 +2417,7 @@ static bool processLangDefineKind(const langType language,
 	parserObject *parser;
 
 	kindDefinition *kdef;
-	int letter;
+	char letter;
 	const char * p = parameter;
 	char *name;
 	char *description;
@@ -2435,11 +2435,12 @@ static bool processLangDefineKind(const langType language,
 	if (p[0] == '\0')
 		error (FATAL, "no kind definition specified in \"--%s\" option", option);
 
-	/* See #1697. isalnum expects 0~255 as the range of characters. */
-	letter = (unsigned char)p[0];
+	letter = p[0];
 	if (letter == ',')
 		error (FATAL, "no kind letter specified in \"--%s\" option", option);
-	if (!isalpha (letter))
+	if (/* See #1697. isalnum expects 0~255 as the range of characters. */
+		!isalpha ((unsigned char)letter)
+		)
 		error (FATAL, "the kind letter given in \"--%s\" option is not an alphabet", option);
 	else if (letter == KIND_FILE_DEFAULT_LETTER)
 		error (FATAL, "the kind letter `F' in \"--%s\" option is reserved for \"file\" kind", option);
@@ -2539,7 +2540,7 @@ static bool processLangDefineRole(const langType language,
 
 	kindDefinition *kdef;
 	roleDefinition *rdef;
-	int kletter;
+	char kletter;
 	const char * p = parameter;
 	char *name;
 	char *description;
@@ -2558,7 +2559,7 @@ static bool processLangDefineRole(const langType language,
 	kletter = p[0];
 	if (kletter == '.')
 		error (FATAL, "no kind letter specified in \"--%s\" option", option);
-	if (!isalnum (kletter))
+	if (!isalnum ((unsigned char)kletter))
 		error (FATAL, "the kind letter given in \"--%s\" option is not an alphabet or a number", option);
 	else if (kletter == KIND_FILE_DEFAULT_LETTER)
 		error (FATAL, "the kind letter `F' in \"--%s\" option is reserved for \"file\" kind and no role can be attached to", option);

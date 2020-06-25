@@ -43,7 +43,7 @@ extern bool isRoleEnabled (struct kindControlBlock* kcb, int kindIndex, int role
 extern unsigned int countKinds (struct kindControlBlock* kcb);
 extern unsigned int countRoles (struct kindControlBlock* kcb, int kindIndex);
 extern kindDefinition *getKind (struct kindControlBlock* kcb, int kindIndex);
-extern kindDefinition *getKindForLetter (struct kindControlBlock* kcb, int letter);
+extern kindDefinition *getKindForLetter (struct kindControlBlock* kcb, char letter);
 extern kindDefinition *getKindForName (struct kindControlBlock* kcb, const char* name);
 extern int getKindIndexForLetter (struct kindControlBlock* kcb, char letter);
 extern int getKindIndexForName (struct kindControlBlock* kcb, const char* name);
