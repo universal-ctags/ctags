@@ -81,6 +81,11 @@ extern void enableKind (kindDefinition *kind, bool enable)
 	}
 }
 
+extern void enableRole (roleDefinition *role, bool enable)
+{
+	role->enabled = enable;
+}
+
 static void initRoleObject (roleObject *robj, roleDefinition *rdef, freeRoleDefFunc freefunc, int roleId)
 {
 #ifdef DEBUG

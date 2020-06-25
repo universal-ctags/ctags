@@ -29,6 +29,7 @@ typedef void (* freeRoleDefFunc) (roleDefinition *);
 *   FUNCTION PROTOTYPES
 */
 extern void enableKind (kindDefinition *kind, bool enable);
+extern void enableRole (roleDefinition *role, bool enable);
 extern const char *renderRole (const roleDefinition* const def, vString* b);
 
 extern struct kindControlBlock* allocKindControlBlock (parserDefinition *parser);
