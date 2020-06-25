@@ -263,6 +263,35 @@ extern kindDefinition *getKindForName (struct kindControlBlock* kcb, const char*
 	return NULL;
 }
 
+extern int getKindIndexForLetter (struct kindControlBlock* kcb, char letter)
+{
+	unsigned int i;
+	kindDefinition * kdef;
+
+	for (i = 0;  i < countKinds (kcb);  ++i)
+	{
+		kdef = getKind (kcb, i);
+		if (kdef->letter == letter)
+			return (unsigned int)i;
+	}
+	return KIND_GHOST_INDEX;
+}
+
+extern int getKindIndexForName (struct kindControlBlock* kcb, const char* name)
+{
+	unsigned int i;
+	kindDefinition * kdef;
+
+	for (i = 0;  i < countKinds (kcb);  ++i)
+	{
+		kdef = getKind (kcb, i);
+		Assert(kdef);
+		if (kdef->name && (strcmp(kdef->name, name) == 0))
+			return (int)i;
+	}
+	return KIND_GHOST_INDEX;
+}
+
 extern roleDefinition* getRole(struct kindControlBlock* kcb, int kindIndex, int roleIndex)
 {
 	struct roleControlBlock *rcb = kcb->kind[kindIndex].rcb;

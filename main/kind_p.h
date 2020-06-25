@@ -45,6 +45,8 @@ extern unsigned int countRoles (struct kindControlBlock* kcb, int kindIndex);
 extern kindDefinition *getKind (struct kindControlBlock* kcb, int kindIndex);
 extern kindDefinition *getKindForLetter (struct kindControlBlock* kcb, int letter);
 extern kindDefinition *getKindForName (struct kindControlBlock* kcb, const char* name);
+extern int getKindIndexForLetter (struct kindControlBlock* kcb, char letter);
+extern int getKindIndexForName (struct kindControlBlock* kcb, const char* name);
 extern roleDefinition* getRole(struct kindControlBlock* kcb, int kindIndex, int roleIndex);
 extern roleDefinition* getRoleForName(struct kindControlBlock* kcb, int kindIndex, const char* name);
 extern void linkKindDependency (struct kindControlBlock *masterKCB,
