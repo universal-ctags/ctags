@@ -2587,7 +2587,8 @@ static bool processLangDefineRole(const langType language,
 	while (p != tmp_end)
 	{
 		if (!isalnum (*p))
-			error (FATAL, "unacceptable char as part of role name in \"--%s\" option", option);
+			error (FATAL, "unacceptable char as part of role name in \"--%s\" option: %c",
+				   option, *p);
 		p++;
 	}
 
