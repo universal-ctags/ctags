@@ -2768,6 +2768,353 @@ extern bool processKindsOption (
 #undef PREFIX_LEN
 }
 
+/*
+ * The argument specification for --roles-<LANG>:<KIND>= option
+ * =====================================================================
+ *
+ * --roles-all.*=
+ * --roles-all=
+ * => Disable all roles of all kinds in all languages.
+ *
+ * --roles-all.*='*'
+ * --roles-all='*'
+ * => Enable all roles of all kinds in all languages.
+ *
+ * --roles-<LANG>.*=
+ * --roles-<LANG>=
+ * => Disable all roles of all kinds.
+ *
+ * --roles-<LANG>.*=*
+ * --roles-<LANG>=*
+ * => Enable all roles of all kinds.
+ *
+ * --roles-<LANG>.{kind}=
+ * --roles-<LANG>.k=
+ * => Disable all roles of the kind specified with a letter.
+ *
+ * --roles-<LANG>.{kind}=*
+ * --roles-<LANG>.k=*
+ * => Enable all roles of the kind specified with a letter.
+ *
+ * --roles-<LANG>.{kind}=[+|-]{role}
+ * --roles-<LANG>.k=[+|-]{role}
+ * => Enable/disable the role of the kind specified with a letter.
+ *
+ *
+ * Examples of combination
+ * ---------------------------------------------------------------------
+ *
+ * --roles-<LANG>.k0=+{role0}-{role1}{role2}
+ * --roles-<LANG>.{kind1}=+{role0}-{role1}{role2}
+ *
+ *
+ * How should --roledef be change to align --roles-<LANG> notation
+ * ---------------------------------------------------------------------
+ *
+ * --_roledef-<LANG>.k=role,description
+ * --_roledef-<LANG>.{kind}=role,description
+ *
+ * The notation was
+ *  --_roledef-<LANG>=k.role,description
+ *
+ *
+ * How should --param be change to align --roles-<LANG> notation
+ * ---------------------------------------------------------------------
+ *
+ * --_param-<LANG>.name=argument
+ *
+ *  * The notation was
+ * --_param-<LANG>:name=argument
+ *
+ *
+ * How should --paramdef be to align --roles-<LANG> notation
+ * ---------------------------------------------------------------------
+ *
+ * --_paramdef-<LANG>.name=[ default (desription) ]
+ *
+ *
+ * Discussion: which shoule we use . or : ?
+ * ---------------------------------------------------------------------
+ *
+ * `.' is better because `:' implies fields.
+ *
+ */
+struct langKindRoleDefinitionStruct {
+	int kindIndex;
+	const char *const option;
+	const char *const parameter;
+};
+
+typedef void (*kindCallback)  (langType language, int kindIndex, void* user_data);
+static void foreachKind(langType language, kindCallback callback, void *user_data)
+{
+	unsigned int c = countLanguageKinds (language);
+	for (unsigned int i = 0; i < c; i++)
+		callback (language, (int)i, user_data);
+}
+
+static void resetKindRoles (const langType language, int kindIndex, const bool mode)
+{
+	Assert (0 <= language  &&  language < (int) LanguageCount);
+	unsigned int c = countLanguageRoles (language, kindIndex);
+
+	for (unsigned int i = 0; i < c; i++)
+	{
+		roleDefinition* rdef = getLanguageRole (language, kindIndex, (int)i);
+		enableRole (rdef, mode);
+	}
+}
+
+static void resetKindRolesAsCallback (const langType language, int kindIndex, void *user_data)
+{
+	bool mode = (bool)user_data;
+	resetKindRoles (language, kindIndex, mode);
+}
+
+static void processLangKindRoleDefinition (
+		const langType language, const int kindIndex, const char *const option,
+		const char *const parameter)
+{
+	Assert (0 <= language  &&  language < (int) LanguageCount);
+	Assert (kindIndex != KIND_GHOST_INDEX);
+	initializeParser (language);
+
+	const char *p = parameter;
+	bool mode = true;
+
+	if (*p == '\0')
+	{
+		resetKindRoles (language, kindIndex, false);
+		return;
+	}
+	else if (*p != '+' && *p != '-' )
+		resetKindRoles (language, kindIndex, false);
+
+	while (*p != '\0')
+	{
+		if (*p == '+')
+		{
+			mode = true;
+			p++;
+		}
+		else if (*p == '-')
+		{
+			mode = false;
+			p++;
+		}
+		else if (*p == '{')
+		{
+			p++;
+			char *q = strchr (p, '}');
+			if (!q)
+
+				error (FATAL, "no '}' representing the end of role name in --%s option: %s",
+					   option, p);
+			if (p == q)
+				error (FATAL, "empty role for the kind letter: %c",
+					   getLanguageKind (language, kindIndex)->letter);
+
+			char *rname = eStrndup (p,  q - p);
+			roleDefinition *rdef = getLanguageRoleForName (language, kindIndex, rname);
+			if (!rdef)
+				error (WARNING, "no such role: %s of %c kind in language %s",
+					   rname, getLanguageKind (language, kindIndex)->letter,
+					   getLanguageName (language));
+			else
+				enableRole (rdef, mode);
+			eFree (rname);
+			p = q + 1;
+		}
+		else if (*p == '*')
+		{
+			resetKindRoles (language, kindIndex, true);
+			p++;
+		}
+		else
+			error (FATAL, "unexpected character %c in --%s=%s option",
+				   *p, option, parameter);
+	}
+}
+
+static void processLangKindRoleDefinitionEach (langType language, void* user_data)
+{
+	struct langKindRoleDefinitionStruct *arg = user_data;
+
+	if (arg->kindIndex == KIND_GHOST_INDEX)
+	{
+		initializeParser (language);
+		foreachKind (language, resetKindRolesAsCallback,
+					 ((*(arg->parameter) == '*')? (void *)true: (void *)false));
+	}
+	else
+		processLangKindRoleDefinition (language, arg->kindIndex,
+									   arg->option, arg->parameter);
+}
+
+extern bool processRolesOption (const char *const option, const char *const parameter)
+{
+#define PREFIX "roles-"
+#define PREFIX_LEN strlen(PREFIX)
+
+	if ( strncmp (option, PREFIX, PREFIX_LEN) != 0 )
+		return false;
+
+	const char* lang = option + PREFIX_LEN;
+	if (lang[0] == '\0')
+	{
+		error (WARNING, "no language given in \"%s\" option", option);
+		return true;
+	}
+
+	/*
+	 * --roles-all.*=
+	 * --roles-all=
+	 * => Disable all roles of all kinds in all languages.
+	 *
+	 * --roles-all.*='*'
+	 * --roles-all='*'
+	 * => Enable all roles of all kinds in all languages.
+	 */
+	if (strncmp (lang, RSV_LANG_ALL, strlen(RSV_LANG_ALL)) == 0)
+	{
+		if (lang [strlen (RSV_LANG_ALL)] == '\0'
+			|| (strcmp (lang + strlen (RSV_LANG_ALL), ".*") == 0))
+		{
+			if (*parameter == '\0'
+				|| strcmp(parameter, "*") == 0)
+			{
+				struct langKindRoleDefinitionStruct arg = {
+					.kindIndex = KIND_GHOST_INDEX,
+					.option = option,
+					.parameter = parameter,
+				};
+				foreachLanguage (processLangKindRoleDefinitionEach, &arg);
+				return true;
+			}
+			else
+				error (FATAL, "only '*' or '' (empty string) is acceptable as an argument for --%s: %s",
+					   option,
+					   parameter);
+		}
+		else if (lang [strlen(RSV_LANG_ALL)] == '.')
+			error (FATAL, "only '*' or '' (empty string) is acceptable as a kind spec for --%sall: --%s",
+				   PREFIX,
+				   option);
+	}
+
+	/* Decide the language. */
+	langType language;
+	const char *dot = strchr (lang, '.');
+	if (dot)
+		language = getNamedLanguage (lang, dot - lang);
+	else
+		language = getNamedLanguage (lang, 0);
+
+	if (language == LANG_IGNORE)
+	{
+		char *lang0 = dot? eStrndup (lang, dot - lang): NULL;
+		error (WARNING, "unknown language \"%s\" in --%s option",
+			   (lang0? lang0: lang), option);
+		if (lang0)
+			eFree (lang0);
+		return true;
+	}
+
+	/*
+	 * --roles-<LANG>.*=
+	 * --roles-<LANG>=
+	 * => Disable all roles of all kinds.
+	 *
+	 * --roles-<LANG>.*=*
+	 * --roles-<LANG>=*
+	 * => Enable all roles of all kinds.
+	 */
+	if (dot == NULL || (strcmp (dot, ".*") == 0))
+	{
+		if (*parameter == '\0'
+			|| strcmp(parameter, "*") == 0)
+		{
+			foreachKind (language, resetKindRolesAsCallback,
+						 ((*parameter == '*')? (void*)true: (void*)false));
+			return true;
+		}
+		else
+			error (FATAL, "only '*' or '' (empty string) is acceptable as an argument for --%s: %s",
+				   option,
+				   parameter);
+	}
+
+	/* Decide the kind of the language. */
+	parserObject *parser = LanguageTable + language;
+	int kindIndex = KIND_GHOST_INDEX;
+	const char *kind = dot + 1;
+	if (*kind == '{')
+	{
+		const char *name_end = strchr (kind, '}');
+		if (name_end == NULL)
+			error (FATAL, "no '}' representing the end of kind name in --%s option: %s",
+				   option, kind);
+		char *kindName = eStrndup (kind + 1, name_end - (kind + 1));
+		if (strcmp (kindName, KIND_FILE_DEFAULT_NAME) == 0)
+		{
+			error (WARNING, "don't enable/disable a role in F/file kind; it has no role: --%s",
+				   option);
+			return true;
+		}
+		kindIndex = getKindIndexForName (parser->kindControlBlock, kindName);
+		if (kindIndex == KIND_GHOST_INDEX)
+		{
+			eFree (kindName);
+			error (WARNING, "no such kind name as specified in --%s option", option);
+			return true;
+		}
+		if (*(name_end + 1) != '\0')
+			error (FATAL, "garbage after the kind specification {%s} in --%s option",
+				   kindName, option);
+		eFree (kindName);
+	}
+	else if (isalpha ((unsigned char)*kind))
+	{
+		if (*kind == KIND_FILE_DEFAULT_LETTER)
+		{
+			error (WARNING, "don't enable/disable a role in F/file kind; it has no role: --%s",
+				   option);
+			return true;
+		}
+		kindIndex = getKindIndexForLetter (parser->kindControlBlock, *kind);
+		if (kindIndex == KIND_GHOST_INDEX)
+		{
+			error (WARNING, "no such kind letter as specified in --%s option", option);
+			return true;
+		}
+		if (*(kind + 1) != '\0')
+			error (FATAL, "garbage after the kind specification '%c' in --%s option",
+				   *kind, option);
+	}
+	else
+		error (FATAL, "'%c', unexpected character in --%s", *kind, option);
+
+
+	/*
+	 * --roles-<LANG>.{kind}=
+	 * --roles-<LANG>.k=
+	 * => Disable all roles of the kind specified with a letter.
+	 *
+	 * --roles-<LANG>.{kind}=*
+	 * --roles-<LANG>.k=*
+	 * => Enable all roles of the kind specified with a letter.
+	 *
+	 * --roles-<LANG>.{kind}=[+|-|]{role}
+	 * --roles-<LANG>.k=[+|-|]{role}
+	 * => Enable/disable the role of the kind specified with a letter.
+	 */
+	processLangKindRoleDefinition (language, kindIndex, option, parameter);
+
+	return true;
+#undef PREFIX
+#undef PREFIX_LEN
+}
+
 extern void printLanguageRoles (const langType language, const char* kindspecs,
 								bool withListHeader, bool machinable, FILE *fp)
 {
