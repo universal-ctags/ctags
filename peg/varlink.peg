@@ -96,7 +96,7 @@ _
 
 field_name
     <- < [A-Za-z]('_'?[A-Za-z0-9])* > {
-    makeVarlikTag(auxil, $1, $1s);
+    makeVarlinkTag(auxil, $1, $1s);
 }
 
 field_name_list
@@ -105,12 +105,12 @@ field_name_list
 name
     <- < [A-Z][A-Za-z0-9]* > {
     if (peekKind(auxil) != KIND_GHOST_INDEX)
-	auxil->scope_cork_index = makeVarlikTag(auxil, $1, $1s);
+	auxil->scope_cork_index = makeVarlinkTag(auxil, $1, $1s);
 }
 
 interface_name
     <- < [a-z]([-]* [a-z0-9])* ( '.' [a-z0-9]([-]*[a-z0-9])* )+ > {
-    auxil->scope_cork_index = makeVarlikTag(auxil, $1, $1s);
+    auxil->scope_cork_index = makeVarlinkTag(auxil, $1, $1s);
 }
 
 dict

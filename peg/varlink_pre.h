@@ -78,4 +78,4 @@ static void pushKindContextual (struct parserCtx *auxil);
 static int peekKind (struct parserCtx *auxil);
 static void setMethodParamState (struct parserCtx *auxil, methodParamState s);
 static void reportError (struct parserCtx *auxil);
-static int makeVarlikTag (struct parserCtx *auxil, const char *name, long offset);
+static int makeVarlinkTag (struct parserCtx *auxil, const char *name, long offset);

@@ -84,7 +84,7 @@ static void reportError (struct parserCtx *auxil)
 			 getInputFileName());
 }
 
-static int makeVarlikTag (struct parserCtx *auxil, const char *name, long offset)
+static int makeVarlinkTag (struct parserCtx *auxil, const char *name, long offset)
 {
 	tagEntryInfo e;
 	int k = peekKind (auxil);
