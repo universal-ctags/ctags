@@ -832,8 +832,8 @@ You can define a role in an optlib parser for capturing reference
 tags. See :ref:`Capturing reference tags <roles>` for more
 details.
 
-Currently ctags doesn't provide the way for disabling a
-specified role.
+``--roles-<LANG>.<KIND>`` is the option for enabling/disabling
+specified roles.
 
 
 Automatic parser selection
