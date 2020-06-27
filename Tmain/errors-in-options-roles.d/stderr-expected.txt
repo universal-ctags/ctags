@@ -1,0 +1,450 @@
+
+#
+# --roles-all=something
+#
+ctags: only '*' or '' (empty string) is acceptable as an argument for --roles-all: something
+status: 1
+
+#
+# --roles-all.*=something
+#
+ctags: only '*' or '' (empty string) is acceptable as an argument for --roles-all.*: something
+status: 1
+
+#
+# --roles-all.?=
+#
+ctags: only '*' or '' (empty string) is acceptable as a kind spec for --roles-all: --roles-all.?
+status: 1
+
+#
+# --roles-NoSuchLang=
+#
+ctags: Warning: unknown language "NoSuchLang" in --roles-NoSuchLang option
+status: 42
+
+#
+# --roles-NoSuchLang.*=
+#
+ctags: Warning: unknown language "NoSuchLang" in --roles-NoSuchLang.* option
+status: 42
+
+#
+# --roles-NoSuchLang=+{role}
+#
+ctags: Warning: unknown language "NoSuchLang" in --roles-NoSuchLang option
+status: 42
+
+#
+# --roles-NoSuchLang=-{role}
+#
+ctags: Warning: unknown language "NoSuchLang" in --roles-NoSuchLang option
+status: 42
+
+#
+# --roles-C={role}
+#
+ctags: only '*' or '' (empty string) is acceptable as an argument for --roles-C: {role}
+status: 1
+
+#
+# --roles-C=+{role}
+#
+ctags: only '*' or '' (empty string) is acceptable as an argument for --roles-C: +{role}
+status: 1
+
+#
+# --roles-C=-{role}
+#
+ctags: only '*' or '' (empty string) is acceptable as an argument for --roles-C: -{role}
+status: 1
+
+#
+# --roles-C.*={role}
+#
+ctags: only '*' or '' (empty string) is acceptable as an argument for --roles-C.*: {role}
+status: 1
+
+#
+# --roles-C.*=+{role}
+#
+ctags: only '*' or '' (empty string) is acceptable as an argument for --roles-C.*: +{role}
+status: 1
+
+#
+# --roles-C.*=-{role}
+#
+ctags: only '*' or '' (empty string) is acceptable as an argument for --roles-C.*: -{role}
+status: 1
+
+#
+# --roles-C.{header=
+#
+ctags: no '}' representing the end of kind name in --roles-C.{header option: {header
+status: 1
+
+#
+# --roles-C.{file}=
+#
+ctags: Warning: don't enable/disable a role in F/file kind; it has no role: --roles-C.{file}
+status: 42
+
+#
+# --roles-C.{noSuchKind}=
+#
+ctags: Warning: no such kind name as specified in --roles-C.{noSuchKind} option
+status: 42
+
+#
+# --roles-C.{header}x=
+#
+ctags: garbage after the kind specification {header} in --roles-C.{header}x option
+status: 1
+
+#
+# --roles-C.F=
+#
+ctags: Warning: don't enable/disable a role in F/file kind; it has no role: --roles-C.F
+status: 42
+
+#
+# unknown kind letter x
+#
+ctags: Warning: no such kind letter as specified in --roles-MyLang.X option
+status: 42
+
+#
+# --roles-C.fx=
+#
+ctags: garbage after the kind specification 'f' in --roles-C.fx option
+status: 1
+
+#
+# --roles-C.?=
+#
+ctags: '?', unexpected character in --roles-C.?
+status: 1
+
+#
+# --roles-C.h={system
+#
+ctags: no '}' representing the end of role name in --roles-C.h option: system
+status: 1
+
+#
+# --roles-C.h=+{system
+#
+ctags: no '}' representing the end of role name in --roles-C.h option: system
+status: 1
+
+#
+# --roles-C.h=-{system
+#
+ctags: no '}' representing the end of role name in --roles-C.h option: system
+status: 1
+
+#
+# --roles-C.h={system}{local
+#
+ctags: no '}' representing the end of role name in --roles-C.h option: local
+status: 1
+
+#
+# --roles-C.h=+{system}{local
+#
+ctags: no '}' representing the end of role name in --roles-C.h option: local
+status: 1
+
+#
+# --roles-C.h=-{system}{local
+#
+ctags: no '}' representing the end of role name in --roles-C.h option: local
+status: 1
+
+#
+# --roles-C.h={system{local}
+#
+ctags: Warning: no such role: system{local of h kind in language C
+status: 42
+
+#
+# --roles-C.h=+{system{local}
+#
+ctags: Warning: no such role: system{local of h kind in language C
+status: 42
+
+#
+# --roles-C.h=-{system{local}
+#
+ctags: Warning: no such role: system{local of h kind in language C
+status: 42
+
+#
+# --roles-C.{header}={system
+#
+ctags: no '}' representing the end of role name in --roles-C.{header} option: system
+status: 1
+
+#
+# --roles-C.{header}=+{system
+#
+ctags: no '}' representing the end of role name in --roles-C.{header} option: system
+status: 1
+
+#
+# --roles-C.{header}=-{system
+#
+ctags: no '}' representing the end of role name in --roles-C.{header} option: system
+status: 1
+
+#
+# --roles-C.{header}={system}{local
+#
+ctags: no '}' representing the end of role name in --roles-C.{header} option: local
+status: 1
+
+#
+# --roles-C.{header}=+{system}{local
+#
+ctags: no '}' representing the end of role name in --roles-C.{header} option: local
+status: 1
+
+#
+# --roles-C.{header}=-{system}{local
+#
+ctags: no '}' representing the end of role name in --roles-C.{header} option: local
+status: 1
+
+#
+# --roles-C.{header}={system{local}
+#
+ctags: Warning: no such role: system{local of h kind in language C
+status: 42
+
+#
+# --roles-C.{header}=+{system{local}
+#
+ctags: Warning: no such role: system{local of h kind in language C
+status: 42
+
+#
+# --roles-C.{header}=-{system{local}
+#
+ctags: Warning: no such role: system{local of h kind in language C
+status: 42
+
+#
+# --roles-C.h={noSuchRole}
+#
+ctags: Warning: no such role: noSuchRole of h kind in language C
+status: 42
+
+#
+# --roles-C.h=+{noSuchRole}
+#
+ctags: Warning: no such role: noSuchRole of h kind in language C
+status: 42
+
+#
+# --roles-C.h=-{noSuchRole}
+#
+ctags: Warning: no such role: noSuchRole of h kind in language C
+status: 42
+
+#
+# --roles-C.h={system}{noSuchRole}
+#
+ctags: Warning: no such role: noSuchRole of h kind in language C
+status: 42
+
+#
+# --roles-C.h={noSuchRole}
+#
+ctags: Warning: no such role: noSuchRole of h kind in language C
+status: 42
+
+#
+# --roles-C.h=+{system}{noSuchRole}
+#
+ctags: Warning: no such role: noSuchRole of h kind in language C
+status: 42
+
+#
+# --roles-C.h=-{system}{noSuchRole}
+#
+ctags: Warning: no such role: noSuchRole of h kind in language C
+status: 42
+
+#
+# --roles-C.h=+{system}-{noSuchRole}
+#
+ctags: Warning: no such role: noSuchRole of h kind in language C
+status: 42
+
+#
+# --roles-C.h=-{system}+{noSuchRole}
+#
+ctags: Warning: no such role: noSuchRole of h kind in language C
+status: 42
+
+#
+# --roles-C.{header}={noSuchRole}
+#
+ctags: Warning: no such role: noSuchRole of h kind in language C
+status: 42
+
+#
+# --roles-C.{header}=+{noSuchRole}
+#
+ctags: Warning: no such role: noSuchRole of h kind in language C
+status: 42
+
+#
+# --roles-C.{header}=-{noSuchRole}
+#
+ctags: Warning: no such role: noSuchRole of h kind in language C
+status: 42
+
+#
+# --roles-C.{header}={system}{noSuchRole}
+#
+ctags: Warning: no such role: noSuchRole of h kind in language C
+status: 42
+
+#
+# --roles-C.{header}={noSuchRole}
+#
+ctags: Warning: no such role: noSuchRole of h kind in language C
+status: 42
+
+#
+# --roles-C.{header}=+{system}{noSuchRole}
+#
+ctags: Warning: no such role: noSuchRole of h kind in language C
+status: 42
+
+#
+# --roles-C.{header}=-{system}{noSuchRole}
+#
+ctags: Warning: no such role: noSuchRole of h kind in language C
+status: 42
+
+#
+# --roles-C.{header}=+{system}-{noSuchRole}
+#
+ctags: Warning: no such role: noSuchRole of h kind in language C
+status: 42
+
+#
+# --roles-C.{header}=-{system}+{noSuchRole}
+#
+ctags: Warning: no such role: noSuchRole of h kind in language C
+status: 42
+
+#
+# --roles-C.h=x{system}
+#
+ctags: unexpected character x in --roles-C.h=x{system} option
+status: 1
+
+#
+# --roles-C.h=+x{system}
+#
+ctags: unexpected character x in --roles-C.h=+x{system} option
+status: 1
+
+#
+# --roles-C.h=-x{system}
+#
+ctags: unexpected character x in --roles-C.h=-x{system} option
+status: 1
+
+#
+# --roles-C.h=x+{system}
+#
+ctags: unexpected character x in --roles-C.h=x+{system} option
+status: 1
+
+#
+# --roles-C.h=+x+{system}
+#
+ctags: unexpected character x in --roles-C.h=+x+{system} option
+status: 1
+
+#
+# --roles-C.h=-x+{system}
+#
+ctags: unexpected character x in --roles-C.h=-x+{system} option
+status: 1
+
+#
+# --roles-C.h=x-{system}
+#
+ctags: unexpected character x in --roles-C.h=x-{system} option
+status: 1
+
+#
+# --roles-C.h=+x-{system}
+#
+ctags: unexpected character x in --roles-C.h=+x-{system} option
+status: 1
+
+#
+# --roles-C.h=-x+-system}
+#
+ctags: unexpected character x in --roles-C.h=-x+-system} option
+status: 1
+
+#
+# --roles-C.{header}=x{system}
+#
+ctags: unexpected character x in --roles-C.{header}=x{system} option
+status: 1
+
+#
+# --roles-C.{header}=+x{system}
+#
+ctags: unexpected character x in --roles-C.{header}=+x{system} option
+status: 1
+
+#
+# --roles-C.{header}=-x{system}
+#
+ctags: unexpected character x in --roles-C.{header}=-x{system} option
+status: 1
+
+#
+# --roles-C.{header}=x+{system}
+#
+ctags: unexpected character x in --roles-C.{header}=x+{system} option
+status: 1
+
+#
+# --roles-C.{header}=+x+{system}
+#
+ctags: unexpected character x in --roles-C.{header}=+x+{system} option
+status: 1
+
+#
+# --roles-C.{header}=-x+{system}
+#
+ctags: unexpected character x in --roles-C.{header}=-x+{system} option
+status: 1
+
+#
+# --roles-C.{header}=x-{system}
+#
+ctags: unexpected character x in --roles-C.{header}=x-{system} option
+status: 1
+
+#
+# --roles-C.{header}=+x-{system}
+#
+ctags: unexpected character x in --roles-C.{header}=+x-{system} option
+status: 1
+
+#
+# --roles-C.{header}=-x+-system}
+#
+ctags: unexpected character x in --roles-C.{header}=-x+-system} option
+status: 1
