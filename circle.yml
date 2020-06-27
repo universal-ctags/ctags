@@ -121,11 +121,45 @@ jobs:
            name: Test
            command: |
              make check roundtrip CIRCLECI=1
+   ubuntu20_32bit:
+     working_directory: ~/universal-ctags
+     docker:
+       - image: docker.io/ubuntu:20.04
+     steps:
+       - run:
+           name: Install git
+           command: |
+             export DEBIAN_FRONTEND=noninteractive
+             dpkg --add-architecture i386
+             apt-get -y update
+             apt-get -y install git
+       - checkout
+       - run:
+           name: Install build tools
+           command: |
+             export DEBIAN_FRONTEND=noninteractive
+             apt-get -y install pkg-config autoconf automake make gcc \
+             libjansson-dev:i386 libyaml-dev:i386 libseccomp-dev:i386 libxml2-dev:i386 \
+             gdb valgrind \
+             python3-docutils \
+             libc6-dev-i386 libc6-dbg:i386
+       - run:
+           name: Build
+           command: |
+             bash ./autogen.sh
+             CC='gcc -m32' ./configure --enable-debugging
+             make -j 2
+       - run:
+           name: Test
+           command: |
+             # make check roundtrip CIRCLECI=1
+             make units CIRCLECI=1 CATEGORIES=parser-varlink
 
 workflows:
   version: 2
   build_and_test:
     jobs:
+      - ubuntu20_32bit
       - fedora30_bmake
       - fedora_distcheck
       - centos_make
