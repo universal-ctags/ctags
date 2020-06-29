@@ -1,0 +1,2 @@
+foo	input.sql	/^CREATE TABLE public.foo ($/;"	t
+id	input.sql	/^    id bigserial PRIMARY KEY,$/;"	E	table:foo
