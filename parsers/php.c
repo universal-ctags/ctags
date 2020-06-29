@@ -356,16 +356,52 @@ static void  makePhpTagEntry  (tagEntryInfo *const e)
 	makeTagEntry (e);
 	makeQualifiedTagEntry (e);
 }
-static void makeSimplePhpTag (const tokenInfo *const token, const phpKind kind,
-							  const accessType access)
+
+static void fillTypeRefField (tagEntryInfo *const e,
+							  const vString *const rtype, const tokenInfo *const token)
+{
+	if ((vStringLength (rtype) == 4)
+		&& (strcmp (vStringValue (rtype), "self") == 0)
+		&& vStringLength (token->scope) > 0)
+	{
+		if (token->parentKind == -1)
+			e->extensionFields.typeRef [0] = "unknown";
+		else
+			e->extensionFields.typeRef [0] = PhpKinds [token->parentKind].name;
+		e->extensionFields.typeRef [1] = vStringValue (token->scope);
+	}
+	else if ((vStringLength (rtype) == 6)
+			 && (strcmp (vStringValue (rtype), "parent") == 0)
+			 && (ParentClass && vStringLength (ParentClass) > 0))
+	{
+		e->extensionFields.typeRef [0] = "class";
+		e->extensionFields.typeRef [1] = vStringValue (ParentClass);
+	}
+	else
+	{
+		e->extensionFields.typeRef [0] = "unknown";
+		e->extensionFields.typeRef [1] = vStringValue (rtype);
+	}
+}
+
+static void makeTypedPhpTag (const tokenInfo *const token, const phpKind kind,
+							 const accessType access, vString* typeName)
 {
 	if (PhpKinds[kind].enabled)
 	{
 		tagEntryInfo e;
 
 		initPhpEntry (&e, token, kind, access);
+		if (typeName)
+			fillTypeRefField (&e, typeName, token);
 		makePhpTagEntry (&e);
 	}
+}
+
+static void makeSimplePhpTag (const tokenInfo *const token, const phpKind kind,
+							  const accessType access)
+{
+	makeTypedPhpTag (token, kind, access, NULL);
 }
 
 static void makeNamespacePhpTag (const tokenInfo *const token, const vString *const name)
@@ -417,30 +453,7 @@ static void makeFunctionTag (const tokenInfo *const token,
 		if (arglist)
 			e.extensionFields.signature = vStringValue (arglist);
 		if (rtype)
-		{
-			if ((vStringLength (rtype) == 4)
-				&& (strcmp (vStringValue (rtype), "self") == 0)
-				&& vStringLength (token->scope) > 0)
-			{
-				if (token->parentKind == -1)
-					e.extensionFields.typeRef [0] = "unknown";
-				else
-					e.extensionFields.typeRef [0] = PhpKinds [token->parentKind].name;
-				e.extensionFields.typeRef [1] = vStringValue (token->scope);
-			}
-			else if ((vStringLength (rtype) == 6)
-				&& (strcmp (vStringValue (rtype), "parent") == 0)
-				&& (ParentClass && vStringLength (ParentClass) > 0))
-			{
-				e.extensionFields.typeRef [0] = "class";
-				e.extensionFields.typeRef [1] = vStringValue (ParentClass);
-			}
-			else
-			{
-				e.extensionFields.typeRef [0] = "unknown";
-				e.extensionFields.typeRef [1] = vStringValue (rtype);
-			}
-		}
+			fillTypeRefField (&e, rtype, token);
 
 		makePhpTagEntry (&e);
 	}
@@ -1556,7 +1569,7 @@ static bool parseUse (tokenInfo *const token)
 /* parses declarations of the form
  * 	$var = VALUE
  * 	$var; */
-static bool parseVariable (tokenInfo *const token)
+static bool parseVariable (tokenInfo *const token, vString * typeName)
 {
 	tokenInfo *name;
 	bool readNext = true;
@@ -1598,7 +1611,7 @@ static bool parseVariable (tokenInfo *const token)
 		if (token->parentKind == K_CLASS ||
 		    token->parentKind == K_INTERFACE ||
 		    token->parentKind == K_TRAIT)
-			makeSimplePhpTag (name, K_VARIABLE, access);
+			makeTypedPhpTag (name, K_VARIABLE, access, typeName);
 	}
 	else
 		readNext = false;
@@ -1658,6 +1671,7 @@ static void enterScope (tokenInfo *const parentToken,
 						const int parentKind)
 {
 	tokenInfo *token = newToken ();
+	vString *typeName = vStringNew ();
 	int origParentKind = parentToken->parentKind;
 
 	copyToken (token, parentToken, true);
@@ -1727,8 +1741,21 @@ static void enterScope (tokenInfo *const parentToken,
 				}
 				break;
 
+			case TOKEN_QMARK:
+				vStringClear (typeName);
+				vStringPut (typeName, '?');
+				readNext = true;
+				break;
+			case TOKEN_IDENTIFIER:
+				vStringCat (typeName, token->string);
+				readNext = true;
+				break;
 			case TOKEN_VARIABLE:
-				readNext = parseVariable (token);
+				readNext = parseVariable (token,
+										  vStringIsEmpty(typeName)
+										  ? NULL
+										  : typeName);
+				vStringClear (typeName);
 				break;
 
 			default: break;
@@ -1740,6 +1767,7 @@ static void enterScope (tokenInfo *const parentToken,
 
 	copyToken (parentToken, token, false);
 	parentToken->parentKind = origParentKind;
+	vStringDelete (typeName);
 	deleteToken (token);
 }
 
