@@ -49,6 +49,11 @@ The base name of the parser source files can be changed by -o option.
 `packcc -o parser example.peg`
 
 By running this, the parser source parser.h and parser.c are generated.
+
+-i option is for putting an #include directive at the head of example.c.
+
+`packcc -i '<early_cdef.h>' example.peg`
+
 If you want to confirm the version of the packcc command, execute the below.
 
 `packcc -v`
@@ -196,7 +201,7 @@ The specified C source code is copied verbatim to the C header file before the g
 
 - `%source { c source code }`
 
-The specified C source code is copied verbatim to the C source file before the generated parser implementation code.
+The specified C source code is copied verbatim to the C source file before the generated parser implementation code but after including basic header files like stdio.h. Use -i option if you want to put your code at the head of the C source file.
 
 - `%common { c source code }`
 

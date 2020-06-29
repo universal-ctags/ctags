@@ -88,7 +88,7 @@ V_WINDRES_1 =
 	$(V_OPTLIB2C) $(OPTLIB2C) $< > $@
 
 peg/%.c peg/%.h: peg/%.peg $(PACKCC)
-	$(V_PACKCC) $(PACKCC) $<
+	$(V_PACKCC) $(PACKCC) -i \"general.h\" $<
 
 all: $(PACKCC) ctags.exe readtags.exe
 

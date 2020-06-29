@@ -146,9 +146,9 @@ packcc_verbose_0 = @echo PACKCC "    $@";
 PACKCC = $(top_builddir)/packcc$(EXEEXT)
 SUFFIXES += .peg
 .peg.c:
-	$(packcc_verbose)$(PACKCC) -o $(top_builddir)/peg/$(*F) "$<"
+	$(packcc_verbose)$(PACKCC) -i \"general.h\" -o $(top_builddir)/peg/$(*F) "$<"
 .peg.h:
-	$(packcc_verbose)$(PACKCC) -o $(top_builddir)/peg/$(*F) "$<"
+	$(packcc_verbose)$(PACKCC) -i \"general.h\" -o $(top_builddir)/peg/$(*F) "$<"
 # You cannot use $(PACKCC) as a target name here.
 $(PEG_SRCS) $(PEG_HEADS): packcc$(EXEEXT) Makefile
 dist_libctags_a_SOURCES = $(ALL_LIB_HEADS) $(ALL_LIB_SRCS)

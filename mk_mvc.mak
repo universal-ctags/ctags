@@ -65,7 +65,7 @@ PDBFLAG =
 {win32\mkstemp}.c{win32\mkstemp}.obj::
 	$(CC) $(OPT) $(DEFINES) $(INCLUDES) /Fowin32\mkstemp\ /c $<
 {peg}.peg{peg}.c::
-	$(PACKCC) $<
+	$(PACKCC) -i \"general.h\" $<
 {peg}.c{peg}.obj::
 	$(CC) $(OPT) $(DEFINES) $(INCLUDES) /Fopeg\ /c $<
 
