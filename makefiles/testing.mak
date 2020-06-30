@@ -161,7 +161,7 @@ validate-input:
 #
 # Test main part, not parsers
 #
-tmain: $(CTAGS_TEST)
+tmain: $(CTAGS_TEST) $(READ_TEST)
 	$(V_RUN) \
 	if test -n "$${ZSH_VERSION+set}"; then set -o SH_WORD_SPLIT; fi; \
 	if test x$(VG) = x1; then		\
