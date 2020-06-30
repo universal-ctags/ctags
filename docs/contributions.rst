@@ -316,9 +316,9 @@ You can write a parser with regex patterns.
 a parser written in regex patterns into C source code.
 
 The `man` parser is one example described in regex patterns.
-See the output of the following command line for details:
+See the output of the following command line for details::
 
-	`git show  0a9e78a8a40e8595b3899e2ad249c8f2c3819c8a^..89aa548`
+	git show 0a9e78a8a40e8595b3899e2ad249c8f2c3819c8a^..89aa548
 
 Translated C code is also committed to our git repository. The
 translated code is useful for building ctags on the platforms where

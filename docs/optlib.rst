@@ -31,7 +31,7 @@ passed through command line.
 
 The following file is an example of an option file:
 
-.. code-block:: python
+.. code-block::
 
 	# Exclude directories that don't contain real code
 	--exclude=Units
@@ -44,9 +44,9 @@ Whitespaces at the start of lines are ignored during loading.
 
 And it works exactly as if we had called:
 
-```sh
-ctags --exclude=Units --exclude=tinst-root --exclude=Tmain
-```
+.. code-block:: sh
+
+	ctags --exclude=Units --exclude=tinst-root --exclude=Tmain
 
 There are two categories of option files, though they both contain command
 line options: **preload** and **optlib** option files.

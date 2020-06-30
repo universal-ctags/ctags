@@ -1414,7 +1414,7 @@ imbalance results from following a #if conditional branch.
 
 ctags will also try to specially handle arguments lists
 enclosed in double sets of parentheses in order to accept the following
-conditional construct:
+conditional construct::
 
 	extern void foo __ARGS((int one, char two));
 
