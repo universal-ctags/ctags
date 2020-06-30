@@ -274,4 +274,3 @@ CPPCHECK_FLAGS  = --enable=all
 cppcheck:
 	cppcheck $(CPPCHECK_DEFS) $(CPPCHECK_UNDEFS) $(CPPCHECK_FLAGS) \
 		 $$(git  ls-files | grep '^\(parsers\|main\)/.*\.[ch]' )
-
