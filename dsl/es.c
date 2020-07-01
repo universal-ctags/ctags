@@ -1555,22 +1555,24 @@ static int  es_pointer_equal(const EsObject* self, const EsObject* other)
 static void es_pointer_print(const EsObject* object, MIO* fp)
 {
 	EsObjectClass *c = class_of(object);
-	mio_puts(fp, "#<");
-	mio_puts(fp, c->name);
-
 	if (((EsPointerClass *)c)->print_fatptr)
 	{
-		mio_putc(fp, ' ');
 		((EsPointerClass *)c)->print_fatptr (((EsPointer *)object)->ptr,
 											 ((EsPointer *)object)->fat,
 											 fp);
 	}
 	else if (((EsPointerClass *)c)->print_ptr)
 	{
-		mio_putc(fp, ' ');
 		((EsPointerClass *)c)->print_ptr (((EsPointer *)object)->ptr, fp);
 	}
-	mio_putc(fp, '>');
+	else
+	{
+		mio_puts(fp, "#<");
+		mio_puts(fp, c->name);
+		mio_putc(fp, ' ');
+		mio_printf(fp, "(%p, %p)", object, ((EsPointer *)object)->ptr);
+		mio_putc(fp, '>');
+	}
 }
 
 static EsObject*
