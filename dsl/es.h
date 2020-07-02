@@ -53,8 +53,9 @@ typedef enum _EsType EsType;
 struct _EsObject;
 typedef struct _EsObject EsObject;
 
-EsType      es_object_get_type      (const EsObject*      object);
+const char* es_type_get_name        (int t);
 
+EsType      es_object_get_type      (const EsObject*      object);
 
 
 EsObject*   es_object_ref           (EsObject*       object);

@@ -363,6 +363,11 @@ es_object_type_p(const EsObject* object, EsType type)
 	return es_object_get_type(object) == type;
 }
 
+const char* es_type_get_name        (int t)
+{
+	return (classes[t]->name);
+}
+
 EsType
 es_object_get_type      (const EsObject*      object)
 {
