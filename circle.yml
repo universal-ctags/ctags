@@ -136,9 +136,14 @@ jobs:
        - checkout
        - run:
            name: Install build tools
+           # APT::Immediate-Configure=false is taken from
+           # https://superuser.com/questions/199582/apt-error-could-not-perform-immediate-configuration-on
+           # I don't understand why I need this.
+           # -- Masatake
            command: |
              export DEBIAN_FRONTEND=noninteractive
-             apt-get -y install pkg-config autoconf automake make gcc \
+             apt-get -o APT::Immediate-Configure=false -y install \
+             pkg-config autoconf automake make gcc \
              libjansson-dev:i386 libyaml-dev:i386 libseccomp-dev:i386 libxml2-dev:i386 \
              gdb valgrind \
              python3-docutils \
