@@ -88,6 +88,7 @@ enum eKeywordId {
 	KEYWORD_endif,
 	KEYWORD_event,
 	KEYWORD_exception,
+	KEYWORD_extension,
 	KEYWORD_external,
 	KEYWORD_for,
 	KEYWORD_foreign,
@@ -267,6 +268,7 @@ static const keywordTable SqlKeywordTable [] = {
 	{ "endif",							KEYWORD_endif			      },
 	{ "event",							KEYWORD_event			      },
 	{ "exception",						KEYWORD_exception		      },
+	{ "extension",						KEYWORD_extension		      },
 	{ "external",						KEYWORD_external		      },
 	{ "for",							KEYWORD_for				      },
 	{ "foreign",						KEYWORD_foreign			      },
@@ -376,6 +378,7 @@ static struct SqlReservedWord SqlReservedWord [SQLKEYWORD_COUNT] = {
 	[KEYWORD_endif]         = {0 & 0&0&0&0 & 0&0 & 1},
 	[KEYWORD_event]         = {0 & 0&0&0&0 & 0&0 & 0},
 	[KEYWORD_exception]     = {0 & 0&0&0&1 & 0&1 & 1},
+	[KEYWORD_extension]     = {0 & 0&0&0&0 & 0&0 & 0},
 	[KEYWORD_external]      = {0 & 0&1&1&1 & 0&0 & 0},
 	[KEYWORD_for]           = {1 & 1&1&1&1 & 1&1 & 1},
 	[KEYWORD_foreign]       = {1 & 1&1&1&1 & 0&0 & 1},
@@ -2655,6 +2658,7 @@ static void parseKeywords (tokenInfo *const token)
 			case KEYWORD_domain:		parseDomain (token); break;
 			case KEYWORD_drop:			parseDrop (token); break;
 			case KEYWORD_event:			parseEvent (token); break;
+			case KEYWORD_extension:		findCmdTerm (token, false); break;
 			case KEYWORD_function:		parseSubProgram (token); break;
 			case KEYWORD_if:			parseStatements (token, false); break;
 			case KEYWORD_index:			parseIndex (token); break;
