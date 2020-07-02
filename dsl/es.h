@@ -161,10 +161,10 @@ EsObject*    es_regex_exec    (const EsObject* regex,
 /*
  * Foreign pointer
  */
-EsType       es_class_define_pointer   (const char *name,
-										void (* freefn) (void *),
-										int  (* equalfn) (const void*, const void*),
-										void (* printfn) (const void*, MIO *));
+EsType       es_type_define_pointer   (const char *name,
+									   void (* freefn) (void *),
+									   int  (* equalfn) (const void*, const void*),
+									   void (* printfn) (const void*, MIO *));
 
 /* If the type has sized fat area, the area is filled with zero. */
 EsObject*    es_pointer_new    (EsType type, void *ptr);
@@ -177,13 +177,13 @@ void*        es_pointer_take   (EsObject *object);
  * init_fat () returns es_true if the initialization ends successfully.
  * In failure case, init_fat () returns an error object.
  */
-EsType       es_class_define_fatptr    (const char *name,
-										size_t fat_size,
-										EsObject *(* initfat_fn) (void *fat, void * ptr, void *extra),
-										void (* freefn) (void * ptr, void *fat),
-										int  (* equalfn) (const void* ptr_a, const void* fat_a,
-														  const void* ptr_b, const void* fat_b),
-										void (* printfn) (const void* ptr, const void *fat, MIO *));
+EsType       es_type_define_fatptr    (const char *name,
+									   size_t fat_size,
+									   EsObject *(* initfat_fn) (void *fat, void * ptr, void *extra),
+									   void (* freefn) (void * ptr, void *fat),
+									   int  (* equalfn) (const void* ptr_a, const void* fat_a,
+														 const void* ptr_b, const void* fat_b),
+									   void (* printfn) (const void* ptr, const void *fat, MIO *));
 /* If initfat_fn is given in the type, the new fat area will is
  * initialized with the method.
  * If initfat_fn is not given, and extra is not NULL, the contents

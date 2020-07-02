@@ -1443,16 +1443,16 @@ struct _EsPointerClass
 };
 
 static EsType
-es_class_define_pointer_full(const char *name,
-							 size_t fat_size,
-							 EsObject *(* initfat_fn) (void *fat, void * ptr, void *extra),
-							 void (* freefn) (void *),
-							 int  (* equalfn) (const void*, const void*),
-							 void (* printfn) (const void*, MIO *),
-							 void (* freefn_fat)  (void * ptr, void *fat),
-							 int  (* equalfn_fat) (const void* ptr_a, const void* fat_a,
-												   const void* ptr_b, const void* fat_b),
-							 void (* printfn_fat) (const void* ptr, const void *fat, MIO *))
+es_type_define_pointer_full(const char *name,
+							size_t fat_size,
+							EsObject *(* initfat_fn) (void *fat, void * ptr, void *extra),
+							void (* freefn) (void *),
+							int  (* equalfn) (const void*, const void*),
+							void (* printfn) (const void*, MIO *),
+							void (* freefn_fat)  (void * ptr, void *fat),
+							int  (* equalfn_fat) (const void* ptr_a, const void* fat_a,
+												  const void* ptr_b, const void* fat_b),
+							void (* printfn_fat) (const void* ptr, const void *fat, MIO *))
 {
 	EsType t = ES_TYPE_NIL;
 	if (classes_count >= ES_TYPE_CLASS_MAX)
@@ -1490,29 +1490,29 @@ es_class_define_pointer_full(const char *name,
 }
 
 EsType
-es_class_define_pointer(const char *name,
-						void (* freefn) (void *),
-						int  (* equalfn) (const void*, const void*),
-						void (* printfn) (const void*, MIO *))
+es_type_define_pointer(const char *name,
+					   void (* freefn) (void *),
+					   int  (* equalfn) (const void*, const void*),
+					   void (* printfn) (const void*, MIO *))
 {
 
-	return es_class_define_pointer_full (name, 0, NULL,
-										 freefn, equalfn, printfn,
-										 NULL, NULL, NULL);
+	return es_type_define_pointer_full (name, 0, NULL,
+										freefn, equalfn, printfn,
+										NULL, NULL, NULL);
 }
 
 EsType
-es_class_define_fatptr    (const char *name,
-						   size_t fat_size,
-						   EsObject *(* initfat_fn) (void *fat, void * ptr, void *extra),
-						   void (* freefn) (void * ptr, void *fat),
-						   int  (* equalfn) (const void* ptr_a, const void* fat_a,
-											 const void* ptr_b, const void* fat_b),
-						   void (* printfn) (const void* ptr, const void *fat, MIO *))
+es_type_define_fatptr    (const char *name,
+						  size_t fat_size,
+						  EsObject *(* initfat_fn) (void *fat, void * ptr, void *extra),
+						  void (* freefn) (void * ptr, void *fat),
+						  int  (* equalfn) (const void* ptr_a, const void* fat_a,
+											const void* ptr_b, const void* fat_b),
+						  void (* printfn) (const void* ptr, const void *fat, MIO *))
 {
-	return es_class_define_pointer_full (name, fat_size, initfat_fn,
-										 NULL, NULL, NULL,
-										 freefn, equalfn, printfn);
+	return es_type_define_pointer_full (name, fat_size, initfat_fn,
+										NULL, NULL, NULL,
+										freefn, equalfn, printfn);
 }
 
 static void es_pointer_free(EsObject* object)
