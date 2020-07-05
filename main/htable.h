@@ -74,7 +74,7 @@ extern bool       hashTableForeachItem (hashTable *htable, hashTableForeachFunc 
  * key. */
 extern bool       hashTableForeachItemOnChain (hashTable *htable, const void *key, hashTableForeachFunc proc, void *user_data);
 
-extern int        hashTableCountItem   (hashTable *htable);
+extern unsigned int hashTableCountItem   (hashTable *htable);
 
 extern hashTable* hashTableIntNew (unsigned int size,
 								   hashTableHashFunc hashfn,

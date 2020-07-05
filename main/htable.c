@@ -258,7 +258,7 @@ static bool count (const void *const key CTAGS_ATTR_UNUSED, void *value CTAGS_AT
 	return true;
 }
 
-extern int        hashTableCountItem   (hashTable *htable)
+extern unsigned int hashTableCountItem   (hashTable *htable)
 {
 	int c = 0;
 	hashTableForeachItem (htable, count, &c);
