@@ -1,0 +1,7 @@
+__anonbbb2b4710108	input.c	/^{$/;"	s	file:
+n	input.c	/^  int*n;$/;"	m	struct:__anonbbb2b4710108	typeref:typename:int *	file:
+S	input.c	/^} S;$/;"	t	typeref:struct:__anonbbb2b4710108	file:
+foo	input.c	/^struct foo {$/;"	s	file:
+bar	input.c	/^	int bar;$/;"	m	struct:foo	typeref:typename:int	file:
+v	input.c	/^} v = {$/;"	v	typeref:struct:foo
+w	input.c	/^struct foo w = {$/;"	v	typeref:struct:foo
