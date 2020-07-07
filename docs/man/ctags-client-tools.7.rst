@@ -273,7 +273,7 @@ So, client tools need to:
 inside the expressions. If the expression also contains strings, ``"`` in the
 strings needs to be replaced by ``\"``.
 
-Client tools written in Lisp could buid the expression using lists. ``prin1``
+Client tools written in Lisp could build the expression using lists. ``prin1``
 (in Common Lisp style Lisps) and ``write`` (in Scheme style Lisps) can
 translate the list into a string that can be directly used. For example, in
 EmacsLisp:
@@ -303,7 +303,7 @@ replaced by ``'"'"'`` to prevent broken expressions and shell injection.
 Parse Readtags Output
 ~~~~~~~~~~~~~~~~~~~~~
 In the output of readtags, tabs can appear in all field values (e.g., the tag
-name itself cound contain tabs), which makes it hard to split the line into
+name itself could contain tabs), which makes it hard to split the line into
 fields. Client tools should use the ``-E`` option, which keeps the escape
 sequences in the tags file, so the only field that could contain tabs is the
 pattern field.

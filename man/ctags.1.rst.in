@@ -1289,7 +1289,7 @@ are not listed here. They are experimental or for debugging purpose.
 		$ @CTAGS_NAME_EXECUTABLE@ --put-field-prefix --fields='{line}{end}' -o - /tmp/hello.c
 		main	/tmp/hello.c	/^main(int argc, char **argv)$/;"	f	line:3	UCTAGSend:6
 
-	In the above exapmle, the prefix is put to "end" field which is
+	In the above example, the prefix is put to "end" field which is
 	newly introduced in Universal-ctags.
 
 ``--quiet[=yes|no]``
