@@ -267,7 +267,7 @@ static void parseFunction (const unsigned char *line)
 	/* TODO - update struct to indicate inside function */
 	while ((line = readVimLine ()) != NULL)
 	{
-		if (wordMatchLen (line, "endfunction", 4))
+		if (wordMatchLen (line, "endfunction", 4) || wordMatchLen (line, "enddef", 6))
 		{
 			tagEntryInfo *e = getEntryInCorkQueue (index);
 			if (e)
@@ -584,7 +584,7 @@ static bool parseVimLine (const unsigned char *line, int infunction)
 		parseMap (skipWord (line));
 	}
 
-	else if (wordMatchLen (line, "function", 2))
+	else if (wordMatchLen (line, "function", 2) || wordMatchLen (line, "def", 3))
 	{
 		parseFunction (skipWord (line));
 	}
