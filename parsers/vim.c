@@ -46,7 +46,8 @@ typedef enum {
 	K_FUNCTION,
 	K_MAP,
 	K_VARIABLE,
-	K_FILENAME
+	K_FILENAME,
+	K_CONST,
 } vimKind;
 
 static kindDefinition VimKinds [] = {
@@ -56,6 +57,7 @@ static kindDefinition VimKinds [] = {
 	{ true,  'm', "map",      "maps" },
 	{ true,  'v', "variable", "variable definitions" },
 	{ true,  'n', "filename", "vimball filename" },
+	{ true,  'C', "constant", "constant definitions" },
 };
 
 /*
@@ -432,7 +434,7 @@ cleanUp:
 	return cmdProcessed;
 }
 
-static void parseLet (const unsigned char *line, int infunction)
+static void parseVariableOrConstant (const unsigned char *line, int infunction, int kindIndex)
 {
 	vString *name = vStringNew ();
 
@@ -482,7 +484,7 @@ static void parseLet (const unsigned char *line, int infunction)
 			vStringPut (name, (int) *cp);
 			++cp;
 		} while (isalnum ((int) *cp) || *cp == '_' || *cp == '#' || *cp == ':' || *cp == '$');
-		makeSimpleTag (name, K_VARIABLE);
+		makeSimpleTag (name, kindIndex);
 		vStringClear (name);
 	}
 
@@ -596,7 +598,11 @@ static bool parseVimLine (const unsigned char *line, int infunction)
 
 	else if (wordMatchLen (line, "let", 3))
 	{
-		parseLet (skipWord (line), infunction);
+		parseVariableOrConstant (skipWord (line), infunction, K_VARIABLE);
+	}
+	else if (wordMatchLen (line, "const", 4))
+	{
+		parseVariableOrConstant (skipWord (line), infunction, K_CONST);
 	}
 
 	return readNextLine;
