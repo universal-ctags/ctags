@@ -20,6 +20,7 @@
 #include <stdio.h>
 #endif
 
+#include "debug.h"
 #include "entry.h"
 #include "parse.h"
 #include "read.h"
@@ -226,13 +227,54 @@ static const unsigned char *readVimballLine (void)
 	return line;
 }
 
+static vString *parseSignature (const unsigned char *cp,
+								tagEntryInfo *e,
+								vString *buf)
+{
+	/* TODO capture parameters */
+
+	Assert (e);
+	Assert (cp);
+
+	if (!buf)
+	{
+		buf = vStringNew ();
+		vStringPut (buf, *cp);
+		++cp;
+	}
+
+	while (*cp != '\0')
+	{
+		if (isspace ((int) *cp)
+			&& vStringLast (buf) == ',')
+		{
+			++cp;
+			continue;
+		}
+		vStringPut (buf, *cp);
+		if (*cp == ')')
+			break;
+		++cp;
+	}
+
+	if (*cp == ')')
+	{
+		e->extensionFields.signature = vStringDeleteUnwrap (buf);
+		buf = NULL;
+	}
+
+	return buf;
+}
+
 static void parseFunction (const unsigned char *line)
 {
 	vString *name = vStringNew ();
+	vString *signature = NULL;
 	/* bool inFunction = false; */
 	int scope;
 	const unsigned char *cp = line;
 	int index = CORK_NIL;
+	tagEntryInfo *e = NULL;
 
 	if (*cp == '!')
 		++cp;
@@ -262,6 +304,15 @@ static void parseFunction (const unsigned char *line)
 				} while (isalnum ((int) *cp) || *cp == '_' || *cp == '.' || *cp == '#');
 				index = makeSimpleTag (name, K_FUNCTION);
 				vStringClear (name);
+
+				e = getEntryInCorkQueue (index);
+				if (e && isFieldEnabled (FIELD_SIGNATURE))
+				{
+					while (*cp && isspace ((int) *cp))
+						++cp;
+					if (*cp == '(')
+						signature = parseSignature (cp, e, NULL);
+				}
 			}
 		}
 	}
@@ -269,9 +320,19 @@ static void parseFunction (const unsigned char *line)
 	/* TODO - update struct to indicate inside function */
 	while ((line = readVimLine ()) != NULL)
 	{
+		if (signature)
+		{
+			cp = line;
+			while (*cp && isspace ((int) *cp))
+				++cp;
+			/* A backslash at the start of a line stands for a line continuation.
+			 * https://vimhelp.org/repeat.txt.html#line-continuation */
+			if (*cp == '\\')
+				signature = parseSignature (++cp, e, signature);
+		}
+
 		if (wordMatchLen (line, "endfunction", 4) || wordMatchLen (line, "enddef", 6))
 		{
-			tagEntryInfo *e = getEntryInCorkQueue (index);
 			if (e)
 				e->extensionFields.endLine = getInputLineNumber ();
 			break;
@@ -279,6 +340,8 @@ static void parseFunction (const unsigned char *line)
 
 		parseVimLine (line, true);
 	}
+	if (signature)
+		vStringDelete (signature);
 	vStringDelete (name);
 }
 
