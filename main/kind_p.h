@@ -29,6 +29,7 @@ typedef void (* freeRoleDefFunc) (roleDefinition *);
 *   FUNCTION PROTOTYPES
 */
 extern void enableKind (kindDefinition *kind, bool enable);
+extern void enableRole (roleDefinition *role, bool enable);
 extern const char *renderRole (const roleDefinition* const def, vString* b);
 
 extern struct kindControlBlock* allocKindControlBlock (parserDefinition *parser);
@@ -43,8 +44,10 @@ extern bool isRoleEnabled (struct kindControlBlock* kcb, int kindIndex, int role
 extern unsigned int countKinds (struct kindControlBlock* kcb);
 extern unsigned int countRoles (struct kindControlBlock* kcb, int kindIndex);
 extern kindDefinition *getKind (struct kindControlBlock* kcb, int kindIndex);
-extern kindDefinition *getKindForLetter (struct kindControlBlock* kcb, int letter);
+extern kindDefinition *getKindForLetter (struct kindControlBlock* kcb, char letter);
 extern kindDefinition *getKindForName (struct kindControlBlock* kcb, const char* name);
+extern int getKindIndexForLetter (struct kindControlBlock* kcb, char letter);
+extern int getKindIndexForName (struct kindControlBlock* kcb, const char* name);
 extern roleDefinition* getRole(struct kindControlBlock* kcb, int kindIndex, int roleIndex);
 extern roleDefinition* getRoleForName(struct kindControlBlock* kcb, int kindIndex, const char* name);
 extern void linkKindDependency (struct kindControlBlock *masterKCB,

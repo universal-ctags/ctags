@@ -26,7 +26,7 @@ ctags: no role name specified in "--_roledef-IMAGINARY" option
 ctags: the role name in "--_roledef-IMAGINARY" option is empty
 
 # wrong char in role name
-ctags: unacceptable char as part of role name in "--_roledef-IMAGINARY" option
+ctags: unacceptable char as part of role name in "--_roledef-IMAGINARY" option: +
 
 # empty description
 ctags: no role description specified in "--_roledef-IMAGINARY" option

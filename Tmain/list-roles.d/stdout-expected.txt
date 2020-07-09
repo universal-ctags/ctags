@@ -195,3 +195,263 @@ Vera           d/macro     undef     on      undefined
 #
 #KIND(L/N) NAME   ENABLED DESCRIPTION
 s/script   loaded on      loaded
+
+#
+# C.* with disabling all roles of all languages
+#
+#KIND(L/N) NAME   ENABLED DESCRIPTION
+d/macro    undef  off     undefined
+h/header   local  off     local header
+h/header   system off     system header
+
+#
+# C.* with disabling all roles of all kinds of all languages
+#
+#KIND(L/N) NAME   ENABLED DESCRIPTION
+d/macro    undef  off     undefined
+h/header   local  off     local header
+h/header   system off     system header
+
+#
+# C.* with enabling all roles of all kinds in all languages
+# after disabling system role of header kind of C language
+#
+#KIND(L/N) NAME   ENABLED DESCRIPTION
+d/macro    undef  on      undefined
+h/header   local  on      local header
+h/header   system on      system header
+
+#
+# C.* with enabling all roles in all languages
+# after disabling system role of header kind of C language
+#
+#KIND(L/N) NAME   ENABLED DESCRIPTION
+d/macro    undef  on      undefined
+h/header   local  on      local header
+h/header   system on      system header
+
+#
+# C.* with disabling all roles in C language
+#
+#KIND(L/N) NAME   ENABLED DESCRIPTION
+d/macro    undef  off     undefined
+h/header   local  off     local header
+h/header   system off     system header
+
+#
+# Sh.* with disabling all roles in C language
+#
+#KIND(L/N) NAME      ENABLED DESCRIPTION
+h/heredoc  endmarker on      end marker
+s/script   loaded    on      loaded
+
+#
+# C.* with disabling all roles of all kinds in C language
+#
+#KIND(L/N) NAME   ENABLED DESCRIPTION
+d/macro    undef  off     undefined
+h/header   local  off     local header
+h/header   system off     system header
+
+#
+# Sh.* with disabling all roles of all kinds in C language
+#
+#KIND(L/N) NAME      ENABLED DESCRIPTION
+h/heredoc  endmarker on      end marker
+s/script   loaded    on      loaded
+
+#
+# C.* with enabling all roles in C language
+# after disabling all roles in all languages
+#
+#KIND(L/N) NAME   ENABLED DESCRIPTION
+d/macro    undef  on      undefined
+h/header   local  on      local header
+h/header   system on      system header
+
+#
+# Sh.* with enabling all roles in C language
+# after disabling all roles in all languages
+#
+#KIND(L/N) NAME      ENABLED DESCRIPTION
+h/heredoc  endmarker off     end marker
+s/script   loaded    off     loaded
+
+#
+# C.* with enabling all roles of all kinds in C language
+# after disabling all roles in all languages
+#
+#KIND(L/N) NAME   ENABLED DESCRIPTION
+d/macro    undef  on      undefined
+h/header   local  on      local header
+h/header   system on      system header
+
+#
+# Sh.* with enabling all roles of all kinds in C language
+# after disabling all roles in all languages
+#
+#KIND(L/N) NAME      ENABLED DESCRIPTION
+h/heredoc  endmarker off     end marker
+s/script   loaded    off     loaded
+
+#
+# C.* with disabling all roles of {header} kind in C language
+#
+#KIND(L/N) NAME   ENABLED DESCRIPTION
+d/macro    undef  on      undefined
+h/header   local  off     local header
+h/header   system off     system header
+
+#
+# Sh.* with disabling all roles of {header} kind in C language
+#
+#KIND(L/N) NAME      ENABLED DESCRIPTION
+h/heredoc  endmarker on      end marker
+s/script   loaded    on      loaded
+
+#
+# C.* with disabling all roles of h kind in C language
+#
+#KIND(L/N) NAME   ENABLED DESCRIPTION
+d/macro    undef  on      undefined
+h/header   local  off     local header
+h/header   system off     system header
+
+#
+# Sh.* with disabling all roles of h kind in C language
+#
+#KIND(L/N) NAME      ENABLED DESCRIPTION
+h/heredoc  endmarker on      end marker
+s/script   loaded    on      loaded
+
+#
+# C.* with enabling all roles of {header} kind in C language
+# after disabling all roles in all languages
+#
+#KIND(L/N) NAME   ENABLED DESCRIPTION
+d/macro    undef  off     undefined
+h/header   local  on      local header
+h/header   system on      system header
+
+#
+# Sh.* with enabling all roles of {header} kind in C language
+# after disabling all roles in all languages
+#
+#KIND(L/N) NAME      ENABLED DESCRIPTION
+h/heredoc  endmarker off     end marker
+s/script   loaded    off     loaded
+
+#
+# C.* with enabling all roles of h kind in C language
+# after disabling all roles in all languages
+#
+#KIND(L/N) NAME   ENABLED DESCRIPTION
+d/macro    undef  off     undefined
+h/header   local  on      local header
+h/header   system on      system header
+
+#
+# Sh.* with enabling all roles of h kind in C language
+# after disabling all roles in all languages
+#
+#KIND(L/N) NAME      ENABLED DESCRIPTION
+h/heredoc  endmarker off     end marker
+s/script   loaded    off     loaded
+
+#
+# C.* with disabling system role of h kind
+#
+#KIND(L/N) NAME   ENABLED DESCRIPTION
+d/macro    undef  on      undefined
+h/header   local  on      local header
+h/header   system off     system header
+
+#
+# C.* with disabling system role of {header} kind
+#
+#KIND(L/N) NAME   ENABLED DESCRIPTION
+d/macro    undef  on      undefined
+h/header   local  on      local header
+h/header   system off     system header
+
+#
+# C.* with enabling system role of h kind after disabling the role
+#
+#KIND(L/N) NAME   ENABLED DESCRIPTION
+d/macro    undef  on      undefined
+h/header   local  on      local header
+h/header   system on      system header
+
+#
+# C.* with enabling system role of {header} kind after disabling the role
+#
+#KIND(L/N) NAME   ENABLED DESCRIPTION
+d/macro    undef  on      undefined
+h/header   local  on      local header
+h/header   system on      system header
+
+#
+# C.* with disabling system and local roles of h kind
+#
+#KIND(L/N) NAME   ENABLED DESCRIPTION
+d/macro    undef  on      undefined
+h/header   local  off     local header
+h/header   system off     system header
+
+#
+# C.* with disabling system and local roles of {header} kind
+#
+#KIND(L/N) NAME   ENABLED DESCRIPTION
+d/macro    undef  on      undefined
+h/header   local  off     local header
+h/header   system off     system header
+
+#
+# C.* with enabling system and local roles of h kind
+# after disabling all roles in all languages
+#
+#KIND(L/N) NAME   ENABLED DESCRIPTION
+d/macro    undef  off     undefined
+h/header   local  on      local header
+h/header   system on      system header
+
+#
+# C.* with enabling system and local roles of {header} kind
+# after disabling all roles in all languages
+#
+#KIND(L/N) NAME   ENABLED DESCRIPTION
+d/macro    undef  off     undefined
+h/header   local  on      local header
+h/header   system on      system header
+
+#
+# C.* with disabling local role of h kind and undef role of d kind
+#
+#KIND(L/N) NAME   ENABLED DESCRIPTION
+d/macro    undef  off     undefined
+h/header   local  off     local header
+h/header   system on      system header
+
+#
+# C.* with enabling all roles of header kinds after disabling all roles of the kind
+#
+#KIND(L/N) NAME   ENABLED DESCRIPTION
+d/macro    undef  on      undefined
+h/header   local  on      local header
+h/header   system on      system header
+
+#
+# C.* with enabling all roles of header kinds after disabling all roles of the kinds of C language
+#
+#KIND(L/N) NAME   ENABLED DESCRIPTION
+d/macro    undef  off     undefined
+h/header   local  on      local header
+h/header   system on      system header
+
+#
+# C.* with enabling all roles of header kinds after disabling all roles of the kinds of C language (short notation)
+#
+#KIND(L/N) NAME   ENABLED DESCRIPTION
+d/macro    undef  off     undefined
+h/header   local  on      local header
+h/header   system on      system header

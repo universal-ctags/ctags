@@ -412,6 +412,8 @@ static optionDescription LongOptionDescription [] = {
 #endif
  {1,"  --regex-<LANG>=/line_pattern/name_pattern/[flags]"},
  {1,"       Define regular expression for locating tags in specific language."},
+ {1,"  --roles-<LANG>.kind=[+|-]role, or"},
+ {1,"       Enable/disable tag roles for kinds of language <LANG>."},
  {0,"  --sort=[yes|no|foldcase]"},
  {0,"       Should tags be sorted (optionally ignoring case) [yes]?"},
  {0,"  --tag-relative=[yes|no|always|never]"},
@@ -3305,6 +3307,8 @@ static void processLongOption (
 	else if (processScopesepOption (option, parameter))
 		;
 	else if (processPretendOption (option, parameter))
+		;
+	else if (processRolesOption (option, parameter))
 		;
 	else
 		error (FATAL, "Unknown option: --%s", option);
