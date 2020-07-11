@@ -1,0 +1,4 @@
+s:ShellEscape	input.vim	/^fun! s:ShellEscape(s, ...)$/;"	f	signature:(s,...)
+s:Foo	input.vim	/^fun! s:Foo()$/;"	f	signature:()
+s:Broken	input.vim	/^function! s:Broken (arg$/;"	f
+s:GetTokensFromLine	input.vim	/^function! s:GetTokensFromLine(line, string_continuation, atom_continuation,$/;"	f	signature:(line,string_continuation,atom_continuation,tabstop)
