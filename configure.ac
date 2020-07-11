@@ -386,38 +386,6 @@ AC_TYPE_OFF_T
 
 AC_CHECK_HEADERS([stdbool.h])
 
-AC_MSG_CHECKING(if "%zu" in printf works)
-AC_RUN_IFELSE([AC_LANG_SOURCE([[
-#include <stdio.h>
-int main(void) {
-	static char buffer[10];
-	size_t i = 999;
-	sprintf(buffer, "%zu", i);
-	return !(buffer[0] == '9' && buffer[1] == '9' && buffer[2] == '9');
-}
-]])],[have_zu_formatter=yes],[have_zu_formatter=no])
-AC_MSG_RESULT($have_zu_formatter)
-
-if test x$have_zu_formatter != xyes; then
-	AC_CHECK_SIZEOF(size_t)
-	AC_CHECK_SIZEOF(unsigned int)
-	AC_CHECK_SIZEOF(unsigned long)
-	AC_CHECK_SIZEOF(unsigned long long)
-	AC_MSG_CHECKING(alternative for "%zu")
-	if test x"$ac_cv_sizeof_size_t" = x"$ac_cv_sizeof_unsigned_int"; then
-		use_no_formatter_for_size_t=yes
-		AC_MSG_RESULT("%u")
-	elif test x"$ac_cv_sizeof_size_t" = x"$ac_cv_sizeof_unsigned_long"; then
-		use_ulong_formatter_for_size_t=yes
-		AC_MSG_RESULT("%lu")
-	elif test x"$ac_cv_sizeof_size_t" = x"$ac_cv_sizeof_unsigned_long_long"; then
-		use_ulonglong_formatter_for_size_t=yes
-		AC_MSG_RESULT("%llu")
-	else
-		AC_MSG_ERROR(no alternative for "%zu" formatter)
-	fi
-fi
-
 # Checks for compiler characteristics
 # -----------------------------------
 
