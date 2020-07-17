@@ -112,7 +112,7 @@ static bool		entry_delete (hentry **entry, const void *key, hashTableEqualFunc e
 			*entry = entry_destroy (*entry, keyfreefn, valfreefn);
 			return true;
 		}
-
+		entry = &((*entry)->next);
 	}
 	return false;
 }
