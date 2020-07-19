@@ -149,7 +149,7 @@ static DSLProcBind pbinds [] = {
 	{ "downcase", builtin_downcase, NULL, DSL_PATTR_CHECK_ARITY, 1,
 	  .helpstr = "(downcase elt<string>|<list>) -> <string>|<list>" },
 	{ "upcase", builtin_upcase, NULL, DSL_PATTR_CHECK_ARITY, 1,
-	  .helpstr = "(upcate elt<string>|<list>) -> <string>|<list>" },
+	  .helpstr = "(upcase elt<string>|<list>) -> <string>|<list>" },
 	{ "+",               builtin_add,          NULL, DSL_PATTR_CHECK_ARITY, 2,
 	  .helpstr = "(+ <integer> <integer>) -> <integer>", },
 	{ "-",               builtin_sub,          NULL, DSL_PATTR_CHECK_ARITY, 2,
