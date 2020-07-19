@@ -68,6 +68,7 @@ static EsObject* builtin_substr (EsObject *args, DSLEnv *env);
 static EsObject* builtin_member (EsObject *args, DSLEnv *env);
 static EsObject* builtin_downcase (EsObject *args, DSLEnv *env);
 static EsObject* builtin_upcase (EsObject *args, DSLEnv *env);
+static EsObject* builtin_length (EsObject *args, DSLEnv *env);
 static EsObject* bulitin_debug_print (EsObject *args, DSLEnv *env);
 static EsObject* builtin_entry_ref (EsObject *args, DSLEnv *env);
 
@@ -150,6 +151,8 @@ static DSLProcBind pbinds [] = {
 	  .helpstr = "(downcase elt<string>|<list>) -> <string>|<list>" },
 	{ "upcase", builtin_upcase, NULL, DSL_PATTR_CHECK_ARITY, 1,
 	  .helpstr = "(upcase elt<string>|<list>) -> <string>|<list>" },
+	{ "length",  builtin_length, NULL, DSL_PATTR_CHECK_ARITY, 1,
+	  .helpstr = "(length <string>) => <integer>" },
 	{ "+",               builtin_add,          NULL, DSL_PATTR_CHECK_ARITY, 2,
 	  .helpstr = "(+ <integer> <integer>) -> <integer>", },
 	{ "-",               builtin_sub,          NULL, DSL_PATTR_CHECK_ARITY, 2,
@@ -776,6 +779,19 @@ static EsObject* builtin_upcase (EsObject *args, DSLEnv *env)
 {
 	EsObject *o = es_car(args);
 	return builtin_caseop0 (o, upcase);
+}
+
+static EsObject* builtin_length (EsObject *args, DSLEnv *env)
+{
+	EsObject *o = es_car(args);
+	if (es_error_p (o))
+		return o;
+	if (!es_string_p (o))
+		dsl_throw (WRONG_TYPE_ARGUMENT, es_symbol_intern ("length"));
+
+	const char *cstr = es_string_get (o);
+	size_t len = strlen (cstr);
+	return es_object_autounref (es_integer_new ((int)len));
 }
 
 static MIO  *miodebug;

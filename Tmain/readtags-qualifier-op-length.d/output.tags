@@ -1,0 +1,15 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_OUTPUT_FILESEP	slash	/slash or backslash/
+!_TAG_OUTPUT_MODE	u-ctags	/u-ctags or e-ctags/
+!_TAG_PATTERN_LENGTH_LIMIT	96	/0 for no limit/
+!_TAG_PROGRAM_AUTHOR	Universal Ctags Team	//
+!_TAG_PROGRAM_NAME	Universal Ctags	/Derived from Exuberant Ctags/
+!_TAG_PROGRAM_URL	https://ctags.io/	/official site/
+!_TAG_PROGRAM_VERSION	0.0.0	/58efa7d1/
+bye	input.el	/^(defun bye ())$/;"	f
+bye-long-long-long-long-lone	input.el	/^(defun bye-long-long-long-long-lone ())$/;"	f
+hi-aaa-some-long-thing	input.el	/^(defun hi-aaa-some-long-thing ())$/;"	f
+hi-bbb-1	input.el	/^(defun hi-bbb-1 ())$/;"	f
+hi-y	input.el	/^(defun hi-y ())$/;"	f
+hi-zzz	input.el	/^(defun hi-zzz ())$/;"	f
