@@ -1,0 +1,10 @@
+# (<> $name &name)
+hi-aaa-some-long-thing	input.el	/^(defun hi-aaa-some-long-thing ())$/
+hi-bbb-1	input.el	/^(defun hi-bbb-1 ())$/
+hi-y	input.el	/^(defun hi-y ())$/
+hi-zzz	input.el	/^(defun hi-zzz ())$/
+# (<or> (<> (length $name) (length &name)) (<> $name &name))
+hi-y	input.el	/^(defun hi-y ())$/
+hi-zzz	input.el	/^(defun hi-zzz ())$/
+hi-bbb-1	input.el	/^(defun hi-bbb-1 ())$/
+hi-aaa-some-long-thing	input.el	/^(defun hi-aaa-some-long-thing ())$/
