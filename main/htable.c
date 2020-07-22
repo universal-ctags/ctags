@@ -65,18 +65,27 @@ static hentry* entry_new (void *key, void *value, hentry* next)
 	return entry;
 }
 
+static void entry_reset  (hentry* entry,
+						  void *newkey,
+						  void *newval,
+						  hashTableDeleteFunc keyfreefn,
+						  hashTableDeleteFunc valfreefn)
+{
+	if (keyfreefn)
+		keyfreefn (entry->key);
+	if (valfreefn)
+		valfreefn (entry->value);
+	entry->key = newkey;
+	entry->value = newval;
+}
+
 static hentry* entry_destroy (hentry* entry,
 			      hashTableDeleteFunc keyfreefn,
 			      hashTableDeleteFunc valfreefn)
 {
 	hentry* tmp;
 
-	if (keyfreefn)
-		keyfreefn (entry->key);
-	if (valfreefn)
-		valfreefn (entry->value);
-	entry->key = NULL;
-	entry->value = NULL;
+	entry_reset (entry, NULL, NULL, keyfreefn, valfreefn);
 	tmp = entry->next;
 	eFree (entry);
 
@@ -113,6 +122,21 @@ static bool		entry_delete (hentry **entry, const void *key, hashTableEqualFunc e
 			return true;
 		}
 		entry = &((*entry)->next);
+	}
+	return false;
+}
+
+static bool		entry_update (hentry *entry, void *key, void *value, hashTableEqualFunc equalfn,
+			      hashTableDeleteFunc keyfreefn, hashTableDeleteFunc valfreefn)
+{
+	while (entry)
+	{
+		if (equalfn (key, entry->key))
+		{
+			entry_reset (entry, key, value, keyfreefn, valfreefn);
+			return true;
+		}
+		entry = entry->next;
 	}
 	return false;
 }
@@ -206,6 +230,18 @@ extern bool     hashTableDeleteItem (hashTable *htable, const void *key)
 	i = htable->hashfn (key) % htable->size;
 	return entry_delete(&htable->table[i], key,
 			    htable->equalfn, htable->keyfreefn, htable->valfreefn);
+}
+
+extern bool    hashTableUpdateItem (hashTable *htable, void *key, void *value)
+{
+	unsigned int i;
+
+	i = htable->hashfn (key) % htable->size;
+	bool r = entry_update(htable->table[i], key, value,
+						  htable->equalfn, htable->keyfreefn, htable->valfreefn);
+	if (!r)
+		htable->table[i] = entry_new(key, value, htable->table[i]);
+	return r;
 }
 
 extern bool    hashTableHasItem    (hashTable *htable, const void *key)

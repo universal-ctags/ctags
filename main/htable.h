@@ -60,6 +60,7 @@ extern void       hashTablePutItem     (hashTable *htable, void *key, void *valu
 extern void*      hashTableGetItem     (hashTable *htable, const void * key);
 extern bool    hashTableHasItem     (hashTable * htable, const void * key);
 extern bool    hashTableDeleteItem  (hashTable *htable, const void *key);
+extern bool       hashTableUpdateItem  (hashTable *htable, void *key, void *value);
 
 /* Return true if proc never returns false; proc returns true for all
  * the items, or htable holds no item.
