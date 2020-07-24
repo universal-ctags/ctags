@@ -56,6 +56,28 @@ extern unsigned int ptrArrayAdd (ptrArray *const current, void *ptr)
 	return current->count++;
 }
 
+extern bool ptrArrayUpdate (ptrArray *const current,
+							unsigned int indx, void *ptr, void *padding)
+{
+	Assert (current != NULL);
+	if (current->count > indx)
+	{
+		void *r = current->array [indx];
+		if (current->deleteFunc)
+			current->deleteFunc (r);
+		current->array [indx] = ptr;
+		return true;
+	}
+	else
+	{
+		unsigned int c = indx - current->count;
+		for (unsigned int i = 0; i < c; i++)
+			ptrArrayAdd (current, padding);
+		ptrArrayAdd (current, ptr);
+		return false;
+	}
+
+}
 extern void *ptrArrayRemoveLast (ptrArray *const current)
 {
 	Assert (current != NULL);

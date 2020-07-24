@@ -30,6 +30,7 @@ typedef void (*ptrArrayDeleteFunc) (void *data);
 
 extern ptrArray *ptrArrayNew (ptrArrayDeleteFunc deleteFunc);
 extern unsigned int ptrArrayAdd (ptrArray *const current, void *ptr);
+extern bool ptrArrayUpdate (ptrArray *const current, unsigned int indx, void *ptr, void *padding);
 extern void *ptrArrayRemoveLast (ptrArray *const current);
 #define ptrArrayDeleteLast(A) ptrArrayDeleteLastInBatch(A, 1)
 extern void  ptrArrayDeleteLastInBatch (ptrArray *const current, unsigned int count);
