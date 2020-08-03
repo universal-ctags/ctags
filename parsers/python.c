@@ -851,6 +851,53 @@ static bool readCDefName (tokenInfo *const token, pythonKind *kind)
 	return token->type == TOKEN_IDENTIFIER;
 }
 
+static vString *parseParamTypeAnnotation (tokenInfo *const token,
+										  vString *arglist)
+{
+	readToken (token);
+	if (token->type != ':')
+	{
+		ungetToken (token);
+		return NULL;
+	}
+
+	reprCat (arglist, token);
+	int depth = 0;
+	vString *t = vStringNew ();
+	while (true)
+	{
+		readTokenFull (token, true);
+		if (token->type == TOKEN_WHITESPACE)
+		{
+			reprCat (arglist, token);
+			continue;
+		}
+		else if (token->type == TOKEN_EOF)
+			break;
+
+		if (token->type == '(' ||
+			token->type == '[' ||
+			token->type == '{')
+			depth ++;
+		else if (token->type == ')' ||
+				 token->type == ']' ||
+				 token->type == '}')
+			depth --;
+
+		if (depth < 0
+			|| (depth == 0 && (token->type == '='
+							   || token->type == ',')))
+		{
+			ungetToken (token);
+			return t;
+		}
+		reprCat (arglist, token);
+		reprCat (t, token);
+	}
+	vStringDelete (t);
+	return NULL;
+}
+
 static vString *parseReturnTypeAnnotation (tokenInfo *const token)
 {
 	readToken (token);
@@ -895,6 +942,7 @@ static bool parseClassOrDef (tokenInfo *const token,
 	vString *arglist = NULL;
 	tokenInfo *name = NULL;
 	tokenInfo *parameterTokens[16] = { NULL };
+	vString   *parameterTypes [ARRAY_SIZE(parameterTokens)] = { NULL };
 	unsigned int parameterCount = 0;
 	NestingLevel *lv;
 	int corkIndex;
@@ -956,7 +1004,8 @@ static bool parseClassOrDef (tokenInfo *const token,
 				tokenInfo *parameterName = newToken ();
 
 				copyToken (parameterName, token);
-				parameterTokens[parameterCount++] = parameterName;
+				parameterTokens[parameterCount] = parameterName;
+				parameterTypes [parameterCount++] = parseParamTypeAnnotation (token, arglist);
 			}
 		}
 		while (token->type != TOKEN_EOF && depth > 0);
@@ -979,8 +1028,16 @@ static bool parseClassOrDef (tokenInfo *const token,
 
 		for (i = 0; i < parameterCount; i++)
 		{
-			makeSimplePythonTag (parameterTokens[i], K_PARAMETER);
+			int paramCorkIndex = makeSimplePythonTag (parameterTokens[i], K_PARAMETER);
 			deleteToken (parameterTokens[i]);
+			tagEntryInfo *e = getEntryInCorkQueue (paramCorkIndex);
+			if (e && parameterTypes[i])
+			{
+				e->extensionFields.typeRef [0] = eStrdup ("typename");
+				e->extensionFields.typeRef [1] = vStringDeleteUnwrap (parameterTypes[i]);
+				parameterTypes[i] = NULL;
+			}
+			vStringDelete (parameterTypes[i]); /* NULL is acceptable. */
 		}
 	}
 
