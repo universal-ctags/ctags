@@ -1,0 +1,8 @@
+T	input.py	/^T = TypeVar('T')$/;"	v
+func1	input.py	/^def func1(a: str, b: Callable[[int, int], T]) -> T:$/;"	f	typeref:typename:T
+a	input.py	/^def func1(a: str, b: Callable[[int, int], T]) -> T:$/;"	z	function:func1	file:
+b	input.py	/^def func1(a: str, b: Callable[[int, int], T]) -> T:$/;"	z	function:func1	file:
+func2	input.py	/^def func2 (a: str) -> "a string":$/;"	f	typeref:typename:"a string"
+a	input.py	/^def func2 (a: str) -> "a string":$/;"	z	function:func2	file:
+i	input.py	/^i:int = 10$/;"	v
+func3	input.py	/^def func3 () -> 3 + i:$/;"	f	typeref:typename:3+i

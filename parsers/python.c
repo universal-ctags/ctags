@@ -172,6 +172,7 @@ typedef enum eTokenType {
 	TOKEN_OPERATOR,
 	TOKEN_IDENTIFIER,
 	TOKEN_STRING,
+	TOKEN_ARROW,				/* -> */
 	TOKEN_WHITESPACE,
 } tokenType;
 
@@ -543,8 +544,20 @@ getNextChar:
 			break;
 		}
 
-		case '+':
 		case '-':
+		{
+			int d = getcFromInputFile ();
+			if (d == '>')
+			{
+				vStringPut (token->string, c);
+				vStringPut (token->string, d);
+				token->type = TOKEN_ARROW;
+				break;
+			}
+			ungetcToInputFile (d);
+			/* fall through */
+		}
+		case '+':
 		case '*':
 		case '%':
 		case '<':
@@ -838,6 +851,43 @@ static bool readCDefName (tokenInfo *const token, pythonKind *kind)
 	return token->type == TOKEN_IDENTIFIER;
 }
 
+static vString *parseReturnTypeAnnotation (tokenInfo *const token)
+{
+	readToken (token);
+	if (token->type != TOKEN_ARROW)
+	{
+		ungetToken (token);
+		return NULL;
+	}
+
+	int depth = 0;
+	vString *t = vStringNew ();
+	while (true)
+	{
+		readToken (token);
+		if (token->type == TOKEN_EOF)
+			break;
+
+		if (token->type == '(' ||
+			token->type == '[' ||
+			token->type == '{')
+			depth ++;
+		else if (token->type == ')' ||
+				 token->type == ']' ||
+				 token->type == '}')
+			depth --;
+		if (depth == 0 && token->type == ':')
+		{
+			ungetToken (token);
+			return t;
+		}
+		else
+			reprCat (t, token);
+	}
+	vStringDelete (t);
+	return NULL;
+}
+
 static bool parseClassOrDef (tokenInfo *const token,
                                 const vString *const decorators,
                                 pythonKind kind, bool isCDef)
@@ -932,6 +982,16 @@ static bool parseClassOrDef (tokenInfo *const token,
 			makeSimplePythonTag (parameterTokens[i], K_PARAMETER);
 			deleteToken (parameterTokens[i]);
 		}
+	}
+
+	tagEntryInfo *e;
+	vString *t;
+	if (kind != K_CLASS
+		&& (e = getEntryInCorkQueue (corkIndex))
+		&& (t = parseReturnTypeAnnotation (token)))
+	{
+		e->extensionFields.typeRef [0] = eStrdup ("typename");
+		e->extensionFields.typeRef [1] = vStringDeleteUnwrap (t);
 	}
 
 	return true;
