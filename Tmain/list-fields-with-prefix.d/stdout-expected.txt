@@ -30,6 +30,7 @@ x       UCTAGSxpath          no      NONE             s--    no    xpath for the
 -       UCTAGShome           yes     Passwd           s--    no    home directory
 -       UCTAGSshell          yes     Passwd           s--    no    login shell
 -       UCTAGSdecorators     no      Python           s--    no    decorators on functions and classes
+-       UCTAGSnameref        yes     Python           s--    no    the original name for the tag
 -       UCTAGSassignmentop   no      R                s--    no    operator for assignment
 -       UCTAGSsectionMarker  no      ReStructuredText s--    no    character used for declaring section
 -       UCTAGSmixin          yes     Ruby             s--    no    how the class or module is mixed in (mixin:HOW:MODULE)
