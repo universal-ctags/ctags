@@ -1,4 +1,4 @@
-np	input.py	/^import numpy as np$/;"	I
+np	input.py	/^import numpy as np$/;"	I	nameref:module:numpy
 dotFunc	input.py	/^def dotFunc():$/;"	f	decorators:something
 dotMethod	input.py	/^def dotMethod():$/;"	f	decorators:something
 atOpv1	input.py	/^def atOpv1():$/;"	f	decorators:something

@@ -61,6 +61,7 @@ static const char *const PythonAccesses[COUNT_ACCESS] = {
 
 typedef enum {
 	F_DECORATORS,
+	F_NAMEREF,
 	COUNT_FIELD
 } pythonField;
 
@@ -68,6 +69,9 @@ static fieldDefinition PythonFields[COUNT_FIELD] = {
 	{ .name = "decorators",
 	  .description = "decorators on functions and classes",
 	  .enabled = false },
+	{ .name = "nameref",
+	  .description = "the original name for the tag",
+	  .enabled = true },
 };
 
 typedef enum {
@@ -99,9 +103,9 @@ typedef enum {
  * import X              X = (kind:module, role:imported)
  *
  * import X as Y         X = (kind:module, role:indirectlyImported),
- *                       Y = (kind:namespace, [nameref:X])
+ *                       Y = (kind:namespace, nameref:module:X)
  *                       ------------------------------------------------
- *                       Don't confuse with namespace role of module kind.
+ *                       Don't confuse the kind of Y with namespace role of module kind.
  *
  * from X import *       X = (kind:module,  role:namespace)
  *
@@ -110,7 +114,7 @@ typedef enum {
  *
  * from X import Y as Z  X = (kind:module,  role:namespace),
  *                       Y = (kind:unknown, role:indirectlyImported, [scope:X])
- *                       Z = (kind:unknown, [nameref:X.Y]) */
+ *                       Z = (kind:unknown, nameref:unknown:Y) */
 
 static roleDefinition PythonModuleRoles [] = {
 	{ true, "imported",
@@ -991,7 +995,7 @@ static bool parseImport (tokenInfo *const token)
 							 * ----------------------------
 							 * x = (kind:module,  role:namespace),
 							 * Y = (kind:unknown, role:indirectlyImported),
-							 * Z = (kind:unknown) */
+							 * Z = (kind:unknown, nameref:unknown:Y) */
 
 							/* Y */
 							makeSimplePythonRefTag (name, NULL, K_UNKNOWN,
@@ -1009,20 +1013,40 @@ static bool parseImport (tokenInfo *const token)
 								vStringDelete (fq);
 							}
 							/* Z */
-							makeSimplePythonTag (token, K_UNKNOWN);
+							int index = makeSimplePythonTag (token, K_UNKNOWN);
+							/* fill the nameref filed for Y */
+							if (PythonFields[F_NAMEREF].enabled)
+							{
+								vString *nameref = vStringNewInit (PythonKinds [K_UNKNOWN].name);
+								vStringPut (nameref, ':');
+								vStringCat (nameref, name->string);
+								attachParserFieldToCorkEntry (index, PythonFields[F_NAMEREF].ftype,
+															  vStringValue (nameref));
+								vStringDelete (nameref);
+							}
 						}
 						else
 						{
 							/* import x as Y
 							 * ----------------------------
-							 * X = (kind:module, role:indirectlyImported)
-							 * Y = (kind:namespace)*/
-							/* X */
+							 * x = (kind:module, role:indirectlyImported)
+							 * Y = (kind:namespace, nameref:module:x)*/
+							/* x */
 							makeSimplePythonRefTag (name, NULL, K_MODULE,
 							                        PYTHON_MODULE_INDIRECTLY_IMPORTED,
 							                        XTAG_UNKNOWN);
 							/* Y */
-							makeSimplePythonTag (token, K_NAMESPACE);
+							int index = makeSimplePythonTag (token, K_NAMESPACE);
+							/* fill the nameref filed for Y */
+							if (PythonFields[F_NAMEREF].enabled)
+							{
+								vString *nameref = vStringNewInit (PythonKinds [K_MODULE].name);
+								vStringPut (nameref, ':');
+								vStringCat (nameref, name->string);
+								attachParserFieldToCorkEntry (index, PythonFields[F_NAMEREF].ftype,
+															  vStringValue (nameref));
+								vStringDelete (nameref);
+							}
 						}
 
 						copyToken (name, token);
