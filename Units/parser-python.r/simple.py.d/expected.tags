@@ -1,6 +1,6 @@
 bsddb	input.py	/^from bsddb import btopen$/;"	kind:module	line:5	language:Python	roles:namespace	extras:reference
-btopen	input.py	/^from bsddb import btopen$/;"	kind:unknown	line:5	language:Python	roles:imported	extras:reference
-bsddb.btopen	input.py	/^from bsddb import btopen$/;"	kind:unknown	line:5	language:Python	roles:imported	extras:qualified,reference
+btopen	input.py	/^from bsddb import btopen$/;"	kind:unknown	line:5	language:Python	scope:module:bsddb	roles:imported	extras:reference
+bsddb.btopen	input.py	/^from bsddb import btopen$/;"	kind:unknown	line:5	language:Python	scope:module:bsddb	roles:imported	extras:qualified,reference
 VERSION	input.py	/^VERSION = '1.2.0'$/;"	kind:variable	line:9	language:Python	access:public	roles:def
 ALL	input.py	/^ALL = 0xff $/;"	kind:variable	line:12	language:Python	access:public	roles:def
 KEY	input.py	/^KEY = 0x01$/;"	kind:variable	line:13	language:Python	access:public	roles:def

@@ -1,12 +1,12 @@
 A.B	input.py	/^from A.B import C as D$/;"	i	roles:namespace
-C	input.py	/^from A.B import C as D$/;"	x	roles:indirectlyImported
+C	input.py	/^from A.B import C as D$/;"	x	module:A.B	roles:indirectlyImported
 D	input.py	/^from A.B import C as D$/;"	x	roles:def	nameref:unknown:C
 .	input.py	/^from . import E$/;"	i	roles:namespace
-E	input.py	/^from . import E$/;"	x	roles:imported
+E	input.py	/^from . import E$/;"	x	module:.	roles:imported
 .F	input.py	/^from .F import G$/;"	i	roles:namespace
-G	input.py	/^from .F import G$/;"	x	roles:imported
+G	input.py	/^from .F import G$/;"	x	module:.F	roles:imported
 H.I	input.py	/^import H.I$/;"	i	roles:imported
 .J.K	input.py	/^from .J.K import L$/;"	i	roles:namespace
-L	input.py	/^from .J.K import L$/;"	x	roles:imported
+L	input.py	/^from .J.K import L$/;"	x	module:.J.K	roles:imported
 ..M.N	input.py	/^from ..M.N import O$/;"	i	roles:namespace
-O	input.py	/^from ..M.N import O$/;"	x	roles:imported
+O	input.py	/^from ..M.N import O$/;"	x	module:..M.N	roles:imported

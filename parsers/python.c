@@ -110,10 +110,10 @@ typedef enum {
  * from X import *       X = (kind:module,  role:namespace)
  *
  * from X import Y       X = (kind:module,  role:namespace),
- *                       Y = (kind:unknown, role:imported, [scope:X])
+ *                       Y = (kind:unknown, role:imported, scope:module:X)
  *
  * from X import Y as Z  X = (kind:module,  role:namespace),
- *                       Y = (kind:unknown, role:indirectlyImported, [scope:X])
+ *                       Y = (kind:unknown, role:indirectlyImported, scope:module:X)
  *                       Z = (kind:unknown, nameref:unknown:Y) */
 
 static roleDefinition PythonModuleRoles [] = {
@@ -955,15 +955,16 @@ static bool parseImport (tokenInfo *const token)
 	if (token->keyword == KEYWORD_import)
 	{
 		bool parenthesized = false;
+		int moduleIndex;
 
 		if (fromModule)
 		{
 			/* from X import ...
 			 * --------------------
 			 * X = (kind:module, role:namespace) */
-			makeSimplePythonRefTag (fromModule, NULL, K_MODULE,
-			                        PYTHON_MODULE_NAMESPACE,
-			                        XTAG_UNKNOWN);
+			moduleIndex = makeSimplePythonRefTag (fromModule, NULL, K_MODULE,
+												  PYTHON_MODULE_NAMESPACE,
+												  XTAG_UNKNOWN);
 		}
 
 		do
@@ -994,26 +995,21 @@ static bool parseImport (tokenInfo *const token)
 							/* from x import Y as Z
 							 * ----------------------------
 							 * x = (kind:module,  role:namespace),
-							 * Y = (kind:unknown, role:indirectlyImported),
+							 * Y = (kind:unknown, role:indirectlyImported, scope:module:X),
 							 * Z = (kind:unknown, nameref:unknown:Y) */
+							int index;
 
 							/* Y */
-							makeSimplePythonRefTag (name, NULL, K_UNKNOWN,
-							                        PYTHON_UNKNOWN_INDIRECTLY_IMPORTED,
-							                        XTAG_UNKNOWN);
-							/* x.Y */
-							if (isXtagEnabled (XTAG_QUALIFIED_TAGS))
-							{
-								vString *fq = vStringNewCopy (fromModule->string);
-								vStringPut (fq, '.');
-								vStringCat (fq, name->string);
-								makeSimplePythonRefTag (name, fq, K_UNKNOWN,
-								                        PYTHON_UNKNOWN_INDIRECTLY_IMPORTED,
-								                        XTAG_QUALIFIED_TAGS);
-								vStringDelete (fq);
-							}
+							index = makeSimplePythonRefTag (name, NULL, K_UNKNOWN,
+															PYTHON_UNKNOWN_INDIRECTLY_IMPORTED,
+															XTAG_UNKNOWN);
+							/* fill the scope field for Y */
+							tagEntryInfo *e = getEntryInCorkQueue (index);
+							if (e)
+								e->extensionFields.scopeIndex = moduleIndex;
+
 							/* Z */
-							int index = makeSimplePythonTag (token, K_UNKNOWN);
+							index = makeSimplePythonTag (token, K_UNKNOWN);
 							/* fill the nameref filed for Y */
 							if (PythonFields[F_NAMEREF].enabled)
 							{
@@ -1060,22 +1056,15 @@ static bool parseImport (tokenInfo *const token)
 						/* from x import Y
 						   --------------
 						   x = (kind:module,  role:namespace),
-						   Y = (kind:unknown, role:imported) */
+						   Y = (kind:unknown, role:imported, scope:module:x) */
 						/* Y */
-						makeSimplePythonRefTag (name, NULL, K_UNKNOWN,
-						                        PYTHON_UNKNOWN_IMPORTED,
-						                        XTAG_UNKNOWN);
-						/* x.Y */
-						if (isXtagEnabled (XTAG_QUALIFIED_TAGS))
-						{
-							vString *fq = vStringNewCopy (fromModule->string);
-							vStringPut (fq, '.');
-							vStringCat (fq, name->string);
-							makeSimplePythonRefTag (name, fq, K_UNKNOWN,
-							                        PYTHON_UNKNOWN_IMPORTED,
-							                        XTAG_QUALIFIED_TAGS);
-							vStringDelete (fq);
-						}
+						int index = makeSimplePythonRefTag (name, NULL, K_UNKNOWN,
+															PYTHON_UNKNOWN_IMPORTED,
+															XTAG_UNKNOWN);
+						/* fill the scope field for Y */
+						tagEntryInfo *e = getEntryInCorkQueue (index);
+						if (e)
+							e->extensionFields.scopeIndex = moduleIndex;
 					}
 					else
 					{
