@@ -24,6 +24,7 @@ a_anteater	input.rs	/^	a_anteater(isize),$/;"	e	enum:Animal
 a_bear	input.rs	/^	a_bear(isize),$/;"	e	enum:Animal
 a_cat	input.rs	/^	a_cat(isize),$/;"	e	enum:Animal
 a_dog	input.rs	/^	a_dog(isize),$/;"	e	enum:Animal
+array_param	input.rs	/^fn array_param(arr: [[u32; 3]; 4])$/;"	f	signature:(arr: [[u32; 3]; 4])
 bar	input.rs	/^	bar: isize$/;"	m	struct:A
 bar	input.rs	/^	bar: isize$/;"	m	struct:B
 do_z	input.rs	/^	fn do_z(&self) {$/;"	P	implementation:Foo	signature:(&self)

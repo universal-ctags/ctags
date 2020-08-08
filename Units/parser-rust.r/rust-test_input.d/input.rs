@@ -47,6 +47,10 @@ pub fn where_foo<T>(a: T) where T: Send
 {
 }
 
+fn array_param(arr: [[u32; 3]; 4])
+{
+}
+
 /*
  * fn ignored_in_comment() {}
  */
