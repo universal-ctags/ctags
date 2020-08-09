@@ -1213,16 +1213,17 @@ static bool parseImport (tokenInfo *const token)
  * expression in theory.
  * this function assumes there must be an annotation, and doesn't do any check
  * on the token on which it is called: the caller should do that part. */
-static bool skipTypeAnnotation (tokenInfo *const token)
+static bool skipVariableTypeAnnotation (tokenInfo *const token, vString *const repr)
 {
 	bool readNext = true;
 
 	readToken (token);
 	switch (token->type)
 	{
-		case '[': readNext = skipOverPair (token, '[', ']', NULL, false); break;
-		case '(': readNext = skipOverPair (token, '(', ')', NULL, false); break;
-		case '{': readNext = skipOverPair (token, '{', '}', NULL, false); break;
+		case '[': readNext = skipOverPair (token, '[', ']', repr, true); break;
+		case '(': readNext = skipOverPair (token, '(', ')', repr, true); break;
+		case '{': readNext = skipOverPair (token, '{', '}', repr, true); break;
+		default: reprCat (repr, token);
 	}
 	if (readNext)
 		readToken (token);
@@ -1231,11 +1232,14 @@ static bool skipTypeAnnotation (tokenInfo *const token)
 	{
 		switch (token->type)
 		{
-			case '[': readNext = skipOverPair (token, '[', ']', NULL, false); break;
-			case '(': readNext = skipOverPair (token, '(', ')', NULL, false); break;
+			case '[': readNext = skipOverPair (token, '[', ']', repr, true); break;
+			case '(': readNext = skipOverPair (token, '(', ')', repr, true); break;
 			case '.':
+				reprCat (repr, token);
 				readToken (token);
 				readNext = token->type == TOKEN_IDENTIFIER;
+				if (readNext)
+					reprCat (repr, token);
 				break;
 			default:  readNext = false; break;
 		}
@@ -1252,12 +1256,15 @@ static bool parseVariable (tokenInfo *const token, const pythonKind kind)
 	 * assignations, we first collect all the names, and then try and map
 	 * an assignation to it */
 	tokenInfo *nameTokens[8] = { NULL };
+	vString   *nameTypes [ARRAY_SIZE (nameTokens)] = { NULL };
 	unsigned int nameCount = 0;
+	vString *type = vStringNew();
 
 	/* first, collect variable name tokens */
 	while (token->type == TOKEN_IDENTIFIER &&
 	       nameCount < ARRAY_SIZE (nameTokens))
 	{
+		unsigned int i;
 		tokenInfo *name = newToken ();
 		copyToken (name, token);
 
@@ -1278,18 +1285,26 @@ static bool parseVariable (tokenInfo *const token, const pythonKind kind)
 			       token->type == '.');
 		}
 
-		nameTokens[nameCount++] = name;
+		i = nameCount++;
+		nameTokens[i] = name;
 
-		/* skip annotations.  we need not to be too permissive because we
+		/* (parse and) skip annotations.  we need not to be too permissive because we
 		 * aren't yet sure we're actually parsing a variable. */
-		if (token->type == ':' && skipTypeAnnotation (token))
+		if (token->type == ':' && skipVariableTypeAnnotation (token, type))
 			readToken (token);
+
+		if (vStringLength (type) > 0)
+		{
+			nameTypes[i] = type;
+			type = vStringNew ();
+		}
 
 		if (token->type == ',')
 			readToken (token);
 		else
 			break;
 	}
+	vStringDelete (type);
 
 	/* then, if it's a proper assignation, try and map assignations so that
 	 * we catch lambdas and alike */
@@ -1299,14 +1314,24 @@ static bool parseVariable (tokenInfo *const token, const pythonKind kind)
 
 		do
 		{
-			const tokenInfo *const nameToken = nameTokens[i++];
+			const tokenInfo *const nameToken = nameTokens[i];
+			vString **type = &(nameTypes[i++]);
 
 			readToken (token);
 
 			if (! nameToken)
 				/* nothing */;
 			else if (token->keyword != KEYWORD_lambda)
-				makeSimplePythonTag (nameToken, kind);
+			{
+				int index = makeSimplePythonTag (nameToken, kind);
+				tagEntryInfo *e = getEntryInCorkQueue (index);
+				if (e && *type)
+				{
+					e->extensionFields.typeRef [0] = eStrdup ("typename");
+					e->extensionFields.typeRef [1] = vStringDeleteUnwrap (*type);
+					*type = NULL;
+				}
+			}
 			else
 			{
 				vString *arglist = vStringNew ();
@@ -1316,6 +1341,36 @@ static bool parseVariable (tokenInfo *const token, const pythonKind kind)
 				skipLambdaArglist (token, arglist);
 				vStringPut (arglist, ')');
 				makeFunctionTag (nameToken, arglist, NULL);
+				/* TODO: how we should do for filling typeref field for this tag?
+				 *
+				 * The value we have in "type" local variable is suitable if
+				 * the name specified with nameToken is a variable kind object.
+				 * However, currently, the name is tagged as a function kind object. The
+				 * value in "type" local variable is not suitable for it.
+				 *
+				 * Think about following input as an example:
+				 *
+				 *    id: Callable[[int], int] = lambda var: var
+				 *
+				 * The tag for the line:
+				 *
+				 *  id	input.py	/^id: Callable[[int], int] = lambda var: var$/;"	function
+				 *
+				 * "typeref:typename:Callable[[int], int]" is not suitable for "id"; typeref field
+				 * should represent the type of returning value if the tag for the field is a function
+				 * kind object.
+				 *
+				 * Using nameref field can be a solution.
+				 *
+				 * With using nameref field, we can captures two tags from the input line:
+				 *
+				 *  id	input.py	/^id: Callable[[int], int] = lambda var: var$/;"	variable	typeref:typename:Callable[[int], int]	nameref:function:anonFuncNNN
+				 *  anonFuncNNN	input.py	/^id: Callable[[int], int] = lambda var: var$/;"	function	extras:anonymous
+				 *
+				 * "typeref:typename:Callable[[int], int]" is suitable for "id" when it is tagged as a
+				 * variable kind object. Just using "variable kind" hides the valuable information; id holds a
+				 * function. The nameref field can be used to record the information.
+				 */
 				vStringDelete (arglist);
 			}
 
@@ -1343,6 +1398,7 @@ static bool parseVariable (tokenInfo *const token, const pythonKind kind)
 	{
 		if (nameTokens[--nameCount])
 			deleteToken (nameTokens[nameCount]);
+		vStringDelete (nameTypes[nameCount]); /* NULL is acceptable. */
 	}
 
 	return false;
