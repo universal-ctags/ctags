@@ -528,6 +528,7 @@ static void parseFn (lexerState *lexer, vString *scope, int parent_kind)
 	unsigned long line;
 	MIOPos pos;
 	int paren_level = 0;
+	int bracket_level = 0;
 	bool found_paren = false;
 	bool valid_signature = true;
 
@@ -545,9 +546,13 @@ static void parseFn (lexerState *lexer, vString *scope, int parent_kind)
 
 	/* HACK: This is a bit coarse as far as what tag entry means by
 	 * 'arglist'... */
-	while (lexer->cur_token != '{' && lexer->cur_token != ';')
+	while (lexer->cur_token != '{')
 	{
-		if (lexer->cur_token == '}')
+		if (lexer->cur_token == ';' && bracket_level == 0)
+		{
+			break;
+		}
+		else if (lexer->cur_token == '}')
 		{
 			valid_signature = false;
 			break;
@@ -566,6 +571,14 @@ static void parseFn (lexerState *lexer, vString *scope, int parent_kind)
 				break;
 			}
 		}
+		else if (lexer->cur_token == '[')
+		{
+			bracket_level++;
+		}
+		else if (lexer->cur_token == ']')
+		{
+			bracket_level--;
+		}
 		else if (lexer->cur_token == TOKEN_EOF)
 		{
 			valid_signature = false;
@@ -574,7 +587,7 @@ static void parseFn (lexerState *lexer, vString *scope, int parent_kind)
 		writeCurTokenToStr(lexer, arg_list);
 		advanceToken(lexer, false);
 	}
-	if (!found_paren || paren_level != 0)
+	if (!found_paren || paren_level != 0 || bracket_level != 0)
 		valid_signature = false;
 
 	if (valid_signature)
