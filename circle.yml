@@ -21,7 +21,7 @@ jobs:
        - run:
            name: Install build tools
            command: |
-             dnf -y install gcc automake autoconf pkgconfig make libseccomp-devel libxml2-devel jansson-devel libyaml-devel findutils diffutils
+             dnf -y install gcc automake autoconf pkgconfig make libseccomp-devel libxml2-devel jansson-devel libyaml-devel findutils diffutils sudo
              dnf -y install jq puppet
        - run:
            name: Build
@@ -59,7 +59,7 @@ jobs:
        - run:
            name: Install build tools
            command: |
-             dnf -y install gcc automake autoconf pkgconfig bmake libseccomp-devel libxml2-devel jansson-devel libyaml-devel findutils
+             dnf -y install gcc automake autoconf pkgconfig bmake libseccomp-devel libxml2-devel jansson-devel libyaml-devel findutils sudo
              dnf -y install jq puppet
        - run:
            name: Build
@@ -85,7 +85,7 @@ jobs:
        - run:
            name: Install build tools
            command: |
-             dnf -y install gcc automake autoconf pkgconfig make libseccomp-devel libxml2-devel jansson-devel libyaml-devel findutils diffutils
+             dnf -y install gcc automake autoconf pkgconfig make libseccomp-devel libxml2-devel jansson-devel libyaml-devel findutils diffutils sudo
              dnf -y install jq puppet
        - run:
            name: Build
@@ -110,7 +110,7 @@ jobs:
        - run:
            name: Install build tools
            command: |
-              yum -y --enablerepo=PowerTools install python3 gcc automake autoconf pkgconfig make libxml2-devel jansson-devel libyaml-devel findutils diffutils
+              yum -y --enablerepo=PowerTools install python3 gcc automake autoconf pkgconfig make libxml2-devel jansson-devel libyaml-devel findutils diffutils sudo
        - run:
            name: Build
            command: |
