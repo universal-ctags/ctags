@@ -1,0 +1,1 @@
+v1	input-1.c	/^int v1;$/;"	v	typeref:typename:int

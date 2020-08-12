@@ -3890,7 +3890,7 @@ extern bool runParserInNarrowedInputStream (const langType language,
 
 static bool createTagsWithFallback (
 	const char *const fileName, const langType language,
-	MIO *mio)
+	MIO *mio, bool *failureInOpenning)
 {
 	langType exclusive_subparser = LANG_IGNORE;
 	bool tagFileResized = false;
@@ -3898,7 +3898,11 @@ static bool createTagsWithFallback (
 	Assert (0 <= language  &&  language < (int) LanguageCount);
 
 	if (!openInputFile (fileName, language, mio))
+	{
+		*failureInOpenning = true;
 		return false;
+	}
+	*failureInOpenning = false;
 
 	tagFileResized = createTagsWithFallback1 (language,
 											  &exclusive_subparser);
@@ -4054,6 +4058,7 @@ static bool parseMio (const char *const fileName, langType language, MIO* mio, b
 					  void *clientData)
 {
 	bool tagFileResized = false;
+	bool failureInOpenning = false;
 
 	setupWriter (clientData);
 
@@ -4061,13 +4066,13 @@ static bool parseMio (const char *const fileName, langType language, MIO* mio, b
 
 	initParserTrashBox ();
 
-	tagFileResized = createTagsWithFallback (fileName, language, mio);
+	tagFileResized = createTagsWithFallback (fileName, language, mio, &failureInOpenning);
 
 	finiParserTrashBox ();
 
 	teardownAnon ();
 
-	if (useSourceFileTagPath)
+	if (useSourceFileTagPath && (!failureInOpenning))
 		return teardownWriter (getSourceFileTagPath())? true: tagFileResized;
 	else
 		return teardownWriter(fileName);

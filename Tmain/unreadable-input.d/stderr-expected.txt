@@ -1,0 +1,1 @@
+ctags: Warning: cannot open "input-0.c" : Permission denied
