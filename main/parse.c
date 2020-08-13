@@ -570,8 +570,8 @@ static bool processLangDefineScopesep(const langType language,
 		parentKindex = KIND_WILDCARD_INDEX;
 	else if (parentKletter == KIND_FILE_DEFAULT_LETTER)
 		error (FATAL,
-			   "the kind letter `F' in \"--%s\" option is reserved for \"file\" kind and no separator can be assigned to",
-			   option);
+			   "the kind letter `%c' in \"--%s\" option is reserved for \"%s\" kind and no separator can be assigned to",
+			   KIND_FILE_DEFAULT_LETTER, option, KIND_FILE_DEFAULT_NAME);
 	else if (isalpha (parentKletter))
 	{
 		kindDefinition *kdef = getKindForLetter (parser->kindControlBlock, parentKletter);
@@ -620,8 +620,8 @@ static bool processLangDefineScopesep(const langType language,
 	}
 	else if (kletter == KIND_FILE_DEFAULT_LETTER)
 		error (FATAL,
-			   "the kind letter `F' in \"--%s\" option is reserved for \"file\" kind and no separator can be assigned to",
-			   option);
+			   "the kind letter `%c' in \"--%s\" option is reserved for \"%s\" kind and no separator can be assigned to",
+			   KIND_FILE_DEFAULT_LETTER, option, KIND_FILE_DEFAULT_NAME);
 	else if (isalpha (kletter))
 	{
 		kindDefinition *kdef = getKindForLetter (parser->kindControlBlock, kletter);
@@ -2443,7 +2443,8 @@ static bool processLangDefineKind(const langType language,
 		)
 		error (FATAL, "the kind letter given in \"--%s\" option is not an alphabet", option);
 	else if (letter == KIND_FILE_DEFAULT_LETTER)
-		error (FATAL, "the kind letter `F' in \"--%s\" option is reserved for \"file\" kind", option);
+		error (FATAL, "the kind letter `%c' in \"--%s\" option is reserved for \"%s\" kind",
+			   KIND_FILE_DEFAULT_LETTER, option, KIND_FILE_DEFAULT_NAME);
 	else if (getKindForLetter (parser->kindControlBlock, letter))
 	{
 		error (WARNING, "the kind for letter `%c' specified in \"--%s\" option is already defined.",
@@ -3057,7 +3058,8 @@ extern bool processRolesOption (const char *const option, const char *const para
 		char *kindName = eStrndup (kind + 1, name_end - (kind + 1));
 		if (strcmp (kindName, KIND_FILE_DEFAULT_NAME) == 0)
 		{
-			error (WARNING, "don't enable/disable a role in F/file kind; it has no role: --%s",
+			error (WARNING, "don't enable/disable a role in %c/%s kind; it has no role: --%s",
+				   KIND_FILE_DEFAULT_LETTER, KIND_FILE_DEFAULT_NAME,
 				   option);
 			return true;
 		}
@@ -3077,7 +3079,8 @@ extern bool processRolesOption (const char *const option, const char *const para
 	{
 		if (*kind == KIND_FILE_DEFAULT_LETTER)
 		{
-			error (WARNING, "don't enable/disable a role in F/file kind; it has no role: --%s",
+			error (WARNING, "don't enable/disable a role in %c/%s kind; it has no role: --%s",
+				   KIND_FILE_DEFAULT_LETTER, KIND_FILE_DEFAULT_NAME,
 				   option);
 			return true;
 		}
