@@ -2809,7 +2809,7 @@ extern bool processKindsOption (
  * --roles-<LANG>.{kind1}=+{role0}-{role1}{role2}
  *
  *
- * How should --roledef be change to align --roles-<LANG> notation
+ * How --roledef should be change to align --roles-<LANG> notation
  * ---------------------------------------------------------------------
  *
  * --_roledef-<LANG>.k=role,description
@@ -2819,7 +2819,7 @@ extern bool processKindsOption (
  *  --_roledef-<LANG>=k.role,description
  *
  *
- * How should --param be change to align --roles-<LANG> notation
+ * How --param should be change to align --roles-<LANG> notation
  * ---------------------------------------------------------------------
  *
  * --_param-<LANG>.name=argument
@@ -2828,7 +2828,7 @@ extern bool processKindsOption (
  * --_param-<LANG>:name=argument
  *
  *
- * How should --paramdef be to align --roles-<LANG> notation
+ * How --paramdef should be to align --roles-<LANG> notation
  * ---------------------------------------------------------------------
  *
  * --_paramdef-<LANG>.name=[ default (desription) ]
