@@ -43,6 +43,13 @@ is_feature_available()
 	fi
 }
 
+skip_if_user_has_dot_ctags_d()
+{
+	if [ -d ~/.ctags.d ]; then
+		skip "this test case doesn't work well if you have ~/.ctags.d"
+	fi
+}
+
 exit_if_win32()
 {
 	is_feature_available $1 '!' win32
