@@ -112,8 +112,8 @@ ${CTAGS} --kinddef-MYTEST='x,kind,\{' --list-kinds-full=MYTEST
 
 title '# _refonly flag'
 ${CTAGS} --kinddef-MYTEST='x,kind,desc' --list-kinds-full=MYTEST
-${CTAGS} --kinddef-MYTEST='x,kind,desc' --_roledef-MYTEST=x.role,roleDesc --list-kinds-full=MYTEST
-${CTAGS} --kinddef-MYTEST='x,kind,desc{_refonly}' --_roledef-MYTEST=x.role,roleDesc --list-kinds-full=MYTEST
+${CTAGS} --kinddef-MYTEST='x,kind,desc' --_roledef-MYTEST.x=role,roleDesc --list-kinds-full=MYTEST
+${CTAGS} --kinddef-MYTEST='x,kind,desc{_refonly}' --_roledef-MYTEST.'{kind}'=role,roleDesc --list-kinds-full=MYTEST
 
 } > /tmp/ctags-tmain-$$.stdout 2>/tmp/ctags-tmain-$$.stderr
 

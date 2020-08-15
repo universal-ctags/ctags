@@ -1501,60 +1501,83 @@ Capturing reference tags
 
 .. NOT REVIEWED YET
 
-To capture a reference tag with an optlib parser, specify a role with
+To make a reference tag with an optlib parser, specify a role with
 `_role` long regex flag. Let's see an example:
 
 .. code-block:: perl
 
 	--langdef=FOO
 	--kinddef-FOO=m,module,modules
-	--_roledef-FOO=m.imported,imported module
+	--_roledef-FOO.m=imported,imported module
 	--regex-FOO=/import[ \t]+([a-z]+)/\1/m/{_role=imported}
 	--extras=+r
 	--fields=+r
 
 A role must be defined before specifying it as value for ``_role`` flag.
-``--_roledef-<LANG>`` option is for defining a role.
+``--_roledef-<LANG>.<KIND>=<ROLE>,<ROLEDESC>`` option is for defining a role.
 See the line, ``--regex-FOO=...``.  In this parser `FOO`, the name of an
 imported module is captured as a reference tag with role `imported`.
 
-The option definition has two parameters separated by a comma:
+For specifing KIND where the role is defined, you can use either a
+kind letter or a kind name.  surrounded by ``{`` and ``}``.
 
-- A kind letter, followed by a period (``.``), followed by the role name.
-- The description of role.
+The option has two parameters separated by a comma:
 
-The first parameter is the name of the role. The period indicates that the role
-is defined under the kind specified with the kind letter.  In the example,
-`imported` role is defined under the `module` kind, which is specified with
-`m`.
+``<ROLE>``
 
-Of course, the kind specified with the kind letter must be defined *before*
-using ``--_roledef-<FOO>`` option. See the option ``--kinddef-<LANG>``.
+	the role name, and
+
+``<ROLEDESC>``
+
+	the description of the role.
+
+The first parameter is the name of the role. The role is defined in
+the kind ``<KIND>`` of the language ``<LANG>``. In the example,
+`imported` role is defined in the `module` kind, which is specified
+with `m`. You can use ``{module}``, the name of the kind instead.
+
+The kind specified in ``--_roledef-<LANG>.<KIND>`` option must be
+defined *before* using the option. See the description of
+``--kinddef-<LANG>`` for defining a kind.
 
 The roles are listed with ``--list-roles=<LANG>``. The name and description
-passed to ``--_roledef-<LANG>`` option are used in the output like::
+passed to ``--_roledef-<LANG>.<KIND>`` option are used in the output like::
 
 	$ ./ctags --langdef=FOO --kinddef-FOO=m,module,modules \
-				--_roledef-FOO='m.imported,imported module' --list-roles=FOO
+				--_roledef-FOO.m='imported,imported module' --list-roles=FOO
 	#KIND(L/N) NAME     ENABLED DESCRIPTION
 	m/module   imported on      imported module
 
 
-When specifying ``_role`` regex flag multiple times with different roles, you can
+If specifying ``_role`` regex flag multiple times with different roles, you can
 assign multiple roles to a reference tag.  See following input of C language
 
 .. code-block:: C
 
+   x  = 0;
    i += 1;
 
-An ultra fine grained C parser may capture a variable `i` with `lvalue` and
-`incremented`. You can do it with:
+An ultra fine grained C parser may capture the variable `x` with
+`lvalue` role and the variable `i` with `lvalue` and `incremented`
+roles.
+
+You can implement such roles by extending the built-in C parser:
 
 .. code-block:: perl
 
-	--_roledef-C=v.lvalue,locator values
-	--_roledef-C=v.incremented,incremeted with ++ operator
-	--regex-C=/([a-zA-Z_][a-zA-Z_0-9])+ *+=/\1/v/{_role=lvalue}{_role=incremeted}
+	# c-extra.ctags
+	--_roledef-C.v=lvalue,locator values
+	--_roledef-C.v=incremented,incremeted with ++ operator
+	--regex-C=/([a-zA-Z_][a-zA-Z_0-9]*) *=/\1/v/{_role=lvalue}
+	--regex-C=/([a-zA-Z_][a-zA-Z_0-9]*) *\+=/\1/v/{_role=lvalue}{_role=incremented}
+
+ctags with ``--options=c-extra.ctags --extras=+r --fields=+r`` emits
+
+.. code-block::
+
+	i	input.c	/^i += 1;$/;"	v	roles:lvalue,incremented
+	x	input.c	/^x = 0;$/;"	v	roles:lvalue
+
 
 .. _guest-regex-flag:
 

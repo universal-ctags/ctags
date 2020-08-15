@@ -151,7 +151,7 @@ OPTIONS
 
 	*name* must consist of alphanumeric characters, "#", or "+"
 	 ('[a-zA-Z0-9#+]+'). The graph characters other than "#" and
-	 "+" are disallowed (or reserved). Some of them ('[-=:{]') are
+	 "+" are disallowed (or reserved). Some of them ('[-=:{.]') are
 	 disallowed because they can make the command line parser of
 	 @CTAGS_NAME_EXECUTABLE@ confused. The rest of them are just
 	 reserved for future extending @CTAGS_NAME_EXECUTABLE@.
