@@ -788,7 +788,10 @@ extern langType getLanguageComponentInOptionFull (const char *const option,
 		lang_len = colon - lang;
 	language = getNamedLanguageFull (lang, lang_len, noPretending);
 	if (language == LANG_IGNORE)
-		error (FATAL, "Unknown language \"%s\" in \"%s\" option", lang, option);
+	{
+		const char *langName = (lang_len == 0)? lang: eStrndup (lang, lang_len);
+		error (FATAL, "Unknown language \"%s\" in \"%s\" option", langName, option);
+	}
 
 	return language;
 }
@@ -2244,7 +2247,10 @@ static void processListRolesOptions (const char *const option CTAGS_ATTR_UNUSED,
 	{
 		lang = getNamedLanguage (parameter, sep - parameter);
 		if (lang == LANG_IGNORE)
-			error (FATAL, "Unknown language \"%s\" in \"%s\"", parameter, option);
+		{
+			const char *langName = eStrndup (parameter, sep - parameter);
+			error (FATAL, "Unknown language \"%s\" in \"%s\"", langName, option);
+		}
 	}
 	printLanguageRoles (lang, kindspecs,
 						localOption.withListHeader,
