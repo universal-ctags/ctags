@@ -220,6 +220,8 @@ man_MANS = \
 	man/ctags-incompatibilities.7 \
 	man/ctags-optlib.7 \
 	\
+	man/ctags-lang-python.7 \
+	\
 	$(NULL)
 rst2man_verbose = $(rst2man_verbose_@AM_V@)
 rst2man_verbose_ = $(rst2man_verbose_@AM_DEFAULT_V@)

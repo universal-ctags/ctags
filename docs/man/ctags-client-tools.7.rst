@@ -333,4 +333,4 @@ editors supporting Ex commands.
 
 SEE ALSO
 --------
-:ref:`ctags(1) <ctags(1)>`, :ref:`ctags-incompatibilities(7) <ctags-incompatibilities(7)>`, :ref:`tags(5) <tags(5)>`, :ref:`readtags(1) <readtags(1)>`
+:ref:`ctags(1) <ctags(1)>`, :ref:`ctags-lang-python(7) <ctags-lang-python(7)>`, :ref:`ctags-incompatibilities(7) <ctags-incompatibilities(7)>`, :ref:`tags(5) <tags(5)>`, :ref:`readtags(1) <readtags(1)>`

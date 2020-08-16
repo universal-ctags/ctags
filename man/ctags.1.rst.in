@@ -1996,6 +1996,8 @@ with Exuberant-ctags.
 See ctags-client-tools(7) if you are interested in writing
 a tool for processing tags files.
 
+See ctags-lang-python(7) about python input specific notes.
+
 See readtags(1) about a client tool for binary searching a
 name in a sorted tags file.
 
