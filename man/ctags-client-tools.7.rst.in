@@ -333,4 +333,4 @@ editors supporting Ex commands.
 
 SEE ALSO
 --------
-ctags(1), ctags-incompatibilities(7), tags(5), readtags(1)
+ctags(1), ctags-lang-python(7), ctags-incompatibilities(7), tags(5), readtags(1)
