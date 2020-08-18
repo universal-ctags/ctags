@@ -1334,43 +1334,84 @@ static bool parseVariable (tokenInfo *const token, const pythonKind kind)
 			}
 			else
 			{
+				tokenInfo *anon  = NULL;
 				vString *arglist = vStringNew ();
-
+				if (*type)
+				{
+					anon = newToken ();
+					copyToken (anon, token);
+				}
 				readToken (token);
 				vStringPut (arglist, '(');
 				skipLambdaArglist (token, arglist);
 				vStringPut (arglist, ')');
-				makeFunctionTag (nameToken, arglist, NULL);
-				/* TODO: how we should do for filling typeref field for this tag?
-				 *
-				 * The value we have in "type" local variable is suitable if
-				 * the name specified with nameToken is a variable kind object.
-				 * However, currently, the name is tagged as a function kind object. The
-				 * value in "type" local variable is not suitable for it.
-				 *
-				 * Think about following input as an example:
-				 *
-				 *    id: Callable[[int], int] = lambda var: var
-				 *
-				 * The tag for the line:
-				 *
-				 *  id	input.py	/^id: Callable[[int], int] = lambda var: var$/;"	function
-				 *
-				 * "typeref:typename:Callable[[int], int]" is not suitable for "id"; typeref field
-				 * should represent the type of returning value if the tag for the field is a function
-				 * kind object.
-				 *
-				 * Using nameref field can be a solution.
-				 *
-				 * With using nameref field, we can captures two tags from the input line:
-				 *
-				 *  id	input.py	/^id: Callable[[int], int] = lambda var: var$/;"	variable	typeref:typename:Callable[[int], int]	nameref:function:anonFuncNNN
-				 *  anonFuncNNN	input.py	/^id: Callable[[int], int] = lambda var: var$/;"	function	extras:anonymous
-				 *
-				 * "typeref:typename:Callable[[int], int]" is suitable for "id" when it is tagged as a
-				 * variable kind object. Just using "variable kind" hides the valuable information; id holds a
-				 * function. The nameref field can be used to record the information.
-				 */
+				if (*type)
+				{
+					/* How to handle lambda assigned to a variable
+					 * --------------------------------------------
+					 *
+					 * input.py:
+					 *
+					 * 	  id = lambda var: var
+					 * 	  id_t: Callable[[int], int] = lambda var: var
+					 *
+					 * `id' is tagged as a function kind object like:
+					 *
+					 *    id	input.py	/^id = lambda var: var$/;"	function
+					 *
+					 * For `id_t' we cannot do the same as `id'.
+					 *
+					 * We should not store `Callable[[int], int]' to typeref
+					 * field of the tag of `id_t' if the tag has "function" as
+					 * its kind because users expect the typeref field of a
+					 * function kind represents a type for the value returned
+					 * from the function (return type).
+					 *
+					 * the unexpected tag:
+					 *
+					 *    id_t	input.py	/^id_t: Callable[[int], int] = lambda var: var$/;"	function \
+					 *                          typeref:typename:Callable[[int], int]
+					 *
+					 * If we make a tag for `id_t' as a function, we should
+					 * attach `typeref:typename:int' and `signature:(int)'. To
+					 * achieve this, we have to make ctags analyze
+					 * `Callable[[int], int]'.  However, we want to avoid the
+					 * level of analyzing.
+					 *
+					 * For recording `Callable[[int], int]', a valuable
+					 * information in the input, we use indirection.
+					 *
+					 *    id_t	input.py	/^id_t: Callable[[int], int] = lambda var: var$/;"	variable \
+					 *                          typeref:typename:Callable[[int], int]	nameref:function:anonFuncNNN
+					 *    anonFuncNNN	input.py	/^id_t: Callable[[int], int] = lambda var: var$/;"	function \
+					 *                          extras:anonymous
+					 */
+					int vindex = makeSimplePythonTag (nameToken, kind);
+					vStringClear (anon->string);
+					anonGenerate (anon->string, "anonFunc", K_FUNCTION);
+					int findex = makeFunctionTag (anon, arglist, NULL);
+					tagEntryInfo *fe = getEntryInCorkQueue (findex);
+					if (fe)
+						markTagExtraBit (fe, XTAG_ANONYMOUS);
+
+					tagEntryInfo *ve = getEntryInCorkQueue (vindex);
+					if (ve)
+					{
+						ve->extensionFields.typeRef [0] = eStrdup ("typename");
+						ve->extensionFields.typeRef [1] = vStringDeleteUnwrap (*type);
+						*type = NULL;
+						vString *nameref = vStringNewInit (PythonKinds [K_FUNCTION].name);
+						vStringPut (nameref, ':');
+						vStringCat (nameref, anon->string);
+						attachParserField (ve, true, PythonFields[F_NAMEREF].ftype,
+										   vStringValue (nameref));
+						vStringDelete (nameref);
+					}
+					if (anon)
+						deleteToken (anon);
+				}
+				else
+					makeFunctionTag (nameToken, arglist, NULL);
 				vStringDelete (arglist);
 			}
 
