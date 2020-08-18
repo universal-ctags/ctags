@@ -7,9 +7,9 @@
 
 --_fielddef-FOO=assocMod,module associated with the namespace
 
---_roledef-FOO=m.used,refereed as an external module
---_roledef-FOO=m.loaded,loaded into the current name space
---_roledef-FOO=f.loaded,loaded into the current name space
+--_roledef-FOO.m=used,refereed as an external module
+--_roledef-FOO.{module}=loaded,loaded into the current name space
+--_roledef-FOO.f=loaded,loaded into the current name space
 
 --regex-FOO=/^defmod +([A-Z]+)/\1/m/
 --regex-FOO=/^use +([A-Z]+)/\1/m/{_role=used}

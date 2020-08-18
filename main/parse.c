@@ -570,8 +570,8 @@ static bool processLangDefineScopesep(const langType language,
 		parentKindex = KIND_WILDCARD_INDEX;
 	else if (parentKletter == KIND_FILE_DEFAULT_LETTER)
 		error (FATAL,
-			   "the kind letter `F' in \"--%s\" option is reserved for \"file\" kind and no separator can be assigned to",
-			   option);
+			   "the kind letter `%c' in \"--%s\" option is reserved for \"%s\" kind and no separator can be assigned to",
+			   KIND_FILE_DEFAULT_LETTER, option, KIND_FILE_DEFAULT_NAME);
 	else if (isalpha (parentKletter))
 	{
 		kindDefinition *kdef = getKindForLetter (parser->kindControlBlock, parentKletter);
@@ -620,8 +620,8 @@ static bool processLangDefineScopesep(const langType language,
 	}
 	else if (kletter == KIND_FILE_DEFAULT_LETTER)
 		error (FATAL,
-			   "the kind letter `F' in \"--%s\" option is reserved for \"file\" kind and no separator can be assigned to",
-			   option);
+			   "the kind letter `%c' in \"--%s\" option is reserved for \"%s\" kind and no separator can be assigned to",
+			   KIND_FILE_DEFAULT_LETTER, option, KIND_FILE_DEFAULT_NAME);
 	else if (isalpha (kletter))
 	{
 		kindDefinition *kdef = getKindForLetter (parser->kindControlBlock, kletter);
@@ -2443,7 +2443,8 @@ static bool processLangDefineKind(const langType language,
 		)
 		error (FATAL, "the kind letter given in \"--%s\" option is not an alphabet", option);
 	else if (letter == KIND_FILE_DEFAULT_LETTER)
-		error (FATAL, "the kind letter `F' in \"--%s\" option is reserved for \"file\" kind", option);
+		error (FATAL, "the kind letter `%c' in \"--%s\" option is reserved for \"%s\" kind",
+			   KIND_FILE_DEFAULT_LETTER, option, KIND_FILE_DEFAULT_NAME);
 	else if (getKindForLetter (parser->kindControlBlock, letter))
 	{
 		error (WARNING, "the kind for letter `%c' specified in \"--%s\" option is already defined.",
@@ -2533,6 +2534,7 @@ static void freeRdef (roleDefinition *rdef)
 }
 
 static bool processLangDefineRole(const langType language,
+								  const char *const kindSpec,
 								  const char *const option,
 								  const char *const parameter)
 {
@@ -2540,51 +2542,61 @@ static bool processLangDefineRole(const langType language,
 
 	kindDefinition *kdef;
 	roleDefinition *rdef;
-	char kletter;
-	const char * p = parameter;
 	char *name;
 	char *description;
-	const char *tmp_start;
-	const char *tmp_end;
-	const char *flags;
 
 	Assert (0 <= language  &&  language < (int) LanguageCount);
+	Assert (parameter);
+
 	parser = LanguageTable + language;
 
-	Assert (p);
-
-	if (p[0] == '\0')
-		error (FATAL, "no role definition specified in \"--%s\" option", option);
-
-	kletter = p[0];
-	if (kletter == '.')
-		error (FATAL, "no kind letter specified in \"--%s\" option", option);
-	if (!isalnum ((unsigned char)kletter))
-		error (FATAL, "the kind letter given in \"--%s\" option is not an alphabet or a number", option);
-	else if (kletter == KIND_FILE_DEFAULT_LETTER)
-		error (FATAL, "the kind letter `F' in \"--%s\" option is reserved for \"file\" kind and no role can be attached to", option);
-
-	kdef = getKindForLetter (parser->kindControlBlock, kletter);
-
-	if (kdef == NULL)
+	if (*kindSpec == '{')
 	{
-		error (WARNING, "the kind for letter `%c' specified in \"--%s\" option is not defined.",
-			   kletter, option);
-		return true;
+		const char *end = strchr (kindSpec, '}');
+		if (end == NULL)
+			error (FATAL, "no '}' representing the end of kind name in --%s option: %s",
+				   option, kindSpec);
+		if (*(end + 1) != '\0')
+			error (FATAL, "garbage after the kind specification %s in --%s option",
+				   kindSpec, option);
+		char *kindName = eStrndup (kindSpec + 1, end - (kindSpec + 1));
+		if (strcmp (kindName, KIND_FILE_DEFAULT_NAME) == 0)
+			error (FATAL, "don't define a role for %c/%s kind; it has no role: --%s",
+				   KIND_FILE_DEFAULT_LETTER, KIND_FILE_DEFAULT_NAME,
+				   option);
+		kdef = getKindForName (parser->kindControlBlock, kindName);
+		if (kdef == NULL)
+			error (FATAL, "the kind for name `%s' specified in \"--%s\" option is not defined.",
+				   kindName, option);
+		eFree (kindName);
+	}
+	else
+	{
+		char kletter = *kindSpec;
+		if (!isalnum ((unsigned char)kletter))
+			error (FATAL, "the kind letter given in \"--%s\" option is not an alphabet or a number", option);
+		else if (kletter == KIND_FILE_DEFAULT_LETTER)
+			error (FATAL, "the kind letter `%c' in \"--%s\" option is reserved for \"%s\" kind, and no role can be attached to it",
+				   KIND_FILE_DEFAULT_LETTER, option, KIND_FILE_DEFAULT_NAME);
+		else if (*(kindSpec + 1) != '\0')
+			error (FATAL, "more than one letters are specified as a kind spec in \"--%s\" option: use `{' and `}' for specifying a kind name",
+				   option);
+
+		kdef = getKindForLetter (parser->kindControlBlock, kletter);
+		if (kdef == NULL)
+		{
+			error (FATAL, "the kind for letter `%c' specified in \"--%s\" option is not defined.",
+				   *kindSpec, option);
+			return true;
+		}
 	}
 
-	if (p[1] != '.')
-		error (FATAL, "wrong role definition in \"--%s\" option: no period after kind letter `%c'",
-			   option, kletter);
-
-	p += 2;
-	if (p[0] == '\0')
-		error (FATAL, "no role name specified in \"--%s\" option", option);
-	tmp_end = strchr (p, ',');
+	const char * p = parameter;
+	const char *tmp_end = strchr (p, ',');
 	if (!tmp_end)
 		error (FATAL, "no role description specified in \"--%s\" option", option);
 
-	tmp_start = p;
+	const char * tmp_start = p;
 	while (p != tmp_end)
 	{
 		if (!isalnum (*p))
@@ -2609,6 +2621,7 @@ static bool processLangDefineRole(const langType language,
 	if (p [0] == '\0' || p [0] == LONG_FLAGS_OPEN)
 		error (FATAL, "found an empty role description in \"--%s\" option", option);
 
+	const char *flags;
 	description = extractDescriptionAndFlags (p, &flags);
 
 	rdef = xCalloc (1, roleDefinition);
@@ -2637,13 +2650,25 @@ extern bool processKinddefOption (const char *const option, const char * const p
 
 extern bool processRoledefOption (const char *const option, const char * const parameter)
 {
-	langType language;
+#define PREFIX "_roledef-"
+#define PREFIX_LEN strlen(PREFIX)
 
-	language = getLanguageComponentInOption (option, "_roledef-");
+	langType language = getLanguageComponentInOption (option, PREFIX);
 	if (language == LANG_IGNORE)
 		return false;
 
-	return processLangDefineRole (language, option, parameter);
+	Assert (0 <= language  &&  language < (int) LanguageCount);
+	const char* kindSpec = option + PREFIX_LEN + strlen (getLanguageName (language));
+	if (*kindSpec == '\0')
+		error (FATAL, "no kind is specifined in \"--%s=%s\"", option, parameter);
+	if (*kindSpec != '.')
+		error (FATAL, "no delimiter (.) where a kindspec starts is found in \"--%s\": %c",
+			   option, *kindSpec);
+	kindSpec++;
+
+	return processLangDefineRole (language, kindSpec, option, parameter);
+#undef PREFIX
+#undef PREFIX_LEN
 }
 
 struct langKindDefinitionStruct {
@@ -2808,7 +2833,7 @@ extern bool processKindsOption (
  * --roles-<LANG>.{kind1}=+{role0}-{role1}{role2}
  *
  *
- * How should --roledef be change to align --roles-<LANG> notation
+ * How --roledef should be change to align --roles-<LANG> notation
  * ---------------------------------------------------------------------
  *
  * --_roledef-<LANG>.k=role,description
@@ -2818,7 +2843,7 @@ extern bool processKindsOption (
  *  --_roledef-<LANG>=k.role,description
  *
  *
- * How should --param be change to align --roles-<LANG> notation
+ * How --param should be change to align --roles-<LANG> notation
  * ---------------------------------------------------------------------
  *
  * --_param-<LANG>.name=argument
@@ -2827,7 +2852,7 @@ extern bool processKindsOption (
  * --_param-<LANG>:name=argument
  *
  *
- * How should --paramdef be to align --roles-<LANG> notation
+ * How --paramdef should be to align --roles-<LANG> notation
  * ---------------------------------------------------------------------
  *
  * --_paramdef-<LANG>.name=[ default (desription) ]
@@ -3057,7 +3082,8 @@ extern bool processRolesOption (const char *const option, const char *const para
 		char *kindName = eStrndup (kind + 1, name_end - (kind + 1));
 		if (strcmp (kindName, KIND_FILE_DEFAULT_NAME) == 0)
 		{
-			error (WARNING, "don't enable/disable a role in F/file kind; it has no role: --%s",
+			error (WARNING, "don't enable/disable a role in %c/%s kind; it has no role: --%s",
+				   KIND_FILE_DEFAULT_LETTER, KIND_FILE_DEFAULT_NAME,
 				   option);
 			return true;
 		}
@@ -3077,7 +3103,8 @@ extern bool processRolesOption (const char *const option, const char *const para
 	{
 		if (*kind == KIND_FILE_DEFAULT_LETTER)
 		{
-			error (WARNING, "don't enable/disable a role in F/file kind; it has no role: --%s",
+			error (WARNING, "don't enable/disable a role in %c/%s kind; it has no role: --%s",
+				   KIND_FILE_DEFAULT_LETTER, KIND_FILE_DEFAULT_NAME,
 				   option);
 			return true;
 		}

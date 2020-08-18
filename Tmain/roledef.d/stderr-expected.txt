@@ -1,38 +1,61 @@
 
 # echo unknown lang
 ctags: Unknown language "NOSUCHLANG" in "_roledef-NOSUCHLANG" option
-ctags: Unknown language "NOSUCHLANG" in "_roledef-NOSUCHLANG" option
+ctags: Unknown language "NOSUCHLANG" in "_roledef-NOSUCHLANG.k" option
+ctags: Unknown language "NOSUCHLANG" in "_roledef-NOSUCHLANG.{kind}" option
 
-# no option value
-ctags: no role definition specified in "--_roledef-IMAGINARY" option
-ctags: no role definition specified in "--_roledef-IMAGINARY" option
+# no kind spec
+ctags: no kind is specifined in "--_roledef-IMAGINARY="
+ctags: no kind is specifined in "--_roledef-IMAGINARY="
+ctags: no kind is specifined in "--_roledef-IMAGINARY=role"
+ctags: no kind is specifined in "--_roledef-IMAGINARY=role,roles"
 
-# echo unknown kind
-ctags: Warning: the kind for letter `x' specified in "--_roledef-IMAGINARY" option is not defined.
-ctags: Warning: the kind for letter `x' specified in "--_roledef-IMAGINARY" option is not defined.
-ctags: Warning: the kind for letter `x' specified in "--_roledef-IMAGINARY" option is not defined.
-ctags: Warning: the kind for letter `x' specified in "--_roledef-IMAGINARY" option is not defined.
-ctags: Warning: the kind for letter `x' specified in "--_roledef-IMAGINARY" option is not defined.
+# echo unknown kind letter
+ctags: the kind for letter `x' specified in "--_roledef-IMAGINARY.x" option is not defined.
+ctags: the kind for letter `x' specified in "--_roledef-IMAGINARY.x" option is not defined.
+ctags: the kind for letter `x' specified in "--_roledef-IMAGINARY.x" option is not defined.
+ctags: the kind for letter `x' specified in "--_roledef-IMAGINARY.x" option is not defined.
+
+# echo unknown kind name
+ctags: the kind for name `abc' specified in "--_roledef-IMAGINARY.{abc}" option is not defined.
+ctags: the kind for name `abc' specified in "--_roledef-IMAGINARY.{abc}" option is not defined.
+ctags: the kind for name `abc' specified in "--_roledef-IMAGINARY.{abc}" option is not defined.
+ctags: the kind for name `abc' specified in "--_roledef-IMAGINARY.{abc}" option is not defined.
 
 # wrong char in a kind letter
-ctags: the kind letter given in "--_roledef-IMAGINARY" option is not an alphabet or a number
-ctags: the kind letter given in "--_roledef-IMAGINARY" option is not an alphabet or a number
-ctags: the kind letter given in "--_roledef-IMAGINARY" option is not an alphabet or a number
-ctags: the kind letter given in "--_roledef-IMAGINARY" option is not an alphabet or a number
+ctags: the kind letter given in "--_roledef-IMAGINARY./" option is not an alphabet or a number
+ctags: the kind letter given in "--_roledef-IMAGINARY.%" option is not an alphabet or a number
+ctags: the kind letter given in "--_roledef-IMAGINARY.^" option is not an alphabet or a number
+ctags: the kind letter given in "--_roledef-IMAGINARY.#" option is not an alphabet or a number
+ctags: the kind letter `F' in "--_roledef-IMAGINARY.F" option is reserved for "file" kind, and no role can be attached to it
+ctags: no '}' representing the end of kind name in --_roledef-IMAGINARY.{ option: {
+ctags: no '}' representing the end of kind name in --_roledef-IMAGINARY.{v option: {v
+
+# wrong kind name
+ctags: don't define a role for F/file kind; it has no role: --_roledef-IMAGINARY.{file}
+ctags: the kind for name `' specified in "--_roledef-IMAGINARY.{}" option is not defined.
+ctags: the kind for name `#' specified in "--_roledef-IMAGINARY.{#}" option is not defined.
 
 # empty role name
-ctags: wrong role definition in "--_roledef-IMAGINARY" option: no period after kind letter `v'
-ctags: no role name specified in "--_roledef-IMAGINARY" option
-ctags: the role name in "--_roledef-IMAGINARY" option is empty
+ctags: no role description specified in "--_roledef-IMAGINARY.v" option
+ctags: the role name in "--_roledef-IMAGINARY.v" option is empty
+ctags: the role name in "--_roledef-IMAGINARY.v" option is empty
+ctags: no role description specified in "--_roledef-IMAGINARY.{variable}" option
+ctags: the role name in "--_roledef-IMAGINARY.{variable}" option is empty
+ctags: the role name in "--_roledef-IMAGINARY.{variable}" option is empty
 
 # wrong char in role name
-ctags: unacceptable char as part of role name in "--_roledef-IMAGINARY" option: +
+ctags: unacceptable char as part of role name in "--_roledef-IMAGINARY.v" option: +
+ctags: unacceptable char as part of role name in "--_roledef-IMAGINARY.{variable}" option: +
 
 # empty description
-ctags: no role description specified in "--_roledef-IMAGINARY" option
-ctags: found an empty role description in "--_roledef-IMAGINARY" option
+ctags: no role description specified in "--_roledef-IMAGINARY.v" option
+ctags: found an empty role description in "--_roledef-IMAGINARY.v" option
+ctags: no role description specified in "--_roledef-IMAGINARY.{variable}" option
+ctags: found an empty role description in "--_roledef-IMAGINARY.{variable}" option
 
 # role is acceptable but no input file
+ctags: No files specified. Try "ctags --help".
 ctags: No files specified. Try "ctags --help".
 
 # listing with --list-roles
@@ -43,8 +66,10 @@ ctags: No files specified. Try "ctags --help".
 
 # inject a broken flag separator(1)
 ctags: Warning: long flags specifier opened with `{' is not closed `}': "{foo"
+ctags: Warning: long flags specifier opened with `{' is not closed `}': "{foo"
 
 # inject a broken flag separator(2)
+ctags: Warning: long flags specifier opened with `{' is not closed `}': "{"
 ctags: Warning: long flags specifier opened with `{' is not closed `}': "{"
 
 # use a { in description (1)
@@ -54,7 +79,8 @@ ctags: Warning: long flags specifier opened with `{' is not closed `}': "{"
 # use a \ in description
 
 # description started from {
-ctags: found an empty role description in "--_roledef-IMAGINARY" option
+ctags: found an empty role description in "--_roledef-IMAGINARY.v" option
+ctags: found an empty role description in "--_roledef-IMAGINARY.{variable}" option
 
 # description started from \{
 

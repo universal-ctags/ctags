@@ -5,4 +5,6 @@ CTAGS=$1
 
 . ../utils.sh
 
+skip_if_user_has_dot_ctags_d
+
 ${CTAGS}

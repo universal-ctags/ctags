@@ -6,5 +6,5 @@ CTAGS=$1
 . ../utils.sh
 
 if is_feature_available "${CTAGS}" json; then
-	${CTAGS} --output-format=json -o - ./input.cs
+	${CTAGS} --quiet --options=NONE --output-format=json -o - ./input.cs
 fi

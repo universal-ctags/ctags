@@ -482,8 +482,8 @@ static optionDescription ExperimentalLongOptionDescription [] = {
  {1,"       Define multitable regular expression for locating tags in specific language."},
  {1,"  --_pretend-<NEWLANG>=<OLDLANG>"},
  {1,"       Make NEWLANG parser pretend OLDLANG parser in lang: field."},
- {1,"  --_roledef-<LANG>=kind_letter.role_name,role_desc"},
- {1,"       Define new role for kind specified with <kind_letter> in <LANG>."},
+ {1,"  --_roledef-<LANG>.kind=role_name,role_desc"},
+ {1,"       Define new role for the kind in <LANG>."},
  {1,"  --_scopesep-<LANG>=[parent_kind_letter]/child_kind_letter:separator"},
  {1,"       Specify scope separator between <PARENT_KIND> and <KIND>."},
  {1,"       * as a kind letter matches any kind."},
@@ -766,7 +766,7 @@ extern langType getLanguageComponentInOptionFull (const char *const option,
 	size_t prefix_len;
 	langType language;
 	const char *lang;
-	char *colon = NULL;
+	char *sep = NULL;
 	size_t lang_len = 0;
 
 	Assert (prefix && prefix[0]);
@@ -782,13 +782,18 @@ extern langType getLanguageComponentInOptionFull (const char *const option,
 			return LANG_IGNORE;
 	}
 
-	/* --param-<LANG>:<PARAM>=... */
-	colon = strchr (lang, ':');
-	if (colon)
-		lang_len = colon - lang;
+	/* Extract <LANG> from
+	 * --param-<LANG>:<PARAM>=..., and
+	 * --_roledef-<LANG>.<KIND>=... */
+	sep = strpbrk (lang, ":.");
+	if (sep)
+		lang_len = sep - lang;
 	language = getNamedLanguageFull (lang, lang_len, noPretending);
 	if (language == LANG_IGNORE)
-		error (FATAL, "Unknown language \"%s\" in \"%s\" option", lang, option);
+	{
+		const char *langName = (lang_len == 0)? lang: eStrndup (lang, lang_len);
+		error (FATAL, "Unknown language \"%s\" in \"%s\" option", langName, option);
+	}
 
 	return language;
 }
@@ -2244,7 +2249,10 @@ static void processListRolesOptions (const char *const option CTAGS_ATTR_UNUSED,
 	{
 		lang = getNamedLanguage (parameter, sep - parameter);
 		if (lang == LANG_IGNORE)
-			error (FATAL, "Unknown language \"%s\" in \"%s\"", parameter, option);
+		{
+			const char *langName = eStrndup (parameter, sep - parameter);
+			error (FATAL, "Unknown language \"%s\" in \"%s\"", langName, option);
+		}
 	}
 	printLanguageRoles (lang, kindspecs,
 						localOption.withListHeader,

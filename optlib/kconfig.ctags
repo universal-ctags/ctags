@@ -22,7 +22,7 @@
 --kinddef-Kconfig=k,kconfig,kconfig file
 --kinddef-Kconfig=C,choice,choices
 
---_roledef-Kconfig=k.source,kconfig file loaded with source directive
+--_roledef-Kconfig.{kconfig}=source,kconfig file loaded with source directive
 
 # Menus can be nested. Combine the parent menu and its child with "".
 --_scopesep-Kconfig=*/*:""

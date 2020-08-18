@@ -114,16 +114,17 @@ my $options =
 
 	 push @{$_[0]->{'fielddefs'}}, { name => $name, desc => $desc };
        } ],
-     [ qr/^--_roledef-(.*)=([a-zA-Z])\.([a-zA-Z0-9]+),([^\{]+)/, sub {
-	   die "Don't use --_roledef-<LANG>=+ option before defining the language"
+     [ qr/^--_roledef-([^.]*)\.(?:([a-zA-Z])|\{([a-zA-Z][a-zA-Z0-9]*)\})=([a-zA-Z0-9]+),([^\{]+)/, sub {
+	   die "Don't use --_roledef-<LANG>.<KNID>=+ option before defining the language"
 	     if (! defined $_[0]->{'langdef'});
 	   die "Adding a field is allowed only to the language specified with --langdef: $1"
 	     unless ($_[0]->{'langdef'} eq $1);
 
 	   my $kind_found = 0;
 	   for (@{$_[0]->{'kinddefs'}}) {
-	       if ($_->{'letter'} eq $2) {
-		   my $role = { name => $3, desc => $4, owner => $_ };
+	       if ((defined $2 && $_->{'letter'} eq $2)
+		   || (defined $3 && $_->{'name'} eq $3)) {
+		   my $role = { name => $4, desc => $5, owner => $_ };
 		   push @{$_->{'roles'}}, $role;
 		   $kind_found = 1;
 		   last;

@@ -27,7 +27,7 @@
 --kinddef-Elm=c,constructor,Type Constructor
 --kinddef-Elm=a,alias,Type Alias
 --kinddef-Elm=f,function,Functions
---_roledef-Elm=m.imported,imported module
+--_roledef-Elm.{module}=imported,imported module
 
 --regex-Elm=/^(port[[:blank:]]+)?module[[:blank:]]+([[:upper:]][[:alnum:]_.]*)/\2/m/{scope=push}{exclusive}
 --regex-Elm=/^import[[:blank:]]+[[:alnum:]_.]+[[:blank:]]+as[[:blank:]]+([[:alnum:]]+)/\1/n/{scope=clear}{exclusive}

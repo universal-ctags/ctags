@@ -11,9 +11,9 @@
 --langdef=myGauche{base=Scheme}
 
 --kinddef-myGauche=m,module,modules
---_roledef-myGauche=m.used,specified as argument for use
---_roledef-myGauche=m.exported,specified as argument for export
---_roledef-myGauche=m.selected,specified as argument for select
+--_roledef-myGauche.m=used,specified as argument for use
+--_roledef-myGauche.{module}=exported,specified as argument for export
+--_roledef-myGauche.{module}=selected,specified as argument for select
 
 --_tabledef-myGauche=main
 --_tabledef-myGauche=export
