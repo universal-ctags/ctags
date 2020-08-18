@@ -117,6 +117,51 @@ with "--options=NONE -o - --extras=+r --fields=+rzKZ input.py"
 accessing the language object named in "Y4" in "X4" module. "nameref:unknown:Y4"
 attached to "Z4" and "scope:module:X4" attached to "Y4" represent the relations.
 
+Lambda expression and type hint
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+"input.py"
+.. code-block:: Python
+
+	from typing import Callable
+	id = lambda var0: var0
+	id_t: Callable[[int], int] = lambda var1: var1
+
+"output.tags"
+with "--options=NONE -o - --sort=no --fields=+KS --fields-Python='+{nameref}' --extras='+{anonymous}' input.py"
+::
+
+	id	input.py	/^id = lambda var0: var0$/;"	function	signature:(var0)
+	id_t	input.py	/^id_t: Callable[[int], int] = lambda var1: var1$/;"\
+   		variable	typeref:typename:Callable[[int], int]	nameref:function:anonFunc84011d2c0101
+	anonFunc84011d2c0101	input.py	/^id_t: Callable[[int], int] = lambda var1: var1$/;"\
+   		function	signature:(var1)
+
+If a variable ("id") with no type hint is initialized with a lambda expression,
+ctags assigns ``function`` kind for the tag of "id".
+
+If a variable ("id_t") with a type hint is initialized with a lambda expression,
+ctags assigns ``variable`` kind for the tag of "id_t" with ``typeref:`` and
+``nameref:`` fields. ctags fills ``typeref:`` field with the value of the type
+hint. The way of filling ``nameref:`` is a bit complicated.
+
+For the lambda expression used in initializing the type-hint'ed variable, ctags
+creates ``anonymous`` extra tag ("anonFunc84011d2c0101"). ctags fills the
+``nameref:`` field of "id_t" with the name of ``anonymous`` extra tag:
+"nameref:function:anonFunc84011d2c0101".
+
+You may think why ctags does so complicated, and why ctags doesn't emit
+following tags output for the input::
+
+	id	input.py	/^id = \\$/;"	function	signature:(var0)
+	id_t	input.py	/^id_t: \\$/;"	function	typeref:typename:Callable[[int], int]	signature:(var1)
+
+There is a reason. The other languages of ctags obey the following rule: ctags fills
+``typeref:`` field for a tag of a callable object (like function) with the type
+of its return value. If we consider "id_t" is a function, its ``typeref:`` field
+should have "typename:int". However, for filling ``typeref:`` with "typename:int",
+ctags has to analyze "Callable[[int], int]" deeper. We don't want to do so.
+
 SEE ALSO
 --------
 ctags(1), ctags-client-tools(7)
