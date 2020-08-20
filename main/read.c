@@ -627,7 +627,7 @@ extern MIO *getMio (const char *const fileName, const char *const openMode,
 			return mio_new_file (fileName, openMode);
 	}
 	fclose (src);
-	return mio_new_memory (data, size, eRealloc, eFree);
+	return mio_new_memory (data, size, eRealloc, eFreeNoNullCheck);
 }
 
 /* Return true if utf8 BOM is found */

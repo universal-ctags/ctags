@@ -219,7 +219,7 @@ extern void *eMalloc (const size_t size)
 {
 	void *buffer = malloc (size);
 
-	if (buffer == NULL)
+	if (buffer == NULL && size != 0)
 		error (FATAL, "out of memory");
 
 	return buffer;
@@ -229,7 +229,7 @@ extern void *eCalloc (const size_t count, const size_t size)
 {
 	void *buffer = calloc (count, size);
 
-	if (buffer == NULL)
+	if (buffer == NULL && count != 0 && size != 0)
 		error (FATAL, "out of memory");
 
 	return buffer;
@@ -243,7 +243,7 @@ extern void *eRealloc (void *const ptr, const size_t size)
 	else
 	{
 		buffer = realloc (ptr, size);
-		if (buffer == NULL)
+		if (buffer == NULL && size != 0)
 			error (FATAL, "out of memory");
 	}
 	return buffer;

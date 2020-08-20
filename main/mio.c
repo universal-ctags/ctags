@@ -81,6 +81,7 @@ static void eFree (void *const ptr)
 {
 	free (ptr);
 }
+#define eFreeNoNullCheck eFree
 
 #  define Assert(c) do {} while(0)
 #  define AssertNotReached() do {} while(0)
@@ -390,7 +391,7 @@ MIO *mio_new_mio (MIO *base, long start, long size)
 	if (r != size)
 		goto cleanup;
 
-	submio = mio_new_memory (data, size, eRealloc, eFree);
+	submio = mio_new_memory (data, size, eRealloc, eFreeNoNullCheck);
 	if (! submio)
 		goto cleanup;
 

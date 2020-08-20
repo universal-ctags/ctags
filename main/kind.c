@@ -154,7 +154,7 @@ static void freeRoleControlBlock (struct roleControlBlock *rcb)
 		if (rcb->role[i].free)
 			rcb->role [i].free (rcb->role [i].def);
 	}
-	eFree (rcb->role);
+	eFreeNoNullCheck (rcb->role);
 	eFree (rcb);
 }
 
@@ -176,7 +176,8 @@ extern void freeKindControlBlock (struct kindControlBlock* kcb)
 	if (kcb->defaultScopeSeparator.separator)
 		eFree((char *)kcb->defaultScopeSeparator.separator);
 
-	eFree (kcb->kind);
+	if (kcb->kind)
+		eFree (kcb->kind);
 	eFree (kcb);
 }
 

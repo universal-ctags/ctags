@@ -466,7 +466,7 @@ void interactiveLoop (cookedArgs *args CTAGS_ATTR_UNUSED, void *user)
 			{					/* read nbytes from stream */
 				unsigned char *data = eMalloc (size);
 				size = fread (data, 1, size, stdin);
-				MIO *mio = mio_new_memory (data, size, eRealloc, eFree);
+				MIO *mio = mio_new_memory (data, size, eRealloc, eFreeNoNullCheck);
 				parseFileWithMio (filename, mio, NULL);
 				mio_unref (mio);
 			}
