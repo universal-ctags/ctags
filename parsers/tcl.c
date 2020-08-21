@@ -493,7 +493,7 @@ static void parseProc (tokenInfo *const token,
 				vStringNCopy(ns, token->string, len - 2);
 			}
 			else
-				vStringCopy (ns, token->string);
+				vStringNCopy (ns, token->string, len - 2);
 
 			if (vStringLength(ns) > 0)
 			{

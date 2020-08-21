@@ -1,0 +1,2 @@
+proc1	input.tcl	/^proc sScope::proc1 {} {}$/;"	p	namespace:sScope
+sScope::proc1	input.tcl	/^proc sScope::proc1 {} {}$/;"	p
