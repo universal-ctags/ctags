@@ -283,10 +283,9 @@ static void readToken0 (tokenInfo *const token, struct sTclParserState *pstate)
 			if (c0 == EOF)
 				break;
 
-			tokenPutc (token, c0);
 			if (c0 == '{')
 			{
-
+				tokenPutc (token, c0);
 				while ((c0 = getcFromInputFile ()) != EOF)
 				{
 					tokenPutc (token, c0);
@@ -294,8 +293,13 @@ static void readToken0 (tokenInfo *const token, struct sTclParserState *pstate)
 						break;
 				}
 			}
-			else
+			else if (isalnum (c0))
+			{
+				tokenPutc (token, c0);
 				readIdentifier (token->string);
+			}
+			else
+				ungetcToInputFile (c0);
 			break;
 		}
 	default:
