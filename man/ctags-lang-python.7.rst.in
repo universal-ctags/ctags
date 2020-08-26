@@ -20,14 +20,99 @@ DESCRIPTION
 -----------
 This man page gathers random notes about tagging python source code.
 
-EXAMPLES
---------
-This section shows how ctags uses kinds, roles, fields, and extras when tagging
-python source code for given input.
+TAGGING ``import`` STATEMENTS
+-----------------------------
 
-Tagging ``import`` statements
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Summary
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+`import X`
+
+	==== ========== ================== ===================
+	name kind       role               other noticeable fields
+	==== ========== ================== ===================
+	X    module     imported           N/A
+	==== ========== ================== ===================
+
+`import X as Y`
+
+	==== ========== ================== ===================
+	name kind       role               other noticeable fields
+	==== ========== ================== ===================
+	X    module     indirectlyImported N/A
+	Y    namespace  definition         nameref:module:X
+	==== ========== ================== ===================
+
+`from X import *`
+
+	==== ========== ================== ===================
+	name kind       role               other noticeable fields
+	==== ========== ================== ===================
+	`X`  module     namespace          N/A
+	==== ========== ================== ===================
+
+`from X import Y`
+
+	==== ========== ================== ===================
+	name kind       role               other noticeable fields
+	==== ========== ================== ===================
+	`X`  module     namespace          N/A
+	`Y`  unknown    imported           scope:module:`X`
+	==== ========== ================== ===================
+
+`from X import Y as Z`
+
+	==== ========== ================== ===================
+	name kind       role               other noticeable fields
+	==== ========== ================== ===================
+	`X`  module     namespace          N/A
+	`Y`  unknown    indirectlyImported scope:module:`X`
+	`Z`  unknown    definition         nameref:unknown:`X`
+	==== ========== ================== ===================
+
+..
+	===================== ==== ========== ================== ===================
+	input code            name kind       role               other noticeable fields
+	===================== ==== ========== ================== ===================
+	import X              X    module     imported
+	import X as Y         X    module     indirectlyImported
+	import X as Y         Y    namespace  definition         nameref:module:X
+	from X import *       X    module     namespace
+	from X import Y       X    module     namespace
+	from X import Y       Y    unknown    imported           scope:module:X
+	from X import Y as Z  X    module     namespace
+	from X import Y as Z  Y    unknown    indirectlyImported scope:module:X
+	from X import Y as Z  Z    unknown    definition         nameref:unknown:X
+	===================== ==== ========== ================== ===================
+
+..  a table having merged cells cannot be converted to man page
+..
+	+--------------------+------------------------------------------------------+
+	|input code          |output tags                                           |
+	|                    +----+----------+------------------+-------------------+
+	|                    |name| kind     |role              |other noticeable fields  |
+	+====================+====+==========+==================+===================+
+	|import X            |X   | module   |imported          |                   |
+	+--------------------+----+----------+------------------+-------------------+
+	|import X as Y       |X   | module   |indirectlyImported|                   |
+	|                    +----+----------+------------------+-------------------+
+	|                    |Y   | namespace|definition        |nameref:module:X   |
+	+--------------------+----+----------+------------------+-------------------+
+	|from X import *     |X   | module   |namespace         |                   |
+	+--------------------+----+----------+------------------+-------------------+
+	|from X import Y     |X   | module   |namespace         |                   |
+	|                    +----+----------+------------------+-------------------+
+	|                    |Y   | unknown  |imported          |scope:module:X     |
+	+--------------------+----+----------+------------------+-------------------+
+	|from X import Y as Z|X   | module   |namespace         |                   |
+	|                    +----+----------+------------------+-------------------+
+	|                    |Y   | unknown  |indirectlyImported|scope:module:X     |
+	|                    +----+----------+------------------+-------------------+
+	|                    |Z   | unknown  |definition        |nameref:unknown:Y  |
+	+--------------------+----+----------+------------------+-------------------+
+
+Examples
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 "input.py"
 .. code-block:: Python
 
@@ -117,9 +202,31 @@ with "--options=NONE -o - --extras=+r --fields=+rzKZ input.py"
 accessing the language object named in "Y4" in "X4" module. "nameref:unknown:Y4"
 attached to "Z4" and "scope:module:X4" attached to "Y4" represent the relations.
 
-Lambda expression and type hint
+LAMBDA EXPRESSION AND TYPE HINT
+-------------------------------
+
+Summary
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+`id = lambda var0: var0`
+
+	=========== ========== ================== ===================
+	name        kind       role               other noticeable fields
+	=========== ========== ================== ===================
+	`id`        function   definition         signature:(`var0`)
+	=========== ========== ================== ===================
+
+`id_t: Callable[[int], int] = lambda var1: var1`
+
+	=========== ========== ================== ===================
+	name        kind       role               other noticeable fields
+	=========== ========== ================== ===================
+	`id_t`      variable   definition         typeref:typename:`Callable[[int], int]` nameref:function:anonFuncN
+	anonFuncN   function   definition         signature:(`var1`)
+	=========== ========== ================== ===================
+
+Examples
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 "input.py"
 .. code-block:: Python
 
