@@ -1,0 +1,10 @@
+qrtz_job_details	input.sql	/^CREATE TABLE qrtz_job_details$/;"	t
+JOB_NAME	input.sql	/^JOB_NAME VARCHAR(200) NOT NULL,$/;"	E	table:qrtz_job_details
+JOB_GROUP	input.sql	/^JOB_GROUP VARCHAR(200) NOT NULL,$/;"	E	table:qrtz_job_details
+DESCRIPTION	input.sql	/^DESCRIPTION VARCHAR(250) NULL,$/;"	E	table:qrtz_job_details
+JOB_CLASS_NAME	input.sql	/^JOB_CLASS_NAME VARCHAR(250) NOT NULL,$/;"	E	table:qrtz_job_details
+IS_DURABLE	input.sql	/^IS_DURABLE BOOLEAN NOT NULL,$/;"	E	table:qrtz_job_details
+IS_VOLATILE	input.sql	/^IS_VOLATILE BOOLEAN NOT NULL,$/;"	E	table:qrtz_job_details
+IS_STATEFUL	input.sql	/^IS_STATEFUL BOOLEAN NOT NULL,$/;"	E	table:qrtz_job_details
+REQUESTS_RECOVERY	input.sql	/^REQUESTS_RECOVERY BOOLEAN NOT NULL,$/;"	E	table:qrtz_job_details
+JOB_DATA	input.sql	/^JOB_DATA BINARY NULL,$/;"	E	table:qrtz_job_details
