@@ -1,0 +1,2 @@
+proc1	input.tcl	/^proc proc1 {} {$/;"	p
+proc2	input.tcl	/^proc proc2  {} {}$/;"	p

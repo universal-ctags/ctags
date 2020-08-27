@@ -148,8 +148,13 @@ static void readString (vString *string)
 		case EOF:
 			return;
 		case '\\':
-			vStringPut (string, c);
-			escaped = true;
+			if (escaped)
+			{
+				vStringPut (string, c);
+				escaped = false;
+			}
+			else
+				escaped = true;
 			break;
 		case '"':
 			vStringPut (string, c);
