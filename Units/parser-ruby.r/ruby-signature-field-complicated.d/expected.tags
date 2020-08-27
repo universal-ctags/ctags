@@ -1,0 +1,2 @@
+X	input.rb	/^class X$/;"	c
+cat	input.rb	/^  def cat (n = ')',              # comment$/;"	f	class:X	signature:(n = ')', m = "missing")

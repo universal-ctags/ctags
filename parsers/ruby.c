@@ -483,6 +483,22 @@ static void parseSignature (const unsigned char** cp, vString* vstr)
 				depth += (**cp == '(')? 1: -1;
 				vStringPut (vstr, **cp);
 			}
+			else if (**cp == '#')
+			{
+				++*cp;
+				while (**cp != '\0')
+					++*cp;
+				break;
+			}
+			else if (**cp == '\'' || **cp == '"')
+			{
+				unsigned char b = **cp;
+				vStringPut (vstr, b);
+				++*cp;
+				parseString (cp, b, vstr);
+				vStringPut (vstr, b);
+				continue;
+			}
 			else if (isspace (vStringLast (vstr)))
 			{
 				if (! (isspace (**cp)))
