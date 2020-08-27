@@ -725,6 +725,9 @@ getNextChar:
 				  token->filePosition = getInputFilePosition ();
 				  break;
 
+		case '#':
+				skipToCharacterInInputFile ('\n');
+				goto getNextChar;
 		case '-':
 				  c = getcFromInputFile ();
 				  if (c == '-')		/* -- is this the start of a comment? */
