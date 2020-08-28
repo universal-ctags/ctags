@@ -1,0 +1,14 @@
+T	input.py	/^T = TypeVar('T')$/;"	v
+func1	input.py	/^def func1(a: str, b: Callable[[int, int], T]) -> T:$/;"	f	typeref:typename:T
+a	input.py	/^def func1(a: str, b: Callable[[int, int], T]) -> T:$/;"	z	function:func1	typeref:typename:str	file:
+b	input.py	/^def func1(a: str, b: Callable[[int, int], T]) -> T:$/;"	z	function:func1	typeref:typename:Callable[[int,int],T]	file:
+func2	input.py	/^def func2 (a: str) -> "a string":$/;"	f	typeref:typename:"a string"
+a	input.py	/^def func2 (a: str) -> "a string":$/;"	z	function:func2	typeref:typename:str	file:
+i	input.py	/^i:int = 10$/;"	v	typeref:typename:int
+t	input.py	/^t: Tuple[str, ...] = ()$/;"	v	typeref:typename:Tuple[str, ...]
+func3	input.py	/^def func3 () -> 3 + i:$/;"	f	typeref:typename:3+i
+id	input.py	/^id: Callable[[int], int] = lambda var1: var1$/;"	v	typeref:typename:Callable[[int], int]	nameref:function:anonFunc100067ac0101
+anonFunc100067ac0101	input.py	/^id: Callable[[int], int] = lambda var1: var1$/;"	f
+id2	input.py	/^id2 = lambda var2: var2$/;"	f
+id3	input.py	/^id3: \\$/;"	v	typeref:typename:Callable[[int], int]	nameref:function:anonFunc100067ac0201
+anonFunc100067ac0201	input.py	/^        lambda var3: var3$/;"	f

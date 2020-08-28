@@ -1,3 +1,11 @@
+How to add a new man page
+---------------------------------------------------------------------
+
+Add the file name to man_MANS of ${top_srcdir}/Makefile.am,
+AC_CONFIG_FILES of ${top_srcdir}/configure.ac,
+IN_SOURCE_FILES or SOURCE_FILES of ${top_srcdir}/man/Makefile,
+toctree of ${top_srcdir}/docs/man-pages.rst.
+
 Rules for writing man pages
 ---------------------------------------------------------------------
 

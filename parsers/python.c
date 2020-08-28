@@ -61,6 +61,7 @@ static const char *const PythonAccesses[COUNT_ACCESS] = {
 
 typedef enum {
 	F_DECORATORS,
+	F_NAMEREF,
 	COUNT_FIELD
 } pythonField;
 
@@ -68,6 +69,9 @@ static fieldDefinition PythonFields[COUNT_FIELD] = {
 	{ .name = "decorators",
 	  .description = "decorators on functions and classes",
 	  .enabled = false },
+	{ .name = "nameref",
+	  .description = "the original name for the tag",
+	  .enabled = true },
 };
 
 typedef enum {
@@ -99,18 +103,18 @@ typedef enum {
  * import X              X = (kind:module, role:imported)
  *
  * import X as Y         X = (kind:module, role:indirectlyImported),
- *                       Y = (kind:namespace, [nameref:X])
+ *                       Y = (kind:namespace, nameref:module:X)
  *                       ------------------------------------------------
- *                       Don't confuse with namespace role of module kind.
+ *                       Don't confuse the kind of Y with namespace role of module kind.
  *
  * from X import *       X = (kind:module,  role:namespace)
  *
  * from X import Y       X = (kind:module,  role:namespace),
- *                       Y = (kind:unknown, role:imported, [scope:X])
+ *                       Y = (kind:unknown, role:imported, scope:module:X)
  *
  * from X import Y as Z  X = (kind:module,  role:namespace),
- *                       Y = (kind:unknown, role:indirectlyImported, [scope:X])
- *                       Z = (kind:unknown, [nameref:X.Y]) */
+ *                       Y = (kind:unknown, role:indirectlyImported, scope:module:X)
+ *                       Z = (kind:unknown, nameref:unknown:Y) */
 
 static roleDefinition PythonModuleRoles [] = {
 	{ true, "imported",
@@ -168,6 +172,7 @@ typedef enum eTokenType {
 	TOKEN_OPERATOR,
 	TOKEN_IDENTIFIER,
 	TOKEN_STRING,
+	TOKEN_ARROW,				/* -> */
 	TOKEN_WHITESPACE,
 } tokenType;
 
@@ -539,8 +544,20 @@ getNextChar:
 			break;
 		}
 
-		case '+':
 		case '-':
+		{
+			int d = getcFromInputFile ();
+			if (d == '>')
+			{
+				vStringPut (token->string, c);
+				vStringPut (token->string, d);
+				token->type = TOKEN_ARROW;
+				break;
+			}
+			ungetcToInputFile (d);
+			/* fall through */
+		}
+		case '+':
 		case '*':
 		case '%':
 		case '<':
@@ -834,6 +851,90 @@ static bool readCDefName (tokenInfo *const token, pythonKind *kind)
 	return token->type == TOKEN_IDENTIFIER;
 }
 
+static vString *parseParamTypeAnnotation (tokenInfo *const token,
+										  vString *arglist)
+{
+	readToken (token);
+	if (token->type != ':')
+	{
+		ungetToken (token);
+		return NULL;
+	}
+
+	reprCat (arglist, token);
+	int depth = 0;
+	vString *t = vStringNew ();
+	while (true)
+	{
+		readTokenFull (token, true);
+		if (token->type == TOKEN_WHITESPACE)
+		{
+			reprCat (arglist, token);
+			continue;
+		}
+		else if (token->type == TOKEN_EOF)
+			break;
+
+		if (token->type == '(' ||
+			token->type == '[' ||
+			token->type == '{')
+			depth ++;
+		else if (token->type == ')' ||
+				 token->type == ']' ||
+				 token->type == '}')
+			depth --;
+
+		if (depth < 0
+			|| (depth == 0 && (token->type == '='
+							   || token->type == ',')))
+		{
+			ungetToken (token);
+			return t;
+		}
+		reprCat (arglist, token);
+		reprCat (t, token);
+	}
+	vStringDelete (t);
+	return NULL;
+}
+
+static vString *parseReturnTypeAnnotation (tokenInfo *const token)
+{
+	readToken (token);
+	if (token->type != TOKEN_ARROW)
+	{
+		ungetToken (token);
+		return NULL;
+	}
+
+	int depth = 0;
+	vString *t = vStringNew ();
+	while (true)
+	{
+		readToken (token);
+		if (token->type == TOKEN_EOF)
+			break;
+
+		if (token->type == '(' ||
+			token->type == '[' ||
+			token->type == '{')
+			depth ++;
+		else if (token->type == ')' ||
+				 token->type == ']' ||
+				 token->type == '}')
+			depth --;
+		if (depth == 0 && token->type == ':')
+		{
+			ungetToken (token);
+			return t;
+		}
+		else
+			reprCat (t, token);
+	}
+	vStringDelete (t);
+	return NULL;
+}
+
 static bool parseClassOrDef (tokenInfo *const token,
                                 const vString *const decorators,
                                 pythonKind kind, bool isCDef)
@@ -841,6 +942,7 @@ static bool parseClassOrDef (tokenInfo *const token,
 	vString *arglist = NULL;
 	tokenInfo *name = NULL;
 	tokenInfo *parameterTokens[16] = { NULL };
+	vString   *parameterTypes [ARRAY_SIZE(parameterTokens)] = { NULL };
 	unsigned int parameterCount = 0;
 	NestingLevel *lv;
 	int corkIndex;
@@ -902,7 +1004,8 @@ static bool parseClassOrDef (tokenInfo *const token,
 				tokenInfo *parameterName = newToken ();
 
 				copyToken (parameterName, token);
-				parameterTokens[parameterCount++] = parameterName;
+				parameterTokens[parameterCount] = parameterName;
+				parameterTypes [parameterCount++] = parseParamTypeAnnotation (token, arglist);
 			}
 		}
 		while (token->type != TOKEN_EOF && depth > 0);
@@ -925,9 +1028,27 @@ static bool parseClassOrDef (tokenInfo *const token,
 
 		for (i = 0; i < parameterCount; i++)
 		{
-			makeSimplePythonTag (parameterTokens[i], K_PARAMETER);
+			int paramCorkIndex = makeSimplePythonTag (parameterTokens[i], K_PARAMETER);
 			deleteToken (parameterTokens[i]);
+			tagEntryInfo *e = getEntryInCorkQueue (paramCorkIndex);
+			if (e && parameterTypes[i])
+			{
+				e->extensionFields.typeRef [0] = eStrdup ("typename");
+				e->extensionFields.typeRef [1] = vStringDeleteUnwrap (parameterTypes[i]);
+				parameterTypes[i] = NULL;
+			}
+			vStringDelete (parameterTypes[i]); /* NULL is acceptable. */
 		}
+	}
+
+	tagEntryInfo *e;
+	vString *t;
+	if (kind != K_CLASS
+		&& (e = getEntryInCorkQueue (corkIndex))
+		&& (t = parseReturnTypeAnnotation (token)))
+	{
+		e->extensionFields.typeRef [0] = eStrdup ("typename");
+		e->extensionFields.typeRef [1] = vStringDeleteUnwrap (t);
 	}
 
 	return true;
@@ -951,15 +1072,16 @@ static bool parseImport (tokenInfo *const token)
 	if (token->keyword == KEYWORD_import)
 	{
 		bool parenthesized = false;
+		int moduleIndex;
 
 		if (fromModule)
 		{
 			/* from X import ...
 			 * --------------------
 			 * X = (kind:module, role:namespace) */
-			makeSimplePythonRefTag (fromModule, NULL, K_MODULE,
-			                        PYTHON_MODULE_NAMESPACE,
-			                        XTAG_UNKNOWN);
+			moduleIndex = makeSimplePythonRefTag (fromModule, NULL, K_MODULE,
+												  PYTHON_MODULE_NAMESPACE,
+												  XTAG_UNKNOWN);
 		}
 
 		do
@@ -990,39 +1112,54 @@ static bool parseImport (tokenInfo *const token)
 							/* from x import Y as Z
 							 * ----------------------------
 							 * x = (kind:module,  role:namespace),
-							 * Y = (kind:unknown, role:indirectlyImported),
-							 * Z = (kind:unknown) */
+							 * Y = (kind:unknown, role:indirectlyImported, scope:module:X),
+							 * Z = (kind:unknown, nameref:unknown:Y) */
+							int index;
 
 							/* Y */
-							makeSimplePythonRefTag (name, NULL, K_UNKNOWN,
-							                        PYTHON_UNKNOWN_INDIRECTLY_IMPORTED,
-							                        XTAG_UNKNOWN);
-							/* x.Y */
-							if (isXtagEnabled (XTAG_QUALIFIED_TAGS))
-							{
-								vString *fq = vStringNewCopy (fromModule->string);
-								vStringPut (fq, '.');
-								vStringCat (fq, name->string);
-								makeSimplePythonRefTag (name, fq, K_UNKNOWN,
-								                        PYTHON_UNKNOWN_INDIRECTLY_IMPORTED,
-								                        XTAG_QUALIFIED_TAGS);
-								vStringDelete (fq);
-							}
+							index = makeSimplePythonRefTag (name, NULL, K_UNKNOWN,
+															PYTHON_UNKNOWN_INDIRECTLY_IMPORTED,
+															XTAG_UNKNOWN);
+							/* fill the scope field for Y */
+							tagEntryInfo *e = getEntryInCorkQueue (index);
+							if (e)
+								e->extensionFields.scopeIndex = moduleIndex;
+
 							/* Z */
-							makeSimplePythonTag (token, K_UNKNOWN);
+							index = makeSimplePythonTag (token, K_UNKNOWN);
+							/* fill the nameref filed for Y */
+							if (PythonFields[F_NAMEREF].enabled)
+							{
+								vString *nameref = vStringNewInit (PythonKinds [K_UNKNOWN].name);
+								vStringPut (nameref, ':');
+								vStringCat (nameref, name->string);
+								attachParserFieldToCorkEntry (index, PythonFields[F_NAMEREF].ftype,
+															  vStringValue (nameref));
+								vStringDelete (nameref);
+							}
 						}
 						else
 						{
 							/* import x as Y
 							 * ----------------------------
-							 * X = (kind:module, role:indirectlyImported)
-							 * Y = (kind:namespace)*/
-							/* X */
+							 * x = (kind:module, role:indirectlyImported)
+							 * Y = (kind:namespace, nameref:module:x)*/
+							/* x */
 							makeSimplePythonRefTag (name, NULL, K_MODULE,
 							                        PYTHON_MODULE_INDIRECTLY_IMPORTED,
 							                        XTAG_UNKNOWN);
 							/* Y */
-							makeSimplePythonTag (token, K_NAMESPACE);
+							int index = makeSimplePythonTag (token, K_NAMESPACE);
+							/* fill the nameref filed for Y */
+							if (PythonFields[F_NAMEREF].enabled)
+							{
+								vString *nameref = vStringNewInit (PythonKinds [K_MODULE].name);
+								vStringPut (nameref, ':');
+								vStringCat (nameref, name->string);
+								attachParserFieldToCorkEntry (index, PythonFields[F_NAMEREF].ftype,
+															  vStringValue (nameref));
+								vStringDelete (nameref);
+							}
 						}
 
 						copyToken (name, token);
@@ -1036,22 +1173,15 @@ static bool parseImport (tokenInfo *const token)
 						/* from x import Y
 						   --------------
 						   x = (kind:module,  role:namespace),
-						   Y = (kind:unknown, role:imported) */
+						   Y = (kind:unknown, role:imported, scope:module:x) */
 						/* Y */
-						makeSimplePythonRefTag (name, NULL, K_UNKNOWN,
-						                        PYTHON_UNKNOWN_IMPORTED,
-						                        XTAG_UNKNOWN);
-						/* x.Y */
-						if (isXtagEnabled (XTAG_QUALIFIED_TAGS))
-						{
-							vString *fq = vStringNewCopy (fromModule->string);
-							vStringPut (fq, '.');
-							vStringCat (fq, name->string);
-							makeSimplePythonRefTag (name, fq, K_UNKNOWN,
-							                        PYTHON_UNKNOWN_IMPORTED,
-							                        XTAG_QUALIFIED_TAGS);
-							vStringDelete (fq);
-						}
+						int index = makeSimplePythonRefTag (name, NULL, K_UNKNOWN,
+															PYTHON_UNKNOWN_IMPORTED,
+															XTAG_UNKNOWN);
+						/* fill the scope field for Y */
+						tagEntryInfo *e = getEntryInCorkQueue (index);
+						if (e)
+							e->extensionFields.scopeIndex = moduleIndex;
 					}
 					else
 					{
@@ -1083,16 +1213,17 @@ static bool parseImport (tokenInfo *const token)
  * expression in theory.
  * this function assumes there must be an annotation, and doesn't do any check
  * on the token on which it is called: the caller should do that part. */
-static bool skipTypeAnnotation (tokenInfo *const token)
+static bool skipVariableTypeAnnotation (tokenInfo *const token, vString *const repr)
 {
 	bool readNext = true;
 
 	readToken (token);
 	switch (token->type)
 	{
-		case '[': readNext = skipOverPair (token, '[', ']', NULL, false); break;
-		case '(': readNext = skipOverPair (token, '(', ')', NULL, false); break;
-		case '{': readNext = skipOverPair (token, '{', '}', NULL, false); break;
+		case '[': readNext = skipOverPair (token, '[', ']', repr, true); break;
+		case '(': readNext = skipOverPair (token, '(', ')', repr, true); break;
+		case '{': readNext = skipOverPair (token, '{', '}', repr, true); break;
+		default: reprCat (repr, token);
 	}
 	if (readNext)
 		readToken (token);
@@ -1101,11 +1232,14 @@ static bool skipTypeAnnotation (tokenInfo *const token)
 	{
 		switch (token->type)
 		{
-			case '[': readNext = skipOverPair (token, '[', ']', NULL, false); break;
-			case '(': readNext = skipOverPair (token, '(', ')', NULL, false); break;
+			case '[': readNext = skipOverPair (token, '[', ']', repr, true); break;
+			case '(': readNext = skipOverPair (token, '(', ')', repr, true); break;
 			case '.':
+				reprCat (repr, token);
 				readToken (token);
 				readNext = token->type == TOKEN_IDENTIFIER;
+				if (readNext)
+					reprCat (repr, token);
 				break;
 			default:  readNext = false; break;
 		}
@@ -1122,12 +1256,15 @@ static bool parseVariable (tokenInfo *const token, const pythonKind kind)
 	 * assignations, we first collect all the names, and then try and map
 	 * an assignation to it */
 	tokenInfo *nameTokens[8] = { NULL };
+	vString   *nameTypes [ARRAY_SIZE (nameTokens)] = { NULL };
 	unsigned int nameCount = 0;
+	vString *type = vStringNew();
 
 	/* first, collect variable name tokens */
 	while (token->type == TOKEN_IDENTIFIER &&
 	       nameCount < ARRAY_SIZE (nameTokens))
 	{
+		unsigned int i;
 		tokenInfo *name = newToken ();
 		copyToken (name, token);
 
@@ -1148,18 +1285,26 @@ static bool parseVariable (tokenInfo *const token, const pythonKind kind)
 			       token->type == '.');
 		}
 
-		nameTokens[nameCount++] = name;
+		i = nameCount++;
+		nameTokens[i] = name;
 
-		/* skip annotations.  we need not to be too permissive because we
+		/* (parse and) skip annotations.  we need not to be too permissive because we
 		 * aren't yet sure we're actually parsing a variable. */
-		if (token->type == ':' && skipTypeAnnotation (token))
+		if (token->type == ':' && skipVariableTypeAnnotation (token, type))
 			readToken (token);
+
+		if (vStringLength (type) > 0)
+		{
+			nameTypes[i] = type;
+			type = vStringNew ();
+		}
 
 		if (token->type == ',')
 			readToken (token);
 		else
 			break;
 	}
+	vStringDelete (type);
 
 	/* then, if it's a proper assignation, try and map assignations so that
 	 * we catch lambdas and alike */
@@ -1169,23 +1314,104 @@ static bool parseVariable (tokenInfo *const token, const pythonKind kind)
 
 		do
 		{
-			const tokenInfo *const nameToken = nameTokens[i++];
+			const tokenInfo *const nameToken = nameTokens[i];
+			vString **type = &(nameTypes[i++]);
 
 			readToken (token);
 
 			if (! nameToken)
 				/* nothing */;
 			else if (token->keyword != KEYWORD_lambda)
-				makeSimplePythonTag (nameToken, kind);
+			{
+				int index = makeSimplePythonTag (nameToken, kind);
+				tagEntryInfo *e = getEntryInCorkQueue (index);
+				if (e && *type)
+				{
+					e->extensionFields.typeRef [0] = eStrdup ("typename");
+					e->extensionFields.typeRef [1] = vStringDeleteUnwrap (*type);
+					*type = NULL;
+				}
+			}
 			else
 			{
+				tokenInfo *anon  = NULL;
 				vString *arglist = vStringNew ();
-
+				if (*type)
+				{
+					anon = newToken ();
+					copyToken (anon, token);
+				}
 				readToken (token);
 				vStringPut (arglist, '(');
 				skipLambdaArglist (token, arglist);
 				vStringPut (arglist, ')');
-				makeFunctionTag (nameToken, arglist, NULL);
+				if (*type)
+				{
+					/* How to handle lambda assigned to a variable
+					 * --------------------------------------------
+					 *
+					 * input.py:
+					 *
+					 * 	  id = lambda var: var
+					 * 	  id_t: Callable[[int], int] = lambda var: var
+					 *
+					 * `id' is tagged as a function kind object like:
+					 *
+					 *    id	input.py	/^id = lambda var: var$/;"	function
+					 *
+					 * For `id_t' we cannot do the same as `id'.
+					 *
+					 * We should not store `Callable[[int], int]' to typeref
+					 * field of the tag of `id_t' if the tag has "function" as
+					 * its kind because users expect the typeref field of a
+					 * function kind represents a type for the value returned
+					 * from the function (return type).
+					 *
+					 * the unexpected tag:
+					 *
+					 *    id_t	input.py	/^id_t: Callable[[int], int] = lambda var: var$/;"	function \
+					 *                          typeref:typename:Callable[[int], int]
+					 *
+					 * If we make a tag for `id_t' as a function, we should
+					 * attach `typeref:typename:int' and `signature:(int)'. To
+					 * achieve this, we have to make ctags analyze
+					 * `Callable[[int], int]'.  However, we want to avoid the
+					 * level of analyzing.
+					 *
+					 * For recording `Callable[[int], int]', a valuable
+					 * information in the input, we use indirection.
+					 *
+					 *    id_t	input.py	/^id_t: Callable[[int], int] = lambda var: var$/;"	variable \
+					 *                          typeref:typename:Callable[[int], int]	nameref:function:anonFuncNNN
+					 *    anonFuncNNN	input.py	/^id_t: Callable[[int], int] = lambda var: var$/;"	function \
+					 *                          extras:anonymous
+					 */
+					int vindex = makeSimplePythonTag (nameToken, kind);
+					vStringClear (anon->string);
+					anonGenerate (anon->string, "anonFunc", K_FUNCTION);
+					int findex = makeFunctionTag (anon, arglist, NULL);
+					tagEntryInfo *fe = getEntryInCorkQueue (findex);
+					if (fe)
+						markTagExtraBit (fe, XTAG_ANONYMOUS);
+
+					tagEntryInfo *ve = getEntryInCorkQueue (vindex);
+					if (ve)
+					{
+						ve->extensionFields.typeRef [0] = eStrdup ("typename");
+						ve->extensionFields.typeRef [1] = vStringDeleteUnwrap (*type);
+						*type = NULL;
+						vString *nameref = vStringNewInit (PythonKinds [K_FUNCTION].name);
+						vStringPut (nameref, ':');
+						vStringCat (nameref, anon->string);
+						attachParserField (ve, true, PythonFields[F_NAMEREF].ftype,
+										   vStringValue (nameref));
+						vStringDelete (nameref);
+					}
+					if (anon)
+						deleteToken (anon);
+				}
+				else
+					makeFunctionTag (nameToken, arglist, NULL);
 				vStringDelete (arglist);
 			}
 
@@ -1213,6 +1439,7 @@ static bool parseVariable (tokenInfo *const token, const pythonKind kind)
 	{
 		if (nameTokens[--nameCount])
 			deleteToken (nameTokens[nameCount]);
+		vStringDelete (nameTypes[nameCount]); /* NULL is acceptable. */
 	}
 
 	return false;
