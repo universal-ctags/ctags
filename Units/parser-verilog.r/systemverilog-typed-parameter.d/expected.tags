@@ -1,0 +1,3 @@
+default_name	input.sv	/^  parameter string default_name = "John Smith"; \/\/ default_name:register => default_name:const/;"	c
+flag	input.sv	/^  parameter logic flag = 1 ; \/\/ flags:register => flags:constant$/;"	c
+r1	input.sv	/^  parameter real r1 = 3.5e17; \/\/ r1:register => r1:constant$/;"	c
