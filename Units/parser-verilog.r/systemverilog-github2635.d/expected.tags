@@ -1,0 +1,18 @@
+ctags_uni_issues	input.sv	/^module ctags_uni_issues ($/;"	m
+data_in	input.sv	/^  input var logic data_in \/\/ var:port, data_in:register => data_in:port$/;"	p	module:ctags_uni_issues
+foo	input.sv	/^  const var foo;$/;"	r	module:ctags_uni_issues
+bar	input.sv	/^  var bar;$/;"	r	module:ctags_uni_issues
+variable_name	input.sv	/^  chandle variable_name ; \/\/ not defined => variable_name:register$/;"	r	module:ctags_uni_issues
+x	input.sv	/^class x;$/;"	C
+ra	input.sv	/^  rand var ra;$/;"	r	class:x
+rb	input.sv	/^  randc var rb;$/;"	r	class:x
+foo	input.sv	/^package foo;$/;"	K
+delay_example	input.sv	/^  sequence delay_example(x, y, min, max, delay1);$/;"	R	package:foo
+x	input.sv	/^  sequence delay_example(x, y, min, max, delay1);$/;"	p	property:foo.delay_example
+y	input.sv	/^  sequence delay_example(x, y, min, max, delay1);$/;"	p	property:foo.delay_example
+min	input.sv	/^  sequence delay_example(x, y, min, max, delay1);$/;"	p	property:foo.delay_example
+max	input.sv	/^  sequence delay_example(x, y, min, max, delay1);$/;"	p	property:foo.delay_example
+delay1	input.sv	/^  sequence delay_example(x, y, min, max, delay1);$/;"	p	property:foo.delay_example
+mh1	input.sv	/^module mh1 ($/;"	m	property:foo.delay_example
+in1	input.sv	/^  input var int in1, \/\/ -> var:port, in1:register => in1:port$/;"	p	module:foo.delay_example.mh1
+out2	input.sv	/^  output var int out2 \/\/ -> var:port, out2:register => out2:port$/;"	p	module:foo.delay_example.mh1

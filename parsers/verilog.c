@@ -175,7 +175,9 @@ static const keywordAssoc KeywordTable [] = {
 	{ "assume",    K_ASSERTION, { 1, 0 } },
 	{ "bit",       K_REGISTER,  { 1, 0 } },
 	{ "byte",      K_REGISTER,  { 1, 0 } },
+	{ "chandle",   K_REGISTER,  { 1, 0 } },
 	{ "class",     K_CLASS,     { 1, 0 } },
+	{ "const",     K_IGNORE,    { 1, 0 } },
 	{ "cover",     K_ASSERTION, { 1, 0 } },
 	{ "covergroup",K_COVERGROUP,{ 1, 0 } },
 	{ "enum",      K_ENUM,      { 1, 0 } },
@@ -190,7 +192,10 @@ static const keywordAssoc KeywordTable [] = {
 	{ "program",   K_PROGRAM,   { 1, 0 } },
 	{ "property",  K_PROPERTY,  { 1, 0 } },
 	{ "pure",      K_IGNORE,    { 1, 0 } },
+	{ "rand",      K_IGNORE,    { 1, 0 } },
+	{ "randc",     K_IGNORE,    { 1, 0 } },
 	{ "ref",       K_PORT,      { 1, 0 } },
+	{ "sequence",  K_PROPERTY,  { 1, 0 } },
 	{ "shortint",  K_REGISTER,  { 1, 0 } },
 	{ "shortreal", K_REGISTER,  { 1, 0 } },
 	{ "static",    K_IGNORE,    { 1, 0 } },
@@ -201,6 +206,7 @@ static const keywordAssoc KeywordTable [] = {
 	{ "union",     K_STRUCT,    { 1, 0 } },
 	{ "unsigned",  K_IGNORE,    { 1, 0 } },
 	{ "virtual",   K_IGNORE,    { 1, 0 } },
+	{ "var",       K_REGISTER,  { 1, 0 } },
 	{ "void",      K_IGNORE,    { 1, 0 } }
 };
 
