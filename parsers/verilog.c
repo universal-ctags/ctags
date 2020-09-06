@@ -970,6 +970,40 @@ static void processEnum (tokenInfo *const token)
 	tagNameList (token, c);
 }
 
+static void processStruct (tokenInfo *const token)
+{
+	int c;
+
+	c = skipWhite (vGetc ());
+
+	/* Skip packed, signed, and unsigned */
+	while (isIdentifierCharacter (c))
+	{
+		readIdentifier (token, c);
+		c = skipWhite (vGetc ());
+	}
+
+	/* Skip struct contents */
+	if (c == '{')
+	{
+		c = skipWhite (skipPastMatch ("{}"));
+	}
+	else
+	{
+		verbose ("Syntax error on struct or union. Token %s kind %d\n", vStringValue (token->name), token->kind);
+	}
+
+	/* Skip packed_dimension */
+	while (c == '[')
+	{
+		c = skipWhite (skipPastMatch ("[]"));
+	}
+
+	/* Following identifiers are tag names */
+	verbose ("Find struct|union tags. Token %s kind %d\n", vStringValue (token->name), token->kind);
+	tagNameList (token, c);
+}
+
 static void processTypedef (tokenInfo *const token)
 {
 	int c;
@@ -1295,6 +1329,10 @@ static void findTag (tokenInfo *const token)
 	else if (token->kind == K_ENUM)
 	{
 		processEnum (token);
+	}
+	else if (token->kind == K_STRUCT)
+	{
+		processStruct (token);
 	}
 	else if (token->kind == K_CLASS)
 	{
