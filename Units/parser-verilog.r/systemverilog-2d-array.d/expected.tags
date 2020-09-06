@@ -1,5 +1,5 @@
 my_pack	input.sv	/^package my_pack;$/;"	K
-MY_WIDTH	input.sv	/^    localparam int MY_WIDTH                  = 1;$/;"	r	package:my_pack
-MY_DEPTH	input.sv	/^    localparam int MY_DEPTH                  = 2;$/;"	r	package:my_pack
+MY_WIDTH	input.sv	/^    localparam int MY_WIDTH                  = 1;$/;"	c	package:my_pack
+MY_DEPTH	input.sv	/^    localparam int MY_DEPTH                  = 2;$/;"	c	package:my_pack
 my_t	input.sv	/^    typedef logic [MY_DEPTH-1:0][MY_WIDTH-1:0]  my_t;$/;"	T	package:my_pack
 my_t2	input.sv	/^    typedef logic   [MY_DEPTH-1:0] 	 [MY_WIDTH-1:0] 	 my_t2;$/;"	T	package:my_pack
