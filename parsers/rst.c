@@ -379,10 +379,15 @@ extern parserDefinition* RstParser (void)
 {
 	static const char *const extensions [] = { "rest", "reST", "rst", NULL };
 	parserDefinition* const def = parserNew ("ReStructuredText");
+	static const char *const aliases[] = {
+		"rst",					/* The name of emacs's mode */
+		NULL
+	};
 
 	def->kindTable = RstKinds;
 	def->kindCount = ARRAY_SIZE (RstKinds);
 	def->extensions = extensions;
+	def->aliases = aliases;
 	def->parser = findRstTags;
 
 	def->fieldTable = RstFields;
