@@ -1236,8 +1236,8 @@ static void tagNameList (tokenInfo* token, int c)
 
 			if (localKind != K_UNDEFINED || isAlreadyTaggedAs (token, K_TYPEDEF))
 			{
-				/* Update kind unless it's a port or an ignored keyword */
-				if (token->kind != K_PORT && localKind != K_IGNORE)
+				/* Update kind unless it's a port, a constant (parameter) or an ignored keyword */
+				if (token->kind != K_PORT && token->kind != K_CONSTANT && localKind != K_IGNORE)
 				{
 					token->kind = localKind;
 				}
