@@ -37,9 +37,16 @@ typedef struct {
     } struct_union;
   } type_struct_union;
 
+typedef struct packed unsigned {
+  logic [7:0] upper;
+  logic [7:0] lower;
+} type_strcut_packed_unsigned;
+
 typedef      bit                 type_bit;
 typedef      bit [1:0]           type_bit_bus;
 typedef      bit [1:0]           type_bit_bus_array [2:0];
+typedef      logic signed [7:0]  type_logic_signed_vec;
+typedef      bit unsigned [7:0]  type_bit_unsigned_vec;
 
 typedef enum int unsigned{
     cond0 = 0, cond1 = 1, cond2 = 2
