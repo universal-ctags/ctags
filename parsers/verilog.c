@@ -1052,6 +1052,13 @@ static void processTypedef (tokenInfo *const token)
 		c = skipWhite (vGetc ());
 	}
 
+	/* Skip signed or unsiged */
+	if (isIdentifierCharacter (c))
+	{
+		readIdentifier (token, c);
+		c = skipWhite (vGetc ());
+	}
+
 	/* Skip bus width definition */
 	while (c == '[')
 	{
