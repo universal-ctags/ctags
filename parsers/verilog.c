@@ -996,7 +996,10 @@ static void processStruct (tokenInfo *const token)
 	}
 	else
 	{
-		verbose ("Syntax error on struct or union. Token %s kind %d\n", vStringValue (token->name), token->kind);
+		verbose ("Prototype struct found \"%s\"\n", vStringValue (token->name));
+		token->kind = K_PROTOTYPE;
+		createTag (token);
+		return;
 	}
 
 	/* Skip packed_dimension */
@@ -1037,10 +1040,22 @@ static void processTypedef (tokenInfo *const token)
 				token->kind = K_TYPEDEF;
 				processEnum (token);
 				return;
+			case K_STRUCT:
+				/* Call enum processing function */
+				token->kind = K_TYPEDEF;
+				processStruct (token);
+				return;
 			default :
 				break;
 		}
 
+		c = skipWhite (vGetc ());
+	}
+
+	/* Skip signed or unsiged */
+	if (isIdentifierCharacter (c))
+	{
+		readIdentifier (token, c);
 		c = skipWhite (vGetc ());
 	}
 
@@ -1061,15 +1076,6 @@ static void processTypedef (tokenInfo *const token)
 	if (c == '{')
 	{
 		c = skipWhite (skipPastMatch ("{}"));
-	}
-	else
-	{
-		/* Typedefs of struct/union that have no contents are forward
-		 * declarations and are considered prototypes */
-		if (token->kind == K_STRUCT)
-		{
-			currentContext->prototype = true;
-		}
 	}
 
 	/* Skip past class parameter override */
