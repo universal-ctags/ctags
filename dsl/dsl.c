@@ -584,7 +584,7 @@ static EsObject* sform_if (EsObject *args, DSLEnv *env)
 
 	o = es_car (args);
 	o = dsl_eval0 (o, env);
-	if (es_object_equal (o, es_false))
+	if (!es_object_equal (o, es_false))
 		return dsl_eval0 (es_car (es_cdr (args)), env);
 	else if (es_error_p (o))
 		return o;

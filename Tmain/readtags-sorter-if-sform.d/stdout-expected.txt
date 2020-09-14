@@ -1,0 +1,5 @@
+mutex	input.c	/^typedef mutex int;$/;"	kind:t	file:	language:C	typeref:typename:int
+mutex	input.c	/^int mutex;$/;"	kind:v	language:C	typeref:typename:int
+mutex	input.c	/^#define mutex /;"	kind:d	file:	language:C
+mutex	input.c	/^enum  MUTEX_E { mutex_a, mutex_b, mutex };$/;"	kind:e	file:	language:C	enum:MUTEX_E
+mutex	input.c	/^	int mutex;$/;"	kind:m	file:	language:C	struct:MUTEX_S	typeref:typename:int
