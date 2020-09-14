@@ -1276,9 +1276,11 @@ static void tagNameList (tokenInfo* token, int c)
 			else
 			{
 				/* Skip until end of current name, kind or parameter list definition */
-				do
+				do {
 					c = vGetc ();
-				while (c != EOF && c != ','  &&  c != ';' && c != ')');
+					if (c == '(')
+						c = skipPastMatch ("()");
+				} while (c != EOF && c != ','  &&  c != ';' && c != ')');
 			}
 		}
 		if (c == ',')
