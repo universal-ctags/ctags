@@ -74,7 +74,7 @@
 extern bool cppIsBraceFormat (void);
 extern unsigned int cppGetDirectiveNestLevel (void);
 
-/* Don't forget to set useCort true in your parser.
+/* Don't forget to add CORK_QUEUE to useCork in your parser.
  * The corkQueue is needed to capture macro parameters.
  */
 extern void cppInit (const bool state,
