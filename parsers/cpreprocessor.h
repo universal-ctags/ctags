@@ -77,16 +77,23 @@ extern unsigned int cppGetDirectiveNestLevel (void);
 /* Don't forget to add CORK_QUEUE to useCork in your parser.
  * The corkQueue is needed to capture macro parameters.
  */
-extern void cppInit (const bool state,
-		     const bool hasAtLiteralStrings,
-		     const bool hasCxxRawLiteralStrings,
-		     const bool hasSingleQuoteLiteralNumbers,
-		     int defineMacroKindIndex,
-		     int macroUndefRoleIndex,
-		     int headerKindIndex,
-		     int headerSystemRoleIndex, int headerLocalRoleIndex,
-		     int macroParamKindIndex,
-		     int macrodefFieldIndex);
+struct cppInitData {
+	bool state;
+	bool hasAtLiteralStrings;
+	bool hasCxxRawLiteralStrings;
+	bool hasSingleQuoteLiteralNumbers;
+
+	int defineMacroKindIndex;
+	int macroUndefRoleIndex;
+	int macroParamKindIndex;
+	int macrodefFieldIndex;
+
+	int headerKindIndex;
+	int headerSystemRoleIndex;
+	int headerLocalRoleIndex;
+};
+
+extern void cppInit (const struct cppInitData *initData);
 
 extern void cppTerminate (void);
 extern void cppBeginStatement (void);

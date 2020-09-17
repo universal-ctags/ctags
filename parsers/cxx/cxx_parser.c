@@ -1836,19 +1836,21 @@ static rescanReason cxxParserMain(const unsigned int passCount)
 
 	Assert(passCount < 3);
 
-	cppInit(
-			(bool) (passCount > 1),
-			false,
-			true, // raw literals
-			false,
-			kind_for_define,
-			role_for_macro_undef,
-			kind_for_macro_param,
-			kind_for_header,
-			role_for_header_system,
-			role_for_header_local,
-			g_cxx.pFieldOptions[CXXTagFieldMacrodef].ftype
-		);
+	const struct cppInitData initData = {
+		.state = (bool) (passCount > 1),
+		.hasAtLiteralStrings = false,
+		.hasCxxRawLiteralStrings = true, // raw literals
+		.hasSingleQuoteLiteralNumbers = false,
+		.defineMacroKindIndex = kind_for_define,
+		.macroUndefRoleIndex = role_for_macro_undef,
+		.macroParamKindIndex = kind_for_macro_param,
+		.macrodefFieldIndex = g_cxx.pFieldOptions[CXXTagFieldMacrodef].ftype,
+		.headerKindIndex = kind_for_header,
+		.headerSystemRoleIndex = role_for_header_system,
+		.headerLocalRoleIndex = role_for_header_local,
+	};
+
+	cppInit(&initData);
 
 	g_cxx.iChar = ' ';
 

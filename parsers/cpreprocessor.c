@@ -244,18 +244,9 @@ extern unsigned int cppGetDirectiveNestLevel (void)
 	return Cpp.directive.nestLevel;
 }
 
-static void cppInitCommon(langType clientLang,
-		     const bool state, const bool hasAtLiteralStrings,
-		     const bool hasCxxRawLiteralStrings,
-		     const bool hasSingleQuoteLiteralNumbers,
-		     int defineMacroKindIndex,
-		     int macroUndefRoleIndex,
-		     int macroParamKindIndex,
-		     int headerKindIndex,
-		     int headerSystemRoleIndex, int headerLocalRoleIndex,
-		     int macrodefFieldIndex)
+static void cppInitCommon(langType clientLang, const struct cppInitData *initData)
 {
-	BraceFormat = state;
+	BraceFormat = initData->state;
 
 	CXX_DEBUG_PRINT("cppInit: brace format is %d",BraceFormat);
 
@@ -277,17 +268,17 @@ static void cppInitCommon(langType clientLang,
 	Cpp.charOrStringContents = vStringNew();
 
 	Cpp.resolveRequired = false;
-	Cpp.hasAtLiteralStrings = hasAtLiteralStrings;
-	Cpp.hasCxxRawLiteralStrings = hasCxxRawLiteralStrings;
-	Cpp.hasSingleQuoteLiteralNumbers = hasSingleQuoteLiteralNumbers;
+	Cpp.hasAtLiteralStrings = initData->hasAtLiteralStrings;
+	Cpp.hasCxxRawLiteralStrings = initData->hasCxxRawLiteralStrings;
+	Cpp.hasSingleQuoteLiteralNumbers = initData->hasSingleQuoteLiteralNumbers;
 
-	if (defineMacroKindIndex != KIND_GHOST_INDEX)
+	if (initData->defineMacroKindIndex != KIND_GHOST_INDEX)
 	{
-		Cpp.defineMacroKindIndex = defineMacroKindIndex;
+		Cpp.defineMacroKindIndex = initData->defineMacroKindIndex;
 		Cpp.useClientLangDefineMacroKindIndex = true;
 
-		Cpp.macroUndefRoleIndex = macroUndefRoleIndex;
-		Cpp.macrodefFieldIndex = macrodefFieldIndex;
+		Cpp.macroUndefRoleIndex = initData->macroUndefRoleIndex;
+		Cpp.macrodefFieldIndex = initData->macrodefFieldIndex;
 	}
 	else
 	{
@@ -298,9 +289,9 @@ static void cppInitCommon(langType clientLang,
 		Cpp.macrodefFieldIndex = CPreProFields [F_MACRODEF].ftype;
 	}
 
-	if (macroParamKindIndex != KIND_GHOST_INDEX)
+	if (initData->macroParamKindIndex != KIND_GHOST_INDEX)
 	{
-		Cpp.macroParamKindIndex = macroParamKindIndex;
+		Cpp.macroParamKindIndex = initData->macroParamKindIndex;
 		Cpp.useClientLangMacroParamKindIndex = true;
 	}
 	else
@@ -309,13 +300,13 @@ static void cppInitCommon(langType clientLang,
 		Cpp.useClientLangMacroParamKindIndex = false;
 	}
 
-	if (headerKindIndex != KIND_GHOST_INDEX)
+	if (initData->headerKindIndex != KIND_GHOST_INDEX)
 	{
-		Cpp.headerKindIndex = headerKindIndex;
+		Cpp.headerKindIndex = initData->headerKindIndex;
 		Cpp.useClientLangHeaderKindIndex = true;
 
-		Cpp.headerSystemRoleIndex = headerSystemRoleIndex;
-		Cpp.headerLocalRoleIndex =  headerLocalRoleIndex;
+		Cpp.headerSystemRoleIndex = initData->headerSystemRoleIndex;
+		Cpp.headerLocalRoleIndex =  initData->headerLocalRoleIndex;
 	}
 	else
 	{
@@ -343,23 +334,10 @@ static void cppInitCommon(langType clientLang,
 		: NULL;
 }
 
-extern void cppInit (const bool state, const bool hasAtLiteralStrings,
-		     const bool hasCxxRawLiteralStrings,
-		     const bool hasSingleQuoteLiteralNumbers,
-		     int defineMacroKindIndex,
-		     int macroUndefRoleIndex,
-		     int macroParamKindIndex,
-		     int headerKindIndex,
-		     int headerSystemRoleIndex, int headerLocalRoleIndex,
-		     int macrodefFieldIndex)
+extern void cppInit (const struct cppInitData *initData)
 {
 	langType client = getInputLanguage ();
-
-	cppInitCommon (client, state, hasAtLiteralStrings,
-				   hasCxxRawLiteralStrings, hasSingleQuoteLiteralNumbers,
-				   defineMacroKindIndex, macroUndefRoleIndex, macroParamKindIndex,
-				   headerKindIndex, headerSystemRoleIndex, headerLocalRoleIndex,
-				   macrodefFieldIndex);
+	cppInitCommon (client, initData);
 }
 
 extern void cppTerminate (void)
@@ -1634,10 +1612,21 @@ process:
 
 static void findCppTags (void)
 {
-	cppInitCommon (Cpp.lang, 0, false, false, false,
-				   KIND_GHOST_INDEX, 0, KIND_GHOST_INDEX,
-				   KIND_GHOST_INDEX, 0, 0,
-				   FIELD_UNKNOWN);
+	struct cppInitData initData = {
+		.state = 0,
+		.hasAtLiteralStrings = false,
+		.hasCxxRawLiteralStrings = false,
+		.hasSingleQuoteLiteralNumbers = false,
+		.defineMacroKindIndex = KIND_GHOST_INDEX,
+		.macroUndefRoleIndex = 0,
+		.macroParamKindIndex = KIND_GHOST_INDEX,
+		.macrodefFieldIndex = FIELD_UNKNOWN,
+		.headerKindIndex = KIND_GHOST_INDEX,
+		.headerSystemRoleIndex = 0,
+		.headerLocalRoleIndex = 0,
+	};
+
+	cppInitCommon (Cpp.lang, &initData);
 
 	findRegexTagsMainloop (cppGetc);
 
