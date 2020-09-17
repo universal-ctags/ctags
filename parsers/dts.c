@@ -50,6 +50,7 @@ static void runCppGetc (void)
 		.headerKindIndex = KIND_GHOST_INDEX,
 		.headerSystemRoleIndex = 0,
 		.headerLocalRoleIndex = 0,
+		.skip__cplusplus_branch = false,
 	};
 	cppInit (&initData);
 

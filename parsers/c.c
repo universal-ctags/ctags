@@ -3508,6 +3508,7 @@ static rescanReason findCTags (const unsigned int passCount)
 		.headerKindIndex = kind_for_header,
 		.headerSystemRoleIndex = role_for_header_system,
 		.headerLocalRoleIndex = role_for_header_local,
+		.skip__cplusplus_branch = !isInputLanguage (Lang_cpp),
 	};
 	cppInit (&initData);
 

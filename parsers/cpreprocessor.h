@@ -91,6 +91,8 @@ struct cppInitData {
 	int headerKindIndex;
 	int headerSystemRoleIndex;
 	int headerLocalRoleIndex;
+
+	bool skip__cplusplus_branch; /* #ifdef __cplusplus ... #endif */
 };
 
 extern void cppInit (const struct cppInitData *initData);

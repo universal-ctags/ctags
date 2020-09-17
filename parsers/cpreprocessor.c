@@ -99,6 +99,8 @@ typedef struct sCppState {
 
 	int macrodefFieldIndex;
 
+	bool skip__cplusplus_branch;
+
 	struct sDirective {
 		enum eState state;       /* current directive being processed */
 		bool	accept;          /* is a directive syntactically permitted? */
@@ -316,6 +318,8 @@ static void cppInitCommon(langType clientLang, const struct cppInitData *initDat
 		Cpp.headerSystemRoleIndex = CPREPRO_HEADER_KIND_SYSTEM_ROLE;
 		Cpp.headerLocalRoleIndex = CPREPRO_HEADER_KIND_LOCAL_ROLE;
 	}
+
+	Cpp.skip__cplusplus_branch = initData->skip__cplusplus_branch;
 
 	Cpp.directive.state     = DRCTV_NONE;
 	Cpp.directive.accept    = true;
@@ -931,10 +935,32 @@ static void directivePragma (int c)
 	Cpp.directive.state = DRCTV_NONE;
 }
 
+static bool isDefCondition (const int c, const char *condition)
+{
+	if (*condition == '\0')
+		return true;
+	else if (c == EOF)
+		return false;
+
+	if (*condition != '\0' && c == condition[0])
+	{
+		const int next = cppGetcFromUngetBufferOrFile ();
+		return isDefCondition (next, condition + 1);
+	}
+
+	return false;
+}
+
 static bool directiveIf (const int c)
 {
 	DebugStatement ( const bool ignore0 = isIgnore (); )
-	const bool ignore = pushConditional ((bool) (c != '0'));
+	bool firstBranchChosen = true;
+
+	if (c == '0'
+		|| (Cpp.skip__cplusplus_branch && isDefCondition (c, "__cplusplus")))
+		firstBranchChosen = false;
+
+	const bool ignore = pushConditional (firstBranchChosen);
 
 	Cpp.directive.state = DRCTV_NONE;
 	DebugStatement ( debugCppNest (true, Cpp.directive.nestLevel);
@@ -1624,6 +1650,7 @@ static void findCppTags (void)
 		.headerKindIndex = KIND_GHOST_INDEX,
 		.headerSystemRoleIndex = 0,
 		.headerLocalRoleIndex = 0,
+		.skip__cplusplus_branch = false,
 	};
 
 	cppInitCommon (Cpp.lang, &initData);
