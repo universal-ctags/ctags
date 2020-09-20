@@ -1,76 +1,76 @@
+ext_func	input.sv	/^extern function ext_func (x, y);$/;"	Q
+x	input.sv	/^extern function ext_func (x, y);$/;"	p	prototype:ext_func
+ext_func.x	input.sv	/^extern function ext_func (x, y);$/;"	p	prototype:ext_func
+y	input.sv	/^extern function ext_func (x, y);$/;"	p	prototype:ext_func
+ext_func.y	input.sv	/^extern function ext_func (x, y);$/;"	p	prototype:ext_func
+ext_static_func	input.sv	/^extern static function ext_static_func (x, y);$/;"	Q
+x	input.sv	/^extern static function ext_static_func (x, y);$/;"	p	prototype:ext_static_func
+ext_static_func.x	input.sv	/^extern static function ext_static_func (x, y);$/;"	p	prototype:ext_static_func
+y	input.sv	/^extern static function ext_static_func (x, y);$/;"	p	prototype:ext_static_func
+ext_static_func.y	input.sv	/^extern static function ext_static_func (x, y);$/;"	p	prototype:ext_static_func
+ext_protected_func	input.sv	/^extern protected function ext_protected_func (x, y);$/;"	Q
+x	input.sv	/^extern protected function ext_protected_func (x, y);$/;"	p	prototype:ext_protected_func
+ext_protected_func.x	input.sv	/^extern protected function ext_protected_func (x, y);$/;"	p	prototype:ext_protected_func
+y	input.sv	/^extern protected function ext_protected_func (x, y);$/;"	p	prototype:ext_protected_func
+ext_protected_func.y	input.sv	/^extern protected function ext_protected_func (x, y);$/;"	p	prototype:ext_protected_func
+ext_local_func	input.sv	/^extern local function ext_local_func (x, y);$/;"	Q
+x	input.sv	/^extern local function ext_local_func (x, y);$/;"	p	prototype:ext_local_func
+ext_local_func.x	input.sv	/^extern local function ext_local_func (x, y);$/;"	p	prototype:ext_local_func
+y	input.sv	/^extern local function ext_local_func (x, y);$/;"	p	prototype:ext_local_func
+ext_local_func.y	input.sv	/^extern local function ext_local_func (x, y);$/;"	p	prototype:ext_local_func
+ext_pure_virt_func	input.sv	/^extern pure virtual function ext_pure_virt_func (x);$/;"	Q
+x	input.sv	/^extern pure virtual function ext_pure_virt_func (x);$/;"	p	prototype:ext_pure_virt_func
+ext_pure_virt_func.x	input.sv	/^extern pure virtual function ext_pure_virt_func (x);$/;"	p	prototype:ext_pure_virt_func
+pure_virt_func	input.sv	/^pure virtual function pure_virt_func (x);$/;"	Q
+x	input.sv	/^pure virtual function pure_virt_func (x);$/;"	p	prototype:pure_virt_func
+pure_virt_func.x	input.sv	/^pure virtual function pure_virt_func (x);$/;"	p	prototype:pure_virt_func
+pure_virt_static_func	input.sv	/^pure virtual static function pure_virt_static_func (x);$/;"	Q
+x	input.sv	/^pure virtual static function pure_virt_static_func (x);$/;"	p	prototype:pure_virt_static_func
+pure_virt_static_func.x	input.sv	/^pure virtual static function pure_virt_static_func (x);$/;"	p	prototype:pure_virt_static_func
+pure_virt_protected_func	input.sv	/^pure virtual protected function pure_virt_protected_func (x);$/;"	Q
+x	input.sv	/^pure virtual protected function pure_virt_protected_func (x);$/;"	p	prototype:pure_virt_protected_func
+pure_virt_protected_func.x	input.sv	/^pure virtual protected function pure_virt_protected_func (x);$/;"	p	prototype:pure_virt_protected_func
+pure_virt_local_func	input.sv	/^pure virtual local function pure_virt_local_func (x);$/;"	Q
+x	input.sv	/^pure virtual local function pure_virt_local_func (x);$/;"	p	prototype:pure_virt_local_func
+pure_virt_local_func.x	input.sv	/^pure virtual local function pure_virt_local_func (x);$/;"	p	prototype:pure_virt_local_func
+ext_task	input.sv	/^extern task ext_task (x, y);$/;"	Q
+x	input.sv	/^extern task ext_task (x, y);$/;"	p	prototype:ext_task
+ext_task.x	input.sv	/^extern task ext_task (x, y);$/;"	p	prototype:ext_task
+y	input.sv	/^extern task ext_task (x, y);$/;"	p	prototype:ext_task
+ext_task.y	input.sv	/^extern task ext_task (x, y);$/;"	p	prototype:ext_task
+ext_static_task	input.sv	/^extern static task ext_static_task (x, y);$/;"	Q
+x	input.sv	/^extern static task ext_static_task (x, y);$/;"	p	prototype:ext_static_task
+ext_static_task.x	input.sv	/^extern static task ext_static_task (x, y);$/;"	p	prototype:ext_static_task
+y	input.sv	/^extern static task ext_static_task (x, y);$/;"	p	prototype:ext_static_task
+ext_static_task.y	input.sv	/^extern static task ext_static_task (x, y);$/;"	p	prototype:ext_static_task
+ext_protected_task	input.sv	/^extern protected task ext_protected_task (x, y);$/;"	Q
+x	input.sv	/^extern protected task ext_protected_task (x, y);$/;"	p	prototype:ext_protected_task
+ext_protected_task.x	input.sv	/^extern protected task ext_protected_task (x, y);$/;"	p	prototype:ext_protected_task
+y	input.sv	/^extern protected task ext_protected_task (x, y);$/;"	p	prototype:ext_protected_task
+ext_protected_task.y	input.sv	/^extern protected task ext_protected_task (x, y);$/;"	p	prototype:ext_protected_task
+ext_local_task	input.sv	/^extern local task ext_local_task (x, y);$/;"	Q
+x	input.sv	/^extern local task ext_local_task (x, y);$/;"	p	prototype:ext_local_task
+ext_local_task.x	input.sv	/^extern local task ext_local_task (x, y);$/;"	p	prototype:ext_local_task
+y	input.sv	/^extern local task ext_local_task (x, y);$/;"	p	prototype:ext_local_task
+ext_local_task.y	input.sv	/^extern local task ext_local_task (x, y);$/;"	p	prototype:ext_local_task
+ext_pure_virt_task	input.sv	/^extern pure virtual task ext_pure_virt_task (x);$/;"	Q
+x	input.sv	/^extern pure virtual task ext_pure_virt_task (x);$/;"	p	prototype:ext_pure_virt_task
+ext_pure_virt_task.x	input.sv	/^extern pure virtual task ext_pure_virt_task (x);$/;"	p	prototype:ext_pure_virt_task
+pure_virt_task	input.sv	/^pure virtual task pure_virt_task (x);$/;"	Q
+x	input.sv	/^pure virtual task pure_virt_task (x);$/;"	p	prototype:pure_virt_task
+pure_virt_task.x	input.sv	/^pure virtual task pure_virt_task (x);$/;"	p	prototype:pure_virt_task
+pure_virt_static_task	input.sv	/^pure virtual static task pure_virt_static_task (x);$/;"	Q
+x	input.sv	/^pure virtual static task pure_virt_static_task (x);$/;"	p	prototype:pure_virt_static_task
+pure_virt_static_task.x	input.sv	/^pure virtual static task pure_virt_static_task (x);$/;"	p	prototype:pure_virt_static_task
+pure_virt_protected_task	input.sv	/^pure virtual protected task pure_virt_protected_task (x);$/;"	Q
+x	input.sv	/^pure virtual protected task pure_virt_protected_task (x);$/;"	p	prototype:pure_virt_protected_task
+pure_virt_protected_task.x	input.sv	/^pure virtual protected task pure_virt_protected_task (x);$/;"	p	prototype:pure_virt_protected_task
+pure_virt_local_task	input.sv	/^pure virtual local task pure_virt_local_task (x);$/;"	Q
+x	input.sv	/^pure virtual local task pure_virt_local_task (x);$/;"	p	prototype:pure_virt_local_task
+pure_virt_local_task.x	input.sv	/^pure virtual local task pure_virt_local_task (x);$/;"	p	prototype:pure_virt_local_task
 auto_function	input.sv	/^function automatic auto_function (x);$/;"	f
+x	input.sv	/^function automatic auto_function (x);$/;"	p	function:auto_function
 auto_function.x	input.sv	/^function automatic auto_function (x);$/;"	p	function:auto_function
 auto_static	input.sv	/^function static auto_static (x);$/;"	f
-auto_static.x	input.sv	/^function static auto_static (x);$/;"	p	function:auto_static
-ext_func	input.sv	/^extern function ext_func (x, y);$/;"	Q
-ext_func.x	input.sv	/^extern function ext_func (x, y);$/;"	p	prototype:ext_func
-ext_func.y	input.sv	/^extern function ext_func (x, y);$/;"	p	prototype:ext_func
-ext_local_func	input.sv	/^extern local function ext_local_func (x, y);$/;"	Q
-ext_local_func.x	input.sv	/^extern local function ext_local_func (x, y);$/;"	p	prototype:ext_local_func
-ext_local_func.y	input.sv	/^extern local function ext_local_func (x, y);$/;"	p	prototype:ext_local_func
-ext_local_task	input.sv	/^extern local task ext_local_task (x, y);$/;"	Q
-ext_local_task.x	input.sv	/^extern local task ext_local_task (x, y);$/;"	p	prototype:ext_local_task
-ext_local_task.y	input.sv	/^extern local task ext_local_task (x, y);$/;"	p	prototype:ext_local_task
-ext_protected_func	input.sv	/^extern protected function ext_protected_func (x, y);$/;"	Q
-ext_protected_func.x	input.sv	/^extern protected function ext_protected_func (x, y);$/;"	p	prototype:ext_protected_func
-ext_protected_func.y	input.sv	/^extern protected function ext_protected_func (x, y);$/;"	p	prototype:ext_protected_func
-ext_protected_task	input.sv	/^extern protected task ext_protected_task (x, y);$/;"	Q
-ext_protected_task.x	input.sv	/^extern protected task ext_protected_task (x, y);$/;"	p	prototype:ext_protected_task
-ext_protected_task.y	input.sv	/^extern protected task ext_protected_task (x, y);$/;"	p	prototype:ext_protected_task
-ext_pure_virt_func	input.sv	/^extern pure virtual function ext_pure_virt_func (x);$/;"	Q
-ext_pure_virt_func.x	input.sv	/^extern pure virtual function ext_pure_virt_func (x);$/;"	p	prototype:ext_pure_virt_func
-ext_pure_virt_task	input.sv	/^extern pure virtual task ext_pure_virt_task (x);$/;"	Q
-ext_pure_virt_task.x	input.sv	/^extern pure virtual task ext_pure_virt_task (x);$/;"	p	prototype:ext_pure_virt_task
-ext_static_func	input.sv	/^extern static function ext_static_func (x, y);$/;"	Q
-ext_static_func.x	input.sv	/^extern static function ext_static_func (x, y);$/;"	p	prototype:ext_static_func
-ext_static_func.y	input.sv	/^extern static function ext_static_func (x, y);$/;"	p	prototype:ext_static_func
-ext_static_task	input.sv	/^extern static task ext_static_task (x, y);$/;"	Q
-ext_static_task.x	input.sv	/^extern static task ext_static_task (x, y);$/;"	p	prototype:ext_static_task
-ext_static_task.y	input.sv	/^extern static task ext_static_task (x, y);$/;"	p	prototype:ext_static_task
-ext_task	input.sv	/^extern task ext_task (x, y);$/;"	Q
-ext_task.x	input.sv	/^extern task ext_task (x, y);$/;"	p	prototype:ext_task
-ext_task.y	input.sv	/^extern task ext_task (x, y);$/;"	p	prototype:ext_task
-pure_virt_func	input.sv	/^pure virtual function pure_virt_func (x);$/;"	Q
-pure_virt_func.x	input.sv	/^pure virtual function pure_virt_func (x);$/;"	p	prototype:pure_virt_func
-pure_virt_local_func	input.sv	/^pure virtual local function pure_virt_local_func (x);$/;"	Q
-pure_virt_local_func.x	input.sv	/^pure virtual local function pure_virt_local_func (x);$/;"	p	prototype:pure_virt_local_func
-pure_virt_local_task	input.sv	/^pure virtual local task pure_virt_local_task (x);$/;"	Q
-pure_virt_local_task.x	input.sv	/^pure virtual local task pure_virt_local_task (x);$/;"	p	prototype:pure_virt_local_task
-pure_virt_protected_func	input.sv	/^pure virtual protected function pure_virt_protected_func (x);$/;"	Q
-pure_virt_protected_func.x	input.sv	/^pure virtual protected function pure_virt_protected_func (x);$/;"	p	prototype:pure_virt_protected_func
-pure_virt_protected_task	input.sv	/^pure virtual protected task pure_virt_protected_task (x);$/;"	Q
-pure_virt_protected_task.x	input.sv	/^pure virtual protected task pure_virt_protected_task (x);$/;"	p	prototype:pure_virt_protected_task
-pure_virt_static_func	input.sv	/^pure virtual static function pure_virt_static_func (x);$/;"	Q
-pure_virt_static_func.x	input.sv	/^pure virtual static function pure_virt_static_func (x);$/;"	p	prototype:pure_virt_static_func
-pure_virt_static_task	input.sv	/^pure virtual static task pure_virt_static_task (x);$/;"	Q
-pure_virt_static_task.x	input.sv	/^pure virtual static task pure_virt_static_task (x);$/;"	p	prototype:pure_virt_static_task
-pure_virt_task	input.sv	/^pure virtual task pure_virt_task (x);$/;"	Q
-pure_virt_task.x	input.sv	/^pure virtual task pure_virt_task (x);$/;"	p	prototype:pure_virt_task
-x	input.sv	/^extern function ext_func (x, y);$/;"	p	prototype:ext_func
-x	input.sv	/^extern local function ext_local_func (x, y);$/;"	p	prototype:ext_local_func
-x	input.sv	/^extern local task ext_local_task (x, y);$/;"	p	prototype:ext_local_task
-x	input.sv	/^extern protected function ext_protected_func (x, y);$/;"	p	prototype:ext_protected_func
-x	input.sv	/^extern protected task ext_protected_task (x, y);$/;"	p	prototype:ext_protected_task
-x	input.sv	/^extern pure virtual function ext_pure_virt_func (x);$/;"	p	prototype:ext_pure_virt_func
-x	input.sv	/^extern pure virtual task ext_pure_virt_task (x);$/;"	p	prototype:ext_pure_virt_task
-x	input.sv	/^extern static function ext_static_func (x, y);$/;"	p	prototype:ext_static_func
-x	input.sv	/^extern static task ext_static_task (x, y);$/;"	p	prototype:ext_static_task
-x	input.sv	/^extern task ext_task (x, y);$/;"	p	prototype:ext_task
-x	input.sv	/^function automatic auto_function (x);$/;"	p	function:auto_function
 x	input.sv	/^function static auto_static (x);$/;"	p	function:auto_static
-x	input.sv	/^pure virtual function pure_virt_func (x);$/;"	p	prototype:pure_virt_func
-x	input.sv	/^pure virtual local function pure_virt_local_func (x);$/;"	p	prototype:pure_virt_local_func
-x	input.sv	/^pure virtual local task pure_virt_local_task (x);$/;"	p	prototype:pure_virt_local_task
-x	input.sv	/^pure virtual protected function pure_virt_protected_func (x);$/;"	p	prototype:pure_virt_protected_func
-x	input.sv	/^pure virtual protected task pure_virt_protected_task (x);$/;"	p	prototype:pure_virt_protected_task
-x	input.sv	/^pure virtual static function pure_virt_static_func (x);$/;"	p	prototype:pure_virt_static_func
-x	input.sv	/^pure virtual static task pure_virt_static_task (x);$/;"	p	prototype:pure_virt_static_task
-x	input.sv	/^pure virtual task pure_virt_task (x);$/;"	p	prototype:pure_virt_task
-y	input.sv	/^extern function ext_func (x, y);$/;"	p	prototype:ext_func
-y	input.sv	/^extern local function ext_local_func (x, y);$/;"	p	prototype:ext_local_func
-y	input.sv	/^extern local task ext_local_task (x, y);$/;"	p	prototype:ext_local_task
-y	input.sv	/^extern protected function ext_protected_func (x, y);$/;"	p	prototype:ext_protected_func
-y	input.sv	/^extern protected task ext_protected_task (x, y);$/;"	p	prototype:ext_protected_task
-y	input.sv	/^extern static function ext_static_func (x, y);$/;"	p	prototype:ext_static_func
-y	input.sv	/^extern static task ext_static_task (x, y);$/;"	p	prototype:ext_static_task
-y	input.sv	/^extern task ext_task (x, y);$/;"	p	prototype:ext_task
+auto_static.x	input.sv	/^function static auto_static (x);$/;"	p	function:auto_static

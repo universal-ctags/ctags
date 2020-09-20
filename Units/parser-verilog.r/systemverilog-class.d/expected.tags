@@ -1,109 +1,109 @@
-BASE	input.sv	/^  type BASE=supertest #(test)$/;"	c	class:paramtest2
-BASE	input.sv	/^class paramtest #(type BASE=supertest #(test)) extends BASE;$/;"	c	class:paramtest
-BASE	input.sv	/^class paramtest3 #(type BASE=supertest, type BASE2=paramtest);$/;"	c	class:paramtest3
-BASE2	input.sv	/^class paramtest3 #(type BASE=supertest, type BASE2=paramtest);$/;"	c	class:paramtest3
 DEFINE	input.sv	/^`define DEFINE$/;"	c
-DEF_VALUE	input.sv	/^`define DEF_VALUE   1'd100$/;"	c
 DEF_WITH_EQ	input.sv	/^`define DEF_WITH_EQ = 1'd100$/;"	c
-a	input.sv	/^    extern virtual function void extern_func (input bit a, input b);$/;"	p	prototype:test.extern_func
-a	input.sv	/^    function mult (a, input b = 0);$/;"	p	function:supertest.mult
-a	input.sv	/^    function mult (a, input b = 0);$/;"	p	function:test.mult
+DEF_VALUE	input.sv	/^`define DEF_VALUE   1'd100$/;"	c
+test	input.sv	/^class test;$/;"	C
 a	input.sv	/^    reg a;$/;"	r	class:test
-a	input.sv	/^virtual function myfunc (a, b);$/;"	p	function:paramtest3.myfunc
-b	input.sv	/^    extern virtual function void extern_func (input bit a, input b);$/;"	p	prototype:test.extern_func
-b	input.sv	/^    function mult (a, input b = 0);$/;"	p	function:supertest.mult
-b	input.sv	/^    function mult (a, input b = 0);$/;"	p	function:test.mult
+test.a	input.sv	/^    reg a;$/;"	r	class:test
 b	input.sv	/^    logic b;$/;"	r	class:test
-b	input.sv	/^virtual function myfunc (a, b);$/;"	p	function:paramtest3.myfunc
-c	input.sv	/^    logic c;$/;"	r	class:supertest
-c	input.sv	/^extern virtual function test ext_func (c, d);$/;"	p	prototype:paramtest3.ext_func
-c	input.sv	/^function test paramtest3::ext_func (c, d);$/;"	p	function:paramtest3.ext_func
-const_local_logic	input.sv	/^  const local logic     const_local_logic;$/;"	r	class:test_attributes
-const_logic	input.sv	/^  const logic           const_logic;$/;"	r	class:test_attributes
-const_protected_logic	input.sv	/^  const protected logic const_protected_logic;$/;"	r	class:test_attributes
-const_static_logic	input.sv	/^  const static logic    const_static_logic;$/;"	r	class:test_attributes
-d	input.sv	/^extern virtual function test ext_func (c, d);$/;"	p	prototype:paramtest3.ext_func
-d	input.sv	/^function test paramtest3::ext_func (c, d);$/;"	p	function:paramtest3.ext_func
-enum_bit1	input.sv	/^      enum_bit1,$/;"	c	enum:test.enum_complex
-enum_bit2	input.sv	/^      enum_bit2='x,$/;"	c	enum:test.enum_complex
-enum_bit3	input.sv	/^      enum_bit3=2'b01,$/;"	c	enum:test.enum_complex
-enum_bit4	input.sv	/^      enum_bit4[0:10]=2'b10,$/;"	c	enum:test.enum_complex
-enum_bit5	input.sv	/^      enum_bit5 [9:0] = 2'b10 ,$/;"	c	enum:test.enum_complex
-enum_complex	input.sv	/^    } enum_complex;$/;"	E	class:test
-enum_const1	input.sv	/^    enum {enum_const1, enum_const2} enum_var1, enum_var2;$/;"	c	enum:test.enum_var1
-enum_const1	input.sv	/^    enum {enum_const1, enum_const2} enum_var1, enum_var2;$/;"	c	enum:test.enum_var2
-enum_const2	input.sv	/^    enum {enum_const1, enum_const2} enum_var1, enum_var2;$/;"	c	enum:test.enum_var1
-enum_const2	input.sv	/^    enum {enum_const1, enum_const2} enum_var1, enum_var2;$/;"	c	enum:test.enum_var2
+test.b	input.sv	/^    logic b;$/;"	r	class:test
 enum_simple	input.sv	/^    enum {enum_simple1, enum_simple2} enum_simple;$/;"	E	class:test
-enum_simple1	input.sv	/^    enum {enum_simple1, enum_simple2} enum_simple;$/;"	c	enum:test.enum_simple
+test.enum_simple	input.sv	/^    enum {enum_simple1, enum_simple2} enum_simple;$/;"	E	class:test
 enum_simple2	input.sv	/^    enum {enum_simple1, enum_simple2} enum_simple;$/;"	c	enum:test.enum_simple
+test.enum_simple.enum_simple2	input.sv	/^    enum {enum_simple1, enum_simple2} enum_simple;$/;"	c	enum:test.enum_simple
+enum_simple1	input.sv	/^    enum {enum_simple1, enum_simple2} enum_simple;$/;"	c	enum:test.enum_simple
+test.enum_simple.enum_simple1	input.sv	/^    enum {enum_simple1, enum_simple2} enum_simple;$/;"	c	enum:test.enum_simple
 enum_var1	input.sv	/^    enum {enum_const1, enum_const2} enum_var1, enum_var2;$/;"	E	class:test
+test.enum_var1	input.sv	/^    enum {enum_const1, enum_const2} enum_var1, enum_var2;$/;"	E	class:test
+enum_const2	input.sv	/^    enum {enum_const1, enum_const2} enum_var1, enum_var2;$/;"	c	enum:test.enum_var1
+test.enum_var1.enum_const2	input.sv	/^    enum {enum_const1, enum_const2} enum_var1, enum_var2;$/;"	c	enum:test.enum_var1
+enum_const1	input.sv	/^    enum {enum_const1, enum_const2} enum_var1, enum_var2;$/;"	c	enum:test.enum_var1
+test.enum_var1.enum_const1	input.sv	/^    enum {enum_const1, enum_const2} enum_var1, enum_var2;$/;"	c	enum:test.enum_var1
 enum_var2	input.sv	/^    enum {enum_const1, enum_const2} enum_var1, enum_var2;$/;"	E	class:test
-ext_func	input.sv	/^extern virtual function test ext_func (c, d);$/;"	Q	class:paramtest3
-ext_func	input.sv	/^function test paramtest3::ext_func (c, d);$/;"	f	class:paramtest3
-extern_func	input.sv	/^    extern virtual function void extern_func (input bit a, input b);$/;"	Q	class:test
-fwrd_ref	input.sv	/^    extern virtual function bit fwrd_ref;$/;"	Q	class:supertest
-local_logic	input.sv	/^  local logic           local_logic;$/;"	r	class:test_attributes
-mult	input.sv	/^    function mult (a, input b = 0);$/;"	f	class:supertest
+test.enum_var2	input.sv	/^    enum {enum_const1, enum_const2} enum_var1, enum_var2;$/;"	E	class:test
+enum_const2	input.sv	/^    enum {enum_const1, enum_const2} enum_var1, enum_var2;$/;"	c	enum:test.enum_var2
+test.enum_var2.enum_const2	input.sv	/^    enum {enum_const1, enum_const2} enum_var1, enum_var2;$/;"	c	enum:test.enum_var2
+enum_const1	input.sv	/^    enum {enum_const1, enum_const2} enum_var1, enum_var2;$/;"	c	enum:test.enum_var2
+test.enum_var2.enum_const1	input.sv	/^    enum {enum_const1, enum_const2} enum_var1, enum_var2;$/;"	c	enum:test.enum_var2
+enum_complex	input.sv	/^    } enum_complex;$/;"	E	class:test
+test.enum_complex	input.sv	/^    } enum_complex;$/;"	E	class:test
+enum_bit5	input.sv	/^      enum_bit5 [9:0] = 2'b10 ,$/;"	c	enum:test.enum_complex
+test.enum_complex.enum_bit5	input.sv	/^      enum_bit5 [9:0] = 2'b10 ,$/;"	c	enum:test.enum_complex
+enum_bit4	input.sv	/^      enum_bit4[0:10]=2'b10,$/;"	c	enum:test.enum_complex
+test.enum_complex.enum_bit4	input.sv	/^      enum_bit4[0:10]=2'b10,$/;"	c	enum:test.enum_complex
+enum_bit3	input.sv	/^      enum_bit3=2'b01,$/;"	c	enum:test.enum_complex
+test.enum_complex.enum_bit3	input.sv	/^      enum_bit3=2'b01,$/;"	c	enum:test.enum_complex
+enum_bit2	input.sv	/^      enum_bit2='x,$/;"	c	enum:test.enum_complex
+test.enum_complex.enum_bit2	input.sv	/^      enum_bit2='x,$/;"	c	enum:test.enum_complex
+enum_bit1	input.sv	/^      enum_bit1,$/;"	c	enum:test.enum_complex
+test.enum_complex.enum_bit1	input.sv	/^      enum_bit1,$/;"	c	enum:test.enum_complex
 mult	input.sv	/^    function mult (a, input b = 0);$/;"	f	class:test
-myfunc	input.sv	/^virtual function myfunc (a, b);$/;"	f	class:paramtest3
+test.mult	input.sv	/^    function mult (a, input b = 0);$/;"	f	class:test
+a	input.sv	/^    function mult (a, input b = 0);$/;"	p	function:test.mult
+test.mult.a	input.sv	/^    function mult (a, input b = 0);$/;"	p	function:test.mult
+b	input.sv	/^    function mult (a, input b = 0);$/;"	p	function:test.mult
+test.mult.b	input.sv	/^    function mult (a, input b = 0);$/;"	p	function:test.mult
+extern_func	input.sv	/^    extern virtual function void extern_func (input bit a, input b);$/;"	Q	class:test
+test.extern_func	input.sv	/^    extern virtual function void extern_func (input bit a, input b);$/;"	Q	class:test
+a	input.sv	/^    extern virtual function void extern_func (input bit a, input b);$/;"	p	prototype:test.extern_func
+test.extern_func.a	input.sv	/^    extern virtual function void extern_func (input bit a, input b);$/;"	p	prototype:test.extern_func
+b	input.sv	/^    extern virtual function void extern_func (input bit a, input b);$/;"	p	prototype:test.extern_func
+test.extern_func.b	input.sv	/^    extern virtual function void extern_func (input bit a, input b);$/;"	p	prototype:test.extern_func
+supertest	input.sv	/^class supertest extends test;$/;"	C	inherits:test
+c	input.sv	/^    logic c;$/;"	r	class:supertest
+supertest.c	input.sv	/^    logic c;$/;"	r	class:supertest
+fwrd_ref	input.sv	/^    extern virtual function bit fwrd_ref;$/;"	Q	class:supertest
+supertest.fwrd_ref	input.sv	/^    extern virtual function bit fwrd_ref;$/;"	Q	class:supertest
+mult	input.sv	/^    function mult (a, input b = 0);$/;"	f	class:supertest
+supertest.mult	input.sv	/^    function mult (a, input b = 0);$/;"	f	class:supertest
+a	input.sv	/^    function mult (a, input b = 0);$/;"	p	function:supertest.mult
+supertest.mult.a	input.sv	/^    function mult (a, input b = 0);$/;"	p	function:supertest.mult
+b	input.sv	/^    function mult (a, input b = 0);$/;"	p	function:supertest.mult
+supertest.mult.b	input.sv	/^    function mult (a, input b = 0);$/;"	p	function:supertest.mult
 paramtest	input.sv	/^class paramtest #(type BASE=supertest #(test)) extends BASE;$/;"	C
+BASE	input.sv	/^class paramtest #(type BASE=supertest #(test)) extends BASE;$/;"	c	class:paramtest
 paramtest.BASE	input.sv	/^class paramtest #(type BASE=supertest #(test)) extends BASE;$/;"	c	class:paramtest
 paramtest2	input.sv	/^class paramtest2 #($/;"	C
+BASE	input.sv	/^  type BASE=supertest #(test)$/;"	c	class:paramtest2
 paramtest2.BASE	input.sv	/^  type BASE=supertest #(test)$/;"	c	class:paramtest2
 paramtest3	input.sv	/^class paramtest3 #(type BASE=supertest, type BASE2=paramtest);$/;"	C
-paramtest3.BASE	input.sv	/^class paramtest3 #(type BASE=supertest, type BASE2=paramtest);$/;"	c	class:paramtest3
+BASE2	input.sv	/^class paramtest3 #(type BASE=supertest, type BASE2=paramtest);$/;"	c	class:paramtest3
 paramtest3.BASE2	input.sv	/^class paramtest3 #(type BASE=supertest, type BASE2=paramtest);$/;"	c	class:paramtest3
-paramtest3.ext_func	input.sv	/^extern virtual function test ext_func (c, d);$/;"	Q	class:paramtest3
-paramtest3.ext_func	input.sv	/^function test paramtest3::ext_func (c, d);$/;"	f	class:paramtest3
-paramtest3.ext_func.c	input.sv	/^extern virtual function test ext_func (c, d);$/;"	p	prototype:paramtest3.ext_func
-paramtest3.ext_func.c	input.sv	/^function test paramtest3::ext_func (c, d);$/;"	p	function:paramtest3.ext_func
-paramtest3.ext_func.d	input.sv	/^extern virtual function test ext_func (c, d);$/;"	p	prototype:paramtest3.ext_func
-paramtest3.ext_func.d	input.sv	/^function test paramtest3::ext_func (c, d);$/;"	p	function:paramtest3.ext_func
+BASE	input.sv	/^class paramtest3 #(type BASE=supertest, type BASE2=paramtest);$/;"	c	class:paramtest3
+paramtest3.BASE	input.sv	/^class paramtest3 #(type BASE=supertest, type BASE2=paramtest);$/;"	c	class:paramtest3
+myfunc	input.sv	/^virtual function myfunc (a, b);$/;"	f	class:paramtest3
 paramtest3.myfunc	input.sv	/^virtual function myfunc (a, b);$/;"	f	class:paramtest3
+a	input.sv	/^virtual function myfunc (a, b);$/;"	p	function:paramtest3.myfunc
 paramtest3.myfunc.a	input.sv	/^virtual function myfunc (a, b);$/;"	p	function:paramtest3.myfunc
+b	input.sv	/^virtual function myfunc (a, b);$/;"	p	function:paramtest3.myfunc
 paramtest3.myfunc.b	input.sv	/^virtual function myfunc (a, b);$/;"	p	function:paramtest3.myfunc
-protected_logic	input.sv	/^  protected logic       protected_logic;$/;"	r	class:test_attributes
-rand_logic	input.sv	/^  rand logic            rand_logic;$/;"	r	class:test_attributes
-randc_logic	input.sv	/^  randc logic           randc_logic;$/;"	r	class:test_attributes
-static_logic	input.sv	/^  static logic          static_logic;$/;"	r	class:test_attributes
-supertest	input.sv	/^class supertest extends test;$/;"	C	inherits:test
-supertest.c	input.sv	/^    logic c;$/;"	r	class:supertest
-supertest.fwrd_ref	input.sv	/^    extern virtual function bit fwrd_ref;$/;"	Q	class:supertest
-supertest.mult	input.sv	/^    function mult (a, input b = 0);$/;"	f	class:supertest
-supertest.mult.a	input.sv	/^    function mult (a, input b = 0);$/;"	p	function:supertest.mult
-supertest.mult.b	input.sv	/^    function mult (a, input b = 0);$/;"	p	function:supertest.mult
-test	input.sv	/^class test;$/;"	C
-test.a	input.sv	/^    reg a;$/;"	r	class:test
-test.b	input.sv	/^    logic b;$/;"	r	class:test
-test.enum_complex	input.sv	/^    } enum_complex;$/;"	E	class:test
-test.enum_complex.enum_bit1	input.sv	/^      enum_bit1,$/;"	c	enum:test.enum_complex
-test.enum_complex.enum_bit2	input.sv	/^      enum_bit2='x,$/;"	c	enum:test.enum_complex
-test.enum_complex.enum_bit3	input.sv	/^      enum_bit3=2'b01,$/;"	c	enum:test.enum_complex
-test.enum_complex.enum_bit4	input.sv	/^      enum_bit4[0:10]=2'b10,$/;"	c	enum:test.enum_complex
-test.enum_complex.enum_bit5	input.sv	/^      enum_bit5 [9:0] = 2'b10 ,$/;"	c	enum:test.enum_complex
-test.enum_simple	input.sv	/^    enum {enum_simple1, enum_simple2} enum_simple;$/;"	E	class:test
-test.enum_simple.enum_simple1	input.sv	/^    enum {enum_simple1, enum_simple2} enum_simple;$/;"	c	enum:test.enum_simple
-test.enum_simple.enum_simple2	input.sv	/^    enum {enum_simple1, enum_simple2} enum_simple;$/;"	c	enum:test.enum_simple
-test.enum_var1	input.sv	/^    enum {enum_const1, enum_const2} enum_var1, enum_var2;$/;"	E	class:test
-test.enum_var1.enum_const1	input.sv	/^    enum {enum_const1, enum_const2} enum_var1, enum_var2;$/;"	c	enum:test.enum_var1
-test.enum_var1.enum_const2	input.sv	/^    enum {enum_const1, enum_const2} enum_var1, enum_var2;$/;"	c	enum:test.enum_var1
-test.enum_var2	input.sv	/^    enum {enum_const1, enum_const2} enum_var1, enum_var2;$/;"	E	class:test
-test.enum_var2.enum_const1	input.sv	/^    enum {enum_const1, enum_const2} enum_var1, enum_var2;$/;"	c	enum:test.enum_var2
-test.enum_var2.enum_const2	input.sv	/^    enum {enum_const1, enum_const2} enum_var1, enum_var2;$/;"	c	enum:test.enum_var2
-test.extern_func	input.sv	/^    extern virtual function void extern_func (input bit a, input b);$/;"	Q	class:test
-test.extern_func.a	input.sv	/^    extern virtual function void extern_func (input bit a, input b);$/;"	p	prototype:test.extern_func
-test.extern_func.b	input.sv	/^    extern virtual function void extern_func (input bit a, input b);$/;"	p	prototype:test.extern_func
-test.mult	input.sv	/^    function mult (a, input b = 0);$/;"	f	class:test
-test.mult.a	input.sv	/^    function mult (a, input b = 0);$/;"	p	function:test.mult
-test.mult.b	input.sv	/^    function mult (a, input b = 0);$/;"	p	function:test.mult
+ext_func	input.sv	/^extern virtual function test ext_func (c, d);$/;"	Q	class:paramtest3
+paramtest3.ext_func	input.sv	/^extern virtual function test ext_func (c, d);$/;"	Q	class:paramtest3
+c	input.sv	/^extern virtual function test ext_func (c, d);$/;"	p	prototype:paramtest3.ext_func
+paramtest3.ext_func.c	input.sv	/^extern virtual function test ext_func (c, d);$/;"	p	prototype:paramtest3.ext_func
+d	input.sv	/^extern virtual function test ext_func (c, d);$/;"	p	prototype:paramtest3.ext_func
+paramtest3.ext_func.d	input.sv	/^extern virtual function test ext_func (c, d);$/;"	p	prototype:paramtest3.ext_func
+ext_func	input.sv	/^function test paramtest3::ext_func (c, d);$/;"	f	class:paramtest3
+paramtest3.ext_func	input.sv	/^function test paramtest3::ext_func (c, d);$/;"	f	class:paramtest3
+c	input.sv	/^function test paramtest3::ext_func (c, d);$/;"	p	function:paramtest3.ext_func
+paramtest3.ext_func.c	input.sv	/^function test paramtest3::ext_func (c, d);$/;"	p	function:paramtest3.ext_func
+d	input.sv	/^function test paramtest3::ext_func (c, d);$/;"	p	function:paramtest3.ext_func
+paramtest3.ext_func.d	input.sv	/^function test paramtest3::ext_func (c, d);$/;"	p	function:paramtest3.ext_func
 test_attributes	input.sv	/^class test_attributes;$/;"	C
-test_attributes.const_local_logic	input.sv	/^  const local logic     const_local_logic;$/;"	r	class:test_attributes
-test_attributes.const_logic	input.sv	/^  const logic           const_logic;$/;"	r	class:test_attributes
-test_attributes.const_protected_logic	input.sv	/^  const protected logic const_protected_logic;$/;"	r	class:test_attributes
-test_attributes.const_static_logic	input.sv	/^  const static logic    const_static_logic;$/;"	r	class:test_attributes
-test_attributes.local_logic	input.sv	/^  local logic           local_logic;$/;"	r	class:test_attributes
-test_attributes.protected_logic	input.sv	/^  protected logic       protected_logic;$/;"	r	class:test_attributes
-test_attributes.rand_logic	input.sv	/^  rand logic            rand_logic;$/;"	r	class:test_attributes
-test_attributes.randc_logic	input.sv	/^  randc logic           randc_logic;$/;"	r	class:test_attributes
+static_logic	input.sv	/^  static logic          static_logic;$/;"	r	class:test_attributes
 test_attributes.static_logic	input.sv	/^  static logic          static_logic;$/;"	r	class:test_attributes
+protected_logic	input.sv	/^  protected logic       protected_logic;$/;"	r	class:test_attributes
+test_attributes.protected_logic	input.sv	/^  protected logic       protected_logic;$/;"	r	class:test_attributes
+local_logic	input.sv	/^  local logic           local_logic;$/;"	r	class:test_attributes
+test_attributes.local_logic	input.sv	/^  local logic           local_logic;$/;"	r	class:test_attributes
+const_static_logic	input.sv	/^  const static logic    const_static_logic;$/;"	r	class:test_attributes
+test_attributes.const_static_logic	input.sv	/^  const static logic    const_static_logic;$/;"	r	class:test_attributes
+const_protected_logic	input.sv	/^  const protected logic const_protected_logic;$/;"	r	class:test_attributes
+test_attributes.const_protected_logic	input.sv	/^  const protected logic const_protected_logic;$/;"	r	class:test_attributes
+const_local_logic	input.sv	/^  const local logic     const_local_logic;$/;"	r	class:test_attributes
+test_attributes.const_local_logic	input.sv	/^  const local logic     const_local_logic;$/;"	r	class:test_attributes
+rand_logic	input.sv	/^  rand logic            rand_logic;$/;"	r	class:test_attributes
+test_attributes.rand_logic	input.sv	/^  rand logic            rand_logic;$/;"	r	class:test_attributes
+randc_logic	input.sv	/^  randc logic           randc_logic;$/;"	r	class:test_attributes
+test_attributes.randc_logic	input.sv	/^  randc logic           randc_logic;$/;"	r	class:test_attributes
+const_logic	input.sv	/^  const logic           const_logic;$/;"	r	class:test_attributes
+test_attributes.const_logic	input.sv	/^  const logic           const_logic;$/;"	r	class:test_attributes
