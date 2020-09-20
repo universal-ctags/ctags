@@ -1,4 +1,4 @@
-N_83	input.v	/^          N_83;     \/\/ then N_83 will be missing in tags.$/;"	n
-N_83	input.v	/^     wire N_84, N_83;     \/\/ is ok.$/;"	n
 N_84	input.v	/^     wire N_84, N_83;     \/\/ is ok.$/;"	n
+N_83	input.v	/^     wire N_84, N_83;     \/\/ is ok.$/;"	n
 N_84	input.v	/^     wire N_84,$/;"	n
+N_83	input.v	/^          N_83;     \/\/ then N_83 will be missing in tags.$/;"	n

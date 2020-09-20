@@ -1,17 +1,17 @@
-Init	input.v	/^initial begin: Init$/;"	b	module:traffic
-amber	input.v	/^reg clock, red, amber, green;$/;"	r	module:traffic
-amber_tics	input.v	/^          amber_tics = 3, green_tics = 20;$/;"	c	module:traffic
-clock	input.v	/^reg clock, red, amber, green;$/;"	r	module:traffic
-clock_wave	input.v	/^always begin: clock_wave$/;"	b	module:traffic
-color	input.v	/^   output color;$/;"	p	task:traffic.light
-green	input.v	/^reg clock, red, amber, green;$/;"	r	module:traffic
-green_tics	input.v	/^          amber_tics = 3, green_tics = 20;$/;"	c	module:traffic
-light	input.v	/^task light;$/;"	t	module:traffic
-main_process	input.v	/^always begin: main_process$/;"	b	module:traffic
-off	input.v	/^parameter on = 1, off = 0, red_tics = 35, $/;"	c	module:traffic
-on	input.v	/^parameter on = 1, off = 0, red_tics = 35, $/;"	c	module:traffic
-red	input.v	/^reg clock, red, amber, green;$/;"	r	module:traffic
-red_tics	input.v	/^parameter on = 1, off = 0, red_tics = 35, $/;"	c	module:traffic
-stop_at	input.v	/^initial begin: stop_at$/;"	b	module:traffic
-tics	input.v	/^   input [31:0] tics;$/;"	p	task:traffic.light
 traffic	input.v	/^module traffic;$/;"	m
+on	input.v	/^parameter on = 1, off = 0, red_tics = 35, $/;"	c	module:traffic
+off	input.v	/^parameter on = 1, off = 0, red_tics = 35, $/;"	c	module:traffic
+red_tics	input.v	/^parameter on = 1, off = 0, red_tics = 35, $/;"	c	module:traffic
+amber_tics	input.v	/^          amber_tics = 3, green_tics = 20;$/;"	c	module:traffic
+green_tics	input.v	/^          amber_tics = 3, green_tics = 20;$/;"	c	module:traffic
+clock	input.v	/^reg clock, red, amber, green;$/;"	r	module:traffic
+red	input.v	/^reg clock, red, amber, green;$/;"	r	module:traffic
+amber	input.v	/^reg clock, red, amber, green;$/;"	r	module:traffic
+green	input.v	/^reg clock, red, amber, green;$/;"	r	module:traffic
+stop_at	input.v	/^initial begin: stop_at$/;"	b	module:traffic
+Init	input.v	/^initial begin: Init$/;"	b	module:traffic
+light	input.v	/^task light;$/;"	t	module:traffic
+color	input.v	/^   output color;$/;"	p	task:traffic.light
+tics	input.v	/^   input [31:0] tics;$/;"	p	task:traffic.light
+clock_wave	input.v	/^always begin: clock_wave$/;"	b	module:traffic
+main_process	input.v	/^always begin: main_process$/;"	b	module:traffic

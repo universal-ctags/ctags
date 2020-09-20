@@ -1,3 +1,4 @@
 --extras=+q
 --kinds-systemverilog=+Q
 --fields=+i
+--sort=no

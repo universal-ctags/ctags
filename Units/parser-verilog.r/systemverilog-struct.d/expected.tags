@@ -1,6 +1,6 @@
 IR	input.sv	/^  struct { bit [7:0] opcode; }IR; \/\/ not defined => IR:struct$/;"	S
 pack1	input.sv	/^  struct packed signed { int a; } pack1; \/\/ packed:struct => pack1:struct$/;"	S
 pack2	input.sv	/^  struct packed unsigned { int a;} pack2; \/\/ packed:struct => pack2:struct$/;"	S
+union1	input.sv	/^  union packed unsigned { logic [7:0] a; } union1; \/\/packed:struct => union1:struct$/;"	S
 pack3	input.sv	/^  struct packed signed { int a; } [3:0] pack3, pack4;$/;"	S
 pack4	input.sv	/^  struct packed signed { int a; } [3:0] pack3, pack4;$/;"	S
-union1	input.sv	/^  union packed unsigned { logic [7:0] a; } union1; \/\/packed:struct => union1:struct$/;"	S
