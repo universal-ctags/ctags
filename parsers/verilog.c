@@ -46,9 +46,13 @@
  * If you will separate the definitions for the parsers, you must revise the
  * code related to the symbol table. */
 typedef enum {
-	K_IGNORE = -2,
-	K_UNDEFINED,
-	K_CONSTANT,
+	/* parser private items */
+	K_IGNORE = -16,
+	K_DEFINE,
+
+	K_UNDEFINED = KEYWORD_NONE,
+	/* the followings items are also used as indices for VerilogKinds[] and SystemVerilogKinds[] */
+	K_CONSTANT= 0,
 	K_EVENT,
 	K_FUNCTION,
 	K_MODULE,
@@ -138,7 +142,7 @@ static const keywordAssoc KeywordTable [] = {
 	/*                            SystemVerilog */
 	/*                            |  Verilog    */
 	/* keyword     keyword ID     |  |          */
-	{ "`define",   K_CONSTANT,  { 1, 1 } },
+	{ "`define",   K_DEFINE,    { 1, 1 } },
 	{ "event",     K_EVENT,     { 1, 1 } },
 	{ "function",  K_FUNCTION,  { 1, 1 } },
 	{ "inout",     K_PORT,      { 1, 1 } },
@@ -1180,6 +1184,20 @@ static void processClass (tokenInfo *const token)
 	}
 }
 
+static void processDefine (tokenInfo *const token)
+{
+	/* Bug #961001: Verilog compiler directives are line-based. */
+	int c = skipWhite (vGetc ());
+	readIdentifier (token, c);
+	token->kind = K_CONSTANT;
+	createTag (token);
+	/* Skip the rest of the line. */
+	do {
+		c = vGetc();
+	} while (c != EOF && c != '\n');
+	vUngetc (c);
+}
+
 static bool doesNameForKindExist (int corkIndex, tagEntryInfo *entry, void *data)
 {
 	verilogKind *kind = data;
@@ -1301,17 +1319,9 @@ static void findTag (tokenInfo *const token)
 		dropEndContext (token);
 	}
 
-	if (token->kind == K_CONSTANT && vStringItem (token->name, 0) == '`')
+	if (token->kind == K_DEFINE)
 	{
-		/* Bug #961001: Verilog compiler directives are line-based. */
-		int c = skipWhite (vGetc ());
-		readIdentifier (token, c);
-		createTag (token);
-		/* Skip the rest of the line. */
-		do {
-			c = vGetc();
-		} while (c != EOF && c != '\n');
-		vUngetc (c);
+		processDefine (token);	/* Process `define foo ... */
 	}
 	else if (token->kind == K_BLOCK)
 	{
