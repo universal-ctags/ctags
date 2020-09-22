@@ -545,7 +545,7 @@ static int skipMacro (int c)
 				c = skipWhite (c);
 				if (c == '(')
 				{
-					c = skipPastMatch ("()");
+					c = skipPastMatch ("()");	/* FIXME: uncovered */
 				}
 			}
 		}
@@ -630,9 +630,14 @@ static void createTag (tokenInfo *const token)
 	}
 
 	/* Do nothing it tag name is empty or tag kind is disabled */
-	if (vStringLength (token->name) == 0 || ! kindEnabled (kind))
+	if (vStringLength (token->name) == 0)
 	{
-		verbose ("Unexpected empty token or kind disabled\n");
+		verbose ("Unexpected empty token\n");	/* FIXME: uncovered */
+		return;
+	}
+	if (! kindEnabled (kind))
+	{
+		verbose ("kind disabled\n");
 		return;
 	}
 
@@ -755,7 +760,7 @@ static void processBlock (tokenInfo *const token)
 		}
 		if (blockEnd && currentContext->kind == K_BLOCK && currentContext->nestLevel <= 1)
 		{
-			verbose ("Dropping context %s\n", vStringValue (currentContext->name));
+			verbose ("Dropping context %s\n", vStringValue (currentContext->name));	/* FIXME: uncovered */
 			currentContext = popToken (currentContext);
 		}
 	}
@@ -1072,19 +1077,13 @@ static void processTypedef (tokenInfo *const token)
 		c = skipWhite (vGetc ());
 	}
 
-	/* Skip typedef contents */
-	if (c == '{')
-	{
-		c = skipWhite (skipPastMatch ("{}"));
-	}
-
 	/* Skip past class parameter override */
 	if (c == '#')
 	{
 		c = skipWhite (vGetc ());
 		if (c == '(')
 		{
-			c = skipWhite (skipPastMatch ("()"));
+			c = skipWhite (skipPastMatch ("()"));	/* FIXME: uncovered */
 		}
 	}
 
@@ -1188,7 +1187,7 @@ static bool doesNameForKindExist (int corkIndex, tagEntryInfo *entry, void *data
 	if (entry->kindIndex == *kind)
 		return false;
 
-	return true;
+	return true;	/* FIXME: uncovered */
 }
 
 static bool isAlreadyTaggedAs (tokenInfo *token, verilogKind kind)
@@ -1221,7 +1220,7 @@ static void tagNameList (tokenInfo* token, int c)
 	c = skipWhite (c);
 	if (c == '#')
 	{
-		c = vGetc ();
+		c = vGetc ();	/* FIXME: uncovered */
 		if (c == '(')
 			c = skipPastMatch ("()");
 	}
@@ -1245,7 +1244,7 @@ static void tagNameList (tokenInfo* token, int c)
 				/* Update kind unless it's a port, a constant (parameter) or an ignored keyword */
 				if (token->kind != K_PORT && token->kind != K_CONSTANT && localKind != K_IGNORE)
 				{
-					token->kind = localKind;
+					token->kind = localKind;	/* FIXME: uncovered : to be removed (cf. #2636) */
 				}
 				repeat = true;
 			}
@@ -1422,13 +1421,10 @@ static void findVerilogTags (void)
 				{
 					verbose ("Dropping context %s\n", vStringValue (currentContext->name));
 					currentContext = popToken (currentContext);
-					currentContext->prototype = false;
 				}
 				/* Prototypes end at the end of statement */
-				if (currentContext->prototype)
-				{
-					currentContext->prototype = false;
-				}
+				currentContext->prototype = false;
+
 				/* Cleanup tag contents list at end of declaration */
 				while (tagContents)
 				{
