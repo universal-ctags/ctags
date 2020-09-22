@@ -1,0 +1,11 @@
+net_decl	input.sv	/^module net_decl;$/;"	m
+addressT	input.sv	/^  typedef logic [31:0] addressT;$/;"	T	module:net_decl
+packed	input.sv	/^  wire struct packed { logic ecc; logic [7:0] data; } memsig; \/\/ FIXME: packed -> memsig$/;"	S	module:net_decl
+ecc	input.sv	/^  wire struct packed { logic ecc; logic [7:0] data; } memsig; \/\/ FIXME: packed -> memsig$/;"	r	module:net_decl
+data	input.sv	/^  wire struct packed { logic ecc; logic [7:0] data; } memsig; \/\/ FIXME: packed -> memsig$/;"	r	module:net_decl
+w	input.sv	/^  wire w; \/\/ equivalent to "wire logic w;"$/;"	n	module:net_decl
+ww	input.sv	/^  wire [15:0] ww; \/\/ equivalent to "wire logic [15:0] ww;"$/;"	n	module:net_decl
+delay_control	input.sv	/^module delay_control #(d, e);$/;"	m
+rega	input.sv	/^  int rega, regb, regr;$/;"	r	module:delay_control
+regb	input.sv	/^  int rega, regb, regr;$/;"	r	module:delay_control
+regr	input.sv	/^  int rega, regb, regr;$/;"	r	module:delay_control
