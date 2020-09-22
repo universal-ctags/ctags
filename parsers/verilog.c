@@ -49,6 +49,7 @@ typedef enum {
 	/* parser private items */
 	K_IGNORE = -16,
 	K_DEFINE,
+	K_IFDEF,
 
 	K_UNDEFINED = KEYWORD_NONE,
 	/* the followings items are also used as indices for VerilogKinds[] and SystemVerilogKinds[] */
@@ -143,6 +144,9 @@ static const keywordAssoc KeywordTable [] = {
 	/*                            |  Verilog    */
 	/* keyword     keyword ID     |  |          */
 	{ "`define",   K_DEFINE,    { 1, 1 } },
+	{ "`elsif",    K_IFDEF,     { 1, 1 } },
+	{ "`ifdef",    K_IFDEF,     { 1, 1 } },
+	{ "`ifndef",   K_IFDEF,     { 1, 1 } },
 	{ "event",     K_EVENT,     { 1, 1 } },
 	{ "function",  K_FUNCTION,  { 1, 1 } },
 	{ "inout",     K_PORT,      { 1, 1 } },
@@ -216,6 +220,14 @@ static const keywordAssoc KeywordTable [] = {
 
 static tokenInfo *currentContext = NULL;
 static tokenInfo *tagContents = NULL;
+
+/*
+ *   PROTOTYPE DEFINITIONS
+ */
+
+static bool findBlockName (tokenInfo *const token);
+static void tagNameList (tokenInfo* token, int c);
+static void updateKind (tokenInfo *const token);
 
 /*
  *   FUNCTION DEFINITIONS
@@ -510,6 +522,13 @@ static bool readIdentifier (tokenInfo *const token, int c)
 	return (bool)(vStringLength (token->name) > 0);
 }
 
+static void skipIfdef (tokenInfo* token)
+{
+	int c = skipWhite (vGetc ());
+	readIdentifier (token, c);
+	verbose ("Skipping conditional macro %s\n", vStringValue (token->name));
+}
+
 static int skipMacro (int c)
 {
 	tokenInfo *token = newToken ();;
@@ -517,29 +536,22 @@ static int skipMacro (int c)
 	if (c == '`')
 	{
 		/* Skip keyword */
-		if (isIdentifierCharacter (c = vGetc ()))
+		readIdentifier (token, c);
+		updateKind (token);
+		/* Skip next keyword if macro is `ifdef, `ifndef or `elsif */
+		if (token->kind == K_IFDEF)
 		{
-			readIdentifier (token, c);
+			token->kind = K_UNDEFINED;
+			skipIfdef(token);
 			c = vGetc ();
-			/* Skip next keyword if macro is `ifdef or `ifndef or `elsif*/
-			if (strcmp (vStringValue (token->name), "ifdef") == 0 ||
-			    strcmp (vStringValue (token->name), "ifndef") == 0 ||
-				strcmp (vStringValue (token->name), "elsif") == 0)
+		}
+		/* Skip macro functions */
+		else
+		{
+			c = skipWhite (vGetc ());
+			if (c == '(')
 			{
-				verbose ("%c\n", c);
-				c = skipWhite (c);
-				readIdentifier (token, c);
-				c = vGetc ();
-				verbose ("Skipping conditional macro %s\n", vStringValue (token->name));
-			}
-			/* Skip macro functions */
-			else
-			{
-				c = skipWhite (c);
-				if (c == '(')
-				{
-					c = skipPastMatch ("()");	/* FIXME: uncovered */
-				}
+				c = skipPastMatch ("()");	/* FIXME: uncovered */
 			}
 		}
 	}
@@ -874,8 +886,6 @@ static void processFunction (tokenInfo *const token)
 		processPortList (c);
 	}
 }
-
-static void tagNameList (tokenInfo* token, int c);
 
 static void processEnum (tokenInfo *const token)
 {
@@ -1311,6 +1321,10 @@ static void findTag (tokenInfo *const token)
 	if (token->kind == K_DEFINE)
 	{
 		processDefine (token);	/* Process `define foo ... */
+	}
+	else if (token->kind == K_IFDEF)
+	{
+		skipIfdef(token);
 	}
 	else if (token->kind == K_BLOCK)
 	{
