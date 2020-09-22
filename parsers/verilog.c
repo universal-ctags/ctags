@@ -50,6 +50,8 @@ typedef enum {
 	K_IGNORE = -16,
 	K_DEFINE,
 	K_IFDEF,
+	K_BEGIN,
+	K_END,
 
 	K_UNDEFINED = KEYWORD_NONE,
 	/* the followings items are also used as indices for VerilogKinds[] and SystemVerilogKinds[] */
@@ -175,8 +177,8 @@ static const keywordAssoc KeywordTable [] = {
 	{ "wand",      K_NET,       { 1, 1 } },
 	{ "wire",      K_NET,       { 1, 1 } },
 	{ "wor",       K_NET,       { 1, 1 } },
-	{ "begin",     K_BLOCK,     { 1, 1 } },
-	{ "end",       K_BLOCK,     { 1, 1 } },
+	{ "begin",     K_BEGIN,     { 1, 1 } },
+	{ "end",       K_END,       { 1, 1 } },
 	{ "signed",    K_IGNORE,    { 1, 1 } },
 	{ "automatic", K_IGNORE,    { 1, 0 } },
 	{ "assert",    K_ASSERTION, { 1, 0 } },
@@ -593,9 +595,8 @@ static void createContext (tokenInfo *const scope)
 static void dropEndContext (tokenInfo *const token)
 {
 	verbose ("current context %s; context kind %0d; nest level %0d\n", vStringValue (currentContext->name), currentContext->kind, currentContext->nestLevel);
-	vString *endTokenName = vStringNewInit("end");
 	if ((currentContext->kind == K_COVERGROUP && strcmp (vStringValue (token->name), "endgroup") == 0) ||
-	    (currentContext->kind == K_BLOCK && currentContext->nestLevel == 0 && strcmp (vStringValue (token->name), vStringValue (endTokenName)) == 0)
+	    (currentContext->kind == K_BLOCK && currentContext->nestLevel == 0 && token->kind == K_END)
 	    )
 	{
 		verbose ("Dropping context %s\n", vStringValue (currentContext->name));
@@ -603,6 +604,7 @@ static void dropEndContext (tokenInfo *const token)
 	}
 	else
 	{
+		vString *endTokenName = vStringNewInit("end");
 		vStringCatS (endTokenName, getNameForKind (currentContext->kind));
 		if (strcmp (vStringValue (token->name), vStringValue (endTokenName)) == 0)
 		{
@@ -614,8 +616,8 @@ static void dropEndContext (tokenInfo *const token)
 				currentContext = popToken (currentContext);
 			}
 		}
+		vStringDelete(endTokenName);
 	}
-	vStringDelete(endTokenName);
 }
 
 
@@ -741,29 +743,25 @@ static bool findBlockName (tokenInfo *const token)
 
 static void processBlock (tokenInfo *const token)
 {
-	bool blockStart = false;
-	bool blockEnd   = false;
-
-	if (strcmp (vStringValue (token->name), "begin") == 0)
+	if (token->kind == K_BEGIN)
 	{
 		currentContext->nestLevel++;
-		blockStart = true;
 	}
-	else if (strcmp (vStringValue (token->name), "end") == 0)
+	else if (token->kind == K_END)
 	{
 		currentContext->nestLevel--;
-		blockEnd = true;
 	}
 
 	if (findBlockName (token))
 	{
 		verbose ("Found block: %s\n", vStringValue (token->name));
-		if (blockStart)
+		if (token->kind == K_BEGIN)
 		{
+			token->kind = K_BLOCK;
 			createTag (token);
 			verbose ("Current context %s\n", vStringValue (currentContext->name));
 		}
-		if (blockEnd && currentContext->kind == K_BLOCK && currentContext->nestLevel <= 1)
+		if (token->kind == K_END && currentContext->kind == K_BLOCK && currentContext->nestLevel <= 1)
 		{
 			verbose ("Dropping context %s\n", vStringValue (currentContext->name));	/* FIXME: uncovered */
 			currentContext = popToken (currentContext);
@@ -1326,7 +1324,7 @@ static void findTag (tokenInfo *const token)
 	{
 		skipIfdef(token);
 	}
-	else if (token->kind == K_BLOCK)
+	else if (token->kind == K_BEGIN || token->kind == K_END)
 	{
 		/* Process begin..end blocks */
 		processBlock (token);
