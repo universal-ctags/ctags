@@ -185,7 +185,7 @@ static const keywordAssoc KeywordTable [] = {
 	{ "cover",     K_ASSERTION, { 1, 0 } },
 	{ "covergroup",K_COVERGROUP,{ 1, 0 } },
 	{ "enum",      K_ENUM,      { 1, 0 } },
-	{ "extern",    K_IGNORE,    { 1, 0 } },
+	{ "extern",    K_PROTOTYPE, { 1, 0 } },
 	{ "int",       K_REGISTER,  { 1, 0 } },
 	{ "interface", K_INTERFACE, { 1, 0 } },
 	{ "local",     K_IGNORE,    { 1, 0 } },
@@ -195,7 +195,7 @@ static const keywordAssoc KeywordTable [] = {
 	{ "package",   K_PACKAGE,   { 1, 0 } },
 	{ "program",   K_PROGRAM,   { 1, 0 } },
 	{ "property",  K_PROPERTY,  { 1, 0 } },
-	{ "pure",      K_IGNORE,    { 1, 0 } },
+	{ "pure",      K_PROTOTYPE, { 1, 0 } },
 	{ "rand",      K_IGNORE,    { 1, 0 } },
 	{ "randc",     K_IGNORE,    { 1, 0 } },
 	{ "ref",       K_PORT,      { 1, 0 } },
@@ -283,17 +283,6 @@ static short hasSimplePortList (tokenInfo const* token)
 			return true;
 		default:
 			return false;
-	}
-}
-
-static short isPrototype (tokenInfo const* token)
-{
-	if (strcmp (vStringValue (token->name), "extern")  == 0 ||
-        strcmp (vStringValue (token->name), "pure") == 0 )
-	{
-		return true;
-	} else {
-		return false;
 	}
 }
 
@@ -1361,7 +1350,7 @@ static void findTag (tokenInfo *const token)
 	{
 		processClass (token);
 	}
-	else if (token->kind == K_IGNORE && isPrototype (token))
+	else if (token->kind == K_PROTOTYPE)
 	{
 		currentContext->prototype = true;
 	}
