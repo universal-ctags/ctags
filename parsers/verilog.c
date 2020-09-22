@@ -1397,8 +1397,7 @@ static void findVerilogTags (void)
 
 	while (c != EOF)
 	{
-		c = vGetc ();
-		c = skipWhite (c);
+		c = skipWhite (vGetc ());
 		switch (c)
 		{
 			/* Store current block name whenever a : is found
