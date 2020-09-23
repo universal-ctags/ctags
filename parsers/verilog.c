@@ -52,6 +52,7 @@ typedef enum {
 	K_IFDEF,
 	K_BEGIN,
 	K_END,
+	K_END_DE,	/* End of Design Elements */
 
 	K_UNDEFINED = KEYWORD_NONE,
 	/* the followings items are also used as indices for VerilogKinds[] and SystemVerilogKinds[] */
@@ -179,6 +180,9 @@ static const keywordAssoc KeywordTable [] = {
 	{ "wor",       K_NET,       { 1, 1 } },
 	{ "begin",     K_BEGIN,     { 1, 1 } },
 	{ "end",       K_END,       { 1, 1 } },
+	{ "endfunction",K_END_DE,   { 1, 1 } },
+	{ "endmodule", K_END_DE,    { 1, 1 } },
+	{ "endtask",   K_END_DE,    { 1, 1 } },
 	{ "signed",    K_IGNORE,    { 1, 1 } },
 	{ "automatic", K_IGNORE,    { 1, 0 } },
 	{ "assert",    K_ASSERTION, { 1, 0 } },
@@ -190,6 +194,12 @@ static const keywordAssoc KeywordTable [] = {
 	{ "const",     K_IGNORE,    { 1, 0 } },
 	{ "cover",     K_ASSERTION, { 1, 0 } },
 	{ "covergroup",K_COVERGROUP,{ 1, 0 } },
+	{ "endclass",  K_END_DE,    { 1, 0 } },
+	{ "endgroup",  K_END_DE,    { 1, 0 } },
+	{ "endinterface",K_END_DE,  { 1, 0 } },
+	{ "endpackage",K_END_DE,    { 1, 0 } },
+	{ "endprogram",K_END_DE,    { 1, 0 } },
+	{ "endproperty",K_END_DE,   { 1, 0 } },
 	{ "enum",      K_ENUM,      { 1, 0 } },
 	{ "extern",    K_PROTOTYPE, { 1, 0 } },
 	{ "int",       K_REGISTER,  { 1, 0 } },
@@ -1310,11 +1320,13 @@ static void findTag (tokenInfo *const token)
 {
 	verbose ("Checking token %s of kind %d\n", vStringValue (token->name), token->kind);
 
-	if (currentContext->kind != K_UNDEFINED)
+	if (currentContext->kind != K_UNDEFINED && (token->kind == K_END || token->kind == K_END_DE))
 	{
 		/* Drop context, but only if an end token is found */
 		dropEndContext (token);
 	}
+	if (token->kind == K_END_DE)
+		return;
 
 	if (token->kind == K_DEFINE)
 	{
