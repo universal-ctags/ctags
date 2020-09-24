@@ -1205,6 +1205,43 @@ static void processDefine (tokenInfo *const token)
 	vUngetc (c);
 }
 
+static void processAssertion (tokenInfo *const token)
+{
+	if (vStringLength (currentContext->blockName) > 0)
+	{
+		vStringCopy (token->name, currentContext->blockName);
+		createTag (token);
+		skipToSemiColon ();
+	}
+}
+
+static void processDesignElement (tokenInfo *const token)
+{
+	int c = skipWhite (vGetc ());
+
+	if (isIdentifierCharacter (c))
+	{
+		readIdentifier (token, c);
+		while (getKindForToken (token) == K_IGNORE)
+		{
+			c = skipWhite (vGetc ());
+			readIdentifier (token, c);
+		}
+		createTag (token);
+
+		/* Get port list if required */
+		c = skipWhite (vGetc ());
+		if (c == '(' && hasSimplePortList (token))
+		{
+			processPortList (c);
+		}
+		else
+		{
+			vUngetc (c);
+		}
+	}
+}
+
 static bool doesNameForKindExist (int corkIndex, tagEntryInfo *entry, void *data)
 {
 	verilogKind *kind = data;
@@ -1351,12 +1388,7 @@ static void findTag (tokenInfo *const token)
 	}
 	else if (token->kind == K_ASSERTION)
 	{
-		if (vStringLength (currentContext->blockName) > 0)
-		{
-			vStringCopy (token->name, currentContext->blockName);
-			createTag (token);
-			skipToSemiColon ();
-		}
+		processAssertion (token);
 	}
 	else if (token->kind == K_TYPEDEF)
 	{
@@ -1380,35 +1412,12 @@ static void findTag (tokenInfo *const token)
 	}
 	else if (isVariable (token))
 	{
-		int c = skipWhite (vGetc ());
-
-		tagNameList (token, c);
+		tagNameList (token, skipWhite (vGetc ()));
 	}
 	else if (token->kind != K_UNDEFINED && token->kind != K_IGNORE)
 	{
-		int c = skipWhite (vGetc ());
-
-		if (isIdentifierCharacter (c))
-		{
-			readIdentifier (token, c);
-			while (getKindForToken (token) == K_IGNORE)
-			{
-				c = skipWhite (vGetc ());
-				readIdentifier (token, c);
-			}
-			createTag (token);
-
-			/* Get port list if required */
-			c = skipWhite (vGetc ());
-			if (c == '(' && hasSimplePortList (token))
-			{
-				processPortList (c);
-			}
-			else
-			{
-				vUngetc (c);
-			}
-		}
+		/* K_MODULE, K_PROGRAM, K_INTERFACE, K_PACKAGE, K_PROPERTY, K_COVERGROUP */
+		processDesignElement (token);
 	}
 }
 
