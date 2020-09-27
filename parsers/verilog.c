@@ -150,6 +150,7 @@ static const keywordAssoc KeywordTable [] = {
 	{ "`elsif",    K_IFDEF,     { 1, 1 } },
 	{ "`ifdef",    K_IFDEF,     { 1, 1 } },
 	{ "`ifndef",   K_IFDEF,     { 1, 1 } },
+	{ "`undef",    K_IFDEF,     { 1, 1 } },
 	{ "begin",     K_BEGIN,     { 1, 1 } },
 	{ "end",       K_END,       { 1, 1 } },
 	{ "endfunction",K_END_DE,   { 1, 1 } },
@@ -603,6 +604,7 @@ static bool readIdentifier (tokenInfo *const token, int c)
 	return (bool)(vStringLength (token->name) > 0);
 }
 
+/* Skip next keyword for `ifdef, `ifndef, `elsif, or `undef */
 static void skipIfdef (tokenInfo* token)
 {
 	int c = skipWhite (vGetc ());
@@ -619,7 +621,7 @@ static int skipMacro (int c)
 		/* Skip keyword */
 		readIdentifier (token, c);
 		updateKind (token);
-		/* Skip next keyword if macro is `ifdef, `ifndef or `elsif */
+		/* Skip next keyword if macro is `ifdef, `ifndef, `elsif, or `undef */
 		if (token->kind == K_IFDEF)
 		{
 			token->kind = K_UNDEFINED;
