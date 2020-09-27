@@ -602,6 +602,12 @@ static void createContext (tokenInfo *const scope)
 	}
 }
 
+static void dropContext ()
+{
+	verbose ("Dropping context %s\n", vStringValue (currentContext->name));
+	currentContext = popToken (currentContext);
+}
+
 static void dropEndContext (tokenInfo *const token)
 {
 	verbose ("current context %s; context kind %0d; nest level %0d\n", vStringValue (currentContext->name), currentContext->kind, currentContext->nestLevel);
@@ -609,8 +615,8 @@ static void dropEndContext (tokenInfo *const token)
 	    (currentContext->kind == K_BLOCK && currentContext->nestLevel == 0 && token->kind == K_END)
 	    )
 	{
-		verbose ("Dropping context %s\n", vStringValue (currentContext->name));
-		currentContext = popToken (currentContext);
+		dropContext ();
+		findBlockName (token);
 	}
 	else
 	{
@@ -618,8 +624,8 @@ static void dropEndContext (tokenInfo *const token)
 		vStringCatS (endTokenName, getNameForKind (currentContext->kind));
 		if (strcmp (vStringValue (token->name), vStringValue (endTokenName)) == 0)
 		{
-			verbose ("Dropping context %s\n", vStringValue (currentContext->name));
-			currentContext = popToken (currentContext);
+			dropContext ();
+			findBlockName (token);
 			if (currentContext->classScope)
 			{
 				verbose ("Dropping local context %s\n", vStringValue (currentContext->name));
@@ -726,8 +732,7 @@ static void createTag (tokenInfo *const token)
 		/* Drop temporary contexts */
 		if (isTempContext (currentContext))
 		{
-			verbose ("Dropping context %s\n", vStringValue (currentContext->name));
-			currentContext = popToken (currentContext);
+			dropContext ();
 		}
 	}
 
@@ -773,8 +778,7 @@ static void processBlock (tokenInfo *const token)
 		}
 		if (token->kind == K_END && currentContext->kind == K_BLOCK && currentContext->nestLevel <= 1)
 		{
-			verbose ("Dropping context %s\n", vStringValue (currentContext->name));	/* FIXME: uncovered */
-			currentContext = popToken (currentContext);
+			dropContext ();	/* FIXME: uncovered */
 		}
 	}
 }
@@ -1450,8 +1454,7 @@ static void findVerilogTags (void)
 				 * end statement */
 				if (currentContext->scope && currentContext->scope->prototype)
 				{
-					verbose ("Dropping context %s\n", vStringValue (currentContext->name));
-					currentContext = popToken (currentContext);
+					dropContext ();
 				}
 				/* Prototypes end at the end of statement */
 				currentContext->prototype = false;
