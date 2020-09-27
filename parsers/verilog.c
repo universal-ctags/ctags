@@ -587,6 +587,7 @@ static void skipToSemiColon (void)
 	} while (c != EOF && c != ';');
 }
 
+/* read an identifier, keyword, number, compiler directive, or macro identifier */
 static bool readIdentifier (tokenInfo *const token, int c)
 {
 	vStringClear (token->name);
@@ -602,6 +603,32 @@ static bool readIdentifier (tokenInfo *const token, int c)
 		token->filePosition = getInputFilePosition ();
 	}
 	return (bool)(vStringLength (token->name) > 0);
+}
+
+/* check if an ideitifier:
+ *   simple_identifier ::= [ a-zA-Z_ ] { [ a-zA-Z0-9_$ ] } */
+static bool isIdentifier (tokenInfo* token)
+{
+	if (token->kind == K_UNDEFINED)
+	{
+		for (int i = 0; i < vStringLength (token->name); i++)
+		{
+			int c = vStringChar (token->name, i);
+			if (i == 0)
+			{
+				if (!(isalpha (c) || c == '_'))
+					return false;
+			}
+			else
+			{
+				if (!(isalnum (c) || c == '_' || c == '$'))
+					return false;
+			}
+		}
+		return true;
+	}
+	else
+		return false;
 }
 
 /* Skip next keyword for `ifdef, `ifndef, `elsif, or `undef */
@@ -1437,7 +1464,7 @@ static void findTag (tokenInfo *const token)
 		/* Drop context, but only if an end token is found */
 		dropEndContext (token);
 	}
-	if (token->kind == K_END_DE)
+	if (token->kind == K_END_DE || token->kind == K_IGNORE)
 		return;
 
 	if (token->kind == K_DEFINE)
@@ -1489,7 +1516,12 @@ static void findTag (tokenInfo *const token)
 	{
 		tagNameList (token, skipWhite (vGetc ()));
 	}
-	else if (token->kind != K_UNDEFINED && token->kind != K_IGNORE)
+	else if (token->kind == K_UNDEFINED)
+	{
+		if (isIdentifier(token))	/* user defined type */
+			tagNameList (token, skipWhite (vGetc ()));
+	}
+	else
 	{
 		/* K_MODULE, K_PROGRAM, K_INTERFACE, K_PACKAGE, K_PROPERTY, K_COVERGROUP */
 		processDesignElement (token);
