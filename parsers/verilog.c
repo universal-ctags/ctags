@@ -959,6 +959,17 @@ static void processPortList (int c)
 	}
 }
 
+static int skipParameterAssignment (int c)
+{
+	if (c == '#')
+	{
+		c = skipWhite (vGetc ());
+		if (c == '(')
+			c = skipWhite (skipPastMatch ("()"));
+	}
+	return c;
+}
+
 static void processFunction (tokenInfo *const token)
 {
 	int c;
@@ -971,6 +982,10 @@ static void processFunction (tokenInfo *const token)
 	{
 		readIdentifier (token, c);
 		c = skipWhite (vGetc ());
+		/* skip parameter assignment of a class type
+		 *    ex. function uvm_port_base #(IF) get_if(int index=0); */
+		c = skipParameterAssignment (c);
+
 		/* Identify class type prefixes and create respective context*/
 		if (isInputLanguage (Lang_systemverilog) && c == ':')
 		{
@@ -1185,14 +1200,7 @@ static void processTypedef (tokenInfo *const token)
 	}
 
 	/* Skip past class parameter override */
-	if (c == '#')
-	{
-		c = skipWhite (vGetc ());
-		if (c == '(')
-		{
-			c = skipWhite (skipPastMatch ("()"));	/* FIXME: uncovered */
-		}
-	}
+	c = skipParameterAssignment (c);
 
 	/* Read typedef name */
 	if (isIdentifierCharacter (c))
