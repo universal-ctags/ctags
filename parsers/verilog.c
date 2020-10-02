@@ -1361,6 +1361,20 @@ static bool isAlreadyTaggedAs (tokenInfo *token, verilogKind kind)
 								   doesNameForKindExist, &kind) == false);
 }
 
+static int skipDelay(tokenInfo* token, int c)
+{
+	if (c == '#')
+	{
+		c = skipWhite (vGetc ());
+		if (c == '(')
+			c = skipPastMatch ("()");
+		else if (isIdentifierCharacter (c))
+			readIdentifier (token, c);
+		c = skipWhite (c);
+	}
+	return c;
+}
+
 static void tagNameList (tokenInfo* token, int c)
 {
 	verilogKind localKind;
@@ -1373,13 +1387,7 @@ static void tagNameList (tokenInfo* token, int c)
 	if (c == '(')
 		c = skipPastMatch ("()");
 	c = skipDimension (skipWhite (c));
-	if (c == '#')
-	{
-		c = vGetc ();	/* FIXME: uncovered */
-		if (c == '(')
-			c = skipPastMatch ("()");
-	}
-	c = skipWhite (c);
+	c = skipDelay(token, c);
 
 	do
 	{
