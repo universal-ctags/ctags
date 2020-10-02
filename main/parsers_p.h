@@ -89,6 +89,7 @@
 	JavaPropertiesParser, \
 	JavaScriptParser, \
 	JsonParser, \
+	JuliaParser, \
 	KconfigParser, \
 	LdScriptParser, \
 	LispParser, \

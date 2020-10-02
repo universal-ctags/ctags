@@ -1,0 +1,30 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_OUTPUT_MODE	u-ctags	/u-ctags or e-ctags/
+Baz.foo	input.jl	/^Baz.foo(x) = 1$/;"	f
+Foo	input.jl	/^abstract type Foo <: Bar end$/;"	t
+Foo	input.jl	/^mutable struct Foo$/;"	s
+Foo	input.jl	/^struct Foo$/;"	s
+Foo.bar	input.jl	/^function Foo.bar(x, y)$/;"	f
+Mod1	input.jl	/^baremodule Mod1$/;"	n
+Mod2	input.jl	/^module Mod2$/;"	n
+Point	input.jl	/^struct Point{T} <: Pointy{T}$/;"	s
+Pointy	input.jl	/^abstract type Pointy{T} end$/;"	t
+cell	input.jl	/^cell(dims::(Integer...)) = Array(Any, convert((Int...), dims))$/;"	f
+elsize	input.jl	/^elsize(::AbstractArray{T}) where {T} = sizeof(T)$/;"	f
+elsize	input.jl	/^function elsize(::AbstractArray{T}) where T$/;"	f
+f	input.jl	/^f(x::FooBar) = x$/;"	f
+foo	input.jl	/^foo(x::(Int,)) = 1$/;"	f
+foo	input.jl	/^function foo()$/;"	f
+foo_bar!	input.jl	/^foo_bar!(x,y) = x + y$/;"	f
+foo_bar!	input.jl	/^function foo_bar!(x,y)$/;"	f
+g	input.jl	/^function g(x, y)::Int8$/;"	f
+myfun	input.jl	/^@inline myfun() = println("myfun")$/;"	f
+norm	input.jl	/^function norm(p::Point{<:Real})$/;"	f
+same_type_numeric	input.jl	/^same_type_numeric(x::T, y::T) where T = false$/;"	f
+same_type_numeric	input.jl	/^same_type_numeric(x::T, y::T) where {T <: Number} = true$/;"	f
+test	input.jl	/^function test(x)$/;"	f
+x	input.jl	/^    x::Bar$/;"	g	struct:Foo
+x	input.jl	/^    x::T$/;"	g	struct:Point
+y	input.jl	/^    y::T$/;"	g	struct:Point
+y	input.jl	/^const y = "hello world"$/;"	c
