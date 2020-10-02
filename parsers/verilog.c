@@ -578,6 +578,15 @@ static int skipPastMatch (const char *const pair)
 	return vGetc ();
 }
 
+static int skipDimension (int c)
+{
+	while (c == '[')
+	{
+		c = skipWhite (skipPastMatch ("[]"));
+	}
+	return c;
+}
+
 static void skipToSemiColon (void)
 {
 	int c;
@@ -892,11 +901,8 @@ static void processPortList (int c)
 
 		while (c != ';' && c != EOF)
 		{
-			if (c == '[')
-			{
-				c = skipPastMatch ("[]");
-			}
-			else if (c == '(')
+			c = skipDimension (c);
+			if (c == '(')
 			{
 				c = skipPastMatch ("()");
 			}
@@ -1036,10 +1042,7 @@ static void processEnum (tokenInfo *const token)
 	}
 
 	/* Skip bus width definition */
-	if (c == '[')
-	{
-		c = skipWhite (skipPastMatch ("[]"));
-	}
+	c = skipDimension (c);
 
 	/* Search enum elements */
 	if (c == '{')
@@ -1054,13 +1057,10 @@ static void processEnum (tokenInfo *const token)
 			tagContents = pushToken (tagContents, content);
 			verbose ("Pushed enum element \"%s\"\n", vStringValue (content->name));
 
-			c = skipWhite (vGetc ());
 			/* Skip element ranges */
 			/* TODO Implement element ranges */
-			if (c == '[')
-			{
-				c = skipWhite (skipPastMatch ("[]"));
-			}
+			c = skipDimension (skipWhite (vGetc ()));
+
 			/* Skip value assignments */
 			if (c == '=')
 			{
@@ -1121,10 +1121,7 @@ static void processStruct (tokenInfo *const token)
 	}
 
 	/* Skip packed_dimension */
-	while (c == '[')
-	{
-		c = skipWhite (skipPastMatch ("[]"));
-	}
+	c = skipDimension (c);
 
 	/* Following identifiers are tag names */
 	verbose ("Find struct|union tags. Token %s kind %d\n", vStringValue (token->name), token->kind);
@@ -1178,10 +1175,7 @@ static void processTypedef (tokenInfo *const token)
 	}
 
 	/* Skip bus width definition */
-	while (c == '[')
-	{
-		c = skipWhite (skipPastMatch ("[]"));
-	}
+	c = skipDimension (c);
 
 	/* Skip remaining identifiers */
 	while (isIdentifierCharacter (c))
@@ -1378,10 +1372,7 @@ static void tagNameList (tokenInfo* token, int c)
 	*/
 	if (c == '(')
 		c = skipPastMatch ("()");
-	c = skipWhite (c);
-	if (c == '[')
-		c = skipPastMatch ("[]");
-	c = skipWhite (c);
+	c = skipDimension (skipWhite (c));
 	if (c == '#')
 	{
 		c = vGetc ();	/* FIXME: uncovered */
@@ -1420,11 +1411,8 @@ static void tagNameList (tokenInfo* token, int c)
 		}
 		else
 			break;
-		c = skipWhite (vGetc ());
 
-		if (c == '[')
-			c = skipPastMatch ("[]");
-		c = skipWhite (c);
+		c = skipDimension (skipWhite (vGetc ()));
 		if (c == '=')
 		{
 			c = skipWhite (vGetc ());
