@@ -409,6 +409,12 @@ static tokenInfo *pushToken (tokenInfo * const token, tokenInfo * const tokenPus
 	return tokenPush;
 }
 
+static tokenInfo *appendToken (tokenInfo * const token, tokenInfo * const tokenAppend)
+{
+	token->scope = tokenAppend;
+	return tokenAppend;
+}
+
 static tokenInfo *popToken (tokenInfo * const token)
 {
 	tokenInfo *localToken;
@@ -1224,12 +1230,67 @@ static void processTypedef (tokenInfo *const token)
 	createTag (token);
 }
 
+static tokenInfo * processParameterList (int c)
+{
+	tokenInfo *head = NULL;
+	tokenInfo *parameters = NULL;
+	if (c == '#')
+	{
+		c = skipWhite (vGetc ());
+		if (c == '(')
+		{
+			tokenInfo *token = newToken ();
+			do
+			{
+				c = skipWhite (vGetc ());
+				if (isIdentifierCharacter (c))
+				{
+					readIdentifier (token, c);
+					updateKind (token);
+					verbose ("Found parameter %s\n", vStringValue (token->name));
+					if (token->kind == K_UNDEFINED)
+					{
+						c = skipWhite (vGetc ());
+						if (c == ',' || c == ')' || c == '=')	// ignore user defined type
+						{
+							token->kind = K_CONSTANT;
+							if (head == NULL)
+							{
+								head = token;
+								parameters = token;
+							} else
+								parameters = appendToken (parameters, token);	// append token on parameters
+							token = newToken ();
+							// skip expression
+							while (c != ',' && c != ')' && c != EOF)
+							{
+								if (c == '(')
+									c = skipPastMatch ("()");
+								else
+									c = skipWhite (vGetc ());
+							}
+						}
+					}
+				}
+				else if (c == '[') {
+					c =skipDimension(c);
+					vUngetc (c);
+				}
+			} while (c != ')' && c != EOF);
+			c = skipWhite (vGetc ());
+			deleteToken (token);
+		}
+	}
+	vUngetc (c);
+	return head;
+}
+
 static void processClass (tokenInfo *const token)
 {
 	/*Note: At the moment, only identifies typedef name and not its contents */
 	int c;
 	tokenInfo *extra;
-	tokenInfo *parameters = NULL;
+	tokenInfo *parameters;
 
 	/* Get identifiers */
 	c = skipWhite (vGetc ());
@@ -1240,33 +1301,8 @@ static void processClass (tokenInfo *const token)
 	}
 
 	/* Find class parameters list */
-	if (c == '#')
-	{
-		c = skipWhite (vGetc ());
-		if (c == '(')
-		{
-			parameters = newToken ();
-			do
-			{
-				c = skipWhite (vGetc ());
-				readIdentifier (parameters, c);
-				updateKind (parameters);
-				verbose ("Found class parameter %s\n", vStringValue (parameters->name));
-				if (parameters->kind == K_UNDEFINED)
-				{
-					parameters->kind = K_CONSTANT;
-					parameters = pushToken (parameters, newToken ());
-					c = vGetc();
-					while (c != ',' && c != ')' && c != EOF)
-					{
-						c = vGetc();
-					}
-				}
-			} while (c != ')' && c != EOF);
-			c = skipWhite (vGetc ());
-			parameters = popToken (parameters);
-		}
-	}
+	parameters = processParameterList (c);
+	c = skipWhite (vGetc ());
 
 	/* Search for inheritance information */
 	if (isIdentifierCharacter (c))
@@ -1333,8 +1369,19 @@ static void processDesignElement (tokenInfo *const token)
 		}
 		createTag (token);
 
-		/* Get port list if required */
 		c = skipWhite (vGetc ());
+		if (c == '#')
+		{
+			tokenInfo *parameters = processParameterList (c);
+			while (parameters)
+			{
+				createTag (parameters);
+				parameters = popToken (parameters);
+			}
+			c = skipWhite (vGetc ());
+		}
+
+		/* Get port list if required */
 		if (c == '(' && hasSimplePortList (token))
 		{
 			processPortList (c);
@@ -1345,7 +1392,7 @@ static void processDesignElement (tokenInfo *const token)
 		}
 	}
 }
-
+#if 0
 static bool doesNameForKindExist (int corkIndex, tagEntryInfo *entry, void *data)
 {
 	verilogKind *kind = data;
@@ -1368,6 +1415,7 @@ static bool isAlreadyTaggedAs (tokenInfo *token, verilogKind kind)
 	return (foreachEntriesInScope (CORK_NIL, vStringValue (name),
 								   doesNameForKindExist, &kind) == false);
 }
+#endif
 
 static int skipDelay(tokenInfo* token, int c)
 {
@@ -1385,13 +1433,15 @@ static int skipDelay(tokenInfo* token, int c)
 
 static void tagNameList (tokenInfo* token, int c)
 {
-	verilogKind localKind;
+	verilogKind kind = token->kind;
+	verilogKind actualKind = K_UNDEFINED;
 	bool repeat;
 
 	/* Many keywords can have bit width.
 	*   reg [3:0] net_name;
 	*   inout [(`DBUSWIDTH-1):0] databus;
 	*/
+	// skip drive|charge strength or type_reference
 	if (c == '(')
 		c = skipPastMatch ("()");
 	c = skipDimension (skipWhite (c));
@@ -1408,29 +1458,43 @@ static void tagNameList (tokenInfo* token, int c)
 		if (isIdentifierCharacter (c))
 		{
 			readIdentifier (token, c);
-			localKind = getKindForToken (token);
-
-			if (localKind != K_UNDEFINED || isAlreadyTaggedAs (token, K_TYPEDEF))
+			updateKind (token);
+			if (kind == K_UNDEFINED)	// user defined type
 			{
-				/* Update kind unless it's a port, a constant (parameter) or an ignored keyword */
-				if (token->kind != K_PORT && token->kind != K_CONSTANT && localKind != K_IGNORE)
+				if (token->kind == K_NET)
 				{
-					token->kind = localKind;	/* FIXME: uncovered : to be removed (cf. #2636) */
+					actualKind = K_NET;
+					repeat = true;
 				}
-				repeat = true;
+				else if (token->kind == K_REGISTER)
+				{
+					actualKind = K_REGISTER;
+					repeat = true;
+				} else {	// identifier of a user defined type
+					kind = K_REGISTER;	// !!!FIXME: consider kind of the user defined type
+				}
 			}
-			else
-			/* Create tag in case name is not a known kind ... */
+			else if ((token->kind != K_UNDEFINED) // skip keywords or an identifier on port
+					 || ((kind == K_PORT) && (token->kind == K_UNDEFINED)))
+					repeat = true;
+		}
+		c = skipWhite (vGetc ());
+
+		// skip unpacked dimension (or packed dimension after type-words)
+		c = skipDimension (skipWhite (c));
+		if (c == ',' || c == ';' || c == ')')
+		{
+			token->kind = kind == K_UNDEFINED ? actualKind : kind;
+			createTag (token);
+			repeat = false;
+		}
+		else if (c == '=')
+		{
+			if (!repeat)	// ignore procedual assignment: foo = bar;
 			{
+				token->kind = kind == K_UNDEFINED ? actualKind : kind;
 				createTag (token);
 			}
-		}
-		else
-			break;
-
-		c = skipDimension (skipWhite (vGetc ()));
-		if (c == '=')
-		{
 			c = skipWhite (vGetc ());
 			if (c == '\'')
 			{
@@ -1522,8 +1586,13 @@ static void findTag (tokenInfo *const token)
 	}
 	else if (token->kind == K_UNDEFINED)
 	{
-		if (isIdentifier(token))	/* user defined type */
-			tagNameList (token, skipWhite (vGetc ()));
+		if (isIdentifier(token)) {
+			int c = skipWhite (vGetc ());
+			if (c == ':')
+				vUngetc (c); /* label */
+			else
+				tagNameList (token, c);	/* user defined type */
+		}
 	}
 	else
 	{
