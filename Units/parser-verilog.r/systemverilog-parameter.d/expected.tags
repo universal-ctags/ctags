@@ -1,0 +1,57 @@
+C	input.sv	/^class C #($/;"	C
+p	input.sv	/^  int p = 1$/;"	c	class:C
+q	input.sv	/^  parameter int q = 5;  \/\/ local parameter$/;"	c	class:C
+t	input.sv	/^  static task t;$/;"	t	class:C
+p	input.sv	/^    int p;$/;"	r	task:C.t
+x	input.sv	/^    int x = C::p;  \/\/ C::p disambiguates p$/;"	r	task:C.t
+C	input.sv	/^class C #($/;"	C
+p	input.sv	/^    int p = 1,$/;"	c	class:C
+T	input.sv	/^    type T = int$/;"	c	class:C
+f	input.sv	/^function C::T C::f();$/;"	f	class:C.C
+C	input.sv	/^virtual class C#(parameter DECODE_W, parameter ENCODE_W = $clog2(DECODE_W));$/;"	C	class:C
+DECODE_W	input.sv	/^virtual class C#(parameter DECODE_W, parameter ENCODE_W = $clog2(DECODE_W));$/;"	c	class:C.C
+ENCODE_W	input.sv	/^virtual class C#(parameter DECODE_W, parameter ENCODE_W = $clog2(DECODE_W));$/;"	c	class:C.C
+ENCODER_f	input.sv	/^  static function logic [ENCODE_W-1:0] ENCODER_f$/;"	f	class:C.C
+DecodeIn	input.sv	/^      (input logic [DECODE_W-1:0] DecodeIn);$/;"	p	function:C.C.ENCODER_f
+i	input.sv	/^    for (int i = 0; i < DECODE_W; i++) begin$/;"	r	function:C.C.ENCODER_f
+DECODER_f	input.sv	/^  static function logic [DECODE_W-1:0] DECODER_f$/;"	f	class:C.C
+EncodeIn	input.sv	/^      (input logic [ENCODE_W-1:0] EncodeIn);$/;"	p	function:C.C.DECODER_f
+class	input.sv	/^interface class PutImp #(type PUT_T = logic); \/\/ FIXME$/;"	I
+class	input.sv	/^interface class GetImp #(type GET_T = logic); \/\/ FIXME$/;"	I	interface:class
+Fifo	input.sv	/^class Fifo #(type T = logic, int DEPTH = 1) implements PutImp#(T), GetImp#(T);$/;"	C	interface:class.class
+T	input.sv	/^class Fifo #(type T = logic, int DEPTH = 1) implements PutImp#(T), GetImp#(T);$/;"	c	class:class.class.Fifo
+DEPTH	input.sv	/^class Fifo #(type T = logic, int DEPTH = 1) implements PutImp#(T), GetImp#(T);$/;"	c	class:class.class.Fifo
+myFifo	input.sv	/^  T myFifo[$:DEPTH-1];$/;"	r	class:class.class.Fifo
+put	input.sv	/^  virtual function void put(T a); \/\/ FIXME : to be ignored$/;"	f	class:class.class.Fifo
+a	input.sv	/^  virtual function void put(T a); \/\/ FIXME : to be ignored$/;"	p	function:class.class.Fifo.put
+get	input.sv	/^  virtual function T get(); \/\/ FIXME : to be ignored$/;"	f	class:class.class.Fifo
+Stack	input.sv	/^class Stack #(type T = logic, int DEPTH = 1) implements PutImp#(T), GetImp#(T);$/;"	C	interface:class.class
+T	input.sv	/^class Stack #(type T = logic, int DEPTH = 1) implements PutImp#(T), GetImp#(T);$/;"	c	class:class.class.Stack
+DEPTH	input.sv	/^class Stack #(type T = logic, int DEPTH = 1) implements PutImp#(T), GetImp#(T);$/;"	c	class:class.class.Stack
+myFifo	input.sv	/^  T myFifo[$:DEPTH-1];$/;"	r	class:class.class.Stack
+put	input.sv	/^  virtual function void put(T a); \/\/ FIXME : to be ignored$/;"	f	class:class.class.Stack
+a	input.sv	/^  virtual function void put(T a); \/\/ FIXME : to be ignored$/;"	p	function:class.class.Stack.put
+get	input.sv	/^  virtual function T get(); \/\/ FIXME : to be ignored$/;"	f	class:class.class.Stack
+generic_fifo	input.sv	/^module generic_fifo$/;"	m	interface:class.class
+MSB	input.sv	/^  #(parameter MSB=3, LSB=0, DEPTH=4) \/\/ these parameters can be redefined$/;"	c	module:class.class.generic_fifo
+LSB	input.sv	/^  #(parameter MSB=3, LSB=0, DEPTH=4) \/\/ these parameters can be redefined$/;"	c	module:class.class.generic_fifo
+DEPTH	input.sv	/^  #(parameter MSB=3, LSB=0, DEPTH=4) \/\/ these parameters can be redefined$/;"	c	module:class.class.generic_fifo
+in	input.sv	/^   (input  wire [MSB:LSB] in,$/;"	p	module:class.class.generic_fifo
+clk	input.sv	/^    input  wire clk, read, write, reset,$/;"	p	module:class.class.generic_fifo
+read	input.sv	/^    input  wire clk, read, write, reset,$/;"	p	module:class.class.generic_fifo
+write	input.sv	/^    input  wire clk, read, write, reset,$/;"	p	module:class.class.generic_fifo
+reset	input.sv	/^    input  wire clk, read, write, reset,$/;"	p	module:class.class.generic_fifo
+out	input.sv	/^    output logic [MSB:LSB] out,$/;"	p	module:class.class.generic_fifo
+full	input.sv	/^    output logic full, empty );$/;"	p	module:class.class.generic_fifo
+empty	input.sv	/^    output logic full, empty );$/;"	p	module:class.class.generic_fifo
+generic_decoder	input.sv	/^module generic_decoder$/;"	m	interface:class.class
+num_code_bits	input.sv	/^  #(num_code_bits = 3, localparam num_out_bits = 1 << num_code_bits)$/;"	c	module:class.class.generic_decoder
+num_out_bits	input.sv	/^  #(num_code_bits = 3, localparam num_out_bits = 1 << num_code_bits)$/;"	c	module:class.class.generic_decoder
+A	input.sv	/^   (input [num_code_bits-1:0] A, output reg [num_out_bits-1:0] Y);$/;"	p	module:class.class.generic_decoder
+Y	input.sv	/^   (input [num_code_bits-1:0] A, output reg [num_out_bits-1:0] Y);$/;"	p	module:class.class.generic_decoder
+int_t	input.sv	/^typedef int int_t;$/;"	T	interface:class.class
+user_defined_type_param	input.sv	/^module user_defined_type_param$/;"	m	interface:class.class
+um_code_bits	input.sv	/^  #(int_t num_code_bits = 3, localparam num_out_bits = 1 << num_code_bits)$/;"	c	module:class.class.user_defined_type_param
+num_out_bits	input.sv	/^  #(int_t num_code_bits = 3, localparam num_out_bits = 1 << num_code_bits)$/;"	c	module:class.class.user_defined_type_param
+A	input.sv	/^   (input [num_code_bits-1:0] A, output reg [num_out_bits-1:0] Y);$/;"	p	module:class.class.user_defined_type_param
+Y	input.sv	/^   (input [num_code_bits-1:0] A, output reg [num_out_bits-1:0] Y);$/;"	p	module:class.class.user_defined_type_param

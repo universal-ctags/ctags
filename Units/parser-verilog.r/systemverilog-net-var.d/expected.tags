@@ -5,6 +5,8 @@ data	input.sv	/^  wire struct packed { logic ecc; logic [7:0] data; } memsig; \/
 w	input.sv	/^  wire w; \/\/ equivalent to "wire logic w;"$/;"	n	module:net_decl
 ww	input.sv	/^  wire [15:0] ww; \/\/ equivalent to "wire logic [15:0] ww;"$/;"	n	module:net_decl
 delay_control	input.sv	/^module delay_control #(d, e);$/;"	m
+d	input.sv	/^module delay_control #(d, e);$/;"	c	module:delay_control
+e	input.sv	/^module delay_control #(d, e);$/;"	c	module:delay_control
 rega	input.sv	/^  int rega, regb, regr;$/;"	r	module:delay_control
 regb	input.sv	/^  int rega, regb, regr;$/;"	r	module:delay_control
 regr	input.sv	/^  int rega, regb, regr;$/;"	r	module:delay_control
