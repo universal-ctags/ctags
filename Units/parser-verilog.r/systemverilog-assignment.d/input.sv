@@ -1,7 +1,5 @@
 module assignment;
-  // user defined types are ignored.
-  //   https://github.com/universal-ctags/ctags/issues/2413
-  // Update expected.tags when #2413 is fixed.
+
   function int bar();
     return 0;
   endfunction

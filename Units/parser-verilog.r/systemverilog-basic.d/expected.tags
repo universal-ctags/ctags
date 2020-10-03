@@ -59,6 +59,8 @@ k	input.sv	/^real k;$/;"	r	module:mod
 mod.k	input.sv	/^real k;$/;"	r	module:mod
 l	input.sv	/^integer l;$/;"	r	module:mod
 mod.l	input.sv	/^integer l;$/;"	r	module:mod
+t	input.sv	/^test t;$/;"	r	module:mod
+mod.t	input.sv	/^test t;$/;"	r	module:mod
 add	input.sv	/^task add ($/;"	t	module:mod
 mod.add	input.sv	/^task add ($/;"	t	module:mod
 x	input.sv	/^    input x, y$/;"	p	task:mod.add

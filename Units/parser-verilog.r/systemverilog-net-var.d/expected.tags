@@ -1,12 +1,92 @@
 net_decl	input.sv	/^module net_decl;$/;"	m
-addressT	input.sv	/^  typedef logic [31:0] addressT;$/;"	T	module:net_decl
-ecc	input.sv	/^  wire struct packed { logic ecc; logic [7:0] data; } memsig; \/\/ FIXME: packed -> memsig$/;"	r	module:net_decl
-data	input.sv	/^  wire struct packed { logic ecc; logic [7:0] data; } memsig; \/\/ FIXME: packed -> memsig$/;"	r	module:net_decl
-w	input.sv	/^  wire w; \/\/ equivalent to "wire logic w;"$/;"	n	module:net_decl
-ww	input.sv	/^  wire [15:0] ww; \/\/ equivalent to "wire logic [15:0] ww;"$/;"	n	module:net_decl
+a	input.sv	/^  trireg a;$/;"	n	module:net_decl
+cap1	input.sv	/^  trireg (large) #(0,0,50) cap1;$/;"	n	module:net_decl
+cap2	input.sv	/^  trireg (small) signed [3:0] cap2;$/;"	n	module:net_decl
+w	input.sv	/^  wire w = vara & varb; \/\/ net with a continuous assignment$/;"	n	module:net_decl
+v	input.sv	/^  logic v = consta & constb; \/\/ variable with initialization$/;"	r	module:net_decl
+vw	input.sv	/^  logic vw; \/\/ no initial assignment$/;"	r	module:net_decl
+circ	input.sv	/^  real circ;$/;"	r	module:net_decl
+top	input.sv	/^module top();$/;"	m
+iBus	input.sv	/^  interconnect [0:1] iBus;$/;"	n	module:top
+rlMod	input.sv	/^module rlMod(input interconnect [0:1] iBus);$/;"	m
+iBus	input.sv	/^module rlMod(input interconnect [0:1] iBus);$/;"	p	module:rlMod
+Net_declarations	input.sv	/^module Net_declarations$/;"	m
+addressT	input.sv	/^  typedef logic [31:0] addressT;$/;"	T	module:Net_declarations
+ecc	input.sv	/^  wire struct packed { logic ecc; logic [7:0] data; } memsig; \/\/ FIXME: ignored -> memsig$/;"	r	module:Net_declarations
+data	input.sv	/^  wire struct packed { logic ecc; logic [7:0] data; } memsig; \/\/ FIXME: ignored -> memsig$/;"	r	module:Net_declarations
+w	input.sv	/^  wire w; \/\/ equivalent to "wire logic w;"$/;"	n	module:Net_declarations
+w	input.sv	/^  wire logic w;$/;"	n	module:Net_declarations
+ww	input.sv	/^  wire [15:0] ww; \/\/ equivalent to "wire logic [15:0] ww;"$/;"	n	module:Net_declarations
+ww	input.sv	/^  wire logic [15:0] ww;$/;"	n	module:Net_declarations
+w1	input.sv	/^  interconnect w1;              \/\/ legal$/;"	n	module:Net_declarations
+w2	input.sv	/^  interconnect [3:0] w2;        \/\/ legal$/;"	n	module:Net_declarations
+w3	input.sv	/^  interconnect [3:0] w3 [1:0];  \/\/ legal$/;"	n	module:Net_declarations
+wT	input.sv	/^  nettype T wT;$/;"	r	module:Net_declarations
+w1	input.sv	/^  wT w1;$/;"	r	module:Net_declarations
+w2	input.sv	/^  wT w2[8];$/;"	r	module:Net_declarations
+w3	input.sv	/^  wTsum w3;$/;"	r	module:Net_declarations
+w4	input.sv	/^  wTsum w4[8];$/;"	r	module:Net_declarations
+TR	input.sv	/^  typedef real TR[5];$/;"	T	module:Net_declarations
+wTR	input.sv	/^  nettype TR wTR;$/;"	r	module:Net_declarations
+w5	input.sv	/^  wTR w5;$/;"	r	module:Net_declarations
+w6	input.sv	/^  wTR w6[8];$/;"	r	module:Net_declarations
+Variable_declarations	input.sv	/^module Variable_declarations;$/;"	m
+s1	input.sv	/^  shortint s1, s2[0:9];$/;"	r	module:Variable_declarations
+s2	input.sv	/^  shortint s1, s2[0:9];$/;"	r	module:Variable_declarations
+v	input.sv	/^  var v; \/\/ equivalent to "var logic v;"$/;"	r	module:Variable_declarations
+vw	input.sv	/^  var [15:0] vw; \/\/ equivalent to "var logic [15:0] vw;"$/;"	r	module:Variable_declarations
+data_in	input.sv	/^  input var logic data_in;$/;"	p	module:Variable_declarations
+r	input.sv	/^  var reg r;$/;"	r	module:Variable_declarations
+i	input.sv	/^  int i = 0;$/;"	r	module:Variable_declarations
+Vector_declarations	input.sv	/^module Vector_declarations;$/;"	m
+w	input.sv	/^  wand w; \/\/ a scalar "wand" net$/;"	n	module:Vector_declarations
+busa	input.sv	/^  tri [15:0] busa; \/\/ a 16-bit bus$/;"	n	module:Vector_declarations
+storeit	input.sv	/^  trireg (small) storeit; \/\/ a charge storage node of strength small$/;"	n	module:Vector_declarations
+a	input.sv	/^  logic a; \/\/ a scalar variable$/;"	r	module:Vector_declarations
+v	input.sv	/^  logic[3:0] v; \/\/ a 4-bit vector made up of (from most to$/;"	r	module:Vector_declarations
+signed_reg	input.sv	/^  logic signed [3:0] signed_reg; \/\/ a 4-bit vector in range -8 to 7$/;"	r	module:Vector_declarations
+b	input.sv	/^  logic [-1:4] b; \/\/ a 6-bit vector$/;"	r	module:Vector_declarations
+w1	input.sv	/^  wire w1, w2; \/\/ declares two nets$/;"	n	module:Vector_declarations
+w2	input.sv	/^  wire w1, w2; \/\/ declares two nets$/;"	n	module:Vector_declarations
+x	input.sv	/^  logic [4:0] x, y, z; \/\/ declares three 5-bit variables$/;"	r	module:Vector_declarations
+y	input.sv	/^  logic [4:0] x, y, z; \/\/ declares three 5-bit variables$/;"	r	module:Vector_declarations
+z	input.sv	/^  logic [4:0] x, y, z; \/\/ declares three 5-bit variables$/;"	r	module:Vector_declarations
+bus64	input.sv	/^  tri1 scalared [63:0] bus64; \/\/a bus that will be expanded$/;"	n	module:Vector_declarations
+data	input.sv	/^  tri vectored [31:0] data; \/\/a bus that may or may not be expanded$/;"	n	module:Vector_declarations
+String_data_type	input.sv	/^module String_data_type;$/;"	m
+default_name	input.sv	/^  parameter string default_name = "John Smith";$/;"	c	module:String_data_type
+myName	input.sv	/^  string myName = default_name;$/;"	r	module:String_data_type
+c	input.sv	/^  byte c = "A"; \/\/ assigns to c "A"$/;"	r	module:String_data_type
+b	input.sv	/^  bit [10:0] b = "\\x41"; \/\/ assigns to b 'b000_0100_0001$/;"	r	module:String_data_type
+h	input.sv	/^  bit [1:4][7:0] h = "hello" ; \/\/ assigns to h "ello"$/;"	r	module:String_data_type
+s0	input.sv	/^  string s0 = "String literal assign";\/\/ sets s0 to "String literal assign"$/;"	r	module:String_data_type
+s1	input.sv	/^  string s1 = "hello\\0world"; \/\/ sets s1 to "helloworld"$/;"	r	module:String_data_type
+b	input.sv	/^  bit [11:0] b = 12'ha41;$/;"	r	module:String_data_type
+s2	input.sv	/^  string s2 = string'(b); \/\/ sets s2 to 16'h0a41$/;"	r	module:String_data_type
+r_t	input.sv	/^  typedef logic [15:0] r_t;$/;"	T	module:String_data_type
+r	input.sv	/^  r_t r;$/;"	r	module:String_data_type
+i	input.sv	/^  integer i = 1;$/;"	r	module:String_data_type
+b	input.sv	/^  string b = "";$/;"	r	module:String_data_type
+a	input.sv	/^  string a = {"Hi", b};$/;"	r	module:String_data_type
+event_data_type	input.sv	/^module event_data_type;$/;"	m
+done	input.sv	/^  event done; \/\/ declare a new event called done$/;"	e	module:event_data_type
+done_too	input.sv	/^  event done_too = done; \/\/ declare done_too as alias to done$/;"	e	module:event_data_type
+empty	input.sv	/^  event empty = null; \/\/ event variable with no synchronization object$/;"	e	module:event_data_type
+user_define_types_0	input.sv	/^module user_define_types_0;$/;"	m
+intP	input.sv	/^  typedef int intP;$/;"	T	module:user_define_types_0
+a	input.sv	/^  intP a, b;$/;"	r	module:user_define_types_0
+b	input.sv	/^  intP a, b;$/;"	r	module:user_define_types_0
+intf_i	input.sv	/^interface intf_i;$/;"	I
+data_t	input.sv	/^  typedef int data_t;$/;"	T	interface:intf_i
+sub	input.sv	/^module sub(intf_i p);$/;"	m
+p	input.sv	/^module sub(intf_i p);$/;"	r	module:sub
+data	input.sv	/^  my_data_t data;$/;"	r	module:sub
+user_define_types_1	input.sv	/^module user_define_types_1;$/;"	m
 delay_control	input.sv	/^module delay_control #(d, e);$/;"	m
 d	input.sv	/^module delay_control #(d, e);$/;"	c	module:delay_control
 e	input.sv	/^module delay_control #(d, e);$/;"	c	module:delay_control
 rega	input.sv	/^  int rega, regb, regr;$/;"	r	module:delay_control
 regb	input.sv	/^  int rega, regb, regr;$/;"	r	module:delay_control
 regr	input.sv	/^  int rega, regb, regr;$/;"	r	module:delay_control
+rega	input.sv	/^    #d rega = regb; \/\/ d is defined as a parameter  FIXME$/;"	r	module:delay_control
+regr	input.sv	/^    #regr regr = regr + 1; \/\/ delay is the value in regr  FIXME$/;"	r	module:delay_control

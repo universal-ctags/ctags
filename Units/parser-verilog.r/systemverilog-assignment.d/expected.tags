@@ -10,12 +10,18 @@ abkey	input.sv	/^  struct {int a; time b;} abkey[1:0];$/;"	S	module:assignment
 abkey_fun	input.sv	/^  struct {int a; time b;} abkey_fun[1:0] = '{'{a:bar(), b:2ns}, '{int:5, time:$time}};$/;"	S	module:assignment
 st	input.sv	/^  } st;$/;"	T	module:assignment
 k	input.sv	/^  int k = 1;$/;"	r	module:assignment
+s1	input.sv	/^  st s1 = '{1, 2+k}; \/\/ by position;$/;"	r	module:assignment
+s2	input.sv	/^  st s2 = '{x:2, y:3+k}; \/\/ by name$/;"	r	module:assignment
 s3	input.sv	/^  struct { int x; int y; } s3 = '{1, 2+k};$/;"	S	module:assignment
 s4	input.sv	/^  struct { int x; int y; } s4 = '{x:2, y:3+k};$/;"	S	module:assignment
+s5	input.sv	/^  st s5 = '{default:2};$/;"	r	module:assignment
 ab	input.sv	/^  typedef struct { int a; shortreal b; } ab;  \/\/ LRM 5.10$/;"	T	module:assignment
+abkey	input.sv	/^  ab abkey[1:0] = '{'{a:1, b:1.0}, '{int:2, shortreal:2.0}};$/;"	r	module:assignment
 ABC	input.sv	/^  } ABC, DEF;$/;"	S	module:assignment
 DEF	input.sv	/^  } ABC, DEF;$/;"	S	module:assignment
 sa	input.sv	/^  } sa;$/;"	T	module:assignment
+s2	input.sv	/^  sa s2 = '{int:1, default:0, string:""};$/;"	r	module:assignment
 A3	input.sv	/^  int A3[1:3];$/;"	r	module:assignment
 AI3	input.sv	/^  typedef int AI3[1:3];$/;"	T	module:assignment
+A3	input.sv	/^  AI3 A3;$/;"	r	module:assignment
 A9	input.sv	/^  int A9[1:9];$/;"	r	module:assignment
