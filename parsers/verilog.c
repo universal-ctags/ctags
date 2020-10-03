@@ -1426,6 +1426,10 @@ static int skipDelay(tokenInfo* token, int c)
 			c = skipPastMatch ("()");
 		else if (isIdentifierCharacter (c))
 			readIdentifier (token, c);
+		else if (c == ('#')) {
+			skipToSemiColon ();	// a dirty hack for "x ##delay1 y[*min:max];"
+			c = vGetc ();
+		}
 		c = skipWhite (c);
 	}
 	return c;
