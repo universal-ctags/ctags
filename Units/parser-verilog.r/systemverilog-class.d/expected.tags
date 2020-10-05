@@ -59,17 +59,17 @@ a	input.sv	/^    function mult (a, input b = 0);$/;"	p	function:supertest.mult
 supertest.mult.a	input.sv	/^    function mult (a, input b = 0);$/;"	p	function:supertest.mult
 b	input.sv	/^    function mult (a, input b = 0);$/;"	p	function:supertest.mult
 supertest.mult.b	input.sv	/^    function mult (a, input b = 0);$/;"	p	function:supertest.mult
-paramtest	input.sv	/^class paramtest #(type BASE=supertest #(test)) extends BASE;$/;"	C
+paramtest	input.sv	/^class paramtest #(type BASE=supertest #(test)) extends BASE;$/;"	C	inherits:BASE
 BASE	input.sv	/^class paramtest #(type BASE=supertest #(test)) extends BASE;$/;"	c	class:paramtest
 paramtest.BASE	input.sv	/^class paramtest #(type BASE=supertest #(test)) extends BASE;$/;"	c	class:paramtest
-paramtest2	input.sv	/^class paramtest2 #($/;"	C
+paramtest2	input.sv	/^class paramtest2 #($/;"	C	inherits:BASE
 BASE	input.sv	/^  type BASE=supertest #(test)$/;"	c	class:paramtest2
 paramtest2.BASE	input.sv	/^  type BASE=supertest #(test)$/;"	c	class:paramtest2
 paramtest3	input.sv	/^class paramtest3 #(type BASE=supertest, type BASE2=paramtest);$/;"	C
-BASE2	input.sv	/^class paramtest3 #(type BASE=supertest, type BASE2=paramtest);$/;"	c	class:paramtest3
-paramtest3.BASE2	input.sv	/^class paramtest3 #(type BASE=supertest, type BASE2=paramtest);$/;"	c	class:paramtest3
 BASE	input.sv	/^class paramtest3 #(type BASE=supertest, type BASE2=paramtest);$/;"	c	class:paramtest3
 paramtest3.BASE	input.sv	/^class paramtest3 #(type BASE=supertest, type BASE2=paramtest);$/;"	c	class:paramtest3
+BASE2	input.sv	/^class paramtest3 #(type BASE=supertest, type BASE2=paramtest);$/;"	c	class:paramtest3
+paramtest3.BASE2	input.sv	/^class paramtest3 #(type BASE=supertest, type BASE2=paramtest);$/;"	c	class:paramtest3
 myfunc	input.sv	/^virtual function myfunc (a, b);$/;"	f	class:paramtest3
 paramtest3.myfunc	input.sv	/^virtual function myfunc (a, b);$/;"	f	class:paramtest3
 a	input.sv	/^virtual function myfunc (a, b);$/;"	p	function:paramtest3.myfunc
