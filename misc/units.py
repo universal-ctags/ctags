@@ -949,7 +949,8 @@ def action_run(parser, action, *args):
     run_summary(build_dir)
 
     if L_FAILED_BY_STATUS or L_FAILED_BY_DIFF or \
-            L_FAILED_BY_TIMEED_OUT or L_BROKEN_ARGS_CTAGS:
+            L_FAILED_BY_TIMEED_OUT or L_BROKEN_ARGS_CTAGS or \
+            L_VALGRIND:
         return 1
     else:
         return 0
