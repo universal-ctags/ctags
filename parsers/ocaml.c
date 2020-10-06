@@ -1136,7 +1136,7 @@ static void typeSpecification (vString * const ident, ocaToken what, ocaToken wh
 	switch (what)
 	{
 	case OcaIDENTIFIER:
-		if (isUpperAlpha (ident->buffer[0]))
+		if (isUpperAlpha (vStringChar (ident, 0)))
 		{
 			/* here we handle type aliases of type
 			 * type foo = AnotherModule.bar
@@ -1213,7 +1213,7 @@ static void parseLabel (vString * const ident, ocaToken what, ocaToken whatNext)
 		break;
 
 	case Tok_Op:
-		if (ident->buffer[0] == ':')
+		if (vStringChar(ident, 0) == ':')
 		{
 			toDoNext = &ignoreToken;
 			comeAfter = &letParam;
@@ -1448,7 +1448,7 @@ static void letParam (vString * const ident, ocaToken what, ocaToken whatNext CT
 		break;
 
 	case Tok_Op:
-		switch (ident->buffer[0])
+		switch (vStringChar (ident, 0))
 		{
 		case ':':
 			/*popSoftContext(); */
@@ -1980,8 +1980,8 @@ static void computeModuleName ( void )
 
 	vStringNCopyS (moduleName, &filename[beginIndex], endIndex - beginIndex);
 
-	if (isLowerAlpha (moduleName->buffer[0]))
-		moduleName->buffer[0] += ('A' - 'a');
+	if (isLowerAlpha (vStringChar (moduleName, 0)))
+		vStringChar (moduleName, 0) += ('A' - 'a');
 
 	addTag (moduleName, K_MODULE);
 	vStringDelete (moduleName);
@@ -2033,7 +2033,7 @@ static void findOcamlTags (void)
 	/* prime the lookahead token */
 	st = nextSt;	// preserve the old state for our first token
 	st.name = vStringNewCopy (st.name);
-	st.cp = (const unsigned char *) temp_cp->buffer;
+	st.cp = (const unsigned char *) vStringValue (temp_cp);
 	tok = nextTok;
 	ocaLineNumber = getInputLineNumber(); /* ??? getSourceLineNumber() */
 	ocaFilePosition = getInputFilePosition();
@@ -2051,7 +2051,7 @@ static void findOcamlTags (void)
 		if (nextTok != Tok_EOF)
 		{
 			vStringCopyS (temp_cp, (const char *) nextSt.cp);
-			st.cp = (const unsigned char *) temp_cp->buffer;
+			st.cp = (const unsigned char *) vStringValue (temp_cp);
 			vStringCopy (st.name, nextSt.name);
 			nextTok = lex (&nextSt);
 		}
