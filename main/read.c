@@ -851,9 +851,9 @@ static eolType readLine (vString *const vLine, MIO *const mio)
 		 * CR (Mac OS 9). As CR-only EOL isn't handled by gets() and Mac OS 9
 		 * is dead, we only handle CR-LF EOLs and convert them into LF. */
 		if (newLine && vStringLength (vLine) > 1 &&
-			vStringItem (vLine, vStringLength (vLine) - 2) == '\r')
+			vStringChar (vLine, vStringLength (vLine) - 2) == '\r')
 		{
-			vStringItem (vLine, vStringLength (vLine) - 2) = '\n';
+			vStringChar (vLine, vStringLength (vLine) - 2) = '\n';
 			vStringChop (vLine);
 			r = eol_cr_nl;
 		}

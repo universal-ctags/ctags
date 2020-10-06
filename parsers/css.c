@@ -144,7 +144,7 @@ static cssKind classifySelector (const vString *const selector)
 
 	for (i = vStringLength (selector); i > 0; --i)
 	{
-		char c = vStringItem (selector, i - 1);
+		char c = vStringChar (selector, i - 1);
 		if (c == '.')
 			return K_CLASS;
 		else if (c == '#')

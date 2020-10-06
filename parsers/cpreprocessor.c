@@ -878,7 +878,7 @@ static int directiveDefine (const int c, bool undef)
 
 					if (vStringLength (param) > 0)
 					{
-						makeParamTag (param, vStringItem(param, 0) == '.');
+						makeParamTag (param, vStringChar(param, 0) == '.');
 						vStringClear (param);
 					}
 					if (p == '\\')
