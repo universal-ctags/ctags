@@ -392,7 +392,7 @@ static bool signatureExpectingParameter (vString *signature)
 
 	for (size_t i = vStringLength (signature); i > 0; i--)
 	{
-		char c = vStringItem (signature, i - 1);
+		char c = vStringChar (signature, i - 1);
 		if (c == ' ')
 			continue;
 		else if (c == ',')
