@@ -590,9 +590,9 @@ static void skipToSemiColon (void)
 /* read an identifier, keyword, number, compiler directive, or macro identifier */
 static bool readWordToken (tokenInfo *const token, int c)
 {
-	vStringClear (token->name);
 	if (isIdentifierCharacter (c))
 	{
+		vStringClear (token->name);
 		while (isIdentifierCharacter (c))
 		{
 			vStringPut (token->name, c);
@@ -601,8 +601,10 @@ static bool readWordToken (tokenInfo *const token, int c)
 		vUngetc (c);
 		token->lineNumber = getInputLineNumber ();
 		token->filePosition = getInputFilePosition ();
+		token->kind = K_UNDEFINED;	// to be set by updateKind()
+		return true;
 	}
-	return (bool)(vStringLength (token->name) > 0);
+	return false;
 }
 
 /* check if an ideitifier:
@@ -846,8 +848,7 @@ static bool findBlockName (tokenInfo *const token)
 	if (c == ':')
 	{
 		c = skipWhite (vGetc ());
-		readWordToken (token, c);
-		return (bool) (vStringLength (token->name) > 0);
+		return readWordToken (token, c);
 	}
 	else
 		vUngetc (c);
@@ -913,9 +914,8 @@ static void processPortList (int c)
 					c = skipWhite (vGetc ());
 				}
 			}
-			else if (isIdentifierCharacter (c))
+			else if (readWordToken (token, c))
 			{
-				readWordToken (token, c);
 				updateKind (token);
 				if (token->kind == K_UNDEFINED)
 				{
@@ -1111,9 +1111,8 @@ static void processStruct (tokenInfo *const token)
 	c = skipWhite (vGetc ());
 
 	/* Skip packed, signed, and unsigned */
-	while (isIdentifierCharacter (c))
+	while (readWordToken (token, c))
 	{
-		readWordToken (token, c);
 		c = skipWhite (vGetc ());
 	}
 
@@ -1144,9 +1143,8 @@ static void processTypedef (tokenInfo *const token)
 
 	/* Get typedef type */
 	c = skipWhite (vGetc ());
-	if (isIdentifierCharacter (c))
+	if (readWordToken (token, c))
 	{
-		readWordToken (token, c);
 		updateKind (token);
 
 		switch (token->kind)
@@ -1178,30 +1176,22 @@ static void processTypedef (tokenInfo *const token)
 	}
 
 	/* Skip signed or unsiged */
-	if (isIdentifierCharacter (c))
-	{
-		readWordToken (token, c);
+	if (readWordToken (token, c))
 		c = skipWhite (vGetc ());
-	}
 
 	/* Skip bus width definition */
 	c = skipDimension (c);
 
 	/* Skip remaining identifiers */
-	while (isIdentifierCharacter (c))
-	{
-		readWordToken (token, c);
+	while (readWordToken (token, c))
 		c = skipWhite (vGetc ());
-	}
 
 	/* Skip past class parameter override */
 	c = skipParameterAssignment (c);
 
 	/* Read typedef name */
-	if (isIdentifierCharacter (c))
-	{
-		readWordToken (token, c);
-	}
+	if (readWordToken (token, c))
+		; // just read a word token
 	else
 	{
 		vUngetc (c);
@@ -1232,9 +1222,8 @@ static tokenInfo * processParameterList (int c)
 			do
 			{
 				c = skipWhite (vGetc ());
-				if (isIdentifierCharacter (c))
+				if (readWordToken (token, c))
 				{
-					readWordToken (token, c);
 					updateKind (token);
 					verbose ("Found parameter %s\n", vStringValue (token->name));
 					if (token->kind == K_UNDEFINED)
@@ -1283,11 +1272,8 @@ static void processClass (tokenInfo *const token)
 
 	/* Get identifiers */
 	c = skipWhite (vGetc ());
-	if (isIdentifierCharacter (c))
-	{
-		readWordToken (token, c);
+	if (readWordToken (token, c))
 		c = skipWhite (vGetc ());
-	}
 
 	/* Find class parameters list */
 	parameters = processParameterList (c);
@@ -1348,9 +1334,8 @@ static void processDesignElement (tokenInfo *const token)
 {
 	int c = skipWhite (vGetc ());
 
-	if (isIdentifierCharacter (c))
+	if (readWordToken (token, c))
 	{
-		readWordToken (token, c);
 		while (getKindForToken (token) == K_IGNORE)
 		{
 			c = skipWhite (vGetc ());
@@ -1413,12 +1398,12 @@ static int skipDelay(tokenInfo* token, int c)
 		c = skipWhite (vGetc ());
 		if (c == '(')
 			c = skipPastMatch ("()");
-		else if (isIdentifierCharacter (c))
-			readWordToken (token, c);
 		else if (c == ('#')) {
 			skipToSemiColon ();	// a dirty hack for "x ##delay1 y[*min:max];"
 			c = vGetc ();
 		}
+		else
+			readWordToken (token, c);
 		c = skipWhite (c);
 	}
 	return c;
@@ -1448,9 +1433,8 @@ static void tagNameList (tokenInfo* token, int c)
 		{
 			c = skipMacro (c);
 		}
-		if (isIdentifierCharacter (c))
+		if (readWordToken (token, c))
 		{
-			readWordToken (token, c);
 			updateKind (token);
 			if (kind == K_UNDEFINED)	// user defined type
 			{
@@ -1637,9 +1621,8 @@ static void findVerilogTags (void)
 					tagContents = popToken (tagContents);
 				}
 			default :
-				if (isIdentifierCharacter (c))
+				if (readWordToken (token, c))
 				{
-					readWordToken (token, c);
 					updateKind (token);
 					findTag (token);
 				}
