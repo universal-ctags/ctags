@@ -344,21 +344,6 @@ static short isTempContext (tokenInfo const* token)
 	}
 }
 
-static short isVariable (tokenInfo const* token)
-{
-	switch (token->kind)
-	{
-		case K_CONSTANT:
-		case K_EVENT:
-		case K_NET:
-		case K_PORT:
-		case K_REGISTER:
-			return true;
-		default:
-			return false;
-	}
-}
-
 static short hasSimplePortList (tokenInfo const* token)
 {
 	switch (token->kind)
@@ -976,6 +961,10 @@ static int skipParameterAssignment (int c)
 	return c;
 }
 
+/* Functions are treated differently because they may also include the
+ * type of the return value.
+ * Tasks are treated in the same way, although not having a return
+ * value.*/
 static void processFunction (tokenInfo *const token)
 {
 	int c;
@@ -1536,72 +1525,75 @@ static void findTag (tokenInfo *const token)
 		/* Drop context, but only if an end token is found */
 		dropEndContext (token);
 	}
-	if (token->kind == K_END_DE || token->kind == K_IGNORE)
-		return;
 
-	if (token->kind == K_DEFINE)
+	switch (token->kind)
 	{
-		processDefine (token);	/* Process `define foo ... */
-	}
-	else if (token->kind == K_IFDEF)
-	{
-		skipIfdef(token);
-	}
-	else if (token->kind == K_BEGIN || token->kind == K_END)
-	{
-		/* Process begin..end blocks */
-		processBlock (token);
-	}
-	else if (token->kind == K_FUNCTION || token->kind == K_TASK)
-	{
-		/* Functions are treated differently because they may also include the
-		 * type of the return value.
-		 * Tasks are treated in the same way, although not having a return
-		 * value.*/
-		processFunction (token);
-	}
-	else if (token->kind == K_ASSERTION)
-	{
-		processAssertion (token);
-	}
-	else if (token->kind == K_TYPEDEF)
-	{
-		processTypedef (token);
-	}
-	else if (token->kind == K_ENUM)
-	{
-		processEnum (token);
-	}
-	else if (token->kind == K_STRUCT)
-	{
-		processStruct (token);
-	}
-	else if (token->kind == K_CLASS)
-	{
-		processClass (token);
-	}
-	else if (token->kind == K_PROTOTYPE)
-	{
-		currentContext->prototype = true;
-	}
-	else if (isVariable (token))
-	{
-		tagNameList (token, skipWhite (vGetc ()));
-	}
-	else if (token->kind == K_UNDEFINED)
-	{
-		if (isIdentifier(token)) {
-			int c = skipWhite (vGetc ());
-			if (c == ':')
-				vUngetc (c); /* label */
-			else
-				tagNameList (token, c);	/* user defined type */
-		}
-	}
-	else
-	{
-		/* K_MODULE, K_PROGRAM, K_INTERFACE, K_PACKAGE, K_PROPERTY, K_COVERGROUP */
-		processDesignElement (token);
+		case K_CONSTANT:
+		case K_EVENT:
+		case K_NET:
+		case K_PORT:
+		case K_REGISTER:
+			tagNameList (token, skipWhite (vGetc ()));
+			break;
+		case K_UNDEFINED:
+			if (isIdentifier(token))
+			{
+				int c = skipWhite(vGetc());
+				if (c == ':')
+					vUngetc(c); /* label */
+				else
+					tagNameList(token, c); /* user defined type */
+			}
+			break;
+		case K_CLASS:
+			processClass(token);
+			break;
+		case K_TYPEDEF:
+			processTypedef(token);
+			break;
+		case K_ENUM:
+			processEnum(token);
+			break;
+		case K_STRUCT:
+			processStruct(token);
+			break;
+		case K_PROTOTYPE:
+			currentContext->prototype = true;
+			break;
+
+		case K_COVERGROUP:
+		case K_INTERFACE:
+		case K_MODPORT:
+		case K_MODULE:
+		case K_PACKAGE:
+		case K_PROGRAM:
+		case K_PROPERTY:
+			processDesignElement(token);
+			break;
+		case K_BEGIN:
+		case K_END:
+			processBlock(token);
+			break;
+		case K_FUNCTION:
+		case K_TASK:
+			processFunction(token);
+			break;
+		case K_ASSERTION:
+			processAssertion(token);
+			break;
+
+		case K_DEFINE:
+			processDefine(token);		// Process `define foo ...
+			break;
+		case K_IFDEF:
+			skipIfdef(token);
+			break;
+
+		case K_END_DE:
+		case K_IGNORE:
+			return;
+		default:
+			verbose ("Unexpected kind->token %d\n", token->kind);
 	}
 }
 
