@@ -588,7 +588,7 @@ static void skipToSemiColon (void)
 }
 
 /* read an identifier, keyword, number, compiler directive, or macro identifier */
-static bool readIdentifier (tokenInfo *const token, int c)
+static bool readWordToken (tokenInfo *const token, int c)
 {
 	vStringClear (token->name);
 	if (isIdentifierCharacter (c))
@@ -635,7 +635,7 @@ static bool isIdentifier (tokenInfo* token)
 static void skipIfdef (tokenInfo* token)
 {
 	int c = skipWhite (vGetc ());
-	readIdentifier (token, c);
+	readWordToken (token, c);
 	verbose ("Skipping conditional macro %s\n", vStringValue (token->name));
 }
 
@@ -646,7 +646,7 @@ static int skipMacro (int c)
 	if (c == '`')
 	{
 		/* Skip keyword */
-		readIdentifier (token, c);
+		readWordToken (token, c);
 		updateKind (token);
 		/* Skip next keyword if macro is `ifdef, `ifndef, `elsif, or `undef */
 		if (token->kind == K_IFDEF)
@@ -846,7 +846,7 @@ static bool findBlockName (tokenInfo *const token)
 	if (c == ':')
 	{
 		c = skipWhite (vGetc ());
-		readIdentifier (token, c);
+		readWordToken (token, c);
 		return (bool) (vStringLength (token->name) > 0);
 	}
 	else
@@ -915,7 +915,7 @@ static void processPortList (int c)
 			}
 			else if (isIdentifierCharacter (c))
 			{
-				readIdentifier (token, c);
+				readWordToken (token, c);
 				updateKind (token);
 				if (token->kind == K_UNDEFINED)
 				{
@@ -975,7 +975,7 @@ static void processFunction (tokenInfo *const token)
 	c = skipWhite (vGetc ());
 	do
 	{
-		readIdentifier (token, c);
+		readWordToken (token, c);
 		c = skipWhite (vGetc ());
 		/* skip parameter assignment of a class type
 		 *    ex. function uvm_port_base #(IF) get_if(int index=0); */
@@ -1028,7 +1028,7 @@ static void processEnum (tokenInfo *const token)
 		{
 			type = newToken ();
 
-			readIdentifier (type, c);
+			readWordToken (type, c);
 			updateKind (type);
 			typeQueue = pushToken (typeQueue, type);
 			verbose ("Enum type %s\n", vStringValue (type->name));
@@ -1062,7 +1062,7 @@ static void processEnum (tokenInfo *const token)
 		{
 			tokenInfo *content = newToken ();
 
-			readIdentifier (content, c);
+			readWordToken (content, c);
 			content->kind = K_CONSTANT;
 			tagContents = pushToken (tagContents, content);
 			verbose ("Pushed enum element \"%s\"\n", vStringValue (content->name));
@@ -1113,7 +1113,7 @@ static void processStruct (tokenInfo *const token)
 	/* Skip packed, signed, and unsigned */
 	while (isIdentifierCharacter (c))
 	{
-		readIdentifier (token, c);
+		readWordToken (token, c);
 		c = skipWhite (vGetc ());
 	}
 
@@ -1146,7 +1146,7 @@ static void processTypedef (tokenInfo *const token)
 	c = skipWhite (vGetc ());
 	if (isIdentifierCharacter (c))
 	{
-		readIdentifier (token, c);
+		readWordToken (token, c);
 		updateKind (token);
 
 		switch (token->kind)
@@ -1154,7 +1154,7 @@ static void processTypedef (tokenInfo *const token)
 			case K_INTERFACE:
 				/* Expecting `typedef interface class` */
 				c = skipWhite (vGetc ());
-				readIdentifier (token, c);
+				readWordToken (token, c);
 				updateKind (token);
 			case K_CLASS:
 				/* A typedef class is just a prototype */
@@ -1180,7 +1180,7 @@ static void processTypedef (tokenInfo *const token)
 	/* Skip signed or unsiged */
 	if (isIdentifierCharacter (c))
 	{
-		readIdentifier (token, c);
+		readWordToken (token, c);
 		c = skipWhite (vGetc ());
 	}
 
@@ -1190,7 +1190,7 @@ static void processTypedef (tokenInfo *const token)
 	/* Skip remaining identifiers */
 	while (isIdentifierCharacter (c))
 	{
-		readIdentifier (token, c);
+		readWordToken (token, c);
 		c = skipWhite (vGetc ());
 	}
 
@@ -1200,7 +1200,7 @@ static void processTypedef (tokenInfo *const token)
 	/* Read typedef name */
 	if (isIdentifierCharacter (c))
 	{
-		readIdentifier (token, c);
+		readWordToken (token, c);
 	}
 	else
 	{
@@ -1234,7 +1234,7 @@ static tokenInfo * processParameterList (int c)
 				c = skipWhite (vGetc ());
 				if (isIdentifierCharacter (c))
 				{
-					readIdentifier (token, c);
+					readWordToken (token, c);
 					updateKind (token);
 					verbose ("Found parameter %s\n", vStringValue (token->name));
 					if (token->kind == K_UNDEFINED)
@@ -1285,7 +1285,7 @@ static void processClass (tokenInfo *const token)
 	c = skipWhite (vGetc ());
 	if (isIdentifierCharacter (c))
 	{
-		readIdentifier (token, c);
+		readWordToken (token, c);
 		c = skipWhite (vGetc ());
 	}
 
@@ -1298,11 +1298,11 @@ static void processClass (tokenInfo *const token)
 	{
 		extra = newToken ();
 
-		readIdentifier (extra, c);
+		readWordToken (extra, c);
 		c = skipWhite (vGetc ());
 		if (strcmp (vStringValue (extra->name), "extends") == 0)
 		{
-			readIdentifier (extra, c);
+			readWordToken (extra, c);
 			vStringCopy (token->inheritance, extra->name);
 			verbose ("Inheritance %s\n", vStringValue (token->inheritance));
 		}
@@ -1324,7 +1324,7 @@ static void processDefine (tokenInfo *const token)
 {
 	/* Bug #961001: Verilog compiler directives are line-based. */
 	int c = skipWhite (vGetc ());
-	readIdentifier (token, c);
+	readWordToken (token, c);
 	token->kind = K_CONSTANT;
 	createTag (token);
 	/* Skip the rest of the line. */
@@ -1350,11 +1350,11 @@ static void processDesignElement (tokenInfo *const token)
 
 	if (isIdentifierCharacter (c))
 	{
-		readIdentifier (token, c);
+		readWordToken (token, c);
 		while (getKindForToken (token) == K_IGNORE)
 		{
 			c = skipWhite (vGetc ());
-			readIdentifier (token, c);
+			readWordToken (token, c);
 		}
 		createTag (token);
 
@@ -1414,7 +1414,7 @@ static int skipDelay(tokenInfo* token, int c)
 		if (c == '(')
 			c = skipPastMatch ("()");
 		else if (isIdentifierCharacter (c))
-			readIdentifier (token, c);
+			readWordToken (token, c);
 		else if (c == ('#')) {
 			skipToSemiColon ();	// a dirty hack for "x ##delay1 y[*min:max];"
 			c = vGetc ();
@@ -1450,7 +1450,7 @@ static void tagNameList (tokenInfo* token, int c)
 		}
 		if (isIdentifierCharacter (c))
 		{
-			readIdentifier (token, c);
+			readWordToken (token, c);
 			updateKind (token);
 			if (kind == K_UNDEFINED)	// user defined type
 			{
@@ -1639,7 +1639,7 @@ static void findVerilogTags (void)
 			default :
 				if (isIdentifierCharacter (c))
 				{
-					readIdentifier (token, c);
+					readWordToken (token, c);
 					updateKind (token);
 					findTag (token);
 				}
