@@ -387,9 +387,9 @@ static const char *parsePowerShellScope (tokenInfo *const token)
 		/* extract the scope */
 		vStringNCopyS (powershellScope, tokenName, powershellScopeLen);
 		/* cut the resulting scope string from the identifier */
-		memmove (token->string->buffer,
+		memmove (vStringValue (token->string),
 				 /* +1 to skip the leading colon */
-				 token->string->buffer + powershellScopeLen + 1,
+				 vStringValue (token->string) + powershellScopeLen + 1,
 				 /* +1 for the skipped leading colon and - 1 to include the trailing \0 byte */
 				 token->string->length + 1 - powershellScopeLen - 1);
 		token->string->length -= powershellScopeLen + 1;

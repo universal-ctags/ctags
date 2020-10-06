@@ -344,9 +344,9 @@ static void makeJsTagCommon (const tokenInfo *const token, const jsKind kind,
 			 * characters. */
 			for (i = 0; i < signature->length; i++)
 			{
-				unsigned char c = (unsigned char) signature->buffer[i];
+				unsigned char c = (unsigned char) vStringChar (signature, i);
 				if (c < 0x20 /* below space */ || c == 0x7F /* DEL */)
-					signature->buffer[i] = ' ';
+					vStringChar (signature, i) = ' ';
 			}
 			e.extensionFields.signature = vStringValue(signature);
 		}
@@ -941,7 +941,7 @@ getNextChar:
 					  else
 					  {
 						  if (repr) /* remove the / we added */
-							  repr->buffer[--repr->length] = 0;
+							  vStringChop(repr);
 						  if (d == '*')
 						  {
 							  skipToCharacterInInputFile2('*', '/');

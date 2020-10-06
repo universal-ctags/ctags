@@ -55,16 +55,16 @@ static bool whitespaceSwap (vString *const s)
         char toReplace = ' ';
 		char changed = false;
 
-        if(strchr(s->buffer, '_'))
+        if(strchr(vStringValue (s), '_'))
         {
             replaceWith = ' ';
             toReplace = '_';
         }
 
         for(unsigned int i=0; i < vStringLength(s); i++)
-            if(s->buffer[i] == toReplace)
+            if(vStringChar(s, i) == toReplace)
 			{
-                s->buffer[i] = replaceWith;
+                vStringChar (s, i) = replaceWith;
 				changed = true;
 			}
 
