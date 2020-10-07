@@ -1351,9 +1351,12 @@ static void processDesignElement (tokenInfo *const token)
 		}
 
 		/* Get port list if required */
-		if (c == '(' && hasSimplePortList (token))
+		if (c == '(')
 		{
-			processPortList (c);
+			if (kind == K_MODPORT)
+				c = skipPastMatch ("()");	// ignore port list
+			else if (hasSimplePortList (token))
+				processPortList (c);
 		}
 		else
 		{
@@ -1589,13 +1592,6 @@ static void findVerilogTags (void)
 			 * */
 			case ':':
 				vStringCopy (currentContext->blockName, token->name);
-				break;
-			/* Skip interface modport port declarations */
-			case '(':
-				if (currentContext && currentContext->lastKind == K_MODPORT)
-				{
-					skipPastMatch ("()");
-				}
 				break;
 			case ';':
 				/* Drop context on prototypes because they don't have an
