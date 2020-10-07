@@ -310,9 +310,9 @@ static void updateKind (tokenInfo *const token);
  *   FUNCTION DEFINITIONS
  */
 
-static short isContainer (tokenInfo const* token)
+static short isContainer (verilogKind kind)
 {
-	switch (token->kind)
+	switch (kind)
 	{
 		case K_MODULE:
 		case K_TASK:
@@ -737,19 +737,18 @@ static void dropEndContext (tokenInfo *const token)
 }
 
 
-static void createTag (tokenInfo *const token)
+static void createTag (tokenInfo *const token, verilogKind kind)
 {
 	tagEntryInfo tag;
-	verilogKind kind;
+
+	/* check if a container before kind is modified by prototype */
+	/* BTW should we create a context for a prototype? */
+	bool container = isContainer(kind);
 
 	/* Determine if kind is prototype */
 	if (currentContext->prototype)
 	{
 		kind = K_PROTOTYPE;
-	}
-	else
-	{
-		kind = token->kind;
 	}
 
 	/* Do nothing it tag name is empty or tag kind is disabled */
@@ -808,7 +807,7 @@ static void createTag (tokenInfo *const token)
 	}
 
 	/* Push token as context if it is a container */
-	if (isContainer (token))
+	if (container)
 	{
 		tokenInfo *newScope = newToken ();
 
@@ -824,7 +823,7 @@ static void createTag (tokenInfo *const token)
 			verbose ("Including tagContents\n");
 			do
 			{
-				createTag (content);
+				createTag (content, content->kind);
 				content = content->scope;
 			} while (content);
 		}
@@ -871,8 +870,7 @@ static void processBlock (tokenInfo *const token)
 		verbose ("Found block: %s\n", vStringValue (token->name));
 		if (token->kind == K_BEGIN)
 		{
-			token->kind = K_BLOCK;
-			createTag (token);
+			createTag (token, K_BLOCK);
 			verbose ("Current context %s\n", vStringValue (currentContext->name));
 		}
 		if (token->kind == K_END && currentContext->kind == K_BLOCK && currentContext->nestLevel <= 1)
@@ -925,8 +923,7 @@ static void processPortList (int c)
 					if (! isIdentifierCharacter (c) || c == '`')
 					{
 						verbose ("Found port: %s\n", vStringValue (token->name));
-						token->kind = K_PORT;
-						createTag (token);
+						createTag (token, K_PORT);
 					}
 				}
 				else
@@ -967,6 +964,7 @@ static int skipParameterAssignment (int c)
  * value.*/
 static void processFunction (tokenInfo *const token)
 {
+	verilogKind kind = token->kind;	// K_FUNCTION or K_TASK
 	int c;
 	tokenInfo *classType;
 
@@ -1006,7 +1004,7 @@ static void processFunction (tokenInfo *const token)
 		verbose ("Found function: %s\n", vStringValue (token->name));
 
 		/* Create tag */
-		createTag (token);
+		createTag (token, kind);
 
 		/* Get port list from function */
 		processPortList (c);
@@ -1041,8 +1039,7 @@ static void processEnum (tokenInfo *const token)
 		if (type->kind == K_UNDEFINED && (typeQueue->scope == NULL || typeQueue->scope->kind != K_UNDEFINED))
 		{
 			verbose ("Prototype enum found \"%s\"\n", vStringValue (type->name));
-			type->kind = K_PROTOTYPE;
-			createTag (type);
+			createTag (type, K_PROTOTYPE);
 			pruneTokens (typeQueue);
 			return;
 		}
@@ -1124,8 +1121,7 @@ static void processStruct (tokenInfo *const token)
 	else
 	{
 		verbose ("Prototype struct found \"%s\"\n", vStringValue (token->name));
-		token->kind = K_PROTOTYPE;
-		createTag (token);
+		createTag (token, K_PROTOTYPE);
 		return;
 	}
 
@@ -1205,8 +1201,7 @@ static void processTypedef (tokenInfo *const token)
 	}
 
 	/* Use last identifier to create tag, but always with kind typedef */
-	token->kind = K_TYPEDEF;
-	createTag (token);
+	createTag (token, K_TYPEDEF);
 }
 
 static tokenInfo * processParameterList (int c)
@@ -1296,12 +1291,12 @@ static void processClass (tokenInfo *const token)
 	}
 
 	/* Use last identifier to create tag */
-	createTag (token);
+	createTag (token, K_CLASS);
 
 	/* Add parameter list */
 	while (parameters)
 	{
-		createTag (parameters);
+		createTag (parameters, K_CONSTANT);
 		parameters = popToken (parameters);
 	}
 }
@@ -1311,8 +1306,7 @@ static void processDefine (tokenInfo *const token)
 	/* Bug #961001: Verilog compiler directives are line-based. */
 	int c = skipWhite (vGetc ());
 	readWordToken (token, c);
-	token->kind = K_CONSTANT;
-	createTag (token);
+	createTag (token, K_CONSTANT);
 	/* Skip the rest of the line. */
 	do {
 		c = vGetc();
@@ -1325,13 +1319,14 @@ static void processAssertion (tokenInfo *const token)
 	if (vStringLength (currentContext->blockName) > 0)
 	{
 		vStringCopy (token->name, currentContext->blockName);
-		createTag (token);
+		createTag (token, K_ASSERTION);
 		skipToSemiColon ();
 	}
 }
 
 static void processDesignElement (tokenInfo *const token)
 {
+	verilogKind kind = token->kind;
 	int c = skipWhite (vGetc ());
 
 	if (readWordToken (token, c))
@@ -1341,7 +1336,7 @@ static void processDesignElement (tokenInfo *const token)
 			c = skipWhite (vGetc ());
 			readWordToken (token, c);
 		}
-		createTag (token);
+		createTag (token, kind);
 
 		c = skipWhite (vGetc ());
 		if (c == '#')
@@ -1349,7 +1344,7 @@ static void processDesignElement (tokenInfo *const token)
 			tokenInfo *parameters = processParameterList (c);
 			while (parameters)
 			{
-				createTag (parameters);
+				createTag (parameters, K_CONSTANT);
 				parameters = popToken (parameters);
 			}
 			c = skipWhite (vGetc ());
@@ -1461,17 +1456,14 @@ static void tagNameList (tokenInfo* token, int c)
 		c = skipDimension (skipWhite (c));
 		if (c == ',' || c == ';' || c == ')')
 		{
-			token->kind = kind == K_UNDEFINED ? actualKind : kind;
-			createTag (token);
+			createTag (token, kind == K_UNDEFINED ? actualKind : kind);
 			repeat = false;
 		}
 		else if (c == '=')
 		{
 			if (!repeat)	// ignore procedual assignment: foo = bar;
-			{
-				token->kind = kind == K_UNDEFINED ? actualKind : kind;
-				createTag (token);
-			}
+				createTag (token, kind == K_UNDEFINED ? actualKind : kind);
+
 			c = skipWhite (vGetc ());
 			if (c == '\'')
 			{
