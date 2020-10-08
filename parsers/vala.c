@@ -497,7 +497,7 @@ static void parseStatement (tokenInfo *const token, int corkIndex)
 				}
 				else
 					vStringDelete (signature);
-				}
+			}
 			break;
 		}
 	}
@@ -516,7 +516,7 @@ static void recurseValaTags (tokenInfo *token, int corkIndex)
 {
 	if (tokenIsKeyword(token, NAMESPACE))
 		parseNamespace (token, corkIndex);
-	if (tokenIsKeyword(token, CLASS))
+	else if (tokenIsKeyword(token, CLASS))
 		parseClass (token, corkIndex);
 	else if (tokenIsType (token, IDENTIFIER))
 		parseStatement (token, corkIndex);
@@ -591,7 +591,7 @@ static void parseClassBody (tokenInfo *const token, int classCorkIndex)
 		if (tokenEqType (token, '}'))
 			break;
 
-		isPublic = tokenIsKeyword(token, PUBLIC)? true: false;
+		isPublic = tokenIsKeyword(token, PUBLIC);
 
 		if (isPublic)
 			tokenRead (token);
@@ -680,7 +680,7 @@ static void parseClass (tokenInfo *const token, int corkIndex)
 	tagEntryInfo *entry = getEntryInCorkQueue (classCorkIndex);
 	entry->extensionFields.scopeIndex = corkIndex;
 
-	/* Skip the class definition. */
+	/* Parse the class definition. */
 	tokenRead (token);
 	if (!tokenSkipToType (token, '{'))
 		return;					/* Unexpected sequence of token */
