@@ -1,0 +1,1 @@
+Delegate	input.vala	/^public delegate bool Delegate ();$/;"	method	line:2	language:Vala

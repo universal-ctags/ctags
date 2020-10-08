@@ -514,7 +514,10 @@ static void parseStatement (tokenInfo *const token, int corkIndex)
 
 static void recurseValaTags (tokenInfo *token, int corkIndex)
 {
-	if (tokenIsKeyword(token, NAMESPACE))
+	/* Skip attributes */
+	if (tokenEqType (token, '['))
+		tokenSkipOverPair (token);
+	else if (tokenIsKeyword(token, NAMESPACE))
 		parseNamespace (token, corkIndex);
 	else if (tokenIsKeyword(token, CLASS))
 		parseClass (token, corkIndex);
