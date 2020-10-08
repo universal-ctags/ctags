@@ -65,7 +65,7 @@ extern ptagDesc* getPtagDesc (ptagType type);
 extern ptagType  getPtagTypeForName (const char *name);
 extern void printPtags (bool withListHeader, bool machinable, FILE *fp);
 extern bool isPtagEnabled (ptagType type);
-extern bool isPtagCommonInParsers  (ptagType type);
+extern bool isPtagCommonInParsers (ptagType type);
 extern bool enablePtag (ptagType type, bool state);
 
 #endif	/* CTAGS_MAIN_FIELD_H */
