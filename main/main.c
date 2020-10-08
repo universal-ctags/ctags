@@ -574,8 +574,8 @@ extern int ctags_cli_main (int argc CTAGS_ATTR_UNUSED, char **argv)
 
 	args = cArgNewFromArgv (argv);
 	previewFirstOption (args);
-	testEtagsInvocation ();
 	initializeParsing ();
+	testEtagsInvocation ();
 	initOptions ();
 	readOptionConfiguration ();
 	verbose ("Reading initial options from command line\n");
