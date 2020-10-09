@@ -854,29 +854,25 @@ static bool findBlockName (tokenInfo *const token)
 	return false;
 }
 
-static void processBlock (tokenInfo *const token)
+static void processBegin (tokenInfo *const token)
 {
-	if (token->kind == K_BEGIN)
-	{
-		currentContext->nestLevel++;
-	}
-	else if (token->kind == K_END)
-	{
-		currentContext->nestLevel--;
-	}
-
+	currentContext->nestLevel++;
 	if (findBlockName (token))
 	{
 		verbose ("Found block: %s\n", vStringValue (token->name));
-		if (token->kind == K_BEGIN)
-		{
-			createTag (token, K_BLOCK);
-			verbose ("Current context %s\n", vStringValue (currentContext->name));
-		}
-		if (token->kind == K_END && currentContext->kind == K_BLOCK && currentContext->nestLevel <= 1)
-		{
+		createTag (token, K_BLOCK);
+		verbose ("Current context %s\n", vStringValue (currentContext->name));
+	}
+}
+
+static void processEnd (tokenInfo *const token)
+{
+	currentContext->nestLevel--;
+	if (findBlockName (token))
+	{
+		verbose ("Found block: %s\n", vStringValue (token->name));
+		if (currentContext->kind == K_BLOCK && currentContext->nestLevel <= 1)
 			dropContext ();	/* FIXME: uncovered */
-		}
 	}
 }
 
@@ -1550,8 +1546,10 @@ static void findTag (tokenInfo *const token)
 			processDesignElement(token);
 			break;
 		case K_BEGIN:
+			processBegin(token);
+			break;
 		case K_END:
-			processBlock(token);
+			processEnd(token);
 			break;
 		case K_FUNCTION:
 		case K_TASK:
