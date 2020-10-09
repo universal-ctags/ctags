@@ -53,6 +53,7 @@ typedef enum {
 	K_BEGIN,
 	K_END,
 	K_END_DE,	/* End of Design Elements */
+	K_IDENTIFIER,
 
 	K_UNDEFINED = KEYWORD_NONE,
 	/* the followings items are also used as indices for VerilogKinds[] and SystemVerilogKinds[] */
@@ -344,9 +345,9 @@ static short isTempContext (tokenInfo const* token)
 	}
 }
 
-static short hasSimplePortList (tokenInfo const* token)
+static short hasSimplePortList (verilogKind kind)
 {
-	switch (token->kind)
+	switch (kind)
 	{
 		case K_TASK:
 		case K_FUNCTION:
@@ -607,7 +608,7 @@ static bool readWordToken (tokenInfo *const token, int c)
 	return false;
 }
 
-/* check if an ideitifier:
+/* check if an identifier:
  *   simple_identifier ::= [ a-zA-Z_ ] { [ a-zA-Z0-9_$ ] } */
 static bool isIdentifier (tokenInfo* token)
 {
@@ -653,7 +654,6 @@ static int skipMacro (int c)
 		/* Skip next keyword if macro is `ifdef, `ifndef, `elsif, or `undef */
 		if (token->kind == K_IFDEF)
 		{
-			token->kind = K_UNDEFINED;
 			skipIfdef(token);
 			c = vGetc ();
 		}
@@ -678,7 +678,8 @@ static verilogKind getKindForToken (tokenInfo *const token)
 
 static void updateKind (tokenInfo *const token)
 {
-	token->kind = getKindForToken (token);
+	verilogKind kind = getKindForToken (token);
+	token->kind = ((kind == K_UNDEFINED) && isIdentifier(token)) ? K_IDENTIFIER : kind;
 }
 
 static void createContext (tokenInfo *const scope)
@@ -740,6 +741,13 @@ static void dropEndContext (tokenInfo *const token)
 static void createTag (tokenInfo *const token, verilogKind kind)
 {
 	tagEntryInfo tag;
+
+	/* FIXME: This if-clause should be removed. */
+	if (kind == K_UNDEFINED || kind == K_IDENTIFIER)
+	{
+		verbose ("Unexpected token kind %d\n", kind);
+		return;
+	}
 
 	/* check if a container before kind is modified by prototype */
 	/* BTW should we create a context for a prototype? */
@@ -911,7 +919,7 @@ static void processPortList (int c)
 			else if (readWordToken (token, c))
 			{
 				updateKind (token);
-				if (token->kind == K_UNDEFINED)
+				if (token->kind == K_IDENTIFIER)
 				{
 					/* Only add port name if it is the last keyword.
 					 * First keyword can be a dynamic type, like a class name */
@@ -1032,7 +1040,7 @@ static void processEnum (tokenInfo *const token)
 		/* Undefined kind means that we've reached the end of the
 		 * declaration without having any contents defined, which
 		 * indicates that this is in fact a forward declaration */
-		if (type->kind == K_UNDEFINED && (typeQueue->scope == NULL || typeQueue->scope->kind != K_UNDEFINED))
+		if (type->kind == K_IDENTIFIER && (typeQueue->scope == NULL || typeQueue->scope->kind != K_UNDEFINED))
 		{
 			verbose ("Prototype enum found \"%s\"\n", vStringValue (type->name));
 			createTag (type, K_PROTOTYPE);
@@ -1099,6 +1107,7 @@ static void processEnum (tokenInfo *const token)
 
 static void processStruct (tokenInfo *const token)
 {
+	verilogKind kind = token->kind;	// K_STRUCT or K_TYPEDEF
 	int c;
 
 	c = skipWhite (vGetc ());
@@ -1126,6 +1135,7 @@ static void processStruct (tokenInfo *const token)
 
 	/* Following identifiers are tag names */
 	verbose ("Find struct|union tags. Token %s kind %d\n", vStringValue (token->name), token->kind);
+	token->kind = kind;
 	tagNameList (token, c);
 }
 
@@ -1190,7 +1200,7 @@ static void processTypedef (tokenInfo *const token)
 
 		/* Empty typedefs are forward declarations and are considered
 		 * prototypes */
-		if (token->kind == K_UNDEFINED)
+		if (token->kind == K_IDENTIFIER)
 		{
 			currentContext->prototype = true;
 		}
@@ -1217,7 +1227,7 @@ static tokenInfo * processParameterList (int c)
 				{
 					updateKind (token);
 					verbose ("Found parameter %s\n", vStringValue (token->name));
-					if (token->kind == K_UNDEFINED)
+					if (token->kind == K_IDENTIFIER)
 					{
 						c = skipWhite (vGetc ());
 						if (c == ',' || c == ')' || c == '=')	// ignore user defined type
@@ -1351,7 +1361,7 @@ static void processDesignElement (tokenInfo *const token)
 		{
 			if (kind == K_MODPORT)
 				c = skipPastMatch ("()");	// ignore port list
-			else if (hasSimplePortList (token))
+			else if (hasSimplePortList (kind))
 				processPortList (c);
 		}
 		else
@@ -1430,7 +1440,7 @@ static void tagNameList (tokenInfo* token, int c)
 		if (readWordToken (token, c))
 		{
 			updateKind (token);
-			if (kind == K_UNDEFINED)	// user defined type
+			if (kind == K_IDENTIFIER)	// user defined type
 			{
 				if (token->kind == K_NET)
 				{
@@ -1445,8 +1455,8 @@ static void tagNameList (tokenInfo* token, int c)
 					kind = K_REGISTER;	// !!!FIXME: consider kind of the user defined type
 				}
 			}
-			else if ((token->kind != K_UNDEFINED) // skip keywords or an identifier on port
-					 || ((kind == K_PORT) && (token->kind == K_UNDEFINED)))
+			else if ((token->kind != K_IDENTIFIER) // skip keywords or an identifier on port
+					 || ((kind == K_PORT) && (token->kind == K_IDENTIFIER)))
 					repeat = true;
 		}
 		c = skipWhite (vGetc ());
@@ -1488,6 +1498,9 @@ static void tagNameList (tokenInfo* token, int c)
 			repeat = true;
 		}
 	} while (repeat);
+	/* skip port list of module instance: foo bar(xx, yy); */
+	if (c == '(')
+		c = skipPastMatch ("()");
 	vUngetc (c);
 }
 
@@ -1510,8 +1523,7 @@ static void findTag (tokenInfo *const token)
 		case K_REGISTER:
 			tagNameList (token, skipWhite (vGetc ()));
 			break;
-		case K_UNDEFINED:
-			if (isIdentifier(token))
+		case K_IDENTIFIER:
 			{
 				int c = skipWhite(vGetc());
 				if (c == ':')
@@ -1606,11 +1618,13 @@ static void findVerilogTags (void)
 				{
 					tagContents = popToken (tagContents);
 				}
+				break;
 			default :
 				if (readWordToken (token, c))
 				{
 					updateKind (token);
-					findTag (token);
+					if (token->kind != K_UNDEFINED)
+						findTag (token);
 				}
 		}
 	}
