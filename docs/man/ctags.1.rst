@@ -6,7 +6,7 @@ ctags
 --------------------------------------------------------------
 Generate tag files for source code
 --------------------------------------------------------------
-:Version: 0.0.0
+:Version: 5.9.0
 :Manual group: Universal-ctags
 :Manual section: 1
 

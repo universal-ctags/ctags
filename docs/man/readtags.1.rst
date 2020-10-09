@@ -6,7 +6,7 @@ readtags
 --------------------------------------------------------------
 Find tag file entries matching specified names
 --------------------------------------------------------------
-:Version: 0.0.0
+:Version: 5.9.0
 :Manual group: Universal-ctags
 :Manual section: 1
 

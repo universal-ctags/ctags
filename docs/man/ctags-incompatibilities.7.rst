@@ -6,7 +6,7 @@ ctags-incompatibilities
 --------------------------------------------------------------
 Incompatibilities between Universal-ctags and Exuberant-ctags
 --------------------------------------------------------------
-:Version: 0.0.0
+:Version: 5.9.0
 :Manual group: Universal-ctags
 :Manual section: 7
 
