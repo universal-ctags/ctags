@@ -4031,11 +4031,11 @@ static void addParserPseudoTags (langType language)
 	parserObject *parser = LanguageTable + language;
 	if (!parser->pseudoTagPrinted)
 	{
-		makePtagIfEnabled (PTAG_KIND_DESCRIPTION, language, parser);
-		makePtagIfEnabled (PTAG_KIND_SEPARATOR, language, parser);
-		makePtagIfEnabled (PTAG_FIELD_DESCRIPTION, language, parser);
-		makePtagIfEnabled (PTAG_EXTRA_DESCRIPTION, language, parser);
-
+		for (int i = 0; i < PTAG_COUNT; i++)
+		{
+			if (isPtagParserSpecific (i))
+				makePtagIfEnabled (i, language, parser);
+		}
 		parser->pseudoTagPrinted = 1;
 	}
 }

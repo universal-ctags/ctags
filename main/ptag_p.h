@@ -44,6 +44,14 @@ typedef enum ePtagType { /* pseudo tag content control */
 	PTAG_COUNT
 } ptagType;
 
+typedef enum ePtagFlag {
+	/* use isPtagCommonInParsers() for testing. */
+	PTAGF_COMMON = 1 << 0,
+	/* use isPtagParserSpecific for testing.
+	 * PSEUDO_TAG_SEPARATOR is used for printing. */
+	PTAGF_PARSER = 1 << 1,
+} ptagFlag;
+
 struct sPtagDesc {
 	bool enabled;
 	const char* name;
@@ -57,7 +65,8 @@ struct sPtagDesc {
 	 * of the parser is passed as the thrid argument.
 	 */
 	bool (* makeTag) (ptagDesc *, langType, const void *);
-	bool commonInParsers;
+
+	ptagFlag flags;
 };
 
 extern bool makePtagIfEnabled (ptagType type, langType language, const void *data);
@@ -65,7 +74,8 @@ extern ptagDesc* getPtagDesc (ptagType type);
 extern ptagType  getPtagTypeForName (const char *name);
 extern void printPtags (bool withListHeader, bool machinable, FILE *fp);
 extern bool isPtagEnabled (ptagType type);
-extern bool isPtagCommonInParsers  (ptagType type);
+extern bool isPtagCommonInParsers (ptagType type);
+extern bool isPtagParserSpecific (ptagType type);
 extern bool enablePtag (ptagType type, bool state);
 
 #endif	/* CTAGS_MAIN_FIELD_H */
