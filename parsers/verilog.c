@@ -588,6 +588,22 @@ static void skipToSemiColon (void)
 	} while (c != EOF && c != ';');
 }
 
+static int skipExpression(int c)
+{
+	while (c != EOF && c != ','  &&  c != ';' && c != ')' && c != '}' && c != ']')
+	{
+		if (c == '(')
+			c = skipPastMatch ("()");
+		else if (c == '{')
+			c = skipPastMatch ("{}");
+		else if (c == '[')
+			c = skipPastMatch ("[]");
+		else
+			c = skipWhite (vGetc ());
+	}
+	return c;
+}
+
 /* read an identifier, keyword, number, compiler directive, or macro identifier */
 static bool readWordToken (tokenInfo *const token, int c)
 {
@@ -1240,14 +1256,8 @@ static tokenInfo * processParameterList (int c)
 							} else
 								parameters = appendToken (parameters, token);	// append token on parameters
 							token = newToken ();
-							// skip expression
-							while (c != ',' && c != ')' && c != EOF)
-							{
-								if (c == '(')
-									c = skipPastMatch ("()");
-								else
-									c = skipWhite (vGetc ());
-							}
+
+							c = skipExpression (c);
 						}
 					}
 				}
@@ -1473,24 +1483,7 @@ static void tagNameList (tokenInfo* token, int c)
 			if (!repeat)	// ignore procedual assignment: foo = bar;
 				createTag (token, kind == K_UNDEFINED ? actualKind : kind);
 
-			c = skipWhite (vGetc ());
-			if (c == '\'')
-			{
-				c = skipWhite (vGetc ());
-				if (c != '{')
-					vUngetc (c);
-			}
-			if (c == '{')
-				skipPastMatch ("{}");
-			else
-			{
-				/* Skip until end of current name, kind or parameter list definition */
-				do {
-					c = vGetc ();
-					if (c == '(')
-						c = skipPastMatch ("()");
-				} while (c != EOF && c != ','  &&  c != ';' && c != ')');
-			}
+			c = skipExpression (skipWhite (vGetc ()));
 		}
 		if (c == ',')
 		{
@@ -1528,6 +1521,8 @@ static void findTag (tokenInfo *const token)
 				int c = skipWhite(vGetc());
 				if (c == ':')
 					vUngetc(c); /* label */
+				else if (c == '=')
+					c = skipExpression (skipWhite(vGetc()));
 				else
 					tagNameList(token, c); /* user defined type */
 			}
