@@ -304,6 +304,7 @@ static const char *systemVerilogKeywords[] = {
  */
 
 static bool findBlockName (tokenInfo *const token);
+static bool readWordToken (tokenInfo *const token, int c);
 static void tagNameList (tokenInfo* token, int c);
 static void updateKind (tokenInfo *const token);
 
@@ -604,6 +605,43 @@ static int skipExpression(int c)
 	return c;
 }
 
+/* Skip next keyword for `ifdef, `ifndef, `elsif, or `undef */
+static void skipIfdef (tokenInfo* token)
+{
+	int c = skipWhite (vGetc ());
+	readWordToken (token, c);
+	verbose ("Skipping conditional macro %s\n", vStringValue (token->name));
+}
+
+static int skipMacro (int c)
+{
+	tokenInfo *token = newToken ();;
+
+	if (c == '`')
+	{
+		/* Skip keyword */
+		readWordToken (token, c);
+		updateKind (token);
+		/* Skip next keyword if macro is `ifdef, `ifndef, `elsif, or `undef */
+		if (token->kind == K_IFDEF)
+		{
+			skipIfdef(token);
+			c = vGetc ();
+		}
+		/* Skip macro functions */
+		else
+		{
+			c = skipWhite (vGetc ());
+			if (c == '(')
+			{
+				c = skipPastMatch ("()");	/* FIXME: uncovered */
+			}
+		}
+	}
+	deleteToken (token);
+	return c;
+}
+
 /* read an identifier, keyword, number, compiler directive, or macro identifier */
 static bool readWordToken (tokenInfo *const token, int c)
 {
@@ -648,43 +686,6 @@ static bool isIdentifier (tokenInfo* token)
 	}
 	else
 		return false;
-}
-
-/* Skip next keyword for `ifdef, `ifndef, `elsif, or `undef */
-static void skipIfdef (tokenInfo* token)
-{
-	int c = skipWhite (vGetc ());
-	readWordToken (token, c);
-	verbose ("Skipping conditional macro %s\n", vStringValue (token->name));
-}
-
-static int skipMacro (int c)
-{
-	tokenInfo *token = newToken ();;
-
-	if (c == '`')
-	{
-		/* Skip keyword */
-		readWordToken (token, c);
-		updateKind (token);
-		/* Skip next keyword if macro is `ifdef, `ifndef, `elsif, or `undef */
-		if (token->kind == K_IFDEF)
-		{
-			skipIfdef(token);
-			c = vGetc ();
-		}
-		/* Skip macro functions */
-		else
-		{
-			c = skipWhite (vGetc ());
-			if (c == '(')
-			{
-				c = skipPastMatch ("()");	/* FIXME: uncovered */
-			}
-		}
-	}
-	deleteToken (token);
-	return c;
 }
 
 static verilogKind getKindForToken (tokenInfo *const token)
