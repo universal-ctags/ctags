@@ -12,12 +12,12 @@ void main(string[] args) {
     print("Hello %s, you're %d years old\n", p.name, p.age);
 }
 
-class Address {
+public class Address {
    string country;
-   string city;
-   string street;
-   int building;
-   int floor;
+   public string city;
+   protected string street;
+   internal int building;
+   private int floor;
 }
 
 class Person {

@@ -503,7 +503,7 @@ static void parseStatement (tokenInfo *const token, int corkIndex)
 			break;
 		}
 	}
-	while (!tokenIsEOF (token));
+	while (!tokenEqType (token, ';') && !tokenIsEOF (token));
 
 	/* Skip the body of method */
 	if (foundSignature)
@@ -519,9 +519,9 @@ static void recurseValaTags (tokenInfo *token, int corkIndex)
 	/* Skip attributes */
 	if (tokenEqType (token, '['))
 		tokenSkipOverPair (token);
-	if (tokenIsKeyword(token, NAMESPACE))
+	else if (tokenIsKeyword(token, NAMESPACE))
 		parseNamespace (token, corkIndex);
-	if (tokenIsKeyword(token, INTERFACE))
+	else if (tokenIsKeyword(token, INTERFACE))
 		parseInterface (token, corkIndex);
 	else if (tokenIsKeyword(token, CLASS))
 		parseClass (token, corkIndex);
@@ -563,6 +563,13 @@ static bool readIdentifierExtended (tokenInfo *const resultToken, bool *extended
 		}
 		else if (tokenIsType (token, KEYWORD))
 			; /* Skip keywords */
+		else if (tokenIsTypeVal (token, '?'))
+			; /* Skip nullable */
+		else if (tokenIsTypeVal (token, '*'))
+			; /* Skip pointer or indirection */
+		else if (tokenIsTypeVal (token, '<'))
+			/* Skip over generic type parameter. */
+			tokenSkipOverPair (token);
 		else if (tokenIsType (token, IDENTIFIER))
 		{
 			if (tokenLast (resultToken) == '.')
