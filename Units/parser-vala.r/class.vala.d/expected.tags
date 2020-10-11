@@ -1,10 +1,10 @@
 main	input.vala	/^void main(string[] args) {$/;"	method	line:8	language:Vala	signature:(string [] args)
-Address	input.vala	/^class Address {$/;"	class	line:15	language:Vala
+Address	input.vala	/^public class Address {$/;"	class	line:15	language:Vala
 country	input.vala	/^   string country;$/;"	field	line:16	language:Vala	class:Address	typeref:typename:string
-city	input.vala	/^   string city;$/;"	field	line:17	language:Vala	class:Address	typeref:typename:string
-street	input.vala	/^   string street;$/;"	field	line:18	language:Vala	class:Address	typeref:typename:string
-building	input.vala	/^   int building;$/;"	field	line:19	language:Vala	class:Address	typeref:typename:int
-floor	input.vala	/^   int floor;$/;"	field	line:20	language:Vala	class:Address	typeref:typename:int
+city	input.vala	/^   public string city;$/;"	field	line:17	language:Vala	class:Address	typeref:typename:string
+street	input.vala	/^   protected string street;$/;"	field	line:18	language:Vala	class:Address	typeref:typename:string
+building	input.vala	/^   internal int building;$/;"	field	line:19	language:Vala	class:Address	typeref:typename:int
+floor	input.vala	/^   private int floor;$/;"	field	line:20	language:Vala	class:Address	typeref:typename:int
 Person	input.vala	/^class Person {$/;"	class	line:23	language:Vala
 address	input.vala	/^   public Address address {get; set;}$/;"	property	line:24	language:Vala	class:Person	typeref:unknown:Address
 name	input.vala	/^   public string name {get; set;}$/;"	property	line:25	language:Vala	class:Person	typeref:typename:string
