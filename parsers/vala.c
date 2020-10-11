@@ -243,6 +243,7 @@ enum ValaTokenType {
 
 static void readToken (tokenInfo *const token, void *data);
 static void parseNamespace (tokenInfo *const token, int corkIndex);
+static void parseInterface (tokenInfo *const token, int corkIndex);
 static void parseClass (tokenInfo *const token, int corkIndex);
 static void parseStatement (tokenInfo *const token, int corkIndex);
 
@@ -518,8 +519,10 @@ static void recurseValaTags (tokenInfo *token, int corkIndex)
 	/* Skip attributes */
 	if (tokenEqType (token, '['))
 		tokenSkipOverPair (token);
-	else if (tokenIsKeyword(token, NAMESPACE))
+	if (tokenIsKeyword(token, NAMESPACE))
 		parseNamespace (token, corkIndex);
+	if (tokenIsKeyword(token, INTERFACE))
+		parseInterface (token, corkIndex);
 	else if (tokenIsKeyword(token, CLASS))
 		parseClass (token, corkIndex);
 	else if (tokenIsType (token, IDENTIFIER))
@@ -544,7 +547,7 @@ static void parseNamespaceBody (tokenInfo *const token, int corkIndex)
 
 static bool readIdentifierExtended (tokenInfo *const resultToken, bool *extended)
 {
-	bool nextTokeIsIdentifier = false;
+	bool nextTokenIsIdentifier = false;
 	tokenInfo *token = newValaToken ();
 	if (extended)
 		*extended = false;
@@ -558,6 +561,8 @@ static bool readIdentifierExtended (tokenInfo *const resultToken, bool *extended
 			if (extended)
 				*extended = true;
 		}
+		else if (tokenIsType (token, KEYWORD))
+			; /* Skip keywords */
 		else if (tokenIsType (token, IDENTIFIER))
 		{
 			if (tokenLast (resultToken) == '.')
@@ -565,7 +570,7 @@ static bool readIdentifierExtended (tokenInfo *const resultToken, bool *extended
 			else
 			{
 				tokenUnread (token);
-				nextTokeIsIdentifier = true;
+				nextTokenIsIdentifier = true;
 				break;
 			}
 		}
@@ -573,14 +578,14 @@ static bool readIdentifierExtended (tokenInfo *const resultToken, bool *extended
 		{
 			if (!tokenIsEOF (token))
 				tokenUnread (token);
-			nextTokeIsIdentifier = false;
+			nextTokenIsIdentifier = false;
 			break;
 		}
 	}
 	while (1);
 
 	tokenDelete (token);
-	return nextTokeIsIdentifier;
+	return nextTokenIsIdentifier;
 }
 
 static void parseClassBody (tokenInfo *const token, int classCorkIndex)
@@ -597,7 +602,8 @@ static void parseClassBody (tokenInfo *const token, int classCorkIndex)
 
 		isPublic = tokenIsKeyword(token, PUBLIC);
 
-		if (isPublic)
+		if (isPublic || tokenIsKeyword (token, PROTECTED) ||
+			tokenIsKeyword (token, PRIVATE) || tokenIsKeyword (token, INTERNAL))
 			tokenRead (token);
 
 		if (tokenIsType (token, IDENTIFIER)
@@ -614,7 +620,13 @@ static void parseClassBody (tokenInfo *const token, int classCorkIndex)
 		if (tokenIsType (token, IDENTIFIER))
 			tokenCopy (nameToken, token);
 
+		/* Argument list for a method */
 		tokenRead (token);
+		if (tokenEqType (token, '(')) {
+			tokenSkipOverPair (token);
+			tokenRead (token);
+		}
+
 		int kind;
 		if (tokenEqType (token, ';'))
 			kind = K_FIELD;
@@ -627,7 +639,7 @@ static void parseClassBody (tokenInfo *const token, int classCorkIndex)
 		tagEntryInfo *entry = getEntryInCorkQueue (memberCorkIndex);
 
 		/* Fill access field. */
-		entry->extensionFields.access = isPublic? eStrdup ("public"): NULL;
+		entry->extensionFields.access = isPublic ? eStrdup ("public") : NULL;
 		/* Fill typeref field. */
 		entry->extensionFields.typeRef [0] = eStrdup (
 			typerefIsClass?
@@ -672,6 +684,24 @@ static void parseNamespace (tokenInfo *const token, int corkIndex)
 		return;					/* Unexpected sequence of token */
 
 	parseNamespaceBody (token, namespaceCorkIndex);
+}
+
+static void parseInterface (tokenInfo *const token, int corkIndex)
+{
+
+	tokenRead (token);
+	if (!tokenIsType (token, IDENTIFIER))
+		return;					/* Unexpected sequence of token */
+
+	int interfaceCorkIndex = makeSimpleTag (token->string, K_INTERFACE);
+	tagEntryInfo *entry = getEntryInCorkQueue (interfaceCorkIndex);
+	entry->extensionFields.scopeIndex = corkIndex;
+
+	tokenRead (token);
+	if (!tokenSkipToType (token, '{'))
+		return;					/* Unexpected sequence of token */
+
+	parseClassBody (token, interfaceCorkIndex);	/* Should we have a custom parser? */
 }
 
 static void parseClass (tokenInfo *const token, int corkIndex)
