@@ -55,10 +55,10 @@ endclass
 
 class Fifo #(type T = logic, int DEPTH = 1) implements PutImp#(T), GetImp#(T);
   T myFifo[$:DEPTH-1];
-  virtual function void put(T a); // FIXME : to be ignored
+  virtual function void put(T a); // FIXME : to be ignored?
     myFifo.push_back(a);
   endfunction
-  virtual function T get(); // FIXME : to be ignored
+  virtual function T get(); // FIXME : to be ignored?
     get = myFifo.pop_front();
   endfunction
 endclass
@@ -93,4 +93,104 @@ typedef int int_t;
 module user_defined_type_param
   #(int_t num_code_bits = 3, localparam num_out_bits = 1 << num_code_bits)
    (input [num_code_bits-1:0] A, output reg [num_out_bits-1:0] Y);
+endmodule
+
+//
+// LRM 6.20.1 Parameter declaration syntax (#2537)
+//
+
+// compilation unit scope
+parameter L1 = 0;  //  synonym for the localparam
+
+module module_with_parameter_port_list #(P1, P2, localparam L2 = P1+1, L3=P2*2, parameter P3, P4)
+( /*port list...*/ );
+  parameter  L4 = "local parameter";  // synonym for the localparam
+  localparam L5 = "local parameter";
+  // ...
+endmodule
+
+module module_with_empty_parameter_port_list #()
+( /*port list...*/ );
+  parameter  L6 = "local parameter";  // synonym for the localparam
+  localparam L7 = "local parameter";
+  // ...
+endmodule
+
+module module_no_parameter_port_list
+( /*port list...*/ );
+  parameter  P5 = "parameter";
+  localparam L8 = "local parameter";
+  // ...
+endmodule
+
+class class_with_parameter_port_list #(P1, P2, localparam L2 = P1+1, L3=P2*2, parameter P3, P4);
+  parameter  L4 = "local parameter";  // synonym for the localparam
+  localparam L5 = "local parameter";
+  // ...
+endclass
+
+class class_with_empty_parameter_port_list #();
+  parameter  L6 = "local parameter";  // synonym for the localparam
+  localparam L7 = "local parameter";
+  // ...
+endclass
+
+class class_no_parameter_port_list;
+  parameter  L8 = "local parameter";  // synonym for the localparam (class only)
+  localparam L9 = "local parameter";
+  // ...
+endclass
+
+program program_with_parameter_port_list #(P1, P2, localparam L2 = P1+1, L3=P2*2, parameter P3, P4)
+( /*port list...*/ );
+  parameter  L4 = "local parameter";  // synonym for the localparam
+  localparam L5 = "local parameter";
+  // ...
+endprogram
+
+program program_with_empty_parameter_port_list #()
+( /*port list...*/ );
+  parameter  L6 = "local parameter";  // synonym for the localparam
+  localparam L7 = "local parameter";
+  // ...
+endprogram
+
+program program_no_parameter_port_list
+( /*port list...*/ );
+  parameter  P5 = "parameter";
+  localparam L8 = "local parameter";
+  // ...
+endprogram
+
+interface interface_with_parameter_port_list #(P1, P2, localparam L2 = P1+1, L3=P2*2, parameter P3, P4)
+( /*port list...*/ );
+  parameter  L4 = "local parameter";  // synonym for the localparam
+  localparam L5 = "local parameter";
+  // ...
+endinterface
+
+interface interface_with_empty_parameter_port_list #()
+( /*port list...*/ );
+  parameter  L6 = "local parameter";  // synonym for the localparam
+  localparam L7 = "local parameter";
+  // ...
+endinterface
+
+interface interface_no_parameter_port_list
+( /*port list...*/ );
+  parameter  P5 = "parameter";
+  localparam L8 = "local parameter";
+  // ...
+endinterface
+
+package package_has_no_parameter_port_list;
+  parameter  L1 = "local parameter";
+  localparam L2 = "local parameter";
+endpackage
+
+module generate_constructs;
+  generate
+    parameter  L1 = "local parameter";  // FIXME
+    localparam L2 = "local parameter";
+  endgenerate
 endmodule
