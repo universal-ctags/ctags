@@ -135,8 +135,31 @@ static void addParserFields (json_t *response, const tagEntryInfo *const tag)
 		if (! isFieldEnabled (ftype))
 			continue;
 
-		const char *str = escapeFieldValueRaw (tag, ftype, i);
-		json_object_set_new (response, getFieldName (ftype), json_string (str));
+		unsigned int dt = getFieldDataType (ftype);
+		json_t *o;
+		if (dt & FIELDTYPE_STRING)
+		{
+			const char *str = escapeFieldValueRaw (tag, ftype, i);
+			if (dt & FIELDTYPE_BOOL && str[0] == '\0')
+				o = json_false ();
+			else
+				o = json_string (str);
+		}
+		else if (dt & FIELDTYPE_INTEGER)
+		{
+			/* NOT IMPLEMENTED YET */
+			AssertNotReached ();
+			o = json_null ();
+		}
+		else if (dt & FIELDTYPE_BOOL)
+			o = json_true ();
+		else
+		{
+			AssertNotReached ();
+			o = json_null ();
+		}
+
+		json_object_set_new (response, getFieldName (ftype), o);
 	}
 }
 
