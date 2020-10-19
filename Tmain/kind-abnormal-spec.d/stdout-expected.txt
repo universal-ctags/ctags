@@ -9,6 +9,7 @@ d  a kind disabled by default [off]
 e  a kind enabled by default
 r  emit a tag with multi roles
 R  emit a tag with multi roles(disabled by default) [off]
+f  tag for testing field:
 
 # list kinds-full
 #LETTER NAME                                      ENABLED REFONLY NROLES MASTER DESCRIPTION
@@ -21,6 +22,7 @@ R       rolesDisabled                             no      yes     2      NONE   
 b       broken tag                                yes     no      1      NONE   name with unwanted characters
 d       disabled                                  no      no      2      NONE   a kind disabled by default
 e       enabled                                   yes     no      2      NONE   a kind enabled by default
+f       fieldMaker                                yes     no      0      NONE   tag for testing field:
 r       roles                                     yes     yes     4      NONE   emit a tag with multi roles
 
 # +K
