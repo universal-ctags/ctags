@@ -5067,6 +5067,7 @@ typedef enum {
 	K_ENABLED,
 	K_ROLES,
 	K_ROLES_DISABLED,
+	K_FIELD_TESTING,
 	KIND_COUNT
 } CTST_Kind;
 
@@ -5145,6 +5146,26 @@ static kindDefinition CTST_Kinds[KIND_COUNT] = {
 	 .referenceOnly = true, ATTACH_ROLES (CTST_RolesKindRoles)},
 	{false, 'R', "rolesDisabled", "emit a tag with multi roles(disabled by default)",
 	 .referenceOnly = true, ATTACH_ROLES (CTST_RolesDisabledKindRoles)},
+	{true,  'f', "fieldMaker", "tag for testing field:" },
+};
+
+typedef enum {
+	F_BOOLEAN_FIELD,
+	F_BOOLEAN_AND_STRING_FIELD,
+	COUNT_FIELD
+} CTSTField;
+
+static fieldDefinition CTSTFields[COUNT_FIELD] = {
+	{ .name = "bField",
+	  .description = "field for testing boolean type",
+	  .dataType = FIELDTYPE_BOOL,
+	  .enabled = true,
+	},
+	{ .name = "sbField",
+	  .description = "field for testing string|boolean type",
+	  .dataType = FIELDTYPE_STRING|FIELDTYPE_BOOL,
+	  .enabled = true,
+	},
 };
 
 static void createCTSTTags (void)
@@ -5278,6 +5299,35 @@ static void createCTSTTags (void)
 						makeTagEntry (&e);
 						break;
 					}
+					case K_FIELD_TESTING:
+					{
+						char c = 'a';
+						char name []= {'\0', 't', 'a', 'g', '\0' };
+
+						name [0] = c++;
+						initTagEntry (&e, name, i);
+						attachParserField (&e, false,
+										   CTSTFields[F_BOOLEAN_FIELD].ftype, "");
+						makeTagEntry (&e);
+
+						name [0] = c++;
+						initTagEntry (&e, name, i);
+						makeTagEntry (&e);
+
+						name [0] = c++;
+						initTagEntry (&e, name, i);
+						attachParserField (&e, false,
+										   CTSTFields[F_BOOLEAN_AND_STRING_FIELD].ftype, "val");
+						makeTagEntry (&e);
+
+						name [0] = c++;
+						initTagEntry (&e, name, i);
+						attachParserField (&e, false,
+										   CTSTFields[F_BOOLEAN_AND_STRING_FIELD].ftype, "");
+						makeTagEntry (&e);
+
+						break;
+					}
 				}
 			}
 	}
@@ -5309,5 +5359,8 @@ static parserDefinition *CTagsSelfTestParser (void)
 	def->useCork = CORK_QUEUE;
 	def->initStats = initStatsCTST;
 	def->printStats = printStatsCTST;
+	def->fieldTable = CTSTFields;
+	def->fieldCount = ARRAY_SIZE (CTSTFields);
+
 	return def;
 }
