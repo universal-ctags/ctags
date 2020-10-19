@@ -1,0 +1,4 @@
+{"_type": "tag", "name": "atag", "path": "input.ctst", "pattern": "/^f$/", "kind": "fieldMaker", "bField": true}
+{"_type": "tag", "name": "btag", "path": "input.ctst", "pattern": "/^f$/", "kind": "fieldMaker"}
+{"_type": "tag", "name": "ctag", "path": "input.ctst", "pattern": "/^f$/", "kind": "fieldMaker", "sbField": "val"}
+{"_type": "tag", "name": "dtag", "path": "input.ctst", "pattern": "/^f$/", "kind": "fieldMaker", "sbField": false}
