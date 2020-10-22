@@ -54,6 +54,8 @@ typedef enum {
 	K_END,
 	K_END_DE,	/* End of Design Elements */
 	K_IDENTIFIER,
+	K_LOCALPARAM,
+	K_PARAMETER,
 
 	K_UNDEFINED = KEYWORD_NONE,
 	/* the followings items are also used as indices for VerilogKinds[] and SystemVerilogKinds[] */
@@ -98,7 +100,13 @@ typedef struct sTokenInfo {
 	vString*            inheritance;   /* Class inheritance */
 	bool                prototype;     /* Is only a prototype */
 	bool                classScope;    /* Context is local to the current sub-context */
+	bool				parameter;	   /* parameter which can be overridden */
+	bool				hasParamList;  /* module definition has a parameter port list */
 } tokenInfo;
+
+typedef enum {
+	F_PARAMETER,
+} verilogField;
 
 /*
  *   DATA DEFINITIONS
@@ -165,10 +173,10 @@ static const keywordAssoc KeywordTable [] = {
 	{ "input",         	K_PORT,      	{ 1, 1 } },
 	{ "integer",       	K_REGISTER,  	{ 1, 1 } },
 	{ "join",          	K_END,       	{ 1, 1 } },
-	{ "localparam",    	K_CONSTANT,  	{ 1, 1 } },
+	{ "localparam",    	K_LOCALPARAM,  	{ 1, 1 } },
 	{ "module",        	K_MODULE,    	{ 1, 1 } },
 	{ "output",        	K_PORT,      	{ 1, 1 } },
-	{ "parameter",     	K_CONSTANT,  	{ 1, 1 } },
+	{ "parameter",     	K_PARAMETER,  	{ 1, 1 } },
 	{ "real",          	K_REGISTER,  	{ 1, 1 } },
 	{ "realtime",      	K_REGISTER,  	{ 1, 1 } },
 	{ "reg",           	K_REGISTER,  	{ 1, 1 } },
@@ -231,6 +239,7 @@ static const keywordAssoc KeywordTable [] = {
 
 static tokenInfo *currentContext = NULL;
 static tokenInfo *tagContents = NULL;
+static fieldDefinition *fieldTable = NULL;
 
 // IEEE Std 1364-2005 LRM, Appendix B "List of Keywords"
 static const char *verilogKeywords[] = {
@@ -297,6 +306,21 @@ static const char *systemVerilogKeywords[] = {
 	"untyped", "use", "uwire", "var", "vectored", "virtual", "void",
 	"wait", "wait_order", "wand", "weak", "weak0", "weak1", "while",
 	"wildcard", "wire", "with", "within", "wor", "xnor", "xor"
+};
+
+// .enabled field cannot be shared by two languages
+static fieldDefinition VerilogFields[] = {
+	{ .name = "parameter",
+	  .description = "parameter whose value can be overridden.",
+	  .enabled = false,
+	  .dataType = FIELDTYPE_BOOL },
+};
+
+static fieldDefinition SystemVerilogFields[] = {
+	{ .name = "parameter",
+	  .description = "parameter whose value can be overridden.",
+	  .enabled = false,
+	  .dataType = FIELDTYPE_BOOL },
 };
 
 /*
@@ -376,6 +400,8 @@ static tokenInfo *newToken (void)
 	token->inheritance = vStringNew ();
 	token->prototype = false;
 	token->classScope = false;
+	token->parameter = false;
+	token->hasParamList = false;
 	return token;
 }
 
@@ -657,6 +683,8 @@ static bool readWordToken (tokenInfo *const token, int c)
 		token->lineNumber = getInputLineNumber ();
 		token->filePosition = getInputFilePosition ();
 		token->kind = K_UNDEFINED;	// to be set by updateKind()
+		token->parameter = false;
+		token->hasParamList = false;
 		return true;
 	}
 	return false;
@@ -766,6 +794,19 @@ static void createTag (tokenInfo *const token, verilogKind kind)
 		return;
 	}
 
+	if (kind == K_LOCALPARAM)
+	{
+		kind = K_CONSTANT;
+	}
+	else if (kind == K_PARAMETER)
+	{
+		kind = K_CONSTANT;
+		// See LRM 2017 6.20.1 Parameter declaration syntax
+		if (currentContext->kind != K_CLASS && currentContext->kind != K_PACKAGE && !currentContext->hasParamList)
+			token->parameter = true;
+	}
+	Assert (kind >= 0);
+
 	/* check if a container before kind is modified by prototype */
 	/* BTW should we create a context for a prototype? */
 	bool container = isContainer(kind);
@@ -809,6 +850,10 @@ static void createTag (tokenInfo *const token, verilogKind kind)
 		tag.extensionFields.inheritance = vStringValue (token->inheritance);
 		verbose ("Class %s extends %s\n", vStringValue (token->name), tag.extensionFields.inheritance);
 	}
+
+	if (token->parameter)
+		attachParserField (&tag, false,
+						   fieldTable [F_PARAMETER].ftype, "");
 
 	int corkIndex = makeTagEntry (&tag);
 	if (isInputLanguage (Lang_systemverilog)
@@ -1231,6 +1276,7 @@ static tokenInfo * processParameterList (int c)
 {
 	tokenInfo *head = NULL;
 	tokenInfo *parameters = NULL;
+	bool parameter = true;	// default "parameter"
 	if (c == '#')
 	{
 		c = skipWhite (vGetc ());
@@ -1250,6 +1296,7 @@ static tokenInfo * processParameterList (int c)
 						if (c == ',' || c == ')' || c == '=')	// ignore user defined type
 						{
 							token->kind = K_CONSTANT;
+							token->parameter = parameter;
 							if (head == NULL)
 							{
 								head = token;
@@ -1261,6 +1308,10 @@ static tokenInfo * processParameterList (int c)
 							c = skipExpression (c);
 						}
 					}
+					else if (token->kind == K_PARAMETER)
+						parameter = true;
+					else if (token->kind == K_LOCALPARAM)
+						parameter = false;
 				}
 				else if (c == '[') {
 					c =skipDimension(c);
@@ -1341,6 +1392,7 @@ static void processAssertion (tokenInfo *const token)
 	}
 }
 
+/* covergroup, interface, modport, module, package, program, property */
 static void processDesignElement (tokenInfo *const token)
 {
 	verilogKind kind = token->kind;
@@ -1364,6 +1416,8 @@ static void processDesignElement (tokenInfo *const token)
 				createTag (parameters, K_CONSTANT);
 				parameters = popToken (parameters);
 			}
+			// disable parameter property on parameter declaration statement
+			currentContext->hasParamList = true;
 			c = skipWhite (vGetc ());
 		}
 
@@ -1512,7 +1566,9 @@ static void findTag (tokenInfo *const token)
 	{
 		case K_CONSTANT:
 		case K_EVENT:
+		case K_LOCALPARAM:
 		case K_NET:
+		case K_PARAMETER:
 		case K_PORT:
 		case K_REGISTER:
 			tagNameList (token, skipWhite (vGetc ()));
@@ -1587,6 +1643,7 @@ static void findVerilogTags (void)
 	tokenInfo *const token = newToken ();
 	int c = '\0';
 	currentContext = newToken ();
+	fieldTable = isInputLanguage (Lang_verilog) ? VerilogFields : SystemVerilogFields;
 
 	while (c != EOF)
 	{
@@ -1636,6 +1693,8 @@ extern parserDefinition* VerilogParser (void)
 	parserDefinition* def = parserNew ("Verilog");
 	def->kindTable      = VerilogKinds;
 	def->kindCount  = ARRAY_SIZE (VerilogKinds);
+	def->fieldTable = VerilogFields;
+	def->fieldCount = ARRAY_SIZE (VerilogFields);
 	def->extensions = extensions;
 	def->parser     = findVerilogTags;
 	def->initialize = initializeVerilog;
@@ -1648,6 +1707,8 @@ extern parserDefinition* SystemVerilogParser (void)
 	parserDefinition* def = parserNew ("SystemVerilog");
 	def->kindTable      = SystemVerilogKinds;
 	def->kindCount  = ARRAY_SIZE (SystemVerilogKinds);
+	def->fieldTable = SystemVerilogFields;
+	def->fieldCount = ARRAY_SIZE (SystemVerilogFields);
 	def->extensions = extensions;
 	def->parser     = findVerilogTags;
 	def->initialize = initializeSystemVerilog;

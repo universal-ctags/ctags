@@ -34,3 +34,5 @@ x       UCTAGSxpath          no      NONE             s--    no    xpath for the
 -       UCTAGSassignmentop   no      R                s--    no    operator for assignment
 -       UCTAGSsectionMarker  no      ReStructuredText s--    no    character used for declaring section
 -       UCTAGSmixin          yes     Ruby             s--    no    how the class or module is mixed in (mixin:HOW:MODULE)
+-       UCTAGSparameter      no      SystemVerilog    --b    no    parameter whose value can be overridden.
+-       UCTAGSparameter      no      Verilog          --b    no    parameter whose value can be overridden.
