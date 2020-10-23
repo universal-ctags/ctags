@@ -501,7 +501,7 @@ static void parseStatement (tokenInfo *const token, int parentIndex)
 				tokenSkipOverPair (token);
 			else
 			{
-				int corkIndex = makeSimpleTag (lastToken->string, K_METHOD);
+				int corkIndex = makeSimpleTagFromToken (lastToken, K_METHOD, parentIndex);
 				e = getEntryInCorkQueue (corkIndex);
 				if (e)
 				{
@@ -659,7 +659,7 @@ static void parseClassBody (tokenInfo *const token, int classCorkIndex)
 		else
 			break;				/* Unexpected sequence of token */
 
-		int memberCorkIndex = makeSimpleTag (nameToken->string, kind);
+		int memberCorkIndex = makeSimpleTagFromToken (nameToken, kind, classCorkIndex);
 		tagEntryInfo *entry = getEntryInCorkQueue (memberCorkIndex);
 
 		/* Fill access field. */
@@ -680,9 +680,6 @@ static void parseClassBody (tokenInfo *const token, int classCorkIndex)
 			"unknown");
 		entry->extensionFields.typeRef [1] = vStringStrdup(typerefToken->string);
 
-		/* Fill scope field. */
-		entry->extensionFields.scopeIndex = classCorkIndex;
-
 		if (kind == K_PROP)
 			tokenSkipOverPair (token);
 	} while (!tokenIsEOF (token));
@@ -699,9 +696,7 @@ static void parseNamespace (tokenInfo *const token, int parentIndex)
 	if (!tokenIsType (token, IDENTIFIER))
 		return;					/* Unexpected sequence of token */
 
-	int namespaceCorkIndex = makeSimpleTag (token->string, K_NAMESPACE);
-	tagEntryInfo *entry = getEntryInCorkQueue (namespaceCorkIndex);
-	entry->extensionFields.scopeIndex = parentIndex;
+	int namespaceCorkIndex = makeSimpleTagFromToken (token, K_NAMESPACE, parentIndex);
 
 	tokenRead (token);
 	if (!tokenSkipToType (token, '{'))
@@ -717,9 +712,7 @@ static void parseInterface (tokenInfo *const token, int parentIndex)
 	if (!tokenIsType (token, IDENTIFIER))
 		return;					/* Unexpected sequence of token */
 
-	int interfaceCorkIndex = makeSimpleTag (token->string, K_INTERFACE);
-	tagEntryInfo *entry = getEntryInCorkQueue (interfaceCorkIndex);
-	entry->extensionFields.scopeIndex = parentIndex;
+	int interfaceCorkIndex = makeSimpleTagFromToken (token, K_INTERFACE, parentIndex);
 
 	tokenRead (token);
 	if (!tokenSkipToType (token, '{'))
@@ -734,9 +727,7 @@ static void parseClass (tokenInfo *const token, int parentIndex)
 	if (!tokenIsType (token, IDENTIFIER))
 		return;					/* Unexpected sequence of token */
 
-	int classCorkIndex = makeSimpleTag (token->string, K_CLASS);
-	tagEntryInfo *entry = getEntryInCorkQueue (classCorkIndex);
-	entry->extensionFields.scopeIndex = parentIndex;
+	int classCorkIndex = makeSimpleTagFromToken (token, K_CLASS, parentIndex);
 
 	/* Parse the class definition. */
 	tokenRead (token);
