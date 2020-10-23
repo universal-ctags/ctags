@@ -1,19 +1,19 @@
 main	input.vala	/^void main(string[] args) {$/;"	m	end:11
 Data	input.vala	/^namespace Data {$/;"	n	end:38
 Address	input.vala	/^   class Address {$/;"	c	namespace:Data	end:29
-country	input.vala	/^      public string country;$/;"	f	class:Data.Address	typeref:typename:string	end:15
-city	input.vala	/^      public string city;$/;"	f	class:Data.Address	typeref:typename:string	end:16
-d_street	input.vala	/^      public string d_street;$/;"	f	class:Data.Address	typeref:typename:string	end:17
-building	input.vala	/^      public int building;$/;"	f	class:Data.Address	typeref:typename:int	end:18
-floor	input.vala	/^      public int floor;$/;"	f	class:Data.Address	typeref:typename:int	end:19
-street	input.vala	/^      public string street {$/;"	p	class:Data.Address	typeref:typename:string	end:28
+country	input.vala	/^      public string country;$/;"	f	class:Data.Address	typeref:typename:string	access:public	end:15
+city	input.vala	/^      public string city;$/;"	f	class:Data.Address	typeref:typename:string	access:public	end:16
+d_street	input.vala	/^      public string d_street;$/;"	f	class:Data.Address	typeref:typename:string	access:public	end:17
+building	input.vala	/^      public int building;$/;"	f	class:Data.Address	typeref:typename:int	access:public	end:18
+floor	input.vala	/^      public int floor;$/;"	f	class:Data.Address	typeref:typename:int	access:public	end:19
+street	input.vala	/^      public string street {$/;"	p	class:Data.Address	typeref:typename:string	access:public	end:28
 Private	input.vala	/^   namespace Private {$/;"	n	namespace:Data	end:37
 Contact	input.vala	/^      class Contact {$/;"	c	namespace:Data.Private	end:36
-email	input.vala	/^         public string email;$/;"	f	class:Data.Private.Contact	typeref:typename:string	end:33
-phone	input.vala	/^         public string phone;$/;"	f	class:Data.Private.Contact	typeref:typename:string	end:34
-id	input.vala	/^         public string id;$/;"	f	class:Data.Private.Contact	typeref:typename:string	end:35
+email	input.vala	/^         public string email;$/;"	f	class:Data.Private.Contact	typeref:typename:string	access:public	end:33
+phone	input.vala	/^         public string phone;$/;"	f	class:Data.Private.Contact	typeref:typename:string	access:public	end:34
+id	input.vala	/^         public string id;$/;"	f	class:Data.Private.Contact	typeref:typename:string	access:public	end:35
 Person	input.vala	/^class Person {$/;"	c	end:55
-address	input.vala	/^   public Data.Address address {get; set;}$/;"	p	class:Person	typeref:class:Data.Address	end:41
-name	input.vala	/^   public string name {get; set;}$/;"	p	class:Person	typeref:typename:string	end:42
-d_age	input.vala	/^   private int d_age;$/;"	f	class:Person	typeref:typename:int	end:43
-age	input.vala	/^   public int age {$/;"	p	class:Person	typeref:typename:int	end:54
+address	input.vala	/^   public Data.Address address {get; set;}$/;"	p	class:Person	typeref:class:Data.Address	access:public	end:41
+name	input.vala	/^   public string name {get; set;}$/;"	p	class:Person	typeref:typename:string	access:public	end:42
+d_age	input.vala	/^   private int d_age;$/;"	f	class:Person	typeref:typename:int	access:private	end:43
+age	input.vala	/^   public int age {$/;"	p	class:Person	typeref:typename:int	access:public	end:54

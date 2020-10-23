@@ -1,12 +1,12 @@
 main	input.vala	/^void main(string[] args) {$/;"	method	line:8	language:Vala	signature:(string [] args)	end:13
 Address	input.vala	/^public class Address {$/;"	class	line:15	language:Vala	end:21
 country	input.vala	/^   string country;$/;"	field	line:16	language:Vala	class:Address	typeref:typename:string	end:16
-city	input.vala	/^   public string city;$/;"	field	line:17	language:Vala	class:Address	typeref:typename:string	end:17
-street	input.vala	/^   protected string street;$/;"	field	line:18	language:Vala	class:Address	typeref:typename:string	end:18
-building	input.vala	/^   internal int building;$/;"	field	line:19	language:Vala	class:Address	typeref:typename:int	end:19
-floor	input.vala	/^   private int floor;$/;"	field	line:20	language:Vala	class:Address	typeref:typename:int	end:20
+city	input.vala	/^   public string city;$/;"	field	line:17	language:Vala	class:Address	typeref:typename:string	access:public	end:17
+street	input.vala	/^   protected string street;$/;"	field	line:18	language:Vala	class:Address	typeref:typename:string	access:protected	end:18
+building	input.vala	/^   internal int building;$/;"	field	line:19	language:Vala	class:Address	typeref:typename:int	access:internal	end:19
+floor	input.vala	/^   private int floor;$/;"	field	line:20	language:Vala	class:Address	typeref:typename:int	access:private	end:20
 Person	input.vala	/^class Person {$/;"	class	line:23	language:Vala	end:38
-address	input.vala	/^   public Address address {get; set;}$/;"	property	line:24	language:Vala	class:Person	typeref:unknown:Address	end:24
-name	input.vala	/^   public string name {get; set;}$/;"	property	line:25	language:Vala	class:Person	typeref:typename:string	end:25
-d_age	input.vala	/^   private int d_age;$/;"	field	line:26	language:Vala	class:Person	typeref:typename:int	end:26
-age	input.vala	/^   public int age {$/;"	property	line:28	language:Vala	class:Person	typeref:typename:int	end:37
+address	input.vala	/^   public Address address {get; set;}$/;"	property	line:24	language:Vala	class:Person	typeref:unknown:Address	access:public	end:24
+name	input.vala	/^   public string name {get; set;}$/;"	property	line:25	language:Vala	class:Person	typeref:typename:string	access:public	end:25
+d_age	input.vala	/^   private int d_age;$/;"	field	line:26	language:Vala	class:Person	typeref:typename:int	access:private	end:26
+age	input.vala	/^   public int age {$/;"	property	line:28	language:Vala	class:Person	typeref:typename:int	access:public	end:37

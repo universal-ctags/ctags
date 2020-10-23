@@ -614,7 +614,7 @@ static bool readIdentifierExtended (tokenInfo *const resultToken, bool *extended
 
 static void parseClassBody (tokenInfo *const token, int classCorkIndex)
 {
-	bool isPublic;
+	char *visiblity = NULL;
 	tokenInfo *typerefToken = newValaToken ();
 	tokenInfo *nameToken = newValaToken ();
 
@@ -624,17 +624,22 @@ static void parseClassBody (tokenInfo *const token, int classCorkIndex)
 		if (tokenEqType (token, '}'))
 			break;
 
-		isPublic = tokenIsKeyword(token, PUBLIC);
-
-		if (isPublic || tokenIsKeyword (token, PROTECTED) ||
+		if (tokenIsKeyword(token, PUBLIC) || tokenIsKeyword (token, PROTECTED) ||
 			tokenIsKeyword (token, PRIVATE) || tokenIsKeyword (token, INTERNAL))
+		{
+			visiblity = eStrdup (tokenString (token));
 			tokenRead (token);
+		}
 
 		if (tokenIsType (token, IDENTIFIER)
 			|| tokenIsType (token, KEYWORD))
 			tokenCopy (typerefToken, token);
 		else
+		{
+			if (visiblity)
+				eFree (visiblity);
 			break;				/* Unexpected sequence to token */
+		}
 
 		bool typerefIsClass;
 		if (!readIdentifierExtended (typerefToken, &typerefIsClass))
@@ -663,7 +668,8 @@ static void parseClassBody (tokenInfo *const token, int classCorkIndex)
 		tagEntryInfo *entry = getEntryInCorkQueue (memberCorkIndex);
 
 		/* Fill access field. */
-		entry->extensionFields.access = isPublic ? eStrdup ("public") : NULL;
+		entry->extensionFields.access = visiblity;
+		visiblity = NULL;
 		/* Fill typeref field. */
 		entry->extensionFields.typeRef [0] = eStrdup (
 			typerefIsClass?
@@ -686,6 +692,8 @@ static void parseClassBody (tokenInfo *const token, int classCorkIndex)
 	} while (!tokenIsEOF (token));
 
  out:
+	if (visiblity)
+		eFree (visiblity);
 	tokenDelete (typerefToken);
 	tokenDelete (nameToken);
 }
