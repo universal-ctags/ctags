@@ -368,6 +368,8 @@ static void readToken (tokenInfo *const token, void *data)
 				if (c0 == EOF)
 				{
 					token->type = TOKEN_EOF;
+					token->lineNumber = getInputLineNumber ();
+					token->filePosition = getInputFilePosition ();
 					return;
 				}
 				else if (c0 == '\n')
@@ -384,6 +386,8 @@ static void readToken (tokenInfo *const token, void *data)
 				if (c1 == EOF)
 				{
 					token->type = TOKEN_EOF;
+					token->lineNumber = getInputLineNumber ();
+					token->filePosition = getInputFilePosition ();
 					return;
 				}
 				else if (c1 == '*')
@@ -394,6 +398,8 @@ static void readToken (tokenInfo *const token, void *data)
 					if (c2 == EOF)
 					{
 						token->type = TOKEN_EOF;
+						token->lineNumber = getInputLineNumber ();
+						token->filePosition = getInputFilePosition ();
 						return;
 					}
 					else if (c2 == '/')
@@ -407,6 +413,8 @@ static void readToken (tokenInfo *const token, void *data)
 			ungetcToInputFile (c0);
 	}
 
+	token->lineNumber = getInputLineNumber ();
+	token->filePosition = getInputFilePosition ();
 	switch (c)
 	{
 	case EOF:
