@@ -1,19 +1,19 @@
-Address	input.vala	/^   class Address {$/;"	c	namespace:Data
-Contact	input.vala	/^      class Contact {$/;"	c	namespace:Data.Private
-Data	input.vala	/^namespace Data {$/;"	n
-Person	input.vala	/^class Person {$/;"	c
-Private	input.vala	/^   namespace Private {$/;"	n	namespace:Data
-address	input.vala	/^   public Data.Address address {get; set;}$/;"	p	class:Person	typeref:class:Data.Address
-age	input.vala	/^   public int age {$/;"	p	class:Person	typeref:typename:int
-building	input.vala	/^      public int building;$/;"	f	class:Data.Address	typeref:typename:int
-city	input.vala	/^      public string city;$/;"	f	class:Data.Address	typeref:typename:string
-country	input.vala	/^      public string country;$/;"	f	class:Data.Address	typeref:typename:string
-d_age	input.vala	/^   private int d_age;$/;"	f	class:Person	typeref:typename:int
-d_street	input.vala	/^      public string d_street;$/;"	f	class:Data.Address	typeref:typename:string
-email	input.vala	/^         public string email;$/;"	f	class:Data.Private.Contact	typeref:typename:string
-floor	input.vala	/^      public int floor;$/;"	f	class:Data.Address	typeref:typename:int
-id	input.vala	/^         public string id;$/;"	f	class:Data.Private.Contact	typeref:typename:string
 main	input.vala	/^void main(string[] args) {$/;"	m
-name	input.vala	/^   public string name {get; set;}$/;"	p	class:Person	typeref:typename:string
-phone	input.vala	/^         public string phone;$/;"	f	class:Data.Private.Contact	typeref:typename:string
+Data	input.vala	/^namespace Data {$/;"	n
+Address	input.vala	/^   class Address {$/;"	c	namespace:Data
+country	input.vala	/^      public string country;$/;"	f	class:Data.Address	typeref:typename:string
+city	input.vala	/^      public string city;$/;"	f	class:Data.Address	typeref:typename:string
+d_street	input.vala	/^      public string d_street;$/;"	f	class:Data.Address	typeref:typename:string
+building	input.vala	/^      public int building;$/;"	f	class:Data.Address	typeref:typename:int
+floor	input.vala	/^      public int floor;$/;"	f	class:Data.Address	typeref:typename:int
 street	input.vala	/^      public string street {$/;"	p	class:Data.Address	typeref:typename:string
+Private	input.vala	/^   namespace Private {$/;"	n	namespace:Data
+Contact	input.vala	/^      class Contact {$/;"	c	namespace:Data.Private
+email	input.vala	/^         public string email;$/;"	f	class:Data.Private.Contact	typeref:typename:string
+phone	input.vala	/^         public string phone;$/;"	f	class:Data.Private.Contact	typeref:typename:string
+id	input.vala	/^         public string id;$/;"	f	class:Data.Private.Contact	typeref:typename:string
+Person	input.vala	/^class Person {$/;"	c
+address	input.vala	/^   public Data.Address address {get; set;}$/;"	p	class:Person	typeref:class:Data.Address
+name	input.vala	/^   public string name {get; set;}$/;"	p	class:Person	typeref:typename:string
+d_age	input.vala	/^   private int d_age;$/;"	f	class:Person	typeref:typename:int
+age	input.vala	/^   public int age {$/;"	p	class:Person	typeref:typename:int
