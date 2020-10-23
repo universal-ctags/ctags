@@ -773,6 +773,7 @@ static void parseClass (tokenInfo *const token, int parentIndex)
 	tokenRead (token);
 	if (!tokenIsType (token, IDENTIFIER))
 		return;					/* Unexpected sequence of token */
+	readIdentifierExtended (token, NULL);
 
 	int classCorkIndex = makeSimpleTagFromToken (token, K_CLASS, parentIndex);
 
