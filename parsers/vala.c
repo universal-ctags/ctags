@@ -1,6 +1,7 @@
 /*
-*   Copyright (c) 2019, Masatake Yamato <yamato@redhat.com>
 *   Copyright (c) 2019, Alberto Fanjul <albertofanjul@gmail.com>
+*   Copyright (c) 2020, Masatake Yamato <yamato@redhat.com>
+*   Copyright (c) 2020, Red Hat, Inc.
 *
 *   This source code is released for free distribution under the terms of the
 *   GNU General Public License version 2 or (at your option) any later version.
