@@ -682,6 +682,7 @@ static void parseClassBody (tokenInfo *const token, int classCorkIndex)
 
 		if (kind == K_PROP)
 			tokenSkipOverPair (token);
+		entry->extensionFields.endLine = token->lineNumber;
 	} while (!tokenIsEOF (token));
 
  out:
@@ -703,6 +704,9 @@ static void parseNamespace (tokenInfo *const token, int parentIndex)
 		return;					/* Unexpected sequence of token */
 
 	parseNamespaceBody (token, namespaceCorkIndex);
+	tagEntryInfo *e = getEntryInCorkQueue (namespaceCorkIndex);
+	if (e)
+		e->extensionFields.endLine = token->lineNumber;
 }
 
 static void parseInterface (tokenInfo *const token, int parentIndex)
@@ -719,6 +723,9 @@ static void parseInterface (tokenInfo *const token, int parentIndex)
 		return;					/* Unexpected sequence of token */
 
 	parseClassBody (token, interfaceCorkIndex);	/* Should we have a custom parser? */
+	tagEntryInfo *e = getEntryInCorkQueue (interfaceCorkIndex);
+	if (e)
+		e->extensionFields.endLine = token->lineNumber;
 }
 
 static void parseClass (tokenInfo *const token, int parentIndex)
@@ -735,6 +742,9 @@ static void parseClass (tokenInfo *const token, int parentIndex)
 		return;					/* Unexpected sequence of token */
 
 	parseClassBody (token, classCorkIndex);
+	tagEntryInfo *e = getEntryInCorkQueue (classCorkIndex);
+	if (e)
+		e->extensionFields.endLine = token->lineNumber;
 }
 
 static void findValaTags (void)
