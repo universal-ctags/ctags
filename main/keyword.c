@@ -256,3 +256,21 @@ extern void dumpKeywordTable (FILE *fp)
 		}
 	}
 }
+
+extern void addKeywordGroup (const struct keywordGroup *const groupdef,
+							 langType language)
+{
+	for (int i = 0; groupdef->keywords[i]; i++)
+	{
+		if (groupdef->addingUnlessExisting)
+		{
+			if (lookupKeyword (groupdef->keywords[i],
+							   language) != KEYWORD_NONE)
+				continue;		/* already added */
+		}
+		else
+			Assert (lookupKeyword (groupdef->keywords[i],
+								   language) == KEYWORD_NONE);
+		addKeyword (groupdef->keywords[i], language, groupdef->value);
+	}
+}

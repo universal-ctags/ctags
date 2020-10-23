@@ -27,4 +27,15 @@ extern void addKeyword (const char *const string, langType language, int value);
 extern int lookupKeyword (const char *const string, langType language);
 extern int lookupCaseKeyword (const char *const string, langType language);
 
+/*
+* KEYWORD GROUP API: Adding keywords for value in batch
+*/
+struct keywordGroup {
+	int value;
+	bool addingUnlessExisting;
+	const char *keywords []; 	/* NULL terminated */
+};
+
+extern void addKeywordGroup (const struct keywordGroup *const groupdef,
+							 langType language);
 #endif  /* CTAGS_MAIN_KEYWORD_H */
