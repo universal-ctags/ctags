@@ -477,7 +477,7 @@ static tokenInfo *newValaToken (void)
 	return newToken (&valaTokenInfoClass);
 }
 
-static void parseStatement (tokenInfo *const token, int corkIndex)
+static void parseStatement (tokenInfo *const token, int parentIndex)
 {
 	tokenInfo *lastToken = newValaToken ();
 	bool foundSignature = false;
@@ -516,22 +516,22 @@ static void parseStatement (tokenInfo *const token, int corkIndex)
 	tokenDelete (lastToken);
 }
 
-static void recurseValaTags (tokenInfo *token, int corkIndex)
+static void recurseValaTags (tokenInfo *token, int parentIndex)
 {
 	/* Skip attributes */
 	if (tokenEqType (token, '['))
 		tokenSkipOverPair (token);
 	else if (tokenIsKeyword(token, NAMESPACE))
-		parseNamespace (token, corkIndex);
+		parseNamespace (token, parentIndex);
 	else if (tokenIsKeyword(token, INTERFACE))
-		parseInterface (token, corkIndex);
+		parseInterface (token, parentIndex);
 	else if (tokenIsKeyword(token, CLASS))
-		parseClass (token, corkIndex);
+		parseClass (token, parentIndex);
 	else if (tokenIsType (token, IDENTIFIER))
-		parseStatement (token, corkIndex);
+		parseStatement (token, parentIndex);
 }
 
-static void parseNamespaceBody (tokenInfo *const token, int corkIndex)
+static void parseNamespaceBody (tokenInfo *const token, int parentIndex)
 {
 	do
 	{
@@ -539,7 +539,7 @@ static void parseNamespaceBody (tokenInfo *const token, int corkIndex)
 		if (tokenEqType (token, '}'))
 			break;
 
-		recurseValaTags (token, corkIndex);
+		recurseValaTags (token, parentIndex);
 
 		if (tokenEqType (token, '{'))
 			tokenSkipOverPair (token);
@@ -677,7 +677,7 @@ static void parseClassBody (tokenInfo *const token, int classCorkIndex)
 	tokenDelete (nameToken);
 }
 
-static void parseNamespace (tokenInfo *const token, int corkIndex)
+static void parseNamespace (tokenInfo *const token, int parentIndex)
 {
 
 	tokenRead (token);
@@ -686,7 +686,7 @@ static void parseNamespace (tokenInfo *const token, int corkIndex)
 
 	int namespaceCorkIndex = makeSimpleTag (token->string, K_NAMESPACE);
 	tagEntryInfo *entry = getEntryInCorkQueue (namespaceCorkIndex);
-	entry->extensionFields.scopeIndex = corkIndex;
+	entry->extensionFields.scopeIndex = parentIndex;
 
 	tokenRead (token);
 	if (!tokenSkipToType (token, '{'))
@@ -695,7 +695,7 @@ static void parseNamespace (tokenInfo *const token, int corkIndex)
 	parseNamespaceBody (token, namespaceCorkIndex);
 }
 
-static void parseInterface (tokenInfo *const token, int corkIndex)
+static void parseInterface (tokenInfo *const token, int parentIndex)
 {
 
 	tokenRead (token);
@@ -704,7 +704,7 @@ static void parseInterface (tokenInfo *const token, int corkIndex)
 
 	int interfaceCorkIndex = makeSimpleTag (token->string, K_INTERFACE);
 	tagEntryInfo *entry = getEntryInCorkQueue (interfaceCorkIndex);
-	entry->extensionFields.scopeIndex = corkIndex;
+	entry->extensionFields.scopeIndex = parentIndex;
 
 	tokenRead (token);
 	if (!tokenSkipToType (token, '{'))
@@ -713,7 +713,7 @@ static void parseInterface (tokenInfo *const token, int corkIndex)
 	parseClassBody (token, interfaceCorkIndex);	/* Should we have a custom parser? */
 }
 
-static void parseClass (tokenInfo *const token, int corkIndex)
+static void parseClass (tokenInfo *const token, int parentIndex)
 {
 	tokenRead (token);
 	if (!tokenIsType (token, IDENTIFIER))
@@ -721,7 +721,7 @@ static void parseClass (tokenInfo *const token, int corkIndex)
 
 	int classCorkIndex = makeSimpleTag (token->string, K_CLASS);
 	tagEntryInfo *entry = getEntryInCorkQueue (classCorkIndex);
-	entry->extensionFields.scopeIndex = corkIndex;
+	entry->extensionFields.scopeIndex = parentIndex;
 
 	/* Parse the class definition. */
 	tokenRead (token);
