@@ -1,2 +1,2 @@
-main	input.vala	/^void main(string[] args) {$/;"	method	line:4	language:Vala	signature:(string [] args)
-sum	input.vala	/^int sum(int sum1, int sum2) {$/;"	method	line:8	language:Vala	signature:(int sum1, int sum2)
+main	input.vala	/^void main(string[] args) {$/;"	method	line:4	language:Vala	signature:(string [] args)	end:6
+sum	input.vala	/^int sum(int sum1, int sum2) {$/;"	method	line:8	language:Vala	signature:(int sum1, int sum2)	end:10

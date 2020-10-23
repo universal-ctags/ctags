@@ -1,4 +1,4 @@
-main	input.vala	/^void main(string[] args) {$/;"	method	line:8	language:Vala	signature:(string [] args)
+main	input.vala	/^void main(string[] args) {$/;"	method	line:8	language:Vala	signature:(string [] args)	end:13
 Address	input.vala	/^public class Address {$/;"	class	line:15	language:Vala
 country	input.vala	/^   string country;$/;"	field	line:16	language:Vala	class:Address	typeref:typename:string
 city	input.vala	/^   public string city;$/;"	field	line:17	language:Vala	class:Address	typeref:typename:string

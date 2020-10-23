@@ -489,6 +489,7 @@ static void parseStatement (tokenInfo *const token, int parentIndex)
 {
 	tokenInfo *lastToken = newValaToken ();
 	bool foundSignature = false;
+	tagEntryInfo *e = NULL;
 
 	do
 	{
@@ -501,7 +502,7 @@ static void parseStatement (tokenInfo *const token, int parentIndex)
 			else
 			{
 				int corkIndex = makeSimpleTag (lastToken->string, K_METHOD);
-				tagEntryInfo *e = getEntryInCorkQueue (corkIndex);
+				e = getEntryInCorkQueue (corkIndex);
 				if (e)
 				{
 					vString *signature = vStringNewInit ("(");
@@ -523,6 +524,10 @@ static void parseStatement (tokenInfo *const token, int parentIndex)
 		if (tokenSkipToType (token, '{'))
 			tokenSkipOverPair (token);
 	}
+
+	if (e)
+		e->extensionFields.endLine = token->lineNumber;
+
 	tokenDelete (lastToken);
 }
 
