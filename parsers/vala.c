@@ -500,16 +500,17 @@ static void parseStatement (tokenInfo *const token, int parentIndex)
 				tokenSkipOverPair (token);
 			else
 			{
-				vString *signature = vStringNewInit ("(");
 				int corkIndex = makeSimpleTag (lastToken->string, K_METHOD);
-				foundSignature = tokenSkipOverPairFull (token, signature);
-				if (foundSignature)
+				tagEntryInfo *e = getEntryInCorkQueue (corkIndex);
+				if (e)
 				{
-					tagEntryInfo *e = getEntryInCorkQueue (corkIndex);
-					e->extensionFields.signature = vStringDeleteUnwrap (signature);
+					vString *signature = vStringNewInit ("(");
+					foundSignature = tokenSkipOverPairFull (token, signature);
+					if (foundSignature)
+						e->extensionFields.signature = vStringDeleteUnwrap (signature);
+					else
+						vStringDelete (signature);
 				}
-				else
-					vStringDelete (signature);
 			}
 			break;
 		}
