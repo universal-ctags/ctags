@@ -488,9 +488,10 @@ static void parseStatement (tokenInfo *const token, int parentIndex)
 		tokenRead (token);
 		if (tokenEqType (token, '('))
 		{
-			if (tokenIsType (lastToken, KEYWORD)) {
+			if (tokenIsType (lastToken, KEYWORD))
 				tokenSkipOverPair (token);
-			} else {
+			else
+			{
 				vString *signature = vStringNewInit ("(");
 				int corkIndex = makeSimpleTag (lastToken->string, K_METHOD);
 				foundSignature = tokenSkipOverPairFull (token, signature);
