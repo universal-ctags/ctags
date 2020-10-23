@@ -736,6 +736,38 @@ static void parseInterface (tokenInfo *const token, int parentIndex)
 		e->extensionFields.endLine = token->lineNumber;
 }
 
+static void parseInheritanceList (tokenInfo *const token, int classIndex)
+{
+	vString *list = vStringNew ();
+
+	do
+	{
+		tokenRead (token);
+		if (!tokenIsType (token, IDENTIFIER))
+			break;				/* Unexpected sequence of token */
+		readIdentifierExtended (token, NULL);
+		vStringCat (list, token->string);
+
+		tokenRead (token);
+		if (tokenIsTypeVal (token, ','))
+			vStringPut (list, ',');
+		else if (tokenIsTypeVal (token, '{'))
+		{
+			tagEntryInfo *e = getEntryInCorkQueue (classIndex);
+			if (e)
+			{
+				e->extensionFields.inheritance = vStringDeleteUnwrap (list);
+				list = NULL;
+			}
+			break;
+		}
+		else
+			break;			 /* Unexpected sequence of token or EOF */
+	} while (1);
+
+	vStringDelete (list);		/* NULL is acceptable */
+}
+
 static void parseClass (tokenInfo *const token, int parentIndex)
 {
 	tokenRead (token);
@@ -746,6 +778,9 @@ static void parseClass (tokenInfo *const token, int parentIndex)
 
 	/* Parse the class definition. */
 	tokenRead (token);
+	if (tokenIsTypeVal (token, ':'))
+		parseInheritanceList (token, classCorkIndex);
+
 	if (!tokenSkipToType (token, '{'))
 		return;					/* Unexpected sequence of token */
 
