@@ -28,7 +28,6 @@
 *   MACROS
 */
 
-#define tokenEqType(TKN,T)     ((TKN)->type == T)
 
 
 /*
@@ -495,7 +494,7 @@ static void parseStatement (tokenInfo *const token, int parentIndex)
 	{
 		tokenCopy (lastToken, token);
 		tokenRead (token);
-		if (tokenEqType (token, '('))
+		if (tokenIsTypeVal (token, '('))
 		{
 			if (tokenIsType (lastToken, KEYWORD))
 				tokenSkipOverPair (token);
@@ -516,7 +515,7 @@ static void parseStatement (tokenInfo *const token, int parentIndex)
 			break;
 		}
 	}
-	while (!tokenEqType (token, ';') && !tokenIsEOF (token));
+	while (!tokenIsTypeVal (token, ';') && !tokenIsEOF (token));
 
 	/* Skip the body of method */
 	if (foundSignature)
@@ -534,7 +533,7 @@ static void parseStatement (tokenInfo *const token, int parentIndex)
 static void recurseValaTags (tokenInfo *token, int parentIndex)
 {
 	/* Skip attributes */
-	if (tokenEqType (token, '['))
+	if (tokenIsTypeVal (token, '['))
 		tokenSkipOverPair (token);
 	else if (tokenIsKeyword(token, NAMESPACE))
 		parseNamespace (token, parentIndex);
@@ -551,12 +550,12 @@ static void parseNamespaceBody (tokenInfo *const token, int parentIndex)
 	do
 	{
 		tokenRead (token);
-		if (tokenEqType (token, '}'))
+		if (tokenIsTypeVal (token, '}'))
 			break;
 
 		recurseValaTags (token, parentIndex);
 
-		if (tokenEqType (token, '{'))
+		if (tokenIsTypeVal (token, '{'))
 			tokenSkipOverPair (token);
 
 	} while (!tokenIsEOF (token));
@@ -621,7 +620,7 @@ static void parseClassBody (tokenInfo *const token, int classCorkIndex)
 	do
 	{
 		tokenRead (token);
-		if (tokenEqType (token, '}'))
+		if (tokenIsTypeVal (token, '}'))
 			break;
 
 		if (tokenIsKeyword(token, PUBLIC) || tokenIsKeyword (token, PROTECTED) ||
@@ -651,15 +650,15 @@ static void parseClassBody (tokenInfo *const token, int classCorkIndex)
 
 		/* Argument list for a method */
 		tokenRead (token);
-		if (tokenEqType (token, '(')) {
+		if (tokenIsTypeVal (token, '(')) {
 			tokenSkipOverPair (token);
 			tokenRead (token);
 		}
 
 		int kind;
-		if (tokenEqType (token, ';'))
+		if (tokenIsTypeVal (token, ';'))
 			kind = K_FIELD;
-		else if (tokenEqType (token, '{'))
+		else if (tokenIsTypeVal (token, '{'))
 			kind = K_PROP;
 		else
 			break;				/* Unexpected sequence of token */
