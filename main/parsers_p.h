@@ -119,6 +119,7 @@
 	QemuHXParser, \
 	QtMocParser, \
 	RParser, \
+	R6ClassParser, \
 	RSpecParser, \
 	RexxParser, \
 	RobotParser, \

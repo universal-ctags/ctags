@@ -83,6 +83,7 @@ The following parsers have been added:
 * QemuHX *optlib*
 * QtMoc
 * R
+* R6Class *R based subperser*
 * RelaxNG *libxml*
 * ReStructuredText
 * Robot

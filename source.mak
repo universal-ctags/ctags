@@ -183,6 +183,7 @@ PARSER_HEADS = \
 	parsers/m4.h \
 	parsers/make.h \
 	parsers/perl.h \
+	parsers/r.h \
 	parsers/tcl.h \
 	parsers/tex.h \
 	\
@@ -262,6 +263,7 @@ PARSER_SRCS =				\
 	parsers/protobuf.c		\
 	parsers/python.c		\
 	parsers/pythonloggingconfig.c	\
+	parsers/r-r6class.c		\
 	parsers/r.c			\
 	parsers/rexx.c			\
 	parsers/robot.c			\
