@@ -207,3 +207,19 @@ bool tokenSkipOverPairFull (tokenInfo *token, void *data)
 
 	return (depth == 0)? true: false;
 }
+
+void initTagEntryFromToken (tagEntryInfo *e, tokenInfo *const token, int kindIndex,
+							int scopeIndex)
+{
+	initTagEntry (e, tokenString (token), kindIndex);
+	e->lineNumber = token->lineNumber;
+	e->filePosition = token->filePosition;
+	e->extensionFields.scopeIndex = scopeIndex;
+}
+
+int makeSimpleTagFromToken (tokenInfo *const token, int kindIndex, int scopeIndex)
+{
+	tagEntryInfo e;
+	initTagEntryFromToken (&e, token, kindIndex, scopeIndex);
+	return makeTagEntry (&e);
+}

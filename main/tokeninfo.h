@@ -102,4 +102,7 @@ bool tokenSkipToTypeFull (tokenInfo *token, tokenType t, void *data);
 bool tokenSkipOverPair (tokenInfo *token);
 bool tokenSkipOverPairFull (tokenInfo *token, void *data);
 
+/* Making a tag from a token */
+void initTagEntryFromToken (tagEntryInfo *e, tokenInfo *const token, int kindIndex, int scopeIndex);
+int  makeSimpleTagFromToken (tokenInfo *const token, int kindIndex, int scopeIndex);
 #endif
