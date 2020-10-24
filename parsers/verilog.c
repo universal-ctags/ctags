@@ -1136,33 +1136,31 @@ static void processFunction (tokenInfo *const token)
 static void processEnum (tokenInfo *const token)
 {
 	int c;
+	tokenInfo* enumToken = dupToken (token);
 
 	/* Read enum type */
 	c = skipWhite (vGetc ());
-	if (isIdentifierCharacter (c))
+	if (readWordToken (token, c))
 	{
 		tokenInfo* typeQueue = NULL;
-		tokenInfo* type;
 
 		do
 		{
-			type = newToken ();
-
-			readWordToken (type, c);
-			updateKind (type);
-			typeQueue = pushToken (typeQueue, type);
-			verbose ("Enum type %s\n", vStringValue (type->name));
+			updateKind (token);
+			typeQueue = pushToken (typeQueue, dupToken (token));
+			verbose ("Enum type %s\n", vStringValue (token->name));
 			c = skipWhite (vGetc ());
-		} while (isIdentifierCharacter (c));
+		} while (readWordToken (token, c));
 
 		/* Undefined kind means that we've reached the end of the
 		 * declaration without having any contents defined, which
 		 * indicates that this is in fact a forward declaration */
-		if (type->kind == K_IDENTIFIER && (typeQueue->scope == NULL || typeQueue->scope->kind != K_UNDEFINED))
+		if (token->kind == K_IDENTIFIER && (typeQueue->scope == NULL || typeQueue->scope->kind != K_UNDEFINED))
 		{
-			verbose ("Prototype enum found \"%s\"\n", vStringValue (type->name));
-			createTag (type, K_PROTOTYPE);
+			verbose ("Prototype enum found \"%s\"\n", vStringValue (token->name));
+			createTag (token, K_PROTOTYPE);
 			pruneTokens (typeQueue);
+			deleteToken (enumToken);
 			return;
 		}
 
@@ -1177,14 +1175,11 @@ static void processEnum (tokenInfo *const token)
 	if (c == '{')
 	{
 		c = skipWhite (vGetc ());
-		while (isIdentifierCharacter (c))
+		while (readWordToken (token, c))
 		{
-			tokenInfo *content = newToken ();
-
-			readWordToken (content, c);
-			content->kind = K_CONSTANT;
-			tagContents = pushToken (tagContents, content);
-			verbose ("Pushed enum element \"%s\"\n", vStringValue (content->name));
+			token->kind = K_CONSTANT;
+			tagContents = pushToken (tagContents, dupToken (token));
+			verbose ("Pushed enum element \"%s\"\n", vStringValue (token->name));
 
 			/* Skip element ranges */
 			/* TODO Implement element ranges */
@@ -1219,8 +1214,9 @@ static void processEnum (tokenInfo *const token)
 	}
 
 	/* Following identifiers are tag names */
-	verbose ("Find enum tags. Token %s kind %d\n", vStringValue (token->name), token->kind);
-	tagNameList (token, c);
+	verbose ("Find enum tags. Token %s kind %d\n", vStringValue (enumToken->name), enumToken->kind);
+	tagNameList (enumToken, c);
+	deleteToken (enumToken);
 }
 
 static void processStruct (tokenInfo *const token)
