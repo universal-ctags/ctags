@@ -855,11 +855,7 @@ static void createTag (tokenInfo *const token, verilogKind kind)
 		attachParserField (&tag, false,
 						   fieldTable [F_PARAMETER].ftype, "");
 
-	int corkIndex = makeTagEntry (&tag);
-	if (isInputLanguage (Lang_systemverilog)
-		&& corkIndex != CORK_NIL
-		&& kind == K_TYPEDEF)
-		registerEntry (corkIndex);
+	makeTagEntry (&tag);
 
 	if (isXtagEnabled(XTAG_QUALIFIED_TAGS) && currentContext->kind != K_UNDEFINED)
 	{
@@ -1435,30 +1431,6 @@ static void processDesignElement (tokenInfo *const token)
 		}
 	}
 }
-#if 0
-static bool doesNameForKindExist (int corkIndex, tagEntryInfo *entry, void *data)
-{
-	verilogKind *kind = data;
-
-	if (entry->kindIndex == *kind)
-		return false;
-
-	return true;	/* FIXME: uncovered */
-}
-
-static bool isAlreadyTaggedAs (tokenInfo *token, verilogKind kind)
-{
-	if (!isInputLanguage (Lang_systemverilog))
-		return false;
-
-	vString *name = token->name;
-	if (vStringIsEmpty (name))
-		return false;
-
-	return (foreachEntriesInScope (CORK_NIL, vStringValue (name),
-								   doesNameForKindExist, &kind) == false);
-}
-#endif
 
 static int skipDelay(tokenInfo* token, int c)
 {
@@ -1712,6 +1684,5 @@ extern parserDefinition* SystemVerilogParser (void)
 	def->extensions = extensions;
 	def->parser     = findVerilogTags;
 	def->initialize = initializeSystemVerilog;
-	def->useCork    = CORK_QUEUE | CORK_SYMTAB;
 	return def;
 }
