@@ -1006,12 +1006,10 @@ static void processEnd (tokenInfo *const token)
 	}
 }
 
-static void processPortList (int c)
+static void processPortList (tokenInfo *token, int c)
 {
 	if ((c = skipWhite (c)) == '(')
 	{
-		tokenInfo *token = newToken ();
-
 		/* Get next non-whitespace character after ( */
 		c = skipWhite (vGetc ());
 
@@ -1064,8 +1062,6 @@ static void processPortList (int c)
 		}
 
 		if (! isIdentifierCharacter (c)) vUngetc (c);
-
-		deleteToken (token);
 	}
 	else if (c != EOF)
 	{
@@ -1133,7 +1129,7 @@ static void processFunction (tokenInfo *const token)
 		createTag (token, kind);
 
 		/* Get port list from function */
-		processPortList (c);
+		processPortList (token, c);
 	}
 }
 
@@ -1483,7 +1479,7 @@ static void processDesignElement (tokenInfo *const token)
 			if (kind == K_MODPORT)
 				c = skipPastMatch ("()");	// ignore port list
 			else if (hasSimplePortList (kind))
-				processPortList (c);
+				processPortList (token, c);
 		}
 		else
 		{
