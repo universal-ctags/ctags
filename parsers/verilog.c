@@ -791,8 +791,12 @@ static void updateKind (tokenInfo *const token)
 	token->kind = ((kind == K_UNDEFINED) && isIdentifier(token)) ? K_IDENTIFIER : kind;
 }
 
-static void createContext (tokenInfo *const scope)
+static void createContext (verilogKind kind, vString* const name)
 {
+	tokenInfo *const scope = newToken ();
+	vStringCopy (scope->name, name);
+	scope->kind = kind;
+
 	if (scope)
 	{
 		vString *contextName = vStringNew ();
@@ -939,11 +943,7 @@ static void createTag (tokenInfo *const token, verilogKind kind)
 	/* Push token as context if it is a container */
 	if (container)
 	{
-		tokenInfo *newScope = newToken ();
-
-		vStringCopy (newScope->name, token->name);
-		newScope->kind = kind;
-		createContext (newScope);
+		createContext (kind, token->name);
 
 		/* Include found contents in context */
 		if (tagContents != NULL)
@@ -1088,7 +1088,6 @@ static void processFunction (tokenInfo *const token)
 {
 	verilogKind kind = token->kind;	// K_FUNCTION or K_TASK
 	int c;
-	tokenInfo *classType;
 
 	/* Search for function name
 	 * Last identifier found before a '(' or a ';' is the function name */
@@ -1108,10 +1107,7 @@ static void processFunction (tokenInfo *const token)
 			if (c == ':')
 			{
 				verbose ("Found function declaration with class type %s\n", vStringValue (token->name));
-				classType = newToken ();
-				vStringCopy (classType->name, token->name);
-				classType->kind = K_CLASS;
-				createContext (classType);
+				createContext (K_CLASS, token->name);
 				currentContext->classScope = true;
 			}
 			else
