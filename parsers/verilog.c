@@ -1382,38 +1382,40 @@ static tokenInfo * processParameterList (tokenInfo *token, int c)
 
 static void processClass (tokenInfo *const token)
 {
-	/*Note: At the moment, only identifies typedef name and not its contents */
 	int c;
-	tokenInfo *extra;
+	tokenInfo *classToken;
 	tokenInfo *parameters;
 
 	/* Get identifiers */
 	c = skipWhite (vGetc ());
-	if (readWordToken (token, c))
-		c = skipWhite (vGetc ());
+	if (!readWordToken (token, c))
+	{
+		verbose ("Unexpected input: class name is expected.\n");
+		return;
+	}
+
+	/* save token */
+	classToken = dupToken (token);
+	c = skipWhite (vGetc ());
 
 	/* Find class parameters list */
 	parameters = processParameterList (token, c);
 	c = skipWhite (vGetc ());
 
 	/* Search for inheritance information */
-	if (isIdentifierCharacter (c))
+	if (readWordToken (token, c))
 	{
-		extra = newToken ();
-
-		readWordToken (extra, c);
-		c = skipWhite (vGetc ());
-		if (strcmp (vStringValue (extra->name), "extends") == 0)
+		if (strcmp (vStringValue (token->name), "extends") == 0)
 		{
-			readWordToken (extra, c);
-			vStringCopy (token->inheritance, extra->name);
-			verbose ("Inheritance %s\n", vStringValue (token->inheritance));
+			c = skipWhite (vGetc ());
+			readWordToken (token, c);
+			vStringCopy (classToken->inheritance, token->name);
+			verbose ("Inheritance %s\n", vStringValue (classToken->inheritance));
 		}
-		deleteToken (extra);
 	}
 
-	/* Use last identifier to create tag */
-	createTag (token, K_CLASS);
+	createTag (classToken, K_CLASS);
+	deleteToken (classToken);
 
 	/* Add parameter list */
 	while (parameters)
