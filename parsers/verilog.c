@@ -1328,7 +1328,7 @@ static void processTypedef (tokenInfo *const token)
 	createTag (token, K_TYPEDEF);
 }
 
-static tokenInfo * processParameterList (int c)
+static tokenInfo * processParameterList (tokenInfo *token, int c)
 {
 	tokenInfo *head = NULL;
 	tokenInfo *parameters = NULL;
@@ -1338,7 +1338,6 @@ static tokenInfo * processParameterList (int c)
 		c = skipWhite (vGetc ());
 		if (c == '(')
 		{
-			tokenInfo *token = newToken ();
 			do
 			{
 				c = skipWhite (vGetc ());
@@ -1351,15 +1350,15 @@ static tokenInfo * processParameterList (int c)
 						c = skipWhite (vGetc ());
 						if (c == ',' || c == ')' || c == '=')	// ignore user defined type
 						{
-							token->kind = K_CONSTANT;
-							token->parameter = parameter;
+							tokenInfo *param = dupToken (token);
+							param->kind = K_CONSTANT;
+							param->parameter = parameter;
 							if (head == NULL)
 							{
-								head = token;
-								parameters = token;
+								head = param;
+								parameters = param;
 							} else
-								parameters = appendToken (parameters, token);	// append token on parameters
-							token = newToken ();
+								parameters = appendToken (parameters, param);	// append token on parameters
 
 							c = skipExpression (c);
 						}
@@ -1375,7 +1374,6 @@ static tokenInfo * processParameterList (int c)
 				}
 			} while (c != ')' && c != EOF);
 			c = skipWhite (vGetc ());
-			deleteToken (token);
 		}
 	}
 	vUngetc (c);
@@ -1395,7 +1393,7 @@ static void processClass (tokenInfo *const token)
 		c = skipWhite (vGetc ());
 
 	/* Find class parameters list */
-	parameters = processParameterList (c);
+	parameters = processParameterList (token, c);
 	c = skipWhite (vGetc ());
 
 	/* Search for inheritance information */
@@ -1462,7 +1460,7 @@ static void processDesignElement (tokenInfo *const token)
 		c = skipWhite (vGetc ());
 		if (c == '#')
 		{
-			tokenInfo *parameters = processParameterList (c);
+			tokenInfo *parameters = processParameterList (token, c);
 			while (parameters)
 			{
 				createTag (parameters, K_CONSTANT);
