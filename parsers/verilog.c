@@ -420,23 +420,47 @@ static short hasSimplePortList (verilogKind kind)
 	}
 }
 
-static tokenInfo *newToken (void)
+static void clearToken (tokenInfo *token)
 {
-	tokenInfo *const token = xMalloc (1, tokenInfo);
-	token->kind = K_UNDEFINED;
-	token->name = vStringNew ();
+	token->kind = K_UNDEFINED;	// to be set by updateKind()
+	vStringClear (token->name);
 	token->lineNumber = getInputLineNumber ();
 	token->filePosition = getInputFilePosition ();
 	token->scope = NULL;
 	token->nestLevel = 0;
 	token->lastKind = K_UNDEFINED;
-	token->blockName = vStringNew ();
-	token->inheritance = vStringNew ();
+	vStringClear (token->blockName);
+	vStringClear (token->inheritance);
 	token->prototype = false;
 	token->classScope = false;
 	token->parameter = false;
 	token->hasParamList = false;
+}
+
+static tokenInfo *newToken (void)
+{
+	tokenInfo *const token = xMalloc (1, tokenInfo);
+	token->name = vStringNew ();
+	token->blockName = vStringNew ();
+	token->inheritance = vStringNew ();
+	clearToken(token);
 	return token;
+}
+
+static tokenInfo *dupToken (tokenInfo *token)
+{
+	tokenInfo *dup = newToken ();
+	tokenInfo tmp = *dup;	// save vStrings, name, blockName, and inheritance
+	*dup = *token;
+	// revert vStrings allocated for dup
+	dup->name = tmp.name;
+	dup->blockName = tmp.blockName;
+	dup->inheritance = tmp.inheritance;
+	// copy contents of vStrings
+	vStringCopy (dup->name, token->name);
+	vStringCopy (dup->blockName, token->blockName);
+	vStringCopy (dup->inheritance, token->inheritance);
+	return dup;
 }
 
 static void deleteToken (tokenInfo * const token)
@@ -718,18 +742,13 @@ static bool readWordToken (tokenInfo *const token, int c)
 {
 	if (isIdentifierCharacter (c))
 	{
-		vStringClear (token->name);
+		clearToken (token);
 		while (isIdentifierCharacter (c))
 		{
 			vStringPut (token->name, c);
 			c = vGetc ();
 		}
 		vUngetc (c);
-		token->lineNumber = getInputLineNumber ();
-		token->filePosition = getInputFilePosition ();
-		token->kind = K_UNDEFINED;	// to be set by updateKind()
-		token->parameter = false;
-		token->hasParamList = false;
 		return true;
 	}
 	return false;
