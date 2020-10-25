@@ -670,13 +670,14 @@ static int skipDimension (int c)
 	return c;
 }
 
-static void skipToSemiColon (void)
+static int skipToSemiColon (void)
 {
 	int c;
 	do
 	{
 		c = vGetc ();
 	} while (c != EOF && c != ';');
+	return c;	// ';' or EOF
 }
 
 static int skipExpression(int c)
@@ -1436,9 +1437,11 @@ static void processAssertion (tokenInfo *const token)
 {
 	if (vStringLength (currentContext->blockName) > 0)
 	{
+		int c;
 		vStringCopy (token->name, currentContext->blockName);
 		createTag (token, K_ASSERTION);
-		skipToSemiColon ();
+		c = skipToSemiColon ();
+		vUngetc (c);
 	}
 }
 
@@ -1494,11 +1497,13 @@ static int skipDelay(tokenInfo* token, int c)
 		if (c == '(')
 			c = skipPastMatch ("()");
 		else if (c == ('#')) {
-			skipToSemiColon ();	// a dirty hack for "x ##delay1 y[*min:max];"
-			c = vGetc ();
+			c = skipToSemiColon ();	// a dirty hack for "x ##delay1 y[*min:max];"
 		}
-		else
-			readWordToken (token, c);
+		else	// time literals
+		{
+			while (isIdentifierCharacter (c) || c == '.')
+				c = vGetc ();
+		}
 		c = skipWhite (c);
 	}
 	return c;
@@ -1696,6 +1701,9 @@ static void findVerilogTags (void)
 				{
 					tagContents = popToken (tagContents);
 				}
+				break;
+			case '#':
+				c = skipDelay (token, c);
 				break;
 			default :
 				if (readWordToken (token, c))
