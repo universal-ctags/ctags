@@ -625,9 +625,16 @@ static int vGetc (void)
 	return c;
 }
 
+// [a-zA-Z_`]
+static bool isFirstIdentifierCharacter (const int c)
+{
+	return (isalpha (c) || c == '_' || c == '`');
+}
+
+// [a-zA-Z0-9_`$]
 static bool isIdentifierCharacter (const int c)
 {
-	return (bool)(isalnum (c)  ||  c == '_'  ||  c == '`');
+	return (isalnum (c) || c == '_' || c == '`' || c == '$');
 }
 
 static int skipWhite (int c)
@@ -740,14 +747,14 @@ static int skipMacro (int c)
 /* read an identifier, keyword, number, compiler directive, or macro identifier */
 static bool readWordToken (tokenInfo *const token, int c)
 {
-	if (isIdentifierCharacter (c))
+	if (isFirstIdentifierCharacter (c))
 	{
 		clearToken (token);
-		while (isIdentifierCharacter (c))
+		do
 		{
 			vStringPut (token->name, c);
 			c = vGetc ();
-		}
+		} while (isIdentifierCharacter (c));
 		vUngetc (c);
 		return true;
 	}
@@ -765,12 +772,12 @@ static bool isIdentifier (tokenInfo* token)
 			int c = vStringChar (token->name, i);
 			if (i == 0)
 			{
-				if (!(isalpha (c) || c == '_'))
+				if (c == '`' || !isFirstIdentifierCharacter (c))
 					return false;
 			}
 			else
 			{
-				if (!(isalnum (c) || c == '_' || c == '$'))
+				if (!isIdentifierCharacter (c))
 					return false;
 			}
 		}
@@ -1044,7 +1051,7 @@ static void processPortList (tokenInfo *token, int c)
 					/* Only add port name if it is the last keyword.
 					 * First keyword can be a dynamic type, like a class name */
 					c = skipWhite (vGetc ());
-					if (! isIdentifierCharacter (c) || c == '`')
+					if (! isFirstIdentifierCharacter (c) || c == '`')
 					{
 						verbose ("Found port: %s\n", vStringValue (token->name));
 						createTag (token, K_PORT);
@@ -1060,13 +1067,12 @@ static void processPortList (tokenInfo *token, int c)
 				c = skipWhite (vGetc ());
 			}
 		}
+		if (c != ';')
+			verbose ("Unexpected char c = %c\n", c);
+	}
 
-		if (! isIdentifierCharacter (c)) vUngetc (c);
-	}
-	else if (c != EOF)
-	{
+	if (c != EOF)
 		vUngetc (c);
-	}
 }
 
 static int skipParameterAssignment (int c)
