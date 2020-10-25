@@ -88,5 +88,8 @@ e	input.sv	/^module delay_control #(d, e);$/;"	c	module:delay_control
 rega	input.sv	/^  int rega, regb, regr;$/;"	r	module:delay_control
 regb	input.sv	/^  int rega, regb, regr;$/;"	r	module:delay_control
 regr	input.sv	/^  int rega, regb, regr;$/;"	r	module:delay_control
-rega	input.sv	/^    #d rega = regb; \/\/ d is defined as a parameter  FIXME$/;"	r	module:delay_control
-regr	input.sv	/^    #regr regr = regr + 1; \/\/ delay is the value in regr  FIXME$/;"	r	module:delay_control
+delay_control_wire	input.sv	/^module delay_control_wire #(d, e);$/;"	m
+d	input.sv	/^module delay_control_wire #(d, e);$/;"	c	module:delay_control_wire
+e	input.sv	/^module delay_control_wire #(d, e);$/;"	c	module:delay_control_wire
+w$ire	input.sv	/^  wire w$ire, wire$;  \/\/ '$' included$/;"	n	module:delay_control_wire
+wire$	input.sv	/^  wire w$ire, wire$;  \/\/ '$' included$/;"	n	module:delay_control_wire

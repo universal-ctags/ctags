@@ -165,8 +165,17 @@ module delay_control #(d, e);
   int rega, regb, regr;
   initial begin
     #10 rega = regb;
-    #d rega = regb; // d is defined as a parameter  FIXME
+    #d rega = regb; // d is defined as a parameter
     #((d+e)/2) rega = regb; // delay is average of d and e
-    #regr regr = regr + 1; // delay is the value in regr  FIXME
+    #regr regr = regr + 1; // delay is the value in regr
   end
+endmodule
+
+// 10.3 Continuous assignments
+module delay_control_wire #(d, e);
+  wire wirea #10 = wireb;
+  wire wireb #d = wireb;
+  wire wirec #((d+e)/2) = wireb;
+  wire wired #wirer = wirer + 1;
+  wire w$ire, wire$;  // '$' included
 endmodule
