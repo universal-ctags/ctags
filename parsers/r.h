@@ -88,6 +88,9 @@ struct sRSubparser {
 						 int parent);
 };
 
+extern void rSetupCollectingSignature (tokenInfo *const token,
+									   vString   *signature);
+extern void rTeardownCollectingSignature (tokenInfo *const token);
 
 /*
  * FUNCTION PROTOTYPES

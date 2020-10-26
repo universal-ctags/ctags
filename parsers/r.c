@@ -164,6 +164,7 @@ typedef struct sRToken {
 	int scopeIndex;
 	int parenDepth;
 	vString *signature;
+	int kindIndexForParams;		/* Used only when gathering parameters */
 } rToken;
 
 #define R(TOKEN) ((rToken *)TOKEN)
@@ -273,6 +274,7 @@ static void clearToken (tokenInfo *token)
 {
 	R (token)->parenDepth = 0;
 	R (token)->scopeIndex = CORK_NIL;
+	R (token)->kindIndexForParams = KIND_GHOST_INDEX;
 	if (R (token)->signature)
 	{
 		vStringDelete (R (token)->signature);
@@ -675,9 +677,11 @@ static void readToken (tokenInfo *const token, void *data)
 		else if (tokenIsTypeVal (token, ')'))
 			R (token)->parenDepth--;
 
-		if (R (token)->parenDepth == 1 && tokenIsType (token, R_SYMBOL)
+		if (R (token)->kindIndexForParams != KIND_GHOST_INDEX
+			&& R (token)->parenDepth == 1 && tokenIsType (token, R_SYMBOL)
 			&& signatureExpectingParameter (signature))
-			makeSimpleRTag (token, R (token)->scopeIndex, false, K_PARAM, NULL);
+			makeSimpleRTag (token, R (token)->scopeIndex, false,
+							R (token)->kindIndexForParams, NULL);
 
 		if (vStringLast (signature) != '(' &&
 			!tokenIsTypeVal (token, ',') &&
@@ -701,6 +705,37 @@ extern void rTokenReadNoNewline (tokenInfo *const token)
 		if (!tokenIsTypeVal (token, '\n'))
 			break;
 	}
+}
+
+static void setupCollectingSignature (tokenInfo *const token,
+									  vString   *signature,
+									  int kindIndexForParams,
+									  int corkIndex)
+{
+	R (token)->signature = signature;
+	R (token)->kindIndexForParams = kindIndexForParams;
+	R (token)->scopeIndex = corkIndex;
+	R (token)->parenDepth = 1;
+}
+
+extern void rSetupCollectingSignature (tokenInfo *const token,
+									   vString   *signature)
+{
+	setupCollectingSignature (token, signature,
+							  KIND_GHOST_INDEX, CORK_NIL);
+}
+
+static void teardownCollectingSignature (tokenInfo *const token)
+{
+	R (token)->parenDepth = 0;
+	R (token)->scopeIndex = CORK_NIL;
+	R (token)->kindIndexForParams = KIND_GHOST_INDEX;
+	R (token)->signature = NULL;
+}
+
+extern void rTeardownCollectingSignature (tokenInfo *const token)
+{
+	teardownCollectingSignature (token);
 }
 
 static void parseRightSide (tokenInfo *const token, tokenInfo *const symbol, int parent)
@@ -729,13 +764,9 @@ static void parseRightSide (tokenInfo *const token, tokenInfo *const symbol, int
 			else
 			{
 				signature = vStringNewInit("(");
-				R (token)->signature = signature;
-				R (token)->scopeIndex = corkIndex;
-				R (token)->parenDepth = 1;
+				setupCollectingSignature (token, signature, K_PARAM, corkIndex);
 				tokenSkipOverPair (token);
-				R (token)->parenDepth = 0;
-				R (token)->scopeIndex = CORK_NIL;
-				R (token)->signature = NULL;
+				teardownCollectingSignature (token);
 			}
 			tokenReadNoNewline (token);
 		}
