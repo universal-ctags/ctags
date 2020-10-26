@@ -53,6 +53,8 @@ HistoryQueue <- R6Class("HistoryQueue",
     remove = function() {
       if (private$length() - private$head_idx == 0) return(NULL)
       private$head_idx <<- private$head_idx + 1
+      # For testing extras: field
+      local_noise <- 1
       private$queue[[private$head_idx]]
     }
   ),
