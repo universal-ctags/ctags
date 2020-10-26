@@ -203,7 +203,7 @@ static  int notifyReadRightSideSymbol (tokenInfo *const symbol,
 static  int makeSimpleSubparserTag (int langType, tokenInfo *const token, int parent,
 									bool in_func, int kindInR, const char *assignmentOperator);
 static  bool askSubparserTagAcceptancy (tagEntryInfo *pe);
-
+static  int notifyReadFuncall (tokenInfo *const func, tokenInfo *const token, int parent);
 
 /*
 *   FUNCTION DEFINITIONS
@@ -875,6 +875,8 @@ static void parsePair (tokenInfo *const token, int parent, tokenInfo *const func
 			done = !preParseExternalEntitiy (token, funcall);
 		else if (tokenIsKeyword (funcall, R_FOR))
 			done = !preParseLoopCounter (token, parent);
+		else if (notifyReadFuncall (funcall, token, parent) != CORK_NIL)
+			done = true;
 	}
 
 	if (done)
@@ -1114,6 +1116,27 @@ static  bool askSubparserTagAcceptancy (tagEntryInfo *pe)
 				leaveSubparser ();
 			}
 			break;
+		}
+	}
+	return q;
+}
+
+static  int notifyReadFuncall (tokenInfo *const func,
+							   tokenInfo *const token,
+							   int parent)
+{
+	int q = CORK_NIL;
+	subparser *sub;
+	foreachSubparser (sub, false)
+	{
+		rSubparser *rsub = (rSubparser *)sub;
+		if (rsub->readFuncall)
+		{
+			enterSubparser (sub);
+			q = rsub->readFuncall (rsub, func, token, parent);
+			leaveSubparser ();
+			if (q != CORK_NIL)
+				break;
 		}
 	}
 	return q;

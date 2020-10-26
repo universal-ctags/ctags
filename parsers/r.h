@@ -82,6 +82,10 @@ struct sRSubparser {
 									int kindInR,
 									const char *const assignmentOperator);
 	bool (* askTagAcceptancy) (rSubparser *s, tagEntryInfo *pe);
+	int (* readFuncall) (rSubparser *s,
+						 tokenInfo *const func,
+						 tokenInfo *const token,
+						 int parent);
 };
 
 
