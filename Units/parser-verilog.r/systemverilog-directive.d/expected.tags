@@ -1,0 +1,47 @@
+directive	input.sv	/^module directive;$/;"	m
+D	input.sv	/^`define D(x,y) initial $display("start", x , y, "end");$/;"	c	module:directive
+MACRO1	input.sv	/^`define MACRO1(a=5,b="B",c) $display(a,,b,,c);$/;"	c	module:directive
+MACRO2	input.sv	/^`define MACRO2(a=5, b, c="C") $display(a,,b,,c);$/;"	c	module:directive
+MACRO3	input.sv	/^`define MACRO3(a=5, b=0, c="C") $display(a,,b,,c);$/;"	c	module:directive
+wordsize	input.sv	/^`define wordsize 8$/;"	c	module:directive
+data	input.sv	/^logic [1:`wordsize] data;$/;"	r	module:directive
+var_nand	input.sv	/^`define var_nand(dly) nand #dly$/;"	c	module:directive
+max	input.sv	/^`define max(a,b)((a) > (b) ? (a) : (b))$/;"	c	module:directive
+TOP	input.sv	/^`define TOP(a,b) a + b$/;"	c	module:directive
+main	input.sv	/^module main;$/;"	m
+HI	input.sv	/^`define HI Hello$/;"	c	module:main
+LO	input.sv	/^`define LO "`HI, world"$/;"	c	module:main
+H	input.sv	/^`define H(x) "Hello, x"$/;"	c	module:main
+directive2	input.sv	/^module directive2;$/;"	m
+msg	input.sv	/^`define msg(x,y) `"x: `\\`"y`\\`"`"$/;"	c	module:directive2
+append	input.sv	/^`define append(f) f``_master$/;"	c	module:directive2
+home	input.sv	/^`define home(filename) `"\/home\/mydir\/filename`"$/;"	c	module:directive2
+and_op	input.sv	/^module and_op (a, b, c);$/;"	m
+a	input.sv	/^    output a;$/;"	p	module:and_op
+b	input.sv	/^    input b, c;$/;"	p	module:and_op
+c	input.sv	/^    input b, c;$/;"	p	module:and_op
+a	input.sv	/^        wire a = b & c;$/;"	n	module:and_op
+test	input.sv	/^module test(out);$/;"	m
+out	input.sv	/^    output out;$/;"	p	module:test
+wow	input.sv	/^    `define wow$/;"	c	module:test
+nest_one	input.sv	/^    `define nest_one$/;"	c	module:test
+second_nest	input.sv	/^    `define second_nest$/;"	c	module:test
+nest_two	input.sv	/^    `define nest_two$/;"	c	module:test
+test	input.sv	/^module test;$/;"	m
+ifdef_in_port	input.sv	/^module ifdef_in_port ($/;"	m
+a	input.sv	/^    input logic a,$/;"	p	module:ifdef_in_port
+b1	input.sv	/^        input logic b1,$/;"	p	module:ifdef_in_port
+b2	input.sv	/^        input logic b2,$/;"	p	module:ifdef_in_port
+b3	input.sv	/^        input logic b3,$/;"	p	module:ifdef_in_port
+c	input.sv	/^    input logic c$/;"	p	module:ifdef_in_port
+define_in_port	input.sv	/^module define_in_port ($/;"	m
+a	input.sv	/^    input logic a,$/;"	p	module:define_in_port
+FOO	input.sv	/^`define FOO$/;"	c	module:define_in_port
+b	input.sv	/^    input logic b,$/;"	p	module:define_in_port
+BAR	input.sv	/^`define BAR$/;"	c	module:define_in_port
+c1	input.sv	/^        input logic c1,$/;"	p	module:define_in_port
+d2	input.sv	/^        input logic d2,$/;"	p	module:define_in_port
+c3	input.sv	/^        input logic c3$/;"	p	module:define_in_port
+assert_clk	input.sv	/^`define assert_clk(arg, __clk=clk, __rst_n=rst_n) \\$/;"	c
+forSkipMacro	input.sv	/^module forSkipMacro;$/;"	m
+add_t	input.sv	/^`define add_t(f) f``_t$/;"	c	module:forSkipMacro

@@ -49,7 +49,7 @@ typedef enum {
 	/* parser private items */
 	K_IGNORE = -16,	/* Verilog/SystemVerilog keywords to be ignored */
 	K_DEFINE,
-	K_IFDEF,
+	K_DIRECTIVE,
 	K_BEGIN,
 	K_END,
 	K_END_DE,	/* End of Design Elements */
@@ -156,10 +156,6 @@ static const keywordAssoc KeywordTable [] = {
 	/*                 	             	  |  Verilog    */
 	/* keyword         	keyword ID   	  |  |          */
 	{ "`define",       	K_DEFINE,   	{ 1, 1 } },
-	{ "`elsif",        	K_IFDEF,     	{ 1, 1 } },
-	{ "`ifdef",        	K_IFDEF,     	{ 1, 1 } },
-	{ "`ifndef",       	K_IFDEF,     	{ 1, 1 } },
-	{ "`undef",        	K_IFDEF,     	{ 1, 1 } },
 	{ "begin",         	K_BEGIN,     	{ 1, 1 } },
 	{ "end",           	K_END,       	{ 1, 1 } },
 	{ "endfunction",   	K_END_DE,    	{ 1, 1 } },
@@ -318,6 +314,33 @@ const static struct keywordGroup systemVerilogKeywords = {
 	},
 };
 
+// IEEE Std 1364-2005 LRM, "19. Compiler directives"
+const static struct keywordGroup verilogDirectives = {
+	.value = K_DIRECTIVE,
+	.addingUnlessExisting = true,
+	.keywords = {
+		"`begin_keywords", "`celldefine", "`default_nettype", "`define",
+		"`else", "`elsif", "`end_keywords", "`endcelldefine", "`endif",
+		"`ifdef", "`ifndef", "`include", "`line", "`nounconnected_drive",
+		"`pragma", "`resetall", "`timescale", "`unconnected_drive", "`undef",
+		NULL
+	},
+};
+
+// IEEE Std 1800-2017 LRM, "22. Compiler directives"
+const static struct keywordGroup systemVerilogDirectives = {
+	.value = K_DIRECTIVE,
+	.addingUnlessExisting = true,
+	.keywords = {
+		"`__LINE__", "`begin_keywords", "`celldefine", "`default_nettype",
+		"`define", "`else", "`elsif", "`end_keywords", "`endcelldefine",
+		"`endif", "`ifdef", "`ifndef", "`include", "`line",
+		"`nounconnected_drive", "`pragma", "`resetall", "`timescale",
+		"`unconnected_drive", "`undef", "`undefineall",
+		NULL
+	},
+};
+
 // .enabled field cannot be shared by two languages
 static fieldDefinition VerilogFields[] = {
 	{ .name = "parameter",
@@ -338,6 +361,7 @@ static fieldDefinition SystemVerilogFields[] = {
  */
 
 static bool findBlockName (tokenInfo *const token);
+static void processDefine (tokenInfo *const token);
 static bool readWordToken (tokenInfo *const token, int c);
 static void tagNameList (tokenInfo* token, int c);
 static void updateKind (tokenInfo *const token);
@@ -483,25 +507,20 @@ static void buildKeywordHash (const langType language, unsigned int idx)
 	}
 }
 
-static void addIgnoredKeywords (const langType language,
-								const struct keywordGroup *const ignoredKeyword)
-{
-	/* mark unspecified Verilog/SystemVexrilog keywords as K_IGNORE */
-	addKeywordGroup (ignoredKeyword, language);
-}
-
 static void initializeVerilog (const langType language)
 {
 	Lang_verilog = language;
 	buildKeywordHash (language, IDX_VERILOG);
-	addIgnoredKeywords (language, &verilogKeywords);
+	addKeywordGroup (&verilogKeywords, language);
+	addKeywordGroup (&verilogDirectives, language);
 }
 
 static void initializeSystemVerilog (const langType language)
 {
 	Lang_systemverilog = language;
 	buildKeywordHash (language, IDX_SYSTEMVERILOG);
-	addIgnoredKeywords (language, &systemVerilogKeywords);
+	addKeywordGroup (&systemVerilogKeywords, language);
+	addKeywordGroup (&systemVerilogDirectives, language);
 }
 
 static void vUngetc (int c)
@@ -645,40 +664,52 @@ static int skipExpression(int c)
 	return c;
 }
 
-/* Skip next keyword for `ifdef, `ifndef, `elsif, or `undef */
-static void skipIfdef (tokenInfo* token)
+// Skip to newline. The newline preceded by a backslash ( \ ) is ignored.
+static void skipToNewLine ()
 {
-	int c = skipWhite (vGetc ());
-	readWordToken (token, c);
-	verbose ("Skipping conditional macro %s\n", vStringValue (token->name));
+	int c;
+	bool escape = false;
+	while (true)
+	{
+		c = vGetc ();
+		if ((c == '\n' && ! escape) ||  c == EOF)
+			break;
+		escape = (c == '\\');
+	}
 }
 
 static int skipMacro (int c)
 {
-	tokenInfo *token = newToken ();;
-
 	if (c == '`')
 	{
-		/* Skip keyword */
+		tokenInfo *token = newToken ();	// don't update token outside
+
 		readWordToken (token, c);
 		updateKind (token);
-		/* Skip next keyword if macro is `ifdef, `ifndef, `elsif, or `undef */
-		if (token->kind == K_IFDEF)
+		/* Skip compiler directive other than `define */
+		if (token->kind == K_DIRECTIVE)
 		{
-			skipIfdef(token);
-			c = vGetc ();
+			skipToNewLine();
+			c = skipWhite (vGetc ());
 		}
-		/* Skip macro functions */
+		/* Skip `define */
+		else if (token->kind == K_DEFINE)
+		{
+			processDefine(token);
+			c = skipWhite (vGetc ());
+		}
+		/* Skip macro or macro functions */
 		else
 		{
 			c = skipWhite (vGetc ());
 			if (c == '(')
 			{
-				c = skipPastMatch ("()");	/* FIXME: uncovered */
+				c = skipPastMatch ("()");
+				c = skipWhite (c);
 			}
 		}
+		deleteToken (token);
 	}
-	deleteToken (token);
 	return c;
 }
 
@@ -1385,11 +1416,7 @@ static void processDefine (tokenInfo *const token)
 	int c = skipWhite (vGetc ());
 	readWordToken (token, c);
 	createTag (token, K_CONSTANT);
-	/* Skip the rest of the line. */
-	do {
-		c = vGetc();
-	} while (c != EOF && c != '\n');
-	vUngetc (c);
+	skipToNewLine ();
 }
 
 static void processAssertion (tokenInfo *const token)
@@ -1484,10 +1511,9 @@ static void tagNameList (tokenInfo* token, int c)
 	{
 		repeat = false;
 
-		while (c == '`' && c != EOF)
-		{
+		while (c == '`')
 			c = skipMacro (c);
-		}
+
 		if (readWordToken (token, c))
 		{
 			updateKind (token);
@@ -1610,10 +1636,10 @@ static void findTag (tokenInfo *const token)
 			break;
 
 		case K_DEFINE:
-			processDefine(token);		// Process `define foo ...
+			processDefine(token);
 			break;
-		case K_IFDEF:
-			skipIfdef(token);
+		case K_DIRECTIVE:
+			skipToNewLine();
 			break;
 
 		case K_END_DE:
