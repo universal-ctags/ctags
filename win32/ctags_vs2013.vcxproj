@@ -239,6 +239,7 @@
     <ClCompile Include="..\parsers\python.c" />
     <ClCompile Include="..\parsers\pythonloggingconfig.c" />
     <ClCompile Include="..\parsers\r-r6class.c" />
+    <ClCompile Include="..\parsers\r-s4class.c" />
     <ClCompile Include="..\parsers\r.c" />
     <ClCompile Include="..\parsers\rexx.c" />
     <ClCompile Include="..\parsers\robot.c" />

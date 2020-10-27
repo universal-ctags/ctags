@@ -90,6 +90,7 @@ The following parsers have been added:
 * RpmSpec
 * RSpec *optlib*
 * Rust
+* S4Class *R based subperser*
 * SCSS *optlib*
 * SystemdUnit
 * SystemTap *optlib*

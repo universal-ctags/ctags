@@ -453,6 +453,9 @@
     <ClCompile Include="..\parsers\r-r6class.c">
       <Filter>Source Files\Parsers</Filter>
     </ClCompile>
+    <ClCompile Include="..\parsers\r-s4class.c">
+      <Filter>Source Files\Parsers</Filter>
+    </ClCompile>
     <ClCompile Include="..\parsers\r.c">
       <Filter>Source Files\Parsers</Filter>
     </ClCompile>

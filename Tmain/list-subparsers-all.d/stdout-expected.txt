@@ -13,6 +13,7 @@ QtMoc                C++        base <> sub {bidirectional}
 R6Class              R          base <> sub {bidirectional}
 RSpec                Ruby       base => sub {shared}
 RelaxNG              XML        base <> sub {bidirectional}
+S4Class              R          base <> sub {bidirectional}
 SVG                  XML        base <> sub {bidirectional}
 SystemdUnit          Iniconf    base <= sub {dedicated}
 TclOO                Tcl        base <> sub {bidirectional}

@@ -264,6 +264,7 @@ PARSER_SRCS =				\
 	parsers/python.c		\
 	parsers/pythonloggingconfig.c	\
 	parsers/r-r6class.c		\
+	parsers/r-s4class.c		\
 	parsers/r.c			\
 	parsers/rexx.c			\
 	parsers/robot.c			\
