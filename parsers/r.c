@@ -231,7 +231,7 @@ static struct tokenInfoClass rTokenInfoClass = {
  * FUNCTION PROTOTYPES
  */
 
-static void parseStatement (tokenInfo *const token, int parent, tokenInfo *const funcall, bool in_continuous_pair);
+static void parseStatement (tokenInfo *const token, int parent, bool in_arglist, bool in_continuous_pair);
 static void parsePair (tokenInfo *const token, int parent, tokenInfo *const funcall);
 
 
@@ -771,7 +771,7 @@ static void parseRightSide (tokenInfo *const token, tokenInfo *const symbol, int
 					 : parent);
 	R_TRACE_TOKEN_TEXT("body", token, new_scope);
 
-	parseStatement (token, new_scope, NULL, false);
+	parseStatement (token, new_scope, false, false);
 
 	tagEntryInfo *tag = getEntryInCorkQueue (corkIndex);
 	if (tag)
@@ -901,7 +901,7 @@ static void parsePair (tokenInfo *const token, int parent, tokenInfo *const func
 	{
 		tokenRead (token);
 		R_TRACE_TOKEN_TEXT("inside pair", token, parent);
-		parseStatement (token, parent, funcall, in_continuous_pair);
+		parseStatement (token, parent, (funcall != NULL), in_continuous_pair);
 	}
 	while (! (tokenIsEOF (token)
 			  || tokenIsTypeVal (token, ')')
@@ -912,7 +912,7 @@ static void parsePair (tokenInfo *const token, int parent, tokenInfo *const func
 }
 
 static void parseStatement (tokenInfo *const token, int parent,
-							tokenInfo *const funcall, bool in_continuous_pair)
+							bool in_arglist, bool in_continuous_pair)
 {
 	R_TRACE_ENTER();
 
@@ -965,8 +965,9 @@ static void parseStatement (tokenInfo *const token, int parent,
 			else if (tokenIsTypeVal (token, '='))
 			{
 				/* Assignment */
-				if (funcall)
+				if (in_arglist)
 				{
+					/* Ignore the left side symbol. */
 					tokenRead (token);
 					R_TRACE_TOKEN_TEXT("(in arg list) after = body", token, parent);
 				}
@@ -1066,7 +1067,7 @@ static void findRTags (void)
 	{
 		tokenRead(token);
 		R_TRACE_TOKEN(token, CORK_NIL);
-		parseStatement (token, CORK_NIL, NULL, false);
+		parseStatement (token, CORK_NIL, false, false);
 	}
 	while (!tokenIsEOF (token));
 
