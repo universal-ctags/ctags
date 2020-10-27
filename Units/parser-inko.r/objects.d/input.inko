@@ -2,7 +2,5 @@ object A {}
 object B {}
 
 object C {
-  object D {
-    object E {}
-  }
+  @foo: X
 }

@@ -1,2 +1,11 @@
 A	input.inko	/^trait A {}$/;"	t
 B	input.inko	/^trait B: SomeRequiredTrait {}$/;"	t
+C	input.inko	/^trait C {$/;"	t
+foo	input.inko	/^  def foo() {}$/;"	m	trait:C
+bar	input.inko	/^  def bar() {}$/;"	m	trait:C
+required_method_foo	input.inko	/^  def required_method_foo$/;"	m	trait:C
+required_method_bar	input.inko	/^  def required_method_bar$/;"	m	trait:C
+wrapped_required_method	input.inko	/^  def wrapped_required_method($/;"	m	trait:C
+wrapped_default_method	input.inko	/^  def wrapped_default_method($/;"	m	trait:C
+blabla	input.inko	/^  def blabla {}$/;"	m	trait:C
+D	input.inko	/^trait D {}$/;"	t

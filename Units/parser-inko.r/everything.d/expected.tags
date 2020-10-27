@@ -1,18 +1,17 @@
 A	input.inko	/^object A$/;"	o
+@number	input.inko	/^  @number: X$/;"	a	object:A
 in_a	input.inko	/^  def in_a {$/;"	m	object:A
-another	input.inko	/^  def another {}$/;"	m	object:A
+another	input.inko	/^  def another {}$/;"	m
 foo	input.inko	/^def foo {}$/;"	m
 B	input.inko	/^object B {$/;"	o
 in_b	input.inko	/^  def in_b {$/;"	m	object:B
-C	input.inko	/^  object C {$/;"	o	object:B
-nested_method	input.inko	/^    def nested_method {}$/;"	m	object:B.C
 global	input.inko	/^def global {}$/;"	m
 SomeTrait	input.inko	/^trait SomeTrait {$/;"	t
-Socket	input.inko	/^object Socket impl Foo {$/;"	o
+required_method	input.inko	/^  def required_method$/;"	m	trait:SomeTrait
+Socket	input.inko	/^object Socket {$/;"	o
 quack	input.inko	/^  def quack {}$/;"	m	object:Socket
 Socket	input.inko	/^impl Bar for Socket {$/;"	r	implements:Bar
 moo	input.inko	/^  def moo !! Integer {}$/;"	m	reopen:Socket
 Chickens	input.inko	/^impl Chickens {$/;"	r
 bok_bok	input.inko	/^  def bok_bok {}$/;"	m	reopen:Chickens
 NUMBER	input.inko	/^let NUMBER = 10$/;"	c
-@number	input.inko	/^let @number = 20$/;"	a

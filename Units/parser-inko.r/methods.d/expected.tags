@@ -2,10 +2,6 @@ A	input.inko	/^object A {$/;"	o
 method_a	input.inko	/^  def method_a {}$/;"	m	object:A
 B	input.inko	/^object B {$/;"	o
 method_b	input.inko	/^  def method_b {}$/;"	m	object:B
-C	input.inko	/^object C {$/;"	o
-D	input.inko	/^  object D {$/;"	o	object:C
-E	input.inko	/^    object E {$/;"	o	object:C.D
-method_e	input.inko	/^      def method_e {}$/;"	m	object:C.D.E
 +	input.inko	/^def + {}$/;"	m
 -	input.inko	/^def - {}$/;"	m
 *	input.inko	/^def * {}$/;"	m
