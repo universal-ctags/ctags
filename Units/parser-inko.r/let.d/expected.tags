@@ -1,4 +1,2 @@
-CONSTANT	input.inko	/^let CONSTANT = 10$/;"	c
-Person	input.inko	/^object Person {$/;"	o
-init	input.inko	/^  def init(name: String) {$/;"	m	object:Person
-@name	input.inko	/^    let @name = name$/;"	a	method:Person.init
+FOO	input.inko	/^let FOO = 10$/;"	c
+BAR	input.inko	/^let BAR = 20$/;"	c

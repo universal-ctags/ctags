@@ -44,6 +44,9 @@ static void initializeInkoParser (const langType language)
 	                               "^\\}",
 	                               "", "", "{scope=pop}", NULL);
 	addLanguageTagMultiTableRegex (language, "toplevel",
+	                               "^(@[a-zA-Z0-9_]+):",
+	                               "\\1", "a", "{scope=ref}", NULL);
+	addLanguageTagMultiTableRegex (language, "toplevel",
 	                               "^.",
 	                               "", "", "", NULL);
 	addLanguageTagMultiTableRegex (language, "object",
@@ -65,11 +68,11 @@ static void initializeInkoParser (const langType language)
 	                               "^.",
 	                               "", "", "", NULL);
 	addLanguageTagMultiTableRegex (language, "method",
-	                               "^([a-zA-Z0-9_?]+|\\[\\]=?|\\^|&|\\||\\*|\\+|\\-|/|>>|<<|%)[^{]*",
+	                               "^([a-zA-Z0-9_?]+|\\[\\]=?|\\^|&|\\||\\*|\\+|\\-|/|>>|<<|%)",
 	                               "\\1", "m", "{scope=push}", NULL);
 	addLanguageTagMultiTableRegex (language, "method",
-	                               "^\\{",
-	                               "", "", "{tleave}", NULL);
+	                               "^\\{|\n",
+	                               "", "", "{scope=pop}{tleave}", NULL);
 	addLanguageTagMultiTableRegex (language, "method",
 	                               "^.",
 	                               "", "", "", NULL);
@@ -91,9 +94,6 @@ static void initializeInkoParser (const langType language)
 	addLanguageTagMultiTableRegex (language, "impl",
 	                               "^.",
 	                               "", "", "", NULL);
-	addLanguageTagMultiTableRegex (language, "let",
-	                               "^(@[a-zA-Z0-9_]+)",
-	                               "\\1", "a", "{scope=ref}", NULL);
 	addLanguageTagMultiTableRegex (language, "let",
 	                               "^([A-Z][a-zA-Z0-9_]+)",
 	                               "\\1", "c", "{scope=ref}", NULL);

@@ -6,14 +6,6 @@ object B {
   def method_b {}
 }
 
-object C {
-  object D {
-    object E {
-      def method_e {}
-    }
-  }
-}
-
 def + {}
 def - {}
 def * {}

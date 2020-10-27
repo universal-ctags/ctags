@@ -1,2 +1,20 @@
 trait A {}
 trait B: SomeRequiredTrait {}
+trait C {
+  def foo() {}
+  def bar() {}
+
+  def required_method_foo
+  def required_method_bar
+
+  def wrapped_required_method(
+    a: A
+  )
+
+  def wrapped_default_method(
+    a: A
+  ) {}
+
+  def blabla {}
+}
+trait D {}

@@ -3,7 +3,7 @@
 #
 #  Copyright (c) 2019, Yorick Peterse
 #
-#  Author: Yorick Peterse <yorickpeterse@gmail.com>
+#  Author: Yorick Peterse <yorick@yorickpeterse.com>
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -49,6 +49,7 @@
 --_mtable-regex-Inko=toplevel/[[:blank:]]*let[[:blank:]]+//{tenter=let}
 --_mtable-regex-Inko=toplevel/\{//{placeholder}{scope=push}
 --_mtable-regex-Inko=toplevel/\}//{scope=pop}
+--_mtable-regex-Inko=toplevel/(@[a-zA-Z0-9_]+):/\1/a/{scope=ref}
 --_mtable-regex-Inko=toplevel/.//
 
 --_mtable-regex-Inko=object/([A-Z][a-zA-Z0-9_?]*)[^{]*/\1/o/{scope=push}
@@ -59,8 +60,8 @@
 --_mtable-regex-Inko=trait/\{//{tleave}
 --_mtable-regex-Inko=trait/.//
 
---_mtable-regex-Inko=method/([a-zA-Z0-9_?]+|\[\]=?|\^|&|\||\*|\+|\-|\/|>>|<<|%)[^{]*/\1/m/{scope=push}
---_mtable-regex-Inko=method/\{//{tleave}
+--_mtable-regex-Inko=method/([a-zA-Z0-9_?]+|\[\]=?|\^|&|\||\*|\+|\-|\/|>>|<<|%)/\1/m/{scope=push}
+--_mtable-regex-Inko=method/\{|\n//{scope=pop}{tleave}
 --_mtable-regex-Inko=method/.//
 
 --_mtable-regex-Inko=impl/([A-Z][a-zA-Z0-9_?]*)[[:blank:]]+for[[:blank:]]+([A-Z][a-zA-Z0-9_?]*)[^{]*/\2/r/{scope=push}{_field=implements:\1}
@@ -68,7 +69,6 @@
 --_mtable-regex-Inko=impl/\{//{tleave}
 --_mtable-regex-Inko=impl/.//
 
---_mtable-regex-Inko=let/(@[a-zA-Z0-9_]+)/\1/a/{scope=ref}
 --_mtable-regex-Inko=let/([A-Z][a-zA-Z0-9_]+)/\1/c/{scope=ref}
 --_mtable-regex-Inko=let/=//{tleave}
 --_mtable-regex-Inko=let/.//
