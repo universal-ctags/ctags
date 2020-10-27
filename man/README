@@ -1,10 +1,22 @@
 How to add a new man page
 ---------------------------------------------------------------------
 
-Add the file name to man_MANS of ${top_srcdir}/Makefile.am,
-AC_CONFIG_FILES of ${top_srcdir}/configure.ac,
-IN_SOURCE_FILES or SOURCE_FILES of ${top_srcdir}/man/Makefile,
-toctree of ${top_srcdir}/docs/man-pages.rst.
+1. read this file, man/README.
+2. write what the users of your parser may want to (or should) know to man/ctags-lang-LANGUAGE.7.rst.in
+3. add man/ctags-lang-LANGUAGE.7.rst to the list of AC_CONFIG_FILES in configure.ac.
+4. add man/ctags-lang-LANGUAGE.7 to man_MANS of Makefile.am.
+5. add man/ctags-lang-LANGUAGE.7.rst.in to IN_SOURCE_FILES of man/Makefile.
+6. run "cd man; make QUICK=1 update-docs". This step generates the rst file at docs/man/ctags-lang-LANGUAGE.7.rst.
+7. add ctags-lang-LANGUAGE(7) to (toctree of) docs/man-pages.rst.
+8. do "git add" for
+   - man/ctags-lang-LANGUAGE.7.rst.in
+   - configure.ac
+   - Makefile.am
+   - man/Makefile
+   - docs/man/ctags-lang-LANGUAGE.7.rst
+   - docs/man-pages.rst
+9. git commit with a log header: "docs(man): add a man page for LANGUAGE".
+10. make a pull request
 
 Rules for writing man pages
 ---------------------------------------------------------------------
