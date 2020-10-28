@@ -98,4 +98,6 @@ extern void rTeardownCollectingSignature (tokenInfo *const token);
 
 extern void rTokenReadNoNewline (tokenInfo *const token);
 extern void rParseStatement (tokenInfo *const token, int parentIndex, bool inArgList);
+extern vString *rExtractNameFromString (vString* str);
+
 #endif	/* CTAGS_PARSER_TEX_H */
