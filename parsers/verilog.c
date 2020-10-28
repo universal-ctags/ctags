@@ -50,7 +50,6 @@ typedef enum {
 	K_IGNORE = -16,	/* Verilog/SystemVerilog keywords to be ignored */
 	K_DEFINE,
 	K_DIRECTIVE,
-	K_BEGIN,
 	K_END,
 	K_END_DE,	/* End of Design Elements */
 	K_IDENTIFIER,
@@ -124,7 +123,7 @@ static kindDefinition VerilogKinds [] = {
  { true, 'p', "port",      "ports" },
  { true, 'r', "register",  "register data types" },
  { true, 't', "task",      "tasks" },
- { true, 'b', "block",     "blocks" }
+ { true, 'b', "block",     "blocks (begin, fork)" }
 };
 
 static kindDefinition SystemVerilogKinds [] = {
@@ -136,8 +135,8 @@ static kindDefinition SystemVerilogKinds [] = {
  { true, 'p', "port",      "ports" },
  { true, 'r', "register",  "register data types" },
  { true, 't', "task",      "tasks" },
- { true, 'b', "block",     "blocks" },
- { true, 'A', "assert",    "assertions" },
+ { true, 'b', "block",     "blocks (begin, fork)" },
+ { true, 'A', "assert",    "assertions (assert, assume, cover, restrict)" },
  { true, 'C', "class",     "classes" },
  { true, 'V', "covergroup","covergroups" },
  { true, 'E', "enum",      "enumerators" },
@@ -145,7 +144,7 @@ static kindDefinition SystemVerilogKinds [] = {
  { true, 'M', "modport",   "modports" },
  { true, 'K', "package",   "packages" },
  { true, 'P', "program",   "programs" },
- { false,'Q', "prototype", "prototypes" },
+ { false,'Q', "prototype", "prototypes (extern, pure)" },
  { true, 'R', "property",  "properties" },
  { true, 'S', "struct",    "structs and unions" },
  { true, 'T', "typedef",   "type declarations" }
@@ -156,13 +155,13 @@ static const keywordAssoc KeywordTable [] = {
 	/*                 	             	  |  Verilog    */
 	/* keyword         	keyword ID   	  |  |          */
 	{ "`define",       	K_DEFINE,   	{ 1, 1 } },
-	{ "begin",         	K_BEGIN,     	{ 1, 1 } },
+	{ "begin",         	K_BLOCK,     	{ 1, 1 } },
 	{ "end",           	K_END,       	{ 1, 1 } },
 	{ "endfunction",   	K_END_DE,    	{ 1, 1 } },
 	{ "endmodule",     	K_END_DE,    	{ 1, 1 } },
 	{ "endtask",       	K_END_DE,    	{ 1, 1 } },
 	{ "event",         	K_EVENT,     	{ 1, 1 } },
-	{ "fork",          	K_BEGIN,     	{ 1, 1 } },
+	{ "fork",          	K_BLOCK,     	{ 1, 1 } },
 	{ "function",      	K_FUNCTION,  	{ 1, 1 } },
 	{ "genvar",        	K_REGISTER,  	{ 1, 1 } },
 	{ "inout",         	K_PORT,      	{ 1, 1 } },
@@ -833,9 +832,7 @@ static void dropContext ()
 static void dropEndContext (tokenInfo *const token)
 {
 	verbose ("current context %s; context kind %0d; nest level %0d\n", vStringValue (currentContext->name), currentContext->kind, currentContext->nestLevel);
-	if ((currentContext->kind == K_COVERGROUP && strcmp (vStringValue (token->name), "endgroup") == 0) ||
-	    (currentContext->kind == K_BLOCK && currentContext->nestLevel == 0 && token->kind == K_END)
-	    )
+	if (currentContext->kind == K_COVERGROUP && strcmp (vStringValue (token->name), "endgroup") == 0)
 	{
 		dropContext ();
 		findBlockName (token);
@@ -992,26 +989,28 @@ static bool findBlockName (tokenInfo *const token)
 	return false;
 }
 
-static void processBegin (tokenInfo *const token)
+// begin, fork
+static void processBlock (tokenInfo *const token)
 {
-	currentContext->nestLevel++;
-	if (findBlockName (token))
+	if (findBlockName (token))	// create a context if the block has a label
 	{
 		verbose ("Found block: %s\n", vStringValue (token->name));
 		createTag (token, K_BLOCK);
 		verbose ("Current context %s\n", vStringValue (currentContext->name));
 	}
+	currentContext->nestLevel++;	// increment after creating a context
 }
 
+// end, join, join_any, join_none
 static void processEnd (tokenInfo *const token)
 {
-	currentContext->nestLevel--;
-	if (findBlockName (token))
-	{
+	if (currentContext->nestLevel > 0)	// for sanity check
+		currentContext->nestLevel--;
+	if (currentContext->kind == K_BLOCK && currentContext->nestLevel == 0)
+		dropContext ();
+
+	if (findBlockName (token)) // block name is optional
 		verbose ("Found block: %s\n", vStringValue (token->name));
-		if (currentContext->kind == K_BLOCK && currentContext->nestLevel <= 1)
-			dropContext ();	/* FIXME: uncovered */
-	}
 }
 
 static void processPortList (tokenInfo *token, int c)
@@ -1586,7 +1585,7 @@ static void findTag (tokenInfo *const token)
 {
 	verbose ("Checking token %s of kind %d\n", vStringValue (token->name), token->kind);
 
-	if (currentContext->kind != K_UNDEFINED && (token->kind == K_END || token->kind == K_END_DE))
+	if (currentContext->kind != K_UNDEFINED && token->kind == K_END_DE)
 	{
 		/* Drop context, but only if an end token is found */
 		dropEndContext (token);
@@ -1639,8 +1638,8 @@ static void findTag (tokenInfo *const token)
 		case K_PROPERTY:
 			processDesignElement(token);
 			break;
-		case K_BEGIN:
-			processBegin(token);
+		case K_BLOCK:
+			processBlock(token);
 			break;
 		case K_END:
 			processEnd(token);

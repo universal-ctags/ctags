@@ -1,0 +1,33 @@
+test	input.sv	/^module test;$/;"	m
+r	input.sv	/^  logic r;$/;"	r	module:test
+enable_a	input.sv	/^  event enable_a, enable_b;$/;"	e	module:test
+enable_b	input.sv	/^  event enable_a, enable_b;$/;"	e	module:test
+wa	input.sv	/^  logic wa, wb;$/;"	r	module:test
+wb	input.sv	/^  logic wa, wb;$/;"	r	module:test
+ta	input.sv	/^  time  ta, tb;$/;"	r	module:test
+tb	input.sv	/^  time  ta, tb;$/;"	r	module:test
+fork_1	input.sv	/^    fork: fork_1$/;"	b	module:test
+block1	input.sv	/^module block1 #(N_IF = 8) ($/;"	m
+N_IF	input.sv	/^module block1 #(N_IF = 8) ($/;"	c	module:block1	parameter:
+clk	input.sv	/^  input logic clk, rst_n$/;"	p	module:block1
+rst_n	input.sv	/^  input logic clk, rst_n$/;"	p	module:block1
+gi	input.sv	/^  generate for (genvar gi = 0; gi < N_IF; ++gi) begin : b_g1$/;"	r	module:block1
+b_g1	input.sv	/^  generate for (genvar gi = 0; gi < N_IF; ++gi) begin : b_g1$/;"	b	module:block1
+a	input.sv	/^      logic a;$/;"	r	block:block1.b_g1
+var_b_g	input.sv	/^    logic var_b_g;$/;"	r	block:block1.b_g1
+gi	input.sv	/^  for (genvar gi = 0; gi < N_IF; ++gi) begin : b_g2$/;"	r	module:block1
+b_g2	input.sv	/^  for (genvar gi = 0; gi < N_IF; ++gi) begin : b_g2$/;"	b	module:block1
+b1	input.sv	/^    always_comb begin:b1$/;"	b	block:block1.b_g2
+lb1	input.sv	/^        logic lb1;$/;"	r	block:block1.b_g2.b1
+b2_1	input.sv	/^        begin :b2_1$/;"	b	block:block1.b_g2.b1
+lb2	input.sv	/^          logic lb2;$/;"	r	block:block1.b_g2.b1.b2_1
+b2_2	input.sv	/^        begin :b2_2$/;"	b	block:block1.b_g2.b1
+lb2	input.sv	/^          logic lb2;$/;"	r	block:block1.b_g2.b1.b2_2
+var_b_g	input.sv	/^    logic var_b_g;$/;"	r	block:block1.b_g2
+nested_block	input.sv	/^class nested_block;$/;"	C
+func	input.sv	/^  function void func (input logic a, b);$/;"	f	class:nested_block
+a	input.sv	/^  function void func (input logic a, b);$/;"	p	function:nested_block.func
+b	input.sv	/^  function void func (input logic a, b);$/;"	p	function:nested_block.func
+outer_block	input.sv	/^    if (a) begin : outer_block$/;"	b	function:nested_block.func
+inner_block	input.sv	/^      if (b) begin : inner_block$/;"	b	block:nested_block.func.outer_block
+p	input.sv	/^  logic p; \/\/ class:nested_block$/;"	r	class:nested_block
