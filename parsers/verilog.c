@@ -829,6 +829,7 @@ static void dropContext ()
 	currentContext = popToken (currentContext);
 }
 
+/* Drop context, but only if an end token is found */
 static void dropEndContext (tokenInfo *const token)
 {
 	verbose ("current context %s; context kind %0d; nest level %0d\n", vStringValue (currentContext->name), currentContext->kind, currentContext->nestLevel);
@@ -837,7 +838,7 @@ static void dropEndContext (tokenInfo *const token)
 		dropContext ();
 		findBlockName (token);
 	}
-	else
+	else if (currentContext->kind != K_UNDEFINED)
 	{
 		vString *endTokenName = vStringNewInit("end");
 		vStringCatS (endTokenName, getNameForKind (currentContext->kind));
@@ -853,6 +854,8 @@ static void dropEndContext (tokenInfo *const token)
 		}
 		vStringDelete(endTokenName);
 	}
+	else
+		verbose ("Unexpected current context %s\n", vStringValue (currentContext->name));
 }
 
 
@@ -1585,12 +1588,6 @@ static void findTag (tokenInfo *const token)
 {
 	verbose ("Checking token %s of kind %d\n", vStringValue (token->name), token->kind);
 
-	if (currentContext->kind != K_UNDEFINED && token->kind == K_END_DE)
-	{
-		/* Drop context, but only if an end token is found */
-		dropEndContext (token);
-	}
-
 	switch (token->kind)
 	{
 		case K_CONSTANT:
@@ -1638,6 +1635,9 @@ static void findTag (tokenInfo *const token)
 		case K_PROPERTY:
 			processDesignElement(token);
 			break;
+		case K_END_DE:
+			dropEndContext(token);
+			break;
 		case K_BLOCK:
 			processBlock(token);
 			break;
@@ -1659,9 +1659,8 @@ static void findTag (tokenInfo *const token)
 			skipToNewLine();
 			break;
 
-		case K_END_DE:
 		case K_IGNORE:
-			return;
+			break;
 		default:
 			verbose ("Unexpected kind->token %d\n", token->kind);
 	}
