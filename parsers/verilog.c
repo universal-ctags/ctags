@@ -1089,10 +1089,11 @@ static int skipParameterAssignment (int c)
 	return c;
 }
 
-/* Functions are treated differently because they may also include the
- * type of the return value.
- * Tasks are treated in the same way, although not having a return
- * value.*/
+// Functions are treated differently because they may also include the type of the return value.
+// Tasks are treated in the same way, although not having a return value.
+//
+// function [ lifetime ] function_data_type_or_implicit [ interface_identifier . | class_scope ] function_identifier [ ( [ tf_port_list ] ) ] ;
+// task     [ lifetime ] task_body_declaration          [ interface_identifier . | class_scope ] task_identifier     [ ( [ tf_port_list ] ) ] ;
 static void processFunction (tokenInfo *const token)
 {
 	verilogKind kind = token->kind;	// K_FUNCTION or K_TASK
@@ -1138,6 +1139,8 @@ static void processFunction (tokenInfo *const token)
 	}
 }
 
+// enum [ enum_base_type ] { < enum_name_declaration > }  { [ … ] }
+// typedef enum type_identifier ;
 static void processEnum (tokenInfo *const token)
 {
 	int c;
@@ -1224,6 +1227,8 @@ static void processEnum (tokenInfo *const token)
 	deleteToken (enumToken);
 }
 
+// [ struct | union [ tagged ] ] [ packed [ signed | unsigned ] ] { struct_union_member { struct_union_member } } { [ … ] }
+// typedef ( struct | union ) type_identifier ;
 static void processStruct (tokenInfo *const token)
 {
 	verilogKind kind = token->kind;	// K_STRUCT or K_TYPEDEF
@@ -1258,6 +1263,14 @@ static void processStruct (tokenInfo *const token)
 	tagNameList (token, c);
 }
 
+// data_declaration ::=
+//       [ const ] [ var ] [ static | automatic ] data_type_or_implicit list_of_variable_decl_assignments ;
+//     | typedef data_type type_identifier { [ … ] } ;
+//     | typedef interface_instance_identifier [ … ] . type_identifier type_identifier ;
+//     | typedef [ enum | struct | union | class | interface class ] type_identifier ;
+//     | import < package_import_item > ;
+//     | nettype data_type net_type_identifier [ with [ class_type :: | package_identifier :: | $unit :: ] tf_identifier ] ;
+//     | nettype [ class_type :: | package_identifier :: | $unit :: ] net_type_identifier net_type_identifier ;
 static void processTypedef (tokenInfo *const token)
 {
 	int c;
@@ -1381,11 +1394,17 @@ static tokenInfo * processParameterList (tokenInfo *token, int c)
 	return head;
 }
 
+// [ virtual ] class [ static | automatic ] class_identifier [ parameter_port_list ]
+//     [ extends class_type [ ( list_of_arguments ) ] ] [ implements < interface_class_type > ] ;
+// interface class class_identifier [ parameter_port_list ] [ extends < interface_class_type > ] ;
+// typedef ( class | interface class ) type_identifier ;
 static void processClass (tokenInfo *const token)
 {
 	int c;
 	tokenInfo *classToken;
 	tokenInfo *parameters;
+
+	// skip static | automatic : FIXME
 
 	/* Get identifiers */
 	c = skipWhite (vGetc ());
@@ -1415,6 +1434,8 @@ static void processClass (tokenInfo *const token)
 		}
 	}
 
+	// process implements: FIXME
+
 	createTag (classToken, K_CLASS);
 	deleteToken (classToken);
 
@@ -1435,6 +1456,11 @@ static void processDefine (tokenInfo *const token)
 	skipToNewLine ();
 }
 
+// assert property ( property_spec ) action_block
+// assume property ( property_spec ) action_block
+// cover property ( property_spec ) statement_or_null
+// cover sequence ( [clocking_event ] [ disable iff ( expression_or_dist ) ] sequence_expr ) statement_or_null
+// restrict property ( property_spec ) ;
 static void processAssertion (tokenInfo *const token)
 {
 	if (vStringLength (currentContext->blockName) > 0)
@@ -1447,7 +1473,18 @@ static void processAssertion (tokenInfo *const token)
 	}
 }
 
-/* covergroup, interface, modport, module, package, program, property */
+// non-ANSI type
+// ( module | interface | program ) [ static | automatic ] identifier { package_import_declaration } [ parameter_port_list ] ( port { , port } ) ;
+// ANSI type
+// ( module | interface | program ) [ static | automatic ] identifier { package_import_declaration } [ parameter_port_list ] [ ( [ < { (* … *) } ansi_port_declaration > ] ) ] ;
+//
+// interface class class_identifier [ parameter_port_list ] [ extends < interface_class_type > ] ;
+// typedef interface class type_identifier ;
+//
+// ( checker | property | sequence ) identifier [ ( [ port_list ] ) ] ;
+// covergroup identifier [ ( [ port_list ] ) ] [ coverage_event ] ;
+// package identifier ;
+// modport < identifier ( < ports_declaration > ) > ;  // FIXME
 static void processDesignElement (tokenInfo *const token)
 {
 	verilogKind kind = token->kind;
@@ -1455,15 +1492,17 @@ static void processDesignElement (tokenInfo *const token)
 
 	if (readWordToken (token, c))
 	{
-		while (getKindForToken (token) == K_IGNORE)
+		while (getKindForToken (token) == K_IGNORE) // skip static or automatic
 		{
 			c = skipWhite (vGetc ());
 			readWordToken (token, c);
 		}
-		createTag (token, kind);
+		createTag (token, kind);	// identifier
+
+		// package_import_declaration : FIXME
 
 		c = skipWhite (vGetc ());
-		if (c == '#')
+		if (c == '#')	// parameter_port_list
 		{
 			tokenInfo *parameters = processParameterList (token, c);
 			while (parameters)
@@ -1476,8 +1515,7 @@ static void processDesignElement (tokenInfo *const token)
 			c = skipWhite (vGetc ());
 		}
 
-		/* Get port list if required */
-		if (c == '(')
+		if (c == '(')	// port_list
 		{
 			if (kind == K_MODPORT)
 				c = skipPastMatch ("()");	// ignore port list
@@ -1488,6 +1526,8 @@ static void processDesignElement (tokenInfo *const token)
 		{
 			vUngetc (c);
 		}
+
+		// skip coverage_event for covergroup : FIXME
 	}
 }
 
