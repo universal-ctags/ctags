@@ -1,0 +1,18 @@
+Queue	input.r	/^Queue <- R6Class("Queue",$/;"	class	language:R6Class	extras:subparser	end:28
+initialize	input.r	/^    initialize = function(...) {$/;"	method	language:R6Class	class:Queue	access:public	signature:(...)	extras:subparser	end:11
+item	input.r	/^      for (item in list(...)) {$/;"	functionVar	language:R	method:Queue.initialize
+add	input.r	/^    add = function(x) {$/;"	method	language:R6Class	class:Queue	access:public	signature:(x)	extras:subparser	end:15
+remove	input.r	/^    remove = function() {$/;"	method	language:R6Class	class:Queue	access:public	signature:()	extras:subparser	end:22
+head	input.r	/^      head <- private$queue[[1]]$/;"	functionVar	language:R	method:Queue.remove	end:19
+queue	input.r	/^    queue = list(),$/;"	field	language:R6Class	class:Queue	access:private	extras:subparser	end:25
+length	input.r	/^    length = function() base::length(private$queue)$/;"	method	language:R6Class	class:Queue	access:private	signature:()	extras:subparser	end:26
+Numbers	input.r	/^Numbers <- R6Class("Numbers",$/;"	class	language:R6Class	extras:subparser	end:42
+x	input.r	/^    x = 100$/;"	field	language:R6Class	class:Numbers	access:public	extras:subparser	end:33
+x2	input.r	/^    x2 = function(value) {$/;"	activeBindingFunc	language:R6Class	class:Numbers	access:public	signature:(value)	extras:subparser	end:39
+rand	input.r	/^    rand = function() rnorm(1)$/;"	activeBindingFunc	language:R6Class	class:Numbers	access:public	signature:()	extras:subparser	end:40
+HistoryQueue	input.r	/^HistoryQueue <- R6Class("HistoryQueue",$/;"	class	language:R6Class	inherits:Queue	extras:subparser	end:64
+show	input.r	/^    show = function() {$/;"	method	language:R6Class	class:HistoryQueue	access:public	signature:()	extras:subparser	end:52
+i	input.r	/^      for (i in seq_along(private$queue)) {$/;"	functionVar	language:R	method:HistoryQueue.show
+remove	input.r	/^    remove = function() {$/;"	method	language:R6Class	class:HistoryQueue	access:public	signature:()	extras:subparser	end:59
+local_noise	input.r	/^      local_noise <- 1$/;"	functionVar	language:R	method:HistoryQueue.remove	end:57
+head_idx	input.r	/^    head_idx = 0$/;"	field	language:R6Class	class:HistoryQueue	access:private	extras:subparser	end:62

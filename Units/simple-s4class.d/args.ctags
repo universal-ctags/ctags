@@ -1,4 +1,4 @@
 --kinds-R=*
 --fields-R=*
---fields=+E
+--fields=+ElS
 --sort=no

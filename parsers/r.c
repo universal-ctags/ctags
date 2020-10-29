@@ -32,10 +32,12 @@
 #include "tokeninfo.h"
 #include "trace.h"
 #include "vstring.h"
-
+#include "subparser.h"
+#include "r.h"
 
 #include <string.h>
 #include <ctype.h>	/* to define isalpha(), isalnum(), isspace() */
+
 
 /*
 *   MACROS
@@ -63,10 +65,10 @@
 #define R_TRACE_LEAVE() do {} while (0);
 #endif
 
+
 /*
 *   DATA DEFINITIONS
 */
-
 typedef enum {
 	K_UNDEFINED = -1,
 	K_FUNCTION,
@@ -119,72 +121,31 @@ static fieldDefinition RFields [] = {
 	},
 };
 
-enum eKeywordId
-{
-	KEYWORD_FUNCTION,
-	KEYWORD_IF,
-	KEYWORD_ELSE,
-	KEYWORD_FOR,
-	KEYWORD_WHILE,
-	KEYWORD_REPEAT,
-	KEYWORD_IN,
-	KEYWORD_NEXT,
-	KEYWORD_BREAK,
-	KEYWORD_TRUE,
-	KEYWORD_FALSE,
-	KEYWORD_NULL,
-	KEYWORD_INF,
-	KEYWORD_NAN,
-	KEYWORD_NA,
-	KEYWORD_SOURCE,
-	KEYWORD_LIBRARY,
-};
-
 typedef int keywordId;			/* to allow KEYWORD_NONE */
 
 static const keywordTable RKeywordTable [] = {
-	{ "function", KEYWORD_FUNCTION },
-	{ "if",       KEYWORD_IF       },
-	{ "else",     KEYWORD_ELSE     },
-	{ "for",      KEYWORD_FOR      },
-	{ "while",    KEYWORD_WHILE    },
-	{ "repeat",   KEYWORD_REPEAT   },
-	{ "in",       KEYWORD_IN       },
-	{ "next",     KEYWORD_NEXT     },
-	{ "break",    KEYWORD_BREAK    },
-	{ "TRUE",     KEYWORD_TRUE,    },
-	{ "FALSE",    KEYWORD_FALSE,   },
-	{ "NULL",     KEYWORD_NULL,    },
-	{ "Inf",      KEYWORD_INF,     },
-	{ "NaN",      KEYWORD_NAN,     },
-	{ "NA",       KEYWORD_NA,      },
-	{ "NA_integer_",   KEYWORD_NA, },
-	{ "NA_real_",      KEYWORD_NA, },
-	{ "NA_complex_",   KEYWORD_NA, },
-	{ "NA_character_", KEYWORD_NA, },
-	{ "source",   KEYWORD_SOURCE   },
-	{ "library",  KEYWORD_LIBRARY  },
-	{ "require",  KEYWORD_LIBRARY  },
-};
-
-enum RTokenType {
-	/* 0..255 are the byte's values */
-	TOKEN_EOF = 256,
-	TOKEN_UNDEFINED,
-	TOKEN_KEYWORD,
-	TOKEN_NEWLINE,
-	TOKEN_NUMBER,				/* 1, 1L */
-	TOKEN_SYMBOL,				/* [0-9a-zA-Z._] */
-	TOKEN_STRING,
-	TOKEN_OPERATOR,				/* - + ! ~ ? : * / ^ %...%, <, > ==
-								 * >=, <=, &, &&, |, || */
-	TOKEN_DOTS,					/* ... */
-	TOKEN_DOTS_N,				/* ..1, ..2, etc */
-	TOKEN_LASSIGN,				/* <-, <<- */
-	TOKEN_RASSIGN,				/* ->, ->> */
-	TOKEN_DBRACKET_OEPN,		/* [[ */
-	TOKEN_DBRACKET_CLOSE,		/* ]] */
-	TOKEN_SCOPE,				/* ::, ::: */
+	{ "function", KEYWORD_R_FUNCTION },
+	{ "if",       KEYWORD_R_IF       },
+	{ "else",     KEYWORD_R_ELSE     },
+	{ "for",      KEYWORD_R_FOR      },
+	{ "while",    KEYWORD_R_WHILE    },
+	{ "repeat",   KEYWORD_R_REPEAT   },
+	{ "in",       KEYWORD_R_IN       },
+	{ "next",     KEYWORD_R_NEXT     },
+	{ "break",    KEYWORD_R_BREAK    },
+	{ "TRUE",     KEYWORD_R_TRUE,    },
+	{ "FALSE",    KEYWORD_R_FALSE,   },
+	{ "NULL",     KEYWORD_R_NULL,    },
+	{ "Inf",      KEYWORD_R_INF,     },
+	{ "NaN",      KEYWORD_R_NAN,     },
+	{ "NA",       KEYWORD_R_NA,      },
+	{ "NA_integer_",   KEYWORD_R_NA, },
+	{ "NA_real_",      KEYWORD_R_NA, },
+	{ "NA_complex_",   KEYWORD_R_NA, },
+	{ "NA_character_", KEYWORD_R_NA, },
+	{ "source",   KEYWORD_R_SOURCE   },
+	{ "library",  KEYWORD_R_LIBRARY  },
+	{ "require",  KEYWORD_R_LIBRARY  },
 };
 
 #ifdef DEBUG
@@ -195,7 +156,7 @@ static struct tokenTypePair typePairs [] = {
 	{ '{', '}' },
 	{ '[', ']' },
 	{ '(', ')' },
-	{ TOKEN_DBRACKET_OEPN, TOKEN_DBRACKET_CLOSE },
+	{ TOKEN_R_DBRACKET_OEPN, TOKEN_R_DBRACKET_CLOSE },
 };
 
 typedef struct sRToken {
@@ -203,20 +164,23 @@ typedef struct sRToken {
 	int scopeIndex;
 	int parenDepth;
 	vString *signature;
+	int kindIndexForParams;		/* Used only when gathering parameters */
 } rToken;
 
 #define R(TOKEN) ((rToken *)TOKEN)
 
 static int blackHoleIndex;
 
+static langType Lang_R;
+
 static void readToken (tokenInfo *const token, void *data);
 static void clearToken (tokenInfo *token);
 static struct tokenInfoClass rTokenInfoClass = {
 	.nPreAlloc        = 4,
-	.typeForUndefined = TOKEN_UNDEFINED,
+	.typeForUndefined = TOKEN_R_UNDEFINED,
 	.keywordNone      = KEYWORD_NONE,
-	.typeForKeyword   = TOKEN_KEYWORD,
-	.typeForEOF       = TOKEN_EOF,
+	.typeForKeyword   = TOKEN_R_KEYWORD,
+	.typeForEOF       = TOKEN_R_EOF,
 	.extraSpace       = sizeof (rToken) - sizeof (tokenInfo),
 	.pairs            = typePairs,
 	.pairCount        = ARRAY_SIZE (typePairs),
@@ -230,17 +194,23 @@ static struct tokenInfoClass rTokenInfoClass = {
 /*
  * FUNCTION PROTOTYPES
  */
-
-static void parseStatement (tokenInfo *const token, int parent, tokenInfo *const funcall, bool in_continuous_pair);
+static void parseStatement (tokenInfo *const token, int parent, bool in_arglist, bool in_continuous_pair);
 static void parsePair (tokenInfo *const token, int parent, tokenInfo *const funcall);
 
+static  int notifyReadRightSideSymbol (tokenInfo *const symbol,
+									   const char *const assignmentOperator,
+									   int parent,
+									   tokenInfo *const token);
+static  int makeSimpleSubparserTag (int langType, tokenInfo *const token, int parent,
+									bool in_func, int kindInR, const char *assignmentOperator);
+static  bool askSubparserTagAcceptancy (tagEntryInfo *pe);
+static  int notifyReadFuncall (tokenInfo *const func, tokenInfo *const token, int parent);
 
 /*
 *   FUNCTION DEFINITIONS
 */
-
-static int makeSimpleRTag (tokenInfo *const token, int parent, int kind,
-						   const char * assignmentOp)
+static int makeSimpleRTagR (tokenInfo *const token, int parent, int kind,
+							const char * assignmentOp)
 {
 	if (assignmentOp && (strlen (assignmentOp) == 3))
 	{
@@ -288,10 +258,23 @@ static int makeSimpleRTag (tokenInfo *const token, int parent, int kind,
 	return corkIndex;
 }
 
+static int makeSimpleRTag (tokenInfo *const token, int parent, bool in_func, int kind,
+						   const char * assignmentOp)
+{
+	tagEntryInfo *pe = (parent == CORK_NIL)? NULL: getEntryInCorkQueue (parent);
+	if (pe == NULL || pe->langType == Lang_R ||
+		!askSubparserTagAcceptancy (pe))
+		return makeSimpleRTagR (token, parent, kind, assignmentOp);
+	else
+		return makeSimpleSubparserTag (pe->langType, token, parent, in_func,
+									   kind, assignmentOp);
+}
+
 static void clearToken (tokenInfo *token)
 {
 	R (token)->parenDepth = 0;
 	R (token)->scopeIndex = CORK_NIL;
+	R (token)->kindIndexForParams = KIND_GHOST_INDEX;
 	if (R (token)->signature)
 	{
 		vStringDelete (R (token)->signature);
@@ -406,7 +389,7 @@ static void readToken (tokenInfo *const token, void *data)
 {
 	int c, c0;
 
-	token->type = TOKEN_UNDEFINED;
+	token->type = TOKEN_R_UNDEFINED;
 	token->keyword = KEYWORD_NONE;
 	vStringClear (token->string);
 
@@ -420,7 +403,7 @@ static void readToken (tokenInfo *const token, void *data)
 	switch (c)
 	{
 	case EOF:
-		token->type = TOKEN_EOF;
+		token->type = TOKEN_R_EOF;
 		break;
 	case '#':
 		while (1)
@@ -428,7 +411,7 @@ static void readToken (tokenInfo *const token, void *data)
 			c = getcFromInputFile ();
 			if (c == EOF)
 			{
-				token->type = TOKEN_EOF;
+				token->type = TOKEN_R_EOF;
 				break;
 			}
 			else if (c == '\n')
@@ -447,7 +430,7 @@ static void readToken (tokenInfo *const token, void *data)
 	case '\'':
 	case '"':
 	case '`':
-		token->type = TOKEN_STRING;
+		token->type = TOKEN_R_STRING;
 		tokenPutc (token, c);
 		readString (token, data);
 		break;
@@ -455,17 +438,17 @@ static void readToken (tokenInfo *const token, void *data)
 	case '/':
 	case '^':
 	case '~':
-		token->type = TOKEN_OPERATOR;
+		token->type = TOKEN_R_OPERATOR;
 		tokenPutc (token, c);
 		break;
 	case ':':
-		token->type = TOKEN_OPERATOR;
+		token->type = TOKEN_R_OPERATOR;
 		tokenPutc (token, c);
 		c = getcFromInputFile ();
 		if (c == ':')
 		{
 			tokenPutc (token, c);
-			token->type = TOKEN_SCOPE;
+			token->type = TOKEN_R_SCOPE;
 			c = getcFromInputFile ();
 			if (c == ':')
 				tokenPutc (token, c);
@@ -478,7 +461,7 @@ static void readToken (tokenInfo *const token, void *data)
 	case '&':
 	case '|':
 	case '*':
-		token->type = TOKEN_OPERATOR;
+		token->type = TOKEN_R_OPERATOR;
 		tokenPutc (token, c);
 		c0 = getcFromInputFile ();
 		if (c == c0)
@@ -487,7 +470,7 @@ static void readToken (tokenInfo *const token, void *data)
 			ungetcToInputFile (c0);
 		break;
 	case '=':
-		token->type = TOKEN_OPERATOR;
+		token->type = TOKEN_R_OPERATOR;
 		tokenPutc (token, c);
 		c = getcFromInputFile ();
 		if (c == '=')
@@ -499,12 +482,12 @@ static void readToken (tokenInfo *const token, void *data)
 		}
 		break;
 	case '-':
-		token->type = TOKEN_OPERATOR;
+		token->type = TOKEN_R_OPERATOR;
 		tokenPutc (token, c);
 		c = getcFromInputFile ();
 		if (c == '>')
 		{
-			token->type = TOKEN_RASSIGN;
+			token->type = TOKEN_R_RASSIGN;
 			tokenPutc (token, c);
 			c = getcFromInputFile ();
 			if (c == '>')
@@ -516,7 +499,7 @@ static void readToken (tokenInfo *const token, void *data)
 			ungetcToInputFile (c);
 		break;
 	case '>':
-		token->type = TOKEN_OPERATOR;
+		token->type = TOKEN_R_OPERATOR;
 		tokenPutc (token, c);
 		c = getcFromInputFile ();
 		if (c == '=')
@@ -525,7 +508,7 @@ static void readToken (tokenInfo *const token, void *data)
 			ungetcToInputFile (c);
 		break;
 	case '<':
-		token->type = TOKEN_OPERATOR;
+		token->type = TOKEN_R_OPERATOR;
 		tokenPutc (token, c);
 		c = getcFromInputFile ();
 
@@ -538,7 +521,7 @@ static void readToken (tokenInfo *const token, void *data)
 
 		if (c == '-')
 		{
-			token->type = TOKEN_LASSIGN;
+			token->type = TOKEN_R_LASSIGN;
 			tokenPutc (token, c);
 		}
 		else if (c == '=')
@@ -547,7 +530,7 @@ static void readToken (tokenInfo *const token, void *data)
 			ungetcToInputFile (c);
 		break;
 	case '%':
-		token->type = TOKEN_OPERATOR;
+		token->type = TOKEN_R_OPERATOR;
 		tokenPutc (token, c);
 		do
 		{
@@ -562,7 +545,7 @@ static void readToken (tokenInfo *const token, void *data)
 		while (1);
 		break;
 	case '!':
-		token->type = TOKEN_OPERATOR;
+		token->type = TOKEN_R_OPERATOR;
 		tokenPutc (token, c);
 		c = getcFromInputFile ();
 		if (c == '=')
@@ -585,7 +568,7 @@ static void readToken (tokenInfo *const token, void *data)
 		c = getcFromInputFile ();
 		if (c == '[')
 		{
-			token->type = TOKEN_DBRACKET_OEPN;
+			token->type = TOKEN_R_DBRACKET_OEPN;
 			tokenPutc (token, c);
 		}
 		else
@@ -599,7 +582,7 @@ static void readToken (tokenInfo *const token, void *data)
 		c = getcFromInputFile ();
 		if (c == ']')
 		{
-			token->type = TOKEN_DBRACKET_CLOSE;
+			token->type = TOKEN_R_DBRACKET_CLOSE;
 			tokenPutc (token, c);
 		}
 		else
@@ -613,23 +596,23 @@ static void readToken (tokenInfo *const token, void *data)
 		c = getcFromInputFile ();
 		if (isdigit(c))
 		{
-			token->type = TOKEN_NUMBER;
+			token->type = TOKEN_R_NUMBER;
 			tokenPutc (token, c);
 			readNumber(token, data);
 		}
 		else if (isalpha (c) || c == '_')
 		{
-			token->type = TOKEN_SYMBOL;
+			token->type = TOKEN_R_SYMBOL;
 			tokenPutc (token, c);
 			readSymbol (token, data);
 
 			token->keyword = resolveKeyword (token->string);
 			if (token->keyword != KEYWORD_NONE)
-				token->type = TOKEN_KEYWORD;
+				token->type = TOKEN_R_KEYWORD;
 		}
 		else if (c == '.')
 		{
-			token->type = TOKEN_DOTS;
+			token->type = TOKEN_R_DOTS;
 			tokenPutc (token, c);
 
 			c = getcFromInputFile ();
@@ -637,7 +620,7 @@ static void readToken (tokenInfo *const token, void *data)
 				tokenPutc (token, c);
 			else if (isdigit(c))
 			{
-				token->type = TOKEN_DOTS_N;
+				token->type = TOKEN_R_DOTS_N;
 				do
 				{
 					tokenPutc (token, c);
@@ -648,17 +631,17 @@ static void readToken (tokenInfo *const token, void *data)
 			}
 			else if (isalpha (c) || c == '_')
 			{
-				token->type = TOKEN_SYMBOL;
+				token->type = TOKEN_R_SYMBOL;
 				tokenPutc (token, c);
 				readSymbol (token, data);
 
 				token->keyword = resolveKeyword (token->string);
 				if (token->keyword != KEYWORD_NONE)
-					token->type = TOKEN_KEYWORD;
+					token->type = TOKEN_R_KEYWORD;
 			}
 			else
 			{
-				token->type = TOKEN_UNDEFINED;
+				token->type = TOKEN_R_UNDEFINED;
 				ungetcToInputFile (c);
 			}
 		}
@@ -667,25 +650,25 @@ static void readToken (tokenInfo *const token, void *data)
 		tokenPutc (token, c);
 		if (isdigit (c))
 		{
-			token->type = TOKEN_NUMBER;
+			token->type = TOKEN_R_NUMBER;
 			readNumber(token, data);
 		}
 		else if (isalpha (c))
 		{
-			token->type = TOKEN_SYMBOL;
+			token->type = TOKEN_R_SYMBOL;
 			readSymbol (token, data);
 
 			token->keyword = resolveKeyword (token->string);
 			if (token->keyword != KEYWORD_NONE)
-				token->type = TOKEN_KEYWORD;
+				token->type = TOKEN_R_KEYWORD;
 		}
 		else
-			token->type = TOKEN_UNDEFINED;
+			token->type = TOKEN_R_UNDEFINED;
 		break;
 	}
 
 	/* Handle parameters in a signature */
-	if (R(token)->signature && !tokenIsType(token, EOF) && !tokenIsTypeVal(token, '\n'))
+	if (R(token)->signature && !tokenIsType(token, R_EOF) && !tokenIsTypeVal(token, '\n'))
 	{
 		vString *signature = R (token)->signature;
 
@@ -694,9 +677,11 @@ static void readToken (tokenInfo *const token, void *data)
 		else if (tokenIsTypeVal (token, ')'))
 			R (token)->parenDepth--;
 
-		if (R (token)->parenDepth == 1 && tokenIsType (token, SYMBOL)
+		if (R (token)->kindIndexForParams != KIND_GHOST_INDEX
+			&& R (token)->parenDepth == 1 && tokenIsType (token, R_SYMBOL)
 			&& signatureExpectingParameter (signature))
-			makeSimpleRTag (token, R (token)->scopeIndex, K_PARAM, NULL);
+			makeSimpleRTag (token, R (token)->scopeIndex, false,
+							R (token)->kindIndexForParams, NULL);
 
 		if (vStringLast (signature) != '(' &&
 			!tokenIsTypeVal (token, ',') &&
@@ -711,8 +696,8 @@ static tokenInfo *newRToken(void)
 	return newToken (&rTokenInfoClass);
 }
 
-
-static void tokenReadNoNewline (tokenInfo *const token)
+#define tokenReadNoNewline rTokenReadNoNewline
+extern void rTokenReadNoNewline (tokenInfo *const token)
 {
 	while (1)
 	{
@@ -720,6 +705,37 @@ static void tokenReadNoNewline (tokenInfo *const token)
 		if (!tokenIsTypeVal (token, '\n'))
 			break;
 	}
+}
+
+static void setupCollectingSignature (tokenInfo *const token,
+									  vString   *signature,
+									  int kindIndexForParams,
+									  int corkIndex)
+{
+	R (token)->signature = signature;
+	R (token)->kindIndexForParams = kindIndexForParams;
+	R (token)->scopeIndex = corkIndex;
+	R (token)->parenDepth = 1;
+}
+
+extern void rSetupCollectingSignature (tokenInfo *const token,
+									   vString   *signature)
+{
+	setupCollectingSignature (token, signature,
+							  KIND_GHOST_INDEX, CORK_NIL);
+}
+
+static void teardownCollectingSignature (tokenInfo *const token)
+{
+	R (token)->parenDepth = 0;
+	R (token)->scopeIndex = CORK_NIL;
+	R (token)->kindIndexForParams = KIND_GHOST_INDEX;
+	R (token)->signature = NULL;
+}
+
+extern void rTeardownCollectingSignature (tokenInfo *const token)
+{
+	teardownCollectingSignature (token);
 }
 
 static void parseRightSide (tokenInfo *const token, tokenInfo *const symbol, int parent)
@@ -732,10 +748,10 @@ static void parseRightSide (tokenInfo *const token, tokenInfo *const symbol, int
 
 	tokenReadNoNewline (token);
 
-	bool in_func = tokenIsKeyword (token, FUNCTION);
+	bool in_func = tokenIsKeyword (token, R_FUNCTION);
 	if (in_func)
 	{
-		corkIndex = makeSimpleRTag (symbol, parent,
+		corkIndex = makeSimpleRTag (symbol, parent, true,
 									parent == CORK_NIL? K_FUNCTION: K_FUNCVAR,
 									assignment_operator);
 		tokenReadNoNewline (token);
@@ -748,19 +764,20 @@ static void parseRightSide (tokenInfo *const token, tokenInfo *const symbol, int
 			else
 			{
 				signature = vStringNewInit("(");
-				R (token)->signature = signature;
-				R (token)->scopeIndex = corkIndex;
-				R (token)->parenDepth = 1;
+				setupCollectingSignature (token, signature, K_PARAM, corkIndex);
 				tokenSkipOverPair (token);
-				R (token)->parenDepth = 0;
-				R (token)->scopeIndex = CORK_NIL;
-				R (token)->signature = NULL;
+				teardownCollectingSignature (token);
 			}
 			tokenReadNoNewline (token);
 		}
 	}
+	else if ((corkIndex = notifyReadRightSideSymbol (symbol,
+													 assignment_operator,
+													 parent,
+													 token)) != CORK_NIL)
+		;
 	else
-		corkIndex = makeSimpleRTag (symbol, parent,
+		corkIndex = makeSimpleRTag (symbol, parent, false,
 									parent == CORK_NIL? K_GLOBALVAR: K_FUNCVAR,
 									assignment_operator);
 
@@ -771,7 +788,7 @@ static void parseRightSide (tokenInfo *const token, tokenInfo *const symbol, int
 					 : parent);
 	R_TRACE_TOKEN_TEXT("body", token, new_scope);
 
-	parseStatement (token, new_scope, NULL, false);
+	parseStatement (token, new_scope, false, false);
 
 	tagEntryInfo *tag = getEntryInCorkQueue (corkIndex);
 	if (tag)
@@ -798,8 +815,8 @@ static bool preParseExternalEntitiy (tokenInfo *const token, tokenInfo *const fu
 	tokenInfo *prefetch_token = newRToken ();
 
 	tokenReadNoNewline (prefetch_token);
-	if (tokenIsType (prefetch_token, SYMBOL)
-		|| tokenIsType (prefetch_token, STRING))
+	if (tokenIsType (prefetch_token, R_SYMBOL)
+		|| tokenIsType (prefetch_token, R_STRING))
 	{
 		tokenInfo *const loaded_obj_token = newTokenByCopying (prefetch_token);
 		tokenReadNoNewline (prefetch_token);
@@ -810,10 +827,10 @@ static bool preParseExternalEntitiy (tokenInfo *const token, tokenInfo *const fu
 				r = false;
 
 			makeSimpleRefTag (loaded_obj_token->string,
-							  (tokenIsKeyword (funcall, LIBRARY)
+							  (tokenIsKeyword (funcall, R_LIBRARY)
 							   ? K_LIBRARY
 							   : K_SOURCE),
-							  (tokenIsKeyword (funcall, LIBRARY)
+							  (tokenIsKeyword (funcall, R_LIBRARY)
 							   ? (strcmp (tokenString(funcall), "library") == 0
 								  ? R_LIBRARY_ATTACHED_BY_LIBRARY
 								  : R_LIBRARY_ATTACHED_BY_REQUIRE)
@@ -855,8 +872,8 @@ static bool preParseLoopCounter(tokenInfo *const token, int parent)
 	TRACE_ENTER();
 
 	tokenReadNoNewline (token);
-	if (tokenIsType (token, SYMBOL))
-		makeSimpleRTag (token, parent,
+	if (tokenIsType (token, R_SYMBOL))
+		makeSimpleRTag (token, parent, false,
 						(parent == CORK_NIL) ? K_GLOBALVAR: K_FUNCVAR , NULL);
 
 	if (tokenIsEOF (token)
@@ -878,17 +895,19 @@ static void parsePair (tokenInfo *const token, int parent, tokenInfo *const func
 
 	bool in_continuous_pair = tokenIsTypeVal (token, '(')
 		|| tokenIsTypeVal (token, '[')
-		|| tokenIsType(token, DBRACKET_OEPN);
+		|| tokenIsType(token, R_DBRACKET_OEPN);
 	bool is_funcall = funcall && tokenIsTypeVal (token, '(');
 	bool done = false;
 
 	if (is_funcall)
 	{
-		if 	(tokenIsKeyword (funcall, LIBRARY) ||
-			 tokenIsKeyword (funcall, SOURCE))
+		if 	(tokenIsKeyword (funcall, R_LIBRARY) ||
+			 tokenIsKeyword (funcall, R_SOURCE))
 			done = !preParseExternalEntitiy (token, funcall);
-		else if (tokenIsKeyword (funcall, FOR))
+		else if (tokenIsKeyword (funcall, R_FOR))
 			done = !preParseLoopCounter (token, parent);
+		else if (notifyReadFuncall (funcall, token, parent) != CORK_NIL)
+			done = true;
 	}
 
 	if (done)
@@ -901,18 +920,18 @@ static void parsePair (tokenInfo *const token, int parent, tokenInfo *const func
 	{
 		tokenRead (token);
 		R_TRACE_TOKEN_TEXT("inside pair", token, parent);
-		parseStatement (token, parent, funcall, in_continuous_pair);
+		parseStatement (token, parent, (funcall != NULL), in_continuous_pair);
 	}
 	while (! (tokenIsEOF (token)
 			  || tokenIsTypeVal (token, ')')
 			  || tokenIsTypeVal (token, '}')
 			  || tokenIsTypeVal (token, ']')
-			  || tokenIsType (token, DBRACKET_CLOSE)));
+			  || tokenIsType (token, R_DBRACKET_CLOSE)));
 	R_TRACE_LEAVE();
 }
 
 static void parseStatement (tokenInfo *const token, int parent,
-							tokenInfo *const funcall, bool in_continuous_pair)
+							bool in_arglist, bool in_continuous_pair)
 {
 	R_TRACE_ENTER();
 
@@ -930,8 +949,8 @@ static void parseStatement (tokenInfo *const token, int parent,
 			R_TRACE_TOKEN_TEXT ("break with \\n", token, parent);
 			break;
 		}
-		else if (tokenIsType (token, KEYWORD)
-				 && tokenIsKeyword (token, FUNCTION))
+		else if (tokenIsType (token, R_KEYWORD)
+				 && tokenIsKeyword (token, R_FUNCTION))
 		{
 			/* This statement doesn't start with a symbol.
 			 * This function is not assigned to any symbol. */
@@ -943,9 +962,9 @@ static void parseStatement (tokenInfo *const token, int parent,
 			parseRightSide (token, anonfunc, parent);
 			tokenDelete (anonfunc);
 		}
-		else if (tokenIsType (token, SYMBOL)
-				 || tokenIsType (token, STRING)
-				 || tokenIsType (token, KEYWORD))
+		else if (tokenIsType (token, R_SYMBOL)
+				 || tokenIsType (token, R_STRING)
+				 || tokenIsType (token, R_KEYWORD))
 		{
 			tokenInfo *const symbol = newTokenByCopying (token);
 
@@ -954,7 +973,7 @@ static void parseStatement (tokenInfo *const token, int parent,
 			else
 				tokenRead (token);
 
-			if (tokenIsType (token, LASSIGN))
+			if (tokenIsType (token, R_LASSIGN))
 			{
 				/* Assignment */
 				parseRightSide (token, symbol, parent);
@@ -965,8 +984,9 @@ static void parseStatement (tokenInfo *const token, int parent,
 			else if (tokenIsTypeVal (token, '='))
 			{
 				/* Assignment */
-				if (funcall)
+				if (in_arglist)
 				{
+					/* Ignore the left side symbol. */
 					tokenRead (token);
 					R_TRACE_TOKEN_TEXT("(in arg list) after = body", token, parent);
 				}
@@ -987,7 +1007,7 @@ static void parseStatement (tokenInfo *const token, int parent,
 			}
 			else if (tokenIsTypeVal (token, '$')
 					 || tokenIsTypeVal (token, '@')
-					 || tokenIsType (token, SCOPE))
+					 || tokenIsType (token, R_SCOPE))
 			{
 				tokenReadNoNewline (token); /* Skip the next identifier */
 				tokenRead (token);
@@ -997,14 +1017,14 @@ static void parseStatement (tokenInfo *const token, int parent,
 				R_TRACE_TOKEN_TEXT("else after symbol", token, parent);
 			tokenDelete(symbol);
 		}
-		else if (tokenIsType (token, RASSIGN))
+		else if (tokenIsType (token, R_RASSIGN))
 		{
 			char *const assignment_operator = eStrdup (tokenString (token));
 			tokenReadNoNewline (token);
-			if (tokenIsType (token, SYMBOL)
-				|| tokenIsType (token, STRING))
+			if (tokenIsType (token, R_SYMBOL)
+				|| tokenIsType (token, R_STRING))
 			{
-				makeSimpleRTag (token, parent,
+				makeSimpleRTag (token, parent, false,
 								parent == CORK_NIL? K_GLOBALVAR: K_FUNCVAR,
 								assignment_operator);
 				tokenRead (token);
@@ -1012,7 +1032,7 @@ static void parseStatement (tokenInfo *const token, int parent,
 			eFree (assignment_operator);
 			R_TRACE_TOKEN_TEXT("after ->", token, parent);
 		}
-		else if (tokenIsType (token, OPERATOR))
+		else if (tokenIsType (token, R_OPERATOR))
 		{
 			tokenReadNoNewline (token);
 			R_TRACE_TOKEN_TEXT("after operator", token, parent);
@@ -1020,7 +1040,7 @@ static void parseStatement (tokenInfo *const token, int parent,
 		else if (tokenIsTypeVal (token, '(')
 				 || tokenIsTypeVal (token, '{')
 				 || tokenIsTypeVal (token, '[')
-				 || tokenIsType (token, DBRACKET_OEPN))
+				 || tokenIsType (token, R_DBRACKET_OEPN))
 		{
 			parsePair (token, parent, NULL);
 			tokenRead (token);
@@ -1029,14 +1049,14 @@ static void parseStatement (tokenInfo *const token, int parent,
 		else if (tokenIsTypeVal (token, ')')
 				 || tokenIsTypeVal (token, '}')
 				 || tokenIsTypeVal (token, ']')
-				 || tokenIsType (token, DBRACKET_CLOSE))
+				 || tokenIsType (token, R_DBRACKET_CLOSE))
 		{
 			R_TRACE_TOKEN_TEXT ("break with close", token, parent);
 			break;
 		}
 		else if (tokenIsTypeVal (token, '$')
 				 || tokenIsTypeVal (token, '@')
-				 || tokenIsType (token, SCOPE))
+				 || tokenIsType (token, R_SCOPE))
 		{
 			tokenReadNoNewline (token); /* Skip the next identifier */
 			tokenRead (token);
@@ -1053,6 +1073,106 @@ static void parseStatement (tokenInfo *const token, int parent,
 	R_TRACE_LEAVE();
 }
 
+extern void rParseStatement (tokenInfo *const token, int parentIndex, bool in_arglist)
+{
+	pushLanguage (Lang_R);
+	parseStatement (token, parentIndex, in_arglist, true);
+	popLanguage ();
+}
+
+static  int notifyReadRightSideSymbol (tokenInfo *const symbol,
+									   const char *const assignmentOperator,
+									   int parent,
+									   tokenInfo *const token)
+{
+	subparser *sub;
+	int q = CORK_NIL;
+
+	foreachSubparser (sub, false)
+	{
+		rSubparser *rsub = (rSubparser *)sub;
+		if (rsub->readRightSideSymbol)
+		{
+			enterSubparser (sub);
+			q = rsub->readRightSideSymbol (rsub, symbol, assignmentOperator, parent, token);
+			leaveSubparser ();
+			if (q != CORK_NIL)
+				break;
+		}
+	}
+
+	return q;
+}
+
+static  int makeSimpleSubparserTag (int langType,
+									tokenInfo *const token, int parent,
+									bool in_func, int kindInR,
+									const char *assignmentOperator)
+{
+	int q = CORK_NIL;
+	subparser *sub;
+	foreachSubparser (sub, false)
+	{
+		if (sub->slaveParser->id == langType)
+		{
+			rSubparser *rsub = (rSubparser *)sub;
+			if (rsub->makeTagWithTranslation)
+			{
+				enterSubparser (sub);
+				q = rsub->makeTagWithTranslation (rsub,
+												  token, parent,
+												  in_func, kindInR,
+												  assignmentOperator);
+				leaveSubparser ();
+			}
+			break;
+		}
+	}
+	return q;
+}
+
+static  bool askSubparserTagAcceptancy (tagEntryInfo *pe)
+{
+	bool q = false;
+	subparser *sub;
+	foreachSubparser (sub, false)
+	{
+		if (sub->slaveParser->id == pe->langType)
+		{
+			rSubparser *rsub = (rSubparser *)sub;
+			if (rsub->askTagAcceptancy)
+			{
+				enterSubparser (sub);
+				q = rsub->askTagAcceptancy (rsub, pe);
+				leaveSubparser ();
+			}
+			break;
+		}
+	}
+	return q;
+}
+
+static  int notifyReadFuncall (tokenInfo *const func,
+							   tokenInfo *const token,
+							   int parent)
+{
+	int q = CORK_NIL;
+	subparser *sub;
+	foreachSubparser (sub, false)
+	{
+		rSubparser *rsub = (rSubparser *)sub;
+		if (rsub->readFuncall)
+		{
+			enterSubparser (sub);
+			q = rsub->readFuncall (rsub, func, token, parent);
+			leaveSubparser ();
+			if (q != CORK_NIL)
+				break;
+		}
+	}
+	return q;
+}
+
 static void findRTags (void)
 {
 	tokenInfo *const token = newRToken ();
@@ -1066,7 +1186,7 @@ static void findRTags (void)
 	{
 		tokenRead(token);
 		R_TRACE_TOKEN(token, CORK_NIL);
-		parseStatement (token, CORK_NIL, NULL, false);
+		parseStatement (token, CORK_NIL, false, false);
 	}
 	while (!tokenIsEOF (token));
 
@@ -1074,6 +1194,11 @@ static void findRTags (void)
 	markAllEntriesInScopeAsPlaceholder (blackHoleIndex);
 
 	tokenDelete (token);
+}
+
+static void initializeRParser (const langType language)
+{
+	Lang_R = language;
 }
 
 extern parserDefinition *RParser (void)
@@ -1093,31 +1218,53 @@ extern parserDefinition *RParser (void)
 	def->useCork = CORK_QUEUE | CORK_SYMTAB;
 	def->parser = findRTags;
 	def->selectLanguage = selectors;
+	def->initialize = initializeRParser;
 
 	return def;
+}
+
+extern vString *rExtractNameFromString (vString* str)
+{
+	int offset = 0;
+
+	if (vStringLength (str) == 0)
+		return NULL;
+
+	char b = vStringChar (str, 0);
+	if (b == '\'' || b == '"' || b == '`')
+		offset = 1;
+
+	if (offset && vStringLength (str) < 3)
+		return NULL;
+
+	vString *n = vStringNewInit (vStringValue (str) + offset);
+	if (vStringChar (n, vStringLength (n) - 1) == b)
+		vStringChop (n);
+
+	return n;
 }
 
 #ifdef DEBUG
 static const char *tokenTypeStr(enum RTokenType e)
 { /* Generated by misc/enumstr.sh with cmdline:
-     parsers/r.c RTokenType tokenTypeStr TOKEN_ --use-lower-bits-as-is */
+     parsers/r.c RTokenType tokenTypeStr TOKEN_R_ --use-lower-bits-as-is */
 	switch (e)
 	{
-		case            TOKEN_EOF: return "EOF";
-		case      TOKEN_UNDEFINED: return "UNDEFINED";
-		case        TOKEN_KEYWORD: return "KEYWORD";
-		case        TOKEN_NEWLINE: return "NEWLINE";
-		case         TOKEN_NUMBER: return "NUMBER";
-		case         TOKEN_SYMBOL: return "SYMBOL";
-		case         TOKEN_STRING: return "STRING";
-		case       TOKEN_OPERATOR: return "OPERATOR";
-		case           TOKEN_DOTS: return "DOTS";
-		case         TOKEN_DOTS_N: return "DOTS_N";
-		case        TOKEN_LASSIGN: return "LASSIGN";
-		case        TOKEN_RASSIGN: return "RASSIGN";
-		case  TOKEN_DBRACKET_OEPN: return "DBRACKET_OEPN";
-		case TOKEN_DBRACKET_CLOSE: return "DBRACKET_CLOSE";
-		case          TOKEN_SCOPE: return "SCOPE";
+		case            TOKEN_R_EOF: return "EOF";
+		case      TOKEN_R_UNDEFINED: return "UNDEFINED";
+		case        TOKEN_R_KEYWORD: return "KEYWORD";
+		case        TOKEN_R_NEWLINE: return "NEWLINE";
+		case         TOKEN_R_NUMBER: return "NUMBER";
+		case         TOKEN_R_SYMBOL: return "SYMBOL";
+		case         TOKEN_R_STRING: return "STRING";
+		case       TOKEN_R_OPERATOR: return "OPERATOR";
+		case           TOKEN_R_DOTS: return "DOTS";
+		case         TOKEN_R_DOTS_N: return "DOTS_N";
+		case        TOKEN_R_LASSIGN: return "LASSIGN";
+		case        TOKEN_R_RASSIGN: return "RASSIGN";
+		case  TOKEN_R_DBRACKET_OEPN: return "DBRACKET_OEPN";
+		case TOKEN_R_DBRACKET_CLOSE: return "DBRACKET_CLOSE";
+		case          TOKEN_R_SCOPE: return "SCOPE";
 		default:                   break;
 	}
 	static char buf[3];

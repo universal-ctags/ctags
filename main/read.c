@@ -122,6 +122,7 @@ static langType sourceLang;
 */
 static void     langStackInit (langStack *langStack);
 static langType langStackTop  (langStack *langStack);
+static langType langStackBotom(langStack *langStack);
 static void     langStackPush (langStack *langStack, langType type);
 static langType langStackPop  (langStack *langStack);
 static void     langStackClear(langStack *langStack);
@@ -429,6 +430,12 @@ static void resetLangOnStack (inputLangInfo *langInfo, langType lang)
 	Assert (langInfo->stack.count > 0);
 	langStackClear  (& (langInfo->stack));
 	langStackPush (& (langInfo->stack), lang);
+}
+
+extern langType baseLangOnStack (inputLangInfo *langInfo)
+{
+	Assert (langInfo->stack.count > 0);
+	return langStackBotom (& (langInfo->stack));
 }
 
 static void pushLangOnStack (inputLangInfo *langInfo, langType lang)
@@ -1154,6 +1161,11 @@ extern langType popLanguage (void)
 	return popLangOnStack (& inputLang);
 }
 
+extern langType getLanguageForBaseParser (void)
+{
+	return baseLangOnStack (& inputLang);
+}
+
 static void langStackInit (langStack *langStack)
 {
 	langStack->count = 0;
@@ -1166,6 +1178,12 @@ static langType langStackTop (langStack *langStack)
 {
 	Assert (langStack->count > 0);
 	return langStack->languages [langStack->count - 1];
+}
+
+static langType langStackBotom(langStack *langStack)
+{
+	Assert (langStack->count > 0);
+	return langStack->languages [0];
 }
 
 static void     langStackClear (langStack *langStack)

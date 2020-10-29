@@ -119,6 +119,7 @@
 	QemuHXParser, \
 	QtMocParser, \
 	RParser, \
+	R6ClassParser, \
 	RSpecParser, \
 	RexxParser, \
 	RobotParser, \
@@ -126,6 +127,7 @@
 	RstParser, \
 	RubyParser, \
 	RustParser, \
+	S4ClassParser, \
 	SchemeParser, \
 	SCSSParser, \
 	ShParser, \

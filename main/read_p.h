@@ -43,6 +43,7 @@ extern bool doesInputLanguageAllowNullTag (void);
 extern bool doesInputLanguageRequestAutomaticFQTag (void);
 extern bool doesParserRunAsGuest (void);
 extern bool doesSubparserRun (void);
+extern langType getLanguageForBaseParser (void);
 
 extern bool isParserMarkedNoEmission (void);
 extern void freeInputFileResources (void);
