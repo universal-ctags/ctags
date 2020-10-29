@@ -420,23 +420,47 @@ static short hasSimplePortList (verilogKind kind)
 	}
 }
 
-static tokenInfo *newToken (void)
+static void clearToken (tokenInfo *token)
 {
-	tokenInfo *const token = xMalloc (1, tokenInfo);
-	token->kind = K_UNDEFINED;
-	token->name = vStringNew ();
+	token->kind = K_UNDEFINED;	// to be set by updateKind()
+	vStringClear (token->name);
 	token->lineNumber = getInputLineNumber ();
 	token->filePosition = getInputFilePosition ();
 	token->scope = NULL;
 	token->nestLevel = 0;
 	token->lastKind = K_UNDEFINED;
-	token->blockName = vStringNew ();
-	token->inheritance = vStringNew ();
+	vStringClear (token->blockName);
+	vStringClear (token->inheritance);
 	token->prototype = false;
 	token->classScope = false;
 	token->parameter = false;
 	token->hasParamList = false;
+}
+
+static tokenInfo *newToken (void)
+{
+	tokenInfo *const token = xMalloc (1, tokenInfo);
+	token->name = vStringNew ();
+	token->blockName = vStringNew ();
+	token->inheritance = vStringNew ();
+	clearToken(token);
 	return token;
+}
+
+static tokenInfo *dupToken (tokenInfo *token)
+{
+	tokenInfo *dup = newToken ();
+	tokenInfo tmp = *dup;	// save vStrings, name, blockName, and inheritance
+	*dup = *token;
+	// revert vStrings allocated for dup
+	dup->name = tmp.name;
+	dup->blockName = tmp.blockName;
+	dup->inheritance = tmp.inheritance;
+	// copy contents of vStrings
+	vStringCopy (dup->name, token->name);
+	vStringCopy (dup->blockName, token->blockName);
+	vStringCopy (dup->inheritance, token->inheritance);
+	return dup;
 }
 
 static void deleteToken (tokenInfo * const token)
@@ -601,9 +625,16 @@ static int vGetc (void)
 	return c;
 }
 
+// [a-zA-Z_`]
+static bool isFirstIdentifierCharacter (const int c)
+{
+	return (isalpha (c) || c == '_' || c == '`');
+}
+
+// [a-zA-Z0-9_`$]
 static bool isIdentifierCharacter (const int c)
 {
-	return (bool)(isalnum (c)  ||  c == '_'  ||  c == '`');
+	return (isalnum (c) || c == '_' || c == '`' || c == '$');
 }
 
 static int skipWhite (int c)
@@ -639,13 +670,14 @@ static int skipDimension (int c)
 	return c;
 }
 
-static void skipToSemiColon (void)
+static int skipToSemiColon (void)
 {
 	int c;
 	do
 	{
 		c = vGetc ();
 	} while (c != EOF && c != ';');
+	return c;	// ';' or EOF
 }
 
 static int skipExpression(int c)
@@ -716,20 +748,15 @@ static int skipMacro (int c)
 /* read an identifier, keyword, number, compiler directive, or macro identifier */
 static bool readWordToken (tokenInfo *const token, int c)
 {
-	if (isIdentifierCharacter (c))
+	if (isFirstIdentifierCharacter (c))
 	{
-		vStringClear (token->name);
-		while (isIdentifierCharacter (c))
+		clearToken (token);
+		do
 		{
 			vStringPut (token->name, c);
 			c = vGetc ();
-		}
+		} while (isIdentifierCharacter (c));
 		vUngetc (c);
-		token->lineNumber = getInputLineNumber ();
-		token->filePosition = getInputFilePosition ();
-		token->kind = K_UNDEFINED;	// to be set by updateKind()
-		token->parameter = false;
-		token->hasParamList = false;
 		return true;
 	}
 	return false;
@@ -746,12 +773,12 @@ static bool isIdentifier (tokenInfo* token)
 			int c = vStringChar (token->name, i);
 			if (i == 0)
 			{
-				if (!(isalpha (c) || c == '_'))
+				if (c == '`' || !isFirstIdentifierCharacter (c))
 					return false;
 			}
 			else
 			{
-				if (!(isalnum (c) || c == '_' || c == '$'))
+				if (!isIdentifierCharacter (c))
 					return false;
 			}
 		}
@@ -772,8 +799,12 @@ static void updateKind (tokenInfo *const token)
 	token->kind = ((kind == K_UNDEFINED) && isIdentifier(token)) ? K_IDENTIFIER : kind;
 }
 
-static void createContext (tokenInfo *const scope)
+static void createContext (verilogKind kind, vString* const name)
 {
+	tokenInfo *const scope = newToken ();
+	vStringCopy (scope->name, name);
+	scope->kind = kind;
+
 	if (scope)
 	{
 		vString *contextName = vStringNew ();
@@ -920,11 +951,7 @@ static void createTag (tokenInfo *const token, verilogKind kind)
 	/* Push token as context if it is a container */
 	if (container)
 	{
-		tokenInfo *newScope = newToken ();
-
-		vStringCopy (newScope->name, token->name);
-		newScope->kind = kind;
-		createContext (newScope);
+		createContext (kind, token->name);
 
 		/* Include found contents in context */
 		if (tagContents != NULL)
@@ -987,12 +1014,10 @@ static void processEnd (tokenInfo *const token)
 	}
 }
 
-static void processPortList (int c)
+static void processPortList (tokenInfo *token, int c)
 {
 	if ((c = skipWhite (c)) == '(')
 	{
-		tokenInfo *token = newToken ();
-
 		/* Get next non-whitespace character after ( */
 		c = skipWhite (vGetc ());
 
@@ -1027,7 +1052,7 @@ static void processPortList (int c)
 					/* Only add port name if it is the last keyword.
 					 * First keyword can be a dynamic type, like a class name */
 					c = skipWhite (vGetc ());
-					if (! isIdentifierCharacter (c) || c == '`')
+					if (! isFirstIdentifierCharacter (c) || c == '`')
 					{
 						verbose ("Found port: %s\n", vStringValue (token->name));
 						createTag (token, K_PORT);
@@ -1043,15 +1068,12 @@ static void processPortList (int c)
 				c = skipWhite (vGetc ());
 			}
 		}
-
-		if (! isIdentifierCharacter (c)) vUngetc (c);
-
-		deleteToken (token);
+		if (c != ';')
+			verbose ("Unexpected char c = %c\n", c);
 	}
-	else if (c != EOF)
-	{
+
+	if (c != EOF)
 		vUngetc (c);
-	}
 }
 
 static int skipParameterAssignment (int c)
@@ -1073,7 +1095,6 @@ static void processFunction (tokenInfo *const token)
 {
 	verilogKind kind = token->kind;	// K_FUNCTION or K_TASK
 	int c;
-	tokenInfo *classType;
 
 	/* Search for function name
 	 * Last identifier found before a '(' or a ';' is the function name */
@@ -1093,10 +1114,7 @@ static void processFunction (tokenInfo *const token)
 			if (c == ':')
 			{
 				verbose ("Found function declaration with class type %s\n", vStringValue (token->name));
-				classType = newToken ();
-				vStringCopy (classType->name, token->name);
-				classType->kind = K_CLASS;
-				createContext (classType);
+				createContext (K_CLASS, token->name);
 				currentContext->classScope = true;
 			}
 			else
@@ -1114,40 +1132,38 @@ static void processFunction (tokenInfo *const token)
 		createTag (token, kind);
 
 		/* Get port list from function */
-		processPortList (c);
+		processPortList (token, c);
 	}
 }
 
 static void processEnum (tokenInfo *const token)
 {
 	int c;
+	tokenInfo* enumToken = dupToken (token);
 
 	/* Read enum type */
 	c = skipWhite (vGetc ());
-	if (isIdentifierCharacter (c))
+	if (readWordToken (token, c))
 	{
 		tokenInfo* typeQueue = NULL;
-		tokenInfo* type;
 
 		do
 		{
-			type = newToken ();
-
-			readWordToken (type, c);
-			updateKind (type);
-			typeQueue = pushToken (typeQueue, type);
-			verbose ("Enum type %s\n", vStringValue (type->name));
+			updateKind (token);
+			typeQueue = pushToken (typeQueue, dupToken (token));
+			verbose ("Enum type %s\n", vStringValue (token->name));
 			c = skipWhite (vGetc ());
-		} while (isIdentifierCharacter (c));
+		} while (readWordToken (token, c));
 
 		/* Undefined kind means that we've reached the end of the
 		 * declaration without having any contents defined, which
 		 * indicates that this is in fact a forward declaration */
-		if (type->kind == K_IDENTIFIER && (typeQueue->scope == NULL || typeQueue->scope->kind != K_UNDEFINED))
+		if (token->kind == K_IDENTIFIER && (typeQueue->scope == NULL || typeQueue->scope->kind != K_UNDEFINED))
 		{
-			verbose ("Prototype enum found \"%s\"\n", vStringValue (type->name));
-			createTag (type, K_PROTOTYPE);
+			verbose ("Prototype enum found \"%s\"\n", vStringValue (token->name));
+			createTag (token, K_PROTOTYPE);
 			pruneTokens (typeQueue);
+			deleteToken (enumToken);
 			return;
 		}
 
@@ -1162,14 +1178,11 @@ static void processEnum (tokenInfo *const token)
 	if (c == '{')
 	{
 		c = skipWhite (vGetc ());
-		while (isIdentifierCharacter (c))
+		while (readWordToken (token, c))
 		{
-			tokenInfo *content = newToken ();
-
-			readWordToken (content, c);
-			content->kind = K_CONSTANT;
-			tagContents = pushToken (tagContents, content);
-			verbose ("Pushed enum element \"%s\"\n", vStringValue (content->name));
+			token->kind = K_CONSTANT;
+			tagContents = pushToken (tagContents, dupToken (token));
+			verbose ("Pushed enum element \"%s\"\n", vStringValue (token->name));
 
 			/* Skip element ranges */
 			/* TODO Implement element ranges */
@@ -1204,8 +1217,9 @@ static void processEnum (tokenInfo *const token)
 	}
 
 	/* Following identifiers are tag names */
-	verbose ("Find enum tags. Token %s kind %d\n", vStringValue (token->name), token->kind);
-	tagNameList (token, c);
+	verbose ("Find enum tags. Token %s kind %d\n", vStringValue (enumToken->name), enumToken->kind);
+	tagNameList (enumToken, c);
+	deleteToken (enumToken);
 }
 
 static void processStruct (tokenInfo *const token)
@@ -1313,7 +1327,7 @@ static void processTypedef (tokenInfo *const token)
 	createTag (token, K_TYPEDEF);
 }
 
-static tokenInfo * processParameterList (int c)
+static tokenInfo * processParameterList (tokenInfo *token, int c)
 {
 	tokenInfo *head = NULL;
 	tokenInfo *parameters = NULL;
@@ -1323,7 +1337,6 @@ static tokenInfo * processParameterList (int c)
 		c = skipWhite (vGetc ());
 		if (c == '(')
 		{
-			tokenInfo *token = newToken ();
 			do
 			{
 				c = skipWhite (vGetc ());
@@ -1336,15 +1349,15 @@ static tokenInfo * processParameterList (int c)
 						c = skipWhite (vGetc ());
 						if (c == ',' || c == ')' || c == '=')	// ignore user defined type
 						{
-							token->kind = K_CONSTANT;
-							token->parameter = parameter;
+							tokenInfo *param = dupToken (token);
+							param->kind = K_CONSTANT;
+							param->parameter = parameter;
 							if (head == NULL)
 							{
-								head = token;
-								parameters = token;
+								head = param;
+								parameters = param;
 							} else
-								parameters = appendToken (parameters, token);	// append token on parameters
-							token = newToken ();
+								parameters = appendToken (parameters, param);	// append token on parameters
 
 							c = skipExpression (c);
 						}
@@ -1360,7 +1373,6 @@ static tokenInfo * processParameterList (int c)
 				}
 			} while (c != ')' && c != EOF);
 			c = skipWhite (vGetc ());
-			deleteToken (token);
 		}
 	}
 	vUngetc (c);
@@ -1369,38 +1381,40 @@ static tokenInfo * processParameterList (int c)
 
 static void processClass (tokenInfo *const token)
 {
-	/*Note: At the moment, only identifies typedef name and not its contents */
 	int c;
-	tokenInfo *extra;
+	tokenInfo *classToken;
 	tokenInfo *parameters;
 
 	/* Get identifiers */
 	c = skipWhite (vGetc ());
-	if (readWordToken (token, c))
-		c = skipWhite (vGetc ());
+	if (!readWordToken (token, c))
+	{
+		verbose ("Unexpected input: class name is expected.\n");
+		return;
+	}
+
+	/* save token */
+	classToken = dupToken (token);
+	c = skipWhite (vGetc ());
 
 	/* Find class parameters list */
-	parameters = processParameterList (c);
+	parameters = processParameterList (token, c);
 	c = skipWhite (vGetc ());
 
 	/* Search for inheritance information */
-	if (isIdentifierCharacter (c))
+	if (readWordToken (token, c))
 	{
-		extra = newToken ();
-
-		readWordToken (extra, c);
-		c = skipWhite (vGetc ());
-		if (strcmp (vStringValue (extra->name), "extends") == 0)
+		if (strcmp (vStringValue (token->name), "extends") == 0)
 		{
-			readWordToken (extra, c);
-			vStringCopy (token->inheritance, extra->name);
-			verbose ("Inheritance %s\n", vStringValue (token->inheritance));
+			c = skipWhite (vGetc ());
+			readWordToken (token, c);
+			vStringCopy (classToken->inheritance, token->name);
+			verbose ("Inheritance %s\n", vStringValue (classToken->inheritance));
 		}
-		deleteToken (extra);
 	}
 
-	/* Use last identifier to create tag */
-	createTag (token, K_CLASS);
+	createTag (classToken, K_CLASS);
+	deleteToken (classToken);
 
 	/* Add parameter list */
 	while (parameters)
@@ -1423,9 +1437,11 @@ static void processAssertion (tokenInfo *const token)
 {
 	if (vStringLength (currentContext->blockName) > 0)
 	{
+		int c;
 		vStringCopy (token->name, currentContext->blockName);
 		createTag (token, K_ASSERTION);
-		skipToSemiColon ();
+		c = skipToSemiColon ();
+		vUngetc (c);
 	}
 }
 
@@ -1447,7 +1463,7 @@ static void processDesignElement (tokenInfo *const token)
 		c = skipWhite (vGetc ());
 		if (c == '#')
 		{
-			tokenInfo *parameters = processParameterList (c);
+			tokenInfo *parameters = processParameterList (token, c);
 			while (parameters)
 			{
 				createTag (parameters, K_CONSTANT);
@@ -1464,7 +1480,7 @@ static void processDesignElement (tokenInfo *const token)
 			if (kind == K_MODPORT)
 				c = skipPastMatch ("()");	// ignore port list
 			else if (hasSimplePortList (kind))
-				processPortList (c);
+				processPortList (token, c);
 		}
 		else
 		{
@@ -1481,11 +1497,13 @@ static int skipDelay(tokenInfo* token, int c)
 		if (c == '(')
 			c = skipPastMatch ("()");
 		else if (c == ('#')) {
-			skipToSemiColon ();	// a dirty hack for "x ##delay1 y[*min:max];"
-			c = vGetc ();
+			c = skipToSemiColon ();	// a dirty hack for "x ##delay1 y[*min:max];"
 		}
-		else
-			readWordToken (token, c);
+		else	// time literals
+		{
+			while (isIdentifierCharacter (c) || c == '.')
+				c = vGetc ();
+		}
 		c = skipWhite (c);
 	}
 	return c;
@@ -1683,6 +1701,9 @@ static void findVerilogTags (void)
 				{
 					tagContents = popToken (tagContents);
 				}
+				break;
+			case '#':
+				c = skipDelay (token, c);
 				break;
 			default :
 				if (readWordToken (token, c))
