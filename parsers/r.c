@@ -33,9 +33,9 @@
 #include "trace.h"
 #include "vstring.h"
 
-
 #include <string.h>
 #include <ctype.h>	/* to define isalpha(), isalnum(), isspace() */
+
 
 /*
 *   MACROS
@@ -63,10 +63,10 @@
 #define R_TRACE_LEAVE() do {} while (0);
 #endif
 
+
 /*
 *   DATA DEFINITIONS
 */
-
 typedef enum {
 	K_UNDEFINED = -1,
 	K_FUNCTION,
@@ -230,7 +230,6 @@ static struct tokenInfoClass rTokenInfoClass = {
 /*
  * FUNCTION PROTOTYPES
  */
-
 static void parseStatement (tokenInfo *const token, int parent, bool in_arglist, bool in_continuous_pair);
 static void parsePair (tokenInfo *const token, int parent, tokenInfo *const funcall);
 
@@ -238,7 +237,6 @@ static void parsePair (tokenInfo *const token, int parent, tokenInfo *const func
 /*
 *   FUNCTION DEFINITIONS
 */
-
 static int makeSimpleRTag (tokenInfo *const token, int parent, int kind,
 						   const char * assignmentOp)
 {
