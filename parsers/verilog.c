@@ -391,6 +391,7 @@ static short isContainer (verilogKind kind)
 		case K_BLOCK:
 		case K_CHECKER:
 		case K_CLASS:
+		case K_CLOCKING:
 		case K_COVERGROUP:
 		case K_INTERFACE:
 		case K_PACKAGE:
@@ -1502,6 +1503,7 @@ static void processAssertion (tokenInfo *const token)
 // covergroup identifier [ ( [ port_list ] ) ] [ coverage_event ] ;
 // package identifier ;
 // modport < identifier ( < ports_declaration > ) > ;  // FIXME
+// [ default | global ] clocking [ identifier ] ( @ identifier | @ ( event_expression ) )
 static void processDesignElement (tokenInfo *const token)
 {
 	verilogKind kind = token->kind;
@@ -1532,6 +1534,15 @@ static void processDesignElement (tokenInfo *const token)
 			c = skipWhite (vGetc ());
 		}
 
+		// skip clocking_event of clocking block
+		if (c == '@' && kind == K_CLOCKING)
+		{
+			c = skipWhite (vGetc ());
+			if (c == '(')
+				c = skipPastMatch ("()");
+		}
+
+		/* Get port list if required */
 		if (c == '(')	// port_list
 		{
 			if (kind == K_MODPORT)
@@ -1654,7 +1665,10 @@ static void findTag (tokenInfo *const token)
 		case K_PARAMETER:
 		case K_PORT:
 		case K_REGISTER:
-			tagNameList (token, skipWhite (vGetc ()));
+			if (token->kind == K_PORT && currentContext->kind == K_CLOCKING)
+				skipToSemiColon (); // clocking items are not port definitions
+			else
+				tagNameList (token, skipWhite (vGetc ()));
 			break;
 		case K_IDENTIFIER:
 			{
@@ -1684,6 +1698,7 @@ static void findTag (tokenInfo *const token)
 			break;
 
 		case K_CHECKER:
+		case K_CLOCKING:
 		case K_COVERGROUP:
 		case K_INTERFACE:
 		case K_MODPORT:
