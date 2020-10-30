@@ -1,32 +1,178 @@
 deferred_immediate_assertions	input.sv	/^initial begin : deferred_immediate_assertions$/;"	b
 immediate_assertion	input.sv	/^    immediate_assertion : assert () task();$/;"	A	block:deferred_immediate_assertions
-deferred_immediate_assertions.immediate_assertion	input.sv	/^    immediate_assertion : assert () task();$/;"	A	block:deferred_immediate_assertions
 immediate_cover	input.sv	/^    immediate_cover     : cover () task();$/;"	A	block:deferred_immediate_assertions
-deferred_immediate_assertions.immediate_cover	input.sv	/^    immediate_cover     : cover () task();$/;"	A	block:deferred_immediate_assertions
 immediate_assume	input.sv	/^    immediate_assume    : assume () task();$/;"	A	block:deferred_immediate_assertions
-deferred_immediate_assertions.immediate_assume	input.sv	/^    immediate_assume    : assume () task();$/;"	A	block:deferred_immediate_assertions
 deferred_assertion1	input.sv	/^    deferred_assertion1 : assert #0 () task();$/;"	A	block:deferred_immediate_assertions
-deferred_immediate_assertions.deferred_assertion1	input.sv	/^    deferred_assertion1 : assert #0 () task();$/;"	A	block:deferred_immediate_assertions
 deferred_cover1	input.sv	/^    deferred_cover1     : cover #0 () task();$/;"	A	block:deferred_immediate_assertions
-deferred_immediate_assertions.deferred_cover1	input.sv	/^    deferred_cover1     : cover #0 () task();$/;"	A	block:deferred_immediate_assertions
 deferred_assume1	input.sv	/^    deferred_assume1    : assume #0 () task();$/;"	A	block:deferred_immediate_assertions
-deferred_immediate_assertions.deferred_assume1	input.sv	/^    deferred_assume1    : assume #0 () task();$/;"	A	block:deferred_immediate_assertions
 deferred_assertion2	input.sv	/^    deferred_assertion2 : assert final () task();$/;"	A	block:deferred_immediate_assertions
-deferred_immediate_assertions.deferred_assertion2	input.sv	/^    deferred_assertion2 : assert final () task();$/;"	A	block:deferred_immediate_assertions
 deferred_cover2	input.sv	/^    deferred_cover2     : cover final () task();$/;"	A	block:deferred_immediate_assertions
-deferred_immediate_assertions.deferred_cover2	input.sv	/^    deferred_cover2     : cover final () task();$/;"	A	block:deferred_immediate_assertions
 deferred_assume2	input.sv	/^    deferred_assume2    : assume final () task();$/;"	A	block:deferred_immediate_assertions
-deferred_immediate_assertions.deferred_assume2	input.sv	/^    deferred_assume2    : assume final () task();$/;"	A	block:deferred_immediate_assertions
 prop1	input.sv	/^property prop1 ($/;"	R
 m	input.sv	/^    local input int m,$/;"	p	property:prop1
-prop1.m	input.sv	/^    local input int m,$/;"	p	property:prop1
 n	input.sv	/^    logic [1:0] n,$/;"	p	property:prop1
-prop1.n	input.sv	/^    logic [1:0] n,$/;"	p	property:prop1
 o	input.sv	/^    int o$/;"	p	property:prop1
-prop1.o	input.sv	/^    int o$/;"	p	property:prop1
 prop2	input.sv	/^property prop2 (a, b);$/;"	R
 a	input.sv	/^property prop2 (a, b);$/;"	p	property:prop2
-prop2.a	input.sv	/^property prop2 (a, b);$/;"	p	property:prop2
 b	input.sv	/^property prop2 (a, b);$/;"	p	property:prop2
-prop2.b	input.sv	/^property prop2 (a, b);$/;"	p	property:prop2
 concurrent_assertion1	input.sv	/^concurrent_assertion1   : assert property prop2 (l, m);$/;"	A
+assert_test	input.sv	/^module assert_test;$/;"	m
+assert_f	input.sv	/^        assert_f: assert(f) $info("passed"); else $error("failed");$/;"	A	module:assert_test
+assume_inputs	input.sv	/^        assume_inputs: assume (in_a || in_b) $info("assumption holds");$/;"	A	module:assert_test
+cover_a_and_b	input.sv	/^        cover_a_and_b: cover (in_a && in_b) $info("in_a && in_b == 1 covered");$/;"	A	module:assert_test
+t	input.sv	/^    time t;$/;"	r	module:assert_test
+b1	input.sv	/^    always_comb begin : b1$/;"	b	module:assert_test
+a1	input.sv	/^        a1: assert (not_a != a);$/;"	A	block:assert_test.b1
+a2	input.sv	/^        a2: assert #0 (not_a != a); \/\/ Should pass once values have settled$/;"	A	block:assert_test.b1
+b1	input.sv	/^    always_comb begin : b1$/;"	b	module:assert_test
+c1	input.sv	/^        c1: cover (b != a);$/;"	A	block:assert_test.b1
+c2	input.sv	/^        c2: cover #0 (b != a);$/;"	A	block:assert_test.b1
+error_type	input.sv	/^    function int error_type (int opcode);$/;"	f	module:assert_test
+opcode	input.sv	/^    function int error_type (int opcode);$/;"	p	function:assert_test.error_type
+func_assert	input.sv	/^        func_assert: assert (opcode < 64) else $display("Opcode error.");$/;"	A	function:assert_test.error_type
+b1	input.sv	/^        always_comb begin : b1$/;"	b	module:assert_test
+a1	input.sv	/^            a1: assert #0 (my_cond) else$/;"	A	block:assert_test.b1
+a2	input.sv	/^            a2: assert #0 (my_cond) else$/;"	A	block:assert_test.b1
+dut	input.sv	/^module dut(input logic clk, input logic a, input logic b);$/;"	m
+clk	input.sv	/^module dut(input logic clk, input logic a, input logic b);$/;"	p	module:dut
+a	input.sv	/^module dut(input logic clk, input logic a, input logic b);$/;"	p	module:dut
+b	input.sv	/^module dut(input logic clk, input logic a, input logic b);$/;"	p	module:dut
+c	input.sv	/^    logic c;$/;"	r	module:dut
+a1	input.sv	/^    a1: assert #0 (!(a & c)) $display("Pass"); else $display("Fail");$/;"	A	module:dut
+a2	input.sv	/^    a2: assert final (!(a & c)) $display("Pass"); else $display("Fail");$/;"	A	module:dut
+tb	input.sv	/^program tb(input logic clk, output logic a, output logic b);$/;"	P
+clk	input.sv	/^program tb(input logic clk, output logic a, output logic b);$/;"	p	program:tb
+a	input.sv	/^program tb(input logic clk, output logic a, output logic b);$/;"	p	program:tb
+b	input.sv	/^program tb(input logic clk, output logic a, output logic b);$/;"	p	program:tb
+m	input.sv	/^    default clocking m @(posedge clk);$/;"	L	program:tb
+sva_svtb	input.sv	/^module sva_svtb;$/;"	m
+clk	input.sv	/^    bit clk;$/;"	r	module:sva_svtb
+a	input.sv	/^    logic a, b;$/;"	r	module:sva_svtb
+b	input.sv	/^    logic a, b;$/;"	r	module:sva_svtb
+m	input.sv	/^module m (input a, b);$/;"	m
+a	input.sv	/^module m (input a, b);$/;"	p	module:m
+b	input.sv	/^module m (input a, b);$/;"	p	module:m
+a1	input.sv	/^    a1: assert #0 (a == b);$/;"	A	module:m
+m	input.sv	/^module m (input a, b);$/;"	m
+a	input.sv	/^module m (input a, b);$/;"	p	module:m
+b	input.sv	/^module m (input a, b);$/;"	p	module:m
+a1	input.sv	/^        a1: assert #0 (a == b);$/;"	A	module:m
+m	input.sv	/^module m (input bad_val, bad_val_ok, a, b, c, clear_b2);$/;"	m
+bad_val	input.sv	/^module m (input bad_val, bad_val_ok, a, b, c, clear_b2);$/;"	p	module:m
+bad_val_ok	input.sv	/^module m (input bad_val, bad_val_ok, a, b, c, clear_b2);$/;"	p	module:m
+a	input.sv	/^module m (input bad_val, bad_val_ok, a, b, c, clear_b2);$/;"	p	module:m
+b	input.sv	/^module m (input bad_val, bad_val_ok, a, b, c, clear_b2);$/;"	p	module:m
+c	input.sv	/^module m (input bad_val, bad_val_ok, a, b, c, clear_b2);$/;"	p	module:m
+clear_b2	input.sv	/^module m (input bad_val, bad_val_ok, a, b, c, clear_b2);$/;"	p	module:m
+b1	input.sv	/^    always @(bad_val or bad_val_ok) begin : b1$/;"	b	module:m
+a1	input.sv	/^        a1: assert #0 (bad_val) else $fatal(1, "Sorry");$/;"	A	block:m.b1
+b2	input.sv	/^    always @(a or b or c) begin : b2$/;"	b	module:m
+a2	input.sv	/^            a2: assert #0 (a && b);$/;"	A	block:m.b2
+a3	input.sv	/^         a3: assert #0 (a || b);$/;"	A	block:m.b2
+b3	input.sv	/^    always @(clear_b2) begin : b3$/;"	b	module:m
+m	input.sv	/^module m;$/;"	m
+a	input.sv	/^    bit a;$/;"	r	module:m
+b	input.sv	/^    integer b;$/;"	r	module:m
+q	input.sv	/^    byte q[$];$/;"	r	module:m
+p1	input.sv	/^    property p1;$/;"	R	module:m
+p2	input.sv	/^    property p2;$/;"	R	module:m
+l_b	input.sv	/^        integer l_b;$/;"	r	property:m.p2
+count	input.sv	/^    bit [2:0] count;$/;"	r	module:m
+t	input.sv	/^    realtime t;$/;"	r	module:m
+p1	input.sv	/^    property p1;$/;"	R	module:m
+p2	input.sv	/^    property p2;$/;"	R	module:m
+l_t	input.sv	/^        realtime l_t;$/;"	r	property:m.p2
+m	input.sv	/^module m;$/;"	m
+delay_example	input.sv	/^    sequence delay_example(x, y, min, max, delay1);$/;"	q	module:m
+x	input.sv	/^    sequence delay_example(x, y, min, max, delay1);$/;"	p	sequence:m.delay_example
+y	input.sv	/^    sequence delay_example(x, y, min, max, delay1);$/;"	p	sequence:m.delay_example
+min	input.sv	/^    sequence delay_example(x, y, min, max, delay1);$/;"	p	sequence:m.delay_example
+max	input.sv	/^    sequence delay_example(x, y, min, max, delay1);$/;"	p	sequence:m.delay_example
+delay1	input.sv	/^    sequence delay_example(x, y, min, max, delay1);$/;"	p	sequence:m.delay_example
+a1	input.sv	/^    a1: assert property (@(posedge clk) delay_example(x, y, 3, $, 2));$/;"	A	module:m
+z	input.sv	/^    int z, d;$/;"	r	module:m
+d	input.sv	/^    int z, d;$/;"	r	module:m
+s1	input.sv	/^    sequence s1;$/;"	q	module:m
+s2	input.sv	/^    sequence s2;$/;"	q	module:m
+s3	input.sv	/^    sequence s3;$/;"	q	module:m
+s4	input.sv	/^    sequence s4;$/;"	q	module:m
+s20_1	input.sv	/^    sequence s20_1(data,en);$/;"	q	module:m
+data	input.sv	/^    sequence s20_1(data,en);$/;"	p	sequence:m.s20_1
+en	input.sv	/^    sequence s20_1(data,en);$/;"	p	sequence:m.s20_1
+s	input.sv	/^    sequence s;$/;"	q	module:m
+rule	input.sv	/^    sequence rule;$/;"	q	module:m
+rule	input.sv	/^    sequence rule;$/;"	q	module:m
+m	input.sv	/^module m;$/;"	m
+s1	input.sv	/^    sequence s1(w, x, y);$/;"	q	module:m
+w	input.sv	/^    sequence s1(w, x, y);$/;"	p	sequence:m.s1
+x	input.sv	/^    sequence s1(w, x, y);$/;"	p	sequence:m.s1
+y	input.sv	/^    sequence s1(w, x, y);$/;"	p	sequence:m.s1
+s2	input.sv	/^    sequence s2(w, y, bit x);$/;"	q	module:m
+w	input.sv	/^    sequence s2(w, y, bit x);$/;"	p	sequence:m.s2
+y	input.sv	/^    sequence s2(w, y, bit x);$/;"	p	sequence:m.s2
+x	input.sv	/^    sequence s2(w, y, bit x);$/;"	p	sequence:m.s2
+delay_arg_example	input.sv	/^    sequence delay_arg_example (max, shortint delay1, delay2, min);$/;"	q	module:m
+max	input.sv	/^    sequence delay_arg_example (max, shortint delay1, delay2, min);$/;"	p	sequence:m.delay_arg_example
+delay1	input.sv	/^    sequence delay_arg_example (max, shortint delay1, delay2, min);$/;"	p	sequence:m.delay_arg_example
+delay2	input.sv	/^    sequence delay_arg_example (max, shortint delay1, delay2, min);$/;"	p	sequence:m.delay_arg_example
+min	input.sv	/^    sequence delay_arg_example (max, shortint delay1, delay2, min);$/;"	p	sequence:m.delay_arg_example
+my_delay	input.sv	/^    parameter my_delay=2;$/;"	c	module:m
+event_arg_example	input.sv	/^    sequence event_arg_example (event ev);$/;"	q	module:m
+ev	input.sv	/^    sequence event_arg_example (event ev);$/;"	p	sequence:m.event_arg_example
+event_arg_example2	input.sv	/^    sequence event_arg_example2 (reg sig);$/;"	q	module:m
+sig	input.sv	/^    sequence event_arg_example2 (reg sig);$/;"	p	sequence:m.event_arg_example2
+s	input.sv	/^    sequence s(bit a, bit b);$/;"	q	module:m
+a	input.sv	/^    sequence s(bit a, bit b);$/;"	p	sequence:m.s
+b	input.sv	/^    sequence s(bit a, bit b);$/;"	p	sequence:m.s
+loc_a	input.sv	/^        bit loc_a;$/;"	r	sequence:m.s
+m	input.sv	/^module m;$/;"	m
+s	input.sv	/^    sequence s;$/;"	q	module:m
+u	input.sv	/^        logic u, v = a, w = v || b;$/;"	r	sequence:m.s
+v	input.sv	/^        logic u, v = a, w = v || b;$/;"	r	sequence:m.s
+w	input.sv	/^        logic u, v = a, w = v || b;$/;"	r	sequence:m.s
+e	input.sv	/^    property e;$/;"	R	module:m
+x	input.sv	/^        int x;$/;"	r	property:m.e
+m	input.sv	/^module m;$/;"	m
+p3	input.sv	/^    property p3;$/;"	R	module:m
+c1	input.sv	/^    c1: cover property (@(posedge clk) a #-# p3);$/;"	A	module:m
+a1	input.sv	/^    a1: assert property (@(posedge clk) a |-> p3);$/;"	A	module:m
+m	input.sv	/^module m;$/;"	m
+p	input.sv	/^    property p;$/;"	R	module:m
+v	input.sv	/^        logic v = e;$/;"	r	property:m.p
+a1	input.sv	/^    a1: assert property (@(posedge clk) f |=> p);$/;"	A	module:m
+p	input.sv	/^    property p;$/;"	R	module:m
+v	input.sv	/^        logic v;$/;"	r	property:m.p
+m	input.sv	/^module m;$/;"	m
+abc	input.sv	/^    property abc(a, b, c);$/;"	R	module:m
+a	input.sv	/^    property abc(a, b, c);$/;"	p	property:m.abc
+b	input.sv	/^    property abc(a, b, c);$/;"	p	property:m.abc
+c	input.sv	/^    property abc(a, b, c);$/;"	p	property:m.abc
+env_prop	input.sv	/^    env_prop: assert property (abc(rst, in1, in2))$/;"	A	module:m
+abc	input.sv	/^    property abc(a, b, c);$/;"	R	module:m
+a	input.sv	/^    property abc(a, b, c);$/;"	p	property:m.abc
+b	input.sv	/^    property abc(a, b, c);$/;"	p	property:m.abc
+c	input.sv	/^    property abc(a, b, c);$/;"	p	property:m.abc
+env_prop	input.sv	/^        assume property (abc(req, gnt, rst)) else $error(”Assumption failed.”);$/;"	A	module:m
+a1	input.sv	/^    a1:assume property ( @(posedge clk) req dist {0:=40, 1:=60} ) ;$/;"	A	module:m
+proto	input.sv	/^    property proto ;$/;"	R	module:m
+a1_assertion	input.sv	/^    a1_assertion:assert property ( @(posedge clk) req inside {0, 1} ) ;$/;"	A	module:m
+proto_assertion	input.sv	/^    property proto_assertion ;$/;"	R	module:m
+tst	input.sv	/^program tst;$/;"	P
+data	input.sv	/^    integer data;$/;"	r	program:tst
+wait_for	input.sv	/^    task automatic wait_for( integer value, output bit success );$/;"	t	program:tst
+value	input.sv	/^    task automatic wait_for( integer value, output bit success );$/;"	p	task:tst.wait_for
+success	input.sv	/^    task automatic wait_for( integer value, output bit success );$/;"	p	task:tst.wait_for
+ok	input.sv	/^        bit ok;$/;"	r	program:tst
+A	input.sv	/^module A;$/;"	m
+a	input.sv	/^    logic a, clk;$/;"	r	module:A
+clk	input.sv	/^    logic a, clk;$/;"	r	module:A
+cb_with_input	input.sv	/^    clocking cb_with_input @(posedge clk);$/;"	L	module:A
+p1	input.sv	/^        property p1;$/;"	R	clocking:A.cb_with_input
+cb_without_input	input.sv	/^    clocking cb_without_input @(posedge clk);$/;"	L	module:A
+p1	input.sv	/^        property p1;$/;"	R	clocking:A.cb_without_input
+p1	input.sv	/^    property p1;$/;"	R	module:A
+p2	input.sv	/^    property p2;$/;"	R	module:A
+a1	input.sv	/^    a1: assert property (p1);$/;"	A	module:A
+a2	input.sv	/^    a2: assert property (cb_with_input.p1);$/;"	A	module:A
+a3	input.sv	/^    a3: assert property (p2);$/;"	A	module:A
+a4	input.sv	/^    a4: assert property (cb_without_input.p1);$/;"	A	module:A

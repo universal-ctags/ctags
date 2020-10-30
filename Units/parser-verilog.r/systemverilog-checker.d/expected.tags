@@ -1,0 +1,69 @@
+my_check1	input.sv	/^checker my_check1 (logic test_sig, event clock);$/;"	H
+test_sig	input.sv	/^checker my_check1 (logic test_sig, event clock);$/;"	p	checker:my_check1
+clock	input.sv	/^checker my_check1 (logic test_sig, event clock);$/;"	p	checker:my_check1
+p	input.sv	/^    property p(logic sig);$/;"	R	checker:my_check1
+sig	input.sv	/^    property p(logic sig);$/;"	p	property:my_check1.p
+a1	input.sv	/^    a1: assert property (p (test_sig));$/;"	A	checker:my_check1
+c1	input.sv	/^    c1: cover property (!test_sig ##1 test_sig);$/;"	A	checker:my_check1
+my_check2	input.sv	/^checker my_check2 (logic a, b);$/;"	H
+a	input.sv	/^checker my_check2 (logic a, b);$/;"	p	checker:my_check2
+b	input.sv	/^checker my_check2 (logic a, b);$/;"	p	checker:my_check2
+a1	input.sv	/^    a1: assert #0 ($onehot0({a, b});$/;"	A	checker:my_check2
+c1	input.sv	/^    c1: cover #0 (a == 0 && b == 0);$/;"	A	checker:my_check2
+c2	input.sv	/^    c2: cover #0 (a == 1);$/;"	A	checker:my_check2
+c3	input.sv	/^    c3: cover #0 (b == 1);$/;"	A	checker:my_check2
+my_check3	input.sv	/^checker my_check3 (logic a, b, event clock, output bit failure, undef);$/;"	H
+a	input.sv	/^checker my_check3 (logic a, b, event clock, output bit failure, undef);$/;"	p	checker:my_check3
+b	input.sv	/^checker my_check3 (logic a, b, event clock, output bit failure, undef);$/;"	p	checker:my_check3
+clock	input.sv	/^checker my_check3 (logic a, b, event clock, output bit failure, undef);$/;"	p	checker:my_check3
+failure	input.sv	/^checker my_check3 (logic a, b, event clock, output bit failure, undef);$/;"	p	checker:my_check3
+undef	input.sv	/^checker my_check3 (logic a, b, event clock, output bit failure, undef);$/;"	p	checker:my_check3
+a1	input.sv	/^    a1: assert property ($onehot0({a, b}) failure = 1'b0; else failure = 1'b1;$/;"	A	checker:my_check3
+a2	input.sv	/^    a2: assert property ($isunknown({a, b}) undef = 1'b0; else undef = 1'b1;$/;"	A	checker:my_check3
+my_check4	input.sv	/^checker my_check4 (input logic in,$/;"	H
+in	input.sv	/^checker my_check4 (input logic in,$/;"	p	checker:my_check4
+en	input.sv	/^                   en = 1'b1, \/\/ default value$/;"	p	checker:my_check4
+clock	input.sv	/^                   event clock,$/;"	p	checker:my_check4
+ctr	input.sv	/^                   output int ctr = 0); \/\/ initial value$/;"	p	checker:my_check4
+a1	input.sv	/^    a1: assert property (ctr < 5);$/;"	A	checker:my_check4
+m	input.sv	/^module m;$/;"	m
+c1	input.sv	/^    checker c1;$/;"	H	module:m
+c2	input.sv	/^    checker c2;$/;"	H	module:m
+mutex	input.sv	/^checker mutex (logic [31:0] sig, event clock, output bit failure);$/;"	H
+sig	input.sv	/^checker mutex (logic [31:0] sig, event clock, output bit failure);$/;"	p	checker:mutex
+clock	input.sv	/^checker mutex (logic [31:0] sig, event clock, output bit failure);$/;"	p	checker:mutex
+failure	input.sv	/^checker mutex (logic [31:0] sig, event clock, output bit failure);$/;"	p	checker:mutex
+m	input.sv	/^module m(wire [31:0] bus, logic clk);$/;"	m
+bus	input.sv	/^module m(wire [31:0] bus, logic clk);$/;"	n	module:m
+clk	input.sv	/^module m(wire [31:0] bus, logic clk);$/;"	n	module:m
+res	input.sv	/^    logic res, scan;$/;"	r	module:m
+scan	input.sv	/^    logic res, scan;$/;"	r	module:m
+c1	input.sv	/^checker c1(event clk, logic[7:0] a, b);$/;"	H
+clk	input.sv	/^checker c1(event clk, logic[7:0] a, b);$/;"	p	checker:c1
+a	input.sv	/^checker c1(event clk, logic[7:0] a, b);$/;"	p	checker:c1
+b	input.sv	/^checker c1(event clk, logic[7:0] a, b);$/;"	p	checker:c1
+sum	input.sv	/^    logic [7:0] sum;$/;"	r	checker:c1
+p0	input.sv	/^        p0: assert property (sum < `MAX_SUM);$/;"	A	checker:c1
+p1	input.sv	/^    p1: assert property (@clk sum < `MAX_SUM);$/;"	A	checker:c1
+p2	input.sv	/^    p2: assert property (@clk a != b);$/;"	A	checker:c1
+p3	input.sv	/^    p3: assert #0 ($onehot(a));$/;"	A	checker:c1
+m	input.sv	/^module m(input logic rst, clk, logic en, logic[7:0] in1, in2,$/;"	m
+rst	input.sv	/^module m(input logic rst, clk, logic en, logic[7:0] in1, in2,$/;"	p	module:m
+clk	input.sv	/^module m(input logic rst, clk, logic en, logic[7:0] in1, in2,$/;"	p	module:m
+en	input.sv	/^module m(input logic rst, clk, logic en, logic[7:0] in1, in2,$/;"	p	module:m
+in1	input.sv	/^module m(input logic rst, clk, logic en, logic[7:0] in1, in2,$/;"	p	module:m
+in2	input.sv	/^module m(input logic rst, clk, logic en, logic[7:0] in1, in2,$/;"	p	module:m
+in_array	input.sv	/^         in_array [20:0]);$/;"	p	module:m
+v1	input.sv	/^        automatic logic [7:0] v1=0;$/;"	r	module:m
+i	input.sv	/^        for (int i = 0; i < 4; i++) begin$/;"	r	module:m
+counter_model	input.sv	/^checker counter_model(logic flag);$/;"	H
+flag	input.sv	/^checker counter_model(logic flag);$/;"	p	checker:counter_model
+counter	input.sv	/^    bit [2:0] counter = '0;$/;"	r	checker:counter_model
+counter	input.sv	/^    assert property (@$global_clock counter == 0 |-> flag); \/\/ FIXME$/;"	r	checker:counter_model
+observer_model	input.sv	/^checker observer_model(bit valid, reset);$/;"	H
+valid	input.sv	/^checker observer_model(bit valid, reset);$/;"	p	checker:observer_model
+reset	input.sv	/^checker observer_model(bit valid, reset);$/;"	p	checker:observer_model
+flag	input.sv	/^    rand bit flag;$/;"	r	checker:observer_model
+m1	input.sv	/^    m1: assume property (reset |=> !flag);$/;"	A	checker:observer_model
+m2	input.sv	/^    m2: assume property (!reset && flag |=> flag);$/;"	A	checker:observer_model
+m3	input.sv	/^    m3: assume property ($rising_gclk(flag) |-> valid);$/;"	A	checker:observer_model

@@ -78,7 +78,10 @@ typedef enum {
 	K_PROTOTYPE,
 	K_PROPERTY,
 	K_STRUCT,
-	K_TYPEDEF
+	K_TYPEDEF,
+	K_CHECKER,
+	K_CLOCKING,
+	K_SEQUENCE
 } verilogKind;
 
 typedef struct {
@@ -121,7 +124,7 @@ static kindDefinition VerilogKinds [] = {
  { true, 'm', "module",    "modules" },
  { true, 'n', "net",       "net data types" },
  { true, 'p', "port",      "ports" },
- { true, 'r', "register",  "register data types" },
+ { true, 'r', "register",  "variable data types" },
  { true, 't', "task",      "tasks" },
  { true, 'b', "block",     "blocks (begin, fork)" }
 };
@@ -133,7 +136,7 @@ static kindDefinition SystemVerilogKinds [] = {
  { true, 'm', "module",    "modules" },
  { true, 'n', "net",       "net data types" },
  { true, 'p', "port",      "ports" },
- { true, 'r', "register",  "register data types" },
+ { true, 'r', "register",  "variable data types" },
  { true, 't', "task",      "tasks" },
  { true, 'b', "block",     "blocks (begin, fork)" },
  { true, 'A', "assert",    "assertions (assert, assume, cover, restrict)" },
@@ -147,7 +150,10 @@ static kindDefinition SystemVerilogKinds [] = {
  { false,'Q', "prototype", "prototypes (extern, pure)" },
  { true, 'R', "property",  "properties" },
  { true, 'S', "struct",    "structs and unions" },
- { true, 'T', "typedef",   "type declarations" }
+ { true, 'T', "typedef",   "type declarations" },
+ { true, 'H', "checker",   "checkers" },
+ { true, 'L', "clocking",  "clocking" },
+ { true, 'q', "sequence",  "sequences" }
 };
 
 static const keywordAssoc KeywordTable [] = {
@@ -196,15 +202,20 @@ static const keywordAssoc KeywordTable [] = {
 	{ "bit",           	K_REGISTER,  	{ 1, 0 } },
 	{ "byte",          	K_REGISTER,  	{ 1, 0 } },
 	{ "chandle",       	K_REGISTER,  	{ 1, 0 } },
+	{ "checker",       	K_CHECKER,  	{ 1, 0 } },
 	{ "class",         	K_CLASS,     	{ 1, 0 } },
 	{ "cover",         	K_ASSERTION, 	{ 1, 0 } },
+	{ "clocking",       K_CLOCKING,     { 1, 0 } },
 	{ "covergroup",    	K_COVERGROUP,	{ 1, 0 } },
+	{ "endchecker",    	K_END_DE,    	{ 1, 0 } },
 	{ "endclass",      	K_END_DE,    	{ 1, 0 } },
+	{ "endclocking",    K_END_DE,     	{ 1, 0 } },
 	{ "endgroup",      	K_END_DE,    	{ 1, 0 } },
 	{ "endinterface",  	K_END_DE,    	{ 1, 0 } },
 	{ "endpackage",    	K_END_DE,    	{ 1, 0 } },
 	{ "endprogram",    	K_END_DE,    	{ 1, 0 } },
 	{ "endproperty",   	K_END_DE,    	{ 1, 0 } },
+	{ "endsequence",   	K_END_DE,    	{ 1, 0 } },
 	{ "enum",          	K_ENUM,      	{ 1, 0 } },
 	{ "extern",        	K_PROTOTYPE, 	{ 1, 0 } },
 	{ "int",           	K_REGISTER,  	{ 1, 0 } },
@@ -220,7 +231,8 @@ static const keywordAssoc KeywordTable [] = {
 	{ "property",      	K_PROPERTY,  	{ 1, 0 } },
 	{ "pure",          	K_PROTOTYPE, 	{ 1, 0 } },
 	{ "ref",           	K_PORT,      	{ 1, 0 } },
-	{ "sequence",      	K_PROPERTY,  	{ 1, 0 } },
+	{ "restrict",      	K_ASSERTION, 	{ 1, 0 } },
+	{ "sequence",      	K_SEQUENCE,  	{ 1, 0 } },
 	{ "shortint",      	K_REGISTER,  	{ 1, 0 } },
 	{ "shortreal",     	K_REGISTER,  	{ 1, 0 } },
 	{ "string",        	K_REGISTER,  	{ 1, 0 } },
@@ -377,12 +389,14 @@ static short isContainer (verilogKind kind)
 		case K_TASK:
 		case K_FUNCTION:
 		case K_BLOCK:
+		case K_CHECKER:
 		case K_CLASS:
 		case K_COVERGROUP:
 		case K_INTERFACE:
 		case K_PACKAGE:
 		case K_PROGRAM:
 		case K_PROPERTY:
+		case K_SEQUENCE:
 		case K_TYPEDEF:
 		case K_ENUM:
 			return true;
@@ -409,10 +423,12 @@ static short hasSimplePortList (verilogKind kind)
 	{
 		case K_TASK:
 		case K_FUNCTION:
+		case K_CHECKER:
 		case K_CLASS:
 		case K_INTERFACE:
 		case K_PROGRAM:
 		case K_PROPERTY:
+		case K_SEQUENCE:
 			return true;
 		default:
 			return false;
@@ -1467,6 +1483,7 @@ static void processAssertion (tokenInfo *const token)
 	{
 		int c;
 		vStringCopy (token->name, currentContext->blockName);
+		vStringClear (currentContext->blockName);	// clear block name not to be reused
 		createTag (token, K_ASSERTION);
 		c = skipToSemiColon ();
 		vUngetc (c);
@@ -1666,6 +1683,7 @@ static void findTag (tokenInfo *const token)
 			currentContext->prototype = true;
 			break;
 
+		case K_CHECKER:
 		case K_COVERGROUP:
 		case K_INTERFACE:
 		case K_MODPORT:
@@ -1673,6 +1691,7 @@ static void findTag (tokenInfo *const token)
 		case K_PACKAGE:
 		case K_PROGRAM:
 		case K_PROPERTY:
+		case K_SEQUENCE:
 			processDesignElement(token);
 			break;
 		case K_END_DE:
