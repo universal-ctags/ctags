@@ -1242,6 +1242,11 @@ static void processEnum (tokenInfo *const token)
 	verbose ("Find enum tags. Token %s kind %d\n", vStringValue (enumToken->name), enumToken->kind);
 	tagNameList (enumToken, c);
 	deleteToken (enumToken);
+
+	// Cleanup tag contents list at end of declaration to support multiple variables;
+	//   enum { ... } foo, bar;
+	while (tagContents)
+		tagContents = popToken (tagContents);
 }
 
 // [ struct | union [ tagged ] ] [ packed [ signed | unsigned ] ] { struct_union_member { struct_union_member } } { [ … ] }
@@ -1768,12 +1773,6 @@ static void findVerilogTags (void)
 
 				/* Prototypes end at the end of statement */
 				currentContext->prototype = false;
-
-				/* Cleanup tag contents list at end of declaration */
-				while (tagContents)
-				{
-					tagContents = popToken (tagContents);
-				}
 				break;
 			case '(':	// ignore locally declared variables in a for-loop (LRM 12.7.1)
 				c = skipPastMatch ("()");;
