@@ -1675,6 +1675,8 @@ static void findTag (tokenInfo *const token)
 				int c = skipWhite(vGetc());
 				if (c == ':')
 					vUngetc(c); /* label */
+				else if (c == '{')
+					;
 				else if (c == '=')
 					c = skipExpression (skipWhite(vGetc()));
 				else
@@ -1762,9 +1764,8 @@ static void findVerilogTags (void)
 				/* Drop context on prototypes because they don't have an
 				 * end statement */
 				if (currentContext->scope && currentContext->scope->prototype)
-				{
 					dropContext ();
-				}
+
 				/* Prototypes end at the end of statement */
 				currentContext->prototype = false;
 
@@ -1774,8 +1775,17 @@ static void findVerilogTags (void)
 					tagContents = popToken (tagContents);
 				}
 				break;
+			case '(':	// ignore locally declared variables in a for-loop (LRM 12.7.1)
+				c = skipPastMatch ("()");;
+				vUngetc (c);
+				break;
+			case '{':
+				c = skipPastMatch ("{}");;
+				vUngetc (c);
+				break;
 			case '#':
 				c = skipDelay (token, c);
+				vUngetc (c);
 				break;
 			default :
 				if (readWordToken (token, c))

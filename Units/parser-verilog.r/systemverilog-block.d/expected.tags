@@ -11,11 +11,9 @@ block1	input.sv	/^module block1 #(N_IF = 8) ($/;"	m
 N_IF	input.sv	/^module block1 #(N_IF = 8) ($/;"	c	module:block1	parameter:
 clk	input.sv	/^  input logic clk, rst_n$/;"	p	module:block1
 rst_n	input.sv	/^  input logic clk, rst_n$/;"	p	module:block1
-gi	input.sv	/^  generate for (genvar gi = 0; gi < N_IF; ++gi) begin : b_g1$/;"	r	module:block1
 b_g1	input.sv	/^  generate for (genvar gi = 0; gi < N_IF; ++gi) begin : b_g1$/;"	b	module:block1
 a	input.sv	/^      logic a;$/;"	r	block:block1.b_g1
 var_b_g	input.sv	/^    logic var_b_g;$/;"	r	block:block1.b_g1
-gi	input.sv	/^  for (genvar gi = 0; gi < N_IF; ++gi) begin : b_g2$/;"	r	module:block1
 b_g2	input.sv	/^  for (genvar gi = 0; gi < N_IF; ++gi) begin : b_g2$/;"	b	module:block1
 b1	input.sv	/^    always_comb begin:b1$/;"	b	block:block1.b_g2
 lb1	input.sv	/^        logic lb1;$/;"	r	block:block1.b_g2.b1

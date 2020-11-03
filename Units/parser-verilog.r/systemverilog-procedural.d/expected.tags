@@ -2,15 +2,11 @@ procedural	input.sv	/^module procedural;$/;"	m
 s	input.sv	/^  string s;$/;"	r	module:procedural
 N	input.sv	/^  parameter N = 8;$/;"	c	module:procedural
 a	input.sv	/^    int a;$/;"	r	module:procedural
-i	input.sv	/^    for (int i = 0; i < N; i++) begin : outer1$/;"	r	module:procedural
 outer1	input.sv	/^    for (int i = 0; i < N; i++) begin : outer1$/;"	b	module:procedural
 b	input.sv	/^      int b;$/;"	r	block:procedural.outer1
-j	input.sv	/^      for (int j = 0; j < N; j++) begin:inner1$/;"	r	block:procedural.outer1
 inner1	input.sv	/^      for (int j = 0; j < N; j++) begin:inner1$/;"	b	block:procedural.outer1
 c	input.sv	/^        int c;$/;"	r	block:procedural.outer1.inner1
-i	input.sv	/^    for (int i = 0; i < N; i++) begin : outer2$/;"	r	module:procedural
 outer2	input.sv	/^    for (int i = 0; i < N; i++) begin : outer2$/;"	b	module:procedural
 d	input.sv	/^      int d;$/;"	r	block:procedural.outer2
-j	input.sv	/^      for (int j = 0; j < N; j++) begin:inner2$/;"	r	block:procedural.outer2
 inner2	input.sv	/^      for (int j = 0; j < N; j++) begin:inner2$/;"	b	block:procedural.outer2
 e	input.sv	/^        int e;$/;"	r	block:procedural.outer2.inner2

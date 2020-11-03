@@ -1,10 +1,8 @@
 task_func	input.sv	/^module task_func;$/;"	m
 crc	input.sv	/^  function automatic int crc( ref byte packet [1000:1] );$/;"	f	module:task_func
 packet	input.sv	/^  function automatic int crc( ref byte packet [1000:1] );$/;"	p	function:task_func.crc
-j	input.sv	/^    for( int j= 1; j <= 1000; j++ ) begin$/;"	r	function:task_func.crc
 show	input.sv	/^  task automatic show ( const ref byte data [] );$/;"	t	module:task_func
 data	input.sv	/^  task automatic show ( const ref byte data [] );$/;"	p	task:task_func.show
-j	input.sv	/^    for ( int j = 0; j < data.size ; j++ )$/;"	r	task:task_func.show
 attr	input.sv	/^  task automatic attr ( (* my_attr *) const ref foo, enum { s0, s1 } sel_e );$/;"	t	module:task_func
 foo	input.sv	/^  task automatic attr ( (* my_attr *) const ref foo, enum { s0, s1 } sel_e );$/;"	p	task:task_func.attr
 sel_e	input.sv	/^  task automatic attr ( (* my_attr *) const ref foo, enum { s0, s1 } sel_e );$/;"	p	task:task_func.attr
