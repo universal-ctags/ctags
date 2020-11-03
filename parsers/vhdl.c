@@ -178,7 +178,8 @@ typedef enum {
 	VHDLTAG_FUNCTION,
 	VHDLTAG_PROCEDURE,
 	VHDLTAG_PACKAGE,
-	VHDLTAG_LOCAL
+	VHDLTAG_LOCAL,
+	VHDLTAG_ARCHITECTURE,
 } vhdlKind;
 
 static kindDefinition VhdlKinds[] = {
@@ -192,7 +193,8 @@ static kindDefinition VhdlKinds[] = {
 	{true, 'f', "function", "function prototypes and declarations"},
 	{true, 'p', "procedure", "procedure prototypes and declarations"},
 	{true, 'P', "package", "package definitions"},
-	{false, 'l', "local", "local definitions"}
+	{false, 'l', "local", "local definitions"},
+	{true, 'a', "architecture", "architectures"},
 };
 
 static const keywordTable VhdlKeywordTable[] = {
@@ -291,6 +293,16 @@ static const keywordTable VhdlKeywordTable[] = {
 	{"with", KEYWORD_WITH},
 	{"xnor", KEYWORD_XNOR},
 	{"xor", KEYWORD_XOR}
+};
+
+typedef enum {
+	F_ENTITY,
+} vhdlField;
+
+static fieldDefinition VhdlFields [] = {
+	{ .name = "entity",
+	  .description = "entity designed by the architecture",
+	  .enabled = true },
 };
 
 /*
@@ -509,8 +521,9 @@ static void skipToMatched (tokenInfo * const token)
 	}
 }
 
-static void makeConstTag (tokenInfo * const token, const vhdlKind kind)
+static int makeConstTag (tokenInfo * const token, const vhdlKind kind)
 {
+	int index = CORK_NIL;
 	if (VhdlKinds[kind].enabled)
 	{
 		const char *const name = vStringValue (token->string);
@@ -518,12 +531,14 @@ static void makeConstTag (tokenInfo * const token, const vhdlKind kind)
 		initTagEntry (&e, name, kind);
 		e.lineNumber = token->lineNumber;
 		e.filePosition = token->filePosition;
-		makeTagEntry (&e);
+		index = makeTagEntry (&e);
 	}
+	return index;
 }
 
-static void makeVhdlTag (tokenInfo * const token, const vhdlKind kind)
+static int makeVhdlTag (tokenInfo * const token, const vhdlKind kind)
 {
+	int index = CORK_NIL;
 	if (VhdlKinds[kind].enabled)
 	{
 		/*
@@ -539,8 +554,9 @@ static void makeVhdlTag (tokenInfo * const token, const vhdlKind kind)
 			vStringCopy (token->string, fulltag);
 			vStringDelete (fulltag);
 		}
-		makeConstTag (token, kind);
+		index = makeConstTag (token, kind);
 	}
+	return index;
 }
 
 static void initialize (const langType language)
@@ -743,6 +759,36 @@ static void parseSubProgram (tokenInfo * const token)
 	deleteToken (name);
 }
 
+/*  architecture behavioral of ent is*/
+static void parseArchitecture (tokenInfo * const token)
+{
+	tokenInfo *const name = newToken ();
+
+	readToken (name);
+	if (!isType (name, TOKEN_IDENTIFIER))
+	{
+		skipToKeyword (KEYWORD_END);
+		skipToCharacterInInputFile (';');
+		deleteToken (name);
+		return;
+	}
+
+	int index = makeVhdlTag (name, VHDLTAG_ARCHITECTURE);
+	readToken (token);
+	if (isKeyword (token, KEYWORD_OF))
+	{
+		readToken (token);
+		if (isType (token, TOKEN_IDENTIFIER))
+		{
+			attachParserFieldToCorkEntry (index,
+										  VhdlFields[F_ENTITY].ftype,
+										  vStringValue (token->string));
+			readToken (token);	/* "is" is expected. */
+		}
+	}
+	deleteToken (name);
+}
+
 /* TODO */
 /* records */
 static void parseKeywords (tokenInfo * const token, bool local)
@@ -776,6 +822,8 @@ static void parseKeywords (tokenInfo * const token, bool local)
 	case KEYWORD_PACKAGE:
 		parsePackage (token);
 		break;
+	case KEYWORD_ARCHITECTURE:
+		parseArchitecture (token);
 	default:
 		break;
 	}
@@ -811,5 +859,8 @@ extern parserDefinition *VhdlParser (void)
 	def->initialize = initialize;
 	def->keywordTable = VhdlKeywordTable;
 	def->keywordCount = ARRAY_SIZE (VhdlKeywordTable);
+	def->fieldTable = VhdlFields;
+	def->fieldCount = ARRAY_SIZE (VhdlFields);
+	def->useCork = CORK_QUEUE;
 	return def;
 }
