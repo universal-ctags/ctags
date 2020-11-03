@@ -121,13 +121,13 @@ static void attachProtectionMaybe(tagEntryInfo *e, keywordId protection)
 		switch (protection)
 		{
 		case KEYWORD_PROTECTED:
-			e->extensionFields.implementation = "protected";
+			e->extensionFields.access = "protected";
 			break;
 		case KEYWORD_PRIVATE:
-			e->extensionFields.implementation = "private";
+			e->extensionFields.access = "private";
 			break;
 		case KEYWORD_PUBLIC:
-			e->extensionFields.implementation = "public";
+			e->extensionFields.access = "public";
 			break;
 		}
 }
