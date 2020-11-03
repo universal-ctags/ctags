@@ -8,6 +8,7 @@
 
 #include "readtags.h"
 
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -156,6 +157,32 @@ main (void)
 	}
 	fprintf (stderr, "ok\n");
 
+	fprintf (stderr, "opening a / (EISDIR is expected)...");
+	t = tagsOpen ("/", &info);
+	if (t != NULL)
+	{
+		fprintf (stderr, "unexpected result (!NULL)\n");
+		return 1;
+	}
+	else if (info.status.opened)
+	{
+		fprintf (stderr, "unexpected result (opened != 0)\n");
+		return 1;
+	}
+	else if (info.status.error_number != EISDIR)
+	{
+		fprintf (stderr, "unexpected result (error_number != EISDIR)\n");
+		return 1;
+	}
+	fprintf (stderr, "ok\n");
+
+	fprintf (stderr, "closing the unopened tag file...");
+	if (tagsClose (t) == TagSuccess)
+	{
+		fprintf (stderr, "unexpected result\n");
+		return 1;
+	}
+	fprintf (stderr, "ok\n");
 
 	return 0;
 }
