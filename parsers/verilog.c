@@ -1052,66 +1052,16 @@ static void processEnd (tokenInfo *const token)
 		verbose ("Found block: %s\n", vStringValue (token->name));
 }
 
-static void processPortList (tokenInfo *token, int c)
+static int processPortList (tokenInfo *token, int c)
 {
-	if ((c = skipWhite (c)) == '(')
+	if (c == '(')
 	{
-		/* Get next non-whitespace character after ( */
 		c = skipWhite (vGetc ());
-
-		while (c != ';' && c != EOF)
-		{
-			c = skipDimension (c);
-			if (c == '(')
-			{
-				c = skipPastMatch ("()");
-			}
-			else if (c == '{')
-			{
-				c = skipPastMatch ("{}");
-			}
-			else if (c == '`')
-			{
-				c = skipMacro (c);
-			}
-			else if (c == '=')
-			{
-				/* Search for next port or end of port declaration */
-				while (c != ',' && c != ')' && c != EOF)
-				{
-					c = skipWhite (vGetc ());
-				}
-			}
-			else if (readWordToken (token, c))
-			{
-				updateKind (token);
-				if (token->kind == K_IDENTIFIER)
-				{
-					/* Only add port name if it is the last keyword.
-					 * First keyword can be a dynamic type, like a class name */
-					c = skipWhite (vGetc ());
-					if (! isFirstIdentifierCharacter (c) || c == '`')
-					{
-						verbose ("Found port: %s\n", vStringValue (token->name));
-						createTag (token, K_PORT);
-					}
-				}
-				else
-				{
-					c = skipWhite (vGetc ());
-				}
-			}
-			else
-			{
-				c = skipWhite (vGetc ());
-			}
-		}
-		if (c != ';')
-			verbose ("Unexpected char c = %c\n", c);
+		clearToken (token);	// for an (illegal) empty port list
+		token->kind = K_PORT;
+		c = tagNameList (token, c);
 	}
-
-	if (c != EOF)
-		vUngetc (c);
+	return c;
 }
 
 static int skipParameterAssignment (int c)
@@ -1163,16 +1113,15 @@ static void processFunction (tokenInfo *const token)
 		}
 	} while (c != '(' && c != ';' && c != EOF);
 
-	if ( vStringLength (token->name) > 0 )
-	{
-		verbose ("Found function: %s\n", vStringValue (token->name));
+	verbose ("Found function: %s\n", vStringValue (token->name));
+	createTag (token, kind);
 
-		/* Create tag */
-		createTag (token, kind);
+	/* Get port list from function */
+	c = skipWhite (c);
+	c = processPortList (token, c);
 
-		/* Get port list from function */
-		processPortList (token, c);
-	}
+	if (c == ';')
+		vUngetc (c);
 }
 
 // enum [ enum_base_type ] { < enum_name_declaration > }  { [ … ] }
@@ -1572,14 +1521,12 @@ static void processDesignElement (tokenInfo *const token)
 			if (kind == K_MODPORT)
 				c = skipPastMatch ("()");	// ignore port list
 			else if (hasSimplePortList (kind))
-				processPortList (token, c);
+				c = processPortList (token, c);
 		}
-		else
-		{
-			vUngetc (c);
-		}
-
 		// skip coverage_event for covergroup : FIXME
+
+		if (c == ';')
+			vUngetc (c);
 	}
 }
 
@@ -1678,7 +1625,7 @@ static int processType (tokenInfo* token, int c, verilogKind* kind)
 	// skip unpacked dimension (or packed dimension after type-words)
 	c = skipDimension (skipWhite (c));
 
-	if (*kind == K_UNDEFINED)
+	if (*kind == K_UNDEFINED && *kind != K_PORT)
 		*kind = actualKind;
 	return c;
 }
@@ -1751,7 +1698,7 @@ static void findTag (tokenInfo *const token)
 				else if (c == '{')
 					;
 				else if (c == '=')
-					c = skipExpression (skipWhite(vGetc()));
+					skipExpression (skipWhite(vGetc()));
 				else
 					tagNameList(token, c); /* user defined type */
 			}

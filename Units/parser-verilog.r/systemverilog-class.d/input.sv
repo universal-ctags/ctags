@@ -64,3 +64,12 @@ class test_attributes;
   randc logic           randc_logic;
   const logic           const_logic;
 endclass : test_attributes
+
+class D;
+  // UVM-1.2: src/base/uvm_callback.svh
+  static function int m_cb_find(foo#(bar) a, callback b);
+    return -1;
+  endfunction
+  // UVM-1.2: src/base/uvm_callback.svh
+  pure virtual function void set_priority (foo::bar x);
+endclass

@@ -32,7 +32,7 @@ module rlMod(input interconnect [0:1] iBus);
 endmodule : rlMod
 
 // 6.7 Net declarations
-module Net_declarations
+module Net_declarations;
   // 6.7.1 Net declarations with built-in net types
   trireg (large) logic #(0,0,0) cap1;
   typedef logic [31:0] addressT;

@@ -10,7 +10,7 @@ top	input.sv	/^module top();$/;"	m
 iBus	input.sv	/^  interconnect [0:1] iBus;$/;"	n	module:top
 rlMod	input.sv	/^module rlMod(input interconnect [0:1] iBus);$/;"	m
 iBus	input.sv	/^module rlMod(input interconnect [0:1] iBus);$/;"	p	module:rlMod
-Net_declarations	input.sv	/^module Net_declarations$/;"	m
+Net_declarations	input.sv	/^module Net_declarations;$/;"	m
 cap1	input.sv	/^  trireg (large) logic #(0,0,0) cap1;$/;"	n	module:Net_declarations
 addressT	input.sv	/^  typedef logic [31:0] addressT;$/;"	T	module:Net_declarations
 w1	input.sv	/^  wire addressT w1;$/;"	n	module:Net_declarations
