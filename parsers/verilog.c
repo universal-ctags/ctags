@@ -374,8 +374,10 @@ static fieldDefinition SystemVerilogFields[] = {
 
 static bool findBlockName (tokenInfo *const token);
 static void processDefine (tokenInfo *const token);
+static int processType (tokenInfo* token, int c, verilogKind* kind);
 static bool readWordToken (tokenInfo *const token, int c);
-static void tagNameList (tokenInfo* token, int c);
+static int skipDelay(tokenInfo* token, int c);
+static int tagNameList (tokenInfo* token, int c);
 static void updateKind (tokenInfo *const token);
 
 /*
@@ -1264,72 +1266,45 @@ static void processStruct (tokenInfo *const token)
 static void processTypedef (tokenInfo *const token)
 {
 	int c;
-
-	/* Get typedef type */
+	verilogKind kind = K_UNDEFINED;
 	c = skipWhite (vGetc ());
 	if (readWordToken (token, c))
 	{
 		updateKind (token);
-
-		switch (token->kind)
-		{
-			case K_INTERFACE:
-				/* Expecting `typedef interface class` */
-				c = skipWhite (vGetc ());
-				readWordToken (token, c);
-				updateKind (token);
-			case K_CLASS:
-				/* A typedef class is just a prototype */
-				currentContext->prototype = true;
-				break;
-			case K_ENUM:
-				/* Call enum processing function */
-				token->kind = K_TYPEDEF;
-				processEnum (token);
-				return;
-			case K_STRUCT:
-				/* Call enum processing function */
-				token->kind = K_TYPEDEF;
-				processStruct (token);
-				return;
-			default :
-				break;
-		}
-
 		c = skipWhite (vGetc ());
+		kind = token->kind;
 	}
-
-	/* Skip signed or unsiged */
-	if (readWordToken (token, c))
-		c = skipWhite (vGetc ());
-
-	/* Skip bus width definition */
-	c = skipDimension (c);
-
-	/* Skip remaining identifiers */
-	while (readWordToken (token, c))
-		c = skipWhite (vGetc ());
-
-	/* Skip past class parameter override */
-	c = skipParameterAssignment (c);
-
-	/* Read typedef name */
-	if (readWordToken (token, c))
-		; // just read a word token
-	else
+	// forward typedef (LRM 6.18) is processed as prototype
+	//   (I don't know why...)
+	switch (kind)
 	{
-		vUngetc (c);
-
-		/* Empty typedefs are forward declarations and are considered
-		 * prototypes */
-		if (token->kind == K_IDENTIFIER)
-		{
+		case K_CLASS:
+		case K_INTERFACE:
 			currentContext->prototype = true;
-		}
+			break;
+		case K_ENUM:
+		case K_STRUCT:
+			if (readWordToken (token, c))
+			{
+				updateKind (token);
+				c = skipWhite (vGetc ());
+				if (token->kind == K_IDENTIFIER && c == ';')
+					currentContext->prototype = true;
+			}
+			break;
+		case K_IDENTIFIER:
+			if (c == ';')
+				currentContext->prototype = true;
+			break;
+		default:
+			; // do nothing
 	}
+	c = processType (token, c, &kind);
 
-	/* Use last identifier to create tag, but always with kind typedef */
 	createTag (token, K_TYPEDEF);
+	// currentContext->prototype = false;
+	if (c == ';')
+		vUngetc (c);
 }
 
 static tokenInfo * processParameterList (tokenInfo *token, int c)
@@ -1630,7 +1605,7 @@ static int processType (tokenInfo* token, int c, verilogKind* kind)
 	return c;
 }
 
-static void tagNameList (tokenInfo* token, int c)
+static int tagNameList (tokenInfo* token, int c)
 {
 	verilogKind kind = token->kind;
 
@@ -1639,7 +1614,7 @@ static void tagNameList (tokenInfo* token, int c)
 		c = skipPastMatch ("()");
 	c = skipDimension (skipWhite (c));
 	if (c == '.')
-		return;	// foo[...].bar = ..;
+		return c;	// foo[...].bar = ..;
 	c = skipDelay(token, c);
 
 	do
@@ -1670,6 +1645,7 @@ static void tagNameList (tokenInfo* token, int c)
 		c = skipPastMatch ("()");
 		c = skipWhite (c);
 	}
+	return c;
 }
 
 static void findTag (tokenInfo *const token)
