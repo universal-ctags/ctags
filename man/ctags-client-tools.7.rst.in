@@ -323,6 +323,7 @@ Client tools could split the line using the following steps:
   * If a ``/`` follows, then the pattern delimiter is ``/``.
   * If a ``?`` follows, then the pattern delimiter is ``?``.
   * If a number follows, then:
+
     * If a ``;/`` follows the number, then the delimiter is ``/``.
     * If a ``;?`` follows the number, then the delimiter is ``?``.
     * If a ``;"`` follows the number, then the field uses only line number, and
