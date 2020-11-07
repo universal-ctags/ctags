@@ -1603,6 +1603,23 @@ static int skipDelay(tokenInfo* token, int c)
 	return c;
 }
 
+static int skipClockEvent(tokenInfo* token, int c)
+{
+	if (c == '@')
+	{
+		c = skipWhite (vGetc ());
+		if (c == ('@')) {	// coverage_event: @@(block_event_expression)
+			c = skipWhite (vGetc ());
+		}
+
+		if (c == '(')
+			c = skipWhite (skipPastMatch ("()"));
+		else if (readWordToken (token, c))
+			c = skipWhite (vGetc ());
+	}
+	return c;
+}
+
 static void tagNameList (tokenInfo* token, int c)
 {
 	verilogKind kind = token->kind;
@@ -1803,6 +1820,10 @@ static void findVerilogTags (void)
 				break;
 			case '#':
 				c = skipDelay (token, c);
+				vUngetc (c);
+				break;
+			case '@':
+				c = skipClockEvent (token, c);
 				vUngetc (c);
 				break;
 			default :
