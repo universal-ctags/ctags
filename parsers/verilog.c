@@ -114,6 +114,7 @@ typedef enum {
  *   DATA DEFINITIONS
  */
 static int Ungetc;
+static bool inSkipPastMatch = false;	// for vGetc() and skipPastMatch()
 static int Lang_verilog;
 static int Lang_systemverilog;
 
@@ -630,7 +631,9 @@ static int vGetc (void)
 			ungetcToInputFile (c2);
 		}
 	}
-	else if (c == '"')  /* strip string contents */
+	// replace a string with "@" only in skipPastMatch()
+	// because the string may contain parens, etc.
+	else if (inSkipPastMatch && c == '"')
 	{
 		int c2;
 		do
@@ -665,6 +668,7 @@ static int skipPastMatch (const char *const pair)
 	const int begin = pair [0], end = pair [1];
 	int matchLevel = 1;
 	int c;
+	inSkipPastMatch = true;
 	do
 	{
 		c = vGetc ();
@@ -674,6 +678,7 @@ static int skipPastMatch (const char *const pair)
 			--matchLevel;
 	}
 	while (c != EOF && matchLevel > 0);
+	inSkipPastMatch = false;
 	return vGetc ();
 }
 
@@ -696,6 +701,18 @@ static int skipToSemiColon (void)
 	return c;	// ';' or EOF
 }
 
+static int skipString(int c)
+{
+	if (c == '"')
+	{
+		do
+			c = vGetc ();
+		while (c != '"' && c != EOF);
+	}
+	c = skipWhite (vGetc ());
+	return c;
+}
+
 static int skipExpression(int c)
 {
 	while (c != EOF && c != ','  &&  c != ';' && c != ')' && c != '}' && c != ']')
@@ -706,6 +723,8 @@ static int skipExpression(int c)
 			c = skipPastMatch ("{}");
 		else if (c == '[')
 			c = skipPastMatch ("[]");
+		else if (c == '"')
+			c = skipString (c);
 		else
 			c = skipWhite (vGetc ());
 	}
