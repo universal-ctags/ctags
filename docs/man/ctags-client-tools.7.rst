@@ -308,15 +308,26 @@ fields. Client tools should use the ``-E`` option, which keeps the escape
 sequences in the tags file, so the only field that could contain tabs is the
 pattern field.
 
-Client tools could then split the line using the following steps:
+The pattern field could:
+
+- Use a line number. It will look like ``number;"`` (e.g. ``10;"``).
+- Use a regex pattern. It will look like ``/pattern/;"`` or ``?pattern?;"``.
+  Notice that the regex pattern could contain tabs.
+- Combine these two, like ``number;/pattern/;"`` or ``number;?pattern?;"``.
+
+Client tools could split the line using the following steps:
 
 * Find the first 2 tabs in the line, so we get the name and input field.
-* From the 2nd tab
+* From the 2nd tab:
 
-  * If a "/" follows, then the pattern delimiter is "/".
-  * If a "?" follows, then the pattern delimiter is "?".
-  * If a number follows, then if after the end of the number is a ";/", then
-    the pattern delimiter is "/"; If it's a ";?", then the delimiter is "?".
+  * If a ``/`` follows, then the pattern delimiter is ``/``.
+  * If a ``?`` follows, then the pattern delimiter is ``?``.
+  * If a number follows, then:
+    * If a ``;/`` follows the number, then the delimiter is ``/``.
+    * If a ``;?`` follows the number, then the delimiter is ``?``.
+    * If a ``;"`` follows the number, then the field uses only line number, and
+      there's no pattern delimiter (since there's no regex pattern). In this
+      case the pattern field ends at the 3rd tab.
 
 * Find the 3rd tab, and count the delimiters between it and the 2nd tab. Notice
   that delimiters can be escaped, so only the ones with a even number
