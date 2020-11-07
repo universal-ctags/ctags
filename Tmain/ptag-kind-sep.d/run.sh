@@ -10,6 +10,7 @@ ${CTAGS} --quiet --options=NONE -o - \
 
 ${CTAGS} --quiet --options=NONE -o - \
 	 --extras=+p --kinds-all= \
-	 --pseudo-tags=+TAG_KIND_SEPARATOR --pseudo-tags=-TAG_PROGRAM_VERSION \
-	 input.php    
-
+	 --pseudo-tags=+TAG_KIND_SEPARATOR \
+	 --pseudo-tags=-TAG_PROGRAM_VERSION \
+	 --pseudo-tags=-TAG_PROC_CWD \
+	 input.php

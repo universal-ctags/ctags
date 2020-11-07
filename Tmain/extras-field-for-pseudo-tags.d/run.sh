@@ -9,6 +9,7 @@ run_ctags()
 	${CTAGS} --quiet --options=NONE \
 			 --fields=E --extras=p \
 			 --pseudo-tags=-TAG_PROGRAM_VERSION \
+			 --pseudo-tags=-TAG_PROC_CWD \
 			 $@ \
 			 -o - input.c
 }
