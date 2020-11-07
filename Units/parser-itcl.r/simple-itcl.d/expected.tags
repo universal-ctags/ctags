@@ -8,25 +8,25 @@ Toaster::clean	input.tcl	/^    method clean {} {$/;"	kind:method	line:14	languag
 SmartToaster	input.tcl	/^itcl::class SmartToaster {$/;"	kind:class	line:19	language:ITcl	inherits:Toaster	roles:def	extras:subparser
 toast	input.tcl	/^    method toast {nslices} {$/;"	kind:method	line:21	language:ITcl	scope:class:SmartToaster	roles:def	extras:subparser	end:26
 SmartToaster::toast	input.tcl	/^    method toast {nslices} {$/;"	kind:method	line:21	language:ITcl	scope:class:SmartToaster	roles:def	extras:qualified,subparser	end:26
-doSomethingPublic	input.tcl	/^    public method doSomethingPublic {} {$/;"	kind:method	line:28	language:ITcl	scope:class:SmartToaster	implementation:public	roles:def	extras:subparser	end:29
-SmartToaster::doSomethingPublic	input.tcl	/^    public method doSomethingPublic {} {$/;"	kind:method	line:28	language:ITcl	scope:class:SmartToaster	implementation:public	roles:def	extras:qualified,subparser	end:29
-doSomethingProtected	input.tcl	/^    protected method doSomethingProtected {} {$/;"	kind:method	line:30	language:ITcl	scope:class:SmartToaster	implementation:protected	roles:def	extras:subparser	end:31
-SmartToaster::doSomethingProtected	input.tcl	/^    protected method doSomethingProtected {} {$/;"	kind:method	line:30	language:ITcl	scope:class:SmartToaster	implementation:protected	roles:def	extras:qualified,subparser	end:31
-doSomethingPrivate	input.tcl	/^    private method doSomethingPrivate {} {$/;"	kind:method	line:32	language:ITcl	scope:class:SmartToaster	implementation:private	roles:def	extras:subparser	end:33
-SmartToaster::doSomethingPrivate	input.tcl	/^    private method doSomethingPrivate {} {$/;"	kind:method	line:32	language:ITcl	scope:class:SmartToaster	implementation:private	roles:def	extras:qualified,subparser	end:33
+doSomethingPublic	input.tcl	/^    public method doSomethingPublic {} {$/;"	kind:method	line:28	language:ITcl	scope:class:SmartToaster	access:public	roles:def	extras:subparser	end:29
+SmartToaster::doSomethingPublic	input.tcl	/^    public method doSomethingPublic {} {$/;"	kind:method	line:28	language:ITcl	scope:class:SmartToaster	access:public	roles:def	extras:qualified,subparser	end:29
+doSomethingProtected	input.tcl	/^    protected method doSomethingProtected {} {$/;"	kind:method	line:30	language:ITcl	scope:class:SmartToaster	access:protected	roles:def	extras:subparser	end:31
+SmartToaster::doSomethingProtected	input.tcl	/^    protected method doSomethingProtected {} {$/;"	kind:method	line:30	language:ITcl	scope:class:SmartToaster	access:protected	roles:def	extras:qualified,subparser	end:31
+doSomethingPrivate	input.tcl	/^    private method doSomethingPrivate {} {$/;"	kind:method	line:32	language:ITcl	scope:class:SmartToaster	access:private	roles:def	extras:subparser	end:33
+SmartToaster::doSomethingPrivate	input.tcl	/^    private method doSomethingPrivate {} {$/;"	kind:method	line:32	language:ITcl	scope:class:SmartToaster	access:private	roles:def	extras:qualified,subparser	end:33
 procNoProtection	input.tcl	/^    proc procNoProtection {} {$/;"	kind:procedure	line:35	language:ITcl	scope:class:SmartToaster	roles:def	extras:subparser	end:36
 SmartToaster::procNoProtection	input.tcl	/^    proc procNoProtection {} {$/;"	kind:procedure	line:35	language:ITcl	scope:class:SmartToaster	roles:def	extras:qualified,subparser	end:36
-procPublic	input.tcl	/^    public proc procPublic {} {$/;"	kind:procedure	line:38	language:ITcl	scope:class:SmartToaster	implementation:public	roles:def	extras:subparser	end:39
-SmartToaster::procPublic	input.tcl	/^    public proc procPublic {} {$/;"	kind:procedure	line:38	language:ITcl	scope:class:SmartToaster	implementation:public	roles:def	extras:qualified,subparser	end:39
-procProtected	input.tcl	/^    protected proc procProtected {} {$/;"	kind:procedure	line:40	language:ITcl	scope:class:SmartToaster	implementation:protected	roles:def	extras:subparser	end:41
-SmartToaster::procProtected	input.tcl	/^    protected proc procProtected {} {$/;"	kind:procedure	line:40	language:ITcl	scope:class:SmartToaster	implementation:protected	roles:def	extras:qualified,subparser	end:41
-procPrivate	input.tcl	/^    private proc procPrivate {} {$/;"	kind:procedure	line:42	language:ITcl	scope:class:SmartToaster	implementation:private	roles:def	extras:subparser	end:43
-SmartToaster::procPrivate	input.tcl	/^    private proc procPrivate {} {$/;"	kind:procedure	line:42	language:ITcl	scope:class:SmartToaster	implementation:private	roles:def	extras:qualified,subparser	end:43
+procPublic	input.tcl	/^    public proc procPublic {} {$/;"	kind:procedure	line:38	language:ITcl	scope:class:SmartToaster	access:public	roles:def	extras:subparser	end:39
+SmartToaster::procPublic	input.tcl	/^    public proc procPublic {} {$/;"	kind:procedure	line:38	language:ITcl	scope:class:SmartToaster	access:public	roles:def	extras:qualified,subparser	end:39
+procProtected	input.tcl	/^    protected proc procProtected {} {$/;"	kind:procedure	line:40	language:ITcl	scope:class:SmartToaster	access:protected	roles:def	extras:subparser	end:41
+SmartToaster::procProtected	input.tcl	/^    protected proc procProtected {} {$/;"	kind:procedure	line:40	language:ITcl	scope:class:SmartToaster	access:protected	roles:def	extras:qualified,subparser	end:41
+procPrivate	input.tcl	/^    private proc procPrivate {} {$/;"	kind:procedure	line:42	language:ITcl	scope:class:SmartToaster	access:private	roles:def	extras:subparser	end:43
+SmartToaster::procPrivate	input.tcl	/^    private proc procPrivate {} {$/;"	kind:procedure	line:42	language:ITcl	scope:class:SmartToaster	access:private	roles:def	extras:qualified,subparser	end:43
 commonNoProtection	input.tcl	/^    common commonNoProtection 0$/;"	kind:common	line:45	language:ITcl	scope:class:SmartToaster	roles:def	extras:subparser	end:45
 SmartToaster::commonNoProtection	input.tcl	/^    common commonNoProtection 0$/;"	kind:common	line:45	language:ITcl	scope:class:SmartToaster	roles:def	extras:qualified,subparser	end:45
-commonPublic	input.tcl	/^    public proc commonPublic "a"$/;"	kind:procedure	line:47	language:ITcl	scope:class:SmartToaster	implementation:public	roles:def	extras:subparser	end:47
-SmartToaster::commonPublic	input.tcl	/^    public proc commonPublic "a"$/;"	kind:procedure	line:47	language:ITcl	scope:class:SmartToaster	implementation:public	roles:def	extras:qualified,subparser	end:47
-commonProtected	input.tcl	/^    protected proc commonProtected "b"$/;"	kind:procedure	line:48	language:ITcl	scope:class:SmartToaster	implementation:protected	roles:def	extras:subparser	end:48
-SmartToaster::commonProtected	input.tcl	/^    protected proc commonProtected "b"$/;"	kind:procedure	line:48	language:ITcl	scope:class:SmartToaster	implementation:protected	roles:def	extras:qualified,subparser	end:48
-commonPrivate	input.tcl	/^    private proc commonPrivate "c"$/;"	kind:procedure	line:49	language:ITcl	scope:class:SmartToaster	implementation:private	roles:def	extras:subparser	end:49
-SmartToaster::commonPrivate	input.tcl	/^    private proc commonPrivate "c"$/;"	kind:procedure	line:49	language:ITcl	scope:class:SmartToaster	implementation:private	roles:def	extras:qualified,subparser	end:49
+commonPublic	input.tcl	/^    public proc commonPublic "a"$/;"	kind:procedure	line:47	language:ITcl	scope:class:SmartToaster	access:public	roles:def	extras:subparser	end:47
+SmartToaster::commonPublic	input.tcl	/^    public proc commonPublic "a"$/;"	kind:procedure	line:47	language:ITcl	scope:class:SmartToaster	access:public	roles:def	extras:qualified,subparser	end:47
+commonProtected	input.tcl	/^    protected proc commonProtected "b"$/;"	kind:procedure	line:48	language:ITcl	scope:class:SmartToaster	access:protected	roles:def	extras:subparser	end:48
+SmartToaster::commonProtected	input.tcl	/^    protected proc commonProtected "b"$/;"	kind:procedure	line:48	language:ITcl	scope:class:SmartToaster	access:protected	roles:def	extras:qualified,subparser	end:48
+commonPrivate	input.tcl	/^    private proc commonPrivate "c"$/;"	kind:procedure	line:49	language:ITcl	scope:class:SmartToaster	access:private	roles:def	extras:subparser	end:49
+SmartToaster::commonPrivate	input.tcl	/^    private proc commonPrivate "c"$/;"	kind:procedure	line:49	language:ITcl	scope:class:SmartToaster	access:private	roles:def	extras:qualified,subparser	end:49
