@@ -375,6 +375,7 @@ static fieldDefinition SystemVerilogFields[] = {
 static bool findBlockName (tokenInfo *const token);
 static void processDefine (tokenInfo *const token);
 static int processType (tokenInfo* token, int c, verilogKind* kind);
+static int pushEnumNames (tokenInfo* token, int c);
 static bool readWordToken (tokenInfo *const token, int c);
 static int skipDelay(tokenInfo* token, int c);
 static int tagNameList (tokenInfo* token, int c);
@@ -1154,46 +1155,7 @@ static void processEnum (tokenInfo *const token)
 	c = skipDimension (c);
 
 	/* Search enum elements */
-	if (c == '{')
-	{
-		c = skipWhite (vGetc ());
-		while (readWordToken (token, c))
-		{
-			token->kind = K_CONSTANT;
-			tagContents = pushToken (tagContents, dupToken (token));
-			verbose ("Pushed enum element \"%s\"\n", vStringValue (token->name));
-
-			/* Skip element ranges */
-			/* TODO Implement element ranges */
-			c = skipDimension (skipWhite (vGetc ()));
-
-			/* Skip value assignments */
-			if (c == '=')
-			{
-				while (c != '}' && c != ',' && c != EOF)
-				{
-					c = skipWhite (vGetc ());
-
-					/* Skip enum value concatenations */
-					if (c == '{')
-					{
-						c = skipWhite (skipPastMatch ("{}"));
-					}
-				}
-			}
-			/* Skip comma */
-			if (c == ',')
-			{
-				c = skipWhite (vGetc ());
-			}
-			/* End of enum elements list */
-			if (c == '}')
-			{
-				c = skipWhite (vGetc ());
-				break;
-			}
-		}
-	}
+	c = pushEnumNames (token, c);
 
 	/* Following identifiers are tag names */
 	verbose ("Find enum tags. Token %s kind %d\n", vStringValue (enumToken->name), enumToken->kind);
@@ -1277,7 +1239,10 @@ static void processTypedef (tokenInfo *const token)
 	c = processType (token, c, &kind);
 
 	createTag (token, K_TYPEDEF);
-	// currentContext->prototype = false;
+
+	while (tagContents)
+		tagContents = popToken (tagContents);
+
 	if (c == ';')
 		vUngetc (c);
 }
@@ -1515,6 +1480,37 @@ static int skipClockEvent(tokenInfo* token, int c)
 	return c;
 }
 
+static int pushEnumNames (tokenInfo* token, int c)
+{
+	if (c == '{')
+	{
+		c = skipWhite (vGetc ());
+		while (readWordToken (token, c))
+		{
+			token->kind = K_CONSTANT;
+			tagContents = pushToken (tagContents, dupToken (token));
+			verbose ("Pushed enum element \"%s\"\n", vStringValue (token->name));
+
+			/* Skip element ranges */
+			/* TODO Implement element ranges */
+			c = skipDimension (skipWhite (vGetc ()));
+
+			/* Skip value assignments */
+			if (c == '=')
+				c = skipExpression (vGetc ());
+
+			/* Skip comma */
+			if (c == ',')
+				c = skipWhite (vGetc ());
+			/* End of enum elements list */
+			if (c == '}')
+				break;
+		}
+		c = skipWhite (vGetc ());
+	}
+	return c;
+}
+
 // input
 //   kind: kind of context
 // output
@@ -1541,7 +1537,12 @@ static int processType (tokenInfo* token, int c, verilogKind* kind)
 		c = skipDimension (skipWhite (c));
 		c = skipDelay(token, c);	// class parameter #(...)
 		if (c == '{')	// skip enum, struct, or union member
-			c = skipWhite (skipPastMatch ("{}"));
+		{
+			if (*kind == K_ENUM)
+				c = pushEnumNames (token, c);
+			else
+				c = skipWhite (skipPastMatch ("{}"));
+		}
 
 		if (!readWordToken (token, c))
 			break;
