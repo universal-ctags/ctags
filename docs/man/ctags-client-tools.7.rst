@@ -205,6 +205,9 @@ for using notable ones.
 ``TAG_KIND_SEPARATOR`` (new in Universal-ctags)
 	TBW
 
+``TAG_OUTPUT_EXCMD`` (new in Universal-ctags)
+	Indicates the specified type of EX command with ``--excmd`` option.
+
 ``TAG_OUTPUT_FILESEP`` (new in Universal-ctags)
 	TBW
 

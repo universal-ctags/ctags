@@ -6,6 +6,7 @@ TAG_FILE_FORMAT           on      the version of tags file format
 TAG_FILE_SORTED           on      how tags are sorted
 TAG_KIND_DESCRIPTION      off     the letters, names and descriptions of enabled kinds in the language
 TAG_KIND_SEPARATOR        off     the separators used in kinds
+TAG_OUTPUT_EXCMD          on      the excmd: number, pattern, mixed, or combine
 TAG_OUTPUT_FILESEP        on      the separator used in file name (slash or backslash)
 TAG_OUTPUT_MODE           on      the output mode: u-ctags or e-ctags
 TAG_PATTERN_LENGTH_LIMIT  on      the limit of pattern length

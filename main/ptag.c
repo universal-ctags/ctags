@@ -192,6 +192,10 @@ static ptagDesc ptagDescs [] = {
 	  "the current working directory of the tags generator",
 	  ptagMakeProcCwd,
 	  PTAGF_COMMON },
+	{ true, "TAG_OUTPUT_EXCMD",
+	  "the excmd: number, pattern, mixed, or combine",
+	  ptagMakeCtagsOutputExcmd,
+	  PTAGF_COMMON },
 };
 
 extern bool makePtagIfEnabled (ptagType type, langType language, const void *data)

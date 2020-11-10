@@ -92,6 +92,7 @@ extern void abort_if_ferror(MIO *const fp);
 extern bool ptagMakeJsonOutputVersion (ptagDesc *desc, langType language CTAGS_ATTR_UNUSED, const void *data CTAGS_ATTR_UNUSED);
 extern bool ptagMakeCtagsOutputMode (ptagDesc *desc, langType language CTAGS_ATTR_UNUSED, const void *data CTAGS_ATTR_UNUSED);
 extern bool ptagMakeCtagsOutputFilesep (ptagDesc *desc, langType language CTAGS_ATTR_UNUSED, const void *data);
+extern bool ptagMakeCtagsOutputExcmd (ptagDesc *desc, langType language CTAGS_ATTR_UNUSED, const void *data);
 
 extern bool writerCanPrintPtag (void);
 extern bool writerDoesTreatFieldAsFixed (int fieldType);
