@@ -5,6 +5,14 @@
 *   GNU General Public License version 2 or (at your option) any later version.
 *
 *   This module contains functions for generating tags for VHDL files.
+*
+*   References:
+*     http://www.vhdl.renerta.com/mobile/index.html
+*     https://www.hdlworks.com/hdl_corner/vhdl_ref/
+*     https://www.ics.uci.edu/~jmoorkan/vhdlref/Synario%20VHDL%20Manual.pdf
+*     http://atlas.physics.arizona.edu/~kjohns/downloads/vhdl/VHDL-xilinx-help.pdf
+*     http://www.csit-sun.pub.ro/resources/xilinx/synvhdl.pdf
+*     https://edg.uchicago.edu/~tang/VHDLref.pdf
 */
 
 /*
