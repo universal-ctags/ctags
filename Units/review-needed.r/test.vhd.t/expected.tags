@@ -1,71 +1,176 @@
 badger	input.vhd	/^package body badger is$/;"	P
 badger2	input.vhd	/^package body badger2 is$/;"	P
 accumulator	input.vhd	/^entity accumulator is port ($/;"	e
+a	input.vhd	/^  a: in std_logic_vector(3 downto 0);$/;"	q	entity:accumulator
+clk	input.vhd	/^  clk, reset: in std_logic;$/;"	q	entity:accumulator
+reset	input.vhd	/^  clk, reset: in std_logic;$/;"	q	entity:accumulator
+accum	input.vhd	/^  accum: out std_logic_vector(3 downto 0)$/;"	q	entity:accumulator
 simple	input.vhd	/^architecture simple of accumulator is$/;"	a	entity:accumulator
 adder	input.vhd	/^entity adder is port ($/;"	e
+a	input.vhd	/^  a,b : in std_logic_vector (15 downto 0);$/;"	q	entity:adder
+b	input.vhd	/^  a,b : in std_logic_vector (15 downto 0);$/;"	q	entity:adder
+sum	input.vhd	/^  sum: out std_logic_vector (15 downto 0)$/;"	q	entity:adder
 dataflow	input.vhd	/^architecture dataflow of adder is$/;"	a	entity:adder
 pAdderAttr	input.vhd	/^entity pAdderAttr is$/;"	e
+a	input.vhd	/^  port (a    : in std_logic_vector(n - 1 downto 0);$/;"	q	entity:pAdderAttr
+b	input.vhd	/^        b    : in std_logic_vector(n - 1 downto 0);$/;"	q	entity:pAdderAttr
+cin	input.vhd	/^        cin  : in std_logic;$/;"	q	entity:pAdderAttr
+sum	input.vhd	/^        sum  : out std_logic_vector(n - 1 downto 0);$/;"	q	entity:pAdderAttr
+cout	input.vhd	/^        cout : out std_logic);$/;"	q	entity:pAdderAttr
 loopDemo	input.vhd	/^architecture loopDemo of pAdderAttr is$/;"	a	entity:pAdderAttr
 adder	input.vhd	/^entity adder is port ($/;"	e
+a	input.vhd	/^  a,b: in unsigned(3 downto 0);$/;"	q	entity:adder
+b	input.vhd	/^  a,b: in unsigned(3 downto 0);$/;"	q	entity:adder
+sum	input.vhd	/^  sum: out unsigned(3 downto 0)$/;"	q	entity:adder
 simple	input.vhd	/^architecture simple of adder is$/;"	a	entity:adder
 AND2	input.vhd	/^entity AND2 is port ($/;"	e
+i1	input.vhd	/^    i1: in std_logic;$/;"	q	entity:AND2
+i2	input.vhd	/^    i2: in std_logic;$/;"	q	entity:AND2
+y	input.vhd	/^    y: out std_logic$/;"	q	entity:AND2
 rtl	input.vhd	/^architecture rtl of AND2 is$/;"	a	entity:AND2
 asyncLoad	input.vhd	/^entity asyncLoad is port ($/;"	e
+loadVal	input.vhd	/^  loadVal, d: in std_logic_vector(3 downto 0);$/;"	q	entity:asyncLoad
+d	input.vhd	/^  loadVal, d: in std_logic_vector(3 downto 0);$/;"	q	entity:asyncLoad
+clk	input.vhd	/^  clk, load: in std_logic;$/;"	q	entity:asyncLoad
+load	input.vhd	/^  clk, load: in std_logic;$/;"	q	entity:asyncLoad
+q	input.vhd	/^  q: out std_logic_vector(3 downto 0)$/;"	q	entity:asyncLoad
 rtl	input.vhd	/^architecture rtl of asyncLoad is$/;"	a	entity:asyncLoad
 BidirBuf	input.vhd	/^entity BidirBuf is port ($/;"	e
+OE	input.vhd	/^  OE: in std_logic;$/;"	q	entity:BidirBuf
+input	input.vhd	/^  input: in std_logic_vector;$/;"	q	entity:BidirBuf
+output	input.vhd	/^  output: out std_logic_vector$/;"	q	entity:BidirBuf
 behavioral	input.vhd	/^architecture behavioral of BidirBuf is$/;"	a	entity:BidirBuf
 BidirCnt	input.vhd	/^entity BidirCnt is port ($/;"	e
+OE	input.vhd	/^  OE: in std_logic;$/;"	q	entity:BidirCnt
+CntEnable	input.vhd	/^  CntEnable: in std_logic;$/;"	q	entity:BidirCnt
+LdCnt	input.vhd	/^  LdCnt: in std_logic;$/;"	q	entity:BidirCnt
+Clk	input.vhd	/^  Clk: in std_logic;$/;"	q	entity:BidirCnt
+Rst	input.vhd	/^  Rst: in std_logic;$/;"	q	entity:BidirCnt
+Cnt	input.vhd	/^  Cnt: inout std_logic_vector(3 downto 0)$/;"	q	entity:BidirCnt
 behavioral	input.vhd	/^architecture behavioral of BidirCnt is$/;"	a	entity:BidirCnt
 BIDIR	input.vhd	/^entity BIDIR is port ($/;"	e
+ip	input.vhd	/^  ip: in std_logic;$/;"	q	entity:BIDIR
+oe	input.vhd	/^  oe: in std_logic;$/;"	q	entity:BIDIR
+op_fb	input.vhd	/^  op_fb: out std_logic;$/;"	q	entity:BIDIR
+op	input.vhd	/^  op: inout std_logic$/;"	q	entity:BIDIR
 rtl	input.vhd	/^architecture rtl of BIDIR is$/;"	a	entity:BIDIR
 bidirbuffer	input.vhd	/^entity bidirbuffer is port ($/;"	e
+input	input.vhd	/^  input: in std_logic;$/;"	q	entity:bidirbuffer
+enable	input.vhd	/^  enable: in std_logic;$/;"	q	entity:bidirbuffer
+feedback	input.vhd	/^  feedback: out std_logic;$/;"	q	entity:bidirbuffer
+output	input.vhd	/^  output: inout std_logic$/;"	q	entity:bidirbuffer
 structural	input.vhd	/^architecture structural of bidirbuffer is$/;"	a	entity:bidirbuffer
 clkGen	input.vhd	/^entity clkGen is port ($/;"	e
+clk	input.vhd	/^  clk: in std_logic;$/;"	q	entity:clkGen
+reset	input.vhd	/^  reset: in std_logic;$/;"	q	entity:clkGen
+ClkDiv2	input.vhd	/^  ClkDiv2, ClkDiv4,$/;"	q	entity:clkGen
+ClkDiv4	input.vhd	/^  ClkDiv2, ClkDiv4,$/;"	q	entity:clkGen
+ClkDiv6	input.vhd	/^  ClkDiv6,ClkDiv8: out std_logic$/;"	q	entity:clkGen
+ClkDiv8	input.vhd	/^  ClkDiv6,ClkDiv8: out std_logic$/;"	q	entity:clkGen
 behav	input.vhd	/^architecture behav of clkGen is$/;"	a	entity:clkGen
 numClks	input.vhd	/^subtype numClks is std_logic_vector(1 to 4);$/;"	T
 numPatterns	input.vhd	/^subtype numPatterns is integer range 0 to 11;$/;"	T
 clkTableType	input.vhd	/^type clkTableType is array (numpatterns'low to numPatterns'high) of numClks;$/;"	t
 clkTable	input.vhd	/^constant clkTable: clkTableType := clkTableType'($/;"	c
 counter	input.vhd	/^entity counter is port ($/;"	e
+clk	input.vhd	/^  clk: in std_logic;$/;"	q	entity:counter
+enable	input.vhd	/^  enable: in std_logic;$/;"	q	entity:counter
+reset	input.vhd	/^  reset: in std_logic;$/;"	q	entity:counter
+count	input.vhd	/^  count: buffer unsigned(3 downto 0)$/;"	q	entity:counter
 simple	input.vhd	/^architecture simple of counter is$/;"	a	entity:counter
 count8	input.vhd	/^entity count8 is port ($/;"	e
+clk	input.vhd	/^  clk: in std_logic;$/;"	q	entity:count8
+rst	input.vhd	/^  rst: in std_logic;$/;"	q	entity:count8
+count	input.vhd	/^  count: out std_logic_vector(7 downto 0)$/;"	q	entity:count8
 structural	input.vhd	/^architecture structural of count8 is$/;"	a	entity:count8
 counter	input.vhd	/^entity counter is port ($/;"	e
+clk	input.vhd	/^  clk: in std_logic;$/;"	q	entity:counter
+reset	input.vhd	/^  reset: in std_logic;$/;"	q	entity:counter
+count	input.vhd	/^  count: out std_logic_vector(0 to 9)$/;"	q	entity:counter
 simple	input.vhd	/^architecture simple of counter is$/;"	a	entity:counter
 counter	input.vhd	/^entity counter is port ($/;"	e
+clk	input.vhd	/^  clk: in std_logic;$/;"	q	entity:counter
+reset	input.vhd	/^  reset: in std_logic;$/;"	q	entity:counter
+count	input.vhd	/^  count: out std_logic_vector(9 downto 0)$/;"	q	entity:counter
 simple	input.vhd	/^architecture simple of counter is$/;"	a	entity:counter
 counter	input.vhd	/^entity counter is port ($/;"	e
+clk	input.vhd	/^  clk: in std_logic;$/;"	q	entity:counter
+reset	input.vhd	/^  reset: in std_logic;$/;"	q	entity:counter
+load	input.vhd	/^  load: in std_logic;$/;"	q	entity:counter
+enable	input.vhd	/^  enable: in std_logic;$/;"	q	entity:counter
+data	input.vhd	/^  data: in std_logic_vector(3 downto 0);$/;"	q	entity:counter
+count	input.vhd	/^  count: out std_logic_vector(3 downto 0)$/;"	q	entity:counter
 simple	input.vhd	/^architecture simple of counter is$/;"	a	entity:counter
 counter	input.vhd	/^entity counter is port ($/;"	e
+clk	input.vhd	/^  clk: in std_logic;$/;"	q	entity:counter
+reset	input.vhd	/^  reset: in std_logic;$/;"	q	entity:counter
+load	input.vhd	/^  load: in std_logic;$/;"	q	entity:counter
+data	input.vhd	/^  data: in std_logic_vector(3 downto 0);$/;"	q	entity:counter
+count	input.vhd	/^  count: out std_logic_vector(3 downto 0)$/;"	q	entity:counter
 simple	input.vhd	/^architecture simple of counter is$/;"	a	entity:counter
 Cnt4Term	input.vhd	/^entity Cnt4Term is port ($/;"	e
+clk	input.vhd	/^  clk: in std_logic;$/;"	q	entity:Cnt4Term
+Cnt	input.vhd	/^  Cnt: out std_logic_vector(3 downto 0);$/;"	q	entity:Cnt4Term
+TermCnt	input.vhd	/^  TermCnt: out std_logic$/;"	q	entity:Cnt4Term
 behavioral	input.vhd	/^architecture behavioral of Cnt4Term is$/;"	a	entity:Cnt4Term
 Counter	input.vhd	/^entity Counter is port ($/;"	e
+clock	input.vhd	/^  clock: in std_logic;$/;"	q	entity:Counter
+Count	input.vhd	/^  Count: out std_logic_vector(3 downto 0)$/;"	q	entity:Counter
 structural	input.vhd	/^architecture structural of Counter is$/;"	a	entity:Counter
 counter	input.vhd	/^entity counter is port ($/;"	e
+clk	input.vhd	/^  clk: in std_logic;$/;"	q	entity:counter
+reset	input.vhd	/^  reset: in std_logic;$/;"	q	entity:counter
+count	input.vhd	/^  count: out std_logic_vector(3 downto 0)$/;"	q	entity:counter
 simple	input.vhd	/^architecture simple of counter is$/;"	a	entity:counter
 convertArith	input.vhd	/^entity convertArith is port ($/;"	e
+truncate	input.vhd	/^  truncate: out unsigned(3 downto 0);$/;"	q	entity:convertArith
+extend	input.vhd	/^  extend: out unsigned(15 downto 0);$/;"	q	entity:convertArith
+direction	input.vhd	/^  direction: out unsigned(0 to 7)$/;"	q	entity:convertArith
 simple	input.vhd	/^architecture simple of convertArith is$/;"	a	entity:convertArith
 Const	input.vhd	/^constant Const: unsigned(7 downto 0) := "00111010";$/;"	c
 FEWGATES	input.vhd	/^entity FEWGATES is port ($/;"	e
+a	input.vhd	/^  a,b,c,d: in std_logic;$/;"	q	entity:FEWGATES
+b	input.vhd	/^  a,b,c,d: in std_logic;$/;"	q	entity:FEWGATES
+c	input.vhd	/^  a,b,c,d: in std_logic;$/;"	q	entity:FEWGATES
+d	input.vhd	/^  a,b,c,d: in std_logic;$/;"	q	entity:FEWGATES
+y	input.vhd	/^  y: out std_logic$/;"	q	entity:FEWGATES
 concurrent	input.vhd	/^architecture concurrent of FEWGATES is$/;"	a	entity:FEWGATES
 THREE	input.vhd	/^constant THREE: std_logic_vector(1 downto 0) := "11";$/;"	c
 typeConvert	input.vhd	/^entity typeConvert is port ($/;"	e
+a	input.vhd	/^  a: out unsigned(7 downto 0)$/;"	q	entity:typeConvert
 simple	input.vhd	/^architecture simple of typeConvert is$/;"	a	entity:typeConvert
 Const	input.vhd	/^constant Const: natural := 43;$/;"	c
 counter	input.vhd	/^entity counter is port ($/;"	e
+clk	input.vhd	/^  clk: in std_logic;$/;"	q	entity:counter
+count	input.vhd	/^  count: out std_logic_vector(3 downto 0)$/;"	q	entity:counter
 simple	input.vhd	/^architecture simple of counter is$/;"	a	entity:counter
 counter	input.vhd	/^entity counter is port ($/;"	e
+clk	input.vhd	/^  clk: in std_logic;$/;"	q	entity:counter
+reset	input.vhd	/^  reset: in std_logic;$/;"	q	entity:counter
+count	input.vhd	/^  count: out std_logic_vector(0 to 3)$/;"	q	entity:counter
 simple	input.vhd	/^architecture simple of counter is$/;"	a	entity:counter
 counter	input.vhd	/^entity counter is port ($/;"	e
+clk	input.vhd	/^  clk: in std_logic;$/;"	q	entity:counter
+reset	input.vhd	/^  reset: in std_logic;$/;"	q	entity:counter
+count	input.vhd	/^  count: out std_logic_vector(3 downto 0)$/;"	q	entity:counter
 simple	input.vhd	/^architecture simple of counter is$/;"	a	entity:counter
 counter	input.vhd	/^entity counter is port ($/;"	e
+clk	input.vhd	/^  clk: in std_logic;$/;"	q	entity:counter
+reset	input.vhd	/^  reset: in std_logic;$/;"	q	entity:counter
+count	input.vhd	/^  count: out std_logic_vector(3 downto 0)$/;"	q	entity:counter
 simple	input.vhd	/^architecture simple of counter is$/;"	a	entity:counter
 counter	input.vhd	/^entity counter is port ($/;"	e
+clk	input.vhd	/^  clk: in std_logic;$/;"	q	entity:counter
+reset	input.vhd	/^  reset: in std_logic;$/;"	q	entity:counter
+count	input.vhd	/^  count: out std_logic_vector(3 downto 0)$/;"	q	entity:counter
 simple	input.vhd	/^architecture simple of counter is$/;"	a	entity:counter
 decoder	input.vhd	/^entity decoder is port ($/;"	e
+decIn	input.vhd	/^  decIn: in std_logic_vector(1 downto 0);$/;"	q	entity:decoder
+decOut	input.vhd	/^  decOut: out std_logic_vector(3 downto 0)$/;"	q	entity:decoder
 simple	input.vhd	/^architecture simple of decoder is$/;"	a	entity:decoder
 isa_dec	input.vhd	/^entity isa_dec is port$/;"	e
+dev_adr	input.vhd	/^  dev_adr:          in std_logic_vector(19 downto 0);$/;"	q	entity:isa_dec
+decOut_n	input.vhd	/^  decOut_n:         out std_logic_vector(5 downto 0)$/;"	q	entity:isa_dec
 synthesis	input.vhd	/^architecture synthesis of isa_dec is$/;"	a	entity:isa_dec
 CtrlRegRange	input.vhd	/^  constant  CtrlRegRange: std_logic_vector(2 downto 0)    := "100";$/;"	c
 SuperIoRange	input.vhd	/^  constant  SuperIoRange: std_logic_vector(2 downto 0)    := "010";$/;"	c
@@ -75,6 +180,13 @@ RstCtrlReg	input.vhd	/^  constant  RstCtrlReg:   std_logic_vector(16 downto 0) :
 AtcStatusReg	input.vhd	/^  constant  AtcStatusReg: std_logic_vector(16 downto 0) := "00000000000000011";$/;"	c
 MgmtStatusReg	input.vhd	/^  constant  MgmtStatusReg:std_logic_vector(16 downto 0) := "00000000000000100";$/;"	c
 isa_dec	input.vhd	/^entity isa_dec is port$/;"	e
+dev_adr	input.vhd	/^  dev_adr:          in std_logic_vector(19 downto 0);$/;"	q	entity:isa_dec
+sio_dec_n	input.vhd	/^  sio_dec_n:        out std_logic;$/;"	q	entity:isa_dec
+rst_ctrl_rd_n	input.vhd	/^  rst_ctrl_rd_n:    out std_logic;$/;"	q	entity:isa_dec
+atc_stat_rd_n	input.vhd	/^  atc_stat_rd_n:    out std_logic;$/;"	q	entity:isa_dec
+mgmt_stat_rd_n	input.vhd	/^  mgmt_stat_rd_n:   out std_logic;$/;"	q	entity:isa_dec
+io_int_stat_rd_n	input.vhd	/^  io_int_stat_rd_n: out std_logic;$/;"	q	entity:isa_dec
+int_ctrl_rd_n	input.vhd	/^  int_ctrl_rd_n:    out std_logic$/;"	q	entity:isa_dec
 synthesis	input.vhd	/^architecture synthesis of isa_dec is$/;"	a	entity:isa_dec
 CtrlRegRange	input.vhd	/^  constant  CtrlRegRange: std_logic_vector(2 downto 0)    := "100";$/;"	c
 SuperIoRange	input.vhd	/^  constant  SuperIoRange: std_logic_vector(2 downto 0)    := "010";$/;"	c
@@ -84,6 +196,13 @@ RstCtrlReg	input.vhd	/^  constant  RstCtrlReg:   std_logic_vector(16 downto 0) :
 AtcStatusReg	input.vhd	/^  constant  AtcStatusReg: std_logic_vector(16 downto 0) := "00000000000000011";$/;"	c
 MgmtStatusReg	input.vhd	/^  constant  MgmtStatusReg:std_logic_vector(16 downto 0) := "00000000000000100";$/;"	c
 isa_dec	input.vhd	/^entity isa_dec is port$/;"	e
+dev_adr	input.vhd	/^  dev_adr:         in std_logic_vector(19 downto 0);$/;"	q	entity:isa_dec
+sio_dec_n	input.vhd	/^  sio_dec_n:       out std_logic;$/;"	q	entity:isa_dec
+rst_ctrl_rd_n	input.vhd	/^  rst_ctrl_rd_n:   out std_logic;$/;"	q	entity:isa_dec
+atc_stat_rd_n	input.vhd	/^  atc_stat_rd_n:   out std_logic;$/;"	q	entity:isa_dec
+mgmt_stat_rd_n	input.vhd	/^  mgmt_stat_rd_n:  out std_logic;$/;"	q	entity:isa_dec
+io_int_stat_rd_n	input.vhd	/^  io_int_stat_rd_n:out std_logic;$/;"	q	entity:isa_dec
+int_ctrl_rd_n	input.vhd	/^  int_ctrl_rd_n:   out std_logic$/;"	q	entity:isa_dec
 synthesis	input.vhd	/^architecture synthesis of isa_dec is$/;"	a	entity:isa_dec
 CtrlRegRange	input.vhd	/^  constant  CtrlRegRange: std_logic_vector(2 downto 0)  := "100";$/;"	c
 SuperIoRange	input.vhd	/^  constant  SuperIoRange: std_logic_vector(2 downto 0)  := "010";$/;"	c
@@ -93,6 +212,14 @@ RstCtrlReg	input.vhd	/^  constant  RstCtrlReg:   std_logic_vector(16 downto 0) :
 AtcStatusReg	input.vhd	/^  constant  AtcStatusReg: std_logic_vector(16 downto 0) := "00000000000000011";$/;"	c
 MgmtStatusReg	input.vhd	/^  constant  MgmtStatusReg:std_logic_vector(16 downto 0) := "00000000000000100";$/;"	c
 isa_dec	input.vhd	/^entity isa_dec is port$/;"	e
+dev_adr	input.vhd	/^  dev_adr:          in std_logic_vector(19 downto 0);$/;"	q	entity:isa_dec
+cs0_n	input.vhd	/^  cs0_n:            in std_logic;$/;"	q	entity:isa_dec
+sio_dec_n	input.vhd	/^  sio_dec_n:        out std_logic;$/;"	q	entity:isa_dec
+rst_ctrl_rd_n	input.vhd	/^  rst_ctrl_rd_n:    out std_logic;$/;"	q	entity:isa_dec
+atc_stat_rd_n	input.vhd	/^  atc_stat_rd_n:    out std_logic;$/;"	q	entity:isa_dec
+mgmt_stat_rd_n	input.vhd	/^  mgmt_stat_rd_n:   out std_logic;$/;"	q	entity:isa_dec
+io_int_stat_rd_n	input.vhd	/^  io_int_stat_rd_n: out std_logic;$/;"	q	entity:isa_dec
+int_ctrl_rd_n	input.vhd	/^  int_ctrl_rd_n:    out std_logic$/;"	q	entity:isa_dec
 synthesis	input.vhd	/^architecture synthesis of isa_dec is$/;"	a	entity:isa_dec
 CtrlRegRange	input.vhd	/^  constant  CtrlRegRange: std_logic_vector(2 downto 0)    := "100";$/;"	c
 SuperIoRange	input.vhd	/^  constant  SuperIoRange: std_logic_vector(2 downto 0)    := "010";$/;"	c
@@ -102,6 +229,14 @@ RstCtrlReg	input.vhd	/^  constant  RstCtrlReg:   std_logic_vector(16 downto 0) :
 AtcStatusReg	input.vhd	/^  constant  AtcStatusReg: std_logic_vector(16 downto 0) := "00000000000000011";$/;"	c
 MgmtStatusReg	input.vhd	/^  constant  MgmtStatusReg:std_logic_vector(16 downto 0) := "00000000000000100";$/;"	c
 isa_dec	input.vhd	/^entity isa_dec is port$/;"	e
+dev_adr	input.vhd	/^  dev_adr:          in std_logic_vector(19 downto 0);$/;"	q	entity:isa_dec
+cs0_n	input.vhd	/^  cs0_n:            in std_logic;$/;"	q	entity:isa_dec
+sio_dec_n	input.vhd	/^  sio_dec_n:        out std_logic;$/;"	q	entity:isa_dec
+rst_ctrl_rd_n	input.vhd	/^  rst_ctrl_rd_n:    out std_logic;$/;"	q	entity:isa_dec
+atc_stat_rd_n	input.vhd	/^  atc_stat_rd_n:    out std_logic;$/;"	q	entity:isa_dec
+mgmt_stat_rd_n	input.vhd	/^  mgmt_stat_rd_n:   out std_logic;$/;"	q	entity:isa_dec
+io_int_stat_rd_n	input.vhd	/^  io_int_stat_rd_n: out std_logic;$/;"	q	entity:isa_dec
+int_ctrl_rd_n	input.vhd	/^  int_ctrl_rd_n:    out std_logic$/;"	q	entity:isa_dec
 synthesis	input.vhd	/^architecture synthesis of isa_dec is$/;"	a	entity:isa_dec
 CtrlRegRange	input.vhd	/^  constant  CtrlRegRange: std_logic_vector(2 downto 0)    := "100";$/;"	c
 SuperIoRange	input.vhd	/^  constant  SuperIoRange: std_logic_vector(2 downto 0)    := "010";$/;"	c
@@ -111,6 +246,13 @@ RstCtrlReg	input.vhd	/^  constant  RstCtrlReg:   std_logic_vector(16 downto 0) :
 AtcStatusReg	input.vhd	/^  constant  AtcStatusReg: std_logic_vector(16 downto 0) := "00000000000000011";$/;"	c
 MgmtStatusReg	input.vhd	/^  constant  MgmtStatusReg:std_logic_vector(16 downto 0) := "00000000000000100";$/;"	c
 isa_dec	input.vhd	/^entity isa_dec is port$/;"	e
+dev_adr	input.vhd	/^  dev_adr:          in std_logic_vector(19 downto 0);$/;"	q	entity:isa_dec
+sio_dec_n	input.vhd	/^  sio_dec_n:        out std_logic;$/;"	q	entity:isa_dec
+rst_ctrl_rd_n	input.vhd	/^  rst_ctrl_rd_n:    out std_logic;$/;"	q	entity:isa_dec
+atc_stat_rd_n	input.vhd	/^  atc_stat_rd_n:    out std_logic;$/;"	q	entity:isa_dec
+mgmt_stat_rd_n	input.vhd	/^  mgmt_stat_rd_n:   out std_logic;$/;"	q	entity:isa_dec
+io_int_stat_rd_n	input.vhd	/^  io_int_stat_rd_n: out std_logic;$/;"	q	entity:isa_dec
+int_ctrl_rd_n	input.vhd	/^  int_ctrl_rd_n:    out std_logic$/;"	q	entity:isa_dec
 synthesis	input.vhd	/^architecture synthesis of isa_dec is$/;"	a	entity:isa_dec
 CtrlRegRange	input.vhd	/^  constant  CtrlRegRange: std_logic_vector(2 downto 0)    := "100";$/;"	c
 SuperIoRange	input.vhd	/^  constant  SuperIoRange: std_logic_vector(2 downto 0)    := "010";$/;"	c
@@ -123,6 +265,13 @@ decProcs	input.vhd	/^package decProcs is$/;"	P
 decProcs	input.vhd	/^package body decProcs is$/;"	P
 DEC2x4	input.vhd	/^  procedure DEC2x4 (inputs : in std_logic_vector(1 downto 0);$/;"	p
 isa_dec	input.vhd	/^entity isa_dec is port$/;"	e
+dev_adr	input.vhd	/^  dev_adr:         in std_logic_vector(19 downto 0);$/;"	q	entity:isa_dec
+sio_dec_n	input.vhd	/^  sio_dec_n:       out std_logic;$/;"	q	entity:isa_dec
+rst_ctrl_rd_n	input.vhd	/^  rst_ctrl_rd_n:   out std_logic;$/;"	q	entity:isa_dec
+atc_stat_rd_n	input.vhd	/^  atc_stat_rd_n:   out std_logic;$/;"	q	entity:isa_dec
+mgmt_stat_rd_n	input.vhd	/^  mgmt_stat_rd_n:  out std_logic;$/;"	q	entity:isa_dec
+io_int_stat_rd_n	input.vhd	/^  io_int_stat_rd_n:out std_logic;$/;"	q	entity:isa_dec
+int_ctrl_rd_n	input.vhd	/^  int_ctrl_rd_n:   out std_logic$/;"	q	entity:isa_dec
 synthesis	input.vhd	/^architecture synthesis of isa_dec is$/;"	a	entity:isa_dec
 CtrlRegRange	input.vhd	/^  constant  CtrlRegRange: std_logic_vector(2 downto 0)  := "100";$/;"	c
 SuperIoRange	input.vhd	/^  constant  SuperIoRange: std_logic_vector(2 downto 0)  := "010";$/;"	c
@@ -132,47 +281,146 @@ RstCtrlReg	input.vhd	/^  constant  RstCtrlReg:   std_logic_vector(16 downto 0) :
 AtcStatusReg	input.vhd	/^  constant  AtcStatusReg: std_logic_vector(16 downto 0) := "00000000000000011";$/;"	c
 MgmtStatusReg	input.vhd	/^  constant  MgmtStatusReg:std_logic_vector(16 downto 0) := "00000000000000100";$/;"	c
 progPulse	input.vhd	/^entity progPulse is port ($/;"	e
+clk	input.vhd	/^  clk, reset: in std_logic;$/;"	q	entity:progPulse
+reset	input.vhd	/^  clk, reset: in std_logic;$/;"	q	entity:progPulse
+loadLength	input.vhd	/^  loadLength,loadDelay: in std_logic;$/;"	q	entity:progPulse
+loadDelay	input.vhd	/^  loadLength,loadDelay: in std_logic;$/;"	q	entity:progPulse
+data	input.vhd	/^  data: in std_logic_vector(7 downto 0);$/;"	q	entity:progPulse
+pulse	input.vhd	/^  pulse: out std_logic$/;"	q	entity:progPulse
 rtl	input.vhd	/^architecture rtl of progPulse is$/;"	a	entity:progPulse
 DFF	input.vhd	/^entity DFF is port ($/;"	e
+d	input.vhd	/^    d: in std_logic;$/;"	q	entity:DFF
+clk	input.vhd	/^    clk: in std_logic;$/;"	q	entity:DFF
+arst	input.vhd	/^    arst : in std_logic;$/;"	q	entity:DFF
+q	input.vhd	/^    q: out std_logic;$/;"	q	entity:DFF
 rtl	input.vhd	/^architecture rtl of DFF is$/;"	a	entity:DFF
 DFF	input.vhd	/^entity DFF is port ($/;"	e
+d	input.vhd	/^    d: in std_logic;$/;"	q	entity:DFF
+clk	input.vhd	/^    clk: in std_logic;$/;"	q	entity:DFF
+a	input.vhd	/^    a,b,c : in std_logic;$/;"	q	entity:DFF
+b	input.vhd	/^    a,b,c : in std_logic;$/;"	q	entity:DFF
+c	input.vhd	/^    a,b,c : in std_logic;$/;"	q	entity:DFF
+q	input.vhd	/^    q: out std_logic$/;"	q	entity:DFF
 rtl	input.vhd	/^architecture rtl of DFF is$/;"	a	entity:DFF
 DFF	input.vhd	/^entity DFF is port ($/;"	e
+d	input.vhd	/^    d: in std_logic;$/;"	q	entity:DFF
+clk	input.vhd	/^    clk: in std_logic;$/;"	q	entity:DFF
+a	input.vhd	/^    a,b,c : in std_logic;$/;"	q	entity:DFF
+b	input.vhd	/^    a,b,c : in std_logic;$/;"	q	entity:DFF
+c	input.vhd	/^    a,b,c : in std_logic;$/;"	q	entity:DFF
+q	input.vhd	/^    q: out std_logic$/;"	q	entity:DFF
 rtl	input.vhd	/^architecture rtl of DFF is$/;"	a	entity:DFF
 DFF	input.vhd	/^entity DFF is port ($/;"	e
+d	input.vhd	/^    d: in std_logic;$/;"	q	entity:DFF
+clk	input.vhd	/^    clk: in std_logic;$/;"	q	entity:DFF
+arst	input.vhd	/^    arst: in std_logic;$/;"	q	entity:DFF
+q	input.vhd	/^    q: out std_logic$/;"	q	entity:DFF
 rtl	input.vhd	/^architecture rtl of DFF is$/;"	a	entity:DFF
 DFF	input.vhd	/^entity DFF is port ($/;"	e
+d	input.vhd	/^    d: in std_logic;$/;"	q	entity:DFF
+clk	input.vhd	/^    clk: in std_logic;$/;"	q	entity:DFF
+aset	input.vhd	/^    aset : in std_logic;$/;"	q	entity:DFF
+q	input.vhd	/^    q: out std_logic$/;"	q	entity:DFF
 rtl	input.vhd	/^architecture rtl of DFF is$/;"	a	entity:DFF
 DFF	input.vhd	/^entity DFF is port ($/;"	e
+d1	input.vhd	/^    d1, d2: in std_logic;$/;"	q	entity:DFF
+d2	input.vhd	/^    d1, d2: in std_logic;$/;"	q	entity:DFF
+clk	input.vhd	/^    clk: in std_logic;$/;"	q	entity:DFF
+arst	input.vhd	/^    arst : in std_logic;$/;"	q	entity:DFF
+q1	input.vhd	/^    q1, q2: out std_logic$/;"	q	entity:DFF
+q2	input.vhd	/^    q1, q2: out std_logic$/;"	q	entity:DFF
 rtl	input.vhd	/^architecture rtl of DFF is$/;"	a	entity:DFF
 DFF	input.vhd	/^entity DFF is port ($/;"	e
+d	input.vhd	/^    d: in std_logic;$/;"	q	entity:DFF
+clk	input.vhd	/^    clk: in std_logic;$/;"	q	entity:DFF
+en	input.vhd	/^    en: in std_logic;$/;"	q	entity:DFF
+q	input.vhd	/^    q: out std_logic$/;"	q	entity:DFF
 rtl	input.vhd	/^architecture rtl of DFF is$/;"	a	entity:DFF
 DFFE	input.vhd	/^entity DFFE is port ($/;"	e
+d	input.vhd	/^    d: in std_logic;$/;"	q	entity:DFFE
+en	input.vhd	/^    en: in std_logic;$/;"	q	entity:DFFE
+clk	input.vhd	/^    clk: in std_logic;$/;"	q	entity:DFFE
+q	input.vhd	/^    q: out std_logic$/;"	q	entity:DFFE
 rtl	input.vhd	/^architecture rtl of DFFE is$/;"	a	entity:DFFE
 DFF	input.vhd	/^entity DFF is port ($/;"	e
+d	input.vhd	/^    d: in std_logic;$/;"	q	entity:DFF
+clk	input.vhd	/^    clk: in std_logic;$/;"	q	entity:DFF
+envector	input.vhd	/^    envector: in std_logic_vector(7 downto 0);$/;"	q	entity:DFF
+q	input.vhd	/^    q: out std_logic$/;"	q	entity:DFF
 rtl	input.vhd	/^architecture rtl of DFF is$/;"	a	entity:DFF
 DFF	input.vhd	/^entity DFF is port ($/;"	e
+d	input.vhd	/^    d: in std_logic;$/;"	q	entity:DFF
+clk	input.vhd	/^    clk: in std_logic;$/;"	q	entity:DFF
+en	input.vhd	/^    en: in std_logic;$/;"	q	entity:DFF
+q	input.vhd	/^    q: out std_logic$/;"	q	entity:DFF
 rtl	input.vhd	/^architecture rtl of DFF is$/;"	a	entity:DFF
 DFFE_SR	input.vhd	/^entity DFFE_SR is port ($/;"	e
+d	input.vhd	/^    d: in std_logic;$/;"	q	entity:DFFE_SR
+en	input.vhd	/^    en: in std_logic;$/;"	q	entity:DFFE_SR
+clk	input.vhd	/^    clk: in std_logic;$/;"	q	entity:DFFE_SR
+rst	input.vhd	/^    rst: in std_logic;$/;"	q	entity:DFFE_SR
+prst	input.vhd	/^    prst: in std_logic;$/;"	q	entity:DFFE_SR
+q	input.vhd	/^    q: out std_logic$/;"	q	entity:DFFE_SR
 rtl	input.vhd	/^architecture rtl of DFFE_SR is$/;"	a	entity:DFFE_SR
 flipFlop	input.vhd	/^entity flipFlop is port ($/;"	e
+clock	input.vhd	/^  clock, input: in std_logic;$/;"	q	entity:flipFlop
+input	input.vhd	/^  clock, input: in std_logic;$/;"	q	entity:flipFlop
+ffOut	input.vhd	/^  ffOut: out std_logic$/;"	q	entity:flipFlop
 simple	input.vhd	/^architecture simple of flipFlop is$/;"	a	entity:flipFlop
 dff	input.vhd	/^  procedure dff (signal clk: in std_logic;$/;"	p
 DFF	input.vhd	/^entity DFF is port ($/;"	e
+d	input.vhd	/^    d: in std_logic;$/;"	q	entity:DFF
+clk	input.vhd	/^    clk: in std_logic;$/;"	q	entity:DFF
+q	input.vhd	/^    q: out std_logic$/;"	q	entity:DFF
 rtl	input.vhd	/^architecture rtl of DFF is$/;"	a	entity:DFF
 DFF	input.vhd	/^entity DFF is port ($/;"	e
+d1	input.vhd	/^    d1, d2: in std_logic;$/;"	q	entity:DFF
+d2	input.vhd	/^    d1, d2: in std_logic;$/;"	q	entity:DFF
+clk	input.vhd	/^    clk: in std_logic;$/;"	q	entity:DFF
+srst	input.vhd	/^    srst : in std_logic;$/;"	q	entity:DFF
+q1	input.vhd	/^    q1, q2: out std_logic$/;"	q	entity:DFF
+q2	input.vhd	/^    q1, q2: out std_logic$/;"	q	entity:DFF
 rtl	input.vhd	/^architecture rtl of DFF is$/;"	a	entity:DFF
 DFFE_SR	input.vhd	/^entity DFFE_SR is port ($/;"	e
+d	input.vhd	/^    d: in std_logic;$/;"	q	entity:DFFE_SR
+en	input.vhd	/^    en: in std_logic;$/;"	q	entity:DFFE_SR
+clk	input.vhd	/^    clk: in std_logic;$/;"	q	entity:DFFE_SR
+rst	input.vhd	/^    rst: in std_logic;$/;"	q	entity:DFFE_SR
+prst	input.vhd	/^    prst: in std_logic;$/;"	q	entity:DFFE_SR
+q	input.vhd	/^    q: out std_logic$/;"	q	entity:DFFE_SR
 rtl	input.vhd	/^architecture rtl of DFFE_SR is$/;"	a	entity:DFFE_SR
 DFF	input.vhd	/^entity DFF is port ($/;"	e
+d	input.vhd	/^    d: in std_logic;$/;"	q	entity:DFF
+clk	input.vhd	/^    clk: in std_logic;$/;"	q	entity:DFF
+srst	input.vhd	/^    srst : in std_logic;$/;"	q	entity:DFF
+q	input.vhd	/^    q: out std_logic$/;"	q	entity:DFF
 rtl	input.vhd	/^architecture rtl of DFF is$/;"	a	entity:DFF
 struct_dffe_sr	input.vhd	/^entity struct_dffe_sr is port ($/;"	e
+d	input.vhd	/^  d: in std_logic;$/;"	q	entity:struct_dffe_sr
+clk	input.vhd	/^  clk: in std_logic;$/;"	q	entity:struct_dffe_sr
+en	input.vhd	/^  en: in std_logic;$/;"	q	entity:struct_dffe_sr
+rst	input.vhd	/^  rst,prst: in std_logic;$/;"	q	entity:struct_dffe_sr
+prst	input.vhd	/^  rst,prst: in std_logic;$/;"	q	entity:struct_dffe_sr
+q	input.vhd	/^  q: out std_logic$/;"	q	entity:struct_dffe_sr
 instance	input.vhd	/^architecture instance of struct_dffe_sr is$/;"	a	entity:struct_dffe_sr
 DFF	input.vhd	/^entity DFF is port ($/;"	e
+d	input.vhd	/^    d: in std_logic;$/;"	q	entity:DFF
+clk	input.vhd	/^    clk: in std_logic;$/;"	q	entity:DFF
+srst	input.vhd	/^    srst : in std_logic;$/;"	q	entity:DFF
+q	input.vhd	/^    q: out std_logic$/;"	q	entity:DFF
 rtl	input.vhd	/^architecture rtl of DFF is$/;"	a	entity:DFF
 struct_dffe	input.vhd	/^entity struct_dffe is port ($/;"	e
+d	input.vhd	/^  d: in std_logic;$/;"	q	entity:struct_dffe
+clk	input.vhd	/^  clk: in std_logic;$/;"	q	entity:struct_dffe
+en	input.vhd	/^  en: in std_logic;$/;"	q	entity:struct_dffe
+q	input.vhd	/^  q: out std_logic$/;"	q	entity:struct_dffe
 instance	input.vhd	/^architecture instance of struct_dffe is$/;"	a	entity:struct_dffe
 dffTri	input.vhd	/^entity dffTri is$/;"	e
+data	input.vhd	/^  data: in std_logic_vector(size - 1 downto 0);$/;"	q	entity:dffTri
+clock	input.vhd	/^  clock: in std_logic;$/;"	q	entity:dffTri
+ff_enable	input.vhd	/^  ff_enable: in std_logic;$/;"	q	entity:dffTri
+op_enable	input.vhd	/^  op_enable: in std_logic;$/;"	q	entity:dffTri
+qout	input.vhd	/^  qout: out std_logic_vector(size - 1 downto 0)$/;"	q	entity:dffTri
 parameterize	input.vhd	/^architecture parameterize of dffTri is$/;"	a	entity:dffTri
 tribufType	input.vhd	/^type tribufType is record$/;"	t
 ip	input.vhd	/^  ip: std_logic;$/;"	r
@@ -180,64 +428,159 @@ oe	input.vhd	/^  oe: std_logic;$/;"	r
 op	input.vhd	/^  op: std_logic;$/;"	r
 tribufArrayType	input.vhd	/^type tribufArrayType is array (integer range <>) of tribufType;$/;"	t
 DFF	input.vhd	/^entity DFF is port ($/;"	e
+d	input.vhd	/^    d: in std_logic;$/;"	q	entity:DFF
+clk	input.vhd	/^    clk: in std_logic;$/;"	q	entity:DFF
+en	input.vhd	/^    en: in std_logic;$/;"	q	entity:DFF
+q	input.vhd	/^    q: out std_logic$/;"	q	entity:DFF
 rtl	input.vhd	/^architecture rtl of DFF is$/;"	a	entity:DFF
 TRIBUF	input.vhd	/^entity TRIBUF is port ($/;"	e
+ip	input.vhd	/^  ip: in std_logic;$/;"	q	entity:TRIBUF
+oe	input.vhd	/^  oe: in std_logic;$/;"	q	entity:TRIBUF
+op	input.vhd	/^  op: out std_logic bus$/;"	q	entity:TRIBUF
 sequential	input.vhd	/^architecture sequential of TRIBUF is$/;"	a	entity:TRIBUF
 DLATCHH	input.vhd	/^entity DLATCHH is port ($/;"	e
+d	input.vhd	/^    d: in std_logic;$/;"	q	entity:DLATCHH
+en	input.vhd	/^    en: in std_logic;$/;"	q	entity:DLATCHH
+q	input.vhd	/^    q: out std_logic$/;"	q	entity:DLATCHH
 rtl	input.vhd	/^architecture rtl of DLATCHH is$/;"	a	entity:DLATCHH
 DLATCHH	input.vhd	/^entity DLATCHH is port ($/;"	e
+d	input.vhd	/^    d: in std_logic;$/;"	q	entity:DLATCHH
+en	input.vhd	/^    en: in std_logic;$/;"	q	entity:DLATCHH
+q	input.vhd	/^    q: out std_logic$/;"	q	entity:DLATCHH
 rtl	input.vhd	/^architecture rtl of DLATCHH is$/;"	a	entity:DLATCHH
 struct_dlatch	input.vhd	/^entity struct_dlatch is port ($/;"	e
+d	input.vhd	/^  d: in std_logic;$/;"	q	entity:struct_dlatch
+en	input.vhd	/^  en: in std_logic;$/;"	q	entity:struct_dlatch
+q	input.vhd	/^  q: out std_logic$/;"	q	entity:struct_dlatch
 instance	input.vhd	/^architecture instance of struct_dlatch is$/;"	a	entity:struct_dlatch
 downCounter	input.vhd	/^entity downCounter is port ($/;"	e
+clk	input.vhd	/^  clk: in std_logic;$/;"	q	entity:downCounter
+reset	input.vhd	/^  reset: in std_logic;$/;"	q	entity:downCounter
+count	input.vhd	/^  count: out std_logic_vector(3 downto 0)$/;"	q	entity:downCounter
 simple	input.vhd	/^architecture simple of downCounter is$/;"	a	entity:downCounter
 compareDC	input.vhd	/^entity compareDC is port ($/;"	e
+addressBus	input.vhd	/^  addressBus: in std_logic_vector(31 downto 0);$/;"	q	entity:compareDC
+addressHit	input.vhd	/^  addressHit: out std_logic$/;"	q	entity:compareDC
 wontWork	input.vhd	/^architecture wontWork of compareDC is$/;"	a	entity:compareDC
 encoder	input.vhd	/^entity encoder is$/;"	e
+invec	input.vhd	/^        port (invec: in std_logic_vector(7 downto 0);$/;"	q	entity:encoder
+enc_out	input.vhd	/^              enc_out: out std_logic_vector(2 downto 0)$/;"	q	entity:encoder
 rtl	input.vhd	/^architecture rtl of encoder is$/;"	a	entity:encoder
 encoder	input.vhd	/^entity encoder is$/;"	e
+invec	input.vhd	/^  port (invec:in std_logic_vector(7 downto 0);$/;"	q	entity:encoder
+enc_out	input.vhd	/^        enc_out:out  std_logic_vector(2 downto 0)$/;"	q	entity:encoder
 rtl	input.vhd	/^architecture rtl of encoder is$/;"	a	entity:encoder
 encoder	input.vhd	/^entity encoder is$/;"	e
+invec	input.vhd	/^  port (invec: in std_logic_vector(7 downto 0);$/;"	q	entity:encoder
+enc_out	input.vhd	/^        enc_out: out std_logic_vector(2 downto 0)$/;"	q	entity:encoder
 rtl	input.vhd	/^architecture rtl of encoder is$/;"	a	entity:encoder
 compare	input.vhd	/^entity compare is port ($/;"	e
+ina	input.vhd	/^  ina: in std_logic_vector (3 downto 0);$/;"	q	entity:compare
+inb	input.vhd	/^  inb: in std_logic_vector (2 downto 0);$/;"	q	entity:compare
+equal	input.vhd	/^  equal: out std_logic$/;"	q	entity:compare
 simple	input.vhd	/^architecture simple of compare is$/;"	a	entity:compare
 LogicFcn	input.vhd	/^entity LogicFcn is port ($/;"	e
+A	input.vhd	/^  A: in std_logic;$/;"	q	entity:LogicFcn
+B	input.vhd	/^  B: in std_logic;$/;"	q	entity:LogicFcn
+C	input.vhd	/^  C: in std_logic;$/;"	q	entity:LogicFcn
+Y	input.vhd	/^  Y: out std_logic$/;"	q	entity:LogicFcn
 behavioral	input.vhd	/^architecture behavioral of LogicFcn is$/;"	a	entity:LogicFcn
 LogicFcn	input.vhd	/^entity LogicFcn is port ($/;"	e
+A	input.vhd	/^  A: in std_logic;$/;"	q	entity:LogicFcn
+B	input.vhd	/^  B: in std_logic;$/;"	q	entity:LogicFcn
+C	input.vhd	/^  C: in std_logic;$/;"	q	entity:LogicFcn
+Y	input.vhd	/^  Y: out std_logic$/;"	q	entity:LogicFcn
 dataflow	input.vhd	/^architecture dataflow of LogicFcn is$/;"	a	entity:LogicFcn
 LogicFcn	input.vhd	/^entity LogicFcn is port ($/;"	e
+A	input.vhd	/^  A: in std_logic;$/;"	q	entity:LogicFcn
+B	input.vhd	/^  B: in std_logic;$/;"	q	entity:LogicFcn
+C	input.vhd	/^  C: in std_logic;$/;"	q	entity:LogicFcn
+Y	input.vhd	/^  Y: out std_logic$/;"	q	entity:LogicFcn
 structural	input.vhd	/^architecture structural of LogicFcn is$/;"	a	entity:LogicFcn
 SimDFF	input.vhd	/^entity SimDFF is port ($/;"	e
+D	input.vhd	/^  D, Clk: in std_logic;$/;"	q	entity:SimDFF
+Clk	input.vhd	/^  D, Clk: in std_logic;$/;"	q	entity:SimDFF
+Q	input.vhd	/^  Q: out std_logic$/;"	q	entity:SimDFF
 SimModel	input.vhd	/^architecture SimModel of SimDFF is$/;"	a	entity:SimDFF
 tCQ	input.vhd	/^constant tCQ: time := 8 ns;$/;"	c
 tS	input.vhd	/^constant tS:  time := 4 ns;$/;"	c
 tH	input.vhd	/^constant tH:  time := 3 ns;$/;"	c
 DFF	input.vhd	/^entity DFF is port ($/;"	e
+d	input.vhd	/^    d: in std_logic;$/;"	q	entity:DFF
+clk	input.vhd	/^    clk: in std_logic;$/;"	q	entity:DFF
+q	input.vhd	/^    q: out std_logic$/;"	q	entity:DFF
 rtl	input.vhd	/^architecture rtl of DFF is$/;"	a	entity:DFF
 DFF	input.vhd	/^entity DFF is port ($/;"	e
+d	input.vhd	/^    d: in std_logic;$/;"	q	entity:DFF
+clk	input.vhd	/^    clk: in std_logic;$/;"	q	entity:DFF
+q	input.vhd	/^    q: out std_logic$/;"	q	entity:DFF
 rtl	input.vhd	/^architecture rtl of DFF is$/;"	a	entity:DFF
 FEWGATES	input.vhd	/^entity FEWGATES is port ($/;"	e
+a	input.vhd	/^  a,b,c,d: in std_logic;$/;"	q	entity:FEWGATES
+b	input.vhd	/^  a,b,c,d: in std_logic;$/;"	q	entity:FEWGATES
+c	input.vhd	/^  a,b,c,d: in std_logic;$/;"	q	entity:FEWGATES
+d	input.vhd	/^  a,b,c,d: in std_logic;$/;"	q	entity:FEWGATES
+y	input.vhd	/^  y: out std_logic$/;"	q	entity:FEWGATES
 structural	input.vhd	/^architecture structural of FEWGATES is$/;"	a	entity:FEWGATES
 FEWGATES	input.vhd	/^entity FEWGATES is port ($/;"	e
+a	input.vhd	/^  a,b,c,d: in std_logic;$/;"	q	entity:FEWGATES
+b	input.vhd	/^  a,b,c,d: in std_logic;$/;"	q	entity:FEWGATES
+c	input.vhd	/^  a,b,c,d: in std_logic;$/;"	q	entity:FEWGATES
+d	input.vhd	/^  a,b,c,d: in std_logic;$/;"	q	entity:FEWGATES
+y	input.vhd	/^  y: out std_logic$/;"	q	entity:FEWGATES
 structural	input.vhd	/^architecture structural of FEWGATES is$/;"	a	entity:FEWGATES
 FEWGATES	input.vhd	/^entity FEWGATES is port ($/;"	e
+a	input.vhd	/^  a,b,c,d: in std_logic;$/;"	q	entity:FEWGATES
+b	input.vhd	/^  a,b,c,d: in std_logic;$/;"	q	entity:FEWGATES
+c	input.vhd	/^  a,b,c,d: in std_logic;$/;"	q	entity:FEWGATES
+d	input.vhd	/^  a,b,c,d: in std_logic;$/;"	q	entity:FEWGATES
+y	input.vhd	/^  y: out std_logic$/;"	q	entity:FEWGATES
 structural	input.vhd	/^architecture structural of FEWGATES is$/;"	a	entity:FEWGATES
 FEWGATES	input.vhd	/^entity FEWGATES is port ($/;"	e
+a	input.vhd	/^  a,b,c,d: in std_logic;$/;"	q	entity:FEWGATES
+b	input.vhd	/^  a,b,c,d: in std_logic;$/;"	q	entity:FEWGATES
+c	input.vhd	/^  a,b,c,d: in std_logic;$/;"	q	entity:FEWGATES
+d	input.vhd	/^  a,b,c,d: in std_logic;$/;"	q	entity:FEWGATES
+y	input.vhd	/^  y: out std_logic$/;"	q	entity:FEWGATES
 concurrent	input.vhd	/^architecture concurrent of FEWGATES is$/;"	a	entity:FEWGATES
 GatesPkg	input.vhd	/^package GatesPkg is$/;"	P
 FEWGATES	input.vhd	/^entity FEWGATES is port ($/;"	e
+a	input.vhd	/^  a,b,c,d: in std_logic;$/;"	q	entity:FEWGATES
+b	input.vhd	/^  a,b,c,d: in std_logic;$/;"	q	entity:FEWGATES
+c	input.vhd	/^  a,b,c,d: in std_logic;$/;"	q	entity:FEWGATES
+d	input.vhd	/^  a,b,c,d: in std_logic;$/;"	q	entity:FEWGATES
+y	input.vhd	/^  y: out std_logic$/;"	q	entity:FEWGATES
 structural	input.vhd	/^architecture structural of FEWGATES is$/;"	a	entity:FEWGATES
 AND2	input.vhd	/^entity AND2 is port ($/;"	e
+i1	input.vhd	/^    i1: in std_logic;$/;"	q	entity:AND2
+i2	input.vhd	/^    i2: in std_logic;$/;"	q	entity:AND2
+y	input.vhd	/^    y: out std_logic$/;"	q	entity:AND2
 rtl	input.vhd	/^architecture rtl of AND2 is$/;"	a	entity:AND2
 OR2	input.vhd	/^entity OR2 is port ($/;"	e
+i1	input.vhd	/^    i1: in std_logic;$/;"	q	entity:OR2
+i2	input.vhd	/^    i2: in std_logic;$/;"	q	entity:OR2
+y	input.vhd	/^    y: out std_logic$/;"	q	entity:OR2
 rtl	input.vhd	/^architecture rtl of OR2 is$/;"	a	entity:OR2
 INVERTER	input.vhd	/^entity INVERTER is port ($/;"	e
+i	input.vhd	/^    i: in std_logic;$/;"	q	entity:INVERTER
+o	input.vhd	/^    o: out std_logic$/;"	q	entity:INVERTER
 rtl	input.vhd	/^architecture rtl of INVERTER is$/;"	a	entity:INVERTER
 FEWGATES	input.vhd	/^entity FEWGATES is port ($/;"	e
+a	input.vhd	/^  a,b,c,d: in std_logic;$/;"	q	entity:FEWGATES
+b	input.vhd	/^  a,b,c,d: in std_logic;$/;"	q	entity:FEWGATES
+c	input.vhd	/^  a,b,c,d: in std_logic;$/;"	q	entity:FEWGATES
+d	input.vhd	/^  a,b,c,d: in std_logic;$/;"	q	entity:FEWGATES
+y	input.vhd	/^  y: out std_logic$/;"	q	entity:FEWGATES
 structural	input.vhd	/^architecture structural of FEWGATES is$/;"	a	entity:FEWGATES
 simHierarchy	input.vhd	/^entity simHierarchy is port ($/;"	e
+A	input.vhd	/^  A, B, Clk: in std_logic;$/;"	q	entity:simHierarchy
+B	input.vhd	/^  A, B, Clk: in std_logic;$/;"	q	entity:simHierarchy
+Clk	input.vhd	/^  A, B, Clk: in std_logic;$/;"	q	entity:simHierarchy
+Y	input.vhd	/^  Y: out std_logic$/;"	q	entity:simHierarchy
 hierarchical	input.vhd	/^architecture hierarchical of simHierarchy is$/;"	a	entity:simHierarchy
 INVERTER	input.vhd	/^entity INVERTER is port ($/;"	e
+i	input.vhd	/^    i: in std_logic;$/;"	q	entity:INVERTER
+o	input.vhd	/^    o: out std_logic$/;"	q	entity:INVERTER
 rtl	input.vhd	/^architecture rtl of INVERTER is$/;"	a	entity:INVERTER
 io1164	input.vhd	/^package io1164 is$/;"	P
 io1164	input.vhd	/^package body io1164 is$/;"	P
@@ -281,8 +624,18 @@ read_oct	input.vhd	/^    procedure read_oct(l     : inout line;$/;"	p
 read_hex	input.vhd	/^    procedure read_hex(l     : inout line;$/;"	p
 read_hex	input.vhd	/^    procedure read_hex(l     : inout line;$/;"	p
 asyncLdCnt	input.vhd	/^entity asyncLdCnt is port ($/;"	e
+loadVal	input.vhd	/^  loadVal: in std_logic_vector(3 downto 0);$/;"	q	entity:asyncLdCnt
+clk	input.vhd	/^  clk, load: in std_logic;$/;"	q	entity:asyncLdCnt
+load	input.vhd	/^  clk, load: in std_logic;$/;"	q	entity:asyncLdCnt
+q	input.vhd	/^  q: out std_logic_vector(3 downto 0)$/;"	q	entity:asyncLdCnt
 rtl	input.vhd	/^architecture rtl of asyncLdCnt is$/;"	a	entity:asyncLdCnt
 LoadCnt	input.vhd	/^entity LoadCnt is port ($/;"	e
+CntEn	input.vhd	/^  CntEn: in std_logic;$/;"	q	entity:LoadCnt
+LdCnt	input.vhd	/^  LdCnt: in std_logic;$/;"	q	entity:LoadCnt
+LdData	input.vhd	/^  LdData: in std_logic_vector(3 downto 0);$/;"	q	entity:LoadCnt
+Clk	input.vhd	/^  Clk: in std_logic;$/;"	q	entity:LoadCnt
+Rst	input.vhd	/^  Rst: in std_logic;$/;"	q	entity:LoadCnt
+CntVal	input.vhd	/^  CntVal: out std_logic_vector(3 downto 0)$/;"	q	entity:LoadCnt
 behavioral	input.vhd	/^architecture behavioral of LoadCnt is$/;"	a	entity:LoadCnt
 loadCntTB	input.vhd	/^entity loadCntTB is$/;"	e
 testbench	input.vhd	/^architecture testbench of loadCntTB is$/;"	a	entity:loadCntTB
@@ -293,75 +646,182 @@ rst	input.vhd	/^  rst: std_logic;$/;"	r
 q	input.vhd	/^  q: std_logic_vector(7 downto 0);$/;"	r
 ClkPeriod	input.vhd	/^constant ClkPeriod: time := 100 ns;$/;"	c
 loadCnt	input.vhd	/^entity loadCnt is port ($/;"	e
+data	input.vhd	/^  data: in std_logic_vector (7 downto 0);$/;"	q	entity:loadCnt
+load	input.vhd	/^  load: in std_logic;$/;"	q	entity:loadCnt
+clk	input.vhd	/^  clk: in std_logic;$/;"	q	entity:loadCnt
+rst	input.vhd	/^  rst: in std_logic;$/;"	q	entity:loadCnt
+q	input.vhd	/^  q: out std_logic_vector (7 downto 0)$/;"	q	entity:loadCnt
 rtl	input.vhd	/^architecture rtl of loadCnt is$/;"	a	entity:loadCnt
 multiplier	input.vhd	/^entity multiplier is port ($/;"	e
+a	input.vhd	/^  a,b : in std_logic_vector (15 downto 0);$/;"	q	entity:multiplier
+b	input.vhd	/^  a,b : in std_logic_vector (15 downto 0);$/;"	q	entity:multiplier
+product	input.vhd	/^  product: out std_logic_vector (31 downto 0)$/;"	q	entity:multiplier
 dataflow	input.vhd	/^architecture dataflow of multiplier is$/;"	a	entity:multiplier
 mux	input.vhd	/^entity mux is port ($/;"	e
+A	input.vhd	/^  A, B, Sel: in std_logic;$/;"	q	entity:mux
+B	input.vhd	/^  A, B, Sel: in std_logic;$/;"	q	entity:mux
+Sel	input.vhd	/^  A, B, Sel: in std_logic;$/;"	q	entity:mux
+Y	input.vhd	/^  Y: out std_logic$/;"	q	entity:mux
 simModel	input.vhd	/^architecture simModel of mux is$/;"	a	entity:mux
 tPD_A	input.vhd	/^constant tPD_A:   time := 10 ns;$/;"	c
 tPD_B	input.vhd	/^constant tPD_B:   time := 15 ns;$/;"	c
 tPD_Sel	input.vhd	/^constant tPD_Sel: time := 5 ns;$/;"	c
 ForceShare	input.vhd	/^entity ForceShare is port ($/;"	e
+a	input.vhd	/^  a,b,c,d,e,f: in std_logic_vector (7 downto 0);$/;"	q	entity:ForceShare
+b	input.vhd	/^  a,b,c,d,e,f: in std_logic_vector (7 downto 0);$/;"	q	entity:ForceShare
+c	input.vhd	/^  a,b,c,d,e,f: in std_logic_vector (7 downto 0);$/;"	q	entity:ForceShare
+d	input.vhd	/^  a,b,c,d,e,f: in std_logic_vector (7 downto 0);$/;"	q	entity:ForceShare
+e	input.vhd	/^  a,b,c,d,e,f: in std_logic_vector (7 downto 0);$/;"	q	entity:ForceShare
+f	input.vhd	/^  a,b,c,d,e,f: in std_logic_vector (7 downto 0);$/;"	q	entity:ForceShare
+result	input.vhd	/^  result: out std_logic_vector(7 downto 0)$/;"	q	entity:ForceShare
 behaviour	input.vhd	/^architecture behaviour of ForceShare is$/;"	a	entity:ForceShare
 TRIBUF8	input.vhd	/^entity TRIBUF8 is port ($/;"	e
+ip	input.vhd	/^  ip: in std_logic_vector(7 downto 0);$/;"	q	entity:TRIBUF8
+oe	input.vhd	/^  oe: in std_logic;$/;"	q	entity:TRIBUF8
+op	input.vhd	/^  op: out std_logic_vector(7 downto 0)$/;"	q	entity:TRIBUF8
 concurrent	input.vhd	/^architecture concurrent of TRIBUF8 is$/;"	a	entity:TRIBUF8
 TRIBUF	input.vhd	/^entity TRIBUF is port ($/;"	e
+ip	input.vhd	/^  ip: in std_logic;$/;"	q	entity:TRIBUF
+oe	input.vhd	/^  oe: in std_logic;$/;"	q	entity:TRIBUF
+op	input.vhd	/^  op: out std_logic$/;"	q	entity:TRIBUF
 concurrent	input.vhd	/^architecture concurrent of TRIBUF is$/;"	a	entity:TRIBUF
 TRIBUF8	input.vhd	/^entity TRIBUF8 is port ($/;"	e
+ip	input.vhd	/^  ip: in std_logic_vector(7 downto 0);$/;"	q	entity:TRIBUF8
+oe	input.vhd	/^  oe: in std_logic;$/;"	q	entity:TRIBUF8
+op	input.vhd	/^  op: out std_logic_vector(7 downto 0)$/;"	q	entity:TRIBUF8
 sequential	input.vhd	/^architecture sequential of TRIBUF8 is$/;"	a	entity:TRIBUF8
 TRIBUF	input.vhd	/^entity TRIBUF is port ($/;"	e
+ip	input.vhd	/^  ip: in bit;$/;"	q	entity:TRIBUF
+oe	input.vhd	/^  oe: in bit;$/;"	q	entity:TRIBUF
+op	input.vhd	/^  op: out bit$/;"	q	entity:TRIBUF
 sequential	input.vhd	/^architecture sequential of TRIBUF is$/;"	a	entity:TRIBUF
 TRIBUF	input.vhd	/^entity TRIBUF is port ($/;"	e
+ip	input.vhd	/^  ip: in std_logic;$/;"	q	entity:TRIBUF
+oe	input.vhd	/^  oe: in std_logic;$/;"	q	entity:TRIBUF
+op	input.vhd	/^  op: out std_logic$/;"	q	entity:TRIBUF
 sequential	input.vhd	/^architecture sequential of TRIBUF is$/;"	a	entity:TRIBUF
 tribuffer	input.vhd	/^entity tribuffer is port ($/;"	e
+input	input.vhd	/^  input: in std_logic;$/;"	q	entity:tribuffer
+enable	input.vhd	/^  enable: in std_logic;$/;"	q	entity:tribuffer
+output	input.vhd	/^  output: out std_logic$/;"	q	entity:tribuffer
 structural	input.vhd	/^architecture structural of tribuffer is$/;"	a	entity:tribuffer
 oddParityGen	input.vhd	/^entity oddParityGen is$/;"	e
+ad	input.vhd	/^  port (ad: in std_logic_vector (width - 1 downto 0);$/;"	q	entity:oddParityGen
+oddParity	input.vhd	/^        oddParity : out std_logic ) ;$/;"	q	entity:oddParityGen
 scaleable	input.vhd	/^architecture scaleable of oddParityGen is$/;"	a	entity:oddParityGen
 oddParityLoop	input.vhd	/^entity oddParityLoop is$/;"	e
+ad	input.vhd	/^  port (ad: in std_logic_vector (width - 1 downto 0);$/;"	q	entity:oddParityLoop
+oddParity	input.vhd	/^        oddParity : out std_logic ) ;$/;"	q	entity:oddParityLoop
 scaleable	input.vhd	/^architecture scaleable of oddParityLoop is$/;"	a	entity:oddParityLoop
 OR2	input.vhd	/^entity OR2 is port ($/;"	e
+i1	input.vhd	/^    i1: in std_logic;$/;"	q	entity:OR2
+i2	input.vhd	/^    i2: in std_logic;$/;"	q	entity:OR2
+y	input.vhd	/^    y: out std_logic$/;"	q	entity:OR2
 rtl	input.vhd	/^architecture rtl of OR2 is$/;"	a	entity:OR2
 OR2	input.vhd	/^entity OR2 is port ($/;"	e
+I1	input.vhd	/^  I1, I2: in std_logic;$/;"	q	entity:OR2
+I2	input.vhd	/^  I1, I2: in std_logic;$/;"	q	entity:OR2
+Y	input.vhd	/^  Y: out std_logic$/;"	q	entity:OR2
 simple	input.vhd	/^architecture simple of OR2 is$/;"	a	entity:OR2
 simPrimitives	input.vhd	/^package simPrimitives is$/;"	P
 OR2	input.vhd	/^entity OR2 is$/;"	e
+I1	input.vhd	/^  port (I1, I2: in std_logic;$/;"	q	entity:OR2
+I2	input.vhd	/^  port (I1, I2: in std_logic;$/;"	q	entity:OR2
+Y	input.vhd	/^    Y: out std_logic$/;"	q	entity:OR2
 simple	input.vhd	/^architecture simple of OR2 is$/;"	a	entity:OR2
 adder	input.vhd	/^entity adder is port ($/;"	e
+a	input.vhd	/^  a,b: in std_logic_vector(3 downto 0);$/;"	q	entity:adder
+b	input.vhd	/^  a,b: in std_logic_vector(3 downto 0);$/;"	q	entity:adder
+sum	input.vhd	/^  sum: out std_logic_vector(3 downto 0);$/;"	q	entity:adder
+overflow	input.vhd	/^  overflow: out std_logic$/;"	q	entity:adder
 concat	input.vhd	/^architecture concat of adder is$/;"	a	entity:adder
 paramDFF	input.vhd	/^entity paramDFF is$/;"	e
+data	input.vhd	/^  data: in std_logic_vector(size - 1 downto 0);$/;"	q	entity:paramDFF
+clock	input.vhd	/^  clock: in std_logic;$/;"	q	entity:paramDFF
+reset	input.vhd	/^  reset: in std_logic;$/;"	q	entity:paramDFF
+ff_enable	input.vhd	/^  ff_enable: in std_logic;$/;"	q	entity:paramDFF
+op_enable	input.vhd	/^  op_enable: in std_logic;$/;"	q	entity:paramDFF
+qout	input.vhd	/^  qout: out std_logic_vector(size - 1 downto 0)$/;"	q	entity:paramDFF
 parameterize	input.vhd	/^architecture parameterize of paramDFF is$/;"	a	entity:paramDFF
 oddParityGen	input.vhd	/^entity oddParityGen is$/;"	e
+ad	input.vhd	/^  port (ad: in std_logic_vector (width - 1 downto 0);$/;"	q	entity:oddParityGen
+oddParity	input.vhd	/^        oddParity : out std_logic ) ;$/;"	q	entity:oddParityGen
 scaleable	input.vhd	/^architecture scaleable of oddParityGen is$/;"	a	entity:oddParityGen
 oddParityGen	input.vhd	/^entity oddParityGen is$/;"	e
+ad	input.vhd	/^  port (ad: in std_logic_vector (width - 1 downto 0);$/;"	q	entity:oddParityGen
+oddParity	input.vhd	/^        oddParity : out std_logic ) ;$/;"	q	entity:oddParityGen
 scaleable	input.vhd	/^architecture scaleable of oddParityGen is$/;"	a	entity:oddParityGen
 powerOfFour	input.vhd	/^entity powerOfFour is port($/;"	e
+clk	input.vhd	/^  clk      : in  std_logic; $/;"	q	entity:powerOfFour
+inputVal	input.vhd	/^  inputVal : in  unsigned(3 downto 0);$/;"	q	entity:powerOfFour
+power	input.vhd	/^  power    : out unsigned(15 downto 0)$/;"	q	entity:powerOfFour
 behavioral	input.vhd	/^architecture behavioral of powerOfFour is$/;"	a	entity:powerOfFour
 Pow	input.vhd	/^   function Pow( N, Exp : integer )  return integer is$/;"	f
 PowerPkg	input.vhd	/^package PowerPkg is  $/;"	P
 Power	input.vhd	/^entity Power is port($/;"	e
+Clk	input.vhd	/^   Clk                   : in  bit; $/;"	q	entity:Power
+inputVal	input.vhd	/^   inputVal              : in  bit_vector(0 to 3);$/;"	q	entity:Power
+power	input.vhd	/^   power                 : out bit_vector(0 to 15) );$/;"	q	entity:Power
 funky	input.vhd	/^architecture funky of Power is$/;"	a	entity:Power
 Pow	input.vhd	/^   function Pow( N, Exp : integer )  return integer is$/;"	f
 RollVal	input.vhd	/^   function RollVal(  CntlVal : integer )  return integer is$/;"	f
 priority_encoder	input.vhd	/^entity priority_encoder is port$/;"	e
+interrupts	input.vhd	/^  (interrupts : in  std_logic_vector(7 downto 0);$/;"	q	entity:priority_encoder
+priority	input.vhd	/^   priority   : in  std_logic_vector(2 downto 0);$/;"	q	entity:priority_encoder
+result	input.vhd	/^   result     : out std_logic_vector(2 downto 0)$/;"	q	entity:priority_encoder
 behave	input.vhd	/^architecture behave of priority_encoder is$/;"	a	entity:priority_encoder
 primitive	input.vhd	/^package primitive is$/;"	P
 DFFE	input.vhd	/^entity DFFE is port ($/;"	e
+d	input.vhd	/^    d: in std_logic;$/;"	q	entity:DFFE
+q	input.vhd	/^    q: out std_logic;$/;"	q	entity:DFFE
+en	input.vhd	/^    en: in std_logic;$/;"	q	entity:DFFE
+clk	input.vhd	/^    clk: in std_logic$/;"	q	entity:DFFE
 rtl	input.vhd	/^architecture rtl of DFFE is$/;"	a	entity:DFFE
 DFFE_SR	input.vhd	/^entity DFFE_SR is port ($/;"	e
+d	input.vhd	/^    d: in std_logic;$/;"	q	entity:DFFE_SR
+en	input.vhd	/^    en: in std_logic;$/;"	q	entity:DFFE_SR
+clk	input.vhd	/^    clk: in std_logic;$/;"	q	entity:DFFE_SR
+rst	input.vhd	/^    rst: in std_logic;$/;"	q	entity:DFFE_SR
+prst	input.vhd	/^    prst: in std_logic;$/;"	q	entity:DFFE_SR
+q	input.vhd	/^    q: out std_logic$/;"	q	entity:DFFE_SR
 rtl	input.vhd	/^architecture rtl of DFFE_SR is$/;"	a	entity:DFFE_SR
 DLATCHH	input.vhd	/^entity DLATCHH is port ($/;"	e
+d	input.vhd	/^    d: in std_logic;$/;"	q	entity:DLATCHH
+en	input.vhd	/^    en: in std_logic;$/;"	q	entity:DLATCHH
+q	input.vhd	/^    q: out std_logic$/;"	q	entity:DLATCHH
 rtl	input.vhd	/^architecture rtl of DLATCHH is$/;"	a	entity:DLATCHH
 AND2	input.vhd	/^entity AND2 is port ($/;"	e
+i1	input.vhd	/^    i1: in std_logic;$/;"	q	entity:AND2
+i2	input.vhd	/^    i2: in std_logic;$/;"	q	entity:AND2
+y	input.vhd	/^    y: out std_logic$/;"	q	entity:AND2
 rtl	input.vhd	/^architecture rtl of AND2 is$/;"	a	entity:AND2
 OR2	input.vhd	/^entity OR2 is port ($/;"	e
+i1	input.vhd	/^    i1: in std_logic;$/;"	q	entity:OR2
+i2	input.vhd	/^    i2: in std_logic;$/;"	q	entity:OR2
+y	input.vhd	/^    y: out std_logic$/;"	q	entity:OR2
 rtl	input.vhd	/^architecture rtl of OR2 is$/;"	a	entity:OR2
 INVERTER	input.vhd	/^entity INVERTER is port ($/;"	e
+i	input.vhd	/^    i: in std_logic;$/;"	q	entity:INVERTER
+o	input.vhd	/^    o: out std_logic$/;"	q	entity:INVERTER
 rtl	input.vhd	/^architecture rtl of INVERTER is$/;"	a	entity:INVERTER
 TRIBUF	input.vhd	/^entity TRIBUF is port ($/;"	e
+ip	input.vhd	/^  ip: in std_logic;$/;"	q	entity:TRIBUF
+oe	input.vhd	/^  oe: in std_logic;$/;"	q	entity:TRIBUF
+op	input.vhd	/^  op: out std_logic$/;"	q	entity:TRIBUF
 rtl	input.vhd	/^architecture rtl of TRIBUF is$/;"	a	entity:TRIBUF
 BIDIR	input.vhd	/^entity BIDIR is port ($/;"	e
+ip	input.vhd	/^  ip: in std_logic;$/;"	q	entity:BIDIR
+oe	input.vhd	/^  oe: in std_logic;$/;"	q	entity:BIDIR
+op_fb	input.vhd	/^  op_fb: out std_logic;$/;"	q	entity:BIDIR
+op	input.vhd	/^  op: inout std_logic$/;"	q	entity:BIDIR
 rtl	input.vhd	/^architecture rtl of BIDIR is$/;"	a	entity:BIDIR
 progPulse	input.vhd	/^entity progPulse is port ($/;"	e
+clk	input.vhd	/^  clk, reset: in std_logic;$/;"	q	entity:progPulse
+reset	input.vhd	/^  clk, reset: in std_logic;$/;"	q	entity:progPulse
+loadLength	input.vhd	/^  loadLength,loadDelay: in std_logic;$/;"	q	entity:progPulse
+loadDelay	input.vhd	/^  loadLength,loadDelay: in std_logic;$/;"	q	entity:progPulse
+data	input.vhd	/^  data: in std_logic_vector(7 downto 0);$/;"	q	entity:progPulse
+pulse	input.vhd	/^  pulse: out std_logic$/;"	q	entity:progPulse
 rtl	input.vhd	/^architecture rtl of progPulse is$/;"	a	entity:progPulse
 fsmType	input.vhd	/^subtype fsmType is std_logic_vector(1 downto 0);$/;"	T
 loadDelayCnt	input.vhd	/^constant loadDelayCnt  : fsmType := "00";$/;"	c
@@ -369,38 +829,106 @@ waitDelayEnd	input.vhd	/^constant waitDelayEnd  : fsmType := "10";$/;"	c
 loadLengthCnt	input.vhd	/^constant loadLengthCnt : fsmType := "11";$/;"	c
 waitLengthEnd	input.vhd	/^constant waitLengthEnd : fsmType := "01";$/;"	c
 pulseErr	input.vhd	/^entity pulseErr is port$/;"	e
+a	input.vhd	/^  (a: in std_logic;$/;"	q	entity:pulseErr
+b	input.vhd	/^   b: out std_logic$/;"	q	entity:pulseErr
 behavior	input.vhd	/^architecture behavior of pulseErr is$/;"	a	entity:pulseErr
 progPulse	input.vhd	/^entity progPulse is port ($/;"	e
+clk	input.vhd	/^  clk, reset: in std_logic;$/;"	q	entity:progPulse
+reset	input.vhd	/^  clk, reset: in std_logic;$/;"	q	entity:progPulse
+loadLength	input.vhd	/^  loadLength,loadDelay: in std_logic;$/;"	q	entity:progPulse
+loadDelay	input.vhd	/^  loadLength,loadDelay: in std_logic;$/;"	q	entity:progPulse
+data	input.vhd	/^  data: in std_logic_vector(7 downto 0);$/;"	q	entity:progPulse
+pulse	input.vhd	/^  pulse: out std_logic$/;"	q	entity:progPulse
 rtl	input.vhd	/^architecture rtl of progPulse is$/;"	a	entity:progPulse
 progPulseFsmType	input.vhd	/^type progPulseFsmType is (loadDelayCnt, waitDelayEnd, loadLengthCnt, waitLengthEnd);$/;"	t
 progPulseFsm	input.vhd	/^entity progPulseFsm is port ($/;"	e
+downCnt	input.vhd	/^  downCnt: in std_logic_vector(7 downto 0);$/;"	q	entity:progPulseFsm
+delayCntVal	input.vhd	/^  delayCntVal: in std_logic_vector(7 downto 0);$/;"	q	entity:progPulseFsm
+lengthCntVal	input.vhd	/^  lengthCntVal: in std_logic_vector(7 downto 0);$/;"	q	entity:progPulseFsm
+loadLength	input.vhd	/^  loadLength: in std_logic;$/;"	q	entity:progPulseFsm
+loadDelay	input.vhd	/^  loadDelay: in std_logic;$/;"	q	entity:progPulseFsm
+clk	input.vhd	/^  clk: in std_logic;$/;"	q	entity:progPulseFsm
+reset	input.vhd	/^  reset: in std_logic;$/;"	q	entity:progPulseFsm
+downCntEn	input.vhd	/^  downCntEn: out std_logic;$/;"	q	entity:progPulseFsm
+downCntLd	input.vhd	/^  downCntLd: out std_logic;$/;"	q	entity:progPulseFsm
+downCntData	input.vhd	/^  downCntData: out std_logic_vector(7 downto 0);$/;"	q	entity:progPulseFsm
+pulse	input.vhd	/^  pulse: out std_logic$/;"	q	entity:progPulseFsm
 fsm	input.vhd	/^architecture fsm of progPulseFsm is$/;"	a	entity:progPulseFsm
 progPulseFsmType	input.vhd	/^type progPulseFsmType is (loadDelayCnt, waitDelayEnd, loadLengthCnt, waitLengthEnd);$/;"	t
 stateVec	input.vhd	/^type stateVec is array (3 downto 0) of std_logic;$/;"	t
 stateBits	input.vhd	/^type stateBits is array (progPulseFsmType) of stateVec;$/;"	t
 stateTable	input.vhd	/^constant stateTable: stateBits := ($/;"	c
 progPulseFsm	input.vhd	/^entity progPulseFsm is port ($/;"	e
+downCnt	input.vhd	/^  downCnt: in std_logic_vector(7 downto 0);$/;"	q	entity:progPulseFsm
+delayCntVal	input.vhd	/^  delayCntVal: in std_logic_vector(7 downto 0);$/;"	q	entity:progPulseFsm
+lengthCntVal	input.vhd	/^  lengthCntVal: in std_logic_vector(7 downto 0);$/;"	q	entity:progPulseFsm
+loadLength	input.vhd	/^  loadLength: in std_logic;$/;"	q	entity:progPulseFsm
+loadDelay	input.vhd	/^  loadDelay: in std_logic;$/;"	q	entity:progPulseFsm
+clk	input.vhd	/^  clk: in std_logic;$/;"	q	entity:progPulseFsm
+reset	input.vhd	/^  reset: in std_logic;$/;"	q	entity:progPulseFsm
+downCntEn	input.vhd	/^  downCntEn: out std_logic;$/;"	q	entity:progPulseFsm
+downCntLd	input.vhd	/^  downCntLd: out std_logic;$/;"	q	entity:progPulseFsm
+downtCntData	input.vhd	/^  downtCntData: out std_logic_vector(7 downto 0);$/;"	q	entity:progPulseFsm
+pulse	input.vhd	/^  pulse: out std_logic$/;"	q	entity:progPulseFsm
 fsm	input.vhd	/^architecture fsm of progPulseFsm is$/;"	a	entity:progPulseFsm
 progPulseFsmType	input.vhd	/^type progPulseFsmType is (loadDelayCnt, waitDelayEnd, loadLengthCnt, waitLengthEnd);$/;"	t
 powerOfFour	input.vhd	/^entity powerOfFour is port($/;"	e
+clk	input.vhd	/^  clk      : in  std_logic; $/;"	q	entity:powerOfFour
+inputVal	input.vhd	/^  inputVal : in  std_logic_vector(3 downto 0);$/;"	q	entity:powerOfFour
+power	input.vhd	/^  power    : out std_logic_vector(15 downto 0)$/;"	q	entity:powerOfFour
 behavioral	input.vhd	/^architecture behavioral of powerOfFour is$/;"	a	entity:powerOfFour
 powerOfFour	input.vhd	/^entity powerOfFour is port($/;"	e
+clk	input.vhd	/^  clk      : in  std_logic; $/;"	q	entity:powerOfFour
+inputVal	input.vhd	/^  inputVal : in  std_logic_vector(3 downto 0);$/;"	q	entity:powerOfFour
+power	input.vhd	/^  power    : out std_logic_vector(15 downto 0)$/;"	q	entity:powerOfFour
 behavioral	input.vhd	/^architecture behavioral of powerOfFour is$/;"	a	entity:powerOfFour
 Pow	input.vhd	/^   function Pow( N, Exp : integer )  return integer is$/;"	f
 powerOfFour	input.vhd	/^entity powerOfFour is port($/;"	e
+clk	input.vhd	/^  clk      : in  std_logic; $/;"	q	entity:powerOfFour
+inputVal	input.vhd	/^  inputVal : in  std_logic_vector(3 downto 0);$/;"	q	entity:powerOfFour
+power	input.vhd	/^  power    : out std_logic_vector(15 downto 0)$/;"	q	entity:powerOfFour
 behavioral	input.vhd	/^architecture behavioral of powerOfFour is$/;"	a	entity:powerOfFour
 Pow	input.vhd	/^   function Pow( N, Exp : integer )  return integer is$/;"	f
 regFile	input.vhd	/^entity regFile is port ($/;"	e
+clk	input.vhd	/^  clk, rst: in std_logic;$/;"	q	entity:regFile
+rst	input.vhd	/^  clk, rst: in std_logic;$/;"	q	entity:regFile
+data	input.vhd	/^  data: in std_logic_vector(31 downto 0);$/;"	q	entity:regFile
+regSel	input.vhd	/^  regSel: in std_logic_vector(1 downto 0);$/;"	q	entity:regFile
+wrEnable	input.vhd	/^  wrEnable: in std_logic;$/;"	q	entity:regFile
+regOut	input.vhd	/^  regOut: out std_logic_vector(31 downto 0)$/;"	q	entity:regFile
 behavioral	input.vhd	/^architecture behavioral of regFile is$/;"	a	entity:regFile
 reg	input.vhd	/^subtype reg is std_logic_vector(31 downto 0);$/;"	T
 regArray	input.vhd	/^type regArray is array (integer range <>) of reg;$/;"	t
 DFF	input.vhd	/^entity DFF is port ($/;"	e
+d1	input.vhd	/^    d1,d2: in std_logic;$/;"	q	entity:DFF
+d2	input.vhd	/^    d1,d2: in std_logic;$/;"	q	entity:DFF
+q1	input.vhd	/^    q1,q2: out std_logic;$/;"	q	entity:DFF
+q2	input.vhd	/^    q1,q2: out std_logic;$/;"	q	entity:DFF
+clk	input.vhd	/^    clk: in std_logic;$/;"	q	entity:DFF
+rst	input.vhd	/^    rst : in std_logic$/;"	q	entity:DFF
 rtl	input.vhd	/^architecture rtl of DFF is$/;"	a	entity:DFF
 resFcnDemo	input.vhd	/^entity resFcnDemo is port ($/;"	e
+a	input.vhd	/^  a, b: in std_logic;$/;"	q	entity:resFcnDemo
+b	input.vhd	/^  a, b: in std_logic;$/;"	q	entity:resFcnDemo
+oeA	input.vhd	/^  oeA,oeB: in std_logic;$/;"	q	entity:resFcnDemo
+oeB	input.vhd	/^  oeA,oeB: in std_logic;$/;"	q	entity:resFcnDemo
+result	input.vhd	/^  result: out std_logic$/;"	q	entity:resFcnDemo
 multiDriver	input.vhd	/^architecture multiDriver of resFcnDemo is$/;"	a	entity:resFcnDemo
 scaleDFF	input.vhd	/^entity scaleDFF is port ($/;"	e
+data	input.vhd	/^  data: in std_logic_vector(7 downto 0);$/;"	q	entity:scaleDFF
+clock	input.vhd	/^  clock: in std_logic;$/;"	q	entity:scaleDFF
+enable	input.vhd	/^  enable: in std_logic;$/;"	q	entity:scaleDFF
+qout	input.vhd	/^  qout: out std_logic_vector(7 downto 0)$/;"	q	entity:scaleDFF
 scalable	input.vhd	/^architecture scalable of scaleDFF is$/;"	a	entity:scaleDFF
 sevenSegment	input.vhd	/^entity sevenSegment is port ($/;"	e
+bcdInputs	input.vhd	/^  bcdInputs: in std_logic_vector (3 downto 0);$/;"	q	entity:sevenSegment
+a_n	input.vhd	/^  a_n, b_n, c_n, d_n,$/;"	q	entity:sevenSegment
+b_n	input.vhd	/^  a_n, b_n, c_n, d_n,$/;"	q	entity:sevenSegment
+c_n	input.vhd	/^  a_n, b_n, c_n, d_n,$/;"	q	entity:sevenSegment
+d_n	input.vhd	/^  a_n, b_n, c_n, d_n,$/;"	q	entity:sevenSegment
+e_n	input.vhd	/^  e_n, f_n, g_n: out std_logic$/;"	q	entity:sevenSegment
+f_n	input.vhd	/^  e_n, f_n, g_n: out std_logic$/;"	q	entity:sevenSegment
+g_n	input.vhd	/^  e_n, f_n, g_n: out std_logic$/;"	q	entity:sevenSegment
 behavioral	input.vhd	/^architecture behavioral of sevenSegment is$/;"	a	entity:sevenSegment
 sevenSegmentTB	input.vhd	/^entity sevenSegmentTB is$/;"	e
 testbench	input.vhd	/^architecture testbench of sevenSegmentTB is$/;"	a	entity:sevenSegmentTB
@@ -413,30 +941,94 @@ SimLoopDelay	input.vhd	/^constant SimLoopDelay: time := 10 ns;$/;"	c
 vectorArray	input.vhd	/^type vectorArray is array (0 to NumVectors - 1) of vector;$/;"	t
 vectorTable	input.vhd	/^constant vectorTable: vectorArray := ($/;"	c
 sevenSegment	input.vhd	/^entity sevenSegment is port ($/;"	e
+bcdInputs	input.vhd	/^  bcdInputs: in std_logic_vector (3 downto 0);$/;"	q	entity:sevenSegment
+a_n	input.vhd	/^  a_n, b_n, c_n, d_n,$/;"	q	entity:sevenSegment
+b_n	input.vhd	/^  a_n, b_n, c_n, d_n,$/;"	q	entity:sevenSegment
+c_n	input.vhd	/^  a_n, b_n, c_n, d_n,$/;"	q	entity:sevenSegment
+d_n	input.vhd	/^  a_n, b_n, c_n, d_n,$/;"	q	entity:sevenSegment
+e_n	input.vhd	/^  e_n, f_n, g_n: out std_logic$/;"	q	entity:sevenSegment
+f_n	input.vhd	/^  e_n, f_n, g_n: out std_logic$/;"	q	entity:sevenSegment
+g_n	input.vhd	/^  e_n, f_n, g_n: out std_logic$/;"	q	entity:sevenSegment
 behavioral	input.vhd	/^architecture behavioral of sevenSegment is$/;"	a	entity:sevenSegment
 ForceShare	input.vhd	/^entity ForceShare is port ($/;"	e
+a	input.vhd	/^  a,b,c,d,e,f: in std_logic_vector (7 downto 0);$/;"	q	entity:ForceShare
+b	input.vhd	/^  a,b,c,d,e,f: in std_logic_vector (7 downto 0);$/;"	q	entity:ForceShare
+c	input.vhd	/^  a,b,c,d,e,f: in std_logic_vector (7 downto 0);$/;"	q	entity:ForceShare
+d	input.vhd	/^  a,b,c,d,e,f: in std_logic_vector (7 downto 0);$/;"	q	entity:ForceShare
+e	input.vhd	/^  a,b,c,d,e,f: in std_logic_vector (7 downto 0);$/;"	q	entity:ForceShare
+f	input.vhd	/^  a,b,c,d,e,f: in std_logic_vector (7 downto 0);$/;"	q	entity:ForceShare
+result	input.vhd	/^  result: out std_logic_vector(7 downto 0)$/;"	q	entity:ForceShare
 behaviour	input.vhd	/^architecture behaviour of ForceShare is$/;"	a	entity:ForceShare
 shifter	input.vhd	/^entity shifter is port ($/;"	e
+clk	input.vhd	/^  clk, rst: in std_logic;$/;"	q	entity:shifter
+rst	input.vhd	/^  clk, rst: in std_logic;$/;"	q	entity:shifter
+shiftEn	input.vhd	/^  shiftEn,shiftIn: std_logic;$/;"	q	entity:shifter
+shiftIn	input.vhd	/^  shiftEn,shiftIn: std_logic;$/;"	q	entity:shifter
+q	input.vhd	/^  q: out std_logic_vector (15 downto 0)$/;"	q	entity:shifter
 behav	input.vhd	/^architecture behav of shifter is$/;"	a	entity:shifter
 lastAssignment	input.vhd	/^entity lastAssignment is port$/;"	e
+a	input.vhd	/^  (a, b: in std_logic;$/;"	q	entity:lastAssignment
+b	input.vhd	/^  (a, b: in std_logic;$/;"	q	entity:lastAssignment
+selA	input.vhd	/^   selA, selb: in std_logic;$/;"	q	entity:lastAssignment
+selb	input.vhd	/^   selA, selb: in std_logic;$/;"	q	entity:lastAssignment
+result	input.vhd	/^   result: out std_logic$/;"	q	entity:lastAssignment
 behavioral	input.vhd	/^architecture behavioral of lastAssignment is$/;"	a	entity:lastAssignment
 signalDemo	input.vhd	/^entity signalDemo is port ($/;"	e
+a	input.vhd	/^  a: in std_logic;$/;"	q	entity:signalDemo
+b	input.vhd	/^  b: out std_logic$/;"	q	entity:signalDemo
 basic	input.vhd	/^architecture basic of signalDemo is$/;"	a	entity:signalDemo
 signalDemo	input.vhd	/^entity signalDemo is port ($/;"	e
+a	input.vhd	/^  a: in std_logic;$/;"	q	entity:signalDemo
+b	input.vhd	/^  b: out std_logic$/;"	q	entity:signalDemo
 basic	input.vhd	/^architecture basic of signalDemo is$/;"	a	entity:signalDemo
 simPrimitives	input.vhd	/^package simPrimitives is$/;"	P
 OR2	input.vhd	/^entity OR2 is$/;"	e
+I1	input.vhd	/^  port (I1, I2: in std_logic;$/;"	q	entity:OR2
+I2	input.vhd	/^  port (I1, I2: in std_logic;$/;"	q	entity:OR2
+Y	input.vhd	/^    Y: out std_logic$/;"	q	entity:OR2
 simple	input.vhd	/^architecture simple of OR2 is$/;"	a	entity:OR2
 SimDFF	input.vhd	/^entity SimDFF is$/;"	e
+D	input.vhd	/^  port (D, Clk: in std_logic;$/;"	q	entity:SimDFF
+Clk	input.vhd	/^  port (D, Clk: in std_logic;$/;"	q	entity:SimDFF
+Q	input.vhd	/^  Q: out std_logic$/;"	q	entity:SimDFF
 SimModel	input.vhd	/^architecture SimModel of SimDFF is$/;"	a	entity:SimDFF
 SRFF	input.vhd	/^entity SRFF is port ($/;"	e
+s	input.vhd	/^    s,r: in std_logic;$/;"	q	entity:SRFF
+r	input.vhd	/^    s,r: in std_logic;$/;"	q	entity:SRFF
+clk	input.vhd	/^    clk: in std_logic;$/;"	q	entity:SRFF
+q	input.vhd	/^    q: out std_logic$/;"	q	entity:SRFF
 rtl	input.vhd	/^architecture rtl of SRFF is$/;"	a	entity:SRFF
 SRFF	input.vhd	/^entity SRFF is port ($/;"	e
+s	input.vhd	/^    s,r: in std_logic;$/;"	q	entity:SRFF
+r	input.vhd	/^    s,r: in std_logic;$/;"	q	entity:SRFF
+clk	input.vhd	/^    clk: in std_logic;$/;"	q	entity:SRFF
+q	input.vhd	/^    q: out std_logic$/;"	q	entity:SRFF
 rtl	input.vhd	/^architecture rtl of SRFF is$/;"	a	entity:SRFF
 scaleable	input.vhd	/^package scaleable is$/;"	P
 scaleUpCnt	input.vhd	/^entity scaleUpCnt is port ($/;"	e
+clk	input.vhd	/^  clk: in std_logic;$/;"	q	entity:scaleUpCnt
+reset	input.vhd	/^  reset: in std_logic;$/;"	q	entity:scaleUpCnt
+cnt	input.vhd	/^  cnt: out std_logic_vector$/;"	q	entity:scaleUpCnt
 scaleable	input.vhd	/^architecture scaleable of scaleUpCnt is$/;"	a	entity:scaleUpCnt
 pci_target	input.vhd	/^entity pci_target is port ($/;"	e
+PCI_Frame_n	input.vhd	/^  PCI_Frame_n: in std_logic;	-- PCI Frame#$/;"	q	entity:pci_target
+PCI_Irdy_n	input.vhd	/^  PCI_Irdy_n: in std_logic;		-- PCI Irdy#$/;"	q	entity:pci_target
+Hit	input.vhd	/^  Hit: in std_logic;			-- Hit on address decode$/;"	q	entity:pci_target
+D_Done	input.vhd	/^  D_Done: in std_logic;			-- Device decode complete$/;"	q	entity:pci_target
+Term	input.vhd	/^  Term: in std_logic;			-- Terminate transaction$/;"	q	entity:pci_target
+Ready	input.vhd	/^  Ready: in std_logic;			-- Ready to transfer data$/;"	q	entity:pci_target
+Cmd_Write	input.vhd	/^  Cmd_Write: in std_logic;		-- Command is Write$/;"	q	entity:pci_target
+Cmd_Read	input.vhd	/^  Cmd_Read: in std_logic;		-- Command is Read$/;"	q	entity:pci_target
+T_Abort	input.vhd	/^  T_Abort: in std_logic;		-- Target error  - abort transaction$/;"	q	entity:pci_target
+PCI_Clk	input.vhd	/^  PCI_Clk: in std_logic;		-- PCI Clock$/;"	q	entity:pci_target
+PCI_Reset_n	input.vhd	/^  PCI_Reset_n: in std_logic;	-- PCI Reset#$/;"	q	entity:pci_target
+PCI_Devsel_n	input.vhd	/^  PCI_Devsel_n: out std_logic;	-- PCI Devsel#$/;"	q	entity:pci_target
+PCI_Trdy_n	input.vhd	/^  PCI_Trdy_n: out std_logic;	-- PCI Trdy#$/;"	q	entity:pci_target
+PCI_Stop_n	input.vhd	/^  PCI_Stop_n: out std_logic;	-- PCI Stop#$/;"	q	entity:pci_target
+OE_AD	input.vhd	/^  OE_AD: out std_logic;			-- PCI AD bus enable$/;"	q	entity:pci_target
+OE_Trdy_n	input.vhd	/^  OE_Trdy_n: out std_logic;		-- PCI Trdy# enable$/;"	q	entity:pci_target
+OE_Stop_n	input.vhd	/^  OE_Stop_n: out std_logic;		-- PCI Stop# enable$/;"	q	entity:pci_target
+OE_Devsel_n	input.vhd	/^  OE_Devsel_n: out std_logic	-- PCI Devsel# enable$/;"	q	entity:pci_target
 fsm	input.vhd	/^architecture fsm of pci_target is$/;"	a	entity:pci_target
 targetFsmType	input.vhd	/^subtype targetFsmType is std_logic_vector(2 downto 0);$/;"	T
 Idle	input.vhd	/^constant Idle: 		targetFsmType := "000";$/;"	c
@@ -445,6 +1037,24 @@ Backoff	input.vhd	/^constant Backoff: 	targetFsmType := "010";$/;"	c
 S_Data	input.vhd	/^constant S_Data: 		targetFsmType := "011";$/;"	c
 Turn_Ar	input.vhd	/^constant Turn_Ar: 	targetFsmType := "110";$/;"	c
 pci_target	input.vhd	/^entity pci_target is port ($/;"	e
+PCI_Frame_n	input.vhd	/^  PCI_Frame_n: in std_logic;	-- PCI Frame#$/;"	q	entity:pci_target
+PCI_Irdy_n	input.vhd	/^  PCI_Irdy_n: in std_logic;		-- PCI Irdy#$/;"	q	entity:pci_target
+Hit	input.vhd	/^  Hit: in std_logic;			-- Hit on address decode$/;"	q	entity:pci_target
+D_Done	input.vhd	/^  D_Done: in std_logic;			-- Device decode complete$/;"	q	entity:pci_target
+Term	input.vhd	/^  Term: in std_logic;			-- Terminate transaction$/;"	q	entity:pci_target
+Ready	input.vhd	/^  Ready: in std_logic;			-- Ready to transfer data$/;"	q	entity:pci_target
+Cmd_Write	input.vhd	/^  Cmd_Write: in std_logic;		-- Command is Write$/;"	q	entity:pci_target
+Cmd_Read	input.vhd	/^  Cmd_Read: in std_logic;		-- Command is Read$/;"	q	entity:pci_target
+T_Abort	input.vhd	/^  T_Abort: in std_logic;		-- Target error  - abort transaction$/;"	q	entity:pci_target
+PCI_Clk	input.vhd	/^  PCI_Clk: in std_logic;		-- PCI Clock$/;"	q	entity:pci_target
+PCI_Reset_n	input.vhd	/^  PCI_Reset_n: in std_logic;	-- PCI Reset#$/;"	q	entity:pci_target
+PCI_Devsel_n	input.vhd	/^  PCI_Devsel_n: out std_logic;	-- PCI Devsel#$/;"	q	entity:pci_target
+PCI_Trdy_n	input.vhd	/^  PCI_Trdy_n: out std_logic;	-- PCI Trdy#$/;"	q	entity:pci_target
+PCI_Stop_n	input.vhd	/^  PCI_Stop_n: out std_logic;	-- PCI Stop#$/;"	q	entity:pci_target
+OE_AD	input.vhd	/^  OE_AD: out std_logic;			-- PCI AD bus enable$/;"	q	entity:pci_target
+OE_Trdy_n	input.vhd	/^  OE_Trdy_n: out std_logic;		-- PCI Trdy# enable$/;"	q	entity:pci_target
+OE_Stop_n	input.vhd	/^  OE_Stop_n: out std_logic;		-- PCI Stop# enable$/;"	q	entity:pci_target
+OE_Devsel_n	input.vhd	/^  OE_Devsel_n: out std_logic	-- PCI Devsel# enable$/;"	q	entity:pci_target
 fsm	input.vhd	/^architecture fsm of pci_target is$/;"	a	entity:pci_target
 targetFsmType	input.vhd	/^subtype targetFsmType is std_logic_vector(2 downto 0);$/;"	T
 Idle	input.vhd	/^constant Idle: 		targetFsmType := "000";$/;"	c
@@ -453,6 +1063,24 @@ Backoff	input.vhd	/^constant Backoff: 	targetFsmType := "011";$/;"	c
 S_Data	input.vhd	/^constant S_Data: 		targetFsmType := "010";$/;"	c
 Turn_Ar	input.vhd	/^constant Turn_Ar: 	targetFsmType := "110";$/;"	c
 pci_target	input.vhd	/^entity pci_target is port ($/;"	e
+PCI_Frame_n	input.vhd	/^  PCI_Frame_n: in std_logic;	-- PCI Frame#$/;"	q	entity:pci_target
+PCI_Irdy_n	input.vhd	/^  PCI_Irdy_n: in std_logic;		-- PCI Irdy#$/;"	q	entity:pci_target
+Hit	input.vhd	/^  Hit: in std_logic;			-- Hit on address decode$/;"	q	entity:pci_target
+D_Done	input.vhd	/^  D_Done: in std_logic;			-- Device decode complete$/;"	q	entity:pci_target
+Term	input.vhd	/^  Term: in std_logic;			-- Terminate transaction$/;"	q	entity:pci_target
+Ready	input.vhd	/^  Ready: in std_logic;			-- Ready to transfer data$/;"	q	entity:pci_target
+Cmd_Write	input.vhd	/^  Cmd_Write: in std_logic;		-- Command is Write$/;"	q	entity:pci_target
+Cmd_Read	input.vhd	/^  Cmd_Read: in std_logic;		-- Command is Read$/;"	q	entity:pci_target
+T_Abort	input.vhd	/^  T_Abort: in std_logic;		-- Target error  - abort transaction$/;"	q	entity:pci_target
+PCI_Clk	input.vhd	/^  PCI_Clk: in std_logic;		-- PCI Clock$/;"	q	entity:pci_target
+PCI_Reset_n	input.vhd	/^  PCI_Reset_n: in std_logic;	-- PCI Reset#$/;"	q	entity:pci_target
+PCI_Devsel_n	input.vhd	/^  PCI_Devsel_n: out std_logic;	-- PCI Devsel#$/;"	q	entity:pci_target
+PCI_Trdy_n	input.vhd	/^  PCI_Trdy_n: out std_logic;	-- PCI Trdy#$/;"	q	entity:pci_target
+PCI_Stop_n	input.vhd	/^  PCI_Stop_n: out std_logic;	-- PCI Stop#$/;"	q	entity:pci_target
+OE_AD	input.vhd	/^  OE_AD: out std_logic;			-- PCI AD bus enable$/;"	q	entity:pci_target
+OE_Trdy_n	input.vhd	/^  OE_Trdy_n: out std_logic;		-- PCI Trdy# enable$/;"	q	entity:pci_target
+OE_Stop_n	input.vhd	/^  OE_Stop_n: out std_logic;		-- PCI Stop# enable$/;"	q	entity:pci_target
+OE_Devsel_n	input.vhd	/^  OE_Devsel_n: out std_logic	-- PCI Devsel# enable$/;"	q	entity:pci_target
 fsm	input.vhd	/^architecture fsm of pci_target is$/;"	a	entity:pci_target
 targetFsmType	input.vhd	/^subtype targetFsmType is std_logic_vector(2 downto 0);$/;"	T
 Idle	input.vhd	/^constant Idle: 		targetFsmType := "000";$/;"	c
@@ -461,6 +1089,24 @@ Backoff	input.vhd	/^constant Backoff: 	targetFsmType := "010";$/;"	c
 S_Data	input.vhd	/^constant S_Data: 	targetFsmType := "011";$/;"	c
 Turn_Ar	input.vhd	/^constant Turn_Ar: 	targetFsmType := "100";$/;"	c
 pci_target	input.vhd	/^entity pci_target is port ($/;"	e
+PCI_Frame_n	input.vhd	/^  PCI_Frame_n: in std_logic;	-- PCI Frame#$/;"	q	entity:pci_target
+PCI_Irdy_n	input.vhd	/^  PCI_Irdy_n: in std_logic;		-- PCI Irdy#$/;"	q	entity:pci_target
+Hit	input.vhd	/^  Hit: in std_logic;			-- Hit on address decode$/;"	q	entity:pci_target
+D_Done	input.vhd	/^  D_Done: in std_logic;			-- Device decode complete$/;"	q	entity:pci_target
+Term	input.vhd	/^  Term: in std_logic;			-- Terminate transaction$/;"	q	entity:pci_target
+Ready	input.vhd	/^  Ready: in std_logic;			-- Ready to transfer data$/;"	q	entity:pci_target
+Cmd_Write	input.vhd	/^  Cmd_Write: in std_logic;		-- Command is Write$/;"	q	entity:pci_target
+Cmd_Read	input.vhd	/^  Cmd_Read: in std_logic;		-- Command is Read$/;"	q	entity:pci_target
+T_Abort	input.vhd	/^  T_Abort: in std_logic;		-- Target error  - abort transaction$/;"	q	entity:pci_target
+PCI_Clk	input.vhd	/^  PCI_Clk: in std_logic;		-- PCI Clock$/;"	q	entity:pci_target
+PCI_Reset_n	input.vhd	/^  PCI_Reset_n: in std_logic;	-- PCI Reset#$/;"	q	entity:pci_target
+PCI_Devsel_n	input.vhd	/^  PCI_Devsel_n: out std_logic;	-- PCI Devsel#$/;"	q	entity:pci_target
+PCI_Trdy_n	input.vhd	/^  PCI_Trdy_n: out std_logic;	-- PCI Trdy#$/;"	q	entity:pci_target
+PCI_Stop_n	input.vhd	/^  PCI_Stop_n: out std_logic;	-- PCI Stop#$/;"	q	entity:pci_target
+OE_AD	input.vhd	/^  OE_AD: out std_logic;			-- PCI AD bus enable$/;"	q	entity:pci_target
+OE_Trdy_n	input.vhd	/^  OE_Trdy_n: out std_logic;		-- PCI Trdy# enable$/;"	q	entity:pci_target
+OE_Stop_n	input.vhd	/^  OE_Stop_n: out std_logic;		-- PCI Stop# enable$/;"	q	entity:pci_target
+OE_Devsel_n	input.vhd	/^  OE_Devsel_n: out std_logic	-- PCI Devsel# enable$/;"	q	entity:pci_target
 fsm	input.vhd	/^architecture fsm of pci_target is$/;"	a	entity:pci_target
 targetFsmType	input.vhd	/^subtype targetFsmType is std_logic_vector(3 downto 0);$/;"	T
 Idle	input.vhd	/^constant Idle: 		targetFsmType := "0000";$/;"	c
@@ -469,6 +1115,24 @@ Backoff	input.vhd	/^constant Backoff: 	targetFsmType := "0011";$/;"	c
 S_Data	input.vhd	/^constant S_Data: 	targetFsmType := "1100";$/;"	c
 Turn_Ar	input.vhd	/^constant Turn_Ar: 	targetFsmType := "1101";$/;"	c
 pci_target	input.vhd	/^entity pci_target is port ($/;"	e
+PCI_Frame_n	input.vhd	/^  PCI_Frame_n: in std_logic;	-- PCI Frame#$/;"	q	entity:pci_target
+PCI_Irdy_n	input.vhd	/^  PCI_Irdy_n: in std_logic;		-- PCI Irdy#$/;"	q	entity:pci_target
+Hit	input.vhd	/^  Hit: in std_logic;			-- Hit on address decode$/;"	q	entity:pci_target
+D_Done	input.vhd	/^  D_Done: in std_logic;			-- Device decode complete$/;"	q	entity:pci_target
+Term	input.vhd	/^  Term: in std_logic;			-- Terminate transaction$/;"	q	entity:pci_target
+Ready	input.vhd	/^  Ready: in std_logic;			-- Ready to transfer data$/;"	q	entity:pci_target
+Cmd_Write	input.vhd	/^  Cmd_Write: in std_logic;		-- Command is Write$/;"	q	entity:pci_target
+Cmd_Read	input.vhd	/^  Cmd_Read: in std_logic;		-- Command is Read$/;"	q	entity:pci_target
+T_Abort	input.vhd	/^  T_Abort: in std_logic;		-- Target error  - abort transaction$/;"	q	entity:pci_target
+PCI_Clk	input.vhd	/^  PCI_Clk: in std_logic;		-- PCI Clock$/;"	q	entity:pci_target
+PCI_Reset_n	input.vhd	/^  PCI_Reset_n: in std_logic;	-- PCI Reset#$/;"	q	entity:pci_target
+PCI_Devsel_n	input.vhd	/^  PCI_Devsel_n: out std_logic;	-- PCI Devsel#$/;"	q	entity:pci_target
+PCI_Trdy_n	input.vhd	/^  PCI_Trdy_n: out std_logic;	-- PCI Trdy#$/;"	q	entity:pci_target
+PCI_Stop_n	input.vhd	/^  PCI_Stop_n: out std_logic;	-- PCI Stop#$/;"	q	entity:pci_target
+OE_AD	input.vhd	/^  OE_AD: out std_logic;			-- PCI AD bus enable$/;"	q	entity:pci_target
+OE_Trdy_n	input.vhd	/^  OE_Trdy_n: out std_logic;		-- PCI Trdy# enable$/;"	q	entity:pci_target
+OE_Stop_n	input.vhd	/^  OE_Stop_n: out std_logic;		-- PCI Stop# enable$/;"	q	entity:pci_target
+OE_Devsel_n	input.vhd	/^  OE_Devsel_n: out std_logic	-- PCI Devsel# enable$/;"	q	entity:pci_target
 fsm	input.vhd	/^architecture fsm of pci_target is$/;"	a	entity:pci_target
 targetFsmType	input.vhd	/^subtype targetFsmType is std_logic_vector(2 downto 0);$/;"	T
 Idle	input.vhd	/^constant Idle: 		targetFsmType := "000";$/;"	c
@@ -478,9 +1142,45 @@ S_Data	input.vhd	/^constant S_Data: 		targetFsmType := "011";$/;"	c
 Turn_Ar	input.vhd	/^constant Turn_Ar: 	targetFsmType := "110";$/;"	c
 Dont_Care	input.vhd	/^constant Dont_Care: targetFsmType := "XXX";$/;"	c
 pci_target	input.vhd	/^entity pci_target is port ($/;"	e
+PCI_Frame_n	input.vhd	/^  PCI_Frame_n: in std_logic;    -- PCI Frame#$/;"	q	entity:pci_target
+PCI_Irdy_n	input.vhd	/^  PCI_Irdy_n: in std_logic;     -- PCI Irdy#$/;"	q	entity:pci_target
+Hit	input.vhd	/^  Hit: in std_logic;            -- Hit on address decode$/;"	q	entity:pci_target
+D_Done	input.vhd	/^  D_Done: in std_logic;         -- Device decode complete$/;"	q	entity:pci_target
+Term	input.vhd	/^  Term: in std_logic;           -- Terminate transaction$/;"	q	entity:pci_target
+Ready	input.vhd	/^  Ready: in std_logic;          -- Ready to transfer data$/;"	q	entity:pci_target
+Cmd_Write	input.vhd	/^  Cmd_Write: in std_logic;      -- Command is Write$/;"	q	entity:pci_target
+Cmd_Read	input.vhd	/^  Cmd_Read: in std_logic;       -- Command is Read$/;"	q	entity:pci_target
+T_Abort	input.vhd	/^  T_Abort: in std_logic;        -- Target error  - abort transaction$/;"	q	entity:pci_target
+PCI_Clk	input.vhd	/^  PCI_Clk: in std_logic;        -- PCI Clock$/;"	q	entity:pci_target
+PCI_Reset_n	input.vhd	/^  PCI_Reset_n: in std_logic;    -- PCI Reset#$/;"	q	entity:pci_target
+PCI_Devsel_n	input.vhd	/^  PCI_Devsel_n: out std_logic;	-- PCI Devsel#$/;"	q	entity:pci_target
+PCI_Stop_n	input.vhd	/^  PCI_Stop_n: out std_logic;    -- PCI Stop#$/;"	q	entity:pci_target
+PCI_Trdy_n	input.vhd	/^  PCI_Trdy_n: out std_logic;    -- PCI Trdy#$/;"	q	entity:pci_target
+OE_AD	input.vhd	/^  OE_AD: out std_logic;         -- PCI AD bus enable$/;"	q	entity:pci_target
+OE_Trdy_n	input.vhd	/^  OE_Trdy_n: out std_logic;     -- PCI Trdy# enable$/;"	q	entity:pci_target
+OE_Stop_n	input.vhd	/^  OE_Stop_n: out std_logic;     -- PCI Stop# enable$/;"	q	entity:pci_target
+OE_Devsel_n	input.vhd	/^  OE_Devsel_n: out std_logic    -- PCI Devsel# enable$/;"	q	entity:pci_target
 fsm	input.vhd	/^architecture fsm of pci_target is$/;"	a	entity:pci_target
 targetFsmType	input.vhd	/^type targetFsmType is (Idle, B_Busy, Backoff, S_Data, Turn_Ar);$/;"	t
 pci_target	input.vhd	/^entity pci_target is port ($/;"	e
+PCI_Frame_n	input.vhd	/^  PCI_Frame_n: in std_logic;    -- PCI Frame#$/;"	q	entity:pci_target
+PCI_Irdy_n	input.vhd	/^  PCI_Irdy_n: in std_logic;     -- PCI Irdy#$/;"	q	entity:pci_target
+Hit	input.vhd	/^  Hit: in std_logic;            -- Hit on address decode$/;"	q	entity:pci_target
+D_Done	input.vhd	/^  D_Done: in std_logic;         -- Device decode complete$/;"	q	entity:pci_target
+Term	input.vhd	/^  Term: in std_logic;           -- Terminate transaction$/;"	q	entity:pci_target
+Ready	input.vhd	/^  Ready: in std_logic;          -- Ready to transfer data$/;"	q	entity:pci_target
+Cmd_Write	input.vhd	/^  Cmd_Write: in std_logic;      -- Command is Write$/;"	q	entity:pci_target
+Cmd_Read	input.vhd	/^  Cmd_Read: in std_logic;       -- Command is Read$/;"	q	entity:pci_target
+T_Abort	input.vhd	/^  T_Abort: in std_logic;        -- Target error  - abort transaction$/;"	q	entity:pci_target
+PCI_Clk	input.vhd	/^  PCI_Clk: in std_logic;        -- PCI Clock$/;"	q	entity:pci_target
+PCI_Reset_n	input.vhd	/^  PCI_Reset_n: in std_logic;    -- PCI Reset#$/;"	q	entity:pci_target
+PCI_Devsel_n	input.vhd	/^  PCI_Devsel_n: out std_logic;  -- PCI Devsel#$/;"	q	entity:pci_target
+PCI_Trdy_n	input.vhd	/^  PCI_Trdy_n: out std_logic;    -- PCI Trdy#$/;"	q	entity:pci_target
+PCI_Stop_n	input.vhd	/^  PCI_Stop_n: out std_logic;    -- PCI Stop#$/;"	q	entity:pci_target
+OE_AD	input.vhd	/^  OE_AD: out std_logic;         -- PCI AD bus enable$/;"	q	entity:pci_target
+OE_Trdy_n	input.vhd	/^  OE_Trdy_n: out std_logic;     -- PCI Trdy# enable$/;"	q	entity:pci_target
+OE_Stop_n	input.vhd	/^  OE_Stop_n: out std_logic;     -- PCI Stop# enable$/;"	q	entity:pci_target
+OE_Devsel_n	input.vhd	/^  OE_Devsel_n: out std_logic    -- PCI Devsel# enable$/;"	q	entity:pci_target
 fsm	input.vhd	/^architecture fsm of pci_target is$/;"	a	entity:pci_target
 targetFsmType	input.vhd	/^subtype targetFsmType is std_logic_vector(4 downto 0);$/;"	T
 Idle	input.vhd	/^constant Idle:    integer := 0;$/;"	c
@@ -489,6 +1189,24 @@ Backoff	input.vhd	/^constant Backoff: integer := 2;$/;"	c
 S_Data	input.vhd	/^constant S_Data:  integer := 3;$/;"	c
 Turn_Ar	input.vhd	/^constant Turn_Ar: integer := 4;$/;"	c
 pci_target	input.vhd	/^entity pci_target is port ($/;"	e
+PCI_Frame_n	input.vhd	/^  PCI_Frame_n: in std_logic;	-- PCI Frame#$/;"	q	entity:pci_target
+PCI_Irdy_n	input.vhd	/^  PCI_Irdy_n: in std_logic;		-- PCI Irdy#$/;"	q	entity:pci_target
+Hit	input.vhd	/^  Hit: in std_logic;			-- Hit on address decode$/;"	q	entity:pci_target
+D_Done	input.vhd	/^  D_Done: in std_logic;			-- Device decode complete$/;"	q	entity:pci_target
+Term	input.vhd	/^  Term: in std_logic;			-- Terminate transaction$/;"	q	entity:pci_target
+Ready	input.vhd	/^  Ready: in std_logic;			-- Ready to transfer data$/;"	q	entity:pci_target
+Cmd_Write	input.vhd	/^  Cmd_Write: in std_logic;		-- Command is Write$/;"	q	entity:pci_target
+Cmd_Read	input.vhd	/^  Cmd_Read: in std_logic;		-- Command is Read$/;"	q	entity:pci_target
+T_Abort	input.vhd	/^  T_Abort: in std_logic;		-- Target error  - abort transaction$/;"	q	entity:pci_target
+PCI_Clk	input.vhd	/^  PCI_Clk: in std_logic;		-- PCI Clock$/;"	q	entity:pci_target
+PCI_Reset_n	input.vhd	/^  PCI_Reset_n: in std_logic;	-- PCI Reset#$/;"	q	entity:pci_target
+PCI_Devsel_n	input.vhd	/^  PCI_Devsel_n: out std_logic;	-- PCI Devsel#$/;"	q	entity:pci_target
+PCI_Trdy_n	input.vhd	/^  PCI_Trdy_n: out std_logic;	-- PCI Trdy#$/;"	q	entity:pci_target
+PCI_Stop_n	input.vhd	/^  PCI_Stop_n: out std_logic;	-- PCI Stop#$/;"	q	entity:pci_target
+OE_AD	input.vhd	/^  OE_AD: out std_logic;			-- PCI AD bus enable$/;"	q	entity:pci_target
+OE_Trdy_n	input.vhd	/^  OE_Trdy_n: out std_logic;		-- PCI Trdy# enable$/;"	q	entity:pci_target
+OE_Stop_n	input.vhd	/^  OE_Stop_n: out std_logic;		-- PCI Stop# enable$/;"	q	entity:pci_target
+OE_Devsel_n	input.vhd	/^  OE_Devsel_n: out std_logic	-- PCI Devsel# enable$/;"	q	entity:pci_target
 fsm	input.vhd	/^architecture fsm of pci_target is$/;"	a	entity:pci_target
 targetFsmType	input.vhd	/^subtype targetFsmType is std_logic_vector(2 downto 0);$/;"	T
 Idle	input.vhd	/^constant Idle: 		targetFsmType := "000";$/;"	c
@@ -497,6 +1215,24 @@ Backoff	input.vhd	/^constant Backoff: 	targetFsmType := "011";$/;"	c
 S_Data	input.vhd	/^constant S_Data: 	targetFsmType := "110";$/;"	c
 Turn_Ar	input.vhd	/^constant Turn_Ar: 	targetFsmType := "100";$/;"	c
 pci_target	input.vhd	/^entity pci_target is port ($/;"	e
+PCI_Frame_n	input.vhd	/^  PCI_Frame_n: in std_logic;    -- PCI Frame#$/;"	q	entity:pci_target
+PCI_Irdy_n	input.vhd	/^  PCI_Irdy_n: in std_logic;     -- PCI Irdy#$/;"	q	entity:pci_target
+Hit	input.vhd	/^  Hit: in std_logic;            -- Hit on address decode$/;"	q	entity:pci_target
+D_Done	input.vhd	/^  D_Done: in std_logic;         -- Device decode complete$/;"	q	entity:pci_target
+Term	input.vhd	/^  Term: in std_logic;           -- Terminate transaction$/;"	q	entity:pci_target
+Ready	input.vhd	/^  Ready: in std_logic;          -- Ready to transfer data$/;"	q	entity:pci_target
+Cmd_Write	input.vhd	/^  Cmd_Write: in std_logic;      -- Command is Write$/;"	q	entity:pci_target
+Cmd_Read	input.vhd	/^  Cmd_Read: in std_logic;       -- Command is Read$/;"	q	entity:pci_target
+T_Abort	input.vhd	/^  T_Abort: in std_logic;        -- Target error  - abort transaction$/;"	q	entity:pci_target
+PCI_Clk	input.vhd	/^  PCI_Clk: in std_logic;        -- PCI Clock$/;"	q	entity:pci_target
+PCI_Reset_n	input.vhd	/^  PCI_Reset_n: in std_logic;    -- PCI Reset#$/;"	q	entity:pci_target
+PCI_Devsel_n	input.vhd	/^  PCI_Devsel_n: out std_logic;  -- PCI Devsel#$/;"	q	entity:pci_target
+PCI_Trdy_n	input.vhd	/^  PCI_Trdy_n: out std_logic;    -- PCI Trdy#$/;"	q	entity:pci_target
+PCI_Stop_n	input.vhd	/^  PCI_Stop_n: out std_logic;    -- PCI Stop#$/;"	q	entity:pci_target
+OE_AD	input.vhd	/^  OE_AD: out std_logic;         -- PCI AD bus enable$/;"	q	entity:pci_target
+OE_Trdy_n	input.vhd	/^  OE_Trdy_n: out std_logic;     -- PCI Trdy# enable$/;"	q	entity:pci_target
+OE_Stop_n	input.vhd	/^  OE_Stop_n: out std_logic;     -- PCI Stop# enable$/;"	q	entity:pci_target
+OE_Devsel_n	input.vhd	/^  OE_Devsel_n: out std_logic    -- PCI Devsel# enable$/;"	q	entity:pci_target
 fsm	input.vhd	/^architecture fsm of pci_target is$/;"	a	entity:pci_target
 targetFsmType	input.vhd	/^  subtype targetFsmType is std_logic_vector(2 downto 0);$/;"	T
 Idle	input.vhd	/^  constant Idle:    targetFsmType := "000";$/;"	c
@@ -505,4 +1241,7 @@ Backoff	input.vhd	/^  constant Backoff: targetFsmType := "011";$/;"	c
 S_Data	input.vhd	/^  constant S_Data:  targetFsmType := "110";$/;"	c
 Turn_Ar	input.vhd	/^  constant Turn_Ar: targetFsmType := "100";$/;"	c
 test	input.vhd	/^entity test is port ($/;"	e
+a	input.vhd	/^  a: in std_logic;$/;"	q	entity:test
+z	input.vhd	/^  z: out std_logic;$/;"	q	entity:test
+en	input.vhd	/^  en: in std_logic$/;"	q	entity:test
 simple	input.vhd	/^architecture simple of test is$/;"	a	entity:test

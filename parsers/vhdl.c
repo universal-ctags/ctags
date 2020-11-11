@@ -30,6 +30,7 @@
 #include "read.h"
 #include "routines.h"
 #include "vstring.h"
+#include "trace.h"
 
 /*
  *   MACROS
@@ -156,6 +157,7 @@ typedef enum eTokenType {
 	TOKEN_PERIOD,		/* . */
 	TOKEN_OPERATOR,
 	TOKEN_SEMICOLON,	/* the semicolon character */
+	TOKEN_COLON,		/* : */
 	TOKEN_STRING
 } tokenType;
 
@@ -188,6 +190,7 @@ typedef enum {
 	VHDLTAG_PACKAGE,
 	VHDLTAG_LOCAL,
 	VHDLTAG_ARCHITECTURE,
+	VHDLTAG_PORT,
 } vhdlKind;
 
 static kindDefinition VhdlKinds[] = {
@@ -203,6 +206,7 @@ static kindDefinition VhdlKinds[] = {
 	{true, 'P', "package", "package definitions"},
 	{false, 'l', "local", "local definitions"},
 	{true, 'a', "architecture", "architectures"},
+	{true, 'q', "port", "port declarations"},
 };
 
 static const keywordTable VhdlKeywordTable[] = {
@@ -429,6 +433,9 @@ static void readToken (tokenInfo * const token)
 	case ';':
 		token->type = TOKEN_SEMICOLON;
 		break;
+	case ':':
+		token->type = TOKEN_COLON;
+		break;
 	case '.':
 		token->type = TOKEN_PERIOD;
 		break;
@@ -567,6 +574,17 @@ static int makeVhdlTag (tokenInfo * const token, const vhdlKind kind)
 	return index;
 }
 
+static int makeVhdlTagWithScope (tokenInfo * const token, const vhdlKind kind, int parent)
+{
+	int index = makeVhdlTag (token, kind);
+
+	tagEntryInfo *e = getEntryInCorkQueue (index);
+	if (e)
+		e->extensionFields.scopeIndex = parent;
+
+	return index;
+}
+
 static void initialize (const langType language)
 {
 	Lang_vhdl = language;
@@ -589,6 +607,62 @@ static void parsePackage (tokenInfo * const token)
 	deleteToken (name);
 }
 
+
+static void parsePort (tokenInfo * const token, int parent)
+{
+	TRACE_ENTER ();
+	while (! (isType (token, TOKEN_EOF)
+			  || isType (token, TOKEN_CLOSE_PAREN)))
+	{
+		if (isType (token, TOKEN_IDENTIFIER))
+		{
+			makeVhdlTagWithScope (token, VHDLTAG_PORT, parent);
+			readToken (token);
+		}
+		else if (isType (token, TOKEN_COMMA))
+			readToken (token);
+		else if (isType (token, TOKEN_COLON))
+		{
+			do
+			{
+				readToken (token);
+				skipToMatched (token);
+				if (isType (token, TOKEN_CLOSE_PAREN)
+					|| isType (token, TOKEN_SEMICOLON))
+					break;
+			}
+			while (!isType (token, TOKEN_EOF));
+		}
+		else
+		{
+			/* Unexpected */
+			readToken (token);
+		}
+	}
+	TRACE_LEAVE ();
+}
+
+static void parseEntityHeader (tokenInfo * const token, int parent)
+{
+	TRACE_ENTER ();
+	while (! (isKeyword (token, KEYWORD_END)
+			  || isType (token, TOKEN_EOF)))
+	{
+		if (isKeyword (token, KEYWORD_PORT))
+		{
+			readToken (token);
+			if (isType (token, TOKEN_OPEN_PAREN))
+			{
+				readToken (token);
+				parsePort (token, parent);
+			}
+		}
+		else
+			readToken (token);
+	}
+	TRACE_LEAVE ();
+}
+
 static void parseModule (tokenInfo * const token)
 {
 	tokenInfo *const name = newToken ();
@@ -608,8 +682,11 @@ static void parseModule (tokenInfo * const token)
 		readToken (token);
 		if (isKeyword (token, KEYWORD_IS))
 		{
-			makeVhdlTag (name, VHDLTAG_ENTITY);
-			skipToKeyword (KEYWORD_END);
+			int index = makeVhdlTag (name, VHDLTAG_ENTITY);
+			readToken (token);
+			parseEntityHeader (token, index);
+			if (!isKeyword (token, KEYWORD_END))
+				skipToKeyword (KEYWORD_END);
 			skipToCharacterInInputFile (';');
 		}
 	}
