@@ -1620,77 +1620,109 @@ static int skipClockEvent(tokenInfo* token, int c)
 	return c;
 }
 
+// input
+//   kind: kind of context
+// output
+//   kind: kind of type
+//   token: identifier token (unless K_IDENTIFIER nor K_UNDEFINED)
+static int processType (tokenInfo* token, int c, verilogKind* kind)
+{
+	verilogKind actualKind = K_UNDEFINED;
+	while (true)
+	{
+		// [ class_type :: | package_identifier :: | $unit :: ] type_identifier { [ … ] }
+		if (c == ':')
+		{
+			c = skipWhite (vGetc ());
+			if (c != ':')	// case label
+			{
+				vUngetc (c);
+				return ':';
+			}
+			c = skipWhite (vGetc ());
+		}
+		if (c == '.')	// interface_identifier .
+			c = skipWhite (vGetc ());
+		c = skipDimension (skipWhite (c));
+		c = skipDelay(token, c);	// class parameter #(...)
+		if (c == '{')	// skip enum, struct, or union member
+			c = skipWhite (skipPastMatch ("{}"));
+
+		if (!readWordToken (token, c))
+			break;
+		updateKind (token);
+		c = skipWhite (vGetc ());	// read next char
+
+		// fix kind of user defined type
+		if (*kind == K_IDENTIFIER)
+		{
+			if (token->kind == K_NET)
+				actualKind = K_NET;
+			else if (token->kind == K_REGISTER)
+				actualKind = K_REGISTER;
+			else if (token->kind == K_IDENTIFIER)
+			{	// identifier of a user defined type
+				*kind = K_REGISTER;	// FIXME: consider kind of the user defined type
+				break;
+			}
+			else
+			{
+				verbose("Unexpected input\n");	// FIXME: fix interface
+				break;
+			}
+		}
+		if (c == '`')	// break on compiler directive
+			break;
+	}
+
+	// skip unpacked dimension (or packed dimension after type-words)
+	c = skipDimension (skipWhite (c));
+
+	if (*kind == K_UNDEFINED)
+		*kind = actualKind;
+	return c;
+}
+
 static void tagNameList (tokenInfo* token, int c)
 {
 	verilogKind kind = token->kind;
-	verilogKind actualKind = K_UNDEFINED;
-	bool repeat;
 
-	/* Many keywords can have bit width.
-	*   reg [3:0] net_name;
-	*   inout [(`DBUSWIDTH-1):0] databus;
-	*/
-	// skip drive|charge strength or type_reference
+	// skip drive|charge strength or type_reference, dimensions, and delay for net
 	if (c == '(')
 		c = skipPastMatch ("()");
 	c = skipDimension (skipWhite (c));
+	if (c == '.')
+		return;	// foo[...].bar = ..;
 	c = skipDelay(token, c);
 
 	do
 	{
-		repeat = false;
+		c = processType(token, c, &kind);	// update token and kind
 
-		while (c == '`')
-			c = skipMacro (c);
+		if (c == '=' || c == ',' || c == ';' || c == ')' || c == '`')
+		{
+			if (kind != K_UNDEFINED && kind != K_IDENTIFIER)	// ignore procedual assignment: foo = bar;
+				createTag (token, kind);
+			if (c == '=')
+				c = skipExpression (c);
+		}
+		c = skipMacro (c);	// `ifdef, `else, `endif, etc. (before comma)
 
-		if (readWordToken (token, c))
-		{
-			updateKind (token);
-			if (kind == K_IDENTIFIER)	// user defined type
-			{
-				if (token->kind == K_NET)
-				{
-					actualKind = K_NET;
-					repeat = true;
-				}
-				else if (token->kind == K_REGISTER)
-				{
-					actualKind = K_REGISTER;
-					repeat = true;
-				} else {	// identifier of a user defined type
-					kind = K_REGISTER;	// !!!FIXME: consider kind of the user defined type
-				}
-			}
-			else if ((token->kind != K_IDENTIFIER) // skip keywords or an identifier on port
-					 || ((kind == K_PORT) && (token->kind == K_IDENTIFIER)))
-					repeat = true;
-		}
-		c = skipWhite (vGetc ());
+		if (c != ',' || c == EOF)
+			break;
+		c = skipWhite (vGetc ());	// read next char
+		c = skipMacro (c);	// `ifdef, `else, `endif, etc. (after comma)
+		if (kind == K_IDENTIFIER)	// for "module foo (a, b, c);"
+			kind = K_UNDEFINED;
+	} while (true);
 
-		// skip unpacked dimension (or packed dimension after type-words)
-		c = skipDimension (skipWhite (c));
-		if (c == ',' || c == ';' || c == ')')
-		{
-			createTag (token, kind == K_UNDEFINED ? actualKind : kind);
-			repeat = false;
-		}
-		else if (c == '=')
-		{
-			if (!repeat)	// ignore procedual assignment: foo = bar;
-				createTag (token, kind == K_UNDEFINED ? actualKind : kind);
-
-			c = skipExpression (skipWhite (vGetc ()));
-		}
-		if (c == ',')
-		{
-			c = skipWhite (vGetc ());
-			repeat = true;
-		}
-	} while (repeat);
 	/* skip port list of module instance: foo bar(xx, yy); */
+	c = skipWhite (c);
 	if (c == '(')
+	{
 		c = skipPastMatch ("()");
-	vUngetc (c);
+		c = skipWhite (c);
+	}
 }
 
 static void findTag (tokenInfo *const token)

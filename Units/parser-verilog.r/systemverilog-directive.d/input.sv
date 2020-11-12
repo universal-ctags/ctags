@@ -201,4 +201,10 @@ endmodule
 module forSkipMacro;
 `define add_t(f) f``_t
     var `add_t(foo) = '0;
+
+    `macro({e},FOO)
+    `macro("string",FOO)
+    `macro(bar)
+    `macro(int)
+    `macro(int,bar)
 endmodule

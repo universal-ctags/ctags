@@ -34,10 +34,10 @@ endmodule : rlMod
 // 6.7 Net declarations
 module Net_declarations
   // 6.7.1 Net declarations with built-in net types
-  trireg (large) logic #(0,0,0) cap1; // FIXME: ignored
+  trireg (large) logic #(0,0,0) cap1;
   typedef logic [31:0] addressT;
-  wire addressT w1; // FIXME: ignored
-  wire struct packed { logic ecc; logic [7:0] data; } memsig; // FIXME: ignored -> memsig
+  wire addressT w1;
+  wire struct packed { logic ecc; logic [7:0] data; } memsig;
 
   wire w; // equivalent to "wire logic w;"
   wire logic w;
@@ -67,7 +67,7 @@ module Variable_declarations;
 
   var v; // equivalent to "var logic v;"
   var [15:0] vw; // equivalent to "var logic [15:0] vw;"
-  var enum bit { clear, error } status; // FIXME: ignored
+  var enum bit { clear, error } status;
   input var logic data_in;
   var reg r;
 
@@ -146,7 +146,7 @@ interface intf_i;
 endinterface
 
 module sub(intf_i p);
-  typedef p.data_t my_data_t; // FIXME: p -> p.data_t?
+  //typedef p.data_t my_data_t; // FIXME: p -> p.data_t?
   my_data_t data;
 endmodule
 

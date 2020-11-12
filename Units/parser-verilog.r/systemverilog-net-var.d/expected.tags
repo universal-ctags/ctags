@@ -11,9 +11,10 @@ iBus	input.sv	/^  interconnect [0:1] iBus;$/;"	n	module:top
 rlMod	input.sv	/^module rlMod(input interconnect [0:1] iBus);$/;"	m
 iBus	input.sv	/^module rlMod(input interconnect [0:1] iBus);$/;"	p	module:rlMod
 Net_declarations	input.sv	/^module Net_declarations$/;"	m
+cap1	input.sv	/^  trireg (large) logic #(0,0,0) cap1;$/;"	n	module:Net_declarations
 addressT	input.sv	/^  typedef logic [31:0] addressT;$/;"	T	module:Net_declarations
-ecc	input.sv	/^  wire struct packed { logic ecc; logic [7:0] data; } memsig; \/\/ FIXME: ignored -> memsig$/;"	r	module:Net_declarations
-data	input.sv	/^  wire struct packed { logic ecc; logic [7:0] data; } memsig; \/\/ FIXME: ignored -> memsig$/;"	r	module:Net_declarations
+w1	input.sv	/^  wire addressT w1;$/;"	n	module:Net_declarations
+memsig	input.sv	/^  wire struct packed { logic ecc; logic [7:0] data; } memsig;$/;"	n	module:Net_declarations
 w	input.sv	/^  wire w; \/\/ equivalent to "wire logic w;"$/;"	n	module:Net_declarations
 w	input.sv	/^  wire logic w;$/;"	n	module:Net_declarations
 ww	input.sv	/^  wire [15:0] ww; \/\/ equivalent to "wire logic [15:0] ww;"$/;"	n	module:Net_declarations
@@ -22,6 +23,7 @@ w1	input.sv	/^  interconnect w1;              \/\/ legal$/;"	n	module:Net_declar
 w2	input.sv	/^  interconnect [3:0] w2;        \/\/ legal$/;"	n	module:Net_declarations
 w3	input.sv	/^  interconnect [3:0] w3 [1:0];  \/\/ legal$/;"	n	module:Net_declarations
 wT	input.sv	/^  nettype T wT;$/;"	r	module:Net_declarations
+Tsum	input.sv	/^  nettype T wTsum with Tsum;  \/\/ FIXME: $/;"	r	module:Net_declarations
 w1	input.sv	/^  wT w1;$/;"	r	module:Net_declarations
 w2	input.sv	/^  wT w2[8];$/;"	r	module:Net_declarations
 w3	input.sv	/^  wTsum w3;$/;"	r	module:Net_declarations
@@ -35,6 +37,7 @@ s1	input.sv	/^  shortint s1, s2[0:9];$/;"	r	module:Variable_declarations
 s2	input.sv	/^  shortint s1, s2[0:9];$/;"	r	module:Variable_declarations
 v	input.sv	/^  var v; \/\/ equivalent to "var logic v;"$/;"	r	module:Variable_declarations
 vw	input.sv	/^  var [15:0] vw; \/\/ equivalent to "var logic [15:0] vw;"$/;"	r	module:Variable_declarations
+status	input.sv	/^  var enum bit { clear, error } status;$/;"	r	module:Variable_declarations
 data_in	input.sv	/^  input var logic data_in;$/;"	p	module:Variable_declarations
 r	input.sv	/^  var reg r;$/;"	r	module:Variable_declarations
 i	input.sv	/^  int i = 0;$/;"	r	module:Variable_declarations
@@ -91,5 +94,9 @@ regr	input.sv	/^  int rega, regb, regr;$/;"	r	module:delay_control
 delay_control_wire	input.sv	/^module delay_control_wire #(d, e);$/;"	m
 d	input.sv	/^module delay_control_wire #(d, e);$/;"	c	module:delay_control_wire
 e	input.sv	/^module delay_control_wire #(d, e);$/;"	c	module:delay_control_wire
+wirea	input.sv	/^  wire wirea #10 = wireb;$/;"	n	module:delay_control_wire
+wireb	input.sv	/^  wire wireb #d = wireb;$/;"	n	module:delay_control_wire
+wirec	input.sv	/^  wire wirec #((d+e)\/2) = wireb;$/;"	n	module:delay_control_wire
+wired	input.sv	/^  wire wired #wirer = wirer + 1;$/;"	n	module:delay_control_wire
 w$ire	input.sv	/^  wire w$ire, wire$;  \/\/ '$' included$/;"	n	module:delay_control_wire
 wire$	input.sv	/^  wire w$ire, wire$;  \/\/ '$' included$/;"	n	module:delay_control_wire
