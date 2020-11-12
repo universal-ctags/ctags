@@ -1,0 +1,27 @@
+foo_bus	input.sv	/^interface foo_bus;$/;"	I
+clock1	input.sv	/^  logic clock1;$/;"	r	interface:foo_bus
+data	input.sv	/^  logic data, ready, enable, ack, addr;$/;"	r	interface:foo_bus
+ready	input.sv	/^  logic data, ready, enable, ack, addr;$/;"	r	interface:foo_bus
+enable	input.sv	/^  logic data, ready, enable, ack, addr;$/;"	r	interface:foo_bus
+ack	input.sv	/^  logic data, ready, enable, ack, addr;$/;"	r	interface:foo_bus
+addr	input.sv	/^  logic data, ready, enable, ack, addr;$/;"	r	interface:foo_bus
+bus	input.sv	/^  clocking bus @(posedge clock1);$/;"	L	interface:foo_bus
+foo_14_4	input.sv	/^module foo_14_4;$/;"	m
+clk	input.sv	/^  logic clk, address, data;$/;"	r	module:foo_14_4
+address	input.sv	/^  logic clk, address, data;$/;"	r	module:foo_14_4
+data	input.sv	/^  logic clk, address, data;$/;"	r	module:foo_14_4
+dram	input.sv	/^  clocking dram @(clk);$/;"	L	module:foo_14_4
+test	input.sv	/^program test( input phi1, input [15:0] data, output logic write,$/;"	P
+phi1	input.sv	/^program test( input phi1, input [15:0] data, output logic write,$/;"	p	program:test
+data	input.sv	/^program test( input phi1, input [15:0] data, output logic write,$/;"	p	program:test
+write	input.sv	/^program test( input phi1, input [15:0] data, output logic write,$/;"	p	program:test
+phi2	input.sv	/^              input phi2, inout [8:1] cmd, input enable$/;"	p	program:test
+cmd	input.sv	/^              input phi2, inout [8:1] cmd, input enable$/;"	p	program:test
+enable	input.sv	/^              input phi2, inout [8:1] cmd, input enable$/;"	p	program:test
+cmd_reg	input.sv	/^  reg [8:1] cmd_reg;$/;"	r	program:test
+cd1	input.sv	/^  clocking cd1 @(posedge phi1);$/;"	L	program:test
+cd2	input.sv	/^  clocking cd2 @(posedge phi2);$/;"	L	program:test
+top	input.sv	/^module top;$/;"	m
+clk1	input.sv	/^logic clk1, clk2;$/;"	r	module:top
+clk2	input.sv	/^logic clk1, clk2;$/;"	r	module:top
+sys	input.sv	/^  global clocking sys @(clk1 or clk2); endclocking$/;"	L	module:top

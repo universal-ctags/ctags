@@ -50,7 +50,6 @@ typedef enum {
 	K_IGNORE = -16,	/* Verilog/SystemVerilog keywords to be ignored */
 	K_DEFINE,
 	K_DIRECTIVE,
-	K_BEGIN,
 	K_END,
 	K_END_DE,	/* End of Design Elements */
 	K_IDENTIFIER,
@@ -79,7 +78,10 @@ typedef enum {
 	K_PROTOTYPE,
 	K_PROPERTY,
 	K_STRUCT,
-	K_TYPEDEF
+	K_TYPEDEF,
+	K_CHECKER,
+	K_CLOCKING,
+	K_SEQUENCE
 } verilogKind;
 
 typedef struct {
@@ -122,9 +124,9 @@ static kindDefinition VerilogKinds [] = {
  { true, 'm', "module",    "modules" },
  { true, 'n', "net",       "net data types" },
  { true, 'p', "port",      "ports" },
- { true, 'r', "register",  "register data types" },
+ { true, 'r', "register",  "variable data types" },
  { true, 't', "task",      "tasks" },
- { true, 'b', "block",     "blocks" }
+ { true, 'b', "block",     "blocks (begin, fork)" }
 };
 
 static kindDefinition SystemVerilogKinds [] = {
@@ -134,10 +136,10 @@ static kindDefinition SystemVerilogKinds [] = {
  { true, 'm', "module",    "modules" },
  { true, 'n', "net",       "net data types" },
  { true, 'p', "port",      "ports" },
- { true, 'r', "register",  "register data types" },
+ { true, 'r', "register",  "variable data types" },
  { true, 't', "task",      "tasks" },
- { true, 'b', "block",     "blocks" },
- { true, 'A', "assert",    "assertions" },
+ { true, 'b', "block",     "blocks (begin, fork)" },
+ { true, 'A', "assert",    "assertions (assert, assume, cover, restrict)" },
  { true, 'C', "class",     "classes" },
  { true, 'V', "covergroup","covergroups" },
  { true, 'E', "enum",      "enumerators" },
@@ -145,10 +147,13 @@ static kindDefinition SystemVerilogKinds [] = {
  { true, 'M', "modport",   "modports" },
  { true, 'K', "package",   "packages" },
  { true, 'P', "program",   "programs" },
- { false,'Q', "prototype", "prototypes" },
+ { false,'Q', "prototype", "prototypes (extern, pure)" },
  { true, 'R', "property",  "properties" },
  { true, 'S', "struct",    "structs and unions" },
- { true, 'T', "typedef",   "type declarations" }
+ { true, 'T', "typedef",   "type declarations" },
+ { true, 'H', "checker",   "checkers" },
+ { true, 'L', "clocking",  "clocking" },
+ { true, 'q', "sequence",  "sequences" }
 };
 
 static const keywordAssoc KeywordTable [] = {
@@ -156,13 +161,13 @@ static const keywordAssoc KeywordTable [] = {
 	/*                 	             	  |  Verilog    */
 	/* keyword         	keyword ID   	  |  |          */
 	{ "`define",       	K_DEFINE,   	{ 1, 1 } },
-	{ "begin",         	K_BEGIN,     	{ 1, 1 } },
+	{ "begin",         	K_BLOCK,     	{ 1, 1 } },
 	{ "end",           	K_END,       	{ 1, 1 } },
 	{ "endfunction",   	K_END_DE,    	{ 1, 1 } },
 	{ "endmodule",     	K_END_DE,    	{ 1, 1 } },
 	{ "endtask",       	K_END_DE,    	{ 1, 1 } },
 	{ "event",         	K_EVENT,     	{ 1, 1 } },
-	{ "fork",          	K_BEGIN,     	{ 1, 1 } },
+	{ "fork",          	K_BLOCK,     	{ 1, 1 } },
 	{ "function",      	K_FUNCTION,  	{ 1, 1 } },
 	{ "genvar",        	K_REGISTER,  	{ 1, 1 } },
 	{ "inout",         	K_PORT,      	{ 1, 1 } },
@@ -197,15 +202,20 @@ static const keywordAssoc KeywordTable [] = {
 	{ "bit",           	K_REGISTER,  	{ 1, 0 } },
 	{ "byte",          	K_REGISTER,  	{ 1, 0 } },
 	{ "chandle",       	K_REGISTER,  	{ 1, 0 } },
+	{ "checker",       	K_CHECKER,  	{ 1, 0 } },
 	{ "class",         	K_CLASS,     	{ 1, 0 } },
 	{ "cover",         	K_ASSERTION, 	{ 1, 0 } },
+	{ "clocking",       K_CLOCKING,     { 1, 0 } },
 	{ "covergroup",    	K_COVERGROUP,	{ 1, 0 } },
+	{ "endchecker",    	K_END_DE,    	{ 1, 0 } },
 	{ "endclass",      	K_END_DE,    	{ 1, 0 } },
+	{ "endclocking",    K_END_DE,     	{ 1, 0 } },
 	{ "endgroup",      	K_END_DE,    	{ 1, 0 } },
 	{ "endinterface",  	K_END_DE,    	{ 1, 0 } },
 	{ "endpackage",    	K_END_DE,    	{ 1, 0 } },
 	{ "endprogram",    	K_END_DE,    	{ 1, 0 } },
 	{ "endproperty",   	K_END_DE,    	{ 1, 0 } },
+	{ "endsequence",   	K_END_DE,    	{ 1, 0 } },
 	{ "enum",          	K_ENUM,      	{ 1, 0 } },
 	{ "extern",        	K_PROTOTYPE, 	{ 1, 0 } },
 	{ "int",           	K_REGISTER,  	{ 1, 0 } },
@@ -221,7 +231,8 @@ static const keywordAssoc KeywordTable [] = {
 	{ "property",      	K_PROPERTY,  	{ 1, 0 } },
 	{ "pure",          	K_PROTOTYPE, 	{ 1, 0 } },
 	{ "ref",           	K_PORT,      	{ 1, 0 } },
-	{ "sequence",      	K_PROPERTY,  	{ 1, 0 } },
+	{ "restrict",      	K_ASSERTION, 	{ 1, 0 } },
+	{ "sequence",      	K_SEQUENCE,  	{ 1, 0 } },
 	{ "shortint",      	K_REGISTER,  	{ 1, 0 } },
 	{ "shortreal",     	K_REGISTER,  	{ 1, 0 } },
 	{ "string",        	K_REGISTER,  	{ 1, 0 } },
@@ -378,12 +389,15 @@ static short isContainer (verilogKind kind)
 		case K_TASK:
 		case K_FUNCTION:
 		case K_BLOCK:
+		case K_CHECKER:
 		case K_CLASS:
+		case K_CLOCKING:
 		case K_COVERGROUP:
 		case K_INTERFACE:
 		case K_PACKAGE:
 		case K_PROGRAM:
 		case K_PROPERTY:
+		case K_SEQUENCE:
 		case K_TYPEDEF:
 		case K_ENUM:
 			return true;
@@ -410,10 +424,12 @@ static short hasSimplePortList (verilogKind kind)
 	{
 		case K_TASK:
 		case K_FUNCTION:
+		case K_CHECKER:
 		case K_CLASS:
 		case K_INTERFACE:
 		case K_PROGRAM:
 		case K_PROPERTY:
+		case K_SEQUENCE:
 			return true;
 		default:
 			return false;
@@ -830,17 +846,16 @@ static void dropContext ()
 	currentContext = popToken (currentContext);
 }
 
+/* Drop context, but only if an end token is found */
 static void dropEndContext (tokenInfo *const token)
 {
 	verbose ("current context %s; context kind %0d; nest level %0d\n", vStringValue (currentContext->name), currentContext->kind, currentContext->nestLevel);
-	if ((currentContext->kind == K_COVERGROUP && strcmp (vStringValue (token->name), "endgroup") == 0) ||
-	    (currentContext->kind == K_BLOCK && currentContext->nestLevel == 0 && token->kind == K_END)
-	    )
+	if (currentContext->kind == K_COVERGROUP && strcmp (vStringValue (token->name), "endgroup") == 0)
 	{
 		dropContext ();
 		findBlockName (token);
 	}
-	else
+	else if (currentContext->kind != K_UNDEFINED)
 	{
 		vString *endTokenName = vStringNewInit("end");
 		vStringCatS (endTokenName, getNameForKind (currentContext->kind));
@@ -856,6 +871,8 @@ static void dropEndContext (tokenInfo *const token)
 		}
 		vStringDelete(endTokenName);
 	}
+	else
+		verbose ("Unexpected current context %s\n", vStringValue (currentContext->name));
 }
 
 
@@ -992,26 +1009,28 @@ static bool findBlockName (tokenInfo *const token)
 	return false;
 }
 
-static void processBegin (tokenInfo *const token)
+// begin, fork
+static void processBlock (tokenInfo *const token)
 {
-	currentContext->nestLevel++;
-	if (findBlockName (token))
+	if (findBlockName (token))	// create a context if the block has a label
 	{
 		verbose ("Found block: %s\n", vStringValue (token->name));
 		createTag (token, K_BLOCK);
 		verbose ("Current context %s\n", vStringValue (currentContext->name));
 	}
+	currentContext->nestLevel++;	// increment after creating a context
 }
 
+// end, join, join_any, join_none
 static void processEnd (tokenInfo *const token)
 {
-	currentContext->nestLevel--;
-	if (findBlockName (token))
-	{
+	if (currentContext->nestLevel > 0)	// for sanity check
+		currentContext->nestLevel--;
+	if (currentContext->kind == K_BLOCK && currentContext->nestLevel == 0)
+		dropContext ();
+
+	if (findBlockName (token)) // block name is optional
 		verbose ("Found block: %s\n", vStringValue (token->name));
-		if (currentContext->kind == K_BLOCK && currentContext->nestLevel <= 1)
-			dropContext ();	/* FIXME: uncovered */
-	}
 }
 
 static void processPortList (tokenInfo *token, int c)
@@ -1087,10 +1106,11 @@ static int skipParameterAssignment (int c)
 	return c;
 }
 
-/* Functions are treated differently because they may also include the
- * type of the return value.
- * Tasks are treated in the same way, although not having a return
- * value.*/
+// Functions are treated differently because they may also include the type of the return value.
+// Tasks are treated in the same way, although not having a return value.
+//
+// function [ lifetime ] function_data_type_or_implicit [ interface_identifier . | class_scope ] function_identifier [ ( [ tf_port_list ] ) ] ;
+// task     [ lifetime ] task_body_declaration          [ interface_identifier . | class_scope ] task_identifier     [ ( [ tf_port_list ] ) ] ;
 static void processFunction (tokenInfo *const token)
 {
 	verilogKind kind = token->kind;	// K_FUNCTION or K_TASK
@@ -1136,6 +1156,8 @@ static void processFunction (tokenInfo *const token)
 	}
 }
 
+// enum [ enum_base_type ] { < enum_name_declaration > }  { [ … ] }
+// typedef enum type_identifier ;
 static void processEnum (tokenInfo *const token)
 {
 	int c;
@@ -1222,6 +1244,8 @@ static void processEnum (tokenInfo *const token)
 	deleteToken (enumToken);
 }
 
+// [ struct | union [ tagged ] ] [ packed [ signed | unsigned ] ] { struct_union_member { struct_union_member } } { [ … ] }
+// typedef ( struct | union ) type_identifier ;
 static void processStruct (tokenInfo *const token)
 {
 	verilogKind kind = token->kind;	// K_STRUCT or K_TYPEDEF
@@ -1256,6 +1280,14 @@ static void processStruct (tokenInfo *const token)
 	tagNameList (token, c);
 }
 
+// data_declaration ::=
+//       [ const ] [ var ] [ static | automatic ] data_type_or_implicit list_of_variable_decl_assignments ;
+//     | typedef data_type type_identifier { [ … ] } ;
+//     | typedef interface_instance_identifier [ … ] . type_identifier type_identifier ;
+//     | typedef [ enum | struct | union | class | interface class ] type_identifier ;
+//     | import < package_import_item > ;
+//     | nettype data_type net_type_identifier [ with [ class_type :: | package_identifier :: | $unit :: ] tf_identifier ] ;
+//     | nettype [ class_type :: | package_identifier :: | $unit :: ] net_type_identifier net_type_identifier ;
 static void processTypedef (tokenInfo *const token)
 {
 	int c;
@@ -1379,11 +1411,17 @@ static tokenInfo * processParameterList (tokenInfo *token, int c)
 	return head;
 }
 
+// [ virtual ] class [ static | automatic ] class_identifier [ parameter_port_list ]
+//     [ extends class_type [ ( list_of_arguments ) ] ] [ implements < interface_class_type > ] ;
+// interface class class_identifier [ parameter_port_list ] [ extends < interface_class_type > ] ;
+// typedef ( class | interface class ) type_identifier ;
 static void processClass (tokenInfo *const token)
 {
 	int c;
 	tokenInfo *classToken;
 	tokenInfo *parameters;
+
+	// skip static | automatic : FIXME
 
 	/* Get identifiers */
 	c = skipWhite (vGetc ());
@@ -1413,6 +1451,8 @@ static void processClass (tokenInfo *const token)
 		}
 	}
 
+	// process implements: FIXME
+
 	createTag (classToken, K_CLASS);
 	deleteToken (classToken);
 
@@ -1433,19 +1473,37 @@ static void processDefine (tokenInfo *const token)
 	skipToNewLine ();
 }
 
+// assert property ( property_spec ) action_block
+// assume property ( property_spec ) action_block
+// cover property ( property_spec ) statement_or_null
+// cover sequence ( [clocking_event ] [ disable iff ( expression_or_dist ) ] sequence_expr ) statement_or_null
+// restrict property ( property_spec ) ;
 static void processAssertion (tokenInfo *const token)
 {
 	if (vStringLength (currentContext->blockName) > 0)
 	{
 		int c;
 		vStringCopy (token->name, currentContext->blockName);
+		vStringClear (currentContext->blockName);	// clear block name not to be reused
 		createTag (token, K_ASSERTION);
 		c = skipToSemiColon ();
 		vUngetc (c);
 	}
 }
 
-/* covergroup, interface, modport, module, package, program, property */
+// non-ANSI type
+// ( module | interface | program ) [ static | automatic ] identifier { package_import_declaration } [ parameter_port_list ] ( port { , port } ) ;
+// ANSI type
+// ( module | interface | program ) [ static | automatic ] identifier { package_import_declaration } [ parameter_port_list ] [ ( [ < { (* … *) } ansi_port_declaration > ] ) ] ;
+//
+// interface class class_identifier [ parameter_port_list ] [ extends < interface_class_type > ] ;
+// typedef interface class type_identifier ;
+//
+// ( checker | property | sequence ) identifier [ ( [ port_list ] ) ] ;
+// covergroup identifier [ ( [ port_list ] ) ] [ coverage_event ] ;
+// package identifier ;
+// modport < identifier ( < ports_declaration > ) > ;  // FIXME
+// [ default | global ] clocking [ identifier ] ( @ identifier | @ ( event_expression ) )
 static void processDesignElement (tokenInfo *const token)
 {
 	verilogKind kind = token->kind;
@@ -1453,15 +1511,17 @@ static void processDesignElement (tokenInfo *const token)
 
 	if (readWordToken (token, c))
 	{
-		while (getKindForToken (token) == K_IGNORE)
+		while (getKindForToken (token) == K_IGNORE) // skip static or automatic
 		{
 			c = skipWhite (vGetc ());
 			readWordToken (token, c);
 		}
-		createTag (token, kind);
+		createTag (token, kind);	// identifier
+
+		// package_import_declaration : FIXME
 
 		c = skipWhite (vGetc ());
-		if (c == '#')
+		if (c == '#')	// parameter_port_list
 		{
 			tokenInfo *parameters = processParameterList (token, c);
 			while (parameters)
@@ -1474,8 +1534,16 @@ static void processDesignElement (tokenInfo *const token)
 			c = skipWhite (vGetc ());
 		}
 
+		// skip clocking_event of clocking block
+		if (c == '@' && kind == K_CLOCKING)
+		{
+			c = skipWhite (vGetc ());
+			if (c == '(')
+				c = skipPastMatch ("()");
+		}
+
 		/* Get port list if required */
-		if (c == '(')
+		if (c == '(')	// port_list
 		{
 			if (kind == K_MODPORT)
 				c = skipPastMatch ("()");	// ignore port list
@@ -1486,6 +1554,8 @@ static void processDesignElement (tokenInfo *const token)
 		{
 			vUngetc (c);
 		}
+
+		// skip coverage_event for covergroup : FIXME
 	}
 }
 
@@ -1586,12 +1656,6 @@ static void findTag (tokenInfo *const token)
 {
 	verbose ("Checking token %s of kind %d\n", vStringValue (token->name), token->kind);
 
-	if (currentContext->kind != K_UNDEFINED && (token->kind == K_END || token->kind == K_END_DE))
-	{
-		/* Drop context, but only if an end token is found */
-		dropEndContext (token);
-	}
-
 	switch (token->kind)
 	{
 		case K_CONSTANT:
@@ -1601,7 +1665,10 @@ static void findTag (tokenInfo *const token)
 		case K_PARAMETER:
 		case K_PORT:
 		case K_REGISTER:
-			tagNameList (token, skipWhite (vGetc ()));
+			if (token->kind == K_PORT && currentContext->kind == K_CLOCKING)
+				skipToSemiColon (); // clocking items are not port definitions
+			else
+				tagNameList (token, skipWhite (vGetc ()));
 			break;
 		case K_IDENTIFIER:
 			{
@@ -1630,6 +1697,8 @@ static void findTag (tokenInfo *const token)
 			currentContext->prototype = true;
 			break;
 
+		case K_CHECKER:
+		case K_CLOCKING:
 		case K_COVERGROUP:
 		case K_INTERFACE:
 		case K_MODPORT:
@@ -1637,10 +1706,14 @@ static void findTag (tokenInfo *const token)
 		case K_PACKAGE:
 		case K_PROGRAM:
 		case K_PROPERTY:
+		case K_SEQUENCE:
 			processDesignElement(token);
 			break;
-		case K_BEGIN:
-			processBegin(token);
+		case K_END_DE:
+			dropEndContext(token);
+			break;
+		case K_BLOCK:
+			processBlock(token);
 			break;
 		case K_END:
 			processEnd(token);
@@ -1660,9 +1733,8 @@ static void findTag (tokenInfo *const token)
 			skipToNewLine();
 			break;
 
-		case K_END_DE:
 		case K_IGNORE:
-			return;
+			break;
 		default:
 			verbose ("Unexpected kind->token %d\n", token->kind);
 	}

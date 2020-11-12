@@ -3,14 +3,14 @@
 //
 module ctags_uni_issues (
   // 6.8 Variable declarations
-  input var logic data_in // var:port, data_in:register => data_in:port
+  input var logic data_in
 );
 
   const var foo;
   var bar;
 
   // 6.14 Chandle data type
-  chandle variable_name ; // not defined => variable_name:register
+  chandle variable_name ;
 endmodule
 
 // 8. Classes
@@ -30,7 +30,7 @@ endpackage
 
 // 23.2 Module definitions
 module mh1 (
-  input var int in1, // -> var:port, in1:register => in1:port
-  output var int out2 // -> var:port, out2:register => out2:port
+  input var int in1,
+  output var int out2
 );
 endmodule
