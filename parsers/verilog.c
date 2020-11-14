@@ -771,7 +771,7 @@ static int skipMacro (int c)
 		/* Skip macro or macro functions */
 		else
 		{
-			c = skipWhite (vGetc ());
+			c = skipWhite (vGetc ());	// FIXME: not covered
 			if (c == '(')
 			{
 				c = skipPastMatch ("()");
@@ -902,13 +902,6 @@ static void createTag (tokenInfo *const token, verilogKind kind)
 {
 	tagEntryInfo tag;
 
-	/* FIXME: This if-clause should be removed. */
-	if (kind == K_UNDEFINED || kind == K_IDENTIFIER)
-	{
-		verbose ("Unexpected token kind %d\n", kind);
-		return;
-	}
-
 	if (kind == K_LOCALPARAM)
 	{
 		kind = K_CONSTANT;
@@ -920,7 +913,7 @@ static void createTag (tokenInfo *const token, verilogKind kind)
 		if (currentContext->kind != K_CLASS && currentContext->kind != K_PACKAGE && !currentContext->hasParamList)
 			token->parameter = true;
 	}
-	Assert (kind >= 0);
+	Assert (kind >= 0 && kind != K_UNDEFINED && kind != K_IDENTIFIER);
 
 	/* check if a container before kind is modified by prototype */
 	/* BTW should we create a context for a prototype? */
@@ -1275,10 +1268,11 @@ static tokenInfo * processParameterList (tokenInfo *token, int c)
 					else if (token->kind == K_LOCALPARAM)
 						parameter = false;
 				}
-				else if (c == '[') {
-					c =skipDimension(c);
-					vUngetc (c);
-				}
+				// unpacked array is not allowed for a parameter
+				// else if (c == '[') {
+				// 	c =skipDimension(c);
+				// 	vUngetc (c);
+				// }
 			} while (c != ')' && c != EOF);
 			c = skipWhite (vGetc ());
 		}
@@ -1456,9 +1450,6 @@ static int skipClockEvent(tokenInfo* token, int c)
 	if (c == '@')
 	{
 		c = skipWhite (vGetc ());
-		if (c == ('@')) {	// coverage_event: @@(block_event_expression)
-			c = skipWhite (vGetc ());
-		}
 
 		if (c == '(')
 			c = skipWhite (skipPastMatch ("()"));
@@ -1551,7 +1542,7 @@ static int processType (tokenInfo* token, int c, verilogKind* kind)
 			}
 			else
 			{
-				verbose("Unexpected input\n");	// FIXME: fix interface
+				verbose("Unexpected input\n");	// FIXME: fix interface, constraint
 				break;
 			}
 		}
