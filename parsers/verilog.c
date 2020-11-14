@@ -1127,42 +1127,30 @@ static void processFunction (tokenInfo *const token)
 		vUngetc (c);
 }
 
-// enum [ enum_base_type ] { < enum_name_declaration > }  { [ … ] }
+// ( enum | union ) [ enum_base_type ] { < enum_name_declaration > }  { [ … ] }
 static void processEnum (tokenInfo *const token)
 {
 	int c;
-	tokenInfo* enumToken = dupToken (token);
+	tokenInfo* enumToken = dupToken (token);	// save enum token
 
-	/* Read enum type */
+	/* skip enum_base_type */
 	c = skipWhite (vGetc ());
-	if (readWordToken (token, c))
-	{
-		tokenInfo* typeQueue = NULL;
-
-		do
-		{
-			updateKind (token);
-			typeQueue = pushToken (typeQueue, dupToken (token));
-			verbose ("Enum type %s\n", vStringValue (token->name));
-			c = skipWhite (vGetc ());
-		} while (readWordToken (token, c));
-
-		/* Cleanup type queue */
-		pruneTokens (typeQueue);
-	}
-
-	/* Skip bus width definition */
+	while (readWordToken (token, c))
+		c = skipWhite (vGetc ());
 	c = skipDimension (c);
 
 	/* Search enum elements */
 	c = pushEnumNames (token, c);
+
+	/* Skip bus width definition */
+	c = skipDimension (c);
 
 	/* Following identifiers are tag names */
 	verbose ("Find enum tags. Token %s kind %d\n", vStringValue (enumToken->name), enumToken->kind);
 	tagNameList (enumToken, c);
 	deleteToken (enumToken);
 
-	// Cleanup tag contents list at end of declaration to support multiple variables;
+	// Clean up the tag content list at the end of the declaration to support multiple variables
 	//   enum { ... } foo, bar;
 	while (tagContents)
 		tagContents = popToken (tagContents);
