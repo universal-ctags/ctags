@@ -10,4 +10,7 @@ covergroup test;
     deferred_assume2    : assume final () task();
 endgroup
 
+covergroup cg @@ ( begin task_end );
+endgroup
+
 reg var_to_check_context;

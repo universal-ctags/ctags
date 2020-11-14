@@ -42,6 +42,7 @@ BAR	input.sv	/^`define BAR$/;"	c	module:define_in_port
 c1	input.sv	/^        input logic c1,$/;"	p	module:define_in_port
 d2	input.sv	/^        input logic d2,$/;"	p	module:define_in_port
 c3	input.sv	/^        input logic c3$/;"	p	module:define_in_port
+MY_DEFINE	input.sv	/^`define MY_DEFINE$/;"	c
 assert_clk	input.sv	/^`define assert_clk(arg, __clk=clk, __rst_n=rst_n) \\$/;"	c
 forSkipMacro	input.sv	/^module forSkipMacro;$/;"	m
 add_t	input.sv	/^`define add_t(f) f``_t$/;"	c	module:forSkipMacro

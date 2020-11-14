@@ -195,6 +195,9 @@ module define_in_port (
 
 endmodule
 
+`undef  MY_UNDEF
+`define MY_DEFINE
+
 `define assert_clk(arg, __clk=clk, __rst_n=rst_n) \
  assert property (@(posedge __clk) disable iff (!__rst_n) arg) 
 

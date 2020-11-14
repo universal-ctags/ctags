@@ -148,3 +148,5 @@ wirec	input.sv	/^  wire wirec #((d+e)\/2) = wireb;$/;"	n	module:delay_control_wi
 wired	input.sv	/^  wire wired #wirer = wirer + 1;$/;"	n	module:delay_control_wire
 w$ire	input.sv	/^  wire w$ire, wire$;  \/\/ '$' included$/;"	n	module:delay_control_wire
 wire$	input.sv	/^  wire w$ire, wire$;  \/\/ '$' included$/;"	n	module:delay_control_wire
+rst	input.sv	/^module rst;$/;"	m
+trst_n	input.sv	/^  logic trst_n;$/;"	r	module:rst

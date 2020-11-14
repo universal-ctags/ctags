@@ -209,3 +209,16 @@ module delay_control_wire #(d, e);
   wire wired #wirer = wirer + 1;
   wire w$ire, wire$;  // '$' included
 endmodule
+
+// orignal : LRM 5.8 Time literals
+module rst;
+  logic trst_n;
+  initial begin
+    #10.5fs trst_n = 1'b0;
+    #10ps   trst_n = 1'b1;
+    #10ns   trst_n = 1'b0;
+    #10us   trst_n = 1'b1;
+    #10ms   trst_n = 1'b0;
+    #10s    trst_n = 1'b1;
+  end
+endmodule

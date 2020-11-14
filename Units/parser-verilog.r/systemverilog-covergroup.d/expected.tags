@@ -17,4 +17,5 @@ deferred_cover2	input.sv	/^    deferred_cover2     : cover final () task();$/;"	
 test.deferred_cover2	input.sv	/^    deferred_cover2     : cover final () task();$/;"	A	covergroup:test
 deferred_assume2	input.sv	/^    deferred_assume2    : assume final () task();$/;"	A	covergroup:test
 test.deferred_assume2	input.sv	/^    deferred_assume2    : assume final () task();$/;"	A	covergroup:test
+cg	input.sv	/^covergroup cg @@ ( begin task_end );$/;"	V
 var_to_check_context	input.sv	/^reg var_to_check_context;$/;"	r

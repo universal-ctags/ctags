@@ -1,0 +1,14 @@
+apb_if	input.sv	/^typedef logic apb_if;$/;"	T
+blk_dut1	input.sv	/^module blk_dut1 (input apb_if    apb, input bit rst); $/;"	m
+apb	input.sv	/^module blk_dut1 (input apb_if    apb, input bit rst); $/;"	p	module:blk_dut1
+rst	input.sv	/^module blk_dut1 (input apb_if    apb, input bit rst); $/;"	p	module:blk_dut1
+blk_dut2	input.sv	/^module blk_dut2 (apb_if    apb, input bit rst);$/;"	m
+apb	input.sv	/^module blk_dut2 (apb_if    apb, input bit rst);$/;"	r	module:blk_dut2
+rst	input.sv	/^module blk_dut2 (apb_if    apb, input bit rst);$/;"	r	module:blk_dut2
+blk_dut3	input.sv	/^module blk_dut3 (logic    apb, input bit rst);$/;"	m
+apb	input.sv	/^module blk_dut3 (logic    apb, input bit rst);$/;"	r	module:blk_dut3
+rst	input.sv	/^module blk_dut3 (logic    apb, input bit rst);$/;"	r	module:blk_dut3
+blk_dut4	input.sv	/^module blk_dut4 #(int BASE_ADDR='h0) (apb_if    apb,$/;"	m
+BASE_ADDR	input.sv	/^module blk_dut4 #(int BASE_ADDR='h0) (apb_if    apb,$/;"	c	module:blk_dut4
+apb	input.sv	/^module blk_dut4 #(int BASE_ADDR='h0) (apb_if    apb,$/;"	r	module:blk_dut4
+rst	input.sv	/^                                     input bit rst);$/;"	r	module:blk_dut4
