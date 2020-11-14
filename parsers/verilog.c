@@ -1127,7 +1127,6 @@ static void processFunction (tokenInfo *const token)
 }
 
 // enum [ enum_base_type ] { < enum_name_declaration > }  { [ … ] }
-// typedef enum type_identifier ;
 static void processEnum (tokenInfo *const token)
 {
 	int c;
@@ -1146,18 +1145,6 @@ static void processEnum (tokenInfo *const token)
 			verbose ("Enum type %s\n", vStringValue (token->name));
 			c = skipWhite (vGetc ());
 		} while (readWordToken (token, c));
-
-		/* Undefined kind means that we've reached the end of the
-		 * declaration without having any contents defined, which
-		 * indicates that this is in fact a forward declaration */
-		if (token->kind == K_IDENTIFIER && (typeQueue->scope == NULL || typeQueue->scope->kind != K_UNDEFINED))
-		{
-			verbose ("Prototype enum found \"%s\"\n", vStringValue (token->name));
-			createTag (token, K_PROTOTYPE);
-			pruneTokens (typeQueue);
-			deleteToken (enumToken);
-			return;
-		}
 
 		/* Cleanup type queue */
 		pruneTokens (typeQueue);
@@ -1220,7 +1207,6 @@ static void processEnum (tokenInfo *const token)
 }
 
 // [ struct | union [ tagged ] ] [ packed [ signed | unsigned ] ] { struct_union_member { struct_union_member } } { [ … ] }
-// typedef ( struct | union ) type_identifier ;
 static void processStruct (tokenInfo *const token)
 {
 	verilogKind kind = token->kind;	// K_STRUCT or K_TYPEDEF
@@ -1230,21 +1216,10 @@ static void processStruct (tokenInfo *const token)
 
 	/* Skip packed, signed, and unsigned */
 	while (readWordToken (token, c))
-	{
 		c = skipWhite (vGetc ());
-	}
 
 	/* Skip struct contents */
-	if (c == '{')
-	{
-		c = skipWhite (skipPastMatch ("{}"));
-	}
-	else
-	{
-		verbose ("Prototype struct found \"%s\"\n", vStringValue (token->name));
-		createTag (token, K_PROTOTYPE);
-		return;
-	}
+	c = skipWhite (skipPastMatch ("{}"));
 
 	/* Skip packed_dimension */
 	c = skipDimension (c);
@@ -1274,7 +1249,7 @@ static void processTypedef (tokenInfo *const token)
 		c = skipWhite (vGetc ());
 		kind = token->kind;
 	}
-	// forward typedef (LRM 6.18) is processed as prototype
+	// forward typedef (LRM 6.18) is tagged as prototype
 	//   (I don't know why...)
 	switch (kind)
 	{
@@ -1362,7 +1337,6 @@ static tokenInfo * processParameterList (tokenInfo *token, int c)
 // [ virtual ] class [ static | automatic ] class_identifier [ parameter_port_list ]
 //     [ extends class_type [ ( list_of_arguments ) ] ] [ implements < interface_class_type > ] ;
 // interface class class_identifier [ parameter_port_list ] [ extends < interface_class_type > ] ;
-// typedef ( class | interface class ) type_identifier ;
 static void processClass (tokenInfo *const token)
 {
 	int c;
@@ -1445,7 +1419,6 @@ static void processAssertion (tokenInfo *const token)
 // ( module | interface | program ) [ static | automatic ] identifier { package_import_declaration } [ parameter_port_list ] [ ( [ < { (* … *) } ansi_port_declaration > ] ) ] ;
 //
 // interface class class_identifier [ parameter_port_list ] [ extends < interface_class_type > ] ;
-// typedef interface class type_identifier ;
 //
 // ( checker | property | sequence ) identifier [ ( [ port_list ] ) ] ;
 // covergroup identifier [ ( [ port_list ] ) ] [ coverage_event ] ;
