@@ -114,7 +114,6 @@ typedef enum {
  *   DATA DEFINITIONS
  */
 static int Ungetc;
-static bool inSkipPastMatch = false;	// for vGetc() and skipPastMatch()
 static int Lang_verilog;
 static int Lang_systemverilog;
 
@@ -604,7 +603,7 @@ static int verilogSkipOverCComment (void)
 	return c;
 }
 
-static int vGetc (void)
+static int _vGetc (bool inSkipPastMatch)
 {
 	int c;
 	if (Ungetc == '\0')
@@ -647,6 +646,11 @@ static int vGetc (void)
 	return c;
 }
 
+static int vGetc (void)
+{
+	return _vGetc (false);
+}
+
 // [a-zA-Z_`]
 static bool isFirstIdentifierCharacter (const int c)
 {
@@ -671,17 +675,15 @@ static int skipPastMatch (const char *const pair)
 	const int begin = pair [0], end = pair [1];
 	int matchLevel = 1;
 	int c;
-	inSkipPastMatch = true;
 	do
 	{
-		c = vGetc ();
+		c = _vGetc (true);
 		if (c == begin)
 			++matchLevel;
 		else if (c == end)
 			--matchLevel;
 	}
 	while (c != EOF && matchLevel > 0);
-	inSkipPastMatch = false;
 	return vGetc ();
 }
 
