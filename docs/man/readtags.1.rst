@@ -281,11 +281,6 @@ example:
 prints a bunch of "#t" (depending on how many lines are in the tags file), and
 the actual tag entries are not printed.
 
-BUGS
-----
-Sometimes readtags exits with status 0 even when an error occurs, e.g., when a
-directory is passed to the ``-t`` option.
-
 SEE ALSO
 --------
 See :ref:`tags(5) <tags(5)>` for the details of tags file format.
