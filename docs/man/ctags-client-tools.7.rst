@@ -314,9 +314,13 @@ pattern field.
 The pattern field could:
 
 - Use a line number. It will look like ``number;"`` (e.g. ``10;"``).
-- Use a regex pattern. It will look like ``/pattern/;"`` or ``?pattern?;"``.
-  Notice that the regex pattern could contain tabs.
+- Use a search pattern. It will look like ``/pattern/;"`` or ``?pattern?;"``.
+  Notice that the search pattern could contain tabs.
 - Combine these two, like ``number;/pattern/;"`` or ``number;?pattern?;"``.
+
+These are true for tags files using extended format, which is the default one.
+The legacy format (i.e. ``--format=1``) doesn't include the semicolons. It's
+old and barely used, so we won't discuss it here.
 
 Client tools could split the line using the following steps:
 
@@ -343,8 +347,92 @@ Client tools could split the line using the following steps:
 
 Then, the escape sequences in fields other than the pattern field should be
 translated. See "Proposal" in :ref:`tags(5) <tags(5)>` to know about all the escape sequences.
-The pattern field needs no special treatment. It can be directly used by
-editors supporting Ex commands.
+
+Make Use of the Pattern Field
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The pattern field specifies how to find a tag in its source file. The code
+generating this field seems to have a long history, so there are some pitfalls
+and it's a bit hard to handle. A client tool could simply require the ``line:``
+field and jump to the line it specifies, to avoid using the pattern field. But
+anyway, we'll discuss how to make the best use of it here.
+
+You should take the words here merely as suggestions, and not standards. A
+client tool could definitely develop better (or simpler) ways to use the
+pattern field.
+
+From the last section, we know the pattern field could contain a line number
+and a search pattern. When it only contains the line number, handling it is
+easy: you simply go to that line.
+
+The search pattern resembles an EX command, but as we'll see later, it's
+actually not a valid one, so some manual work are required to process it.
+
+The search pattern could look like ``/pat/``, called "forward search pattern",
+or ``?pat?``, called "backward search pattern". Using a search pattern means
+even if the source file is updated, as long as the part containing the tag
+doesn't change, we could still locate the tag correctly by searching.
+
+When the pattern field only contains the search pattern, you just search for
+it. The search direction (forward/backward) doesn't matter, as it's decided
+solely by whether the ``-B`` option is enabled, and not the actual context. You
+could always start the search from say the beginning of the file.
+
+When both the search pattern and the line number are presented, you could make
+good use of the line number, by going to the line first, then searching for the
+nearest occurence of the pattern. A way to do this is to search both forward
+and backward for the pattern, and when there is a occurence on both sides, go
+to the nearer one.
+
+What's good about this is when there are multiple identical lines in the source
+file (e.g. the COMMON block in Fortran), this could help us find the correct
+one, even after the source file is updated and the tag position is shifted by a
+few lines.
+
+Now let's discuss how to search for the pattern. After you trim the ``/`` or
+``?`` around it, the pattern resembles a regex pattern. It should be a regex
+pattern, as required by being a valid EX command, but it's actually not, as
+you'll see below.
+
+It could begin with a ``^``, which means the pattern starts from the beginning
+of a line. It could also end with an *unescaped* ``$`` which means the pattern
+ends at the end of a line. Let's keep this information, and trim them too.
+
+Now the remaining part is the actual string containing the tag. Some characters
+are escaped:
+
+* ``\``.
+* ``$``, but only at the end of the string.
+* ``/``, but only in forward search patterns.
+* ``?``, but only in backward search patterns.
+
+You need to unescape these to get the literal string. Now you could convert
+this literal string to a regexp that matches it (by escaping, like
+``re.escape`` in Python or ``regexp-quote`` in Elisp), and assemble it with
+``^`` or ``$`` if the pattern originally has it, and finally search for the tag
+using this regexp.
+
+Remark: About a Previous Format of the Pattern Field
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In some earlier versions of ctags, the line number in the
+pattern field is the actual line number minus one, for forward search patterns;
+or plus one, for backward search patterns. The idea is to resemble an EX
+command: you go to the line, then search forward/backward for the pattern, and
+you can always find the correct one. But the developers found this denies the
+purpose of using a search pattern: to tolerate file updates. For example, the
+tag is at line 50, according to this scheme, the pattern field should be::
+
+	49;/pat/;"
+
+Then let's assume that some code above are removed, and the tag is now at
+line 45. Now you can't find it if you search forward from line 49.
+
+Due to this reason, ctags turns to use the actual line number. A client tool
+could distinguish them by the ``TAG_OUTPUT_EXCMD`` pseudo tag, it's "combine"
+for the old scheme, and "combineV2" for the present scheme. But probably
+there's no need to treat them differently, since "search for the nearest
+occurence from the line" gives good result on both schemes.
 
 SEE ALSO
 --------
