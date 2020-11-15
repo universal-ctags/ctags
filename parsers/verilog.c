@@ -82,7 +82,8 @@ typedef enum {
 	K_TYPEDEF,
 	K_CHECKER,
 	K_CLOCKING,
-	K_SEQUENCE
+	K_SEQUENCE,
+	K_MEMBER
 } verilogKind;
 
 typedef struct {
@@ -154,7 +155,8 @@ static kindDefinition SystemVerilogKinds [] = {
  { true, 'T', "typedef",   "type declarations" },
  { true, 'H', "checker",   "checkers" },
  { true, 'L', "clocking",  "clocking" },
- { true, 'q', "sequence",  "sequences" }
+ { true, 'q', "sequence",  "sequences" },
+ { true, 'w', "member",    "struct and union members" }
 };
 
 static const keywordAssoc KeywordTable [] = {
@@ -376,6 +378,7 @@ static bool findBlockName (tokenInfo *const token);
 static void processDefine (tokenInfo *const token);
 static int processType (tokenInfo* token, int c, verilogKind* kind);
 static int pushEnumNames (tokenInfo* token, int c);
+static int pushMembers (tokenInfo* token, int c);
 static bool readWordToken (tokenInfo *const token, int c);
 static int skipDelay(tokenInfo* token, int c);
 static int tagNameList (tokenInfo* token, int c);
@@ -404,6 +407,7 @@ static short isContainer (verilogKind kind)
 		case K_SEQUENCE:
 		case K_TYPEDEF:
 		case K_ENUM:
+		case K_STRUCT:
 			return true;
 		default:
 			return false;
@@ -416,6 +420,7 @@ static short isTempContext (tokenInfo const* token)
 	{
 		case K_TYPEDEF:
 		case K_ENUM:
+		case K_STRUCT:
 			return true;
 		default:
 			return false;
@@ -1158,8 +1163,8 @@ static void processStruct (tokenInfo *const token)
 	while (readWordToken (token, c))
 		c = skipWhite (vGetc ());
 
-	/* Skip struct contents */
-	c = skipWhite (skipPastMatch ("{}"));
+	/* create a list of members */
+	c = pushMembers (token, c);
 
 	/* Skip packed_dimension */
 	c = skipDimension (c);
@@ -1167,7 +1172,11 @@ static void processStruct (tokenInfo *const token)
 	/* Following identifiers are tag names */
 	verbose ("Find struct|union tags. Token %s kind %d\n", vStringValue (token->name), token->kind);
 	token->kind = kind;
-	tagNameList (token, c);
+	c = tagNameList (token, c);
+	ptrArrayClear (tagContents);
+
+	if (c == ';')
+		vUngetc (c);
 }
 
 // data_declaration ::=
@@ -1476,6 +1485,57 @@ static int pushEnumNames (tokenInfo* token, int c)
 	return c;
 }
 
+// create a list of struct/union members
+static int pushMembers (tokenInfo* token, int c)
+{
+	if (c == '{')
+	{
+		c = skipWhite (vGetc ());
+		do
+		{
+			verilogKind kind = K_UNDEFINED;	// set kind of context for processType()
+			if (readWordToken (token, c))
+				c = skipWhite (vGetc ());
+
+			c = processType (token, c, &kind);
+			do
+			{
+				token->kind = K_MEMBER;
+				ptrArrayAdd (tagContents, dupToken (token));
+				verbose ("Pushed struct/union member \"%s\"\n", vStringValue (token->name));
+
+				/* Skip unpacked dimensions */
+				c = skipDimension (skipWhite (c));
+
+				/* Skip value assignments */
+				if (c == '=')
+					c = skipExpression (vGetc ());
+
+				if (c != ',')
+					break;
+
+				c = skipWhite (vGetc ());
+				if (readWordToken (token, c))
+					c = skipWhite (vGetc ());
+				else
+				{
+					verbose ("Unexpected input.\n");
+					break;
+				}
+			} while (true);
+
+			/* Skip semicolon */
+			if (c == ';')
+				c = skipWhite (vGetc ());
+			/* End of enum elements list */
+			if (c == '}' || c == EOF)
+				break;
+		} while (true);
+		c = skipWhite (vGetc ());
+	}
+	return c;
+}
+
 // input
 //   kind: kind of context
 // output
@@ -1505,7 +1565,9 @@ static int processType (tokenInfo* token, int c, verilogKind* kind)
 		{
 			if (*kind == K_ENUM)
 				c = pushEnumNames (token, c);
-			else
+			else if (*kind == K_STRUCT)
+				c = pushMembers (token, c);
+			else	// for a nested structure
 				c = skipWhite (skipPastMatch ("{}"));
 		}
 		c = skipDimension (c);

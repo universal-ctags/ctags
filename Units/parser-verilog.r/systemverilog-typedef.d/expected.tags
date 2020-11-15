@@ -20,11 +20,35 @@ type_enum_bit2.Y	input.sv	/^typedef enum bit [1:0] {Y, Z}    type_enum_bit2;$/;"
 Z	input.sv	/^typedef enum bit [1:0] {Y, Z}    type_enum_bit2;$/;"	c	typedef:type_enum_bit2
 type_enum_bit2.Z	input.sv	/^typedef enum bit [1:0] {Y, Z}    type_enum_bit2;$/;"	c	typedef:type_enum_bit2
 type_struct	input.sv	/^  } type_struct;$/;"	T
+struct_real	input.sv	/^  real       struct_real;$/;"	w	typedef:type_struct
+type_struct.struct_real	input.sv	/^  real       struct_real;$/;"	w	typedef:type_struct
+struct_bit	input.sv	/^  bit  [1:0] struct_bit;$/;"	w	typedef:type_struct
+type_struct.struct_bit	input.sv	/^  bit  [1:0] struct_bit;$/;"	w	typedef:type_struct
 type_union	input.sv	/^  } type_union;$/;"	T
+union_real	input.sv	/^  real       union_real;$/;"	w	typedef:type_union
+type_union.union_real	input.sv	/^  real       union_real;$/;"	w	typedef:type_union
+union_bit	input.sv	/^  bit  [1:0] union_bit;$/;"	w	typedef:type_union
+type_union.union_bit	input.sv	/^  bit  [1:0] union_bit;$/;"	w	typedef:type_union
 type_union_packed	input.sv	/^  } type_union_packed;$/;"	T
+union_bit1	input.sv	/^  bit  [1:0] union_bit1;$/;"	w	typedef:type_union_packed
+type_union_packed.union_bit1	input.sv	/^  bit  [1:0] union_bit1;$/;"	w	typedef:type_union_packed
+union_bit2	input.sv	/^  bit  [1:0] union_bit2;$/;"	w	typedef:type_union_packed
+type_union_packed.union_bit2	input.sv	/^  bit  [1:0] union_bit2;$/;"	w	typedef:type_union_packed
 type_union_tagged	input.sv	/^  } type_union_tagged;$/;"	T
+Invalid	input.sv	/^  void Invalid;$/;"	w	typedef:type_union_tagged
+type_union_tagged.Invalid	input.sv	/^  void Invalid;$/;"	w	typedef:type_union_tagged
+Valid	input.sv	/^  int Valid;$/;"	w	typedef:type_union_tagged
+type_union_tagged.Valid	input.sv	/^  int Valid;$/;"	w	typedef:type_union_tagged
 type_struct_union	input.sv	/^  } type_struct_union;$/;"	T
+struct_real	input.sv	/^  real       struct_real;$/;"	w	typedef:type_struct_union
+type_struct_union.struct_real	input.sv	/^  real       struct_real;$/;"	w	typedef:type_struct_union
+struct_union	input.sv	/^    } struct_union;$/;"	w	typedef:type_struct_union
+type_struct_union.struct_union	input.sv	/^    } struct_union;$/;"	w	typedef:type_struct_union
 type_strcut_packed_unsigned	input.sv	/^} type_strcut_packed_unsigned;$/;"	T
+upper	input.sv	/^  logic [7:0] upper;$/;"	w	typedef:type_strcut_packed_unsigned
+type_strcut_packed_unsigned.upper	input.sv	/^  logic [7:0] upper;$/;"	w	typedef:type_strcut_packed_unsigned
+lower	input.sv	/^  logic [7:0] lower;$/;"	w	typedef:type_strcut_packed_unsigned
+type_strcut_packed_unsigned.lower	input.sv	/^  logic [7:0] lower;$/;"	w	typedef:type_strcut_packed_unsigned
 type_bit	input.sv	/^typedef      bit                 type_bit;$/;"	T
 type_bit_bus	input.sv	/^typedef      bit [1:0]           type_bit_bus;$/;"	T
 type_bit_bus_array	input.sv	/^typedef      bit [1:0]           type_bit_bus_array [2:0];$/;"	T
