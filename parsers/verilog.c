@@ -500,12 +500,6 @@ static tokenInfo *pushToken (tokenInfo * const token, tokenInfo * const tokenPus
 	return tokenPush;
 }
 
-static tokenInfo *appendToken (tokenInfo * const token, tokenInfo * const tokenAppend)
-{
-	token->scope = tokenAppend;
-	return tokenAppend;
-}
-
 static tokenInfo *popToken (tokenInfo * const token)
 {
 	tokenInfo *localToken;
@@ -993,10 +987,9 @@ static void createTag (tokenInfo *const token, verilogKind kind)
 	{
 		createContext (kind, token->name);
 
-		/* Include found contents in context */
-		verbose ("Including tagContents: %d element(s)\n",
+		/* Put found contents in context */
+		verbose ("Putting tagContents: %d element(s)\n",
 				 ptrArrayCount(tagContents));
-
 		for (unsigned int i = 0; i < ptrArrayCount (tagContents); i++)
 		{
 			tokenInfo *content = ptrArrayItem (tagContents, i);
@@ -1231,10 +1224,8 @@ static void processTypedef (tokenInfo *const token)
 		vUngetc (c);
 }
 
-static tokenInfo * processParameterList (tokenInfo *token, int c)
+static void processParameterList (tokenInfo *token, int c)
 {
-	tokenInfo *head = NULL;
-	tokenInfo *parameters = NULL;
 	bool parameter = true;	// default "parameter"
 	if (c == '#')
 	{
@@ -1256,12 +1247,7 @@ static tokenInfo * processParameterList (tokenInfo *token, int c)
 							tokenInfo *param = dupToken (token);
 							param->kind = K_CONSTANT;
 							param->parameter = parameter;
-							if (head == NULL)
-							{
-								head = param;
-								parameters = param;
-							} else
-								parameters = appendToken (parameters, param);	// append token on parameters
+							ptrArrayAdd (tagContents, param);
 
 							c = skipExpression (c);
 						}
@@ -1281,7 +1267,6 @@ static tokenInfo * processParameterList (tokenInfo *token, int c)
 		}
 	}
 	vUngetc (c);
-	return head;
 }
 
 // [ virtual ] class [ static | automatic ] class_identifier [ parameter_port_list ]
@@ -1291,7 +1276,6 @@ static void processClass (tokenInfo *const token)
 {
 	int c;
 	tokenInfo *classToken;
-	tokenInfo *parameters;
 
 	// skip static | automatic : FIXME
 
@@ -1308,7 +1292,7 @@ static void processClass (tokenInfo *const token)
 	c = skipWhite (vGetc ());
 
 	/* Find class parameters list */
-	parameters = processParameterList (token, c);
+	processParameterList (token, c);
 	c = skipWhite (vGetc ());
 
 	/* Search for inheritance information */
@@ -1327,13 +1311,7 @@ static void processClass (tokenInfo *const token)
 
 	createTag (classToken, K_CLASS);
 	deleteToken (classToken);
-
-	/* Add parameter list */
-	while (parameters)
-	{
-		createTag (parameters, K_CONSTANT);
-		parameters = popToken (parameters);
-	}
+	ptrArrayClear (tagContents);
 }
 
 static void processDefine (tokenInfo *const token)
@@ -1394,12 +1372,17 @@ static void processDesignElement (tokenInfo *const token)
 		c = skipWhite (vGetc ());
 		if (c == '#')	// parameter_port_list
 		{
-			tokenInfo *parameters = processParameterList (token, c);
-			while (parameters)
+			processParameterList (token, c);
+
+			/* Put found parameters in context */
+			verbose ("Putting parameters: %d element(s)\n",
+					ptrArrayCount(tagContents));
+			for (unsigned int i = 0; i < ptrArrayCount (tagContents); i++)
 			{
-				createTag (parameters, K_CONSTANT);
-				parameters = popToken (parameters);
+				tokenInfo *content = ptrArrayItem (tagContents, i);
+				createTag (content, K_CONSTANT);
 			}
+			ptrArrayClear (tagContents);
 			// disable parameter property on parameter declaration statement
 			currentContext->hasParamList = true;
 			c = skipWhite (vGetc ());
