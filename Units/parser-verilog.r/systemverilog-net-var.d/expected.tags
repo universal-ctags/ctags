@@ -87,52 +87,52 @@ data	input.sv	/^  my_data_t data;$/;"	r	module:sub
 user_define_types_1	input.sv	/^module user_define_types_1;$/;"	m
 enum_test	input.sv	/^module enum_test;$/;"	m
 light1	input.sv	/^  enum {red, yellow, green} light1, light2; \/\/ anonymous int type$/;"	E	module:enum_test
-green	input.sv	/^  enum {red, yellow, green} light1, light2; \/\/ anonymous int type$/;"	c	enum:enum_test.light1
-yellow	input.sv	/^  enum {red, yellow, green} light1, light2; \/\/ anonymous int type$/;"	c	enum:enum_test.light1
 red	input.sv	/^  enum {red, yellow, green} light1, light2; \/\/ anonymous int type$/;"	c	enum:enum_test.light1
+yellow	input.sv	/^  enum {red, yellow, green} light1, light2; \/\/ anonymous int type$/;"	c	enum:enum_test.light1
+green	input.sv	/^  enum {red, yellow, green} light1, light2; \/\/ anonymous int type$/;"	c	enum:enum_test.light1
 light2	input.sv	/^  enum {red, yellow, green} light1, light2; \/\/ anonymous int type$/;"	E	module:enum_test
-green	input.sv	/^  enum {red, yellow, green} light1, light2; \/\/ anonymous int type$/;"	c	enum:enum_test.light2
-yellow	input.sv	/^  enum {red, yellow, green} light1, light2; \/\/ anonymous int type$/;"	c	enum:enum_test.light2
 red	input.sv	/^  enum {red, yellow, green} light1, light2; \/\/ anonymous int type$/;"	c	enum:enum_test.light2
+yellow	input.sv	/^  enum {red, yellow, green} light1, light2; \/\/ anonymous int type$/;"	c	enum:enum_test.light2
+green	input.sv	/^  enum {red, yellow, green} light1, light2; \/\/ anonymous int type$/;"	c	enum:enum_test.light2
 state	input.sv	/^  enum integer {IDLE, XX='x, S1='b01, S2='b10} state, next;$/;"	E	module:enum_test
-S2	input.sv	/^  enum integer {IDLE, XX='x, S1='b01, S2='b10} state, next;$/;"	c	enum:enum_test.state
-S1	input.sv	/^  enum integer {IDLE, XX='x, S1='b01, S2='b10} state, next;$/;"	c	enum:enum_test.state
-XX	input.sv	/^  enum integer {IDLE, XX='x, S1='b01, S2='b10} state, next;$/;"	c	enum:enum_test.state
 IDLE	input.sv	/^  enum integer {IDLE, XX='x, S1='b01, S2='b10} state, next;$/;"	c	enum:enum_test.state
+XX	input.sv	/^  enum integer {IDLE, XX='x, S1='b01, S2='b10} state, next;$/;"	c	enum:enum_test.state
+S1	input.sv	/^  enum integer {IDLE, XX='x, S1='b01, S2='b10} state, next;$/;"	c	enum:enum_test.state
+S2	input.sv	/^  enum integer {IDLE, XX='x, S1='b01, S2='b10} state, next;$/;"	c	enum:enum_test.state
 next	input.sv	/^  enum integer {IDLE, XX='x, S1='b01, S2='b10} state, next;$/;"	E	module:enum_test
-S2	input.sv	/^  enum integer {IDLE, XX='x, S1='b01, S2='b10} state, next;$/;"	c	enum:enum_test.next
-S1	input.sv	/^  enum integer {IDLE, XX='x, S1='b01, S2='b10} state, next;$/;"	c	enum:enum_test.next
-XX	input.sv	/^  enum integer {IDLE, XX='x, S1='b01, S2='b10} state, next;$/;"	c	enum:enum_test.next
 IDLE	input.sv	/^  enum integer {IDLE, XX='x, S1='b01, S2='b10} state, next;$/;"	c	enum:enum_test.next
+XX	input.sv	/^  enum integer {IDLE, XX='x, S1='b01, S2='b10} state, next;$/;"	c	enum:enum_test.next
+S1	input.sv	/^  enum integer {IDLE, XX='x, S1='b01, S2='b10} state, next;$/;"	c	enum:enum_test.next
+S2	input.sv	/^  enum integer {IDLE, XX='x, S1='b01, S2='b10} state, next;$/;"	c	enum:enum_test.next
 medal	input.sv	/^  enum {bronze=3, silver, gold} medal; \/\/ silver=4, gold=5$/;"	E	module:enum_test
-gold	input.sv	/^  enum {bronze=3, silver, gold} medal; \/\/ silver=4, gold=5$/;"	c	enum:enum_test.medal
-silver	input.sv	/^  enum {bronze=3, silver, gold} medal; \/\/ silver=4, gold=5$/;"	c	enum:enum_test.medal
 bronze	input.sv	/^  enum {bronze=3, silver, gold} medal; \/\/ silver=4, gold=5$/;"	c	enum:enum_test.medal
+silver	input.sv	/^  enum {bronze=3, silver, gold} medal; \/\/ silver=4, gold=5$/;"	c	enum:enum_test.medal
+gold	input.sv	/^  enum {bronze=3, silver, gold} medal; \/\/ silver=4, gold=5$/;"	c	enum:enum_test.medal
 medal2	input.sv	/^  enum bit [3:0] {bronze='h3, silver, gold='h5} medal2;$/;"	E	module:enum_test
-gold	input.sv	/^  enum bit [3:0] {bronze='h3, silver, gold='h5} medal2;$/;"	c	enum:enum_test.medal2
-silver	input.sv	/^  enum bit [3:0] {bronze='h3, silver, gold='h5} medal2;$/;"	c	enum:enum_test.medal2
 bronze	input.sv	/^  enum bit [3:0] {bronze='h3, silver, gold='h5} medal2;$/;"	c	enum:enum_test.medal2
+silver	input.sv	/^  enum bit [3:0] {bronze='h3, silver, gold='h5} medal2;$/;"	c	enum:enum_test.medal2
+gold	input.sv	/^  enum bit [3:0] {bronze='h3, silver, gold='h5} medal2;$/;"	c	enum:enum_test.medal2
 medal3	input.sv	/^  enum bit [3:0] {bronze=4'h3, silver, gold=4'h5} medal3;$/;"	E	module:enum_test
-gold	input.sv	/^  enum bit [3:0] {bronze=4'h3, silver, gold=4'h5} medal3;$/;"	c	enum:enum_test.medal3
-silver	input.sv	/^  enum bit [3:0] {bronze=4'h3, silver, gold=4'h5} medal3;$/;"	c	enum:enum_test.medal3
 bronze	input.sv	/^  enum bit [3:0] {bronze=4'h3, silver, gold=4'h5} medal3;$/;"	c	enum:enum_test.medal3
+silver	input.sv	/^  enum bit [3:0] {bronze=4'h3, silver, gold=4'h5} medal3;$/;"	c	enum:enum_test.medal3
+gold	input.sv	/^  enum bit [3:0] {bronze=4'h3, silver, gold=4'h5} medal3;$/;"	c	enum:enum_test.medal3
 boolean	input.sv	/^  typedef enum {NO, YES} boolean;$/;"	T	module:enum_test
-YES	input.sv	/^  typedef enum {NO, YES} boolean;$/;"	c	typedef:enum_test.boolean
 NO	input.sv	/^  typedef enum {NO, YES} boolean;$/;"	c	typedef:enum_test.boolean
+YES	input.sv	/^  typedef enum {NO, YES} boolean;$/;"	c	typedef:enum_test.boolean
 myvar	input.sv	/^  boolean myvar; \/\/ named type$/;"	r	module:enum_test
 E1	input.sv	/^  typedef enum { add=10, sub[5], jmp[6:8] } E1; \/\/ FIXME$/;"	T	module:enum_test
-jmp	input.sv	/^  typedef enum { add=10, sub[5], jmp[6:8] } E1; \/\/ FIXME$/;"	c	typedef:enum_test.E1
-sub	input.sv	/^  typedef enum { add=10, sub[5], jmp[6:8] } E1; \/\/ FIXME$/;"	c	typedef:enum_test.E1
 add	input.sv	/^  typedef enum { add=10, sub[5], jmp[6:8] } E1; \/\/ FIXME$/;"	c	typedef:enum_test.E1
+sub	input.sv	/^  typedef enum { add=10, sub[5], jmp[6:8] } E1; \/\/ FIXME$/;"	c	typedef:enum_test.E1
+jmp	input.sv	/^  typedef enum { add=10, sub[5], jmp[6:8] } E1; \/\/ FIXME$/;"	c	typedef:enum_test.E1
 vr	input.sv	/^  enum { register[2] = 1, register[2:4] = 10 } vr; \/\/ FIXME$/;"	E	module:enum_test
 register	input.sv	/^  enum { register[2] = 1, register[2:4] = 10 } vr; \/\/ FIXME$/;"	c	enum:enum_test.vr
 register	input.sv	/^  enum { register[2] = 1, register[2:4] = 10 } vr; \/\/ FIXME$/;"	c	enum:enum_test.vr
 cmplx_enum1	input.sv	/^  enum logic signed [3:0] { foo, bar } [1:0] cmplx_enum1; $/;"	E	module:enum_test
-bar	input.sv	/^  enum logic signed [3:0] { foo, bar } [1:0] cmplx_enum1; $/;"	c	enum:enum_test.cmplx_enum1
 foo	input.sv	/^  enum logic signed [3:0] { foo, bar } [1:0] cmplx_enum1; $/;"	c	enum:enum_test.cmplx_enum1
+bar	input.sv	/^  enum logic signed [3:0] { foo, bar } [1:0] cmplx_enum1; $/;"	c	enum:enum_test.cmplx_enum1
 cmplx_enum2	input.sv	/^  enum logic unsigned [3:0] { foo, bar } [] cmplx_enum2; $/;"	E	module:enum_test
-bar	input.sv	/^  enum logic unsigned [3:0] { foo, bar } [] cmplx_enum2; $/;"	c	enum:enum_test.cmplx_enum2
 foo	input.sv	/^  enum logic unsigned [3:0] { foo, bar } [] cmplx_enum2; $/;"	c	enum:enum_test.cmplx_enum2
+bar	input.sv	/^  enum logic unsigned [3:0] { foo, bar } [] cmplx_enum2; $/;"	c	enum:enum_test.cmplx_enum2
 delay_control	input.sv	/^module delay_control #(d, e);$/;"	m
 d	input.sv	/^module delay_control #(d, e);$/;"	c	module:delay_control
 e	input.sv	/^module delay_control #(d, e);$/;"	c	module:delay_control

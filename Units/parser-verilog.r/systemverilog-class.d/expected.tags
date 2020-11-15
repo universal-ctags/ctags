@@ -8,34 +8,34 @@ b	input.sv	/^    logic b;$/;"	r	class:test
 test.b	input.sv	/^    logic b;$/;"	r	class:test
 enum_simple	input.sv	/^    enum {enum_simple1, enum_simple2} enum_simple;$/;"	E	class:test
 test.enum_simple	input.sv	/^    enum {enum_simple1, enum_simple2} enum_simple;$/;"	E	class:test
-enum_simple2	input.sv	/^    enum {enum_simple1, enum_simple2} enum_simple;$/;"	c	enum:test.enum_simple
-test.enum_simple.enum_simple2	input.sv	/^    enum {enum_simple1, enum_simple2} enum_simple;$/;"	c	enum:test.enum_simple
 enum_simple1	input.sv	/^    enum {enum_simple1, enum_simple2} enum_simple;$/;"	c	enum:test.enum_simple
 test.enum_simple.enum_simple1	input.sv	/^    enum {enum_simple1, enum_simple2} enum_simple;$/;"	c	enum:test.enum_simple
+enum_simple2	input.sv	/^    enum {enum_simple1, enum_simple2} enum_simple;$/;"	c	enum:test.enum_simple
+test.enum_simple.enum_simple2	input.sv	/^    enum {enum_simple1, enum_simple2} enum_simple;$/;"	c	enum:test.enum_simple
 enum_var1	input.sv	/^    enum {enum_const1, enum_const2} enum_var1, enum_var2;$/;"	E	class:test
 test.enum_var1	input.sv	/^    enum {enum_const1, enum_const2} enum_var1, enum_var2;$/;"	E	class:test
-enum_const2	input.sv	/^    enum {enum_const1, enum_const2} enum_var1, enum_var2;$/;"	c	enum:test.enum_var1
-test.enum_var1.enum_const2	input.sv	/^    enum {enum_const1, enum_const2} enum_var1, enum_var2;$/;"	c	enum:test.enum_var1
 enum_const1	input.sv	/^    enum {enum_const1, enum_const2} enum_var1, enum_var2;$/;"	c	enum:test.enum_var1
 test.enum_var1.enum_const1	input.sv	/^    enum {enum_const1, enum_const2} enum_var1, enum_var2;$/;"	c	enum:test.enum_var1
+enum_const2	input.sv	/^    enum {enum_const1, enum_const2} enum_var1, enum_var2;$/;"	c	enum:test.enum_var1
+test.enum_var1.enum_const2	input.sv	/^    enum {enum_const1, enum_const2} enum_var1, enum_var2;$/;"	c	enum:test.enum_var1
 enum_var2	input.sv	/^    enum {enum_const1, enum_const2} enum_var1, enum_var2;$/;"	E	class:test
 test.enum_var2	input.sv	/^    enum {enum_const1, enum_const2} enum_var1, enum_var2;$/;"	E	class:test
-enum_const2	input.sv	/^    enum {enum_const1, enum_const2} enum_var1, enum_var2;$/;"	c	enum:test.enum_var2
-test.enum_var2.enum_const2	input.sv	/^    enum {enum_const1, enum_const2} enum_var1, enum_var2;$/;"	c	enum:test.enum_var2
 enum_const1	input.sv	/^    enum {enum_const1, enum_const2} enum_var1, enum_var2;$/;"	c	enum:test.enum_var2
 test.enum_var2.enum_const1	input.sv	/^    enum {enum_const1, enum_const2} enum_var1, enum_var2;$/;"	c	enum:test.enum_var2
+enum_const2	input.sv	/^    enum {enum_const1, enum_const2} enum_var1, enum_var2;$/;"	c	enum:test.enum_var2
+test.enum_var2.enum_const2	input.sv	/^    enum {enum_const1, enum_const2} enum_var1, enum_var2;$/;"	c	enum:test.enum_var2
 enum_complex	input.sv	/^    } enum_complex;$/;"	E	class:test
 test.enum_complex	input.sv	/^    } enum_complex;$/;"	E	class:test
-enum_bit5	input.sv	/^      enum_bit5 [9:0] = 2'b10 ,$/;"	c	enum:test.enum_complex
-test.enum_complex.enum_bit5	input.sv	/^      enum_bit5 [9:0] = 2'b10 ,$/;"	c	enum:test.enum_complex
-enum_bit4	input.sv	/^      enum_bit4[0:10]=2'b10,$/;"	c	enum:test.enum_complex
-test.enum_complex.enum_bit4	input.sv	/^      enum_bit4[0:10]=2'b10,$/;"	c	enum:test.enum_complex
-enum_bit3	input.sv	/^      enum_bit3=2'b01,$/;"	c	enum:test.enum_complex
-test.enum_complex.enum_bit3	input.sv	/^      enum_bit3=2'b01,$/;"	c	enum:test.enum_complex
-enum_bit2	input.sv	/^      enum_bit2='x,$/;"	c	enum:test.enum_complex
-test.enum_complex.enum_bit2	input.sv	/^      enum_bit2='x,$/;"	c	enum:test.enum_complex
 enum_bit1	input.sv	/^      enum_bit1,$/;"	c	enum:test.enum_complex
 test.enum_complex.enum_bit1	input.sv	/^      enum_bit1,$/;"	c	enum:test.enum_complex
+enum_bit2	input.sv	/^      enum_bit2='x,$/;"	c	enum:test.enum_complex
+test.enum_complex.enum_bit2	input.sv	/^      enum_bit2='x,$/;"	c	enum:test.enum_complex
+enum_bit3	input.sv	/^      enum_bit3=2'b01,$/;"	c	enum:test.enum_complex
+test.enum_complex.enum_bit3	input.sv	/^      enum_bit3=2'b01,$/;"	c	enum:test.enum_complex
+enum_bit4	input.sv	/^      enum_bit4[0:10]=2'b10,$/;"	c	enum:test.enum_complex
+test.enum_complex.enum_bit4	input.sv	/^      enum_bit4[0:10]=2'b10,$/;"	c	enum:test.enum_complex
+enum_bit5	input.sv	/^      enum_bit5 [9:0] = 2'b10 ,$/;"	c	enum:test.enum_complex
+test.enum_complex.enum_bit5	input.sv	/^      enum_bit5 [9:0] = 2'b10 ,$/;"	c	enum:test.enum_complex
 mult	input.sv	/^    function mult (a, input b = 0);$/;"	f	class:test
 test.mult	input.sv	/^    function mult (a, input b = 0);$/;"	f	class:test
 a	input.sv	/^    function mult (a, input b = 0);$/;"	p	function:test.mult

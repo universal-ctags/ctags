@@ -997,9 +997,9 @@ static void createTag (tokenInfo *const token, verilogKind kind)
 		verbose ("Including tagContents: %d element(s)\n",
 				 ptrArrayCount(tagContents));
 
-		for (unsigned int i = ptrArrayCount (tagContents); i > 0; i--)
+		for (unsigned int i = 0; i < ptrArrayCount (tagContents); i++)
 		{
-			tokenInfo *content = ptrArrayItem (tagContents, i - 1);
+			tokenInfo *content = ptrArrayItem (tagContents, i);
 			createTag (content, content->kind);
 		}
 
