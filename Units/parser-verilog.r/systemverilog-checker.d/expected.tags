@@ -55,7 +55,6 @@ in1	input.sv	/^module m(input logic rst, clk, logic en, logic[7:0] in1, in2,$/;"
 in2	input.sv	/^module m(input logic rst, clk, logic en, logic[7:0] in1, in2,$/;"	p	module:m
 in_array	input.sv	/^         in_array [20:0]);$/;"	p	module:m
 v1	input.sv	/^        automatic logic [7:0] v1=0;$/;"	r	module:m
-i	input.sv	/^        for (int i = 0; i < 4; i++) begin$/;"	r	module:m
 counter_model	input.sv	/^checker counter_model(logic flag);$/;"	H
 flag	input.sv	/^checker counter_model(logic flag);$/;"	p	checker:counter_model
 counter	input.sv	/^    bit [2:0] counter = '0;$/;"	r	checker:counter_model

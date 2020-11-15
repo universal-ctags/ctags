@@ -10,10 +10,11 @@ top	input.sv	/^module top();$/;"	m
 iBus	input.sv	/^  interconnect [0:1] iBus;$/;"	n	module:top
 rlMod	input.sv	/^module rlMod(input interconnect [0:1] iBus);$/;"	m
 iBus	input.sv	/^module rlMod(input interconnect [0:1] iBus);$/;"	p	module:rlMod
-Net_declarations	input.sv	/^module Net_declarations$/;"	m
+Net_declarations	input.sv	/^module Net_declarations;$/;"	m
+cap1	input.sv	/^  trireg (large) logic #(0,0,0) cap1;$/;"	n	module:Net_declarations
 addressT	input.sv	/^  typedef logic [31:0] addressT;$/;"	T	module:Net_declarations
-ecc	input.sv	/^  wire struct packed { logic ecc; logic [7:0] data; } memsig; \/\/ FIXME: ignored -> memsig$/;"	r	module:Net_declarations
-data	input.sv	/^  wire struct packed { logic ecc; logic [7:0] data; } memsig; \/\/ FIXME: ignored -> memsig$/;"	r	module:Net_declarations
+w1	input.sv	/^  wire addressT w1;$/;"	n	module:Net_declarations
+memsig	input.sv	/^  wire struct packed { logic ecc; logic [7:0] data; } memsig;$/;"	n	module:Net_declarations
 w	input.sv	/^  wire w; \/\/ equivalent to "wire logic w;"$/;"	n	module:Net_declarations
 w	input.sv	/^  wire logic w;$/;"	n	module:Net_declarations
 ww	input.sv	/^  wire [15:0] ww; \/\/ equivalent to "wire logic [15:0] ww;"$/;"	n	module:Net_declarations
@@ -22,6 +23,7 @@ w1	input.sv	/^  interconnect w1;              \/\/ legal$/;"	n	module:Net_declar
 w2	input.sv	/^  interconnect [3:0] w2;        \/\/ legal$/;"	n	module:Net_declarations
 w3	input.sv	/^  interconnect [3:0] w3 [1:0];  \/\/ legal$/;"	n	module:Net_declarations
 wT	input.sv	/^  nettype T wT;$/;"	r	module:Net_declarations
+Tsum	input.sv	/^  nettype T wTsum with Tsum;  \/\/ FIXME: $/;"	r	module:Net_declarations
 w1	input.sv	/^  wT w1;$/;"	r	module:Net_declarations
 w2	input.sv	/^  wT w2[8];$/;"	r	module:Net_declarations
 w3	input.sv	/^  wTsum w3;$/;"	r	module:Net_declarations
@@ -35,6 +37,7 @@ s1	input.sv	/^  shortint s1, s2[0:9];$/;"	r	module:Variable_declarations
 s2	input.sv	/^  shortint s1, s2[0:9];$/;"	r	module:Variable_declarations
 v	input.sv	/^  var v; \/\/ equivalent to "var logic v;"$/;"	r	module:Variable_declarations
 vw	input.sv	/^  var [15:0] vw; \/\/ equivalent to "var logic [15:0] vw;"$/;"	r	module:Variable_declarations
+status	input.sv	/^  var enum bit { clear, error } status;$/;"	r	module:Variable_declarations
 data_in	input.sv	/^  input var logic data_in;$/;"	p	module:Variable_declarations
 r	input.sv	/^  var reg r;$/;"	r	module:Variable_declarations
 i	input.sv	/^  int i = 0;$/;"	r	module:Variable_declarations
@@ -82,6 +85,54 @@ sub	input.sv	/^module sub(intf_i p);$/;"	m
 p	input.sv	/^module sub(intf_i p);$/;"	r	module:sub
 data	input.sv	/^  my_data_t data;$/;"	r	module:sub
 user_define_types_1	input.sv	/^module user_define_types_1;$/;"	m
+enum_test	input.sv	/^module enum_test;$/;"	m
+light1	input.sv	/^  enum {red, yellow, green} light1, light2; \/\/ anonymous int type$/;"	E	module:enum_test
+green	input.sv	/^  enum {red, yellow, green} light1, light2; \/\/ anonymous int type$/;"	c	enum:enum_test.light1
+yellow	input.sv	/^  enum {red, yellow, green} light1, light2; \/\/ anonymous int type$/;"	c	enum:enum_test.light1
+red	input.sv	/^  enum {red, yellow, green} light1, light2; \/\/ anonymous int type$/;"	c	enum:enum_test.light1
+light2	input.sv	/^  enum {red, yellow, green} light1, light2; \/\/ anonymous int type$/;"	E	module:enum_test
+green	input.sv	/^  enum {red, yellow, green} light1, light2; \/\/ anonymous int type$/;"	c	enum:enum_test.light2
+yellow	input.sv	/^  enum {red, yellow, green} light1, light2; \/\/ anonymous int type$/;"	c	enum:enum_test.light2
+red	input.sv	/^  enum {red, yellow, green} light1, light2; \/\/ anonymous int type$/;"	c	enum:enum_test.light2
+state	input.sv	/^  enum integer {IDLE, XX='x, S1='b01, S2='b10} state, next;$/;"	E	module:enum_test
+S2	input.sv	/^  enum integer {IDLE, XX='x, S1='b01, S2='b10} state, next;$/;"	c	enum:enum_test.state
+S1	input.sv	/^  enum integer {IDLE, XX='x, S1='b01, S2='b10} state, next;$/;"	c	enum:enum_test.state
+XX	input.sv	/^  enum integer {IDLE, XX='x, S1='b01, S2='b10} state, next;$/;"	c	enum:enum_test.state
+IDLE	input.sv	/^  enum integer {IDLE, XX='x, S1='b01, S2='b10} state, next;$/;"	c	enum:enum_test.state
+next	input.sv	/^  enum integer {IDLE, XX='x, S1='b01, S2='b10} state, next;$/;"	E	module:enum_test
+S2	input.sv	/^  enum integer {IDLE, XX='x, S1='b01, S2='b10} state, next;$/;"	c	enum:enum_test.next
+S1	input.sv	/^  enum integer {IDLE, XX='x, S1='b01, S2='b10} state, next;$/;"	c	enum:enum_test.next
+XX	input.sv	/^  enum integer {IDLE, XX='x, S1='b01, S2='b10} state, next;$/;"	c	enum:enum_test.next
+IDLE	input.sv	/^  enum integer {IDLE, XX='x, S1='b01, S2='b10} state, next;$/;"	c	enum:enum_test.next
+medal	input.sv	/^  enum {bronze=3, silver, gold} medal; \/\/ silver=4, gold=5$/;"	E	module:enum_test
+gold	input.sv	/^  enum {bronze=3, silver, gold} medal; \/\/ silver=4, gold=5$/;"	c	enum:enum_test.medal
+silver	input.sv	/^  enum {bronze=3, silver, gold} medal; \/\/ silver=4, gold=5$/;"	c	enum:enum_test.medal
+bronze	input.sv	/^  enum {bronze=3, silver, gold} medal; \/\/ silver=4, gold=5$/;"	c	enum:enum_test.medal
+medal2	input.sv	/^  enum bit [3:0] {bronze='h3, silver, gold='h5} medal2;$/;"	E	module:enum_test
+gold	input.sv	/^  enum bit [3:0] {bronze='h3, silver, gold='h5} medal2;$/;"	c	enum:enum_test.medal2
+silver	input.sv	/^  enum bit [3:0] {bronze='h3, silver, gold='h5} medal2;$/;"	c	enum:enum_test.medal2
+bronze	input.sv	/^  enum bit [3:0] {bronze='h3, silver, gold='h5} medal2;$/;"	c	enum:enum_test.medal2
+medal3	input.sv	/^  enum bit [3:0] {bronze=4'h3, silver, gold=4'h5} medal3;$/;"	E	module:enum_test
+gold	input.sv	/^  enum bit [3:0] {bronze=4'h3, silver, gold=4'h5} medal3;$/;"	c	enum:enum_test.medal3
+silver	input.sv	/^  enum bit [3:0] {bronze=4'h3, silver, gold=4'h5} medal3;$/;"	c	enum:enum_test.medal3
+bronze	input.sv	/^  enum bit [3:0] {bronze=4'h3, silver, gold=4'h5} medal3;$/;"	c	enum:enum_test.medal3
+boolean	input.sv	/^  typedef enum {NO, YES} boolean;$/;"	T	module:enum_test
+YES	input.sv	/^  typedef enum {NO, YES} boolean;$/;"	c	typedef:enum_test.boolean
+NO	input.sv	/^  typedef enum {NO, YES} boolean;$/;"	c	typedef:enum_test.boolean
+myvar	input.sv	/^  boolean myvar; \/\/ named type$/;"	r	module:enum_test
+E1	input.sv	/^  typedef enum { add=10, sub[5], jmp[6:8] } E1; \/\/ FIXME$/;"	T	module:enum_test
+jmp	input.sv	/^  typedef enum { add=10, sub[5], jmp[6:8] } E1; \/\/ FIXME$/;"	c	typedef:enum_test.E1
+sub	input.sv	/^  typedef enum { add=10, sub[5], jmp[6:8] } E1; \/\/ FIXME$/;"	c	typedef:enum_test.E1
+add	input.sv	/^  typedef enum { add=10, sub[5], jmp[6:8] } E1; \/\/ FIXME$/;"	c	typedef:enum_test.E1
+vr	input.sv	/^  enum { register[2] = 1, register[2:4] = 10 } vr; \/\/ FIXME$/;"	E	module:enum_test
+register	input.sv	/^  enum { register[2] = 1, register[2:4] = 10 } vr; \/\/ FIXME$/;"	c	enum:enum_test.vr
+register	input.sv	/^  enum { register[2] = 1, register[2:4] = 10 } vr; \/\/ FIXME$/;"	c	enum:enum_test.vr
+cmplx_enum1	input.sv	/^  enum logic signed [3:0] { foo, bar } [1:0] cmplx_enum1; $/;"	E	module:enum_test
+bar	input.sv	/^  enum logic signed [3:0] { foo, bar } [1:0] cmplx_enum1; $/;"	c	enum:enum_test.cmplx_enum1
+foo	input.sv	/^  enum logic signed [3:0] { foo, bar } [1:0] cmplx_enum1; $/;"	c	enum:enum_test.cmplx_enum1
+cmplx_enum2	input.sv	/^  enum logic unsigned [3:0] { foo, bar } [] cmplx_enum2; $/;"	E	module:enum_test
+bar	input.sv	/^  enum logic unsigned [3:0] { foo, bar } [] cmplx_enum2; $/;"	c	enum:enum_test.cmplx_enum2
+foo	input.sv	/^  enum logic unsigned [3:0] { foo, bar } [] cmplx_enum2; $/;"	c	enum:enum_test.cmplx_enum2
 delay_control	input.sv	/^module delay_control #(d, e);$/;"	m
 d	input.sv	/^module delay_control #(d, e);$/;"	c	module:delay_control
 e	input.sv	/^module delay_control #(d, e);$/;"	c	module:delay_control
@@ -91,5 +142,11 @@ regr	input.sv	/^  int rega, regb, regr;$/;"	r	module:delay_control
 delay_control_wire	input.sv	/^module delay_control_wire #(d, e);$/;"	m
 d	input.sv	/^module delay_control_wire #(d, e);$/;"	c	module:delay_control_wire
 e	input.sv	/^module delay_control_wire #(d, e);$/;"	c	module:delay_control_wire
+wirea	input.sv	/^  wire wirea #10 = wireb;$/;"	n	module:delay_control_wire
+wireb	input.sv	/^  wire wireb #d = wireb;$/;"	n	module:delay_control_wire
+wirec	input.sv	/^  wire wirec #((d+e)\/2) = wireb;$/;"	n	module:delay_control_wire
+wired	input.sv	/^  wire wired #wirer = wirer + 1;$/;"	n	module:delay_control_wire
 w$ire	input.sv	/^  wire w$ire, wire$;  \/\/ '$' included$/;"	n	module:delay_control_wire
 wire$	input.sv	/^  wire w$ire, wire$;  \/\/ '$' included$/;"	n	module:delay_control_wire
+rst	input.sv	/^module rst;$/;"	m
+trst_n	input.sv	/^  logic trst_n;$/;"	r	module:rst

@@ -59,4 +59,12 @@ typedef enum bit [1:0] {
     D = {1'b1, 1'b1}
 } type_enum_bit_bus_defined_values;
 
+// enum with user defined type
+typedef  bit [7:0]  foo_t ;
+typedef enum foo_t {
+    X = 'h0000,
+    Y = 'h0001,
+    Z = -1
+} bar_e;
+
 typedef classname#(paramvalue) type_class;

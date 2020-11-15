@@ -46,4 +46,12 @@ B	input.sv	/^    B = 2'b01,$/;"	c	typedef:type_enum_bit_bus_defined_values
 type_enum_bit_bus_defined_values.B	input.sv	/^    B = 2'b01,$/;"	c	typedef:type_enum_bit_bus_defined_values
 A	input.sv	/^    A = 2'b00,$/;"	c	typedef:type_enum_bit_bus_defined_values
 type_enum_bit_bus_defined_values.A	input.sv	/^    A = 2'b00,$/;"	c	typedef:type_enum_bit_bus_defined_values
+foo_t	input.sv	/^typedef  bit [7:0]  foo_t ;$/;"	T
+bar_e	input.sv	/^} bar_e;$/;"	T
+Z	input.sv	/^    Z = -1$/;"	c	typedef:bar_e
+bar_e.Z	input.sv	/^    Z = -1$/;"	c	typedef:bar_e
+Y	input.sv	/^    Y = 'h0001,$/;"	c	typedef:bar_e
+bar_e.Y	input.sv	/^    Y = 'h0001,$/;"	c	typedef:bar_e
+X	input.sv	/^    X = 'h0000,$/;"	c	typedef:bar_e
+bar_e.X	input.sv	/^    X = 'h0000,$/;"	c	typedef:bar_e
 type_class	input.sv	/^typedef classname#(paramvalue) type_class;$/;"	T

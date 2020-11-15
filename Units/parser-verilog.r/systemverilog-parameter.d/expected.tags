@@ -13,7 +13,6 @@ DECODE_W	input.sv	/^virtual class C#(parameter DECODE_W, parameter ENCODE_W = $c
 ENCODE_W	input.sv	/^virtual class C#(parameter DECODE_W, parameter ENCODE_W = $clog2(DECODE_W));$/;"	c	class:C.C	parameter:
 ENCODER_f	input.sv	/^  static function logic [ENCODE_W-1:0] ENCODER_f$/;"	f	class:C.C
 DecodeIn	input.sv	/^      (input logic [DECODE_W-1:0] DecodeIn);$/;"	p	function:C.C.ENCODER_f
-i	input.sv	/^    for (int i = 0; i < DECODE_W; i++) begin$/;"	r	function:C.C.ENCODER_f
 DECODER_f	input.sv	/^  static function logic [DECODE_W-1:0] DECODER_f$/;"	f	class:C.C
 EncodeIn	input.sv	/^      (input logic [ENCODE_W-1:0] EncodeIn);$/;"	p	function:C.C.DECODER_f
 class	input.sv	/^interface class PutImp #(type PUT_T = logic); \/\/ FIXME$/;"	I

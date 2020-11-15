@@ -1,0 +1,21 @@
+Bus	input.sv	/^class Bus;$/;"	C
+addr	input.sv	/^  rand bit[15:0] addr;$/;"	r	class:Bus
+data	input.sv	/^  rand bit[31:0] data;$/;"	r	class:Bus
+AddrType	input.sv	/^typedef enum {low, mid, high} AddrType;$/;"	T
+high	input.sv	/^typedef enum {low, mid, high} AddrType;$/;"	c	typedef:AddrType
+mid	input.sv	/^typedef enum {low, mid, high} AddrType;$/;"	c	typedef:AddrType
+low	input.sv	/^typedef enum {low, mid, high} AddrType;$/;"	c	typedef:AddrType
+MyBus	input.sv	/^class MyBus extends Bus;$/;"	C
+atype	input.sv	/^  rand AddrType atype;$/;"	r	class:MyBus
+exercise_bus	input.sv	/^task exercise_bus (MyBus bus);$/;"	t
+bus	input.sv	/^task exercise_bus (MyBus bus);$/;"	p	task:exercise_bus
+res	input.sv	/^  int res;$/;"	r	task:exercise_bus
+C	input.sv	/^class C;$/;"	C
+x	input.sv	/^  rand int x;$/;"	r	class:C
+D	input.sv	/^virtual class D;$/;"	C
+E	input.sv	/^class E;$/;"	C
+a	input.sv	/^  rand byte a[5];$/;"	r	class:E
+b	input.sv	/^  rand byte b;$/;"	r	class:E
+excluded	input.sv	/^  rand byte excluded;$/;"	r	class:E
+C	input.sv	/^class C;$/;"	C
+A	input.sv	/^  rand byte A[] ;$/;"	r	class:C

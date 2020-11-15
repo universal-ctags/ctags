@@ -67,7 +67,7 @@ endfunction
 
 function ref_test (
     ref tref1,
-    ref wire tref2,
+    ref wire tref2
     );
 endfunction
 

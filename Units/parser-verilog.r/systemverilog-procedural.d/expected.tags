@@ -1,16 +1,23 @@
 procedural	input.sv	/^module procedural;$/;"	m
+index	input.sv	/^  int index, rega, regb, result;$/;"	r	module:procedural
+rega	input.sv	/^  int index, rega, regb, result;$/;"	r	module:procedural
+regb	input.sv	/^  int index, rega, regb, result;$/;"	r	module:procedural
+result	input.sv	/^  int index, rega, regb, result;$/;"	r	module:procedural
+expression	input.sv	/^    logic expression, a, result, flaga, flagb;$/;"	r	module:procedural
+a	input.sv	/^    logic expression, a, result, flaga, flagb;$/;"	r	module:procedural
+result	input.sv	/^    logic expression, a, result, flaga, flagb;$/;"	r	module:procedural
+flaga	input.sv	/^    logic expression, a, result, flaga, flagb;$/;"	r	module:procedural
+flagb	input.sv	/^    logic expression, a, result, flaga, flagb;$/;"	r	module:procedural
+b	input.sv	/^    logic [2:1] b;$/;"	r	module:procedural
+select	input.sv	/^    logic [1:2] select;$/;"	r	module:procedural
+encode	input.sv	/^    logic [2:0] encode ;$/;"	r	module:procedural
 s	input.sv	/^  string s;$/;"	r	module:procedural
+value	input.sv	/^  int value, a[3];$/;"	r	module:procedural
+a	input.sv	/^  int value, a[3];$/;"	r	module:procedural
+offset	input.sv	/^  int offset = 10;$/;"	r	module:procedural
 N	input.sv	/^  parameter N = 8;$/;"	c	module:procedural
-a	input.sv	/^    int a;$/;"	r	module:procedural
-i	input.sv	/^    for (int i = 0; i < N; i++) begin : outer1$/;"	r	module:procedural
-outer1	input.sv	/^    for (int i = 0; i < N; i++) begin : outer1$/;"	b	module:procedural
-b	input.sv	/^      int b;$/;"	r	block:procedural.outer1
-j	input.sv	/^      for (int j = 0; j < N; j++) begin:inner1$/;"	r	block:procedural.outer1
-inner1	input.sv	/^      for (int j = 0; j < N; j++) begin:inner1$/;"	b	block:procedural.outer1
-c	input.sv	/^        int c;$/;"	r	block:procedural.outer1.inner1
-i	input.sv	/^    for (int i = 0; i < N; i++) begin : outer2$/;"	r	module:procedural
-outer2	input.sv	/^    for (int i = 0; i < N; i++) begin : outer2$/;"	b	module:procedural
-d	input.sv	/^      int d;$/;"	r	block:procedural.outer2
-j	input.sv	/^      for (int j = 0; j < N; j++) begin:inner2$/;"	r	block:procedural.outer2
-inner2	input.sv	/^      for (int j = 0; j < N; j++) begin:inner2$/;"	b	block:procedural.outer2
-e	input.sv	/^        int e;$/;"	r	block:procedural.outer2.inner2
+outer	input.sv	/^    for (int i = 0; i < N; i++) begin:outer$/;"	b	module:procedural
+inner	input.sv	/^      for (int j = 0; j < N; j++) begin : inner$/;"	b	block:procedural.outer
+state	input.sv	/^    enum { FSM_IDLE, FSM_ITER } state;$/;"	E	module:procedural
+FSM_ITER	input.sv	/^    enum { FSM_IDLE, FSM_ITER } state;$/;"	c	enum:procedural.state
+FSM_IDLE	input.sv	/^    enum { FSM_IDLE, FSM_ITER } state;$/;"	c	enum:procedural.state
