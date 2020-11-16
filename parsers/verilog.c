@@ -1508,6 +1508,7 @@ static int processType (tokenInfo* token, int c, verilogKind* kind)
 			else
 				c = skipWhite (skipPastMatch ("{}"));
 		}
+		c = skipDimension (c);
 
 		if (!readWordToken (token, c))
 			break;
