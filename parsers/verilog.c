@@ -29,6 +29,7 @@
 #include "read.h"
 #include "routines.h"
 #include "xtag.h"
+#include "ptrarray.h"
 
 /*
 *   MACROS
@@ -245,7 +246,7 @@ static const keywordAssoc KeywordTable [] = {
 };
 
 static tokenInfo *currentContext = NULL;
-static tokenInfo *tagContents = NULL;
+static ptrArray *tagContents;
 static fieldDefinition *fieldTable = NULL;
 
 // IEEE Std 1364-2005 LRM, Appendix B "List of Keywords"
@@ -556,6 +557,9 @@ static void initializeVerilog (const langType language)
 	buildKeywordHash (language, IDX_VERILOG);
 	addKeywordGroup (&verilogKeywords, language);
 	addKeywordGroup (&verilogDirectives, language);
+	if (tagContents == NULL)
+		tagContents = ptrArrayNew ((ptrArrayDeleteFunc)deleteToken);
+
 }
 
 static void initializeSystemVerilog (const langType language)
@@ -564,6 +568,8 @@ static void initializeSystemVerilog (const langType language)
 	buildKeywordHash (language, IDX_SYSTEMVERILOG);
 	addKeywordGroup (&systemVerilogKeywords, language);
 	addKeywordGroup (&systemVerilogDirectives, language);
+	if (tagContents == NULL)
+		tagContents = ptrArrayNew ((ptrArrayDeleteFunc)deleteToken);
 }
 
 static void vUngetc (int c)
@@ -988,16 +994,13 @@ static void createTag (tokenInfo *const token, verilogKind kind)
 		createContext (kind, token->name);
 
 		/* Include found contents in context */
-		if (tagContents != NULL)
-		{
-			tokenInfo* content = tagContents;
+		verbose ("Including tagContents: %d element(s)\n",
+				 ptrArrayCount(tagContents));
 
-			verbose ("Including tagContents\n");
-			do
-			{
-				createTag (content, content->kind);
-				content = content->scope;
-			} while (content);
+		for (unsigned int i = ptrArrayCount (tagContents); i > 0; i--)
+		{
+			tokenInfo *content = ptrArrayItem (tagContents, i - 1);
+			createTag (content, content->kind);
 		}
 
 		/* Drop temporary contexts */
@@ -1147,8 +1150,7 @@ static void processEnum (tokenInfo *const token)
 
 	// Clean up the tag content list at the end of the declaration to support multiple variables
 	//   enum { ... } foo, bar;
-	while (tagContents)
-		tagContents = popToken (tagContents);
+	ptrArrayClear (tagContents);
 }
 
 // [ struct | union [ tagged ] ] [ packed [ signed | unsigned ] ] { struct_union_member { struct_union_member } } { [ … ] }
@@ -1223,8 +1225,7 @@ static void processTypedef (tokenInfo *const token)
 
 	createTag (token, K_TYPEDEF);
 
-	while (tagContents)
-		tagContents = popToken (tagContents);
+	ptrArrayClear (tagContents);
 
 	if (c == ';')
 		vUngetc (c);
@@ -1469,7 +1470,7 @@ static int pushEnumNames (tokenInfo* token, int c)
 		while (readWordToken (token, c))
 		{
 			token->kind = K_CONSTANT;
-			tagContents = pushToken (tagContents, dupToken (token));
+			ptrArrayAdd (tagContents, dupToken (token));
 			verbose ("Pushed enum element \"%s\"\n", vStringValue (token->name));
 
 			/* Skip element ranges */
@@ -1699,6 +1700,7 @@ static void findVerilogTags (void)
 	int c = '\0';
 	currentContext = newToken ();
 	fieldTable = isInputLanguage (Lang_verilog) ? VerilogFields : SystemVerilogFields;
+	ptrArrayClear (tagContents);
 
 	while (c != EOF)
 	{
