@@ -8,8 +8,13 @@ vw	input.sv	/^  logic vw; \/\/ no initial assignment$/;"	r	module:net_decl
 circ	input.sv	/^  real circ;$/;"	r	module:net_decl
 top	input.sv	/^module top();$/;"	m
 iBus	input.sv	/^  interconnect [0:1] iBus;$/;"	n	module:top
+l1	input.sv	/^  lDriver l1(iBus[0]);$/;"	i	module:top
+r1	input.sv	/^  rDriver r1(iBus[1]);$/;"	i	module:top
+m1	input.sv	/^  rlMod m1(iBus);$/;"	i	module:top
 rlMod	input.sv	/^module rlMod(input interconnect [0:1] iBus);$/;"	m
 iBus	input.sv	/^module rlMod(input interconnect [0:1] iBus);$/;"	p	module:rlMod
+l1	input.sv	/^  lMod l1(iBus[0]);$/;"	i	module:rlMod
+r1	input.sv	/^  rMod r1(iBus[1]);$/;"	i	module:rlMod
 Net_declarations	input.sv	/^module Net_declarations;$/;"	m
 cap1	input.sv	/^  trireg (large) logic #(0,0,0) cap1;$/;"	n	module:Net_declarations
 addressT	input.sv	/^  typedef logic [31:0] addressT;$/;"	T	module:Net_declarations
