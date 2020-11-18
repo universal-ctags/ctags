@@ -17,7 +17,7 @@
 # json --languages=+man --fields=* --extras=*
 {"_type": "ptag", "name": "JSON_OUTPUT_VERSION", "path": "0.0", "pattern": "in development"}
 {"_type": "ptag", "name": "TAG_FILE_SORTED", "path": "1", "pattern": "0=unsorted, 1=sorted, 2=foldcase"}
-{"_type": "ptag", "name": "TAG_OUTPUT_EXCMD", "path": "mixed", "pattern": "number, pattern, mixed, or combine(v2)"}
+{"_type": "ptag", "name": "TAG_OUTPUT_EXCMD", "path": "mixed", "pattern": "number, pattern, mixed, or combineV2"}
 {"_type": "ptag", "name": "TAG_PATTERN_LENGTH_LIMIT", "path": "96", "pattern": "0 for no limit"}
 {"_type": "ptag", "name": "TAG_PROGRAM_AUTHOR", "path": "Universal Ctags Team", "pattern": ""}
 {"_type": "ptag", "name": "TAG_PROGRAM_NAME", "path": "Universal Ctags", "pattern": "Derived from Exuberant Ctags"}
