@@ -19,7 +19,7 @@
 !_TAG_KIND_SEPARATOR!PHP	\\	/nn/
 !_TAG_KIND_SEPARATOR!PHP	\\	/nt/
 !_TAG_KIND_SEPARATOR!PHP	\\	/nv/
-!_TAG_OUTPUT_EXCMD	mixed	/number, pattern, mixed, or combine/
+!_TAG_OUTPUT_EXCMD	mixed	/number, pattern, mixed, or combine(v2)/
 !_TAG_OUTPUT_FILESEP	slash	/slash or backslash/
 !_TAG_OUTPUT_MODE	u-ctags	/u-ctags or e-ctags/
 !_TAG_PATTERN_LENGTH_LIMIT	96	/0 for no limit/
