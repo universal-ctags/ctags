@@ -1125,7 +1125,7 @@ static void processFunction (tokenInfo *const token)
 		vUngetc (c);
 }
 
-// ( enum | union ) [ enum_base_type ] { < enum_name_declaration > }  { [ … ] }
+// ( enum | union ) [ enum_base_type ] { < enum_name_declaration > }  { [ ... ] }
 static void processEnum (tokenInfo *const token)
 {
 	int c;
@@ -1153,7 +1153,7 @@ static void processEnum (tokenInfo *const token)
 	ptrArrayClear (tagContents);
 }
 
-// [ struct | union [ tagged ] ] [ packed [ signed | unsigned ] ] { struct_union_member { struct_union_member } } { [ … ] }
+// [ struct | union [ tagged ] ] [ packed [ signed | unsigned ] ] { struct_union_member { struct_union_member } } { [ ... ] }
 static void processStruct (tokenInfo *const token)
 {
 	verilogKind kind = token->kind;	// K_STRUCT or K_TYPEDEF
@@ -1179,8 +1179,8 @@ static void processStruct (tokenInfo *const token)
 
 // data_declaration ::=
 //       [ const ] [ var ] [ static | automatic ] data_type_or_implicit list_of_variable_decl_assignments ;
-//     | typedef data_type type_identifier { [ … ] } ;
-//     | typedef interface_instance_identifier [ … ] . type_identifier type_identifier ;
+//     | typedef data_type type_identifier { [ ... ] } ;
+//     | typedef interface_instance_identifier [ ... ] . type_identifier type_identifier ;
 //     | typedef [ enum | struct | union | class | interface class ] type_identifier ;
 //     | import < package_import_item > ;
 //     | nettype data_type net_type_identifier [ with [ class_type :: | package_identifier :: | $unit :: ] tf_identifier ] ;
@@ -1366,7 +1366,7 @@ static void processAssertion (tokenInfo *const token)
 // non-ANSI type
 // ( module | interface | program ) [ static | automatic ] identifier { package_import_declaration } [ parameter_port_list ] ( port { , port } ) ;
 // ANSI type
-// ( module | interface | program ) [ static | automatic ] identifier { package_import_declaration } [ parameter_port_list ] [ ( [ < { (* … *) } ansi_port_declaration > ] ) ] ;
+// ( module | interface | program ) [ static | automatic ] identifier { package_import_declaration } [ parameter_port_list ] [ ( [ < { (* ... *) } ansi_port_declaration > ] ) ] ;
 //
 // interface class class_identifier [ parameter_port_list ] [ extends < interface_class_type > ] ;
 //
@@ -1503,7 +1503,7 @@ static int processType (tokenInfo* token, int c, verilogKind* kind)
 	verilogKind actualKind = K_UNDEFINED;
 	while (true)
 	{
-		// [ class_type :: | package_identifier :: | $unit :: ] type_identifier { [ … ] }
+		// [ class_type :: | package_identifier :: | $unit :: ] type_identifier { [ ... ] }
 		if (c == ':')
 		{
 			c = skipWhite (vGetc ());
