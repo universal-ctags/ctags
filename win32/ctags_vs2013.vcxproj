@@ -165,6 +165,7 @@
     <ClCompile Include="..\optlib\qemuhx.c" />
     <ClCompile Include="..\optlib\scss.c" />
     <ClCompile Include="..\optlib\systemtap.c" />
+    <ClCompile Include="..\parsers\abc.c" />
     <ClCompile Include="..\parsers\ada.c" />
     <ClCompile Include="..\parsers\ant.c" />
     <ClCompile Include="..\parsers\asciidoc.c" />

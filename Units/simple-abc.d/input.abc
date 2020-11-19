@@ -1,0 +1,78 @@
+% A Selection of Scotch, English, Irish and Foreign
+% Airs adapted to the Fife, Violin, or German-Flute
+% Glasgow
+% Printed and Sold by James Aird
+% Volume First
+% 1778 (often cited as 1782)
+
+X:0001
+T:The Ranting Highlandman.
+T:The White Cockade
+M:C|
+L:1/8
+Q:1/2=112
+I: :: ::
+%% G A B c d e ^f g a
+Z:Jack Campin * www.campin.me.uk * 2009
+K:G
+AG|B2B2 B2AG|B2B2 B2g2|B2B2 B2AG|AGAB A2
+GA|B2B2 cBAG|A2B2 g2fg|a2gf g2fe|d2B2 B2::
+Bc|d2B2 g2B2|d2d2 d2e2|d2cB g2fg|a2A2 A2
+GA|B2B2 cBAG|A2B2 g2fg|a2gf g2fe|d2B2 B2:|
+
+X:0002
+T:Quick Step. 25th Regt.
+N:bars of quavers are all beamed together in the original
+M:2/4
+L:1/16
+Q:1/4=89
+I: :: ::
+%% D ^F G A B c d e f ^f g a
+Z:Jack Campin * www.campin.me.uk * 2009
+K:G
+g2d2 d2c2|(BcdB) G2D2 |G2B2 (ABcd)| B2``G2  G2d2|
+e2c2 c2e2| d2B2  B2d2 |g2d2  c2B2 | B4      A4 :|
+F2A2 A2dc| B2G2  G4   |B2d2  d2=f2|(ed)(cB) c4  |
+e2a2 a2g2|(gfed) g2c2 |B2AG  A2D2 | G2``G2  G4 :|
+
+X:0003
+T:The Lads of the Village.
+M:2/4
+L:1/8
+Q:1/4=104
+I: :: ::
+%% D ^F G A B c d e ^f g a
+Z:Jack Campin * www.campin.me.uk * 2009
+K:G
+G2g>d|ecBG|a>cBG|FA`FD|G2 gd|ecBG|A>cBG|(D/G/``F/A/) G2:|
+g>fgd|ecBG|g>fge|a>gfd|g>fgd|ecBG|A>cBG|(D/G/)(F/A/) G2:|
+
+X:0004
+T:I'll Touzle your Kurchy.
+M:6/8
+L:1/8
+Q:3/8=120
+I: :: ::
+%% D  E  ^F  G  A  B  c  d  e  ^f  g
+Z:Jack Campin * www.campin.me.uk * 2009
+K:E Minor
+B   |E>GE GEG|B>AB e2f|g>fe dgB|A>GA BG
+E   |E>GE GEG|B>AB e2f|g>fe dcB|AGF  E2:|
+B   |E>GE B2B|GEG  B2B|E>GE A2G|FDF  A2
+G/F/|E>GE B2B|GEG  e2f|gfe  dcB|AGF  E2:|
+
+X:0005
+T:The Lady's play thing, or Gen Howe's March.
+M:6/8
+L:1/8
+Q:3/8=120
+I: :: ::
+%% D  G  A  B  c  d  e  g
+N:last note printed as G3
+Z:Jack Campin * www.campin.me.uk * 2009
+K:G
+d/c/|B2B Bcd|A2A A2d|G2G GAB|B3  A2
+e   |dgd BdB|GBG Ddc|BcB AGA|G2G G2:|
+d   |dBd dBd|e2e e2c|cAc cAc|d2d d2
+c   |BGB BGB|c2c cBA|Bcd dcB|B3  A2
+e   |dgd BdB|GBG Ddc|BcB AGA|G2G G2:|
