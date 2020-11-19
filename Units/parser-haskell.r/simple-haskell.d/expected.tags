@@ -1,0 +1,10 @@
+Cards	input.hs	/^module Cards where$/;"	m
+Int	input.hs	/^data Int = -2147483648 | -2147483647 | ... | -1 | 0 | 1 | 2 | ... | 2147483647$/;"	t
+Fd	input.hs	/^newtype Fd = Fd CInt$/;"	t
+Fd	input.hs	/^newtype Fd = Fd CInt$/;"	c
+Bool	input.hs	/^data Bool $/;"	t
+True	input.hs	/^  = True | False$/;"	c
+False	input.hs	/^  = True | False$/;"	c
+Name	input.hs	/^type Name = String$/;"	t
+getSpareBuffer	input.hs	/^getSpareBuffer Handle__{haCharBuffer=ref, $/;"	f
+add	input.hs	/^add x y  = x + y$/;"	f

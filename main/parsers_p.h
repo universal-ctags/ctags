@@ -85,6 +85,7 @@
 	FyppParser,	   \
 	GdbinitParser, \
 	GoParser, \
+	HaskellParser, \
 	HaxeParser, \
 	HtmlParser, \
 	IniconfParser, \
@@ -98,6 +99,7 @@
 	KconfigParser, \
 	LdScriptParser, \
 	LispParser, \
+	LiterateHaskellParser, \
 	LuaParser, \
 	M4Parser, \
 	ManParser, \

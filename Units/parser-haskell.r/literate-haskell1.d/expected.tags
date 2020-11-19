@@ -1,0 +1,3 @@
+main	input.lhs	/^> main = do putStr "Enter a number: "$/;"	f
+fact	input.lhs	/^> fact 0 = 1$/;"	f
+fact	input.lhs	/^> fact n = n * fact (n-1)$/;"	f
