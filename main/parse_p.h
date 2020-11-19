@@ -25,7 +25,8 @@
 /*
 *   MACROS
 */
-#define LANG_FALLBACK   (1)
+#define FALLBACK_PARSER_NAME "Unknown"
+#define LANG_FALLBACK   (getNamedLanguage(FALLBACK_PARSER_NAME, 0))
 
 /*
 *   DATA DECLARATIONS

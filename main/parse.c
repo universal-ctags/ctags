@@ -126,7 +126,7 @@ static parserDefinition *FallbackParser (void);
 static parserDefinition *CTagsParser (void);
 static parserDefinition *CTagsSelfTestParser (void);
 static parserDefinitionFunc* BuiltInParsers[] = {
-	CTagsParser,				/* This must be first entry. */
+	CTagsParser,				/* This one is for printing ptags in xref output */
 	FallbackParser,				/* LANG_FALLBACK */
 	CTagsSelfTestParser,
 #ifdef EXTERNAL_PARSER_LIST
@@ -5000,7 +5000,7 @@ extern bool processPretendOption (const char *const option, const char *const pa
  */
 static parserDefinition *FallbackParser (void)
 {
-	parserDefinition *const def = parserNew ("Unknown");
+	parserDefinition *const def = parserNew (FALLBACK_PARSER_NAME);
 	def->extensions = NULL;
 	def->kindTable = NULL;
 	def->kindCount = 0;
