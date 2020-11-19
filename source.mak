@@ -287,6 +287,7 @@ PARSER_SRCS =				\
 	parsers/tex.c			\
 	parsers/tex-beamer.c		\
 	parsers/ttcn.c			\
+	parsers/txt2tags.c		\
 	parsers/typescript.c		\
 	parsers/verilog.c		\
 	parsers/vhdl.c			\

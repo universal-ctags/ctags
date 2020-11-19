@@ -522,6 +522,9 @@
     <ClCompile Include="..\parsers\ttcn.c">
       <Filter>Source Files\Parsers</Filter>
     </ClCompile>
+    <ClCompile Include="..\parsers\txt2tags.c">
+      <Filter>Source Files\Parsers</Filter>
+    </ClCompile>
     <ClCompile Include="..\parsers\typescript.c">
       <Filter>Source Files\Parsers</Filter>
     </ClCompile>

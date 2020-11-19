@@ -145,6 +145,7 @@
 	TexParser, \
 	TexBeamerParser, \
 	TTCNParser, \
+	Txt2tagsParser, \
 	TypeScriptParser, \
 	VeraParser, \
 	VerilogParser, \

@@ -1,0 +1,32 @@
+Paragraph	input.t2t	/^= Paragraph =[paragraph]$/;"	s
+Comment	input.t2t	/^= Comment =[comment]$/;"	s
+Line	input.t2t	/^= Line =[line]$/;"	s
+Inline	input.t2t	/^= Inline =[inline]$/;"	s
+Link	input.t2t	/^= Link =[link]$/;"	s
+Image	input.t2t	/^= Image =[image]$/;"	s
+Macro	input.t2t	/^= Macro =[macro]$/;"	s
+Numbered Title	input.t2t	/^= Numbered Title =[numtitle]$/;"	s
+Title	input.t2t	/^= Title =[title]$/;"	s
+Title Level 1	input.t2t	/^= Title Level 1 =$/;"	s
+Title Level 2	input.t2t	/^== Title Level 2 ==$/;"	s	section:Title Level 1
+Title Level 3	input.t2t	/^=== Title Level 3 ===$/;"	s	section:Title Level 1""Title Level 2
+Title Level 4	input.t2t	/^==== Title Level 4 ====$/;"	s	section:Title Level 1""Title Level 2""Title Level 3
+Title Level 5	input.t2t	/^===== Title Level 5 =====$/;"	s	section:Title Level 1""Title Level 2""Title Level 3""Title Level 4
+Title Level 1	input.t2t	/^= Title Level 1 =[lab_el-1]$/;"	s
+Title Level 2	input.t2t	/^== Title Level 2 ==[lab_el-2]$/;"	s	section:Title Level 1
+Title Level 3	input.t2t	/^=== Title Level 3 ===[lab_el-3]$/;"	s	section:Title Level 1""Title Level 2
+Title Level 4	input.t2t	/^==== Title Level 4 ====[lab_el-4]$/;"	s	section:Title Level 1""Title Level 2""Title Level 3
+Title Level 5	input.t2t	/^===== Title Level 5 =====[lab_el-5]$/;"	s	section:Title Level 1""Title Level 2""Title Level 3""Title Level 4
+Title Level 3	input.t2t	/^     ===Title Level 3===    $/;"	s	section:Title Level 1""Title Level 2
+Title Level 3	input.t2t	/^    === Title Level 3 ===    $/;"	s	section:Title Level 1""Title Level 2
+Title Level 3	input.t2t	/^   ===  Title Level 3  ===   $/;"	s	section:Title Level 1""Title Level 2
+Title Level 3	input.t2t	/^===     Title Level 3      ===$/;"	s	section:Title Level 1""Title Level 2
+Title Level 3	input.t2t	/^===          Title Level 3 ===$/;"	s	section:Title Level 1""Title Level 2
+Title Level 3	input.t2t	/^   ===  Title Level 3  ===[lab_el-9]   $/;"	s	section:Title Level 1""Title Level 2
+Quote	input.t2t	/^= Quote =[quote]$/;"	s
+Raw	input.t2t	/^= Raw =[raw]$/;"	s
+Verbatim	input.t2t	/^= Verbatim =[verbatim]$/;"	s
+Definition List	input.t2t	/^= Definition List =[deflist]$/;"	s
+Numbered List	input.t2t	/^= Numbered List =[numlist]$/;"	s
+List	input.t2t	/^= List =[list]$/;"	s
+Table	input.t2t	/^= Table =[table]$/;"	s
