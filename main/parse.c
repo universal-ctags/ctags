@@ -126,12 +126,12 @@ static parserDefinition *FallbackParser (void);
 static parserDefinition *CTagsParser (void);
 static parserDefinition *CTagsSelfTestParser (void);
 static parserDefinitionFunc* BuiltInParsers[] = {
-	CTagsParser,				/* This must be first entry. */
-	FallbackParser,				/* LANG_FALLBACK */
-	CTagsSelfTestParser,
 #ifdef EXTERNAL_PARSER_LIST
 	EXTERNAL_PARSER_LIST
 #else  /* ! EXTERNAL_PARSER_LIST */
+	CTagsParser,				/* This must be first entry. */
+	FallbackParser,				/* LANG_FALLBACK */
+	CTagsSelfTestParser,
 
 	PARSER_LIST,
 	XML_PARSER_LIST
