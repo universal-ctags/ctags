@@ -126,12 +126,16 @@ static parserDefinition *FallbackParser (void);
 static parserDefinition *CTagsParser (void);
 static parserDefinition *CTagsSelfTestParser (void);
 static parserDefinitionFunc* BuiltInParsers[] = {
-	CTagsParser,				/* This one is for printing ptags in xref output */
-	FallbackParser,				/* LANG_FALLBACK */
-	CTagsSelfTestParser,
+	/*
+	 * Geany expects EXTERNAL_PARSER_LIST is at the head of this array.
+	 */
 #ifdef EXTERNAL_PARSER_LIST
 	EXTERNAL_PARSER_LIST
 #else  /* ! EXTERNAL_PARSER_LIST */
+
+	CTagsParser,				/* This one is for printing ptags in xref output */
+	FallbackParser,				/* LANG_FALLBACK */
+	CTagsSelfTestParser,
 
 	PARSER_LIST,
 	XML_PARSER_LIST
