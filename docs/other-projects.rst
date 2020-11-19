@@ -29,7 +29,6 @@ Changes known by devs worth backporting:
 
 They have these additional language parsers:
 
-* `Abaqus <https://en.wikipedia.org/wiki/Abaqus>`_
 * `ActionScript <https://en.wikipedia.org/wiki/ActionScript>`_
 * `AsciiDoc <https://en.wikipedia.org/wiki/AsciiDoc>`_
 * `DocBook <https://en.wikipedia.org/wiki/DocBook>`_

@@ -1,0 +1,106 @@
+**
+**    Simple input file demonstrating user material in ABAQUS
+**
+**    This input file was created with ABAQUS/CAE, and then edited
+**    to insert the additional commands associated with user material.
+**
+**    You can run the code with
+**     abaqus job=user_element, user=Usermat.for
+**
+*Heading
+** Job name: Job-1 Model name: Model-1
+*Preprint, echo=NO, model=NO, history=NO, contact=NO
+**
+** PARTS
+**
+*Part, name=Part-1
+*End Part
+**  
+**
+** ASSEMBLY
+**
+*Assembly, name=Assembly
+**  
+*Instance, name=Part-1-1, part=Part-1
+*Node
+      1,           0.,           0.
+      2,          2.5,           0.
+      3,           0.,          2.5
+      4,          2.5,          2.5
+**
+** NOTE - if you use reduced integration elements
+** with a UMAT, you have to define the hourglass
+** stiffness for the element
+**
+*Element, type=CPE4R
+1, 1, 2, 4, 3
+*Nset, nset=_PickedSet2, internal, generate
+ 1,  4,  1
+*Elset, elset=_PickedSet2, internal
+ 1,
+** Region: (Section-1:Picked)
+*Elset, elset=_PickedSet2, internal
+ 1,
+** Section: Section-1
+** THE LINE BELOW WAS EDITED TO ASSIGN THE USER MATERIAL
+*Solid Section, elset=_PickedSet2, material=usermat_elastic
+1.,
+*hourglass stiffness
+0.1
+*End Instance
+**  
+*Nset, nset=_PickedSet4, internal, instance=Part-1-1
+ 1, 2
+*Elset, elset=_PickedSet4, internal, instance=Part-1-1
+ 1,
+*Nset, nset=_PickedSet5, internal, instance=Part-1-1
+ 1, 3
+*Elset, elset=_PickedSet5, internal, instance=Part-1-1
+ 1,
+*Nset, nset=_PickedSet6, internal, instance=Part-1-1
+ 3, 4
+*Elset, elset=_PickedSet6, internal, instance=Part-1-1
+ 1,
+*End Assembly
+** 
+** MATERIALS
+**
+**  THE LINES BELOW WERE EDITED TO DEFINE THE USER MATERIAL 
+*Material, name=usermat_elastic
+*user material, constants=2, type=mechanical
+ 1000.0, 0.3
+** This defines the number of state variables (none in this case)
+*DEPVAR
+1
+** ----------------------------------------------------------------
+** 
+** STEP: Step-1
+** 
+*Step, name=Step-1
+*Static
+0.1, 1., 1e-05, 1.
+** 
+** BOUNDARY CONDITIONS
+** 
+** Name: BC-1 Type: Displacement/Rotation
+*Boundary
+_PickedSet4, 2, 2
+** Name: BC-2 Type: Displacement/Rotation
+*Boundary
+_PickedSet5, 1, 1
+** Name: BC-3 Type: Displacement/Rotation
+*Boundary
+_PickedSet6, 2, 2, 0.1
+** 
+** OUTPUT REQUESTS
+** 
+*Restart, write, frequency=0
+** 
+** FIELD OUTPUT: F-Output-1
+** 
+*Output, field, variable=PRESELECT
+** 
+** HISTORY OUTPUT: H-Output-1
+** 
+*Output, history, variable=PRESELECT
+*End Step

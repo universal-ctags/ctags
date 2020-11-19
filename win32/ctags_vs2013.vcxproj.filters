@@ -234,6 +234,9 @@
     <ClCompile Include="..\parsers\ada.c">
       <Filter>Source Files\Parsers</Filter>
     </ClCompile>
+    <ClCompile Include="..\parsers\abaqus.c">
+      <Filter>Source Files\Parsers</Filter>
+    </ClCompile>
     <ClCompile Include="..\parsers\ant.c">
       <Filter>Source Files\Parsers</Filter>
     </ClCompile>
