@@ -81,6 +81,7 @@
 	FyppParser,	   \
 	GdbinitParser, \
 	GoParser, \
+	HaxeParser, \
 	HtmlParser, \
 	IniconfParser, \
 	InkoParser, \
