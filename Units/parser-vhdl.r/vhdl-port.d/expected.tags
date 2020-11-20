@@ -8,3 +8,9 @@ ENTITY_A	input-0.vhd	/^entity ENTITY_A is$/;"	e
 PORT_C	input-0.vhd	/^    PORT_C : in std_logic$/;"	q	entity:ENTITY_A
 ENTITY_B	input-0.vhd	/^entity ENTITY_B is$/;"	e
 PORT_C	input-0.vhd	/^    PORT_C : in std_logic$/;"	q	entity:ENTITY_B
+COMPONENT_A	input-1.vhd	/^component COMPONENT_A is$/;"	C
+PORT_C	input-1.vhd	/^    PORT_C : in std_logic$/;"	q	component:COMPONENT_A
+COMPONENT_B	input-1.vhd	/^component COMPONENT_B is$/;"	C
+PORT_C	input-1.vhd	/^    PORT_C : in std_logic$/;"	q	component:COMPONENT_B
+COMPONENT_C	input-1.vhd	/^component COMPONENT_C is$/;"	C
+PORT_C	input-1.vhd	/^    PORT_C : in std_logic$/;"	q	component:COMPONENT_C

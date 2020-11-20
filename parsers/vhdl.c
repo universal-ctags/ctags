@@ -632,7 +632,7 @@ static void parsePort (tokenInfo * const token, int parent)
 	TRACE_LEAVE ();
 }
 
-static void parseEntityHeader (tokenInfo * const token, int parent)
+static void parseModuleDecl (tokenInfo * const token, int parent)
 {
 	TRACE_ENTER ();
 	while (! (isKeyword (token, KEYWORD_END)
@@ -661,24 +661,15 @@ static void parseModule (tokenInfo * const token)
 	Assert (isKeyword (token, KEYWORD_ENTITY) ||
 		isKeyword (token, KEYWORD_COMPONENT));
 	readToken (name);
-	if (kind == VHDLTAG_COMPONENT)
+	readToken (token);
+	if (isKeyword (token, KEYWORD_IS))
 	{
-		makeVhdlTag (name, VHDLTAG_COMPONENT);
-		skipToKeyword (KEYWORD_END);
-		skipToCharacterInInputFile (';');
-	}
-	else
-	{
+		int index = makeVhdlTag (name, kind);
 		readToken (token);
-		if (isKeyword (token, KEYWORD_IS))
-		{
-			int index = makeVhdlTag (name, VHDLTAG_ENTITY);
-			readToken (token);
-			parseEntityHeader (token, index);
-			if (!isKeyword (token, KEYWORD_END))
-				skipToKeyword (KEYWORD_END);
-			skipToCharacterInInputFile (';');
-		}
+		parseModuleDecl (token, index);
+		if (!isKeyword (token, KEYWORD_END))
+			skipToKeyword (KEYWORD_END);
+		skipToCharacterInInputFile (';');
 	}
 	deleteToken (name);
 }

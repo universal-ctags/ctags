@@ -1,2 +1,2 @@
 --sort=no
---kinds-VHDL=+{port}
+--kinds-VHDL=+{port}{component}
