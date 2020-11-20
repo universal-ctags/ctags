@@ -385,7 +385,6 @@ static bool readWordToken (tokenInfo *const token, int c);
 static int skipBlockName (tokenInfo *const token, int c);
 static int skipDelay(tokenInfo* token, int c);
 static int tagNameList (tokenInfo* token, int c);
-static void updateKind (tokenInfo *const token);
 
 /*
  *   FUNCTION DEFINITIONS
@@ -788,6 +787,12 @@ static int skipMacro (int c)
 	return c;
 }
 
+static void _updateKind (tokenInfo *const token)
+{
+	verilogKind kind = (verilogKind) lookupKeyword (vStringValue (token->name), getInputLanguage () );
+	token->kind = ((kind == K_UNDEFINED) && isIdentifier(token)) ? K_IDENTIFIER : kind;
+}
+
 /* read an identifier, keyword, number, compiler directive, or macro identifier */
 static bool readWordToken (tokenInfo *const token, int c)
 {
@@ -799,7 +804,7 @@ static bool readWordToken (tokenInfo *const token, int c)
 			vStringPut (token->name, c);
 			c = vGetc ();
 		} while (isIdentifierCharacter (c));
-		updateKind (token);
+		_updateKind (token);
 		vUngetc (c);
 		return true;
 	}
@@ -830,17 +835,6 @@ static bool isIdentifier (tokenInfo* token)
 	}
 	else
 		return false;
-}
-
-static verilogKind getKindForToken (tokenInfo *const token)
-{
-	return (verilogKind) lookupKeyword (vStringValue (token->name), getInputLanguage () );
-}
-
-static void updateKind (tokenInfo *const token)
-{
-	verilogKind kind = getKindForToken (token);
-	token->kind = ((kind == K_UNDEFINED) && isIdentifier(token)) ? K_IDENTIFIER : kind;
 }
 
 static void createContext (verilogKind kind, vString* const name)
