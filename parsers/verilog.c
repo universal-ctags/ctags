@@ -658,13 +658,13 @@ static int vGetc (void)
 	return _vGetc (false);
 }
 
-// [a-zA-Z_`]
-static bool isFirstIdentifierCharacter (const int c)
+// Is the first charactor in an identifier? [a-zA-Z_`]
+static bool isWordToken (const int c)
 {
 	return (isalpha (c) || c == '_' || c == '`');
 }
 
-// [a-zA-Z0-9_`$]
+// Is a charactor in an identifier? [a-zA-Z0-9_`$]
 static bool isIdentifierCharacter (const int c)
 {
 	return (isalnum (c) || c == '_' || c == '`' || c == '$');
@@ -796,7 +796,7 @@ static void _updateKind (tokenInfo *const token)
 /* read an identifier, keyword, number, compiler directive, or macro identifier */
 static bool readWordToken (tokenInfo *const token, int c)
 {
-	if (isFirstIdentifierCharacter (c))
+	if (isWordToken (c))
 	{
 		clearToken (token);
 		do
@@ -822,7 +822,7 @@ static bool isIdentifier (tokenInfo* token)
 			int c = vStringChar (token->name, i);
 			if (i == 0)
 			{
-				if (c == '`' || !isFirstIdentifierCharacter (c))
+				if (c == '`' || !isWordToken (c))
 					return false;
 			}
 			else
