@@ -764,7 +764,6 @@ static int skipMacro (int c)
 		tokenInfo *token = newToken ();	// don't update token outside
 
 		readWordToken (token, c);
-		updateKind (token);
 		/* Skip compiler directive other than `define */
 		if (token->kind == K_DIRECTIVE)
 		{
@@ -800,6 +799,7 @@ static bool readWordToken (tokenInfo *const token, int c)
 			vStringPut (token->name, c);
 			c = vGetc ();
 		} while (isIdentifierCharacter (c));
+		updateKind (token);
 		vUngetc (c);
 		return true;
 	}
@@ -1189,7 +1189,6 @@ static int processTypedef (tokenInfo *const token, int c)
 	verilogKind kind = K_UNDEFINED;
 	if (readWordToken (token, c))
 	{
-		updateKind (token);
 		c = skipWhite (vGetc ());
 		kind = token->kind;
 	}
@@ -1205,7 +1204,6 @@ static int processTypedef (tokenInfo *const token, int c)
 		case K_STRUCT:
 			if (readWordToken (token, c))
 			{
-				updateKind (token);
 				c = skipWhite (vGetc ());
 				if (token->kind == K_IDENTIFIER && c == ';')
 					currentContext->prototype = true;
@@ -1239,7 +1237,6 @@ static int processParameterList (tokenInfo *token, int c)
 				c = skipWhite (vGetc ());
 				if (readWordToken (token, c))
 				{
-					updateKind (token);
 					verbose ("Found parameter %s\n", vStringValue (token->name));
 					if (token->kind == K_IDENTIFIER)
 					{
@@ -1360,7 +1357,7 @@ static int processDesignElement (tokenInfo *const token, int c)
 
 	if (readWordToken (token, c))
 	{
-		while (getKindForToken (token) == K_IGNORE) // skip static or automatic
+		while (token->kind == K_IGNORE) // skip static or automatic
 		{
 			c = skipWhite (vGetc ());
 			readWordToken (token, c);
@@ -1562,7 +1559,6 @@ static int processType (tokenInfo* token, int c, verilogKind* kind)
 
 		if (!readWordToken (token, c))
 			break;
-		updateKind (token);
 		c = skipWhite (vGetc ());	// read next char
 
 		// fix kind of user defined type
@@ -1777,7 +1773,6 @@ static void findVerilogTags (void)
 			default :
 				if (readWordToken (token, c))
 				{
-					updateKind (token);
 					if (token->kind == K_DIRECTIVE)
 					{
 						// Skip compiler directives which are line-based.
