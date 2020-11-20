@@ -538,40 +538,30 @@ static void skipToMatched (tokenInfo * const token)
 
 static int makeConstTag (tokenInfo * const token, const vhdlKind kind)
 {
-	int index = CORK_NIL;
-	if (VhdlKinds[kind].enabled)
-	{
-		const char *const name = vStringValue (token->string);
-		tagEntryInfo e;
-		initTagEntry (&e, name, kind);
-		e.lineNumber = token->lineNumber;
-		e.filePosition = token->filePosition;
-		index = makeTagEntry (&e);
-	}
-	return index;
+	const char *const name = vStringValue (token->string);
+	tagEntryInfo e;
+	initTagEntry (&e, name, kind);
+	e.lineNumber = token->lineNumber;
+	e.filePosition = token->filePosition;
+	return makeTagEntry (&e);
 }
 
 static int makeVhdlTag (tokenInfo * const token, const vhdlKind kind)
 {
-	int index = CORK_NIL;
-	if (VhdlKinds[kind].enabled)
+	/*
+	 * If a scope has been added to the token, change the token
+	 * string to include the scope when making the tag.
+	 */
+	if (vStringLength (token->scope) > 0)
 	{
-		/*
-		 * If a scope has been added to the token, change the token
-		 * string to include the scope when making the tag.
-		 */
-		if (vStringLength (token->scope) > 0)
-		{
-			vString *fulltag = vStringNew ();
-			vStringCopy (fulltag, token->scope);
-			vStringPut (fulltag, '.');
-			vStringCat (fulltag, token->string);
-			vStringCopy (token->string, fulltag);
-			vStringDelete (fulltag);
-		}
-		index = makeConstTag (token, kind);
+		vString *fulltag = vStringNew ();
+		vStringCopy (fulltag, token->scope);
+		vStringPut (fulltag, '.');
+		vStringCat (fulltag, token->string);
+		vStringCopy (token->string, fulltag);
+		vStringDelete (fulltag);
 	}
-	return index;
+	return makeConstTag (token, kind);
 }
 
 static int makeVhdlTagWithScope (tokenInfo * const token, const vhdlKind kind, int parent)
