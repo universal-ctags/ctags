@@ -1,2 +1,2 @@
-bar	input.cpp	1;/^bar(void)$/;"	f	typeref:typename:int	file:
-main	input.cpp	9;/^main(void)$/;"	f	typeref:typename:int
+bar	input.cpp	2;/^bar(void)$/;"	f	typeref:typename:int	file:
+main	input.cpp	10;/^main(void)$/;"	f	typeref:typename:int

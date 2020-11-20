@@ -445,11 +445,7 @@ are not listed here. They are experimental or for debugging purpose.
 		for finding all matches.
 
 	combine
-		Combine adjusted line number and pattern with a semicolon.
-		ctags adjusts the line number by decrementing
-		or incrementing (if ``-B`` option is given) one.
-		This adjustment helps a client tool like vim to search the pattern
-		from the line before (or after) the pattern starts.
+		Concatenate the line number and pattern with a semicolon in between.
 
 ``--extra=[+|-]flags|*``
 	Equivalent to ``--extras=[+|-]flags|*``, which was introduced to
