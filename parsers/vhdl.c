@@ -191,6 +191,7 @@ typedef enum {
 	VHDLTAG_LOCAL,
 	VHDLTAG_ARCHITECTURE,
 	VHDLTAG_PORT,
+	VHDLTAG_GENERIC,
 } vhdlKind;
 
 static kindDefinition VhdlKinds[] = {
@@ -207,6 +208,7 @@ static kindDefinition VhdlKinds[] = {
 	{false, 'l', "local", "local definitions"},
 	{true, 'a', "architecture", "architectures"},
 	{true, 'q', "port", "port declarations"},
+	{true, 'g', "generic", "generic declarations"},
 };
 
 static const keywordTable VhdlKeywordTable[] = {
@@ -598,7 +600,8 @@ static void parsePackage (tokenInfo * const token)
 }
 
 
-static void parsePort (tokenInfo * const token, int parent)
+static void parseModuleDeclElement (tokenInfo * const token,
+									  vhdlKind kind, int parent)
 {
 	TRACE_ENTER ();
 	while (! (isType (token, TOKEN_EOF)
@@ -606,7 +609,7 @@ static void parsePort (tokenInfo * const token, int parent)
 	{
 		if (isType (token, TOKEN_IDENTIFIER))
 		{
-			makeVhdlTagWithScope (token, VHDLTAG_PORT, parent);
+			makeVhdlTagWithScope (token, kind, parent);
 			readToken (token);
 		}
 		else if (isType (token, TOKEN_COMMA))
@@ -638,13 +641,19 @@ static void parseModuleDecl (tokenInfo * const token, int parent)
 	while (! (isKeyword (token, KEYWORD_END)
 			  || isType (token, TOKEN_EOF)))
 	{
+		vhdlKind kind = VHDLTAG_UNDEFINED;
 		if (isKeyword (token, KEYWORD_PORT))
+			kind = VHDLTAG_PORT;
+		else if (isKeyword (token, KEYWORD_GENERIC))
+			kind = VHDLTAG_GENERIC;
+
+		if (kind != VHDLTAG_UNDEFINED)
 		{
 			readToken (token);
 			if (isType (token, TOKEN_OPEN_PAREN))
 			{
 				readToken (token);
-				parsePort (token, parent);
+				parseModuleDeclElement (token, kind, parent);
 			}
 		}
 		else

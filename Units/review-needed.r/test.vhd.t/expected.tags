@@ -12,6 +12,7 @@ b	input.vhd	/^  a,b : in std_logic_vector (15 downto 0);$/;"	q	entity:adder
 sum	input.vhd	/^  sum: out std_logic_vector (15 downto 0)$/;"	q	entity:adder
 dataflow	input.vhd	/^architecture dataflow of adder is$/;"	a	entity:adder
 pAdderAttr	input.vhd	/^entity pAdderAttr is$/;"	e
+n	input.vhd	/^  generic(n : integer := 8);$/;"	g	entity:pAdderAttr
 a	input.vhd	/^  port (a    : in std_logic_vector(n - 1 downto 0);$/;"	q	entity:pAdderAttr
 b	input.vhd	/^        b    : in std_logic_vector(n - 1 downto 0);$/;"	q	entity:pAdderAttr
 cin	input.vhd	/^        cin  : in std_logic;$/;"	q	entity:pAdderAttr
@@ -416,6 +417,7 @@ en	input.vhd	/^  en: in std_logic;$/;"	q	entity:struct_dffe
 q	input.vhd	/^  q: out std_logic$/;"	q	entity:struct_dffe
 instance	input.vhd	/^architecture instance of struct_dffe is$/;"	a	entity:struct_dffe
 dffTri	input.vhd	/^entity dffTri is$/;"	e
+size	input.vhd	/^  generic (size: integer := 8);$/;"	g	entity:dffTri
 data	input.vhd	/^  data: in std_logic_vector(size - 1 downto 0);$/;"	q	entity:dffTri
 clock	input.vhd	/^  clock: in std_logic;$/;"	q	entity:dffTri
 ff_enable	input.vhd	/^  ff_enable: in std_logic;$/;"	q	entity:dffTri
@@ -706,10 +708,12 @@ enable	input.vhd	/^  enable: in std_logic;$/;"	q	entity:tribuffer
 output	input.vhd	/^  output: out std_logic$/;"	q	entity:tribuffer
 structural	input.vhd	/^architecture structural of tribuffer is$/;"	a	entity:tribuffer
 oddParityGen	input.vhd	/^entity oddParityGen is$/;"	e
+width	input.vhd	/^  generic ( width : integer := 8 );$/;"	g	entity:oddParityGen
 ad	input.vhd	/^  port (ad: in std_logic_vector (width - 1 downto 0);$/;"	q	entity:oddParityGen
 oddParity	input.vhd	/^        oddParity : out std_logic ) ;$/;"	q	entity:oddParityGen
 scaleable	input.vhd	/^architecture scaleable of oddParityGen is$/;"	a	entity:oddParityGen
 oddParityLoop	input.vhd	/^entity oddParityLoop is$/;"	e
+width	input.vhd	/^  generic ( width : integer := 8 );$/;"	g	entity:oddParityLoop
 ad	input.vhd	/^  port (ad: in std_logic_vector (width - 1 downto 0);$/;"	q	entity:oddParityLoop
 oddParity	input.vhd	/^        oddParity : out std_logic ) ;$/;"	q	entity:oddParityLoop
 scaleable	input.vhd	/^architecture scaleable of oddParityLoop is$/;"	a	entity:oddParityLoop
@@ -725,6 +729,7 @@ Y	input.vhd	/^  Y: out std_logic$/;"	q	entity:OR2
 simple	input.vhd	/^architecture simple of OR2 is$/;"	a	entity:OR2
 simPrimitives	input.vhd	/^package simPrimitives is$/;"	P
 OR2	input.vhd	/^entity OR2 is$/;"	e
+tPD	input.vhd	/^  generic (tPD: time := 1 ns);$/;"	g	entity:OR2
 I1	input.vhd	/^  port (I1, I2: in std_logic;$/;"	q	entity:OR2
 I2	input.vhd	/^  port (I1, I2: in std_logic;$/;"	q	entity:OR2
 Y	input.vhd	/^    Y: out std_logic$/;"	q	entity:OR2
@@ -736,6 +741,7 @@ sum	input.vhd	/^  sum: out std_logic_vector(3 downto 0);$/;"	q	entity:adder
 overflow	input.vhd	/^  overflow: out std_logic$/;"	q	entity:adder
 concat	input.vhd	/^architecture concat of adder is$/;"	a	entity:adder
 paramDFF	input.vhd	/^entity paramDFF is$/;"	e
+size	input.vhd	/^  generic (size: integer := 8);$/;"	g	entity:paramDFF
 data	input.vhd	/^  data: in std_logic_vector(size - 1 downto 0);$/;"	q	entity:paramDFF
 clock	input.vhd	/^  clock: in std_logic;$/;"	q	entity:paramDFF
 reset	input.vhd	/^  reset: in std_logic;$/;"	q	entity:paramDFF
@@ -744,10 +750,12 @@ op_enable	input.vhd	/^  op_enable: in std_logic;$/;"	q	entity:paramDFF
 qout	input.vhd	/^  qout: out std_logic_vector(size - 1 downto 0)$/;"	q	entity:paramDFF
 parameterize	input.vhd	/^architecture parameterize of paramDFF is$/;"	a	entity:paramDFF
 oddParityGen	input.vhd	/^entity oddParityGen is$/;"	e
+width	input.vhd	/^  generic ( width : integer := 32 );$/;"	g	entity:oddParityGen
 ad	input.vhd	/^  port (ad: in std_logic_vector (width - 1 downto 0);$/;"	q	entity:oddParityGen
 oddParity	input.vhd	/^        oddParity : out std_logic ) ;$/;"	q	entity:oddParityGen
 scaleable	input.vhd	/^architecture scaleable of oddParityGen is$/;"	a	entity:oddParityGen
 oddParityGen	input.vhd	/^entity oddParityGen is$/;"	e
+width	input.vhd	/^  generic ( width : integer := 32 ); -- (2 <= width <= 32) and a power of 2$/;"	g	entity:oddParityGen
 ad	input.vhd	/^  port (ad: in std_logic_vector (width - 1 downto 0);$/;"	q	entity:oddParityGen
 oddParity	input.vhd	/^        oddParity : out std_logic ) ;$/;"	q	entity:oddParityGen
 scaleable	input.vhd	/^architecture scaleable of oddParityGen is$/;"	a	entity:oddParityGen
@@ -983,11 +991,15 @@ b	input.vhd	/^  b: out std_logic$/;"	q	entity:signalDemo
 basic	input.vhd	/^architecture basic of signalDemo is$/;"	a	entity:signalDemo
 simPrimitives	input.vhd	/^package simPrimitives is$/;"	P
 OR2	input.vhd	/^entity OR2 is$/;"	e
+tPD	input.vhd	/^  generic (tPD: time := 1 ns);$/;"	g	entity:OR2
 I1	input.vhd	/^  port (I1, I2: in std_logic;$/;"	q	entity:OR2
 I2	input.vhd	/^  port (I1, I2: in std_logic;$/;"	q	entity:OR2
 Y	input.vhd	/^    Y: out std_logic$/;"	q	entity:OR2
 simple	input.vhd	/^architecture simple of OR2 is$/;"	a	entity:OR2
 SimDFF	input.vhd	/^entity SimDFF is$/;"	e
+tCQ	input.vhd	/^  generic(tCQ: time := 1 ns;$/;"	g	entity:SimDFF
+tS	input.vhd	/^          tS : time := 1 ns;$/;"	g	entity:SimDFF
+tH	input.vhd	/^          tH : time := 1 ns$/;"	g	entity:SimDFF
 D	input.vhd	/^  port (D, Clk: in std_logic;$/;"	q	entity:SimDFF
 Clk	input.vhd	/^  port (D, Clk: in std_logic;$/;"	q	entity:SimDFF
 Q	input.vhd	/^  Q: out std_logic$/;"	q	entity:SimDFF
