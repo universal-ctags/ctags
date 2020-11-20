@@ -19,5 +19,5 @@ N	input.sv	/^  parameter N = 8;$/;"	c	module:procedural
 outer	input.sv	/^    for (int i = 0; i < N; i++) begin:outer$/;"	b	module:procedural
 inner	input.sv	/^      for (int j = 0; j < N; j++) begin : inner$/;"	b	block:procedural.outer
 state	input.sv	/^    enum { FSM_IDLE, FSM_ITER } state;$/;"	E	module:procedural
-FSM_ITER	input.sv	/^    enum { FSM_IDLE, FSM_ITER } state;$/;"	c	enum:procedural.state
 FSM_IDLE	input.sv	/^    enum { FSM_IDLE, FSM_ITER } state;$/;"	c	enum:procedural.state
+FSM_ITER	input.sv	/^    enum { FSM_IDLE, FSM_ITER } state;$/;"	c	enum:procedural.state

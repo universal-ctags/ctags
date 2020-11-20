@@ -9,6 +9,6 @@ package MyPackage;
     function MyData mul(MyData x, y);
         mul.b = x.b * y.b;
     endfunction
-endpackage : ComplexPkg
+endpackage : MyPackage
 
 reg var_to_check_context;

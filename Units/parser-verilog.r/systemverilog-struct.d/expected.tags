@@ -1,6 +1,124 @@
-IR	input.sv	/^  struct { bit [7:0] opcode; }IR; \/\/ not defined => IR:struct$/;"	S
-pack1	input.sv	/^  struct packed signed { int a; } pack1; \/\/ packed:struct => pack1:struct$/;"	S
-pack2	input.sv	/^  struct packed unsigned { int a;} pack2; \/\/ packed:struct => pack2:struct$/;"	S
-union1	input.sv	/^  union packed unsigned { logic [7:0] a; } union1; \/\/packed:struct => union1:struct$/;"	S
-pack3	input.sv	/^  struct packed signed { int a; } [3:0] pack3, pack4;$/;"	S
-pack4	input.sv	/^  struct packed signed { int a; } [3:0] pack3, pack4;$/;"	S
+S	input.sv	/^class S;$/;"	C
+IR	input.sv	/^  struct { bit [7:0] opcode; bit [23:0] addr; }IR;  \/\/ anonymous structure$/;"	S	class:S
+opcode	input.sv	/^  struct { bit [7:0] opcode; bit [23:0] addr; }IR;  \/\/ anonymous structure$/;"	w	struct:S.IR
+addr	input.sv	/^  struct { bit [7:0] opcode; bit [23:0] addr; }IR;  \/\/ anonymous structure$/;"	w	struct:S.IR
+foo	input.sv	/^  function foo;$/;"	f	class:S
+instruction	input.sv	/^  } instruction;      \/\/ named structure type$/;"	T	class:S
+opcode	input.sv	/^    bit [7:0] opcode;$/;"	w	typedef:S.instruction
+addr	input.sv	/^    bit [23:0] addr;$/;"	w	typedef:S.instruction
+IR1	input.sv	/^  instruction IR1;    \/\/ define variable$/;"	r	class:S
+pack1	input.sv	/^  } pack1; \/\/ signed, 2-state$/;"	S	class:S
+a	input.sv	/^    int a;$/;"	w	struct:S.pack1
+b	input.sv	/^    shortint b;$/;"	w	struct:S.pack1
+c	input.sv	/^    byte c;$/;"	w	struct:S.pack1
+d	input.sv	/^    bit [7:0] d;$/;"	w	struct:S.pack1
+pack2	input.sv	/^  } pack2; \/\/ unsigned, 4-state$/;"	S	class:S
+a	input.sv	/^    time a;$/;"	w	struct:S.pack2
+b	input.sv	/^    integer b;$/;"	w	struct:S.pack2
+c	input.sv	/^    logic [31:0] c;$/;"	w	struct:S.pack2
+s_atmcell	input.sv	/^  } s_atmcell;$/;"	T	class:S
+GFC	input.sv	/^    bit [3:0] GFC;$/;"	w	typedef:S.s_atmcell
+VPI	input.sv	/^    bit [7:0] VPI;$/;"	w	typedef:S.s_atmcell
+VCI	input.sv	/^    bit [11:0] VCI;$/;"	w	typedef:S.s_atmcell
+CLP	input.sv	/^    bit CLP;$/;"	w	typedef:S.s_atmcell
+PT	input.sv	/^    bit [3:0] PT ;$/;"	w	typedef:S.s_atmcell
+HEC	input.sv	/^    bit [7:0] HEC;$/;"	w	typedef:S.s_atmcell
+Payload	input.sv	/^    bit [47:0] [7:0] Payload;$/;"	w	typedef:S.s_atmcell
+filler	input.sv	/^    bit [2:0] filler;$/;"	w	typedef:S.s_atmcell
+packet1	input.sv	/^  } packet1;$/;"	T	class:S
+addr	input.sv	/^    int addr = 1 + constant;$/;"	w	typedef:S.packet1
+crc	input.sv	/^    int crc;$/;"	w	typedef:S.packet1
+data	input.sv	/^    byte data [4] = '{4{1}};$/;"	w	typedef:S.packet1
+pi	input.sv	/^  packet1 pi = '{1,2,'{2,3,4,5}}; \/\/suppresses the typedef initialization$/;"	r	class:S
+U	input.sv	/^class U;$/;"	C
+num	input.sv	/^  typedef union { int i; shortreal f; } num;  \/\/ named union type$/;"	T	class:U
+i	input.sv	/^  typedef union { int i; shortreal f; } num;  \/\/ named union type$/;"	w	typedef:U.num
+f	input.sv	/^  typedef union { int i; shortreal f; } num;  \/\/ named union type$/;"	w	typedef:U.num
+n	input.sv	/^  num n;$/;"	r	class:U
+tagged_st	input.sv	/^  } tagged_st;                        \/\/ named structure$/;"	T	class:U
+isfloat	input.sv	/^    bit isfloat;$/;"	w	typedef:U.tagged_st
+n	input.sv	/^    union { int i; shortreal f; } n;  \/\/ anonymous union type$/;"	w	typedef:U.tagged_st
+u_atmcell	input.sv	/^  } u_atmcell;$/;"	T	class:U
+acell	input.sv	/^    s_atmcell acell;$/;"	w	typedef:U.u_atmcell
+bit_slice	input.sv	/^    bit [423:0] bit_slice;$/;"	w	typedef:U.u_atmcell
+byte_slice	input.sv	/^    bit [52:0][7:0] byte_slice;$/;"	w	typedef:U.u_atmcell
+u1	input.sv	/^  u_atmcell u1;$/;"	r	class:U
+b	input.sv	/^  byte b; bit [3:0] nib;$/;"	r	class:U
+nib	input.sv	/^  byte b; bit [3:0] nib;$/;"	r	class:U
+O	input.sv	/^class O;$/;"	C
+IR	input.sv	/^  struct { bit [7:0] opcode; }IR;$/;"	S	class:O
+opcode	input.sv	/^  struct { bit [7:0] opcode; }IR;$/;"	w	struct:O.IR
+pack1	input.sv	/^  struct packed signed { int a; } pack1;$/;"	S	class:O
+a	input.sv	/^  struct packed signed { int a; } pack1;$/;"	w	struct:O.pack1
+pack2	input.sv	/^  struct packed unsigned { int a;} pack2;$/;"	S	class:O
+a	input.sv	/^  struct packed unsigned { int a;} pack2;$/;"	w	struct:O.pack2
+union1	input.sv	/^  union packed unsigned { logic [7:0] a; } union1;$/;"	S	class:O
+a	input.sv	/^  union packed unsigned { logic [7:0] a; } union1;$/;"	w	struct:O.union1
+pack3	input.sv	/^  struct packed signed { int a; } [3:0] pack3, pack4;$/;"	S	class:O
+a	input.sv	/^  struct packed signed { int a; } [3:0] pack3, pack4;$/;"	w	struct:O.pack3
+pack4	input.sv	/^  struct packed signed { int a; } [3:0] pack3, pack4;$/;"	S	class:O
+a	input.sv	/^  struct packed signed { int a; } [3:0] pack3, pack4;$/;"	w	struct:O.pack4
+user_t	input.sv	/^  typedef logic user_t;$/;"	T	class:O
+enum00_e	input.sv	/^  enum user_t [1:0] { FOO, BAR, BAZ } [3:0] enum00_e, enum01_e ;$/;"	E	class:O
+FOO	input.sv	/^  enum user_t [1:0] { FOO, BAR, BAZ } [3:0] enum00_e, enum01_e ;$/;"	c	enum:O.enum00_e
+BAR	input.sv	/^  enum user_t [1:0] { FOO, BAR, BAZ } [3:0] enum00_e, enum01_e ;$/;"	c	enum:O.enum00_e
+BAZ	input.sv	/^  enum user_t [1:0] { FOO, BAR, BAZ } [3:0] enum00_e, enum01_e ;$/;"	c	enum:O.enum00_e
+enum01_e	input.sv	/^  enum user_t [1:0] { FOO, BAR, BAZ } [3:0] enum00_e, enum01_e ;$/;"	E	class:O
+FOO	input.sv	/^  enum user_t [1:0] { FOO, BAR, BAZ } [3:0] enum00_e, enum01_e ;$/;"	c	enum:O.enum01_e
+BAR	input.sv	/^  enum user_t [1:0] { FOO, BAR, BAZ } [3:0] enum00_e, enum01_e ;$/;"	c	enum:O.enum01_e
+BAZ	input.sv	/^  enum user_t [1:0] { FOO, BAR, BAZ } [3:0] enum00_e, enum01_e ;$/;"	c	enum:O.enum01_e
+enum10_e	input.sv	/^  enum logic unsigned{A,B,C}[1:0]enum10_e,enum11_e;$/;"	E	class:O
+A	input.sv	/^  enum logic unsigned{A,B,C}[1:0]enum10_e,enum11_e;$/;"	c	enum:O.enum10_e
+B	input.sv	/^  enum logic unsigned{A,B,C}[1:0]enum10_e,enum11_e;$/;"	c	enum:O.enum10_e
+C	input.sv	/^  enum logic unsigned{A,B,C}[1:0]enum10_e,enum11_e;$/;"	c	enum:O.enum10_e
+enum11_e	input.sv	/^  enum logic unsigned{A,B,C}[1:0]enum10_e,enum11_e;$/;"	E	class:O
+A	input.sv	/^  enum logic unsigned{A,B,C}[1:0]enum10_e,enum11_e;$/;"	c	enum:O.enum11_e
+B	input.sv	/^  enum logic unsigned{A,B,C}[1:0]enum10_e,enum11_e;$/;"	c	enum:O.enum11_e
+C	input.sv	/^  enum logic unsigned{A,B,C}[1:0]enum10_e,enum11_e;$/;"	c	enum:O.enum11_e
+enum0_t	input.sv	/^  typedef enum user_t [1:0] { FOO, BAR, BAZ } [3:0] enum0_t ;$/;"	T	class:O
+FOO	input.sv	/^  typedef enum user_t [1:0] { FOO, BAR, BAZ } [3:0] enum0_t ;$/;"	c	typedef:O.enum0_t
+BAR	input.sv	/^  typedef enum user_t [1:0] { FOO, BAR, BAZ } [3:0] enum0_t ;$/;"	c	typedef:O.enum0_t
+BAZ	input.sv	/^  typedef enum user_t [1:0] { FOO, BAR, BAZ } [3:0] enum0_t ;$/;"	c	typedef:O.enum0_t
+enum1_t	input.sv	/^  typedef enum logic unsigned{A,B,C}[1:0]enum1_t;$/;"	T	class:O
+A	input.sv	/^  typedef enum logic unsigned{A,B,C}[1:0]enum1_t;$/;"	c	typedef:O.enum1_t
+B	input.sv	/^  typedef enum logic unsigned{A,B,C}[1:0]enum1_t;$/;"	c	typedef:O.enum1_t
+C	input.sv	/^  typedef enum logic unsigned{A,B,C}[1:0]enum1_t;$/;"	c	typedef:O.enum1_t
+complex0_s	input.sv	/^  } [1:0] complex0_s, complex1_s;$/;"	S	class:O
+a	input.sv	/^    logic a,b ;$/;"	w	struct:O.complex0_s
+b	input.sv	/^    logic a,b ;$/;"	w	struct:O.complex0_s
+s0	input.sv	/^    logic [15:0] [7:0] s0 , s1;$/;"	w	struct:O.complex0_s
+s1	input.sv	/^    logic [15:0] [7:0] s0 , s1;$/;"	w	struct:O.complex0_s
+struct0_s	input.sv	/^    } [15:0] [7:0] struct0_s, struct1_s;$/;"	w	struct:O.complex0_s
+struct1_s	input.sv	/^    } [15:0] [7:0] struct0_s, struct1_s;$/;"	w	struct:O.complex0_s
+enum00_e	input.sv	/^    enum user_t [1:0] { FOO, BAR, BAZ } [3:0] enum00_e, enum01_e ;$/;"	w	struct:O.complex0_s
+enum01_e	input.sv	/^    enum user_t [1:0] { FOO, BAR, BAZ } [3:0] enum00_e, enum01_e ;$/;"	w	struct:O.complex0_s
+enum10_e	input.sv	/^    enum logic unsigned{A,B,C}[1:0]enum10_e,enum11_e;$/;"	w	struct:O.complex0_s
+enum11_e	input.sv	/^    enum logic unsigned{A,B,C}[1:0]enum10_e,enum11_e;$/;"	w	struct:O.complex0_s
+d	input.sv	/^    bit[7:0][1:0]d,e;$/;"	w	struct:O.complex0_s
+e	input.sv	/^    bit[7:0][1:0]d,e;$/;"	w	struct:O.complex0_s
+complex1_s	input.sv	/^  } [1:0] complex0_s, complex1_s;$/;"	S	class:O
+a	input.sv	/^    logic a,b ;$/;"	w	struct:O.complex1_s
+b	input.sv	/^    logic a,b ;$/;"	w	struct:O.complex1_s
+s0	input.sv	/^    logic [15:0] [7:0] s0 , s1;$/;"	w	struct:O.complex1_s
+s1	input.sv	/^    logic [15:0] [7:0] s0 , s1;$/;"	w	struct:O.complex1_s
+struct0_s	input.sv	/^    } [15:0] [7:0] struct0_s, struct1_s;$/;"	w	struct:O.complex1_s
+struct1_s	input.sv	/^    } [15:0] [7:0] struct0_s, struct1_s;$/;"	w	struct:O.complex1_s
+enum00_e	input.sv	/^    enum user_t [1:0] { FOO, BAR, BAZ } [3:0] enum00_e, enum01_e ;$/;"	w	struct:O.complex1_s
+enum01_e	input.sv	/^    enum user_t [1:0] { FOO, BAR, BAZ } [3:0] enum00_e, enum01_e ;$/;"	w	struct:O.complex1_s
+enum10_e	input.sv	/^    enum logic unsigned{A,B,C}[1:0]enum10_e,enum11_e;$/;"	w	struct:O.complex1_s
+enum11_e	input.sv	/^    enum logic unsigned{A,B,C}[1:0]enum10_e,enum11_e;$/;"	w	struct:O.complex1_s
+d	input.sv	/^    bit[7:0][1:0]d,e;$/;"	w	struct:O.complex1_s
+e	input.sv	/^    bit[7:0][1:0]d,e;$/;"	w	struct:O.complex1_s
+complex_t	input.sv	/^  } [1:0] complex_t;$/;"	T	class:O
+a	input.sv	/^    logic a,b ;$/;"	w	typedef:O.complex_t
+b	input.sv	/^    logic a,b ;$/;"	w	typedef:O.complex_t
+s0	input.sv	/^    logic [15:0] [7:0] s0 , s1;$/;"	w	typedef:O.complex_t
+s1	input.sv	/^    logic [15:0] [7:0] s0 , s1;$/;"	w	typedef:O.complex_t
+struct0_s	input.sv	/^    } [15:0] [7:0] struct0_s, struct1_s;$/;"	w	typedef:O.complex_t
+struct1_s	input.sv	/^    } [15:0] [7:0] struct0_s, struct1_s;$/;"	w	typedef:O.complex_t
+enum00_e	input.sv	/^    enum user_t [1:0] { FOO, BAR, BAZ } [3:0] enum00_e, enum01_e ;$/;"	w	typedef:O.complex_t
+enum01_e	input.sv	/^    enum user_t [1:0] { FOO, BAR, BAZ } [3:0] enum00_e, enum01_e ;$/;"	w	typedef:O.complex_t
+enum10_e	input.sv	/^    enum logic unsigned{A,B,C}[1:0]enum10_e,enum11_e;$/;"	w	typedef:O.complex_t
+enum11_e	input.sv	/^    enum logic unsigned{A,B,C}[1:0]enum10_e,enum11_e;$/;"	w	typedef:O.complex_t
+d	input.sv	/^    bit[7:0][1:0]d,e;$/;"	w	typedef:O.complex_t
+e	input.sv	/^    bit[7:0][1:0]d,e;$/;"	w	typedef:O.complex_t
