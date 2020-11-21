@@ -192,6 +192,7 @@ typedef enum {
 	VHDLTAG_ARCHITECTURE,
 	VHDLTAG_PORT,
 	VHDLTAG_GENERIC,
+	VHDLTAG_SIGNAL,
 } vhdlKind;
 
 static kindDefinition VhdlKinds[] = {
@@ -209,6 +210,7 @@ static kindDefinition VhdlKinds[] = {
 	{true, 'a', "architecture", "architectures"},
 	{true, 'q', "port", "port declarations"},
 	{true, 'g', "generic", "generic declarations"},
+	{true , 's', "signal", "signal declarations"},
 };
 
 static const keywordTable VhdlKeywordTable[] = {
@@ -652,12 +654,14 @@ static void parsePackage (tokenInfo * const token)
 }
 
 
-static void parseModuleDeclElement (tokenInfo * const token,
-									  vhdlKind kind, int parent)
+static void parseDeclElement (tokenInfo * const token,
+							  vhdlKind kind, int parent,
+							  bool ended_with_semicolon)
 {
 	TRACE_ENTER ();
 	while (! (isType (token, TOKEN_EOF)
-			  || isType (token, TOKEN_CLOSE_PAREN)))
+			  || isType (token, TOKEN_CLOSE_PAREN)
+			  || (ended_with_semicolon && isType (token, TOKEN_SEMICOLON))))
 	{
 		if (isType (token, TOKEN_IDENTIFIER))
 		{
@@ -705,7 +709,7 @@ static void parseModuleDecl (tokenInfo * const token, int parent)
 			if (isType (token, TOKEN_OPEN_PAREN))
 			{
 				readToken (token);
-				parseModuleDeclElement (token, kind, parent);
+				parseDeclElement (token, kind, parent, false);
 			}
 		}
 		else
@@ -881,6 +885,12 @@ static void parseArchitecture (tokenInfo * const token)
 	deleteToken (name);
 }
 
+static void parseSignal (tokenInfo * const token, int parent)
+{
+	readToken (token);
+	parseDeclElement (token, VHDLTAG_SIGNAL, parent, true);
+}
+
 /* TODO */
 /* records */
 static void parseKeywords (tokenInfo * const token, int index)
@@ -916,6 +926,9 @@ static void parseKeywords (tokenInfo * const token, int index)
 		break;
 	case KEYWORD_ARCHITECTURE:
 		parseArchitecture (token);
+		break;
+	case KEYWORD_SIGNAL:
+		parseSignal (token, index);
 		break;
 	default:
 		break;
