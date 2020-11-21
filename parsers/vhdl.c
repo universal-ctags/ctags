@@ -614,6 +614,20 @@ static void parseTillEnd (tokenInfo * const token, int parent, const int end_key
 	} while (!ended);
 }
 
+static void parseTillBegin (tokenInfo * const token, int parent)
+{
+	bool begun = false;
+	do
+	{
+		readToken (token);
+		if (isKeyword (token, KEYWORD_BEGIN)
+			|| isType (token, TOKEN_EOF))
+			begun = true;
+		else
+			parseKeywords (token, parent);
+	} while (!begun);
+}
+
 static void parsePackage (tokenInfo * const token)
 {
 	tokenInfo *const name = newToken ();
@@ -856,7 +870,12 @@ static void parseArchitecture (tokenInfo * const token)
 			attachParserFieldToCorkEntry (index,
 										  VhdlFields[F_ENTITY].ftype,
 										  vStringValue (token->string));
-			readToken (token);	/* "is" is expected. */
+			readToken (token);
+			if (isKeyword (token, KEYWORD_IS))
+			{
+				parseTillBegin (token, index);
+				parseTillEnd (token, index, KEYWORD_ARCHITECTURE);
+			}
 		}
 	}
 	deleteToken (name);
