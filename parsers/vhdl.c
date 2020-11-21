@@ -759,6 +759,7 @@ static void parseSubProgram (tokenInfo * const token)
 	bool endSubProgram = false;
 	const vhdlKind kind = isKeyword (token, KEYWORD_FUNCTION) ?
 		VHDLTAG_FUNCTION : VHDLTAG_PROCEDURE;
+	const int end_keyword = token->keyword;
 	Assert (isKeyword (token, KEYWORD_FUNCTION) ||
 		isKeyword (token, KEYWORD_PROCEDURE));
 	readToken (name);	/* the name of the function or procedure */
@@ -789,60 +790,30 @@ static void parseSubProgram (tokenInfo * const token)
 	}
 	else if (isKeyword (token, KEYWORD_IS))
 	{
-		if (kind == VHDLTAG_FUNCTION)
+		int index = makeVhdlTag (name, kind);
+		do
 		{
-			int index = makeVhdlTag (name, VHDLTAG_FUNCTION);
-			do
+			readToken (token);
+			if (isKeyword (token, KEYWORD_END))
 			{
 				readToken (token);
-				if (isKeyword (token, KEYWORD_END))
+				endSubProgram = isSemicolonOrKeywordOrIdent (token,
+															 end_keyword, name->string);
+				if (!isType (token, TOKEN_SEMICOLON))
+					skipToCharacterInInputFile (';');
+			}
+			else
+			{
+				if (isType (token, TOKEN_EOF))
 				{
-					readToken (token);
-					endSubProgram = isSemicolonOrKeywordOrIdent (token,
-						KEYWORD_FUNCTION, name->string);
-					if (isType (name, TOKEN_SEMICOLON))
-						skipToCharacterInInputFile (';');
+					endSubProgram = true;
 				}
 				else
 				{
-					if (isType (token, TOKEN_EOF))
-					{
-						endSubProgram = true;
-					}
-					else
-					{
-						parseKeywords (token, index);
-					}
+					parseKeywords (token, index);
 				}
-			} while (!endSubProgram);
-		}
-		else
-		{
-			int index = makeVhdlTag (name, VHDLTAG_PROCEDURE);
-			do
-			{
-				readToken (token);
-				if (isKeyword (token, KEYWORD_END))
-				{
-					readToken (token);
-					endSubProgram = isSemicolonOrKeywordOrIdent (token,
-						KEYWORD_PROCEDURE, name->string);
-					if (isType (name, TOKEN_SEMICOLON))
-						skipToCharacterInInputFile (';');
-				}
-				else
-				{
-					if (isType (token, TOKEN_EOF))
-					{
-						endSubProgram = true;
-					}
-					else
-					{
-						parseKeywords (token, index);
-					}
-				}
-			} while (!endSubProgram);
-		}
+			}
+		} while (!endSubProgram);
 	}
 	deleteToken (name);
 }
