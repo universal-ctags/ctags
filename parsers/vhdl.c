@@ -328,16 +328,16 @@ static void parseKeywords (tokenInfo * const token, int parent);
  *   FUNCTION DEFINITIONS
  */
 static bool isIdentifierMatch (const tokenInfo * const token,
-	const vString * const name)
+	const char *name)
 {
 	return (bool) (isType (token, TOKEN_IDENTIFIER) &&
-		strcasecmp (vStringValue (token->string), vStringValue (name)) == 0);
+		strcasecmp (vStringValue (token->string), name) == 0);
 	/* XXX this is copy/paste from eiffel.c and slightly modified */
 	/* shouldn't we use strNcasecmp ? */
 }
 
 static bool isSemicolonOrKeywordOrIdent (const tokenInfo * const token,
-	const keywordId keyword, const vString * const name)
+	const keywordId keyword, const char *name)
 {
 	return (bool) (isType (token, TOKEN_SEMICOLON)
 				   || isKeyword (token, keyword)
@@ -791,6 +791,8 @@ static void parseSubProgram (tokenInfo * const token)
 	else if (isKeyword (token, KEYWORD_IS))
 	{
 		int index = makeVhdlTag (name, kind);
+		tagEntryInfo *e = getEntryInCorkQueue (index);
+		const char *end_id = e->name;
 		do
 		{
 			readToken (token);
@@ -798,7 +800,7 @@ static void parseSubProgram (tokenInfo * const token)
 			{
 				readToken (token);
 				endSubProgram = isSemicolonOrKeywordOrIdent (token,
-															 end_keyword, name->string);
+															 end_keyword, end_id);
 				if (!isType (token, TOKEN_SEMICOLON))
 					skipToCharacterInInputFile (';');
 			}
