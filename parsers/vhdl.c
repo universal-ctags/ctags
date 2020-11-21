@@ -336,11 +336,12 @@ static bool isIdentifierMatch (const tokenInfo * const token,
 	/* shouldn't we use strNcasecmp ? */
 }
 
-static bool isKeywordOrIdent (const tokenInfo * const token,
+static bool isSemicolonOrKeywordOrIdent (const tokenInfo * const token,
 	const keywordId keyword, const vString * const name)
 {
-	return (bool) (isKeyword (token, keyword) ||
-		isIdentifierMatch (token, name));
+	return (bool) (isType (token, TOKEN_SEMICOLON)
+				   || isKeyword (token, keyword)
+				   || isIdentifierMatch (token, name));
 }
 
 static tokenInfo *newToken (void)
@@ -787,9 +788,10 @@ static void parseSubProgram (tokenInfo * const token)
 				if (isKeyword (token, KEYWORD_END))
 				{
 					readToken (token);
-					endSubProgram = isKeywordOrIdent (token,
+					endSubProgram = isSemicolonOrKeywordOrIdent (token,
 						KEYWORD_FUNCTION, name->string);
-					skipToCharacterInInputFile (';');
+					if (isType (name, TOKEN_SEMICOLON))
+						skipToCharacterInInputFile (';');
 				}
 				else
 				{
@@ -813,9 +815,10 @@ static void parseSubProgram (tokenInfo * const token)
 				if (isKeyword (token, KEYWORD_END))
 				{
 					readToken (token);
-					endSubProgram = isKeywordOrIdent (token,
+					endSubProgram = isSemicolonOrKeywordOrIdent (token,
 						KEYWORD_PROCEDURE, name->string);
-					skipToCharacterInInputFile (';');
+					if (isType (name, TOKEN_SEMICOLON))
+						skipToCharacterInInputFile (';');
 				}
 				else
 				{
