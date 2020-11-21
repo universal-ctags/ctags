@@ -752,7 +752,7 @@ static void parseRecord (tokenInfo * const token)
 	deleteToken (name);
 }
 
-static void parseTypes (tokenInfo * const token)
+static void parseTypes (tokenInfo * const token, int parent)
 {
 	tokenInfo *const name = newToken ();
 	const vhdlKind kind = isKeyword (token, KEYWORD_TYPE) ?
@@ -766,13 +766,13 @@ static void parseTypes (tokenInfo * const token)
 		readToken (token);	/* type */
 		if (isKeyword (token, KEYWORD_RECORD))
 		{
-			makeVhdlTag (name, kind);
+			makeVhdlTagWithScope (name, kind, parent);
 			/*TODO: make tags of the record's names */
 			parseRecord (token);
 		}
 		else
 		{
-			makeVhdlTag (name, kind);
+			makeVhdlTagWithScope (name, kind, parent);
 		}
 	}
 	deleteToken (name);
@@ -894,10 +894,10 @@ static void parseKeywords (tokenInfo * const token, int index)
 		parseConstant (index);
 		break;
 	case KEYWORD_TYPE:
-		parseTypes (token);
+		parseTypes (token, index);
 		break;
 	case KEYWORD_SUBTYPE:
-		parseTypes (token);
+		parseTypes (token, index);
 		break;
 	case KEYWORD_ENTITY:
 		parseModule (token);

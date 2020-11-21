@@ -17,7 +17,7 @@ StringToSVector	input.vhd	/^  function StringToSVector(inStr: string) return std
 SymbolToSVector	input.vhd	/^  function SymbolToSVector(inStr: string; idx: integer) return std_logic_vector is$/;"	function	package:types_util
 ss	input.vhd	/^    constant ss: string(1 to inStr'length) := inStr;$/;"	local	function:types_util.SymbolToSVector
 UnsignedToSigned	input.vhd	/^  function UnsignedToSigned(inUnsigned: std_ulogic_vector) $/;"	function	package:types_util
-nibble	input.vhd	/^  subtype nibble is std_logic_vector(3 downto 0);$/;"	subtype
+nibble	input.vhd	/^  subtype nibble is std_logic_vector(3 downto 0);$/;"	subtype	package:types_util
 todec	input.vhd	/^  function todec(i:integer) return character is$/;"	function	package:types_util
 tohex	input.vhd	/^  function tohex(n:nibble) return character is$/;"	function	package:types_util
 tost	input.vhd	/^  function tost(v:std_logic_vector) return string is$/;"	function	package:types_util
