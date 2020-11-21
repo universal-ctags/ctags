@@ -583,6 +583,37 @@ static void initialize (const langType language)
 	Lang_vhdl = language;
 }
 
+static void parseTillEnd (tokenInfo * const token, int parent, const int end_keyword)
+{
+	bool ended = false;
+	tagEntryInfo *e = getEntryInCorkQueue (parent);
+	const char *end_id = e->name;
+
+	do
+	{
+		readToken (token);
+		if (isKeyword (token, KEYWORD_END))
+		{
+			readToken (token);
+			ended = isSemicolonOrKeywordOrIdent (token,
+												 end_keyword, end_id);
+			if (!isType (token, TOKEN_SEMICOLON))
+				skipToCharacterInInputFile (';');
+		}
+		else
+		{
+			if (isType (token, TOKEN_EOF))
+			{
+				ended = true;
+			}
+			else
+			{
+				parseKeywords (token, parent);
+			}
+		}
+	} while (!ended);
+}
+
 static void parsePackage (tokenInfo * const token)
 {
 	tokenInfo *const name = newToken ();
@@ -756,7 +787,6 @@ static void parseConstant (int parent)
 static void parseSubProgram (tokenInfo * const token)
 {
 	tokenInfo *const name = newToken ();
-	bool endSubProgram = false;
 	const vhdlKind kind = isKeyword (token, KEYWORD_FUNCTION) ?
 		VHDLTAG_FUNCTION : VHDLTAG_PROCEDURE;
 	const int end_keyword = token->keyword;
@@ -791,31 +821,7 @@ static void parseSubProgram (tokenInfo * const token)
 	else if (isKeyword (token, KEYWORD_IS))
 	{
 		int index = makeVhdlTag (name, kind);
-		tagEntryInfo *e = getEntryInCorkQueue (index);
-		const char *end_id = e->name;
-		do
-		{
-			readToken (token);
-			if (isKeyword (token, KEYWORD_END))
-			{
-				readToken (token);
-				endSubProgram = isSemicolonOrKeywordOrIdent (token,
-															 end_keyword, end_id);
-				if (!isType (token, TOKEN_SEMICOLON))
-					skipToCharacterInInputFile (';');
-			}
-			else
-			{
-				if (isType (token, TOKEN_EOF))
-				{
-					endSubProgram = true;
-				}
-				else
-				{
-					parseKeywords (token, index);
-				}
-			}
-		} while (!endSubProgram);
+		parseTillEnd (token, index, end_keyword);
 	}
 	deleteToken (name);
 }
