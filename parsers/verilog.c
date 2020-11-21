@@ -689,15 +689,13 @@ static int skipPastMatch (const char *const pair)
 			--matchLevel;
 	}
 	while (c != EOF && matchLevel > 0);
-	return vGetc ();
+	return skipWhite (vGetc ());
 }
 
 static int skipDimension (int c)
 {
 	while (c == '[')
-	{
-		c = skipWhite (skipPastMatch ("[]"));
-	}
+		c = skipPastMatch ("[]");
 	return c;
 }
 
@@ -780,10 +778,7 @@ static int skipMacro (int c)
 		{
 			c = skipWhite (vGetc ());	// FIXME: not covered
 			if (c == '(')
-			{
 				c = skipPastMatch ("()");
-				c = skipWhite (c);
-			}
 		}
 		deleteToken (token);
 	}
@@ -1069,7 +1064,7 @@ static int skipParameterAssignment (int c)
 	{
 		c = skipWhite (vGetc ());
 		if (c == '(')
-			c = skipWhite (skipPastMatch ("()"));
+			c = skipPastMatch ("()");
 	}
 	return c;
 }
@@ -1447,7 +1442,7 @@ static int skipClockEvent(tokenInfo* token, int c)
 		c = skipWhite (vGetc ());
 
 		if (c == '(')
-			c = skipWhite (skipPastMatch ("()"));
+			c = skipPastMatch ("()");
 		else if (readWordToken (token, c))
 			c = skipWhite (vGetc ());
 	}
@@ -1568,7 +1563,7 @@ static int processType (tokenInfo* token, int c, verilogKind* kind)
 			else if (*kind == K_STRUCT)
 				c = pushMembers (token, c);
 			else	// for a nested structure
-				c = skipWhite (skipPastMatch ("{}"));
+				c = skipPastMatch ("{}");
 		}
 		c = skipDimension (c);
 
@@ -1614,7 +1609,7 @@ static int tagNameList (tokenInfo* token, int c)
 	// skip drive|charge strength or type_reference, dimensions, and delay for net
 	if (c == '(')
 		c = skipPastMatch ("()");
-	c = skipDimension (skipWhite (c));
+	c = skipDimension (c);
 	if (c == '.')
 		return c;	// foo[...].bar = ..;
 	c = skipDelay(token, c);
@@ -1643,10 +1638,7 @@ static int tagNameList (tokenInfo* token, int c)
 	/* skip port list of module instance: foo bar(xx, yy); */
 	c = skipWhite (c);
 	if (c == '(')
-	{
 		c = skipPastMatch ("()");
-		c = skipWhite (c);
-	}
 	return c;
 }
 
