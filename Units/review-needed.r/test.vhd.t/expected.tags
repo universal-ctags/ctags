@@ -264,7 +264,7 @@ AtcStatusReg	input.vhd	/^  constant  AtcStatusReg: std_logic_vector(16 downto 0)
 MgmtStatusReg	input.vhd	/^  constant  MgmtStatusReg:std_logic_vector(16 downto 0) := "00000000000000100";$/;"	c
 decProcs	input.vhd	/^package decProcs is$/;"	P
 decProcs	input.vhd	/^package body decProcs is$/;"	P
-DEC2x4	input.vhd	/^  procedure DEC2x4 (inputs : in std_logic_vector(1 downto 0);$/;"	p
+DEC2x4	input.vhd	/^  procedure DEC2x4 (inputs : in std_logic_vector(1 downto 0);$/;"	p	package:decProcs
 isa_dec	input.vhd	/^entity isa_dec is port$/;"	e
 dev_adr	input.vhd	/^  dev_adr:         in std_logic_vector(19 downto 0);$/;"	q	entity:isa_dec
 sio_dec_n	input.vhd	/^  sio_dec_n:       out std_logic;$/;"	q	entity:isa_dec
@@ -587,44 +587,44 @@ rtl	input.vhd	/^architecture rtl of INVERTER is$/;"	a	entity:INVERTER
 io1164	input.vhd	/^package io1164 is$/;"	P
 io1164	input.vhd	/^package body io1164 is$/;"	P
 char2char_t	input.vhd	/^    type char2char_t is array (character'low to character'high) of character;$/;"	t
-lowcase	input.vhd	/^    constant lowcase: char2char_t := ($/;"	c
+lowcase	input.vhd	/^    constant lowcase: char2char_t := ($/;"	c	package:io1164
 f_logic_to_character_t	input.vhd	/^    type f_logic_to_character_t is $/;"	t
-f_logic_to_character	input.vhd	/^    constant f_logic_to_character : f_logic_to_character_t := $/;"	c
-x_charcode	input.vhd	/^    constant x_charcode     : integer := -1;$/;"	c
-maxoct_charcode	input.vhd	/^    constant maxoct_charcode: integer := 7;$/;"	c
-maxhex_charcode	input.vhd	/^    constant maxhex_charcode: integer := 15;$/;"	c
-bad_charcode	input.vhd	/^    constant bad_charcode   : integer := integer'left;$/;"	c
+f_logic_to_character	input.vhd	/^    constant f_logic_to_character : f_logic_to_character_t := $/;"	c	package:io1164
+x_charcode	input.vhd	/^    constant x_charcode     : integer := -1;$/;"	c	package:io1164
+maxoct_charcode	input.vhd	/^    constant maxoct_charcode: integer := 7;$/;"	c	package:io1164
+maxhex_charcode	input.vhd	/^    constant maxhex_charcode: integer := 15;$/;"	c	package:io1164
+bad_charcode	input.vhd	/^    constant bad_charcode   : integer := integer'left;$/;"	c	package:io1164
 digit2int_t	input.vhd	/^    type digit2int_t is $/;"	t
-octdigit2int	input.vhd	/^    constant octdigit2int: digit2int_t := ($/;"	c
-hexdigit2int	input.vhd	/^    constant hexdigit2int: digit2int_t := ($/;"	c
-oct_bits_per_digit	input.vhd	/^    constant oct_bits_per_digit: integer := 3;$/;"	c
-hex_bits_per_digit	input.vhd	/^    constant hex_bits_per_digit: integer := 4;$/;"	c
+octdigit2int	input.vhd	/^    constant octdigit2int: digit2int_t := ($/;"	c	package:io1164
+hexdigit2int	input.vhd	/^    constant hexdigit2int: digit2int_t := ($/;"	c	package:io1164
+oct_bits_per_digit	input.vhd	/^    constant oct_bits_per_digit: integer := 3;$/;"	c	package:io1164
+hex_bits_per_digit	input.vhd	/^    constant hex_bits_per_digit: integer := 4;$/;"	c	package:io1164
 int2octdigit_t	input.vhd	/^    type     int2octdigit_t is $/;"	t
-int2octdigit	input.vhd	/^    constant int2octdigit: int2octdigit_t :=$/;"	c
+int2octdigit	input.vhd	/^    constant int2octdigit: int2octdigit_t :=$/;"	c	package:io1164
 int2hexdigit_t	input.vhd	/^    type     int2hexdigit_t is $/;"	t
-int2hexdigit	input.vhd	/^    constant int2hexdigit: int2hexdigit_t :=$/;"	c
+int2hexdigit	input.vhd	/^    constant int2hexdigit: int2hexdigit_t :=$/;"	c	package:io1164
 oct_logic_vector_t	input.vhd	/^    type     oct_logic_vector_t is$/;"	t
 octint2logic_t	input.vhd	/^    type     octint2logic_t is $/;"	t
-octint2logic	input.vhd	/^    constant octint2logic  : octint2logic_t := ($/;"	c
+octint2logic	input.vhd	/^    constant octint2logic  : octint2logic_t := ($/;"	c	package:io1164
 hex_logic_vector_t	input.vhd	/^    type     hex_logic_vector_t is$/;"	t
 hexint2logic_t	input.vhd	/^    type     hexint2logic_t is $/;"	t
-hexint2logic	input.vhd	/^    constant hexint2logic  : hexint2logic_t := ($/;"	c
-read	input.vhd	/^    procedure read( l: inout line; value: out std_ulogic; good : out boolean ) is$/;"	p
-read	input.vhd	/^    procedure read( l: inout line; value: out std_ulogic ) is$/;"	p
-read	input.vhd	/^    procedure read(l    : inout line           ; $/;"	p
-read	input.vhd	/^    procedure read(l: inout line; value: out std_logic_vector ) is$/;"	p
-write	input.vhd	/^    procedure write(l        : inout line          ;$/;"	p
-write	input.vhd	/^    procedure write(l        : inout line                   ;$/;"	p
-read_oct	input.vhd	/^    procedure read_oct(l         : inout line            ; $/;"	p
-read_oct	input.vhd	/^    procedure read_oct(l         : inout line            ; $/;"	p
-write_oct	input.vhd	/^    procedure write_oct(l        : inout line                   ;$/;"	p
-read_hex	input.vhd	/^    procedure read_hex(l         : inout line            ; $/;"	p
-read_hex	input.vhd	/^    procedure read_hex(l         : inout line            ; $/;"	p
-write_hex	input.vhd	/^    procedure write_hex(l        : inout line                   ;$/;"	p
-read_oct	input.vhd	/^    procedure read_oct(l     : inout line;$/;"	p
-read_oct	input.vhd	/^    procedure read_oct(l     : inout line;$/;"	p
-read_hex	input.vhd	/^    procedure read_hex(l     : inout line;$/;"	p
-read_hex	input.vhd	/^    procedure read_hex(l     : inout line;$/;"	p
+hexint2logic	input.vhd	/^    constant hexint2logic  : hexint2logic_t := ($/;"	c	package:io1164
+read	input.vhd	/^    procedure read( l: inout line; value: out std_ulogic; good : out boolean ) is$/;"	p	package:io1164
+read	input.vhd	/^    procedure read( l: inout line; value: out std_ulogic ) is$/;"	p	package:io1164
+read	input.vhd	/^    procedure read(l    : inout line           ; $/;"	p	package:io1164
+read	input.vhd	/^    procedure read(l: inout line; value: out std_logic_vector ) is$/;"	p	package:io1164
+write	input.vhd	/^    procedure write(l        : inout line          ;$/;"	p	package:io1164
+write	input.vhd	/^    procedure write(l        : inout line                   ;$/;"	p	package:io1164
+read_oct	input.vhd	/^    procedure read_oct(l         : inout line            ; $/;"	p	package:io1164
+read_oct	input.vhd	/^    procedure read_oct(l         : inout line            ; $/;"	p	package:io1164
+write_oct	input.vhd	/^    procedure write_oct(l        : inout line                   ;$/;"	p	package:io1164
+read_hex	input.vhd	/^    procedure read_hex(l         : inout line            ; $/;"	p	package:io1164
+read_hex	input.vhd	/^    procedure read_hex(l         : inout line            ; $/;"	p	package:io1164
+write_hex	input.vhd	/^    procedure write_hex(l        : inout line                   ;$/;"	p	package:io1164
+read_oct	input.vhd	/^    procedure read_oct(l     : inout line;$/;"	p	package:io1164
+read_oct	input.vhd	/^    procedure read_oct(l     : inout line;$/;"	p	package:io1164
+read_hex	input.vhd	/^    procedure read_hex(l     : inout line;$/;"	p	package:io1164
+read_hex	input.vhd	/^    procedure read_hex(l     : inout line;$/;"	p	package:io1164
 asyncLdCnt	input.vhd	/^entity asyncLdCnt is port ($/;"	e
 loadVal	input.vhd	/^  loadVal: in std_logic_vector(3 downto 0);$/;"	q	entity:asyncLdCnt
 clk	input.vhd	/^  clk, load: in std_logic;$/;"	q	entity:asyncLdCnt

@@ -617,17 +617,23 @@ static void parseTillEnd (tokenInfo * const token, int parent, const int end_key
 static void parsePackage (tokenInfo * const token)
 {
 	tokenInfo *const name = newToken ();
+	tokenInfo *token_for_tagging = NULL;
 	Assert (isKeyword (token, KEYWORD_PACKAGE));
 	readToken (token);
 	if (isKeyword (token, KEYWORD_BODY))
 	{
 		readToken (name);
-		makeVhdlTag (name, VHDLTAG_PACKAGE);
+		token_for_tagging = name;
 	}
 	else if (isType (token, TOKEN_IDENTIFIER))
+		token_for_tagging = token;
+
+	if (token_for_tagging)
 	{
-		makeVhdlTag (token, VHDLTAG_PACKAGE);
+		int index = makeVhdlTag (token_for_tagging, VHDLTAG_PACKAGE);
+		parseTillEnd (token, index, KEYWORD_PACKAGE);
 	}
+
 	deleteToken (name);
 }
 
@@ -784,7 +790,7 @@ static void parseConstant (int parent)
 	deleteToken (name);
 }
 
-static void parseSubProgram (tokenInfo * const token)
+static void parseSubProgram (tokenInfo * const token, int parent)
 {
 	tokenInfo *const name = newToken ();
 	const vhdlKind kind = isKeyword (token, KEYWORD_FUNCTION) ?
@@ -816,11 +822,11 @@ static void parseSubProgram (tokenInfo * const token)
 
 	if (isType (token, TOKEN_SEMICOLON))
 	{
-		makeVhdlTag (name, VHDLTAG_PROTOTYPE);
+		makeVhdlTagWithScope (name, VHDLTAG_PROTOTYPE, parent);
 	}
 	else if (isKeyword (token, KEYWORD_IS))
 	{
-		int index = makeVhdlTag (name, kind);
+		int index = makeVhdlTagWithScope (name, kind, parent);
 		parseTillEnd (token, index, end_keyword);
 	}
 	deleteToken (name);
@@ -881,10 +887,10 @@ static void parseKeywords (tokenInfo * const token, int index)
 		parseModule (token);
 		break;
 	case KEYWORD_FUNCTION:
-		parseSubProgram (token);
+		parseSubProgram (token, index);
 		break;
 	case KEYWORD_PROCEDURE:
-		parseSubProgram (token);
+		parseSubProgram (token, index);
 		break;
 	case KEYWORD_PACKAGE:
 		parsePackage (token);
