@@ -1231,7 +1231,7 @@ static void processTypedef (tokenInfo *const token)
 		vUngetc (c);
 }
 
-static void processParameterList (tokenInfo *token, int c)
+static int processParameterList (tokenInfo *token, int c)
 {
 	bool parameter = true;	// default "parameter"
 	if (c == '#')
@@ -1273,7 +1273,7 @@ static void processParameterList (tokenInfo *token, int c)
 			c = skipWhite (vGetc ());
 		}
 	}
-	vUngetc (c);
+	return c;
 }
 
 // [ virtual ] class [ static | automatic ] class_identifier [ parameter_port_list ]
@@ -1299,8 +1299,7 @@ static void processClass (tokenInfo *const token)
 	c = skipWhite (vGetc ());
 
 	/* Find class parameters list */
-	processParameterList (token, c);
-	c = skipWhite (vGetc ());
+	c = processParameterList (token, c);
 
 	/* Search for inheritance information */
 	if (readWordToken (token, c))
@@ -1379,7 +1378,7 @@ static void processDesignElement (tokenInfo *const token)
 		c = skipWhite (vGetc ());
 		if (c == '#')	// parameter_port_list
 		{
-			processParameterList (token, c);
+			c = processParameterList (token, c);
 
 			/* Put found parameters in context */
 			verbose ("Putting parameters: %d element(s)\n",
@@ -1392,7 +1391,6 @@ static void processDesignElement (tokenInfo *const token)
 			ptrArrayClear (tagContents);
 			// disable parameter property on parameter declaration statement
 			currentContext->hasParamList = true;
-			c = skipWhite (vGetc ());
 		}
 
 		// skip clocking_event of clocking block
