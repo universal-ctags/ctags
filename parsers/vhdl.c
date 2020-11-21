@@ -322,7 +322,7 @@ static fieldDefinition VhdlFields [] = {
 /*
  *   FUNCTION DECLARATIONS
  */
-static void parseKeywords (tokenInfo * const token, bool local);
+static void parseKeywords (tokenInfo * const token, int parent);
 
 /*
  *   FUNCTION DEFINITIONS
@@ -727,18 +727,28 @@ static void parseTypes (tokenInfo * const token)
 	deleteToken (name);
 }
 
-static void parseConstant (bool local)
+static void parseConstant (int parent)
 {
+	vhdlKind parent_kind = VHDLTAG_UNDEFINED;
+	tagEntryInfo *e = getEntryInCorkQueue (parent);
+	if (e)
+		parent_kind = e->kindIndex;
+
+	vhdlKind kind;
+	switch (parent_kind)
+	{
+	case VHDLTAG_FUNCTION:
+	case VHDLTAG_PROCEDURE:
+		kind = VHDLTAG_LOCAL;
+		break;
+	default:
+		kind = VHDLTAG_CONSTANT;
+		break;
+	}
+
 	tokenInfo *const name = newToken ();
 	readToken (name);
-	if (local)
-	{
-		makeVhdlTag (name, VHDLTAG_LOCAL);
-	}
-	else
-	{
-		makeVhdlTag (name, VHDLTAG_CONSTANT);
-	}
+	makeVhdlTagWithScope (name, kind, parent);
 	skipToCharacterInInputFile (';');
 	deleteToken (name);
 }
@@ -781,7 +791,7 @@ static void parseSubProgram (tokenInfo * const token)
 	{
 		if (kind == VHDLTAG_FUNCTION)
 		{
-			makeVhdlTag (name, VHDLTAG_FUNCTION);
+			int index = makeVhdlTag (name, VHDLTAG_FUNCTION);
 			do
 			{
 				readToken (token);
@@ -801,14 +811,14 @@ static void parseSubProgram (tokenInfo * const token)
 					}
 					else
 					{
-						parseKeywords (token, true);
+						parseKeywords (token, index);
 					}
 				}
 			} while (!endSubProgram);
 		}
 		else
 		{
-			makeVhdlTag (name, VHDLTAG_PROCEDURE);
+			int index = makeVhdlTag (name, VHDLTAG_PROCEDURE);
 			do
 			{
 				readToken (token);
@@ -828,7 +838,7 @@ static void parseSubProgram (tokenInfo * const token)
 					}
 					else
 					{
-						parseKeywords (token, true);
+						parseKeywords (token, index);
 					}
 				}
 			} while (!endSubProgram);
@@ -869,7 +879,7 @@ static void parseArchitecture (tokenInfo * const token)
 
 /* TODO */
 /* records */
-static void parseKeywords (tokenInfo * const token, bool local)
+static void parseKeywords (tokenInfo * const token, int index)
 {
 	switch (token->keyword)
 	{
@@ -877,7 +887,7 @@ static void parseKeywords (tokenInfo * const token, bool local)
 		skipToCharacterInInputFile (';');
 		break;
 	case KEYWORD_CONSTANT:
-		parseConstant (local);
+		parseConstant (index);
 		break;
 	case KEYWORD_TYPE:
 		parseTypes (token);
@@ -912,7 +922,7 @@ static tokenType parseVhdlFile (tokenInfo * const token)
 	do
 	{
 		readToken (token);
-		parseKeywords (token, false);
+		parseKeywords (token, CORK_NIL);
 	} while (!isKeyword (token, KEYWORD_END) && !isType (token, TOKEN_EOF));
 	return token->type;
 }
