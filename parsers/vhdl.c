@@ -916,6 +916,7 @@ static void parseKeywords (tokenInfo * const token, int index)
 		break;
 	case KEYWORD_ARCHITECTURE:
 		parseArchitecture (token);
+		break;
 	default:
 		break;
 	}
