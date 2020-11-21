@@ -377,12 +377,12 @@ static fieldDefinition SystemVerilogFields[] = {
  *   PROTOTYPE DEFINITIONS
  */
 
-static bool findBlockName (tokenInfo *const token);
 static void processDefine (tokenInfo *const token);
 static int processType (tokenInfo* token, int c, verilogKind* kind);
 static int pushEnumNames (tokenInfo* token, int c);
 static int pushMembers (tokenInfo* token, int c);
 static bool readWordToken (tokenInfo *const token, int c);
+static int skipBlockName (tokenInfo *const token, int c);
 static int skipDelay(tokenInfo* token, int c);
 static int tagNameList (tokenInfo* token, int c);
 static void updateKind (tokenInfo *const token);
@@ -876,11 +876,14 @@ static void dropContext ()
 /* Drop context, but only if an end token is found */
 static void dropEndContext (tokenInfo *const token)
 {
+	int c;
 	verbose ("current context %s; context kind %0d; nest level %0d\n", vStringValue (currentContext->name), currentContext->kind, currentContext->nestLevel);
 	if (currentContext->kind == K_COVERGROUP && strcmp (vStringValue (token->name), "endgroup") == 0)
 	{
 		dropContext ();
-		findBlockName (token);
+		c = skipWhite (vGetc ());
+		c = skipBlockName (token ,c);
+		vUngetc (c);
 	}
 	else if (currentContext->kind != K_UNDEFINED)
 	{
@@ -889,7 +892,9 @@ static void dropEndContext (tokenInfo *const token)
 		if (strcmp (vStringValue (token->name), vStringValue (endTokenName)) == 0)
 		{
 			dropContext ();
-			findBlockName (token);
+			c = skipWhite (vGetc ());
+			c = skipBlockName (token ,c);
+			vUngetc (c);
 			if (currentContext->classScope)
 			{
 				verbose ("Dropping local context %s\n", vStringValue (currentContext->name));
@@ -1010,43 +1015,47 @@ static void createTag (tokenInfo *const token, verilogKind kind)
 	vStringClear (token->inheritance);
 }
 
-static bool findBlockName (tokenInfo *const token)
+static int skipBlockName (tokenInfo *const token, int c)
 {
-	int c;
-
-	c = skipWhite (vGetc ());
 	if (c == ':')
 	{
 		c = skipWhite (vGetc ());
-		return readWordToken (token, c);
+		readWordToken (token, c);
+		c = skipWhite (vGetc ());
 	}
-	else
-		vUngetc (c);
-	return false;
+	return c;
 }
 
 // begin, fork
 static void processBlock (tokenInfo *const token)
 {
-	if (findBlockName (token))	// create a context if the block has a label
+	int c = skipWhite (vGetc ());
+	if (c == ':')	// tag an optional block identifier
 	{
-		verbose ("Found block: %s\n", vStringValue (token->name));
-		createTag (token, K_BLOCK);
-		verbose ("Current context %s\n", vStringValue (currentContext->name));
+		c = skipWhite (vGetc ());
+		if (readWordToken (token, c))
+		{
+			verbose ("Found block: %s\n", vStringValue (token->name));
+			createTag (token, K_BLOCK);
+			verbose ("Current context %s\n", vStringValue (currentContext->name));
+		}
 	}
+	else
+		vUngetc (c);
 	currentContext->nestLevel++;	// increment after creating a context
 }
 
 // end, join, join_any, join_none
 static void processEnd (tokenInfo *const token)
 {
+	int c = skipWhite (vGetc ());
 	if (currentContext->nestLevel > 0)	// for sanity check
 		currentContext->nestLevel--;
 	if (currentContext->kind == K_BLOCK && currentContext->nestLevel == 0)
 		dropContext ();
 
-	if (findBlockName (token)) // block name is optional
-		verbose ("Found block: %s\n", vStringValue (token->name));
+	c = skipBlockName (token, c);
+	vUngetc (c);
 }
 
 static int processPortList (tokenInfo *token, int c)
