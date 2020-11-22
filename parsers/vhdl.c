@@ -174,6 +174,15 @@ typedef struct sTokenInfo {
  */
 static int Lang_vhdl;
 
+typedef enum {
+	VHDL_ENTITY_DESIGNED,
+} vhdlEntityRole;
+
+static roleDefinition VhdlEntityRoles [] = {
+	{ true, "desigend",
+	  "designed by an architecture" },
+};
+
 /* Used to index into the VhdlKinds table. */
 typedef enum {
 	VHDLTAG_UNDEFINED = -1,
@@ -199,7 +208,8 @@ static kindDefinition VhdlKinds[] = {
 	{true, 't', "type", "type definitions"},
 	{true, 'T', "subtype", "subtype definitions"},
 	{true, 'r', "record", "record names"},
-	{true, 'e', "entity", "entity declarations"},
+	{true, 'e', "entity", "entity declarations",
+	 .referenceOnly = false, ATTACH_ROLES(VhdlEntityRoles)},
 	{false, 'C', "component", "component declarations"},
 	{false, 'd', "prototype", "prototypes"},
 	{true, 'f', "function", "function prototypes and declarations"},
@@ -308,16 +318,6 @@ static const keywordTable VhdlKeywordTable[] = {
 	{"with", KEYWORD_WITH},
 	{"xnor", KEYWORD_XNOR},
 	{"xor", KEYWORD_XOR}
-};
-
-typedef enum {
-	F_ENTITY,
-} vhdlField;
-
-static fieldDefinition VhdlFields [] = {
-	{ .name = "entity",
-	  .description = "entity designed by the architecture",
-	  .enabled = true },
 };
 
 /*
@@ -710,6 +710,8 @@ static void parseModule (tokenInfo * const token, int parent)
 		if (!isKeyword (token, KEYWORD_END))
 			skipToKeyword (KEYWORD_END);
 		skipToCharacterInInputFile (';');
+		if (kind == VHDLTAG_ENTITY)
+			registerEntry (index);
 	}
 	deleteToken (name);
 }
@@ -846,9 +848,22 @@ static void parseArchitecture (tokenInfo * const token)
 		readToken (token);
 		if (isType (token, TOKEN_IDENTIFIER))
 		{
-			attachParserFieldToCorkEntry (index,
-										  VhdlFields[F_ENTITY].ftype,
-										  vStringValue (token->string));
+			/* Filling scope field of this architecture.
+			   If the definition for the entity can be found in the symbol table,
+			   use its cork as the scope. If not, use the reference tag for the
+			   entity as fallback. */
+			int role_index = makeSimpleRefTag (token->string,
+											   VHDLTAG_ENTITY, VHDL_ENTITY_DESIGNED);
+			int entity_index = anyKindEntryInScope (CORK_NIL,
+													vStringValue (token->string),
+													VHDLTAG_ENTITY);
+			tagEntryInfo *e = getEntryInCorkQueue (index);
+			if (e)
+				e->extensionFields.scopeIndex = (
+					entity_index == CORK_NIL
+					? role_index
+					: entity_index);
+
 			readToken (token);
 			if (isKeyword (token, KEYWORD_IS))
 			{
@@ -940,8 +955,6 @@ extern parserDefinition *VhdlParser (void)
 	def->initialize = initialize;
 	def->keywordTable = VhdlKeywordTable;
 	def->keywordCount = ARRAY_SIZE (VhdlKeywordTable);
-	def->fieldTable = VhdlFields;
-	def->fieldCount = ARRAY_SIZE (VhdlFields);
-	def->useCork = CORK_QUEUE;
+	def->useCork = CORK_QUEUE|CORK_SYMTAB;
 	return def;
 }

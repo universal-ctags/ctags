@@ -1,21 +1,24 @@
-ENTITY_TOP	input.vhd	/^entity ENTITY_TOP is$/;"	entity
-GEN	input.vhd	/^    GEN : integer := 0$/;"	generic	entity:ENTITY_TOP
-INP	input.vhd	/^    INP : in std_logic$/;"	port	entity:ENTITY_TOP
-arch	input.vhd	/^architecture arch of ENTITY_TOP is$/;"	architecture	entity:ENTITY_TOP
-sig	input.vhd	/^  signal sig : std_logic := '0';$/;"	signal	architecture:arch
-ENTITY_1	input.vhd	/^  component ENTITY_1$/;"	component	architecture:arch
-GEN	input.vhd	/^      GEN : integer := 0$/;"	generic	component:arch.ENTITY_1
-INP	input.vhd	/^      INP : in std_logic$/;"	port	component:arch.ENTITY_1
-ENTITY_2	input.vhd	/^  component ENTITY_2$/;"	component	architecture:arch
-GEN	input.vhd	/^      GEN : integer := 0$/;"	generic	component:arch.ENTITY_2
-INP	input.vhd	/^      INP : in std_logic$/;"	port	component:arch.ENTITY_2
-ENTITY_1	input-0.vhd	/^entity ENTITY_1 is$/;"	entity
-GEN	input-0.vhd	/^    GEN : integer := 0$/;"	generic	entity:ENTITY_1
-INP	input-0.vhd	/^    INP : in std_logic$/;"	port	entity:ENTITY_1
-arch	input-0.vhd	/^architecture arch of ENTITY_1 is$/;"	architecture	entity:ENTITY_1
-sig	input-0.vhd	/^  signal sig : std_logic := '0';$/;"	signal	architecture:arch
-ENTITY_2	input-1.vhd	/^entity ENTITY_2 is$/;"	entity
-GEN	input-1.vhd	/^    GEN : integer := 0$/;"	generic	entity:ENTITY_2
-INP	input-1.vhd	/^    INP : in std_logic$/;"	port	entity:ENTITY_2
-arch	input-1.vhd	/^architecture arch of ENTITY_2 is$/;"	architecture	entity:ENTITY_2
-sig	input-1.vhd	/^  signal sig : std_logic := '0';$/;"	signal	architecture:arch
+ENTITY_TOP	input.vhd	/^entity ENTITY_TOP is$/;"	entity	roles:def
+GEN	input.vhd	/^    GEN : integer := 0$/;"	generic	entity:ENTITY_TOP	roles:def
+INP	input.vhd	/^    INP : in std_logic$/;"	port	entity:ENTITY_TOP	roles:def
+arch	input.vhd	/^architecture arch of ENTITY_TOP is$/;"	architecture	entity:ENTITY_TOP	roles:def
+ENTITY_TOP	input.vhd	/^architecture arch of ENTITY_TOP is$/;"	entity	roles:desigend
+sig	input.vhd	/^  signal sig : std_logic := '0';$/;"	signal	architecture:ENTITY_TOP.arch	roles:def
+ENTITY_1	input.vhd	/^  component ENTITY_1$/;"	component	architecture:ENTITY_TOP.arch	roles:def
+GEN	input.vhd	/^      GEN : integer := 0$/;"	generic	component:ENTITY_TOP.arch.ENTITY_1	roles:def
+INP	input.vhd	/^      INP : in std_logic$/;"	port	component:ENTITY_TOP.arch.ENTITY_1	roles:def
+ENTITY_2	input.vhd	/^  component ENTITY_2$/;"	component	architecture:ENTITY_TOP.arch	roles:def
+GEN	input.vhd	/^      GEN : integer := 0$/;"	generic	component:ENTITY_TOP.arch.ENTITY_2	roles:def
+INP	input.vhd	/^      INP : in std_logic$/;"	port	component:ENTITY_TOP.arch.ENTITY_2	roles:def
+ENTITY_1	input-0.vhd	/^entity ENTITY_1 is$/;"	entity	roles:def
+GEN	input-0.vhd	/^    GEN : integer := 0$/;"	generic	entity:ENTITY_1	roles:def
+INP	input-0.vhd	/^    INP : in std_logic$/;"	port	entity:ENTITY_1	roles:def
+arch	input-0.vhd	/^architecture arch of ENTITY_1 is$/;"	architecture	entity:ENTITY_1	roles:def
+ENTITY_1	input-0.vhd	/^architecture arch of ENTITY_1 is$/;"	entity	roles:desigend
+sig	input-0.vhd	/^  signal sig : std_logic := '0';$/;"	signal	architecture:ENTITY_1.arch	roles:def
+ENTITY_2	input-1.vhd	/^entity ENTITY_2 is$/;"	entity	roles:def
+GEN	input-1.vhd	/^    GEN : integer := 0$/;"	generic	entity:ENTITY_2	roles:def
+INP	input-1.vhd	/^    INP : in std_logic$/;"	port	entity:ENTITY_2	roles:def
+arch	input-1.vhd	/^architecture arch of ENTITY_2 is$/;"	architecture	entity:ENTITY_2	roles:def
+ENTITY_2	input-1.vhd	/^architecture arch of ENTITY_2 is$/;"	entity	roles:desigend
+sig	input-1.vhd	/^  signal sig : std_logic := '0';$/;"	signal	architecture:ENTITY_2.arch	roles:def
