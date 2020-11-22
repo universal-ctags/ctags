@@ -53,6 +53,7 @@ z	kind	no	NONE	s--	no	[tags output] prepend "kind:" to k/ (or K/) field output, 
 -	sectionMarker	no	ReStructuredText	s--	no	character used for declaring section
 -	mixin	yes	Ruby	s--	no	how the class or module is mixed in (mixin:HOW:MODULE)
 -	parameter	no	SystemVerilog	--b	no	parameter whose value can be overridden.
+-	architecture	yes	VHDL	s--	no	architecture designing the entity
 -	parameter	no	Verilog	--b	no	parameter whose value can be overridden.
 #
 Foo	input.java	/^abstract public class Foo extends Bar$/

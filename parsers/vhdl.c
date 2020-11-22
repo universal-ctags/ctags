@@ -320,6 +320,16 @@ static const keywordTable VhdlKeywordTable[] = {
 	{"xor", KEYWORD_XOR}
 };
 
+typedef enum {
+	F_ARCHITECTURE,
+} vhdlField;
+
+static fieldDefinition VhdlFields [] = {
+	{ .name = "architecture",
+	  .description = "architecture designing the entity",
+	  .enabled = true },
+};
+
 /*
  *   FUNCTION DECLARATIONS
  */
@@ -859,10 +869,19 @@ static void parseArchitecture (tokenInfo * const token)
 													VHDLTAG_ENTITY);
 			tagEntryInfo *e = getEntryInCorkQueue (index);
 			if (e)
+			{
 				e->extensionFields.scopeIndex = (
 					entity_index == CORK_NIL
 					? role_index
 					: entity_index);
+
+				/* TODO: append thes architecture name to
+				 * architecture: field of *e*. */
+			}
+
+			attachParserFieldToCorkEntry (role_index,
+										  VhdlFields[F_ARCHITECTURE].ftype,
+										  vStringValue (name->string));
 
 			readToken (token);
 			if (isKeyword (token, KEYWORD_IS))
@@ -955,6 +974,8 @@ extern parserDefinition *VhdlParser (void)
 	def->initialize = initialize;
 	def->keywordTable = VhdlKeywordTable;
 	def->keywordCount = ARRAY_SIZE (VhdlKeywordTable);
+	def->fieldTable = VhdlFields;
+	def->fieldCount = ARRAY_SIZE (VhdlFields);
 	def->useCork = CORK_QUEUE|CORK_SYMTAB;
 	return def;
 }
