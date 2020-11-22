@@ -165,7 +165,6 @@ typedef struct sTokenInfo {
 	tokenType type;
 	keywordId keyword;
 	vString *string;		/* the name of the token */
-	vString *scope;
 	unsigned long lineNumber;	/* line number of tag */
 	MIOPos filePosition;		/* file position of line containing name */
 } tokenInfo;
@@ -352,7 +351,6 @@ static tokenInfo *newToken (void)
 	token->type = TOKEN_NONE;
 	token->keyword = KEYWORD_NONE;
 	token->string = vStringNew ();
-	token->scope = vStringNew ();
 	token->lineNumber = getInputLineNumber ();
 	token->filePosition = getInputFilePosition ();
 	return token;
@@ -363,7 +361,6 @@ static void deleteToken (tokenInfo * const token)
 	if (token != NULL)
 	{
 		vStringDelete (token->string);
-		vStringDelete (token->scope);
 		eFree (token);
 	}
 }
@@ -541,43 +538,20 @@ static void skipToMatched (tokenInfo * const token)
 	}
 }
 
-static int makeConstTag (tokenInfo * const token, const vhdlKind kind)
+static int makeVhdlTagWithScope (tokenInfo * const token, const vhdlKind kind, int parent)
 {
 	const char *const name = vStringValue (token->string);
 	tagEntryInfo e;
 	initTagEntry (&e, name, kind);
 	e.lineNumber = token->lineNumber;
 	e.filePosition = token->filePosition;
+	e.extensionFields.scopeIndex = parent;
 	return makeTagEntry (&e);
 }
 
 static int makeVhdlTag (tokenInfo * const token, const vhdlKind kind)
 {
-	/*
-	 * If a scope has been added to the token, change the token
-	 * string to include the scope when making the tag.
-	 */
-	if (vStringLength (token->scope) > 0)
-	{
-		vString *fulltag = vStringNew ();
-		vStringCopy (fulltag, token->scope);
-		vStringPut (fulltag, '.');
-		vStringCat (fulltag, token->string);
-		vStringCopy (token->string, fulltag);
-		vStringDelete (fulltag);
-	}
-	return makeConstTag (token, kind);
-}
-
-static int makeVhdlTagWithScope (tokenInfo * const token, const vhdlKind kind, int parent)
-{
-	int index = makeVhdlTag (token, kind);
-
-	tagEntryInfo *e = getEntryInCorkQueue (index);
-	if (e)
-		e->extensionFields.scopeIndex = parent;
-
-	return index;
+	return makeVhdlTagWithScope (token, kind, CORK_NIL);
 }
 
 static void initialize (const langType language)
