@@ -494,7 +494,7 @@ static void readToken (tokenInfo * const token)
 	}
 }
 
-static void skipToKeyword (const keywordId keyword)
+static bool skipToKeyword (const keywordId keyword)
 {
 	tokenInfo *const token = newToken ();
 	do
@@ -502,7 +502,10 @@ static void skipToKeyword (const keywordId keyword)
 		readToken (token);
 	}
 	while (!isType (token, TOKEN_EOF) && !isKeyword (token, keyword));
+
+	bool r = isKeyword (token, keyword);
 	deleteToken (token);
+	return r;
 }
 
 static void skipToMatched (tokenInfo * const token)
@@ -585,6 +588,8 @@ static void parseTillEnd (tokenInfo * const token, int parent, const int end_key
 												 end_keyword, end_id);
 			if (!isType (token, TOKEN_SEMICOLON))
 				skipToCharacterInInputFile (';');
+			if (ended)
+				e->extensionFields.endLine = getInputLineNumber ();
 		}
 		else
 		{
@@ -717,9 +722,19 @@ static void parseModule (tokenInfo * const token, int parent)
 		if (isKeyword (token, KEYWORD_IS))
 			readToken (token);
 		parseModuleDecl (token, index);
-		if (!isKeyword (token, KEYWORD_END))
-			skipToKeyword (KEYWORD_END);
+
+		bool ended = isKeyword (token, KEYWORD_END);
+		if (!ended)
+			ended = skipToKeyword (KEYWORD_END);
 		skipToCharacterInInputFile (';');
+
+		if (ended)
+		{
+			tagEntryInfo *e = getEntryInCorkQueue (index);
+			if (e)
+				e->extensionFields.endLine = getInputLineNumber ();
+		}
+
 		if (kind == VHDLTAG_ENTITY)
 			registerEntry (index);
 	}
@@ -740,6 +755,14 @@ static void parseRecord (tokenInfo * const token, int parent)
 	}
 	while (!isKeyword (name, KEYWORD_END) && !isType (name, TOKEN_EOF));
 	skipToCharacterInInputFile (';');
+
+	if (isKeyword (name, KEYWORD_END))
+	{
+		tagEntryInfo *e = getEntryInCorkQueue (parent);
+		if (e)
+			e->extensionFields.endLine = getInputLineNumber ();
+	}
+
 	deleteToken (name);
 }
 
