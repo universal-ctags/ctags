@@ -727,10 +727,11 @@ static void parseModule (tokenInfo * const token)
 		isKeyword (token, KEYWORD_COMPONENT));
 	readToken (name);
 	readToken (token);
-	if (isKeyword (token, KEYWORD_IS))
+	if (kind == VHDLTAG_COMPONENT || isKeyword (token, KEYWORD_IS))
 	{
 		int index = makeVhdlTag (name, kind);
-		readToken (token);
+		if (isKeyword (token, KEYWORD_IS))
+			readToken (token);
 		parseModuleDecl (token, index);
 		if (!isKeyword (token, KEYWORD_END))
 			skipToKeyword (KEYWORD_END);
