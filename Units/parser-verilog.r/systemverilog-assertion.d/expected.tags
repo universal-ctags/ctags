@@ -49,6 +49,8 @@ sva_svtb	input.sv	/^module sva_svtb;$/;"	m
 clk	input.sv	/^    bit clk;$/;"	r	module:sva_svtb
 a	input.sv	/^    logic a, b;$/;"	r	module:sva_svtb
 b	input.sv	/^    logic a, b;$/;"	r	module:sva_svtb
+dut	input.sv	/^    dut dut (.*);$/;"	i	module:sva_svtb
+tb	input.sv	/^    tb tb (.*);$/;"	i	module:sva_svtb
 m	input.sv	/^module m (input a, b);$/;"	m
 a	input.sv	/^module m (input a, b);$/;"	p	module:m
 b	input.sv	/^module m (input a, b);$/;"	p	module:m

@@ -68,6 +68,7 @@ typedef enum {
 	K_REGISTER,
 	K_TASK,
 	K_BLOCK,
+	K_INSTANCE,
 	K_ASSERTION,
 	K_CLASS,
 	K_COVERGROUP,
@@ -128,7 +129,8 @@ static kindDefinition VerilogKinds [] = {
  { true, 'p', "port",      "ports" },
  { true, 'r', "register",  "variable data types" },
  { true, 't', "task",      "tasks" },
- { true, 'b', "block",     "blocks (begin, fork)" }
+ { true, 'b', "block",     "blocks (begin, fork)" },
+ { true, 'i', "instance",  "instances of module" }
 };
 
 static kindDefinition SystemVerilogKinds [] = {
@@ -141,6 +143,7 @@ static kindDefinition SystemVerilogKinds [] = {
  { true, 'r', "register",  "variable data types" },
  { true, 't', "task",      "tasks" },
  { true, 'b', "block",     "blocks (begin, fork)" },
+ { true, 'i', "instance"   "instances of module or interface" },
  { true, 'A', "assert",    "assertions (assert, assume, cover, restrict)" },
  { true, 'C', "class",     "classes" },
  { true, 'V', "covergroup","covergroups" },
@@ -1625,6 +1628,19 @@ static int tagNameList (tokenInfo* token, int c)
 			if (c == '=')
 				c = skipExpression (c);
 		}
+		else if (c == '(' || c == '[')	// should be instance
+		{
+			c = skipDimension(c); // name_of_instance {unpacked_dimension}
+			c = skipPastMatch ("()"); // list_of_port_connections
+
+			// if without the next "if" clause, get a instance named: `add_t from the following example
+			// var `add_t(foo) = '0;
+			if (c == ';' || c == ',')
+			{
+				verbose("find instance: %s with kind %s\n", vStringValue (token->name), getNameForKind(K_INSTANCE));
+				createTag (token, K_INSTANCE);
+			}
+		}
 		c = skipMacro (c);	// `ifdef, `else, `endif, etc. (before comma)
 
 		if (c != ',' || c == EOF)
@@ -1635,10 +1651,6 @@ static int tagNameList (tokenInfo* token, int c)
 			kind = K_UNDEFINED;
 	} while (true);
 
-	/* skip port list of module instance: foo bar(xx, yy); */
-	c = skipWhite (c);
-	if (c == '(')
-		c = skipPastMatch ("()");
 	return c;
 }
 
