@@ -50,7 +50,7 @@ module Net_declarations;
 
   // 6.7.2 Net declarations with user-defined nettypes
   nettype T wT;
-  nettype T wTsum with Tsum;  // FIXME: 
+  //nettype T wTsum with Tsum;  // FIXME: "nettype" and "with" are unsupported
   wT w1;
   wT w2[8];
   wTsum w3;

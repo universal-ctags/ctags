@@ -1644,7 +1644,7 @@ static int tagNameList (tokenInfo* token, int c)
 	return c;
 }
 
-static void findTag (tokenInfo *const token, int c)
+static int findTag (tokenInfo *const token, int c)
 {
 	verbose ("Checking token %s of kind %d\n", vStringValue (token->name), token->kind);
 
@@ -1661,49 +1661,33 @@ static void findTag (tokenInfo *const token, int c)
 				c = skipToSemiColon (); // clocking items are not port definitions
 			else
 				c = tagNameList (token, c);
-			vUngetc (c);
 			break;
 		case K_IDENTIFIER:
 			{
 				if (c == ':')
-					vUngetc (c); /* label */
+					; /* label */
 				else if (c == '{')
-				{
 					c = skipWhite(vGetc());
-					vUngetc (c);
-				}
 				else if (c == '=')
-				{
 					c = skipExpression (skipWhite(vGetc()));
-					vUngetc (c);
-				}
 				else
-				{
 					c = tagNameList (token, c); /* user defined type */
-					if (c == ';')	// FIXME
-						vUngetc (c);
-				}
 			}
 			break;
 		case K_CLASS:
 			c = processClass (token, c);
-			vUngetc (c);
 			break;
 		case K_TYPEDEF:
 			c = processTypedef (token, c);
-			vUngetc (c);
 			break;
 		case K_ENUM:
 			c = processEnum (token, c);
-			vUngetc (c);
 			break;
 		case K_STRUCT:
 			c = processStruct (token, c);
-			vUngetc (c);
 			break;
 		case K_PROTOTYPE:
 			currentContext->prototype = true;
-			vUngetc (c);
 			break;
 
 		case K_CHECKER:
@@ -1717,56 +1701,48 @@ static void findTag (tokenInfo *const token, int c)
 		case K_PROPERTY:
 		case K_SEQUENCE:
 			c = processDesignElement (token, c);
-			if (c == ';')	// FIXME
-				vUngetc (c);
+			if (c == '(')	// FIXME: fix processAssertion()
+				c = skipWhite (vGetc());
 			break;
 		case K_END_DE:
 			c = dropEndContext (token, c);
-			vUngetc (c);
 			break;
 		case K_BLOCK:
 			c = processBlock (token, c);
-			vUngetc (c);
 			break;
 		case K_END:
 			c = processEnd (token, c);
-			vUngetc (c);
 			break;
 		case K_FUNCTION:
 		case K_TASK:
 			c = processFunction (token, c);
-			if (c == ';')	// FIXME
-				vUngetc (c);
 			break;
 		case K_ASSERTION:
 			c = processAssertion (token, c);
-			vUngetc (c);
 			break;
 
 		case K_DEFINE:
 			c = processDefine (token, c);
-			vUngetc (c);
 			break;
 
 		case K_IGNORE:
-			vUngetc (c);
 			break;
 		default:
 			verbose ("Unexpected kind->token %d\n", token->kind);
 	}
+	return c;
 }
 
 static void findVerilogTags (void)
 {
 	tokenInfo *const token = newToken ();
-	int c = '\0';
+	int c = skipWhite (vGetc ());
 	currentContext = newToken ();
 	fieldTable = isInputLanguage (Lang_verilog) ? VerilogFields : SystemVerilogFields;
 	ptrArrayClear (tagContents);
 
 	while (c != EOF)
 	{
-		c = skipWhite (vGetc ());
 		switch (c)
 		{
 			/* Store current block name whenever a : is found
@@ -1774,6 +1750,7 @@ static void findVerilogTags (void)
 			 * */
 			case ':':
 				vStringCopy (currentContext->blockName, token->name);
+				c = skipWhite (vGetc ());
 				break;
 			case ';':
 				/* Drop context on prototypes because they don't have an
@@ -1783,33 +1760,41 @@ static void findVerilogTags (void)
 
 				/* Prototypes end at the end of statement */
 				currentContext->prototype = false;
+				c = skipWhite (vGetc ());
 				break;
 			case '(':	// ignore locally declared variables in a for-loop (LRM 12.7.1)
 				c = skipPastMatch ("()");;
-				vUngetc (c);
 				break;
 			case '{':
 				c = skipPastMatch ("{}");;
-				vUngetc (c);
 				break;
 			case '#':
 				c = skipDelay (token, c);
-				vUngetc (c);
 				break;
 			case '@':
 				c = skipClockEvent (token, c);
-				vUngetc (c);
 				break;
 			default :
 				if (readWordToken (token, c))
 				{
 					updateKind (token);
 					if (token->kind == K_DIRECTIVE)
+					{
 						// Skip compiler directives which are line-based.
 						c = skipToNewLine ();
+						c = skipWhite (vGetc ());
+					}
 					else if (token->kind != K_UNDEFINED)
-						findTag (token, skipWhite (vGetc ()));
+						c = findTag (token, skipWhite (vGetc ()));
+					else if (c == '`')	/* Skip macro or macro functions */
+					{
+						c = skipWhite (vGetc ());
+						if (c == '(')
+							c = skipPastMatch ("()");
+					}
 				}
+				else
+					c = skipWhite (vGetc ());
 		}
 	}
 

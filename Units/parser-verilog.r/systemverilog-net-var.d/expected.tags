@@ -28,7 +28,6 @@ w1	input.sv	/^  interconnect w1;              \/\/ legal$/;"	n	module:Net_declar
 w2	input.sv	/^  interconnect [3:0] w2;        \/\/ legal$/;"	n	module:Net_declarations
 w3	input.sv	/^  interconnect [3:0] w3 [1:0];  \/\/ legal$/;"	n	module:Net_declarations
 wT	input.sv	/^  nettype T wT;$/;"	r	module:Net_declarations
-Tsum	input.sv	/^  nettype T wTsum with Tsum;  \/\/ FIXME: $/;"	r	module:Net_declarations
 w1	input.sv	/^  wT w1;$/;"	r	module:Net_declarations
 w2	input.sv	/^  wT w2[8];$/;"	r	module:Net_declarations
 w3	input.sv	/^  wTsum w3;$/;"	r	module:Net_declarations
