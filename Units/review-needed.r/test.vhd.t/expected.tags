@@ -50,17 +50,17 @@ Clk	input.vhd	/^  Clk: in std_logic;$/;"	q	entity:BidirCnt
 Rst	input.vhd	/^  Rst: in std_logic;$/;"	q	entity:BidirCnt
 Cnt	input.vhd	/^  Cnt: inout std_logic_vector(3 downto 0)$/;"	q	entity:BidirCnt
 behavioral	input.vhd	/^architecture behavioral of BidirCnt is$/;"	a	entity:BidirCnt
-LoadCnt	input.vhd	/^  component LoadCnt port ($/;"	C
-CntEn	input.vhd	/^    CntEn: in std_logic;$/;"	q	component:LoadCnt
-LdCnt	input.vhd	/^    LdCnt: in std_logic;$/;"	q	component:LoadCnt
-LdData	input.vhd	/^    LdData: in std_logic_vector(3 downto 0);$/;"	q	component:LoadCnt
-Clk	input.vhd	/^    Clk: in std_logic;$/;"	q	component:LoadCnt
-Rst	input.vhd	/^    Rst: in std_logic;$/;"	q	component:LoadCnt
-CntVal	input.vhd	/^    CntVal: out std_logic_vector(3 downto 0)$/;"	q	component:LoadCnt
-BidirBuf	input.vhd	/^  component BidirBuf port ($/;"	C
-OE	input.vhd	/^    OE: in std_logic;$/;"	q	component:BidirBuf
-input	input.vhd	/^    input: in std_logic_vector;$/;"	q	component:BidirBuf
-output	input.vhd	/^    output: inout std_logic_vector$/;"	q	component:BidirBuf
+LoadCnt	input.vhd	/^  component LoadCnt port ($/;"	C	architecture:behavioral
+CntEn	input.vhd	/^    CntEn: in std_logic;$/;"	q	component:behavioral.LoadCnt
+LdCnt	input.vhd	/^    LdCnt: in std_logic;$/;"	q	component:behavioral.LoadCnt
+LdData	input.vhd	/^    LdData: in std_logic_vector(3 downto 0);$/;"	q	component:behavioral.LoadCnt
+Clk	input.vhd	/^    Clk: in std_logic;$/;"	q	component:behavioral.LoadCnt
+Rst	input.vhd	/^    Rst: in std_logic;$/;"	q	component:behavioral.LoadCnt
+CntVal	input.vhd	/^    CntVal: out std_logic_vector(3 downto 0)$/;"	q	component:behavioral.LoadCnt
+BidirBuf	input.vhd	/^  component BidirBuf port ($/;"	C	architecture:behavioral
+OE	input.vhd	/^    OE: in std_logic;$/;"	q	component:behavioral.BidirBuf
+input	input.vhd	/^    input: in std_logic_vector;$/;"	q	component:behavioral.BidirBuf
+output	input.vhd	/^    output: inout std_logic_vector$/;"	q	component:behavioral.BidirBuf
 CntVal	input.vhd	/^signal CntVal: std_logic_vector(3 downto 0);$/;"	s	architecture:behavioral
 LoadVal	input.vhd	/^signal LoadVal: std_logic_vector(3 downto 0);$/;"	s	architecture:behavioral
 BIDIR	input.vhd	/^entity BIDIR is port ($/;"	e
@@ -138,10 +138,10 @@ Counter	input.vhd	/^entity Counter is port ($/;"	e
 clock	input.vhd	/^  clock: in std_logic;$/;"	q	entity:Counter
 Count	input.vhd	/^  Count: out std_logic_vector(3 downto 0)$/;"	q	entity:Counter
 structural	input.vhd	/^architecture structural of Counter is$/;"	a	entity:Counter
-Cnt4Term	input.vhd	/^  component Cnt4Term port ($/;"	C
-clk	input.vhd	/^    clk: in std_logic;$/;"	q	component:Cnt4Term
-Cnt	input.vhd	/^    Cnt: out std_logic_vector(3 downto 0);$/;"	q	component:Cnt4Term
-TermCnt	input.vhd	/^    TermCnt: out std_logic);$/;"	q	component:Cnt4Term
+Cnt4Term	input.vhd	/^  component Cnt4Term port ($/;"	C	architecture:structural
+clk	input.vhd	/^    clk: in std_logic;$/;"	q	component:structural.Cnt4Term
+Cnt	input.vhd	/^    Cnt: out std_logic_vector(3 downto 0);$/;"	q	component:structural.Cnt4Term
+TermCnt	input.vhd	/^    TermCnt: out std_logic);$/;"	q	component:structural.Cnt4Term
 counter	input.vhd	/^entity counter is port ($/;"	e
 clk	input.vhd	/^  clk: in std_logic;$/;"	q	entity:counter
 reset	input.vhd	/^  reset: in std_logic;$/;"	q	entity:counter
@@ -574,17 +574,17 @@ c	input.vhd	/^  a,b,c,d: in std_logic;$/;"	q	entity:FEWGATES
 d	input.vhd	/^  a,b,c,d: in std_logic;$/;"	q	entity:FEWGATES
 y	input.vhd	/^  y: out std_logic$/;"	q	entity:FEWGATES
 structural	input.vhd	/^architecture structural of FEWGATES is$/;"	a	entity:FEWGATES
-AND2	input.vhd	/^  component AND2 port ($/;"	C
-i1	input.vhd	/^    i1: in std_logic;$/;"	q	component:AND2
-i2	input.vhd	/^    i2: in std_logic;$/;"	q	component:AND2
-y	input.vhd	/^    y: out std_logic$/;"	q	component:AND2
-OR2	input.vhd	/^  component OR2 port ($/;"	C
-i1	input.vhd	/^    i1: in std_logic;$/;"	q	component:OR2
-i2	input.vhd	/^    i2: in std_logic;$/;"	q	component:OR2
-y	input.vhd	/^    y: out std_logic$/;"	q	component:OR2
-INVERTER	input.vhd	/^  component INVERTER port ($/;"	C
-i	input.vhd	/^    i: in std_logic;$/;"	q	component:INVERTER
-o	input.vhd	/^    o: out std_logic$/;"	q	component:INVERTER
+AND2	input.vhd	/^  component AND2 port ($/;"	C	architecture:structural
+i1	input.vhd	/^    i1: in std_logic;$/;"	q	component:structural.AND2
+i2	input.vhd	/^    i2: in std_logic;$/;"	q	component:structural.AND2
+y	input.vhd	/^    y: out std_logic$/;"	q	component:structural.AND2
+OR2	input.vhd	/^  component OR2 port ($/;"	C	architecture:structural
+i1	input.vhd	/^    i1: in std_logic;$/;"	q	component:structural.OR2
+i2	input.vhd	/^    i2: in std_logic;$/;"	q	component:structural.OR2
+y	input.vhd	/^    y: out std_logic$/;"	q	component:structural.OR2
+INVERTER	input.vhd	/^  component INVERTER port ($/;"	C	architecture:structural
+i	input.vhd	/^    i: in std_logic;$/;"	q	component:structural.INVERTER
+o	input.vhd	/^    o: out std_logic$/;"	q	component:structural.INVERTER
 a_and_b	input.vhd	/^signal a_and_b, c_and_d, not_c_and_d: std_logic;$/;"	s	architecture:structural
 c_and_d	input.vhd	/^signal a_and_b, c_and_d, not_c_and_d: std_logic;$/;"	s	architecture:structural
 not_c_and_d	input.vhd	/^signal a_and_b, c_and_d, not_c_and_d: std_logic;$/;"	s	architecture:structural
@@ -595,17 +595,17 @@ c	input.vhd	/^  a,b,c,d: in std_logic;$/;"	q	entity:FEWGATES
 d	input.vhd	/^  a,b,c,d: in std_logic;$/;"	q	entity:FEWGATES
 y	input.vhd	/^  y: out std_logic$/;"	q	entity:FEWGATES
 structural	input.vhd	/^architecture structural of FEWGATES is$/;"	a	entity:FEWGATES
-AND2	input.vhd	/^  component AND2 port ($/;"	C
-i1	input.vhd	/^    i1: in std_logic;$/;"	q	component:AND2
-i2	input.vhd	/^    i2: in std_logic;$/;"	q	component:AND2
-y	input.vhd	/^    y: out std_logic$/;"	q	component:AND2
-OR2	input.vhd	/^  component OR2 port ($/;"	C
-i1	input.vhd	/^    i1: in std_logic;$/;"	q	component:OR2
-i2	input.vhd	/^    i2: in std_logic;$/;"	q	component:OR2
-y	input.vhd	/^    y: out std_logic$/;"	q	component:OR2
-INVERTER	input.vhd	/^  component INVERTER port ($/;"	C
-i	input.vhd	/^    i: in std_logic;$/;"	q	component:INVERTER
-o	input.vhd	/^    o: out std_logic$/;"	q	component:INVERTER
+AND2	input.vhd	/^  component AND2 port ($/;"	C	architecture:structural
+i1	input.vhd	/^    i1: in std_logic;$/;"	q	component:structural.AND2
+i2	input.vhd	/^    i2: in std_logic;$/;"	q	component:structural.AND2
+y	input.vhd	/^    y: out std_logic$/;"	q	component:structural.AND2
+OR2	input.vhd	/^  component OR2 port ($/;"	C	architecture:structural
+i1	input.vhd	/^    i1: in std_logic;$/;"	q	component:structural.OR2
+i2	input.vhd	/^    i2: in std_logic;$/;"	q	component:structural.OR2
+y	input.vhd	/^    y: out std_logic$/;"	q	component:structural.OR2
+INVERTER	input.vhd	/^  component INVERTER port ($/;"	C	architecture:structural
+i	input.vhd	/^    i: in std_logic;$/;"	q	component:structural.INVERTER
+o	input.vhd	/^    o: out std_logic$/;"	q	component:structural.INVERTER
 a_and_b	input.vhd	/^signal a_and_b, c_and_d, not_c_and_d: std_logic;$/;"	s	architecture:structural
 c_and_d	input.vhd	/^signal a_and_b, c_and_d, not_c_and_d: std_logic;$/;"	s	architecture:structural
 not_c_and_d	input.vhd	/^signal a_and_b, c_and_d, not_c_and_d: std_logic;$/;"	s	architecture:structural
@@ -630,17 +630,17 @@ a_and_b	input.vhd	/^signal a_and_b, c_and_d, not_c_and_d: std_logic;$/;"	s	archi
 c_and_d	input.vhd	/^signal a_and_b, c_and_d, not_c_and_d: std_logic;$/;"	s	architecture:concurrent
 not_c_and_d	input.vhd	/^signal a_and_b, c_and_d, not_c_and_d: std_logic;$/;"	s	architecture:concurrent
 GatesPkg	input.vhd	/^package GatesPkg is$/;"	P
-AND2	input.vhd	/^  component AND2 port ($/;"	C
-i1	input.vhd	/^    i1: in std_logic;$/;"	q	component:AND2
-i2	input.vhd	/^    i2: in std_logic;$/;"	q	component:AND2
-y	input.vhd	/^    y: out std_logic$/;"	q	component:AND2
-OR2	input.vhd	/^  component OR2 port ($/;"	C
-i1	input.vhd	/^    i1: in std_logic;$/;"	q	component:OR2
-i2	input.vhd	/^    i2: in std_logic;$/;"	q	component:OR2
-y	input.vhd	/^    y: out std_logic$/;"	q	component:OR2
-INVERTER	input.vhd	/^  component INVERTER port ($/;"	C
-i	input.vhd	/^    i: in std_logic;$/;"	q	component:INVERTER
-o	input.vhd	/^    o: out std_logic$/;"	q	component:INVERTER
+AND2	input.vhd	/^  component AND2 port ($/;"	C	package:GatesPkg
+i1	input.vhd	/^    i1: in std_logic;$/;"	q	component:GatesPkg.AND2
+i2	input.vhd	/^    i2: in std_logic;$/;"	q	component:GatesPkg.AND2
+y	input.vhd	/^    y: out std_logic$/;"	q	component:GatesPkg.AND2
+OR2	input.vhd	/^  component OR2 port ($/;"	C	package:GatesPkg
+i1	input.vhd	/^    i1: in std_logic;$/;"	q	component:GatesPkg.OR2
+i2	input.vhd	/^    i2: in std_logic;$/;"	q	component:GatesPkg.OR2
+y	input.vhd	/^    y: out std_logic$/;"	q	component:GatesPkg.OR2
+INVERTER	input.vhd	/^  component INVERTER port ($/;"	C	package:GatesPkg
+i	input.vhd	/^    i: in std_logic;$/;"	q	component:GatesPkg.INVERTER
+o	input.vhd	/^    o: out std_logic$/;"	q	component:GatesPkg.INVERTER
 FEWGATES	input.vhd	/^entity FEWGATES is port ($/;"	e
 a	input.vhd	/^  a,b,c,d: in std_logic;$/;"	q	entity:FEWGATES
 b	input.vhd	/^  a,b,c,d: in std_logic;$/;"	q	entity:FEWGATES
@@ -672,17 +672,17 @@ c	input.vhd	/^  a,b,c,d: in std_logic;$/;"	q	entity:FEWGATES
 d	input.vhd	/^  a,b,c,d: in std_logic;$/;"	q	entity:FEWGATES
 y	input.vhd	/^  y: out std_logic$/;"	q	entity:FEWGATES
 structural	input.vhd	/^architecture structural of FEWGATES is$/;"	a	entity:FEWGATES
-AND2	input.vhd	/^  component AND2 port ($/;"	C
-i1	input.vhd	/^    i1: in std_logic;$/;"	q	component:AND2
-i2	input.vhd	/^    i2: in std_logic;$/;"	q	component:AND2
-y	input.vhd	/^    y: out std_logic$/;"	q	component:AND2
-OR2	input.vhd	/^  component OR2 port ($/;"	C
-i1	input.vhd	/^    i1: in std_logic;$/;"	q	component:OR2
-i2	input.vhd	/^    i2: in std_logic;$/;"	q	component:OR2
-y	input.vhd	/^    y: out std_logic$/;"	q	component:OR2
-INVERTER	input.vhd	/^  component INVERTER port ($/;"	C
-i	input.vhd	/^    i: in std_logic;$/;"	q	component:INVERTER
-o	input.vhd	/^    o: out std_logic$/;"	q	component:INVERTER
+AND2	input.vhd	/^  component AND2 port ($/;"	C	architecture:structural
+i1	input.vhd	/^    i1: in std_logic;$/;"	q	component:structural.AND2
+i2	input.vhd	/^    i2: in std_logic;$/;"	q	component:structural.AND2
+y	input.vhd	/^    y: out std_logic$/;"	q	component:structural.AND2
+OR2	input.vhd	/^  component OR2 port ($/;"	C	architecture:structural
+i1	input.vhd	/^    i1: in std_logic;$/;"	q	component:structural.OR2
+i2	input.vhd	/^    i2: in std_logic;$/;"	q	component:structural.OR2
+y	input.vhd	/^    y: out std_logic$/;"	q	component:structural.OR2
+INVERTER	input.vhd	/^  component INVERTER port ($/;"	C	architecture:structural
+i	input.vhd	/^    i: in std_logic;$/;"	q	component:structural.INVERTER
+o	input.vhd	/^    o: out std_logic$/;"	q	component:structural.INVERTER
 a_and_b	input.vhd	/^signal a_and_b, c_and_d, not_c_and_d: std_logic;$/;"	s	architecture:structural
 c_and_d	input.vhd	/^signal a_and_b, c_and_d, not_c_and_d: std_logic;$/;"	s	architecture:structural
 not_c_and_d	input.vhd	/^signal a_and_b, c_and_d, not_c_and_d: std_logic;$/;"	s	architecture:structural
@@ -761,12 +761,12 @@ behavioral	input.vhd	/^architecture behavioral of LoadCnt is$/;"	a	entity:LoadCn
 Cnt	input.vhd	/^signal Cnt: std_logic_vector(3 downto 0);$/;"	s	architecture:behavioral
 loadCntTB	input.vhd	/^entity loadCntTB is$/;"	e
 testbench	input.vhd	/^architecture testbench of loadCntTB is$/;"	a	entity:loadCntTB
-loadCnt	input.vhd	/^  component loadCnt port ($/;"	C
-data	input.vhd	/^    data: in std_logic_vector (7 downto 0);$/;"	q	component:loadCnt
-load	input.vhd	/^    load: in std_logic;$/;"	q	component:loadCnt
-clk	input.vhd	/^    clk: in std_logic;$/;"	q	component:loadCnt
-rst	input.vhd	/^    rst: in std_logic;$/;"	q	component:loadCnt
-q	input.vhd	/^    q: out std_logic_vector (7 downto 0)$/;"	q	component:loadCnt
+loadCnt	input.vhd	/^  component loadCnt port ($/;"	C	architecture:testbench
+data	input.vhd	/^    data: in std_logic_vector (7 downto 0);$/;"	q	component:testbench.loadCnt
+load	input.vhd	/^    load: in std_logic;$/;"	q	component:testbench.loadCnt
+clk	input.vhd	/^    clk: in std_logic;$/;"	q	component:testbench.loadCnt
+rst	input.vhd	/^    rst: in std_logic;$/;"	q	component:testbench.loadCnt
+q	input.vhd	/^    q: out std_logic_vector (7 downto 0)$/;"	q	component:testbench.loadCnt
 vectorType	input.vhd	/^type vectorType is record$/;"	t	architecture:testbench
 data	input.vhd	/^  data: std_logic_vector(7 downto 0);$/;"	r
 load	input.vhd	/^  load: std_logic;$/;"	r
@@ -859,11 +859,11 @@ I2	input.vhd	/^  I1, I2: in std_logic;$/;"	q	entity:OR2
 Y	input.vhd	/^  Y: out std_logic$/;"	q	entity:OR2
 simple	input.vhd	/^architecture simple of OR2 is$/;"	a	entity:OR2
 simPrimitives	input.vhd	/^package simPrimitives is$/;"	P
-OR2	input.vhd	/^  component OR2$/;"	C
-tPD	input.vhd	/^    generic (tPD: time := 1 ns);$/;"	g	component:OR2
-I1	input.vhd	/^    port (I1, I2: in std_logic;$/;"	q	component:OR2
-I2	input.vhd	/^    port (I1, I2: in std_logic;$/;"	q	component:OR2
-Y	input.vhd	/^      Y: out std_logic$/;"	q	component:OR2
+OR2	input.vhd	/^  component OR2$/;"	C	package:simPrimitives
+tPD	input.vhd	/^    generic (tPD: time := 1 ns);$/;"	g	component:simPrimitives.OR2
+I1	input.vhd	/^    port (I1, I2: in std_logic;$/;"	q	component:simPrimitives.OR2
+I2	input.vhd	/^    port (I1, I2: in std_logic;$/;"	q	component:simPrimitives.OR2
+Y	input.vhd	/^      Y: out std_logic$/;"	q	component:simPrimitives.OR2
 OR2	input.vhd	/^entity OR2 is$/;"	e
 tPD	input.vhd	/^  generic (tPD: time := 1 ns);$/;"	g	entity:OR2
 I1	input.vhd	/^  port (I1, I2: in std_logic;$/;"	q	entity:OR2
@@ -913,10 +913,10 @@ Pow	input.vhd	/^   function Pow( N, Exp : integer )  return integer is$/;"	f	arc
 inputValInt	input.vhd	/^signal inputValInt: integer range 0 to 15;$/;"	s	architecture:behavioral
 powerL	input.vhd	/^signal powerL: integer range 0 to 65535;$/;"	s	architecture:behavioral
 PowerPkg	input.vhd	/^package PowerPkg is  $/;"	P
-Power	input.vhd	/^  component Power port($/;"	C
-Clk	input.vhd	/^      Clk                   : in  bit; $/;"	q	component:Power
-inputVal	input.vhd	/^      inputVal              : in  bit_vector(0 to 3);$/;"	q	component:Power
-power	input.vhd	/^      power                 : out bit_vector(0 to 15) );$/;"	q	component:Power
+Power	input.vhd	/^  component Power port($/;"	C	package:PowerPkg
+Clk	input.vhd	/^      Clk                   : in  bit; $/;"	q	component:PowerPkg.Power
+inputVal	input.vhd	/^      inputVal              : in  bit_vector(0 to 3);$/;"	q	component:PowerPkg.Power
+power	input.vhd	/^      power                 : out bit_vector(0 to 15) );$/;"	q	component:PowerPkg.Power
 Power	input.vhd	/^entity Power is port($/;"	e
 Clk	input.vhd	/^   Clk                   : in  bit; $/;"	q	entity:Power
 inputVal	input.vhd	/^   inputVal              : in  bit_vector(0 to 3);$/;"	q	entity:Power
@@ -930,42 +930,42 @@ priority	input.vhd	/^   priority   : in  std_logic_vector(2 downto 0);$/;"	q	ent
 result	input.vhd	/^   result     : out std_logic_vector(2 downto 0)$/;"	q	entity:priority_encoder
 behave	input.vhd	/^architecture behave of priority_encoder is$/;"	a	entity:priority_encoder
 primitive	input.vhd	/^package primitive is$/;"	P
-DFFE	input.vhd	/^  component DFFE port ($/;"	C
-d	input.vhd	/^    d: in std_logic;$/;"	q	component:DFFE
-q	input.vhd	/^    q: out std_logic;$/;"	q	component:DFFE
-en	input.vhd	/^    en: in std_logic;$/;"	q	component:DFFE
-clk	input.vhd	/^    clk: in std_logic$/;"	q	component:DFFE
-DFFE_SR	input.vhd	/^  component DFFE_SR port ($/;"	C
-d	input.vhd	/^    d: in std_logic;$/;"	q	component:DFFE_SR
-en	input.vhd	/^    en: in std_logic;$/;"	q	component:DFFE_SR
-clk	input.vhd	/^    clk: in std_logic;$/;"	q	component:DFFE_SR
-rst	input.vhd	/^    rst: in std_logic;$/;"	q	component:DFFE_SR
-prst	input.vhd	/^    prst: in std_logic;$/;"	q	component:DFFE_SR
-q	input.vhd	/^    q: out std_logic$/;"	q	component:DFFE_SR
-DLATCHH	input.vhd	/^  component DLATCHH port ($/;"	C
-d	input.vhd	/^    d: in std_logic;$/;"	q	component:DLATCHH
-en	input.vhd	/^    en: in std_logic;$/;"	q	component:DLATCHH
-q	input.vhd	/^    q: out std_logic$/;"	q	component:DLATCHH
-AND2	input.vhd	/^  component AND2 port ($/;"	C
-i1	input.vhd	/^    i1: in std_logic;$/;"	q	component:AND2
-i2	input.vhd	/^    i2: in std_logic;$/;"	q	component:AND2
-y	input.vhd	/^    y: out std_logic$/;"	q	component:AND2
-OR2	input.vhd	/^  component OR2 port ($/;"	C
-i1	input.vhd	/^    i1: in std_logic;$/;"	q	component:OR2
-i2	input.vhd	/^    i2: in std_logic;$/;"	q	component:OR2
-y	input.vhd	/^    y: out std_logic$/;"	q	component:OR2
-INVERTER	input.vhd	/^  component INVERTER port ($/;"	C
-i	input.vhd	/^    i: in std_logic;$/;"	q	component:INVERTER
-o	input.vhd	/^    o: out std_logic$/;"	q	component:INVERTER
-TRIBUF	input.vhd	/^  component TRIBUF port ($/;"	C
-ip	input.vhd	/^    ip: in std_logic;$/;"	q	component:TRIBUF
-oe	input.vhd	/^    oe: in std_logic;$/;"	q	component:TRIBUF
-op	input.vhd	/^    op: out std_logic$/;"	q	component:TRIBUF
-BIDIR	input.vhd	/^  component BIDIR port ($/;"	C
-ip	input.vhd	/^    ip: in std_logic;$/;"	q	component:BIDIR
-oe	input.vhd	/^    oe: in std_logic;$/;"	q	component:BIDIR
-op_fb	input.vhd	/^    op_fb: out std_logic;$/;"	q	component:BIDIR
-op	input.vhd	/^    op: inout std_logic$/;"	q	component:BIDIR
+DFFE	input.vhd	/^  component DFFE port ($/;"	C	package:primitive
+d	input.vhd	/^    d: in std_logic;$/;"	q	component:primitive.DFFE
+q	input.vhd	/^    q: out std_logic;$/;"	q	component:primitive.DFFE
+en	input.vhd	/^    en: in std_logic;$/;"	q	component:primitive.DFFE
+clk	input.vhd	/^    clk: in std_logic$/;"	q	component:primitive.DFFE
+DFFE_SR	input.vhd	/^  component DFFE_SR port ($/;"	C	package:primitive
+d	input.vhd	/^    d: in std_logic;$/;"	q	component:primitive.DFFE_SR
+en	input.vhd	/^    en: in std_logic;$/;"	q	component:primitive.DFFE_SR
+clk	input.vhd	/^    clk: in std_logic;$/;"	q	component:primitive.DFFE_SR
+rst	input.vhd	/^    rst: in std_logic;$/;"	q	component:primitive.DFFE_SR
+prst	input.vhd	/^    prst: in std_logic;$/;"	q	component:primitive.DFFE_SR
+q	input.vhd	/^    q: out std_logic$/;"	q	component:primitive.DFFE_SR
+DLATCHH	input.vhd	/^  component DLATCHH port ($/;"	C	package:primitive
+d	input.vhd	/^    d: in std_logic;$/;"	q	component:primitive.DLATCHH
+en	input.vhd	/^    en: in std_logic;$/;"	q	component:primitive.DLATCHH
+q	input.vhd	/^    q: out std_logic$/;"	q	component:primitive.DLATCHH
+AND2	input.vhd	/^  component AND2 port ($/;"	C	package:primitive
+i1	input.vhd	/^    i1: in std_logic;$/;"	q	component:primitive.AND2
+i2	input.vhd	/^    i2: in std_logic;$/;"	q	component:primitive.AND2
+y	input.vhd	/^    y: out std_logic$/;"	q	component:primitive.AND2
+OR2	input.vhd	/^  component OR2 port ($/;"	C	package:primitive
+i1	input.vhd	/^    i1: in std_logic;$/;"	q	component:primitive.OR2
+i2	input.vhd	/^    i2: in std_logic;$/;"	q	component:primitive.OR2
+y	input.vhd	/^    y: out std_logic$/;"	q	component:primitive.OR2
+INVERTER	input.vhd	/^  component INVERTER port ($/;"	C	package:primitive
+i	input.vhd	/^    i: in std_logic;$/;"	q	component:primitive.INVERTER
+o	input.vhd	/^    o: out std_logic$/;"	q	component:primitive.INVERTER
+TRIBUF	input.vhd	/^  component TRIBUF port ($/;"	C	package:primitive
+ip	input.vhd	/^    ip: in std_logic;$/;"	q	component:primitive.TRIBUF
+oe	input.vhd	/^    oe: in std_logic;$/;"	q	component:primitive.TRIBUF
+op	input.vhd	/^    op: out std_logic$/;"	q	component:primitive.TRIBUF
+BIDIR	input.vhd	/^  component BIDIR port ($/;"	C	package:primitive
+ip	input.vhd	/^    ip: in std_logic;$/;"	q	component:primitive.BIDIR
+oe	input.vhd	/^    oe: in std_logic;$/;"	q	component:primitive.BIDIR
+op_fb	input.vhd	/^    op_fb: out std_logic;$/;"	q	component:primitive.BIDIR
+op	input.vhd	/^    op: inout std_logic$/;"	q	component:primitive.BIDIR
 DFFE	input.vhd	/^entity DFFE is port ($/;"	e
 d	input.vhd	/^    d: in std_logic;$/;"	q	entity:DFFE
 q	input.vhd	/^    q: out std_logic;$/;"	q	entity:DFFE
@@ -1163,15 +1163,15 @@ lg_n	input.vhd	/^signal la_n, lb_n, lc_n, ld_n, le_n, lf_n, lg_n: std_logic;$/;"
 oe	input.vhd	/^signal oe: std_logic;$/;"	s	architecture:behavioral
 sevenSegmentTB	input.vhd	/^entity sevenSegmentTB is$/;"	e
 testbench	input.vhd	/^architecture testbench of sevenSegmentTB is$/;"	a	entity:sevenSegmentTB
-sevenSegment	input.vhd	/^component sevenSegment port ($/;"	C
-bcdInputs	input.vhd	/^  bcdInputs: in std_logic_vector (3 downto 0);$/;"	q	component:sevenSegment
-a_n	input.vhd	/^  a_n, b_n, c_n, d_n,$/;"	q	component:sevenSegment
-b_n	input.vhd	/^  a_n, b_n, c_n, d_n,$/;"	q	component:sevenSegment
-c_n	input.vhd	/^  a_n, b_n, c_n, d_n,$/;"	q	component:sevenSegment
-d_n	input.vhd	/^  a_n, b_n, c_n, d_n,$/;"	q	component:sevenSegment
-e_n	input.vhd	/^  e_n, f_n, g_n: out std_logic$/;"	q	component:sevenSegment
-f_n	input.vhd	/^  e_n, f_n, g_n: out std_logic$/;"	q	component:sevenSegment
-g_n	input.vhd	/^  e_n, f_n, g_n: out std_logic$/;"	q	component:sevenSegment
+sevenSegment	input.vhd	/^component sevenSegment port ($/;"	C	architecture:testbench
+bcdInputs	input.vhd	/^  bcdInputs: in std_logic_vector (3 downto 0);$/;"	q	component:testbench.sevenSegment
+a_n	input.vhd	/^  a_n, b_n, c_n, d_n,$/;"	q	component:testbench.sevenSegment
+b_n	input.vhd	/^  a_n, b_n, c_n, d_n,$/;"	q	component:testbench.sevenSegment
+c_n	input.vhd	/^  a_n, b_n, c_n, d_n,$/;"	q	component:testbench.sevenSegment
+d_n	input.vhd	/^  a_n, b_n, c_n, d_n,$/;"	q	component:testbench.sevenSegment
+e_n	input.vhd	/^  e_n, f_n, g_n: out std_logic$/;"	q	component:testbench.sevenSegment
+f_n	input.vhd	/^  e_n, f_n, g_n: out std_logic$/;"	q	component:testbench.sevenSegment
+g_n	input.vhd	/^  e_n, f_n, g_n: out std_logic$/;"	q	component:testbench.sevenSegment
 vector	input.vhd	/^type vector is record$/;"	t	architecture:testbench
 bcdStimulus	input.vhd	/^  bcdStimulus: std_logic_vector(3 downto 0);$/;"	r
 sevSegOut	input.vhd	/^  sevSegOut: std_logic_vector(6 downto 0);$/;"	r
@@ -1227,18 +1227,18 @@ b	input.vhd	/^  b: out std_logic$/;"	q	entity:signalDemo
 basic	input.vhd	/^architecture basic of signalDemo is$/;"	a	entity:signalDemo
 c	input.vhd	/^signal c: std_logic;$/;"	s	architecture:basic
 simPrimitives	input.vhd	/^package simPrimitives is$/;"	P
-OR2	input.vhd	/^  component OR2$/;"	C
-tPD	input.vhd	/^    generic (tPD: time := 1 ns);$/;"	g	component:OR2
-I1	input.vhd	/^    port (I1, I2: in std_logic;$/;"	q	component:OR2
-I2	input.vhd	/^    port (I1, I2: in std_logic;$/;"	q	component:OR2
-Y	input.vhd	/^          Y: out std_logic$/;"	q	component:OR2
-SimDFF	input.vhd	/^  component SimDFF$/;"	C
-tCQ	input.vhd	/^  generic(tCQ: time := 1 ns;$/;"	g	component:SimDFF
-tS	input.vhd	/^          tS : time := 1 ns;$/;"	g	component:SimDFF
-tH	input.vhd	/^          tH : time := 1 ns$/;"	g	component:SimDFF
-D	input.vhd	/^  port (D, Clk: in std_logic;$/;"	q	component:SimDFF
-Clk	input.vhd	/^  port (D, Clk: in std_logic;$/;"	q	component:SimDFF
-Q	input.vhd	/^        Q: out std_logic$/;"	q	component:SimDFF
+OR2	input.vhd	/^  component OR2$/;"	C	package:simPrimitives
+tPD	input.vhd	/^    generic (tPD: time := 1 ns);$/;"	g	component:simPrimitives.OR2
+I1	input.vhd	/^    port (I1, I2: in std_logic;$/;"	q	component:simPrimitives.OR2
+I2	input.vhd	/^    port (I1, I2: in std_logic;$/;"	q	component:simPrimitives.OR2
+Y	input.vhd	/^          Y: out std_logic$/;"	q	component:simPrimitives.OR2
+SimDFF	input.vhd	/^  component SimDFF$/;"	C	package:simPrimitives
+tCQ	input.vhd	/^  generic(tCQ: time := 1 ns;$/;"	g	component:simPrimitives.SimDFF
+tS	input.vhd	/^          tS : time := 1 ns;$/;"	g	component:simPrimitives.SimDFF
+tH	input.vhd	/^          tH : time := 1 ns$/;"	g	component:simPrimitives.SimDFF
+D	input.vhd	/^  port (D, Clk: in std_logic;$/;"	q	component:simPrimitives.SimDFF
+Clk	input.vhd	/^  port (D, Clk: in std_logic;$/;"	q	component:simPrimitives.SimDFF
+Q	input.vhd	/^        Q: out std_logic$/;"	q	component:simPrimitives.SimDFF
 OR2	input.vhd	/^entity OR2 is$/;"	e
 tPD	input.vhd	/^  generic (tPD: time := 1 ns);$/;"	g	entity:OR2
 I1	input.vhd	/^  port (I1, I2: in std_logic;$/;"	q	entity:OR2
@@ -1266,10 +1266,10 @@ clk	input.vhd	/^    clk: in std_logic;$/;"	q	entity:SRFF
 q	input.vhd	/^    q: out std_logic$/;"	q	entity:SRFF
 rtl	input.vhd	/^architecture rtl of SRFF is$/;"	a	entity:SRFF
 scaleable	input.vhd	/^package scaleable is$/;"	P
-scaleUpCnt	input.vhd	/^  component scaleUpCnt port ($/;"	C
-clk	input.vhd	/^    clk: in std_logic;$/;"	q	component:scaleUpCnt
-reset	input.vhd	/^    reset: in std_logic;$/;"	q	component:scaleUpCnt
-cnt	input.vhd	/^    cnt: in std_logic_vector$/;"	q	component:scaleUpCnt
+scaleUpCnt	input.vhd	/^  component scaleUpCnt port ($/;"	C	package:scaleable
+clk	input.vhd	/^    clk: in std_logic;$/;"	q	component:scaleable.scaleUpCnt
+reset	input.vhd	/^    reset: in std_logic;$/;"	q	component:scaleable.scaleUpCnt
+cnt	input.vhd	/^    cnt: in std_logic_vector$/;"	q	component:scaleable.scaleUpCnt
 scaleUpCnt	input.vhd	/^entity scaleUpCnt is port ($/;"	e
 clk	input.vhd	/^  clk: in std_logic;$/;"	q	entity:scaleUpCnt
 reset	input.vhd	/^  reset: in std_logic;$/;"	q	entity:scaleUpCnt

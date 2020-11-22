@@ -718,7 +718,7 @@ static void parseModuleDecl (tokenInfo * const token, int parent)
 	TRACE_LEAVE ();
 }
 
-static void parseModule (tokenInfo * const token)
+static void parseModule (tokenInfo * const token, int parent)
 {
 	tokenInfo *const name = newToken ();
 	const vhdlKind kind = isKeyword (token, KEYWORD_ENTITY) ?
@@ -729,7 +729,7 @@ static void parseModule (tokenInfo * const token)
 	readToken (token);
 	if (kind == VHDLTAG_COMPONENT || isKeyword (token, KEYWORD_IS))
 	{
-		int index = makeVhdlTag (name, kind);
+		int index = makeVhdlTagWithScope (name, kind, parent);
 		if (isKeyword (token, KEYWORD_IS))
 			readToken (token);
 		parseModuleDecl (token, index);
@@ -911,10 +911,10 @@ static void parseKeywords (tokenInfo * const token, int index)
 		parseTypes (token, index);
 		break;
 	case KEYWORD_ENTITY:
-		parseModule (token);
+		parseModule (token, index);
 		break;
 	case KEYWORD_COMPONENT:
-		parseModule (token);
+		parseModule (token, index);
 		break;
 	case KEYWORD_FUNCTION:
 		parseSubProgram (token, index);
