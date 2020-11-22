@@ -203,6 +203,7 @@ typedef enum {
 	VHDLTAG_SIGNAL,
 	VHDLTAG_PROCESS,
 	VHDLTAG_VARIABLE,
+	VHDLTAG_ALIAS,
 } vhdlKind;
 
 static kindDefinition VhdlKinds[] = {
@@ -224,6 +225,7 @@ static kindDefinition VhdlKinds[] = {
 	{true , 's', "signal", "signal declarations"},
 	{true, 'Q',  "process", "processes"},
 	{true, 'v',  "variable", "variables"},
+	{true, 'A',  "alias", "aliases"},
 };
 
 static const keywordTable VhdlKeywordTable[] = {
@@ -969,6 +971,12 @@ static void parseVariable (tokenInfo * const token, int parent)
 	parseDeclElement (token, VHDLTAG_VARIABLE, parent, true);
 }
 
+static void parseAlias (tokenInfo * const token, int parent)
+{
+	readToken (token);
+	parseDeclElement (token, VHDLTAG_ALIAS, parent, true);
+}
+
 /* TODO */
 /* records */
 static void parseKeywords (tokenInfo * const token, vString * label, int index)
@@ -1013,6 +1021,9 @@ static void parseKeywords (tokenInfo * const token, vString * label, int index)
 		break;
 	case KEYWORD_VARIABLE:
 		parseVariable (token, index);
+		break;
+	case KEYWORD_ALIAS:
+		parseAlias (token, index);
 		break;
 	default:
 		if (isType (token, TOKEN_IDENTIFIER))

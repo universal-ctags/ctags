@@ -229,6 +229,14 @@ IoIntStatReg	input.vhd	/^  constant  IoIntStatReg: std_logic_vector(16 downto 0)
 RstCtrlReg	input.vhd	/^  constant  RstCtrlReg:   std_logic_vector(16 downto 0) := "00000000000000010";$/;"	c	architecture:isa_dec.synthesis
 AtcStatusReg	input.vhd	/^  constant  AtcStatusReg: std_logic_vector(16 downto 0) := "00000000000000011";$/;"	c	architecture:isa_dec.synthesis
 MgmtStatusReg	input.vhd	/^  constant  MgmtStatusReg:std_logic_vector(16 downto 0) := "00000000000000100";$/;"	c	architecture:isa_dec.synthesis
+sio_dec_n	input.vhd	/^  alias sio_dec_n: std_logic is        decOut_n(5);$/;"	A	architecture:isa_dec.synthesis
+rst_ctrl_rd_n	input.vhd	/^  alias rst_ctrl_rd_n: std_logic is    decOut_n(4);$/;"	A	architecture:isa_dec.synthesis
+atc_stat_rd_n	input.vhd	/^  alias atc_stat_rd_n: std_logic is    decOut_n(3);$/;"	A	architecture:isa_dec.synthesis
+mgmt_stat_rd_n	input.vhd	/^  alias mgmt_stat_rd_n: std_logic is   decOut_n(2);$/;"	A	architecture:isa_dec.synthesis
+io_int_stat_rd_n	input.vhd	/^  alias io_int_stat_rd_n: std_logic is decOut_n(1);$/;"	A	architecture:isa_dec.synthesis
+int_ctrl_rd_n	input.vhd	/^  alias int_ctrl_rd_n: std_logic is    decOut_n(0);$/;"	A	architecture:isa_dec.synthesis
+upper	input.vhd	/^  alias upper: std_logic_vector(2 downto 0) is dev_adr(19 downto 17);$/;"	A	architecture:isa_dec.synthesis
+CtrlBits	input.vhd	/^  alias CtrlBits: std_logic_vector(16 downto 0) is dev_adr(16 downto 0);$/;"	A	architecture:isa_dec.synthesis
 decoder	input.vhd	/^  decoder: process (upper, CtrlBits)$/;"	Q
 isa_dec	input.vhd	/^entity isa_dec is port$/;"	e
 dev_adr	input.vhd	/^  dev_adr:          in std_logic_vector(19 downto 0);$/;"	q	entity:isa_dec
