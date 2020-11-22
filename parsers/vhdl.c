@@ -726,7 +726,7 @@ static void parseModule (tokenInfo * const token, int parent)
 	deleteToken (name);
 }
 
-static void parseRecord (tokenInfo * const token)
+static void parseRecord (tokenInfo * const token, int parent)
 {
 	tokenInfo *const name = newToken ();
 	Assert (isKeyword (token, KEYWORD_RECORD));
@@ -735,7 +735,7 @@ static void parseRecord (tokenInfo * const token)
 	{
 		readToken (token);	/* should be a colon */
 		skipToCharacterInInputFile (';');
-		makeVhdlTag (name, VHDLTAG_RECORD);
+		makeVhdlTagWithScope (name, VHDLTAG_RECORD, parent);
 		readToken (name);
 	}
 	while (!isKeyword (name, KEYWORD_END) && !isType (name, TOKEN_EOF));
@@ -757,9 +757,9 @@ static void parseTypes (tokenInfo * const token, int parent)
 		readToken (token);	/* type */
 		if (isKeyword (token, KEYWORD_RECORD))
 		{
-			makeVhdlTagWithScope (name, kind, parent);
+			int index = makeVhdlTagWithScope (name, kind, parent);
 			/*TODO: make tags of the record's names */
-			parseRecord (token);
+			parseRecord (token, index);
 		}
 		else
 		{

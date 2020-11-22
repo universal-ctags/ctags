@@ -468,9 +468,9 @@ op_enable	input.vhd	/^  op_enable: in std_logic;$/;"	q	entity:dffTri
 qout	input.vhd	/^  qout: out std_logic_vector(size - 1 downto 0)$/;"	q	entity:dffTri
 parameterize	input.vhd	/^architecture parameterize of dffTri is$/;"	a	entity:dffTri
 tribufType	input.vhd	/^type tribufType is record$/;"	t	architecture:dffTri.parameterize
-ip	input.vhd	/^  ip: std_logic;$/;"	r
-oe	input.vhd	/^  oe: std_logic;$/;"	r
-op	input.vhd	/^  op: std_logic;$/;"	r
+ip	input.vhd	/^  ip: std_logic;$/;"	r	type:dffTri.parameterize.tribufType
+oe	input.vhd	/^  oe: std_logic;$/;"	r	type:dffTri.parameterize.tribufType
+op	input.vhd	/^  op: std_logic;$/;"	r	type:dffTri.parameterize.tribufType
 tribufArrayType	input.vhd	/^type tribufArrayType is array (integer range <>) of tribufType;$/;"	t	architecture:dffTri.parameterize
 tri	input.vhd	/^signal tri: tribufArrayType(size - 1 downto 0);$/;"	s	architecture:dffTri.parameterize
 DFF	input.vhd	/^entity DFF is port ($/;"	e
@@ -768,10 +768,10 @@ clk	input.vhd	/^    clk: in std_logic;$/;"	q	component:loadCntTB.testbench.loadC
 rst	input.vhd	/^    rst: in std_logic;$/;"	q	component:loadCntTB.testbench.loadCnt
 q	input.vhd	/^    q: out std_logic_vector (7 downto 0)$/;"	q	component:loadCntTB.testbench.loadCnt
 vectorType	input.vhd	/^type vectorType is record$/;"	t	architecture:loadCntTB.testbench
-data	input.vhd	/^  data: std_logic_vector(7 downto 0);$/;"	r
-load	input.vhd	/^  load: std_logic;$/;"	r
-rst	input.vhd	/^  rst: std_logic;$/;"	r
-q	input.vhd	/^  q: std_logic_vector(7 downto 0);$/;"	r
+data	input.vhd	/^  data: std_logic_vector(7 downto 0);$/;"	r	type:loadCntTB.testbench.vectorType
+load	input.vhd	/^  load: std_logic;$/;"	r	type:loadCntTB.testbench.vectorType
+rst	input.vhd	/^  rst: std_logic;$/;"	r	type:loadCntTB.testbench.vectorType
+q	input.vhd	/^  q: std_logic_vector(7 downto 0);$/;"	r	type:loadCntTB.testbench.vectorType
 testVector	input.vhd	/^signal testVector: vectorType;$/;"	s	architecture:loadCntTB.testbench
 TestClk	input.vhd	/^signal TestClk: std_logic := '0';$/;"	s	architecture:loadCntTB.testbench
 Qout	input.vhd	/^signal Qout: std_logic_vector(7 downto 0);$/;"	s	architecture:loadCntTB.testbench
@@ -1173,8 +1173,8 @@ e_n	input.vhd	/^  e_n, f_n, g_n: out std_logic$/;"	q	component:sevenSegmentTB.te
 f_n	input.vhd	/^  e_n, f_n, g_n: out std_logic$/;"	q	component:sevenSegmentTB.testbench.sevenSegment
 g_n	input.vhd	/^  e_n, f_n, g_n: out std_logic$/;"	q	component:sevenSegmentTB.testbench.sevenSegment
 vector	input.vhd	/^type vector is record$/;"	t	architecture:sevenSegmentTB.testbench
-bcdStimulus	input.vhd	/^  bcdStimulus: std_logic_vector(3 downto 0);$/;"	r
-sevSegOut	input.vhd	/^  sevSegOut: std_logic_vector(6 downto 0);$/;"	r
+bcdStimulus	input.vhd	/^  bcdStimulus: std_logic_vector(3 downto 0);$/;"	r	type:sevenSegmentTB.testbench.vector
+sevSegOut	input.vhd	/^  sevSegOut: std_logic_vector(6 downto 0);$/;"	r	type:sevenSegmentTB.testbench.vector
 NumVectors	input.vhd	/^constant NumVectors: integer:= 17;$/;"	c	architecture:sevenSegmentTB.testbench
 PropDelay	input.vhd	/^constant PropDelay: time := 40 ns;$/;"	c	architecture:sevenSegmentTB.testbench
 SimLoopDelay	input.vhd	/^constant SimLoopDelay: time := 10 ns;$/;"	c	architecture:sevenSegmentTB.testbench
