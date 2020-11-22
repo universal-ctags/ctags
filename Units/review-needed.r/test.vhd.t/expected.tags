@@ -22,6 +22,8 @@ sum	input.vhd	/^        sum  : out std_logic_vector(n - 1 downto 0);$/;"	q	entit
 cout	input.vhd	/^        cout : out std_logic);$/;"	q	entity:pAdderAttr
 loopDemo	input.vhd	/^architecture loopDemo of pAdderAttr is$/;"	a	entity:pAdderAttr
 anonProcesscfc8de98010f	input.vhd	/^  process(a, b, cin)$/;"	Q
+carry	input.vhd	/^    variable carry: std_logic_vector(sum'length downto 0);$/;"	v	process:anonProcesscfc8de98010f
+localSum	input.vhd	/^    variable localSum: std_logic_vector(sum'high downto 0);$/;"	v	process:anonProcesscfc8de98010f
 adder	input.vhd	/^entity adder is port ($/;"	e
 a	input.vhd	/^  a,b: in unsigned(3 downto 0);$/;"	q	entity:adder
 b	input.vhd	/^  a,b: in unsigned(3 downto 0);$/;"	q	entity:adder
@@ -784,21 +786,76 @@ hex_logic_vector_t	input.vhd	/^    type     hex_logic_vector_t is$/;"	t	package:
 hexint2logic_t	input.vhd	/^    type     hexint2logic_t is $/;"	t	package:io1164
 hexint2logic	input.vhd	/^    constant hexint2logic  : hexint2logic_t := ($/;"	c	package:io1164
 read	input.vhd	/^    procedure read( l: inout line; value: out std_ulogic; good : out boolean ) is$/;"	p	package:io1164
+c	input.vhd	/^        variable c      : character;        -- char read while looping$/;"	v	procedure:io1164.read
+m	input.vhd	/^        variable m      : line;             -- safe copy of L$/;"	v	procedure:io1164.read
+success	input.vhd	/^        variable success: boolean := false; -- readable version of GOOD$/;"	v	procedure:io1164.read
+done	input.vhd	/^        variable done   : boolean := false; -- flag to say done reading chars$/;"	v	procedure:io1164.read
 read	input.vhd	/^    procedure read( l: inout line; value: out std_ulogic ) is$/;"	p	package:io1164
+success	input.vhd	/^        variable success: boolean;  -- internal good flag$/;"	v	procedure:io1164.read
 read	input.vhd	/^    procedure read(l    : inout line           ; $/;"	p	package:io1164
+m	input.vhd	/^        variable m           : line           ; -- saved copy of L$/;"	v	procedure:io1164.read
+success	input.vhd	/^        variable success     : boolean := true; -- readable GOOD$/;"	v	procedure:io1164.read
+logic_value	input.vhd	/^        variable logic_value : std_logic      ; -- value for one array element$/;"	v	procedure:io1164.read
+c	input.vhd	/^        variable c           : character      ; -- read a character$/;"	v	procedure:io1164.read
 read	input.vhd	/^    procedure read(l: inout line; value: out std_logic_vector ) is$/;"	p	package:io1164
+success	input.vhd	/^        variable success: boolean;$/;"	v	procedure:io1164.read
 write	input.vhd	/^    procedure write(l        : inout line          ;$/;"	p	package:io1164
 write	input.vhd	/^    procedure write(l        : inout line                   ;$/;"	p	package:io1164
+m	input.vhd	/^        variable m: line; -- build up intermediate string$/;"	v	procedure:io1164.write
 read_oct	input.vhd	/^    procedure read_oct(l         : inout line            ; $/;"	p	package:io1164
+m	input.vhd	/^        variable m               : line                      ; -- safe L$/;"	v	procedure:io1164.read_oct
+success	input.vhd	/^        variable success         : boolean            := true; -- readable GOOD$/;"	v	procedure:io1164.read_oct
+logic_value	input.vhd	/^        variable logic_value     : std_logic                 ; -- elem value$/;"	v	procedure:io1164.read_oct
+c	input.vhd	/^        variable c               : character                 ; -- char read$/;"	v	procedure:io1164.read_oct
+charcode	input.vhd	/^        variable charcode        : integer                   ; -- char->int$/;"	v	procedure:io1164.read_oct
+oct_logic_vector	input.vhd	/^        variable oct_logic_vector: oct_logic_vector_t        ; -- for 1 digit$/;"	v	procedure:io1164.read_oct
+bitpos	input.vhd	/^        variable bitpos          : integer                   ; -- in state vec.$/;"	v	procedure:io1164.read_oct
 read_oct	input.vhd	/^    procedure read_oct(l         : inout line            ; $/;"	p	package:io1164
+success	input.vhd	/^        variable success: boolean;                 -- internal good flag$/;"	v	procedure:io1164.read_oct
 write_oct	input.vhd	/^    procedure write_oct(l        : inout line                   ;$/;"	p	package:io1164
+m	input.vhd	/^        variable m            : line     ; -- safe copy of L$/;"	v	procedure:io1164.write_oct
+goodlength	input.vhd	/^        variable goodlength   : boolean  ; -- array is ok len for this base$/;"	v	procedure:io1164.write_oct
+isx	input.vhd	/^        variable isx          : boolean  ; -- an X in this digit$/;"	v	procedure:io1164.write_oct
+integer_value	input.vhd	/^        variable integer_value: integer  ; -- accumulate integer value$/;"	v	procedure:io1164.write_oct
+c	input.vhd	/^        variable c            : character; -- character read$/;"	v	procedure:io1164.write_oct
+charpos	input.vhd	/^        variable charpos      : integer  ; -- index string being contructed$/;"	v	procedure:io1164.write_oct
+bitpos	input.vhd	/^        variable bitpos       : integer  ; -- bit index inside digit$/;"	v	procedure:io1164.write_oct
 read_hex	input.vhd	/^    procedure read_hex(l         : inout line            ; $/;"	p	package:io1164
+m	input.vhd	/^        variable m               : line                      ; -- safe L$/;"	v	procedure:io1164.read_hex
+success	input.vhd	/^        variable success         : boolean            := true; -- readable GOOD$/;"	v	procedure:io1164.read_hex
+logic_value	input.vhd	/^        variable logic_value     : std_logic                 ; -- elem value$/;"	v	procedure:io1164.read_hex
+c	input.vhd	/^        variable c               : character                 ; -- char read$/;"	v	procedure:io1164.read_hex
+charcode	input.vhd	/^        variable charcode        : integer                   ; -- char->int$/;"	v	procedure:io1164.read_hex
+hex_logic_vector	input.vhd	/^        variable hex_logic_vector: hex_logic_vector_t        ; -- for 1 digit$/;"	v	procedure:io1164.read_hex
+bitpos	input.vhd	/^        variable bitpos          : integer                   ; -- in state vec.$/;"	v	procedure:io1164.read_hex
 read_hex	input.vhd	/^    procedure read_hex(l         : inout line            ; $/;"	p	package:io1164
+success	input.vhd	/^        variable success: boolean;                 -- internal good flag$/;"	v	procedure:io1164.read_hex
 write_hex	input.vhd	/^    procedure write_hex(l        : inout line                   ;$/;"	p	package:io1164
+m	input.vhd	/^        variable m            : line     ; -- safe copy of L$/;"	v	procedure:io1164.write_hex
+goodlength	input.vhd	/^        variable goodlength   : boolean  ; -- array is ok len for this base$/;"	v	procedure:io1164.write_hex
+isx	input.vhd	/^        variable isx          : boolean  ; -- an X in this digit$/;"	v	procedure:io1164.write_hex
+integer_value	input.vhd	/^        variable integer_value: integer  ; -- accumulate integer value$/;"	v	procedure:io1164.write_hex
+c	input.vhd	/^        variable c            : character; -- character read$/;"	v	procedure:io1164.write_hex
+charpos	input.vhd	/^        variable charpos      : integer  ; -- index string being contructed$/;"	v	procedure:io1164.write_hex
+bitpos	input.vhd	/^        variable bitpos       : integer  ; -- bit index inside digit$/;"	v	procedure:io1164.write_hex
 read_oct	input.vhd	/^    procedure read_oct(l     : inout line;$/;"	p	package:io1164
+pos	input.vhd	/^        variable pos     : integer;$/;"	v	procedure:io1164.read_oct
+digit	input.vhd	/^        variable digit   : integer;$/;"	v	procedure:io1164.read_oct
+result	input.vhd	/^        variable result  : integer := 0;$/;"	v	procedure:io1164.read_oct
+success	input.vhd	/^        variable success : boolean := true;$/;"	v	procedure:io1164.read_oct
+c	input.vhd	/^        variable c       : character;$/;"	v	procedure:io1164.read_oct
+old_l	input.vhd	/^        variable old_l   : line := l;$/;"	v	procedure:io1164.read_oct
 read_oct	input.vhd	/^    procedure read_oct(l     : inout line;$/;"	p	package:io1164
+success	input.vhd	/^        variable success: boolean;                 -- internal good flag$/;"	v	procedure:io1164.read_oct
 read_hex	input.vhd	/^    procedure read_hex(l     : inout line;$/;"	p	package:io1164
+pos	input.vhd	/^        variable pos     : integer;$/;"	v	procedure:io1164.read_hex
+digit	input.vhd	/^        variable digit   : integer;$/;"	v	procedure:io1164.read_hex
+result	input.vhd	/^        variable result  : integer := 0;$/;"	v	procedure:io1164.read_hex
+success	input.vhd	/^        variable success : boolean := true;$/;"	v	procedure:io1164.read_hex
+c	input.vhd	/^        variable c       : character;$/;"	v	procedure:io1164.read_hex
+old_l	input.vhd	/^        variable old_l   : line := l;$/;"	v	procedure:io1164.read_hex
 read_hex	input.vhd	/^    procedure read_hex(l     : inout line;$/;"	p	package:io1164
+success	input.vhd	/^        variable success: boolean;                 -- internal good flag$/;"	v	procedure:io1164.read_hex
 asyncLdCnt	input.vhd	/^entity asyncLdCnt is port ($/;"	e
 loadVal	input.vhd	/^  loadVal: in std_logic_vector(3 downto 0);$/;"	q	entity:asyncLdCnt
 clk	input.vhd	/^  clk, load: in std_logic;$/;"	q	entity:asyncLdCnt
@@ -835,7 +892,14 @@ TestClk	input.vhd	/^signal TestClk: std_logic := '0';$/;"	s	architecture:loadCnt
 Qout	input.vhd	/^signal Qout: std_logic_vector(7 downto 0);$/;"	s	architecture:loadCntTB.testbench
 ClkPeriod	input.vhd	/^constant ClkPeriod: time := 100 ns;$/;"	c	architecture:loadCntTB.testbench
 readVec	input.vhd	/^  readVec: process$/;"	Q
+VectorLine	input.vhd	/^    variable VectorLine: line;$/;"	v	process:readVec
+VectorValid	input.vhd	/^    variable VectorValid: boolean;$/;"	v	process:readVec
+vRst	input.vhd	/^    variable vRst: std_logic;$/;"	v	process:readVec
+vLoad	input.vhd	/^    variable vLoad: std_logic;$/;"	v	process:readVec
+vData	input.vhd	/^    variable vData: std_logic_vector(7 downto 0);$/;"	v	process:readVec
+vQ	input.vhd	/^    variable vQ: std_logic_vector(7 downto 0);$/;"	v	process:readVec
 verify	input.vhd	/^  verify: process (TestClk)$/;"	Q
+ErrorMsg	input.vhd	/^  variable ErrorMsg: line;$/;"	v	process:verify
 loadCnt	input.vhd	/^entity loadCnt is port ($/;"	e
 data	input.vhd	/^  data: in std_logic_vector (7 downto 0);$/;"	q	entity:loadCnt
 load	input.vhd	/^  load: in std_logic;$/;"	q	entity:loadCnt
@@ -860,6 +924,7 @@ tPD_A	input.vhd	/^constant tPD_A:   time := 10 ns;$/;"	c	architecture:mux.simMod
 tPD_B	input.vhd	/^constant tPD_B:   time := 15 ns;$/;"	c	architecture:mux.simModel
 tPD_Sel	input.vhd	/^constant tPD_Sel: time := 5 ns;$/;"	c	architecture:mux.simModel
 DelayMux	input.vhd	/^  DelayMux: process (A, B, Sel)$/;"	Q
+localY	input.vhd	/^  variable localY: std_logic; -- Zero delay place holder for Y$/;"	v	process:DelayMux
 ForceShare	input.vhd	/^entity ForceShare is port ($/;"	e
 a	input.vhd	/^  a,b,c,d,e,f: in std_logic_vector (7 downto 0);$/;"	q	entity:ForceShare
 b	input.vhd	/^  a,b,c,d,e,f: in std_logic_vector (7 downto 0);$/;"	q	entity:ForceShare
@@ -915,6 +980,7 @@ ad	input.vhd	/^  port (ad: in std_logic_vector (width - 1 downto 0);$/;"	q	entit
 oddParity	input.vhd	/^        oddParity : out std_logic ) ;$/;"	q	entity:oddParityLoop
 scaleable	input.vhd	/^architecture scaleable of oddParityLoop is$/;"	a	entity:oddParityLoop
 anonProcesscfc8de98190f	input.vhd	/^  process (ad) $/;"	Q
+loopXor	input.vhd	/^    variable loopXor: std_logic;$/;"	v	process:anonProcesscfc8de98190f
 OR2	input.vhd	/^entity OR2 is port ($/;"	e
 i1	input.vhd	/^    i1: in std_logic;$/;"	q	entity:OR2
 i2	input.vhd	/^    i2: in std_logic;$/;"	q	entity:OR2
@@ -977,6 +1043,7 @@ inputVal	input.vhd	/^  inputVal : in  unsigned(3 downto 0);$/;"	q	entity:powerOf
 power	input.vhd	/^  power    : out unsigned(15 downto 0)$/;"	q	entity:powerOfFour
 behavioral	input.vhd	/^architecture behavioral of powerOfFour is$/;"	a	entity:powerOfFour
 Pow	input.vhd	/^   function Pow( N, Exp : integer )  return integer is$/;"	f	architecture:powerOfFour.behavioral
+Result	input.vhd	/^      Variable Result   : integer := 1;$/;"	v	function:powerOfFour.behavioral.Pow
 inputValInt	input.vhd	/^signal inputValInt: integer range 0 to 15;$/;"	s	architecture:powerOfFour.behavioral
 powerL	input.vhd	/^signal powerL: integer range 0 to 65535;$/;"	s	architecture:powerOfFour.behavioral
 anonProcesscfc8de981a0f	input.vhd	/^   process begin$/;"	Q
@@ -991,6 +1058,8 @@ inputVal	input.vhd	/^   inputVal              : in  bit_vector(0 to 3);$/;"	q	en
 power	input.vhd	/^   power                 : out bit_vector(0 to 15) );$/;"	q	entity:Power
 funky	input.vhd	/^architecture funky of Power is$/;"	a	entity:Power
 Pow	input.vhd	/^   function Pow( N, Exp : integer )  return integer is$/;"	f	architecture:Power.funky
+Result	input.vhd	/^      Variable Result   : integer := 1;$/;"	v	function:Power.funky.Pow
+i	input.vhd	/^      Variable i        : integer := 0;$/;"	v	function:Power.funky.Pow
 RollVal	input.vhd	/^   function RollVal(  CntlVal : integer )  return integer is$/;"	f	architecture:Power.funky
 anonProcesscfc8de981b0f	input.vhd	/^   process $/;"	Q
 priority_encoder	input.vhd	/^entity priority_encoder is port$/;"	e
@@ -999,6 +1068,8 @@ priority	input.vhd	/^   priority   : in  std_logic_vector(2 downto 0);$/;"	q	ent
 result	input.vhd	/^   result     : out std_logic_vector(2 downto 0)$/;"	q	entity:priority_encoder
 behave	input.vhd	/^architecture behave of priority_encoder is$/;"	a	entity:priority_encoder
 anonProcesscfc8de981c0f	input.vhd	/^  process (interrupts)$/;"	Q
+selectIn	input.vhd	/^     variable selectIn  : integer;$/;"	v	process:anonProcesscfc8de981c0f
+LoopCount	input.vhd	/^     variable LoopCount : integer;$/;"	v	process:anonProcesscfc8de981c0f
 primitive	input.vhd	/^package primitive is$/;"	P
 DFFE	input.vhd	/^  component DFFE port ($/;"	C	package:primitive
 d	input.vhd	/^    d: in std_logic;$/;"	q	component:primitive.DFFE
@@ -1197,6 +1268,7 @@ inputVal	input.vhd	/^  inputVal : in  std_logic_vector(3 downto 0);$/;"	q	entity
 power	input.vhd	/^  power    : out std_logic_vector(15 downto 0)$/;"	q	entity:powerOfFour
 behavioral	input.vhd	/^architecture behavioral of powerOfFour is$/;"	a	entity:powerOfFour
 Pow	input.vhd	/^   function Pow( N, Exp : integer )  return integer is$/;"	f	architecture:powerOfFour.behavioral
+Result	input.vhd	/^      Variable Result   : integer := 1;$/;"	v	function:powerOfFour.behavioral.Pow
 anonProcesscfc8de98210f	input.vhd	/^   process begin$/;"	Q
 powerOfFour	input.vhd	/^entity powerOfFour is port($/;"	e
 clk	input.vhd	/^  clk      : in  std_logic; $/;"	q	entity:powerOfFour
@@ -1204,6 +1276,7 @@ inputVal	input.vhd	/^  inputVal : in  std_logic_vector(3 downto 0);$/;"	q	entity
 power	input.vhd	/^  power    : out std_logic_vector(15 downto 0)$/;"	q	entity:powerOfFour
 behavioral	input.vhd	/^architecture behavioral of powerOfFour is$/;"	a	entity:powerOfFour
 Pow	input.vhd	/^   function Pow( N, Exp : integer )  return integer is$/;"	f	architecture:powerOfFour.behavioral
+Result	input.vhd	/^      Variable Result   : integer := 1;$/;"	v	function:powerOfFour.behavioral.Pow
 anonProcesscfc8de98220f	input.vhd	/^   process begin$/;"	Q
 regFile	input.vhd	/^entity regFile is port ($/;"	e
 clk	input.vhd	/^  clk, rst: in std_logic;$/;"	q	entity:regFile
@@ -1217,6 +1290,7 @@ reg	input.vhd	/^subtype reg is std_logic_vector(31 downto 0);$/;"	T	architecture
 regArray	input.vhd	/^type regArray is array (integer range <>) of reg;$/;"	t	architecture:regFile.behavioral
 registerFile	input.vhd	/^signal registerFile: regArray(0 to 3);$/;"	s	architecture:regFile.behavioral
 regProc	input.vhd	/^  regProc: process (clk, rst) $/;"	Q
+i	input.vhd	/^  variable i: integer;$/;"	v	process:regProc
 outputs	input.vhd	/^  outputs: process(regSel, registerFile) begin$/;"	Q
 DFF	input.vhd	/^entity DFF is port ($/;"	e
 d1	input.vhd	/^    d1,d2: in std_logic;$/;"	q	entity:DFF
@@ -1281,6 +1355,9 @@ vectorTable	input.vhd	/^constant vectorTable: vectorArray := ($/;"	c	architectur
 StimInputs	input.vhd	/^signal StimInputs: std_logic_vector(3 downto 0);$/;"	s	architecture:sevenSegmentTB.testbench
 CaptureOutputs	input.vhd	/^signal CaptureOutputs: std_logic_vector(6 downto 0);$/;"	s	architecture:sevenSegmentTB.testbench
 LoopStim	input.vhd	/^  LoopStim: process$/;"	Q
+FoundError	input.vhd	/^    variable FoundError: boolean := false;$/;"	v	process:LoopStim
+TempVector	input.vhd	/^    variable TempVector: vector;$/;"	v	process:LoopStim
+ErrorMsgLine	input.vhd	/^    variable ErrorMsgLine: line;$/;"	v	process:LoopStim
 sevenSegment	input.vhd	/^entity sevenSegment is port ($/;"	e
 bcdInputs	input.vhd	/^  bcdInputs: in std_logic_vector (3 downto 0);$/;"	q	entity:sevenSegment
 a_n	input.vhd	/^  a_n, b_n, c_n, d_n,$/;"	q	entity:sevenSegment
@@ -1302,6 +1379,7 @@ f	input.vhd	/^  a,b,c,d,e,f: in std_logic_vector (7 downto 0);$/;"	q	entity:Forc
 result	input.vhd	/^  result: out std_logic_vector(7 downto 0)$/;"	q	entity:ForceShare
 behaviour	input.vhd	/^architecture behaviour of ForceShare is$/;"	a	entity:ForceShare
 sum	input.vhd	/^  sum: process (a,c,b,d,e,f)$/;"	Q
+tempSum	input.vhd	/^  variable tempSum: std_logic_vector(7 downto 0);$/;"	v	process:sum
 shifter	input.vhd	/^entity shifter is port ($/;"	e
 clk	input.vhd	/^  clk, rst: in std_logic;$/;"	q	entity:shifter
 rst	input.vhd	/^  clk, rst: in std_logic;$/;"	q	entity:shifter
