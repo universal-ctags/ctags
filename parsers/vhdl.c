@@ -201,6 +201,7 @@ typedef enum {
 	VHDLTAG_PORT,
 	VHDLTAG_GENERIC,
 	VHDLTAG_SIGNAL,
+	VHDLTAG_PROCESS,
 } vhdlKind;
 
 static kindDefinition VhdlKinds[] = {
@@ -220,6 +221,7 @@ static kindDefinition VhdlKinds[] = {
 	{true, 'q', "port", "port declarations"},
 	{true, 'g', "generic", "generic declarations"},
 	{true , 's', "signal", "signal declarations"},
+	{true, 'Q',  "process", "processes"},
 };
 
 static const keywordTable VhdlKeywordTable[] = {
@@ -333,7 +335,7 @@ static fieldDefinition VhdlFields [] = {
 /*
  *   FUNCTION DECLARATIONS
  */
-static void parseKeywords (tokenInfo * const token, int parent);
+static void parseKeywords (tokenInfo * const token, vString * label, int parent);
 
 /*
  *   FUNCTION DEFINITIONS
@@ -599,7 +601,7 @@ static void parseTillEnd (tokenInfo * const token, int parent, const int end_key
 			}
 			else
 			{
-				parseKeywords (token, parent);
+				parseKeywords (token, NULL, parent);
 			}
 		}
 	} while (!ended);
@@ -615,7 +617,7 @@ static void parseTillBegin (tokenInfo * const token, int parent)
 			|| isType (token, TOKEN_EOF))
 			begun = true;
 		else
-			parseKeywords (token, parent);
+			parseKeywords (token, NULL, parent);
 	} while (!begun);
 }
 
@@ -923,9 +925,45 @@ static void parseSignal (tokenInfo * const token, int parent)
 	parseDeclElement (token, VHDLTAG_SIGNAL, parent, true);
 }
 
+static void parseLabel (tokenInfo * const name, int parent)
+{
+	tokenInfo *const token = newToken ();
+
+	readToken (token);
+	if (isType (token, TOKEN_COLON))
+	{
+		readToken (token);
+		if (isType (token, TOKEN_KEYWORD))
+			parseKeywords (token, name->string, parent);
+	}
+	deleteToken (token);
+}
+
+static void parseProcess (tokenInfo * const token, vString * label, int parent)
+{
+	vString *process = label? label: vStringNew();
+
+	if (label == NULL)
+		anonGenerate (process, "anonProcess", VHDLTAG_PROCESS);
+
+	int index = makeSimpleTag (process, VHDLTAG_PROCESS);
+
+	if (label == NULL)
+	{
+		tagEntryInfo *e = getEntryInCorkQueue (index);
+		if (e)
+			markTagExtraBit (e, XTAG_ANONYMOUS);
+		vStringDelete (process);
+	}
+
+	skipToMatched (token);
+	parseTillBegin (token, index);
+	parseTillEnd (token, index, KEYWORD_PROCESS);
+}
+
 /* TODO */
 /* records */
-static void parseKeywords (tokenInfo * const token, int index)
+static void parseKeywords (tokenInfo * const token, vString * label, int index)
 {
 	switch (token->keyword)
 	{
@@ -962,7 +1000,12 @@ static void parseKeywords (tokenInfo * const token, int index)
 	case KEYWORD_SIGNAL:
 		parseSignal (token, index);
 		break;
+	case KEYWORD_PROCESS:
+		parseProcess (token, label, index);
+		break;
 	default:
+		if (isType (token, TOKEN_IDENTIFIER))
+			parseLabel (token, index);
 		break;
 	}
 }
@@ -972,7 +1015,7 @@ static tokenType parseVhdlFile (tokenInfo * const token)
 	do
 	{
 		readToken (token);
-		parseKeywords (token, CORK_NIL);
+		parseKeywords (token, NULL, CORK_NIL);
 	} while (!isKeyword (token, KEYWORD_END) && !isType (token, TOKEN_EOF));
 	return token->type;
 }
