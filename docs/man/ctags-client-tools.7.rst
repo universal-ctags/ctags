@@ -415,24 +415,24 @@ using this regexp.
 Remark: About a Previous Format of the Pattern Field
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-In some earlier versions of ctags, the line number in the
-pattern field is the actual line number minus one, for forward search patterns;
-or plus one, for backward search patterns. The idea is to resemble an EX
-command: you go to the line, then search forward/backward for the pattern, and
-you can always find the correct one. But the developers found this denies the
-purpose of using a search pattern: to tolerate file updates. For example, the
-tag is at line 50, according to this scheme, the pattern field should be::
+In some earlier versions of Universal-ctags, the line number in the pattern
+field is the actual line number minus one, for forward search patterns; or plus
+one, for backward search patterns. The idea is to resemble an EX command: you
+go to the line, then search forward/backward for the pattern, and you can
+always find the correct one. But this denies the purpose of using a search
+pattern: to tolerate file updates. For example, the tag is at line 50,
+according to this scheme, the pattern field should be::
 
 	49;/pat/;"
 
 Then let's assume that some code above are removed, and the tag is now at
 line 45. Now you can't find it if you search forward from line 49.
 
-Due to this reason, ctags turns to use the actual line number. A client tool
-could distinguish them by the ``TAG_OUTPUT_EXCMD`` pseudo tag, it's "combine"
-for the old scheme, and "combineV2" for the present scheme. But probably
-there's no need to treat them differently, since "search for the nearest
-occurence from the line" gives good result on both schemes.
+Due to this reason, Universal-ctags turns to use the actual line number. A
+client tool could distinguish them by the ``TAG_OUTPUT_EXCMD`` pseudo tag, it's
+"combine" for the old scheme, and "combineV2" for the present scheme. But
+probably there's no need to treat them differently, since "search for the
+nearest occurence from the line" gives good result on both schemes.
 
 SEE ALSO
 --------
