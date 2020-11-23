@@ -1244,24 +1244,27 @@ static int processParameterList (tokenInfo *token, int c)
 		c = skipWhite (vGetc ());
 		if (c == '(')
 		{
-			do
+			c = skipWhite (vGetc ());
+			while (true)
 			{
-				c = skipWhite (vGetc ());
 				if (isWordToken (c))
 				{
-					readWordTokenNoSkip (token, c);	// FIXME
+					c = readWordToken (token, c);
 					verbose ("Found parameter %s\n", vStringValue (token->name));
 					if (token->kind == K_IDENTIFIER)
 					{
-						c = skipWhite (vGetc ());
 						if (c == ',' || c == ')' || c == '=')	// ignore user defined type
 						{
 							tokenInfo *param = dupToken (token);
 							param->kind = K_CONSTANT;
 							param->parameter = parameter;
 							ptrArrayAdd (tagContents, param);
-
-							c = skipExpression (c);
+							if (c == '=')
+								c = skipExpression (vGetc ());
+							else if (c == ',')
+								c = skipWhite (vGetc ());
+							else	// ')'
+								break;
 						}
 					}
 					else if (token->kind == K_PARAMETER)
@@ -1269,12 +1272,12 @@ static int processParameterList (tokenInfo *token, int c)
 					else if (token->kind == K_LOCALPARAM)
 						parameter = false;
 				}
+				else if  (c == ')' || c == EOF)
+					break;
+				else
+					c = skipWhite (vGetc ());
 				// unpacked array is not allowed for a parameter
-				// else if (c == '[') {
-				// 	c =skipDimension(c);
-				// 	vUngetc (c);
-				// }
-			} while (c != ')' && c != EOF);
+			}
 			c = skipWhite (vGetc ());
 		}
 	}

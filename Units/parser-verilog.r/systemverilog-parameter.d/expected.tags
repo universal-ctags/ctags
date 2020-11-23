@@ -50,7 +50,7 @@ A	input.sv	/^   (input [num_code_bits-1:0] A, output reg [num_out_bits-1:0] Y);$
 Y	input.sv	/^   (input [num_code_bits-1:0] A, output reg [num_out_bits-1:0] Y);$/;"	p	module:class.class.generic_decoder
 int_t	input.sv	/^typedef int int_t;$/;"	T	interface:class.class
 user_defined_type_param	input.sv	/^module user_defined_type_param$/;"	m	interface:class.class
-um_code_bits	input.sv	/^  #(int_t num_code_bits = 3, localparam num_out_bits = 1 << num_code_bits)$/;"	c	module:class.class.user_defined_type_param	parameter:
+num_code_bits	input.sv	/^  #(int_t num_code_bits = 3, localparam num_out_bits = 1 << num_code_bits)$/;"	c	module:class.class.user_defined_type_param	parameter:
 num_out_bits	input.sv	/^  #(int_t num_code_bits = 3, localparam num_out_bits = 1 << num_code_bits)$/;"	c	module:class.class.user_defined_type_param
 A	input.sv	/^   (input [num_code_bits-1:0] A, output reg [num_out_bits-1:0] Y);$/;"	p	module:class.class.user_defined_type_param
 Y	input.sv	/^   (input [num_code_bits-1:0] A, output reg [num_out_bits-1:0] Y);$/;"	p	module:class.class.user_defined_type_param
