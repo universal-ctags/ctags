@@ -393,6 +393,9 @@
     <ClCompile Include="..\parsers\json.c">
       <Filter>Source Files\Parsers</Filter>
     </ClCompile>
+    <ClCompile Include="..\parsers\julia.c">
+      <Filter>Source Files\Parsers</Filter>
+    </ClCompile>
     <ClCompile Include="..\parsers\ldscript.c">
       <Filter>Source Files\Parsers</Filter>
     </ClCompile>
