@@ -44,7 +44,7 @@ typedef enum {
     K_MODULE,
     K_STRUCT,
     K_TYPE,
-    K_IMPORT,
+    // K_IMPORT,
     K_NONE
 } JuliaKind;
 
@@ -56,7 +56,7 @@ static kindDefinition JuliaKinds [] = {
     { true, 'n', "module",   "Modules"      },
     { true, 's', "struct",   "Structures"   },
     { true, 't', "type",     "Types"        },
-    { true, 'x', "unknown",  "Imported name"}
+    // { true, 'x', "unknown",  "Imported name"}
 };
 
 typedef enum {
@@ -1163,7 +1163,7 @@ static void parseImport (lexerState *lexer, vString *scope, int parent_kind)
 
     while (lexer->cur_token == TOKEN_IDENTIFIER || lexer->cur_token == TOKEN_MACROCALL)
     {
-        addTag(lexer->token_str, vStringValue(name), NULL, K_IMPORT, lexer->line, lexer->pos, scope, parent_kind);
+        // addTag(lexer->token_str, vStringValue(name), NULL, K_IMPORT, lexer->line, lexer->pos, scope, parent_kind);
 
         skipWhitespace(lexer, false);
         if (lexer->cur_c == ',')

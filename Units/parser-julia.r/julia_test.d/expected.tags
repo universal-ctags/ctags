@@ -1,8 +1,3 @@
-Revise	input.jl	/^using Revise$/;"	x
-Normal	input.jl	/^import Distributions: Normal$/;"	x
-Random.randn	input.jl	/^using Random.randn$/;"	x
-Plots	input.jl	/^using Plots, Makie$/;"	x
-Makie	input.jl	/^using Plots, Makie$/;"	x
 a	input.jl	/^const a::Int = 'c'  # struct Struct_wrong3 end$/;"	c
 test_macro	input.jl	/^macro test_macro() end$/;"	m
 test_fun	input.jl	/^function test_fun(a::Int, b::T) where #$/;"	f
