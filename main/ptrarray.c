@@ -56,6 +56,28 @@ extern unsigned int ptrArrayAdd (ptrArray *const current, void *ptr)
 	return current->count++;
 }
 
+extern bool ptrArrayUpdate (ptrArray *const current,
+							unsigned int indx, void *ptr, void *padding)
+{
+	Assert (current != NULL);
+	if (current->count > indx)
+	{
+		void *r = current->array [indx];
+		if (current->deleteFunc)
+			current->deleteFunc (r);
+		current->array [indx] = ptr;
+		return true;
+	}
+	else
+	{
+		unsigned int c = indx - current->count;
+		for (unsigned int i = 0; i < c; i++)
+			ptrArrayAdd (current, padding);
+		ptrArrayAdd (current, ptr);
+		return false;
+	}
+
+}
 extern void *ptrArrayRemoveLast (ptrArray *const current)
 {
 	Assert (current != NULL);
@@ -63,6 +85,20 @@ extern void *ptrArrayRemoveLast (ptrArray *const current)
 	void *r = ptrArrayLast (current);
 	--current->count;
 	return r;
+}
+
+extern void  ptrArrayDeleteLastInBatch (ptrArray *const current, unsigned int count)
+{
+	Assert (current != NULL);
+	Assert (current->count >= count);
+	while (count > 0)
+	{
+		void *r = ptrArrayLast (current);
+		if (current->deleteFunc)
+			current->deleteFunc (r);
+		--current->count;
+		--count;
+	}
 }
 
 /* Combine array `from' into `current', deleting `from' */
@@ -86,14 +122,15 @@ extern unsigned int ptrArrayCount (const ptrArray *const current)
 extern void* ptrArrayItem (const ptrArray *const current, const unsigned int indx)
 {
 	Assert (current != NULL);
+	Assert (current->count > indx);
 	return current->array [indx];
 }
 
-extern void* ptrArrayLast (const ptrArray *const current)
+extern void* ptrArrayItemFromLast (const ptrArray *const current, const unsigned int indx)
 {
 	Assert (current != NULL);
-	Assert (current->count > 0);
-	return current->array [current->count - 1];
+	Assert (current->count > indx);
+	return current->array [current->count - 1 - indx];
 }
 
 extern void ptrArrayClear (ptrArray *const current)
@@ -164,6 +201,32 @@ extern void ptrArrayDeleteItem (ptrArray* const current, unsigned int indx)
 	memmove (current->array + indx, current->array + indx + 1,
 			(current->count - indx) * sizeof (*current->array));
 	--current->count;
+}
+
+extern void*ptrArrayRemoveItem (ptrArray* const current, unsigned int indx)
+{
+	void *ptr = current->array[indx];
+
+	memmove (current->array + indx, current->array + indx + 1,
+			(current->count - indx) * sizeof (*current->array));
+	--current->count;
+
+	return ptr;
+}
+
+extern void ptrArrayInsertItem (ptrArray* const current, unsigned int indx, void *ptr)
+{
+	Assert (current != NULL);
+	if (current->count == current->max)
+	{
+		current->max *= 2;
+		current->array = xRealloc (current->array, current->max, void*);
+	}
+
+	memmove (current->array + indx + 1, current->array + indx,
+			 (current->count - indx) * sizeof (*current->array));
+	current->array[indx] = ptr;
+	++current->count;
 }
 
 static int (*ptrArraySortCompareVar)(const void *, const void *);

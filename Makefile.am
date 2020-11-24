@@ -155,7 +155,7 @@ dist_libctags_a_SOURCES = $(ALL_LIB_HEADS) $(ALL_LIB_SRCS)
 
 ctags_CPPFLAGS = $(libctags_a_CPPFLAGS)
 ctags_CFLAGS = $(libctags_a_CFLAGS)
-ctags_LDADD  =libctags.a
+ctags_LDADD  = libctags.a
 ctags_LDADD += $(LIBXML_LIBS)
 ctags_LDADD += $(JANSSON_LIBS)
 ctags_LDADD += $(LIBYAML_LIBS)

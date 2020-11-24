@@ -23,7 +23,7 @@
 # include <config.h>
 #endif
 
-#include "es-lang-c-stdc99.h"
+#include "es.h"
 
 
 #include <stdlib.h>
@@ -44,6 +44,7 @@ typedef struct _EsSymbol EsSymbol;
 typedef struct _EsError EsError;
 typedef struct _EsCons EsCons;
 typedef struct _EsRegex EsRegex;
+typedef struct _EsPointer EsPointer;
 
 struct _EsObject
 {
@@ -112,6 +113,18 @@ struct _EsRegex
 	int   case_insensitive;
 };
 
+struct _EsPointer
+{
+	EsObject base;
+	void *ptr;
+	char  fat [];
+};
+
+enum EsObjectFlag
+{
+	ES_OBJECT_FLAG_ATOM = 1 << 0,
+};
+
 typedef struct _EsObjectClass EsObjectClass;
 struct _EsObjectClass
 {
@@ -119,7 +132,7 @@ struct _EsObjectClass
 	void           (* free)  (EsObject* object);
 	int            (* equal) (const EsObject* self, const EsObject* other);
 	void           (* print) (const EsObject* object, MIO* fp);
-	char           atom_p;
+	unsigned       flags;
 	EsSingleton  **obarray;
 	const char*    name;
 };
@@ -159,8 +172,11 @@ static void es_regex_print(const EsObject* object, MIO* fp);
 
 static void es_error_free(EsObject* object);
 static int  es_error_equal(const EsObject* self, const EsObject* other);
-static void es_error_print(const EsObject* other, MIO* fp);
+static void es_error_print(const EsObject* object, MIO* fp);
 
+static void es_pointer_free(EsObject* object);
+static int  es_pointer_equal(const EsObject* self, const EsObject* other);
+static void es_pointer_print(const EsObject* object, MIO* fp);
 
 static EsSingleton* es_obarray_intern(EsType type, const char* name);
 static const char*  es_singleton_get   (EsSingleton *singleton);
@@ -169,88 +185,109 @@ static unsigned int hash(const char* keyarg);
 static EsSingleton  *symbol_obarray[OBARRAY_SIZE];
 static EsSingleton  *error_obarray [OBARRAY_SIZE];
 
-static EsObjectClass classes[] = {
-	[ES_TYPE_NIL] = {
-		.size    = 0,
-		.free    = es_nil_free,
-		.equal   = es_nil_equal,
-		.print   = es_nil_print,
-		.atom_p  = 1,
-		.obarray = NULL,
-		.name    = "nil",
-	},
-	[ES_TYPE_INTEGER] = {
-		.size    = sizeof(EsInteger),
-		.free    = es_integer_free,
-		.equal   = es_integer_equal,
-		.print   = es_integer_print,
-		.atom_p  = 1,
-		.obarray = NULL,
-		.name    = "integer",
-	},
-	[ES_TYPE_REAL]    = {
-		.size    = sizeof(EsReal),
-		.free    = es_real_free,
-		.equal   = es_real_equal,
-		.print   = es_real_print,
-		.atom_p  = 1,
-		.obarray = NULL,
-		.name    = "real",
-	},
-	[ES_TYPE_BOOLEAN] = {
-		.size    = sizeof(EsBoolean),
-		.free    = es_boolean_free,
-		.equal   = es_boolean_equal,
-		.print   = es_boolean_print,
-		.atom_p  = 1,
-		.obarray = (void*)1,
-		.name    = "boolean",
-	},
-	[ES_TYPE_SYMBOL]  = {
-		.size    = sizeof(EsSymbol),
-		.free    = es_symbol_free,
-		.equal   = es_symbol_equal,
-		.print   = es_symbol_print,
-		.atom_p  = 1,
-		.obarray = symbol_obarray,
-		.name    = "symbol",
-	},
-	[ES_TYPE_STRING]  = {
-		.size    = sizeof(EsString),
-		.free    = es_string_free,
-		.equal   = es_string_equal,
-		.print   = es_string_print,
-		.atom_p  = 1,
-		.obarray = NULL,
-		.name    = "string",
-	},
-	[ES_TYPE_CONS]    = {
-		.size    = sizeof(EsCons),
-		.free    = es_cons_free,
-		.equal   = es_cons_equal,
-		.print   = es_cons_print,
-		.atom_p  = 0,
-		.obarray = NULL,
-		.name    = "cons",
-	},
-	[ES_TYPE_REGEX]   = {
-		.size    = sizeof(EsRegex),
-		.free    = es_regex_free,
-		.equal   = es_regex_equal,
-		.print   = es_regex_print,
-		.atom_p  = 1,
-		.obarray = NULL,
-		.name    = "regex",
-	},
-	[ES_TYPE_ERROR] = {
-		.size    = sizeof(EsError),
-		.free    = es_error_free,
-		.equal   = es_error_equal,
-		.print   = es_error_print,
-		.atom_p  = 1,
-		.obarray = error_obarray,
-		.name    = "error",
-	},
+static EsObjectClass es_nil_class = {
+	.size    = 0,
+	.free    = es_nil_free,
+	.equal   = es_nil_equal,
+	.print   = es_nil_print,
+	.flags   = ES_OBJECT_FLAG_ATOM,
+	.obarray = NULL,
+	.name    = "nil",
+};
+
+static EsObjectClass es_integer_class = {
+	.size    = sizeof(EsInteger),
+	.free    = es_integer_free,
+	.equal   = es_integer_equal,
+	.print   = es_integer_print,
+	.flags   = ES_OBJECT_FLAG_ATOM,
+	.obarray = NULL,
+	.name    = "integer",
+};
+
+static EsObjectClass es_real_class = {
+	.size    = sizeof(EsReal),
+	.free    = es_real_free,
+	.equal   = es_real_equal,
+	.print   = es_real_print,
+	.flags   = ES_OBJECT_FLAG_ATOM,
+	.obarray = NULL,
+	.name    = "real",
+};
+
+static EsObjectClass es_boolean_class = {
+	.size    = sizeof(EsBoolean),
+	.free    = es_boolean_free,
+	.equal   = es_boolean_equal,
+	.print   = es_boolean_print,
+	.flags   = ES_OBJECT_FLAG_ATOM,
+	.obarray = (void*)1,
+	.name    = "boolean",
+};
+
+static EsObjectClass es_symbol_class = {
+	.size    = sizeof(EsSymbol),
+	.free    = es_symbol_free,
+	.equal   = es_symbol_equal,
+	.print   = es_symbol_print,
+	.flags   = ES_OBJECT_FLAG_ATOM,
+	.obarray = symbol_obarray,
+	.name    = "symbol",
+};
+
+static EsObjectClass es_string_class = {
+	.size    = sizeof(EsString),
+	.free    = es_string_free,
+	.equal   = es_string_equal,
+	.print   = es_string_print,
+	.flags   = ES_OBJECT_FLAG_ATOM,
+	.obarray = NULL,
+	.name    = "string",
+};
+
+static EsObjectClass es_cons_class = {
+	.size    = sizeof(EsCons),
+	.free    = es_cons_free,
+	.equal   = es_cons_equal,
+	.print   = es_cons_print,
+	.flags   = 0,
+	.obarray = NULL,
+	.name    = "cons",
+};
+
+static EsObjectClass es_regex_class = {
+	.size    = sizeof(EsRegex),
+	.free    = es_regex_free,
+	.equal   = es_regex_equal,
+	.print   = es_regex_print,
+	.flags   = ES_OBJECT_FLAG_ATOM,
+	.obarray = NULL,
+	.name    = "regex",
+};
+
+static EsObjectClass es_error_class = {
+	.size    = sizeof(EsError),
+	.free    = es_error_free,
+	.equal   = es_error_equal,
+	.print   = es_error_print,
+	.flags   = ES_OBJECT_FLAG_ATOM,
+	.obarray = error_obarray,
+	.name    = "error",
+};
+
+
+#define ES_TYPE_CLASS_MAX 32
+static int classes_count = ES_TYPE_FOREIGNER_START;
+static EsObjectClass *classes[ES_TYPE_CLASS_MAX] = {
+	[ES_TYPE_NIL]     = &es_nil_class,
+	[ES_TYPE_INTEGER] = &es_integer_class,
+	[ES_TYPE_REAL]    = &es_real_class,
+	[ES_TYPE_BOOLEAN] = &es_boolean_class,
+	[ES_TYPE_SYMBOL]  = &es_symbol_class,
+	[ES_TYPE_STRING]  = &es_string_class,
+	[ES_TYPE_CONS]    = &es_cons_class,
+	[ES_TYPE_REGEX]   = &es_regex_class,
+	[ES_TYPE_ERROR]   = &es_error_class,
 };
 
 
@@ -290,7 +327,7 @@ static MIO *mio_stderr (void)
 static EsObjectClass*
 class_of(const EsObject* object)
 {
-	return &(classes[es_object_get_type(object)]);
+	return (classes[es_object_get_type(object)]);
 }
 
 static EsObject*
@@ -299,7 +336,7 @@ es_object_new(EsType type)
 	EsObject* r;
 
 
-	r = calloc(1, (&classes[type])->size);
+	r = calloc(1, (classes[type])->size);
 	if (r == NULL)
 		return ES_ERROR_MEMORY;
 	r->type = type;
@@ -307,7 +344,7 @@ es_object_new(EsType type)
 
 	if (es_debug)
 		mio_printf(mio_stderr(), ";; new{%s}: 0x%p\n",
-				   (&classes[type])->name,
+				   (classes[type])->name,
 				   r);
 
 	return r;
@@ -324,6 +361,11 @@ static int
 es_object_type_p(const EsObject* object, EsType type)
 {
 	return es_object_get_type(object) == type;
+}
+
+const char* es_type_get_name        (int t)
+{
+	return (classes[t]->name);
 }
 
 EsType
@@ -410,7 +452,7 @@ es_object_equal         (const EsObject* self,
 int
 es_atom         (const EsObject* object)
 {
-	return class_of(object)->atom_p;
+	return class_of(object)->flags  & ES_OBJECT_FLAG_ATOM;
 }
 
 
@@ -653,7 +695,7 @@ es_obarray_intern(EsType type, const char* name)
 	EsSingleton* tmp;
 
 
-	obarray = (&classes[type])->obarray;
+	obarray = (classes[type])->obarray;
 	if (!obarray)
 		return NULL;
 
@@ -1381,6 +1423,246 @@ es_error_print(const EsObject* object, MIO* fp)
 	string = es_error_name(object);
 	mio_printf(fp, "#%s:", string);
 	es_print (e->object, fp);
+}
+
+/*
+ * Foreigner
+ */
+typedef struct _EsPointerClass EsPointerClass;
+struct _EsPointerClass
+{
+	EsObjectClass base;
+
+	size_t fat_size;
+	EsObject *(* init_fat) (void *fat, void * ptr, void *extra);
+
+	void (* free_ptr) (void *);
+	int  (* equal_ptr) (const void*, const void*);
+	void (* print_ptr) (const void*, MIO *);
+
+
+	void (* free_fatptr) (void *, void *);
+	int  (* equal_fatptr) (const void*, const void*,
+						   const void*, const void*);
+	void (* print_fatptr) (const void*, const void*, MIO *);
+};
+
+static EsType
+es_type_define_pointer_full(const char *name,
+							size_t fat_size,
+							EsObject *(* initfat_fn) (void *fat, void * ptr, void *extra),
+							void (* freefn) (void *),
+							int  (* equalfn) (const void*, const void*),
+							void (* printfn) (const void*, MIO *),
+							void (* freefn_fat)  (void * ptr, void *fat),
+							int  (* equalfn_fat) (const void* ptr_a, const void* fat_a,
+												  const void* ptr_b, const void* fat_b),
+							void (* printfn_fat) (const void* ptr, const void *fat, MIO *))
+{
+	EsType t = ES_TYPE_NIL;
+	if (classes_count >= ES_TYPE_CLASS_MAX)
+		return t;
+
+	EsPointerClass *c = calloc (1, sizeof (EsPointerClass));
+	if (c == NULL)
+		return t;
+
+	c->fat_size  = fat_size;
+	c->init_fat = initfat_fn;
+	c->free_ptr  = freefn;
+	c->equal_ptr = equalfn;
+	c->print_ptr = printfn;
+	c->free_fatptr  = freefn_fat;
+	c->equal_fatptr = equalfn_fat;
+	c->print_fatptr = printfn_fat;
+
+	c->base.size  = sizeof (EsPointer) + c->fat_size;
+	c->base.free  = es_pointer_free;
+	c->base.equal = es_pointer_equal;
+	c->base.print = es_pointer_print;
+	c->base.flags = ES_OBJECT_FLAG_ATOM;
+	c->base.name  = strdup (name);
+	if (c->base.name == NULL)
+	{
+		free (c);
+		return t;
+	}
+
+	t = classes_count++;
+	classes [t] = (EsObjectClass *)c;
+
+	return t;
+}
+
+EsType
+es_type_define_pointer(const char *name,
+					   void (* freefn) (void *),
+					   int  (* equalfn) (const void*, const void*),
+					   void (* printfn) (const void*, MIO *))
+{
+
+	return es_type_define_pointer_full (name, 0, NULL,
+										freefn, equalfn, printfn,
+										NULL, NULL, NULL);
+}
+
+EsType
+es_type_define_fatptr    (const char *name,
+						  size_t fat_size,
+						  EsObject *(* initfat_fn) (void *fat, void * ptr, void *extra),
+						  void (* freefn) (void * ptr, void *fat),
+						  int  (* equalfn) (const void* ptr_a, const void* fat_a,
+											const void* ptr_b, const void* fat_b),
+						  void (* printfn) (const void* ptr, const void *fat, MIO *))
+{
+	return es_type_define_pointer_full (name, fat_size, initfat_fn,
+										NULL, NULL, NULL,
+										freefn, equalfn, printfn);
+}
+
+static void es_pointer_free(EsObject* object)
+{
+	EsObjectClass *c = class_of(object);
+	if (((EsPointer*)object)->ptr)
+	{
+		if (((EsPointerClass *)c)->free_fatptr)
+			((EsPointerClass *)c)->free_fatptr (((EsPointer*)object)->ptr,
+												((EsPointer*)object)->fat);
+		else if (((EsPointerClass *)c)->free_ptr)
+			((EsPointerClass *)c)->free_ptr (((EsPointer*)object)->ptr);
+	}
+	es_object_free (object);
+}
+
+static int  es_pointer_equal(const EsObject* self, const EsObject* other)
+{
+	if (es_object_get_type (self) != es_object_get_type (other))
+		return 0;
+
+	EsPointerClass *c = (EsPointerClass *)class_of(self);
+	void *self_ptr  = ((EsPointer *)self)->ptr;
+	void *other_ptr = ((EsPointer *)other)->ptr;
+
+	if (c->fat_size == 0 && self_ptr == other_ptr)
+		return 1;
+
+	if (self_ptr == NULL)
+		return 0;
+
+	if (c->equal_fatptr)
+		return c->equal_fatptr (self_ptr, ((EsPointer*)self)->fat,
+								other_ptr, ((EsPointer*)other)->fat);
+	else if (c->equal_ptr)
+		return c->equal_ptr (self_ptr, other_ptr);
+	return 0;
+}
+
+static void es_pointer_print(const EsObject* object, MIO* fp)
+{
+	EsObjectClass *c = class_of(object);
+	if (((EsPointerClass *)c)->print_fatptr)
+	{
+		((EsPointerClass *)c)->print_fatptr (((EsPointer *)object)->ptr,
+											 ((EsPointer *)object)->fat,
+											 fp);
+	}
+	else if (((EsPointerClass *)c)->print_ptr)
+	{
+		((EsPointerClass *)c)->print_ptr (((EsPointer *)object)->ptr, fp);
+	}
+	else
+	{
+		mio_puts(fp, "#<");
+		mio_puts(fp, c->name);
+		mio_putc(fp, ' ');
+		mio_printf(fp, "(%p, %p)", object, ((EsPointer *)object)->ptr);
+		mio_putc(fp, '>');
+	}
+}
+
+static EsObject*
+es_pointer_new_common (EsType type, void *ptr)
+{
+	EsObject *r;
+
+	r = es_object_new (type);
+	if (es_error_p (r))
+		return r;
+
+	((EsPointer *)r)->ptr = ptr;
+	return r;
+}
+
+/*
+ * Pointer
+ */
+EsObject*
+es_pointer_new (EsType type, void *ptr)
+{
+	EsObject *r = es_pointer_new_common (type, ptr);
+	if (es_error_p (r))
+		return r;
+
+	if (((EsPointerClass *) (classes [type]))->fat_size > 0)
+		memset(((EsPointer *)r)->fat, 0,
+			   ((EsPointerClass *) (classes [type]))->fat_size);
+	return r;
+}
+
+void*
+es_pointer_get    (const EsObject *object)
+{
+	return ((EsPointer *)object)->ptr;
+}
+
+void*
+es_pointer_take    (EsObject *object)
+{
+	void *r = ((EsPointer *)object)->ptr;
+	((EsPointer *)object)->ptr = NULL;
+	return r;
+}
+
+/*
+ * Fat pointer
+ */
+EsObject*
+es_fatptr_new (EsType type, void *ptr, void *extra)
+{
+	EsObject *r = es_pointer_new_common (type, ptr);
+	if (es_error_p (r))
+		return r;
+
+	if (((EsPointerClass *) (classes [type]))->fat_size > 0)
+	{
+		if (((EsPointerClass *) (classes [type]))->init_fat)
+		{
+			EsObject *f = (* ((EsPointerClass *) (classes [type]))->init_fat)
+				(((EsPointer *)r)->fat, ptr, extra);
+			if (es_error_p (f))
+			{
+				es_object_free (r);
+				return f;
+			}
+		}
+		else if (extra)
+			memcpy (((EsPointer *)r)->fat, extra,
+					((EsPointerClass *) (classes [type]))->fat_size);
+		else
+			memset(((EsPointer *)r)->fat, 0,
+				   ((EsPointerClass *) (classes [type]))->fat_size);
+	}
+	return r;
+}
+
+void*
+es_fatptr_get     (const EsObject *object)
+{
+	EsObjectClass *c = class_of(object);
+	if (((EsPointerClass *)c)->fat_size == 0)
+		return NULL;
+
+	return ((EsPointer *)object)->fat;
 }
 
 

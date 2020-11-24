@@ -43,8 +43,8 @@ struct sHashTable {
 	unsigned int size;
 	hashTableHashFunc hashfn;
 	hashTableEqualFunc equalfn;
-	hashTableFreeFunc keyfreefn;
-	hashTableFreeFunc valfreefn;
+	hashTableDeleteFunc keyfreefn;
+	hashTableDeleteFunc valfreefn;
 };
 
 struct chainTracker {
@@ -65,18 +65,27 @@ static hentry* entry_new (void *key, void *value, hentry* next)
 	return entry;
 }
 
-static hentry* entry_destroy (hentry* entry,
-			      hashTableFreeFunc keyfreefn,
-			      hashTableFreeFunc valfreefn)
+static void entry_reset  (hentry* entry,
+						  void *newkey,
+						  void *newval,
+						  hashTableDeleteFunc keyfreefn,
+						  hashTableDeleteFunc valfreefn)
 {
-	hentry* tmp;
-
 	if (keyfreefn)
 		keyfreefn (entry->key);
 	if (valfreefn)
 		valfreefn (entry->value);
-	entry->key = NULL;
-	entry->value = NULL;
+	entry->key = newkey;
+	entry->value = newval;
+}
+
+static hentry* entry_destroy (hentry* entry,
+			      hashTableDeleteFunc keyfreefn,
+			      hashTableDeleteFunc valfreefn)
+{
+	hentry* tmp;
+
+	entry_reset (entry, NULL, NULL, keyfreefn, valfreefn);
 	tmp = entry->next;
 	eFree (entry);
 
@@ -84,8 +93,8 @@ static hentry* entry_destroy (hentry* entry,
 }
 
 static void  entry_reclaim (hentry* entry,
-			    hashTableFreeFunc keyfreefn,
-			    hashTableFreeFunc valfreefn)
+			    hashTableDeleteFunc keyfreefn,
+			    hashTableDeleteFunc valfreefn)
 {
 	while (entry)
 		entry = entry_destroy (entry, keyfreefn, valfreefn);
@@ -103,7 +112,7 @@ static void *entry_find (hentry* entry, const void* const key, hashTableEqualFun
 }
 
 static bool		entry_delete (hentry **entry, const void *key, hashTableEqualFunc equalfn,
-			      hashTableFreeFunc keyfreefn, hashTableFreeFunc valfreefn)
+			      hashTableDeleteFunc keyfreefn, hashTableDeleteFunc valfreefn)
 {
 	while (*entry)
 	{
@@ -112,7 +121,22 @@ static bool		entry_delete (hentry **entry, const void *key, hashTableEqualFunc e
 			*entry = entry_destroy (*entry, keyfreefn, valfreefn);
 			return true;
 		}
+		entry = &((*entry)->next);
+	}
+	return false;
+}
 
+static bool		entry_update (hentry *entry, void *key, void *value, hashTableEqualFunc equalfn,
+			      hashTableDeleteFunc keyfreefn, hashTableDeleteFunc valfreefn)
+{
+	while (entry)
+	{
+		if (equalfn (key, entry->key))
+		{
+			entry_reset (entry, key, value, keyfreefn, valfreefn);
+			return true;
+		}
+		entry = entry->next;
 	}
 	return false;
 }
@@ -131,8 +155,8 @@ static bool  entry_foreach (hentry *entry, hashTableForeachFunc proc, void *user
 extern hashTable *hashTableNew    (unsigned int size,
 				   hashTableHashFunc hashfn,
 				   hashTableEqualFunc equalfn,
-				   hashTableFreeFunc keyfreefn,
-				   hashTableFreeFunc valfreefn)
+				   hashTableDeleteFunc keyfreefn,
+				   hashTableDeleteFunc valfreefn)
 {
 	hashTable *htable;
 
@@ -151,7 +175,7 @@ extern hashTable *hashTableNew    (unsigned int size,
 extern hashTable* hashTableIntNew (unsigned int size,
 								   hashTableHashFunc hashfn,
 								   hashTableEqualFunc equalfn,
-								   hashTableFreeFunc keyfreefn)
+								   hashTableDeleteFunc keyfreefn)
 {
 	return hashTableNew (size, hashfn, equalfn, keyfreefn, NULL);
 }
@@ -208,6 +232,18 @@ extern bool     hashTableDeleteItem (hashTable *htable, const void *key)
 			    htable->equalfn, htable->keyfreefn, htable->valfreefn);
 }
 
+extern bool    hashTableUpdateItem (hashTable *htable, void *key, void *value)
+{
+	unsigned int i;
+
+	i = htable->hashfn (key) % htable->size;
+	bool r = entry_update(htable->table[i], key, value,
+						  htable->equalfn, htable->keyfreefn, htable->valfreefn);
+	if (!r)
+		htable->table[i] = entry_new(key, value, htable->table[i]);
+	return r;
+}
+
 extern bool    hashTableHasItem    (hashTable *htable, const void *key)
 {
 	return hashTableGetItem (htable, key)? true: false;
@@ -258,7 +294,7 @@ static bool count (const void *const key CTAGS_ATTR_UNUSED, void *value CTAGS_AT
 	return true;
 }
 
-extern int        hashTableCountItem   (hashTable *htable)
+extern unsigned int hashTableCountItem   (hashTable *htable)
 {
 	int c = 0;
 	hashTableForeachItem (htable, count, &c);

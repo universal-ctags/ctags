@@ -30,12 +30,17 @@ typedef void (*ptrArrayDeleteFunc) (void *data);
 
 extern ptrArray *ptrArrayNew (ptrArrayDeleteFunc deleteFunc);
 extern unsigned int ptrArrayAdd (ptrArray *const current, void *ptr);
+extern bool ptrArrayUpdate (ptrArray *const current, unsigned int indx, void *ptr, void *padding);
 extern void *ptrArrayRemoveLast (ptrArray *const current);
+#define ptrArrayDeleteLast(A) ptrArrayDeleteLastInBatch(A, 1)
+extern void  ptrArrayDeleteLastInBatch (ptrArray *const current, unsigned int count);
 extern void ptrArrayCombine (ptrArray *const current, ptrArray *const from);
 extern void ptrArrayClear (ptrArray *const current);
 extern unsigned int ptrArrayCount (const ptrArray *const current);
+#define ptrArrayIsEmpty(A) (ptrArrayCount(A) == 0)
 extern void* ptrArrayItem (const ptrArray *const current, const unsigned int indx);
-extern void* ptrArrayLast (const ptrArray *const current);
+extern void* ptrArrayItemFromLast (const ptrArray *const current, const unsigned int indx);
+#define ptrArrayLast(A) ptrArrayItemFromLast(A, 0)
 extern void ptrArrayDelete (ptrArray *const current);
 extern bool ptrArrayHasTest (const ptrArray *const current,
 				  bool (*test)(const void *ptr, void *userData),
@@ -43,6 +48,8 @@ extern bool ptrArrayHasTest (const ptrArray *const current,
 extern bool ptrArrayHas (const ptrArray *const current, void *ptr);
 extern void ptrArrayReverse (const ptrArray *const current);
 extern void ptrArrayDeleteItem (ptrArray* const current, unsigned int indx);
+extern void*ptrArrayRemoveItem (ptrArray* const current, unsigned int indx);
+extern void ptrArrayInsertItem (ptrArray* const current, unsigned int indx, void *ptr);
 
 extern void ptrArraySort (ptrArray *const current, int (*compare)(const void *, const void *));
 
