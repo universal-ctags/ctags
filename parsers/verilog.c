@@ -1500,8 +1500,12 @@ static int pushMembers (tokenInfo* token, int c)
 		do
 		{
 			verilogKind kind = K_UNDEFINED;	// set kind of context for processType()
-			if (isWordToken (c))
-				c = readWordToken (token, c);
+			if (!isWordToken (c))
+			{
+				verbose ("Unexpected input: %c\n", c);
+				return c;
+			}
+			c = readWordToken (token, c);
 
 			c = processType (token, c, &kind);
 			do
