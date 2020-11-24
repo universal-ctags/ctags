@@ -383,7 +383,7 @@ static int processType (tokenInfo* token, int c, verilogKind* kind);
 static int pushEnumNames (tokenInfo* token, int c);
 static int pushMembers (tokenInfo* token, int c);
 static int readWordToken (tokenInfo *const token, int c);
-static void readWordTokenNoSkip (tokenInfo *const token, int c);
+static int readWordTokenNoSkip (tokenInfo *const token, int c);
 static int skipBlockName (tokenInfo *const token, int c);
 static int skipDelay(tokenInfo* token, int c);
 static int tagNameList (tokenInfo* token, int c);
@@ -744,17 +744,13 @@ static int skipExpression(int c)
 }
 
 // Skip to newline. The newline preceded by a backslash ( \ ) is ignored.
-static int skipToNewLine ()
+// Should be used after readWordTokenNoSkip() for compiler directives
+static int skipToNewLine (int c)
 {
-	int c;
 	bool escape = false;
-	while (true)
-	{
-		c = vGetc ();
-		if ((c == '\n' && ! escape) ||  c == EOF)
-			break;
+	for ( ; (c != '\n' || escape) &&  c != EOF; c = vGetc ())
 		escape = (c == '\\');
-	}
+
 	return c;	// '\n' or EOF
 }
 
@@ -764,24 +760,23 @@ static int skipMacro (int c)
 	{
 		tokenInfo *token = newToken ();	// don't update token outside
 
-		if (isWordToken (c))
-			readWordTokenNoSkip (token, c);
+		c = readWordTokenNoSkip (token, c);
 		/* Skip compiler directive other than `define */
 		if (token->kind == K_DIRECTIVE)
 		{
-			c = skipToNewLine();
+			c = skipToNewLine(c);
 			c = skipWhite (c);
 		}
 		/* Skip `define */
 		else if (token->kind == K_DEFINE)
 		{
-			c = skipWhite (vGetc ());
+			c = skipWhite (c);
 			c = processDefine(token, c);
 		}
 		/* Skip macro or macro functions */
 		else
 		{
-			c = skipWhite (vGetc ());	// FIXME: not covered
+			c = skipWhite (c);	// FIXME: not covered
 			if (c == '(')
 				c = skipPastMatch ("()");
 		}
@@ -812,21 +807,22 @@ static int _readWordToken (tokenInfo *const token, int c, bool skip)
 	if (skip)
 		return skipWhite (c);
 	else
-	{
-		vUngetc (c);
-		return c;	// not used
-	}
+		return c;
 }
 
+// read a word token starting with "c".
+// returns the first charactor of the next token.
 static int readWordToken (tokenInfo *const token, int c)
 {
 	return _readWordToken (token, c, true);
 }
 
+// read a word token starting with "c".
+// returns the next charactor of the token read.
 // for compiler directives.  Since they are line-based, skipWhite() cannot be used.
-static void readWordTokenNoSkip (tokenInfo *const token, int c)
+static int readWordTokenNoSkip (tokenInfo *const token, int c)
 {
-	_readWordToken (token, c, false);
+	return _readWordToken (token, c, false);
 }
 
 /* check if an identifier:
@@ -1334,10 +1330,10 @@ static int processDefine (tokenInfo *const token, int c)
 	/* Bug #961001: Verilog compiler directives are line-based. */
 	if (isWordToken (c))
 	{
-		readWordTokenNoSkip (token, c);
+		c = readWordTokenNoSkip (token, c);
 		createTag (token, K_CONSTANT);
 	}
-	c = skipToNewLine ();
+	c = skipToNewLine (c);
 	c = skipWhite (c);
 	return c;
 }
@@ -1798,18 +1794,18 @@ static void findVerilogTags (void)
 			default :
 				if (isWordToken (c))
 				{
-					readWordTokenNoSkip (token, c);
+					c = readWordTokenNoSkip (token, c);
 					if (token->kind == K_DIRECTIVE)
 					{
 						// Skip compiler directives which are line-based.
-						c = skipToNewLine ();
-						c = skipWhite (vGetc ());
+						c = skipToNewLine (c);
+						c = skipWhite (c);
 					}
 					else if (token->kind != K_UNDEFINED)
-						c = findTag (token, skipWhite (vGetc ()));
+						c = findTag (token, skipWhite (c));
 					else if (c == '`')	/* Skip macro or macro functions */
 					{
-						c = skipWhite (vGetc ());
+						c = skipWhite (c);
 						if (c == '(')
 							c = skipPastMatch ("()");
 					}
