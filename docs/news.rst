@@ -59,6 +59,7 @@ The following parsers have been added:
 * Gdbinit script *optlib*
 * Glade *libxml*
 * Go
+* Haxe
 * Inko *optlib*
 * JavaProperties
 * JSON

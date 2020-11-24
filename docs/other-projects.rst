@@ -36,7 +36,6 @@ They have these additional language parsers:
 * `Ferite (c.c) <https://en.wikipedia.org/wiki/Ferite>`_
 * `GLSL (c.c) <https://en.wikipedia.org/wiki/OpenGL_Shading_Language>`_
 * `Haskell <https://en.wikipedia.org/wiki/Haskell_%28programming_language%29>`_
-* `Haxe <https://en.wikipedia.org/wiki/Haxe>`_
 * `txt2tags <https://en.wikipedia.org/wiki/Txt2tags>`_
 * `Vala (c.c) <https://en.wikipedia.org/wiki/Vala_%28programming_language%29>`_
 
