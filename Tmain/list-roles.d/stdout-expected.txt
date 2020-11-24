@@ -42,6 +42,10 @@ HTML           C/stylesheet      extFile            on      referenced as extern
 HTML           J/script          extFile            on      referenced as external files
 HTML           c/class           attribute          on      assigned as attributes
 Java           p/package         imported           on      imported package
+Julia          n/module          imported           on      loaded by "import"
+Julia          n/module          using              on      loaded by "using"
+Julia          x/unknown         imported           on      loaded by "import"
+Julia          x/unknown         using              on      loaded by "using"
 Kconfig        k/kconfig         source             on      kconfig file loaded with source directive
 LdScript       i/inputSection    discarded          on      discarded when linking
 LdScript       i/inputSection    mapped             on      mapped to output section
@@ -128,6 +132,10 @@ HTML           C/stylesheet      extFile            on      referenced as extern
 HTML           J/script          extFile            on      referenced as external files
 HTML           c/class           attribute          on      assigned as attributes
 Java           p/package         imported           on      imported package
+Julia          n/module          imported           on      loaded by "import"
+Julia          n/module          using              on      loaded by "using"
+Julia          x/unknown         imported           on      loaded by "import"
+Julia          x/unknown         using              on      loaded by "using"
 Kconfig        k/kconfig         source             on      kconfig file loaded with source directive
 LdScript       i/inputSection    discarded          on      discarded when linking
 LdScript       i/inputSection    mapped             on      mapped to output section

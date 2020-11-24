@@ -1,0 +1,20 @@
+Module1	input.jl	/^using Module1$/;"	kind:module	roles:using
+Module2	input.jl	/^using Module2: func1, func2$/;"	kind:module	roles:using
+func1	input.jl	/^using Module2: func1, func2$/;"	kind:unknown	scope:module:Module2	roles:using
+func2	input.jl	/^using Module2: func1, func2$/;"	kind:unknown	scope:module:Module2	roles:using
+Module3	input.jl	/^import Module3$/;"	kind:module	roles:imported
+Module4	input.jl	/^import Module4.func1, Module4.func2$/;"	kind:module	roles:imported
+func1	input.jl	/^import Module4.func1, Module4.func2$/;"	kind:unknown	scope:module:Module4	roles:imported
+Module4	input.jl	/^import Module4.func1, Module4.func2$/;"	kind:module	roles:imported
+func2	input.jl	/^import Module4.func1, Module4.func2$/;"	kind:unknown	scope:module:Module4	roles:imported
+Module5	input.jl	/^import Module5: func1, func2$/;"	kind:module	roles:imported
+func1	input.jl	/^import Module5: func1, func2$/;"	kind:unknown	scope:module:Module5	roles:imported
+func2	input.jl	/^import Module5: func1, func2$/;"	kind:unknown	scope:module:Module5	roles:imported
+MyModule	input.jl	/^module MyModule$/;"	kind:module	roles:def
+Module6	input.jl	/^using Module6,$/;"	kind:module	roles:using
+Module7	input.jl	/^      Module7,$/;"	kind:module	roles:using
+Module8	input.jl	/^      Module8$/;"	kind:module	roles:using
+Module9	input.jl	/^using Module9: func1,$/;"	kind:module	roles:using
+func1	input.jl	/^using Module9: func1,$/;"	kind:unknown	scope:module:Module9	roles:using
+func2	input.jl	/^               func2,$/;"	kind:unknown	scope:module:Module9	roles:using
+func3	input.jl	/^               func3$/;"	kind:unknown	scope:module:Module9	roles:using

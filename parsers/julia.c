@@ -44,19 +44,54 @@ typedef enum {
     K_MODULE,
     K_STRUCT,
     K_TYPE,
-    // K_IMPORT,
+    K_UNKNOWN,
     K_NONE
 } JuliaKind;
+
+typedef enum {
+    JULIA_MODULE_IMPORTED,
+    JULIA_MODULE_USING,
+} juliaModuleRole;
+
+typedef enum {
+    JULIA_UNKNOWN_IMPORTED,
+    JULIA_UNKNOWN_USING,
+} juliaUnknownRole;
+
+/*
+*  using X               X = (kind:module, role:using)
+*
+*  using X: a, b         X = (kind:module, role:using)
+*                     a, b = (kind:unknown, role: using, scope:module:X)
+*
+*  import X              X = (kind:module, role:imported)
+*
+*  import X.a, X.b       X = (kind:module, role:imported)
+*                     a, b = (kind: unknown, role:imported, scope:module:X)
+*
+*  import X: a, b     Same as the above one
+*/
+static roleDefinition JuliaModuleRoles [] = {
+    { true, "imported", "loaded by \"import\"" },
+    { true, "using", "loaded by \"using\"" },
+};
+
+static roleDefinition JuliaUnknownRoles [] = {
+    { true, "imported", "loaded by \"import\"" },
+    { true, "using", "loaded by \"using\""},
+};
 
 static kindDefinition JuliaKinds [] = {
     { true, 'c', "constant", "Constants"    },
     { true, 'f', "function", "Functions"    },
     { true, 'g', "field",    "Fields"       },
     { true, 'm', "macro",    "Macros"       },
-    { true, 'n', "module",   "Modules"      },
+    { true, 'n', "module",   "Modules",
+      ATTACH_ROLES(JuliaModuleRoles) },
     { true, 's', "struct",   "Structures"   },
     { true, 't', "type",     "Types"        },
-    // { true, 'x', "unknown",  "Imported name"}
+    { true, 'x', "unknown", "name defined in other modules",
+      .referenceOnly = true, ATTACH_ROLES(JuliaUnknownRoles) },
 };
 
 typedef enum {
@@ -81,6 +116,7 @@ typedef enum {
     TOKEN_ENUM,
     TOKEN_TYPE,
     TOKEN_IMPORT,         /*  = 20 */
+    TOKEN_USING,
     TOKEN_EXPORT,
     TOKEN_NEWLINE,
     TOKEN_SEMICOLON,
@@ -107,7 +143,7 @@ static const keywordTable JuliaKeywordTable [] = {
     { "module",    TOKEN_MODULE       },
     { "baremodule",TOKEN_MODULE       },
 
-    { "using",     TOKEN_IMPORT       },
+    { "using",     TOKEN_USING        },
     { "import",    TOKEN_IMPORT       },
 
     { "export",    TOKEN_EXPORT       },
@@ -638,6 +674,7 @@ static int parseIdentifier (lexerState *lexer)
     if ((k == TOKEN_OPEN_BLOCK)
         || (k == TOKEN_MODULE)
         || (k == TOKEN_IMPORT)
+        || (k == TOKEN_USING)
         || (k == TOKEN_EXPORT)
         || (k == TOKEN_CONST)
         || (k == TOKEN_MACRO)
@@ -841,6 +878,24 @@ static void addTag (vString* ident, const char* type, const char* arg_list, int 
     if (parent_kind != K_NONE)
     {
         tag.extensionFields.scopeKindIndex = parent_kind;
+        tag.extensionFields.scopeName = vStringValue(scope);
+    }
+    makeTagEntry(&tag);
+}
+
+static void addReferenceTag (vString* ident, int kind, int role, unsigned long line, MIOPos pos, vString* scope)
+{
+    if (kind == K_NONE)
+    {
+        return;
+    }
+    tagEntryInfo tag;
+    initRefTagEntry(&tag, vStringValue(ident), kind, role);
+    tag.lineNumber = line;
+    tag.filePosition = pos;
+    if (scope != NULL)
+    {
+        tag.extensionFields.scopeKindIndex = K_MODULE;
         tag.extensionFields.scopeName = vStringValue(scope);
     }
     makeTagEntry(&tag);
@@ -1155,39 +1210,95 @@ static void parseModule (lexerState *lexer, vString *scope, int parent_kind)
     parseExpr(lexer, true, K_MODULE, scope);
 }
 
+/*
+ * Parse a token in import expression that may have a dot in it.
+ */
+static void parseImportToken(lexerState *lexer, vString *scope, int module_role, int unknown_role, vString *module_name)
+{
+    char *dot = strchr(vStringValue(lexer->token_str), '.');
+    if (dot)
+    {
+        vString *module_part = vStringNewNInit(vStringValue(lexer->token_str), dot - vStringValue(lexer->token_str));
+        vString *unknown_part = vStringNewInit(dot + 1);
+        addReferenceTag(module_part, K_MODULE, module_role, lexer->line, lexer->pos, NULL);
+        addReferenceTag(unknown_part, K_UNKNOWN, unknown_role, lexer->line, lexer->pos, module_part);
+        vStringDelete(module_part);
+        vStringDelete(unknown_part);
+    }
+    else
+    {
+        addReferenceTag(module_name, K_MODULE, module_role, lexer->line, lexer->pos, NULL);
+    }
+}
+
 /* Import format:
  * [ "import" | "using" ] <ident> [: <name>]
  */
-static void parseImport (lexerState *lexer, vString *scope, int parent_kind)
+static void parseImport (lexerState *lexer, vString *scope, int token_type)
 {
     vString *name = vStringNew();
-
+    int module_role;
+    int unknown_role;
     /* capture the imported name */
     advanceToken(lexer, true);
-    if (lexer->cur_c == ':')
+    vStringCopy(name, lexer->token_str);
+    if (token_type == TOKEN_IMPORT)
     {
-        advanceAndStoreChar(lexer);
-        vStringCopy(name, lexer->token_str);
-        advanceToken(lexer, true);
+        module_role = JULIA_MODULE_IMPORTED;
+        unknown_role = JULIA_UNKNOWN_IMPORTED;
+        /* The import expression may look like "import Mod" or "import
+         * Mod.symbol", we have to deal with these 2 possibilities. */
+        parseImportToken(lexer, scope, module_role, unknown_role, name);
     }
-
-    while (lexer->cur_token == TOKEN_IDENTIFIER || lexer->cur_token == TOKEN_MACROCALL)
+    else /* if (token_type) == TOKEN_USING */
     {
-        // addTag(lexer->token_str, vStringValue(name), NULL, K_IMPORT, lexer->line, lexer->pos, scope, parent_kind);
-
-        skipWhitespace(lexer, false);
-        if (lexer->cur_c == ',')
+        module_role = JULIA_MODULE_USING;
+        unknown_role = JULIA_UNKNOWN_USING;
+        /* The using expression always look like "using Mod", so we can tag it
+         * easily. */
+        addReferenceTag(lexer->token_str, K_MODULE, module_role, lexer->line, lexer->pos, NULL);
+    }
+    if (lexer->cur_c == ':' || lexer->cur_c == ',')
+    {
+        char delimiter = lexer->cur_c;
+        advanceChar(lexer);
+        advanceToken(lexer, true);
+        if (lexer->cur_token == TOKEN_NEWLINE)
         {
-            advanceNChar(lexer, 1);
             advanceToken(lexer, true);
-            if (lexer->cur_token == TOKEN_NEWLINE)
+        }
+        while (lexer->cur_token == TOKEN_IDENTIFIER || lexer->cur_token == TOKEN_MACROCALL)
+        {
+            if (token_type == TOKEN_IMPORT && delimiter == ',')
+            {
+                /* import Mod1.symbol1, Mod2.symbol2, Mod3 */
+                parseImportToken(lexer, scope, module_role, unknown_role, name);
+            }
+            else if (token_type == TOKEN_USING && delimiter == ',')
+            {
+                /* using Mod1, Mod2 */
+                addReferenceTag(lexer->token_str, K_MODULE, module_role, lexer->line, lexer->pos, NULL);
+            }
+            else /* if (delimiter == ':') */
+            {
+                /* import Mod1: symbol1, symbol2 */
+                /* using Mod1: symbol1, symbol2 */
+                addReferenceTag(lexer->token_str, K_UNKNOWN, unknown_role, lexer->line, lexer->pos, name);
+            }
+            skipWhitespace(lexer, false);
+            if (lexer->cur_c == ',')
+            {
+                advanceNChar(lexer, 1);
+                advanceToken(lexer, true);
+                if (lexer->cur_token == TOKEN_NEWLINE)
+                {
+                    advanceToken(lexer, true);
+                }
+            }
+            else
             {
                 advanceToken(lexer, true);
             }
-        }
-        else
-        {
-            advanceToken(lexer, true);
         }
     }
 
@@ -1317,8 +1428,10 @@ static void parseExpr (lexerState *lexer, bool delim, int kind, vString *scope)
                 parseType(lexer, scope, kind);
                 break;
             case TOKEN_IMPORT:
-                parseImport(lexer, scope, kind);
+                parseImport(lexer, scope, TOKEN_IMPORT);
                 break;
+            case TOKEN_USING:
+                parseImport(lexer, scope, TOKEN_USING);
             case TOKEN_IDENTIFIER:
                 if (lexer->first_token && lexer->cur_c == '.')
                 {
