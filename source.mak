@@ -190,6 +190,7 @@ PARSER_HEADS = \
 	$(NULL)
 
 PARSER_SRCS =				\
+	parsers/abaqus.c		\
 	parsers/ada.c			\
 	parsers/ant.c			\
 	parsers/asciidoc.c		\
