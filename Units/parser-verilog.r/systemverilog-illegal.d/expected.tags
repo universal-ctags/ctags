@@ -1,0 +1,2 @@
+m	input.sv	/^module m;$/;"	m
+foo	input.sv	/^  logic foo;$/;"	r	module:m

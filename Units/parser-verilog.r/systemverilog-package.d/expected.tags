@@ -1,6 +1,10 @@
 MyPackage	input.sv	/^package MyPackage;$/;"	K
 MyData	input.sv	/^    } MyData;$/;"	T	package:MyPackage
 MyPackage.MyData	input.sv	/^    } MyData;$/;"	T	package:MyPackage
+a	input.sv	/^        shortreal a;$/;"	w	typedef:MyPackage.MyData
+MyPackage.MyData.a	input.sv	/^        shortreal a;$/;"	w	typedef:MyPackage.MyData
+b	input.sv	/^        real b;$/;"	w	typedef:MyPackage.MyData
+MyPackage.MyData.b	input.sv	/^        real b;$/;"	w	typedef:MyPackage.MyData
 add	input.sv	/^    function MyData add(MyData x, y);$/;"	f	package:MyPackage
 MyPackage.add	input.sv	/^    function MyData add(MyData x, y);$/;"	f	package:MyPackage
 x	input.sv	/^    function MyData add(MyData x, y);$/;"	p	function:MyPackage.add

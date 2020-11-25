@@ -43,15 +43,19 @@ enum _EsType {
   ES_TYPE_CONS,
   ES_TYPE_REGEX,
   /* ... */
-  ES_TYPE_ERROR
+  ES_TYPE_ERROR,
+  /* ... */
+  ES_TYPE_BUILTIN_LAST = ES_TYPE_ERROR,
+  ES_TYPE_FOREIGNER_START,
 };
 typedef enum _EsType EsType;
 
 struct _EsObject;
 typedef struct _EsObject EsObject;
 
-EsType      es_object_get_type      (const EsObject*      object);
+const char* es_type_get_name        (int t);
 
+EsType      es_object_get_type      (const EsObject*      object);
 
 
 EsObject*   es_object_ref           (EsObject*       object);
@@ -156,10 +160,46 @@ EsObject*    es_regex_exec    (const EsObject* regex,
 							   const EsObject* str);
 
 /*
+ * Foreign pointer
+ */
+EsType       es_type_define_pointer   (const char *name,
+									   void (* freefn) (void *),
+									   int  (* equalfn) (const void*, const void*),
+									   void (* printfn) (const void*, MIO *));
+
+/* If the type has sized fat area, the area is filled with zero. */
+EsObject*    es_pointer_new    (EsType type, void *ptr);
+void*        es_pointer_get    (const EsObject *object);
+void*        es_pointer_take   (EsObject *object);
+
+/*
+ * Fatptr: Foreign pointer with extra data
+ *
+ * init_fat () returns es_true if the initialization ends successfully.
+ * In failure case, init_fat () returns an error object.
+ */
+EsType       es_type_define_fatptr    (const char *name,
+									   size_t fat_size,
+									   EsObject *(* initfat_fn) (void *fat, void * ptr, void *extra),
+									   void (* freefn) (void * ptr, void *fat),
+									   int  (* equalfn) (const void* ptr_a, const void* fat_a,
+														 const void* ptr_b, const void* fat_b),
+									   void (* printfn) (const void* ptr, const void *fat, MIO *));
+/* If initfat_fn is given in the type, the new fat area will is
+ * initialized with the method.
+ * If initfat_fn is not given, and extra is not NULL, the contents
+ * pointed by extra is copied to the fat area.
+ * If initfat_fn is not given, and extra is NULL, the fat area
+ * is filled with zero as es_pointer_new does. */
+EsObject*    es_fatptr_new     (EsType type, void *ptr, void *extra);
+/* Access to the fat area. Use es_pointer_get to access the pointer. */
+void*        es_fatptr_get     (const EsObject *object);
+
+/*
  * Print
  */
 void         es_print           (const EsObject* object,
-				 MIO*           out);
+								 MIO*           out);
 char*        es_print_to_string (EsObject*        object);
 
 /*

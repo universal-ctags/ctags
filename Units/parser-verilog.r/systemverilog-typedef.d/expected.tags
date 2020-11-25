@@ -5,53 +5,77 @@ fwd_type_class	input.sv	/^typedef class             fwd_type_class;$/;"	Q
 fwd_type_interface_class	input.sv	/^typedef interface class   fwd_type_interface_class;$/;"	Q
 fwd_type	input.sv	/^typedef                   fwd_type;$/;"	Q
 type_enum	input.sv	/^typedef enum           {no, yes} type_enum;$/;"	T
-yes	input.sv	/^typedef enum           {no, yes} type_enum;$/;"	c	typedef:type_enum
-type_enum.yes	input.sv	/^typedef enum           {no, yes} type_enum;$/;"	c	typedef:type_enum
 no	input.sv	/^typedef enum           {no, yes} type_enum;$/;"	c	typedef:type_enum
 type_enum.no	input.sv	/^typedef enum           {no, yes} type_enum;$/;"	c	typedef:type_enum
+yes	input.sv	/^typedef enum           {no, yes} type_enum;$/;"	c	typedef:type_enum
+type_enum.yes	input.sv	/^typedef enum           {no, yes} type_enum;$/;"	c	typedef:type_enum
 type_enum_bit	input.sv	/^typedef enum bit       {W, X}    type_enum_bit;$/;"	T
-X	input.sv	/^typedef enum bit       {W, X}    type_enum_bit;$/;"	c	typedef:type_enum_bit
-type_enum_bit.X	input.sv	/^typedef enum bit       {W, X}    type_enum_bit;$/;"	c	typedef:type_enum_bit
 W	input.sv	/^typedef enum bit       {W, X}    type_enum_bit;$/;"	c	typedef:type_enum_bit
 type_enum_bit.W	input.sv	/^typedef enum bit       {W, X}    type_enum_bit;$/;"	c	typedef:type_enum_bit
+X	input.sv	/^typedef enum bit       {W, X}    type_enum_bit;$/;"	c	typedef:type_enum_bit
+type_enum_bit.X	input.sv	/^typedef enum bit       {W, X}    type_enum_bit;$/;"	c	typedef:type_enum_bit
 type_enum_bit2	input.sv	/^typedef enum bit [1:0] {Y, Z}    type_enum_bit2;$/;"	T
-Z	input.sv	/^typedef enum bit [1:0] {Y, Z}    type_enum_bit2;$/;"	c	typedef:type_enum_bit2
-type_enum_bit2.Z	input.sv	/^typedef enum bit [1:0] {Y, Z}    type_enum_bit2;$/;"	c	typedef:type_enum_bit2
 Y	input.sv	/^typedef enum bit [1:0] {Y, Z}    type_enum_bit2;$/;"	c	typedef:type_enum_bit2
 type_enum_bit2.Y	input.sv	/^typedef enum bit [1:0] {Y, Z}    type_enum_bit2;$/;"	c	typedef:type_enum_bit2
+Z	input.sv	/^typedef enum bit [1:0] {Y, Z}    type_enum_bit2;$/;"	c	typedef:type_enum_bit2
+type_enum_bit2.Z	input.sv	/^typedef enum bit [1:0] {Y, Z}    type_enum_bit2;$/;"	c	typedef:type_enum_bit2
 type_struct	input.sv	/^  } type_struct;$/;"	T
+struct_real	input.sv	/^  real       struct_real;$/;"	w	typedef:type_struct
+type_struct.struct_real	input.sv	/^  real       struct_real;$/;"	w	typedef:type_struct
+struct_bit	input.sv	/^  bit  [1:0] struct_bit;$/;"	w	typedef:type_struct
+type_struct.struct_bit	input.sv	/^  bit  [1:0] struct_bit;$/;"	w	typedef:type_struct
 type_union	input.sv	/^  } type_union;$/;"	T
+union_real	input.sv	/^  real       union_real;$/;"	w	typedef:type_union
+type_union.union_real	input.sv	/^  real       union_real;$/;"	w	typedef:type_union
+union_bit	input.sv	/^  bit  [1:0] union_bit;$/;"	w	typedef:type_union
+type_union.union_bit	input.sv	/^  bit  [1:0] union_bit;$/;"	w	typedef:type_union
 type_union_packed	input.sv	/^  } type_union_packed;$/;"	T
+union_bit1	input.sv	/^  bit  [1:0] union_bit1;$/;"	w	typedef:type_union_packed
+type_union_packed.union_bit1	input.sv	/^  bit  [1:0] union_bit1;$/;"	w	typedef:type_union_packed
+union_bit2	input.sv	/^  bit  [1:0] union_bit2;$/;"	w	typedef:type_union_packed
+type_union_packed.union_bit2	input.sv	/^  bit  [1:0] union_bit2;$/;"	w	typedef:type_union_packed
 type_union_tagged	input.sv	/^  } type_union_tagged;$/;"	T
+Invalid	input.sv	/^  void Invalid;$/;"	w	typedef:type_union_tagged
+type_union_tagged.Invalid	input.sv	/^  void Invalid;$/;"	w	typedef:type_union_tagged
+Valid	input.sv	/^  int Valid;$/;"	w	typedef:type_union_tagged
+type_union_tagged.Valid	input.sv	/^  int Valid;$/;"	w	typedef:type_union_tagged
 type_struct_union	input.sv	/^  } type_struct_union;$/;"	T
+struct_real	input.sv	/^  real       struct_real;$/;"	w	typedef:type_struct_union
+type_struct_union.struct_real	input.sv	/^  real       struct_real;$/;"	w	typedef:type_struct_union
+struct_union	input.sv	/^    } struct_union;$/;"	w	typedef:type_struct_union
+type_struct_union.struct_union	input.sv	/^    } struct_union;$/;"	w	typedef:type_struct_union
 type_strcut_packed_unsigned	input.sv	/^} type_strcut_packed_unsigned;$/;"	T
+upper	input.sv	/^  logic [7:0] upper;$/;"	w	typedef:type_strcut_packed_unsigned
+type_strcut_packed_unsigned.upper	input.sv	/^  logic [7:0] upper;$/;"	w	typedef:type_strcut_packed_unsigned
+lower	input.sv	/^  logic [7:0] lower;$/;"	w	typedef:type_strcut_packed_unsigned
+type_strcut_packed_unsigned.lower	input.sv	/^  logic [7:0] lower;$/;"	w	typedef:type_strcut_packed_unsigned
 type_bit	input.sv	/^typedef      bit                 type_bit;$/;"	T
 type_bit_bus	input.sv	/^typedef      bit [1:0]           type_bit_bus;$/;"	T
 type_bit_bus_array	input.sv	/^typedef      bit [1:0]           type_bit_bus_array [2:0];$/;"	T
 type_logic_signed_vec	input.sv	/^typedef      logic signed [7:0]  type_logic_signed_vec;$/;"	T
 type_bit_unsigned_vec	input.sv	/^typedef      bit unsigned [7:0]  type_bit_unsigned_vec;$/;"	T
 type_int_unsigned	input.sv	/^    } type_int_unsigned;$/;"	T
-cond2	input.sv	/^    cond0 = 0, cond1 = 1, cond2 = 2$/;"	c	typedef:type_int_unsigned
-type_int_unsigned.cond2	input.sv	/^    cond0 = 0, cond1 = 1, cond2 = 2$/;"	c	typedef:type_int_unsigned
-cond1	input.sv	/^    cond0 = 0, cond1 = 1, cond2 = 2$/;"	c	typedef:type_int_unsigned
-type_int_unsigned.cond1	input.sv	/^    cond0 = 0, cond1 = 1, cond2 = 2$/;"	c	typedef:type_int_unsigned
 cond0	input.sv	/^    cond0 = 0, cond1 = 1, cond2 = 2$/;"	c	typedef:type_int_unsigned
 type_int_unsigned.cond0	input.sv	/^    cond0 = 0, cond1 = 1, cond2 = 2$/;"	c	typedef:type_int_unsigned
+cond1	input.sv	/^    cond0 = 0, cond1 = 1, cond2 = 2$/;"	c	typedef:type_int_unsigned
+type_int_unsigned.cond1	input.sv	/^    cond0 = 0, cond1 = 1, cond2 = 2$/;"	c	typedef:type_int_unsigned
+cond2	input.sv	/^    cond0 = 0, cond1 = 1, cond2 = 2$/;"	c	typedef:type_int_unsigned
+type_int_unsigned.cond2	input.sv	/^    cond0 = 0, cond1 = 1, cond2 = 2$/;"	c	typedef:type_int_unsigned
 type_enum_bit_bus_defined_values	input.sv	/^} type_enum_bit_bus_defined_values;$/;"	T
-D	input.sv	/^    D = {1'b1, 1'b1}$/;"	c	typedef:type_enum_bit_bus_defined_values
-type_enum_bit_bus_defined_values.D	input.sv	/^    D = {1'b1, 1'b1}$/;"	c	typedef:type_enum_bit_bus_defined_values
-C	input.sv	/^    C = 2'b10,$/;"	c	typedef:type_enum_bit_bus_defined_values
-type_enum_bit_bus_defined_values.C	input.sv	/^    C = 2'b10,$/;"	c	typedef:type_enum_bit_bus_defined_values
-B	input.sv	/^    B = 2'b01,$/;"	c	typedef:type_enum_bit_bus_defined_values
-type_enum_bit_bus_defined_values.B	input.sv	/^    B = 2'b01,$/;"	c	typedef:type_enum_bit_bus_defined_values
 A	input.sv	/^    A = 2'b00,$/;"	c	typedef:type_enum_bit_bus_defined_values
 type_enum_bit_bus_defined_values.A	input.sv	/^    A = 2'b00,$/;"	c	typedef:type_enum_bit_bus_defined_values
+B	input.sv	/^    B = 2'b01,$/;"	c	typedef:type_enum_bit_bus_defined_values
+type_enum_bit_bus_defined_values.B	input.sv	/^    B = 2'b01,$/;"	c	typedef:type_enum_bit_bus_defined_values
+C	input.sv	/^    C = 2'b10,$/;"	c	typedef:type_enum_bit_bus_defined_values
+type_enum_bit_bus_defined_values.C	input.sv	/^    C = 2'b10,$/;"	c	typedef:type_enum_bit_bus_defined_values
+D	input.sv	/^    D = {1'b1, 1'b1}$/;"	c	typedef:type_enum_bit_bus_defined_values
+type_enum_bit_bus_defined_values.D	input.sv	/^    D = {1'b1, 1'b1}$/;"	c	typedef:type_enum_bit_bus_defined_values
 foo_t	input.sv	/^typedef  bit [7:0]  foo_t ;$/;"	T
 bar_e	input.sv	/^} bar_e;$/;"	T
-Z	input.sv	/^    Z = -1$/;"	c	typedef:bar_e
-bar_e.Z	input.sv	/^    Z = -1$/;"	c	typedef:bar_e
-Y	input.sv	/^    Y = 'h0001,$/;"	c	typedef:bar_e
-bar_e.Y	input.sv	/^    Y = 'h0001,$/;"	c	typedef:bar_e
 X	input.sv	/^    X = 'h0000,$/;"	c	typedef:bar_e
 bar_e.X	input.sv	/^    X = 'h0000,$/;"	c	typedef:bar_e
+Y	input.sv	/^    Y = 'h0001,$/;"	c	typedef:bar_e
+bar_e.Y	input.sv	/^    Y = 'h0001,$/;"	c	typedef:bar_e
+Z	input.sv	/^    Z = -1$/;"	c	typedef:bar_e
+bar_e.Z	input.sv	/^    Z = -1$/;"	c	typedef:bar_e
 type_class	input.sv	/^typedef classname#(paramvalue) type_class;$/;"	T

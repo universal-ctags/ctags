@@ -1,0 +1,17 @@
+a	input.jl	/^const a::Int = 'c'  # struct Struct_wrong3 end$/;"	c
+test_macro	input.jl	/^macro test_macro() end$/;"	m
+test_fun	input.jl	/^function test_fun(a::Int, b::T) where #$/;"	f
+Base.ifelse	input.jl	/^function Base.ifelse(a::Int)$/;"	f
+lone_function	input.jl	/^function lone_function end$/;"	f
+run_test	input.jl	/^function run_test(a::T) where T<:Int; a::Int end$/;"	f
+eq	input.jl	/^eq(c=4; b=(1,2,3), c=:a=>5) = a == b$/;"	f
+eq	input.jl	/^eq(a::T, b::T, c=4; b=(1,2,3), c=:a=>5)::T where T<:Real = (a == b; a)$/;"	f
+ATest	input.jl	/^abstract type ATest end$/;"	t
+STest	input.jl	/^mutable struct STest <: ATest; a::Int end$/;"	s
+a	input.jl	/^mutable struct STest <: ATest; a::Int end$/;"	g	struct:STest
+Test1	input.jl	/^struct Test1 <: ATest$/;"	s
+a	input.jl	/^    a::Int$/;"	g	struct:Test1
+α	input.jl	/^    α::Real$/;"	g	struct:Test1
+Test1	input.jl	/^    Test1() = new(0)$/;"	f	struct:Test1
+Test1	input.jl	/^    Test1(a) = new(1)$/;"	f	struct:Test1
+Test1	input.jl	/^    Test1(a, b) = begin new(2) end$/;"	f	struct:Test1

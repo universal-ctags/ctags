@@ -2,9 +2,9 @@ Bus	input.sv	/^class Bus;$/;"	C
 addr	input.sv	/^  rand bit[15:0] addr;$/;"	r	class:Bus
 data	input.sv	/^  rand bit[31:0] data;$/;"	r	class:Bus
 AddrType	input.sv	/^typedef enum {low, mid, high} AddrType;$/;"	T
-high	input.sv	/^typedef enum {low, mid, high} AddrType;$/;"	c	typedef:AddrType
-mid	input.sv	/^typedef enum {low, mid, high} AddrType;$/;"	c	typedef:AddrType
 low	input.sv	/^typedef enum {low, mid, high} AddrType;$/;"	c	typedef:AddrType
+mid	input.sv	/^typedef enum {low, mid, high} AddrType;$/;"	c	typedef:AddrType
+high	input.sv	/^typedef enum {low, mid, high} AddrType;$/;"	c	typedef:AddrType
 MyBus	input.sv	/^class MyBus extends Bus;$/;"	C
 atype	input.sv	/^  rand AddrType atype;$/;"	r	class:MyBus
 exercise_bus	input.sv	/^task exercise_bus (MyBus bus);$/;"	t

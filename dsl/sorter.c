@@ -12,7 +12,7 @@
 
 #include "sorter.h"
 #include "dsl.h"
-#include "es-lang-c-stdc99.h"
+#include "es.h"
 
 #include <stdlib.h>
 #include <string.h>

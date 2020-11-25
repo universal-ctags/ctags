@@ -165,6 +165,7 @@
     <ClCompile Include="..\optlib\qemuhx.c" />
     <ClCompile Include="..\optlib\scss.c" />
     <ClCompile Include="..\optlib\systemtap.c" />
+    <ClCompile Include="..\parsers\abaqus.c" />                       
     <ClCompile Include="..\parsers\abc.c" />
     <ClCompile Include="..\parsers\ada.c" />
     <ClCompile Include="..\parsers\ant.c" />
@@ -214,12 +215,14 @@
     <ClCompile Include="..\parsers\fortran.c" />
     <ClCompile Include="..\parsers\fypp.c" />
     <ClCompile Include="..\parsers\go.c" />
+    <ClCompile Include="..\parsers\haxe.c" />
     <ClCompile Include="..\parsers\html.c" />
     <ClCompile Include="..\parsers\iniconf.c" />
     <ClCompile Include="..\parsers\itcl.c" />
     <ClCompile Include="..\parsers\jprop.c" />
     <ClCompile Include="..\parsers\jscript.c" />
     <ClCompile Include="..\parsers\json.c" />
+    <ClCompile Include="..\parsers\julia.c" />
     <ClCompile Include="..\parsers\ldscript.c" />
     <ClCompile Include="..\parsers\lisp.c" />
     <ClCompile Include="..\parsers\lua.c" />

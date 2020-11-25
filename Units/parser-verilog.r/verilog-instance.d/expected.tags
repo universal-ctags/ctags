@@ -1,0 +1,36 @@
+foo	input.v	/^module foo # (parameter$/;"	m
+PAR_A	input.v	/^              PAR_A = 1,$/;"	c	module:foo
+foo.PAR_A	input.v	/^              PAR_A = 1,$/;"	c	module:foo
+PAR_B	input.v	/^              PAR_B = 2$/;"	c	module:foo
+foo.PAR_B	input.v	/^              PAR_B = 2$/;"	c	module:foo
+a	input.v	/^   input a, b;$/;"	p	module:foo
+foo.a	input.v	/^   input a, b;$/;"	p	module:foo
+b	input.v	/^   input a, b;$/;"	p	module:foo
+foo.b	input.v	/^   input a, b;$/;"	p	module:foo
+top	input.v	/^module top (\/*AUTOARG*\/$/;"	m
+a	input.v	/^   input                a;                      \/\/ To uut3 of foo.v$/;"	p	module:top
+top.a	input.v	/^   input                a;                      \/\/ To uut3 of foo.v$/;"	p	module:top
+b	input.v	/^   input                b;                      \/\/ To uut3 of foo.v$/;"	p	module:top
+top.b	input.v	/^   input                b;                      \/\/ To uut3 of foo.v$/;"	p	module:top
+unused_pin	input.v	/^   wire unused_pin;$/;"	n	module:top
+top.unused_pin	input.v	/^   wire unused_pin;$/;"	n	module:top
+uut1	input.v	/^   foo uut1 ($/;"	i	module:top
+top.uut1	input.v	/^   foo uut1 ($/;"	i	module:top
+uut2	input.v	/^     uut2 ($/;"	i	module:top
+top.uut2	input.v	/^     uut2 ($/;"	i	module:top
+uut3	input.v	/^   foo uut3 (\/*AUTOINST*\/$/;"	i	module:top
+top.uut3	input.v	/^   foo uut3 (\/*AUTOINST*\/$/;"	i	module:top
+uut4	input.v	/^   uut4 (\/*AUTOINST*\/$/;"	i	module:top
+top.uut4	input.v	/^   uut4 (\/*AUTOINST*\/$/;"	i	module:top
+uut5	input.v	/^   uut5 (\/*AUTOINST*\/$/;"	i	module:top
+top.uut5	input.v	/^   uut5 (\/*AUTOINST*\/$/;"	i	module:top
+uut6	input.v	/^   foo uut6 [10:0]();$/;"	i	module:top
+top.uut6	input.v	/^   foo uut6 [10:0]();$/;"	i	module:top
+uut7	input.v	/^   foo uut7 [1:0][10:0]();$/;"	i	module:top
+top.uut7	input.v	/^   foo uut7 [1:0][10:0]();$/;"	i	module:top
+uut8	input.v	/^   foo uut8 () ;$/;"	i	module:top
+top.uut8	input.v	/^   foo uut8 () ;$/;"	i	module:top
+func_foo	input.v	/^   function void func_foo(int a);$/;"	f	module:top
+top.func_foo	input.v	/^   function void func_foo(int a);$/;"	f	module:top
+a	input.v	/^   function void func_foo(int a);$/;"	p	function:top.func_foo
+top.func_foo.a	input.v	/^   function void func_foo(int a);$/;"	p	function:top.func_foo

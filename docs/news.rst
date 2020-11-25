@@ -36,6 +36,7 @@ New parsers
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 The following parsers have been added:
 
+* Abaqus
 * Abc
 * Ada
 * AnsiblePlaybook *libyaml*
@@ -60,9 +61,11 @@ The following parsers have been added:
 * Gdbinit script *optlib*
 * Glade *libxml*
 * Go
+* Haxe
 * Inko *optlib*
 * JavaProperties
 * JSON
+* Julia
 * Kconfig *optlib*
 * GNU linker script(LdScript)
 * Man page *optlib*

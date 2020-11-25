@@ -43,6 +43,7 @@
 
 /* Add the name of any new parser definition function here */
 #define PARSER_LIST \
+	AbaqusParser, \
 	AbcParser, \
 	AdaParser, \
 	AntParser, \
@@ -82,6 +83,7 @@
 	FyppParser,	   \
 	GdbinitParser, \
 	GoParser, \
+	HaxeParser, \
 	HtmlParser, \
 	IniconfParser, \
 	InkoParser, \
@@ -90,6 +92,7 @@
 	JavaPropertiesParser, \
 	JavaScriptParser, \
 	JsonParser, \
+	JuliaParser, \
 	KconfigParser, \
 	LdScriptParser, \
 	LispParser, \

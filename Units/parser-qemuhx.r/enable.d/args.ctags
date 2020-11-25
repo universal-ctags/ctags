@@ -1,4 +1,5 @@
 --sort=no
 --extras-QemuHX=+{funcmap}
 --fields=+E
+--language-force=QemuHX
 

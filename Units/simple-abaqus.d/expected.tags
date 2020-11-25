@@ -1,0 +1,3 @@
+Part-1	input.inp	/^*Part, name=Part-1$/;"	p
+Assembly	input.inp	/^*Assembly, name=Assembly$/;"	a
+Step-1	input.inp	/^*Step, name=Step-1$/;"	s

@@ -42,13 +42,13 @@ typedef enum _CXXParserParseTemplateAngleBracketsResult
 
 static bool cxxTemplateTokenCheckIsNonTypeAndCompareWord(const CXXToken *t,void * szWord)
 {
-	// To be non type the token must NOT be preceeded by class/struct/union
+	// To be non type the token must NOT be preceded by class/struct/union
 	if(!t->pPrev)
 		return false;
 	if(cxxTokenTypeIs(t->pPrev,CXXTokenTypeKeyword))
 	{
 		if(cxxKeywordIsTypeRefMarker(t->pPrev->eKeyword))
-			return false; // preceeded by a type ref marker
+			return false; // preceded by a type ref marker
 
 		// otherwise it's probably something like "int"
 	}
@@ -79,7 +79,7 @@ static bool cxxTokenIsPresentInTemplateParametersAsNonType(CXXToken * t)
 
 static bool cxxTemplateTokenCheckIsTypeAndCompareWord(const CXXToken * t,void * szWord)
 {
-	// To be non type the token must be preceeded by class/struct/union
+	// To be non type the token must be preceded by class/struct/union
 	if(!t->pPrev)
 		return false;
 	if(!cxxTokenTypeIs(t->pPrev,CXXTokenTypeKeyword))
