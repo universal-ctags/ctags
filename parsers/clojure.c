@@ -123,6 +123,7 @@ static int makeNamespaceTag (vString * const name, const char *dbp)
 
 static void makeFunctionTag (vString * const name, const char *dbp, int scope_index)
 {
+	dbp = skipMetadata (dbp);
 	functionName (name, dbp);
 	if (vStringLength (name) > 0 && ClojureKinds[K_FUNCTION].enabled)
 	{

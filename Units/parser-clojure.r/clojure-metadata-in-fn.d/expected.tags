@@ -1,0 +1,6 @@
+my-fn	input.clj	/^(defn my-fn [])$/;"	f
+my-hinted-fn	input.clj	/^(defn my-hinted-fn ^MyReturnType [])$/;"	f
+my-private-fn	input.clj	/^(defn ^:private my-private-fn [])$/;"	f
+my-private-hinted-fn	input.clj	/^(defn ^:private my-private-hinted-fn ^MyReturnType [])$/;"	f
+my-public-fn	input.clj	/^(defn ^{:foo :bar} my-public-fn [])$/;"	f
+so-many-hints	input.clj	/^(defn ^:private so-many-hints ^MyReturnType$/;"	f
