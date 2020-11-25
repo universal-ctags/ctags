@@ -37,6 +37,7 @@ New parsers
 The following parsers have been added:
 
 * Abaqus
+* Abc
 * Ada
 * AnsiblePlaybook *libyaml*
 * Asciidoc

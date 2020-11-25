@@ -191,6 +191,7 @@ PARSER_HEADS = \
 
 PARSER_SRCS =				\
 	parsers/abaqus.c		\
+	parsers/abc.c			\
 	parsers/ada.c			\
 	parsers/ant.c			\
 	parsers/asciidoc.c		\
