@@ -523,7 +523,8 @@ static tokenInfo *popToken (tokenInfo * const token)
 
 static void pruneTokens (tokenInfo * token)
 {
-	while ((token = popToken (token)));
+	while ((token = popToken (token)))
+		;
 }
 
 static const char *getNameForKind (const verilogKind kind)
@@ -698,7 +699,7 @@ static int skipPastMatch (const char *const pair)
 
 static int skipDimension (int c)
 {
-	while (c == '[')
+	while (c == '[' && c != EOF)
 		c = skipPastMatch ("[]");
 	return c;
 }
@@ -709,7 +710,7 @@ static int skipToSemiColon (void)
 	do
 	{
 		c = vGetc ();
-	} while (c != EOF && c != ';');
+	} while (c != ';' && c != EOF);
 	return c;	// ';' or EOF
 }
 
@@ -1140,7 +1141,7 @@ static int processEnum (tokenInfo *const token, int c)
 	tokenInfo* enumToken = dupToken (token);	// save enum token
 
 	/* skip enum_base_type */
-	while (isWordToken (c))
+	while (isWordToken (c) && c != EOF)
 		c = readWordToken (token, c);
 	c = skipDimension (c);
 
@@ -1167,7 +1168,7 @@ static int processStruct (tokenInfo *const token, int c)
 	verilogKind kind = token->kind;	// K_STRUCT or K_TYPEDEF
 
 	/* Skip packed, signed, and unsigned */
-	while (isWordToken (c))
+	while (isWordToken (c) && c != EOF)
 		c = readWordToken (token, c);
 
 	/* create a list of members */
@@ -1374,7 +1375,7 @@ static int processDesignElement (tokenInfo *const token, int c)
 	if (isWordToken (c))
 	{
 		c = readWordToken (token, c);
-		while (token->kind == K_IGNORE) // skip static or automatic
+		while (token->kind == K_IGNORE && c != EOF) // skip static or automatic
 		{
 			if (isWordToken (c))
 				c = readWordToken (token, c);
@@ -1460,7 +1461,7 @@ static int pushEnumNames (tokenInfo* token, int c)
 	if (c == '{')
 	{
 		c = skipWhite (vGetc ());
-		while (isWordToken (c))
+		while (isWordToken (c) && c != EOF)
 		{
 			c = readWordToken (token, c);
 			token->kind = K_CONSTANT;
