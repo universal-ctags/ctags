@@ -610,26 +610,37 @@ static void parseString (vString *const string, const int delimiter)
 	}
 }
 
-/* reads an HereDoc or a NowDoc (the part after the <<<).
+/* reads a PHP >= 7.3 HereDoc or a NowDoc (the part after the <<<).
  * 	<<<[ \t]*(ID|'ID'|"ID")
  * 	...
- * 	ID;?
+ * 	[ \t]*ID[^:indent-char:];?
  *
  * note that:
  *  1) starting ID must be immediately followed by a newline;
  *  2) closing ID is the same as opening one;
- *  3) closing ID must be immediately followed by a newline or a semicolon
- *     then a newline.
+ *  3) closing ID must not be immediately followed by an identifier character;
+ *  4) optional indentation of the closing ID is stripped from body lines,
+ *     which lines must have the exact same prefix indentation.
  *
- * Example of a *single* valid heredoc:
+ * This is slightly relaxed from PHP < 7.3, where the closing ID had to be the
+ * only thing on its line, with the only exception of a semicolon right after
+ * the ID.
+ *
+ * Example of a single valid heredoc:
  * 	<<< FOO
  * 	something
  * 	something else
- * 	FOO this is not an end
- * 	FOO; this isn't either
- * 	FOO; # neither this is
+ * 	FOO_this is not an end
  * 	FOO;
  * 	# previous line was the end, but the semicolon wasn't required
+ *
+ * Another example using indentation and more code after the heredoc:
+ * 	<<<FOO
+ * 		something
+ * 		something else
+ * 		FOO . 'hello';
+ * 	# the heredoc ends at FOO, and leading tabs are stripped from the body.
+ * 	# ". 'hello'" is a normal concatenation operator and the string "hello".
  */
 static void parseHeredoc (vString *const string)
 {
@@ -679,48 +690,29 @@ static void parseHeredoc (vString *const string)
 		{
 			/* new line, check for a delimiter right after */
 			int nl = c;
-			int extra = EOF;
 
 			c = getcFromInputFile ();
+			while (c == ' ' || c == '\t')
+			{
+				vStringPut (string, (char) c);
+				c = getcFromInputFile ();
+			}
+
 			for (len = 0; c != 0 && (c - delimiter[len]) == 0; len++)
 				c = getcFromInputFile ();
 
 			if (delimiter[len] != 0)
 				ungetcToInputFile (c);
-			else
+			else if (! isIdentChar (c))
 			{
-				/* line start matched the delimiter, now check whether there
-				 * is anything after it */
-				if (c == '\r' || c == '\n')
-				{
-					ungetcToInputFile (c);
-					break;
-				}
-				else if (c == ';')
-				{
-					int d = getcFromInputFile ();
-					if (d == '\r' || d == '\n')
-					{
-						/* put back the semicolon since it's not part of the
-						 * string.  we can't put back the newline, but it's a
-						 * whitespace character nobody cares about it anyway */
-						ungetcToInputFile (';');
-						break;
-					}
-					else
-					{
-						/* put semicolon in the string and continue */
-						extra = ';';
-						ungetcToInputFile (d);
-					}
-				}
+				/* line start matched the delimiter and has a separator, we're done */
+				ungetcToInputFile (c);
+				break;
 			}
 			/* if we are here it wasn't a delimiter, so put everything in the
 			 * string */
 			vStringPut (string, (char) nl);
 			vStringNCatS (string, delimiter, len);
-			if (extra != EOF)
-				vStringPut (string, (char) extra);
 		}
 	}
 	while (c != EOF);

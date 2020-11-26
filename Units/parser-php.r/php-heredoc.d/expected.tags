@@ -1,0 +1,8 @@
+a	input.php	/^$a = <<<EOS$/;"	v
+b	input.php	/^$b = <<<'EOS'$/;"	v
+c	input.php	/^$c = <<<"EOS"$/;"	v
+d	input.php	/^$d = <<<EOS$/;"	v
+e	input.php	/^$e = <<<EOS$/;"	v
+f	input.php	/^$f = <<<EOS$/;"	v
+g	input.php	/^$g = <<<EOS$/;"	v
+zzz_end	input.php	/^$zzz_end = 42;$/;"	v
