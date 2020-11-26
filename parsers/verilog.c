@@ -1242,7 +1242,7 @@ static int processParameterList (tokenInfo *token, int c)
 		if (c == '(')
 		{
 			c = skipWhite (vGetc ());
-			while (true)
+			while (c != ')' && c != EOF)
 			{
 				if (isWordToken (c))
 				{
@@ -1269,8 +1269,6 @@ static int processParameterList (tokenInfo *token, int c)
 					else if (token->kind == K_LOCALPARAM)
 						parameter = false;
 				}
-				else if  (c == ')' || c == EOF)
-					break;
 				else
 					c = skipWhite (vGetc ());
 				// unpacked array is not allowed for a parameter
@@ -1494,7 +1492,7 @@ static int pushMembers (tokenInfo* token, int c)
 	if (c == '{')
 	{
 		c = skipWhite (vGetc ());
-		do
+		while (c != '}' && c != EOF)
 		{
 			verilogKind kind = K_UNDEFINED;	// set kind of context for processType()
 			if (!isWordToken (c))
@@ -1505,7 +1503,7 @@ static int pushMembers (tokenInfo* token, int c)
 			c = readWordToken (token, c);
 
 			c = processType (token, c, &kind);
-			do
+			while (true)
 			{
 				token->kind = K_MEMBER;
 				ptrArrayAdd (tagContents, dupToken (token));
@@ -1529,15 +1527,13 @@ static int pushMembers (tokenInfo* token, int c)
 					verbose ("Unexpected input.\n");
 					break;
 				}
-			} while (true);
+			}
 
 			/* Skip semicolon */
 			if (c == ';')
 				c = skipWhite (vGetc ());
 			/* End of enum elements list */
-			if (c == '}' || c == EOF)
-				break;
-		} while (true);
+		}
 		c = skipWhite (vGetc ());
 	}
 	return c;
@@ -1551,7 +1547,7 @@ static int pushMembers (tokenInfo* token, int c)
 static int processType (tokenInfo* token, int c, verilogKind* kind)
 {
 	verilogKind actualKind = K_UNDEFINED;
-	while (true)
+	do
 	{
 		// [ class_type :: | package_identifier :: | $unit :: ] type_identifier { [ ... ] }
 		if (c == ':')
@@ -1601,9 +1597,7 @@ static int processType (tokenInfo* token, int c, verilogKind* kind)
 				break;
 			}
 		}
-		if (c == '`')	// break on compiler directive
-			break;
-	}
+	} while (c != '`' && c != EOF);	// break on compiler directive
 
 	// skip unpacked dimension (or packed dimension after type-words)
 	c = skipDimension (skipWhite (c));
@@ -1625,7 +1619,7 @@ static int tagNameList (tokenInfo* token, int c)
 		return c;	// foo[...].bar = ..;
 	c = skipDelay(token, c);
 
-	do
+	while (c != EOF)
 	{
 		c = processType(token, c, &kind);	// update token and kind
 
@@ -1657,7 +1651,7 @@ static int tagNameList (tokenInfo* token, int c)
 		c = skipMacro (c);	// `ifdef, `else, `endif, etc. (after comma)
 		if (kind == K_IDENTIFIER)	// for "module foo (a, b, c);"
 			kind = K_UNDEFINED;
-	} while (true);
+	}
 
 	return c;
 }
