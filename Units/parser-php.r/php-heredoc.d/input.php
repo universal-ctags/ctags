@@ -34,5 +34,24 @@ $g = <<<EOS
   42
   EOS+4;
 
+/* check we get the right value out of the heredocs */
+
+define(<<<EOS
+constant1
+EOS
+, 42);
+
+define(<<<EOS
+constant2
+EOS, 43);
+
+define(<<<EOS
+  constant3
+  EOS, 43);
+
+define(<<<EOS
+	constant4
+	EOS, 44);
+
 # just to check we're correctly out of a heredoc/nowdoc here
 $zzz_end = 42;

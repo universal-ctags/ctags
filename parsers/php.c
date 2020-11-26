@@ -610,6 +610,38 @@ static void parseString (vString *const string, const int delimiter)
 	}
 }
 
+/* Strips @indent_len characters from lines in @string to get the correct
+ * string value for an indented heredoc (PHP 7.3+).
+ * This doesn't handle invalid values specially and might yield surprising
+ * results with them, but it doesn't really matter as it's invalid anyway. */
+static void stripHeredocIndent (vString *const string, size_t indent_len)
+{
+	char *str = vStringValue (string);
+	size_t str_len = vStringLength (string);
+	char *p = str;
+	size_t new_len = str_len;
+	bool at_line_start = true;
+
+	while (*p)
+	{
+		if (at_line_start)
+		{
+			size_t p_len;
+			size_t strip_len;
+
+			p_len = str_len - (p - str);
+			strip_len = p_len < indent_len ? p_len : indent_len;
+			memmove (p, p + strip_len, p_len - strip_len);
+			p += strip_len;
+			new_len -= strip_len;
+		}
+		/* CRLF is already normalized as LF */
+		at_line_start = (*p == '\r' || *p == '\n');
+		p++;
+	}
+	vStringTruncate (string, new_len);
+}
+
 /* reads a PHP >= 7.3 HereDoc or a NowDoc (the part after the <<<).
  * 	<<<[ \t]*(ID|'ID'|"ID")
  * 	...
@@ -684,18 +716,20 @@ static void parseHeredoc (vString *const string)
 	{
 		c = getcFromInputFile ();
 
-		if (c != '\r' && c != '\n')
-			vStringPut (string, (char) c);
-		else
+		vStringPut (string, (char) c);
+		if (c == '\r' || c == '\n')
 		{
-			/* new line, check for a delimiter right after */
-			int nl = c;
+			/* new line, check for a delimiter right after.  No need to handle
+			 * CRLF, getcFromInputFile() normalizes it to LF already. */
+			const size_t prev_string_len = vStringLength (string) - 1;
+			size_t indent_len = 0;
 
 			c = getcFromInputFile ();
 			while (c == ' ' || c == '\t')
 			{
 				vStringPut (string, (char) c);
 				c = getcFromInputFile ();
+				indent_len++;
 			}
 
 			for (len = 0; c != 0 && (c - delimiter[len]) == 0; len++)
@@ -707,11 +741,17 @@ static void parseHeredoc (vString *const string)
 			{
 				/* line start matched the delimiter and has a separator, we're done */
 				ungetcToInputFile (c);
+
+				/* strip trailing newline and indent of the end delimiter */
+				vStringTruncate (string, prev_string_len);
+
+				/* strip indent from the value if needed */
+				if (indent_len > 0)
+					stripHeredocIndent (string, indent_len);
 				break;
 			}
 			/* if we are here it wasn't a delimiter, so put everything in the
 			 * string */
-			vStringPut (string, (char) nl);
 			vStringNCatS (string, delimiter, len);
 		}
 	}
