@@ -112,6 +112,7 @@ typedef struct sInputFile {
 	inputLineFposMap lineFposMap;
 	vString *allLines;
 	int thinDepth;
+	time_t mtime;
 } inputFile;
 
 static inputLangInfo inputLang;
@@ -604,8 +605,8 @@ static bool parseLineDirective (char *s)
 #define MAX_IN_MEMORY_FILE_SIZE (1024*1024)
 #endif
 
-extern MIO *getMio (const char *const fileName, const char *const openMode,
-		    bool memStreamRequired)
+static MIO *getMioFull (const char *const fileName, const char *const openMode,
+		    bool memStreamRequired, time_t *mtime)
 {
 	FILE *src;
 	fileStatus *st;
@@ -614,6 +615,8 @@ extern MIO *getMio (const char *const fileName, const char *const openMode,
 
 	st = eStat (fileName);
 	size = st->size;
+	if (mtime)
+		*mtime = st->mtime;
 	eStatFree (st);
 	if ((!memStreamRequired)
 	    && (size > MAX_IN_MEMORY_FILE_SIZE || size == 0))
@@ -635,6 +638,12 @@ extern MIO *getMio (const char *const fileName, const char *const openMode,
 	}
 	fclose (src);
 	return mio_new_memory (data, size, eRealloc, eFreeNoNullCheck);
+}
+
+extern MIO *getMio (const char *const fileName, const char *const openMode,
+		    bool memStreamRequired)
+{
+	return getMioFull (fileName, openMode, memStreamRequired, NULL);
 }
 
 /* Return true if utf8 BOM is found */
@@ -708,7 +717,7 @@ extern bool openInputFile (const char *const fileName, const langType language,
 			mio_rewind (mio);
 	}
 
-	File.mio = mio? mio_ref (mio): getMio (fileName, openMode, memStreamRequired);
+	File.mio = mio? mio_ref (mio): getMioFull (fileName, openMode, memStreamRequired, &File.mtime);
 
 	if (File.mio == NULL)
 		error (WARNING | PERROR, "cannot open \"%s\"", fileName);
@@ -716,6 +725,8 @@ extern bool openInputFile (const char *const fileName, const langType language,
 	{
 		opened = true;
 
+		if (File.mio == mio)
+			memset (&File.mtime, 0, sizeof (File.mtime));
 
 		File.bomFound = checkUTF8BOM (File.mio, true);
 
@@ -746,6 +757,11 @@ extern bool openInputFile (const char *const fileName, const langType language,
 				 memStreamRequired? ",required": "");
 	}
 	return opened;
+}
+
+extern time_t getInputFileMtime (void)
+{
+	return File.mtime;
 }
 
 extern void resetInputFile (const langType language)

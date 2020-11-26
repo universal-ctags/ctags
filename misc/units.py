@@ -486,7 +486,7 @@ def run_tcase(finput, t, name, tclass, category, build_t, extra_inputs):
     #
     # Build cmdline
     #
-    cmdline = [CTAGS, '--verbose', '--options=NONE']
+    cmdline = [CTAGS, '--verbose', '--options=NONE', '--fields=-T']
     if PRETENSE_OPTS != '':
         cmdline += [PRETENSE_OPTS]
     cmdline += ['--optlib-dir=+' + t + '/optlib', '-o', '-']

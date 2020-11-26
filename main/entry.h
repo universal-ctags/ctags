@@ -16,6 +16,7 @@
 #include "types.h"
 
 #include <stdint.h>
+#include <time.h>
 
 #include "field.h"
 #include "xtag.h"
@@ -95,6 +96,7 @@ struct sTagEntryInfo {
 		const char* xpath;
 #endif
 		unsigned long endLine;
+		time_t epoch;
 	} extensionFields;  /* list of extension fields*/
 
 	/* `usedParserFields' tracks how many parser own fields are

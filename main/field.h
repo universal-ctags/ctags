@@ -57,7 +57,8 @@ typedef enum eFieldType { /* extension field content control */
 	FIELD_XPATH,
 	FIELD_SCOPE_KIND_LONG,
 	FIELD_END_LINE,
-	FIELD_BUILTIN_LAST = FIELD_END_LINE,
+	FIELD_EPOCH,
+	FIELD_BUILTIN_LAST = FIELD_EPOCH,
 } fieldType ;
 
 #define fieldDataTypeFalgs "sib" /* used in --list-fields */

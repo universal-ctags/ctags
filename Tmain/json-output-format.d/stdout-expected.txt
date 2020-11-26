@@ -1,4 +1,4 @@
-# json --languages=+man
+# json --languages=+man --fields=-T
 {"_type": "tag", "name": "Foo", "path": "input.py", "pattern": "/^class Foo:$/", "kind": "class"}
 {"_type": "tag", "name": "N\tA\tM\tE", "path": "input.1", "pattern": "/^.SH \"\tN\tA\tM\tE\t\"$/", "kind": "section"}
 {"_type": "tag", "name": "doIt", "path": "input.py", "pattern": "/^    def doIt():$/", "kind": "member", "scope": "Foo", "scopeKind": "class"}
@@ -6,7 +6,7 @@
 {"_type": "tag", "name": "main", "path": "input.c", "pattern": "/^main(void)$/", "typeref": "typename:int", "kind": "function"}
 {"_type": "tag", "name": "main", "path": "input.go", "pattern": "/^func main() {$/", "kind": "func", "scope": "main", "scopeKind": "package"}
 {"_type": "tag", "name": "main", "path": "input.go", "pattern": "/^package main$/", "kind": "package"}
-# json --languages=+man --fields=*
+# json --languages=+man --fields=*-T
 {"_type": "tag", "name": "Foo", "path": "input.py", "pattern": "/^class Foo:$/", "access": "public", "inherits": false, "language": "Python", "line": 1, "kind": "class", "roles": "def", "end": 3}
 {"_type": "tag", "name": "N\tA\tM\tE", "path": "input.1", "pattern": "/^.SH \"\tN\tA\tM\tE\t\"$/", "language": "Man", "line": 1, "kind": "section", "roles": "def"}
 {"_type": "tag", "name": "doIt", "path": "input.py", "pattern": "/^    def doIt():$/", "access": "public", "language": "Python", "line": 2, "signature": "()", "kind": "member", "roles": "def", "scope": "Foo", "scopeKind": "class", "end": 3}
@@ -14,7 +14,7 @@
 {"_type": "tag", "name": "main", "path": "input.c", "pattern": "/^main(void)$/", "language": "C", "line": 9, "signature": "(void)", "typeref": "typename:int", "kind": "function", "roles": "def", "end": 12}
 {"_type": "tag", "name": "main", "path": "input.go", "pattern": "/^func main() {$/", "language": "Go", "line": 3, "signature": "()", "kind": "func", "roles": "def", "scope": "main", "scopeKind": "package", "end": 4}
 {"_type": "tag", "name": "main", "path": "input.go", "pattern": "/^package main$/", "language": "Go", "line": 1, "kind": "package", "roles": "def"}
-# json --languages=+man --fields=* --extras=*
+# json --languages=+man --fields=*-T --extras=*
 {"_type": "ptag", "name": "JSON_OUTPUT_VERSION", "path": "0.0", "pattern": "in development"}
 {"_type": "ptag", "name": "TAG_FILE_SORTED", "path": "1", "pattern": "0=unsorted, 1=sorted, 2=foldcase"}
 {"_type": "ptag", "name": "TAG_OUTPUT_EXCMD", "path": "mixed", "pattern": "number, pattern, mixed, or combineV2"}

@@ -1,5 +1,6 @@
 # BUILTIN
 !_TAG_EXTRA_DESCRIPTION	pseudo	/Include pseudo tags/
+!_TAG_FIELD_DESCRIPTION	epoch	/the last modified time of the input file (only for F\/file kind tag)/
 !_TAG_FIELD_DESCRIPTION	input	/input file/
 !_TAG_FIELD_DESCRIPTION	name	/tag name/
 !_TAG_FIELD_DESCRIPTION	pattern	/pattern/
@@ -19,6 +20,7 @@
 # REGEX
 !_TAG_EXTRA_DESCRIPTION	pseudo	/Include pseudo tags/
 !_TAG_EXTRA_DESCRIPTION!foo	extra	/extra example/
+!_TAG_FIELD_DESCRIPTION	epoch	/the last modified time of the input file (only for F\/file kind tag)/
 !_TAG_FIELD_DESCRIPTION	input	/input file/
 !_TAG_FIELD_DESCRIPTION	name	/tag name/
 !_TAG_FIELD_DESCRIPTION	pattern	/pattern/

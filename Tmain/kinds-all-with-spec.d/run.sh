@@ -8,9 +8,9 @@ CTAGS=$1
 t ()
 {
 	echo '#' "--all-kinds=$1" 1>&2
-	$CTAGS --quiet --options=NONE -o - --all-kinds="$1" input.c
+	$CTAGS --quiet --options=NONE -o - --all-kinds="$1" --fields=-T input.c
 	echo '#' "--kinds-all=$1" 1>&2
-	$CTAGS --quiet --options=NONE -o - --kinds-all="$1" input.c
+	$CTAGS --quiet --options=NONE -o - --kinds-all="$1" --fields=-T input.c
 }
 
 echo '#' 1>&2
@@ -91,15 +91,15 @@ echo '#' 1>&2
 echo '# Just print the parsed file name' 1>&2
 echo '#' 1>&2
 
-$CTAGS --quiet --options=NONE -o- --all-kinds=F --extras=+f input.c
-$CTAGS --quiet --options=NONE -o- --all-kinds=FF --extras=+f input.c
-$CTAGS --quiet --options=NONE -o- --all-kinds=-F+F --extras=+f input.c
-$CTAGS --quiet --options=NONE -o- --all-kinds='*' --all-kinds=F --extras=+f input.c
+$CTAGS --quiet --options=NONE -o- --all-kinds=F --extras=+f --fields=-T input.c
+$CTAGS --quiet --options=NONE -o- --all-kinds=FF --extras=+f --fields=-T input.c
+$CTAGS --quiet --options=NONE -o- --all-kinds=-F+F --extras=+f --fields=-T input.c
+$CTAGS --quiet --options=NONE -o- --all-kinds='*' --all-kinds=F --extras=+f --fields=-T input.c
 
-$CTAGS --quiet --options=NONE -o- --kinds-all=F --extras=+f input.c
-$CTAGS --quiet --options=NONE -o- --kinds-all=FF --extras=+f input.c
-$CTAGS --quiet --options=NONE -o- --kinds-all=-F+F --extras=+f input.c
-$CTAGS --quiet --options=NONE -o- --kinds-all='*' --kinds-all=F --extras=+f input.c
+$CTAGS --quiet --options=NONE -o- --kinds-all=F --extras=+f --fields=-T input.c
+$CTAGS --quiet --options=NONE -o- --kinds-all=FF --extras=+f --fields=-T input.c
+$CTAGS --quiet --options=NONE -o- --kinds-all=-F+F --extras=+f --fields=-T input.c
+$CTAGS --quiet --options=NONE -o- --kinds-all='*' --kinds-all=F --extras=+f --fields=-T input.c
 
 echo '#' 1>&2
 echo '# The original test cases' 1>&2

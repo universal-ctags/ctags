@@ -203,6 +203,9 @@ extern void makeFileTag (const char *const fileName)
 		tag.extensionFields.endLine = getInputLineNumber ();
 	}
 
+	if (isFieldEnabled (FIELD_EPOCH))
+		tag.extensionFields.epoch = getInputFileMtime ();
+
 	makeTagEntry (&tag);
 }
 
