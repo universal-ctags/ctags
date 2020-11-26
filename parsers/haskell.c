@@ -273,6 +273,7 @@ static void findHaskellTags (int is_literate)
 			}
 		}
 		if (is_literate && in_tex_lit_code && c == '\\') {
+			get_line(token);
 			if (strncmp(token, "end{code}", 9) == 0) {
 				in_tex_lit_code = 0;
 				c = get_next_char();
