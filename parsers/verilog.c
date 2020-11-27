@@ -432,24 +432,6 @@ static short isTempContext (tokenInfo const* token)
 	}
 }
 
-static short hasSimplePortList (verilogKind kind)
-{
-	switch (kind)
-	{
-		case K_TASK:
-		case K_FUNCTION:
-		case K_CHECKER:
-		case K_CLASS:
-		case K_INTERFACE:
-		case K_PROGRAM:
-		case K_PROPERTY:
-		case K_SEQUENCE:
-			return true;
-		default:
-			return false;
-	}
-}
-
 static void clearToken (tokenInfo *token)
 {
 	token->kind = K_UNDEFINED;	// to be set by updateKind()
@@ -1367,58 +1349,46 @@ static int processAssertion (tokenInfo *const token, int c)
 // ANSI type
 // ( module | interface | program ) [ static | automatic ] identifier { package_import_declaration } [ parameter_port_list ] [ ( [ < { (* ... *) } ansi_port_declaration > ] ) ] ;
 //
-// interface class class_identifier [ parameter_port_list ] [ extends < interface_class_type > ] ;
+// interface class class_identifier [ parameter_port_list ] [ extends < interface_class_type > ] ;	// FIXME
 static int processDesignElementL (tokenInfo *const token, int c)
 {
 	verilogKind kind = token->kind;
 
 	if (isWordToken (c))
-	{
 		c = readWordToken (token, c);
-		while (token->kind == K_IGNORE && c != EOF) // skip static or automatic
-		{
-			if (isWordToken (c))
-				c = readWordToken (token, c);
-		}
-		createTag (token, kind);	// identifier
+	else
+		return c;
 
-		// package_import_declaration : FIXME
-
-		if (c == '#')	// parameter_port_list
-		{
-			c = processParameterList (token, c);
-
-			/* Put found parameters in context */
-			verbose ("Putting parameters: %d element(s)\n",
-					ptrArrayCount(tagContents));
-			for (unsigned int i = 0; i < ptrArrayCount (tagContents); i++)
-			{
-				tokenInfo *content = ptrArrayItem (tagContents, i);
-				createTag (content, K_CONSTANT);
-			}
-			ptrArrayClear (tagContents);
-			// disable parameter property on parameter declaration statement
-			currentContext->hasParamList = true;
-		}
-
-		// skip clocking_event of clocking block
-		if (c == '@' && kind == K_CLOCKING)
-		{
-			c = skipWhite (vGetc ());
-			if (c == '(')
-				c = skipPastMatch ("()");
-		}
-
-		/* Get port list if required */
-		if (c == '(')	// port_list
-		{
-			if (kind == K_MODPORT)
-				c = skipPastMatch ("()");	// ignore port list
-			else if (hasSimplePortList (kind))
-				c = processPortList (token, c);
-		}
-		// skip coverage_event for covergroup : FIXME
+	while (token->kind == K_IGNORE && c != EOF) // skip static or automatic
+	{
+		if (isWordToken (c))
+			c = readWordToken (token, c);
 	}
+	createTag (token, kind);	// identifier
+
+	// package_import_declaration : FIXME
+
+	if (c == '#')	// parameter_port_list
+	{
+		c = processParameterList (token, c);
+
+		/* Put found parameters in context */
+		verbose ("Putting parameters: %d element(s)\n",
+				ptrArrayCount(tagContents));
+		for (unsigned int i = 0; i < ptrArrayCount (tagContents); i++)
+		{
+			tokenInfo *content = ptrArrayItem (tagContents, i);
+			createTag (content, K_CONSTANT);
+		}
+		ptrArrayClear (tagContents);
+		// disable parameter property on parameter declaration statement
+		currentContext->hasParamList = true;
+	}
+
+	// Process ANSI/non-ANSI port list in main loop
+	if (c == '(')	// port_list
+		c = skipWhite (vGetc());
+
 	return c;
 }
 
@@ -1742,8 +1712,6 @@ static int findTag (tokenInfo *const token, int c)
 		case K_MODULE:
 		case K_PROGRAM:
 			c = processDesignElementL (token, c);
-			if (c == '(')	// FIXME: move into processDesignElement()
-				c = skipWhite (vGetc());
 			break;
 		case K_CHECKER:
 		case K_CLOCKING:
