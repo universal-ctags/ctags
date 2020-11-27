@@ -704,13 +704,10 @@ static int skipDimension (int c)
 	return c;
 }
 
-static int skipToSemiColon (void)
+static int skipToSemiColon (int c)
 {
-	int c;
-	do
-	{
+	while (c != EOF && c != ';')
 		c = vGetc ();
-	} while (c != ';' && c != EOF);
 	return c;	// ';' or EOF
 }
 
@@ -1349,7 +1346,7 @@ static int processAssertion (tokenInfo *const token, int c)
 		vStringCopy (token->name, currentContext->blockName);
 		vStringClear (currentContext->blockName);	// clear block name not to be reused
 		createTag (token, K_ASSERTION);
-		c = skipToSemiColon ();	// FIXME
+		c = skipToSemiColon (c);	// FIXME
 	}
 	return c;
 }
@@ -1427,8 +1424,8 @@ static int skipDelay(tokenInfo* token, int c)
 		c = skipWhite (vGetc ());
 		if (c == '(')
 			c = skipPastMatch ("()");
-		else if (c == ('#')) {
-			c = skipToSemiColon ();	// a dirty hack for "x ##delay1 y[*min:max];"
+		else if (c == '#') {
+			c = skipToSemiColon (vGetc ());	// a dirty hack for "x ##delay1 y[*min:max];"
 		}
 		else	// time literals
 		{
@@ -1670,7 +1667,7 @@ static int findTag (tokenInfo *const token, int c)
 		case K_PORT:
 		case K_REGISTER:
 			if (token->kind == K_PORT && currentContext->kind == K_CLOCKING)
-				c = skipToSemiColon (); // clocking items are not port definitions
+				c = skipToSemiColon (c); // clocking items are not port definitions
 			else
 				c = tagNameList (token, c);
 			break;
