@@ -398,3 +398,17 @@ module A;
     a3: assert property (p2);
     a4: assert property (cb_without_input.p1);
 endmodule
+
+// original test
+// excerpt from UVM 1.2:examples/integrated/ubus/sv/ubus_slave_monitor.sv
+class C;
+  protected function void check_transfer_size();
+    assert_transfer_size : assert(trans_collected.size == 1) else begin
+      `uvm_error(get_type_name(),
+        "Invalid transfer size!")
+    end
+  endfunction : check_transfer_size
+
+  // check_transfer_data_size
+  protected function void check_transfer_data_size();
+  endfunction : check_transfer_data_size

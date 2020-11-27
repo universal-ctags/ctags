@@ -1334,11 +1334,14 @@ static int processDefine (tokenInfo *const token, int c)
 	return c;
 }
 
-// assert property ( property_spec ) action_block
-// assume property ( property_spec ) action_block
-// cover property ( property_spec ) statement_or_null
-// cover sequence ( [clocking_event ] [ disable iff ( expression_or_dist ) ] sequence_expr ) statement_or_null
-// restrict property ( property_spec ) ;
+// immediate_assertion_statement ::=
+//     ( assert | asume | cover ) [ #0 | final ] '(' expression ')' block
+// concurrent_assertion_statement ::=
+//     ( assert | assume ) property ( property_spec ) action_block
+//   | expect ( property_spec ) action_block  # ignore : processed as same as "if"
+//   | cover property ( property_spec ) statement_or_null
+//   | cover sequence ( [clocking_event ] [ disable iff ( expression_or_dist ) ] sequence_expr ) statement_or_null
+//   | restrict property ( property_spec ) ;
 static int processAssertion (tokenInfo *const token, int c)
 {
 	if (vStringLength (currentContext->blockName) > 0)
@@ -1346,8 +1349,15 @@ static int processAssertion (tokenInfo *const token, int c)
 		vStringCopy (token->name, currentContext->blockName);
 		vStringClear (currentContext->blockName);	// clear block name not to be reused
 		createTag (token, K_ASSERTION);
-		c = skipToSemiColon (c);	// FIXME
 	}
+	// skip final | property | sequence
+	if (isWordToken (c))
+		c = readWordToken (token, c);
+	// skip #0
+	c = skipDelay (token, c);
+	// skip ( ... )
+	if (c == '(')
+		c = skipPastMatch ("()");
 	return c;
 }
 
@@ -1710,7 +1720,7 @@ static int findTag (tokenInfo *const token, int c)
 		case K_PROPERTY:
 		case K_SEQUENCE:
 			c = processDesignElement (token, c);
-			if (c == '(')	// FIXME: fix processAssertion()
+			if (c == '(')	// FIXME: move into processDesignElement()
 				c = skipWhite (vGetc());
 			break;
 		case K_END_DE:
