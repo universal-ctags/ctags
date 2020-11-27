@@ -843,16 +843,8 @@ static int skipSingleComment (void)
 	do
 	{
 		c = getcFromInputFile ();
-		if (c == '\r')
-		{
-			int next = getcFromInputFile ();
-			if (next != '\n')
-				ungetcToInputFile (next);
-			else
-				c = next;
-		}
 		/* ?> in single-line comments leaves PHP mode */
-		else if (c == '?')
+		if (c == '?')
 		{
 			int next = getcFromInputFile ();
 			if (next == '>')
