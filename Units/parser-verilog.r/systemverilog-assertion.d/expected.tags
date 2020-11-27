@@ -1,13 +1,13 @@
 deferred_immediate_assertions	input.sv	/^initial begin : deferred_immediate_assertions$/;"	b
-immediate_assertion	input.sv	/^    immediate_assertion : assert () task();$/;"	A	block:deferred_immediate_assertions
-immediate_cover	input.sv	/^    immediate_cover     : cover () task();$/;"	A	block:deferred_immediate_assertions
-immediate_assume	input.sv	/^    immediate_assume    : assume () task();$/;"	A	block:deferred_immediate_assertions
-deferred_assertion1	input.sv	/^    deferred_assertion1 : assert #0 () task();$/;"	A	block:deferred_immediate_assertions
-deferred_cover1	input.sv	/^    deferred_cover1     : cover #0 () task();$/;"	A	block:deferred_immediate_assertions
-deferred_assume1	input.sv	/^    deferred_assume1    : assume #0 () task();$/;"	A	block:deferred_immediate_assertions
-deferred_assertion2	input.sv	/^    deferred_assertion2 : assert final () task();$/;"	A	block:deferred_immediate_assertions
-deferred_cover2	input.sv	/^    deferred_cover2     : cover final () task();$/;"	A	block:deferred_immediate_assertions
-deferred_assume2	input.sv	/^    deferred_assume2    : assume final () task();$/;"	A	block:deferred_immediate_assertions
+immediate_assertion	input.sv	/^    immediate_assertion : assert () myTask();$/;"	A	block:deferred_immediate_assertions
+immediate_cover	input.sv	/^    immediate_cover     : cover () myTask();$/;"	A	block:deferred_immediate_assertions
+immediate_assume	input.sv	/^    immediate_assume    : assume () myTask();$/;"	A	block:deferred_immediate_assertions
+deferred_assertion1	input.sv	/^    deferred_assertion1 : assert #0 () myTask();$/;"	A	block:deferred_immediate_assertions
+deferred_cover1	input.sv	/^    deferred_cover1     : cover #0 () myTask();$/;"	A	block:deferred_immediate_assertions
+deferred_assume1	input.sv	/^    deferred_assume1    : assume #0 () myTask();$/;"	A	block:deferred_immediate_assertions
+deferred_assertion2	input.sv	/^    deferred_assertion2 : assert final () myTask();$/;"	A	block:deferred_immediate_assertions
+deferred_cover2	input.sv	/^    deferred_cover2     : cover final () myTask();$/;"	A	block:deferred_immediate_assertions
+deferred_assume2	input.sv	/^    deferred_assume2    : assume final () myTask();$/;"	A	block:deferred_immediate_assertions
 prop1	input.sv	/^property prop1 ($/;"	R
 m	input.sv	/^    local input int m,$/;"	p	property:prop1
 n	input.sv	/^    logic [1:0] n,$/;"	p	property:prop1
@@ -178,3 +178,7 @@ a1	input.sv	/^    a1: assert property (p1);$/;"	A	module:A
 a2	input.sv	/^    a2: assert property (cb_with_input.p1);$/;"	A	module:A
 a3	input.sv	/^    a3: assert property (p2);$/;"	A	module:A
 a4	input.sv	/^    a4: assert property (cb_without_input.p1);$/;"	A	module:A
+C	input.sv	/^class C;$/;"	C
+check_transfer_size	input.sv	/^  protected function void check_transfer_size();$/;"	f	class:C
+assert_transfer_size	input.sv	/^    assert_transfer_size : assert(trans_collected.size == 1) else begin$/;"	A	function:C.check_transfer_size
+check_transfer_data_size	input.sv	/^  protected function void check_transfer_data_size();$/;"	f	class:C

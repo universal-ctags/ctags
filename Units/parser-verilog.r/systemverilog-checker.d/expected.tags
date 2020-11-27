@@ -8,7 +8,7 @@ c1	input.sv	/^    c1: cover property (!test_sig ##1 test_sig);$/;"	A	checker:my_
 my_check2	input.sv	/^checker my_check2 (logic a, b);$/;"	H
 a	input.sv	/^checker my_check2 (logic a, b);$/;"	p	checker:my_check2
 b	input.sv	/^checker my_check2 (logic a, b);$/;"	p	checker:my_check2
-a1	input.sv	/^    a1: assert #0 ($onehot0({a, b});$/;"	A	checker:my_check2
+a1	input.sv	/^    a1: assert #0 ($onehot0({a, b}));$/;"	A	checker:my_check2
 c1	input.sv	/^    c1: cover #0 (a == 0 && b == 0);$/;"	A	checker:my_check2
 c2	input.sv	/^    c2: cover #0 (a == 1);$/;"	A	checker:my_check2
 c3	input.sv	/^    c3: cover #0 (b == 1);$/;"	A	checker:my_check2
@@ -18,8 +18,8 @@ b	input.sv	/^checker my_check3 (logic a, b, event clock, output bit failure, und
 clock	input.sv	/^checker my_check3 (logic a, b, event clock, output bit failure, undef);$/;"	p	checker:my_check3
 failure	input.sv	/^checker my_check3 (logic a, b, event clock, output bit failure, undef);$/;"	p	checker:my_check3
 undef	input.sv	/^checker my_check3 (logic a, b, event clock, output bit failure, undef);$/;"	p	checker:my_check3
-a1	input.sv	/^    a1: assert property ($onehot0({a, b}) failure = 1'b0; else failure = 1'b1;$/;"	A	checker:my_check3
-a2	input.sv	/^    a2: assert property ($isunknown({a, b}) undef = 1'b0; else undef = 1'b1;$/;"	A	checker:my_check3
+a1	input.sv	/^    a1: assert property ($onehot0({a, b})) failure = 1'b0; else failure = 1'b1;$/;"	A	checker:my_check3
+a2	input.sv	/^    a2: assert property ($isunknown({a, b})) undef = 1'b0; else undef = 1'b1;$/;"	A	checker:my_check3
 my_check4	input.sv	/^checker my_check4 (input logic in,$/;"	H
 in	input.sv	/^checker my_check4 (input logic in,$/;"	p	checker:my_check4
 en	input.sv	/^                   en = 1'b1, \/\/ default value$/;"	p	checker:my_check4
@@ -62,7 +62,6 @@ check_loop	input.sv	/^                c1 check_loop(posedge clk, in1, in_array[v
 counter_model	input.sv	/^checker counter_model(logic flag);$/;"	H
 flag	input.sv	/^checker counter_model(logic flag);$/;"	p	checker:counter_model
 counter	input.sv	/^    bit [2:0] counter = '0;$/;"	r	checker:counter_model
-counter	input.sv	/^    assert property (@$global_clock counter == 0 |-> flag); \/\/ FIXME$/;"	r	checker:counter_model
 observer_model	input.sv	/^checker observer_model(bit valid, reset);$/;"	H
 valid	input.sv	/^checker observer_model(bit valid, reset);$/;"	p	checker:observer_model
 reset	input.sv	/^checker observer_model(bit valid, reset);$/;"	p	checker:observer_model

@@ -16,7 +16,7 @@ endchecker : my_check1
 
 // Simple checker containing deferred assertions
 checker my_check2 (logic a, b);
-    a1: assert #0 ($onehot0({a, b});
+    a1: assert #0 ($onehot0({a, b}));
     c1: cover #0 (a == 0 && b == 0);
     c2: cover #0 (a == 1);
     c3: cover #0 (b == 1);
@@ -25,8 +25,8 @@ endchecker : my_check2
 // Simple checker with output arguments
 checker my_check3 (logic a, b, event clock, output bit failure, undef);
     default clocking @clock; endclocking
-    a1: assert property ($onehot0({a, b}) failure = 1'b0; else failure = 1'b1;
-    a2: assert property ($isunknown({a, b}) undef = 1'b0; else undef = 1'b1;
+    a1: assert property ($onehot0({a, b})) failure = 1'b0; else failure = 1'b1;
+    a2: assert property ($isunknown({a, b})) undef = 1'b0; else undef = 1'b1;
 endchecker : my_check3
 
 // Checker with default input and initialized output arguments
@@ -105,7 +105,7 @@ checker counter_model(logic flag);
     bit [2:0] counter = '0;
     always_ff @$global_clock
         counter <= counter + 1'b1;
-    assert property (@$global_clock counter == 0 |-> flag); // FIXME
+    assert property (@$global_clock counter == 0 |-> flag);
 endchecker : counter_model
 
 checker observer_model(bit valid, reset);
