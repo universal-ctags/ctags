@@ -1367,13 +1367,66 @@ static int processAssertion (tokenInfo *const token, int c)
 // ( module | interface | program ) [ static | automatic ] identifier { package_import_declaration } [ parameter_port_list ] [ ( [ < { (* ... *) } ansi_port_declaration > ] ) ] ;
 //
 // interface class class_identifier [ parameter_port_list ] [ extends < interface_class_type > ] ;
-//
+static int processDesignElementL (tokenInfo *const token, int c)
+{
+	verilogKind kind = token->kind;
+
+	if (isWordToken (c))
+	{
+		c = readWordToken (token, c);
+		while (token->kind == K_IGNORE && c != EOF) // skip static or automatic
+		{
+			if (isWordToken (c))
+				c = readWordToken (token, c);
+		}
+		createTag (token, kind);	// identifier
+
+		// package_import_declaration : FIXME
+
+		if (c == '#')	// parameter_port_list
+		{
+			c = processParameterList (token, c);
+
+			/* Put found parameters in context */
+			verbose ("Putting parameters: %d element(s)\n",
+					ptrArrayCount(tagContents));
+			for (unsigned int i = 0; i < ptrArrayCount (tagContents); i++)
+			{
+				tokenInfo *content = ptrArrayItem (tagContents, i);
+				createTag (content, K_CONSTANT);
+			}
+			ptrArrayClear (tagContents);
+			// disable parameter property on parameter declaration statement
+			currentContext->hasParamList = true;
+		}
+
+		// skip clocking_event of clocking block
+		if (c == '@' && kind == K_CLOCKING)
+		{
+			c = skipWhite (vGetc ());
+			if (c == '(')
+				c = skipPastMatch ("()");
+		}
+
+		/* Get port list if required */
+		if (c == '(')	// port_list
+		{
+			if (kind == K_MODPORT)
+				c = skipPastMatch ("()");	// ignore port list
+			else if (hasSimplePortList (kind))
+				c = processPortList (token, c);
+		}
+		// skip coverage_event for covergroup : FIXME
+	}
+	return c;
+}
+
 // ( checker | property | sequence ) identifier [ ( [ port_list ] ) ] ;
 // covergroup identifier [ ( [ port_list ] ) ] [ coverage_event ] ;
 // package identifier ;
 // modport < identifier ( < ports_declaration > ) > ;  // FIXME
 // [ default | global ] clocking [ identifier ] ( @ identifier | @ ( event_expression ) )
-static int processDesignElement (tokenInfo *const token, int c)
+static int processDesignElementS (tokenInfo *const token, int c)
 {
 	verilogKind kind = token->kind;
 
@@ -1709,17 +1762,21 @@ static int findTag (tokenInfo *const token, int c)
 			currentContext->prototype = true;
 			break;
 
+		case K_INTERFACE:
+		case K_MODULE:
+		case K_PROGRAM:
+			c = processDesignElementL (token, c);
+			if (c == '(')	// FIXME: move into processDesignElement()
+				c = skipWhite (vGetc());
+			break;
 		case K_CHECKER:
 		case K_CLOCKING:
 		case K_COVERGROUP:
-		case K_INTERFACE:
 		case K_MODPORT:
-		case K_MODULE:
 		case K_PACKAGE:
-		case K_PROGRAM:
 		case K_PROPERTY:
 		case K_SEQUENCE:
-			c = processDesignElement (token, c);
+			c = processDesignElementS (token, c);
 			if (c == '(')	// FIXME: move into processDesignElement()
 				c = skipWhite (vGetc());
 			break;
