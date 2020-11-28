@@ -23,11 +23,16 @@
 #include "debug.h"
 #include "xtag.h"
 #include "objpool.h"
+#include "hint.h"
+#include "routines.h"
+#include "field.h"
 
 #define isIdentifierChar(c) \
 	(isalnum (c) || (c) == '_' || (c) >= 0x80)
 #define newToken() (objPoolGet (TokenPool))
 #define deleteToken(t) (objPoolPut (TokenPool, (t)))
+
+#define PYTHON_LANG_NAME "Python"
 
 enum {
 	KEYWORD_as,
@@ -133,12 +138,18 @@ static roleDefinition PythonModuleRoles [] = {
 };
 
 defineRolesWithCommoneElements (Unknown);
+defineRolesWithCommoneElements (Class);
+defineRolesWithCommoneElements (Variable);
+defineRolesWithCommoneElements (Function);
 
 static kindDefinition PythonKinds[COUNT_KIND] = {
-	{true, 'c', "class",    "classes"},
-	{true, 'f', "function", "functions"},
+	{true, 'c', "class",    "classes",
+	 .referenceOnly = false, ATTACH_ROLES(PythonClassRoles)},
+	{true, 'f', "function", "functions",
+	 .referenceOnly = false, ATTACH_ROLES(PythonFunctionRoles)},
 	{true, 'm', "member",   "class members"},
-	{true, 'v', "variable", "variables"},
+	{true, 'v', "variable", "variables",
+	 .referenceOnly = false, ATTACH_ROLES(PythonVariableRoles)},
 	{true, 'I', "namespace", "name referring a module defined in other file"},
 	{true, 'i', "module",    "modules",
 	 .referenceOnly = true,  ATTACH_ROLES(PythonModuleRoles)},
@@ -1057,6 +1068,80 @@ static bool parseClassOrDef (tokenInfo *const token,
 	return true;
 }
 
+struct foreachHintData
+{
+	const char *module_name;
+	size_t module_namelen;
+	int kind;
+};
+
+static bool findKindInHintEntry (const char *name, hintEntry *hint, void *data)
+{
+	struct foreachHintData *hdata = data;
+
+	const char *lang = hintFieldForType (hint, FIELD_LANGUAGE);
+
+	if (lang == NULL)
+		return true;			/* continue the finding */
+
+	if (strcmp (lang, PYTHON_LANG_NAME))
+		return true;			/* continue the finding */
+
+	if (!hint->file)
+		return true;			/* continue th finding */
+
+	const char *f = strrstr (hint->file, hdata->module_name);
+	if (f == NULL)
+		return true;			/* continue the finding */
+
+	const char * suffix = f + hdata->module_namelen;
+	if (strcmp(suffix, ".py") != 0)
+		return true;			/* continue the finding */
+
+	if (!(hint->kind && *hint->kind))
+		return true;
+
+	kindDefinition *kdef = (hint->kind[1] == '\0')
+		? getLanguageKindForLetter (Lang_python, *hint->kind)
+		: getLanguageKindForName (Lang_python, hint->kind);
+
+	if (kdef == NULL)
+		return true;			/* continue the finding */
+
+	switch (kdef->id)
+	{
+	case K_CLASS:
+	case K_FUNCTION:
+	case K_VARIABLE:
+		hdata->kind = kdef->id;
+		/* Found; stop the finding. */
+		return false;
+	default:
+		/* Not found; continue the finding. */
+		return true;
+	}
+}
+
+static int resolveKindWithHints (const char *name, int moduleIndex)
+{
+	if (!isHintAvailable ())
+		return K_UNKNOWN;
+
+	tagEntryInfo *e = getEntryInCorkQueue (moduleIndex);
+	if (!e)
+		return K_UNKNOWN;
+
+	struct foreachHintData data = {
+		.kind = K_UNKNOWN,
+		.module_name = e->name,
+		.module_namelen = strlen(e->name),
+	};
+
+	foreachHintEntries (name, TAG_FULLMATCH, findKindInHintEntry, &data);
+
+	return data.kind;
+}
+
 static bool parseImport (tokenInfo *const token)
 {
 	tokenInfo *fromModule = NULL;
@@ -1120,7 +1205,8 @@ static bool parseImport (tokenInfo *const token)
 							int index;
 
 							/* Y */
-							index = makeSimplePythonRefTag (name, NULL, K_UNKNOWN,
+							int kind  = resolveKindWithHints (vStringValue (name->string), moduleIndex);
+							index = makeSimplePythonRefTag (name, NULL, kind,
 															PYTHON_COMMON_INDIRECTLY_IMPORTED,
 															XTAG_UNKNOWN);
 							/* fill the scope field for Y */
@@ -1129,11 +1215,11 @@ static bool parseImport (tokenInfo *const token)
 								e->extensionFields.scopeIndex = moduleIndex;
 
 							/* Z */
-							index = makeSimplePythonTag (token, K_UNKNOWN);
+							index = makeSimplePythonTag (token, kind);
 							/* fill the nameref filed for Y */
 							if (PythonFields[F_NAMEREF].enabled)
 							{
-								vString *nameref = vStringNewInit (PythonKinds [K_UNKNOWN].name);
+								vString *nameref = vStringNewInit (PythonKinds [kind].name);
 								vStringPut (nameref, ':');
 								vStringCat (nameref, name->string);
 								attachParserFieldToCorkEntry (index, PythonFields[F_NAMEREF].ftype,
@@ -1178,7 +1264,8 @@ static bool parseImport (tokenInfo *const token)
 						   x = (kind:module,  role:namespace),
 						   Y = (kind:unknown, role:imported, scope:module:x) */
 						/* Y */
-						int index = makeSimplePythonRefTag (name, NULL, K_UNKNOWN,
+						int kind  = resolveKindWithHints (vStringValue (name->string), moduleIndex);
+						int index = makeSimplePythonRefTag (name, NULL, kind,
 															PYTHON_COMMON_IMPORTED,
 															XTAG_UNKNOWN);
 						/* fill the scope field for Y */
@@ -1577,7 +1664,7 @@ extern parserDefinition* PythonParser (void)
 	static const char *const extensions[] = { "py", "pyx", "pxd", "pxi", "scons",
 											  "wsgi", NULL };
 	static const char *const aliases[] = { "python[23]*", "scons", NULL };
-	parserDefinition *def = parserNew ("Python");
+	parserDefinition *def = parserNew (PYTHON_LANG_NAME);
 	def->kindTable = PythonKinds;
 	def->kindCount = ARRAY_SIZE (PythonKinds);
 	def->extensions = extensions;
