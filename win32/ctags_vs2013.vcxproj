@@ -262,6 +262,7 @@
     <ClCompile Include="..\parsers\tex.c" />
     <ClCompile Include="..\parsers\tex-beamer.c" />
     <ClCompile Include="..\parsers\ttcn.c" />
+    <ClCompile Include="..\parsers\txt2tags.c" />
     <ClCompile Include="..\parsers\typescript.c" />
     <ClCompile Include="..\parsers\verilog.c" />
     <ClCompile Include="..\parsers\vhdl.c" />
