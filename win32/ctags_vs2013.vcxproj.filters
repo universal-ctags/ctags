@@ -576,6 +576,9 @@
     <ClCompile Include="..\parsers\yumrepo.c">
       <Filter>Source Files\Parsers</Filter>
     </ClCompile>
+    <ClCompile Include="..\libreadtags\readtags.c">
+      <Filter>Source Files\Libreadtags</Filter>
+    </ClCompile>
     <ClCompile Include="mkstemp\mkstemp.c">
       <Filter>Source Files\win32\mkstemp</Filter>
     </ClCompile>
@@ -840,6 +843,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\parsers\tex.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\libreadtags\readtags.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="resource.h">
