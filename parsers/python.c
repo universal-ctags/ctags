@@ -88,15 +88,14 @@ typedef enum {
 } pythonKind;
 
 typedef enum {
-	PYTHON_MODULE_IMPORTED,
-	PYTHON_MODULE_NAMESPACE,
-	PYTHON_MODULE_INDIRECTLY_IMPORTED,
-} pythonModuleRole;
+	PYTHON_COMMON_IMPORTED,
+	PYTHON_COMMON_INDIRECTLY_IMPORTED,
+	PYTHON_COMMON_LAST = PYTHON_COMMON_INDIRECTLY_IMPORTED,
+} pythonCommonRole;
 
 typedef enum {
-	PYTHON_UNKNOWN_IMPORTED,
-	PYTHON_UNKNOWN_INDIRECTLY_IMPORTED,
-} pythonUnknownRole;
+	PYTHON_MODULE_NAMESPACE = PYTHON_COMMON_LAST + 1,
+} pythonModuleRole;
 
 /* Roles related to `import'
  * ==========================
@@ -116,20 +115,24 @@ typedef enum {
  *                       Y = (kind:unknown, role:indirectlyImported, scope:module:X)
  *                       Z = (kind:unknown, nameref:unknown:Y) */
 
+#define PythonCommonRolesElements										\
+	{ true, "imported",   "imported module/imported from the other module" }, \
+	{ true, "indirectlyImported",										\
+	  "classes/variables/functions/modules imported in alternative name" }
+
+#define defineRolesWithCommoneElements(KIND)			\
+	static roleDefinition Python##KIND##Roles [] = {	\
+		PythonCommonRolesElements,						\
+	}
+
+
 static roleDefinition PythonModuleRoles [] = {
-	{ true, "imported",
-	  "imported modules" },
+	PythonCommonRolesElements,
 	{ true, "namespace",
 	  "namespace from where classes/variables/functions are imported" },
-	{ true, "indirectlyImported",
-	  "module imported in alternative name" },
 };
 
-static roleDefinition PythonUnknownRoles [] = {
-	{ true, "imported",   "imported from the other module" },
-	{ true, "indirectlyImported",
-	  "classes/variables/functions/modules imported in alternative name" },
-};
+defineRolesWithCommoneElements (Unknown);
 
 static kindDefinition PythonKinds[COUNT_KIND] = {
 	{true, 'c', "class",    "classes"},
@@ -1118,7 +1121,7 @@ static bool parseImport (tokenInfo *const token)
 
 							/* Y */
 							index = makeSimplePythonRefTag (name, NULL, K_UNKNOWN,
-															PYTHON_UNKNOWN_INDIRECTLY_IMPORTED,
+															PYTHON_COMMON_INDIRECTLY_IMPORTED,
 															XTAG_UNKNOWN);
 							/* fill the scope field for Y */
 							tagEntryInfo *e = getEntryInCorkQueue (index);
@@ -1146,7 +1149,7 @@ static bool parseImport (tokenInfo *const token)
 							 * Y = (kind:namespace, nameref:module:x)*/
 							/* x */
 							makeSimplePythonRefTag (name, NULL, K_MODULE,
-							                        PYTHON_MODULE_INDIRECTLY_IMPORTED,
+							                        PYTHON_COMMON_INDIRECTLY_IMPORTED,
 							                        XTAG_UNKNOWN);
 							/* Y */
 							int index = makeSimplePythonTag (token, K_NAMESPACE);
@@ -1176,7 +1179,7 @@ static bool parseImport (tokenInfo *const token)
 						   Y = (kind:unknown, role:imported, scope:module:x) */
 						/* Y */
 						int index = makeSimplePythonRefTag (name, NULL, K_UNKNOWN,
-															PYTHON_UNKNOWN_IMPORTED,
+															PYTHON_COMMON_IMPORTED,
 															XTAG_UNKNOWN);
 						/* fill the scope field for Y */
 						tagEntryInfo *e = getEntryInCorkQueue (index);
@@ -1189,7 +1192,7 @@ static bool parseImport (tokenInfo *const token)
 						   --------------
 						   X = (kind:module, role:imported) */
 						makeSimplePythonRefTag (name, NULL, K_MODULE,
-						                        PYTHON_MODULE_IMPORTED,
+						                        PYTHON_COMMON_IMPORTED,
 						                        XTAG_UNKNOWN);
 					}
 				}

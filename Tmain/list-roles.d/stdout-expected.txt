@@ -61,10 +61,10 @@ Perl           M/module          unused             on      specified in `no' bu
 Perl           M/module          used               on      specified in `use' built-in function
 Protobuf       D/protodef        imported           on      imported
 Protobuf       m/message         extension          on      extending the message
-Python         i/module          imported           on      imported modules
-Python         i/module          indirectlyImported on      module imported in alternative name
+Python         i/module          imported           on      imported module/imported from the other module
+Python         i/module          indirectlyImported on      classes/variables/functions/modules imported in alternative name
 Python         i/module          namespace          on      namespace from where classes/variables/functions are imported
-Python         x/unknown         imported           on      imported from the other module
+Python         x/unknown         imported           on      imported module/imported from the other module
 Python         x/unknown         indirectlyImported on      classes/variables/functions/modules imported in alternative name
 R              l/library         library            on      library attached by library function
 R              l/library         require            on      library attached by require function
@@ -152,10 +152,10 @@ Perl           M/module          unused             on      specified in `no' bu
 Perl           M/module          used               on      specified in `use' built-in function
 Protobuf       D/protodef        imported           on      imported
 Protobuf       m/message         extension          on      extending the message
-Python         i/module          imported           on      imported modules
-Python         i/module          indirectlyImported on      module imported in alternative name
+Python         i/module          imported           on      imported module/imported from the other module
+Python         i/module          indirectlyImported on      classes/variables/functions/modules imported in alternative name
 Python         i/module          namespace          on      namespace from where classes/variables/functions are imported
-Python         x/unknown         imported           on      imported from the other module
+Python         x/unknown         imported           on      imported module/imported from the other module
 Python         x/unknown         indirectlyImported on      classes/variables/functions/modules imported in alternative name
 R              l/library         library            on      library attached by library function
 R              l/library         require            on      library attached by require function
