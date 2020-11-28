@@ -1,3 +1,5 @@
+Abstract1	input.php	/^abstract class Abstract1 {$/;"	c	implementation:abstract
+Abstracted	input.php	/^class Abstracted extends Abstract1 {$/;"	c	inherits:Abstract1
 Bar	input.php	/^class Bar {$/;"	c
 Foo	input.php	/^class Foo {$/;"	c
 Iface1	input.php	/^interface Iface1 {$/;"	i
@@ -6,6 +8,10 @@ Inherited	input.php	/^class Inherited extends Bar {$/;"	c	inherits:Bar
 Interfaced	input.php	/^class Interfaced extends Inherited implements Iface1, Iface2 {$/;"	c	inherits:Inherited,Iface1,Iface2
 __construct	input.php	/^	function __construct () {$/;"	f	class:Bar
 __construct	input.php	/^	function __construct($a, $b) {$/;"	f	class:Foo
+abstract_method1	input.php	/^	abstract function abstract_method1();$/;"	f	class:Abstract1	implementation:abstract
+abstract_method1	input.php	/^	function abstract_method1() {$/;"	f	class:Abstracted
+abstract_method2	input.php	/^	abstract protected function abstract_method2();$/;"	f	class:Abstract1	implementation:abstract
+abstract_method2	input.php	/^	protected function abstract_method2() {$/;"	f	class:Abstracted
 ifaced_method1	input.php	/^	function ifaced_method1 () {$/;"	f	class:Interfaced
 ifaced_method1	input.php	/^	function ifaced_method1 ();$/;"	f	interface:Iface1
 ifaced_method2	input.php	/^	function ifaced_method2 () {$/;"	f	class:Interfaced
@@ -13,3 +19,4 @@ ifaced_method2	input.php	/^	function ifaced_method2 ();$/;"	f	interface:Iface2
 method1	input.php	/^	function method1 () {$/;"	f	class:Bar
 method1	input.php	/^	function method1($arg) {$/;"	f	class:Foo
 method2	input.php	/^	function method2() {$/;"	f	class:Foo
+method3	input.php	/^	public function method3() {$/;"	f	class:Abstract1

@@ -1,0 +1,16 @@
+Acls1	input.php	/^abstract class Acls1 {$/;"	c	implementation:abstract
+AnonymousClass0314f3c80100	input.php	/^$obj = new class(array(1, 2, 3), (1 + 2) * 3) {$/;"	c
+Cls1	input.php	/^class Cls1 extends Acls1 {$/;"	c	inherits:Acls1
+WIDTH	input.php	/^define('WIDTH', 36 * ((4 + 2) \/ 3));$/;"	d
+__construct	input.php	/^  function __construct($a, $b) {$/;"	f	class:AnonymousClass0314f3c80100
+__construct	input.php	/^  public function __construct ($args = null) {$/;"	f	class:Acls1
+cls1	input.php	/^$cls1 = new Cls1();$/;"	v
+func1	input.php	/^function func1($n, $c) {$/;"	f
+func2	input.php	/^function func2($a, $b = ((4 + 1) * 2 - 4 \/ 2)) {$/;"	f
+func3	input.php	/^function func3($/;"	f	typeref:unknown:string
+name	input.php	/^$$name = 'world';$/;"	v
+name	input.php	/^$name = <<<NAME$/;"	v
+obj	input.php	/^$obj = new class(array(1, 2, 3), (1 + 2) * 3) {$/;"	v
+present	input.php	/^  protected abstract function present($args);$/;"	f	class:Acls1	implementation:abstract
+present	input.php	/^  protected function present($args) {$/;"	f	class:Cls1
+scisors	input.php	/^function scisors($width) {$/;"	f

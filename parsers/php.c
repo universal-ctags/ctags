@@ -840,13 +840,17 @@ static int findPhpStart (void)
 		if ((c = getcFromInputFile ()) == '<')
 		{
 			c = getcFromInputFile ();
-			/* <? and <?php, but not <?xml */
+			/* <?, <?= and <?php, but not <?xml */
 			if (c == '?')
 			{
+				c = getcFromInputFile ();
+				/* echo tag */
+				if (c == '=')
+					c = getcFromInputFile ();
 				/* don't enter PHP mode on "<?xml", yet still support short open tags (<?) */
-				if (tolower ((c = getcFromInputFile ())) != 'x' ||
-					tolower ((c = getcFromInputFile ())) != 'm' ||
-					tolower ((c = getcFromInputFile ())) != 'l')
+				else if (tolower (c)                          != 'x' ||
+				         tolower ((c = getcFromInputFile ())) != 'm' ||
+				         tolower ((c = getcFromInputFile ())) != 'l')
 				{
 					break;
 				}
@@ -871,16 +875,8 @@ static int skipSingleComment (void)
 	do
 	{
 		c = getcFromInputFile ();
-		if (c == '\r')
-		{
-			int next = getcFromInputFile ();
-			if (next != '\n')
-				ungetcToInputFile (next);
-			else
-				c = next;
-		}
 		/* ?> in single-line comments leaves PHP mode */
-		else if (c == '?')
+		if (c == '?')
 		{
 			int next = getcFromInputFile ();
 			if (next == '>')
