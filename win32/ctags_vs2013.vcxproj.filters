@@ -90,6 +90,9 @@
     <ClCompile Include="..\main\fmt.c">
       <Filter>Source Files\Main</Filter>
     </ClCompile>
+    <ClCompile Include="..\main\hint.c">
+      <Filter>Source Files\Main</Filter>
+    </ClCompile>
     <ClCompile Include="..\main\htable.c">
       <Filter>Source Files\Main</Filter>
     </ClCompile>
@@ -645,6 +648,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\main\gvars.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\main\hint.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\main\hint_p.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\main\htable.h">

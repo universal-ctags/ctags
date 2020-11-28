@@ -38,6 +38,7 @@
 #include "interactive_p.h"
 #include "writer_p.h"
 #include "trace.h"
+#include "hint_p.h"
 
 #ifdef HAVE_JANSSON
 #include <jansson.h>
@@ -247,6 +248,8 @@ static optionDescription LongOptionDescription [] = {
  {1,0,"       Write tags to specified <tagfile>. Value of \"-\" writes tags to stdout"},
  {1,0,"       [\"tags\"; or \"TAGS\" when -e supplied]."},
  {1,0,"  -o   Alternative for -f."},
+ {1,1, " --_hint-file=HINT.tags"},
+ {1,1, "      Use the existing tags file as hints for parsing and tagging"},
  {1,0,""},
  {1,0,"Output Format Options"},
  {0,0,"  --format=(1|2)"},
@@ -2879,6 +2882,7 @@ static parametricOption ParametricOptions [] = {
 #ifdef HAVE_JANSSON
 	{ "_interactive",           processInteractiveOption,       true,   STAGE_ANY },
 #endif
+	{ "_hint-file",             processHintFileOption,          true,   STAGE_ANY },
 	{ "_list-kinddef-flags",    processListKinddefFlagsOptions, true,   STAGE_ANY },
 	{ "_list-langdef-flags",    processListLangdefFlagsOptions, true,   STAGE_ANY },
 	{ "_list-mtable-regex-flags", processListMultitableRegexFlagsOptions, true, STAGE_ANY },

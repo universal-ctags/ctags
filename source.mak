@@ -17,6 +17,7 @@ MAIN_PUBLIC_HEADS =		\
 	main/field.h		\
 	main/gcc-attr.h		\
 	main/gvars.h		\
+	main/hint.h		\
 	main/htable.h		\
 	main/inline.h		\
 	main/keyword.h		\
@@ -57,6 +58,7 @@ LIB_PRIVATE_HEADS =		\
 	main/field_p.h		\
 	main/flags_p.h		\
 	main/fmt_p.h		\
+	main/hint_p.h		\
 	main/interactive_p.h	\
 	main/keyword_p.h	\
 	main/kind_p.h		\
@@ -102,6 +104,7 @@ LIB_SRCS =			\
 	main/field.c			\
 	main/flags.c			\
 	main/fmt.c			\
+	main/hint.c			\
 	main/htable.c			\
 	main/keyword.c			\
 	main/kind.c			\
