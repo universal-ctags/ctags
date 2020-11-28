@@ -56,6 +56,7 @@ typedef enum {
 	K_IDENTIFIER,
 	K_LOCALPARAM,
 	K_PARAMETER,
+	K_IMPORT,
 
 	K_UNDEFINED = KEYWORD_NONE,
 	/* the followings items are also used as indices for VerilogKinds[] and SystemVerilogKinds[] */
@@ -224,6 +225,7 @@ static const keywordAssoc KeywordTable [] = {
 	{ "endsequence",   	K_END_DE,    	{ 1, 0 } },
 	{ "enum",          	K_ENUM,      	{ 1, 0 } },
 	{ "extern",        	K_PROTOTYPE, 	{ 1, 0 } },
+	{ "import",        	K_IMPORT,	  	{ 1, 0 } },
 	{ "int",           	K_REGISTER,  	{ 1, 0 } },
 	{ "interconnect",  	K_NET,       	{ 1, 0 } },
 	{ "interface",     	K_INTERFACE, 	{ 1, 0 } },
@@ -1705,6 +1707,7 @@ static int findTag (tokenInfo *const token, int c)
 			c = processStruct (token, c);
 			break;
 		case K_PROTOTYPE:
+		case K_IMPORT:
 			currentContext->prototype = true;
 			break;
 
@@ -1793,6 +1796,9 @@ static void findVerilogTags (void)
 				break;
 			case '@':
 				c = skipClockEvent (token, c);
+				break;
+			case '"':
+				c = skipString (c);
 				break;
 			default :
 				if (isWordToken (c))

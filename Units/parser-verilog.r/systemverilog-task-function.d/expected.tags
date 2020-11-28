@@ -7,16 +7,23 @@ attr	input.sv	/^  task automatic attr ( (* my_attr *) const ref foo, enum { s0, 
 foo	input.sv	/^  task automatic attr ( (* my_attr *) const ref foo, enum { s0, s1 } sel_e );$/;"	p	task:task_func.attr
 sel_e	input.sv	/^  task automatic attr ( (* my_attr *) const ref foo, enum { s0, s1 } sel_e );$/;"	p	task:task_func.attr
 C	input.sv	/^class C;$/;"	C
+foo	input.sv	/^package foo;$/;"	K
+uvm_object	input.sv	/^  typedef logic uvm_object;$/;"	T	package:foo
+bar	input.sv	/^  function logic bar (uvm_object baz);$/;"	f	package:foo
+baz	input.sv	/^  function logic bar (uvm_object baz);$/;"	p	function:foo.bar
 func_test	input.sv	/^class func_test;$/;"	C
-bar	input.sv	/^  function void foo::bar(uvm_object element);$/;"	f	class:func_test.foo
-element	input.sv	/^  function void foo::bar(uvm_object element);$/;"	p	function:func_test.foo.bar
+uvm_object	input.sv	/^  typedef logic uvm_object;$/;"	T	class:func_test
+uvm_comparer	input.sv	/^  typedef logic uvm_comparer;$/;"	T	class:func_test
+uvm_packer	input.sv	/^  typedef logic uvm_packer;$/;"	T	class:func_test
+bar	input.sv	/^  function void foo::bar(uvm_object element);	\/\/ FIXME$/;"	f	class:func_test.foo
+element	input.sv	/^  function void foo::bar(uvm_object element);	\/\/ FIXME$/;"	p	function:func_test.foo.bar
 do_compare	input.sv	/^  function bit do_compare(uvm_object rhs, uvm_comparer comparer);$/;"	f	class:func_test
 rhs	input.sv	/^  function bit do_compare(uvm_object rhs, uvm_comparer comparer);$/;"	p	function:func_test.do_compare
 comparer	input.sv	/^  function bit do_compare(uvm_object rhs, uvm_comparer comparer);$/;"	p	function:func_test.do_compare
 do_pack	input.sv	/^  function void do_pack(uvm_packer packer);$/;"	f	class:func_test
 packer	input.sv	/^  function void do_pack(uvm_packer packer);$/;"	p	function:func_test.do_pack
-get_if	input.sv	/^  function uvm_port_base #(IF) get_if(int index=0);$/;"	f	class:func_test
-index	input.sv	/^  function uvm_port_base #(IF) get_if(int index=0);$/;"	p	function:func_test.get_if
+get_if	input.sv	/^  function uvm_port_base #(IF) get_if(int index=0);	\/\/ FIXME$/;"	f	class:func_test
+index	input.sv	/^  function uvm_port_base #(IF) get_if(int index=0);	\/\/ FIXME$/;"	p	function:func_test.get_if
 bind_vitf	input.sv	/^  function void bind_vitf(virtual wb_if.master sigs);$/;"	f	class:func_test
 sigs	input.sv	/^  function void bind_vitf(virtual wb_if.master sigs);$/;"	p	function:func_test.bind_vitf
 get	input.sv	/^  function string get(string v);$/;"	f	class:func_test
