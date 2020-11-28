@@ -1,21 +1,36 @@
-test	input.sv	/^covergroup test;$/;"	V
-immediate_assertion	input.sv	/^    immediate_assertion : assert () myTask();$/;"	A	covergroup:test
-test.immediate_assertion	input.sv	/^    immediate_assertion : assert () myTask();$/;"	A	covergroup:test
-immediate_cover	input.sv	/^    immediate_cover     : cover () myTask();$/;"	A	covergroup:test
-test.immediate_cover	input.sv	/^    immediate_cover     : cover () myTask();$/;"	A	covergroup:test
-immediate_assume	input.sv	/^    immediate_assume    : assume () myTask();$/;"	A	covergroup:test
-test.immediate_assume	input.sv	/^    immediate_assume    : assume () myTask();$/;"	A	covergroup:test
-deferred_assertion1	input.sv	/^    deferred_assertion1 : assert #0 () myTask();$/;"	A	covergroup:test
-test.deferred_assertion1	input.sv	/^    deferred_assertion1 : assert #0 () myTask();$/;"	A	covergroup:test
-deferred_cover1	input.sv	/^    deferred_cover1     : cover #0 () myTask();$/;"	A	covergroup:test
-test.deferred_cover1	input.sv	/^    deferred_cover1     : cover #0 () myTask();$/;"	A	covergroup:test
-deferred_assume1	input.sv	/^    deferred_assume1    : assume #0 () myTask();$/;"	A	covergroup:test
-test.deferred_assume1	input.sv	/^    deferred_assume1    : assume #0 () myTask();$/;"	A	covergroup:test
-deferred_assertion2	input.sv	/^    deferred_assertion2 : assert final () myTask();$/;"	A	covergroup:test
-test.deferred_assertion2	input.sv	/^    deferred_assertion2 : assert final () myTask();$/;"	A	covergroup:test
-deferred_cover2	input.sv	/^    deferred_cover2     : cover final () myTask();$/;"	A	covergroup:test
-test.deferred_cover2	input.sv	/^    deferred_cover2     : cover final () myTask();$/;"	A	covergroup:test
-deferred_assume2	input.sv	/^    deferred_assume2    : assume final () myTask();$/;"	A	covergroup:test
-test.deferred_assume2	input.sv	/^    deferred_assume2    : assume final () myTask();$/;"	A	covergroup:test
-cg	input.sv	/^covergroup cg @@ ( begin task_end );$/;"	V
-var_to_check_context	input.sv	/^reg var_to_check_context;$/;"	r
+C0	input.sv	/^checker C0 (logic clk);$/;"	H
+clk	input.sv	/^checker C0 (logic clk);$/;"	p	checker:C0
+color	input.sv	/^    enum { red, green, blue } color;$/;"	E	checker:C0
+red	input.sv	/^    enum { red, green, blue } color;$/;"	c	enum:C0.color
+green	input.sv	/^    enum { red, green, blue } color;$/;"	c	enum:C0.color
+blue	input.sv	/^    enum { red, green, blue } color;$/;"	c	enum:C0.color
+pixel_adr	input.sv	/^    bit [3:0] pixel_adr, pixel_offset, pixel_hue;$/;"	r	checker:C0
+pixel_offset	input.sv	/^    bit [3:0] pixel_adr, pixel_offset, pixel_hue;$/;"	r	checker:C0
+pixel_hue	input.sv	/^    bit [3:0] pixel_adr, pixel_offset, pixel_hue;$/;"	r	checker:C0
+g2	input.sv	/^    covergroup g2 @(posedge clk);$/;"	V	checker:C0
+xyz	input.sv	/^class xyz;$/;"	C
+m_x	input.sv	/^    bit [3:0] m_x;$/;"	r	class:xyz
+m_y	input.sv	/^    int m_y;$/;"	r	class:xyz
+m_z	input.sv	/^    bit m_z;$/;"	r	class:xyz
+cov1	input.sv	/^    covergroup cov1 @m_z;   \/\/ embedded covergroup$/;"	V	class:xyz
+new	input.sv	/^    function new(); cov1 = new; endfunction$/;"	f	class:xyz
+C1	input.sv	/^checker C1 (logic clk);$/;"	H
+clk	input.sv	/^checker C1 (logic clk);$/;"	p	checker:C1
+v_a	input.sv	/^    bit [9:0] v_a;$/;"	r	checker:C1
+cg	input.sv	/^    covergroup cg @(posedge clk);$/;"	V	checker:C1
+C2	input.sv	/^checker C2 (logic clk);$/;"	H
+clk	input.sv	/^checker C2 (logic clk);$/;"	p	checker:C2
+a	input.sv	/^    bit [3:0] a, b, c;$/;"	r	checker:C2
+b	input.sv	/^    bit [3:0] a, b, c;$/;"	r	checker:C2
+c	input.sv	/^    bit [3:0] a, b, c;$/;"	r	checker:C2
+cov2	input.sv	/^    covergroup cov2 @(posedge clk);$/;"	V	checker:C2
+C3	input.sv	/^checker C3 (logic clk);$/;"	H
+clk	input.sv	/^checker C3 (logic clk);$/;"	p	checker:C3
+p_cg	input.sv	/^    covergroup p_cg with function sample(bit a, int x);$/;"	V	checker:C3
+sample	input.sv	/^    covergroup p_cg with function sample(bit a, int x);$/;"	Q	covergroup:C3.p_cg
+a	input.sv	/^    covergroup p_cg with function sample(bit a, int x);$/;"	p	prototype:C3.p_cg.sample
+x	input.sv	/^    covergroup p_cg with function sample(bit a, int x);$/;"	p	prototype:C3.p_cg.sample
+C4	input.sv	/^checker C4 (logic clk);$/;"	H
+clk	input.sv	/^checker C4 (logic clk);$/;"	p	checker:C4
+cg	input.sv	/^    covergroup cg @@ ( begin task_end );$/;"	V	checker:C4
+var_to_check_context	input.sv	/^    reg var_to_check_context;$/;"	r	checker:C4

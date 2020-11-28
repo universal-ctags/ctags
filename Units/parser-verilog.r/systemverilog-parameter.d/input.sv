@@ -45,11 +45,11 @@ virtual class C#(parameter DECODE_W, parameter ENCODE_W = $clog2(DECODE_W));
 endclass
 
 // LRM 8.26 Interface classes
-interface class PutImp #(type PUT_T = logic); // FIXME
+interface class PutImp #(type PUT_T = logic);
   pure virtual function void put(PUT_T a);
 endclass
 
-interface class GetImp #(type GET_T = logic); // FIXME
+interface class GetImp #(type GET_T = logic);
   pure virtual function GET_T get();
 endclass
 
@@ -72,6 +72,16 @@ class Stack #(type T = logic, int DEPTH = 1) implements PutImp#(T), GetImp#(T);
     get = myFifo.pop_front();
   endfunction
 endclass
+
+// 8.26.3 Type access
+interface class IntfA #(type T1 = logic);
+  typedef T1[1:0] T2;
+  pure virtual function T2 funcA();
+endclass : IntfA
+
+interface class IntfB #(type T = bit) extends IntfA #(T);
+  pure virtual function T2 funcB(); // legal, type T2 is inherited
+endclass : IntfB
 
 // 23.2.3 Parameterized modules
 module generic_fifo

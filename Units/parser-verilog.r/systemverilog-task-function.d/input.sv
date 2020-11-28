@@ -25,23 +25,32 @@ class C;
 endclass
 
 // from UVM-1.2
-class func_test;
-  // FIXME don't create context
-  // import "DPI-C" context function int uvm_re_match(string re, string str);
+package foo;
+  import "DPI-C" context function int import_func (string str);
+  typedef logic uvm_object;
+  function logic bar (uvm_object baz);
+    return 1'b1;
+  endfunction
+endpackage
 
-  function void foo::bar(uvm_object element);
+class func_test;
+  typedef logic uvm_object;
+  typedef logic uvm_comparer;
+  typedef logic uvm_packer;
+
+  function void foo::bar(uvm_object element);	// FIXME
   endfunction
 
   function bit do_compare(uvm_object rhs, uvm_comparer comparer);
+    foo::bar(rhs);
   endfunction
 
   function void do_pack(uvm_packer packer);
-    always_comb
-      for (int i = 0; i < m_length; i++)
-        ;
+    for (int i = 0; i < 10; i++)
+      ;
   endfunction
 
-  function uvm_port_base #(IF) get_if(int index=0);
+  function uvm_port_base #(IF) get_if(int index=0);	// FIXME
   endfunction
 
   function void bind_vitf(virtual wb_if.master sigs);

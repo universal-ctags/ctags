@@ -56,6 +56,8 @@ typedef enum {
 	K_IDENTIFIER,
 	K_LOCALPARAM,
 	K_PARAMETER,
+	K_IMPORT,
+	K_WITH,
 
 	K_UNDEFINED = KEYWORD_NONE,
 	/* the followings items are also used as indices for VerilogKinds[] and SystemVerilogKinds[] */
@@ -84,7 +86,8 @@ typedef enum {
 	K_CHECKER,
 	K_CLOCKING,
 	K_SEQUENCE,
-	K_MEMBER
+	K_MEMBER,
+	K_IFCLASS	/* interface class */
 } verilogKind;
 
 typedef struct {
@@ -159,7 +162,8 @@ static kindDefinition SystemVerilogKinds [] = {
  { true, 'H', "checker",   "checkers" },
  { true, 'L', "clocking",  "clocking" },
  { true, 'q', "sequence",  "sequences" },
- { true, 'w', "member",    "struct and union members" }
+ { true, 'w', "member",    "struct and union members" },
+ { true, 'l', "ifclass",   "interface class" }
 };
 
 static const keywordAssoc KeywordTable [] = {
@@ -224,6 +228,7 @@ static const keywordAssoc KeywordTable [] = {
 	{ "endsequence",   	K_END_DE,    	{ 1, 0 } },
 	{ "enum",          	K_ENUM,      	{ 1, 0 } },
 	{ "extern",        	K_PROTOTYPE, 	{ 1, 0 } },
+	{ "import",        	K_IMPORT,	  	{ 1, 0 } },
 	{ "int",           	K_REGISTER,  	{ 1, 0 } },
 	{ "interconnect",  	K_NET,       	{ 1, 0 } },
 	{ "interface",     	K_INTERFACE, 	{ 1, 0 } },
@@ -247,7 +252,8 @@ static const keywordAssoc KeywordTable [] = {
 	{ "typedef",       	K_TYPEDEF,   	{ 1, 0 } },
 	{ "union",         	K_STRUCT,    	{ 1, 0 } },
 	{ "var",           	K_REGISTER,  	{ 1, 0 } },
-	{ "void",          	K_REGISTER,  	{ 1, 0 } }
+	{ "void",          	K_REGISTER,  	{ 1, 0 } },
+	{ "with",          	K_WITH,			{ 1, 0 } }
 };
 
 static tokenInfo *currentContext = NULL;
@@ -385,6 +391,7 @@ static int pushMembers (tokenInfo* token, int c);
 static int readWordToken (tokenInfo *const token, int c);
 static int readWordTokenNoSkip (tokenInfo *const token, int c);
 static int skipBlockName (tokenInfo *const token, int c);
+static int skipClockEvent(tokenInfo* token, int c);
 static int skipDelay(tokenInfo* token, int c);
 static int tagNameList (tokenInfo* token, int c);
 
@@ -404,6 +411,7 @@ static short isContainer (verilogKind kind)
 		case K_CLASS:
 		case K_CLOCKING:
 		case K_COVERGROUP:
+		case K_IFCLASS:
 		case K_INTERFACE:
 		case K_PACKAGE:
 		case K_PROGRAM:
@@ -425,24 +433,6 @@ static short isTempContext (tokenInfo const* token)
 		case K_TYPEDEF:
 		case K_ENUM:
 		case K_STRUCT:
-			return true;
-		default:
-			return false;
-	}
-}
-
-static short hasSimplePortList (verilogKind kind)
-{
-	switch (kind)
-	{
-		case K_TASK:
-		case K_FUNCTION:
-		case K_CHECKER:
-		case K_CLASS:
-		case K_INTERFACE:
-		case K_PROGRAM:
-		case K_PROPERTY:
-		case K_SEQUENCE:
 			return true;
 		default:
 			return false;
@@ -884,7 +874,8 @@ static void dropContext ()
 static int dropEndContext (tokenInfo *const token, int c)
 {
 	verbose ("current context %s; context kind %0d; nest level %0d\n", vStringValue (currentContext->name), currentContext->kind, currentContext->nestLevel);
-	if (currentContext->kind == K_COVERGROUP && strcmp (vStringValue (token->name), "endgroup") == 0)
+	if ((currentContext->kind == K_COVERGROUP && strcmp (vStringValue (token->name), "endgroup") == 0)
+	    || (currentContext->kind == K_IFCLASS && strcmp (vStringValue (token->name), "endclass") == 0))
 	{
 		dropContext ();
 		c = skipBlockName (token ,c);
@@ -1279,7 +1270,7 @@ static int processParameterList (tokenInfo *token, int c)
 // [ virtual ] class [ static | automatic ] class_identifier [ parameter_port_list ]
 //     [ extends class_type [ ( list_of_arguments ) ] ] [ implements < interface_class_type > ] ;
 // interface class class_identifier [ parameter_port_list ] [ extends < interface_class_type > ] ;
-static int processClass (tokenInfo *const token, int c)
+static int processClass (tokenInfo *const token, int c, verilogKind kind)
 {
 	tokenInfo *classToken;
 
@@ -1315,7 +1306,7 @@ static int processClass (tokenInfo *const token, int c)
 
 	// process implements: FIXME
 
-	createTag (classToken, K_CLASS);
+	createTag (classToken, kind);
 	deleteToken (classToken);
 	ptrArrayClear (tagContents);
 	return c;
@@ -1367,63 +1358,96 @@ static int processAssertion (tokenInfo *const token, int c)
 // ( module | interface | program ) [ static | automatic ] identifier { package_import_declaration } [ parameter_port_list ] [ ( [ < { (* ... *) } ansi_port_declaration > ] ) ] ;
 //
 // interface class class_identifier [ parameter_port_list ] [ extends < interface_class_type > ] ;
-//
-// ( checker | property | sequence ) identifier [ ( [ port_list ] ) ] ;
-// covergroup identifier [ ( [ port_list ] ) ] [ coverage_event ] ;
-// package identifier ;
-// modport < identifier ( < ports_declaration > ) > ;  // FIXME
-// [ default | global ] clocking [ identifier ] ( @ identifier | @ ( event_expression ) )
-static int processDesignElement (tokenInfo *const token, int c)
+static int processDesignElementL (tokenInfo *const token, int c)
 {
 	verilogKind kind = token->kind;
 
 	if (isWordToken (c))
+		c = readWordToken (token, c);
+	else
+		return c;
+
+	// interface class
+	if (token->kind == K_CLASS)
+		return processClass (token, c, K_IFCLASS);
+
+	while (token->kind == K_IGNORE && c != EOF) // skip static or automatic
+	{
+		if (isWordToken (c))
+			c = readWordToken (token, c);
+	}
+	createTag (token, kind);	// identifier
+
+	// skip package_import_declaration
+	if (isWordToken (c))
 	{
 		c = readWordToken (token, c);
-		while (token->kind == K_IGNORE && c != EOF) // skip static or automatic
+		if (token->kind == K_IMPORT)
 		{
-			if (isWordToken (c))
-				c = readWordToken (token, c);
+			c = skipToSemiColon (c);
+			c = skipWhite (vGetc ());	// skip semicolon
 		}
-		createTag (token, kind);	// identifier
-
-		// package_import_declaration : FIXME
-
-		if (c == '#')	// parameter_port_list
+		else
 		{
-			c = processParameterList (token, c);
-
-			/* Put found parameters in context */
-			verbose ("Putting parameters: %d element(s)\n",
-					ptrArrayCount(tagContents));
-			for (unsigned int i = 0; i < ptrArrayCount (tagContents); i++)
-			{
-				tokenInfo *content = ptrArrayItem (tagContents, i);
-				createTag (content, K_CONSTANT);
-			}
-			ptrArrayClear (tagContents);
-			// disable parameter property on parameter declaration statement
-			currentContext->hasParamList = true;
+			verbose ("Unexpected input\n");
+			return c;
 		}
-
-		// skip clocking_event of clocking block
-		if (c == '@' && kind == K_CLOCKING)
-		{
-			c = skipWhite (vGetc ());
-			if (c == '(')
-				c = skipPastMatch ("()");
-		}
-
-		/* Get port list if required */
-		if (c == '(')	// port_list
-		{
-			if (kind == K_MODPORT)
-				c = skipPastMatch ("()");	// ignore port list
-			else if (hasSimplePortList (kind))
-				c = processPortList (token, c);
-		}
-		// skip coverage_event for covergroup : FIXME
 	}
+
+	if (c == '#')	// parameter_port_list
+	{
+		c = processParameterList (token, c);
+
+		/* Put found parameters in context */
+		verbose ("Putting parameters: %d element(s)\n",
+				ptrArrayCount(tagContents));
+		for (unsigned int i = 0; i < ptrArrayCount (tagContents); i++)
+		{
+			tokenInfo *content = ptrArrayItem (tagContents, i);
+			createTag (content, K_CONSTANT);
+		}
+		ptrArrayClear (tagContents);
+		// disable parameter property on parameter declaration statement
+		currentContext->hasParamList = true;
+	}
+
+	// Process ANSI/non-ANSI port list in main loop
+	if (c == '(')	// port_list
+		c = skipWhite (vGetc());
+
+	return c;
+}
+
+// ( checker | property | sequence ) identifier [ ( [ port_list ] ) ] ;
+// covergroup identifier [ ( [ port_list ] ) ] [ coverage_event ] ;
+//   coverage_event ::= clocking_event | with function sample ( ... ) | @@( ... )
+// package identifier ;
+// modport < identifier ( < ports_declaration > ) > ;
+// [ default | global ] clocking [ identifier ] ( @ identifier | @ ( event_expression ) )
+static int processDesignElementS (tokenInfo *const token, int c)
+{
+	verilogKind kind = token->kind;
+
+	if (isWordToken (c))
+		c = readWordToken (token, c);
+	else
+		return c;
+
+	createTag (token, kind);	// identifier
+
+	/* Get port list if required */
+	if (c == '(')	// port_list
+	{
+		if (kind == K_MODPORT)
+			c = skipPastMatch ("()");	// ignore port list
+		else
+			c = processPortList (token, c);
+	}
+	// skip clocking_event for clocking block or coverage_event for covergroup
+	// "with function sample ()" is processed in the main loop
+	if (c == '@')
+		c = skipClockEvent (token, c);
+
 	return c;
 }
 
@@ -1452,7 +1476,9 @@ static int skipClockEvent(tokenInfo* token, int c)
 	if (c == '@')
 	{
 		c = skipWhite (vGetc ());
-
+		// for @@ ( ... ) : coverage_event
+		if (c == '@')
+			c = skipWhite (vGetc ());
 		if (c == '(')
 			c = skipPastMatch ("()");
 		else if (isWordToken (c))
@@ -1694,7 +1720,7 @@ static int findTag (tokenInfo *const token, int c)
 			}
 			break;
 		case K_CLASS:
-			c = processClass (token, c);
+			c = processClass (token, c, K_CLASS);
 			break;
 		case K_TYPEDEF:
 			c = processTypedef (token, c);
@@ -1706,22 +1732,24 @@ static int findTag (tokenInfo *const token, int c)
 			c = processStruct (token, c);
 			break;
 		case K_PROTOTYPE:
+		case K_IMPORT:
+		case K_WITH:
 			currentContext->prototype = true;
 			break;
 
+		case K_INTERFACE:
+		case K_MODULE:
+		case K_PROGRAM:
+			c = processDesignElementL (token, c);
+			break;
 		case K_CHECKER:
 		case K_CLOCKING:
 		case K_COVERGROUP:
-		case K_INTERFACE:
 		case K_MODPORT:
-		case K_MODULE:
 		case K_PACKAGE:
-		case K_PROGRAM:
 		case K_PROPERTY:
 		case K_SEQUENCE:
-			c = processDesignElement (token, c);
-			if (c == '(')	// FIXME: move into processDesignElement()
-				c = skipWhite (vGetc());
+			c = processDesignElementS (token, c);
 			break;
 		case K_END_DE:
 			c = dropEndContext (token, c);
@@ -1792,6 +1820,9 @@ static void findVerilogTags (void)
 				break;
 			case '@':
 				c = skipClockEvent (token, c);
+				break;
+			case '"':
+				c = skipString (c);
 				break;
 			default :
 				if (isWordToken (c))

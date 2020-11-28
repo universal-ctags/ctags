@@ -1,0 +1,11 @@
+C	input.sv	/^class C;$/;"	C
+ext_func	input.sv	/^  extern function ext_func ();$/;"	Q	class:C
+ext_pure_virt_task	input.sv	/^  pure virtual task ext_pure_virt_task (x);$/;"	Q	class:C
+x	input.sv	/^  pure virtual task ext_pure_virt_task (x);$/;"	p	prototype:C.ext_pure_virt_task
+fwd_type_class	input.sv	/^  typedef class   fwd_type_class;$/;"	Q	class:C
+foo	input.sv	/^package foo;$/;"	K
+import_func	input.sv	/^  import "DPI-C" context function int import_func (string str);$/;"	Q	package:foo
+str	input.sv	/^  import "DPI-C" context function int import_func (string str);$/;"	p	prototype:foo.import_func
+uvm_object	input.sv	/^  typedef logic uvm_object;$/;"	T	package:foo
+bar	input.sv	/^  function logic bar (uvm_object baz);$/;"	f	package:foo
+baz	input.sv	/^  function logic bar (uvm_object baz);$/;"	p	function:foo.bar

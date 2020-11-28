@@ -1,20 +1,47 @@
+ComplexPkg	input.sv	/^package ComplexPkg;$/;"	K
+Complex	input.sv	/^    } Complex;$/;"	T	package:ComplexPkg
+i	input.sv	/^        shortreal i, r;$/;"	w	typedef:ComplexPkg.Complex
+r	input.sv	/^        shortreal i, r;$/;"	w	typedef:ComplexPkg.Complex
+add	input.sv	/^    function Complex add(Complex a, b);$/;"	f	package:ComplexPkg
+a	input.sv	/^    function Complex add(Complex a, b);$/;"	p	function:ComplexPkg.add
+b	input.sv	/^    function Complex add(Complex a, b);$/;"	p	function:ComplexPkg.add
+mul	input.sv	/^    function Complex mul(Complex a, b);$/;"	f	package:ComplexPkg
+a	input.sv	/^    function Complex mul(Complex a, b);$/;"	p	function:ComplexPkg.mul
+b	input.sv	/^    function Complex mul(Complex a, b);$/;"	p	function:ComplexPkg.mul
+p	input.sv	/^package p;$/;"	K
+bool_t	input.sv	/^    typedef enum { FALSE, TRUE } bool_t;$/;"	T	package:p
+FALSE	input.sv	/^    typedef enum { FALSE, TRUE } bool_t;$/;"	c	typedef:p.bool_t
+TRUE	input.sv	/^    typedef enum { FALSE, TRUE } bool_t;$/;"	c	typedef:p.bool_t
+q	input.sv	/^package q;$/;"	K
+teeth_t	input.sv	/^    typedef enum { ORIGINAL, FALSE } teeth_t;$/;"	T	package:q
+ORIGINAL	input.sv	/^    typedef enum { ORIGINAL, FALSE } teeth_t;$/;"	c	typedef:q.teeth_t
+FALSE	input.sv	/^    typedef enum { ORIGINAL, FALSE } teeth_t;$/;"	c	typedef:q.teeth_t
+top1	input.sv	/^module top1 ;$/;"	m
+myteeth	input.sv	/^    teeth_t myteeth;$/;"	r	module:top1
+top2	input.sv	/^module top2 ;$/;"	m
+myteeth	input.sv	/^    teeth_t myteeth;$/;"	r	module:top2
+A	input.sv	/^package A;$/;"	K
+instruction_t	input.sv	/^    } instruction_t;$/;"	T	package:A
+opcode	input.sv	/^        bit [ 7:0] opcode;$/;"	w	typedef:A.instruction_t
+addr	input.sv	/^        bit [23:0] addr;$/;"	w	typedef:A.instruction_t
+B	input.sv	/^package B;$/;"	K
+boolean_t	input.sv	/^    typedef enum bit {FALSE, TRUE} boolean_t;$/;"	T	package:B
+FALSE	input.sv	/^    typedef enum bit {FALSE, TRUE} boolean_t;$/;"	c	typedef:B.boolean_t
+TRUE	input.sv	/^    typedef enum bit {FALSE, TRUE} boolean_t;$/;"	c	typedef:B.boolean_t
+M	input.sv	/^module M import A::instruction_t, B::*;$/;"	m
+WIDTH	input.sv	/^    #(WIDTH = 32)$/;"	c	module:M
+data	input.sv	/^     (input [WIDTH-1:0] data,$/;"	p	module:M
+a	input.sv	/^      input instruction_t a,$/;"	p	module:M
+result	input.sv	/^      output [WIDTH-1:0] result,$/;"	p	module:M
+OK	input.sv	/^      output boolean_t OK$/;"	p	module:M
 MyPackage	input.sv	/^package MyPackage;$/;"	K
 MyData	input.sv	/^    } MyData;$/;"	T	package:MyPackage
-MyPackage.MyData	input.sv	/^    } MyData;$/;"	T	package:MyPackage
 a	input.sv	/^        shortreal a;$/;"	w	typedef:MyPackage.MyData
-MyPackage.MyData.a	input.sv	/^        shortreal a;$/;"	w	typedef:MyPackage.MyData
 b	input.sv	/^        real b;$/;"	w	typedef:MyPackage.MyData
-MyPackage.MyData.b	input.sv	/^        real b;$/;"	w	typedef:MyPackage.MyData
 add	input.sv	/^    function MyData add(MyData x, y);$/;"	f	package:MyPackage
-MyPackage.add	input.sv	/^    function MyData add(MyData x, y);$/;"	f	package:MyPackage
 x	input.sv	/^    function MyData add(MyData x, y);$/;"	p	function:MyPackage.add
-MyPackage.add.x	input.sv	/^    function MyData add(MyData x, y);$/;"	p	function:MyPackage.add
 y	input.sv	/^    function MyData add(MyData x, y);$/;"	p	function:MyPackage.add
-MyPackage.add.y	input.sv	/^    function MyData add(MyData x, y);$/;"	p	function:MyPackage.add
 mul	input.sv	/^    function MyData mul(MyData x, y);$/;"	f	package:MyPackage
-MyPackage.mul	input.sv	/^    function MyData mul(MyData x, y);$/;"	f	package:MyPackage
 x	input.sv	/^    function MyData mul(MyData x, y);$/;"	p	function:MyPackage.mul
-MyPackage.mul.x	input.sv	/^    function MyData mul(MyData x, y);$/;"	p	function:MyPackage.mul
 y	input.sv	/^    function MyData mul(MyData x, y);$/;"	p	function:MyPackage.mul
-MyPackage.mul.y	input.sv	/^    function MyData mul(MyData x, y);$/;"	p	function:MyPackage.mul
 var_to_check_context	input.sv	/^reg var_to_check_context;$/;"	r
