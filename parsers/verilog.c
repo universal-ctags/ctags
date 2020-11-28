@@ -1368,7 +1368,21 @@ static int processDesignElementL (tokenInfo *const token, int c)
 	}
 	createTag (token, kind);	// identifier
 
-	// package_import_declaration : FIXME
+	// skip package_import_declaration
+	if (isWordToken (c))
+	{
+		c = readWordToken (token, c);
+		if (token->kind == K_IMPORT)
+		{
+			c = skipToSemiColon (c);
+			c = skipWhite (vGetc ());	// skip semicolon
+		}
+		else
+		{
+			verbose ("Unexpected input\n");
+			return c;
+		}
+	}
 
 	if (c == '#')	// parameter_port_list
 	{
