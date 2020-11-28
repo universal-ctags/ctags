@@ -194,7 +194,7 @@ static struct tokenInfoClass rTokenInfoClass = {
 /*
  * FUNCTION PROTOTYPES
  */
-static void parseStatement (tokenInfo *const token, int parent, bool in_arglist, bool in_continuous_pair);
+static bool parseStatement (tokenInfo *const token, int parent, bool in_arglist, bool in_continuous_pair);
 static void parsePair (tokenInfo *const token, int parent, tokenInfo *const funcall);
 
 static  int notifyReadRightSideSymbol (tokenInfo *const symbol,
@@ -930,10 +930,11 @@ static void parsePair (tokenInfo *const token, int parent, tokenInfo *const func
 	R_TRACE_LEAVE();
 }
 
-static void parseStatement (tokenInfo *const token, int parent,
+static bool parseStatement (tokenInfo *const token, int parent,
 							bool in_arglist, bool in_continuous_pair)
 {
 	R_TRACE_ENTER();
+	int last_count = rTokenInfoClass.read_counter;
 
 	do
 	{
@@ -1071,13 +1072,16 @@ static void parseStatement (tokenInfo *const token, int parent,
 	while (!tokenIsEOF (token));
 
 	R_TRACE_LEAVE();
+
+	return (last_count != rTokenInfoClass.read_counter);
 }
 
-extern void rParseStatement (tokenInfo *const token, int parentIndex, bool in_arglist)
+extern bool rParseStatement (tokenInfo *const token, int parentIndex, bool in_arglist)
 {
 	pushLanguage (Lang_R);
-	parseStatement (token, parentIndex, in_arglist, true);
+	bool r = parseStatement (token, parentIndex, in_arglist, true);
 	popLanguage ();
+	return r;
 }
 
 static  int notifyReadRightSideSymbol (tokenInfo *const symbol,

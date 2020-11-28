@@ -97,7 +97,11 @@ extern void rTeardownCollectingSignature (tokenInfo *const token);
  */
 
 extern void rTokenReadNoNewline (tokenInfo *const token);
-extern void rParseStatement (tokenInfo *const token, int parentIndex, bool inArgList);
+
+/* This function returns true if a new token is read.
+ * EOF is exception. If EOF is read, this function returns FALSE. */
+extern bool rParseStatement (tokenInfo *const token, int parentIndex, bool inArgList);
+
 extern vString *rExtractNameFromString (vString* str);
 
 #endif	/* CTAGS_PARSER_TEX_H */
