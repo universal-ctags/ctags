@@ -130,10 +130,11 @@ static void parseListMain (rSubparser *s,
 
 	rTokenReadNoNewline (token);
 
-	while (! (tokenIsEOF (token) || tokenIsTypeVal (token, ')')))
+	while (! tokenIsTypeVal (token, ')'))
 	{
-		rParseStatement (token, classIndex, false);
-		if (tokenIsTypeVal (token, '\n'))
+		if (!rParseStatement (token, classIndex, false))
+			break;
+		else if (tokenIsTypeVal (token, '\n'))
 			rTokenReadNoNewline (token);
 	}
 	((struct r6Subparser *)s)->access = last_access;

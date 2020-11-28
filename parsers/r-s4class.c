@@ -93,11 +93,11 @@ static void parseRepresentation (rSubparser *s, tokenInfo *const token, int pare
 	if (tokenIsTypeVal (token, '('))
 	{
 		rTokenReadNoNewline (token);
-		while (!(tokenIsEOF (token)
-				 || tokenIsTypeVal (token, ')') || tokenIsTypeVal (token, ',')))
+		while (!(tokenIsTypeVal (token, ')') || tokenIsTypeVal (token, ',')))
 		{
-			rParseStatement (token, parent, false);
-			if (tokenIsTypeVal (token, '\n'))
+			if (!rParseStatement (token, parent, false))
+				break;
+			else if (tokenIsTypeVal (token, '\n'))
 				rTokenReadNoNewline (token);
 		}
 	}
@@ -204,10 +204,11 @@ static bool parseMethodArgs (rSubparser *s, tokenInfo *const token, int parent,
 			{
 				rTokenReadNoNewline (token);
 				/* anonymous function for implementing this method may be here.*/
-				while (!(tokenIsEOF (token) || tokenIsTypeVal (token, ')')))
+				while (!tokenIsTypeVal (token, ')'))
 				{
-					rParseStatement (token, parent, true);
-					if (tokenIsTypeVal (token, '\n'))
+					if (!rParseStatement (token, parent, true))
+						break;
+					else if (tokenIsTypeVal (token, '\n'))
 						rTokenReadNoNewline (token);
 				}
 			}
@@ -228,11 +229,11 @@ static bool parseMethodArgs (rSubparser *s, tokenInfo *const token, int parent,
 static bool parseGenericArgs (rSubparser *s, tokenInfo *const token, int parent,
 							  tokenInfo *const open_paren)
 {
-	while (!(tokenIsEOF (token)
-			 || tokenIsTypeVal (token, ')')))
+	while (!tokenIsTypeVal (token, ')'))
 	{
-		rParseStatement (token, parent, true);
-		if (tokenIsTypeVal (token, '\n'))
+		if (!rParseStatement (token, parent, true))
+			break;
+		else if (tokenIsTypeVal (token, '\n'))
 			rTokenReadNoNewline (token);
 	}
 	return false;
