@@ -57,6 +57,7 @@ typedef enum {
 	K_LOCALPARAM,
 	K_PARAMETER,
 	K_IMPORT,
+	K_WITH,
 
 	K_UNDEFINED = KEYWORD_NONE,
 	/* the followings items are also used as indices for VerilogKinds[] and SystemVerilogKinds[] */
@@ -251,7 +252,8 @@ static const keywordAssoc KeywordTable [] = {
 	{ "typedef",       	K_TYPEDEF,   	{ 1, 0 } },
 	{ "union",         	K_STRUCT,    	{ 1, 0 } },
 	{ "var",           	K_REGISTER,  	{ 1, 0 } },
-	{ "void",          	K_REGISTER,  	{ 1, 0 } }
+	{ "void",          	K_REGISTER,  	{ 1, 0 } },
+	{ "with",          	K_WITH,			{ 1, 0 } }
 };
 
 static tokenInfo *currentContext = NULL;
@@ -1418,11 +1420,10 @@ static int processDesignElementL (tokenInfo *const token, int c)
 
 // ( checker | property | sequence ) identifier [ ( [ port_list ] ) ] ;
 // covergroup identifier [ ( [ port_list ] ) ] [ coverage_event ] ;
+//   coverage_event ::= clocking_event | with function sample ( ... ) | @@( ... )
 // package identifier ;
 // modport < identifier ( < ports_declaration > ) > ;
 // [ default | global ] clocking [ identifier ] ( @ identifier | @ ( event_expression ) )
-
-// coverage_event ::= clocking_event | with function sample ( ... ) | @@( ... )
 static int processDesignElementS (tokenInfo *const token, int c)
 {
 	verilogKind kind = token->kind;
@@ -1442,10 +1443,10 @@ static int processDesignElementS (tokenInfo *const token, int c)
 		else
 			c = processPortList (token, c);
 	}
-	// skip clocking_event of clocking block or covergroup
+	// skip clocking_event for clocking block or coverage_event for covergroup
+	// "with function sample ()" is processed in the main loop
 	if (c == '@')
 		c = skipClockEvent (token, c);
-	// skip coverage_event for covergroup : FIXME
 
 	return c;
 }
@@ -1475,7 +1476,9 @@ static int skipClockEvent(tokenInfo* token, int c)
 	if (c == '@')
 	{
 		c = skipWhite (vGetc ());
-
+		// for @@ ( ... ) : coverage_event
+		if (c == '@')
+			c = skipWhite (vGetc ());
 		if (c == '(')
 			c = skipPastMatch ("()");
 		else if (isWordToken (c))
@@ -1730,6 +1733,7 @@ static int findTag (tokenInfo *const token, int c)
 			break;
 		case K_PROTOTYPE:
 		case K_IMPORT:
+		case K_WITH:
 			currentContext->prototype = true;
 			break;
 
@@ -1746,8 +1750,6 @@ static int findTag (tokenInfo *const token, int c)
 		case K_PROPERTY:
 		case K_SEQUENCE:
 			c = processDesignElementS (token, c);
-			if (c == '(')	// FIXME: move into processDesignElement()
-				c = skipWhite (vGetc());
 			break;
 		case K_END_DE:
 			c = dropEndContext (token, c);

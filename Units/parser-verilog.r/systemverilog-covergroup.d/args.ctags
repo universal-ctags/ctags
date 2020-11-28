@@ -1,2 +1,2 @@
---extras=+q
 --sort=no
+--kinds-systemverilog=+Q
