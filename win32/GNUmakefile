@@ -24,16 +24,16 @@ all: $(VCXPROJ) $(VCXPROJ_FILTERS)
 include $(SOURCE_MAK)
 
 # exclude some files for Win32 and replace a slash (/) to a backslash (\)
-MVC_SRCS = $(MVC_GNULIB_SRCS) $(CMDLINE_SRCS) $(LIB_SRCS) $(OPTLIB2C_SRCS) $(PARSER_SRCS) $(OPTSCRIPT_DSL_SRCS) $(DEBUG_SRCS) $(WIN32_SRCS)
+MVC_SRCS = $(MVC_GNULIB_SRCS) $(CMDLINE_SRCS) $(LIB_SRCS) $(OPTLIB2C_SRCS) $(PARSER_SRCS) $(OPTSCRIPT_DSL_SRCS) $(LIBREADTAGS_SRCS) $(DEBUG_SRCS) $(WIN32_SRCS)
 MVC_SRCS_EXCLUDE = main/mbcs.c main/seccomp.c main/trace.c
 MVC_SRCS_CONV = $(sort $(subst /,\\,$(filter-out $(MVC_SRCS_EXCLUDE),$(MVC_SRCS))))
 
-MVC_HEADS = $(MVC_GNULIB_HEADS) $(CMDLINE_HEADS) $(LIB_HEADS) $(OPTLIB2C_HEADS) $(PARSER_HEADS) $(OPTSCRIPT_DSL_HEADS) $(DEBUG_HEADS)  $(WIN32_HEADS)
+MVC_HEADS = $(MVC_GNULIB_HEADS) $(CMDLINE_HEADS) $(LIB_HEADS) $(OPTLIB2C_HEADS) $(PARSER_HEADS) $(OPTSCRIPT_DSL_HEADS) $(LIBREADTAGS_HEADS) $(DEBUG_HEADS) $(WIN32_HEADS)
 MVC_HEADS_EXCLUDE = main/interactive_p.h main/mbcs.h main/mbcs_p.h main/trace.h
 MVC_HEADS_CONV = $(sort $(subst /,\\,$(filter-out $(MVC_HEADS_EXCLUDE),$(MVC_HEADS))))
 
-MVC_INC_DIRS1 = ..;../main;../gnulib;../parsers;../parsers/cxx;../dsl;
-MVC_INC_DIRS2 = ..;../main;../gnulib;../parsers;../parsers/cxx;
+MVC_INC_DIRS1 = ..;../main;../gnulib;../parsers;../parsers/cxx;../dsl;../libreadtags;
+MVC_INC_DIRS2 = ..;../main;../gnulib;../parsers;../parsers/cxx;../libreadtags;
 
 # a portable 'echo' which disables the interpretation of escape characters like 'echo -E' on bash
 # see https://www.gnu.org/savannah-checkouts/gnu/autoconf/manual/autoconf-2.70/autoconf.html#Limitations-of-Builtins

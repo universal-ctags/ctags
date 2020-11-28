@@ -485,14 +485,18 @@ READTAGS_DSL_SRCS = \
 	$(NULL)
 READTAGS_DSL_OBJS = $(READTAGS_DSL_SRCS:.c=.$(OBJEXT))
 
+LIBREADTAGS_SRCS  = libreadtags/readtags.c
+LIBREADTAGS_HEADS = libreadtags/readtags.h
+
 READTAGS_SRCS  = \
-	libreadtags/readtags.c      \
+	$(LIBREADTAGS_SRCS)     \
 	extra-cmds/printtags.c  \
 	extra-cmds/readtags-cmd.c  \
 	extra-cmds/readtags-stub.c \
 	\
 	$(NULL)
 READTAGS_HEADS = \
+	$(LIBREADTAGS_HEADS) \
 	libreadtags/readtags.h \
 	extra-cmds/printtags.h  \
 	extra-cmds/readtags-stub.h \
@@ -546,8 +550,8 @@ MINGW_GNULIB_SRCS = \
 ENVIRONMENT_HEADS =
 ENVIRONMENT_SRCS =
 
-ALL_LIB_HEADS = $(LIB_HEADS) $(PARSER_HEADS) $(DEBUG_HEADS) $(DSL_HEADS) $(OPTSCRIPT_DSL_HEADS)
-ALL_LIB_SRCS  = $(LIB_SRCS) $(PARSER_SRCS) $(DEBUG_SRCS) $(DSL_SRCS) $(OPTSCRIPT_DSL_SRCS)
+ALL_LIB_HEADS = $(LIB_HEADS) $(PARSER_HEADS) $(DEBUG_HEADS) $(DSL_HEADS) $(OPTSCRIPT_DSL_HEADS) $(LIBREADTAGS_HEADS)
+ALL_LIB_SRCS  = $(LIB_SRCS) $(PARSER_SRCS) $(DEBUG_SRCS) $(DSL_SRCS) $(OPTSCRIPT_DSL_SRCS) $(LIBREADTAGS_SRCS)
 ALL_LIB_OBJS = \
 	$(ALL_LIB_SRCS:.c=.$(OBJEXT)) \
 	$(LIBOBJS)

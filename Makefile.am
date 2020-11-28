@@ -138,7 +138,7 @@ utiltest_LDADD  =
 utiltest_LDADD += libutil.a
 dist_utiltest_SOURCES = $(UTILTEST_HEADS) $(UTILTEST_SRCS)
 
-libctags_a_CPPFLAGS = -I. -I$(srcdir) -I$(srcdir)/main -I$(srcdir)/dsl -I$(srcdir)/peg -DHAVE_PACKCC
+libctags_a_CPPFLAGS = -I. -I$(srcdir) -I$(srcdir)/main -I$(srcdir)/dsl -I$(srcdir)/libreadtags -I$(srcdir)/peg -DHAVE_PACKCC
 if ENABLE_DEBUGGING
 libctags_a_CPPFLAGS+= $(DEBUG_CPPFLAGS)
 endif

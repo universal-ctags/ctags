@@ -66,6 +66,9 @@
     <ClCompile Include="..\gnulib\wmempcpy.c">
       <Filter>Source Files\gnulib</Filter>
     </ClCompile>
+    <ClCompile Include="..\libreadtags\readtags.c">
+      <Filter>Source Files\libreadtags</Filter>
+    </ClCompile>
     <ClCompile Include="..\main\CommonPrelude.c">
       <Filter>Source Files\main</Filter>
     </ClCompile>
@@ -642,6 +645,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\gnulib\regex.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\libreadtags\readtags.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\main\args_p.h">
