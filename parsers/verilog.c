@@ -85,7 +85,8 @@ typedef enum {
 	K_CHECKER,
 	K_CLOCKING,
 	K_SEQUENCE,
-	K_MEMBER
+	K_MEMBER,
+	K_IFCLASS	/* interface class */
 } verilogKind;
 
 typedef struct {
@@ -160,7 +161,8 @@ static kindDefinition SystemVerilogKinds [] = {
  { true, 'H', "checker",   "checkers" },
  { true, 'L', "clocking",  "clocking" },
  { true, 'q', "sequence",  "sequences" },
- { true, 'w', "member",    "struct and union members" }
+ { true, 'w', "member",    "struct and union members" },
+ { true, 'l', "ifclass",   "interface class" }
 };
 
 static const keywordAssoc KeywordTable [] = {
@@ -407,6 +409,7 @@ static short isContainer (verilogKind kind)
 		case K_CLASS:
 		case K_CLOCKING:
 		case K_COVERGROUP:
+		case K_IFCLASS:
 		case K_INTERFACE:
 		case K_PACKAGE:
 		case K_PROGRAM:
@@ -869,7 +872,8 @@ static void dropContext ()
 static int dropEndContext (tokenInfo *const token, int c)
 {
 	verbose ("current context %s; context kind %0d; nest level %0d\n", vStringValue (currentContext->name), currentContext->kind, currentContext->nestLevel);
-	if (currentContext->kind == K_COVERGROUP && strcmp (vStringValue (token->name), "endgroup") == 0)
+	if ((currentContext->kind == K_COVERGROUP && strcmp (vStringValue (token->name), "endgroup") == 0)
+	    || (currentContext->kind == K_IFCLASS && strcmp (vStringValue (token->name), "endclass") == 0))
 	{
 		dropContext ();
 		c = skipBlockName (token ,c);
@@ -1264,7 +1268,7 @@ static int processParameterList (tokenInfo *token, int c)
 // [ virtual ] class [ static | automatic ] class_identifier [ parameter_port_list ]
 //     [ extends class_type [ ( list_of_arguments ) ] ] [ implements < interface_class_type > ] ;
 // interface class class_identifier [ parameter_port_list ] [ extends < interface_class_type > ] ;
-static int processClass (tokenInfo *const token, int c)
+static int processClass (tokenInfo *const token, int c, verilogKind kind)
 {
 	tokenInfo *classToken;
 
@@ -1300,7 +1304,7 @@ static int processClass (tokenInfo *const token, int c)
 
 	// process implements: FIXME
 
-	createTag (classToken, K_CLASS);
+	createTag (classToken, kind);
 	deleteToken (classToken);
 	ptrArrayClear (tagContents);
 	return c;
@@ -1351,7 +1355,7 @@ static int processAssertion (tokenInfo *const token, int c)
 // ANSI type
 // ( module | interface | program ) [ static | automatic ] identifier { package_import_declaration } [ parameter_port_list ] [ ( [ < { (* ... *) } ansi_port_declaration > ] ) ] ;
 //
-// interface class class_identifier [ parameter_port_list ] [ extends < interface_class_type > ] ;	// FIXME
+// interface class class_identifier [ parameter_port_list ] [ extends < interface_class_type > ] ;
 static int processDesignElementL (tokenInfo *const token, int c)
 {
 	verilogKind kind = token->kind;
@@ -1360,6 +1364,10 @@ static int processDesignElementL (tokenInfo *const token, int c)
 		c = readWordToken (token, c);
 	else
 		return c;
+
+	// interface class
+	if (token->kind == K_CLASS)
+		return processClass (token, c, K_IFCLASS);
 
 	while (token->kind == K_IGNORE && c != EOF) // skip static or automatic
 	{
@@ -1709,7 +1717,7 @@ static int findTag (tokenInfo *const token, int c)
 			}
 			break;
 		case K_CLASS:
-			c = processClass (token, c);
+			c = processClass (token, c, K_CLASS);
 			break;
 		case K_TYPEDEF:
 			c = processTypedef (token, c);
