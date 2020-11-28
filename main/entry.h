@@ -163,8 +163,9 @@ void          registerEntry (int corkIndex);
  * under the scope.
  *
  * If FUNC returns false, this function returns false.
- * If FUNC never returns false, this func returns true.
- * If FUNC is not called because no node for NAME in the symbol table.
+ * If FUNC never returns false, this function returns true.
+ * If FUNC is not called because no node for NAME in the symbol table,
+ * this function returns true.
  */
 bool          foreachEntriesInScope (int corkIndex,
 									 const char *name, /* or NULL */
