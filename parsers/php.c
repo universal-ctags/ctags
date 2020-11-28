@@ -1557,6 +1557,9 @@ static bool parseUse (tokenInfo *const token)
 		if (readNext)
 		{
 			readToken (token);
+			/* in case of a trailing comma (or an empty group) */
+			if (token->type == TOKEN_CLOSE_CURLY)
+				break;
 			readQualifiedName (token, refName, nameToken);
 		}
 
