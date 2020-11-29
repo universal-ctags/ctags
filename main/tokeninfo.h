@@ -53,6 +53,14 @@ struct tokenInfoClass {
 	void (*copy)   (tokenInfo *dest, tokenInfo *src, void *data);
 	objPool *pool;
 	ptrArray *backlog;
+
+	/* read_counter is incremented every time when reading a
+	 * new token from the input stream unless the new token is EOF.
+	 *
+	 * When filling a tokenInfo from an entry in the backlog, we don't
+	 * regard it as "reading a new token".
+	 */
+	int read_counter;
 };
 
 void *newToken       (struct tokenInfoClass *klass);

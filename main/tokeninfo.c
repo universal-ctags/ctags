@@ -108,7 +108,11 @@ void tokenReadFull (tokenInfo *token, void *data)
 		tokenDelete (backlog);
 	}
 	else
+	{
 		token->klass->read (token, data);
+		if (!tokenIsEOF (token))
+			token->klass->read_counter++;
+	}
 }
 
 void tokenRead (tokenInfo *token)
