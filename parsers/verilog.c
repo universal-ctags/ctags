@@ -133,7 +133,7 @@ static kindDefinition VerilogKinds [] = {
  { true, 'r', "register",  "variable data types" },
  { true, 't', "task",      "tasks" },
  { true, 'b', "block",     "blocks (begin, fork)" },
- { true, 'i', "instance",  "instances of module" }
+ { true, 'i', "instance",  "instances of module" },
 };
 
 static kindDefinition SystemVerilogKinds [] = {
@@ -163,7 +163,7 @@ static kindDefinition SystemVerilogKinds [] = {
  { true, 'L', "clocking",  "clocking" },
  { true, 'q', "sequence",  "sequences" },
  { true, 'w', "member",    "struct and union members" },
- { true, 'l', "ifclass",   "interface class" }
+ { true, 'l', "ifclass",   "interface class" },
 };
 
 static const keywordAssoc KeywordTable [] = {
@@ -253,7 +253,7 @@ static const keywordAssoc KeywordTable [] = {
 	{ "union",         	K_STRUCT,    	{ 1, 0 } },
 	{ "var",           	K_REGISTER,  	{ 1, 0 } },
 	{ "void",          	K_REGISTER,  	{ 1, 0 } },
-	{ "with",          	K_WITH,			{ 1, 0 } }
+	{ "with",          	K_WITH,			{ 1, 0 } },
 };
 
 static tokenInfo *currentContext = NULL;
@@ -683,7 +683,7 @@ static int skipPastMatch (const char *const pair)
 		else if (c == end)
 			--matchLevel;
 	}
-	while (c != EOF && matchLevel > 0);
+	while (matchLevel > 0 && c != EOF);
 	return skipWhite (vGetc ());
 }
 
@@ -696,7 +696,7 @@ static int skipDimension (int c)
 
 static int skipToSemiColon (int c)
 {
-	while (c != EOF && c != ';')
+	while (c != ';' && c != EOF)
 		c = vGetc ();
 	return c;	// ';' or EOF
 }
@@ -715,7 +715,7 @@ static int skipString(int c)
 
 static int skipExpression(int c)
 {
-	while (c != EOF && c != ','  &&  c != ';' && c != ')' && c != '}' && c != ']')
+	while (c != ','  &&  c != ';' && c != ')' && c != '}' && c != ']' && c != EOF)
 	{
 		if (c == '(')
 			c = skipPastMatch ("()");
@@ -1088,7 +1088,7 @@ static int processFunction (tokenInfo *const token, int c)
 
 	/* Search for function name
 	 * Last identifier found before a '(' or a ';' is the function name */
-	do
+	while (c != '(' && c != ';' && c != EOF)
 	{
 		if (isWordToken (c))
 			c = readWordToken (token, c);
@@ -1111,7 +1111,7 @@ static int processFunction (tokenInfo *const token, int c)
 			else
 				vUngetc (c);
 		}
-	} while (c != '(' && c != ';' && c != EOF);
+	}
 
 	verbose ("Found function: %s\n", vStringValue (token->name));
 	createTag (token, kind);
@@ -1129,7 +1129,7 @@ static int processEnum (tokenInfo *const token, int c)
 	tokenInfo* enumToken = dupToken (token);	// save enum token
 
 	/* skip enum_base_type */
-	while (isWordToken (c) && c != EOF)
+	while (isWordToken (c))
 		c = readWordToken (token, c);
 	c = skipDimension (c);
 
@@ -1156,7 +1156,7 @@ static int processStruct (tokenInfo *const token, int c)
 	verilogKind kind = token->kind;	// K_STRUCT or K_TYPEDEF
 
 	/* Skip packed, signed, and unsigned */
-	while (isWordToken (c) && c != EOF)
+	while (isWordToken (c))
 		c = readWordToken (token, c);
 
 	/* create a list of members */
@@ -1224,47 +1224,48 @@ static int processTypedef (tokenInfo *const token, int c)
 static int processParameterList (tokenInfo *token, int c)
 {
 	bool parameter = true;	// default "parameter"
-	if (c == '#')
+
+	if (c != '#')
+		return c;
+	c = skipWhite (vGetc ());
+
+	if (c != '(')
+		return c;
+	c = skipWhite (vGetc ());
+
+	while (c != ')' && c != EOF)
 	{
-		c = skipWhite (vGetc ());
-		if (c == '(')
+		if (isWordToken (c))
 		{
-			c = skipWhite (vGetc ());
-			while (c != ')' && c != EOF)
+			c = readWordToken (token, c);
+			verbose ("Found parameter %s\n", vStringValue (token->name));
+			if (token->kind == K_IDENTIFIER)
 			{
-				if (isWordToken (c))
+				if (c == ',' || c == ')' || c == '=')	// ignore user defined type
 				{
-					c = readWordToken (token, c);
-					verbose ("Found parameter %s\n", vStringValue (token->name));
-					if (token->kind == K_IDENTIFIER)
-					{
-						if (c == ',' || c == ')' || c == '=')	// ignore user defined type
-						{
-							tokenInfo *param = dupToken (token);
-							param->kind = K_CONSTANT;
-							param->parameter = parameter;
-							ptrArrayAdd (tagContents, param);
-							if (c == '=')
-								c = skipExpression (vGetc ());
-							else if (c == ',')
-								c = skipWhite (vGetc ());
-							else	// ')'
-								break;
-						}
-					}
-					else if (token->kind == K_PARAMETER)
-						parameter = true;
-					else if (token->kind == K_LOCALPARAM)
-						parameter = false;
+					tokenInfo *param = dupToken (token);
+					param->kind = K_CONSTANT;
+					param->parameter = parameter;
+					ptrArrayAdd (tagContents, param);
+					if (c == '=')
+						c = skipExpression (vGetc ());
+					else if (c == ',')
+						c = skipWhite (vGetc ());
+					else	// ')'
+						break;
 				}
-				else
-					c = skipWhite (vGetc ());
-				// unpacked array is not allowed for a parameter
 			}
-			c = skipWhite (vGetc ());
+			else if (token->kind == K_PARAMETER)
+				parameter = true;
+			else if (token->kind == K_LOCALPARAM)
+				parameter = false;
 		}
+		else
+			c = skipWhite (vGetc ());
+		// unpacked array is not allowed for a parameter
 	}
-	return c;
+	c = skipWhite (vGetc ());	// skip ')'
+return c;
 }
 
 // [ virtual ] class [ static | automatic ] class_identifier [ parameter_port_list ]
@@ -1463,8 +1464,8 @@ static int skipDelay(tokenInfo* token, int c)
 		{
 			while (isIdentifierCharacter (c) || c == '.')
 				c = vGetc ();
+			c = skipWhite (c);
 		}
-		c = skipWhite (c);
 	}
 	return c;
 }
@@ -1490,9 +1491,15 @@ static int pushEnumNames (tokenInfo* token, int c)
 	if (c == '{')
 	{
 		c = skipWhite (vGetc ());
-		while (isWordToken (c) && c != EOF)
+		while (c != '}' && c != EOF)
 		{
+			if (!isWordToken (c))
+			{
+				verbose ("Unexpected input: %c\n", c);
+				return c;
+			}
 			c = readWordToken (token, c);
+
 			token->kind = K_CONSTANT;
 			ptrArrayAdd (tagContents, dupToken (token));
 			verbose ("Pushed enum element \"%s\"\n", vStringValue (token->name));
@@ -1508,11 +1515,8 @@ static int pushEnumNames (tokenInfo* token, int c)
 			/* Skip comma */
 			if (c == ',')
 				c = skipWhite (vGetc ());
-			/* End of enum elements list */
-			if (c == '}')
-				break;
 		}
-		c = skipWhite (vGetc ());
+		c = skipWhite (vGetc ());	// skip '}'
 	}
 	return c;
 }
@@ -1541,16 +1545,16 @@ static int pushMembers (tokenInfo* token, int c)
 				verbose ("Pushed struct/union member \"%s\"\n", vStringValue (token->name));
 
 				/* Skip unpacked dimensions */
-				c = skipDimension (skipWhite (c));
+				c = skipDimension (c);
 
 				/* Skip value assignments */
 				if (c == '=')
 					c = skipExpression (vGetc ());
 
-				if (c != ',')
-					break;
+				if (c != ',' || c == EOF)
+					break;		// should be ';'
 
-				c = skipWhite (vGetc ());
+				c = skipWhite (vGetc ());	// skip ','
 				if (isWordToken (c))
 					c = readWordToken (token, c);
 				else
@@ -1565,7 +1569,7 @@ static int pushMembers (tokenInfo* token, int c)
 				c = skipWhite (vGetc ());
 			/* End of enum elements list */
 		}
-		c = skipWhite (vGetc ());
+		c = skipWhite (vGetc ());	// skip '}'
 	}
 	return c;
 }
@@ -1593,7 +1597,7 @@ static int processType (tokenInfo* token, int c, verilogKind* kind)
 		}
 		if (c == '.')	// interface_identifier .
 			c = skipWhite (vGetc ());
-		c = skipDimension (skipWhite (c));
+		c = skipDimension (c);
 		c = skipDelay(token, c);	// class parameter #(...)
 		if (c == '{')	// skip enum, struct, or union member
 		{
@@ -1678,7 +1682,7 @@ static int tagNameList (tokenInfo* token, int c)
 
 		if (c != ',' || c == EOF)
 			break;
-		c = skipWhite (vGetc ());	// read next char
+		c = skipWhite (vGetc ());	// skip ','
 		c = skipMacro (c);	// `ifdef, `else, `endif, etc. (after comma)
 		if (kind == K_IDENTIFIER)	// for "module foo (a, b, c);"
 			kind = K_UNDEFINED;
