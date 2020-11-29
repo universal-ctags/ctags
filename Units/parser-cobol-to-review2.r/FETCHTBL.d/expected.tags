@@ -1,0 +1,23 @@
+AUTHOR	input.cbl	/^       AUTHOR.                     TSH.$/;"	p
+D-EMP-NAME	input.cbl	/^           05  D-EMP-NAME          PIC  X(20).$/;"	d	group:D-EMP-REC
+D-EMP-NO	input.cbl	/^           05  D-EMP-NO            PIC  9(04).$/;"	d	group:D-EMP-REC
+D-EMP-REC	input.cbl	/^       01  D-EMP-REC.$/;"	g
+D-EMP-SALARY	input.cbl	/^           05  D-EMP-SALARY        PIC  --,--9.$/;"	d	group:D-EMP-REC
+DATA	input.cbl	/^       DATA                        DIVISION.$/;"	D
+DATE-WRITTEN	input.cbl	/^       DATE-WRITTEN.               2013-06-28.$/;"	p
+DBNAME	input.cbl	/^       01  DBNAME                  PIC  X(30) VALUE SPACE.$/;"	d
+EMP-CNT	input.cbl	/^       01  EMP-CNT                 PIC  9(04).$/;"	d
+EMP-NAME	input.cbl	/^           05  EMP-NAME            PIC  X(20) .$/;"	d	group:EMP-REC-VARS
+EMP-NO	input.cbl	/^           05  EMP-NO              PIC S9(04).$/;"	d	group:EMP-REC-VARS
+EMP-REC-VARS	input.cbl	/^       01  EMP-REC-VARS.$/;"	g
+EMP-SALARY	input.cbl	/^           05  EMP-SALARY          PIC S9(04).$/;"	d	group:EMP-REC-VARS
+END-EVALUATE	input.cbl	/^           END-EVALUATE.$/;"	p
+END-PERFORM	input.cbl	/^           END-PERFORM.$/;"	p
+ERROR-RTN	input.cbl	/^       ERROR-RTN.$/;"	p
+FETCHTBL	input.cbl	/^       PROGRAM-ID.                 FETCHTBL.$/;"	P
+IDENTIFICATION	input.cbl	/^       IDENTIFICATION              DIVISION.$/;"	D
+MAIN-RTN	input.cbl	/^       MAIN-RTN.$/;"	p
+PASSWD	input.cbl	/^       01  PASSWD                  PIC  X(10) VALUE SPACE.$/;"	d
+PROCEDURE	input.cbl	/^       PROCEDURE                   DIVISION.$/;"	D
+USERNAME	input.cbl	/^       01  USERNAME                PIC  X(30) VALUE SPACE.$/;"	d
+WORKING-STORAGE	input.cbl	/^       WORKING-STORAGE             SECTION.$/;"	s

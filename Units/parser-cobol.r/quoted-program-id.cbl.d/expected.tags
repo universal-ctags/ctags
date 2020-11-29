@@ -1,0 +1,4 @@
+IDENTIFICATION	input.cbl	/^       IDENTIFICATION DIVISION.$/;"	D
+MAIN	input.cbl	/^       MAIN.$/;"	p
+PROCEDURE	input.cbl	/^       PROCEDURE DIVISION.$/;"	D
+Test program name	input.cbl	/^       PROGRAM-ID. 'Test program name'.$/;"	P

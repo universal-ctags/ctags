@@ -5,16 +5,16 @@ SPECIAL-NAMES	input.cbl	/^       SPECIAL-NAMES.$/;"	p	roles:def
 DATA	input.cbl	/^       DATA DIVISION.$/;"	D	roles:def
 WORKING-STORAGE	input.cbl	/^       WORKING-STORAGE SECTION.$/;"	s	roles:def
 WS-ABBRUCH-TYP	input.cbl	/^       01  WS-ABBRUCH-TYP          PIC 99.$/;"	d	roles:def
-WS-ABBRUCH-EVENT	input.cbl	/^           88  WS-ABBRUCH-EVENT    VALUE 91.$/;"	d	roles:def
-WS-ABBRUCH-OBJMGR	input.cbl	/^.          88  WS-ABBRUCH-OBJMGR   VALUE 92.$/;"	d	roles:def
-WS-ABBRUCH-DB	input.cbl	/^.          88  WS-ABBRUCH-DB       VALUE 93.$/;"	d	roles:def
-WS-ABBRUCH-PGM	input.cbl	/^.          88  WS-ABBRUCH-PGM      VALUE 94.$/;"	d	roles:def
+WS-ABBRUCH-EVENT	input.cbl	/^           88  WS-ABBRUCH-EVENT    VALUE 91.$/;"	d	data:WS-ABBRUCH-TYP	roles:def
+WS-ABBRUCH-OBJMGR	input.cbl	/^.          88  WS-ABBRUCH-OBJMGR   VALUE 92.$/;"	d	data:WS-ABBRUCH-TYP	roles:def
+WS-ABBRUCH-DB	input.cbl	/^.          88  WS-ABBRUCH-DB       VALUE 93.$/;"	d	data:WS-ABBRUCH-TYP	roles:def
+WS-ABBRUCH-PGM	input.cbl	/^.          88  WS-ABBRUCH-PGM      VALUE 94.$/;"	d	data:WS-ABBRUCH-TYP	roles:def
 F-TEXT	input.cbl	/^       01  F-TEXT.$/;"	g	roles:def
-F-TEXT-DB	input.cbl	/^           05 F-TEXT-DB            PIC X(5).$/;"	d	roles:def
-F-TEXT-KEY1	input.cbl	/^           05 F-TEXT-KEY1          PIC 9(8).$/;"	d	roles:def
-F-TEXT-KEY2	input.cbl	/^           05 F-TEXT-KEY2          PIC 9(8).$/;"	d	roles:def
-F-TEXT-KEY3	input.cbl	/^           05 F-TEXT-KEY3          PIC 99.$/;"	d	roles:def
-F-TEXT-EVENT	input.cbl	/^           05 F-TEXT-EVENT         PIC X(10).$/;"	d	roles:def
+F-TEXT-DB	input.cbl	/^           05 F-TEXT-DB            PIC X(5).$/;"	d	group:F-TEXT	roles:def
+F-TEXT-KEY1	input.cbl	/^           05 F-TEXT-KEY1          PIC 9(8).$/;"	d	group:F-TEXT	roles:def
+F-TEXT-KEY2	input.cbl	/^           05 F-TEXT-KEY2          PIC 9(8).$/;"	d	group:F-TEXT	roles:def
+F-TEXT-KEY3	input.cbl	/^           05 F-TEXT-KEY3          PIC 99.$/;"	d	group:F-TEXT	roles:def
+F-TEXT-EVENT	input.cbl	/^           05 F-TEXT-EVENT         PIC X(10).$/;"	d	group:F-TEXT	roles:def
 TCTOENV	input.cbl	/^       COPY TCTOENV.$/;"	S	roles:copied
 TCWFLENG	input.cbl	/^       COPY TCWFLENG.$/;"	S	roles:copied
 TCPR	input.cbl	/^       COPY TCPR.$/;"	S	roles:copied

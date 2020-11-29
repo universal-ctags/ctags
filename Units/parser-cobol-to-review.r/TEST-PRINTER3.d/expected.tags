@@ -1,0 +1,17 @@
+BUF-NB-LIGNES-PAR-PAGE	input.cbl	/^       01 BUF-NB-LIGNES-PAR-PAGE PIC 99 VALUE 10.$/;"	d
+DATA	input.cbl	/^       DATA DIVISION.$/;"	D
+ENVIRONMENT	input.cbl	/^       ENVIRONMENT DIVISION.$/;"	D
+FILE	input.cbl	/^       FILE SECTION.$/;"	s
+HELLO-WORLD	input.cbl	/^       HELLO-WORLD.$/;"	p
+IDENTIFICATION	input.cbl	/^       IDENTIFICATION DIVISION.$/;"	D
+INPUT-OUTPUT	input.cbl	/^       INPUT-OUTPUT SECTION.$/;"	s
+MAIN-PROCEDURE	input.cbl	/^       MAIN-PROCEDURE.$/;"	p
+PA-BUFFER	input.cbl	/^           02 PA-BUFFER        PIC X(80)   VALUE SPACES    .$/;"	d	group:PRINTER-PARAM
+PA-HOWMANY	input.cbl	/^           02 PA-HOWMANY       PIC 99      VALUE 1         .$/;"	d	group:PRINTER-PARAM
+PA-RESET	input.cbl	/^           02 PA-RESET         PIC X       VALUE "N"       .$/;"	d	group:PRINTER-PARAM
+PA-WHAT	input.cbl	/^           02 PA-WHAT          PIC X(5)    VALUE "LINES"   .$/;"	d	group:PRINTER-PARAM
+PA-WHEN	input.cbl	/^           02 PA-WHEN          PIC X(6)    VALUE "AFTER"   .$/;"	d	group:PRINTER-PARAM
+PRINTER-PARAM	input.cbl	/^       01 PRINTER-PARAM.$/;"	g
+PROCEDURE	input.cbl	/^       PROCEDURE DIVISION.$/;"	D
+TEST-PRINTER	input.cbl	/^       PROGRAM-ID. TEST-PRINTER.$/;"	P
+WORKING-STORAGE	input.cbl	/^       WORKING-STORAGE SECTION.$/;"	s

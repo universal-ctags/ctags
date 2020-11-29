@@ -1,0 +1,19 @@
+DATA	input.cbl	/^       DATA DIVISION.$/;"	D
+ENREG-PRINTER	input.cbl	/^       01 ENREG-PRINTER PIC X(80).$/;"	d
+ENVIRONMENT	input.cbl	/^       ENVIRONMENT DIVISION.$/;"	D
+FILE	input.cbl	/^       FILE SECTION.$/;"	s
+FILE-CONTROL	input.cbl	/^       FILE-CONTROL.$/;"	p
+FPRINTER	input.cbl	/^       FD FPRINTER.$/;"	f
+IDENTIFICATION	input.cbl	/^       IDENTIFICATION DIVISION.$/;"	D
+INPUT-OUTPUT	input.cbl	/^       INPUT-OUTPUT SECTION.$/;"	s
+LINKAGE	input.cbl	/^       LINKAGE SECTION.$/;"	s
+MAIN-PRINTER	input.cbl	/^       MAIN-PRINTER.$/;"	p
+PA-BUFFER	input.cbl	/^           02 PA-BUFFER        PIC X(80)   .$/;"	d	group:RECEIVED-PARAM
+PA-HOWMANY	input.cbl	/^           02 PA-HOWMANY       PIC 99      .$/;"	d	group:RECEIVED-PARAM
+PA-RESET	input.cbl	/^           02 PA-RESET         PIC X       .$/;"	d	group:RECEIVED-PARAM
+PA-WHAT	input.cbl	/^           02 PA-WHAT          PIC X(5)    .$/;"	d	group:RECEIVED-PARAM
+PA-WHEN	input.cbl	/^           02 PA-WHEN          PIC X(6)    .$/;"	d	group:RECEIVED-PARAM
+RECEIVED-PARAM	input.cbl	/^                RECEIVED-PARAM.$/;"	p
+RECEIVED-PARAM	input.cbl	/^       01 RECEIVED-PARAM.$/;"	g
+VIRTUAL-PRINTER	input.cbl	/^       PROGRAM-ID. VIRTUAL-PRINTER.$/;"	P
+WORKING-STORAGE	input.cbl	/^       WORKING-STORAGE SECTION.$/;"	s

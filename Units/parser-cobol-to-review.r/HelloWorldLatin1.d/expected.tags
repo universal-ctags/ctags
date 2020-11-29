@@ -1,0 +1,10 @@
+CONFIGURATION	input.cbl	/^       CONFIGURATION SECTION.$/;"	s
+DATA	input.cbl	/^       DATA DIVISION.$/;"	D
+ENVIRONMENT	input.cbl	/^       ENVIRONMENT DIVISION.$/;"	D
+FILE	input.cbl	/^       FILE SECTION.$/;"	s
+IDENTIFICATION	input.cbl	/^       IDENTIFICATION DIVISION.$/;"	D
+INPUT-OUTPUT	input.cbl	/^       INPUT-OUTPUT SECTION.$/;"	s
+MAIN-PROCEDURE	input.cbl	/^       MAIN-PROCEDURE.$/;"	p
+PROCEDURE	input.cbl	/^       PROCEDURE DIVISION.$/;"	D
+WORKING-STORAGE	input.cbl	/^       WORKING-STORAGE SECTION.$/;"	s
+YOUR-PROGRAM-NAME	input.cbl	/^       PROGRAM-ID. YOUR-PROGRAM-NAME.$/;"	P
