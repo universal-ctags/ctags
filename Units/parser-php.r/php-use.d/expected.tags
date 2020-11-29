@@ -24,6 +24,7 @@ NS30	input.php	/^  use NS2\\{NS30, NS31\\Cls4};$/;"	a	typeref:unknown:NS2\\NS30
 NSCls	input.php	/^  use NS\\Iface as NSIface, NS\\Cls as NSCls;$/;"	a	namespace:NS2	typeref:unknown:NS\\Cls
 NSIface	input.php	/^  use NS\\Iface as NSIface, NS\\Cls as NSCls;$/;"	a	namespace:NS2	typeref:unknown:NS\\Iface
 NameSpaceTreePointO	input.php	/^  use NS2\\{NS30 as NameSpaceTreePointO, NS31\\Cls4 as ClassFour};$/;"	a	typeref:unknown:NS2\\NS30
+NameSpaceTreePointZero	input.php	/^  use NS2\\{NS30 as NameSpaceTreePointZero,};$/;"	a	typeref:unknown:NS2\\NS30
 SomeAliasedNS	input.php	/^  use NS as SomeAliasedNS;$/;"	a	typeref:unknown:NS
 cls	input.php	/^  $cls = new Cls2;$/;"	v
 cls	input.php	/^  $cls = new Cls;$/;"	v

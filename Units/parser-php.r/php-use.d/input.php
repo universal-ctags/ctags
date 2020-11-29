@@ -57,6 +57,7 @@ namespace {
   use NS2\{Cls as NS2Cls, Iface};
   use NS2\{NS30, NS31\Cls4};
   use NS2\{NS30 as NameSpaceTreePointO, NS31\Cls4 as ClassFour};
+  use NS2\{NS30 as NameSpaceTreePointZero,};
   
   $cls = new Cls;
   echo $cls::CONST, "\n";
