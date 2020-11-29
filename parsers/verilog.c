@@ -1362,21 +1362,19 @@ static int processDesignElementL (tokenInfo *const token, int c)
 {
 	verilogKind kind = token->kind;
 
-	if (isWordToken (c))
-		c = readWordToken (token, c);
-	else
-		return c;
-
-	// interface class
-	if (token->kind == K_CLASS)
-		return processClass (token, c, K_IFCLASS);
-
-	while (token->kind == K_IGNORE && c != EOF) // skip static or automatic
+	while (isWordToken (c))
 	{
-		if (isWordToken (c))
-			c = readWordToken (token, c);
+		c = readWordToken (token, c);
+		// interface class
+		if (token->kind == K_CLASS)
+			return processClass (token, c, K_IFCLASS);
+		// skip static or automatic
+		else if (token->kind != K_IGNORE)
+			break;
 	}
-	createTag (token, kind);	// identifier
+
+	if (token->kind == K_IDENTIFIER)
+		createTag (token, kind);	// identifier
 
 	// skip package_import_declaration
 	if (isWordToken (c))
