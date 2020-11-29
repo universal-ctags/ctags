@@ -938,7 +938,7 @@ static tagResult find (tagFile *const file, tagEntry *const entry,
 	else
 	{
 #ifdef DEBUG
-		fpruts ("<performing sequential search>\n", stderr);
+		fputs ("<performing sequential search>\n", stderr);
 #endif
 		result = findSequential (file);
 	}
