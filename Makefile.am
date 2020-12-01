@@ -1,3 +1,5 @@
+ACLOCAL_AMFLAGS = -I m4
+
 include $(top_srcdir)/source.mak
 
 EXTRA_DIST   = README.md autogen.sh \
@@ -39,15 +41,18 @@ noinst_PROGRAMS =
 noinst_PROGRAMS += packcc
 noinst_PROGRAMS += mini-geany
 
-packcc_CPPFLAGS =
-packcc_CFLAGS  =
-packcc_CFLAGS += $(EXTRA_CFLAGS)
 dist_packcc_SOURCES = $(PACKCC_SRCS)
 
-if HAVE_STRNLEN
-packcc_CPPFLAGS += -DUSE_SYSTEM_STRNLEN
-endif
+# no need to use system's strnlen(3)
+#if HAVE_STRNLEN
+#packcc_CPPFLAGS += -DUSE_SYSTEM_STRNLEN
+#endif
 
+# https://www.gnu.org/software/automake/manual/automake.html#index-maude_005fLINK
+packcc_LINK = $(CC_FOR_BUILD) $(LDFLAGS_FOR_BUILD) -o $@
+
+misc/packcc/packcc.o: misc/packcc/packcc.c
+	$(CC_FOR_BUILD) $(CFLAGS_FOR_BUILD) $(CPPFLAGS_FOR_BUILD) -c -o $@ $<
 
 if USE_READCMD
 bin_PROGRAMS+= readtags
