@@ -24,6 +24,18 @@ class C;
   typedef class   fwd_type_class;
 endclass
 
+// LRM 13.4.1 Return values and void functions
+module M (output a, input b, c, d);
+  always_comb begin
+    a = b + myfunc1(c, d); // call myfunc1 (defined above) as an expression
+    myprint(a); // call myprint (defined below) as a statement
+  end
+
+  function void myprint (int a);
+    logic x;
+  endfunction
+endmodule
+
 // from UVM-1.2
 package foo;
   import "DPI-C" context function int import_func (string str);

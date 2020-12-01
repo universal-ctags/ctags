@@ -7,6 +7,14 @@ attr	input.sv	/^  task automatic attr ( (* my_attr *) const ref foo, enum { s0, 
 foo	input.sv	/^  task automatic attr ( (* my_attr *) const ref foo, enum { s0, s1 } sel_e );$/;"	p	task:task_func.attr
 sel_e	input.sv	/^  task automatic attr ( (* my_attr *) const ref foo, enum { s0, s1 } sel_e );$/;"	p	task:task_func.attr
 C	input.sv	/^class C;$/;"	C
+M	input.sv	/^module M (output a, input b, c, d);$/;"	m
+a	input.sv	/^module M (output a, input b, c, d);$/;"	p	module:M
+b	input.sv	/^module M (output a, input b, c, d);$/;"	p	module:M
+c	input.sv	/^module M (output a, input b, c, d);$/;"	p	module:M
+d	input.sv	/^module M (output a, input b, c, d);$/;"	p	module:M
+myprint	input.sv	/^  function void myprint (int a);$/;"	f	module:M
+a	input.sv	/^  function void myprint (int a);$/;"	p	function:M.myprint
+x	input.sv	/^    logic x;$/;"	r	function:M.myprint
 foo	input.sv	/^package foo;$/;"	K
 uvm_object	input.sv	/^  typedef logic uvm_object;$/;"	T	package:foo
 bar	input.sv	/^  function logic bar (uvm_object baz);$/;"	f	package:foo
