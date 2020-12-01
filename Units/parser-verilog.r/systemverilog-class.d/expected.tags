@@ -118,3 +118,22 @@ set_priority	input.sv	/^  pure virtual function void set_priority (foo::bar x);$
 D.set_priority	input.sv	/^  pure virtual function void set_priority (foo::bar x);$/;"	Q	class:D
 x	input.sv	/^  pure virtual function void set_priority (foo::bar x);$/;"	p	prototype:D.set_priority
 D.set_priority.x	input.sv	/^  pure virtual function void set_priority (foo::bar x);$/;"	p	prototype:D.set_priority
+BasePacket	input.sv	/^virtual class BasePacket;$/;"	C
+send	input.sv	/^pure virtual function integer send(bit[31:0] data); \/\/ No implementation$/;"	Q	class:BasePacket
+BasePacket.send	input.sv	/^pure virtual function integer send(bit[31:0] data); \/\/ No implementation$/;"	Q	class:BasePacket
+data	input.sv	/^pure virtual function integer send(bit[31:0] data); \/\/ No implementation$/;"	p	prototype:BasePacket.send
+BasePacket.send.data	input.sv	/^pure virtual function integer send(bit[31:0] data); \/\/ No implementation$/;"	p	prototype:BasePacket.send
+complex_class	input.sv	/^virtual class static complex_class #(type BASE1=foo, type BASE2=bar) extends base (a, b) impleme/;"	C	inherits:base
+BASE1	input.sv	/^virtual class static complex_class #(type BASE1=foo, type BASE2=bar) extends base (a, b) impleme/;"	c	class:complex_class
+complex_class.BASE1	input.sv	/^virtual class static complex_class #(type BASE1=foo, type BASE2=bar) extends base (a, b) impleme/;"	c	class:complex_class
+BASE2	input.sv	/^virtual class static complex_class #(type BASE1=foo, type BASE2=bar) extends base (a, b) impleme/;"	c	class:complex_class
+complex_class.BASE2	input.sv	/^virtual class static complex_class #(type BASE1=foo, type BASE2=bar) extends base (a, b) impleme/;"	c	class:complex_class
+packet_c	input.sv	/^  Packet packet_c;$/;"	r	class:complex_class
+complex_class.packet_c	input.sv	/^  Packet packet_c;$/;"	r	class:complex_class
+next	input.sv	/^  LinkedPacket next;$/;"	r	class:complex_class
+complex_class.next	input.sv	/^  LinkedPacket next;$/;"	r	class:complex_class
+get_next	input.sv	/^  function LinkedPacket get_next();$/;"	f	class:complex_class
+complex_class.get_next	input.sv	/^  function LinkedPacket get_next();$/;"	f	class:complex_class
+auto_class	input.sv	/^class automatic auto_class;$/;"	C
+a	input.sv	/^  logic a;$/;"	r	class:auto_class
+auto_class.a	input.sv	/^  logic a;$/;"	r	class:auto_class

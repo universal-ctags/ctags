@@ -1275,12 +1275,16 @@ static int processClass (tokenInfo *const token, int c, verilogKind kind)
 {
 	tokenInfo *classToken;
 
-	// skip static | automatic : FIXME
-
 	/* Get identifiers */
-	if (isWordToken (c))
+	while (isWordToken (c))
+	{
 		c = readWordToken (token, c);
-	else
+		// skip static or automatic
+		if (token->kind != K_IGNORE)
+			break;
+	}
+
+	if (token->kind != K_IDENTIFIER)
 	{
 		verbose ("Unexpected input: class name is expected.\n");
 		return c;
