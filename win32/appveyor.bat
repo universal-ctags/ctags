@@ -194,10 +194,16 @@ copy COPYING package\license > nul
 copy win32\mkstemp\COPYING.MinGW-w64-runtime.txt package\license > nul
 robocopy man package\man *.html > nul
 cd package
-7z a ..\ctags-%ver%-%ARCH%.debug.zip %filelist% %dirlist%
-strip *.exe
+for %%i in (*.exe) do call :strip %%i
 7z a ..\ctags-%ver%-%ARCH%.zip %filelist% %dirlist%
+7z a ..\ctags-%ver%-%ARCH%.debuginfo.zip *.exe.debug
 cd ..
+goto :eof
+
+:strip
+objcopy --only-keep-debug %1 %1.debug
+strip %1
+objcopy --add-gnu-debuglink=%1.debug %1
 goto :eof
 
 
