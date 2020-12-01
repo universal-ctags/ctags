@@ -43,10 +43,9 @@ noinst_PROGRAMS += mini-geany
 
 dist_packcc_SOURCES = $(PACKCC_SRCS)
 
-# no need to use system's strnlen(3)
-#if HAVE_STRNLEN
-#packcc_CPPFLAGS += -DUSE_SYSTEM_STRNLEN
-#endif
+if HAVE_STRNLEN_FOR_BUILD
+override CPPFLAGS_FOR_BUILD += -DUSE_SYSTEM_STRNLEN
+endif
 
 # https://www.gnu.org/software/automake/manual/automake.html#index-maude_005fLINK
 packcc_LINK = $(CC_FOR_BUILD) $(LDFLAGS_FOR_BUILD) -o $@
