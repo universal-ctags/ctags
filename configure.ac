@@ -727,20 +727,19 @@ AC_CHECK_DECLS([strnlen],[have_strnlen=yes],[],[
 AM_CONDITIONAL(HAVE_STRNLEN, test "x$have_strnlen" = xyes)
 
 AC_MSG_CHECKING(whether strnlen is declared for build)
-testFile=$(mktemp -d)/test.c
-cat > $testFile <<EOF
+TEMP_DIR_FOR_CHECKING=$(mktemp -d || exit 1)
+cat > "$TEMP_DIR_FOR_CHECKING/test.c" <<EOF
 #include<string.h>
 int main() { strnlen("abcd",1); return 0;}
 EOF
 
-if $CC_FOR_BUILD $CPPFLAGS_FOR_BUILD $CFLAGS_FOR_BUILD $testFile > /dev/null 2>&1 ; then
+if $CC_FOR_BUILD $CPPFLAGS_FOR_BUILD $CFLAGS_FOR_BUILD -o "$TEMP_DIR_FOR_CHECKING/test.o" "$TEMP_DIR_FOR_CHECKING/test.c" > /dev/null 2>&1 ; then
     have_strnlen_for_build=yes
 else
     have_strnlen_for_build=no
 fi
 AC_MSG_RESULT($have_strnlen_for_build)
 AM_CONDITIONAL(HAVE_STRNLEN_FOR_BUILD, test "x$have_strnlen_for_build" = xyes)
-rm -f a.out
 
 if test "$CTAGS_NAME_EXECUTABLE" != ctags ; then
 	AC_MSG_NOTICE(Changing name of 'ctags' for $CTAGS_NAME_EXECUTABLE)
