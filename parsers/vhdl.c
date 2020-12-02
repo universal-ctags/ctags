@@ -339,7 +339,7 @@ static fieldDefinition VhdlFields [] = {
 /*
  *   FUNCTION DECLARATIONS
  */
-static void parseKeywords (tokenInfo * const token, vString * label, int parent);
+static void parseKeywords (tokenInfo * const token, tokenInfo * const label, int parent);
 
 /*
  *   FUNCTION DEFINITIONS
@@ -370,6 +370,13 @@ static tokenInfo *newToken (void)
 	token->lineNumber = getInputLineNumber ();
 	token->filePosition = getInputFilePosition ();
 	return token;
+}
+
+static tokenInfo *copyToken (tokenInfo * const src)
+{
+	tokenInfo *dst = newToken ();
+	vStringCopy (dst->string, src->string);
+	return dst;
 }
 
 static void deleteToken (tokenInfo * const token)
@@ -938,26 +945,30 @@ static void parseLabel (tokenInfo * const name, int parent)
 	{
 		readToken (token);
 		if (isType (token, TOKEN_KEYWORD))
-			parseKeywords (token, name->string, parent);
+			parseKeywords (token, name, parent);
 	}
 	deleteToken (token);
 }
 
-static void parseProcess (tokenInfo * const token, vString * label, int parent)
+static void parseProcess (tokenInfo * const token, tokenInfo * const label, int parent)
 {
-	vString *process = label? label: vStringNew();
+	tokenInfo *process = label? label: copyToken (token);
 
 	if (label == NULL)
-		anonGenerate (process, "anonProcess", VHDLTAG_PROCESS);
+	{
+		process->type = TOKEN_IDENTIFIER;
+		vStringClear (process->string);
+		anonGenerate (process->string, "anonProcess", VHDLTAG_PROCESS);
+	}
 
-	int index = makeSimpleTag (process, VHDLTAG_PROCESS);
+	int index = makeVhdlTagWithScope (process, VHDLTAG_PROCESS, parent);
 
 	if (label == NULL)
 	{
 		tagEntryInfo *e = getEntryInCorkQueue (index);
 		if (e)
 			markTagExtraBit (e, XTAG_ANONYMOUS);
-		vStringDelete (process);
+		deleteToken (process);
 	}
 
 	skipToMatched (token);
@@ -979,7 +990,7 @@ static void parseAlias (tokenInfo * const token, int parent)
 
 /* TODO */
 /* records */
-static void parseKeywords (tokenInfo * const token, vString * label, int index)
+static void parseKeywords (tokenInfo * const token, tokenInfo * const label, int index)
 {
 	switch (token->keyword)
 	{
