@@ -44,14 +44,14 @@ noinst_PROGRAMS += mini-geany
 dist_packcc_SOURCES = $(PACKCC_SRCS)
 
 if HAVE_STRNLEN_FOR_BUILD
-override CPPFLAGS_FOR_BUILD += -DUSE_SYSTEM_STRNLEN
+EXTRA_CPPFLAGS_FOR_BUILD = -DUSE_SYSTEM_STRNLEN
 endif
 
 # https://www.gnu.org/software/automake/manual/automake.html#index-maude_005fLINK
 packcc_LINK = $(CC_FOR_BUILD) $(LDFLAGS_FOR_BUILD) -o $@
 
 misc/packcc/packcc.o: misc/packcc/packcc.c
-	$(CC_FOR_BUILD) $(CFLAGS_FOR_BUILD) $(CPPFLAGS_FOR_BUILD) -c -o $@ $<
+	$(CC_FOR_BUILD) $(CFLAGS_FOR_BUILD) $(CPPFLAGS_FOR_BUILD) $(EXTRA_CPPFLAGS_FOR_BUILD) -c -o $@ $<
 
 if USE_READCMD
 bin_PROGRAMS+= readtags
