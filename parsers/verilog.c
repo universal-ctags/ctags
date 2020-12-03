@@ -89,7 +89,7 @@ typedef enum {
 	K_MEMBER,
 	K_IFCLASS,	/* interface class */
 	K_CONSTRAINT,
-	K_IFCLASS	/* interface class */
+	K_NETTYPE,
 } verilogKind;
 
 typedef struct {
@@ -167,6 +167,7 @@ static kindDefinition SystemVerilogKinds [] = {
  { true, 'w', "member",    "struct and union members" },
  { true, 'l', "ifclass",   "interface class" },
  { true, 'O', "constraint","constraints" },
+ { true, 'N', "nettype",   "nettype declarations" },
 };
 
 static const keywordAssoc KeywordTable [] = {
@@ -258,6 +259,7 @@ static const keywordAssoc KeywordTable [] = {
 	{ "var",           	K_REGISTER,  	{ 1, 0 } },
 	{ "void",          	K_REGISTER,  	{ 1, 0 } },
 	{ "with",          	K_WITH,			{ 1, 0 } },
+	{ "nettype",       	K_NETTYPE,		{ 1, 0 } },
 };
 
 static tokenInfo *currentContext = NULL;
@@ -422,6 +424,7 @@ static short isContainer (verilogKind kind)
 		case K_PROPERTY:
 		case K_SEQUENCE:
 		case K_TYPEDEF:
+		case K_NETTYPE:
 		case K_ENUM:
 		case K_STRUCT:
 			return true;
@@ -435,6 +438,7 @@ static short isTempContext (tokenInfo const* token)
 	switch (token->kind)
 	{
 		case K_TYPEDEF:
+		case K_NETTYPE:
 		case K_ENUM:
 		case K_STRUCT:
 			return true;
@@ -1157,7 +1161,7 @@ static int processEnum (tokenInfo *const token, int c)
 // [ struct | union [ tagged ] ] [ packed [ signed | unsigned ] ] { struct_union_member { struct_union_member } } { [ ... ] }
 static int processStruct (tokenInfo *const token, int c)
 {
-	verilogKind kind = token->kind;	// K_STRUCT or K_TYPEDEF
+	verilogKind kind = token->kind;	// K_STRUCT, K_TYPEDEF, or K_NETTYPE
 
 	/* Skip packed, signed, and unsigned */
 	while (isWordToken (c))
@@ -1187,6 +1191,7 @@ static int processStruct (tokenInfo *const token, int c)
 //     | nettype [ class_type :: | package_identifier :: | $unit :: ] net_type_identifier net_type_identifier ;
 static int processTypedef (tokenInfo *const token, int c)
 {
+	verilogKind kindSave = token->kind;	// K_TYPEDEF or K_NETTYPE
 	verilogKind kind = K_UNDEFINED;
 	if (isWordToken (c))
 	{
@@ -1219,7 +1224,7 @@ static int processTypedef (tokenInfo *const token, int c)
 	}
 	c = processType (token, c, &kind);
 
-	createTag (token, K_TYPEDEF);
+	createTag (token, kindSave);
 
 	ptrArrayClear (tagContents);
 	return c;
@@ -1605,6 +1610,7 @@ static int pushMembers (tokenInfo* token, int c)
 static int processType (tokenInfo* token, int c, verilogKind* kind)
 {
 	verilogKind actualKind = K_UNDEFINED;
+	tokenInfo *tokenSaved;
 	do
 	{
 		// [ class_type :: | package_identifier :: | $unit :: ] type_identifier { [ ... ] }
@@ -1633,9 +1639,25 @@ static int processType (tokenInfo* token, int c, verilogKind* kind)
 		}
 		c = skipDimension (c);
 
+		// break on ',', ';', ')', '}', or other unexpected charactors
 		if (!isWordToken (c))
 			break;
+
+		tokenSaved = dupToken (token);
 		c = readWordToken (token, c);
+		// break on "with"
+		if (token->kind == K_WITH)
+		{
+			// restore tokenSaved to token
+			//   tokenClear() cannot be used to free strings.
+			vStringDelete (token->name);
+			vStringDelete (token->blockName);
+			vStringDelete (token->inheritance);
+			*token = *tokenSaved;
+			eFree (tokenSaved);
+			break;
+		}
+		deleteToken(tokenSaved);
 
 		// fix kind of user defined type
 		if (*kind == K_IDENTIFIER)
@@ -1748,6 +1770,7 @@ static int findTag (tokenInfo *const token, int c)
 			c = processClass (token, c, K_CLASS);
 			break;
 		case K_TYPEDEF:
+		case K_NETTYPE:
 			c = processTypedef (token, c);
 			break;
 		case K_ENUM:
