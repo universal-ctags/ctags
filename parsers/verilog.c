@@ -87,6 +87,8 @@ typedef enum {
 	K_CLOCKING,
 	K_SEQUENCE,
 	K_MEMBER,
+	K_IFCLASS,	/* interface class */
+	K_CONSTRAINT,
 	K_IFCLASS	/* interface class */
 } verilogKind;
 
@@ -164,6 +166,7 @@ static kindDefinition SystemVerilogKinds [] = {
  { true, 'q', "sequence",  "sequences" },
  { true, 'w', "member",    "struct and union members" },
  { true, 'l', "ifclass",   "interface class" },
+ { true, 'O', "constraint","constraints" },
 };
 
 static const keywordAssoc KeywordTable [] = {
@@ -214,6 +217,7 @@ static const keywordAssoc KeywordTable [] = {
 	{ "chandle",       	K_REGISTER,  	{ 1, 0 } },
 	{ "checker",       	K_CHECKER,  	{ 1, 0 } },
 	{ "class",         	K_CLASS,     	{ 1, 0 } },
+	{ "constraint",   	K_CONSTRAINT, 	{ 1, 0 } },
 	{ "cover",         	K_ASSERTION, 	{ 1, 0 } },
 	{ "clocking",       K_CLOCKING,     { 1, 0 } },
 	{ "covergroup",    	K_COVERGROUP,	{ 1, 0 } },
@@ -1317,6 +1321,21 @@ static int processClass (tokenInfo *const token, int c, verilogKind kind)
 	return c;
 }
 
+// constraint_declaration ::= [ static ] constraint constraint_identifier '{' { constraint_block_item } '}'
+// constraint_prototype ::= [ extern | pure ] [ static ] constraint constraint_identifier ;
+static int processConstraint (tokenInfo *const token, int c)
+{
+	if (isWordToken (c))
+	{
+		c = readWordToken (token, c);
+		createTag (token, K_CONSTRAINT);
+	}
+	if (c == '{')
+		c = skipPastMatch ("{}");
+
+	return c;
+}
+
 static int processDefine (tokenInfo *const token, int c)
 {
 	/* Bug #961001: Verilog compiler directives are line-based. */
@@ -1632,7 +1651,7 @@ static int processType (tokenInfo* token, int c, verilogKind* kind)
 			}
 			else
 			{
-				verbose("Unexpected input\n");	// FIXME: fix interface, constraint
+				verbose("Unexpected input\n");	// FIXME: x dist {}, with
 				break;
 			}
 		}
@@ -1772,6 +1791,9 @@ static int findTag (tokenInfo *const token, int c)
 			break;
 		case K_ASSERTION:
 			c = processAssertion (token, c);
+			break;
+		case K_CONSTRAINT:
+			c = processConstraint (token, c);
 			break;
 
 		case K_DEFINE:
