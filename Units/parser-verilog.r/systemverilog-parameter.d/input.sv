@@ -55,20 +55,20 @@ endclass
 
 class Fifo #(type T = logic, int DEPTH = 1) implements PutImp#(T), GetImp#(T);
   T myFifo[$:DEPTH-1];
-  virtual function void put(T a); // FIXME : to be ignored?
+  virtual function void put(T a);
     myFifo.push_back(a);
   endfunction
-  virtual function T get(); // FIXME : to be ignored?
+  virtual function T get();
     get = myFifo.pop_front();
   endfunction
 endclass
 
 class Stack #(type T = logic, int DEPTH = 1) implements PutImp#(T), GetImp#(T);
   T myFifo[$:DEPTH-1];
-  virtual function void put(T a); // FIXME : to be ignored
+  virtual function void put(T a);
     myFifo.push_front(a);
   endfunction
-  virtual function T get(); // FIXME : to be ignored
+  virtual function T get();
     get = myFifo.pop_front();
   endfunction
 endclass

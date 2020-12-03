@@ -260,6 +260,7 @@ static const keywordAssoc KeywordTable [] = {
 	{ "void",          	K_REGISTER,  	{ 1, 0 } },
 	{ "with",          	K_WITH,			{ 1, 0 } },
 	{ "nettype",       	K_NETTYPE,		{ 1, 0 } },
+//	{ "virtual",       	K_PROTOTYPE,	{ 1, 0 } },		// do not add for now
 };
 
 static tokenInfo *currentContext = NULL;
