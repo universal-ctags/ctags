@@ -30,8 +30,7 @@ CLEANFILES =
 MOSTLYCLEANFILES =
 
 clean-local:
-	rm -f packcc
-	rm -f packcc.exe
+	rm -f packcc$(BUILD_EXEEXT)
 	@if test "$(top_srcdir)" != "$(top_builddir)"; then \
 		rm -rf $(OPTLIB2C_SRCS); \
 	fi
