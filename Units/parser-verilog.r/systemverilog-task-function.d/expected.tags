@@ -48,3 +48,4 @@ sigs	input.sv	/^  function void bind_vitf(virtual wb_if.master sigs);$/;"	p	func
 get	input.sv	/^  function string get(string v);$/;"	f	class:func_test
 v	input.sv	/^  function string get(string v);$/;"	p	function:func_test.get
 get_arg	input.sv	/^  function string get_arg();$/;"	f	class:func_test
+parameterized_task	input.sv	/^  function parameterized_task;$/;"	f	class:func_test

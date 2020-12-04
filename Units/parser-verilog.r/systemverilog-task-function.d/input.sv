@@ -95,4 +95,11 @@ class func_test;
 
   function string get_arg();
   endfunction
+
+  // cf. LRM 13.8 Parameterized tasks and functions
+  function parameterized_task;
+    // src/reg/uvm_reg_indirect.svh
+    uvm_resource_db#(bit)::set({"REG::", get_full_name()}, "NO_REG_TESTS", 1);
+  endfunction
+
 endclass

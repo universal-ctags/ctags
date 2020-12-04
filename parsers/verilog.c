@@ -1692,9 +1692,43 @@ static int processType (tokenInfo* token, int c, verilogKind* kind, bool* with)
 	return c;
 }
 
+// class_type ::=
+//       ps_class_identifier [ # ( … ) ] { :: class_identifier [ # ( … ) ] }
+static int skipClassType (tokenInfo* token, int c)
+{
+	while (c == '#' || c == ':')
+	{
+		if (c == '#')
+		{
+			c = skipWhite (vGetc ());
+			// a dirty hack for "x ##delay1 y[*min:max];"
+			if (c == '#')
+				return skipToSemiColon (vGetc ());
+			c = skipPastMatch ("()");
+		}
+		else	// c == ':'
+		{
+			c = skipWhite (vGetc ());
+			if (c != ':')	// case label
+			{
+				vUngetc (c);
+				return ':';
+			}
+			c = skipWhite (vGetc ());
+			if (isWordToken (c))
+				c = readWordToken (token, c);
+		}
+	}
+	return c;
+}
+
 static int tagNameList (tokenInfo* token, int c)
 {
 	verilogKind kind = token->kind;
+
+	c = skipClassType (token, c);
+	if (c == ':' || c == ';')	// case label or ## (cycle delay)
+		return c;
 
 	// skip drive|charge strength or type_reference, dimensions, and delay for net
 	if (c == '(')
