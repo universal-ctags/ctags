@@ -36,6 +36,24 @@ module M (output a, input b, c, d);
   endfunction
 endmodule
 
+// 7.12 Array manipulation methods
+module N;
+  // 7.12.1 Array locator methods
+  function array_locator();
+    string SA[10], qs[$];
+    int IA[int], qi[$];
+    // Find all items greater than 5
+    qi = IA.find( x ) with ( x > 5 );
+  endfunction
+
+  // 7.12.2 Array ordering methods
+  function array_ordering();
+    struct { byte red, green, blue; } c [512];
+    c.sort with ( item.red );               // sort c using the red field only
+    c.sort( x ) with ( {x.blue, x.green} ); // sort by blue then green
+  endfunction
+endmodule
+
 // from UVM-1.2
 package foo;
   import "DPI-C" context function int import_func (string str);

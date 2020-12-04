@@ -392,7 +392,7 @@ static fieldDefinition SystemVerilogFields[] = {
 
 static bool isIdentifier (tokenInfo* token);
 static int processDefine (tokenInfo *const token, int c);
-static int processType (tokenInfo* token, int c, verilogKind* kind);
+static int processType (tokenInfo* token, int c, verilogKind* kind, bool* with);
 static int pushEnumNames (tokenInfo* token, int c);
 static int pushMembers (tokenInfo* token, int c);
 static int readWordToken (tokenInfo *const token, int c);
@@ -1194,6 +1194,7 @@ static int processTypedef (tokenInfo *const token, int c)
 {
 	verilogKind kindSave = token->kind;	// K_TYPEDEF or K_NETTYPE
 	verilogKind kind = K_UNDEFINED;
+	bool not_used;
 	if (isWordToken (c))
 	{
 		c = readWordToken (token, c);
@@ -1223,7 +1224,7 @@ static int processTypedef (tokenInfo *const token, int c)
 		default:
 			; // do nothing
 	}
-	c = processType (token, c, &kind);
+	c = processType (token, c, &kind, &not_used);
 
 	createTag (token, kindSave);
 
@@ -1559,6 +1560,7 @@ static int pushMembers (tokenInfo* token, int c)
 		while (c != '}' && c != EOF)
 		{
 			verilogKind kind = K_UNDEFINED;	// set kind of context for processType()
+			bool not_used;
 			if (!isWordToken (c))
 			{
 				verbose ("Unexpected input: %c\n", c);
@@ -1566,7 +1568,7 @@ static int pushMembers (tokenInfo* token, int c)
 			}
 			c = readWordToken (token, c);
 
-			c = processType (token, c, &kind);
+			c = processType (token, c, &kind, &not_used);
 			while (true)
 			{
 				token->kind = K_MEMBER;
@@ -1608,10 +1610,11 @@ static int pushMembers (tokenInfo* token, int c)
 // output
 //   kind: kind of type
 //   token: identifier token (unless K_IDENTIFIER nor K_UNDEFINED)
-static int processType (tokenInfo* token, int c, verilogKind* kind)
+static int processType (tokenInfo* token, int c, verilogKind* kind, bool* with)
 {
 	verilogKind actualKind = K_UNDEFINED;
 	tokenInfo *tokenSaved;
+	*with = false;
 	do
 	{
 		// [ class_type :: | package_identifier :: | $unit :: ] type_identifier { [ ... ] }
@@ -1656,6 +1659,7 @@ static int processType (tokenInfo* token, int c, verilogKind* kind)
 			vStringDelete (token->inheritance);
 			*token = *tokenSaved;
 			eFree (tokenSaved);
+			*with = true;	// inform to caller
 			break;
 		}
 		deleteToken(tokenSaved);
@@ -1702,9 +1706,10 @@ static int tagNameList (tokenInfo* token, int c)
 
 	while (c != EOF)
 	{
-		c = processType(token, c, &kind);	// update token and kind
+		bool with = false;
+		c = processType(token, c, &kind, &with);	// update token and kind
 
-		if (c == '=' || c == ',' || c == ';' || c == ')' || c == '`')
+		if (c == '=' || c == ',' || c == ';' || c == ')' || c == '`' || with)
 		{
 			if (kind != K_UNDEFINED && kind != K_IDENTIFIER)	// ignore procedual assignment: foo = bar;
 				createTag (token, kind);
@@ -1761,6 +1766,8 @@ static int findTag (tokenInfo *const token, int c)
 					; /* label */
 				else if (c == '{')
 					c = skipWhite(vGetc());
+				else if (c == '(')	// task, function, or method call
+					c = skipPastMatch ("()");
 				else if (c == '=')
 					c = skipExpression (skipWhite(vGetc()));
 				else
