@@ -240,6 +240,7 @@ PARSER_SRCS =				\
 	parsers/fortran.c		\
 	parsers/fypp.c			\
 	parsers/go.c			\
+	parsers/haskell.c		\
 	parsers/haxe.c			\
 	parsers/html.c			\
 	parsers/iniconf.c		\

@@ -215,6 +215,7 @@
     <ClCompile Include="..\parsers\fortran.c" />
     <ClCompile Include="..\parsers\fypp.c" />
     <ClCompile Include="..\parsers\go.c" />
+    <ClCompile Include="..\parsers\haskell.c" />
     <ClCompile Include="..\parsers\haxe.c" />
     <ClCompile Include="..\parsers\html.c" />
     <ClCompile Include="..\parsers\iniconf.c" />

@@ -381,6 +381,9 @@
     <ClCompile Include="..\parsers\go.c">
       <Filter>Source Files\Parsers</Filter>
     </ClCompile>
+    <ClCompile Include="..\parsers\haskell.c">
+      <Filter>Source Files\Parsers</Filter>
+    </ClCompile>
     <ClCompile Include="..\parsers\haxe.c">
       <Filter>Source Files\Parsers</Filter>
     </ClCompile>
