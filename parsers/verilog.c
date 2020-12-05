@@ -1172,7 +1172,7 @@ static int processStruct (tokenInfo *const token, int c)
 // data_declaration ::=
 //       [ const ] [ var ] [ static | automatic ] data_type_or_implicit list_of_variable_decl_assignments ;
 //     | typedef data_type type_identifier { [ ... ] } ;
-//     | typedef interface_instance_identifier [ ... ] . type_identifier type_identifier ;
+//     | typedef interface_instance_identifier [ ... ] . type_identifier type_identifier ; // interface based typedef
 //     | typedef [ enum | struct | union | class | interface class ] type_identifier ;
 //     | import < package_import_item > ;
 //     | nettype data_type net_type_identifier [ with [ class_type :: | package_identifier :: | $unit :: ] tf_identifier ] ;
@@ -1205,6 +1205,14 @@ static int processTypedef (tokenInfo *const token, int c)
 			}
 			break;
 		case K_IDENTIFIER:
+			// interface based typedef
+			c = skipDimension (c);
+			if (c == '.')
+			{
+				c = skipWhite (vGetc ());
+				if (isWordToken (c))
+					c = readWordToken (token, c);
+			}
 			if (c == ';')
 				currentContext->prototype = true;
 			break;

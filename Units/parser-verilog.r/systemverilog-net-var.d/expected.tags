@@ -88,7 +88,10 @@ intf_i	input.sv	/^interface intf_i;$/;"	I
 data_t	input.sv	/^  typedef int data_t;$/;"	T	interface:intf_i
 sub	input.sv	/^module sub(intf_i p);$/;"	m
 p	input.sv	/^module sub(intf_i p);$/;"	r	module:sub
+my_data_t	input.sv	/^  typedef p.data_t my_data_t;$/;"	T	module:sub
 data	input.sv	/^  my_data_t data;$/;"	r	module:sub
+cbs	input.sv	/^module cbs;$/;"	m
+cbs_t	input.sv	/^  typedef p[10].data_t cbs_t;$/;"	T	module:cbs
 user_define_types_1	input.sv	/^module user_define_types_1;$/;"	m
 enum_test	input.sv	/^module enum_test;$/;"	m
 light1	input.sv	/^  enum {red, yellow, green} light1, light2; \/\/ anonymous int type$/;"	E	module:enum_test
