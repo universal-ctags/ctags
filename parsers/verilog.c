@@ -87,7 +87,9 @@ typedef enum {
 	K_CLOCKING,
 	K_SEQUENCE,
 	K_MEMBER,
-	K_IFCLASS	/* interface class */
+	K_IFCLASS,	/* interface class */
+	K_CONSTRAINT,
+	K_NETTYPE,
 } verilogKind;
 
 typedef struct {
@@ -164,6 +166,8 @@ static kindDefinition SystemVerilogKinds [] = {
  { true, 'q', "sequence",  "sequences" },
  { true, 'w', "member",    "struct and union members" },
  { true, 'l', "ifclass",   "interface class" },
+ { true, 'O', "constraint","constraints" },
+ { true, 'N', "nettype",   "nettype declarations" },
 };
 
 static const keywordAssoc KeywordTable [] = {
@@ -214,6 +218,7 @@ static const keywordAssoc KeywordTable [] = {
 	{ "chandle",       	K_REGISTER,  	{ 1, 0 } },
 	{ "checker",       	K_CHECKER,  	{ 1, 0 } },
 	{ "class",         	K_CLASS,     	{ 1, 0 } },
+	{ "constraint",   	K_CONSTRAINT, 	{ 1, 0 } },
 	{ "cover",         	K_ASSERTION, 	{ 1, 0 } },
 	{ "clocking",       K_CLOCKING,     { 1, 0 } },
 	{ "covergroup",    	K_COVERGROUP,	{ 1, 0 } },
@@ -254,6 +259,8 @@ static const keywordAssoc KeywordTable [] = {
 	{ "var",           	K_REGISTER,  	{ 1, 0 } },
 	{ "void",          	K_REGISTER,  	{ 1, 0 } },
 	{ "with",          	K_WITH,			{ 1, 0 } },
+	{ "nettype",       	K_NETTYPE,		{ 1, 0 } },
+//	{ "virtual",       	K_PROTOTYPE,	{ 1, 0 } },		// do not add for now
 };
 
 static tokenInfo *currentContext = NULL;
@@ -385,7 +392,7 @@ static fieldDefinition SystemVerilogFields[] = {
 
 static bool isIdentifier (tokenInfo* token);
 static int processDefine (tokenInfo *const token, int c);
-static int processType (tokenInfo* token, int c, verilogKind* kind);
+static int processType (tokenInfo* token, int c, verilogKind* kind, bool* with);
 static int pushEnumNames (tokenInfo* token, int c);
 static int pushMembers (tokenInfo* token, int c);
 static int readWordToken (tokenInfo *const token, int c);
@@ -418,6 +425,7 @@ static short isContainer (verilogKind kind)
 		case K_PROPERTY:
 		case K_SEQUENCE:
 		case K_TYPEDEF:
+		case K_NETTYPE:
 		case K_ENUM:
 		case K_STRUCT:
 			return true;
@@ -431,6 +439,7 @@ static short isTempContext (tokenInfo const* token)
 	switch (token->kind)
 	{
 		case K_TYPEDEF:
+		case K_NETTYPE:
 		case K_ENUM:
 		case K_STRUCT:
 			return true;
@@ -1153,7 +1162,7 @@ static int processEnum (tokenInfo *const token, int c)
 // [ struct | union [ tagged ] ] [ packed [ signed | unsigned ] ] { struct_union_member { struct_union_member } } { [ ... ] }
 static int processStruct (tokenInfo *const token, int c)
 {
-	verilogKind kind = token->kind;	// K_STRUCT or K_TYPEDEF
+	verilogKind kind = token->kind;	// K_STRUCT, K_TYPEDEF, or K_NETTYPE
 
 	/* Skip packed, signed, and unsigned */
 	while (isWordToken (c))
@@ -1183,7 +1192,9 @@ static int processStruct (tokenInfo *const token, int c)
 //     | nettype [ class_type :: | package_identifier :: | $unit :: ] net_type_identifier net_type_identifier ;
 static int processTypedef (tokenInfo *const token, int c)
 {
+	verilogKind kindSave = token->kind;	// K_TYPEDEF or K_NETTYPE
 	verilogKind kind = K_UNDEFINED;
+	bool not_used;
 	if (isWordToken (c))
 	{
 		c = readWordToken (token, c);
@@ -1213,9 +1224,9 @@ static int processTypedef (tokenInfo *const token, int c)
 		default:
 			; // do nothing
 	}
-	c = processType (token, c, &kind);
+	c = processType (token, c, &kind, &not_used);
 
-	createTag (token, K_TYPEDEF);
+	createTag (token, kindSave);
 
 	ptrArrayClear (tagContents);
 	return c;
@@ -1275,12 +1286,16 @@ static int processClass (tokenInfo *const token, int c, verilogKind kind)
 {
 	tokenInfo *classToken;
 
-	// skip static | automatic : FIXME
-
 	/* Get identifiers */
-	if (isWordToken (c))
+	while (isWordToken (c))
+	{
 		c = readWordToken (token, c);
-	else
+		// skip static or automatic
+		if (token->kind != K_IGNORE)
+			break;
+	}
+
+	if (token->kind != K_IDENTIFIER)
 	{
 		verbose ("Unexpected input: class name is expected.\n");
 		return c;
@@ -1310,6 +1325,21 @@ static int processClass (tokenInfo *const token, int c, verilogKind kind)
 	createTag (classToken, kind);
 	deleteToken (classToken);
 	ptrArrayClear (tagContents);
+	return c;
+}
+
+// constraint_declaration ::= [ static ] constraint constraint_identifier '{' { constraint_block_item } '}'
+// constraint_prototype ::= [ extern | pure ] [ static ] constraint constraint_identifier ;
+static int processConstraint (tokenInfo *const token, int c)
+{
+	if (isWordToken (c))
+	{
+		c = readWordToken (token, c);
+		createTag (token, K_CONSTRAINT);
+	}
+	if (c == '{')
+		c = skipPastMatch ("{}");
+
 	return c;
 }
 
@@ -1530,6 +1560,7 @@ static int pushMembers (tokenInfo* token, int c)
 		while (c != '}' && c != EOF)
 		{
 			verilogKind kind = K_UNDEFINED;	// set kind of context for processType()
+			bool not_used;
 			if (!isWordToken (c))
 			{
 				verbose ("Unexpected input: %c\n", c);
@@ -1537,7 +1568,7 @@ static int pushMembers (tokenInfo* token, int c)
 			}
 			c = readWordToken (token, c);
 
-			c = processType (token, c, &kind);
+			c = processType (token, c, &kind, &not_used);
 			while (true)
 			{
 				token->kind = K_MEMBER;
@@ -1579,17 +1610,20 @@ static int pushMembers (tokenInfo* token, int c)
 // output
 //   kind: kind of type
 //   token: identifier token (unless K_IDENTIFIER nor K_UNDEFINED)
-static int processType (tokenInfo* token, int c, verilogKind* kind)
+static int processType (tokenInfo* token, int c, verilogKind* kind, bool* with)
 {
 	verilogKind actualKind = K_UNDEFINED;
+	tokenInfo *tokenSaved;
+	*with = false;
 	do
 	{
 		// [ class_type :: | package_identifier :: | $unit :: ] type_identifier { [ ... ] }
 		if (c == ':')
 		{
 			c = skipWhite (vGetc ());
-			if (c != ':')	// case label
+			if (c != ':')
 			{
+				verbose ("Unexpected input.\n");
 				vUngetc (c);
 				return ':';
 			}
@@ -1610,9 +1644,26 @@ static int processType (tokenInfo* token, int c, verilogKind* kind)
 		}
 		c = skipDimension (c);
 
+		// break on ',', ';', ')', '}', or other unexpected charactors
 		if (!isWordToken (c))
 			break;
+
+		tokenSaved = dupToken (token);
 		c = readWordToken (token, c);
+		// break on "with"
+		if (token->kind == K_WITH)
+		{
+			// restore tokenSaved to token
+			//   tokenClear() cannot be used to free strings.
+			vStringDelete (token->name);
+			vStringDelete (token->blockName);
+			vStringDelete (token->inheritance);
+			*token = *tokenSaved;
+			eFree (tokenSaved);
+			*with = true;	// inform to caller
+			break;
+		}
+		deleteToken(tokenSaved);
 
 		// fix kind of user defined type
 		if (*kind == K_IDENTIFIER)
@@ -1628,7 +1679,7 @@ static int processType (tokenInfo* token, int c, verilogKind* kind)
 			}
 			else
 			{
-				verbose("Unexpected input\n");	// FIXME: fix interface, constraint
+				verbose("Unexpected input\n");	// FIXME: x dist {}, with
 				break;
 			}
 		}
@@ -1642,9 +1693,44 @@ static int processType (tokenInfo* token, int c, verilogKind* kind)
 	return c;
 }
 
+// class_type ::=
+//       ps_class_identifier [ # ( … ) ] { :: class_identifier [ # ( … ) ] }
+static int skipClassType (tokenInfo* token, int c)
+{
+	while (c == '#' || c == ':')
+	{
+		if (c == '#')
+		{
+			c = skipWhite (vGetc ());
+			// a dirty hack for "x ##delay1 y[*min:max];"
+			if (c == '#')
+				return skipToSemiColon (vGetc ());
+			c = skipPastMatch ("()");
+		}
+		else	// c == ':'
+		{
+			c = skipWhite (vGetc ());
+			if (c != ':')
+			{
+				verbose ("Unexpected input.\n");
+				vUngetc (c);
+				return ':';
+			}
+			c = skipWhite (vGetc ());
+			if (isWordToken (c))
+				c = readWordToken (token, c);
+		}
+	}
+	return c;
+}
+
 static int tagNameList (tokenInfo* token, int c)
 {
 	verilogKind kind = token->kind;
+
+	c = skipClassType (token, c);
+	if (c == ':' || c == ';')	// ## (cycle delay) or unexpected input
+		return c;
 
 	// skip drive|charge strength or type_reference, dimensions, and delay for net
 	if (c == '(')
@@ -1656,9 +1742,10 @@ static int tagNameList (tokenInfo* token, int c)
 
 	while (c != EOF)
 	{
-		c = processType(token, c, &kind);	// update token and kind
+		bool with = false;
+		c = processType(token, c, &kind, &with);	// update token and kind
 
-		if (c == '=' || c == ',' || c == ';' || c == ')' || c == '`')
+		if (c == '=' || c == ',' || c == ';' || c == ')' || c == '`' || with)
 		{
 			if (kind != K_UNDEFINED && kind != K_IDENTIFIER)	// ignore procedual assignment: foo = bar;
 				createTag (token, kind);
@@ -1711,11 +1798,16 @@ static int findTag (tokenInfo *const token, int c)
 			break;
 		case K_IDENTIFIER:
 			{
+				if (c == '[')	// for a case label foo[x]:
+					c = skipPastMatch ("[]");
+
 				if (c == ':')
 					; /* label */
-				else if (c == '{')
+				else if (c == ',' || c == '{')	// "foo, ..." or "coverpoint foo { ... }"
 					c = skipWhite(vGetc());
-				else if (c == '=')
+				else if (c == '(')	// task, function, or method call
+					c = skipPastMatch ("()");
+				else if (c == '=')	// assignment
 					c = skipExpression (skipWhite(vGetc()));
 				else
 					c = tagNameList (token, c); /* user defined type */
@@ -1725,6 +1817,7 @@ static int findTag (tokenInfo *const token, int c)
 			c = processClass (token, c, K_CLASS);
 			break;
 		case K_TYPEDEF:
+		case K_NETTYPE:
 			c = processTypedef (token, c);
 			break;
 		case K_ENUM:
@@ -1768,6 +1861,9 @@ static int findTag (tokenInfo *const token, int c)
 			break;
 		case K_ASSERTION:
 			c = processAssertion (token, c);
+			break;
+		case K_CONSTRAINT:
+			c = processConstraint (token, c);
 			break;
 
 		case K_DEFINE:

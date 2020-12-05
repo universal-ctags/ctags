@@ -1,7 +1,6 @@
 //
 // LRM 18. Constrained random value generation
 //
-// FIXME: constraint is not tagged yet
 
 // 18.3 Concepts and usage
 class Bus;

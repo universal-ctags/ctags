@@ -1,21 +1,30 @@
 Bus	input.sv	/^class Bus;$/;"	C
 addr	input.sv	/^  rand bit[15:0] addr;$/;"	r	class:Bus
 data	input.sv	/^  rand bit[31:0] data;$/;"	r	class:Bus
+word_align	input.sv	/^  constraint word_align {addr[1:0] == 2'b0;}$/;"	O	class:Bus
 AddrType	input.sv	/^typedef enum {low, mid, high} AddrType;$/;"	T
 low	input.sv	/^typedef enum {low, mid, high} AddrType;$/;"	c	typedef:AddrType
 mid	input.sv	/^typedef enum {low, mid, high} AddrType;$/;"	c	typedef:AddrType
 high	input.sv	/^typedef enum {low, mid, high} AddrType;$/;"	c	typedef:AddrType
 MyBus	input.sv	/^class MyBus extends Bus;$/;"	C
 atype	input.sv	/^  rand AddrType atype;$/;"	r	class:MyBus
+addr_range	input.sv	/^  constraint addr_range$/;"	O	class:MyBus
 exercise_bus	input.sv	/^task exercise_bus (MyBus bus);$/;"	t
 bus	input.sv	/^task exercise_bus (MyBus bus);$/;"	p	task:exercise_bus
 res	input.sv	/^  int res;$/;"	r	task:exercise_bus
 C	input.sv	/^class C;$/;"	C
 x	input.sv	/^  rand int x;$/;"	r	class:C
+proto1	input.sv	/^  constraint proto1;        \/\/ implicit form$/;"	O	class:C
+proto2	input.sv	/^  extern constraint proto2; \/\/ explicit form$/;"	Q	class:C
 D	input.sv	/^virtual class D;$/;"	C
+Test	input.sv	/^  pure constraint Test;$/;"	Q	class:D
 E	input.sv	/^class E;$/;"	C
 a	input.sv	/^  rand byte a[5];$/;"	r	class:E
 b	input.sv	/^  rand byte b;$/;"	r	class:E
 excluded	input.sv	/^  rand byte excluded;$/;"	r	class:E
+u	input.sv	/^  constraint u { unique {b, a[2:3], excluded}; }$/;"	O	class:E
+exclusion	input.sv	/^  constraint exclusion { excluded == 5; }$/;"	O	class:E
 C	input.sv	/^class C;$/;"	C
 A	input.sv	/^  rand byte A[] ;$/;"	r	class:C
+C1	input.sv	/^  constraint C1 { foreach ( A [ i ] ) A[i] inside {2,4,8,16}; }$/;"	O	class:C
+C2	input.sv	/^  constraint C2 { foreach ( A [ j ] ) A[j] > 2 * j; }$/;"	O	class:C

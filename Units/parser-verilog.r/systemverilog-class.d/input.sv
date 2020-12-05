@@ -73,3 +73,21 @@ class D;
   // UVM-1.2: src/base/uvm_callback.svh
   pure virtual function void set_priority (foo::bar x);
 endclass
+
+// 8.21 Abstract classes and pure virtual methods
+virtual class BasePacket;
+pure virtual function integer send(bit[31:0] data); // No implementation
+endclass
+
+// original complex class
+virtual class static complex_class #(type BASE1=foo, type BASE2=bar) extends base (a, b) implements xxx, yyy;
+  Packet packet_c;
+  LinkedPacket next;
+  function LinkedPacket get_next();
+    get_next = next;
+  endfunction
+endclass
+
+class automatic auto_class;
+  logic a;
+endclass : auto_class

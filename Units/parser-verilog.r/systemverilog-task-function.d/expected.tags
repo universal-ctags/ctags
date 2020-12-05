@@ -7,6 +7,25 @@ attr	input.sv	/^  task automatic attr ( (* my_attr *) const ref foo, enum { s0, 
 foo	input.sv	/^  task automatic attr ( (* my_attr *) const ref foo, enum { s0, s1 } sel_e );$/;"	p	task:task_func.attr
 sel_e	input.sv	/^  task automatic attr ( (* my_attr *) const ref foo, enum { s0, s1 } sel_e );$/;"	p	task:task_func.attr
 C	input.sv	/^class C;$/;"	C
+M	input.sv	/^module M (output a, input b, c, d);$/;"	m
+a	input.sv	/^module M (output a, input b, c, d);$/;"	p	module:M
+b	input.sv	/^module M (output a, input b, c, d);$/;"	p	module:M
+c	input.sv	/^module M (output a, input b, c, d);$/;"	p	module:M
+d	input.sv	/^module M (output a, input b, c, d);$/;"	p	module:M
+myprint	input.sv	/^  function void myprint (int a);$/;"	f	module:M
+a	input.sv	/^  function void myprint (int a);$/;"	p	function:M.myprint
+x	input.sv	/^    logic x;$/;"	r	function:M.myprint
+N	input.sv	/^module N;$/;"	m
+array_locator	input.sv	/^  function array_locator();$/;"	f	module:N
+SA	input.sv	/^    string SA[10], qs[$];$/;"	r	function:N.array_locator
+qs	input.sv	/^    string SA[10], qs[$];$/;"	r	function:N.array_locator
+IA	input.sv	/^    int IA[int], qi[$];$/;"	r	function:N.array_locator
+qi	input.sv	/^    int IA[int], qi[$];$/;"	r	function:N.array_locator
+array_ordering	input.sv	/^  function array_ordering();$/;"	f	module:N
+c	input.sv	/^    struct { byte red, green, blue; } c [512];$/;"	S	function:N.array_ordering
+red	input.sv	/^    struct { byte red, green, blue; } c [512];$/;"	w	struct:N.array_ordering.c
+green	input.sv	/^    struct { byte red, green, blue; } c [512];$/;"	w	struct:N.array_ordering.c
+blue	input.sv	/^    struct { byte red, green, blue; } c [512];$/;"	w	struct:N.array_ordering.c
 foo	input.sv	/^package foo;$/;"	K
 uvm_object	input.sv	/^  typedef logic uvm_object;$/;"	T	package:foo
 bar	input.sv	/^  function logic bar (uvm_object baz);$/;"	f	package:foo
@@ -29,3 +48,4 @@ sigs	input.sv	/^  function void bind_vitf(virtual wb_if.master sigs);$/;"	p	func
 get	input.sv	/^  function string get(string v);$/;"	f	class:func_test
 v	input.sv	/^  function string get(string v);$/;"	p	function:func_test.get
 get_arg	input.sv	/^  function string get_arg();$/;"	f	class:func_test
+parameterized_task	input.sv	/^  function parameterized_task;$/;"	f	class:func_test

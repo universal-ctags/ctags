@@ -23,16 +23,16 @@ Fifo	input.sv	/^class Fifo #(type T = logic, int DEPTH = 1) implements PutImp#(T
 T	input.sv	/^class Fifo #(type T = logic, int DEPTH = 1) implements PutImp#(T), GetImp#(T);$/;"	c	class:Fifo	parameter:
 DEPTH	input.sv	/^class Fifo #(type T = logic, int DEPTH = 1) implements PutImp#(T), GetImp#(T);$/;"	c	class:Fifo	parameter:
 myFifo	input.sv	/^  T myFifo[$:DEPTH-1];$/;"	r	class:Fifo
-put	input.sv	/^  virtual function void put(T a); \/\/ FIXME : to be ignored?$/;"	f	class:Fifo
-a	input.sv	/^  virtual function void put(T a); \/\/ FIXME : to be ignored?$/;"	p	function:Fifo.put
-get	input.sv	/^  virtual function T get(); \/\/ FIXME : to be ignored?$/;"	f	class:Fifo
+put	input.sv	/^  virtual function void put(T a);$/;"	f	class:Fifo
+a	input.sv	/^  virtual function void put(T a);$/;"	p	function:Fifo.put
+get	input.sv	/^  virtual function T get();$/;"	f	class:Fifo
 Stack	input.sv	/^class Stack #(type T = logic, int DEPTH = 1) implements PutImp#(T), GetImp#(T);$/;"	C
 T	input.sv	/^class Stack #(type T = logic, int DEPTH = 1) implements PutImp#(T), GetImp#(T);$/;"	c	class:Stack	parameter:
 DEPTH	input.sv	/^class Stack #(type T = logic, int DEPTH = 1) implements PutImp#(T), GetImp#(T);$/;"	c	class:Stack	parameter:
 myFifo	input.sv	/^  T myFifo[$:DEPTH-1];$/;"	r	class:Stack
-put	input.sv	/^  virtual function void put(T a); \/\/ FIXME : to be ignored$/;"	f	class:Stack
-a	input.sv	/^  virtual function void put(T a); \/\/ FIXME : to be ignored$/;"	p	function:Stack.put
-get	input.sv	/^  virtual function T get(); \/\/ FIXME : to be ignored$/;"	f	class:Stack
+put	input.sv	/^  virtual function void put(T a);$/;"	f	class:Stack
+a	input.sv	/^  virtual function void put(T a);$/;"	p	function:Stack.put
+get	input.sv	/^  virtual function T get();$/;"	f	class:Stack
 IntfA	input.sv	/^interface class IntfA #(type T1 = logic);$/;"	l
 T1	input.sv	/^interface class IntfA #(type T1 = logic);$/;"	c	ifclass:IntfA	parameter:
 T2	input.sv	/^  typedef T1[1:0] T2;$/;"	T	ifclass:IntfA

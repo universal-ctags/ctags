@@ -24,6 +24,36 @@ class C;
   typedef class   fwd_type_class;
 endclass
 
+// LRM 13.4.1 Return values and void functions
+module M (output a, input b, c, d);
+  always_comb begin
+    a = b + myfunc1(c, d); // call myfunc1 (defined above) as an expression
+    myprint(a); // call myprint (defined below) as a statement
+  end
+
+  function void myprint (int a);
+    logic x;
+  endfunction
+endmodule
+
+// 7.12 Array manipulation methods
+module N;
+  // 7.12.1 Array locator methods
+  function array_locator();
+    string SA[10], qs[$];
+    int IA[int], qi[$];
+    // Find all items greater than 5
+    qi = IA.find( x ) with ( x > 5 );
+  endfunction
+
+  // 7.12.2 Array ordering methods
+  function array_ordering();
+    struct { byte red, green, blue; } c [512];
+    c.sort with ( item.red );               // sort c using the red field only
+    c.sort( x ) with ( {x.blue, x.green} ); // sort by blue then green
+  endfunction
+endmodule
+
 // from UVM-1.2
 package foo;
   import "DPI-C" context function int import_func (string str);
@@ -65,4 +95,11 @@ class func_test;
 
   function string get_arg();
   endfunction
+
+  // cf. LRM 13.8 Parameterized tasks and functions
+  function parameterized_task;
+    // src/reg/uvm_reg_indirect.svh
+    uvm_resource_db#(bit)::set({"REG::", get_full_name()}, "NO_REG_TESTS", 1);
+  endfunction
+
 endclass

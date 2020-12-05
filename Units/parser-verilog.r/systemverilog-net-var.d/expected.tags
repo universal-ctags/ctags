@@ -27,13 +27,14 @@ ww	input.sv	/^  wire logic [15:0] ww;$/;"	n	module:Net_declarations
 w1	input.sv	/^  interconnect w1;              \/\/ legal$/;"	n	module:Net_declarations
 w2	input.sv	/^  interconnect [3:0] w2;        \/\/ legal$/;"	n	module:Net_declarations
 w3	input.sv	/^  interconnect [3:0] w3 [1:0];  \/\/ legal$/;"	n	module:Net_declarations
-wT	input.sv	/^  nettype T wT;$/;"	r	module:Net_declarations
+wT	input.sv	/^  nettype T wT;$/;"	N	module:Net_declarations
+wTsum	input.sv	/^  nettype T wTsum with Tsum;$/;"	N	module:Net_declarations
 w1	input.sv	/^  wT w1;$/;"	r	module:Net_declarations
 w2	input.sv	/^  wT w2[8];$/;"	r	module:Net_declarations
 w3	input.sv	/^  wTsum w3;$/;"	r	module:Net_declarations
 w4	input.sv	/^  wTsum w4[8];$/;"	r	module:Net_declarations
 TR	input.sv	/^  typedef real TR[5];$/;"	T	module:Net_declarations
-wTR	input.sv	/^  nettype TR wTR;$/;"	r	module:Net_declarations
+wTR	input.sv	/^  nettype TR wTR;$/;"	N	module:Net_declarations
 w5	input.sv	/^  wTR w5;$/;"	r	module:Net_declarations
 w6	input.sv	/^  wTR w6[8];$/;"	r	module:Net_declarations
 Variable_declarations	input.sv	/^module Variable_declarations;$/;"	m
