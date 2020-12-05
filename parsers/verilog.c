@@ -1621,8 +1621,9 @@ static int processType (tokenInfo* token, int c, verilogKind* kind, bool* with)
 		if (c == ':')
 		{
 			c = skipWhite (vGetc ());
-			if (c != ':')	// case label
+			if (c != ':')
 			{
+				verbose ("Unexpected input.\n");
 				vUngetc (c);
 				return ':';
 			}
@@ -1709,8 +1710,9 @@ static int skipClassType (tokenInfo* token, int c)
 		else	// c == ':'
 		{
 			c = skipWhite (vGetc ());
-			if (c != ':')	// case label
+			if (c != ':')
 			{
+				verbose ("Unexpected input.\n");
 				vUngetc (c);
 				return ':';
 			}
@@ -1727,7 +1729,7 @@ static int tagNameList (tokenInfo* token, int c)
 	verilogKind kind = token->kind;
 
 	c = skipClassType (token, c);
-	if (c == ':' || c == ';')	// case label or ## (cycle delay)
+	if (c == ':' || c == ';')	// ## (cycle delay) or unexpected input
 		return c;
 
 	// skip drive|charge strength or type_reference, dimensions, and delay for net
@@ -1796,13 +1798,16 @@ static int findTag (tokenInfo *const token, int c)
 			break;
 		case K_IDENTIFIER:
 			{
+				if (c == '[')	// for a case label foo[x]:
+					c = skipPastMatch ("[]");
+
 				if (c == ':')
 					; /* label */
-				else if (c == '{')
+				else if (c == ',' || c == '{')	// "foo, ..." or "coverpoint foo { ... }"
 					c = skipWhite(vGetc());
 				else if (c == '(')	// task, function, or method call
 					c = skipPastMatch ("()");
-				else if (c == '=')
+				else if (c == '=')	// assignment
 					c = skipExpression (skipWhite(vGetc()));
 				else
 					c = tagNameList (token, c); /* user defined type */
