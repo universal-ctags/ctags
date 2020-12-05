@@ -1,0 +1,24 @@
+ENTITY_TOP	input.vhd	/^entity ENTITY_TOP is$/;"	entity	roles:def	end:13
+GEN	input.vhd	/^    GEN : integer := 0$/;"	generic	entity:ENTITY_TOP	roles:def
+INP	input.vhd	/^    INP : in std_logic$/;"	port	entity:ENTITY_TOP	roles:def
+arch	input.vhd	/^architecture arch of ENTITY_TOP is$/;"	architecture	entity:ENTITY_TOP	roles:def	end:54
+ENTITY_TOP	input.vhd	/^architecture arch of ENTITY_TOP is$/;"	entity	roles:desigend	architecture:arch
+sig	input.vhd	/^  signal sig : std_logic := '0';$/;"	signal	architecture:ENTITY_TOP.arch	roles:def
+ENTITY_1	input.vhd	/^  component ENTITY_1$/;"	component	architecture:ENTITY_TOP.arch	roles:def	end:25
+GEN	input.vhd	/^      GEN : integer := 0$/;"	generic	component:ENTITY_TOP.arch.ENTITY_1	roles:def
+INP	input.vhd	/^      INP : in std_logic$/;"	port	component:ENTITY_TOP.arch.ENTITY_1	roles:def
+ENTITY_2	input.vhd	/^  component ENTITY_2$/;"	component	architecture:ENTITY_TOP.arch	roles:def	end:34
+GEN	input.vhd	/^      GEN : integer := 0$/;"	generic	component:ENTITY_TOP.arch.ENTITY_2	roles:def
+INP	input.vhd	/^      INP : in std_logic$/;"	port	component:ENTITY_TOP.arch.ENTITY_2	roles:def
+ENTITY_1	input-0.vhd	/^entity ENTITY_1 is$/;"	entity	roles:def	end:13
+GEN	input-0.vhd	/^    GEN : integer := 0$/;"	generic	entity:ENTITY_1	roles:def
+INP	input-0.vhd	/^    INP : in std_logic$/;"	port	entity:ENTITY_1	roles:def
+arch	input-0.vhd	/^architecture arch of ENTITY_1 is$/;"	architecture	entity:ENTITY_1	roles:def	end:20
+ENTITY_1	input-0.vhd	/^architecture arch of ENTITY_1 is$/;"	entity	roles:desigend	architecture:arch
+sig	input-0.vhd	/^  signal sig : std_logic := '0';$/;"	signal	architecture:ENTITY_1.arch	roles:def
+ENTITY_2	input-1.vhd	/^entity ENTITY_2 is$/;"	entity	roles:def	end:13
+GEN	input-1.vhd	/^    GEN : integer := 0$/;"	generic	entity:ENTITY_2	roles:def
+INP	input-1.vhd	/^    INP : in std_logic$/;"	port	entity:ENTITY_2	roles:def
+arch	input-1.vhd	/^architecture arch of ENTITY_2 is$/;"	architecture	entity:ENTITY_2	roles:def	end:20
+ENTITY_2	input-1.vhd	/^architecture arch of ENTITY_2 is$/;"	entity	roles:desigend	architecture:arch
+sig	input-1.vhd	/^  signal sig : std_logic := '0';$/;"	signal	architecture:ENTITY_2.arch	roles:def

@@ -1,0 +1,174 @@
+types_misc	input.vhd	/^package types_misc is$/;"	package	roles:def	end:325
+CFG_IRQ_UNUSED	input.vhd	/^constant CFG_IRQ_UNUSED         : integer := 0;$/;"	constant	package:types_misc	roles:def
+CFG_IRQ_UART1	input.vhd	/^constant CFG_IRQ_UART1          : integer := 1;$/;"	constant	package:types_misc	roles:def
+CFG_IRQ_ETHMAC	input.vhd	/^constant CFG_IRQ_ETHMAC         : integer := 2;$/;"	constant	package:types_misc	roles:def
+CFG_IRQ_GPTIMERS	input.vhd	/^constant CFG_IRQ_GPTIMERS       : integer := 3;$/;"	constant	package:types_misc	roles:def
+CFG_IRQ_GNSSENGINE	input.vhd	/^constant CFG_IRQ_GNSSENGINE     : integer := 4;$/;"	constant	package:types_misc	roles:def
+CFG_IRQ_TOTAL	input.vhd	/^constant CFG_IRQ_TOTAL          : integer := 5;$/;"	constant	package:types_misc	roles:def
+reset_global	input.vhd	/^component reset_global$/;"	component	package:types_misc	roles:def	end:67
+inSysReset	input.vhd	/^  inSysReset  : in std_ulogic;$/;"	port	component:types_misc.reset_global	roles:def
+inSysClk	input.vhd	/^  inSysClk    : in std_ulogic;$/;"	port	component:types_misc.reset_global	roles:def
+outReset	input.vhd	/^  outReset    : out std_ulogic );$/;"	port	component:types_misc.reset_global	roles:def
+axi4_rom	input.vhd	/^component axi4_rom is$/;"	component	package:types_misc	roles:def	end:86
+memtech	input.vhd	/^    memtech  : integer := inferred;$/;"	generic	component:types_misc.axi4_rom	roles:def
+async_reset	input.vhd	/^    async_reset : boolean := false;$/;"	generic	component:types_misc.axi4_rom	roles:def
+xaddr	input.vhd	/^    xaddr    : integer := 0;$/;"	generic	component:types_misc.axi4_rom	roles:def
+xmask	input.vhd	/^    xmask    : integer := 16#fffff#;$/;"	generic	component:types_misc.axi4_rom	roles:def
+sim_hexfile	input.vhd	/^    sim_hexfile : string$/;"	generic	component:types_misc.axi4_rom	roles:def
+clk	input.vhd	/^    clk  : in std_logic;$/;"	port	component:types_misc.axi4_rom	roles:def
+nrst	input.vhd	/^    nrst : in std_logic;$/;"	port	component:types_misc.axi4_rom	roles:def
+cfg	input.vhd	/^    cfg  : out axi4_slave_config_type;$/;"	port	component:types_misc.axi4_rom	roles:def
+i	input.vhd	/^    i    : in  axi4_slave_in_type;$/;"	port	component:types_misc.axi4_rom	roles:def
+o	input.vhd	/^    o    : out axi4_slave_out_type$/;"	port	component:types_misc.axi4_rom	roles:def
+axi4_sram	input.vhd	/^component axi4_sram is$/;"	component	package:types_misc	roles:def	end:105
+memtech	input.vhd	/^    memtech  : integer := inferred;$/;"	generic	component:types_misc.axi4_sram	roles:def
+async_reset	input.vhd	/^    async_reset : boolean := false;$/;"	generic	component:types_misc.axi4_sram	roles:def
+xaddr	input.vhd	/^    xaddr    : integer := 0;$/;"	generic	component:types_misc.axi4_sram	roles:def
+xmask	input.vhd	/^    xmask    : integer := 16#fffff#;$/;"	generic	component:types_misc.axi4_sram	roles:def
+abits	input.vhd	/^    abits    : integer := 17;$/;"	generic	component:types_misc.axi4_sram	roles:def
+init_file	input.vhd	/^    init_file : string := "" -- only for 'inferred'$/;"	generic	component:types_misc.axi4_sram	roles:def
+clk	input.vhd	/^    clk  : in std_logic;$/;"	port	component:types_misc.axi4_sram	roles:def
+nrst	input.vhd	/^    nrst : in std_logic;$/;"	port	component:types_misc.axi4_sram	roles:def
+cfg	input.vhd	/^    cfg  : out axi4_slave_config_type;$/;"	port	component:types_misc.axi4_sram	roles:def
+i	input.vhd	/^    i    : in  axi4_slave_in_type;$/;"	port	component:types_misc.axi4_sram	roles:def
+o	input.vhd	/^    o    : out axi4_slave_out_type$/;"	port	component:types_misc.axi4_sram	roles:def
+spi_in_type	input.vhd	/^type spi_in_type is record$/;"	type	package:types_misc	roles:def	end:110
+SDI	input.vhd	/^    SDI : std_logic;$/;"	record	type:types_misc.spi_in_type	roles:def
+spi_out_type	input.vhd	/^type spi_out_type is record$/;"	type	package:types_misc	roles:def	end:119
+SDO	input.vhd	/^    SDO : std_logic;$/;"	record	type:types_misc.spi_out_type	roles:def
+SCK	input.vhd	/^    SCK : std_logic;$/;"	record	type:types_misc.spi_out_type	roles:def
+nCS	input.vhd	/^    nCS : std_logic;$/;"	record	type:types_misc.spi_out_type	roles:def
+nWP	input.vhd	/^    nWP : std_logic;$/;"	record	type:types_misc.spi_out_type	roles:def
+nHOLD	input.vhd	/^    nHOLD : std_logic;$/;"	record	type:types_misc.spi_out_type	roles:def
+RESET	input.vhd	/^    RESET : std_logic;$/;"	record	type:types_misc.spi_out_type	roles:def
+spi_out_none	input.vhd	/^constant spi_out_none : spi_out_type := ($/;"	constant	package:types_misc	roles:def
+axi4_flashspi	input.vhd	/^component axi4_flashspi is$/;"	component	package:types_misc	roles:def	end:140
+async_reset	input.vhd	/^    async_reset : boolean := false;$/;"	generic	component:types_misc.axi4_flashspi	roles:def
+xaddr	input.vhd	/^    xaddr   : integer := 0;$/;"	generic	component:types_misc.axi4_flashspi	roles:def
+xmask	input.vhd	/^    xmask   : integer := 16#fffff#;$/;"	generic	component:types_misc.axi4_flashspi	roles:def
+wait_while_write	input.vhd	/^    wait_while_write : boolean := true  -- hold AXI bus response until end of write cycle$/;"	generic	component:types_misc.axi4_flashspi	roles:def
+clk	input.vhd	/^    clk    : in  std_logic;$/;"	port	component:types_misc.axi4_flashspi	roles:def
+nrst	input.vhd	/^    nrst   : in  std_logic;$/;"	port	component:types_misc.axi4_flashspi	roles:def
+cfg	input.vhd	/^    cfg    : out axi4_slave_config_type;$/;"	port	component:types_misc.axi4_flashspi	roles:def
+i_spi	input.vhd	/^    i_spi  : in  spi_in_type;$/;"	port	component:types_misc.axi4_flashspi	roles:def
+o_spi	input.vhd	/^    o_spi  : out spi_out_type;$/;"	port	component:types_misc.axi4_flashspi	roles:def
+i_axi	input.vhd	/^    i_axi  : in  axi4_slave_in_type;$/;"	port	component:types_misc.axi4_flashspi	roles:def
+o_axi	input.vhd	/^    o_axi  : out axi4_slave_out_type  );$/;"	port	component:types_misc.axi4_flashspi	roles:def
+axi4_gpio	input.vhd	/^component axi4_gpio is$/;"	component	package:types_misc	roles:def	end:161
+async_reset	input.vhd	/^    async_reset : boolean := false;$/;"	generic	component:types_misc.axi4_gpio	roles:def
+xaddr	input.vhd	/^    xaddr    : integer := 0;$/;"	generic	component:types_misc.axi4_gpio	roles:def
+xmask	input.vhd	/^    xmask    : integer := 16#fffff#;$/;"	generic	component:types_misc.axi4_gpio	roles:def
+xirq	input.vhd	/^    xirq     : integer := 0;$/;"	generic	component:types_misc.axi4_gpio	roles:def
+width	input.vhd	/^    width    : integer := 12$/;"	generic	component:types_misc.axi4_gpio	roles:def
+clk	input.vhd	/^    clk  : in std_logic;$/;"	port	component:types_misc.axi4_gpio	roles:def
+nrst	input.vhd	/^    nrst : in std_logic;$/;"	port	component:types_misc.axi4_gpio	roles:def
+cfg	input.vhd	/^    cfg  : out axi4_slave_config_type;$/;"	port	component:types_misc.axi4_gpio	roles:def
+i	input.vhd	/^    i    : in  axi4_slave_in_type;$/;"	port	component:types_misc.axi4_gpio	roles:def
+o	input.vhd	/^    o    : out axi4_slave_out_type;$/;"	port	component:types_misc.axi4_gpio	roles:def
+i_gpio	input.vhd	/^    i_gpio : in std_logic_vector(width-1 downto 0);$/;"	port	component:types_misc.axi4_gpio	roles:def
+o_gpio	input.vhd	/^    o_gpio : out std_logic_vector(width-1 downto 0);$/;"	port	component:types_misc.axi4_gpio	roles:def
+o_gpio_dir	input.vhd	/^    o_gpio_dir : out std_logic_vector(width-1 downto 0)$/;"	port	component:types_misc.axi4_gpio	roles:def
+uart_in_type	input.vhd	/^type uart_in_type is record$/;"	type	package:types_misc	roles:def	end:166
+rd	input.vhd	/^  rd   	: std_ulogic;$/;"	record	type:types_misc.uart_in_type	roles:def
+cts	input.vhd	/^  cts   : std_ulogic;$/;"	record	type:types_misc.uart_in_type	roles:def
+uart_out_type	input.vhd	/^type uart_out_type is record$/;"	type	package:types_misc	roles:def	end:171
+td	input.vhd	/^  td   	: std_ulogic;$/;"	record	type:types_misc.uart_out_type	roles:def
+rts	input.vhd	/^  rts   : std_ulogic;$/;"	record	type:types_misc.uart_out_type	roles:def
+axi4_uart	input.vhd	/^component axi4_uart is$/;"	component	package:types_misc	roles:def	end:191
+async_reset	input.vhd	/^    async_reset : boolean := false;$/;"	generic	component:types_misc.axi4_uart	roles:def
+xaddr	input.vhd	/^    xaddr   : integer := 0;$/;"	generic	component:types_misc.axi4_uart	roles:def
+xmask	input.vhd	/^    xmask   : integer := 16#fffff#;$/;"	generic	component:types_misc.axi4_uart	roles:def
+xirq	input.vhd	/^    xirq    : integer := 0;$/;"	generic	component:types_misc.axi4_uart	roles:def
+fifosz	input.vhd	/^    fifosz  : integer := 16$/;"	generic	component:types_misc.axi4_uart	roles:def
+clk	input.vhd	/^    clk    : in  std_logic;$/;"	port	component:types_misc.axi4_uart	roles:def
+nrst	input.vhd	/^    nrst   : in  std_logic;$/;"	port	component:types_misc.axi4_uart	roles:def
+cfg	input.vhd	/^    cfg    : out axi4_slave_config_type;$/;"	port	component:types_misc.axi4_uart	roles:def
+i_uart	input.vhd	/^    i_uart : in  uart_in_type;$/;"	port	component:types_misc.axi4_uart	roles:def
+o_uart	input.vhd	/^    o_uart : out uart_out_type;$/;"	port	component:types_misc.axi4_uart	roles:def
+i_axi	input.vhd	/^    i_axi  : in  axi4_slave_in_type;$/;"	port	component:types_misc.axi4_uart	roles:def
+o_axi	input.vhd	/^    o_axi  : out axi4_slave_out_type;$/;"	port	component:types_misc.axi4_uart	roles:def
+o_irq	input.vhd	/^    o_irq  : out std_logic);$/;"	port	component:types_misc.axi4_uart	roles:def
+uart_tap	input.vhd	/^component uart_tap is$/;"	component	package:types_misc	roles:def	end:204
+nrst	input.vhd	/^    nrst     : in std_logic;$/;"	port	component:types_misc.uart_tap	roles:def
+clk	input.vhd	/^    clk      : in std_logic;$/;"	port	component:types_misc.uart_tap	roles:def
+i_uart	input.vhd	/^    i_uart   : in  uart_in_type;$/;"	port	component:types_misc.uart_tap	roles:def
+o_uart	input.vhd	/^    o_uart   : out uart_out_type;$/;"	port	component:types_misc.uart_tap	roles:def
+i_msti	input.vhd	/^    i_msti   : in axi4_master_in_type;$/;"	port	component:types_misc.uart_tap	roles:def
+o_msto	input.vhd	/^    o_msto   : out axi4_master_out_type;$/;"	port	component:types_misc.uart_tap	roles:def
+o_mstcfg	input.vhd	/^    o_mstcfg : out axi4_master_config_type$/;"	port	component:types_misc.uart_tap	roles:def
+tap_jtag	input.vhd	/^component tap_jtag is$/;"	component	package:types_misc	roles:def	end:224
+ainst	input.vhd	/^    ainst  : integer range 0 to 255 := 2;$/;"	generic	component:types_misc.tap_jtag	roles:def
+dinst	input.vhd	/^    dinst  : integer range 0 to 255 := 3);$/;"	generic	component:types_misc.tap_jtag	roles:def
+nrst	input.vhd	/^    nrst  : in std_logic;$/;"	port	component:types_misc.tap_jtag	roles:def
+clk	input.vhd	/^    clk  : in std_logic;$/;"	port	component:types_misc.tap_jtag	roles:def
+i_tck	input.vhd	/^    i_tck   : in std_logic;   -- in: Test Clock$/;"	port	component:types_misc.tap_jtag	roles:def
+i_ntrst	input.vhd	/^    i_ntrst   : in std_logic;   -- in: $/;"	port	component:types_misc.tap_jtag	roles:def
+i_tms	input.vhd	/^    i_tms   : in std_logic;   -- in: Test Mode State$/;"	port	component:types_misc.tap_jtag	roles:def
+i_tdi	input.vhd	/^    i_tdi   : in std_logic;   -- in: Test Data Input$/;"	port	component:types_misc.tap_jtag	roles:def
+o_tdo	input.vhd	/^    o_tdo   : out std_logic;   -- out: Test Data Output$/;"	port	component:types_misc.tap_jtag	roles:def
+o_jtag_vref	input.vhd	/^    o_jtag_vref : out std_logic;$/;"	port	component:types_misc.tap_jtag	roles:def
+i_msti	input.vhd	/^    i_msti   : in axi4_master_in_type;$/;"	port	component:types_misc.tap_jtag	roles:def
+o_msto	input.vhd	/^    o_msto   : out axi4_master_out_type;$/;"	port	component:types_misc.tap_jtag	roles:def
+o_mstcfg	input.vhd	/^    o_mstcfg : out axi4_master_config_type$/;"	port	component:types_misc.tap_jtag	roles:def
+axi4_irqctrl	input.vhd	/^component axi4_irqctrl is$/;"	component	package:types_misc	roles:def	end:245
+async_reset	input.vhd	/^    async_reset : boolean := false;$/;"	generic	component:types_misc.axi4_irqctrl	roles:def
+xaddr	input.vhd	/^    xaddr    : integer := 0;$/;"	generic	component:types_misc.axi4_irqctrl	roles:def
+xmask	input.vhd	/^    xmask    : integer := 16#fffff#$/;"	generic	component:types_misc.axi4_irqctrl	roles:def
+clk	input.vhd	/^    clk    : in std_logic;$/;"	port	component:types_misc.axi4_irqctrl	roles:def
+nrst	input.vhd	/^    nrst   : in std_logic;$/;"	port	component:types_misc.axi4_irqctrl	roles:def
+i_irqs	input.vhd	/^    i_irqs : in std_logic_vector(CFG_IRQ_TOTAL-1 downto 1);$/;"	port	component:types_misc.axi4_irqctrl	roles:def
+o_cfg	input.vhd	/^    o_cfg  : out axi4_slave_config_type;$/;"	port	component:types_misc.axi4_irqctrl	roles:def
+i_axi	input.vhd	/^    i_axi  : in axi4_slave_in_type;$/;"	port	component:types_misc.axi4_irqctrl	roles:def
+o_axi	input.vhd	/^    o_axi  : out axi4_slave_out_type;$/;"	port	component:types_misc.axi4_irqctrl	roles:def
+o_irq_meip	input.vhd	/^    o_irq_meip : out std_logic$/;"	port	component:types_misc.axi4_irqctrl	roles:def
+axi4_gptimers	input.vhd	/^  component axi4_gptimers is$/;"	component	package:types_misc	roles:def	end:267
+async_reset	input.vhd	/^    async_reset : boolean := false;$/;"	generic	component:types_misc.axi4_gptimers	roles:def
+xaddr	input.vhd	/^    xaddr   : integer := 0;$/;"	generic	component:types_misc.axi4_gptimers	roles:def
+xmask	input.vhd	/^    xmask   : integer := 16#fffff#;$/;"	generic	component:types_misc.axi4_gptimers	roles:def
+xirq	input.vhd	/^    xirq    : integer := 0;$/;"	generic	component:types_misc.axi4_gptimers	roles:def
+tmr_total	input.vhd	/^    tmr_total  : integer := 2$/;"	generic	component:types_misc.axi4_gptimers	roles:def
+clk	input.vhd	/^    clk    : in  std_logic;$/;"	port	component:types_misc.axi4_gptimers	roles:def
+nrst	input.vhd	/^    nrst   : in  std_logic;$/;"	port	component:types_misc.axi4_gptimers	roles:def
+cfg	input.vhd	/^    cfg    : out axi4_slave_config_type;$/;"	port	component:types_misc.axi4_gptimers	roles:def
+i_axi	input.vhd	/^    i_axi  : in  axi4_slave_in_type;$/;"	port	component:types_misc.axi4_gptimers	roles:def
+o_axi	input.vhd	/^    o_axi  : out axi4_slave_out_type;$/;"	port	component:types_misc.axi4_gptimers	roles:def
+o_pwm	input.vhd	/^    o_pwm : out std_logic_vector(tmr_total-1 downto 0);$/;"	port	component:types_misc.axi4_gptimers	roles:def
+o_irq	input.vhd	/^    o_irq  : out std_logic$/;"	port	component:types_misc.axi4_gptimers	roles:def
+axi4_pnp	input.vhd	/^component axi4_pnp is$/;"	component	package:types_misc	roles:def	end:298
+async_reset	input.vhd	/^    async_reset : boolean := false;$/;"	generic	component:types_misc.axi4_pnp	roles:def
+xaddr	input.vhd	/^    xaddr   : integer := 0;$/;"	generic	component:types_misc.axi4_pnp	roles:def
+xmask	input.vhd	/^    xmask   : integer := 16#fffff#;$/;"	generic	component:types_misc.axi4_pnp	roles:def
+tech	input.vhd	/^    tech    : integer := 0;$/;"	generic	component:types_misc.axi4_pnp	roles:def
+hw_id	input.vhd	/^    hw_id   : std_logic_vector(31 downto 0) := X"20170101"$/;"	generic	component:types_misc.axi4_pnp	roles:def
+sys_clk	input.vhd	/^    sys_clk : in  std_logic;$/;"	port	component:types_misc.axi4_pnp	roles:def
+adc_clk	input.vhd	/^    adc_clk : in  std_logic;$/;"	port	component:types_misc.axi4_pnp	roles:def
+nrst	input.vhd	/^    nrst   : in  std_logic;$/;"	port	component:types_misc.axi4_pnp	roles:def
+mstcfg	input.vhd	/^    mstcfg : in  bus0_xmst_cfg_vector;$/;"	port	component:types_misc.axi4_pnp	roles:def
+slvcfg	input.vhd	/^    slvcfg : in  bus0_xslv_cfg_vector;$/;"	port	component:types_misc.axi4_pnp	roles:def
+cfg	input.vhd	/^    cfg    : out  axi4_slave_config_type;$/;"	port	component:types_misc.axi4_pnp	roles:def
+i	input.vhd	/^    i      : in  axi4_slave_in_type;$/;"	port	component:types_misc.axi4_pnp	roles:def
+o	input.vhd	/^    o      : out axi4_slave_out_type;$/;"	port	component:types_misc.axi4_pnp	roles:def
+i_otp_busy	input.vhd	/^    i_otp_busy : in std_logic;$/;"	port	component:types_misc.axi4_pnp	roles:def
+o_otp_cfg_rsetup	input.vhd	/^    o_otp_cfg_rsetup : out std_logic_vector(3 downto 0);$/;"	port	component:types_misc.axi4_pnp	roles:def
+o_otp_cfg_wadrsetup	input.vhd	/^    o_otp_cfg_wadrsetup : out std_logic_vector(3 downto 0);$/;"	port	component:types_misc.axi4_pnp	roles:def
+o_otp_cfg_wactive	input.vhd	/^    o_otp_cfg_wactive : out std_logic_vector(31 downto 0);$/;"	port	component:types_misc.axi4_pnp	roles:def
+o_otp_cfg_whold	input.vhd	/^    o_otp_cfg_whold : out std_logic_vector(3 downto 0)$/;"	port	component:types_misc.axi4_pnp	roles:def
+axi4_otp	input.vhd	/^component axi4_otp is$/;"	component	package:types_misc	roles:def	end:323
+async_reset	input.vhd	/^    async_reset : boolean := false;$/;"	generic	component:types_misc.axi4_otp	roles:def
+xaddr	input.vhd	/^    xaddr   : integer := 0;$/;"	generic	component:types_misc.axi4_otp	roles:def
+xmask	input.vhd	/^    xmask   : integer := 16#ffffe#$/;"	generic	component:types_misc.axi4_otp	roles:def
+clk	input.vhd	/^    clk    : in  std_logic;$/;"	port	component:types_misc.axi4_otp	roles:def
+nrst	input.vhd	/^    nrst   : in  std_logic;$/;"	port	component:types_misc.axi4_otp	roles:def
+cfg	input.vhd	/^    cfg    : out axi4_slave_config_type;$/;"	port	component:types_misc.axi4_otp	roles:def
+i_axi	input.vhd	/^    i_axi  : in  axi4_slave_in_type;$/;"	port	component:types_misc.axi4_otp	roles:def
+o_axi	input.vhd	/^    o_axi  : out axi4_slave_out_type;$/;"	port	component:types_misc.axi4_otp	roles:def
+o_otp_we	input.vhd	/^    o_otp_we     : out  std_ulogic;$/;"	port	component:types_misc.axi4_otp	roles:def
+o_otp_re	input.vhd	/^    o_otp_re     : out  std_ulogic;$/;"	port	component:types_misc.axi4_otp	roles:def
+o_otp_addr	input.vhd	/^    o_otp_addr   : out std_logic_vector(11 downto 0);$/;"	port	component:types_misc.axi4_otp	roles:def
+o_otp_wdata	input.vhd	/^    o_otp_wdata  : out std_logic_vector(15 downto 0);$/;"	port	component:types_misc.axi4_otp	roles:def
+i_otp_rdata	input.vhd	/^    i_otp_rdata  : in std_logic_vector(15 downto 0);$/;"	port	component:types_misc.axi4_otp	roles:def
+i_cfg_rsetup	input.vhd	/^    i_cfg_rsetup : in std_logic_vector(3 downto 0);$/;"	port	component:types_misc.axi4_otp	roles:def
+i_cfg_wadrsetup	input.vhd	/^    i_cfg_wadrsetup : in std_logic_vector(3 downto 0);$/;"	port	component:types_misc.axi4_otp	roles:def
+i_cfg_wactive	input.vhd	/^    i_cfg_wactive : in std_logic_vector(31 downto 0);$/;"	port	component:types_misc.axi4_otp	roles:def
+i_cfg_whold	input.vhd	/^    i_cfg_whold : in std_logic_vector(3 downto 0);$/;"	port	component:types_misc.axi4_otp	roles:def
+o_busy	input.vhd	/^    o_busy : out std_logic$/;"	port	component:types_misc.axi4_otp	roles:def

@@ -1,0 +1,21 @@
+logical_ops_1	input.vhd	/^entity logical_ops_1 is$/;"	e	end:5
+a	input.vhd	/^  port (a, b, c, d: in bit;$/;"	q	entity:logical_ops_1
+b	input.vhd	/^  port (a, b, c, d: in bit;$/;"	q	entity:logical_ops_1
+c	input.vhd	/^  port (a, b, c, d: in bit;$/;"	q	entity:logical_ops_1
+d	input.vhd	/^  port (a, b, c, d: in bit;$/;"	q	entity:logical_ops_1
+m	input.vhd	/^        m: out bit);$/;"	q	entity:logical_ops_1
+ENTITY_A	input-0.vhd	/^entity ENTITY_A is$/;"	e	end:10
+GENERIC_C	input-0.vhd	/^    GENERIC_C : integer := value;$/;"	g	entity:ENTITY_A
+PORT_C	input-0.vhd	/^    PORT_C : in std_logic$/;"	q	entity:ENTITY_A
+ENTITY_B	input-0.vhd	/^entity ENTITY_B is$/;"	e	end:19
+GENERIC_C	input-0.vhd	/^    GENERIC_C : integer := value;$/;"	g	entity:ENTITY_B
+PORT_C	input-0.vhd	/^    PORT_C : in std_logic$/;"	q	entity:ENTITY_B
+COMPONENT_A	input-1.vhd	/^component COMPONENT_A is$/;"	C	end:10
+GENERIC_C	input-1.vhd	/^    GENERIC_C : integer := value;$/;"	g	component:COMPONENT_A
+PORT_C	input-1.vhd	/^    PORT_C : in std_logic$/;"	q	component:COMPONENT_A
+COMPONENT_B	input-1.vhd	/^component COMPONENT_B is$/;"	C	end:19
+GENERIC_C	input-1.vhd	/^    GENERIC_C : integer := value;$/;"	g	component:COMPONENT_B
+PORT_C	input-1.vhd	/^    PORT_C : in std_logic$/;"	q	component:COMPONENT_B
+COMPONENT_C	input-1.vhd	/^component COMPONENT_C is$/;"	C	end:28
+GENERIC_C	input-1.vhd	/^    GENERIC_C : integer := value;$/;"	g	component:COMPONENT_C
+PORT_C	input-1.vhd	/^    PORT_C : in std_logic$/;"	q	component:COMPONENT_C

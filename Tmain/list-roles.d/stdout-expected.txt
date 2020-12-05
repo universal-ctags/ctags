@@ -80,6 +80,7 @@ SystemdUnit    u/unit            Wants              on      referred in Wants ke
 Tex            i/xinput          bibliography       on      bibliography (.bib) file
 Tex            i/xinput          included           on      external input file specified with \include
 Tex            i/xinput          input              on      external input file specified with \input
+VHDL           e/entity          desigend           on      designed by an architecture
 Vera           d/macro           undef              on      undefined
 Vera           h/header          local              on      local header
 Vera           h/header          system             on      system header
@@ -165,6 +166,7 @@ SystemdUnit    u/unit            Wants              on      referred in Wants ke
 Tex            i/xinput          bibliography       on      bibliography (.bib) file
 Tex            i/xinput          included           on      external input file specified with \include
 Tex            i/xinput          input              on      external input file specified with \input
+VHDL           e/entity          desigend           on      designed by an architecture
 Vera           d/macro           undef              on      undefined
 Vera           h/header          local              on      local header
 Vera           h/header          system             on      system header

@@ -1,0 +1,4 @@
+--sort=no
+--kinds-VHDL=+{local}{prototype}{component}
+--fields=+Kpre
+--extras=+r

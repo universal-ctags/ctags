@@ -5,6 +5,14 @@
 *   GNU General Public License version 2 or (at your option) any later version.
 *
 *   This module contains functions for generating tags for VHDL files.
+*
+*   References:
+*     http://www.vhdl.renerta.com/mobile/index.html
+*     https://www.hdlworks.com/hdl_corner/vhdl_ref/
+*     https://www.ics.uci.edu/~jmoorkan/vhdlref/Synario%20VHDL%20Manual.pdf
+*     http://atlas.physics.arizona.edu/~kjohns/downloads/vhdl/VHDL-xilinx-help.pdf
+*     http://www.csit-sun.pub.ro/resources/xilinx/synvhdl.pdf
+*     https://edg.uchicago.edu/~tang/VHDLref.pdf
 */
 
 /*
@@ -22,6 +30,7 @@
 #include "read.h"
 #include "routines.h"
 #include "vstring.h"
+#include "trace.h"
 
 /*
  *   MACROS
@@ -148,6 +157,7 @@ typedef enum eTokenType {
 	TOKEN_PERIOD,		/* . */
 	TOKEN_OPERATOR,
 	TOKEN_SEMICOLON,	/* the semicolon character */
+	TOKEN_COLON,		/* : */
 	TOKEN_STRING
 } tokenType;
 
@@ -155,7 +165,6 @@ typedef struct sTokenInfo {
 	tokenType type;
 	keywordId keyword;
 	vString *string;		/* the name of the token */
-	vString *scope;
 	unsigned long lineNumber;	/* line number of tag */
 	MIOPos filePosition;		/* file position of line containing name */
 } tokenInfo;
@@ -164,6 +173,15 @@ typedef struct sTokenInfo {
  *   DATA DEFINITIONS
  */
 static int Lang_vhdl;
+
+typedef enum {
+	VHDL_ENTITY_DESIGNED,
+} vhdlEntityRole;
+
+static roleDefinition VhdlEntityRoles [] = {
+	{ true, "desigend",
+	  "designed by an architecture" },
+};
 
 /* Used to index into the VhdlKinds table. */
 typedef enum {
@@ -180,6 +198,12 @@ typedef enum {
 	VHDLTAG_PACKAGE,
 	VHDLTAG_LOCAL,
 	VHDLTAG_ARCHITECTURE,
+	VHDLTAG_PORT,
+	VHDLTAG_GENERIC,
+	VHDLTAG_SIGNAL,
+	VHDLTAG_PROCESS,
+	VHDLTAG_VARIABLE,
+	VHDLTAG_ALIAS,
 } vhdlKind;
 
 static kindDefinition VhdlKinds[] = {
@@ -187,7 +211,8 @@ static kindDefinition VhdlKinds[] = {
 	{true, 't', "type", "type definitions"},
 	{true, 'T', "subtype", "subtype definitions"},
 	{true, 'r', "record", "record names"},
-	{true, 'e', "entity", "entity declarations"},
+	{true, 'e', "entity", "entity declarations",
+	 .referenceOnly = false, ATTACH_ROLES(VhdlEntityRoles)},
 	{false, 'C', "component", "component declarations"},
 	{false, 'd', "prototype", "prototypes"},
 	{true, 'f', "function", "function prototypes and declarations"},
@@ -195,6 +220,12 @@ static kindDefinition VhdlKinds[] = {
 	{true, 'P', "package", "package definitions"},
 	{false, 'l', "local", "local definitions"},
 	{true, 'a', "architecture", "architectures"},
+	{true, 'q', "port", "port declarations"},
+	{true, 'g', "generic", "generic declarations"},
+	{true , 's', "signal", "signal declarations"},
+	{true, 'Q',  "process", "processes"},
+	{true, 'v',  "variable", "variables"},
+	{true, 'A',  "alias", "aliases"},
 };
 
 static const keywordTable VhdlKeywordTable[] = {
@@ -296,37 +327,38 @@ static const keywordTable VhdlKeywordTable[] = {
 };
 
 typedef enum {
-	F_ENTITY,
+	F_ARCHITECTURE,
 } vhdlField;
 
 static fieldDefinition VhdlFields [] = {
-	{ .name = "entity",
-	  .description = "entity designed by the architecture",
+	{ .name = "architecture",
+	  .description = "architecture designing the entity",
 	  .enabled = true },
 };
 
 /*
  *   FUNCTION DECLARATIONS
  */
-static void parseKeywords (tokenInfo * const token, bool local);
+static void parseKeywords (tokenInfo * const token, tokenInfo * const label, int parent);
 
 /*
  *   FUNCTION DEFINITIONS
  */
 static bool isIdentifierMatch (const tokenInfo * const token,
-	const vString * const name)
+	const char *name)
 {
 	return (bool) (isType (token, TOKEN_IDENTIFIER) &&
-		strcasecmp (vStringValue (token->string), vStringValue (name)) == 0);
+		strcasecmp (vStringValue (token->string), name) == 0);
 	/* XXX this is copy/paste from eiffel.c and slightly modified */
 	/* shouldn't we use strNcasecmp ? */
 }
 
-static bool isKeywordOrIdent (const tokenInfo * const token,
-	const keywordId keyword, const vString * const name)
+static bool isSemicolonOrKeywordOrIdent (const tokenInfo * const token,
+	const keywordId keyword, const char *name)
 {
-	return (bool) (isKeyword (token, keyword) ||
-		isIdentifierMatch (token, name));
+	return (bool) (isType (token, TOKEN_SEMICOLON)
+				   || isKeyword (token, keyword)
+				   || isIdentifierMatch (token, name));
 }
 
 static tokenInfo *newToken (void)
@@ -335,10 +367,16 @@ static tokenInfo *newToken (void)
 	token->type = TOKEN_NONE;
 	token->keyword = KEYWORD_NONE;
 	token->string = vStringNew ();
-	token->scope = vStringNew ();
 	token->lineNumber = getInputLineNumber ();
 	token->filePosition = getInputFilePosition ();
 	return token;
+}
+
+static tokenInfo *copyToken (tokenInfo * const src)
+{
+	tokenInfo *dst = newToken ();
+	vStringCopy (dst->string, src->string);
+	return dst;
 }
 
 static void deleteToken (tokenInfo * const token)
@@ -346,7 +384,6 @@ static void deleteToken (tokenInfo * const token)
 	if (token != NULL)
 	{
 		vStringDelete (token->string);
-		vStringDelete (token->scope);
 		eFree (token);
 	}
 }
@@ -421,6 +458,9 @@ static void readToken (tokenInfo * const token)
 	case ';':
 		token->type = TOKEN_SEMICOLON;
 		break;
+	case ':':
+		token->type = TOKEN_COLON;
+		break;
 	case '.':
 		token->type = TOKEN_PERIOD;
 		break;
@@ -467,7 +507,7 @@ static void readToken (tokenInfo * const token)
 	}
 }
 
-static void skipToKeyword (const keywordId keyword)
+static bool skipToKeyword (const keywordId keyword)
 {
 	tokenInfo *const token = newToken ();
 	do
@@ -475,7 +515,10 @@ static void skipToKeyword (const keywordId keyword)
 		readToken (token);
 	}
 	while (!isType (token, TOKEN_EOF) && !isKeyword (token, keyword));
+
+	bool r = isKeyword (token, keyword);
 	deleteToken (token);
+	return r;
 }
 
 static void skipToMatched (tokenInfo * const token)
@@ -521,42 +564,20 @@ static void skipToMatched (tokenInfo * const token)
 	}
 }
 
-static int makeConstTag (tokenInfo * const token, const vhdlKind kind)
+static int makeVhdlTagWithScope (tokenInfo * const token, const vhdlKind kind, int parent)
 {
-	int index = CORK_NIL;
-	if (VhdlKinds[kind].enabled)
-	{
-		const char *const name = vStringValue (token->string);
-		tagEntryInfo e;
-		initTagEntry (&e, name, kind);
-		e.lineNumber = token->lineNumber;
-		e.filePosition = token->filePosition;
-		index = makeTagEntry (&e);
-	}
-	return index;
+	const char *const name = vStringValue (token->string);
+	tagEntryInfo e;
+	initTagEntry (&e, name, kind);
+	e.lineNumber = token->lineNumber;
+	e.filePosition = token->filePosition;
+	e.extensionFields.scopeIndex = parent;
+	return makeTagEntry (&e);
 }
 
 static int makeVhdlTag (tokenInfo * const token, const vhdlKind kind)
 {
-	int index = CORK_NIL;
-	if (VhdlKinds[kind].enabled)
-	{
-		/*
-		 * If a scope has been added to the token, change the token
-		 * string to include the scope when making the tag.
-		 */
-		if (vStringLength (token->scope) > 0)
-		{
-			vString *fulltag = vStringNew ();
-			vStringCopy (fulltag, token->scope);
-			vStringPut (fulltag, '.');
-			vStringCat (fulltag, token->string);
-			vStringCopy (token->string, fulltag);
-			vStringDelete (fulltag);
-		}
-		index = makeConstTag (token, kind);
-	}
-	return index;
+	return makeVhdlTagWithScope (token, kind, CORK_NIL);
 }
 
 static void initialize (const langType language)
@@ -564,24 +585,142 @@ static void initialize (const langType language)
 	Lang_vhdl = language;
 }
 
+static void parseTillEnd (tokenInfo * const token, int parent, const int end_keyword)
+{
+	bool ended = false;
+	tagEntryInfo *e = getEntryInCorkQueue (parent);
+	const char *end_id = e->name;
+
+	do
+	{
+		readToken (token);
+		if (isKeyword (token, KEYWORD_END))
+		{
+			readToken (token);
+			ended = isSemicolonOrKeywordOrIdent (token,
+												 end_keyword, end_id);
+			if (!isType (token, TOKEN_SEMICOLON))
+				skipToCharacterInInputFile (';');
+			if (ended)
+				e->extensionFields.endLine = getInputLineNumber ();
+		}
+		else
+		{
+			if (isType (token, TOKEN_EOF))
+			{
+				ended = true;
+			}
+			else
+			{
+				parseKeywords (token, NULL, parent);
+			}
+		}
+	} while (!ended);
+}
+
+static void parseTillBegin (tokenInfo * const token, int parent)
+{
+	bool begun = false;
+	do
+	{
+		readToken (token);
+		if (isKeyword (token, KEYWORD_BEGIN)
+			|| isType (token, TOKEN_EOF))
+			begun = true;
+		else
+			parseKeywords (token, NULL, parent);
+	} while (!begun);
+}
+
 static void parsePackage (tokenInfo * const token)
 {
 	tokenInfo *const name = newToken ();
+	tokenInfo *token_for_tagging = NULL;
 	Assert (isKeyword (token, KEYWORD_PACKAGE));
 	readToken (token);
 	if (isKeyword (token, KEYWORD_BODY))
 	{
 		readToken (name);
-		makeVhdlTag (name, VHDLTAG_PACKAGE);
+		token_for_tagging = name;
 	}
 	else if (isType (token, TOKEN_IDENTIFIER))
+		token_for_tagging = token;
+
+	if (token_for_tagging)
 	{
-		makeVhdlTag (token, VHDLTAG_PACKAGE);
+		int index = makeVhdlTag (token_for_tagging, VHDLTAG_PACKAGE);
+		parseTillEnd (token, index, KEYWORD_PACKAGE);
 	}
+
 	deleteToken (name);
 }
 
-static void parseModule (tokenInfo * const token)
+
+static void parseDeclElement (tokenInfo * const token,
+							  vhdlKind kind, int parent,
+							  bool ended_with_semicolon)
+{
+	TRACE_ENTER ();
+	while (! (isType (token, TOKEN_EOF)
+			  || isType (token, TOKEN_CLOSE_PAREN)
+			  || (ended_with_semicolon && isType (token, TOKEN_SEMICOLON))))
+	{
+		if (isType (token, TOKEN_IDENTIFIER))
+		{
+			makeVhdlTagWithScope (token, kind, parent);
+			readToken (token);
+		}
+		else if (isType (token, TOKEN_COMMA))
+			readToken (token);
+		else if (isType (token, TOKEN_COLON))
+		{
+			do
+			{
+				readToken (token);
+				skipToMatched (token);
+				if (isType (token, TOKEN_CLOSE_PAREN)
+					|| isType (token, TOKEN_SEMICOLON))
+					break;
+			}
+			while (!isType (token, TOKEN_EOF));
+		}
+		else
+		{
+			/* Unexpected */
+			readToken (token);
+		}
+	}
+	TRACE_LEAVE ();
+}
+
+static void parseModuleDecl (tokenInfo * const token, int parent)
+{
+	TRACE_ENTER ();
+	while (! (isKeyword (token, KEYWORD_END)
+			  || isType (token, TOKEN_EOF)))
+	{
+		vhdlKind kind = VHDLTAG_UNDEFINED;
+		if (isKeyword (token, KEYWORD_PORT))
+			kind = VHDLTAG_PORT;
+		else if (isKeyword (token, KEYWORD_GENERIC))
+			kind = VHDLTAG_GENERIC;
+
+		if (kind != VHDLTAG_UNDEFINED)
+		{
+			readToken (token);
+			if (isType (token, TOKEN_OPEN_PAREN))
+			{
+				readToken (token);
+				parseDeclElement (token, kind, parent, false);
+			}
+		}
+		else
+			readToken (token);
+	}
+	TRACE_LEAVE ();
+}
+
+static void parseModule (tokenInfo * const token, int parent)
 {
 	tokenInfo *const name = newToken ();
 	const vhdlKind kind = isKeyword (token, KEYWORD_ENTITY) ?
@@ -589,26 +728,33 @@ static void parseModule (tokenInfo * const token)
 	Assert (isKeyword (token, KEYWORD_ENTITY) ||
 		isKeyword (token, KEYWORD_COMPONENT));
 	readToken (name);
-	if (kind == VHDLTAG_COMPONENT)
+	readToken (token);
+	if (kind == VHDLTAG_COMPONENT || isKeyword (token, KEYWORD_IS))
 	{
-		makeVhdlTag (name, VHDLTAG_COMPONENT);
-		skipToKeyword (KEYWORD_END);
-		skipToCharacterInInputFile (';');
-	}
-	else
-	{
-		readToken (token);
+		int index = makeVhdlTagWithScope (name, kind, parent);
 		if (isKeyword (token, KEYWORD_IS))
+			readToken (token);
+		parseModuleDecl (token, index);
+
+		bool ended = isKeyword (token, KEYWORD_END);
+		if (!ended)
+			ended = skipToKeyword (KEYWORD_END);
+		skipToCharacterInInputFile (';');
+
+		if (ended)
 		{
-			makeVhdlTag (name, VHDLTAG_ENTITY);
-			skipToKeyword (KEYWORD_END);
-			skipToCharacterInInputFile (';');
+			tagEntryInfo *e = getEntryInCorkQueue (index);
+			if (e)
+				e->extensionFields.endLine = getInputLineNumber ();
 		}
+
+		if (kind == VHDLTAG_ENTITY)
+			registerEntry (index);
 	}
 	deleteToken (name);
 }
 
-static void parseRecord (tokenInfo * const token)
+static void parseRecord (tokenInfo * const token, int parent)
 {
 	tokenInfo *const name = newToken ();
 	Assert (isKeyword (token, KEYWORD_RECORD));
@@ -617,15 +763,23 @@ static void parseRecord (tokenInfo * const token)
 	{
 		readToken (token);	/* should be a colon */
 		skipToCharacterInInputFile (';');
-		makeVhdlTag (name, VHDLTAG_RECORD);
+		makeVhdlTagWithScope (name, VHDLTAG_RECORD, parent);
 		readToken (name);
 	}
 	while (!isKeyword (name, KEYWORD_END) && !isType (name, TOKEN_EOF));
 	skipToCharacterInInputFile (';');
+
+	if (isKeyword (name, KEYWORD_END))
+	{
+		tagEntryInfo *e = getEntryInCorkQueue (parent);
+		if (e)
+			e->extensionFields.endLine = getInputLineNumber ();
+	}
+
 	deleteToken (name);
 }
 
-static void parseTypes (tokenInfo * const token)
+static void parseTypes (tokenInfo * const token, int parent)
 {
 	tokenInfo *const name = newToken ();
 	const vhdlKind kind = isKeyword (token, KEYWORD_TYPE) ?
@@ -639,40 +793,50 @@ static void parseTypes (tokenInfo * const token)
 		readToken (token);	/* type */
 		if (isKeyword (token, KEYWORD_RECORD))
 		{
-			makeVhdlTag (name, kind);
+			int index = makeVhdlTagWithScope (name, kind, parent);
 			/*TODO: make tags of the record's names */
-			parseRecord (token);
+			parseRecord (token, index);
 		}
 		else
 		{
-			makeVhdlTag (name, kind);
+			makeVhdlTagWithScope (name, kind, parent);
 		}
 	}
 	deleteToken (name);
 }
 
-static void parseConstant (bool local)
+static void parseConstant (int parent)
 {
+	vhdlKind parent_kind = VHDLTAG_UNDEFINED;
+	tagEntryInfo *e = getEntryInCorkQueue (parent);
+	if (e)
+		parent_kind = e->kindIndex;
+
+	vhdlKind kind;
+	switch (parent_kind)
+	{
+	case VHDLTAG_FUNCTION:
+	case VHDLTAG_PROCEDURE:
+		kind = VHDLTAG_LOCAL;
+		break;
+	default:
+		kind = VHDLTAG_CONSTANT;
+		break;
+	}
+
 	tokenInfo *const name = newToken ();
 	readToken (name);
-	if (local)
-	{
-		makeVhdlTag (name, VHDLTAG_LOCAL);
-	}
-	else
-	{
-		makeVhdlTag (name, VHDLTAG_CONSTANT);
-	}
+	makeVhdlTagWithScope (name, kind, parent);
 	skipToCharacterInInputFile (';');
 	deleteToken (name);
 }
 
-static void parseSubProgram (tokenInfo * const token)
+static void parseSubProgram (tokenInfo * const token, int parent)
 {
 	tokenInfo *const name = newToken ();
-	bool endSubProgram = false;
 	const vhdlKind kind = isKeyword (token, KEYWORD_FUNCTION) ?
 		VHDLTAG_FUNCTION : VHDLTAG_PROCEDURE;
+	const int end_keyword = token->keyword;
 	Assert (isKeyword (token, KEYWORD_FUNCTION) ||
 		isKeyword (token, KEYWORD_PROCEDURE));
 	readToken (name);	/* the name of the function or procedure */
@@ -699,62 +863,12 @@ static void parseSubProgram (tokenInfo * const token)
 
 	if (isType (token, TOKEN_SEMICOLON))
 	{
-		makeVhdlTag (name, VHDLTAG_PROTOTYPE);
+		makeVhdlTagWithScope (name, VHDLTAG_PROTOTYPE, parent);
 	}
 	else if (isKeyword (token, KEYWORD_IS))
 	{
-		if (kind == VHDLTAG_FUNCTION)
-		{
-			makeVhdlTag (name, VHDLTAG_FUNCTION);
-			do
-			{
-				readToken (token);
-				if (isKeyword (token, KEYWORD_END))
-				{
-					readToken (token);
-					endSubProgram = isKeywordOrIdent (token,
-						KEYWORD_FUNCTION, name->string);
-					skipToCharacterInInputFile (';');
-				}
-				else
-				{
-					if (isType (token, TOKEN_EOF))
-					{
-						endSubProgram = true;
-					}
-					else
-					{
-						parseKeywords (token, true);
-					}
-				}
-			} while (!endSubProgram);
-		}
-		else
-		{
-			makeVhdlTag (name, VHDLTAG_PROCEDURE);
-			do
-			{
-				readToken (token);
-				if (isKeyword (token, KEYWORD_END))
-				{
-					readToken (token);
-					endSubProgram = isKeywordOrIdent (token,
-						KEYWORD_PROCEDURE, name->string);
-					skipToCharacterInInputFile (';');
-				}
-				else
-				{
-					if (isType (token, TOKEN_EOF))
-					{
-						endSubProgram = true;
-					}
-					else
-					{
-						parseKeywords (token, true);
-					}
-				}
-			} while (!endSubProgram);
-		}
+		int index = makeVhdlTagWithScope (name, kind, parent);
+		parseTillEnd (token, index, end_keyword);
 	}
 	deleteToken (name);
 }
@@ -780,18 +894,103 @@ static void parseArchitecture (tokenInfo * const token)
 		readToken (token);
 		if (isType (token, TOKEN_IDENTIFIER))
 		{
-			attachParserFieldToCorkEntry (index,
-										  VhdlFields[F_ENTITY].ftype,
-										  vStringValue (token->string));
-			readToken (token);	/* "is" is expected. */
+			/* Filling scope field of this architecture.
+			   If the definition for the entity can be found in the symbol table,
+			   use its cork as the scope. If not, use the reference tag for the
+			   entity as fallback. */
+			int role_index = makeSimpleRefTag (token->string,
+											   VHDLTAG_ENTITY, VHDL_ENTITY_DESIGNED);
+			int entity_index = anyKindEntryInScope (CORK_NIL,
+													vStringValue (token->string),
+													VHDLTAG_ENTITY);
+			tagEntryInfo *e = getEntryInCorkQueue (index);
+			if (e)
+			{
+				e->extensionFields.scopeIndex = (
+					entity_index == CORK_NIL
+					? role_index
+					: entity_index);
+
+				/* TODO: append thes architecture name to
+				 * architecture: field of *e*. */
+			}
+
+			attachParserFieldToCorkEntry (role_index,
+										  VhdlFields[F_ARCHITECTURE].ftype,
+										  vStringValue (name->string));
+
+			readToken (token);
+			if (isKeyword (token, KEYWORD_IS))
+			{
+				parseTillBegin (token, index);
+				parseTillEnd (token, index, KEYWORD_ARCHITECTURE);
+			}
 		}
 	}
 	deleteToken (name);
 }
 
+static void parseSignal (tokenInfo * const token, int parent)
+{
+	readToken (token);
+	parseDeclElement (token, VHDLTAG_SIGNAL, parent, true);
+}
+
+static void parseLabel (tokenInfo * const name, int parent)
+{
+	tokenInfo *const token = newToken ();
+
+	readToken (token);
+	if (isType (token, TOKEN_COLON))
+	{
+		readToken (token);
+		if (isType (token, TOKEN_KEYWORD))
+			parseKeywords (token, name, parent);
+	}
+	deleteToken (token);
+}
+
+static void parseProcess (tokenInfo * const token, tokenInfo * const label, int parent)
+{
+	tokenInfo *process = label? label: copyToken (token);
+
+	if (label == NULL)
+	{
+		process->type = TOKEN_IDENTIFIER;
+		vStringClear (process->string);
+		anonGenerate (process->string, "anonProcess", VHDLTAG_PROCESS);
+	}
+
+	int index = makeVhdlTagWithScope (process, VHDLTAG_PROCESS, parent);
+
+	if (label == NULL)
+	{
+		tagEntryInfo *e = getEntryInCorkQueue (index);
+		if (e)
+			markTagExtraBit (e, XTAG_ANONYMOUS);
+		deleteToken (process);
+	}
+
+	skipToMatched (token);
+	parseTillBegin (token, index);
+	parseTillEnd (token, index, KEYWORD_PROCESS);
+}
+
+static void parseVariable (tokenInfo * const token, int parent)
+{
+	readToken (token);
+	parseDeclElement (token, VHDLTAG_VARIABLE, parent, true);
+}
+
+static void parseAlias (tokenInfo * const token, int parent)
+{
+	readToken (token);
+	parseDeclElement (token, VHDLTAG_ALIAS, parent, true);
+}
+
 /* TODO */
 /* records */
-static void parseKeywords (tokenInfo * const token, bool local)
+static void parseKeywords (tokenInfo * const token, tokenInfo * const label, int index)
 {
 	switch (token->keyword)
 	{
@@ -799,32 +998,47 @@ static void parseKeywords (tokenInfo * const token, bool local)
 		skipToCharacterInInputFile (';');
 		break;
 	case KEYWORD_CONSTANT:
-		parseConstant (local);
+		parseConstant (index);
 		break;
 	case KEYWORD_TYPE:
-		parseTypes (token);
+		parseTypes (token, index);
 		break;
 	case KEYWORD_SUBTYPE:
-		parseTypes (token);
+		parseTypes (token, index);
 		break;
 	case KEYWORD_ENTITY:
-		parseModule (token);
+		parseModule (token, index);
 		break;
 	case KEYWORD_COMPONENT:
-		parseModule (token);
+		parseModule (token, index);
 		break;
 	case KEYWORD_FUNCTION:
-		parseSubProgram (token);
+		parseSubProgram (token, index);
 		break;
 	case KEYWORD_PROCEDURE:
-		parseSubProgram (token);
+		parseSubProgram (token, index);
 		break;
 	case KEYWORD_PACKAGE:
 		parsePackage (token);
 		break;
 	case KEYWORD_ARCHITECTURE:
 		parseArchitecture (token);
+		break;
+	case KEYWORD_SIGNAL:
+		parseSignal (token, index);
+		break;
+	case KEYWORD_PROCESS:
+		parseProcess (token, label, index);
+		break;
+	case KEYWORD_VARIABLE:
+		parseVariable (token, index);
+		break;
+	case KEYWORD_ALIAS:
+		parseAlias (token, index);
+		break;
 	default:
+		if (isType (token, TOKEN_IDENTIFIER))
+			parseLabel (token, index);
 		break;
 	}
 }
@@ -834,7 +1048,7 @@ static tokenType parseVhdlFile (tokenInfo * const token)
 	do
 	{
 		readToken (token);
-		parseKeywords (token, false);
+		parseKeywords (token, NULL, CORK_NIL);
 	} while (!isKeyword (token, KEYWORD_END) && !isType (token, TOKEN_EOF));
 	return token->type;
 }
@@ -861,6 +1075,6 @@ extern parserDefinition *VhdlParser (void)
 	def->keywordCount = ARRAY_SIZE (VhdlKeywordTable);
 	def->fieldTable = VhdlFields;
 	def->fieldCount = ARRAY_SIZE (VhdlFields);
-	def->useCork = CORK_QUEUE;
+	def->useCork = CORK_QUEUE|CORK_SYMTAB;
 	return def;
 }

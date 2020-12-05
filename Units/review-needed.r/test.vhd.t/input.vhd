@@ -4646,7 +4646,7 @@ begin
                            op => qout
                           );
 
-end paramterize;
+end parameterize;
 library ieee;
 use ieee.std_logic_1164.all;
 

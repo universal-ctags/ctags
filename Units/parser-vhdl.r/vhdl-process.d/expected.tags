@@ -1,0 +1,28 @@
+StackTraceBuffer	input.vhd	/^entity StackTraceBuffer is $/;"	entity	roles:def	end:29
+abits	input.vhd	/^    abits : integer := 5;$/;"	generic	entity:StackTraceBuffer	roles:def
+dbits	input.vhd	/^    dbits : integer := 64$/;"	generic	entity:StackTraceBuffer	roles:def
+i_clk	input.vhd	/^    i_clk   : in std_logic;$/;"	port	entity:StackTraceBuffer	roles:def
+i_raddr	input.vhd	/^    i_raddr : in std_logic_vector(abits-1 downto 0);$/;"	port	entity:StackTraceBuffer	roles:def
+o_rdata	input.vhd	/^    o_rdata : out std_logic_vector(dbits-1 downto 0);$/;"	port	entity:StackTraceBuffer	roles:def
+i_we	input.vhd	/^    i_we    : in std_logic;$/;"	port	entity:StackTraceBuffer	roles:def
+i_waddr	input.vhd	/^    i_waddr : in std_logic_vector(abits-1 downto 0);$/;"	port	entity:StackTraceBuffer	roles:def
+i_wdata	input.vhd	/^    i_wdata : in std_logic_vector(dbits-1 downto 0)$/;"	port	entity:StackTraceBuffer	roles:def
+arch_StackTraceBuffer	input.vhd	/^architecture arch_StackTraceBuffer of StackTraceBuffer is$/;"	architecture	entity:StackTraceBuffer	roles:def	end:51
+ram_type	input.vhd	/^  type ram_type is array ((2**abits)-1 downto 0) of std_logic_vector (dbits-1 downto 0);$/;"	type	architecture:StackTraceBuffer.arch_StackTraceBuffer	roles:def
+stackbuf	input.vhd	/^  signal stackbuf    : ram_type;$/;"	signal	architecture:StackTraceBuffer.arch_StackTraceBuffer	roles:def
+raddr	input.vhd	/^  signal raddr       : std_logic_vector(abits-1 downto 0);$/;"	signal	architecture:StackTraceBuffer.arch_StackTraceBuffer	roles:def
+regs	input.vhd	/^  regs : process(i_clk) begin $/;"	process	architecture:StackTraceBuffer.arch_StackTraceBuffer	roles:def	end:47
+StackTraceBuffer0	input-0.vhd	/^entity StackTraceBuffer0 is $/;"	entity	roles:def	end:30
+abits0	input-0.vhd	/^    abits0 : integer := 5;$/;"	generic	entity:StackTraceBuffer0	roles:def
+dbits0	input-0.vhd	/^    dbits0 : integer := 64$/;"	generic	entity:StackTraceBuffer0	roles:def
+i_clk0	input-0.vhd	/^    i_clk0   : in std_logic;$/;"	port	entity:StackTraceBuffer0	roles:def
+i_raddr0	input-0.vhd	/^    i_raddr0 : in std_logic_vector(abits0-1 downto 0);$/;"	port	entity:StackTraceBuffer0	roles:def
+o_rdata0	input-0.vhd	/^    o_rdata0 : out std_logic_vector(dbits0-1 downto 0);$/;"	port	entity:StackTraceBuffer0	roles:def
+i_we0	input-0.vhd	/^    i_we0    : in std_logic;$/;"	port	entity:StackTraceBuffer0	roles:def
+i_waddr0	input-0.vhd	/^    i_waddr0 : in std_logic_vector(abits0-1 downto 0);$/;"	port	entity:StackTraceBuffer0	roles:def
+i_wdata0	input-0.vhd	/^    i_wdata0 : in std_logic_vector(dbits0-1 downto 0)$/;"	port	entity:StackTraceBuffer0	roles:def
+arch_StackTraceBuffer0	input-0.vhd	/^architecture arch_StackTraceBuffer0 of StackTraceBuffer0 is$/;"	architecture	entity:StackTraceBuffer0	roles:def	end:52
+ram_type0	input-0.vhd	/^  type ram_type0 is array ((2**abits0)-1 downto 0) of std_logic_vector (dbits0-1 downto 0);$/;"	type	architecture:StackTraceBuffer0.arch_StackTraceBuffer0	roles:def
+stackbuf0	input-0.vhd	/^  signal stackbuf0    : ram_type0;$/;"	signal	architecture:StackTraceBuffer0.arch_StackTraceBuffer0	roles:def
+raddr0	input-0.vhd	/^  signal raddr0       : std_logic_vector(abits0-1 downto 0);$/;"	signal	architecture:StackTraceBuffer0.arch_StackTraceBuffer0	roles:def
+anonProcess21a9f813010f	input-0.vhd	/^  process(i_clk0) begin $/;"	process	architecture:StackTraceBuffer0.arch_StackTraceBuffer0	roles:def	extras:anonymous	end:48

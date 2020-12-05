@@ -1,0 +1,3 @@
+--sort=no
+--kinds-VHDL=+{local}{prototype}
+--fields=+Kpe

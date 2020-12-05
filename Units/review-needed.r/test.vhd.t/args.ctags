@@ -1,1 +1,2 @@
 --sort=no
+--kinds-VHDL=+{port}{component}{generic}{local}

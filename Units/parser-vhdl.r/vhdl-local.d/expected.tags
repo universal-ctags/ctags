@@ -1,0 +1,47 @@
+types_util	input.vhd	/^package types_util is$/;"	package	end:30
+strlen	input.vhd	/^function strlen(s: in string) return integer;$/;"	prototype	package:types_util
+StringToUVector	input.vhd	/^function StringToUVector(inStr: string) return std_ulogic_vector;$/;"	prototype	package:types_util
+StringToSVector	input.vhd	/^function StringToSVector(inStr: string) return std_logic_vector;$/;"	prototype	package:types_util
+UnsignedToSigned	input.vhd	/^function UnsignedToSigned(inUnsigned: std_ulogic_vector) return std_logic_vector;$/;"	prototype	package:types_util
+SignalFromString	input.vhd	/^function SignalFromString(inStr: string; ind : integer ) return std_logic;$/;"	prototype	package:types_util
+SymbolToSVector	input.vhd	/^function SymbolToSVector(inStr: string; idx: integer) return std_logic_vector;$/;"	prototype	package:types_util
+tost	input.vhd	/^function tost(v:std_logic_vector) return string;$/;"	prototype	package:types_util
+tost	input.vhd	/^function tost(v:std_logic) return string;$/;"	prototype	package:types_util
+tost	input.vhd	/^function tost(i : integer) return string;$/;"	prototype	package:types_util
+print	input.vhd	/^procedure print(s : string);$/;"	prototype	package:types_util
+types_util	input.vhd	/^package body types_util is$/;"	package	end:203
+strlen	input.vhd	/^  function strlen(s: in string) return integer is$/;"	function	package:types_util	end:44
+n	input.vhd	/^    variable n: integer:=0; variable sj: integer:=s'left;$/;"	variable	function:types_util.strlen
+sj	input.vhd	/^    variable n: integer:=0; variable sj: integer:=s'left;$/;"	variable	function:types_util.strlen
+SignalFromString	input.vhd	/^  function SignalFromString(inStr: string; ind : integer ) return std_logic is$/;"	function	package:types_util	end:53
+temp	input.vhd	/^    variable temp: std_logic := 'X';$/;"	variable	function:types_util.SignalFromString
+StringToUVector	input.vhd	/^  function StringToUVector(inStr: string) return std_ulogic_vector is$/;"	function	package:types_util	end:65
+temp	input.vhd	/^    variable temp: std_ulogic_vector(inStr'range) := (others => 'X');$/;"	variable	function:types_util.StringToUVector
+StringToSVector	input.vhd	/^  function StringToSVector(inStr: string) return std_logic_vector is$/;"	function	package:types_util	end:77
+temp	input.vhd	/^    variable temp: std_logic_vector(inStr'range) := (others => 'X');$/;"	variable	function:types_util.StringToSVector
+SymbolToSVector	input.vhd	/^  function SymbolToSVector(inStr: string; idx: integer) return std_logic_vector is$/;"	function	package:types_util	end:89
+ss	input.vhd	/^    constant ss: string(1 to inStr'length) := inStr;$/;"	local	function:types_util.SymbolToSVector
+c	input.vhd	/^    variable c : integer;$/;"	variable	function:types_util.SymbolToSVector
+temp	input.vhd	/^    variable temp: std_logic_vector(7 downto 0) := (others => 'X');$/;"	variable	function:types_util.SymbolToSVector
+UnsignedToSigned	input.vhd	/^  function UnsignedToSigned(inUnsigned: std_ulogic_vector) $/;"	function	package:types_util	end:104
+temp	input.vhd	/^    variable temp: std_logic_vector(inUnsigned'length-1 downto 0) := (others => 'X');$/;"	variable	function:types_util.UnsignedToSigned
+i	input.vhd	/^    variable i: integer:=0;$/;"	variable	function:types_util.UnsignedToSigned
+nibble	input.vhd	/^  subtype nibble is std_logic_vector(3 downto 0);$/;"	subtype	package:types_util
+todec	input.vhd	/^  function todec(i:integer) return character is$/;"	function	package:types_util	end:124
+tohex	input.vhd	/^  function tohex(n:nibble) return character is$/;"	function	package:types_util	end:148
+tost	input.vhd	/^  function tost(v:std_logic_vector) return string is$/;"	function	package:types_util	end:170
+vlen	input.vhd	/^    constant vlen : natural := v'length; --'$/;"	local	function:types_util.tost
+slen	input.vhd	/^    constant slen : natural := (vlen+3)\/4;$/;"	local	function:types_util.tost
+vv	input.vhd	/^    variable vv : std_logic_vector(0 to slen*4-1) := (others => '0');$/;"	variable	function:types_util.tost
+s	input.vhd	/^    variable s : string(1 to slen);$/;"	variable	function:types_util.tost
+nz	input.vhd	/^    variable nz : boolean := false;$/;"	variable	function:types_util.tost
+index	input.vhd	/^    variable index : integer := -1;$/;"	variable	function:types_util.tost
+tost	input.vhd	/^  function tost(v:std_logic) return string is$/;"	function	package:types_util	end:176
+tost	input.vhd	/^  function tost(i : integer) return string is$/;"	function	package:types_util	end:195
+L	input.vhd	/^    variable L : line;$/;"	variable	function:types_util.tost
+s	input.vhd	/^    variable s, x : string(1 to 128);$/;"	variable	function:types_util.tost
+x	input.vhd	/^    variable s, x : string(1 to 128);$/;"	variable	function:types_util.tost
+n	input.vhd	/^    variable n, tmp : integer := 0;$/;"	variable	function:types_util.tost
+tmp	input.vhd	/^    variable n, tmp : integer := 0;$/;"	variable	function:types_util.tost
+print	input.vhd	/^  procedure print(s : string) is$/;"	procedure	package:types_util	end:201
+L	input.vhd	/^    variable L : line;$/;"	variable	procedure:types_util.print
