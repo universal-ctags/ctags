@@ -6,6 +6,7 @@
 [![Build status](https://ci.appveyor.com/api/projects/status/6hk2p5lv6jsrd9o7/branch/master?svg=true)](https://ci.appveyor.com/project/universalctags/ctags/branch/master)
 [![RTD build status](https://readthedocs.org/projects/ctags/badge)](https://docs.ctags.io)
 [![CircleCI Build Status](https://circleci.com/gh/universal-ctags/ctags.svg?style=shield&circle-token=2e582261da84ebc6d21725b05381f410bc5de29d)](https://circleci.com/gh/universal-ctags)
+![GitHub Actions/VALGRIND](https://github.com/universal-ctags/ctags/workflows/run%20units%20target%20under%20VALGRIND/badge.svg)
 
 Universal Ctags generates an index (or tag) file of language objects found in source files for many popular programming languages. This index makes it easy for text editors and other tools to locate the indexed items. Universal Ctags improves on traditional ctags because of its multilanguage support, its ability for the user to define new languages searched by regular expressions, and its ability to generate emacs-style TAGS files.
 
