@@ -770,13 +770,6 @@ static int skipMacro (int c)
 			c = skipWhite (c);
 			c = processDefine(token, c);
 		}
-		/* Skip macro or macro functions */
-		else
-		{
-			c = skipWhite (c);	// FIXME: not covered
-			if (c == '(')
-				c = skipPastMatch ("()");
-		}
 		deleteToken (token);
 	}
 	return c;
@@ -1927,12 +1920,6 @@ static void findVerilogTags (void)
 					}
 					else if (token->kind != K_UNDEFINED)
 						c = findTag (token, skipWhite (c));
-					else if (c == '`')	/* Skip macro or macro functions */
-					{
-						c = skipWhite (c);
-						if (c == '(')
-							c = skipPastMatch ("()");
-					}
 				}
 				else
 					c = skipWhite (vGetc ());
