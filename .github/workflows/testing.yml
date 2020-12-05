@@ -7,7 +7,7 @@ on:
     branches: [ master ]
 
 jobs:
-  testing:
+  testing-O0_fixme:
 
     runs-on: ubuntu-latest
 
@@ -24,6 +24,6 @@ jobs:
     - name: configure
       run: ./configure --enable-debugging
     - name: make
-      run: make
+      run: make CFLAGS='-g -O0'
     - name: make units
       run: make units VG=1 GITHUBACTIONS=1
