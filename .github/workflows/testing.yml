@@ -19,6 +19,8 @@ jobs:
       run: sudo apt-get install valgrind pkg-config automake bash libjansson-dev libyaml-dev libseccomp-dev libxml2-dev gdb
     - name: autogen.sh
       run: ./autogen.sh
+    - name: report the version of cc
+      run: cc --version
     - name: configure
       run: ./configure --enable-debugging
     - name: make
