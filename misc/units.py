@@ -573,7 +573,8 @@ def run_tcase(finput, t, name, tclass, category, build_t, extra_inputs):
 
     timeout_value = WITH_TIMEOUT
     if WITH_VALGRIND:
-        cmdline = ['valgrind', '--leak-check=full', '--error-exitcode=' + str(_VALGRIND_EXIT), '--log-file=' + ovalgrind] + cmdline
+        cmdline = ['valgrind', '--leak-check=full', '--track-origins=yes',
+                   '--error-exitcode=' + str(_VALGRIND_EXIT), '--log-file=' + ovalgrind] + cmdline
         timeout_value *= _VG_TIMEOUT_FACTOR
     if timeout_value == 0:
         timeout_value = None
