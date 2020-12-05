@@ -24,4 +24,4 @@ jobs:
     - name: make
       run: make
     - name: make units
-      run: make units VG=1
+      run: make units VG=1 GITHUBACTIONS=1
