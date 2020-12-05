@@ -400,7 +400,7 @@ static int readWordTokenNoSkip (tokenInfo *const token, int c);
 static int skipBlockName (tokenInfo *const token, int c);
 static int skipClockEvent(tokenInfo* token, int c);
 static int skipDelay(tokenInfo* token, int c);
-static int tagNameList (tokenInfo* token, int c);
+static int tagNameList (tokenInfo* token, int c, verilogKind kind);
 
 /*
  *   FUNCTION DEFINITIONS
@@ -927,6 +927,7 @@ static void createTag (tokenInfo *const token, verilogKind kind)
 			token->parameter = true;
 	}
 	Assert (kind >= 0 && kind != K_UNDEFINED && kind != K_IDENTIFIER);
+	Assert (vStringLength (token->name) > 0);
 
 	/* check if a container before kind is modified by prototype */
 	/* BTW should we create a context for a prototype? */
@@ -938,12 +939,7 @@ static void createTag (tokenInfo *const token, verilogKind kind)
 		kind = K_PROTOTYPE;
 	}
 
-	/* Do nothing it tag name is empty or tag kind is disabled */
-	if (vStringLength (token->name) == 0)
-	{
-		verbose ("Unexpected empty token\n");	/* FIXME: uncovered */
-		return;
-	}
+	/* Do nothing if tag kind is disabled */
 	if (! kindEnabled (kind))
 	{
 		verbose ("kind disabled\n");
@@ -1065,8 +1061,7 @@ static int processPortList (tokenInfo *token, int c)
 	{
 		c = skipWhite (vGetc ());
 		clearToken (token);	// for an (illegal) empty port list
-		token->kind = K_PORT;
-		c = tagNameList (token, c);
+		c = tagNameList (token, c, K_PORT);
 		if (c == ')')	// sanity check
 			c = skipWhite (vGetc ());
 		else
@@ -1150,7 +1145,7 @@ static int processEnum (tokenInfo *const token, int c)
 
 	/* Following identifiers are tag names */
 	verbose ("Find enum tags. Token %s kind %d\n", vStringValue (enumToken->name), enumToken->kind);
-	c = tagNameList (enumToken, c);
+	c = tagNameList (enumToken, c, enumToken->kind);
 	deleteToken (enumToken);
 
 	// Clean up the tag content list at the end of the declaration to support multiple variables
@@ -1176,8 +1171,7 @@ static int processStruct (tokenInfo *const token, int c)
 
 	/* Following identifiers are tag names */
 	verbose ("Find struct|union tags. Token %s kind %d\n", vStringValue (token->name), token->kind);
-	token->kind = kind;
-	c = tagNameList (token, c);
+	c = tagNameList (token, c, kind);
 	ptrArrayClear (tagContents);
 	return c;
 }
@@ -1724,10 +1718,8 @@ static int skipClassType (tokenInfo* token, int c)
 	return c;
 }
 
-static int tagNameList (tokenInfo* token, int c)
+static int tagNameList (tokenInfo* token, int c, verilogKind kind)
 {
-	verilogKind kind = token->kind;
-
 	c = skipClassType (token, c);
 	if (c == ':' || c == ';')	// ## (cycle delay) or unexpected input
 		return c;
@@ -1747,7 +1739,8 @@ static int tagNameList (tokenInfo* token, int c)
 
 		if (c == '=' || c == ',' || c == ';' || c == ')' || c == '`' || with)
 		{
-			if (kind != K_UNDEFINED && kind != K_IDENTIFIER)	// ignore procedual assignment: foo = bar;
+			// ignore an empty token or procedual assignment: foo = bar;
+			if (kind != K_UNDEFINED && kind != K_IDENTIFIER && token->kind != K_UNDEFINED)
 				createTag (token, kind);
 			if (c == '=')
 				c = skipExpression (c);
@@ -1794,7 +1787,7 @@ static int findTag (tokenInfo *const token, int c)
 			if (token->kind == K_PORT && currentContext->kind == K_CLOCKING)
 				c = skipToSemiColon (c); // clocking items are not port definitions
 			else
-				c = tagNameList (token, c);
+				c = tagNameList (token, c, token->kind);
 			break;
 		case K_IDENTIFIER:
 			{
@@ -1810,7 +1803,7 @@ static int findTag (tokenInfo *const token, int c)
 				else if (c == '=')	// assignment
 					c = skipExpression (skipWhite(vGetc()));
 				else
-					c = tagNameList (token, c); /* user defined type */
+					c = tagNameList (token, c, token->kind); /* user defined type */
 			}
 			break;
 		case K_CLASS:
