@@ -70,6 +70,7 @@ _VG_TIMEOUT_FACTOR = 10
 _VALGRIND_EXIT = 58
 _STDERR_OUTPUT_NAME = 'STDERR.tmp'
 _DIFF_OUTPUT_NAME = 'DIFF.tmp'
+_VALGRIND_OUTPUT_NAME = 'VALGRIND.tmp'
 
 #
 # Results
@@ -469,7 +470,7 @@ def run_tcase(finput, t, name, tclass, category, build_t, extra_inputs):
     ofiltered = o + '/FILTERED.tmp'
     odiff = o + '/' + _DIFF_OUTPUT_NAME
     ocmdline = o + '/CMDLINE.tmp'
-    ovalgrind = o + '/VALGRIND.tmp'
+    ovalgrind = o + '/' + _VALGRIND_OUTPUT_NAME
     oresult = o + '/RESULT.tmp'
     oshrink_template = o + '/SHRINK-%s.tmp'
     obundles = o + '/BUNDLES'
@@ -783,6 +784,15 @@ def run_show_stderr_output(units_dir, t):
                 print("\t" + l, end='')
     print()
 
+def run_show_valgrind_output(units_dir, t):
+    print("\t", end='')
+    line('.')
+    for fn in glob.glob(units_dir + '/' + t + '.*/' + _VALGRIND_OUTPUT_NAME):
+        with open(fn, 'r') as f:
+            for l in f:
+                print("\t" + l, end='')
+    print()
+
 def run_summary(build_dir):
     print()
     print('Summary (see CMDLINE.tmp to reproduce without test harness)')
@@ -838,6 +848,11 @@ def run_summary(build_dir):
         print(fmt % ('#valgrind-error:', len(L_VALGRIND)))
         for t in L_VALGRIND:
             print("\t" + remove_prefix(t, _DEFAULT_CATEGORY + '/'))
+        if SHOW_DIFF_OUTPUT:
+            print(fmt % ('##valgrind-error:', len(L_VALGRIND)))
+            for t in L_VALGRIND:
+                print("\t" + remove_prefix(t, _DEFAULT_CATEGORY + '/'))
+                run_show_valgrind_output(build_dir, remove_prefix(t, _DEFAULT_CATEGORY + '/'))
 
 def make_pretense_map(arg):
     r = ''
@@ -888,7 +903,7 @@ def action_run(parser, action, *args):
     parser.add_argument('--run-shrink', action='store_true', default=False,
             help='(TODO: NOT IMPLEMENTED YET)')
     parser.add_argument('--show-diff-output', action='store_true', default=False,
-            help='show diff output for failed test cases in the summary.')
+            help='show diff output (and valgrind errors) for failed test cases in the summary.')
     parser.add_argument('--with-pretense-map',
             metavar='NEWLANG0/OLDLANG0[,...]',
             help='make NEWLANG parser pretend OLDLANG.')
