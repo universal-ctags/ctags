@@ -759,26 +759,34 @@ static int skipToNewLine (int c)
 	return c;	// '\n' or EOF
 }
 
-static int skipMacro (int c)
+static int skipMacro (int c, tokenInfo *token)
 {
 	if (c == '`')
 	{
-		tokenInfo *token = newToken ();	// don't update token outside
+		tokenInfo *localToken = newToken ();	// don't update token outside
 
-		c = readWordTokenNoSkip (token, c);
+		c = readWordTokenNoSkip (localToken, c);
 		/* Skip compiler directive other than `define */
-		if (token->kind == K_DIRECTIVE)
+		if (localToken->kind == K_DIRECTIVE)
 		{
 			c = skipToNewLine(c);
 			c = skipWhite (c);
 		}
 		/* Skip `define */
-		else if (token->kind == K_DEFINE)
+		else if (localToken->kind == K_DEFINE)
 		{
 			c = skipWhite (c);
-			c = processDefine(token, c);
+			c = processDefine(localToken, c);
 		}
-		deleteToken (token);
+		/* return macro expansion */
+		else
+		{
+			swapToken (token, localToken);
+			c = skipWhite (c);
+			if (c == '(')
+				c = skipPastMatch ("()");
+		}
+		deleteToken (localToken);
 	}
 	return c;
 }
@@ -1644,7 +1652,7 @@ static int processType (tokenInfo* token, int c, verilogKind* kind, bool* with)
 				c = skipPastMatch ("{}");
 		}
 		c = skipDimension (c);
-		c = skipMacro (c);
+		c = skipMacro (c, token);
 
 		// break on ',', ';', ')', '}', or other unexpected charactors
 		if (!isWordToken (c))
@@ -1763,11 +1771,11 @@ static int tagIdentifierList (tokenInfo *const token, int c, verilogKind kind, b
 		if (c == '=')
 			c = skipExpression (vGetc ());
 
-		c = skipMacro (c);	// `ifdef, `else, `endif, etc. (before comma)
+		c = skipMacro (c, token);	// `ifdef, `else, `endif, etc. (before comma)
 		if (c != ',' || c == EOF)
 			break;
 		c = skipWhite (vGetc ());	// skip ','
-		c = skipMacro (c);	// `ifdef, `else, `endif, etc. (after comma)
+		c = skipMacro (c, token);	// `ifdef, `else, `endif, etc. (after comma)
 	}
 	return c;
 }
@@ -1812,11 +1820,11 @@ static int tagNameList (tokenInfo* token, int c, verilogKind kind)
 				createTag (token, K_INSTANCE);
 			}
 		}
-		c = skipMacro (c);	// `ifdef, `else, `endif, etc. (before comma)
+		c = skipMacro (c, token);	// `ifdef, `else, `endif, etc. (before comma)
 		if (c != ',' || c == EOF)
 			break;
 		c = skipWhite (vGetc ());	// skip ','
-		c = skipMacro (c);	// `ifdef, `else, `endif, etc. (after comma)
+		c = skipMacro (c, token);	// `ifdef, `else, `endif, etc. (after comma)
 	}
 
 	return c;
