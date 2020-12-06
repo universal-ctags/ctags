@@ -400,6 +400,7 @@ static int readWordTokenNoSkip (tokenInfo *const token, int c);
 static int skipBlockName (tokenInfo *const token, int c);
 static int skipClockEvent(tokenInfo* token, int c);
 static int skipDelay(tokenInfo* token, int c);
+static int tagIdentifierList (tokenInfo *const token, int c, verilogKind kind, bool mayPortDecl);
 static int tagNameList (tokenInfo* token, int c, verilogKind kind);
 
 /*
@@ -1444,8 +1445,12 @@ static int processDesignElementL (tokenInfo *const token, int c)
 
 	// Process ANSI/non-ANSI port list in main loop
 	if (c == '(')	// port_list
-		c = skipWhite (vGetc());
-
+	{
+		c = skipWhite (vGetc ());	// skip '('
+		c = tagIdentifierList (token, c, K_PORT, true);
+		if (c == ')')
+			c = skipWhite (vGetc ());
+	}
 	return c;
 }
 
@@ -1669,6 +1674,8 @@ static int processType (tokenInfo* token, int c, verilogKind* kind, bool* with)
 				actualKind = K_NET;
 			else if (token->kind == K_REGISTER)
 				actualKind = K_REGISTER;
+			else if (token->kind == K_PORT)
+				actualKind = K_PORT;
 			else if (token->kind == K_IDENTIFIER)
 			{	// identifier of a user defined type
 				*kind = K_REGISTER;	// FIXME: consider kind of the user defined type
@@ -1717,6 +1724,51 @@ static int skipClassType (tokenInfo* token, int c)
 			if (isWordToken (c))
 				c = readWordToken (token, c);
 		}
+	}
+	return c;
+}
+
+// Tag a list of identifiers
+//   mayPortDecl: may be a ANSI port declaration.  true for module, interface, or program.
+static int tagIdentifierList (tokenInfo *const token, int c, verilogKind kind, bool mayPortDecl)
+{
+	bool first_port = true;
+	bool enableTag = true;
+	verilogKind localKind;
+	bool not_used;
+
+	while (c != EOF)
+	{
+		// skip attribute_instance: (* ... *)
+		if (c == '(')
+			c = skipPastMatch ("()");
+		if (!isWordToken (c))
+			break;
+
+		c = readWordToken (token, c);
+		localKind = token->kind;
+		c = processType (token, c, &localKind, &not_used);
+
+		// LRM 23.2.2.3 Rules for determining port kind, data type, and direction
+		// If the direction, port kind, and data type are all omitted for
+		// the first port in the port list, ... non-ANSI style, ...
+		if (mayPortDecl && first_port)
+		{
+			first_port = false;
+			if (localKind == K_IDENTIFIER)
+				enableTag = false;	// don't tag for non-ANSI port
+		}
+		if (enableTag && token->kind == K_IDENTIFIER)
+			createTag (token, kind);
+
+		if (c == '=')
+			c = skipExpression (vGetc ());
+
+		c = skipMacro (c);	// `ifdef, `else, `endif, etc. (before comma)
+		if (c != ',' || c == EOF)
+			break;
+		c = skipWhite (vGetc ());	// skip ','
+		c = skipMacro (c);	// `ifdef, `else, `endif, etc. (after comma)
 	}
 	return c;
 }

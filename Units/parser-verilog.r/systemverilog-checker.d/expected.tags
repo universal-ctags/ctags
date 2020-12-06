@@ -34,8 +34,8 @@ sig	input.sv	/^checker mutex (logic [31:0] sig, event clock, output bit failure)
 clock	input.sv	/^checker mutex (logic [31:0] sig, event clock, output bit failure);$/;"	p	checker:mutex
 failure	input.sv	/^checker mutex (logic [31:0] sig, event clock, output bit failure);$/;"	p	checker:mutex
 m	input.sv	/^module m(wire [31:0] bus, logic clk);$/;"	m
-bus	input.sv	/^module m(wire [31:0] bus, logic clk);$/;"	n	module:m
-clk	input.sv	/^module m(wire [31:0] bus, logic clk);$/;"	n	module:m
+bus	input.sv	/^module m(wire [31:0] bus, logic clk);$/;"	p	module:m
+clk	input.sv	/^module m(wire [31:0] bus, logic clk);$/;"	p	module:m
 res	input.sv	/^    logic res, scan;$/;"	r	module:m
 scan	input.sv	/^    logic res, scan;$/;"	r	module:m
 check_bus	input.sv	/^    mutex check_bus(bus, posedge clk, res);$/;"	i	module:m

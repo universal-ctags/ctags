@@ -1,14 +1,32 @@
-apb_if	input.sv	/^typedef logic apb_if;$/;"	T
-blk_dut1	input.sv	/^module blk_dut1 (input apb_if    apb, input bit rst); $/;"	m
-apb	input.sv	/^module blk_dut1 (input apb_if    apb, input bit rst); $/;"	p	module:blk_dut1
-rst	input.sv	/^module blk_dut1 (input apb_if    apb, input bit rst); $/;"	p	module:blk_dut1
-blk_dut2	input.sv	/^module blk_dut2 (apb_if    apb, input bit rst);$/;"	m
-apb	input.sv	/^module blk_dut2 (apb_if    apb, input bit rst);$/;"	r	module:blk_dut2
-rst	input.sv	/^module blk_dut2 (apb_if    apb, input bit rst);$/;"	r	module:blk_dut2
-blk_dut3	input.sv	/^module blk_dut3 (logic    apb, input bit rst);$/;"	m
-apb	input.sv	/^module blk_dut3 (logic    apb, input bit rst);$/;"	r	module:blk_dut3
-rst	input.sv	/^module blk_dut3 (logic    apb, input bit rst);$/;"	r	module:blk_dut3
-blk_dut4	input.sv	/^module blk_dut4 #(int BASE_ADDR='h0) (apb_if    apb,$/;"	m
-BASE_ADDR	input.sv	/^module blk_dut4 #(int BASE_ADDR='h0) (apb_if    apb,$/;"	c	module:blk_dut4
-apb	input.sv	/^module blk_dut4 #(int BASE_ADDR='h0) (apb_if    apb,$/;"	r	module:blk_dut4
-rst	input.sv	/^                                     input bit rst);$/;"	r	module:blk_dut4
+user_t	input.sv	/^typedef logic user_t;$/;"	T
+blk_dut1	input.sv	/^module blk_dut1 (input user_t apb, input logic rst); $/;"	m
+apb	input.sv	/^module blk_dut1 (input user_t apb, input logic rst); $/;"	p	module:blk_dut1
+rst	input.sv	/^module blk_dut1 (input user_t apb, input logic rst); $/;"	p	module:blk_dut1
+blk_dut2	input.sv	/^module blk_dut2 (user_t apb, input logic rst);$/;"	m
+apb	input.sv	/^module blk_dut2 (user_t apb, input logic rst);$/;"	p	module:blk_dut2
+rst	input.sv	/^module blk_dut2 (user_t apb, input logic rst);$/;"	p	module:blk_dut2
+blk_dut3	input.sv	/^module blk_dut3 (logic apb, input logic rst);$/;"	m
+apb	input.sv	/^module blk_dut3 (logic apb, input logic rst);$/;"	p	module:blk_dut3
+rst	input.sv	/^module blk_dut3 (logic apb, input logic rst);$/;"	p	module:blk_dut3
+blk_dut4	input.sv	/^module blk_dut4 #(int BASE_ADDR='h0) (user_t apb,$/;"	m
+BASE_ADDR	input.sv	/^module blk_dut4 #(int BASE_ADDR='h0) (user_t apb,$/;"	c	module:blk_dut4
+apb	input.sv	/^module blk_dut4 #(int BASE_ADDR='h0) (user_t apb,$/;"	p	module:blk_dut4
+rst	input.sv	/^                                     input logic rst);$/;"	p	module:blk_dut4
+M1	input.sv	/^module M1;$/;"	m
+M2	input.sv	/^module M2 ();$/;"	m
+M3	input.sv	/^module M3 (a);$/;"	m
+a	input.sv	/^  input a;$/;"	p	module:M3
+M4	input.sv	/^module M4 (a, b);$/;"	m
+a	input.sv	/^  input a, b;$/;"	p	module:M4
+b	input.sv	/^  input a, b;$/;"	p	module:M4
+M5	input.sv	/^module M5 (input user_t a, b);$/;"	m
+a	input.sv	/^module M5 (input user_t a, b);$/;"	p	module:M5
+b	input.sv	/^module M5 (input user_t a, b);$/;"	p	module:M5
+M6	input.sv	/^module M6 (logic a);$/;"	m
+a	input.sv	/^module M6 (logic a);$/;"	p	module:M6
+M7	input.sv	/^module M7 (logic a, output b);$/;"	m
+a	input.sv	/^module M7 (logic a, output b);$/;"	p	module:M7
+b	input.sv	/^module M7 (logic a, output b);$/;"	p	module:M7
+M8	input.sv	/^module M8 (user_t a, b);$/;"	m
+a	input.sv	/^module M8 (user_t a, b);$/;"	p	module:M8
+b	input.sv	/^module M8 (user_t a, b);$/;"	p	module:M8
