@@ -526,6 +526,13 @@ static void pruneTokens (tokenInfo * token)
 		;
 }
 
+static void swapToken (tokenInfo *t0, tokenInfo *t1)
+{
+	tokenInfo tmp = *t0;
+	*t0 = *t1;
+	*t1 = tmp;
+}
+
 static const char *getNameForKind (const verilogKind kind)
 {
 	if (isInputLanguage (Lang_systemverilog))
@@ -1648,13 +1655,8 @@ static int processType (tokenInfo* token, int c, verilogKind* kind, bool* with)
 		// break on "with"
 		if (token->kind == K_WITH)
 		{
-			// restore tokenSaved to token
-			//   tokenClear() cannot be used to free strings.
-			vStringDelete (token->name);
-			vStringDelete (token->blockName);
-			vStringDelete (token->inheritance);
-			*token = *tokenSaved;
-			eFree (tokenSaved);
+ 			swapToken (token, tokenSaved);
+			deleteToken (tokenSaved);
 			*with = true;	// inform to caller
 			break;
 		}
