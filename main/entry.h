@@ -67,7 +67,6 @@ struct sTagEntryInfo {
 
 	struct {
 		const char* access;
-		const char* fileScope;
 		const char* implementation;
 		const char* inheritance;
 

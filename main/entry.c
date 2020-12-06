@@ -1066,8 +1066,6 @@ static tagEntryInfoX *copyTagEntry (const tagEntryInfo *const tag,
 	slot->name = eStrdup (slot->name);
 	if (slot->extensionFields.access)
 		slot->extensionFields.access = eStrdup (slot->extensionFields.access);
-	if (slot->extensionFields.fileScope)
-		slot->extensionFields.fileScope = eStrdup (slot->extensionFields.fileScope);
 	if (slot->extensionFields.implementation)
 		slot->extensionFields.implementation = eStrdup (slot->extensionFields.implementation);
 	if (slot->extensionFields.inheritance)
@@ -1144,8 +1142,6 @@ static void deleteTagEnry (void *data)
 
 	if (slot->extensionFields.access)
 		eFree ((char *)slot->extensionFields.access);
-	if (slot->extensionFields.fileScope)
-		eFree ((char *)slot->extensionFields.fileScope);
 	if (slot->extensionFields.implementation)
 		eFree ((char *)slot->extensionFields.implementation);
 	if (slot->extensionFields.inheritance)
