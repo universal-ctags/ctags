@@ -1056,13 +1056,12 @@ static int processEnd (tokenInfo *const token, int c)
 	return c;
 }
 
-static int processPortList (tokenInfo *token, int c)
+static int processPortList (tokenInfo *token, int c, bool mayPortDecl)
 {
 	if (c == '(')
 	{
-		c = skipWhite (vGetc ());
-		clearToken (token);	// for an (illegal) empty port list
-		c = tagNameList (token, c, K_PORT);
+		c = skipWhite (vGetc ());	// skip '('
+		c = tagIdentifierList (token, c, K_PORT, mayPortDecl);
 		if (c == ')')	// sanity check
 			c = skipWhite (vGetc ());
 		else
@@ -1123,7 +1122,7 @@ static int processFunction (tokenInfo *const token, int c)
 
 	/* Get port list from function */
 	c = skipWhite (c);
-	c = processPortList (token, c);
+	c = processPortList (token, c, false);
 
 	return c;
 }
@@ -1444,13 +1443,8 @@ static int processDesignElementL (tokenInfo *const token, int c)
 	}
 
 	// Process ANSI/non-ANSI port list in main loop
-	if (c == '(')	// port_list
-	{
-		c = skipWhite (vGetc ());	// skip '('
-		c = tagIdentifierList (token, c, K_PORT, true);
-		if (c == ')')
-			c = skipWhite (vGetc ());
-	}
+	c = processPortList (token, c, true);
+
 	return c;
 }
 
@@ -1477,7 +1471,7 @@ static int processDesignElementS (tokenInfo *const token, int c)
 		if (kind == K_MODPORT)
 			c = skipPastMatch ("()");	// ignore port list
 		else
-			c = processPortList (token, c);
+			c = processPortList (token, c, false);
 	}
 	// skip clocking_event for clocking block or coverage_event for covergroup
 	// "with function sample ()" is processed in the main loop
@@ -1650,6 +1644,7 @@ static int processType (tokenInfo* token, int c, verilogKind* kind, bool* with)
 				c = skipPastMatch ("{}");
 		}
 		c = skipDimension (c);
+		c = skipMacro (c);
 
 		// break on ',', ';', ')', '}', or other unexpected charactors
 		if (!isWordToken (c))
@@ -1746,7 +1741,11 @@ static int tagIdentifierList (tokenInfo *const token, int c, verilogKind kind, b
 			break;
 
 		c = readWordToken (token, c);
-		localKind = token->kind;
+		c = skipClassType (token, c);
+		if (c == ':' || c == ';')	// ## (cycle delay) or unexpected input
+			return c;
+
+		localKind = token->kind == K_ENUM || token->kind == K_STRUCT ? K_PORT : token->kind;
 		c = processType (token, c, &localKind, &not_used);
 
 		// LRM 23.2.2.3 Rules for determining port kind, data type, and direction
@@ -1814,13 +1813,10 @@ static int tagNameList (tokenInfo* token, int c, verilogKind kind)
 			}
 		}
 		c = skipMacro (c);	// `ifdef, `else, `endif, etc. (before comma)
-
 		if (c != ',' || c == EOF)
 			break;
 		c = skipWhite (vGetc ());	// skip ','
 		c = skipMacro (c);	// `ifdef, `else, `endif, etc. (after comma)
-		if (kind == K_IDENTIFIER)	// for "module foo (a, b, c);"
-			kind = K_UNDEFINED;
 	}
 
 	return c;
