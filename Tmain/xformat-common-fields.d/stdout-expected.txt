@@ -41,6 +41,11 @@ output: Foo -
 output: doIt ()
 status: 0
 
+field: T
+output: Foo 0
+output: doIt 0
+status: 0
+
 field: Z
 output: Foo 
 output: doIt Foo

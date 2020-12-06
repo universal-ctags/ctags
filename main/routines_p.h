@@ -68,6 +68,9 @@ typedef struct {
 
 		/* Size of file (pointed to) */
 	unsigned long size;
+
+		/* The last modified time */
+	time_t mtime;
 } fileStatus;
 
 /*

@@ -7,9 +7,9 @@ CTAGS=$1
 
 if is_feature_available "${CTAGS}" json; then
     {
-	run_with_format json --languages=+man
-	run_with_format json --languages=+man --fields="*"
-	run_with_format json --languages=+man --fields="*" --extras='*'
+	run_with_format json --languages=+man --fields=-T
+	run_with_format json --languages=+man --fields="*"-T
+	run_with_format json --languages=+man --fields="*"-T --extras='*'
     } | cat \
 		| grep -v TAG_PROGRAM_VERSION \
 		| grep -v TAG_OUTPUT_FILESEP  \

@@ -1,4 +1,5 @@
 E       UCTAGSextras         no      NONE             s--    no    Extra tag type information
+T       UCTAGSepoch          yes     NONE             -i-    no    the last modified time of the input file (only for F/file kind tag)
 Z       UCTAGSscope          no      NONE             s--    no    [tags output] prepend "scope:" key to s/scope field output, [xref and json output] the same as s/ field
 e       UCTAGSend            no      NONE             -i-    no    end lines of various items
 p       UCTAGSscopeKind      no      NONE             s--    no    [tags output] no effect, [xref and json output] kind of scope in long-name form

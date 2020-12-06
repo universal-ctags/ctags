@@ -477,6 +477,7 @@ extern fileStatus *eStat (const char *const fileName)
 				file.isSetuid = (bool) ((status.st_mode & S_ISUID) != 0);
 				file.isSetgid = (bool) ((status.st_mode & S_ISGID) != 0);
 				file.size = status.st_size;
+				file.mtime = status.st_mtime;
 			}
 		}
 	}

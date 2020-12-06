@@ -64,6 +64,8 @@ extern unsigned int getNestedInputBoundaryInfo (unsigned long lineNumber);
 extern const char *getSourceFileTagPath (void);
 extern langType getSourceLanguage (void);
 
+extern time_t getInputFileMtime (void);
+
 /* Bypass: reading from fp in inputFile WITHOUT updating fields in input fields */
 extern char *readLineFromBypass (vString *const vLine, MIOPos location, long *const pSeekValue);
 extern void   pushNarrowedInputStream (
