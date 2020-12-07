@@ -1626,18 +1626,6 @@ static int processType (tokenInfo* token, int c, verilogKind* kind, bool* with)
 	*with = false;
 	do
 	{
-		// [ class_type :: | package_identifier :: | $unit :: ] type_identifier { [ ... ] }
-		if (c == ':')
-		{
-			c = skipWhite (vGetc ());
-			if (c != ':')
-			{
-				verbose ("Unexpected input.\n");
-				vUngetc (c);
-				return ':';
-			}
-			c = skipWhite (vGetc ());
-		}
 		if (c == '.')	// interface_identifier .
 			c = skipWhite (vGetc ());
 		c = skipDimension (c);
