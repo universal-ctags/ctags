@@ -145,9 +145,15 @@ interface intf_i;
   typedef int data_t;
 endinterface
 
+// interface based typedef
 module sub(intf_i p);
-  //typedef p.data_t my_data_t; // FIXME: p -> p.data_t?
+  typedef p.data_t my_data_t;
   my_data_t data;
+endmodule
+
+// interface based typedef with constant bit select
+module cbs;
+  typedef p[10].data_t cbs_t;
 endmodule
 
 module user_define_types_1;

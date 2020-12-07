@@ -79,3 +79,5 @@ bar_e.Y	input.sv	/^    Y = 'h0001,$/;"	c	typedef:bar_e
 Z	input.sv	/^    Z = -1$/;"	c	typedef:bar_e
 bar_e.Z	input.sv	/^    Z = -1$/;"	c	typedef:bar_e
 type_class	input.sv	/^typedef classname#(paramvalue) type_class;$/;"	T
+`UVM_CORESERVICE_TYPE	input.sv	/^typedef class `UVM_CORESERVICE_TYPE;$/;"	Q
+`UVM_CORESERVICE_TYPE	input.sv	/^typedef class `UVM_CORESERVICE_TYPE(arg);$/;"	Q
