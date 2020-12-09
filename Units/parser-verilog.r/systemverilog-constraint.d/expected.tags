@@ -14,7 +14,7 @@ bus	input.sv	/^task exercise_bus (MyBus bus);$/;"	p	task:exercise_bus
 res	input.sv	/^  int res;$/;"	r	task:exercise_bus
 C	input.sv	/^class C;$/;"	C
 x	input.sv	/^  rand int x;$/;"	r	class:C
-proto1	input.sv	/^  constraint proto1;        \/\/ implicit form$/;"	O	class:C
+proto1	input.sv	/^  constraint proto1;        \/\/ implicit form$/;"	Q	class:C
 proto2	input.sv	/^  extern constraint proto2; \/\/ explicit form$/;"	Q	class:C
 D	input.sv	/^virtual class D;$/;"	C
 Test	input.sv	/^  pure constraint Test;$/;"	Q	class:D

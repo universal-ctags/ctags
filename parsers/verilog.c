@@ -1342,14 +1342,17 @@ static int processClass (tokenInfo *const token, int c, verilogKind kind)
 // constraint_prototype ::= [ extern | pure ] [ static ] constraint constraint_identifier ;
 static int processConstraint (tokenInfo *const token, int c)
 {
+	verilogKind kind;
 	if (isWordToken (c))
-	{
 		c = readWordToken (token, c);
-		createTag (token, K_CONSTRAINT);
-	}
 	if (c == '{')
+	{
 		c = skipPastMatch ("{}");
-
+		kind = K_CONSTRAINT;
+	}
+	else
+		kind = K_PROTOTYPE;
+	createTag (token, kind);
 	return c;
 }
 
