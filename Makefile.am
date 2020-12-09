@@ -1,3 +1,5 @@
+ACLOCAL_AMFLAGS = -I m4
+
 include $(top_srcdir)/source.mak
 
 EXTRA_DIST   = README.md autogen.sh \
@@ -9,7 +11,7 @@ EXTRA_DIST   = README.md autogen.sh \
 	       misc/ctags-optlib-mode.el \
 	       misc/mk-interactive-request.sh misc/roundtrip misc/tinst \
 	       misc/packcc/.gitignore misc/packcc/LICENSE.txt \
-	       misc/packcc/README.md \
+	       misc/packcc/README.md misc/packcc/packcc.c \
 	       misc/validators/validator-jq \
 	       misc/validators/validator-KNOWN-INVALIDATION \
 	       misc/validators/validator-NONE \
@@ -28,6 +30,7 @@ CLEANFILES =
 MOSTLYCLEANFILES =
 
 clean-local:
+	rm -f packcc$(BUILD_EXEEXT)
 	@if test "$(top_srcdir)" != "$(top_builddir)"; then \
 		rm -rf $(OPTLIB2C_SRCS); \
 	fi
@@ -36,18 +39,16 @@ bin_PROGRAMS = ctags
 noinst_LIBRARIES = libctags.a
 
 noinst_PROGRAMS =
-noinst_PROGRAMS += packcc
 noinst_PROGRAMS += mini-geany
 
-packcc_CPPFLAGS =
-packcc_CFLAGS  =
-packcc_CFLAGS += $(EXTRA_CFLAGS)
-dist_packcc_SOURCES = $(PACKCC_SRCS)
-
-if HAVE_STRNLEN
-packcc_CPPFLAGS += -DUSE_SYSTEM_STRNLEN
+if HAVE_STRNLEN_FOR_BUILD
+EXTRA_CPPFLAGS_FOR_BUILD = -DUSE_SYSTEM_STRNLEN
 endif
 
+PACKCC = $(top_builddir)/packcc$(BUILD_EXEEXT)
+
+$(PACKCC):
+	$(CC_FOR_BUILD) $(CFLAGS_FOR_BUILD) $(CPPFLAGS_FOR_BUILD) $(EXTRA_CPPFLAGS_FOR_BUILD) $(LDFLAGS_FOR_BUILD) -o $@ $(top_srcdir)/misc/packcc/packcc.c
 
 if USE_READCMD
 bin_PROGRAMS+= readtags
@@ -143,14 +144,13 @@ endif
 packcc_verbose = $(packcc_verbose_@AM_V@)
 packcc_verbose_ = $(packcc_verbose_@AM_DEFAULT_V@)
 packcc_verbose_0 = @echo PACKCC "    $@";
-PACKCC = $(top_builddir)/packcc$(EXEEXT)
 SUFFIXES += .peg
 .peg.c:
 	$(packcc_verbose)$(PACKCC) -i \"general.h\" -o $(top_builddir)/peg/$(*F) "$<"
 .peg.h:
 	$(packcc_verbose)$(PACKCC) -i \"general.h\" -o $(top_builddir)/peg/$(*F) "$<"
 # You cannot use $(PACKCC) as a target name here.
-$(PEG_SRCS) $(PEG_HEADS): packcc$(EXEEXT) Makefile
+$(PEG_SRCS) $(PEG_HEADS): $(PACKCC) Makefile
 dist_libctags_a_SOURCES = $(ALL_LIB_HEADS) $(ALL_LIB_SRCS)
 
 ctags_CPPFLAGS = $(libctags_a_CPPFLAGS)

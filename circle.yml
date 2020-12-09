@@ -160,6 +160,48 @@ jobs:
              # make check roundtrip CIRCLECI=1
              make units CIRCLECI=1 CATEGORIES=parser-varlink
 
+   fedora33_cross_aarch64:
+     working_directory: ~/universal-ctags
+     docker:
+       - image: docker.io/library/fedora:33
+     steps:
+       - run:
+           name: Install tools
+           command: |
+             dnf -y install git gcc autoconf automake make
+       - run:
+           name: Prepare repo file for install cross compiler
+           command: |
+             curl -o /etc/yum.repos.d/lantw44-aarch64-linux-gnu-toolchain-fedora-33.repo https://copr.fedorainfracloud.org/coprs/lantw44/aarch64-linux-gnu-toolchain/repo/fedora-33/lantw44-aarch64-linux-gnu-toolchain-fedora-33.repo
+       - run:
+           name: Install the cross compiler for aarch64
+           command: |
+             dnf -y install aarch64-linux-gnu-binutils aarch64-linux-gnu-gcc aarch64-linux-gnu-glibc
+       - checkout
+       - run:
+           name: Build ctags for aarch64
+           command: |
+             bash ./autogen.sh
+             mkdir out
+             ./configure --host=aarch64-linux-gnu \
+             --prefix=`pwd`/out \
+             --enable-static \
+             --disable-seccomp \
+             CC=/usr/bin/aarch64-linux-gnu-gcc \
+             CPP=/usr/bin/aarch64-linux-gnu-cpp \
+             AR=/usr/bin/aarch64-linux-gnu-gcc-ar \
+             RANLIB=/usr/bin/aarch64-linux-gnu-gcc-ranlib \
+             CC_FOR_BUILD=/usr/bin/gcc
+             make -j 2
+       - run:
+           name: Install locally
+           command: |
+             make install
+       - run:
+           name: Test
+           command: |
+             test -f out/bin/ctags
+
 workflows:
   version: 2
   build_and_test:
@@ -169,3 +211,4 @@ workflows:
       - fedora_distcheck
       - centos_make
       - fedora32_gmake
+      - fedora33_cross_aarch64

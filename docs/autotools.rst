@@ -68,3 +68,49 @@ To completely change the program's name run the following:
 	$ ./configure --program-transform-name='s/ctags/my_ctags/; s/etags/myemacs_tags/'
 
 Please remember there is also an 'etags' installed alongside 'ctags' which you may also want to rename as shown above.
+
+Cross-compilation
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+
+The way of cross-compilation is a bit complicated because the
+build-system of ctags uses `packcc`, a code generator written in C
+language. It means that two C compilers should be installed on you build machine;
+one for compiling `packcc`, another for compiling `ctags`.
+
+We provide two sets of configure variables to affect these two C compilers:
+`CC`, `CFLAGS`, `CPPFLAGS`, `LDFLAGS` variables affect the compiler who compiles `ctags`.
+`CC_FOR_BUILD`, `CPPFLAGS_FOR_BUILD`, `CPPFLAGS_FOR_BUILD`, `LDFLAGS_FOR_BUILD` variables
+affect the compiler who compiles `packcc`.
+
+When native-compiling, `FOO_FOR_BUILD` is the same as `FOO`.
+
+Here is an example show you how to use these configure variables:
+
+::
+
+       $ mkdir ./out
+       $ configure \
+               --host=armv7a-linux-androideabi \
+               --prefix=`pwd`/out \
+               --enable-static \
+               --disable-seccomp \
+               CC=/usr/local/opt/android-sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64/bin/armv7a-linux-androideabi21-clang \
+               CFLAGS='-v' \
+               CPP='/usr/local/opt/android-sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64/bin/armv7a-linux-androideabi21-clang -E' \
+               CPPFLAGS='-I/Users/leleliu008/.ndk-pkg/pkg/jansson/armeabi-v7a/include -I/Users/leleliu008/.ndk-pkg/pkg/libyaml/armeabi-v7a/include -I/Users/leleliu008/.ndk-pkg/pkg/libxml2/armeabi-v7a/include -I/Users/leleliu008/.ndk-pkg/pkg/libiconv/armeabi-v7a/include --sysroot /usr/local/opt/android-sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64/sysroot -Qunused-arguments -Dftello=ftell -Dfseeko=fseek' \
+               LDFLAGS='-L/Users/leleliu008/.ndk-pkg/pkg/jansson/armeabi-v7a/lib -L/Users/leleliu008/.ndk-pkg/pkg/libyaml/armeabi-v7a/lib -L/Users/leleliu008/.ndk-pkg/pkg/libxml2/armeabi-v7a/lib -L/Users/leleliu008/.ndk-pkg/pkg/libiconv/armeabi-v7a/lib --sysroot /usr/local/opt/android-sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64/sysroot' \
+               AR=/usr/local/opt/android-sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64/bin/arm-linux-androideabi-ar \
+               RANLIB=/usr/local/opt/android-sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64/bin/arm-linux-androideabi-ranlib \
+               CC_FOR_BUILD=/usr/bin/cc \
+               CFLAGS_FOR_BUILD='-v' \
+               PKG_CONFIG_PATH=/Users/leleliu008/.ndk-pkg/pkg/libiconv/armeabi-v7a/lib/pkgconfig:/Users/leleliu008/.ndk-pkg/pkg/libxml2/armeabi-v7a/lib/pkgconfig:/Users/leleliu008/.ndk-pkg/pkg/libyaml/armeabi-v7a/lib/pkgconfig:/Users/leleliu008/.ndk-pkg/pkg/jansson/armeabi-v7a/lib/pkgconfig \
+               PKG_CONFIG_LIBDIR=/Users/leleliu008/.ndk-pkg/pkg
+       ...
+       $ make
+       ...
+       $ make install
+       ...
+       $ ls out/bin
+       ctags readtags
+
+Simpler example for `aarch64-linux-gnu` can be found in `circle.yml` in the source tree.
