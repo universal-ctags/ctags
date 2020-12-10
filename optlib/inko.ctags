@@ -40,6 +40,26 @@
 --_tabledef-Inko=comment
 --_tabledef-Inko=impl
 --_tabledef-Inko=let
+--_tabledef-Inko=sstring
+--_tabledef-Inko=dstring
+--_tabledef-Inko=tstring
+
+# Handle and ignore the bodies of strings
+--_mtable-regex-Inko=toplevel/'//{tenter=sstring}
+--_mtable-regex-Inko=toplevel/"//{tenter=dstring}
+--_mtable-regex-Inko=toplevel/`//{tenter=tstring}
+
+--_mtable-regex-Inko=sstring/'//{tleave}
+--_mtable-regex-Inko=sstring/\\'//
+--_mtable-regex-Inko=sstring/.//
+
+--_mtable-regex-Inko=dstring/"//{tleave}
+--_mtable-regex-Inko=dstring/\\"//
+--_mtable-regex-Inko=dstring/.//
+
+--_mtable-regex-Inko=tstring/`//{tleave}
+--_mtable-regex-Inko=tstring/\\`//
+--_mtable-regex-Inko=tstring/.//
 
 --_mtable-regex-Inko=toplevel/#//{tenter=comment}
 --_mtable-regex-Inko=toplevel/[[:blank:]]*object[[:blank:]]+//{tenter=object}

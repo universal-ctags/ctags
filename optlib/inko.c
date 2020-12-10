@@ -18,7 +18,19 @@ static void initializeInkoParser (const langType language)
 	addLanguageRegexTable (language, "comment");
 	addLanguageRegexTable (language, "impl");
 	addLanguageRegexTable (language, "let");
+	addLanguageRegexTable (language, "sstring");
+	addLanguageRegexTable (language, "dstring");
+	addLanguageRegexTable (language, "tstring");
 
+	addLanguageTagMultiTableRegex (language, "toplevel",
+	                               "^'",
+	                               "", "", "{tenter=sstring}", NULL);
+	addLanguageTagMultiTableRegex (language, "toplevel",
+	                               "^\"",
+	                               "", "", "{tenter=dstring}", NULL);
+	addLanguageTagMultiTableRegex (language, "toplevel",
+	                               "^`",
+	                               "", "", "{tenter=tstring}", NULL);
 	addLanguageTagMultiTableRegex (language, "toplevel",
 	                               "^#",
 	                               "", "", "{tenter=comment}", NULL);
@@ -101,6 +113,33 @@ static void initializeInkoParser (const langType language)
 	                               "^=",
 	                               "", "", "{tleave}", NULL);
 	addLanguageTagMultiTableRegex (language, "let",
+	                               "^.",
+	                               "", "", "", NULL);
+	addLanguageTagMultiTableRegex (language, "sstring",
+	                               "^'",
+	                               "", "", "{tleave}", NULL);
+	addLanguageTagMultiTableRegex (language, "sstring",
+	                               "^\\\\'",
+	                               "", "", "", NULL);
+	addLanguageTagMultiTableRegex (language, "sstring",
+	                               "^.",
+	                               "", "", "", NULL);
+	addLanguageTagMultiTableRegex (language, "dstring",
+	                               "^\"",
+	                               "", "", "{tleave}", NULL);
+	addLanguageTagMultiTableRegex (language, "dstring",
+	                               "^\\\\\"",
+	                               "", "", "", NULL);
+	addLanguageTagMultiTableRegex (language, "dstring",
+	                               "^.",
+	                               "", "", "", NULL);
+	addLanguageTagMultiTableRegex (language, "tstring",
+	                               "^`",
+	                               "", "", "{tleave}", NULL);
+	addLanguageTagMultiTableRegex (language, "tstring",
+	                               "^\\\\`",
+	                               "", "", "", NULL);
+	addLanguageTagMultiTableRegex (language, "tstring",
 	                               "^.",
 	                               "", "", "", NULL);
 }
