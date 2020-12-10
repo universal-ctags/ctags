@@ -110,7 +110,7 @@ jobs:
        - run:
            name: Install build tools
            command: |
-              yum -y --enablerepo=PowerTools install python3 gcc automake autoconf pkgconfig make libxml2-devel jansson-devel libyaml-devel findutils diffutils sudo
+              yum -y --enablerepo=powertools install python3 gcc automake autoconf pkgconfig make libxml2-devel jansson-devel libyaml-devel findutils diffutils sudo
        - run:
            name: Build
            command: |
