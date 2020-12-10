@@ -89,9 +89,7 @@
 --_mtable-regex-Inko=impl/\{//{tleave}
 --_mtable-regex-Inko=impl/.//
 
---_mtable-regex-Inko=let/([A-Z][a-zA-Z0-9_]+)/\1/c/{scope=ref}
---_mtable-regex-Inko=let/=//{tleave}
---_mtable-regex-Inko=let/.//
+--_mtable-regex-Inko=let/([A-Z][a-zA-Z0-9_]+)/\1/c/{scope=ref}{tleave}
 
 --_mtable-regex-Inko=comment/\n//{tleave}
 --_mtable-regex-Inko=comment/.//
