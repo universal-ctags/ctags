@@ -1695,7 +1695,7 @@ static int processType (tokenInfo* token, int c, verilogKind* kind, bool* with)
 //       ps_class_identifier [ # ( … ) ] { :: class_identifier [ # ( … ) ] }
 static int skipClassType (tokenInfo* token, int c)
 {
-	while (c == '#' || c == ':')
+	while (c == '#' || c == ':' || c == '.')
 	{
 		if (c == '#')
 		{
@@ -1705,7 +1705,7 @@ static int skipClassType (tokenInfo* token, int c)
 				return skipToSemiColon (vGetc ());
 			c = skipPastMatch ("()");
 		}
-		else	// c == ':'
+		else if (c == ':')
 		{
 			c = skipWhite (vGetc ());
 			if (c != ':')
@@ -1718,11 +1718,24 @@ static int skipClassType (tokenInfo* token, int c)
 			if (isWordToken (c))
 				c = readWordToken (token, c);
 		}
+		else	// c == '.'
+		{
+			c = skipWhite (vGetc ());
+			if (isWordToken (c))
+				c = readWordToken (token, c);
+		}
 	}
 	return c;
 }
 
 // Tag a list of identifiers
+// data_type :: =
+//   ...
+//   | virtual [ interface ] identifier [ # ( [ ... ] ) ]  [ . identifier ]
+//   | [ class_type :: | identifier :: | $unit :: ] identifier { [ ... ] }
+//   | [ identifier :: | $unit :: ] identifier [ # ( … ) ] { :: identifier [ # ( ... ) ] }
+//   | ...
+//
 //   mayPortDecl: may be a ANSI port declaration.  true for module, interface, or program.
 static int tagIdentifierList (tokenInfo *const token, int c, verilogKind kind, bool mayPortDecl)
 {
@@ -1731,19 +1744,35 @@ static int tagIdentifierList (tokenInfo *const token, int c, verilogKind kind, b
 	verilogKind localKind;
 	bool not_used;
 
-	while (c != EOF)
+	while (c != ')' && c != EOF)	// skip empty port, "()"
 	{
 		// skip attribute_instance: (* ... *)
 		if (c == '(')
 			c = skipPastMatch ("()");
-		if (!isWordToken (c))
-			break;
 
-		c = readWordToken (token, c);
-		c = skipClassType (token, c);
-		if (c == ':' || c == ';')	// ## (cycle delay) or unexpected input
-			return c;
+		// skip port direction, "virtual", or "interface"
+		while (isWordToken (c))
+		{
+			c = readWordToken (token, c);
+			if (token->kind == K_PORT || token->kind == K_IGNORE || token->kind == K_INTERFACE)
+				mayPortDecl = false;	// now never be a non-ANSI port
+			else
+				break;
+		}
+		if (token->kind == K_IDENTIFIER)
+			c = skipClassType (token, c);
+		c = skipMacro (c, token);	// `ifdef, `else, `endif, etc.
 
+		if (isWordToken (c))
+		{
+			c = readWordToken (token, c);
+			if (token->kind == K_IDENTIFIER)
+			{
+				mayPortDecl = false;
+				c = skipClassType (token, c);
+			}
+		}
+		// aoid tagging enum and struct items
 		localKind = token->kind == K_ENUM || token->kind == K_STRUCT ? K_PORT : token->kind;
 		c = processType (token, c, &localKind, &not_used);
 
