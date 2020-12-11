@@ -761,10 +761,9 @@ static int skipToNewLine (int c)
 
 static int skipMacro (int c, tokenInfo *token)
 {
-	if (c == '`')
+	tokenInfo *localToken = newToken ();	// don't update token outside
+	while (c == '`')	// to support back-to-back compiler directives
 	{
-		tokenInfo *localToken = newToken ();	// don't update token outside
-
 		c = readWordTokenNoSkip (localToken, c);
 		/* Skip compiler directive other than `define */
 		if (localToken->kind == K_DIRECTIVE)
@@ -785,9 +784,10 @@ static int skipMacro (int c, tokenInfo *token)
 			c = skipWhite (c);
 			if (c == '(')
 				c = skipPastMatch ("()");
+			break;
 		}
-		deleteToken (localToken);
 	}
+	deleteToken (localToken);
 	return c;
 }
 
@@ -1761,7 +1761,7 @@ static int tagIdentifierList (tokenInfo *const token, int c, verilogKind kind, b
 		}
 		if (token->kind == K_IDENTIFIER)
 			c = skipClassType (token, c);
-		c = skipMacro (c, token);	// `ifdef, `else, `endif, etc.
+		c = skipMacro (c, token);	// `ifdef, `else, `endif, etc. (between identifiers)
 
 		if (isWordToken (c))
 		{
