@@ -1,17 +1,21 @@
 /*
 *   Copyright (c) 2003, Darren Hiebert
+*   Copyright (c) 2017, Vitor Antunes
+*   Copyright (c) 2020, Hiroo Hayashi
 *
 *   This source code is released for free distribution under the terms of the
 *   GNU General Public License version 2 or (at your option) any later version.
 *
-*   This module contains functions for generating tags for the Verilog HDL
-*   (Hardware Description Language).
+*   This module contains functions for generating tags for the Verilog or
+*   SystemVerilog HDL (Hardware Description Language).
 *
 *   Language definition documents:
-*       http://www.eg.bucknell.edu/~cs320/verilog/verilog-manual.html
-*       http://www.sutherland-hdl.com/on-line_ref_guide/vlog_ref_top.html
-*       http://www.verilog.com/VerilogBNF.html
-*       http://eesun.free.fr/DOC/VERILOG/verilog_manual1.html
+*       IEEE Std 1800-2017, SystemVerilog Language Reference Manual
+*          https://ieeexplore.ieee.org/document/8299595
+*       SystemVerilog IEEE Std 1800-2012 Grammer
+*          https://insights.sigasi.com/tech/systemverilog.ebnf/
+*       Verilog Formal Syntax Specification
+*          http://www.verilog.com/VerilogBNF.html
 */
 
 /*
