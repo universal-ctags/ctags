@@ -1611,8 +1611,6 @@ static int processType (tokenInfo* token, int c, verilogKind* kind, bool* with)
 	*with = false;
 	do
 	{
-		if (c == '.')	// interface_identifier .
-			c = skipWhite (vGetc ());
 		c = skipDimension (c);
 		c = skipDelay (token, c);	// class parameter #(...)
 		if (c == '{')	// skip enum, struct, or union member
@@ -1675,6 +1673,7 @@ static int processType (tokenInfo* token, int c, verilogKind* kind, bool* with)
 
 // class_type ::=
 //       ps_class_identifier [ # ( … ) ] { :: class_identifier [ # ( … ) ] }
+// "interface_identifier ." is also handled
 static int skipClassType (tokenInfo* token, int c)
 {
 	while (c == '#' || c == ':' || c == '.')
@@ -1700,7 +1699,7 @@ static int skipClassType (tokenInfo* token, int c)
 			if (isWordToken (c))
 				c = readWordToken (token, c);
 		}
-		else	// c == '.'
+		else	// c == '.' : interface_identifier .
 		{
 			c = skipWhite (vGetc ());
 			if (isWordToken (c))
