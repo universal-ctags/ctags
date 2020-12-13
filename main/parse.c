@@ -1369,6 +1369,7 @@ struct GetLanguageRequest {
 	enum { GLR_OPEN, GLR_DISCARD, GLR_REUSE, } type;
 	const char *const fileName;
 	MIO *mio;
+	time_t mtime;
 };
 
 static langType
@@ -1466,7 +1467,13 @@ getFileLanguageForRequestInternal (struct GetLanguageRequest *req)
 
   cleanup:
 	if (req->type == GLR_OPEN && glc.input)
+	{
 		req->mio = mio_ref (glc.input);
+		if (!fstatus)
+			fstatus = eStat (fileName);
+		if (fstatus)
+			req->mtime = fstatus->mtime;
+	}
     GLC_FCLOSE(&glc);
     if (fstatus)
 	    eStatFree (fstatus);
@@ -1516,6 +1523,7 @@ extern langType getLanguageForFilenameAndContents (const char *const fileName)
 	struct GetLanguageRequest req = {
 		.type = GLR_DISCARD,
 		.fileName = fileName,
+		.mtime = (time_t)0,
 	};
 
 	return getFileLanguageForRequest (&req);
@@ -3917,14 +3925,14 @@ extern bool runParserInNarrowedInputStream (const langType language,
 
 static bool createTagsWithFallback (
 	const char *const fileName, const langType language,
-	MIO *mio, bool *failureInOpenning)
+	MIO *mio, time_t mtime, bool *failureInOpenning)
 {
 	langType exclusive_subparser = LANG_IGNORE;
 	bool tagFileResized = false;
 
 	Assert (0 <= language  &&  language < (int) LanguageCount);
 
-	if (!openInputFile (fileName, language, mio))
+	if (!openInputFile (fileName, language, mio, mtime))
 	{
 		*failureInOpenning = true;
 		return false;
@@ -4081,7 +4089,7 @@ extern bool parseFile (const char *const fileName)
 	return bRet;
 }
 
-static bool parseMio (const char *const fileName, langType language, MIO* mio, bool useSourceFileTagPath,
+static bool parseMio (const char *const fileName, langType language, MIO* mio, time_t mtime, bool useSourceFileTagPath,
 					  void *clientData)
 {
 	bool tagFileResized = false;
@@ -4093,7 +4101,7 @@ static bool parseMio (const char *const fileName, langType language, MIO* mio, b
 
 	initParserTrashBox ();
 
-	tagFileResized = createTagsWithFallback (fileName, language, mio, &failureInOpenning);
+	tagFileResized = createTagsWithFallback (fileName, language, mio, mtime, &failureInOpenning);
 
 	finiParserTrashBox ();
 
@@ -4115,6 +4123,7 @@ extern bool parseFileWithMio (const char *const fileName, MIO *mio,
 		.fileName = fileName,
 		.mio = mio,
 	};
+	memset (&req.mtime, 0, sizeof (req.mtime));
 
 	language = getFileLanguageForRequest (&req);
 	Assert (language != LANG_AUTO);
@@ -4139,7 +4148,7 @@ extern bool parseFileWithMio (const char *const fileName, MIO *mio,
 		/* TODO: checkUTF8BOM can be used to update the encodings. */
 		openConverter (getLanguageEncoding (language), Option.outputEncoding);
 #endif
-		tagFileResized = parseMio (fileName, language, req.mio, true, clientData);
+		tagFileResized = parseMio (fileName, language, req.mio, req.mtime, true, clientData);
 		if (Option.filter && ! Option.interactive)
 			closeTagFile (tagFileResized);
 		addTotals (1, 0L, 0L);
@@ -4164,7 +4173,7 @@ extern bool parseRawBuffer(const char *fileName, unsigned char *buffer,
 	if (buffer)
 		mio = mio_new_memory (buffer, bufferSize, NULL, NULL);
 
-	r = parseMio (fileName, language, mio, false, clientData);
+	r = parseMio (fileName, language, mio, (time_t)0, false, clientData);
 
 	if (buffer)
 		mio_unref (mio);

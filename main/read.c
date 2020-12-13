@@ -680,7 +680,7 @@ static void rewindInputFile (inputFile *f)
  *  fails, it will display an error message and leave the File.mio set to NULL.
  */
 extern bool openInputFile (const char *const fileName, const langType language,
-			      MIO *mio)
+			      MIO *mio, time_t mtime)
 {
 	const char *const openMode = "rb";
 	bool opened = false;
@@ -726,7 +726,7 @@ extern bool openInputFile (const char *const fileName, const langType language,
 		opened = true;
 
 		if (File.mio == mio)
-			memset (&File.mtime, 0, sizeof (File.mtime));
+			File.mtime = mtime;
 
 		File.bomFound = checkUTF8BOM (File.mio, true);
 

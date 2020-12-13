@@ -52,7 +52,7 @@ extern void freeInputFileResources (void);
    argument. If the 3rd argument is NULL, openInputFile calls getMio
    internally. The 3rd argument is introduced for reusing mio object
    created in parser guessing stage. */
-extern bool openInputFile (const char *const fileName, const langType language, MIO *mio);
+extern bool openInputFile (const char *const fileName, const langType language, MIO *mio, time_t mtime);
 extern MIO *getMio (const char *const fileName, const char *const openMode,
 				    bool memStreamRequired);
 extern void resetInputFile (const langType language);
