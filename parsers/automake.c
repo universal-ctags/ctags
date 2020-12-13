@@ -34,6 +34,7 @@ typedef enum {
 	K_AM_SCRIPT,
 	K_AM_DATA,
 	K_AM_CONDITION,
+	K_AM_SUBDIR,
 } makeAMKind;
 
 typedef enum {
@@ -83,6 +84,7 @@ static kindDefinition AutomakeKinds [] = {
 	  ATTACH_SEPARATORS(AutomakeSeparators) },
 	{ true, 'c', "condition", "conditions",
 	  .referenceOnly = true, ATTACH_ROLES(AutomakeConditionRoles) },
+	{ true, 's', "subdir", "subdirs" },
 };
 
 struct sBlacklist {
@@ -101,6 +103,7 @@ struct sAutomakeSubparser {
 
 	hashTable* directories;
 	int index;
+	bool in_subdirs;
 };
 
 
@@ -208,6 +211,11 @@ static void valueCallback (makeSubparser *make, char *name)
 		elt.extensionFields.scopeIndex = p;
 		makeTagEntry (&elt);
 	}
+	else if (automake->in_subdirs)
+	{
+		initTagEntry (&elt, name, K_AM_SUBDIR);
+		makeTagEntry (&elt);
+	}
 }
 
 static void refCondtionAM (vString *directive)
@@ -266,9 +274,16 @@ static void newMacroCallback (makeSubparser *make, char* name, bool with_define_
 	struct sAutomakeSubparser *automake = (struct sAutomakeSubparser *)make;
 
 	automake->index = CORK_NIL;
+	automake->in_subdirs = false;
 
 	if (with_define_directive)
 		return;
+
+	if (strcmp (name, "SUBDIRS") == 0)
+	{
+		automake->in_subdirs = true;
+		return;
+	}
 
 	(void)(0
 	       || automakeMakeTag (automake,
@@ -301,6 +316,7 @@ static void inputStart (subparser *s)
 
 	automake->directories = hashTableNew (11, hashCstrhash, hashCstreq, eFree, eFree);
 	automake->index = CORK_NIL;
+	automake->in_subdirs = false;
 }
 
 static void inputEnd (subparser *s)
