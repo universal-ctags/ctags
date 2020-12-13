@@ -179,17 +179,44 @@ module ifdef_in_port (
 
 endmodule
 
+typedef logic user_t;
 module define_in_port (
-    input logic a,
+    input user_t a,
 `define FOO
-    input logic b,
+    input user_t b,
 `define BAR
 `ifdef FOO
-        input logic c1,
+        input user_t c1,
 `elsif BAZ
-        input logic d2,
+        input user_t c2,
 `else
-        input logic c3
+        input user_t c3,c4,
+`endif
+`ifdef FOO
+        output user_t d1 ,
+`else
+        output user_t d2
+`endif
+);
+
+endmodule
+
+module define_in_port_messy (
+    input user_t a
+`define FOO
+    ,input user_t b
+`define BAR
+`ifdef FOO
+        ,input user_t c1
+`elsif BAZ
+        ,input user_t c2
+`else
+        ,input user_t c3 , c4
+`endif
+`ifdef FOO
+        , output user_t d1
+`else
+        , output user_t d2
 `endif
 );
 

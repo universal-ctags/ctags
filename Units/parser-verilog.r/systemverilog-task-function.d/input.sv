@@ -102,4 +102,6 @@ class func_test;
     uvm_resource_db#(bit)::set({"REG::", get_full_name()}, "NO_REG_TESTS", 1);
   endfunction
 
+  function void foo (inout bar::type_t baz);
+  endfunction
 endclass

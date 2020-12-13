@@ -34,14 +34,29 @@ b1	input.sv	/^        input logic b1,$/;"	p	module:ifdef_in_port
 b2	input.sv	/^        input logic b2,$/;"	p	module:ifdef_in_port
 b3	input.sv	/^        input logic b3,$/;"	p	module:ifdef_in_port
 c	input.sv	/^    input logic c$/;"	p	module:ifdef_in_port
+user_t	input.sv	/^typedef logic user_t;$/;"	T
 define_in_port	input.sv	/^module define_in_port ($/;"	m
-a	input.sv	/^    input logic a,$/;"	p	module:define_in_port
+a	input.sv	/^    input user_t a,$/;"	p	module:define_in_port
 FOO	input.sv	/^`define FOO$/;"	c	module:define_in_port
-b	input.sv	/^    input logic b,$/;"	p	module:define_in_port
+b	input.sv	/^    input user_t b,$/;"	p	module:define_in_port
 BAR	input.sv	/^`define BAR$/;"	c	module:define_in_port
-c1	input.sv	/^        input logic c1,$/;"	p	module:define_in_port
-d2	input.sv	/^        input logic d2,$/;"	p	module:define_in_port
-c3	input.sv	/^        input logic c3$/;"	p	module:define_in_port
+c1	input.sv	/^        input user_t c1,$/;"	p	module:define_in_port
+c2	input.sv	/^        input user_t c2,$/;"	p	module:define_in_port
+c3	input.sv	/^        input user_t c3,c4,$/;"	p	module:define_in_port
+c4	input.sv	/^        input user_t c3,c4,$/;"	p	module:define_in_port
+d1	input.sv	/^        output user_t d1 ,$/;"	p	module:define_in_port
+d2	input.sv	/^        output user_t d2$/;"	p	module:define_in_port
+define_in_port_messy	input.sv	/^module define_in_port_messy ($/;"	m
+FOO	input.sv	/^`define FOO$/;"	c	module:define_in_port_messy
+a	input.sv	/^    input user_t a$/;"	p	module:define_in_port_messy
+BAR	input.sv	/^`define BAR$/;"	c	module:define_in_port_messy
+b	input.sv	/^    ,input user_t b$/;"	p	module:define_in_port_messy
+c1	input.sv	/^        ,input user_t c1$/;"	p	module:define_in_port_messy
+c2	input.sv	/^        ,input user_t c2$/;"	p	module:define_in_port_messy
+c3	input.sv	/^        ,input user_t c3 , c4$/;"	p	module:define_in_port_messy
+c4	input.sv	/^        ,input user_t c3 , c4$/;"	p	module:define_in_port_messy
+d1	input.sv	/^        , output user_t d1$/;"	p	module:define_in_port_messy
+d2	input.sv	/^        , output user_t d2$/;"	p	module:define_in_port_messy
 MY_DEFINE	input.sv	/^`define MY_DEFINE$/;"	c
 assert_clk	input.sv	/^`define assert_clk(arg, __clk=clk, __rst_n=rst_n) \\$/;"	c
 forSkipMacro	input.sv	/^module forSkipMacro;$/;"	m
