@@ -60,6 +60,11 @@ readonly _NOISE_REPORT_MAX_COLUMN=50
 readonly _VALIDATION_EXIT_INVALID=2
 readonly _NOOP_VALIDATOR="NONE"
 readonly _KNOWN_INVALIDATION_VALIDATOR="KNOWN-INVALIDATION"
+if stat --help >/dev/null 2>&1; then
+    readonly _FSIZE="stat -c %s" # GNU coreutils
+else
+    readonly _FSIZE="stat -f %z" # BSD based OSes including macOS
+fi
 
 _RUNNABLE_VALIDATORS=
 _UNAVAILABLE_VALIDATORS=
@@ -1394,7 +1399,7 @@ shrink_main ()
 	fi
     fi
 
-    len=$(stat -c %s "${input}")
+    len=$(${_FSIZE} "${input}")
 
     if shrink_test "${cmdline}" "${input}" 0 "${len}" "${output}"; then
 	printf "the target command line exits normally against the original input\n" 1>&2
@@ -1863,7 +1868,7 @@ noise_lang_file ()
 
     local cmdline
     local cmdline_for_shirking
-    local len=$(stat -c %s "${input}")
+    local len=$(${_FSIZE} "${input}")
     local r
     local i
     local c
@@ -2400,7 +2405,7 @@ chop_lang_file ()
     local r
     local cmdline
     local cmdline_for_shirking
-    local len=$(stat -c %s "${input}")
+    local len=$(${_FSIZE} "${input}")
 
     local guessed_lang
     guessed_lang=$( ${_CMDLINE_FOR_SHRINKING} --print-language "${input}" 2>/dev/null | sed -n 's/^.*: //p')
