@@ -1877,7 +1877,7 @@ extern void findRegexTags (void)
 	findRegexTagsMainloop (fileReadLineDriver);
 }
 
-static bool hasScopeActionInRegex0(ptrArray *entries)
+static bool doesExpectCorkInRegex0(ptrArray *entries)
 {
 	for (unsigned int i = 0; i < ptrArrayCount(entries); i++)
 	{
@@ -1889,18 +1889,18 @@ static bool hasScopeActionInRegex0(ptrArray *entries)
 	return false;
 }
 
-extern bool hasScopeActionInRegex (struct lregexControlBlock *lcb)
+extern bool doesExpectCorkInRegex (struct lregexControlBlock *lcb)
 {
 	ptrArray *entries;
 
 	entries = lcb->entries[REG_PARSER_SINGLE_LINE];
-	if (hasScopeActionInRegex0 (entries))
+	if (doesExpectCorkInRegex0 (entries))
 		return true;
 
 	for (unsigned int i = 0; i < ptrArrayCount(lcb->tables); i++)
 	{
 		struct regexTable *table = ptrArrayItem(lcb->tables, i);
-		if (hasScopeActionInRegex0 (table->entries))
+		if (doesExpectCorkInRegex0 (table->entries))
 			return true;
 	}
 

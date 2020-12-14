@@ -55,7 +55,7 @@ extern void addTagMultiTableRegex(struct lregexControlBlock *lcb,
 								  bool *disabled);
 
 extern bool matchRegex (struct lregexControlBlock *lcb, const vString* const line);
-extern bool hasScopeActionInRegex (struct lregexControlBlock *lcb);
+extern bool doesExpectCorkInRegex (struct lregexControlBlock *lcb);
 extern void addCallbackRegex (struct lregexControlBlock *lcb,
 							  const char* const regex,
 							  const char* const flags,
