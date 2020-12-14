@@ -40,6 +40,26 @@
 --_tabledef-Inko=comment
 --_tabledef-Inko=impl
 --_tabledef-Inko=let
+--_tabledef-Inko=sstring
+--_tabledef-Inko=dstring
+--_tabledef-Inko=tstring
+
+# Handle and ignore the bodies of strings
+--_mtable-regex-Inko=toplevel/'//{tenter=sstring}
+--_mtable-regex-Inko=toplevel/"//{tenter=dstring}
+--_mtable-regex-Inko=toplevel/`//{tenter=tstring}
+
+--_mtable-regex-Inko=sstring/'//{tleave}
+--_mtable-regex-Inko=sstring/\\'//
+--_mtable-regex-Inko=sstring/.//
+
+--_mtable-regex-Inko=dstring/"//{tleave}
+--_mtable-regex-Inko=dstring/\\"//
+--_mtable-regex-Inko=dstring/.//
+
+--_mtable-regex-Inko=tstring/`//{tleave}
+--_mtable-regex-Inko=tstring/\\`//
+--_mtable-regex-Inko=tstring/.//
 
 --_mtable-regex-Inko=toplevel/#//{tenter=comment}
 --_mtable-regex-Inko=toplevel/[[:blank:]]*object[[:blank:]]+//{tenter=object}
@@ -69,9 +89,7 @@
 --_mtable-regex-Inko=impl/\{//{tleave}
 --_mtable-regex-Inko=impl/.//
 
---_mtable-regex-Inko=let/([A-Z][a-zA-Z0-9_]+)/\1/c/{scope=ref}
---_mtable-regex-Inko=let/=//{tleave}
---_mtable-regex-Inko=let/.//
+--_mtable-regex-Inko=let/([A-Z][a-zA-Z0-9_]+)/\1/c/{scope=ref}{tleave}
 
 --_mtable-regex-Inko=comment/\n//{tleave}
 --_mtable-regex-Inko=comment/.//

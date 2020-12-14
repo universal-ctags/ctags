@@ -1,0 +1,29 @@
+.. _ctags_lang-inko(7):
+
+======================================================================
+ctags-lang-inko
+======================================================================
+
+:Version: @VERSION@
+:Manual group: Universal-ctags
+:Manual section: 7
+
+SYNOPSIS
+--------
+|	**@CTAGS_NAME_EXECUTABLE@** ... --languages=+Inko ...
+|	**@CTAGS_NAME_EXECUTABLE@** ... --language-force=Inko ...
+|	**@CTAGS_NAME_EXECUTABLE@** ... --map-Inko=+.inko ...
+
+DESCRIPTION
+-----------
+This man page describes the Inko parser for Universal-ctags.
+
+The input file is expected to be valid Inko source code, otherwise the output of
+ctags is undefined.
+
+Tags are generated for objects, traits, methods, attributes, and constants.
+String literals are ignored.
+
+SEE ALSO
+--------
+ctags(1), ctags-client-tools(7)

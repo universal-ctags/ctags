@@ -1,0 +1,12 @@
+'foo'
+'let A = 10'
+'object B {}'
+'trait C {}'
+"trait D {}"
+
+'foo \' object AA {}'
+"foo \" object AA {}"
+
+`trait Hello {}`
+
+object Foo {}

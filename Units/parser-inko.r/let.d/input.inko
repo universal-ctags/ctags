@@ -1,2 +1,3 @@
 let FOO = 10
 let BAR = 20
+let foo: Bla = 30
