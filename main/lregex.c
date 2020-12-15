@@ -364,7 +364,7 @@ static void initRegexTag (tagEntryInfo *e,
  * Returns pointer to terminating separator.  Works in place.  Null
  * terminates name string.
  */
-static char* scanSeparators (char* name, enum regexParserType regptype)
+static char* scanSeparators (char* name, bool multiline)
 {
 	char sep = name [0];
 	char *copyto = name;
@@ -378,9 +378,7 @@ static char* scanSeparators (char* name, enum regexParserType regptype)
 				*copyto++ = sep;
 			else if (*name == 't')
 				*copyto++ = '\t';
-			else if ((regptype == REG_PARSER_MULTI_LINE
-					  || (regptype == REG_PARSER_MULTI_TABLE))
-					 && *name == 'n')
+			else if (multiline && *name == 'n')
 				*copyto++ = '\n';
 			else
 			{
@@ -420,7 +418,8 @@ static bool parseTagRegex (
 	bool result = false;
 	const int separator = (unsigned char) regexp [0];
 
-	*name = scanSeparators (regexp, regptype);
+	*name = scanSeparators (regexp, (regptype == REG_PARSER_MULTI_LINE
+									 || regptype == REG_PARSER_MULTI_TABLE));
 	if (*regexp == '\0')
 		error (WARNING, "empty regexp");
 	else if (**name != separator)
