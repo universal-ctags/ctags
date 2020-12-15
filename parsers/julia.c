@@ -1279,6 +1279,7 @@ static void parseExpr (lexerState *lexer, bool delim, int kind, vString *scope)
 {
     int level = 1;
     size_t old_scope_len;
+    vString *local_scope;
 
     while (lexer->cur_token != TOKEN_EOF)
     {
@@ -1316,14 +1317,28 @@ static void parseExpr (lexerState *lexer, bool delim, int kind, vString *scope)
                 parseImport(lexer, scope, kind);
                 break;
             case TOKEN_IDENTIFIER:
-                skipWhitespace(lexer, false);
-                if (lexer->first_token && lexer->cur_c == '(')
+                if (lexer->first_token && lexer->cur_c == '.')
                 {
-                    parseShortFunction(lexer, scope, kind);
+                    local_scope = vStringNewCopy(lexer->token_str);
+                    advanceChar(lexer);
+                    advanceToken(lexer, true);
+                    skipWhitespace(lexer, false);
+                    if (lexer->cur_c == '(')
+                    {
+                        parseShortFunction(lexer, local_scope, K_MODULE);
+                    }
                 }
                 else
                 {
-                    advanceToken(lexer, true);
+                    skipWhitespace(lexer, false);
+                    if (lexer->first_token && lexer->cur_c == '(')
+                    {
+                        parseShortFunction(lexer, scope, kind);
+                    }
+                    else
+                    {
+                        advanceToken(lexer, true);
+                    }
                 }
                 break;
             case TOKEN_OPEN_BLOCK:
