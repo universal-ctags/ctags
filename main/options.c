@@ -579,6 +579,7 @@ static struct Feature {
 	/* The test harnesses use this as hints for skipping test cases */
 	{"packcc", "has peg based parser(s)"},
 #endif
+	{"optscript", "can use the interpreter"},
 	{NULL,}
 };
 

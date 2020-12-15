@@ -1,0 +1,11 @@
+--langdef=hello
+--kinddef-hello=d,def,definitions
+--map-hello=+.hello
+
+--regex-hello=/^def ([a-z]+):$/\1/d/{{
+	(world)
+}}
+
+--regex-hello=/^end//{{
+	(hello) pstack
+}}

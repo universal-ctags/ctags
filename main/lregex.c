@@ -35,6 +35,7 @@
 #include "htable.h"
 #include "kind.h"
 #include "options.h"
+#include "optscript.h"
 #include "parse_p.h"
 #include "promise.h"
 #include "read.h"
@@ -172,6 +173,9 @@ typedef struct {
 		char *message_string;
 	} message;
 
+	char *optscript_src;
+	EsObject *optscript;
+
 	int refcount;
 } regexPattern;
 
@@ -215,12 +219,16 @@ struct lregexControlBlock {
 
 	struct guestRequest *guest_req;
 
+	EsObject *local_dict;
+
 	langType owner;
 };
 
 /*
 *   DATA DEFINITIONS
 */
+static OptVM *optvm;
+static EsObject *lregex_dict = es_nil;
 
 /*
 *   FUNCTION DEFINITIONS
@@ -236,6 +244,8 @@ static void   guestRequestDelete (struct guestRequest *);
 static bool   guestRequestIsFilled(struct guestRequest *);
 static void   guestRequestClear (struct guestRequest *);
 static void   guestRequestSubmit (struct guestRequest *);
+
+static EsObject* optscriptRun (OptVM *vm, EsObject *optscript);
 
 static void deleteTable (void *ptrn)
 {
@@ -285,6 +295,11 @@ static void deletePattern (regexPattern *p)
 	if (p->anonymous_tag_prefix)
 		eFree (p->anonymous_tag_prefix);
 
+	if (p->optscript)
+		es_object_unref (p->optscript);
+	if (p->optscript_src)
+		eFree (p->optscript_src);
+
 	eFree (p);
 }
 
@@ -304,6 +319,7 @@ extern struct lregexControlBlock* allocLregexControlBlock (parserDefinition *par
 	lcb->tables = ptrArrayNew(deleteTable);
 	lcb->tstack = ptrArrayNew(NULL);
 	lcb->guest_req = guestRequestNew ();
+	lcb->local_dict = es_nil;
 	lcb->owner = parser->id;
 
 	return lcb;
@@ -326,6 +342,9 @@ extern void freeLregexControlBlock (struct lregexControlBlock* lcb)
 
 	guestRequestDelete (lcb->guest_req);
 	lcb->guest_req = NULL;
+
+	es_object_unref (lcb->local_dict);
+	lcb->local_dict = es_nil;
 
 	eFree (lcb);
 }
@@ -603,6 +622,10 @@ static regexPattern * newPattern (regex_t* const pattern,
 
 	ptrn->u.tag.roleBits = 0;
 	ptrn->refcount = 1;
+
+	ptrn->optscript = NULL;
+	ptrn->optscript_src = NULL;
+
 	return ptrn;
 }
 
@@ -1218,6 +1241,20 @@ static void setKind(regexPattern * ptrn, const langType owner,
 	}
 }
 
+static EsObject *makeOptscriptObject (OptVM *vm, const char *src)
+{
+	size_t len = strlen (src);
+	Assert (len > 2);
+	Assert (src[len - 1] == '}');
+	Assert (src[len - 2] == '}');
+	MIO *mio = mio_new_memory ((unsigned char *)src + 1, len - 1 -1, NULL, NULL);
+	EsObject *obj = opt_vm_read (vm, mio);
+	if (es_error_p (obj))
+		error (FATAL, "failed in loading an optscript: %s", src);
+	mio_unref (mio);
+	return obj;
+}
+
 static void patternEvalFlags (struct lregexControlBlock *lcb,
 							  regexPattern * ptrn,
 							  enum regexParserType regptype,
@@ -1232,7 +1269,12 @@ static void patternEvalFlags (struct lregexControlBlock *lcb,
 	if (regptype == REG_PARSER_SINGLE_LINE)
 		flagsEval (flags, prePtrnFlagDef, ARRAY_SIZE(prePtrnFlagDef), &ptrn->exclusive);
 
-	flagsEval (flags, commonSpecFlagDef, ARRAY_SIZE(commonSpecFlagDef), &commonFlagData);
+	const char * optscript = flagsEval (flags, commonSpecFlagDef, ARRAY_SIZE(commonSpecFlagDef), &commonFlagData);
+	if (optscript)
+	{
+		ptrn->optscript = makeOptscriptObject (optvm, optscript);
+		ptrn->optscript_src = eStrdup (optscript);
+	}
 
 	if (regptype == REG_PARSER_SINGLE_LINE || regptype == REG_PARSER_MULTI_TABLE)
 		flagsEval (flags, scopePtrnFlagDef, ARRAY_SIZE(scopePtrnFlagDef), &ptrn->scopeActions);
@@ -1478,6 +1520,12 @@ static void fillEndLineFieldOfUpperScopes (struct lregexControlBlock *lcb, unsig
 	}
 }
 
+static bool hasNameSlot (const regexPattern* const patbuf)
+{
+	return (patbuf->u.tag.name_pattern[0] != '\0'
+			|| patbuf->anonymous_tag_prefix);
+}
+
 static void matchTagPattern (struct lregexControlBlock *lcb,
 		const char* line,
 		const regexPattern* const patbuf,
@@ -1601,6 +1649,17 @@ static void matchTagPattern (struct lregexControlBlock *lcb,
 	if (patbuf->scopeActions & SCOPE_PUSH)
 		lcb->currentScope = n;
 
+	if (n != CORK_NIL)
+	{
+		if (patbuf->optscript)
+		{
+			EsObject *e = optscriptRun (optvm, patbuf->optscript);
+			if (es_error_p (e))
+				error (WARNING, "error when evaluating: %s", patbuf->optscript_src);
+			es_object_unref (e);
+		}
+	}
+
 	vStringDelete (name);
 }
 
@@ -1713,6 +1772,28 @@ static bool fillGuestRequest (const char *start,
 	return guestRequestIsFilled (guest_req);
 }
 
+static EsObject*
+optscriptRun (OptVM *vm, EsObject *optscript)
+{
+	static EsObject *exec = es_nil;
+
+	if (es_null (exec))
+	{
+		MIO *mio = mio_new_memory ((unsigned char*)"//exec", 6, NULL, NULL);
+		exec = opt_vm_read (vm, mio);
+		if (es_error_p (exec))
+			error (FATAL, "failed in converting //exec to an optscript object");
+		mio_unref (mio);
+	}
+
+	EsObject *o = opt_vm_eval (vm, optscript);
+	if (es_error_p (o))
+		error (FATAL, "failed to push the proc representing the script");
+	es_object_unref (o);
+
+	return opt_vm_eval (vm, exec);
+}
+
 static bool matchRegexPattern (struct lregexControlBlock *lcb,
 							   const vString* const line,
 							   regexTableEntry *entry)
@@ -1732,6 +1813,13 @@ static bool matchRegexPattern (struct lregexControlBlock *lcb,
 	{
 		result = true;
 		entry->statistics.match++;
+		if (patbuf->optscript && (! hasNameSlot (patbuf)))
+		{
+			EsObject *e = optscriptRun (optvm, patbuf->optscript);
+			if (es_error_p (e))
+				error (WARNING, "error when evaluating: %s", patbuf->optscript_src);
+			es_object_unref (e);
+		}
 
 		if (hasMessage(patbuf))
 			printMessage(lcb->owner, patbuf, 0, vStringValue (line), pmatch);
@@ -1806,6 +1894,14 @@ static bool matchMultilineRegexPattern (struct lregexControlBlock *lcb,
 				 - start;
 
 		entry->statistics.match++;
+		if (patbuf->optscript && (! hasNameSlot (patbuf)))
+		{
+			EsObject *e = optscriptRun (optvm, patbuf->optscript);
+			if (es_error_p (e))
+				error (WARNING, "error when evaluating: %s", patbuf->optscript_src);
+			es_object_unref (e);
+		}
+
 		if (patbuf->type == PTRN_TAG)
 		{
 			matchTagPattern (lcb, current, patbuf, pmatch, offset);
@@ -1884,10 +1980,22 @@ extern void notifyRegexInputStart (struct lregexControlBlock *lcb)
 
 	ptrArrayClear (lcb->tstack);
 	guestRequestClear (lcb->guest_req);
+
+	if (es_null (lregex_dict))
+	{
+		lregex_dict = opt_dict_new (17);
+	}
+	opt_vm_dstack_push (optvm, lregex_dict);
+
+	if (es_null (lcb->local_dict))
+		lcb->local_dict = opt_dict_new (23);
+	opt_vm_dstack_push (optvm, lcb->local_dict);
 }
 
 extern void notifyRegexInputEnd (struct lregexControlBlock *lcb)
 {
+	opt_vm_clear (optvm);
+	opt_dict_clear (lcb->local_dict);
 	unsigned long endline = getInputLineNumber ();
 	fillEndLineFieldOfUpperScopes (lcb, endline);
 }
@@ -1915,7 +2023,9 @@ static bool doesExpectCorkInRegex0(ptrArray *entries)
 	{
 		regexTableEntry *entry = ptrArrayItem(entries, i);
 		Assert (entry && entry->pattern);
-		if (entry->pattern->scopeActions)
+		if (entry->pattern->scopeActions
+			|| entry->pattern->optscript
+			)
 			return true;
 	}
 	return false;
@@ -2063,6 +2173,7 @@ static regexPattern *addTagRegexInternal (struct lregexControlBlock *lcb,
 			|| rptr->anonymous_tag_prefix
 			|| regptype == REG_PARSER_MULTI_TABLE
 			|| rptr->guest.lang.type != GUEST_LANG_UNKNOWN
+			|| rptr->optscript
 			)
 			rptr->accept_empty_name = true;
 		else
@@ -2268,7 +2379,8 @@ extern void printMultitableRegexFlags (bool withListHeader, bool machinable, FIL
 
 extern void freeRegexResources (void)
 {
-	/* TODO: SHOULD BE REMOVED */
+	es_object_unref (lregex_dict);
+	opt_vm_delete (optvm);
 }
 
 extern bool regexNeedsMultilineBuffer (struct lregexControlBlock *lcb)
@@ -2499,6 +2611,13 @@ static struct regexTable * matchMultitableRegexTable (struct lregexControlBlock 
 		if (match == 0)
 		{
 			entry->statistics.match++;
+			if (ptrn->optscript && (! hasNameSlot (ptrn)))
+			{
+				EsObject *e = optscriptRun (optvm, ptrn->optscript);
+				if (es_error_p (e))
+					error (WARNING, "error when evaluating: %s", ptrn->optscript_src);
+				es_object_unref (e);
+			}
 
 			if (ptrn->type == PTRN_TAG)
 			{
@@ -2821,5 +2940,19 @@ extern bool checkRegex (void)
 	/* We are using bundled regex engine. */
 	regexAvailable = true;
 #endif
+
+	if (regexAvailable)
+	{
+		MIO *in  = mio_new_fp (stdin, NULL);
+		MIO *out = mio_new_fp (stdout, NULL);
+		MIO *err = mio_new_fp (stderr, NULL);
+
+		optvm = opt_vm_new (in, out, err);
+
+		mio_unref (err);
+		mio_unref (out);
+		mio_unref (in);
+	}
+
 	return regexAvailable;
 }
