@@ -435,9 +435,27 @@ static bool parseTagRegex (
 		{
 			/*
 			 * first----------V third------------V
-			 * --regex-<LANG>=/regexp/replacement/[kind-spec/][flags]
+			 * --regex-<LANG>=/regexp/replacement/[kind-spec/][flags][{{\n...\n}}]
 			 * second----------------^ fourth---------------^
 			 */
+
+			/*
+			 * The following code assumes "{{\n" is never used in flags.
+			 * If the input comes from the command line or an optlib file,
+			 * this assumption is always correct; a new line character is never
+			 * put at the middle (or end) of the input.
+			 *
+			 * TODO: How about the input comes from the source code translated
+			 * by optlib2c?
+			 */
+			char *script = strstr (third, "{{\n");
+			if (script)
+			{
+				/* The script part should not be unescaed by scanSeparators().
+				 * By spitting the string, we can hide the script part from
+				 * scanSeparators(). */
+				script [0] = '\0';
+			}
 
 			char* const fourth = scanSeparators (third, false);
 			if (*fourth == separator)
@@ -451,6 +469,21 @@ static bool parseTagRegex (
 				*flags = third;
 				*kinds = NULL;
 			}
+
+			if (script)
+			{
+				Assert (*flags);
+
+				char *end = *flags + strlen (*flags);
+				script [0] = '{';
+				if (end != script)
+				{
+					size_t len = strlen (script);
+					memmove (end, script, len);
+					end [len] = '\0';
+				}
+			}
+
 			result = true;
 		}
 	}
