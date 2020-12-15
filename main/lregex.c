@@ -245,7 +245,9 @@ static bool   guestRequestIsFilled(struct guestRequest *);
 static void   guestRequestClear (struct guestRequest *);
 static void   guestRequestSubmit (struct guestRequest *);
 
+static void optscriptSetup (OptVM *vm, struct lregexControlBlock *lcb, int corkIndex);
 static EsObject* optscriptRun (OptVM *vm, EsObject *optscript);
+static void optscriptTeardown (OptVM *vm, struct lregexControlBlock *lcb);
 
 static void deleteTable (void *ptrn)
 {
@@ -1653,10 +1655,12 @@ static void matchTagPattern (struct lregexControlBlock *lcb,
 	{
 		if (patbuf->optscript)
 		{
+			optscriptSetup (optvm, lcb, n);
 			EsObject *e = optscriptRun (optvm, patbuf->optscript);
 			if (es_error_p (e))
 				error (WARNING, "error when evaluating: %s", patbuf->optscript_src);
 			es_object_unref (e);
+			optscriptTeardown (optvm, lcb);
 		}
 	}
 
@@ -1815,10 +1819,12 @@ static bool matchRegexPattern (struct lregexControlBlock *lcb,
 		entry->statistics.match++;
 		if (patbuf->optscript && (! hasNameSlot (patbuf)))
 		{
+			optscriptSetup (optvm, lcb, CORK_NIL);
 			EsObject *e = optscriptRun (optvm, patbuf->optscript);
 			if (es_error_p (e))
 				error (WARNING, "error when evaluating: %s", patbuf->optscript_src);
 			es_object_unref (e);
+			optscriptTeardown (optvm, lcb);
 		}
 
 		if (hasMessage(patbuf))
@@ -1896,10 +1902,12 @@ static bool matchMultilineRegexPattern (struct lregexControlBlock *lcb,
 		entry->statistics.match++;
 		if (patbuf->optscript && (! hasNameSlot (patbuf)))
 		{
+			optscriptSetup (optvm, lcb, CORK_NIL);
 			EsObject *e = optscriptRun (optvm, patbuf->optscript);
 			if (es_error_p (e))
 				error (WARNING, "error when evaluating: %s", patbuf->optscript_src);
 			es_object_unref (e);
+			optscriptTeardown (optvm, lcb);
 		}
 
 		if (patbuf->type == PTRN_TAG)
@@ -2613,10 +2621,12 @@ static struct regexTable * matchMultitableRegexTable (struct lregexControlBlock 
 			entry->statistics.match++;
 			if (ptrn->optscript && (! hasNameSlot (ptrn)))
 			{
+				optscriptSetup (optvm, lcb, CORK_NIL);
 				EsObject *e = optscriptRun (optvm, ptrn->optscript);
 				if (es_error_p (e))
 					error (WARNING, "error when evaluating: %s", ptrn->optscript_src);
 				es_object_unref (e);
+				optscriptTeardown (optvm, lcb);
 			}
 
 			if (ptrn->type == PTRN_TAG)
@@ -2921,6 +2931,31 @@ static void   guestRequestSubmit (struct guestRequest *r)
 	makePromiseForAreaSpecifiedWithOffsets (langName,
 											r->boundary[BOUNDARY_START].offset,
 											r->boundary[BOUNDARY_END].offset);
+}
+
+static EsObject *optscript_CorkIndex_sym = es_nil;
+
+static void optscriptSetup (OptVM *vm, struct lregexControlBlock *lcb, int corkIndex)
+{
+	if (corkIndex != CORK_NIL)
+	{
+		static EsObject *corkIndex_sym = es_nil;
+		if (es_null (corkIndex_sym))
+			corkIndex_sym = es_symbol_intern (".");
+		EsObject *corkIndex_val = es_integer_new (corkIndex);
+		opt_dict_def (lcb->local_dict, corkIndex_sym, corkIndex_val);
+		es_object_unref (corkIndex_val);
+		optscript_CorkIndex_sym = corkIndex_sym;
+	}
+}
+
+static void optscriptTeardown (OptVM *vm, struct lregexControlBlock *lcb)
+{
+	if (!es_null (optscript_CorkIndex_sym))
+	{
+		opt_dict_undef (lcb->local_dict, optscript_CorkIndex_sym);
+		optscript_CorkIndex_sym = es_nil;
+	}
 }
 
 /* Return true if available. */

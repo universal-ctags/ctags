@@ -1,3 +1,4 @@
 (hello)
 (world)
+1
 x	input.hello	/^def x:$/;"	d
