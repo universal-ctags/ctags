@@ -27,7 +27,8 @@ typedef struct sFlagDefinition {
 	const char *description;
 } flagDefinition;
 
-extern void flagsEval (const char* flags, flagDefinition* defs, unsigned int ndefs, void* data);
+/* Return {{optscript}} part. */
+extern const char*  flagsEval (const char* flags, flagDefinition* defs, unsigned int ndefs, void* data);
 extern struct colprintTable * flagsColprintTableNew (void);
 extern void flagsColprintAddDefinitions (struct colprintTable *table, flagDefinition* def, unsigned int ndefs);
 extern void flagsColprintTablePrint (struct colprintTable *table,

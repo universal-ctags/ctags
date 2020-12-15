@@ -21,18 +21,24 @@
 #include "vstring.h"
 #include "routines.h"
 
-void flagsEval (const char* flags_original, flagDefinition* defs, unsigned int ndefs, void* data)
+extern const char *flagsEval (const char* flags_original, flagDefinition* defs, unsigned int ndefs, void* data)
 {
 	unsigned int i, j;
 	char *flags;
+	const char *optscript = NULL;
 
 	if (!flags_original)
-		return;
+		return NULL;
 
 	flags = eStrdup (flags_original);
 	for (i = 0 ; flags [i] != '\0' ; ++i)
 	{
-		if (flags [i] == LONG_FLAGS_OPEN)
+		if (flags [i] == LONG_FLAGS_OPEN && flags [i + 1] == LONG_FLAGS_OPEN)
+		{
+			optscript = flags_original + i;
+			break;
+		}
+		else if (flags [i] == LONG_FLAGS_OPEN)
 		{
 			const char* aflag = flags + i + 1;
 			char* needle_close_paren = strchr(aflag, LONG_FLAGS_CLOSE);
@@ -74,6 +80,7 @@ void flagsEval (const char* flags_original, flagDefinition* defs, unsigned int n
 				defs[j].shortProc(flags[i], data);
 	}
 	eFree (flags);
+	return optscript;
 }
 
 extern struct colprintTable * flagsColprintTableNew (void)
