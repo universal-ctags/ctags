@@ -234,12 +234,10 @@ static bool isIdentifierFirstCharacter (int c)
     return (bool) ((isAscii(c) && (isalpha (c) || c == '_')) || c >= 0xC0);
 }
 
-/* This does not distinguish Unicode letters from operators...
- * The dot is considered an identifier character for fully qualified names
- * */
+/* This does not distinguish Unicode letters from operators... */
 static bool isIdentifierCharacter (int c)
 {
-    return (bool) (isIdentifierFirstCharacter(c) || (isAscii(c) && (isdigit(c) || c == '!' || c == '.')) || c >= 0x80);
+    return (bool) (isIdentifierFirstCharacter(c) || (isAscii(c) && (isdigit(c) || c == '!')) || c >= 0x80);
 }
 
 static void skipWhitespace (lexerState *lexer, bool newline)
@@ -1003,6 +1001,8 @@ static void parseFunction (lexerState *lexer, vString *scope, int parent_kind)
 {
     vString *name;
     vString *arg_list;
+    vString *local_scope;
+    int local_parent_kind;
     unsigned long line;
     MIOPos pos;
 
@@ -1010,6 +1010,14 @@ static void parseFunction (lexerState *lexer, vString *scope, int parent_kind)
     if (lexer->cur_token != TOKEN_IDENTIFIER)
     {
         return;
+    } else if (lexer->cur_c == '.') {
+        local_scope = vStringNewCopy(lexer->token_str);
+        local_parent_kind = K_MODULE;
+        advanceChar(lexer);
+        advanceToken(lexer, true);
+    } else {
+        local_scope = scope;
+        local_parent_kind = parent_kind;
     }
 
     name = vStringNewCopy(lexer->token_str);
@@ -1037,14 +1045,14 @@ static void parseFunction (lexerState *lexer, vString *scope, int parent_kind)
             advanceToken(lexer, true);
         }
 
-        addTag(name, NULL, vStringValue(arg_list), K_FUNCTION, line, pos, scope, parent_kind);
+        addTag(name, NULL, vStringValue(arg_list), K_FUNCTION, line, pos, local_scope, local_parent_kind);
         //addToScope(scope, name);
         //parseExpr(lexer, true, K_FUNCTION, scope);
     }
     else if (lexer->cur_token == TOKEN_CLOSE_BLOCK)
     {
         /* Function without method */
-        addTag(name, NULL, NULL, K_FUNCTION, line, pos, scope, parent_kind);
+        addTag(name, NULL, NULL, K_FUNCTION, line, pos, local_scope, local_parent_kind);
     }
 
     /* Go to the closing 'end' keyword */
@@ -1140,9 +1148,9 @@ static void parseModule (lexerState *lexer, vString *scope, int parent_kind)
     }
 
     addTag(lexer->token_str, NULL, NULL, K_MODULE, lexer->line, lexer->pos, scope, parent_kind);
-    //addToScope(scope, lexer->token_str);
-    //advanceToken(lexer, true);
-    //parseExpr(lexer, true, K_MODULE, scope);
+    addToScope(scope, lexer->token_str);
+    advanceToken(lexer, true);
+    parseExpr(lexer, true, K_MODULE, scope);
 }
 
 /* Import format:
@@ -1360,5 +1368,6 @@ extern parserDefinition* JuliaParser (void)
     def->parser     = findJuliaTags;
     def->keywordTable = JuliaKeywordTable;
     def->keywordCount = ARRAY_SIZE (JuliaKeywordTable);
+    def->useCork    = CORK_QUEUE;
     return def;
 }

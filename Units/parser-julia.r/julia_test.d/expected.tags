@@ -1,7 +1,7 @@
 a	input.jl	/^const a::Int = 'c'  # struct Struct_wrong3 end$/;"	c
 test_macro	input.jl	/^macro test_macro() end$/;"	m
 test_fun	input.jl	/^function test_fun(a::Int, b::T) where #$/;"	f
-Base.ifelse	input.jl	/^function Base.ifelse(a::Int)$/;"	f
+ifelse	input.jl	/^function Base.ifelse(a::Int)$/;"	f	module:Base
 lone_function	input.jl	/^function lone_function end$/;"	f
 run_test	input.jl	/^function run_test(a::T) where T<:Int; a::Int end$/;"	f
 eq	input.jl	/^eq(c=4; b=(1,2,3), c=:a=>5) = a == b$/;"	f
