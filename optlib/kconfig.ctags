@@ -56,7 +56,8 @@
 --regex-Kconfig=/^[ \t]*menu[ \t]+"([^"]+)"[ \t]*/\1/m/{scope=push}{exclusive}
 --regex-Kconfig=/^[ \t]*endmenu[ \t]*//{scope=pop}{placeholder}{exclusive}
 
---regex-Kconfig=/^[ \t]*source[ \t]+"([^"]+)"[ \t]*/\1/k/{_role=source}{exclusive}{scope=ref}
+# Qemu's Kconfig does't use double quotes
+--regex-Kconfig=/^[ \t]*source[ \t]+"?([^"]+)"?[ \t]*/\1/k/{_role=source}{exclusive}{scope=ref}
 
 --regex-Kconfig=/^[ \t]*choice[ \t]+([A-Za-z0-9_]+)[ \t]*/\1/C/{scope=push}{exclusive}
 --regex-Kconfig=/^[ \t]*choice[ \t]*$//C/{_anonymous=choice}{scope=push}{exclusive}

@@ -161,3 +161,7 @@ NET_PKTGEN	input-3.kconfig	/^config NET_PKTGEN$/;"	c	menu:Networking options""Ne
 CONFIG_NET_PKTGEN	input-3.kconfig	/^config NET_PKTGEN$/;"	c	menu:Networking options""Network testing	roles:def
 NET_DROP_MONITOR	input-3.kconfig	/^config NET_DROP_MONITOR$/;"	c	menu:Networking options""Network testing	roles:def
 CONFIG_NET_DROP_MONITOR	input-3.kconfig	/^config NET_DROP_MONITOR$/;"	c	menu:Networking options""Network testing	roles:def
+Kconfig.host	input-4.kconfig	/^source Kconfig.host$/;"	k	roles:source
+backends/Kconfig	input-4.kconfig	/^source backends\/Kconfig$/;"	k	roles:source
+accel/Kconfig	input-4.kconfig	/^source accel\/Kconfig$/;"	k	roles:source
+hw/Kconfig	input-4.kconfig	/^source hw\/Kconfig$/;"	k	roles:source

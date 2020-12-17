@@ -75,7 +75,7 @@ extern parserDefinition* KconfigParser (void)
 		"m", "{scope=push}{exclusive}", NULL, false},
 		{"^[ \t]*endmenu[ \t]*", "",
 		"", "{scope=pop}{placeholder}{exclusive}", NULL, false},
-		{"^[ \t]*source[ \t]+\"([^\"]+)\"[ \t]*", "\\1",
+		{"^[ \t]*source[ \t]+\"?([^\"]+)\"?[ \t]*", "\\1",
 		"k", "{_role=source}{exclusive}{scope=ref}", NULL, false},
 		{"^[ \t]*choice[ \t]+([A-Za-z0-9_]+)[ \t]*", "\\1",
 		"C", "{scope=push}{exclusive}", NULL, false},
