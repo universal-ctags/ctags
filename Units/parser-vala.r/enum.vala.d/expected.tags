@@ -1,4 +1,7 @@
 Skk	input.vala	/^namespace Skk {$/;"	n
+KeyEventFormatError	input.vala	/^    public errordomain KeyEventFormatError {$/;"	E	namespace:Skk
+PARSE_FAILED	input.vala	/^        PARSE_FAILED,$/;"	r	errordomain:Skk.KeyEventFormatError
+KEYSYM_NOT_FOUND	input.vala	/^        KEYSYM_NOT_FOUND$/;"	r	errordomain:Skk.KeyEventFormatError
 ModifierType	input.vala	/^    public enum ModifierType {$/;"	e	namespace:Skk
 NONE	input.vala	/^        NONE = 0,$/;"	v	enum:Skk.ModifierType
 SHIFT_MASK	input.vala	/^        SHIFT_MASK = 1 << 0,$/;"	v	enum:Skk.ModifierType

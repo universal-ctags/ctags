@@ -1,6 +1,5 @@
 /* Taken from https://github.com/ueno/libskk
  * (libskk/libskk/key-event.vala)
- * errordomain is removed because ctags is not ready to parse it.
  */
 
 /*
@@ -23,6 +22,11 @@
 using Gee;
 
 namespace Skk {
+    public errordomain KeyEventFormatError {
+        PARSE_FAILED,
+        KEYSYM_NOT_FOUND
+    }
+
     /**
      * A set of bit-flags to indicate the state of modifier keys.
      */

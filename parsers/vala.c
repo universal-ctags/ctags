@@ -281,7 +281,7 @@ static void parseNamespace (tokenInfo *const token, int corkIndex);
 static void parseInterface (tokenInfo *const token, int corkIndex);
 static void parseClass (tokenInfo *const token, int corkIndex);
 static void parseStatement (tokenInfo *const token, int corkIndex);
-static void parseEnum (tokenInfo *const token, int corkIndex);
+static void parseEnum (tokenInfo *const token, int kindIndex, int elementKindIndex, int corkIndex);
 
 
 /*
@@ -565,7 +565,7 @@ static void parseStatement (tokenInfo *const token, int parentIndex)
 	tokenDelete (lastToken);
 }
 
-static void parseEnumBody (tokenInfo *const token, int corkIndex)
+static void parseEnumBody (tokenInfo *const token, int kindIndex, int corkIndex)
 {
 	bool s = tokenTypePairSetState (&valaTokenInfoClass, '<', false);
 	while (!tokenIsEOF (token))
@@ -573,7 +573,7 @@ static void parseEnumBody (tokenInfo *const token, int corkIndex)
 		tokenRead (token);
 		if (tokenIsType (token, IDENTIFIER))
 		{
-			makeSimpleTagFromToken (token, K_ENUMVALUE, corkIndex);
+			makeSimpleTagFromToken (token, kindIndex, corkIndex);
 			tokenType endMakers [] = {',', '}'};
 			if (tokenSkipToTypesOverPairs (token, endMakers, ARRAY_SIZE(endMakers)))
 			{
@@ -587,18 +587,18 @@ static void parseEnumBody (tokenInfo *const token, int corkIndex)
 	tokenTypePairSetState (&valaTokenInfoClass, '<', s);
 }
 
-static void parseEnum (tokenInfo *const token, int corkIndex)
+static void parseEnum (tokenInfo *const token, int kindIndex, int elementKindIndex, int corkIndex)
 {
 	tokenRead (token);
 	if (!tokenIsType (token, IDENTIFIER))
 		return;					/* Unexpected sequence of token */
 
-	int enumCorkIndex = makeSimpleTagFromToken (token, K_ENUM, corkIndex);
+	int enumCorkIndex = makeSimpleTagFromToken (token, kindIndex, corkIndex);
 
 	tokenRead (token);
 	if (!tokenSkipToType (token, '{'))
 		return;					/* Unexpected sequence of token */
-	parseEnumBody (token, enumCorkIndex);
+	parseEnumBody (token, elementKindIndex, enumCorkIndex);
 
 	tagEntryInfo *e = getEntryInCorkQueue (enumCorkIndex);
 	if (e)
@@ -617,7 +617,9 @@ static void recurseValaTags (tokenInfo *token, int parentIndex)
 	else if (tokenIsKeyword(token, CLASS))
 		parseClass (token, parentIndex);
 	else if (tokenIsKeyword(token, ENUM))
-		parseEnum (token, parentIndex);
+		parseEnum (token, K_ENUM, K_ENUMVALUE, parentIndex);
+	else if (tokenIsKeyword(token, ERRORDOMAIN))
+		parseEnum (token, K_ERRORDOMAIN, K_ERRORCODE, parentIndex);
 	else if (tokenIsType (token, IDENTIFIER))
 		parseStatement (token, parentIndex);
 }
