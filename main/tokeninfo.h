@@ -104,6 +104,10 @@ bool tokenSkipOverPairFull (tokenInfo *token, void *data);
 
 bool tokenSkipToTypes    (tokenInfo *token, const tokenType ts[], size_t count);
 bool tokenSkipToTypesFull (tokenInfo *token, const tokenType ts[], size_t count, void *data);
+bool tokenSkipToTypeOverPairs    (tokenInfo *token, tokenType t);
+bool tokenSkipToTypeOverPairsFull (tokenInfo *token, tokenType t, void *data);
+bool tokenSkipToTypesOverPairs    (tokenInfo *token, const tokenType ts[], size_t count);
+bool tokenSkipToTypesOverPairsFull (tokenInfo *token, const tokenType ts[], size_t count, void *data);
 
 /* Making a tag from a token */
 void initTagEntryFromToken (tagEntryInfo *e, tokenInfo *const token, int kindIndex, int scopeIndex);

@@ -183,15 +183,26 @@ bool tokenSkipOverPair (tokenInfo *token)
 	return tokenSkipOverPairFull(token, NULL);
 }
 
+static struct  tokenTypePair *tokenTypeIsStarterOfPairs (tokenType t,
+														 struct  tokenTypePair pairs [],
+														 size_t count)
+{
+	for (size_t i = 0; i < count; i++)
+		if (t == pairs[i].start)
+			return pairs + i;
+	return NULL;
+}
+
 bool tokenSkipOverPairFull (tokenInfo *token, void *data)
 {
 	int start = token->type;
 	int end = token->klass->typeForUndefined;
-	unsigned int i;
 
-	for (i = 0; i < token->klass->pairCount; i++)
-		if (start == token->klass->pairs[i].start)
-			end = token->klass->pairs[i].end;
+	struct tokenTypePair *endp = tokenTypeIsStarterOfPairs (start,
+															token->klass->pairs,
+															token->klass->pairCount);
+	if (endp)
+		end = endp->end;
 
 	if (end == token->klass->typeForUndefined)
 		return false;
@@ -228,6 +239,36 @@ bool tokenSkipToTypesFull (tokenInfo *token, const tokenType ts[], size_t count,
 		tokenReadFull (token, data);
 
 	return tokenIsEOF (token)? false: true;
+}
+
+bool tokenSkipToTypeOverPairs    (tokenInfo *token, tokenType t)
+{
+	return tokenSkipToTypeOverPairsFull (token, t, NULL);
+}
+
+bool tokenSkipToTypeOverPairsFull (tokenInfo *token, tokenType t, void *data)
+{
+
+	return tokenSkipToTypesOverPairsFull (token, &t, 1, data);
+}
+
+bool tokenSkipToTypesOverPairs     (tokenInfo *token, const tokenType ts[], size_t count)
+{
+	return tokenSkipToTypesOverPairsFull (token, ts, count, NULL);
+}
+
+bool tokenSkipToTypesOverPairsFull (tokenInfo *token, const tokenType ts[], size_t count, void *data)
+{
+	while (! (tokenIsEOF (token)))
+	{
+		if (tokenTypeIsMember (token->type, ts, count))
+			return true;
+		tokenSkipOverPairFull (token, data);
+		if (tokenIsEOF (token))
+			return false;
+		tokenReadFull (token, data);
+	}
+	return false;
 }
 
 void initTagEntryFromToken (tagEntryInfo *e, tokenInfo *const token, int kindIndex,
