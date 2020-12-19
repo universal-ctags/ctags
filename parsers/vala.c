@@ -72,11 +72,7 @@ static kindDefinition ValaKinds [] = {
 
 enum eKeywordId
 {
-	KEYWORD_STRING,
-	KEYWORD_INT,
-	KEYWORD_DOUBLE,
-	KEYWORD_FLOAT,
-	KEYWORD_BOOL,
+	KEYWORD_BUILTIN_TYPE,
 	KEYWORD_VOID,
 	KEYWORD_TYPE,
 	KEYWORD_ABSTRACT,
@@ -150,13 +146,51 @@ enum eKeywordId
 
 typedef int keywordId; /* to allow KEYWORD_NONE */
 
-static const keywordTable ValaKeywordTable [] = {
-	{ "string", KEYWORD_STRING },
-	{ "int", KEYWORD_INT },
-	{ "double", KEYWORD_DOUBLE },
-	{ "float", KEYWORD_FLOAT },
-	{ "bool", KEYWORD_BOOL },
+static struct keywordGroup valaBuiltInKeywordGroup = {
+	.value = KEYWORD_BUILTIN_TYPE,
+	.addingUnlessExisting = false,
+	.keywords = {
+		/* type:
+		 *   value-type:
+		 *     fundamental-struct-type:
+		 *       integral-type: */
+		"char",
+		"uchar",
+		"short",
+		"ushort",
+		"int",
+		"uint",
+		"long",
+		"ulong",
+		"size_t",
+		"ssize_t",
+		"int8",
+		"uint8",
+		"int16",
+		"uint16",
+		"int32",
+		"uint32",
+		"int64",
+		"uint64",
+		"unichar",
+		/* type:
+		 *   value-type:
+		 *     fundamental-struct-type:
+		 *       floating-point-type: */
+		"float",
+		"double",
+		/* type:
+		 *   value-type:
+		 *     fundamental-struct-type: */
+		"bool",
+		/* type:
+		 *   reference-type: */
+		"string",
+		NULL
+	},
+};
 
+static const keywordTable ValaKeywordTable [] = {
 	{ "void",   KEYWORD_VOID  },
 	{ "Type",       KEYWORD_TYPE },
 	{ "abstract",       KEYWORD_ABSTRACT },
@@ -804,6 +838,11 @@ static void findValaTags (void)
 	flashTokenBacklog (&valaTokenInfoClass);
 }
 
+static void initialize (const langType language)
+{
+	addKeywordGroup (&valaBuiltInKeywordGroup, language);
+}
+
 extern parserDefinition* ValaParser (void)
 {
 	static const char *const extensions [] = { "vala", NULL };
@@ -817,6 +856,7 @@ extern parserDefinition* ValaParser (void)
 	def->useCork = true;
 	def->requestAutomaticFQTag = true;
 
+	def->initialize = initialize,
 	def->parser = findValaTags;
 	return def;
 }
