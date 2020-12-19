@@ -194,9 +194,9 @@ static const char *tokenTypeStr(enum RTokenType e);
 #endif
 
 static struct tokenTypePair typePairs [] = {
-	{ '{', '}' },
-	{ '[', ']' },
-	{ '(', ')' },
+	{ '{', '}', NULL },
+	{ '[', ']', NULL },
+	{ '(', ')', NULL },
 };
 
 typedef struct sRToken {

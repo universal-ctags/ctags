@@ -33,6 +33,15 @@ typedef struct sTokenInfo {
 struct tokenTypePair {
 	tokenType start;
 	tokenType end;
+
+	/* If the field is NULL or the value pointed by the field is true,
+	 * tokenSkipOverPair and its variants regard the pair as an active
+	 * pair; they will skip over the pair.
+	 *
+	 * The value pointed by the field is false, they regard the pair
+	 * as an inactive pair; they will not skip over the pair.
+	 */
+	bool *active;
 };
 
 #define TOKEN(X)  ((tokenInfo *)X)

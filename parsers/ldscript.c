@@ -131,7 +131,7 @@ typedef struct sLdScriptToken {
 #define LDSCRIPT(TOKEN) ((ldScriptToken *)TOKEN)
 
 static struct tokenTypePair ldScriptTypePairs [] = {
-	{ '{', '}' },
+	{ '{', '}', NULL },
 };
 
 static struct tokenInfoClass ldScriptTokenInfoClass = {

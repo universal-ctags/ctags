@@ -10,6 +10,7 @@
 #include "general.h"
 #include "tokeninfo.h"
 
+#include "debug.h"
 #include "entry.h"
 #include "read.h"
 #include "routines.h"
@@ -183,12 +184,17 @@ bool tokenSkipOverPair (tokenInfo *token)
 	return tokenSkipOverPairFull(token, NULL);
 }
 
+static bool isTokenTypePairActive (struct tokenTypePair *pair)
+{
+	return ((pair->active == NULL) || (*pair->active))? true: false;
+}
+
 static struct  tokenTypePair *tokenTypeIsStarterOfPairs (tokenType t,
 														 struct  tokenTypePair pairs [],
 														 size_t count)
 {
 	for (size_t i = 0; i < count; i++)
-		if (t == pairs[i].start)
+		if (isTokenTypePairActive (pairs +i) && (t == pairs[i].start))
 			return pairs + i;
 	return NULL;
 }
