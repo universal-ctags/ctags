@@ -281,6 +281,7 @@ static void parseNamespace (tokenInfo *const token, int corkIndex);
 static void parseInterface (tokenInfo *const token, int corkIndex);
 static void parseClass (tokenInfo *const token, int corkIndex);
 static void parseStatement (tokenInfo *const token, int corkIndex);
+static void parseEnum (tokenInfo *const token, int corkIndex);
 
 
 /*
@@ -564,6 +565,46 @@ static void parseStatement (tokenInfo *const token, int parentIndex)
 	tokenDelete (lastToken);
 }
 
+static void parseEnumBody (tokenInfo *const token, int corkIndex)
+{
+	bool s = tokenTypePairSetState (&valaTokenInfoClass, '<', false);
+	while (!tokenIsEOF (token))
+	{
+		tokenRead (token);
+		if (tokenIsType (token, IDENTIFIER))
+		{
+			makeSimpleTagFromToken (token, K_ENUMVALUE, corkIndex);
+			tokenType endMakers [] = {',', '}'};
+			if (tokenSkipToTypesOverPairs (token, endMakers, ARRAY_SIZE(endMakers)))
+			{
+				if (tokenIsTypeVal (token, '}'))
+					break;
+			}
+			else
+				break;
+		}
+	}
+	tokenTypePairSetState (&valaTokenInfoClass, '<', s);
+}
+
+static void parseEnum (tokenInfo *const token, int corkIndex)
+{
+	tokenRead (token);
+	if (!tokenIsType (token, IDENTIFIER))
+		return;					/* Unexpected sequence of token */
+
+	int enumCorkIndex = makeSimpleTagFromToken (token, K_ENUM, corkIndex);
+
+	tokenRead (token);
+	if (!tokenSkipToType (token, '{'))
+		return;					/* Unexpected sequence of token */
+	parseEnumBody (token, enumCorkIndex);
+
+	tagEntryInfo *e = getEntryInCorkQueue (enumCorkIndex);
+	if (e)
+		e->extensionFields.endLine = token->lineNumber;
+}
+
 static void recurseValaTags (tokenInfo *token, int parentIndex)
 {
 	/* Skip attributes */
@@ -575,6 +616,8 @@ static void recurseValaTags (tokenInfo *token, int parentIndex)
 		parseInterface (token, parentIndex);
 	else if (tokenIsKeyword(token, CLASS))
 		parseClass (token, parentIndex);
+	else if (tokenIsKeyword(token, ENUM))
+		parseEnum (token, parentIndex);
 	else if (tokenIsType (token, IDENTIFIER))
 		parseStatement (token, parentIndex);
 }

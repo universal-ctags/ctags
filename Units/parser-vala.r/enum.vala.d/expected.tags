@@ -1,0 +1,19 @@
+Skk	input.vala	/^namespace Skk {$/;"	n
+ModifierType	input.vala	/^    public enum ModifierType {$/;"	e	namespace:Skk
+NONE	input.vala	/^        NONE = 0,$/;"	v	enum:Skk.ModifierType
+SHIFT_MASK	input.vala	/^        SHIFT_MASK = 1 << 0,$/;"	v	enum:Skk.ModifierType
+LOCK_MASK	input.vala	/^        LOCK_MASK = 1 << 1,$/;"	v	enum:Skk.ModifierType
+CONTROL_MASK	input.vala	/^        CONTROL_MASK = 1 << 2,$/;"	v	enum:Skk.ModifierType
+MOD1_MASK	input.vala	/^        MOD1_MASK = 1 << 3,$/;"	v	enum:Skk.ModifierType
+MOD2_MASK	input.vala	/^        MOD2_MASK = 1 << 4,$/;"	v	enum:Skk.ModifierType
+MOD3_MASK	input.vala	/^        MOD3_MASK = 1 << 5,$/;"	v	enum:Skk.ModifierType
+MOD4_MASK	input.vala	/^        MOD4_MASK = 1 << 6,$/;"	v	enum:Skk.ModifierType
+MOD5_MASK	input.vala	/^        MOD5_MASK = 1 << 7,$/;"	v	enum:Skk.ModifierType
+LSHIFT_MASK	input.vala	/^        LSHIFT_MASK = 1 << 22,$/;"	v	enum:Skk.ModifierType
+RSHIFT_MASK	input.vala	/^        RSHIFT_MASK = 1 << 23,$/;"	v	enum:Skk.ModifierType
+USLEEP_MASK	input.vala	/^        USLEEP_MASK = 1 << 24,$/;"	v	enum:Skk.ModifierType
+SUPER_MASK	input.vala	/^        SUPER_MASK = 1 << 26,$/;"	v	enum:Skk.ModifierType
+HYPER_MASK	input.vala	/^        HYPER_MASK = 1 << 27,$/;"	v	enum:Skk.ModifierType
+META_MASK	input.vala	/^        META_MASK = 1 << 28,$/;"	v	enum:Skk.ModifierType
+RELEASE_MASK	input.vala	/^        RELEASE_MASK = 1 << 30$/;"	v	enum:Skk.ModifierType
+KeyEvent	input.vala	/^    public class KeyEvent : Object {$/;"	c	namespace:Skk
