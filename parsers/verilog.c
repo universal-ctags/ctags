@@ -152,7 +152,7 @@ static kindDefinition SystemVerilogKinds [] = {
  { true, 'r', "register",  "variable data types" },
  { true, 't', "task",      "tasks" },
  { true, 'b', "block",     "blocks (begin, fork)" },
- { true, 'i', "instance"   "instances of module or interface" },
+ { true, 'i', "instance",  "instances of module or interface" },
  { true, 'A', "assert",    "assertions (assert, assume, cover, restrict)" },
  { true, 'C', "class",     "classes" },
  { true, 'V', "covergroup","covergroups" },
