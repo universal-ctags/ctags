@@ -159,6 +159,7 @@
     <ClCompile Include="..\optlib\kconfig.c" />
     <ClCompile Include="..\optlib\man.c" />
     <ClCompile Include="..\optlib\markdown.c" />
+    <ClCompile Include="..\optlib\meson.c" />
     <ClCompile Include="..\optlib\passwd.c" />
     <ClCompile Include="..\optlib\pod.c" />
     <ClCompile Include="..\optlib\puppetManifest.c" />

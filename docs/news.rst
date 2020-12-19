@@ -72,6 +72,7 @@ The following parsers have been added:
 * Man page *optlib*
 * Markdown *optlib*
 * Maven2 *libxml*
+* MesonBuild (Meson) *optlib*
 * Moose *perl basesd subperser*
 * Myrddin
 * M4

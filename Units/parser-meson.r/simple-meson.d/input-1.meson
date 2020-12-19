@@ -1,0 +1,23 @@
+# Taken from https://mesonbuild.com/IndepthTutorial.html
+foo_sources = ['source1.cpp', 'source2.cpp']
+foolib = shared_library('foo',
+                        foo_sources,
+                        include_directories : inc,
+                        dependencies : glib_dep,
+                        install : true)
+
+foolib0 = library('foo0',
+                        foo_sources,
+                        include_directories : inc,
+                        dependencies : glib_dep,
+                        install : true)
+foolib1 = both_library('foo1',
+                        foo_sources,
+                        include_directories : inc,
+                        dependencies : glib_dep,
+                        install : true)
+foolib2 = static_library('foo2',
+                        foo_sources,
+                        include_directories : inc,
+                        dependencies : glib_dep,
+                        install : true)

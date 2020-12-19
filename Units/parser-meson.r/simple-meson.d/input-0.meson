@@ -1,0 +1,2 @@
+# Taken from https://mesonbuild.com/IndepthTutorial.html
+install_headers('foolib.h')

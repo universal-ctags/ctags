@@ -106,6 +106,7 @@
 	MakefileParser, \
 	MarkdownParser, \
 	MatLabParser, \
+	MesonParser, \
 	MooseParser, \
 	MyrddinParser, \
 	NsisParser, \
