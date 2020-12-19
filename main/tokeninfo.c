@@ -208,6 +208,28 @@ bool tokenSkipOverPairFull (tokenInfo *token, void *data)
 	return (depth == 0)? true: false;
 }
 
+bool tokenSkipToTypes    (tokenInfo *token, const tokenType ts[], size_t count)
+{
+	return tokenSkipToTypesFull (token, ts, count, NULL);
+}
+
+static bool tokenTypeIsMember (tokenType t, const tokenType ts[], size_t count)
+{
+	for (size_t i = 0; i < count; i++)
+		if (ts [i] == t)
+			return true;
+	return false;
+}
+
+bool tokenSkipToTypesFull (tokenInfo *token, const tokenType ts[], size_t count, void *data)
+{
+	while (! (tokenIsEOF (token)
+			  || tokenTypeIsMember (token->type, ts, count)))
+		tokenReadFull (token, data);
+
+	return tokenIsEOF (token)? false: true;
+}
+
 void initTagEntryFromToken (tagEntryInfo *e, tokenInfo *const token, int kindIndex,
 							int scopeIndex)
 {
