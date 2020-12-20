@@ -279,7 +279,7 @@ enum ValaTokenType {
 static void readToken (tokenInfo *const token, void *data);
 static void parseNamespace (tokenInfo *const token, int corkIndex);
 static void parseInterface (tokenInfo *const token, int corkIndex);
-static void parseClass (tokenInfo *const token, int corkIndex);
+static void parseClass (tokenInfo *const token, int kindIndex, int corkIndex);
 static void parseStatement (tokenInfo *const token, int corkIndex);
 static void parseEnum (tokenInfo *const token, int kindIndex, int elementKindIndex, int corkIndex);
 
@@ -615,11 +615,13 @@ static void recurseValaTags (tokenInfo *token, int parentIndex)
 	else if (tokenIsKeyword(token, INTERFACE))
 		parseInterface (token, parentIndex);
 	else if (tokenIsKeyword(token, CLASS))
-		parseClass (token, parentIndex);
+		parseClass (token, K_CLASS, parentIndex);
 	else if (tokenIsKeyword(token, ENUM))
 		parseEnum (token, K_ENUM, K_ENUMVALUE, parentIndex);
 	else if (tokenIsKeyword(token, ERRORDOMAIN))
 		parseEnum (token, K_ERRORDOMAIN, K_ERRORCODE, parentIndex);
+	else if (tokenIsKeyword (token, STRUCT))
+		parseClass (token, K_STRUCT, parentIndex);
 	else if (tokenIsType (token, IDENTIFIER))
 		parseStatement (token, parentIndex);
 }
@@ -846,14 +848,14 @@ static void parseInheritanceList (tokenInfo *const token, int classIndex)
 	vStringDelete (list);		/* NULL is acceptable */
 }
 
-static void parseClass (tokenInfo *const token, int parentIndex)
+static void parseClass (tokenInfo *const token, int kindIndex, int parentIndex)
 {
 	tokenRead (token);
 	if (!tokenIsType (token, IDENTIFIER))
 		return;					/* Unexpected sequence of token */
 	readIdentifierExtended (token, NULL);
 
-	int classCorkIndex = makeSimpleTagFromToken (token, K_CLASS, parentIndex);
+	int classCorkIndex = makeSimpleTagFromToken (token, kindIndex, parentIndex);
 
 	/* Parse the class definition. */
 	tokenRead (token);

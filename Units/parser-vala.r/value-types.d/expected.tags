@@ -1,0 +1,4 @@
+Vector	input.vala	/^struct Vector {$/;"	s
+x	input.vala	/^    public double x;$/;"	f	struct:Vector	typeref:typename:double
+y	input.vala	/^    public double y;$/;"	f	struct:Vector	typeref:typename:double
+z	input.vala	/^    public double z;$/;"	f	struct:Vector	typeref:typename:double
