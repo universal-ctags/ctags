@@ -47,4 +47,3 @@ This is a draft document. Proofreading and pull-requests are welcome!
 	tips.rst
 	testing.rst
 	developers.rst
-	guessing.rst
