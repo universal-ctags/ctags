@@ -567,7 +567,8 @@ static void parseStatement (tokenInfo *const token, int parentIndex)
 
 static void parseEnumBody (tokenInfo *const token, int kindIndex, int corkIndex)
 {
-	bool s = tokenTypePairSetState (&valaTokenInfoClass, '<', false);
+	bool s = trianglePairState;
+	trianglePairState = false;
 	while (!tokenIsEOF (token))
 	{
 		tokenRead (token);
@@ -584,7 +585,7 @@ static void parseEnumBody (tokenInfo *const token, int kindIndex, int corkIndex)
 				break;
 		}
 	}
-	tokenTypePairSetState (&valaTokenInfoClass, '<', s);
+	trianglePairState = s;
 }
 
 static void parseEnum (tokenInfo *const token, int kindIndex, int elementKindIndex, int corkIndex)
@@ -737,8 +738,17 @@ static void parseClassBody (tokenInfo *const token, int classCorkIndex)
 		}
 
 		int kind;
-		if (tokenIsTypeVal (token, ';'))
+		if (tokenIsTypeVal (token, ';')
+			|| tokenIsTypeVal (token, '='))
+		{
 			kind = K_FIELD;
+			if (tokenIsTypeVal (token, '='))
+			{
+				bool s = trianglePairState;
+				tokenSkipToTypeOverPairs (token, ';');
+				trianglePairState = s;
+			}
+		}
 		else if (tokenIsTypeVal (token, '{'))
 			kind = K_PROP;
 		else

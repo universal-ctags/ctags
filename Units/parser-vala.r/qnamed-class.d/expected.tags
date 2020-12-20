@@ -1,3 +1,6 @@
 X	input.vala	/^namespace X {$/;"	n
 X.MyObject	input.vala	/^public class X.MyObject {$/;"	c
 a	input.vala	/^       int a;$/;"	f	class:X.MyObject	typeref:typename:int
+b	input.vala	/^       int b = 1;$/;"	f	class:X.MyObject	typeref:typename:int
+c	input.vala	/^       int c = 2;$/;"	f	class:X.MyObject	typeref:typename:int
+d	input.vala	/^       int d;$/;"	f	class:X.MyObject	typeref:typename:int
