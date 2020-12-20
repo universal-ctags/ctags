@@ -1,0 +1,11 @@
+# Taken from https://mesonbuild.com/IndepthTutorial.html
+testexe = executable('testexe', 'footest.cpp',
+                     include_directories : inc,
+                     link_with : foolib)
+test('foolib test', testexe)
+'''
+testexe3 = executable('testexe2', 'footest2.cpp',
+                     include_directories : inc,
+                     link_with : foolib)
+test('foolib test2', testexe)
+'''

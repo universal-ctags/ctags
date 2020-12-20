@@ -1,0 +1,12 @@
+# Taken fromh https://mesonbuild.com/Custom-build-targets.html
+comp = find_program('custom_compiler')
+
+infile = 'source_code.txt'
+outfile = 'output.bin'
+
+mytarget = custom_target('targetname',
+  output : outfile,
+  input : infile,
+  command : [comp, '@INPUT@', '@OUTPUT@'],
+  install : true,
+  install_dir : 'subdir')

@@ -1,0 +1,3 @@
+# Taken from https://mesonbuild.com/Run-targets.html
+run_target('inspector',
+  command : ['scripts/inspect.sh', '--exclude', 'tests'])

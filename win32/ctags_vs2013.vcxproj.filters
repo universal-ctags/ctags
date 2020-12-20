@@ -213,6 +213,9 @@
     <ClCompile Include="..\optlib\markdown.c">
       <Filter>Source Files\optlib</Filter>
     </ClCompile>
+    <ClCompile Include="..\optlib\meson.c">
+      <Filter>Source Files\optlib</Filter>
+    </ClCompile>
     <ClCompile Include="..\optlib\passwd.c">
       <Filter>Source Files\optlib</Filter>
     </ClCompile>

@@ -1,0 +1,25 @@
+c++ foolib	input.meson	/^project('c++ foolib', 'cpp',$/;"	project
+glib_dep	input.meson	/^glib_dep = dependency('glib-2.0')$/;"	variable
+inc	input.meson	/^inc = include_directories('include')$/;"	variable
+include	input.meson	/^subdir('include')$/;"	subdir
+src	input.meson	/^subdir('src')$/;"	subdir
+test	input.meson	/^subdir('test')$/;"	subdir
+pkg_mod	input.meson	/^pkg_mod = import('pkgconfig')$/;"	variable
+foo_sources	input-1.meson	/^foo_sources = ['source1.cpp', 'source2.cpp']$/;"	variable
+foolib	input-1.meson	/^foolib = shared_library('foo',$/;"	variable
+foo	input-1.meson	/^foolib = shared_library('foo',$/;"	build
+foolib0	input-1.meson	/^foolib0 = library('foo0',$/;"	variable
+foo0	input-1.meson	/^foolib0 = library('foo0',$/;"	build
+foolib1	input-1.meson	/^foolib1 = both_library('foo1',$/;"	variable
+foo1	input-1.meson	/^foolib1 = both_library('foo1',$/;"	build
+foolib2	input-1.meson	/^foolib2 = static_library('foo2',$/;"	variable
+foo2	input-1.meson	/^foolib2 = static_library('foo2',$/;"	build
+testexe	input-2.meson	/^testexe = executable('testexe', 'footest.cpp',$/;"	variable
+testexe	input-2.meson	/^testexe = executable('testexe', 'footest.cpp',$/;"	build
+foolib test	input-2.meson	/^test('foolib test', testexe)$/;"	test
+comp	input-3.meson	/^comp = find_program('custom_compiler')$/;"	variable
+infile	input-3.meson	/^infile = 'source_code.txt'$/;"	variable
+outfile	input-3.meson	/^outfile = 'output.bin'$/;"	variable
+mytarget	input-3.meson	/^mytarget = custom_target('targetname',$/;"	variable
+targetname	input-3.meson	/^mytarget = custom_target('targetname',$/;"	custom
+inspector	input-4.meson	/^run_target('inspector',$/;"	run

@@ -10,6 +10,7 @@ OPTLIB2C_INPUT = \
 	optlib/kconfig.ctags			\
 	optlib/man.ctags			\
 	optlib/markdown.ctags			\
+	optlib/meson.ctags			\
 	optlib/passwd.ctags			\
 	optlib/pod.ctags			\
 	optlib/qemuhx.ctags			\
