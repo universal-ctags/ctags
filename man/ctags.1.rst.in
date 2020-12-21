@@ -491,7 +491,7 @@ are not listed here. They are experimental or for debugging purpose.
 		@CTAGS_NAME_EXECUTABLE@ generates an anonymous extra tag for the struct
 		and fills the scope fields with the name of the extra tag.
 
-		.. code-block::
+		.. code-block:: tags
 
 			__anon9f26d2460108	input.c	/^struct {$/;"	s
 			p	input.c	/^} p = { .x = 0.0, .y = 0.0 };$/;"	v	typeref:struct:__anon9f26d2460108

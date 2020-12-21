@@ -31,7 +31,7 @@ passed through command line.
 
 The following file is an example of an option file:
 
-.. code-block::
+.. code-block:: perl
 
 	# Exclude directories that don't contain real code
 	--exclude=Units
@@ -1573,7 +1573,7 @@ You can implement such roles by extending the built-in C parser:
 
 ctags with ``--options=c-extra.ctags --extras=+r --fields=+r`` emits
 
-.. code-block::
+.. code-block:: tags
 
 	i	input.c	/^i += 1;$/;"	v	roles:lvalue,incremented
 	x	input.c	/^x = 0;$/;"	v	roles:lvalue

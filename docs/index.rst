@@ -32,19 +32,18 @@ This is a draft document. Proofreading and pull-requests are welcome!
 .. toctree::
 	:maxdepth: 2
 
-	news.rst
-	reporting.rst
-	contributions.rst
+	building.rst
+	man-pages.rst
 	parsers.rst
 	output-format.rst
+	news.rst
 	interactive-mode.rst
-	guessing.rst
-	running-multi-parsers.rst
-	building.rst
-	testing.rst
-	extending.rst
-	tips.rst
+	reporting.rst
 	other-projects.rst
+	contributions.rst
 	development-process.rst
-	man-pages.rst
+	extending.rst
+	running-multi-parsers.rst
+	tips.rst
+	testing.rst
 	developers.rst

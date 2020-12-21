@@ -20,119 +20,6 @@ information regarding imported changes.
 
 Some changes have also been imported from Fedora and Debian.
 
-Parser related changes
----------------------------------------------------------------------
-
-Fully rewritten parsers
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-* C (see :ref:`The new C/C++ parser <cxx>`)
-* C++ (see :ref:`The new C/C++ parser <cxx>`)
-* Python (see :ref:`The new Python parser <python>`)
-* HTML (see :ref:`The new HTML parser <html>`)
-* Tcl (see :ref:`The new Tcl parser <tcl>`)
-* ITcl (see :ref:`The new Tcl parser <tcl>`)
-
-New parsers
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-The following parsers have been added:
-
-* Abaqus
-* Abc
-* Ada
-* AnsiblePlaybook *libyaml*
-* Asciidoc
-* Autoconf
-* Automake
-* AutoIt
-* BibTeX
-* Clojure
-* CMake *optlib*
-* CSS
-* Ctags option library *optlib*
-* CUDA
-* D
-* DBusIntrospect *libxml*
-* Diff
-* DTD
-* DTS
-* Elixir *optlib*
-* Elm *optlib*
-* Falcon
-* Gdbinit script *optlib*
-* Glade *libxml*
-* Go
-* Haskell
-* Haxe
-* Inko *optlib*
-* JavaProperties
-* JSON
-* Julia
-* Kconfig *optlib*
-* GNU linker script(LdScript)
-* Man page *optlib*
-* Markdown *optlib*
-* Maven2 *libxml*
-* MesonBuild (Meson) *optlib*
-* Moose *perl basesd subperser*
-* Myrddin
-* M4
-* NSIS
-* ObjectiveC
-* Passwd *optlib*
-* PuppetManifest *optlib*
-* Perl6
-* Pod *optlib*
-* PowerShell
-* PropertyList(plist) *libxml*
-* Protobuf
-* PythonLoggingConfig
-* QemuHX *optlib*
-* QtMoc
-* R
-* R6Class *R based subperser*
-* RelaxNG *libxml*
-* ReStructuredText
-* Robot
-* RpmSpec
-* RSpec *optlib*
-* Rust
-* S4Class *R based subperser*
-* SCSS *optlib*
-* SystemdUnit
-* SystemTap *optlib*
-* SystemVerilog
-* SVG *libxml*
-* TclOO (see :ref:`The new Tcl parser <tcl>`)
-* TTCN
-* Txt2tags
-* TypeScript
-* Varlink *peg/packcc*
-* WindRes
-* XSLT v1.0 *libxml*
-* Yacc
-* Yaml *libyaml*
-* YumRepo
-* Zephir
-
-See "Option library" for details on *optlib*.
-Libxml2 is required to use the parser(s) marked with *libxml*.
-Libyaml is required to use the parser(s) marked with *libyaml*.
-
-TIPS: you can list newly introduced parsers if you also have
-Exuberant-ctags installed with following command line:
-
-.. code-block:: console
-
-		$ diff -ruN <(universal-ctags --list-languages) <(exuberant-ctags --list-languages)  | grep '^[-+]'
-
-
-Heavily improved parsers
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-* Ant (rewritten with *libxml*)
-* PHP
-* Verilog
-
-
 ``F`` kind usage
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -1413,6 +1300,113 @@ TODO:
 * Do the same in guessing and selecting parser stage.
 * Refect the BOM detection to encoding option
 
+Parser related changes
+---------------------------------------------------------------------
+
+New parsers
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The following parsers have been added:
+
+* Abaqus
+* Abc
+* Ada
+* AnsiblePlaybook *libyaml*
+* Asciidoc
+* Autoconf
+* Automake
+* AutoIt
+* BibTeX
+* Clojure
+* CMake *optlib*
+* CSS
+* Ctags option library *optlib*
+* CUDA
+* D
+* DBusIntrospect *libxml*
+* Diff
+* DTD
+* DTS
+* Elixir *optlib*
+* Elm *optlib*
+* Falcon
+* Gdbinit script *optlib*
+* Glade *libxml*
+* Go
+* Haskell
+* Haxe
+* Inko *optlib*
+* JavaProperties
+* JSON
+* Julia
+* Kconfig *optlib*
+* GNU linker script(LdScript)
+* Man page *optlib*
+* Markdown *optlib*
+* Maven2 *libxml*
+* MesonBuild (Meson) *optlib*
+* Moose *perl basesd subperser*
+* Myrddin
+* M4
+* NSIS
+* ObjectiveC
+* Passwd *optlib*
+* PuppetManifest *optlib*
+* Perl6
+* Pod *optlib*
+* PowerShell
+* PropertyList(plist) *libxml*
+* Protobuf
+* PythonLoggingConfig
+* QemuHX *optlib*
+* QtMoc
+* R
+* R6Class *R based subperser*
+* RelaxNG *libxml*
+* ReStructuredText
+* Robot
+* RpmSpec
+* RSpec *optlib*
+* Rust
+* S4Class *R based subperser*
+* SCSS *optlib*
+* SystemdUnit
+* SystemTap *optlib*
+* SystemVerilog
+* SVG *libxml*
+* TclOO (see :ref:`The new Tcl parser <tcl>`)
+* TTCN
+* Txt2tags
+* TypeScript
+* Varlink *peg/packcc*
+* WindRes
+* XSLT v1.0 *libxml*
+* Yacc
+* Yaml *libyaml*
+* YumRepo
+* Zephir
+
+See "Option library" for details on *optlib*.
+Libxml2 is required to use the parser(s) marked with *libxml*.
+Libyaml is required to use the parser(s) marked with *libyaml*.
+
+TIPS: you can list newly introduced parsers if you also have
+Exuberant-ctags installed with following command line:
+
+.. code-block:: console
+
+		$ diff -ruN <(universal-ctags --list-languages) <(exuberant-ctags --list-languages)  | grep '^[-+]'
+
+Fully improved parsers
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+* C (see :ref:`The new C/C++ parser <cxx>`)
+* C++ (see :ref:`The new C/C++ parser <cxx>`)
+* Python (see :ref:`The new Python parser <python>`)
+* HTML (see :ref:`The new HTML parser <html>`)
+* Tcl (see :ref:`The new Tcl parser <tcl>`)
+* ITcl (see :ref:`The new Tcl parser <tcl>`)
+* Ant (rewritten with *libxml*)
+* PHP
+* Verilog/SystemVerilog
 
 Readtags
 ---------------------------------------------------------------------
