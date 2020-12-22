@@ -34,31 +34,31 @@ static void initializeKotlinParser (const langType language)
 	                               "^'.{1,2}'",
 	                               "", "", "", NULL);
 	addLanguageTagMultiTableRegex (language, "toplevel",
-	                               "^val\\s+\\(\\s*",
+	                               "^val[[:space:]]+\\([[:space:]]*",
 	                               "", "", "{tenter=vals}", NULL);
 	addLanguageTagMultiTableRegex (language, "toplevel",
-	                               "^var\\s+\\(\\s*",
+	                               "^var[[:space:]]+\\([[:space:]]*",
 	                               "", "", "{tenter=vars}", NULL);
 	addLanguageTagMultiTableRegex (language, "toplevel",
-	                               "^class\\s+([[:alnum:]_]+)",
+	                               "^class[[:space:]]+([[:alnum:]_]+)",
 	                               "\\1", "c", "", NULL);
 	addLanguageTagMultiTableRegex (language, "toplevel",
-	                               "^interface\\s+([[:alnum:]_]+)",
+	                               "^interface[[:space:]]+([[:alnum:]_]+)",
 	                               "\\1", "i", "", NULL);
 	addLanguageTagMultiTableRegex (language, "toplevel",
-	                               "^object\\s+([[:alnum:]_]+)",
+	                               "^object[[:space:]]+([[:alnum:]_]+)",
 	                               "\\1", "o", "", NULL);
 	addLanguageTagMultiTableRegex (language, "toplevel",
-	                               "^typealias\\s+([[:alnum:]_]+)",
+	                               "^typealias[[:space:]]+([[:alnum:]_]+)",
 	                               "\\1", "T", "", NULL);
 	addLanguageTagMultiTableRegex (language, "toplevel",
-	                               "^fun(<.*>)*\\s+([[:alnum:]_]+\\.)*([[:alnum:]_]+)",
+	                               "^fun(<.*>)*[[:space:]]+([[:alnum:]_]+\\.)*([[:alnum:]_]+)",
 	                               "\\3", "m", "", NULL);
 	addLanguageTagMultiTableRegex (language, "toplevel",
-	                               "^val\\s+([[:alnum:]_]+\\.)*([[:alnum:]_]+)",
+	                               "^val[[:space:]]+([[:alnum:]_]+\\.)*([[:alnum:]_]+)",
 	                               "\\2", "C", "", NULL);
 	addLanguageTagMultiTableRegex (language, "toplevel",
-	                               "^var\\s+([[:alnum:]_]+\\.)*([[:alnum:]_]+)",
+	                               "^var[[:space:]]+([[:alnum:]_]+\\.)*([[:alnum:]_]+)",
 	                               "\\2", "v", "", NULL);
 	addLanguageTagMultiTableRegex (language, "toplevel",
 	                               "^[[:alnum:]]+",
@@ -97,13 +97,13 @@ static void initializeKotlinParser (const langType language)
 	                               "^.",
 	                               "", "", "", NULL);
 	addLanguageTagMultiTableRegex (language, "vals",
-	                               "^([[:alnum:]_]+)\\s*(:\\s*[[:alnum:]_]+)*\\s*,*\\s*",
+	                               "^([[:alnum:]_]+)[[:space:]]*(:[[:space:]]*[[:alnum:]_]+)*[[:space:]]*,*[[:space:]]*",
 	                               "\\1", "C", "", NULL);
 	addLanguageTagMultiTableRegex (language, "vals",
 	                               "^\\)",
 	                               "", "", "{tleave}", NULL);
 	addLanguageTagMultiTableRegex (language, "vars",
-	                               "^([[:alnum:]_]+)\\s*(:\\s*[[:alnum:]_]+)*\\s*,*\\s*",
+	                               "^([[:alnum:]_]+)[[:space:]]*(:[[:space:]]*[[:alnum:]_]+)*[[:space:]]*,*[[:space:]]*",
 	                               "\\1", "v", "", NULL);
 	addLanguageTagMultiTableRegex (language, "vars",
 	                               "^\\)",
