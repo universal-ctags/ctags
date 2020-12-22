@@ -46,38 +46,32 @@
 --_tabledef-Kotlin=vals
 --_tabledef-Kotlin=vars
 
-# ignore anything in comment
---_mtable-regex-Kotlin=toplevel/\/\*//{tenter=comment}
---_mtable-regex-Kotlin=toplevel/\/\/[^\n]*\n//
 --_mtable-regex-Kotlin=comment/\*\///{tleave}
 --_mtable-regex-Kotlin=comment/[^*]+//
 --_mtable-regex-Kotlin=comment/.//
 
-# ignore anything in multiline strings
---_mtable-regex-Kotlin=toplevel/"""//{tenter=mlstring}
 --_mtable-regex-Kotlin=mlstring/"""//{tleave}
 --_mtable-regex-Kotlin=mlstring/[^\\"]+//
 --_mtable-regex-Kotlin=mlstring/.//
 
-# ignore anything in strings
---_mtable-regex-Kotlin=toplevel/"//{tenter=string}
 --_mtable-regex-Kotlin=string/[^\\"]+//
 --_mtable-regex-Kotlin=string/\\.//
 --_mtable-regex-Kotlin=string/"//{tleave}
 --_mtable-regex-Kotlin=string/.//
 
-# ignore character literals
---_mtable-regex-Kotlin=toplevel/'.{1,2}'//
-
-# handle destructuring declarations
---_mtable-regex-Kotlin=toplevel/val\s+\(\s*//{tenter=vals}
 --_mtable-regex-Kotlin=vals/([[:alnum:]_]+)\s*(:\s*[[:alnum:]_]+)*\s*,*\s*/\1/C/
 --_mtable-regex-Kotlin=vals/\)//{tleave}
---_mtable-regex-Kotlin=toplevel/var\s+\(\s*//{tenter=vars}
+
 --_mtable-regex-Kotlin=vars/([[:alnum:]_]+)\s*(:\s*[[:alnum:]_]+)*\s*,*\s*/\1/v/
 --_mtable-regex-Kotlin=vars/\)//{tleave}
 
-# parse the language constructs
+--_mtable-regex-Kotlin=toplevel/\/\*//{tenter=comment}
+--_mtable-regex-Kotlin=toplevel/\/\/[^\n]*\n//
+--_mtable-regex-Kotlin=toplevel/"""//{tenter=mlstring}
+--_mtable-regex-Kotlin=toplevel/"//{tenter=string}
+--_mtable-regex-Kotlin=toplevel/'.{1,2}'//
+--_mtable-regex-Kotlin=toplevel/val\s+\(\s*//{tenter=vals}
+--_mtable-regex-Kotlin=toplevel/var\s+\(\s*//{tenter=vars}
 --_mtable-regex-Kotlin=toplevel/class\s+([[:alnum:]_]+)/\1/c/
 --_mtable-regex-Kotlin=toplevel/interface\s+([[:alnum:]_]+)/\1/i/
 --_mtable-regex-Kotlin=toplevel/object\s+([[:alnum:]_]+)/\1/o/
@@ -85,7 +79,5 @@
 --_mtable-regex-Kotlin=toplevel/fun(<.*>)*\s+([[:alnum:]_]+\.)*([[:alnum:]_]+)/\3/m/
 --_mtable-regex-Kotlin=toplevel/val\s+([[:alnum:]_]+\.)*([[:alnum:]_]+)/\2/C/
 --_mtable-regex-Kotlin=toplevel/var\s+([[:alnum:]_]+\.)*([[:alnum:]_]+)/\2/v/
-
-# ignore anything else
 --_mtable-regex-Kotlin=toplevel/[[:alnum:]]+//
 --_mtable-regex-Kotlin=toplevel/.//
