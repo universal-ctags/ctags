@@ -1,0 +1,2 @@
+used1	input.kt	/^var used1 = "var unused1 = 1"$/;"	v
+used2	input.kt	/^var used2 = "\\"var\\" unused2 = 2"$/;"	v

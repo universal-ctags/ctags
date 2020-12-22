@@ -1,0 +1,1 @@
+f	input.kt	/^\/* comment *\/ var f = 6 \/* another comment *\/$/;"	v

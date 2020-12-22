@@ -97,6 +97,7 @@
 	JsonParser, \
 	JuliaParser, \
 	KconfigParser, \
+	KotlinParser, \
 	LdScriptParser, \
 	LispParser, \
 	LiterateHaskellParser, \
