@@ -38,23 +38,38 @@ code from GitHub.
 
 ## How to build and install ##
 
-To build with Autotools, see `docs/autotools.rst` for more information.
-(To build on GNU/Linux, Autotools is your choice.)
-To build on Windows, see `docs/windows.rst` for more information.
-To build on OSX, see `docs/osx.rst` for more information.
+To build with Autotools (Autoconf, Automake, and Libtool) on GNU/Linux, OSX, or Windows 10 WSL,
+```
+    $ git clone https://github.com/universal-ctags/ctags.git
+    $ cd ctags
+    $ ./autogen.sh
+    $ ./configure --prefix=/where/you/want # defaults to /usr/local
+    $ make
+    $ make install # may require extra privileges depending on where to install
+```
+
+See
+[`docs/autotools.rst`](https://github.com/universal-ctags/ctags/blob/master/docs/autotools.rst)
+for more information.
+
+To build on Windows, see
+[`docs/windows.rst`](https://github.com/universal-ctags/ctags/blob/master/docs/windows.rst)
+for more information.
+
+To build on OSX, see
+[`docs/osx.rst`](https://github.com/universal-ctags/ctags/blob/master/docs/osx.rst)
+for more information.
 
 ## Manual ##
-Man page (ctags.1) is generated only in Autotools based building process.
-In addition rst2man command is needed.
+Go to https://docs.ctags.io for the preformatted documentations
+of the latest development version.
+See also `*/README.md` on this repository.
 
-rst2man is part of the python-docutils package on Ubuntu.
-
-## Differences ##
+## Differences from exuberant-ctags ##
 
 You may be interested in how universal-ctags is different from
-exuberant-ctags. The critical and attractive changes are explained
-in docs/\*.rst. The preformatted version is available on line,
-https://docs.ctags.io/.
+exuberant-ctags. See [Introduced changes](https://docs.ctags.io/en/latest/news.html)
+on https://docs.ctags.io/ for details.
 
 The most significant incompatible changes:
 
