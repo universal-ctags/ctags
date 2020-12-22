@@ -780,8 +780,7 @@ def run_show_stderr_output(units_dir, t):
     line('.')
     for fn in glob.glob(units_dir + '/' + t + '.*/' + _STDERR_OUTPUT_NAME):
         with open(fn, 'r') as f:
-            lines = f.readlines()
-            for l in lines[-50:]:
+            for l in f:
                 print("\t" + l, end='')
     print()
 
