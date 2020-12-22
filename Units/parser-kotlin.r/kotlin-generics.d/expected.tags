@@ -1,5 +1,0 @@
-Bar	input.kt	/^class Bar<T, U>(val a: T, val b: U): Foo<T>$/;"	c
-Foo	input.kt	/^interface Foo<T> {$/;"	i
-a	input.kt	/^class Bar<T, U>(val a: T, val b: U): Foo<T>$/;"	C
-b	input.kt	/^class Bar<T, U>(val a: T, val b: U): Foo<T>$/;"	C
-genericFunction	input.kt	/^    fun<T: Any> genericFunction() = 42$/;"	m
