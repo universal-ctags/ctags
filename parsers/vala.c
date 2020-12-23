@@ -282,6 +282,7 @@ static void parseInterface (tokenInfo *const token, int corkIndex);
 static void parseClass (tokenInfo *const token, int kindIndex, int corkIndex);
 static void parseStatement (tokenInfo *const token, int corkIndex);
 static void parseEnum (tokenInfo *const token, int kindIndex, int elementKindIndex, int corkIndex);
+static void recurseValaTags (tokenInfo *token, int parentIndex);
 
 
 /*
@@ -575,7 +576,7 @@ static void parseEnumBody (tokenInfo *const token, int kindIndex, int corkIndex)
 		if (tokenIsType (token, IDENTIFIER))
 		{
 			makeSimpleTagFromToken (token, kindIndex, corkIndex);
-			tokenType endMakers [] = {',', '}'};
+			tokenType endMakers [] = {',', ';', '}'};
 			if (tokenSkipToTypesOverPairs (token, endMakers, ARRAY_SIZE(endMakers)))
 			{
 				if (tokenIsTypeVal (token, ','))
@@ -590,6 +591,19 @@ static void parseEnumBody (tokenInfo *const token, int kindIndex, int corkIndex)
 
 				if (tokenIsTypeVal (token, '}'))
 					break;
+				else if (tokenIsTypeVal (token, ';'))
+				{
+					bool t = trianglePairState;
+					do
+					{
+						tokenRead (token);
+						if (tokenIsTypeVal (token, '}'))
+							break;
+						recurseValaTags (token, corkIndex);
+					} while (!tokenIsEOF (token));
+					trianglePairState = t;
+					break;
+				}
 			}
 			else
 				break;

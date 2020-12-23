@@ -58,6 +58,17 @@ namespace Skk {
         MIRACLE_MASK = 1 << 21,	// valac accept this.
 	}
 
+	public enum ModifierType3 {
+        A_MASK = 1 << 29,
+        B_MASK = 1 << 31;
+		string to_string0() {
+			return "";
+		}
+		string to_string1() {
+			return "";
+		}
+	}
+
     /**
      * Object representing a key event.
      */
