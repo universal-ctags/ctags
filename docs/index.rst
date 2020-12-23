@@ -42,6 +42,7 @@ This is a draft document. Proofreading and pull-requests are welcome!
 	other-projects.rst
 	contributions.rst
 	development-process.rst
+	optlib.rst
 	extending.rst
 	running-multi-parsers.rst
 	tips.rst

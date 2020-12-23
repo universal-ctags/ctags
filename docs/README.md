@@ -16,10 +16,16 @@ on the tools. When converting rst to man, two backslashes are converted
 into one, however when converting to html, four backslashes are converted
 into one.
 
+##  Generating man pages ##
+
 The files in `man/` directory are generated from the man pages in `../man/`
-directory. Do not edit the files in `man/` directory directly.
+directory. **Do not edit the files in `man/` directory directly.**
+
 Execute the following command in the top directory to update them:
 
 ```sh
 make -C man QUICK=1 update-docs
 ```
+
+To genereate the man pages rst2man command is needed.
+rst2man is part of the python-docutils package on Ubuntu.
