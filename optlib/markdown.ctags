@@ -71,8 +71,8 @@
 --_mtable-regex-Markdown=rest/^[^\n]*[\n]+//
 --_mtable-regex-Markdown=rest/^[^\n]*//{tquit}
 
---_mtable-regex-Markdown=code/^[ \t]*````*([a-zA-Z0-9][-#+a-zA-Z0-9]*)?[^`\n]*[\n]//{tenter=codeblockBacktick}{_guest=\1,0end,}
---_mtable-regex-Markdown=code/^[ \t]*~~~~*([a-zA-Z0-9][-#+a-zA-Z0-9]*)?[^~\n]*[\n]//{tenter=codeblockTildes}{_guest=\1,0end,}
+--_mtable-regex-Markdown=code/^[ \t]*````*[ \t]*([a-zA-Z0-9][-#+a-zA-Z0-9]*)?[^`\n]*[\n]//{tenter=codeblockBacktick}{_guest=\1,0end,}
+--_mtable-regex-Markdown=code/^[ \t]*~~~~*[ \t]*([a-zA-Z0-9][-#+a-zA-Z0-9]*)?[^~\n]*[\n]//{tenter=codeblockTildes}{_guest=\1,0end,}
 
 
 #
