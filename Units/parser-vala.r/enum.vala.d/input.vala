@@ -53,6 +53,11 @@ namespace Skk {
         RELEASE_MASK = 1 << 30
     }
 
+	public enum ModifierType2 {
+        ULTRA_MASK = 1 << 20,
+        MIRACLE_MASK = 1 << 21,	// valac accept this.
+	}
+
     /**
      * Object representing a key event.
      */

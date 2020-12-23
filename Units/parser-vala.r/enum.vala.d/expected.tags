@@ -19,4 +19,7 @@ SUPER_MASK	input.vala	/^        SUPER_MASK = 1 << 26,$/;"	v	enum:Skk.ModifierTyp
 HYPER_MASK	input.vala	/^        HYPER_MASK = 1 << 27,$/;"	v	enum:Skk.ModifierType
 META_MASK	input.vala	/^        META_MASK = 1 << 28,$/;"	v	enum:Skk.ModifierType
 RELEASE_MASK	input.vala	/^        RELEASE_MASK = 1 << 30$/;"	v	enum:Skk.ModifierType
+ModifierType2	input.vala	/^	public enum ModifierType2 {$/;"	e	namespace:Skk
+ULTRA_MASK	input.vala	/^        ULTRA_MASK = 1 << 20,$/;"	v	enum:Skk.ModifierType2
+MIRACLE_MASK	input.vala	/^        MIRACLE_MASK = 1 << 21,	\/\/ valac accept this.$/;"	v	enum:Skk.ModifierType2
 KeyEvent	input.vala	/^    public class KeyEvent : Object {$/;"	c	namespace:Skk

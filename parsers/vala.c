@@ -578,6 +578,16 @@ static void parseEnumBody (tokenInfo *const token, int kindIndex, int corkIndex)
 			tokenType endMakers [] = {',', '}'};
 			if (tokenSkipToTypesOverPairs (token, endMakers, ARRAY_SIZE(endMakers)))
 			{
+				if (tokenIsTypeVal (token, ','))
+				{
+					tokenRead (token);
+					if (!tokenIsTypeVal (token, '}'))
+					{
+						tokenUnread (token);
+						continue;
+					}
+				}
+
 				if (tokenIsTypeVal (token, '}'))
 					break;
 			}
