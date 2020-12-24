@@ -94,7 +94,7 @@ source tree).
 
   If you want to reuse your .ctags written for Exuberant-ctags,
   you must review kind letters and names defined with `--regex-<LANG>=...`
-  options. When updating the definitions, using `--kind-<LANG>` option
+  options. When updating the definitions, using `--kinddef-<LANG>=...` option
   is appreciated.
 
 Pull-requests are welcome!
