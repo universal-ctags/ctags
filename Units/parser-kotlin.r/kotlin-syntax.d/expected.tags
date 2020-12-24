@@ -1,3 +1,4 @@
+com.example.helloworld	input.kt	/^package com.example.helloworld$/;"	p
 AbstractWorker	input.kt	/^interface AbstractWorker {$/;"	i
 process	input.kt	/^    abstract fun process(): String$/;"	m
 Worker	input.kt	/^class Worker<T>(val name: T): AbstractWorker {$/;"	c

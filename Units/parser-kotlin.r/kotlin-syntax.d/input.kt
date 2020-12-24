@@ -1,3 +1,5 @@
+package com.example.helloworld
+
 interface AbstractWorker {
     abstract fun process(): String
 }

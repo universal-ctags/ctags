@@ -31,6 +31,7 @@
 --map-Kotlin=+.kt
 --map-Kotlin=+.kts
 
+--kinddef-Kotlin=p,package,packages
 --kinddef-Kotlin=c,class,classes
 --kinddef-Kotlin=o,object,objects
 --kinddef-Kotlin=i,interface,interfaces
@@ -70,6 +71,7 @@
 --_mtable-regex-Kotlin=toplevel/"""//{tenter=mlstring}
 --_mtable-regex-Kotlin=toplevel/"//{tenter=string}
 --_mtable-regex-Kotlin=toplevel/'.{1,2}'//
+--_mtable-regex-Kotlin=toplevel/package[[:space:]]+([^\n]+)/\1/p/
 --_mtable-regex-Kotlin=toplevel/val[[:space:]]+\([[:space:]]*//{tenter=vals}
 --_mtable-regex-Kotlin=toplevel/var[[:space:]]+\([[:space:]]*//{tenter=vars}
 --_mtable-regex-Kotlin=toplevel/class[[:space:]]+([[:alnum:]_]+)/\1/c/

@@ -34,6 +34,9 @@ static void initializeKotlinParser (const langType language)
 	                               "^'.{1,2}'",
 	                               "", "", "", NULL);
 	addLanguageTagMultiTableRegex (language, "toplevel",
+	                               "^package[[:space:]]+([^\n]+)",
+	                               "\\1", "p", "", NULL);
+	addLanguageTagMultiTableRegex (language, "toplevel",
 	                               "^val[[:space:]]+\\([[:space:]]*",
 	                               "", "", "{tenter=vals}", NULL);
 	addLanguageTagMultiTableRegex (language, "toplevel",
@@ -127,6 +130,9 @@ extern parserDefinition* KotlinParser (void)
 	};
 
 	static kindDefinition KotlinKindTable [] = {
+		{
+		  true, 'p', "package", "packages",
+		},
 		{
 		  true, 'c', "class", "classes",
 		},
