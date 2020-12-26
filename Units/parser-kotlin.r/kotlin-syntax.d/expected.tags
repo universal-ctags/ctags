@@ -1,0 +1,11 @@
+com.example.helloworld	input.kt	/^package com.example.helloworld$/;"	p
+AbstractWorker	input.kt	/^interface AbstractWorker {$/;"	i
+process	input.kt	/^    abstract fun process(): String$/;"	m
+Worker	input.kt	/^class Worker<T>(val name: T): AbstractWorker {$/;"	c
+name	input.kt	/^class Worker<T>(val name: T): AbstractWorker {$/;"	C
+process	input.kt	/^    override fun process(): String = name.toString()$/;"	m
+Global	input.kt	/^object Global {$/;"	o
+greeting	input.kt	/^    const val greeting = "Hello"$/;"	C
+StringWorker	input.kt	/^typealias StringWorker = Worker<String>$/;"	T
+main	input.kt	/^fun main() {$/;"	m
+result	input.kt	/^    var result: String = Global.greeting$/;"	v

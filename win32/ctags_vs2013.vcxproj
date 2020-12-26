@@ -157,6 +157,7 @@
     <ClCompile Include="..\optlib\gdbinit.c" />
     <ClCompile Include="..\optlib\inko.c" />
     <ClCompile Include="..\optlib\kconfig.c" />
+    <ClCompile Include="..\optlib\kotlin.c" />
     <ClCompile Include="..\optlib\man.c" />
     <ClCompile Include="..\optlib\markdown.c" />
     <ClCompile Include="..\optlib\meson.c" />

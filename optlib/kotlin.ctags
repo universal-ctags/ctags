@@ -1,0 +1,85 @@
+#
+#  Copyright (c) 2020, Jan Dolinár
+#
+#  Author: Jan Dolinár <dolik.rce@gmail.com>
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,
+# USA.
+#
+
+# Reference documentation for Kotlin language can be found
+# at https://kotlinlang.org/docs/reference/, including its
+# grammar (https://kotlinlang.org/docs/reference/grammar.html).
+
+# Known issues:
+#  - annotations are not handled correctly
+
+# Regex for Kotlin
+--langdef=Kotlin
+--map-Kotlin=+.kt
+--map-Kotlin=+.kts
+
+--kinddef-Kotlin=p,package,packages
+--kinddef-Kotlin=c,class,classes
+--kinddef-Kotlin=o,object,objects
+--kinddef-Kotlin=i,interface,interfaces
+--kinddef-Kotlin=T,typealias,typealiases
+--kinddef-Kotlin=m,method,methods
+--kinddef-Kotlin=C,constant,constants
+--kinddef-Kotlin=v,variable,variables
+
+--_tabledef-Kotlin=toplevel
+--_tabledef-Kotlin=comment
+--_tabledef-Kotlin=string
+--_tabledef-Kotlin=mlstring
+--_tabledef-Kotlin=vals
+--_tabledef-Kotlin=vars
+
+--_mtable-regex-Kotlin=comment/\*\///{tleave}
+--_mtable-regex-Kotlin=comment/[^*]+//
+--_mtable-regex-Kotlin=comment/.//
+
+--_mtable-regex-Kotlin=mlstring/"""//{tleave}
+--_mtable-regex-Kotlin=mlstring/[^\\"]+//
+--_mtable-regex-Kotlin=mlstring/.//
+
+--_mtable-regex-Kotlin=string/[^\\"]+//
+--_mtable-regex-Kotlin=string/\\.//
+--_mtable-regex-Kotlin=string/"//{tleave}
+--_mtable-regex-Kotlin=string/.//
+
+--_mtable-regex-Kotlin=vals/([[:alnum:]_]+)[[:space:]]*(:[[:space:]]*[[:alnum:]_]+)*[[:space:]]*,*[[:space:]]*/\1/C/
+--_mtable-regex-Kotlin=vals/\)//{tleave}
+
+--_mtable-regex-Kotlin=vars/([[:alnum:]_]+)[[:space:]]*(:[[:space:]]*[[:alnum:]_]+)*[[:space:]]*,*[[:space:]]*/\1/v/
+--_mtable-regex-Kotlin=vars/\)//{tleave}
+
+--_mtable-regex-Kotlin=toplevel/\/\*//{tenter=comment}
+--_mtable-regex-Kotlin=toplevel/\/\/[^\n]*\n//
+--_mtable-regex-Kotlin=toplevel/"""//{tenter=mlstring}
+--_mtable-regex-Kotlin=toplevel/"//{tenter=string}
+--_mtable-regex-Kotlin=toplevel/'.{1,2}'//
+--_mtable-regex-Kotlin=toplevel/package[[:space:]]+([^\n]+)/\1/p/
+--_mtable-regex-Kotlin=toplevel/val[[:space:]]+\([[:space:]]*//{tenter=vals}
+--_mtable-regex-Kotlin=toplevel/var[[:space:]]+\([[:space:]]*//{tenter=vars}
+--_mtable-regex-Kotlin=toplevel/class[[:space:]]+([[:alnum:]_]+)/\1/c/
+--_mtable-regex-Kotlin=toplevel/interface[[:space:]]+([[:alnum:]_]+)/\1/i/
+--_mtable-regex-Kotlin=toplevel/object[[:space:]]+([[:alnum:]_]+)/\1/o/
+--_mtable-regex-Kotlin=toplevel/typealias[[:space:]]+([[:alnum:]_]+)/\1/T/
+--_mtable-regex-Kotlin=toplevel/fun(<.*>)*[[:space:]]+([[:alnum:]_]+\.)*([[:alnum:]_]+)/\3/m/
+--_mtable-regex-Kotlin=toplevel/val[[:space:]]+([[:alnum:]_]+\.)*([[:alnum:]_]+)/\2/C/
+--_mtable-regex-Kotlin=toplevel/var[[:space:]]+([[:alnum:]_]+\.)*([[:alnum:]_]+)/\2/v/
+--_mtable-regex-Kotlin=toplevel/[[:alnum:]]+//
+--_mtable-regex-Kotlin=toplevel/.//

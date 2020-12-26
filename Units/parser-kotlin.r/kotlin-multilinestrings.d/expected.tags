@@ -1,0 +1,3 @@
+used1	input.kt	/^var used1 = """var unused1 = 1"""$/;"	v
+used2	input.kt	/^var used2 = """$/;"	v
+used3	input.kt	/^var used3 = """var unused3 = 3""" + """var unused4 = 4"""$/;"	v

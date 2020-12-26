@@ -1,0 +1,8 @@
+a	input.kt	/^val (a, b) = functionReturningPair()$/;"	C
+b	input.kt	/^val (a, b) = functionReturningPair()$/;"	C
+c	input.kt	/^val (c: Int, d: String) = functionReturningPair()$/;"	C
+d	input.kt	/^val (c: Int, d: String) = functionReturningPair()$/;"	C
+e	input.kt	/^var (e, f) = functionReturningPair()$/;"	v
+f	input.kt	/^var (e, f) = functionReturningPair()$/;"	v
+g	input.kt	/^var (g: Int, h: Pair<String, Int>) = functionReturningPair()$/;"	v
+h	input.kt	/^var (g: Int, h: Pair<String, Int>) = functionReturningPair()$/;"	v

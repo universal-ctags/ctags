@@ -1,0 +1,3 @@
+A	input.kt	/^class A$/;"	c
+test	input.kt	/^fun A.test() = true$/;"	m
+value	input.kt	/^val A.value$/;"	C

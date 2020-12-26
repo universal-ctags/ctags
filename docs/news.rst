@@ -1339,6 +1339,7 @@ The following parsers have been added:
 * JSON
 * Julia
 * Kconfig *optlib*
+* Kotlin *optlib*
 * GNU linker script(LdScript)
 * Man page *optlib*
 * Markdown *optlib*
