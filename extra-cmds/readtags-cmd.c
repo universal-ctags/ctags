@@ -27,6 +27,30 @@ static QCode *Qualifier;
 static SCode *Sorter;
 #endif
 
+static const char* tagsStrerror (int err)
+{
+	if (err > 0)
+		return strerror (err);
+	else if (err < 0)
+	{
+		switch (err)
+		{
+		case TagErrnoUnexpectedSortedMethod:
+			return "Unexpected sorted method";
+		case TagErrnoUnexpectedFormat:
+			return "Unexpected format number";
+		case TagErrnoUnexpectedLineno:
+			return "Unexpected value for line: field";
+		case TagErrnoInvalidArgument:
+			return "Unexpected argument passed to the API function";
+		default:
+			return "Unknown error";
+		}
+	}
+	else
+		return "no error";
+}
+
 static void printTag (const tagEntry *entry)
 {
 	tagPrintOptions opts = {
@@ -214,6 +238,14 @@ static void walkTags (tagFile *const file, tagEntry *first_entry,
 			(* actionfn) (first_entry);
 	} while ( (*nextfn) (file, first_entry) == TagSuccess);
 
+	int err = tagsGetErrno (file);
+	if (err != 0)
+	{
+		fprintf (stderr, "%s: error in walktTags(): %s\n",
+				 ProgramName,
+				 tagsStrerror (err));
+		exit (1);
+	}
 
 	if (a)
 	{
@@ -231,6 +263,15 @@ static void walkTags (tagFile *const file, tagEntry *first_entry,
 	do
 		(* actionfn) (first_entry);
 	while ( (*nextfn) (file, first_entry) == TagSuccess);
+
+	int err = tagsGetErrno (file);
+	if (err != 0)
+	{
+		fprintf (stderr, "%s: error in walktTags(): %s\n",
+				 ProgramName,
+				 tagsStrerror (err));
+		exit (1);
+	}
 }
 #endif
 
@@ -239,21 +280,41 @@ static void findTag (const char *const name, const int options)
 	tagFileInfo info;
 	tagEntry entry;
 	tagFile *const file = tagsOpen (TagFileName, &info);
-	if (file == NULL)
+	if (file == NULL || !info.status.opened)
 	{
 		fprintf (stderr, "%s: cannot open tag file: %s: %s\n",
-				ProgramName, strerror (info.status.error_number), TagFileName);
+				 ProgramName, tagsStrerror (info.status.error_number), TagFileName);
+		if (file)
+			tagsClose (file);
 		exit (1);
 	}
 	else
 	{
+		int err = 0;
 		if (SortOverride)
-			tagsSetSortType (file, SortMethod);
+		{
+			if (tagsSetSortType (file, SortMethod) != TagSuccess)
+			{
+				err = tagsGetErrno (file);
+				fprintf (stderr, "%s: cannot set sort type to %d: %s\n",
+						 ProgramName,
+						 SortMethod,
+						 tagsStrerror (err));
+				exit (1);
+			}
+		}
 		if (debugMode)
 			fprintf (stderr, "%s: searching for \"%s\" in \"%s\"\n",
 					 ProgramName, name, TagFileName);
 		if (tagsFind (file, &entry, name, options) == TagSuccess)
 			walkTags (file, &entry, tagsFindNext, printTag);
+		else if ((err = tagsGetErrno (file)) != 0)
+		{
+			fprintf (stderr, "%s: error in tagsFind(): %s\n",
+					 ProgramName,
+					 tagsStrerror (err));
+			exit (1);
+		}
 		tagsClose (file);
 	}
 }
@@ -263,22 +324,42 @@ static void listTags (int pseudoTags)
 	tagFileInfo info;
 	tagEntry entry;
 	tagFile *const file = tagsOpen (TagFileName, &info);
-	if (file == NULL)
+	if (file == NULL || !info.status.opened)
 	{
 		fprintf (stderr, "%s: cannot open tag file: %s: %s\n",
-				ProgramName, strerror (info.status.error_number), TagFileName);
+				 ProgramName,
+				 tagsStrerror (info.status.error_number),
+				 TagFileName);
+		if (file)
+			tagsClose (file);
 		exit (1);
 	}
 	else if (pseudoTags)
 	{
+		int err = 0;
 		if (tagsFirstPseudoTag (file, &entry) == TagSuccess)
 			walkTags (file, &entry, tagsNextPseudoTag, printPseudoTag);
+		else if ((err = tagsGetErrno (file)) != 0)
+		{
+			fprintf (stderr, "%s: error in tagsFirstPseudoTag(): %s\n",
+					 ProgramName,
+					 tagsStrerror (err));
+			exit (1);
+		}
 		tagsClose (file);
 	}
 	else
 	{
+		int err = 0;
 		if (tagsFirst (file, &entry) == TagSuccess)
 			walkTags (file, &entry, tagsNext, printTag);
+		else if ((err = tagsGetErrno (file)) != 0)
+		{
+			fprintf (stderr, "%s: error in tagsFirst(): %s\n",
+					 ProgramName,
+					 tagsStrerror (err));
+			exit (1);
+		}
 		tagsClose (file);
 	}
 }
