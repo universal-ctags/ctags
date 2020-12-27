@@ -412,7 +412,11 @@ static const char *const Usage =
 
 static void printUsage(FILE* stream, int exitCode)
 {
-	fprintf (stream, Usage, ProgramName, ProgramName, ProgramName);
+	fprintf (stream, Usage, ProgramName,
+#ifdef READTAGS_DSL
+			 ProgramName,
+#endif
+			 ProgramName);
 	exit (exitCode);
 }
 
