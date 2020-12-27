@@ -23,39 +23,69 @@ struct expectation {
 	char *scope_name;
 	char *typeref;
 	int fileScope;
+
+	tagResult result;
+	int       err;
 };
 
 #define COUNT(x) (sizeof(x)/sizeof(x[0]))
 
+enum extraTest { TESTX_NO_REMAIN, TESTX_INVALID_ARG };
+
 static int
 check_finding0 (tagFile *t, const char *name, const int options,
-			   struct expectation *expectations, int count)
+				struct expectation *expectations, int count, enum extraTest xtest)
 {
 	tagEntry e;
 	struct expectation *x;
+	int err;
 
 	for (int i = 0; i < count; i++)
 	{
 		fprintf (stderr, "[%d/%d] finding \"%s\" (%d)...", i + 1, count, name, options);
-		if (i == 0)
+		tagResult r = (i == 0)
+			? tagsFind (t, &e, name, options)
+			: tagsFindNext (t, &e);
+		x = expectations + i;
+		if (r == TagSuccess)
 		{
-			if (tagsFind (t, &e, name, options) != TagSuccess)
+			if (x->result == TagFailure)
 			{
-				fprintf (stderr, "not found\n");
+				fprintf (stderr, "found unexpectedly\n");
 				return 1;
 			}
+			else
+				fprintf (stderr, "found as expected\n");
 		}
 		else
 		{
-			if (tagsFindNext (t, &e) != TagSuccess)
+			if (x->result == TagFailure)
 			{
-				fprintf (stderr, "not found\n");
+				err = tagsGetErrno (t);
+				if (err == x->err)
+				{
+					if (err == 0)
+						fprintf (stderr, "not found, and it is expected\n", err);
+					else
+						fprintf (stderr, "error as expected: %d\n", err);
+					continue;
+				}
+				else
+				{
+					fprintf (stderr, "errer number doesn't match: %d (expected: %d)\n",
+							 err, x->err);
+					return 1;
+				}
+			}
+			else
+			{
+				if ((err = tagsGetErrno (t)))
+					fprintf (stderr, "error: %d\n", err);
+				else
+					fprintf (stderr, "not found\n");
 				return 1;
 			}
 		}
-		fprintf (stderr, "found\n");
-
-		x = expectations + i;
 
 		fprintf (stderr, "checking name field...");
 		if (!(e.name && strcmp (x->name, e.name) == 0))
@@ -123,15 +153,46 @@ check_finding0 (tagFile *t, const char *name, const int options,
 		fprintf (stderr, "ok\n");
 	}
 
-	if (tagsFindNext (t, &e) == TagSuccess)
-		return 1;
+	if (xtest == TESTX_NO_REMAIN)
+	{
+		fprintf (stderr, "verifying no remain....");
+		if (tagsFindNext (t, &e) == TagSuccess)
+		{
+			fprintf (stderr, "still existing\n");
+			return 1;
+		}
+		else if ((err = tagsGetErrno (t)))
+		{
+			fprintf (stderr, "unexpected error: %d\n", err);
+			return 1;
+		}
+		fprintf (stderr, "ok\n");
+	}
+	else if (xtest == TESTX_NO_REMAIN)
+	{
+		fprintf (stderr, "call tagsFindNext after getting an error....");
+		if (tagsFindNext (t, &e) == TagSuccess)
+		{
+			fprintf (stderr, "unexpectedly successful\n");
+			return 1;
+		}
+
+		err = tagsGetErrno (t);
+		if (err != TagErrnoInvalidArgument)
+		{
+			fprintf (stderr, "errer number doesn't match: %d (expected: %d)\n",
+					 err, TagErrnoInvalidArgument);
+			return 1;
+		}
+		fprintf (stderr, "get TagErrnoInvalidArgument expectedly\n");
+	}
 
 	return 0;
 }
 
 static int
 check_finding (const char *tags, const char *name, const int options,
-			   struct expectation *expectations, int count)
+			   struct expectation *expectations, int count, enum extraTest xtest)
 {
 	tagFile *t;
 	tagFileInfo info;
@@ -146,7 +207,7 @@ check_finding (const char *tags, const char *name, const int options,
 	}
 	fprintf (stderr, "ok\n");
 
-	if (check_finding0 (t, name, options, expectations, count) != 0)
+	if (check_finding0 (t, name, options, expectations, count, xtest) != 0)
 		return 1;
 
 	fprintf (stderr, "closing the tag file...");
@@ -186,6 +247,7 @@ main (void)
 			.scope_name = "main",
 			.typeref = "typename:int",
 			.fileScope = 1,
+			.result = TagSuccess,
 		},
 		{
 			.name = "n",
@@ -196,6 +258,7 @@ main (void)
 			.scope_name = "main",
 			.typeref = "typename:int",
 			.fileScope = 1,
+			.result = TagSuccess,
 		},
 		{
 			.name = "n",
@@ -206,6 +269,7 @@ main (void)
 			.scope_name = "n",
 			.typeref = "typename:int",
 			.fileScope = 1,
+			.result = TagSuccess,
 		},
 		{
 			.name = "n",
@@ -216,6 +280,7 @@ main (void)
 			.scope_name = "main",
 			.typeref = "typename:int",
 			.fileScope = 1,
+			.result = TagSuccess,
 		},
 		{
 			.name = "n",
@@ -226,6 +291,7 @@ main (void)
 			.scope_name = NULL,
 			.typeref = NULL,
 			.fileScope = 1,
+			.result = TagSuccess,
 		},
 		{
 			.name = "n",
@@ -236,6 +302,7 @@ main (void)
 			.scope_name = NULL,
 			.typeref = "typename:int",
 			.fileScope = 1,
+			.result = TagSuccess,
 		},
 	};
 
@@ -249,6 +316,7 @@ main (void)
 			.scope_name = NULL,
 			.typeref = "typename:int",
 			.fileScope = 0,
+			.result = TagSuccess,
 		},
 	};
 	for (int i = 0; i < COUNT(sorted_yes_FULLMATCH_OBSERVECASE); i++)
@@ -264,6 +332,7 @@ main (void)
 			.scope_name = NULL,
 			.typeref = "typename:int",
 			.fileScope = 0,
+			.result = TagSuccess,
 		},
 		{
 			.name = "main",
@@ -274,6 +343,7 @@ main (void)
 			.scope_name = NULL,
 			.typeref = "typename:int",
 			.fileScope = 0,
+			.result = TagSuccess,
 		},
 	};
 
@@ -287,25 +357,30 @@ main (void)
 			.scope_name = NULL,
 			.typeref = "typename:int",
 			.fileScope = 0,
+			.result = TagSuccess,
 		},
 	};
 	for (int i = 0; i < COUNT(sorted_yes_PARTIALMATCH_OBSERVECASE); i++)
 		sorted_yes_PARTIALMATCH_IGNORECASE [i + 1] = sorted_yes_PARTIALMATCH_OBSERVECASE [i];
 
 	if (check_finding (tags_sorted_yes, "n", TAG_FULLMATCH|TAG_OBSERVECASE,
-					   sorted_yes_FULLMATCH_OBSERVECASE, COUNT(sorted_yes_FULLMATCH_OBSERVECASE)) != 0)
+					   sorted_yes_FULLMATCH_OBSERVECASE, COUNT(sorted_yes_FULLMATCH_OBSERVECASE),
+					   TESTX_NO_REMAIN) != 0)
 		return 1;
 
 	if (check_finding (tags_sorted_yes, "n", TAG_FULLMATCH|TAG_IGNORECASE,
-					   sorted_yes_FULLMATCH_IGNORECASE, COUNT(sorted_yes_FULLMATCH_IGNORECASE)) != 0)
+					   sorted_yes_FULLMATCH_IGNORECASE, COUNT(sorted_yes_FULLMATCH_IGNORECASE),
+					   TESTX_NO_REMAIN) != 0)
 		return 1;
 
 	if (check_finding (tags_sorted_yes, "m", TAG_PARTIALMATCH|TAG_OBSERVECASE,
-					   sorted_yes_PARTIALMATCH_OBSERVECASE, COUNT(sorted_yes_PARTIALMATCH_OBSERVECASE)) != 0)
+					   sorted_yes_PARTIALMATCH_OBSERVECASE, COUNT(sorted_yes_PARTIALMATCH_OBSERVECASE),
+					   TESTX_NO_REMAIN) != 0)
 		return 1;
 
 	if (check_finding (tags_sorted_yes, "m", TAG_PARTIALMATCH|TAG_IGNORECASE,
-					   sorted_yes_PARTIALMATCH_IGNORECASE, COUNT(sorted_yes_PARTIALMATCH_IGNORECASE)) != 0)
+					   sorted_yes_PARTIALMATCH_IGNORECASE, COUNT(sorted_yes_PARTIALMATCH_IGNORECASE),
+					   TESTX_NO_REMAIN) != 0)
 		return 1;
 
 
@@ -323,6 +398,7 @@ main (void)
 			.scope_name = NULL,
 			.typeref = NULL,
 			.fileScope = 1,
+			.result = TagSuccess,
 		},
 		{
 			.name = "n",
@@ -333,6 +409,7 @@ main (void)
 			.scope_name = "n",
 			.typeref = "typename:int",
 			.fileScope = 1,
+			.result = TagSuccess,
 		},
 		{
 			.name = "n",
@@ -343,6 +420,7 @@ main (void)
 			.scope_name = NULL,
 			.typeref = "typename:int",
 			.fileScope = 1,
+			.result = TagSuccess,
 		},
 		{
 			.name = "n",
@@ -353,6 +431,7 @@ main (void)
 			.scope_name = "main",
 			.typeref = "typename:int",
 			.fileScope = 1,
+			.result = TagSuccess,
 		},
 		{
 			.name = "n",
@@ -363,6 +442,7 @@ main (void)
 			.scope_name = "main",
 			.typeref = "typename:int",
 			.fileScope = 1,
+			.result = TagSuccess,
 		},
 		{
 			.name = "n",
@@ -373,6 +453,7 @@ main (void)
 			.scope_name = "main",
 			.typeref = "typename:int",
 			.fileScope = 1,
+			.result = TagSuccess,
 		},
 	};
 
@@ -386,6 +467,7 @@ main (void)
 			.scope_name = NULL,
 			.typeref = "typename:int",
 			.fileScope = 0,
+			.result = TagSuccess,
 		},
 	};
 	for (int i = 0; i < COUNT(sorted_no_FULLMATCH_OBSERVECASE); i++)
@@ -401,6 +483,7 @@ main (void)
 			.scope_name = NULL,
 			.typeref = "typename:int",
 			.fileScope = 0,
+			.result = TagSuccess,
 		},
 		{
 			.name = "m",
@@ -411,6 +494,7 @@ main (void)
 			.scope_name = NULL,
 			.typeref = "typename:int",
 			.fileScope = 0,
+			.result = TagSuccess,
 		},
 	};
 
@@ -424,25 +508,30 @@ main (void)
 			.scope_name = NULL,
 			.typeref = "typename:int",
 			.fileScope = 0,
+			.result = TagSuccess,
 		},
 	};
 	for (int i = 0; i < COUNT(sorted_no_PARTIALMATCH_OBSERVECASE); i++)
 		sorted_no_PARTIALMATCH_IGNORECASE [i] = sorted_no_PARTIALMATCH_OBSERVECASE [i];
 
 	if (check_finding (tags_sorted_no, "n", TAG_FULLMATCH|TAG_OBSERVECASE,
-					   sorted_no_FULLMATCH_OBSERVECASE, COUNT(sorted_no_FULLMATCH_OBSERVECASE)) != 0)
+					   sorted_no_FULLMATCH_OBSERVECASE, COUNT(sorted_no_FULLMATCH_OBSERVECASE),
+					   TESTX_NO_REMAIN) != 0)
 		return 1;
 
 	if (check_finding (tags_sorted_no, "n", TAG_FULLMATCH|TAG_IGNORECASE,
-					   sorted_no_FULLMATCH_IGNORECASE, COUNT(sorted_no_FULLMATCH_IGNORECASE)) != 0)
+					   sorted_no_FULLMATCH_IGNORECASE, COUNT(sorted_no_FULLMATCH_IGNORECASE),
+					   TESTX_NO_REMAIN) != 0)
 		return 1;
 
 	if (check_finding (tags_sorted_no, "m", TAG_PARTIALMATCH|TAG_OBSERVECASE,
-					   sorted_no_PARTIALMATCH_OBSERVECASE, COUNT(sorted_no_PARTIALMATCH_OBSERVECASE)) != 0)
+					   sorted_no_PARTIALMATCH_OBSERVECASE, COUNT(sorted_no_PARTIALMATCH_OBSERVECASE),
+					   TESTX_NO_REMAIN) != 0)
 		return 1;
 
 	if (check_finding (tags_sorted_no, "m", TAG_PARTIALMATCH|TAG_IGNORECASE,
-					   sorted_no_PARTIALMATCH_IGNORECASE, COUNT(sorted_no_PARTIALMATCH_IGNORECASE)) != 0)
+					   sorted_no_PARTIALMATCH_IGNORECASE, COUNT(sorted_no_PARTIALMATCH_IGNORECASE),
+					   TESTX_NO_REMAIN) != 0)
 		return 1;
 
 
@@ -464,6 +553,7 @@ main (void)
 			.scope_name = NULL,
 			.typeref = "typename:int",
 			.fileScope = 0,
+			.result = TagSuccess,
 		},
 		[5] = sorted_foldcase_FULLMATCH_OBSERVECASE[4],
 		[6] = sorted_foldcase_FULLMATCH_OBSERVECASE[5],
@@ -481,21 +571,69 @@ main (void)
 
 
 	if (check_finding (tags_sorted_foldcase, "n", TAG_FULLMATCH|TAG_OBSERVECASE,
-					   sorted_foldcase_FULLMATCH_OBSERVECASE, COUNT(sorted_foldcase_FULLMATCH_OBSERVECASE)) != 0)
+					   sorted_foldcase_FULLMATCH_OBSERVECASE, COUNT(sorted_foldcase_FULLMATCH_OBSERVECASE),
+					   TESTX_NO_REMAIN) != 0)
 		return 1;
 
 	if (check_finding (tags_sorted_foldcase, "n", TAG_FULLMATCH|TAG_IGNORECASE,
-					   sorted_foldcase_FULLMATCH_IGNORECASE, COUNT(sorted_foldcase_FULLMATCH_IGNORECASE)) != 0)
+					   sorted_foldcase_FULLMATCH_IGNORECASE, COUNT(sorted_foldcase_FULLMATCH_IGNORECASE),
+					   TESTX_NO_REMAIN) != 0)
 		return 1;
 
 	if (check_finding (tags_sorted_foldcase, "m", TAG_PARTIALMATCH|TAG_OBSERVECASE,
-					   sorted_foldcase_PARTIALMATCH_OBSERVECASE, COUNT(sorted_foldcase_PARTIALMATCH_OBSERVECASE)) != 0)
+					   sorted_foldcase_PARTIALMATCH_OBSERVECASE, COUNT(sorted_foldcase_PARTIALMATCH_OBSERVECASE),
+					   TESTX_NO_REMAIN) != 0)
 		return 1;
 
 	if (check_finding (tags_sorted_foldcase, "m", TAG_PARTIALMATCH|TAG_IGNORECASE,
-					   sorted_foldcase_PARTIALMATCH_IGNORECASE, COUNT(sorted_foldcase_PARTIALMATCH_IGNORECASE)) != 0)
+					   sorted_foldcase_PARTIALMATCH_IGNORECASE, COUNT(sorted_foldcase_PARTIALMATCH_IGNORECASE),
+					   TESTX_NO_REMAIN) != 0)
 		return 1;
 
+	/*
+	 * Not found
+	 */
+	const char *tags_not_found = "./duplicated-names--sorted-yes.tags";
+	struct expectation not_found_case = {
+		.result = TagFailure,
+		.err    = 0,
+	};
+	if (check_finding (tags_not_found, "noSuchItem", TAG_FULLMATCH|TAG_IGNORECASE,
+					   &not_found_case, 1, TESTX_NO_REMAIN) != 0)
+		return 1;
+
+	/*
+	 * Broken line:
+	 */
+	const char *tags_broken_line_field = "./broken-line-field-in-middle.tags";
+	struct expectation broken_line_case = {
+		.result = TagFailure,
+		.err    = TagErrnoUnexpectedLineno,
+	};
+	if (check_finding (tags_broken_line_field, "n", TAG_FULLMATCH|TAG_OBSERVECASE,
+					   &broken_line_case, 1, TESTX_INVALID_ARG) != 0)
+		return 1;
+
+	struct expectation broken_line_cases[] = {
+		{
+			.name = "N",
+			.file = "duplicated-names.c",
+			.pattern = "/^int N;$/",
+			.kind = "v",
+			.scope_kind = NULL,
+			.scope_name = NULL,
+			.typeref = "typename:int",
+			.fileScope = 0,
+			.result = TagSuccess,
+		},
+		{
+			.result = TagFailure,
+			.err    = TagErrnoUnexpectedLineno,
+		},
+	};
+	if (check_finding (tags_broken_line_field, "n", TAG_FULLMATCH|TAG_IGNORECASE,
+					   broken_line_cases, COUNT(broken_line_cases), TESTX_INVALID_ARG) != 0)
+		return 1;
 
 	return 0;
 }

@@ -27,15 +27,19 @@ check_iterating0 (tagFile *t, struct expectation *expectations, int count)
 {
 	tagEntry e;
 	struct expectation *x;
+	int err;
 
 	for (int i = 0; i < count; i++)
 	{
-		fprintf (stderr, "[%d/%d] interating ptags...", i + 1, count);
+		fprintf (stderr, "[%d/%d] iterating ptags...", i + 1, count);
 		if (i == 0)
 		{
 			if (tagsFirstPseudoTag (t, &e) != TagSuccess)
 			{
-				fprintf (stderr, "no more ptag\n");
+				if ((err = tagsGetErrno (t)))
+					fprintf (stderr, "error: %d\n", err);
+				else
+					fprintf (stderr, "no more ptag\n");
 				return 1;
 			}
 		}
@@ -43,7 +47,10 @@ check_iterating0 (tagFile *t, struct expectation *expectations, int count)
 		{
 			if (tagsNextPseudoTag (t, &e) != TagSuccess)
 			{
-				fprintf (stderr, "no more ptag\n");
+				if ((err = tagsGetErrno (t)))
+					fprintf (stderr, "error: %d\n", err);
+				else
+					fprintf (stderr, "no more ptag\n");
 				return 1;
 			}
 		}
@@ -80,7 +87,10 @@ check_iterating0 (tagFile *t, struct expectation *expectations, int count)
 	fprintf (stderr, "verifying no remain....");
 	if (tagsNextPseudoTag (t, &e) == TagSuccess)
 	{
-		fprintf (stderr, "still existing\n");
+		if ((err = tagsGetErrno (t)))
+			fprintf (stderr, "error: %d\n", err);
+		else
+			fprintf (stderr, "still existing\n");
 		return 1;
 	}
 	fprintf (stderr, "ok\n");
@@ -235,6 +245,52 @@ main (void)
 	if (check_iterating (tags_sorted_no, exp_sorted_no, COUNT(exp_sorted_no)) != 0)
 		return 1;
 
+	/* No entry */
+	const char *tags = "./ptag-sort-yes.tags";
+	tagFileInfo info;
+
+	fprintf (stderr, "opening %s...", tags);
+	tagFile *t = tagsOpen (tags, &info);
+	if (!t)
+	{
+		fprintf (stderr, "unexpected result (t: %p, opened: %d, error_number: %d)\n",
+				 t, info.status.opened, info.status.error_number);
+		return 1;
+	}
+	fprintf (stderr, "ok\n");
+
+
+	fprintf (stderr, "visiting the first tag with NULL tagEntry...");
+	if (tagsFirstPseudoTag (t, NULL) != TagSuccess)
+	{
+		int err;
+		if ((err = tagsGetErrno (t)))
+			fprintf (stderr, "error: %d\n", err);
+		else
+			fprintf (stderr, "no first ptag\n");
+		return 1;
+	}
+	fprintf (stderr, "ok\n");
+
+	fprintf (stderr, "visiting the next tag with NULL tagEntry...");
+	if (tagsNextPseudoTag (t, NULL) != TagSuccess)
+	{
+		int err;
+		if ((err = tagsGetErrno (t)))
+			fprintf (stderr, "error: %d\n", err);
+		else
+			fprintf (stderr, "no more ptag\n");
+		return 1;
+	}
+	fprintf (stderr, "ok\n");
+
+	fprintf (stderr, "closing the tag file...");
+	if (tagsClose (t) != TagSuccess)
+	{
+		fprintf (stderr, "unexpected result\n");
+		return 1;
+	}
+	fprintf (stderr, "ok\n");
 
 	return 0;
 }
