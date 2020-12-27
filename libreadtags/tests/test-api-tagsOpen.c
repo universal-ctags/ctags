@@ -184,5 +184,127 @@ main (void)
 	}
 	fprintf (stderr, "ok\n");
 
+	fprintf (stderr, "opening an broken tags file (format: unexpected number)...");
+	t = tagsOpen ("./api-tagsOpen-wrong-format-num.tags", &info);
+	if (t)
+	{
+		fprintf (stderr, "opened well unexpectedly (NULL)\n");
+		return 1;
+	}
+	else if (info.status.error_number != TagErrnoUnexpectedFormat)
+	{
+		fprintf (stderr, "unexpected error (!= TagErrnoUnexpectedFormat)\n");
+	}
+	fprintf (stderr, "ok\n");
+	fprintf (stderr, "closing the unopened tag file...");
+	if (tagsClose (t) == TagSuccess)
+	{
+		fprintf (stderr, "unexpected result\n");
+		return 1;
+	}
+	fprintf (stderr, "ok\n");
+
+	fprintf (stderr, "opening an broken tags file (format: not a number)...");
+	t = tagsOpen ("./api-tagsOpen-wrong-format-nonum.tags", &info);
+	if (t)
+	{
+		fprintf (stderr, "opened well unexpectedly (NULL)\n");
+		return 1;
+	}
+	else if (info.status.error_number != TagErrnoUnexpectedFormat)
+	{
+		fprintf (stderr, "unexpected error (!= TagErrnoUnexpectedFormat)\n");
+	}
+	fprintf (stderr, "ok\n");
+	fprintf (stderr, "closing the unopened tag file...");
+	if (tagsClose (t) == TagSuccess)
+	{
+		fprintf (stderr, "unexpected result\n");
+		return 1;
+	}
+	fprintf (stderr, "ok\n");
+
+	fprintf (stderr, "opening an broken tags file (sort: unexpected number)...");
+	t = tagsOpen ("./api-tagsOpen-wrong-sort-method-num.tags", &info);
+	if (t)
+	{
+		fprintf (stderr, "opened well unexpectedly (NULL)\n");
+		return 1;
+	}
+	else if (info.status.error_number != TagErrnoUnexpectedSortedMethod)
+	{
+		fprintf (stderr, "unexpected error (!= TagErrnoUnexpectedSortedMethod)\n");
+	}
+	fprintf (stderr, "ok\n");
+	fprintf (stderr, "closing the unopened tag file...");
+	if (tagsClose (t) == TagSuccess)
+	{
+		fprintf (stderr, "unexpected result\n");
+		return 1;
+	}
+	fprintf (stderr, "ok\n");
+
+	fprintf (stderr, "opening an broken tags file (sort: not a number)...");
+	t = tagsOpen ("./api-tagsOpen-wrong-sort-method-nonum.tags", &info);
+	if (t)
+	{
+		fprintf (stderr, "opened well unexpectedly (NULL)\n");
+		return 1;
+	}
+	else if (info.status.error_number != TagErrnoUnexpectedSortedMethod)
+	{
+		fprintf (stderr, "unexpected error (!= TagErrnoUnexpectedSortedMethod)\n");
+	}
+	fprintf (stderr, "ok\n");
+	fprintf (stderr, "closing the unopened tag file...");
+	if (tagsClose (t) == TagSuccess)
+	{
+		fprintf (stderr, "unexpected result\n");
+		return 1;
+	}
+	fprintf (stderr, "ok\n");
+
+	const char* broken_PROGRAM_AUTHOR [6] = {
+		"Universal Ctags Team",
+		"Universal Ctags Team",
+		"",
+		NULL,
+		NULL,
+		NULL,
+	};
+	for (int i = 0; i < 6; i++)
+	{
+		char tagf_name_tmpl [] = "./api-tagsOpen-incomplete-program-author-%d.tags";
+		char tagf_name [sizeof (tagf_name_tmpl)];
+		fprintf (stderr, "opening a tags file with incomplete PROGRAM_AUTHOR field [trimming level: %d]...", i);
+		sprintf (tagf_name, tagf_name_tmpl, i);
+		t = tagsOpen (tagf_name, &info);
+		if (t == NULL)
+		{
+			fprintf (stderr, "unexpected error: %d %s\n", info.status.error_number,
+					 info.status.error_number > 0
+					 ? strerror (info.status.error_number)
+					 : "");
+			return 1;
+		}
+		if (!((broken_PROGRAM_AUTHOR [i] == info.program.author)
+			  || (broken_PROGRAM_AUTHOR [i]
+				  && info.program.author
+				  && strcmp (broken_PROGRAM_AUTHOR [i], info.program.author)) == 0))
+		{
+			fprintf (stderr, "unexpected value: %s (!= %s)\n",
+					 info.program.author? info.program.author: "(null)",
+					 broken_PROGRAM_AUTHOR [i]? broken_PROGRAM_AUTHOR [i]: "(null)");
+			return 1;
+		}
+		fprintf (stderr, "closing the unopened tag file...");
+		if (tagsClose (t) == TagFailure)
+		{
+			fprintf (stderr, "successful unexpectedly\n");
+			return 1;
+		}
+		fprintf (stderr, "ok\n");
+	}
+
 	return 0;
 }
