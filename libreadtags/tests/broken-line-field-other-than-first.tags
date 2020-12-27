@@ -1,0 +1,21 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_OUTPUT_EXCMD	mixed	/number, pattern, mixed, or combineV2/
+!_TAG_OUTPUT_FILESEP	slash	/slash or backslash/
+!_TAG_OUTPUT_MODE	u-ctags	/u-ctags or e-ctags/
+!_TAG_PATTERN_LENGTH_LIMIT	96	/0 for no limit/
+!_TAG_PROC_CWD	/home/jet/var/libreadtags/tests/	//
+!_TAG_PROGRAM_AUTHOR	Universal Ctags Team	//
+!_TAG_PROGRAM_NAME	Universal Ctags	/Derived from Exuberant Ctags/
+!_TAG_PROGRAM_URL	https://ctags.io/	/official site/
+!_TAG_PROGRAM_VERSION	5.9.0	/a8bf418d/
+M	duplicated-names.c	/^int M (void) { return 0; }$/;"	f	line:24	typeref:typename:int
+N	duplicated-names.c	/^int N;$/;"	v	line:9	typeref:typename:int
+O	duplicated-names.c	/^int O (void) { return 0; }$/;"	f	line:x7	typeref:typename:int
+duplicated-names.c	duplicated-names.c	1;"	F	line:x1	epoch:1608822975
+m	duplicated-names.c	/^int m;$/;"	v	line:x23	typeref:typename:int
+main	duplicated-names.c	/^int main(int n)$/;"	f	line:x14	typeref:typename:int
+n	duplicated-names.c	/^	int n;$/;"	m	line:x11	struct:n	typeref:typename:int	file:
+n	duplicated-names.c	/^struct n {$/;"	s	line:x10	file:
+n	duplicated-names.c	/^typedef int n;$/;"	t	line:x13	typeref:typename:int	file:
+o	duplicated-names.c	/^int o;$/;"	v	line:x6	typeref:typename:int

@@ -30,7 +30,14 @@ extern "C" {
 /* Options for tagsSetSortType() */
 typedef enum {
 	TAG_UNSORTED, TAG_SORTED, TAG_FOLDSORTED
-} sortType ;
+} tagSortType ;
+
+/* For source code level compatibility, sortType is defined here.
+*  Define TAG_NO_COMPAT_SORT_TYPE if you want to avoid namespace pollution.
+*/
+#ifndef TAG_NO_COMPAT_SORT_TYPE
+#define sortType tagSortType
+#endif
 
 /* Options for tagsFind() */
 #define TAG_FULLMATCH     0x0
@@ -45,6 +52,15 @@ typedef enum {
 
 typedef enum { TagFailure = 0, TagSuccess = 1 } tagResult;
 
+typedef enum {
+	TagErrnoUnexpectedSortedMethod = -1, /* Unexpected sorted method */
+	TagErrnoUnexpectedFormat       = -2, /* Unexpected format number */
+	TagErrnoUnexpectedLineno       = -3, /* Unexpected value for line: field
+										  * (Zero or a positive integer is expected.) */
+	TagErrnoInvalidArgument        = -4, /* Unexpected argument passed to the API
+										  * function */
+} tagErrno;
+
 struct sTagFile;
 
 typedef struct sTagFile tagFile;
@@ -56,7 +72,8 @@ typedef struct {
 			/* was the tag file successfully opened? */
 		int opened;
 
-			/* errno value when 'opened' is false */
+			/* errno value or tagErrno typed value
+			   when 'opened' is false */
 		int error_number;
 	} status;
 
@@ -66,7 +83,7 @@ typedef struct {
 			short format;
 
 				/* how is the tag file sorted? */
-			sortType sort;
+			tagSortType sort;
 	} file;
 
 
@@ -149,12 +166,14 @@ typedef struct {
 *  null) pointer to a structure which, if not null, will be populated with
 *  information about the tag file. If successful, the function will return a
 *  handle which must be supplied to other calls to read information from the
-*  tag file, and info.status.opened will be set to true. If unsuccessful,
-*  the function will return NULL, and
-*  info.status.opened will be set to false and info.status.error_number will
-*  be set to the errno value representing the system error preventing the tag
-*  file from being successfully opened. The error_number will be zero if the
-*  memory allocation for the handle is failed.
+*  tag file, and info.status.opened will be set to true.
+*  If unsuccessful, the function will return NULL, and
+*  info.status.opened will be set to false and
+*  info.status.error_number will be set to either the errno value
+*  representing the system error preventing the tag file from being
+*  successfully opened, or the tagErrno typed value representing the
+*  library level error. The error_number will be ENOMEM if the memory
+*  allocation for the handle is failed.
 */
 extern tagFile *tagsOpen (const char *const filePath, tagFileInfo *const info);
 
@@ -171,7 +190,7 @@ extern tagFile *tagsOpen (const char *const filePath, tagFileInfo *const info);
 *  it actually is not. The function will return TagSuccess if called on an
 *  open tag file or TagFailure if not.
 */
-extern tagResult tagsSetSortType (tagFile *const file, const sortType type);
+extern tagResult tagsSetSortType (tagFile *const file, const tagSortType type);
 
 /*
 *  Reads the first tag in the file, if any. It is passed the handle to an
@@ -251,11 +270,23 @@ extern tagResult tagsFirstPseudoTag (tagFile *const file, tagEntry *const entry)
 extern tagResult tagsNextPseudoTag (tagFile *const file, tagEntry *const entry);
 
 /*
-*  Call tagsTerminate() at completion of reading the tag file, which will
+*  Call tagsClose() at completion of reading the tag file, which will
 *  close the file and free any internal memory allocated. The function will
-*  return TagFailure is no file is currently open, TagSuccess otherwise.
+*  return TagFailure if no file is currently open, TagSuccess otherwise.
 */
 extern tagResult tagsClose (tagFile *const file);
+
+/*
+*  Get the error status set in the last API call.
+*  Much of the API functions return TagFailure because (1) no tag is
+*  found, or (2) an error occurs. tagsGetErrno() is for distinguishing
+*  (1) or (2). This function will return 0 for (1). The errno value
+*  representing the system error or tagErrno value for (2).
+*
+*  This function does not deal with the results of tagsOpen(),
+*  tagsClose(), and tagsField().
+*/
+extern int tagsGetErrno (tagFile *const file);
 
 #ifdef __cplusplus
 };

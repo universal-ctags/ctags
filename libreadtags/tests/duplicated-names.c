@@ -1,7 +1,13 @@
 /*
- * for s in yes foldcase no; do 
+ * for s in yes foldcase no; do
  *   u-ctags --quiet --options=NONE -o duplicated-names--sorted-$s.tags --kinds-C='*' --sort=$s duplicated-names.c
  * done
+ *
+ * u-ctags --extras=+pf --fields=+n -o - duplicated-names.c \
+ * | sed -e 's/line:/line:x/' \
+ * > broken-line-field.tags
+ *
+
  */
 int o;
 int O (void) { return 0; }
