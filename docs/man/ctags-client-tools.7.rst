@@ -241,6 +241,15 @@ for using notable ones.
 ``TAG_PROGRAM_NAME``
 	TBW
 
+``TAG_ROLE_DESCRIPTION`` (new in Universal-ctags)
+	Indicates the names and descriptions of enabled roles::
+
+	  !_TAG_ROLE_DESCRIPTION!{language-name}!{kind-name}	{role-name}	/description/
+
+	If your tool relies on some roles, refer to the pseudo-tags of
+	this type. Note that a role owned by a disabled kind is not listed
+	even if the role itself is enabled.
+
 REDUNDANT-KINDS
 ---------------
 TBW

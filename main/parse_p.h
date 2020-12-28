@@ -170,6 +170,8 @@ extern bool makeFieldDescriptionsPseudoTags (const langType language,
 					       const ptagDesc *pdesc);
 extern bool makeExtraDescriptionsPseudoTags (const langType language,
 					       const ptagDesc *pdesc);
+extern bool makeRoleDescriptionsPseudoTags (const langType language,
+					       const ptagDesc *pdesc);
 
 extern void printLanguageMultitableStatistics (langType language);
 extern void printParserStatisticsIfUsed (langType lang);

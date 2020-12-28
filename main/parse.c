@@ -4551,6 +4551,30 @@ static bool makeKindDescriptionPseudoTag (kindDefinition *kind,
 	return false;
 }
 
+static bool makeRoleDescriptionPseudoTag (kindDefinition *kind,
+										  roleDefinition *role,
+										  void *user_data)
+{
+	struct makeKindDescriptionPseudoTagData *data = user_data;
+
+	vString *parser_and_kind_name = vStringNewInit (data->langName);
+	vStringCatS (parser_and_kind_name, PSEUDO_TAG_SEPARATOR);
+	vStringCatS (parser_and_kind_name, kind->name);
+
+	vString *description = vStringNew ();
+	const char *d = role->description? role->description: role->name;
+	vStringCatSWithEscapingAsPattern (description, d);
+
+	data->written |=  writePseudoTag (data->pdesc, role->name,
+									  vStringValue (description),
+									  vStringValue (parser_and_kind_name));
+
+	vStringDelete (description);
+	vStringDelete (parser_and_kind_name);
+
+	return false;
+}
+
 extern bool makeKindDescriptionsPseudoTags (const langType language,
 					    const ptagDesc *pdesc)
 {
@@ -4658,6 +4682,47 @@ extern bool makeExtraDescriptionsPseudoTags (const langType language,
 		}
 	}
 	return written;
+}
+
+extern bool makeRoleDescriptionsPseudoTags (const langType language,
+											const ptagDesc *pdesc)
+{
+	parserObject *parser;
+	struct kindControlBlock *kcb;
+	parserDefinition* lang;
+	kindDefinition *kind;
+	struct makeKindDescriptionPseudoTagData data;
+
+	Assert (0 <= language  &&  language < (int) LanguageCount);
+	parser = LanguageTable + language;
+	kcb = parser->kindControlBlock;
+	lang = parser->def;
+
+	unsigned int kindCount = countKinds(kcb);
+
+	data.langName = lang->name;
+	data.pdesc = pdesc;
+	data.written = false;
+
+	for (unsigned int i = 0; i < kindCount; ++i)
+	{
+		if (!isLanguageKindEnabled (language, i))
+			continue;
+
+		kind = getKind (kcb, i);
+
+		unsigned int roleCount = countRoles (kcb, i);
+		for (unsigned int j = 0; j < roleCount; ++j)
+		{
+			if (isRoleEnabled (kcb, i, j))
+			{
+				roleDefinition *role = getRole (kcb, i, j);
+				makeRoleDescriptionPseudoTag (kind, role, &data);
+			}
+		}
+	}
+
+	return data.written;
 }
 
 /*
