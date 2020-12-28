@@ -586,4 +586,3 @@ runs the command in two ways.
     non-zero if the input file contains invalid syntax. This method
     will never run if *is_runnable* method of the command exits with
     non-zero.
-
