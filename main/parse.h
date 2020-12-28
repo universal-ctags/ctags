@@ -84,7 +84,7 @@ struct sParserDefinition {
 	rescanParser parser2;          /* rescanning parser (unusual case) */
 	selectLanguage* selectLanguage; /* may be used to resolve conflicts */
 	unsigned int method;           /* See METHOD_ definitions above */
-	unsigned int useCork;		   /* bit or of corkUsage */
+	unsigned int useCork;		   /* bit fields of corkUsage */
 	bool useMemoryStreamInput;
 	bool allowNullTag;
 	bool requestAutomaticFQTag;
