@@ -3842,7 +3842,8 @@ static bool createTagsWithFallback1 (const langType language,
 	if (useCork)
 		corkTagFile(corkFlags);
 
-	addParserPseudoTags (language);
+	if (isXtagEnabled (XTAG_PSEUDO_TAGS))
+		addParserPseudoTags (language);
 	initializeParserStats (parser);
 	tagFilePosition (&tagfpos);
 
