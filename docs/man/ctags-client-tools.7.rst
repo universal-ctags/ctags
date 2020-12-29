@@ -142,6 +142,8 @@ for using notable ones.
 	A client tool can know "{anonymous}", "{fileScope}", "{pseudo}",
 	and "{subparser}" extras are enabled from the output.
 
+	Universal Ctags version 6.0 will turn on this pseudo tag by default.
+
 ``TAG_FIELD_DESCRIPTION``  (new in Universal Ctags)
 	Indicates the names and descriptions of enabled fields::
 
@@ -168,6 +170,8 @@ for using notable ones.
 	and "{typeref}" fields are enabled from the output.
 	The fields are common in languages. In addition to the common fields,
 	the tool can known "{macrodef}" field of C language is also enabled.
+
+	Universal Ctags version 6.0 will turn on this pseudo tag by default.
 
 ``TAG_FILE_ENCODING``  (new in Universal Ctags)
 	TBW
@@ -201,6 +205,8 @@ for using notable ones.
 
 	A client tool can know "{function}", "{member}", and "{variable}"
 	kinds of C language are enabled from the output.
+
+	Universal Ctags version 6.0 will turn on this pseudo tag by default.
 
 ``TAG_KIND_SEPARATOR`` (new in Universal Ctags)
 	TBW
@@ -539,6 +545,13 @@ used in a field of JSON.
 	boolean (true or false)
 
 For an example, the value for ``pattern`` field of ctags takes a string or a boolean value.
+
+CHANGES
+-----------
+
+Version 6.0
+~~~~~~~~~~~
+* ctags enables TAG_{KIND,EXTRA,FIELD,ROLE}_DESCRIPTION pseudo tags by default.
 
 SEE ALSO
 --------
