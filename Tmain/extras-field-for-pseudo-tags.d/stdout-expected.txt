@@ -1,6 +1,21 @@
 # option:  --format=1
+!_TAG_EXTRA_DESCRIPTION	pseudo	/Include pseudo tags/
+!_TAG_FIELD_DESCRIPTION	extras	/Extra tag type information/
+!_TAG_FIELD_DESCRIPTION	input	/input file/
+!_TAG_FIELD_DESCRIPTION	name	/tag name/
+!_TAG_FIELD_DESCRIPTION	pattern	/pattern/
 !_TAG_FILE_FORMAT	1	/original ctags format/
 !_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_KIND_DESCRIPTION!C	d,macro	/macro definitions/
+!_TAG_KIND_DESCRIPTION!C	e,enumerator	/enumerators (values inside an enumeration)/
+!_TAG_KIND_DESCRIPTION!C	f,function	/function definitions/
+!_TAG_KIND_DESCRIPTION!C	g,enum	/enumeration names/
+!_TAG_KIND_DESCRIPTION!C	h,header	/included header files/
+!_TAG_KIND_DESCRIPTION!C	m,member	/struct, and union members/
+!_TAG_KIND_DESCRIPTION!C	s,struct	/structure names/
+!_TAG_KIND_DESCRIPTION!C	t,typedef	/typedefs/
+!_TAG_KIND_DESCRIPTION!C	u,union	/union names/
+!_TAG_KIND_DESCRIPTION!C	v,variable	/variable definitions/
 !_TAG_OUTPUT_EXCMD	mixed	/number, pattern, mixed, or combineV2/
 !_TAG_OUTPUT_FILESEP	slash	/slash or backslash/
 !_TAG_OUTPUT_MODE	u-ctags	/u-ctags or e-ctags/
@@ -8,10 +23,28 @@
 !_TAG_PROGRAM_AUTHOR	Universal Ctags Team	//
 !_TAG_PROGRAM_NAME	Universal Ctags	/Derived from Exuberant Ctags/
 !_TAG_PROGRAM_URL	https://ctags.io/	/official site/
+!_TAG_ROLE_DESCRIPTION!C!header	local	/local header/
+!_TAG_ROLE_DESCRIPTION!C!header	system	/system header/
+!_TAG_ROLE_DESCRIPTION!C!macro	undef	/undefined/
 main	input.c	/^int main (void) { return 0; }$/
 # option:  --format=2
+!_TAG_EXTRA_DESCRIPTION	pseudo	/Include pseudo tags/;"	extras:pseudo
+!_TAG_FIELD_DESCRIPTION	extras	/Extra tag type information/;"	extras:pseudo
+!_TAG_FIELD_DESCRIPTION	input	/input file/;"	extras:pseudo
+!_TAG_FIELD_DESCRIPTION	name	/tag name/;"	extras:pseudo
+!_TAG_FIELD_DESCRIPTION	pattern	/pattern/;"	extras:pseudo
 !_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/;"	extras:pseudo
 !_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/;"	extras:pseudo
+!_TAG_KIND_DESCRIPTION!C	d,macro	/macro definitions/;"	extras:pseudo
+!_TAG_KIND_DESCRIPTION!C	e,enumerator	/enumerators (values inside an enumeration)/;"	extras:pseudo
+!_TAG_KIND_DESCRIPTION!C	f,function	/function definitions/;"	extras:pseudo
+!_TAG_KIND_DESCRIPTION!C	g,enum	/enumeration names/;"	extras:pseudo
+!_TAG_KIND_DESCRIPTION!C	h,header	/included header files/;"	extras:pseudo
+!_TAG_KIND_DESCRIPTION!C	m,member	/struct, and union members/;"	extras:pseudo
+!_TAG_KIND_DESCRIPTION!C	s,struct	/structure names/;"	extras:pseudo
+!_TAG_KIND_DESCRIPTION!C	t,typedef	/typedefs/;"	extras:pseudo
+!_TAG_KIND_DESCRIPTION!C	u,union	/union names/;"	extras:pseudo
+!_TAG_KIND_DESCRIPTION!C	v,variable	/variable definitions/;"	extras:pseudo
 !_TAG_OUTPUT_EXCMD	mixed	/number, pattern, mixed, or combineV2/;"	extras:pseudo
 !_TAG_OUTPUT_FILESEP	slash	/slash or backslash/;"	extras:pseudo
 !_TAG_OUTPUT_MODE	u-ctags	/u-ctags or e-ctags/;"	extras:pseudo
@@ -19,4 +52,7 @@ main	input.c	/^int main (void) { return 0; }$/
 !_TAG_PROGRAM_AUTHOR	Universal Ctags Team	//;"	extras:pseudo
 !_TAG_PROGRAM_NAME	Universal Ctags	/Derived from Exuberant Ctags/;"	extras:pseudo
 !_TAG_PROGRAM_URL	https://ctags.io/	/official site/;"	extras:pseudo
+!_TAG_ROLE_DESCRIPTION!C!header	local	/local header/;"	extras:pseudo
+!_TAG_ROLE_DESCRIPTION!C!header	system	/system header/;"	extras:pseudo
+!_TAG_ROLE_DESCRIPTION!C!macro	undef	/undefined/;"	extras:pseudo
 main	input.c	/^int main (void) { return 0; }$/
