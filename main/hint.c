@@ -20,6 +20,7 @@
 #include "hint_p.h"
 #include "routines.h"
 #include "field_p.h"
+#include "ptag_p.h"
 
 #define TAG_NO_COMPAT_SORT_TYPE
 #include "readtags.h"
@@ -79,6 +80,38 @@ extern void processHintFileOption (const char *const option,
 		error (FATAL, "cannot open tag file as specified as hint: %s: %s",
 			   tagsStrerror (hFileInfo.status.error_number), parameter);
 	verbose ("done\n");
+}
+
+extern void proprocessHints (void)
+{
+	if (hFile == NULL)
+		return;
+
+	int err;
+	int count = 0;
+	hintEntry hint;
+	verbose ("preprocessing pseudo tags in the hint file...");
+	if (tagsFirstPseudoTag (hFile, &hint) != TagSuccess)
+	{
+		err = tagsGetErrno (hFile);
+		if (err)
+			error (FATAL, "faild to find the first pseudo in the hint file: %s",
+				   tagsStrerror (err));
+		else
+			error (FATAL, "no pseudo tag in the hint file");
+	}
+
+	do
+	{
+		preloadMetaHint (&hint);
+		count++;
+	}
+	while (tagsNextPseudoTag (hFile, &hint) == TagSuccess);
+	err = tagsGetErrno (hFile);
+	if (err)
+		error (FATAL, "faild to find a next pseudo in the hint file: %s",
+			   tagsStrerror (err));
+	verbose ("done (loading %d pseudo tags)\n", count);
 }
 
 extern bool isHintAvailable (void)

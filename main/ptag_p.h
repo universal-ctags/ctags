@@ -14,6 +14,7 @@
 
 #include "general.h"
 #include "types.h"
+#include "hint.h"
 
 #define PSEUDO_TAG_PREFIX       "!_"
 #define PSEUDO_TAG_SEPARATOR    "!"
@@ -68,6 +69,29 @@ struct sPtagDesc {
 	 */
 	bool (* makeTag) (ptagDesc *, langType, const void *);
 
+	/* The hint loader calls this method when the loader reads a
+	 * pseudo tag from a hint file.
+	 *
+	 * pseudo tag associated with a ptag desc having PTAGF_PARSER
+	 * flag have following form:
+	 *
+	 *     !_TAG_KIND_DESCRIPTION!C	g,enum	/enumeration names/
+	 *
+	 * The language name, "C" in the above example, in the pseudo tag
+	 * is extracted and converted to a langType value. The value is
+	 * passed to the method as the second argument. LANG_AUTO is
+	 * passed instead for ptag descs not having PTAGF_PARSER flag.
+	 *
+	 * Some pseudo tags have more complicated form like:
+	 *
+	 *     !_TAG_ROLE_DESCRIPTION!C!header	local	/local header/
+	 *
+	 * The part after the language name, "header" in the above example,
+	 * is passed to the method as the third argument. NULL is passed
+	 * instead if no such part is.
+	 */
+	void (* preloadMetaHint) (ptagDesc *, langType, const char *, hintEntry *);
+
 	ptagFlag flags;
 };
 
@@ -79,5 +103,7 @@ extern bool isPtagEnabled (ptagType type);
 extern bool isPtagCommonInParsers (ptagType type);
 extern bool isPtagParserSpecific (ptagType type);
 extern bool enablePtag (ptagType type, bool state);
+
+extern void preloadMetaHint (hintEntry *metaHint);
 
 #endif	/* CTAGS_MAIN_PTAG_PRIVATE_H */

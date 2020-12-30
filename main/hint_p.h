@@ -19,5 +19,6 @@
 
 extern void processHintFileOption (const char *const option,
 								   const char *const parameter);
+extern void proprocessHints (void);
 
 #endif	/* CTAGS_MAIN_HINT_PRIVATE_H */

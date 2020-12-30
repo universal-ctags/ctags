@@ -18,6 +18,7 @@
 #include "debug.h"
 #include "entry_p.h"
 #include "options_p.h"
+#include "parse.h"
 #include "parse_p.h"
 #include "ptag_p.h"
 #include "routines_p.h"
@@ -135,76 +136,94 @@ static ptagDesc ptagDescs [] = {
 	  false, "JSON_OUTPUT_VERSION",
 	  "the version of json output stream format",
 	  ptagMakeJsonOutputVersion,
+	  NULL,
 	  PTAGF_COMMON },
 	{ true, "TAG_FILE_FORMAT",
 	  "the version of tags file format",
 	  ptagMakeFormat,
+	  NULL,
 	  PTAGF_COMMON },
 	{ true, "TAG_FILE_SORTED",
 	  "how tags are sorted",
 	  ptagMakeHowSorted,
+	  NULL,
 	  PTAGF_COMMON },
 	{ true, "TAG_PROGRAM_AUTHOR",
 	  "the author of this ctags implementation",
 	  ptagMakeAuthor,
+	  NULL,
 	  PTAGF_COMMON },
 	{ true, "TAG_PROGRAM_NAME",
 	  "the name of this ctags implementation",
 	  ptagMakeProgName,
+	  NULL,
 	  PTAGF_COMMON },
 	{ true, "TAG_PROGRAM_URL",
 	  "the official site URL of this ctags implementation",
 	  ptagMakeProgURL,
+	  NULL,
 	  PTAGF_COMMON },
 	{ true, "TAG_PROGRAM_VERSION",
 	  "the version of this ctags implementation",
 	  ptagMakeProgVersion,
+	  NULL,
 	  PTAGF_COMMON },
 #ifdef HAVE_ICONV
 	{ true, "TAG_FILE_ENCODING",
 	  "the encoding used in output tags file",
 	  ptagMakeFileEncoding,
+	  NULL,
 	  PTAGF_COMMON },
 #endif
 	{ false, "TAG_KIND_SEPARATOR",
 	  "the separators used in kinds",
 	  ptagMakeKindSeparators,
+	  NULL,
 	  PTAGF_PARSER },
 	{ true, "TAG_KIND_DESCRIPTION",
 	  "the letters, names and descriptions of enabled kinds in the language",
 	  ptagMakeKindDescriptions,
+	  NULL,
 	  PTAGF_PARSER },
 	{ true, "TAG_FIELD_DESCRIPTION",
 	  "the names and descriptions of enabled fields",
 	  ptagMakeFieldDescriptions,
+	  NULL,
 	  PTAGF_COMMON|PTAGF_PARSER },
 	{ true, "TAG_EXTRA_DESCRIPTION",
 	  "the names and descriptions of enabled extras",
 	  ptagMakeExtraDescriptions,
+	  NULL,
 	  PTAGF_COMMON|PTAGF_PARSER },
 	{ true, "TAG_ROLE_DESCRIPTION",
 	  "the names and descriptions of enabled roles",
 	  ptagMakeRoleDescriptions,
+	  NULL,
 	  PTAGF_PARSER },
 	{ true, "TAG_OUTPUT_MODE",
 	  "the output mode: u-ctags or e-ctags",
 	  ptagMakeCtagsOutputMode,
+	  NULL,
 	  PTAGF_COMMON },
 	{ true, "TAG_OUTPUT_FILESEP",
 	  "the separator used in file name (slash or backslash)",
 	  ptagMakeCtagsOutputFilesep,
+	  NULL,
 	  PTAGF_COMMON },
 	{ true, "TAG_PATTERN_LENGTH_LIMIT",
 	  "the limit of pattern length",
 	  ptagMakePatternLengthLimit,
+	  NULL,
 	  PTAGF_COMMON },
 	{ true, "TAG_PROC_CWD",
 	  "the current working directory of the tags generator",
 	  ptagMakeProcCwd,
+	  NULL,
 	  PTAGF_COMMON },
 	{ true, "TAG_OUTPUT_EXCMD",
 	  "the excmd: number, pattern, mixed, or combine",
 	  ptagMakeCtagsOutputExcmd,
+	  NULL,
 	  PTAGF_COMMON },
 };
 
@@ -303,4 +322,78 @@ extern void printPtags (bool withListHeader, bool machinable, FILE *fp)
 	colprintTableSort (table, ptagCompare);
 	colprintTablePrint (table, 0, withListHeader, machinable, fp);
 	colprintTableDelete (table);
+}
+
+static void preloadMetaHintOnePerParser (hintEntry *metaHint, ptagType type,
+										 const char *lang_name)
+{
+	size_t sep_len = strlen (PSEUDO_TAG_SEPARATOR);
+	const char *next_sep = strstr (lang_name, PSEUDO_TAG_SEPARATOR);
+	langType lang = getNamedLanguage (lang_name, next_sep? next_sep - lang_name: 0);
+
+	if (lang == LANG_IGNORE)
+	{
+		vString *s = (next_sep)
+			? vStringNewNInit (lang_name, next_sep - lang_name)
+			: vStringNewInit (lang_name);
+		error (WARNING, "unknown language in hint file: %s", vStringValue (s));
+		vStringDelete (s);
+	}
+
+	initializeParser (lang);
+	const char *rest_part = next_sep? next_sep + sep_len: NULL;
+	if (ptagDescs [type].preloadMetaHint)
+		ptagDescs [type].preloadMetaHint (ptagDescs + type, lang, rest_part, metaHint);
+}
+
+static void preloadMetaHintOne (hintEntry *metaHint, ptagType type,
+								const char *hint_rest_name)
+{
+	ptagFlag flags = ptagDescs [type].flags;
+	size_t sep_len = strlen (PSEUDO_TAG_SEPARATOR);
+	bool sep = (strncmp (hint_rest_name, PSEUDO_TAG_SEPARATOR, sep_len) == 0);
+
+	Assert (flags & (PTAGF_PARSER | PTAGF_COMMON));
+
+	if (sep && (flags & PTAGF_PARSER))
+	{
+		preloadMetaHintOnePerParser (metaHint, type, hint_rest_name + sep_len);
+		return;
+	}
+
+	if (flags & PTAGF_COMMON)
+	{
+		if (ptagDescs [type].preloadMetaHint)
+			ptagDescs [type].preloadMetaHint (ptagDescs + type, LANG_IGNORE, NULL, metaHint);
+		return;
+	}
+
+	error (WARNING, "no language part found: %s", metaHint->name);
+}
+
+extern void preloadMetaHint (hintEntry *metaHint)
+{
+	size_t prefix_len = strlen (PSEUDO_TAG_PREFIX);
+
+	if (strncmp (metaHint->name, PSEUDO_TAG_PREFIX, prefix_len) != 0)
+	{
+		error (WARNING, "pseudo tag doesn't start with %s: %s",
+			   PSEUDO_TAG_PREFIX, metaHint->name);
+		return;
+	}
+
+	bool handled = false;
+	for (int i = 0; i < PTAG_COUNT; i++)
+	{
+		size_t name_len = strlen (ptagDescs [i].name);
+		if (strncmp (ptagDescs [i].name, metaHint->name + prefix_len, name_len) == 0)
+		{
+			const char *hint_rest_name = metaHint->name + prefix_len + name_len;
+			preloadMetaHintOne (metaHint, i, hint_rest_name);
+			handled = true;
+			break;
+		}
+	}
+	if (!handled)
+		verbose ("handled pseudo tag in hint file: %s\n", metaHint->name);
 }
