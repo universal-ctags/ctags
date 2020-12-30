@@ -5144,6 +5144,26 @@ static parserDefinition *FallbackParser (void)
 	return def;
 }
 
+extern void parserPreloadMetaHint (ptagType ptag, langType lang,
+								   const char *rest_part, hintEntry *hint)
+{
+	if (lang == LANG_IGNORE)
+	{
+		for (int i = 0; i < (int) LanguageCount; i++)
+			if (LanguageTable [i].def->preloadMetaHint)
+				LanguageTable [i].def->preloadMetaHint (ptag,
+														i, lang,
+														rest_part,
+														hint);
+	}
+	else
+		if (LanguageTable [lang].def->preloadMetaHint)
+			LanguageTable [lang].def->preloadMetaHint (ptag,
+													   lang, lang,
+													   rest_part,
+													   hint);
+}
+
 /*
  * A dummy parser for printing pseudo tags in xref output
  */

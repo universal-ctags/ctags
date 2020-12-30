@@ -18,6 +18,8 @@
 #include "kind.h"
 #include "lregex.h"
 #include "lxpath.h"
+#include "hint.h"
+#include "ptag.h"
 #include "vstring.h"
 
 /*
@@ -41,6 +43,7 @@ typedef rescanReason (*rescanParser) (const unsigned int passCount);
 typedef void (*parserInitialize) (langType language);
 typedef void (*initStatistics) (langType language);
 typedef void (*printStatistics) (langType langType);
+typedef void (*metaHintPreloader) (ptagType ptag, langType receiverLangType, langType hintLangType, const char *rest_part, hintEntry *metaHint);
 
 /* Per language finalizer is called anytime when ctags exits.
    (Exceptions are a kind of options are given when invoked. Here
@@ -119,6 +122,8 @@ struct sParserDefinition {
 	/* Following two fields are used in a parser using cork. */
 	const char *defaultScopeSeparator;
 	const char *defaultRootScopeSeparator;
+
+	metaHintPreloader preloadMetaHint;
 
 	initStatistics initStats;
 	printStatistics printStats;

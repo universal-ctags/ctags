@@ -344,6 +344,7 @@ static void preloadMetaHintOnePerParser (hintEntry *metaHint, ptagType type,
 	const char *rest_part = next_sep? next_sep + sep_len: NULL;
 	if (ptagDescs [type].preloadMetaHint)
 		ptagDescs [type].preloadMetaHint (ptagDescs + type, lang, rest_part, metaHint);
+	parserPreloadMetaHint (type, lang, rest_part, metaHint);
 }
 
 static void preloadMetaHintOne (hintEntry *metaHint, ptagType type,
@@ -365,6 +366,7 @@ static void preloadMetaHintOne (hintEntry *metaHint, ptagType type,
 	{
 		if (ptagDescs [type].preloadMetaHint)
 			ptagDescs [type].preloadMetaHint (ptagDescs + type, LANG_IGNORE, NULL, metaHint);
+		parserPreloadMetaHint (type, LANG_IGNORE, NULL, metaHint);
 		return;
 	}
 

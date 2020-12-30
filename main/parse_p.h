@@ -13,10 +13,12 @@
 *   INCLUDE FILES
 */
 #include "general.h"  /* must always come first */
+#include "hint.h"
 #include "kind.h"
 #include "lregex_p.h"
 #include "parse.h"
 #include "parsers_p.h"  /* contains list of parsers */
+#include "ptag_p.h"
 #include "strlist.h"
 #ifdef EXTERNAL_PARSER_LIST_FILE
 #include EXTERNAL_PARSER_LIST_FILE
@@ -174,5 +176,7 @@ extern bool makeRoleDescriptionsPseudoTags (const langType language,
 
 extern void printLanguageMultitableStatistics (langType language);
 extern void printParserStatisticsIfUsed (langType lang);
+
+extern void parserPreloadMetaHint (ptagType ptag, langType lang, const char *rest_part, hintEntry *hint);
 
 #endif	/* CTAGS_MAIN_PARSE_PRIVATE_H */
