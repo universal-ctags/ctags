@@ -1383,6 +1383,5 @@ extern parserDefinition* JuliaParser (void)
     def->parser     = findJuliaTags;
     def->keywordTable = JuliaKeywordTable;
     def->keywordCount = ARRAY_SIZE (JuliaKeywordTable);
-    def->useCork    = CORK_QUEUE;
     return def;
 }
