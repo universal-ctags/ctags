@@ -32,6 +32,7 @@ MAIN_PUBLIC_HEADS =		\
 	main/param.h		\
 	main/parse.h		\
 	main/promise.h		\
+	main/ptag.h		\
 	main/ptrarray.h		\
 	main/rbtree.h		\
 	main/read.h		\

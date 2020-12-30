@@ -731,6 +731,9 @@
     <ClInclude Include="..\main\promise_p.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\main\ptag.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="..\main\ptag_p.h">
       <Filter>Header Files</Filter>
     </ClInclude>

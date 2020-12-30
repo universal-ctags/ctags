@@ -406,6 +406,7 @@
     <ClInclude Include="..\main\portable-dirent_p.h" />
     <ClInclude Include="..\main\promise.h" />
     <ClInclude Include="..\main\promise_p.h" />
+    <ClInclude Include="..\main\ptag.h" />
     <ClInclude Include="..\main\ptag_p.h" />
     <ClInclude Include="..\main\ptrarray.h" />
     <ClInclude Include="..\main\rbtree.h" />
