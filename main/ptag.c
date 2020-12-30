@@ -212,6 +212,45 @@ static bool ptagMakeRoleDescriptions (ptagDesc *desc, langType language,
 	return makeRoleDescriptionsPseudoTags (language, desc);
 }
 
+static void preloadMetaHintForRoleDescriptions (ptagDesc *ptag, langType lang,
+												const char *rest_part, hintEntry * metaHint)
+{
+	if (metaHint->file == NULL)
+	{
+		error (WARNING, "role name is NULL: %s", metaHint->name);
+		return;
+	}
+
+	if (lang == LANG_IGNORE)
+	{
+		error (WARNING, "no lang part: %s", metaHint->name);
+		return;
+	}
+
+	if (rest_part == NULL)
+	{
+		error (WARNING, "kind part is empty");
+		return;
+	}
+
+	kindDefinition* kdef = getLanguageKindForName (lang, rest_part);
+	if (kdef == NULL)
+	{
+		error (WARNING, "no such kind for name: %s in %s",
+			   rest_part, getLanguageName (lang));
+		return;
+	}
+
+	roleDefinition *rdef = getLanguageRoleForName (lang, kdef->id, metaHint->file);
+	if (rdef == NULL)
+	{
+		error (WARNING, "no such role for name: %s in %s in %s",
+			   metaHint->file, rest_part, getLanguageName (lang));
+
+	}
+	makeLanguageRoleAvailableInHint (lang, kdef->id, rdef->id);
+}
+
 static bool ptagMakeProcCwd (ptagDesc *desc, langType language,
 									   const void *data CTAGS_ATTR_UNUSED)
 {
@@ -287,7 +326,7 @@ static ptagDesc ptagDescs [] = {
 	{ true, "TAG_ROLE_DESCRIPTION",
 	  "the names and descriptions of enabled roles",
 	  ptagMakeRoleDescriptions,
-	  NULL,
+	  preloadMetaHintForRoleDescriptions,
 	  PTAGF_PARSER },
 	{ true, "TAG_OUTPUT_MODE",
 	  "the output mode: u-ctags or e-ctags",

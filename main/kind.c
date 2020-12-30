@@ -30,6 +30,7 @@
 typedef struct sRoleObject {
 	roleDefinition *def;
 	freeRoleDefFunc free;
+	bool availableInHint;
 } roleObject;
 
 struct roleControlBlock {
@@ -97,6 +98,7 @@ static void initRoleObject (roleObject *robj, roleDefinition *rdef, freeRoleDefF
 	robj->def = rdef;
 	robj->free = freefunc;
 	robj->def->id = roleId;
+	robj->availableInHint = false;
 }
 
 static struct roleControlBlock* allocRoleControlBlock (kindObject *kind)
@@ -707,4 +709,14 @@ extern bool isKindAvailableInHint (struct kindControlBlock* kcb, int kindIndex)
 extern void makeKindAvailableInHint (struct kindControlBlock* kcb, int kindIndex)
 {
 	kcb->kind [kindIndex].availableInHint = true;
+}
+
+extern bool isRoleAvailableInHint (struct kindControlBlock* kcb, int kindIndex, int roleIndex)
+{
+	return kcb->kind [kindIndex].rcb->role[roleIndex].availableInHint;
+}
+
+extern void makeRoleAvailableInHint (struct kindControlBlock* kcb, int kindIndex, int roleIndex)
+{
+	kcb->kind [kindIndex].rcb->role[roleIndex].availableInHint = true;
 }

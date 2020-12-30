@@ -5182,6 +5182,18 @@ extern void makeLanguageKindAvailableInHint (langType lang, int kindIndex)
 	makeKindAvailableInHint (kcb, kindIndex);
 }
 
+extern bool isLanguageRoleAvailableInHint (const langType lang, int kindIndex, int roleIndex)
+{
+	struct kindControlBlock *kcb = LanguageTable [lang].kindControlBlock;
+	return isRoleAvailableInHint (kcb, kindIndex, roleIndex);
+}
+
+extern void makeLanguageRoleAvailableInHint (langType lang, int kindIndex, int roleIndex)
+{
+	struct kindControlBlock *kcb = LanguageTable [lang].kindControlBlock;
+	makeRoleAvailableInHint (kcb, kindIndex, roleIndex);
+}
+
 /*
  * A dummy parser for printing pseudo tags in xref output
  */

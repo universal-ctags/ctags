@@ -181,5 +181,6 @@ extern void parserPreloadMetaHint (ptagType ptag, langType lang, const char *res
 extern void parserPreloadHint     (langType lang, hintEntry *hint);
 
 extern void makeLanguageKindAvailableInHint (langType lang, int kindIndex);
+extern void makeLanguageRoleAvailableInHint (langType lang, int kindIndex, int roleIndex);
 
 #endif	/* CTAGS_MAIN_PARSE_PRIVATE_H */
