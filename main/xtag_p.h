@@ -18,7 +18,11 @@
 
 #include "general.h"
 
+#include "types.h"
+#include "xtag.h"
 #include "colprint_p.h"
+
+#include <stdio.h>
 
 /*
 *   FUNCTION PROTOTYPES
