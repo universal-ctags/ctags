@@ -25,6 +25,8 @@
 #include "ptag_p.h"
 #include "routines_p.h"
 #include "writer_p.h"
+#include "xtag.h"
+#include "xtag_p.h"
 #include <string.h>
 
 
@@ -185,6 +187,25 @@ static bool ptagMakeExtraDescriptions (ptagDesc *desc, langType language,
 	return makeExtraDescriptionsPseudoTags (language, desc);
 }
 
+static void preloadMetaHintForExtraDescriptions (ptagDesc *ptag, langType lang,
+												 const char *rest_part, hintEntry * metaHint)
+{
+	if (metaHint->file == NULL)
+	{
+		error (WARNING, "extra name is NULL: %s", metaHint->name);
+		return;
+	}
+
+	xtagType x = getXtagTypeForNameAndLanguage (metaHint->file, lang);
+	if (x == XTAG_UNKNOWN)
+	{
+		error (WARNING, "unknown xtag in hint file: %s (lang: %s)",
+			   metaHint->file, getLanguageName (lang));
+		return;
+	}
+	makeXtagAvailableInHint (x);
+}
+
 static bool ptagMakeRoleDescriptions (ptagDesc *desc, langType language,
 									  const void *data CTAGS_ATTR_UNUSED)
 {
@@ -261,7 +282,7 @@ static ptagDesc ptagDescs [] = {
 	{ true, "TAG_EXTRA_DESCRIPTION",
 	  "the names and descriptions of enabled extras",
 	  ptagMakeExtraDescriptions,
-	  NULL,
+	  preloadMetaHintForExtraDescriptions,
 	  PTAGF_COMMON|PTAGF_PARSER },
 	{ true, "TAG_ROLE_DESCRIPTION",
 	  "the names and descriptions of enabled roles",
