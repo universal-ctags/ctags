@@ -1319,7 +1319,11 @@ static void parseExpr (lexerState *lexer, bool delim, int kind, vString *scope)
             case TOKEN_IDENTIFIER:
                 if (lexer->first_token && lexer->cur_c == '.')
                 {
-                    local_scope = vStringNewCopy(lexer->token_str);
+                    if (local_scope == NULL)
+                    {
+                        local_scope = vStringNew();
+                    }
+                    vStringCopy(local_scope, lexer->token_str);
                     advanceChar(lexer);
                     advanceToken(lexer, true);
                     skipWhitespace(lexer, false);
