@@ -19,7 +19,10 @@
 #include "hint.h"
 #include "hint_p.h"
 #include "routines.h"
+#include "field.h"
 #include "field_p.h"
+#include "parse.h"
+#include "parse_p.h"
 #include "ptag_p.h"
 
 #define TAG_NO_COMPAT_SORT_TYPE
@@ -82,6 +85,19 @@ extern void processHintFileOption (const char *const option,
 	verbose ("done\n");
 }
 
+static void preloadHint (hintEntry *hint)
+{
+	const char *lang_name = hintFieldForType (hint, FIELD_LANGUAGE);
+	if (!lang_name)
+		return;
+
+	langType lang = getNamedLanguage (lang_name, 0);
+	if (lang == LANG_IGNORE)
+		return;
+
+	parserPreloadHint (lang, hint);
+}
+
 extern void proprocessHints (void)
 {
 	if (hFile == NULL)
@@ -112,6 +128,36 @@ extern void proprocessHints (void)
 		error (FATAL, "faild to find a next pseudo in the hint file: %s",
 			   tagsStrerror (err));
 	verbose ("done (loading %d pseudo tags)\n", count);
+
+	if (!isFieldAvailableInHint (FIELD_LANGUAGE))
+	{
+		error (WARNING, "don't refer regular tags in the hint file because the language field is unavailable");
+		return;
+	}
+
+	count = 0;
+	verbose ("preprocessing regular tags in the hint file...");
+	if (tagsFirst (hFile, &hint) != TagSuccess)
+	{
+		err = tagsGetErrno (hFile);
+		if (err)
+			error (FATAL, "faild to find the first pseudo in the hint file: %s",
+				   tagsStrerror (err));
+		else
+			error (FATAL, "no pseudo tag in the hint file");
+	}
+
+	do
+	{
+		preloadHint (&hint);
+		count++;
+	}
+	while (tagsNext (hFile, &hint) == TagSuccess);
+	err = tagsGetErrno (hFile);
+	if (err)
+		error (FATAL, "faild to find a next pseudo in the hint file: %s",
+			   tagsStrerror (err));
+	verbose ("done (loading %d regular tags)\n", count);
 }
 
 extern bool isHintAvailable (void)

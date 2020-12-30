@@ -178,5 +178,6 @@ extern void printLanguageMultitableStatistics (langType language);
 extern void printParserStatisticsIfUsed (langType lang);
 
 extern void parserPreloadMetaHint (ptagType ptag, langType lang, const char *rest_part, hintEntry *hint);
+extern void parserPreloadHint     (langType lang, hintEntry *hint);
 
 #endif	/* CTAGS_MAIN_PARSE_PRIVATE_H */

@@ -44,6 +44,7 @@ typedef void (*parserInitialize) (langType language);
 typedef void (*initStatistics) (langType language);
 typedef void (*printStatistics) (langType langType);
 typedef void (*metaHintPreloader) (ptagType ptag, langType receiverLangType, langType hintLangType, const char *rest_part, hintEntry *metaHint);
+typedef void (*hintPreloader) (langType receiverLangType, hintEntry *hint);
 
 /* Per language finalizer is called anytime when ctags exits.
    (Exceptions are a kind of options are given when invoked. Here
@@ -124,6 +125,7 @@ struct sParserDefinition {
 	const char *defaultRootScopeSeparator;
 
 	metaHintPreloader preloadMetaHint;
+	hintPreloader preloadHint;
 
 	initStatistics initStats;
 	printStatistics printStats;
