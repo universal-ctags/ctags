@@ -37,6 +37,7 @@
 AU_ALIAS([AC_PROG_CC_FOR_BUILD], [AX_PROG_CC_FOR_BUILD])
 AC_DEFUN([AX_PROG_CC_FOR_BUILD], [dnl
 AC_REQUIRE([AC_PROG_CC])dnl
+AC_REQUIRE([AC_PROG_CC_C99])dnl
 AC_REQUIRE([AC_PROG_CPP])dnl
 AC_REQUIRE([AC_CANONICAL_BUILD])dnl
 
@@ -44,6 +45,7 @@ dnl Use the standard macros, but make them use other variable names
 dnl
 pushdef([ac_cv_prog_CPP], ac_cv_build_prog_CPP)dnl
 pushdef([ac_cv_prog_cc_c89], ac_cv_build_prog_cc_c89)dnl
+pushdef([ac_cv_prog_cc_c99], ac_cv_build_prog_cc_c99)dnl
 pushdef([ac_cv_prog_gcc], ac_cv_build_prog_gcc)dnl
 pushdef([ac_cv_prog_cc_works], ac_cv_build_prog_cc_works)dnl
 pushdef([ac_cv_prog_cc_cross], ac_cv_build_prog_cc_cross)dnl
@@ -84,6 +86,7 @@ AS_IF([test -n "$build"],      [ac_build_tool_prefix="$build-"],
 
 AC_LANG_PUSH([C])
 AC_PROG_CC
+AC_PROG_CC_C99
 _AC_COMPILER_EXEEXT
 _AC_COMPILER_OBJEXT
 AC_PROG_CPP
@@ -120,6 +123,7 @@ popdef([ac_cv_c_compiler_gnu])dnl
 popdef([ac_cv_prog_cc_g])dnl
 popdef([ac_cv_prog_cc_cross])dnl
 popdef([ac_cv_prog_cc_works])dnl
+popdef([ac_cv_prog_cc_c99])dnl
 popdef([ac_cv_prog_cc_c89])dnl
 popdef([ac_cv_prog_gcc])dnl
 popdef([ac_cv_prog_CPP])dnl
