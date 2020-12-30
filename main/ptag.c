@@ -17,6 +17,8 @@
 #include "ctags.h"
 #include "debug.h"
 #include "entry_p.h"
+#include "field.h"
+#include "field_p.h"
 #include "options_p.h"
 #include "parse.h"
 #include "parse_p.h"
@@ -111,6 +113,39 @@ static bool ptagMakeFieldDescriptions (ptagDesc *desc, langType language,
 	return makeFieldDescriptionsPseudoTags (language, desc);
 }
 
+static void preloadMetaHintForFieldDescriptions (ptagDesc *ptag, langType lang,
+												 const char *rest_part, hintEntry * metaHint)
+{
+	fieldType f;
+
+	if (metaHint->file == NULL)
+	{
+		error (WARNING, "field name is NULL: %s", metaHint->name);
+		return;
+	}
+
+	if (lang == LANG_IGNORE)
+	{
+		f = getFieldTypeForName (metaHint->file);
+		if (f == FIELD_UNKNOWN)
+		{
+			error (WARNING, "unknown field in hint file: %s", metaHint->file);
+			return;
+		}
+	}
+	else
+	{
+		f = getFieldTypeForNameAndLanguage (metaHint->file, lang);
+		if (f == FIELD_UNKNOWN)
+		{
+			error (WARNING, "unknown field in hint file: %s (lang: %s)",
+				   metaHint->file, getLanguageName (lang));
+			return;
+		}
+	}
+	makeFieldAvailableInHint (f);
+}
+
 static bool ptagMakeExtraDescriptions (ptagDesc *desc, langType language,
 									   const void *data CTAGS_ATTR_UNUSED)
 {
@@ -188,7 +223,7 @@ static ptagDesc ptagDescs [] = {
 	{ true, "TAG_FIELD_DESCRIPTION",
 	  "the names and descriptions of enabled fields",
 	  ptagMakeFieldDescriptions,
-	  NULL,
+	  preloadMetaHintForFieldDescriptions,
 	  PTAGF_COMMON|PTAGF_PARSER },
 	{ true, "TAG_EXTRA_DESCRIPTION",
 	  "the names and descriptions of enabled extras",
