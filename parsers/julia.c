@@ -1016,7 +1016,7 @@ static void parseFunction (lexerState *lexer, vString *scope, int parent_kind)
         advanceChar(lexer);
         advanceToken(lexer, true);
     } else {
-        local_scope = scope;
+        local_scope = vStringNewCopy(scope);
         local_parent_kind = parent_kind;
     }
 
@@ -1059,6 +1059,7 @@ static void parseFunction (lexerState *lexer, vString *scope, int parent_kind)
 
     vStringDelete(name);
     vStringDelete(arg_list);
+    vStringDelete(local_scope);
 }
 
 /* Macro format:
@@ -1278,7 +1279,7 @@ static void parseExpr (lexerState *lexer, bool delim, int kind, vString *scope)
 {
     int level = 1;
     size_t old_scope_len;
-    vString *local_scope;
+    vString *local_scope = NULL;
 
     while (lexer->cur_token != TOKEN_EOF)
     {
@@ -1358,6 +1359,7 @@ static void parseExpr (lexerState *lexer, bool delim, int kind, vString *scope)
             break;
         }
     }
+    vStringDelete(local_scope);
 }
 
 static void findJuliaTags (void)
