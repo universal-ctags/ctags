@@ -1046,17 +1046,16 @@ static void parseFunction (lexerState *lexer, vString *scope, int parent_kind)
         }
 
         addTag(name, NULL, vStringValue(arg_list), K_FUNCTION, line, pos, local_scope, local_parent_kind);
-        //addToScope(scope, name);
-        //parseExpr(lexer, true, K_FUNCTION, scope);
+        addToScope(scope, name);
+        parseExpr(lexer, true, K_FUNCTION, scope);
     }
     else if (lexer->cur_token == TOKEN_CLOSE_BLOCK)
     {
         /* Function without method */
         addTag(name, NULL, NULL, K_FUNCTION, line, pos, local_scope, local_parent_kind);
+        /* Go to the closing 'end' keyword */
+        skipUntilEnd(lexer);
     }
-
-    /* Go to the closing 'end' keyword */
-    skipUntilEnd(lexer);
 
     vStringDelete(name);
     vStringDelete(arg_list);
