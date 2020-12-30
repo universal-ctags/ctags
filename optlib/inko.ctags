@@ -22,19 +22,19 @@
 
 --langdef=Inko
 --map-Inko=+.inko
---kinddef-Inko=o,object,Object definition
+--kinddef-Inko=o,class,Class definition
 --kinddef-Inko=m,method,Method definition
 --kinddef-Inko=t,trait,Trait definition
 --kinddef-Inko=a,attribute,Attribute definition
 --kinddef-Inko=c,constant,Constant definition
---kinddef-Inko=r,reopen,Reopen object
+--kinddef-Inko=r,reopen,Reopen class
 
 --_fielddef-Inko=implements,Trait being implemented
 
 --fields-Inko=+{implements}
 
 --_tabledef-Inko=toplevel
---_tabledef-Inko=object
+--_tabledef-Inko=class
 --_tabledef-Inko=trait
 --_tabledef-Inko=method
 --_tabledef-Inko=comment
@@ -62,7 +62,7 @@
 --_mtable-regex-Inko=tstring/.//
 
 --_mtable-regex-Inko=toplevel/#//{tenter=comment}
---_mtable-regex-Inko=toplevel/[[:blank:]]*object[[:blank:]]+//{tenter=object}
+--_mtable-regex-Inko=toplevel/[[:blank:]]*class[[:blank:]]+//{tenter=class}
 --_mtable-regex-Inko=toplevel/[[:blank:]]*trait[[:blank:]]+//{tenter=trait}
 --_mtable-regex-Inko=toplevel/[[:blank:]]*def[[:blank:]]+//{tenter=method}
 --_mtable-regex-Inko=toplevel/[[:blank:]]*impl[[:blank:]]+//{tenter=impl}
@@ -72,9 +72,9 @@
 --_mtable-regex-Inko=toplevel/(@[a-zA-Z0-9_]+):/\1/a/{scope=ref}
 --_mtable-regex-Inko=toplevel/.//
 
---_mtable-regex-Inko=object/([A-Z][a-zA-Z0-9_?]*)[^{]*/\1/o/{scope=push}
---_mtable-regex-Inko=object/\{//{tleave}
---_mtable-regex-Inko=object/.//
+--_mtable-regex-Inko=class/([A-Z][a-zA-Z0-9_?]*)[^{]*/\1/o/{scope=push}
+--_mtable-regex-Inko=class/\{//{tleave}
+--_mtable-regex-Inko=class/.//
 
 --_mtable-regex-Inko=trait/([A-Z][a-zA-Z0-9_?]*)[^{]*/\1/t/{scope=push}
 --_mtable-regex-Inko=trait/\{//{tleave}

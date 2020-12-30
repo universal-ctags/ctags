@@ -1,7 +1,7 @@
-A	input.inko	/^object A {$/;"	o
-method_a	input.inko	/^  def method_a {}$/;"	m	object:A
-B	input.inko	/^object B {$/;"	o
-method_b	input.inko	/^  def method_b {}$/;"	m	object:B
+A	input.inko	/^class A {$/;"	o
+method_a	input.inko	/^  def method_a {}$/;"	m	class:A
+B	input.inko	/^class B {$/;"	o
+method_b	input.inko	/^  def method_b {}$/;"	m	class:B
 +	input.inko	/^def + {}$/;"	m
 -	input.inko	/^def - {}$/;"	m
 *	input.inko	/^def * {}$/;"	m

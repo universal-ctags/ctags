@@ -1,12 +1,12 @@
 'foo'
 'let A = 10'
-'object B {}'
+'class B {}'
 'trait C {}'
 "trait D {}"
 
-'foo \' object AA {}'
-"foo \" object AA {}"
+'foo \' class AA {}'
+"foo \" class AA {}"
 
 `trait Hello {}`
 
-object Foo {}
+class Foo {}

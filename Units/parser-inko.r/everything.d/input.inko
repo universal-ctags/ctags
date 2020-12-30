@@ -1,6 +1,6 @@
 { 20 }
 
-object A
+class A
 {
   @number: X
 
@@ -13,7 +13,7 @@ object A
 
 def foo {}
 
-object B {
+class B {
   def in_b {
     { 10  }
   }
@@ -26,7 +26,7 @@ trait SomeTrait {
   def required_method
 }
 
-object Socket {
+class Socket {
   def quack {}
 }
 
