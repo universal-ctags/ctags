@@ -17,6 +17,8 @@
 !_TAG_PROGRAM_AUTHOR	Universal Ctags Team	//
 !_TAG_PROGRAM_NAME	Universal Ctags	/Derived from Exuberant Ctags/
 !_TAG_PROGRAM_URL	https://ctags.io/	/official site/
+!_TAG_ROLE_DESCRIPTION!Sh!heredoc	endmarker	/end marker/
+!_TAG_ROLE_DESCRIPTION!Sh!script	loaded	/loaded/
 # REGEX
 !_TAG_EXTRA_DESCRIPTION	pseudo	/Include pseudo tags/
 !_TAG_EXTRA_DESCRIPTION!foo	extra	/extra example/

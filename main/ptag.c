@@ -116,6 +116,12 @@ static bool ptagMakeExtraDescriptions (ptagDesc *desc, langType language,
 	return makeExtraDescriptionsPseudoTags (language, desc);
 }
 
+static bool ptagMakeRoleDescriptions (ptagDesc *desc, langType language,
+									  const void *data CTAGS_ATTR_UNUSED)
+{
+	return makeRoleDescriptionsPseudoTags (language, desc);
+}
+
 static bool ptagMakeProcCwd (ptagDesc *desc, langType language,
 									   const void *data CTAGS_ATTR_UNUSED)
 {
@@ -176,6 +182,10 @@ static ptagDesc ptagDescs [] = {
 	  "the names and descriptions of enabled extras",
 	  ptagMakeExtraDescriptions,
 	  PTAGF_COMMON|PTAGF_PARSER },
+	{ false, "TAG_ROLE_DESCRIPTION",
+	  "the names and descriptions of enabled roles",
+	  ptagMakeRoleDescriptions,
+	  PTAGF_PARSER },
 	{ true, "TAG_OUTPUT_MODE",
 	  "the output mode: u-ctags or e-ctags",
 	  ptagMakeCtagsOutputMode,

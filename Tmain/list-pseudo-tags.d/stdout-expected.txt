@@ -15,3 +15,4 @@ TAG_PROGRAM_AUTHOR        on      the author of this ctags implementation
 TAG_PROGRAM_NAME          on      the name of this ctags implementation
 TAG_PROGRAM_URL           on      the official site URL of this ctags implementation
 TAG_PROGRAM_VERSION       on      the version of this ctags implementation
+TAG_ROLE_DESCRIPTION      off     the names and descriptions of enabled roles
