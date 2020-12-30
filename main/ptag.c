@@ -107,6 +107,39 @@ static bool ptagMakeKindDescriptions (ptagDesc *desc, langType language,
 	return makeKindDescriptionsPseudoTags (language, desc);
 }
 
+static void preloadMetaHintForKindDescriptions (ptagDesc *ptag, langType lang,
+												const char *rest_part, hintEntry * metaHint)
+{
+	if (metaHint->file == NULL)
+	{
+		error (WARNING, "kind name is NULL: %s", metaHint->name);
+		return;
+	}
+
+	if (lang == LANG_IGNORE)
+	{
+		error (WARNING, "no lang part: %s", metaHint->name);
+		return;
+	}
+
+	char kind_letter = metaHint->file [0];
+	if (kind_letter == '\0')
+	{
+		error (WARNING, "kind part is empty");
+		return;
+	}
+
+	kindDefinition* kdef = getLanguageKindForLetter (lang, kind_letter);
+	if (kdef == NULL)
+	{
+		error (WARNING, "no such kind for letter: %c in %s",
+			   kind_letter, getLanguageName (lang));
+		return;
+	}
+
+	makeLanguageKindAvailableInHint (lang, kdef->id);
+}
+
 static bool ptagMakeFieldDescriptions (ptagDesc *desc, langType language,
 									   const void *data CTAGS_ATTR_UNUSED)
 {
@@ -218,7 +251,7 @@ static ptagDesc ptagDescs [] = {
 	{ true, "TAG_KIND_DESCRIPTION",
 	  "the letters, names and descriptions of enabled kinds in the language",
 	  ptagMakeKindDescriptions,
-	  NULL,
+	  preloadMetaHintForKindDescriptions,
 	  PTAGF_PARSER },
 	{ true, "TAG_FIELD_DESCRIPTION",
 	  "the names and descriptions of enabled fields",

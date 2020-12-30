@@ -41,6 +41,7 @@ struct roleControlBlock {
 typedef struct sKindObject {
 	kindDefinition *def;
 	freeKindDefFunc free;
+	bool availableInHint;
 	struct roleControlBlock *rcb;
 	ptrArray * dynamicSeparators;
 } kindObject;
@@ -138,6 +139,7 @@ extern struct kindControlBlock* allocKindControlBlock (parserDefinition *parser)
 		kindObject *kind = kcb->kind + i;
 		kind->def = parser->kindTable + i;
 		kind->free = NULL;
+		kind->availableInHint = false;
 		kind->def->id = i;
 		kind->rcb = allocRoleControlBlock (kind);
 		kind->dynamicSeparators = NULL;
@@ -188,6 +190,7 @@ extern int  defineKind (struct kindControlBlock* kcb, kindDefinition *def,
 	kcb->kind = xRealloc (kcb->kind, kcb->count, kindObject);
 	kcb->kind [def->id].def = def;
 	kcb->kind [def->id].free = freeKindDef;
+	kcb->kind [def->id].availableInHint = false;
 	kcb->kind [def->id].rcb = allocRoleControlBlock(kcb->kind + def->id);
 	kcb->kind [def->id].dynamicSeparators = NULL;
 
@@ -694,4 +697,14 @@ extern void roleColprintTablePrint (struct colprintTable *table, bool noparser,
 {
 	colprintTableSort (table, roleColprintCompareLines);
 	colprintTablePrint (table, noparser? 1: 0, withListHeader, machinable, fp);
+}
+
+extern bool isKindAvailableInHint (struct kindControlBlock* kcb, int kindIndex)
+{
+	return kcb->kind [kindIndex].availableInHint;
+}
+
+extern void makeKindAvailableInHint (struct kindControlBlock* kcb, int kindIndex)
+{
+	kcb->kind [kindIndex].availableInHint = true;
 }

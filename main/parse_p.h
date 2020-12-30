@@ -180,4 +180,6 @@ extern void printParserStatisticsIfUsed (langType lang);
 extern void parserPreloadMetaHint (ptagType ptag, langType lang, const char *rest_part, hintEntry *hint);
 extern void parserPreloadHint     (langType lang, hintEntry *hint);
 
+extern void makeLanguageKindAvailableInHint (langType lang, int kindIndex);
+
 #endif	/* CTAGS_MAIN_PARSE_PRIVATE_H */

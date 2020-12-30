@@ -5170,6 +5170,18 @@ extern void parserPreloadHint (langType lang, hintEntry *hint)
 		LanguageTable [lang].def->preloadHint (lang, hint);
 }
 
+extern bool isLanguageKindAvailableInHint (const langType lang, int kindIndex)
+{
+	struct kindControlBlock *kcb = LanguageTable [lang].kindControlBlock;
+	return isKindAvailableInHint (kcb, kindIndex);
+}
+
+extern void makeLanguageKindAvailableInHint (langType lang, int kindIndex)
+{
+	struct kindControlBlock *kcb = LanguageTable [lang].kindControlBlock;
+	makeKindAvailableInHint (kcb, kindIndex);
+}
+
 /*
  * A dummy parser for printing pseudo tags in xref output
  */

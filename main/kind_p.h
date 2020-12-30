@@ -79,4 +79,7 @@ extern void roleColprintTablePrint (struct colprintTable *table, bool noparser,
 extern bool doesParserUseKind (struct kindControlBlock* kcb, char letter);
 #endif
 
+extern bool isKindAvailableInHint (struct kindControlBlock* kcb, int kindIndex);
+extern void makeKindAvailableInHint (struct kindControlBlock* kcb, int kindIndex);
+
 #endif	/* CTAGS_MAIN_KIND_PRIVATE_H */
