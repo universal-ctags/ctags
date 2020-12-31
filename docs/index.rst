@@ -48,7 +48,6 @@ This is a draft document. Proofreading and pull-requests are welcome!
 	reporting.rst
 	other-projects.rst
 	contributions.rst
-	development-process.rst
 	optlib.rst
 	extending.rst
 	tips.rst
