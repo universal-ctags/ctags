@@ -2008,7 +2008,7 @@ extern bool processParamOption (
 	name = sep + 1;
 
 	if (value == NULL || value [0] == '\0')
-		error (FATAL, "no parameter is given for %s", option);
+		error (FATAL, "no value is given for %s", option);
 
 	applyParameter (language, name, value);
 
