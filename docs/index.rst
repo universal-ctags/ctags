@@ -51,7 +51,6 @@ This is a draft document. Proofreading and pull-requests are welcome!
 	development-process.rst
 	optlib.rst
 	extending.rst
-	running-multi-parsers.rst
 	tips.rst
 	testing.rst
 	developers.rst

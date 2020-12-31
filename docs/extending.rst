@@ -12,3 +12,4 @@ Extending ctags with a parser written in C
 	:maxdepth: 4
 
 	internal.rst
+	running-multi-parsers.rst
