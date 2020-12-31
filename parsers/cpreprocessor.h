@@ -115,9 +115,12 @@ typedef struct sCppMacroReplacementPartInfo {
 typedef struct sCppMacroInfo {
 	bool hasParameterList; /* true if the macro has a trailing () */
 	cppMacroReplacementPartInfo * replacements;
+	int useCount;
+	struct sCppMacroInfo * next;
 } cppMacroInfo;
 
-extern const cppMacroInfo * cppFindMacro (const char *const name);
+extern cppMacroInfo * cppFindMacro (const char *const name);
+extern void cppUngetStringBuiltByMacro (const char * string,int len, cppMacroInfo *macro);
 
 /*
 * Build a replacement string for the specified macro.

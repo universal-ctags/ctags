@@ -1,0 +1,2 @@
+typeref field for `p' in expected.tags may be changed when
+the definition for CXX_PARSER_MAXIMUM_MACRO_USE_COUNT is changed.

@@ -107,6 +107,7 @@ typedef struct sCppState {
 		conditionalInfo ifdef [MaxCppNestingLevel];
 	} directive;
 
+	cppMacroInfo * macroInUse;
 	hashTable * fileMacroTable;
 
 } cppState;
@@ -337,6 +338,7 @@ static void cppInitCommon(langType clientLang,
 
 	Cpp.directive.name = vStringNewOrClear (Cpp.directive.name);
 
+	Cpp.macroInUse = NULL;
 	Cpp.fileMacroTable =
 		doesExpandMacros && isFieldEnabled (FIELD_SIGNATURE) && isFieldEnabled (Cpp.macrodefFieldIndex)
 		? makeMacroTable ()
@@ -362,6 +364,16 @@ extern void cppInit (const bool state, const bool hasAtLiteralStrings,
 				   macrodefFieldIndex);
 }
 
+static void cppClearMacroInUse (cppMacroInfo **pM)
+{
+	for (cppMacroInfo *p = *pM; p; p = p->next)
+	{
+		CXX_DEBUG_PRINT("Macro <%p> clear useCount: %d -> 0", p, p->useCount);
+		p->useCount = 0;
+	}
+	*pM = NULL;
+}
+
 extern void cppTerminate (void)
 {
 	if (Cpp.directive.name != NULL)
@@ -383,6 +395,8 @@ extern void cppTerminate (void)
 	}
 
 	Cpp.clientLang = LANG_IGNORE;
+
+	cppClearMacroInUse (&Cpp.macroInUse);
 
 	if (Cpp.fileMacroTable)
 	{
@@ -505,6 +519,22 @@ void cppUngetString(const char * string,int len)
 	Cpp.ungetDataSize += len;
 }
 
+extern void cppUngetStringBuiltByMacro(const char * string,int len, cppMacroInfo *macro)
+{
+	if (macro->useCount == 0)
+	{
+		cppMacroInfo *m = Cpp.macroInUse;
+		Cpp.macroInUse = macro;
+		macro->next = m;
+	}
+	macro->useCount++;
+
+	CXX_DEBUG_PRINT("Macro <%p> increment useCount: %d->%d", macro,
+					(macro->useCount - 1), macro->useCount);
+
+	cppUngetString (string, len);
+}
+
 static int cppGetcFromUngetBufferOrFile(void)
 {
 	if(Cpp.ungetPointer)
@@ -522,6 +552,8 @@ static int cppGetcFromUngetBufferOrFile(void)
 		return c;
 	}
 
+	if (Cpp.macroInUse)
+		cppClearMacroInUse (&Cpp.macroInUse);
 	return getcFromInputFile();
 }
 
@@ -1693,7 +1725,7 @@ extern cppMacroInfo * cppFindMacroFromSymtab (const char *const name)
 
 /*  Determines whether or not "name" should be ignored, per the ignore list.
  */
-extern const cppMacroInfo * cppFindMacro (const char *const name)
+extern cppMacroInfo * cppFindMacro (const char *const name)
 {
 	cppMacroInfo *info;
 
@@ -1828,6 +1860,8 @@ static void saveIgnoreToken(const char * ignoreToken)
 	} else {
 		info->replacements = NULL;
 	}
+	info->useCount = 0;
+	info->next = NULL;
 
 	hashTablePutItem(cmdlineMacroTable,eStrndup(tokenBegin,tokenEnd - tokenBegin),info);
 
@@ -1881,6 +1915,8 @@ static cppMacroInfo * saveMacro(hashTable *table, const char * macro)
 		c++;
 
 	cppMacroInfo * info = (cppMacroInfo *)eMalloc(sizeof(cppMacroInfo));
+	info->useCount = 0;
+	info->next = NULL;
 
 	if(*c == '(')
 	{
