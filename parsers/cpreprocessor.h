@@ -134,4 +134,6 @@ extern vString * cppBuildMacroReplacement(
 		int parameterCount
 	);
 
+extern void cppPrintStats (langType lang);
+
 #endif  /* CTAGS_MAIN_GET_H */

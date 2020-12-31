@@ -1,0 +1,5 @@
+# u-ctags -o hint.tags --options=hint.ctags macro.h
+--sort=no
+--fields=+{language}{signature}
+--fields-C++=+{macrodef}
+
