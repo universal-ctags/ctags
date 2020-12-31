@@ -448,6 +448,10 @@ extern void cppUngetc (const int c)
 	Cpp.ungetDataSize++;
 }
 
+int cppUngetBufferSize()
+{
+	return Cpp.ungetBufferSize;
+}
 
 /*  This puts an entire string back into the input queue for the input File. */
 void cppUngetString(const char * string,int len)
