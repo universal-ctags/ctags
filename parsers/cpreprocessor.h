@@ -92,6 +92,7 @@ extern void cppTerminate (void);
 extern void cppBeginStatement (void);
 extern void cppEndStatement (void);
 extern void cppUngetc (const int c);
+extern int cppUngetBufferSize();
 extern void cppUngetString(const char * string,int len);
 extern int cppGetc (void);
 extern const vString * cppGetLastCharOrStringContents (void);

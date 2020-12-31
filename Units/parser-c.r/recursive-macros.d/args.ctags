@@ -1,0 +1,3 @@
+--kinds-C=*
+-D p=a
+-D a=p+p
