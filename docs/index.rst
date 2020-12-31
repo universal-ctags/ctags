@@ -8,7 +8,14 @@ Universal-ctags Hacking Guide
 :Authors: universal-ctags developers
 :Web Page: https://ctags.io/
 
-`Universal-ctags`_ was created to continue the development of Darren
+`Universal-ctags`_ generates an index (or tag) file of language objects found in
+source files for many popular programming languages. This index makes it easy
+for text editors and other tools to locate the indexed items. Universal Ctags
+improves on traditional ctags because of its multilanguage support, its ability
+for the user to define new languages searched by regular expressions, and its
+ability to generate emacs-style TAGS files.
+
+`Universal-ctags`_ has the objective of continuing the development of Darren
 Hiebert's `Exuberant-ctags`_ after activity on that project
 unfortunately stalled.
 
@@ -16,7 +23,7 @@ Reza Jelveh <reza.jelveh@gmail.com> initially created a personal fork
 on GitHub and as interest and participation grew it was decided to
 move development to a dedicated GitHub organization.
 
-The goal of this project is to maintain a common/unified space where
+The goal of this project is to maintain a common/unified working space where
 people interested in improving ctags can work together.
 
 This guide is primarily intended for developers. Users should first
