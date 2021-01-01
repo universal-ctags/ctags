@@ -1,4 +1,4 @@
-A	input.inko	/^object A {}$/;"	o
-B	input.inko	/^object B {}$/;"	o
-C	input.inko	/^object C {$/;"	o
-@foo	input.inko	/^  @foo: X$/;"	a	object:C
+A	input.inko	/^class A {}$/;"	o
+B	input.inko	/^class B {}$/;"	o
+C	input.inko	/^class C {$/;"	o
+@foo	input.inko	/^  @foo: X$/;"	a	class:C

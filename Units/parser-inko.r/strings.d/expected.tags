@@ -1,1 +1,1 @@
-Foo	input.inko	/^object Foo {}$/;"	o
+Foo	input.inko	/^class Foo {}$/;"	o
