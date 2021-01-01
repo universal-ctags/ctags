@@ -67,18 +67,6 @@ if [ "$TARGET" = "Unix" ]; then
 			echo "Please execute 'make -C man QUICK=1 update-docs' and commit them."
 			exit 1
 		fi
-
-        BUILDDIR=${BUILDDIR0}
-        mkdir -p "${BUILDDIR}"
-        (
-            cd "${BUILDDIR}"
-            ${CONFIGURE_CMDLINE}
-            make -j2
-            echo 'List features'
-            ./ctags --list-features
-            echo 'Run "make check" (without gcov)'
-            make check roundtrip TRAVIS=1
-        )
     fi
 
 elif [ "$TARGET" = "Mingw32" ]; then
