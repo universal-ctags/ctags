@@ -410,30 +410,3 @@ http://anonscm.debian.org/cgit/users/cjwatson/exuberant-ctags.git/tree/debian/pa
 	::
 
 	   	e59325a576e38bc63b91abb05a5a22d2cef25ab7
-
-
-Other interesting ctags repositories
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-There are several interesting repo's with ctags around. These are
-interesting to integrate in the future.
-
-`VIM-Japan <https://github.com/vim-jp/ctags/>`_
-......................................................................
-
-VIM-Japan have some interesting things, especially regarding encoding.
-
-`Anjuta <https://git.gnome.org/browse/anjuta/tree/plugins/symbol-db/anjuta-tags>`_
-.......................................................................................
-
-Anjuta is a Gnome IDE. They did not fork Exuberant ctags, but they did
-natively include it in Anjuta. They have made several additions to
-their version of it including fairly extensive Vala language support.
-
-tagbar
-.......................................................................
-
-Wiki
-
-	https://github.com/majutsushi/tagbar/wiki
-
-This is a gold mine of optlibs.
