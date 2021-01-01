@@ -1,0 +1,7 @@
+used1	input.kt	/^var used1 = """var unused1 = 1"""$/;"	v
+used2	input.kt	/^var used2 = """$/;"	v
+used3	input.kt	/^var used3 = """var unused3a = 3""" + """var unused3b = 3"""$/;"	v
+used4	input.kt	/^var used4 = """..."val unused4"..."""$/;"	v
+used5	input.kt	/^var used5 = """${process("""var unused5 = 5""")}"""$/;"	v
+used6	input.kt	/^var used6 = """"val unused6=6""""$/;"	v
+used7	input.kt	/^var used7 = """""var unused6=6"""""$/;"	v

@@ -13,3 +13,9 @@ var c = 3
  */
 
 /* comment */ var f = 6 /* another comment */
+
+/*
+comment
+    /* nested comment */
+var g = 7
+*/

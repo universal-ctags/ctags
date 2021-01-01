@@ -1,5 +1,10 @@
 Bar	input.kt	/^class Bar<T, U>(val a: T, val b: U): Foo<T>$/;"	c
+Baz	input.kt	/^class Baz <T, U: Pair<String,Pair<T, Double>>>(val c: T, val d: U): Foo<T>$/;"	c
 Foo	input.kt	/^interface Foo<T> {$/;"	i
-a	input.kt	/^class Bar<T, U>(val a: T, val b: U): Foo<T>$/;"	C
-b	input.kt	/^class Bar<T, U>(val a: T, val b: U): Foo<T>$/;"	C
-genericFunction	input.kt	/^    fun<T: Any> genericFunction() = 42$/;"	m
+a	input.kt	/^class Bar<T, U>(val a: T, val b: U): Foo<T>$/;"	C	class:Bar
+b	input.kt	/^class Bar<T, U>(val a: T, val b: U): Foo<T>$/;"	C	class:Bar
+c	input.kt	/^class Baz <T, U: Pair<String,Pair<T, Double>>>(val c: T, val d: U): Foo<T>$/;"	C	class:Baz
+d	input.kt	/^class Baz <T, U: Pair<String,Pair<T, Double>>>(val c: T, val d: U): Foo<T>$/;"	C	class:Baz
+genericFunction1	input.kt	/^    fun<T: Any> genericFunction1() = 41$/;"	m	interface:Foo
+genericFunction2	input.kt	/^    fun<T: Pair<String,Pair<Int, T>>> genericFunction2() = 42$/;"	m	interface:Foo
+genericFunction3	input.kt	/^    fun <T> genericFunction3() = 43$/;"	m	interface:Foo

@@ -1,0 +1,20 @@
+com.example.test	input.kt	/^package com.example.test$/;"	p
+TestObject	input.kt	/^object TestObject {$/;"	o	package:com.example.test
+a	input.kt	/^    val a = 1$/;"	C	object:com.example.test.TestObject
+f1	input.kt	/^    fun f1(): String {$/;"	m	object:com.example.test.TestObject
+b	input.kt	/^        val b = "hi"$/;"	C	method:com.example.test.TestObject.f1
+TestClass	input.kt	/^class TestClass(val c: String, var d: Int) {$/;"	c	package:com.example.test
+c	input.kt	/^class TestClass(val c: String, var d: Int) {$/;"	C	class:com.example.test.TestClass
+d	input.kt	/^class TestClass(val c: String, var d: Int) {$/;"	v	class:com.example.test.TestClass
+e	input.kt	/^    val e = 2$/;"	C	class:com.example.test.TestClass
+f2	input.kt	/^    fun f2(): String {$/;"	m	class:com.example.test.TestClass
+f	input.kt	/^        var f = 42 * 12$/;"	v	method:com.example.test.TestClass.f2
+TestInterface	input.kt	/^interface TestInterface {$/;"	i	package:com.example.test
+g	input.kt	/^    abstract val g: Int$/;"	C	interface:com.example.test.TestInterface
+f3	input.kt	/^    fun f3(): String {$/;"	m	interface:com.example.test.TestInterface
+lmbd	input.kt	/^        val lmbd: () -> String = {$/;"	C	method:com.example.test.TestInterface.f3
+<lambda>	input.kt	/^        val lmbd: () -> String = {$/;"	m	method:com.example.test.TestInterface.f3
+h	input.kt	/^            val h = "B".toLowerCase()$/;"	C	method:com.example.test.TestInterface.f3.<lambda>
+anonymousFunction	input.kt	/^val anonymousFunction = fun(x: Int, y: Int): Int {$/;"	C	package:com.example.test
+<anonymous>	input.kt	/^val anonymousFunction = fun(x: Int, y: Int): Int {$/;"	m	package:com.example.test
+sum	input.kt	/^    val sum = x + y$/;"	C	method:com.example.test.<anonymous>
