@@ -309,11 +309,6 @@ Guessing parser from file contents (``-G`` option)
 
 See :ref:`ctags(1) <ctags(1)>`.
 
-Automatic parser selection
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-See :ref:`ctags(1) <ctags(1)>`.
-
 ``--put-field-prefix`` options
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
