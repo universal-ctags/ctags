@@ -1,7 +1,7 @@
 .. _interactive-mode:
 
 ======================================================================
-``--_interactive`` Mode
+Interactive mode
 ======================================================================
 
 Universal ctags can be run with ``--_interactive``, which enters a REPL that
