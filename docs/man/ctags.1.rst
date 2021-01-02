@@ -1448,6 +1448,7 @@ name in the tag file will always be preceded by the string "operator "
 After creating or appending to the tag file, it is sorted by the tag name,
 removing identical tag lines.
 
+.. _guessing:
 
 Determining file language
 --------------------------
