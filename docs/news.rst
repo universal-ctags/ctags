@@ -77,7 +77,8 @@ for more defailts.
 
 Notice messages and ``--quiet``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-There were 3 classes of message in ctags:
+There were 3 classes of message in Exuberant-ctags.
+In addition to them Universal-ctags introduced a new class of message, *notice*.
 
 *fatal*
 
@@ -87,16 +88,19 @@ There were 3 classes of message in ctags:
 
 	An error has occurred but ctags continues the execution.
 
+*notice* (new)
+
+    It is less important than *warning* but more important for users than *verbose*.
+
 *verbose*
 
 	Mainly used for debugging purposes.
 
-
-*notice* is a new class of message. It is less important than
-*warning* but more important for users than *verbose*.
-
 Generally the user can ignore *notice* class messages and ``--quiet``
 can be used to disable them.
+
+*verbose* class messages are disabled by default, and ``--verbose`` or ``-V``
+can be used to enable them.
 
 Skipping utf-8 BOM
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
