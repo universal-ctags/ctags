@@ -1,0 +1,6 @@
+func1	input.jl	/^function func1(a::Int)$/;"	f
+func2	input.jl	/^function SomeModule.func2(a::Int)$/;"	f	scope:module:SomeModule
+MyModule	input.jl	/^module MyModule$/;"	n
+func3	input.jl	/^function func3(a::Int)$/;"	f	scope:module:MyModule
+func4	input.jl	/^function func4(a::Int)$/;"	f	scope:module:MyModule
+func5	input.jl	/^    function func5(b::Int)$/;"	f	scope:function:MyModule.func4

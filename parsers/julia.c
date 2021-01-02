@@ -234,12 +234,10 @@ static bool isIdentifierFirstCharacter (int c)
     return (bool) ((isAscii(c) && (isalpha (c) || c == '_')) || c >= 0xC0);
 }
 
-/* This does not distinguish Unicode letters from operators...
- * The dot is considered an identifier character for fully qualified names
- * */
+/* This does not distinguish Unicode letters from operators... */
 static bool isIdentifierCharacter (int c)
 {
-    return (bool) (isIdentifierFirstCharacter(c) || (isAscii(c) && (isdigit(c) || c == '!' || c == '.')) || c >= 0x80);
+    return (bool) (isIdentifierFirstCharacter(c) || (isAscii(c) && (isdigit(c) || c == '!')) || c >= 0x80);
 }
 
 static void skipWhitespace (lexerState *lexer, bool newline)
@@ -1003,6 +1001,8 @@ static void parseFunction (lexerState *lexer, vString *scope, int parent_kind)
 {
     vString *name;
     vString *arg_list;
+    vString *local_scope;
+    int local_parent_kind;
     unsigned long line;
     MIOPos pos;
 
@@ -1010,6 +1010,14 @@ static void parseFunction (lexerState *lexer, vString *scope, int parent_kind)
     if (lexer->cur_token != TOKEN_IDENTIFIER)
     {
         return;
+    } else if (lexer->cur_c == '.') {
+        local_scope = vStringNewCopy(lexer->token_str);
+        local_parent_kind = K_MODULE;
+        advanceChar(lexer);
+        advanceToken(lexer, true);
+    } else {
+        local_scope = vStringNewCopy(scope);
+        local_parent_kind = parent_kind;
     }
 
     name = vStringNewCopy(lexer->token_str);
@@ -1037,21 +1045,21 @@ static void parseFunction (lexerState *lexer, vString *scope, int parent_kind)
             advanceToken(lexer, true);
         }
 
-        addTag(name, NULL, vStringValue(arg_list), K_FUNCTION, line, pos, scope, parent_kind);
-        //addToScope(scope, name);
-        //parseExpr(lexer, true, K_FUNCTION, scope);
+        addTag(name, NULL, vStringValue(arg_list), K_FUNCTION, line, pos, local_scope, local_parent_kind);
+        addToScope(scope, name);
+        parseExpr(lexer, true, K_FUNCTION, scope);
     }
     else if (lexer->cur_token == TOKEN_CLOSE_BLOCK)
     {
         /* Function without method */
-        addTag(name, NULL, NULL, K_FUNCTION, line, pos, scope, parent_kind);
+        addTag(name, NULL, NULL, K_FUNCTION, line, pos, local_scope, local_parent_kind);
+        /* Go to the closing 'end' keyword */
+        skipUntilEnd(lexer);
     }
-
-    /* Go to the closing 'end' keyword */
-    skipUntilEnd(lexer);
 
     vStringDelete(name);
     vStringDelete(arg_list);
+    vStringDelete(local_scope);
 }
 
 /* Macro format:
@@ -1140,9 +1148,9 @@ static void parseModule (lexerState *lexer, vString *scope, int parent_kind)
     }
 
     addTag(lexer->token_str, NULL, NULL, K_MODULE, lexer->line, lexer->pos, scope, parent_kind);
-    //addToScope(scope, lexer->token_str);
-    //advanceToken(lexer, true);
-    //parseExpr(lexer, true, K_MODULE, scope);
+    addToScope(scope, lexer->token_str);
+    advanceToken(lexer, true);
+    parseExpr(lexer, true, K_MODULE, scope);
 }
 
 /* Import format:
@@ -1271,6 +1279,7 @@ static void parseExpr (lexerState *lexer, bool delim, int kind, vString *scope)
 {
     int level = 1;
     size_t old_scope_len;
+    vString *local_scope = NULL;
 
     while (lexer->cur_token != TOKEN_EOF)
     {
@@ -1308,14 +1317,32 @@ static void parseExpr (lexerState *lexer, bool delim, int kind, vString *scope)
                 parseImport(lexer, scope, kind);
                 break;
             case TOKEN_IDENTIFIER:
-                skipWhitespace(lexer, false);
-                if (lexer->first_token && lexer->cur_c == '(')
+                if (lexer->first_token && lexer->cur_c == '.')
                 {
-                    parseShortFunction(lexer, scope, kind);
+                    if (local_scope == NULL)
+                    {
+                        local_scope = vStringNew();
+                    }
+                    vStringCopy(local_scope, lexer->token_str);
+                    advanceChar(lexer);
+                    advanceToken(lexer, true);
+                    skipWhitespace(lexer, false);
+                    if (lexer->cur_c == '(')
+                    {
+                        parseShortFunction(lexer, local_scope, K_MODULE);
+                    }
                 }
                 else
                 {
-                    advanceToken(lexer, true);
+                    skipWhitespace(lexer, false);
+                    if (lexer->first_token && lexer->cur_c == '(')
+                    {
+                        parseShortFunction(lexer, scope, kind);
+                    }
+                    else
+                    {
+                        advanceToken(lexer, true);
+                    }
                 }
                 break;
             case TOKEN_OPEN_BLOCK:
@@ -1336,6 +1363,7 @@ static void parseExpr (lexerState *lexer, bool delim, int kind, vString *scope)
             break;
         }
     }
+    vStringDelete(local_scope);
 }
 
 static void findJuliaTags (void)
