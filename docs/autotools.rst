@@ -8,6 +8,8 @@ the packages.
 
 Like most Autotools-based projects, you need to do::
 
+    $ git clone https://github.com/universal-ctags/ctags.git
+    $ cd ctags
     $ ./autogen.sh
     $ ./configure --prefix=/where/you/want # defaults to /usr/local
     $ make
