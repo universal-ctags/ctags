@@ -368,7 +368,7 @@ Incompatible changes to file name pattern and extension handling
 
 See :ref:`ctags-incompatibilities(7) <ctags-incompatibilities(7)>`.
 
-``--_interactive`` Mode
+Interactive mode
 ---------------------------------------------------------------------
 
 A new ``--_interactive`` option launches a JSON based command REPL which
