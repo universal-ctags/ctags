@@ -15,52 +15,14 @@
 
 make --version
 
-# Our sandbox doesn't work with gcov.
-# Following cases target ctags without gcov.
-SANDBOX_CASES=sandbox,sandbox-crash,sandbox-default-req,sandbox-unknown-submode
-
-
 if [ "$TARGET" = "Unix" ]; then
     ./autogen.sh
-    CONFIGURE_CMDLINE="../configure --enable-debugging --enable-iconv "
-
-    BUILDDIR0="$TRAVIS_OS_NAME"-"$CC"
     if [ "$TRAVIS_OS_NAME" = "linux" ] && [ "$CC" = "gcc" ]; then
 		if ! git diff --exit-code optlib; then
 			echo "Files under optlib are not up to date."
 			echo "If you change optlib/foo.ctags, don't forget to add optlib/foo.c to your commit."
 			exit 1
 		fi
-
-        BUILDDIR=${BUILDDIR0}-gcov
-        mkdir -p "${BUILDDIR}"
-        (
-            cd "${BUILDDIR}"
-            ${CONFIGURE_CMDLINE} --enable-coverage-gcov
-            make -j2
-            echo 'List features'
-            ./ctags --list-features
-            echo 'Run "make check" with gcov'
-            make check roundtrip TRAVIS=1
-			make dist
-			tar zxvf universal-ctags*tar.gz
-			(
-				cd universal-ctags*[0-9]
-				BUILDDIR=${BUILDDIR0}
-				mkdir -p "${BUILDDIR}"
-				(
-					cd "${BUILDDIR}"
-					${CONFIGURE_CMDLINE}
-					make -j2
-					echo 'Run "make tmain (sandbox only)" without gcov'
-					make tmain TRAVIS=1 UNITS=${SANDBOX_CASES}
-
-					make clean
-				)
-			)
-        )
-
-    else
 		make -B -C man QUICK=1 update-docs
 		if ! git diff --exit-code docs/man; then
 			echo "Files under docs/man/ are not up to date."
