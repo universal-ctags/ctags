@@ -671,6 +671,7 @@ static int advanceToken (lexerState *lexer, bool skip_whitespace)
     /* the next token is the first token of the line */
     if (lexer->cur_token == TOKEN_NEWLINE ||
         lexer->cur_token == TOKEN_SEMICOLON ||
+        lexer->cur_token == TOKEN_NONE ||
         (lexer->first_token && lexer->cur_token == TOKEN_MACROCALL))
     {
         lexer->first_token = true;
@@ -798,6 +799,7 @@ static void initLexer (lexerState *lexer)
     lexer->token_str = vStringNew();
     lexer->first_token = true;
     lexer->cur_token = TOKEN_NONE;
+    lexer->prev_c = '\0';
 
     if (lexer->cur_c == '#' && lexer->next_c == '!')
     {
@@ -1286,7 +1288,8 @@ static void parseExpr (lexerState *lexer, bool delim, int kind, vString *scope)
         old_scope_len = vStringLength(scope);
         /* Advance token and update if this is a new line */
         while (lexer->cur_token == TOKEN_NEWLINE ||
-               lexer->cur_token == TOKEN_SEMICOLON )
+               lexer->cur_token == TOKEN_SEMICOLON ||
+               lexer->cur_token == TOKEN_NONE )
         {
             advanceToken(lexer, true);
         }
