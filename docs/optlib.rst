@@ -5,6 +5,12 @@ Extending ctags with Regex parser (*optlib*)
 
 :Maintainer: Masatake YAMATO <yamato@redhat.com>
 
+.. contents:: `Table of contents`
+	:depth: 3
+	:local:
+
+----
+
 .. TODO:
 	review extras, fields, and roles sections
 	possibly restructure this file's section ordering

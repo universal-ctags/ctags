@@ -13,20 +13,6 @@ Introduced changes
 Many changes have been introduced in Universal-ctags. Use git-log to
 review changes not enumerated here, especially in language parsers.
 
-Importing changes from Exuberant-ctags
----------------------------------------------------------------------
-See "Exuberant-ctags" in "Tracking other projects" for detailed
-information regarding imported changes.
-
-Some changes have also been imported from Fedora and Debian.
-
-``F`` kind usage
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-You cannot use ``F`` (``file``) kind in your .ctags because Universal-ctags
-reserves it. See :ref:`ctags-incompatibilities(7) <ctags-incompatibilities(7)>`.
-
-
 New and extended options
 ---------------------------------------------------------------------
 
@@ -51,7 +37,6 @@ source code the "wildcard"(``*``) option value has been introduced.
 ``--kinds-all=*``
 
 	Enables all available kinds for all available language parsers.
-
 
 Long names in kinds, fields, and extra options
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -80,11 +65,20 @@ characters by the shell.
 The available names can be listed with ``--list-kinds-full``,
 ``--list-fields``, or ``--list-extras``.
 
+Defining a CPreProcessor macro from command line
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+Newly introduced ``-D`` option extends the function provided by
+``-I`` option.
+
+``-D`` emulates the behaviour of the corresponding gcc option:
+it defines a C preprocessor macro. See `The new C/C++ parser <cxx>`
+for more defailts.
 
 Notice messages and ``--quiet``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-There were 3 classes of message in ctags:
+There were 3 classes of message in Exuberant-ctags.
+In addition to them Universal-ctags introduced a new class of message, *notice*.
 
 *fatal*
 
@@ -94,16 +88,30 @@ There were 3 classes of message in ctags:
 
 	An error has occurred but ctags continues the execution.
 
+*notice* (new)
+
+    It is less important than *warning* but more important for users than *verbose*.
+
 *verbose*
 
 	Mainly used for debugging purposes.
 
-
-*notice* is a new class of message. It is less important than
-*warning* but more important for users than *verbose*.
-
 Generally the user can ignore *notice* class messages and ``--quiet``
 can be used to disable them.
+
+*verbose* class messages are disabled by default, and ``--verbose`` or ``-V``
+can be used to enable them.
+
+Skipping utf-8 BOM
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The three bytes sequence(``\xEF\xBB\xBF``) at the head of an input
+file is skipped when parsing.
+
+TODO:
+
+* Do the same in guessing and selecting parser stage.
+* Refect the BOM detection to encoding option
 
 ``--input-encoding=ENCODING`` and ``--output-encoding=ENCODING``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -179,6 +187,17 @@ These extra tag entries are newly introduced.
 
 	Include pseudo-tags.
 
+..
+	NOT REVIEWED YET
+
+Defining an extra
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+A new ``--_extradef-<LANG>=name,description`` option allows you to
+defining a parser specific extra which turning on and off can be
+referred from a regex based parser for ``<LANG>``.
+
+See :ref:`Conditional tagging with extras <extras>` for more details.
 
 Options for inspecting ctags internals
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -213,22 +232,10 @@ header is easy because it starts with a `#` character.
 
 ``--with-list-header=no`` suppresses output of the column header.
 
-Kinds synchronization
+Defining a kind
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-See the description about ``--kinds-<LANG>`` and ``--list-kinds-full``
-option in :ref:`ctags(1) <ctags(1)>`.
 
-
-``--put-field-prefix`` options
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-See :ref:`ctags(1) <ctags(1)>`.
-
-``--maxdepth`` option
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-See :ref:`ctags(1) <ctags(1)>`.
-
+See :ref:`ctags-optlib(7) <ctags-optlib(7)>`.
 
 ``--map-<LANG>`` option
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -292,35 +299,25 @@ Both `FOO` and `BAR` are registered as handlers for the spec `*.ABC`.
 spec-centric manner and ``--map-<LANG>`` provides a way to manipulate
 the langmap in a parser-centric manner.
 
+Kinds synchronization
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+See the description about ``--kinds-<LANG>`` and ``--list-kinds-full``
+option in :ref:`ctags(1) <ctags(1)>`.
 
 Guessing parser from file contents (``-G`` option)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 See :ref:`ctags(1) <ctags(1)>`.
 
+``--put-field-prefix`` options
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Enabling/disabling pseudo-tags (``--pseudo-tags`` option)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+See :ref:`ctags(1) <ctags(1)>`.
 
-.. IN MAN PAGE
+``--maxdepth`` option
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-See :ref:`ctags-client-tools(7) <ctags-client-tools(7)>` about the
-option.
-
-JSON output
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Experimental JSON output has been added. ``--output-format`` can be
-used to enable it.
-
-.. code-block:: console
-
-   $ ./ctags --output-format=json --fields=-s /tmp/foo.py
-   {"_type": "tag", "name": "Foo", "path": "/tmp/foo.py", "pattern": "/^class Foo:$/", "kind": "class"}
-   {"_type": "tag", "name": "doIt", "path": "/tmp/foo.py", "pattern": "/^    def doIt():$/", "kind": "member"}
-
-
-See :ref:`JSON output <output-json>` for more details.
+See :ref:`ctags(1) <ctags(1)>`.
 
 "always" and "never" as an argument for ``--tag-relative``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -333,26 +330,41 @@ See :ref:`JSON output <output-json>` for more details.
 
 See :ref:`ctags(1) <ctags(1)>`.
 
+Including line number to pattern field
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Defining a CPreProcessor macro from command line
+See :ref:`ctags(1) <ctags(1)>`.
+
+Enabling/disabling pseudo-tags (``--pseudo-tags`` option)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Newly introduced ``-D`` option extends the function provided by
-``-I`` option.
+.. IN MAN PAGE
 
-``-D`` emulates the behaviour of the corresponding gcc option:
-it defines a C preprocessor macro. See `The new C/C++ parser <cxx>`
-for more defailts.
+See :ref:`ctags-client-tools(7) <ctags-client-tools(7)>` about the
+option.
 
+Incompatible changes in command line
+---------------------------------------------------------------------
 
-Automatically expanding CPreProcessor macros defined in the same input file (HIGHLY EXPERIMENTAL)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. NOT REVIEWED YET
 
-See `The new C/C++ parser <cxx>` for more defailts.
-
-
-``--_interactive`` Mode
+``-D`` option
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+For a ctags binary that had debugging output enabled in the build config
+stage, ``-D`` was used for specifying the level of debugging
+output. It is changed to ``-d``. This change is not critical because
+``-D`` option was not described in ctags.1 man page.
+
+Instead ``-D`` is used for defining a macro in CPreProcessor parser.
+
+Incompatible changes to file name pattern and extension handling
+---------------------------------------------------------------------
+
+See :ref:`ctags-incompatibilities(7) <ctags-incompatibilities(7)>`.
+
+Interactive mode
+---------------------------------------------------------------------
 
 A new ``--_interactive`` option launches a JSON based command REPL which
 can be used to control ctags generation programmatically.
@@ -362,35 +374,18 @@ See :ref:`--_interactive Mode <interactive-mode>` for more details.
 ``--_interactive=sandbox`` adds up seccomp filter. See
 :ref:`sandbox submode <sandbox-submode>` for more details.
 
-Defining a kind
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-See :ref:`ctags-optlib(7) <ctags-optlib(7)>`.
-
-
-..
-	NOT REVIEWED YET
-
-Defining an extra
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-A new ``--_extradef-<LANG>=name,description`` option allows you to
-defining a parser specific extra which turning on and off can be
-referred from a regex based parser for ``<LANG>``.
-
-See :ref:`Conditional tagging with extras <extras>` for more details.
-
-
 ..
 	NOT REVIEWED YET
 
 .. _defining-subparsers:
 
 Defining a subparser
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---------------------------------------------------------------------
+
+.. TODO upper level?
 
 Basic
-......................................................................
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 About the concept of subparser, see :ref:`Tagging definitions of higher(upper) level language (sub/base) <base-sub-parsers>`.
 
@@ -462,7 +457,7 @@ In addition you can enable/disable with the subparser usable
 	 SYSCALL_DEFINE3   function          C
 
 Directions
-......................................................................
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 As explained in :ref:`Tagging definitions of higher(upper) level language (sub/base) <base-sub-parsers>`,
 you can choose direction(s) how a base parser and a guest parser work together with
@@ -494,7 +489,7 @@ C++ parser can capture `main` as a function. Mojom subparser defined in the
 later runs on C++ parser and is for capturing `ABC`.
 
 shared combination
-,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+.........................................................................
 `{shared}` is specified, for `input.cc`, both tags capture by C++ parser
 and mojom parser are recorded to tags file. For `input.mojom`, only
 tags captured by mojom parser are recorded to tags file.
@@ -525,7 +520,7 @@ dropped in the output.
 
 
 dedicated combination
-,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+.........................................................................
 `{dedicated}` is specified, for `input.cc`, only tags capture by C++
 parser are recorded to tags file. For `input.mojom`, both tags capture
 by C++ parser and mojom parser are recorded to tags file.
@@ -551,7 +546,7 @@ tags for `input.mojom`::
 Mojom parser works only when `.mojom` file is given as input.
 
 bidirectional combination
-,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+.........................................................................
 `{bidirectional}` is specified, both tags capture by C++ parser and
 mojom parser are recorded to tags file for either input `input.cc` and
 `input.mojom`.
@@ -576,7 +571,7 @@ tags for `input.mojom`::
     main	input.cc	/^int main(void)$/;"	f	language:C++	typeref:typename:int
 
 Listing subparsers
-......................................................................
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Subparsers can be listed with ``--list-subparser``:
 
 .. code-block:: console
@@ -586,24 +581,17 @@ Subparsers can be listed with ``--list-subparser``:
     #NAME                          BASEPARSER           DIRECTION
     linux                          C                    base => sub {shared}
 
-Including line number to pattern field
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-
-See :ref:`ctags(1) <ctags(1)>`.
-
-
 Changes to the tags file format
 ---------------------------------------------------------------------
 
-
-Truncating the pattern for long input lines
+``F`` kind usage
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-See :ref:`ctags(1) <ctags(1)>`.
+You cannot use ``F`` (``file``) kind in your .ctags because Universal-ctags
+reserves it. See :ref:`ctags-incompatibilities(7) <ctags-incompatibilities(7)>`.
 
 Reference tags
----------------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Traditionally ctags collects the information for locating where a
 language object is DEFINED.
@@ -731,21 +719,8 @@ details.
 ``--roles-<LANG>.<KIND>`` is the option for enabling/disabling
 specified roles.
 
-
-Automatic parser selection
----------------------------------------------------------------------
-
-See :ref:`ctags(1) <ctags(1)>`.
-
-
-Incompatible changes to file name pattern and extension handling
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-See :ref:`ctags-incompatibilities(7) <ctags-incompatibilities(7)>`.
-
-
 Pseudo-tags
----------------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. IN MAN PAGE
 
@@ -754,7 +729,7 @@ concept of the pseudo-tags.
 
 
 ``TAG_KIND_DESCRIPTION``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.........................................................................
 
 This is a newly introduced pseudo-tag. It is not emitted by default.
 It is emitted only when ``--pseudo-tags=+TAG_KIND_DESCRIPTION`` is
@@ -771,7 +746,7 @@ A backslash and a slash in {description} is escaped with a backslash.
 
 
 ``TAG_KIND_SEPARATOR``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.........................................................................
 
 This is a newly introduced pseudo-tag. It is not emitted by default.
 It is emitted only when ``--pseudo-tags=+TAG_KIND_SEPARATOR`` is
@@ -833,7 +808,7 @@ Of course, ctags uses the more specific line when choosing a
 separator; the third line has higher priority than the first.
 
 ``TAG_OUTPUT_FILESEP``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.........................................................................
 
 This pseudo-tag represents the separator used in file name: slash or
 backslash.  This is always 'slash' on Unix-like environments.
@@ -843,7 +818,7 @@ is specified, it becomes 'backslash'.
 
 
 ``TAG_OUTPUT_MODE``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.........................................................................
 
 .. NOT REVIEWED YET
 
@@ -852,10 +827,15 @@ This is controlled by ``--output-format`` option.
 
 See also :ref:`Compatible output and weakness <compat-output>`.
 
+Truncating the pattern for long input lines
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+See :ref:`ctags(1) <ctags(1)>`.
+
 .. _parser-specific-fields:
 
 Parser specific fields
----------------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 A tag has a `name`, an `input` file name, and a `pattern` as basic
 information. Some fields like `language:`, `signature:`, etc are
@@ -949,7 +929,7 @@ field of the tag identifies the owner.
 
 
 Parser specific extras
----------------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. NOT REVIEWED YET
 
@@ -1000,7 +980,7 @@ derived from the name `it's ok to be correct` when the extra flag is
 enabled.
 
 Discussion
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.........................................................................
 
 .. NOT REVIEWED YET
 
@@ -1107,7 +1087,7 @@ can be used as the last resort.
 
 
 Parser specific parameter
----------------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. NOT REVIEWED YET
 
@@ -1143,11 +1123,27 @@ All available parameters can be listed with ``--list-params`` option.
 
 (At this time only CPreProcessor parser has parameters.)
 
+JSON output
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. XREF TODO
+
+Experimental JSON output has been added. ``--output-format`` can be
+used to enable it.
+
+.. code-block:: console
+
+   $ ./ctags --output-format=json --fields=-s /tmp/foo.py
+   {"_type": "tag", "name": "Foo", "path": "/tmp/foo.py", "pattern": "/^class Foo:$/", "kind": "class"}
+   {"_type": "tag", "name": "doIt", "path": "/tmp/foo.py", "pattern": "/^    def doIt():$/", "kind": "member"}
+
+
+See :ref:`JSON output <output-json>` for more details.
 
 .. _xformat:
 
 Customizing xref output
----------------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ``--_xformat`` option allows a user to customize the cross reference
 (xref) output enabled with ``-x``.
@@ -1273,32 +1269,12 @@ the elements of the format.
 .. TODO: An example of using WILDCARD
 
 
-Incompatible changes in command line
+Changes imported from Exuberant-ctags
 ---------------------------------------------------------------------
+See "Exuberant-ctags" in "Tracking other projects" for detailed
+information regarding imported changes.
 
-.. NOT REVIEWED YET
-
-``-D`` option
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-For a ctags binary that had debugging output enabled in the build config
-stage, ``-D`` was used for specifying the level of debugging
-output. It is changed to ``-d``. This change is not critical because
-``-D`` option was not described in ctags.1 man page.
-
-Instead ``-D`` is used for defining a macro in CPreProcessor parser.
-
-
-Skipping utf-8 BOM
----------------------------------------------------------------------
-
-The three bytes sequence(``\xEF\xBB\xBF``) at the head of an input
-file is skipped when parsing.
-
-TODO:
-
-* Do the same in guessing and selecting parser stage.
-* Refect the BOM detection to encoding option
+Some changes have also been imported from Fedora and Debian.
 
 Parser related changes
 ---------------------------------------------------------------------
@@ -1408,6 +1384,11 @@ Fully improved parsers
 * Ant (rewritten with *libxml*)
 * PHP
 * Verilog/SystemVerilog
+
+Automatically expanding CPreProcessor macros defined in the same input file (HIGHLY EXPERIMENTAL)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+See `The new C/C++ parser <cxx>` for more defailts.
 
 Readtags
 ---------------------------------------------------------------------
