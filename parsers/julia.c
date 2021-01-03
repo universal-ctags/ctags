@@ -62,12 +62,12 @@ typedef enum {
 *  using X               X = (kind:module, role:using)
 *
 *  using X: a, b         X = (kind:module, role:using)
-*                     a, b = (kind:unknown, role: using, scope:module:X)
+*                     a, b = (kind:unknown, role:using, scope:module:X)
 *
 *  import X              X = (kind:module, role:imported)
 *
 *  import X.a, X.b       X = (kind:module, role:imported)
-*                     a, b = (kind: unknown, role:imported, scope:module:X)
+*                     a, b = (kind:unknown, role:imported, scope:module:X)
 *
 *  import X: a, b     Same as the above one
 */
@@ -1215,19 +1215,12 @@ static void parseModule (lexerState *lexer, vString *scope, int parent_kind)
  */
 static void parseImportToken(lexerState *lexer, vString *scope, int module_role, int unknown_role, vString *module_name)
 {
-    char *dot = strchr(vStringValue(lexer->token_str), '.');
-    if (dot)
+    addReferenceTag(module_name, K_MODULE, module_role, lexer->line, lexer->pos, NULL);
+    if (lexer->cur_c == '.')
     {
-        vString *module_part = vStringNewNInit(vStringValue(lexer->token_str), dot - vStringValue(lexer->token_str));
-        vString *unknown_part = vStringNewInit(dot + 1);
-        addReferenceTag(module_part, K_MODULE, module_role, lexer->line, lexer->pos, NULL);
-        addReferenceTag(unknown_part, K_UNKNOWN, unknown_role, lexer->line, lexer->pos, module_part);
-        vStringDelete(module_part);
-        vStringDelete(unknown_part);
-    }
-    else
-    {
-        addReferenceTag(module_name, K_MODULE, module_role, lexer->line, lexer->pos, NULL);
+        advanceChar(lexer);
+        advanceToken(lexer, true);
+        addReferenceTag(lexer->token_str, K_UNKNOWN, unknown_role, lexer->line, lexer->pos, module_name);
     }
 }
 
