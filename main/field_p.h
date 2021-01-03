@@ -50,7 +50,6 @@ extern const char* getFieldDescription (fieldType type);
 extern const char* getFieldName (fieldType type);
 extern unsigned char getFieldLetter (fieldType type);
 extern unsigned int getFieldDataType (fieldType type);
-extern void printFields (int language);
 
 /* Whether the field specified with TYPE has a
    method for rendering in the current format. */
