@@ -9,8 +9,8 @@
  *   GNU General Public License version 2 or (at your option) any later version.
  *
  */
-#ifndef CTAGS_MAIN_PTAG_H
-#define CTAGS_MAIN_PTAG_H
+#ifndef CTAGS_MAIN_PTAG_PRIVATE_H
+#define CTAGS_MAIN_PTAG_PRIVATE_H
 
 #include "general.h"
 #include "types.h"
@@ -80,4 +80,4 @@ extern bool isPtagCommonInParsers (ptagType type);
 extern bool isPtagParserSpecific (ptagType type);
 extern bool enablePtag (ptagType type, bool state);
 
-#endif	/* CTAGS_MAIN_FIELD_H */
+#endif	/* CTAGS_MAIN_PTAG_PRIVATE_H */

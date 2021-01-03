@@ -2146,7 +2146,7 @@ static hashTable *makeMacroTable (void)
 		1024,
 		hashCstrhash,
 		hashCstreq,
-		free,
+		eFree,
 		(void (*)(void *))freeMacroInfo
 		);
 }
