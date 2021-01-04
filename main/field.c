@@ -87,6 +87,9 @@ static bool     isXpathFieldAvailable     (const tagEntryInfo *const tag);
 static bool     isEndFieldAvailable       (const tagEntryInfo *const tag);
 static bool     isEpochAvailable           (const tagEntryInfo *const tag);
 
+static EsObject* getFieldValueForName (const tagEntryInfo *, const fieldDefinition *);
+static EsObject* setFieldValueForName (tagEntryInfo *, const fieldDefinition *, const EsObject *);
+
 #define WITH_DEFUALT_VALUE(str) ((str)?(str):FIELD_NULL_LETTER_STRING)
 
 static fieldDefinition fieldDefinitionsFixed [] = {
@@ -100,6 +103,11 @@ static fieldDefinition fieldDefinitionsFixed [] = {
 		.doesContainAnyChar = doesContainAnyCharInName,
 		.isValueAvailable   = NULL,
 		.dataType           = FIELDTYPE_STRING,
+		.getterValueType    = NULL,
+		.getValueObject     = getFieldValueForName,
+		.setterValueType    = NULL,
+		.checkValueForSetter= NULL,
+		.setValueObject     = setFieldValueForName,
 	},
 	[FIELD_INPUT_FILE] = {
 		.letter             = 'F',
@@ -1451,4 +1459,17 @@ extern EsObject* checkFieldValueForSetter (fieldType type, const EsObject *val)
 {
 	fieldObject *fobj = getFieldObject (type);
 	return fobj->def->checkValueForSetter (fobj->def, val);
+}
+
+static EsObject* getFieldValueForName (const tagEntryInfo *tag, const fieldDefinition *fdef)
+{
+	return opt_string_new_from_cstr (tag->name);
+}
+
+static EsObject* setFieldValueForName (tagEntryInfo *tag, const fieldDefinition *fdef, const EsObject *val)
+{
+	eFree ((char*) tag->name);
+	const char *cstr = opt_string_get_cstr (val);
+	tag->name = eStrdup (cstr);
+	return es_false;
 }
