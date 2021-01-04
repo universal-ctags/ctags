@@ -249,6 +249,8 @@ static void optscriptSetup (OptVM *vm, struct lregexControlBlock *lcb, int corkI
 static EsObject* optscriptRun (OptVM *vm, EsObject *optscript);
 static void optscriptTeardown (OptVM *vm, struct lregexControlBlock *lcb);
 
+static void optscriptInstallProcs (EsObject *dict);
+
 static void deleteTable (void *ptrn)
 {
 	struct regexTable *t = ptrn;
@@ -1992,6 +1994,7 @@ extern void notifyRegexInputStart (struct lregexControlBlock *lcb)
 	if (es_null (lregex_dict))
 	{
 		lregex_dict = opt_dict_new (17);
+		optscriptInstallProcs (lregex_dict);
 	}
 	opt_vm_dstack_push (optvm, lregex_dict);
 
@@ -2956,6 +2959,206 @@ static void optscriptTeardown (OptVM *vm, struct lregexControlBlock *lcb)
 		opt_dict_undef (lcb->local_dict, optscript_CorkIndex_sym);
 		optscript_CorkIndex_sym = es_nil;
 	}
+}
+
+static EsObject* lrop_get_field_value (OptVM *vm, EsObject *name)
+{
+	EsObject *nobj = opt_vm_ostack_top (vm);
+	if (!es_integer_p (nobj))
+		return OPT_ERR_TYPECHECK;
+
+	int n = es_integer_get (nobj);
+	tagEntryInfo *e = getEntryInCorkQueue (n);
+	if (e == NULL)
+	{
+		EsObject *err = es_error_intern ("undefined");
+		return err;
+	}
+
+	void * data = es_symbol_get_data (name);
+	fieldType ftype = HT_PTR_TO_INT (data);
+	EsObject *val = getFieldValue (ftype, e);
+	if (es_error_p (val))
+		return val;
+
+	opt_vm_ostack_pop (vm);
+
+	if (isFieldValueAvailableAlways (ftype))
+	{
+		opt_vm_ostack_push (vm, val);
+		es_object_unref (val);
+	}
+	else if (es_null (val))
+	{
+		opt_vm_ostack_push (vm, es_false);
+	}
+	else
+	{
+		opt_vm_ostack_push (vm, val);
+		opt_vm_ostack_push (vm, es_true);
+		es_object_unref (val);
+	}
+	return es_false;
+}
+
+static EsObject* lrop_set_field_value (OptVM *vm, EsObject *name)
+{
+	EsObject *indexobj = opt_vm_ostack_peek (vm, 1);
+	if (!es_integer_p (indexobj))
+		return OPT_ERR_TYPECHECK;
+
+	int n = es_integer_get (indexobj);
+	tagEntryInfo *e = getEntryInCorkQueue (n);
+	if (e == NULL)
+	{
+		EsObject *err = es_error_intern ("undefined");
+		return err;
+	}
+
+	void * data = es_symbol_get_data (name);
+	fieldType ftype = HT_PTR_TO_INT (data);
+	unsigned int fdata_type = getFieldDataType (ftype);
+
+	EsObject *valobj = opt_vm_ostack_top (vm);
+	int valtype = es_object_get_type (valobj);
+
+	if (hasFieldValueCheckerForSetter (ftype))
+	{
+		EsObject *e = checkFieldValueForSetter (ftype, valobj);
+		if (!es_object_equal (e, es_false))
+			return e;
+	}
+	else
+	{
+		if (! (((fdata_type & FIELDTYPE_STRING) && (valtype == OPT_TYPE_STRING))
+			   || ((fdata_type & FIELDTYPE_BOOL) && (valtype == ES_TYPE_BOOLEAN))
+			   || ((fdata_type & FIELDTYPE_INTEGER) && (valtype == ES_TYPE_INTEGER))))
+			return OPT_ERR_TYPECHECK;
+	}
+
+	EsObject *r = setFieldValue (ftype, e, valobj);
+	if (es_error_p (r))
+		return r;
+
+	opt_vm_ostack_pop (vm);
+	opt_vm_ostack_pop (vm);
+
+	return es_false;
+}
+
+static void optscriptInstallFieldGetter (EsObject *dict, fieldType ftype,
+										 vString *op_name, vString *op_desc)
+{
+	const char *fname = getFieldName (ftype);
+	vStringPut (op_name, ':');
+	vStringCatS (op_name, fname);
+	EsObject *op_sym = es_symbol_intern (vStringValue (op_name));
+	es_symbol_set_data (op_sym, HT_INT_TO_PTR (ftype));
+
+	const char *vtype = getFieldGetterValueType (ftype);
+	unsigned int fdata_type = getFieldDataType (ftype);
+
+	vStringCatS (op_desc, "int :");
+	vStringCatS (op_desc, fname);
+	vStringPut (op_desc, ' ');
+
+	if (vtype)
+		vStringCatS (op_desc, vtype);
+	else
+	{
+		Assert (fdata_type);
+		if (fdata_type & FIELDTYPE_STRING)
+			vStringCatS (op_desc, "string|");
+		if (fdata_type & FIELDTYPE_INTEGER)
+			vStringCatS (op_desc, "int|");
+		if (fdata_type & FIELDTYPE_BOOL)
+			vStringCatS (op_desc, "bool|");
+		vStringChop (op_desc);
+	}
+
+	if (!isFieldValueAvailableAlways (ftype))
+	{
+		vStringPut (op_desc, ' ');
+		vStringCatS (op_desc, "true%");
+		vStringCatS (op_desc, "int :");
+		vStringCatS (op_desc, fname);
+		vStringCatS (op_desc, " false");
+	}
+
+	EsObject *op = opt_operator_new (lrop_get_field_value,
+									 vStringValue (op_name),
+									 1, vStringValue (op_desc));
+	opt_dict_def (dict, op_sym, op);
+	es_object_unref (op);
+}
+
+static void optscriptInstallFieldSetter (EsObject *dict, fieldType ftype,
+										 vString *op_name, vString *op_desc)
+{
+	const char *fname = getFieldName (ftype);
+	vStringCatS (op_name, fname);
+	vStringPut (op_name, ':');
+
+	EsObject *op_sym = es_symbol_intern (vStringValue (op_name));
+	es_symbol_set_data (op_sym, HT_INT_TO_PTR (ftype));
+
+	const char *vtype = getFieldSetterValueType (ftype);
+	unsigned int fdata_type = getFieldDataType (ftype);
+	vStringCatS (op_desc, "int ");
+
+	if (vtype)
+		vStringCatS (op_desc, vtype);
+	else
+	{
+		Assert (fdata_type);
+		if (fdata_type & FIELDTYPE_STRING)
+			vStringCatS (op_desc, "string|");
+		if (fdata_type & FIELDTYPE_INTEGER)
+			vStringCatS (op_desc, "int|");
+		if (fdata_type & FIELDTYPE_BOOL)
+			vStringCatS (op_desc, "bool|");
+		vStringChop (op_desc);
+	}
+
+	vStringPut (op_desc, ' ');
+	vStringCatS (op_desc, fname);
+	vStringCatS (op_desc, ": -");
+
+	EsObject *op = opt_operator_new (lrop_set_field_value,
+									 vStringValue (op_name),
+									 2, vStringValue (op_desc));
+	opt_dict_def (dict, op_sym, op);
+	es_object_unref (op);
+}
+
+static void optscriptInstallFieldAccessors (EsObject *dict)
+{
+	vString *op_name = vStringNew ();
+	vString *op_desc = vStringNew ();
+
+	for (fieldType ftype = 0; ftype <= FIELD_BUILTIN_LAST; ftype++)
+	{
+		if (hasFieldGetter (ftype))
+		{
+			optscriptInstallFieldGetter (dict, ftype, op_name, op_desc);
+			vStringClear (op_name);
+			vStringClear (op_desc);
+		}
+		if (hasFieldSetter (ftype))
+		{
+			optscriptInstallFieldSetter (dict, ftype, op_name, op_desc);
+			vStringClear (op_name);
+			vStringClear (op_desc);
+		}
+	}
+
+	vStringDelete (op_name);
+	vStringDelete (op_desc);
+}
+
+static void optscriptInstallProcs (EsObject *dict)
+{
+	optscriptInstallFieldAccessors (dict);
 }
 
 /* Return true if available. */

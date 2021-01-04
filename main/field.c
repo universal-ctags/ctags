@@ -31,6 +31,8 @@
 #include "writer_p.h"
 #include "xtag_p.h"
 
+#include "optscript.h"
+
 #define FIELD_NULL_LETTER_CHAR '-'
 #define FIELD_NULL_LETTER_STRING "-"
 
@@ -1153,6 +1155,11 @@ extern unsigned int getFieldDataType (fieldType type)
 	return getFieldObject(type)->def->dataType;
 }
 
+extern bool isFieldValueAvailableAlways (fieldType type)
+{
+	return getFieldObject(type)->def->isValueAvailable == NULL;
+}
+
 extern bool doesFieldHaveRenderer (fieldType type, bool noEscaping)
 {
 	if (noEscaping)
@@ -1387,4 +1394,61 @@ extern void fieldColprintTablePrint (struct colprintTable *table,
 {
 	colprintTableSort (table, fieldColprintCompareLines);
 	colprintTablePrint (table, 0, withListHeader, machinable, fp);
+}
+
+extern const char * getFieldGetterValueType (fieldType type)
+{
+	fieldObject *fobj = getFieldObject (type);
+	return (fobj? fobj->def->getterValueType: NULL);
+}
+
+extern EsObject * getFieldValue (fieldType type, const tagEntryInfo *tag)
+{
+	fieldObject* fobj;
+
+	fobj = getFieldObject (type);
+	if (fobj && fobj->def->getValueObject)
+		return fobj->def->getValueObject (tag, fobj->def);
+	return es_nil;
+}
+
+extern bool hasFieldGetter (fieldType type)
+{
+	fieldObject *fobj = getFieldObject (type);
+	return (fobj && fobj->def->getValueObject);
+}
+
+extern const char * getFieldSetterValueType (fieldType type)
+{
+	fieldObject *fobj = getFieldObject (type);
+	return (fobj? fobj->def->setterValueType: NULL);
+}
+
+extern EsObject * setFieldValue (fieldType type, tagEntryInfo *tag, const EsObject *val)
+{
+	fieldObject *fobj;
+
+	fobj = getFieldObject (type);
+	if (fobj && fobj->def->setValueObject)
+		return fobj->def->setValueObject (tag, fobj->def, val);
+	return es_false;
+}
+
+extern bool hasFieldSetter (fieldType type)
+{
+	fieldObject *fobj = getFieldObject (type);
+	return (fobj && fobj->def->setValueObject);
+}
+
+
+extern bool hasFieldValueCheckerForSetter (fieldType type)
+{
+	fieldObject *fobj = getFieldObject (type);
+	return (fobj && fobj->def->checkValueForSetter);
+}
+
+extern EsObject* checkFieldValueForSetter (fieldType type, const EsObject *val)
+{
+	fieldObject *fobj = getFieldObject (type);
+	return fobj->def->checkValueForSetter (fobj->def, val);
 }

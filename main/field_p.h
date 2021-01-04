@@ -18,6 +18,7 @@
 #include "general.h"
 #include "colprint_p.h"
 #include "field.h"
+#include "optscript.h"
 
 /*
 *   DATA DECLARATIONS
@@ -50,6 +51,7 @@ extern const char* getFieldDescription (fieldType type);
 extern const char* getFieldName (fieldType type);
 extern unsigned char getFieldLetter (fieldType type);
 extern unsigned int getFieldDataType (fieldType type);
+extern bool isFieldValueAvailableAlways (fieldType type);
 
 /* Whether the field specified with TYPE has a
    method for rendering in the current format. */
@@ -75,5 +77,15 @@ extern void fieldColprintAddCommonLines (struct colprintTable *table);
 extern void fieldColprintAddLanguageLines (struct colprintTable *table, langType language);
 extern void fieldColprintTablePrint (struct colprintTable *table,
 									 bool withListHeader, bool machinable, FILE *fp);
+
+/* tag is assumed that it is in the cork queue. */
+extern EsObject * getFieldValue (fieldType type, const tagEntryInfo *tag);
+extern bool hasFieldGetter (fieldType type);
+extern const char * getFieldGetterValueType (fieldType type);
+extern EsObject * setFieldValue (fieldType type, tagEntryInfo *tag, const EsObject *val);
+extern bool hasFieldSetter (fieldType type);
+extern const char * getFieldSetterValueType (fieldType type);
+extern bool hasFieldValueCheckerForSetter (fieldType type);
+extern EsObject *checkFieldValueForSetter (fieldType type, const EsObject *val);
 
 #endif	/* CTAGS_MAIN_FIELD_PRIVATE_H */

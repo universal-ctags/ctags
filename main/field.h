@@ -20,6 +20,7 @@
 #include "types.h"
 
 #include "vstring.h"
+#include "optscript.h"
 
 /*
 *   DATA DECLARATIONS
@@ -90,6 +91,15 @@ struct sFieldDefinition {
 	bool (* doesContainAnyChar) (const tagEntryInfo *const, const char*, const char *);
 
 	bool (* isValueAvailable) (const tagEntryInfo *const);
+
+	const char * getterValueType;
+	EsObject * (* getValueObject) (const tagEntryInfo *, const fieldDefinition *);
+	const char * setterValueType;
+
+	/* Return es_false if passed value is acceptable.
+	   Return an error object is unacceptable. */
+	EsObject * (* checkValueForSetter) (const fieldDefinition *, const EsObject *);
+	EsObject * (* setValueObject) (tagEntryInfo *, const fieldDefinition *, const EsObject *);
 
 	fieldDataType dataType; /* used in json output */
 

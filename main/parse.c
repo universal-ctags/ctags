@@ -3666,6 +3666,11 @@ static bool processLangDefineField (const langType language,
 	fdef->name = eStrndup(parameter, name_end - parameter);
 	fdef->description = desc;
 	fdef->isValueAvailable = NULL;
+	fdef->getValueObject = NULL;
+	fdef->getterValueType = NULL;
+	fdef->setValueObject = NULL;
+	fdef->setterValueType = NULL;
+	fdef->checkValueForSetter = NULL;
 	fdef->dataType = FIELDTYPE_STRING; /* TODO */
 	fdef->ftype = FIELD_UNKNOWN;
 	DEFAULT_TRASH_BOX(fdef, fieldDefinitionDestroy);
