@@ -89,6 +89,7 @@ static bool     isEpochAvailable           (const tagEntryInfo *const tag);
 
 static EsObject* getFieldValueForName (const tagEntryInfo *, const fieldDefinition *);
 static EsObject* setFieldValueForName (tagEntryInfo *, const fieldDefinition *, const EsObject *);
+static EsObject* getFieldValueForKind (const tagEntryInfo *, const fieldDefinition *);
 
 #define WITH_DEFUALT_VALUE(str) ((str)?(str):FIELD_NULL_LETTER_STRING)
 
@@ -278,6 +279,11 @@ static fieldDefinition fieldDefinitionsExuberant [] = {
 		.doesContainAnyChar = NULL,
 		.isValueAvailable	= NULL,
 		.dataType			= FIELDTYPE_STRING,
+		.getterValueType    = "name",
+		.getValueObject     = getFieldValueForKind,
+		.setterValueType    = NULL,
+		.checkValueForSetter= NULL,
+		.setValueObject     = NULL,
 	},
 };
 
@@ -1472,4 +1478,10 @@ static EsObject* setFieldValueForName (tagEntryInfo *tag, const fieldDefinition 
 	const char *cstr = opt_string_get_cstr (val);
 	tag->name = eStrdup (cstr);
 	return es_false;
+}
+
+static EsObject* getFieldValueForKind (const tagEntryInfo *tag, const fieldDefinition *fdef)
+{
+	const char *kind_name = getLanguageKindName (tag->langType, tag->kindIndex);
+	return opt_name_new_from_cstr (kind_name);
 }
