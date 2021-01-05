@@ -1,0 +1,10 @@
+fun1	input.jl	/^@eval fun1(x) = $a$/;"	f
+fun2	input.jl	/^Base.@eval fun2(x) = $a$/;"	f
+fun3	input.jl	/^@eval function fun3(x)$/;"	f
+fun4	input.jl	/^Base.@eval function fun4(x)$/;"	f
+Test1	input.jl	/^@eval struct Test1$/;"	s
+a	input.jl	/^    a::$T$/;"	g	scope:struct:Test1
+Test2	input.jl	/^Base.@eval struct Test2$/;"	s
+a	input.jl	/^    a::$T$/;"	g	scope:struct:Test2
+macro1	input.jl	/^@eval macro macro1(x)$/;"	m
+macro2	input.jl	/^Base.@eval macro macro2(x)$/;"	m
