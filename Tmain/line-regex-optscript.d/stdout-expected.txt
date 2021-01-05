@@ -1,4 +1,3 @@
 (hello)
 (world)
-1
-x	input.hello	/^def x:$/;"	d
+x_y_z	input.hello	/^def x-y-z:$/;"	d
