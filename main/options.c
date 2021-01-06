@@ -372,6 +372,8 @@ static optionDescription LongOptionDescription [] = {
  {1,1,"       Copy patterns of a regex table to another regex table."},
  {1,1,"  --_mtable-regex-<LANG>=<table>/<line_pattern>/<name_pattern>/[<flags>]"},
  {1,1,"       Define multitable regular expression for locating tags in specific language."},
+ {1,1,"  --_prelude-<LANG>={{ optscript-code }}"},
+ {1,1,"       Specify code run before parsing with <LANG> parser."},
  {1,1,"  --_pretend-<NEWLANG>=<OLDLANG>"},
  {1,1,"       Make NEWLANG parser pretend OLDLANG parser in lang: field."},
  {1,1,"  --_roledef-<LANG>.<kind>=<name>,<description>"},
@@ -3310,6 +3312,8 @@ static void processLongOption (
 	else if (processRoledefOption (option, parameter))
 		;
 	else if (processScopesepOption (option, parameter))
+		;
+	else if (processPreludeOption (option, parameter))
 		;
 	else if (processPretendOption (option, parameter))
 		;

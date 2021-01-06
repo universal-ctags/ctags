@@ -221,6 +221,8 @@ struct lregexControlBlock {
 
 	EsObject *local_dict;
 
+	ptrArray *prelude;
+
 	langType owner;
 };
 
@@ -324,6 +326,7 @@ extern struct lregexControlBlock* allocLregexControlBlock (parserDefinition *par
 	lcb->tstack = ptrArrayNew(NULL);
 	lcb->guest_req = guestRequestNew ();
 	lcb->local_dict = es_nil;
+	lcb->prelude = ptrArrayNew (eFree);
 	lcb->owner = parser->id;
 
 	return lcb;
@@ -349,6 +352,9 @@ extern void freeLregexControlBlock (struct lregexControlBlock* lcb)
 
 	es_object_unref (lcb->local_dict);
 	lcb->local_dict = es_nil;
+
+	ptrArrayDelete (lcb->prelude);
+	lcb->prelude = NULL;
 
 	eFree (lcb);
 }
@@ -1778,8 +1784,7 @@ static bool fillGuestRequest (const char *start,
 	return guestRequestIsFilled (guest_req);
 }
 
-static EsObject*
-optscriptRun (OptVM *vm, EsObject *optscript)
+static EsObject* optscriptRun (OptVM *vm, EsObject *optscript)
 {
 	static EsObject *exec = es_nil;
 
@@ -1798,6 +1803,21 @@ optscriptRun (OptVM *vm, EsObject *optscript)
 	es_object_unref (o);
 
 	return opt_vm_eval (vm, exec);
+}
+
+static void optscriptRunPrelude (OptVM *vm, EsObject *dict, ptrArray *prelude)
+{
+	opt_vm_dstack_push (vm, dict);
+	for (int i = 0; i < ptrArrayCount (prelude); i++)
+	{
+		const char *src = ptrArrayItem (prelude, i);
+		EsObject * code = makeOptscriptObject (vm, src);
+		EsObject * e = optscriptRun (vm, code);
+		if (es_error_p (e))
+			error (WARNING, "error when evaluating: %s", src);
+		es_object_unref (code);
+	}
+	opt_vm_dstack_pop (vm);
 }
 
 static bool matchRegexPattern (struct lregexControlBlock *lcb,
@@ -1999,7 +2019,10 @@ extern void notifyRegexInputStart (struct lregexControlBlock *lcb)
 	opt_vm_dstack_push (optvm, lregex_dict);
 
 	if (es_null (lcb->local_dict))
+	{
 		lcb->local_dict = opt_dict_new (23);
+		optscriptRunPrelude (optvm, lcb->local_dict, lcb->prelude);
+	}
 	opt_vm_dstack_push (optvm, lcb->local_dict);
 }
 
@@ -3159,6 +3182,11 @@ static void optscriptInstallFieldAccessors (EsObject *dict)
 static void optscriptInstallProcs (EsObject *dict)
 {
 	optscriptInstallFieldAccessors (dict);
+}
+
+extern void	addOptscriptPrelude (struct lregexControlBlock *lcb, const char *code)
+{
+	ptrArrayAdd (lcb->prelude, eStrdup (code));
 }
 
 /* Return true if available. */

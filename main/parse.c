@@ -5004,6 +5004,29 @@ extern void addLanguageTagMultiTableRegex(const langType language,
 						   name, kinds, flags, disabled);
 }
 
+extern void addLanguageOptscriptPrelude (langType language, const char *const src)
+{
+	addOptscriptPrelude (LanguageTable [language].lregexControlBlock, src);
+}
+
+extern bool processPreludeOption (const char *const option, const char *const parameter)
+{
+#define preludeOptionPrefix "_prelude-"
+	langType language = getLanguageComponentInOption (option, preludeOptionPrefix);
+	if (language == LANG_IGNORE)
+		return false;
+
+	if (parameter == NULL || parameter[0] == '\0')
+		error (FATAL, "A parameter is needed after \"%s\" option", option);
+
+	const char * code = flagsEval (parameter, NULL, 0, NULL);
+	if (code == NULL)
+		error (FATAL, "Cannot recognized a code block surrounded by `{{' and `}}' after \"%s\" option", option);
+	addLanguageOptscriptPrelude (language, code);
+
+	return true;
+}
+
 extern bool processPretendOption (const char *const option, const char *const parameter)
 {
 	langType new_language, old_language;
