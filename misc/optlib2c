@@ -42,6 +42,7 @@ my $options =
     [
      [ qr/^--options=(.*)/, sub {
 	   parse_optlib ($1, $_[0]);
+	   return 1;
        } ],
      #
      # TODO: We should not assume the order of flags.
@@ -87,6 +88,7 @@ my $options =
 
 	 push @{$_[0]->{'kinddefs'}}, { enabled => 1, letter => $letter, name => $name, desc => $desc,
 					refonly => $refonly, roles => [], seps => [] };
+	 return 1;
        } ],
      [ qr/^--_extradef-(.*)=([^,]+),([^\{]+)/, sub {
 	 die "Don't use --_extradef-<LANG>=+ option before defining the language"
@@ -101,6 +103,7 @@ my $options =
 	     unless ($name =~ /^[a-zA-Z0-9]+$/);
 
 	 push @{$_[0]->{'extradefs'}}, { name => $name, desc => $desc };
+	 return 1;
        } ],
      [ qr/^--_fielddef-(.*)=([^,]+),([^\{]+)/, sub {
 	 die "Don't use --_fielddef-<LANG>=+ option before defining the language"
@@ -114,6 +117,7 @@ my $options =
 	     unless ($name =~ /^[a-zA-Z]+$/);
 
 	 push @{$_[0]->{'fielddefs'}}, { name => $name, desc => $desc };
+	 return 1;
        } ],
      [ qr/^--_roledef-([^.]*)\.(?:([a-zA-Z])|\{([a-zA-Z][a-zA-Z0-9]*)\})=([a-zA-Z0-9]+),([^\{]+)/, sub {
 	   die "Don't use --_roledef-<LANG>.<KNID>=+ option before defining the language"
@@ -132,6 +136,7 @@ my $options =
 	       }
 	   }
 	   die "no such kind, \"$2\" where role \"$3\" is attached to" if (! $kind_found);
+	   return 1;
        } ],
      [ qr/^--languages=-(.*)/, sub {
 	   die "Don't use --languages=- option before defining the language"
@@ -139,6 +144,7 @@ my $options =
 	   die "Only language specified with --langdef can be disabled: $1"
 	       unless ($_[0]->{'langdef'} eq $1);
 	   $_[0]->{'disabled'} = 1;
+	   return 1;
        } ],
      [ qr/^--language=(.*)/, sub {
 	   die "--languages can be used only for disabling a language defined with --langdef: $1";
@@ -156,6 +162,7 @@ my $options =
 	   } else {
 	       die "Unexpected notation is used in the argument for --map-$1= option";
 	   }
+	   return 1;
        } ],
      [ qr/^--map-([^=]*)=[^+].*/, sub {
 	   die "map manipulation other than the appending(--map-<LANG>=+...) is not supported";
@@ -166,6 +173,7 @@ my $options =
 	   die "Adding an alias is allowed only to the language specified with --langdef: $1"
 	       unless ($_[0]->{'langdef'} eq $1);
 	   push @{$_[0]->{'aliases'}}, $2;
+	   return 1;
        } ],
      [ qr/^--alias-([^=]*)=[^+].*/, sub {
 	   die "alias manipulation other than the appending(--alias-<LANG>=+...) is not supported";
@@ -175,20 +183,20 @@ my $options =
 	       if (! defined $_[0]->{'langdef'});
 	   die "Adding a regex is allowed only to the language specified with --langdef: $1"
 	       unless ($_[0]->{'langdef'} eq $1);
-	   parse_regex ($2, $_[0], 0);
+	   return parse_regex ($2, $_[0], 0);
        } ],
      [ qr/^--mline-regex-([^=]*)=(.*)/, sub {
 	   die "Don't use --mline-regex-<LANG>= option before defining the language"
 	       if (! defined $_[0]->{'langdef'});
 	   die "Adding a multiline regex is allowed only to the language specified with --langdef: $1"
 	       unless ($_[0]->{'langdef'} eq $1);
-	   parse_regex ($2, $_[0], 1);
+	   return parse_regex ($2, $_[0], 1);
        } ],
-
      [ qr/^--kinds-([^=]*)=-(.*)/, sub {
 	   die "Don't use --kinds-<LANG>= option before defining the language"
 	       if (! defined $_[0]->{'langdef'});
 	   parse_kinds ($2, $_[0]);
+	   return 1;
        } ],
      [ qr/^--kinds-([^=]*)=(.*)/, sub {
 	   die "--kinds-<LANG>= can be used only for disabling a kind: $1";
@@ -201,6 +209,7 @@ my $options =
 	   die "Specifing multiple extras in one --extras-... is not handled: {$3}"
 	       if ( index ($3, '{') != -1 );
 	   parse_extras ($2, $3, $_[0]);
+	   return 1;
        } ],
      [ qr/^--extras-([^=]*)=\{/, sub {
 	 die "--extras-<LANG>= can be used only for enabling or disabling an extra: $1";
@@ -216,6 +225,7 @@ my $options =
 	   die "Specifing multiple fields in one --fields-... is not handled: {$3}"
 	       if ( index ($3, '{') != -1 );
 	   parse_fields ($2, $3, $_[0]);
+	   return 1;
        } ],
      [ qr/^--fields-([^=]*)=\{/, sub {
 	 die "--fields-<LANG>= can be used only for enabling or disabling a field: $1";
@@ -233,13 +243,14 @@ my $options =
 	   unless ($_[0]->{'langdef'} eq $1);
 	 $_[0]->{'tabledefs'}->{$2} = [];
 	 push @{$_[0]->{'tablenames'}}, "$2";
+	 return 1;
        } ],
      [ qr/^--_mtable-regex-([^=]*)=([^\/]+)(\/.*)/, sub {
 	 die "Don't use --_mtable-regex-<LANG>= option before defining the language"
 	   if (! defined $_[0]->{'langdef'});
 	 die "Adding a multitable regex is allowed only to the language specified with --langdef: $1"
 	   unless ($_[0]->{'langdef'} eq $1);
-	 parse_regex ($3, $_[0], 1, $2);
+	 return parse_regex ($3, $_[0], 1, $2);
        } ],
      [ qr/^--_mtable-extend-([^=]*)=(.*)\+(.*)/, sub {
 	 die "Don't use --_mline-extend-<LANG>= option before defining the language"
@@ -247,13 +258,35 @@ my $options =
 	 die "Extending a multitable regex is allowed only to the language specified with --langdef: $1"
 	   unless ($_[0]->{'langdef'} eq $1);
 	 extend_table($_[0], $2, $3);
-       } ],
+	 return 1;
+     } ],
+     [ qr/^--_prelude-([^=]*)=(\{\{)$/, sub {
+	 die "Don't use --_mtable-regex-<LANG>= option before defining the language"
+	   if (! defined $_[0]->{'langdef'});
+
+	 my $prelude = $_[0]->{'prelude'};
+	 my $slot = @$prelude;
+	 push @$prelude, $2;
+	 return sub {
+	   $prelude->[$slot] = $prelude->[$slot] . $_[0];
+	 }
+       }],
+     [ qr/^--_prelude-([^=]*)=(\{\{.*\}\})$/, sub {
+	 die "Don't use --_mtable-regex-<LANG>= option before defining the language"
+	   if (! defined $_[0]->{'langdef'});
+
+	 my $prelude = $_[0]->{'prelude'};
+	 my $slot = @$prelude;
+	 push @$prelude, $2;
+	 return 1;
+       }],
      [ qr/^--_scopesep-([^=]*)=([^,]?)\/([^:]+):(.+)/, sub {
 	 die "Don't use --_scopesep-<LANG>= option before defining the language"
 	   if (! defined $_[0]->{'langdef'});
 	 die "Specifying a scope separator is allowed only to the language specified with --langdef: $1"
 	   unless ($_[0]->{'langdef'} eq $1);
 	 scopesep($_[0], $2, $3, $4);
+	 return 1;
        } ],
      [ qr/^-.*/, sub {
 	 die "Unhandled option: \"$&\"";
@@ -270,8 +303,7 @@ sub parse_line {
     for (@{$options}) {
 	my ($pat, $action) = @{$_};
 	if ($line =~ $pat) {
-	    $action -> ($opts);
-	    $r = 1;
+	    $r = $action -> ($opts);
 	    last;
 	}
     }
@@ -365,29 +397,46 @@ sub parse_regex {
 	($flags, $last_char) = gather_chars (\@chars);
     }
 
+    my $optscript = '';
+    if ($flags =~ /(.*)\{\{$/) {
+	$flags = $1;
+	$optscript = "{{\n";
+    }
+
+    my $entry;
     if (defined $table) {
 
       if (! (substr ($regex, 0, 1) eq '^')) {
 	$regex = '^' . $regex;
       }
-      push @{$opts->{'tabledefs'}->{"$table"}}, { 'regex' => $regex,
-						  'name'  => $name,
-						  'kind'  => $kind,
-						  'flags' => $flags,
-						  'mline' => $mline,
-						};
+      $entry = { 'regex' => $regex,
+		 'name'  => $name,
+		 'kind'  => $kind,
+		 'flags' => $flags,
+		 'mline' => $mline,
+		 'optscript' => $optscript,
+	       };
+      push @{$opts->{'tabledefs'}->{"$table"}}, $entry;
     } else {
-      push @{$opts->{'regexs'}}, { 'regex' => $regex,
-				   'name'  => $name,
-				   'kind'  => $kind,
-				   'flags' => $flags,
-				   'mline' => $mline,
-				 };
+      $entry = { 'regex' => $regex,
+		 'name'  => $name,
+		 'kind'  => $kind,
+		 'flags' => $flags,
+		 'mline' => $mline,
+		 'optscript' => $optscript,
+	       };
+      push @{$opts->{'regexs'}}, $entry;
     }
 
-    if ($flags =~ '{scope=') {
+    if ($flags =~ '{scope=' || $optscript) {
 	$opts->{'useCork'} = 1;
     }
+
+    return $optscript
+	? sub {
+	    $entry->{'optscript'} = $entry->{'optscript'} . $_[0];
+	}
+	: 1;
 }
 
 sub extend_table {
@@ -415,14 +464,25 @@ sub parse_optlib {
     open(my $optlibfh, "<", $optlib)
 	or die "cannot open the optlib file: \"$optlib\"";
 
+    my $receiver = 0;
     while (<$optlibfh>) {
 	chomp;
-	if ( /^#.*/ ) {
+
+	if (/^\}\}$/ && $receiver && ($receiver != 1)) {
+	    $receiver->('}}');
+	    $receiver = 1;
+	}
+	elsif ($receiver && $receiver != 1) {
+	    my $str = escape_as_cstr ($_);
+	    $receiver->($str);
+	    $receiver->("\n");
+	} elsif ( /^#.*/ ) {
 	    next;
 	} else {
 	    s/^\s*//;
 	    next if ( /^\s*$/ );
-	    if (! parse_line ($_, $opts)) {
+	    $receiver = parse_line ($_, $opts);
+	    if (! $receiver) {
 		return undef;
 	    }
 	}
@@ -546,6 +606,17 @@ sub emit_initializer {
 static void initialize$opts->{'Clangdef'}Parser (const langType language$may_unused)
 {
 EOF
+    for (@{$opts->{'prelude'}}) {
+	my $prelude = "";
+	for my $frag (split /\n/, $_) {
+	    $prelude = $prelude . "\n\t\t\"" . $frag . ($frag =~ /.*\}\}$/
+							? '"'
+							: '\n"');
+	}
+	print <<EOF;
+	addLanguageOptscriptPrelude (language,$prelude);
+EOF
+    }
     if ($opts->{'tablenames'}) {
       print "\n";
 
@@ -559,10 +630,18 @@ EOF
 
       for my $table (@{$opts->{'tablenames'}}) {
 	for (@{$opts->{'tabledefs'}->{"$table"}}) {
+	  my $optscript = "";
+	  if ($_-> {'optscript'}) {
+	    for my $frag (split /\n/, $_-> {'optscript'}) {
+	      $optscript = $optscript . "\n\t\t\"" . $frag . ($frag =~ /.*\}\}$/
+							      ? '"'
+							      : '\n"');
+	    }
+	  }
 	  print <<EOF;
 	addLanguageTagMultiTableRegex (language, "$table",
 	                               "$_->{'regex'}",
-	                               "$_->{'name'}", "$_->{'kind'}", "$_->{'flags'}", NULL);
+	                               "$_->{'name'}", "$_->{'kind'}", "$_->{'flags'}"$optscript, NULL);
 EOF
 	}
       }
@@ -745,7 +824,28 @@ sub emit_regexs {
 	static tagRegexTable $opts->{'Clangdef'}TagRegexTable [] = {
 EOF
     for (@{$opts->{'regexs'}}) {
-	my $flags = $_-> {'flags'}? '"' . $_-> {'flags'} . '"': "NULL";
+	my $flags;
+	if ($_-> {'flags'}) {
+	    $flags = '"' . $_-> {'flags'} . '"';
+	    if ($_-> {'optscript'}) {
+		for my $frag (split /\n/, $_-> {'optscript'}) {
+		    $flags = $flags . "\n\t\t\"" . $frag . ($frag =~ /.*\}\}$/
+							    ? '"'
+							    : '\n"');
+		}
+	    }
+	} else {
+	    if ($_-> {'optscript'}) {
+		$flags = '""';
+		for my $frag (split /\n/, $_-> {'optscript'}) {
+		    $flags = $flags . "\n\t\t\"" . $frag . ($frag =~ /.*\}\}$/
+							    ? '"'
+							    : '\n"');
+		}
+	    } else {
+		$flags = 'NULL';
+	    }
+	}
 	my $mline = $_-> {'mline'}? "true": "false";
 	print <<EOF;
 		{"$_->{'regex'}", "$_->{'name'}",
@@ -1000,7 +1100,7 @@ sub main {
 		patterns => [],
 		extensions => [],
 		aliases => [],
-		regexs => [# { regex => "", name => "", kind => "", flags => "", mline => 1|0 },
+		regexs => [# { regex => "", name => "", kind => "", flags => "", mline => 1|0, optscript => "" },
 			  ],
 		kinddefs => [# { letter => '', name => "", desc => "",
 			     #   seps => [ {parentKindIndex => "", sep => "" } ]
@@ -1019,6 +1119,8 @@ sub main {
 		defaultScopeSeparator => undef,
 		defaultRootScopeSeparator => undef,
 		hasSepSpeicifer => 0,
+		prelude => [ # ""
+			   ],
 	       );
 
     for (@_) {
