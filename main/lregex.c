@@ -1896,6 +1896,10 @@ extern bool doesExpectCorkInRegex (struct lregexControlBlock *lcb)
 	if (doesExpectCorkInRegex0 (entries))
 		return true;
 
+	entries = lcb->entries[REG_PARSER_MULTI_LINE];
+	if (doesExpectCorkInRegex0 (entries))
+		return true;
+
 	for (unsigned int i = 0; i < ptrArrayCount(lcb->tables); i++)
 	{
 		struct regexTable *table = ptrArrayItem(lcb->tables, i);
