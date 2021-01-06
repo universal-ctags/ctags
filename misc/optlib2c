@@ -137,7 +137,7 @@ my $options =
 	       if (! defined $_[0]->{'langdef'});
 	   die "Only language specified with --langdef can be disabled: $1"
 	       unless ($_[0]->{'langdef'} eq $1);
-	   $_[0]->{'disabled'} = 1
+	   $_[0]->{'disabled'} = 1;
        } ],
      [ qr/^--language=(.*)/, sub {
 	   die "--languages can be used only for disabling a language defined with --langdef: $1";
