@@ -150,6 +150,9 @@
     <ClCompile Include="..\main\routines.c">
       <Filter>Source Files\Main</Filter>
     </ClCompile>
+    <ClCompile Include="..\main\script.c">
+      <Filter>Source Files\Main</Filter>
+    </ClCompile>
     <ClCompile Include="..\main\selectors.c">
       <Filter>Source Files\Main</Filter>
     </ClCompile>
@@ -726,6 +729,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\main\routines_p.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\main\script_p.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\main\selectors.h">

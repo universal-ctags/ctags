@@ -569,7 +569,6 @@ extern int ctags_cli_main (int argc CTAGS_ATTR_UNUSED, char **argv)
 	setCurrentDirectory ();
 	setExecutableName (*argv++);
 	sanitizeEnviron ();
-	opt_init ();
 	checkRegex ();
 	initFieldObjects ();
 	initXtagObjects ();

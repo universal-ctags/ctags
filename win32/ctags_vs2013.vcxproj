@@ -211,6 +211,7 @@
     <ClCompile Include="..\main\read.c" />
     <ClCompile Include="..\main\repoinfo.c" />
     <ClCompile Include="..\main\routines.c" />
+    <ClCompile Include="..\main\script.c" />
     <ClCompile Include="..\main\selectors.c" />
     <ClCompile Include="..\main\sort.c" />
     <ClCompile Include="..\main\stats.c" />
@@ -405,6 +406,7 @@
     <ClInclude Include="..\main\read_p.h" />
     <ClInclude Include="..\main\routines.h" />
     <ClInclude Include="..\main\routines_p.h" />
+    <ClInclude Include="..\main\script.h" />
     <ClInclude Include="..\main\selectors.h" />
     <ClInclude Include="..\main\sort_p.h" />
     <ClInclude Include="..\main\stat_p.h" />

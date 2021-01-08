@@ -73,6 +73,7 @@ LIB_PRIVATE_HEADS =		\
 	main/ptag_p.h		\
 	main/read_p.h		\
 	main/routines_p.h	\
+	main/script_p.h		\
 	main/sort_p.h		\
 	main/stats_p.h		\
 	main/subparser_p.h	\
@@ -121,6 +122,7 @@ LIB_SRCS =			\
 	main/rbtree.c			\
 	main/read.c			\
 	main/routines.c			\
+	main/script.c			\
 	main/seccomp.c			\
 	main/selectors.c		\
 	main/sort.c			\
