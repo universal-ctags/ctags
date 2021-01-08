@@ -223,6 +223,7 @@ struct lregexControlBlock {
 	EsObject *local_dict;
 
 	ptrArray *prelude;
+	ptrArray *prelude_code;
 
 	langType owner;
 };
@@ -251,7 +252,7 @@ static void   guestRequestSubmit (struct guestRequest *);
 static EsObject *scriptRead (OptVM *vm, const char *src);
 static void scriptSetup (OptVM *vm, struct lregexControlBlock *lcb, int corkIndex);
 static EsObject* scriptEval (OptVM *vm, EsObject *optscript);
-static void scriptEvalPrelude (OptVM *vm, EsObject *dict, ptrArray *prelude);
+static void scriptEvalPrelude (OptVM *vm, struct lregexControlBlock *lcb);
 static void scriptTeardown (OptVM *vm, struct lregexControlBlock *lcb);
 
 static void deleteTable (void *ptrn)
@@ -328,6 +329,7 @@ extern struct lregexControlBlock* allocLregexControlBlock (parserDefinition *par
 	lcb->guest_req = guestRequestNew ();
 	lcb->local_dict = es_nil;
 	lcb->prelude = ptrArrayNew (eFree);
+	lcb->prelude_code = ptrArrayNew ((ptrArrayDeleteFunc)es_object_unref);
 	lcb->owner = parser->id;
 
 	return lcb;
@@ -356,6 +358,9 @@ extern void freeLregexControlBlock (struct lregexControlBlock* lcb)
 
 	ptrArrayDelete (lcb->prelude);
 	lcb->prelude = NULL;
+
+	ptrArrayDelete (lcb->prelude_code);
+	lcb->prelude_code = NULL;
 
 	eFree (lcb);
 }
@@ -1970,11 +1975,9 @@ extern void notifyRegexInputStart (struct lregexControlBlock *lcb)
 	opt_vm_dstack_push (optvm, lregex_dict);
 
 	if (es_null (lcb->local_dict))
-	{
 		lcb->local_dict = opt_dict_new (23);
-		scriptEvalPrelude (optvm, lcb->local_dict, lcb->prelude);
-	}
 	opt_vm_dstack_push (optvm, lcb->local_dict);
+	scriptEvalPrelude (optvm, lcb);
 }
 
 extern void notifyRegexInputEnd (struct lregexControlBlock *lcb)
@@ -2935,19 +2938,28 @@ extern EsObject* scriptEval (OptVM *vm, EsObject *optscript)
 	return optscriptEval (vm, optscript);
 }
 
-static void scriptEvalPrelude (OptVM *vm, EsObject *dict, ptrArray *prelude)
+static void scriptEvalPrelude (OptVM *vm, struct lregexControlBlock *lcb)
 {
-	opt_vm_dstack_push (vm, dict);
-	for (int i = 0; i < ptrArrayCount (prelude); i++)
+	if (ptrArrayCount (lcb->prelude_code) == 0)
 	{
-		const char *src = ptrArrayItem (prelude, i);
-		EsObject * code = scriptRead (vm, src);
+		for (int i = 0; i < ptrArrayCount (lcb->prelude); i++)
+		{
+			const char *src = ptrArrayItem (lcb->prelude, i);
+			EsObject *code = scriptRead (vm, src);
+			if (es_error_p (code))
+				error (FATAL, "error when reading prelude code: %s", src);
+			ptrArrayAdd (lcb->prelude_code, es_object_ref (code));
+			es_object_unref (code);
+		}
+	}
+	for (int i = 0; i < ptrArrayCount (lcb->prelude_code); i++)
+	{
+		EsObject *code = ptrArrayItem (lcb->prelude_code, i);
 		EsObject * e = optscriptEval (vm, code);
 		if (es_error_p (e))
-			error (WARNING, "error when evaluating: %s", src);
-		es_object_unref (code);
+			error (WARNING, "error when evaluating prelude code: %s",
+				   (char *)ptrArrayItem (lcb->prelude, i));
 	}
-	opt_vm_dstack_pop (vm);
 }
 
 static void scriptSetup (OptVM *vm, struct lregexControlBlock *lcb, int corkIndex)
