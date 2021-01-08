@@ -15,6 +15,8 @@
 
 #include "optscript.h"
 
+extern EsObject *OPTSCRIPT_ERR_NOTAGENTRY;
+
 extern OptVM *optscriptInit (void);
 
 extern void optscriptInstallProcs (EsObject *dict);
@@ -25,5 +27,10 @@ extern void optscriptTeardown (OptVM *vm, EsObject *dict);
 /* If len is 0, strlen (src) is used instead of 0. */
 extern EsObject *optscriptRead (OptVM *vm, const char *src, size_t len);
 extern EsObject *optscriptEval (OptVM *vm, EsObject *code);
+extern EsObject *optscriptDefine (EsObject *dict, const char *name, EsObject *obj);
+
+extern EsObject *optscriptReadAndEval   (OptVM *vm, const char *src, size_t len);
+extern EsObject *optscriptReadAndDefine (OptVM *vm, EsObject *dict, const char *name,
+										 const char *src, size_t len);
 
 #endif	/* CTAGS_MAIN_SCRIPT_PRIVATE_H */

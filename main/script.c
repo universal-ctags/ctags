@@ -19,6 +19,8 @@
 
 #include <string.h>
 
+EsObject *OPTSCRIPT_ERR_NOTAGENTRY;
+
 extern OptVM *optscriptInit (void)
 {
 	opt_init ();
@@ -32,6 +34,8 @@ extern OptVM *optscriptInit (void)
 	mio_unref (out);
 	mio_unref (in);
 
+	OPTSCRIPT_ERR_NOTAGENTRY = es_error_intern ("notagentry");
+
 	return optvm;
 }
 
@@ -44,10 +48,7 @@ static EsObject* lrop_get_field_value (OptVM *vm, EsObject *name)
 	int n = es_integer_get (nobj);
 	tagEntryInfo *e = getEntryInCorkQueue (n);
 	if (e == NULL)
-	{
-		EsObject *err = es_error_intern ("undefined");
-		return err;
-	}
+		return OPTSCRIPT_ERR_NOTAGENTRY;;
 
 	void * data = es_symbol_get_data (name);
 	fieldType ftype = HT_PTR_TO_INT (data);
@@ -84,10 +85,7 @@ static EsObject* lrop_set_field_value (OptVM *vm, EsObject *name)
 	int n = es_integer_get (indexobj);
 	tagEntryInfo *e = getEntryInCorkQueue (n);
 	if (e == NULL)
-	{
-		EsObject *err = es_error_intern ("undefined");
-		return err;
-	}
+		return OPTSCRIPT_ERR_NOTAGENTRY;;
 
 	void * data = es_symbol_get_data (name);
 	fieldType ftype = HT_PTR_TO_INT (data);
@@ -300,4 +298,33 @@ extern EsObject* optscriptEval (OptVM *vm, EsObject *code)
 	if (es_error_p (r))
 		opt_vm_report_error (vm, r, NULL);
 	return r;
+}
+
+extern EsObject* optscriptDefine (EsObject *dict,
+								  const char *name, EsObject *obj)
+{
+	EsObject *sym = es_symbol_intern (name);
+	opt_dict_def (dict, sym, obj);
+	return sym;
+}
+
+
+extern EsObject *optscriptReadAndEval   (OptVM *vm, const char *src, size_t len)
+{
+	EsObject *obj = optscriptRead (vm, src, len);
+	if (es_error_p (obj))
+		return obj;
+
+	EsObject *r = optscriptEval (vm, obj);
+	es_object_unref (obj);
+	return r;
+}
+
+extern EsObject *optscriptReadAndDefine (OptVM *vm, EsObject *dict, const char *name,
+										 const char *src, size_t len)
+{
+	EsObject *obj = optscriptRead (vm, src, len);
+	if (es_error_p (obj))
+		return obj;
+	return optscriptDefine (dict, name, obj);
 }
