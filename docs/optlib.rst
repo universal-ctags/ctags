@@ -96,7 +96,7 @@ file extension under the following statically defined directories:
 ``ctags`` visits the directories in the order listed above for preloading files.
 ``ctags`` loads files having :file:`.ctags` as file extension in alphabetical
 order (strcmp(3) is used for comparing, so for example
-:file:`.ctags.d/ZZZ.ctags` will be loaded *before* :file:`.ctags.d/aaa.ctags`).
+:file:`.ctags.d/ZZZ.ctags` will be loaded *before* :file:`.ctags.d/aaa.ctags` in an ordinary locale).
 
 Quoted from man page of Exuberant-ctags:
 

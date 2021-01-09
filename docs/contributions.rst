@@ -222,6 +222,14 @@ I like GNU style, but for keeping consistency in existing code of
 Exuberant-ctags, the origin of Universal-ctags, I introduced the style
 and configuration to my .emacs.  Please, do the same.
 
+Compatibility
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+We are trying to maintain compatibility with Exuberant-ctags in the
+following two areas.
+
+* Command line option
+* Tag file compatibility
 
 Command line options
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -242,27 +250,6 @@ underscore at the start of a long option name like: `--_echo`.
 Write a test case for Tmain or Units.
 
 Don't remove an option, especially if it exists in Exuberant-ctags.
-We want to maintain compatibility as much as possible.
-
-Compatibility
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. TODO: to be removed?
-
-We are trying to maintain compatibility with Exuberant-ctags in the
-following two areas.
-
-Tag file compatibility with Exuberant-ctags
-.........................................................................
-We will not accept a patch that breaks the tags file format described
-in :ref:`tags(5) <tags(5)>` man page.
-
-TBW.
-
-Command line option with Exuberant-ctags
-.........................................................................
-
-TBW.
 
 Writing parser in regex
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -359,10 +346,9 @@ Committing and submitting a pull request
 
 * Wait for 3 days at least for non-small change to your parser.
 
-* Wait for 7 days at least and get an LTGM comment from a member of the
-  team if your commit changes the other parts than your parser.
-
-.. TODO: should be LGTM (Looks Good To Me) ?
+* Wait for 7 days at least and get an LGTM (Looks Good To Me) comment from a
+  member of the team if your commit changes the other parts than your parser and
+  the changes are not obvious.
 
 * Add a test case to your pull request. To make git-bisect happy,
   don't add a test case for a feature or a bugfix before adding the

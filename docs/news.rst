@@ -222,13 +222,6 @@ header is easy because it starts with a `#` character.
 
 ``--with-list-header=no`` suppresses output of the column header.
 
-Defining a kind
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. TODO: can we remove this section?
-
-See :ref:`ctags-optlib(7) <ctags-optlib(7)>`.
-
 ``--map-<LANG>`` option
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -348,13 +341,6 @@ output. It is changed to ``-d``. This change is not critical because
 ``-D`` option was not described in ctags.1 man page.
 
 Instead ``-D`` is used for defining a macro in CPreProcessor parser.
-
-Incompatible changes to file name pattern and extension handling
----------------------------------------------------------------------
-
-.. TODO: can we remove this section?
-
-See :ref:`ctags-incompatibilities(7) <ctags-incompatibilities(7)>`.
 
 Interactive mode
 ---------------------------------------------------------------------
@@ -697,7 +683,7 @@ listed with ``--list-roles``:
     LdScript       i/inputSection    discarded           on      discarded when linking
     ...
 
-.. TODO: can we extract referenced tag from the list above? Is --xformat the only way?
+.. NOTE: --xformat is the only way to extract referenced tag
 
 The first column shows the name of the parser.
 The second column shows the letter/name of the kind.

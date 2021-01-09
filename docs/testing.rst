@@ -93,14 +93,14 @@ have its own directory under Units directory.
 	If you want to test json output (specified with ``--output-format=json`` ),
 	Use **.tags-json** as suffix instead of **.tags**.
 	In such a case you don't have to write ``--output-format=json`` to ``args.ctags``,
-	and ``json`` to ``features``.
+	and add ``json`` to ``features`` as described below.
 	The test facility sets the option and the feature automatically.
 
 *Units/TEST/args.ctags* **optional**
 
 	``-o -`` is used as default optional argument when running a
 	unit test ctags. If you want to add more options, enumerate
-	options in **args.ctags** file. This file is an optional.
+	options in **args.ctags** file.
 
 	Remember you have to put one option in one line; don't
 	put multiple options to one line. Multiple options in
@@ -233,8 +233,9 @@ Multiple languages can be selected using a comma separated list.
 Gathering test cases for known bugs
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-When we met a bug, making a small test case that triggers the bug is
-important development activity. Even the bug cannot be fixed in soon,
+When we meet a bug, it is an important development activity to make a small test
+case that triggers the bug.
+Even the bug cannot be fixed in soon,
 the test case is an important result of work. Such result should
 be merged to the source tree. However, we don't love **FAILED**
 message, too. What we should do?
@@ -479,11 +480,11 @@ However, there is still an issue; a developer who doesn't know a
 target language well may write a broken test input file for the
 language.  Here comes "Input validation."
 
-You can validate the test input files of *Units* with *validate-input*
-make target if a validator for a language is defined.
-
-How to run and an example session
+How to run an example session of input validation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+You can validate the test input files of *Units* with *validate-input*
+make target if a validator or a language is defined.
 
 Here is an example validating an input file for JSON.
 

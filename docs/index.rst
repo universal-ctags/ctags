@@ -46,10 +46,10 @@ This is a draft document. Proofreading and pull-requests are welcome!
 	news.rst
 	interactive-mode.rst
 	reporting.rst
-	other-projects.rst
 	contributions.rst
 	optlib.rst
 	extending.rst
 	tips.rst
 	testing.rst
+	other-projects.rst
 	developers.rst
