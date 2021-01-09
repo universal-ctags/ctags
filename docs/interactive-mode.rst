@@ -81,8 +81,10 @@ In the sandbox submode ctags can generate tags only for inline
 requests because ctags has to use open system call to handle file
 requests. The open system call is not allowed in the sandbox.
 
-This feature uses seccomp-bpf, and is only supported on Linux.
-To use the submode libseccomp is needed at build-time. If ctags was
+This feature uses `Seccomp BPF (SECure COMPuting with filters)
+<https://www.kernel.org/doc/html/latest/userspace-api/seccomp_filter.html>`_,
+and is only supported on Linux. To use the sandbox submode `libseccomp
+<https://github.com/seccomp/libseccomp>`_ is needed at build-time. If ctags was
 built with seccomp support, ``sandbox`` is listed in the output of
 ``--list-features`` option.
 

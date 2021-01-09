@@ -35,15 +35,17 @@ Universal-ctags follows and extends the design of Exuberant-ctags in more
 powerful ways, as described in the following chapters.
 
 Universal-ctags encourages users to share the new parsers defined by
-their options. See :ref:`optlib <optlib>` to know how you can share your
+their options. See ":ref:`submitting_optlib`" to know how you can share your
 parser definition with others.
 
 Note that some of the new features are experimental, and will be marked as such
 in the documentation.
 
+.. _option_files:
+
 Option files
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-An "option" file is a file in which command line options are written line
+An "option file" is a file in which command line options are written line
 by line. ``ctags`` loads it and runs as if the options in the file were
 passed through command line.
 
@@ -85,48 +87,49 @@ from Exuberant-ctags.
 At start-up time, Universal-ctags loads files having :file:`.ctags` as a
 file extension under the following statically defined directories:
 
-#. :file:`$XDG_CONFIG_HOME/ctags`, or :file:`$HOME/.config/ctags` if `$XDG_CONFIG_HOME` is not defined (on other than ``Windows``)
-#. :file:`$HOME/.ctags.d`
-#. :file:`$HOMEDRIVE$HOMEPATH/ctags.d` (in ``Windows``)
-#. :file:`.ctags.d`
-#. :file:`ctags.d`
+#. :file:`$XDG_CONFIG_HOME/ctags/`, or :file:`$HOME/.config/ctags/` if `$XDG_CONFIG_HOME` is not defined (on other than ``Windows``)
+#. :file:`$HOME/.ctags.d/`
+#. :file:`$HOMEDRIVE$HOMEPATH/ctags.d/` (in Windows)
+#. :file:`./.ctags.d/`
+#. :file:`./ctags.d/`
 
 ``ctags`` visits the directories in the order listed above for preloading files.
 ``ctags`` loads files having :file:`.ctags` as file extension in alphabetical
 order (strcmp(3) is used for comparing, so for example
 :file:`.ctags.d/ZZZ.ctags` will be loaded *before* :file:`.ctags.d/aaa.ctags`).
 
-Quoted from man page of Exuberant-ctags::
+Quoted from man page of Exuberant-ctags:
 
 	FILES
-		   /ctags.cnf (on MSDOS, MSWindows only)
-		   /etc/ctags.conf
-		   /usr/local/etc/ctags.conf
-		   $HOME/.ctags
-		   $HOME/ctags.cnf (on MSDOS, MSWindows only)
-		   .ctags
-		   ctags.cnf (on MSDOS, MSWindows only)
-				  If any of these configuration files exist, each will
-				  be expected to contain a set of default options
-				  which are read in the order listed when ctags
-				  starts, but before the CTAGS environment variable is
-				  read or any command line options are read.  This
-				  makes it possible to set up site-wide, personal or
-				  project-level defaults. It is possible to compile
-				  ctags to read an additional configuration file
-				  before any of those shown above, which will be
-				  indicated if the output produced by the --version
-				  option lists the "custom-conf" feature. Options
-				  appearing in the CTAGS environment variable or on
-				  the command line will override options specified in
-				  these files. Only options will be read from these
-				  files.  Note that the option files are read in
-				  line-oriented mode in which spaces are significant
-				  (since shell quoting is not possible). Each line of
-				  the file is read as one command line parameter (as
-				  if it were quoted with single quotes). Therefore,
-				  use new lines to indicate separate command-line
-				  arguments.
+		- /ctags.cnf (on MSDOS, MSWindows only)
+		- /etc/ctags.conf
+		- /usr/local/etc/ctags.conf
+		- $HOME/.ctags
+		- $HOME/ctags.cnf (on MSDOS, MSWindows only)
+		- .ctags
+		- ctags.cnf (on MSDOS, MSWindows only)
+
+	If any of these configuration files exist, each will
+	be expected to contain a set of default options
+	which are read in the order listed when ctags
+	starts, but before the CTAGS environment variable is
+	read or any command line options are read.  This
+	makes it possible to set up site-wide, personal or
+	project-level defaults. It is possible to compile
+	ctags to read an additional configuration file
+	before any of those shown above, which will be
+	indicated if the output produced by the --version
+	option lists the "custom-conf" feature. Options
+	appearing in the CTAGS environment variable or on
+	the command line will override options specified in
+	these files. Only options will be read from these
+	files.  Note that the option files are read in
+	line-oriented mode in which spaces are significant
+	(since shell quoting is not possible). Each line of
+	the file is read as one command line parameter (as
+	if it were quoted with single quotes). Therefore,
+	use new lines to indicate separate command-line
+	arguments.
 
 What follows explains the differences and their intentions...
 
@@ -284,7 +287,7 @@ you can safely use ``\n`` because that regex is not compiled with REG_NEWLINE.
 You should always test your regex patterns against test files with strings that
 do and do not match. Pay particular emphasis to when it should *not* match, and
 how *much* it matches when it should. A common error is forgetting that a
-POSIX.2 ERE engine is always greedy; the `*` and `+` quantifiers match
+POSIX.2 ERE engine is always *greedy*; the `*` and `+` quantifiers match
 as much as possible, before backtracking from the end of their match.
 
 For example this pattern::
@@ -548,8 +551,8 @@ Overriding the letter for file kind is not allowed in Universal-ctags.
 
 .. warning::
 
-	Don't use ``F`` as a kind letter in your parser. (See issue #317 on github)
-
+	Don't use ``F`` as a kind letter in your parser. (See issue `#317
+	<https://github.com/universal-ctags/ctags/issues/317>`_ on github)
 
 Generating fully qualified tags automatically from scope information
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -757,7 +760,9 @@ and an experimental multi-table regex options described later.
 The newly introduced ``--mline-regex-<LANG>`` is similar to ``--regex-<LANG>``
 except the pattern is applied to the whole file's contents, not line by line.
 
-This example is based on an issue #219 posted by @andreicristianpetcu:
+This example is based on an issue `#219
+<https://github.com/universal-ctags/ctags/issues/219>`_ posted by
+@andreicristianpetcu:
 
 .. code-block:: java
 
@@ -766,14 +771,14 @@ This example is based on an issue #219 posted by @andreicristianpetcu:
 	@Subscribe
 	public void catchEvent(SomeEvent e)
 	{
-	return;
+	   return;
 	}
 
 	@Subscribe
 	public void
 	recover(Exception e)
 	{
-	return;
+	    return;
 	}
 
 The above java code is similar to the Java `Spring <https://spring.io>`_
@@ -862,7 +867,7 @@ Multiline pattern flags
 
 	   def	input.foo	/^def def abc$/;"	a
 
-	*bar.ctgs* emits following tags output::
+	*bar.ctags* emits following tags output::
 
 	   def	input-0.bar	/^def def abc$/;"	a
 	   abc	input-0.bar	/^def def abc$/;"	a
@@ -944,17 +949,14 @@ Knowledge about them will help you understand the new options.
 The new options are:
 
 ``--_tabledef-<LANG>``
-
 	Declares a new regex matching table of a given name for the language,
 	as described in :ref:`tabledef`.
 
 ``--_mtable-regex-<LANG>``
-
 	Adds a regex pattern and associated tag generation information and flags, to
 	the given table, as described in :ref:`mtable_regex`.
 
 ``--_mtable-extend-<LANG>``
-
 	Includes a previously-defined regex table to the named one.
 
 The above will be discussed in more detail shortly.
@@ -1069,24 +1071,19 @@ In addition, several new flags are introduced exclusively for multi-table
 regex use:
 
 ``{tenter}``
-
 	Push the current table on the stack, and enter another table.
 
 ``{tleave}``
-
 	Leave the current table, pop the stack, and go to the table that was
 	just popped from the stack.
 
 ``{tjump}``
-
 	Jump to another table, without affecting the stack.
 
 ``{treset}``
-
 	Clear the stack, and go to another table.
 
 ``{tquit}``
-
 	Clear the stack, and stop processing the current input file for this
 	language.
 
@@ -1742,6 +1739,7 @@ following input file::
 			 `- "1end" points here.                       |
 			                       "2start" points here. -+
 
+.. _submitting_optlib:
 
 Submitting an optlib file to the Universal-ctags project
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1750,7 +1748,7 @@ You are encouraged to submit your :file:`.ctags` file to our repository on
 github through a pull request.
 
 Universal-ctags provides a facility for "Option library".
-Read "Option library" about the concept and usage first.
+Read ":ref:`option_files`" about the concept and usage first.
 
 Here I will explain how to merge your .ctags into Universal-ctags as
 part of the option library. Here I assume you consider contributing

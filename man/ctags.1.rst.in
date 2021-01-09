@@ -157,7 +157,7 @@ are not listed here. They are experimental or for debugging purpose.
 	Use backward searching patterns (e.g. ?pattern?). [Ignored in etags mode]
 
 ``-D macro=definition``
-	Defines a C preprocessor macro. This emulates the behaviour of the
+	Defines a C preprocessor macro. This emulates the behavior of the
 	corresponding gcc option. All types of macros are supported,
 	including the ones with parameters and variable arguments.
 	Stringification, token pasting and recursive macro expansion are also
@@ -1243,7 +1243,7 @@ are not listed here. They are experimental or for debugging purpose.
 	An input source file with long lines and multiple tag matches per
 	line can generate an excessively large tags file with an
 	unconstrained pattern length. For example, running ctags on a
-	minified JavaScript source file often exhibits this behaviour.
+	minified JavaScript source file often exhibits this behavior.
 
 	The truncation avoids cutting in the middle of a UTF-8 code point
 	spanning multiple bytes to prevent writing invalid byte sequences from
@@ -1598,6 +1598,7 @@ Examples:
 
 ``NONE`` means that @CTAGS_NAME_EXECUTABLE@ does not select any parser for the file.
 
+.. _tag_entries:
 
 TAG ENTRIES
 -----------
@@ -1941,7 +1942,7 @@ TMPDIR
 FILES
 -----
 
-$XDG_CONFIG_HOME/ctags/\*.ctags, or $HOME/.config/ctags/\*.ctags if $XDG_CONFIG_HOME is not defeind
+$XDG_CONFIG_HOME/ctags/\*.ctags, or $HOME/.config/ctags/\*.ctags if $XDG_CONFIG_HOME is not defined
 (on other than MSWindows)
 
 $HOME/.ctags.d/\*.ctags

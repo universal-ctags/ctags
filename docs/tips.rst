@@ -1,3 +1,5 @@
+.. _testing_ctags:
+
 =============================================================================
 Testing ctags
 =============================================================================
@@ -95,7 +97,7 @@ tinst target is for testing the result of ``make install``.
 
 Fussy syntax checking
 ------------------------------------------------------------
-If -Wall of gcc is not enough, you may be interested in this.
+If ``-Wall`` of gcc is not enough, you may be interested in this.
 
 You can change C compiler warning options with 'WARNING_CFLAGS'
 configure arg-var option.
@@ -106,7 +108,8 @@ configure arg-var option.
 
 
 If configure option '--with-sparse-cgcc' is specified,
-cgcc is used as CC. cgcc is part of Sparse, Semantic Parser for C.
+cgcc is used as CC. cgcc is part of `Sparse, Semantic Parser for C
+<https://sparse.docs.kernel.org/en/latest/>`_.
 It is used in development of Linux kernel for finding programming error.
 cgcc acts as a c compiler but more fussy. '-Wsparse-all' is used as
 default option passed to cgcc but you can change with 'CGCC_CFLAGS'
@@ -120,7 +123,9 @@ configure arg-var option.
 Finding performance bottleneck
 ------------------------------------------------------------
 
-See https://wiki.geany.org/howtos/profiling/gperftools and #383
+See `Profiling with gperftools
+<https://wiki.geany.org/howtos/profiling/gperftools>`_ and `#383
+<https://github.com/universal-ctags/ctags/issues/383>`_.
 
 Checking coverage
 ------------------------------------------------------------
@@ -138,16 +143,17 @@ by the compiler. *\*.gcno* files can be removed with ``make clean``.
 
 After building ctags, you can run run-gcov target.  When running
 *\*.gcda* files.  The target runs ctags with all input files under
-*Units/\*\*/input.\**; and call gcov. Human readable result is
+*Units/\*\*/input.\**; and call ``gcov``. Human readable result is
 printed. The detail can be shown in *\*.gcov*. files. *\*.gcda* files
 and *\*.gcov* files can be removed with ``make clean-gcov``.
 
 Running cppcheck
 ------------------------------------------------------------
 
-.. NOT REVIEWD YET
+.. NOT REVIEWED YET
 
-cppcheck is a tool for static C/C++ code analysis.
+`cppcheck <http://cppcheck.sourceforge.net/>`_ is a tool for static C/C++ code
+analysis.
 
 To run it do as following after install cppcheck::
 

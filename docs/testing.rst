@@ -1,3 +1,5 @@
+.. _testing_parser:
+
 =============================================================================
 Testing a parser
 =============================================================================
@@ -11,7 +13,7 @@ It is difficult for us to know syntax of all languages supported in ctags. Test
 facility and test cases are quite important for maintaining ctags with limited
 resources.
 
-..	units.rst
+..	_units:
 
 *Units* test facility
 ---------------------------------------------------------------------
@@ -39,7 +41,7 @@ this point a difference is found and *Test* reports failure.
 
 **Units facility**
 
-The units test facility(*Units*) I describe here takes a different
+The units test facility (*Units*) I describe here takes a different
 approach. An input file and an expected output file are given by a
 contributor of a language parser. The units test facility runs ctags
 command with the input file and compares its output and the expected
@@ -158,8 +160,8 @@ not.
 Example of files
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-See *Units/parser-c.r/c-sample/input.c* and
-*Units/parser-c.r/c-sample/expected.tags*.
+See `Units/parser-c.r/c-sample.d
+<https://github.com/universal-ctags/ctags/tree/master/Units/parser-c.r/c-sample.d>`_.
 
 How to run unit tests
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -197,8 +199,8 @@ defined.
 
 **failed (KNOWN bug)**
 
-	mean the result if failed but the failure is expected.
-	See "Gathering test cases for known bugs".
+	means the result was failed but the failure is expected.
+	See ":ref:`gathering_test`".
 
 Example of running
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -226,6 +228,8 @@ You can run only the tests for specific languages by setting
 
 Multiple languages can be selected using a comma separated list.
 
+.. _gathering_test:
+
 Gathering test cases for known bugs
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -240,6 +244,8 @@ the directory of test case instead of *.d*.
 
 *Unix/css-singlequote-in-comment-issue2.b* is an example
 of *.b* suffix usage.
+
+.. TODO: Now we only have Units/parser-css.r/css-singlequote-in-comment-issue2.d/
 
 When you run test.units target, you will see::
 
@@ -455,7 +461,7 @@ slap target is derived from chop target. While chop target truncates
 the existing input files from tail, the slap target does the same
 from head.
 
-..	input-validation.rst
+..	_input-validation:
 
 Input validation for *Units*
 ---------------------------------------------------------------------
