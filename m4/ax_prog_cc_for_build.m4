@@ -35,21 +35,21 @@
 #serial 18
 
 
-# This fix is taken from alsa-firmware.
-#
-# https://git.alsa-project.org/?p=alsa-firmware.git;a=patch;h=39da20beb3165ef759161b9467c9c98fd314bc08;hp=f08b6476d0db2f34a256514533f2f86d7a23ef7f
-#
-# From 39da20beb3165ef759161b9467c9c98fd314bc08 Mon Sep 17 00:00:00 2001
-# From: Jaroslav Kysela <perex@perex.cz>
-# Date: Tue, 20 Oct 2020 13:27:16 +0200
-# Subject: [PATCH 1/1] add _AC_LANG_COMPILER_GNU workaround to
-#  m4/ax_prog_cc_for_build.m4
-#
-# Signed-off-by: Jaroslav Kysela <perex@perex.cz>
-#
-# _AC_LANG_COMPILER_GNU
-# ---------------------
-# This is hacked version to bypass the cache. --jk
+dnl This fix is taken from alsa-firmware.
+dnl
+dnl https://git.alsa-project.org/?p=alsa-firmware.git;a=patch;h=39da20beb3165ef759161b9467c9c98fd314bc08;hp=f08b6476d0db2f34a256514533f2f86d7a23ef7f
+dnl
+dnl From 39da20beb3165ef759161b9467c9c98fd314bc08 Mon Sep 17 00:00:00 2001
+dnl From: Jaroslav Kysela <perex@perex.cz>
+dnl Date: Tue, 20 Oct 2020 13:27:16 +0200
+dnl Subject: [PATCH 1/1] add _AC_LANG_COMPILER_GNU workaround to
+dnl  m4/ax_prog_cc_for_build.m4
+dnl
+dnl Signed-off-by: Jaroslav Kysela <perex@perex.cz>
+dnl
+dnl _AC_LANG_COMPILER_GNU
+dnl ---------------------
+dnl This is hacked version to bypass the cache. --jk
 m4_define([_AC_LANG_COMPILER_GNU],
 [AC_MSG_CHECKING([whether we are using the GNU _AC_LANG compiler])
  _AC_COMPILE_IFELSE([AC_LANG_PROGRAM([], [[#ifndef __GNUC__
