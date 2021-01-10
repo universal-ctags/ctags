@@ -29,11 +29,11 @@ subversion
   ::
 
       <svn>
-      => <git: local universal-ctags repo>
-	 => <git: local universal-ctags repo>
+      => <git: local Universal Ctags repo>
+      => <git: local Universal Ctags repo>
 
 
-  1. prepare your own universal-ctags repo: a local git repo cloned from github.
+  1. prepare your own Universal Ctags repo: a local git repo cloned from github.
      You may know how to do it :)
 
      ::
@@ -62,14 +62,14 @@ subversion
 
   4. cherry-pick
 
-     4.1. Make a branch at local universal-ctags repo and switch to it.
+     4.1. Make a branch at local Universal Ctags repo and switch to it.
 
      4.2. Do cherry-pick like::
 
 	 	$ git cherry-pick -s -x c81a8ce
 
      You can find commit id on the another terminal
-     <git: local universal-ctags repo>::
+     <git: local Universal Ctags repo>::
 
 	 	$ git log
 
@@ -82,7 +82,7 @@ subversion
 
 	 $ git reset --hard
 
-     <git: local universal-ctags repo>
+     <git: local Universal Ctags repo>
       at the branch for picking.
 
 bugs
@@ -240,17 +240,17 @@ Patches are always there. So it is easy to evaluate the value:)
 
    <67> Objective C language parser
 
-	* This is the implementation we have in universal-ctags tree.
+	* This is the implementation we have in Universal Ctags tree.
 
    <65> absoluteFilename uses strcpy on overlapping strings
 
-	* Fixed in universal-ctags tree, however the ticket is still open::
+	* Fixed in Universal Ctags tree, however the ticket is still open::
 
    		d2bdf505abb7569deae2b50305ea1edce6208557
 
    <64> Fix strcpy() misuse
 
-	* Fixed in universal-ctags tree, however the ticket is still open::
+	* Fixed in Universal Ctags tree, however the ticket is still open::
 
 		d2bdf505abb7569deae2b50305ea1edce6208557
 
@@ -260,13 +260,13 @@ Patches are always there. So it is easy to evaluate the value:)
 
    <51> Ada support
 
-	* Ada support is now available in universal-ctags tree::
+	* Ada support is now available in Universal Ctags tree::
 
 		4b6b4a72f3d2d4ef969d7c650de1829d79f0ea7c
 
    <38> Ada support
 
-	* Ada support is now available in universal-ctags tree::
+	* Ada support is now available in Universal Ctags tree::
 
 		4b6b4a72f3d2d4ef969d7c650de1829d79f0ea7c
 
@@ -337,52 +337,52 @@ http://pkgs.fedoraproject.org/cgit/ctags.git/tree/ctags.spec
 
 <ctags-5.7-destdir.patch>
 
-	This patch was merged in universal-ctags git tree::
+	This patch was merged in Universal Ctags git tree::
 
 		d4b5972427a46cbdcbfb050a944cf62b300676be
 
 <ctags-5.7-segment-fault.patch>
 
-	This patch was merged in universal-ctags git tree::
+	This patch was merged in Universal Ctags git tree::
 
 		8cc2b482f6c7257c5151893a6d02b8c79851fedd
 
 (ctags-5.8-cssparse.patch)
 
-	Not in universal-ctags tree.
+	Not in Universal Ctags tree.
 
 	The reproducer is attached to the following page:
 	https://bugzilla.redhat.com/show_bug.cgi?id=852101
 
-	However, universal-ctags doesn't reproduce with it.
+	However, Universal Ctags doesn't reproduce with it.
 
 	I, Masatake YAMATO, read the patch.  However, I don't
 	understand the patch.
 
 <ctags-5.8-css.patch>
 
-	This patch was merged in universal-ctags git tree::
+	This patch was merged in Universal Ctags git tree::
 
 		80c1522a36df3ba52b8b7cd7f5c79d5c30437a63
 
 <ctags-5.8-memmove.patch>
 
 	This patch was merged in exuberant ctags svn tree.
-	As the result this patch is in universal-ctags tree::
+	As the result this patch is in Universal Ctags tree::
 
 		d2bdf505abb7569deae2b50305ea1edce6208557
 
 <ctags-5.8-ocaml-crash.patch>
 
 	This patch was merged in exuberant ctags svn tree.
-	As the result this patch is in universal-ctags tree::
+	As the result this patch is in Universal Ctags tree::
 
 		ddb29762b37d60a875252dcc401de0b7479527b1
 
 <ctags-5.8-format-security.patch>
 
 	This patch was merged in exuberant ctags svn tree.
-	As the result this patch is in universal-ctags tree::
+	As the result this patch is in Universal Ctags tree::
 
 		2f7a78ce21e4156ec3e63c821827cf1d5680ace8
 
@@ -395,7 +395,7 @@ http://anonscm.debian.org/cgit/users/cjwatson/exuberant-ctags.git/tree/debian/pa
 
 <python-disable-imports.patch>
 
-	universal-ctags tags Y in `import X as Y` and Z in `from X import Y as Z`
+	Universal Ctags tags Y in `import X as Y` and Z in `from X import Y as Z`
 	as definition tags. They are turned on by default.
 	The others are tagged as reference tags. reference tags are recorded only
 	when "r" extra tags are enabled. e.g. `--extras=+r`.

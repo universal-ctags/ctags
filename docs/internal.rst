@@ -268,7 +268,7 @@ tokenInfo API
 In Exuberant-ctags, a developer can write a parser anyway; only input
 stream and tagEntryInfo data structure is given.
 
-However, while maintaining Universal-ctags I (Masatake YAMATO) think
+However, while maintaining Universal Ctags I (Masatake YAMATO) think
 we should have a framework for writing parser. Of course the framework
 is optional; you can still write a parser without the framework.
 
@@ -435,7 +435,7 @@ derived repositories.
 
 The source tree of packcc is grafted at misc/packcc directory.
 Building packcc and ctags are integrated in the build-scripts of
-Universal-ctags.
+Universal Ctags.
 
 .. TODO:
 	refer peg/* as a sample implementation

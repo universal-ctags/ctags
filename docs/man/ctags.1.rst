@@ -7,7 +7,7 @@ ctags
 Generate tag files for source code
 --------------------------------------------------------------
 :Version: 5.9.0
-:Manual group: Universal-ctags
+:Manual group: Universal Ctags
 :Manual section: 1
 
 SYNOPSIS
@@ -43,14 +43,14 @@ languages, the names by which they are recognized, and the kinds of tags
 which are generated for each, see the ``--list-languages`` and ``--list-kinds-full``
 options.
 
-This man page describes **Universal-ctags**, an implementation of ctags
+This man page describes **Universal Ctags**, an implementation of ctags
 derived from **Exuberant-ctags**. The major incompatible changes between
-Universal-ctags and Exuberant-ctags are enumerated in
+Universal Ctags and Exuberant-ctags are enumerated in
 :ref:`ctags-incompatibilities(7) <ctags-incompatibilities(7)>`.
 
 One of the advantages of Exuberant-ctags is that it allows a user to
 define a new parser from the command line. Extending this capability is one
-of the major features of Universal-ctags. :ref:`ctags-optlib(7) <ctags-optlib(7)>`
+of the major features of Universal Ctags. :ref:`ctags-optlib(7) <ctags-optlib(7)>`
 describes how the capability is extended.
 
 Newly introduced experimental features are not explained here. If you
@@ -97,7 +97,7 @@ Specifying just letters help a user create a complicated command line
 quickly.  However, a command line including sequences of one-letter flags
 becomes difficult to understand.
 
-Universal-ctags accepts long-name flags in
+Universal Ctags accepts long-name flags in
 addition to such one-letter flags. The long-name and one-letter flags can be mixed in an
 option parameter by surrounding each long-name by braces. Thus, for an
 example, the following three notations for ``--kinds-C`` option have
@@ -116,8 +116,8 @@ single quotes in such case.
 List options
 ~~~~~~~~~~~~
 
-Universal-ctags introduces many ``--list-...`` options that provide
-the internal data of Universal-ctags. Both users and client tools may
+Universal Ctags introduces many ``--list-...`` options that provide
+the internal data of Universal Ctags. Both users and client tools may
 use the data. ``--with-list-header`` and ``--machinable`` options
 adjust the output of the most of ``--list-...`` options.
 
@@ -466,7 +466,7 @@ are not listed here. They are experimental or for debugging purpose.
 	included  if '*' is given.
 
 	This ``--extras=`` option is for controlling extras common in all
-	languages (or language-independent extras).  Universal-ctags also
+	languages (or language-independent extras).  Universal Ctags also
 	supports language-specific extras. (See "`Language-specific fields and
 	extras`_" about the concept). Use ``--extras-<LANG>=`` option for
 	controlling them.
@@ -549,7 +549,7 @@ are not listed here. They are experimental or for debugging purpose.
 
 		Note: Using backslash characters as separators forming
 		qualified name in PHP. However, in tags output of
-		Universal-ctags, a backslash character in a name is escaped
+		Universal Ctags, a backslash character in a name is escaped
 		with a backslash character. See :ref:`tags(5) <tags(5)>` about the escaping.
 
 	r/reference
@@ -560,7 +560,7 @@ are not listed here. They are experimental or for debugging purpose.
 
 ``--extras-<LANG>=[+|-]flags|*``
 	Specifies whether to include extra tag entries for certain kinds of
-	information for language <LANG>. Universal-ctags
+	information for language <LANG>. Universal Ctags
 	introduces language-specific extras. See "`Language-specific fields and
 	extras`_" about the concept. This option is for controlling them.
 
@@ -588,7 +588,7 @@ are not listed here. They are experimental or for debugging purpose.
 	option ``--format=1`` (legacy tag file format) has been specified.
 
 	This ``--fields=`` option is for controlling fields common in all
-	languages (or language-independent fields).  Universal-ctags also
+	languages (or language-independent fields).  Universal Ctags also
 	supports language-specific fields. (See "`Language-specific fields and
 	extras`_" about the concept). Use ``--fields-<LANG>=`` option for
 	controlling them.
@@ -661,7 +661,7 @@ are not listed here. They are experimental or for debugging purpose.
 
 ``--fields-<LANG>=[+|-]flags|*``
 	Specifies which language-specific fields are to be included in
-	the entries of the tag file. Universal-ctags
+	the entries of the tag file. Universal Ctags
 	supports language-specific fields. (See "`Language-specific fields and
 	extras`_" about the concept). This option is for controlling them.
 
@@ -731,7 +731,7 @@ are not listed here. They are experimental or for debugging purpose.
 
 ``--input-encoding=encoding``
 	Specifies the encoding of the input files.
-	If this option is specified, Universal-ctags converts the input from this
+	If this option is specified, Universal Ctags converts the input from this
 	encoding to the encoding specified by ``--output-encoding=encoding``.
 
 ``--input-encoding-<LANG>=encoding``
@@ -821,7 +821,7 @@ are not listed here. They are experimental or for debugging purpose.
 	default language mappings for all languages, specify "--langmap=default".
 
 	Note that file name patterns are tested before file extensions when inferring
-	the language of a file. This order of Universal-ctags is different from
+	the language of a file. This order of Universal Ctags is different from
 	Exuberant-ctags. See :ref:`ctags-incompatibilities(7) <ctags-incompatibilities(7)>` for the background of
 	this incompatible change.
 
@@ -989,7 +989,7 @@ are not listed here. They are experimental or for debugging purpose.
 	by default.
 
 	The critical weakness of this option is that this option does not
-	print the name of kind. Universal-ctags introduces
+	print the name of kind. Universal Ctags introduces
 	``--list-kinds-full`` because it considers that names are
 	important.
 
@@ -1037,7 +1037,7 @@ are not listed here. They are experimental or for debugging purpose.
 
 	MASTER
 		The master parser controlling enablement of the kind.
-		A kind belongs to a language (owner) in Universal-ctags;
+		A kind belongs to a language (owner) in Universal Ctags;
 		enabling and disabling a kind in a language has no effect on
 		a kind in another language even if both kinds has the
 		same one-letter flag and/or the same long-name flag. In other words,
@@ -1046,7 +1046,7 @@ are not listed here. They are experimental or for debugging purpose.
 		However, Exuberant-ctags does not separate the kinds of C and
 		C++. Enabling/disabling kindX in C language enables/disables a
 		kind in C++ language having the same long-name flag with kindX. To
-		emulate this behavior in Universal-ctags, a concept named
+		emulate this behavior in Universal Ctags, a concept named
 		"master parser" is introduced. Enabling/disabling some kinds
 		are synchronized under the control of a master language.
 
@@ -1214,7 +1214,7 @@ are not listed here. They are experimental or for debugging purpose.
 
 ``--output-encoding=encoding``
 	Specifies the encoding of the tags file.
-	Universal-ctags converts the encoding of input files from the encoding
+	Universal Ctags converts the encoding of input files from the encoding
 	specified by ``--input-encoding=encoding`` to this encoding.
 
 	In addition ``encoding`` is specified at the top the tags file as the
@@ -1267,15 +1267,15 @@ are not listed here. They are experimental or for debugging purpose.
 
 ``--put-field-prefix``
 	Put "UCTAGS" as prefix for the name of fields newly introduced in
-	Universal-ctags.
+	Universal Ctags.
 
-	Some fields are newly introduced in Universal-ctags and more will
+	Some fields are newly introduced in Universal Ctags and more will
 	be introduced in the future. Other tags generators may also
 	introduce their specific fields.
 
 	In such a situation, there is a concern about conflicting field
 	names; mixing tags files generated by multiple tags generators
-	including Universal-ctags is difficult. This option provides a
+	including Universal Ctags is difficult. This option provides a
 	workaround for such station.
 
 	.. code-block:: console
@@ -1286,7 +1286,7 @@ are not listed here. They are experimental or for debugging purpose.
 		main	/tmp/hello.c	/^main(int argc, char **argv)$/;"	f	line:3	UCTAGSend:6
 
 	In the above example, the prefix is put to "end" field which is
-	newly introduced in Universal-ctags.
+	newly introduced in Universal Ctags.
 
 ``--quiet[=yes|no]``
 	Write fewer messages (default is no).
@@ -1604,12 +1604,12 @@ TAG ENTRIES
 -----------
 
 A tag is an index for a language object. The concept of a tag and related
-items in Exuberant-ctags are refined and extended in Universal-ctags.
+items in Exuberant-ctags are refined and extended in Universal Ctags.
 
 A tag is categorized into **definition tags** or **reference tags**.
 In general, Exuberant-ctags only tags *definitions* of
 language objects: places where newly named language objects are introduced.
-Universal-ctags, on the other hand, can also tag *references* of language
+Universal Ctags, on the other hand, can also tag *references* of language
 objects: places where named language objects are used. However, support
 for generating reference tags is new and limited to specific areas of
 specific languages in the current version.
@@ -1673,7 +1673,7 @@ option in "`OPTIONS`_".
 Roles
 ~~~~~~
 
-*Role* is a newly introduced concept in Universal-ctags. Role is a
+*Role* is a newly introduced concept in Universal Ctags. Role is a
 concept associated with reference tags, and is not implemented widely yet.
 
 As described previously in "Kinds", the "kind" field represents the type
@@ -1699,7 +1699,7 @@ Language-specific fields and extras
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Exuberant-ctags has the concept of "fields" and "extras". They are common
-between parsers of different languages. Universal-ctags extends this concept
+between parsers of different languages. Universal Ctags extends this concept
 by providing language-specific fields and extras.
 
 .. options should be explained and revised here
@@ -1999,7 +1999,7 @@ See :ref:`ctags-lang-python(7) <ctags-lang-python(7)>` about python input specif
 See :ref:`readtags(1) <readtags(1)>` about a client tool for binary searching a
 name in a sorted tags file.
 
-The official Universal-ctags web site at:
+The official Universal Ctags web site at:
 
 https://ctags.io/
 
@@ -2012,7 +2012,7 @@ https://www.vim.org/
 AUTHOR
 ------
 
-Universal-ctags project
+Universal Ctags project
 https://ctags.io/
 
 Darren Hiebert <dhiebert@users.sourceforge.net>
@@ -2033,7 +2033,7 @@ service to humanity."
 
 CREDITS
 -------
-This version of ctags (Universal-ctags) derived from
+This version of ctags (Universal Ctags) derived from
 the repository, known as **fishman-ctags**, started by Reza Jelveh.
 
 Some parsers are taken from **tagmanager** of **Geany** (https://www.geany.org/)

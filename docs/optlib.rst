@@ -31,10 +31,10 @@ Extending ctags with Regex parser (*optlib*)
 Exuberant-ctags allows a user to add a new parser to ctags with ``--langdef=<LANG>``
 and ``--regex-<LANG>=...`` options.
 
-Universal-ctags follows and extends the design of Exuberant-ctags in more
+Universal Ctags follows and extends the design of Exuberant-ctags in more
 powerful ways, as described in the following chapters.
 
-Universal-ctags encourages users to share the new parsers defined by
+Universal Ctags encourages users to share the new parsers defined by
 their options. See ":ref:`submitting_optlib`" to know how you can share your
 parser definition with others.
 
@@ -84,7 +84,7 @@ Preload option files are option files loaded by ``ctags`` automatically
 at start-up time. Which files are loaded at start-up time are very different
 from Exuberant-ctags.
 
-At start-up time, Universal-ctags loads files having :file:`.ctags` as a
+At start-up time, Universal Ctags loads files having :file:`.ctags` as a
 file extension under the following statically defined directories:
 
 #. :file:`$XDG_CONFIG_HOME/ctags/`, or :file:`$HOME/.config/ctags/` if `$XDG_CONFIG_HOME` is not defined (on other than ``Windows``)
@@ -141,31 +141,31 @@ Exuberant-ctags provides a way to customize ctags with options like
 ``--langdef=<LANG>`` and ``--regex-<LANG>``. These options are
 powerful and make ctags popular for programmers.
 
-Universal-ctags extends this idea; we have added new options for
+Universal Ctags extends this idea; we have added new options for
 defining a parser, and have extended existing options. Defining
 a new parser with the options is more than "customizing" in
-Universal-ctags.
+Universal Ctags.
 
 To make easier the maintenance a parser defined using the options, you can put
-each language parser in a different options file. Universal-ctags doesn't
-preload a single file. Instead, Universal-ctags loads all the files having the
+each language parser in a different options file. Universal Ctags doesn't
+preload a single file. Instead, Universal Ctags loads all the files having the
 :file:`.ctags` extension under the previously specified directories. If you
 have multiple parser definitions, put them in different files.
 
 Avoiding option incompatibility issues
 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 
-The Universal-ctags options are different from those of Exuberant-ctags,
-therefore Universal-ctags doesn't load any of the files Exuberant-ctags loads at
+The Universal Ctags options are different from those of Exuberant-ctags,
+therefore Universal Ctags doesn't load any of the files Exuberant-ctags loads at
 start-up. Otherwise there would be incompatibility issues if Exuberant-ctags
-loaded an option file that used a newly introduced option in Universal-ctags,
+loaded an option file that used a newly introduced option in Universal Ctags,
 and vice versa.
 
 No system wide configuration
 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 
 To make the preload path list short and because it was rarely ever used,
-Universal-ctags does not load any option files for system wide configuration.
+Universal Ctags does not load any option files for system wide configuration.
 (i.e., no :file:`/etc/ctags.d`)
 
 Using :file:`.ctags` for the file extension
@@ -188,7 +188,7 @@ explicitly. The pathname can be just the filename if it's in the
 current directory.
 
 Exuberant-ctags has the ``--options`` option, but you can only specify a
-single file to load. Universal-ctags extends the option in two aspects:
+single file to load. Universal Ctags extends the option in two aspects:
 
 - You can specify a directory, to load all the files in that directory.
 - You can specify a PATH list to look in. See next section for details.
@@ -198,7 +198,7 @@ Specifying a directory
 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 
 If you specify a directory instead of a file as the argument for the
-``--options=PATHNAME``, Universal-ctags will load all files having a
+``--options=PATHNAME``, Universal Ctags will load all files having a
 :file:`.ctags` extension under said directory in alphabetical order.
 
 Specifying an optlib PATH list
@@ -238,15 +238,15 @@ Tips for writing an option file
   debugging the process of loading option files. See "OPTIONS"
   section of :ref:`ctags-optlib(7) <ctags-optlib(7)>`.
 
-* Universal-ctags has an ``optlib2c`` script that translates an option file
+* Universal Ctags has an ``optlib2c`` script that translates an option file
   into C source code. Your optlib parser can thus easily become a built-in parser,
-  by contributing to Universal-ctags' github. You could be famous!
-  Examples are in the ``optlib`` directory in Universal-ctags source tree.
+  by contributing to Universal Ctags' github. You could be famous!
+  Examples are in the ``optlib`` directory in Universal Ctags source tree.
 
 Regular expression (regex) engine
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Universal-ctags currently uses the same regex engine as Exuberant-ctags:
+Universal Ctags currently uses the same regex engine as Exuberant-ctags:
 the POSIX.2 regex engine in GNU glibc-2.10.1. By default it uses the Extended
 Regular Expressions (ERE) syntax, as used by most engines today; however it does
 *not* support many of the "modern" extensions such as lazy captures,
@@ -269,7 +269,7 @@ bracket expression are for ``\t`` and ``\n``, which ctags converts to their
 single literal character control codes before passing the pattern to glibc.
 
 Another detail to keep in mind is how the regex engine treats newlines.
-Universal-ctags compiles the regular expressions in the ``--regex-<LANG>`` and
+Universal Ctags compiles the regular expressions in the ``--regex-<LANG>`` and
 ``--mline-regex-<LANG>`` options with REG_NEWLINE set. What that means is documented
 in the
 `POSIX spec <https://pubs.opengroup.org/onlinepubs/009695399/functions/regcomp.html>`_.
@@ -546,8 +546,8 @@ Overriding the letter for file kind
 .. Q: this was fixed in https://github.com/universal-ctags/ctags/pull/331
 	so can we remove this section?
 
-One of the built-in tag kinds in Universal-ctags is the ``F`` file kind.
-Overriding the letter for file kind is not allowed in Universal-ctags.
+One of the built-in tag kinds in Universal Ctags is the ``F`` file kind.
+Overriding the letter for file kind is not allowed in Universal Ctags.
 
 .. warning::
 
@@ -754,7 +754,7 @@ needing contextual information to decide whether to tag or not, or to
 constrain generating tags to only certain cases, or to grab multiple
 substrings to generate the tag name.
 
-Universal-ctags has two ways to accomplish this: multi-line regex options,
+Universal Ctags has two ways to accomplish this: multi-line regex options,
 and an experimental multi-table regex options described later.
 
 The newly introduced ``--mline-regex-<LANG>`` is similar to ``--regex-<LANG>``
@@ -940,7 +940,7 @@ reasons for this are:
 * To break up an overly complicated ``--mline-regex-<LANG>`` pattern into
   separate regex patterns, for performance or readability reasons.
 
-To help handle such things, Universal-ctags has been enhanced with multi-table
+To help handle such things, Universal Ctags has been enhanced with multi-table
 regex matching. The feature is inspired by `lex`, the fast lexical analyzer
 generator, which is a popular tool on Unix environments for writing parsers, and
 `RegexLexer <http://pygments.org/docs/lexerdevelopment/>`_ of Pygments.
@@ -1426,7 +1426,7 @@ Adding custom fields to the tag output
 Exuberant-ctags allows just one of the specified groups in a regex pattern to
 be used as a part of the name of a tagEntry.
 
-Universal-ctags allows using the other groups in the regex pattern.
+Universal Ctags allows using the other groups in the regex pattern.
 
 An optlib parser can have its specific fields. The groups can be used as a
 value of the fields of a tagEntry.
@@ -1441,7 +1441,7 @@ Here is a source file(*input.unknown*) written in *Unknown*:
 	private func baz(n,...);
 
 With `--regex-Unknown=...` Exuberant-ctags can capture `foo`, `bar`, and `baz`
-as names. Universal-ctags can attach extra context information to the
+as names. Universal Ctags can attach extra context information to the
 names as values for fields. Let's focus on `bar`. `protected` is a
 keyword to control how widely the identifier `bar` can be accessed.
 `(n)` is the parameter list of `bar`. `protected` and `(n)` are
@@ -1741,16 +1741,16 @@ following input file::
 
 .. _submitting_optlib:
 
-Submitting an optlib file to the Universal-ctags project
+Submitting an optlib file to the Universal Ctags project
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 You are encouraged to submit your :file:`.ctags` file to our repository on
 github through a pull request.
 
-Universal-ctags provides a facility for "Option library".
+Universal Ctags provides a facility for "Option library".
 Read ":ref:`option_files`" about the concept and usage first.
 
-Here I will explain how to merge your .ctags into Universal-ctags as
+Here I will explain how to merge your .ctags into Universal Ctags as
 part of the option library. Here I assume you consider contributing
 an option library in which a regex-based language parser is defined.
 
@@ -1808,7 +1808,7 @@ version 2 or later version" is be required.
 *Units* test cases
 ......................................................................
 
-We, universal-ctags developers don't have enough time to learn all
+We, Universal Ctags developers don't have enough time to learn all
 languages supported by ``ctags``. In other word, we cannot review the
 code. Only test cases help us to know whether a contributed option
 library works well or not. We may reject any contribution without
@@ -1838,7 +1838,7 @@ Incorporating your parser to ctags build process
 ......................................................................
 
 Add your optlib file, *swine.ctags* to ``OPTLIB2C_INPUT`` variable of
-+*makefiles/optlib2c_input.mak* in Universal-ctags source tree.
++*makefiles/optlib2c_input.mak* in Universal Ctags source tree.
 
 
 Verification
@@ -1863,7 +1863,7 @@ Pull-request
 ......................................................................
 
 Please, consider submitting your well written optlib parser to
-Universal-ctags. Your *.ctags* is a treasure and can be shared as a
-first class software component in Universal-ctags.
+Universal Ctags. Your *.ctags* is a treasure and can be shared as a
+first class software component in Universal Ctags.
 
 Pull-requests are welcome.

@@ -4,10 +4,10 @@
 ctags-incompatibilities
 ==============================================================
 --------------------------------------------------------------
-Incompatibilities between Universal-ctags and Exuberant-ctags
+Incompatibilities between Universal Ctags and Exuberant-ctags
 --------------------------------------------------------------
 :Version: @VERSION@
-:Manual group: Universal-ctags
+:Manual group: Universal Ctags
 :Manual section: 7
 
 SYNOPSIS
@@ -19,7 +19,7 @@ DESCRIPTION
 -----------
 
 This page describes major incompatible changes introduced to
-Universal-ctags forked from Exuberant-ctags.
+Universal Ctags forked from Exuberant-ctags.
 
 Incompatibilities in command line interface
 -------------------------------------------------------------
@@ -29,7 +29,7 @@ The order of application of patterns and extensions in ``--langmap``
 
 When applying mappings for a name of given source file,
 Exuberant-ctags tests file name patterns AFTER file extensions
-(**e-map-order**). Universal-ctags does this differently; it tests file
+(**e-map-order**). Universal Ctags does this differently; it tests file
 name patterns BEFORE file extensions (**u-map-order**).
 
 This incompatible change is introduced to deal with the following
@@ -40,12 +40,12 @@ situation:
 	* The "XML" parser declares it handles a file extension "xml".
 
 Which parser should be used for parsing "build.xml"?  The assumption
-of Universal-ctags is the user may want to use the "Ant" parser; the
+of Universal Ctags is the user may want to use the "Ant" parser; the
 file name pattern it declares is more specific than the file extension
 that the "XML" parser declares. However, e-map-order chooses the "XML"
 parser.
 
-So Universal-ctags uses the u-map-order even though it introduces an
+So Universal Ctags uses the u-map-order even though it introduces an
 incompatibility.
 
 ``--list-map-extensions=language`` and ``--list-map-patterns=language``
@@ -62,7 +62,7 @@ Instead of specifying "--file-tags" or "--file-tags=yes", use
 Instead of specifying "--file-tags=no", use
 "--extras=-f" or "--extras=-{inputFile}".
 
-Universal-ctags introduces "F/fileScope" extra as the replacement for
+Universal Ctags introduces "F/fileScope" extra as the replacement for
 ``--file-scope`` option.
 
 Instead of specifying "--file-tags" or "--file-tags=yes", use
@@ -88,9 +88,9 @@ Some options have *<LANG>* as parameterized parts in their name like
 options in Exuberant-ctags have the former form, ``--foo-<LANG>=...``.
 The exception is ``--<LANG>-kinds``.
 
-Universal-ctags uses the former form for all *<LANG>* parameterized
+Universal Ctags uses the former form for all *<LANG>* parameterized
 option. Use ``--kinds-<LANG>`` instead of ``--<LANG>-kinds`` in
-Universal-ctags. ``--<LANG>-kinds`` still works but it will be
+Universal Ctags. ``--<LANG>-kinds`` still works but it will be
 removed in the future.
 
 The former form may be friendly to shell completion engines.
@@ -111,7 +111,7 @@ Disallowing to use other than alphabetical character as kind letter
 ....................................................................................
 
 Exuberant-ctags accepts a character other than alphabetical character
-as kind letter in ``--regex-<LANG>=...`` option.  Universal-ctags
+as kind letter in ``--regex-<LANG>=...`` option.  Universal Ctags
 accepts only an alphabetical character.
 
 Acceptable characters as parts of a kind name
@@ -120,25 +120,25 @@ Acceptable characters as parts of a kind name
 Exuberant-ctags accepts any character as a part of a kind name
 defined with ``--regex-<LANG>=/regex/replacement/kind-spec/``.
 
-Universal-ctags accepts only an alphabetical character as
+Universal Ctags accepts only an alphabetical character as
 the initial letter of a kind name.
-Universal-ctags accepts only an alphabetical character or
+Universal Ctags accepts only an alphabetical character or
 numerical character as the rest letters.
 
 An example::
 
   --regex-Foo=/abstract +class +([a-z]+)/\1/a,abstract class/i
 
-Universal-ctags rejects this because the kind name, "abstract class",
+Universal Ctags rejects this because the kind name, "abstract class",
 includes a whitespace character.
 
-This requirement is for making the output of Universal-ctags follow
+This requirement is for making the output of Universal Ctags follow
 the tags file format.
 
 A combination of a kind letter and a kind name
 ....................................................................................
 
-In Universal-ctags, the combination of
+In Universal Ctags, the combination of
 a kind letter and a kind name must be unique in a language.
 
 You cannot define more than one kind reusing a kind letter with
@@ -150,7 +150,7 @@ An example::
   --regex-Foo=/abstract +class +([a-z]+)/\1/a,abstractClass/i
   --regex-Foo=/attribute +([a-z]+)/\1/a,attribute/i
 
-Universal-ctags rejects this because the kind letter, "a", used twice
+Universal Ctags rejects this because the kind letter, "a", used twice
 for defining a kind "abstractClass" and "attribute".
 
 
@@ -164,7 +164,7 @@ The version 2 tags file format, the default output format of
 Exuberant-ctags, accepts only alphabetical characters in the name part
 of tag tagfield.
 
-Universal-ctags introduces an exception to this specification; it may
+Universal Ctags introduces an exception to this specification; it may
 use numerical characters in addition to alphabetical characters as the
 letters other than initial letter of the name part.
 
@@ -183,7 +183,7 @@ Option files loading at starting up time (preload files)
 -------------------------------------------------------------
 
 File paths for preload files are changed.
-Universal-ctags doesn't load "~/.ctags" at starting up time.
+Universal Ctags doesn't load "~/.ctags" at starting up time.
 See "FILES" section of ctags(1).
 
 Kind letters and names

@@ -12,7 +12,7 @@ Other tagging engines
 `Exuberant-ctags <http://ctags.sourceforge.net/>`_
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The origin of Universal-ctags.
+The origin of Universal Ctags.
 
 `Geany <https://github.com/geany/geany>`_
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

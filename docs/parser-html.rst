@@ -19,12 +19,12 @@ on regular expressions and detecting only function declarations.
 
 The new parser is hand-written, using separated lexical analysis (dividing
 the input into tokens) and syntax analysis. The parser has been profiled and
-optimized for speed so it is one of the fastest parsers in universal-ctags.
+optimized for speed so it is one of the fastest parsers in Universal Ctags.
 It handles HTML comments correctly and in addition to existing tags it extracts
 also <h1>, <h2> and <h3> headings. It should be reasonably simple to add new
 tag types.
 
-Finally, the parser uses the new functionality of universal-ctags to use another
+Finally, the parser uses the new functionality of Universal Ctags to use another
 parser for parsing other languages within a host language. This is used for
 parsing JavaScript within <script> tags and CSS within <style> tags. This
 simplifies the parser and generates much better results than having a simplified

@@ -4,7 +4,7 @@
 Interactive mode
 ======================================================================
 
-Universal ctags can be run with ``--_interactive``, which enters a REPL that
+Universal Ctags can be run with ``--_interactive``, which enters a REPL that
 can be used programmatically to control ctags generation. In this mode, json
 commands are received over stdin, and corresponding responses are emitted over
 stdout.
@@ -17,7 +17,7 @@ at build-time. If it's supported it will be listed in the output of ``--list-fea
 	$ ./ctags --list-features | grep json
 	json
 
-Communication with Universal ctags over stdio uses the `json lines`_ format, where each
+Communication with Universal Ctags over stdio uses the `json lines`_ format, where each
 json object appears on a single line and is terminated with a newline.
 
 When ``ctags --_interactive`` is invoked, it will emit a single json object to stdout announcing
@@ -75,7 +75,7 @@ sandbox submode
 
 ``sandbox`` submode can be used with ``--_interactive=sandbox``.  This
 submode will activate a sandbox, to this limits the damage that the
-can be achieved when exploiting a buffer overflow in Universal-ctags.
+can be achieved when exploiting a buffer overflow in Universal Ctags.
 
 In the sandbox submode ctags can generate tags only for inline
 requests because ctags has to use open system call to handle file

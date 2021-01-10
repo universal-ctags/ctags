@@ -16,5 +16,5 @@ Quoted from ``:help script-variable`` in the Vim documentation::
 
 Exuberant-ctags records the prefix `s:` as part of a script-local
 variable's name. However, it is omitted from function names. As
-requested in issue #852 on GitHub, Universal-ctags now also includes
+requested in issue #852 on GitHub, Universal Ctags now also includes
 the prefix in script-local function names.

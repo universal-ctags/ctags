@@ -70,7 +70,7 @@ The purposes listed at the top of this subsection should help you
 decide.
 
 The secondary class is a *reference tag*. This is newly introduced in
-Universal-ctags and is not available in Exuberant-ctags. If a name is
+Universal Ctags and is not available in Exuberant-ctags. If a name is
 used (or referenced) in a file, it can be tagged as a reference tag.
 
 Don't be confused by the two tag classes.
@@ -219,7 +219,7 @@ Above code snippet applies the `.editorconfig` configuration AFTER
 installing the "linux" style to the current buffer.
 
 I like GNU style, but for keeping consistency in existing code of
-Exuberant-ctags, the origin of Universal-ctags, I introduced the style
+Exuberant-ctags, the origin of Universal Ctags, I introduced the style
 and configuration to my .emacs.  Please, do the same.
 
 Compatibility
@@ -255,7 +255,7 @@ Writing parser in regex
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 You can write a parser with regex patterns.
 
-`optlib2c`, a part of the Universal-ctags build system can translate
+`optlib2c`, a part of the Universal Ctags build system can translate
 a parser written in regex patterns into C source code.
 
 The `man` parser is one example described in regex patterns.
@@ -448,7 +448,7 @@ Title of commit log and pull request
   detail of breakage.
 
 * Use [SELF-INCOMPATIBLE] as a prefix for both pull request and commit
-  log if the change breaks the compatibility with Universal-ctags
+  log if the change breaks the compatibility with Universal Ctags
   itself.
 
 Commit log

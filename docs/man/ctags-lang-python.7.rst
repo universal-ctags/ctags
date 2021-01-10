@@ -4,10 +4,10 @@
 ctags-lang-python
 ==============================================================
 -------------------------------------------------------------------
-Random notes about tagging python source code with Universal-ctags
+Random notes about tagging python source code with Universal Ctags
 -------------------------------------------------------------------
 :Version: 5.9.0
-:Manual group: Universal-ctags
+:Manual group: Universal Ctags
 :Manual section: 7
 
 SYNOPSIS

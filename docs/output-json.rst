@@ -49,7 +49,7 @@ fields internally. As for all kinds, long names are used for printing
 ; kind letters are never used.
 
 If you need kind letters, open an issue at the GitHub site of
-Universal-ctags.
+Universal Ctags.
 
 .. NOT REVIEWED YET
 

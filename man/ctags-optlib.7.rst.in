@@ -4,10 +4,10 @@
 ctags-optlib
 ==============================================================
 --------------------------------------------------------------
-Universal-ctags parser definition language
+Universal Ctags parser definition language
 --------------------------------------------------------------
 :Version: @VERSION@
-:Manual group: Universal-ctags
+:Manual group: Universal Ctags
 :Manual section: 7
 
 SYNOPSIS
@@ -18,15 +18,15 @@ SYNOPSIS
 DESCRIPTION
 -----------
 
-**Exuberant-ctags**, the ancestor of **Universal-ctags**, has provided
-the way to define a new parser from command line.  Universal-ctags
+**Exuberant-ctags**, the ancestor of **Universal Ctags**, has provided
+the way to define a new parser from command line.  Universal Ctags
 extends and refines this feature. **optlib parser** is the name for such
-parser in Universal-ctags. "opt" intends a parser is defined with
+parser in Universal Ctags. "opt" intends a parser is defined with
 combination of command line options. "lib" intends an optlib parser
 can be more than ad-hoc personal configuration.
 
 This man page is for people who want to define an optlib parser. The
-readers should read ctags(1) of Universal-ctags first. Following
+readers should read ctags(1) of Universal Ctags first. Following
 options are for defining (or customizing) a parser:
 
 * ``--langdef=``
@@ -46,16 +46,16 @@ Exuberant-ctags may focus on reducing the number of typing by user.
 Reducing the number of typing is important for users who want to
 define (or customize) a parser quickly.
 
-On the other hand, the design in Universal-ctags focuses on
-maintainability. The notation of Universal-ctags is redundant than
+On the other hand, the design in Universal Ctags focuses on
+maintainability. The notation of Universal Ctags is redundant than
 that of Exuberant-ctags; the newly introduced kind should be declared
 explicitly, (long) names are approved than one-letter flags
 specifying kinds, and naming rules are stricter.
 
-This man page explains only stable options and flags.  Universal-ctags
+This man page explains only stable options and flags.  Universal Ctags
 also introduces experimental options and flags which have names starting
 with ``_``. For documentation on these options and flags, visit
-Universal-ctags web site at https://ctags.io/.
+Universal Ctags web site at https://ctags.io/.
 
 
 Storing a parser definition to a file
@@ -93,7 +93,7 @@ Overview for defining a parser
 
    You need know both the target language and the ctags'
    concepts (definition, reference, kind, role, field, extra). About
-   the concepts, ctags(1) of Universal-ctags may help you.
+   the concepts, ctags(1) of Universal Ctags may help you.
 
 2. Give a name to the parser
 
@@ -107,7 +107,7 @@ Overview for defining a parser
 4. Define kinds
 
    Use ``--kinddef-<LANG>=letter,name,description`` option.
-   Universal-ctags introduces this option.  Exuberant-ctags doesn't
+   Universal Ctags introduces this option.  Exuberant-ctags doesn't
    have. In Exuberant-ctags, a kind is defined as a side effect of
    specifying ``--regex-<LANG>=`` option. So user doesn't have a
    chance to recognize how important the definition of kind.
@@ -203,7 +203,7 @@ OPTIONS
 	Both *letter*, *name* and their combination must be unique in
 	a *<LANG>*.
 
-	This option is newly introduced in Universal-ctags.  This option
+	This option is newly introduced in Universal Ctags.  This option
 	reduces the typing defining a regex pattern with
 	``--regex-<LANG>=``, and keeps the consistency of kind
 	definitions in a language.
@@ -255,7 +255,7 @@ OPTIONS
 	one-letter form assumes using ``--regex-<LANG>`` option with
 	``--kinddef-<LANG>`` option. The *kind-spec* in ``--regex-<LANG>``
 	option just refers a letter defined with
-	``--kinddef-<LANG>``. This form is recommended in Universal-ctags.
+	``--kinddef-<LANG>``. This form is recommended in Universal Ctags.
 
 	The full form of *kind-spec* is in the form of a single *letter*, a
 	comma, a *name*, a comma, a *description*. See the description of
@@ -265,9 +265,9 @@ OPTIONS
 	Either the kind *name* and/or the *description* can be omitted.
 	However, unless the *letter* is not defined with
 	``--kinddef-<LANG>`` option, omitting is not recommended in
-	Universal-ctags. The omitting form is supported only for keeping
+	Universal Ctags. The omitting form is supported only for keeping
 	the compatibility with Exuberant-ctags. Supporting the omitting
-	form will be removed from Universal-ctags in the future.  If
+	form will be removed from Universal Ctags in the future.  If
 	kind-spec is omitted, it defaults to "r,regex".
 
 	About *flag*, see "Flags for ``--regex-<LANG>`` option".
@@ -278,24 +278,24 @@ OPTIONS
 
 ``--_echo=msg``
 	Print *msg* to the standard error stream.  This is helpful to
-	understand (and debug) optlib loading feature of Universal-ctags.
+	understand (and debug) optlib loading feature of Universal Ctags.
 
 ``--_force-quit=[num]``
 	Exits immediately when this option is processed.  If *num* is used
 	as exit status. The default is 0.  This is helpful to debug optlib
-	loading feature of Universal-ctags.
+	loading feature of Universal Ctags.
 
 
 FLAGS FOR ``--regex-<LANG>`` OPTION
 -----------------------------------
 
 You can specify more than one flag at the end of ``--regex-<LANG>`` to
-control how Universal-ctags uses the pattern.
+control how Universal Ctags uses the pattern.
 
 Exuberant-ctags uses a *letter* to represent a flag. In
-Universal-ctags, a *name* surrounded by braces (name form) can be used
+Universal Ctags, a *name* surrounded by braces (name form) can be used
 in addition to *letter*. The name form makes a user reading an optlib
-file easier. The most of all flags newly added in Universal-ctags
+file easier. The most of all flags newly added in Universal Ctags
 don't have the one-letter representation. All of them have only the name
 representation. ``--list-regex-flags`` lists all the flags.
 
@@ -428,7 +428,7 @@ command line and output::
 SEE ALSO
 --------
 
-The official Universal-ctags web site at:
+The official Universal Ctags web site at:
 
 https://ctags.io/
 
@@ -437,7 +437,7 @@ ctags(1), tags(5), regex(5,7), egrep(1)
 AUTHOR
 ------
 
-Universal-ctags project
+Universal Ctags project
 https://ctags.io/
 (This man page partially derived from ctags(1) of
 Executable-ctags)

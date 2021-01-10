@@ -10,7 +10,7 @@ Introduced changes
 
 ----
 
-Many changes have been introduced in Universal-ctags. Use git-log to
+Many changes have been introduced in Universal Ctags. Use git-log to
 review changes not enumerated here, especially in language parsers.
 
 New and extended options
@@ -38,7 +38,7 @@ Long names in kinds, fields, and extra options
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 A letter is used for specifying a kind, a field, or an extra entry.
-In Universal-ctags a name can also be used.
+In Universal Ctags a name can also be used.
 
 Surround the name with braces (`{` and `}`) in values assigned to the
 options, ``--kind-<LANG>=``, ``--fields=``, or ``--extras=``.
@@ -74,7 +74,7 @@ for more details.
 Notice messages and ``--quiet``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 There were 3 classes of message in Exuberant-ctags.
-In addition to them Universal-ctags introduced a new class of message, *notice*.
+In addition to them Universal Ctags introduced a new class of message, *notice*.
 
 *fatal*
 	A critical error has occurred and ctags aborts the execution.
@@ -167,7 +167,7 @@ links to.
 Extra tag entries (``--extras``)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ``--extra`` option in Exuberant-ctags is renamed to ``--extras`` (plural) in
-Universal-ctags for making consistent with ``--kinds-<LANG>`` and ``--fields``.
+Universal Ctags for making consistent with ``--kinds-<LANG>`` and ``--fields``.
 
 These extra tag entries are newly introduced.
 
@@ -195,7 +195,7 @@ Options for inspecting ctags internals
 Exuberant-ctags provides a way to inspect its internals via
 ``--list-kinds``, ``--list-languages``, and ``--list-maps``.
 
-This idea has been expanded in Universal-ctags with
+This idea has been expanded in Universal Ctags with
 ``--list-kinds-full``, ``--list-map-extensions``,  ``--list-extras``,
 ``--list-features``, ``--list-fields``, ``--list-map-patterns``, and
 ``--list-pseudo-tags`` being added.
@@ -247,7 +247,7 @@ extensions and patterns.
 Though language `FOO` is added before `BAR`, only `BAR` is set as a
 handler for the spec `*.ABC`.
 
-Universal-ctags enables multiple parsers to be configured for a spec.
+Universal Ctags enables multiple parsers to be configured for a spec.
 The appropriate parser for a given input file can then be chosen by a
 variety of internal guessing strategies (see :ref:`Determining file language
 <guessing>`).
@@ -455,7 +455,7 @@ Let's see actual difference of behaviors.
 
 The examples are taken from `#1409
 <https://github.com/universal-ctags/ctags/issues/1409>`_ submitted by @sgraham on
-github Universal-ctags repository.
+github Universal Ctags repository.
 
 `input.cc` and `input.mojom` are input files, and have the same
 contents::
@@ -563,7 +563,7 @@ Changes to the tags file format
 ``F`` kind usage
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-You cannot use ``F`` (``file``) kind in your .ctags because Universal-ctags
+You cannot use ``F`` (``file``) kind in your .ctags because Universal Ctags
 reserves it. See :ref:`ctags-incompatibilities(7) <ctags-incompatibilities(7)>`.
 
 Reference tags
@@ -572,8 +572,8 @@ Reference tags
 Traditionally ctags collects the information for locating where a
 language object is DEFINED.
 
-In addition Universal-ctags supports reference tags. If the extra-tag
-``r`` is enabled, Universal-ctags also collects the information for
+In addition Universal Ctags supports reference tags. If the extra-tag
+``r`` is enabled, Universal Ctags also collects the information for
 locating where a language object is REFERENCED. This feature was
 proposed by @shigio in `#569
 <https://github.com/universal-ctags/ctags/issues/569>`_ for GNU GLOBAL.
@@ -619,11 +619,11 @@ Output with the extra-tag ``r`` enabled:
 
 `#undef X` and two `#include` are newly collected.
 
-"roles" is a newly introduced field in Universal-ctags. The field
+"roles" is a newly introduced field in Universal Ctags. The field
 named is for recording how a tag is referenced. If a tag is definition
 tag, the roles field has "def" as its value.
 
-Universal-ctags prints the role information when the `r`
+Universal Ctags prints the role information when the `r`
 field is enabled with ``--fields=+r``.
 
 .. code-block:: console
@@ -822,7 +822,7 @@ information. Some fields like `language:`, `signature:`, etc are
 attached to the tag as optional information.
 
 In Exuberant-ctags, fields are common to all languages.
-Universal-ctags extends the concept of fields; a parser can define
+Universal Ctags extends the concept of fields; a parser can define
 its specific field. This extension was proposed by @pragmaware in
 `#857 <https://github.com/universal-ctags/ctags/issues/857>`_.
 
@@ -892,10 +892,10 @@ only fields owned by parsers but also common fields having the name
 specified (`end` in this example) are enabled/disabled.
 
 Using the wild card notation to specify the language is helpful to
-avoid incompatibilities between versions of Universal-ctags itself
+avoid incompatibilities between versions of Universal Ctags itself
 (SELF INCOMPATIBLY).
 
-In Universal-ctags development, a parser developer may add a new
+In Universal Ctags development, a parser developer may add a new
 parser specific field for a certain language.  Sometimes other developers
 then recognize it is meaningful not only for the original language
 but also other languages. In this case the field may be promoted to a
@@ -916,9 +916,9 @@ Parser specific extras
 
 As man page of Exuberant-ctags says, ``--extras`` option specifies
 whether to include extra tag entries for certain kinds of information.
-This option is available in Universal-ctags, too.
+This option is available in Universal Ctags, too.
 
-In Universal-ctags it is extended; a parser can define its specific
+In Universal Ctags it is extended; a parser can define its specific
 extra flags. They can be controlled with ``--extras-<LANG>=[+|-]{...}``.
 
 See some examples:
@@ -968,7 +968,7 @@ Discussion
 (This subsection should move to somewhere for developers.)
 
 The question is what are extra tag entries. As far as I know none has
-answered explicitly. I have two ideas in Universal-ctags. I
+answered explicitly. I have two ideas in Universal Ctags. I
 write "ideas", not "definitions" here because existing parsers don't
 follow the ideas. They are kept as is in variety reasons but the
 ideas may be good guide for people who wants to write a new parser
