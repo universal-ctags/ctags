@@ -48,7 +48,7 @@ used in the field for input file. The description, "Derived from
 Exuberant Ctags", is used in the field for pattern.
 
 Universal Ctags extends the naming scheme of the classical pseudo-tags
-available in Exuberant-ctags for emitting language specific
+available in Exuberant Ctags for emitting language specific
 information as pseudo tags::
 
 	!_{pseudo-tag-name}!{language-name}	{associated-value}	/{description}/

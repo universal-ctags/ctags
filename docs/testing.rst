@@ -24,7 +24,7 @@ resources.
 
 **Test facility**
 
-Exuberant ctags has a test facility. The test case were *Test*
+Exuberant Ctags has a test facility. The test case were *Test*
 directory. So Here I call it *Test*.
 
 Main aim of the facility is detecting regression. All files under Test

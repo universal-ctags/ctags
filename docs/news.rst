@@ -73,7 +73,7 @@ for more details.
 
 Notice messages and ``--quiet``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-There were 3 classes of message in Exuberant-ctags.
+There were 3 classes of message in Exuberant Ctags.
 In addition to them Universal Ctags introduced a new class of message, *notice*.
 
 *fatal*
@@ -166,7 +166,7 @@ links to.
 
 Extra tag entries (``--extras``)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-``--extra`` option in Exuberant-ctags is renamed to ``--extras`` (plural) in
+``--extra`` option in Exuberant Ctags is renamed to ``--extras`` (plural) in
 Universal Ctags for making consistent with ``--kinds-<LANG>`` and ``--fields``.
 
 These extra tag entries are newly introduced.
@@ -192,7 +192,7 @@ See :ref:`Conditional tagging with extras <extras>` for more details.
 Options for inspecting ctags internals
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Exuberant-ctags provides a way to inspect its internals via
+Exuberant Ctags provides a way to inspect its internals via
 ``--list-kinds``, ``--list-languages``, and ``--list-maps``.
 
 This idea has been expanded in Universal Ctags with
@@ -821,7 +821,7 @@ A tag has a `name`, an `input` file name, and a `pattern` as basic
 information. Some fields like `language:`, `signature:`, etc are
 attached to the tag as optional information.
 
-In Exuberant-ctags, fields are common to all languages.
+In Exuberant Ctags, fields are common to all languages.
 Universal Ctags extends the concept of fields; a parser can define
 its specific field. This extension was proposed by @pragmaware in
 `#857 <https://github.com/universal-ctags/ctags/issues/857>`_.
@@ -914,7 +914,7 @@ Parser specific extras
 
 .. NOT REVIEWED YET
 
-As man page of Exuberant-ctags says, ``--extras`` option specifies
+As man page of Exuberant Ctags says, ``--extras`` option specifies
 whether to include extra tag entries for certain kinds of information.
 This option is available in Universal Ctags, too.
 
@@ -1250,9 +1250,9 @@ the elements of the format.
 .. TODO: An example of using WILDCARD
 
 
-Changes imported from Exuberant-ctags
+Changes imported from Exuberant Ctags
 ---------------------------------------------------------------------
-See "Exuberant-ctags" in "Tracking other projects" for detailed
+See "Exuberant Ctags" in "Tracking other projects" for detailed
 information regarding imported changes.
 
 Some changes have also been imported from Fedora and Debian.
@@ -1348,7 +1348,7 @@ Libxml2 is required to use the parser(s) marked with *libxml*.
 Libyaml is required to use the parser(s) marked with *libyaml*.
 
 TIPS: you can list newly introduced parsers if you also have
-Exuberant-ctags installed with following command line:
+Exuberant Ctags installed with following command line:
 
 .. code-block:: console
 

@@ -18,7 +18,7 @@ SYNOPSIS
 DESCRIPTION
 -----------
 
-**Exuberant-ctags**, the ancestor of **Universal Ctags**, has provided
+**Exuberant Ctags**, the ancestor of **Universal Ctags**, has provided
 the way to define a new parser from command line.  Universal Ctags
 extends and refines this feature. **optlib parser** is the name for such
 parser in Universal Ctags. "opt" intends a parser is defined with
@@ -42,13 +42,13 @@ definition:
 * ``--options-maybe=pathname``
 
 The design of options and notations for defining a parser in
-Exuberant-ctags may focus on reducing the number of typing by user.
+Exuberant Ctags may focus on reducing the number of typing by user.
 Reducing the number of typing is important for users who want to
 define (or customize) a parser quickly.
 
 On the other hand, the design in Universal Ctags focuses on
 maintainability. The notation of Universal Ctags is redundant than
-that of Exuberant-ctags; the newly introduced kind should be declared
+that of Exuberant Ctags; the newly introduced kind should be declared
 explicitly, (long) names are approved than one-letter flags
 specifying kinds, and naming rules are stricter.
 
@@ -107,8 +107,8 @@ Overview for defining a parser
 4. Define kinds
 
    Use ``--kinddef-<LANG>=letter,name,description`` option.
-   Universal Ctags introduces this option.  Exuberant-ctags doesn't
-   have. In Exuberant-ctags, a kind is defined as a side effect of
+   Universal Ctags introduces this option.  Exuberant Ctags doesn't
+   have. In Exuberant Ctags, a kind is defined as a side effect of
    specifying ``--regex-<LANG>=`` option. So user doesn't have a
    chance to recognize how important the definition of kind.
 
@@ -183,12 +183,12 @@ OPTIONS
 
 	*letter* must be an alphabetical character ('[a-zA-EG-Z]')
 	other than "F". "F" has been reserved for representing a file
-	since Exuberant-ctags.
+	since Exuberant Ctags.
 
 	*name* must start with an alphabetic character, and the rest
 	must  be alphanumeric ('[a-zA-Z][a-zA-Z0-9]*'). Do not use
 	"file" as *name*. It has been reserved for representing a file
-	since Exuberant-ctags.
+	since Exuberant Ctags.
 
 	Note that using a number character in a *name* violates the
 	version 2 of tags file format though ctags
@@ -266,7 +266,7 @@ OPTIONS
 	However, unless the *letter* is not defined with
 	``--kinddef-<LANG>`` option, omitting is not recommended in
 	Universal Ctags. The omitting form is supported only for keeping
-	the compatibility with Exuberant-ctags. Supporting the omitting
+	the compatibility with Exuberant Ctags. Supporting the omitting
 	form will be removed from Universal Ctags in the future.  If
 	kind-spec is omitted, it defaults to "r,regex".
 
@@ -292,7 +292,7 @@ FLAGS FOR ``--regex-<LANG>`` OPTION
 You can specify more than one flag at the end of ``--regex-<LANG>`` to
 control how Universal Ctags uses the pattern.
 
-Exuberant-ctags uses a *letter* to represent a flag. In
+Exuberant Ctags uses a *letter* to represent a flag. In
 Universal Ctags, a *name* surrounded by braces (name form) can be used
 in addition to *letter*. The name form makes a user reading an optlib
 file easier. The most of all flags newly added in Universal Ctags

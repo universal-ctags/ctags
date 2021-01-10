@@ -28,10 +28,10 @@ Extending ctags with Regex parser (*optlib*)
 	you want to use permanently. It's really the new language parsers using
 	--regex-<LANG> and such that are about "Extending ctags", no?
 
-Exuberant-ctags allows a user to add a new parser to ctags with ``--langdef=<LANG>``
+Exuberant Ctags allows a user to add a new parser to ctags with ``--langdef=<LANG>``
 and ``--regex-<LANG>=...`` options.
 
-Universal Ctags follows and extends the design of Exuberant-ctags in more
+Universal Ctags follows and extends the design of Exuberant Ctags in more
 powerful ways, as described in the following chapters.
 
 Universal Ctags encourages users to share the new parsers defined by
@@ -82,7 +82,7 @@ Preload option file
 
 Preload option files are option files loaded by ``ctags`` automatically
 at start-up time. Which files are loaded at start-up time are very different
-from Exuberant-ctags.
+from Exuberant Ctags.
 
 At start-up time, Universal Ctags loads files having :file:`.ctags` as a
 file extension under the following statically defined directories:
@@ -98,7 +98,7 @@ file extension under the following statically defined directories:
 order (strcmp(3) is used for comparing, so for example
 :file:`.ctags.d/ZZZ.ctags` will be loaded *before* :file:`.ctags.d/aaa.ctags` in an ordinary locale).
 
-Quoted from man page of Exuberant-ctags:
+Quoted from man page of Exuberant Ctags:
 
 	FILES
 		- /ctags.cnf (on MSDOS, MSWindows only)
@@ -137,7 +137,7 @@ What follows explains the differences and their intentions...
 Directory oriented configuration management
 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 
-Exuberant-ctags provides a way to customize ctags with options like
+Exuberant Ctags provides a way to customize ctags with options like
 ``--langdef=<LANG>`` and ``--regex-<LANG>``. These options are
 powerful and make ctags popular for programmers.
 
@@ -155,9 +155,9 @@ have multiple parser definitions, put them in different files.
 Avoiding option incompatibility issues
 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 
-The Universal Ctags options are different from those of Exuberant-ctags,
-therefore Universal Ctags doesn't load any of the files Exuberant-ctags loads at
-start-up. Otherwise there would be incompatibility issues if Exuberant-ctags
+The Universal Ctags options are different from those of Exuberant Ctags,
+therefore Universal Ctags doesn't load any of the files Exuberant Ctags loads at
+start-up. Otherwise there would be incompatibility issues if Exuberant Ctags
 loaded an option file that used a newly introduced option in Universal Ctags,
 and vice versa.
 
@@ -187,7 +187,7 @@ for an optlib option file with ``--options=PATHNAME`` option
 explicitly. The pathname can be just the filename if it's in the
 current directory.
 
-Exuberant-ctags has the ``--options`` option, but you can only specify a
+Exuberant Ctags has the ``--options`` option, but you can only specify a
 single file to load. Universal Ctags extends the option in two aspects:
 
 - You can specify a directory, to load all the files in that directory.
@@ -246,7 +246,7 @@ Tips for writing an option file
 Regular expression (regex) engine
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Universal Ctags currently uses the same regex engine as Exuberant-ctags:
+Universal Ctags currently uses the same regex engine as Exuberant Ctags:
 the POSIX.2 regex engine in GNU glibc-2.10.1. By default it uses the Extended
 Regular Expressions (ERE) syntax, as used by most engines today; however it does
 *not* support many of the "modern" extensions such as lazy captures,
@@ -1423,7 +1423,7 @@ Adding custom fields to the tag output
 
 .. NEEDS MORE REVIEWS
 
-Exuberant-ctags allows just one of the specified groups in a regex pattern to
+Exuberant Ctags allows just one of the specified groups in a regex pattern to
 be used as a part of the name of a tagEntry.
 
 Universal Ctags allows using the other groups in the regex pattern.
@@ -1440,7 +1440,7 @@ Here is a source file(*input.unknown*) written in *Unknown*:
 	protected func bar(n);
 	private func baz(n,...);
 
-With `--regex-Unknown=...` Exuberant-ctags can capture `foo`, `bar`, and `baz`
+With `--regex-Unknown=...` Exuberant Ctags can capture `foo`, `bar`, and `baz`
 as names. Universal Ctags can attach extra context information to the
 names as values for fields. Let's focus on `bar`. `protected` is a
 keyword to control how widely the identifier `bar` can be accessed.

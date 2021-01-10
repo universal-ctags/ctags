@@ -4,7 +4,7 @@
 ctags-incompatibilities
 ==============================================================
 --------------------------------------------------------------
-Incompatibilities between Universal Ctags and Exuberant-ctags
+Incompatibilities between Universal Ctags and Exuberant Ctags
 --------------------------------------------------------------
 :Version: 5.9.0
 :Manual group: Universal Ctags
@@ -19,7 +19,7 @@ DESCRIPTION
 -----------
 
 This page describes major incompatible changes introduced to
-Universal Ctags forked from Exuberant-ctags.
+Universal Ctags forked from Exuberant Ctags.
 
 Incompatibilities in command line interface
 -------------------------------------------------------------
@@ -28,7 +28,7 @@ The order of application of patterns and extensions in ``--langmap``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 When applying mappings for a name of given source file,
-Exuberant-ctags tests file name patterns AFTER file extensions
+Exuberant Ctags tests file name patterns AFTER file extensions
 (**e-map-order**). Universal Ctags does this differently; it tests file
 name patterns BEFORE file extensions (**u-map-order**).
 
@@ -55,7 +55,7 @@ name patterns of given *language*.
 Remove ``--file-tags`` and ``--file-scope`` options
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Even in Exuberant-ctags, "--file-tags" is not documented in its man page.
+Even in Exuberant Ctags, "--file-tags" is not documented in its man page.
 Instead of specifying "--file-tags" or "--file-tags=yes", use
 "--extras=+f" or "--extras=+{inputFile}".
 
@@ -77,7 +77,7 @@ Language and kind definitions
 Language name defined with ``--langdef=name`` option
 ....................................................................................
 
-The characters you can use are more restricted than Exuberant-ctags.
+The characters you can use are more restricted than Exuberant Ctags.
 For more details, see the description of ``--langdef=name`` in :ref:`ctags-optlib(7) <ctags-optlib(7)>`.
 
 Obsoleting ``--<LANG>-kinds`` option
@@ -85,7 +85,7 @@ Obsoleting ``--<LANG>-kinds`` option
 
 Some options have *<LANG>* as parameterized parts in their name like
 ``--foo-<LANG>=...`` or ``--<LANG>-foo=...``. The most of all such
-options in Exuberant-ctags have the former form, ``--foo-<LANG>=...``.
+options in Exuberant Ctags have the former form, ``--foo-<LANG>=...``.
 The exception is ``--<LANG>-kinds``.
 
 Universal Ctags uses the former form for all *<LANG>* parameterized
@@ -110,14 +110,14 @@ The kind letter "F" is reserved.  Using it as part of a kind spec in
 Disallowing to use other than alphabetical character as kind letter
 ....................................................................................
 
-Exuberant-ctags accepts a character other than alphabetical character
+Exuberant Ctags accepts a character other than alphabetical character
 as kind letter in ``--regex-<LANG>=...`` option.  Universal Ctags
 accepts only an alphabetical character.
 
 Acceptable characters as parts of a kind name
 ....................................................................................
 
-Exuberant-ctags accepts any character as a part of a kind name
+Exuberant Ctags accepts any character as a part of a kind name
 defined with ``--regex-<LANG>=/regex/replacement/kind-spec/``.
 
 Universal Ctags accepts only an alphabetical character as
@@ -161,7 +161,7 @@ Using numerical character in the name part of tag tagfield
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The version 2 tags file format, the default output format of
-Exuberant-ctags, accepts only alphabetical characters in the name part
+Exuberant Ctags, accepts only alphabetical characters in the name part
 of tag tagfield.
 
 Universal Ctags introduces an exception to this specification; it may
@@ -177,7 +177,7 @@ Truncating the pattern for long input lines
 To prevent generating overly large tags files, a pattern field is
 truncated, by default, when its size exceeds 96 bytes. A different
 limit can be specified with ``--pattern-length-limit=N``. Specifying
-0 as *N* results no truncation as Exuberant-ctags does not.
+0 as *N* results no truncation as Exuberant Ctags does not.
 
 Option files loading at starting up time (preload files)
 -------------------------------------------------------------

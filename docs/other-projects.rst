@@ -9,7 +9,7 @@ Relationship between other projects
 Other tagging engines
 ----------------------------------------------------------------------
 
-`Exuberant-ctags <http://ctags.sourceforge.net/>`_
+`Exuberant Ctags <http://ctags.sourceforge.net/>`_
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The origin of Universal Ctags.
@@ -119,7 +119,7 @@ Anjuta DevStudio is a versatile Integrated Development Environment (IDE)
 on GNOME Desktop Environment and features a number of advanced
 programming facilities.
 
-They did not fork Exuberant ctags, but they did
+They did not fork Exuberant Ctags, but they did
 natively `include it in Anjuta <https://git.gnome.org/browse/anjuta/tree/plugins/symbol-db/anjuta-tags>`_.
 They have made several additions to
 their version of it including fairly extensive Vala language support.

@@ -16,7 +16,7 @@ for the user to define new languages searched by regular expressions, and its
 ability to generate emacs-style TAGS files.
 
 `Universal Ctags`_ has the objective of continuing the development of Darren
-Hiebert's `Exuberant-ctags`_ after activity on that project
+Hiebert's `Exuberant Ctags`_ after activity on that project
 unfortunately stalled.
 
 Reza Jelveh <reza.jelveh@gmail.com> initially created a personal fork
@@ -32,7 +32,7 @@ consult the ctags.1 man page.
 This is a draft document. Proofreading and pull-requests are welcome!
 
 
-.. _Exuberant-ctags: http://ctags.sourceforge.net/
+.. _Exuberant Ctags: http://ctags.sourceforge.net/
 .. _Universal Ctags: https://github.com/universal-ctags
 
 

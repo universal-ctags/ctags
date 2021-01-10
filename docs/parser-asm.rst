@@ -8,7 +8,7 @@ Asm parser
 
 :Maintainer: Masatake YAMATO <yamato@redhat.com>
 
-The original (Exuberant-ctags) parser handles #define C preprocessor directive and C
+The original (Exuberant Ctags) parser handles #define C preprocessor directive and C
 style comments by itself. In Universal Ctags Asm parser utilizes CPreProcessor meta
 parser for handling them. So a language object defined with #define is tagged as
 "defines" of CPreProcessor language, not Asm language.

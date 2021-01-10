@@ -4,13 +4,13 @@ Tracking other projects
 ----------------------------------------------------------------------
 
 This is working note for tracking activities other projects,
-especially activity at exuberant-ctags.
+especially activity at Exuberant Ctags.
 
 I(Masatake YAMATO) consider tracking activities as the first class
 fruits of this project.
 
 
-exuberant-ctags
+Exuberant Ctags
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 subversion
@@ -40,9 +40,9 @@ subversion
 
 	$ git clone https://github.com/universal-ctags/ctags.git
 
-  2. prepare exuberant-ctags SVN repo: a local git repo clone from exuberant-ctags svn tree.
+  2. prepare Exuberant Ctags SVN repo: a local git repo clone from Exuberant Ctags svn tree.
 
-    The original clone is already part of exuberant tree.
+    The original clone is already part of Exuberant Ctags tree.
 
     To initialize your git repository with the required subversion information do ::
 
@@ -193,12 +193,12 @@ Patches are always there. So it is easy to evaluate the value:)
 
    <TICKET#>
 
-   	means the ticket is closed from the view of exuberant tree
+   	means the ticket is closed from the view of Exuberant Ctags tree
    	developers.  We don't have to take time for this ticket.
 
    (TICKET#)
 
-   	means the ticket is still opened from the view of exuberant
+   	means the ticket is still opened from the view of Exuberant Ctags
 	tree developers.  We don't have to take time for this ticket.
 
 ----
@@ -367,21 +367,21 @@ http://pkgs.fedoraproject.org/cgit/ctags.git/tree/ctags.spec
 
 <ctags-5.8-memmove.patch>
 
-	This patch was merged in exuberant ctags svn tree.
+	This patch was merged in Exuberant Ctags svn tree.
 	As the result this patch is in Universal Ctags tree::
 
 		d2bdf505abb7569deae2b50305ea1edce6208557
 
 <ctags-5.8-ocaml-crash.patch>
 
-	This patch was merged in exuberant ctags svn tree.
+	This patch was merged in Exuberant Ctags svn tree.
 	As the result this patch is in Universal Ctags tree::
 
 		ddb29762b37d60a875252dcc401de0b7479527b1
 
 <ctags-5.8-format-security.patch>
 
-	This patch was merged in exuberant ctags svn tree.
+	This patch was merged in Exuberant Ctags svn tree.
 	As the result this patch is in Universal Ctags tree::
 
 		2f7a78ce21e4156ec3e63c821827cf1d5680ace8

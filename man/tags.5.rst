@@ -13,8 +13,8 @@ Vi tags file format extended in ctags projects
 DESCRIPTION
 -----------
 
-The contents of next section is a copy of FORMAT file in exuberant
-ctags source code in its subversion repository at sourceforge.net.
+The contents of next section is a copy of FORMAT file in Exuberant
+Ctags source code in its subversion repository at sourceforge.net.
 
 Exceptions introduced in Universal Ctags are explained inline with
 "EXCEPTION" marker.
@@ -58,7 +58,7 @@ by most people working on versions of Vi, ctags, etc..  Currently this
 standard is supported by:
 
 Darren Hiebert <dhiebert at users.sourceforge.net>
-	Exuberant ctags
+	Exuberant Ctags
 
 Bram Moolenaar <Bram at vim.org>
 	Vim (Vi IMproved)
@@ -515,7 +515,7 @@ Compatible output and weakness
 Default behavior (``--output-format=u-ctags`` option) has the
 exceptions.  In other hand, with ``--output-format=e-ctags`` option
 ctags has no exception; Universal Ctags command may use the same file
-format as Exuberant-ctags. However, ``--output-format=e-ctags`` throws
+format as Exuberant Ctags. However, ``--output-format=e-ctags`` throws
 away a tag entry which name includes a space or a tab
 character. ``TAG_OUTPUT_MODE`` pseudo-tag tells which format is
 used when ctags generating tags file.

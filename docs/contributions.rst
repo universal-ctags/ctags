@@ -70,7 +70,7 @@ The purposes listed at the top of this subsection should help you
 decide.
 
 The secondary class is a *reference tag*. This is newly introduced in
-Universal Ctags and is not available in Exuberant-ctags. If a name is
+Universal Ctags and is not available in Exuberant Ctags. If a name is
 used (or referenced) in a file, it can be tagged as a reference tag.
 
 Don't be confused by the two tag classes.
@@ -219,7 +219,7 @@ Above code snippet applies the `.editorconfig` configuration AFTER
 installing the "linux" style to the current buffer.
 
 I like GNU style, but for keeping consistency in existing code of
-Exuberant-ctags, the origin of Universal Ctags, I introduced the style
+Exuberant Ctags, the origin of Universal Ctags, I introduced the style
 and configuration to my .emacs.  Please, do the same.
 
 Compatibility
@@ -249,7 +249,7 @@ underscore at the start of a long option name like: `--_echo`.
 
 Write a test case for Tmain or Units.
 
-Don't remove an option, especially if it exists in Exuberant-ctags.
+Don't remove an option, especially if it exists in Exuberant Ctags.
 
 Writing parser in regex
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -443,7 +443,7 @@ Title of commit log and pull request
   These prefixes reduce the load of reviewers.
 
 * Use [INCOMPATIBLE] as a prefix for both pull request and commit log
-  if the change breaks the compatibility with Exuberant-ctags. Write
+  if the change breaks the compatibility with Exuberant Ctags. Write
   an explanation in ``man/ctags-incompatibilities.7.rst.in`` about the
   detail of breakage.
 
@@ -462,7 +462,7 @@ on the tags file.
 If you fix a bug reported somewhere on the web, its URL should be
 logged, too.
 
-If the bug is reported in the Exuberant-ctags tracker on the
+If the bug is reported in the Exuberant Ctags tracker on the
 SourceForge web site, log it as ``sf-bugs:N``, ``sf-patches:N``,
 ``sf-support-requests:N``, or ``sf-feature-requests:N``.
 ``docs/tracking.rst`` also should be updated.

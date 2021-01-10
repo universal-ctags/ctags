@@ -44,11 +44,11 @@ which are generated for each, see the ``--list-languages`` and ``--list-kinds-fu
 options.
 
 This man page describes **Universal Ctags**, an implementation of ctags
-derived from **Exuberant-ctags**. The major incompatible changes between
-Universal Ctags and Exuberant-ctags are enumerated in
+derived from **Exuberant Ctags**. The major incompatible changes between
+Universal Ctags and Exuberant Ctags are enumerated in
 ctags-incompatibilities(7).
 
-One of the advantages of Exuberant-ctags is that it allows a user to
+One of the advantages of Exuberant Ctags is that it allows a user to
 define a new parser from the command line. Extending this capability is one
 of the major features of Universal Ctags. ctags-optlib(7)
 describes how the capability is extended.
@@ -452,7 +452,7 @@ are not listed here. They are experimental or for debugging purpose.
 	make the option naming convention align to the other options
 	like ``--kinds-<LANG>=`` and ``--fields=``.
 
-	This option is kept for backward-compatibility with Exuberant-ctags.
+	This option is kept for backward-compatibility with Exuberant Ctags.
 
 ``--extras=[+|-]flags|*``
 	Specifies whether to include extra tag entries for certain kinds of
@@ -507,13 +507,13 @@ are not listed here. They are experimental or for debugging purpose.
 		language objects with "static" modifier of C language) should be included
 		in the output. See, also, the ``-h`` option. This option is enabled by
 		default. This is the replacement for ``--file-scope`` option of
-		Exuberant-ctags.
+		Exuberant Ctags.
 
 	f/inputFile
 		Include an entry for the base file name of every source file
 		(e.g. "example.c"), which addresses the first line of the file.
 		This flag is the replacement for ``--file-tags`` hidden option of
-		Exuberant-ctags.
+		Exuberant Ctags.
 
 		If the ``end:`` field is enabled, the end line number of the file can be
 		attached to the tag. (However, @CTAGS_NAME_EXAMPLE@ omits the ``end:`` field
@@ -822,7 +822,7 @@ are not listed here. They are experimental or for debugging purpose.
 
 	Note that file name patterns are tested before file extensions when inferring
 	the language of a file. This order of Universal Ctags is different from
-	Exuberant-ctags. See ctags-incompatibilities(7) for the background of
+	Exuberant Ctags. See ctags-incompatibilities(7) for the background of
 	this incompatible change.
 
 ``--language-force=language``
@@ -979,7 +979,7 @@ are not listed here. They are experimental or for debugging purpose.
 
 ``--list-kinds[=language|all]``
 	Subset of ``--list-kinds-full``. This option is kept for
-	backward-compatibility with Exuberant-ctags.
+	backward-compatibility with Exuberant Ctags.
 
 	This option prints only LETTER, DESCRIPTION, and ENABLED fields
 	of ``--list-kinds-full`` output. However, the presentation of
@@ -1043,7 +1043,7 @@ are not listed here. They are experimental or for debugging purpose.
 		same one-letter flag and/or the same long-name flag. In other words,
 		the namespace of kinds are separated by language.
 
-		However, Exuberant-ctags does not separate the kinds of C and
+		However, Exuberant Ctags does not separate the kinds of C and
 		C++. Enabling/disabling kindX in C language enables/disables a
 		kind in C++ language having the same long-name flag with kindX. To
 		emulate this behavior in Universal Ctags, a concept named
@@ -1604,10 +1604,10 @@ TAG ENTRIES
 -----------
 
 A tag is an index for a language object. The concept of a tag and related
-items in Exuberant-ctags are refined and extended in Universal Ctags.
+items in Exuberant Ctags are refined and extended in Universal Ctags.
 
 A tag is categorized into **definition tags** or **reference tags**.
-In general, Exuberant-ctags only tags *definitions* of
+In general, Exuberant Ctags only tags *definitions* of
 language objects: places where newly named language objects are introduced.
 Universal Ctags, on the other hand, can also tag *references* of language
 objects: places where named language objects are used. However, support
@@ -1698,7 +1698,7 @@ options.
 Language-specific fields and extras
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Exuberant-ctags has the concept of "fields" and "extras". They are common
+Exuberant Ctags has the concept of "fields" and "extras". They are common
 between parsers of different languages. Universal Ctags extends this concept
 by providing language-specific fields and extras.
 
@@ -1989,7 +1989,7 @@ in a configuration file.
 See tags(5) for the format of tag files.
 
 See ctags-incompatibilities(7) about known incompatible changes
-with Exuberant-ctags.
+with Exuberant Ctags.
 
 See ctags-client-tools(7) if you are interested in writing
 a tool for processing tags files.
@@ -2040,9 +2040,9 @@ Some parsers are taken from **tagmanager** of **Geany** (https://www.geany.org/)
 project.
 
 
-The fishman-ctags was derived from Exuberant-ctags.
+The fishman-ctags was derived from Exuberant Ctags.
 
-Exuberant-ctags was originally derived from and
+Exuberant Ctags was originally derived from and
 inspired by the ctags program by Steve Kirkendall <kirkenda@cs.pdx.edu>
 that comes with the Elvis vi clone (though virtually none of the original
 code remains).

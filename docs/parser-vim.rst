@@ -14,7 +14,7 @@ Quoted from ``:help script-variable`` in the Vim documentation::
     cannot be accessed from outside of the scripts, thus are local to
     the script.
 
-Exuberant-ctags records the prefix `s:` as part of a script-local
+Exuberant Ctags records the prefix `s:` as part of a script-local
 variable's name. However, it is omitted from function names. As
 requested in issue #852 on GitHub, Universal Ctags now also includes
 the prefix in script-local function names.
