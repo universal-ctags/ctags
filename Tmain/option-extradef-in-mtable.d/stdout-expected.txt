@@ -1,0 +1,12 @@
+# []: enabled, {}: enabled
+a	input.mtextra	/^(def a)$/;"	d
+b	input.mtextra	/^{def b}$/;"	d	extras:acceptCurlyBracket
+c	input.mtextra	/^[def c]$/;"	d	extras:acceptSquareBracket
+# []: disabled, {}: disabled
+a	input.mtextra	/^(def a)$/;"	d
+# []: enabled, {}: disabled
+a	input.mtextra	/^(def a)$/;"	d
+c	input.mtextra	/^[def c]$/;"	d	extras:acceptSquareBracket
+# []: disabled, {}: enabled
+a	input.mtextra	/^(def a)$/;"	d
+b	input.mtextra	/^{def b}$/;"	d	extras:acceptCurlyBracket

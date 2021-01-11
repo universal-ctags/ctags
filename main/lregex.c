@@ -2406,6 +2406,10 @@ static struct regexTable * matchMultitableRegexTable (struct lregexControlBlock 
 	for (unsigned int i = 0; i < ptrArrayCount(table->entries); i++)
 	{
 		regexTableEntry *entry = ptrArrayItem(table->entries, i);
+		if ((entry->pattern->xtagType != XTAG_UNKNOWN)
+			&& (!isXtagEnabled (entry->pattern->xtagType)))
+			continue;
+
 		regexPattern *ptrn = entry->pattern;
 		struct guestSpec  *guest = &ptrn->guest;
 

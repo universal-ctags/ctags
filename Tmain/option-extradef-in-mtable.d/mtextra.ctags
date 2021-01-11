@@ -1,0 +1,23 @@
+--langdef=MTExtra
+--map-MTExtra=+.mtextra
+
+--kinddef-MTExtra=d,def,definitions
+
+# []
+--_extradef-MTExtra=acceptSquareBracket,accept square bracket
+# {}
+--_extradef-MTExtra=acceptCurlyBracket,accept curly bracket
+
+
+--_tabledef-MTExtra=main
+--_tabledef-MTExtra=body
+
+--_mtable-regex-MTExtra=main/\(def +//{tenter=body}
+--_mtable-regex-MTExtra=main/\[def +//{tenter=body}{_extra=acceptSquareBracket}
+--_mtable-regex-MTExtra=main/\{def +//{tenter=body}{_extra=acceptCurlyBracket}
+--_mtable-regex-MTExtra=main/.//
+
+--_mtable-regex-MTExtra=body/([_a-z]+)\)/\1/d/{tleave}
+--_mtable-regex-MTExtra=body/([_a-z]+)\]/\1/d/{tleave}{_extra=acceptSquareBracket}
+--_mtable-regex-MTExtra=body/([_a-z]+)\}/\1/d/{tleave}{_extra=acceptCurlyBracket}
+--_mtable-regex-MTExtra=body/.//
