@@ -192,7 +192,7 @@ jobs:
        - run:
            name: Install tools
            command: |
-             dnf -y install git gcc autoconf automake make
+             dnf -y install git gcc autoconf automake make file
        - run:
            name: Prepare repo file for install cross compiler
            command: |
@@ -224,7 +224,7 @@ jobs:
        - run:
            name: Test
            command: |
-             test -f out/bin/ctags
+             test -f out/bin/ctags && ( file out/bin/ctags | grep -q 'ARM aarch64' )
 
 workflows:
   version: 2
