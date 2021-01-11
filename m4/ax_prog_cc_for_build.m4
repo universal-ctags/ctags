@@ -102,7 +102,8 @@ pushdef([ac_cv_host_cpu], ac_cv_build_cpu)dnl
 pushdef([ac_cv_host_vendor], ac_cv_build_vendor)dnl
 pushdef([ac_cv_host_os], ac_cv_build_os)dnl
 pushdef([ac_tool_prefix], ac_build_tool_prefix)dnl
-pushdef([am_cv_CC_dependencies_compiler_type], am_cv_build_CC_dependencies_compiler_type)dnl
+dnl pushdef([am_cv_CC_dependencies_compiler_type], am_cv_build_CC_dependencies_compiler_type)dnl
+pushdef([am_cv_CC_dependencies_compiler_type], am_cv_CC_FOR_BUILD_dependencies_compiler_type)dnl
 pushdef([am_cv_prog_cc_c_o], am_cv_build_prog_cc_c_o)dnl
 pushdef([cross_compiling], cross_compiling_build)dnl
 
