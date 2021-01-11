@@ -236,6 +236,7 @@ AM_CONDITIONAL(ENABLE_DEBUGGING, [test "x$enable_debugging" = "xyes"])
 # Checks for programs
 # -------------------
 
+dnl the 1st time. See m4/ax_prog_cc_for_build.m4.
 AC_PROG_CC
 AC_PROG_CC_C99
 AC_PROG_RANLIB
