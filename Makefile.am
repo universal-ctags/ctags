@@ -220,6 +220,7 @@ man_MANS = \
 	man/ctags-incompatibilities.7 \
 	man/ctags-optlib.7 \
 	\
+	man/ctags-lang-julia.7 \
 	man/ctags-lang-python.7 \
 	man/ctags-lang-verilog.7 \
 	man/ctags-lang-inko.7 \
