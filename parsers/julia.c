@@ -50,35 +50,37 @@ typedef enum {
 
 typedef enum {
     JULIA_MODULE_IMPORTED,
-    JULIA_MODULE_USING,
+    JULIA_MODULE_USED,
+    JULIA_MODULE_NAMESPACE,
 } juliaModuleRole;
 
 typedef enum {
     JULIA_UNKNOWN_IMPORTED,
-    JULIA_UNKNOWN_USING,
+    JULIA_UNKNOWN_USED,
 } juliaUnknownRole;
 
 /*
-*  using X               X = (kind:module, role:using)
+*  using X               X = (kind:module, role:used)
 *
-*  using X: a, b         X = (kind:module, role:using)
-*                     a, b = (kind:unknown, role:using, scope:module:X)
+*  using X: a, b         X = (kind:module, role:namespace)
+*                     a, b = (kind:unknown, role:used, scope:module:X)
 *
 *  import X              X = (kind:module, role:imported)
 *
-*  import X.a, X.b       X = (kind:module, role:imported)
+*  import X.a, Y.b    X, Y = (kind:module, role:namespace)
 *                     a, b = (kind:unknown, role:imported, scope:module:X)
 *
 *  import X: a, b     Same as the above one
 */
 static roleDefinition JuliaModuleRoles [] = {
     { true, "imported", "loaded by \"import\"" },
-    { true, "using", "loaded by \"using\"" },
+    { true, "used", "loaded by \"using\"" },
+    { true, "namespace", "only some symbols in it are imported" },
 };
 
 static roleDefinition JuliaUnknownRoles [] = {
     { true, "imported", "loaded by \"import\"" },
-    { true, "using", "loaded by \"using\""},
+    { true, "used", "loaded by \"using\""},
 };
 
 static kindDefinition JuliaKinds [] = {
@@ -1213,8 +1215,17 @@ static void parseModule (lexerState *lexer, vString *scope, int parent_kind)
 /*
  * Parse a token in import expression that may have a dot in it.
  */
-static void parseImportToken(lexerState *lexer, vString *scope, int module_role, int unknown_role, vString *module_name)
+static void parseImportToken(lexerState *lexer, vString *scope, int unknown_role, vString *module_name)
 {
+    int module_role;
+    if (lexer->cur_c == '.' || lexer->cur_c == ':')
+    {
+        module_role = JULIA_MODULE_NAMESPACE;
+    }
+    else
+    {
+        module_role = JULIA_MODULE_IMPORTED;
+    }
     addReferenceTag(module_name, K_MODULE, module_role, lexer->line, lexer->pos, NULL);
     if (lexer->cur_c == '.')
     {
@@ -1235,20 +1246,28 @@ static void parseImport (lexerState *lexer, vString *scope, int token_type)
     /* capture the imported name */
     advanceToken(lexer, true);
     vStringCopy(name, lexer->token_str);
+    /* The part after ":" is not handled by this if statement, but the next
+     * one. */
     if (token_type == TOKEN_IMPORT)
     {
-        module_role = JULIA_MODULE_IMPORTED;
         unknown_role = JULIA_UNKNOWN_IMPORTED;
         /* The import expression may look like "import Mod" or "import
          * Mod.symbol", we have to deal with these 2 possibilities. */
-        parseImportToken(lexer, scope, module_role, unknown_role, name);
+        parseImportToken(lexer, scope, JULIA_UNKNOWN_IMPORTED, name);
     }
     else /* if (token_type) == TOKEN_USING */
     {
-        module_role = JULIA_MODULE_USING;
-        unknown_role = JULIA_UNKNOWN_USING;
+        unknown_role = JULIA_UNKNOWN_USED;
         /* The using expression always look like "using Mod", so we can tag it
          * easily. */
+        if (lexer->cur_c == ':')
+        {
+            module_role = JULIA_MODULE_NAMESPACE;
+        }
+        else
+        {
+            module_role = JULIA_MODULE_USED;
+        }
         addReferenceTag(lexer->token_str, K_MODULE, module_role, lexer->line, lexer->pos, NULL);
     }
     if (lexer->cur_c == ':' || lexer->cur_c == ',')
@@ -1264,13 +1283,14 @@ static void parseImport (lexerState *lexer, vString *scope, int token_type)
         {
             if (token_type == TOKEN_IMPORT && delimiter == ',')
             {
+                vStringCopy(name, lexer->token_str);
                 /* import Mod1.symbol1, Mod2.symbol2, Mod3 */
-                parseImportToken(lexer, scope, module_role, unknown_role, name);
+                parseImportToken(lexer, scope, unknown_role, name);
             }
             else if (token_type == TOKEN_USING && delimiter == ',')
             {
                 /* using Mod1, Mod2 */
-                addReferenceTag(lexer->token_str, K_MODULE, module_role, lexer->line, lexer->pos, NULL);
+                addReferenceTag(lexer->token_str, K_MODULE, JULIA_MODULE_USED, lexer->line, lexer->pos, NULL);
             }
             else /* if (delimiter == ':') */
             {
