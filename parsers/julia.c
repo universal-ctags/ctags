@@ -1213,26 +1213,86 @@ static void parseModule (lexerState *lexer, vString *scope, int parent_kind)
 }
 
 /*
- * Parse a token in import expression that may have a dot in it.
+ * Parse comma separated entity in import/using expressions. An entity could be
+ * in the form of "Module" or "Module.symbol". The lexer should be at the end
+ * of "Module", and this function will take it to the end of the entity
+ * (whitespaces also skipped).
  */
-static void parseImportToken(lexerState *lexer, vString *scope, int unknown_role, vString *module_name)
+static void parseImportEntity(lexerState *lexer, int token_type)
 {
-    int module_role;
-    if (lexer->cur_c == '.' || lexer->cur_c == ':')
+    if (lexer->cur_c == '.')
     {
-        module_role = JULIA_MODULE_NAMESPACE;
+        if (token_type == TOKEN_IMPORT)
+        {
+            vString *module_name = vStringNewCopy(lexer->token_str);
+            addReferenceTag(module_name, K_MODULE, JULIA_MODULE_NAMESPACE, lexer->line, lexer->pos, NULL);
+            advanceChar(lexer);
+            advanceToken(lexer, true);
+            addReferenceTag(lexer->token_str, K_UNKNOWN, JULIA_UNKNOWN_IMPORTED, lexer->line, lexer->pos, module_name);
+            vStringDelete(module_name);
+        }
+        else /* if (token_type == TOKEN_USING) */
+        {
+            /* using Module.symbol is invalid, so we advance the lexer but don't tag it. */
+            advanceChar(lexer);
+            advanceToken(lexer, true);
+        }
     }
     else
     {
-        module_role = JULIA_MODULE_IMPORTED;
+        if (token_type == TOKEN_IMPORT)
+        {
+            addReferenceTag(lexer->token_str, K_MODULE, JULIA_MODULE_IMPORTED, lexer->line, lexer->pos, NULL);
+        }
+        else /* if (token_type == TOKEN_USING) */
+        {
+            addReferenceTag(lexer->token_str, K_MODULE, JULIA_MODULE_USED, lexer->line, lexer->pos, NULL);
+        }
     }
-    addReferenceTag(module_name, K_MODULE, module_role, lexer->line, lexer->pos, NULL);
-    if (lexer->cur_c == '.')
+}
+
+/* Parse import/using expressions with a colon, like: */
+/* import Module: symbol1, symbol2 */
+/* using Module: symbol1, symbol2 */
+/* The lexer should be at the end of "Module", and this function will take it
+ * to the end of the token after this expression (whitespaces also skipped). */
+static void parseColonImportExpr(lexerState *lexer, int token_type)
+{
+    int symbol_role;
+    if (token_type == TOKEN_IMPORT)
     {
-        advanceChar(lexer);
-        advanceToken(lexer, true);
-        addReferenceTag(lexer->token_str, K_UNKNOWN, unknown_role, lexer->line, lexer->pos, module_name);
+        symbol_role = JULIA_UNKNOWN_IMPORTED;
     }
+    else /* if (token_type == TOKEN_USING) */
+    {
+        symbol_role = JULIA_UNKNOWN_USED;
+    }
+    vString *name = vStringNewCopy(lexer->token_str);
+    addReferenceTag(name, K_MODULE, JULIA_MODULE_NAMESPACE, lexer->line, lexer->pos, NULL);
+    advanceChar(lexer);
+    advanceToken(lexer, true);
+    if (lexer->cur_token == TOKEN_NEWLINE)
+    {
+        advanceToken(lexer, true);
+    }
+    while (lexer->cur_token == TOKEN_IDENTIFIER || lexer->cur_token == TOKEN_MACROCALL)
+    {
+        addReferenceTag(lexer->token_str, K_UNKNOWN, symbol_role, lexer->line, lexer->pos, name);
+        if (lexer->cur_c == ',')
+        {
+            advanceChar(lexer);
+            advanceToken(lexer, true);
+            if (lexer->cur_token == TOKEN_NEWLINE)
+            {
+                advanceToken(lexer, true);
+            }
+        }
+        else
+        {
+            advanceToken(lexer, true);
+        }
+    }
+    vStringDelete(name);
 }
 
 /* Import format:
@@ -1240,68 +1300,23 @@ static void parseImportToken(lexerState *lexer, vString *scope, int unknown_role
  */
 static void parseImport (lexerState *lexer, vString *scope, int token_type)
 {
-    vString *name = vStringNew();
-    int module_role;
-    int unknown_role;
     /* capture the imported name */
     advanceToken(lexer, true);
-    vStringCopy(name, lexer->token_str);
-    /* The part after ":" is not handled by this if statement, but the next
-     * one. */
-    if (token_type == TOKEN_IMPORT)
+    /* import Mod1: symbol1, symbol2 */
+    /* using Mod1: symbol1, symbol2 */
+    if (lexer->cur_c == ':')
     {
-        unknown_role = JULIA_UNKNOWN_IMPORTED;
-        /* The import expression may look like "import Mod" or "import
-         * Mod.symbol", we have to deal with these 2 possibilities. */
-        parseImportToken(lexer, scope, JULIA_UNKNOWN_IMPORTED, name);
+        parseColonImportExpr(lexer, token_type);
     }
-    else /* if (token_type) == TOKEN_USING */
+    /* All other situations, like import/using Mod1, Mod2.symbol1, Mod3... */
+    else
     {
-        unknown_role = JULIA_UNKNOWN_USED;
-        /* The using expression always look like "using Mod", so we can tag it
-         * easily. */
-        if (lexer->cur_c == ':')
-        {
-            module_role = JULIA_MODULE_NAMESPACE;
-        }
-        else
-        {
-            module_role = JULIA_MODULE_USED;
-        }
-        addReferenceTag(lexer->token_str, K_MODULE, module_role, lexer->line, lexer->pos, NULL);
-    }
-    if (lexer->cur_c == ':' || lexer->cur_c == ',')
-    {
-        char delimiter = lexer->cur_c;
-        advanceChar(lexer);
-        advanceToken(lexer, true);
-        if (lexer->cur_token == TOKEN_NEWLINE)
-        {
-            advanceToken(lexer, true);
-        }
         while (lexer->cur_token == TOKEN_IDENTIFIER || lexer->cur_token == TOKEN_MACROCALL)
         {
-            if (token_type == TOKEN_IMPORT && delimiter == ',')
-            {
-                vStringCopy(name, lexer->token_str);
-                /* import Mod1.symbol1, Mod2.symbol2, Mod3 */
-                parseImportToken(lexer, scope, unknown_role, name);
-            }
-            else if (token_type == TOKEN_USING && delimiter == ',')
-            {
-                /* using Mod1, Mod2 */
-                addReferenceTag(lexer->token_str, K_MODULE, JULIA_MODULE_USED, lexer->line, lexer->pos, NULL);
-            }
-            else /* if (delimiter == ':') */
-            {
-                /* import Mod1: symbol1, symbol2 */
-                /* using Mod1: symbol1, symbol2 */
-                addReferenceTag(lexer->token_str, K_UNKNOWN, unknown_role, lexer->line, lexer->pos, name);
-            }
-            skipWhitespace(lexer, false);
+            parseImportEntity(lexer, token_type);
             if (lexer->cur_c == ',')
             {
-                advanceNChar(lexer, 1);
+                advanceChar(lexer);
                 advanceToken(lexer, true);
                 if (lexer->cur_token == TOKEN_NEWLINE)
                 {
@@ -1314,8 +1329,6 @@ static void parseImport (lexerState *lexer, vString *scope, int token_type)
             }
         }
     }
-
-    vStringDelete(name);
 }
 
 /* Structs format:
