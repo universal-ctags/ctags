@@ -16,94 +16,15 @@ review changes not enumerated here, especially in language parsers.
 New and extended options
 ---------------------------------------------------------------------
 
-Wildcard in options
+``--exclude-exception``, an option complementing ``--exclude``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-For the purpose of gathering as much as information as possible from
-source code the "wildcard"(``*``) option value has been introduced.
+See :ref:`ctags(1) <ctags(1)>`.
 
-``--extras=*``
-	Enables all extra tags.
+``--maxdepth`` option
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-``--fields=*``
-	Enables all available fields.
-
-``--kinds-<LANG>=*``
-	Enables all available kinds for ``LANG``.
-
-``--kinds-all=*``
-	Enables all available kinds for all available language parsers.
-
-Long names in kinds, fields, and extra options
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-A letter is used for specifying a kind, a field, or an extra entry.
-In Universal Ctags a name can also be used.
-
-Surround the name with braces (`{` and `}`) in values assigned to the
-options, ``--kind-<LANG>=``, ``--fields=``, or ``--extras=``.
-
-.. code-block:: console
-
-	$ ./ctags --kinds-C=+L-d ...
-
-This command line uses the letters, `L` for enabling the label kind
-and `d` for disabling the macro kind of C. The command line can be
-rewritten with the associated names.
-
-.. code-block:: console
-
-	$ ./ctags --kinds-C='+{label}-{macro}' ...
-
-The quotes are needed because braces are interpreted as meta
-characters by the shell.
-
-The available names can be listed with ``--list-kinds-full``,
-``--list-fields``, or ``--list-extras``.
-
-Defining a CPreProcessor macro from command line
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Newly introduced ``-D`` option extends the function provided by
-``-I`` option.
-
-``-D`` emulates the behaviour of the corresponding gcc option:
-it defines a C preprocessor macro. See `The new C/C++ parser <cxx>`
-for more details.
-
-Notice messages and ``--quiet``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-There were 3 classes of message in Exuberant Ctags.
-In addition to them Universal Ctags introduced a new class of message, *notice*.
-
-*fatal*
-	A critical error has occurred and ctags aborts the execution.
-
-*warning*
-	An error has occurred but ctags continues the execution.
-
-*notice* (new)
-    It is less important than *warning* but more important for users than *verbose*.
-
-*verbose*
-	Mainly used for debugging purposes.
-
-Generally the user can ignore *notice* class messages and ``--quiet``
-can be used to disable them.
-
-*verbose* class messages are disabled by default, and ``--verbose`` or ``-V``
-can be used to enable them.
-
-Skipping utf-8 BOM
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-The three bytes sequence(``\xEF\xBB\xBF``) at the head of an input
-file is skipped when parsing.
-
-TODO:
-
-* Do the same in guessing and selecting parser stage.
-* Refect the BOM detection to encoding option
+See :ref:`ctags(1) <ctags(1)>`.
 
 ``--input-encoding=ENCODING`` and ``--output-encoding=ENCODING``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -163,64 +84,6 @@ like this::
 ``--list-features`` helps you to know whether your ctags executable
 links to libiconv or not. You will find ``iconv`` in the output if it
 links to.
-
-Extra tag entries (``--extras``)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-``--extra`` option in Exuberant Ctags is renamed to ``--extras`` (plural) in
-Universal Ctags for making consistent with ``--kinds-<LANG>`` and ``--fields``.
-
-These extra tag entries are newly introduced.
-
-``F``
-	Replacement for --file-scope.
-
-``p``
-	Include pseudo-tags.
-
-..
-	NOT REVIEWED YET
-
-Defining a parser specific extra
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-A new ``--_extradef-<LANG>=name,description`` option allows you to
-defining a parser specific extra which turning on and off can be
-referred from a regex based parser for ``<LANG>``.
-
-See :ref:`Conditional tagging with extras <extras>` for more details.
-
-Options for inspecting ctags internals
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Exuberant Ctags provides a way to inspect its internals via
-``--list-kinds``, ``--list-languages``, and ``--list-maps``.
-
-This idea has been expanded in Universal Ctags with
-``--list-kinds-full``, ``--list-map-extensions``,  ``--list-extras``,
-``--list-features``, ``--list-fields``, ``--list-map-patterns``, and
-``--list-pseudo-tags`` being added.
-
-The original three ``--list-`` options are not changed for
-compatibility reasons, however, the newly introduced options are
-recommended for all future use.
-
-By default, interactive use is assumed and ctags tries aligning the
-list output in columns for easier reading.
-
-When ``--machinable`` is given before a ``--list-`` option, ctags
-outputs the list in a format more suitable for processing by scripts.
-Tab characters are used as separators between columns. The alignment
-of columns is never considered when ``--machinable`` is given.
-
-Currently only ``--list-extras``, ``--list-fields`` and
-``--list-kinds-full`` support ``--machinable`` output.
-
-These new ``--list-`` options also print a column header, a line
-representing the name of each column. The header may help users and
-scripts to understand and recognize the columns. Ignoring the column
-header is easy because it starts with a `#` character.
-
-``--with-list-header=no`` suppresses output of the column header.
 
 ``--map-<LANG>`` option
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -284,22 +147,91 @@ Both `FOO` and `BAR` are registered as handlers for the spec `*.ABC`.
 spec-centric manner and ``--map-<LANG>`` provides a way to manipulate
 the langmap in a parser-centric manner.
 
-Kinds synchronization
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-See the description about ``--kinds-<LANG>`` and ``--list-kinds-full``
-option in :ref:`ctags(1) <ctags(1)>`.
-
 Guessing parser from file contents (``-G`` option)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 See :ref:`guessing`.
 
-``--put-field-prefix`` options
+Including line number to pattern field
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-See :ref:`ctags(1) <ctags(1)>`.
+Use ``--excmd=number``.  See :ref:`ctags(1) <ctags(1)>`.
 
-``--maxdepth`` option
+Long names in kinds, fields, and extra options
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+A letter is used for specifying a kind, a field, or an extra entry.
+In Universal Ctags a name can also be used.
+
+Surround the name with braces (`{` and `}`) in values assigned to the
+options, ``--kind-<LANG>=``, ``--fields=``, or ``--extras=``.
+
+.. code-block:: console
+
+	$ ./ctags --kinds-C=+L-d ...
+
+This command line uses the letters, `L` for enabling the label kind
+and `d` for disabling the macro kind of C. The command line can be
+rewritten with the associated names.
+
+.. code-block:: console
+
+	$ ./ctags --kinds-C='+{label}-{macro}' ...
+
+The quotes are needed because braces are interpreted as meta
+characters by the shell.
+
+The available names can be listed with ``--list-kinds-full``,
+``--list-fields``, or ``--list-extras``.
+
+Wildcard in options
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+For the purpose of gathering as much as information as possible from
+source code the "wildcard"(``*``) option value has been introduced.
+
+``--extras=*``
+	Enables all extra tags.
+
+``--fields=*``
+	Enables all available fields.
+
+``--kinds-<LANG>=*``
+	Enables all available kinds for ``LANG``.
+
+``--kinds-all=*``
+	Enables all available kinds for all available language parsers.
+
+Extra tag entries (``--extras``)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+``--extra`` option in Exuberant Ctags is renamed to ``--extras`` (plural) in
+Universal Ctags for making consistent with ``--kinds-<LANG>`` and ``--fields``.
+
+These extra tag entries are newly introduced.
+
+``F``
+	Replacement for --file-scope.
+
+``p``
+	Include pseudo-tags.
+
+..
+	NOT REVIEWED YET
+
+Kinds synchronization
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+See the description about ``--kinds-<LANG>`` and ``--list-kinds-full``
+option in :ref:`ctags(1) <ctags(1)>`.
+
+Enabling/disabling pseudo-tags (``--pseudo-tags`` option)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. IN MAN PAGE
+
+See :ref:`ctags-client-tools(7) <ctags-client-tools(7)>` about the
+option.
+
+``--put-field-prefix`` options
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 See :ref:`ctags(1) <ctags(1)>`.
@@ -309,23 +241,99 @@ See :ref:`ctags(1) <ctags(1)>`.
 
 ``--tag-relative`` option is extend. See :ref:`ctags(1) <ctags(1)>`.
 
-``--exclude-exception``, an option complementing ``--exclude``
+Defining a parser specific extra
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-See :ref:`ctags(1) <ctags(1)>`.
+A new ``--_extradef-<LANG>=name,description`` option allows you to
+defining a parser specific extra which turning on and off can be
+referred from a regex based parser for ``<LANG>``.
 
-Including line number to pattern field
+See :ref:`Conditional tagging with extras <extras>` for more details.
+
+Defining a CPreProcessor macro from command line
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Newly introduced ``-D`` option extends the function provided by
+``-I`` option.
+
+``-D`` emulates the behaviour of the corresponding gcc option:
+it defines a C preprocessor macro. See `The new C/C++ parser <cxx>`
+for more details.
+
+Options for inspecting ctags internals
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Use ``--excmd=number``.  See :ref:`ctags(1) <ctags(1)>`.
+Exuberant Ctags provides a way to inspect its internals via
+``--list-kinds``, ``--list-languages``, and ``--list-maps``.
 
-Enabling/disabling pseudo-tags (``--pseudo-tags`` option)
+This idea has been expanded in Universal Ctags with
+``--list-kinds-full``, ``--list-map-extensions``,  ``--list-extras``,
+``--list-features``, ``--list-fields``, ``--list-map-patterns``, and
+``--list-pseudo-tags`` being added.
+
+The original three ``--list-`` options are not changed for
+compatibility reasons, however, the newly introduced options are
+recommended for all future use.
+
+By default, interactive use is assumed and ctags tries aligning the
+list output in columns for easier reading.
+
+When ``--machinable`` is given before a ``--list-`` option, ctags
+outputs the list in a format more suitable for processing by scripts.
+Tab characters are used as separators between columns. The alignment
+of columns is never considered when ``--machinable`` is given.
+
+Currently only ``--list-extras``, ``--list-fields`` and
+``--list-kinds-full`` support ``--machinable`` output.
+
+These new ``--list-`` options also print a column header, a line
+representing the name of each column. The header may help users and
+scripts to understand and recognize the columns. Ignoring the column
+header is easy because it starts with a `#` character.
+
+``--with-list-header=no`` suppresses output of the column header.
+
+Notice messages and ``--quiet``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+There were 3 classes of message in Exuberant Ctags.
+In addition to them Universal Ctags introduced a new class of message, *notice*.
+
+*fatal*
+	A critical error has occurred and ctags aborts the execution.
+
+*warning*
+	An error has occurred but ctags continues the execution.
+
+*notice* (new)
+    It is less important than *warning* but more important for users than *verbose*.
+
+*verbose*
+	Mainly used for debugging purposes.
+
+Generally the user can ignore *notice* class messages and ``--quiet``
+can be used to disable them.
+
+*verbose* class messages are disabled by default, and ``--verbose`` or ``-V``
+can be used to enable them.
+
+Skipping utf-8 BOM
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. IN MAN PAGE
+The three bytes sequence(``\xEF\xBB\xBF``) at the head of an input
+file is skipped when parsing.
 
-See :ref:`ctags-client-tools(7) <ctags-client-tools(7)>` about the
-option.
+TODO:
+
+* Do the same in guessing and selecting parser stage.
+* Refect the BOM detection to encoding option
+
+Interactive mode
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+A new ``--_interactive`` option launches a JSON based command REPL which
+can be used to control ctags generation programmatically.
+
+See :ref:`interactive-mode` for more details.
 
 Incompatible changes in command line
 ---------------------------------------------------------------------
@@ -341,14 +349,6 @@ output. It is changed to ``-d``. This change is not critical because
 ``-D`` option was not described in ctags.1 man page.
 
 Instead ``-D`` is used for defining a macro in CPreProcessor parser.
-
-Interactive mode
----------------------------------------------------------------------
-
-A new ``--_interactive`` option launches a JSON based command REPL which
-can be used to control ctags generation programmatically.
-
-See :ref:`interactive-mode` for more details.
 
 ..
 	NOT REVIEWED YET
