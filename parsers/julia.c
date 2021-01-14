@@ -1218,7 +1218,7 @@ static void parseModule (lexerState *lexer, vString *scope, int parent_kind)
  * of "Module", and this function will take it to the end of the entity
  * (whitespaces also skipped).
  */
-static void parseImportEntity(lexerState *lexer, int token_type)
+static void parseImportEntity (lexerState *lexer, int token_type)
 {
     if (lexer->cur_c == '.')
     {
@@ -1256,7 +1256,7 @@ static void parseImportEntity(lexerState *lexer, int token_type)
 /* using Module: symbol1, symbol2 */
 /* The lexer should be at the end of "Module", and this function will take it
  * to the end of the token after this expression (whitespaces also skipped). */
-static void parseColonImportExpr(lexerState *lexer, int token_type)
+static void parseColonImportExpr (lexerState *lexer, int token_type)
 {
     int symbol_role;
     if (token_type == TOKEN_IMPORT)
