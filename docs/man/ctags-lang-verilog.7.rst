@@ -5,7 +5,7 @@ ctags-lang-verilog
 ======================================================================
 
 :Version: 5.9.0
-:Manual group: Universal-ctags
+:Manual group: Universal Ctags
 :Manual section: 7
 
 SYNOPSIS
@@ -25,7 +25,7 @@ SYNOPSIS
 
 DESCRIPTION
 -----------
-This man page describes about the Verilog/SystemVerilog parser for Universal-ctags.
+This man page describes about the Verilog/SystemVerilog parser for Universal Ctags.
 
 It assumes the input file is written in the correct grammer.  Otherwise output of
 ctags is undefined.

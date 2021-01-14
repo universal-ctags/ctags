@@ -8,14 +8,14 @@ Asm parser
 
 :Maintainer: Masatake YAMATO <yamato@redhat.com>
 
-The original (Exuberant-ctags) parser handles #define C preprocessor directive and C
-style comments by itself. In Universal-ctags Asm parser utilizes CPreProcessor meta
+The original (Exuberant Ctags) parser handles #define C preprocessor directive and C
+style comments by itself. In Universal Ctags Asm parser utilizes CPreProcessor meta
 parser for handling them. So a language object defined with #define is tagged as
 "defines" of CPreProcessor language, not Asm language.
 
 .. code-block:: console
 
-   $ cat input.S 
+   $ cat input.S
    #define S 1
 
    $ e-ctags --fields=+l  -o - input.S
@@ -23,4 +23,4 @@ parser for handling them. So a language object defined with #define is tagged as
 
    $ u-ctags --fields=+l  -o - input.S
    S	input.S	/^#define S /;"	d	language:CPreProcessor	file:
-   
+

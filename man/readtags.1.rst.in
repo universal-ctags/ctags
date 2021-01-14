@@ -7,7 +7,7 @@ readtags
 Find tag file entries matching specified names
 --------------------------------------------------------------
 :Version: @VERSION@
-:Manual group: Universal-ctags
+:Manual group: Universal Ctags
 :Manual section: 1
 
 SYNOPSIS
@@ -288,7 +288,7 @@ See tags(5) for the details of tags file format.
 See ctags-client-tools(7) for the tips writing a
 tool utilizing tags file.
 
-The official Universal-ctags web site at:
+The official Universal Ctags web site at:
 
 https://ctags.io/
 
@@ -298,12 +298,12 @@ https://github.com/universal-ctags/libreadtags
 
 CREDITS
 -------
-Universal-ctags project
+Universal Ctags project
 https://ctags.io/
 
 Darren Hiebert <dhiebert@users.sourceforge.net>
 http://DarrenHiebert.com/
 
-The readtags command and libreadtags maintained at Universal-ctags
+The readtags command and libreadtags maintained at Universal Ctags
 are derived from readtags.c and readtags.h developd at
 http://ctags.sourceforge.net.

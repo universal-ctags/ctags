@@ -4,7 +4,7 @@
 Interactive mode
 ======================================================================
 
-Universal ctags can be run with ``--_interactive``, which enters a REPL that
+Universal Ctags can be run with ``--_interactive``, which enters a REPL that
 can be used programmatically to control ctags generation. In this mode, json
 commands are received over stdin, and corresponding responses are emitted over
 stdout.
@@ -17,7 +17,7 @@ at build-time. If it's supported it will be listed in the output of ``--list-fea
 	$ ./ctags --list-features | grep json
 	json
 
-Communication with Universal ctags over stdio uses the `json lines`_ format, where each
+Communication with Universal Ctags over stdio uses the `json lines`_ format, where each
 json object appears on a single line and is terminated with a newline.
 
 When ``ctags --_interactive`` is invoked, it will emit a single json object to stdout announcing
@@ -75,14 +75,16 @@ sandbox submode
 
 ``sandbox`` submode can be used with ``--_interactive=sandbox``.  This
 submode will activate a sandbox, to this limits the damage that the
-can be achieved when exploiting a buffer overflow in Universal-ctags.
+can be achieved when exploiting a buffer overflow in Universal Ctags.
 
 In the sandbox submode ctags can generate tags only for inline
 requests because ctags has to use open system call to handle file
 requests. The open system call is not allowed in the sandbox.
 
-This feature uses seccomp-bpf, and is only supported on Linux.
-To use the submode libseccomp is needed at build-time. If ctags was
+This feature uses `Seccomp BPF (SECure COMPuting with filters)
+<https://www.kernel.org/doc/html/latest/userspace-api/seccomp_filter.html>`_,
+and is only supported on Linux. To use the sandbox submode `libseccomp
+<https://github.com/seccomp/libseccomp>`_ is needed at build-time. If ctags was
 built with seccomp support, ``sandbox`` is listed in the output of
 ``--list-features`` option.
 

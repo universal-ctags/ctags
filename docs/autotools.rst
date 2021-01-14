@@ -1,8 +1,8 @@
 Building with configure (\*nix including GNU/Linux)
 ---------------------------------------------------------------------
 
-If you are going to build Universal-ctags on a popular GNU/Linux
-distribution, you can install the tools and libraries that Universal-ctags
+If you are going to build Universal Ctags on a popular GNU/Linux
+distribution, you can install the tools and libraries that Universal Ctags
 requires (or may use) as packages. See `GNU/Linux distributions`_ about
 the packages.
 
@@ -54,7 +54,7 @@ Changing the executable's name
 
 On some systems, like certain BSDs, there is already a 'ctags' program in the base
 system, so it is somewhat inconvenient to have the same name for
-Universal-ctags. During the ``configure`` stage you can now change
+Universal Ctags. During the ``configure`` stage you can now change
 the name of the created executable.
 
 To add a prefix 'ex' which will result in 'ctags' being renamed to 'exctags':

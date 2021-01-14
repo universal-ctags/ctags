@@ -8,20 +8,40 @@
 [![CircleCI Build Status](https://circleci.com/gh/universal-ctags/ctags.svg?style=shield&circle-token=2e582261da84ebc6d21725b05381f410bc5de29d)](https://circleci.com/gh/universal-ctags)
 ![GitHub Actions/VALGRIND](https://github.com/universal-ctags/ctags/workflows/run%20units%20target%20under%20VALGRIND/badge.svg)
 
-Universal Ctags generates an index (or tag) file of language objects found in source files for many popular programming languages. This index makes it easy for text editors and other tools to locate the indexed items. Universal Ctags improves on traditional ctags because of its multilanguage support, its ability for the user to define new languages searched by regular expressions, and its ability to generate emacs-style TAGS files.
+[Universal Ctags](https://ctags.io/) (abbreviated as u-ctags) is a *maintained*
+implementation of `ctags`.
+`ctags` generates an index (or tag) file of language objects found in source
+files for programming languages.
+This index makes it easy for text editors and other tools to locate the indexed
+items.
 
-universal-ctags has the objective of continuing the development from
-what existed in the Sourceforge area. Github exuberant-ctags
-repository was started by Reza Jelveh and was later moved to the
-universal-ctags organization.
+[Exuberant Ctags](http://ctags.sourceforge.net/) (e-ctags) maintained by Darren
+Hiebert, the ancestor of Universal Ctags, improved traditional `ctags` with
+multi-language support, the ability for the user to define new languages
+searched by regular expressions (called optlib in Universal Ctags), and the
+ability to generate emacs-style TAGS files.
+But the activity of the project unfortunately stalled.
 
-The goal of the project is preparing and maintaining common/unified working
-space where people interested in making ctags better can work
-together.
+Universal Ctags has the objective of continuing the development of Exuberant
+Ctags.
+Reza Jelveh <reza.jelveh@gmail.com> initially created a personal fork of
+Exuberant Ctags on GitHub.
+As interest and participation grew, it was decided to move development to a
+dedicated project as Universal Ctags.
+The goal of this project is to maintain a common/unified working space where
+people interested in making ctags better can work together.
+
+Some of major features of Universal Ctags are;
+
+* more numbers of improved language support
+    * new extended C/C++ language parser, etc.
+* fully extended optlib (a feature to define a new language parser from a
+  command line)
+* interactive mode (experimental)
 
 ## The latest build and package ##
 
-If you want to try the latest universal-ctags without building it yourself...
+If you want to try the latest Universal Ctags without building it yourself...
 
 ### Windows
 Daily builds are available at the [ctags-win32](https://github.com/universal-ctags/ctags-win32) project.
@@ -33,7 +53,7 @@ See [Homebrew Tap for Universal Ctags](https://github.com/universal-ctags/homebr
 ### Snap
 Go to [ctags-snap](https://github.com/universal-ctags/ctags-snap) and
 clone the `ctags-snap` repo. Then, follow instructions to build the
-snap package of ctags. Snapcraft will automatically fetch the source
+snap package of Universal Ctags. Snapcraft will automatically fetch the source
 code from GitHub.
 
 ## How to build and install ##
@@ -61,26 +81,30 @@ To build on OSX, see
 for more information.
 
 ## Manual ##
-Go to https://docs.ctags.io for the preformatted documentations
-of the latest development version.
+The primary documents of Universal Ctags are man pages.
+Users should first consult the
+[ctags(1)](https://docs.ctags.io/en/latest/man/ctags.1.html), and [other man
+pages](https://docs.ctags.io/en/latest/man-pages.html) if necessary.
+
+[Universal Ctags Hacking Guide](https://docs.ctags.io), which also includes the
+man pages, is primarily for developers and provides additional information to
+the man pages, including experimental features.
+
 See also `*/README.md` on this repository.
 
 ## Differences from exuberant-ctags ##
 
-You may be interested in how universal-ctags is different from
-exuberant-ctags. See [Introduced changes](https://docs.ctags.io/en/latest/news.html)
-on https://docs.ctags.io/ for details.
+You may be interested in how Universal Ctags is different from Exuberant Ctags.
+See
+[ctags-incompatibilities(7)](https://docs.ctags.io/en/latest/man/ctags-incompatibilities.7.html)
+and [Introduced changes](https://docs.ctags.io/en/latest/news.html) for details.
 
 The most significant incompatible changes:
 
-* Universal-ctags doesn't load
-`~/.ctags` and `./.ctags` at starting up time. Instead, it loads
-`~/.ctags.d/*.ctags` and `./.ctags.d/*.ctags`. See the above web
-site and man pages
-(man/ctags.1.rst.in and man/ctags-incompatibilities.7.in in the
-source tree).
+* Universal Ctags doesn't load `~/.ctags` and `./.ctags` at starting up time.
+  Instead, it loads `~/.ctags.d/*.ctags` and `./.ctags.d/*.ctags`.
 
-* Universal-ctags is more strict about characters that can be
+* Universal Ctags is more strict about characters that can be
   used in kind letters and kind names than Exuberant-ctags.
 
   - The letter must be an alphabetical character (`[a-zA-EG-Z]`).
@@ -89,10 +113,10 @@ source tree).
   - The first character of the name must be alphabetic, and
     the rest characters must be alphanumeric (`[a-zA-Z][a-zA-Z0-9]*`).
 
-  See the web site and man pages. The detailed background is explained
-  in [#1737](https://github.com/universal-ctags/ctags/pull/1737).
+  The detailed background is explained in
+  [#1737](https://github.com/universal-ctags/ctags/pull/1737).
 
-  If you want to reuse your .ctags written for Exuberant-ctags,
+  If you want to reuse your `.ctags` written for Exuberant-ctags,
   you must review kind letters and names defined with `--regex-<LANG>=...`
   options. When updating the definitions, using `--kinddef-<LANG>=...` option
   is appreciated.

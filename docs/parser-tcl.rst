@@ -8,7 +8,7 @@ The new Tcl parser
 
 Tcl parser is rewritten as a token oriented parser to support
 namespace.  It was line oriented parser. Some incompatibility between
-Exuberant-ctags is introduced in the rewriting.
+Exuberant Ctags is introduced in the rewriting.
 
 The line oriented parser captures `class`, `public|protected|private
 method`.  They are definitions in ITcl and TclOO. The new token oriented Tcl

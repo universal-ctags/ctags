@@ -5,7 +5,7 @@ ctags-lang-inko
 ======================================================================
 
 :Version: 5.9.0
-:Manual group: Universal-ctags
+:Manual group: Universal Ctags
 :Manual section: 7
 
 SYNOPSIS
@@ -16,7 +16,7 @@ SYNOPSIS
 
 DESCRIPTION
 -----------
-This man page describes the Inko parser for Universal-ctags.
+This man page describes the Inko parser for Universal Ctags.
 
 The input file is expected to be valid Inko source code, otherwise the output of
 ctags is undefined.

@@ -5,7 +5,7 @@ Building on Mac OS
 
 ----
 
-This part of the documentation is written by Cameron Eagans, a co-maintainer of Universal-ctags and the maintainer of
+This part of the documentation is written by Cameron Eagans, a co-maintainer of Universal Ctags and the maintainer of
 the OSX packaging of this project.
 
 
@@ -31,7 +31,7 @@ You can simply run the build instructions in README.md.
 Building with Homebrew
 .............................................................................
 
-Homebrew (https://brew.sh/) is the preferred method for installing Universal-ctags for end users. Currently, the process
+Homebrew (https://brew.sh/) is the preferred method for installing Universal Ctags for end users. Currently, the process
 for installing with Homebrew looks like this::
 
         brew tap universal-ctags/universal-ctags

@@ -7,7 +7,7 @@ ctags-client-tools
 Hints for developing a tool using @CTAGS_NAME_EXECUTABLE@ command and tags output
 --------------------------------------------------------------------------------
 :Version: @VERSION@
-:Manual group: Universal-ctags
+:Manual group: Universal Ctags
 :Manual section: 7
 
 SYNOPSIS
@@ -47,8 +47,8 @@ The value, "2", associated with the pseudo tag "TAG_PROGRAM_NAME", is
 used in the field for input file. The description, "Derived from
 Exuberant Ctags", is used in the field for pattern.
 
-Universal-ctags extends the naming scheme of the classical pseudo-tags
-available in Exuberant-ctags for emitting language specific
+Universal Ctags extends the naming scheme of the classical pseudo-tags
+available in Exuberant Ctags for emitting language specific
 information as pseudo tags::
 
 	!_{pseudo-tag-name}!{language-name}	{associated-value}	/{description}/
@@ -82,7 +82,7 @@ Options for Pseudo-tags
 
 	Running @CTAGS_NAME_EXECUTABLE@ with ``--list-pseudo-tags`` option
 	lists available pseudo-tags. Some of pseudo-tags newly introduced
-	in Universal-ctags project are disabled by default. Use
+	in Universal Ctags project are disabled by default. Use
 	``--pseudo-tags=...`` to enable them.
 
 ``--pseudo-tags=[+|-]names|*``
@@ -119,7 +119,7 @@ Running ctags with ``--list-pseudo-tags`` option lists available types
 of pseudo-tags with short descriptions. This subsection shows hints
 for using notable ones.
 
-``TAG_EXTRA_DESCRIPTION``  (new in Universal-ctags)
+``TAG_EXTRA_DESCRIPTION``  (new in Universal Ctags)
 	Indicates the names and descriptions of enabled extras::
 
 	  !_TAG_EXTRA_DESCRIPTION	{extra-name}	/description/
@@ -142,7 +142,7 @@ for using notable ones.
 	A client tool can know "{anonymous}", "{fileScope}", "{pseudo}",
 	and "{subparser}" extras are enabled from the output.
 
-``TAG_FIELD_DESCRIPTION``  (new in Universal-ctags)
+``TAG_FIELD_DESCRIPTION``  (new in Universal Ctags)
 	Indicates the names and descriptions of enabled fields::
 
 	  !_TAG_FIELD_DESCRIPTION	{field-name}	/description/
@@ -169,7 +169,7 @@ for using notable ones.
 	The fields are common in languages. In addition to the common fields,
 	the tool can known "{macrodef}" field of C language is also enabled.
 
-``TAG_FILE_ENCODING``  (new in Universal-ctags)
+``TAG_FILE_ENCODING``  (new in Universal Ctags)
 	TBW
 
 ``TAG_FILE_FORMAT``
@@ -178,7 +178,7 @@ for using notable ones.
 ``TAG_FILE_SORTED``
 	See also tags(5).
 
-``TAG_KIND_DESCRIPTION`` (new in Universal-ctags)
+``TAG_KIND_DESCRIPTION`` (new in Universal Ctags)
 	Indicates the names and descriptions of enabled kinds::
 
 	  !_TAG_KIND_DESCRIPTION!{language-name}	{kind-letter},{kind-name}	/description/
@@ -202,22 +202,22 @@ for using notable ones.
 	A client tool can know "{function}", "{member}", and "{variable}"
 	kinds of C language are enabled from the output.
 
-``TAG_KIND_SEPARATOR`` (new in Universal-ctags)
+``TAG_KIND_SEPARATOR`` (new in Universal Ctags)
 	TBW
 
-``TAG_OUTPUT_EXCMD`` (new in Universal-ctags)
+``TAG_OUTPUT_EXCMD`` (new in Universal Ctags)
 	Indicates the specified type of EX command with ``--excmd`` option.
 
-``TAG_OUTPUT_FILESEP`` (new in Universal-ctags)
+``TAG_OUTPUT_FILESEP`` (new in Universal Ctags)
 	TBW
 
-``TAG_OUTPUT_MODE`` (new in Universal-ctags)
+``TAG_OUTPUT_MODE`` (new in Universal Ctags)
 	TBW
 
-``TAG_PATTERN_LENGTH_LIMIT`` (new in Universal-ctags)
+``TAG_PATTERN_LENGTH_LIMIT`` (new in Universal Ctags)
 	TBW
 
-``TAG_PROC_CWD`` (new in Universal-ctags)
+``TAG_PROC_CWD`` (new in Universal Ctags)
 	Indicates the working directory of @CTAGS_NAME_EXECUTABLE@ during processing.
 
 	This pseudo-tag helps a client tool solve the absolute paths for
@@ -241,7 +241,7 @@ for using notable ones.
 ``TAG_PROGRAM_NAME``
 	TBW
 
-``TAG_ROLE_DESCRIPTION`` (new in Universal-ctags)
+``TAG_ROLE_DESCRIPTION`` (new in Universal Ctags)
 	Indicates the names and descriptions of enabled roles::
 
 	  !_TAG_ROLE_DESCRIPTION!{language-name}!{kind-name}	{role-name}	/description/
@@ -424,7 +424,7 @@ using this regexp.
 Remark: About a Previous Format of the Pattern Field
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-In some earlier versions of Universal-ctags, the line number in the pattern
+In some earlier versions of Universal Ctags, the line number in the pattern
 field is the actual line number minus one, for forward search patterns; or plus
 one, for backward search patterns. The idea is to resemble an EX command: you
 go to the line, then search forward/backward for the pattern, and you can
@@ -437,7 +437,7 @@ according to this scheme, the pattern field should be::
 Then let's assume that some code above are removed, and the tag is now at
 line 45. Now you can't find it if you search forward from line 49.
 
-Due to this reason, Universal-ctags turns to use the actual line number. A
+Due to this reason, Universal Ctags turns to use the actual line number. A
 client tool could distinguish them by the ``TAG_OUTPUT_EXCMD`` pseudo tag, it's
 "combine" for the old scheme, and "combineV2" for the present scheme. But
 probably there's no need to treat them differently, since "search for the

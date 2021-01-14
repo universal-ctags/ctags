@@ -3,7 +3,7 @@
 Running multiple parsers on an input file
 ---------------------------------------------------------------------
 
-Universal-ctags provides parser developers ways(guest/host and
+Universal Ctags provides parser developers ways(guest/host and
 sub/base) to run multiple parsers for an input file.
 
 This section shows concepts behind the running multiple parsers,
@@ -36,7 +36,7 @@ Examples of guest/host combinations
 
 For an html file, you may want to run HTML parser, of course. The
 html file may have CSS areas and JavaScript areas. In other hand
-Universal-ctags has both CSS and JavaScript parsers. Don't you
+Universal Ctags has both CSS and JavaScript parsers. Don't you
 think it is useful if you can apply these parsers to the areas?
 
 In this case, HTML has responsible to detect the CSS and
@@ -53,7 +53,7 @@ See :ref:`The new HTML parser <html>` and parsers/html.c.
 C/Yacc parser combination
 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 
-A yacc file has some areas written in C. Universal-ctags has both YACC
+A yacc file has some areas written in C. Universal Ctags has both YACC
 and C parsers. You may want to run C parser for the areas from YACC
 parser.
 
@@ -68,7 +68,7 @@ Pod (Plain Old Documentation) is a language for documentation.  The language
 can be used not only in a stand alone file but also it can be
 used inside a Perl script.
 
-Universal-ctags has both parsers for Perl and Pod.
+Universal Ctags has both parsers for Perl and Pod.
 The Perl parser recognizes the area where Pod document is
 embedded in a Perl script and schedules applying pod parser
 as a guest parser on the area.
@@ -82,13 +82,12 @@ A host parser using the interface has responsibility to detect areas
 from input stream and record them with name of guest parsers that will
 be applied to the areas.
 
-.. _base-sub-parsers:
-
 Running guest parsers from an optlib based host parser
 ......................................................................
 
 See :ref:`Running a guest parser with guest regex flag <guest-regex-flag>`.
 
+.. _base-sub-parsers:
 
 Tagging definitions of higher(upper) level language (sub/base)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -149,7 +148,7 @@ In scheme parser level, the two expressions define nothing; the two
 expressions are just macro(`define-agent`) expansions.
 
 However, in the application level, they define agents as the
-macro name shown. In this level Universal-ctags should capture
+macro name shown. In this level Universal Ctags should capture
 `Bond` and `Bourne`. The question is which parser should
 capture them?  scheme parser should not; define-agent is not part of
 scheme language. Newly defined SPY-WARS parser is the answer.
@@ -210,7 +209,7 @@ Top down parser choice and bottom up parser choice
 There are two ways to run a subparser: top down or bottom up parser
 choices.
 
-Universal-ctags can chose a subparser :ref:`automatically <guessing>`.
+Universal Ctags can chose a subparser :ref:`automatically <guessing>`.
 Matching file name patterns and extensions are the typical ways for
 choosing. A user can choose a subparser with `--language-force=` option.
 Choosing a parser in these deterministic way is called *top down*.
@@ -218,7 +217,7 @@ When a parser is chosen as a subparser in the top down way, the
 subparser must call its base parser. The base parser may call methods
 defined in the sub parser.
 
-Universal-ctags uses *bottom up* choice when the top down way
+Universal Ctags uses *bottom up* choice when the top down way
 doesn't work; a given file name doesn't match any patterns and
 extensions of subparsers and the user doesn't specify
 `--language-force=` explicitly. In choosing a subparser bottom up way
@@ -231,12 +230,12 @@ higher level language, a subparser for the higher level language is
 chosen.  Choosing a parser in this non-deterministic way(dynamic way)
 is called *bottom up*.
 
-Here is an example. Universal-ctags has both m4 parser and Autoconf
+Here is an example. Universal Ctags has both m4 parser and Autoconf
 parser.  The m4 parser is a base parser. The Autoconf parser is a
 subparser based on the m4 parser. If *configure.ac* is given as an
 input file, Autoconf parser is chosen automatically because the
 Autoconf parser has *configure.ac* in its patterns list. Based on the
-pattern matching, Universal-ctags chooses the Autoconf parser
+pattern matching, Universal Ctags chooses the Autoconf parser
 automatically(top down choice).
 
 If *input.m4* is given as an input file, the Autoconf parser is
@@ -356,7 +355,7 @@ Autoconf parser can be chosen in bottom up way.
 
 `inputStart` is called before the base parser starting parsing a new input file.
 `inputEnd` is called after the base parser finishing parsing the input file.
-Universal-ctags main part calls these methods. Therefore, a base parser doesn't
+Universal Ctags main part calls these methods. Therefore, a base parser doesn't
 have to call them.
 
 `exclusiveSubparserChosenNotify` is called when a parser is chosen
@@ -607,7 +606,7 @@ named "M4".
 
 `dependencies` function static variable must be assigned to
 `dependencies` fields of a variable of `parserDefinition`.
-The main part of Universal-ctags refers the field when
+The main part of Universal Ctags refers the field when
 initializing parsers.
 
 `[0]` emphasizes this is "the 0th element". The subparser may refer
@@ -761,7 +760,7 @@ disabled.
 Autoconf/M4 parser combination
 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 
-Universal-ctags uses m4 parser as a base parser and Autoconf parse as
+Universal Ctags uses m4 parser as a base parser and Autoconf parse as
 a sub parser for `configure.ac` input file.
 
 .. code-block:: Autoconf

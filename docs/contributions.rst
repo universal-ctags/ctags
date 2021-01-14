@@ -61,7 +61,7 @@ these purposes.
 What should be tagged?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-There are two classes of tags. The primary class is a definition tag.
+There are two classes of tags. The primary class is a *definition tag*.
 If a name is defined in a file, the name and the line and the file
 where the name is defined should be tagged (recorded). However, in
 some languages answering, "What is a definition?" is not so obvious.
@@ -69,8 +69,8 @@ You may have to decide what is tagged in your parser thoughtfully.
 The purposes listed at the top of this subsection should help you
 decide.
 
-The secondary class is a reference tag. This is newly introduced in
-Universal-ctags and is not available in Exuberant-ctags. If a name is
+The secondary class is a *reference tag*. This is newly introduced in
+Universal Ctags and is not available in Exuberant Ctags. If a name is
 used (or referenced) in a file, it can be tagged as a reference tag.
 
 Don't be confused by the two tag classes.
@@ -85,6 +85,9 @@ tags file compatibility.
 If you are not interested in designing kinds because you are an
 emacs user and use just TAGS output, there are two choices:
 TBW.
+
+See :ref:`tag_entries` in :ref:`ctags(1) <ctags(1)>` for more details of kinds
+and roles.
 
 Scope information and full qualified tags
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -110,7 +113,6 @@ commit IDs should be logged, too.
 
 Include a copyright notice when adding a new
 ``{parsers,main}/*.[ch]`` file.
-
 A new file also requires a license notice at the head of the file.
 
 We expect your change (or new code) to be provided under the terms of
@@ -217,9 +219,17 @@ Above code snippet applies the `.editorconfig` configuration AFTER
 installing the "linux" style to the current buffer.
 
 I like GNU style, but for keeping consistency in existing code of
-Exuberant-ctags, the origin of Universal-ctags, I introduced the style
+Exuberant Ctags, the origin of Universal Ctags, I introduced the style
 and configuration to my .emacs.  Please, do the same.
 
+Compatibility
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+We are trying to maintain compatibility with Exuberant-ctags in the
+following two areas.
+
+* Command line option
+* Tag file compatibility
 
 Command line options
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -239,34 +249,13 @@ underscore at the start of a long option name like: `--_echo`.
 
 Write a test case for Tmain or Units.
 
-Don't remove an option, especially if it exists in Exuberant-ctags.
-We want to maintain compatibility as much as possible.
-
-Compatibility
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. TODO: to be removed?
-
-We are trying to maintain compatibility with Exuberant-ctags in the
-following two areas.
-
-Tag file compatibility with Exuberant-ctags
-.........................................................................
-We will not accept a patch that breaks the tags file format described
-in :ref:`tags(5) <tags(5)>` man page.
-
-TBW.
-
-Command line option with Exuberant-ctags
-.........................................................................
-
-TBW.
+Don't remove an option, especially if it exists in Exuberant Ctags.
 
 Writing parser in regex
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 You can write a parser with regex patterns.
 
-`optlib2c`, a part of the Universal-ctags build system can translate
+`optlib2c`, a part of the Universal Ctags build system can translate
 a parser written in regex patterns into C source code.
 
 The `man` parser is one example described in regex patterns.
@@ -296,8 +285,8 @@ Add test cases, and run both existing cases and your new cases.
 
 If you add a new parser or modify an existing parser, add new test
 cases to "Units". If you modify the core, add new test cases to
-"Tmain". The way to write and run test cases is described in the
-"Testing ctags" section of this guide.
+"Tmain". The way to write and run test cases is described in
+:ref:`testing_ctags` and :ref:`testing_parser` section of this guide.
 
 With the exception of the tmain test harness, you can specify VG=1
 for running test cases under the Valgrind memory debugger.
@@ -336,14 +325,14 @@ test case directory should be prepared like `Units/parser-c.r`.
 Writing Documents
 ---------------------------------------------------------------------
 
-* Update documents. man/\*.rst files are the source files of our man pages.
-  The man pages are for users. docs/\*.rst files explain experimental
+* Update documents. ``man/*.rst`` files are the source files of our man pages.
+  The man pages are for users. ``docs/*.rst`` files explain experimental
   new features. The files are for developers. The parts of contents
-  of docs/\*.rst should be moved to man/\*.rst in the future.
+  of ``docs/*.rst`` should be moved to ``man/*.rst`` in the future.
 
-* Update docs/news.rst especially if you add a new parser.
+* Update ``docs/news.rst`` especially if you add a new parser.
 
-* Write docs/parser-<NAME-OF-YOUR-PARSER>.rst as you want.
+* Write ``docs/parser-<NAME-OF-YOUR-PARSER>.rst`` as you want.
   A FAQ and the design or your parser are common topics.
   Consider the maintenance of your parser after you left the
   project for some reason.
@@ -357,8 +346,9 @@ Committing and submitting a pull request
 
 * Wait for 3 days at least for non-small change to your parser.
 
-* Wait for 7 days at least and get an LTGM comment from a member of the
-  team if your commit changes the other parts than your parser.
+* Wait for 7 days at least and get an LGTM (Looks Good To Me) comment from a
+  member of the team if your commit changes the other parts than your parser and
+  the changes are not obvious.
 
 * Add a test case to your pull request. To make git-bisect happy,
   don't add a test case for a feature or a bugfix before adding the
@@ -379,27 +369,24 @@ Title of commit log and pull request
   boring. You may want to make "mix fixes" pull request especially if
   your code is young.
 
-* Use [WIP] prefix as the title of your pull request, if you don't
+* Use [WIP] (Work In Progress) prefix as the title of your pull request, if you don't
   want people to take time for reviewing your code. Removing [WIP]
   implies "ready to be reviewed."
 
-* Use [FYI] prefix as the title to show your idea or sketch represented
+* Use [FYI] (For Your Information) prefix as the title to show your idea or sketch represented
   in C language.
 
 * Use the name of your parser as the prefix of a commit log.
 
   .. code-block:: git
 
-
         C++: record template type parameters to detect the end of template prefix
-
 
         If we know Foo is a name of type, it becomes easier to detect whether
         ">>" in "Foo>>" is a shift operator or the end marker of the template
         prefix.
 
-
-   In the above example, "C++: " is the prefix.
+  In the above example, "C++: " is the prefix.
 
 * Use the name of your parser as the prefix of a pull request if your
   change is about a parser.
@@ -407,26 +394,21 @@ Title of commit log and pull request
 * Use following prefixes for the changes other than parsers.
 
   main:
-
-    Changes for files under main/ directory
+    Changes for files under ``main/`` directory
 
   Units:
-
-    Changes for the test cases under Units directory
+    Changes for the test cases under ``Units/`` directory
 
   Tmain
-
-    Changes for the test cases under Tmain directory
+    Changes for the test cases under ``Tmain/`` directory
 
   docs(web)
-
-    Changes for the docs/\*.rst.
+    Changes for the ``docs/*.rst``
 
   docs(man)
+    Changes for the ``man/*.rst``
 
-    Changes for the man/\*.rst.
-
-  See also the output of git-log.
+  See also the output of ``git log`` command.
 
 * Combine prefixes with a comma if a change modifies multiple parts of our source tree
 
@@ -439,37 +421,34 @@ Title of commit log and pull request
         Author: Masatake YAMATO <yamato@redhat.com>
         Date:   Tue Mar 19 12:19:37 2019 +0900
 
-        main,Flex,JavaScriupt,SQL,refactor: introduce a helper function to skip two character sequence
+        main,Flex,JavaScript,SQL,refactor: introduce a helper function to skip two character sequence
 
         ...
 
 * Use following prefixes if the change as no run-time impact.
 
   cosmetic
-
     - Remove whitespaces at the end of lines
     - Adjust indentation
     - Remove an empty line
     - ...
 
   style
-
     - Rename symbol names
     - ...
 
   refactor
-
-    Code transformation that doesn't intent changing run-time behavior
+    - Code transformation that doesn't intent changing run-time behavior
 
   These prefixes reduce the load of reviewers.
 
 * Use [INCOMPATIBLE] as a prefix for both pull request and commit log
-  if the change breaks the compatibility with Exuberant-ctags. Write
-  an explanation in man/ctags-incompatibilities.7.rst.in about the
+  if the change breaks the compatibility with Exuberant Ctags. Write
+  an explanation in ``man/ctags-incompatibilities.7.rst.in`` about the
   detail of breakage.
 
 * Use [SELF-INCOMPATIBLE] as a prefix for both pull request and commit
-  log if the change breaks the compatibility with Universal-ctags
+  log if the change breaks the compatibility with Universal Ctags
   itself.
 
 Commit log
@@ -483,10 +462,10 @@ on the tags file.
 If you fix a bug reported somewhere on the web, its URL should be
 logged, too.
 
-If the bug is reported in the Exuberant-ctags tracker on the
-SourceForge web site, log it as sf-bugs:N, sf-patches:N,
-sf-support-requests:N, or sf-feature-requests:N.
-docs/tracking.rst also should be updated.
+If the bug is reported in the Exuberant Ctags tracker on the
+SourceForge web site, log it as ``sf-bugs:N``, ``sf-patches:N``,
+``sf-support-requests:N``, or ``sf-feature-requests:N``.
+``docs/tracking.rst`` also should be updated.
 
 Squashing commits
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -497,12 +476,13 @@ would like you to squash your patches into logical units of work
 before we merge them to keep the repository history as simple as
 possible.
 
-* Use "git rebase -i" and "git push --force" to refine your change in
+* Use ``git rebase -i`` and ``git push --force`` to refine your change in
   the meaning of "semantically well separated."  "semantically well
   separated" is important than "recording the history of your try and
   error."
 
-Quoted from @steveno in #393:
+Quoted from @steveno in `#393
+<https://github.com/universal-ctags/ctags/issues/393>`_ :
 
     You can check out this page for a good example of how to squash
     commits

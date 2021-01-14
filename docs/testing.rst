@@ -1,3 +1,5 @@
+.. _testing_parser:
+
 =============================================================================
 Testing a parser
 =============================================================================
@@ -11,7 +13,7 @@ It is difficult for us to know syntax of all languages supported in ctags. Test
 facility and test cases are quite important for maintaining ctags with limited
 resources.
 
-..	units.rst
+..	_units:
 
 *Units* test facility
 ---------------------------------------------------------------------
@@ -22,7 +24,7 @@ resources.
 
 **Test facility**
 
-Exuberant ctags has a test facility. The test case were *Test*
+Exuberant Ctags has a test facility. The test case were *Test*
 directory. So Here I call it *Test*.
 
 Main aim of the facility is detecting regression. All files under Test
@@ -39,7 +41,7 @@ this point a difference is found and *Test* reports failure.
 
 **Units facility**
 
-The units test facility(*Units*) I describe here takes a different
+The units test facility (*Units*) I describe here takes a different
 approach. An input file and an expected output file are given by a
 contributor of a language parser. The units test facility runs ctags
 command with the input file and compares its output and the expected
@@ -91,14 +93,14 @@ have its own directory under Units directory.
 	If you want to test json output (specified with ``--output-format=json`` ),
 	Use **.tags-json** as suffix instead of **.tags**.
 	In such a case you don't have to write ``--output-format=json`` to ``args.ctags``,
-	and ``json`` to ``features``.
+	and add ``json`` to ``features`` as described below.
 	The test facility sets the option and the feature automatically.
 
 *Units/TEST/args.ctags* **optional**
 
 	``-o -`` is used as default optional argument when running a
 	unit test ctags. If you want to add more options, enumerate
-	options in **args.ctags** file. This file is an optional.
+	options in **args.ctags** file.
 
 	Remember you have to put one option in one line; don't
 	put multiple options to one line. Multiple options in
@@ -158,8 +160,8 @@ not.
 Example of files
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-See *Units/parser-c.r/c-sample/input.c* and
-*Units/parser-c.r/c-sample/expected.tags*.
+See `Units/parser-c.r/c-sample.d
+<https://github.com/universal-ctags/ctags/tree/master/Units/parser-c.r/c-sample.d>`_.
 
 How to run unit tests
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -197,8 +199,8 @@ defined.
 
 **failed (KNOWN bug)**
 
-	mean the result if failed but the failure is expected.
-	See "Gathering test cases for known bugs".
+	means the result was failed but the failure is expected.
+	See ":ref:`gathering_test`".
 
 Example of running
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -226,11 +228,14 @@ You can run only the tests for specific languages by setting
 
 Multiple languages can be selected using a comma separated list.
 
+.. _gathering_test:
+
 Gathering test cases for known bugs
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-When we met a bug, making a small test case that triggers the bug is
-important development activity. Even the bug cannot be fixed in soon,
+When we meet a bug, it is an important development activity to make a small test
+case that triggers the bug.
+Even the bug cannot be fixed in soon,
 the test case is an important result of work. Such result should
 be merged to the source tree. However, we don't love **FAILED**
 message, too. What we should do?
@@ -240,6 +245,8 @@ the directory of test case instead of *.d*.
 
 *Unix/css-singlequote-in-comment-issue2.b* is an example
 of *.b* suffix usage.
+
+.. TODO: Now we only have Units/parser-css.r/css-singlequote-in-comment-issue2.d/
 
 When you run test.units target, you will see::
 
@@ -455,7 +462,7 @@ slap target is derived from chop target. While chop target truncates
 the existing input files from tail, the slap target does the same
 from head.
 
-..	input-validation.rst
+..	_input-validation:
 
 Input validation for *Units*
 ---------------------------------------------------------------------
@@ -473,11 +480,11 @@ However, there is still an issue; a developer who doesn't know a
 target language well may write a broken test input file for the
 language.  Here comes "Input validation."
 
-You can validate the test input files of *Units* with *validate-input*
-make target if a validator for a language is defined.
-
-How to run and an example session
+How to run an example session of input validation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+You can validate the test input files of *Units* with *validate-input*
+make target if a validator or a language is defined.
 
 Here is an example validating an input file for JSON.
 

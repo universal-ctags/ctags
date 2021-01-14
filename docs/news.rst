@@ -10,7 +10,7 @@ Introduced changes
 
 ----
 
-Many changes have been introduced in Universal-ctags. Use git-log to
+Many changes have been introduced in Universal Ctags. Use git-log to
 review changes not enumerated here, especially in language parsers.
 
 New and extended options
@@ -23,26 +23,22 @@ For the purpose of gathering as much as information as possible from
 source code the "wildcard"(``*``) option value has been introduced.
 
 ``--extras=*``
-
 	Enables all extra tags.
 
 ``--fields=*``
-
 	Enables all available fields.
 
 ``--kinds-<LANG>=*``
-
 	Enables all available kinds for ``LANG``.
 
 ``--kinds-all=*``
-
 	Enables all available kinds for all available language parsers.
 
 Long names in kinds, fields, and extra options
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 A letter is used for specifying a kind, a field, or an extra entry.
-In Universal-ctags a name can also be used.
+In Universal Ctags a name can also be used.
 
 Surround the name with braces (`{` and `}`) in values assigned to the
 options, ``--kind-<LANG>=``, ``--fields=``, or ``--extras=``.
@@ -73,27 +69,23 @@ Newly introduced ``-D`` option extends the function provided by
 
 ``-D`` emulates the behaviour of the corresponding gcc option:
 it defines a C preprocessor macro. See `The new C/C++ parser <cxx>`
-for more defailts.
+for more details.
 
 Notice messages and ``--quiet``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-There were 3 classes of message in Exuberant-ctags.
-In addition to them Universal-ctags introduced a new class of message, *notice*.
+There were 3 classes of message in Exuberant Ctags.
+In addition to them Universal Ctags introduced a new class of message, *notice*.
 
 *fatal*
-
 	A critical error has occurred and ctags aborts the execution.
 
 *warning*
-
 	An error has occurred but ctags continues the execution.
 
 *notice* (new)
-
     It is less important than *warning* but more important for users than *verbose*.
 
 *verbose*
-
 	Mainly used for debugging purposes.
 
 Generally the user can ignore *notice* class messages and ``--quiet``
@@ -174,23 +166,21 @@ links to.
 
 Extra tag entries (``--extras``)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-``--extra`` option in Exuberant-ctags is renamed to ``--extras`` (plural) in
-Universal-ctags for making consistent with ``--kinds-<LANG>`` and ``--fields``.
+``--extra`` option in Exuberant Ctags is renamed to ``--extras`` (plural) in
+Universal Ctags for making consistent with ``--kinds-<LANG>`` and ``--fields``.
 
 These extra tag entries are newly introduced.
 
 ``F``
-
 	Replacement for --file-scope.
 
 ``p``
-
 	Include pseudo-tags.
 
 ..
 	NOT REVIEWED YET
 
-Defining an extra
+Defining a parser specific extra
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 A new ``--_extradef-<LANG>=name,description`` option allows you to
@@ -202,10 +192,10 @@ See :ref:`Conditional tagging with extras <extras>` for more details.
 Options for inspecting ctags internals
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Exuberant-ctags provides a way to inspect its internals via
+Exuberant Ctags provides a way to inspect its internals via
 ``--list-kinds``, ``--list-languages``, and ``--list-maps``.
 
-This idea has been expanded in Universal-ctags with
+This idea has been expanded in Universal Ctags with
 ``--list-kinds-full``, ``--list-map-extensions``,  ``--list-extras``,
 ``--list-features``, ``--list-fields``, ``--list-map-patterns``, and
 ``--list-pseudo-tags`` being added.
@@ -232,11 +222,6 @@ header is easy because it starts with a `#` character.
 
 ``--with-list-header=no`` suppresses output of the column header.
 
-Defining a kind
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-See :ref:`ctags-optlib(7) <ctags-optlib(7)>`.
-
 ``--map-<LANG>`` option
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -262,10 +247,10 @@ extensions and patterns.
 Though language `FOO` is added before `BAR`, only `BAR` is set as a
 handler for the spec `*.ABC`.
 
-Universal-ctags enables multiple parsers to be configured for a spec.
+Universal Ctags enables multiple parsers to be configured for a spec.
 The appropriate parser for a given input file can then be chosen by a
-variety of internal guessing strategies (see "Choosing a proper
-parser in ctags").
+variety of internal guessing strategies (see :ref:`Determining file language
+<guessing>`).
 
 Let's see how specs can be mapped non-exclusively with
 ``--map-<LANG>``::
@@ -307,7 +292,7 @@ option in :ref:`ctags(1) <ctags(1)>`.
 Guessing parser from file contents (``-G`` option)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-See :ref:`ctags(1) <ctags(1)>`.
+See :ref:`guessing`.
 
 ``--put-field-prefix`` options
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -324,7 +309,6 @@ See :ref:`ctags(1) <ctags(1)>`.
 
 ``--tag-relative`` option is extend. See :ref:`ctags(1) <ctags(1)>`.
 
-
 ``--exclude-exception``, an option complementing ``--exclude``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -333,7 +317,7 @@ See :ref:`ctags(1) <ctags(1)>`.
 Including line number to pattern field
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-See :ref:`ctags(1) <ctags(1)>`.
+Use ``--excmd=number``.  See :ref:`ctags(1) <ctags(1)>`.
 
 Enabling/disabling pseudo-tags (``--pseudo-tags`` option)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -358,21 +342,13 @@ output. It is changed to ``-d``. This change is not critical because
 
 Instead ``-D`` is used for defining a macro in CPreProcessor parser.
 
-Incompatible changes to file name pattern and extension handling
----------------------------------------------------------------------
-
-See :ref:`ctags-incompatibilities(7) <ctags-incompatibilities(7)>`.
-
 Interactive mode
 ---------------------------------------------------------------------
 
 A new ``--_interactive`` option launches a JSON based command REPL which
 can be used to control ctags generation programmatically.
 
-See :ref:`--_interactive Mode <interactive-mode>` for more details.
-
-``--_interactive=sandbox`` adds up seccomp filter. See
-:ref:`sandbox submode <sandbox-submode>` for more details.
+See :ref:`interactive-mode` for more details.
 
 ..
 	NOT REVIEWED YET
@@ -387,7 +363,7 @@ Defining a subparser
 Basic
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-About the concept of subparser, see :ref:`Tagging definitions of higher(upper) level language (sub/base) <base-sub-parsers>`.
+About the concept of subparser, see :ref:`base-sub-parsers`.
 
 With ``base`` long flag of `--langdef=<LANG>` option, you can define
 a subparser for a specified base parser. Combining with ``--kinddef-<LANG>``
@@ -466,16 +442,20 @@ long flags putting after `--langdef=Foo{base=Bar}`.
 ========================  ======================
 C level notation          Command line long flag
 ========================  ======================
-SUBPARSER_BASE_RUNS_SUB   shared
+SUBPARSER_BASE_RUNS_SUB   shared (default)
 SUBPARSER_SUB_RUNS_BASE   dedicated
 SUBPARSER_BASE_RUNS_SUB   bidirectional
 ========================  ======================
 
+`{shared}` is the default behavior. If none of `{shared}`, `{dedicated}`, nor
+`{bidirectional}` is specified, it implies `{shared}`.
+
 Let's see actual difference of behaviors.
 
 
-The examples are taken from #1409 submitted by @sgraham on github
-Universal-ctags repository.
+The examples are taken from `#1409
+<https://github.com/universal-ctags/ctags/issues/1409>`_ submitted by @sgraham on
+github Universal Ctags repository.
 
 `input.cc` and `input.mojom` are input files, and have the same
 contents::
@@ -514,10 +494,6 @@ tags for `input.mojom`::
 
 Mojom parser uses C++ parser internally but tags captured by C++ parser are
 dropped in the output.
-
-`{shared}` is the default behavior. If none of `{shared}`, `{dedicated}`, nor
-`{bidirectional}` is specified, it implies `{shared}`.
-
 
 dedicated combination
 .........................................................................
@@ -587,7 +563,7 @@ Changes to the tags file format
 ``F`` kind usage
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-You cannot use ``F`` (``file``) kind in your .ctags because Universal-ctags
+You cannot use ``F`` (``file``) kind in your .ctags because Universal Ctags
 reserves it. See :ref:`ctags-incompatibilities(7) <ctags-incompatibilities(7)>`.
 
 Reference tags
@@ -596,10 +572,11 @@ Reference tags
 Traditionally ctags collects the information for locating where a
 language object is DEFINED.
 
-In addition Universal-ctags supports reference tags. If the extra-tag
-``r`` is enabled, Universal-ctags also collects the information for
+In addition Universal Ctags supports reference tags. If the extra-tag
+``r`` is enabled, Universal Ctags also collects the information for
 locating where a language object is REFERENCED. This feature was
-proposed by @shigio in #569 for GNU GLOBAL.
+proposed by @shigio in `#569
+<https://github.com/universal-ctags/ctags/issues/569>`_ for GNU GLOBAL.
 
 Here are some examples. Here is the target input file named reftag.c.
 
@@ -642,11 +619,11 @@ Output with the extra-tag ``r`` enabled:
 
 `#undef X` and two `#include` are newly collected.
 
-"roles" is a newly introduced field in Universal-ctags. The field
+"roles" is a newly introduced field in Universal Ctags. The field
 named is for recording how a tag is referenced. If a tag is definition
 tag, the roles field has "def" as its value.
 
-Universal-ctags prints the role information when the `r`
+Universal Ctags prints the role information when the `r`
 field is enabled with ``--fields=+r``.
 
 .. code-block:: console
@@ -679,7 +656,7 @@ used for the new reference tags. The field can be used only with
     R stdio.h             1 reftag.c         #include <stdio.h>
 
 See :ref:`Customizing xref output <xformat>` for more details about
-this option.
+``--_xformat``.
 
 Although the facility for collecting reference tags is implemented,
 only a few parsers currently utilize it. All available roles can be
@@ -706,6 +683,8 @@ listed with ``--list-roles``:
     LdScript       i/inputSection    discarded           on      discarded when linking
     ...
 
+.. NOTE: --xformat is the only way to extract referenced tag
+
 The first column shows the name of the parser.
 The second column shows the letter/name of the kind.
 The third column shows the name of the role.
@@ -727,6 +706,7 @@ Pseudo-tags
 See :ref:`ctags-client-tools(7) <ctags-client-tools(7)>` about the
 concept of the pseudo-tags.
 
+.. TODO move the following contents to ctags-client-tools(7).
 
 ``TAG_KIND_DESCRIPTION``
 .........................................................................
@@ -830,7 +810,7 @@ See also :ref:`Compatible output and weakness <compat-output>`.
 Truncating the pattern for long input lines
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-See :ref:`ctags(1) <ctags(1)>`.
+See ``--pattern-length-limit=N`` option in :ref:`ctags(1) <ctags(1)>`.
 
 .. _parser-specific-fields:
 
@@ -841,9 +821,10 @@ A tag has a `name`, an `input` file name, and a `pattern` as basic
 information. Some fields like `language:`, `signature:`, etc are
 attached to the tag as optional information.
 
-In Exuberant-ctags, fields are common to all languages.
-Universal-ctags extends the concept of fields; a parser can define
-its specific field. This extension was proposed by @pragmaware in #857.
+In Exuberant Ctags, fields are common to all languages.
+Universal Ctags extends the concept of fields; a parser can define
+its specific field. This extension was proposed by @pragmaware in
+`#857 <https://github.com/universal-ctags/ctags/issues/857>`_.
 
 For implementing the parser specific fields, the options for listing and
 enabling/disabling fields are also extended.
@@ -911,10 +892,10 @@ only fields owned by parsers but also common fields having the name
 specified (`end` in this example) are enabled/disabled.
 
 Using the wild card notation to specify the language is helpful to
-avoid incompatibilities between versions of Universal-ctags itself
+avoid incompatibilities between versions of Universal Ctags itself
 (SELF INCOMPATIBLY).
 
-In Universal-ctags development, a parser developer may add a new
+In Universal Ctags development, a parser developer may add a new
 parser specific field for a certain language.  Sometimes other developers
 then recognize it is meaningful not only for the original language
 but also other languages. In this case the field may be promoted to a
@@ -933,11 +914,11 @@ Parser specific extras
 
 .. NOT REVIEWED YET
 
-As man page of Exuberant-ctags says, ``--extras`` option specifies
+As man page of Exuberant Ctags says, ``--extras`` option specifies
 whether to include extra tag entries for certain kinds of information.
-This option is available in Universal-ctags, too.
+This option is available in Universal Ctags, too.
 
-In Universal-ctags it is extended; a parser can define its specific
+In Universal Ctags it is extended; a parser can define its specific
 extra flags. They can be controlled with ``--extras-<LANG>=[+|-]{...}``.
 
 See some examples:
@@ -987,7 +968,7 @@ Discussion
 (This subsection should move to somewhere for developers.)
 
 The question is what are extra tag entries. As far as I know none has
-answered explicitly. I have two ideas in Universal-ctags. I
+answered explicitly. I have two ideas in Universal Ctags. I
 write "ideas", not "definitions" here because existing parsers don't
 follow the ideas. They are kept as is in variety reasons but the
 ideas may be good guide for people who wants to write a new parser
@@ -1269,9 +1250,9 @@ the elements of the format.
 .. TODO: An example of using WILDCARD
 
 
-Changes imported from Exuberant-ctags
+Changes imported from Exuberant Ctags
 ---------------------------------------------------------------------
-See "Exuberant-ctags" in "Tracking other projects" for detailed
+See "Exuberant Ctags" in "Tracking other projects" for detailed
 information regarding imported changes.
 
 Some changes have also been imported from Fedora and Debian.
@@ -1321,7 +1302,7 @@ The following parsers have been added:
 * Markdown *optlib*
 * Maven2 *libxml*
 * MesonBuild (Meson) *optlib*
-* Moose *perl basesd subperser*
+* Moose *perl based subparser*
 * Myrddin
 * M4
 * NSIS
@@ -1337,14 +1318,14 @@ The following parsers have been added:
 * QemuHX *optlib*
 * QtMoc
 * R
-* R6Class *R based subperser*
+* R6Class *R based subparser*
 * RelaxNG *libxml*
 * ReStructuredText
 * Robot
 * RpmSpec
 * RSpec *optlib*
 * Rust
-* S4Class *R based subperser*
+* S4Class *R based subparser*
 * SCSS *optlib*
 * SystemdUnit
 * SystemTap *optlib*
@@ -1362,12 +1343,12 @@ The following parsers have been added:
 * YumRepo
 * Zephir
 
-See "Option library" for details on *optlib*.
+See :ref:`optlib` for details on *optlib*.
 Libxml2 is required to use the parser(s) marked with *libxml*.
 Libyaml is required to use the parser(s) marked with *libyaml*.
 
 TIPS: you can list newly introduced parsers if you also have
-Exuberant-ctags installed with following command line:
+Exuberant Ctags installed with following command line:
 
 .. code-block:: console
 
@@ -1388,7 +1369,7 @@ Fully improved parsers
 Automatically expanding CPreProcessor macros defined in the same input file (HIGHLY EXPERIMENTAL)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-See `The new C/C++ parser <cxx>` for more defailts.
+See :ref:`The new C/C++ parser <cxx>` for more details.
 
 Readtags
 ---------------------------------------------------------------------

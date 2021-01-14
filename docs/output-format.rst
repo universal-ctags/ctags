@@ -10,7 +10,7 @@ The command line option ``--output-format=``\ *format* chooses an output format.
 Supported *format* are ``u-ctags``, ``e-ctags``, ``etags``, ``xref``, and ``json``.
 
 ``u-ctags``, ``e-ctags``
-	``u-ctags`` is the default output format extending the Exuberant-ctags
+	``u-ctags`` is the default output format extending the Exuberant Ctags
 	output format (``e-ctags``).
 
 	``--format=1`` and ``--format=2`` are same as ``--output-format=e-ctags``
