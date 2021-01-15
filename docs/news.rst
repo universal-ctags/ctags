@@ -915,23 +915,6 @@ All available parameters can be listed with ``--list-params`` option.
 
 (At this time only CPreProcessor parser has parameters.)
 
-JSON output
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. XREF TODO
-
-Experimental JSON output has been added. ``--output-format`` can be
-used to enable it.
-
-.. code-block:: console
-
-   $ ./ctags --output-format=json --fields=-s /tmp/foo.py
-   {"_type": "tag", "name": "Foo", "path": "/tmp/foo.py", "pattern": "/^class Foo:$/", "kind": "class"}
-   {"_type": "tag", "name": "doIt", "path": "/tmp/foo.py", "pattern": "/^    def doIt():$/", "kind": "member"}
-
-
-See :ref:`JSON output <output-json>` for more details.
-
 Changes imported from Exuberant Ctags
 ---------------------------------------------------------------------
 See "Exuberant Ctags" in "Tracking other projects" for detailed
