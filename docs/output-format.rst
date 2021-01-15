@@ -14,7 +14,7 @@ Supported *format* are ``u-ctags``, ``e-ctags``, ``etags``, ``xref``, and ``json
 	output format (``e-ctags``).
 
 	``--format=1`` and ``--format=2`` are same as ``--output-format=e-ctags``
-	and ``--output-format=e-ctags`` respectively.
+	and ``--output-format=u-ctags`` respectively.
 
 	See man page :ref:`tags (5) <tags(5)>` for details. The difference between
 	``u-ctags`` and ``e-ctags`` are marked as "EXCEPTION".
