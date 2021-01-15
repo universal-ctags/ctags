@@ -26,15 +26,11 @@ jobs:
     - name: update package information
       run: brew update
     - name: install tools and libraries
-      # gdb and docutils need python@3.9.
-      # python@3.9 is not installed expectedly via gdb or docutils.
-      # Therefore we install libxml2 before installing before
-      # installing gdb and docutils. python@3.9 is installed well
-      # via libxml2.
       run: |
-        brew install autoconf automake pkg-config jansson libyaml bash
-        brew install libxml2 || brew link --overwrite libxml2
-        brew install gdb docutils
+        # libxml2 requires python@3.9.
+        # However, the request is not satisfied with just installing libxml2.
+        brew install libxml2 || brew link --overwrite python@3.9
+        brew install autoconf automake pkg-config jansson libyaml bash gdb docutils
     - name: autogen.sh
       run: ./autogen.sh
     - name: report the version of cc
